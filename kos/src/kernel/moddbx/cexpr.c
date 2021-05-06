@@ -871,9 +871,10 @@ do_second_pass:
 			/* Convert to l-value */
 			union {
 				uintptr_t p;
-				byte_t buf[CFI_UNWIND_REGISTER_MAXSIZE];
+				byte_t buf[CFI_REGISTER_MAXSIZE];
 			} regval;
-			if unlikely(!dbg_getreg((void *)(uintptr_t)DBG_REGLEVEL_VIEW, ste_top.s_register, regval.buf))
+			if unlikely(!dbg_getreg((void *)(uintptr_t)DBG_REGLEVEL_VIEW,
+			                        ste_top.s_register, regval.buf))
 				goto done;
 			lvalue = (byte_t *)regval.p + ste_top.s_regoffset;
 		}

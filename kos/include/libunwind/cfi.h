@@ -35,26 +35,26 @@
 #endif /* !Arch... */
 
 
-#ifndef CFI_UNWIND_COMMON_REGISTER_COUNT
+#ifndef CFI_UNWIND_COMMON_REGISTER_MAXCOUNT
 #define CFI_UNWIND_NO_COMMON_UNCOMMON_REGISTERS      1
-#define CFI_UNWIND_COMMON_REGISTER_COUNT             CFI_UNWIND_REGISTER_COUNT
-#define CFI_UNWIND_UNCOMMON_REGISTER_COUNT           0
+#define CFI_UNWIND_COMMON_REGISTER_MAXCOUNT          CFI_UNWIND_REGISTER_MAXCOUNT
+#define CFI_UNWIND_UNCOMMON_REGISTER_MAXCOUNT        0
 #define CFI_UNWIND_COMMON_REGISTER_SP                CFI_UNWIND_REGISTER_SP
 #define cfi_unwind_register_dw2common(dw_regno)      (dw_regno)
 #define cfi_unwind_register_dw2uncommon(dw_regno)    0
 #define cfi_unwind_register_common2dw(com_regno)     (com_regno)
-#define cfi_unwind_register_uncommon2dw(uncom_regno) CFI_UNWIND_REGISTER_COUNT
-#endif /* !CFI_UNWIND_COMMON_REGISTER_COUNT */
+#define cfi_unwind_register_uncommon2dw(uncom_regno) CFI_UNWIND_REGISTER_MAXCOUNT
+#endif /* !CFI_UNWIND_COMMON_REGISTER_MAXCOUNT */
 
 #if (defined(CFI_UNWIND_COMMON_REGISTER_SP) + \
      defined(CFI_UNWIND_UNCOMMON_REGISTER_SP)) != 1
 #error "Need exactly one of `CFI_UNWIND_COMMON_REGISTER_SP' or `CFI_UNWIND_UNCOMMON_REGISTER_SP'"
 #endif
 
-#ifndef CFI_UNWIND_SIGFRAME_COMMON_REGISTER_COUNT
+#ifndef CFI_UNWIND_SIGFRAME_COMMON_REGISTER_MAXCOUNT
 #define CFI_UNWIND_NO_SIGFRAME_COMMON_UNCOMMON_REGISTERS 1
-#define CFI_UNWIND_SIGFRAME_COMMON_REGISTER_COUNT   CFI_UNWIND_COMMON_REGISTER_COUNT
-#define CFI_UNWIND_SIGFRAME_UNCOMMON_REGISTER_COUNT CFI_UNWIND_UNCOMMON_REGISTER_COUNT
+#define CFI_UNWIND_SIGFRAME_COMMON_REGISTER_MAXCOUNT   CFI_UNWIND_COMMON_REGISTER_MAXCOUNT
+#define CFI_UNWIND_SIGFRAME_UNCOMMON_REGISTER_MAXCOUNT CFI_UNWIND_UNCOMMON_REGISTER_MAXCOUNT
 #ifdef CFI_UNWIND_COMMON_REGISTER_SP
 #define CFI_UNWIND_SIGFRAME_COMMON_REGISTER_SP      CFI_UNWIND_COMMON_REGISTER_SP
 #else /* CFI_UNWIND_COMMON_REGISTER_SP */
@@ -64,16 +64,16 @@
 #define cfi_unwind_sigframe_register_dw2uncommon    cfi_unwind_register_dw2uncommon
 #define cfi_unwind_sigframe_register_common2dw      cfi_unwind_register_common2dw
 #define cfi_unwind_sigframe_register_uncommon2dw    cfi_unwind_register_uncommon2dw
-#endif /* !CFI_UNWIND_COMMON_REGISTER_COUNT */
+#endif /* !CFI_UNWIND_COMMON_REGISTER_MAXCOUNT */
 
 #if (defined(CFI_UNWIND_SIGFRAME_COMMON_REGISTER_SP) + \
      defined(CFI_UNWIND_SIGFRAME_UNCOMMON_REGISTER_SP)) != 1
 #error "Need exactly one of `CFI_UNWIND_SIGFRAME_COMMON_REGISTER_SP' or `CFI_UNWIND_SIGFRAME_UNCOMMON_REGISTER_SP'"
 #endif
-#ifndef CFI_UNWIND_LANDING_COMMON_REGISTER_COUNT
+#ifndef CFI_UNWIND_LANDING_COMMON_REGISTER_MAXCOUNT
 #define CFI_UNWIND_NO_LANDING_COMMON_UNCOMMON_REGISTERS 1
-#define CFI_UNWIND_LANDING_COMMON_REGISTER_COUNT   CFI_UNWIND_COMMON_REGISTER_COUNT
-#define CFI_UNWIND_LANDING_UNCOMMON_REGISTER_COUNT CFI_UNWIND_UNCOMMON_REGISTER_COUNT
+#define CFI_UNWIND_LANDING_COMMON_REGISTER_MAXCOUNT   CFI_UNWIND_COMMON_REGISTER_MAXCOUNT
+#define CFI_UNWIND_LANDING_UNCOMMON_REGISTER_MAXCOUNT CFI_UNWIND_UNCOMMON_REGISTER_MAXCOUNT
 #ifdef CFI_UNWIND_COMMON_REGISTER_SP
 #define CFI_UNWIND_LANDING_COMMON_REGISTER_SP      CFI_UNWIND_COMMON_REGISTER_SP
 #else /* CFI_UNWIND_COMMON_REGISTER_SP */
@@ -83,7 +83,7 @@
 #define cfi_unwind_landing_register_dw2uncommon    cfi_unwind_register_dw2uncommon
 #define cfi_unwind_landing_register_common2dw      cfi_unwind_register_common2dw
 #define cfi_unwind_landing_register_uncommon2dw    cfi_unwind_register_uncommon2dw
-#endif /* !CFI_UNWIND_COMMON_REGISTER_COUNT */
+#endif /* !CFI_UNWIND_COMMON_REGISTER_MAXCOUNT */
 
 #if (defined(CFI_UNWIND_LANDING_COMMON_REGISTER_SP) + \
      defined(CFI_UNWIND_LANDING_UNCOMMON_REGISTER_SP)) != 1
@@ -743,25 +743,25 @@ __NOTHROW_NCX(LIBUNWIND_CC unwind_ste_addr)(unwind_ste_t const *__restrict __sel
  * @return: UNWIND_INVALID_REGISTER:             Invalid register referenced by `self'
  * @return: UNWIND_EMULATOR_ILLEGAL_INSTRUCTION: Invalid stack-value type in `self'
  * @return: UNWIND_SEGFAULT:                     Attempted to access faulty memory. */
-typedef __ATTR_NONNULL((1, 2, 4)) unsigned int
-/*__NOTHROW_NCX*/ (LIBUNWIND_CC *PUNWIND_STE_READ)(unwind_ste_t const *__restrict __self,
+typedef __ATTR_NONNULL((1, 3, 5)) unsigned int
+/*__NOTHROW_NCX*/ (LIBUNWIND_CC *PUNWIND_STE_READ)(unwind_ste_t const *__restrict __self, __uint8_t __addrsize,
                                                    unwind_getreg_t __regget, void const *__regget_arg,
                                                    void *__restrict __dst, __size_t __num_bits,
                                                    unsigned int __dst_left_shift, unsigned int __src_left_shift);
-typedef __ATTR_NONNULL((1, 2, 4, 6)) unsigned int
-/*__NOTHROW_NCX*/ (LIBUNWIND_CC *PUNWIND_STE_WRITE)(unwind_ste_t const *__restrict __self,
+typedef __ATTR_NONNULL((1, 3, 7)) unsigned int
+/*__NOTHROW_NCX*/ (LIBUNWIND_CC *PUNWIND_STE_WRITE)(unwind_ste_t const *__restrict __self, __uint8_t __addrsize,
                                                     /*[1..1]*/ unwind_getreg_t __regget, void const *__regget_arg,
                                                     /*[0..1]*/ unwind_setreg_t __regset, void *__regset_arg,
                                                     void const *__restrict __src, __size_t __num_bits,
                                                     unsigned int __dst_left_shift, unsigned int __src_left_shift);
 #ifdef LIBUNWIND_WANT_PROTOTYPES
-LIBUNWIND_DECL __ATTR_NONNULL((1, 2, 4)) unsigned int
-__NOTHROW_NCX(LIBUNWIND_CC unwind_ste_read)(unwind_ste_t const *__restrict __self,
+LIBUNWIND_DECL __ATTR_NONNULL((1, 3, 5)) unsigned int
+__NOTHROW_NCX(LIBUNWIND_CC unwind_ste_read)(unwind_ste_t const *__restrict __self, __uint8_t __addrsize,
                                             unwind_getreg_t __regget, void const *__regget_arg,
                                             void *__restrict __dst, __size_t __num_bits,
                                             unsigned int __dst_left_shift, unsigned int __src_left_shift);
-LIBUNWIND_DECL __ATTR_NONNULL((1, 2, 6)) unsigned int
-__NOTHROW_NCX(LIBUNWIND_CC unwind_ste_write)(unwind_ste_t const *__restrict __self,
+LIBUNWIND_DECL __ATTR_NONNULL((1, 3, 7)) unsigned int
+__NOTHROW_NCX(LIBUNWIND_CC unwind_ste_write)(unwind_ste_t const *__restrict __self, __uint8_t __addrsize,
                                              /*[1..1]*/ unwind_getreg_t __regget, void const *__regget_arg,
                                              /*[0..1]*/ unwind_setreg_t __regset, void *__regset_arg,
                                              void const *__restrict __src, __size_t __num_bits,

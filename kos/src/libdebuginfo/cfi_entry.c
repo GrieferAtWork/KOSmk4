@@ -113,10 +113,10 @@ nope:
 #endif /* !__KERNEL__ */
 
 struct unwind_register {
-	unwind_regno_t ur_regno;                             /* Register number. */
+	unwind_regno_t ur_regno;                      /* Register number. */
 	union {
-		byte_t     ur_data[CFI_UNWIND_REGISTER_MAXSIZE]; /* Unwind register data. */
-		uintptr_t  ur_word;                              /* Unwind register data word. */
+		byte_t     ur_data[CFI_REGISTER_MAXSIZE]; /* Unwind register data. */
+		uintptr_t  ur_word;                       /* Unwind register data word. */
 	};
 };
 
@@ -260,7 +260,7 @@ NOTHROW_NCX(LIBUNWIND_CC after_unwind_getreg)(/*struct cfientry **/ void const *
 	BSEARCH(i, self->ce_unwind_regv, self->ce_unwind_regc, .ur_regno, dw_regno) {
 		/* Found it! */
 		memcpy(dst, self->ce_unwind_regv[i].ur_data,
-		       CFI_REGISTER_SIZE(dw_regno));
+		       CFI_REGISTER_SIZE(self->ce_emulator->ue_addrsize, dw_regno));
 		return UNWIND_SUCCESS;
 	}
 	/* Forward the request to the underlying register accessor function. */
@@ -496,7 +496,7 @@ NOTHROW_NCX(CC cfientry_loadmodule)(struct cfientry *__restrict self) {
 	}
 
 	/* Lookup an override for the PC register. */
-	pc_register = find_register(self, CFI_UNWIND_REGISTER_PC);
+	pc_register = find_register(self, CFI_UNWIND_REGISTER_PC(self->ce_emulator->ue_addrsize));
 	if unlikely(!pc_register)
 		goto noinfo_fail;
 	self->ce_module = module_fromaddr_nx((void const *)pc_register->ur_word);
@@ -743,7 +743,7 @@ again_runexpr:
 	emulator.ue_ptrsize            = self->ce_parser.dup_ptrsize;
 	emulator.ue_piecewrite         = 0;
 	emulator.ue_piecebuf           = (byte_t *)dst;
-	emulator.ue_piecesiz           = CFI_REGISTER_SIZE(dw_regno);
+	emulator.ue_piecesiz           = CFI_REGISTER_SIZE(emulator.ue_addrsize, dw_regno);
 	emulator.ue_piecebits          = 0;
 	emulator.ue_call_frame_cfa     = 0;
 	emulator.ue_cu                 = &self->cr_cu;
@@ -758,8 +758,8 @@ again_runexpr:
 	if (error == UNWIND_SUCCESS) {
 		if (deref_expression_result) {
 			/* Read from the pointed-to memory location of stack-top to fill in the rest. */
-			error = unwind_ste_read(&top, &after_unwind_getreg, self, dst,
-			                        CFI_REGISTER_SIZE(dw_regno) * NBBY,
+			error = unwind_ste_read(&top, emulator.ue_addrsize, &after_unwind_getreg, self, dst,
+			                        CFI_REGISTER_SIZE(emulator.ue_addrsize, dw_regno) * NBBY,
 			                        emulator.ue_piecebits, 0);
 		} else {
 			void *addr;
@@ -847,7 +847,7 @@ NOTHROW_NCX(LIBUNWIND_CC cfi_getreg)(/*struct cfientry **/ void const *arg,
 	BSEARCH(i, self->ce_unwind_regv, self->ce_unwind_regc, .ur_regno, dw_regno) {
 		/* Found it! */
 		memcpy(dst, self->ce_unwind_regv[i].ur_data,
-		       CFI_REGISTER_SIZE(dw_regno));
+		       CFI_REGISTER_SIZE(self->ce_emulator->ue_addrsize, dw_regno));
 		return UNWIND_SUCCESS;
 	}
 
@@ -941,7 +941,7 @@ NOTHROW_NCX(CC make_rvalue)(unwind_emulator_t *__restrict self,
                             unwind_ste_t *__restrict ste) {
 	union {
 		uintptr_t p;
-		byte_t buf[CFI_UNWIND_REGISTER_MAXSIZE];
+		byte_t buf[CFI_REGISTER_MAXSIZE];
 	} regval;
 	switch (ste->s_type) {
 
@@ -990,8 +990,8 @@ cfi_entry_init_setreg(void *arg,
 			lo = index + 1;
 		} else {
 			/* Register had been set before. - Just override its old data-entry. */
-			memcpy(self->ce_unwind_regv[index].ur_data,
-			       src, CFI_REGISTER_SIZE(dw_regno));
+			memcpy(self->ce_unwind_regv[index].ur_data, src,
+			       CFI_REGISTER_SIZE(self->ce_emulator->ue_addrsize, dw_regno));
 			return UNWIND_SUCCESS;
 		}
 	}
@@ -1004,8 +1004,8 @@ cfi_entry_init_setreg(void *arg,
 		          self->ce_unwind_regc - index,
 		          sizeof(struct unwind_register));
 		self->ce_unwind_regv[index].ur_regno = dw_regno;
-		memcpy(self->ce_unwind_regv[index].ur_data,
-		       src, CFI_REGISTER_SIZE(dw_regno));
+		memcpy(self->ce_unwind_regv[index].ur_data, src,
+		       CFI_REGISTER_SIZE(self->ce_emulator->ue_addrsize, dw_regno));
 	}
 
 	/* Track the # of unwind registers. */
@@ -1025,11 +1025,11 @@ NOTHROW_NCX(CC cfientry_init)(struct cfientry *__restrict self,
                               void const *regget_arg) {
 	unsigned int result;
 	union {
-		byte_t buf[CFI_REGISTER_SIZE(CFI_UNWIND_REGISTER_PC)];
+		byte_t buf[CFI_REGISTER_MAXSIZE];
 		void *pc;
 	} pc_buf;
 	/* Lookup the origin PC (which we need for unwinding to the call-site) */
-	result = (*regget)(regget_arg, CFI_UNWIND_REGISTER_PC, pc_buf.buf);
+	result = (*regget)(regget_arg, CFI_UNWIND_REGISTER_PC(self->ce_emulator->ue_addrsize), pc_buf.buf);
 	if likely(result == UNWIND_SUCCESS) {
 		/* Use unwind_for_debug(3) because we can. */
 		result = libdi_unwind_for_debug(pc_buf.pc, regget, regget_arg,

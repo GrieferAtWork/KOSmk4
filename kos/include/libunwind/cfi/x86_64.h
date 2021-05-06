@@ -27,15 +27,16 @@
 #include <hybrid/typecore.h>
 
 /* x86_64-specific CFI constants. */
-#define CFI_X86_64_UNWIND_REGISTER_SIZE      8
-#define CFI_X86_64_UNWIND_FPU_REGISTER_SIZE  16
+#define CFI_X86_64_UNWIND_GPR_REGISTER_SIZE 8
+#define CFI_X86_64_UNWIND_FPU_REGISTER_SIZE 16
 #define CFI_X86_64_UNWIND_IS_FPU_REGISTER(regno)                                                  \
 	(((regno) >= CFI_X86_64_UNWIND_REGISTER_XMM0 && (regno) <= CFI_X86_64_UNWIND_REGISTER_MM7) || \
 	 ((regno) >= CFI_X86_64_UNWIND_REGISTER_XMM16 && (regno) <= CFI_X86_64_UNWIND_REGISTER_XMM31))
+#define CFI_X86_64_REGISTER_MAXSIZE 16
 #define CFI_X86_64_REGISTER_SIZE(regno)       \
 	(CFI_X86_64_UNWIND_IS_FPU_REGISTER(regno) \
 	 ? CFI_X86_64_UNWIND_FPU_REGISTER_SIZE    \
-	 : CFI_X86_64_UNWIND_REGISTER_SIZE)
+	 : CFI_X86_64_UNWIND_GPR_REGISTER_SIZE)
 
 #define CFI_X86_64_UNWIND_REGISTER_PC        CFI_X86_64_UNWIND_REGISTER_RIP /* The register containing the program counter. */
 #define CFI_X86_64_UNWIND_REGISTER_SP        CFI_X86_64_UNWIND_REGISTER_RSP /* The register for the CFA. */
@@ -448,71 +449,86 @@ printArrayDefineMacro("DEFINE_cfi_x86_64_unwind_landing_register_dw2uncommon", g
 printArrayDefineMacro("DEFINE_cfi_x86_64_unwind_landing_register_common2dw", generateArrayMapping(macros, "CFI_X86_64_UNWIND_LANDING_COMMON_REGISTER_", "CFI_X86_64_UNWIND_REGISTER_"));
 printArrayDefineMacro("DEFINE_cfi_x86_64_unwind_landing_register_uncommon2dw", generateArrayMapping(macros, "CFI_X86_64_UNWIND_LANDING_UNCOMMON_REGISTER_", "CFI_X86_64_UNWIND_REGISTER_"));
 ]]]*/
-#define DEFINE_cfi_x86_64_unwind_register_dw2common(name)                             \
-	__UINT8_TYPE__ const name[17] = { 7, 7, 7, 0, 7, 7, 1, 7, 7, 7, 7, 7, 2, 3, 4, 5, \
-	                                  6 }
-#define DEFINE_cfi_x86_64_unwind_register_dw2uncommon(name)                                            \
-	__UINT8_TYPE__ const name[126] = { 0,  1,  2,  80, 3,  4,  80, 5,  6,  7,  8,  9,  80, 80, 80, 80, \
-	                                   80, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24, \
-	                                   25, 26, 27, 28, 29, 30, 31, 32, 33, 34, 35, 36, 37, 38, 39, 40, \
-	                                   41, 42, 43, 44, 45, 46, 47, 48, 80, 80, 49, 50, 80, 80, 51, 52, \
-	                                   53, 54, 55, 56, 57, 58, 59, 60, 61, 62, 63, 64, 65, 66, 67, 68, \
-	                                   69, 70, 71, 80, 80, 80, 80, 80, 80, 80, 80, 80, 80, 80, 80, 80, \
-	                                   80, 80, 80, 80, 80, 80, 80, 80, 80, 80, 80, 80, 80, 80, 80, 80, \
-	                                   80, 80, 80, 80, 80, 80, 72, 73, 74, 75, 76, 77, 78, 79 }
+#define DEFINE_cfi_x86_64_unwind_register_dw2common(name)                                                              \
+	__UINT8_TYPE__ const name[127] = { 255, 255, 255, 0,   255, 255, 1,   255, 255, 255, 255, 255, 2,   3,   4,   5,   \
+	                                   6,   255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, \
+	                                   255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, \
+	                                   255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, \
+	                                   255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, \
+	                                   255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, \
+	                                   255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, \
+	                                   255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 7 }
+#define DEFINE_cfi_x86_64_unwind_register_dw2uncommon(name)                                                            \
+	__UINT8_TYPE__ const name[127] = { 0,   1,   2,   255, 3,   4,   255, 5,   6,   7,   8,   9,   255, 255, 255, 255, \
+	                                   255, 10,  11,  12,  13,  14,  15,  16,  17,  18,  19,  20,  21,  22,  23,  24,  \
+	                                   25,  26,  27,  28,  29,  30,  31,  32,  33,  34,  35,  36,  37,  38,  39,  40,  \
+	                                   41,  42,  43,  44,  45,  46,  47,  48,  255, 255, 49,  50,  255, 255, 51,  52,  \
+	                                   53,  54,  55,  56,  57,  58,  59,  60,  61,  62,  63,  64,  65,  66,  67,  68,  \
+	                                   69,  70,  71,  255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, \
+	                                   255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, \
+	                                   255, 255, 255, 255, 255, 255, 72,  73,  74,  75,  76,  77,  78,  79,  80 }
 #define DEFINE_cfi_x86_64_unwind_register_common2dw(name) \
-	__UINT8_TYPE__ const name[7] = { 3, 6, 12, 13, 14, 15, 16 }
+	__UINT8_TYPE__ const name[8] = { 3, 6, 12, 13, 14, 15, 16, 126 }
 #define DEFINE_cfi_x86_64_unwind_register_uncommon2dw(name)                                                           \
-	__UINT8_TYPE__ const name[80] = { 0,   1,   2,   4,   5,   7,   8,   9,   10,  11,  17,  18,  19,  20,  21,  22,  \
+	__UINT8_TYPE__ const name[81] = { 0,   1,   2,   4,   5,   7,   8,   9,   10,  11,  17,  18,  19,  20,  21,  22,  \
 	                                  23,  24,  25,  26,  27,  28,  29,  30,  31,  32,  33,  34,  35,  36,  37,  38,  \
 	                                  39,  40,  41,  42,  43,  44,  45,  46,  47,  48,  49,  50,  51,  52,  53,  54,  \
 	                                  55,  58,  59,  62,  63,  64,  65,  66,  67,  68,  69,  70,  71,  72,  73,  74,  \
-	                                  75,  76,  77,  78,  79,  80,  81,  82,  118, 119, 120, 121, 122, 123, 124, 125 }
-#define DEFINE_cfi_x86_64_unwind_sigframe_register_dw2common(name)                                    \
-	__UINT8_TYPE__ const name[60] = { 0,  1,  2,  3,  4,  5,  6,  7,  8,  9,  10, 11, 12, 13, 14, 15, \
-	                                  16, 26, 26, 26, 26, 26, 26, 26, 26, 26, 26, 26, 26, 26, 26, 26, \
-	                                  26, 26, 26, 26, 26, 26, 26, 26, 26, 26, 26, 26, 26, 26, 26, 26, \
-	                                  26, 17, 18, 19, 20, 21, 22, 23, 26, 26, 24, 25 }
-#define DEFINE_cfi_x86_64_unwind_sigframe_register_dw2uncommon(name)                                   \
-	__UINT8_TYPE__ const name[126] = { 61, 61, 61, 61, 61, 61, 61, 61, 61, 61, 61, 61, 61, 61, 61, 61, \
-	                                   61, 0,  1,  2,  3,  4,  5,  6,  7,  8,  9,  10, 11, 12, 13, 14, \
-	                                   15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29, 30, \
-	                                   31, 61, 61, 61, 61, 61, 61, 61, 61, 61, 61, 61, 61, 61, 32, 33, \
-	                                   34, 35, 36, 37, 38, 39, 40, 41, 42, 43, 44, 45, 46, 47, 48, 49, \
-	                                   50, 51, 52, 61, 61, 61, 61, 61, 61, 61, 61, 61, 61, 61, 61, 61, \
-	                                   61, 61, 61, 61, 61, 61, 61, 61, 61, 61, 61, 61, 61, 61, 61, 61, \
-	                                   61, 61, 61, 61, 61, 61, 53, 54, 55, 56, 57, 58, 59, 60 }
-#define DEFINE_cfi_x86_64_unwind_sigframe_register_common2dw(name)                                    \
-	__UINT8_TYPE__ const name[26] = { 0,  1,  2,  3,  4,  5,  6,  7,  8,  9,  10, 11, 12, 13, 14, 15, \
-	                                  16, 49, 50, 51, 52, 53, 54, 55, 58, 59 }
+	                                  75,  76,  77,  78,  79,  80,  81,  82,  118, 119, 120, 121, 122, 123, 124, 125, \
+	                                  126 }
+#define DEFINE_cfi_x86_64_unwind_sigframe_register_dw2common(name)                                                     \
+	__UINT8_TYPE__ const name[127] = { 0,   1,   2,   3,   4,   5,   6,   7,   8,   9,   10,  11,  12,  13,  14,  15,  \
+	                                   16,  255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, \
+	                                   255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, \
+	                                   255, 17,  18,  19,  20,  21,  22,  23,  255, 255, 24,  25,  255, 255, 255, 255, \
+	                                   255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, \
+	                                   255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, \
+	                                   255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, \
+	                                   255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 26 }
+#define DEFINE_cfi_x86_64_unwind_sigframe_register_dw2uncommon(name)                                                   \
+	__UINT8_TYPE__ const name[127] = { 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, \
+	                                   255, 0,   1,   2,   3,   4,   5,   6,   7,   8,   9,   10,  11,  12,  13,  14,  \
+	                                   15,  16,  17,  18,  19,  20,  21,  22,  23,  24,  25,  26,  27,  28,  29,  30,  \
+	                                   31,  255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 32,  33,  \
+	                                   34,  35,  36,  37,  38,  39,  40,  41,  42,  43,  44,  45,  46,  47,  48,  49,  \
+	                                   50,  51,  52,  255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, \
+	                                   255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, \
+	                                   255, 255, 255, 255, 255, 255, 53,  54,  55,  56,  57,  58,  59,  60,  61 }
+#define DEFINE_cfi_x86_64_unwind_sigframe_register_common2dw(name)                                                    \
+	__UINT8_TYPE__ const name[27] = { 0,   1,   2,   3,   4,   5,   6,   7,   8,   9,   10,  11,  12,  13,  14,  15,  \
+	                                  16,  49,  50,  51,  52,  53,  54,  55,  58,  59,  126 }
 #define DEFINE_cfi_x86_64_unwind_sigframe_register_uncommon2dw(name)                                                  \
-	__UINT8_TYPE__ const name[61] = { 17,  18,  19,  20,  21,  22,  23,  24,  25,  26,  27,  28,  29,  30,  31,  32,  \
+	__UINT8_TYPE__ const name[62] = { 17,  18,  19,  20,  21,  22,  23,  24,  25,  26,  27,  28,  29,  30,  31,  32,  \
 	                                  33,  34,  35,  36,  37,  38,  39,  40,  41,  42,  43,  44,  45,  46,  47,  48,  \
 	                                  62,  63,  64,  65,  66,  67,  68,  69,  70,  71,  72,  73,  74,  75,  76,  77,  \
-	                                  78,  79,  80,  81,  82,  118, 119, 120, 121, 122, 123, 124, 125 }
-#define DEFINE_cfi_x86_64_unwind_landing_register_dw2common(name)                     \
-	__UINT8_TYPE__ const name[50] = { 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, \
-	                                  1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, \
-	                                  1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, \
-	                                  1, 0 }
-#define DEFINE_cfi_x86_64_unwind_landing_register_dw2uncommon(name)                                    \
-	__UINT8_TYPE__ const name[126] = { 0,  1,  2,  3,  4,  5,  6,  7,  8,  9,  10, 11, 12, 13, 14, 15, \
-	                                   16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29, 30, 31, \
-	                                   32, 33, 34, 35, 36, 37, 38, 39, 40, 41, 42, 43, 44, 45, 46, 47, \
-	                                   48, 86, 49, 50, 51, 52, 53, 54, 86, 86, 55, 56, 86, 86, 57, 58, \
-	                                   59, 60, 61, 62, 63, 64, 65, 66, 67, 68, 69, 70, 71, 72, 73, 74, \
-	                                   75, 76, 77, 86, 86, 86, 86, 86, 86, 86, 86, 86, 86, 86, 86, 86, \
-	                                   86, 86, 86, 86, 86, 86, 86, 86, 86, 86, 86, 86, 86, 86, 86, 86, \
-	                                   86, 86, 86, 86, 86, 86, 78, 79, 80, 81, 82, 83, 84, 85 }
+	                                  78,  79,  80,  81,  82,  118, 119, 120, 121, 122, 123, 124, 125, 126 }
+#define DEFINE_cfi_x86_64_unwind_landing_register_dw2common(name)                                                      \
+	__UINT8_TYPE__ const name[127] = { 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, \
+	                                   255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, \
+	                                   255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, \
+	                                   255, 0,   255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, \
+	                                   255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, \
+	                                   255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, \
+	                                   255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, \
+	                                   255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 1 }
+#define DEFINE_cfi_x86_64_unwind_landing_register_dw2uncommon(name)                                                    \
+	__UINT8_TYPE__ const name[127] = { 0,   1,   2,   3,   4,   5,   6,   7,   8,   9,   10,  11,  12,  13,  14,  15,  \
+	                                   16,  17,  18,  19,  20,  21,  22,  23,  24,  25,  26,  27,  28,  29,  30,  31,  \
+	                                   32,  33,  34,  35,  36,  37,  38,  39,  40,  41,  42,  43,  44,  45,  46,  47,  \
+	                                   48,  255, 49,  50,  51,  52,  53,  54,  255, 255, 55,  56,  255, 255, 57,  58,  \
+	                                   59,  60,  61,  62,  63,  64,  65,  66,  67,  68,  69,  70,  71,  72,  73,  74,  \
+	                                   75,  76,  77,  255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, \
+	                                   255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, \
+	                                   255, 255, 255, 255, 255, 255, 78,  79,  80,  81,  82,  83,  84,  85,  86 }
 #define DEFINE_cfi_x86_64_unwind_landing_register_common2dw(name) \
-	__UINT8_TYPE__ const name[1] = { 49 }
+	__UINT8_TYPE__ const name[2] = { 49, 126 }
 #define DEFINE_cfi_x86_64_unwind_landing_register_uncommon2dw(name)                                                   \
-	__UINT8_TYPE__ const name[86] = { 0,   1,   2,   3,   4,   5,   6,   7,   8,   9,   10,  11,  12,  13,  14,  15,  \
+	__UINT8_TYPE__ const name[87] = { 0,   1,   2,   3,   4,   5,   6,   7,   8,   9,   10,  11,  12,  13,  14,  15,  \
 	                                  16,  17,  18,  19,  20,  21,  22,  23,  24,  25,  26,  27,  28,  29,  30,  31,  \
 	                                  32,  33,  34,  35,  36,  37,  38,  39,  40,  41,  42,  43,  44,  45,  46,  47,  \
 	                                  48,  50,  51,  52,  53,  54,  55,  58,  59,  62,  63,  64,  65,  66,  67,  68,  \
 	                                  69,  70,  71,  72,  73,  74,  75,  76,  77,  78,  79,  80,  81,  82,  118, 119, \
-	                                  120, 121, 122, 123, 124, 125 }
+	                                  120, 121, 122, 123, 124, 125, 126 }
 /*[[[end]]]*/
 
 
@@ -521,39 +537,165 @@ printArrayDefineMacro("DEFINE_cfi_x86_64_unwind_landing_register_uncommon2dw", g
 
 /* Host-specific CFI constants. */
 #ifdef __x86_64__
-#define CFI_UNWIND_REGISTER_MAXSIZE   CFI_X86_64_UNWIND_FPU_REGISTER_SIZE
-#define CFI_REGISTER_SIZE             CFI_X86_64_REGISTER_SIZE
-#define CFI_UNWIND_REGISTER_PC        CFI_X86_64_UNWIND_REGISTER_PC        /* The register containing the program counter. */
-#define CFI_UNWIND_REGISTER_SP        CFI_X86_64_UNWIND_REGISTER_SP        /* The register for the CFA. */
-#define CFI_UNWIND_REGISTER_EXCEPTION CFI_X86_64_UNWIND_REGISTER_EXCEPTION /* The register used to hold the current exception upon entry to an exception handler. */
-#define CFI_UNWIND_REGISTER_COUNT     CFI_X86_64_UNWIND_REGISTER_COUNT
+#define CFI_REGISTER_MAXSIZE                    CFI_X86_64_REGISTER_MAXSIZE
+#define CFI_REGISTER_SIZE(addrsize, regno)      CFI_X86_64_REGISTER_SIZE(regno)
+#define CFI_REGISTER_MEMSIZE(addrsize, regno)   CFI_X86_64_REGISTER_SIZE(regno)      /* Register size for read/write to/from memory */
+#define CFI_REGISTER_MEMSIZE_IS_SIZE            1                                    /* Hint: `CFI_REGISTER_MEMSIZE() == CFI_REGISTER_SIZE()' */
+#define CFI_UNWIND_REGISTER_PC(addrsize)        CFI_X86_64_UNWIND_REGISTER_PC        /* The register containing the program counter. */
+#define CFI_UNWIND_REGISTER_SP(addrsize)        CFI_X86_64_UNWIND_REGISTER_SP        /* The register for the CFA. */
+#define CFI_UNWIND_REGISTER_EXCEPTION(addrsize) CFI_X86_64_UNWIND_REGISTER_EXCEPTION /* The register used to hold the current exception upon entry to an exception handler. */
+#define CFI_UNWIND_REGISTER_MAXCOUNT            CFI_X86_64_UNWIND_REGISTER_COUNT
+#define CFI_UNWIND_REGISTER_COUNT(addrsize)     CFI_X86_64_UNWIND_REGISTER_COUNT
 
 /* Normal common/uncommon */
-#define CFI_UNWIND_COMMON_REGISTER_COUNT       CFI_X86_64_UNWIND_COMMON_REGISTER_COUNT
-#define CFI_UNWIND_UNCOMMON_REGISTER_SP        CFI_X86_64_UNWIND_UNCOMMON_REGISTER_SP
-#define CFI_UNWIND_UNCOMMON_REGISTER_COUNT     CFI_X86_64_UNWIND_UNCOMMON_REGISTER_COUNT
-#define DEFINE_cfi_unwind_register_dw2common   DEFINE_cfi_x86_64_unwind_register_dw2common
-#define DEFINE_cfi_unwind_register_dw2uncommon DEFINE_cfi_x86_64_unwind_register_dw2uncommon
-#define DEFINE_cfi_unwind_register_common2dw   DEFINE_cfi_x86_64_unwind_register_common2dw
-#define DEFINE_cfi_unwind_register_uncommon2dw DEFINE_cfi_x86_64_unwind_register_uncommon2dw
+#define CFI_UNWIND_COMMON_REGISTER_MAXCOUNT                    CFI_X86_64_UNWIND_COMMON_REGISTER_COUNT
+#define CFI_UNWIND_COMMON_REGISTER_COUNT(addrsize)             CFI_X86_64_UNWIND_COMMON_REGISTER_COUNT
+#define CFI_UNWIND_UNCOMMON_REGISTER_SP(addrsize)              CFI_X86_64_UNWIND_UNCOMMON_REGISTER_SP
+#define CFI_UNWIND_UNCOMMON_REGISTER_MAXCOUNT                  CFI_X86_64_UNWIND_UNCOMMON_REGISTER_COUNT
+#define CFI_UNWIND_UNCOMMON_REGISTER_COUNT(addrsize)           CFI_X86_64_UNWIND_UNCOMMON_REGISTER_COUNT
+#define DEFINE_cfi_unwind_register_dw2common(addrsize, name)   DEFINE_cfi_x86_64_unwind_register_dw2common(name)
+#define DEFINE_cfi_unwind_register_dw2uncommon(addrsize, name) DEFINE_cfi_x86_64_unwind_register_dw2uncommon(name)
+#define DEFINE_cfi_unwind_register_common2dw(addrsize, name)   DEFINE_cfi_x86_64_unwind_register_common2dw(name)
+#define DEFINE_cfi_unwind_register_uncommon2dw(addrsize, name) DEFINE_cfi_x86_64_unwind_register_uncommon2dw(name)
 
 /* Sigframe common/uncommon */
-#define CFI_UNWIND_SIGFRAME_COMMON_REGISTER_SP          CFI_X86_64_UNWIND_SIGFRAME_COMMON_REGISTER_SP
-#define CFI_UNWIND_SIGFRAME_COMMON_REGISTER_COUNT       CFI_X86_64_UNWIND_SIGFRAME_COMMON_REGISTER_COUNT
-#define CFI_UNWIND_SIGFRAME_UNCOMMON_REGISTER_COUNT     CFI_X86_64_UNWIND_SIGFRAME_UNCOMMON_REGISTER_COUNT
-#define DEFINE_cfi_unwind_sigframe_register_dw2common   DEFINE_cfi_x86_64_unwind_sigframe_register_dw2common
-#define DEFINE_cfi_unwind_sigframe_register_dw2uncommon DEFINE_cfi_x86_64_unwind_sigframe_register_dw2uncommon
-#define DEFINE_cfi_unwind_sigframe_register_common2dw   DEFINE_cfi_x86_64_unwind_sigframe_register_common2dw
-#define DEFINE_cfi_unwind_sigframe_register_uncommon2dw DEFINE_cfi_x86_64_unwind_sigframe_register_uncommon2dw
+#define CFI_UNWIND_SIGFRAME_COMMON_REGISTER_SP(addrsize)                CFI_X86_64_UNWIND_SIGFRAME_COMMON_REGISTER_SP
+#define CFI_UNWIND_SIGFRAME_COMMON_REGISTER_MAXCOUNT                    CFI_X86_64_UNWIND_SIGFRAME_COMMON_REGISTER_COUNT
+#define CFI_UNWIND_SIGFRAME_COMMON_REGISTER_COUNT(addrsize)             CFI_X86_64_UNWIND_SIGFRAME_COMMON_REGISTER_COUNT
+#define CFI_UNWIND_SIGFRAME_UNCOMMON_REGISTER_MAXCOUNT                  CFI_X86_64_UNWIND_SIGFRAME_UNCOMMON_REGISTER_COUNT
+#define CFI_UNWIND_SIGFRAME_UNCOMMON_REGISTER_COUNT(addrsize)           CFI_X86_64_UNWIND_SIGFRAME_UNCOMMON_REGISTER_COUNT
+#define DEFINE_cfi_unwind_sigframe_register_dw2common(addrsize, name)   DEFINE_cfi_x86_64_unwind_sigframe_register_dw2common(name)
+#define DEFINE_cfi_unwind_sigframe_register_dw2uncommon(addrsize, name) DEFINE_cfi_x86_64_unwind_sigframe_register_dw2uncommon(name)
+#define DEFINE_cfi_unwind_sigframe_register_common2dw(addrsize, name)   DEFINE_cfi_x86_64_unwind_sigframe_register_common2dw(name)
+#define DEFINE_cfi_unwind_sigframe_register_uncommon2dw(addrsize, name) DEFINE_cfi_x86_64_unwind_sigframe_register_uncommon2dw(name)
 
 /* Landing-pad common/uncommon */
-#define CFI_UNWIND_LANDING_UNCOMMON_REGISTER_SP        CFI_X86_64_UNWIND_LANDING_UNCOMMON_REGISTER_SP
-#define CFI_UNWIND_LANDING_COMMON_REGISTER_COUNT       CFI_X86_64_UNWIND_LANDING_COMMON_REGISTER_COUNT
-#define CFI_UNWIND_LANDING_UNCOMMON_REGISTER_COUNT     CFI_X86_64_UNWIND_LANDING_UNCOMMON_REGISTER_COUNT
-#define DEFINE_cfi_unwind_landing_register_dw2common   DEFINE_cfi_x86_64_unwind_landing_register_dw2common
-#define DEFINE_cfi_unwind_landing_register_dw2uncommon DEFINE_cfi_x86_64_unwind_landing_register_dw2uncommon
-#define DEFINE_cfi_unwind_landing_register_common2dw   DEFINE_cfi_x86_64_unwind_landing_register_common2dw
-#define DEFINE_cfi_unwind_landing_register_uncommon2dw DEFINE_cfi_x86_64_unwind_landing_register_uncommon2dw
+#define CFI_UNWIND_LANDING_UNCOMMON_REGISTER_SP(addrsize)              CFI_X86_64_UNWIND_LANDING_UNCOMMON_REGISTER_SP
+#define CFI_UNWIND_LANDING_COMMON_REGISTER_MAXCOUNT                    CFI_X86_64_UNWIND_LANDING_COMMON_REGISTER_COUNT
+#define CFI_UNWIND_LANDING_COMMON_REGISTER_COUNT(addrsize)             CFI_X86_64_UNWIND_LANDING_COMMON_REGISTER_COUNT
+#define CFI_UNWIND_LANDING_UNCOMMON_REGISTER_MAXCOUNT                  CFI_X86_64_UNWIND_LANDING_UNCOMMON_REGISTER_COUNT
+#define CFI_UNWIND_LANDING_UNCOMMON_REGISTER_COUNT(addrsize)           CFI_X86_64_UNWIND_LANDING_UNCOMMON_REGISTER_COUNT
+#define DEFINE_cfi_unwind_landing_register_dw2common(addrsize, name)   DEFINE_cfi_x86_64_unwind_landing_register_dw2common(name)
+#define DEFINE_cfi_unwind_landing_register_dw2uncommon(addrsize, name) DEFINE_cfi_x86_64_unwind_landing_register_dw2uncommon(name)
+#define DEFINE_cfi_unwind_landing_register_common2dw(addrsize, name)   DEFINE_cfi_x86_64_unwind_landing_register_common2dw(name)
+#define DEFINE_cfi_unwind_landing_register_uncommon2dw(addrsize, name) DEFINE_cfi_x86_64_unwind_landing_register_uncommon2dw(name)
+
+#include <libunwind/arch-register.h> /* LIBUNWIND_WANT_COMPAT_REGISTER_WRAPPER */
+#ifdef LIBUNWIND_WANT_COMPAT_REGISTER_WRAPPER
+#include "i386.h"
+#define CFI_ADDRSIZE_ISCOMPAT(addrsize) __unlikely((addrsize) < 8)
+
+
+#if CFI_386_REGISTER_MAXSIZE > CFI_REGISTER_MAXSIZE
+#undef CFI_REGISTER_MAXSIZE
+#define CFI_REGISTER_MAXSIZE CFI_386_REGISTER_MAXSIZE
+#endif /* CFI_386_REGISTER_MAXSIZE > CFI_REGISTER_MAXSIZE */
+#if CFI_386_UNWIND_REGISTER_COUNT > CFI_UNWIND_REGISTER_MAXCOUNT
+#undef CFI_UNWIND_REGISTER_MAXCOUNT
+#define CFI_UNWIND_REGISTER_MAXCOUNT CFI_386_UNWIND_REGISTER_COUNT
+#endif /* CFI_386_UNWIND_REGISTER_COUNT > CFI_UNWIND_REGISTER_MAXCOUNT */
+#if CFI_386_UNWIND_COMMON_REGISTER_COUNT > CFI_UNWIND_COMMON_REGISTER_MAXCOUNT
+#undef CFI_UNWIND_COMMON_REGISTER_MAXCOUNT
+#define CFI_UNWIND_COMMON_REGISTER_MAXCOUNT CFI_386_UNWIND_COMMON_REGISTER_COUNT
+#endif /* CFI_386_UNWIND_COMMON_REGISTER_COUNT > CFI_UNWIND_COMMON_REGISTER_MAXCOUNT */
+#if CFI_386_UNWIND_UNCOMMON_REGISTER_COUNT > CFI_UNWIND_UNCOMMON_REGISTER_MAXCOUNT
+#undef CFI_UNWIND_UNCOMMON_REGISTER_MAXCOUNT
+#define CFI_UNWIND_UNCOMMON_REGISTER_MAXCOUNT CFI_386_UNWIND_UNCOMMON_REGISTER_COUNT
+#endif /* CFI_386_UNWIND_UNCOMMON_REGISTER_COUNT > CFI_UNWIND_UNCOMMON_REGISTER_MAXCOUNT */
+#if CFI_386_UNWIND_SIGFRAME_COMMON_REGISTER_COUNT > CFI_UNWIND_SIGFRAME_COMMON_REGISTER_MAXCOUNT
+#undef CFI_UNWIND_SIGFRAME_COMMON_REGISTER_MAXCOUNT
+#define CFI_UNWIND_SIGFRAME_COMMON_REGISTER_MAXCOUNT CFI_386_UNWIND_SIGFRAME_COMMON_REGISTER_COUNT
+#endif /* CFI_386_UNWIND_SIGFRAME_COMMON_REGISTER_COUNT > CFI_UNWIND_SIGFRAME_COMMON_REGISTER_MAXCOUNT */
+#if CFI_386_UNWIND_SIGFRAME_UNCOMMON_REGISTER_COUNT > CFI_UNWIND_SIGFRAME_UNCOMMON_REGISTER_MAXCOUNT
+#undef CFI_UNWIND_SIGFRAME_UNCOMMON_REGISTER_MAXCOUNT
+#define CFI_UNWIND_SIGFRAME_UNCOMMON_REGISTER_MAXCOUNT CFI_386_UNWIND_SIGFRAME_UNCOMMON_REGISTER_COUNT
+#endif /* CFI_386_UNWIND_SIGFRAME_UNCOMMON_REGISTER_COUNT > CFI_UNWIND_SIGFRAME_UNCOMMON_REGISTER_MAXCOUNT */
+
+#undef CFI_REGISTER_SIZE
+#undef CFI_REGISTER_MEMSIZE
+#undef CFI_REGISTER_MEMSIZE_IS_SIZE
+#undef CFI_UNWIND_REGISTER_PC
+#undef CFI_UNWIND_REGISTER_SP
+#undef CFI_UNWIND_REGISTER_EXCEPTION
+#undef CFI_UNWIND_REGISTER_COUNT
+#define CFI_REGISTER_MEMSIZE(addrsize, regno)                 (__likely((addrsize) >= 8) ? CFI_X86_64_REGISTER_SIZE(regno) : CFI_386_REGISTER_SIZE(regno))
+#define CFI_REGISTER_SIZE(addrsize, regno)                    (__likely((addrsize) >= 8) ? CFI_X86_64_REGISTER_SIZE(regno) : CFI_386_UNWIND_IS_FPU_REGISTER(regno) ? CFI_X86_64_UNWIND_FPU_REGISTER_SIZE : CFI_X86_64_UNWIND_GPR_REGISTER_SIZE)
+#define CFI_UNWIND_REGISTER_PC(addrsize)                      (__likely((addrsize) >= 8) ? CFI_X86_64_UNWIND_REGISTER_PC : CFI_386_UNWIND_REGISTER_PC)
+#define CFI_UNWIND_REGISTER_SP(addrsize)                      (__likely((addrsize) >= 8) ? CFI_X86_64_UNWIND_REGISTER_SP : CFI_386_UNWIND_REGISTER_SP)
+#define CFI_UNWIND_REGISTER_EXCEPTION(addrsize)               (__likely((addrsize) >= 8) ? CFI_X86_64_UNWIND_REGISTER_EXCEPTION : CFI_386_UNWIND_REGISTER_EXCEPTION)
+#define CFI_UNWIND_REGISTER_COUNT(addrsize)                   (__likely((addrsize) >= 8) ? CFI_X86_64_UNWIND_REGISTER_COUNT : CFI_386_UNWIND_REGISTER_COUNT)
+#define CFI_UNWIND_COMMON_REGISTER_COUNT(addrsize)            (__likely((addrsize) >= 8) ? CFI_X86_64_UNWIND_COMMON_REGISTER_COUNT : CFI_386_UNWIND_COMMON_REGISTER_COUNT)
+#define CFI_UNWIND_UNCOMMON_REGISTER_SP(addrsize)             (__likely((addrsize) >= 8) ? CFI_X86_64_UNWIND_UNCOMMON_REGISTER_SP : CFI_386_UNWIND_UNCOMMON_REGISTER_SP)
+#define CFI_UNWIND_UNCOMMON_REGISTER_COUNT(addrsize)          (__likely((addrsize) >= 8) ? CFI_X86_64_UNWIND_UNCOMMON_REGISTER_COUNT : CFI_386_UNWIND_UNCOMMON_REGISTER_COUNT)
+#define CFI_UNWIND_SIGFRAME_COMMON_REGISTER_SP(addrsize)      (__likely((addrsize) >= 8) ? CFI_X86_64_UNWIND_SIGFRAME_COMMON_REGISTER_SP : CFI_386_UNWIND_SIGFRAME_COMMON_REGISTER_SP)
+#define CFI_UNWIND_SIGFRAME_COMMON_REGISTER_COUNT(addrsize)   (__likely((addrsize) >= 8) ? CFI_X86_64_UNWIND_SIGFRAME_COMMON_REGISTER_COUNT : CFI_386_UNWIND_SIGFRAME_COMMON_REGISTER_COUNT)
+#define CFI_UNWIND_SIGFRAME_UNCOMMON_REGISTER_COUNT(addrsize) (__likely((addrsize) >= 8) ? CFI_X86_64_UNWIND_SIGFRAME_UNCOMMON_REGISTER_COUNT : CFI_386_UNWIND_SIGFRAME_UNCOMMON_REGISTER_COUNT)
+
+#define __PRIVATE_DEFINE_cfi_unwind_register_dw2common_4                          DEFINE_cfi_386_unwind_register_dw2common
+#define __PRIVATE_DEFINE_cfi_unwind_register_dw2common_8                          DEFINE_cfi_x86_64_unwind_register_dw2common
+#define __PRIVATE_DEFINE_cfi_unwind_register_dw2uncommon_4                        DEFINE_cfi_386_unwind_register_dw2uncommon
+#define __PRIVATE_DEFINE_cfi_unwind_register_dw2uncommon_8                        DEFINE_cfi_x86_64_unwind_register_dw2uncommon
+#define __PRIVATE_DEFINE_cfi_unwind_register_common2dw_4                          DEFINE_cfi_386_unwind_register_common2dw
+#define __PRIVATE_DEFINE_cfi_unwind_register_common2dw_8                          DEFINE_cfi_x86_64_unwind_register_common2dw
+#define __PRIVATE_DEFINE_cfi_unwind_register_uncommon2dw_4                        DEFINE_cfi_386_unwind_register_uncommon2dw
+#define __PRIVATE_DEFINE_cfi_unwind_register_uncommon2dw_8                        DEFINE_cfi_x86_64_unwind_register_uncommon2dw
+#define __PRIVATE_DEFINE_cfi_unwind_sigframe_register_dw2common_4                 DEFINE_cfi_386_unwind_sigframe_register_dw2common
+#define __PRIVATE_DEFINE_cfi_unwind_sigframe_register_dw2common_8                 DEFINE_cfi_x86_64_unwind_sigframe_register_dw2common
+#define __PRIVATE_DEFINE_cfi_unwind_sigframe_register_dw2uncommon_4               DEFINE_cfi_386_unwind_sigframe_register_dw2uncommon
+#define __PRIVATE_DEFINE_cfi_unwind_sigframe_register_dw2uncommon_8               DEFINE_cfi_x86_64_unwind_sigframe_register_dw2uncommon
+#define __PRIVATE_DEFINE_cfi_unwind_sigframe_register_common2dw_4                 DEFINE_cfi_386_unwind_sigframe_register_common2dw
+#define __PRIVATE_DEFINE_cfi_unwind_sigframe_register_common2dw_8                 DEFINE_cfi_x86_64_unwind_sigframe_register_common2dw
+#define __PRIVATE_DEFINE_cfi_unwind_sigframe_register_uncommon2dw_4               DEFINE_cfi_386_unwind_sigframe_register_uncommon2dw
+#define __PRIVATE_DEFINE_cfi_unwind_sigframe_register_uncommon2dw_8               DEFINE_cfi_x86_64_unwind_sigframe_register_uncommon2dw
+#define __PRIVATE_DEFINE_cfi_unwind_register_dw2common(addrsize, name)            __PRIVATE_DEFINE_cfi_unwind_register_dw2common_##addrsize(name)
+#define __PRIVATE_DEFINE_cfi_unwind_register_dw2uncommon(addrsize, name)          __PRIVATE_DEFINE_cfi_unwind_register_dw2uncommon_##addrsize(name)
+#define __PRIVATE_DEFINE_cfi_unwind_register_common2dw(addrsize, name)            __PRIVATE_DEFINE_cfi_unwind_register_common2dw_##addrsize(name)
+#define __PRIVATE_DEFINE_cfi_unwind_register_uncommon2dw(addrsize, name)          __PRIVATE_DEFINE_cfi_unwind_register_uncommon2dw_##addrsize(name)
+#define __PRIVATE_DEFINE_cfi_unwind_sigframe_register_dw2common(addrsize, name)   __PRIVATE_DEFINE_cfi_unwind_sigframe_register_dw2common_##addrsize(name)
+#define __PRIVATE_DEFINE_cfi_unwind_sigframe_register_dw2uncommon(addrsize, name) __PRIVATE_DEFINE_cfi_unwind_sigframe_register_dw2uncommon_##addrsize(name)
+#define __PRIVATE_DEFINE_cfi_unwind_sigframe_register_common2dw(addrsize, name)   __PRIVATE_DEFINE_cfi_unwind_sigframe_register_common2dw_##addrsize(name)
+#define __PRIVATE_DEFINE_cfi_unwind_sigframe_register_uncommon2dw(addrsize, name) __PRIVATE_DEFINE_cfi_unwind_sigframe_register_uncommon2dw_##addrsize(name)
+#define DEFINE_cfi_unwind_register_dw2common(addrsize, name)                      __PRIVATE_DEFINE_cfi_unwind_register_dw2common(addrsize, name)
+#define DEFINE_cfi_unwind_register_dw2uncommon(addrsize, name)                    __PRIVATE_DEFINE_cfi_unwind_register_dw2uncommon(addrsize, name)
+#define DEFINE_cfi_unwind_register_common2dw(addrsize, name)                      __PRIVATE_DEFINE_cfi_unwind_register_common2dw(addrsize, name)
+#define DEFINE_cfi_unwind_register_uncommon2dw(addrsize, name)                    __PRIVATE_DEFINE_cfi_unwind_register_uncommon2dw(addrsize, name)
+#define DEFINE_cfi_unwind_sigframe_register_dw2common(addrsize, name)             __PRIVATE_DEFINE_cfi_unwind_sigframe_register_dw2common(addrsize, name)
+#define DEFINE_cfi_unwind_sigframe_register_dw2uncommon(addrsize, name)           __PRIVATE_DEFINE_cfi_unwind_sigframe_register_dw2uncommon(addrsize, name)
+#define DEFINE_cfi_unwind_sigframe_register_common2dw(addrsize, name)             __PRIVATE_DEFINE_cfi_unwind_sigframe_register_common2dw(addrsize, name)
+#define DEFINE_cfi_unwind_sigframe_register_uncommon2dw(addrsize, name)           __PRIVATE_DEFINE_cfi_unwind_sigframe_register_uncommon2dw(addrsize, name)
+
+#if 0 /* Not needed */
+#if CFI_386_UNWIND_LANDING_COMMON_REGISTER_COUNT > CFI_UNWIND_LANDING_COMMON_REGISTER_MAXCOUNT
+#undef CFI_UNWIND_LANDING_COMMON_REGISTER_MAXCOUNT
+#define CFI_UNWIND_LANDING_COMMON_REGISTER_MAXCOUNT CFI_386_UNWIND_LANDING_COMMON_REGISTER_COUNT
+#endif /* CFI_386_UNWIND_LANDING_COMMON_REGISTER_COUNT > CFI_UNWIND_LANDING_COMMON_REGISTER_MAXCOUNT */
+#if CFI_386_UNWIND_LANDING_UNCOMMON_REGISTER_COUNT > CFI_UNWIND_LANDING_UNCOMMON_REGISTER_MAXCOUNT
+#undef CFI_UNWIND_LANDING_UNCOMMON_REGISTER_MAXCOUNT
+#define CFI_UNWIND_LANDING_UNCOMMON_REGISTER_MAXCOUNT CFI_386_UNWIND_LANDING_UNCOMMON_REGISTER_COUNT
+#endif /* CFI_386_UNWIND_LANDING_UNCOMMON_REGISTER_COUNT > CFI_UNWIND_LANDING_UNCOMMON_REGISTER_MAXCOUNT */
+#define CFI_UNWIND_LANDING_UNCOMMON_REGISTER_SP(addrsize)    (__likely((addrsize) >= 8) ? CFI_X86_64_UNWIND_LANDING_UNCOMMON_REGISTER_SP : CFI_386_UNWIND_LANDING_UNCOMMON_REGISTER_SP)
+#define CFI_UNWIND_LANDING_COMMON_REGISTER_COUNT(addrsize)   (__likely((addrsize) >= 8) ? CFI_X86_64_UNWIND_LANDING_COMMON_REGISTER_COUNT : CFI_386_UNWIND_LANDING_COMMON_REGISTER_COUNT)
+#define CFI_UNWIND_LANDING_UNCOMMON_REGISTER_COUNT(addrsize) (__likely((addrsize) >= 8) ? CFI_X86_64_UNWIND_LANDING_UNCOMMON_REGISTER_COUNT : CFI_386_UNWIND_LANDING_UNCOMMON_REGISTER_COUNT)
+
+#define __PRIVATE_DEFINE_cfi_unwind_landing_register_dw2common_4                 DEFINE_cfi_386_unwind_landing_register_dw2common
+#define __PRIVATE_DEFINE_cfi_unwind_landing_register_dw2common_8                 DEFINE_cfi_x86_64_unwind_landing_register_dw2common
+#define __PRIVATE_DEFINE_cfi_unwind_landing_register_dw2uncommon_4               DEFINE_cfi_386_unwind_landing_register_dw2uncommon
+#define __PRIVATE_DEFINE_cfi_unwind_landing_register_dw2uncommon_8               DEFINE_cfi_x86_64_unwind_landing_register_dw2uncommon
+#define __PRIVATE_DEFINE_cfi_unwind_landing_register_common2dw_4                 DEFINE_cfi_386_unwind_landing_register_common2dw
+#define __PRIVATE_DEFINE_cfi_unwind_landing_register_common2dw_8                 DEFINE_cfi_x86_64_unwind_landing_register_common2dw
+#define __PRIVATE_DEFINE_cfi_unwind_landing_register_uncommon2dw_4               DEFINE_cfi_386_unwind_landing_register_uncommon2dw
+#define __PRIVATE_DEFINE_cfi_unwind_landing_register_uncommon2dw_8               DEFINE_cfi_x86_64_unwind_landing_register_uncommon2dw
+#define __PRIVATE_DEFINE_cfi_unwind_landing_register_dw2common(addrsize, name)   __PRIVATE_DEFINE_cfi_unwind_landing_register_dw2common_##addrsize(name)
+#define __PRIVATE_DEFINE_cfi_unwind_landing_register_dw2uncommon(addrsize, name) __PRIVATE_DEFINE_cfi_unwind_landing_register_dw2uncommon_##addrsize(name)
+#define __PRIVATE_DEFINE_cfi_unwind_landing_register_common2dw(addrsize, name)   __PRIVATE_DEFINE_cfi_unwind_landing_register_common2dw_##addrsize(name)
+#define __PRIVATE_DEFINE_cfi_unwind_landing_register_uncommon2dw(addrsize, name) __PRIVATE_DEFINE_cfi_unwind_landing_register_uncommon2dw_##addrsize(name)
+#define DEFINE_cfi_unwind_landing_register_dw2common(addrsize, name)             __PRIVATE_DEFINE_cfi_unwind_landing_register_dw2common(addrsize, name)
+#define DEFINE_cfi_unwind_landing_register_dw2uncommon(addrsize, name)           __PRIVATE_DEFINE_cfi_unwind_landing_register_dw2uncommon(addrsize, name)
+#define DEFINE_cfi_unwind_landing_register_common2dw(addrsize, name)             __PRIVATE_DEFINE_cfi_unwind_landing_register_common2dw(addrsize, name)
+#define DEFINE_cfi_unwind_landing_register_uncommon2dw(addrsize, name)           __PRIVATE_DEFINE_cfi_unwind_landing_register_uncommon2dw(addrsize, name)
+#endif /* ... */
+
+#endif /* LIBUNWIND_WANT_COMPAT_REGISTER_WRAPPER */
 #endif /* __x86_64__ */
 
 

@@ -290,6 +290,15 @@ NOTHROW(FCALL module_locksection_index_nx)(struct module *__restrict self, unsig
 #define module_sizeof_pointer(self) sizeof(void *)
 #endif /* !_MODULE_HAVE_SIZEOF_POINTER */
 
+/* Check if a given module must be executed in compatibility mode. */
+#ifndef module_iscompat
+#ifdef _MODULE_HAVE_SIZEOF_POINTER
+#define module_iscompat(self) (module_sizeof_pointer(self) != sizeof(void *))
+#else /* _MODULE_HAVE_SIZEOF_POINTER */
+#define module_iscompat(self) 0
+#endif /* !_MODULE_HAVE_SIZEOF_POINTER */
+#endif /* !module_iscompat */
+
 /* Check if a given module is actually a `struct driver'
  * Note  that when this is not the case, you are allowed
  * to assume  that the  module represents  some sort  of

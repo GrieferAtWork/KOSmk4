@@ -34,11 +34,17 @@
 #include <kernel/paging.h>
 #include <kernel/panic.h>
 
+#include <compat/config.h>
+
 #include <assert.h>
 #include <format-printer.h>
 #include <inttypes.h>
 #include <stddef.h>
 #include <string.h>
+
+#ifdef __ARCH_HAVE_COMPAT
+#include <libunwind/arch-register.h>
+#endif /* __ARCH_HAVE_COMPAT */
 
 #ifdef CONFIG_HAVE_DEBUGGER
 #include <sched/task.h>
@@ -641,11 +647,11 @@ unwind_userspace_with_section(struct module *__restrict mod, void const *absolut
 		 * related functions that somehow make use  of it, where this argument  then
 		 * describes the offset from the .eh_frame that was loaded, towards the  one
 		 * that would actually exist for user-space.
-		 * However the added complexity it's worth it for this one special case, and
-		 * since we already have to  switch VM to the  user-space's one in order  to
-		 * restore registers that were spilled onto the stack, we might as well also
-		 * make use of the actual `.eh_frame' section (assuming that it is where  it
-		 * should be) */
+		 * However the added complexity isn't worth it for this one special  case,
+		 * and since we already have to switch VM to the user-space's one in order
+		 * to restore registers that were spilled onto the stack, we might as well
+		 * also  make use of  the actual `.eh_frame' section  (assuming that it is
+		 * where it should be) */
 		if (is_debug_frame) {
 			result = unwind_fde_scan_df(eh_frame_data,
 			                            eh_frame_data + eh_frame_size,
@@ -690,7 +696,23 @@ unwind_userspace(void const *absolute_pc,
 	mod = module_fromaddr_nx(absolute_pc);
 	if likely(mod) {
 		unsigned int i;
+#ifdef LIBUNWIND_HAVE_COMPAT_REGISTER_WRAPPER
+		struct unwind_getreg_compat_data compat_getreg_data;
+		struct unwind_setreg_compat_data compat_setreg_data;
+#endif /* LIBUNWIND_HAVE_COMPAT_REGISTER_WRAPPER */
 		FINALLY_DECREF_UNLIKELY(mod);
+
+		/* Check if compatibility mode support is needed. */
+#ifdef LIBUNWIND_HAVE_COMPAT_REGISTER_WRAPPER
+		if (module_iscompat(mod)) {
+			unwind_getreg_compat_data_init(&compat_getreg_data, reg_getter, reg_getter_arg);
+			unwind_setreg_compat_data_init(&compat_setreg_data, reg_setter, reg_setter_arg);
+			reg_getter     = &unwind_getreg_compat;
+			reg_setter     = &unwind_setreg_compat;
+			reg_getter_arg = &compat_getreg_data;
+			reg_setter_arg = &compat_setreg_data;
+		}
+#endif /* LIBUNWIND_HAVE_COMPAT_REGISTER_WRAPPER */
 
 		/* Search for the `.eh_frame' and `.debug_frame' sections. */
 		for (i = 0; i < 2; ++i) {

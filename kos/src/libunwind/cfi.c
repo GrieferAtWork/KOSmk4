@@ -218,7 +218,7 @@ libuw_unwind_emulator_make_const(unwind_emulator_t *__restrict self,
 		    ste->s_type == UNWIND_STE_REGPOINTER) {
 			union {
 				uintptr_t p;
-				byte_t buf[CFI_UNWIND_REGISTER_MAXSIZE];
+				byte_t buf[CFI_REGISTER_MAXSIZE];
 			} regval;
 			error = (*self->ue_regget)(self->ue_regget_arg, ste->s_register, regval.buf);
 			if unlikely(error != UNWIND_SUCCESS)
@@ -340,14 +340,16 @@ libuw_unwind_emulator_calculate_cfa(unwind_emulator_t *__restrict self) {
 	unwind_cfa_value_t cfa;
 	unsigned int error;
 	union {
-		byte_t buf[CFI_REGISTER_SIZE(CFI_UNWIND_REGISTER_PC)];
+		byte_t buf[CFI_REGISTER_MAXSIZE];
 		void *pc;
 	} pc_buf;
 	if unlikely(!self->ue_sectinfo)
 		goto err_no_cfa;
 
 	/* Load the current program counter position. */
-	error = (*self->ue_regget)(self->ue_regget_arg, CFI_UNWIND_REGISTER_PC, pc_buf.buf);
+	error = (*self->ue_regget)(self->ue_regget_arg,
+	                           CFI_UNWIND_REGISTER_PC(self->ue_addrsize),
+	                           pc_buf.buf);
 	if unlikely(error != UNWIND_SUCCESS)
 		ERRORF(err, "%u\n", error);
 
@@ -457,7 +459,7 @@ NOTHROW_NCX(CC libuw_unwind_ste_addr)(unwind_ste_t const *__restrict self,
 	case UNWIND_STE_REGPOINTER: {
 		union {
 			uintptr_t word;
-			byte_t data[CFI_UNWIND_REGISTER_MAXSIZE];
+			byte_t data[CFI_REGISTER_MAXSIZE];
 		} regval;
 		error = (*regget)(regget_arg, self->s_register, regval.data);
 		if unlikely(error != UNWIND_SUCCESS)
@@ -499,12 +501,13 @@ err:
  * @return: UNWIND_INVALID_REGISTER:             Invalid register referenced by `self'
  * @return: UNWIND_EMULATOR_ILLEGAL_INSTRUCTION: Invalid stack-value type in `self'
  * @return: UNWIND_SEGFAULT:                     Attempted to access faulty memory. */
-INTERN NONNULL((1, 2, 4)) unsigned int
-NOTHROW_NCX(CC libuw_unwind_ste_read)(unwind_ste_t const *__restrict self,
+INTERN NONNULL((1, 3, 5)) unsigned int
+NOTHROW_NCX(CC libuw_unwind_ste_read)(unwind_ste_t const *__restrict self, uint8_t addrsize,
                                       unwind_getreg_t regget, void const *regget_arg,
                                       void *__restrict dst, size_t num_bits,
                                       unsigned int dst_left_shift, unsigned int src_left_shift) {
 	unsigned int error;
+	(void)addrsize;
 	switch (self->s_type) {
 
 	case UNWIND_STE_STACKVALUE: {
@@ -529,18 +532,19 @@ NOTHROW_NCX(CC libuw_unwind_ste_read)(unwind_ste_t const *__restrict self,
 	case UNWIND_STE_REGPOINTER: {
 		union {
 			uintptr_t word;
-			byte_t data[CFI_UNWIND_REGISTER_MAXSIZE];
+			byte_t data[CFI_REGISTER_MAXSIZE];
 		} regval;
-		size_t max_bits;
+		size_t reg_bits, max_bits;
 		memset(regval.data, 0, sizeof(regval.data));
 		error = (*regget)(regget_arg, self->s_register, regval.data);
 		if unlikely(error != UNWIND_SUCCESS)
 			ERRORF(err, "self->s_register = %u (%u)\n", (unsigned int)self->s_register, error);
 		regval.word += self->s_regoffset;
-		if unlikely(src_left_shift >= (sizeof(regval.data) * NBBY)) {
+		reg_bits = CFI_REGISTER_MEMSIZE(addrsize, self->s_register) * NBBY;
+		if unlikely(src_left_shift >= reg_bits) {
 			max_bits = 0;
 		} else {
-			max_bits = (sizeof(regval.data) * NBBY) - src_left_shift;
+			max_bits = reg_bits - src_left_shift;
 			if (max_bits > num_bits)
 				max_bits = num_bits;
 		}
@@ -574,7 +578,7 @@ NOTHROW_NCX(CC libuw_unwind_ste_read)(unwind_ste_t const *__restrict self,
 			/* Convert to l-value */
 			union {
 				uintptr_t p;
-				byte_t buf[CFI_UNWIND_REGISTER_MAXSIZE];
+				byte_t buf[CFI_REGISTER_MAXSIZE];
 			} regval;
 			error = (*regget)(regget_arg, self->s_register, regval.buf);
 			if unlikely(error != UNWIND_SUCCESS)
@@ -600,29 +604,31 @@ err:
 	return error;
 }
 
-INTERN NONNULL((1, 2, 6)) unsigned int
-NOTHROW_NCX(CC libuw_unwind_ste_write)(unwind_ste_t const *__restrict self,
+INTERN NONNULL((1, 3, 7)) unsigned int
+NOTHROW_NCX(CC libuw_unwind_ste_write)(unwind_ste_t const *__restrict self, uint8_t addrsize,
                                        /*[1..1]*/ unwind_getreg_t regget, void const *regget_arg,
                                        /*[0..1]*/ unwind_setreg_t regset, void *regset_arg,
                                        void const *__restrict src, size_t num_bits,
                                        unsigned int dst_left_shift, unsigned int src_left_shift) {
 	unsigned int error;
+	(void)addrsize;
 	switch (self->s_type) {
 
 	case UNWIND_STE_REGPOINTER: {
 		union {
 			uintptr_t word;
-			byte_t data[CFI_UNWIND_REGISTER_MAXSIZE];
+			byte_t data[CFI_REGISTER_MAXSIZE];
 		} regval;
+		size_t reg_bits;
 		if unlikely(!regset)
 			ERROR(err_not_writable);
-		if unlikely(dst_left_shift >= CFI_REGISTER_SIZE(self->s_register) * NBBY)
+		reg_bits = CFI_REGISTER_MEMSIZE(addrsize, self->s_register) * NBBY;
+		if unlikely(dst_left_shift >= reg_bits)
 			ERROR(err_not_writable);
-		if unlikely(dst_left_shift + num_bits > CFI_REGISTER_SIZE(self->s_register) * NBBY)
-			num_bits = (CFI_REGISTER_SIZE(self->s_register) * NBBY) - dst_left_shift;
+		if unlikely(dst_left_shift + num_bits > reg_bits)
+			num_bits = reg_bits - dst_left_shift;
 		/* Write to a register. */
-		if (dst_left_shift == 0 &&
-		    num_bits == CFI_REGISTER_SIZE(self->s_register) * NBBY) {
+		if (dst_left_shift == 0 && num_bits == reg_bits) {
 			/* Write whole register. */
 		} else {
 			error = (*regget)(regget_arg, self->s_register, regval.data);
@@ -648,7 +654,7 @@ NOTHROW_NCX(CC libuw_unwind_ste_write)(unwind_ste_t const *__restrict self,
 			/* Convert to l-value */
 			union {
 				uintptr_t word;
-				byte_t data[CFI_UNWIND_REGISTER_MAXSIZE];
+				byte_t data[CFI_REGISTER_MAXSIZE];
 			} regval;
 			error = (*regget)(regget_arg, self->s_register, regval.data);
 			if unlikely(error != UNWIND_SUCCESS)
@@ -687,6 +693,7 @@ libuw_unwind_emulator_read_from_piece(unwind_emulator_t *__restrict self,
 	if unlikely(((self->ue_piecebits + num_bits + NBBY - 1) / NBBY) > self->ue_piecesiz)
 		ERROR(err_buffer_too_small);
 	result = libuw_unwind_ste_read(ste,
+	                               self->ue_addrsize,
 	                               self->ue_regget,
 	                               self->ue_regget_arg,
 	                               self->ue_piecebuf,
@@ -711,6 +718,7 @@ libuw_unwind_emulator_write_to_piece(unwind_emulator_t *__restrict self,
 	if unlikely(((self->ue_piecebits + num_bits + NBBY - 1) / NBBY) > self->ue_piecesiz)
 		ERROR(err_buffer_too_small);
 	result = libuw_unwind_ste_write(ste,
+	                                self->ue_addrsize,
 	                                self->ue_regget,
 	                                self->ue_regget_arg,
 	                                self->ue_regset,
@@ -824,7 +832,7 @@ again_switch_opcode:
 			} else if (self->ue_addrsize >= 2) {
 				value = (uintptr_t)UNALIGNED_GET16((uint16_t const *)pc);
 			} else {
-				value = (uintptr_t)*(uint8_t const *)pc;
+				value = (uintptr_t)(*(uint8_t const *)pc);
 			}
 
 			/* To quote a comment found within the GDB source tree:
@@ -862,7 +870,7 @@ do_make_top_const:
 				    TOP.s_type == UNWIND_STE_REGPOINTER) {
 					union {
 						uintptr_t p;
-						byte_t buf[CFI_UNWIND_REGISTER_MAXSIZE];
+						byte_t buf[CFI_REGISTER_MAXSIZE];
 					} regval;
 					error = (*self->ue_regget)(self->ue_regget_arg, TOP.s_register, regval.buf);
 					if unlikely(error != UNWIND_SUCCESS)
@@ -1121,7 +1129,7 @@ do_make_second_const:
 				    SECOND.s_type == UNWIND_STE_REGPOINTER) {
 					union {
 						uintptr_t p;
-						byte_t buf[CFI_UNWIND_REGISTER_MAXSIZE];
+						byte_t buf[CFI_REGISTER_MAXSIZE];
 					} regval;
 					error = (*self->ue_regget)(self->ue_regget_arg, SECOND.s_register, regval.buf);
 					if unlikely(error != UNWIND_SUCCESS)
@@ -1666,9 +1674,11 @@ do_read_bit_pieces:
 				/* Figure out `funcbase' */
 				union {
 					void const *p;
-					byte_t buf[CFI_REGISTER_SIZE(CFI_UNWIND_REGISTER_PC)];
+					byte_t buf[CFI_REGISTER_MAXSIZE];
 				} regval;
-				error = (*self->ue_regget)(self->ue_regget_arg, CFI_UNWIND_REGISTER_PC, regval.buf);
+				error = (*self->ue_regget)(self->ue_regget_arg,
+					                       CFI_UNWIND_REGISTER_PC(self->ue_addrsize),
+					                       regval.buf);
 				if unlikely(error != UNWIND_SUCCESS)
 					ERRORF(err, "Can't get PC register: %u\n", error);
 				funcbase = libuw_get_funbase(regval.p);

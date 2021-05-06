@@ -89,10 +89,10 @@ FUNDEF unsigned int NOTHROW(LIBUNWIND_CC dbg_getreg)(/*uintptr_t level*/ void co
 FUNDEF unsigned int NOTHROW(LIBUNWIND_CC dbg_setreg)(/*uintptr_t level*/ void *arg, uintptr_half_t cfi_regno, void const *__restrict buf);
 
 /* Get/Set the PC/SP registers of a given register level. */
-#define dbg_getpcreg(level)        (byte_t const *)dbg_getregp(level, CFI_UNWIND_REGISTER_PC)
-#define dbg_setpcreg(level, value) dbg_setregp(level, CFI_UNWIND_REGISTER_PC, (uintptr_t)(value))
-#define dbg_getspreg(level)        (byte_t *)dbg_getregp(level, CFI_UNWIND_REGISTER_SP)
-#define dbg_setspreg(level, value) dbg_setregp(level, CFI_UNWIND_REGISTER_SP, (uintptr_t)(value))
+#define dbg_getpcreg(level)        (byte_t const *)dbg_getregp(level, CFI_UNWIND_REGISTER_PC(sizeof(void *)))
+#define dbg_setpcreg(level, value) dbg_setregp(level, CFI_UNWIND_REGISTER_PC(sizeof(void *)), (uintptr_t)(value))
+#define dbg_getspreg(level)        (byte_t *)dbg_getregp(level, CFI_UNWIND_REGISTER_SP(sizeof(void *)))
+#define dbg_setspreg(level, value) dbg_setregp(level, CFI_UNWIND_REGISTER_SP(sizeof(void *)), (uintptr_t)(value))
 
 /* Return the size of a pointer within the context of `dbg_current' */
 #ifndef dbg_current_sizeof_pointer
@@ -112,7 +112,7 @@ NOTHROW(KCALL dbg_getregp)(unsigned int level, uintptr_half_t cfi_regno) {
 	dbg_getreg((void *)(uintptr_t)level, cfi_regno, &result);
 #else /* NDEBUG */
 	unsigned int error;
-	__hybrid_assert(CFI_REGISTER_SIZE(cfi_regno) == sizeof(uintptr_t));
+	__hybrid_assert(CFI_REGISTER_SIZE(sizeof(void *), cfi_regno) == sizeof(uintptr_t));
 	error = dbg_getreg((void *)(uintptr_t)level, cfi_regno, &result);
 	__hybrid_assert(error == UNWIND_SUCCESS);
 #endif /* !NDEBUG */
@@ -125,7 +125,7 @@ NOTHROW(KCALL dbg_setregp)(unsigned int level, uintptr_half_t cfi_regno, uintptr
 	dbg_setreg((void *)(uintptr_t)level, cfi_regno, &value);
 #else /* NDEBUG */
 	unsigned int error;
-	__hybrid_assert(CFI_REGISTER_SIZE(cfi_regno) == sizeof(uintptr_t));
+	__hybrid_assert(CFI_REGISTER_SIZE(sizeof(void *), cfi_regno) == sizeof(uintptr_t));
 	error = dbg_setreg((void *)(uintptr_t)level, cfi_regno, &value);
 	__hybrid_assert(error == UNWIND_SUCCESS);
 #endif /* !NDEBUG */

@@ -35,11 +35,11 @@
 
 
 #undef SIZEOF_UNWIND_ORDER_INDEX_T
-#if (((CFI_UNWIND_COMMON_REGISTER_COUNT + CFI_UNWIND_UNCOMMON_REGISTER_COUNT) > 0xffff) || \
-     ((CFI_UNWIND_SIGFRAME_COMMON_REGISTER_COUNT + CFI_UNWIND_SIGFRAME_UNCOMMON_REGISTER_COUNT) > 0xffff))
+#if (((CFI_UNWIND_COMMON_REGISTER_MAXCOUNT + CFI_UNWIND_UNCOMMON_REGISTER_MAXCOUNT) > 0xffff) || \
+     ((CFI_UNWIND_SIGFRAME_COMMON_REGISTER_MAXCOUNT + CFI_UNWIND_SIGFRAME_UNCOMMON_REGISTER_MAXCOUNT) > 0xffff))
 #define SIZEOF_UNWIND_ORDER_INDEX_T 4
-#elif (((CFI_UNWIND_COMMON_REGISTER_COUNT + CFI_UNWIND_UNCOMMON_REGISTER_COUNT) > 0xff) || \
-       ((CFI_UNWIND_SIGFRAME_COMMON_REGISTER_COUNT + CFI_UNWIND_SIGFRAME_UNCOMMON_REGISTER_COUNT) > 0xff))
+#elif (((CFI_UNWIND_COMMON_REGISTER_MAXCOUNT + CFI_UNWIND_UNCOMMON_REGISTER_MAXCOUNT) > 0xff) || \
+       ((CFI_UNWIND_SIGFRAME_COMMON_REGISTER_MAXCOUNT + CFI_UNWIND_SIGFRAME_UNCOMMON_REGISTER_MAXCOUNT) > 0xff))
 #define SIZEOF_UNWIND_ORDER_INDEX_T 2
 #else /* ... */
 #define SIZEOF_UNWIND_ORDER_INDEX_T 1
@@ -185,12 +185,12 @@ typedef struct unwind_cfa_value_struct {
 } unwind_cfa_value_t;
 
 typedef struct unwind_cfa_state_struct {
-#if CFI_UNWIND_COMMON_REGISTER_COUNT != 0
-	unwind_cfa_register_t cs_regs[CFI_UNWIND_COMMON_REGISTER_COUNT];       /* Common register restore rules. */
-#endif /* CFI_UNWIND_COMMON_REGISTER_COUNT != 0 */
-#if CFI_UNWIND_UNCOMMON_REGISTER_COUNT != 0
-	unwind_order_index_t  cs_uncorder[CFI_UNWIND_UNCOMMON_REGISTER_COUNT]; /* Restore order for uncommon registers (0 means unused). */
-#endif /* CFI_UNWIND_UNCOMMON_REGISTER_COUNT != 0 */
+#if CFI_UNWIND_COMMON_REGISTER_MAXCOUNT != 0
+	unwind_cfa_register_t cs_regs[CFI_UNWIND_COMMON_REGISTER_MAXCOUNT];       /* Common register restore rules. */
+#endif /* CFI_UNWIND_COMMON_REGISTER_MAXCOUNT != 0 */
+#if CFI_UNWIND_UNCOMMON_REGISTER_MAXCOUNT != 0
+	unwind_order_index_t  cs_uncorder[CFI_UNWIND_UNCOMMON_REGISTER_MAXCOUNT]; /* Restore order for uncommon registers (0 means unused). */
+#endif /* CFI_UNWIND_UNCOMMON_REGISTER_MAXCOUNT != 0 */
 	unwind_cfa_value_t    cs_cfa; /* Canonical Frame Address evaluation rule. */
 } unwind_cfa_state_t;
 
@@ -199,23 +199,23 @@ typedef struct unwind_cfa_sigframe_state_struct {
 	 *          When  libunwind is built  with -Os, functions using
 	 *          this struct will actually interpret it as though it
 	 *          was a `unwind_cfa_state_t'. */
-#if CFI_UNWIND_SIGFRAME_COMMON_REGISTER_COUNT != 0
-	unwind_cfa_register_t cs_regs[CFI_UNWIND_SIGFRAME_COMMON_REGISTER_COUNT];       /* Common register restore rules. */
-#endif /* CFI_UNWIND_SIGFRAME_COMMON_REGISTER_COUNT != 0 */
-#if CFI_UNWIND_SIGFRAME_UNCOMMON_REGISTER_COUNT != 0
-	unwind_order_index_t  cs_uncorder[CFI_UNWIND_SIGFRAME_UNCOMMON_REGISTER_COUNT]; /* Restore order for uncommon registers (0 means unused). */
-#endif /* CFI_UNWIND_SIGFRAME_UNCOMMON_REGISTER_COUNT != 0 */
+#if CFI_UNWIND_SIGFRAME_COMMON_REGISTER_MAXCOUNT != 0
+	unwind_cfa_register_t cs_regs[CFI_UNWIND_SIGFRAME_COMMON_REGISTER_MAXCOUNT];       /* Common register restore rules. */
+#endif /* CFI_UNWIND_SIGFRAME_COMMON_REGISTER_MAXCOUNT != 0 */
+#if CFI_UNWIND_SIGFRAME_UNCOMMON_REGISTER_MAXCOUNT != 0
+	unwind_order_index_t  cs_uncorder[CFI_UNWIND_SIGFRAME_UNCOMMON_REGISTER_MAXCOUNT]; /* Restore order for uncommon registers (0 means unused). */
+#endif /* CFI_UNWIND_SIGFRAME_UNCOMMON_REGISTER_MAXCOUNT != 0 */
 	unwind_cfa_value_t    cs_cfa; /* Canonical Frame Address evaluation rule. */
 } unwind_cfa_sigframe_state_t;
 
 #ifdef LIBUNWIND_CONFIG_SUPPORT_CFI_CAPSULES
 typedef struct _unwind_cfa_landing_state_struct {
-#if CFI_UNWIND_LANDING_COMMON_REGISTER_COUNT != 0
-	unwind_cfa_register_t cs_regs[CFI_UNWIND_LANDING_COMMON_REGISTER_COUNT];       /* Common register restore rules. */
-#endif /* CFI_UNWIND_LANDING_COMMON_REGISTER_COUNT != 0 */
-#if CFI_UNWIND_LANDING_UNCOMMON_REGISTER_COUNT != 0
-	unwind_order_index_t  cs_uncorder[CFI_UNWIND_LANDING_UNCOMMON_REGISTER_COUNT]; /* Restore order for uncommon registers (0 means unused). */
-#endif /* CFI_UNWIND_LANDING_UNCOMMON_REGISTER_COUNT != 0 */
+#if CFI_UNWIND_LANDING_COMMON_REGISTER_MAXCOUNT != 0
+	unwind_cfa_register_t cs_regs[CFI_UNWIND_LANDING_COMMON_REGISTER_MAXCOUNT];       /* Common register restore rules. */
+#endif /* CFI_UNWIND_LANDING_COMMON_REGISTER_MAXCOUNT != 0 */
+#if CFI_UNWIND_LANDING_UNCOMMON_REGISTER_MAXCOUNT != 0
+	unwind_order_index_t  cs_uncorder[CFI_UNWIND_LANDING_UNCOMMON_REGISTER_MAXCOUNT]; /* Restore order for uncommon registers (0 means unused). */
+#endif /* CFI_UNWIND_LANDING_UNCOMMON_REGISTER_MAXCOUNT != 0 */
 	unwind_cfa_value_t    cs_cfa; /* Canonical Frame Address evaluation rule. */
 } _unwind_cfa_landing_state_t;
 #endif /* LIBUNWIND_CONFIG_SUPPORT_CFI_CAPSULES */

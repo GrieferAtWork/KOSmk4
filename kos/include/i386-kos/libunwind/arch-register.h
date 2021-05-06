@@ -161,6 +161,60 @@ typedef PUNWIND_SETREG_KCPUSTATE PUNWIND_SETREG_ERROR_REGISTER_STATE;
 #endif /* LIBUNWIND_WANT_PROTOTYPES */
 
 
+/* Because x86_64 uses different register indices for x86_64, we
+ * need a wrapper mechanism for converting i386 register indices
+ * to x86_64, and use this mechanism when unwind-ing 32-bit user
+ * modules. */
+#undef LIBUNWIND_WANT_COMPAT_REGISTER_WRAPPER
+
+/* Only provided for kernel-space (for now); User-space support
+ * could also be provided, but isn't needed and would  therefor
+ * only add unnecessary bloat! */
+#if defined(__x86_64__) && (defined(__KERNEL__) || defined(__INTELLISENSE__))
+#define LIBUNWIND_WANT_COMPAT_REGISTER_WRAPPER 1
+#endif /* __x86_64__ && __KERNEL__ */
+
+#ifdef LIBUNWIND_WANT_COMPAT_REGISTER_WRAPPER
+#define LIBUNWIND_HAVE_COMPAT_REGISTER_WRAPPER 1
+struct unwind_getreg_compat_data {
+	/* [1..1] The underlying, register getter function.
+	 * @param: regno: One of `CFI_X86_64_UNWIND_REGISTER_*' */
+	__ATTR_NONNULL((1, 3)) unsigned int /*__NOTHROW_NCX*/
+	(LIBUNWIND_CC *ugcd_getreg)(void const *__arg, unwind_regno_t __regno, void *__restrict __dst);
+
+	/* [?..?] Argument for `ugcd_getreg' */
+	void const    *ugcd_arg;
+};
+
+struct unwind_setreg_compat_data {
+	/* [1..1] The underlying, register setter function.
+	 * @param: regno: One of `CFI_X86_64_UNWIND_REGISTER_*' */
+	__ATTR_NONNULL((1, 3)) unsigned int /*__NOTHROW_NCX*/
+	(LIBUNWIND_CC *uscd_setreg)(void *__arg, unwind_regno_t __regno, void const *__restrict __src);
+
+	/* [?..?] Argument for `uscd_setreg' */
+	void          *uscd_arg;
+};
+
+/* Initializers for the above data structures. */
+#define unwind_getreg_compat_data_init(self, noncompat_getreg, noncompat_arg) \
+	((self)->ugcd_getreg = (noncompat_getreg),                                \
+	 (self)->ugcd_arg    = (noncompat_arg))
+#define unwind_setreg_compat_data_init(self, noncompat_setreg, noncompat_arg) \
+	((self)->uscd_setreg = (noncompat_setreg),                                \
+	 (self)->uscd_arg    = (noncompat_arg))
+
+
+/* Compatibility mode register get/set wrappers.
+ * @param: regno: One of `CFI_386_UNWIND_REGISTER_*' */
+typedef __ATTR_NONNULL((1, 3)) unsigned int (LIBUNWIND_CC *PUNWIND_GETREG_COMPAT)(/*struct unwind_getreg_compat_data **/ void const *__arg, unwind_regno_t __regno, void *__restrict __dst);
+typedef __ATTR_NONNULL((1, 3)) unsigned int (LIBUNWIND_CC *PUNWIND_SETREG_COMPAT)(/*struct unwind_setreg_compat_data **/ void *__arg, unwind_regno_t __regno, void const *__restrict __src);
+#ifdef LIBUNWIND_WANT_PROTOTYPES
+LIBUNWIND_DECL __ATTR_NONNULL((1, 3)) unsigned int __NOTHROW_NCX(LIBUNWIND_CC unwind_getreg_compat)(/*struct unwind_getreg_compat_data **/ void const *__arg, unwind_regno_t __regno, void *__restrict __dst);
+LIBUNWIND_DECL __ATTR_NONNULL((1, 3)) unsigned int __NOTHROW_NCX(LIBUNWIND_CC unwind_setreg_compat)(/*struct unwind_setreg_compat_data **/ void *__arg, unwind_regno_t __regno, void const *__restrict __src);
+#endif /* LIBUNWIND_WANT_PROTOTYPES */
+#endif /* LIBUNWIND_WANT_COMPAT_REGISTER_WRAPPER */
+
 __DECL_END
 #endif /* __CC__ */
 

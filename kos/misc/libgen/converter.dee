@@ -61,10 +61,9 @@ function getMacrosFromPattern(
 
 function generateArrayMapping(
 		macros: {string: int}, fromPrefix: string,
-		toPrefix: string, errorValue: string = none): {int...} {
-	if (errorValue is none)
-		errorValue = toPrefix + "COUNT";
-	errorValue = macros.get(errorValue, errorValue);
+		toPrefix: string, errorValue: string = none): {int | none...} {
+	if (errorValue !is none)
+		errorValue = macros.get(errorValue, errorValue);
 	local toMacros: {string: int} = Dict();
 	for (local name, value: getMacrosFromPattern(macros, toPrefix))
 		toMacros[name[#toPrefix:].lower()] = value;
@@ -74,40 +73,49 @@ function generateArrayMapping(
 			result.resize(value + 1, errorValue);
 		name = name[#fromPrefix:].lower();
 		local newval = toMacros.get(name, errorValue);
-		if (result[value] == errorValue)
+		if (errorValue == result[value])
 			result[value] = newval;
-		else if (newval != errorValue && result[value] != newval) {
-			throw Error("Ambiguous mapping for {} (both {} and {})"
-				.format({ name, result[value], newval }));
+		else if (errorValue != newval && result[value] != newval) {
+			throw Error("Ambiguous mapping for {!r}={!r} (both {!r} and {!r})"
+				.format({ name, value, result[value], newval }));
 		}
 	}
-	while (result && result.last == errorValue)
+	while (result && errorValue == result.last)
 		result.popback();
 	if (!result)
 		result.append(errorValue); // Ensure non-empty
 	return result;
 }
 
-function printArrayDefineMacro(macroName: string, array: {int...}) {
+function printArrayDefineMacro(macroName: string, array: {int | none...}) {
 	final local MAX_VALUES_PER_LINE = 16;
-	local maxValue = max(array);
+	local items = List(array);
+	local maxValue = max(for (local x: items) if (x !is none) x);
 	local elemType = maxValue > 0xffff
 		? "__UINT32_TYPE__"
 		: maxValue > 0xff
 		? "__UINT16_TYPE__"
 		: "__UINT8_TYPE__";
+	for (local i = 0; i < #items; ++i) {
+		if (items[i] is none) {
+			items[i] = maxValue = {
+				"__UINT32_TYPE__" : 0xffffffff,
+				"__UINT16_TYPE__" : 0xffff,
+				"__UINT8_TYPE__" : 0xff,
+			}[elemType];
+		}
+	}
 	local elemWidth = #str(maxValue);
-	local namePrefix = " const name[" + #array + "] = { ";
+	local namePrefix = " const name[" + #items + "] = { ";
 	local lineWidth = #elemType + #namePrefix +
-		min(MAX_VALUES_PER_LINE, #array) * (elemWidth + 2);
+		min(MAX_VALUES_PER_LINE, #items) * (elemWidth + 2);
 	local firstLine = "#define " + macroName + "(name) ";
-	local isMultiLine = #array > MAX_VALUES_PER_LINE;
+	local isMultiLine = #items > MAX_VALUES_PER_LINE;
 	if (#firstLine < lineWidth + 4 && isMultiLine)
 		firstLine += " " * ((lineWidth + 4) - #firstLine);
 	print(firstLine, "\\");
 	print("\t", elemType, namePrefix),;
 	local linePrefix = "\t" + (" " * (#elemType + #namePrefix));
-	local items = List(array);
 	while (#items > MAX_VALUES_PER_LINE) {
 		local part = items[:MAX_VALUES_PER_LINE];
 		items = items[MAX_VALUES_PER_LINE:];

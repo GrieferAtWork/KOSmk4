@@ -43,6 +43,7 @@
 #include <stddef.h>
 #include <string.h>
 
+#include <libunwind/arch-register.h>
 #include <libunwind/cfi.h>
 #include <libunwind/unwind.h>
 
@@ -1756,5 +1757,11 @@ DEFINE_PUBLIC_ALIAS(unwind_setreg_xfpustate_exclusive, libuw_unwind_setreg_xfpus
 #undef IRREGS_LOADSELF
 
 DECL_END
+
+#ifndef __INTELLISENSE__
+#ifdef LIBUNWIND_WANT_COMPAT_REGISTER_WRAPPER
+#include "compat.c.inl"
+#endif /* LIBUNWIND_WANT_COMPAT_REGISTER_WRAPPER */
+#endif /* !__INTELLISENSE__ */
 
 #endif /* !GUARD_LIBUNWIND_ARCH_I386_UNWIND_C */
