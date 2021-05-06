@@ -3555,13 +3555,13 @@ void setproctitle(char const *format, ...);
 
 %[insert:function(reallocarr = reallocarray)]
 
-//TODO:ssize_t hmac(char const *, const void *, $size_t, const void *, $size_t, void *, $size_t);
+//TODO:ssize_t hmac(char const *, void const *, $size_t, void const *, $size_t, void *, $size_t);
 //TODO:devmajor_t getdevmajor(char const *, mode_t);
 //TODO:int getenv_r(char const *, char *, $size_t);
-//TODO:void mi_vector_hash(const void *__restrict, $size_t, uint32_t, uint32_t[3]);
+//TODO:void mi_vector_hash(void const *__restrict, $size_t, uint32_t, uint32_t[3]);
 
-//TODO:$size_t shquote(char const *, char *, $size_t);
-//TODO:$size_t shquotev(int, char *const *, char *, $size_t);
+//TODO:$size_t shquote(char const *arg, char *buf, $size_t buflen);
+//TODO:$size_t shquotev(int argc, char *const *argv, char *buf, $size_t buflen);
 
 
 %#ifdef __LONGLONG

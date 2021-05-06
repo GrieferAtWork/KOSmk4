@@ -25,8 +25,6 @@
 #include "api.h"
 /**/
 
-#include "parser.h"
-
 #include <hybrid/byteorder.h>
 #include <hybrid/byteswap.h>
 #include <hybrid/unaligned.h>
@@ -37,6 +35,8 @@
 #include <string.h>
 #include <uchar.h>
 #include <unicode.h>
+
+#include "parser.h"
 
 DECL_BEGIN
 

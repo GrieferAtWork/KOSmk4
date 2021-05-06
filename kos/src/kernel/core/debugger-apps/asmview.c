@@ -453,9 +453,9 @@ NOTHROW(FCALL av_printscreen)(void const *start_addr,
 	size_t current_line_size = 0;
 	void const *sel_addr = *psel_addr;
 	size_t maxbytes;
-	maxbytes = disasm_default_maxbytes(DISASSEMBLER_TARGET_CURRENT);
+	maxbytes = disasm_default_maxbytes(av_instrlen_da.d_target);
 	disasm_init(&da, &dbg_printer, NULL, start_addr,
-	            DISASSEMBLER_TARGET_CURRENT,
+	            av_instrlen_da.d_target,
 	            DISASSEMBLER_FNOADDR | DISASSEMBLER_FNOBYTES, 0);
 	da.d_format = &av_format;
 	da.d_symbol = &av_symbol_printer;
@@ -579,6 +579,17 @@ PRIVATE ATTR_DBGTEXT void *
 NOTHROW(FCALL av_main)(void *addr) {
 	void *start_addr, *end_addr = (void *)-1;
 	bool display_addr2line = false;
+
+	/* Fill in the appropriate target for the disassembler. */
+	av_instrlen_da.d_target = DISASSEMBLER_TARGET_CURRENT;
+#ifdef __x86_64__
+	if (dbg_current_iscompat())
+		av_instrlen_da.d_target = DISASSEMBLER_TARGET_I386;
+#elif defined(__i386__)
+	if (x86_dbg_getregbyidp(DBG_REGLEVEL_VIEW, X86_REGISTER_MISC_EFLAGS) & EFLAGS_VM)
+		av_instrlen_da.d_target = DISASSEMBLER_TARGET_8086;
+#endif /* ... */
+
 	start_addr = av_instr_pred_n(addr, (dbg_screen_height - 1) / 2);
 	for (;;) {
 		unsigned int key;
@@ -717,6 +728,7 @@ PUBLIC void *NOTHROW(FCALL dbg_asmview)(void *addr) {
 	bool was_cursor_visible;
 	void *buf, *result;
 	u32 oldcur;
+
 	/* Save terminal settings and display contents. */
 	was_cursor_visible = dbg_getcur_visible();
 	buf = alloca(dbg_screen_width * dbg_screen_height * dbg_screen_cellsize);

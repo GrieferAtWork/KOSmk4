@@ -45,14 +45,10 @@
 
 DECL_BEGIN
 
-
-
 #ifndef LIBJSON_EMPTY_STRING_DEFINED
 #define LIBJSON_EMPTY_STRING_DEFINED 1
 INTDEF char const libjson_empty_string[1];
 #endif /* !LIBJSON_EMPTY_STRING_DEFINED */
-
-
 
 INTERN
 	IF_DECODE(NONNULL((1, 2, 3, 4)))
@@ -670,10 +666,6 @@ done:
 	*preader = reader;
 	return result;
 }
-
-
-
-
 
 DECL_END
 

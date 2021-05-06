@@ -24,8 +24,6 @@
 #include "api.h"
 /**/
 
-#include "writer.h"
-
 #include <kos/types.h>
 
 #include <format-printer.h>
@@ -36,6 +34,8 @@
 #include <unicode.h>
 
 #include <libjson/writer.h>
+
+#include "writer.h"
 
 DECL_BEGIN
 
