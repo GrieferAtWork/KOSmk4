@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x66bd714d */
+/* HASH CRC-32:0x10c5eeec */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -2432,8 +2432,26 @@ __NAMESPACE_LOCAL_USING_OR_IMPL(srandom, __FORCELOCAL __ATTR_ARTIFICIAL void __N
 #endif /* !... */
 __CDECLARE_OPT(__ATTR_NONNULL((2)),char *,__NOTHROW_NCX,initstate,(unsigned int __seed, char *__statebuf, __SIZE_TYPE__ __statelen),(__seed,__statebuf,__statelen))
 __CDECLARE_OPT(__ATTR_NONNULL((1)),char *,__NOTHROW_NCX,setstate,(char *__statebuf),(__statebuf))
-__CDECLARE_OPT(__ATTR_WUNUSED,char *,__NOTHROW_NCX,l64a,(long __n),(__n))
-__CDECLARE_OPT(__ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1)),long,__NOTHROW_NCX,a64l,(char const *__s),(__s))
+#ifdef __CRT_HAVE_l64a
+/* >> l64a(3), a64l(3)
+ * Convert between `long' and base-64 encoded integer strings. */
+__CDECLARE(__ATTR_RETNONNULL __ATTR_WUNUSED,char *,__NOTHROW_NCX,l64a,(long __n),(__n))
+#else /* __CRT_HAVE_l64a */
+#include <libc/local/stdlib/l64a.h>
+/* >> l64a(3), a64l(3)
+ * Convert between `long' and base-64 encoded integer strings. */
+__NAMESPACE_LOCAL_USING_OR_IMPL(l64a, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_RETNONNULL __ATTR_WUNUSED char *__NOTHROW_NCX(__LIBCCALL l64a)(long __n) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(l64a))(__n); })
+#endif /* !__CRT_HAVE_l64a */
+#ifdef __CRT_HAVE_a64l
+/* >> l64a(3), a64l(3)
+ * Convert between `long' and base-64 encoded integer strings. */
+__CDECLARE(__ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1)),long,__NOTHROW_NCX,a64l,(char const *__s),(__s))
+#else /* __CRT_HAVE_a64l */
+#include <libc/local/stdlib/a64l.h>
+/* >> l64a(3), a64l(3)
+ * Convert between `long' and base-64 encoded integer strings. */
+__NAMESPACE_LOCAL_USING_OR_IMPL(a64l, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1)) long __NOTHROW_NCX(__LIBCCALL a64l)(char const *__s) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(a64l))(__s); })
+#endif /* !__CRT_HAVE_a64l */
 /* Load the filesystem location of a given file handle.
  * This function behaves similar to `readlink()', but will also function for
  * non-symlink paths, as well as always return an absolute (unambiguous) path
@@ -3262,6 +3280,20 @@ __CDECLARE(__ATTR_WUNUSED,char *,__NOTHROW_RPC,getpassphrase,(char const *__rest
 __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_WUNUSED char *__NOTHROW_RPC(__LIBCCALL getpassphrase)(char const *__restrict __prompt) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(getpass))(__prompt); }
 #endif /* __CRT_HAVE_getpass_r || __CRT_HAVE_getpassfd || __CRT_HAVE_read || __CRT_HAVE__read || __CRT_HAVE___read || __CRT_HAVE_readpassphrase */
 #endif /* !... */
+#ifdef __LONGLONG
+#ifdef __CRT_HAVE_lltostr
+__CDECLARE(__ATTR_RETNONNULL __ATTR_WUNUSED __ATTR_NONNULL((2)),char *,__NOTHROW_NCX,lltostr,(__LONGLONG __value, char *__buf),(__value,__buf))
+#else /* __CRT_HAVE_lltostr */
+#include <libc/local/stdlib/lltostr.h>
+__NAMESPACE_LOCAL_USING_OR_IMPL(lltostr, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_RETNONNULL __ATTR_WUNUSED __ATTR_NONNULL((2)) char *__NOTHROW_NCX(__LIBCCALL lltostr)(__LONGLONG __value, char *__buf) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(lltostr))(__value, __buf); })
+#endif /* !__CRT_HAVE_lltostr */
+#ifdef __CRT_HAVE_ulltostr
+__CDECLARE(__ATTR_RETNONNULL __ATTR_WUNUSED __ATTR_NONNULL((2)),char *,__NOTHROW_NCX,ulltostr,(__ULONGLONG __value, char *__buf),(__value,__buf))
+#else /* __CRT_HAVE_ulltostr */
+#include <libc/local/stdlib/ulltostr.h>
+__NAMESPACE_LOCAL_USING_OR_IMPL(ulltostr, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_RETNONNULL __ATTR_WUNUSED __ATTR_NONNULL((2)) char *__NOTHROW_NCX(__LIBCCALL ulltostr)(__ULONGLONG __value, char *__buf) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(ulltostr))(__value, __buf); })
+#endif /* !__CRT_HAVE_ulltostr */
+#endif /* __LONGLONG */
 #endif /* __USE_SOLARIS */
 
 #ifdef __USE_BSD
@@ -3325,6 +3357,24 @@ __CDECLARE(__ATTR_WUNUSED __ATTR_NONNULL((1, 2)),char *,__NOTHROW_NCX,getbsize,(
 /* >> daemon(3) */
 __CDECLARE(,int,__NOTHROW_RPC,daemon,(__STDC_INT_AS_UINT_T __nochdir, __STDC_INT_AS_UINT_T __noclose),(__nochdir,__noclose))
 #endif /* !__daemon_defined && __CRT_HAVE_daemon */
+#ifdef __CRT_HAVE_l64a_r
+/* >> l64a_r(3)
+ * Reentrant variant of `l64a(3)'. Note that the max required buffer size
+ * @param: buf:     Target buffer (with a size of `bufsize' bytes)
+ * @param: bufsize: Buffer size (including a trailing NUL-character)
+ * @return: 0 : Success
+ * @return: -1: Buffer too small (`errno' was not modified) */
+__CDECLARE(,int,__NOTHROW_NCX,l64a_r,(long __n, char *__buf, __STDC_INT_AS_SIZE_T __bufsize),(__n,__buf,__bufsize))
+#else /* __CRT_HAVE_l64a_r */
+#include <libc/local/stdlib/l64a_r.h>
+/* >> l64a_r(3)
+ * Reentrant variant of `l64a(3)'. Note that the max required buffer size
+ * @param: buf:     Target buffer (with a size of `bufsize' bytes)
+ * @param: bufsize: Buffer size (including a trailing NUL-character)
+ * @return: 0 : Success
+ * @return: -1: Buffer too small (`errno' was not modified) */
+__NAMESPACE_LOCAL_USING_OR_IMPL(l64a_r, __FORCELOCAL __ATTR_ARTIFICIAL int __NOTHROW_NCX(__LIBCCALL l64a_r)(long __n, char *__buf, __STDC_INT_AS_SIZE_T __bufsize) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(l64a_r))(__n, __buf, __bufsize); })
+#endif /* !__CRT_HAVE_l64a_r */
 #ifndef __getprogname_defined
 #define __getprogname_defined 1
 #ifdef __CRT_HAVE_getprogname

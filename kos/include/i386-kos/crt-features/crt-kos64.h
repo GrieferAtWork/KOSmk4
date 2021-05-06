@@ -2248,6 +2248,7 @@
 #define __CRT_HAVE_kstat64
 #define __CRT_HAVE_ksysctl
 #define __CRT_HAVE_l64a
+#define __CRT_HAVE_l64a_r
 #define __CRT_HAVE_labs
 #define __CRT_HAVE_lchmod
 #define __CRT_HAVE_lchown
@@ -2287,6 +2288,7 @@
 #define __CRT_HAVE_llround
 #define __CRT_HAVE_llroundf
 #define __CRT_HAVE_llroundl
+#define __CRT_HAVE_lltostr
 #define __CRT_HAVE_localeconv
 #define __CRT_HAVE_localtime
 #define __CRT_HAVE_localtime64
@@ -4231,6 +4233,7 @@
 #define __CRT_HAVE_ualarm
 #define __CRT_HAVE_ulckpwdf
 #define __CRT_HAVE_ulimit
+#define __CRT_HAVE_ulltostr
 #define __CRT_HAVE_ultoa
 #define __CRT_HAVE_umask
 #define __CRT_HAVE_umask_s
@@ -6663,6 +6666,7 @@
 #define __CRT_HAVE_KOS$kreaddirf
 #define __CRT_HAVE_KOS$kreaddirf64
 #define __CRT_HAVE_KOS$l64a
+#define __CRT_HAVE_KOS$l64a_r
 #define __CRT_HAVE_KOS$labs
 #define __CRT_HAVE_KOS$lchmod
 #define __CRT_HAVE_KOS$lchown
@@ -6701,6 +6705,7 @@
 #define __CRT_HAVE_KOS$llround
 #define __CRT_HAVE_KOS$llroundf
 #define __CRT_HAVE_KOS$llroundl
+#define __CRT_HAVE_KOS$lltostr
 #define __CRT_HAVE_KOS$localtime
 #define __CRT_HAVE_KOS$localtime64
 #define __CRT_HAVE_KOS$localtime64_r
@@ -7773,6 +7778,7 @@
 #define __CRT_HAVE_KOS$twalk
 #define __CRT_HAVE_KOS$ualarm
 #define __CRT_HAVE_KOS$ulimit
+#define __CRT_HAVE_KOS$ulltostr
 #define __CRT_HAVE_KOS$ultoa
 #define __CRT_HAVE_KOS$umask
 #define __CRT_HAVE_KOS$umask_s
@@ -10202,6 +10208,7 @@
 #define __CRT_HAVE_DOS$kreaddirf
 #define __CRT_HAVE_DOS$kreaddirf64
 #define __CRT_HAVE_DOS$l64a
+#define __CRT_HAVE_DOS$l64a_r
 #define __CRT_HAVE_DOS$labs
 #define __CRT_HAVE_DOS$lchmod
 #define __CRT_HAVE_DOS$lchown
@@ -10240,6 +10247,7 @@
 #define __CRT_HAVE_DOS$llround
 #define __CRT_HAVE_DOS$llroundf
 #define __CRT_HAVE_DOS$llroundl
+#define __CRT_HAVE_DOS$lltostr
 #define __CRT_HAVE_DOS$localtime
 #define __CRT_HAVE_DOS$localtime64
 #define __CRT_HAVE_DOS$localtime64_r
@@ -11312,6 +11320,7 @@
 #define __CRT_HAVE_DOS$twalk
 #define __CRT_HAVE_DOS$ualarm
 #define __CRT_HAVE_DOS$ulimit
+#define __CRT_HAVE_DOS$ulltostr
 #define __CRT_HAVE_DOS$ultoa
 #define __CRT_HAVE_DOS$umask
 #define __CRT_HAVE_DOS$umask_s

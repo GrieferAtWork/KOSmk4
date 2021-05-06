@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x811cf89d */
+/* HASH CRC-32:0xfd858cc */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -592,8 +592,26 @@ INTDEF NONNULL((1)) int NOTHROW_NCX(LIBDCALL libd_putenv)(char *string);
 INTDEF void NOTHROW_NCX(LIBDCALL libd_srandom)(unsigned int seed);
 INTDEF NONNULL((2)) char *NOTHROW_NCX(LIBDCALL libd_initstate)(unsigned int seed, char *statebuf, size_t statelen);
 INTDEF NONNULL((1)) char *NOTHROW_NCX(LIBDCALL libd_setstate)(char *statebuf);
-INTDEF WUNUSED char *NOTHROW_NCX(LIBDCALL libd_l64a)(long n);
+/* >> l64a(3), a64l(3)
+ * Convert between `long' and base-64 encoded integer strings. */
+INTDEF ATTR_RETNONNULL WUNUSED char *NOTHROW_NCX(LIBDCALL libd_l64a)(long n);
+#endif /* !__LIBCCALL_IS_LIBDCALL && !__KERNEL__ */
+#ifndef __KERNEL__
+/* >> l64a(3), a64l(3)
+ * Convert between `long' and base-64 encoded integer strings. */
+INTDEF ATTR_RETNONNULL WUNUSED char *NOTHROW_NCX(LIBCCALL libc_l64a)(long n);
+#endif /* !__KERNEL__ */
+#if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
+/* >> l64a(3), a64l(3)
+ * Convert between `long' and base-64 encoded integer strings. */
 INTDEF ATTR_PURE WUNUSED NONNULL((1)) long NOTHROW_NCX(LIBDCALL libd_a64l)(char const *s);
+#endif /* !__LIBCCALL_IS_LIBDCALL && !__KERNEL__ */
+#ifndef __KERNEL__
+/* >> l64a(3), a64l(3)
+ * Convert between `long' and base-64 encoded integer strings. */
+INTDEF ATTR_PURE WUNUSED NONNULL((1)) long NOTHROW_NCX(LIBCCALL libc_a64l)(char const *s);
+#endif /* !__KERNEL__ */
+#if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
 /* Load the filesystem location of a given file handle.
  * This function behaves similar to `readlink()', but will also function for
  * non-symlink paths, as well as always return an absolute (unambiguous) path
@@ -833,6 +851,18 @@ INTDEF NONNULL((1)) int NOTHROW_NCX(LIBDCALL libd_fdwalk)(__fdwalk_func_t func, 
 INTDEF NONNULL((1)) int NOTHROW_NCX(LIBCCALL libc_fdwalk)(__fdwalk_func_t func, void *cookie);
 #endif /* !__KERNEL__ */
 #if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
+INTDEF ATTR_RETNONNULL WUNUSED NONNULL((2)) char *NOTHROW_NCX(LIBDCALL libd_lltostr)(__LONGLONG value, char *buf);
+#endif /* !__LIBCCALL_IS_LIBDCALL && !__KERNEL__ */
+#ifndef __KERNEL__
+INTDEF ATTR_RETNONNULL WUNUSED NONNULL((2)) char *NOTHROW_NCX(LIBCCALL libc_lltostr)(__LONGLONG value, char *buf);
+#endif /* !__KERNEL__ */
+#if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
+INTDEF ATTR_RETNONNULL WUNUSED NONNULL((2)) char *NOTHROW_NCX(LIBDCALL libd_ulltostr)(__ULONGLONG value, char *buf);
+#endif /* !__LIBCCALL_IS_LIBDCALL && !__KERNEL__ */
+#ifndef __KERNEL__
+INTDEF ATTR_RETNONNULL WUNUSED NONNULL((2)) char *NOTHROW_NCX(LIBCCALL libc_ulltostr)(__ULONGLONG value, char *buf);
+#endif /* !__KERNEL__ */
+#if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
 INTDEF ATTR_MALL_DEFAULT_ALIGNED WUNUSED ATTR_ALLOC_SIZE((2)) void *NOTHROW_NCX(LIBDCALL libd_reallocf)(void *mallptr, size_t num_bytes);
 #endif /* !__LIBCCALL_IS_LIBDCALL && !__KERNEL__ */
 #ifndef __KERNEL__
@@ -851,8 +881,22 @@ INTDEF ATTR_MALL_DEFAULT_ALIGNED WUNUSED ATTR_ALLOC_SIZE((3, 4)) void *NOTHROW_N
  * while still containing its previous contents. */
 INTDEF void NOTHROW_NCX(LIBDCALL libd_freezero)(void *mallptr, size_t num_bytes);
 INTDEF WUNUSED NONNULL((1, 2)) char *NOTHROW_NCX(LIBDCALL libd_getbsize)(int *headerlenp, __LONGPTR_TYPE__ *blocksizep);
+/* >> l64a_r(3)
+ * Reentrant variant of `l64a(3)'. Note that the max required buffer size
+ * @param: buf:     Target buffer (with a size of `bufsize' bytes)
+ * @param: bufsize: Buffer size (including a trailing NUL-character)
+ * @return: 0 : Success
+ * @return: -1: Buffer too small (`errno' was not modified) */
+INTDEF int NOTHROW_NCX(LIBDCALL libd_l64a_r)(long n, char *buf, __STDC_INT_AS_SIZE_T bufsize);
 #endif /* !__LIBCCALL_IS_LIBDCALL && !__KERNEL__ */
 #ifndef __KERNEL__
+/* >> l64a_r(3)
+ * Reentrant variant of `l64a(3)'. Note that the max required buffer size
+ * @param: buf:     Target buffer (with a size of `bufsize' bytes)
+ * @param: bufsize: Buffer size (including a trailing NUL-character)
+ * @return: 0 : Success
+ * @return: -1: Buffer too small (`errno' was not modified) */
+INTDEF int NOTHROW_NCX(LIBCCALL libc_l64a_r)(long n, char *buf, __STDC_INT_AS_SIZE_T bufsize);
 /* >> getprogname(3), setprogname(3) */
 INTDEF ATTR_CONST WUNUSED char const *NOTHROW_NCX(LIBCCALL libc_getprogname)(void);
 #endif /* !__KERNEL__ */

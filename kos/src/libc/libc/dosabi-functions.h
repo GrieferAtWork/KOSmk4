@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x91be612 */
+/* HASH CRC-32:0xabfd9e42 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -1593,8 +1593,8 @@ DFUN(".text.crt.dos.fs.environ", libd_putenv, libc_putenv, TD, 1, TP)
 DFUN(".text.crt.dos.random", libd_srandom, libc_srandom, TV, 1, TD)
 DFUN(".text.crt.dos.random", libd_initstate, libc_initstate, TP, 3, TD, TP, TI)
 DFUN(".text.crt.dos.random", libd_setstate, libc_setstate, TP, 1, TP)
-DFUN(".text.crt.dos.string.encrypt", libd_l64a, libc_l64a, TP, 1, TL)
-DFUN(".text.crt.dos.string.encrypt", libd_a64l, libc_a64l, TL, 1, TP)
+DFUN(".text.crt.dos.bsd", libd_l64a, libc_l64a, TP, 1, TL)
+DFUN(".text.crt.dos.bsd", libd_a64l, libc_a64l, TL, 1, TP)
 DFUN(".text.crt.dos.fs.property", libd_realpath, libc_realpath, TP, 2, TP, TP)
 DFUN(".text.crt.dos.fs.property", libd_frealpath, libc_frealpath, TP, 3, TIn(__SIZEOF_FD_T__), TP, TI)
 DFUN(".text.crt.dos.fs.property", libd_frealpath4, libc_frealpath4, TP, 4, TIn(__SIZEOF_FD_T__), TP, TI, TIn(__SIZEOF_ATFLAG_T__))
@@ -1621,10 +1621,13 @@ DFUN(".text.crt.dos.fs.environ", libd_secure_getenv, libc_secure_getenv, TP, 1, 
 DFUN(".text.crt.dos.fs.property", libd_canonicalize_file_name, libc_canonicalize_file_name, TP, 1, TP)
 DFUN(".text.crt.dos.fs.exec.system", libd_shexec, libc_shexec, TD, 1, TP)
 DFUN(".text.crt.dos.solaris", libd_fdwalk, libc_fdwalk, TD, 2, TP, TP)
+DFUN(".text.crt.dos.solaris", libd_lltostr, libc_lltostr, TP, 2, TLL, TP)
+DFUN(".text.crt.dos.solaris", libd_ulltostr, libc_ulltostr, TP, 2, TLL, TP)
 DFUN(".text.crt.dos.heap.rare_helpers", libd_reallocf, libc_reallocf, TP, 2, TP, TI)
 DFUN(".text.crt.dos.heap.rare_helpers", libd_recallocarray, libc_recallocarray, TP, 4, TP, TI, TI, TI)
 DFUN(".text.crt.dos.heap.rare_helpers", libd_freezero, libc_freezero, TV, 2, TP, TI)
 DFUN(".text.crt.dos.bsd", libd_getbsize, libc_getbsize, TP, 2, TP, TP)
+DFUN(".text.crt.dos.bsd", libd_l64a_r, libc_l64a_r, TD, 3, TL, TP, TD)
 DFUN(".text.crt.dos.bsd", libd_setprogname, libc_setprogname, TV, 1, TP)
 DFUN(".text.crt.dos.bsd", libd_heapsort, libc_heapsort, TD, 4, TP, TI, TI, TP)
 DFUN(".text.crt.dos.bsd", libd_mergesort, libc_mergesort, TD, 4, TP, TI, TI, TP)

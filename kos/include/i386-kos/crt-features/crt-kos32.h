@@ -2394,6 +2394,7 @@
 #define __CRT_HAVE_kstat64
 #define __CRT_HAVE_ksysctl
 #define __CRT_HAVE_l64a
+#define __CRT_HAVE_l64a_r
 #define __CRT_HAVE_labs
 #define __CRT_HAVE_lchmod
 #define __CRT_HAVE_lchown
@@ -2433,6 +2434,7 @@
 #define __CRT_HAVE_llround
 #define __CRT_HAVE_llroundf
 #define __CRT_HAVE_llroundl
+#define __CRT_HAVE_lltostr
 #define __CRT_HAVE_localeconv
 #define __CRT_HAVE_localtime
 #define __CRT_HAVE_localtime64
@@ -4566,6 +4568,7 @@
 #define __CRT_HAVE_ualarm
 #define __CRT_HAVE_ulckpwdf
 #define __CRT_HAVE_ulimit
+#define __CRT_HAVE_ulltostr
 #define __CRT_HAVE_ultoa
 #define __CRT_HAVE_umask
 #define __CRT_HAVE_umask_s

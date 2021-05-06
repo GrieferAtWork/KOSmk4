@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x5d67888b */
+/* HASH CRC-32:0x10397f2e */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -2051,10 +2051,13 @@ DEFINE_PUBLIC_ALIAS(DOS$secure_getenv, libd_secure_getenv);
 DEFINE_PUBLIC_ALIAS(DOS$canonicalize_file_name, libd_canonicalize_file_name);
 DEFINE_PUBLIC_ALIAS(DOS$shexec, libd_shexec);
 DEFINE_PUBLIC_ALIAS(DOS$fdwalk, libd_fdwalk);
+DEFINE_PUBLIC_ALIAS(DOS$lltostr, libd_lltostr);
+DEFINE_PUBLIC_ALIAS(DOS$ulltostr, libd_ulltostr);
 DEFINE_PUBLIC_ALIAS(DOS$reallocf, libd_reallocf);
 DEFINE_PUBLIC_ALIAS(DOS$recallocarray, libd_recallocarray);
 DEFINE_PUBLIC_ALIAS(DOS$freezero, libd_freezero);
 DEFINE_PUBLIC_ALIAS(DOS$getbsize, libd_getbsize);
+DEFINE_PUBLIC_ALIAS(DOS$l64a_r, libd_l64a_r);
 DEFINE_PUBLIC_ALIAS(DOS$setprogname, libd_setprogname);
 DEFINE_PUBLIC_ALIAS(DOS$heapsort, libd_heapsort);
 DEFINE_PUBLIC_ALIAS(DOS$mergesort, libd_mergesort);

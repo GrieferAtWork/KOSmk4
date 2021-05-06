@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x1198057d */
+/* HASH CRC-32:0xdee00c15 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -76,8 +76,6 @@ INTDEF long NOTHROW_NCX(LIBCCALL libc_random)(void);
 INTDEF void NOTHROW_NCX(LIBCCALL libc_srandom)(unsigned int seed);
 INTDEF NONNULL((2)) char *NOTHROW_NCX(LIBCCALL libc_initstate)(unsigned int seed, char *statebuf, size_t statelen);
 INTDEF NONNULL((1)) char *NOTHROW_NCX(LIBCCALL libc_setstate)(char *statebuf);
-INTDEF WUNUSED char *NOTHROW_NCX(LIBCCALL libc_l64a)(long n);
-INTDEF ATTR_PURE WUNUSED NONNULL((1)) long NOTHROW_NCX(LIBCCALL libc_a64l)(char const *s);
 /* Load the filesystem location of a given file handle.
  * This function behaves similar to `readlink()', but will also function for
  * non-symlink paths, as well as always return an absolute (unambiguous) path

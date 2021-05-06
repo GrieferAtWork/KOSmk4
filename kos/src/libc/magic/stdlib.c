@@ -2275,13 +2275,43 @@ char *initstate(unsigned int seed, [[outp(statelen)]] char *statebuf, $size_t st
 char *setstate([[nonnull]] char *statebuf);
 
 
-[[wunused]]
-[[section(".text.crt{|.dos}.string.encrypt")]]
-char *l64a(long n); /* TODO: Implement here */
+@@>> l64a(3), a64l(3)
+@@Convert between `long' and base-64 encoded integer strings.
+[[wunused, section(".text.crt{|.dos}.bsd")]]
+[[nonnull, impl_include("<hybrid/typecore.h>")]]
+char *l64a(long n) {
+	/* l64a_r() encodes 6 bytes from `n' into 1 character, followed
+	 * by 1 trailing NUL-character. So we can can calculate the max
+	 * required buffer size here, based on `sizeof(long)'! */
+	static char buf[(((sizeof(long) * __CHAR_BIT__) + 5) / 6) + 1];
+	l64a_r(n, buf, sizeof(buf));
+	return buf;
+}
 
-[[wunused, pure]]
-[[section(".text.crt{|.dos}.string.encrypt")]]
-long a64l([[nonnull]] char const *s); /* TODO: Implement here */
+[[wunused, pure, doc_alias("l64a")]]
+[[section(".text.crt{|.dos}.bsd")]]
+long a64l([[nonnull]] char const *s) {
+	unsigned long digit, result = 0;
+	unsigned int shift = 0;
+	for (;; ++s) {
+		char ch = *s;
+		if (ch <= 0) {
+			break;
+		} else if (ch <= '/') {
+			digit = (ch - '.') + 0;
+		} else if (ch <= '9') {
+			digit = (ch - '0') + 2;
+		} else if (ch <= 'Z') {
+			digit = (ch - 'A') + 12;
+		} else {
+			digit = (ch - 'a') + 38;
+		}
+		digit <<= shift;
+		result |= digit;
+		shift += 6;
+	}
+	return result;
+}
 
 @@Load the filesystem location of a given file handle.
 @@This function behaves similar to `readlink()', but will also function for
@@ -3058,8 +3088,27 @@ int fdwalk([[nonnull]] __fdwalk_func_t func, void *cookie) {
 
 %[insert:function(getpassphrase = getpass)]
 
-//TODO: char *lltostr(long long, char *);
-//TODO: char *ulltostr(unsigned long long, char *);
+%#ifdef __LONGLONG
+[[nonnull, wunused]]
+char *lltostr(__LONGLONG value, [[nonnull]] char *buf) {
+	char *result;
+	if (value < 0) {
+		result    = ulltostr((__ULONGLONG)0 - value, buf);
+		*--result = '-';
+	} else {
+		result = ulltostr((__ULONGLONG)value, buf);
+	}
+	return result;
+}
+
+[[nonnull, wunused]]
+char *ulltostr(__ULONGLONG value, [[nonnull]] char *buf) {
+	do {
+		*--buf = '0' + (value % 10);
+	} while ((value /= 10) != 0);
+	return buf;
+}
+%#endif /* __LONGLONG */
 %#endif /* __USE_SOLARIS */
 
 
@@ -3177,10 +3226,46 @@ char *getbsize([[nonnull]] int *headerlenp,
 //TODO:char *devname_r($dev_t dev, $mode_t mode, char *buf, __STDC_INT_AS_SIZE_T buflen);
 //TODO:char *fdevname($fd_t fd);
 //TODO:char *fdevname_r($fd_t fd, char *buf, __STDC_INT_AS_SIZE_T buflenint);
-//TODO:int l64a_r(long n, char *buf, __STDC_INT_AS_SIZE_T buflen);
 //TODO:$fd_t mkostempsat($fd_t dirfd, char *template_, __STDC_INT_AS_SIZE_T suffixlen, $oflag_t flags);
 //TODO:extern char *suboptarg;
 //TODO:void srandomdev(void);
+
+@@>> l64a_r(3)
+@@Reentrant variant of `l64a(3)'. Note that the max required buffer size
+@@@param: buf:     Target buffer (with a size of `bufsize' bytes)
+@@@param: bufsize: Buffer size (including a trailing NUL-character)
+@@@return: 0 : Success
+@@@return: -1: Buffer too small (`errno' was not modified)
+[[section(".text.crt{|.dos}.bsd")]]
+int l64a_r(long n, char *buf, __STDC_INT_AS_SIZE_T bufsize) {
+	unsigned long un;
+	/* Mapping from digit values --> base-64 characters. */
+	static char const chrs[64] = {
+		'.', '/', '0', '1', '2', '3', '4', '5',
+		'6', '7', '8', '9', 'A', 'B', 'C', 'D',
+		'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L',
+		'M', 'N', 'O', 'P', 'Q', 'R', 'S', 'T',
+		'U', 'V', 'W', 'X', 'Y', 'Z', 'a', 'b',
+		'c', 'd', 'e', 'f', 'g', 'h', 'i', 'j',
+		'k', 'l', 'm', 'n', 'o', 'p', 'q', 'r',
+		's', 't', 'u', 'v', 'w', 'x', 'y', 'z'
+	};
+	un = (unsigned long )n;
+	while (bufsize) {
+		--bufsize;
+		if (!un) {
+			/* Done! */
+			*buf = '\0';
+			return 0;
+		}
+		/* Encode 1 character. */
+		*buf++ = chrs[un & 0x3f];
+		un >>= 6;
+	}
+	return -1;
+
+}
+
 
 @@>> getprogname(3), setprogname(3)
 [[guard, wunused, const]]

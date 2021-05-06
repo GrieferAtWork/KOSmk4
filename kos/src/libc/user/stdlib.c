@@ -1210,29 +1210,7 @@ NOTHROW_NCX(LIBCCALL libc_setstate)(char *statebuf)
 }
 /*[[[end:libc_setstate]]]*/
 
-/*[[[head:libc_l64a,hash:CRC-32=0xc2c78b77]]]*/
-INTERN ATTR_SECTION(".text.crt.string.encrypt") WUNUSED char *
-NOTHROW_NCX(LIBCCALL libc_l64a)(long n)
-/*[[[body:libc_l64a]]]*/
-/*AUTO*/{
-	(void)n;
-	CRT_UNIMPLEMENTEDF("l64a(%lx)", n); /* TODO */
-	libc_seterrno(ENOSYS);
-	return NULL;
-}
-/*[[[end:libc_l64a]]]*/
 
-/*[[[head:libc_a64l,hash:CRC-32=0xea4a21cb]]]*/
-INTERN ATTR_SECTION(".text.crt.string.encrypt") ATTR_PURE WUNUSED NONNULL((1)) long
-NOTHROW_NCX(LIBCCALL libc_a64l)(char const *s)
-/*[[[body:libc_a64l]]]*/
-/*AUTO*/{
-	(void)s;
-	CRT_UNIMPLEMENTEDF("a64l(%q)", s); /* TODO */
-	libc_seterrno(ENOSYS);
-	return 0;
-}
-/*[[[end:libc_a64l]]]*/
 
 /*[[[head:libc_realpath,hash:CRC-32=0x6c88b30c]]]*/
 /* Load the filesystem location of a given file handle.
@@ -2278,7 +2256,7 @@ NOTHROW_NCX(VLIBCCALL libc_setproctitle)(char const *format,
 
 
 
-/*[[[start:exports,hash:CRC-32=0xea20198c]]]*/
+/*[[[start:exports,hash:CRC-32=0xfa19944a]]]*/
 DEFINE_PUBLIC_ALIAS(getenv, libc_getenv);
 DEFINE_PUBLIC_ALIAS(exit, libc_exit);
 DEFINE_PUBLIC_ALIAS(atexit, libc_atexit);
@@ -2324,8 +2302,6 @@ DEFINE_PUBLIC_ALIAS(random, libc_random);
 DEFINE_PUBLIC_ALIAS(srandom, libc_srandom);
 DEFINE_PUBLIC_ALIAS(initstate, libc_initstate);
 DEFINE_PUBLIC_ALIAS(setstate, libc_setstate);
-DEFINE_PUBLIC_ALIAS(l64a, libc_l64a);
-DEFINE_PUBLIC_ALIAS(a64l, libc_a64l);
 DEFINE_PUBLIC_ALIAS(realpath, libc_realpath);
 DEFINE_PUBLIC_ALIAS(frealpath, libc_frealpath);
 DEFINE_PUBLIC_ALIAS(frealpath4, libc_frealpath4);

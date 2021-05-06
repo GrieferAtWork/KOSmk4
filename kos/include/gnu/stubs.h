@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xc1004c */
+/* HASH CRC-32:0xaecf16e7 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -99,7 +99,6 @@
 #define __stub__wsearchenv_s
 #define __stub__wtempnam
 #define __stub__wtmpnam_s
-#define __stub_a64l
 #define __stub___acos
 #define __stub_acos
 #define __stub___acosh
@@ -397,7 +396,6 @@
 #define __stub_jrand48
 #define __stub_jrand48_r
 #define __stub_klogctl
-#define __stub_l64a
 #define __stub_lckpwdf
 #define __stub_lcong48
 #define __stub_lcong48_r

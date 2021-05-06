@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x80578e56 */
+/* HASH CRC-32:0x1b8362ae */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -1575,6 +1575,7 @@
 #define __CRT_HAVE_DOS$kreaddirf
 #define __CRT_HAVE_DOS$kreaddirf64
 #define __CRT_HAVE_DOS$l64a
+#define __CRT_HAVE_DOS$l64a_r
 #define __CRT_HAVE_DOS$labs
 #define __CRT_HAVE_DOS$lchmod
 #define __CRT_HAVE_DOS$lchown
@@ -1613,6 +1614,7 @@
 #define __CRT_HAVE_DOS$llround
 #define __CRT_HAVE_DOS$llroundf
 #define __CRT_HAVE_DOS$llroundl
+#define __CRT_HAVE_DOS$lltostr
 #define __CRT_HAVE_DOS$localtime
 #define __CRT_HAVE_DOS$localtime64
 #define __CRT_HAVE_DOS$localtime64_r
@@ -2707,6 +2709,7 @@
 #define __CRT_HAVE_DOS$twalk
 #define __CRT_HAVE_DOS$ualarm
 #define __CRT_HAVE_DOS$ulimit
+#define __CRT_HAVE_DOS$ulltostr
 #define __CRT_HAVE_DOS$ultoa
 #define __CRT_HAVE_DOS$umask
 #define __CRT_HAVE_DOS$umask_s
@@ -4729,6 +4732,7 @@
 #define __CRT_HAVE_kstat
 #define __CRT_HAVE_kstat64
 #define __CRT_HAVE_l64a
+#define __CRT_HAVE_l64a_r
 #define __CRT_HAVE_labs
 #define __CRT_HAVE_lchmod
 #define __CRT_HAVE_lchown
@@ -4768,6 +4772,7 @@
 #define __CRT_HAVE_llround
 #define __CRT_HAVE_llroundf
 #define __CRT_HAVE_llroundl
+#define __CRT_HAVE_lltostr
 #define __CRT_HAVE_localeconv
 #define __CRT_HAVE_localtime
 #define __CRT_HAVE_localtime64
@@ -5928,6 +5933,7 @@
 #define __CRT_HAVE_ualarm
 #define __CRT_HAVE_ulckpwdf
 #define __CRT_HAVE_ulimit
+#define __CRT_HAVE_ulltostr
 #define __CRT_HAVE_ultoa
 #define __CRT_HAVE_umask
 #define __CRT_HAVE_umask_s

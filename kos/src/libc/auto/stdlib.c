@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xb70c4bf0 */
+/* HASH CRC-32:0xa0513c61 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -1549,6 +1549,43 @@ NOTHROW_NCX(LIBCCALL libc_rpmatch)(char const *response) {
 		return 1;
 	return -1;
 }
+#include <hybrid/typecore.h>
+/* >> l64a(3), a64l(3)
+ * Convert between `long' and base-64 encoded integer strings. */
+INTERN ATTR_SECTION(".text.crt.bsd") ATTR_RETNONNULL WUNUSED char *
+NOTHROW_NCX(LIBCCALL libc_l64a)(long n) {
+	/* l64a_r() encodes 6 bytes from `n' into 1 character, followed
+	 * by 1 trailing NUL-character. So we can can calculate the max
+	 * required buffer size here, based on `sizeof(long)'! */
+	static char buf[(((sizeof(long) * __CHAR_BIT__) + 5) / 6) + 1];
+	libc_l64a_r(n, buf, sizeof(buf));
+	return buf;
+}
+/* >> l64a(3), a64l(3)
+ * Convert between `long' and base-64 encoded integer strings. */
+INTERN ATTR_SECTION(".text.crt.bsd") ATTR_PURE WUNUSED NONNULL((1)) long
+NOTHROW_NCX(LIBCCALL libc_a64l)(char const *s) {
+	unsigned long digit, result = 0;
+	unsigned int shift = 0;
+	for (;; ++s) {
+		char ch = *s;
+		if (ch <= 0) {
+			break;
+		} else if (ch <= '/') {
+			digit = (ch - '.') + 0;
+		} else if (ch <= '9') {
+			digit = (ch - '0') + 2;
+		} else if (ch <= 'Z') {
+			digit = (ch - 'A') + 12;
+		} else {
+			digit = (ch - 'a') + 38;
+		}
+		digit <<= shift;
+		result |= digit;
+		shift += 6;
+	}
+	return result;
+}
 /* >> mktemp(3)
  * Badly designed version of `mkstemp' that won't actually create
  * the temporary file, meaning that by the time the caller tries to
@@ -2017,6 +2054,26 @@ NOTHROW_NCX(LIBCCALL libc_fdwalk)(__fdwalk_func_t func,
 	}
 	return result;
 }
+INTERN ATTR_SECTION(".text.crt.solaris") ATTR_RETNONNULL WUNUSED NONNULL((2)) char *
+NOTHROW_NCX(LIBCCALL libc_lltostr)(__LONGLONG value,
+                                   char *buf) {
+	char *result;
+	if (value < 0) {
+		result    = libc_ulltostr((__ULONGLONG)0 - value, buf);
+		*--result = '-';
+	} else {
+		result = libc_ulltostr((__ULONGLONG)value, buf);
+	}
+	return result;
+}
+INTERN ATTR_SECTION(".text.crt.solaris") ATTR_RETNONNULL WUNUSED NONNULL((2)) char *
+NOTHROW_NCX(LIBCCALL libc_ulltostr)(__ULONGLONG value,
+                                    char *buf) {
+	do {
+		*--buf = '0' + (value % 10);
+	} while ((value /= 10) != 0);
+	return buf;
+}
 #include <asm/crt/malloc.h>
 INTERN ATTR_SECTION(".text.crt.heap.rare_helpers") ATTR_MALL_DEFAULT_ALIGNED WUNUSED ATTR_ALLOC_SIZE((2)) void *
 NOTHROW_NCX(LIBCCALL libc_reallocf)(void *mallptr,
@@ -2043,6 +2100,43 @@ NOTHROW_NCX(LIBCCALL libc_reallocf)(void *mallptr,
 	}
 #endif /* __CRT_HAVE_free || __CRT_HAVE_cfree */
 	return result;
+}
+/* >> l64a_r(3)
+ * Reentrant variant of `l64a(3)'. Note that the max required buffer size
+ * @param: buf:     Target buffer (with a size of `bufsize' bytes)
+ * @param: bufsize: Buffer size (including a trailing NUL-character)
+ * @return: 0 : Success
+ * @return: -1: Buffer too small (`errno' was not modified) */
+INTERN ATTR_SECTION(".text.crt.bsd") int
+NOTHROW_NCX(LIBCCALL libc_l64a_r)(long n,
+                                  char *buf,
+                                  __STDC_INT_AS_SIZE_T bufsize) {
+	unsigned long un;
+	/* Mapping from digit values --> base-64 characters. */
+	static char const chrs[64] = {
+		'.', '/', '0', '1', '2', '3', '4', '5',
+		'6', '7', '8', '9', 'A', 'B', 'C', 'D',
+		'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L',
+		'M', 'N', 'O', 'P', 'Q', 'R', 'S', 'T',
+		'U', 'V', 'W', 'X', 'Y', 'Z', 'a', 'b',
+		'c', 'd', 'e', 'f', 'g', 'h', 'i', 'j',
+		'k', 'l', 'm', 'n', 'o', 'p', 'q', 'r',
+		's', 't', 'u', 'v', 'w', 'x', 'y', 'z'
+	};
+	un = (unsigned long )n;
+	while (bufsize) {
+		--bufsize;
+		if (!un) {
+			/* Done! */
+			*buf = '\0';
+			return 0;
+		}
+		/* Encode 1 character. */
+		*buf++ = chrs[un & 0x3f];
+		un >>= 6;
+	}
+	return -1;
+
 }
 /* >> getprogname(3), setprogname(3) */
 INTERN ATTR_SECTION(".text.crt.bsd") ATTR_CONST WUNUSED char const *
@@ -4324,6 +4418,8 @@ DEFINE_PUBLIC_ALIAS(qfcvt, libc_qfcvt);
 DEFINE_PUBLIC_ALIAS(mkstemps64, libc_mkstemps);
 DEFINE_PUBLIC_ALIAS(mkstemps, libc_mkstemps);
 DEFINE_PUBLIC_ALIAS(rpmatch, libc_rpmatch);
+DEFINE_PUBLIC_ALIAS(l64a, libc_l64a);
+DEFINE_PUBLIC_ALIAS(a64l, libc_a64l);
 #ifdef __LIBCCALL_IS_LIBDCALL
 DEFINE_PUBLIC_ALIAS(_mktemp, libc_mktemp);
 #endif /* __LIBCCALL_IS_LIBDCALL */
@@ -4381,7 +4477,10 @@ DEFINE_PUBLIC_ALIAS(strtold_l, libc_strtold_l);
 DEFINE_PUBLIC_ALIAS(shexec, libc_shexec);
 DEFINE_PUBLIC_ALIAS(getexecname, libc_getexecname);
 DEFINE_PUBLIC_ALIAS(fdwalk, libc_fdwalk);
+DEFINE_PUBLIC_ALIAS(lltostr, libc_lltostr);
+DEFINE_PUBLIC_ALIAS(ulltostr, libc_ulltostr);
 DEFINE_PUBLIC_ALIAS(reallocf, libc_reallocf);
+DEFINE_PUBLIC_ALIAS(l64a_r, libc_l64a_r);
 DEFINE_PUBLIC_ALIAS(getprogname, libc_getprogname);
 DEFINE_PUBLIC_ALIAS(setprogname, libc_setprogname);
 DEFINE_PUBLIC_ALIAS(heapsort, libc_heapsort);
