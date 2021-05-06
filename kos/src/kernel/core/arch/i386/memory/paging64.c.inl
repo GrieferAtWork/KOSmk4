@@ -1765,29 +1765,72 @@ NOTHROW(FCALL p64_pagedir_xch_e1_word_nochk)(unsigned int vec4,
 #endif /* !NDEBUG */
 
 
-INTERN u64 p64_pageperm_matrix[16] = {
-#define COMMON_PRESENT (P64_PAGE_FACCESSED | P64_PAGE_FDIRTY | P64_PAGE_FPRESENT)
-	[(0)]                                                                              = P64_PAGE_FPREPARED | P64_PAGE_FNOEXEC,
-	[(PAGEDIR_MAP_FEXEC)]                                                              = P64_PAGE_FPREPARED | COMMON_PRESENT,
-	[(PAGEDIR_MAP_FWRITE)]                                                             = P64_PAGE_FPREPARED | COMMON_PRESENT | P64_PAGE_FWRITE | P64_PAGE_FNOEXEC,
-	[(PAGEDIR_MAP_FWRITE | PAGEDIR_MAP_FEXEC)]                                         = P64_PAGE_FPREPARED | COMMON_PRESENT | P64_PAGE_FWRITE,
-	[(PAGEDIR_MAP_FREAD)]                                                              = P64_PAGE_FPREPARED | COMMON_PRESENT | P64_PAGE_FNOEXEC,
-	[(PAGEDIR_MAP_FREAD | PAGEDIR_MAP_FEXEC)]                                          = P64_PAGE_FPREPARED | COMMON_PRESENT,
-	[(PAGEDIR_MAP_FREAD | PAGEDIR_MAP_FWRITE)]                                         = P64_PAGE_FPREPARED | COMMON_PRESENT | P64_PAGE_FWRITE | P64_PAGE_FNOEXEC,
-	[(PAGEDIR_MAP_FREAD | PAGEDIR_MAP_FWRITE | PAGEDIR_MAP_FEXEC)]                     = P64_PAGE_FPREPARED | COMMON_PRESENT | P64_PAGE_FWRITE,
-	[(PAGEDIR_MAP_FUSER)]                                                              = P64_PAGE_FPREPARED | COMMON_PRESENT | P64_PAGE_FUSER | P64_PAGE_FNOEXEC,
-	[(PAGEDIR_MAP_FUSER | PAGEDIR_MAP_FEXEC)]                                          = P64_PAGE_FPREPARED | COMMON_PRESENT | P64_PAGE_FUSER,
-	[(PAGEDIR_MAP_FUSER | PAGEDIR_MAP_FWRITE)]                                         = P64_PAGE_FPREPARED | COMMON_PRESENT | P64_PAGE_FWRITE | P64_PAGE_FUSER | P64_PAGE_FNOEXEC,
-	[(PAGEDIR_MAP_FUSER | PAGEDIR_MAP_FWRITE | PAGEDIR_MAP_FEXEC)]                     = P64_PAGE_FPREPARED | COMMON_PRESENT | P64_PAGE_FWRITE | P64_PAGE_FUSER,
-	[(PAGEDIR_MAP_FUSER | PAGEDIR_MAP_FREAD)]                                          = P64_PAGE_FPREPARED | COMMON_PRESENT | P64_PAGE_FUSER | P64_PAGE_FNOEXEC,
-	[(PAGEDIR_MAP_FUSER | PAGEDIR_MAP_FREAD | PAGEDIR_MAP_FEXEC)]                      = P64_PAGE_FPREPARED | COMMON_PRESENT | P64_PAGE_FUSER,
-	[(PAGEDIR_MAP_FUSER | PAGEDIR_MAP_FREAD | PAGEDIR_MAP_FWRITE)]                     = P64_PAGE_FPREPARED | COMMON_PRESENT | P64_PAGE_FWRITE | P64_PAGE_FUSER | P64_PAGE_FNOEXEC,
-	[(PAGEDIR_MAP_FUSER | PAGEDIR_MAP_FREAD | PAGEDIR_MAP_FWRITE | PAGEDIR_MAP_FEXEC)] = P64_PAGE_FPREPARED | COMMON_PRESENT | P64_PAGE_FWRITE | P64_PAGE_FUSER,
-	/* TODO: Support for encoding the 3 different page-attribute bits:
-	 *   - P64_PAGE_FPWT
-	 *   - P64_PAGE_FPCD
-	 *   - P64_PAGE_FPAT_4KIB  (Already gets automatically converted to P64_PAGE_FPAT_2MIB/P64_PAGE_FPAT_1GIB as necessary)
-	 */
+INTERN u64 p64_pageperm_matrix[0x40] = {
+#define COMMON_PRESENT (P64_PAGE_FPREPARED | P64_PAGE_FACCESSED | P64_PAGE_FDIRTY | P64_PAGE_FPRESENT)
+	[(0)]                                                                                                                               = P64_PAGE_FNOEXEC,
+	[(PAGEDIR_PROT_EXEC)]                                                                                                               = COMMON_PRESENT,
+	[(PAGEDIR_PROT_WRITE)]                                                                                                              = COMMON_PRESENT | P64_PAGE_FWRITE | P64_PAGE_FNOEXEC,
+	[(PAGEDIR_PROT_WRITE | PAGEDIR_PROT_EXEC)]                                                                                          = COMMON_PRESENT | P64_PAGE_FWRITE,
+	[(PAGEDIR_PROT_READ)]                                                                                                               = COMMON_PRESENT | P64_PAGE_FNOEXEC,
+	[(PAGEDIR_PROT_READ | PAGEDIR_PROT_EXEC)]                                                                                           = COMMON_PRESENT,
+	[(PAGEDIR_PROT_READ | PAGEDIR_PROT_WRITE)]                                                                                          = COMMON_PRESENT | P64_PAGE_FWRITE | P64_PAGE_FNOEXEC,
+	[(PAGEDIR_PROT_READ | PAGEDIR_PROT_WRITE | PAGEDIR_PROT_EXEC)]                                                                      = COMMON_PRESENT | P64_PAGE_FWRITE,
+	[(PAGEDIR_PROT_X86_PWT)]                                                                                                            = P64_PAGE_FPWT | P64_PAGE_FNOEXEC,
+	[(PAGEDIR_PROT_X86_PWT | PAGEDIR_PROT_EXEC)]                                                                                        = P64_PAGE_FPWT | COMMON_PRESENT,
+	[(PAGEDIR_PROT_X86_PWT | PAGEDIR_PROT_WRITE)]                                                                                       = P64_PAGE_FPWT | COMMON_PRESENT | P64_PAGE_FWRITE | P64_PAGE_FNOEXEC,
+	[(PAGEDIR_PROT_X86_PWT | PAGEDIR_PROT_WRITE | PAGEDIR_PROT_EXEC)]                                                                   = P64_PAGE_FPWT | COMMON_PRESENT | P64_PAGE_FWRITE,
+	[(PAGEDIR_PROT_X86_PWT | PAGEDIR_PROT_READ)]                                                                                        = P64_PAGE_FPWT | COMMON_PRESENT | P64_PAGE_FNOEXEC,
+	[(PAGEDIR_PROT_X86_PWT | PAGEDIR_PROT_READ | PAGEDIR_PROT_EXEC)]                                                                    = P64_PAGE_FPWT | COMMON_PRESENT,
+	[(PAGEDIR_PROT_X86_PWT | PAGEDIR_PROT_READ | PAGEDIR_PROT_WRITE)]                                                                   = P64_PAGE_FPWT | COMMON_PRESENT | P64_PAGE_FWRITE | P64_PAGE_FNOEXEC,
+	[(PAGEDIR_PROT_X86_PWT | PAGEDIR_PROT_READ | PAGEDIR_PROT_WRITE | PAGEDIR_PROT_EXEC)]                                               = P64_PAGE_FPWT | COMMON_PRESENT | P64_PAGE_FWRITE,
+	[(PAGEDIR_PROT_X86_PCD)]                                                                                                            = P64_PAGE_FPCD | P64_PAGE_FNOEXEC,
+	[(PAGEDIR_PROT_X86_PCD | PAGEDIR_PROT_EXEC)]                                                                                        = P64_PAGE_FPCD | COMMON_PRESENT,
+	[(PAGEDIR_PROT_X86_PCD | PAGEDIR_PROT_WRITE)]                                                                                       = P64_PAGE_FPCD | COMMON_PRESENT | P64_PAGE_FWRITE | P64_PAGE_FNOEXEC,
+	[(PAGEDIR_PROT_X86_PCD | PAGEDIR_PROT_WRITE | PAGEDIR_PROT_EXEC)]                                                                   = P64_PAGE_FPCD | COMMON_PRESENT | P64_PAGE_FWRITE,
+	[(PAGEDIR_PROT_X86_PCD | PAGEDIR_PROT_READ)]                                                                                        = P64_PAGE_FPCD | COMMON_PRESENT | P64_PAGE_FNOEXEC,
+	[(PAGEDIR_PROT_X86_PCD | PAGEDIR_PROT_READ | PAGEDIR_PROT_EXEC)]                                                                    = P64_PAGE_FPCD | COMMON_PRESENT,
+	[(PAGEDIR_PROT_X86_PCD | PAGEDIR_PROT_READ | PAGEDIR_PROT_WRITE)]                                                                   = P64_PAGE_FPCD | COMMON_PRESENT | P64_PAGE_FWRITE | P64_PAGE_FNOEXEC,
+	[(PAGEDIR_PROT_X86_PCD | PAGEDIR_PROT_READ | PAGEDIR_PROT_WRITE | PAGEDIR_PROT_EXEC)]                                               = P64_PAGE_FPCD | COMMON_PRESENT | P64_PAGE_FWRITE,
+	[(PAGEDIR_PROT_X86_PCD | PAGEDIR_PROT_X86_PWT)]                                                                                     = P64_PAGE_FPCD | P64_PAGE_FPWT | P64_PAGE_FNOEXEC,
+	[(PAGEDIR_PROT_X86_PCD | PAGEDIR_PROT_X86_PWT | PAGEDIR_PROT_EXEC)]                                                                 = P64_PAGE_FPCD | P64_PAGE_FPWT | COMMON_PRESENT,
+	[(PAGEDIR_PROT_X86_PCD | PAGEDIR_PROT_X86_PWT | PAGEDIR_PROT_WRITE)]                                                                = P64_PAGE_FPCD | P64_PAGE_FPWT | COMMON_PRESENT | P64_PAGE_FWRITE | P64_PAGE_FNOEXEC,
+	[(PAGEDIR_PROT_X86_PCD | PAGEDIR_PROT_X86_PWT | PAGEDIR_PROT_WRITE | PAGEDIR_PROT_EXEC)]                                            = P64_PAGE_FPCD | P64_PAGE_FPWT | COMMON_PRESENT | P64_PAGE_FWRITE,
+	[(PAGEDIR_PROT_X86_PCD | PAGEDIR_PROT_X86_PWT | PAGEDIR_PROT_READ)]                                                                 = P64_PAGE_FPCD | P64_PAGE_FPWT | COMMON_PRESENT | P64_PAGE_FNOEXEC,
+	[(PAGEDIR_PROT_X86_PCD | PAGEDIR_PROT_X86_PWT | PAGEDIR_PROT_READ | PAGEDIR_PROT_EXEC)]                                             = P64_PAGE_FPCD | P64_PAGE_FPWT | COMMON_PRESENT,
+	[(PAGEDIR_PROT_X86_PCD | PAGEDIR_PROT_X86_PWT | PAGEDIR_PROT_READ | PAGEDIR_PROT_WRITE)]                                            = P64_PAGE_FPCD | P64_PAGE_FPWT | COMMON_PRESENT | P64_PAGE_FWRITE | P64_PAGE_FNOEXEC,
+	[(PAGEDIR_PROT_X86_PCD | PAGEDIR_PROT_X86_PWT | PAGEDIR_PROT_READ | PAGEDIR_PROT_WRITE | PAGEDIR_PROT_EXEC)]                        = P64_PAGE_FPCD | P64_PAGE_FPWT | COMMON_PRESENT | P64_PAGE_FWRITE,
+	[(PAGEDIR_PROT_X86_PAT)]                                                                                                            = P64_PAGE_FPAT_4KIB | P64_PAGE_FNOEXEC,
+	[(PAGEDIR_PROT_X86_PAT | PAGEDIR_PROT_EXEC)]                                                                                        = P64_PAGE_FPAT_4KIB | COMMON_PRESENT,
+	[(PAGEDIR_PROT_X86_PAT | PAGEDIR_PROT_WRITE)]                                                                                       = P64_PAGE_FPAT_4KIB | COMMON_PRESENT | P64_PAGE_FWRITE | P64_PAGE_FNOEXEC,
+	[(PAGEDIR_PROT_X86_PAT | PAGEDIR_PROT_WRITE | PAGEDIR_PROT_EXEC)]                                                                   = P64_PAGE_FPAT_4KIB | COMMON_PRESENT | P64_PAGE_FWRITE,
+	[(PAGEDIR_PROT_X86_PAT | PAGEDIR_PROT_READ)]                                                                                        = P64_PAGE_FPAT_4KIB | COMMON_PRESENT | P64_PAGE_FNOEXEC,
+	[(PAGEDIR_PROT_X86_PAT | PAGEDIR_PROT_READ | PAGEDIR_PROT_EXEC)]                                                                    = P64_PAGE_FPAT_4KIB | COMMON_PRESENT,
+	[(PAGEDIR_PROT_X86_PAT | PAGEDIR_PROT_READ | PAGEDIR_PROT_WRITE)]                                                                   = P64_PAGE_FPAT_4KIB | COMMON_PRESENT | P64_PAGE_FWRITE | P64_PAGE_FNOEXEC,
+	[(PAGEDIR_PROT_X86_PAT | PAGEDIR_PROT_READ | PAGEDIR_PROT_WRITE | PAGEDIR_PROT_EXEC)]                                               = P64_PAGE_FPAT_4KIB | COMMON_PRESENT | P64_PAGE_FWRITE,
+	[(PAGEDIR_PROT_X86_PAT | PAGEDIR_PROT_X86_PWT)]                                                                                     = P64_PAGE_FPAT_4KIB | P64_PAGE_FPWT | P64_PAGE_FNOEXEC,
+	[(PAGEDIR_PROT_X86_PAT | PAGEDIR_PROT_X86_PWT | PAGEDIR_PROT_EXEC)]                                                                 = P64_PAGE_FPAT_4KIB | P64_PAGE_FPWT | COMMON_PRESENT,
+	[(PAGEDIR_PROT_X86_PAT | PAGEDIR_PROT_X86_PWT | PAGEDIR_PROT_WRITE)]                                                                = P64_PAGE_FPAT_4KIB | P64_PAGE_FPWT | COMMON_PRESENT | P64_PAGE_FWRITE | P64_PAGE_FNOEXEC,
+	[(PAGEDIR_PROT_X86_PAT | PAGEDIR_PROT_X86_PWT | PAGEDIR_PROT_WRITE | PAGEDIR_PROT_EXEC)]                                            = P64_PAGE_FPAT_4KIB | P64_PAGE_FPWT | COMMON_PRESENT | P64_PAGE_FWRITE,
+	[(PAGEDIR_PROT_X86_PAT | PAGEDIR_PROT_X86_PWT | PAGEDIR_PROT_READ)]                                                                 = P64_PAGE_FPAT_4KIB | P64_PAGE_FPWT | COMMON_PRESENT | P64_PAGE_FNOEXEC,
+	[(PAGEDIR_PROT_X86_PAT | PAGEDIR_PROT_X86_PWT | PAGEDIR_PROT_READ | PAGEDIR_PROT_EXEC)]                                             = P64_PAGE_FPAT_4KIB | P64_PAGE_FPWT | COMMON_PRESENT,
+	[(PAGEDIR_PROT_X86_PAT | PAGEDIR_PROT_X86_PWT | PAGEDIR_PROT_READ | PAGEDIR_PROT_WRITE)]                                            = P64_PAGE_FPAT_4KIB | P64_PAGE_FPWT | COMMON_PRESENT | P64_PAGE_FWRITE | P64_PAGE_FNOEXEC,
+	[(PAGEDIR_PROT_X86_PAT | PAGEDIR_PROT_X86_PWT | PAGEDIR_PROT_READ | PAGEDIR_PROT_WRITE | PAGEDIR_PROT_EXEC)]                        = P64_PAGE_FPAT_4KIB | P64_PAGE_FPWT | COMMON_PRESENT | P64_PAGE_FWRITE,
+	[(PAGEDIR_PROT_X86_PAT | PAGEDIR_PROT_X86_PCD)]                                                                                     = P64_PAGE_FPAT_4KIB | P64_PAGE_FPCD | P64_PAGE_FNOEXEC,
+	[(PAGEDIR_PROT_X86_PAT | PAGEDIR_PROT_X86_PCD | PAGEDIR_PROT_EXEC)]                                                                 = P64_PAGE_FPAT_4KIB | P64_PAGE_FPCD | COMMON_PRESENT,
+	[(PAGEDIR_PROT_X86_PAT | PAGEDIR_PROT_X86_PCD | PAGEDIR_PROT_WRITE)]                                                                = P64_PAGE_FPAT_4KIB | P64_PAGE_FPCD | COMMON_PRESENT | P64_PAGE_FWRITE | P64_PAGE_FNOEXEC,
+	[(PAGEDIR_PROT_X86_PAT | PAGEDIR_PROT_X86_PCD | PAGEDIR_PROT_WRITE | PAGEDIR_PROT_EXEC)]                                            = P64_PAGE_FPAT_4KIB | P64_PAGE_FPCD | COMMON_PRESENT | P64_PAGE_FWRITE,
+	[(PAGEDIR_PROT_X86_PAT | PAGEDIR_PROT_X86_PCD | PAGEDIR_PROT_READ)]                                                                 = P64_PAGE_FPAT_4KIB | P64_PAGE_FPCD | COMMON_PRESENT | P64_PAGE_FNOEXEC,
+	[(PAGEDIR_PROT_X86_PAT | PAGEDIR_PROT_X86_PCD | PAGEDIR_PROT_READ | PAGEDIR_PROT_EXEC)]                                             = P64_PAGE_FPAT_4KIB | P64_PAGE_FPCD | COMMON_PRESENT,
+	[(PAGEDIR_PROT_X86_PAT | PAGEDIR_PROT_X86_PCD | PAGEDIR_PROT_READ | PAGEDIR_PROT_WRITE)]                                            = P64_PAGE_FPAT_4KIB | P64_PAGE_FPCD | COMMON_PRESENT | P64_PAGE_FWRITE | P64_PAGE_FNOEXEC,
+	[(PAGEDIR_PROT_X86_PAT | PAGEDIR_PROT_X86_PCD | PAGEDIR_PROT_READ | PAGEDIR_PROT_WRITE | PAGEDIR_PROT_EXEC)]                        = P64_PAGE_FPAT_4KIB | P64_PAGE_FPCD | COMMON_PRESENT | P64_PAGE_FWRITE,
+	[(PAGEDIR_PROT_X86_PAT | PAGEDIR_PROT_X86_PCD | PAGEDIR_PROT_X86_PWT)]                                                              = P64_PAGE_FPAT_4KIB | P64_PAGE_FPCD | P64_PAGE_FPWT | P64_PAGE_FNOEXEC,
+	[(PAGEDIR_PROT_X86_PAT | PAGEDIR_PROT_X86_PCD | PAGEDIR_PROT_X86_PWT | PAGEDIR_PROT_EXEC)]                                          = P64_PAGE_FPAT_4KIB | P64_PAGE_FPCD | P64_PAGE_FPWT | COMMON_PRESENT,
+	[(PAGEDIR_PROT_X86_PAT | PAGEDIR_PROT_X86_PCD | PAGEDIR_PROT_X86_PWT | PAGEDIR_PROT_WRITE)]                                         = P64_PAGE_FPAT_4KIB | P64_PAGE_FPCD | P64_PAGE_FPWT | COMMON_PRESENT | P64_PAGE_FWRITE | P64_PAGE_FNOEXEC,
+	[(PAGEDIR_PROT_X86_PAT | PAGEDIR_PROT_X86_PCD | PAGEDIR_PROT_X86_PWT | PAGEDIR_PROT_WRITE | PAGEDIR_PROT_EXEC)]                     = P64_PAGE_FPAT_4KIB | P64_PAGE_FPCD | P64_PAGE_FPWT | COMMON_PRESENT | P64_PAGE_FWRITE,
+	[(PAGEDIR_PROT_X86_PAT | PAGEDIR_PROT_X86_PCD | PAGEDIR_PROT_X86_PWT | PAGEDIR_PROT_READ)]                                          = P64_PAGE_FPAT_4KIB | P64_PAGE_FPCD | P64_PAGE_FPWT | COMMON_PRESENT | P64_PAGE_FNOEXEC,
+	[(PAGEDIR_PROT_X86_PAT | PAGEDIR_PROT_X86_PCD | PAGEDIR_PROT_X86_PWT | PAGEDIR_PROT_READ | PAGEDIR_PROT_EXEC)]                      = P64_PAGE_FPAT_4KIB | P64_PAGE_FPCD | P64_PAGE_FPWT | COMMON_PRESENT,
+	[(PAGEDIR_PROT_X86_PAT | PAGEDIR_PROT_X86_PCD | PAGEDIR_PROT_X86_PWT | PAGEDIR_PROT_READ | PAGEDIR_PROT_WRITE)]                     = P64_PAGE_FPAT_4KIB | P64_PAGE_FPCD | P64_PAGE_FPWT | COMMON_PRESENT | P64_PAGE_FWRITE | P64_PAGE_FNOEXEC,
+	[(PAGEDIR_PROT_X86_PAT | PAGEDIR_PROT_X86_PCD | PAGEDIR_PROT_X86_PWT | PAGEDIR_PROT_READ | PAGEDIR_PROT_WRITE | PAGEDIR_PROT_EXEC)] = P64_PAGE_FPAT_4KIB | P64_PAGE_FPCD | P64_PAGE_FPWT | COMMON_PRESENT | P64_PAGE_FWRITE,
 #undef COMMON_PRESENT
 };
 
@@ -1798,19 +1841,24 @@ NOTHROW(FCALL p64_pagedir_encode_4kib)(PAGEDIR_PAGEALIGNED VIRT void *addr,
 	u64 result;
 	PG_ASSERT_ALIGNED_ADDRESS(addr);
 	assertf(IS_ALIGNED(phys, 4096), "phys = %" PRIpN(__SIZEOF_PHYSADDR_T__), phys);
-	assertf(!(perm & ~PAGEDIR_MAP_FMASK),
+	assertf(!(perm & ~PAGEDIR_PROT_MASK),
 	        "Invalid page permissions: %#.4" PRIx16, perm);
 	assertf(phys <= (physaddr_t)UINT64_C(0x000ffffffffff000),
 	        "Address cannot be mapped under p64: %" PRIpN(__SIZEOF_PHYSADDR_T__),
 	        phys);
 	result  = (u64)phys;
-#if PAGEDIR_MAP_FMASK == 0xf
+#if PAGEDIR_PROT_MASK == 0x3f
 	result |= p64_pageperm_matrix[perm];
-#else /* PAGEDIR_MAP_FMASK == 0xf */
-	result |= p64_pageperm_matrix[perm & 0xf];
-#endif /* PAGEDIR_MAP_FMASK != 0xf */
+#else /* PAGEDIR_PROT_MASK == 0x3f */
+	result |= p64_pageperm_matrix[perm & 0x3f];
+#endif /* PAGEDIR_PROT_MASK != 0x3f */
+
+	/* All kernel pages have the GLOBAL bit set, and all user pages the USER bit. */
 	if ((byte_t *)addr >= (byte_t *)KERNELSPACE_BASE)
 		result |= USED_P64_PAGE_FGLOBAL;
+	else {
+		result |= P64_PAGE_FUSER;
+	}
 	return result;
 }
 
@@ -1890,7 +1938,7 @@ NOTHROW(FCALL p64_pagedir_gethint)(VIRT void *addr) {
 
 
 /* Create/delete a page-directory mapping.
- * @param: perm: A set of `PAGEDIR_MAP_F*' detailing how memory should be mapped. */
+ * @param: perm: A set of `PAGEDIR_PROT_*' detailing how memory should be mapped. */
 INTERN NOBLOCK void
 NOTHROW(FCALL p64_pagedir_mapone)(PAGEDIR_PAGEALIGNED VIRT void *addr,
                                   PAGEDIR_PAGEALIGNED PHYS physaddr_t phys,

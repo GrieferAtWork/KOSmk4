@@ -520,7 +520,7 @@ again_lock_kernel_mman:
 
 			/* Map the stack into memory */
 			mpart_mmap_force(&FORTASK(result, this_kernel_stackpart_), stack_addr,
-			                 KERNEL_STACKSIZE, 0, PAGEDIR_MAP_FREAD | PAGEDIR_MAP_FWRITE);
+			                 KERNEL_STACKSIZE, 0, PAGEDIR_PROT_READ | PAGEDIR_PROT_WRITE);
 			mman_lock_release(&mman_kernel);
 		} EXCEPT {
 			mpart_ll_ccfreemem(&FORTASK(result, this_kernel_stackpart_));

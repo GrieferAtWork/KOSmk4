@@ -519,7 +519,7 @@ i386_allocate_secondary_cores(void) {
 #endif /* ARCH_PAGEDIR_NEED_PERPARE_FOR_KERNELSPACE */
 			mpart_mmap_force(&FORCPU(altcore, thiscpu_x86_dfstackpart_),
 			                 addr, KERNEL_DF_STACKSIZE, 0,
-			                 PAGEDIR_MAP_FREAD | PAGEDIR_MAP_FWRITE);
+			                 PAGEDIR_PROT_READ | PAGEDIR_PROT_WRITE);
 			mman_mappings_insert(&mman_kernel, &FORCPU(altcore, thiscpu_x86_dfstacknode_));
 			addr = (byte_t *)addr + KERNEL_DF_STACKSIZE;
 			/* Store the DF stack pointer in internal CPU structures. */
@@ -581,7 +581,7 @@ i386_allocate_secondary_cores(void) {
 #endif /* ARCH_PAGEDIR_NEED_PERPARE_FOR_KERNELSPACE */
 			mpart_mmap_force(&FORTASK(altidle, this_kernel_stackpart_), addr,
 			                 KERNEL_IDLE_STACKSIZE, 0,
-			                 PAGEDIR_MAP_FREAD | PAGEDIR_MAP_FWRITE);
+			                 PAGEDIR_PROT_READ | PAGEDIR_PROT_WRITE);
 			mman_mappings_insert(&mman_kernel, &FORTASK(altidle, this_kernel_stacknode_));
 #ifdef CONFIG_HAVE_KERNEL_STACK_GUARD
 			mman_mappings_insert(&mman_kernel, &FORTASK(altidle, this_kernel_stackguard_));

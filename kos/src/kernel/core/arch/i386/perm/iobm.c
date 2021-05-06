@@ -75,7 +75,7 @@ NOTHROW(KCALL ioperm_bitmap_unset_write_access)(struct ioperm_bitmap *__restrict
 		pagedir_map(FORCPU(me, thiscpu_x86_iob),
 		            2 * PAGESIZE,
 		            self->ib_pages,
-		            PAGEDIR_MAP_FREAD);
+		            PAGEDIR_PROT_READ);
 	}
 	PREEMPTION_POP(was);
 }

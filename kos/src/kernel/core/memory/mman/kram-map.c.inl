@@ -465,8 +465,8 @@ LOCAL_IFNX(err_physmem:)
 			/* Map the part into the page directory. */
 do_prefault:
 			mpart_mmap_force(part, result, num_bytes, 0,
-			                 PAGEDIR_MAP_FREAD |
-			                 PAGEDIR_MAP_FWRITE);
+			                 PAGEDIR_PROT_READ |
+			                 PAGEDIR_PROT_WRITE);
 #ifdef ARCH_PAGEDIR_NEED_PERPARE_FOR_KERNELSPACE
 			if (!(flags & GFP_MAP_PREPARED))
 				pagedir_unprepare(result, num_bytes);

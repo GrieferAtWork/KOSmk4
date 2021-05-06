@@ -62,13 +62,13 @@ DECL_BEGIN
 #define phys_pushpage(addr_of_page)                             \
 	(trampoline = THIS_TRAMPOLINE, COMPILER_BARRIER(),          \
 	 _pp_oldval = pagedir_push_mapone(trampoline, addr_of_page, \
-	                                  PAGEDIR_MAP_FREAD |       \
-	                                  PAGEDIR_MAP_FWRITE),      \
+	                                  PAGEDIR_PROT_READ |       \
+	                                  PAGEDIR_PROT_WRITE),      \
 	 pagedir_syncone(trampoline), COMPILER_BARRIER(), trampoline)
 #define phys_loadpage(addr_of_page)                          \
 	(COMPILER_BARRIER(),                                     \
 	 pagedir_mapone(trampoline, addr_of_page,                \
-	                PAGEDIR_MAP_FREAD | PAGEDIR_MAP_FWRITE), \
+	                PAGEDIR_PROT_READ | PAGEDIR_PROT_WRITE), \
 	 pagedir_syncone(trampoline),                            \
 	 COMPILER_BARRIER(), trampoline)
 #define phys_pushaddr(addr) (phys_pushpage((addr) & ~PAGEMASK) + (uintptr_t)((addr) & PAGEMASK))

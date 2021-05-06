@@ -194,7 +194,7 @@ load_bootloader_driver2(PHYS u32 blob_addr, size_t blob_size, char *cmdline) {
 		pagedir_map(blob,
 		            aligned_blob_size,
 		            (physaddr_t)(blob_addr & ~PAGEMASK),
-		            PAGEDIR_MAP_FREAD);
+		            PAGEDIR_PROT_READ);
 
 		/* Load the mapped driver blob as a driver module.
 		 * NOTE: We  pass  the  `DRIVER_INSMOD_FLAG_NOINIT'  flag  so-as  to allow

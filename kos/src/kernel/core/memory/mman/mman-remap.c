@@ -276,7 +276,7 @@ something_changed:
 		 * then add it to the  list of writable nodes within  our
 		 * memory manager. */
 		LIST_ENTRY_UNBOUND_INIT(&node->mn_writable);
-		if (map_prot & PAGEDIR_MAP_FWRITE)
+		if (map_prot & PAGEDIR_PROT_WRITE)
 			LIST_INSERT_HEAD(&self->mm_writable, node, mn_writable);
 
 		mman_mappings_insert(self, node);
@@ -481,7 +481,7 @@ NOTHROW(KCALL insert_and_maybe_map_nodes)(struct mman *__restrict self,
 				/* If the node was mapped with write-permissions enabled,
 				 * then add it to the  list of writable nodes within  our
 				 * memory manager. */
-				if (map_prot & PAGEDIR_MAP_FWRITE)
+				if (map_prot & PAGEDIR_PROT_WRITE)
 					LIST_INSERT_HEAD(&self->mm_writable, node, mn_writable);
 			}
 			node = mnode_merge_with_partlock(node);
@@ -678,7 +678,7 @@ err_cannot_prepare:
 					/* If the node was mapped with write-permissions enabled,
 					 * then add it to the  list of writable nodes within  our
 					 * memory manager. */
-					if (map_prot & PAGEDIR_MAP_FWRITE)
+					if (map_prot & PAGEDIR_PROT_WRITE)
 						LIST_INSERT_HEAD(&self->mm_writable, node, mn_writable);
 					node = mnode_merge_with_partlock(node);
 					mpart_lock_release(node->mn_part);
@@ -837,7 +837,7 @@ again_lock_mman_phase2:
 							/* If the node was mapped with write-permissions enabled,
 							 * then add it to the  list of writable nodes within  our
 							 * memory manager. */
-							if (map_prot & PAGEDIR_MAP_FWRITE)
+							if (map_prot & PAGEDIR_PROT_WRITE)
 								LIST_INSERT_HEAD(&self->mm_writable, node, mn_writable);
 							node = mnode_merge_with_partlock(node);
 							mpart_lock_release(node->mn_part);

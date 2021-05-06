@@ -376,24 +376,16 @@ struct mnode {
 /* Return mem-node paging  permissions, irregardless of  copy-on-write
  * semantics. - That is: allow write whenever the node requests write,
  * no matter who else might also be using the underlying mem-part. */
-#if (PAGEDIR_MAP_FEXEC == MNODE_F_PEXEC && \
-     PAGEDIR_MAP_FREAD == MNODE_F_PREAD && \
-     PAGEDIR_MAP_FWRITE == MNODE_F_PWRITE)
+#if (PAGEDIR_PROT_EXEC == MNODE_F_PEXEC && \
+     PAGEDIR_PROT_READ == MNODE_F_PREAD && \
+     PAGEDIR_PROT_WRITE == MNODE_F_PWRITE)
 #define mnode_getperm_force(self)                                            \
-	(((self)->mn_flags & (MNODE_F_PEXEC | MNODE_F_PREAD | MNODE_F_PWRITE)) | \
-	 (ADDR_ISUSER(mnode_getmaxaddr(self)) ? PAGEDIR_MAP_FUSER : 0))
-#define mnode_getperm_force_nouser(self) \
 	((self)->mn_flags & (MNODE_F_PEXEC | MNODE_F_PREAD | MNODE_F_PWRITE))
 #else /* ... */
-#define mnode_getperm_force(self)                                     \
-	((((self)->mn_flags & MNODE_F_PEXEC) ? PAGEDIR_MAP_FEXEC : 0) |   \
-	 (((self)->mn_flags & MNODE_F_PREAD) ? PAGEDIR_MAP_FREAD : 0) |   \
-	 (((self)->mn_flags & MNODE_F_PWRITE) ? PAGEDIR_MAP_FWRITE : 0) | \
-	 (ADDR_ISUSER(mnode_getmaxaddr(self)) ? PAGEDIR_MAP_FUSER : 0))
-#define mnode_getperm_force_nouser(self)                            \
-	((((self)->mn_flags & MNODE_F_PEXEC) ? PAGEDIR_MAP_FEXEC : 0) | \
-	 (((self)->mn_flags & MNODE_F_PREAD) ? PAGEDIR_MAP_FREAD : 0) | \
-	 (((self)->mn_flags & MNODE_F_PWRITE) ? PAGEDIR_MAP_FWRITE : 0))
+#define mnode_getperm_force(self)                                   \
+	((((self)->mn_flags & MNODE_F_PEXEC) ? PAGEDIR_PROT_EXEC : 0) | \
+	 (((self)->mn_flags & MNODE_F_PREAD) ? PAGEDIR_PROT_READ : 0) | \
+	 (((self)->mn_flags & MNODE_F_PWRITE) ? PAGEDIR_PROT_WRITE : 0))
 #endif /* !... */
 
 /* Get bounds for the given mem-node. */

@@ -1638,7 +1638,7 @@ NOTHROW(KCALL patch_fsgsbase_at)(void const *pc) {
 					pagedir_pushval_t pv;
 					byte_t *tramp = THIS_TRAMPOLINE;
 					pv = pagedir_push_mapone(tramp, pc_phys & ~PAGEMASK,
-					                         PAGEDIR_MAP_FREAD | PAGEDIR_MAP_FWRITE);
+					                         PAGEDIR_PROT_READ | PAGEDIR_PROT_WRITE);
 					pagedir_syncone(tramp);
 					ok = x86_fsgsbase_patch(tramp + (uintptr_t)(pc_phys & ~PAGEMASK), pc);
 					pagedir_pop_mapone(tramp, pv);
@@ -1649,7 +1649,7 @@ NOTHROW(KCALL patch_fsgsbase_at)(void const *pc) {
 					if (tempaddr != MAP_FAILED) {
 						if (pagedir_prepare(tempaddr, 2 * PAGESIZE)) {
 							pagedir_map(tempaddr, 2 * PAGESIZE, pc_phys & ~PAGEMASK,
-							            PAGEDIR_MAP_FREAD | PAGEDIR_MAP_FWRITE);
+							            PAGEDIR_PROT_READ | PAGEDIR_PROT_WRITE);
 							pagedir_sync(tempaddr, 2 * PAGESIZE);
 							ok = x86_fsgsbase_patch((byte_t *)tempaddr +
 							                        ((uintptr_t)pc & PAGEMASK),

@@ -500,7 +500,7 @@ again_lock_mfile_map:
 			 * then add it to the  list of writable nodes within  our
 			 * memory manager. */
 			LIST_ENTRY_UNBOUND_INIT(&node->mn_writable);
-			if (map_prot & PAGEDIR_MAP_FWRITE)
+			if (map_prot & PAGEDIR_PROT_WRITE)
 				LIST_INSERT_HEAD(&self->mm_writable, node, mn_writable);
 
 			mman_mappings_insert(self, node);
@@ -543,7 +543,7 @@ again_lock_mfile_map:
 		                        node->mn_partoff,
 		                        mnode_getperm_force(node));
 		LIST_ENTRY_UNBOUND_INIT(&node->mn_writable);
-		if (map_prot & PAGEDIR_MAP_FWRITE)
+		if (map_prot & PAGEDIR_PROT_WRITE)
 			LIST_INSERT_HEAD(&self->mm_writable, node, mn_writable);
 		mman_mappings_insert(self, node);
 		/* Add the part to the list of all parts. Note that this is

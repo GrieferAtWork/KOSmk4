@@ -314,7 +314,7 @@ again_acquire_lock:
 
 					/* If write-permissions went away, remove the node from  the
 					 * list of writable nodes stored within the associated mman. */
-					if (LIST_ISBOUND(node, mn_writable) && !(newperm & PAGEDIR_MAP_FWRITE))
+					if (LIST_ISBOUND(node, mn_writable) && !(newperm & PAGEDIR_PROT_WRITE))
 						LIST_UNBIND(node, mn_writable);
 				}
 			}

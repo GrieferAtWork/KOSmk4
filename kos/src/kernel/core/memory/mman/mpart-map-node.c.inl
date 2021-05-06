@@ -47,7 +47,7 @@ DECL_BEGIN
  * access can be granted on a per-page basis (see the documentation
  * of `mpart_iscopywritable()' and `mpart_issharewritable()' for
  * when write-access can be given)
- * @return: * : The union (or aka. |-ed together) set of `PAGEDIR_MAP_F*'
+ * @return: * : The union (or aka. |-ed together) set of `PAGEDIR_PROT_*'
  *              flags used to map pages from the given address range. */
 #ifdef DEFINE_mpart_mmap_node
 PUBLIC NOBLOCK NONNULL((1, 5)) u16
@@ -77,7 +77,7 @@ NOTHROW(FCALL mpart_mmap_node_p)(struct mpart const *__restrict self,
 	perm = mnode_getperm_force(node);
 
 	/* Check for simple case: No write access needed. */
-	if (!(perm & PAGEDIR_MAP_FWRITE))
+	if (!(perm & PAGEDIR_PROT_WRITE))
 		return LOCAL_mpart_mmap(addr, size, offset, perm);
 
 	/* Deal with write permissions on a per-page basis! */
@@ -99,7 +99,7 @@ NOTHROW(FCALL mpart_mmap_node_p)(struct mpart const *__restrict self,
 
 		/* Disallow write-access if need be. */
 		if (!is_writable)
-			used_perm &= ~PAGEDIR_MAP_FWRITE;
+			used_perm &= ~PAGEDIR_PROT_WRITE;
 
 		/* Map this portion. */
 		result |= LOCAL_mpart_mmap(addr, part, offset, used_perm);

@@ -338,7 +338,7 @@ again:
 			                             node);
 
 			/* Set `MBNODE_F_WRITABLE' if the node ends up as writable. */
-			if (map_prot & PAGEDIR_MAP_FWRITE)
+			if (map_prot & PAGEDIR_PROT_WRITE)
 				tree->mbn_flags |= MBNODE_F_WRITABLE;
 			/* If we've only temporarily prepared the pagedir, then unprepare again. */
 			if (was_prepared != flags)

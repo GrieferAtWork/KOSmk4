@@ -1345,7 +1345,7 @@ PRIVATE ATTR_DBGTEXT void NOTHROW(FCALL vga_map)(void) {
 			byte_t *addr = (byte_t *)((uintptr_t)vga_real_terminal_start & ~PAGEMASK) + i * PAGESIZE;
 			oldword = pagedir_push_mapone(addr,
 			                              (physaddr_t)VGA_VRAM_TEXT + i * PAGESIZE,
-			                              PAGEDIR_MAP_FREAD | PAGEDIR_MAP_FWRITE);
+			                              PAGEDIR_PROT_READ | PAGEDIR_PROT_WRITE);
 			vga_oldmapping[i] = oldword;
 		}
 	}
@@ -1391,7 +1391,7 @@ NOTHROW(FCALL vga_vram)(u32 vram_offset) {
 		addr = (byte_t *)((uintptr_t)vga_real_terminal_start & ~PAGEMASK);
 		pagedir_map(addr, PAGESIZE,
 		            (physaddr_t)VGA_VRAM_BASE + vram_offset,
-		            PAGEDIR_MAP_FREAD | PAGEDIR_MAP_FWRITE);
+		            PAGEDIR_PROT_READ | PAGEDIR_PROT_WRITE);
 		pagedir_syncone(addr);
 		vga_vram_offset = vram_offset;
 	}

@@ -249,8 +249,8 @@ again_read_e3_word:
 		union p64_pdir_e2 e2, *e2_vector;
 		e2_vector = (union p64_pdir_e2 *)THIS_TRAMPOLINE;
 		pushval = pagedir_push_mapone(e2_vector, new_e3_word,
-		                              PAGEDIR_MAP_FREAD |
-		                              PAGEDIR_MAP_FWRITE);
+		                              PAGEDIR_PROT_READ |
+		                              PAGEDIR_PROT_WRITE);
 		pagedir_syncone(e2_vector);
 		/* Figure out which physical memory range should be mapped.
 		 * We're going to fill in  512 * 2MiB pages, totaling  1GiB

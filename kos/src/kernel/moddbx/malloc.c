@@ -141,8 +141,8 @@ NOTHROW(FCALL allocate_physical_memory)(PAGEDIR_PAGEALIGNED void *addr,
 			goto fail;
 		pagedir_mapone((byte_t *)addr + i,
 		               physpage2addr(ppage),
-		               PAGEDIR_MAP_FREAD |
-		               PAGEDIR_MAP_FWRITE);
+		               PAGEDIR_PROT_READ |
+		               PAGEDIR_PROT_WRITE);
 	}
 	pagedir_sync(addr, num_bytes);
 	return true;

@@ -348,7 +348,7 @@ NOTHROW(FCALL mcoreheap_replicate_extend_below)(struct mnode *__restrict node) {
 
 	/* Success! (Start by physically mapping the new page) */
 	pagedir_mapone(node->mn_minaddr - PAGESIZE, physpage2addr(ppage),
-	               PAGEDIR_MAP_FREAD | PAGEDIR_MAP_FWRITE);
+	               PAGEDIR_PROT_READ | PAGEDIR_PROT_WRITE);
 #ifdef ARCH_PAGEDIR_NEED_PERPARE_FOR_KERNELSPACE
 	pagedir_unprepareone(node->mn_minaddr - PAGESIZE);
 #endif /* ARCH_PAGEDIR_NEED_PERPARE_FOR_KERNELSPACE */
@@ -383,7 +383,7 @@ NOTHROW(FCALL mcoreheap_replicate_extend_above)(struct mnode *__restrict node) {
 
 	/* Success! (Start by physically mapping the new page) */
 	pagedir_mapone(node->mn_maxaddr + 1, physpage2addr(ppage),
-	               PAGEDIR_MAP_FREAD | PAGEDIR_MAP_FWRITE);
+	               PAGEDIR_PROT_READ | PAGEDIR_PROT_WRITE);
 #ifdef ARCH_PAGEDIR_NEED_PERPARE_FOR_KERNELSPACE
 	pagedir_unprepareone(node->mn_maxaddr + 1);
 #endif /* ARCH_PAGEDIR_NEED_PERPARE_FOR_KERNELSPACE */
@@ -566,7 +566,7 @@ NOTHROW(FCALL mcoreheap_replicate)(/*inherit(always)*/ struct mpart *__restrict 
 	/* And finally: immediately map the new core-page into the kernel mman. */
 	pagedir_mapone(node->mn_minaddr,
 	               physpage2addr(part->mp_mem.mc_start),
-	               PAGEDIR_MAP_FREAD | PAGEDIR_MAP_FWRITE);
+	               PAGEDIR_PROT_READ | PAGEDIR_PROT_WRITE);
 #ifdef ARCH_PAGEDIR_NEED_PERPARE_FOR_KERNELSPACE
 	pagedir_unprepare(node->mn_minaddr, PAGESIZE);
 #endif /* ARCH_PAGEDIR_NEED_PERPARE_FOR_KERNELSPACE */

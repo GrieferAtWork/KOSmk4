@@ -1136,9 +1136,9 @@ mpart_lock_acquire_and_setcore_unwrite_sync(struct mpart *__restrict self)
  *
  * NOTES:
  *   - When  mapping  blocks not  marked  as `MPART_BLOCK_ST_CHNG',
- *     the `PAGEDIR_MAP_FWRITE' perm-flag is automatically cleared.
+ *     the `PAGEDIR_PROT_WRITE' perm-flag is automatically cleared.
  *   - When mapping blocks marked as `MPART_BLOCK_ST_NDEF' or `MPART_BLOCK_ST_INIT',
- *     the `PAGEDIR_MAP_FEXEC', `PAGEDIR_MAP_FREAD'  and `PAGEDIR_MAP_FWRITE'  perm-
+ *     the `PAGEDIR_PROT_EXEC', `PAGEDIR_PROT_READ'  and `PAGEDIR_PROT_WRITE'  perm-
  *     flags are automatically cleared.
  *
  * @return: * : The union of permissions actually applied to all  pages.
@@ -1284,7 +1284,7 @@ NOTHROW(FCALL _mpart_issharewritable)(struct mpart const *__restrict self,
  * access can be granted on a per-page basis (see the documentation
  * of `mpart_iscopywritable()' and `mpart_issharewritable()' for
  * when write-access can be given)
- * @return: * : The union (or aka. |-ed together) set of `PAGEDIR_MAP_F*'
+ * @return: * : The union (or aka. |-ed together) set of `PAGEDIR_PROT_*'
  *              flags used to map pages from the given address range. */
 FUNDEF NOBLOCK NONNULL((1, 5)) u16
 NOTHROW(FCALL mpart_mmap_node)(struct mpart const *__restrict self,

@@ -250,8 +250,8 @@ handle_iob_access(struct cpu *__restrict me,
 	pagedir_map(FORCPU(me, thiscpu_x86_iob),
 	            2 * PAGESIZE,
 	            iob->ib_pages,
-	            is_writing ? (PAGEDIR_MAP_FREAD | PAGEDIR_MAP_FWRITE)
-	                       : (PAGEDIR_MAP_FREAD));
+	            is_writing ? (PAGEDIR_PROT_READ | PAGEDIR_PROT_WRITE)
+	                       : (PAGEDIR_PROT_READ));
 	FORCPU(me, thiscpu_x86_ioperm_bitmap) = iob;
 #undef GET_GFP_FLAGS
 	return true;
@@ -1033,7 +1033,7 @@ decref_part_and_pop_connections_and_set_exception_pointers:
 		mpart_lock_release(mf.mfl_part);
 
 		/* If write-access was granted, add the node to the list of writable nodes. */
-		if ((perm & PAGEDIR_MAP_FWRITE) && !LIST_ISBOUND(mf.mfl_node, mn_writable))
+		if ((perm & PAGEDIR_PROT_WRITE) && !LIST_ISBOUND(mf.mfl_node, mn_writable))
 		    LIST_INSERT_HEAD(&mf.mfl_mman->mm_writable, mf.mfl_node, mn_writable);
 
 		/* Sync the newly mapped address range if the mapping was created  with
@@ -1050,7 +1050,7 @@ decref_part_and_pop_connections_and_set_exception_pointers:
 		 * So to prevent cross-cpu inconsistencies, whenever a mapping is made
 		 * that ~may~ be  replacing another pre-existing  mapping, we force  a
 		 * sync for the mapped range. */
-		if (perm & PAGEDIR_MAP_FWRITE)
+		if (perm & PAGEDIR_PROT_WRITE)
 			mman_sync(mf.mfl_addr, mf.mfl_size);
 
 #if 0

@@ -380,8 +380,8 @@ NOTHROW(CC vga_vm86_state_init)(vga_vm86_state_t *__restrict self) {
 		for (i = 0, virt = self->vv_biosbase, phys = 0;
 		     i < VGA_VM86_BIOS_SIZE / PAGESIZE; ++i) {
 			self->vv_backup[i] = pagedir_push_mapone(virt, phys,
-			                                         PAGEDIR_MAP_FREAD |
-			                                         PAGEDIR_MAP_FWRITE);
+			                                         PAGEDIR_PROT_READ |
+			                                         PAGEDIR_PROT_WRITE);
 			phys += PAGESIZE;
 			virt += PAGESIZE;
 		}

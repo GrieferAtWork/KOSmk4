@@ -78,8 +78,8 @@ INTDEF ATTR_PERCPU void *thiscpu_x86_iobnode_pagedir_identity;
  *     >>         PERTASK_SET(this_x86_ioperm_bitmap, iob);
  *     >>     }
  *     >>     pagedir_map(THIS_CPU:thiscpu_x86_iob, 2 * PAGESIZE,
- *     >>                 iob->ib_pages, IS_WRITING() ? (PAGEDIR_MAP_FREAD | PAGEDIR_MAP_FWRITE)
- *     >>                                             : PAGEDIR_MAP_FREAD);
+ *     >>                 iob->ib_pages, IS_WRITING() ? (PAGEDIR_PROT_READ | PAGEDIR_PROT_WRITE)
+ *     >>                                             : PAGEDIR_PROT_READ);
  *     >>     SET_IOPERM_BITMAP_LOADED(THIS_CPU, true);
  *     >>     return;
  *     >> }

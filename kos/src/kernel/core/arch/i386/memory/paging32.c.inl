@@ -183,7 +183,7 @@ FOREACH_PAGING_FUNCTION(DEFINE_PUBLIC_ALIAS_PAGING_P32)
 
 
 #ifndef CONFIG_NO_PAGING_P32
-INTDEF u32 p32_pageperm_matrix_[16] ASMNAME("p32_pageperm_matrix");
+INTDEF u32 p32_pageperm_matrix_[0x40] ASMNAME("p32_pageperm_matrix");
 
 INTERN ATTR_FREETEXT void
 NOTHROW(KCALL kernel_initialize_paging_p32)(void) {
@@ -206,7 +206,7 @@ NOTHROW(KCALL kernel_initialize_paging_p32)(void) {
 #endif /* !CONFIG_NO_PAGING_P32 */
 
 #ifndef CONFIG_NO_PAGING_PAE
-INTDEF u64 pae_pageperm_matrix_[16] ASMNAME("pae_pageperm_matrix");
+INTDEF u64 pae_pageperm_matrix_[0x40] ASMNAME("pae_pageperm_matrix");
 
 INTERN ATTR_FREETEXT void
 NOTHROW(KCALL kernel_initialize_paging_pae)(void) {

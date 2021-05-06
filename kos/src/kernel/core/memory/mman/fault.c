@@ -134,7 +134,7 @@ again:
 			pagedir_unprepare(mf.mfl_addr, mf.mfl_size);
 			pagedir_sync(mf.mfl_addr, mf.mfl_size);
 			mpart_lock_release(mf.mfl_part);
-			if ((perm & PAGEDIR_MAP_FWRITE) && !LIST_ISBOUND(mf.mfl_node, mn_writable))
+			if ((perm & PAGEDIR_PROT_WRITE) && !LIST_ISBOUND(mf.mfl_node, mn_writable))
 				LIST_INSERT_HEAD(&mf.mfl_mman->mm_writable, mf.mfl_node, mn_writable);
 		}
 		mman_lock_release(mf.mfl_mman);
@@ -301,7 +301,7 @@ again:
 			pagedir_unprepare(mf.mfl_addr, mf.mfl_size);
 			pagedir_sync(mf.mfl_addr, mf.mfl_size);
 			mpart_lock_release(mf.mfl_part);
-			if ((perm & PAGEDIR_MAP_FWRITE) && !LIST_ISBOUND(mf.mfl_node, mn_writable))
+			if ((perm & PAGEDIR_PROT_WRITE) && !LIST_ISBOUND(mf.mfl_node, mn_writable))
 				LIST_INSERT_HEAD(&mf.mfl_mman->mm_writable, mf.mfl_node, mn_writable);
 		}
 		mman_lock_release(mf.mfl_mman);
@@ -540,7 +540,7 @@ NOTHROW(FCALL bitmovedown)(mpart_blkst_word_t *dst_bitset, size_t dst_index,
  * >>     pagedir_unprepare(mf.mfl_addr, mf.mfl_size);
  * >>     pagedir_sync(mf.mfl_addr, mf.mfl_size);
  * >>     mpart_lock_release(mf.mfl_part);
- * >>     if ((perm & PAGEDIR_MAP_FWRITE) && !LIST_ISBOUND(mf.mfl_node, mn_writable))
+ * >>     if ((perm & PAGEDIR_PROT_WRITE) && !LIST_ISBOUND(mf.mfl_node, mn_writable))
  * >>         LIST_INSERT_HEAD(&mf.mfl_mman->mm_writable, mf.mfl_node, mn_writable);
  * >>     mman_lock_release(mf.mfl_mman);
  * >>     // NOTE: Don't call `mfault_fini(&mf)' here!

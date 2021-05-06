@@ -91,7 +91,7 @@ NOTHROW(FCALL mpart_mmap_impl)(mpart_blkst_word_t const *bitset, unsigned int sh
 		size_t page_start, page_end;
 		page_start = baseaddr_offset >> PAGESHIFT;
 		page_end   = (baseaddr_offset + chunk_size) >> PAGESHIFT;
-		result     = perm & ~PAGEDIR_MAP_FWRITE;
+		result     = perm & ~PAGEDIR_PROT_WRITE;
 #ifndef __OPTIMIZE_SIZE__
 		if likely(shift == PAGESHIFT) {
 			for (i = page_start; i < page_end;) {
@@ -105,7 +105,7 @@ do_load_whole_pages_readonly:
 						if (st == MPART_BLOCK_ST_LOAD) {
 							++endpage;
 						} else if (st == MPART_BLOCK_ST_CHNG &&
-						           !(perm & PAGEDIR_MAP_FWRITE)) {
+						           !(perm & PAGEDIR_PROT_WRITE)) {
 							++endpage;
 						} else {
 							break;
@@ -116,11 +116,11 @@ do_load_whole_pages_readonly:
 					LOCAL_pagedir_map((byte_t *)addr + addr_offset,
 					                  (endpage - i) * PAGESIZE,
 					                  baseaddr + addr_offset,
-					                  perm & ~PAGEDIR_MAP_FWRITE);
+					                  perm & ~PAGEDIR_PROT_WRITE);
 					i = endpage;
 				} else if (st == MPART_BLOCK_ST_CHNG) {
 					size_t addr_offset, endpage;
-					if (!(perm & PAGEDIR_MAP_FWRITE))
+					if (!(perm & PAGEDIR_PROT_WRITE))
 						goto do_load_whole_pages_readonly;
 					endpage = i + 1;
 					while (endpage < page_end &&
@@ -131,7 +131,7 @@ do_load_whole_pages_readonly:
 					LOCAL_pagedir_map((byte_t *)addr + addr_offset,
 					                  (endpage - i) * PAGESIZE,
 					                  baseaddr + addr_offset, perm);
-					result |= PAGEDIR_MAP_FWRITE;
+					result |= PAGEDIR_PROT_WRITE;
 					i = endpage;
 				} else {
 					++i;
@@ -160,7 +160,7 @@ do_load_small_pages_readonly:
 						if (st == MPART_BLOCK_ST_LOAD) {
 							++endpage;
 						} else if (st == MPART_BLOCK_ST_CHNG &&
-						           !(perm & PAGEDIR_MAP_FWRITE)) {
+						           !(perm & PAGEDIR_PROT_WRITE)) {
 							++endpage;
 						} else {
 							break;
@@ -171,11 +171,11 @@ do_load_small_pages_readonly:
 					LOCAL_pagedir_map((byte_t *)addr + addr_offset,
 					                  (endpage - i) * PAGESIZE,
 					                  baseaddr + addr_offset,
-					                  perm & ~PAGEDIR_MAP_FWRITE);
+					                  perm & ~PAGEDIR_PROT_WRITE);
 					i = endpage;
 				} else if (st == MPART_BLOCK_ST_CHNG) {
 					size_t addr_offset, endpage;
-					if (!(perm & PAGEDIR_MAP_FWRITE))
+					if (!(perm & PAGEDIR_PROT_WRITE))
 						goto do_load_small_pages_readonly;
 					endpage = i + 1;
 					while (endpage < page_end) {
@@ -190,7 +190,7 @@ do_load_small_pages_readonly:
 					LOCAL_pagedir_map((byte_t *)addr + addr_offset,
 					                  (endpage - i) * PAGESIZE,
 					                  baseaddr + addr_offset, perm);
-					result |= PAGEDIR_MAP_FWRITE;
+					result |= PAGEDIR_PROT_WRITE;
 					i = endpage;
 				} else {
 					++i;
@@ -216,7 +216,7 @@ do_load_large_pages_readonly:
 						if (st == MPART_BLOCK_ST_LOAD) {
 							++endpage;
 						} else if (st == MPART_BLOCK_ST_CHNG &&
-						           !(perm & PAGEDIR_MAP_FWRITE)) {
+						           !(perm & PAGEDIR_PROT_WRITE)) {
 							++endpage;
 						} else {
 							break;
@@ -227,11 +227,11 @@ do_load_large_pages_readonly:
 					LOCAL_pagedir_map((byte_t *)addr + addr_offset,
 					                  (endpage - i) * PAGESIZE,
 					                  baseaddr + addr_offset,
-					                  perm & ~PAGEDIR_MAP_FWRITE);
+					                  perm & ~PAGEDIR_PROT_WRITE);
 					i = endpage;
 				} else if (st == MPART_BLOCK_ST_CHNG) {
 					size_t addr_offset, endpage;
-					if (!(perm & PAGEDIR_MAP_FWRITE))
+					if (!(perm & PAGEDIR_PROT_WRITE))
 						goto do_load_large_pages_readonly;
 					endpage = i + 1;
 					while (endpage < page_end &&
@@ -242,7 +242,7 @@ do_load_large_pages_readonly:
 					LOCAL_pagedir_map((byte_t *)addr + addr_offset,
 					                  (endpage - i) * PAGESIZE,
 					                  baseaddr + addr_offset, perm);
-					result |= PAGEDIR_MAP_FWRITE;
+					result |= PAGEDIR_PROT_WRITE;
 					i = endpage;
 				} else {
 					++i;
@@ -264,9 +264,9 @@ do_load_large_pages_readonly:
  *
  * NOTES:
  *   - When  mapping  blocks not  marked  as `MPART_BLOCK_ST_CHNG',
- *     the `PAGEDIR_MAP_FWRITE' perm-flag is automatically cleared.
+ *     the `PAGEDIR_PROT_WRITE' perm-flag is automatically cleared.
  *   - When mapping blocks marked as `MPART_BLOCK_ST_NDEF' or `MPART_BLOCK_ST_INIT',
- *     the `PAGEDIR_MAP_FEXEC', `PAGEDIR_MAP_FREAD'  and `PAGEDIR_MAP_FWRITE'  perm-
+ *     the `PAGEDIR_PROT_EXEC', `PAGEDIR_PROT_READ'  and `PAGEDIR_PROT_WRITE'  perm-
  *     flags are automatically cleared.
  *
  * @return: * : The union of permissions actually applied to all  pages.

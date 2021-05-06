@@ -705,7 +705,7 @@ NOTHROW(KCALL kernel_initialize_minfo_relocate)(void) {
 	/* Create a new page directory mapping. */
 	pagedir_map(dest, num_bytes,
 	            physpage2addr(kernel_meminfo_mpart.mp_mem.mc_start),
-	            PAGEDIR_MAP_FREAD | PAGEDIR_MAP_FWRITE);
+	            PAGEDIR_PROT_READ | PAGEDIR_PROT_WRITE);
 #ifdef ARCH_PAGEDIR_NEED_PERPARE_FOR_KERNELSPACE
 	pagedir_unprepare(dest, num_bytes);
 #endif /* ARCH_PAGEDIR_NEED_PERPARE_FOR_KERNELSPACE */

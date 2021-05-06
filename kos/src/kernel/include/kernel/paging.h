@@ -204,13 +204,12 @@ NOTHROW(FCALL pagedir_fini)(VIRT pagedir_t *__restrict self);
  *          bits,  more  permissions  than  specified  may  be granted.
  *          For example: On X86, write-permissions require read-permissions
  *                       to  be granted, and exec-permissions require read. */
-#ifndef PAGEDIR_MAP_FMASK
-#define PAGEDIR_MAP_FEXEC      0x0001 /* Permission bit: Allow execution within the mapping. */
-#define PAGEDIR_MAP_FWRITE     0x0002 /* Permission bit: Permit write-access to memory within mapping. */
-#define PAGEDIR_MAP_FREAD      0x0004 /* Permission bit: Permit read-access to memory within mapping. */
-#define PAGEDIR_MAP_FUSER      0x0008 /* Permission bit: Permit the user access to the mapping. */
-#define PAGEDIR_MAP_FMASK      0x000f /* Mask of valid permission bits. */
-#endif /* !PAGEDIR_MAP_FMASK */
+#ifndef PAGEDIR_PROT_MASK
+#define PAGEDIR_PROT_EXEC  0x0001 /* Permission bit: Allow execution within the mapping. */
+#define PAGEDIR_PROT_WRITE 0x0002 /* Permission bit: Permit write-access to memory within mapping. */
+#define PAGEDIR_PROT_READ  0x0004 /* Permission bit: Permit read-access to memory within mapping. */
+#define PAGEDIR_PROT_MASK  0x0007 /* Mask of valid permission bits. */
+#endif /* !PAGEDIR_PROT_MASK */
 
 
 
@@ -423,7 +422,7 @@ FUNDEF NOBLOCK WUNUSED void *NOTHROW(FCALL pagedir_gethint)(VIRT void *addr);
 #endif /* !ARCH_PAGEDIR_ARCHHEADER_DEFINES_PAGEDIR_GETHINT */
 
 /* Create/delete a page-directory mapping.
- * @param: perm: A set  of `PAGEDIR_MAP_F*'  detailing how  memory should  be  mapped.
+ * @param: perm: A set  of `PAGEDIR_PROT_*'  detailing how  memory should  be  mapped.
  * `pagedir_sync()' must be called while specifying a virtual address range containing
  * `addr...+=num_bytes' in order to ensure that changes will become visible.
  * NOTE: This function  can be called  regardless of which  page directory is  active. */

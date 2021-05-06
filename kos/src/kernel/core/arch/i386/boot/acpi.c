@@ -70,7 +70,7 @@ NOTHROW(KCALL copyfromphys_noidentity_partial)(void *__restrict dst,
 	 *       As such, we must preserve this mapping, as things such that  the
 	 *       kernel commandline are  still used  by later steps  of the  boot
 	 *       process. */
-	pv = pagedir_push_mapone(vsrc, src & ~(PAGESIZE - 1), PAGEDIR_MAP_FREAD);
+	pv = pagedir_push_mapone(vsrc, src & ~(PAGESIZE - 1), PAGEDIR_PROT_READ);
 	pagedir_syncone(vsrc);
 	offset = (uintptr_t)(src & (PAGESIZE - 1));
 	result = PAGESIZE - offset;

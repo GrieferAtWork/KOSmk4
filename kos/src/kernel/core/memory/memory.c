@@ -1146,7 +1146,7 @@ NOTHROW(KCALL page_stat_between)(physpage_t base, physpagecnt_t num_pages,
  *       mapping of zero-initialized memory, such that the initializer
  *       will do something like:
  *       >> page = page_malloc(1);
- *       >> pagedir_mapone(dest, page, PAGEDIR_MAP_FREAD | PAGEDIR_MAP_FWRITE);
+ *       >> pagedir_mapone(dest, page, PAGEDIR_PROT_READ | PAGEDIR_PROT_WRITE);
  *       >> if (!page_iszero(page))
  *       >>      memsetphys(physpage2addr(dest), 0, PAGESIZE);
  *       In other words: The information is most useful in freshly

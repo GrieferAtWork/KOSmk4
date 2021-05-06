@@ -2735,7 +2735,7 @@ driver_disable_textrel(struct driver *__restrict self)
 				node->mn_flags &= ~MNODE_F_PWRITE;
 				mpart_mmap_force(node->mn_part, mnode_getaddr(node),
 				                 mnode_getsize(node), node->mn_partoff,
-				                 mnode_getperm_force_nouser(node));
+				                 mnode_getperm_force(node));
 				/* 'have to sync the driver on all CPUs down below! */
 				mustsync = true;
 			}
@@ -5154,10 +5154,10 @@ again_acquire_mman_lock:
 						/* Force-map the node's part into kernelspace. */
 						mpart_mmap_force(node->mn_part, mnode_getaddr(node),
 						                 mnode_getsize(node), node->mn_partoff,
-						                 mnode_getperm_force_nouser(node) |
+						                 mnode_getperm_force(node) |
 						                 /* Always force write-access  for all mappings,  until
 						                  * `driver_initialize()' has finished applying relocs. */
-						                 PAGEDIR_MAP_FWRITE);
+						                 PAGEDIR_PROT_WRITE);
 					}
 					assert(result->d_module.md_nodecount != 0);
 

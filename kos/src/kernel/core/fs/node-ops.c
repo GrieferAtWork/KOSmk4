@@ -59,7 +59,7 @@ inode_file_pwrite_with_write(struct inode *__restrict self, physaddr_t src,
 		if unlikely(!num_bytes)
 			return;
 		tramp  = THIS_TRAMPOLINE;
-		backup = pagedir_push_mapone(tramp, minpageaddr, PAGEDIR_MAP_FREAD);
+		backup = pagedir_push_mapone(tramp, minpageaddr, PAGEDIR_PROT_READ);
 		pagedir_syncone(tramp);
 		TRY {
 			(*self->i_type->it_file.f_write)(self,

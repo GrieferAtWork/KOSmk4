@@ -260,7 +260,7 @@ again_lock_mman:
 				/* Map the stack into memory */
 				mpart_mmap_force(&FORTASK(result, this_kernel_stackpart_),
 				                 stack_addr, KERNEL_STACKSIZE, 0,
-				                 PAGEDIR_MAP_FREAD | PAGEDIR_MAP_FWRITE);
+				                 PAGEDIR_PROT_READ | PAGEDIR_PROT_WRITE);
 
 				/* Kernel stacks have the `MNODE_F_MPREPARED' flag set.
 				 * XXX: Maybe change this in the future? */

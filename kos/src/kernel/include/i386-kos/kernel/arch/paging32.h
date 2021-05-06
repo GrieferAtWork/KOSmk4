@@ -167,6 +167,19 @@
 
 
 
+/* Page protection flags. */
+#ifndef PAGEDIR_PROT_MASK
+#define PAGEDIR_PROT_EXEC    0x0001 /* Permission bit: Allow execution within the mapping. */
+#define PAGEDIR_PROT_WRITE   0x0002 /* Permission bit: Permit write-access to memory within mapping. */
+#define PAGEDIR_PROT_READ    0x0004 /* Permission bit: Permit read-access to memory within mapping. */
+#define PAGEDIR_PROT_X86_PWT 0x0008 /* PAE_PAGE_FPWT */
+#define PAGEDIR_PROT_X86_PCD 0x0010 /* PAE_PAGE_FPCD */
+#define PAGEDIR_PROT_X86_PAT 0x0020 /* PAE_PAGE_FPAT_4KIB / PAE_PAGE_FPAT_2MIB */
+#define PAGEDIR_PROT_MASK    0x003f /* Mask of valid permission bits. */
+#endif /* !PAGEDIR_PROT_MASK */
+
+
+
 DECL_BEGIN
 
 #ifdef __CC__

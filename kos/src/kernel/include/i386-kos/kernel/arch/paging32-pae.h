@@ -365,7 +365,7 @@ INTDEF NOBLOCK WUNUSED void *
 NOTHROW(FCALL pae_pagedir_gethint)(PAGEDIR_PAGEALIGNED VIRT void *addr);
 
 /* Create/delete a page-directory mapping.
- * @param: perm: A set of `PAGEDIR_MAP_F*' detailing how memory should be mapped. */
+ * @param: perm: A set of `PAGEDIR_PROT_*' detailing how memory should be mapped. */
 INTDEF NOBLOCK void
 NOTHROW(FCALL pae_pagedir_mapone)(PAGEDIR_PAGEALIGNED VIRT void *addr,
                                   PAGEDIR_PAGEALIGNED PHYS physaddr_t phys,

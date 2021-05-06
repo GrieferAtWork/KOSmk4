@@ -415,20 +415,20 @@ INTERN ATTR_FREETEXT void NOTHROW(KCALL x86_initialize_mman_kernel)(void) {
 	/* NOTE: Map the .text and .rodata sections as writable for now, so-as to
 	 *       allow initialization code to modify itself, as well as otherwise
 	 *       constant data structures. */
-	simple_insert_and_activate(&x86_kernel_mnodes[X86_KERNEL_MMAPPING_CORE_TEXT], PAGEDIR_MAP_FEXEC | PAGEDIR_MAP_FWRITE | PAGEDIR_MAP_FREAD);
-	simple_insert_and_activate(&x86_kernel_mnodes[X86_KERNEL_MMAPPING_CORE_RODATA], PAGEDIR_MAP_FWRITE | PAGEDIR_MAP_FREAD);
+	simple_insert_and_activate(&x86_kernel_mnodes[X86_KERNEL_MMAPPING_CORE_TEXT], PAGEDIR_PROT_EXEC | PAGEDIR_PROT_WRITE | PAGEDIR_PROT_READ);
+	simple_insert_and_activate(&x86_kernel_mnodes[X86_KERNEL_MMAPPING_CORE_RODATA], PAGEDIR_PROT_WRITE | PAGEDIR_PROT_READ);
 #ifdef X86_KERNEL_MMAPPING_CORE_DATA
-	simple_insert_and_activate(&x86_kernel_mnodes[X86_KERNEL_MMAPPING_CORE_DATA], PAGEDIR_MAP_FWRITE | PAGEDIR_MAP_FREAD);
+	simple_insert_and_activate(&x86_kernel_mnodes[X86_KERNEL_MMAPPING_CORE_DATA], PAGEDIR_PROT_WRITE | PAGEDIR_PROT_READ);
 #else /* X86_KERNEL_MMAPPING_CORE_DATA */
-	simple_insert_and_activate(&x86_kernel_mnodes[X86_KERNEL_MMAPPING_CORE_DATA1], PAGEDIR_MAP_FWRITE | PAGEDIR_MAP_FREAD);
-	simple_insert_and_activate(&x86_kernel_mnodes[X86_KERNEL_MMAPPING_CORE_DATA2], PAGEDIR_MAP_FWRITE | PAGEDIR_MAP_FREAD);
+	simple_insert_and_activate(&x86_kernel_mnodes[X86_KERNEL_MMAPPING_CORE_DATA1], PAGEDIR_PROT_WRITE | PAGEDIR_PROT_READ);
+	simple_insert_and_activate(&x86_kernel_mnodes[X86_KERNEL_MMAPPING_CORE_DATA2], PAGEDIR_PROT_WRITE | PAGEDIR_PROT_READ);
 #endif /* !X86_KERNEL_MMAPPING_CORE_DATA */
-	simple_insert_and_activate(&x86_kernel_mnodes[X86_KERNEL_MMAPPING_CORE_XDATA], PAGEDIR_MAP_FEXEC | PAGEDIR_MAP_FWRITE | PAGEDIR_MAP_FREAD);
+	simple_insert_and_activate(&x86_kernel_mnodes[X86_KERNEL_MMAPPING_CORE_XDATA], PAGEDIR_PROT_EXEC | PAGEDIR_PROT_WRITE | PAGEDIR_PROT_READ);
 #ifdef X86_KERNEL_MMAPPING_CORE_BSS
-	simple_insert_and_activate(&x86_kernel_mnodes[X86_KERNEL_MMAPPING_CORE_BSS], PAGEDIR_MAP_FWRITE | PAGEDIR_MAP_FREAD);
+	simple_insert_and_activate(&x86_kernel_mnodes[X86_KERNEL_MMAPPING_CORE_BSS], PAGEDIR_PROT_WRITE | PAGEDIR_PROT_READ);
 #else /* X86_KERNEL_MMAPPING_CORE_BSS */
-	simple_insert_and_activate(&x86_kernel_mnodes[X86_KERNEL_MMAPPING_CORE_BSS1], PAGEDIR_MAP_FWRITE | PAGEDIR_MAP_FREAD);
-	simple_insert_and_activate(&x86_kernel_mnodes[X86_KERNEL_MMAPPING_CORE_BSS2], PAGEDIR_MAP_FWRITE | PAGEDIR_MAP_FREAD);
+	simple_insert_and_activate(&x86_kernel_mnodes[X86_KERNEL_MMAPPING_CORE_BSS1], PAGEDIR_PROT_WRITE | PAGEDIR_PROT_READ);
+	simple_insert_and_activate(&x86_kernel_mnodes[X86_KERNEL_MMAPPING_CORE_BSS2], PAGEDIR_PROT_WRITE | PAGEDIR_PROT_READ);
 #endif /* !X86_KERNEL_MMAPPING_CORE_BSS */
 	mman_mappings_insert(&mman_kernel, &FORCPU(&bootcpu, thiscpu_x86_iobnode));
 	mman_mappings_insert(&mman_kernel, &x86_kernel_mnodes[X86_KERNEL_MMAPPING_IDENTITY_RESERVE]);
@@ -441,7 +441,7 @@ INTERN ATTR_FREETEXT void NOTHROW(KCALL x86_initialize_mman_kernel)(void) {
 	 * known physical memory location. */
 	if (!pagedir_prepare(__kernel_pdata_start - KERNEL_CORE_BASE, (size_t)__kernel_pdata_size))
 		kernel_panic(FREESTR("Failed to prepare kernel MMan for mapping .pdata\n"));
-	simple_insert_and_activate(&x86_pdata_mnode, PAGEDIR_MAP_FEXEC | PAGEDIR_MAP_FWRITE | PAGEDIR_MAP_FREAD);
+	simple_insert_and_activate(&x86_pdata_mnode, PAGEDIR_PROT_EXEC | PAGEDIR_PROT_WRITE | PAGEDIR_PROT_READ);
 #ifndef NDEBUG
 	{
 		u32 virt_word, phys_word;
@@ -463,7 +463,7 @@ INTERN ATTR_FREETEXT void NOTHROW(KCALL x86_initialize_mman_kernel)(void) {
 			kernel_panic(FREESTR("Failed to map the LAPIC somewhere\n"));
 		x86_lapic_mnode.mn_minaddr = lapic_addr;
 		x86_lapic_mnode.mn_maxaddr = lapic_addr + x86_lapic_mpart.mp_mem.mc_size * PAGESIZE - 1;
-		simple_insert_and_activate(&x86_lapic_mnode, PAGEDIR_MAP_FWRITE | PAGEDIR_MAP_FREAD);
+		simple_insert_and_activate(&x86_lapic_mnode, PAGEDIR_PROT_WRITE | PAGEDIR_PROT_READ);
 		/* Remember where we mapped the LAPIC */
 		x86_lapicbase_ += (uintptr_t)lapic_addr;
 	}
@@ -523,10 +523,10 @@ NOTHROW(KCALL x86_initialize_mman_kernel_rdonly)(void) {
 	 * appropriate version. */
 	mnode_pagedir_map(&x86_kernel_mnodes[X86_KERNEL_MMAPPING_CORE_TEXT],
 	                  physpage2addr(x86_kernel_mparts[X86_KERNEL_MMAPPING_CORE_TEXT].mp_mem.mc_start),
-	                  PAGEDIR_MAP_FEXEC | PAGEDIR_MAP_FREAD);
+	                  PAGEDIR_PROT_EXEC | PAGEDIR_PROT_READ);
 	mnode_pagedir_map(&x86_kernel_mnodes[X86_KERNEL_MMAPPING_CORE_RODATA],
 	                  physpage2addr(x86_kernel_mparts[X86_KERNEL_MMAPPING_CORE_RODATA].mp_mem.mc_start),
-	                  PAGEDIR_MAP_FREAD);
+	                  PAGEDIR_PROT_READ);
 	assert(!pagedir_iswritable(mnode_getminaddr(&x86_kernel_mnodes[X86_KERNEL_MMAPPING_CORE_TEXT])));
 	assert(!pagedir_iswritable(mnode_getminaddr(&x86_kernel_mnodes[X86_KERNEL_MMAPPING_CORE_RODATA])));
 #ifdef X86_KERNEL_MMAPPING_CORE_DATA

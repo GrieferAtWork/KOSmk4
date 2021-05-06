@@ -964,7 +964,7 @@ NOTHROW(FCALL mnode_hinted_mmap)(struct mnode *__restrict self,
 	                  self->mn_partoff +
 	                  (mpart_reladdr_t)((uintptr_t)fault_page -
 	                                    (uintptr_t)mnode_getminaddr(self)),
-	                  mnode_getperm_force_nouser(self));
+	                  mnode_getperm_force(self));
 }
 
 

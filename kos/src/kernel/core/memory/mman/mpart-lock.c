@@ -1664,19 +1664,19 @@ free_unused_block_status:
 	 * valid state, time to have the hardware match us by updating the
 	 * underlying page directories. */
 	{
-		u16 prot_mask = PAGEDIR_MAP_FEXEC | PAGEDIR_MAP_FWRITE | PAGEDIR_MAP_FREAD;
+		u16 prot_mask = PAGEDIR_PROT_EXEC | PAGEDIR_PROT_WRITE | PAGEDIR_PROT_READ;
 		assert(!LIST_EMPTY(&copy->mp_copy));
 		/* We can map as writable if only a single copy-on-write node exists! */
 		if (LIST_NEXT(LIST_FIRST(&copy->mp_copy), mn_link) != NULL)
-			prot_mask &= ~PAGEDIR_MAP_FWRITE;
+			prot_mask &= ~PAGEDIR_PROT_WRITE;
 		LIST_FOREACH (node, &copy->mp_copy, mn_link) {
 			struct mman *mm;
 			void *addr;
 			size_t size;
 			u16 prot;
-			STATIC_ASSERT(PAGEDIR_MAP_FEXEC == MNODE_F_PEXEC);
-			STATIC_ASSERT(PAGEDIR_MAP_FWRITE == MNODE_F_PWRITE);
-			STATIC_ASSERT(PAGEDIR_MAP_FREAD == MNODE_F_PREAD);
+			STATIC_ASSERT(PAGEDIR_PROT_EXEC == MNODE_F_PEXEC);
+			STATIC_ASSERT(PAGEDIR_PROT_WRITE == MNODE_F_PWRITE);
+			STATIC_ASSERT(PAGEDIR_PROT_READ == MNODE_F_PREAD);
 			assert(mnode_ismapping(node, partrel_minaddr, partrel_maxaddr));
 			mm = node->mn_mman;
 			assert(!wasdestroyed(mm));
@@ -1685,14 +1685,11 @@ free_unused_block_status:
 			addr = mnode_getaddr(node);
 			size = mnode_getsize(node);
 			prot = node->mn_flags & prot_mask;
-			if (ADDR_ISUSER(addr))
-				prot |= PAGEDIR_MAP_FUSER; /* XXX: Maybe get rid of this eventually? */
-
 			prot = mpart_mmap_p(copy, mm->mm_pagedir_p, addr,
 			                    size, node->mn_partoff, prot);
 
 			/* Make sure that the node's writable-bound-state is correct. */
-			if unlikely(prot & PAGEDIR_MAP_FWRITE) {
+			if unlikely(prot & PAGEDIR_PROT_WRITE) {
 				if (!LIST_ISBOUND(node, mn_writable))
 					LIST_INSERT_HEAD(&mm->mm_writable, node, mn_writable);
 			} else {
@@ -1710,7 +1707,7 @@ free_unused_block_status:
 			 * caches! */
 			mman_sync_p(mm, addr, size);
 		}
-		if (prot_mask & PAGEDIR_MAP_FWRITE) {
+		if (prot_mask & PAGEDIR_PROT_WRITE) {
 			/* Insert the (only) writable node into it's mman's writable chain. */
 			node = LIST_FIRST(&copy->mp_copy);
 			if (node->mn_flags & MNODE_F_PWRITE)

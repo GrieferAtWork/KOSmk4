@@ -158,7 +158,7 @@ NOTHROW(KCALL phcore_page_alloc_nx)(PAGEDIR_PAGEALIGNED size_t num_bytes,
 	}
 #endif /* ARCH_PAGEDIR_NEED_PERPARE_FOR_KERNELSPACE */
 	pagedir_map(result, num_bytes, physpage2addr(part->mp_mem.mc_start),
-	            PAGEDIR_MAP_FREAD | PAGEDIR_MAP_FWRITE);
+	            PAGEDIR_PROT_READ | PAGEDIR_PROT_WRITE);
 	pagedir_sync(result, num_bytes);
 #ifdef ARCH_PAGEDIR_NEED_PERPARE_FOR_KERNELSPACE
 	pagedir_unprepare(result, num_bytes);

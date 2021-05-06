@@ -406,11 +406,11 @@ do_inode_flexread_phys(struct inode *__restrict self,
 			page_bytes = num_bytes;
 		if (is_first) {
 			backup = pagedir_push_mapone(tramp, buf & ~PAGEMASK,
-			                             PAGEDIR_MAP_FWRITE);
+			                             PAGEDIR_PROT_WRITE);
 			is_first = false;
 		} else {
 			pagedir_mapone(tramp, buf & ~PAGEMASK,
-			               PAGEDIR_MAP_FWRITE);
+			               PAGEDIR_PROT_WRITE);
 		}
 		pagedir_syncone(tramp);
 		/* Copy memory. */

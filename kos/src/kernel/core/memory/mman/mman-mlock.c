@@ -318,7 +318,7 @@ again_prefault:
 						mpart_lock_release(mf.mfl_part);
 
 						/* If write-access was granted, add the node to the list of writable nodes. */
-						if ((perm & PAGEDIR_MAP_FWRITE) && !LIST_ISBOUND(mf.mfl_node, mn_writable))
+						if ((perm & PAGEDIR_PROT_WRITE) && !LIST_ISBOUND(mf.mfl_node, mn_writable))
 						    LIST_INSERT_HEAD(&self->mm_writable, mf.mfl_node, mn_writable);
 					}
 

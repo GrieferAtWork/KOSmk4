@@ -259,12 +259,12 @@ NOTHROW(FCALL mptram_mappage_noidentity)(struct mptram *__restrict self,
 	byte_t *tramp = THIS_TRAMPOLINE;
 	if (self->mpt_pushval == PAGEDIR_PUSHVAL_INVALID) {
 		self->mpt_pushval = pagedir_push_mapone(tramp, physpage2addr(page),
-		                                        PAGEDIR_MAP_FREAD |
-		                                        PAGEDIR_MAP_FWRITE);
+		                                        PAGEDIR_PROT_READ |
+		                                        PAGEDIR_PROT_WRITE);
 	} else {
 		pagedir_mapone(tramp, physpage2addr(page),
-		               PAGEDIR_MAP_FREAD |
-		               PAGEDIR_MAP_FWRITE);
+		               PAGEDIR_PROT_READ |
+		               PAGEDIR_PROT_WRITE);
 	}
 	pagedir_syncone(tramp);
 	return tramp;
