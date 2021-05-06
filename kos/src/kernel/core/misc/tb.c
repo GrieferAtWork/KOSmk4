@@ -92,8 +92,8 @@ do_print_traceback(pformatprinter printer, void *arg,
 	void *old_state;
 	void *pc, *sp, *last_good_sp;
 	old_state = alloca(state_size);
-	(*reg_getter)(state, CFI_UNWIND_REGISTER_PC, &pc);
-	(*reg_getter)(state, CFI_UNWIND_REGISTER_SP, &sp);
+	(*reg_getter)(state, CFI_UNWIND_REGISTER_PC(sizeof(void *)), &pc);
+	(*reg_getter)(state, CFI_UNWIND_REGISTER_SP(sizeof(void *)), &sp);
 	last_good_sp = sp;
 	if (n_skip) {
 		--n_skip;
@@ -114,8 +114,8 @@ do_print_traceback(pformatprinter printer, void *arg,
 		                         reg_setter, state);
 		if (error != UNWIND_SUCCESS)
 			break;
-		(*reg_getter)(state, CFI_UNWIND_REGISTER_PC, &pc);
-		(*reg_getter)(state, CFI_UNWIND_REGISTER_SP, &sp);
+		(*reg_getter)(state, CFI_UNWIND_REGISTER_PC(sizeof(void *)), &pc);
+		(*reg_getter)(state, CFI_UNWIND_REGISTER_SP(sizeof(void *)), &sp);
 		if (n_skip) {
 			--n_skip;
 		} else {
