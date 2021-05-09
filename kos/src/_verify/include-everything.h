@@ -894,6 +894,7 @@ incdir("");
 #include <mntent.h>
 #include <monetary.h>
 #include <mqueue.h>
+#include <nan.h>
 #include <ndir.h>
 #include <net/bits/types.h>
 #include <net/ethernet.h>

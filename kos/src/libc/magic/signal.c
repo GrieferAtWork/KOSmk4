@@ -1226,7 +1226,7 @@ __NAMESPACE_STD_USING(size_t)
 [[std, userimpl, crt_dos_variant, decl_include("<bits/types.h>")]]
 [[requires(($has_function(pthread_kill) && $has_function(pthread_self)) ||
            ($has_function(kill) && $has_function(getpid)))]]
-[[impl_include("<libc/errno.h>")]]
+[[libc, impl_include("<libc/errno.h>")]]
 int raise($signo_t signo) {
 @@pp_if $has_function(pthread_kill) && $has_function(pthread_self)@@
 	errno_t error;

@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xbf7a760 */
+/* HASH CRC-32:0xcc54657c */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -27,6 +27,10 @@
 #include <__crt.h>
 #include "core/signal.h"
 
+#if !defined(____libc_raise_defined) && defined(____libc_core_raise_defined)
+#define ____libc_raise_defined 1
+#define __libc_raise __libc_core_raise
+#endif /* !____libc_raise_defined && ____libc_core_raise_defined */
 /* >> sigfillset(3)
  * Add all possible signals (possibly even including undefined signals,
  * though these would be ignored by the kernel) to the given signal set

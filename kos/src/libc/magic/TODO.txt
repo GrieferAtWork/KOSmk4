@@ -55,7 +55,6 @@
 ### Referenced, but origin unknown
 <cthreads.h>           (Python ./configure)
 <fp.h>                 (libstdc++ ./configure)
-<nan.h>                (libstdc++ ./configure)
 
 ### Unlikely to ever be added
 <nlist.h>              (libbsd)
