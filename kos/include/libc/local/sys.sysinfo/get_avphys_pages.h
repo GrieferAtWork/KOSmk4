@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xfd526db3 */
+/* HASH CRC-32:0x5a41ae6 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -25,7 +25,7 @@
 #include <asm/pagesize.h>
 #endif /* __LIBC_BIND_OPTIMIZATIONS */
 #include <asm/pagesize.h>
-#if defined(__CRT_HAVE_sysinfo) && (defined(__CRT_HAVE_getpagesize) || defined(__CRT_HAVE___getpagesize) || defined(__ARCH_PAGESIZE))
+#if defined(__CRT_HAVE_sysinfo) && !defined(__solaris__) && (defined(__CRT_HAVE_getpagesize) || defined(__CRT_HAVE___getpagesize) || defined(__ARCH_PAGESIZE))
 #include <bits/types.h>
 __NAMESPACE_LOCAL_BEGIN
 /* Dependency: getpagesize from unistd */
@@ -37,14 +37,14 @@ __NAMESPACE_LOCAL_END
 __NAMESPACE_LOCAL_BEGIN
 /* >> getpagesize(3)
  * Return the size of a PAGE (in bytes) */
-__CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,__STDC_INT_AS_SIZE_T,__NOTHROW_NCX,__localdep_getpagesize,(void),getpagesize,())
+__CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,__STDC_INT_AS_SIZE_T,__NOTHROW,__localdep_getpagesize,(void),getpagesize,())
 #elif defined(__CRT_HAVE___getpagesize)
 __NAMESPACE_LOCAL_END
 #include <features.h>
 __NAMESPACE_LOCAL_BEGIN
 /* >> getpagesize(3)
  * Return the size of a PAGE (in bytes) */
-__CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,__STDC_INT_AS_SIZE_T,__NOTHROW_NCX,__localdep_getpagesize,(void),__getpagesize,())
+__CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,__STDC_INT_AS_SIZE_T,__NOTHROW,__localdep_getpagesize,(void),__getpagesize,())
 #elif defined(__ARCH_PAGESIZE)
 __NAMESPACE_LOCAL_END
 #include <libc/local/unistd/getpagesize.h>
@@ -64,7 +64,7 @@ __NAMESPACE_LOCAL_END
 __NAMESPACE_LOCAL_BEGIN
 /* >> sysinfo(2)
  * Return current system information */
-__CREDIRECT(__ATTR_NONNULL((1)),int,__NOTHROW_RPC,__localdep_sysinfo,(struct sysinfo *__info),sysinfo,(__info))
+__CREDIRECT(__ATTR_NONNULL((1)),int,__NOTHROW_NCX,__localdep_sysinfo,(struct sysinfo *__info),sysinfo,(__info))
 #endif /* !__local___localdep_sysinfo_defined */
 __NAMESPACE_LOCAL_END
 #include <linux/sysinfo.h>
@@ -72,7 +72,7 @@ __NAMESPACE_LOCAL_BEGIN
 /* >> get_avphys_pages(3)
  * Return the total # of free pages of physical memory */
 __LOCAL_LIBC(get_avphys_pages) __ATTR_WUNUSED __INTPTR_TYPE__
-__NOTHROW_RPC(__LIBCCALL __LIBC_LOCAL_NAME(get_avphys_pages))(void) {
+__NOTHROW(__LIBCCALL __LIBC_LOCAL_NAME(get_avphys_pages))(void) {
 	struct sysinfo __info;
 	__UINTPTR_TYPE__ __result;
 	__SIZE_TYPE__ __ps;
@@ -95,7 +95,7 @@ __NAMESPACE_LOCAL_END
 #define __local___localdep_get_avphys_pages_defined 1
 #define __localdep_get_avphys_pages __LIBC_LOCAL_NAME(get_avphys_pages)
 #endif /* !__local___localdep_get_avphys_pages_defined */
-#else /* __CRT_HAVE_sysinfo && (__CRT_HAVE_getpagesize || __CRT_HAVE___getpagesize || __ARCH_PAGESIZE) */
+#else /* __CRT_HAVE_sysinfo && !__solaris__ && (__CRT_HAVE_getpagesize || __CRT_HAVE___getpagesize || __ARCH_PAGESIZE) */
 #undef __local_get_avphys_pages_defined
-#endif /* !__CRT_HAVE_sysinfo || (!__CRT_HAVE_getpagesize && !__CRT_HAVE___getpagesize && !__ARCH_PAGESIZE) */
+#endif /* !__CRT_HAVE_sysinfo || __solaris__ || (!__CRT_HAVE_getpagesize && !__CRT_HAVE___getpagesize && !__ARCH_PAGESIZE) */
 #endif /* !__local_get_avphys_pages_defined */

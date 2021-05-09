@@ -673,6 +673,7 @@
 #define __CRT_HAVE___sinhl
 #define __CRT_HAVE___sinl
 #define __CRT_HAVE___socket
+#define __CRT_HAVE___solaris_sysinfo
 #define __CRT_HAVE___sqrt
 #define __CRT_HAVE___sqrtf
 #define __CRT_HAVE___sqrtl

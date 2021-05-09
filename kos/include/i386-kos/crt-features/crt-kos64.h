@@ -670,6 +670,7 @@
 #define __CRT_HAVE___sinhl
 #define __CRT_HAVE___sinl
 #define __CRT_HAVE___socket
+#define __CRT_HAVE___solaris_sysinfo
 #define __CRT_HAVE___sqrt
 #define __CRT_HAVE___sqrtf
 #define __CRT_HAVE___sqrtl
@@ -5066,6 +5067,7 @@
 #define __CRT_HAVE_KOS$__sinhl
 #define __CRT_HAVE_KOS$__sinl
 #define __CRT_HAVE_KOS$__socket
+#define __CRT_HAVE_KOS$__solaris_sysinfo
 #define __CRT_HAVE_KOS$__sqrt
 #define __CRT_HAVE_KOS$__sqrtf
 #define __CRT_HAVE_KOS$__sqrtl
@@ -8608,6 +8610,7 @@
 #define __CRT_HAVE_DOS$__sinhl
 #define __CRT_HAVE_DOS$__sinl
 #define __CRT_HAVE_DOS$__socket
+#define __CRT_HAVE_DOS$__solaris_sysinfo
 #define __CRT_HAVE_DOS$__sqrt
 #define __CRT_HAVE_DOS$__sqrtf
 #define __CRT_HAVE_DOS$__sqrtl

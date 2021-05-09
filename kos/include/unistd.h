@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x9c592094 */
+/* HASH CRC-32:0x23a50045 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -1850,24 +1850,24 @@ __CDECLARE_OPT(__ATTR_WUNUSED,__LONGPTR_TYPE__,__NOTHROW_NCX,gethostid,(void),()
 #if defined(__LIBC_BIND_OPTIMIZATIONS) && defined(__ARCH_PAGESIZE) && defined(__CRT_HAVE_getpagesize)
 /* >> getpagesize(3)
  * Return the size of a PAGE (in bytes) */
-__CEIDECLARE(__ATTR_CONST __ATTR_WUNUSED,__STDC_INT_AS_SIZE_T,__NOTHROW_NCX,getpagesize,(void),{ return __ARCH_PAGESIZE; })
+__CEIDECLARE(__ATTR_CONST __ATTR_WUNUSED,__STDC_INT_AS_SIZE_T,__NOTHROW,getpagesize,(void),{ return __ARCH_PAGESIZE; })
 #elif defined(__LIBC_BIND_OPTIMIZATIONS) && defined(__ARCH_PAGESIZE) && defined(__CRT_HAVE___getpagesize)
 /* >> getpagesize(3)
  * Return the size of a PAGE (in bytes) */
-__CEIREDIRECT(__ATTR_CONST __ATTR_WUNUSED,__STDC_INT_AS_SIZE_T,__NOTHROW_NCX,getpagesize,(void),__getpagesize,{ return __ARCH_PAGESIZE; })
+__CEIREDIRECT(__ATTR_CONST __ATTR_WUNUSED,__STDC_INT_AS_SIZE_T,__NOTHROW,getpagesize,(void),__getpagesize,{ return __ARCH_PAGESIZE; })
 #elif defined(__CRT_HAVE_getpagesize)
 /* >> getpagesize(3)
  * Return the size of a PAGE (in bytes) */
-__CDECLARE(__ATTR_CONST __ATTR_WUNUSED,__STDC_INT_AS_SIZE_T,__NOTHROW_NCX,getpagesize,(void),())
+__CDECLARE(__ATTR_CONST __ATTR_WUNUSED,__STDC_INT_AS_SIZE_T,__NOTHROW,getpagesize,(void),())
 #elif defined(__CRT_HAVE___getpagesize)
 /* >> getpagesize(3)
  * Return the size of a PAGE (in bytes) */
-__CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,__STDC_INT_AS_SIZE_T,__NOTHROW_NCX,getpagesize,(void),__getpagesize,())
+__CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,__STDC_INT_AS_SIZE_T,__NOTHROW,getpagesize,(void),__getpagesize,())
 #elif defined(__ARCH_PAGESIZE)
 #include <libc/local/unistd/getpagesize.h>
 /* >> getpagesize(3)
  * Return the size of a PAGE (in bytes) */
-__NAMESPACE_LOCAL_USING_OR_IMPL(getpagesize, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_CONST __ATTR_WUNUSED __STDC_INT_AS_SIZE_T __NOTHROW_NCX(__LIBCCALL getpagesize)(void) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(getpagesize))(); })
+__NAMESPACE_LOCAL_USING_OR_IMPL(getpagesize, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_CONST __ATTR_WUNUSED __STDC_INT_AS_SIZE_T __NOTHROW(__LIBCCALL getpagesize)(void) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(getpagesize))(); })
 #endif /* ... */
 #ifdef __ARCH_PAGESIZE
 /* If known to be a compile-time  constant, use macros to make  sure
@@ -1877,11 +1877,11 @@ __NAMESPACE_LOCAL_USING_OR_IMPL(getpagesize, __FORCELOCAL __ATTR_ARTIFICIAL __AT
 #endif /* __ARCH_PAGESIZE */
 #ifdef __CRT_HAVE_getdtablesize
 /* >> getdtablesize(3) */
-__CDECLARE(__ATTR_CONST __ATTR_WUNUSED,__STDC_INT_AS_SIZE_T,__NOTHROW_NCX,getdtablesize,(void),())
+__CDECLARE(__ATTR_CONST __ATTR_WUNUSED,__STDC_INT_AS_SIZE_T,__NOTHROW,getdtablesize,(void),())
 #else /* __CRT_HAVE_getdtablesize */
 #include <libc/local/unistd/getdtablesize.h>
 /* >> getdtablesize(3) */
-__NAMESPACE_LOCAL_USING_OR_IMPL(getdtablesize, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_CONST __ATTR_WUNUSED __STDC_INT_AS_SIZE_T __NOTHROW_NCX(__LIBCCALL getdtablesize)(void) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(getdtablesize))(); })
+__NAMESPACE_LOCAL_USING_OR_IMPL(getdtablesize, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_CONST __ATTR_WUNUSED __STDC_INT_AS_SIZE_T __NOTHROW(__LIBCCALL getdtablesize)(void) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(getdtablesize))(); })
 #endif /* !__CRT_HAVE_getdtablesize */
 #endif /* __USE_MISC || !__USE_XOPEN2K */
 #endif /* __USE_MISC || __USE_XOPEN_EXTENDED */

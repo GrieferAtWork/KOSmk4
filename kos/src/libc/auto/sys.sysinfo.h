@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xc31bf79b */
+/* HASH CRC-32:0xc1dd15de */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -32,15 +32,15 @@ DECL_BEGIN
 #if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
 /* >> sysinfo(2)
  * Return current system information */
-INTDEF NONNULL((1)) int NOTHROW_RPC(LIBDCALL libd_sysinfo)(struct sysinfo *info);
+INTDEF NONNULL((1)) int NOTHROW_NCX(LIBDCALL libd_sysinfo)(struct sysinfo *info);
 #endif /* !__LIBCCALL_IS_LIBDCALL && !__KERNEL__ */
 #ifndef __KERNEL__
 /* >> get_phys_pages(3)
  * Return the total # of pages of physical memory */
-INTDEF WUNUSED intptr_t NOTHROW_RPC(LIBCCALL libc_get_phys_pages)(void);
+INTDEF WUNUSED intptr_t NOTHROW(LIBCCALL libc_get_phys_pages)(void);
 /* >> get_avphys_pages(3)
  * Return the total # of free pages of physical memory */
-INTDEF WUNUSED intptr_t NOTHROW_RPC(LIBCCALL libc_get_avphys_pages)(void);
+INTDEF WUNUSED intptr_t NOTHROW(LIBCCALL libc_get_avphys_pages)(void);
 #endif /* !__KERNEL__ */
 
 DECL_END

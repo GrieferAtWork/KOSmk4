@@ -29,11 +29,11 @@
 
 DECL_BEGIN
 
-/*[[[head:libc_sysinfo,hash:CRC-32=0x1d46f7ad]]]*/
+/*[[[head:libc_sysinfo,hash:CRC-32=0x3847e777]]]*/
 /* >> sysinfo(2)
  * Return current system information */
 INTERN ATTR_SECTION(".text.crt.system.info") NONNULL((1)) int
-NOTHROW_RPC(LIBCCALL libc_sysinfo)(struct sysinfo *info)
+NOTHROW_NCX(LIBCCALL libc_sysinfo)(struct sysinfo *info)
 /*[[[body:libc_sysinfo]]]*/
 {
 	errno_t error;
@@ -42,11 +42,11 @@ NOTHROW_RPC(LIBCCALL libc_sysinfo)(struct sysinfo *info)
 }
 /*[[[end:libc_sysinfo]]]*/
 
-/*[[[head:libc_get_nprocs_conf,hash:CRC-32=0xd58bda27]]]*/
+/*[[[head:libc_get_nprocs_conf,hash:CRC-32=0xd8904d5f]]]*/
 /* >> get_nprocs_conf(3)
  * Return the # of configured online processors */
 INTERN ATTR_SECTION(".text.crt.system.info") WUNUSED int
-NOTHROW_RPC(LIBCCALL libc_get_nprocs_conf)(void)
+NOTHROW(LIBCCALL libc_get_nprocs_conf)(void)
 /*[[[body:libc_get_nprocs_conf]]]*/
 {
 	/* TODO: Configured processor count (aka: The kernel's `cpu_count' global) */
@@ -56,11 +56,11 @@ NOTHROW_RPC(LIBCCALL libc_get_nprocs_conf)(void)
 }
 /*[[[end:libc_get_nprocs_conf]]]*/
 
-/*[[[head:libc_get_nprocs,hash:CRC-32=0x473c54f0]]]*/
+/*[[[head:libc_get_nprocs,hash:CRC-32=0x97ca2425]]]*/
 /* >> get_nprocs(3)
  * Return the # of currently online processors */
 INTERN ATTR_SECTION(".text.crt.system.info") WUNUSED int
-NOTHROW_RPC(LIBCCALL libc_get_nprocs)(void)
+NOTHROW(LIBCCALL libc_get_nprocs)(void)
 /*[[[body:libc_get_nprocs]]]*/
 {
 	/* TODO: Active processor count (aka: The kernel's `cpu_online_count' global) */

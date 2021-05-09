@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x65499202 */
+/* HASH CRC-32:0x62714ee1 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -420,9 +420,9 @@ INTDEF int NOTHROW_NCX(LIBDCALL libd_setregid)(gid_t rgid, gid_t egid);
 #ifndef __KERNEL__
 /* >> getpagesize(3)
  * Return the size of a PAGE (in bytes) */
-INTDEF ATTR_CONST WUNUSED __STDC_INT_AS_SIZE_T NOTHROW_NCX(LIBCCALL libc_getpagesize)(void);
+INTDEF ATTR_CONST WUNUSED __STDC_INT_AS_SIZE_T NOTHROW(LIBCCALL libc_getpagesize)(void);
 /* >> getdtablesize(3) */
-INTDEF ATTR_CONST WUNUSED __STDC_INT_AS_SIZE_T NOTHROW_NCX(LIBCCALL libc_getdtablesize)(void);
+INTDEF ATTR_CONST WUNUSED __STDC_INT_AS_SIZE_T NOTHROW(LIBCCALL libc_getdtablesize)(void);
 #endif /* !__KERNEL__ */
 #if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
 /* >> seteuid(2)

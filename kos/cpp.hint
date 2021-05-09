@@ -1721,6 +1721,7 @@
 #define __fsword_t         fsword_t
 #define __STDC_INT_AS_SSIZE_T   ssize_t
 #define __STDC_INT_AS_SIZE_T    size_t
+#define __STDC_LONG_AS_SIZE_T   size_t
 #define __STDC_INT32_AS_SSIZE_T ssize_t
 #define __STDC_INT32_AS_SIZE_T  size_t
 #define __STDC_UINT_AS_SIZE_T   size_t

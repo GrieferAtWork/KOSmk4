@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x5d3a4c4c */
+/* HASH CRC-32:0xa3a13dae */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -34,7 +34,7 @@ DECL_BEGIN
 /* >> get_phys_pages(3)
  * Return the total # of pages of physical memory */
 INTERN ATTR_SECTION(".text.crt.system.info") WUNUSED intptr_t
-NOTHROW_RPC(LIBCCALL libc_get_phys_pages)(void) {
+NOTHROW(LIBCCALL libc_get_phys_pages)(void) {
 	struct sysinfo info;
 	uintptr_t result;
 	size_t ps;
@@ -56,7 +56,7 @@ NOTHROW_RPC(LIBCCALL libc_get_phys_pages)(void) {
 /* >> get_avphys_pages(3)
  * Return the total # of free pages of physical memory */
 INTERN ATTR_SECTION(".text.crt.system.info") WUNUSED intptr_t
-NOTHROW_RPC(LIBCCALL libc_get_avphys_pages)(void) {
+NOTHROW(LIBCCALL libc_get_avphys_pages)(void) {
 	struct sysinfo info;
 	uintptr_t result;
 	size_t ps;

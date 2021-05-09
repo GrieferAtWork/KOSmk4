@@ -1,4 +1,3 @@
-/* HASH CRC-32:0xdc896493 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -18,25 +17,36 @@
  *    misrepresented as being the original software.                          *
  * 3. This notice may not be removed or altered from any source distribution. *
  */
-#ifndef __local_getpagesize_defined
-#define __local_getpagesize_defined 1
-#include <__crt.h>
-#include <asm/pagesize.h>
-#ifdef __ARCH_PAGESIZE
-#include <features.h>
-__NAMESPACE_LOCAL_BEGIN
-/* >> getpagesize(3)
- * Return the size of a PAGE (in bytes) */
-__LOCAL_LIBC(getpagesize) __ATTR_CONST __ATTR_WUNUSED __STDC_INT_AS_SIZE_T
-__NOTHROW(__LIBCCALL __LIBC_LOCAL_NAME(getpagesize))(void) {
-	return __ARCH_PAGESIZE;
+#ifndef GUARD_LIBC_USER_SYS_SYSTEMINFO_C
+#define GUARD_LIBC_USER_SYS_SYSTEMINFO_C 1
+
+#include "../api.h"
+/**/
+
+#include "sys.systeminfo.h"
+
+DECL_BEGIN
+
+/*[[[head:libc___solaris_sysinfo,hash:CRC-32=0x65361ff3]]]*/
+INTERN ATTR_SECTION(".text.crt.system.info") int
+NOTHROW_NCX(LIBCCALL libc___solaris_sysinfo)(__STDC_INT_AS_UINT_T command,
+                                             char *buf,
+                                             __STDC_LONG_AS_SIZE_T buflen)
+/*[[[body:libc___solaris_sysinfo]]]*/
+/*AUTO*/{
+	(void)command;
+	(void)buf;
+	(void)buflen;
+	CRT_UNIMPLEMENTEDF("__solaris_sysinfo(%x, %q, %lx)", command, buf, buflen); /* TODO */
+	libc_seterrno(ENOSYS);
+	return 0;
 }
-__NAMESPACE_LOCAL_END
-#ifndef __local___localdep_getpagesize_defined
-#define __local___localdep_getpagesize_defined 1
-#define __localdep_getpagesize __LIBC_LOCAL_NAME(getpagesize)
-#endif /* !__local___localdep_getpagesize_defined */
-#else /* __ARCH_PAGESIZE */
-#undef __local_getpagesize_defined
-#endif /* !__ARCH_PAGESIZE */
-#endif /* !__local_getpagesize_defined */
+/*[[[end:libc___solaris_sysinfo]]]*/
+
+/*[[[start:exports,hash:CRC-32=0x4865c117]]]*/
+DEFINE_PUBLIC_ALIAS(__solaris_sysinfo, libc___solaris_sysinfo);
+/*[[[end:exports]]]*/
+
+DECL_END
+
+#endif /* !GUARD_LIBC_USER_SYS_SYSTEMINFO_C */

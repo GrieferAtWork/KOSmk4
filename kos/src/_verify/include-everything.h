@@ -1102,6 +1102,7 @@ incdir("");
 #include <sys/syslimits.h>
 #include <sys/syslog.h>
 #include <sys/sysmacros.h>
+#include <sys/systeminfo.h>
 #include <sys/termio.h>
 #include <sys/termios.h>
 #include <sys/termiox.h>

@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x1b8362ae */
+/* HASH CRC-32:0x9bb8ef49 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -220,6 +220,7 @@
 #define __CRT_HAVE_DOS$__signbit
 #define __CRT_HAVE_DOS$__signbitf
 #define __CRT_HAVE_DOS$__signbitl
+#define __CRT_HAVE_DOS$__solaris_sysinfo
 #define __CRT_HAVE_DOS$__stpcpy_chk
 #define __CRT_HAVE_DOS$__stpncpy_chk
 #define __CRT_HAVE_DOS$__strcat_chk
@@ -3308,6 +3309,7 @@
 #define __CRT_HAVE___signbit
 #define __CRT_HAVE___signbitf
 #define __CRT_HAVE___signbitl
+#define __CRT_HAVE___solaris_sysinfo
 #endif /* !__KERNEL__ */
 #define __CRT_HAVE___stack_chk_fail
 #define __CRT_HAVE___stack_chk_guard

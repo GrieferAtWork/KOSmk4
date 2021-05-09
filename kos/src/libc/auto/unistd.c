@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x7d4c7105 */
+/* HASH CRC-32:0x505558c3 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -261,19 +261,19 @@ NOTHROW_NCX(LIBCCALL libc_isatty)(fd_t fd) {
 /* >> getpagesize(3)
  * Return the size of a PAGE (in bytes) */
 INTERN ATTR_SECTION(".text.crt.system.configuration") ATTR_CONST WUNUSED __STDC_INT_AS_SIZE_T
-NOTHROW_NCX(LIBCCALL libc_getpagesize)(void) {
+NOTHROW(LIBCCALL libc_getpagesize)(void) {
 	return __ARCH_PAGESIZE;
 }
 /* >> getdtablesize(3) */
 INTERN ATTR_SECTION(".text.crt.system.configuration") ATTR_CONST WUNUSED __STDC_INT_AS_SIZE_T
-NOTHROW_NCX(LIBCCALL libc_getdtablesize)(void) {
-#if defined(__KOS__)
+NOTHROW(LIBCCALL libc_getdtablesize)(void) {
+
 	return 0x7fffffff; /* INT_MAX */
-#elif defined(__linux__) || defined(__linux) || defined(linux)
-	return 0x10000;    /* UINT16_MAX + 1 */
-#else
-	return 256;        /* UINT8_MAX + 1 */
-#endif
+
+
+
+
+
 }
 #include <bits/crt/db/passwd.h>
 /* >> getlogin_r(3)

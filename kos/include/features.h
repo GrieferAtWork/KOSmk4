@@ -774,6 +774,7 @@
 #ifndef __CC__
 #define __STDC_INT_AS_SSIZE_T   /* nothing */
 #define __STDC_INT_AS_SIZE_T    /* nothing */
+#define __STDC_LONG_AS_SIZE_T   /* nothing */
 #define __STDC_INT32_AS_SSIZE_T /* nothing */
 #define __STDC_INT32_AS_SIZE_T  /* nothing */
 #define __STDC_UINT_AS_SIZE_T   /* nothing */
@@ -793,6 +794,7 @@
 #endif /* !__INTELLISENSE_SSIZE_TYPE__ */
 #ifdef __INTELLISENSE_SIZE_TYPE__
 #define __STDC_INT_AS_SIZE_T    __INTELLISENSE_SIZE_TYPE__
+#define __STDC_LONG_AS_SIZE_T   __INTELLISENSE_SIZE_TYPE__
 #define __STDC_INT32_AS_SIZE_T  __INTELLISENSE_SIZE_TYPE__
 #define __STDC_UINT_AS_SIZE_T   __INTELLISENSE_SIZE_TYPE__
 #define __STDC_UINT32_AS_SIZE_T __INTELLISENSE_SIZE_TYPE__
@@ -801,6 +803,7 @@
 #include "hybrid/typecore.h"
 #endif /* !__SIZE_TYPE__ */
 #define __STDC_INT_AS_SIZE_T    __SIZE_TYPE__
+#define __STDC_LONG_AS_SIZE_T   __SIZE_TYPE__
 #define __STDC_INT32_AS_SIZE_T  __SIZE_TYPE__
 #define __STDC_UINT_AS_SIZE_T   __SIZE_TYPE__
 #define __STDC_UINT32_AS_SIZE_T __SIZE_TYPE__
@@ -809,6 +812,7 @@
 #else /* __USE_KOS_ALTERATIONS */
 #define __STDC_INT_AS_SSIZE_T   int
 #define __STDC_INT_AS_SIZE_T    int
+#define __STDC_LONG_AS_SIZE_T   long
 #define __STDC_INT32_AS_SSIZE_T int
 #define __STDC_INT32_AS_SIZE_T  int
 #define __STDC_UINT_AS_SIZE_T   unsigned int
@@ -824,6 +828,11 @@
 #define __STDC_INT_AS_SSIZE_T   int
 #define __STDC_INT_AS_SIZE_T    unsigned int
 #endif /* __SIZEOF_SIZE_T__ > __SIZEOF_INT__ */
+#if __SIZEOF_SIZE_T__ <= __SIZEOF_LONG__
+#define __STDC_LONG_AS_SIZE_T   __SIZE_TYPE__
+#else /* __SIZEOF_SIZE_T__ <= __SIZEOF_LONG__ */
+#define __STDC_LONG_AS_SIZE_T   unsigned long
+#endif /* __SIZEOF_SIZE_T__ > __SIZEOF_LONG__ */
 #if __SIZEOF_SIZE_T__ <= 4
 #define __STDC_INT32_AS_SSIZE_T __SSIZE_TYPE__
 #define __STDC_INT32_AS_SIZE_T  __SIZE_TYPE__
@@ -840,6 +849,7 @@
 #endif /* !__INT32_TYPE__ || !__UINT32_TYPE__ */
 #define __STDC_INT_AS_SSIZE_T   int
 #define __STDC_INT_AS_SIZE_T    int
+#define __STDC_LONG_AS_SIZE_T   long
 #define __STDC_INT32_AS_SSIZE_T __INT32_TYPE__
 #define __STDC_INT32_AS_SIZE_T  __INT32_TYPE__
 #define __STDC_UINT_AS_SIZE_T   unsigned int

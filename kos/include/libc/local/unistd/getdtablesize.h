@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xe7c7cfa1 */
+/* HASH CRC-32:0x33444e80 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -25,14 +25,14 @@
 __NAMESPACE_LOCAL_BEGIN
 /* >> getdtablesize(3) */
 __LOCAL_LIBC(getdtablesize) __ATTR_CONST __ATTR_WUNUSED __STDC_INT_AS_SIZE_T
-__NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(getdtablesize))(void) {
-#if defined(__KOS__)
+__NOTHROW(__LIBCCALL __LIBC_LOCAL_NAME(getdtablesize))(void) {
+#ifdef __KOS__
 	return 0x7fffffff; /* INT_MAX */
-#elif defined(__linux__) || defined(__linux) || defined(__linux)
+#elif defined(__linux__) || defined(__linux) || defined(linux)
 	return 0x10000;    /* UINT16_MAX + 1 */
-#else
+#else /* ... */
 	return 256;        /* UINT8_MAX + 1 */
-#endif
+#endif /* !... */
 }
 __NAMESPACE_LOCAL_END
 #ifndef __local___localdep_getdtablesize_defined

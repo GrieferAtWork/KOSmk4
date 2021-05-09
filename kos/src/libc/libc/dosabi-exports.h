@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x10397f2e */
+/* HASH CRC-32:0xba8ca8fe */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -2712,6 +2712,9 @@ DEFINE_PUBLIC_ALIAS(DOS$vsyslog, libd_vsyslog);
 DEFINE_PUBLIC_ALIAS(DOS$gnu_dev_major, libd_gnu_dev_major);
 DEFINE_PUBLIC_ALIAS(DOS$gnu_dev_minor, libd_gnu_dev_minor);
 DEFINE_PUBLIC_ALIAS(DOS$gnu_dev_makedev, libd_gnu_dev_makedev);
+
+/* sys.systeminfo */
+DEFINE_PUBLIC_ALIAS(DOS$__solaris_sysinfo, libd___solaris_sysinfo);
 
 /* sys.time */
 DEFINE_PUBLIC_ALIAS(DOS$__gettimeofday, libd_gettimeofday);

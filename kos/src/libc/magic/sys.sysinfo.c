@@ -45,22 +45,23 @@ __SYSDECL_BEGIN
 
 @@>> sysinfo(2)
 @@Return current system information
-[[cp, decl_include("<linux/sysinfo.h>")]]
+[[guard, decl_include("<linux/sysinfo.h>")]]
+[[no_crt_self_import, if(!defined(__solaris__)), alias("sysinfo")]]
 int sysinfo([[nonnull]] struct sysinfo *info);
 
 @@>> get_nprocs_conf(3)
 @@Return the # of configured online processors
-[[cp, wunused]]
+[[wunused, nothrow]]
 int get_nprocs_conf();
 
 @@>> get_nprocs(3)
 @@Return the # of currently online processors
-[[cp, wunused]]
+[[wunused, nothrow]]
 int get_nprocs();
 
 @@>> get_phys_pages(3)
 @@Return the total # of pages of physical memory
-[[cp, wunused, decl_include("<bits/types.h>")]]
+[[wunused, nothrow, decl_include("<bits/types.h>")]]
 [[impl_include("<linux/sysinfo.h>")]]
 [[requires_function(sysinfo, getpagesize)]]
 $intptr_t get_phys_pages() {
@@ -85,7 +86,7 @@ $intptr_t get_phys_pages() {
 
 @@>> get_avphys_pages(3)
 @@Return the total # of free pages of physical memory
-[[cp, wunused, decl_include("<bits/types.h>")]]
+[[wunused, nothrow, decl_include("<bits/types.h>")]]
 [[impl_include("<linux/sysinfo.h>")]]
 [[requires_function(sysinfo, getpagesize)]]
 $intptr_t get_avphys_pages() {

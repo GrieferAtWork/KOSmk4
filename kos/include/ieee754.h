@@ -223,7 +223,7 @@ union __ATTR_ALIGNED(8) __ATTR_PACKED ieee754_double {
 		unsigned int exponent : 11;
 		unsigned int negative : 1;
 #endif /* __FLOAT_WORD_ORDER__ != __ORDER_BIG_ENDIAN__ */
-#endif /* Little endian. */
+#endif /* ... */
 	} ieee;
 
 	/* This format makes it easier to see if a NaN is a signaling NaN. */
@@ -250,7 +250,7 @@ union __ATTR_ALIGNED(8) __ATTR_PACKED ieee754_double {
 		unsigned int exponent : 11;
 		unsigned int negative : 1;
 #endif /* __FLOAT_WORD_ORDER__ != __ORDER_BIG_ENDIAN__ */
-#endif
+#endif /* ... */
 	} ieee_nan;
 };
 

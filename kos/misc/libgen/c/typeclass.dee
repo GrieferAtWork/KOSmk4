@@ -283,6 +283,7 @@ global knownTypeClasses: {string: string} = Dict({
 	"__STDC_UINT_AS_SIZE_T"   : "TD",
 	"__STDC_UINT32_AS_SIZE_T" : "TI32",
 	"__STDC_INT_AS_UINT_T"    : "TD",
+	"__STDC_LONG_AS_SIZE_T"   : "TL",
 
 	/* Misc. types */
 	"__le8"             : "TI8",

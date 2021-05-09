@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xf6bf9111 */
+/* HASH CRC-32:0x7118f3f1 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -35,12 +35,12 @@ __SYSDECL_BEGIN
 #include <features.h>
 /* >> getpagesize(3)
  * Return the size of a PAGE (in bytes) */
-__CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,__STDC_INT_AS_SIZE_T,__NOTHROW_NCX,__libc_core_getpagesize,(void),getpagesize,())
+__CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,__STDC_INT_AS_SIZE_T,__NOTHROW,__libc_core_getpagesize,(void),getpagesize,())
 #elif defined(__CRT_HAVE___getpagesize)
 #include <features.h>
 /* >> getpagesize(3)
  * Return the size of a PAGE (in bytes) */
-__CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,__STDC_INT_AS_SIZE_T,__NOTHROW_NCX,__libc_core_getpagesize,(void),__getpagesize,())
+__CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,__STDC_INT_AS_SIZE_T,__NOTHROW,__libc_core_getpagesize,(void),__getpagesize,())
 #else /* ... */
 #include <asm/pagesize.h>
 #ifdef __ARCH_PAGESIZE

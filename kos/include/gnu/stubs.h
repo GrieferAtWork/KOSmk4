@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xaecf16e7 */
+/* HASH CRC-32:0x680d94ed */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -51,6 +51,7 @@
 #define __stub___pthread_unregister_cancel
 #define __stub___pthread_unregister_cancel_restore
 #define __stub___pthread_unwind_next
+#define __stub___solaris_sysinfo
 #define __stub___wcserror
 #define __stub___wcserror_s
 #define __stub__beep

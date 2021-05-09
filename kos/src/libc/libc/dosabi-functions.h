@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xabfd9e42 */
+/* HASH CRC-32:0xdf734b5f */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -2203,6 +2203,9 @@ DFUN(".text.crt.dos.system.syslog", libd_vsyslog, libc_vsyslog, TV, 3, TD, TP, T
 DFUN(".text.crt.dos.system.utility", libd_gnu_dev_major, libc_gnu_dev_major, TIn(__SIZEOF_MAJOR_T__), 1, TIn(__SIZEOF_DEV_T__))
 DFUN(".text.crt.dos.system.utility", libd_gnu_dev_minor, libc_gnu_dev_minor, TIn(__SIZEOF_MINOR_T__), 1, TIn(__SIZEOF_DEV_T__))
 DFUN(".text.crt.dos.system.utility", libd_gnu_dev_makedev, libc_gnu_dev_makedev, TIn(__SIZEOF_DEV_T__), 2, TIn(__SIZEOF_MAJOR_T__), TIn(__SIZEOF_MINOR_T__))
+
+/* sys.systeminfo */
+DFUN(".text.crt.dos.system.info", libd___solaris_sysinfo, libc___solaris_sysinfo, TD, 3, TD, TP, TL)
 
 /* sys.time */
 DFUN(".text.crt.dos.time", libd_gettimeofday, libc_gettimeofday, TD, 2, TP, TP)

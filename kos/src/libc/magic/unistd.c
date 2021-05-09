@@ -1690,7 +1690,7 @@ int setregid($gid_t rgid, $gid_t egid);
 %#if defined(__USE_MISC) || !defined(__USE_XOPEN2K)
 @@>> getpagesize(3)
 @@Return the size of a PAGE (in bytes)
-[[libc, ATTR_CONST, wunused, export_alias("__getpagesize")]]
+[[libc, const, wunused, nothrow, export_alias("__getpagesize")]]
 [[requires_include("<asm/pagesize.h>"), requires(defined(__ARCH_PAGESIZE))]]
 [[section(".text.crt{|.dos}.system.configuration"), decl_include("<features.h>")]]
 [[if($extended_prefix(
@@ -1720,16 +1720,16 @@ __STDC_INT_AS_SIZE_T getpagesize() {
 }
 
 @@>> getdtablesize(3)
-[[ATTR_CONST, wunused, section(".text.crt{|.dos}.system.configuration")]]
-[[decl_include("<features.h>")]]
+[[const, wunused, nothrow, decl_include("<features.h>")]]
+[[section(".text.crt{|.dos}.system.configuration")]]
 __STDC_INT_AS_SIZE_T getdtablesize() {
-#if defined(__KOS__)
+@@pp_if defined(__KOS__)@@
 	return 0x7fffffff; /* INT_MAX */
-#elif defined(__linux__) || defined(__linux) || defined(linux)
+@@pp_elif defined(__linux__) || defined(__linux) || defined(@linux@)@@
 	return 0x10000;    /* UINT16_MAX + 1 */
-#else
+@@pp_else@@
 	return 256;        /* UINT8_MAX + 1 */
-#endif
+@@pp_endif@@
 }
 
 %#endif /* __USE_MISC || !__USE_XOPEN2K */
