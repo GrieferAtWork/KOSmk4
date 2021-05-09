@@ -28,6 +28,7 @@
 /* (#) Portability: NetBSD        (/include/math.h) */
 /* (#) Portability: Newlib        (/newlib/libc/include/math.h) */
 /* (#) Portability: OpenBSD       (/include/math.h) */
+/* (#) Portability: OpenSolaris   (/usr/src/lib/libbc/inc/include/math.h) */
 /* (#) Portability: Windows Kits  (/ucrt/math.h) */
 /* (#) Portability: diet libc     (/include/math.h) */
 /* (#) Portability: musl libc     (/include/math.h) */

@@ -28,6 +28,7 @@
 
 #include "__stdinc.h"
 #include "features.h"
+/**/
 
 #include <hybrid/floatcore.h>
 #include <hybrid/limitcore.h>
@@ -36,8 +37,8 @@
 /* GLibc includes these two headers unconditionally,
  * but as an extension KOS doesn't. */
 #ifdef __USE_GLIBC
-#include "limits.h"
 #include "float.h"
+#include "limits.h"
 #endif /* __USE_GLIBC */
 
 #define _TYPEBITS(type) (sizeof(type) * __CHAR_BIT__)
@@ -49,22 +50,22 @@
 #define DOUBLEBITS      (__CHAR_BIT__ * __SIZEOF_DOUBLE__)
 #define FLOATBITS       (__CHAR_BIT__ * __SIZEOF_FLOAT__)
 
-#define MINSHORT    __SHRT_MIN__
-#define MAXSHORT    __SHRT_MAX__
-#define MININT      __INT_MIN__
-#define MAXINT      __INT_MAX__
-#define MINLONG     __LONG_MIN__
-#define MAXLONG     __LONG_MAX__
-#define HIBITS      __SHRT_MIN__
-#define HIBITL      __LONG_MIN__
-#define MAXDOUBLE   __DBL_MAX__
-#define MAXFLOAT    __FLT_MAX__
-#define MINDOUBLE   __DBL_MIN__
-#define MINFLOAT    __FLT_MIN__
-#define DMINEXP     __DBL_MIN_EXP__
-#define FMINEXP     __FLT_MIN_EXP__
-#define DMAXEXP     __DBL_MAX_EXP__
-#define FMAXEXP     __FLT_MAX_EXP__
+#define MINSHORT  __SHRT_MIN__
+#define MAXSHORT  __SHRT_MAX__
+#define MININT    __INT_MIN__
+#define MAXINT    __INT_MAX__
+#define MINLONG   __LONG_MIN__
+#define MAXLONG   __LONG_MAX__
+#define HIBITS    __SHRT_MIN__
+#define HIBITL    __LONG_MIN__
+#define MAXDOUBLE __DBL_MAX__
+#define MAXFLOAT  __FLT_MAX__
+#define MINDOUBLE __DBL_MIN__
+#define MINFLOAT  __FLT_MIN__
+#define DMINEXP   __DBL_MIN_EXP__
+#define FMINEXP   __FLT_MIN_EXP__
+#define DMAXEXP   __DBL_MAX_EXP__
+#define FMAXEXP   __FLT_MAX_EXP__
 
 #ifdef __USE_MISC
 #define BITSPERBYTE __CHAR_BIT__

@@ -25,23 +25,23 @@
 #include <asm/ioctl.h>
 
 /* ioctl(2) request codes */
-#define __I_NREAD     _IO('S', 1)  /* ??? */
-#define __I_PUSH      _IO('S', 2)  /* ??? */
+#define __I_NREAD     _IO('S', 1)  /* [int *arg] ??? */
+#define __I_PUSH      _IO('S', 2)  /* [char arg[FMNAMESZ+1]] ??? */
 #define __I_POP       _IO('S', 3)  /* ??? */
-#define __I_LOOK      _IO('S', 4)  /* ??? */
+#define __I_LOOK      _IO('S', 4)  /* [char arg[FMNAMESZ+1]] ??? */
 #define __I_FLUSH     _IO('S', 5)  /* ??? */
 #define __I_SRDOPT    _IO('S', 6)  /* ??? */
-#define __I_GRDOPT    _IO('S', 7)  /* ??? */
-#define __I_STR       _IO('S', 8)  /* ??? */
+#define __I_GRDOPT    _IO('S', 7)  /* [int *arg] ??? */
+#define __I_STR       _IO('S', 8)  /* [struct strioctl *arg] ??? */
 #define __I_SETSIG    _IO('S', 9)  /* ??? */
-#define __I_GETSIG    _IO('S', 10) /* ??? */
-#define __I_FIND      _IO('S', 11) /* ??? */
+#define __I_GETSIG    _IO('S', 10) /* [int *arg] ??? */
+#define __I_FIND      _IO('S', 11) /* [char arg[FMNAMESZ+1]] ??? */
 #define __I_LINK      _IO('S', 12) /* ??? */
 #define __I_UNLINK    _IO('S', 13) /* ??? */
-#define __I_PEEK      _IO('S', 15) /* ??? */
-#define __I_FDINSERT  _IO('S', 16) /* ??? */
+#define __I_PEEK      _IO('S', 15) /* [struct strpeek *arg] ??? */
+#define __I_FDINSERT  _IO('S', 16) /* [struct strfdinsert *arg] ??? */
 #define __I_SENDFD    _IO('S', 17) /* ??? */
-#define __I_RECVFD    _IO('S', 14) /* ??? */
+#define __I_RECVFD    _IO('S', 14) /* [struct strrecvfd *arg] ??? */
 #define __I_SWROPT    _IO('S', 19) /* ??? */
 #define __I_GWROPT    _IO('S', 20) /* ??? */
 #define __I_LIST      _IO('S', 21) /* ??? */

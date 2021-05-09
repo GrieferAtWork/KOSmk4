@@ -196,7 +196,7 @@ typedef struct unwind_cfa_state_struct {
 
 typedef struct unwind_cfa_sigframe_state_struct {
 	/* WARNING: Do not  use the  members of  this struct  directly!
-	 *          When  libunwind is built  with -Os, functions using
+	 *          When libunwind is built with `-Os', functions using
 	 *          this struct will actually interpret it as though it
 	 *          was a `unwind_cfa_state_t'. */
 #if CFI_UNWIND_SIGFRAME_COMMON_REGISTER_MAXCOUNT != 0

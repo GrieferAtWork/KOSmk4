@@ -80,7 +80,8 @@ END
 
 BEGIN GROUP("apps.playground") { COMPILE, LINK, MCOPY };
 	SET_OUTPUT("/bin/playground")
-	if (TARGET_REAL_ARCH == "x86_64" && TARGET_ARCH == "i386")
+	if (TARGET_REAL_ARCH == "x86_64" && TARGET_ARCH == "i386") {
 		SET_OUTPUT("/bin/playground32")
+	}
 	SOURCE({ "playground/*.c" })
 END

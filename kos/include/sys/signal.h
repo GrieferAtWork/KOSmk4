@@ -29,5 +29,7 @@
 /* (#) Portability: uClibc        (/include/sys/signal.h) */
 #ifndef _SYS_SIGNAL_H
 #define _SYS_SIGNAL_H 1
+
 #include <signal.h>
+
 #endif /* !_SYS_SIGNAL_H */

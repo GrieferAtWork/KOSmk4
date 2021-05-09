@@ -29,11 +29,10 @@
 
 #include <errno.h> /* ELIMIT */
 
-/* INTERN NONNULL((1))
- * ATTR_WEAK      ATTR_SECTION(".text.crt.sched.access.clone")       pid_t
- * NOTHROW_NCX(VLIBCCALL libc_clone)(__clone_func_t fn, void *child_stack,
- *                                   int flags, void *arg, pid_t *ptid,
- *                                   void    *newtls,    pid_t   *ctid) */
+/* >> INTERN NONNULL((1)) ATTR_SECTION(".text.crt.sched.access.clone") pid_t
+ * >> NOTHROW_NCX(VLIBCCALL libc_clone)(__clone_func_t fn, void *child_stack,
+ * >>                                   int flags, void *arg, pid_t *ptid,
+ * >>                                   void *newtls, pid_t *ctid) */
 .section .text.crt.sched.access.clone
 INTERN_FUNCTION(libc_clone)
 	.cfi_startproc
@@ -52,7 +51,7 @@ INTERN_FUNCTION(libc_clone)
 	pushl_cfi  32(%esp) /* pid_t *ptid */
 	pushl_cfi  24(%esp) /* void *child_stack */
 	pushl_cfi  32(%esp) /* int flags */
-	lcall  $(7), $SYS_clone
+	lcall  $(7), $(SYS_clone)
 
 	/* Check if we're inside of the child thread */
 	testl  %eax, %eax

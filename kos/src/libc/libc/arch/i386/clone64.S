@@ -29,15 +29,14 @@
 
 #include <errno.h> /* ELIMIT */
 
-/* INTERN NONNULL((1))
- * ATTR_WEAK ATTR_SECTION(".text.crt.sched.access.clone") pid_t
- * NOTHROW_NCX(VLIBCCALL libc_clone)(%rdi:    __clone_func_t fn,
- *                                   %rsi:    void *child_stack,
- *                                   %rdx:    int flags,
- *                                   %rcx:    void *arg,
- *                                   %r8:     pid_t *ptid,
- *                                   %r9:     void *newtls,
- *                                   8(%rsp): pid_t *ctid) */
+/* >> INTERN NONNULL((1)) ATTR_SECTION(".text.crt.sched.access.clone") pid_t
+ * >> NOTHROW_NCX(VLIBCCALL libc_clone)(%rdi:    __clone_func_t fn,
+ * >>                                   %rsi:    void *child_stack,
+ * >>                                   %rdx:    int flags,
+ * >>                                   %rcx:    void *arg,
+ * >>                                   %r8:     pid_t *ptid,
+ * >>                                   %r9:     void *newtls,
+ * >>                                   8(%rsp): pid_t *ctid) */
 .section .text.crt.sched.access.clone
 INTERN_FUNCTION(libc_clone)
 	.cfi_startproc

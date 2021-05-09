@@ -44,11 +44,13 @@ INTDEF ATTR_THREAD struct pthread current;
 /* Return a handle for libc.so, as would also be returned by `dlopen("libc.so")'
  * Note however that  this function  doesn't return  a new  reference to  libc's
  * shared library handle, but rather simply returns the raw handle pointer. */
+#ifndef libc_handle
 #ifdef LIBC_ARCH_HAVE_LIBC_HANDLE
 INTDEF WUNUSED ATTR_CONST ATTR_RETNONNULL void *NOTHROW(LIBCCALL libc_handle)(void);
 #else /* LIBC_ARCH_HAVE_LIBC_HANDLE */
 #define libc_handle() dlgethandle((void *)&libc_get_dlgethandle, DLGETHANDLE_FNORMAL)
 #endif /* !LIBC_ARCH_HAVE_LIBC_HANDLE */
+#endif /* !libc_handle */
 
 /* Return a pointer to `current', given a tls_segment
  * pointer,   as   allocated   by   `dltlsallocseg()' */

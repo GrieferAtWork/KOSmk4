@@ -17,6 +17,9 @@
  *    misrepresented as being the original software.                          *
  * 3. This notice may not be removed or altered from any source distribution. *
  */
+%(c_prefix){
+/* (#) Portability: OpenSolaris (/usr/src/lib/libbc/inc/include/vfork.h) */
+}
 
 %[insert:prefix(
 #include <features.h>

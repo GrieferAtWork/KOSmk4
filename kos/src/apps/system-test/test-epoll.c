@@ -75,7 +75,7 @@ DEFINE_TEST(epoll) {
 	EQx32(events[0].events, EPOLLOUT);
 	EQu64(events[0].data.u64, 4321);
 
-	/* Now write some data, so which should cause readable to become set. */
+	/* Now write some data, which should cause readable to become set. */
 	EQss(3, write(pipes[1], "foo", 3));
 
 	/* Now both readable and writable should be set. */

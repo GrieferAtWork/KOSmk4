@@ -35,15 +35,16 @@ DECL_BEGIN
 /* Execute the CFI expression loaded into the given unwind-emulator  `self'.
  * Upon  success, `self->ue_stacksz' will have been updated to the new stack
  * size, allowing the caller to read the expression's return values from it.
- * NOTE: `unwind_emulator_exec_autostack()' behaves the same as `unwind_emulator_exec()',
- *        but will automatically allocated/free the expression stack upon entry/return, pushing
- *       `PENTRY_STACK_TOP' upon entry, and storing the last stack-entry in `*PEXIT_STACK_TOP'
- *        before returning (if no such value exists, `UNWIND_EMULATOR_NO_RETURN_VALUE' is returned).
- *        If no stack  of sufficient  size could  be allocated  (or if  the required  stack size  is
- *        absurdly large), `UNWIND_EMULATOR_STACK_OVERFLOW' will be returned instead.
- * @param: PENTRY_STACK_TOP:      A value to-be pushed onto the stack upon entry (or NULL).
- * @param: PEXIT_STACK_TOP:       A value to-be popped off of the stack upon exit (or NULL).
- * @param: PEXIT_STACK_TOP_CONST: Same as `PEXIT_STACK_TOP', but casted into a constant.
+ * NOTE: `unwind_emulator_exec_autostack()'  behaves the same as `unwind_emulator_exec()', but
+ *       will automatically  allocated/free the  expression stack  upon entry/return,  pushing
+ *       `pentry_stack_top' upon entry, and storing the last stack-entry in `*pexit_stack_top'
+ *       before returning  (if  no  such value  exists,  `UNWIND_EMULATOR_NO_RETURN_VALUE'  is
+ *       returned). If no  stack of sufficient  size could  be allocated (or  if the  required
+ *       stack size  is absurdly  large),  `UNWIND_EMULATOR_STACK_OVERFLOW' will  be  returned
+ *       instead.
+ * @param: pentry_stack_top:      A value to-be pushed onto the stack upon entry (or NULL).
+ * @param: pexit_stack_top:       A value to-be popped off of the stack upon exit (or NULL).
+ * @param: pexit_stack_top_const: Same as `pexit_stack_top', but casted into a constant.
  * @return: UNWIND_SUCCESS:          ...
  * @return: UNWIND_INVALID_REGISTER: ...
  * @return: UNWIND_SEGFAULT:         ...
@@ -79,7 +80,7 @@ NOTHROW_NCX(CC libuw_debuginfo_location_select)(di_debuginfo_location_t const *_
                                                 uint8_t addrsize,
                                                 size_t *__restrict pexpr_length);
 
-/* Load the effective l-value address of `self' into `*PADDR':
+/* Load the effective l-value address of `self' into `*paddr':
  *   UNWIND_STE_CONSTANT:     Write-back s_uconst or s_sconst
  *   UNWIND_STE_STACKVALUE:   Write-back s_uconst or s_sconst
  *   UNWIND_STE_REGISTER:     Write-back REGISTER[s_register] + s_regoffset

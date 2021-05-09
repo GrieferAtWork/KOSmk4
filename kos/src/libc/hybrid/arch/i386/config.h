@@ -199,6 +199,28 @@
 /* void *LIBCCALL libc_handle(void); */
 #define LIBC_ARCH_HAVE_LIBC_HANDLE 1
 
+#ifdef __x86_64__
+#ifdef __CC__
+DECL_BEGIN
+#define libc_handle libc_handle
+LOCAL WUNUSED ATTR_CONST ATTR_RETNONNULL void *NOTHROW(libc_handle)(void) {
+	void *result;
+	/* The  `current@tlsgd' symbol points to a `tls_index' structure,
+	 * which consists of 16 bytes total, where the first 8 are filled
+	 * with a module handle pointer by libdl.
+	 * Note that this is a KOS-specific implementation detail. As far
+	 * as the standard is concerned, libdl is allowed to make up some
+	 * arbitrary module index for those 8 bytes, however KOS's  libdl
+	 * simply re-uses  the regular  module handle  for this  purpose,
+	 * meaning that we can simply (ab-)use that fact to quickly get a
+	 * handle for libc itself. */
+	__asm__("movq current@tlsgd(%%rip), %0" : "=r" (result));
+	return result;
+}
+DECL_END
+#endif /* __CC__ */
+#endif /* __x86_64__ */
+
 /* Arch-specific RTM optimizations do exist on x86
  * (in the form  of a  dedicated instruction  set) */
 #define LIBC_ARCH_HAVE_RTM_BEGIN 1

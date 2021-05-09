@@ -317,7 +317,8 @@
 
 
 /* Call Frame Information (section 6.4.1) */
-#define DW_CFA_register_rule_undefined      0 /* Register has an undefined after unwinding */
+#define DW_CFA_register_rule_undefined      0 /* Register has an undefined value after unwinding (but  should
+                                               * really handle the same as `DW_CFA_register_rule_same_value') */
 #define DW_CFA_register_rule_same_value     1 /* Register maintains its value after unwinding */
 #define DW_CFA_register_rule_offsetn        2 /* Register value is stored at `*(CFA + OFFSET)' */
 #define DW_CFA_register_rule_val_offsetn    3 /* Register value is equal to `CFA + OFFSET' */
@@ -636,7 +637,8 @@ typedef struct unwind_emulator_struct {
 	unwind_emulator_sections_t const
 	                       *ue_sectinfo;           /* [0..1][const] Emulator section information. */
 	unwind_getreg_t         ue_regget;             /* [1..1][const] Callback for reading out the value of a register. */
-	unwind_setreg_t         ue_regset;             /* [0..1][const] Callback for writing the value of a register (or NULL if registers are read-only; ignored when `ue_piecewrite' is false). */
+	unwind_setreg_t         ue_regset;             /* [0..1][const] Callback for writing the value of a register (or NULL
+	                                                * if registers are read-only; ignored when `ue_piecewrite' is false). */
 	void const             *ue_regget_arg;         /* [?..?][const] Argument passed to `ue_regget'. */
 	void                   *ue_regset_arg;         /* [?..?][const] Argument passed to `ue_regset'. */
 	di_debuginfo_location_t const
@@ -674,15 +676,16 @@ typedef struct unwind_emulator_struct {
 /* Execute the CFI expression loaded into the given unwind-emulator  `self'.
  * Upon  success, `self->ue_stacksz' will have been updated to the new stack
  * size, allowing the caller to read the expression's return values from it.
- * NOTE: `unwind_emulator_exec_autostack()' behaves the same as `unwind_emulator_exec()',
- *        but will automatically allocated/free the expression stack upon entry/return, pushing
- *       `PENTRY_STACK_TOP' upon entry, and storing the last stack-entry in `*PEXIT_STACK_TOP'
- *        before returning (if no such value exists, `UNWIND_EMULATOR_NO_RETURN_VALUE' is returned).
- *        If no stack  of sufficient  size could  be allocated  (or if  the required  stack size  is
- *        absurdly large), `UNWIND_EMULATOR_STACK_OVERFLOW' will be returned instead.
- * @param: PENTRY_STACK_TOP:      A value to-be pushed onto the stack upon entry (or NULL).
- * @param: PEXIT_STACK_TOP:       A value to-be popped off of the stack upon exit (or NULL).
- * @param: PEXIT_STACK_TOP_CONST: Same as `PEXIT_STACK_TOP', but casted into a constant.
+ * NOTE: `unwind_emulator_exec_autostack()'  behaves the same as `unwind_emulator_exec()', but
+ *       will automatically  allocated/free the  expression stack  upon entry/return,  pushing
+ *       `pentry_stack_top' upon entry, and storing the last stack-entry in `*pexit_stack_top'
+ *       before returning  (if  no  such value  exists,  `UNWIND_EMULATOR_NO_RETURN_VALUE'  is
+ *       returned). If no  stack of sufficient  size could  be allocated (or  if the  required
+ *       stack size  is absurdly  large),  `UNWIND_EMULATOR_STACK_OVERFLOW' will  be  returned
+ *       instead.
+ * @param: pentry_stack_top:      A value to-be pushed onto the stack upon entry (or NULL).
+ * @param: pexit_stack_top:       A value to-be popped off of the stack upon exit (or NULL).
+ * @param: pexit_stack_top_const: Same as `pexit_stack_top', but casted into a constant.
  * @return: UNWIND_SUCCESS:          ...
  * @return: UNWIND_INVALID_REGISTER: ...
  * @return: UNWIND_SEGFAULT:         ...
@@ -706,7 +709,7 @@ unwind_emulator_exec_autostack(unwind_emulator_t *__restrict __self,
 #endif /* LIBUNWIND_WANT_PROTOTYPES */
 
 
-/* Load the effective l-value address of `self' into `*PADDR':
+/* Load the effective l-value address of `self' into `*paddr':
  *   UNWIND_STE_CONSTANT:     Write-back s_uconst or s_sconst
  *   UNWIND_STE_STACKVALUE:   Write-back s_uconst or s_sconst
  *   UNWIND_STE_REGISTER:     Write-back REGISTER[s_register] + s_regoffset

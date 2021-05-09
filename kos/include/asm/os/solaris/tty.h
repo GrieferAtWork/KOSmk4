@@ -77,8 +77,8 @@
 #define __TIOCOUTQ     _IO('t', 115)
 #define __TIOCNOTTY    _IO('t', 113)
 #define __TIOCSCTTY    _IO('t', 132)
-#define __TIOCSTOP     _IO('t', 111)
-#define __TIOCSTART    _IO('t', 110)
+#define __TIOCSTOP     _IO('t', 111) /* Emulate ^S */
+#define __TIOCSTART    _IO('t', 110) /* Emulate ^Q */
 #define __TIOCSILOOP   _IO('t', 109)
 #define __TIOCGPGRP    _IO('t', 20)
 #define __TIOCSPGRP    _IO('t', 21)

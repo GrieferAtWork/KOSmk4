@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x77b1f3bb */
+/* HASH CRC-32:0xafca26bb */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -18,6 +18,7 @@
  *    misrepresented as being the original software.                          *
  * 3. This notice may not be removed or altered from any source distribution. *
  */
+/* (#) Portability: OpenSolaris (/usr/src/lib/libbc/inc/include/vfork.h) */
 #ifndef _VFORK_H
 #define _VFORK_H 1
 

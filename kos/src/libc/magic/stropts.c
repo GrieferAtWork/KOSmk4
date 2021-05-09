@@ -35,55 +35,55 @@
 
 /* ioctl(2) request codes */
 #if !defined(I_NREAD) && defined(__I_NREAD)
-#define I_NREAD     __I_NREAD     /* ??? */
+#define I_NREAD    __I_NREAD    /* [int *arg] ??? */
 #endif /* !I_NREAD && __I_NREAD */
 #if !defined(I_PUSH) && defined(__I_PUSH)
-#define I_PUSH      __I_PUSH      /* ??? */
+#define I_PUSH     __I_PUSH     /* [char arg[FMNAMESZ+1]] ??? */
 #endif /* !I_PUSH && __I_PUSH */
 #if !defined(I_POP) && defined(__I_POP)
-#define I_POP       __I_POP       /* ??? */
+#define I_POP      __I_POP      /* ??? */
 #endif /* !I_POP && __I_POP */
 #if !defined(I_LOOK) && defined(__I_LOOK)
-#define I_LOOK      __I_LOOK      /* ??? */
+#define I_LOOK     __I_LOOK     /* [char arg[FMNAMESZ+1]] ??? */
 #endif /* !I_LOOK && __I_LOOK */
 #if !defined(I_FLUSH) && defined(__I_FLUSH)
-#define I_FLUSH     __I_FLUSH     /* ??? */
+#define I_FLUSH    __I_FLUSH    /* ??? */
 #endif /* !I_FLUSH && __I_FLUSH */
 #if !defined(I_SRDOPT) && defined(__I_SRDOPT)
-#define I_SRDOPT    __I_SRDOPT    /* ??? */
+#define I_SRDOPT   __I_SRDOPT   /* ??? */
 #endif /* !I_SRDOPT && __I_SRDOPT */
 #if !defined(I_GRDOPT) && defined(__I_GRDOPT)
-#define I_GRDOPT    __I_GRDOPT    /* ??? */
+#define I_GRDOPT   __I_GRDOPT   /* [int *arg] ??? */
 #endif /* !I_GRDOPT && __I_GRDOPT */
 #if !defined(I_STR) && defined(__I_STR)
-#define I_STR       __I_STR       /* ??? */
+#define I_STR      __I_STR      /* [struct strioctl *arg] ??? */
 #endif /* !I_STR && __I_STR */
 #if !defined(I_SETSIG) && defined(__I_SETSIG)
-#define I_SETSIG    __I_SETSIG    /* ??? */
+#define I_SETSIG   __I_SETSIG   /* ??? */
 #endif /* !I_SETSIG && __I_SETSIG */
 #if !defined(I_GETSIG) && defined(__I_GETSIG)
-#define I_GETSIG    __I_GETSIG    /* ??? */
+#define I_GETSIG   __I_GETSIG   /* [int *arg] ??? */
 #endif /* !I_GETSIG && __I_GETSIG */
 #if !defined(I_FIND) && defined(__I_FIND)
-#define I_FIND      __I_FIND      /* ??? */
+#define I_FIND     __I_FIND     /* [char arg[FMNAMESZ+1]] ??? */
 #endif /* !I_FIND && __I_FIND */
 #if !defined(I_LINK) && defined(__I_LINK)
-#define I_LINK      __I_LINK      /* ??? */
+#define I_LINK     __I_LINK     /* ??? */
 #endif /* !I_LINK && __I_LINK */
 #if !defined(I_UNLINK) && defined(__I_UNLINK)
-#define I_UNLINK    __I_UNLINK    /* ??? */
+#define I_UNLINK   __I_UNLINK   /* ??? */
 #endif /* !I_UNLINK && __I_UNLINK */
 #if !defined(I_PEEK) && defined(__I_PEEK)
-#define I_PEEK      __I_PEEK      /* ??? */
+#define I_PEEK     __I_PEEK     /* [struct strpeek *arg] ??? */
 #endif /* !I_PEEK && __I_PEEK */
 #if !defined(I_FDINSERT) && defined(__I_FDINSERT)
-#define I_FDINSERT  __I_FDINSERT  /* ??? */
+#define I_FDINSERT __I_FDINSERT /* [struct strfdinsert *arg] ??? */
 #endif /* !I_FDINSERT && __I_FDINSERT */
 #if !defined(I_SENDFD) && defined(__I_SENDFD)
-#define I_SENDFD    __I_SENDFD    /* ??? */
+#define I_SENDFD   __I_SENDFD   /* ??? */
 #endif /* !I_SENDFD && __I_SENDFD */
 #if !defined(I_RECVFD) && defined(__I_RECVFD)
-#define I_RECVFD    __I_RECVFD    /* ??? */
+#define I_RECVFD   __I_RECVFD   /* [struct strrecvfd *arg] ??? */
 #endif /* !I_RECVFD && __I_RECVFD */
 #if !defined(I_SWROPT) && defined(__I_SWROPT)
 #define I_SWROPT    __I_SWROPT    /* ??? */

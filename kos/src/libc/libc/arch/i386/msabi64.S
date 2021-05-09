@@ -127,6 +127,7 @@
 
 /* Some reminders on the differences between SYSVABI and MSABI:
  *
+ * ```
  *  [argv]   SYSVABI    MSABI
  *  ARG#1    %rdi       %rcx
  *  ARG#2    %rsi       %rdx
@@ -135,7 +136,7 @@
  *  ARG#5    %r8        8(%rsp)
  *  ARG#6    %r9        16(%rsp)
  *  ARG#7    8(%rsp)    24(%rsp)
- *  ARG#8    16(%rsp) 32(%rsp)
+ *  ARG#8    16(%rsp)   32(%rsp)
  *           ...        ...
  *
  *  [Preserve]
@@ -145,7 +146,7 @@
  *  [Clobber]
  *  SYSVABI    %rax, %rcx, %rdx, %rsi, %rdi, %r8, %r9, %r10, %r11
  *  MSABI      %rax, %rcx, %rdx,             %r8, %r9, %r10, %r11
- *
+ * ```
  */
 
 

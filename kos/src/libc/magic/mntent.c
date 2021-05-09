@@ -21,6 +21,7 @@
 /* (#) Portability: Cygwin        (/winsup/cygwin/include/mntent.h) */
 /* (#) Portability: DJGPP         (/include/mntent.h) */
 /* (#) Portability: GNU C Library (/misc/mntent.h) */
+/* (#) Portability: OpenSolaris   (/usr/src/lib/libbc/inc/include/mntent.h) */
 /* (#) Portability: diet libc     (/include/mntent.h) */
 /* (#) Portability: musl libc     (/include/mntent.h) */
 /* (#) Portability: uClibc        (/include/mntent.h) */

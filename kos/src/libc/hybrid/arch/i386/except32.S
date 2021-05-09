@@ -53,10 +53,10 @@ EXTERN(this_exception_state)
 #define FIELD_ERROR_POINTERS(off)  %fs:this_exception_args + (off)
 #define FIELD_ERROR_FAULTADDR      %fs:this_exception_faultaddr
 #define FIELD_ERROR_REGISTERS(off) %fs:this_exception_state + (off)
-#define S_EXCEPT_TEXT(name)    .text
-#define S_EXCEPT_DATA(name)    .data
-#define S_EXCEPT_RODATA(name)  .rodata
-#define S_EXCEPT_STRING(name)  .rodata
+#define S_EXCEPT_TEXT(name)        .text
+#define S_EXCEPT_DATA(name)        .data
+#define S_EXCEPT_RODATA(name)      .rodata
+#define S_EXCEPT_STRING(name)      .rodata
 #else /* __KERNEL__ */
 #define FIELD_ERROR_CODE            OFFSET_EXCEPTION_INFO_CODE(%eax)
 #define FIELD_ERROR_FLAGS           OFFSET_EXCEPTION_INFO_FLAGS(%eax)
@@ -64,10 +64,10 @@ EXTERN(this_exception_state)
 #define FIELD_ERROR_FAULTADDR      (OFFSET_EXCEPTION_INFO_DATA + __OFFSET_EXCEPTION_DATA_FAULTADDR)(%eax)
 #define FIELD_ERROR_TRACE(off)     (OFFSET_EXCEPTION_INFO_TRACE + (off))(%eax)
 #define FIELD_ERROR_REGISTERS(off) (OFFSET_EXCEPTION_INFO_STATE + (off))(%eax)
-#define S_EXCEPT_TEXT(name)    .text.crt.except.name
-#define S_EXCEPT_DATA(name)    .data.crt.except.name
-#define S_EXCEPT_RODATA(name)  .rodata.crt.except.name
-#define S_EXCEPT_STRING(name)  .rodata.crt.except.name
+#define S_EXCEPT_TEXT(name)        .text.crt.except.name
+#define S_EXCEPT_DATA(name)        .data.crt.except.name
+#define S_EXCEPT_RODATA(name)      .rodata.crt.except.name
+#define S_EXCEPT_STRING(name)      .rodata.crt.except.name
 #endif /* !__KERNEL__ */
 
 #ifdef __KERNEL__
@@ -195,8 +195,8 @@ INTERN_FUNCTION(libc_Unwind_RaiseException)
 	.cfi_startproc
 	.cfi_signal_frame
 	PUSH_KCPUSTATE_ON_FUNCTION_ENTRY
-	movl   %esp, %ecx /* error_register_state_t *__restrict state */
-	movl   SIZEOF_KCPUSTATE(%esp), %edx /* struct _Unwind_Exception *__restrict exception_object */
+	movl   %esp, %ecx                       /* error_register_state_t *__restrict state */
+	movl   SIZEOF_KCPUSTATE(%esp), %edx     /* struct _Unwind_Exception *__restrict exception_object */
 	INTERN(libc_Unwind_RaiseException_impl)
 	call   libc_Unwind_RaiseException_impl
 	jmp    .Lload_kcpustate_eax
@@ -210,8 +210,8 @@ INTERN_FUNCTION(libc_Unwind_Resume)
 	.cfi_startproc
 	.cfi_signal_frame
 	PUSH_KCPUSTATE_ON_FUNCTION_ENTRY
-	movl   %esp, %ecx /* error_register_state_t *__restrict state */
-	movl   SIZEOF_KCPUSTATE(%esp), %edx /* struct _Unwind_Exception *__restrict exception_object */
+	movl   %esp, %ecx                       /* error_register_state_t *__restrict state */
+	movl   SIZEOF_KCPUSTATE(%esp), %edx     /* struct _Unwind_Exception *__restrict exception_object */
 	INTERN(libc_Unwind_Resume_impl)
 	call   libc_Unwind_Resume_impl
 	jmp    .Lload_kcpustate_eax
@@ -225,8 +225,8 @@ INTERN_FUNCTION(libc_Unwind_Resume_or_Rethrow)
 	.cfi_startproc
 	.cfi_signal_frame
 	PUSH_KCPUSTATE_ON_FUNCTION_ENTRY
-	movl   %esp, %ecx /* error_register_state_t *__restrict state */
-	movl   SIZEOF_KCPUSTATE(%esp), %edx /* struct _Unwind_Exception *__restrict exception_object */
+	movl   %esp, %ecx                       /* error_register_state_t *__restrict state */
+	movl   SIZEOF_KCPUSTATE(%esp), %edx     /* struct _Unwind_Exception *__restrict exception_object */
 	INTERN(libc_Unwind_Resume_or_Rethrow_impl)
 	call   libc_Unwind_Resume_or_Rethrow_impl
 	jmp    .Lload_kcpustate_eax
@@ -240,10 +240,10 @@ INTERN_FUNCTION(libc_Unwind_ForcedUnwind)
 	.cfi_startproc
 	.cfi_signal_frame
 	PUSH_KCPUSTATE_ON_FUNCTION_ENTRY
-	movl   %esp, %ecx /* error_register_state_t *__restrict state */
-	movl   SIZEOF_KCPUSTATE(%esp), %edx /* struct _Unwind_Exception *__restrict exception_object */
-	pushl_cfi (SIZEOF_KCPUSTATE + 12)(%esp)   /* void *stop_arg */
-	pushl_cfi (SIZEOF_KCPUSTATE + 12)(%esp)   /* _Unwind_Stop_Fn stop */
+	movl   %esp, %ecx                       /* error_register_state_t *__restrict state */
+	movl   SIZEOF_KCPUSTATE(%esp), %edx     /* struct _Unwind_Exception *__restrict exception_object */
+	pushl_cfi (SIZEOF_KCPUSTATE + 12)(%esp) /* void *stop_arg */
+	pushl_cfi (SIZEOF_KCPUSTATE + 12)(%esp) /* _Unwind_Stop_Fn stop */
 	INTERN(libc_Unwind_ForcedUnwind_impl)
 	call   libc_Unwind_ForcedUnwind_impl
 	.cfi_adjust_cfa_offset -8
@@ -258,13 +258,13 @@ INTERN_FUNCTION(libc_Unwind_Backtrace)
 	.cfi_startproc
 	.cfi_signal_frame
 	PUSH_KCPUSTATE_ON_FUNCTION_ENTRY
-	movl   %esp, %ecx /* error_register_state_t *__restrict state */
-	movl   SIZEOF_KCPUSTATE(%esp), %edx /* _Unwind_Trace_Fn func */
-	pushl_cfi (SIZEOF_KCPUSTATE + 12)(%esp)   /* void *arg */
+	movl   %esp, %ecx                       /* error_register_state_t *__restrict state */
+	movl   SIZEOF_KCPUSTATE(%esp), %edx     /* _Unwind_Trace_Fn func */
+	pushl_cfi (SIZEOF_KCPUSTATE + 12)(%esp) /* void *arg */
 	INTERN(libc_Unwind_Backtrace_impl)
 	call   libc_Unwind_Backtrace_impl
 	.cfi_adjust_cfa_offset -4
-	addl   $(SIZEOF_KCPUSTATE - 4), %esp /* -4: EIP */
+	addl   $(SIZEOF_KCPUSTATE - 4), %esp    /* -4: EIP */
 	.cfi_adjust_cfa_offset -(SIZEOF_KCPUSTATE - 4)
 	ret
 	.cfi_endproc

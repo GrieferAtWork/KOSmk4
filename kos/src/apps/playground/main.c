@@ -802,13 +802,13 @@ int main_vfork(int argc, char *argv[], char *envp[]) {
 
 /************************************************************************/
 PRIVATE sigset_t const full_sigset = SIGSET_INIT_FULL;
-PRIVATE void *sigbound_threadmain(void *) {
+PRIVATE void *sigbounce_threadmain(void *) {
 	/* Block _all_ signals.
 	 * This function's implementation will also ensure
 	 * that  we're  using the  userprocmask mechanism. */
 	setsigmaskptr((sigset_t *)&full_sigset);
 	for (;;) {
-		printf("sigbound_threadmain(): %d\n", gettid());
+		printf("sigbounce_threadmain(): %d\n", gettid());
 		pause();
 	}
 	return NULL;
@@ -826,7 +826,7 @@ int main_sigbounce(int argc, char *argv[], char *envp[]) {
 	/* Create an additional thread, thus bumping our process's total
 	 * thread count up to 2, which is needed to get the two  threads
 	 * the signal used to end up bouncing between. */
-	pthread_create(&pt, NULL, &sigbound_threadmain, NULL);
+	pthread_create(&pt, NULL, &sigbounce_threadmain, NULL);
 
 	/* A test program  to test the  corner-case detailed in  `sigmask_ismasked_in()'
 	 * To trigger the corner-case, press CTRL+C after running `playground sigbounce'
