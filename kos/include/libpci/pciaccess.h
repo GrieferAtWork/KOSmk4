@@ -82,7 +82,7 @@ __INTDEF void __NOTHROW(LIBPCI_CC pci_system_init)(void);
 #else /* __KERNEL__ */
 LIBPCI_DECL __errno_t __NOTHROW(LIBPCI_CC pci_system_init)(void);
 LIBPCI_DECL void __NOTHROW(LIBPCI_CC pci_system_init_dev_mem)(__fd_t fd);
-LIBPCI_DECL void __NOTHROW(LIBPCI_CC pci_system_cleanup)(void);
+LIBPCI_DECL __NOBLOCK void __NOTHROW(LIBPCI_CC pci_system_cleanup)(void);
 #endif /* !__KERNEL__ */
 
 
@@ -271,7 +271,7 @@ LIBPCI_DECL __ATTR_WUNUSED __ATTR_NONNULL((1)) struct pci_device *__NOTHROW(LIBP
 LIBPCI_DECL __ATTR_WUNUSED struct pci_device *__NOTHROW(LIBPCI_CC pci_device_next)(/*[0..1]*/ struct pci_device_iterator *iter);
 LIBPCI_DECL __ATTR_MALLOC __ATTR_WUNUSED struct pci_device_iterator *__NOTHROW(LIBPCI_CC pci_slot_match_iterator_create)(struct pci_slot_match const *match);
 LIBPCI_DECL __ATTR_MALLOC __ATTR_WUNUSED struct pci_device_iterator *__NOTHROW(LIBPCI_CC pci_id_match_iterator_create)(struct pci_id_match const *match);
-LIBPCI_DECL void __NOTHROW(LIBPCI_CC pci_iterator_destroy)(/*[0..1]*/ struct pci_device_iterator *iter);
+LIBPCI_DECL __NOBLOCK void __NOTHROW(LIBPCI_CC pci_iterator_destroy)(/*[0..1]*/ struct pci_device_iterator *iter);
 #endif /* !__KERNEL__ */
 
 

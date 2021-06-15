@@ -56,7 +56,7 @@ INTDEF FREE void NOTHROW(CC libpci_system_init)(void);
 #else /* __KERNEL__ */
 INTDEF errno_t NOTHROW(CC libpci_system_init)(void);
 INTDEF void NOTHROW(CC libpci_system_init_dev_mem)(fd_t fd);
-INTDEF void NOTHROW(CC libpci_system_cleanup)(void);
+INTDEF NOBLOCK void NOTHROW(CC libpci_system_cleanup)(void);
 #endif /* !__KERNEL__ */
 
 #ifndef __KERNEL__
@@ -82,7 +82,7 @@ INTDEF WUNUSED NONNULL((1)) struct pci_device *NOTHROW(CC libpci_device_next)(/*
 INTDEF WUNUSED struct pci_device *NOTHROW(CC libpci_device_next)(/*[0..1]*/ struct pci_device_iterator *iter);
 INTDEF ATTR_MALLOC WUNUSED struct pci_device_iterator *NOTHROW(CC libpci_slot_match_iterator_create)(struct pci_slot_match const *match);
 INTDEF ATTR_MALLOC WUNUSED struct pci_device_iterator *NOTHROW(CC libpci_id_match_iterator_create)(struct pci_id_match const *match);
-INTDEF void NOTHROW(CC libpci_iterator_destroy)(/*[0..1]*/ struct pci_device_iterator *iter);
+INTDEF NOBLOCK void NOTHROW(CC libpci_iterator_destroy)(/*[0..1]*/ struct pci_device_iterator *iter);
 #endif /* !__KERNEL__ */
 
 /************************************************************************/

@@ -452,10 +452,35 @@ INTERN void NOTHROW(CC libpci_system_init_dev_mem)(fd_t fd) {
 	libpci_system_init();
 }
 
+PRIVATE NOBLOCK NONNULL((1)) void
+NOTHROW(CC pci_device_destroy)(struct pci_device *__restrict self) {
+	unsigned int i;
+
+	/* Cleanup lazy mappings of physical memory. */
+	for (i = 0; i < COMPILER_LENOF(self->pd_regions); ++i) {
+		if (self->pd_regions[i].pmr_memory != NULL) {
+			munmapphys(self->pd_regions[i].pmr_memory,
+			           self->pd_regions[i].pmr_size);
+		}
+	}
+
+	/* Free dynamically allocated data. */
+	free(self->_pd_info_agp);
+	free(self->_pd_info_bridge);
+	free(self->_pd_info_pcmcia_bridge);
+	free(self);
+}
+
 DEFINE_PUBLIC_ALIAS(pci_system_cleanup, libpci_system_cleanup);
-INTERN void NOTHROW(CC libpci_system_cleanup)(void) {
-	COMPILER_IMPURE();
-	/* TODO: Cleanup `libpci_devices' */
+INTERN NOBLOCK void NOTHROW(CC libpci_system_cleanup)(void) {
+	/* Cleanup the list of known PCI devices. */
+	libpci_devices_tree = NULL;
+	while (!SLIST_EMPTY(&libpci_devices)) {
+		struct pci_device *dev;
+		dev = SLIST_FIRST(&libpci_devices);
+		SLIST_REMOVE_HEAD(&libpci_devices, _pd_link);
+		pci_device_destroy(dev);
+	}
 
 	/* Disable I/O permissions access for all ports. */
 	iopl(0);
@@ -609,7 +634,7 @@ NOTHROW(CC libpci_id_match_iterator_create)(struct pci_id_match const *match) {
 }
 
 DEFINE_PUBLIC_ALIAS(pci_iterator_destroy, libpci_iterator_destroy);
-INTERN void
+INTERN NOBLOCK void
 NOTHROW(CC libpci_iterator_destroy)(/*[0..1]*/ struct pci_device_iterator *iter) {
 	free(iter);
 }
