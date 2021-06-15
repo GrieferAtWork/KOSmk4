@@ -645,13 +645,13 @@ LIBPCI_DECL __ATTR_NONNULL((1)) __errno_t __NOTHROW(LIBPCI_CC pci_device_probe)(
 
 /* Lookup a device, given its exact address. */
 #if defined(__USE_KOS) || defined(__USE_KOS_KERNEL)
-LIBPCI_DECL __ATTR_WUNUSED struct pci_device *__NOTHROW(LIBPCI_CC pci_device_byaddr)(pciaddr_t addr);
+LIBPCI_DECL __ATTR_PURE __ATTR_WUNUSED struct pci_device *__NOTHROW(LIBPCI_CC pci_device_byaddr)(pciaddr_t addr);
 #define __pci_device_byaddr pci_device_byaddr
 #else /* __USE_KOS || __USE_KOS_KERNEL */
-__COMPILER_REDIRECT(LIBPCI_DECL,__ATTR_WUNUSED,struct pci_device *,__NOTHROW,LIBPCI_CC,__pci_device_byaddr,(pciaddr_t addr),pci_device_byaddr,(addr))
+__COMPILER_REDIRECT(LIBPCI_DECL,__ATTR_PURE __ATTR_WUNUSED,struct pci_device *,__NOTHROW,LIBPCI_CC,__pci_device_byaddr,(pciaddr_t addr),pci_device_byaddr,(addr))
 #endif /* !__USE_KOS && !__USE_KOS_KERNEL */
 #ifdef __INTELLISENSE__
-__ATTR_WUNUSED struct pci_device *
+__ATTR_PURE __ATTR_WUNUSED struct pci_device *
 __NOTHROW(LIBPCI_CC pci_device_find_by_slot)(__uint32_t domain, __uint8_t bus,
                                              __uint8_t dev, __uint8_t func);
 #else /* __INTELLISENSE__ */
@@ -671,9 +671,9 @@ __NOTHROW(LIBPCI_CC pci_device_get_bridge_buses)(struct pci_device const *__rest
 
 /* Lookup bridge device information. */
 #if defined(__USE_KOS) || defined(__USE_KOS_KERNEL)
-LIBPCI_DECL __ATTR_WUNUSED __ATTR_NONNULL((1, 2)) __errno_t __NOTHROW(LIBPCI_CC pci_device_getinfo_agp)(struct pci_device *__restrict self, struct pci_agp_info *__restrict result);
-LIBPCI_DECL __ATTR_WUNUSED __ATTR_NONNULL((1, 2)) __errno_t __NOTHROW(LIBPCI_CC pci_device_getinfo_bridge)(struct pci_device *__restrict self, struct pci_bridge_info *__restrict result);
-LIBPCI_DECL __ATTR_WUNUSED __ATTR_NONNULL((1, 2)) __errno_t __NOTHROW(LIBPCI_CC pci_device_getinfo_pcmcia_bridge)(struct pci_device *__restrict self, struct pci_pcmcia_bridge_info *__restrict result);
+LIBPCI_DECL __ATTR_WUNUSED __ATTR_NONNULL((1, 2)) __errno_t __NOTHROW(LIBPCI_CC pci_device_getinfo_agp)(struct pci_device const *__restrict self, struct pci_agp_info *__restrict result);
+LIBPCI_DECL __ATTR_WUNUSED __ATTR_NONNULL((1, 2)) __errno_t __NOTHROW(LIBPCI_CC pci_device_getinfo_bridge)(struct pci_device const *__restrict self, struct pci_bridge_info *__restrict result);
+LIBPCI_DECL __ATTR_WUNUSED __ATTR_NONNULL((1, 2)) __errno_t __NOTHROW(LIBPCI_CC pci_device_getinfo_pcmcia_bridge)(struct pci_device const *__restrict self, struct pci_pcmcia_bridge_info *__restrict result);
 #endif /* __USE_KOS || __USE_KOS_KERNEL */
 
 #ifdef __KERNEL__
@@ -727,7 +727,7 @@ LIBPCI_DECL __ATTR_WUNUSED __ATTR_NONNULL((1)) char const *__NOTHROW(LIBPCI_CC p
 /* Read/Write to/from the configuration space of a given PCI device. */
 #ifdef __KERNEL__
 #if defined(__USE_KOS) || defined(__USE_KOS_KERNEL)
-LIBPCI_DECL __ATTR_NONNULL((1, 2)) __size_t __NOTHROW_NCX(LIBPCI_CC pci_device_readcfg)(struct pci_device *__restrict self, void *data, __uint8_t offset, __uint8_t size);
+LIBPCI_DECL __ATTR_NONNULL((1, 2)) __size_t __NOTHROW_NCX(LIBPCI_CC pci_device_readcfg)(struct pci_device const *__restrict self, void *data, __uint8_t offset, __uint8_t size);
 LIBPCI_DECL __ATTR_NONNULL((1, 2)) __size_t __NOTHROW_NCX(LIBPCI_CC pci_device_writecfg)(struct pci_device *__restrict self, void const *data, __uint8_t offset, __uint8_t size);
 #endif /* __USE_KOS || __USE_KOS_KERNEL */
 LIBPCI_DECL __ATTR_NONNULL((1)) void __NOTHROW(LIBPCI_CC pci_device_cfg_write_u8)(struct pci_device *__restrict self, __uint8_t data, __uint8_t reg);
@@ -736,18 +736,18 @@ LIBPCI_DECL __ATTR_NONNULL((1)) void __NOTHROW(LIBPCI_CC pci_device_cfg_write_u3
 LIBPCI_DECL __ATTR_NONNULL((1)) void __NOTHROW(LIBPCI_CC pci_device_cfg_write_bits)(struct pci_device *__restrict self, __uint32_t mask, __uint32_t data, __uint8_t reg);
 #else /* __KERNEL__ */
 #if defined(__USE_KOS) || defined(__USE_KOS_KERNEL)
-LIBPCI_DECL __ATTR_NONNULL((1, 2)) __ssize_t __NOTHROW_NCX(LIBPCI_CC pci_device_readcfg)(struct pci_device *__restrict self, void *data, __uint8_t offset, __uint8_t size);
+LIBPCI_DECL __ATTR_NONNULL((1, 2)) __ssize_t __NOTHROW_NCX(LIBPCI_CC pci_device_readcfg)(struct pci_device const *__restrict self, void *data, __uint8_t offset, __uint8_t size);
 LIBPCI_DECL __ATTR_NONNULL((1, 2)) __ssize_t __NOTHROW_NCX(LIBPCI_CC pci_device_writecfg)(struct pci_device *__restrict self, void const *data, __uint8_t offset, __uint8_t size);
 #endif /* __USE_KOS || __USE_KOS_KERNEL */
 LIBPCI_DECL __ATTR_NONNULL((1)) __errno_t __NOTHROW(LIBPCI_CC pci_device_cfg_write_u8)(struct pci_device *__restrict self, __uint8_t data, __uint8_t reg);
 LIBPCI_DECL __ATTR_NONNULL((1)) __errno_t __NOTHROW(LIBPCI_CC pci_device_cfg_write_u16)(struct pci_device *__restrict self, __uint16_t data, __uint8_t reg);
 LIBPCI_DECL __ATTR_NONNULL((1)) __errno_t __NOTHROW(LIBPCI_CC pci_device_cfg_write_u32)(struct pci_device *__restrict self, __uint32_t data, __uint8_t reg);
 LIBPCI_DECL __ATTR_NONNULL((1)) __errno_t __NOTHROW(LIBPCI_CC pci_device_cfg_write_bits)(struct pci_device *__restrict self, __uint32_t mask, __uint32_t data, __uint8_t reg);
-LIBPCI_DECL __ATTR_NONNULL((1, 2)) __errno_t __NOTHROW_NCX(LIBPCI_CC pci_device_cfg_read)(struct pci_device *__restrict self, void *data, __uint8_t offset, __uint8_t size, /*[0..1]*/ pciaddr_t *bytes_read);
+LIBPCI_DECL __ATTR_NONNULL((1, 2)) __errno_t __NOTHROW_NCX(LIBPCI_CC pci_device_cfg_read)(struct pci_device const *__restrict self, void *data, __uint8_t offset, __uint8_t size, /*[0..1]*/ pciaddr_t *bytes_read);
 LIBPCI_DECL __ATTR_NONNULL((1, 2)) __errno_t __NOTHROW_NCX(LIBPCI_CC pci_device_cfg_write)(struct pci_device *__restrict self, void const *data, __uint8_t offset, __uint8_t size, /*[0..1]*/ pciaddr_t *bytes_written);
-LIBPCI_DECL __ATTR_NONNULL((1, 2)) __errno_t __NOTHROW(LIBPCI_CC pci_device_cfg_read_u8)(struct pci_device *__restrict self, __uint8_t *__restrict data, __uint8_t reg);
-LIBPCI_DECL __ATTR_NONNULL((1, 2)) __errno_t __NOTHROW(LIBPCI_CC pci_device_cfg_read_u16)(struct pci_device *__restrict self, __uint16_t *__restrict data, __uint8_t reg);
-LIBPCI_DECL __ATTR_NONNULL((1, 2)) __errno_t __NOTHROW(LIBPCI_CC pci_device_cfg_read_u32)(struct pci_device *__restrict self, __uint32_t *__restrict data, __uint8_t reg);
+LIBPCI_DECL __ATTR_NONNULL((1, 2)) __errno_t __NOTHROW(LIBPCI_CC pci_device_cfg_read_u8)(struct pci_device const *__restrict self, __uint8_t *__restrict data, __uint8_t reg);
+LIBPCI_DECL __ATTR_NONNULL((1, 2)) __errno_t __NOTHROW(LIBPCI_CC pci_device_cfg_read_u16)(struct pci_device const *__restrict self, __uint16_t *__restrict data, __uint8_t reg);
+LIBPCI_DECL __ATTR_NONNULL((1, 2)) __errno_t __NOTHROW(LIBPCI_CC pci_device_cfg_read_u32)(struct pci_device const *__restrict self, __uint32_t *__restrict data, __uint8_t reg);
 LIBPCI_DECL __ATTR_DEPRECATED_ __ATTR_NONNULL((1)) __errno_t __NOTHROW(LIBPCI_CC pci_device_map_region)(struct pci_device *__restrict self, unsigned int bar_index, int write_enable);
 LIBPCI_DECL __ATTR_DEPRECATED_ __errno_t __NOTHROW(LIBPCI_CC pci_device_unmap_region)(struct pci_device *self, unsigned int bar_index);
 LIBPCI_DECL __ATTR_DEPRECATED_ __ATTR_NONNULL((1, 5)) __errno_t __NOTHROW(LIBPCI_CC pci_device_map_memory_range)(struct pci_device *__restrict self, __physaddr_t base, __size_t size, int write_enable, void **__restrict paddr);
@@ -755,9 +755,9 @@ LIBPCI_DECL __ATTR_DEPRECATED_ __errno_t __NOTHROW(LIBPCI_CC pci_device_unmap_me
 #endif /* !__KERNEL__ */
 #if defined(__USE_KOS) || defined(__USE_KOS_KERNEL)
 /* In user-space, these functions will return 0xff[ff[ffff]] on error and set errno to non-zero */
-LIBPCI_DECL __ATTR_NONNULL((1)) __uint8_t __NOTHROW(LIBPCI_CC pci_device_cfg_readb)(struct pci_device *__restrict self, __uint8_t reg);
-LIBPCI_DECL __ATTR_NONNULL((1)) __uint16_t __NOTHROW(LIBPCI_CC pci_device_cfg_readw)(struct pci_device *__restrict self, __uint8_t reg);
-LIBPCI_DECL __ATTR_NONNULL((1)) __uint32_t __NOTHROW(LIBPCI_CC pci_device_cfg_readl)(struct pci_device *__restrict self, __uint8_t reg);
+LIBPCI_DECL __ATTR_NONNULL((1)) __uint8_t __NOTHROW(LIBPCI_CC pci_device_cfg_readb)(struct pci_device const *__restrict self, __uint8_t reg);
+LIBPCI_DECL __ATTR_NONNULL((1)) __uint16_t __NOTHROW(LIBPCI_CC pci_device_cfg_readw)(struct pci_device const *__restrict self, __uint8_t reg);
+LIBPCI_DECL __ATTR_NONNULL((1)) __uint32_t __NOTHROW(LIBPCI_CC pci_device_cfg_readl)(struct pci_device const *__restrict self, __uint8_t reg);
 #define pci_device_cfg_writeb(self, reg, data) pci_device_cfg_write_u8(self, data, reg)
 #define pci_device_cfg_writew(self, reg, data) pci_device_cfg_write_u16(self, data, reg)
 #define pci_device_cfg_writel(self, reg, data) pci_device_cfg_write_u32(self, data, reg)
@@ -873,9 +873,9 @@ struct pci_bridge_info {
 	__uint32_t pbi_io_base;                 /* == `((pci_device_cfg_readw(0x1c) & 0xf0) << 8) | (pci_device_cfg_readw(0x30) << 16)' */
 	__uint32_t pbi_io_limit;                /* == `0xfff | ((pci_device_cfg_readb(0x1d) & 0xf0) << 8) | (pci_device_cfg_readw(0x32) << 16)' */
 	__uint32_t pbi_mem_base;                /* == `(pci_device_cfg_readw(0x20) & 0xfff0) << 16' */
-	__uint32_t pbi_mem_limit;               /* == `0xfff | (pci_device_cfg_readw(0x22) & 0xfff0) << 16' */
+	__uint32_t pbi_mem_limit;               /* == `0xfff | (pci_device_cfg_readw(0x22) & 0xf0) << 16' */
 	__uint64_t pbi_prefetch_mem_base;       /* == `((pci_device_cfg_readw(0x24) & 0xfff0) << 16) | (pci_device_cfg_readl(0x28) << 32)' */
-	__uint64_t pbi_prefetch_mem_limit;      /* == `(0xfff | (pci_device_cfg_readw(0x26) & 0xfff0) << 16) | (pci_device_cfg_readl(0x2c) << 32)' */
+	__uint64_t pbi_prefetch_mem_limit;      /* == `(0xfff | (pci_device_cfg_readw(0x26) & 0xf0) << 16) | (pci_device_cfg_readl(0x2c) << 32)' */
 #else /* __USE_KOS_ALTERATIONS */
 	union {
 		__uint8_t  pbi_primary_bus;         /* == `pci_device_cfg_readb(0x18)' */
@@ -929,16 +929,16 @@ struct pci_bridge_info {
 		__uint32_t mem_base;                /* == `(pci_device_cfg_readw(0x20) & 0xfff0) << 16' */
 	};
 	union {
-		__uint32_t pbi_mem_limit;           /* == `0xfff | (pci_device_cfg_readw(0x22) & 0xfff0) << 16' */
-		__uint32_t mem_limit;               /* == `0xfff | (pci_device_cfg_readw(0x22) & 0xfff0) << 16' */
+		__uint32_t pbi_mem_limit;           /* == `0xfff | (pci_device_cfg_readw(0x22) & 0xf0) << 16' */
+		__uint32_t mem_limit;               /* == `0xfff | (pci_device_cfg_readw(0x22) & 0xf0) << 16' */
 	};
 	union {
 		__uint64_t pbi_prefetch_mem_base;   /* == `((pci_device_cfg_readw(0x24) & 0xfff0) << 16) | (pci_device_cfg_readl(0x28) << 32)' */
 		__uint64_t prefetch_mem_base;       /* == `((pci_device_cfg_readw(0x24) & 0xfff0) << 16) | (pci_device_cfg_readl(0x28) << 32)' */
 	};
 	union {
-		__uint64_t pbi_prefetch_mem_limit;  /* == `(0xfff | (pci_device_cfg_readw(0x26) & 0xfff0) << 16) | (pci_device_cfg_readl(0x2c) << 32)' */
-		__uint64_t prefetch_mem_limit;      /* == `(0xfff | (pci_device_cfg_readw(0x26) & 0xfff0) << 16) | (pci_device_cfg_readl(0x2c) << 32)' */
+		__uint64_t pbi_prefetch_mem_limit;  /* == `(0xfff | (pci_device_cfg_readw(0x26) & 0xf0) << 16) | (pci_device_cfg_readl(0x2c) << 32)' */
+		__uint64_t prefetch_mem_limit;      /* == `(0xfff | (pci_device_cfg_readw(0x26) & 0xf0) << 16) | (pci_device_cfg_readl(0x2c) << 32)' */
 	};
 #endif /* !__USE_KOS_ALTERATIONS */
 #else /* __USE_KOS */
@@ -956,9 +956,9 @@ struct pci_bridge_info {
 	__uint32_t io_base;                 /* == `((pci_device_cfg_readw(0x1c) & 0xf0) << 8) | (pci_device_cfg_readw(0x30) << 16)' */
 	__uint32_t io_limit;                /* == `0xfff | ((pci_device_cfg_readb(0x1d) & 0xf0) << 8) | (pci_device_cfg_readw(0x32) << 16)' */
 	__uint32_t mem_base;                /* == `(pci_device_cfg_readw(0x20) & 0xfff0) << 16' */
-	__uint32_t mem_limit;               /* == `0xfff | (pci_device_cfg_readw(0x22) & 0xfff0) << 16' */
+	__uint32_t mem_limit;               /* == `0xfff | (pci_device_cfg_readw(0x22) & 0xf0) << 16' */
 	__uint64_t prefetch_mem_base;       /* == `((pci_device_cfg_readw(0x24) & 0xfff0) << 16) | (pci_device_cfg_readl(0x28) << 32)' */
-	__uint64_t prefetch_mem_limit;      /* == `(0xfff | (pci_device_cfg_readw(0x26) & 0xfff0) << 16) | (pci_device_cfg_readl(0x2c) << 32)' */
+	__uint64_t prefetch_mem_limit;      /* == `(0xfff | (pci_device_cfg_readw(0x26) & 0xf0) << 16) | (pci_device_cfg_readl(0x2c) << 32)' */
 #endif /* !__USE_KOS */
 };
 
@@ -1061,7 +1061,7 @@ LIBPCI_DECL int __NOTHROW(LIBPCI_CC pci_device_vgaarb_decodes)(int new_vga_rsrc)
 LIBPCI_DECL int __NOTHROW(LIBPCI_CC pci_device_vgaarb_lock)(void);
 LIBPCI_DECL int __NOTHROW(LIBPCI_CC pci_device_vgaarb_trylock)(void);
 LIBPCI_DECL int __NOTHROW(LIBPCI_CC pci_device_vgaarb_unlock)(void);
-LIBPCI_DECL __ATTR_NONNULL((2, 3)) __errno_t __NOTHROW(LIBPCI_CC pci_device_vgaarb_get_info)(struct pci_device *self, int *__restrict vga_count, int *__restrict rsrc_decodes);
+LIBPCI_DECL __ATTR_NONNULL((2, 3)) __errno_t __NOTHROW(LIBPCI_CC pci_device_vgaarb_get_info)(struct pci_device const *self, int *__restrict vga_count, int *__restrict rsrc_decodes);
 #endif /* !__KERNEL__ */
 
 

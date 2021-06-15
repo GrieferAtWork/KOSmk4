@@ -77,7 +77,7 @@ INTDEF NONNULL((1)) void NOTHROW(CC libpci_slot_match_iterator_init)(struct pci_
 #endif /* !__KERNEL__ */
 INTDEF NONNULL((1)) void NOTHROW(CC libpci_id_match_iterator_init)(struct pci_device_iterator *__restrict self, struct pci_id_match const *match);
 #ifdef __KERNEL__
-INTDEF WUNUSED NONNULL((1)) struct pci_device *NOTHROW(CC libpci_device_next)(/*[1..1]*/ struct pci_device_iterator *iter);
+INTDEF WUNUSED NONNULL((1)) struct pci_device *NOTHROW(CC libpci_device_next)(/*[1..1]*/ struct pci_device_iterator *__restrict iter);
 #else /* __KERNEL__ */
 INTDEF WUNUSED struct pci_device *NOTHROW(CC libpci_device_next)(/*[0..1]*/ struct pci_device_iterator *iter);
 INTDEF ATTR_MALLOC WUNUSED struct pci_device_iterator *NOTHROW(CC libpci_slot_match_iterator_create)(struct pci_slot_match const *match);
@@ -98,7 +98,7 @@ INTDEF NONNULL((1)) errno_t NOTHROW(CC libpci_device_probe)(struct pci_device *_
 #endif /* !__KERNEL__ */
 
 /* Lookup a device, given its exact address. */
-INTDEF WUNUSED struct pci_device *NOTHROW(CC libpci_device_byaddr)(pciaddr_t addr);
+INTDEF ATTR_PURE WUNUSED struct pci_device *NOTHROW(CC libpci_device_byaddr)(pciaddr_t addr);
 
 /* Fill in information about bridge bus indices (s.a. `PCI_ADDR_BUSMASK') */
 INTDEF WUNUSED NONNULL((1, 2, 3, 4)) errno_t
@@ -108,13 +108,13 @@ NOTHROW(CC libpci_device_get_bridge_buses)(struct pci_device const *__restrict s
                                            int *__restrict subordinate_bus);
 
 /* Lookup bridge device information. */
-INTDEF WUNUSED NONNULL((1, 2)) errno_t NOTHROW(CC libpci_device_getinfo_agp)(struct pci_device *__restrict self, struct pci_agp_info *__restrict result);
-INTDEF WUNUSED NONNULL((1, 2)) errno_t NOTHROW(CC libpci_device_getinfo_bridge)(struct pci_device *__restrict self, struct pci_bridge_info *__restrict result);
-INTDEF WUNUSED NONNULL((1, 2)) errno_t NOTHROW(CC libpci_device_getinfo_pcmcia_bridge)(struct pci_device *__restrict self, struct pci_pcmcia_bridge_info *__restrict result);
+INTDEF WUNUSED NONNULL((1, 2)) errno_t NOTHROW(CC libpci_device_getinfo_agp)(struct pci_device const *__restrict self, struct pci_agp_info *__restrict result);
+INTDEF WUNUSED NONNULL((1, 2)) errno_t NOTHROW(CC libpci_device_getinfo_bridge)(struct pci_device const *__restrict self, struct pci_bridge_info *__restrict result);
+INTDEF WUNUSED NONNULL((1, 2)) errno_t NOTHROW(CC libpci_device_getinfo_pcmcia_bridge)(struct pci_device const *__restrict self, struct pci_pcmcia_bridge_info *__restrict result);
 #ifdef __KERNEL__
-INTDEF WUNUSED NONNULL((1)) struct pci_device *NOTHROW(CC libpci_device_get_parent_bridge)(struct pci_device *__restrict self);
+INTDEF WUNUSED NONNULL((1)) struct pci_device *NOTHROW(CC libpci_device_get_parent_bridge)(struct pci_device const *__restrict self);
 #else /* __KERNEL__ */
-INTDEF WUNUSED struct pci_device *NOTHROW(CC libpci_device_get_parent_bridge)(/*[0..1]*/ struct pci_device *self);
+INTDEF WUNUSED struct pci_device *NOTHROW(CC libpci_device_get_parent_bridge)(/*[0..1]*/ struct pci_device const *self);
 #endif /* !__KERNEL__ */
 
 #ifndef __KERNEL__
@@ -158,33 +158,33 @@ INTDEF WUNUSED NONNULL((1)) char const *NOTHROW(CC libpci_device_get_subvendor_n
 
 /* Read/Write to/from the configuration space of a given PCI device. */
 #ifdef __KERNEL__
-INTDEF NONNULL((1, 2)) size_t NOTHROW_NCX(CC libpci_device_readcfg)(struct pci_device *__restrict self, void *data, uint8_t offset, uint8_t size);
+INTDEF NONNULL((1, 2)) size_t NOTHROW_NCX(CC libpci_device_readcfg)(struct pci_device const *__restrict self, void *data, uint8_t offset, uint8_t size);
 INTDEF NONNULL((1, 2)) size_t NOTHROW_NCX(CC libpci_device_writecfg)(struct pci_device *__restrict self, void const *data, uint8_t offset, uint8_t size);
 INTDEF NONNULL((1)) void NOTHROW(CC libpci_device_cfg_write_u8)(struct pci_device *__restrict self, uint8_t data, uint8_t reg);
 INTDEF NONNULL((1)) void NOTHROW(CC libpci_device_cfg_write_u16)(struct pci_device *__restrict self, uint16_t data, uint8_t reg);
 INTDEF NONNULL((1)) void NOTHROW(CC libpci_device_cfg_write_u32)(struct pci_device *__restrict self, uint32_t data, uint8_t reg);
 INTDEF NONNULL((1)) void NOTHROW(CC libpci_device_cfg_write_bits)(struct pci_device *__restrict self, uint32_t mask, uint32_t data, uint8_t reg);
 #else /* __KERNEL__ */
-INTDEF NONNULL((1, 2)) ssize_t NOTHROW_NCX(CC libpci_device_readcfg)(struct pci_device *__restrict self, void *data, uint8_t offset, uint8_t size);
+INTDEF NONNULL((1, 2)) ssize_t NOTHROW_NCX(CC libpci_device_readcfg)(struct pci_device const *__restrict self, void *data, uint8_t offset, uint8_t size);
 INTDEF NONNULL((1, 2)) ssize_t NOTHROW_NCX(CC libpci_device_writecfg)(struct pci_device *__restrict self, void const *data, uint8_t offset, uint8_t size);
 INTDEF NONNULL((1)) errno_t NOTHROW(CC libpci_device_cfg_write_u8)(struct pci_device *__restrict self, uint8_t data, uint8_t reg);
 INTDEF NONNULL((1)) errno_t NOTHROW(CC libpci_device_cfg_write_u16)(struct pci_device *__restrict self, uint16_t data, uint8_t reg);
 INTDEF NONNULL((1)) errno_t NOTHROW(CC libpci_device_cfg_write_u32)(struct pci_device *__restrict self, uint32_t data, uint8_t reg);
 INTDEF NONNULL((1)) errno_t NOTHROW(CC libpci_device_cfg_write_bits)(struct pci_device *__restrict self, uint32_t mask, uint32_t data, uint8_t reg);
-INTDEF NONNULL((1, 2)) errno_t NOTHROW_NCX(CC libpci_device_cfg_read)(struct pci_device *__restrict self, void *data, uint8_t offset, uint8_t size, /*[0..1]*/ pciaddr_t *bytes_read);
+INTDEF NONNULL((1, 2)) errno_t NOTHROW_NCX(CC libpci_device_cfg_read)(struct pci_device const *__restrict self, void *data, uint8_t offset, uint8_t size, /*[0..1]*/ pciaddr_t *bytes_read);
 INTDEF NONNULL((1, 2)) errno_t NOTHROW_NCX(CC libpci_device_cfg_write)(struct pci_device *__restrict self, void const *data, uint8_t offset, uint8_t size, /*[0..1]*/ pciaddr_t *bytes_written);
-INTDEF NONNULL((1, 2)) errno_t NOTHROW(CC libpci_device_cfg_read_u8)(struct pci_device *__restrict self, uint8_t *__restrict data, uint8_t reg);
-INTDEF NONNULL((1, 2)) errno_t NOTHROW(CC libpci_device_cfg_read_u16)(struct pci_device *__restrict self, uint16_t *__restrict data, uint8_t reg);
-INTDEF NONNULL((1, 2)) errno_t NOTHROW(CC libpci_device_cfg_read_u32)(struct pci_device *__restrict self, uint32_t *__restrict data, uint8_t reg);
+INTDEF NONNULL((1, 2)) errno_t NOTHROW(CC libpci_device_cfg_read_u8)(struct pci_device const *__restrict self, uint8_t *__restrict data, uint8_t reg);
+INTDEF NONNULL((1, 2)) errno_t NOTHROW(CC libpci_device_cfg_read_u16)(struct pci_device const *__restrict self, uint16_t *__restrict data, uint8_t reg);
+INTDEF NONNULL((1, 2)) errno_t NOTHROW(CC libpci_device_cfg_read_u32)(struct pci_device const *__restrict self, uint32_t *__restrict data, uint8_t reg);
 INTDEF NONNULL((1)) errno_t NOTHROW(CC libpci_device_map_region)(struct pci_device *__restrict self, unsigned int bar_index, int write_enable);
 INTDEF errno_t NOTHROW(CC libpci_device_unmap_region)(struct pci_device *self, unsigned int bar_index);
 INTDEF NONNULL((1, 5)) errno_t NOTHROW(CC libpci_device_map_memory_range)(struct pci_device *__restrict self, physaddr_t base, size_t size, int write_enable, void **__restrict paddr);
 INTDEF errno_t NOTHROW(CC libpci_device_unmap_memory_range)(struct pci_device *self, void *memory, size_t size);
 #endif /* !__KERNEL__ */
 /* In user-space, these functions will return 0xff[ff[ffff]] on error and set errno to non-zero */
-INTDEF NONNULL((1)) uint8_t NOTHROW(CC libpci_device_cfg_readb)(struct pci_device *__restrict self, uint8_t reg);
-INTDEF NONNULL((1)) uint16_t NOTHROW(CC libpci_device_cfg_readw)(struct pci_device *__restrict self, uint8_t reg);
-INTDEF NONNULL((1)) uint32_t NOTHROW(CC libpci_device_cfg_readl)(struct pci_device *__restrict self, uint8_t reg);
+INTDEF NONNULL((1)) uint8_t NOTHROW(CC libpci_device_cfg_readb)(struct pci_device const *__restrict self, uint8_t reg);
+INTDEF NONNULL((1)) uint16_t NOTHROW(CC libpci_device_cfg_readw)(struct pci_device const *__restrict self, uint8_t reg);
+INTDEF NONNULL((1)) uint32_t NOTHROW(CC libpci_device_cfg_readl)(struct pci_device const *__restrict self, uint8_t reg);
 
 
 
@@ -201,7 +201,7 @@ INTDEF int NOTHROW(CC libpci_device_vgaarb_decodes)(int new_vga_rsrc);
 INTDEF int NOTHROW(CC libpci_device_vgaarb_lock)(void);
 INTDEF int NOTHROW(CC libpci_device_vgaarb_trylock)(void);
 INTDEF int NOTHROW(CC libpci_device_vgaarb_unlock)(void);
-INTDEF NONNULL((2, 3)) errno_t NOTHROW(CC libpci_device_vgaarb_get_info)(struct pci_device *self, int *__restrict vga_count, int *__restrict rsrc_decodes);
+INTDEF NONNULL((2, 3)) errno_t NOTHROW(CC libpci_device_vgaarb_get_info)(struct pci_device const *self, int *__restrict vga_count, int *__restrict rsrc_decodes);
 
 /************************************************************************/
 /* General purpose I/O accessors.                                       */

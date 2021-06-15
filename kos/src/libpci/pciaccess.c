@@ -564,7 +564,7 @@ NOTHROW(CC libpci_id_match_iterator_init)(struct pci_device_iterator *__restrict
 DEFINE_PUBLIC_ALIAS(pci_device_next, libpci_device_next);
 #ifdef __KERNEL__
 INTERN WUNUSED NONNULL((1)) struct pci_device *
-NOTHROW(CC libpci_device_next)(/*[1..1]*/ struct pci_device_iterator *iter)
+NOTHROW(CC libpci_device_next)(/*[1..1]*/ struct pci_device_iterator *__restrict iter)
 #else /* __KERNEL__ */
 INTERN WUNUSED struct pci_device *
 NOTHROW(CC libpci_device_next)(/*[0..1]*/ struct pci_device_iterator *iter)
@@ -743,7 +743,7 @@ NOTHROW(CC libpci_device_probe)(struct pci_device *__restrict self) {
 
 /* Lookup a device, given its exact address. */
 DEFINE_PUBLIC_ALIAS(pci_device_byaddr, libpci_device_byaddr);
-INTERN WUNUSED struct pci_device *
+INTERN ATTR_PURE WUNUSED struct pci_device *
 NOTHROW(CC libpci_device_byaddr)(pciaddr_t addr) {
 	return pcidev_tree_locate(libpci_devices_tree, addr);
 }
@@ -755,19 +755,37 @@ NOTHROW(CC libpci_device_get_bridge_buses)(struct pci_device const *__restrict s
                                            int *__restrict primary_bus,
                                            int *__restrict secondary_bus,
                                            int *__restrict subordinate_bus) {
-	(void)self;
-	COMPILER_IMPURE();
-	/* TODO */
 	*primary_bus     = -1;
 	*secondary_bus   = -1;
 	*subordinate_bus = -1;
+	if (self->pd_class_id != PCI_DEV8_CLASS_BRIDGE)
+		return ENODEV;
+	*primary_bus = self->pd_bus;
+	switch (self->pd_header_type & PCI_DEVC_HEADER_TYPEMASK) {
+
+	case PCI_DEVC_HEADER_BRIDGE:
+	case PCI_DEVC_HEADER_CARDBUS: {
+		uint32_t bdev18;
+		USER_TRY {
+			bdev18 = pci_rdaddr(self->pd_addr | PCI_BDEV18);
+		} USER_EXCEPT ({
+			return EACCES;
+		})
+		*primary_bus     = PCI_BDEV18_PRIMARY_BUS(bdev18);
+		*secondary_bus   = PCI_BDEV18_SECONDARY_BUS(bdev18);
+		*subordinate_bus = PCI_BDEV18_SUBORDINATE_BUS(bdev18);
+	}	break;
+
+	default:
+		break;
+	}
 	return EOK;
 }
 
 /* Lookup bridge device information. */
 DEFINE_PUBLIC_ALIAS(pci_device_getinfo_agp, libpci_device_getinfo_agp);
 INTERN WUNUSED NONNULL((1, 2)) errno_t
-NOTHROW(CC libpci_device_getinfo_agp)(struct pci_device *__restrict self,
+NOTHROW(CC libpci_device_getinfo_agp)(struct pci_device const *__restrict self,
                                       struct pci_agp_info *__restrict result) {
 	(void)self;
 	(void)result;
@@ -778,32 +796,84 @@ NOTHROW(CC libpci_device_getinfo_agp)(struct pci_device *__restrict self,
 
 DEFINE_PUBLIC_ALIAS(pci_device_getinfo_bridge, libpci_device_getinfo_bridge);
 INTERN WUNUSED NONNULL((1, 2)) errno_t
-NOTHROW(CC libpci_device_getinfo_bridge)(struct pci_device *__restrict self,
+NOTHROW(CC libpci_device_getinfo_bridge)(struct pci_device const *__restrict self,
                                          struct pci_bridge_info *__restrict result) {
-	(void)self;
-	(void)result;
-	COMPILER_IMPURE();
-	/* TODO */
-	return ENOENT;
+	if ((self->pd_header_type & PCI_DEVC_HEADER_TYPEMASK) != PCI_DEVC_HEADER_BRIDGE)
+		return ENOENT;
+	USER_TRY {
+		/* Read in bridge control words. */
+		uint32_t bdev18 = pci_rdaddr(self->pd_addr | PCI_BDEV18);
+		uint32_t bdev1c = pci_rdaddr(self->pd_addr | PCI_BDEV1C);
+		uint32_t bdev20 = pci_rdaddr(self->pd_addr | PCI_BDEV20);
+		uint32_t bdev24 = pci_rdaddr(self->pd_addr | PCI_BDEV24);
+		uint32_t bdev30 = pci_rdaddr(self->pd_addr | PCI_BDEV30);
+		uint32_t bdev3c = pci_rdaddr(self->pd_addr | PCI_BDEV3C);
+
+		/* Extract information bits. */
+		result->pbi_primary_bus             = PCI_BDEV18_PRIMARY_BUS(bdev18);
+		result->pbi_secondary_bus           = PCI_BDEV18_SECONDARY_BUS(bdev18);
+		result->pbi_subordinate_bus         = PCI_BDEV18_SUBORDINATE_BUS(bdev18);
+		result->pbi_secondary_latency_timer = PCI_BDEV18_SECONDARY_LATENCY_TIMER(bdev18);
+		result->pbi_io_type                 = PCI_BDEV1C_IOBASE(bdev1c) & 0xf;
+		result->pbi_mem_type                = PCI_BDEV20_MEMBASE(bdev20) & 0xf;
+		result->pbi_prefetch_mem_type       = PCI_BDEV24_PREFETCH_MEMBASE(bdev24) & 0xf;
+		result->pbi_secondary_status        = PCI_BDEV1C_SECONDARY_STATUS(bdev1c);
+		result->pbi_bridge_control          = PCI_BDEV3C_BRIDGECONTROL(bdev3c);
+		result->pbi_io_base                 = ((PCI_BDEV1C_IOBASE(bdev1c) & 0xf0) << 8) | (PCI_BDEV30_IOBASE_HI16(bdev30) << 16);
+		result->pbi_io_limit                = 0xfff | ((PCI_BDEV1C_IOLIMIT(bdev1c) & 0xf0) << 8) | (PCI_BDEV30_IOLIMIT_HI16(bdev30) << 16);
+		result->pbi_mem_base                = (PCI_BDEV20_MEMBASE(bdev20) & 0xfff0) << 16;
+		result->pbi_mem_limit               = 0xfff | (PCI_BDEV20_MEMLIMIT(bdev20) & 0xf0) << 16;
+
+		/* Prefetch information is a bit more complicated. */
+		result->pbi_prefetch_mem_base = (uint64_t)((PCI_BDEV24_PREFETCH_MEMBASE(bdev24) & 0xfff0) << 16) |
+		                                ((uint64_t)pci_rdaddr(self->pd_addr | PCI_BDEV_PREFETCHBASE_HI32) << 32);
+		result->pbi_prefetch_mem_limit = (uint64_t)(0xfff | (PCI_BDEV24_PREFETCH_MEMLIMIT(bdev24) & 0xf0) << 16) |
+		                                 ((uint64_t)pci_rdaddr(self->pd_addr | PCI_BDEV_PREFETCHLIMIT_HI32) << 32);
+	} USER_EXCEPT ({
+		return EACCES;
+	})
+	return EOK;
 }
 
 DEFINE_PUBLIC_ALIAS(pci_device_getinfo_pcmcia_bridge, libpci_device_getinfo_pcmcia_bridge);
 INTERN WUNUSED NONNULL((1, 2)) errno_t
-NOTHROW(CC libpci_device_getinfo_pcmcia_bridge)(struct pci_device *__restrict self,
+NOTHROW(CC libpci_device_getinfo_pcmcia_bridge)(struct pci_device const *__restrict self,
                                                 struct pci_pcmcia_bridge_info *__restrict result) {
-	(void)self;
-	(void)result;
-	COMPILER_IMPURE();
-	/* TODO */
-	return ENOENT;
+	if ((self->pd_header_type & PCI_DEVC_HEADER_TYPEMASK) != PCI_DEVC_HEADER_CARDBUS)
+		return ENOENT;
+	USER_TRY {
+		/* Read in bridge control words. */
+		uint32_t cdev14 = pci_rdaddr(self->pd_addr | PCI_CDEV14);
+		uint32_t cdev18 = pci_rdaddr(self->pd_addr | PCI_CDEV18);
+		uint32_t cdev3c = pci_rdaddr(self->pd_addr | PCI_CDEV3C);
+
+		/* Extract information bits. */
+		result->pcbi_primary_bus           = PCI_CDEV18_PRIMARY_BUS(cdev18);
+		result->pcbi_card_bus              = PCI_CDEV18_CARD_BUS(cdev18);
+		result->pcbi_subordinate_bus       = PCI_CDEV18_SUBORDINATE_BUS(cdev18);
+		result->pcbi_cardbus_latency_timer = PCI_CDEV18_CARDBUS_LATENCY_TIMER(cdev18);
+		result->pcbi_secondary_status      = PCI_CDEV14_SECONDARY_STATUS(cdev14);
+		result->pcbi_bridge_control        = PCI_CDEV3C_BRIDGECONTROL(cdev3c);
+		result->pcbi_mem[0].m_base         = pci_rdaddr(self->pd_addr | PCI_CDEV_MEMBASE0);
+		result->pcbi_mem[0].m_limit        = pci_rdaddr(self->pd_addr | PCI_CDEV_MEMLIMIT0);
+		result->pcbi_mem[1].m_base         = pci_rdaddr(self->pd_addr | PCI_CDEV_MEMBASE1);
+		result->pcbi_mem[1].m_limit        = pci_rdaddr(self->pd_addr | PCI_CDEV_MEMLIMIT1);
+		result->pcbi_io[0].i_base          = pci_rdaddr(self->pd_addr | PCI_CDEV_IOBASE0);
+		result->pcbi_io[0].i_limit         = pci_rdaddr(self->pd_addr | PCI_CDEV_IOLIMIT0);
+		result->pcbi_io[1].i_base          = pci_rdaddr(self->pd_addr | PCI_CDEV_IOBASE1);
+		result->pcbi_io[1].i_limit         = pci_rdaddr(self->pd_addr | PCI_CDEV_IOLIMIT1);
+	} USER_EXCEPT ({
+		return EACCES;
+	})
+	return EOK;
 }
 
 #ifdef __KERNEL__
 INTERN WUNUSED NONNULL((1)) struct pci_device *
-NOTHROW(CC libpci_device_get_parent_bridge)(struct pci_device *__restrict self)
+NOTHROW(CC libpci_device_get_parent_bridge)(struct pci_device const *__restrict self)
 #else /* __KERNEL__ */
 INTERN WUNUSED struct pci_device *
-NOTHROW(CC libpci_device_get_parent_bridge)(/*[0..1]*/ struct pci_device *self)
+NOTHROW(CC libpci_device_get_parent_bridge)(/*[0..1]*/ struct pci_device const *self)
 #endif /* !__KERNEL__ */
 {
 #ifndef __KERNEL__
@@ -1002,7 +1072,7 @@ NOTHROW(CC libpci_device_get_subvendor_name)(struct pci_device const *__restrict
 #ifndef __KERNEL__
 DEFINE_PUBLIC_ALIAS(pci_device_cfg_read, libpci_device_cfg_read);
 INTERN NONNULL((1, 2)) errno_t
-NOTHROW_NCX(CC libpci_device_cfg_read)(struct pci_device *__restrict self,
+NOTHROW_NCX(CC libpci_device_cfg_read)(struct pci_device const *__restrict self,
                                        void *data, uint8_t offset, uint8_t size,
                                        /*[0..1]*/ pciaddr_t *bytes_read) {
 	ssize_t result;
@@ -1030,7 +1100,7 @@ NOTHROW_NCX(CC libpci_device_cfg_write)(struct pci_device *__restrict self,
 
 DEFINE_PUBLIC_ALIAS(pci_device_cfg_read_u8, libpci_device_cfg_read_u8);
 INTERN NONNULL((1, 2)) errno_t
-NOTHROW(CC libpci_device_cfg_read_u8)(struct pci_device *__restrict self,
+NOTHROW(CC libpci_device_cfg_read_u8)(struct pci_device const *__restrict self,
                                       uint8_t *__restrict data, uint8_t reg) {
 	uint32_t word;
 	NESTED_TRY {
@@ -1045,7 +1115,7 @@ NOTHROW(CC libpci_device_cfg_read_u8)(struct pci_device *__restrict self,
 
 DEFINE_PUBLIC_ALIAS(pci_device_cfg_read_u16, libpci_device_cfg_read_u16);
 INTERN NONNULL((1, 2)) errno_t
-NOTHROW(CC libpci_device_cfg_read_u16)(struct pci_device *__restrict self,
+NOTHROW(CC libpci_device_cfg_read_u16)(struct pci_device const *__restrict self,
                                        uint16_t *__restrict data, uint8_t reg) {
 	if likely((reg & 1) == 0) {
 		uint32_t word;
@@ -1075,7 +1145,7 @@ NOTHROW(CC libpci_device_cfg_read_u16)(struct pci_device *__restrict self,
 
 DEFINE_PUBLIC_ALIAS(pci_device_cfg_read_u32, libpci_device_cfg_read_u32);
 INTERN NONNULL((1, 2)) errno_t
-NOTHROW(CC libpci_device_cfg_read_u32)(struct pci_device *__restrict self,
+NOTHROW(CC libpci_device_cfg_read_u32)(struct pci_device const *__restrict self,
                                        uint32_t *__restrict data, uint8_t reg) {
 	if likely((reg & 3) == 0) {
 		uint32_t word;
@@ -1155,7 +1225,7 @@ INTERN NONNULL((1, 2)) size_t
 #else /* __KERNEL__ */
 INTERN NONNULL((1, 2)) ssize_t
 #endif /* !__KERNEL__ */
-NOTHROW_NCX(CC libpci_device_readcfg)(struct pci_device *__restrict self,
+NOTHROW_NCX(CC libpci_device_readcfg)(struct pci_device const *__restrict self,
                                       void *data, uint8_t offset, uint8_t size) {
 	size_t result = 0;
 	USER_TRY {
@@ -1252,7 +1322,7 @@ done:
 /* In user-space, these functions will return 0xff[ff[ffff]] on error and set errno to non-zero */
 DEFINE_PUBLIC_ALIAS(pci_device_cfg_readb, libpci_device_cfg_readb);
 INTERN NONNULL((1)) uint8_t
-NOTHROW(CC libpci_device_cfg_readb)(struct pci_device *__restrict self, uint8_t reg) {
+NOTHROW(CC libpci_device_cfg_readb)(struct pci_device const *__restrict self, uint8_t reg) {
 	uint8_t result;
 	USER_TRY {
 		uint32_t word;
@@ -1267,7 +1337,7 @@ NOTHROW(CC libpci_device_cfg_readb)(struct pci_device *__restrict self, uint8_t 
 
 DEFINE_PUBLIC_ALIAS(pci_device_cfg_readw, libpci_device_cfg_readw);
 INTERN NONNULL((1)) uint16_t
-NOTHROW(CC libpci_device_cfg_readw)(struct pci_device *__restrict self, uint8_t reg) {
+NOTHROW(CC libpci_device_cfg_readw)(struct pci_device const *__restrict self, uint8_t reg) {
 	if likely((reg & 1) == 0) {
 		uint32_t word;
 		USER_TRY {
@@ -1290,7 +1360,7 @@ NOTHROW(CC libpci_device_cfg_readw)(struct pci_device *__restrict self, uint8_t 
 
 DEFINE_PUBLIC_ALIAS(pci_device_cfg_readl, libpci_device_cfg_readl);
 INTERN NONNULL((1)) uint32_t
-NOTHROW(CC libpci_device_cfg_readl)(struct pci_device *__restrict self, uint8_t reg) {
+NOTHROW(CC libpci_device_cfg_readl)(struct pci_device const *__restrict self, uint8_t reg) {
 	if likely((reg & 3) == 0) {
 		uint32_t word;
 		USER_TRY {
@@ -1503,7 +1573,7 @@ NOTHROW(CC libpci_device_vgaarb_unlock)(void) {
 
 DEFINE_PUBLIC_ALIAS(pci_device_vgaarb_get_info, libpci_device_vgaarb_get_info);
 INTERN NONNULL((2, 3)) errno_t
-NOTHROW(CC libpci_device_vgaarb_get_info)(struct pci_device *self,
+NOTHROW(CC libpci_device_vgaarb_get_info)(struct pci_device const *self,
                                           int *__restrict vga_count,
                                           int *__restrict rsrc_decodes) {
 	COMPILER_IMPURE();
