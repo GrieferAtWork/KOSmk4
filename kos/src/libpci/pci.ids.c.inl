@@ -429,12 +429,14 @@ NOTHROW(CC pci_ids_parser_readline)(struct pci_ids_parser *__restrict self) {
 			self->pip_subdevice = id2;
 			self->pip_name      = ptr;
 		}
-//		syslog(LOG_DEBUG, "pci_ids_parser_readline: %#.4x.%#.4x.%#.4x.%#.4x: %q\n",
-//		       self->pip_vendor,
-//		       self->pip_device,
-//		       self->pip_subvendor,
-//		       self->pip_subdevice,
-//		       self->pip_name);
+#if 0
+		syslog(LOG_DEBUG, "pci_ids_parser_readline: %#.4x.%#.4x.%#.4x.%#.4x: %q\n",
+		       self->pip_vendor,
+		       self->pip_device,
+		       self->pip_subvendor,
+		       self->pip_subdevice,
+		       self->pip_name);
+#endif
 		return true;
 	}
 	return false;
@@ -461,7 +463,8 @@ PRIVATE char const *NOTHROW(CC get_device_name)(pci_devnameid_t id) {
 			pci_ids_parser_fini(&parser);
 		}
 		/* Remember that the database doesn't contain this device. */
-		result = remember_device_name(id, "");
+		if (!result)
+			result = remember_device_name(id, "");
 	}
 	if (result && !*result)
 		result = NULL;
@@ -489,7 +492,8 @@ PRIVATE char const *NOTHROW(CC get_vendor_name)(uint16_t vendor_id) {
 			pci_ids_parser_fini(&parser);
 		}
 		/* Remember that the database doesn't contain this vendor. */
-		result = remember_vendor_name(vendor_id, "");
+		if (!result)
+			result = remember_vendor_name(vendor_id, "");
 	}
 	if (result && !*result)
 		result = NULL;
@@ -638,6 +642,24 @@ PRIVATE void NOTHROW(CC preload_system_pci_names)(void) {
 		}
 		pci_ids_parser_fini(&parser);
 	}
+
+	/* Remember empty strings for all vendor/device names that weren't
+	 * contained in the database. This is still required to ensure that
+	 * we won't try to reload the database the first time those strings
+	 * will be requested. */
+	{
+		size_t i;
+		for (i = 0; i < vennames->pvl_size; ++i) {
+			if (find_vendor_name(vennames->pvl_list[i]) == NULL)
+				remember_vendor_name(vennames->pvl_list[i], "");
+		}
+		for (i = 0; i < devnames->pdl_size; ++i) {
+			if (find_device_name(devnames->pdl_list[i]) == NULL)
+				remember_device_name(devnames->pdl_list[i], "");
+		}
+	}
+
+	/* Remember that we've preloaded all system PCI device strings. */
 	did_preload_system_pci_names = true;
 }
 
