@@ -68,8 +68,8 @@ typedef uint64_t pci_devnameid_t;
 /************************************************************************/
 /* Low-level database cache functions                                   */
 /************************************************************************/
-struct geenric_cache_node {
-	LLRBTREE_NODE(geenric_cache_node) gcn_node;  /* Tree node. */
+struct generic_cache_node {
+	LLRBTREE_NODE(generic_cache_node) gcn_node;  /* Tree node. */
 };
 
 struct vendor_cache_node {
@@ -195,15 +195,15 @@ NOTHROW(CC remember_device_name)(pci_devnameid_t id, char const *name) {
 }
 
 PRIVATE NOBLOCK NONNULL((1)) void
-NOTHROW(CC geenric_cache_node_destroy_r)(struct geenric_cache_node *__restrict self) {
-	struct geenric_cache_node *lhs, *rhs;
+NOTHROW(CC generic_cache_node_destroy_r)(struct generic_cache_node *__restrict self) {
+	struct generic_cache_node *lhs, *rhs;
 again:
 	lhs = self->gcn_node.rb_lhs;
 	rhs = self->gcn_node.rb_rhs;
 	free(self);
 	if (lhs) {
 		if (rhs)
-			geenric_cache_node_destroy_r(rhs);
+			generic_cache_node_destroy_r(rhs);
 		self = lhs;
 		goto again;
 	}
@@ -216,9 +216,9 @@ again:
 /* Cleanup all items form the vendor/device name cache. */
 PRIVATE NOBLOCK void NOTHROW(CC fini_name_cache)(void) {
 	if (vendor_cache)
-		geenric_cache_node_destroy_r((struct geenric_cache_node *)vendor_cache);
+		generic_cache_node_destroy_r((struct generic_cache_node *)vendor_cache);
 	if (device_cache)
-		geenric_cache_node_destroy_r((struct geenric_cache_node *)device_cache);
+		generic_cache_node_destroy_r((struct generic_cache_node *)device_cache);
 }
 /************************************************************************/
 
@@ -255,7 +255,7 @@ PRIVATE char *fallback_gzgets(gzFile file, char *buf, int len) {
 	return fgets(buf, (size_t)(unsigned int)len, (FILE *)file);
 }
 
-/* Library finalizers (linked by `-Wl,-fini=libpci_fini') */
+/* Library finalizer (linked by `-Wl,-fini=libpci_fini') */
 INTERN NOBLOCK void libpci_fini(void) {
 	fini_name_cache();
 	if (pdyn_libz)
@@ -435,7 +435,7 @@ NOTHROW(CC pci_ids_parser_readline)(struct pci_ids_parser *__restrict self) {
 	return false;
 }
 
-PRIVATE NONNULL((1)) char *
+PRIVATE WUNUSED NONNULL((1)) char *
 NOTHROW(CC str_strip)(char *__restrict str) {
 	char *end;
 	while (isspace(*str))
@@ -448,34 +448,8 @@ NOTHROW(CC str_strip)(char *__restrict str) {
 }
 
 
-PRIVATE char const *NOTHROW(CC get_device_name)(pci_devnameid_t id) {
-	char *result;
-	result = find_device_name(id);
-	if (!result) {
-		/* Search the database. */
-		struct pci_ids_parser parser;
-		if (pci_ids_parser_init(&parser)) {
-			while (pci_ids_parser_readline(&parser)) {
-				if (parser.pip_device == PCI_MATCH_ANY)
-					continue; /* This is a vendor name... */
-				if (parser.pip_devnameid != id)
-					continue; /* Some other device... */
-				/* Remember this device's name. */
-				result = remember_device_name(id, str_strip(parser.pip_name));
-				break;
-			}
-			pci_ids_parser_fini(&parser);
-		}
-		/* Remember that the database doesn't contain this device. */
-		if (!result)
-			result = remember_device_name(id, "");
-	}
-	if (result && !*result)
-		result = NULL;
-	return result;
-}
-
-PRIVATE char const *NOTHROW(CC get_vendor_name)(uint16_t vendor_id) {
+PRIVATE WUNUSED char const *
+NOTHROW(CC get_vendor_name)(uint16_t vendor_id) {
 	char *result;
 	if (vendor_id == PCI_MATCH_ANY)
 		return NULL;
@@ -504,6 +478,34 @@ PRIVATE char const *NOTHROW(CC get_vendor_name)(uint16_t vendor_id) {
 	return result;
 }
 
+PRIVATE WUNUSED char const *
+NOTHROW(CC get_device_name)(pci_devnameid_t id) {
+	char *result;
+	result = find_device_name(id);
+	if (!result) {
+		/* Search the database. */
+		struct pci_ids_parser parser;
+		if (pci_ids_parser_init(&parser)) {
+			while (pci_ids_parser_readline(&parser)) {
+				if (parser.pip_device == PCI_MATCH_ANY)
+					continue; /* This is a vendor name... */
+				if (parser.pip_devnameid != id)
+					continue; /* Some other device... */
+				/* Remember this device's name. */
+				result = remember_device_name(id, str_strip(parser.pip_name));
+				break;
+			}
+			pci_ids_parser_fini(&parser);
+		}
+		/* Remember that the database doesn't contain this device. */
+		if (!result)
+			result = remember_device_name(id, "");
+	}
+	if (result && !*result)
+		result = NULL;
+	return result;
+}
+
 
 struct pci_vennameid_list {
 	size_t                            pvl_size;  /* # of entries */
@@ -517,7 +519,7 @@ struct pci_devnameid_list {
 
 PRIVATE ATTR_PURE WUNUSED NONNULL((1)) bool
 NOTHROW(CC pci_vennameid_list_contains)(struct pci_vennameid_list const *__restrict self,
-                                           uint16_t id) {
+                                        uint16_t id) {
 	size_t index;
 	BSEARCH (index, self->pvl_list, self->pvl_size, , id) {
 		return true;
@@ -537,70 +539,59 @@ NOTHROW(CC pci_devnameid_list_contains)(struct pci_devnameid_list const *__restr
 
 
 /* Try to insert the given `id' into the list (no-op if `ip' had already been inserted) */
-PRIVATE NONNULL((1, 2)) void
+PRIVATE NONNULL((1)) void
 NOTHROW(CC pci_vennameid_list_insert)(struct pci_vennameid_list *__restrict self,
-                                      size_t *__restrict preq_count,
-                                      size_t *__restrict pcount,
                                       uint16_t id) {
 	size_t index, lo, hi;
-	BSEARCH_EX (index, lo, hi, self->pvl_list, *pcount, , id) {
+	BSEARCH_EX (index, lo, hi, self->pvl_list, self->pvl_size, , id) {
 		/* Already defined. */
 		return;
 	}
-	if (*pcount < self->pvl_size) {
-		/* Insert a new element at `lo' */
-		memmoveup(&self->pvl_list[lo + 1],
-		          &self->pvl_list[lo],
-		          *pcount - lo,
-		          sizeof(self->pvl_list[0]));
-		self->pvl_list[lo] = id;
-		++*pcount;
-	}
-	++*preq_count;
+	/* Insert a new element at `lo' */
+	memmoveup(&self->pvl_list[lo + 1],
+	          &self->pvl_list[lo],
+	          self->pvl_size - lo,
+	          sizeof(self->pvl_list[0]));
+	self->pvl_list[lo] = id;
+	++self->pvl_size;
 }
 
 /* Try to insert the given `id' into the list (no-op if `ip' had already been inserted) */
-PRIVATE NONNULL((1, 2)) void
+PRIVATE NONNULL((1)) void
 NOTHROW(CC pci_devnameid_list_insert)(struct pci_devnameid_list *__restrict self,
-                                      size_t *__restrict preq_count,
-                                      size_t *__restrict pcount,
                                       pci_devnameid_t id) {
 	size_t index, lo, hi;
-	BSEARCH_EX (index, lo, hi, self->pdl_list, *pcount, , id) {
+	BSEARCH_EX (index, lo, hi, self->pdl_list, self->pdl_size, , id) {
 		/* Already defined. */
 		return;
 	}
-	if (*pcount < self->pdl_size) {
-		/* Insert a new element at `lo' */
-		memmoveup(&self->pdl_list[lo + 1],
-		          &self->pdl_list[lo],
-		          *pcount - lo,
-		          sizeof(self->pdl_list[0]));
-		self->pdl_list[lo] = id;
-		++*pcount;
-	}
-	++*preq_count;
+	/* Insert a new element at `lo' */
+	memmoveup(&self->pdl_list[lo + 1],
+	          &self->pdl_list[lo],
+	          self->pdl_size - lo,
+	          sizeof(self->pdl_list[0]));
+	self->pdl_list[lo] = id;
+	++self->pdl_size;
 }
 
 
 /* Collect used device and vendor name IDs. */
-PRIVATE NONNULL((1, 2, 3, 4)) void
-NOTHROW(CC collect_devname_ids)(struct pci_vennameid_list *ven_names, size_t *__restrict preq_venname_ids,
-                                struct pci_devnameid_list *dev_names, size_t *__restrict preq_devname_ids) {
+PRIVATE NONNULL((1, 2)) void
+NOTHROW(CC collect_devname_ids)(struct pci_vennameid_list *ven_names,
+                                struct pci_devnameid_list *dev_names) {
 	struct pci_device *dev;
-	size_t venname_count = 0;
-	size_t devname_count = 0;
-	*preq_venname_ids    = 0;
-	*preq_devname_ids    = 0;
 	SLIST_FOREACH (dev, &libpci_devices, _pd_link) {
-		pci_vennameid_list_insert(ven_names, preq_venname_ids, &venname_count, dev->pd_vendor_id);
-		pci_vennameid_list_insert(ven_names, preq_venname_ids, &venname_count, dev->pd_subvendor_id);
-		pci_devnameid_list_insert(dev_names, preq_devname_ids, &devname_count,
+		if (dev->pd_vendor_id == PCI_MATCH_ANY)
+			continue; /* Ignored... */
+		pci_vennameid_list_insert(ven_names, dev->pd_vendor_id);
+		if (dev->pd_subvendor_id != PCI_MATCH_ANY)
+			pci_vennameid_list_insert(ven_names, dev->pd_subvendor_id);
+		pci_devnameid_list_insert(dev_names,
 		                          PCI_DEVNAMEID_MAKE(dev->pd_vendor_id,
 		                                             dev->pd_device_id,
 		                                             PCI_MATCH_ANY,
 		                                             PCI_MATCH_ANY));
-		pci_devnameid_list_insert(dev_names, preq_devname_ids, &devname_count,
+		pci_devnameid_list_insert(dev_names,
 		                          PCI_DEVNAMEID_MAKE(dev->pd_vendor_id,
 		                                             dev->pd_device_id,
 		                                             dev->pd_subvendor_id,
@@ -608,30 +599,61 @@ NOTHROW(CC collect_devname_ids)(struct pci_vennameid_list *ven_names, size_t *__
 	}
 }
 
+/* Return upper limit estimates for how many vendor/device names are referenced. */
+PRIVATE WUNUSED void
+NOTHROW(CC get_pci_device_id_max_count)(size_t *__restrict pvendor_count,
+                                      size_t *__restrict pdevice_count) {
+	struct pci_device *dev;
+	*pvendor_count = 0;
+	*pdevice_count = 0;
+	SLIST_FOREACH (dev, &libpci_devices, _pd_link) {
+		if (dev->pd_vendor_id == PCI_MATCH_ANY)
+			continue; /* Ignored... */
+		++*pvendor_count;
+		if (dev->pd_subvendor_id != PCI_MATCH_ANY &&
+		    dev->pd_subvendor_id != dev->pd_vendor_id)
+			++*pvendor_count;
+		++*pdevice_count;
+		if (dev->pd_subvendor_id != PCI_MATCH_ANY ||
+		    dev->pd_subdevice_id != PCI_MATCH_ANY)
+			++*pdevice_count;
+	}
+}
+
 PRIVATE bool did_preload_system_pci_names = false;
 PRIVATE void NOTHROW(CC preload_system_pci_names)(void) {
 	struct pci_ids_parser parser;
-	size_t req_vencount, req_devcount, zero = 0;
 	struct pci_vennameid_list *vennames;
 	struct pci_devnameid_list *devnames;
-	collect_devname_ids((struct pci_vennameid_list *)&zero, &req_vencount,
-	                    (struct pci_devnameid_list *)&zero, &req_devcount);
-	vennames = (struct pci_vennameid_list *)alloca(offsetof(struct pci_vennameid_list, pvl_list) + (req_vencount * sizeof(uint16_t)));
-	devnames = (struct pci_devnameid_list *)alloca(offsetof(struct pci_devnameid_list, pdl_list) + (req_devcount * sizeof(pci_devnameid_t)));
-	vennames->pvl_size = req_vencount;
-	devnames->pdl_size = req_devcount;
-	collect_devname_ids(vennames, &req_vencount,
-	                    devnames, &req_devcount);
-	assertf(req_vencount <= vennames->pvl_size,
-	        "req_vencount       = %" PRIuSIZ "\n"
-	        "vennames->pvl_size = %" PRIuSIZ "\n",
-	        req_vencount, vennames->pvl_size);
-	assertf(req_devcount <= devnames->pdl_size,
-	        "req_devcount       = %" PRIuSIZ "\n"
-	        "devnames->pdl_size = %" PRIuSIZ "\n",
-	        req_devcount, devnames->pdl_size);
-	vennames->pvl_size = req_vencount;
-	devnames->pdl_size = req_devcount;
+	size_t vencount, devcount;
+
+	/* Get upper-bound estimates on how many different vendor/device IDs we might need. */
+	get_pci_device_id_max_count(&vencount, &devcount);
+
+	/* Allocate buffers for the vendor/device ID lists (these lists will be sorted,
+	 * meaning that we can check for relevant IDs in O(log2(N)) while scanning  the
+	 * database) */
+	vennames = (struct pci_vennameid_list *)alloca(offsetof(struct pci_vennameid_list, pvl_list) +
+	                                               (vencount * sizeof(uint16_t)));
+	devnames = (struct pci_devnameid_list *)alloca(offsetof(struct pci_devnameid_list, pdl_list) +
+	                                               (devcount * sizeof(pci_devnameid_t)));
+
+	/* Initially, both lists are empty. */
+	vennames->pvl_size = 0;
+	devnames->pdl_size = 0;
+
+	/* Actually collect all of the different vendor/device IDs. */
+	collect_devname_ids(vennames, devnames);
+	assertf(vennames->pvl_size <= vencount,
+	        "vennames->pvl_size = %" PRIuSIZ "\n"
+	        "vencount           = %" PRIuSIZ "\n",
+	        vennames->pvl_size, vencount);
+	assertf(devnames->pdl_size <= devcount,
+	        "devnames->pdl_size = %" PRIuSIZ "\n"
+	        "devcount           = %" PRIuSIZ "\n",
+	        devnames->pdl_size, devcount);
+
+	/* Scan the database for the releval IDs. */
 	if (pci_ids_parser_init(&parser)) {
 		while (pci_ids_parser_readline(&parser)) {
 			if (parser.pip_device == PCI_MATCH_ANY) {
