@@ -782,19 +782,30 @@ struct pci_agp_info {
 	union {
 		__uint8_t        pai_cfg2;          /* == `pci_device_cfg_readb(config_offset + 2)' */
 		struct {
+#if __BYTE_ORDER__ == __ORDER_LITTLE_ENDIAN__
 			unsigned int pai_minor_version : 4; /* == `pci_device_cfg_readb(config_offset + 2) & 0xf' */
 			unsigned int pai_major_version : 4; /* == `(pci_device_cfg_readb(config_offset + 2) & 0xf0) >> 4' */
+#else /* __BYTE_ORDER__ == __ORDER_LITTLE_ENDIAN__ */
+			unsigned int pai_major_version : 4; /* == `(pci_device_cfg_readb(config_offset + 2) & 0xf0) >> 4' */
+			unsigned int pai_minor_version : 4; /* == `pci_device_cfg_readb(config_offset + 2) & 0xf' */
+#endif /* __BYTE_ORDER__ != __ORDER_LITTLE_ENDIAN__ */
 		};
 #ifndef __USE_KOS_ALTERATIONS
 		struct {
+#if __BYTE_ORDER__ == __ORDER_LITTLE_ENDIAN__
 			unsigned int minor_version : 4; /* == `pci_device_cfg_readb(config_offset + 2) & 0xf' */
 			unsigned int major_version : 4; /* == `(pci_device_cfg_readb(config_offset + 2) & 0xf0) >> 4' */
+#else /* __BYTE_ORDER__ == __ORDER_LITTLE_ENDIAN__ */
+			unsigned int major_version : 4; /* == `(pci_device_cfg_readb(config_offset + 2) & 0xf0) >> 4' */
+			unsigned int minor_version : 4; /* == `pci_device_cfg_readb(config_offset + 2) & 0xf' */
+#endif /* __BYTE_ORDER__ != __ORDER_LITTLE_ENDIAN__ */
 		};
 #endif /* !__USE_KOS_ALTERATIONS */
 	};
 	union {
 		__uint32_t   _pai_cfg4_mod;         /* Slightly modified `pci_device_cfg_readl(config_offset + 4)' */
 		struct {
+#if __BYTE_ORDER__ == __ORDER_LITTLE_ENDIAN__
 			unsigned int pai_rates : 4;         /* Bitset of supported rates (1: 1x, 2: 2x, 4: 4x and 8:8x)  */
 			unsigned int pai_fast_writes : 1;   /* Support for fast-writes. */
 			unsigned int pai_addr64 : 1;        /* ... */
@@ -804,9 +815,21 @@ struct pci_agp_info {
 			unsigned int pai_sideband : 1;      /* Support for side-band addressing. */
 			unsigned int __pai_pad : 6;         /* ... */
 			unsigned int pai_isochronus : 1;    /* ... */
+#else /* __BYTE_ORDER__ == __ORDER_LITTLE_ENDIAN__ */
+			unsigned int pai_isochronus : 1;    /* ... */
+			unsigned int __pai_pad : 6;         /* ... */
+			unsigned int pai_sideband : 1;      /* Support for side-band addressing. */
+			unsigned int pai_coherent : 1;      /* ... */
+			unsigned int pai_gart64 : 1;        /* ... */
+			unsigned int pai_htrans : 1;        /* ... */
+			unsigned int pai_addr64 : 1;        /* ... */
+			unsigned int pai_fast_writes : 1;   /* Support for fast-writes. */
+			unsigned int pai_rates : 4;         /* Bitset of supported rates (1: 1x, 2: 2x, 4: 4x and 8:8x)  */
+#endif /* __BYTE_ORDER__ != __ORDER_LITTLE_ENDIAN__ */
 		};
 #ifndef __USE_KOS_ALTERATIONS
 		struct {
+#if __BYTE_ORDER__ == __ORDER_LITTLE_ENDIAN__
 			unsigned int rates : 4;         /* Bitset of supported rates (1: 1x, 2: 2x, 4: 4x and 8:8x)  */
 			unsigned int fast_writes : 1;   /* Support for fast-writes. */
 			unsigned int addr64 : 1;        /* ... */
@@ -816,6 +839,17 @@ struct pci_agp_info {
 			unsigned int sideband : 1;      /* Support for side-band addressing. */
 			unsigned int __pad : 6;         /* ... */
 			unsigned int isochronus : 1;    /* ... */
+#else /* __BYTE_ORDER__ == __ORDER_LITTLE_ENDIAN__ */
+			unsigned int isochronus : 1;    /* ... */
+			unsigned int __pad : 6;         /* ... */
+			unsigned int sideband : 1;      /* Support for side-band addressing. */
+			unsigned int coherent : 1;      /* ... */
+			unsigned int gart64 : 1;        /* ... */
+			unsigned int htrans : 1;        /* ... */
+			unsigned int addr64 : 1;        /* ... */
+			unsigned int fast_writes : 1;   /* Support for fast-writes. */
+			unsigned int rates : 4;         /* Bitset of supported rates (1: 1x, 2: 2x, 4: 4x and 8:8x)  */
+#endif /* __BYTE_ORDER__ != __ORDER_LITTLE_ENDIAN__ */
 		};
 #endif /* !__USE_KOS_ALTERATIONS */
 	};
@@ -839,8 +873,14 @@ struct pci_agp_info {
 #endif /* !__USE_KOS_ALTERATIONS */
 #else /* __USE_KOS */
 	__uint8_t    config_offset;            /* PCI_ADDR_REGMASK-style offset for the capability matrix.  */
+#if __BYTE_ORDER__ == __ORDER_LITTLE_ENDIAN__
 	unsigned int minor_version : 4;        /* == `pci_device_cfg_readb(config_offset + 2) & 0xf' */
 	unsigned int major_version : 4;        /* == `(pci_device_cfg_readb(config_offset + 2) & 0xf0) >> 4' */
+#else /* __BYTE_ORDER__ == __ORDER_LITTLE_ENDIAN__ */
+	unsigned int major_version : 4;        /* == `(pci_device_cfg_readb(config_offset + 2) & 0xf0) >> 4' */
+	unsigned int minor_version : 4;        /* == `pci_device_cfg_readb(config_offset + 2) & 0xf' */
+#endif /* __BYTE_ORDER__ != __ORDER_LITTLE_ENDIAN__ */
+#if __BYTE_ORDER__ == __ORDER_LITTLE_ENDIAN__
 	unsigned int rates : 4;                /* Bitset of supported rates (1: 1x, 2: 2x, 4: 4x and 8:8x)  */
 	unsigned int fast_writes : 1;          /* Support for fast-writes. */
 	unsigned int addr64 : 1;               /* ... */
@@ -850,6 +890,17 @@ struct pci_agp_info {
 	unsigned int sideband : 1;             /* Support for side-band addressing. */
 	unsigned int __pad : 6;                /* ... */
 	unsigned int isochronus : 1;           /* ... */
+#else /* __BYTE_ORDER__ == __ORDER_LITTLE_ENDIAN__ */
+	unsigned int isochronus : 1;           /* ... */
+	unsigned int __pad : 6;                /* ... */
+	unsigned int sideband : 1;             /* Support for side-band addressing. */
+	unsigned int coherent : 1;             /* ... */
+	unsigned int gart64 : 1;               /* ... */
+	unsigned int htrans : 1;               /* ... */
+	unsigned int addr64 : 1;               /* ... */
+	unsigned int fast_writes : 1;          /* Support for fast-writes. */
+	unsigned int rates : 4;                /* Bitset of supported rates (1: 1x, 2: 2x, 4: 4x and 8:8x)  */
+#endif /* __BYTE_ORDER__ != __ORDER_LITTLE_ENDIAN__ */
 	__uint8_t    async_req_size;           /* ... */
 	__uint8_t    calibration_cycle_timing; /* ... */
 	__uint8_t    max_requests;             /* ... */
@@ -864,10 +915,20 @@ struct pci_bridge_info {
 	__uint8_t  pbi_secondary_bus;           /* == `pci_device_cfg_readb(0x19)' */
 	__uint8_t  pbi_subordinate_bus;         /* == `pci_device_cfg_readb(0x1a)' */
 	__uint8_t  pbi_secondary_latency_timer; /* == `pci_device_cfg_readb(0x1b)' */
+#if __BYTE_ORDER__ == __ORDER_LITTLE_ENDIAN__
 	unsigned int pbi_io_type : 4;           /* == `pci_device_cfg_readb(0x1c) & 0xf' */
 	unsigned int pbi_mem_type : 4;          /* == `pci_device_cfg_readb(0x20) & 0xf' */
+#else /* __BYTE_ORDER__ == __ORDER_LITTLE_ENDIAN__ */
+	unsigned int pbi_mem_type : 4;          /* == `pci_device_cfg_readb(0x20) & 0xf' */
+	unsigned int pbi_io_type : 4;           /* == `pci_device_cfg_readb(0x1c) & 0xf' */
+#endif /* __BYTE_ORDER__ != __ORDER_LITTLE_ENDIAN__ */
+#if __BYTE_ORDER__ == __ORDER_LITTLE_ENDIAN__
 	unsigned int pbi_prefetch_mem_type : 4; /* == `pci_device_cfg_readb(0x24) & 0xf' */
 	unsigned int __pbi_pad : 4;             /* ... */
+#else /* __BYTE_ORDER__ == __ORDER_LITTLE_ENDIAN__ */
+	unsigned int __pbi_pad : 4;             /* ... */
+	unsigned int pbi_prefetch_mem_type : 4; /* == `pci_device_cfg_readb(0x24) & 0xf' */
+#endif /* __BYTE_ORDER__ != __ORDER_LITTLE_ENDIAN__ */
 	__uint16_t pbi_secondary_status;        /* == `pci_device_cfg_readw(0x1e)' */
 	__uint16_t pbi_bridge_control;          /* == `pci_device_cfg_readw(0x3e)' */
 	__uint16_t __pbi_pad2;                  /* ... */
@@ -896,16 +957,42 @@ struct pci_bridge_info {
 	};
 	union {
 		struct {
+#if __BYTE_ORDER__ == __ORDER_LITTLE_ENDIAN__
 			unsigned int pbi_io_type : 4;           /* == `pci_device_cfg_readb(0x1c) & 0xf' */
 			unsigned int pbi_mem_type : 4;          /* == `pci_device_cfg_readb(0x20) & 0xf' */
-			unsigned int pbi_prefetch_mem_type : 4; /* == `pci_device_cfg_readb(0x24) & 0xf' */
-			unsigned int __pbi_pad : 4;             /* ... */
+#else /* __BYTE_ORDER__ == __ORDER_LITTLE_ENDIAN__ */
+			unsigned int pbi_mem_type : 4;          /* == `pci_device_cfg_readb(0x20) & 0xf' */
+			unsigned int pbi_io_type : 4;           /* == `pci_device_cfg_readb(0x1c) & 0xf' */
+#endif /* __BYTE_ORDER__ != __ORDER_LITTLE_ENDIAN__ */
 		};
 		struct {
+#if __BYTE_ORDER__ == __ORDER_LITTLE_ENDIAN__
 			unsigned int io_type : 4;           /* == `pci_device_cfg_readb(0x1c) & 0xf' */
 			unsigned int mem_type : 4;          /* == `pci_device_cfg_readb(0x20) & 0xf' */
+#else /* __BYTE_ORDER__ == __ORDER_LITTLE_ENDIAN__ */
+			unsigned int mem_type : 4;          /* == `pci_device_cfg_readb(0x20) & 0xf' */
+			unsigned int io_type : 4;           /* == `pci_device_cfg_readb(0x1c) & 0xf' */
+#endif /* __BYTE_ORDER__ != __ORDER_LITTLE_ENDIAN__ */
+		};
+	};
+	union {
+		struct {
+#if __BYTE_ORDER__ == __ORDER_LITTLE_ENDIAN__
+			unsigned int pbi_prefetch_mem_type : 4; /* == `pci_device_cfg_readb(0x24) & 0xf' */
+			unsigned int __pbi_pad : 4;             /* ... */
+#else /* __BYTE_ORDER__ == __ORDER_LITTLE_ENDIAN__ */
+			unsigned int __pbi_pad : 4;             /* ... */
+			unsigned int pbi_prefetch_mem_type : 4; /* == `pci_device_cfg_readb(0x24) & 0xf' */
+#endif /* __BYTE_ORDER__ != __ORDER_LITTLE_ENDIAN__ */
+		};
+		struct {
+#if __BYTE_ORDER__ == __ORDER_LITTLE_ENDIAN__
 			unsigned int prefetch_mem_type : 4; /* == `pci_device_cfg_readb(0x24) & 0xf' */
 			unsigned int __pad : 4;             /* ... */
+#else /* __BYTE_ORDER__ == __ORDER_LITTLE_ENDIAN__ */
+			unsigned int __pad : 4;             /* ... */
+			unsigned int prefetch_mem_type : 4; /* == `pci_device_cfg_readb(0x24) & 0xf' */
+#endif /* __BYTE_ORDER__ != __ORDER_LITTLE_ENDIAN__ */
 		};
 	};
 	union {
@@ -947,10 +1034,20 @@ struct pci_bridge_info {
 	__uint8_t  secondary_bus;           /* == `pci_device_cfg_readb(0x19)' */
 	__uint8_t  subordinate_bus;         /* == `pci_device_cfg_readb(0x1a)' */
 	__uint8_t  secondary_latency_timer; /* == `pci_device_cfg_readb(0x1b)' */
+#if __BYTE_ORDER__ == __ORDER_LITTLE_ENDIAN__
 	unsigned int io_type : 4;           /* == `pci_device_cfg_readb(0x1c) & 0xf' */
 	unsigned int mem_type : 4;          /* == `pci_device_cfg_readb(0x20) & 0xf' */
+#else /* __BYTE_ORDER__ == __ORDER_LITTLE_ENDIAN__ */
+	unsigned int mem_type : 4;          /* == `pci_device_cfg_readb(0x20) & 0xf' */
+	unsigned int io_type : 4;           /* == `pci_device_cfg_readb(0x1c) & 0xf' */
+#endif /* __BYTE_ORDER__ != __ORDER_LITTLE_ENDIAN__ */
+#if __BYTE_ORDER__ == __ORDER_LITTLE_ENDIAN__
 	unsigned int prefetch_mem_type : 4; /* == `pci_device_cfg_readb(0x24) & 0xf' */
 	unsigned int __pad : 4;             /* ... */
+#else /* __BYTE_ORDER__ == __ORDER_LITTLE_ENDIAN__ */
+	unsigned int __pad : 4;             /* ... */
+	unsigned int prefetch_mem_type : 4; /* == `pci_device_cfg_readb(0x24) & 0xf' */
+#endif /* __BYTE_ORDER__ != __ORDER_LITTLE_ENDIAN__ */
 	__uint16_t secondary_status;        /* == `pci_device_cfg_readw(0x1e)' */
 	__uint16_t bridge_control;          /* == `pci_device_cfg_readw(0x3e)' */
 	__uint16_t __pad2;                  /* ... */
