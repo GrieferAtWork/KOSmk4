@@ -745,10 +745,7 @@ NOTHROW(CC libpci_device_probe)(struct pci_device *__restrict self) {
 DEFINE_PUBLIC_ALIAS(pci_device_byaddr, libpci_device_byaddr);
 INTERN WUNUSED struct pci_device *
 NOTHROW(CC libpci_device_byaddr)(pciaddr_t addr) {
-	(void)addr;
-	COMPILER_IMPURE();
-	/* TODO */
-	return NULL;
+	return pcidev_tree_locate(libpci_devices_tree, addr);
 }
 
 /* Fill in information about bridge bus indices (s.a. `PCI_ADDR_BUSMASK') */
