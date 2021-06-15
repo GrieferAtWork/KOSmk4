@@ -287,9 +287,9 @@ BEGIN_SCAN_FUNCTION(pci_scan_function, pciaddr_t addr) {
 		/* Write a system log entry for the detected device. */
 		printk(FREESTR(KERN_INFO
 		               "[pci] Device at %" PRIp32 " located "
-		               "[vendor:%.4" PRIx16 ",%.4" PRIx16 ","
-		               " device:%.4" PRIx16 ",%.4" PRIx16 ","
-		               " class:%.2" PRIx8 ".%.2" PRIx8 ".%.2" PRIx8 ".%.2" PRIx8 "]\n"),
+		               "[vendor:%#.4" PRIx16 ",%#.4" PRIx16 ","
+		               " device:%#.4" PRIx16 ",%#.4" PRIx16 ","
+		               " class:%#.2" PRIx8 ".%#.2" PRIx8 ".%#.2" PRIx8 ".%#.2" PRIx8 "]\n"),
 		       dev->pd_addr,
 		       dev->pd_vendor_id, dev->pd_subvendor_id,
 		       dev->pd_device_id, dev->pd_subdevice_id,
@@ -300,9 +300,9 @@ BEGIN_SCAN_FUNCTION(pci_scan_function, pciaddr_t addr) {
 		/* Insert the device into the tree of known devices. */
 		pcidev_tree_insert(&libpci_devices_tree, dev);
 		SLIST_INSERT(&libpci_devices, dev, _pd_link);
-		if (dev->pd_class_id == PCI_DEV8_CLASS_BRIDGE /* &&
-		    dev->pd_subclass_id == PCI_DEV8_CLASS_MUMEDIA*/) {
-			/* Recursively enumerate a bridge device. */
+		if ((dev->pd_header_type & PCI_DEVC_HEADER_TYPEMASK) == PCI_DEVC_HEADER_BRIDGE ||
+		    (dev->pd_header_type & PCI_DEVC_HEADER_TYPEMASK) == PCI_DEVC_HEADER_CARDBUS) {
+			/* Recursively enumerate a bridge devices. */
 			uint32_t bdev18 = pci_rdaddr(addr | PCI_BDEV18);
 			uint8_t bus     = PCI_BDEV18_SECONDARY_BUS(bdev18);
 			CALL_SCAN_FUNCTION(pci_scan_bus(PCI_ADDR(bus, 0, 0)));
@@ -593,7 +593,8 @@ NOTHROW(CC libpci_device_probe)(struct pci_device *__restrict self) {
 		romreg                = 0xff;
 		self->pd_subvendor_id = PCI_DEV0_VENDOR_NODEV;
 		self->pd_subdevice_id = PCI_DEV0_VENDOR_NODEV;
-		switch (PCI_DEVC_HEADER(devc) & PCI_DEVC_HEADER_TYPEMASK) {
+		self->pd_header_type  = PCI_DEVC_HEADER(devc);
+		switch (self->pd_header_type & PCI_DEVC_HEADER_TYPEMASK) {
 		case PCI_DEVC_HEADER_GENERIC: {
 			uint32_t dev3c;
 			self->pd_gdev2c = pci_rdaddr(addr | PCI_GDEV2C);

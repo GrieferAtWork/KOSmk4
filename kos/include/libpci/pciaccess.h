@@ -542,10 +542,17 @@ struct pci_device {
 #endif /* !__KERNEL__ */
 	struct { /* NOTE: This is an SLIST_ENTRY()-compatible structure! */
 		struct pci_device *sle_next;
-	} _pd_link;                     /* [0..1][const] Unordered list of all PCI devices. */
-	struct pci_device *_pd_next_lo; /* [0..1][const] Another device (left node of internal LLRB-tree) */
-	struct pci_device *_pd_next_hi; /* [0..1][const] Another device (left node of internal LLRB-tree) */
-	uint8_t            _pd_tree_rd; /* [const] Read tree leaf. */
+	} _pd_link;                        /* [0..1][const] Unordered list of all PCI devices. */
+	struct pci_device *_pd_next_lo;    /* [0..1][const] Another device (left node of internal LLRB-tree) */
+	struct pci_device *_pd_next_hi;    /* [0..1][const] Another device (left node of internal LLRB-tree) */
+	uint8_t            _pd_tree_rd;    /* [const] Read tree leaf. */
+#ifdef __USE_KOS
+	uint8_t            pd_header_type; /* [const] Device header type (== `PCI_DEVC_HEADER(pci_device_cfg_readl(PCI_DEVC))').
+	                                    * One of `PCI_DEVC_HEADER_*', optionally or'd with `PCI_DEVC_HEADER_MULTIDEV' */
+#else /* __USE_KOS */
+	uint8_t           _pd_header_type; /* [const] Device header type (== `PCI_DEVC_HEADER(pci_device_cfg_readl(PCI_DEVC))').
+	                                    * One of `PCI_DEVC_HEADER_*', optionally or'd with `PCI_DEVC_HEADER_MULTIDEV' */
+#endif /* !__USE_KOS */
 
 #if 0
 	int vgaarb_rsrc; /* Currently not defined... */
