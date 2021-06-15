@@ -34,8 +34,9 @@
 
 #include <hybrid/byteorder.h>
 
-#include <bits/types.h>
 #include <asm/os/mman.h>
+#include <bits/types.h>
+#include <kos/anno.h>
 
 /* Flags for `pci_device_map_range::map_flags' */
 #define PCI_DEV_MAP_FLAG_WRITABLE      (__PROT_WRITE)
@@ -578,12 +579,12 @@ struct pci_device {
 	} _pd_link;                        /* [0..1][const] Unordered list of all PCI devices. */
 	struct pci_device *_pd_next_lo;    /* [0..1][const] Another device (left node of internal LLRB-tree) */
 	struct pci_device *_pd_next_hi;    /* [0..1][const] Another device (left node of internal LLRB-tree) */
-	uint8_t            _pd_tree_rd;    /* [const] Read tree leaf. */
+	__uint8_t          _pd_tree_rd;    /* [const] Read tree leaf. */
 #ifdef __USE_KOS
-	uint8_t            pd_header_type; /* [const] Device header type (== `PCI_DEVC_HEADER(pci_device_cfg_readl(PCI_DEVC))').
+	__uint8_t          pd_header_type; /* [const] Device header type (== `PCI_DEVC_HEADER(pci_device_cfg_readl(PCI_DEVC))').
 	                                    * One   of  `PCI_DEVC_HEADER_*',  optionally  or'd  with  `PCI_DEVC_HEADER_MULTIDEV' */
 #else /* __USE_KOS */
-	uint8_t           _pd_header_type; /* [const] Device header type (== `PCI_DEVC_HEADER(pci_device_cfg_readl(PCI_DEVC))').
+	__uint8_t         _pd_header_type; /* [const] Device header type (== `PCI_DEVC_HEADER(pci_device_cfg_readl(PCI_DEVC))').
 	                                    * One   of  `PCI_DEVC_HEADER_*',  optionally  or'd  with  `PCI_DEVC_HEADER_MULTIDEV' */
 #endif /* !__USE_KOS */
 
