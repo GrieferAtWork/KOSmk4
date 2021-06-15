@@ -43,6 +43,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#include <syslog.h>
 
 #include <libpci/paths.h>
 
@@ -369,8 +370,6 @@ NOTHROW(CC ishex4)(char const buf[4]) {
 	       isxdigit(buf[2]) && isxdigit(buf[3]);
 }
 
-#include <syslog.h>
-
 /* Read the next line from the database (returning `false' on EOF) */
 PRIVATE NONNULL((1)) bool
 NOTHROW(CC pci_ids_parser_readline)(struct pci_ids_parser *__restrict self) {
@@ -417,14 +416,8 @@ NOTHROW(CC pci_ids_parser_readline)(struct pci_ids_parser *__restrict self) {
 				continue;
 			id2 = decode_hex4(ptr);
 			ptr += 4;
-			if (isspace(*ptr)) {
-				do {
-					++ptr;
-				} while (isspace(*ptr));
-			} else {
-				if (*ptr != '\0')
-					continue;
-			}
+			if (!isspace(*ptr) && *ptr != '\0')
+				continue;
 			self->pip_subvendor = id;
 			self->pip_subdevice = id2;
 			self->pip_name      = ptr;
@@ -442,6 +435,17 @@ NOTHROW(CC pci_ids_parser_readline)(struct pci_ids_parser *__restrict self) {
 	return false;
 }
 
+PRIVATE NONNULL((1)) char *
+NOTHROW(CC str_strip)(char *__restrict str) {
+	char *end;
+	while (isspace(*str))
+		++str;
+	end = strend(str);
+	while (end > str && isspace(end[-1]))
+		--end;
+	*end = '\0';
+	return str;
+}
 
 
 PRIVATE char const *NOTHROW(CC get_device_name)(pci_devnameid_t id) {
@@ -457,7 +461,7 @@ PRIVATE char const *NOTHROW(CC get_device_name)(pci_devnameid_t id) {
 				if (parser.pip_devnameid != id)
 					continue; /* Some other device... */
 				/* Remember this device's name. */
-				result = remember_device_name(id, parser.pip_name);
+				result = remember_device_name(id, str_strip(parser.pip_name));
 				break;
 			}
 			pci_ids_parser_fini(&parser);
@@ -486,7 +490,7 @@ PRIVATE char const *NOTHROW(CC get_vendor_name)(uint16_t vendor_id) {
 				if (parser.pip_vendor != vendor_id)
 					continue; /* Some other vendor name... */
 				/* Remember this vendor's name. */
-				result = remember_vendor_name(vendor_id, parser.pip_name);
+				result = remember_vendor_name(vendor_id, str_strip(parser.pip_name));
 				break;
 			}
 			pci_ids_parser_fini(&parser);
@@ -633,17 +637,17 @@ PRIVATE void NOTHROW(CC preload_system_pci_names)(void) {
 			if (parser.pip_device == PCI_MATCH_ANY) {
 				/* Vendor name. */
 				if (pci_vennameid_list_contains(vennames, parser.pip_vendor))
-					remember_vendor_name(parser.pip_vendor, parser.pip_name);
+					remember_vendor_name(parser.pip_vendor, str_strip(parser.pip_name));
 			} else {
 				/* Device name. */
 				if (pci_devnameid_list_contains(devnames, parser.pip_devnameid))
-					remember_device_name(parser.pip_devnameid, parser.pip_name);
+					remember_device_name(parser.pip_devnameid, str_strip(parser.pip_name));
 			}
 		}
 		pci_ids_parser_fini(&parser);
 	}
 
-	/* Remember empty strings for all vendor/device names that weren't
+	/* Remember empty strings for all vendor/device names that  weren't
 	 * contained in the database. This is still required to ensure that
 	 * we won't try to reload the database the first time those strings
 	 * will be requested. */
