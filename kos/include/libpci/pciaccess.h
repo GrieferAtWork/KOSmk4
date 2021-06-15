@@ -72,9 +72,9 @@ struct pci_bridge_info;
 struct pci_pcmcia_bridge_info;
 
 /* PCI System initialization.
- * NOTE: These functions are really only of interest to user-space.
+ * NOTE: These functions  are  really  only  of  interest  to  user-space.
  *       Within the kernel, `pci_system_init()' isn't exported to drivers,
- *       and is unconditionally called during system boot initialization. */
+ *       and  is unconditionally called during system boot initialization. */
 #ifdef __KERNEL__
 #ifdef CONFIG_BUILDING_KERNEL_CORE
 __INTDEF void __NOTHROW(LIBPCI_CC pci_system_init)(void);
@@ -581,10 +581,10 @@ struct pci_device {
 	uint8_t            _pd_tree_rd;    /* [const] Read tree leaf. */
 #ifdef __USE_KOS
 	uint8_t            pd_header_type; /* [const] Device header type (== `PCI_DEVC_HEADER(pci_device_cfg_readl(PCI_DEVC))').
-	                                    * One of `PCI_DEVC_HEADER_*', optionally or'd with `PCI_DEVC_HEADER_MULTIDEV' */
+	                                    * One   of  `PCI_DEVC_HEADER_*',  optionally  or'd  with  `PCI_DEVC_HEADER_MULTIDEV' */
 #else /* __USE_KOS */
 	uint8_t           _pd_header_type; /* [const] Device header type (== `PCI_DEVC_HEADER(pci_device_cfg_readl(PCI_DEVC))').
-	                                    * One of `PCI_DEVC_HEADER_*', optionally or'd with `PCI_DEVC_HEADER_MULTIDEV' */
+	                                    * One   of  `PCI_DEVC_HEADER_*',  optionally  or'd  with  `PCI_DEVC_HEADER_MULTIDEV' */
 #endif /* !__USE_KOS */
 
 #if 0

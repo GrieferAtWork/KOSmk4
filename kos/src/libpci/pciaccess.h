@@ -48,9 +48,9 @@ typedef __port_t port_t;
 #endif /* !__port_t_defined */
 
 /* PCI System initialization.
- * NOTE: These functions are really only of interest to user-space.
+ * NOTE: These functions  are  really  only  of  interest  to  user-space.
  *       Within the kernel, `pci_system_init()' isn't exported to drivers,
- *       and is unconditionally called during system boot initialization. */
+ *       and  is unconditionally called during system boot initialization. */
 #ifdef __KERNEL__
 INTDEF FREE void NOTHROW(CC libpci_system_init)(void);
 #else /* __KERNEL__ */

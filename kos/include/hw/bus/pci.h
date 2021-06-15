@@ -75,7 +75,9 @@ typedef __uint32_t pci_addr_t; /* PCI Address (Following configuration space mec
 #define    PCI_DEV0_VENDOR(x)          ((x) & PCI_DEV0_VENDORMASK)
 #define    PCI_DEV0_VENDOR_NODEV       0xffff /* Returned by non-existent devices. */
 #define PCI_DEV4                       0x4 /* Status/Command register. */
+#define    PCI_DEV4_STAT(x)            (((x) & PCI_DEV4_STATMASK) >> PCI_DEV4_STATSHIFT)
 #define    PCI_DEV4_STATMASK           0xffff0000
+#define    PCI_DEV4_STATSHIFT          16
 #define       PCI_CDEV4_STAT_DETECT_PARITY_ERROR 0x8000 /* Set on parity error. */
 #define       PCI_CDEV4_STAT_SIGNAL_SYSTEM_ERROR 0x4000 /* Set when SERR# is asserted. */
 #define       PCI_CDEV4_STAT_MASTER_ABORT        0x2000 /* Set by the master when a transaction is aborted with Master-Abort. */
@@ -91,6 +93,7 @@ typedef __uint32_t pci_addr_t; /* PCI Address (Following configuration space mec
 #define       PCI_CDEV4_STAT_HAVE_CAPLINK_34     0x0010 /* The device implements a capability list as offset 0x34. */
 #define       PCI_CDEV4_STAT_IRQ_STATUS          0x0004 /* When set alongside `PCI_CDEV4_NOIRQ' being disabled, interrupts can be generated. */
 #define    PCI_DEV4_CMDMASK            0x0000ffff
+#define    PCI_DEV4_CMDSHIFT           0
 #define       PCI_DEV4_CMD_DISCONNECT  0 /* When written to `PCI_DEV_STATCMD_CMDMASK', disconnect the device from the PCI bus. */
 #define       PCI_CDEV4_NOIRQ          0x0400 /* Interrupt disabled. */
 #define       PCI_CDEV4_FAST_B2B       0x0200 /* Allow fast back-to-back transactions. */
@@ -102,8 +105,6 @@ typedef __uint32_t pci_addr_t; /* PCI Address (Following configuration space mec
 #define       PCI_CDEV4_BUSMASTER      0x0004 /* Allow the device to behave as bus Master. */
 #define       PCI_CDEV4_ALLOW_MEMTOUCH 0x0002 /* Allow the device to receive notifications when the CPU touches memory. */
 #define       PCI_CDEV4_ALLOW_IOTOUCH  0x0001 /* Allow the device to receive notifications when the CPU writes to I/O space. */
-#define    PCI_DEV4_STATSHIFT          16
-#define    PCI_DEV4_CMDSHIFT           0
 #define PCI_DEV8                       0x8 /* Class code, subclass, Prog IF and Revision ID. */
 #define    PCI_DEV8_CLASS(x)           (((x) & PCI_DEV8_CLASSMASK) >> PCI_DEV8_CLASSSHIFT)
 #define    PCI_DEV8_CLASSMASK          0xff000000
@@ -171,18 +172,22 @@ typedef __uint32_t pci_addr_t; /* PCI Address (Following configuration space mec
 #define    PCI_GDEV2C_VENDORSHIFT 0
 #define PCI_GDEV_EXPROM  0x30 /* Expansion ROM base address. */
 #define PCI_GDEV_RES0    0x34 /* Reserved + Capabilities pointer. */
-#define    PCI_GDEV_RES0_CAPPTRMASK  0x000000ff
+#define    PCI_GDEV_RES0_CAPPTR(x)   (((x) & PCI_GDEV_RES0_CAPPTRMASK) >> PCI_GDEV_RES0_CAPPTRSHIFT)
+#define    PCI_GDEV_RES0_CAPPTRMASK  0x000000fc
 #define    PCI_GDEV_RES0_CAPPTRSHIFT 0
 #define PCI_GDEV_RES1    0x38 /* Reserved. */
 #define PCI_GDEV3C       0x3c
+#define    PCI_GDEV3C_MAXLATENCY(x)   (((x) & PCI_GDEV3C_MAXLATENCYMASK) >> PCI_GDEV3C_MAXLATENCYSHIFT)
 #define    PCI_GDEV3C_MAXLATENCYMASK  0xff000000 /* Specifies how often the device needs access to the PCI bus (in 1/4 microsecond units). */
+#define    PCI_GDEV3C_MAXLATENCYSHIFT 24
+#define    PCI_GDEV3C_MINGRANT(x)     (((x) & PCI_GDEV3C_MINGRANTMASK) >> PCI_GDEV3C_MINGRANTSHIFT)
 #define    PCI_GDEV3C_MINGRANTMASK    0x00ff0000 /* Specifies the burst period length, in 1/4 microsecond units, that the device needs (assuming a 33 MHz clock rate). */
+#define    PCI_GDEV3C_MINGRANTSHIFT   16
+#define    PCI_GDEV3C_IRQPIN(x)       (((x) & PCI_GDEV3C_IRQPINMASK) > PCI_GDEV3C_IRQPINSHIFT)
 #define    PCI_GDEV3C_IRQPINMASK      0x0000ff00 /* Interrupt pin number. */
+#define    PCI_GDEV3C_IRQPINSHIFT     8
 #define    PCI_GDEV3C_IRQLINE(x)      (((x) & PCI_GDEV3C_IRQLINEMASK) >> PCI_GDEV3C_IRQLINESHIFT)
 #define    PCI_GDEV3C_IRQLINEMASK     0x000000ff /* Interrupt line number. */
-#define    PCI_GDEV3C_MAXLATENCYSHIFT 24
-#define    PCI_GDEV3C_MINGRANTSHIFT   16
-#define    PCI_GDEV3C_IRQPINSHIFT     8
 #define    PCI_GDEV3C_IRQLINESHIFT    0
 
 /* PCI Header-type (PCI_DEVC_HEADER_BRIDGE) specific registers. */
@@ -293,6 +298,19 @@ typedef __uint32_t pci_addr_t; /* PCI Address (Following configuration space mec
 #define    PCI_CDEV40_SSYSIDSHIFT 16
 #define    PCI_CDEV40_VENDORSHIFT 0
 #define PCI_CDEV_LEGACY_BASEADDR16 0x44 /* 16-bit PC Card legacy mode base address. */
+
+/* Capabilities pointer data layout descriptor. (s.a. `PCI_GDEV_RES0' and `PCI_CDEV4_STAT_HAVE_CAPLINK_34') */
+#define PCI_CAPPTR_CAPID(x)      (((x) & PCI_CAPPTR_CAPIDMASK) >> PCI_CAPPTR_CAPIDSHIFT)
+#define PCI_CAPPTR_CAPIDMASK     0x000000ff /* Capability ID (one of `PCI_CAPID_*') */
+#define PCI_CAPPTR_CAPIDSHIFT    0
+#define    PCI_CAPID_AGP         2
+#define PCI_CAPPTR_NEXT(x)       (((x) & PCI_CAPPTR_NEXTMASK) >> PCI_CAPPTR_NEXTSHIFT)
+#define PCI_CAPPTR_NEXTMASK      0x0000fc00 /* Register index for the next capability */
+#define PCI_CAPPTR_NEXTSHIFT     8
+#define PCI_CAPPTR_VERSION(x)    (((x) & PCI_CAPPTR_VERSIONMASK) >> PCI_CAPPTR_VERSIONSHIFT)
+#define PCI_CAPPTR_VERSIONMASK   0x00ff0000 /* Capability version number */
+#define PCI_CAPPTR_VERSIONSHIFT  16
+
 
 /* BAR data layout descriptor. */
 #define PCI_BAR_SPACEMASK     0x00000001 /* BAR address space indicator (one of `PCI_BAR_SPACE_*') */

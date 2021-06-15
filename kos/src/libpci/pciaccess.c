@@ -36,6 +36,7 @@
 #include <kos/except.h>
 #include <kos/types.h>
 #include <sys/io.h>
+#include <sys/param.h>
 
 #include <assert.h>
 #include <errno.h>
@@ -368,9 +369,9 @@ END_SCAN_FUNCTION
 
 
 /* PCI System initialization.
- * NOTE: These functions are really only of interest to user-space.
+ * NOTE: These functions  are  really  only  of  interest  to  user-space.
  *       Within the kernel, `pci_system_init()' isn't exported to drivers,
- *       and is unconditionally called during system boot initialization. */
+ *       and  is unconditionally called during system boot initialization. */
 #ifdef __KERNEL__
 DEFINE_INTERN_ALIAS(pci_system_init, libpci_system_init);
 INTERN ATTR_FREETEXT void NOTHROW(CC libpci_system_init)(void)
@@ -787,11 +788,42 @@ DEFINE_PUBLIC_ALIAS(pci_device_getinfo_agp, libpci_device_getinfo_agp);
 INTERN WUNUSED NONNULL((1, 2)) errno_t
 NOTHROW(CC libpci_device_getinfo_agp)(struct pci_device const *__restrict self,
                                       struct pci_agp_info *__restrict result) {
-	(void)self;
-	(void)result;
-	COMPILER_IMPURE();
-	/* TODO */
-	return ENOENT;
+	USER_TRY {
+		uint32_t dev4;
+		uint8_t capptr;
+		byte_t visited_offsets[CEILDIV((0xff + 1) / 4, NBBY)];
+#define VISITED_OFFSETS_OP(capptr, op) \
+	(visited_offsets[((capptr) / 4) / NBBY] op (1 << (((capptr) / 4) % NBBY)))
+
+		/* Check if the device has a capabilities pointer at offset 0x34 */
+		dev4 = pci_rdaddr(self->pd_addr | PCI_DEV4);
+		if (!(PCI_DEV4_STAT(dev4) & PCI_CDEV4_STAT_HAVE_CAPLINK_34))
+			return ENOSYS; /* Not supported */
+		capptr = PCI_GDEV_RES0_CAPPTR(pci_rdaddr(self->pd_addr | 0x34));
+		memset(visited_offsets, 0, sizeof(visited_offsets));
+		visited_offsets[0] = 1 | 2 | 4 | 8; /* The first 4 control words can't be capabilities (because they're PCI_DEV0...PCI_DEVC) */
+		while (!VISITED_OFFSETS_OP(capptr, &)) {
+			uint32_t capword;
+			VISITED_OFFSETS_OP(capptr, |=);
+			capword = pci_rdaddr(self->pd_addr | capptr);
+			if (PCI_CAPPTR_CAPID(capword) == PCI_CAPID_AGP) {
+				result->pai_config_offset = capptr;
+				result->pai_cfg2          = PCI_CAPPTR_VERSION(capword);
+				result->_pai_cfg4_mod     = pci_rdaddr(self->pd_addr | (capptr + 4));
+				if (result->pai_rates & 0x8) /* AGP3 support */
+					result->pai_rates <<= 2;
+				result->pai_async_req_size           = 4 + (1 << ((result->_pai_cfg4_mod & 0xe000) >> 13));
+				result->pai_calibration_cycle_timing = (result->_pai_cfg4_mod & 0x1c00) >> 10;
+				result->pai_max_requests             = 1 + ((result->_pai_cfg4_mod & 0xff000000) >> 24);
+				return EOK;
+			}
+			capptr = PCI_CAPPTR_NEXT(capword);
+		}
+#undef VISITED_OFFSETS_OP
+	} USER_EXCEPT ({
+		return EACCES;
+	})
+	return ENOSYS;
 }
 
 DEFINE_PUBLIC_ALIAS(pci_device_getinfo_bridge, libpci_device_getinfo_bridge);
