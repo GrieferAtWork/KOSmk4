@@ -72,14 +72,16 @@ NOTHROW(CC libpci_get_strings)(/*[1..1]*/ struct pci_id_match const *__restrict 
 /************************************************************************/
 /* PCI Device search API.                                               */
 /************************************************************************/
-INTDEF NONNULL((1, 2)) void NOTHROW(CC libpci_slot_match_iterator_init)(struct pci_device_iterator *__restrict self, struct pci_slot_match const *__restrict match);
-INTDEF NONNULL((1, 2)) void NOTHROW(CC libpci_id_match_iterator_init)(struct pci_device_iterator *__restrict self, struct pci_id_match const *__restrict match);
+#ifndef __KERNEL__
+INTDEF NONNULL((1)) void NOTHROW(CC libpci_slot_match_iterator_init)(struct pci_device_iterator *__restrict self, struct pci_slot_match const *match);
+#endif /* !__KERNEL__ */
+INTDEF NONNULL((1)) void NOTHROW(CC libpci_id_match_iterator_init)(struct pci_device_iterator *__restrict self, struct pci_id_match const *match);
 #ifdef __KERNEL__
 INTDEF WUNUSED NONNULL((1)) struct pci_device *NOTHROW(CC libpci_device_next)(/*[1..1]*/ struct pci_device_iterator *iter);
 #else /* __KERNEL__ */
 INTDEF WUNUSED struct pci_device *NOTHROW(CC libpci_device_next)(/*[0..1]*/ struct pci_device_iterator *iter);
-INTDEF ATTR_MALLOC WUNUSED NONNULL((1)) struct pci_device_iterator *NOTHROW(CC libpci_slot_match_iterator_create)(struct pci_slot_match const *__restrict match);
-INTDEF ATTR_MALLOC WUNUSED NONNULL((1)) struct pci_device_iterator *NOTHROW(CC libpci_id_match_iterator_create)(struct pci_id_match const *__restrict match);
+INTDEF ATTR_MALLOC WUNUSED struct pci_device_iterator *NOTHROW(CC libpci_slot_match_iterator_create)(struct pci_slot_match const *match);
+INTDEF ATTR_MALLOC WUNUSED struct pci_device_iterator *NOTHROW(CC libpci_id_match_iterator_create)(struct pci_id_match const *match);
 INTDEF void NOTHROW(CC libpci_iterator_destroy)(/*[0..1]*/ struct pci_device_iterator *iter);
 #endif /* !__KERNEL__ */
 

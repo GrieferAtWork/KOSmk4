@@ -40,6 +40,7 @@
 #include <assert.h>
 #include <errno.h>
 #include <inttypes.h>
+#include <stdbool.h>
 #include <stddef.h>
 #include <stdint.h>
 #include <stdlib.h>
@@ -488,24 +489,76 @@ NOTHROW(CC libpci_get_strings)(/*[1..1]*/ struct pci_id_match const *__restrict 
 /************************************************************************/
 /* PCI Device search API.                                               */
 /************************************************************************/
-DEFINE_PUBLIC_ALIAS(pci_slot_match_iterator_init, libpci_slot_match_iterator_init);
-INTERN NONNULL((1, 2)) void
-NOTHROW(CC libpci_slot_match_iterator_init)(struct pci_device_iterator *__restrict self,
-                                            struct pci_slot_match const *__restrict match) {
-	(void)self;
-	(void)match;
-	COMPILER_IMPURE();
-	/* TODO */
+PRIVATE WUNUSED ATTR_PURE NONNULL((1, 2)) bool
+NOTHROW(CC iterator_matches_device)(struct pci_device_iterator const *__restrict self,
+                                    struct pci_device const *__restrict dev) {
+	if (!PCI_ID_COMPARE(self->pdi_vendor_id, dev->pd_vendor_id))
+		goto nope;
+	if (!PCI_ID_COMPARE(self->pdi_device_id, dev->pd_device_id))
+		goto nope;
+	if (!PCI_ID_COMPARE(self->pdi_subvendor_id, dev->pd_subvendor_id))
+		goto nope;
+	if (!PCI_ID_COMPARE(self->pdi_subdevice_id, dev->pd_subdevice_id))
+		goto nope;
+	if ((dev->pd_device_class & self->pdi_device_class_mask) != self->pdi_device_class)
+		goto nope;
+	return true;
+nope:
+	return false;
 }
 
+
+#ifndef __KERNEL__
+DEFINE_PUBLIC_ALIAS(pci_slot_match_iterator_init, libpci_slot_match_iterator_init);
+INTERN NONNULL((1)) void
+NOTHROW(CC libpci_slot_match_iterator_init)(struct pci_device_iterator *__restrict self,
+                                            struct pci_slot_match const *match) {
+	if (match) {
+		struct pci_device *dev;
+		pciaddr_t addr;
+		addr = match->psm_addr & ~0xff; /* Mask out the domain address. */
+		dev  = pcidev_tree_locate(libpci_devices_tree, addr);
+
+		/* Set-up impossible device class requirements (there is no `x', such that `(x & 0) == 1') */
+		self->pdi_device_class      = 1;
+		self->pdi_device_class_mask = 0;
+
+		/* Have the first call to `pci_device_next()' return the requested device. */
+		self->pdi_next = dev;
+	} else {
+		self->pdi_next = SLIST_FIRST(&libpci_devices);
+		self->pdi_device_class      = 0;
+		self->pdi_device_class_mask = 0;
+		self->pdi_vendor_id         = PCI_MATCH_ANY;
+		self->pdi_device_id         = PCI_MATCH_ANY;
+		self->pdi_subvendor_id      = PCI_MATCH_ANY;
+		self->pdi_subdevice_id      = PCI_MATCH_ANY;
+	}
+}
+#endif /* !__KERNEL__ */
+
 DEFINE_PUBLIC_ALIAS(pci_id_match_iterator_init, libpci_id_match_iterator_init);
-INTERN NONNULL((1, 2)) void
+INTERN NONNULL((1)) void
 NOTHROW(CC libpci_id_match_iterator_init)(struct pci_device_iterator *__restrict self,
-                                          struct pci_id_match const *__restrict match) {
-	(void)self;
-	(void)match;
-	COMPILER_IMPURE();
-	/* TODO */
+                                          struct pci_id_match const *match) {
+	self->pdi_next = SLIST_FIRST(&libpci_devices);
+	if (match) {
+		self->pdi_device_class      = match->pim_device_class;
+		self->pdi_device_class_mask = match->pim_device_class_mask;
+		self->pdi_vendor_id         = match->pim_vendor_id;
+		self->pdi_device_id         = match->pim_device_id;
+		self->pdi_subvendor_id      = match->pim_subvendor_id;
+		self->pdi_subdevice_id      = match->pim_subdevice_id;
+		while (self->pdi_next && !iterator_matches_device(self, self->pdi_next))
+			self->pdi_next = SLIST_NEXT(self->pdi_next, _pd_link);
+	} else {
+		self->pdi_device_class      = 0;
+		self->pdi_device_class_mask = 0;
+		self->pdi_vendor_id         = PCI_MATCH_ANY;
+		self->pdi_device_id         = PCI_MATCH_ANY;
+		self->pdi_subvendor_id      = PCI_MATCH_ANY;
+		self->pdi_subdevice_id      = PCI_MATCH_ANY;
+	}
 }
 
 DEFINE_PUBLIC_ALIAS(pci_device_next, libpci_device_next);
@@ -517,20 +570,26 @@ INTERN WUNUSED struct pci_device *
 NOTHROW(CC libpci_device_next)(/*[0..1]*/ struct pci_device_iterator *iter)
 #endif /* !__KERNEL__ */
 {
+	struct pci_device *result, *next;
 #ifndef __KERNEL__
 	if unlikely(!iter)
 		return NULL;
 #endif /* !__KERNEL__ */
-	(void)iter;
-	COMPILER_IMPURE();
-	/* TODO */
-	return NULL;
+	result = iter->pdi_next;
+
+	/* Load the next device that should be enumerated. */
+	for (next = SLIST_NEXT(result, _pd_link); next; next = SLIST_NEXT(next, _pd_link)) {
+		if (iterator_matches_device(iter, next))
+			break;
+	}
+	iter->pdi_next = next;
+	return result;
 }
 
 #ifndef __KERNEL__
 DEFINE_PUBLIC_ALIAS(pci_slot_match_iterator_create, libpci_slot_match_iterator_create);
-INTERN ATTR_MALLOC WUNUSED NONNULL((1)) struct pci_device_iterator *
-NOTHROW(CC libpci_slot_match_iterator_create)(struct pci_slot_match const *__restrict match) {
+INTERN ATTR_MALLOC WUNUSED struct pci_device_iterator *
+NOTHROW(CC libpci_slot_match_iterator_create)(struct pci_slot_match const *match) {
 	struct pci_device_iterator *result;
 	result = (struct pci_device_iterator *)malloc(sizeof(struct pci_device_iterator));
 	if likely(result)
@@ -539,8 +598,8 @@ NOTHROW(CC libpci_slot_match_iterator_create)(struct pci_slot_match const *__res
 }
 
 DEFINE_PUBLIC_ALIAS(pci_id_match_iterator_create, libpci_id_match_iterator_create);
-INTERN ATTR_MALLOC WUNUSED NONNULL((1)) struct pci_device_iterator *
-NOTHROW(CC libpci_id_match_iterator_create)(struct pci_id_match const *__restrict match) {
+INTERN ATTR_MALLOC WUNUSED struct pci_device_iterator *
+NOTHROW(CC libpci_id_match_iterator_create)(struct pci_id_match const *match) {
 	struct pci_device_iterator *result;
 	result = (struct pci_device_iterator *)malloc(sizeof(struct pci_device_iterator));
 	if likely(result)

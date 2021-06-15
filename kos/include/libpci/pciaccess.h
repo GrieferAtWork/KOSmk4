@@ -87,12 +87,12 @@ LIBPCI_DECL void __NOTHROW(LIBPCI_CC pci_system_cleanup)(void);
 
 
 /* Special PCI match ID: Match anything. (all 1-bits) */
-#define PCI_MATCH_ANY (~0U)
+#define PCI_MATCH_ANY __UINT16_C(0xffff)
 
 /* Check if the given 2 PCI ids are identical.
  * Used internally to compare fields of `struct pci_id_match' and `struct pci_device' */
 #define PCI_ID_COMPARE(a, b) \
-	(((a) == PCI_MATCH_ANY) || ((a) == (b)))
+	((a) == PCI_MATCH_ANY || (a) == (b))
 
 /* Descriptor for a PCI device search query (based on ID) */
 struct pci_id_match {
@@ -182,14 +182,14 @@ struct pci_slot_match {
 #ifdef __USE_KOS
 	union {
 		struct {
-			__uint8_t    psm_domain;   /* Always `0' (for now) */
+			__uint8_t    psm_domain;   /* Ignored (for now) */
 			unsigned int psm_func: 3;  /* s.a. `PCI_ADDR_FUNMASK' */
 			unsigned int psm_dev: 5;   /* s.a. `PCI_ADDR_DEVMASK' */
 			__uint8_t    psm_bus;      /* s.a. `PCI_ADDR_BUSMASK' */
 		};
 #ifndef __USE_KOS_ALTERATIONS
 		struct {
-			__uint8_t    domain;   /* Always `0' (for now) */
+			__uint8_t    domain;   /* Ignored (for now) */
 			unsigned int func: 3;  /* s.a. `PCI_ADDR_FUNMASK' */
 			unsigned int dev: 5;   /* s.a. `PCI_ADDR_DEVMASK' */
 			__uint8_t    bus;      /* s.a. `PCI_ADDR_BUSMASK' */
@@ -198,7 +198,7 @@ struct pci_slot_match {
 		pciaddr_t        psm_addr;      /* PCI match address. */
 	};
 #else /* __USE_KOS */
-	__uint8_t    domain;   /* Always `0' (for now) */
+	__uint8_t    domain;   /* Ignored (for now) */
 	unsigned int func: 3;  /* s.a. `PCI_ADDR_FUNMASK' */
 	unsigned int dev: 5;   /* s.a. `PCI_ADDR_DEVMASK' */
 	__uint8_t    bus;      /* s.a. `PCI_ADDR_BUSMASK' */
@@ -225,19 +225,52 @@ __NOTHROW(LIBPCI_CC pci_get_strings)(/*[1..1]*/ struct pci_id_match const *__res
 /************************************************************************/
 /* PCI Device search API.                                               */
 /************************************************************************/
-struct pci_device_iterator {
-	int placeholder; /* TODO */
-};
 #if defined(__USE_KOS) || defined(__USE_KOS_KERNEL)
-LIBPCI_DECL __ATTR_NONNULL((1, 2)) void __NOTHROW(LIBPCI_CC pci_slot_match_iterator_init)(struct pci_device_iterator *__restrict self, struct pci_slot_match const *__restrict match);
-LIBPCI_DECL __ATTR_NONNULL((1, 2)) void __NOTHROW(LIBPCI_CC pci_id_match_iterator_init)(struct pci_device_iterator *__restrict self, struct pci_id_match const *__restrict match);
+struct pci_device_iterator {
+	struct pci_device *pdi_next; /* [0..1] Next device to enumerate (`NULL' when done) */
+	union {
+		struct {
+#if __BYTE_ORDER__ == __ORDER_LITTLE_ENDIAN__
+			__uint16_t pdi_vendor_id;         /* [const] s.a. `PCI_DEV0_VENDORMASK' */
+			__uint16_t pdi_device_id;         /* [const] s.a. `PCI_DEV0_DEVICEMASK' */
+#else /* __BYTE_ORDER__ == __ORDER_LITTLE_ENDIAN__ */
+			__uint16_t pdi_device_id;         /* [const] s.a. `PCI_DEV0_DEVICEMASK' */
+			__uint16_t pdi_vendor_id;         /* [const] s.a. `PCI_DEV0_VENDORMASK' */
+#endif /* __BYTE_ORDER__ != __ORDER_LITTLE_ENDIAN__ */
+		};
+		__uint32_t     pdi_dev0;              /* [const] s.a. `PCI_DEV0' */
+	};
+	union {
+		struct {
+#if __BYTE_ORDER__ == __ORDER_LITTLE_ENDIAN__
+			__uint16_t pdi_subvendor_id;      /* [const] s.a. `PCI_GDEV2C_VENDORMASK' */
+			__uint16_t pdi_subdevice_id;      /* [const] s.a. `PCI_GDEV2C_SSYSIDMASK' */
+#else /* __BYTE_ORDER__ == __ORDER_LITTLE_ENDIAN__ */
+			__uint16_t pdi_subdevice_id;      /* [const] s.a. `PCI_GDEV2C_SSYSIDMASK' */
+			__uint16_t pdi_subvendor_id;      /* [const] s.a. `PCI_GDEV2C_VENDORMASK' */
+#endif /* __BYTE_ORDER__ != __ORDER_LITTLE_ENDIAN__ */
+		};
+		__uint32_t     pdi_gdev2c;            /* [const] s.a. `PCI_GDEV2C' */
+	};
+	pciclass_t         pdi_device_class;      /* [const] Required class bits */
+	pciclass_t         pdi_device_class_mask; /* [const] Masked class bits */
+};
+#else /* __USE_KOS || __USE_KOS_KERNEL */
+struct pci_device_iterator; /* opaque... */
+#endif /* !__USE_KOS && !__USE_KOS_KERNEL */
+
+#if defined(__USE_KOS) || defined(__USE_KOS_KERNEL)
+#ifndef __KERNEL__
+LIBPCI_DECL __ATTR_NONNULL((1)) void __NOTHROW(LIBPCI_CC pci_slot_match_iterator_init)(struct pci_device_iterator *__restrict self, struct pci_slot_match const *match);
+#endif /* !__KERNEL__ */
+LIBPCI_DECL __ATTR_NONNULL((1)) void __NOTHROW(LIBPCI_CC pci_id_match_iterator_init)(struct pci_device_iterator *__restrict self, struct pci_id_match const *match);
 #endif /* __USE_KOS || __USE_KOS_KERNEL */
 #ifdef __KERNEL__
 LIBPCI_DECL __ATTR_WUNUSED __ATTR_NONNULL((1)) struct pci_device *__NOTHROW(LIBPCI_CC pci_device_next)(/*[1..1]*/ struct pci_device_iterator *iter);
 #else /* __KERNEL__ */
 LIBPCI_DECL __ATTR_WUNUSED struct pci_device *__NOTHROW(LIBPCI_CC pci_device_next)(/*[0..1]*/ struct pci_device_iterator *iter);
-LIBPCI_DECL __ATTR_MALLOC __ATTR_WUNUSED __ATTR_NONNULL((1)) struct pci_device_iterator *__NOTHROW(LIBPCI_CC pci_slot_match_iterator_create)(struct pci_slot_match const *__restrict match);
-LIBPCI_DECL __ATTR_MALLOC __ATTR_WUNUSED __ATTR_NONNULL((1)) struct pci_device_iterator *__NOTHROW(LIBPCI_CC pci_id_match_iterator_create)(struct pci_id_match const *__restrict match);
+LIBPCI_DECL __ATTR_MALLOC __ATTR_WUNUSED struct pci_device_iterator *__NOTHROW(LIBPCI_CC pci_slot_match_iterator_create)(struct pci_slot_match const *match);
+LIBPCI_DECL __ATTR_MALLOC __ATTR_WUNUSED struct pci_device_iterator *__NOTHROW(LIBPCI_CC pci_id_match_iterator_create)(struct pci_id_match const *match);
 LIBPCI_DECL void __NOTHROW(LIBPCI_CC pci_iterator_destroy)(/*[0..1]*/ struct pci_device_iterator *iter);
 #endif /* !__KERNEL__ */
 
