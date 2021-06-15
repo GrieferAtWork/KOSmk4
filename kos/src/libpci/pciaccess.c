@@ -1,3 +1,8 @@
+/*[[[magic
+local gcc_opt = options.setdefault("GCC.options", []);
+gcc_opt.removeif([](x) -> x.startswith("-O"));
+gcc_opt.append("-O3"); // Force-enable optimizations (mainly for faster pci.ids scanning)
+]]]*/
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -201,6 +206,8 @@ SLIST_HEAD(pci_device_slist, pci_device);
 #endif /* !__pci_device_slist_defined */
 
 
+#ifndef __libpci_devices_defined
+#define __libpci_devices_defined
 #ifdef __KERNEL__
 DEFINE_PUBLIC_ALIAS(pci_devices, libpci_devices);
 INTERN
@@ -209,6 +216,7 @@ PRIVATE
 #endif /* !__KERNEL__ */
 /* [0..n][const] List of PCI devices. (random order) */
 struct pci_device_slist libpci_devices = SLIST_HEAD_INITIALIZER(libpci_devices);
+#endif /* !__libpci_devices_defined */
 
 /* [0..n][const] Tree of PCI devices. (lookup via `pd_addr') */
 PRIVATE LLRBTREE_ROOT(pci_device) libpci_devices_tree = NULL;
@@ -487,29 +495,6 @@ INTERN NOBLOCK void NOTHROW(CC libpci_system_cleanup)(void) {
 }
 #endif /* !__KERNEL__ */
 
-#ifndef __KERNEL__
-/* Lookup the device names matching the given description. */
-DEFINE_PUBLIC_ALIAS(pci_get_strings, libpci_get_strings);
-INTERN NONNULL((1)) void
-NOTHROW(CC libpci_get_strings)(/*[1..1]*/ struct pci_id_match const *__restrict match,
-                               /*[0..1]*/ char const **pdevice_name,
-                               /*[0..1]*/ char const **pvendor_name,
-                               /*[0..1]*/ char const **psubdevice_name,
-                               /*[0..1]*/ char const **psubvendor_name) {
-	(void)match;
-	COMPILER_IMPURE();
-	/* TODO */
-	if (pdevice_name)
-		*pdevice_name = NULL;
-	if (pvendor_name)
-		*pvendor_name = NULL;
-	if (psubdevice_name)
-		*psubdevice_name = NULL;
-	if (psubvendor_name)
-		*psubvendor_name = NULL;
-}
-#endif /* !__KERNEL__ */
-
 
 
 /************************************************************************/
@@ -602,13 +587,14 @@ NOTHROW(CC libpci_device_next)(/*[0..1]*/ struct pci_device_iterator *iter)
 		return NULL;
 #endif /* !__KERNEL__ */
 	result = iter->pdi_next;
-
-	/* Load the next device that should be enumerated. */
-	for (next = SLIST_NEXT(result, _pd_link); next; next = SLIST_NEXT(next, _pd_link)) {
-		if (iterator_matches_device(iter, next))
-			break;
+	if (result) {
+		/* Load the next device that should be enumerated. */
+		for (next = SLIST_NEXT(result, _pd_link); next; next = SLIST_NEXT(next, _pd_link)) {
+			if (iterator_matches_device(iter, next))
+				break;
+		}
+		iter->pdi_next = next;
 	}
-	iter->pdi_next = next;
 	return result;
 }
 
@@ -1095,44 +1081,6 @@ NOTHROW(CC libpci_device_has_kernel_driver)(struct pci_device const *__restrict 
 	(void)self;
 	return 0;
 }
-
-/* Return device names (retrieved from the "pci.ids" database; only available in user-space) */
-DEFINE_PUBLIC_ALIAS(pci_device_get_device_name, libpci_device_get_device_name);
-INTERN WUNUSED NONNULL((1)) char const *
-NOTHROW(CC libpci_device_get_device_name)(struct pci_device const *__restrict self) {
-	(void)self;
-	COMPILER_IMPURE();
-	/* TODO */
-	return NULL;
-}
-
-DEFINE_PUBLIC_ALIAS(pci_device_get_subdevice_name, libpci_device_get_subdevice_name);
-INTERN WUNUSED NONNULL((1)) char const *
-NOTHROW(CC libpci_device_get_subdevice_name)(struct pci_device const *__restrict self) {
-	(void)self;
-	COMPILER_IMPURE();
-	/* TODO */
-	return NULL;
-}
-
-DEFINE_PUBLIC_ALIAS(pci_device_get_vendor_name, libpci_device_get_vendor_name);
-INTERN WUNUSED NONNULL((1)) char const *
-NOTHROW(CC libpci_device_get_vendor_name)(struct pci_device const *__restrict self) {
-	(void)self;
-	COMPILER_IMPURE();
-	/* TODO */
-	return NULL;
-}
-
-DEFINE_PUBLIC_ALIAS(pci_device_get_subvendor_name, libpci_device_get_subvendor_name);
-INTERN WUNUSED NONNULL((1)) char const *
-NOTHROW(CC libpci_device_get_subvendor_name)(struct pci_device const *__restrict self) {
-	(void)self;
-	COMPILER_IMPURE();
-	/* TODO */
-	return NULL;
-}
-
 #endif /* !__KERNEL__ */
 
 
@@ -1767,5 +1715,9 @@ NOTHROW(CC libpci_io_write32)(struct pci_io_handle *handle, port_t reg, uint32_t
 #endif /* !__KERNEL__ */
 
 DECL_END
+
+#ifndef __INTELLISENSE__
+#include "pci.ids.c.inl"
+#endif /* !__INTELLISENSE__ */
 
 #endif /* !GUARD_LIBPCI_PCIACCESS_C */
