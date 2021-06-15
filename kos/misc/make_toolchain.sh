@@ -394,7 +394,7 @@ do_mkdir "$PREFIX/bin"
 do_mkdir "$PREFIX/usr"
 do_mkdir "$PREFIX/share"
 do_mkdir "$PREFIX/lib"
-do_mkdir "$PREFIX/opt"
+do_mkdir "$PREFIX/opt/pkg_config"
 do_mkdir "$PREFIX/$TARGET/usr"
 
 # Make sure that our bin/lib paths were created, else GCC won't detect them...
@@ -783,6 +783,31 @@ symlink_binutil readelf
 symlink_binutil size
 symlink_binutil strings
 symlink_binutil strip
+
+install_cat_file() {
+	echo "Checking for $1"
+	if ! [ -f "$1" ]; then
+		echo "Creating file $1"
+		cat > "$1" < /dev/stdin
+	else
+		echo "    File already exists"
+	fi
+}
+
+# KOS includes a built-in version of libpciaccess.
+# Advertise this fact such that 3rd party programs can find it.
+install_cat_file "$PREFIX/opt/pkg_config/pciaccess.pc" <<EOF
+prefix=/
+exec_prefix=/
+libdir=$KOS_ROOT/bin/$NAME/$BINLIBDIRNAME
+includedir=$KOS_ROOT/kos/include
+
+Name: pciaccess
+Description: KOS-specific reimplementation
+Version: 0.16
+Cflags:
+Libs: -lpci
+EOF
 
 
 

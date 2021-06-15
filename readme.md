@@ -57,8 +57,6 @@ All ported applications can be installed onto your KOS disk image by using `bash
 	- [libstdc++-9.1.0](https://gcc.gnu.org/onlinedocs/libstdc++/)
 	- [libffi-3.3](https://github.com/libffi/libffi)
 	- [libpng-1.6.35](https://github.com/glennrp/libpng)
-	- [libpciaccess-0.16](https://cgit.freedesktop.org/xorg/lib/libpciaccess/)
-		- [pci.ids.gz](http://pci-ids.ucw.cz/)
 	- [libexpat-2.2.9](https://github.com/libexpat/libexpat)
 	- [libbzip2-1.0.8](https://sourceware.org/bzip2/index.html)
 	- [libuuid-1.0.3](https://sourceforge.net/projects/libuuid/files/)
@@ -423,6 +421,10 @@ All ported applications can be installed onto your KOS disk image by using `bash
 			- Unsupported instruction emulation
 			- Generating detailed errors for hardware exceptions
 				- Most notably: I don't like how x86_64 triggers a #GP when accessing unaligned memory. So by inspecting the faulting instruction, I can determine the unaligned address, and throw an `E_SEGFAULT`, allowing the exception to be handled the same way as an access of an unmapped address.
+	- libpci (user/kernel)
+		- A re-implementation of [libpciaccess-0.16](https://cgit.freedesktop.org/xorg/lib/libpciaccess/) specifically designed to work best on KOS
+		- Used to implement PCI access for kernel drivers, as well as all of the same functionality for user-space
+		- The user-space version of this library can also make use of [pci.ids.gz](http://pci-ids.ucw.cz/) (which you can install via `make_utility`) to display PCI vendor/device names.
 	- ... More libraries may get added in the future without being documented here
 
 

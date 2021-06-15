@@ -29,7 +29,7 @@
 #include <stdlib.h>
 #include <unistd.h>
 
-#include <libpci/pciaccess.h>
+#include <pciaccess.h>
 
 /* Slightly modified version of libpciaccess's `scanpci'
  * utility (made to work with KOS's PCI library variant) */

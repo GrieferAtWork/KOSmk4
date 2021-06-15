@@ -70,9 +70,6 @@ __ice__
 /kos/include/pngconf.h
 /kos/include/pnglibconf.h
 
-# These headers are installed by `make_utility.sh ... libpciaccess`
-/kos/include/pciaccess.h
-
 # These headers are installed by `make_utility.sh ... libdrm`
 /kos/include/libdrm/
 /kos/include/libkms/
