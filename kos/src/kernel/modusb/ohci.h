@@ -23,7 +23,6 @@
 #include <kernel/compiler.h>
 
 #include <dev/char.h>
-#include <drivers/pci.h>
 #include <drivers/usb.h>
 #include <kernel/printk.h>
 

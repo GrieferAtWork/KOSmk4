@@ -25,7 +25,10 @@
 #include <bits/types.h>
 #include <sys/io.h>
 
-__SYSDECL_BEGIN
+#define PCI_ADDR_PORT __IOPORT(0xcf8)
+#define PCI_DATA_PORT __IOPORT(0xcfc)
+
+__DECL_BEGIN
 
 #ifdef __CC__
 typedef __uint8_t pci_bus_t; /* PCI Bus number. */
@@ -162,10 +165,10 @@ typedef __uint32_t pci_addr_t; /* PCI Address (Following configuration space mec
 #define PCI_GDEV_BAR5    0x24 /* Base address #5. */
 #define PCI_GDEV_CARDCIS 0x28 /* Cardbus CIS Pointer. */
 #define PCI_GDEV2C       0x2c /* Subsystem ID / Subsystem Vendor ID. */
-#define    PCI_GDEV3C_SSYSIDMASK  0xffff0000
-#define    PCI_GDEV3C_VENDORMASK  0x0000ffff
-#define    PCI_GDEV3C_SSYSIDSHIFT 16
-#define    PCI_GDEV3C_VENDORSHIFT 0
+#define    PCI_GDEV2C_SSYSIDMASK  0xffff0000
+#define    PCI_GDEV2C_VENDORMASK  0x0000ffff
+#define    PCI_GDEV2C_SSYSIDSHIFT 16
+#define    PCI_GDEV2C_VENDORSHIFT 0
 #define PCI_GDEV_EXPROM  0x30 /* Expansion ROM base address. */
 #define PCI_GDEV_RES0    0x34 /* Reserved + Capabilities pointer. */
 #define    PCI_GDEV_RES0_CAPPTRMASK  0x000000ff
@@ -272,6 +275,19 @@ typedef __uint32_t pci_addr_t; /* PCI Address (Following configuration space mec
 #define    PCI_CDEV40_VENDORSHIFT 0
 #define PCI_CDEV_LEGACY_BASEADDR16 0x44 /* 16-bit PC Card legacy mode base address. */
 
-__SYSDECL_END
+/* BAR data layout descriptor. */
+#define PCI_BAR_SPACEMASK     0x00000001 /* BAR address space indicator (one of `PCI_BAR_SPACE_*') */
+#define PCI_BAR_SPACESHIFT    0          /* ... */
+#define    PCI_BAR_SPACE_MEM  0          /* Physical memory */
+#define    PCI_BAR_SPACE_IO   1          /* I/O space */
+#define PCI_BAR_SPACEISMEM(x) (((x) & PCI_BAR_SPACEMASK) == (PCI_BAR_SPACE_MEM << PCI_BAR_SPACESHIFT))
+#define PCI_MBAR_RESERVED     0x00000002 /* FLAG: Reserved. */
+#define PCI_MBAR_64BIT        0x00000004 /* FLAG: 64-bit BAR register (the next BAR is included as part of this bar) */
+#define PCI_MBAR_PREFETCHABLE 0x00000008 /* FLAG: Memory may be prefetched */
+#define PCI_MBAR_ADDRMASK     0xfffffff0 /* Mask: 16-bit aligned physical memory base address. */
+#define PCI_IBAR_ADDRMASK     0xfffffffc /* Mask: 4-bit aligned I/O base address. */
+
+
+__DECL_END
 
 #endif /* !_HW_BUS_PCI_H */

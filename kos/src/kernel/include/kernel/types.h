@@ -28,22 +28,17 @@
 #include <bits/os/timespec.h>
 #include <kos/kernel/types.h>
 
-#define __SIZEOF_PORT_T__ 2
-
 #ifdef __CC__
 DECL_BEGIN
 
 #ifndef __port_t_defined
 #define __port_t_defined 1
-__HYBRID_ALTINT_TYPEDEF(u16, port_t, false);
+__HYBRID_ALTINT_TYPEDEF(__port_t, port_t, false);
 #endif /* !__port_t_defined */
-
-#ifndef __IOPORT_T
-#define __IOPORT_T     port_t
-#endif /* !__IOPORT_T */
-
+#undef __port_t
+#define __port_t port_t
 #ifndef __IOPORT
-#define __IOPORT(x)  ((__IOPORT_T)x)
+#define __IOPORT(x) ((__port_t)x)
 #endif /* !__IOPORT */
 
 #ifndef __intptr_half_t_defined
@@ -60,9 +55,9 @@ typedef u8 uintptr_half_t;
 #elif __SIZEOF_POINTER__ == 16
 typedef s64 intptr_half_t;
 typedef u64 uintptr_half_t;
-#else
+#else /* __SIZEOF_POINTER__ == ... */
 #undef __intptr_half_t_defined
-#endif
+#endif /* __SIZEOF_POINTER__ != ... */
 #endif /* !__intptr_half_t_defined */
 
 #ifndef __intptr_quarter_t_defined
@@ -79,9 +74,9 @@ typedef u32 uintptr_quarter_t;
 #elif __SIZEOF_POINTER__ == 32
 typedef s64 intptr_quarter_t;
 typedef u64 uintptr_quarter_t;
-#else
+#else /* __SIZEOF_POINTER__ == ... */
 #undef __intptr_quarter_t_defined
-#endif
+#endif /* __SIZEOF_POINTER__ != ... */
 #endif /* !__intptr_quarter_t_defined */
 
 /* Time (in Nano seconds == 1/1000000000 (1/1_000_000_000) seconds)

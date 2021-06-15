@@ -398,6 +398,7 @@ typedef __bitwise__ __UINT64_TYPE__ __be64;
 #define __useconds_t      __CRT_PRIVATE_UINT(__SIZEOF_USECONDS_T__)
 #define __jtime_t         __CRT_PRIVATE_UINT(__SIZEOF_JTIME_T__)
 #define __fsword_t        __CRT_PRIVATE_SLNG(__SIZEOF_FSWORD_T__)
+#define __port_t          __CRT_PRIVATE_UINT(__SIZEOF_PORT_T__)
 #define __physaddr_t      __CRT_PRIVATE_ULNG(__SIZEOF_PHYSADDR_T__)
 #define __physpage_t      __CRT_PRIVATE_ULNG(__SIZEOF_PHYSPAGE_T__)
 #define __sa_family_t     __CRT_PRIVATE_UINT(__SIZEOF_SA_FAMILY_T__)

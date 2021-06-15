@@ -2177,12 +2177,12 @@ void EMU86_EMULATE_LDMXCSR(u32 mxcsr);                      /* EMU86_EMULATE_CON
 /* Access I/O ports. */
 #ifndef EMU86_EMULATE_INB
 #include <sys/io.h>
-#define EMU86_EMULATE_INB(portno, result) do { (result) = inb((__IOPORT_T)(portno)); } __WHILE0
-#define EMU86_EMULATE_INW(portno, result) do { (result) = inw((__IOPORT_T)(portno)); } __WHILE0
-#define EMU86_EMULATE_INL(portno, result) do { (result) = inl((__IOPORT_T)(portno)); } __WHILE0
-#define EMU86_EMULATE_OUTB(portno, value) do { outb((__IOPORT_T)(portno), value); } __WHILE0
-#define EMU86_EMULATE_OUTW(portno, value) do { outw((__IOPORT_T)(portno), value); } __WHILE0
-#define EMU86_EMULATE_OUTL(portno, value) do { outl((__IOPORT_T)(portno), value); } __WHILE0
+#define EMU86_EMULATE_INB(portno, result) do { (result) = inb((__port_t)(portno)); } __WHILE0
+#define EMU86_EMULATE_INW(portno, result) do { (result) = inw((__port_t)(portno)); } __WHILE0
+#define EMU86_EMULATE_INL(portno, result) do { (result) = inl((__port_t)(portno)); } __WHILE0
+#define EMU86_EMULATE_OUTB(portno, value) do { outb((__port_t)(portno), value); } __WHILE0
+#define EMU86_EMULATE_OUTW(portno, value) do { outw((__port_t)(portno), value); } __WHILE0
+#define EMU86_EMULATE_OUTL(portno, value) do { outl((__port_t)(portno), value); } __WHILE0
 #ifdef __KERNEL__
 /* Define these to allow for some minor optimizations, when it is known
  * that in/out emulation can never  throw an exception (Note that  this

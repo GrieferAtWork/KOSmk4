@@ -19,23 +19,25 @@
  */
 #ifndef GUARD_MODUSB_INIT_C
 #define GUARD_MODUSB_INIT_C 1
+#define _KOS_SOURCE 1
 #define CONFIG_BUILDING_MODUSB 1
 
 #include <kernel/compiler.h>
 
-#include <drivers/pci.h>
 #include <drivers/usb.h>
 #include <kernel/driver.h>
 #include <kernel/printk.h>
 #include <kernel/types.h>
 
+#include <libpci/pciaccess.h>
+
 DECL_BEGIN
 
 PRIVATE ATTR_FREETEXT void KCALL
 USBProbe_LogFound(char const *__restrict name,
-                           struct pci_device *__restrict dev) {
+                  struct pci_device *__restrict dev) {
 	printk(FREESTR(KERN_INFO "[usb] Found %s controller at pci:%I32p\n"),
-	       name, dev->pd_base);
+	       name, dev->pd_addr);
 }
 
 PRIVATE ATTR_FREETEXT DRIVER_INIT void KCALL USB_Init(void) {
@@ -43,8 +45,8 @@ PRIVATE ATTR_FREETEXT DRIVER_INIT void KCALL USB_Init(void) {
 	printk(FREESTR(KERN_INFO "[usb] Initialize usb\n"));
 
 	/* Enumerate PCI USB controllers. */
-	PCI_FOREACH_CLASS(d, 0x0c, 0x03) {
-		switch (d->pd_progifid) {
+	PCI_FOREACH_DEVICE_CLASS (d, 0x0c, 0x03) {
+		switch (d->pd_progif_id) {
 
 		case 0x00:
 			USBProbe_LogFound(FREESTR("uhci"), d);
@@ -70,7 +72,7 @@ PRIVATE ATTR_FREETEXT DRIVER_INIT void KCALL USB_Init(void) {
 
 		default:
 			printk(FREESTR(KERN_TRACE "[usb] Unrecognized USB progif: %#.2I8x\n"),
-			       d->pd_progifid);
+			       d->pd_progif_id);
 			break;
 		}
 	}

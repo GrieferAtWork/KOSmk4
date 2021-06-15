@@ -17,10 +17,10 @@
  *    misrepresented as being the original software.                          *
  * 3. This notice may not be removed or altered from any source distribution. *
  */
-#ifndef GUARD_KERNEL_INCLUDE_I386_KOS_DRIVERS_CONFIG_H
-#define GUARD_KERNEL_INCLUDE_I386_KOS_DRIVERS_CONFIG_H 1
+#ifndef _I386_KOS_LIBPCI_CONFIG_H
+#define _I386_KOS_LIBPCI_CONFIG_H 1
 
-#include <kernel/compiler.h>
-#include <hybrid/host.h>
+/* Define if libpci is supported on this platform. */
+#define LIBPCI_SUPPORTED
 
-#endif /* !GUARD_KERNEL_INCLUDE_I386_KOS_DRIVERS_CONFIG_H */
+#endif /* !_I386_KOS_LIBPCI_CONFIG_H */

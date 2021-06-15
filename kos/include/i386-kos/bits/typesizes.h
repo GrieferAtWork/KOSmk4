@@ -44,6 +44,7 @@
 #define __SIZEOF_IOMODE_T__         2
 #endif /* !__x86_64__ */
 
+#define __SIZEOF_PORT_T__ 2
 #ifdef __x86_64__
 #define __SIZEOF_PHYSPAGE_T__ 8
 #define __SIZEOF_PHYSADDR_T__ 8

@@ -35,11 +35,7 @@
 
 
 #ifndef __ALIGNOF_PHYSADDR_T__
-#if __SIZEOF_PHYSADDR_T__ == 8
-#define __ALIGNOF_PHYSADDR_T__ __ALIGNOF_INT64__
-#else /* __SIZEOF_PHYSADDR_T__ == 8 */
-#define __ALIGNOF_PHYSADDR_T__ __SIZEOF_PHYSADDR_T__
-#endif /* __SIZEOF_PHYSADDR_T__ != 8 */
+#define __ALIGNOF_PHYSADDR_T__ __ALIGNOF_INTN(__SIZEOF_PHYSADDR_T__)
 #endif /* !__ALIGNOF_PHYSADDR_T__ */
 
 

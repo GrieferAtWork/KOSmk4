@@ -121,21 +121,21 @@ __DECL_BEGIN
 
 #ifdef __CC__
 struct ata_ports {
-	__IOPORT_T a_bus;  /* I/O port for the ATA bus. */
-	__IOPORT_T a_ctrl; /* Device control register/Alternate status ports. */
-	__IOPORT_T a_dma;  /* DMA controller port (or (__IOPORT_T)-1 if DMA isn't supported)
-	                    * NOTE: When initializing a secondary ATA device, this port
-	                    *       has been shifted such that  `DMA_SECONDARY_COMMAND'
-	                    *       becomes `DMA_PRIMARY_COMMAND', etc. */
+	__port_t a_bus;  /* I/O port for the ATA bus. */
+	__port_t a_ctrl; /* Device control register/Alternate status ports. */
+	__port_t a_dma;  /* DMA controller port (or (port_t)-1 if DMA isn't supported)
+	                  * NOTE: When initializing a secondary ATA device, this port
+	                  *       has been shifted such that  `DMA_SECONDARY_COMMAND'
+	                  *       becomes `DMA_PRIMARY_COMMAND', etc. */
 };
 
 struct ide_ports {
-	__IOPORT_T i_primary_bus;    /* I/O port for the primary ATA bus. */
-	__IOPORT_T i_primary_ctrl;   /* Primary device control register/Alternate status ports. */
-	__IOPORT_T i_secondary_bus;  /* I/O port for the secondary ATA bus. */
-	__IOPORT_T i_secondary_ctrl; /* Secondary device control register/Alternate status ports. */
-	__IOPORT_T i_dma_ctrl;       /* DMA controller port (or (__IOPORT_T)-1 if DMA isn't supported)
-	                              * NOTE: Documentation calls th(is|ese) the `Bus Master Register(s)' */
+	__port_t i_primary_bus;    /* I/O port for the primary ATA bus. */
+	__port_t i_primary_ctrl;   /* Primary device control register/Alternate status ports. */
+	__port_t i_secondary_bus;  /* I/O port for the secondary ATA bus. */
+	__port_t i_secondary_ctrl; /* Secondary device control register/Alternate status ports. */
+	__port_t i_dma_ctrl;       /* DMA controller port (or (port_t)-1 if DMA isn't supported)
+	                            * NOTE: Documentation calls th(is|ese) the `Bus Master Register(s)' */
 };
 #endif /* __CC__ */
 

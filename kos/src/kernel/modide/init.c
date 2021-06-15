@@ -26,7 +26,6 @@
 
 #include <kernel/compiler.h>
 
-#include <drivers/pci.h>
 #include <kernel/driver-param.h>
 #include <kernel/driver.h>
 #include <kernel/isr.h>
@@ -34,6 +33,7 @@
 
 #include <hybrid/atomic.h>
 
+#include <hw/bus/pci.h>
 #include <kos/dev.h>
 #include <linux/hdreg.h>
 
@@ -42,6 +42,8 @@
 #include <stddef.h>
 #include <stdio.h>
 #include <time.h>
+
+#include <libpci/pciaccess.h>
 
 /**/
 #include <kernel/x86/pic.h> /* TODO: Non-portable! */
@@ -412,73 +414,72 @@ PRIVATE ATTR_FREETEXT ATTR_NOINLINE bool KCALL
 kernel_load_pci_ide(struct pci_device *__restrict dev) {
 	bool result = false;
 	struct ide_ports i;
-	if (dev->pd_res[PD_RESOURCE_BAR0].pr_flags == PCI_RESOURCE_FUNUSED) {
+	if (dev->pd_regions[0].pmr_size == 0) {
 		i.i_primary_bus = ATA_DEFAULT_PRIMARY_BUS;
 		result          = true;
 	} else {
-		if (!(dev->pd_res[PD_RESOURCE_BAR0].pr_flags & PCI_RESOURCE_FIO)) {
+		if (!dev->pd_regions[0].pmr_is_IO) {
 			printk(FREESTR(KERN_WARNING "[ata] PCI IDE device at %" PRIp32 " uses a "
 			                            "memory mapping for BAR0 (primary bus)\n"),
-			       dev->pd_base);
+			       dev->pd_addr);
 			return false;
 		}
-		i.i_primary_bus = (port_t)dev->pd_res[PD_RESOURCE_BAR0].pr_start;
+		i.i_primary_bus = (port_t)dev->pd_regions[0].pmr_addr;
 		if (i.i_primary_bus == ATA_DEFAULT_PRIMARY_BUS)
 			result = true;
 	}
-	if (dev->pd_res[PD_RESOURCE_BAR1].pr_flags == PCI_RESOURCE_FUNUSED) {
+	if (dev->pd_regions[1].pmr_size == 0) {
 		i.i_primary_ctrl = ATA_DEFAULT_PRIMARY_CTRL;
 		result           = true;
 	} else {
-		if (!(dev->pd_res[PD_RESOURCE_BAR1].pr_flags & PCI_RESOURCE_FIO)) {
+		if (!dev->pd_regions[1].pmr_is_IO) {
 			printk(FREESTR(KERN_WARNING "[ata] PCI IDE device at %" PRIp32 " uses a "
 			                            "memory mapping for BAR1 (primary control)\n"),
-			       dev->pd_base);
+			       dev->pd_addr);
 			return false;
 		}
-		i.i_primary_ctrl = (port_t)dev->pd_res[PD_RESOURCE_BAR1].pr_start;
+		i.i_primary_ctrl = (port_t)dev->pd_regions[1].pmr_addr;
 		if (i.i_primary_ctrl == ATA_DEFAULT_PRIMARY_CTRL)
 			result = true;
 	}
-	if (dev->pd_res[PD_RESOURCE_BAR2].pr_flags == PCI_RESOURCE_FUNUSED) {
+	if (dev->pd_regions[2].pmr_size == 0) {
 		i.i_secondary_bus = ATA_DEFAULT_SECONDARY_BUS;
 		result            = true;
 	} else {
-		if (!(dev->pd_res[PD_RESOURCE_BAR2].pr_flags & PCI_RESOURCE_FIO)) {
+		if (!dev->pd_regions[2].pmr_is_IO) {
 			printk(FREESTR(KERN_WARNING "[ata] PCI IDE device at %" PRIp32 " uses a "
 			                            "memory mapping for BAR2 (secondary bus)\n"),
-			       dev->pd_base);
+			       dev->pd_addr);
 			return false;
 		}
-		i.i_secondary_bus = (port_t)dev->pd_res[PD_RESOURCE_BAR2].pr_start;
+		i.i_secondary_bus = (port_t)dev->pd_regions[2].pmr_addr;
 		if (i.i_secondary_bus == ATA_DEFAULT_SECONDARY_BUS)
 			result = true;
 	}
-	if (dev->pd_res[PD_RESOURCE_BAR3].pr_flags == PCI_RESOURCE_FUNUSED) {
+	if (dev->pd_regions[3].pmr_size == 0) {
 		i.i_secondary_ctrl = ATA_DEFAULT_SECONDARY_CTRL;
 		result             = true;
 	} else {
-		if (!(dev->pd_res[PD_RESOURCE_BAR3].pr_flags & PCI_RESOURCE_FIO)) {
+		if (!dev->pd_regions[3].pmr_is_IO) {
 			printk(FREESTR(KERN_WARNING "[ata] PCI IDE device at %" PRIp32 " uses a "
 			                            "memory mapping for BAR3 (secondary control)\n"),
-			       dev->pd_base);
+			       dev->pd_addr);
 			return false;
 		}
-		i.i_secondary_ctrl = (port_t)dev->pd_res[PD_RESOURCE_BAR3].pr_start;
+		i.i_secondary_ctrl = (port_t)dev->pd_regions[3].pmr_addr;
 		if (i.i_secondary_ctrl == ATA_DEFAULT_SECONDARY_CTRL)
 			result = true;
 	}
 	i.i_dma_ctrl = (port_t)-1;
+
 	/* Check if this IDE may support DMA mode. */
-	if (dev->pd_res[PD_RESOURCE_BAR4].pr_flags != PCI_RESOURCE_FUNUSED &&
-	    (dev->pd_res[PD_RESOURCE_BAR4].pr_flags & PCI_RESOURCE_FIO) &&
-	    dev->pd_res[PD_RESOURCE_BAR4].pr_size >= 16) {
-		i.i_dma_ctrl = (port_t)dev->pd_res[PD_RESOURCE_BAR4].pr_start;
-		pci_write(dev->pd_base, PCI_DEV4,
-		          (pci_read(dev->pd_base, PCI_DEV4) & ~(PCI_CDEV4_NOIRQ)) |
-		          PCI_CDEV4_BUSMASTER |
-		          PCI_CDEV4_ALLOW_MEMWRITE);
+	if (dev->pd_regions[4].pmr_is_IO && dev->pd_regions[4].pmr_size >= 16) {
+		i.i_dma_ctrl = (port_t)dev->pd_regions[4].pmr_addr;
+		pci_device_cfg_writel(dev, PCI_DEV4,
+		                      (pci_device_cfg_readl(dev, PCI_DEV4) & ~(PCI_CDEV4_NOIRQ)) |
+		                      (PCI_CDEV4_BUSMASTER | PCI_CDEV4_ALLOW_MEMWRITE));
 	}
+
 	/* Forceably disable DMA, the same way a bus without support would */
 	if (ide_nodma)
 		i.i_dma_ctrl = (port_t)-1;
@@ -495,7 +496,7 @@ PRIVATE DRIVER_INIT ATTR_FREETEXT void KCALL ata_init(void)
 	bool has_primary = false;
 	struct pci_device *dev;
 	/* Search for IDE PCI devices. */
-	PCI_FOREACH_CLASS(dev, PCI_DEV8_CLASS_STORAGE, 1) {
+	PCI_FOREACH_DEVICE_CLASS (dev, PCI_DEV8_CLASS_STORAGE, 1) {
 		has_primary |= kernel_load_pci_ide(dev);
 	}
 	if (!has_primary) {

@@ -25,7 +25,6 @@
 
 #include <kernel/compiler.h>
 
-#include <drivers/pci.h>
 #include <kernel/aio.h>
 #include <kernel/driver.h>
 #include <kernel/except.h>
@@ -39,6 +38,7 @@
 
 #include <hybrid/atomic.h>
 
+#include <hw/bus/pci.h>
 #include <hw/net/ne2k.h>
 #include <kos/except/reason/io.h>
 #include <linux/if_ether.h>
@@ -48,6 +48,8 @@
 #include <stddef.h>
 #include <stdio.h>
 #include <string.h>
+
+#include <libpci/pciaccess.h>
 
 #if 0
 #define NE2K_DEBUG(...) printk(KERN_DEBUG __VA_ARGS__)
@@ -1334,14 +1336,15 @@ Ne2k_ProbePciDevice(struct pci_device *__restrict dev) THROWS(...) {
 	unsigned int i;
 	byte_t prom[NE_PROM_SIZE];
 	REF Ne2kDevice *self;
-
-	if (!(dev->pd_res[0].pr_flags & PCI_RESOURCE_FIO))
+	if (dev->pd_irq < 0)
 		return false;
-	if (dev->pd_res[0].pr_size < 0xff)
+	if (!dev->pd_regions[0].pmr_is_IO)
 		return false;
-	iobase = (port_t)dev->pd_res[0].pr_start;
+	if (dev->pd_regions[0].pmr_size < 0xff)
+		return false;
+	iobase = (port_t)dev->pd_regions[0].pmr_addr;
 	printk(FREESTR(KERN_INFO "[ne2k] Found NE2K(%p) at %#I16x (pci:%#I32x)\n"),
-	       dev, iobase, dev->pd_base);
+	       dev, iobase, dev->pd_addr);
 	Ne2k_ResetCard(iobase);
 	/* Execute a sequence of startup instructions. */
 	for (i = 0; i < COMPILER_LENOF(Ne2k_StartupSequence); ++i) {
@@ -1377,8 +1380,7 @@ Ne2k_ProbePciDevice(struct pci_device *__restrict dev) THROWS(...) {
 	self->nk_rx_end    = 128;
 
 	/* set-up IRQ handling. */
-	hisr_register_at(X86_INTERRUPT_PIC1_BASE + /* TODO: Non-portable */
-	                 PCI_GDEV3C_IRQLINE(pci_read(dev->pd_base, PCI_GDEV3C)),
+	hisr_register_at(X86_INTERRUPT_PIC1_BASE + dev->pd_irq, /* TODO: Non-portable */
 	                 &Ne2k_InterruptHandler, self);
 
 	/* Reset the NIC */
@@ -1435,9 +1437,7 @@ Ne2k_ProbePciDevice(struct pci_device *__restrict dev) THROWS(...) {
 
 PRIVATE ATTR_FREETEXT DRIVER_INIT void KCALL Ne2k_InitDriver(void) {
 	struct pci_device *dev;
-	PCI_FOREACH_CLASS(dev,
-	                  PCI_DEV8_CLASS_NETWORK,
-	                  PCI_DEV8_CLASS_NOCLASS) {
+	PCI_FOREACH_DEVICE_CLASS (dev, PCI_DEV8_CLASS_NETWORK, PCI_DEV8_CLASS_NOCLASS) {
 		TRY {
 			Ne2k_ProbePciDevice(dev);
 		} EXCEPT {
@@ -1445,7 +1445,7 @@ PRIVATE ATTR_FREETEXT DRIVER_INIT void KCALL Ne2k_InitDriver(void) {
 			if (ERRORCLASS_ISRTLPRIORITY(cls))
 				RETHROW();
 			error_printf(FREESTR("Initializing ne2k at pci:%#I32x"),
-			             dev->pd_base);
+			             dev->pd_addr);
 		}
 	}
 }

@@ -32,7 +32,7 @@ DECL_BEGIN
 
 #ifndef __port_t_defined
 #define __port_t_defined 1
-typedef __IOPORT_T port_t;
+typedef __port_t port_t;
 #endif /* !__port_t_defined */
 
 #define VGA_VRAM_BASE 0xa0000

@@ -23,7 +23,6 @@
 
 #include <kernel/compiler.h>
 
-#include <drivers/pci.h>
 #include <kernel/driver.h>
 #include <kernel/except.h>
 #include <kernel/isr.h>

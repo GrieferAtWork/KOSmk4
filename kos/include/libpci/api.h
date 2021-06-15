@@ -17,10 +17,32 @@
  *    misrepresented as being the original software.                          *
  * 3. This notice may not be removed or altered from any source distribution. *
  */
-#ifndef GUARD_KERNEL_INCLUDE_I386_KOS_DRIVERS_CONFIG_H
-#define GUARD_KERNEL_INCLUDE_I386_KOS_DRIVERS_CONFIG_H 1
+#ifndef _LIBPCI_API_H
+#define _LIBPCI_API_H 1
 
-#include <kernel/compiler.h>
+#include <libpci/config.h> /* LIBPCI_SUPPORTED */
+#ifdef LIBPCI_SUPPORTED
+#include <__stdinc.h>
 #include <hybrid/host.h>
 
-#endif /* !GUARD_KERNEL_INCLUDE_I386_KOS_DRIVERS_CONFIG_H */
+#if defined(__i386__) && !defined(__x86_64__)
+#define LIBPCI_CC __ATTR_FASTCALL
+#else
+#define LIBPCI_CC /* nothing */
+#endif
+
+#if defined(__KOS__) && defined(__KERNEL__)
+#define LIBPCI_WANT_PROTOTYPES 1
+#endif /* __KOS__ && __KERNEL__ */
+
+#ifdef __LIBPCI_STATIC
+#define LIBPCI_DECL __INTDEF
+#else
+#define LIBPCI_DECL __IMPDEF
+#endif
+
+/* Library name for use with `dlopen()' */
+#define LIBPCI_LIBRARY_NAME "libpci.so"
+#endif /* LIBPCI_SUPPORTED */
+
+#endif /* !_LIBPCI_API_H */

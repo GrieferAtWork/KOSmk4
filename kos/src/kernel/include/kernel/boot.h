@@ -56,7 +56,6 @@ INTDEF FREE void NOTHROW(KCALL kernel_initialize_loaded_drivers)(void);
 
 /* Initialize builtin core drivers. */
 INTDEF FREE void NOTHROW(KCALL kernel_initialize_devfs_driver)(void);
-INTDEF FREE void NOTHROW(KCALL kernel_initialize_pci_driver)(void);
 INTDEF FREE void NOTHROW(KCALL kernel_initialize_ide_driver)(void);
 INTDEF FREE void NOTHROW(KCALL kernel_initialize_fat_driver)(void);
 

@@ -25,11 +25,12 @@
 
 #include <kernel/compiler.h>
 
-#include <drivers/pci.h>
 #include <drivers/usb.h>
 #include <kernel/printk.h>
 
 #include <hw/usb/ohci.h>
+
+#include <libpci/pciaccess.h>
 
 DECL_BEGIN
 

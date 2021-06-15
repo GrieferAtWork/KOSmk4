@@ -28,7 +28,6 @@
 
 #include <dev/block.h>
 #include <dev/char.h>
-#include <drivers/pci.h>
 #include <drivers/usb.h>
 #include <kernel/aio.h>
 #include <kernel/driver.h>
@@ -51,6 +50,7 @@
 #include <hybrid/sync/atomic-lock.h>
 #include <hybrid/sync/atomic-rwlock.h>
 
+#include <hw/bus/pci.h>
 #include <hw/usb/uhci.h>
 #include <hw/usb/usb.h>
 #include <kos/except/reason/io.h>
@@ -60,6 +60,8 @@
 #include <stddef.h>
 #include <stdio.h>
 #include <string.h>
+
+#include <libpci/pciaccess.h>
 
 #if !defined(NDEBUG) && 1
 //#define UHCI_DEBUG_LOG_TD_COMPLETE 1
@@ -228,12 +230,12 @@ NOTHROW(FCALL uhci_controller_resume)(struct uhci_controller *__restrict self) {
 LOCAL NOBLOCK void
 NOTHROW(FCALL uhci_controller_egsm_enter_log)(struct uhci_controller *__restrict self) {
 	printk(KERN_INFO "[usb][pci:%" PRIp32 ",io:%#" PRIxPTR "][+] Enter uhci suspend mode\n",
-	       self->uc_pci->pd_base, self->uc_base.uc_mmbase);
+	       self->uc_pci->pd_addr, self->uc_base.uc_mmbase);
 }
 LOCAL NOBLOCK void
 NOTHROW(FCALL uhci_controller_egsm_leave_log)(struct uhci_controller *__restrict self) {
 	printk(KERN_INFO "[usb][pci:%" PRIp32 ",io:%#" PRIxPTR "][-] Leave uhci suspend mode\n",
-	       self->uc_pci->pd_base, self->uc_base.uc_mmbase);
+	       self->uc_pci->pd_addr, self->uc_base.uc_mmbase);
 }
 
 /* Check if any port has the `UHCI_PORTSC_CSC' (ConnectStatusChange) flag set. */
@@ -263,7 +265,7 @@ NOTHROW(FCALL uhci_controller_egsm_enter)(struct uhci_controller *__restrict sel
 			uhci_wrw(self, UHCI_USBCMD, cmd & ~(UHCI_USBCMD_EGSM));
 			UHCI_DEBUG(KERN_DEBUG "[usb][pci:%" PRIp32 ",io:%#" PRIxPTR "] Cannot enter "
 			                      "uhci EGSM mode: there are changed ports\n",
-			           self->uc_pci->pd_base, self->uc_base.uc_mmbase);
+			           self->uc_pci->pd_addr, self->uc_base.uc_mmbase);
 			return false;
 		}
 		self->uc_flags |= UHCI_CONTROLLER_FLAG_SUSPENDED;
@@ -832,7 +834,7 @@ NOTHROW(FCALL uhci_osqh_aio_completed)(struct uhci_controller *__restrict self,
 #ifdef UHCI_DEBUG_LOG_TD_COMPLETE
 		UHCI_DEBUG(KERN_DEBUG "[usb][pci:%" PRIp32 ",io:%#" PRIxPTR "] uhci:td:complete"
 		                      " [actlen=%#" PRIx16 ",maxlen=%#" PRIx16 ",cs=%#" PRIx32 ",tok=%#" PRIx32 "]\n",
-		           self->uc_pci->pd_base, self->uc_base.uc_mmbase,
+		           self->uc_pci->pd_addr, self->uc_base.uc_mmbase,
 		           actlen, maxlen, cs, td->td_tok);
 #endif /* UHCI_DEBUG_LOG_TD_COMPLETE */
 		/* Check for short packet */
@@ -860,7 +862,7 @@ NOTHROW(FCALL uhci_osqh_aio_completed)(struct uhci_controller *__restrict self,
 				printk(KERN_WARNING "[usb][pci:%" PRIp32 ",io:%#" PRIxPTR "] "
 				                    "uhci:td:incomplete packet (%" PRIu16 "/%" PRIu16 ") followed "
 				                    "by non-empty packets of the same type (pid=%#" PRIx8 ")\n",
-				       self->uc_pci->pd_base, self->uc_base.uc_mmbase,
+				       self->uc_pci->pd_addr, self->uc_base.uc_mmbase,
 				       actlen, maxlen, mypid);
 				/* XXX: What now? Should we be  trying to shift around buffer  memory
 				 *      in order to fill  the gap? - When  does this even happen?  Or
@@ -969,7 +971,7 @@ NOTHROW(FCALL uhci_int_completed)(struct uhci_controller *__restrict self,
 #ifdef UHCI_DEBUG_LOG_TD_COMPLETE
 		UHCI_DEBUG(KERN_DEBUG "[usb][pci:%" PRIp32 ",io:%#" PRIxPTR "] uhci:int:td:complete"
 		                      " [actlen=%#" PRIx16 ",maxlen=%#" PRIx16 ",cs=%#" PRIx32 ",tok=%#" PRIx32 "]\n",
-		           self->uc_pci->pd_base, self->uc_base.uc_mmbase,
+		           self->uc_pci->pd_addr, self->uc_base.uc_mmbase,
 		           actlen, maxlen, cs, td->td_tok);
 #endif /* UHCI_DEBUG_LOG_TD_COMPLETE */
 		/* Check for short packet */
@@ -995,7 +997,7 @@ NOTHROW(FCALL uhci_int_completed)(struct uhci_controller *__restrict self,
 				printk(KERN_WARNING "[usb][pci:%" PRIp32 ",io:%#" PRIxPTR "] "
 				                    "uhci:int:td:incomplete packet (%" PRIu16 "/%" PRIu16 ") followed "
 				                    "by non-empty packets of the same type (pid=%#" PRIx8 ")\n",
-				       self->uc_pci->pd_base, self->uc_base.uc_mmbase,
+				       self->uc_pci->pd_addr, self->uc_base.uc_mmbase,
 				       actlen, maxlen, mypid);
 				/* XXX: What now? Should we be  trying to shift around buffer  memory
 				 *      in order to fill  the gap? - When  does this even happen?  Or
@@ -1080,7 +1082,7 @@ NOTHROW(FCALL uhci_finish_intreg)(struct uhci_controller *__restrict self,
 			/* Shouldn't happen... */
 			printk(KERN_CRIT "[usb][pci:%" PRIp32 ",io:%#" PRIxPTR "] "
 			                 "uhci:int:bad:ep (%#" PRIp32 ")\n",
-			       self->uc_pci->pd_base, self->uc_base.uc_mmbase, ep);
+			       self->uc_pci->pd_addr, self->uc_base.uc_mmbase, ep);
 			HW_WRITE(qh->qh_ep, UHCI_QHEP_TERM);
 			restart_mode = uhci_int_completed_ioerror(ui, NULL, 0,
 			                                          ERROR_CODEOF(E_IOERROR_NODATA),
@@ -1101,7 +1103,7 @@ NOTHROW(FCALL uhci_finish_intreg)(struct uhci_controller *__restrict self,
 					/* That's an error! */
 					printk(KERN_ERR "[usb][pci:%" PRIp32 ",io:%#" PRIxPTR "] "
 					                "uhci:int:short-packet (%" PRIu16 " < %" PRIu16 ")\n",
-					       self->uc_pci->pd_base, self->uc_base.uc_mmbase, actlen, maxlen);
+					       self->uc_pci->pd_addr, self->uc_base.uc_mmbase, actlen, maxlen);
 					restart_mode = uhci_int_completed_ioerror(ui, NULL, 0,
 					                                          ERROR_CODEOF(E_IOERROR_NODATA),
 					                                          E_IOERROR_REASON_USB_SHORTPACKET);
@@ -1115,7 +1117,7 @@ NOTHROW(FCALL uhci_finish_intreg)(struct uhci_controller *__restrict self,
 		          UHCI_TDCS_DBE | UHCI_TDCS_STALL)) {
 			printk(KERN_ERR "[usb][pci:%" PRIp32 ",io:%#" PRIxPTR "] "
 			                "uhci:int:error (cs=%#" PRIx32 ",tok=%#" PRIx32 ")\n",
-			       self->uc_pci->pd_base, self->uc_base.uc_mmbase, cs, ATOMIC_READ(td->td_tok));
+			       self->uc_pci->pd_addr, self->uc_base.uc_mmbase, cs, ATOMIC_READ(td->td_tok));
 			restart_mode = uhci_int_completed_ioerror(ui, NULL, 0,
 			                                          ERROR_CODEOF(E_IOERROR_ERRORBIT),
 			                                          E_IOERROR_REASON_UHCI_TDCS,
@@ -1125,7 +1127,7 @@ NOTHROW(FCALL uhci_finish_intreg)(struct uhci_controller *__restrict self,
 		if (!(cs & UHCI_TDCS_ACTIVE)) {
 			printk(KERN_ERR "[usb][pci:%" PRIp32 ",io:%#" PRIxPTR "] "
 			                "uhci:int:inactive for unknown reason\n",
-			       self->uc_pci->pd_base, self->uc_base.uc_mmbase);
+			       self->uc_pci->pd_addr, self->uc_base.uc_mmbase);
 			restart_mode = uhci_int_completed_ioerror(ui, NULL, 0,
 			                                          ERROR_CODEOF(E_IOERROR_NODATA),
 			                                          E_IOERROR_REASON_UHCI_INCOMPLETE);
@@ -1136,7 +1138,7 @@ NOTHROW(FCALL uhci_finish_intreg)(struct uhci_controller *__restrict self,
 		 * the `UHCI_TDLP_DBS' flag set) */
 		UHCI_DEBUG(KERN_DEBUG "[usb][pci:%" PRIp32 ",io:%#" PRIxPTR "] "
 		                      "uhci:incomplete [ep=%#" PRIx32 ",cs=%#" PRIx32 ",tok=%#" PRIx32 "]\n",
-		           self->uc_pci->pd_base, self->uc_base.uc_mmbase,
+		           self->uc_pci->pd_addr, self->uc_base.uc_mmbase,
 		           ep, cs, ATOMIC_READ(td->td_tok));
 
 		/* In  the case of  depth-first, we can assume  that there are no
@@ -1176,7 +1178,7 @@ done_qh:
 		          UHCI_TDCS_DBE | UHCI_TDCS_STALL)) {
 			printk(KERN_ERR "[usb][pci:%" PRIp32 ",io:%#" PRIxPTR "] "
 			                "uhci:int:error (cs=%#" PRIx32 ",tok=%#" PRIx32 ")\n",
-			       self->uc_pci->pd_base, self->uc_base.uc_mmbase, cs, ATOMIC_READ(td->td_tok));
+			       self->uc_pci->pd_addr, self->uc_base.uc_mmbase, cs, ATOMIC_READ(td->td_tok));
 			restart_mode = uhci_int_completed_ioerror(ui, NULL, 0,
 			                                          ERROR_CODEOF(E_IOERROR_ERRORBIT),
 			                                          E_IOERROR_REASON_UHCI_TDCS,
@@ -1314,7 +1316,7 @@ NOTHROW(FCALL uhci_finish_completed)(struct uhci_controller *__restrict self) {
 			/* Shouldn't happen... */
 			printk(KERN_CRIT "[usb][pci:%" PRIp32 ",io:%#" PRIxPTR "] "
 			                 "uhci:bad:ep (%#" PRIp32 ")\n",
-			       self->uc_pci->pd_base, self->uc_base.uc_mmbase, ep);
+			       self->uc_pci->pd_addr, self->uc_base.uc_mmbase, ep);
 			uhci_osqh_unlink(self, iter, piter);
 			uhci_osqh_completed_ioerror(self, iter,
 			                            ERROR_CODEOF(E_IOERROR_NODATA),
@@ -1336,7 +1338,7 @@ NOTHROW(FCALL uhci_finish_completed)(struct uhci_controller *__restrict self) {
 					/* That's an error! */
 					printk(KERN_ERR "[usb][pci:%" PRIp32 ",io:%#" PRIxPTR "] "
 					                "uhci:short-packet (%" PRIu16 " < %" PRIu16 ")\n",
-					       self->uc_pci->pd_base, self->uc_base.uc_mmbase, actlen, maxlen);
+					       self->uc_pci->pd_addr, self->uc_base.uc_mmbase, actlen, maxlen);
 					uhci_osqh_unlink(self, iter, piter);
 					uhci_osqh_completed_ioerror(self, iter,
 					                            ERROR_CODEOF(E_IOERROR_NODATA),
@@ -1352,7 +1354,7 @@ NOTHROW(FCALL uhci_finish_completed)(struct uhci_controller *__restrict self) {
 		          UHCI_TDCS_DBE | UHCI_TDCS_STALL)) {
 			printk(KERN_ERR "[usb][pci:%" PRIp32 ",io:%#" PRIxPTR "] "
 			                "uhci:error (cs=%#" PRIx32 ",tok=%#" PRIx32 ")\n",
-			       self->uc_pci->pd_base, self->uc_base.uc_mmbase, cs, ATOMIC_READ(td->td_tok));
+			       self->uc_pci->pd_addr, self->uc_base.uc_mmbase, cs, ATOMIC_READ(td->td_tok));
 			uhci_osqh_unlink(self, iter, piter);
 			uhci_osqh_completed_ioerror(self, iter,
 			                            ERROR_CODEOF(E_IOERROR_ERRORBIT),
@@ -1364,7 +1366,7 @@ NOTHROW(FCALL uhci_finish_completed)(struct uhci_controller *__restrict self) {
 		if (!(cs & UHCI_TDCS_ACTIVE)) {
 			printk(KERN_ERR "[usb][pci:%" PRIp32 ",io:%#" PRIxPTR "] "
 			                "uhci:inactive for unknown reason\n",
-			       self->uc_pci->pd_base, self->uc_base.uc_mmbase);
+			       self->uc_pci->pd_addr, self->uc_base.uc_mmbase);
 			uhci_osqh_unlink(self, iter, piter);
 			uhci_osqh_completed_ioerror(self, iter,
 			                            ERROR_CODEOF(E_IOERROR_NODATA),
@@ -1377,7 +1379,7 @@ NOTHROW(FCALL uhci_finish_completed)(struct uhci_controller *__restrict self) {
 		 * the `UHCI_TDLP_DBS' flag set) */
 		UHCI_DEBUG(KERN_DEBUG "[usb][pci:%" PRIp32 ",io:%#" PRIxPTR "] "
 		                      "uhci:incomplete [ep=%#" PRIx32 ",cs=%#" PRIx32 ",tok=%#" PRIx32 "]\n",
-		           self->uc_pci->pd_base, self->uc_base.uc_mmbase,
+		           self->uc_pci->pd_addr, self->uc_base.uc_mmbase,
 		           ep, cs, ATOMIC_READ(td->td_tok));
 
 		/* In  the case of  depth-first, we can assume  that there are no
@@ -1458,7 +1460,7 @@ NOTHROW(FCALL uhci_interrupt_handler)(void *arg) {
 	if unlikely(status & UHCI_USBSTS_HSE) {
 		printk(KERN_CRIT "[usb][pci:%" PRIp32 ",io:%#" PRIxPTR "] "
 		                 "uhci:Host-System-Error set (status=%#" PRIx8 ")\n",
-		       self->uc_pci->pd_base, self->uc_base.uc_mmbase, status);
+		       self->uc_pci->pd_addr, self->uc_base.uc_mmbase, status);
 		/* XXX: Do something more? */
 		uhci_wrw(self, UHCI_USBSTS, UHCI_USBSTS_HSE);
 		ack |= UHCI_USBSTS_HSE;
@@ -1466,7 +1468,7 @@ NOTHROW(FCALL uhci_interrupt_handler)(void *arg) {
 	if unlikely(status & UHCI_USBSTS_HCPE) {
 		printk(KERN_CRIT "[usb][pci:%" PRIp32 ",io:%#" PRIxPTR "] "
 		                 "uhci:Host-Controller-Process-Error set (status=%#" PRIx8 ")\n",
-		       self->uc_pci->pd_base, self->uc_base.uc_mmbase, status);
+		       self->uc_pci->pd_addr, self->uc_base.uc_mmbase, status);
 		/* XXX: Do something more? */
 		uhci_wrw(self, UHCI_USBSTS, UHCI_USBSTS_HCPE);
 		ack |= UHCI_USBSTS_HCPE;
@@ -1474,7 +1476,7 @@ NOTHROW(FCALL uhci_interrupt_handler)(void *arg) {
 	if (status & (UHCI_USBSTS_USBINT | UHCI_USBSTS_ERROR)) {
 #ifdef UHCI_DEBUG_LOG_INTERRUPT
 		UHCI_DEBUG(KERN_TRACE "[usb][pci:%" PRIp32 ",io:%#" PRIxPTR "] uhci interrupt (status=%#" PRIx8 ")\n",
-		           self->uc_pci->pd_base, self->uc_base.uc_mmbase, status);
+		           self->uc_pci->pd_addr, self->uc_base.uc_mmbase, status);
 #endif /* UHCI_DEBUG_LOG_INTERRUPT */
 		uhci_wrw(self, UHCI_USBSTS, status & (UHCI_USBSTS_USBINT | UHCI_USBSTS_ERROR));
 		ack |= status & (UHCI_USBSTS_USBINT | UHCI_USBSTS_ERROR);
@@ -1500,7 +1502,7 @@ NOTHROW(FCALL uhci_interrupt_handler)(void *arg) {
 done_tdint:
 	if (status & UHCI_USBSTS_RD) {
 		UHCI_DEBUG(KERN_TRACE "[usb][pci:%" PRIp32 ",io:%#" PRIxPTR "] uhci:Resume-Detect (status=%#" PRIx8 ")\n",
-		           self->uc_pci->pd_base, self->uc_base.uc_mmbase, status);
+		           self->uc_pci->pd_addr, self->uc_base.uc_mmbase, status);
 		if (!(ATOMIC_FETCHOR(self->uc_flags, UHCI_CONTROLLER_FLAG_RESDECT) & UHCI_CONTROLLER_FLAG_RESDECT))
 			sig_broadcast_nopr(&self->uc_resdec);
 		uhci_wrw(self, UHCI_USBSTS, UHCI_USBSTS_RD);
@@ -1508,7 +1510,7 @@ done_tdint:
 	}
 	if unlikely(!ack) {
 		printk(KERN_TRACE "[usb][pci:%" PRIp32 ",io:%#" PRIxPTR "] uhci sporadic (status=%#" PRIx8 ")\n",
-		       self->uc_pci->pd_base, self->uc_base.uc_mmbase, status);
+		       self->uc_pci->pd_addr, self->uc_base.uc_mmbase, status);
 		return false;
 	}
 	return true;
@@ -2702,7 +2704,7 @@ uhci_controller_device_attached(struct uhci_controller *__restrict self,
                                 u16 portsc_status) {
 	uintptr_t flags;
 	printk(KERN_INFO "[usb][pci:%" PRIp32 ",io:%#" PRIxPTR "] Device attached on uhci:%#" PRIx16 "\n",
-	       self->uc_pci->pd_base, self->uc_base.uc_mmbase, portno);
+	       self->uc_pci->pd_addr, self->uc_base.uc_mmbase, portno);
 	/* NOTE: A call to `usb_device_discovered()' always releases the `uc_disclock' lock! */
 	flags = portsc_status & UHCI_PORTSC_LSDA
 	        ? USB_ENDPOINT_FLAG_LOWSPEED
@@ -2714,7 +2716,7 @@ uhci_controller_device_attached(struct uhci_controller *__restrict self,
 		if (ERRORCLASS_ISRTLPRIORITY(cls))
 			RETHROW();
 		error_printf("discovering usb device on uhci[pci:%" PRIp32 ",io:%#" PRIxPTR "] port #%" PRIu16,
-		             self->uc_pci->pd_base, self->uc_base.uc_mmbase, portno);
+		             self->uc_pci->pd_addr, self->uc_base.uc_mmbase, portno);
 	}
 }
 
@@ -2723,7 +2725,7 @@ uhci_controller_device_detached(struct uhci_controller *__restrict self,
                                 unsigned int portno) {
 	printk(KERN_INFO "[usb][pci:%" PRIp32 ",io:%#" PRIxPTR "] "
 	                 "Device detached from uhci port #%" PRIu16 "\n",
-	       self->uc_pci->pd_base, self->uc_base.uc_mmbase, portno);
+	       self->uc_pci->pd_addr, self->uc_base.uc_mmbase, portno);
 	/* TODO */
 }
 
@@ -2735,7 +2737,7 @@ uhci_chk_port_changes(struct uhci_controller *__restrict self) {
 	unsigned int i;
 	printk(KERN_INFO "[usb][pci:%" PRIp32 ",io:%#" PRIxPTR "] "
 	                 "Check for uhci root-hub connectivity changes\n",
-	       self->uc_pci->pd_base, self->uc_base.uc_mmbase);
+	       self->uc_pci->pd_addr, self->uc_base.uc_mmbase);
 again:
 	sync_write(&self->uc_disclock);
 	for (i = 0; i < self->uc_portnum; ++i) {
@@ -3020,7 +3022,7 @@ uhci_controller_reset_port_and_probe(struct uhci_controller *__restrict self,
 	u16 status;
 	UHCI_DEBUG(FREESTR(KERN_INFO "[usb][pci:%" PRIp32 ",io:%#" PRIxPTR "] "
 	                             "Checking for device on uhci port #%" PRIu16 "\n"),
-	           self->uc_pci->pd_base, self->uc_base.uc_mmbase, portno);
+	           self->uc_pci->pd_addr, self->uc_base.uc_mmbase, portno);
 	sync_write(&self->uc_disclock);
 	TRY {
 		status = uhci_controller_reset_port(self, portno);
@@ -3043,26 +3045,25 @@ PRIVATE ATTR_FREETEXT ATTR_PURE WUNUSED unsigned int KCALL
 uhci_find_pci_bar_ex(struct pci_device const *__restrict dev,
                      unsigned int requirements) {
 	unsigned int result, i;
-	result = PD_RESOURCE_COUNT;
-	for (i = 0; i < PD_RESOURCE_COUNT; ++i) {
-		struct pci_resource const *res;
-		res = &dev->pd_res[PD_RESOURCE_BAR(i)];
-		if (res->pr_flags == PCI_RESOURCE_FUNUSED)
+	result = COMPILER_LENOF(dev->pd_regions);
+	for (i = 0; i < COMPILER_LENOF(dev->pd_regions); ++i) {
+		if (dev->pd_regions[i].pmr_size == 0)
 			continue;
-		if (!(res->pr_flags & PCI_RESOURCE_FIO) &&
+		if (!dev->pd_regions[i].pmr_is_IO &&
 		    (requirements & UHC_BAR_CORRECT_IOTYPE))
 			continue;
-		if ((res->pr_size != 0x20) &&
+		if ((dev->pd_regions[i].pmr_size != 0x20) &&
 		    (requirements & UHC_BAR_CORRECT_IOSIZE))
 			continue;
 		if (!(requirements & UHC_BAR_CORRECT_UNIQUE)) {
 			result = i;
 			break;
 		}
-		if (result == PD_RESOURCE_COUNT)
+		if (result == COMPILER_LENOF(dev->pd_regions))
 			result = i;
 		else {
-			result = PD_RESOURCE_COUNT + 1;
+			result = COMPILER_LENOF(dev->pd_regions) + 1;
+			break;
 		}
 	}
 	return result;
@@ -3086,16 +3087,16 @@ uhci_find_pci_bar(struct pci_device const *__restrict dev) {
 	flags = UHC_BAR_CORRECT_UNIQUE;
 again:
 	result = uhci_find_pci_bar_ex(dev, flags | UHC_BAR_CORRECT_IOTYPE | UHC_BAR_CORRECT_IOSIZE);
-	if (result < PD_RESOURCE_COUNT)
+	if (result < COMPILER_LENOF(dev->pd_regions))
 		goto done;
 	result = uhci_find_pci_bar_ex(dev, flags | UHC_BAR_CORRECT_IOSIZE);
-	if (result < PD_RESOURCE_COUNT)
+	if (result < COMPILER_LENOF(dev->pd_regions))
 		goto done;
 	result = uhci_find_pci_bar_ex(dev, flags | UHC_BAR_CORRECT_IOTYPE);
-	if (result < PD_RESOURCE_COUNT)
+	if (result < COMPILER_LENOF(dev->pd_regions))
 		goto done;
 	result = uhci_find_pci_bar_ex(dev, flags);
-	if (result < PD_RESOURCE_COUNT)
+	if (result < COMPILER_LENOF(dev->pd_regions))
 		goto done;
 	if (flags & UHC_BAR_CORRECT_UNIQUE) {
 		flags = 0;
@@ -3110,10 +3111,15 @@ INTERN ATTR_FREETEXT void KCALL
 usb_probe_uhci(struct pci_device *__restrict dev) {
 	struct uhci_controller *result;
 	unsigned int i, pci_bar;
+	if unlikely(dev->pd_irq < 0) {
+		printk(FREESTR(KERN_ERR "[usb][pci:%" PRIp32 "] Uhci device doesn't support interrupts\n"),
+		       dev->pd_addr);
+		return;
+	}
 	pci_bar = uhci_find_pci_bar(dev);
-	if unlikely(pci_bar >= PD_RESOURCE_COUNT) {
+	if unlikely(pci_bar >= COMPILER_LENOF(dev->pd_regions)) {
 		printk(FREESTR(KERN_ERR "[usb][pci:%" PRIp32 "] Failed to determine uhci I/O bar\n"),
-		       dev->pd_base);
+		       dev->pd_addr);
 		return;
 	}
 
@@ -3124,11 +3130,11 @@ usb_probe_uhci(struct pci_device *__restrict dev) {
 	sig_cinit(&result->uc_resdec);
 	atomic_rwlock_cinit(&result->uc_lock);
 	usb_controller_cinit(result);
-	result->uc_pci          = dev;
+	result->uc_pci = dev;
 	assert(IS_ALIGNED((uintptr_t)&result->uc_qhstart, UHCI_FLE_ALIGN));
 
-	if (dev->pd_res[PD_RESOURCE_BAR(pci_bar)].pr_flags & PCI_RESOURCE_FIO) {
-		result->uc_base.uc_iobase = (port_t)dev->pd_res[PD_RESOURCE_BAR(pci_bar)].pr_start;
+	if (dev->pd_regions[pci_bar].pmr_is_IO) {
+		result->uc_base.uc_iobase = (port_t)dev->pd_regions[pci_bar].pmr_addr;
 	} else {
 		void *addr;
 		addr = mman_map(/* self:        */ &mman_kernel,
@@ -3139,7 +3145,7 @@ usb_probe_uhci(struct pci_device *__restrict dev) {
 		                /* file:        */ &mfile_phys,
 		                /* file_fspath: */ NULL,
 		                /* file_fsname: */ NULL,
-		                /* file_pos:    */ (pos_t)dev->pd_res[PD_RESOURCE_BAR(pci_bar)].pr_start);
+		                /* file_pos:    */ (pos_t)dev->pd_regions[pci_bar].pmr_addr);
 		result->uc_base.uc_mmbase = (byte_t *)addr;
 		result->uc_flags |= UHCI_CONTROLLER_FLAG_USESMMIO;
 	}
@@ -3163,23 +3169,20 @@ usb_probe_uhci(struct pci_device *__restrict dev) {
 	}
 	if unlikely(!i) {
 		printk(FREESTR(KERN_WARNING "[usb][pci:%" PRIp32 ",io:%#" PRIxPTR "] uhci controller has no ports\n"),
-		       dev->pd_base, result->uc_base.uc_mmbase);
+		       dev->pd_addr, result->uc_base.uc_mmbase);
 		destroy(result);
 		return;
 	}
 	result->uc_portnum = i;
 
 	/* Configure PCI access. */
-	pci_write(dev->pd_base, PCI_DEV4,
-	          (pci_read(dev->pd_base, PCI_DEV4) & ~(PCI_CDEV4_NOIRQ)) |
-	          (PCI_CDEV4_BUSMASTER | PCI_CDEV4_ALLOW_MEMWRITE) |
-	          (dev->pd_res[PD_RESOURCE_BAR(pci_bar)].pr_flags & PCI_RESOURCE_FIO
-	           ? PCI_CDEV4_ALLOW_IOTOUCH
-	           : PCI_CDEV4_ALLOW_MEMTOUCH));
+	pci_device_cfg_writel(dev, PCI_DEV4,
+	                      (pci_device_cfg_readl(dev, PCI_DEV4) & ~(PCI_CDEV4_NOIRQ)) |
+	                      (PCI_CDEV4_BUSMASTER | PCI_CDEV4_ALLOW_MEMWRITE));
 
 	/* Disable legacy support. */
-	pci_write(dev->pd_base, 0xc0, 0x8f00);
-	pci_write(dev->pd_base, 0xc0, 0x2000);
+	pci_device_cfg_writel(dev, 0xc0, 0x8f00); /* ??? */
+	pci_device_cfg_writel(dev, 0xc0, 0x2000); /* ??? */
 
 	/* Set the controller. */
 	uhci_wrw(result, UHCI_USBCMD,
@@ -3200,8 +3203,7 @@ usb_probe_uhci(struct pci_device *__restrict dev) {
 	uhci_wrw(result, UHCI_USBSTS, 0xffff);
 
 	/* Register the interrupt handler. */
-	hisr_register_at(X86_INTERRUPT_PIC1_BASE + /* TODO: Non-portable! */
-	                 PCI_GDEV3C_IRQLINE(pci_read(dev->pd_base, PCI_GDEV3C)),
+	hisr_register_at(X86_INTERRUPT_PIC1_BASE + dev->pd_irq, /* TODO: Non-portable! */
 	                 &uhci_interrupt_handler, result);
 
 	/* Enable interrupts that we want to listen for. */

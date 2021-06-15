@@ -30,9 +30,12 @@
 #include <hybrid/host.h>
 #include <hybrid/typecore.h>
 
+#include <bits/typesizes.h> /* __SIZEOF_PORT_T__ */
 #include <sys/perm.h>
 
+#ifndef __SIZEOF_PORT_T__
 #define __SIZEOF_PORT_T__ 2
+#endif /* !__SIZEOF_PORT_T__ */
 
 #ifndef __NOTHROW_KRN
 #ifdef __KERNEL__
@@ -53,11 +56,24 @@ __SYSDECL_BEGIN
 #define __COMPILER_ASM_BUFFER(T, s, p) (*(T *)(p))
 #endif /* !__COMPILER_ASM_BUFFER */
 
-#ifndef __IOPORT_T
-#define __IOPORT_T __UINT16_TYPE__
-#endif /* !__IOPORT_T */
+#ifndef __port_t
+#if __SIZEOF_PORT_T__ == 2
+#define __port_t __UINT16_TYPE__
+#elif __SIZEOF_PORT_T__ == 1
+#define __port_t __UINT8_TYPE__
+#elif __SIZEOF_PORT_T__ == 4
+#define __port_t __UINT32_TYPE__
+#elif __SIZEOF_PORT_T__ == 8
+#define __port_t __UINT64_TYPE__
+#else /* __SIZEOF_PORT_T__ == ... */
+#include <bits/types.h>
+#ifndef __port_t
+#define __port_t __CRT_PRIVATE_ULNG(__SIZEOF_PORT_T__)
+#endif /* !__port_t */
+#endif /* __SIZEOF_PORT_T__ != ... */
+#endif /* !__port_t */
 #ifndef __IOPORT
-#define __IOPORT(x) ((__IOPORT_T)x)
+#define __IOPORT(x) ((__port_t)x)
 #endif /* !__IOPORT */
 #ifndef __MEMPORT_T
 #define __MEMPORT_T __UINTPTR_TYPE__
@@ -65,36 +81,36 @@ __SYSDECL_BEGIN
 
 #ifdef __INTELLISENSE__
 
-__UINT8_TYPE__ __NOTHROW_KRN(inb)(__IOPORT_T __port);
-__UINT16_TYPE__ __NOTHROW_KRN(inw)(__IOPORT_T __port);
-__UINT32_TYPE__ __NOTHROW_KRN(inl)(__IOPORT_T __port);
+__UINT8_TYPE__ __NOTHROW_KRN(inb)(__port_t __port);
+__UINT16_TYPE__ __NOTHROW_KRN(inw)(__port_t __port);
+__UINT32_TYPE__ __NOTHROW_KRN(inl)(__port_t __port);
 
-__UINT8_TYPE__ __NOTHROW_KRN(inb_p)(__IOPORT_T __port);
-__UINT16_TYPE__ __NOTHROW_KRN(inw_p)(__IOPORT_T __port);
-__UINT32_TYPE__ __NOTHROW_KRN(inl_p)(__IOPORT_T __port);
+__UINT8_TYPE__ __NOTHROW_KRN(inb_p)(__port_t __port);
+__UINT16_TYPE__ __NOTHROW_KRN(inw_p)(__port_t __port);
+__UINT32_TYPE__ __NOTHROW_KRN(inl_p)(__port_t __port);
 
-void __NOTHROW_NCX(insb)(__IOPORT_T __port, void *__buf, __SIZE_TYPE__ __n_bytes);
-void __NOTHROW_NCX(insw)(__IOPORT_T __port, void *__buf, __SIZE_TYPE__ __n_words);
-void __NOTHROW_NCX(insl)(__IOPORT_T __port, void *__buf, __SIZE_TYPE__ __n_dwords);
+void __NOTHROW_NCX(insb)(__port_t __port, void *__buf, __SIZE_TYPE__ __n_bytes);
+void __NOTHROW_NCX(insw)(__port_t __port, void *__buf, __SIZE_TYPE__ __n_words);
+void __NOTHROW_NCX(insl)(__port_t __port, void *__buf, __SIZE_TYPE__ __n_dwords);
 
-void __NOTHROW_NCX(outsb)(__IOPORT_T __port, void const *__buf, __SIZE_TYPE__ __n_bytes);
-void __NOTHROW_NCX(outsw)(__IOPORT_T __port, void const *__buf, __SIZE_TYPE__ __n_words);
-void __NOTHROW_NCX(outsl)(__IOPORT_T __port, void const *__buf, __SIZE_TYPE__ __n_dwords);
+void __NOTHROW_NCX(outsb)(__port_t __port, void const *__buf, __SIZE_TYPE__ __n_bytes);
+void __NOTHROW_NCX(outsw)(__port_t __port, void const *__buf, __SIZE_TYPE__ __n_words);
+void __NOTHROW_NCX(outsl)(__port_t __port, void const *__buf, __SIZE_TYPE__ __n_dwords);
 
 #ifdef __USE_KOS_ALTERATIONS
-void __NOTHROW_KRN(outb)(__IOPORT_T __port, __UINT8_TYPE__ __val);
-void __NOTHROW_KRN(outw)(__IOPORT_T __port, __UINT16_TYPE__ __val);
-void __NOTHROW_KRN(outl)(__IOPORT_T __port, __UINT32_TYPE__ __val);
-void __NOTHROW_KRN(outb_p)(__IOPORT_T __port, __UINT8_TYPE__ __val);
-void __NOTHROW_KRN(outw_p)(__IOPORT_T __port, __UINT16_TYPE__ __val);
-void __NOTHROW_KRN(outl_p)(__IOPORT_T __port, __UINT32_TYPE__ __val);
+void __NOTHROW_KRN(outb)(__port_t __port, __UINT8_TYPE__ __val);
+void __NOTHROW_KRN(outw)(__port_t __port, __UINT16_TYPE__ __val);
+void __NOTHROW_KRN(outl)(__port_t __port, __UINT32_TYPE__ __val);
+void __NOTHROW_KRN(outb_p)(__port_t __port, __UINT8_TYPE__ __val);
+void __NOTHROW_KRN(outw_p)(__port_t __port, __UINT16_TYPE__ __val);
+void __NOTHROW_KRN(outl_p)(__port_t __port, __UINT32_TYPE__ __val);
 #else /* __USE_KOS_ALTERATIONS */
-void __NOTHROW_KRN(outb)(__UINT8_TYPE__ __val, __IOPORT_T __port);
-void __NOTHROW_KRN(outw)(__UINT16_TYPE__ __val, __IOPORT_T __port);
-void __NOTHROW_KRN(outl)(__UINT32_TYPE__ __val, __IOPORT_T __port);
-void __NOTHROW_KRN(outb_p)(__UINT8_TYPE__ __val, __IOPORT_T __port);
-void __NOTHROW_KRN(outw_p)(__UINT16_TYPE__ __val, __IOPORT_T __port);
-void __NOTHROW_KRN(outl_p)(__UINT32_TYPE__ __val, __IOPORT_T __port);
+void __NOTHROW_KRN(outb)(__UINT8_TYPE__ __val, __port_t __port);
+void __NOTHROW_KRN(outw)(__UINT16_TYPE__ __val, __port_t __port);
+void __NOTHROW_KRN(outl)(__UINT32_TYPE__ __val, __port_t __port);
+void __NOTHROW_KRN(outb_p)(__UINT8_TYPE__ __val, __port_t __port);
+void __NOTHROW_KRN(outw_p)(__UINT16_TYPE__ __val, __port_t __port);
+void __NOTHROW_KRN(outl_p)(__UINT32_TYPE__ __val, __port_t __port);
 #endif /* !__USE_KOS_ALTERATIONS */
 
 #ifdef __USE_KOS_KERNEL
@@ -115,7 +131,7 @@ void __NOTHROW_KRN(io_delay)(void);
 
 #define __PRIVATE_DEFINE_IO_IN(T, sfx, r, n, count)                          \
 	__FORCELOCAL __ATTR_ARTIFICIAL T                                         \
-	__NOTHROW_KRN(in##sfx)(__IOPORT_T __port) {                              \
+	__NOTHROW_KRN(in##sfx)(__port_t __port) {                                \
 		__register T __rv;                                                   \
 		__asm__ __volatile__("in" #sfx " %w1, %0"                            \
 		                     : "=a" (__rv)                                   \
@@ -123,7 +139,7 @@ void __NOTHROW_KRN(io_delay)(void);
 		return __rv;                                                         \
 	}                                                                        \
 	__FORCELOCAL __ATTR_ARTIFICIAL T                                         \
-	__NOTHROW_KRN(in##sfx##_p)(__IOPORT_T __port) {                          \
+	__NOTHROW_KRN(in##sfx##_p)(__port_t __port) {                            \
 		__register T __rv;                                                   \
 		__asm__ __volatile__("in" #sfx " %w1, %0" __IO_SLOWDOWN              \
 		                     : "=a" (__rv)                                   \
@@ -131,7 +147,7 @@ void __NOTHROW_KRN(io_delay)(void);
 		return __rv;                                                         \
 	}                                                                        \
 	__FORCELOCAL __ATTR_ARTIFICIAL __ATTR_NONNULL((2)) void                  \
-	__NOTHROW_NCX(ins##sfx)(__IOPORT_T __port,                               \
+	__NOTHROW_NCX(ins##sfx)(__port_t __port,                                 \
 	                        void *__buf,                                     \
 	                        __SIZE_TYPE__ count) {                           \
 		__asm__ __volatile__("rep; ins" #sfx                                 \
@@ -146,21 +162,21 @@ void __NOTHROW_KRN(io_delay)(void);
 #ifdef __USE_KOS_ALTERATIONS
 #define __PRIVATE_DEFINE_IO_OUT(T, sfx, s1, r, n, count)                      \
 	__FORCELOCAL __ATTR_ARTIFICIAL void                                       \
-	__NOTHROW_KRN(out##sfx)(__IOPORT_T __port, T __val) {                     \
+	__NOTHROW_KRN(out##sfx)(__port_t __port, T __val) {                       \
 		__asm__ __volatile__("out" #sfx " %" s1 "0, %w1"                      \
 		                     :                                                \
 		                     : "a" (__val)                                    \
 		                     , "Nd" (__port));                                \
 	}                                                                         \
 	__FORCELOCAL __ATTR_ARTIFICIAL void                                       \
-	__NOTHROW_KRN(out##sfx##_p)(__IOPORT_T __port, T __val) {                 \
+	__NOTHROW_KRN(out##sfx##_p)(__port_t __port, T __val) {                   \
 		__asm__ __volatile__("out" #sfx " %" s1 "0, %w1" __IO_SLOWDOWN        \
 		                     :                                                \
 		                     : "a" (__val)                                    \
 		                     , "Nd" (__port));                                \
 	}                                                                         \
 	__FORCELOCAL __ATTR_ARTIFICIAL __ATTR_NONNULL((2)) void                   \
-	__NOTHROW_NCX(outs##sfx)(__IOPORT_T __port,                               \
+	__NOTHROW_NCX(outs##sfx)(__port_t __port,                                 \
 	                         void const *__buf,                               \
 	                         __SIZE_TYPE__ count) {                           \
 		__asm__ __volatile__("rep; outs" #sfx                                 \
@@ -174,21 +190,21 @@ void __NOTHROW_KRN(io_delay)(void);
 #else /* __USE_KOS_ALTERATIONS */
 #define __PRIVATE_DEFINE_IO_OUT(T, sfx, s1, r, n, count)                      \
 	__FORCELOCAL __ATTR_ARTIFICIAL void                                       \
-	__NOTHROW_KRN(out##sfx)(T __val, __IOPORT_T __port) {                     \
+	__NOTHROW_KRN(out##sfx)(T __val, __port_t __port) {                       \
 		__asm__ __volatile__("out" #sfx " %" s1 "0, %w1"                      \
 		                     :                                                \
 		                     : "a" (__val)                                    \
 		                     , "Nd" (__port));                                \
 	}                                                                         \
 	__FORCELOCAL __ATTR_ARTIFICIAL void                                       \
-	__NOTHROW_KRN(out##sfx##_p)(T __val, __IOPORT_T __port) {                 \
+	__NOTHROW_KRN(out##sfx##_p)(T __val, __port_t __port) {                   \
 		__asm__ __volatile__("out" #sfx " %" s1 "0, %w1" __IO_SLOWDOWN        \
 		                     :                                                \
 		                     : "a" (__val)                                    \
 		                     , "Nd" (__port));                                \
 	}                                                                         \
 	__FORCELOCAL __ATTR_ARTIFICIAL __ATTR_NONNULL((2)) void                   \
-	__NOTHROW_NCX(outs##sfx)(__IOPORT_T __port,                               \
+	__NOTHROW_NCX(outs##sfx)(__port_t __port,                                 \
 	                         void const *__buf,                               \
 	                         __SIZE_TYPE__ count) {                           \
 		__asm__ __volatile__("rep; outs" #sfx                                 \
@@ -222,18 +238,18 @@ __NOTHROW_KRN(__LIBCCALL io_delay)(void) {
 #else /* GCC... */
 
 __NAMESPACE_INT_BEGIN
-extern __UINT8_TYPE__ __NOTHROW_KRN(__cdecl __inbyte)(__IOPORT_T __port);
-extern __UINT16_TYPE__ __NOTHROW_KRN(__cdecl __inword)(__IOPORT_T __port);
-extern __ULONG32_TYPE__ __NOTHROW_KRN(__cdecl __indword)(__IOPORT_T __port);
-extern void __NOTHROW_NCX(__cdecl __inbytestring)(__IOPORT_T __port, __UINT8_TYPE__ *__addr, __LONGSIZE_TYPE__ __n_bytes);
-extern void __NOTHROW_NCX(__cdecl __inwordstring)(__IOPORT_T __port, __UINT16_TYPE__ *__addr, __LONGSIZE_TYPE__ __n_words);
-extern void __NOTHROW_NCX(__cdecl __indwordstring)(__IOPORT_T __port, __ULONG32_TYPE__ *__addr, __LONGSIZE_TYPE__ __n_dwords);
-extern void __NOTHROW_KRN(__cdecl __outbyte)(__IOPORT_T __port, __UINT8_TYPE__ __val);
-extern void __NOTHROW_KRN(__cdecl __outword)(__IOPORT_T __port, __UINT16_TYPE__ __val);
-extern void __NOTHROW_KRN(__cdecl __outdword)(__IOPORT_T __port, __ULONG32_TYPE__ __val);
-extern void __NOTHROW_NCX(__cdecl __outbytestring)(__IOPORT_T __port, __UINT8_TYPE__ *__addr, __LONGSIZE_TYPE__ __n_bytes);
-extern void __NOTHROW_NCX(__cdecl __outwordstring)(__IOPORT_T __port, __UINT16_TYPE__ *__addr, __LONGSIZE_TYPE__ __n_words);
-extern void __NOTHROW_NCX(__cdecl __outdwordstring)(__IOPORT_T __port, __ULONG32_TYPE__ *__addr, __LONGSIZE_TYPE__ __n_dwords);
+extern __UINT8_TYPE__ __NOTHROW_KRN(__cdecl __inbyte)(__port_t __port);
+extern __UINT16_TYPE__ __NOTHROW_KRN(__cdecl __inword)(__port_t __port);
+extern __ULONG32_TYPE__ __NOTHROW_KRN(__cdecl __indword)(__port_t __port);
+extern void __NOTHROW_NCX(__cdecl __inbytestring)(__port_t __port, __UINT8_TYPE__ *__addr, __LONGSIZE_TYPE__ __n_bytes);
+extern void __NOTHROW_NCX(__cdecl __inwordstring)(__port_t __port, __UINT16_TYPE__ *__addr, __LONGSIZE_TYPE__ __n_words);
+extern void __NOTHROW_NCX(__cdecl __indwordstring)(__port_t __port, __ULONG32_TYPE__ *__addr, __LONGSIZE_TYPE__ __n_dwords);
+extern void __NOTHROW_KRN(__cdecl __outbyte)(__port_t __port, __UINT8_TYPE__ __val);
+extern void __NOTHROW_KRN(__cdecl __outword)(__port_t __port, __UINT16_TYPE__ __val);
+extern void __NOTHROW_KRN(__cdecl __outdword)(__port_t __port, __ULONG32_TYPE__ __val);
+extern void __NOTHROW_NCX(__cdecl __outbytestring)(__port_t __port, __UINT8_TYPE__ *__addr, __LONGSIZE_TYPE__ __n_bytes);
+extern void __NOTHROW_NCX(__cdecl __outwordstring)(__port_t __port, __UINT16_TYPE__ *__addr, __LONGSIZE_TYPE__ __n_words);
+extern void __NOTHROW_NCX(__cdecl __outdwordstring)(__port_t __port, __ULONG32_TYPE__ *__addr, __LONGSIZE_TYPE__ __n_dwords);
 #pragma intrinsic(__inbyte)
 #pragma intrinsic(__inword)
 #pragma intrinsic(__indword)
@@ -272,22 +288,22 @@ __NAMESPACE_INT_END
 #endif
 
 __FORCELOCAL __ATTR_ARTIFICIAL __UINT8_TYPE__
-__NOTHROW_KRN(inb)(__IOPORT_T __port) {
+__NOTHROW_KRN(inb)(__port_t __port) {
 	return (__NAMESPACE_INT_SYM __inbyte)(__port);
 }
 
 __FORCELOCAL __ATTR_ARTIFICIAL __UINT16_TYPE__
-__NOTHROW_KRN(inw)(__IOPORT_T __port) {
+__NOTHROW_KRN(inw)(__port_t __port) {
 	return (__NAMESPACE_INT_SYM __inword)(__port);
 }
 
 __FORCELOCAL __ATTR_ARTIFICIAL __UINT32_TYPE__
-__NOTHROW_KRN(inl)(__IOPORT_T __port) {
+__NOTHROW_KRN(inl)(__port_t __port) {
 	return (__UINT32_TYPE__)(__NAMESPACE_INT_SYM __indword)(__port);
 }
 
 __FORCELOCAL __ATTR_ARTIFICIAL __UINT8_TYPE__
-__NOTHROW_KRN(inb_p)(__IOPORT_T __port) {
+__NOTHROW_KRN(inb_p)(__port_t __port) {
 	__UINT8_TYPE__ __res;
 	__res = (__NAMESPACE_INT_SYM __inbyte)(__port);
 	__IO_SLOWDOWN
@@ -295,7 +311,7 @@ __NOTHROW_KRN(inb_p)(__IOPORT_T __port) {
 }
 
 __FORCELOCAL __ATTR_ARTIFICIAL __UINT16_TYPE__
-__NOTHROW_KRN(inw_p)(__IOPORT_T __port) {
+__NOTHROW_KRN(inw_p)(__port_t __port) {
 	__UINT16_TYPE__ __res;
 	__res = (__NAMESPACE_INT_SYM __inword)(__port);
 	__IO_SLOWDOWN
@@ -303,7 +319,7 @@ __NOTHROW_KRN(inw_p)(__IOPORT_T __port) {
 }
 
 __FORCELOCAL __ATTR_ARTIFICIAL __UINT32_TYPE__
-__NOTHROW_KRN(inl_p)(__IOPORT_T __port) {
+__NOTHROW_KRN(inl_p)(__port_t __port) {
 	__UINT32_TYPE__ __res;
 	__res = (__UINT32_TYPE__)(__NAMESPACE_INT_SYM __indword)(__port);
 	__IO_SLOWDOWN
@@ -311,100 +327,100 @@ __NOTHROW_KRN(inl_p)(__IOPORT_T __port) {
 }
 
 __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_NONNULL((2)) void
-__NOTHROW_NCX(insb)(__IOPORT_T __port, void *__buf, __SIZE_TYPE__ __n_bytes) {
+__NOTHROW_NCX(insb)(__port_t __port, void *__buf, __SIZE_TYPE__ __n_bytes) {
 	(__NAMESPACE_INT_SYM __inbytestring)(__port, (__UINT8_TYPE__ *)__buf, (__LONGSIZE_TYPE__)__n_bytes);
 }
 
 __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_NONNULL((2)) void
-__NOTHROW_NCX(insw)(__IOPORT_T __port, void *__buf, __SIZE_TYPE__ __n_words) {
+__NOTHROW_NCX(insw)(__port_t __port, void *__buf, __SIZE_TYPE__ __n_words) {
 	(__NAMESPACE_INT_SYM __inwordstring)(__port, (__UINT16_TYPE__ *)__buf, (__LONGSIZE_TYPE__)__n_words);
 }
 
 __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_NONNULL((2)) void
-__NOTHROW_NCX(insl)(__IOPORT_T __port, void *__buf, __SIZE_TYPE__ __n_dwords) {
+__NOTHROW_NCX(insl)(__port_t __port, void *__buf, __SIZE_TYPE__ __n_dwords) {
 	(__NAMESPACE_INT_SYM __indwordstring)(__port, (__ULONG32_TYPE__ *)__buf, (__LONGSIZE_TYPE__)__n_dwords);
 }
 
 #ifdef __USE_KOS_ALTERATIONS
 __FORCELOCAL __ATTR_ARTIFICIAL void
-__NOTHROW_KRN(outb)(__IOPORT_T __port, __UINT8_TYPE__ __val) {
+__NOTHROW_KRN(outb)(__port_t __port, __UINT8_TYPE__ __val) {
 	(__NAMESPACE_INT_SYM __outbyte)(__port, __val);
 }
 
 __FORCELOCAL __ATTR_ARTIFICIAL void
-__NOTHROW_KRN(outw)(__IOPORT_T __port, __UINT16_TYPE__ __val) {
+__NOTHROW_KRN(outw)(__port_t __port, __UINT16_TYPE__ __val) {
 	(__NAMESPACE_INT_SYM __outword)(__port, __val);
 }
 
 __FORCELOCAL __ATTR_ARTIFICIAL void
-__NOTHROW_KRN(outl)(__IOPORT_T __port, __UINT32_TYPE__ __val) {
+__NOTHROW_KRN(outl)(__port_t __port, __UINT32_TYPE__ __val) {
 	(__NAMESPACE_INT_SYM __outdword)(__port, (__ULONG32_TYPE__)__val);
 }
 
 __FORCELOCAL __ATTR_ARTIFICIAL void
-__NOTHROW_KRN(outb_p)(__IOPORT_T __port, __UINT8_TYPE__ __val) {
+__NOTHROW_KRN(outb_p)(__port_t __port, __UINT8_TYPE__ __val) {
 	(__NAMESPACE_INT_SYM __outbyte)(__port, __val);
 	__IO_SLOWDOWN
 }
 
 __FORCELOCAL __ATTR_ARTIFICIAL void
-__NOTHROW_KRN(outw_p)(__IOPORT_T __port, __UINT16_TYPE__ __val) {
+__NOTHROW_KRN(outw_p)(__port_t __port, __UINT16_TYPE__ __val) {
 	(__NAMESPACE_INT_SYM __outword)(__port, __val);
 	__IO_SLOWDOWN
 }
 
 __FORCELOCAL __ATTR_ARTIFICIAL void
-__NOTHROW_KRN(outl_p)(__IOPORT_T __port, __UINT32_TYPE__ __val) {
+__NOTHROW_KRN(outl_p)(__port_t __port, __UINT32_TYPE__ __val) {
 	(__NAMESPACE_INT_SYM __outdword)(__port, (__ULONG32_TYPE__)__val);
 	__IO_SLOWDOWN
 }
 #else /* __USE_KOS_ALTERATIONS */
 __FORCELOCAL __ATTR_ARTIFICIAL void
-__NOTHROW_KRN(outb)(__UINT8_TYPE__ __val, __IOPORT_T __port) {
+__NOTHROW_KRN(outb)(__UINT8_TYPE__ __val, __port_t __port) {
 	(__NAMESPACE_INT_SYM __outbyte)(__port, __val);
 }
 
 __FORCELOCAL __ATTR_ARTIFICIAL void
-__NOTHROW_KRN(outw)(__UINT16_TYPE__ __val, __IOPORT_T __port) {
+__NOTHROW_KRN(outw)(__UINT16_TYPE__ __val, __port_t __port) {
 	(__NAMESPACE_INT_SYM __outword)(__port, __val);
 }
 
 __FORCELOCAL __ATTR_ARTIFICIAL void
-__NOTHROW_KRN(outl)(__UINT32_TYPE__ __val, __IOPORT_T __port) {
+__NOTHROW_KRN(outl)(__UINT32_TYPE__ __val, __port_t __port) {
 	(__NAMESPACE_INT_SYM __outdword)(__port, (__ULONG32_TYPE__)__val);
 }
 
 __FORCELOCAL __ATTR_ARTIFICIAL void
-__NOTHROW_KRN(outb_p)(__UINT8_TYPE__ __val, __IOPORT_T __port) {
+__NOTHROW_KRN(outb_p)(__UINT8_TYPE__ __val, __port_t __port) {
 	(__NAMESPACE_INT_SYM __outbyte)(__port, __val);
 	__IO_SLOWDOWN
 }
 
 __FORCELOCAL __ATTR_ARTIFICIAL void
-__NOTHROW_KRN(outw_p)(__UINT16_TYPE__ __val, __IOPORT_T __port) {
+__NOTHROW_KRN(outw_p)(__UINT16_TYPE__ __val, __port_t __port) {
 	(__NAMESPACE_INT_SYM __outword)(__port, __val);
 	__IO_SLOWDOWN
 }
 
 __FORCELOCAL __ATTR_ARTIFICIAL void
-__NOTHROW_KRN(outl_p)(__UINT32_TYPE__ __val, __IOPORT_T __port) {
+__NOTHROW_KRN(outl_p)(__UINT32_TYPE__ __val, __port_t __port) {
 	(__NAMESPACE_INT_SYM __outdword)(__port, (__ULONG32_TYPE__)__val);
 	__IO_SLOWDOWN
 }
 #endif /* !__USE_KOS_ALTERATIONS */
 
 __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_NONNULL((2)) void
-__NOTHROW_NCX(outsb)(__IOPORT_T __port, void const *__buf, __SIZE_TYPE__ __n_bytes) {
+__NOTHROW_NCX(outsb)(__port_t __port, void const *__buf, __SIZE_TYPE__ __n_bytes) {
 	(__NAMESPACE_INT_SYM __outbytestring)(__port, (__UINT8_TYPE__ *)__buf, (__SIZE_TYPE__)__n_bytes);
 }
 
 __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_NONNULL((2)) void
-__NOTHROW_NCX(outsw)(__IOPORT_T __port, void const *__buf, __SIZE_TYPE__ __n_words) {
+__NOTHROW_NCX(outsw)(__port_t __port, void const *__buf, __SIZE_TYPE__ __n_words) {
 	(__NAMESPACE_INT_SYM __outwordstring)(__port, (__UINT16_TYPE__ *)__buf, (__SIZE_TYPE__)__n_words);
 }
 
 __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_NONNULL((2)) void
-__NOTHROW_NCX(outsl)(__IOPORT_T __port, void const *__buf, __SIZE_TYPE__ __n_dwords) {
+__NOTHROW_NCX(outsl)(__port_t __port, void const *__buf, __SIZE_TYPE__ __n_dwords) {
 	(__NAMESPACE_INT_SYM __outdwordstring)(__port, (__ULONG32_TYPE__ *)__buf, (__SIZE_TYPE__)__n_dwords);
 }
 

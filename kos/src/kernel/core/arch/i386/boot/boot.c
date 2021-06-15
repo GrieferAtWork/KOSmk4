@@ -47,6 +47,8 @@ if (gcc_opt.removeif([](x) -> x.startswith("-O")))
 #include <inttypes.h>
 #include <stddef.h>
 
+#include <libpci/pciaccess.h> /* pci_system_init() */
+
 /**/
 #include <dev/block.h>    /* TODO: Remove me; Only used for boot_partition-init */
 #include <fs/node.h>      /* TODO: Remove me; Only used for boot_partition-init */
@@ -321,7 +323,7 @@ NOTHROW(KCALL __i386_kernel_main)(struct icpustate *__restrict state) {
 
 	/* Initialize builtin core drivers. */
 	kernel_initialize_devfs_driver();
-	kernel_initialize_pci_driver();
+	pci_system_init();
 	kernel_initialize_ide_driver();
 	kernel_initialize_fat_driver();
 
