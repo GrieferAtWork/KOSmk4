@@ -900,6 +900,7 @@ NOTHROW(CC libpci_device_getinfo_pcmcia_bridge)(struct pci_device const *__restr
 	return EOK;
 }
 
+DEFINE_PUBLIC_ALIAS(pci_device_get_parent_bridge, libpci_device_get_parent_bridge);
 #ifdef __KERNEL__
 INTERN WUNUSED NONNULL((1)) struct pci_device *
 NOTHROW(CC libpci_device_get_parent_bridge)(struct pci_device const *__restrict self)
@@ -908,13 +909,23 @@ INTERN WUNUSED struct pci_device *
 NOTHROW(CC libpci_device_get_parent_bridge)(/*[0..1]*/ struct pci_device const *self)
 #endif /* !__KERNEL__ */
 {
+	struct pci_device *iter;
 #ifndef __KERNEL__
 	if unlikely(!self)
 		return NULL;
 #endif /* !__KERNEL__ */
-	(void)self;
-	COMPILER_IMPURE();
-	/* TODO */
+	SLIST_FOREACH (iter, &libpci_devices, _pd_link) {
+		if ((iter->pd_header_type & PCI_DEVC_HEADER_TYPEMASK) != PCI_DEVC_HEADER_BRIDGE)
+			continue;
+		/* Search for a the appropriate PCI device. */
+		USER_TRY {
+			uint32_t bdev18 = pci_rdaddr(iter->pd_addr | PCI_BDEV18);
+			if (PCI_BDEV18_SECONDARY_BUS(bdev18) == self->pd_bus)
+				return iter;
+		} USER_EXCEPT ({
+			return NULL;
+		})
+	}
 	return NULL;
 }
 
