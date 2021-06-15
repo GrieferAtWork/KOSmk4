@@ -43,6 +43,11 @@ DEFINE_SIMPLE_C_APPLICATION("getconf")
 DEFINE_SIMPLE_C_APPLICATION("snake")
 DEFINE_SIMPLE_CXX_APPLICATION("gfx", USELIB("libvideo-gfx"))
 
+if (TARGET_ARCH in ["i386", "x86_64"]) {
+	DEFINE_SIMPLE_C_APPLICATION("scanpci", USELIB("libpci"))
+}
+
+
 BEGIN GROUP("apps.insmod") { COMPILE, LINK, MCOPY }; SET_OUTPUT("/bin/insmod") SOURCE({ "insmod/insmod.c" }) END
 BEGIN GROUP("apps.lsmod") { COMPILE, LINK, MCOPY }; SET_OUTPUT("/bin/lsmod") SOURCE({ "insmod/lsmod.c" }) END
 BEGIN GROUP("apps.rmmod") { COMPILE, LINK, MCOPY }; SET_OUTPUT("/bin/rmmod") SOURCE({ "insmod/rmmod.c" }) END
