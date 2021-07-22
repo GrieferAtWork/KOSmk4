@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xa0cbe338 */
+/* HASH CRC-32:0x14d94d07 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -29,6 +29,7 @@ __NAMESPACE_LOCAL_BEGIN
 #define __local___localdep_getsockopt_defined 1
 __NAMESPACE_LOCAL_END
 #include <features.h>
+#include <bits/types.h>
 __NAMESPACE_LOCAL_BEGIN
 /* >> getsockopt(2)
  * Get the value of the named socket option `level:optname' and store it in `optval'

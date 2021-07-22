@@ -37,7 +37,7 @@ DECL_BEGIN
 struct unlockinfo;
 
 /************************************************************************/
-/* Flags for `mman_getunmapped()' and friends                           */
+/* Flags for `mman_findunmapped()' and friends                          */
 /************************************************************************/
 
 /* Always re-return `FLOOR_ALIGN(addr, PAGESIZE)' (but see `MAP_FIXED_NOREPLACE')
@@ -62,14 +62,14 @@ struct unlockinfo;
 #endif /* !MAP_32BIT && __MAP_32BIT */
 
 /* [valid_if(!MAP_FIXED)]
- * Try  to return  an address `return + num_bytes <= addr'  (but also allow  returning anything else)
- * If neither this flag, nor `MAP_GROWSUP' is given, try to return an address that is close to `addr' */
+ * Try to return an address `return + num_bytes <= addr' (only try: also allow returning anything else)
+ * If neither this flag, nor `MAP_GROWSUP' is given, try  to return an address that is close to  `addr' */
 #if !defined(MAP_GROWSDOWN) && defined(__MAP_GROWSDOWN)
 #define MAP_GROWSDOWN __MAP_GROWSDOWN
 #endif /* !MAP_GROWSDOWN && __MAP_GROWSDOWN */
 
 /* [valid_if(!MAP_FIXED)]
- * Try   to   return  an   address   `return >= addr'  (but   also   allow  returning   anything  else)
+ * Try  to  return  an  address  `return >= addr'  (only  try:  also  allow  returning  anything  else)
  * If neither this flag, nor `MAP_GROWSDOWN' is given, try to return an address that is close to `addr' */
 #if !defined(MAP_GROWSUP) && defined(__MAP_GROWSUP)
 #define MAP_GROWSUP __MAP_GROWSUP
@@ -88,13 +88,13 @@ struct unlockinfo;
 #endif /* !MAP_STACK && __MAP_STACK */
 
 /* [valid_if(!MAP_FIXED)]
- * Disable ASLR (iow: don't randomize automatically determined mmap addresses)  */
+ * Disable ASLR (iow: don't randomize automatically determined mmap addresses) */
 #if !defined(MAP_NOASLR) && defined(__MAP_NOASLR)
 #define MAP_NOASLR __MAP_NOASLR
 #endif /* !MAP_NOASLR && __MAP_NOASLR */
 
 
-/* Error return value for `mman_getunmapped()' & friends */
+/* Error return value for `mman_findunmapped()' & friends */
 #if !defined(MAP_FAILED) && defined(__MAP_FAILED)
 #define MAP_FAILED __MAP_FAILED
 #endif /* !MAP_FAILED && __MAP_FAILED */
@@ -123,7 +123,7 @@ struct unlockinfo;
 
 
 /* The lowest (user-space) address  that might ever be  automatically
- * selected for mapping by  `mman_getunmapped()'. Note that the  user
+ * selected for mapping by `mman_findunmapped()'. Note that the  user
  * may still employ `MAP_FIXED' to overrule this limit, allowing them
  * to mmap anywhere (in user-space).
  *
@@ -149,13 +149,13 @@ DATDEF USER CHECKED void *mman_getunmapped_user_defbase;
 DATDEF USER CHECKED void *mman_getunmapped_user_stkbase;
 
 /* [lock(ATOMIC)]
- * Additional flags that are always or'd to those given to `mman_getunmapped()'
+ * Additional flags that are always or'd to those given to `mman_findunmapped()'
  * NOTE: _ONLY_ use this always force the  `MAP_NOASLR' flag to be set,  thus
  *       allowing you to force-disable ASLR system-wide. Using this for other
  *       flags  does  what you'd  think, but  the  results would  probably be
  *       catastrophic.
  *       Also note that modifications to this variable must be done atomically! */
-DATDEF unsigned int mman_getunmapped_extflags;
+DATDEF unsigned int mman_findunmapped_extflags;
 
 
 /* Try to find a suitable, unmapped address range. Note that this function  never
@@ -186,7 +186,7 @@ NOTHROW(FCALL mman_findunmapped)(struct mman const *__restrict self, void *addr,
                                  size_t num_bytes, unsigned int flags,
                                  size_t min_alignment DFL(PAGESIZE));
 
-/* Given a `struct mnode **p_tree_root', try to find a free uesr-space location.
+/* Given a `struct mnode **p_tree_root', try to find a free user-space location.
  * Don't  use this function. - It's a kind-of hacky work-around to allow for the
  * use of `mman_findunmapped()' in implementing `mbuilder_findunmapped()' */
 #define mman_findunmapped_in_usertree(p_tree_root, ...) \

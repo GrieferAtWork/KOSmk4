@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x7118f3f1 */
+/* HASH CRC-32:0x9fe653a5 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -31,7 +31,13 @@ __SYSDECL_BEGIN
 
 #ifndef ____libc_core_getpagesize_defined
 #define ____libc_core_getpagesize_defined 1
-#ifdef __CRT_HAVE_getpagesize
+#include <asm/pagesize.h>
+#if defined(__CRT_HAVE_getpagesize) && defined(__ARCH_PAGESIZE)
+#include <features.h>
+/* >> getpagesize(3)
+ * Return the size of a PAGE (in bytes) */
+__CEIREDIRECT(__ATTR_CONST __ATTR_WUNUSED,__STDC_INT_AS_SIZE_T,__NOTHROW,__libc_core_getpagesize,(void),getpagesize,{ return __ARCH_PAGESIZE; })
+#elif defined(__CRT_HAVE_getpagesize)
 #include <features.h>
 /* >> getpagesize(3)
  * Return the size of a PAGE (in bytes) */
@@ -41,16 +47,13 @@ __CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,__STDC_INT_AS_SIZE_T,__NOTHROW,__libc_co
 /* >> getpagesize(3)
  * Return the size of a PAGE (in bytes) */
 __CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,__STDC_INT_AS_SIZE_T,__NOTHROW,__libc_core_getpagesize,(void),__getpagesize,())
-#else /* ... */
-#include <asm/pagesize.h>
-#ifdef __ARCH_PAGESIZE
-#include <libc/local/unistd/getpagesize.h>
+#elif defined(__ARCH_PAGESIZE)
+#include <features.h>
 /* >> getpagesize(3)
  * Return the size of a PAGE (in bytes) */
-#define __libc_core_getpagesize (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(getpagesize))
-#else /* __ARCH_PAGESIZE */
+__FORCELOCAL __ATTR_CONST __ATTR_WUNUSED __STDC_INT_AS_SIZE_T __NOTHROW(__LIBCCALL __libc_core_getpagesize)(void) { return __ARCH_PAGESIZE; }
+#else /* ... */
 #undef ____libc_core_getpagesize_defined
-#endif /* !__ARCH_PAGESIZE */
 #endif /* !... */
 #endif /* !____libc_core_getpagesize_defined */
 #if !defined(____libc_core_syscall_defined) && defined(__CRT_HAVE_syscall)

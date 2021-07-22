@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x20ddac91 */
+/* HASH CRC-32:0x29d5b2f1 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -28,6 +28,9 @@ __NAMESPACE_LOCAL_BEGIN
 #ifndef __local___localdep_getlogin_r_defined
 #define __local___localdep_getlogin_r_defined 1
 #ifdef __CRT_HAVE_getlogin_r
+__NAMESPACE_LOCAL_END
+#include <hybrid/typecore.h>
+__NAMESPACE_LOCAL_BEGIN
 /* >> getlogin_r(3)
  * Reentrant version of `getlogin()'. May truncate the name if it's longer than `name_len'
  * s.a. `getlogin()' and `cuserid()' */

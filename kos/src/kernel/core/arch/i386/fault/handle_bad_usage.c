@@ -1604,9 +1604,9 @@ NOTHROW(KCALL patch_fsgsbase_at)(void const *pc) {
 		 * get patched, and do nothing for this case (and simply emulate the
 		 * instruction without patching) */
 	} else {
-		/* By holding a reference to `d' (as returned by `driver_at_address()'),
-		 * we know that  the associated  driver won't get  unloaded from  memory
-		 * while  we're in here,  meaning that we're safe  to access its backing
+		/* By holding a reference to `d' (as returned by `driver_fromaddr()'),
+		 * we know that the associated  driver won't get unloaded from  memory
+		 * while we're in here, meaning that we're safe to access its  backing
 		 * segment memory.
 		 * However, we must still acquire a lock to the kernel VM, so-as  to
 		 * ensure that no-one tries to off-load the drivers text data into a
@@ -1626,7 +1626,7 @@ NOTHROW(KCALL patch_fsgsbase_at)(void const *pc) {
 				/* Try to patch the instruction at `pc' */
 #ifndef NO_PHYS_IDENTITY
 				if (PHYS_IS_IDENTITY(pc_phys, 5)) {
-					/* Simple case: Can simply patch the instruction within the phys-identity-mapping */
+					/* Simple case: Can patch the instruction within the phys-identity-mapping */
 					ok = x86_fsgsbase_patch(PHYS_TO_IDENTITY(pc_phys), pc);
 				} else
 #endif /* !NO_PHYS_IDENTITY */
@@ -1938,7 +1938,7 @@ err_illegal:
 	}
 
 	/* Like above, if we get here as the result of #UD,
-	 * then something must be wrong with the hardware. */
+	 * then  something must be wrong with the hardware. */
 	if ((usage & ~0xffff) == BAD_USAGE_REASON_UD) {
 		printk(KERN_WARNING "[io] ioperm allowed, but I/O instruction still "
 		                    "caused #UD [pc=%p,port=%#" PRIx16 ",%" PRIu8 "]\n",

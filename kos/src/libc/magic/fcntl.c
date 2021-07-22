@@ -1544,10 +1544,10 @@ typedef struct flock64 flock64_t;
 %[define(DEFINE_PIO_OFFSET =
 #ifndef __PIO_OFFSET
 #ifdef __USE_KOS_ALTERATIONS
-#define __PIO_OFFSET   __FS_TYPE(pos)
+#define __PIO_OFFSET   __FS_TYPE(@pos@)
 #define __PIO_OFFSET64 __pos64_t
 #else /* __USE_KOS_ALTERATIONS */
-#define __PIO_OFFSET   __FS_TYPE(off)
+#define __PIO_OFFSET   __FS_TYPE(@off@)
 #define __PIO_OFFSET64 __off64_t
 #endif /* !__USE_KOS_ALTERATIONS */
 #endif /* !__PIO_OFFSET */
@@ -1789,11 +1789,11 @@ int posix_fadvise32($fd_t fd, $off32_t offset, $off32_t length,
                     __STDC_INT_AS_UINT_T advise);
 
 
-[[decl_include("<features.h>", "<bits/types.h>"), no_crt_self_import]]
+[[decl_include("<features.h>", "<bits/types.h>")]]
+[[no_crt_self_import, decl_prefix(DEFINE_PIO_OFFSET)]]
 [[if(defined(__USE_FILE_OFFSET64)), preferred_alias("posix_fadvise64")]]
 [[if(!defined(__USE_FILE_OFFSET64)), preferred_alias("posix_fadvise")]]
 [[userimpl, section(".text.crt{|.dos}.io.utility")]]
-[[decl_include("<features.h>"), decl_prefix(DEFINE_PIO_OFFSET)]]
 int posix_fadvise($fd_t fd, __PIO_OFFSET offset, __PIO_OFFSET length,
                   __STDC_INT_AS_UINT_T advise) {
 @@pp_if $has_function(posix_fadvise64)@@
@@ -1813,11 +1813,11 @@ int posix_fadvise($fd_t fd, __PIO_OFFSET offset, __PIO_OFFSET length,
 [[decl_include("<bits/types.h>"), doc_alias("posix_fallocate")]]
 int posix_fallocate32($fd_t fd, $pos32_t offset, $pos32_t length);
 
-[[decl_include("<features.h>", "<bits/types.h>"), no_crt_self_import]]
+[[decl_include("<features.h>", "<bits/types.h>")]]
+[[no_crt_self_import, decl_prefix(DEFINE_PIO_OFFSET)]]
 [[if(defined(__USE_FILE_OFFSET64)), preferred_alias("posix_fallocate64")]]
 [[if(!defined(__USE_FILE_OFFSET64)), preferred_alias("posix_fallocate")]]
 [[userimpl, section(".text.crt{|.dos}.io.utility")]]
-[[decl_include("<features.h>"), decl_prefix(DEFINE_PIO_OFFSET)]]
 int posix_fallocate($fd_t fd, __PIO_OFFSET offset, __PIO_OFFSET length) {
 @@pp_if $has_function(posix_fallocate64)@@
 	return posix_fallocate64(fd, (__PIO_OFFSET64)offset, (__PIO_OFFSET64)length);

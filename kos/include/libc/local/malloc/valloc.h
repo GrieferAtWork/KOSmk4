@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x6dc21b49 */
+/* HASH CRC-32:0x6c66b8e8 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -27,7 +27,17 @@ __NAMESPACE_LOCAL_BEGIN
 /* Dependency: getpagesize from unistd */
 #ifndef __local___localdep_getpagesize_defined
 #define __local___localdep_getpagesize_defined 1
-#ifdef __CRT_HAVE_getpagesize
+__NAMESPACE_LOCAL_END
+#include <asm/pagesize.h>
+__NAMESPACE_LOCAL_BEGIN
+#if defined(__CRT_HAVE_getpagesize) && defined(__ARCH_PAGESIZE)
+__NAMESPACE_LOCAL_END
+#include <features.h>
+__NAMESPACE_LOCAL_BEGIN
+/* >> getpagesize(3)
+ * Return the size of a PAGE (in bytes) */
+__CEIREDIRECT(__ATTR_CONST __ATTR_WUNUSED,__STDC_INT_AS_SIZE_T,__NOTHROW,__localdep_getpagesize,(void),getpagesize,{ return __ARCH_PAGESIZE; })
+#elif defined(__CRT_HAVE_getpagesize)
 __NAMESPACE_LOCAL_END
 #include <features.h>
 __NAMESPACE_LOCAL_BEGIN
@@ -41,20 +51,15 @@ __NAMESPACE_LOCAL_BEGIN
 /* >> getpagesize(3)
  * Return the size of a PAGE (in bytes) */
 __CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,__STDC_INT_AS_SIZE_T,__NOTHROW,__localdep_getpagesize,(void),__getpagesize,())
-#else /* ... */
+#elif defined(__ARCH_PAGESIZE)
 __NAMESPACE_LOCAL_END
-#include <asm/pagesize.h>
-__NAMESPACE_LOCAL_BEGIN
-#ifdef __ARCH_PAGESIZE
-__NAMESPACE_LOCAL_END
-#include <libc/local/unistd/getpagesize.h>
+#include <features.h>
 __NAMESPACE_LOCAL_BEGIN
 /* >> getpagesize(3)
  * Return the size of a PAGE (in bytes) */
-#define __localdep_getpagesize __LIBC_LOCAL_NAME(getpagesize)
-#else /* __ARCH_PAGESIZE */
+__FORCELOCAL __ATTR_CONST __ATTR_WUNUSED __STDC_INT_AS_SIZE_T __NOTHROW(__LIBCCALL __localdep_getpagesize)(void) { return __ARCH_PAGESIZE; }
+#else /* ... */
 #undef __local___localdep_getpagesize_defined
-#endif /* !__ARCH_PAGESIZE */
 #endif /* !... */
 #endif /* !__local___localdep_getpagesize_defined */
 /* Dependency: memalign from malloc */

@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x830a44d9 */
+/* HASH CRC-32:0x6ad161cd */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -22,7 +22,7 @@
 #define __local_wlchown_defined 1
 #include <__crt.h>
 #include <asm/os/fcntl.h>
-#if defined(__AT_FDCWD) && defined(__CRT_HAVE_wfchownat)
+#if defined(__AT_FDCWD) && defined(__AT_SYMLINK_NOFOLLOW) && defined(__CRT_HAVE_wfchownat)
 #include <bits/types.h>
 __NAMESPACE_LOCAL_BEGIN
 /* Dependency: wfchownat from parts.wchar.unistd */
@@ -37,14 +37,14 @@ __CREDIRECT(__ATTR_NONNULL((2)),int,__NOTHROW_RPC,__localdep_wfchownat,(__fd_t _
  * but don't reference it if that file is a symbolic link */
 __LOCAL_LIBC(wlchown) __ATTR_NONNULL((1)) int
 __NOTHROW_RPC(__LIBCCALL __LIBC_LOCAL_NAME(wlchown))(__WCHAR_TYPE__ const *__file, __uid_t __owner, __gid_t __group) {
-	return __localdep_wfchownat(__AT_FDCWD, __file, __owner, __group, 0x0100); /* AT_SYMLINK_NOFOLLOW */
+	return __localdep_wfchownat(__AT_FDCWD, __file, __owner, __group, __AT_SYMLINK_NOFOLLOW);
 }
 __NAMESPACE_LOCAL_END
 #ifndef __local___localdep_wlchown_defined
 #define __local___localdep_wlchown_defined 1
 #define __localdep_wlchown __LIBC_LOCAL_NAME(wlchown)
 #endif /* !__local___localdep_wlchown_defined */
-#else /* __AT_FDCWD && __CRT_HAVE_wfchownat */
+#else /* __AT_FDCWD && __AT_SYMLINK_NOFOLLOW && __CRT_HAVE_wfchownat */
 #undef __local_wlchown_defined
-#endif /* !__AT_FDCWD || !__CRT_HAVE_wfchownat */
+#endif /* !__AT_FDCWD || !__AT_SYMLINK_NOFOLLOW || !__CRT_HAVE_wfchownat */
 #endif /* !__local_wlchown_defined */

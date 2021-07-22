@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x23a50045 */
+/* HASH CRC-32:0xf3d2c906 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -846,6 +846,7 @@ __NAMESPACE_LOCAL_USING_OR_IMPL(chown, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_NON
  * return: -1: [errno=EINVAL]      The given `name' isn't a recognized config option */
 __CDECLARE(__ATTR_NONNULL((1)),__LONGPTR_TYPE__,__NOTHROW_RPC,pathconf,(char const *__path, __STDC_INT_AS_UINT_T __name),(__path,__name))
 #else /* __CRT_HAVE_pathconf */
+#include <asm/os/oflags.h>
 #include <asm/os/fcntl.h>
 #if defined(__CRT_HAVE_fpathconf) && (defined(__CRT_HAVE_open64) || defined(__CRT_HAVE___open64) || defined(__CRT_HAVE_open) || defined(__CRT_HAVE__open) || defined(__CRT_HAVE___open) || (defined(__AT_FDCWD) && (defined(__CRT_HAVE_openat64) || defined(__CRT_HAVE_openat)))) && defined(__O_RDONLY)
 #include <libc/local/unistd/pathconf.h>
@@ -1668,13 +1669,13 @@ __CDECLARE_OPT(__ATTR_WUNUSED,__pid_t,__NOTHROW_NCX,getsid,(__pid_t __pid),(__pi
 __CDECLARE(__ATTR_NONNULL((1)),int,__NOTHROW_RPC,lchown,(char const *__file, __uid_t __owner, __gid_t __group),(__file,__owner,__group))
 #else /* __CRT_HAVE_lchown */
 #include <asm/os/fcntl.h>
-#if defined(__AT_FDCWD) && defined(__CRT_HAVE_fchownat)
+#if defined(__AT_FDCWD) && defined(__AT_SYMLINK_NOFOLLOW) && defined(__CRT_HAVE_fchownat)
 #include <libc/local/unistd/lchown.h>
 /* >> lchown(2)
  * Change the ownership of a given `file' to `group:owner',
  * but don't reference it if that file is a symbolic link */
 __NAMESPACE_LOCAL_USING_OR_IMPL(lchown, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_NONNULL((1)) int __NOTHROW_RPC(__LIBCCALL lchown)(char const *__file, __uid_t __owner, __gid_t __group) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(lchown))(__file, __owner, __group); })
-#endif /* __AT_FDCWD && __CRT_HAVE_fchownat */
+#endif /* __AT_FDCWD && __AT_SYMLINK_NOFOLLOW && __CRT_HAVE_fchownat */
 #endif /* !__CRT_HAVE_lchown */
 
 #if defined(__USE_XOPEN_EXTENDED) || defined(__USE_XOPEN2K8)
@@ -1844,14 +1845,11 @@ __CDECLARE_OPT(,int,__NOTHROW_NCX,setregid,(__gid_t __rgid, __gid_t __egid),(__r
 /* >> gethostid(3) */
 __CDECLARE_OPT(__ATTR_WUNUSED,__LONGPTR_TYPE__,__NOTHROW_NCX,gethostid,(void),())
 #if defined(__USE_MISC) || !defined(__USE_XOPEN2K)
-#ifdef __LIBC_BIND_OPTIMIZATIONS
-#include <asm/pagesize.h>
-#endif /* __LIBC_BIND_OPTIMIZATIONS */
-#if defined(__LIBC_BIND_OPTIMIZATIONS) && defined(__ARCH_PAGESIZE) && defined(__CRT_HAVE_getpagesize)
+#if defined(__ARCH_PAGESIZE) && defined(__CRT_HAVE_getpagesize)
 /* >> getpagesize(3)
  * Return the size of a PAGE (in bytes) */
 __CEIDECLARE(__ATTR_CONST __ATTR_WUNUSED,__STDC_INT_AS_SIZE_T,__NOTHROW,getpagesize,(void),{ return __ARCH_PAGESIZE; })
-#elif defined(__LIBC_BIND_OPTIMIZATIONS) && defined(__ARCH_PAGESIZE) && defined(__CRT_HAVE___getpagesize)
+#elif defined(__ARCH_PAGESIZE) && defined(__CRT_HAVE___getpagesize)
 /* >> getpagesize(3)
  * Return the size of a PAGE (in bytes) */
 __CEIREDIRECT(__ATTR_CONST __ATTR_WUNUSED,__STDC_INT_AS_SIZE_T,__NOTHROW,getpagesize,(void),__getpagesize,{ return __ARCH_PAGESIZE; })
@@ -1864,10 +1862,9 @@ __CDECLARE(__ATTR_CONST __ATTR_WUNUSED,__STDC_INT_AS_SIZE_T,__NOTHROW,getpagesiz
  * Return the size of a PAGE (in bytes) */
 __CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,__STDC_INT_AS_SIZE_T,__NOTHROW,getpagesize,(void),__getpagesize,())
 #elif defined(__ARCH_PAGESIZE)
-#include <libc/local/unistd/getpagesize.h>
 /* >> getpagesize(3)
  * Return the size of a PAGE (in bytes) */
-__NAMESPACE_LOCAL_USING_OR_IMPL(getpagesize, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_CONST __ATTR_WUNUSED __STDC_INT_AS_SIZE_T __NOTHROW(__LIBCCALL getpagesize)(void) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(getpagesize))(); })
+__FORCELOCAL __ATTR_CONST __ATTR_WUNUSED __STDC_INT_AS_SIZE_T __NOTHROW(__LIBCCALL getpagesize)(void) { return __ARCH_PAGESIZE; }
 #endif /* ... */
 #ifdef __ARCH_PAGESIZE
 /* If known to be a compile-time  constant, use macros to make  sure

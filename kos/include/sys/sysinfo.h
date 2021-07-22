@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xcc335838 */
+/* HASH CRC-32:0xf43cc049 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -59,9 +59,6 @@ __CDECLARE_OPT(__ATTR_WUNUSED,int,__NOTHROW,get_nprocs,(void),())
  * Return the total # of pages of physical memory */
 __CDECLARE(__ATTR_WUNUSED,__INTPTR_TYPE__,__NOTHROW,get_phys_pages,(void),())
 #else /* __CRT_HAVE_get_phys_pages */
-#ifdef __LIBC_BIND_OPTIMIZATIONS
-#include <asm/pagesize.h>
-#endif /* __LIBC_BIND_OPTIMIZATIONS */
 #include <asm/pagesize.h>
 #if defined(__CRT_HAVE_sysinfo) && !defined(__solaris__) && (defined(__CRT_HAVE_getpagesize) || defined(__CRT_HAVE___getpagesize) || defined(__ARCH_PAGESIZE))
 #include <libc/local/sys.sysinfo/get_phys_pages.h>
@@ -75,9 +72,6 @@ __NAMESPACE_LOCAL_USING_OR_IMPL(get_phys_pages, __FORCELOCAL __ATTR_ARTIFICIAL _
  * Return the total # of free pages of physical memory */
 __CDECLARE(__ATTR_WUNUSED,__INTPTR_TYPE__,__NOTHROW,get_avphys_pages,(void),())
 #else /* __CRT_HAVE_get_avphys_pages */
-#ifdef __LIBC_BIND_OPTIMIZATIONS
-#include <asm/pagesize.h>
-#endif /* __LIBC_BIND_OPTIMIZATIONS */
 #include <asm/pagesize.h>
 #if defined(__CRT_HAVE_sysinfo) && !defined(__solaris__) && (defined(__CRT_HAVE_getpagesize) || defined(__CRT_HAVE___getpagesize) || defined(__ARCH_PAGESIZE))
 #include <libc/local/sys.sysinfo/get_avphys_pages.h>

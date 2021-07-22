@@ -731,7 +731,7 @@ int chown([[nonnull]] char const *file, $uid_t owner, $gid_t group) {
 @@return: -1: [errno=<unchanged>] The configuration specified by `name' is unlimited for `path'
 @@return: -1: [errno=EINVAL]      The given `name' isn't a recognized config option
 [[cp, section(".text.crt{|.dos}.fs.property"), decl_include("<features.h>")]]
-[[userimpl, requires_include("<asm/os/fcntl.h>")]]
+[[userimpl, requires_include("<asm/os/oflags.h>")]]
 [[requires($has_function(fpathconf) && $has_function(open) && defined(__O_RDONLY))]]
 $longptr_t pathconf([[nonnull]] char const *path, __STDC_INT_AS_UINT_T name) {
 	fd_t fd;
@@ -929,7 +929,9 @@ int chdir([[nonnull]] char const *path);
 
 @@>> getcwd(2)
 @@Return the path of the current working directory, relative to the filesystem root set by `chdir(2)'
-[[cp, guard, dos_only_export_alias("_getcwd"), section(".text.crt{|.dos}.fs.basic_property")]]
+[[cp, guard, dos_only_export_alias("_getcwd")]]
+[[section(".text.crt{|.dos}.fs.basic_property")]]
+[[decl_include("<hybrid/typecore.h>")]]
 char *getcwd([[outp_opt(bufsize)]] char *buf, size_t bufsize);
 
 %[default:section(".text.crt{|.dos}.fs.modify")]
@@ -1065,10 +1067,10 @@ $off64_t lseek64($fd_t fd, $off64_t offset, __STDC_INT_AS_UINT_T whence) {
 %[define(DEFINE_PIO_OFFSET =
 #ifndef __PIO_OFFSET
 #ifdef __USE_KOS_ALTERATIONS
-#define __PIO_OFFSET   __FS_TYPE(pos)
+#define __PIO_OFFSET   __FS_TYPE(@pos@)
 #define __PIO_OFFSET64 __pos64_t
 #else /* __USE_KOS_ALTERATIONS */
-#define __PIO_OFFSET   __FS_TYPE(off)
+#define __PIO_OFFSET   __FS_TYPE(@off@)
 #define __PIO_OFFSET64 __off64_t
 #endif /* !__USE_KOS_ALTERATIONS */
 #endif /* !__PIO_OFFSET */
@@ -1079,7 +1081,7 @@ $off64_t lseek64($fd_t fd, $off64_t offset, __STDC_INT_AS_UINT_T whence) {
 @@>> pread(2)
 @@Read data from a file at a specific `offset', rather than the current R/W position
 @@@return: <= bufsize: The actual amount of read bytes
-[[cp, decl_include("<features.h>"), decl_prefix(DEFINE_PIO_OFFSET), no_crt_self_import]]
+[[cp, decl_include("<features.h>", "<bits/types.h>"), decl_prefix(DEFINE_PIO_OFFSET), no_crt_self_import]]
 [[if(defined(__USE_FILE_OFFSET64)), preferred_alias("pread64")]]
 [[if(!defined(__USE_FILE_OFFSET64)), preferred_alias("pread")]]
 [[section(".text.crt{|.dos}.io.read"), requires_include("<asm/os/stdio.h>"), decl_include("<bits/types.h>")]]
@@ -1105,7 +1107,7 @@ ssize_t pread($fd_t fd, [[outp(bufsize)]] void *buf, size_t bufsize, __PIO_OFFSE
 @@>> pwrite(2)
 @@Write data to a file at a specific `offset', rather than the current R/W position
 @@@return: <= bufsize: The actual amount of written bytes
-[[cp, decl_include("<features.h>"), decl_prefix(DEFINE_PIO_OFFSET), no_crt_self_import]]
+[[cp, decl_include("<features.h>", "<bits/types.h>"), decl_prefix(DEFINE_PIO_OFFSET), no_crt_self_import]]
 [[if(defined(__USE_FILE_OFFSET64)), preferred_alias("pwrite64")]]
 [[if(!defined(__USE_FILE_OFFSET64)), preferred_alias("pwrite")]]
 [[section(".text.crt{|.dos}.io.write"), requires_include("<asm/os/stdio.h>"), decl_include("<bits/types.h>")]]
@@ -1133,7 +1135,7 @@ ssize_t pwrite($fd_t fd, [[inp(bufsize)]] void const *buf, size_t bufsize, __PIO
 %#ifdef __USE_KOS
 @@>> preadall(3)
 @@Same as `readall(3)', but using `pread(2)' instead of `read()'
-[[cp, decl_include("<features.h>"), decl_prefix(DEFINE_PIO_OFFSET), no_crt_self_import]]
+[[cp, decl_include("<features.h>", "<bits/types.h>"), decl_prefix(DEFINE_PIO_OFFSET), no_crt_self_import]]
 [[if(defined(__USE_FILE_OFFSET64)), preferred_alias("preadall64")]]
 [[if(!defined(__USE_FILE_OFFSET64)), preferred_alias("preadall")]]
 [[section(".text.crt{|.dos}.io.read"), impl_include("<libc/errno.h>")]]
@@ -1145,7 +1147,7 @@ ssize_t preadall($fd_t fd, [[outp(bufsize)]] void *buf,
 
 @@>> pwriteall(3)
 @@Same as `writeall(3)', but using `pwrite(2)' instead of `write()'
-[[cp, decl_include("<features.h>"), decl_prefix(DEFINE_PIO_OFFSET), no_crt_self_import]]
+[[cp, decl_include("<features.h>", "<bits/types.h>"), decl_prefix(DEFINE_PIO_OFFSET), no_crt_self_import]]
 [[if(defined(__USE_FILE_OFFSET64)), preferred_alias("pwriteall64")]]
 [[if(!defined(__USE_FILE_OFFSET64)), preferred_alias("pwriteall")]]
 [[impl_include("<libc/errno.h>"), section(".text.crt{|.dos}.io.write")]]
@@ -1173,7 +1175,7 @@ ssize_t pwrite32($fd_t fd, [[inp(bufsize)]] void const *buf,
 
 @@>> pread64(2)
 @@Read data from a file at a specific offset
-[[cp, decl_include("<features.h>"), decl_prefix(DEFINE_PIO_OFFSET)]]
+[[cp, decl_include("<features.h>", "<bits/types.h>"), decl_prefix(DEFINE_PIO_OFFSET)]]
 [[off64_variant_of(pread), section(".text.crt{|.dos}.io.large.read")]]
 [[export_alias("__pread64"), requires_include("<asm/os/stdio.h>"), decl_include("<bits/types.h>")]]
 [[userimpl, requires($has_function(pread32) || ($has_function(lseek) && $has_function(read) && defined(__SEEK_CUR) && defined(__SEEK_SET)))]]
@@ -1209,7 +1211,7 @@ ssize_t pread64($fd_t fd, [[outp(bufsize)]] void *buf, size_t bufsize, __PIO_OFF
 
 @@>> pwrite64(2)
 @@Write data to a file at a specific offset
-[[cp, decl_include("<features.h>"), decl_prefix(DEFINE_PIO_OFFSET)]]
+[[cp, decl_include("<features.h>", "<bits/types.h>"), decl_prefix(DEFINE_PIO_OFFSET)]]
 [[off64_variant_of(pwrite), section(".text.crt{|.dos}.io.large.write")]]
 [[export_alias("__pwrite64"), requires_include("<asm/os/stdio.h>"), decl_include("<bits/types.h>")]]
 [[userimpl, requires($has_function(pwrite32) || ($has_function(lseek) && $has_function(write) && defined(__SEEK_CUR) && defined(__SEEK_SET)))]]
@@ -1308,6 +1310,8 @@ ssize_t pwriteall64($fd_t fd, [[inp(bufsize)]] void *buf, size_t bufsize, __PIO_
 [[userimpl, requires_function(dup2)]]
 [[decl_include("<bits/types.h>")]]
 $fd_t dup3($fd_t oldfd, $fd_t newfd, $oflag_t flags) {
+	/* TODO: Document which `flags' actually do anything */
+	/* TODO: Emulate using dup2()+fcntl() */
 	(void)flags;
 	return newfd != oldfd ? dup2(oldfd, newfd) : -1;
 }
@@ -1316,6 +1320,8 @@ $fd_t dup3($fd_t oldfd, $fd_t newfd, $oflag_t flags) {
 [[userimpl, requires_function(pipe)]]
 [[decl_include("<bits/types.h>")]]
 int pipe2([[nonnull]] $fd_t pipedes[2], $oflag_t flags) {
+	/* TODO: Document which `flags' actually do anything */
+	/* TODO: Emulate using pipe()+fcntl() */
 	(void)flags;
 	return pipe(pipedes);
 }
@@ -1434,6 +1440,7 @@ int usleep($useconds_t useconds) {
 [[cp, deprecated("Use getcwd()")]]
 [[section(".text.crt{|.dos}.fs.basic_property")]]
 [[userimpl, requires_function(getcwd)]]
+[[impl_include("<hybrid/typecore.h>")]]
 char *getwd([[nonnull]] char *buf) {
 	return getcwd(buf, (size_t)-1);
 }
@@ -1506,9 +1513,9 @@ $pid_t getsid($pid_t pid);
 @@but don't reference it if that file is a symbolic link
 [[cp, section(".text.crt{|.dos}.fs.modify"), decl_include("<bits/types.h>")]]
 [[userimpl, requires_include("<asm/os/fcntl.h>")]]
-[[requires(defined(__AT_FDCWD) && $has_function(fchownat))]]
+[[requires(defined(__AT_FDCWD) && defined(__AT_SYMLINK_NOFOLLOW) && $has_function(fchownat))]]
 int lchown([[nonnull]] char const *file, $uid_t owner, $gid_t group) {
-	return fchownat(__AT_FDCWD, file, owner, group, 0x0100); /* AT_SYMLINK_NOFOLLOW */
+	return fchownat(__AT_FDCWD, file, owner, group, __AT_SYMLINK_NOFOLLOW);
 }
 
 
@@ -1533,7 +1540,7 @@ int truncate32([[nonnull]] char const *file, $pos32_t length);
 
 @@>> truncate(2)
 @@Truncate the given file `file' to a length of `length'
-[[decl_include("<features.h>"), decl_prefix(DEFINE_PIO_OFFSET), no_crt_self_import]]
+[[decl_include("<features.h>", "<bits/types.h>"), decl_prefix(DEFINE_PIO_OFFSET), no_crt_self_import]]
 [[if(defined(__USE_FILE_OFFSET64)), preferred_alias("truncate64")]]
 [[if(!defined(__USE_FILE_OFFSET64)), preferred_alias("truncate")]]
 [[section(".text.crt{|.dos}.fs.modify"), decl_include("<bits/types.h>")]]
@@ -1621,7 +1628,7 @@ int nice(int inc) {
 @@@return: 1 :    Empty configuration string.
 @@@return: 0 :    [errno=EINVAL] Bad configuration `name'.
 [[section(".text.crt{|.dos}.system.configuration")]]
-[[decl_include("<features.h>")]]
+[[decl_include("<features.h>", "<hybrid/typecore.h>")]]
 size_t confstr(__STDC_INT_AS_UINT_T name, char *buf, size_t buflen);
 
 %
@@ -1690,22 +1697,14 @@ int setregid($gid_t rgid, $gid_t egid);
 %#if defined(__USE_MISC) || !defined(__USE_XOPEN2K)
 @@>> getpagesize(3)
 @@Return the size of a PAGE (in bytes)
-[[libc, const, wunused, nothrow, export_alias("__getpagesize")]]
+[[libc, const, wunused, nothrow, forceinline, export_alias("__getpagesize")]]
 [[requires_include("<asm/pagesize.h>"), requires(defined(__ARCH_PAGESIZE))]]
 [[section(".text.crt{|.dos}.system.configuration"), decl_include("<features.h>")]]
-[[if($extended_prefix(
-#ifdef __LIBC_BIND_OPTIMIZATIONS
-#include <asm/pagesize.h>
-#endif /* __LIBC_BIND_OPTIMIZATIONS */
-)defined(__LIBC_BIND_OPTIMIZATIONS) && defined(__ARCH_PAGESIZE)),
-  preferred_fast_extern_inline("getpagesize", { return __ARCH_PAGESIZE; })
-]][[if($extended_prefix(
-#ifdef __LIBC_BIND_OPTIMIZATIONS
-#include <asm/pagesize.h>
-#endif /* __LIBC_BIND_OPTIMIZATIONS */
-)defined(__LIBC_BIND_OPTIMIZATIONS) && defined(__ARCH_PAGESIZE)),
-  preferred_fast_extern_inline("__getpagesize", { return __ARCH_PAGESIZE; })
-]]
+[[if($extended_include_prefix("<asm/pagesize.h>")defined(__ARCH_PAGESIZE)),
+  preferred_fast_extern_inline("getpagesize", { return __ARCH_PAGESIZE; })]]
+[[if($extended_include_prefix("<asm/pagesize.h>")defined(__ARCH_PAGESIZE)),
+  preferred_fast_extern_inline("__getpagesize", { return __ARCH_PAGESIZE; })]]
+[[impl_include("<asm/pagesize.h>")]]
 __STDC_INT_AS_SIZE_T getpagesize() {
 	return __ARCH_PAGESIZE;
 }
@@ -1791,7 +1790,7 @@ int symlink([[nonnull]] char const *link_text,
 @@         keep on over allocating until the function indicates that it didn't
 @@         make use of the buffer in its entirety.
 @@When targeting KOS, consider using `freadlinkat(2)' with `AT_READLINK_REQSIZE'
-[[cp, section(".text.crt{|.dos}.fs.property")]]
+[[cp, section(".text.crt{|.dos}.fs.property"), decl_include("<hybrid/typecore.h>")]]
 [[userimpl, requires_include("<asm/os/fcntl.h>")]]
 [[requires(defined(__AT_FDCWD) && $has_function(readlinkat))]]
 ssize_t readlink([[nonnull]] char const *path,
@@ -1807,7 +1806,7 @@ ssize_t readlink([[nonnull]] char const *path,
 @@>> getlogin_r(3)
 @@Reentrant version of `getlogin()'. May truncate the name if it's longer than `name_len'
 @@s.a. `getlogin()' and `cuserid()'
-[[cp, section(".text.crt{|.dos}.io.tty")]]
+[[cp, section(".text.crt{|.dos}.io.tty"), decl_include("<hybrid/typecore.h>")]]
 [[requires($has_function(getenv) || ($has_function(getpwuid_r) && $has_function(geteuid)))]]
 [[impl_include("<bits/crt/db/passwd.h>")]] /* struct passwd */
 int getlogin_r([[outp(name_len)]] char *name, size_t name_len) {
@@ -1846,6 +1845,7 @@ int getlogin_r([[outp(name_len)]] char *name, size_t name_len) {
 @@>> gethostname(3)
 @@Return the name assigned to the hosting machine, as set by `sethostname(2)'
 [[section(".text.crt{|.dos}.system.configuration")]]
+[[decl_include("<hybrid/typecore.h>")]]
 int gethostname([[outp(buflen)]] char *name, size_t buflen);
 %#endif /* __USE_UNIX98 || __USE_XOPEN2K */
 
@@ -1858,6 +1858,7 @@ int setlogin([[nonnull]] char const *name);
 @@>> sethostname(2)
 @@Set the name of the hosting machine
 [[section(".text.crt{|.dos}.system.configuration")]]
+[[decl_include("<hybrid/typecore.h>")]]
 int sethostname([[inp(len)]] char const *name, size_t len);
 
 @@>> sethostid(3)
@@ -1867,11 +1868,13 @@ int sethostid($longptr_t id);
 @@>> getdomainname(3)
 @@Return the name assigned to the hosting machine's domain, as set by `setdomainname(2)'
 [[section(".text.crt{|.dos}.system.configuration")]]
+[[decl_include("<hybrid/typecore.h>")]]
 int getdomainname([[outp(buflen)]] char *name, size_t buflen);
 
 @@>> setdomainname(2)
 @@Set the name of the hosting machine's domain
 [[section(".text.crt{|.dos}.system.configuration")]]
+[[decl_include("<hybrid/typecore.h>")]]
 int setdomainname([[inp(len)]] char const *name, size_t len);
 
 @@>> vhangup(3)
@@ -1880,6 +1883,7 @@ int vhangup();
 
 @@>> profil(3)
 [[section(".text.crt{|.dos}.system.utility")]]
+[[decl_include("<hybrid/typecore.h>")]]
 int profil([[nonnull]] $uint16_t *sample_buffer,
            size_t size, size_t offset,
            unsigned int scale);
@@ -2758,6 +2762,7 @@ out:
 [[requires($has_function(getpassfd) || $has_function(readpassphrase))]]
 [[impl_include("<asm/crt/getpassfd.h>")]]
 [[impl_include("<asm/crt/readpassphrase.h>")]]
+[[decl_include("<hybrid/typecore.h>")]]
 char *getpass_r([[nullable]] char const *prompt, char *buf, size_t bufsize) {
 @@pp_if $has_function(getpassfd)@@
 	/* Prefer using `getpassfd(3)' because I feel like that one's more
@@ -3008,8 +3013,8 @@ int fchroot($fd_t fd) {
 @@the function will set errno=ERANGE and return -1
 @@@return: * : Used buffer size (possibly including a NUL-byte, but maybe not)
 @@@return: -1: Error. (s.a. `errno')
+[[decl_include("<hybrid/typecore.h>"), impl_include("<libc/errno.h>")]]
 [[requires_include("<asm/os/fcntl.h>")]]
-[[impl_include("<libc/errno.h>")]]
 [[requires($has_function(frealpathat) && defined(__AT_FDCWD))]]
 __STDC_INT_AS_SSIZE_T resolvepath([[nonnull]] char const *filename,
                                   char *resolved, $size_t buflen) {

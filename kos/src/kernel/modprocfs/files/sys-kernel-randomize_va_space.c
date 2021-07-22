@@ -23,7 +23,7 @@
 
 #include <kernel/compiler.h>
 
-#include <kernel/mman/unmapped.h> /* mman_getunmapped_extflags */
+#include <kernel/mman/unmapped.h> /* mman_findunmapped_extflags */
 
 #include <hybrid/atomic.h>
 
@@ -39,7 +39,7 @@ DECL_BEGIN
 INTERN NONNULL((1)) ssize_t KCALL
 ProcFS_Sys_Kernel_RandomizeVaSpace_Print(struct regular_node *__restrict UNUSED(self),
                                          pformatprinter printer, void *arg) {
-	return ProcFS_PrintUInt(printer, arg, (mman_getunmapped_extflags & MAP_NOASLR) ? 0 : 2);
+	return ProcFS_PrintUInt(printer, arg, (mman_findunmapped_extflags & MAP_NOASLR) ? 0 : 2);
 }
 
 INTERN NONNULL((1)) void KCALL
@@ -50,10 +50,10 @@ ProcFS_Sys_Kernel_RandomizeVaSpace_Write(struct regular_node *__restrict UNUSED(
 	mode = ProcFS_ParseUInt(buf, bufsize, 0, 2);
 	if (mode == 0) {
 		/* Disable */
-		ATOMIC_OR(mman_getunmapped_extflags, MAP_NOASLR);
+		ATOMIC_OR(mman_findunmapped_extflags, MAP_NOASLR);
 	} else {
 		/* Enable */
-		ATOMIC_AND(mman_getunmapped_extflags, ~MAP_NOASLR);
+		ATOMIC_AND(mman_findunmapped_extflags, ~MAP_NOASLR);
 	}
 }
 

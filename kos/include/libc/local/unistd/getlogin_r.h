@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x77fa14cd */
+/* HASH CRC-32:0x9f634388 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -23,6 +23,7 @@
 #include <__crt.h>
 #include <libc/local/environ.h>
 #if defined(__CRT_HAVE_getenv) || defined(__LOCAL_environ) || (defined(__CRT_HAVE_getpwuid_r) && defined(__CRT_HAVE_geteuid))
+#include <hybrid/typecore.h>
 __NAMESPACE_LOCAL_BEGIN
 /* Dependency: getenv from stdlib */
 #ifndef __local___localdep_getenv_defined
@@ -65,9 +66,6 @@ __CREDIRECT(__ATTR_NONNULL((2, 3, 5)),__errno_t,__NOTHROW_RPC,__localdep_getpwui
 #ifndef __local___localdep_strncpy_defined
 #define __local___localdep_strncpy_defined 1
 #if __has_builtin(__builtin_strncpy) && defined(__LIBC_BIND_CRTBUILTINS) && defined(__CRT_HAVE_strncpy)
-__NAMESPACE_LOCAL_END
-#include <hybrid/typecore.h>
-__NAMESPACE_LOCAL_BEGIN
 /* >> strncpy(3)
  * Always write exactly `buflen' characters to `buf'. As far as
  * space for doing so is available, up to the `strlen(src)' of
@@ -75,9 +73,6 @@ __NAMESPACE_LOCAL_BEGIN
  * characters are always set to '\0'. Always re-returns `buf' */
 __CEIREDIRECT(__ATTR_LEAF __ATTR_RETNONNULL __ATTR_NONNULL((1, 2)),char *,__NOTHROW_NCX,__localdep_strncpy,(char *__restrict __buf, char const *__restrict __src, __SIZE_TYPE__ __buflen),strncpy,{ return __builtin_strncpy(__buf, __src, __buflen); })
 #elif defined(__CRT_HAVE_strncpy)
-__NAMESPACE_LOCAL_END
-#include <hybrid/typecore.h>
-__NAMESPACE_LOCAL_BEGIN
 /* >> strncpy(3)
  * Always write exactly `buflen' characters to `buf'. As far as
  * space for doing so is available, up to the `strlen(src)' of

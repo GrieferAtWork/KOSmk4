@@ -109,7 +109,7 @@ NOTHROW(KCALL copyfromphys_noidentity)(void *__restrict dst,
 PRIVATE ATTR_FREETEXT ATTR_PURE byte_t
 NOTHROW(KCALL acpi_memsum)(void const *__restrict p, size_t n_bytes) {
 	byte_t result = 0;
-	byte_t *iter, *end;
+	byte_t const *iter, *end;
 	end = (iter = (byte_t *)p) + n_bytes;
 	for (; iter != end; ++iter)
 		result += *iter;
@@ -121,7 +121,7 @@ NOTHROW(KCALL acpi_memsum_phys)(physaddr_t p, size_t n_bytes) {
 	u8 buf[256];
 	byte_t result = 0;
 	while (n_bytes) {
-		size_t cnt = MIN(n_bytes, COMPILER_LENOF(buf));
+		size_t cnt = MIN(n_bytes, sizeof(buf));
 		copyfromphys_noidentity(buf, p, cnt);
 		result += acpi_memsum(buf, cnt);
 		n_bytes -= cnt;
@@ -183,7 +183,7 @@ PRIVATE ATTR_FREETEXT RSDPDescriptor *
 NOTHROW(KCALL RSDP_LocateDescriptor)(void) {
 	RSDPDescriptor *result;
 	uintptr_t base;
-	base = (uintptr_t)*(u16 volatile *)(KERNEL_CORE_BASE + 0x40E);
+	base   = (uintptr_t)(*(u16 volatile *)(KERNEL_CORE_BASE + 0x40e));
 	result = RSDP_LocateInRange(KERNEL_CORE_BASE + base, 1024);
 	if (result)
 		goto done;

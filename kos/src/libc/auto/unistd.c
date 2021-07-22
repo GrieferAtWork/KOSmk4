@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x505558c3 */
+/* HASH CRC-32:0xac81585 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -258,6 +258,7 @@ NOTHROW_NCX(LIBCCALL libc_isatty)(fd_t fd) {
 	return libc_tcgetattr(fd, &ios) != 0 ? 0 : 1;
 #endif /* !__CRT_HAVE_ioctl || !__TCGETA */
 }
+#include <asm/pagesize.h>
 /* >> getpagesize(3)
  * Return the size of a PAGE (in bytes) */
 INTERN ATTR_SECTION(".text.crt.system.configuration") ATTR_CONST WUNUSED __STDC_INT_AS_SIZE_T

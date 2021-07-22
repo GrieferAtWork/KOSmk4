@@ -2899,10 +2899,10 @@ int fisatty([[nonnull]] $FILE *__restrict stream) {
 %[define(DEFINE_PIO_OFFSET =
 #ifndef __PIO_OFFSET
 #ifdef __USE_KOS_ALTERATIONS
-#define __PIO_OFFSET   __FS_TYPE(pos)
+#define __PIO_OFFSET   __FS_TYPE(@pos@)
 #define __PIO_OFFSET64 __pos64_t
 #else /* __USE_KOS_ALTERATIONS */
-#define __PIO_OFFSET   __FS_TYPE(off)
+#define __PIO_OFFSET   __FS_TYPE(@off@)
 #define __PIO_OFFSET64 __off64_t
 #endif /* !__USE_KOS_ALTERATIONS */
 #endif /* !__PIO_OFFSET */
@@ -2912,7 +2912,8 @@ int fisatty([[nonnull]] $FILE *__restrict stream) {
 
 @@>> fftruncate(3)
 @@Truncate the given file `stream' to a length of `length'
-[[cp_stdio, decl_prefix(DEFINE_PIO_OFFSET), no_crt_self_import, no_crt_self_export, export_as(CNL_fftruncate...)]]
+[[cp_stdio, decl_include("<features.h>", "<bits/types.h>"), decl_prefix(DEFINE_PIO_OFFSET)]]
+[[no_crt_self_import, no_crt_self_export, export_as(CNL_fftruncate...)]]
 [[if($extended_include_prefix("<features.h>", "<bits/types.h>")defined(__USE_STDIO_UNLOCKED) && __FS_SIZEOF(@OFF@) == __SIZEOF_OFF32_T__), alias(CNL_fftruncate_unlocked...)]]
 [[if($extended_include_prefix("<features.h>", "<bits/types.h>")defined(__USE_STDIO_UNLOCKED) && __FS_SIZEOF(@OFF@) == __SIZEOF_OFF64_T__), alias(CNL_fftruncate64_unlocked...)]]
 [[if($extended_include_prefix("<features.h>", "<bits/types.h>")                                 __FS_SIZEOF(@OFF@) == __SIZEOF_OFF32_T__), alias(CNL_fftruncate...)]]
@@ -2931,7 +2932,7 @@ int fftruncate([[nonnull]] $FILE *__restrict stream, __PIO_OFFSET length) {
 
 @@>> fftruncate_unlocked(3)
 @@Same as `fftruncate()', but don't acquire a lock to the file
-[[cp_stdio, decl_prefix(DEFINE_PIO_OFFSET)]]
+[[cp_stdio, decl_include("<features.h>", "<bits/types.h>"), decl_prefix(DEFINE_PIO_OFFSET)]]
 [[no_crt_self_import, no_crt_self_export, export_as(CNL_fftruncate_unlocked...)]]
 [[if($extended_include_prefix("<features.h>", "<bits/types.h>")__FS_SIZEOF(@OFF@) == __SIZEOF_OFF32_T__), alias(CNL_fftruncate_unlocked...)]]
 [[if($extended_include_prefix("<features.h>", "<bits/types.h>")__FS_SIZEOF(@OFF@) == __SIZEOF_OFF64_T__), alias(CNL_fftruncate64_unlocked...)]]
@@ -3030,7 +3031,7 @@ int fsetpos64_unlocked([[nonnull]] $FILE *__restrict stream,
 
 @@>> fftruncate64(3)
 @@Truncate the given file `stream' to a length of `length'
-[[cp_stdio, decl_prefix(DEFINE_PIO_OFFSET)]]
+[[cp_stdio, decl_include("<features.h>", "<bits/types.h>"), decl_prefix(DEFINE_PIO_OFFSET)]]
 [[if($extended_include_prefix("<bits/types.h>")__SIZEOF_OFF32_T__ == __SIZEOF_OFF64_T__), crt_intern_kos_alias("libc_fftruncate")]]
 [[no_crt_self_import, no_crt_self_export, export_as(CNL_fftruncate64...)]]
 [[if($extended_include_prefix("<features.h>", "<bits/types.h>")defined(__USE_STDIO_UNLOCKED) && __SIZEOF_OFF64_T__ == __SIZEOF_OFF32_T__), alias(CNL_fftruncate_unlocked...)]]
@@ -3051,7 +3052,7 @@ int fftruncate64([[nonnull]] $FILE *__restrict stream, __PIO_OFFSET64 length) {
 
 @@>> fftruncate64_unlocked(3)
 @@Truncate the given file `stream' to a length of `length'
-[[cp_stdio, decl_prefix(DEFINE_PIO_OFFSET)]]
+[[cp_stdio, decl_include("<features.h>", "<bits/types.h>"), decl_prefix(DEFINE_PIO_OFFSET)]]
 [[if($extended_include_prefix("<bits/types.h>")__SIZEOF_OFF32_T__ == __SIZEOF_OFF64_T__), crt_intern_kos_alias("libc_fftruncate_unlocked")]]
 [[no_crt_self_import, no_crt_self_export, export_as(CNL_fftruncate64_unlocked...)]]
 [[if($extended_include_prefix("<bits/types.h>")__SIZEOF_OFF64_T__ == __SIZEOF_OFF32_T__), alias(CNL_fftruncate_unlocked...)]]

@@ -76,7 +76,7 @@ DECL_BEGIN
 #endif /* !KERNEL_MHINT_USER_MINADDR */
 
 /* The lowest (user-space) address  that might ever be  automatically
- * selected for mapping by  `mman_getunmapped()'. Note that the  user
+ * selected for mapping by `mman_findunmapped()'. Note that the  user
  * may still employ `MAP_FIXED' to overrule this limit, allowing them
  * to mmap anywhere (in user-space).
  *
@@ -102,13 +102,13 @@ PUBLIC USER CHECKED void *mman_getunmapped_user_defbase = MHINT_GETADDR(KERNEL_M
 PUBLIC USER CHECKED void *mman_getunmapped_user_stkbase = MHINT_GETADDR(KERNEL_MHINT_USER_STACK);
 
 /* [lock(ATOMIC)]
- * Additional flags that are always or'd to those given to `mman_getunmapped()'
+ * Additional flags that are always or'd to those given to `mman_findunmapped()'
  * NOTE: _ONLY_ use this always force the  `MAP_NOASLR' flag to be set,  thus
  *       allowing you to force-disable ASLR system-wide. Using this for other
  *       flags  does  what you'd  think, but  the  results would  probably be
  *       catastrophic.
  *       Also note that modifications to this variable must be done atomically! */
-PUBLIC unsigned int mman_getunmapped_extflags = 0;
+PUBLIC unsigned int mman_findunmapped_extflags = 0;
 
 
 /* Select a random integer >= minval && <= maxval, with
@@ -197,7 +197,7 @@ NOTHROW(FCALL mman_findunmapped)(struct mman const *__restrict self,
 	/*assert(mman_lock_acquired(self));*/ /* Cannot be asserted because of `mman_findunmapped_in_usertree()' */
 
 	/* Load additional flags. */
-	flags |= mman_getunmapped_extflags;
+	flags |= mman_findunmapped_extflags;
 
 	/* Ensure that the hinted address range is properly aligned. */
 	if unlikely(!IS_ALIGNED((uintptr_t)addr, PAGESIZE)) {

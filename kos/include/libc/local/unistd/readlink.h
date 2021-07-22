@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xb95ea670 */
+/* HASH CRC-32:0x58fbb50c */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -23,6 +23,7 @@
 #include <__crt.h>
 #include <asm/os/fcntl.h>
 #if defined(__AT_FDCWD) && defined(__CRT_HAVE_readlinkat)
+#include <hybrid/typecore.h>
 __NAMESPACE_LOCAL_BEGIN
 /* Dependency: readlinkat from unistd */
 #ifndef __local___localdep_readlinkat_defined

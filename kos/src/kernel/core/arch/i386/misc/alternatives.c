@@ -34,9 +34,35 @@
 #include <asm/intrin.h>
 
 #include <assert.h>
+#include <stddef.h>
 #include <string.h>
 
 DECL_BEGIN
+
+struct feature_offset {
+	u32 fo_feature; /* Feature ID (one of `X86_FEATURE(?, ?, 0)') */
+	u32 fo_offset;  /* Feature word offset (into `struct cpuinfo') */
+};
+
+/* Table of offsets into `struct cpuinfo' for known feature words. */
+PRIVATE struct feature_offset const feature_offsets[] = {
+	{ X86_FEATURE(0x00000000, A, 0), offsetof(struct cpuinfo, ci_0a) },
+	{ X86_FEATURE(0x00000000, C, 0), offsetof(struct cpuinfo, ci_0c) },
+	{ X86_FEATURE(0x00000000, D, 0), offsetof(struct cpuinfo, ci_0d) },
+	{ X86_FEATURE(0x00000000, B, 0), offsetof(struct cpuinfo, ci_0b) },
+	{ X86_FEATURE(0x00000001, A, 0), offsetof(struct cpuinfo, ci_1a) },
+	{ X86_FEATURE(0x00000001, C, 0), offsetof(struct cpuinfo, ci_1c) },
+	{ X86_FEATURE(0x00000001, D, 0), offsetof(struct cpuinfo, ci_1d) },
+	{ X86_FEATURE(0x00000001, B, 0), offsetof(struct cpuinfo, ci_1b) },
+	{ X86_FEATURE(0x00000007, C, 0), offsetof(struct cpuinfo, ci_7c) },
+	{ X86_FEATURE(0x00000007, D, 0), offsetof(struct cpuinfo, ci_7d) },
+	{ X86_FEATURE(0x00000007, B, 0), offsetof(struct cpuinfo, ci_7b) },
+	{ X86_FEATURE(0x80000000, A, 0), offsetof(struct cpuinfo, ci_80000000a) },
+	{ X86_FEATURE(0x80000001, C, 0), offsetof(struct cpuinfo, ci_80000001c) },
+	{ X86_FEATURE(0x80000001, D, 0), offsetof(struct cpuinfo, ci_80000001d) },
+	{ X86_FEATURE(0x80000007, D, 0), offsetof(struct cpuinfo, ci_80000007d) },
+};
+
 
 /* Check if the machine supports a given `feature' */
 PRIVATE ATTR_COLDTEXT NOBLOCK WUNUSED bool
@@ -45,84 +71,31 @@ NOTHROW(FCALL has_feature)(u32 feature) {
 	switch (feature & X86_FEATURE_TYPMASK) {
 
 	case X86_FEATURE_TYP_CPUID: {
-		u32 word = 0;
+		/* Feature detection via CPUID word bittest. */
 		STATIC_ASSERT(X86_FEATURE_TYP_CPUID == 0);
+		u32 word = 0;
+		unsigned int i;
+
 		/* Use the boot-cpu's cpuid  feature table (since that  one
 		 * can be overwritten, unlike the actual cpuid instruction) */
-		switch (feature & ~X86_FEATURE_BITMASK) {
-
-		case X86_FEATURE(0, A, 0):
-			word = bootcpu_x86_cpuid.ci_0a;
-			break;
-
-		case X86_FEATURE(0, C, 0):
-			word = bootcpu_x86_cpuid.ci_0c;
-			break;
-
-		case X86_FEATURE(0, D, 0):
-			word = bootcpu_x86_cpuid.ci_0d;
-			break;
-
-		case X86_FEATURE(0, B, 0):
-			word = bootcpu_x86_cpuid.ci_0b;
-			break;
-
-		case X86_FEATURE(1, A, 0):
-			word = bootcpu_x86_cpuid.ci_1a;
-			break;
-
-		case X86_FEATURE(1, C, 0):
-			word = bootcpu_x86_cpuid.ci_1c;
-			break;
-
-		case X86_FEATURE(1, D, 0):
-			word = bootcpu_x86_cpuid.ci_1d;
-			break;
-
-		case X86_FEATURE(1, B, 0):
-			word = bootcpu_x86_cpuid.ci_1b;
-			break;
-
-		case X86_FEATURE(7, C, 0):
-			word = bootcpu_x86_cpuid.ci_7c;
-			break;
-
-		case X86_FEATURE(7, D, 0):
-			word = bootcpu_x86_cpuid.ci_7d;
-			break;
-
-		case X86_FEATURE(7, B, 0):
-			word = bootcpu_x86_cpuid.ci_7b;
-			break;
-
-		case X86_FEATURE(0x80000000, A, 0):
-			word = bootcpu_x86_cpuid.ci_80000000a;
-			break;
-
-		case X86_FEATURE(0x80000001, C, 0):
-			word = bootcpu_x86_cpuid.ci_80000001c;
-			break;
-
-		case X86_FEATURE(0x80000001, D, 0):
-			word = bootcpu_x86_cpuid.ci_80000001d;
-			break;
-
-		case X86_FEATURE(0x80000007, D, 0):
-			word = bootcpu_x86_cpuid.ci_80000007d;
-			break;
-
-		default:
-			/* Actually invoke cpuid. */
-			if (X86_HAVE_CPUID) {
-				u32 regs[4];
-				__cpuid(X86_FEATURE_GETEAX(feature),
-				        &regs[0], &regs[1],
-				        &regs[2], &regs[3]);
-				/* Test the requested bit. */
-				word = regs[X86_FEATURE_GETREG(feature)];
+		for (i = 0; i < COMPILER_LENOF(feature_offsets); ++i) {
+			if (feature_offsets[i].fo_feature == (feature & ~X86_FEATURE_BITMASK)) {
+				word = *(u32 const *)((byte_t const *)&bootcpu_x86_cpuid +
+				                      feature_offsets[i].fo_offset);
+				goto got_feature_word;
 			}
-			break;
 		}
+
+		/* Fallback: actually invoke cpuid. */
+		if (X86_HAVE_CPUID) {
+			u32 regs[4];
+			__cpuid(X86_FEATURE_GETEAX(feature),
+			        &regs[0], &regs[1],
+			        &regs[2], &regs[3]);
+			/* Test the requested bit. */
+			word = regs[X86_FEATURE_GETREG(feature)];
+		}
+got_feature_word:
 		result = (word & ((u32)1 << X86_FEATURE_GETBIT(feature))) != 0;
 	}	break;
 
@@ -163,12 +136,15 @@ init_alternatives(struct x86_alternative const *start,
 		total_len    = end_offset - start_offset;
 		assert(end_offset >= start_offset);
 		assert(start->xa_altlen <= total_len);
+
 		/* Copy alternative code. */
 		dest = mempcpy((byte_t *)loadaddr + start_offset,
 		               (byte_t *)loadaddr + start->xa_altcode,
 		               start->xa_altlen);
+
 		/* Pad with nop-instructions. */
 		memset(dest, 0x90, total_len - start->xa_altlen);
+
 		/* Skip additional alternatives for the same region. */
 		do {
 			++start;

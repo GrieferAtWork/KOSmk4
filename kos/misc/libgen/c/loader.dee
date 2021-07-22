@@ -851,7 +851,7 @@ class FunctionFeatures {
 
 	/* Declaration features */
 	public member decl: UserString | string = DEFAULT_DECL;          /* [decl(...)]             Declaration prefix */
-	public member std: bool = false;                                 /* [[std]]                   Expose as part of the std:: namespace */
+	public member std: bool = false;                                 /* [std]                   Expose as part of the std:: namespace */
 	public member namespaces: {string...} = ("",);                   /* [[no_]ignore]           Namespaces from which to import the function */
 	public member libc: bool = false;                                /* [[no_]libc]             Export in <libc/string.h> */
 	public member inline: UserString | string | none = none;         /* [[no_]inline]           Use the associated body for inline implementations, rather than including <libc/local/...> headers */

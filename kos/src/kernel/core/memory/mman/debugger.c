@@ -219,7 +219,7 @@ DBG_COMMAND_AUTO(aslr, DBG_COMMANDHOOK_FLAG_AUTOEXCLUSIVE,
                  argc, argv) {
 	bool enabled;
 	if (argc == 1) {
-		enabled = !(mman_getunmapped_extflags & MAP_NOASLR);
+		enabled = !(mman_findunmapped_extflags & MAP_NOASLR);
 		dbg_print(enabled ? DBGSTR("enabled\n") : DBGSTR("disabled\n"));
 		return enabled ? 0 : 1;
 	}
@@ -233,9 +233,9 @@ DBG_COMMAND_AUTO(aslr, DBG_COMMANDHOOK_FLAG_AUTOEXCLUSIVE,
 		return DBG_STATUS_INVALID_ARGUMENTS;
 	}
 	if (enabled) {
-		ATOMIC_AND(mman_getunmapped_extflags, ~MAP_NOASLR);
+		ATOMIC_AND(mman_findunmapped_extflags, ~MAP_NOASLR);
 	} else {
-		ATOMIC_OR(mman_getunmapped_extflags, MAP_NOASLR);
+		ATOMIC_OR(mman_findunmapped_extflags, MAP_NOASLR);
 	}
 	return 0;
 }

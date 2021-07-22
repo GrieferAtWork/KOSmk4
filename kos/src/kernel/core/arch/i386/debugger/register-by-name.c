@@ -374,11 +374,11 @@ do_pax:
 	if (namelen == 5 &&
 	    EQNOCASE(name[0], 's') &&
 	    EQNOCASE(name[1], 't') &&
-	    EQNOCASE(name[2], '(') &&
+	    (name[2] == '(') &&
 	    /* TODO: Allow white-space as in `st ( 0 )'
 	     *                            here: ^ ^ ^ */
 	    (name[3] >= '0' && name[3] <= '7') &&
-	    EQNOCASE(name[4], ')')) {
+	    (name[4] == ')')) {
 		result = X86_REGISTER_FLOAT_ST0 + (name[3] - '0');
 		goto done;
 	}
