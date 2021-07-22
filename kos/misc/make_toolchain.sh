@@ -806,7 +806,7 @@ Name: pciaccess
 Description: KOS-specific reimplementation
 Version: 0.16
 Cflags:
-Libs: -lpci
+Libs: -lpciaccess
 EOF
 
 

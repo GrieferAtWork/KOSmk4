@@ -17,8 +17,8 @@
  *    misrepresented as being the original software.                          *
  * 3. This notice may not be removed or altered from any source distribution. *
  */
-#ifndef GUARD_LIBPCI_PCIACCESS_H
-#define GUARD_LIBPCI_PCIACCESS_H 1
+#ifndef GUARD_LIBPCIACCESS_PCIACCESS_H
+#define GUARD_LIBPCIACCESS_PCIACCESS_H 1
 
 #include "api.h"
 
@@ -29,7 +29,7 @@
 
 #include <kos/types.h>
 
-#include <libpci/pciaccess.h>
+#include <libpciaccess/pciaccess.h>
 
 #ifndef NOBLOCK
 #define NOBLOCK __NOBLOCK
@@ -219,4 +219,4 @@ INTDEF void NOTHROW(CC libpci_io_write32)(struct pci_io_handle *handle, port_t r
 
 DECL_END
 
-#endif /* !GUARD_LIBPCI_PCIACCESS_H */
+#endif /* !GUARD_LIBPCIACCESS_PCIACCESS_H */

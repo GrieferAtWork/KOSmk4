@@ -183,8 +183,8 @@
 #define LIBVM86_DECL
 #define LIBZLIB_CC
 #define LIBZLIB_DECL
-#define LIBPCI_CC
-#define LIBPCI_DECL
+#define LIBPCIACCESS_CC
+#define LIBPCIACCESS_DECL
 #define DLFCN_CC
 #define __DLFCN_CC
 #define DLFCN_VCC

@@ -22,8 +22,8 @@ gcc_opt.append("-O3"); // Force-enable optimizations (mainly for faster pci.ids 
  *    misrepresented as being the original software.                          *
  * 3. This notice may not be removed or altered from any source distribution. *
  */
-#ifndef GUARD_LIBPCI_PCIACCESS_C
-#define GUARD_LIBPCI_PCIACCESS_C 1
+#ifndef GUARD_LIBPCIACCESS_PCIACCESS_C
+#define GUARD_LIBPCIACCESS_PCIACCESS_C 1
 #define LIBPHYS_WANT_PROTOTYPES 1
 
 #include "api.h"
@@ -52,7 +52,7 @@ gcc_opt.append("-O3"); // Force-enable optimizations (mainly for faster pci.ids 
 #include <stdlib.h>
 #include <string.h>
 
-#include <libpci/pciaccess.h>
+#include <libpciaccess/pciaccess.h>
 #include <libphys/phys.h>
 
 #ifdef __KERNEL__
@@ -223,7 +223,7 @@ PRIVATE LLRBTREE_ROOT(pci_device) libpci_devices_tree = NULL;
 
 #ifndef __KERNEL__
 DEFINE_PUBLIC_ALIAS(pci_devices, libpci_devices_getter);
-INTERN WUNUSED ATTR_CONST struct pci_device *NOTHROW(LIBPCI_CC libpci_devices_getter)(void) {
+INTERN WUNUSED ATTR_CONST struct pci_device *NOTHROW(LIBPCIACCESS_CC libpci_devices_getter)(void) {
 	return SLIST_FIRST(&libpci_devices);
 }
 #endif /* !__KERNEL__ */
@@ -1720,4 +1720,4 @@ DECL_END
 #include "pci.ids.c.inl"
 #endif /* !__INTELLISENSE__ */
 
-#endif /* !GUARD_LIBPCI_PCIACCESS_C */
+#endif /* !GUARD_LIBPCIACCESS_PCIACCESS_C */

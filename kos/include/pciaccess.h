@@ -21,6 +21,6 @@
 #ifndef PCIACCESS_H
 #define PCIACCESS_H
 
-#include <libpci/pciaccess.h>
+#include <libpciaccess/pciaccess.h>
 
 #endif /* PCIACCESS_H */

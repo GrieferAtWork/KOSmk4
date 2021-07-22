@@ -61,7 +61,7 @@
 #include <stdio.h>
 #include <string.h>
 
-#include <libpci/pciaccess.h>
+#include <libpciaccess/pciaccess.h>
 
 #if !defined(NDEBUG) && 1
 //#define UHCI_DEBUG_LOG_TD_COMPLETE 1

@@ -30,7 +30,7 @@
 
 #include <hw/usb/ohci.h>
 
-#include <libpci/pciaccess.h>
+#include <libpciaccess/pciaccess.h>
 
 DECL_BEGIN
 

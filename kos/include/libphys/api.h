@@ -51,8 +51,8 @@
 #define LIBPHYS_CC /* nothing */
 #endif
 
-/* NOTE: In kernel-space,  libpci doesn't  exist  per-se, but  (most)  functions
- *       exist with identical names, and are also declared when <libphys/phys.h>
+/* NOTE: In kernel-space, libpciaccess doesn't exist per-se, but (most) functions
+ *       exist with identical names, and are also declared when  <libphys/phys.h>
  *       is #included, so act as though prototypes were provided. */
 #if defined(__KOS__) && defined(__KERNEL__)
 #define LIBPHYS_WANT_PROTOTYPES 1

@@ -17,10 +17,10 @@
  *    misrepresented as being the original software.                          *
  * 3. This notice may not be removed or altered from any source distribution. *
  */
-#ifndef _LIBPCI_CONFIG_H
-#define _LIBPCI_CONFIG_H 1
+#ifndef _LIBPCIACCESS_CONFIG_H
+#define _LIBPCIACCESS_CONFIG_H 1
 
-/* Define if libpci is supported on this platform. */
-/* #define LIBPCI_SUPPORTED */
+/* Define if libpciaccess is supported on this platform. */
+/* #define LIBPCIACCESS_SUPPORTED */
 
-#endif /* !_LIBPCI_CONFIG_H */
+#endif /* !_LIBPCIACCESS_CONFIG_H */

@@ -136,7 +136,7 @@ BEGIN
 		KERNEL_C_SOURCES.append("../../libemu86/*.c");
 
 		/* Required for: PCI device access. */
-		KERNEL_C_SOURCES.append("../../libpci/*.c");
+		KERNEL_C_SOURCES.append("../../libpciaccess/*.c");
 	}
 
 	if (TARGET_ARCH == "x86_64") {

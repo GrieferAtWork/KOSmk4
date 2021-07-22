@@ -29,7 +29,7 @@
 #include <kernel/printk.h>
 #include <kernel/types.h>
 
-#include <libpci/pciaccess.h>
+#include <libpciaccess/pciaccess.h>
 
 DECL_BEGIN
 

@@ -43,7 +43,7 @@
 #include <stdio.h>
 #include <time.h>
 
-#include <libpci/pciaccess.h>
+#include <libpciaccess/pciaccess.h>
 
 /**/
 #include <kernel/x86/pic.h> /* TODO: Non-portable! */

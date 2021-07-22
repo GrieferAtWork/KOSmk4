@@ -17,20 +17,20 @@
  *    misrepresented as being the original software.                          *
  * 3. This notice may not be removed or altered from any source distribution. *
  */
-#ifndef GUARD_LIBPCI_API_H
-#define GUARD_LIBPCI_API_H 1
+#ifndef GUARD_LIBPCIACCESS_API_H
+#define GUARD_LIBPCIACCESS_API_H 1
 #define _KOS_SOURCE 1
 #define _KOS_ALTERATIONS_SOURCE 1
 
 #include <__stdinc.h>
 #include <hybrid/compiler.h>
 
-#include <libpci/api.h>
+#include <libpciaccess/api.h>
 
-#ifndef LIBPCI_SUPPORTED
+#ifndef LIBPCIACCESS_SUPPORTED
 #error "Unsupported library"
-#endif /* !LIBPCI_SUPPORTED */
+#endif /* !LIBPCIACCESS_SUPPORTED */
 
-#define CC LIBPCI_CC
+#define CC LIBPCIACCESS_CC
 
-#endif /* !GUARD_LIBPCI_API_H */
+#endif /* !GUARD_LIBPCIACCESS_API_H */

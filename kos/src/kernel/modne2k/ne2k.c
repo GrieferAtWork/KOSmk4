@@ -49,7 +49,7 @@
 #include <stdio.h>
 #include <string.h>
 
-#include <libpci/pciaccess.h>
+#include <libpciaccess/pciaccess.h>
 
 #if 0
 #define NE2K_DEBUG(...) printk(KERN_DEBUG __VA_ARGS__)

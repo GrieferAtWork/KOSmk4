@@ -47,7 +47,7 @@ if (gcc_opt.removeif([](x) -> x.startswith("-O")))
 #include <inttypes.h>
 #include <stddef.h>
 
-#include <libpci/pciaccess.h> /* pci_system_init() */
+#include <libpciaccess/pciaccess.h> /* pci_system_init() */
 
 /**/
 #include <dev/block.h>    /* TODO: Remove me; Only used for boot_partition-init */

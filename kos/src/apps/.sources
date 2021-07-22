@@ -44,7 +44,7 @@ DEFINE_SIMPLE_C_APPLICATION("snake")
 DEFINE_SIMPLE_CXX_APPLICATION("gfx", USELIB("libvideo-gfx"))
 
 if (TARGET_ARCH in ["i386", "x86_64"]) {
-	DEFINE_SIMPLE_C_APPLICATION("scanpci", USELIB("libpci"))
+	DEFINE_SIMPLE_C_APPLICATION("scanpci", USELIB("libpciaccess"))
 }
 
 

@@ -17,8 +17,8 @@
  *    misrepresented as being the original software.                          *
  * 3. This notice may not be removed or altered from any source distribution. *
  */
-#ifndef GUARD_LIBPCI_PCI_IDS_C_INL
-#define GUARD_LIBPCI_PCI_IDS_C_INL 1
+#ifndef GUARD_LIBPCIACCESS_PCI_IDS_C_INL
+#define GUARD_LIBPCIACCESS_PCI_IDS_C_INL 1
 #define _KOS_SOURCE 1
 
 #include "api.h"
@@ -45,7 +45,7 @@
 #include <string.h>
 #include <syslog.h>
 
-#include <libpci/paths.h>
+#include <libpciaccess/paths.h>
 
 /**/
 #include "pciaccess.h"
@@ -789,4 +789,4 @@ NOTHROW(CC libpci_get_strings)(/*[1..1]*/ struct pci_id_match const *__restrict 
 DECL_END
 #endif /* __KERNEL__ */
 
-#endif /* !GUARD_LIBPCI_PCI_IDS_C_INL */
+#endif /* !GUARD_LIBPCIACCESS_PCI_IDS_C_INL */

@@ -17,12 +17,12 @@
  *    misrepresented as being the original software.                          *
  * 3. This notice may not be removed or altered from any source distribution. *
  */
-#ifndef _LIBPCI_PATHS_H
-#define _LIBPCI_PATHS_H 1
+#ifndef _LIBPCIACCESS_PATHS_H
+#define _LIBPCIACCESS_PATHS_H 1
 
 #include "api.h"
 
-#ifdef LIBPCI_SUPPORTED
+#ifdef LIBPCIACCESS_SUPPORTED
 
 /* Default path to the `pci.ids' strings database file.
  * NOTE: When  `make_utility.sh ... zlib'  has been  installed, this  file is
@@ -36,6 +36,6 @@
 #define _PATH_PCI_IDS_GZ "/usr/share/hwdata/pci.ids.gz"
 #endif /* !_PATH_PCI_IDS_GZ */
 
-#endif /* LIBPCI_SUPPORTED */
+#endif /* LIBPCIACCESS_SUPPORTED */
 
-#endif /* !_LIBPCI_PATHS_H */
+#endif /* !_LIBPCIACCESS_PATHS_H */
