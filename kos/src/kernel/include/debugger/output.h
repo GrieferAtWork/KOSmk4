@@ -105,12 +105,6 @@ FUNDEF void NOTHROW(FCALL dbg_vline)(int x, int y, unsigned int size_y, /*utf-32
 	              0x2551, 0x255A, 0x2550, 0x255D)
 
 /* Print text to the given coords. (invalid coords are clamped) */
-FUNDEF void NOTHROW(FCALL dbg_pputuni)(int x, int y, /*utf-32*/ char32_t ch);
-FUNDEF size_t FCALL dbg_pprint(int x, int y, /*utf-8*/ char const *__restrict str);
-FUNDEF size_t VCALL dbg_pprintf(int x, int y, /*utf-8*/ char const *__restrict format, ...);
-FUNDEF size_t FCALL dbg_vpprintf(int x, int y, /*utf-8*/ char const *__restrict format, __builtin_va_list args);
-FUNDEF ssize_t KCALL dbg_pprinter(/*dbg_pprinter_arg_t*/ void *arg, /*utf-8*/ char const *__restrict data, size_t datalen);
-
 typedef struct {
 	int p_printx;  /* X-coord of the next character */
 	int p_printy;  /* Y-coord of the next character */
@@ -124,6 +118,13 @@ typedef struct {
 	 (self)->p_printy = (y),              \
 	 __libc_memset((self)->p_utf8, 0, 8))
 
+FUNDEF void NOTHROW(FCALL dbg_pputuni)(int x, int y, /*utf-32*/ char32_t ch);
+FUNDEF size_t FCALL dbg_pprint(int x, int y, /*utf-8*/ char const *__restrict str);
+FUNDEF size_t VCALL dbg_pprintf(int x, int y, /*utf-8*/ char const *__restrict format, ...);
+FUNDEF size_t FCALL dbg_vpprintf(int x, int y, /*utf-8*/ char const *__restrict format, __builtin_va_list args);
+FUNDEF ssize_t KCALL dbg_pprinter(/*dbg_pprinter_arg_t*/ void *arg, /*utf-8*/ char const *__restrict data, size_t datalen);
+FUNDEF NONNULL((1)) void NOTHROW(FCALL dbg_pprinter_putc)(dbg_pprinter_arg_t *__restrict printer, /*utf-8*/ char ch);
+FUNDEF NONNULL((1)) void NOTHROW(FCALL dbg_pprinter_putuni)(dbg_pprinter_arg_t *__restrict printer, /*utf-32*/ char32_t ch);
 
 
 

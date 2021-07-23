@@ -3296,8 +3296,8 @@ print_sigmask_sigset_and_len_impl(pformatprinter printer, void *arg,
 #ifdef NEED_print_sigmask_sigset_and_len_sizearg
 #ifdef NEED_print_sigmask_sigset_and_len_x32
 	if (sizeof_pointer == 4) {
-		ss_ptr = (USER UNCHECKED sigset_t const *)(uintptr_t)*(uint32_t USER CHECKED const *)((byte_t *)ptr + 0);
-		ss_len = (size_t)*(uint32_t USER CHECKED const *)((byte_t *)ptr + 4);
+		ss_ptr = (USER UNCHECKED sigset_t const *)(uintptr_t)(*(uint32_t USER CHECKED const *)((byte_t *)ptr + 0));
+		ss_len = (size_t)(*(uint32_t USER CHECKED const *)((byte_t *)ptr + 4));
 	} else
 #endif /* NEED_print_sigmask_sigset_and_len_x32 */
 #ifdef NEED_print_sigmask_sigset_and_len_x64
@@ -3305,8 +3305,8 @@ print_sigmask_sigset_and_len_impl(pformatprinter printer, void *arg,
 	if (sizeof_pointer == 8)
 #endif /* NEED_print_sigmask_sigset_and_len_misc */
 	{
-		ss_ptr = (USER UNCHECKED sigset_t const *)(uintptr_t)*(uint64_t USER CHECKED const *)((byte_t *)ptr + 0);
-		ss_len = (size_t)*(uint64_t USER CHECKED const *)((byte_t *)ptr + 8);
+		ss_ptr = (USER UNCHECKED sigset_t const *)(uintptr_t)(*(uint64_t USER CHECKED const *)((byte_t *)ptr + 0));
+		ss_len = (size_t)(*(uint64_t USER CHECKED const *)((byte_t *)ptr + 8));
 	}
 #ifdef NEED_print_sigmask_sigset_and_len_misc
 	else

@@ -127,7 +127,7 @@ libjson_encode_INTO(struct json_writer *__restrict writer,
 		break;
 
 	case JSON_TYPE_UINT8:
-		result = libjson_writer_putnumber(writer, (intptr_t)(uintptr_t)*(uint8_t const *)src);
+		result = libjson_writer_putnumber(writer, (intptr_t)(uintptr_t)(*(uint8_t const *)src));
 		break;
 
 	case JSON_TYPE_UINT16:

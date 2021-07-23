@@ -64,12 +64,14 @@ __FORCELOCAL void __KCALL vga_w_fast(port_t port, u8 reg, u8 val) {
 
 #ifdef VGA_OUTW_WRITE
 #if 1
-#define __VGA_OUTW_SELECTOR(func,port_i,port_d, reg, val)           func##_fast(port_i, reg, val)
+#define __VGA_OUTW_SELECTOR(func, port_i, port_d, reg, val) func##_fast(port_i, reg, val)
 #else
-#define __VGA_OUTW_SELECTOR(func,port_i,port_d, reg, val)          ((port_i+1 == port_d) ? func##_fast(port_i, reg, val)         : (func(port_i, reg),func(port_d, val)))
+#define __VGA_OUTW_SELECTOR(func, port_i, port_d, reg, val) \
+	((port_i + 1 == port_d) ? func##_fast(port_i, reg, val) \
+	                        : (func(port_i, reg), func(port_d, val)))
 #endif
 #else
-#define __VGA_OUTW_SELECTOR(func,port_i,port_d, reg, val)          (func(port_i, reg),func(port_d, val))
+#define __VGA_OUTW_SELECTOR(func, port_i, port_d, reg, val) (func(port_i, reg), func(port_d, val))
 #endif
 
 /* VGA CRTC register read/write */

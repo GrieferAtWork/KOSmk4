@@ -34,6 +34,7 @@
 
 #include <hybrid/atomic.h>
 #include <hybrid/minmax.h>
+#include <hybrid/unaligned.h>
 
 #include <kos/except/reason/inval.h>
 #include <kos/hop/blockdevice.h>
@@ -257,13 +258,13 @@ do_BLKGETSIZE_compat:
 #endif /* __ARCH_HAVE_COMPAT && (__ARCH_COMPAT_SIZEOF_POINTER != __SIZEOF_POINTER__) */
 	case _IOW(_IOC_TYPE(BLKRASET), _IOC_NR(BLKRASET), uintptr_t):
 		validate_readable(arg, sizeof(uintptr_t));
-		block_device_set_readahead(self, (size_t)*(uintptr_t *)arg);
+		block_device_set_readahead(self, (size_t)UNALIGNED_GET((uintptr_t const *)arg));
 		break;
 #if defined(__ARCH_HAVE_COMPAT) && (__ARCH_COMPAT_SIZEOF_POINTER != __SIZEOF_POINTER__)
 	case _IOW(_IOC_TYPE(BLKRASET), _IOC_NR(BLKRASET), __ARCH_COMPAT_ULONGPTR_TYPE):
 do_BLKRASET_compat:
 		validate_readable(arg, sizeof(__ARCH_COMPAT_ULONGPTR_TYPE));
-		block_device_set_readahead(self, (size_t)*(__ARCH_COMPAT_ULONGPTR_TYPE *)arg);
+		block_device_set_readahead(self, (size_t)UNALIGNED_GET((__ARCH_COMPAT_ULONGPTR_TYPE const *)arg));
 		break;
 #endif /* __ARCH_HAVE_COMPAT && (__ARCH_COMPAT_SIZEOF_POINTER != __SIZEOF_POINTER__) */
 
@@ -293,13 +294,13 @@ do_BLKRAGET_compat:
 #endif /* __ARCH_HAVE_COMPAT && (__ARCH_COMPAT_SIZEOF_POINTER != __SIZEOF_POINTER__) */
 	case _IOW(_IOC_TYPE(BLKFRASET), _IOC_NR(BLKFRASET), uintptr_t):
 		validate_readable(arg, sizeof(uintptr_t));
-		block_device_set_fsreadahead(self, (size_t)*(uintptr_t *)arg);
+		block_device_set_fsreadahead(self, (size_t)UNALIGNED_GET((uintptr_t const *)arg));
 		break;
 #if defined(__ARCH_HAVE_COMPAT) && (__ARCH_COMPAT_SIZEOF_POINTER != __SIZEOF_POINTER__)
 	case _IOW(_IOC_TYPE(BLKFRASET), _IOC_NR(BLKFRASET), __ARCH_COMPAT_ULONGPTR_TYPE):
 do_BLKFRASET_compat:
 		validate_readable(arg, sizeof(__ARCH_COMPAT_ULONGPTR_TYPE));
-		block_device_set_fsreadahead(self, (size_t)*(__ARCH_COMPAT_ULONGPTR_TYPE *)arg);
+		block_device_set_fsreadahead(self, (size_t)UNALIGNED_GET((__ARCH_COMPAT_ULONGPTR_TYPE const *)arg));
 		break;
 #endif /* __ARCH_HAVE_COMPAT && (__ARCH_COMPAT_SIZEOF_POINTER != __SIZEOF_POINTER__) */
 
@@ -361,7 +362,7 @@ do_BLKFRAGET_compat:
 #if defined(__ARCH_HAVE_COMPAT) && (__ARCH_COMPAT_SIZEOF_SIZE_T != __SIZEOF_SIZE_T__)
 	case _IOW(_IOC_TYPE(BLKBSZSET), _IOC_NR(BLKBSZSET), __ARCH_COMPAT_SIZE_T):
 		validate_readable(arg, sizeof(__ARCH_COMPAT_SIZE_T));
-		block_device_set_sector_size(self, (size_t)*(__ARCH_COMPAT_SIZE_T *)arg);
+		block_device_set_sector_size(self, (size_t)UNALIGNED_GET((__ARCH_COMPAT_SIZE_T const *)arg));
 		break;
 #endif /* __ARCH_HAVE_COMPAT && (__ARCH_COMPAT_SIZEOF_SIZE_T != __SIZEOF_SIZE_T__) */
 

@@ -64,11 +64,11 @@
 #include <hybrid/__bit.h>
 #endif /* !EMU86_EMULATE_CONFIG_DONT_USE_HYBRID_BIT */
 
-/* When `EMU86_EMULATE_CONFIG_DONT_USE_HYBRID_BYTESWAP' is defined, don't use the BSWAP()
- * functions    from    `<hybrid/byteswap.h>'.   This    should   be    configured   when
- * libemu86   is   being   used   to   emulate   instructions   not   supported   by  the
- * host,  in   which   case  it   couldn't   very   well  use   the   instructions   it's
- * trying to emulate. */
+/* When `EMU86_EMULATE_CONFIG_DONT_USE_HYBRID_BYTESWAP' is defined, don't
+ * use the BSWAP() functions  from `<hybrid/byteswap.h>'. This should  be
+ * configured  when libemu86  is being  used to  emulate instructions not
+ * supported by the  host, in which  case it couldn't  very well use  the
+ * instructions it's trying to emulate. */
 #if !defined(EMU86_EMULATE_CONFIG_DONT_USE_HYBRID_BYTESWAP) || 1
 #include <hybrid/byteswap.h>
 #endif /* !EMU86_EMULATE_CONFIG_DONT_USE_HYBRID_BYTESWAP || 1 */
@@ -2394,7 +2394,7 @@ EMU86_EMULATE_NOTHROW(EMU86_EMULATE_CC EMU86_EMULATE_HELPER_NAME(emu86_getregw))
 	regno &= __EMU86_GPREG_MASK;
 	if (regno == EMU86_R_SP)
 		return EMU86_GETSPREG();
-	return (u16)*(uintptr_t const *)((byte_t *)_state + EMU86_EMULATE_HELPER_NAME(emu86_reg_offsets)[regno]);
+	return (u16)(*(uintptr_t const *)((byte_t *)_state + EMU86_EMULATE_HELPER_NAME(emu86_reg_offsets)[regno]));
 }
 #endif /* !EMU86_GETREGW */
 
@@ -2422,7 +2422,7 @@ EMU86_EMULATE_NOTHROW(EMU86_EMULATE_CC EMU86_EMULATE_HELPER_NAME(emu86_getregl))
 	regno &= __EMU86_GPREG_MASK;
 	if (regno == EMU86_R_SP)
 		return (u32)EMU86_GETSPREG();
-	return (u32)*(uintptr_t const *)((byte_t const *)_state + EMU86_EMULATE_HELPER_NAME(emu86_reg_offsets)[regno]);
+	return (u32)(*(uintptr_t const *)((byte_t const *)_state + EMU86_EMULATE_HELPER_NAME(emu86_reg_offsets)[regno]));
 }
 #endif /* !EMU86_GETREGL */
 
@@ -2451,7 +2451,7 @@ EMU86_EMULATE_NOTHROW(EMU86_EMULATE_CC EMU86_EMULATE_HELPER_NAME(emu86_getregq))
 	regno &= __EMU86_GPREG_MASK;
 	if (regno == EMU86_R_SP)
 		return (u64)EMU86_GETSPREG();
-	return (u64)*(uintptr_t const *)((byte_t const *)_state + EMU86_EMULATE_HELPER_NAME(emu86_reg_offsets)[regno]);
+	return (u64)(*(uintptr_t const *)((byte_t const *)_state + EMU86_EMULATE_HELPER_NAME(emu86_reg_offsets)[regno]));
 }
 #endif /* !EMU86_GETREGQ */
 

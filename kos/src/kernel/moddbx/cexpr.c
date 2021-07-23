@@ -1331,7 +1331,7 @@ NOTHROW(FCALL cexpr_pushexpr)(struct ctyperef const *__restrict typ,
 	return DBX_EOK;
 }
 
-FUNDEF NONNULL((1, 2)) dbx_errno_t /* Push `(typ)*(typ *)data' */
+FUNDEF NONNULL((1, 2)) dbx_errno_t /* Push `(typ)(*(typ const *)data)' */
 NOTHROW(FCALL cexpr_pushdata)(struct ctyperef const *__restrict typ,
                               void const *__restrict data) {
 	struct cvalue *valp;
@@ -1431,7 +1431,7 @@ NOTHROW(FCALL cexpr_pushaddr_simple)(struct ctype *__restrict typ,
 	return cexpr_pushaddr(&ct, addr);
 }
 
-PUBLIC NONNULL((1, 2)) dbx_errno_t /* Push `(typ)*(typ *)data' */
+PUBLIC NONNULL((1, 2)) dbx_errno_t /* Push `(typ)(*(typ const *)data)' */
 NOTHROW(FCALL cexpr_pushdata_simple)(struct ctype *__restrict typ,
                                      void const *__restrict data) {
 	struct ctyperef ct;

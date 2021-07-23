@@ -69,7 +69,7 @@ typedef uint64_t pci_devnameid_t;
 /* Low-level database cache functions                                   */
 /************************************************************************/
 struct generic_cache_node {
-	LLRBTREE_NODE(generic_cache_node) gcn_node;  /* Tree node. */
+	LLRBTREE_NODE(generic_cache_node) gcn_node; /* Tree node. */
 };
 
 struct vendor_cache_node {
@@ -653,7 +653,7 @@ PRIVATE void NOTHROW(CC preload_system_pci_names)(void) {
 	        "devcount           = %" PRIuSIZ "\n",
 	        devnames->pdl_size, devcount);
 
-	/* Scan the database for the releval IDs. */
+	/* Scan the database for the relevant IDs. */
 	if (pci_ids_parser_init(&parser)) {
 		while (pci_ids_parser_readline(&parser)) {
 			if (parser.pip_device == PCI_MATCH_ANY) {

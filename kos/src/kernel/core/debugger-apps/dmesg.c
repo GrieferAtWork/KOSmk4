@@ -196,7 +196,7 @@ dbg_dmesg_render_enum(void *arg, struct syslog_packet *__restrict packet,
 					struct mexecinfo *ei;
 					ei = &FORMMAN(sender->t_mman, thismman_execinfo);
 					if (ei->mei_path && ei->mei_dent) {
-						dbg_pprinter(&printer, DBGSTR(":"), 1);
+						dbg_pprinter_putuni(&printer, ':');
 						path_printentex(ei->mei_path,
 						                ei->mei_dent->de_name,
 						                ei->mei_dent->de_namelen,

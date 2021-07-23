@@ -916,7 +916,7 @@ do_put_cp_ch:
 				 *               to the next line,  however the first character  then printed was also  a
 				 *               linefeed. - In this case, don't wrap the line, as the linefeed requested
 				 *               by the caller already happened implicitly, thus not creating an entirely
-				 *               empty line and wasting what little screen space we only have. */
+				 *               empty line and wasting what little screen space we have. */
 			} else {
 				/* Clear the remainder of the old line */
 				if (dbg_tty.at_ttymode & ANSITTY_MODE_NEWLINE_CLRFREE)
@@ -1122,9 +1122,10 @@ do_put_cp_ch:
 			/* Return to the start of the current line. */
 			if (dbg_tty.at_ttymode & ANSITTY_MODE_NEWLINE_CLRFREE) {
 				if (printer->p_printx >= 0 && printer->p_printx < VGA_WIDTH &&
-				    printer->p_printy >= 0 && printer->p_printy < VGA_HEIGHT)
+				    printer->p_printy >= 0 && printer->p_printy < VGA_HEIGHT) {
 					memsetw(&vga_terminal_start[printer->p_printx + printer->p_printy * VGA_WIDTH],
 					        VGA_EMPTY, VGA_WIDTH - (unsigned int)printer->p_printx);
+				}
 			}
 			printer->p_printx = dbg_indent;
 			if (ch == '\n')
@@ -1138,7 +1139,7 @@ do_put_cp_ch:
 	}
 }
 
-PRIVATE NOBLOCK ATTR_DBGTEXT NONNULL((1)) void
+PUBLIC ATTR_DBGTEXT NONNULL((1)) void
 NOTHROW(FCALL dbg_pprinter_putuni)(dbg_pprinter_arg_t *__restrict printer, /*utf-32*/ char32_t ch) {
 	if (dbg_tty._at_state != 0 || ch == (unsigned char)'\033') {
 		ansitty_putuni(&dbg_tty, ch);
@@ -1148,8 +1149,8 @@ NOTHROW(FCALL dbg_pprinter_putuni)(dbg_pprinter_arg_t *__restrict printer, /*utf
 	}
 }
 
-LOCAL ATTR_DBGTEXT NONNULL((1)) char32_t
-NOTHROW(FCALL dbg_pprinter_pending_ch32)(dbg_pprinter_arg_t *__restrict printer) {
+LOCAL NOBLOCK ATTR_DBGTEXT ATTR_PURE NONNULL((1)) char32_t
+NOTHROW(FCALL dbg_pprinter_pending_ch32)(dbg_pprinter_arg_t const *__restrict printer) {
 	char32_t result;
 	u8 seqlen = unicode_utf8seqlen[printer->p_utf8[0]];
 	result = (char32_t)printer->p_utf8[0];
@@ -1219,7 +1220,7 @@ NOTHROW(FCALL dbg_pprinter_pending_ch32)(dbg_pprinter_arg_t *__restrict printer)
 	return result;
 }
 
-PRIVATE ATTR_DBGTEXT NONNULL((1)) void
+PUBLIC ATTR_DBGTEXT NONNULL((1)) void
 NOTHROW(FCALL dbg_pprinter_putc)(dbg_pprinter_arg_t *__restrict printer, /*utf-8*/ char ch) {
 	if (printer->p_utf8[0]) {
 		/* Continue a utf-8 sequence. */

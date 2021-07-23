@@ -1216,7 +1216,7 @@ again_dotab:
 						 *               to the next line,  however the first character  then printed was also  a
 						 *               linefeed. - In this case, don't wrap the line, as the linefeed requested
 						 *               by the caller already happened implicitly, thus not creating an entirely
-						 *               empty line and wasting what little screen space we only have. */
+						 *               empty line and wasting what little screen space we have. */
 					} else
 #endif /* CONFIG_VGA_LESS_LINE_FEEDS */
 					{

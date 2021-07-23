@@ -94,7 +94,7 @@ again:
 	reader += 4;
 	if unlikely((uint32_t)length == (uint32_t)-1) {
 #if __SIZEOF_POINTER__ > 4
-		length = (size_t)*(u64 const *)reader;
+		length = (size_t)(*(u64 const *)reader);
 		reader += 8;
 #else /* __SIZEOF_POINTER__ > 4 */
 		ERROR(err_noframe); /* Too large. Impossible to represent. */
@@ -224,7 +224,7 @@ again:
 #if __SIZEOF_POINTER__ > 4
 	/* Above code already asserted that the length fits into 32 bits of the CIE. */
 	if unlikely((uint32_t)length == (uint32_t)-1) {
-		length = (size_t)*(u64 const *)reader;
+		length = (size_t)(*(u64 const *)reader);
 		reader += 8;
 	}
 #endif /* __SIZEOF_POINTER__ > 4 */

@@ -486,7 +486,7 @@ NOTHROW_NCX(CC libuw_unwind_fde_exec_rule_until)(unwind_fde_t const *__restrict 
 				break;
 
 			CASE(DW_CFA_advance_loc1)
-				current_pc += (uintptr_t)*(uint8_t const *)reader * self->f_codealign;
+				current_pc += (uintptr_t)(*(uint8_t const *)reader) * self->f_codealign;
 				reader += 1;
 				break;
 

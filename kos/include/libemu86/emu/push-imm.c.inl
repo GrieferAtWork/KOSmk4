@@ -30,7 +30,7 @@ EMU86_INTELLISENSE_BEGIN(push_imm) {
 {
 	EMU86_UREG_TYPE imm;
 case EMU86_OPCODE_ENCODE(0x6a):
-	imm = (EMU86_UREG_TYPE)(EMU86_SREG_TYPE)*(s8 const *)pc;
+	imm = (EMU86_UREG_TYPE)(EMU86_SREG_TYPE)(*(s8 const *)pc);
 	pc += 1;
 	goto do_push_imm;
 case EMU86_OPCODE_ENCODE(0x68):

@@ -94,7 +94,10 @@ struct module_section_ops {
 	/* [1..1] Similar to `ms_getaddr_alias()', but if the section
 	 * contains compressed data, inflate  that data, map it  into
 	 * the  kernel, and return a pointer to that mapping, as well
-	 * as the size (in bytes) of the decompressed data blob. */
+	 * as the size (in bytes) of the decompressed data blob.
+	 *
+	 * If the section isn't compressed, call `ms_getaddr_alias()'
+	 * and write `self->ms_size' to `*psize' */
 	WUNUSED NONNULL((1, 2)) KERNEL byte_t *
 	(FCALL *ms_getaddr_inflate)(struct module_section *__restrict self,
 	                            size_t *__restrict psize);

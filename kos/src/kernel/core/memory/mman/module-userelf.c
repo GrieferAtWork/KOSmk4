@@ -364,9 +364,9 @@ uems_getaddr_inflate(struct userelf_module_section *__restrict self,
 				if (module_haspath_or_name(mod)) {
 					module_printpath_or_name(mod, &dbg_pprinter, &pp);
 				} else {
-					dbg_pprinter(&pp, DBGSTR("?"), 1);
+					dbg_pprinter_putuni(&pp, '?');
 				}
-				dbg_pprinter(&pp, DBGSTR(":"), 1);
+				dbg_pprinter_putuni(&pp, ':');
 				dbg_pprinter(&pp, section_name, strlen(section_name));
 				dbg_pprinter(&pp, DBGSTR("..."), 3);
 				dbg_loadcolor();
@@ -499,7 +499,7 @@ NOTHROW(FCALL uem_destroy)(struct userelf_module *__restrict self) {
 			 *
 			 * For this purpose,  we (re-)use the  original
 			 * UserELF module object as a storage container
-			 * for the a lockop descriptor that's then used
+			 * for the lockop  descriptor that's then  used
 			 * to  remove all of the module's sections from
 			 * the module section cache. */
 			++self->um_shnum; /* Must do the last section once again! */
@@ -2157,10 +2157,10 @@ again:
 			mman_lock_release(self);
 			return NULL;
 		}
-	
+
 		/* Try to create a UserELF module ontop of this node. */
 		result = uem_trycreate(self, node);
-	
+
 		/* Handle all of the different cases... */
 		if (result == NULL) {
 			mman_lock_release(self);
@@ -2205,10 +2205,10 @@ unlock_and_return_NULL:
 		for (;;) {
 			void *node_minaddr = mnode_getminaddr(node);
 			void *node_maxaddr = mnode_getmaxaddr(node);
-	
+
 			/* Try to create a UserELF module ontop of this node. */
 			result = uem_trycreate(self, node);
-	
+
 			/* Handle all of the different cases... */
 			if (result == NULL) {
 				if (node == mima.mm_max)
@@ -2269,7 +2269,7 @@ unlock_and_return_NULL:
 		}
 		for (;;) {
 			void *node_minaddr, *node_maxaddr;
-	
+
 			/* Check if this node is known to be bound to the old module.
 			 * If it is, then simply skip this node! */
 			if (node->mn_module == prev) {
@@ -2280,13 +2280,13 @@ nextnode:
 				assert(node);
 				continue;
 			}
-	
+
 			node_minaddr = mnode_getminaddr(node);
 			node_maxaddr = mnode_getmaxaddr(node);
-	
+
 			/* Try to create a UserELF module ontop of this node. */
 			result = uem_trycreate(self, node);
-	
+
 			/* Handle all of the different cases... */
 			if (result == NULL) {
 				goto nextnode;

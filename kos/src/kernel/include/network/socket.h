@@ -134,7 +134,7 @@ ancillary_message_readcmsghdr(USER CHECKED void const *reader,
 	USER CHECKED byte_t const *result;
 	result = (USER CHECKED byte_t const *)reader;
 	if (msg_flags & MSG_CMSG_COMPAT) {
-		*plen = (size_t)*(USER CHECKED __compat_size_t const *)result;
+		*plen = (size_t)(*(USER CHECKED __compat_size_t const *)result);
 		result += sizeof(__compat_size_t);
 	} else {
 		*plen = *(USER CHECKED size_t const *)result;

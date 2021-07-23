@@ -1725,7 +1725,7 @@ extract_size_t_dfl_int(USER CHECKED void const *optval,
 #endif /* __SIZEOF_SIZE_T__ >= 2 */
 
 	case 1:
-		result = (size_t)*(u8 const *)optval;
+		result = (size_t)(*(u8 const *)optval);
 		break;
 
 	default:

@@ -472,9 +472,9 @@ driver_section_getaddr_inflate(struct driver_section *__restrict self,
 				if (module_haspath_or_name(&drv->d_module)) {
 					module_printpath_or_name(&drv->d_module, &dbg_pprinter, &pp);
 				} else {
-					dbg_pprinter(&pp, DBGSTR("?"), 1);
+					dbg_pprinter_putuni(&pp, '?');
 				}
-				dbg_pprinter(&pp, DBGSTR(":"), 1);
+				dbg_pprinter_putuni(&pp, ':');
 				dbg_pprinter(&pp, section_name, strlen(section_name));
 				dbg_pprinter(&pp, DBGSTR("..."), 3);
 				dbg_loadcolor();

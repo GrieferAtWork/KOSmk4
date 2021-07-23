@@ -340,7 +340,7 @@ NOTHROW(FCALL module_clear_mnode_pointers_and_destroy)(struct module *__restrict
 	mm = self->md_mman;
 
 	/* Try to acquire a proper reference to the associated mman.
-	 * Note that if the mman had already been destroyed, then we
+	 * Note that if the mman has already been destroyed, then we
 	 * can  assume that the  mman has already  died, and that we
 	 * don't have to  manually clear self-pointers  from all  of
 	 * its mem-nodes! */
@@ -630,11 +630,12 @@ unwind_userspace_with_section(struct module *__restrict mod, void const *absolut
                               bool is_debug_frame) {
 	unsigned int result;
 	REF struct mman *oldmm;
-	if (!tryincref(mod->md_mman))
+	REF struct mman *newmm = mod->md_mman;
+	if (!tryincref(newmm))
 		return UNWIND_NO_FRAME;
 	/* Must switch VM to the one of `mod' in order to get user-space memory
 	 * into the expected  state for  the unwind  handler to  do its  thing. */
-	oldmm = task_xchmman(mod->md_mman);
+	oldmm = task_xchmman(newmm);
 	TRY {
 		unwind_fde_t fde;
 		/* NOTE: We  use the  user-space's mapping  of the  .eh_frame section here,
@@ -676,11 +677,11 @@ unwind_userspace_with_section(struct module *__restrict mod, void const *absolut
 		}
 	} EXCEPT {
 		task_setmman_inherit(oldmm);
-		decref_unlikely(mod->md_mman);
+		decref_unlikely(newmm);
 		RETHROW();
 	}
 	task_setmman_inherit(oldmm);
-	decref_unlikely(mod->md_mman);
+	decref_unlikely(newmm);
 	return result;
 }
 

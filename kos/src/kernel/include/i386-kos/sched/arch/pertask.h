@@ -74,7 +74,7 @@ FORCELOCAL ATTR_ARTIFICIAL ATTR_CONST WUNUSED
 struct task *NOTHROW(KCALL __get_this_task)(void) {
 	__register struct task *__result;
 #ifdef __X86_SEG_TASK
-	__result = (struct task *)*(__X86_SEG_TASK __UINTPTR_TYPE__ *)0;
+	__result = (struct task *)(*(__X86_SEG_TASK __UINTPTR_TYPE__ const *)0);
 #elif defined(__x86_64__)
 	__asm__("movq %%gs:0, %0\n" : "=r" (__result));
 #else /* __x86_64__ */
@@ -88,7 +88,7 @@ FORCELOCAL ATTR_ARTIFICIAL ATTR_CONST ATTR_RETNONNULL WUNUSED
 void *NOTHROW(KCALL __get_per_task)(void *__ptr) {
 	__register void *__result;
 #ifdef __X86_SEG_TASK
-	__result = (void *)(*(__X86_SEG_TASK __UINTPTR_TYPE__ *)0 + (__UINTPTR_TYPE__)__ptr);
+	__result = (void *)(*(__X86_SEG_TASK __UINTPTR_TYPE__ const *)0 + (__UINTPTR_TYPE__)__ptr);
 #elif defined(__x86_64__)
 	__asm__("addq %%gs:0, %0\n" : "=r" (__result) : "0" (__ptr));
 #else /* __x86_64__ */

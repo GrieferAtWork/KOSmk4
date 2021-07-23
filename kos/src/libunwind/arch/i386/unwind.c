@@ -204,7 +204,7 @@ NOTHROW_NCX(CC libuw_unwind_setreg_implicit)(unwind_regno_t dw_regno,
 #endif /* !__x86_64__ */
 	default: goto badreg;
 	}
-	if ((u16)*(uintptr_t const *)src != expected_value)
+	if ((u16)(*(uintptr_t const *)src) != expected_value)
 		goto badreg;
 	return UNWIND_SUCCESS;
 badreg:
@@ -320,12 +320,12 @@ NOTHROW_NCX(CC libuw_unwind_setreg_ucpustate_base)(struct ucpustate *__restrict 
 	case CFI_X86_64_UNWIND_REGISTER_R15:    self->ucs_gpregs.gp_r15 = *(u64 const *)src; break;
 	case CFI_X86_64_UNWIND_REGISTER_RIP:    self->ucs_rip = *(u64 const *)src; break;
 	case CFI_X86_64_UNWIND_REGISTER_RFLAGS: self->ucs_rflags = *(u64 const *)src; break;
-	case CFI_X86_64_UNWIND_REGISTER_ES:     self->ucs_sgregs.sg_es = (u16)*(u64 const *)src; break;
-	case CFI_X86_64_UNWIND_REGISTER_CS:     self->ucs_cs = (u16)*(u64 const *)src; break;
-	case CFI_X86_64_UNWIND_REGISTER_SS:     self->ucs_ss = (u16)*(u64 const *)src; break;
-	case CFI_X86_64_UNWIND_REGISTER_DS:     self->ucs_sgregs.sg_ds = (u16)*(u64 const *)src; break;
-	case CFI_X86_64_UNWIND_REGISTER_FS:     self->ucs_sgregs.sg_fs = (u16)*(u64 const *)src; break;
-	case CFI_X86_64_UNWIND_REGISTER_GS:     self->ucs_sgregs.sg_gs = (u16)*(u64 const *)src; break;
+	case CFI_X86_64_UNWIND_REGISTER_ES:     self->ucs_sgregs.sg_es = (u16)(*(u64 const *)src); break;
+	case CFI_X86_64_UNWIND_REGISTER_CS:     self->ucs_cs = (u16)(*(u64 const *)src); break;
+	case CFI_X86_64_UNWIND_REGISTER_SS:     self->ucs_ss = (u16)(*(u64 const *)src); break;
+	case CFI_X86_64_UNWIND_REGISTER_DS:     self->ucs_sgregs.sg_ds = (u16)(*(u64 const *)src); break;
+	case CFI_X86_64_UNWIND_REGISTER_FS:     self->ucs_sgregs.sg_fs = (u16)(*(u64 const *)src); break;
+	case CFI_X86_64_UNWIND_REGISTER_GS:     self->ucs_sgregs.sg_gs = (u16)(*(u64 const *)src); break;
 	case CFI_X86_64_UNWIND_REGISTER_FSBASE: self->ucs_sgbase.sg_fsbase = *(u64 const *)src; break;
 	case CFI_X86_64_UNWIND_REGISTER_GSBASE: self->ucs_sgbase.sg_gsbase = *(u64 const *)src; break;
 	default:
@@ -461,12 +461,12 @@ NOTHROW_NCX(CC libuw_unwind_setreg_scpustate_base)(struct scpustate *__restrict 
 	case CFI_X86_64_UNWIND_REGISTER_R15:    self->scs_gpregs.gp_r15 = *(u64 const *)src; break;
 	case CFI_X86_64_UNWIND_REGISTER_RIP:    self->scs_irregs.ir_rip = *(u64 const *)src; break;
 	case CFI_X86_64_UNWIND_REGISTER_RFLAGS: self->scs_irregs.ir_rflags = *(u64 const *)src; break;
-	case CFI_X86_64_UNWIND_REGISTER_ES:     self->scs_sgregs.sg_es = (u16)*(u64 const *)src; break;
-	case CFI_X86_64_UNWIND_REGISTER_CS:     self->scs_irregs.ir_cs = (u16)*(u64 const *)src; break;
-	case CFI_X86_64_UNWIND_REGISTER_SS:     self->scs_irregs.ir_ss = (u16)*(u64 const *)src; break;
-	case CFI_X86_64_UNWIND_REGISTER_DS:     self->scs_sgregs.sg_ds = (u16)*(u64 const *)src; break;
-	case CFI_X86_64_UNWIND_REGISTER_FS:     self->scs_sgregs.sg_fs = (u16)*(u64 const *)src; break;
-	case CFI_X86_64_UNWIND_REGISTER_GS:     self->scs_sgregs.sg_gs = (u16)*(u64 const *)src; break;
+	case CFI_X86_64_UNWIND_REGISTER_ES:     self->scs_sgregs.sg_es = (u16)(*(u64 const *)src); break;
+	case CFI_X86_64_UNWIND_REGISTER_CS:     self->scs_irregs.ir_cs = (u16)(*(u64 const *)src); break;
+	case CFI_X86_64_UNWIND_REGISTER_SS:     self->scs_irregs.ir_ss = (u16)(*(u64 const *)src); break;
+	case CFI_X86_64_UNWIND_REGISTER_DS:     self->scs_sgregs.sg_ds = (u16)(*(u64 const *)src); break;
+	case CFI_X86_64_UNWIND_REGISTER_FS:     self->scs_sgregs.sg_fs = (u16)(*(u64 const *)src); break;
+	case CFI_X86_64_UNWIND_REGISTER_GS:     self->scs_sgregs.sg_gs = (u16)(*(u64 const *)src); break;
 	case CFI_X86_64_UNWIND_REGISTER_FSBASE: self->scs_sgbase.sg_fsbase = *(u64 const *)src; break;
 	case CFI_X86_64_UNWIND_REGISTER_GSBASE: self->scs_sgbase.sg_gsbase = *(u64 const *)src; break;
 	default:
@@ -533,8 +533,8 @@ NOTHROW_NCX(CC libuw_unwind_setreg_icpustate_base)(struct icpustate *__restrict 
 	case CFI_X86_64_UNWIND_REGISTER_R15:    self->ics_gpregs.gp_r15 = *(u64 const *)src; break;
 	case CFI_X86_64_UNWIND_REGISTER_RIP:    self->ics_irregs.ir_rip = *(u64 const *)src; break;
 	case CFI_X86_64_UNWIND_REGISTER_RFLAGS: self->ics_irregs.ir_rflags = *(u64 const *)src; break;
-	case CFI_X86_64_UNWIND_REGISTER_CS:     self->ics_irregs.ir_cs = (u16)*(u64 const *)src; break;
-	case CFI_X86_64_UNWIND_REGISTER_SS:     self->ics_irregs.ir_ss = (u16)*(u64 const *)src; break;
+	case CFI_X86_64_UNWIND_REGISTER_CS:     self->ics_irregs.ir_cs = (u16)(*(u64 const *)src); break;
+	case CFI_X86_64_UNWIND_REGISTER_SS:     self->ics_irregs.ir_ss = (u16)(*(u64 const *)src); break;
 	default:
 		goto badreg;
 	}
@@ -610,16 +610,16 @@ NOTHROW_NCX(CC libuw_unwind_setreg_fcpustate)(struct fcpustate *__restrict self,
 	case CFI_X86_64_UNWIND_REGISTER_R15:    self->fcs_gpregs.gp_r15 = *(u64 const *)src; break;
 	case CFI_X86_64_UNWIND_REGISTER_RIP:    self->fcs_rip = *(u64 const *)src; break;
 	case CFI_X86_64_UNWIND_REGISTER_RFLAGS: self->fcs_rflags = *(u64 const *)src; break;
-	case CFI_X86_64_UNWIND_REGISTER_ES:     self->fcs_sgregs.sg_es = (u16)*(u64 const *)src; break;
-	case CFI_X86_64_UNWIND_REGISTER_CS:     self->fcs_sgregs.sg_cs = (u16)*(u64 const *)src; break;
-	case CFI_X86_64_UNWIND_REGISTER_SS:     self->fcs_sgregs.sg_ss = (u16)*(u64 const *)src; break;
-	case CFI_X86_64_UNWIND_REGISTER_DS:     self->fcs_sgregs.sg_ds = (u16)*(u64 const *)src; break;
-	case CFI_X86_64_UNWIND_REGISTER_FS:     self->fcs_sgregs.sg_fs = (u16)*(u64 const *)src; break;
-	case CFI_X86_64_UNWIND_REGISTER_GS:     self->fcs_sgregs.sg_gs = (u16)*(u64 const *)src; break;
+	case CFI_X86_64_UNWIND_REGISTER_ES:     self->fcs_sgregs.sg_es = (u16)(*(u64 const *)src); break;
+	case CFI_X86_64_UNWIND_REGISTER_CS:     self->fcs_sgregs.sg_cs = (u16)(*(u64 const *)src); break;
+	case CFI_X86_64_UNWIND_REGISTER_SS:     self->fcs_sgregs.sg_ss = (u16)(*(u64 const *)src); break;
+	case CFI_X86_64_UNWIND_REGISTER_DS:     self->fcs_sgregs.sg_ds = (u16)(*(u64 const *)src); break;
+	case CFI_X86_64_UNWIND_REGISTER_FS:     self->fcs_sgregs.sg_fs = (u16)(*(u64 const *)src); break;
+	case CFI_X86_64_UNWIND_REGISTER_GS:     self->fcs_sgregs.sg_gs = (u16)(*(u64 const *)src); break;
 	case CFI_X86_64_UNWIND_REGISTER_FSBASE: self->fcs_sgbase.sg_fsbase = *(u64 const *)src; break;
 	case CFI_X86_64_UNWIND_REGISTER_GSBASE: self->fcs_sgbase.sg_gsbase = *(u64 const *)src; break;
-	case CFI_X86_64_UNWIND_REGISTER_TR:     self->fcs_sgregs.sg_tr = (u16)*(u64 const *)src; break;
-	case CFI_X86_64_UNWIND_REGISTER_LDTR:   self->fcs_sgregs.sg_ldt = (u16)*(u64 const *)src; break;
+	case CFI_X86_64_UNWIND_REGISTER_TR:     self->fcs_sgregs.sg_tr = (u16)(*(u64 const *)src); break;
+	case CFI_X86_64_UNWIND_REGISTER_LDTR:   self->fcs_sgregs.sg_ldt = (u16)(*(u64 const *)src); break;
 	default:
 		goto badreg;
 	}
@@ -728,9 +728,9 @@ do_fpreg:
 
 	case CFI_X86_64_UNWIND_REGISTER_FCW:
 		if (self->mc_flags & MCONTEXT_FLAG_HAVEXFPU) {
-			self->mc_fpu.f_xsave.fx_fcw = (u16)*(u32 const *)src;
+			self->mc_fpu.f_xsave.fx_fcw = (u16)(*(u32 const *)src);
 		} else if (self->mc_flags & MCONTEXT_FLAG_HAVESFPU) {
-			self->mc_fpu.f_ssave.fs_fcw = (u16)*(u32 const *)src;
+			self->mc_fpu.f_ssave.fs_fcw = (u16)(*(u32 const *)src);
 		} else {
 			goto badreg;
 		}
@@ -738,9 +738,9 @@ do_fpreg:
 
 	case CFI_X86_64_UNWIND_REGISTER_FSW:
 		if (self->mc_flags & MCONTEXT_FLAG_HAVEXFPU) {
-			self->mc_fpu.f_xsave.fx_fsw = (u16)*(u32 const *)src;
+			self->mc_fpu.f_xsave.fx_fsw = (u16)(*(u32 const *)src);
 		} else if (self->mc_flags & MCONTEXT_FLAG_HAVESFPU) {
-			self->mc_fpu.f_ssave.fs_fsw = (u16)*(u32 const *)src;
+			self->mc_fpu.f_ssave.fs_fsw = (u16)(*(u32 const *)src);
 		} else {
 			goto badreg;
 		}
@@ -898,12 +898,12 @@ NOTHROW_NCX(CC libuw_unwind_setreg_ucpustate_base)(struct ucpustate *__restrict 
 	case CFI_386_UNWIND_REGISTER_EDX:    self->ucs_gpregs.gp_edx = *(u32 const *)src; break;
 	case CFI_386_UNWIND_REGISTER_ECX:    self->ucs_gpregs.gp_ecx = *(u32 const *)src; break;
 	case CFI_386_UNWIND_REGISTER_EAX:    self->ucs_gpregs.gp_eax = *(u32 const *)src; break;
-	case CFI_386_UNWIND_REGISTER_GS:     self->ucs_sgregs.sg_gs = (u16)*(u32 const *)src; break;
-	case CFI_386_UNWIND_REGISTER_FS:     self->ucs_sgregs.sg_fs = (u16)*(u32 const *)src; break;
-	case CFI_386_UNWIND_REGISTER_ES:     self->ucs_sgregs.sg_es = (u16)*(u32 const *)src; break;
-	case CFI_386_UNWIND_REGISTER_DS:     self->ucs_sgregs.sg_ds = (u16)*(u32 const *)src; break;
-	case CFI_386_UNWIND_REGISTER_CS:     self->ucs_cs = (u16)*(u32 const *)src; break;
-	case CFI_386_UNWIND_REGISTER_SS:     self->ucs_ss = (u16)*(u32 const *)src; break;
+	case CFI_386_UNWIND_REGISTER_GS:     self->ucs_sgregs.sg_gs = (u16)(*(u32 const *)src); break;
+	case CFI_386_UNWIND_REGISTER_FS:     self->ucs_sgregs.sg_fs = (u16)(*(u32 const *)src); break;
+	case CFI_386_UNWIND_REGISTER_ES:     self->ucs_sgregs.sg_es = (u16)(*(u32 const *)src); break;
+	case CFI_386_UNWIND_REGISTER_DS:     self->ucs_sgregs.sg_ds = (u16)(*(u32 const *)src); break;
+	case CFI_386_UNWIND_REGISTER_CS:     self->ucs_cs = (u16)(*(u32 const *)src); break;
+	case CFI_386_UNWIND_REGISTER_SS:     self->ucs_ss = (u16)(*(u32 const *)src); break;
 	case CFI_386_UNWIND_REGISTER_EFLAGS: self->ucs_eflags = *(u32 const *)src; break;
 	case CFI_386_UNWIND_REGISTER_EIP:    self->ucs_eip = *(u32 const *)src; break;
 	default:
@@ -1017,7 +1017,7 @@ NOTHROW_NCX(CC libuw_unwind_setreg_scpustate_base_p)(struct scpustate **__restri
 
 	case CFI_386_UNWIND_REGISTER_CS: {
 		u16 newval, oldval;
-		newval = (u16)*(u32 const *)src;
+		newval = (u16)(*(u32 const *)src);
 		oldval = scpustate_getcs(self);
 		/* Must not switch between user-space/kernel-space contexts. */
 		if (((newval & 3) != 0) != ((oldval & 3) != 0))
@@ -1098,7 +1098,7 @@ NOTHROW_NCX(CC libuw_unwind_setreg_icpustate_base_p)(struct icpustate **__restri
 
 	case CFI_386_UNWIND_REGISTER_CS: {
 		u16 newval, oldval;
-		newval = (u16)*(u32 const *)src;
+		newval = (u16)(*(u32 const *)src);
 		oldval = icpustate_getcs(self);
 		if (oldval == newval)
 			break;
@@ -1174,16 +1174,16 @@ NOTHROW_NCX(CC libuw_unwind_setreg_fcpustate)(struct fcpustate *__restrict self,
 	case CFI_386_UNWIND_REGISTER_EDX:    self->fcs_gpregs.gp_edx = *(u32 const *)src; break;
 	case CFI_386_UNWIND_REGISTER_ECX:    self->fcs_gpregs.gp_ecx = *(u32 const *)src; break;
 	case CFI_386_UNWIND_REGISTER_EAX:    self->fcs_gpregs.gp_eax = *(u32 const *)src; break;
-	case CFI_386_UNWIND_REGISTER_GS:     self->fcs_sgregs.sg_gs = (u16)*(u32 const *)src; break;
-	case CFI_386_UNWIND_REGISTER_FS:     self->fcs_sgregs.sg_fs = (u16)*(u32 const *)src; break;
-	case CFI_386_UNWIND_REGISTER_ES:     self->fcs_sgregs.sg_es = (u16)*(u32 const *)src; break;
-	case CFI_386_UNWIND_REGISTER_DS:     self->fcs_sgregs.sg_ds = (u16)*(u32 const *)src; break;
-	case CFI_386_UNWIND_REGISTER_CS:     self->fcs_sgregs.sg_cs = (u16)*(u32 const *)src; break;
-	case CFI_386_UNWIND_REGISTER_SS:     self->fcs_sgregs.sg_ss = (u16)*(u32 const *)src; break;
+	case CFI_386_UNWIND_REGISTER_GS:     self->fcs_sgregs.sg_gs = (u16)(*(u32 const *)src); break;
+	case CFI_386_UNWIND_REGISTER_FS:     self->fcs_sgregs.sg_fs = (u16)(*(u32 const *)src); break;
+	case CFI_386_UNWIND_REGISTER_ES:     self->fcs_sgregs.sg_es = (u16)(*(u32 const *)src); break;
+	case CFI_386_UNWIND_REGISTER_DS:     self->fcs_sgregs.sg_ds = (u16)(*(u32 const *)src); break;
+	case CFI_386_UNWIND_REGISTER_CS:     self->fcs_sgregs.sg_cs = (u16)(*(u32 const *)src); break;
+	case CFI_386_UNWIND_REGISTER_SS:     self->fcs_sgregs.sg_ss = (u16)(*(u32 const *)src); break;
 	case CFI_386_UNWIND_REGISTER_EFLAGS: self->fcs_eflags = *(u32 const *)src; break;
 	case CFI_386_UNWIND_REGISTER_EIP:    self->fcs_eip = *(u32 const *)src; break;
-	case CFI_386_UNWIND_REGISTER_TR:     self->fcs_sgregs.sg_tr = (u16)*(u32 const *)src; break;
-	case CFI_386_UNWIND_REGISTER_LDTR:   self->fcs_sgregs.sg_ldt = (u16)*(u32 const *)src; break;
+	case CFI_386_UNWIND_REGISTER_TR:     self->fcs_sgregs.sg_tr = (u16)(*(u32 const *)src); break;
+	case CFI_386_UNWIND_REGISTER_LDTR:   self->fcs_sgregs.sg_ldt = (u16)(*(u32 const *)src); break;
 	default:
 		goto badreg;
 	}
@@ -1291,12 +1291,12 @@ NOTHROW_NCX(CC libuw_unwind_setreg_mcontext_base)(struct mcontext *__restrict se
 	case CFI_386_UNWIND_REGISTER_EDX:    self->mc_context.ucs_gpregs.gp_edx = *(u32 const *)src; break;
 	case CFI_386_UNWIND_REGISTER_ECX:    self->mc_context.ucs_gpregs.gp_ecx = *(u32 const *)src; break;
 	case CFI_386_UNWIND_REGISTER_EAX:    self->mc_context.ucs_gpregs.gp_eax = *(u32 const *)src; break;
-	case CFI_386_UNWIND_REGISTER_GS:     self->mc_context.ucs_sgregs.sg_gs = (u16)*(u32 const *)src; break;
-	case CFI_386_UNWIND_REGISTER_FS:     self->mc_context.ucs_sgregs.sg_fs = (u16)*(u32 const *)src; break;
-	case CFI_386_UNWIND_REGISTER_ES:     self->mc_context.ucs_sgregs.sg_es = (u16)*(u32 const *)src; break;
-	case CFI_386_UNWIND_REGISTER_DS:     self->mc_context.ucs_sgregs.sg_ds = (u16)*(u32 const *)src; break;
-	case CFI_386_UNWIND_REGISTER_CS:     self->mc_context.ucs_cs = (u16)*(u32 const *)src; break;
-	case CFI_386_UNWIND_REGISTER_SS:     self->mc_context.ucs_ss = (u16)*(u32 const *)src; break;
+	case CFI_386_UNWIND_REGISTER_GS:     self->mc_context.ucs_sgregs.sg_gs = (u16)(*(u32 const *)src); break;
+	case CFI_386_UNWIND_REGISTER_FS:     self->mc_context.ucs_sgregs.sg_fs = (u16)(*(u32 const *)src); break;
+	case CFI_386_UNWIND_REGISTER_ES:     self->mc_context.ucs_sgregs.sg_es = (u16)(*(u32 const *)src); break;
+	case CFI_386_UNWIND_REGISTER_DS:     self->mc_context.ucs_sgregs.sg_ds = (u16)(*(u32 const *)src); break;
+	case CFI_386_UNWIND_REGISTER_CS:     self->mc_context.ucs_cs = (u16)(*(u32 const *)src); break;
+	case CFI_386_UNWIND_REGISTER_SS:     self->mc_context.ucs_ss = (u16)(*(u32 const *)src); break;
 	case CFI_386_UNWIND_REGISTER_EFLAGS: self->mc_context.ucs_eflags = *(u32 const *)src; break;
 	case CFI_386_UNWIND_REGISTER_EIP:    self->mc_context.ucs_eip = *(u32 const *)src; break;
 
@@ -1326,9 +1326,9 @@ do_fpreg:
 
 	case CFI_386_UNWIND_REGISTER_FCW:
 		if (self->mc_flags & MCONTEXT_FLAG_HAVEXFPU) {
-			self->mc_fpu.f_xsave.fx_fcw = (u16)*(u32 const *)src;
+			self->mc_fpu.f_xsave.fx_fcw = (u16)(*(u32 const *)src);
 		} else if (self->mc_flags & MCONTEXT_FLAG_HAVESFPU) {
-			self->mc_fpu.f_ssave.fs_fcw = (u16)*(u32 const *)src;
+			self->mc_fpu.f_ssave.fs_fcw = (u16)(*(u32 const *)src);
 		} else {
 			goto badreg;
 		}
@@ -1336,9 +1336,9 @@ do_fpreg:
 
 	case CFI_386_UNWIND_REGISTER_FSW:
 		if (self->mc_flags & MCONTEXT_FLAG_HAVEXFPU) {
-			self->mc_fpu.f_xsave.fx_fsw = (u16)*(u32 const *)src;
+			self->mc_fpu.f_xsave.fx_fsw = (u16)(*(u32 const *)src);
 		} else if (self->mc_flags & MCONTEXT_FLAG_HAVESFPU) {
-			self->mc_fpu.f_ssave.fs_fsw = (u16)*(u32 const *)src;
+			self->mc_fpu.f_ssave.fs_fsw = (u16)(*(u32 const *)src);
 		} else {
 			goto badreg;
 		}
@@ -1481,11 +1481,11 @@ do_fpreg:
 		break;
 
 	case CFI_UNWIND_REGISTER_FCW:
-		self->fs_fcw = (u16)*(uintptr_t const *)src;
+		self->fs_fcw = (u16)(*(uintptr_t const *)src);
 		break;
 
 	case CFI_UNWIND_REGISTER_FSW:
-		self->fs_fsw = (u16)*(uintptr_t const *)src;
+		self->fs_fsw = (u16)(*(uintptr_t const *)src);
 		break;
 
 	default:
@@ -1555,15 +1555,15 @@ do_fpreg:
 		break;
 
 	case CFI_UNWIND_REGISTER_FCW:
-		self->fx_fcw = (u16)*(uintptr_t const *)src;
+		self->fx_fcw = (u16)(*(uintptr_t const *)src);
 		break;
 
 	case CFI_UNWIND_REGISTER_FSW:
-		self->fx_fsw = (u16)*(uintptr_t const *)src;
+		self->fx_fsw = (u16)(*(uintptr_t const *)src);
 		break;
 
 	case CFI_UNWIND_REGISTER_MXCSR:
-		self->fx_mxcsr = (u32)*(uintptr_t const *)src;
+		self->fx_mxcsr = (u32)(*(uintptr_t const *)src);
 		break;
 
 #ifdef __x86_64__

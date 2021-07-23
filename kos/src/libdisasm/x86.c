@@ -1003,7 +1003,7 @@ do_nextop_nocomma:
 				case OPC_S8:
 					disasm_print(self, "$", 1);
 					disasm_print_format(self, DISASSEMBLER_FORMAT_IMMEDIATE_PREFIX);
-					disasm_printf(self, "%#tx", (ptrdiff_t)*(s8 const *)self->d_pc);
+					disasm_printf(self, "%#tx", (ptrdiff_t)(*(s8 const *)self->d_pc));
 					disasm_print_format(self, DISASSEMBLER_FORMAT_IMMEDIATE_SUFFIX);
 					self->d_pc += 1;
 					break;
@@ -1172,7 +1172,7 @@ done_escape_register:
 
 				case OPC_MOFFS8: {
 					uintptr_t addr;
-					addr = (uintptr_t)*(u8 const *)self->d_pc;
+					addr = (uintptr_t)(*(u8 const *)self->d_pc);
 					self->d_pc += 1;
 					goto do_print_moffs;
 				case OPC_MOFFS16:
@@ -1521,21 +1521,21 @@ nextop_nocomma:
 				case OPC_DISP8:
 					libda_disasm_print_symbol(self,
 					                          (self->d_pc + 1 + self->d_baseoff) +
-					                          ((intptr_t)*(s8 const *)self->d_pc));
+					                          (intptr_t)(*(s8 const *)self->d_pc));
 					self->d_pc += 1;
 					break;
 
 				case OPC_DISP16:
 					libda_disasm_print_symbol(self,
 					                          (self->d_pc + 2 + self->d_baseoff) +
-					                          ((intptr_t)(s16)UNALIGNED_GET16((u16 const *)self->d_pc)));
+					                          (intptr_t)(s16)UNALIGNED_GET16((u16 const *)self->d_pc));
 					self->d_pc += 2;
 					break;
 
 				case OPC_DISP32:
 					libda_disasm_print_symbol(self,
 					                          (self->d_pc + 4 + self->d_baseoff) +
-					                          ((intptr_t)(s32)UNALIGNED_GET32((u32 const *)self->d_pc)));
+					                          (intptr_t)(s32)UNALIGNED_GET32((u32 const *)self->d_pc));
 					self->d_pc += 4;
 					break;
 

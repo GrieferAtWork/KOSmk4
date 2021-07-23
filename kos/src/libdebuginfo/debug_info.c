@@ -1086,7 +1086,7 @@ decode_form:
 		return true;
 
 	case DW_FORM_data1: /* constant */
-		*presult = (uintptr_t)*(uint8_t const *)reader;
+		*presult = (uintptr_t)(*(uint8_t const *)reader);
 		return true;
 
 	case DW_FORM_data2: /* constant */
@@ -1186,7 +1186,7 @@ decode_form:
 		break;
 
 	case DW_FORM_ref1:
-		offset = (uintptr_t)*(uint8_t const *)reader;
+		offset = (uintptr_t)(*(uint8_t const *)reader);
 		break;
 
 	case DW_FORM_ref2:
@@ -2989,7 +2989,7 @@ print_unknown_inner_array_type:
 		} else if (datasize >= 2) {
 			value = (uintptr_t)UNALIGNED_GET16((uint16_t const *)data);
 		} else if (datasize >= 1) {
-			value = (uintptr_t)*(uint8_t const *)data;
+			value = (uintptr_t)(*(uint8_t const *)data);
 		} else {
 			value = 0;
 		}

@@ -96,11 +96,11 @@ NOTHROW(KCALL Mp_LocateFloatingPointerStructure)(void) {
 	/* NOTE: No need to identity-map these,  as they're all part of  the
 	 *       first 1Gb of physical memory, which is fully mapped at this
 	 *       point, both in 32-bit and 64-bit mode. */
-	base   = (uintptr_t)*(u16 volatile *)(KERNEL_CORE_BASE + 0x40E);
+	base   = (uintptr_t)(*(u16 const volatile *)(KERNEL_CORE_BASE + 0x40E));
 	result = Mp_LocateFloatingPointerStructureInAddressRange(KERNEL_CORE_BASE + base, 1024);
 	if (result)
 		goto done;
-	base   = (uintptr_t)*(u16 volatile *)(KERNEL_CORE_BASE + 0x413);
+	base   = (uintptr_t)(*(u16 const volatile *)(KERNEL_CORE_BASE + 0x413));
 	result = Mp_LocateFloatingPointerStructureInAddressRange(KERNEL_CORE_BASE + base * 1024, 1024);
 	if (result)
 		goto done;

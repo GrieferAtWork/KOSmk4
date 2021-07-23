@@ -341,7 +341,7 @@ case EMU86_OPCODE_ENCODE(0x83):
 		/* 83 /5 ib      SUB r/m64,Simm8      Subtract sign-extended imm8 from r/m64 */
 		/* 83 /6 ib      XOR r/m64,Simm8      r/m64 XOR imm8 (sign-extended) */
 		/* 83 /7 ib      CMP r/m64,Simm8      Compare imm8 with r/m64 */
-		op64 = (u64)(s64)*(s8 const *)pc;
+		op64 = (u64)(s64)(*(s8 const *)pc);
 		pc += 1;
 		goto do_op64;
 	} else
@@ -355,7 +355,7 @@ case EMU86_OPCODE_ENCODE(0x83):
 		/* 83 /5 ib      SUB r/m32,Simm8      Subtract sign-extended imm8 from r/m32 */
 		/* 83 /6 ib      XOR r/m32,Simm8      r/m32 XOR imm8 (sign-extended) */
 		/* 83 /7 ib      CMP r/m32,Simm8      Compare imm8 with r/m32 */
-		op32 = (u32)(s32)*(s8 const *)pc;
+		op32 = (u32)(s32)(*(s8 const *)pc);
 		pc += 1;
 		goto do_op32;
 	} else {
@@ -367,7 +367,7 @@ case EMU86_OPCODE_ENCODE(0x83):
 		/* 83 /5 ib      SUB r/m16,Simm8      Subtract sign-extended imm8 from r/m16 */
 		/* 83 /6 ib      XOR r/m16,Simm8      r/m16 XOR imm8 (sign-extended) */
 		/* 83 /7 ib      CMP r/m16,Simm8      Compare imm8 with r/m16 */
-		op16 = (u16)(s16)*(s8 const *)pc;
+		op16 = (u16)(s16)(*(s8 const *)pc);
 		pc += 1;
 		goto do_op16;
 	}

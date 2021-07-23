@@ -917,8 +917,8 @@ do_make_top_const:
 			pc += size;                                           \
 			++stacksz;                                            \
 			break;
-		DEFINE_PUSH_CONSTANT(DW_OP_const1u, s_uconst, (uintptr_t)*(uint8_t const *)pc, 1)
-		DEFINE_PUSH_CONSTANT(DW_OP_const1s, s_sconst, (intptr_t)*(int8_t const *)pc, 1)
+		DEFINE_PUSH_CONSTANT(DW_OP_const1u, s_uconst, (uintptr_t)(*(uint8_t const *)pc), 1)
+		DEFINE_PUSH_CONSTANT(DW_OP_const1s, s_sconst, (intptr_t)(*(int8_t const *)pc), 1)
 		DEFINE_PUSH_CONSTANT(DW_OP_const2u, s_uconst, (uintptr_t)UNALIGNED_GET16((uint16_t const *)pc), 2)
 		DEFINE_PUSH_CONSTANT(DW_OP_const2s, s_sconst, (intptr_t)(int16_t)UNALIGNED_GET16((uint16_t const *)pc), 2)
 		DEFINE_PUSH_CONSTANT(DW_OP_const4u, s_uconst, (uintptr_t)UNALIGNED_GET32((uint32_t const *)pc), 4)
@@ -1652,7 +1652,7 @@ do_read_bit_pieces:
 			} else if (self->ue_addrsize >= 2) {
 				value = (uintptr_t)UNALIGNED_GET16((uint16_t const *)debug_addr_loc);
 			} else {
-				value = (uintptr_t)*(uint8_t const *)debug_addr_loc;
+				value = (uintptr_t)(*(uint8_t const *)debug_addr_loc);
 			}
 			self->ue_stack[stacksz].s_type   = UNWIND_STE_CONSTANT;
 			self->ue_stack[stacksz].s_uconst = value;
