@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xd680a50a */
+/* HASH CRC-32:0x818bc663 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -30,29 +30,32 @@ DECL_BEGIN
 
 #ifndef __KERNEL__
 #include <bits/crt/locale.h>
-INTERN ATTR_SECTION(".text.crt.l10n") ATTR_PURE WUNUSED __ATTR_FORMAT_ARG(2) char *
+#ifndef __LC_MESSAGES
+#define __LC_MESSAGES 0
+#endif /* !__LC_MESSAGES */
+INTERN ATTR_SECTION(".text.crt.i18n") ATTR_PURE WUNUSED __ATTR_FORMAT_ARG(2) char *
 NOTHROW_NCX(LIBCCALL libc_dgettext)(char const *domainname,
                                     char const *msgid) {
 	return libc_dcgettext(domainname, msgid, __LC_MESSAGES);
 }
-INTERN ATTR_SECTION(".text.crt.l10n") ATTR_PURE WUNUSED __ATTR_FORMAT_ARG(1) char *
+INTERN ATTR_SECTION(".text.crt.i18n") ATTR_PURE WUNUSED __ATTR_FORMAT_ARG(1) char *
 NOTHROW_NCX(LIBCCALL libc_gettext)(char const *msgid) {
 	return libc_dgettext(NULL, msgid);
 }
-INTERN ATTR_SECTION(".text.crt.l10n") ATTR_PURE WUNUSED __ATTR_FORMAT_ARG(1) __ATTR_FORMAT_ARG(2) char *
+INTERN ATTR_SECTION(".text.crt.i18n") ATTR_PURE WUNUSED __ATTR_FORMAT_ARG(1) __ATTR_FORMAT_ARG(2) char *
 NOTHROW_NCX(LIBCCALL libc_ngettext)(char const *msgid_singular,
                                     char const *msgid_plural,
                                     ulongptr_t n) {
 	return libc_dgettext(NULL, (n) == 1 ? msgid_singular : msgid_plural);
 }
-INTERN ATTR_SECTION(".text.crt.l10n") ATTR_PURE WUNUSED __ATTR_FORMAT_ARG(2) __ATTR_FORMAT_ARG(3) char *
+INTERN ATTR_SECTION(".text.crt.i18n") ATTR_PURE WUNUSED __ATTR_FORMAT_ARG(2) __ATTR_FORMAT_ARG(3) char *
 NOTHROW_NCX(LIBCCALL libc_dngettext)(char const *domainname,
                                      char const *msgid_singular,
                                      char const *msgid_plural,
                                      ulongptr_t n) {
 	return libc_dgettext(domainname, (n) == 1 ? msgid_singular : msgid_plural);
 }
-INTERN ATTR_SECTION(".text.crt.l10n") ATTR_PURE WUNUSED __ATTR_FORMAT_ARG(2) __ATTR_FORMAT_ARG(3) char *
+INTERN ATTR_SECTION(".text.crt.i18n") ATTR_PURE WUNUSED __ATTR_FORMAT_ARG(2) __ATTR_FORMAT_ARG(3) char *
 NOTHROW_NCX(LIBCCALL libc_dcngettext)(char const *domainname,
                                       char const *msgid_singular,
                                       char const *msgid_plural,

@@ -29,8 +29,8 @@ DECL_BEGIN
 
 
 
-/*[[[head:libc_dcgettext,hash:CRC-32=0x737222dd]]]*/
-INTERN ATTR_SECTION(".text.crt.l10n") ATTR_PURE WUNUSED __ATTR_FORMAT_ARG(2) char *
+/*[[[head:libc_dcgettext,hash:CRC-32=0xbbf3807e]]]*/
+INTERN ATTR_SECTION(".text.crt.i18n") ATTR_PURE WUNUSED __ATTR_FORMAT_ARG(2) char *
 NOTHROW_NCX(LIBCCALL libc_dcgettext)(char const *domainname,
                                      char const *msgid,
                                      int category)
@@ -47,8 +47,8 @@ NOTHROW_NCX(LIBCCALL libc_dcgettext)(char const *domainname,
 
 
 
-/*[[[head:libc_textdomain,hash:CRC-32=0x9128e422]]]*/
-INTERN ATTR_SECTION(".text.crt.l10n") char *
+/*[[[head:libc_textdomain,hash:CRC-32=0x1c4888fb]]]*/
+INTERN ATTR_SECTION(".text.crt.i18n") char *
 NOTHROW_NCX(LIBCCALL libc_textdomain)(char const *domainname)
 /*[[[body:libc_textdomain]]]*/
 /*AUTO*/{
@@ -59,8 +59,8 @@ NOTHROW_NCX(LIBCCALL libc_textdomain)(char const *domainname)
 }
 /*[[[end:libc_textdomain]]]*/
 
-/*[[[head:libc_bindtextdomain,hash:CRC-32=0xec4b401b]]]*/
-INTERN ATTR_SECTION(".text.crt.l10n") char *
+/*[[[head:libc_bindtextdomain,hash:CRC-32=0x7725190e]]]*/
+INTERN ATTR_SECTION(".text.crt.i18n") char *
 NOTHROW_NCX(LIBCCALL libc_bindtextdomain)(char const *domainname,
                                           char const *dirname)
 /*[[[body:libc_bindtextdomain]]]*/
@@ -73,8 +73,8 @@ NOTHROW_NCX(LIBCCALL libc_bindtextdomain)(char const *domainname,
 }
 /*[[[end:libc_bindtextdomain]]]*/
 
-/*[[[head:libc_bind_textdomain_codeset,hash:CRC-32=0xbad95f1a]]]*/
-INTERN ATTR_SECTION(".text.crt.l10n") char *
+/*[[[head:libc_bind_textdomain_codeset,hash:CRC-32=0x96f3a897]]]*/
+INTERN ATTR_SECTION(".text.crt.i18n") char *
 NOTHROW_NCX(LIBCCALL libc_bind_textdomain_codeset)(char const *domainname,
                                                    char const *codeset)
 /*[[[body:libc_bind_textdomain_codeset]]]*/

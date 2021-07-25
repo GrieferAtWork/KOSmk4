@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xa56f569e */
+/* HASH CRC-32:0xed2fc5a5 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -622,22 +622,22 @@ DFUN(".text.crt.dos.unsorted", libd_dirname, libc_dirname, TP, 1, TP)
 DFUN(".text.crt.dos.unsorted", libd___xpg_basename, libc___xpg_basename, TP, 1, TP)
 
 /* libintl */
-DFUN(".text.crt.dos.l10n", libd_dcgettext, libc_dcgettext, TP, 3, TP, TP, TD)
-DFUN(".text.crt.dos.l10n", libd_dgettext, libc_dgettext, TP, 2, TP, TP)
-DFUN(".text.crt.dos.l10n", libd_gettext, libc_gettext, TP, 1, TP)
-DFUN(".text.crt.dos.l10n", libd_ngettext, libc_ngettext, TP, 3, TP, TP, TP)
-DFUN(".text.crt.dos.l10n", libd_dngettext, libc_dngettext, TP, 4, TP, TP, TP, TP)
-DFUN(".text.crt.dos.l10n", libd_dcngettext, libc_dcngettext, TP, 5, TP, TP, TP, TP, TD)
-DFUN(".text.crt.dos.l10n", libd_textdomain, libc_textdomain, TP, 1, TP)
-DFUN(".text.crt.dos.l10n", libd_bindtextdomain, libc_bindtextdomain, TP, 2, TP, TP)
-DFUN(".text.crt.dos.l10n", libd_bind_textdomain_codeset, libc_bind_textdomain_codeset, TP, 2, TP, TP)
+DFUN(".text.crt.dos.i18n", libd_dcgettext, libc_dcgettext, TP, 3, TP, TP, TD)
+DFUN(".text.crt.dos.i18n", libd_dgettext, libc_dgettext, TP, 2, TP, TP)
+DFUN(".text.crt.dos.i18n", libd_gettext, libc_gettext, TP, 1, TP)
+DFUN(".text.crt.dos.i18n", libd_ngettext, libc_ngettext, TP, 3, TP, TP, TP)
+DFUN(".text.crt.dos.i18n", libd_dngettext, libc_dngettext, TP, 4, TP, TP, TP, TP)
+DFUN(".text.crt.dos.i18n", libd_dcngettext, libc_dcngettext, TP, 5, TP, TP, TP, TP, TD)
+DFUN(".text.crt.dos.i18n", libd_textdomain, libc_textdomain, TP, 1, TP)
+DFUN(".text.crt.dos.i18n", libd_bindtextdomain, libc_bindtextdomain, TP, 2, TP, TP)
+DFUN(".text.crt.dos.i18n", libd_bind_textdomain_codeset, libc_bind_textdomain_codeset, TP, 2, TP, TP)
 
 /* locale */
-DFUN(".text.crt.dos.i10n", libd_setlocale, libc_setlocale, TP, 2, TD, TP)
-DFUN(".text.crt.dos.i10n", libd_newlocale, libc_newlocale, TP, 3, TD, TP, TP)
-DFUN(".text.crt.dos.i10n", libd_duplocale, libc_duplocale, TP, 1, TP)
-DFUN(".text.crt.dos.i10n", libd_freelocale, libc_freelocale, TV, 1, TP)
-DFUN(".text.crt.dos.i10n", libd_uselocale, libc_uselocale, TP, 1, TP)
+DFUN(".text.crt.dos.i18n", libd_setlocale, libc_setlocale, TP, 2, TD, TP)
+DFUN(".text.crt.dos.i18n", libd_newlocale, libc_newlocale, TP, 3, TD, TP, TP)
+DFUN(".text.crt.dos.i18n", libd_duplocale, libc_duplocale, TP, 1, TP)
+DFUN(".text.crt.dos.i18n", libd_freelocale, libc_freelocale, TV, 1, TP)
+DFUN(".text.crt.dos.i18n", libd_uselocale, libc_uselocale, TP, 1, TP)
 
 /* malloc */
 DFUN(".text.crt.dos.heap.helpers", libd_realloc_in_place, libc_realloc_in_place, TP, 2, TP, TI)

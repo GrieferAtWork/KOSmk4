@@ -26,7 +26,7 @@
 }
 
 %[define_replacement(fd_t = __fd_t)]
-%[default:section(".text.crt{|.dos}.l10n")]
+%[default:section(".text.crt{|.dos}.i18n")]
 
 %[insert:prefix(
 #include <features.h>
@@ -58,7 +58,20 @@ char *dcgettext(char const *domainname,
 [[wunused, pure, export_alias("__dgettext")]]
 [[impl_include("<bits/crt/locale.h>")]]
 [[extern_inline, requires_include("<bits/crt/locale.h>")]]
-[[requires($has_function(dcgettext) && defined(__LC_MESSAGES))]]
+[[requires(($has_function(dcgettext) && defined(__LC_MESSAGES)) ||
+           (!defined(__CRT_HAVE_dcgettext) && !defined(__CRT_HAVE___dcgettext)))]]
+/* NOTE: When  `dcgettext()'  isn't crt-supported,  then `__LC_MESSAGES'  not being
+ *       defined doesn't actually matter since our default impl's going to be used.
+ *       To handle that cause, simply stub-define `__LC_MESSAGES' if it's  unknown,
+ *       so that the implementation doesn't break.
+ *       Essentially, the only case where we can't be implemented is when the linked
+ *       CRT _does_ support `dcgettext()', but we don't know what `__LC_MESSAGES' is
+ *       supposed to be. */
+[[impl_prefix(
+#ifndef __LC_MESSAGES
+#define __LC_MESSAGES 0
+#endif /* !__LC_MESSAGES */
+)]]
 char *dgettext(char const *domainname, [[format_arg]] char const *msgid) {
 	return dcgettext(domainname, msgid, __LC_MESSAGES);
 }
@@ -112,9 +125,14 @@ char *bind_textdomain_codeset(char const *domainname, char const *codeset);
 }
 %[insert:pp_if(defined(@dcgettext@) || $has_function(dcgettext))]
 %#define dcngettext(domainname, msgid_singular, msgid_plural, n, category) dcgettext(domainname, (n) == 1 ? msgid_singular : msgid_plural, category)
+%#define __dcgettext(domainname, msgid, category)                          dcgettext(domainname, msgid, category)
+%[insert:pp_endif]
+%[insert:pp_if(!defined(__LC_MESSAGES) && !defined(__CRT_HAVE_dcgettext) && !defined(__CRT_HAVE___dcgettext))]
+%#define __LC_MESSAGES 0
 %[insert:pp_endif]
 %[insert:pp_if(defined(__LC_MESSAGES) && (defined(@dcgettext@) || $has_function(dcgettext)))]
-%#define dgettext(domainname, msgid) dcgettext(domainname, msgid, __LC_MESSAGES)
+%#define dgettext(domainname, msgid)   dcgettext(domainname, msgid, __LC_MESSAGES)
+%#define __dgettext(domainname, msgid) dcgettext(domainname, msgid, __LC_MESSAGES)
 %[insert:pp_endif]
 %[insert:pp_if(defined(@dgettext@) || $has_function(dgettext))]
 %#define dngettext(domainname, msgid_singular, msgid_plural, n) dgettext(domainname, (n) == 1 ? msgid_singular : msgid_plural)
