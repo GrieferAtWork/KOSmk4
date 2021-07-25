@@ -629,6 +629,7 @@ again_handle_tok:
 			tok = self.next();
 			switch (tok) {
 
+			case "import":
 			case "include":
 			case "include_next": {
 				/* Don't escape anything within this line! */

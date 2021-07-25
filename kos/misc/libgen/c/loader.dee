@@ -974,7 +974,6 @@ class FunctionFeatures {
 			"no_crt_self_import"          : ("crt_noSelfImport", true),
 			"crt_self_export"             : ("crt_noSelfExport", false),
 			"no_crt_self_export"          : ("crt_noSelfExport", true),
-			"no_crt_impl_requires"        : ("crt_kosImplRequires", "1"),
 			"no_crt_kos_impl_requires"    : ("crt_kosImplRequires", "1"),
 			"no_crt_dos_impl_requires"    : ("crt_dosImplRequires", "1"),
 			"userimpl"                    : ("crt_userimpl", true),
@@ -986,6 +985,11 @@ class FunctionFeatures {
 		};
 
 		switch (tok) {
+
+		case "no_crt_impl_requires":
+			crt_kosImplRequires = "1";
+			crt_dosImplRequires = "1";
+			break;
 
 		case "crt":
 			crt_noImpl       = false;
@@ -1959,7 +1963,7 @@ again_parse_default_annotation:
 	}
 
 	public function parseDirective_include() {
-		/* %[include(...)] Set default function annotations */
+		/* %[include(...)] include contents of another file here */
 		local self = this.self;
 		self.next();
 		self.skip("(");
@@ -2740,11 +2744,15 @@ again_parse_annotations:
 					}
 				}	break;
 
-				case "if_fast_defined": {
+				case "if_fast_defined":
+				case "if_fast_defined_always": {
 					/* Conditional annotations */
 					self.next();
 					self.skip("(");
-					local ppAddend = IF_FAST_DEFINED_PATTERN.format({
+					local ppAddend = (tok.endswith("_always")
+						? IF_ALWAYS_FAST_DEFINED_PATTERN
+						: IF_FAST_DEFINED_PATTERN
+					).format({
 						headerName,
 						self.parseCStringOrAllUntilRParen()
 					});
@@ -3021,32 +3029,25 @@ again_parse_annotations:
 					self.skip(")");
 					break;
 
-				case "inline_as":
-					self.next();
-					self.skip("(");
-					self.inline = self.parseCStringOrKeyword();
-					self.skip(")");
-					break;
-
 				case "fastbind":
 				case "fastbind_always":
 				case "preferred_fastbind":
 				case "preferred_fastbind_always": {
 					/* Simplified binding for compile-time inline-optimizations
 					 *
-					 * >> [[fastbind]]
+					 * >> [[preferred_fastbind]]
 					 * >> void *memcpy(void *dst, void const *src, size_t num_bytes);
 					 *
 					 * Same as:
-					 * >> [[fastbind(memcpy)]]
+					 * >> [[preferred_fastbind(memcpy)]]
 					 * >> void *memcpy(void *dst, void const *src, size_t num_bytes);
 					 *
 					 * Same as:
-					 * >> [[fastbind(memcpy(dst, src, num_bytes))]]
+					 * >> [[preferred_fastbind(memcpy(dst, src, num_bytes))]]
 					 * >> void *memcpy(void *dst, void const *src, size_t num_bytes);
 					 *
 					 * Same as:
-					 * >> [[fastbind(memcpy(dst, src, num_bytes), ["memcpy"])]]
+					 * >> [[preferred_fastbind(memcpy(dst, src, num_bytes), ["memcpy"])]]
 					 * >> void *memcpy(void *dst, void const *src, size_t num_bytes);
 					 *
 					 * Same as:
@@ -3469,7 +3470,7 @@ again_parse_annotations:
 					 * or [[if(cond), alt_variant_of(name)]]
 					 * Same as:
 					 * [[if(cond), alias(name)]]
-					 * [[if(cond), crt_intern_kos_alias(name)]]
+					 * [[if(cond), crt_intern_kos_alias(libc_name)]]
 					 * In other words: When "cond" is true, link the current function
 					 *                 against some other function "name" in both the
 					 *                 system header, as  well as  the internal  libc
@@ -3517,7 +3518,7 @@ do_handle_alt_variant_of:
 					 * Same as:
 					 * >> [[crt_kos_impl_if(1)]]
 					 * Whereas the default  for `crt_export_if'  is:
-					 * >> [[crt_kos_impl_if(!defined(__KERNEL__)))]]
+					 * >> [[crt_kos_impl_if(!defined(__KERNEL__))]]
 					 */
 					if (currentConditions !is none)
 						goto illegal_annotation_with_condition;
