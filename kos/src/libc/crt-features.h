@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x9bb8ef49 */
+/* HASH CRC-32:0x6635ca45 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -662,8 +662,10 @@
 #define __CRT_HAVE_DOS$basename
 #define __CRT_HAVE_DOS$bcopy
 #define __CRT_HAVE_DOS$bind
+#define __CRT_HAVE_DOS$bind_textdomain_codeset
 #define __CRT_HAVE_DOS$bindresvport
 #define __CRT_HAVE_DOS$bindresvport6
+#define __CRT_HAVE_DOS$bindtextdomain
 #define __CRT_HAVE_DOS$brk
 #endif /* !__LIBCCALL_IS_LIBDCALL && !__KERNEL__ */
 #ifndef __KERNEL__
@@ -819,16 +821,20 @@
 #define __CRT_HAVE_DOS$cuserid
 #define __CRT_HAVE_DOS$cwait
 #define __CRT_HAVE_DOS$daemon
+#define __CRT_HAVE_DOS$dcgettext
+#define __CRT_HAVE_DOS$dcngettext
 #define __CRT_HAVE_DOS$dehumanize_number
 #define __CRT_HAVE_DOS$delay
 #define __CRT_HAVE_DOS$detach
 #define __CRT_HAVE_DOS$devname
 #define __CRT_HAVE_DOS$devname_r
+#define __CRT_HAVE_DOS$dgettext
 #define __CRT_HAVE_DOS$difftime
 #define __CRT_HAVE_DOS$difftime64
 #define __CRT_HAVE_DOS$dirfd
 #define __CRT_HAVE_DOS$dirname
 #define __CRT_HAVE_DOS$div
+#define __CRT_HAVE_DOS$dngettext
 #define __CRT_HAVE_DOS$dprintf
 #define __CRT_HAVE_DOS$drand48_r
 #define __CRT_HAVE_DOS$dup
@@ -1382,6 +1388,7 @@
 #define __CRT_HAVE_DOS$getspnam
 #define __CRT_HAVE_DOS$getspnam_r
 #define __CRT_HAVE_DOS$getsubopt
+#define __CRT_HAVE_DOS$gettext
 #define __CRT_HAVE_DOS$gettimeofday
 #define __CRT_HAVE_DOS$gettimeofday64
 #define __CRT_HAVE_DOS$getttynam
@@ -1860,6 +1867,7 @@
 #define __CRT_HAVE_DOS$nexttowardf
 #define __CRT_HAVE_DOS$nftw
 #define __CRT_HAVE_DOS$nftw64
+#define __CRT_HAVE_DOS$ngettext
 #define __CRT_HAVE_DOS$nice
 #define __CRT_HAVE_DOS$nrand48
 #define __CRT_HAVE_DOS$nrand48_r
@@ -2651,6 +2659,7 @@
 #define __CRT_HAVE_DOS$tell64
 #define __CRT_HAVE_DOS$telldir
 #define __CRT_HAVE_DOS$tempnam
+#define __CRT_HAVE_DOS$textdomain
 #define __CRT_HAVE_DOS$tfind
 #define __CRT_HAVE_DOS$tgamma
 #define __CRT_HAVE_DOS$tgammaf
@@ -3735,8 +3744,10 @@
 #define __CRT_HAVE_basename
 #define __CRT_HAVE_bcopy
 #define __CRT_HAVE_bind
+#define __CRT_HAVE_bind_textdomain_codeset
 #define __CRT_HAVE_bindresvport
 #define __CRT_HAVE_bindresvport6
+#define __CRT_HAVE_bindtextdomain
 #define __CRT_HAVE_brk
 #define __CRT_HAVE_bsd_signal
 #define __CRT_HAVE_bsearch
@@ -3889,16 +3900,20 @@
 #define __CRT_HAVE_cuserid
 #define __CRT_HAVE_cwait
 #define __CRT_HAVE_daemon
+#define __CRT_HAVE_dcgettext
+#define __CRT_HAVE_dcngettext
 #define __CRT_HAVE_dehumanize_number
 #define __CRT_HAVE_delay
 #define __CRT_HAVE_detach
 #define __CRT_HAVE_devname
 #define __CRT_HAVE_devname_r
+#define __CRT_HAVE_dgettext
 #define __CRT_HAVE_difftime
 #define __CRT_HAVE_difftime64
 #define __CRT_HAVE_dirfd
 #define __CRT_HAVE_dirname
 #define __CRT_HAVE_div
+#define __CRT_HAVE_dngettext
 #define __CRT_HAVE_dprintf
 #define __CRT_HAVE_drand48
 #define __CRT_HAVE_drand48_r
@@ -4507,6 +4522,7 @@
 #define __CRT_HAVE_getspnam
 #define __CRT_HAVE_getspnam_r
 #define __CRT_HAVE_getsubopt
+#define __CRT_HAVE_gettext
 #define __CRT_HAVE_gettid
 #define __CRT_HAVE_gettimeofday
 #define __CRT_HAVE_gettimeofday64
@@ -5043,6 +5059,7 @@
 #define __CRT_HAVE_nexttowardf
 #define __CRT_HAVE_nftw
 #define __CRT_HAVE_nftw64
+#define __CRT_HAVE_ngettext
 #define __CRT_HAVE_nice
 #define __CRT_HAVE_nrand48
 #define __CRT_HAVE_nrand48_r
@@ -5866,6 +5883,7 @@
 #define __CRT_HAVE_tell64
 #define __CRT_HAVE_telldir
 #define __CRT_HAVE_tempnam
+#define __CRT_HAVE_textdomain
 #define __CRT_HAVE_tfind
 #define __CRT_HAVE_tgamma
 #define __CRT_HAVE_tgammaf

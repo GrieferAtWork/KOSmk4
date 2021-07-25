@@ -111,7 +111,7 @@ Usage (all of these are the same):
 | `%[define(NAME = REPLACEMENT)]`                  | Specify a `REPLACEMENT` to use used in place of `NAME`, even in dont-escape modes |
 |                                                  |                                                              |
 | `%[define_crt_name_list(NAME = [A,B,C,...])]`    | Define a CRT name list `NAME` which expands to `A,B,C,...` in assembly name lists, if followed by `...` (3 dots) (s.a. `[alias(X,Y,Z)]`) |
-|                                                  |                                                              |
+
 TODO: Incomplete
 
 
@@ -120,19 +120,20 @@ TODO: Incomplete
 
 | Annotation               | Description                                               |
 | ------------------------ | --------------------------------------------------------- |
+| `[format_arg]`           | Add attribute `__ATTR_FORMAT_ARG(\<argumentIndex\>)`      |
 | `[nullable]`             | no-op                                                     |
 | `[null]`                 | no-op                                                     |
 | `[nonnull]`              | Add arg index to `ATTR_NONNULL((...))`                    |
-| `[inp(...)]`             | no-op                                                     |
-| `[inpb(...)]`            | no-op                                                     |
+| `[inp(...)]`             | Same as `[nonnull]`                                       |
+| `[inpb(...)]`            | Same as `[nonnull]`                                       |
 | `[inp_opt(...)]`         | no-op                                                     |
 | `[inpb_opt(...)]`        | no-op                                                     |
-| `[outp(...)]`            | no-op                                                     |
-| `[outpb(...)]`           | no-op                                                     |
+| `[outp(...)]`            | Same as `[nonnull]`                                       |
+| `[outpb(...)]`           | Same as `[nonnull]`                                       |
 | `[outp_opt(...)]`        | no-op                                                     |
 | `[outpb_opt(...)]`       | no-op                                                     |
-| `[inoutp(...)]`          | no-op                                                     |
-| `[inoutpb(...)]`         | no-op                                                     |
+| `[inoutp(...)]`          | Same as `[nonnull]`                                       |
+| `[inoutpb(...)]`         | Same as `[nonnull]`                                       |
 | `[inoutp_opt(...)]`      | no-op                                                     |
 | `[inoutpb_opt(...)]`     | no-op                                                     |
 

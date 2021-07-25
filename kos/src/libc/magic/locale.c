@@ -38,6 +38,7 @@
 
 %[define_ccompat_header("clocale")]
 %[define_replacement(locale_t = __locale_t)]
+%[default:section(".text.crt{|.dos}.i10n")]
 
 %[insert:prefix(
 #include <features.h>

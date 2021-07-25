@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xba8ca8fe */
+/* HASH CRC-32:0x5f7b703f */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -634,6 +634,19 @@ DEFINE_PUBLIC_ALIAS(DOS$FDataSync, libd_FDataSync);
 DEFINE_PUBLIC_ALIAS(DOS$dirname, libd_dirname);
 DEFINE_PUBLIC_ALIAS(DOS$__gnu_basename, libd___xpg_basename);
 DEFINE_PUBLIC_ALIAS(DOS$__xpg_basename, libd___xpg_basename);
+
+/* libintl */
+DEFINE_PUBLIC_ALIAS(DOS$__dcgettext, libd_dcgettext);
+DEFINE_PUBLIC_ALIAS(DOS$dcgettext, libd_dcgettext);
+DEFINE_PUBLIC_ALIAS(DOS$__dgettext, libd_dgettext);
+DEFINE_PUBLIC_ALIAS(DOS$dgettext, libd_dgettext);
+DEFINE_PUBLIC_ALIAS(DOS$gettext, libd_gettext);
+DEFINE_PUBLIC_ALIAS(DOS$ngettext, libd_ngettext);
+DEFINE_PUBLIC_ALIAS(DOS$dngettext, libd_dngettext);
+DEFINE_PUBLIC_ALIAS(DOS$dcngettext, libd_dcngettext);
+DEFINE_PUBLIC_ALIAS(DOS$textdomain, libd_textdomain);
+DEFINE_PUBLIC_ALIAS(DOS$bindtextdomain, libd_bindtextdomain);
+DEFINE_PUBLIC_ALIAS(DOS$bind_textdomain_codeset, libd_bind_textdomain_codeset);
 
 /* locale */
 DEFINE_PUBLIC_ALIAS(DOS$setlocale, libd_setlocale);

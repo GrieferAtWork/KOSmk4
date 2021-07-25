@@ -372,7 +372,9 @@
 #else /* ... */
 #define __noprofile        /* nothing */
 #endif /* !... */
-#if __has_attribute(__gnu_inline__) && defined(__GNUC_STDC_INLINE__)
+#ifdef __INTELLISENSE__
+#define __c99inline        static
+#elif __has_attribute(__gnu_inline__) && defined(__GNUC_STDC_INLINE__)
 #define __c99inline        extern __attribute__((__gnu_inline__)) __ATTR_INLINE
 #elif !defined(__NO_ATTR_INLINE)
 #define __c99inline        __ATTR_INLINE

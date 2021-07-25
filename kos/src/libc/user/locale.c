@@ -66,7 +66,7 @@ struct lconv current_lconv = {
 
 
 
-/*[[[head:libc_setlocale,hash:CRC-32=0xcd2b53e]]]*/
+/*[[[head:libc_setlocale,hash:CRC-32=0x8d9a933]]]*/
 /* >> setlocale(3)
  * Get or set the current locale
  * @param: category: One of `LC_*'
@@ -74,7 +74,7 @@ struct lconv current_lconv = {
  *                   When `NULL', don't change the locale.
  * @return: * :      The current locale set for `category'
  * @return: NULL:    Error */
-INTERN ATTR_SECTION(".text.crt.unsorted") char *
+INTERN ATTR_SECTION(".text.crt.i10n") char *
 NOTHROW_NCX(LIBCCALL libc_setlocale)(int category,
                                      char const *locale)
 /*[[[body:libc_setlocale]]]*/
@@ -86,10 +86,10 @@ NOTHROW_NCX(LIBCCALL libc_setlocale)(int category,
 }
 /*[[[end:libc_setlocale]]]*/
 
-/*[[[head:libc_localeconv,hash:CRC-32=0xad508515]]]*/
+/*[[[head:libc_localeconv,hash:CRC-32=0xc44456b4]]]*/
 /* >> localeconv(3)
  * Return numeric and monetary information for the current locale */
-INTERN ATTR_SECTION(".text.crt.unsorted") ATTR_RETNONNULL WUNUSED struct lconv *
+INTERN ATTR_SECTION(".text.crt.i10n") ATTR_RETNONNULL WUNUSED struct lconv *
 NOTHROW_NCX(LIBCCALL libc_localeconv)(void)
 /*[[[body:libc_localeconv]]]*/
 {
@@ -111,10 +111,10 @@ NOTHROW_NCX(LIBCCALL libc_localeconv)(void)
 }
 /*[[[end:libc_localeconv]]]*/
 
-/*[[[head:libc_newlocale,hash:CRC-32=0xc5598fa4]]]*/
+/*[[[head:libc_newlocale,hash:CRC-32=0x8af6f857]]]*/
 /* >> newlocale(3)
  * @param: category_mask: Set of `LC_*_MASK' */
-INTERN ATTR_SECTION(".text.crt.unsorted") locale_t
+INTERN ATTR_SECTION(".text.crt.i10n") locale_t
 NOTHROW_NCX(LIBCCALL libc_newlocale)(int category_mask,
                                      char const *locale,
                                      locale_t base)
@@ -129,10 +129,10 @@ NOTHROW_NCX(LIBCCALL libc_newlocale)(int category_mask,
 }
 /*[[[end:libc_newlocale]]]*/
 
-/*[[[head:libc_duplocale,hash:CRC-32=0xa5a82dae]]]*/
+/*[[[head:libc_duplocale,hash:CRC-32=0xef916e08]]]*/
 /* >> duplocale(3)
  * Duplicate the given locale `dataset' */
-INTERN ATTR_SECTION(".text.crt.unsorted") locale_t
+INTERN ATTR_SECTION(".text.crt.i10n") locale_t
 NOTHROW_NCX(LIBCCALL libc_duplocale)(locale_t dataset)
 /*[[[body:libc_duplocale]]]*/
 /*AUTO*/{
@@ -143,9 +143,9 @@ NOTHROW_NCX(LIBCCALL libc_duplocale)(locale_t dataset)
 }
 /*[[[end:libc_duplocale]]]*/
 
-/*[[[head:libc_freelocale,hash:CRC-32=0xf88daef1]]]*/
+/*[[[head:libc_freelocale,hash:CRC-32=0xb7e22ff8]]]*/
 /* >> freelocale(3) */
-INTERN ATTR_SECTION(".text.crt.unsorted") void
+INTERN ATTR_SECTION(".text.crt.i10n") void
 NOTHROW_NCX(LIBCCALL libc_freelocale)(locale_t dataset)
 /*[[[body:libc_freelocale]]]*/
 /*AUTO*/{
@@ -155,7 +155,7 @@ NOTHROW_NCX(LIBCCALL libc_freelocale)(locale_t dataset)
 }
 /*[[[end:libc_freelocale]]]*/
 
-/*[[[head:libc_uselocale,hash:CRC-32=0xe15bd1d4]]]*/
+/*[[[head:libc_uselocale,hash:CRC-32=0x1adffbaf]]]*/
 /* >> uselocale(3)
  * Set the calling thread's current default locale to `dataset'
  * @param: dataset: NULL:             Don't change the calling thread's locale
@@ -164,7 +164,7 @@ NOTHROW_NCX(LIBCCALL libc_freelocale)(locale_t dataset)
  * @return: NULL:             Error
  * @return: LC_GLOBAL_LOCALE: The calling thread uses the global locale (default)
  * @return: * :               The currently used locale */
-INTERN ATTR_SECTION(".text.crt.unsorted") locale_t
+INTERN ATTR_SECTION(".text.crt.i10n") locale_t
 NOTHROW_NCX(LIBCCALL libc_uselocale)(locale_t dataset)
 /*[[[body:libc_uselocale]]]*/
 /*AUTO*/{

@@ -716,6 +716,7 @@ incdir("");
 #include <libinstrlen/api.h>
 #include <libinstrlen/bits/isa.h>
 #include <libinstrlen/instrlen.h>
+#include <libintl.h>
 #include <libio.h>
 #include <libjson/api.h>
 #include <libjson/generator.h>
@@ -781,6 +782,10 @@ incdir("");
 #include <libm/significand.h>
 #include <libm/sqrt.h>
 #include <libm/trunc.h>
+#include <libpciaccess/api.h>
+#include <libpciaccess/config.h>
+#include <libpciaccess/paths.h>
+#include <libpciaccess/pciaccess.h>
 #include <libphys/api.h>
 #include <libphys/phys.h>
 #include <libregdump/api.h>
@@ -956,6 +961,7 @@ incdir("");
 #include <parts/wchar/unistd.h>
 #include <parts/wchar/utime.h>
 #include <paths.h>
+#include <pciaccess.h>
 #include <poll.h>
 #include <process.h>
 #include <pthread.h>

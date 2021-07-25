@@ -495,6 +495,14 @@ again_parse_arg_annotations:
 					++numRBracket;
 					goto again_parse_arg_annotations;
 
+				case "format_arg":
+					if (result.attributes === defaultAttributes)
+						result.attributes = List(defaultAttributes);
+					result.attributes.append("__ATTR_FORMAT_ARG({})"
+						.format({ #result.argv + 1 }));
+					self.next();
+					break;
+
 				case "nullable":
 				case "null":
 					tok = self.next();
