@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xeea6e97a */
+/* HASH CRC-32:0xc4f17acf */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -52,7 +52,7 @@ INTDEF NONNULL((1)) int NOTHROW_NCX(LIBCCALL libc_sem_destroy)(sem_t *sem);
 /* >> sem_open(3)
  * Open a named semaphore `name', which must be string that starts with `/'
  * NOTE: When called multiple times with identical strings for `name',
- *       the behavior of this function differes between implementations:
+ *       the behavior of this function differs between implementations:
  *       #ifdef __ARCH_HAVE_NON_UNIQUE_SEM_OPEN
  *          The returned pointer is allowed to be unique and different from
  *          any previously returned semaphore, but the backing physical memory

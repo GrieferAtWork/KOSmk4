@@ -649,6 +649,10 @@ NOTHROW(KCALL __i386_kernel_main)(struct icpustate *__restrict state) {
 	 *       correctly. The actual text is scrollable as it should be, but some
 	 *       of the text shows up as control characters and the like... */
 
+	/* TODO: libgen/c  should insert 1 blank line prior to the comment block
+	 *       of a function if that block is immediately preceded by a #endif
+	 *       or another function's declaration. */
+
 	/* TODO: (the problem isn't the coredump, but the errors in .debug_info parsing!)
 Coredump /bin/playground tid:13
 assert.expr: "count == 0"

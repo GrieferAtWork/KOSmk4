@@ -3277,8 +3277,8 @@ got_symbol_type:
 				}
 
 				/* Do special handling for this[|mman|cpu]_* globals from the kernel core!
-				 * When accessed, automatically include an addend to the relevant object
-				 * in relation to dbg_current, such that the user can directly reference
+				 * When accessed, automatically include an  addend to the relevant  object
+				 * in relation to dbg_current, such  that the user can directly  reference
 				 * these objects without having to manually sym@object them.
 				 *
 				 * Note  however that this is in normal code, this is only done when the

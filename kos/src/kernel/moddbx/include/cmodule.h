@@ -288,10 +288,10 @@ NOTHROW(FCALL cmodunit_parser_from_dip)(struct cmodunit const *__restrict self,
 
 
 struct cmodule {
-	struct cmodule                         **cm_pself;     /* [1..1][1..1] Self-pointer */
-	struct cmodule                          *cm_next;      /* [0..1] Next module. */
-	REF struct cmodule                      *cm_cache;     /* [0..1] Next cached module. */
-	uintptr_t                                cm_refcnt;    /* Reference counter. */
+	struct cmodule                         **cm_pself;    /* [1..1][1..1] Self-pointer */
+	struct cmodule                          *cm_next;     /* [0..1] Next module. */
+	REF struct cmodule                      *cm_cache;    /* [0..1] Next cached module. */
+	uintptr_t                                cm_refcnt;   /* Reference counter. */
 	REF module_t                            *cm_module;   /* [1..1][const] Module handle. */
 	di_debug_sections_t                      cm_sections; /* [const] Debug section mappings. */
 	di_debug_dl_sections_t                   cm_sectrefs; /* [const] Debug section references. */
@@ -398,9 +398,10 @@ NOTHROW(FCALL cmodule_current)(void);
  * `dbg_awaituser()' to  allow it  to be  interrupted prior  to  being
  * completed. If this happens, then this function returns `DBX_EINTR',
  * and the caller must assume that  not all symbols have been  loaded.
- * In  this case,  the caller is  allowed to continue  as through that
+ * In this case,  the caller  is allowed  to continue  as though  that
  * the  symbol  they were  looking for  doesn't  exist, or  no symbols
- * exist at all.
+ * exist  at all. Calling the function again will resume loading still
+ * missing symbols.
  * @return: DBX_EOK:    Success.
  * @return: DBX_ENOMEM: Insufficient memory.
  * @return: DBX_EINTR:  Operation was interrupted. */
@@ -416,7 +417,7 @@ NOTHROW(FCALL cmodule_loadsyms)(struct cmodule *__restrict self);
  * If this table  contains a symbol  matching `name', that  symbol
  * is  then returned, unless it has the `CMODSYM_DIP_NS_FCONFLICT'
  * flag set,  in which  case `dbg_getpcreg(DBG_REGLEVEL_VIEW)'  is
- * check for being apart of `self'. If  it is, try to find the  CU
+ * checked for being apart of `self'. If it is, try to find the CU
  * associated with that address. If  such a CU exists, check  that
  * CU's symbol table for `name' once again. If that table contains
  * the given `name'  also, return that  symbol. Otherwise (if  any
@@ -450,7 +451,7 @@ NOTHROW(FCALL cmodule_getsym_global)(char const *__restrict name, size_t namelen
 /* Same as `cmodule_getsym_global()',  but search for  symbols starting  with
  * `start_module', and continuing the search within related modules. For this
  * purpose,  start by searching `start_module' itself, and moving on to other
- * modules  within its address space, before finally search throug modules in
+ * modules within its address space, before finally search through modules in
  * different address spaces. */
 FUNDEF WUNUSED NONNULL((2, 4)) struct cmodsym const *
 NOTHROW(FCALL cmodule_getsym_withhint)(struct cmodule *start_module,
@@ -511,7 +512,7 @@ struct cmodsyminfo {
 	byte_t const               *clv_dip;       /* [0..1] Debug information pointer. */
 	union {
 		/* The following are selected based upon `clv_parser.dup_comp.dic_tag' */
-		struct {                                 /* Variable */
+		struct {                               /* Variable */
 			union {
 				struct {
 					di_debuginfo_location_t v_framebase; /* [valid_if(v_objaddr != _v_objdata)] Frame-base expression. (from the containing `DW_TAG_subprogram', if any) */
@@ -519,9 +520,9 @@ struct cmodsyminfo {
 				};
 				byte_t _v_objdata[sizeof(di_debuginfo_location_t) * 2]; /* Inline buffer for object data. */
 			};
-			byte_t const           *v_typeinfo;  /* [0..1] Type information. */
-			void                   *v_objaddr;   /* [0..1] Object address. */
-		} s_var;                                 /* [!cmodsyminfo_istype] Variable or parameter. */
+			byte_t const       *v_typeinfo;    /* [0..1] Type information. */
+			void               *v_objaddr;     /* [0..1] Object address. */
+		} s_var;                               /* [!cmodsyminfo_istype] Variable or parameter. */
 	} clv_data;
 };
 #define cmodsyminfo_istype(self) cmodsym_istype(&(self)->clv_symbol)
@@ -571,7 +572,7 @@ NOTHROW(FCALL cmod_syminfo_local)(/*out*/ struct cmodsyminfo *__restrict info,
 
 /* Symbol enumeration callback prototype (see functions below)
  * NOTE: This   callback   must  not   modify  `info->clv_parser'   before  returning.
- *       If  it  needs  to  parsing   additional  debug  information,  this  must   be
+ *       If  it  needs   to  parse   additional  debug  information,   this  must   be
  *       done  via  a   different  parser,   which  may  be   constructed  by   doing:
  *       >> cmodunit_parser_from_dip(info->clv_unit, info->clv_mod, &NEW_PARSER, DIP);
  * NOTE: This callback must not modify `info->clv_mod' before returning.

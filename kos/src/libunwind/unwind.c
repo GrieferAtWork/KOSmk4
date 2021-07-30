@@ -85,7 +85,7 @@ struct fde_cache_entry {
 	__WEAK __REF void             *fce_dlhand; /* [const] Weak reference for the  dl-handle of the library  that
 	                                            * is backing this slot. This weakref is used to detect when  the
 	                                            * associated module has been dlclose'd, at which point this will
-	                                            * point to an wasdestroyed()-object. */
+	                                            * point to a wasdestroyed()-object. */
 	LLRBTREE_NODE(fde_cache_entry) fce_link;   /* Tree of cached FDE entries. */
 };
 
@@ -162,7 +162,7 @@ NOTHROW_NCX(CC libuw_unwind_fde_find)(void const *absolute_pc,
 	unsigned int error;
 	/* Try to search the FDE-cache.
 	 * NOTE: To prevent deadlocks upon re-entrance, only
-	 *       try  to acquire locks  here, and ignore the
+	 *       _try_ to acquire locks here, and ignore the
 	 *       cache if we're unable to acquire them! */
 	if (atomic_rwlock_tryread(&fde_cache_lock)) {
 		fce = fde_cache_tree_locate(fde_cache, absolute_pc);
@@ -206,6 +206,7 @@ destroy_new_fce:
 		goto done;
 	}
 	if unlikely(!fde_cache_tree_tryinsert(&fde_cache, fce)) {
+		/* TODO: Handle this by downgrading the lock and starting over. */
 		struct fde_cache_entry *existing_fce;
 		/* Try to remove the existing cache entry. */
 		existing_fce = fde_cache_tree_rremove(&fde_cache, result->f_pcstart,
@@ -214,7 +215,7 @@ destroy_new_fce:
 		if (dlauxctrl(fce->fce_dlhand, DLAUXCTRL_MOD_NOTDESTROYED) != NULL) {
 			/* Entry isn't stale...
 			 * This might happen if another thread created this entry while
-			 * we've created ours, but after we've checked for another pre-
+			 * we  created  ours, but  after  we checked  for  another pre-
 			 * existing above! */
 			memcpy(result, &existing_fce->fce_fde, sizeof(unwind_fde_t));
 			fde_cache_tree_insert(&fde_cache, existing_fce);

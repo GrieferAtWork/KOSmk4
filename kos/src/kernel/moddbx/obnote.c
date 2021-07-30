@@ -1135,7 +1135,7 @@ NOTHROW(KCALL note_mfutex)(pformatprinter printer, void *arg,
 			if (!ADDR_ISKERN(file_ops))
 				goto badobj;
 			isanon = mpart_isanon(part);
-			
+
 			/* Check if there's an mnode-mapping that includes fs-name info. */
 			for (i = 0; i < COMPILER_LENOF(part->_mp_nodlsts); ++i) {
 				struct mnode *node;

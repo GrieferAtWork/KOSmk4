@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x41ed067a */
+/* HASH CRC-32:0x30949f94 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -83,7 +83,7 @@ __CDECLARE_OPT(__ATTR_NONNULL((1)),int,__NOTHROW_NCX,sem_destroy,(sem_t *__sem),
 /* >> sem_open(3)
  * Open a named semaphore `name', which must be string that starts with `/'
  * NOTE: When called multiple times with identical strings for `name',
- *       the behavior of this function differes between implementations:
+ *       the behavior of this function differs between implementations:
  *       #ifdef __ARCH_HAVE_NON_UNIQUE_SEM_OPEN
  *          The returned pointer is allowed to be unique and different from
  *          any previously returned semaphore, but the backing physical memory

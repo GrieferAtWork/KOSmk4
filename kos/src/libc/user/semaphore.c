@@ -128,11 +128,11 @@ char const named_prefix[] = "/dev/shm/sem.";
 #define NAMED_PREFIX_OFFSETOF_SEM COMPILER_STRLEN("/dev/shm/")
 
 
-/*[[[head:libc_sem_open,hash:CRC-32=0x1419e6ab]]]*/
+/*[[[head:libc_sem_open,hash:CRC-32=0x9fbe0f5]]]*/
 /* >> sem_open(3)
  * Open a named semaphore `name', which must be string that starts with `/'
  * NOTE: When called multiple times with identical strings for `name',
- *       the behavior of this function differes between implementations:
+ *       the behavior of this function differs between implementations:
  *       #ifdef __ARCH_HAVE_NON_UNIQUE_SEM_OPEN
  *          The returned pointer is allowed to be unique and different from
  *          any previously returned semaphore, but the backing physical memory

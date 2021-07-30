@@ -21,7 +21,7 @@
 import fs;
 import * from deemon;
 
-/* In order to get a simple way of quickly building the project accociated
+/* In order to get a simple way of quickly building the project associated
  * with the currently selected source file in Visual Studio, we have to go
  * through a bunch of hoops.
  * In a perfect world, we could simply assign a keyboard shortcut to:
@@ -30,10 +30,10 @@ import * from deemon;
  * However, sadly I was unable to do that, and this file is part of the work-around:
  *
  *  - Define an External Tool (Tools -> External Tools...):
- *    Title:                    `Build Current KOS Project'
- *    Command:           `cmd.exe'
- *    Arguments: `/c "deemon magic.dee --vcautotargetconfig=$(SolutionDir).vs\ProjectSettings.json --vsgengroup-of=$(ItemPath)"'
- *    Initial directory: `$(SolutionDir)..'
+ *    Title:                   `Build Current KOS Project'
+ *    Command:                 `cmd.exe'
+ *    Arguments:               `/c "deemon magic.dee --vcautotargetconfig=$(SolutionDir).vs\ProjectSettings.json --vsgengroup-of=$(ItemPath)"'
+ *    Initial directory:       `$(SolutionDir)..'
  *    Use Output window:       TRUE
  *    Treat output as Unicode: TRUE
  *

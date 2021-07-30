@@ -4439,6 +4439,7 @@ typedef struct elf_mips_abiflags_v0 {
 /* AMD x86-64 specific declarations                                     */
 /************************************************************************/
 
+#define SHF_X86_64_LARGE  0x10000000 /* If set, only -mcmodel=large can use this section. */
 #define SHT_X86_64_UNWIND 0x70000001        /* unwind information */
 #define SHT_AMD64_UNWIND  SHT_X86_64_UNWIND /* unwind information */
 
