@@ -1,0 +1,453 @@
+/* Copyright (c) 2019-2021 Griefer@Work                                       *
+ *                                                                            *
+ * This software is provided 'as-is', without any express or implied          *
+ * warranty. In no event will the authors be held liable for any damages      *
+ * arising from the use of this software.                                     *
+ *                                                                            *
+ * Permission is granted to anyone to use this software for any purpose,      *
+ * including commercial applications, and to alter it and redistribute it     *
+ * freely, subject to the following restrictions:                             *
+ *                                                                            *
+ * 1. The origin of this software must not be misrepresented; you must not    *
+ *    claim that you wrote the original software. If you use this software    *
+ *    in a product, an acknowledgement (see the following) in the product     *
+ *    documentation is required:                                              *
+ *    Portions Copyright (c) 2019-2021 Griefer@Work                           *
+ * 2. Altered source versions must be plainly marked as such, and must not be *
+ *    misrepresented as being the original software.                          *
+ * 3. This notice may not be removed or altered from any source distribution. *
+ */
+
+import * from deemon;
+import fs;
+import util;
+
+fs.chdir(fs.headof(__FILE__) + "/../../.."); /* $PROJPATH */
+
+global final ROOTDIR = fs.getcwd().replace("/", "\\").rstrip("\\");
+
+global final PROJ_GUID = "3CFDCE40-7387-4CB8-BC7A-79666A98C8A6";
+global final PROJ_TARGETS = {
+	"i386-kos"   : ("Win32", { "kos/include/i386-kos", "kos/src/kernel/include/i386-kos" }, { "__i386__=1" }),
+	"x86_64-kos" : ("x64",   { "kos/include/i386-kos", "kos/src/kernel/include/i386-kos" }, { "__x86_64__=1" })
+};
+#define PORJ_TARGETS_INTERNAL_NAME(name) PROJ_TARGETS[name][0]
+#define PORJ_TARGETS_INC_PATHS(name)     PROJ_TARGETS[name][1]
+#define PORJ_TARGETS_DEFINES(name)       PROJ_TARGETS[name][2]
+#define PORJ_TARGETS_MAGIC_NAME(name)    (name).rsstrip("-kos")
+
+global final PROJ_CONFIGS = {
+	"DEBUG"              : { "nOD",  { } },
+	"NDEBUG"             : { "nOnD", { "NDEBUG=1" } },
+	"Optimize, DEBUG"    : { "OD",   { "__OPTIMIZE__=1" } },
+	"Optimize, NDEBUG"   : { "nOnD", { "__OPTIMIZE__=1", "NDEBUG=1" } },
+};
+#define PROJ_CONFIGS_SHORTHAND(name) PROJ_CONFIGS[name][0]
+#define PROJ_CONFIGS_DEFINES(name)   PROJ_CONFIGS[name][1]
+
+
+global final PROJ_TARGET_CONFIGS = {
+	"i386-kos",
+	"x86_64-kos"
+};
+
+
+global final FILE_KIND_MSC = 0;
+global final FILE_KIND_HDR = 1;
+global final FILE_KIND_SRC = 2;
+global final FILE_KIND_IGN = 3;
+global final HEADER_MAPPING: {string: int} = {
+	"h"         : FILE_KIND_HDR,
+	"inl"       : FILE_KIND_HDR,
+	""          : FILE_KIND_HDR,
+	"c"         : FILE_KIND_SRC,
+	"stackdump" : FILE_KIND_IGN,
+};
+
+global FILES: {string: int} = Dict({
+	"LICENSE" : FILE_KIND_MSC, /* Otherwise, this would be `FILE_KIND_HDR` */
+});
+
+function projRelPath(filename: string): string {
+	return "..\\" + filename.replace("/", "\\");
+}
+
+function projFilterOf(filename: string): string {
+	return fs.headof(filename).replace("/", "\\").strip("\\");
+}
+
+
+function scanFolderForFiles(path: string) {
+	if (path.replace("\\", "/") in [
+		"./.git",
+		"./bin",
+		"./build",
+		"./binutils",
+	])	return;
+	for (local e: fs.dir(path)) {
+		if (e in [".git", ".vs", ".vscode"])
+			continue;
+		e = fs.joinpath(path, e);
+		if (fs.stat.isdir(e)) {
+			scanFolderForFiles(e);
+			continue;
+		}
+		e = e.replace("\\", "/").lsstrip("./");
+		if (e !in FILES) {
+			local ext = fs.extof(e);
+			local typ = HEADER_MAPPING.get(ext, FILE_KIND_MSC);
+			if (typ != FILE_KIND_IGN) {
+				FILES[e] = typ;
+			}
+		}
+	}
+}
+
+scanFolderForFiles(".");
+
+final global SORTED_FILE_NAMES = FILES.keys.sorted();
+
+function createVsFile(filename: string, cb: Callable) {
+	print("Creating file: ", repr filename);
+	local fp;
+	try {
+		fp = File.open(".vs/" + filename, "w");
+	} catch (...) {
+		try fs.mkdir(".vs"); catch (...);
+		fp = File.open(".vs/" + filename, "w");
+	}
+	with (fp) cb(fp);
+}
+
+createVsFile("kos.sln", [](fp) {
+	fp <<
+"
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio 14
+VisualStudioVersion = 14.0.23107.0
+MinimumVisualStudioVersion = 10.0.40219.1
+Project(\"{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}\") = \"kos\", \"kos.vcxproj\", \"{" << PROJ_GUID << "}\"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+";
+	for (local config: PROJ_CONFIGS.keys.sorted()) {
+		for (local target: PROJ_TARGETS.keys.sorted()) {
+			fp <<
+"		" << config << "|" << target << " = " << config << "|" << target << "
+";		}
+	}
+	fp <<
+"	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+";
+	for (local config: PROJ_CONFIGS.keys.sorted()) {
+		for (local target: PROJ_TARGETS.keys.sorted()) {
+			local target_int = PORJ_TARGETS_INTERNAL_NAME(target);
+			fp <<
+"		{" << PROJ_GUID << "}." << config << "|" << target << ".ActiveCfg = " << config << "|" << target_int << "
+		{" << PROJ_GUID << "}." << config << "|" << target << ".Build.0 = " << config << "|" << target_int << "
+";		}
+	}
+	fp <<
+"	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+EndGlobal
+";
+});
+
+
+createVsFile("kos.vcxproj", [](fp) {
+	fp <<
+"<?xml version=\"1.0\" encoding=\"utf-8\"?>
+<Project DefaultTargets=\"Build\" ToolsVersion=\"14.0\" xmlns=\"http://schemas.microsoft.com/developer/msbuild/2003\">
+	<ItemGroup Label=\"ProjectConfigurations\">
+";
+	for (local config: PROJ_CONFIGS.keys.sorted()) {
+		for (local target: PROJ_TARGETS.keys.sorted()) {
+			local target_int = PORJ_TARGETS_INTERNAL_NAME(target);
+			fp <<
+"		<ProjectConfiguration Include=\"" << config << "|" << target_int << "\">
+			<Configuration>" << config << "</Configuration>
+			<Platform>" << target_int << "</Platform>
+		</ProjectConfiguration>
+";		}
+	}
+	fp <<
+"	</ItemGroup>
+	<ItemGroup>
+";
+	for (local name: SORTED_FILE_NAMES) {
+		local typ = FILES[name];
+		if (typ == FILE_KIND_HDR) {
+			fp <<
+"		<ClInclude Include=\"" << projRelPath(name) << "\" />
+";
+		}
+	}
+	fp <<
+"	</ItemGroup>
+	<ItemGroup>
+";
+	for (local name: SORTED_FILE_NAMES) {
+		local typ = FILES[name];
+		if (typ !in [FILE_KIND_SRC, FILE_KIND_HDR]) {
+			fp <<
+"		<None Include=\"" << projRelPath(name) << "\" />
+";
+		}
+	}
+	fp <<
+"	</ItemGroup>
+	<ItemGroup>
+";
+	for (local name: SORTED_FILE_NAMES) {
+		local typ = FILES[name];
+		if (typ == FILE_KIND_SRC) {
+			fp <<
+"		<ClCompile Include=\"" << projRelPath(name) << "\" />
+";
+		}
+	}
+	fp <<
+"	</ItemGroup>
+	<PropertyGroup Label=\"Globals\">
+		<ProjectGuid>{" << PROJ_GUID << "}</ProjectGuid>
+		<RootNamespace>kos</RootNamespace>
+		<WindowsTargetPlatformVersion>8.1</WindowsTargetPlatformVersion>
+	</PropertyGroup>
+	<Import Project=\"$(VCTargetsPath)\\Microsoft.Cpp.Default.props\" />
+";
+	for (local config: PROJ_CONFIGS.keys.sorted()) {
+		for (local target: PROJ_TARGETS.keys.sorted()) {
+			local target_int = PORJ_TARGETS_INTERNAL_NAME(target);
+			fp <<
+"	<PropertyGroup Condition=\"'$(Configuration)|$(Platform)'=='" << config << "|" << target_int << "'\" Label=\"Configuration\">
+		<ConfigurationType>Makefile</ConfigurationType>
+		<UseDebugLibraries>" << ("NDEBUG" in config ? "false" : "true") << "</UseDebugLibraries>
+		<PlatformToolset>v140</PlatformToolset>
+		<CharacterSet>MultiByte</CharacterSet>
+	</PropertyGroup>
+";		}
+	}
+	fp <<
+"	<Import Project=\"$(VCTargetsPath)\\Microsoft.Cpp.props\" />
+	<ImportGroup Label=\"ExtensionSettings\">
+	</ImportGroup>
+	<ImportGroup Label=\"Shared\">
+	</ImportGroup>
+";
+	for (local config: PROJ_CONFIGS.keys.sorted()) {
+		for (local target: PROJ_TARGETS.keys.sorted()) {
+			local target_int = PORJ_TARGETS_INTERNAL_NAME(target);
+			fp <<
+"	<ImportGroup Label=\"PropertySheets\" Condition=\"'$(Configuration)|$(Platform)'=='" << config << "|" << target_int << "'\">
+		<Import Project=\"$(UserRootDir)\\Microsoft.Cpp.$(Platform).user.props\" Condition=\"exists('$(UserRootDir)\\Microsoft.Cpp.$(Platform).user.props')\" Label=\"LocalAppDataPlatform\" />
+	</ImportGroup>
+";		}
+	}
+	fp <<
+"	<PropertyGroup Label=\"UserMacros\" />
+";
+	for (local config: PROJ_CONFIGS.keys.sorted()) {
+		local configShortHand = PROJ_CONFIGS_SHORTHAND(config);
+		for (local target: PROJ_TARGETS.keys.sorted()) {
+			local target_int = PORJ_TARGETS_INTERNAL_NAME(target);
+			local incPaths = List(PORJ_TARGETS_INC_PATHS(target));
+			local defines  = ["__KOS__=1", "__unix__=1"];
+			incPaths.extend({ "kos/include", "kos/src/kernel/include" });
+			defines.extend(PORJ_TARGETS_DEFINES(target));
+			defines.extend(PROJ_CONFIGS_DEFINES(config));
+			fp <<
+"	<PropertyGroup Condition=\"'$(Configuration)|$(Platform)'=='" << config << "|" << target_int << "'\">
+		<IncludePath>" << ";".join(for (local p: incPaths) ROOTDIR + "\\" + p.replace("/", "\\")) << "</IncludePath>
+		<OutDir>" << ROOTDIR << "\\bin\\" << target << "-" << configShortHand << "</OutDir>
+		<IntDir>" << ROOTDIR << "\\build\\" << target << "-" << configShortHand << "</IntDir>
+		<TargetName>os\\kernel.bin</TargetName>
+		<ExecutablePath />
+		<ReferencePath />
+		<LibraryPath />
+		<LibraryWPath />
+		<SourcePath />
+		<ExcludePath />
+		<NMakeBuildCommandLine>cmd /C \"" << ROOTDIR << "\\binutils\\deemon\\deemon.exe"
+			" " << ROOTDIR << "\\magic.dee"
+			" --build-only"     /* Force rebuild */
+			" --target=" << PORJ_TARGETS_MAGIC_NAME(target) <<
+			" --config=" << configShortHand <<
+			"\"</NMakeBuildCommandLine>
+		<NMakeReBuildCommandLine>cmd /C \"" << ROOTDIR << "\\binutils\\deemon\\deemon.exe"
+			" " << ROOTDIR << "\\magic.dee"
+			" -f"               /* Force rebuild */
+			" --build-only"     /* Only build */
+			" --target=" << PORJ_TARGETS_MAGIC_NAME(target) <<
+			" --config=" << configShortHand <<
+			"\"</NMakeReBuildCommandLine>
+		<NMakeCleanCommandLine>CMD_NEW"  /* ??? */
+			"</NMakeCleanCommandLine>
+		<NMakeOutput>" << ROOTDIR << "\\bin\\" << target << "-" << configShortHand << "\\os\\kernel.bin</NMakeOutput>
+		<NMakePreprocessorDefinitions>" << ";".join(defines) << "</NMakePreprocessorDefinitions>
+		<NMakeForcedIncludes>" << ROOTDIR << "\\kos\\include\\compiler\\intellisense-msvc.h</NMakeForcedIncludes>
+		<AdditionalOptions>/TP</AdditionalOptions>
+	</PropertyGroup>
+";		}
+	}
+
+	for (local config: PROJ_CONFIGS.keys.sorted()) {
+		for (local target: PROJ_TARGETS.keys.sorted()) {
+			local target_int = PORJ_TARGETS_INTERNAL_NAME(target);
+			fp <<
+"	<ItemDefinitionGroup Condition=\"'$(Configuration)|$(Platform)'=='" << config << "|" << target_int << "'\">
+		<ClCompile>
+			<WarningLevel>Level3</WarningLevel>
+			<Optimization>" << ("Optimize" in config ? "MaxSpeed" : "Disabled") << "</Optimization>";
+			if ("Optimize" in config) {
+				fp <<
+"			<FunctionLevelLinking>true</FunctionLevelLinking>
+			<IntrinsicFunctions>true</IntrinsicFunctions>
+";
+			}
+			fp <<
+"			<SDLCheck>true</SDLCheck>
+		</ClCompile>
+		<Link>
+			<GenerateDebugInformation>true</GenerateDebugInformation>
+";
+			if ("Optimize" in config) {
+				fp <<
+"			<EnableCOMDATFolding>true</EnableCOMDATFolding>
+			<OptimizeReferences>true</OptimizeReferences>
+";
+			}
+			fp <<
+"		</Link>
+	</ItemDefinitionGroup>
+";		}
+	}
+	fp <<
+"	<Import Project=\"$(VCTargetsPath)\\Microsoft.Cpp.targets\" />
+	<ImportGroup Label=\"ExtensionTargets\">
+	</ImportGroup>
+</Project>";
+});
+
+
+createVsFile("kos.vcxproj.filters", [](fp) {
+	fp <<
+"<?xml version=\"1.0\" encoding=\"utf-8\"?>
+<Project ToolsVersion=\"4.0\" xmlns=\"http://schemas.microsoft.com/developer/msbuild/2003\">
+	<ItemGroup>
+";
+	{
+		local filePaths: {string...} = HashSet();
+		for (local filename: SORTED_FILE_NAMES) {
+			local filter = projFilterOf(filename);
+			local total = "";
+			for (local part: filter.split("\\")) {
+				if (total)
+					total += "\\";
+				total += part;
+				filePaths.insert(total);
+			}
+		}
+		filePaths.remove("");
+		for (local i, path: util.enumerate(filePaths.sorted())) {
+			local id = 0x1234567890ABCDEF1234567890ABCDEF + i;
+			local e  = ((id) & 0xffffffffffff).hex()[2:].lower();
+			local d  = ((id >> 48) & 0xffff).hex()[2:].lower();
+			local c  = ((id >> 64) & 0xffff).hex()[2:].lower();
+			local b  = ((id >> 80) & 0xffff).hex()[2:].lower();
+			local a  = ((id >> 96) & 0xffffffff).hex()[2:].lower();
+			fp <<
+"		<Filter Include=\"" << path << "\">
+			<UniqueIdentifier>{" << a << "-" << b << "-" << c << "-" << d << "-" << e << "}</UniqueIdentifier>
+		</Filter>
+";
+		}
+	}
+
+	fp <<
+"	</ItemGroup>
+	<ItemGroup>";
+
+	function printFileFilterLocation(fp: File, decl: string, name: string) {
+		local filter = projFilterOf(name);
+		if (filter) {
+			fp <<
+"		<" << decl << " Include=\"" << projRelPath(name) << "\">
+			<Filter>" << filter << "</Filter>
+		</" << decl << ">
+";
+		} else {
+			fp <<
+"		<" << decl << " Include=\"" << projRelPath(name) << "\" />
+";
+		}
+	}
+
+	for (local name: SORTED_FILE_NAMES) {
+		local typ = FILES[name];
+		if (typ == FILE_KIND_HDR) {
+			printFileFilterLocation(fp, "ClInclude", name);
+		}
+	}
+
+	fp <<
+"	</ItemGroup>
+	<ItemGroup>";
+
+	for (local name: SORTED_FILE_NAMES) {
+		local typ = FILES[name];
+		if (typ !in [FILE_KIND_SRC, FILE_KIND_HDR]) {
+			printFileFilterLocation(fp, "None", name);
+		}
+	}
+
+	fp <<
+"	</ItemGroup>
+	<ItemGroup>";
+
+	for (local name: SORTED_FILE_NAMES) {
+		local typ = FILES[name];
+		if (typ == FILE_KIND_SRC) {
+			printFileFilterLocation(fp, "ClCompile", name);
+		}
+	}
+
+	fp <<
+"	</ItemGroup>
+</Project>";
+});
+
+
+createVsFile("kos.vcxproj.user", [](fp) {
+	fp <<
+"<?xml version=\"1.0\" encoding=\"utf-8\"?>
+<Project ToolsVersion=\"14.0\" xmlns=\"http://schemas.microsoft.com/developer/msbuild/2003\">
+";
+	for (local config: PROJ_CONFIGS.keys.sorted()) {
+		local configShortHand = PROJ_CONFIGS_SHORTHAND(config);
+		for (local target: PROJ_TARGETS.keys.sorted()) {
+			local target_int = PORJ_TARGETS_INTERNAL_NAME(target);
+			fp <<
+"	<PropertyGroup Condition=\"'$(Configuration)|$(Platform)'=='" << config << "|" << target_int << "'\">
+		<LocalDebuggerCommand>" << ROOTDIR << "\\binutils\\deemon\\deemon.exe</LocalDebuggerCommand>
+		<LocalDebuggerCommandArguments>--run-only"
+			" --target=" << PORJ_TARGETS_MAGIC_NAME(target) <<
+			" --config=" << configShortHand <<
+			"</LocalDebuggerCommandArguments>
+		<LocalDebuggerWorkingDirectory>" << ROOTDIR << "</LocalDebuggerWorkingDirectory>
+		<DebuggerFlavor>WindowsLocalDebugger</DebuggerFlavor>
+	</PropertyGroup>
+";		}
+	}
+	fp <<
+"</Project>";
+});
+
+
+
+
+

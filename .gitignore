@@ -2,10 +2,11 @@
 /bin/
 /binutils/
 /build/
+/kos/.vs/config
+/kos/.vs/kos
+/kos/.vs/proj
 /kos/.vs/slnx.sqlite
 /kos/.vs/slnx.sqlite-journal
-/kos/.vs/kos
-/kos/.vs/config
 /kos/.vs/launch.vs.json
 /kos/.vs/ProjectSettings.json
 /kos/.vs/VSWorkspaceState.json
