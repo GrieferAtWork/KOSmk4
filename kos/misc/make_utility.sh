@@ -61,6 +61,16 @@ MODE_FORCE_CONF=no
 MODE_FORCE_MAKE=no
 MODE_FORCE_DISK=no
 MODE_DRYRUN=no
+MODE_RECURSIVE=no
+
+# Print options for recursive calls to make_utility.sh
+print_make_utility_options() {
+	if test x"$MODE_FORCE_CONF" == xyes; then echo " --force-configure"; fi
+	if test x"$MODE_FORCE_MAKE" == xyes; then echo " --force-make"; fi
+	if test x"$MODE_FORCE_DISK" == xyes; then echo " --force-disk"; fi
+	if test x"$MODE_DRYRUN"     == xyes; then echo " --dry-run"; fi
+	if test x"$MODE_RECURSIVE"  == xyes; then echo " --recursive"; fi
+}
 
 while [[ $# -gt 0 ]]; do
 	case $1 in
@@ -82,6 +92,10 @@ while [[ $# -gt 0 ]]; do
 		MODE_DRYRUN=yes
 		;;
 
+	-r | --recursive)
+		MODE_RECURSIVE=yes
+		;;
+
 	*)
 		break
 		;;
@@ -96,6 +110,7 @@ if (($# != 2)); then
 	echo "    --force-make          Force make to be re-executed"
 	echo "    --force-disk          Force on-disk files to be updated"
 	echo "    --dry-run             Don't install files, but tell what would be installed"
+	echo "    -r --recursive        Recursively install missing dependencies"
 	echo ""
 	echo "TARGET_NAME should be one of:"
 	echo "i386 x86_64"
@@ -158,10 +173,15 @@ require_program() {
 # require_utility <UTILITY_NAME> <INDICATOR_FILE>
 require_utility() {
 	if ! [ -f "$2" ]; then
-		echo "Required untility not installed: $1 (file '$2' does't exist)"
-		echo "Resolve this issue by running:"
-		echo "\$ bash make_utility.sh $TARGET_NAME $1"
-		exit 1
+		if test x"$MODE_RECURSIVE" == xyes; then
+			echo "Required untility not installed: $1 (file '$2' does't exist; install automatically)"
+			vcmd bash "$KOS_MISC/make_utility.sh" $(print_make_utility_options) $TARGET_NAME $1
+		else
+			echo "Required untility not installed: $1 (file '$2' does't exist)"
+			echo "Resolve this issue by running:"
+			echo "\$ bash make_utility.sh $TARGET_NAME $1"
+			exit 1
+		fi
 	fi
 }
 
@@ -627,12 +647,7 @@ HOST_SYSROOT="$KOS_ROOT/binutils/misc"
 # Handle the case where the utility name contains a "*"
 case "$UTILITY_NAME" in
 *\**)
-	RARGS=""
-	if test x"$MODE_FORCE_CONF" == xyes; then RARGS="$RARGS --force-configure"; fi
-	if test x"$MODE_FORCE_MAKE" == xyes; then RARGS="$RARGS --force-make"; fi
-	if test x"$MODE_FORCE_DISK" == xyes; then RARGS="$RARGS --force-disk"; fi
-	if test x"$MODE_DRYRUN" == xyes; then RARGS="$RARGS --dry-run"; fi
-	RARGS="$RARGS $TARGET_NAME"
+	RARGS="$(print_make_utility_options) $TARGET_NAME"
 	cmd cd "${KOS_ROOT}/kos/misc/utilities"
 	for util in $UTILITY_NAME; do
 		if [[ "$util" == *".sh" ]] && [ -f "$util" ]; then
