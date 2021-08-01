@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x2b9be133 */
+/* HASH CRC-32:0x25335cbd */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -34,6 +34,7 @@
 #include <bits/types.h>
 #include <sys/stat.h>
 #include <stdint.h>
+#include <kos/anno.h>
 
 #ifdef __CC__
 __SYSDECL_BEGIN

@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x9eec6f84 */
+/* HASH CRC-32:0xcace8d92 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -37,6 +37,7 @@
 
 #include <features.h>
 #include <paths.h>
+#include <kos/anno.h>
 
 #include <bits/crt/db/mntent.h>
 

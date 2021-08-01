@@ -34,12 +34,17 @@
 %(auto_source)#include "../libc/dl.h"
 %(auto_source)#include "../libc/globals.h"
 
-%{
+%[insert:prefix(
 #include <features.h>
+)]%{
 
+}%[insert:prefix(
 #include <asm/crt/process.h>
+)]%[insert:prefix(
 #include <bits/types.h>
+)]%[insert:prefix(
 #include <kos/anno.h>
+)]%{
 
 __SYSDECL_BEGIN
 

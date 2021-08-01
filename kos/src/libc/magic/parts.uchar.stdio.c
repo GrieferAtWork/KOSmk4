@@ -23,6 +23,8 @@
 
 %[insert:prefix(
 #include <features.h>
+)]%[insert:prefix(
+#include <kos/anno.h>
 )]%{
 #ifndef _STDIO_H
 #include <stdio.h>

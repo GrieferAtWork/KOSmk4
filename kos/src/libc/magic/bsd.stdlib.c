@@ -31,6 +31,8 @@
 #include <sys/stat.h>
 )]%[insert:prefix(
 #include <stdint.h>
+)]%[insert:prefix(
+#include <kos/anno.h>
 )]%{
 
 #ifdef __CC__

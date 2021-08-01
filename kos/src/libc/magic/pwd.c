@@ -36,10 +36,15 @@
 %[define_replacement(uid_t = __uid_t)]
 %[default:section(".text.crt{|.dos}.database.pwd")]
 
-%{
+%[insert:prefix(
 #include <features.h>
+)]%[insert:prefix(
 #include <bits/types.h>
+)]%[insert:prefix(
 #include <bits/crt/db/passwd.h>
+)]%[insert:prefix(
+#include <kos/anno.h>
+)]%{
 
 __SYSDECL_BEGIN
 

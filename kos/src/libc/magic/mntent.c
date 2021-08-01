@@ -34,6 +34,8 @@
 #include <features.h>
 )]%[insert:prefix(
 #include <paths.h>
+)]%[insert:prefix(
+#include <kos/anno.h>
 )]%{
 
 #include <bits/crt/db/mntent.h>
