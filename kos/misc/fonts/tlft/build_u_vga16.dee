@@ -26,7 +26,11 @@ import * from ...libgen.libtlft.compiler;
 fs.chdir(fs.headof(__FILE__));
 
 function runBashProcess(cmdline: string) {
+#ifdef __WINDOWS__
+	local p = ipc.Process("bash.exe", ["-c", cmdline]);
+#else /* __WINDOWS__ */
 	local p = ipc.Process("bash", ["-c", cmdline]);
+#endif /* !__WINDOWS__ */
 	p.start();
 	local err = p.join();
 	if (err != 0)
