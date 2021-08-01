@@ -156,6 +156,7 @@ if [ "$MODE_FORCE_MAKE" == yes ] || ! [ -d "$DESTDIR" ]; then
 				rmdir "$SRCPATH" > /dev/null 2>&1
 				if ! [ -d "$SRCPATH" ]; then
 					BINUTILS_SOURCES="$(dirname "$SRCPATH")"
+					cmd mkdir -p "$BINUTILS_SOURCES"
 					cmd cd "$BINUTILS_SOURCES"
 					if ! test -z "$PACKAGE_URL"; then
 						_PACKAGE_URL_FILENAME="${PACKAGE_URL##*/}"

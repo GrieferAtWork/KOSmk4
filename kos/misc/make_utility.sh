@@ -586,7 +586,9 @@ download_file() {
 	echo "Checking download: $1"
 	if ! [ -f "$1" ]; then
 		local OLDPWD="$(pwd)"
-		cmd cd "$(dirname "$1")"
+		local DIR="$(dirname "$1")"
+		cmd mkdir -p "$DIR"
+		cmd cd "$DIR"
 		cmd wget "$2"
 		cmd cd "$OLDPWD"
 		if ! [ -f "$1" ]; then
