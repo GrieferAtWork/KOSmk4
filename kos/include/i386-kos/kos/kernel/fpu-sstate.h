@@ -86,7 +86,7 @@ struct __ATTR_ALIGNED(ALIGNOF_SFPUSTATE) __ATTR_PACKED sfpustate /*[PREFIX(fs_)]
 	/* FPU context structure, as described here:
 	 *   - https://www.intel.com/content/dam/www/public/us/en/documents/manuals/64-ia-32-architectures-software-developer-vol-1-manual.pdf
 	 *   - https://c9x.me/x86/html/file_module_x86_id_112.html */
-	union __ATTR_PACKED {
+	union __ATTR_ALIGNED(ALIGNOF_SFPUENV) __ATTR_PACKED {
 		struct sfpuenv            fs_env;     /* FPU environment */
 		struct __ATTR_PACKED {
 			__uint16_t            fs_fcw;     /* Floating point control word. (Set of `FCW_*')

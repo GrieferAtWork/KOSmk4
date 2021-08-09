@@ -915,6 +915,7 @@ class FunctionPrototype {
 		local otArgc = #callToPrototype.argv;
 		local myHaveEllipsis = hasEllipsis;
 		local otHaveEllipsis = callToPrototype.hasEllipsis;
+		/* Prevent GCC from complaining about nonsense... (*ugh*) */
 		if (myArgc != otArgc || myHaveEllipsis != otHaveEllipsis) {
 			/* Different # of arguments (shouldn't happen, but can only be dealt  with
 			 * by generating a function-like macro, though obviously this macro cannot
@@ -945,9 +946,12 @@ class FunctionPrototype {
 					fp << ", ";
 				local myArg = argv[i];
 				local otArg = callToPrototype.argv[i];
-				if (!myArg.implicitlyConvertibleTo(otArg))
-					otArg.cprintCCastPrefix(fp, escapeMode);
-				fp << myArg.name;
+				if (!myArg.ctype.implicitlyConvertibleTo(otArg.ctype)) {
+					otArg.ctype.cprintCCastPrefix(fp, escapeMode);
+					fp << "(" << myArg.name << ")";
+				} else {
+					fp << myArg.name;
+				}
 			}
 			if (otArgc > commonArgc) {
 				if (commonArgc)

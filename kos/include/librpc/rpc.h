@@ -121,11 +121,11 @@ __SYSDECL_BEGIN
                                       * `ifthen %newreg(d), %newreg(c), %newreg(b), %newreg(a)' -- %newreg(a) = %newreg(b) != 0 ? %newreg(c) : %newreg(d) */
 #define RPC_PROGRAM_OP_stftx    0x09 /* `[stftx %arg[i++]]'            -- Take the address of the status futex from arguments (Ignored if the `RPC_SCHEDULE_FLAG_STATUSFUTEX' flag isn't set) */
 #define RPC_PROGRAM_OP_rep_stftx_psha 0x0a /* `rep(%arg[i++]); [stftx %arg[i++]]; psh %arg[i++]' -- An intermingled variant of `stftx + rep_psha' that takes arguments in the order { argc, stftx, args...*argc } */
-/*      RPC_PROGRAM_OP_         0x0a /* ... */
-/*      RPC_PROGRAM_OP_         0x0b /* ... */
-/*      RPC_PROGRAM_OP_         0x0c /* ... */
-/*      RPC_PROGRAM_OP_         0x0d /* ... */
-/*      RPC_PROGRAM_OP_         0x0e /* ... */
+/*      RPC_PROGRAM_OP_         0x0a  * ... */
+/*      RPC_PROGRAM_OP_         0x0b  * ... */
+/*      RPC_PROGRAM_OP_         0x0c  * ... */
+/*      RPC_PROGRAM_OP_         0x0d  * ... */
+/*      RPC_PROGRAM_OP_         0x0e  * ... */
 #define RPC_PROGRAM_OP_ext      0x0f /* Extended opcode prefix (must be followed by 1 or more `RPC_PROGRAM_OP_arg' opcodes, the first of which contains the actual opcode as operand) */
 #define RPC_PROGRAM_OP_add      0x10 /* >> add  %arg[i++],  %newreg(a)             #          -- %newreg(a) = %newreg(a) + %arg[i++]
                                       * >> add  %arg[i++],  %newreg(b), %newreg(a) #          -- %newreg(a) = %newreg(b) + %arg[i++]
@@ -147,8 +147,8 @@ __SYSDECL_BEGIN
                                       * >> xorn %newreg(c), %newreg(b), %newreg(a) # + d=0x0b -- %newreg(a) = %newreg(b) ^ ~%newreg(c)
                                       * NOTE: Divide-by-zero will set the `RPC_STATUS_BADARGUMENTS' status (as will modulo-by-zero). */
 
-/*      RPC_PROGRAM_OP_         0x16 /* ... */
-/*      RPC_PROGRAM_OP_         0x17 /* ... */
+/*      RPC_PROGRAM_OP_         0x16  * ... */
+/*      RPC_PROGRAM_OP_         0x17  * ... */
 #define RPC_PROGRAM_OP_padd     0x18 /* >> psh  add  %newreg(a), %arg[i++]  #           -- `push(%newreg(a) + %arg[i++]);'
                                       * >> psh  add  %newreg(b), %newreg(a) #           -- `push(%newreg(a) + %newreg(b));' */
 #define RPC_PROGRAM_OP_psub     0x19 /* >> psh  sub  %newreg(a), %arg[i++]  #           -- `push(%newreg(a) - %arg[i++]);'
@@ -166,14 +166,14 @@ __SYSDECL_BEGIN
                                       * >> psh  xor  %newreg(b), %newreg(a) # + c=0x0a  -- `push(%newreg(a) ^ %newreg(b));'
                                       * >> psh  xorn %newreg(b), %newreg(a) # + c=0x0b  -- `push(%newreg(a) ^ ~%newreg(b));'
                                       * NOTE: Divide-by-zero will set the `RPC_STATUS_BADARGUMENTS' status. */
-/*      RPC_PROGRAM_OP_         0x1d /* ... */
-/*      RPC_PROGRAM_OP_         0x1e /* ... */
-/*      RPC_PROGRAM_OP_         0x1f /* ... */
+/*      RPC_PROGRAM_OP_         0x1d  * ... */
+/*      RPC_PROGRAM_OP_         0x1e  * ... */
+/*      RPC_PROGRAM_OP_         0x1f  * ... */
 #define RPC_PROGRAM_OP_pshr     0x20 /* `psh  %oldreg(opcode & 0x1f)'                -- Push a register onto a stack `%newreg(<STACK_POINTER>)' */
 #define RPC_PROGRAM_OP_loda     0x40 /* `lod  %newreg(opcode & 0x1f), %arg[i++]'     -- Load the next argument into a register. */
 #define RPC_PROGRAM_OP_plda     0x60 /* Combination of psh+lod for the register `opcode & 0x1f' */
 #define RPC_PROGRAM_OP_lod_rsn  0x80 /* `lod  %newreg(opcode & 0x1f), reason'        -- Load the interrupt reason (one of `RPC_REASON_*') into a register. */
-/*      RPC_PROGRAM_OP_         0xc0 /* ... */
+/*      RPC_PROGRAM_OP_         0xc0  * ... */
 #define RPC_PROGRAM_OP_nop      0xe0 /* `nop'  -- No-op (though `opcode & 0x1f' may be used as operand by a preceding opcode) */
 #define RPC_PROGRAM_OP_arg      0xe0 /* Argument for the preceding opcode */
 
@@ -233,20 +233,20 @@ __SYSDECL_BEGIN
                                                 * than RPC_REASON_SYSCALL.  - This  can e.g.  happen when  the  target
                                                 * thread accesses VIO memory, or a memory-mapped file needs to acquire
                                                 * a blocking lock in order to be able to load data from disk. */
-/*      RPC_SCHEDULE_FLAG_              0x0004 /* ... */
-/*      RPC_SCHEDULE_FLAG_              0x0008 /* ... */
-/*      RPC_SCHEDULE_FLAG_              0x0010 /* ... */
+/*      RPC_SCHEDULE_FLAG_              0x0004  * ... */
+/*      RPC_SCHEDULE_FLAG_              0x0008  * ... */
+/*      RPC_SCHEDULE_FLAG_              0x0010  * ... */
 #define RPC_SCHEDULE_FLAG_WAITFORSTART  0x0020 /* [A|S] Blocking wait for the RPC to reach a state of being able to start.
                                                 * NOTE: If the target terminates before servicing can start, `rpc_schedule_ex()'
                                                 *       will  return  to  indicate  that  the  target  thread  has   terminated. */
 #define RPC_SCHEDULE_FLAG_STATUSFUTEX   0x0040 /* [A|S] Allow the program to define a futex pointer to which the pointer-sized
                                                 * RPC  state  will  be  written,  as  one  of  the  `RPC_STATUS_*'  constants. */
-/*      RPC_SCHEDULE_FLAG_              0x0080 /* ... */
+/*      RPC_SCHEDULE_FLAG_              0x0080  * ... */
 #define RPC_SCHEDULE_FLAG_SYSRESTART    0x0100 /* [A|S] Always restart interrupted system calls (Always indicate `RPC_REASON_SYSCALL' as reason for system calls).
                                                 * This flag behaves identical to the `SA_RESTART' flag for signal handlers. */
 #define RPC_SCHEDULE_FLAG_NOSYSRESTART  0x0200 /* [A|S] Never restart interrupted system calls (Always indicate `RPC_REASON_ASYNC' as reason). */
-/*      RPC_SCHEDULE_FLAG_              0x0400 /* ... */
-/*      RPC_SCHEDULE_FLAG_              0x0800 /* ... */
+/*      RPC_SCHEDULE_FLAG_              0x0400  * ... */
+/*      RPC_SCHEDULE_FLAG_              0x0800  * ... */
 #define RPC_SCHEDULE_FLAG_WAITSMPACK    0x1000 /* [A|S] In an SMP environment, wait for the target's CPU to acknowledge a potential IPI. */
 #define RPC_SCHEDULE_FLAG_DONTWAKE      0x2000 /* [A|S] Don't trigger a  sporadic wake-up of  the target  thread (don't force  the target  to
                                                 * begin a quantum when IDLE before, but keep it idle until something else causes an wake-up).

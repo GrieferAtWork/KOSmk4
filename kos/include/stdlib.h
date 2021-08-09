@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x264b20ab */
+/* HASH CRC-32:0xb907179f */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -4197,10 +4197,16 @@ __CDECLARE(__ATTR_CONST __ATTR_WUNUSED,__UINT64_TYPE__,__NOTHROW_NCX,_byteswap_u
 __NAMESPACE_LOCAL_USING_OR_IMPL(_byteswap_uint64, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_CONST __ATTR_WUNUSED __UINT64_TYPE__ __NOTHROW_NCX(__LIBCCALL _byteswap_uint64)(__UINT64_TYPE__ __val) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(_byteswap_uint64))(__val); })
 #endif /* !__CRT_HAVE__byteswap_uint64 */
 #endif /* __UINT64_TYPE__ */
+#ifndef _byteswap_ushort
 #define _byteswap_ushort(x) __hybrid_bswap16(x)
+#endif /* !_byteswap_ushort */
+#ifndef _byteswap_ulong
 #define _byteswap_ulong(x)  __hybrid_bswap32(x)
+#endif /* !_byteswap_ulong */
 #ifdef __UINT64_TYPE__
+#ifndef _byteswap_uint64
 #define _byteswap_uint64(x) __hybrid_bswap64(x)
+#endif /* !_byteswap_uint64 */
 #endif /* __UINT64_TYPE__ */
 #endif /* !_MSC_VER */
 #ifdef __USE_DOS_SLIB

@@ -71,6 +71,12 @@ __LOCAL __ATTR_WUNUSED __BOOL __NOTHROW(atomic_lock_acquire_nx)(struct atomic_lo
 __LOCAL __NOPREEMPT void __NOTHROW(atomic_lock_acquire_nopr)(struct atomic_lock *__restrict __self);
 #endif /* __KERNEL__ && __KOS_VERSION__ >= 400 */
 
+#if !defined(__INTELLISENSE__) && !defined(__NO_builtin_expect)
+#undef atomic_lock_tryacquire
+#define atomic_lock_tryacquire(self) __builtin_expect(__hybrid_atomic_xch((self)->a_lock, 1, __ATOMIC_ACQUIRE) == 0, 1)
+#define atomic_lock_acquire_nx(self) __builtin_expect(atomic_lock_acquire_nx(self), 1)
+#endif /* !__INTELLISENSE__ && !__NO_builtin_expect */
+
 #ifndef __INTELLISENSE__
 __LOCAL void (atomic_lock_acquire)(struct atomic_lock *__restrict __self) {
 	while (!atomic_lock_tryacquire(__self))
@@ -94,11 +100,6 @@ __LOCAL __NOPREEMPT void __NOTHROW(atomic_lock_acquire_nopr)(struct atomic_lock 
 #endif /* __KERNEL__ && __KOS_VERSION__ >= 400 */
 #endif /* !__INTELLISENSE__ */
 
-
-#if !defined(__INTELLISENSE__) && !defined(__NO_builtin_expect)
-#define atomic_lock_tryacquire(self) __builtin_expect(__hybrid_atomic_xch((self)->a_lock, 1, __ATOMIC_ACQUIRE) == 0, 1)
-#define atomic_lock_acquire_nx(self) __builtin_expect(atomic_lock_acquire_nx(self), 1)
-#endif /* !__INTELLISENSE__ && !__NO_builtin_expect */
 
 #ifdef __DEFINE_SYNC_MUTEX
 __DEFINE_SYNC_MUTEX(struct atomic_lock,

@@ -75,6 +75,9 @@ __DECL_END
 #else /* __INTELLISENSE__ */
 #include <hybrid/pp/__va_nargs.h>
 
+#define freea(ptr) __freea(ptr)
+
+#ifdef __HYBRID_PP_VA_OVERLOAD
 #define __PRIVATE_malloca_1(num_bytes)                             __malloca(num_bytes)
 #define __PRIVATE_malloca_2(elem_count, elem_size)                 __malloca((elem_count) * (elem_size))
 #define __PRIVATE_calloca_1(num_bytes)                             __calloca(num_bytes)
@@ -83,20 +86,41 @@ __DECL_END
 #define __PRIVATE_malloca_tryhard_3(result, elem_count, elem_size) __malloca_tryhard(result, (elem_count) * (elem_size))
 #define __PRIVATE_calloca_tryhard_2(result, num_bytes)             __calloca_tryhard(result, num_bytes)
 #define __PRIVATE_calloca_tryhard_3(result, elem_count, elem_size) __calloca_tryhard(result, (elem_count) * (elem_size))
-
-#define freea(ptr)           __freea(ptr)
+#ifdef __PREPROCESSOR_HAVE_VA_ARGS
 #define malloca(...)         __HYBRID_PP_VA_OVERLOAD(__PRIVATE_malloca_, (__VA_ARGS__))(__VA_ARGS__)
 #define calloca(...)         __HYBRID_PP_VA_OVERLOAD(__PRIVATE_calloca_, (__VA_ARGS__))(__VA_ARGS__)
 #define malloca_tryhard(...) __HYBRID_PP_VA_OVERLOAD(__PRIVATE_malloca_tryhard_, (__VA_ARGS__))(__VA_ARGS__)
 #define calloca_tryhard(...) __HYBRID_PP_VA_OVERLOAD(__PRIVATE_calloca_tryhard_, (__VA_ARGS__))(__VA_ARGS__)
+#else /* __PREPROCESSOR_HAVE_VA_ARGS */
+#define malloca(args...)         __HYBRID_PP_VA_OVERLOAD(__PRIVATE_malloca_, (args))(args)
+#define calloca(args...)         __HYBRID_PP_VA_OVERLOAD(__PRIVATE_calloca_, (args))(args)
+#define malloca_tryhard(args...) __HYBRID_PP_VA_OVERLOAD(__PRIVATE_malloca_tryhard_, (args))(args)
+#define calloca_tryhard(args...) __HYBRID_PP_VA_OVERLOAD(__PRIVATE_calloca_tryhard_, (args))(args)
+#endif /* !__PREPROCESSOR_HAVE_VA_ARGS */
+#else /* __HYBRID_PP_VA_OVERLOAD */
+#define malloca         __malloca
+#define calloca         __calloca
+#define malloca_tryhard __malloca_tryhard
+#define calloca_tryhard __calloca_tryhard
+#endif /* !__HYBRID_PP_VA_OVERLOAD */
 
 #ifdef __malloca_heap
+#ifdef __HYBRID_PP_VA_OVERLOAD
 #define __PRIVATE_malloca_heap_1(num_bytes)             __malloca_heap(num_bytes)
 #define __PRIVATE_malloca_heap_2(elem_count, elem_size) __malloca_heap((elem_count) * (elem_size))
 #define __PRIVATE_calloca_heap_1(num_bytes)             __calloca_heap(num_bytes)
 #define __PRIVATE_calloca_heap_2(elem_count, elem_size) __calloca_heap((elem_count) * (elem_size))
-#define malloca_heap(num_bytes) __HYBRID_PP_VA_OVERLOAD(__PRIVATE_malloca_heap_, (__VA_ARGS__))(__VA_ARGS__)
-#define calloca_heap(num_bytes) __HYBRID_PP_VA_OVERLOAD(__PRIVATE_calloca_heap_, (__VA_ARGS__))(__VA_ARGS__)
+#ifdef __PREPROCESSOR_HAVE_VA_ARGS
+#define malloca_heap(...) __HYBRID_PP_VA_OVERLOAD(__PRIVATE_malloca_heap_, (__VA_ARGS__))(__VA_ARGS__)
+#define calloca_heap(...) __HYBRID_PP_VA_OVERLOAD(__PRIVATE_calloca_heap_, (__VA_ARGS__))(__VA_ARGS__)
+#else /* __PREPROCESSOR_HAVE_VA_ARGS */
+#define malloca_heap(args...) __HYBRID_PP_VA_OVERLOAD(__PRIVATE_malloca_heap_, (args))(args)
+#define calloca_heap(args...) __HYBRID_PP_VA_OVERLOAD(__PRIVATE_calloca_heap_, (args))(args)
+#endif /* !__PREPROCESSOR_HAVE_VA_ARGS */
+#else /* __HYBRID_PP_VA_OVERLOAD */
+#define malloca_heap __malloca_heap
+#define calloca_heap __calloca_heap
+#endif /* !__HYBRID_PP_VA_OVERLOAD */
 #else /* __malloca_heap */
 #define __NO_MALLOCA_HEAP 1
 #define malloca_heap      malloca
@@ -104,12 +128,22 @@ __DECL_END
 #endif /* !__malloca_heap */
 
 #ifdef __malloca_stack
+#ifdef __HYBRID_PP_VA_OVERLOAD
 #define __PRIVATE_malloca_stack_1(num_bytes)             __malloca_stack(num_bytes)
 #define __PRIVATE_malloca_stack_2(elem_count, elem_size) __malloca_stack((elem_count) * (elem_size))
 #define __PRIVATE_calloca_stack_1(num_bytes)             __calloca_stack(num_bytes)
 #define __PRIVATE_calloca_stack_2(elem_count, elem_size) __calloca_stack((elem_count) * (elem_size))
-#define malloca_stack(num_bytes) __HYBRID_PP_VA_OVERLOAD(__PRIVATE_malloca_stack_, (__VA_ARGS__))(__VA_ARGS__)
-#define calloca_stack(num_bytes) __HYBRID_PP_VA_OVERLOAD(__PRIVATE_calloca_stack_, (__VA_ARGS__))(__VA_ARGS__)
+#ifdef __PREPROCESSOR_HAVE_VA_ARGS
+#define malloca_stack(...) __HYBRID_PP_VA_OVERLOAD(__PRIVATE_malloca_stack_, (__VA_ARGS__))(__VA_ARGS__)
+#define calloca_stack(...) __HYBRID_PP_VA_OVERLOAD(__PRIVATE_calloca_stack_, (__VA_ARGS__))(__VA_ARGS__)
+#else /* __PREPROCESSOR_HAVE_VA_ARGS */
+#define malloca_stack(args...) __HYBRID_PP_VA_OVERLOAD(__PRIVATE_malloca_stack_, (args))(args)
+#define calloca_stack(args...) __HYBRID_PP_VA_OVERLOAD(__PRIVATE_calloca_stack_, (args))(args)
+#endif /* !__PREPROCESSOR_HAVE_VA_ARGS */
+#else /* __HYBRID_PP_VA_OVERLOAD */
+#define malloca_stack __malloca_stack
+#define calloca_stack __calloca_stack
+#endif /* !__HYBRID_PP_VA_OVERLOAD */
 #else /* __malloca_stack */
 #define __NO_MALLOCA_STACK 1
 #define malloca_stack      malloca

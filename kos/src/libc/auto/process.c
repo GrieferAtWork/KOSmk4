@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x924baf98 */
+/* HASH CRC-32:0xc41dbf04 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -60,6 +60,7 @@ INTERN ATTR_SECTION(".text.crt.dos.fs.dlfcn") int
 #ifdef __CRT_HAVE_dlclose
 	return dlclose((void *)(uintptr_t)hnd);
 #else /* __CRT_HAVE_dlclose */
+	(void)hnd;
 	return 0;
 #endif /* !__CRT_HAVE_dlclose */
 }

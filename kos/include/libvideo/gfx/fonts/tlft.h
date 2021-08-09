@@ -77,9 +77,9 @@ typedef struct {
 	__uint8_t     h_ngroups;             /* Number of unicode character groups. */
 	__uint16_t    h_nchars;              /* Number of characters in `h_chars' (<= 0xffa1 == 0x10000 - 95) (little endian). */
 /*	__byte_t      h_pad[offsetafter(TLFT_Hdr, h_nchars) - h_hdrsize]; */
-/*	TLFT_UniGroup h_groups[h_ngroups];   /* Unicode character groups */
-/*	__byte_t      h_ascii[95][1 << h_log2chsize]; /* Representations for U+0020-U+007e */
-/*	__byte_t      h_chars[][1 << h_log2chsize];   /* Unicode group blobs. */
+/*	TLFT_UniGroup h_groups[h_ngroups];    * Unicode character groups */
+/*	__byte_t      h_ascii[95][1 << h_log2chsize]; * Representations for U+0020-U+007e */
+/*	__byte_t      h_chars[][1 << h_log2chsize];   * Unicode group blobs. */
 } TLFT_Hdr;
 
 /* Helper macros to getting offsets and file size from a given TLFT header.

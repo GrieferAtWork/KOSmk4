@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x27d63af */
+/* HASH CRC-32:0x4d3ec8a6 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -10570,7 +10570,7 @@ __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_CONST __ATTR_WUNUSED int __NOTHROW_NCX(__L
 /* This variable is used by `gamma' and `lgamma'. */
 #ifdef __CRT_HAVE_signgam
 #undef signgam
-__LIBC int (signgam);
+__LIBC int signgam;
 #endif /* __CRT_HAVE_signgam */
 #endif /* __USE_MISC || __USE_XOPEN */
 

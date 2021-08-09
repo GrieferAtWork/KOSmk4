@@ -179,7 +179,7 @@
 /* Flags that can be changed when combined with `MS_REMOUNT' */
 #if !defined(MS_RMT_MASK) && defined(__MS_RMT_MASK)
 #define MS_RMT_MASK __MS_RMT_MASK
-#endif /* !MS_RMT_MASK && __MS_RMT_MASK /
+#endif /* !MS_RMT_MASK && __MS_RMT_MASK */
 
 /* Magic mount flag number. Must be or'd with flag values. */
 #if !defined(MS_MGC_VAL) && defined(__MS_MGC_VAL)

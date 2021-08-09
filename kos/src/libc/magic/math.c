@@ -2039,7 +2039,7 @@ int _dpcomp(double x, double y) /* TODO */;
 /* This variable is used by `gamma' and `lgamma'. */
 #ifdef __CRT_HAVE_signgam
 #undef signgam
-__LIBC int (signgam);
+__LIBC int signgam;
 #endif /* __CRT_HAVE_signgam */
 #endif /* __USE_MISC || __USE_XOPEN */
 

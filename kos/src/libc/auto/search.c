@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xa109166b */
+/* HASH CRC-32:0x7585353a */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -657,10 +657,10 @@ __LIBC_LOCAL_NAME(trecurse)(void const *root, __action_fn_t action, int level) {
 	} else {
 		(*action)(root, (VISIT)0, level);
 		if (l != NULL)
-			trecurse(l, action, level + 1);
+			__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(trecurse)(l, action, level + 1);
 		(*action)(root, (VISIT)1, level);
 		if (r != NULL)
-			trecurse(r, action, level + 1);
+			__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(trecurse)(r, action, level + 1);
 		(*action)(root, (VISIT)2, level);
 	}
 }

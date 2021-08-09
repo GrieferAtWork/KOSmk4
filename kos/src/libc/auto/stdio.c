@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xc09b03a9 */
+/* HASH CRC-32:0xad3453a5 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -2220,7 +2220,7 @@ __LOCAL_LIBC(vsnscanf_getc) __SSIZE_TYPE__
 	__CHAR32_TYPE__ __result;
 	__result = libc_unicode_readutf8_n(&((struct __vsnscanf_data *)__arg)->__ptr,
 	                              ((struct __vsnscanf_data *)__arg)->__end);
-	return __result ? __result : __EOF;
+	return __result ? (__SSIZE_TYPE__)__result : (__SSIZE_TYPE__)__EOF;
 }
 __LOCAL_LIBC(vsnscanf_ungetc) __SSIZE_TYPE__
 (__FORMATPRINTER_CC __vsnscanf_ungetc)(void *__arg, __CHAR32_TYPE__ __UNUSED(__ch)) {
@@ -2643,8 +2643,8 @@ NOTHROW_NCX(LIBCCALL libc__vsnprintf)(char *__restrict buf,
                                       va_list args) {
 	__STDC_INT_AS_SIZE_T result;
 	result = libc_vsnprintf(buf, bufsize, format, args);
-	if (result > bufsize)
-		result = bufsize;
+	if ((size_t)result > bufsize)
+		result = (__STDC_INT_AS_SIZE_T)bufsize;
 	return result;
 }
 INTERN ATTR_SECTION(".text.crt.dos.unicode.locale.format.printf") ATTR_LIBC_PRINTF(3, 0) NONNULL((3)) __STDC_INT_AS_SIZE_T

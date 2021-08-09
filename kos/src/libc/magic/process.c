@@ -293,6 +293,7 @@ int _unloaddll(intptr_t hnd) {
 @@pp_ifdef __CRT_HAVE_dlclose@@
 	return @dlclose@((void *)(uintptr_t)hnd);
 @@pp_else@@
+	(void)hnd;
 	return 0;
 @@pp_endif@@
 }

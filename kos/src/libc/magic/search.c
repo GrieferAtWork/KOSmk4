@@ -833,10 +833,10 @@ __LIBC_LOCAL_NAME(trecurse)(void const *root, __action_fn_t action, int level) {
 	} else {
 		(*action)(root, (@VISIT@)preorder, level);
 		if (l != NULL)
-			trecurse(l, action, level + 1);
+			__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(trecurse)(l, action, level + 1);
 		(*action)(root, (@VISIT@)postorder, level);
 		if (r != NULL)
-			trecurse(r, action, level + 1);
+			__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(trecurse)(r, action, level + 1);
 		(*action)(root, (@VISIT@)endorder, level);
 	}
 }

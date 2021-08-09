@@ -148,17 +148,6 @@ typedef __ATTR_NONNULL((2)) void
 (__LIBKCALL *_Unwind_Exception_Cleanup_Fn)(_Unwind_Reason_Code __reason /* = _URC_FOREIGN_EXCEPTION_CAUGHT */,
                                            struct _Unwind_Exception *__restrict __exc);
 
-typedef _Unwind_Reason_Code
-(__LIBKCALL *_Unwind_Stop_Fn)(int __version /*=1*/,
-                              _Unwind_Action __actions,
-                              _Unwind_Exception_Class __exception_class,
-                              struct _Unwind_Exception *__exc,
-                              struct _Unwind_Context *__context, void *__stop_arg);
-
-typedef _Unwind_Reason_Code
-(__LIBKCALL *_Unwind_Trace_Fn)(struct _Unwind_Context *__context, void *__trace_arg);
-
-
 
 #ifdef __COMPILER_HAVE_PRAGMA_PUSHMACRO
 #pragma push_macro("exception_class")
@@ -192,6 +181,17 @@ struct _Unwind_Context /* Opaque structure */
 }
 #endif /* __USE_KOS */
 ;
+
+typedef _Unwind_Reason_Code
+(__LIBKCALL *_Unwind_Stop_Fn)(int __version /*=1*/,
+                              _Unwind_Action __actions,
+                              _Unwind_Exception_Class __exception_class,
+                              struct _Unwind_Exception *__exc,
+                              struct _Unwind_Context *__context, void *__stop_arg);
+
+typedef _Unwind_Reason_Code
+(__LIBKCALL *_Unwind_Trace_Fn)(struct _Unwind_Context *__context, void *__trace_arg);
+
 
 
 /* NOTE: `__gcc_personality_v0' has the prototype `_Unwind_Personality_Fn' */

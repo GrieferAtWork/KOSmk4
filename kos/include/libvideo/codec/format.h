@@ -44,10 +44,10 @@ struct video_palette;
 /* Helper macros for doing low-level video data manipulations. */
 #define video_format_getpixel(self, line, x)        (*(self)->vf_codec->vc_getpixel)(line, x)
 #define video_format_setpixel(self, line, x, pixel) (*(self)->vf_codec->vc_setpixel)(line, x, pixel);
-#define video_format_getcolor(self, line, x)        video_format_pixel2color(self, video_format_getpixel(self, line, x))
-#define video_format_setcolor(self, line, x, color) video_format_pixel2color(self, video_format_getpixel(self, line, x))
 #define video_format_pixel2color(self, pixel)       (*(self)->vf_codec->vc_pixel2color)(self, pixel)
 #define video_format_color2pixel(self, color)       (*(self)->vf_codec->vc_color2pixel)(self, color)
+#define video_format_getcolor(self, line, x)        video_format_pixel2color(self, video_format_getpixel(self, line, x))
+#define video_format_setcolor(self, line, x, color) video_format_setpixel(self, line, x, video_format_color2pixel(self, color))
 #define video_format_linecopy(self, dst_line, dst_x, src_line, src_x, num_pixels) \
 	(*(self)->vf_codec->vc_linecopy)(dst_line, dst_x, src_line, src_x, num_pixels)
 #define video_format_linefill(self, dst_line, dst_x, pixel, num_pixels) \

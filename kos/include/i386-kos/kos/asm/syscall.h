@@ -42,7 +42,6 @@
 #define __WANT_SYSCALL_REGISTER_COUNT 1
 #include <asm/syscalls.h>
 #endif /* !__NRFEAT_DEFINED_SYSCALL_REGISTER_COUNT */
-#define __CRT_HAVE_SC(name) __X86_SYSCALL_EXISTS(__NRRC_##name)
 
 #ifdef __KERNEL__
 #include <hybrid/host.h>
@@ -59,6 +58,7 @@
 /* Within the kernel, syscall functions _all_ can throw errors! */
 #define __CDECLARE_XSC(attr, Treturn, name, param, args) /* nothing */
 #define __CDECLARE_VOID_XSC(attr, name, param, args)     /* nothing */
+#define __CRT_HAVE_SC(name) __X86_SYSCALL_EXISTS(__NRRC_##name)
 #define __CRT_HAVE_XSC(name) 0
 
 #else /* __KERNEL__ */
@@ -81,7 +81,7 @@
 #include <asm/syscalls-proto.h>
 #endif /* !... */
 
-
+#define __CRT_HAVE_SC(name) __X86_SYSCALL_EXISTS(__NRRC_##name)
 #define __CRT_HAVE_XSC __CRT_HAVE_SC
 
 #define __X86_SYSCALL_NORETURN_UNREACHABLE2_0   /* nothing */

@@ -81,7 +81,7 @@
 #define     IA32_MISC_ENABLE_X87_COMPAT         __UINT64_C(0x0000000000000004) /* [bit(2)] FOPCODE compatibility mode enable */
 #define     IA32_MISC_ENABLE_TM1                __UINT64_C(0x0000000000000008) /* [bit(3)] Thermal monitor enable */
 #define     IA32_MISC_ENABLE_SPLIT_LOCK_DISABLE __UINT64_C(0x0000000000000010) /* [bit(4)] Split-lock disable */
-/*          IA32_MISC_ENABLE_                   __UINT64_C(0x0000000000000020) /* [bit(5)] */
+/*          IA32_MISC_ENABLE_                   __UINT64_C(0x0000000000000020)  * [bit(5)] */
 #define     IA32_MISC_ENABLE_L3CACHE_DISABLE    __UINT64_C(0x0000000000000040) /* [bit(6)] */
 #define     IA32_MISC_ENABLE_EMON               __UINT64_C(0x0000000000000080) /* [bit(7)] */
 #define     IA32_MISC_ENABLE_SUPPRESS_LOCK      __UINT64_C(0x0000000000000100) /* [bit(8)] Bus lock on cache line splits disable */
@@ -91,56 +91,56 @@
 #define     IA32_MISC_ENABLE_BTS_UNAVAIL        __UINT64_C(0x0000000000000800) /* [bit(11)] */
 #define     IA32_MISC_ENABLE_PEBS_UNAVAIL       __UINT64_C(0x0000000000001000) /* [bit(12)] */
 #define     IA32_MISC_ENABLE_TM2                __UINT64_C(0x0000000000002000) /* [bit(13)] */
-/*          IA32_MISC_ENABLE_                   __UINT64_C(0x0000000000004000) /* [bit(14)] */
+/*          IA32_MISC_ENABLE_                   __UINT64_C(0x0000000000004000)  * [bit(14)] */
 #define     IA32_MISC_ENABLE_GV12_LEGACY_ENABLE __UINT64_C(0x0000000000008000) /* [bit(15)] GV1/2 legacy enable */
 #define     IA32_MISC_ENABLE_ENHANCED_SPEEDSTEP __UINT64_C(0x0000000000010000) /* [bit(16)][requires(CPUID_1C_EST)] */
-/*          IA32_MISC_ENABLE_                   __UINT64_C(0x0000000000020000) /* [bit(17)] */
+/*          IA32_MISC_ENABLE_                   __UINT64_C(0x0000000000020000)  * [bit(17)] */
 #define     IA32_MISC_ENABLE_MWAIT              __UINT64_C(0x0000000000040000) /* [bit(18)] MONITOR/MWAIT s/m enable */
 #define     IA32_MISC_ENABLE_ADJ_PREF_DISABLE   __UINT64_C(0x0000000000080000) /* [bit(19)] Adjacent sector prefetch disable */
 #define     IA32_MISC_ENABLE_SPEEDSTEP_LOCK     __UINT64_C(0x0000000000100000) /* [bit(20)] */
-/*          IA32_MISC_ENABLE_                   __UINT64_C(0x0000000000200000) /* [bit(21)] */
+/*          IA32_MISC_ENABLE_                   __UINT64_C(0x0000000000200000)  * [bit(21)] */
 #define     IA32_MISC_ENABLE_LIMIT_CPUID        __UINT64_C(0x0000000000400000) /* [bit(22)] */
 #define     IA32_MISC_ENABLE_XTPR_DISABLE       __UINT64_C(0x0000000000800000) /* [bit(23)][requires(CPUID_1C_XTPR)] */
 #define     IA32_MISC_ENABLE_L1D_CONTEXT        __UINT64_C(0x0000000001000000) /* [bit(24)] */
-/*          IA32_MISC_ENABLE_                   __UINT64_C(0x0000000002000000) /* [bit(25)] */
-/*          IA32_MISC_ENABLE_                   __UINT64_C(0x0000000004000000) /* [bit(26)] */
-/*          IA32_MISC_ENABLE_                   __UINT64_C(0x0000000008000000) /* [bit(27)] */
-/*          IA32_MISC_ENABLE_                   __UINT64_C(0x0000000010000000) /* [bit(28)] */
-/*          IA32_MISC_ENABLE_                   __UINT64_C(0x0000000020000000) /* [bit(29)] */
-/*          IA32_MISC_ENABLE_                   __UINT64_C(0x0000000040000000) /* [bit(30)] */
-/*          IA32_MISC_ENABLE_                   __UINT64_C(0x0000000080000000) /* [bit(31)] */
-/*          IA32_MISC_ENABLE_                   __UINT64_C(0x0000000100000000) /* [bit(32)] */
-/*          IA32_MISC_ENABLE_                   __UINT64_C(0x0000000200000000) /* [bit(33)] */
+/*          IA32_MISC_ENABLE_                   __UINT64_C(0x0000000002000000)  * [bit(25)] */
+/*          IA32_MISC_ENABLE_                   __UINT64_C(0x0000000004000000)  * [bit(26)] */
+/*          IA32_MISC_ENABLE_                   __UINT64_C(0x0000000008000000)  * [bit(27)] */
+/*          IA32_MISC_ENABLE_                   __UINT64_C(0x0000000010000000)  * [bit(28)] */
+/*          IA32_MISC_ENABLE_                   __UINT64_C(0x0000000020000000)  * [bit(29)] */
+/*          IA32_MISC_ENABLE_                   __UINT64_C(0x0000000040000000)  * [bit(30)] */
+/*          IA32_MISC_ENABLE_                   __UINT64_C(0x0000000080000000)  * [bit(31)] */
+/*          IA32_MISC_ENABLE_                   __UINT64_C(0x0000000100000000)  * [bit(32)] */
+/*          IA32_MISC_ENABLE_                   __UINT64_C(0x0000000200000000)  * [bit(33)] */
 #define     IA32_MISC_ENABLE_XD_DISABLE         __UINT64_C(0x0000000400000000) /* [bit(34)][requires(CPUID_80000001D_NX)] */
-/*          IA32_MISC_ENABLE_                   __UINT64_C(0x0000000800000000) /* [bit(35)] */
-/*          IA32_MISC_ENABLE_                   __UINT64_C(0x0000001000000000) /* [bit(36)] */
+/*          IA32_MISC_ENABLE_                   __UINT64_C(0x0000000800000000)  * [bit(35)] */
+/*          IA32_MISC_ENABLE_                   __UINT64_C(0x0000001000000000)  * [bit(36)] */
 #define     IA32_MISC_ENABLE_DCU_PREF_DISABLE   __UINT64_C(0x0000002000000000) /* [bit(37)] */
 #define     IA32_MISC_ENABLE_TURBO_DISABLE      __UINT64_C(0x0000004000000000) /* [bit(38)] */
 #define     IA32_MISC_ENABLE_IP_PREF_DISABLE    __UINT64_C(0x0000008000000000) /* [bit(39)] */
-/*          IA32_MISC_ENABLE_                   __UINT64_C(0x0000010000000000) /* [bit(40)] */
-/*          IA32_MISC_ENABLE_                   __UINT64_C(0x0000020000000000) /* [bit(41)] */
-/*          IA32_MISC_ENABLE_                   __UINT64_C(0x0000040000000000) /* [bit(42)] */
-/*          IA32_MISC_ENABLE_                   __UINT64_C(0x0000080000000000) /* [bit(43)] */
-/*          IA32_MISC_ENABLE_                   __UINT64_C(0x0000100000000000) /* [bit(44)] */
-/*          IA32_MISC_ENABLE_                   __UINT64_C(0x0000200000000000) /* [bit(45)] */
-/*          IA32_MISC_ENABLE_                   __UINT64_C(0x0000400000000000) /* [bit(46)] */
-/*          IA32_MISC_ENABLE_                   __UINT64_C(0x0000800000000000) /* [bit(47)] */
-/*          IA32_MISC_ENABLE_                   __UINT64_C(0x0001000000000000) /* [bit(48)] */
-/*          IA32_MISC_ENABLE_                   __UINT64_C(0x0002000000000000) /* [bit(49)] */
-/*          IA32_MISC_ENABLE_                   __UINT64_C(0x0004000000000000) /* [bit(50)] */
-/*          IA32_MISC_ENABLE_                   __UINT64_C(0x0008000000000000) /* [bit(51)] */
-/*          IA32_MISC_ENABLE_                   __UINT64_C(0x0010000000000000) /* [bit(52)] */
-/*          IA32_MISC_ENABLE_                   __UINT64_C(0x0020000000000000) /* [bit(53)] */
-/*          IA32_MISC_ENABLE_                   __UINT64_C(0x0040000000000000) /* [bit(54)] */
-/*          IA32_MISC_ENABLE_                   __UINT64_C(0x0080000000000000) /* [bit(55)] */
-/*          IA32_MISC_ENABLE_                   __UINT64_C(0x0100000000000000) /* [bit(56)] */
-/*          IA32_MISC_ENABLE_                   __UINT64_C(0x0200000000000000) /* [bit(57)] */
-/*          IA32_MISC_ENABLE_                   __UINT64_C(0x0400000000000000) /* [bit(58)] */
-/*          IA32_MISC_ENABLE_                   __UINT64_C(0x0800000000000000) /* [bit(59)] */
-/*          IA32_MISC_ENABLE_                   __UINT64_C(0x1000000000000000) /* [bit(60)] */
-/*          IA32_MISC_ENABLE_                   __UINT64_C(0x2000000000000000) /* [bit(61)] */
-/*          IA32_MISC_ENABLE_                   __UINT64_C(0x4000000000000000) /* [bit(62)] */
-/*          IA32_MISC_ENABLE_                   __UINT64_C(0x8000000000000000) /* [bit(63)] */
+/*          IA32_MISC_ENABLE_                   __UINT64_C(0x0000010000000000)  * [bit(40)] */
+/*          IA32_MISC_ENABLE_                   __UINT64_C(0x0000020000000000)  * [bit(41)] */
+/*          IA32_MISC_ENABLE_                   __UINT64_C(0x0000040000000000)  * [bit(42)] */
+/*          IA32_MISC_ENABLE_                   __UINT64_C(0x0000080000000000)  * [bit(43)] */
+/*          IA32_MISC_ENABLE_                   __UINT64_C(0x0000100000000000)  * [bit(44)] */
+/*          IA32_MISC_ENABLE_                   __UINT64_C(0x0000200000000000)  * [bit(45)] */
+/*          IA32_MISC_ENABLE_                   __UINT64_C(0x0000400000000000)  * [bit(46)] */
+/*          IA32_MISC_ENABLE_                   __UINT64_C(0x0000800000000000)  * [bit(47)] */
+/*          IA32_MISC_ENABLE_                   __UINT64_C(0x0001000000000000)  * [bit(48)] */
+/*          IA32_MISC_ENABLE_                   __UINT64_C(0x0002000000000000)  * [bit(49)] */
+/*          IA32_MISC_ENABLE_                   __UINT64_C(0x0004000000000000)  * [bit(50)] */
+/*          IA32_MISC_ENABLE_                   __UINT64_C(0x0008000000000000)  * [bit(51)] */
+/*          IA32_MISC_ENABLE_                   __UINT64_C(0x0010000000000000)  * [bit(52)] */
+/*          IA32_MISC_ENABLE_                   __UINT64_C(0x0020000000000000)  * [bit(53)] */
+/*          IA32_MISC_ENABLE_                   __UINT64_C(0x0040000000000000)  * [bit(54)] */
+/*          IA32_MISC_ENABLE_                   __UINT64_C(0x0080000000000000)  * [bit(55)] */
+/*          IA32_MISC_ENABLE_                   __UINT64_C(0x0100000000000000)  * [bit(56)] */
+/*          IA32_MISC_ENABLE_                   __UINT64_C(0x0200000000000000)  * [bit(57)] */
+/*          IA32_MISC_ENABLE_                   __UINT64_C(0x0400000000000000)  * [bit(58)] */
+/*          IA32_MISC_ENABLE_                   __UINT64_C(0x0800000000000000)  * [bit(59)] */
+/*          IA32_MISC_ENABLE_                   __UINT64_C(0x1000000000000000)  * [bit(60)] */
+/*          IA32_MISC_ENABLE_                   __UINT64_C(0x2000000000000000)  * [bit(61)] */
+/*          IA32_MISC_ENABLE_                   __UINT64_C(0x4000000000000000)  * [bit(62)] */
+/*          IA32_MISC_ENABLE_                   __UINT64_C(0x8000000000000000)  * [bit(63)] */
 #define IA32_ENERGY_PERF_BIAS     __UINT32_C(0x000001b0)
 #define IA32_PACKAGE_THERM_STATUS __UINT32_C(0x000001b1)
 #define IA32_PACKAGE_THERM_INTERRUPT __UINT32_C(0x000001b2)

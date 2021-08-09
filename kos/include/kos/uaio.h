@@ -97,8 +97,7 @@ __LOCAL int __NOTHROW_NCX(__LIBCCALL uaio_cancel)(__fd_t __self) {
 }
 #endif /* __hop_defined */
 #ifdef __Hop_defined
-__LOCAL __ATTR_NONNULL((2)) void __LIBCCALL
-UAio_Cancel(__fd_t __self, struct uaio *__restrict __ops) {
+__LOCAL void __LIBCCALL UAio_Cancel(__fd_t __self) {
 	Hop(__self, HOP_UAIO_CANCEL);
 }
 #endif /* __Hop_defined */

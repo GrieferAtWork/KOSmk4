@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x60e4bee1 */
+/* HASH CRC-32:0xb91bf0aa */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -179,7 +179,7 @@
 /* Flags that can be changed when combined with `MS_REMOUNT' */
 #if !defined(MS_RMT_MASK) && defined(__MS_RMT_MASK)
 #define MS_RMT_MASK __MS_RMT_MASK
-#endif /* !MS_RMT_MASK && __MS_RMT_MASK /
+#endif /* !MS_RMT_MASK && __MS_RMT_MASK */
 
 /* Magic mount flag number. Must be or'd with flag values. */
 #if !defined(MS_MGC_VAL) && defined(__MS_MGC_VAL)

@@ -63,7 +63,9 @@
 #define __analysis_suppress_lock_checking(lock)
 #define __declare_lock_level(level)
 #define __function_ignore_lock_checking(lock)
+#ifndef __guarded_by /* Defined differently in <sys/cdefs.h> */
 #define __guarded_by(lock)
+#endif /* !__guarded_by */
 #define __has_lock_level(level)
 #define __has_lock_property(kind)
 #define __interlocked

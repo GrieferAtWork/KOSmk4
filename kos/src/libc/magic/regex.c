@@ -46,6 +46,7 @@
 #include <features.h>
 
 #include <hybrid/typecore.h>
+#include <asm/crt/limits.h> /* __RE_DUP_MAX */
 #include <sys/types.h>
 
 /* NOTE: On KOS, regex is implemented by a dedicated library that gets loaded by libc
@@ -132,7 +133,17 @@ __LIBC reg_syntax_t re_syntax_options;
 #define RE_SYNTAX_POSIX_MINIMAL_BASIC    (_RE_SYNTAX_POSIX_COMMON | RE_LIMITED_OPS)
 #define RE_SYNTAX_POSIX_EXTENDED         (_RE_SYNTAX_POSIX_COMMON | RE_CONTEXT_INDEP_ANCHORS | RE_CONTEXT_INDEP_OPS | RE_NO_BK_BRACES | RE_NO_BK_PARENS | RE_NO_BK_VBAR | RE_CONTEXT_INVALID_OPS | RE_UNMATCHED_RIGHT_PAREN_ORD)
 #define RE_SYNTAX_POSIX_MINIMAL_EXTENDED (_RE_SYNTAX_POSIX_COMMON | RE_CONTEXT_INDEP_ANCHORS | RE_CONTEXT_INVALID_OPS | RE_NO_BK_BRACES | RE_NO_BK_PARENS | RE_NO_BK_REFS | RE_NO_BK_VBAR | RE_UNMATCHED_RIGHT_PAREN_ORD)
-#define RE_DUP_MAX (0x7fff)
+
+#ifndef RE_DUP_MAX
+#ifndef __RE_DUP_MAX
+#define __RE_DUP_MAX 255 /* _POSIX_RE_DUP_MAX */
+#endif /* !__RE_DUP_MAX */
+#if __RE_DUP_MAX != -1
+#define RE_DUP_MAX __RE_DUP_MAX
+#else /* __RE_DUP_MAX != -1 */
+#define RE_DUP_MAX 255 /* _POSIX_RE_DUP_MAX */
+#endif /* __RE_DUP_MAX == -1 */
+#endif /* !RE_DUP_MAX */
 #endif /* __USE_GNU */
 
 }

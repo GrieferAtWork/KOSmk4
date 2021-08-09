@@ -35,9 +35,9 @@
 #define IOCPARM_MAX         _IOC_SIZEMASK
 #define IOC_VOID            0
 #define IOC_DIRMASK         _IOC_DIRMASK
-#define IOC_OUT             _IOC_OUT
 #define IOC_IN              _IOC_IN
-#define IOC_INOUT           (IOC_IN | IOC_OUT)
+#define IOC_OUT             _IOC_OUT
+#define IOC_INOUT           _IOC_INOUT
 #define _IORN(type, nr, T)  _IOC(_IOC_READ, type, nr, T)
 #define _IOWN(type, nr, T)  _IOC(_IOC_WRITE, type, nr, T)
 #define _IOWRN(type, nr, T) _IOC(_IOC_READ | _IOC_WRITE, type, nr, T)

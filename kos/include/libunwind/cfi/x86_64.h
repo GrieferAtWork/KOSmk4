@@ -618,6 +618,12 @@ printArrayDefineMacro("DEFINE_cfi_x86_64_unwind_landing_register_uncommon2dw", g
 #undef CFI_UNWIND_REGISTER_SP
 #undef CFI_UNWIND_REGISTER_EXCEPTION
 #undef CFI_UNWIND_REGISTER_COUNT
+#undef CFI_UNWIND_COMMON_REGISTER_COUNT
+#undef CFI_UNWIND_UNCOMMON_REGISTER_SP
+#undef CFI_UNWIND_UNCOMMON_REGISTER_COUNT
+#undef CFI_UNWIND_SIGFRAME_COMMON_REGISTER_SP
+#undef CFI_UNWIND_SIGFRAME_COMMON_REGISTER_COUNT
+#undef CFI_UNWIND_SIGFRAME_UNCOMMON_REGISTER_COUNT
 #define CFI_REGISTER_MEMSIZE(addrsize, regno)                 (__likely((addrsize) >= 8) ? CFI_X86_64_REGISTER_SIZE(regno) : CFI_386_REGISTER_SIZE(regno))
 #define CFI_REGISTER_SIZE(addrsize, regno)                    (__likely((addrsize) >= 8) ? CFI_X86_64_REGISTER_SIZE(regno) : CFI_386_UNWIND_IS_FPU_REGISTER(regno) ? CFI_X86_64_UNWIND_FPU_REGISTER_SIZE : CFI_X86_64_UNWIND_GPR_REGISTER_SIZE)
 #define CFI_UNWIND_REGISTER_PC(addrsize)                      (__likely((addrsize) >= 8) ? CFI_X86_64_UNWIND_REGISTER_PC : CFI_386_UNWIND_REGISTER_PC)
@@ -631,6 +637,14 @@ printArrayDefineMacro("DEFINE_cfi_x86_64_unwind_landing_register_uncommon2dw", g
 #define CFI_UNWIND_SIGFRAME_COMMON_REGISTER_COUNT(addrsize)   (__likely((addrsize) >= 8) ? CFI_X86_64_UNWIND_SIGFRAME_COMMON_REGISTER_COUNT : CFI_386_UNWIND_SIGFRAME_COMMON_REGISTER_COUNT)
 #define CFI_UNWIND_SIGFRAME_UNCOMMON_REGISTER_COUNT(addrsize) (__likely((addrsize) >= 8) ? CFI_X86_64_UNWIND_SIGFRAME_UNCOMMON_REGISTER_COUNT : CFI_386_UNWIND_SIGFRAME_UNCOMMON_REGISTER_COUNT)
 
+#undef DEFINE_cfi_unwind_register_dw2common
+#undef DEFINE_cfi_unwind_register_dw2uncommon
+#undef DEFINE_cfi_unwind_register_common2dw
+#undef DEFINE_cfi_unwind_register_uncommon2dw
+#undef DEFINE_cfi_unwind_sigframe_register_dw2common
+#undef DEFINE_cfi_unwind_sigframe_register_dw2uncommon
+#undef DEFINE_cfi_unwind_sigframe_register_common2dw
+#undef DEFINE_cfi_unwind_sigframe_register_uncommon2dw
 #define __PRIVATE_DEFINE_cfi_unwind_register_dw2common_4                          DEFINE_cfi_386_unwind_register_dw2common
 #define __PRIVATE_DEFINE_cfi_unwind_register_dw2common_8                          DEFINE_cfi_x86_64_unwind_register_dw2common
 #define __PRIVATE_DEFINE_cfi_unwind_register_dw2uncommon_4                        DEFINE_cfi_386_unwind_register_dw2uncommon
@@ -677,6 +691,10 @@ printArrayDefineMacro("DEFINE_cfi_x86_64_unwind_landing_register_uncommon2dw", g
 #define CFI_UNWIND_LANDING_COMMON_REGISTER_COUNT(addrsize)   (__likely((addrsize) >= 8) ? CFI_X86_64_UNWIND_LANDING_COMMON_REGISTER_COUNT : CFI_386_UNWIND_LANDING_COMMON_REGISTER_COUNT)
 #define CFI_UNWIND_LANDING_UNCOMMON_REGISTER_COUNT(addrsize) (__likely((addrsize) >= 8) ? CFI_X86_64_UNWIND_LANDING_UNCOMMON_REGISTER_COUNT : CFI_386_UNWIND_LANDING_UNCOMMON_REGISTER_COUNT)
 
+#undef DEFINE_cfi_unwind_landing_register_dw2common
+#undef DEFINE_cfi_unwind_landing_register_dw2uncommon
+#undef DEFINE_cfi_unwind_landing_register_common2dw
+#undef DEFINE_cfi_unwind_landing_register_uncommon2dw
 #define __PRIVATE_DEFINE_cfi_unwind_landing_register_dw2common_4                 DEFINE_cfi_386_unwind_landing_register_dw2common
 #define __PRIVATE_DEFINE_cfi_unwind_landing_register_dw2common_8                 DEFINE_cfi_x86_64_unwind_landing_register_dw2common
 #define __PRIVATE_DEFINE_cfi_unwind_landing_register_dw2uncommon_4               DEFINE_cfi_386_unwind_landing_register_dw2uncommon

@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x7943b75e */
+/* HASH CRC-32:0xd554a1b7 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -768,7 +768,6 @@ __NAMESPACE_STD_END
 #define _RPT_BASE_W(args) (void)((_CrtDbgReportW args) != 1 || (_CrtDbgBreak(), 0))
 #else /* ___CrtDbgReportW_defined */
 #define _ASSERT_EXPR(expr, msg) __hybrid_assertf(expr, "%ls", msg)
-#define _RPT_BASE_W(args)       (void)((_CrtDbgReportW args) != 1 || (_CrtDbgBreak(), 0))
 #define _RPT_BASE_W2(report_type, filename, line, module_name, ...) \
 	__assertion_failed_at(__NULLPTR, NULL, 0, "%ls(%d) : %ls", filename, line, module_name)
 #define _RPT_BASE_W(args) _RPT_BASE_W2 args

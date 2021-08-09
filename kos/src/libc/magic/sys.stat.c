@@ -123,6 +123,22 @@
 #include <bits/types.h>
 )]%{
 
+#ifdef __USE_DOS
+#ifdef _BITS_OS_DOS_STAT_H
+#ifdef __CC__
+__DECL_BEGIN
+struct __dos_stat32;
+struct __dos_stat32i64;
+struct __dos_stat64i32;
+struct __dos_stat64;
+__DECL_END
+#endif /* __CC__ */
+#else /* _BITS_OS_DOS_STAT_H */
+#define __DEFINE_DOS_STAT_STRUCTURES
+#include <bits/os/dos/stat.h>
+#endif /* !_BITS_OS_DOS_STAT_H */
+#endif /* __USE_DOS */
+
 #if defined(__USE_XOPEN) || defined(__USE_XOPEN2K)
 #include <time.h>
 #endif /* __USE_XOPEN || __USE_XOPEN2K */

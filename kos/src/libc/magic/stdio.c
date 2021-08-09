@@ -4323,7 +4323,7 @@ __LOCAL_LIBC(@vsnscanf_getc@) __SSIZE_TYPE__
 	__CHAR32_TYPE__ __result;
 	__result = unicode_readutf8_n(&((struct __vsnscanf_data *)__arg)->__ptr,
 	                              ((struct __vsnscanf_data *)__arg)->__end);
-	return __result ? __result : __EOF;
+	return __result ? (__SSIZE_TYPE__)__result : (__SSIZE_TYPE__)__EOF;
 }
 __LOCAL_LIBC(@vsnscanf_ungetc@) __SSIZE_TYPE__
 (__FORMATPRINTER_CC __vsnscanf_ungetc)(void *__arg, __CHAR32_TYPE__ __UNUSED(__ch)) {
@@ -4540,8 +4540,8 @@ __STDC_INT_AS_SIZE_T _vsnprintf([[outp_opt(min(return, bufsize))]] char *__restr
                                 [[nonnull]] char const *__restrict format, $va_list args) {
 	__STDC_INT_AS_SIZE_T result;
 	result = vsnprintf(buf, bufsize, format, args);
-	if (result > bufsize)
-		result = bufsize;
+	if ((size_t)result > bufsize)
+		result = (__STDC_INT_AS_SIZE_T)bufsize;
 	return result;
 }
 

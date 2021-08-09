@@ -900,56 +900,62 @@ DEFINE_GMTIME_BUFFER
 
 
 
-#undef __tzname
-#undef __daylight
-#undef __timezone
+#ifndef __tzname
 #if defined(__CRT_HAVE_tzname) && !defined(__NO_ASMNAME)
-__LIBC char *(__tzname)[2] __ASMNAME("tzname");
+__LIBC char *__tzname[2] __ASMNAME("tzname");
 #elif defined(__CRT_HAVE___tzname)
-__LIBC char *(__tzname)[2];
+__LIBC char *__tzname[2];
+#elif defined(tzname)
+#define __tzname tzname
 #elif defined(__CRT_HAVE_tzname)
 #define __tzname tzname
 #ifndef __tzname_defined
 #define __tzname_defined 1
-#undef tzname
-__LIBC char *(tzname)[2];
+__LIBC char *tzname[2];
 #endif /* !__tzname_defined */
 #elif defined(__CRT_HAVE_DOS$__tzname)
 __CREDIRECT_DOS(__ATTR_WUNUSED __ATTR_RETNONNULL __ATTR_CONST,char **,__NOTHROW_NCX,__dos_tzname,(void),__tzname,())
-#define __tzname  (__dos_tzname())
-#endif
+#define __tzname (__dos_tzname())
+#endif /* ... */
+#endif /* !__tzname */
 
+#ifndef __daylight
 #if defined(__CRT_HAVE_daylight) && !defined(__NO_ASMNAME)
-__LIBC int (__daylight) __ASMNAME("daylight");
+__LIBC int __daylight __ASMNAME("daylight");
 #elif defined(__CRT_HAVE___daylight)
-__LIBC int (__daylight);
+__LIBC int __daylight;
+#elif defined(daylight)
+#define __daylight daylight
 #elif defined(__CRT_HAVE_daylight)
 #define __daylight daylight
 #ifndef __daylight_defined
 #define __daylight_defined 1
-#undef daylight
-__LIBC int (daylight);
+__LIBC int daylight;
 #endif /* !__daylight_defined */
 #elif defined(__CRT_HAVE_DOS$__daylight)
 __CREDIRECT_DOS(__ATTR_WUNUSED __ATTR_RETNONNULL __ATTR_CONST,int *,__NOTHROW_NCX,__dos_daylight,(void),__daylight,())
 #define __daylight (*__dos_daylight())
-#endif
+#endif /* ... */
+#endif /* !__daylight */
 
+#ifndef __timezone
 #if defined(__CRT_HAVE_timezone) && !defined(__NO_ASMNAME)
-__LIBC __LONGPTR_TYPE__ (__timezone) __ASMNAME("timezone");
+__LIBC __LONGPTR_TYPE__ __timezone __ASMNAME("timezone");
 #elif defined(__CRT_HAVE___timezone)
-__LIBC __LONGPTR_TYPE__ (__timezone);
+__LIBC __LONGPTR_TYPE__ __timezone;
+#elif defined(timezone)
+#define __timezone timezone
 #elif defined(__CRT_HAVE_timezone)
 #define __timezone timezone
 #ifndef __timezone_defined
 #define __timezone_defined 1
-#undef timezone
-__LIBC __LONGPTR_TYPE__ (timezone);
+__LIBC __LONGPTR_TYPE__ timezone;
 #endif /* !__timezone_defined */
 #elif defined(__CRT_HAVE_DOS$__timezone)
 __CREDIRECT_DOS(__ATTR_WUNUSED __ATTR_RETNONNULL __ATTR_CONST,long *,__NOTHROW_NCX,__dos_timezone,(void),__timezone,())
 #define __timezone (*__dos_timezone())
-#endif
+#endif /* ... */
+#endif /* !__timezone */
 
 }
 
@@ -958,18 +964,21 @@ __CREDIRECT_DOS(__ATTR_WUNUSED __ATTR_RETNONNULL __ATTR_CONST,long *,__NOTHROW_N
 #ifdef __USE_POSIX
 #ifndef __tzname_defined
 #define __tzname_defined 1
-#undef tzname
+#ifndef tzname
 #ifdef __CRT_HAVE_tzname
-__LIBC char *(tzname)[2];
+__LIBC char *tzname[2];
 #elif defined(__CRT_HAVE___tzname) && !defined(__NO_ASMNAME)
-__LIBC char *(tzname)[2] __ASMNAME("__tzname");
+__LIBC char *tzname[2] __ASMNAME("__tzname");
 #elif defined(__CRT_HAVE___tzname)
-#define tzname  __tzname
+#define tzname __tzname
 #elif defined(__CRT_HAVE_DOS$__tzname)
-#define tzname  (__dos_tzname())
-#else
+#define tzname (__dos_tzname())
+#elif defined(__tzname)
+#define tzname __tzname
+#else /* ... */
 #undef __tzname_defined
-#endif
+#endif /* !... */
+#endif /* !tzname */
 #endif /* !__tzname_defined */
 }
 
@@ -984,40 +993,49 @@ void tzset();
 #if defined(__USE_MISC) || defined(__USE_XOPEN)
 #ifndef __daylight_defined
 #define __daylight_defined 1
-#undef daylight
+#ifndef daylight
 #ifdef __CRT_HAVE_daylight
-__LIBC int (daylight);
+__LIBC int daylight;
 #elif defined(__CRT_HAVE___daylight) && !defined(__NO_ASMNAME)
-__LIBC int (daylight) __ASMNAME("__daylight");
+__LIBC int daylight __ASMNAME("__daylight");
 #elif defined(__CRT_HAVE___daylight)
-#define daylight  __daylight
+#define daylight __daylight
 #elif defined(__CRT_HAVE_DOS$__daylight)
-#define daylight  (*__dos_daylight())
-#else
+#define daylight (*__dos_daylight())
+#elif defined(__daylight)
+#define daylight __daylight
+#else /* ... */
 #undef __daylight_defined
-#endif
+#endif /* !... */
+#endif /* !daylight */
 #endif /* !__daylight_defined */
 
 #ifndef __timezone_defined
 #define __timezone_defined 1
-#undef timezone
+#ifndef timezone
 #ifdef __CRT_HAVE_timezone
-__LIBC __LONGPTR_TYPE__ (timezone);
+__LIBC __LONGPTR_TYPE__ timezone;
 #elif defined(__CRT_HAVE___timezone) && !defined(__NO_ASMNAME)
-__LIBC __LONGPTR_TYPE__ (timezone) __ASMNAME("__timezone");
+__LIBC __LONGPTR_TYPE__ timezone __ASMNAME("__timezone");
 #elif defined(__CRT_HAVE___timezone)
-#define timezone  __timezone
+#define timezone __timezone
 #ifdef __struct_timezone_defined
 #warning "Please #include <sys/time.h> after <time.h>, else `struct timezone' cannot be used"
 #endif /* __struct_timezone_defined */
 #elif defined(__CRT_HAVE_DOS$__timezone)
-#define timezone  (*__dos_timezone())
+#define timezone (*__dos_timezone())
 #ifdef __struct_timezone_defined
 #warning "With the linked libc, `struct timezone' from <sys/time.h> cannot be used after <time.h> was included"
 #endif /* __struct_timezone_defined */
-#else
+#elif defined(__timezone)
+#define timezone __timezone
+#ifdef __struct_timezone_defined
+#warning "Please #include <sys/time.h> after <time.h>, else `struct timezone' cannot be used"
+#endif /* __struct_timezone_defined */
+#else /* ... */
 #undef __timezone_defined
-#endif
+#endif /* !... */
+#endif /* !timezone */
 #endif /* !__timezone_defined */
 
 #endif /* __USE_MISC || __USE_XOPEN */

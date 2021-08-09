@@ -80,7 +80,7 @@ __NOTHROW_NCX(__hybrid_bitset_atomic_cmpxch)(BITSET_WORDTYPE *__restrict __pword
 	__oldval = __newval = 0;
 	if (__old_ison)
 		__oldval = __mask;
-	if (__newval)
+	if (__new_ison)
 		__newval = __mask;
 	do {
 		__oldword = __hybrid_atomic_load(*__pword, __ATOMIC_ACQUIRE);

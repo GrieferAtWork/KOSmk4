@@ -30,9 +30,9 @@
 #include <newlib.h>
 #include <sys/config.h>
 
-#if defined(__STDC__) || 1
+#ifndef __NO_PROTOTYPES
 #define _HAVE_STDC
-#endif /* __STDC__ */
+#endif /* __NO_PROTOTYPES */
 
 #ifdef _HAVE_STD_CXX
 #define _BEGIN_STD_C __DECL_BEGIN __NAMESPACE_STD_BEGIN
@@ -57,15 +57,15 @@
 #   define _SIGNED   signed
 #   define _DOTS     , ...
 #   define _VOID     void
-#   define _EXFUN_NOTHROW(name,proto) (__LIBCCALL name) proto _NOTHROW
-#   define _EXFUN(name,proto)         (__LIBCCALL name) proto
-#   define _EXPARM(name,proto)      (* __LIBCCALL name) proto
-#   define _EXFNPTR(name,proto)      (__LIBCCALL *name) proto
-#   define _DEFUN(name,arglist,args) name(args)
-#   define _DEFUN_VOID(name)         name(_NOARGS)
-#   define _CAST_VOID               (void)
+#   define _EXFUN_NOTHROW(name, proto) __NOTHROW(name) proto
+#   define _EXFUN(name, proto)         (name) proto
+#   define _EXPARM(name,proto)         (*name) proto
+#   define _EXFNPTR(name,proto)        (*name) proto
+#   define _DEFUN(name, arglist, args) (name)(args)
+#   define _DEFUN_VOID(name)           (name)(void)
+#   define _CAST_VOID                  (void)
 #ifndef _PARAMS
-#   define _PARAMS(paramlist)        paramlist
+#   define _PARAMS(args)               args
 #endif /* !_PARAMS */
 #else /* _HAVE_STDC */
 #   define _PTR                         char *
@@ -76,13 +76,13 @@
 #   define _SIGNED                      /* Nothing */
 #   define _DOTS                        /* Nothing */
 #   define _VOID                        void
-#   define _EXFUN(name,proto)           name()
-#   define _EXFUN_NOTHROW(name,proto)   name()
-#   define _DEFUN(name,arglist,args)    name arglist args;
+#   define _EXFUN_NOTHROW(name, proto)  name()
+#   define _EXFUN(name, proto)          name()
+#   define _DEFUN(name, arglist, args)  name arglist args;
 #   define _DEFUN_VOID(name)            name()
 #   define _CAST_VOID                   /* Nothing */
 #ifndef _PARAMS
-#   define _PARAMS(paramlist)          ()
+#   define _PARAMS(args)                ()
 #endif /* !_PARAMS */
 #endif /* !_HAVE_STDC */
 
@@ -95,6 +95,7 @@
 #endif /* _LONG_DOUBLE */
 
 
+#undef _ATTRIBUTE
 #define _ATTRIBUTE(attrs) __attribute__(attrs)
 #if defined(__GNUC__) && !defined(__GNUC_STDC_INLINE__)
 #define _ELIDABLE_INLINE extern __ATTR_FORCEINLINE

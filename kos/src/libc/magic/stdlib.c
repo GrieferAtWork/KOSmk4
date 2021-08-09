@@ -4105,10 +4105,16 @@ $u64 _byteswap_uint64($u64 val) {
 %#endif /* __UINT64_TYPE__ */
 
 %{
+#ifndef _byteswap_ushort
 #define _byteswap_ushort(x) __hybrid_bswap16(x)
+#endif /* !_byteswap_ushort */
+#ifndef _byteswap_ulong
 #define _byteswap_ulong(x)  __hybrid_bswap32(x)
+#endif /* !_byteswap_ulong */
 #ifdef __UINT64_TYPE__
+#ifndef _byteswap_uint64
 #define _byteswap_uint64(x) __hybrid_bswap64(x)
+#endif /* !_byteswap_uint64 */
 #endif /* __UINT64_TYPE__ */
 }
 %#endif /* !_MSC_VER */

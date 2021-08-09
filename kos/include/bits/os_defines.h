@@ -18,6 +18,8 @@
  * 3. This notice may not be removed or altered from any source distribution. *
  */
 #ifndef _BITS_OS_DEFINES_H
+/* This header only does something when it's included from glibc++'s "c++config.h" header! */
+#ifdef _GLIBCXX_CXX_CONFIG_H
 #define _BITS_OS_DEFINES_H 1
 
 /* This header is used to better integrate libstdc++ into the KOS header system. */
@@ -74,4 +76,5 @@
 
 #define _GLIBCXX_GTHREAD_USE_WEAK 0
 
+#endif /* _GLIBCXX_CXX_CONFIG_H */
 #endif /* !_BITS_OS_DEFINES_H */

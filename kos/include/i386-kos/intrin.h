@@ -98,9 +98,17 @@ __FORCELOCAL __ATTR_NORETURN void(__fastfail)(unsigned int __code) {
 /* __MACHINE: unsigned char _bittestandcomplement(long *, long) */
 /* __MACHINE: unsigned char _bittestandreset(long *, long) */
 /* __MACHINE: unsigned char _bittestandset(long *, long) */
-#define _byteswap_uint64(val) __hybrid_bswap64(val)
-#define _byteswap_ulong(val)  __hybrid_bswap32(val)
-#define _byteswap_ushort(val) __hybrid_bswap16(val)
+#ifndef _byteswap_ushort
+#define _byteswap_ushort(x)   __hybrid_bswap16(x)
+#endif /* !_byteswap_ushort */
+#ifndef _byteswap_ulong
+#define _byteswap_ulong(x)    __hybrid_bswap32(x)
+#endif /* !_byteswap_ulong */
+#ifdef __UINT64_TYPE__
+#ifndef _byteswap_uint64
+#define _byteswap_uint64(x)   __hybrid_bswap64(x)
+#endif /* !_byteswap_uint64 */
+#endif /* __UINT64_TYPE__ */
 #define _disable()            __cli()
 #define _enable()             __sti()
 /* __MACHINE: unsigned char _interlockedbittestandreset(long volatile *, long) */

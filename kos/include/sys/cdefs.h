@@ -76,12 +76,41 @@
 #ifdef __NO_PROTOTYPES
 #define __P(args)     ()
 #define __PMT(args)   ()
+#ifndef _PARAMS
 #define _PARAMS(args) ()
+#endif /* !_PARAMS */
+#define _AND                        ;
+#define _NOARGS                     /* Nothing */
+#define _CONST                      /* Nothing */
+#define _VOLATILE                   /* Nothing */
+#define _SIGNED                     /* Nothing */
+#define _DOTS                       /* Nothing */
+#define _VOID                       void
+#define _EXFUN(name, proto)         name()
+#define _DEFUN(name, arglist, args) name arglist args;
+#define _DEFUN_VOID(name)           name()
+#define _CAST_VOID                  /* Nothing */
 #else /* __NO_PROTOTYPES */
 #define __P(args)     args
 #define __PMT(args)   args
+#ifndef _PARAMS
 #define _PARAMS(args) args
+#endif /* !_PARAMS */
+#define __ptr_t                     void *
+#define _PTR                        void *
+#define _AND                        ,
+#define _NOARGS                     void
+#define _CONST                      const
+#define _VOLATILE                   volatile
+#define _SIGNED                     signed
+#define _DOTS                       , ...
+#define _VOID                       void
+#define _EXFUN(name, proto)         (name) proto
+#define _DEFUN(name, arglist, args) (name)(args)
+#define _DEFUN_VOID(name)           (name)(void)
+#define _CAST_VOID                  (void)
 #endif /* !__NO_PROTOTYPES */
+
 #define __LEAF_ATTR __ATTR_LEAF
 
 #if __GNUC_PREREQ(4, 6) || __has_attribute(__leaf__)
@@ -106,19 +135,6 @@
 #define __long_double_t __LONGDOUBLE
 #define _LONG_DOUBLE    __LONGDOUBLE
 #endif /* __COMPILER_HAVE_LONGDOUBLE */
-#define __ptr_t                     void *
-#define _PTR                        void *
-#define _AND                        ,
-#define _NOARGS                     void
-#define _CONST                      const
-#define _VOLATILE                   volatile
-#define _SIGNED                     signed
-#define _DOTS                       , ...
-#define _VOID                       void
-#define _EXFUN(name, proto)         (name) proto
-#define _DEFUN(name, arglist, args) (name)(args)
-#define _DEFUN_VOID(name)           (name)(void)
-#define _CAST_VOID                  (void)
 
 
 #if defined(__cplusplus) && defined(_GLIBCPP_USE_NAMESPACES)
@@ -202,7 +218,6 @@
 #endif /* !__BOUNDED_POINTERS__ */
 #define __ptr_t                          void *
 #define __long_double_t                  __LONGDOUBLE
-#define __flexarr                        [0]
 #define __expect                         __builtin_expect
 #define __pure                           __ATTR_PURE
 #define __attribute_malloc__             __ATTR_MALLOC
@@ -225,6 +240,7 @@
 #define __attribute_alloc__(x)           __ATTR_ALLOC_SIZE((x))
 #define __attribute_alloc2__(x, y)       __ATTR_ALLOC_SIZE((x, y))
 #define __attribute_formatarg__          __ATTR_FORMAT_ARG
+#undef _ATTRIBUTE
 #define _ATTRIBUTE(attrs)                __attribute__((attrs))
 
 #if defined(__USE_FORTIFY_LEVEL) && (__USE_FORTIFY_LEVEL + 0) > 0
@@ -411,7 +427,9 @@
 #define __requires_shared(...)    __lock_annotate(shared_locks_required(__VA_ARGS__))
 #define __requires_unlocked(...)  __lock_annotate(locks_excluded(__VA_ARGS__))
 #define __no_lock_analysis        __lock_annotate(no_thread_safety_analysis)
+#ifndef __guarded_by
 #define __guarded_by(x)           __lock_annotate(guarded_by(x))
+#endif /* !__guarded_by */
 #define __pt_guarded_by(x)        __lock_annotate(pt_guarded_by(x))
 
 /* Scope modifiers */

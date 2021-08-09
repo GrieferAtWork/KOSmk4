@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xf16c3ab9 */
+/* HASH CRC-32:0xbcb8e272 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -49,6 +49,22 @@
 #include <bits/os/stat.h>     /* `struct stat', `struct stat64' */
 #include <bits/os/timespec.h> /* `struct timespec' */
 #include <bits/types.h>
+
+#ifdef __USE_DOS
+#ifdef _BITS_OS_DOS_STAT_H
+#ifdef __CC__
+__DECL_BEGIN
+struct __dos_stat32;
+struct __dos_stat32i64;
+struct __dos_stat64i32;
+struct __dos_stat64;
+__DECL_END
+#endif /* __CC__ */
+#else /* _BITS_OS_DOS_STAT_H */
+#define __DEFINE_DOS_STAT_STRUCTURES
+#include <bits/os/dos/stat.h>
+#endif /* !_BITS_OS_DOS_STAT_H */
+#endif /* __USE_DOS */
 
 #if defined(__USE_XOPEN) || defined(__USE_XOPEN2K)
 #include <time.h>
