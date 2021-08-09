@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xa6a6216 */
+/* HASH CRC-32:0xde8b1638 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -124,7 +124,7 @@ __err_inval:
 #endif /* !__EINVAL */
 __err_range:
 #ifdef __ERANGE
-	__libc_seterrno(__ERANGE);
+	(void)__libc_seterrno(__ERANGE);
 	return __ERANGE;
 #else /* __ERANGE */
 	return 1;

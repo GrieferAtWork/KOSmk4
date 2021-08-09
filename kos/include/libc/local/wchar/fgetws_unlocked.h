@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xf27242c1 */
+/* HASH CRC-32:0xdefddb54 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -83,7 +83,7 @@ __LOCAL_LIBC(fgetws_unlocked) __ATTR_NONNULL((1, 3)) __WCHAR_TYPE__ *
 	if __unlikely(!__buf || !__bufsize) {
 		/* The buffer cannot be empty! */
 #ifdef __ERANGE
-		__libc_seterrno(__ERANGE);
+		(void)__libc_seterrno(__ERANGE);
 #endif /* __ERANGE */
 		return __NULLPTR;
 	}

@@ -835,9 +835,9 @@ char *fgets([[outp(min(strlen(return), bufsize))]] char *__restrict buf,
 	size_t n;
 	if unlikely(!buf || !bufsize) {
 		/* The buffer cannot be empty! */
-#ifdef ERANGE
-		__libc_seterrno(ERANGE);
-#endif /* ERANGE */
+@@pp_ifdef ERANGE@@
+		(void)__libc_seterrno(ERANGE);
+@@pp_endif@@
 		return NULL;
 	}
 	for (n = 0; n < bufsize - 1; ++n) {
@@ -2265,7 +2265,7 @@ char *fgets_unlocked([[outp(min(strlen(return), bufsize))]] char *__restrict buf
 	if unlikely(!buf || !bufsize) {
 		/* The buffer cannot be empty! */
 @@pp_ifdef ERANGE@@
-		__libc_seterrno(ERANGE);
+		(void)__libc_seterrno(ERANGE);
 @@pp_endif@@
 		return NULL;
 	}
@@ -4865,13 +4865,13 @@ $size_t fread_s([[outp(min(return * elemsize, elemcount * elemsize, bufsize))]] 
 	if (__hybrid_overflow_umul(elemsize, elemcount, &reqbuf) ||
 	    reqbuf > bufsize) {
 @@pp_ifdef ERANGE@@
-		__libc_seterrno(ERANGE);
+		(void)__libc_seterrno(ERANGE);
 @@pp_endif@@
 		return 0;
 	}
 	if unlikely(!stream || !buf) {
 @@pp_ifdef EINVAL@@
-		__libc_seterrno(EINVAL);
+		(void)__libc_seterrno(EINVAL);
 @@pp_endif@@
 		return 0;
 	}
@@ -4886,7 +4886,7 @@ $size_t fread_s([[outp(min(return * elemsize, elemcount * elemsize, bufsize))]] 
 char *gets_s([[outp(min(strlen(return), bufsize))]] char *__restrict buf, rsize_t bufsize) {
 	if unlikely(!buf) {
 @@pp_ifdef EINVAL@@
-		__libc_seterrno(EINVAL);
+		(void)__libc_seterrno(EINVAL);
 @@pp_endif@@
 		return NULL;
 	}

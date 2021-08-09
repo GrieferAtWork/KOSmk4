@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x529a292f */
+/* HASH CRC-32:0xefbd328d */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -629,7 +629,7 @@ __NOTHROW_RPC(__LIBCCALL __LIBC_LOCAL_NAME(getpassfd))(char const *__prompt, cha
 	if (__buflen < 1) {
 		/* Invalid buffer length */
 #ifdef __EINVAL
-		__libc_seterrno(__EINVAL);
+		(void)__libc_seterrno(__EINVAL);
 #endif /* __EINVAL */
 		goto __out;
 	}
@@ -782,9 +782,9 @@ __NOTHROW_RPC(__LIBCCALL __LIBC_LOCAL_NAME(getpassfd))(char const *__prompt, cha
 					goto __out; /* Error... */
 				if __unlikely(__status == 0) {
 #ifdef __ETIMEDOUT
-					__libc_seterrno(__ETIMEDOUT);
+					(void)__libc_seterrno(__ETIMEDOUT);
 #else /* __ETIMEDOUT */
-					__libc_seterrno(1);
+					(void)__libc_seterrno(1);
 #endif /* !__ETIMEDOUT */
 					goto __out; /* Timeout... */
 				}
@@ -807,7 +807,7 @@ __handle_eof:
 					if (__flags & __GETPASS_FAIL_EOF) {
 						/* Error out on regular, old EOF */
 #ifdef __ENODATA
-						__libc_seterrno(__ENODATA);
+						(void)__libc_seterrno(__ENODATA);
 #endif /* __ENODATA */
 						goto __out;
 					}
@@ -1115,7 +1115,7 @@ __out:
 				(void)__localdep_raise(__interrupt_signo);
 #endif /* __CRT_HAVE_raise || (__CRT_HAVE_pthread_kill && (__CRT_HAVE_pthread_self || __CRT_HAVE_thrd_current)) || (__CRT_HAVE_kill && (__CRT_HAVE_getpid || __CRT_HAVE__getpid || __CRT_HAVE___getpid)) */
 #ifdef __EINTR
-			__libc_seterrno(__EINTR);
+			(void)__libc_seterrno(__EINTR);
 #endif /* __EINTR */
 		}
 	}

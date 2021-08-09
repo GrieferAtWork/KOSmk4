@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x37cab64b */
+/* HASH CRC-32:0xf6edab6 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -69,8 +69,7 @@ __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(ftime64))(struct __timeb64 *__timebuf
 #ifdef __CRT_HAVE__ftime64_s
 	__errno_t __error = __localdep_crt_ftime64_s(__timebuf);
 	if __unlikely(__error) {
-		__libc_seterrno(__error);
-		__error = -1;
+		__error = __libc_seterrno(__error);
 	}
 	return (int)__error;
 #elif defined(__CRT_HAVE__ftime64)
@@ -90,8 +89,7 @@ __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(ftime64))(struct __timeb64 *__timebuf
 	struct __timeb32 __temp;
 	__errno_t __error = __localdep_crt_ftime32_s(&__temp);
 	if __unlikely(__error) {
-		__libc_seterrno(__error);
-		__error = -1;
+		__error = __libc_seterrno(__error);
 	} else {
 		__timebuf->time     = (__time64_t)__temp.time;
 		__timebuf->millitm  = __temp.millitm;

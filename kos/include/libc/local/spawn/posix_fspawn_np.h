@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x30371099 */
+/* HASH CRC-32:0x5b1c0077 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -868,7 +868,7 @@ __NOTHROW_RPC(__LIBCCALL __LIBC_LOCAL_NAME(posix_fspawn_np))(__pid_t *__restrict
 	__pid_t __child;
 	__old_errno = __libc_geterrno_or(0);
 #if defined(__ARCH_HAVE_SHARED_VM_VFORK) && (defined(__CRT_HAVE_vfork) || defined(__CRT_HAVE___vfork))
-	__libc_seterrno(0);
+	(void)__libc_seterrno(0);
 	__child = __localdep_vfork();
 	if (__child == 0)
 		goto __do_exec;
@@ -880,14 +880,14 @@ __NOTHROW_RPC(__LIBCCALL __LIBC_LOCAL_NAME(posix_fspawn_np))(__pid_t *__restrict
 	if (__result != 0) {
 		if (__child < 0) {
 			/* The vfork() itself failed. */
-			__libc_seterrno(__old_errno);
+			(void)__libc_seterrno(__old_errno);
 			return __result;
 		}
 		/* Something within the child failed after vfork(). */
 		goto __err_join_zombie_child;
 	}
 	/* Restore the old errno */
-	__libc_seterrno(__old_errno);
+	(void)__libc_seterrno(__old_errno);
 	/* Write back the child's PID */
 	*__pid = __child;
 	return __result;
@@ -896,7 +896,7 @@ __NOTHROW_RPC(__LIBCCALL __LIBC_LOCAL_NAME(posix_fspawn_np))(__pid_t *__restrict
 	if (__localdep_pipe2(__pipes, __O_CLOEXEC)) {
 __err_without_child:
 		__result = __libc_geterrno_or(0);
-		__libc_seterrno(__old_errno);
+		(void)__libc_seterrno(__old_errno);
 		return __result;
 	}
 	__child = __localdep_fork();
@@ -915,7 +915,7 @@ __err_without_child:
 	/* This means that `fexecve()' below closed the pipe during a successful exec(). */
 	if (__temp != sizeof(__result)) {
 		*__pid = __child;
-		__libc_seterrno(__old_errno);
+		(void)__libc_seterrno(__old_errno);
 		return 0;
 	}
 #endif /* !__ARCH_HAVE_SHARED_VM_VFORK || (!__CRT_HAVE_vfork && !__CRT_HAVE___vfork) */
@@ -929,7 +929,7 @@ __err_join_zombie_child:
 			goto __err_join_zombie_child;
 #endif /* __EINTR */
 	}
-	__libc_seterrno(__old_errno);
+	(void)__libc_seterrno(__old_errno);
 	return __result;
 __do_exec:
 	/* Perform additional actions within the child. */
@@ -1012,11 +1012,11 @@ __do_exec:
 #undef __POSIX_SPAWN_HAVE_UNSUPPORTED_FILE_ACTION
 			default:
 #ifdef __ENOSYS
-				__libc_seterrno(__ENOSYS);
+				(void)__libc_seterrno(__ENOSYS);
 #elif defined(__EPERM)
-				__libc_seterrno(__EPERM);
+				(void)__libc_seterrno(__EPERM);
 #else /* ... */
-				__libc_seterrno(1);
+				(void)__libc_seterrno(1);
 #endif /* !... */
 				goto __child_error;
 #else /* __POSIX_SPAWN_HAVE_UNSUPPORTED_FILE_ACTION */
@@ -1039,11 +1039,11 @@ __do_exec:
 #endif /* __CRT_HAVE_setegid && __CRT_HAVE_getgid */
 #else /* (__CRT_HAVE_seteuid && __CRT_HAVE_getuid) || (__CRT_HAVE_setegid && __CRT_HAVE_getgid) */
 #ifdef __ENOSYS
-			__libc_seterrno(__ENOSYS);
+			(void)__libc_seterrno(__ENOSYS);
 #elif defined(__EPERM)
-			__libc_seterrno(__EPERM);
+			(void)__libc_seterrno(__EPERM);
 #else /* ... */
-			__libc_seterrno(1);
+			(void)__libc_seterrno(1);
 #endif /* !... */
 			goto __child_error;
 #endif /* (!__CRT_HAVE_seteuid || !__CRT_HAVE_getuid) && (!__CRT_HAVE_setegid || !__CRT_HAVE_getgid) */
@@ -1055,11 +1055,11 @@ __do_exec:
 				goto __child_error;
 #else /* __CRT_HAVE_setpgid || __CRT_HAVE___setpgid */
 #ifdef __ENOSYS
-			__libc_seterrno(__ENOSYS);
+			(void)__libc_seterrno(__ENOSYS);
 #elif defined(__EPERM)
-			__libc_seterrno(__EPERM);
+			(void)__libc_seterrno(__EPERM);
 #else /* ... */
-			__libc_seterrno(1);
+			(void)__libc_seterrno(1);
 #endif /* !... */
 			goto __child_error;
 #endif /* !__CRT_HAVE_setpgid && !__CRT_HAVE___setpgid */
@@ -1079,11 +1079,11 @@ __do_exec:
 			}
 #else /* (__CRT_HAVE_sigaction || __CRT_HAVE___sigaction) && __SIG_DFL */
 #ifdef __ENOSYS
-			__libc_seterrno(__ENOSYS);
+			(void)__libc_seterrno(__ENOSYS);
 #elif defined(__EPERM)
-			__libc_seterrno(__EPERM);
+			(void)__libc_seterrno(__EPERM);
 #else /* ... */
-			__libc_seterrno(1);
+			(void)__libc_seterrno(1);
 #endif /* !... */
 			goto __child_error;
 #endif /* (!__CRT_HAVE_sigaction && !__CRT_HAVE___sigaction) || !__SIG_DFL */
@@ -1094,11 +1094,11 @@ __do_exec:
 				goto __child_error;
 #else /* (__CRT_HAVE_sigprocmask || __CRT_HAVE_pthread_sigmask) && __SIG_SETMASK */
 #ifdef __ENOSYS
-			__libc_seterrno(__ENOSYS);
+			(void)__libc_seterrno(__ENOSYS);
 #elif defined(__EPERM)
-			__libc_seterrno(__EPERM);
+			(void)__libc_seterrno(__EPERM);
 #else /* ... */
-			__libc_seterrno(1);
+			(void)__libc_seterrno(1);
 #endif /* !... */
 			goto __child_error;
 #endif /* (!__CRT_HAVE_sigprocmask && !__CRT_HAVE_pthread_sigmask) || !__SIG_SETMASK */
@@ -1121,11 +1121,11 @@ __do_exec:
 				goto __child_error;
 #else /* (__CRT_HAVE_sched_setscheduler || __CRT_HAVE___sched_setscheduler) && __CRT_HAVE_sched_setparam && (__CRT_HAVE_sched_getparam || __CRT_HAVE___sched_getparam) */
 #ifdef __ENOSYS
-			__libc_seterrno(__ENOSYS);
+			(void)__libc_seterrno(__ENOSYS);
 #elif defined(__EPERM)
-			__libc_seterrno(__EPERM);
+			(void)__libc_seterrno(__EPERM);
 #else /* ... */
-			__libc_seterrno(1);
+			(void)__libc_seterrno(1);
 #endif /* !... */
 			goto __child_error;
 #endif /* (!__CRT_HAVE_sched_setscheduler && !__CRT_HAVE___sched_setscheduler) || !__CRT_HAVE_sched_setparam || (!__CRT_HAVE_sched_getparam && !__CRT_HAVE___sched_getparam) */
@@ -1138,7 +1138,7 @@ __do_exec:
 	if (__attrp && __attrp->__flags & __POSIX_SPAWN_NOEXECERR) {
 		/* Suppress the exec error. */
 #if defined(__ARCH_HAVE_SHARED_VM_VFORK) && (defined(__CRT_HAVE_vfork) || defined(__CRT_HAVE___vfork))
-		__libc_seterrno(0);
+		(void)__libc_seterrno(0);
 #endif /* __ARCH_HAVE_SHARED_VM_VFORK && (__CRT_HAVE_vfork || __CRT_HAVE___vfork) */
 	} else
 #endif /* __POSIX_SPAWN_NOEXECERR */

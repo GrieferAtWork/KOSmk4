@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xe19c3136 */
+/* HASH CRC-32:0xfd8727dc */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -569,7 +569,7 @@ __done_free_dbline:
 
 __err_ERANGE:
 #ifdef __ERANGE
-	__libc_seterrno(__ERANGE);
+	(void)__libc_seterrno(__ERANGE);
 #endif /* __ERANGE */
 	/* FALLTHRU */
 __err_restore:

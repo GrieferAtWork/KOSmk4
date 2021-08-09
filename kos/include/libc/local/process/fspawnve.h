@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x38ecce3d */
+/* HASH CRC-32:0xdd098c99 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -431,7 +431,7 @@ __NOTHROW_RPC(__LIBCCALL __LIBC_LOCAL_NAME(fspawnve))(__STDC_INT_AS_UINT_T __mod
 		return __localdep_fexecve(__execfd, ___argv, ___envp);
 #if defined(__ARCH_HAVE_SHARED_VM_VFORK) && (defined(__CRT_HAVE_vfork) || defined(__CRT_HAVE___vfork))
 	__old_errno = __libc_geterrno_or(0);
-	__libc_seterrno(0);
+	(void)__libc_seterrno(0);
 #endif /* __ARCH_HAVE_SHARED_VM_VFORK && (__CRT_HAVE_vfork || __CRT_HAVE___vfork) */
 #if !defined(__ARCH_HAVE_SHARED_VM_VFORK) || (!defined(__CRT_HAVE_vfork) && !defined(__CRT_HAVE___vfork))
 	/* Create a pair of pipes for temporary communication. */
@@ -480,7 +480,7 @@ __NOTHROW_RPC(__LIBCCALL __LIBC_LOCAL_NAME(fspawnve))(__STDC_INT_AS_UINT_T __mod
 			goto __err_join_zombie_child;
 		/* Success (but still restore the old errno
 		 * since  we  overwrote it  to be  0 above) */
-		__libc_seterrno(__old_errno);
+		(void)__libc_seterrno(__old_errno);
 #else /* __ARCH_HAVE_SHARED_VM_VFORK && (__CRT_HAVE_vfork || __CRT_HAVE___vfork) */
 		__localdep_close(__pipes[1]); /* Close the writer. */
 		__temp = __localdep_read(__pipes[0], &__error, sizeof(__error));
@@ -489,7 +489,7 @@ __NOTHROW_RPC(__LIBCCALL __LIBC_LOCAL_NAME(fspawnve))(__STDC_INT_AS_UINT_T __mod
 			goto __err_join_zombie_child;
 		if (__temp == sizeof(__error)) {
 			/* If something was read, then it is the errno value that caused the failure. */
-			__libc_seterrno(__error);
+			(void)__libc_seterrno(__error);
 			goto __err;
 		}
 #endif /* !__ARCH_HAVE_SHARED_VM_VFORK || (!__CRT_HAVE_vfork && !__CRT_HAVE___vfork) */
@@ -522,7 +522,7 @@ __read_child_errors:
 		goto __err_join_zombie_child;
 	/* Complete success (but we must still restore the old errno from
 	 * before we were called) */
-	__libc_seterrno(__old_errno);
+	(void)__libc_seterrno(__old_errno);
 	/* Return the child's PID */
 	return __child;
 #else /* __ARCH_HAVE_SHARED_VM_VFORK && (__CRT_HAVE_vfork || __CRT_HAVE___vfork) */
@@ -538,7 +538,7 @@ __read_child_errors:
 	if (__temp != sizeof(__error))
 		return __child;
 	/* If something was read, then it is the errno value that caused the failure. */
-	__libc_seterrno(__error);
+	(void)__libc_seterrno(__error);
 #endif /* !__ARCH_HAVE_SHARED_VM_VFORK || (!__CRT_HAVE_vfork && !__CRT_HAVE___vfork) */
 __err_join_zombie_child:
 	if (__mode != __P_DETACH) {

@@ -2550,9 +2550,9 @@ $sighandler_t sigset($signo_t signo, $sighandler_t disp) {
 	       : oact.@sa_handler@;
 err_inval:
 @@pp_ifdef EINVAL@@
-	__libc_seterrno(EINVAL);
+	(void)__libc_seterrno(EINVAL);
 @@pp_else@@
-	__libc_seterrno(1);
+	(void)__libc_seterrno(1);
 @@pp_endif@@
 err:
 	return (sighandler_t)@__SIG_ERR@;

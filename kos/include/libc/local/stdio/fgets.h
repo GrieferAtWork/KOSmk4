@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x452cf00f */
+/* HASH CRC-32:0xdf43809e */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -151,8 +151,8 @@ __LOCAL_LIBC(fgets) __ATTR_WUNUSED __ATTR_NONNULL((1, 3)) char *
 	if __unlikely(!__buf || !__bufsize) {
 		/* The buffer cannot be empty! */
 #ifdef __ERANGE
-		__libc_seterrno(__ERANGE);
-#endif /* ERANGE */
+		(void)__libc_seterrno(__ERANGE);
+#endif /* __ERANGE */
 		return __NULLPTR;
 	}
 	for (__n = 0; __n < __bufsize - 1; ++__n) {

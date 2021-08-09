@@ -1688,7 +1688,7 @@ $uint32_t strtou32([[nonnull]] char const *__restrict nptr,
 	errno_t error;
 	result = strtou32_r(nptr, endptr, base, &error);
 	if (error == ERANGE)
-		__libc_seterrno(ERANGE);
+		(void)__libc_seterrno(ERANGE);
 	return result;
 @@pp_else@@
 	return strtou32_r(nptr, endptr, base, NULL);
@@ -1708,7 +1708,7 @@ $int32_t strto32([[nonnull]] char const *__restrict nptr,
 	errno_t error;
 	result = strto32_r(nptr, endptr, base, &error);
 	if (error == ERANGE)
-		__libc_seterrno(ERANGE);
+		(void)__libc_seterrno(ERANGE);
 	return result;
 @@pp_else@@
 	return strto32_r(nptr, endptr, base, NULL);
@@ -1731,7 +1731,7 @@ $uint64_t strtou64([[nonnull]] char const *__restrict nptr,
 	errno_t error;
 	result = strtou64_r(nptr, endptr, base, &error);
 	if (error == ERANGE)
-		__libc_seterrno(ERANGE);
+		(void)__libc_seterrno(ERANGE);
 	return result;
 @@pp_else@@
 	return strtou64_r(nptr, endptr, base, NULL);
@@ -1754,7 +1754,7 @@ $int64_t strto64([[nonnull]] char const *__restrict nptr,
 	errno_t error;
 	result = strto64_r(nptr, endptr, base, &error);
 	if (error == ERANGE)
-		__libc_seterrno(ERANGE);
+		(void)__libc_seterrno(ERANGE);
 	return result;
 @@pp_else@@
 	return strto64_r(nptr, endptr, base, NULL);
@@ -3074,7 +3074,7 @@ int fdwalk([[nonnull]] __fdwalk_func_t func, void *cookie) {
 		fd = fcntl(fd, __F_NEXT);
 		if (fd < 0) {
 @@pp_ifdef __libc_geterrno@@
-			__libc_seterrno(saved_err);
+			(void)__libc_seterrno(saved_err);
 @@pp_endif@@
 			break;
 		}
@@ -5141,7 +5141,7 @@ err_inval:
 @@pp_endif@@
 err_range:
 @@pp_ifdef ERANGE@@
-	__libc_seterrno(ERANGE);
+	(void)__libc_seterrno(ERANGE);
 	return ERANGE;
 @@pp_else@@
 	return 1;

@@ -367,7 +367,7 @@ double ldexp(double x, int exponent) {
 @@pp_endif@@
 @@pp_ifdef ERANGE@@
 	if unlikely(!__LIBM_MATHFUN(@finite@, result) || result == 0.0)
-		__libc_seterrno(ERANGE);
+		(void)__libc_seterrno(ERANGE);
 @@pp_endif@@
 	return result;
 }
@@ -1551,7 +1551,7 @@ double scalb(double x, double fn) {
 				return __kernel_standard(x, fn, result, __LIBM_KMATHERR_SCALB_OVERFLOW); /* scalb overflow */
 			} else {
 #ifdef __ERANGE
-				__libc_seterrno(__ERANGE);
+				(void)__libc_seterrno(__ERANGE);
 #endif /* __ERANGE */
 			}
 		} else if (result == 0.0 && result != x) {

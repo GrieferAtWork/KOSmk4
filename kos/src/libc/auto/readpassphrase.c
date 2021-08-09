@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xa63de29d */
+/* HASH CRC-32:0xd9a430f5 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -114,9 +114,9 @@ NOTHROW_NCX(LIBCCALL libc_readpassphrase)(char const *prompt,
 	/* Validate input arguments. */
 	if unlikely(buf == NULL || bufsize < sizeof(char)) {
 #ifdef EINVAL
-		__libc_seterrno(EINVAL);
+		(void)__libc_seterrno(EINVAL);
 #else /* EINVAL */
-		__libc_seterrno(1);
+		(void)__libc_seterrno(1);
 #endif /* !EINVAL */
 		goto err;
 	}
@@ -147,18 +147,18 @@ again:
 		if unlikely(infd == -1) {
 #ifdef ENOTTY
 			if (flags & __RPP_REQUIRE_TTY)
-				__libc_seterrno(ENOTTY);
+				(void)__libc_seterrno(ENOTTY);
 #endif /* ENOTTY */
 			goto err;
 		}
 		outfd = infd;
 #else /* __CRT_HAVE_open64 || __CRT_HAVE___open64 || __CRT_HAVE_open || __CRT_HAVE__open || __CRT_HAVE___open || (__AT_FDCWD && (__CRT_HAVE_openat64 || __CRT_HAVE_openat)) */
 #if defined(ENOTTY) && defined(ENOENT)
-		__libc_seterrno(flags & __RPP_REQUIRE_TTY ? ENOTTY : ENOENT);
+		(void)__libc_seterrno(flags & __RPP_REQUIRE_TTY ? ENOTTY : ENOENT);
 #elif defined(ENOENT)
-		__libc_seterrno(ENOENT);
+		(void)__libc_seterrno(ENOENT);
 #else /* ... */
-		__libc_seterrno(1);
+		(void)__libc_seterrno(1);
 #endif /* !... */
 		goto err;
 #endif /* !__CRT_HAVE_open64 && !__CRT_HAVE___open64 && !__CRT_HAVE_open && !__CRT_HAVE__open && !__CRT_HAVE___open && (!__AT_FDCWD || (!__CRT_HAVE_openat64 && !__CRT_HAVE_openat)) */
@@ -169,7 +169,7 @@ again:
 	if (libc_tcgetattr(infd, &old_ios) != 0) {
 		if (flags & RPP_REQUIRE_TTY) {
 #ifdef ENOTTY
-			__libc_seterrno(ENOTTY);
+			(void)__libc_seterrno(ENOTTY);
 #endif /* ENOTTY */
 			goto err_infd;
 #define __PRIVATE_WANT_err_infd

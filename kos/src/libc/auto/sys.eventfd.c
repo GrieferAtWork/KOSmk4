@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xc9c5e05c */
+/* HASH CRC-32:0x1a9a4795 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -42,7 +42,7 @@ NOTHROW_RPC(LIBCCALL libc_eventfd_read)(fd_t fd,
 		return 0;
 #ifdef EINVAL
 	if (error >= 0)
-		__libc_seterrno(EINVAL);
+		(void)__libc_seterrno(EINVAL);
 #endif /* EINVAL */
 	return -1;
 }
@@ -58,7 +58,7 @@ NOTHROW_RPC(LIBCCALL libc_eventfd_write)(fd_t fd,
 		return 0;
 #ifdef EINVAL
 	if (error >= 0)
-		__libc_seterrno(EINVAL);
+		(void)__libc_seterrno(EINVAL);
 #endif /* EINVAL */
 	return -1;
 }

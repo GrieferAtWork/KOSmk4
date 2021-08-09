@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xe437d8fd */
+/* HASH CRC-32:0x4b3557a5 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -117,11 +117,11 @@ __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(inet_neta))(__UINT32_TYPE__ __net, ch
 	return __buf;
 __too_small:
 #ifdef __EMSGSIZE
-	__libc_seterrno(__EMSGSIZE);
+	(void)__libc_seterrno(__EMSGSIZE);
 #elif defined(__ERANGE)
-	__libc_seterrno(__ERANGE);
+	(void)__libc_seterrno(__ERANGE);
 #elif defined(__EINVAL)
-	__libc_seterrno(__EINVAL);
+	(void)__libc_seterrno(__EINVAL);
 #endif /* ... */
 	return __NULLPTR;
 }

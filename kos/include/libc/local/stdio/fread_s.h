@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x7918a1dd */
+/* HASH CRC-32:0x9d92db36 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -91,13 +91,13 @@ __NOTHROW_RPC(__LIBCCALL __LIBC_LOCAL_NAME(fread_s))(void *__restrict __buf, __S
 	if (__hybrid_overflow_umul(__elemsize, __elemcount, &__reqbuf) ||
 	    __reqbuf > __bufsize) {
 #ifdef __ERANGE
-		__libc_seterrno(__ERANGE);
+		(void)__libc_seterrno(__ERANGE);
 #endif /* __ERANGE */
 		return 0;
 	}
 	if __unlikely(!__stream || !__buf) {
 #ifdef __EINVAL
-		__libc_seterrno(__EINVAL);
+		(void)__libc_seterrno(__EINVAL);
 #endif /* __EINVAL */
 		return 0;
 	}

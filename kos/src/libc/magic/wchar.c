@@ -326,7 +326,7 @@ size_t mbrtowc([[nullable]] wchar_t *pwc,
 @@pp_endif@@
 @@pp_ifdef EILSEQ@@
 	if (error == (size_t)-1)
-		__libc_seterrno(EILSEQ);
+		(void)__libc_seterrno(EILSEQ);
 @@pp_endif@@
 	return error;
 };
@@ -361,7 +361,7 @@ size_t wcrtomb(char *__restrict str, wchar_t wc,
 		              (u16)wc <= UTF16_LOW_SURROGATE_MAX)) {
 			/* Expected low surrogate */
 @@pp_ifdef EILSEQ@@
-			__libc_seterrno(EILSEQ);
+			(void)__libc_seterrno(EILSEQ);
 @@pp_endif@@
 			return (size_t)-1;
 		}
@@ -643,7 +643,7 @@ wchar_t *fgetws([[outp(bufsize)]] wchar_t *__restrict buf,
 	if unlikely(!buf || !bufsize) {
 		/* The buffer cannot be empty! */
 @@pp_ifdef ERANGE@@
-		__libc_seterrno(ERANGE);
+		(void)__libc_seterrno(ERANGE);
 @@pp_endif@@
 		return NULL;
 	}
@@ -1203,7 +1203,7 @@ wchar_t *fgetws_unlocked([[outp(bufsize)]] wchar_t *__restrict buf, __STDC_INT_A
 	if unlikely(!buf || !bufsize) {
 		/* The buffer cannot be empty! */
 @@pp_ifdef ERANGE@@
-		__libc_seterrno(ERANGE);
+		(void)__libc_seterrno(ERANGE);
 @@pp_endif@@
 		return NULL;
 	}

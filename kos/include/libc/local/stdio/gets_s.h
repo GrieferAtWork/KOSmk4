@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x7f39d4cb */
+/* HASH CRC-32:0xd5c29fb3 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -76,7 +76,7 @@ __LOCAL_LIBC(gets_s) __ATTR_WUNUSED __ATTR_NONNULL((1)) char *
 __NOTHROW_RPC(__LIBCCALL __LIBC_LOCAL_NAME(gets_s))(char *__restrict __buf, __SIZE_TYPE__ __bufsize) {
 	if __unlikely(!__buf) {
 #ifdef __EINVAL
-		__libc_seterrno(__EINVAL);
+		(void)__libc_seterrno(__EINVAL);
 #endif /* __EINVAL */
 		return __NULLPTR;
 	}

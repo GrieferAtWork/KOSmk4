@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xfdb96553 */
+/* HASH CRC-32:0x6ff87556 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -197,7 +197,7 @@ __NOTHROW_RPC(__LIBCCALL __LIBC_LOCAL_NAME(spawnvpe))(__STDC_INT_AS_UINT_T __mod
 		}
 	} else {
 #ifdef __ENOENT
-		__libc_seterrno(__ENOENT);
+		(void)__libc_seterrno(__ENOENT);
 #endif /* __ENOENT */
 	}
 	return -1;

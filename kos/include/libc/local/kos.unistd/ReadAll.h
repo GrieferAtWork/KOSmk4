@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x840b3f8c */
+/* HASH CRC-32:0xab213fcd */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -113,7 +113,7 @@ __LOCAL_LIBC(ReadAll) __ATTR_NONNULL((2)) __SIZE_TYPE__
 				/* Try to un-read data that had already been loaded. */
 				__localdep_lseek(__fd, -(__FS_TYPE(off))(__FS_TYPE(pos))__result, __SEEK_CUR);
 #ifdef __libc_geterrno
-				__libc_seterrno(__old_error);
+				(void)__libc_seterrno(__old_error);
 #endif /* __libc_geterrno */
 				RETHROW();
 			}

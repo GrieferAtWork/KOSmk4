@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x3bdda892 */
+/* HASH CRC-32:0xedd2a498 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -96,7 +96,7 @@ __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(wcstou32))(__WCHAR_TYPE__ const *__re
 	__errno_t __error;
 	__result = __localdep_wcstou32_r(__nptr, __endptr, __base, &__error);
 	if (__error == __ERANGE)
-		__libc_seterrno(__ERANGE);
+		(void)__libc_seterrno(__ERANGE);
 	return __result;
 #else /* __libc_geterrno && __ERANGE */
 	return __localdep_wcstou32_r(__nptr, __endptr, __base, __NULLPTR);

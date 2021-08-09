@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x834afd5e */
+/* HASH CRC-32:0x37f8dec8 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -197,7 +197,7 @@ NOTHROW_RPC(LIBCCALL libc_execvpe)(char const *__restrict file,
 		}
 	} else {
 #ifdef ENOENT
-		__libc_seterrno(ENOENT);
+		(void)__libc_seterrno(ENOENT);
 #endif /* ENOENT */
 	}
 	return -1;
@@ -489,7 +489,7 @@ NOTHROW_RPC(LIBCCALL libc_getpassfd)(char const *prompt,
 	if (buflen < 1) {
 		/* Invalid buffer length */
 #ifdef EINVAL
-		__libc_seterrno(EINVAL);
+		(void)__libc_seterrno(EINVAL);
 #endif /* EINVAL */
 		goto out;
 	}
@@ -642,9 +642,9 @@ NOTHROW_RPC(LIBCCALL libc_getpassfd)(char const *prompt,
 					goto out; /* Error... */
 				if unlikely(status == 0) {
 #ifdef ETIMEDOUT
-					__libc_seterrno(ETIMEDOUT);
+					(void)__libc_seterrno(ETIMEDOUT);
 #else /* ETIMEDOUT */
-					__libc_seterrno(1);
+					(void)__libc_seterrno(1);
 #endif /* !ETIMEDOUT */
 					goto out; /* Timeout... */
 				}
@@ -667,7 +667,7 @@ handle_eof:
 					if (flags & __GETPASS_FAIL_EOF) {
 						/* Error out on regular, old EOF */
 #ifdef ENODATA
-						__libc_seterrno(ENODATA);
+						(void)__libc_seterrno(ENODATA);
 #endif /* ENODATA */
 						goto out;
 					}
@@ -975,7 +975,7 @@ out:
 				(void)libc_raise(interrupt_signo);
 #endif /* __CRT_HAVE_raise || (__CRT_HAVE_pthread_kill && (__CRT_HAVE_pthread_self || __CRT_HAVE_thrd_current)) || (__CRT_HAVE_kill && (__CRT_HAVE_getpid || __CRT_HAVE__getpid || __CRT_HAVE___getpid)) */
 #ifdef EINTR
-			__libc_seterrno(EINTR);
+			(void)__libc_seterrno(EINTR);
 #endif /* EINTR */
 		}
 	}

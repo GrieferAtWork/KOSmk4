@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xba76a89b */
+/* HASH CRC-32:0x55311ac4 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -74,17 +74,13 @@ __LOCAL_LIBC(ftime) __ATTR_NONNULL((1)) int
 __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(ftime))(struct timeb *__timebuf) {
 #if defined(__CRT_HAVE__ftime32_s) && !defined(__USE_TIME_BITS64)
 	__errno_t __error = __localdep_crt_ftime32_s(__timebuf);
-	if __unlikely(__error) {
-		__libc_seterrno(__error);
-		__error = -1;
-	}
+	if __unlikely(__error)
+		__error = __libc_seterrno(__error);
 	return (int)__error;
 #elif defined(__CRT_HAVE__ftime64_s) && defined(__USE_TIME_BITS64)
 	__errno_t __error = __localdep_crt_ftime64_s(__timebuf);
-	if __unlikely(__error) {
-		__libc_seterrno(__error);
-		__error = -1;
-	}
+	if __unlikely(__error)
+		__error = __libc_seterrno(__error);
 	return (int)__error;
 #elif defined(__CRT_HAVE__ftime32) && !defined(__USE_TIME_BITS64)
 	__localdep_crt_dos_ftime32(&__temp);
@@ -116,8 +112,7 @@ __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(ftime))(struct timeb *__timebuf) {
 	struct __timeb32 __temp;
 	__errno_t __error = __localdep_crt_ftime32_s(&__temp);
 	if __unlikely(__error) {
-		__libc_seterrno(__error);
-		__error = -1;
+		__error = __libc_seterrno(__error);
 	} else {
 		__timebuf->time     = (__time64_t)__temp.time;
 		__timebuf->millitm  = __temp.millitm;
@@ -129,8 +124,7 @@ __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(ftime))(struct timeb *__timebuf) {
 	struct __timeb64 __temp;
 	__errno_t __error = __localdep_crt_ftime64_s(&__temp);
 	if __unlikely(__error) {
-		__libc_seterrno(__error);
-		__error = -1;
+		__error = __libc_seterrno(__error);
 	} else {
 		__timebuf->time     = (__time32_t)__temp.time;
 		__timebuf->millitm  = __temp.millitm;

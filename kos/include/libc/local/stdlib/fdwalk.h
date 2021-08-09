@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x6749227d */
+/* HASH CRC-32:0x48e42fd7 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -71,7 +71,7 @@ __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(fdwalk))(__fdwalk_func_t __func, void
 		__fd = __localdep_fcntl(__fd, __F_NEXT);
 		if (__fd < 0) {
 #ifdef __libc_geterrno
-			__libc_seterrno(__saved_err);
+			(void)__libc_seterrno(__saved_err);
 #endif /* __libc_geterrno */
 			break;
 		}

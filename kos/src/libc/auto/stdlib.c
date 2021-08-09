@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xa0513c61 */
+/* HASH CRC-32:0xb6a4871 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -1240,7 +1240,7 @@ NOTHROW_NCX(LIBCCALL libc_strtou32)(char const *__restrict nptr,
 	errno_t error;
 	result = libc_strtou32_r(nptr, endptr, base, &error);
 	if (error == ERANGE)
-		__libc_seterrno(ERANGE);
+		(void)__libc_seterrno(ERANGE);
 	return result;
 #else /* __libc_geterrno && ERANGE */
 	return libc_strtou32_r(nptr, endptr, base, NULL);
@@ -1270,7 +1270,7 @@ NOTHROW_NCX(LIBCCALL libc_strto32)(char const *__restrict nptr,
 	errno_t error;
 	result = libc_strto32_r(nptr, endptr, base, &error);
 	if (error == ERANGE)
-		__libc_seterrno(ERANGE);
+		(void)__libc_seterrno(ERANGE);
 	return result;
 #else /* __libc_geterrno && ERANGE */
 	return libc_strto32_r(nptr, endptr, base, NULL);
@@ -1300,7 +1300,7 @@ NOTHROW_NCX(LIBCCALL libc_strtou64)(char const *__restrict nptr,
 	errno_t error;
 	result = libc_strtou64_r(nptr, endptr, base, &error);
 	if (error == ERANGE)
-		__libc_seterrno(ERANGE);
+		(void)__libc_seterrno(ERANGE);
 	return result;
 #else /* __libc_geterrno && ERANGE */
 	return libc_strtou64_r(nptr, endptr, base, NULL);
@@ -1330,7 +1330,7 @@ NOTHROW_NCX(LIBCCALL libc_strto64)(char const *__restrict nptr,
 	errno_t error;
 	result = libc_strto64_r(nptr, endptr, base, &error);
 	if (error == ERANGE)
-		__libc_seterrno(ERANGE);
+		(void)__libc_seterrno(ERANGE);
 	return result;
 #else /* __libc_geterrno && ERANGE */
 	return libc_strto64_r(nptr, endptr, base, NULL);
@@ -2043,7 +2043,7 @@ NOTHROW_NCX(LIBCCALL libc_fdwalk)(__fdwalk_func_t func,
 		fd = libc_fcntl(fd, __F_NEXT);
 		if (fd < 0) {
 #ifdef __libc_geterrno
-			__libc_seterrno(saved_err);
+			(void)__libc_seterrno(saved_err);
 #endif /* __libc_geterrno */
 			break;
 		}
@@ -3449,7 +3449,7 @@ err_inval:
 #endif /* !EINVAL */
 err_range:
 #ifdef ERANGE
-	__libc_seterrno(ERANGE);
+	(void)__libc_seterrno(ERANGE);
 	return ERANGE;
 #else /* ERANGE */
 	return 1;
@@ -4229,7 +4229,7 @@ err_inval:
 #endif /* !EINVAL */
 err_range:
 #ifdef ERANGE
-	__libc_seterrno(ERANGE);
+	(void)__libc_seterrno(ERANGE);
 	return ERANGE;
 #else /* ERANGE */
 	return 1;
@@ -4322,7 +4322,7 @@ err_inval:
 #endif /* !EINVAL */
 err_range:
 #ifdef ERANGE
-	__libc_seterrno(ERANGE);
+	(void)__libc_seterrno(ERANGE);
 	return ERANGE;
 #else /* ERANGE */
 	return 1;

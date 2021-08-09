@@ -352,7 +352,7 @@ int hsearch_r(ENTRY item, ACTION action,
 	if (action == ENTER) {
 		if (htab->@filled@ == htab->@size@) {
 @@pp_ifdef ENOMEM@@
-			__libc_seterrno(ENOMEM);
+			(void)__libc_seterrno(ENOMEM);
 @@pp_endif@@
 			*retval = NULL;
 			return 0;
@@ -364,7 +364,7 @@ int hsearch_r(ENTRY item, ACTION action,
 		return 1;
 	}
 @@pp_ifdef ESRCH@@
-	__libc_seterrno(ESRCH);
+	(void)__libc_seterrno(ESRCH);
 @@pp_endif@@
 	*retval = NULL;
 	return 0;
@@ -402,7 +402,7 @@ int hcreate_r(size_t nel, struct hsearch_data *htab) {
 	} entry_type;
 	if (htab == NULL) {
 @@pp_ifdef EINVAL@@
-		__libc_seterrno(EINVAL);
+		(void)__libc_seterrno(EINVAL);
 @@pp_endif@@
 		return 0;
 	}
@@ -413,7 +413,7 @@ int hcreate_r(size_t nel, struct hsearch_data *htab) {
 	for (nel |= 1; ; nel += 2) {
 		if (UINT_MAX - 2 < nel) {
 @@pp_ifdef ENOMEM@@
-			__libc_seterrno(ENOMEM);
+			(void)__libc_seterrno(ENOMEM);
 @@pp_endif@@
 			return 0;
 		}
@@ -435,7 +435,7 @@ int hcreate_r(size_t nel, struct hsearch_data *htab) {
 void hdestroy_r(struct hsearch_data *htab) {
 	if (htab == NULL) {
 @@pp_ifdef EINVAL@@
-		__libc_seterrno(EINVAL);
+		(void)__libc_seterrno(EINVAL);
 @@pp_endif@@
 		return;
 	}
