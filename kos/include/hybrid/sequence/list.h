@@ -1300,7 +1300,6 @@
 #define STAILQ_P_REMOVE_R_P(self, p_lo_elem, hi_elem, getpath)                __HYBRID_STAILQ_P_REMOVE_R(self, p_lo_elem, hi_elem, __HYBRID_Q_PTH, getpath)
 #define STAILQ_REMOVE_AFTER_P(self, elem, getpath)                            __HYBRID_STAILQ_REMOVE_AFTER(self, elem, __HYBRID_Q_PTH, getpath)
 #define STAILQ_REMOVE_HEAD_P(self, getpath)                                   __HYBRID_STAILQ_REMOVE_HEAD(self, __HYBRID_Q_PTH, getpath)
-#define STAILQ_SWAP_P(l1, l2, T)                                              __HYBRID_STAILQ_SWAP(l1, l2, T)
 #define STAILQ_MOVE(dst, src)                                   \
 	(void)((dst)->stqh_last = (src)->stqh_last,                 \
 	       ((dst)->stqh_first = (src)->stqh_first) == __NULLPTR \
@@ -1770,7 +1769,6 @@
 #define SIMPLEQ_P_REMOVE_R_P(self, p_lo_elem, hi_elem, getpath)                __HYBRID_SIMPLEQ_P_REMOVE_R(self, p_lo_elem, hi_elem, __HYBRID_Q_PTH, getpath)
 #define SIMPLEQ_REMOVE_AFTER_P(self, elem, getpath)                            __HYBRID_SIMPLEQ_REMOVE_AFTER(self, elem, __HYBRID_Q_PTH, getpath)
 #define SIMPLEQ_REMOVE_HEAD_P(self, getpath)                                   __HYBRID_SIMPLEQ_REMOVE_HEAD(self, __HYBRID_Q_PTH, getpath)
-#define SIMPLEQ_SWAP_P(l1, l2, T)                                              __HYBRID_SIMPLEQ_SWAP(l1, l2, T)
 #define SIMPLEQ_MOVE(dst, src)                                \
 	(void)((dst)->sqh_last = (src)->sqh_last,                 \
 	       ((dst)->sqh_first = (src)->sqh_first) == __NULLPTR \
