@@ -1373,8 +1373,23 @@ __CDECLARE(__ATTR_WUNUSED __ATTR_CONST __ATTR_RETNONNULL,char ***,__NOTHROW,__p_
 
 [[cp, wunused, ATTR_MALLOC]]
 [[section(".text.crt{|.dos}.fs.basic_property")]]
-[[userimpl, requires_function(getcwd)]]
+[[impl_include("<bits/os/stat.h>"), requires_function(getcwd)]]
 char *get_current_dir_name() {
+@@pp_if $has_function(getenv) && $has_function(stat) && $has_function(strdup)@@
+	/* Specs require us to return a duplicate of $PWD iff it's correct
+	 *   ***Author's comment: DUMB!***
+	 */
+	char *pwd = getenv("PWD");
+	if (pwd && *pwd) {
+		struct @stat@ st_pwd, st_cwd;
+		if (stat(pwd, &st_pwd) == 0 &&
+		    stat(".", &st_cwd) == 0) {
+			if (st_pwd.@st_dev@ == st_cwd.@st_dev@ &&
+			    st_pwd.@st_ino@ == st_cwd.@st_ino@)
+				return strdup(pwd);
+		}
+	}
+@@pp_endif@@
 	return getcwd(NULL, 0);
 }
 

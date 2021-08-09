@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xc6eef4c5 */
+/* HASH CRC-32:0x41ad7ee6 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -23,6 +23,98 @@
 #include <__crt.h>
 #if defined(__CRT_HAVE_wgetcwd) || defined(__CRT_HAVE__wgetcwd)
 __NAMESPACE_LOCAL_BEGIN
+/* Dependency: getenv from stdlib */
+#ifndef __local___localdep_getenv_defined
+#define __local___localdep_getenv_defined 1
+#ifdef __CRT_HAVE_getenv
+__CREDIRECT(__ATTR_WUNUSED __ATTR_NONNULL((1)),char *,__NOTHROW_NCX,__localdep_getenv,(char const *__varname),getenv,(__varname))
+#else /* __CRT_HAVE_getenv */
+__NAMESPACE_LOCAL_END
+#include <libc/local/environ.h>
+__NAMESPACE_LOCAL_BEGIN
+#ifdef __LOCAL_environ
+__NAMESPACE_LOCAL_END
+#include <libc/local/stdlib/getenv.h>
+__NAMESPACE_LOCAL_BEGIN
+#define __localdep_getenv __LIBC_LOCAL_NAME(getenv)
+#else /* __LOCAL_environ */
+#undef __local___localdep_getenv_defined
+#endif /* !__LOCAL_environ */
+#endif /* !__CRT_HAVE_getenv */
+#endif /* !__local___localdep_getenv_defined */
+/* Dependency: stat from sys.stat */
+#ifndef __local___localdep_stat_defined
+#define __local___localdep_stat_defined 1
+#if defined(__CRT_HAVE_kstat) && defined(__CRT_KOS_PRIMARY)
+__NAMESPACE_LOCAL_END
+#include <bits/os/stat.h>
+__NAMESPACE_LOCAL_BEGIN
+__CREDIRECT(__ATTR_NONNULL((1, 2)),int,__NOTHROW_NCX,__localdep_stat,(char const *__restrict __filename, struct stat *__restrict __buf),kstat,(__filename,__buf))
+#elif defined(__CRT_HAVE_kstat64) && defined(__CRT_KOS_PRIMARY)
+__NAMESPACE_LOCAL_END
+#include <bits/os/stat.h>
+__NAMESPACE_LOCAL_BEGIN
+__CREDIRECT(__ATTR_NONNULL((1, 2)),int,__NOTHROW_NCX,__localdep_stat,(char const *__restrict __filename, struct stat *__restrict __buf),kstat64,(__filename,__buf))
+#elif defined(__CRT_HAVE__stat64) && defined(__CRT_DOS_PRIMARY) && defined(__USE_TIME_BITS64)
+__NAMESPACE_LOCAL_END
+#include <bits/os/stat.h>
+__NAMESPACE_LOCAL_BEGIN
+__CREDIRECT(__ATTR_NONNULL((1, 2)),int,__NOTHROW_NCX,__localdep_stat,(char const *__restrict __filename, struct stat *__restrict __buf),_stat64,(__filename,__buf))
+#elif defined(__CRT_HAVE__stat64i32) && defined(__CRT_DOS_PRIMARY) && defined(__USE_TIME_BITS64)
+__NAMESPACE_LOCAL_END
+#include <bits/os/stat.h>
+__NAMESPACE_LOCAL_BEGIN
+__CREDIRECT(__ATTR_NONNULL((1, 2)),int,__NOTHROW_NCX,__localdep_stat,(char const *__restrict __filename, struct stat *__restrict __buf),_stat64i32,(__filename,__buf))
+#elif defined(__CRT_HAVE__stati64) && defined(__CRT_DOS_PRIMARY) && !defined(__USE_TIME_BITS64) && defined(__USE_FILE_OFFSET64)
+__NAMESPACE_LOCAL_END
+#include <bits/os/stat.h>
+__NAMESPACE_LOCAL_BEGIN
+__CREDIRECT(__ATTR_NONNULL((1, 2)),int,__NOTHROW_NCX,__localdep_stat,(char const *__restrict __filename, struct stat *__restrict __buf),_stati64,(__filename,__buf))
+#elif defined(__CRT_HAVE__stat32i64) && defined(__CRT_DOS_PRIMARY) && !defined(__USE_TIME_BITS64) && defined(__USE_FILE_OFFSET64)
+__NAMESPACE_LOCAL_END
+#include <bits/os/stat.h>
+__NAMESPACE_LOCAL_BEGIN
+__CREDIRECT(__ATTR_NONNULL((1, 2)),int,__NOTHROW_NCX,__localdep_stat,(char const *__restrict __filename, struct stat *__restrict __buf),_stat32i64,(__filename,__buf))
+#elif defined(__CRT_HAVE__stat) && defined(__CRT_DOS_PRIMARY) && !defined(__USE_TIME_BITS64) && !defined(__USE_FILE_OFFSET64)
+__NAMESPACE_LOCAL_END
+#include <bits/os/stat.h>
+__NAMESPACE_LOCAL_BEGIN
+__CREDIRECT(__ATTR_NONNULL((1, 2)),int,__NOTHROW_NCX,__localdep_stat,(char const *__restrict __filename, struct stat *__restrict __buf),_stat,(__filename,__buf))
+#elif defined(__CRT_HAVE__stat32) && defined(__CRT_DOS_PRIMARY) && !defined(__USE_TIME_BITS64) && !defined(__USE_FILE_OFFSET64)
+__NAMESPACE_LOCAL_END
+#include <bits/os/stat.h>
+__NAMESPACE_LOCAL_BEGIN
+__CREDIRECT(__ATTR_NONNULL((1, 2)),int,__NOTHROW_NCX,__localdep_stat,(char const *__restrict __filename, struct stat *__restrict __buf),_stat32,(__filename,__buf))
+#elif defined(__CRT_HAVE_stat64) && defined(__USE_FILE_OFFSET64)
+__NAMESPACE_LOCAL_END
+#include <bits/os/stat.h>
+__NAMESPACE_LOCAL_BEGIN
+__CREDIRECT(__ATTR_NONNULL((1, 2)),int,__NOTHROW_NCX,__localdep_stat,(char const *__restrict __filename, struct stat *__restrict __buf),stat64,(__filename,__buf))
+#elif defined(__CRT_HAVE_stat) && !defined(__USE_FILE_OFFSET64)
+__NAMESPACE_LOCAL_END
+#include <bits/os/stat.h>
+__NAMESPACE_LOCAL_BEGIN
+__CREDIRECT(__ATTR_NONNULL((1, 2)),int,__NOTHROW_NCX,__localdep_stat,(char const *__restrict __filename, struct stat *__restrict __buf),stat,(__filename,__buf))
+#else /* ... */
+#undef __local___localdep_stat_defined
+#endif /* !... */
+#endif /* !__local___localdep_stat_defined */
+/* Dependency: wcsdup from wchar */
+#ifndef __local___localdep_wcsdup_defined
+#define __local___localdep_wcsdup_defined 1
+#ifdef __CRT_HAVE_wcsdup
+__CREDIRECT(__ATTR_MALLOC __ATTR_MALL_DEFAULT_ALIGNED __ATTR_WUNUSED __ATTR_NONNULL((1)),__WCHAR_TYPE__ *,__NOTHROW_NCX,__localdep_wcsdup,(__WCHAR_TYPE__ const *__restrict __string),wcsdup,(__string))
+#elif defined(__CRT_HAVE__wcsdup)
+__CREDIRECT(__ATTR_MALLOC __ATTR_MALL_DEFAULT_ALIGNED __ATTR_WUNUSED __ATTR_NONNULL((1)),__WCHAR_TYPE__ *,__NOTHROW_NCX,__localdep_wcsdup,(__WCHAR_TYPE__ const *__restrict __string),_wcsdup,(__string))
+#elif defined(__CRT_HAVE_malloc) || defined(__CRT_HAVE_calloc) || defined(__CRT_HAVE_realloc) || defined(__CRT_HAVE_memalign) || defined(__CRT_HAVE_aligned_alloc) || defined(__CRT_HAVE_posix_memalign)
+__NAMESPACE_LOCAL_END
+#include <libc/local/wchar/wcsdup.h>
+__NAMESPACE_LOCAL_BEGIN
+#define __localdep_wcsdup __LIBC_LOCAL_NAME(wcsdup)
+#else /* ... */
+#undef __local___localdep_wcsdup_defined
+#endif /* !... */
+#endif /* !__local___localdep_wcsdup_defined */
 /* Dependency: wgetcwd from parts.wchar.unistd */
 #ifndef __local___localdep_wgetcwd_defined
 #define __local___localdep_wgetcwd_defined 1
@@ -44,8 +136,26 @@ __CREDIRECT(,__WCHAR_TYPE__ *,__NOTHROW_RPC,__localdep_wgetcwd,(__WCHAR_TYPE__ *
 #undef __local___localdep_wgetcwd_defined
 #endif /* !... */
 #endif /* !__local___localdep_wgetcwd_defined */
+__NAMESPACE_LOCAL_END
+#include <bits/os/stat.h>
+__NAMESPACE_LOCAL_BEGIN
 __LOCAL_LIBC(wget_current_dir_name) __ATTR_MALLOC __ATTR_WUNUSED __WCHAR_TYPE__ *
 __NOTHROW_RPC(__LIBCCALL __LIBC_LOCAL_NAME(wget_current_dir_name))(void) {
+#if (defined(__CRT_HAVE_getenv) || defined(__LOCAL_environ)) && ((defined(__CRT_HAVE_kstat) && defined(__CRT_KOS_PRIMARY)) || (defined(__CRT_HAVE_kstat64) && defined(__CRT_KOS_PRIMARY)) || (defined(__CRT_HAVE__stat64) && defined(__CRT_DOS_PRIMARY) && defined(__USE_TIME_BITS64)) || (defined(__CRT_HAVE__stat64i32) && defined(__CRT_DOS_PRIMARY) && defined(__USE_TIME_BITS64)) || (defined(__CRT_HAVE__stati64) && defined(__CRT_DOS_PRIMARY) && !defined(__USE_TIME_BITS64) && defined(__USE_FILE_OFFSET64)) || (defined(__CRT_HAVE__stat32i64) && defined(__CRT_DOS_PRIMARY) && !defined(__USE_TIME_BITS64) && defined(__USE_FILE_OFFSET64)) || (defined(__CRT_HAVE__stat) && defined(__CRT_DOS_PRIMARY) && !defined(__USE_TIME_BITS64) && !defined(__USE_FILE_OFFSET64)) || (defined(__CRT_HAVE__stat32) && defined(__CRT_DOS_PRIMARY) && !defined(__USE_TIME_BITS64) && !defined(__USE_FILE_OFFSET64)) || (defined(__CRT_HAVE_stat64) && defined(__USE_FILE_OFFSET64)) || (defined(__CRT_HAVE_stat) && !defined(__USE_FILE_OFFSET64))) && (defined(__CRT_HAVE_wcsdup) || defined(__CRT_HAVE__wcsdup) || defined(__CRT_HAVE_malloc) || defined(__CRT_HAVE_calloc) || defined(__CRT_HAVE_realloc) || defined(__CRT_HAVE_memalign) || defined(__CRT_HAVE_aligned_alloc) || defined(__CRT_HAVE_posix_memalign))
+	/* Specs require us to return a duplicate of $PWD iff it's correct
+	 *   ***Author's comment: DUMB!***
+	 */
+	__WCHAR_TYPE__ *__pwd = __localdep_getenv("PWD");
+	if (__pwd && *__pwd) {
+		struct stat __st_pwd, __st_cwd;
+		if (__localdep_stat(__pwd, &__st_pwd) == 0 &&
+		    __localdep_stat(".", &__st_cwd) == 0) {
+			if (__st_pwd.st_dev == __st_cwd.st_dev &&
+			    __st_pwd.st_ino == __st_cwd.st_ino)
+				return __localdep_wcsdup(__pwd);
+		}
+	}
+#endif /* (__CRT_HAVE_getenv || __LOCAL_environ) && ((__CRT_HAVE_kstat && __CRT_KOS_PRIMARY) || (__CRT_HAVE_kstat64 && __CRT_KOS_PRIMARY) || (__CRT_HAVE__stat64 && __CRT_DOS_PRIMARY && __USE_TIME_BITS64) || (__CRT_HAVE__stat64i32 && __CRT_DOS_PRIMARY && __USE_TIME_BITS64) || (__CRT_HAVE__stati64 && __CRT_DOS_PRIMARY && !__USE_TIME_BITS64 && __USE_FILE_OFFSET64) || (__CRT_HAVE__stat32i64 && __CRT_DOS_PRIMARY && !__USE_TIME_BITS64 && __USE_FILE_OFFSET64) || (__CRT_HAVE__stat && __CRT_DOS_PRIMARY && !__USE_TIME_BITS64 && !__USE_FILE_OFFSET64) || (__CRT_HAVE__stat32 && __CRT_DOS_PRIMARY && !__USE_TIME_BITS64 && !__USE_FILE_OFFSET64) || (__CRT_HAVE_stat64 && __USE_FILE_OFFSET64) || (__CRT_HAVE_stat && !__USE_FILE_OFFSET64)) && (__CRT_HAVE_wcsdup || __CRT_HAVE__wcsdup || __CRT_HAVE_malloc || __CRT_HAVE_calloc || __CRT_HAVE_realloc || __CRT_HAVE_memalign || __CRT_HAVE_aligned_alloc || __CRT_HAVE_posix_memalign) */
 	return __localdep_wgetcwd(__NULLPTR, 0);
 }
 __NAMESPACE_LOCAL_END

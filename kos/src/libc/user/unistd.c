@@ -1073,16 +1073,6 @@ NOTHROW_NCX(LIBCCALL libc_dup3)(fd_t oldfd,
 }
 /*[[[end:libc_dup3]]]*/
 
-/*[[[head:libc_get_current_dir_name,hash:CRC-32=0x4c0969ed]]]*/
-INTERN ATTR_SECTION(".text.crt.fs.basic_property") ATTR_MALLOC WUNUSED char *
-NOTHROW_RPC(LIBCCALL libc_get_current_dir_name)(void)
-/*[[[body:libc_get_current_dir_name]]]*/
-{
-	return getcwd(NULL, 0);
-}
-/*[[[end:libc_get_current_dir_name]]]*/
-
-
 PRIVATE ATTR_NOINLINE int LIBCCALL
 group_member_impl(gid_t gid, unsigned int bufsize) {
 	int n; unsigned int i;
@@ -3619,7 +3609,7 @@ NOTHROW_NCX(LIBCCALL libc_ctermid_r)(char *s)
 
 
 
-/*[[[start:exports,hash:CRC-32=0xc1427a34]]]*/
+/*[[[start:exports,hash:CRC-32=0x47337b48]]]*/
 #ifdef __LIBCCALL_IS_LIBDCALL
 DEFINE_PUBLIC_ALIAS(_execve, libc_execve);
 #endif /* __LIBCCALL_IS_LIBDCALL */
@@ -3737,7 +3727,6 @@ DEFINE_PUBLIC_ALIAS(preadall64, libc_preadall64);
 DEFINE_PUBLIC_ALIAS(pwriteall64, libc_pwriteall64);
 DEFINE_PUBLIC_ALIAS(dup3, libc_dup3);
 DEFINE_PUBLIC_ALIAS(pipe2, libc_pipe2);
-DEFINE_PUBLIC_ALIAS(get_current_dir_name, libc_get_current_dir_name);
 DEFINE_PUBLIC_ALIAS(syncfs, libc_syncfs);
 DEFINE_PUBLIC_ALIAS(group_member, libc_group_member);
 DEFINE_PUBLIC_ALIAS(getresuid, libc_getresuid);

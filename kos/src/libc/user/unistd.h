@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x99ffa9ec */
+/* HASH CRC-32:0x21251023 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -286,7 +286,6 @@ INTDEF NONNULL((2)) ssize_t NOTHROW_RPC(LIBCCALL libc_preadall64)(fd_t fd, void 
 INTDEF NONNULL((2)) ssize_t NOTHROW_RPC(LIBCCALL libc_pwriteall64)(fd_t fd, void *buf, size_t bufsize, __PIO_OFFSET64 offset);
 INTDEF fd_t NOTHROW_NCX(LIBCCALL libc_dup3)(fd_t oldfd, fd_t newfd, oflag_t flags);
 INTDEF NONNULL((1)) int NOTHROW_NCX(LIBCCALL libc_pipe2)(fd_t pipedes[2], oflag_t flags);
-INTDEF ATTR_MALLOC WUNUSED char *NOTHROW_RPC(LIBCCALL libc_get_current_dir_name)(void);
 INTDEF int NOTHROW_RPC(LIBCCALL libc_syncfs)(fd_t fd);
 INTDEF int NOTHROW_NCX(LIBCCALL libc_group_member)(gid_t gid);
 /* >> getresuid(2)
