@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xbd98e0bc */
+/* HASH CRC-32:0x5eec48e2 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -74,7 +74,7 @@ __CREDIRECT(__ATTR_MALL_DEFAULT_ALIGNED __ATTR_WUNUSED __ATTR_ALLOC_SIZE((2)),vo
 #ifndef ____libc_core_free_defined
 #define ____libc_core_free_defined 1
 #if __has_builtin(__builtin_free) && defined(__LIBC_BIND_CRTBUILTINS) && defined(__CRT_HAVE_free)
-__CEIREDIRECT(,void,__NOTHROW_NCX,__libc_core_free,(void *__mallptr),free,{ return __builtin_free(__mallptr); })
+__CEIREDIRECT(,void,__NOTHROW_NCX,__libc_core_free,(void *__mallptr),free,{ __builtin_free(__mallptr); })
 #elif defined(__CRT_HAVE_free)
 __CREDIRECT_VOID(,__NOTHROW_NCX,__libc_core_free,(void *__mallptr),free,(__mallptr))
 #elif defined(__CRT_HAVE_cfree)

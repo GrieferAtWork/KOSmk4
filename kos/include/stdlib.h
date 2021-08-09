@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x10c5eeec */
+/* HASH CRC-32:0x264b20ab */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -742,7 +742,7 @@ __NAMESPACE_LOCAL_USING_OR_IMPL(system, __FORCELOCAL __ATTR_ARTIFICIAL int __NOT
 #ifdef __abort_defined
 __NAMESPACE_GLB_USING_OR_IMPL(abort, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_NORETURN void (__LIBCCALL abort)(void) __THROWS(...) { (:: abort)(); })
 #elif __has_builtin(__builtin_abort) && defined(__LIBC_BIND_CRTBUILTINS) && defined(__CRT_HAVE_abort)
-__CEIDECLARE_GCCNCX(__ATTR_NORETURN,void,__THROWING,abort,(void),{ return __builtin_abort(); })
+__CEIDECLARE_GCCNCX(__ATTR_NORETURN,void,__THROWING,abort,(void),{ __builtin_abort(); })
 #elif defined(__CRT_HAVE_abort)
 __CDECLARE_VOID_GCCNCX(__ATTR_NORETURN,__THROWING,abort,(void),())
 #elif defined(__CRT_HAVE__ZSt9terminatev)
@@ -763,7 +763,7 @@ __NAMESPACE_LOCAL_USING_OR_IMPL(abort, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_NOR
 #ifdef __exit_defined
 __NAMESPACE_GLB_USING_OR_IMPL(exit, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_NORETURN void (__LIBCCALL exit)(int __status) __THROWS(...) { (:: exit)(__status); })
 #elif __has_builtin(__builtin_exit) && defined(__LIBC_BIND_CRTBUILTINS) && defined(__CRT_HAVE_exit)
-__CEIDECLARE_GCCNCX(__ATTR_NORETURN,void,__THROWING,exit,(int __status),{ return __builtin_exit(__status); })
+__CEIDECLARE_GCCNCX(__ATTR_NORETURN,void,__THROWING,exit,(int __status),{ __builtin_exit(__status); })
 #elif defined(__CRT_HAVE_exit)
 __CDECLARE_VOID_GCCNCX(__ATTR_NORETURN,__THROWING,exit,(int __status),(__status))
 #elif defined(__CRT_HAVE_quick_exit)
@@ -799,7 +799,7 @@ __CREDIRECT(__ATTR_NONNULL((1)),int,__NOTHROW_NCX,at_quick_exit,(__atexit_func_t
 #endif /* __USE_ISOC11 || __USE_ISOCXX11 */
 #ifdef __USE_ISOC99
 #if __has_builtin(__builtin__Exit) && defined(__LIBC_BIND_CRTBUILTINS) && defined(__CRT_HAVE__Exit)
-__CEIDECLARE_GCCNCX(__ATTR_NORETURN,void,__THROWING,_Exit,(int __status),{ return __builtin__Exit(__status); })
+__CEIDECLARE_GCCNCX(__ATTR_NORETURN,void,__THROWING,_Exit,(int __status),{ __builtin__Exit(__status); })
 #elif __has_builtin(__builtin__exit) && defined(__LIBC_BIND_CRTBUILTINS) && defined(__CRT_HAVE__exit)
 __CEIREDIRECT_GCCNCX(__ATTR_NORETURN,void,__THROWING,_Exit,(int __status),_exit,{ __builtin__exit(__status); })
 #elif defined(__CRT_HAVE__Exit)
@@ -863,7 +863,7 @@ __CDECLARE_GCCNCX(__ATTR_MALL_DEFAULT_ALIGNED __ATTR_WUNUSED __ATTR_ALLOC_SIZE((
 #ifdef __free_defined
 __NAMESPACE_GLB_USING_OR_IMPL(free, __FORCELOCAL __ATTR_ARTIFICIAL void __NOTHROW_NCX(__LIBCCALL free)(void *__mallptr) { (:: free)(__mallptr); })
 #elif __has_builtin(__builtin_free) && defined(__LIBC_BIND_CRTBUILTINS) && defined(__CRT_HAVE_free)
-__CEIDECLARE_GCCNCX(,void,__NOTHROW_NCX,free,(void *__mallptr),{ return __builtin_free(__mallptr); })
+__CEIDECLARE_GCCNCX(,void,__NOTHROW_NCX,free,(void *__mallptr),{ __builtin_free(__mallptr); })
 #elif defined(__CRT_HAVE_free)
 __CDECLARE_VOID_GCCNCX(,__NOTHROW_NCX,free,(void *__mallptr),(__mallptr))
 #elif defined(__CRT_HAVE_cfree)
@@ -2278,7 +2278,7 @@ __NAMESPACE_LOCAL_USING_OR_IMPL(rpmatch, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_P
 #ifndef __cfree_defined
 #define __cfree_defined 1
 #if __has_builtin(__builtin_free) && defined(__LIBC_BIND_CRTBUILTINS) && defined(__CRT_HAVE_free)
-__CEIREDIRECT(,void,__NOTHROW_NCX,cfree,(void *__mallptr),free,{ return __builtin_free(__mallptr); })
+__CEIREDIRECT(,void,__NOTHROW_NCX,cfree,(void *__mallptr),free,{ __builtin_free(__mallptr); })
 #elif defined(__CRT_HAVE_free)
 __CREDIRECT_VOID(,__NOTHROW_NCX,cfree,(void *__mallptr),free,(__mallptr))
 #elif defined(__CRT_HAVE_cfree)

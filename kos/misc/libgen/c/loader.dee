@@ -3391,7 +3391,11 @@ again_parse_annotations:
 						if (currentConditions !is none)
 							bindingCond = "({})&&{}".format({ currentConditions, bindingCond });
 						File.Writer bodyFp;
-						bodyFp << "{ return " << builtinName << "(";
+						bodyFp << "{ ";
+						if (!usedCurrentPrototype.isNoreturn &&
+						    !usedCurrentPrototype.returnType.isVoid)
+							bodyFp << "return ";
+						bodyFp << builtinName << "(";
 						/* Print argument names */
 						local isFirst: bool = true;
 						for (local a: usedCurrentPrototype.argv) {

@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x3081b074 */
+/* HASH CRC-32:0x98d0c83b */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -1721,7 +1721,7 @@ __NAMESPACE_LOCAL_USING_OR_IMPL(strsep, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_LE
 #if __has_builtin(__builtin_bcopy) && defined(__LIBC_BIND_CRTBUILTINS) && defined(__CRT_HAVE_bcopy)
 /* Same as `memmove(dst, src, num_bytes)'
  * Note that bcopy is called with `dst' and `src' reversed */
-__CEIDECLARE_GCCNCX(__ATTR_NONNULL((1, 2)),void,__NOTHROW_NCX,bcopy,(void const *__src, void *__dst, __SIZE_TYPE__ __num_bytes),{ return __builtin_bcopy(__src, __dst, __num_bytes); })
+__CEIDECLARE_GCCNCX(__ATTR_NONNULL((1, 2)),void,__NOTHROW_NCX,bcopy,(void const *__src, void *__dst, __SIZE_TYPE__ __num_bytes),{ __builtin_bcopy(__src, __dst, __num_bytes); })
 #elif defined(__CRT_HAVE_bcopy)
 /* Same as `memmove(dst, src, num_bytes)'
  * Note that bcopy is called with `dst' and `src' reversed */

@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x9b318959 */
+/* HASH CRC-32:0x27d63af */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -6393,7 +6393,7 @@ __NAMESPACE_STD_USING(llroundl)
 #ifdef __USE_GNU
 #if __has_builtin(__builtin_sincos) && defined(__LIBC_BIND_CRTBUILTINS) && defined(__CRT_HAVE_sincos)
 /* Cosine and sine of `x' */
-__CEIDECLARE(__DECL_SIMD_sincos __ATTR_NONNULL((2, 3)),void,__NOTHROW,sincos,(double __x, double *__psinx, double *__pcosx),{ return __builtin_sincos(__x, __psinx, __pcosx); })
+__CEIDECLARE(__DECL_SIMD_sincos __ATTR_NONNULL((2, 3)),void,__NOTHROW,sincos,(double __x, double *__psinx, double *__pcosx),{ __builtin_sincos(__x, __psinx, __pcosx); })
 #elif defined(__CRT_HAVE_sincos)
 /* Cosine and sine of `x' */
 __CDECLARE_VOID(__DECL_SIMD_sincos __ATTR_NONNULL((2, 3)),__NOTHROW,sincos,(double __x, double *__psinx, double *__pcosx),(__x,__psinx,__pcosx))
@@ -6427,7 +6427,7 @@ __NAMESPACE_LOCAL_USING_OR_IMPL(pow10, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_WUN
 #endif /* ... */
 #if __has_builtin(__builtin_sincosf) && defined(__LIBC_BIND_CRTBUILTINS) && defined(__CRT_HAVE_sincosf)
 /* Cosine and sine of `x' */
-__CEIDECLARE(__DECL_SIMD_sincosf __ATTR_NONNULL((2, 3)),void,__NOTHROW,sincosf,(float __x, float *__psinx, float *__pcosx),{ return __builtin_sincosf(__x, __psinx, __pcosx); })
+__CEIDECLARE(__DECL_SIMD_sincosf __ATTR_NONNULL((2, 3)),void,__NOTHROW,sincosf,(float __x, float *__psinx, float *__pcosx),{ __builtin_sincosf(__x, __psinx, __pcosx); })
 #elif defined(__CRT_HAVE_sincosf)
 /* Cosine and sine of `x' */
 __CDECLARE_VOID(__DECL_SIMD_sincosf __ATTR_NONNULL((2, 3)),__NOTHROW,sincosf,(float __x, float *__psinx, float *__pcosx),(__x,__psinx,__pcosx))
@@ -6470,7 +6470,7 @@ __NAMESPACE_LOCAL_USING_OR_IMPL(pow10f, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_WU
 #ifdef __COMPILER_HAVE_LONGDOUBLE
 #if __has_builtin(__builtin_sincosl) && defined(__LIBC_BIND_CRTBUILTINS) && defined(__CRT_HAVE_sincosl)
 /* Cosine and sine of `x' */
-__CEIDECLARE(__DECL_SIMD_sincosl __ATTR_NONNULL((2, 3)),void,__NOTHROW,sincosl,(__LONGDOUBLE __x, __LONGDOUBLE *__psinx, __LONGDOUBLE *__pcosx),{ return __builtin_sincosl(__x, __psinx, __pcosx); })
+__CEIDECLARE(__DECL_SIMD_sincosl __ATTR_NONNULL((2, 3)),void,__NOTHROW,sincosl,(__LONGDOUBLE __x, __LONGDOUBLE *__psinx, __LONGDOUBLE *__pcosx),{ __builtin_sincosl(__x, __psinx, __pcosx); })
 #elif defined(__CRT_HAVE_sincosl)
 /* Cosine and sine of `x' */
 __CDECLARE_VOID(__DECL_SIMD_sincosl __ATTR_NONNULL((2, 3)),__NOTHROW,sincosl,(__LONGDOUBLE __x, __LONGDOUBLE *__psinx, __LONGDOUBLE *__pcosx),(__x,__psinx,__pcosx))
@@ -7531,7 +7531,7 @@ __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_WUNUSED __LONGDOUBLE __NOTHROW(__LIBCCALL 
 #ifdef __USE_GNU
 #if __has_builtin(__builtin_sincos) && defined(__LIBC_BIND_CRTBUILTINS) && defined(__CRT_HAVE_sincos)
 /* Cosine and sine of `x' */
-__CEIREDIRECT(__DECL_SIMD_sincos __ATTR_NONNULL((2, 3)),void,__NOTHROW,__sincos,(double __x, double *__psinx, double *__pcosx),sincos,{ return __builtin_sincos(__x, __psinx, __pcosx); })
+__CEIREDIRECT(__DECL_SIMD_sincos __ATTR_NONNULL((2, 3)),void,__NOTHROW,__sincos,(double __x, double *__psinx, double *__pcosx),sincos,{ __builtin_sincos(__x, __psinx, __pcosx); })
 #elif defined(__CRT_HAVE_sincos)
 /* Cosine and sine of `x' */
 __CREDIRECT_VOID(__DECL_SIMD_sincos __ATTR_NONNULL((2, 3)),__NOTHROW,__sincos,(double __x, double *__psinx, double *__pcosx),sincos,(__x,__psinx,__pcosx))
@@ -7541,7 +7541,7 @@ __CDECLARE_VOID(__DECL_SIMD_sincos __ATTR_NONNULL((2, 3)),__NOTHROW,__sincos,(do
 #endif /* ... */
 #if __has_builtin(__builtin_sincosf) && defined(__LIBC_BIND_CRTBUILTINS) && defined(__CRT_HAVE_sincosf)
 /* Cosine and sine of `x' */
-__CEIREDIRECT(__DECL_SIMD_sincosf __ATTR_NONNULL((2, 3)),void,__NOTHROW,__sincosf,(float __x, float *__psinx, float *__pcosx),sincosf,{ return __builtin_sincosf(__x, __psinx, __pcosx); })
+__CEIREDIRECT(__DECL_SIMD_sincosf __ATTR_NONNULL((2, 3)),void,__NOTHROW,__sincosf,(float __x, float *__psinx, float *__pcosx),sincosf,{ __builtin_sincosf(__x, __psinx, __pcosx); })
 #elif defined(__CRT_HAVE_sincosf)
 /* Cosine and sine of `x' */
 __CREDIRECT_VOID(__DECL_SIMD_sincosf __ATTR_NONNULL((2, 3)),__NOTHROW,__sincosf,(float __x, float *__psinx, float *__pcosx),sincosf,(__x,__psinx,__pcosx))
@@ -7556,7 +7556,7 @@ __FORCELOCAL __ATTR_ARTIFICIAL __DECL_SIMD_sincosf __ATTR_NONNULL((2, 3)) void _
 #ifdef __COMPILER_HAVE_LONGDOUBLE
 #if __has_builtin(__builtin_sincosl) && defined(__LIBC_BIND_CRTBUILTINS) && defined(__CRT_HAVE_sincosl)
 /* Cosine and sine of `x' */
-__CEIREDIRECT(__DECL_SIMD_sincosl __ATTR_NONNULL((2, 3)),void,__NOTHROW,__sincosl,(__LONGDOUBLE __x, __LONGDOUBLE *__psinx, __LONGDOUBLE *__pcosx),sincosl,{ return __builtin_sincosl(__x, __psinx, __pcosx); })
+__CEIREDIRECT(__DECL_SIMD_sincosl __ATTR_NONNULL((2, 3)),void,__NOTHROW,__sincosl,(__LONGDOUBLE __x, __LONGDOUBLE *__psinx, __LONGDOUBLE *__pcosx),sincosl,{ __builtin_sincosl(__x, __psinx, __pcosx); })
 #elif defined(__CRT_HAVE_sincosl)
 /* Cosine and sine of `x' */
 __CREDIRECT_VOID(__DECL_SIMD_sincosl __ATTR_NONNULL((2, 3)),__NOTHROW,__sincosl,(__LONGDOUBLE __x, __LONGDOUBLE *__psinx, __LONGDOUBLE *__pcosx),sincosl,(__x,__psinx,__pcosx))
