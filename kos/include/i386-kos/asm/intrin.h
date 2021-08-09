@@ -103,7 +103,7 @@ __FORCELOCAL void (__wrr14)(__UINTPTR_TYPE__ __val) { __asm__ __volatile__("movq
 __FORCELOCAL void (__wrr15)(__UINTPTR_TYPE__ __val) { __asm__ __volatile__("movq %q0, %%r15" : : "r" (__val) : "%r15"); }
 #endif /* !__COMPILER_HAVE_REGISTER_VARS */
 __FORCELOCAL __ATTR_WUNUSED __UINTPTR_TYPE__ (__rdflags)(void) { __UINTPTR_TYPE__ __result; __asm__ __volatile__("pushfq; popq %0" : "=g" (__result)); return __result; }
-__FORCELOCAL void (__wrflags)(__UINTPTR_TYPE__ __fl) { __asm__ __volatile__("pushq %q0; popfq" : : "g" (__fl) : "cc"); }
+__FORCELOCAL void (__wrflags)(__UINTPTR_TYPE__ __fl) { __asm__ __volatile__("pushq %q0\n\tpopfq" : : "g" (__fl) : "cc"); }
 #else /* __x86_64__ */
 #ifdef __COMPILER_HAVE_REGISTER_VARS
 __FORCELOCAL __ATTR_WUNUSED void *(__rdsp)(void) { __register void *__esp __asm__("%esp"); return __esp; }
@@ -129,10 +129,21 @@ __FORCELOCAL void (__wrsi)(void *__val) { __asm__ __volatile__("movl %k0, %%esi"
 __FORCELOCAL void (__wrbx)(__UINTPTR_TYPE__ __val) { __asm__ __volatile__("movl %k0, %%ebx" : : "g" (__val) : "%ebx"); }
 #endif /* !__COMPILER_HAVE_REGISTER_VARS */
 __FORCELOCAL __ATTR_WUNUSED __UINTPTR_TYPE__ (__rdflags)(void) { __UINTPTR_TYPE__ __result; __asm__ __volatile__("pushfl; popl %0" : "=g" (__result)); return __result; }
-__FORCELOCAL void (__wrflags)(__UINTPTR_TYPE__ __fl) { __asm__ __volatile__("pushl %k0; popfl" : : "g" (__fl) : "cc"); }
+__FORCELOCAL void (__wrflags)(__UINTPTR_TYPE__ __fl) { __asm__ __volatile__("pushl %k0\n\tpopfl" : : "g" (__fl) : "cc"); }
 #endif /* !__x86_64__ */
 #ifdef __COMPILER_HAVE_ADDRESSIBLE_LABELS
+/*[[[warning push_ignored("-Wreturn-local-addr")]]]*/
+#ifdef __GNUC__
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wreturn-local-addr"
+#endif /* __GNUC__ */
+/*[[[end]]]*/
 __FORCELOCAL __ATTR_WUNUSED void *(__rdip)(void) { __label: return (void *)&&__label; }
+/*[[[warning pop]]]*/
+#ifdef __GNUC__
+#pragma GCC diagnostic pop
+#endif /* __GNUC__ */
+/*[[[end]]]*/
 #else /* __COMPILER_HAVE_ADDRESSIBLE_LABELS */
 __FORCELOCAL __ATTR_WUNUSED void *(__rdip)(void) {
 	__register void *__result;

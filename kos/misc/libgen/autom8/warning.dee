@@ -1,0 +1,96 @@
+/* Copyright (c) 2019-2021 Griefer@Work                                       *
+ *                                                                            *
+ * This software is provided 'as-is', without any express or implied          *
+ * warranty. In no event will the authors be held liable for any damages      *
+ * arising from the use of this software.                                     *
+ *                                                                            *
+ * Permission is granted to anyone to use this software for any purpose,      *
+ * including commercial applications, and to alter it and redistribute it     *
+ * freely, subject to the following restrictions:                             *
+ *                                                                            *
+ * 1. The origin of this software must not be misrepresented; you must not    *
+ *    claim that you wrote the original software. If you use this software    *
+ *    in a product, an acknowledgement (see the following) in the product     *
+ *    documentation is required:                                              *
+ *    Portions Copyright (c) 2019-2021 Griefer@Work                           *
+ * 2. Altered source versions must be plainly marked as such, and must not be *
+ *    misrepresented as being the original software.                          *
+ * 3. This notice may not be removed or altered from any source distribution. *
+ */
+
+import * from deemon;
+import * from ..autom8;
+import * from ..c.ppexpr;
+
+function stringParen(s: string): string {
+	s = s.strip();
+	while (s.startswith("(") && s.endswith(")") &&
+	       s.findmatch("(", ")", 1) == #s - 1)
+		s = s[1:-1].strip();
+	return s;
+}
+
+@@Mapping for warning names to compiler support expressions.
+global final COMPILER_WARNING_SUPPORT_EXPRESSIONS: {string: string} = {
+	"-Wreturn-local-addr" : "defined(__GNUC__)", /* TODO: Version? */
+};
+
+function getPpCondForCompilerWarningSupport(name: string): string {
+	return COMPILER_WARNING_SUPPORT_EXPRESSIONS
+		.get(name, "defined(__GNUC__)");
+}
+
+@@Stack of active compiler warnings
+global WARNINGS_STACK: {string...} = [];
+
+function operator_push_ignored(fp: File, arg: string) {
+	if (!arg.startswith("\"") || !arg.endswith("\""))
+		throw Error("`warning push_ignored` expects a string, but was given " + repr arg);
+	local warningName = arg[1:-1].decode("c-escape");
+	WARNINGS_STACK.append(warningName);
+	local expr = getPpCondForCompilerWarningSupport(warningName);
+	fp << optimizeForIfdef(expr)
+		<< "#pragma GCC diagnostic push\n"
+		<< "#pragma GCC diagnostic ignored " << repr(warningName) << "\n"
+		<< optimizeForEndif(expr);
+}
+
+function operator_pop(fp: File, arg: string) {
+	if (arg)
+		throw Error("`warning pop` doesn't take any arguments, but was given " + repr arg);
+	if (!WARNINGS_STACK)
+		throw Error("Warnings stack is empty");
+	local warningName = WARNINGS_STACK.popback();
+	local expr = getPpCondForCompilerWarningSupport(warningName);
+	fp << optimizeForIfdef(expr)
+		<< "#pragma GCC diagnostic pop\n"
+		<< optimizeForEndif(expr);
+}
+
+global final OPERATORS: {string: Callable} = {
+	"push_ignored" : operator_push_ignored,
+	"pop"          : operator_pop,
+};
+
+
+function main(parser: Autom8Parser, body: string) {
+	body = stringParen(body);
+	if (!body || !body.issymstrt(0))
+		throw Error("Invalid warning directive: " + repr body);
+	local commandEnd = 1;
+	while (commandEnd < #body && body.issymcont(commandEnd))
+		++commandEnd;
+	local command = body[:commandEnd];
+	body = stringParen(body[commandEnd:]);
+
+	local autoEnd = parser.text.find("/*[[[end]]]*/", parser.commentEnd);
+	if (autoEnd < 0)
+		parser.errAt(parser.commentStart, "Missing /*[[[end]]]*/ tag");
+	parser.newText << parser.text[parser.flushStart:parser.commentEnd+2] << "\n";
+	parser.flushStart = autoEnd + 13;
+
+	/* Invoke the command-specific handler. */
+	OPERATORS[command](parser.newText, body);
+
+	parser.newText << "/*[[[end]]]*/";
+}

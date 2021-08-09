@@ -1552,6 +1552,28 @@ function optimize(expr: string, assumedExpr: string = none): string {
 }
 
 
+@@Same as @optimize, but automatically wrap for a `#if`, `#ifdef` or `#ifndef` expression
+@@The returned string is semantically equivalent to `"#if " + optimize(expr) + "\n"`
+function optimizeForIfdef(expr: string): string {
+	local result = optimize(expr);
+	if (result.startswith("defined(") && result.endswith(")") &&
+	    result.findmatch("(", ")", 8) == #result - 1)
+		return "#ifdef {}\n".format({ result[8:-1].strip() });
+	if (expr.startswith("!defined(") && expr.endswith(")") &&
+	    expr.findmatch("(", ")", 9) == #expr - 1)
+		return "#ifndef {}\n".format({ result[8:-1].strip() });
+	return "#if {}\n".format({ result });
+}
+
+function optimizeForEndif(expr: string): string {
+	return "#endif /* {} */\n".format({
+		ppParse(expr)
+			.optimize()
+			.tostr(removeDefined: true)
+	});
+}
+
+
 
 
 #ifdef __MAIN__
