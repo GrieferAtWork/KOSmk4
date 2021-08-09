@@ -600,7 +600,7 @@ NOTHROW(CC collect_devname_ids)(struct pci_vennameid_list *ven_names,
 }
 
 /* Return upper limit estimates for how many vendor/device names are referenced. */
-PRIVATE WUNUSED void
+PRIVATE NONNULL((1, 2)) void
 NOTHROW(CC get_pci_device_id_max_count)(size_t *__restrict pvendor_count,
                                         size_t *__restrict pdevice_count) {
 	struct pci_device *dev;
