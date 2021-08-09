@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xedf281ac */
+/* HASH CRC-32:0xe2935f7c */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -18,21 +18,23 @@
  *    misrepresented as being the original software.                          *
  * 3. This notice may not be removed or altered from any source distribution. *
  */
-#ifndef __local_dcgettext_defined
-#define __local_dcgettext_defined 1
+#ifndef __local_dcngettext_defined
+#define __local_dcngettext_defined 1
 #include <__crt.h>
+#include <hybrid/typecore.h>
 __NAMESPACE_LOCAL_BEGIN
-__LOCAL_LIBC(dcgettext) __ATTR_PURE __ATTR_WUNUSED __ATTR_FORMAT_ARG(2) char *
-__NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(dcgettext))(char const *__domainname, char const *__msgid, int __category) {
+__LOCAL_LIBC(dcngettext) __ATTR_PURE __ATTR_WUNUSED __ATTR_FORMAT_ARG(2) __ATTR_FORMAT_ARG(3) char *
+__NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(dcngettext))(char const *__domainname, char const *__msgid_singular, char const *__msgid_plural, __ULONGPTR_TYPE__ __n, int __category) {
 	/* Generic no-op that works, but doesn't actually support languages */
 	__COMPILER_IMPURE();
 	(void)__domainname;
 	(void)__category;
-	return (char *)__msgid;
+	return __n == 1 ? (char *)__msgid_singular
+	              : (char *)__msgid_plural;
 }
 __NAMESPACE_LOCAL_END
-#ifndef __local___localdep_dcgettext_defined
-#define __local___localdep_dcgettext_defined 1
-#define __localdep_dcgettext __LIBC_LOCAL_NAME(dcgettext)
-#endif /* !__local___localdep_dcgettext_defined */
-#endif /* !__local_dcgettext_defined */
+#ifndef __local___localdep_dcngettext_defined
+#define __local___localdep_dcngettext_defined 1
+#define __localdep_dcngettext __LIBC_LOCAL_NAME(dcngettext)
+#endif /* !__local___localdep_dcngettext_defined */
+#endif /* !__local_dcngettext_defined */

@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x818bc663 */
+/* HASH CRC-32:0x3d257967 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -34,46 +34,61 @@ DECL_BEGIN
 #define __LC_MESSAGES 0
 #endif /* !__LC_MESSAGES */
 INTERN ATTR_SECTION(".text.crt.i18n") ATTR_PURE WUNUSED __ATTR_FORMAT_ARG(2) char *
+NOTHROW_NCX(LIBCCALL libc_dcgettext)(char const *domainname,
+                                     char const *msgid,
+                                     int category) {
+	return libc_dcngettext(domainname, msgid, NULL, 1, category);
+}
+#include <bits/crt/locale.h>
+#ifndef __LC_MESSAGES
+#define __LC_MESSAGES 0
+#endif /* !__LC_MESSAGES */
+INTERN ATTR_SECTION(".text.crt.i18n") ATTR_PURE WUNUSED __ATTR_FORMAT_ARG(2) char *
 NOTHROW_NCX(LIBCCALL libc_dgettext)(char const *domainname,
                                     char const *msgid) {
-	return libc_dcgettext(domainname, msgid, __LC_MESSAGES);
+	return libc_dcngettext(domainname, msgid, NULL, 1, __LC_MESSAGES);
 }
+#include <bits/crt/locale.h>
+#ifndef __LC_MESSAGES
+#define __LC_MESSAGES 0
+#endif /* !__LC_MESSAGES */
 INTERN ATTR_SECTION(".text.crt.i18n") ATTR_PURE WUNUSED __ATTR_FORMAT_ARG(1) char *
 NOTHROW_NCX(LIBCCALL libc_gettext)(char const *msgid) {
-	return libc_dgettext(NULL, msgid);
+	return libc_dcngettext(NULL, msgid, NULL, 1, __LC_MESSAGES);
 }
+#include <bits/crt/locale.h>
+#ifndef __LC_MESSAGES
+#define __LC_MESSAGES 0
+#endif /* !__LC_MESSAGES */
 INTERN ATTR_SECTION(".text.crt.i18n") ATTR_PURE WUNUSED __ATTR_FORMAT_ARG(1) __ATTR_FORMAT_ARG(2) char *
 NOTHROW_NCX(LIBCCALL libc_ngettext)(char const *msgid_singular,
                                     char const *msgid_plural,
                                     ulongptr_t n) {
-	return libc_dgettext(NULL, (n) == 1 ? msgid_singular : msgid_plural);
+	return libc_dcngettext(NULL, msgid_singular, msgid_plural, n, __LC_MESSAGES);
 }
+#include <bits/crt/locale.h>
+#ifndef __LC_MESSAGES
+#define __LC_MESSAGES 0
+#endif /* !__LC_MESSAGES */
 INTERN ATTR_SECTION(".text.crt.i18n") ATTR_PURE WUNUSED __ATTR_FORMAT_ARG(2) __ATTR_FORMAT_ARG(3) char *
 NOTHROW_NCX(LIBCCALL libc_dngettext)(char const *domainname,
                                      char const *msgid_singular,
                                      char const *msgid_plural,
                                      ulongptr_t n) {
-	return libc_dgettext(domainname, (n) == 1 ? msgid_singular : msgid_plural);
-}
-INTERN ATTR_SECTION(".text.crt.i18n") ATTR_PURE WUNUSED __ATTR_FORMAT_ARG(2) __ATTR_FORMAT_ARG(3) char *
-NOTHROW_NCX(LIBCCALL libc_dcngettext)(char const *domainname,
-                                      char const *msgid_singular,
-                                      char const *msgid_plural,
-                                      ulongptr_t n,
-                                      int category) {
-	return libc_dcgettext(domainname, (n) == 1 ? msgid_singular : msgid_plural, category);
+	return libc_dcngettext(domainname, msgid_singular, msgid_plural, n, __LC_MESSAGES);
 }
 #endif /* !__KERNEL__ */
 
 DECL_END
 
 #ifndef __KERNEL__
+DEFINE_PUBLIC_ALIAS(__dcgettext, libc_dcgettext);
+DEFINE_PUBLIC_ALIAS(dcgettext, libc_dcgettext);
 DEFINE_PUBLIC_ALIAS(__dgettext, libc_dgettext);
 DEFINE_PUBLIC_ALIAS(dgettext, libc_dgettext);
 DEFINE_PUBLIC_ALIAS(gettext, libc_gettext);
 DEFINE_PUBLIC_ALIAS(ngettext, libc_ngettext);
 DEFINE_PUBLIC_ALIAS(dngettext, libc_dngettext);
-DEFINE_PUBLIC_ALIAS(dcngettext, libc_dcngettext);
 #endif /* !__KERNEL__ */
 
 #endif /* !GUARD_LIBC_AUTO_LIBINTL_C */

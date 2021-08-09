@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xba8d15e5 */
+/* HASH CRC-32:0x192368f7 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -43,502 +43,318 @@
 #ifdef __CC__
 __SYSDECL_BEGIN
 
-#ifdef __CRT_HAVE_dcgettext
-__CDECLARE(__ATTR_PURE __ATTR_WUNUSED __ATTR_FORMAT_ARG(2),char *,__NOTHROW_NCX,dcgettext,(char const *__domainname, char const *__msgid, int __category),(__domainname,__msgid,__category))
-#elif defined(__CRT_HAVE___dcgettext)
-__CREDIRECT(__ATTR_PURE __ATTR_WUNUSED __ATTR_FORMAT_ARG(2),char *,__NOTHROW_NCX,dcgettext,(char const *__domainname, char const *__msgid, int __category),__dcgettext,(__domainname,__msgid,__category))
-#else /* ... */
-#include <libc/local/libintl/dcgettext.h>
-__NAMESPACE_LOCAL_USING_OR_IMPL(dcgettext, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_PURE __ATTR_WUNUSED __ATTR_FORMAT_ARG(2) char *__NOTHROW_NCX(__LIBCCALL dcgettext)(char const *__domainname, char const *__msgid, int __category) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(dcgettext))(__domainname, __msgid, __category); })
-#endif /* !... */
-#if defined(__CRT_HAVE_dgettext) && (defined(__LC_MESSAGES) || (!defined(__CRT_HAVE_dcgettext) && !defined(__CRT_HAVE___dcgettext)))
-__NAMESPACE_LOCAL_BEGIN
-#ifndef __local___localdep_dcgettext_defined
-#define __local___localdep_dcgettext_defined 1
-#ifdef __CRT_HAVE_dcgettext
-__CREDIRECT(__ATTR_PURE __ATTR_WUNUSED __ATTR_FORMAT_ARG(2),char *,__NOTHROW_NCX,__localdep_dcgettext,(char const *__domainname, char const *__msgid, int __category),dcgettext,(__domainname,__msgid,__category))
-#elif defined(__CRT_HAVE___dcgettext)
-__CREDIRECT(__ATTR_PURE __ATTR_WUNUSED __ATTR_FORMAT_ARG(2),char *,__NOTHROW_NCX,__localdep_dcgettext,(char const *__domainname, char const *__msgid, int __category),__dcgettext,(__domainname,__msgid,__category))
-#else /* ... */
-__NAMESPACE_LOCAL_END
-#include <libc/local/libintl/dcgettext.h>
-__NAMESPACE_LOCAL_BEGIN
-#define __localdep_dcgettext __LIBC_LOCAL_NAME(dcgettext)
-#endif /* !... */
-#endif /* !__local___localdep_dcgettext_defined */
-__NAMESPACE_LOCAL_END
 #ifndef __LC_MESSAGES
 #define __LC_MESSAGES 0
 #endif /* !__LC_MESSAGES */
-__CEIDECLARE(__ATTR_PURE __ATTR_WUNUSED __ATTR_FORMAT_ARG(2),char *,__NOTHROW_NCX,dgettext,(char const *__domainname, char const *__msgid),{ return (__NAMESPACE_LOCAL_SYM __localdep_dcgettext)(__domainname, __msgid, __LC_MESSAGES); })
-#elif defined(__CRT_HAVE_dgettext)
-__CDECLARE(__ATTR_PURE __ATTR_WUNUSED __ATTR_FORMAT_ARG(2),char *,__NOTHROW_NCX,dgettext,(char const *__domainname, char const *__msgid),(__domainname,__msgid))
-#elif defined(__CRT_HAVE___dgettext)
-__CREDIRECT(__ATTR_PURE __ATTR_WUNUSED __ATTR_FORMAT_ARG(2),char *,__NOTHROW_NCX,dgettext,(char const *__domainname, char const *__msgid),__dgettext,(__domainname,__msgid))
-#elif defined(__LC_MESSAGES) || (!defined(__CRT_HAVE_dcgettext) && !defined(__CRT_HAVE___dcgettext))
-__NAMESPACE_LOCAL_BEGIN
-#ifndef __local___localdep_dcgettext_defined
-#define __local___localdep_dcgettext_defined 1
 #ifdef __CRT_HAVE_dcgettext
-__CREDIRECT(__ATTR_PURE __ATTR_WUNUSED __ATTR_FORMAT_ARG(2),char *,__NOTHROW_NCX,__localdep_dcgettext,(char const *__domainname, char const *__msgid, int __category),dcgettext,(__domainname,__msgid,__category))
-#elif defined(__CRT_HAVE___dcgettext)
-__CREDIRECT(__ATTR_PURE __ATTR_WUNUSED __ATTR_FORMAT_ARG(2),char *,__NOTHROW_NCX,__localdep_dcgettext,(char const *__domainname, char const *__msgid, int __category),__dcgettext,(__domainname,__msgid,__category))
-#else /* ... */
-__NAMESPACE_LOCAL_END
-#include <libc/local/libintl/dcgettext.h>
 __NAMESPACE_LOCAL_BEGIN
-#define __localdep_dcgettext __LIBC_LOCAL_NAME(dcgettext)
-#endif /* !... */
-#endif /* !__local___localdep_dcgettext_defined */
-__NAMESPACE_LOCAL_END
-#ifndef __LC_MESSAGES
-#define __LC_MESSAGES 0
-#endif /* !__LC_MESSAGES */
-__LOCAL __ATTR_PURE __ATTR_WUNUSED __ATTR_FORMAT_ARG(2) char *__NOTHROW_NCX(__LIBCCALL dgettext)(char const *__domainname, char const *__msgid) { return (__NAMESPACE_LOCAL_SYM __localdep_dcgettext)(__domainname, __msgid, __LC_MESSAGES); }
-#endif /* ... */
-#if defined(__CRT_HAVE_gettext) && (defined(__CRT_HAVE_dgettext) || defined(__CRT_HAVE___dgettext) || defined(__LC_MESSAGES) || (!defined(__CRT_HAVE_dcgettext) && !defined(__CRT_HAVE___dcgettext)))
-__NAMESPACE_LOCAL_BEGIN
-#ifndef __local___localdep_dgettext_defined
-#define __local___localdep_dgettext_defined 1
-#if defined(__CRT_HAVE_dgettext) && (defined(__LC_MESSAGES) || (!defined(__CRT_HAVE_dcgettext) && !defined(__CRT_HAVE___dcgettext)))
-#ifndef __local___localdep_dcgettext_defined
-#define __local___localdep_dcgettext_defined 1
-#ifdef __CRT_HAVE_dcgettext
-__CREDIRECT(__ATTR_PURE __ATTR_WUNUSED __ATTR_FORMAT_ARG(2),char *,__NOTHROW_NCX,__localdep_dcgettext,(char const *__domainname, char const *__msgid, int __category),dcgettext,(__domainname,__msgid,__category))
-#elif defined(__CRT_HAVE___dcgettext)
-__CREDIRECT(__ATTR_PURE __ATTR_WUNUSED __ATTR_FORMAT_ARG(2),char *,__NOTHROW_NCX,__localdep_dcgettext,(char const *__domainname, char const *__msgid, int __category),__dcgettext,(__domainname,__msgid,__category))
-#else /* ... */
-__NAMESPACE_LOCAL_END
-#include <libc/local/libintl/dcgettext.h>
-__NAMESPACE_LOCAL_BEGIN
-#define __localdep_dcgettext __LIBC_LOCAL_NAME(dcgettext)
-#endif /* !... */
-#endif /* !__local___localdep_dcgettext_defined */
-__NAMESPACE_LOCAL_END
-#ifndef __LC_MESSAGES
-#define __LC_MESSAGES 0
-#endif /* !__LC_MESSAGES */
-__NAMESPACE_LOCAL_BEGIN
-__CEIREDIRECT(__ATTR_PURE __ATTR_WUNUSED __ATTR_FORMAT_ARG(2),char *,__NOTHROW_NCX,__localdep_dgettext,(char const *__domainname, char const *__msgid),dgettext,{ return __localdep_dcgettext(__domainname, __msgid, __LC_MESSAGES); })
-#elif defined(__CRT_HAVE_dgettext)
-__CREDIRECT(__ATTR_PURE __ATTR_WUNUSED __ATTR_FORMAT_ARG(2),char *,__NOTHROW_NCX,__localdep_dgettext,(char const *__domainname, char const *__msgid),dgettext,(__domainname,__msgid))
-#elif defined(__CRT_HAVE___dgettext)
-__CREDIRECT(__ATTR_PURE __ATTR_WUNUSED __ATTR_FORMAT_ARG(2),char *,__NOTHROW_NCX,__localdep_dgettext,(char const *__domainname, char const *__msgid),__dgettext,(__domainname,__msgid))
-#elif defined(__LC_MESSAGES) || (!defined(__CRT_HAVE_dcgettext) && !defined(__CRT_HAVE___dcgettext))
-#ifndef __local___localdep_dcgettext_defined
-#define __local___localdep_dcgettext_defined 1
-#ifdef __CRT_HAVE_dcgettext
-__CREDIRECT(__ATTR_PURE __ATTR_WUNUSED __ATTR_FORMAT_ARG(2),char *,__NOTHROW_NCX,__localdep_dcgettext,(char const *__domainname, char const *__msgid, int __category),dcgettext,(__domainname,__msgid,__category))
-#elif defined(__CRT_HAVE___dcgettext)
-__CREDIRECT(__ATTR_PURE __ATTR_WUNUSED __ATTR_FORMAT_ARG(2),char *,__NOTHROW_NCX,__localdep_dcgettext,(char const *__domainname, char const *__msgid, int __category),__dcgettext,(__domainname,__msgid,__category))
-#else /* ... */
-__NAMESPACE_LOCAL_END
-#include <libc/local/libintl/dcgettext.h>
-__NAMESPACE_LOCAL_BEGIN
-#define __localdep_dcgettext __LIBC_LOCAL_NAME(dcgettext)
-#endif /* !... */
-#endif /* !__local___localdep_dcgettext_defined */
-__NAMESPACE_LOCAL_END
-#ifndef __LC_MESSAGES
-#define __LC_MESSAGES 0
-#endif /* !__LC_MESSAGES */
-__NAMESPACE_LOCAL_BEGIN
-__LOCAL __ATTR_PURE __ATTR_WUNUSED __ATTR_FORMAT_ARG(2) char *__NOTHROW_NCX(__LIBCCALL __localdep_dgettext)(char const *__domainname, char const *__msgid) { return __localdep_dcgettext(__domainname, __msgid, __LC_MESSAGES); }
-#else /* ... */
-#undef __local___localdep_dgettext_defined
-#endif /* !... */
-#endif /* !__local___localdep_dgettext_defined */
-__NAMESPACE_LOCAL_END
-__CEIDECLARE(__ATTR_PURE __ATTR_WUNUSED __ATTR_FORMAT_ARG(1),char *,__NOTHROW_NCX,gettext,(char const *__msgid),{ return (__NAMESPACE_LOCAL_SYM __localdep_dgettext)(__NULLPTR, __msgid); })
-#elif defined(__CRT_HAVE_gettext)
-__CDECLARE(__ATTR_PURE __ATTR_WUNUSED __ATTR_FORMAT_ARG(1),char *,__NOTHROW_NCX,gettext,(char const *__msgid),(__msgid))
-#elif defined(__CRT_HAVE_dgettext) || defined(__CRT_HAVE___dgettext) || defined(__LC_MESSAGES) || (!defined(__CRT_HAVE_dcgettext) && !defined(__CRT_HAVE___dcgettext))
-__NAMESPACE_LOCAL_BEGIN
-#ifndef __local___localdep_dgettext_defined
-#define __local___localdep_dgettext_defined 1
-#if defined(__CRT_HAVE_dgettext) && (defined(__LC_MESSAGES) || (!defined(__CRT_HAVE_dcgettext) && !defined(__CRT_HAVE___dcgettext)))
-#ifndef __local___localdep_dcgettext_defined
-#define __local___localdep_dcgettext_defined 1
-#ifdef __CRT_HAVE_dcgettext
-__CREDIRECT(__ATTR_PURE __ATTR_WUNUSED __ATTR_FORMAT_ARG(2),char *,__NOTHROW_NCX,__localdep_dcgettext,(char const *__domainname, char const *__msgid, int __category),dcgettext,(__domainname,__msgid,__category))
-#elif defined(__CRT_HAVE___dcgettext)
-__CREDIRECT(__ATTR_PURE __ATTR_WUNUSED __ATTR_FORMAT_ARG(2),char *,__NOTHROW_NCX,__localdep_dcgettext,(char const *__domainname, char const *__msgid, int __category),__dcgettext,(__domainname,__msgid,__category))
-#else /* ... */
-__NAMESPACE_LOCAL_END
-#include <libc/local/libintl/dcgettext.h>
-__NAMESPACE_LOCAL_BEGIN
-#define __localdep_dcgettext __LIBC_LOCAL_NAME(dcgettext)
-#endif /* !... */
-#endif /* !__local___localdep_dcgettext_defined */
-__NAMESPACE_LOCAL_END
-#ifndef __LC_MESSAGES
-#define __LC_MESSAGES 0
-#endif /* !__LC_MESSAGES */
-__NAMESPACE_LOCAL_BEGIN
-__CEIREDIRECT(__ATTR_PURE __ATTR_WUNUSED __ATTR_FORMAT_ARG(2),char *,__NOTHROW_NCX,__localdep_dgettext,(char const *__domainname, char const *__msgid),dgettext,{ return __localdep_dcgettext(__domainname, __msgid, __LC_MESSAGES); })
-#elif defined(__CRT_HAVE_dgettext)
-__CREDIRECT(__ATTR_PURE __ATTR_WUNUSED __ATTR_FORMAT_ARG(2),char *,__NOTHROW_NCX,__localdep_dgettext,(char const *__domainname, char const *__msgid),dgettext,(__domainname,__msgid))
-#elif defined(__CRT_HAVE___dgettext)
-__CREDIRECT(__ATTR_PURE __ATTR_WUNUSED __ATTR_FORMAT_ARG(2),char *,__NOTHROW_NCX,__localdep_dgettext,(char const *__domainname, char const *__msgid),__dgettext,(__domainname,__msgid))
-#elif defined(__LC_MESSAGES) || (!defined(__CRT_HAVE_dcgettext) && !defined(__CRT_HAVE___dcgettext))
-#ifndef __local___localdep_dcgettext_defined
-#define __local___localdep_dcgettext_defined 1
-#ifdef __CRT_HAVE_dcgettext
-__CREDIRECT(__ATTR_PURE __ATTR_WUNUSED __ATTR_FORMAT_ARG(2),char *,__NOTHROW_NCX,__localdep_dcgettext,(char const *__domainname, char const *__msgid, int __category),dcgettext,(__domainname,__msgid,__category))
-#elif defined(__CRT_HAVE___dcgettext)
-__CREDIRECT(__ATTR_PURE __ATTR_WUNUSED __ATTR_FORMAT_ARG(2),char *,__NOTHROW_NCX,__localdep_dcgettext,(char const *__domainname, char const *__msgid, int __category),__dcgettext,(__domainname,__msgid,__category))
-#else /* ... */
-__NAMESPACE_LOCAL_END
-#include <libc/local/libintl/dcgettext.h>
-__NAMESPACE_LOCAL_BEGIN
-#define __localdep_dcgettext __LIBC_LOCAL_NAME(dcgettext)
-#endif /* !... */
-#endif /* !__local___localdep_dcgettext_defined */
-__NAMESPACE_LOCAL_END
-#ifndef __LC_MESSAGES
-#define __LC_MESSAGES 0
-#endif /* !__LC_MESSAGES */
-__NAMESPACE_LOCAL_BEGIN
-__LOCAL __ATTR_PURE __ATTR_WUNUSED __ATTR_FORMAT_ARG(2) char *__NOTHROW_NCX(__LIBCCALL __localdep_dgettext)(char const *__domainname, char const *__msgid) { return __localdep_dcgettext(__domainname, __msgid, __LC_MESSAGES); }
-#else /* ... */
-#undef __local___localdep_dgettext_defined
-#endif /* !... */
-#endif /* !__local___localdep_dgettext_defined */
-__NAMESPACE_LOCAL_END
-__LOCAL __ATTR_PURE __ATTR_WUNUSED __ATTR_FORMAT_ARG(1) char *__NOTHROW_NCX(__LIBCCALL gettext)(char const *__msgid) { return (__NAMESPACE_LOCAL_SYM __localdep_dgettext)(__NULLPTR, __msgid); }
-#endif /* ... */
-#if defined(__CRT_HAVE_ngettext) && (defined(__CRT_HAVE_dgettext) || defined(__CRT_HAVE___dgettext) || defined(__LC_MESSAGES) || (!defined(__CRT_HAVE_dcgettext) && !defined(__CRT_HAVE___dcgettext)))
-__NAMESPACE_LOCAL_BEGIN
-#ifndef __local___localdep_dgettext_defined
-#define __local___localdep_dgettext_defined 1
-#if defined(__CRT_HAVE_dgettext) && (defined(__LC_MESSAGES) || (!defined(__CRT_HAVE_dcgettext) && !defined(__CRT_HAVE___dcgettext)))
-#ifndef __local___localdep_dcgettext_defined
-#define __local___localdep_dcgettext_defined 1
-#ifdef __CRT_HAVE_dcgettext
-__CREDIRECT(__ATTR_PURE __ATTR_WUNUSED __ATTR_FORMAT_ARG(2),char *,__NOTHROW_NCX,__localdep_dcgettext,(char const *__domainname, char const *__msgid, int __category),dcgettext,(__domainname,__msgid,__category))
-#elif defined(__CRT_HAVE___dcgettext)
-__CREDIRECT(__ATTR_PURE __ATTR_WUNUSED __ATTR_FORMAT_ARG(2),char *,__NOTHROW_NCX,__localdep_dcgettext,(char const *__domainname, char const *__msgid, int __category),__dcgettext,(__domainname,__msgid,__category))
-#else /* ... */
-__NAMESPACE_LOCAL_END
-#include <libc/local/libintl/dcgettext.h>
-__NAMESPACE_LOCAL_BEGIN
-#define __localdep_dcgettext __LIBC_LOCAL_NAME(dcgettext)
-#endif /* !... */
-#endif /* !__local___localdep_dcgettext_defined */
-__NAMESPACE_LOCAL_END
-#ifndef __LC_MESSAGES
-#define __LC_MESSAGES 0
-#endif /* !__LC_MESSAGES */
-__NAMESPACE_LOCAL_BEGIN
-__CEIREDIRECT(__ATTR_PURE __ATTR_WUNUSED __ATTR_FORMAT_ARG(2),char *,__NOTHROW_NCX,__localdep_dgettext,(char const *__domainname, char const *__msgid),dgettext,{ return __localdep_dcgettext(__domainname, __msgid, __LC_MESSAGES); })
-#elif defined(__CRT_HAVE_dgettext)
-__CREDIRECT(__ATTR_PURE __ATTR_WUNUSED __ATTR_FORMAT_ARG(2),char *,__NOTHROW_NCX,__localdep_dgettext,(char const *__domainname, char const *__msgid),dgettext,(__domainname,__msgid))
-#elif defined(__CRT_HAVE___dgettext)
-__CREDIRECT(__ATTR_PURE __ATTR_WUNUSED __ATTR_FORMAT_ARG(2),char *,__NOTHROW_NCX,__localdep_dgettext,(char const *__domainname, char const *__msgid),__dgettext,(__domainname,__msgid))
-#elif defined(__LC_MESSAGES) || (!defined(__CRT_HAVE_dcgettext) && !defined(__CRT_HAVE___dcgettext))
-#ifndef __local___localdep_dcgettext_defined
-#define __local___localdep_dcgettext_defined 1
-#ifdef __CRT_HAVE_dcgettext
-__CREDIRECT(__ATTR_PURE __ATTR_WUNUSED __ATTR_FORMAT_ARG(2),char *,__NOTHROW_NCX,__localdep_dcgettext,(char const *__domainname, char const *__msgid, int __category),dcgettext,(__domainname,__msgid,__category))
-#elif defined(__CRT_HAVE___dcgettext)
-__CREDIRECT(__ATTR_PURE __ATTR_WUNUSED __ATTR_FORMAT_ARG(2),char *,__NOTHROW_NCX,__localdep_dcgettext,(char const *__domainname, char const *__msgid, int __category),__dcgettext,(__domainname,__msgid,__category))
-#else /* ... */
-__NAMESPACE_LOCAL_END
-#include <libc/local/libintl/dcgettext.h>
-__NAMESPACE_LOCAL_BEGIN
-#define __localdep_dcgettext __LIBC_LOCAL_NAME(dcgettext)
-#endif /* !... */
-#endif /* !__local___localdep_dcgettext_defined */
-__NAMESPACE_LOCAL_END
-#ifndef __LC_MESSAGES
-#define __LC_MESSAGES 0
-#endif /* !__LC_MESSAGES */
-__NAMESPACE_LOCAL_BEGIN
-__LOCAL __ATTR_PURE __ATTR_WUNUSED __ATTR_FORMAT_ARG(2) char *__NOTHROW_NCX(__LIBCCALL __localdep_dgettext)(char const *__domainname, char const *__msgid) { return __localdep_dcgettext(__domainname, __msgid, __LC_MESSAGES); }
-#else /* ... */
-#undef __local___localdep_dgettext_defined
-#endif /* !... */
-#endif /* !__local___localdep_dgettext_defined */
-__NAMESPACE_LOCAL_END
-__CEIDECLARE(__ATTR_PURE __ATTR_WUNUSED __ATTR_FORMAT_ARG(1) __ATTR_FORMAT_ARG(2),char *,__NOTHROW_NCX,ngettext,(char const *__msgid_singular, char const *__msgid_plural, __ULONGPTR_TYPE__ __n),{ return (__NAMESPACE_LOCAL_SYM __localdep_dgettext)(__NULLPTR, (__n) == 1 ? __msgid_singular : __msgid_plural); })
-#elif defined(__CRT_HAVE_ngettext)
-__CDECLARE(__ATTR_PURE __ATTR_WUNUSED __ATTR_FORMAT_ARG(1) __ATTR_FORMAT_ARG(2),char *,__NOTHROW_NCX,ngettext,(char const *__msgid_singular, char const *__msgid_plural, __ULONGPTR_TYPE__ __n),(__msgid_singular,__msgid_plural,__n))
-#elif defined(__CRT_HAVE_dgettext) || defined(__CRT_HAVE___dgettext) || defined(__LC_MESSAGES) || (!defined(__CRT_HAVE_dcgettext) && !defined(__CRT_HAVE___dcgettext))
-__NAMESPACE_LOCAL_BEGIN
-#ifndef __local___localdep_dgettext_defined
-#define __local___localdep_dgettext_defined 1
-#if defined(__CRT_HAVE_dgettext) && (defined(__LC_MESSAGES) || (!defined(__CRT_HAVE_dcgettext) && !defined(__CRT_HAVE___dcgettext)))
-#ifndef __local___localdep_dcgettext_defined
-#define __local___localdep_dcgettext_defined 1
-#ifdef __CRT_HAVE_dcgettext
-__CREDIRECT(__ATTR_PURE __ATTR_WUNUSED __ATTR_FORMAT_ARG(2),char *,__NOTHROW_NCX,__localdep_dcgettext,(char const *__domainname, char const *__msgid, int __category),dcgettext,(__domainname,__msgid,__category))
-#elif defined(__CRT_HAVE___dcgettext)
-__CREDIRECT(__ATTR_PURE __ATTR_WUNUSED __ATTR_FORMAT_ARG(2),char *,__NOTHROW_NCX,__localdep_dcgettext,(char const *__domainname, char const *__msgid, int __category),__dcgettext,(__domainname,__msgid,__category))
-#else /* ... */
-__NAMESPACE_LOCAL_END
-#include <libc/local/libintl/dcgettext.h>
-__NAMESPACE_LOCAL_BEGIN
-#define __localdep_dcgettext __LIBC_LOCAL_NAME(dcgettext)
-#endif /* !... */
-#endif /* !__local___localdep_dcgettext_defined */
-__NAMESPACE_LOCAL_END
-#ifndef __LC_MESSAGES
-#define __LC_MESSAGES 0
-#endif /* !__LC_MESSAGES */
-__NAMESPACE_LOCAL_BEGIN
-__CEIREDIRECT(__ATTR_PURE __ATTR_WUNUSED __ATTR_FORMAT_ARG(2),char *,__NOTHROW_NCX,__localdep_dgettext,(char const *__domainname, char const *__msgid),dgettext,{ return __localdep_dcgettext(__domainname, __msgid, __LC_MESSAGES); })
-#elif defined(__CRT_HAVE_dgettext)
-__CREDIRECT(__ATTR_PURE __ATTR_WUNUSED __ATTR_FORMAT_ARG(2),char *,__NOTHROW_NCX,__localdep_dgettext,(char const *__domainname, char const *__msgid),dgettext,(__domainname,__msgid))
-#elif defined(__CRT_HAVE___dgettext)
-__CREDIRECT(__ATTR_PURE __ATTR_WUNUSED __ATTR_FORMAT_ARG(2),char *,__NOTHROW_NCX,__localdep_dgettext,(char const *__domainname, char const *__msgid),__dgettext,(__domainname,__msgid))
-#elif defined(__LC_MESSAGES) || (!defined(__CRT_HAVE_dcgettext) && !defined(__CRT_HAVE___dcgettext))
-#ifndef __local___localdep_dcgettext_defined
-#define __local___localdep_dcgettext_defined 1
-#ifdef __CRT_HAVE_dcgettext
-__CREDIRECT(__ATTR_PURE __ATTR_WUNUSED __ATTR_FORMAT_ARG(2),char *,__NOTHROW_NCX,__localdep_dcgettext,(char const *__domainname, char const *__msgid, int __category),dcgettext,(__domainname,__msgid,__category))
-#elif defined(__CRT_HAVE___dcgettext)
-__CREDIRECT(__ATTR_PURE __ATTR_WUNUSED __ATTR_FORMAT_ARG(2),char *,__NOTHROW_NCX,__localdep_dcgettext,(char const *__domainname, char const *__msgid, int __category),__dcgettext,(__domainname,__msgid,__category))
-#else /* ... */
-__NAMESPACE_LOCAL_END
-#include <libc/local/libintl/dcgettext.h>
-__NAMESPACE_LOCAL_BEGIN
-#define __localdep_dcgettext __LIBC_LOCAL_NAME(dcgettext)
-#endif /* !... */
-#endif /* !__local___localdep_dcgettext_defined */
-__NAMESPACE_LOCAL_END
-#ifndef __LC_MESSAGES
-#define __LC_MESSAGES 0
-#endif /* !__LC_MESSAGES */
-__NAMESPACE_LOCAL_BEGIN
-__LOCAL __ATTR_PURE __ATTR_WUNUSED __ATTR_FORMAT_ARG(2) char *__NOTHROW_NCX(__LIBCCALL __localdep_dgettext)(char const *__domainname, char const *__msgid) { return __localdep_dcgettext(__domainname, __msgid, __LC_MESSAGES); }
-#else /* ... */
-#undef __local___localdep_dgettext_defined
-#endif /* !... */
-#endif /* !__local___localdep_dgettext_defined */
-__NAMESPACE_LOCAL_END
-__LOCAL __ATTR_PURE __ATTR_WUNUSED __ATTR_FORMAT_ARG(1) __ATTR_FORMAT_ARG(2) char *__NOTHROW_NCX(__LIBCCALL ngettext)(char const *__msgid_singular, char const *__msgid_plural, __ULONGPTR_TYPE__ __n) { return (__NAMESPACE_LOCAL_SYM __localdep_dgettext)(__NULLPTR, (__n) == 1 ? __msgid_singular : __msgid_plural); }
-#endif /* ... */
-#if defined(__CRT_HAVE_dngettext) && (defined(__CRT_HAVE_dgettext) || defined(__CRT_HAVE___dgettext) || defined(__LC_MESSAGES) || (!defined(__CRT_HAVE_dcgettext) && !defined(__CRT_HAVE___dcgettext)))
-__NAMESPACE_LOCAL_BEGIN
-#ifndef __local___localdep_dgettext_defined
-#define __local___localdep_dgettext_defined 1
-#if defined(__CRT_HAVE_dgettext) && (defined(__LC_MESSAGES) || (!defined(__CRT_HAVE_dcgettext) && !defined(__CRT_HAVE___dcgettext)))
-#ifndef __local___localdep_dcgettext_defined
-#define __local___localdep_dcgettext_defined 1
-#ifdef __CRT_HAVE_dcgettext
-__CREDIRECT(__ATTR_PURE __ATTR_WUNUSED __ATTR_FORMAT_ARG(2),char *,__NOTHROW_NCX,__localdep_dcgettext,(char const *__domainname, char const *__msgid, int __category),dcgettext,(__domainname,__msgid,__category))
-#elif defined(__CRT_HAVE___dcgettext)
-__CREDIRECT(__ATTR_PURE __ATTR_WUNUSED __ATTR_FORMAT_ARG(2),char *,__NOTHROW_NCX,__localdep_dcgettext,(char const *__domainname, char const *__msgid, int __category),__dcgettext,(__domainname,__msgid,__category))
-#else /* ... */
-__NAMESPACE_LOCAL_END
-#include <libc/local/libintl/dcgettext.h>
-__NAMESPACE_LOCAL_BEGIN
-#define __localdep_dcgettext __LIBC_LOCAL_NAME(dcgettext)
-#endif /* !... */
-#endif /* !__local___localdep_dcgettext_defined */
-__NAMESPACE_LOCAL_END
-#ifndef __LC_MESSAGES
-#define __LC_MESSAGES 0
-#endif /* !__LC_MESSAGES */
-__NAMESPACE_LOCAL_BEGIN
-__CEIREDIRECT(__ATTR_PURE __ATTR_WUNUSED __ATTR_FORMAT_ARG(2),char *,__NOTHROW_NCX,__localdep_dgettext,(char const *__domainname, char const *__msgid),dgettext,{ return __localdep_dcgettext(__domainname, __msgid, __LC_MESSAGES); })
-#elif defined(__CRT_HAVE_dgettext)
-__CREDIRECT(__ATTR_PURE __ATTR_WUNUSED __ATTR_FORMAT_ARG(2),char *,__NOTHROW_NCX,__localdep_dgettext,(char const *__domainname, char const *__msgid),dgettext,(__domainname,__msgid))
-#elif defined(__CRT_HAVE___dgettext)
-__CREDIRECT(__ATTR_PURE __ATTR_WUNUSED __ATTR_FORMAT_ARG(2),char *,__NOTHROW_NCX,__localdep_dgettext,(char const *__domainname, char const *__msgid),__dgettext,(__domainname,__msgid))
-#elif defined(__LC_MESSAGES) || (!defined(__CRT_HAVE_dcgettext) && !defined(__CRT_HAVE___dcgettext))
-#ifndef __local___localdep_dcgettext_defined
-#define __local___localdep_dcgettext_defined 1
-#ifdef __CRT_HAVE_dcgettext
-__CREDIRECT(__ATTR_PURE __ATTR_WUNUSED __ATTR_FORMAT_ARG(2),char *,__NOTHROW_NCX,__localdep_dcgettext,(char const *__domainname, char const *__msgid, int __category),dcgettext,(__domainname,__msgid,__category))
-#elif defined(__CRT_HAVE___dcgettext)
-__CREDIRECT(__ATTR_PURE __ATTR_WUNUSED __ATTR_FORMAT_ARG(2),char *,__NOTHROW_NCX,__localdep_dcgettext,(char const *__domainname, char const *__msgid, int __category),__dcgettext,(__domainname,__msgid,__category))
-#else /* ... */
-__NAMESPACE_LOCAL_END
-#include <libc/local/libintl/dcgettext.h>
-__NAMESPACE_LOCAL_BEGIN
-#define __localdep_dcgettext __LIBC_LOCAL_NAME(dcgettext)
-#endif /* !... */
-#endif /* !__local___localdep_dcgettext_defined */
-__NAMESPACE_LOCAL_END
-#ifndef __LC_MESSAGES
-#define __LC_MESSAGES 0
-#endif /* !__LC_MESSAGES */
-__NAMESPACE_LOCAL_BEGIN
-__LOCAL __ATTR_PURE __ATTR_WUNUSED __ATTR_FORMAT_ARG(2) char *__NOTHROW_NCX(__LIBCCALL __localdep_dgettext)(char const *__domainname, char const *__msgid) { return __localdep_dcgettext(__domainname, __msgid, __LC_MESSAGES); }
-#else /* ... */
-#undef __local___localdep_dgettext_defined
-#endif /* !... */
-#endif /* !__local___localdep_dgettext_defined */
-__NAMESPACE_LOCAL_END
-__CEIDECLARE(__ATTR_PURE __ATTR_WUNUSED __ATTR_FORMAT_ARG(2) __ATTR_FORMAT_ARG(3),char *,__NOTHROW_NCX,dngettext,(char const *__domainname, char const *__msgid_singular, char const *__msgid_plural, __ULONGPTR_TYPE__ __n),{ return (__NAMESPACE_LOCAL_SYM __localdep_dgettext)(__domainname, (__n) == 1 ? __msgid_singular : __msgid_plural); })
-#elif defined(__CRT_HAVE_dngettext)
-__CDECLARE(__ATTR_PURE __ATTR_WUNUSED __ATTR_FORMAT_ARG(2) __ATTR_FORMAT_ARG(3),char *,__NOTHROW_NCX,dngettext,(char const *__domainname, char const *__msgid_singular, char const *__msgid_plural, __ULONGPTR_TYPE__ __n),(__domainname,__msgid_singular,__msgid_plural,__n))
-#elif defined(__CRT_HAVE_dgettext) || defined(__CRT_HAVE___dgettext) || defined(__LC_MESSAGES) || (!defined(__CRT_HAVE_dcgettext) && !defined(__CRT_HAVE___dcgettext))
-__NAMESPACE_LOCAL_BEGIN
-#ifndef __local___localdep_dgettext_defined
-#define __local___localdep_dgettext_defined 1
-#if defined(__CRT_HAVE_dgettext) && (defined(__LC_MESSAGES) || (!defined(__CRT_HAVE_dcgettext) && !defined(__CRT_HAVE___dcgettext)))
-#ifndef __local___localdep_dcgettext_defined
-#define __local___localdep_dcgettext_defined 1
-#ifdef __CRT_HAVE_dcgettext
-__CREDIRECT(__ATTR_PURE __ATTR_WUNUSED __ATTR_FORMAT_ARG(2),char *,__NOTHROW_NCX,__localdep_dcgettext,(char const *__domainname, char const *__msgid, int __category),dcgettext,(__domainname,__msgid,__category))
-#elif defined(__CRT_HAVE___dcgettext)
-__CREDIRECT(__ATTR_PURE __ATTR_WUNUSED __ATTR_FORMAT_ARG(2),char *,__NOTHROW_NCX,__localdep_dcgettext,(char const *__domainname, char const *__msgid, int __category),__dcgettext,(__domainname,__msgid,__category))
-#else /* ... */
-__NAMESPACE_LOCAL_END
-#include <libc/local/libintl/dcgettext.h>
-__NAMESPACE_LOCAL_BEGIN
-#define __localdep_dcgettext __LIBC_LOCAL_NAME(dcgettext)
-#endif /* !... */
-#endif /* !__local___localdep_dcgettext_defined */
-__NAMESPACE_LOCAL_END
-#ifndef __LC_MESSAGES
-#define __LC_MESSAGES 0
-#endif /* !__LC_MESSAGES */
-__NAMESPACE_LOCAL_BEGIN
-__CEIREDIRECT(__ATTR_PURE __ATTR_WUNUSED __ATTR_FORMAT_ARG(2),char *,__NOTHROW_NCX,__localdep_dgettext,(char const *__domainname, char const *__msgid),dgettext,{ return __localdep_dcgettext(__domainname, __msgid, __LC_MESSAGES); })
-#elif defined(__CRT_HAVE_dgettext)
-__CREDIRECT(__ATTR_PURE __ATTR_WUNUSED __ATTR_FORMAT_ARG(2),char *,__NOTHROW_NCX,__localdep_dgettext,(char const *__domainname, char const *__msgid),dgettext,(__domainname,__msgid))
-#elif defined(__CRT_HAVE___dgettext)
-__CREDIRECT(__ATTR_PURE __ATTR_WUNUSED __ATTR_FORMAT_ARG(2),char *,__NOTHROW_NCX,__localdep_dgettext,(char const *__domainname, char const *__msgid),__dgettext,(__domainname,__msgid))
-#elif defined(__LC_MESSAGES) || (!defined(__CRT_HAVE_dcgettext) && !defined(__CRT_HAVE___dcgettext))
-#ifndef __local___localdep_dcgettext_defined
-#define __local___localdep_dcgettext_defined 1
-#ifdef __CRT_HAVE_dcgettext
-__CREDIRECT(__ATTR_PURE __ATTR_WUNUSED __ATTR_FORMAT_ARG(2),char *,__NOTHROW_NCX,__localdep_dcgettext,(char const *__domainname, char const *__msgid, int __category),dcgettext,(__domainname,__msgid,__category))
-#elif defined(__CRT_HAVE___dcgettext)
-__CREDIRECT(__ATTR_PURE __ATTR_WUNUSED __ATTR_FORMAT_ARG(2),char *,__NOTHROW_NCX,__localdep_dcgettext,(char const *__domainname, char const *__msgid, int __category),__dcgettext,(__domainname,__msgid,__category))
-#else /* ... */
-__NAMESPACE_LOCAL_END
-#include <libc/local/libintl/dcgettext.h>
-__NAMESPACE_LOCAL_BEGIN
-#define __localdep_dcgettext __LIBC_LOCAL_NAME(dcgettext)
-#endif /* !... */
-#endif /* !__local___localdep_dcgettext_defined */
-__NAMESPACE_LOCAL_END
-#ifndef __LC_MESSAGES
-#define __LC_MESSAGES 0
-#endif /* !__LC_MESSAGES */
-__NAMESPACE_LOCAL_BEGIN
-__LOCAL __ATTR_PURE __ATTR_WUNUSED __ATTR_FORMAT_ARG(2) char *__NOTHROW_NCX(__LIBCCALL __localdep_dgettext)(char const *__domainname, char const *__msgid) { return __localdep_dcgettext(__domainname, __msgid, __LC_MESSAGES); }
-#else /* ... */
-#undef __local___localdep_dgettext_defined
-#endif /* !... */
-#endif /* !__local___localdep_dgettext_defined */
-__NAMESPACE_LOCAL_END
-__LOCAL __ATTR_PURE __ATTR_WUNUSED __ATTR_FORMAT_ARG(2) __ATTR_FORMAT_ARG(3) char *__NOTHROW_NCX(__LIBCCALL dngettext)(char const *__domainname, char const *__msgid_singular, char const *__msgid_plural, __ULONGPTR_TYPE__ __n) { return (__NAMESPACE_LOCAL_SYM __localdep_dgettext)(__domainname, (__n) == 1 ? __msgid_singular : __msgid_plural); }
-#endif /* ... */
+#ifndef __local___localdep_dcngettext_defined
+#define __local___localdep_dcngettext_defined 1
 #ifdef __CRT_HAVE_dcngettext
-__NAMESPACE_LOCAL_BEGIN
-#ifndef __local___localdep_dcgettext_defined
-#define __local___localdep_dcgettext_defined 1
-#ifdef __CRT_HAVE_dcgettext
-__CREDIRECT(__ATTR_PURE __ATTR_WUNUSED __ATTR_FORMAT_ARG(2),char *,__NOTHROW_NCX,__localdep_dcgettext,(char const *__domainname, char const *__msgid, int __category),dcgettext,(__domainname,__msgid,__category))
-#elif defined(__CRT_HAVE___dcgettext)
-__CREDIRECT(__ATTR_PURE __ATTR_WUNUSED __ATTR_FORMAT_ARG(2),char *,__NOTHROW_NCX,__localdep_dcgettext,(char const *__domainname, char const *__msgid, int __category),__dcgettext,(__domainname,__msgid,__category))
-#else /* ... */
-__NAMESPACE_LOCAL_END
-#include <libc/local/libintl/dcgettext.h>
-__NAMESPACE_LOCAL_BEGIN
-#define __localdep_dcgettext __LIBC_LOCAL_NAME(dcgettext)
-#endif /* !... */
-#endif /* !__local___localdep_dcgettext_defined */
-__NAMESPACE_LOCAL_END
-__CEIDECLARE(__ATTR_PURE __ATTR_WUNUSED __ATTR_FORMAT_ARG(2) __ATTR_FORMAT_ARG(3),char *,__NOTHROW_NCX,dcngettext,(char const *__domainname, char const *__msgid_singular, char const *__msgid_plural, __ULONGPTR_TYPE__ __n, int __category),{ return (__NAMESPACE_LOCAL_SYM __localdep_dcgettext)(__domainname, (__n) == 1 ? __msgid_singular : __msgid_plural, __category); })
+__CREDIRECT(__ATTR_PURE __ATTR_WUNUSED __ATTR_FORMAT_ARG(2) __ATTR_FORMAT_ARG(3),char *,__NOTHROW_NCX,__localdep_dcngettext,(char const *__domainname, char const *__msgid_singular, char const *__msgid_plural, __ULONGPTR_TYPE__ __n, int __category),dcngettext,(__domainname,__msgid_singular,__msgid_plural,__n,__category))
 #else /* __CRT_HAVE_dcngettext */
+__NAMESPACE_LOCAL_END
+#include <libc/local/libintl/dcngettext.h>
 __NAMESPACE_LOCAL_BEGIN
-#ifndef __local___localdep_dcgettext_defined
-#define __local___localdep_dcgettext_defined 1
-#ifdef __CRT_HAVE_dcgettext
-__CREDIRECT(__ATTR_PURE __ATTR_WUNUSED __ATTR_FORMAT_ARG(2),char *,__NOTHROW_NCX,__localdep_dcgettext,(char const *__domainname, char const *__msgid, int __category),dcgettext,(__domainname,__msgid,__category))
+#define __localdep_dcngettext __LIBC_LOCAL_NAME(dcngettext)
+#endif /* !__CRT_HAVE_dcngettext */
+#endif /* !__local___localdep_dcngettext_defined */
+__NAMESPACE_LOCAL_END
+__CEIDECLARE(__ATTR_PURE __ATTR_WUNUSED __ATTR_FORMAT_ARG(2),char *,__NOTHROW_NCX,dcgettext,(char const *__domainname, char const *__msgid, int __category),{ return (__NAMESPACE_LOCAL_SYM __localdep_dcngettext)(__domainname, __msgid, __NULLPTR, 1, __category); })
 #elif defined(__CRT_HAVE___dcgettext)
-__CREDIRECT(__ATTR_PURE __ATTR_WUNUSED __ATTR_FORMAT_ARG(2),char *,__NOTHROW_NCX,__localdep_dcgettext,(char const *__domainname, char const *__msgid, int __category),__dcgettext,(__domainname,__msgid,__category))
-#else /* ... */
-__NAMESPACE_LOCAL_END
-#include <libc/local/libintl/dcgettext.h>
 __NAMESPACE_LOCAL_BEGIN
-#define __localdep_dcgettext __LIBC_LOCAL_NAME(dcgettext)
-#endif /* !... */
-#endif /* !__local___localdep_dcgettext_defined */
+#ifndef __local___localdep_dcngettext_defined
+#define __local___localdep_dcngettext_defined 1
+#ifdef __CRT_HAVE_dcngettext
+__CREDIRECT(__ATTR_PURE __ATTR_WUNUSED __ATTR_FORMAT_ARG(2) __ATTR_FORMAT_ARG(3),char *,__NOTHROW_NCX,__localdep_dcngettext,(char const *__domainname, char const *__msgid_singular, char const *__msgid_plural, __ULONGPTR_TYPE__ __n, int __category),dcngettext,(__domainname,__msgid_singular,__msgid_plural,__n,__category))
+#else /* __CRT_HAVE_dcngettext */
 __NAMESPACE_LOCAL_END
-__LOCAL __ATTR_PURE __ATTR_WUNUSED __ATTR_FORMAT_ARG(2) __ATTR_FORMAT_ARG(3) char *__NOTHROW_NCX(__LIBCCALL dcngettext)(char const *__domainname, char const *__msgid_singular, char const *__msgid_plural, __ULONGPTR_TYPE__ __n, int __category) { return (__NAMESPACE_LOCAL_SYM __localdep_dcgettext)(__domainname, (__n) == 1 ? __msgid_singular : __msgid_plural, __category); }
+#include <libc/local/libintl/dcngettext.h>
+__NAMESPACE_LOCAL_BEGIN
+#define __localdep_dcngettext __LIBC_LOCAL_NAME(dcngettext)
+#endif /* !__CRT_HAVE_dcngettext */
+#endif /* !__local___localdep_dcngettext_defined */
+__NAMESPACE_LOCAL_END
+__CEIREDIRECT(__ATTR_PURE __ATTR_WUNUSED __ATTR_FORMAT_ARG(2),char *,__NOTHROW_NCX,dcgettext,(char const *__domainname, char const *__msgid, int __category),__dcgettext,{ return (__NAMESPACE_LOCAL_SYM __localdep_dcngettext)(__domainname, __msgid, __NULLPTR, 1, __category); })
+#else /* ... */
+__NAMESPACE_LOCAL_BEGIN
+#ifndef __local___localdep_dcngettext_defined
+#define __local___localdep_dcngettext_defined 1
+#ifdef __CRT_HAVE_dcngettext
+__CREDIRECT(__ATTR_PURE __ATTR_WUNUSED __ATTR_FORMAT_ARG(2) __ATTR_FORMAT_ARG(3),char *,__NOTHROW_NCX,__localdep_dcngettext,(char const *__domainname, char const *__msgid_singular, char const *__msgid_plural, __ULONGPTR_TYPE__ __n, int __category),dcngettext,(__domainname,__msgid_singular,__msgid_plural,__n,__category))
+#else /* __CRT_HAVE_dcngettext */
+__NAMESPACE_LOCAL_END
+#include <libc/local/libintl/dcngettext.h>
+__NAMESPACE_LOCAL_BEGIN
+#define __localdep_dcngettext __LIBC_LOCAL_NAME(dcngettext)
+#endif /* !__CRT_HAVE_dcngettext */
+#endif /* !__local___localdep_dcngettext_defined */
+__NAMESPACE_LOCAL_END
+__LOCAL __ATTR_PURE __ATTR_WUNUSED __ATTR_FORMAT_ARG(2) char *__NOTHROW_NCX(__LIBCCALL dcgettext)(char const *__domainname, char const *__msgid, int __category) { return (__NAMESPACE_LOCAL_SYM __localdep_dcngettext)(__domainname, __msgid, __NULLPTR, 1, __category); }
+#endif /* !... */
+#ifdef __CRT_HAVE_dgettext
+__NAMESPACE_LOCAL_BEGIN
+#ifndef __local___localdep_dcngettext_defined
+#define __local___localdep_dcngettext_defined 1
+#ifdef __CRT_HAVE_dcngettext
+__CREDIRECT(__ATTR_PURE __ATTR_WUNUSED __ATTR_FORMAT_ARG(2) __ATTR_FORMAT_ARG(3),char *,__NOTHROW_NCX,__localdep_dcngettext,(char const *__domainname, char const *__msgid_singular, char const *__msgid_plural, __ULONGPTR_TYPE__ __n, int __category),dcngettext,(__domainname,__msgid_singular,__msgid_plural,__n,__category))
+#else /* __CRT_HAVE_dcngettext */
+__NAMESPACE_LOCAL_END
+#include <libc/local/libintl/dcngettext.h>
+__NAMESPACE_LOCAL_BEGIN
+#define __localdep_dcngettext __LIBC_LOCAL_NAME(dcngettext)
+#endif /* !__CRT_HAVE_dcngettext */
+#endif /* !__local___localdep_dcngettext_defined */
+__NAMESPACE_LOCAL_END
+__CEIDECLARE(__ATTR_PURE __ATTR_WUNUSED __ATTR_FORMAT_ARG(2),char *,__NOTHROW_NCX,dgettext,(char const *__domainname, char const *__msgid),{ return (__NAMESPACE_LOCAL_SYM __localdep_dcngettext)(__domainname, __msgid, __NULLPTR, 1, __LC_MESSAGES); })
+#elif defined(__CRT_HAVE___dgettext)
+__NAMESPACE_LOCAL_BEGIN
+#ifndef __local___localdep_dcngettext_defined
+#define __local___localdep_dcngettext_defined 1
+#ifdef __CRT_HAVE_dcngettext
+__CREDIRECT(__ATTR_PURE __ATTR_WUNUSED __ATTR_FORMAT_ARG(2) __ATTR_FORMAT_ARG(3),char *,__NOTHROW_NCX,__localdep_dcngettext,(char const *__domainname, char const *__msgid_singular, char const *__msgid_plural, __ULONGPTR_TYPE__ __n, int __category),dcngettext,(__domainname,__msgid_singular,__msgid_plural,__n,__category))
+#else /* __CRT_HAVE_dcngettext */
+__NAMESPACE_LOCAL_END
+#include <libc/local/libintl/dcngettext.h>
+__NAMESPACE_LOCAL_BEGIN
+#define __localdep_dcngettext __LIBC_LOCAL_NAME(dcngettext)
+#endif /* !__CRT_HAVE_dcngettext */
+#endif /* !__local___localdep_dcngettext_defined */
+__NAMESPACE_LOCAL_END
+__CEIREDIRECT(__ATTR_PURE __ATTR_WUNUSED __ATTR_FORMAT_ARG(2),char *,__NOTHROW_NCX,dgettext,(char const *__domainname, char const *__msgid),__dgettext,{ return (__NAMESPACE_LOCAL_SYM __localdep_dcngettext)(__domainname, __msgid, __NULLPTR, 1, __LC_MESSAGES); })
+#else /* ... */
+__NAMESPACE_LOCAL_BEGIN
+#ifndef __local___localdep_dcngettext_defined
+#define __local___localdep_dcngettext_defined 1
+#ifdef __CRT_HAVE_dcngettext
+__CREDIRECT(__ATTR_PURE __ATTR_WUNUSED __ATTR_FORMAT_ARG(2) __ATTR_FORMAT_ARG(3),char *,__NOTHROW_NCX,__localdep_dcngettext,(char const *__domainname, char const *__msgid_singular, char const *__msgid_plural, __ULONGPTR_TYPE__ __n, int __category),dcngettext,(__domainname,__msgid_singular,__msgid_plural,__n,__category))
+#else /* __CRT_HAVE_dcngettext */
+__NAMESPACE_LOCAL_END
+#include <libc/local/libintl/dcngettext.h>
+__NAMESPACE_LOCAL_BEGIN
+#define __localdep_dcngettext __LIBC_LOCAL_NAME(dcngettext)
+#endif /* !__CRT_HAVE_dcngettext */
+#endif /* !__local___localdep_dcngettext_defined */
+__NAMESPACE_LOCAL_END
+__LOCAL __ATTR_PURE __ATTR_WUNUSED __ATTR_FORMAT_ARG(2) char *__NOTHROW_NCX(__LIBCCALL dgettext)(char const *__domainname, char const *__msgid) { return (__NAMESPACE_LOCAL_SYM __localdep_dcngettext)(__domainname, __msgid, __NULLPTR, 1, __LC_MESSAGES); }
+#endif /* !... */
+#ifdef __CRT_HAVE_gettext
+__NAMESPACE_LOCAL_BEGIN
+#ifndef __local___localdep_dcngettext_defined
+#define __local___localdep_dcngettext_defined 1
+#ifdef __CRT_HAVE_dcngettext
+__CREDIRECT(__ATTR_PURE __ATTR_WUNUSED __ATTR_FORMAT_ARG(2) __ATTR_FORMAT_ARG(3),char *,__NOTHROW_NCX,__localdep_dcngettext,(char const *__domainname, char const *__msgid_singular, char const *__msgid_plural, __ULONGPTR_TYPE__ __n, int __category),dcngettext,(__domainname,__msgid_singular,__msgid_plural,__n,__category))
+#else /* __CRT_HAVE_dcngettext */
+__NAMESPACE_LOCAL_END
+#include <libc/local/libintl/dcngettext.h>
+__NAMESPACE_LOCAL_BEGIN
+#define __localdep_dcngettext __LIBC_LOCAL_NAME(dcngettext)
+#endif /* !__CRT_HAVE_dcngettext */
+#endif /* !__local___localdep_dcngettext_defined */
+__NAMESPACE_LOCAL_END
+__CEIDECLARE(__ATTR_PURE __ATTR_WUNUSED __ATTR_FORMAT_ARG(1),char *,__NOTHROW_NCX,gettext,(char const *__msgid),{ return (__NAMESPACE_LOCAL_SYM __localdep_dcngettext)(__NULLPTR, __msgid, __NULLPTR, 1, __LC_MESSAGES); })
+#else /* __CRT_HAVE_gettext */
+__NAMESPACE_LOCAL_BEGIN
+#ifndef __local___localdep_dcngettext_defined
+#define __local___localdep_dcngettext_defined 1
+#ifdef __CRT_HAVE_dcngettext
+__CREDIRECT(__ATTR_PURE __ATTR_WUNUSED __ATTR_FORMAT_ARG(2) __ATTR_FORMAT_ARG(3),char *,__NOTHROW_NCX,__localdep_dcngettext,(char const *__domainname, char const *__msgid_singular, char const *__msgid_plural, __ULONGPTR_TYPE__ __n, int __category),dcngettext,(__domainname,__msgid_singular,__msgid_plural,__n,__category))
+#else /* __CRT_HAVE_dcngettext */
+__NAMESPACE_LOCAL_END
+#include <libc/local/libintl/dcngettext.h>
+__NAMESPACE_LOCAL_BEGIN
+#define __localdep_dcngettext __LIBC_LOCAL_NAME(dcngettext)
+#endif /* !__CRT_HAVE_dcngettext */
+#endif /* !__local___localdep_dcngettext_defined */
+__NAMESPACE_LOCAL_END
+__LOCAL __ATTR_PURE __ATTR_WUNUSED __ATTR_FORMAT_ARG(1) char *__NOTHROW_NCX(__LIBCCALL gettext)(char const *__msgid) { return (__NAMESPACE_LOCAL_SYM __localdep_dcngettext)(__NULLPTR, __msgid, __NULLPTR, 1, __LC_MESSAGES); }
+#endif /* !__CRT_HAVE_gettext */
+#ifdef __CRT_HAVE_ngettext
+__NAMESPACE_LOCAL_BEGIN
+#ifndef __local___localdep_dcngettext_defined
+#define __local___localdep_dcngettext_defined 1
+#ifdef __CRT_HAVE_dcngettext
+__CREDIRECT(__ATTR_PURE __ATTR_WUNUSED __ATTR_FORMAT_ARG(2) __ATTR_FORMAT_ARG(3),char *,__NOTHROW_NCX,__localdep_dcngettext,(char const *__domainname, char const *__msgid_singular, char const *__msgid_plural, __ULONGPTR_TYPE__ __n, int __category),dcngettext,(__domainname,__msgid_singular,__msgid_plural,__n,__category))
+#else /* __CRT_HAVE_dcngettext */
+__NAMESPACE_LOCAL_END
+#include <libc/local/libintl/dcngettext.h>
+__NAMESPACE_LOCAL_BEGIN
+#define __localdep_dcngettext __LIBC_LOCAL_NAME(dcngettext)
+#endif /* !__CRT_HAVE_dcngettext */
+#endif /* !__local___localdep_dcngettext_defined */
+__NAMESPACE_LOCAL_END
+__CEIDECLARE(__ATTR_PURE __ATTR_WUNUSED __ATTR_FORMAT_ARG(1) __ATTR_FORMAT_ARG(2),char *,__NOTHROW_NCX,ngettext,(char const *__msgid_singular, char const *__msgid_plural, __ULONGPTR_TYPE__ __n),{ return (__NAMESPACE_LOCAL_SYM __localdep_dcngettext)(__NULLPTR, __msgid_singular, __msgid_plural, __n, __LC_MESSAGES); })
+#else /* __CRT_HAVE_ngettext */
+__NAMESPACE_LOCAL_BEGIN
+#ifndef __local___localdep_dcngettext_defined
+#define __local___localdep_dcngettext_defined 1
+#ifdef __CRT_HAVE_dcngettext
+__CREDIRECT(__ATTR_PURE __ATTR_WUNUSED __ATTR_FORMAT_ARG(2) __ATTR_FORMAT_ARG(3),char *,__NOTHROW_NCX,__localdep_dcngettext,(char const *__domainname, char const *__msgid_singular, char const *__msgid_plural, __ULONGPTR_TYPE__ __n, int __category),dcngettext,(__domainname,__msgid_singular,__msgid_plural,__n,__category))
+#else /* __CRT_HAVE_dcngettext */
+__NAMESPACE_LOCAL_END
+#include <libc/local/libintl/dcngettext.h>
+__NAMESPACE_LOCAL_BEGIN
+#define __localdep_dcngettext __LIBC_LOCAL_NAME(dcngettext)
+#endif /* !__CRT_HAVE_dcngettext */
+#endif /* !__local___localdep_dcngettext_defined */
+__NAMESPACE_LOCAL_END
+__LOCAL __ATTR_PURE __ATTR_WUNUSED __ATTR_FORMAT_ARG(1) __ATTR_FORMAT_ARG(2) char *__NOTHROW_NCX(__LIBCCALL ngettext)(char const *__msgid_singular, char const *__msgid_plural, __ULONGPTR_TYPE__ __n) { return (__NAMESPACE_LOCAL_SYM __localdep_dcngettext)(__NULLPTR, __msgid_singular, __msgid_plural, __n, __LC_MESSAGES); }
+#endif /* !__CRT_HAVE_ngettext */
+#ifdef __CRT_HAVE_dngettext
+__NAMESPACE_LOCAL_BEGIN
+#ifndef __local___localdep_dcngettext_defined
+#define __local___localdep_dcngettext_defined 1
+#ifdef __CRT_HAVE_dcngettext
+__CREDIRECT(__ATTR_PURE __ATTR_WUNUSED __ATTR_FORMAT_ARG(2) __ATTR_FORMAT_ARG(3),char *,__NOTHROW_NCX,__localdep_dcngettext,(char const *__domainname, char const *__msgid_singular, char const *__msgid_plural, __ULONGPTR_TYPE__ __n, int __category),dcngettext,(__domainname,__msgid_singular,__msgid_plural,__n,__category))
+#else /* __CRT_HAVE_dcngettext */
+__NAMESPACE_LOCAL_END
+#include <libc/local/libintl/dcngettext.h>
+__NAMESPACE_LOCAL_BEGIN
+#define __localdep_dcngettext __LIBC_LOCAL_NAME(dcngettext)
+#endif /* !__CRT_HAVE_dcngettext */
+#endif /* !__local___localdep_dcngettext_defined */
+__NAMESPACE_LOCAL_END
+__CEIDECLARE(__ATTR_PURE __ATTR_WUNUSED __ATTR_FORMAT_ARG(2) __ATTR_FORMAT_ARG(3),char *,__NOTHROW_NCX,dngettext,(char const *__domainname, char const *__msgid_singular, char const *__msgid_plural, __ULONGPTR_TYPE__ __n),{ return (__NAMESPACE_LOCAL_SYM __localdep_dcngettext)(__domainname, __msgid_singular, __msgid_plural, __n, __LC_MESSAGES); })
+#else /* __CRT_HAVE_dngettext */
+__NAMESPACE_LOCAL_BEGIN
+#ifndef __local___localdep_dcngettext_defined
+#define __local___localdep_dcngettext_defined 1
+#ifdef __CRT_HAVE_dcngettext
+__CREDIRECT(__ATTR_PURE __ATTR_WUNUSED __ATTR_FORMAT_ARG(2) __ATTR_FORMAT_ARG(3),char *,__NOTHROW_NCX,__localdep_dcngettext,(char const *__domainname, char const *__msgid_singular, char const *__msgid_plural, __ULONGPTR_TYPE__ __n, int __category),dcngettext,(__domainname,__msgid_singular,__msgid_plural,__n,__category))
+#else /* __CRT_HAVE_dcngettext */
+__NAMESPACE_LOCAL_END
+#include <libc/local/libintl/dcngettext.h>
+__NAMESPACE_LOCAL_BEGIN
+#define __localdep_dcngettext __LIBC_LOCAL_NAME(dcngettext)
+#endif /* !__CRT_HAVE_dcngettext */
+#endif /* !__local___localdep_dcngettext_defined */
+__NAMESPACE_LOCAL_END
+__LOCAL __ATTR_PURE __ATTR_WUNUSED __ATTR_FORMAT_ARG(2) __ATTR_FORMAT_ARG(3) char *__NOTHROW_NCX(__LIBCCALL dngettext)(char const *__domainname, char const *__msgid_singular, char const *__msgid_plural, __ULONGPTR_TYPE__ __n) { return (__NAMESPACE_LOCAL_SYM __localdep_dcngettext)(__domainname, __msgid_singular, __msgid_plural, __n, __LC_MESSAGES); }
+#endif /* !__CRT_HAVE_dngettext */
+#ifdef __CRT_HAVE_dcngettext
+__CDECLARE(__ATTR_PURE __ATTR_WUNUSED __ATTR_FORMAT_ARG(2) __ATTR_FORMAT_ARG(3),char *,__NOTHROW_NCX,dcngettext,(char const *__domainname, char const *__msgid_singular, char const *__msgid_plural, __ULONGPTR_TYPE__ __n, int __category),(__domainname,__msgid_singular,__msgid_plural,__n,__category))
+#else /* __CRT_HAVE_dcngettext */
+#include <libc/local/libintl/dcngettext.h>
+__NAMESPACE_LOCAL_USING_OR_IMPL(dcngettext, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_PURE __ATTR_WUNUSED __ATTR_FORMAT_ARG(2) __ATTR_FORMAT_ARG(3) char *__NOTHROW_NCX(__LIBCCALL dcngettext)(char const *__domainname, char const *__msgid_singular, char const *__msgid_plural, __ULONGPTR_TYPE__ __n, int __category) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(dcngettext))(__domainname, __msgid_singular, __msgid_plural, __n, __category); })
 #endif /* !__CRT_HAVE_dcngettext */
 __CDECLARE_OPT(,char *,__NOTHROW_NCX,textdomain,(char const *__domainname),(__domainname))
 __CDECLARE_OPT(,char *,__NOTHROW_NCX,bindtextdomain,(char const *__domainname, char const *__dirname),(__domainname,__dirname))
 __CDECLARE_OPT(,char *,__NOTHROW_NCX,bind_textdomain_codeset,(char const *__domainname, char const *__codeset),(__domainname,__codeset))
-#if defined(__CRT_HAVE_dgettext) && (defined(__LC_MESSAGES) || (!defined(__CRT_HAVE_dcgettext) && !defined(__CRT_HAVE___dcgettext)))
+#ifdef __CRT_HAVE_dgettext
 __NAMESPACE_LOCAL_BEGIN
-#ifndef __local___localdep_dcgettext_defined
-#define __local___localdep_dcgettext_defined 1
-#ifdef __CRT_HAVE_dcgettext
-__CREDIRECT(__ATTR_PURE __ATTR_WUNUSED __ATTR_FORMAT_ARG(2),char *,__NOTHROW_NCX,__localdep_dcgettext,(char const *__domainname, char const *__msgid, int __category),dcgettext,(__domainname,__msgid,__category))
-#elif defined(__CRT_HAVE___dcgettext)
-__CREDIRECT(__ATTR_PURE __ATTR_WUNUSED __ATTR_FORMAT_ARG(2),char *,__NOTHROW_NCX,__localdep_dcgettext,(char const *__domainname, char const *__msgid, int __category),__dcgettext,(__domainname,__msgid,__category))
-#else /* ... */
+#ifndef __local___localdep_dcngettext_defined
+#define __local___localdep_dcngettext_defined 1
+#ifdef __CRT_HAVE_dcngettext
+__CREDIRECT(__ATTR_PURE __ATTR_WUNUSED __ATTR_FORMAT_ARG(2) __ATTR_FORMAT_ARG(3),char *,__NOTHROW_NCX,__localdep_dcngettext,(char const *__domainname, char const *__msgid_singular, char const *__msgid_plural, __ULONGPTR_TYPE__ __n, int __category),dcngettext,(__domainname,__msgid_singular,__msgid_plural,__n,__category))
+#else /* __CRT_HAVE_dcngettext */
 __NAMESPACE_LOCAL_END
-#include <libc/local/libintl/dcgettext.h>
+#include <libc/local/libintl/dcngettext.h>
 __NAMESPACE_LOCAL_BEGIN
-#define __localdep_dcgettext __LIBC_LOCAL_NAME(dcgettext)
-#endif /* !... */
-#endif /* !__local___localdep_dcgettext_defined */
+#define __localdep_dcngettext __LIBC_LOCAL_NAME(dcngettext)
+#endif /* !__CRT_HAVE_dcngettext */
+#endif /* !__local___localdep_dcngettext_defined */
 __NAMESPACE_LOCAL_END
-#ifndef __LC_MESSAGES
-#define __LC_MESSAGES 0
-#endif /* !__LC_MESSAGES */
-__CEIREDIRECT(__ATTR_PURE __ATTR_WUNUSED __ATTR_FORMAT_ARG(2),char *,__NOTHROW_NCX,__dgettext,(char const *__domainname, char const *__msgid),dgettext,{ return (__NAMESPACE_LOCAL_SYM __localdep_dcgettext)(__domainname, __msgid, __LC_MESSAGES); })
-#elif defined(__CRT_HAVE_dgettext)
-__CREDIRECT(__ATTR_PURE __ATTR_WUNUSED __ATTR_FORMAT_ARG(2),char *,__NOTHROW_NCX,__dgettext,(char const *__domainname, char const *__msgid),dgettext,(__domainname,__msgid))
+__CEIREDIRECT(__ATTR_PURE __ATTR_WUNUSED __ATTR_FORMAT_ARG(2),char *,__NOTHROW_NCX,__dgettext,(char const *__domainname, char const *__msgid),dgettext,{ return (__NAMESPACE_LOCAL_SYM __localdep_dcngettext)(__domainname, __msgid, __NULLPTR, 1, __LC_MESSAGES); })
 #elif defined(__CRT_HAVE___dgettext)
-__CDECLARE(__ATTR_PURE __ATTR_WUNUSED __ATTR_FORMAT_ARG(2),char *,__NOTHROW_NCX,__dgettext,(char const *__domainname, char const *__msgid),(__domainname,__msgid))
-#elif defined(__LC_MESSAGES) || (!defined(__CRT_HAVE_dcgettext) && !defined(__CRT_HAVE___dcgettext))
 __NAMESPACE_LOCAL_BEGIN
-#ifndef __local___localdep_dcgettext_defined
-#define __local___localdep_dcgettext_defined 1
-#ifdef __CRT_HAVE_dcgettext
-__CREDIRECT(__ATTR_PURE __ATTR_WUNUSED __ATTR_FORMAT_ARG(2),char *,__NOTHROW_NCX,__localdep_dcgettext,(char const *__domainname, char const *__msgid, int __category),dcgettext,(__domainname,__msgid,__category))
-#elif defined(__CRT_HAVE___dcgettext)
-__CREDIRECT(__ATTR_PURE __ATTR_WUNUSED __ATTR_FORMAT_ARG(2),char *,__NOTHROW_NCX,__localdep_dcgettext,(char const *__domainname, char const *__msgid, int __category),__dcgettext,(__domainname,__msgid,__category))
-#else /* ... */
+#ifndef __local___localdep_dcngettext_defined
+#define __local___localdep_dcngettext_defined 1
+#ifdef __CRT_HAVE_dcngettext
+__CREDIRECT(__ATTR_PURE __ATTR_WUNUSED __ATTR_FORMAT_ARG(2) __ATTR_FORMAT_ARG(3),char *,__NOTHROW_NCX,__localdep_dcngettext,(char const *__domainname, char const *__msgid_singular, char const *__msgid_plural, __ULONGPTR_TYPE__ __n, int __category),dcngettext,(__domainname,__msgid_singular,__msgid_plural,__n,__category))
+#else /* __CRT_HAVE_dcngettext */
 __NAMESPACE_LOCAL_END
-#include <libc/local/libintl/dcgettext.h>
+#include <libc/local/libintl/dcngettext.h>
 __NAMESPACE_LOCAL_BEGIN
-#define __localdep_dcgettext __LIBC_LOCAL_NAME(dcgettext)
+#define __localdep_dcngettext __LIBC_LOCAL_NAME(dcngettext)
+#endif /* !__CRT_HAVE_dcngettext */
+#endif /* !__local___localdep_dcngettext_defined */
+__NAMESPACE_LOCAL_END
+__CEIDECLARE(__ATTR_PURE __ATTR_WUNUSED __ATTR_FORMAT_ARG(2),char *,__NOTHROW_NCX,__dgettext,(char const *__domainname, char const *__msgid),{ return (__NAMESPACE_LOCAL_SYM __localdep_dcngettext)(__domainname, __msgid, __NULLPTR, 1, __LC_MESSAGES); })
+#else /* ... */
+__NAMESPACE_LOCAL_BEGIN
+#ifndef __local___localdep_dcngettext_defined
+#define __local___localdep_dcngettext_defined 1
+#ifdef __CRT_HAVE_dcngettext
+__CREDIRECT(__ATTR_PURE __ATTR_WUNUSED __ATTR_FORMAT_ARG(2) __ATTR_FORMAT_ARG(3),char *,__NOTHROW_NCX,__localdep_dcngettext,(char const *__domainname, char const *__msgid_singular, char const *__msgid_plural, __ULONGPTR_TYPE__ __n, int __category),dcngettext,(__domainname,__msgid_singular,__msgid_plural,__n,__category))
+#else /* __CRT_HAVE_dcngettext */
+__NAMESPACE_LOCAL_END
+#include <libc/local/libintl/dcngettext.h>
+__NAMESPACE_LOCAL_BEGIN
+#define __localdep_dcngettext __LIBC_LOCAL_NAME(dcngettext)
+#endif /* !__CRT_HAVE_dcngettext */
+#endif /* !__local___localdep_dcngettext_defined */
+__NAMESPACE_LOCAL_END
+__LOCAL __ATTR_PURE __ATTR_WUNUSED __ATTR_FORMAT_ARG(2) char *__NOTHROW_NCX(__LIBCCALL __dgettext)(char const *__domainname, char const *__msgid) { return (__NAMESPACE_LOCAL_SYM __localdep_dcngettext)(__domainname, __msgid, __NULLPTR, 1, __LC_MESSAGES); }
 #endif /* !... */
-#endif /* !__local___localdep_dcgettext_defined */
-__NAMESPACE_LOCAL_END
-#ifndef __LC_MESSAGES
-#define __LC_MESSAGES 0
-#endif /* !__LC_MESSAGES */
-__LOCAL __ATTR_PURE __ATTR_WUNUSED __ATTR_FORMAT_ARG(2) char *__NOTHROW_NCX(__LIBCCALL __dgettext)(char const *__domainname, char const *__msgid) { return (__NAMESPACE_LOCAL_SYM __localdep_dcgettext)(__domainname, __msgid, __LC_MESSAGES); }
-#endif /* ... */
 #ifdef __CRT_HAVE_dcgettext
-__CREDIRECT(__ATTR_PURE __ATTR_WUNUSED __ATTR_FORMAT_ARG(2),char *,__NOTHROW_NCX,__dcgettext,(char const *__domainname, char const *__msgid, int __category),dcgettext,(__domainname,__msgid,__category))
+__NAMESPACE_LOCAL_BEGIN
+#ifndef __local___localdep_dcngettext_defined
+#define __local___localdep_dcngettext_defined 1
+#ifdef __CRT_HAVE_dcngettext
+__CREDIRECT(__ATTR_PURE __ATTR_WUNUSED __ATTR_FORMAT_ARG(2) __ATTR_FORMAT_ARG(3),char *,__NOTHROW_NCX,__localdep_dcngettext,(char const *__domainname, char const *__msgid_singular, char const *__msgid_plural, __ULONGPTR_TYPE__ __n, int __category),dcngettext,(__domainname,__msgid_singular,__msgid_plural,__n,__category))
+#else /* __CRT_HAVE_dcngettext */
+__NAMESPACE_LOCAL_END
+#include <libc/local/libintl/dcngettext.h>
+__NAMESPACE_LOCAL_BEGIN
+#define __localdep_dcngettext __LIBC_LOCAL_NAME(dcngettext)
+#endif /* !__CRT_HAVE_dcngettext */
+#endif /* !__local___localdep_dcngettext_defined */
+__NAMESPACE_LOCAL_END
+__CEIREDIRECT(__ATTR_PURE __ATTR_WUNUSED __ATTR_FORMAT_ARG(2),char *,__NOTHROW_NCX,__dcgettext,(char const *__domainname, char const *__msgid, int __category),dcgettext,{ return (__NAMESPACE_LOCAL_SYM __localdep_dcngettext)(__domainname, __msgid, __NULLPTR, 1, __category); })
 #elif defined(__CRT_HAVE___dcgettext)
-__CDECLARE(__ATTR_PURE __ATTR_WUNUSED __ATTR_FORMAT_ARG(2),char *,__NOTHROW_NCX,__dcgettext,(char const *__domainname, char const *__msgid, int __category),(__domainname,__msgid,__category))
+__NAMESPACE_LOCAL_BEGIN
+#ifndef __local___localdep_dcngettext_defined
+#define __local___localdep_dcngettext_defined 1
+#ifdef __CRT_HAVE_dcngettext
+__CREDIRECT(__ATTR_PURE __ATTR_WUNUSED __ATTR_FORMAT_ARG(2) __ATTR_FORMAT_ARG(3),char *,__NOTHROW_NCX,__localdep_dcngettext,(char const *__domainname, char const *__msgid_singular, char const *__msgid_plural, __ULONGPTR_TYPE__ __n, int __category),dcngettext,(__domainname,__msgid_singular,__msgid_plural,__n,__category))
+#else /* __CRT_HAVE_dcngettext */
+__NAMESPACE_LOCAL_END
+#include <libc/local/libintl/dcngettext.h>
+__NAMESPACE_LOCAL_BEGIN
+#define __localdep_dcngettext __LIBC_LOCAL_NAME(dcngettext)
+#endif /* !__CRT_HAVE_dcngettext */
+#endif /* !__local___localdep_dcngettext_defined */
+__NAMESPACE_LOCAL_END
+__CEIDECLARE(__ATTR_PURE __ATTR_WUNUSED __ATTR_FORMAT_ARG(2),char *,__NOTHROW_NCX,__dcgettext,(char const *__domainname, char const *__msgid, int __category),{ return (__NAMESPACE_LOCAL_SYM __localdep_dcngettext)(__domainname, __msgid, __NULLPTR, 1, __category); })
 #else /* ... */
-#include <libc/local/libintl/dcgettext.h>
-__FORCELOCAL __ATTR_ARTIFICIAL __ATTR_PURE __ATTR_WUNUSED __ATTR_FORMAT_ARG(2) char *__NOTHROW_NCX(__LIBCCALL __dcgettext)(char const *__domainname, char const *__msgid, int __category) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(dcgettext))(__domainname, __msgid, __category); }
+__NAMESPACE_LOCAL_BEGIN
+#ifndef __local___localdep_dcngettext_defined
+#define __local___localdep_dcngettext_defined 1
+#ifdef __CRT_HAVE_dcngettext
+__CREDIRECT(__ATTR_PURE __ATTR_WUNUSED __ATTR_FORMAT_ARG(2) __ATTR_FORMAT_ARG(3),char *,__NOTHROW_NCX,__localdep_dcngettext,(char const *__domainname, char const *__msgid_singular, char const *__msgid_plural, __ULONGPTR_TYPE__ __n, int __category),dcngettext,(__domainname,__msgid_singular,__msgid_plural,__n,__category))
+#else /* __CRT_HAVE_dcngettext */
+__NAMESPACE_LOCAL_END
+#include <libc/local/libintl/dcngettext.h>
+__NAMESPACE_LOCAL_BEGIN
+#define __localdep_dcngettext __LIBC_LOCAL_NAME(dcngettext)
+#endif /* !__CRT_HAVE_dcngettext */
+#endif /* !__local___localdep_dcngettext_defined */
+__NAMESPACE_LOCAL_END
+__LOCAL __ATTR_PURE __ATTR_WUNUSED __ATTR_FORMAT_ARG(2) char *__NOTHROW_NCX(__LIBCCALL __dcgettext)(char const *__domainname, char const *__msgid, int __category) { return (__NAMESPACE_LOCAL_SYM __localdep_dcngettext)(__domainname, __msgid, __NULLPTR, 1, __category); }
 #endif /* !... */
 
 /* If appropriate, provide macro optimizations of the above functions */
 #if (!defined(__OPTIMIZE_SIZE__) && (!defined(__cplusplus) || defined(__USE_CTYPE_MACROS)))
-#define dcngettext(domainname, msgid_singular, msgid_plural, n, category) dcgettext(domainname, (n) == 1 ? msgid_singular : msgid_plural, category)
-#define __dcgettext(domainname, msgid, category)                          dcgettext(domainname, msgid, category)
-#if !defined(__LC_MESSAGES) && !defined(__CRT_HAVE_dcgettext) && !defined(__CRT_HAVE___dcgettext)
-#define __LC_MESSAGES 0
-#endif /* !__LC_MESSAGES && !__CRT_HAVE_dcgettext && !__CRT_HAVE___dcgettext */
-#ifdef __LC_MESSAGES
-#define dgettext(domainname, msgid)   dcgettext(domainname, msgid, __LC_MESSAGES)
-#define __dgettext(domainname, msgid) dcgettext(domainname, msgid, __LC_MESSAGES)
-#endif /* __LC_MESSAGES */
-#if defined(dgettext) || defined(__CRT_HAVE_dgettext) || defined(__CRT_HAVE___dgettext) || defined(__LC_MESSAGES) || (!defined(__CRT_HAVE_dcgettext) && !defined(__CRT_HAVE___dcgettext))
-#define dngettext(domainname, msgid_singular, msgid_plural, n) dgettext(domainname, (n) == 1 ? msgid_singular : msgid_plural)
-#define gettext(msgid)                                         dgettext(__NULLPTR, msgid)
-#endif /* dgettext || __CRT_HAVE_dgettext || __CRT_HAVE___dgettext || __LC_MESSAGES || (!__CRT_HAVE_dcgettext && !__CRT_HAVE___dcgettext) */
-#if defined(gettext) || defined(__CRT_HAVE_gettext) || defined(__CRT_HAVE_dgettext) || defined(__CRT_HAVE___dgettext) || defined(__LC_MESSAGES) || (!defined(__CRT_HAVE_dcgettext) && !defined(__CRT_HAVE___dcgettext))
-#define ngettext(msgid_singular, msgid_plural, n) gettext((n) == 1 ? msgid_singular : msgid_plural)
-#endif /* gettext || __CRT_HAVE_gettext || __CRT_HAVE_dgettext || __CRT_HAVE___dgettext || __LC_MESSAGES || (!__CRT_HAVE_dcgettext && !__CRT_HAVE___dcgettext) */
+#ifndef __CRT_HAVE_dcngettext
+#define dcngettext(domainname, msgid_singular, msgid_plural, n, category) ((char *)((n) == 1 ? (msgid_singular) : (msgid_plural)))
+#define dngettext(domainname, msgid_singular, msgid_plural, n)            ((char *)((n) == 1 ? (msgid_singular) : (msgid_plural)))
+#define ngettext(msgid_singular, msgid_plural, n)                         ((char *)((n) == 1 ? (msgid_singular) : (msgid_plural)))
+#define dgettext(domainname, msgid)                                       ((char *)(msgid))
+#define gettext(msgid)                                                    ((char *)(msgid))
+#else /* !__CRT_HAVE_dcngettext */
+#define dngettext(domainname, msgid_singular, msgid_plural, n) \
+	dcngettext(domainname, msgid_singular, msgid_plural, n, __LC_MESSAGES)
+#define dgettext(domainname, msgid) \
+	dcngettext(domainname, msgid, __NULLPTR, 1, __LC_MESSAGES)
+#define ngettext(msgid_singular, msgid_plural, n) \
+	dcngettext(__NULLPTR, msgid_singular, msgid_plural, n, __LC_MESSAGES)
+#define gettext(msgid) \
+	dcngettext(__NULLPTR, msgid, __NULLPTR, 1, __LC_MESSAGES)
+#endif /* __CRT_HAVE_dcngettext */
+#define __dcngettext(domainname, msgid_singular, msgid_plural, n, category) \
+	dcngettext(domainname, msgid_singular, msgid_plural, n, category)
+#define __dgettext(domainname, msgid) \
+	dgettext(domainname, msgid)
 #endif /* !__OPTIMIZE_SIZE__ && (!__cplusplus || __USE_CTYPE_MACROS) */
 
 __SYSDECL_END

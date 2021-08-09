@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x6e51d531 */
+/* HASH CRC-32:0x23ba45a6 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -31,6 +31,11 @@ DECL_BEGIN
 
 #if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
 INTDEF ATTR_PURE WUNUSED __ATTR_FORMAT_ARG(2) char *NOTHROW_NCX(LIBDCALL libd_dcgettext)(char const *domainname, char const *msgid, int category);
+#endif /* !__LIBCCALL_IS_LIBDCALL && !__KERNEL__ */
+#ifndef __KERNEL__
+INTDEF ATTR_PURE WUNUSED __ATTR_FORMAT_ARG(2) char *NOTHROW_NCX(LIBCCALL libc_dcgettext)(char const *domainname, char const *msgid, int category);
+#endif /* !__KERNEL__ */
+#if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
 INTDEF ATTR_PURE WUNUSED __ATTR_FORMAT_ARG(2) char *NOTHROW_NCX(LIBDCALL libd_dgettext)(char const *domainname, char const *msgid);
 #endif /* !__LIBCCALL_IS_LIBDCALL && !__KERNEL__ */
 #ifndef __KERNEL__
@@ -56,11 +61,6 @@ INTDEF ATTR_PURE WUNUSED __ATTR_FORMAT_ARG(2) __ATTR_FORMAT_ARG(3) char *NOTHROW
 #endif /* !__KERNEL__ */
 #if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
 INTDEF ATTR_PURE WUNUSED __ATTR_FORMAT_ARG(2) __ATTR_FORMAT_ARG(3) char *NOTHROW_NCX(LIBDCALL libd_dcngettext)(char const *domainname, char const *msgid_singular, char const *msgid_plural, ulongptr_t n, int category);
-#endif /* !__LIBCCALL_IS_LIBDCALL && !__KERNEL__ */
-#ifndef __KERNEL__
-INTDEF ATTR_PURE WUNUSED __ATTR_FORMAT_ARG(2) __ATTR_FORMAT_ARG(3) char *NOTHROW_NCX(LIBCCALL libc_dcngettext)(char const *domainname, char const *msgid_singular, char const *msgid_plural, ulongptr_t n, int category);
-#endif /* !__KERNEL__ */
-#if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
 INTDEF char *NOTHROW_NCX(LIBDCALL libd_textdomain)(char const *domainname);
 INTDEF char *NOTHROW_NCX(LIBDCALL libd_bindtextdomain)(char const *domainname, char const *dirname);
 INTDEF char *NOTHROW_NCX(LIBDCALL libd_bind_textdomain_codeset)(char const *domainname, char const *codeset);

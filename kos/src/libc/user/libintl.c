@@ -29,23 +29,27 @@ DECL_BEGIN
 
 
 
-/*[[[head:libc_dcgettext,hash:CRC-32=0xbbf3807e]]]*/
-INTERN ATTR_SECTION(".text.crt.i18n") ATTR_PURE WUNUSED __ATTR_FORMAT_ARG(2) char *
-NOTHROW_NCX(LIBCCALL libc_dcgettext)(char const *domainname,
-                                     char const *msgid,
-                                     int category)
-/*[[[body:libc_dcgettext]]]*/
+
+
+
+
+/*[[[head:libc_dcngettext,hash:CRC-32=0x79ad7a07]]]*/
+INTERN ATTR_SECTION(".text.crt.i18n") ATTR_PURE WUNUSED __ATTR_FORMAT_ARG(2) __ATTR_FORMAT_ARG(3) char *
+NOTHROW_NCX(LIBCCALL libc_dcngettext)(char const *domainname,
+                                      char const *msgid_singular,
+                                      char const *msgid_plural,
+                                      ulongptr_t n,
+                                      int category)
+/*[[[body:libc_dcngettext]]]*/
 /*AUTO*/{
 	/* Generic no-op that works, but doesn't actually support languages */
 	COMPILER_IMPURE();
 	(void)domainname;
 	(void)category;
-	return (char *)msgid;
+	return n == 1 ? (char *)msgid_singular
+	              : (char *)msgid_plural;
 }
-/*[[[end:libc_dcgettext]]]*/
-
-
-
+/*[[[end:libc_dcngettext]]]*/
 
 /*[[[head:libc_textdomain,hash:CRC-32=0x1c4888fb]]]*/
 INTERN ATTR_SECTION(".text.crt.i18n") char *
@@ -87,9 +91,8 @@ NOTHROW_NCX(LIBCCALL libc_bind_textdomain_codeset)(char const *domainname,
 }
 /*[[[end:libc_bind_textdomain_codeset]]]*/
 
-/*[[[start:exports,hash:CRC-32=0xa18aa25b]]]*/
-DEFINE_PUBLIC_ALIAS(__dcgettext, libc_dcgettext);
-DEFINE_PUBLIC_ALIAS(dcgettext, libc_dcgettext);
+/*[[[start:exports,hash:CRC-32=0x2829af3a]]]*/
+DEFINE_PUBLIC_ALIAS(dcngettext, libc_dcngettext);
 DEFINE_PUBLIC_ALIAS(textdomain, libc_textdomain);
 DEFINE_PUBLIC_ALIAS(bindtextdomain, libc_bindtextdomain);
 DEFINE_PUBLIC_ALIAS(bind_textdomain_codeset, libc_bind_textdomain_codeset);
