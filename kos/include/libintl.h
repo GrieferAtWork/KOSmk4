@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x192368f7 */
+/* HASH CRC-32:0xcd57c8f6 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -34,7 +34,7 @@
 #endif /* __COMPILER_HAVE_PRAGMA_GCC_SYSTEM_HEADER */
 
 #include <features.h>
-#include <bits/crt/locale.h>
+#include <asm/crt/locale.h>
 #include <hybrid/typecore.h>
 
 #define __USE_GNU_GETTEXT 1 /* We're emulating glibc's <libintrl.h> */

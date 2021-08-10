@@ -307,9 +307,9 @@ __FORCELOCAL __ATTR_ARTIFICIAL __uint64_t (__LIBKCALL __x86_Xsyscall6_dw)(__sysc
 #define __X86_DEFINE_SYSCALL6_WRAPPER                                             \
 	".ifndef __x86.syscall6\n"                                                    \
 	".pushsection .text.__x86.syscall6,\"axG\",@progbits,__x86.syscall6,comdat\n" \
-	".globl   __x86.syscall6\n"                                                   \
-	".hidden  __x86.syscall6\n"                                                   \
-	".type    __x86.syscall6, @function\n"                                        \
+	".globl  __x86.syscall6\n"                                                    \
+	".hidden __x86.syscall6\n"                                                    \
+	".type   __x86.syscall6, @function\n"                                         \
 	"__x86.syscall6:\n"                                                           \
 	"\t.cfi_startproc simple\n"                                                   \
 	"\t.cfi_def_cfa %%esp, 8\n"                                                   \
@@ -325,9 +325,9 @@ __FORCELOCAL __ATTR_ARTIFICIAL __uint64_t (__LIBKCALL __x86_Xsyscall6_dw)(__sysc
 #define __X86_DEFINE_XSYSCALL6_WRAPPER                                              \
 	".ifndef __x86.Xsyscall6\n"                                                     \
 	".pushsection .text.__x86.Xsyscall6,\"axG\",@progbits,__x86.Xsyscall6,comdat\n" \
-	".globl   __x86.Xsyscall6\n"                                                    \
-	".hidden  __x86.Xsyscall6\n"                                                    \
-	".type    __x86.Xsyscall6, @function\n"                                         \
+	".globl  __x86.Xsyscall6\n"                                                     \
+	".hidden __x86.Xsyscall6\n"                                                     \
+	".type   __x86.Xsyscall6, @function\n"                                          \
 	"__x86.Xsyscall6:\n"                                                            \
 	"\t.cfi_startproc simple\n"                                                     \
 	"\t.cfi_def_cfa %%esp, 8\n"                                                     \
@@ -371,10 +371,10 @@ __FORCELOCAL __ATTR_ARTIFICIAL __uint64_t (__LIBKCALL __x86_Xsyscall6_dw)(__sysc
 	"movl %1, %%ebp\n\t"                 \
 	".endif\n\t"                         \
 	".endif\n\t"
-__FORCELOCAL __ATTR_ARTIFICIAL __syscall_ulong_t (__LIBKCALL __x86_syscall6)(__syscall_ulong_t __sysno, __syscall_ulong_t __arg0, __syscall_ulong_t __arg1, __syscall_ulong_t __arg2, __syscall_ulong_t __arg3, __syscall_ulong_t __arg4, __syscall_ulong_t __arg5) { __register __syscall_ulong_t __res; __register __syscall_ulong_t __temp; __asm__ __volatile__(__X86_SYSCALL_WITH_EBP(__X86_SYSCALL_ASSEMBLY, __X86_DEFINE_SYSCALL6_WRAPPER, "call __x86.syscall6") : "=a" (__res), "=&m" (__temp) : "0" (__sysno), "b" (__arg0), "c" (__arg1), "d" (__arg2), "S" (__arg3), "D" (__arg4), "g" (__arg5) : "memory", "cc"); return __res; }
-__FORCELOCAL __ATTR_ARTIFICIAL __syscall_ulong_t (__LIBKCALL __x86_Xsyscall6)(__syscall_ulong_t __sysno, __syscall_ulong_t __arg0, __syscall_ulong_t __arg1, __syscall_ulong_t __arg2, __syscall_ulong_t __arg3, __syscall_ulong_t __arg4, __syscall_ulong_t __arg5) { __register __syscall_ulong_t __res; __register __syscall_ulong_t __temp; __asm__ __volatile__(__X86_SYSCALL_WITH_EBP(__X86_XSYSCALL_ASSEMBLY, __X86_DEFINE_XSYSCALL6_WRAPPER, "call __x86.Xsyscall6") : "=a" (__res), "=&m" (__temp) : "0" (__sysno), "b" (__arg0), "c" (__arg1), "d" (__arg2), "S" (__arg3), "D" (__arg4), "g" (__arg5) : "memory", "cc"); return __res; }
-__FORCELOCAL __ATTR_ARTIFICIAL __uint64_t (__LIBKCALL __x86_syscall6_dw)(__syscall_ulong_t __sysno, __syscall_ulong_t __arg0, __syscall_ulong_t __arg1, __syscall_ulong_t __arg2, __syscall_ulong_t __arg3, __syscall_ulong_t __arg4, __syscall_ulong_t __arg5) { __register __uint64_t __res; __register __syscall_ulong_t __temp; __asm__ __volatile__(__X86_SYSCALL_WITH_EBP(__X86_SYSCALL_ASSEMBLY, __X86_DEFINE_SYSCALL6_WRAPPER, "call __x86.syscall6") : "=A" (__res), "=&m" (__temp) : "a" (__sysno), "b" (__arg0), "c" (__arg1), "d" (__arg2), "S" (__arg3), "D" (__arg4), "g" (__arg5) : "memory", "cc"); return __res; }
-__FORCELOCAL __ATTR_ARTIFICIAL __uint64_t (__LIBKCALL __x86_Xsyscall6_dw)(__syscall_ulong_t __sysno, __syscall_ulong_t __arg0, __syscall_ulong_t __arg1, __syscall_ulong_t __arg2, __syscall_ulong_t __arg3, __syscall_ulong_t __arg4, __syscall_ulong_t __arg5) { __register __uint64_t __res; __register __syscall_ulong_t __temp; __asm__ __volatile__(__X86_SYSCALL_WITH_EBP(__X86_XSYSCALL_ASSEMBLY, __X86_DEFINE_XSYSCALL6_WRAPPER, "call __x86.Xsyscall6") : "=A" (__res), "=&m" (__temp) : "a" (__sysno), "b" (__arg0), "c" (__arg1), "d" (__arg2), "S" (__arg3), "D" (__arg4), "g" (__arg5) : "memory", "cc"); return __res; }
+__FORCELOCAL __ATTR_ARTIFICIAL __syscall_ulong_t (__LIBKCALL __x86_syscall6)(__syscall_ulong_t __sysno, __syscall_ulong_t __arg0, __syscall_ulong_t __arg1, __syscall_ulong_t __arg2, __syscall_ulong_t __arg3, __syscall_ulong_t __arg4, __syscall_ulong_t __arg5) { __register __syscall_ulong_t __res; __syscall_ulong_t __temp; __asm__ __volatile__(__X86_SYSCALL_WITH_EBP(__X86_SYSCALL_ASSEMBLY, __X86_DEFINE_SYSCALL6_WRAPPER, "call __x86.syscall6") : "=a" (__res), "=&m" (__temp) : "0" (__sysno), "b" (__arg0), "c" (__arg1), "d" (__arg2), "S" (__arg3), "D" (__arg4), "g" (__arg5) : "memory", "cc"); return __res; }
+__FORCELOCAL __ATTR_ARTIFICIAL __syscall_ulong_t (__LIBKCALL __x86_Xsyscall6)(__syscall_ulong_t __sysno, __syscall_ulong_t __arg0, __syscall_ulong_t __arg1, __syscall_ulong_t __arg2, __syscall_ulong_t __arg3, __syscall_ulong_t __arg4, __syscall_ulong_t __arg5) { __register __syscall_ulong_t __res; __syscall_ulong_t __temp; __asm__ __volatile__(__X86_SYSCALL_WITH_EBP(__X86_XSYSCALL_ASSEMBLY, __X86_DEFINE_XSYSCALL6_WRAPPER, "call __x86.Xsyscall6") : "=a" (__res), "=&m" (__temp) : "0" (__sysno), "b" (__arg0), "c" (__arg1), "d" (__arg2), "S" (__arg3), "D" (__arg4), "g" (__arg5) : "memory", "cc"); return __res; }
+__FORCELOCAL __ATTR_ARTIFICIAL __uint64_t (__LIBKCALL __x86_syscall6_dw)(__syscall_ulong_t __sysno, __syscall_ulong_t __arg0, __syscall_ulong_t __arg1, __syscall_ulong_t __arg2, __syscall_ulong_t __arg3, __syscall_ulong_t __arg4, __syscall_ulong_t __arg5) { __register __uint64_t __res; __syscall_ulong_t __temp; __asm__ __volatile__(__X86_SYSCALL_WITH_EBP(__X86_SYSCALL_ASSEMBLY, __X86_DEFINE_SYSCALL6_WRAPPER, "call __x86.syscall6") : "=A" (__res), "=&m" (__temp) : "a" (__sysno), "b" (__arg0), "c" (__arg1), "d" (__arg2), "S" (__arg3), "D" (__arg4), "g" (__arg5) : "memory", "cc"); return __res; }
+__FORCELOCAL __ATTR_ARTIFICIAL __uint64_t (__LIBKCALL __x86_Xsyscall6_dw)(__syscall_ulong_t __sysno, __syscall_ulong_t __arg0, __syscall_ulong_t __arg1, __syscall_ulong_t __arg2, __syscall_ulong_t __arg3, __syscall_ulong_t __arg4, __syscall_ulong_t __arg5) { __register __uint64_t __res; __syscall_ulong_t __temp; __asm__ __volatile__(__X86_SYSCALL_WITH_EBP(__X86_XSYSCALL_ASSEMBLY, __X86_DEFINE_XSYSCALL6_WRAPPER, "call __x86.Xsyscall6") : "=A" (__res), "=&m" (__temp) : "a" (__sysno), "b" (__arg0), "c" (__arg1), "d" (__arg2), "S" (__arg3), "D" (__arg4), "g" (__arg5) : "memory", "cc"); return __res; }
 #endif /* !__X86_SYSCALL_MAY_CLOBBER_ECX_EDX */
 #undef __X86_SYSCALL_WITH_EBP
 #endif

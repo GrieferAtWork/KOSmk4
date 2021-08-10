@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x3d257967 */
+/* HASH CRC-32:0x6697ac22 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -29,7 +29,7 @@
 DECL_BEGIN
 
 #ifndef __KERNEL__
-#include <bits/crt/locale.h>
+#include <asm/crt/locale.h>
 #ifndef __LC_MESSAGES
 #define __LC_MESSAGES 0
 #endif /* !__LC_MESSAGES */
@@ -39,7 +39,7 @@ NOTHROW_NCX(LIBCCALL libc_dcgettext)(char const *domainname,
                                      int category) {
 	return libc_dcngettext(domainname, msgid, NULL, 1, category);
 }
-#include <bits/crt/locale.h>
+#include <asm/crt/locale.h>
 #ifndef __LC_MESSAGES
 #define __LC_MESSAGES 0
 #endif /* !__LC_MESSAGES */
@@ -48,7 +48,7 @@ NOTHROW_NCX(LIBCCALL libc_dgettext)(char const *domainname,
                                     char const *msgid) {
 	return libc_dcngettext(domainname, msgid, NULL, 1, __LC_MESSAGES);
 }
-#include <bits/crt/locale.h>
+#include <asm/crt/locale.h>
 #ifndef __LC_MESSAGES
 #define __LC_MESSAGES 0
 #endif /* !__LC_MESSAGES */
@@ -56,7 +56,7 @@ INTERN ATTR_SECTION(".text.crt.i18n") ATTR_PURE WUNUSED __ATTR_FORMAT_ARG(1) cha
 NOTHROW_NCX(LIBCCALL libc_gettext)(char const *msgid) {
 	return libc_dcngettext(NULL, msgid, NULL, 1, __LC_MESSAGES);
 }
-#include <bits/crt/locale.h>
+#include <asm/crt/locale.h>
 #ifndef __LC_MESSAGES
 #define __LC_MESSAGES 0
 #endif /* !__LC_MESSAGES */
@@ -66,7 +66,7 @@ NOTHROW_NCX(LIBCCALL libc_ngettext)(char const *msgid_singular,
                                     ulongptr_t n) {
 	return libc_dcngettext(NULL, msgid_singular, msgid_plural, n, __LC_MESSAGES);
 }
-#include <bits/crt/locale.h>
+#include <asm/crt/locale.h>
 #ifndef __LC_MESSAGES
 #define __LC_MESSAGES 0
 #endif /* !__LC_MESSAGES */

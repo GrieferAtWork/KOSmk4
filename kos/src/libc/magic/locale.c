@@ -43,7 +43,7 @@
 %[insert:prefix(
 #include <features.h>
 )]%[insert:prefix(
-#include <bits/crt/locale.h>
+#include <asm/crt/locale.h>
 )]%[insert:prefix(
 #include <bits/crt/lconv.h>
 )]%{

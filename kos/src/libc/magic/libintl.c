@@ -31,7 +31,7 @@
 %[insert:prefix(
 #include <features.h>
 )]%[insert:prefix(
-#include <bits/crt/locale.h>
+#include <asm/crt/locale.h>
 )]%[insert:prefix(
 #include <hybrid/typecore.h>
 )]%{
@@ -55,21 +55,21 @@ __SYSDECL_BEGIN
 
 
 [[wunused, pure, export_alias("__dcgettext")]]
-[[extern_inline, impl_include("<bits/crt/locale.h>")]]
+[[extern_inline, impl_include("<asm/crt/locale.h>")]]
 [[impl_prefix(DEFINE_FALLBACK___LC_MESSAGES)]]
 char *dcgettext(char const *domainname, [[format_arg]] char const *msgid, int category) {
 	return dcngettext(domainname, msgid, NULL, 1, category);
 }
 
 [[wunused, pure, export_alias("__dgettext")]]
-[[extern_inline, impl_include("<bits/crt/locale.h>")]]
+[[extern_inline, impl_include("<asm/crt/locale.h>")]]
 [[impl_prefix(DEFINE_FALLBACK___LC_MESSAGES)]]
 char *dgettext(char const *domainname, [[format_arg]] char const *msgid) {
 	return dcngettext(domainname, msgid, NULL, 1, __LC_MESSAGES);
 }
 
 [[wunused, pure]]
-[[extern_inline, impl_include("<bits/crt/locale.h>")]]
+[[extern_inline, impl_include("<asm/crt/locale.h>")]]
 [[impl_prefix(DEFINE_FALLBACK___LC_MESSAGES)]]
 char *gettext([[format_arg]] char const *msgid) {
 	return dcngettext(NULL, msgid, NULL, 1, __LC_MESSAGES);
@@ -77,7 +77,7 @@ char *gettext([[format_arg]] char const *msgid) {
 
 
 [[wunused, pure, decl_include("<hybrid/typecore.h>")]]
-[[extern_inline, impl_include("<bits/crt/locale.h>")]]
+[[extern_inline, impl_include("<asm/crt/locale.h>")]]
 [[impl_prefix(DEFINE_FALLBACK___LC_MESSAGES)]]
 char *ngettext([[format_arg]] char const *msgid_singular,
                [[format_arg]] char const *msgid_plural,
@@ -86,7 +86,7 @@ char *ngettext([[format_arg]] char const *msgid_singular,
 }
 
 [[wunused, pure, decl_include("<hybrid/typecore.h>")]]
-[[extern_inline, impl_include("<bits/crt/locale.h>")]]
+[[extern_inline, impl_include("<asm/crt/locale.h>")]]
 [[impl_prefix(DEFINE_FALLBACK___LC_MESSAGES)]]
 char *dngettext(char const *domainname,
                 [[format_arg]] char const *msgid_singular,

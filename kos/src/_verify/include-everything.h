@@ -136,6 +136,7 @@ incdir("");
 #include <asm/crt/glob.h>
 #include <asm/crt/humanize_number.h>
 #include <asm/crt/limits.h>
+#include <asm/crt/locale.h>
 #include <asm/crt/malloc.h>
 #include <asm/crt/math-exception.h>
 #include <asm/crt/math-libc_version.h>
@@ -240,7 +241,6 @@ incdir("");
 #include <bits/crt/inttypes.h>
 #include <bits/crt/io-file.h>
 #include <bits/crt/lconv.h>
-#include <bits/crt/locale.h>
 #include <bits/crt/math-vector.h>
 #include <bits/crt/mathdef.h>
 #include <bits/crt/mbstate.h>
