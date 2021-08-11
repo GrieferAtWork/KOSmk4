@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xf2860696 */
+/* HASH CRC-32:0x680d94ed */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -194,7 +194,6 @@
 #define __stub_ctanhf
 #define __stub_ctanhl
 #define __stub_ctanl
-#define __stub_dcngettext
 #define __stub_dehumanize_number
 #define __stub_devname_r
 #define __stub_drand48
