@@ -196,6 +196,11 @@ struct mo_file_header {
 };
 
 
+struct mo_file_string {
+	u32 mfs_len; /* Length of string */
+	u32 mfs_off; /* Offset of string (relative to `mf_base') */
+};
+
 struct mo_file {
 	/* .mo filename makeup:
 	 *
@@ -232,6 +237,10 @@ struct mo_file {
 		byte_t                      *mf_base;     /* [1..mf_size][owned][const] File base address / data blob. (mmap'd) */
 		struct mo_file_header const *mf_hdr;      /* [1..1][const] File header. */
 	};
+	/* Cached fields. */
+	size_t                           mf_strcnt;   /* [const][== mf_hdr->mo_strcount] */
+	struct mo_file_string const     *mf_strtab;   /* [const][== mf_base + mf_hdr->mo_stroffs] */
+	struct mo_file_string const     *mf_trntab;   /* [const][== mf_base + mf_hdr->mo_trnoffs] */
 	COMPILER_FLEXIBLE_ARRAY(char,    mf_name);    /* [*][const] Absolute filename of this file. */
 };
 
@@ -245,7 +254,11 @@ DECL_END
 #define RBTREE_CC                  __FCALL
 #define RBTREE_NOTHROW             NOTHROW
 #define RBTREE_KEY_LO(a, b)        (strcmp(a, b) < 0)
+#define RBTREE_KEY_LE(a, b)        (strcmp(a, b) <= 0)
 #define RBTREE_KEY_EQ(a, b)        (strcmp(a, b) == 0)
+#define RBTREE_KEY_NE(a, b)        (strcmp(a, b) != 0)
+#define RBTREE_KEY_GR(a, b)        (strcmp(a, b) > 0)
+#define RBTREE_KEY_GE(a, b)        (strcmp(a, b) >= 0)
 #define RBTREE_ISRED(self)         ((self)->mf_red != 0)
 #define RBTREE_SETRED(self)        (void)((self)->mf_red = 1)
 #define RBTREE_SETBLACK(self)      (void)((self)->mf_red = 0)
@@ -369,7 +382,7 @@ get_domain_directory(char const *__restrict domainname) {
 		size_t i;
 		int cmp;
 		i   = (lo + hi) / 2;
-		cmp = strcmp(domain_directory_list[i].dd_dom, domainname);
+		cmp = strcmp(domainname, domain_directory_list[i].dd_dom);
 		if (cmp < 0) {
 			hi = i;
 		} else if (cmp > 0) {
@@ -493,7 +506,7 @@ err_r_map:
 			/* Verify that offsets within the header  are all OK. Note that  because
 			 * we're using `MAP_PRIVATE', we're guarantied that the data of our file
 			 * mapping won't change, even when  another process would attempt to  do
-			 * so. (Meaning that these offests will _remain_ valid) */
+			 * so. (Meaning that these offsets will _remain_ valid) */
 			if (OVERFLOW_UMUL(base->mo_strcount, 8, &size))
 				goto err_r_map;
 			if (OVERFLOW_UADD(maxoff, size, &maxoff))
@@ -502,8 +515,11 @@ err_r_map:
 				goto err_r_map;
 		}
 
-		result->mf_size = (size_t)st.st_size;
-		result->mf_base = (byte_t *)base;
+		result->mf_size   = (size_t)st.st_size;
+		result->mf_base   = (byte_t *)base;
+		result->mf_strcnt = base->mo_strcount;
+		result->mf_strtab = (struct mo_file_string const *)((byte_t const *)base + base->mo_stroffs);
+		result->mf_trntab = (struct mo_file_string const *)((byte_t const *)base + base->mo_trnoffs);
 	}
 
 	/* Fill in the other fields of the new file. */
@@ -593,6 +609,58 @@ load_file_slowly:
 PRIVATE char *current_domainname = NULL;
 
 
+/* Translate the given message. */
+PRIVATE WUNUSED ATTR_RETNONNULL NONNULL((1, 2)) char const *
+NOTHROW_NCX(__FCALL mo_file_translate)(struct mo_file *__restrict self,
+                                       char const *__restrict msgid) {
+	size_t lo, hi;
+	/* The specs promise that strings are sorted lexicographically.
+	 * As such, we're able to perform a binary search to find  what
+	 * we're after! */
+	lo = 0;
+	hi = self->mf_strcnt;
+	while (lo < hi) {
+		size_t i;
+		u32 offset, size, end_offset;
+		char const *str;
+		int cmp;
+		i      = (lo + hi) / 2;
+		offset = self->mf_strtab[i].mfs_off;
+		size   = self->mf_strtab[i].mfs_len;
+		if unlikely(OVERFLOW_UADD(offset, size, &end_offset) ||
+		            end_offset >= self->mf_size)
+			goto corrupt;
+		str = (char const *)(self->mf_base + offset);
+		if unlikely(str[size] != '\0')
+			goto corrupt;
+		cmp = strcmp(msgid, str);
+		if (cmp < 0) {
+			hi = i;
+		} else if (cmp > 0) {
+			lo = i + 1;
+		} else {
+			/* Found it! */
+			offset = self->mf_trntab[i].mfs_off;
+			size   = self->mf_trntab[i].mfs_len;
+			if unlikely(OVERFLOW_UADD(offset, size, &end_offset) ||
+			            end_offset >= self->mf_size)
+				goto corrupt;
+			str = (char const *)(self->mf_base + offset);
+			if unlikely(str[size] != '\0')
+				goto corrupt;
+			return str;
+		}
+	}
+fallback:
+	return msgid;
+corrupt:
+	self->mf_strcnt = 0; /* There's something wrong (don't try again in the future...) */
+	goto fallback;
+}
+
+
+
+
 /*[[[head:libc_dcngettext,hash:CRC-32=0x79ad7a07]]]*/
 INTERN ATTR_SECTION(".text.crt.i18n") ATTR_PURE WUNUSED __ATTR_FORMAT_ARG(2) __ATTR_FORMAT_ARG(3) char *
 NOTHROW_NCX(LIBCCALL libc_dcngettext)(char const *domainname,
@@ -625,15 +693,23 @@ NOTHROW_NCX(LIBCCALL libc_dcngettext)(char const *domainname,
 	}
 
 	file = get_mo_file(domainname, category);
-	if unlikely(!file)
-		goto fail;
+	if (file) {
+		char const *msgid = msgid_singular;
+		if (0) {
+			/* TODO: Plural  parsing support! (something  to do with `mo_file_translate(file, "")',
+			 *       which is guarantied to be located in string slot 0 (because of lexicographical
+			 *       sorting)) */
+		} else {
+			if (n != 1)
+				msgid = msgid_plural;
+		}
 
-	/* TODO: Actually retrieve strings. */
-
+		/* Actually retrieve strings. */
+		if likely(msgid != NULL)
+			msgid = mo_file_translate(file, msgid);
+		return (char *)msgid;
+	}
 fail:
-	/* Fallback... */
-	CRT_UNIMPLEMENTEDF("libc_dcngettext(%q, %q, %q, %lu, %d)",
-	                   domainname, msgid_singular, msgid_plural, n, category);
 	return n == 1 ? (char *)msgid_singular
 	              : (char *)msgid_plural;
 }
@@ -692,7 +768,7 @@ delete_domain_name:
 			size_t i;
 			int cmp;
 			i   = (lo + hi) / 2;
-			cmp = strcmp(domain_directory_list[i].dd_dom, domainname);
+			cmp = strcmp(domainname, domain_directory_list[i].dd_dom);
 			if (cmp < 0) {
 				hi = i;
 			} else if (cmp > 0) {
@@ -744,7 +820,7 @@ delete_domain_name:
 				size_t i;
 				int cmp;
 				i   = (lo + hi) / 2;
-				cmp = strcmp(domain_directory_list[i].dd_dom, domainname);
+				cmp = strcmp(domainname, domain_directory_list[i].dd_dom);
 				if (cmp < 0) {
 					hi = i;
 				} else if (cmp > 0) {
