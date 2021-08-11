@@ -1378,11 +1378,13 @@ PRIVATE ATTR_PURE bool CC
 is_printable_string(USER CHECKED char const *str,
                     size_t length) {
 	size_t i;
+	size_t num_printable = 0;
 	for (i = 0; i < length; ++i) {
-		if (!is_printable_character(str[i]))
-			return false;
+		if (is_printable_character(str[i]))
+			++num_printable;
 	}
-	return true;
+	/* Consider as printable when at least 3/4th are printable characters. */
+	return (num_printable * 4) >= (length * 3);
 }
 
 PRIVATE ssize_t CC
@@ -1399,8 +1401,8 @@ print_string_or_buffer(pformatprinter printer, void *arg,
 		if (used_length > LIMIT_STRLEN)
 			used_length = LIMIT_STRLEN;
 		validate_readable(buf, used_length);
-		/* Check if all characters are printable.
-		 * If  all  of  them  are,  output  as  a */
+		/* Check if all characters are  printable.
+		 * If all of them are, output as a string. */
 		if (is_printable_string((char const *)buf, used_length)) {
 			result = format_printf(printer, arg, "%$q", used_length, buf);
 			if unlikely(result < 0)
