@@ -40,7 +40,6 @@
  * >> #define RBTREE_Tkey                uintptr_t
  * >> #define RBTREE_CC                  LIBCCALL
  * >> #define RBTREE_NOTHROW             NOTHROW_NCX
- * >> #define RBTREE_MINKEY_EQ_MAXKEY                   // minkey == maxkey for all nodes
  * >> #define RBTREE_KEY_LO(a, b)        ((a) < (b))    // Compare keys
  * >> #define RBTREE_KEY_EQ(a, b)        ((a) == (b))   // Compare keys
  * >> #define RBTREE_NULL                NULL           // Null-branch

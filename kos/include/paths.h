@@ -100,6 +100,8 @@
 
 #define _PATH_TMP "/tmp/"
 
+#define _PATH_TEXTDOMAIN "/usr/share/locale"
+
 #ifndef _PATH_DEFPATH
 #define _PATH_DEFPATH "/usr/bin:/bin"
 #endif /* !_PATH_DEFPATH */

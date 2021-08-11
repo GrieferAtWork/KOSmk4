@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xba3c9aa1 */
+/* HASH CRC-32:0xf2860696 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -114,10 +114,8 @@
 #define __stub_asinh
 #define __stub___atanh
 #define __stub_atanh
-#define __stub_bind_textdomain_codeset
 #define __stub_bindresvport
 #define __stub_bindresvport6
-#define __stub_bindtextdomain
 #define __stub_cabs
 #define __stub_cabsf
 #define __stub_cabsl
@@ -196,6 +194,7 @@
 #define __stub_ctanhf
 #define __stub_ctanhl
 #define __stub_ctanl
+#define __stub_dcngettext
 #define __stub_dehumanize_number
 #define __stub_devname_r
 #define __stub_drand48
@@ -568,7 +567,6 @@
 #define __stub__tempnam
 #endif /* __LIBCCALL_IS_LIBDCALL */
 #define __stub_tempnam
-#define __stub_textdomain
 #define __stub___tgamma
 #define __stub_tgamma
 #define __stub_tmpfile
