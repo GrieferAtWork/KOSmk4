@@ -41,6 +41,7 @@ gcc_opt.append("-fexceptions");
 
 #include <alloca.h>
 #include <assert.h>
+#include <ctype.h>
 #include <fcntl.h>
 #include <locale.h>
 #include <paths.h>
@@ -201,6 +202,12 @@ struct mo_file_string {
 	u32 mfs_off; /* Offset of string (relative to `mf_base') */
 };
 
+#ifndef __OPTIMIZE_SIZE__
+/* Because it's the most common case (s.a. `gettext(3)'),
+ * we have a dedicated optimization for when `n == 1'  */
+#define MO_FILE_HAVE_PLURAL1
+#endif /* !__OPTIMIZE_SIZE__ */
+
 struct mo_file {
 	/* .mo filename makeup:
 	 *
@@ -241,6 +248,10 @@ struct mo_file {
 	size_t                           mf_strcnt;   /* [const][== mf_hdr->mo_strcount] */
 	struct mo_file_string const     *mf_strtab;   /* [const][== mf_base + mf_hdr->mo_stroffs] */
 	struct mo_file_string const     *mf_trntab;   /* [const][== mf_base + mf_hdr->mo_trnoffs] */
+	char const                      *mf_plural;   /* [const][0..1] Plural decode expression. */
+#ifdef MO_FILE_HAVE_PLURAL1
+	ulongptr_t                       mf_plural1;  /* [const][valid_if(mf_plural)] The value of `eval_plural_expression(mf_plural, 1)'. */
+#endif /* MO_FILE_HAVE_PLURAL1 */
 	COMPILER_FLEXIBLE_ARRAY(char,    mf_name);    /* [*][const] Absolute filename of this file. */
 };
 
@@ -312,7 +323,7 @@ PRIVATE void NOTHROW(__FCALL clear_language_cache)(void) {
  * messages. Returns an empty string if no language is  set.
  * NOTE: The caller must ensure that `category' is valid.
  * NOTE: Leading or trailing slashes will have been removed */
-PRIVATE WUNUSED ATTR_RETNONNULL char const *
+PRIVATE ATTR_RETNONNULL WUNUSED char const *
 NOTHROW(__FCALL get_language_name)(int category) {
 	char const *result;
 	result = language_names[(unsigned int)category];
@@ -374,7 +385,7 @@ PRIVATE struct domain_directory *domain_directory_list = NULL;
 PRIVATE char const default_domain_dir[] = _PATH_TEXTDOMAIN;
 
 /* Return the directory against which `domainname' is bound. */
-PRIVATE WUNUSED ATTR_PURE ATTR_RETNONNULL NONNULL((1)) char const *__FCALL
+PRIVATE ATTR_PURE ATTR_RETNONNULL WUNUSED NONNULL((1)) char const *__FCALL
 get_domain_directory(char const *__restrict domainname) {
 	size_t lo = 0, hi = domain_directory_size;
 	/* Binary search for the correct entry. */
@@ -395,11 +406,454 @@ get_domain_directory(char const *__restrict domainname) {
 	return default_domain_dir;
 }
 
+typedef ulongptr_t plural_tok_t;
+#define PLURAL_TOK_EOF  0     /* End-of-file */
+#define PLURAL_TOK_LAND 0x100 /* && */
+#define PLURAL_TOK_LOR  0x101 /* || */
+#define PLURAL_TOK_EQ   0x102 /* == */
+#define PLURAL_TOK_NE   0x103 /* != */
+#define PLURAL_TOK_GE   0x104 /* >= */
+#define PLURAL_TOK_LE   0x105 /* <= */
 
+#define _PLURAL_TOK_CONST_BASE 0x106
+#define PLURAL_TOK_ISCONST(x)      ((plural_tok_t)(x) >= _PLURAL_TOK_CONST_BASE)
+#define PLURAL_TOK_GETCONST(x)     ((longptr_t)(x)-_PLURAL_TOK_CONST_BASE)
+#define PLURAL_TOK_SETCONST(value) ((plural_tok_t)(value) + _PLURAL_TOK_CONST_BASE)
+
+struct plural_parser {
+	plural_tok_t pp_tok; /* Current token. */
+	char const  *pp_ptr; /* [1..1] Next token text pointer. */
+	longptr_t    pp_n;   /* The input constant `n' */
+};
+
+
+/* Plural expression tokenization. */
+PRIVATE NONNULL((1)) void
+NOTHROW_NCX(__FCALL plural_yield)(struct plural_parser *__restrict self) {
+	plural_tok_t result;
+	char const *ptr = self->pp_ptr;
+	char ch;
+again:
+	ch = *ptr++;
+	switch (ch) {
+
+	case 0x00 ... 0x08:
+	case 0x0e ... 0x1f:
+	case 0x0a: /* LF */
+	case 0x0d: /* CR */
+	case ';':
+		/* End-of-file characters. */
+		goto eof;
+
+	case 0x09: /* TAB */
+	case 0x0b: /* VT */
+	case 0x0c: /* FF */
+	case 0x20: /* SPC */
+		/* Space characters. */
+		goto again;
+
+	case 'n':
+		/* Special case: the input constant `n' */
+		if unlikely(isalnum(*ptr))
+			goto eof; /* Error */
+		result = PLURAL_TOK_SETCONST(self->pp_n);
+		break;
+
+	case '0': {
+		ulongptr_t value;
+		ch = *ptr;
+		if (ch == 'x' || ch == 'X') {
+			/* Hex constant */
+			ch = *++ptr;
+			if (ch >= '0' && ch <= '9') {
+				value = ch - '0';
+			} else if (ch >= 'a' && ch <= 'f') {
+				value = 10 + ch - 'a';
+			} else if (ch >= 'A' && ch <= 'F') {
+				value = 10 + ch - 'A';
+			} else {
+				goto eof; /* Error */
+			}
+			for (;;) {
+				ulongptr_t addend;
+				ch = *++ptr;
+				if (ch >= '0' && ch <= '9') {
+					addend = ch - '0';
+				} else if (ch >= 'a' && ch <= 'f') {
+					addend = 10 + ch - 'a';
+				} else if (ch >= 'A' && ch <= 'F') {
+					addend = 10 + ch - 'A';
+				} else {
+					break; /* Error */
+				}
+				value *= 16;
+				value += addend;
+			}
+		} else if (ch == 'b' || ch == 'B') {
+			/* Binary constant */
+			ch = *++ptr;
+			if (ch != '0' && ch != '1')
+				goto eof; /* Error */
+			value = ch - '0';
+			for (;;) {
+				ch = *++ptr;
+				if (ch != '0' && ch != '1')
+					break;
+				value *= 2;
+				value += ch - '0';
+			}
+		} else if (ch >= '0' && ch <= '7') {
+			/* Octal constant */
+			value = ch - '0';
+			for (;;) {
+				ch = *++ptr;
+				if (!(ch >= '0' && ch <= '7'))
+					break;
+				value *= 8;
+				value += ch - '0';
+			}
+		} else {
+			/* Just the number '0' */
+			value = 0;
+		}
+		result = PLURAL_TOK_SETCONST(value);
+	}	break;
+
+	case '1' ... '9': {
+		/* Decimal constant */
+		ulongptr_t value = ch - '0';
+		for (;;) {
+			ch = *ptr;
+			if (!(ch >= '0' && ch <= '9'))
+				break;
+			value *= 10;
+			value += ch - '0';
+			++ptr;
+		}
+		result = PLURAL_TOK_SETCONST(value);
+	}	break;
+
+	/* Multi-character tokens. */
+	case '&':
+		if (*ptr == '&') {
+			++ptr;
+			result = PLURAL_TOK_LAND;
+		} else {
+			goto defl;
+		}
+		break;
+
+	case '|':
+		if (*ptr == '|') {
+			++ptr;
+			result = PLURAL_TOK_LOR;
+		} else {
+			goto defl;
+		}
+		break;
+
+	case '=':
+		if (*ptr == '=') {
+			++ptr;
+			result = PLURAL_TOK_EQ;
+		} else {
+			goto defl;
+		}
+		break;
+
+	case '!':
+		if (*ptr == '=') {
+			++ptr;
+			result = PLURAL_TOK_NE;
+		} else {
+			goto defl;
+		}
+		break;
+
+	case '>':
+		if (*ptr == '=') {
+			++ptr;
+			result = PLURAL_TOK_GE;
+		} else {
+			goto defl;
+		}
+		break;
+
+	case '<':
+		if (*ptr == '=') {
+			++ptr;
+			result = PLURAL_TOK_LE;
+		} else {
+			goto defl;
+		}
+		break;
+
+	default:
+defl:
+		result = (plural_tok_t)(unsigned char)ch;
+		break;
+	}
+	self->pp_ptr = ptr;
+	self->pp_tok = result;
+	return;
+eof:
+	self->pp_tok = PLURAL_TOK_EOF;
+}
+
+/* The following c-like operators are supported (in this priority order):
+ *   UNARY  ::=  '!' UNARY | <CONST> | '(' COND ')'
+ *   PROD   ::=  UNARY | UNARY '*' PROD | UNARY '/' PROD | UNARY '%' PROD
+ *   SUM    ::=  PROD | PROD '+' SUM | PROD '-' SUM
+ *   CMP    ::=  SUM | SUM '<' CMP | SUM '>' CMP | SUM '<=' CMP | SUM '>=' CMP
+ *   CMPEQ  ::=  CMP | CMP '==' CMPEQ | CMP '!=' CMPEQ
+ *   LAND   ::=  CMPEQ | CMPEQ '&&' LAND
+ *   LOR    ::=  LAND | LAND '||' LOR
+ *   COND   ::=  LOR | LOR '?' COND ':' COND
+ */
+
+PRIVATE WUNUSED NONNULL((1)) longptr_t
+NOTHROW_NCX(__FCALL plural_cond)(struct plural_parser *__restrict self);
+PRIVATE WUNUSED NONNULL((1)) longptr_t
+NOTHROW_NCX(__FCALL plural_unary)(struct plural_parser *__restrict self) {
+	longptr_t result;
+	plural_tok_t tok;
+	tok = self->pp_tok;
+	plural_yield(self);
+	switch (tok) {
+
+	case '-':
+		result = -plural_unary(self);
+		break;
+
+	case '!':
+		result = !plural_unary(self);
+		break;
+
+	case '(':
+		result = plural_cond(self);
+		if likely(self->pp_tok == ')')
+			plural_yield(self);
+		else {
+			/* Force EOF */
+			self->pp_tok = PLURAL_TOK_EOF;
+			self->pp_ptr = strend(self->pp_ptr);
+		}
+		break;
+
+	default:
+		if (PLURAL_TOK_ISCONST(tok)) {
+			result = PLURAL_TOK_GETCONST(tok);
+		} else {
+			result = 0; /* Invalid token... */
+		}
+		break;
+	}
+	return result;
+}
+
+PRIVATE WUNUSED NONNULL((1)) longptr_t
+NOTHROW_NCX(__FCALL plural_prod)(struct plural_parser *__restrict self) {
+	longptr_t other, result = plural_unary(self);
+	while (self->pp_tok == '*' || self->pp_tok == '/' || self->pp_tok == '%') {
+		plural_tok_t cmd = self->pp_tok;
+		plural_yield(self);
+		other = plural_unary(self);
+		if (cmd == '*') {
+			result = result * other;
+		} else if (other != 0) {
+			result = cmd == '/' ? (result / other)
+			                    : (result % other);
+		}
+	}
+	return result;
+}
+
+PRIVATE WUNUSED NONNULL((1)) longptr_t
+NOTHROW_NCX(__FCALL plural_sum)(struct plural_parser *__restrict self) {
+	longptr_t other, result = plural_prod(self);
+	while (self->pp_tok == '+' || self->pp_tok == '-') {
+		plural_tok_t cmd = self->pp_tok;
+		plural_yield(self);
+		other = plural_prod(self);
+		result = cmd == '+' ? (result + other)
+		                    : (result - other);
+	}
+	return result;
+}
+
+PRIVATE WUNUSED NONNULL((1)) longptr_t
+NOTHROW_NCX(__FCALL plural_cmp)(struct plural_parser *__restrict self) {
+	longptr_t other, result = plural_sum(self);
+	while (self->pp_tok == '<' || self->pp_tok == PLURAL_TOK_LE ||
+	       self->pp_tok == '>' || self->pp_tok == PLURAL_TOK_GE) {
+		plural_tok_t cmd = self->pp_tok;
+		plural_yield(self);
+		other = plural_sum(self);
+		if (cmd == '<') {
+			result = result < other;
+		} else if (cmd == PLURAL_TOK_LE) {
+			result = result <= other;
+		} else if (cmd == '>') {
+			result = result > other;
+		} else {
+			result = result >= other;
+		}
+	}
+	return result;
+}
+
+PRIVATE WUNUSED NONNULL((1)) longptr_t
+NOTHROW_NCX(__FCALL plural_cmpeq)(struct plural_parser *__restrict self) {
+	longptr_t other, result = plural_cmp(self);
+	while (self->pp_tok == PLURAL_TOK_EQ || self->pp_tok == PLURAL_TOK_NE) {
+		plural_tok_t cmd = self->pp_tok;
+		plural_yield(self);
+		other = plural_cmp(self);
+		result = cmd == PLURAL_TOK_EQ ? (result == other)
+		                              : (result != other);
+	}
+	return result;
+}
+
+PRIVATE WUNUSED NONNULL((1)) longptr_t
+NOTHROW_NCX(__FCALL plural_land)(struct plural_parser *__restrict self) {
+	longptr_t result;
+	result = plural_cmpeq(self);
+	while (self->pp_tok == PLURAL_TOK_LAND) {
+		plural_yield(self);
+		result = result && plural_cmpeq(self);
+	}
+	return result;
+}
+
+PRIVATE WUNUSED NONNULL((1)) longptr_t
+NOTHROW_NCX(__FCALL plural_lor)(struct plural_parser *__restrict self) {
+	longptr_t result;
+	result = plural_land(self);
+	while (self->pp_tok == PLURAL_TOK_LOR) {
+		plural_yield(self);
+		result = result || plural_land(self);
+	}
+	return result;
+}
+
+PRIVATE WUNUSED NONNULL((1)) longptr_t
+NOTHROW_NCX(__FCALL plural_cond)(struct plural_parser *__restrict self) {
+	longptr_t result;
+	result = plural_lor(self);
+	if (self->pp_tok == '?') {
+		longptr_t tt, ff;
+		plural_yield(self);
+		tt = plural_cond(self);
+		if (self->pp_tok == ':')
+			plural_yield(self);
+		ff = plural_cond(self);
+		result = result ? tt : ff;
+	}
+	return result;
+}
+
+/* Evaluate a plural expression and return the strend^N index to-be used. */
+PRIVATE ATTR_PURE WUNUSED NONNULL((1)) ulongptr_t
+NOTHROW_NCX(__FCALL eval_plural_expression)(char const *__restrict expr, longptr_t n) {
+	longptr_t result;
+	struct plural_parser parser;
+	parser.pp_ptr = expr;
+	parser.pp_n   = n;
+	plural_yield(&parser); /* Yield the first token. */
+
+	/* Evaluate the expression. */
+	result = plural_cond(&parser);
+
+	/*syslog(LOG_DEBUG, "eval_plural_expression(%$q, %ld) -> %lu\n",
+	       (size_t)(parser.pp_ptr - expr), expr, n, (ulongptr_t)result);*/
+
+	/* Return the result */
+	return (ulongptr_t)result;
+}
+
+
+/* Parse meta-data information. */
+PRIVATE WUNUSED NONNULL((1)) char const *
+NOTHROW_NCX(__FCALL mo_extract_plural_from_metadata)(char const *__restrict header,
+                                                     size_t header_len) {
+	char const *header_end;
+	/* We only care about plural information. The header contains line-wise
+	 * instructions of where to find that sort of information, and the line
+	 * we're looking for looks something like this:
+	 * >> "Plural-Forms: nplurals=2; plural=(n != 1);\n"
+	 * The part we're actually interested in here is "(n != 1);", where we
+	 * want to return the pointer to the "(".
+	 *
+	 * When translating strings, we then parse the associated expression via
+	 * a dedicated evaluation engine, which then evaluates to an addend that
+	 * is to-be applied to translations by use of strend^N.
+	 * In the above example then, do `return = strend(return)+1' whenever
+	 * the `n'  argument  given  to  `dcngettext(3)'  differs  from  `1'.
+	 *
+	 * The expression parser treats these characters as EOF:
+	 *     - ';',        (just a semicollon)
+	 *     - 0 ... 31    (all control characters, but excluding `isspace(3)' ones)
+	 *     - ')'         (only if unmatched by a preceding ')')
+	 */
+	header_end = header + header_len;
+#define islf(ch) ((ch) == '\n' || (ch) == '\r')
+	while (header < header_end) {
+		char const *iter, *line_end;
+		line_end = iter = header;
+		while (line_end < header_end && !islf(*line_end))
+			++line_end;
+		/* Skip leading spaces. */
+		while (iter < line_end && isspace(*iter))
+			++iter;
+		if (memcmp(iter, "Plural-Forms", 12 * sizeof(char)) == 0) {
+			/* NOTE: No need to check for bounds with `line_end', because we
+			 *       know that `line_end' is succeeded by \n or \r,  neither
+			 *       of which are apart of the string "Plural-Forms". */
+			iter += 12;
+			while (iter < line_end && isspace(*iter))
+				++iter;
+			if (*iter == ':') {
+				++iter;
+				/* Found it! The rest of the  line is a sequence of  ";"-seperated
+				 * expressions of the form "NAME=VALUE". We're looking for the one
+				 * where NAME is `plural' */
+				for (;;) {
+					while (iter < line_end && isspace(*iter))
+						++iter;
+					if (iter >= line_end)
+						break;
+					if (memcmp(iter, "plural", 6 * sizeof(char)) == 0) {
+						iter += 6;
+						while (iter < line_end && isspace(*iter))
+							++iter;
+						if (*iter == '=') {
+							++iter;
+							while (iter < line_end && isspace(*iter))
+								++iter;
+							/* This is where the expression starts! */
+							if (*iter <= 31 || *iter == ';')
+								return NULL; /* No/empty plural expression? */
+							return iter;
+						}
+					}
+					/* Go to the next element of the expression list. */
+					iter = (char const *)memend(iter, ';', (size_t)(line_end - iter)) + 1;
+				}
+			}
+		}
+
+		/* Go to the next line. */
+		while (line_end < header_end && islf(*line_end))
+			++line_end;
+		header = line_end;
+	}
+	return NULL;
+}
 
 /* Try to open a .mo file for the given specs. */
-PRIVATE ATTR_NOINLINE WUNUSED NONNULL((1)) struct mo_file *__FCALL
-open_mo_file(char const *__restrict domainname, int category) {
+PRIVATE ATTR_NOINLINE WUNUSED NONNULL((1)) struct mo_file *
+NOTHROW_NCX(__FCALL open_mo_file)(char const *__restrict domainname, int category) {
 	struct mo_file *result;
 	char const *lng; /* Used language name */
 	char const *dir; /* Used domain directory */
@@ -520,6 +974,27 @@ err_r_map:
 		result->mf_strcnt = base->mo_strcount;
 		result->mf_strtab = (struct mo_file_string const *)((byte_t const *)base + base->mo_stroffs);
 		result->mf_trntab = (struct mo_file_string const *)((byte_t const *)base + base->mo_trnoffs);
+
+		/* Load plural information. */
+		result->mf_plural = NULL;
+		if (base->mo_strcount > 1 && result->mf_strtab[0].mfs_len == 0) {
+			u32 offset;
+			if (!OVERFLOW_UADD(result->mf_trntab[0].mfs_off,
+			                   result->mf_trntab[0].mfs_len,
+			                   &offset) &&
+			    offset < result->mf_size) {
+				char const *metadata;
+				size_t metadata_len;
+				metadata     = (char const *)(result->mf_base + result->mf_trntab[0].mfs_off);
+				metadata_len = result->mf_trntab[0].mfs_len;
+				/* Extract the plural expression. */
+				result->mf_plural = mo_extract_plural_from_metadata(metadata, metadata_len);
+#ifdef MO_FILE_HAVE_PLURAL1
+				if (result->mf_plural)
+					result->mf_plural1 = eval_plural_expression(result->mf_plural, 1);
+#endif /* MO_FILE_HAVE_PLURAL1 */
+			}
+		}
 	}
 
 	/* Fill in the other fields of the new file. */
@@ -610,7 +1085,7 @@ PRIVATE char *current_domainname = NULL;
 
 
 /* Translate the given message. */
-PRIVATE WUNUSED ATTR_RETNONNULL NONNULL((1, 2)) char const *
+PRIVATE ATTR_RETNONNULL WUNUSED NONNULL((1, 2)) char const *
 NOTHROW_NCX(__FCALL mo_file_translate)(struct mo_file *__restrict self,
                                        char const *__restrict msgid) {
 	size_t lo, hi;
@@ -658,6 +1133,72 @@ corrupt:
 	goto fallback;
 }
 
+/* Translate the given message. */
+PRIVATE ATTR_RETNONNULL WUNUSED NONNULL((1, 2)) char const *
+NOTHROW_NCX(__FCALL mo_file_translate_plural)(struct mo_file *__restrict self,
+                                              char const *__restrict msgid,
+                                              ulongptr_t index) {
+	size_t lo, hi;
+	/* The specs promise that strings are sorted lexicographically.
+	 * As such, we're able to perform a binary search to find  what
+	 * we're after! */
+	lo = 0;
+	hi = self->mf_strcnt;
+	while (lo < hi) {
+		size_t i;
+		u32 offset, size, end_offset;
+		char const *str;
+		int cmp;
+		i      = (lo + hi) / 2;
+		offset = self->mf_strtab[i].mfs_off;
+		size   = self->mf_strtab[i].mfs_len;
+		if unlikely(OVERFLOW_UADD(offset, size, &end_offset) ||
+		            end_offset >= self->mf_size)
+			goto corrupt;
+		str = (char const *)(self->mf_base + offset);
+		if unlikely(str[size] != '\0')
+			goto corrupt;
+		cmp = strcmp(msgid, str);
+		if (cmp < 0) {
+			hi = i;
+		} else if (cmp > 0) {
+			lo = i + 1;
+		} else {
+			/* Found it! */
+			offset = self->mf_trntab[i].mfs_off;
+			size   = self->mf_trntab[i].mfs_len;
+			if unlikely(OVERFLOW_UADD(offset, size, &end_offset) ||
+			            end_offset >= self->mf_size)
+				goto corrupt;
+			str = (char const *)(self->mf_base + offset);
+			if unlikely(str[size] != '\0')
+				goto corrupt;
+			if (index > 0) {
+				/* Skip to the index'th strend^N string.
+				 *
+				 * If  no such string  exists, ignore the plural
+				 * index and simply return the base translation. */
+				char const *end = str + size;
+				char const *result = str;
+				do {
+					result = strend(result) + 1;
+					if unlikely(result >= end)
+						goto ignore_plural;
+				} while (--index);
+				return result;
+			}
+ignore_plural:
+			return str;
+		}
+	}
+fallback:
+	return msgid;
+corrupt:
+	self->mf_strcnt = 0; /* There's something wrong (don't try again in the future...) */
+	goto fallback;
+}
+
+
 
 
 
@@ -695,16 +1236,26 @@ NOTHROW_NCX(LIBCCALL libc_dcngettext)(char const *domainname,
 	file = get_mo_file(domainname, category);
 	if (file) {
 		char const *msgid = msgid_singular;
-		if (0) {
-			/* TODO: Plural  parsing support! (something  to do with `mo_file_translate(file, "")',
-			 *       which is guarantied to be located in string slot 0 (because of lexicographical
-			 *       sorting)) */
-		} else {
-			if (n != 1)
-				msgid = msgid_plural;
+		if (file->mf_plural != NULL) {
+			/* Plural  parsing support! */
+			ulongptr_t index;
+			if unlikely(msgid == NULL)
+				return NULL;
+			/* Calculate the plural expression index. */
+#ifdef MO_FILE_HAVE_PLURAL1
+			if (n == 1) {
+				index = file->mf_plural1;
+			} else
+#endif /* MO_FILE_HAVE_PLURAL1 */
+			{
+				index = eval_plural_expression(file->mf_plural, n);
+			}
+			return (char *)mo_file_translate_plural(file, msgid, index);
 		}
 
 		/* Actually retrieve strings. */
+		if (n != 1)
+			msgid = msgid_plural;
 		if likely(msgid != NULL)
 			msgid = mo_file_translate(file, msgid);
 		return (char *)msgid;
