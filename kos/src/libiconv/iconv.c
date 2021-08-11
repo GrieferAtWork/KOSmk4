@@ -78,30 +78,32 @@ NOTHROW_NCX(CC _libiconv_decode_init)(/*in|out*/ struct iconv_decode *__restrict
 		*input = self->icd_output;
 		break;
 
-//TODO:	case CODEC_UTF16LE:
-//TODO:		input->ii_arg     = self;
-//TODO:		input->ii_printer = (pformatprinter)&libiconv_utf16le_decode;
-//TODO:		self->icd_data.ied_utf.u_pbc = 0;
-//TODO:		break;
-//TODO:
-//TODO:	case CODEC_UTF16BE:
-//TODO:		input->ii_arg     = self;
-//TODO:		input->ii_printer = (pformatprinter)&libiconv_utf16be_decode;
-//TODO:		self->icd_data.ied_utf.u_pbc = 0;
-//TODO:		break;
-//TODO:
-//TODO:
-//TODO:	case CODEC_UTF32LE:
-//TODO:		input->ii_arg     = self;
-//TODO:		input->ii_printer = (pformatprinter)&libiconv_utf32le_decode;
-//TODO:		self->icd_data.ied_utf.u_pbc = 0;
-//TODO:		break;
-//TODO:
-//TODO:	case CODEC_UTF32BE:
-//TODO:		input->ii_arg     = self;
-//TODO:		input->ii_printer = (pformatprinter)&libiconv_utf32be_decode;
-//TODO:		self->icd_data.ied_utf.u_pbc = 0;
-//TODO:		break;
+	case CODEC_UTF16LE:
+		input->ii_arg     = self;
+		input->ii_printer = (pformatprinter)&libiconv_utf16le_decode;
+		self->icd_data.ied_utf.u_pbc = 0;
+		__mbstate_init(&self->icd_data.ied_utf.u_16);
+		break;
+
+	case CODEC_UTF16BE:
+		input->ii_arg     = self;
+		input->ii_printer = (pformatprinter)&libiconv_utf16be_decode;
+		self->icd_data.ied_utf.u_pbc = 0;
+		__mbstate_init(&self->icd_data.ied_utf.u_16);
+		break;
+
+
+	case CODEC_UTF32LE:
+		input->ii_arg     = self;
+		input->ii_printer = (pformatprinter)&libiconv_utf32le_decode;
+		self->icd_data.ied_utf.u_pbc = 0;
+		break;
+
+	case CODEC_UTF32BE:
+		input->ii_arg     = self;
+		input->ii_printer = (pformatprinter)&libiconv_utf32be_decode;
+		self->icd_data.ied_utf.u_pbc = 0;
+		break;
 
 	default:
 		errno = ENOENT;

@@ -29,10 +29,12 @@ gcc_opt.append("-O3"); // Force _all_ optimizations because stuff in here is per
 /**/
 
 #include <hybrid/byteswap.h>
+#include <hybrid/unaligned.h>
 
 #include <kos/types.h>
 
 #include <errno.h>
+#include <string.h>
 #include <unicode.h>
 
 #include <libiconv/iconv.h>

@@ -46,8 +46,9 @@ __DECL_BEGIN
 #ifdef LIBICONV_EXPOSE_INTERNAL
 union iconv_decode_data {
 	struct {
-		byte_t u_pbc;    /* # of pending bytes in `u_pb' */
-		byte_t u_pb[3];  /* Pending byte(s). */
+		byte_t           u_pbc;   /* # of pending bytes in `u_pb' */
+		byte_t           u_pb[3]; /* Pending byte(s). */
+		struct __mbstate u_16;    /* Surrogate storage for utf-16 input. */
 	} ied_utf; /* Pending bytes for UTF-16 and UTF-32 input data. */
 };
 

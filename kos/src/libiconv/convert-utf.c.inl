@@ -19,7 +19,7 @@
  */
 #ifdef __INTELLISENSE__
 #include "convert.c"
-#define UTF_WIDTH     16
+#define UTF_WIDTH     32
 #define UTF_BYTEORDER 1234
 #endif /* __INTELLISENSE__ */
 
@@ -75,6 +75,170 @@ err_ilseq:
 	errno = EILSEQ;
 	return -1;
 }
+
+
+#if UTF_WIDTH == 16
+#if UTF_BYTEORDER == 1234
+INTERN NONNULL((1, 2)) ssize_t
+NOTHROW_NCX(FORMATPRINTER_CC libiconv_utf16le_decode)(struct iconv_decode *__restrict self,
+                                                      /*utf-16*/ void const *__restrict data,
+                                                      size_t size)
+#else /* UTF_BYTEORDER == 1234 */
+INTERN NONNULL((1, 2)) ssize_t
+NOTHROW_NCX(FORMATPRINTER_CC libiconv_utf16be_decode)(struct iconv_decode *__restrict self,
+                                                      /*utf-16*/ void const *__restrict data,
+                                                      size_t size)
+#endif /* UTF_BYTEORDER != 1234 */
+{
+	ssize_t temp, result = 0;
+	/*utf-8*/ char buf[64], *ptr = buf;
+	size_t error;
+	if unlikely(self->icd_flags & ICONV_HASERR)
+		goto err_ilseq;
+	if (self->icd_data.ied_utf.u_pbc) {
+		union word {
+			uint16_t w;
+			uint8_t b[2];
+		};
+		union word c16;
+		if unlikely(!size)
+			return 0;
+#if UTF_BYTEORDER == 1234
+		c16.b[0] = self->icd_data.ied_utf.u_pb[0];
+		c16.b[1] = ((byte_t const *)data)[0];
+#else /* UTF_BYTEORDER == 1234 */
+		c16.b[0] = ((byte_t const *)data)[0];
+		c16.b[1] = self->icd_data.ied_utf.u_pb[0];
+#endif /* UTF_BYTEORDER != 1234 */
+		error = unicode_c16toc8(ptr, c16.w, &self->icd_data.ied_utf.u_16);
+		if unlikely(error == (size_t)-1) {
+			if (IS_ICONV_ERR_ERRNO(self->icd_flags))
+				goto err_ilseq;
+			ptr[0] = '?';
+			error  = 1;
+		}
+		ptr += error;
+		self->icd_data.ied_utf.u_pbc = 0;
+		data = (byte_t const *)data + 1;
+		--size;
+	}
+	while (size >= 2) {
+		char16_t c16;
+		/* Check if the buffer must be flushed. */
+		if ((ptr + UNICODE_16TO8_MAXBUF(1)) >= COMPILER_ENDOF(buf)) {
+			DO_decode_output(buf, (size_t)(ptr - buf));
+			ptr = buf;
+		}
+#if UTF_BYTEORDER == 1234
+		c16 = (char16_t)UNALIGNED_GETLE16((uint16_t const *)data);
+#else /* UTF_BYTEORDER == 1234 */
+		c16 = (char16_t)UNALIGNED_GETBE16((uint16_t const *)data);
+#endif /* UTF_BYTEORDER != 1234 */
+		error = unicode_c16toc8(ptr, c16, &self->icd_data.ied_utf.u_16);
+		if unlikely(error == (size_t)-1) {
+			if (IS_ICONV_ERR_ERRNO(self->icd_flags))
+				goto err_ilseq;
+			ptr[0] = '?';
+			error  = 1;
+		}
+		ptr += error;
+		data = (byte_t const *)data + 2;
+		size -= 2;
+	}
+	/* Handle unmatched utf-16 byte. */
+	if (size) {
+		self->icd_data.ied_utf.u_pb[0] = *(byte_t const *)data;
+		self->icd_data.ied_utf.u_pbc   = 1;
+	}
+	/* Flush all remaining data. */
+	DO_decode_output(buf, (size_t)(ptr - buf));
+	return result;
+err:
+	return temp;
+err_ilseq:
+	self->icd_flags |= ICONV_HASERR;
+	errno = EILSEQ;
+	return -1;
+}
+#endif /* UTF_WIDTH == 16 */
+
+
+#if UTF_WIDTH == 32
+#if UTF_BYTEORDER == 1234
+INTERN NONNULL((1, 2)) ssize_t
+NOTHROW_NCX(FORMATPRINTER_CC libiconv_utf32le_decode)(struct iconv_decode *__restrict self,
+                                                      /*utf-32*/ void const *__restrict data,
+                                                      size_t size)
+#else /* UTF_BYTEORDER == 1234 */
+INTERN NONNULL((1, 2)) ssize_t
+NOTHROW_NCX(FORMATPRINTER_CC libiconv_utf32be_decode)(struct iconv_decode *__restrict self,
+                                                      /*utf-32*/ void const *__restrict data,
+                                                      size_t size)
+#endif /* UTF_BYTEORDER != 1234 */
+{
+	ssize_t temp, result = 0;
+	/*utf-8*/ char buf[64], *ptr = buf;
+	if (self->icd_data.ied_utf.u_pbc) {
+		union dword {
+			uint32_t l;
+			uint8_t b[4];
+		};
+		union dword c32;
+		for (;;) {
+			if unlikely(!size)
+				return 0;
+			if (self->icd_data.ied_utf.u_pbc >= 3)
+				break;
+			self->icd_data.ied_utf.u_pb[self->icd_data.ied_utf.u_pbc] = *(byte_t const *)data;
+			++self->icd_data.ied_utf.u_pbc;
+			data = (byte_t const *)data + 1;
+			--size;
+		}
+#if UTF_BYTEORDER == 1234
+		c32.b[0] = self->icd_data.ied_utf.u_pb[0];
+		c32.b[1] = self->icd_data.ied_utf.u_pb[1];
+		c32.b[2] = self->icd_data.ied_utf.u_pb[2];
+		c32.b[3] = ((byte_t const *)data)[0];
+#else /* UTF_BYTEORDER == 1234 */
+		c32.b[0] = ((byte_t const *)data)[0];
+		c32.b[1] = self->icd_data.ied_utf.u_pb[2];
+		c32.b[2] = self->icd_data.ied_utf.u_pb[1];
+		c32.b[3] = self->icd_data.ied_utf.u_pb[0];
+#endif /* UTF_BYTEORDER != 1234 */
+		ptr = unicode_writeutf8(ptr, c32.l);
+		self->icd_data.ied_utf.u_pbc = 0;
+		data = (byte_t const *)data + 1;
+		--size;
+	}
+	while (size >= 4) {
+		char32_t c32;
+		/* Check if the buffer must be flushed. */
+		if ((ptr + UNICODE_UTF8_MAXLEN) >= COMPILER_ENDOF(buf)) {
+			DO_decode_output(buf, (size_t)(ptr - buf));
+			ptr = buf;
+		}
+#if UTF_BYTEORDER == 1234
+		c32 = (char32_t)UNALIGNED_GETLE32((uint32_t const *)data);
+#else /* UTF_BYTEORDER == 1234 */
+		c32 = (char32_t)UNALIGNED_GETBE32((uint32_t const *)data);
+#endif /* UTF_BYTEORDER != 1234 */
+		ptr = unicode_writeutf8(ptr, c32);
+		data = (byte_t const *)data + 2;
+		size -= 2;
+	}
+	/* Handle unmatched utf-16 byte. */
+	if (size) {
+		memcpy(self->icd_data.ied_utf.u_pb, data, size);
+		self->icd_data.ied_utf.u_pbc = size;
+	}
+	/* Flush all remaining data. */
+	DO_decode_output(buf, (size_t)(ptr - buf));
+	return result;
+err:
+	return temp;
+}
+#endif /* UTF_WIDTH == 32 */
+
 
 DECL_END
 
