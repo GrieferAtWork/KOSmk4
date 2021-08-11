@@ -21,7 +21,16 @@
 #define _ASM_CRT_LOCALE_H 1
 
 #include <__stdinc.h>
+#include <__crt.h>
 
+#ifdef __CRT_DOS_PRIMARY
+#define __LC_ALL      0
+#define __LC_COLLATE  1
+#define __LC_CTYPE    2
+#define __LC_MONETARY 3
+#define __LC_NUMERIC  4
+#define __LC_TIME     5
+#else /* __CRT_DOS_PRIMARY */
 #define __LC_CTYPE          0
 #define __LC_NUMERIC        1
 #define __LC_TIME           2
@@ -35,5 +44,6 @@
 #define __LC_TELEPHONE      10
 #define __LC_MEASUREMENT    11
 #define __LC_IDENTIFICATION 12
+#endif /* !__CRT_DOS_PRIMARY */
 
 #endif /* !_ASM_CRT_LOCALE_H */

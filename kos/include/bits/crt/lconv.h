@@ -27,8 +27,6 @@
 #ifdef __CC__
 __DECL_BEGIN
 
-#if defined(__CRT_KOS) || defined(__CRT_GLC)
-
 #ifdef __COMPILER_HAVE_PRAGMA_PUSHMACRO
 #pragma push_macro("decimal_point")
 #pragma push_macro("thousands_sep")
@@ -114,6 +112,16 @@ struct lconv {
 	                           * 3  The sign string immediately precedes the currency_symbol.
 	                           * 4  The sign string  immediately follows the currency_symbol. */
 	char  n_sign_posn;        /* s.a. `p_sign_posn' */
+#ifdef __CRT_DOS_PRIMARY
+	__WCHAR16_TYPE__ *_W_decimal_point;
+	__WCHAR16_TYPE__ *_W_thousands_sep;
+	__WCHAR16_TYPE__ *_W_int_curr_symbol;
+	__WCHAR16_TYPE__ *_W_currency_symbol;
+	__WCHAR16_TYPE__ *_W_mon_decimal_point;
+	__WCHAR16_TYPE__ *_W_mon_thousands_sep;
+	__WCHAR16_TYPE__ *_W_positive_sign;
+	__WCHAR16_TYPE__ *_W_negative_sign;
+#else /* __CRT_DOS_PRIMARY */
 #ifdef __USE_ISOC99
 	char  int_p_cs_precedes;  /* 1 if int_curr_symbol precedes a positive value, 0 if succeeds. */
 	char  int_p_sep_by_space; /* 1 iff a space separates int_curr_symbol from a positive value. */
@@ -134,6 +142,7 @@ struct lconv {
 	char __int_p_sign_posn;
 	char __int_n_sign_posn;
 #endif /* !__USE_ISOC99 */
+#endif /* !__CRT_DOS_PRIMARY */
 };
 __NAMESPACE_STD_END
 
@@ -168,8 +177,6 @@ __NAMESPACE_STD_USING(lconv)
 #pragma pop_macro("thousands_sep")
 #pragma pop_macro("decimal_point")
 #endif /* __COMPILER_HAVE_PRAGMA_PUSHMACRO */
-
-#endif /* __CRT_KOS || __CRT_GLC */
 
 __DECL_END
 #endif /* __CC__ */
