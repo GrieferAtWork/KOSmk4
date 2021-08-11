@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x986ac9ec */
+/* HASH CRC-32:0x9778fe22 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -990,6 +990,44 @@ done_empty:
 done:
 	return i + 1;
 }
+/* >> unicode_c16toc8(3)
+ * @return: 0 :         Success, but no characters were generated
+ * @return: * :         Success (this many bytes were written to `*pc8'; max is `UNICODE_16TO8_MAXBUF(1)')
+ * @return: (size_t)-1: Unicode error (the given input string isn't a valid unicode sequence) */
+INTERN ATTR_SECTION(".text.crt.unicode.UTF") NONNULL((1, 3)) size_t
+NOTHROW_NCX(LIBCCALL libc_unicode_c16toc8)(char pc8[3],
+                                           char16_t c16,
+                                           mbstate_t *__restrict mbs) {
+	char32_t ch32;
+	uint32_t state;
+	state = mbs->__word & __MBSTATE_TYPE_MASK;
+	if (state == __MBSTATE_TYPE_UTF16_LO) {
+		if unlikely(!(c16 >= 0xdc00 &&
+		              c16 <= 0xdfff))
+			return (size_t)-1;
+		ch32 = ((mbs->__word & 0x000003ff) << 10) + 0x10000 + ((u16)c16 - 0xdc00);
+		mbs->__word = 0;
+	} else if (c16 >= 0xd800 &&
+	           c16 <= 0xdbff) {
+		mbs->__word = __MBSTATE_TYPE_UTF16_LO | ((u16)c16 - 0xd800);
+		return 0;
+	} else {
+		ch32 = (char32_t)c16;
+	}
+	if likely(ch32 <= ((uint32_t)1 << 7)-1) {
+		pc8[0] = (char)(u8)ch32;
+		return 1;
+	}
+	if (ch32 <= ((uint32_t)1 << 11)-1) {
+		pc8[0] = (char)(0xc0 | (u8)((ch32 >> 6)/* & 0x1f*/));
+		pc8[1] = (char)(0x80 | (u8)((ch32) & 0x3f));
+		return 2;
+	}
+	pc8[0] = (char)(0xe0 | (u8)((ch32 >> 12)/* & 0x0f*/));
+	pc8[1] = (char)(0x80 | (u8)((ch32 >> 6) & 0x3f));
+	pc8[2] = (char)(0x80 | (u8)((ch32) & 0x3f));
+	return 3;
+}
 #include <bits/crt/mbstate.h>
 #include <bits/crt/format-printer.h>
 #include <bits/crt/uformat-printer.h>
@@ -1495,6 +1533,7 @@ DEFINE_PUBLIC_ALIAS(unicode_32to16, libc_unicode_32to16);
 #ifndef __KERNEL__
 DEFINE_PUBLIC_ALIAS(unicode_c8toc16, libc_unicode_c8toc16);
 DEFINE_PUBLIC_ALIAS(unicode_c8toc32, libc_unicode_c8toc32);
+DEFINE_PUBLIC_ALIAS(unicode_c16toc8, libc_unicode_c16toc8);
 DEFINE_PUBLIC_ALIAS(format_8to16, libc_format_8to16);
 DEFINE_PUBLIC_ALIAS(format_8to32, libc_format_8to32);
 DEFINE_PUBLIC_ALIAS(DOS$format_wto8, libd_format_wto8);

@@ -4598,6 +4598,7 @@
 #define __CRT_HAVE_unicode_8to16
 #define __CRT_HAVE_unicode_8to16_chk
 #define __CRT_HAVE_unicode_8to32
+#define __CRT_HAVE_unicode_c16toc8
 #define __CRT_HAVE_unicode_c8toc16
 #define __CRT_HAVE_unicode_c8toc32
 #define __CRT_HAVE_unicode_fold

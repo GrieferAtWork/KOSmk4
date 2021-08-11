@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xed2fc5a5 */
+/* HASH CRC-32:0x10fad7e */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -2430,6 +2430,7 @@ DFUN(".text.crt.dos.unicode.UTF", libd_unicode_32to8, libc_unicode_32to8, TP, 3,
 DFUN(".text.crt.dos.unicode.UTF", libd_unicode_32to16, libc_unicode_32to16, TP, 3, TP, TP, TI)
 DFUN(".text.crt.dos.unicode.UTF", libd_unicode_c8toc16, libc_unicode_c8toc16, TI, 4, TP, TP, TI, TP)
 DFUN(".text.crt.dos.unicode.UTF", libd_unicode_c8toc32, libc_unicode_c8toc32, TI, 4, TP, TP, TI, TP)
+DFUN(".text.crt.dos.unicode.UTF", libd_unicode_c16toc8, libc_unicode_c16toc8, TI, 3, TP, TI16, TP)
 DFUN(".text.crt.dos.unicode.UTF", libd_format_8to16, libc_format_8to16, TI, 3, TP, TP, TI)
 DFUN(".text.crt.dos.unicode.UTF", libd_format_8to32, libc_format_8to32, TI, 3, TP, TP, TI)
 

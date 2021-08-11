@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xcab79dcd */
+/* HASH CRC-32:0xf6c38edb */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -310,6 +310,20 @@ INTDEF NONNULL((1, 2, 4)) size_t NOTHROW_NCX(LIBDCALL libd_unicode_c8toc32)(char
  * @return: (size_t)-1: Unicode error (the given input string isn't a valid unicode sequence)
  * @return: (size_t)-2: Success, but no character was generated (s...+=n, together with `mbs' doesn't for a full character, but `mbs' was updated) */
 INTDEF NONNULL((1, 2, 4)) size_t NOTHROW_NCX(LIBCCALL libc_unicode_c8toc32)(char32_t *__restrict pc32, char const *__restrict s, size_t n, mbstate_t *__restrict mbs);
+#endif /* !__KERNEL__ */
+#if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
+/* >> unicode_c16toc8(3)
+ * @return: 0 :         Success, but no characters were generated
+ * @return: * :         Success (this many bytes were written to `*pc8'; max is `UNICODE_16TO8_MAXBUF(1)')
+ * @return: (size_t)-1: Unicode error (the given input string isn't a valid unicode sequence) */
+INTDEF NONNULL((1, 3)) size_t NOTHROW_NCX(LIBDCALL libd_unicode_c16toc8)(char pc8[3], char16_t c16, mbstate_t *__restrict mbs);
+#endif /* !__LIBCCALL_IS_LIBDCALL && !__KERNEL__ */
+#ifndef __KERNEL__
+/* >> unicode_c16toc8(3)
+ * @return: 0 :         Success, but no characters were generated
+ * @return: * :         Success (this many bytes were written to `*pc8'; max is `UNICODE_16TO8_MAXBUF(1)')
+ * @return: (size_t)-1: Unicode error (the given input string isn't a valid unicode sequence) */
+INTDEF NONNULL((1, 3)) size_t NOTHROW_NCX(LIBCCALL libc_unicode_c16toc8)(char pc8[3], char16_t c16, mbstate_t *__restrict mbs);
 #endif /* !__KERNEL__ */
 #if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
 /* >> format_8to16(3)

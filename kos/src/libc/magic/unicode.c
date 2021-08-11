@@ -1158,15 +1158,15 @@ $size_t unicode_c8toc16([[nonnull]] $char16_t *__restrict pc16,
                         [[nonnull]] $mbstate_t *__restrict mbs) {
 	char32_t resch;
 	size_t i;
-	if ((mbs->__word & __MBSTATE_TYPE_MASK) == __MBSTATE_TYPE_WR_UTF16_LO) {
-		*pc16 = 0xdc00 + (mbs->__word & 0x3ff);
-		mbs->__word = __MBSTATE_TYPE_EMPTY;
+	if ((mbs->@__word@ & __MBSTATE_TYPE_MASK) == __MBSTATE_TYPE_WR_UTF16_LO) {
+		*pc16 = 0xdc00 + (mbs->@__word@ & 0x3ff);
+		mbs->@__word@ = __MBSTATE_TYPE_EMPTY;
 		return 0;
 	}
 	for (i = 0; i < n; ++i) {
 		uint32_t state;
 		uint8_t ch;
-		state = mbs->__word & __MBSTATE_TYPE_MASK;
+		state = mbs->@__word@ & __MBSTATE_TYPE_MASK;
 		ch = (uint8_t)s[i];
 		if (state == __MBSTATE_TYPE_EMPTY) {
 			if (ch <= 0x7f) {
@@ -1175,19 +1175,19 @@ $size_t unicode_c8toc16([[nonnull]] $char16_t *__restrict pc16,
 			} else if (ch <= 0xbf) {
 				goto error_ilseq;
 			} else if (ch <= 0xdf) {
-				mbs->__word = __MBSTATE_TYPE_UTF8_2_2 | (ch & 0x1f);
+				mbs->@__word@ = __MBSTATE_TYPE_UTF8_2_2 | (ch & 0x1f);
 				continue;
 			} else if (ch <= 0xef) {
-				mbs->__word = __MBSTATE_TYPE_UTF8_3_2 | ((ch & 0xf) << 6);
+				mbs->@__word@ = __MBSTATE_TYPE_UTF8_3_2 | ((ch & 0xf) << 6);
 				continue;
 			} else if (ch <= 0xf7) {
-				mbs->__word = __MBSTATE_TYPE_UTF8_4_2 | ((ch & 0x7) << 12);
+				mbs->@__word@ = __MBSTATE_TYPE_UTF8_4_2 | ((ch & 0x7) << 12);
 				continue;
 			} else if (ch <= 0xfb) {
-				mbs->__word = __MBSTATE_TYPE_UTF8_5_2 | ((ch & 0x3) << 18);
+				mbs->@__word@ = __MBSTATE_TYPE_UTF8_5_2 | ((ch & 0x3) << 18);
 				continue;
 			} else if (ch <= 0xfd) {
-				mbs->__word = __MBSTATE_TYPE_UTF8_6_2 | ((ch & 0x1) << 24);
+				mbs->@__word@ = __MBSTATE_TYPE_UTF8_6_2 | ((ch & 0x1) << 24);
 				continue;
 			} else {
 				goto error_ilseq;
@@ -1196,66 +1196,66 @@ $size_t unicode_c8toc16([[nonnull]] $char16_t *__restrict pc16,
 		if ((ch & 0xc0) != 0x80)
 			goto error_ilseq; /* Must be a follow-up byte */
 		ch &= 0x3f;
-		switch (mbs->__word & __MBSTATE_TYPE_MASK) {
+		switch (mbs->@__word@ & __MBSTATE_TYPE_MASK) {
 
 		case __MBSTATE_TYPE_UTF8_2_2: /* expect 2nd character of a 2-byte utf-8 sequence. { WORD & 0x0000001f } */
-			*pc16 = ((mbs->__word & 0x1f) << __MBSTATE_TYPE_UTF8_SHIFT) | ch;
+			*pc16 = ((mbs->@__word@ & 0x1f) << __MBSTATE_TYPE_UTF8_SHIFT) | ch;
 			goto done_empty;
 
 		case __MBSTATE_TYPE_UTF8_3_2: /* expect 2nd character of a 3-byte utf-8 sequence. { WORD & 0x000003c0 } */
-			mbs->__word = __MBSTATE_TYPE_UTF8_3_3 | (mbs->__word & 0x3c0) | ch;
+			mbs->@__word@ = __MBSTATE_TYPE_UTF8_3_3 | (mbs->@__word@ & 0x3c0) | ch;
 			break;
 
 		case __MBSTATE_TYPE_UTF8_3_3: /* expect 3rd character of a 3-byte utf-8 sequence. { WORD & 0x000003c0, WORD & 0x0000003f } */
-			resch = ((mbs->__word & 0x3ff) << __MBSTATE_TYPE_UTF8_SHIFT) | ch;
+			resch = ((mbs->@__word@ & 0x3ff) << __MBSTATE_TYPE_UTF8_SHIFT) | ch;
 			goto done_empty_chk_surrogate;
 
 		case __MBSTATE_TYPE_UTF8_4_2: /* expect 2nd character of a 4-byte utf-8 sequence. { WORD & 0x00007000 } */
-			mbs->__word = __MBSTATE_TYPE_UTF8_4_3 | (mbs->__word & 0x7000) | ((uint32_t)ch << __MBSTATE_TYPE_UTF8_SHIFT);
+			mbs->@__word@ = __MBSTATE_TYPE_UTF8_4_3 | (mbs->@__word@ & 0x7000) | ((uint32_t)ch << __MBSTATE_TYPE_UTF8_SHIFT);
 			break;
 
 		case __MBSTATE_TYPE_UTF8_4_3: /* expect 3rd character of a 4-byte utf-8 sequence. { WORD & 0x00007000, WORD & 0x00000fc0 } */
-			mbs->__word = __MBSTATE_TYPE_UTF8_4_4 | (mbs->__word & 0x7fc0) | ch;
+			mbs->@__word@ = __MBSTATE_TYPE_UTF8_4_4 | (mbs->@__word@ & 0x7fc0) | ch;
 			break;
 
 		case __MBSTATE_TYPE_UTF8_4_4: /* expect 4th character of a 4-byte utf-8 sequence. { WORD & 0x00007000, WORD & 0x00000fc0, WORD & 0x0000003f } */
-			resch = ((mbs->__word & 0x7fff) << __MBSTATE_TYPE_UTF8_SHIFT) | ch;
+			resch = ((mbs->@__word@ & 0x7fff) << __MBSTATE_TYPE_UTF8_SHIFT) | ch;
 			goto done_empty_chk_surrogate;
 
 		case __MBSTATE_TYPE_UTF8_5_2: /* expect 2nd character of a 5-byte utf-8 sequence. { WORD & 0x000c0000 } */
-			mbs->__word = __MBSTATE_TYPE_UTF8_5_3 | (mbs->__word & 0xc0000) | ((uint32_t)ch << (2 * __MBSTATE_TYPE_UTF8_SHIFT));
+			mbs->@__word@ = __MBSTATE_TYPE_UTF8_5_3 | (mbs->@__word@ & 0xc0000) | ((uint32_t)ch << (2 * __MBSTATE_TYPE_UTF8_SHIFT));
 			break;
 
 		case __MBSTATE_TYPE_UTF8_5_3: /* expect 3rd character of a 5-byte utf-8 sequence. { WORD & 0x000c0000, WORD & 0x0003f000 } */
-			mbs->__word = __MBSTATE_TYPE_UTF8_5_4 | (mbs->__word & 0xff000) | ((uint32_t)ch << __MBSTATE_TYPE_UTF8_SHIFT);
+			mbs->@__word@ = __MBSTATE_TYPE_UTF8_5_4 | (mbs->@__word@ & 0xff000) | ((uint32_t)ch << __MBSTATE_TYPE_UTF8_SHIFT);
 			break;
 
 		case __MBSTATE_TYPE_UTF8_5_4: /* expect 4th character of a 5-byte utf-8 sequence. { WORD & 0x000c0000, WORD & 0x0003f000, WORD & 0x00000fc0 } */
-			mbs->__word = __MBSTATE_TYPE_UTF8_5_5 | (mbs->__word & 0xfffc0) | ch;
+			mbs->@__word@ = __MBSTATE_TYPE_UTF8_5_5 | (mbs->@__word@ & 0xfffc0) | ch;
 			break;
 
 		case __MBSTATE_TYPE_UTF8_5_5: /* expect 5th character of a 5-byte utf-8 sequence. { WORD & 0x000c0000, WORD & 0x0003f000, WORD & 0x00000fc0, WORD & 0x0000003f } */
-			resch = ((mbs->__word & 0x000cffff) << __MBSTATE_TYPE_UTF8_SHIFT) | ch;
+			resch = ((mbs->@__word@ & 0x000cffff) << __MBSTATE_TYPE_UTF8_SHIFT) | ch;
 			goto done_empty_chk_surrogate;
 
 		case __MBSTATE_TYPE_UTF8_6_2: /* expect 2nd character of a 6-byte utf-8 sequence. { WORD & 0x01000000 } */
-			mbs->__word = __MBSTATE_TYPE_UTF8_6_3 | (mbs->__word & 0x1000000) | ((uint32_t)ch << (3 * __MBSTATE_TYPE_UTF8_SHIFT));
+			mbs->@__word@ = __MBSTATE_TYPE_UTF8_6_3 | (mbs->@__word@ & 0x1000000) | ((uint32_t)ch << (3 * __MBSTATE_TYPE_UTF8_SHIFT));
 			break;
 
 		case __MBSTATE_TYPE_UTF8_6_3: /* expect 3rd character of a 6-byte utf-8 sequence. { WORD & 0x01000000, WORD & 0x00fc0000 } */
-			mbs->__word = __MBSTATE_TYPE_UTF8_6_4 | (mbs->__word & 0x1fc0000) | ((uint32_t)ch << (2 * __MBSTATE_TYPE_UTF8_SHIFT));
+			mbs->@__word@ = __MBSTATE_TYPE_UTF8_6_4 | (mbs->@__word@ & 0x1fc0000) | ((uint32_t)ch << (2 * __MBSTATE_TYPE_UTF8_SHIFT));
 			break;
 
 		case __MBSTATE_TYPE_UTF8_6_4: /* expect 4th character of a 6-byte utf-8 sequence. { WORD & 0x01000000, WORD & 0x00fc0000, WORD & 0x0003f000 } */
-			mbs->__word = __MBSTATE_TYPE_UTF8_6_5 | (mbs->__word & 0x1fff000) | ((uint32_t)ch << __MBSTATE_TYPE_UTF8_SHIFT);
+			mbs->@__word@ = __MBSTATE_TYPE_UTF8_6_5 | (mbs->@__word@ & 0x1fff000) | ((uint32_t)ch << __MBSTATE_TYPE_UTF8_SHIFT);
 			break;
 
 		case __MBSTATE_TYPE_UTF8_6_5: /* expect 5th character of a 6-byte utf-8 sequence. { WORD & 0x01000000, WORD & 0x00fc0000, WORD & 0x0003f000, WORD & 0x00000fc0 } */
-			mbs->__word = __MBSTATE_TYPE_UTF8_6_6 | (mbs->__word & 0x1ffffc0) | ch;
+			mbs->@__word@ = __MBSTATE_TYPE_UTF8_6_6 | (mbs->@__word@ & 0x1ffffc0) | ch;
 			break;
 
 		case __MBSTATE_TYPE_UTF8_6_6: /* expect 6th character of a 6-byte utf-8 sequence. { WORD & 0x01000000, WORD & 0x00fc0000, WORD & 0x0003f000, WORD & 0x00000fc0, WORD & 0x0000003f } */
-			resch = ((mbs->__word & 0x1ffffff) << __MBSTATE_TYPE_UTF8_SHIFT) | ch;
+			resch = ((mbs->@__word@ & 0x1ffffff) << __MBSTATE_TYPE_UTF8_SHIFT) | ch;
 			goto done_empty_chk_surrogate;
 
 		default:
@@ -1272,12 +1272,12 @@ done_empty_chk_surrogate:
 		/* Need a utf-16 surrogate pair. */
 		resch -= 0x10000;
 		*pc16 = 0xd800 + (__CHAR16_TYPE__)(resch >> 10);
-		mbs->__word = __MBSTATE_TYPE_WR_UTF16_LO | (__CHAR16_TYPE__)(resch & 0x3ff);
+		mbs->@__word@ = __MBSTATE_TYPE_WR_UTF16_LO | (__CHAR16_TYPE__)(resch & 0x3ff);
 	} else {
 		*pc16 = (char16_t)resch;
 	}
 done_empty:
-	mbs->__word = __MBSTATE_TYPE_EMPTY;
+	mbs->@__word@ = __MBSTATE_TYPE_EMPTY;
 done:
 	return i + 1;
 }
@@ -1295,7 +1295,7 @@ $size_t unicode_c8toc32([[nonnull]] $char32_t *__restrict pc32,
 	for (i = 0; i < n; ++i) {
 		uint32_t state;
 		uint8_t ch;
-		state = mbs->__word & __MBSTATE_TYPE_MASK;
+		state = mbs->@__word@ & __MBSTATE_TYPE_MASK;
 		ch = (uint8_t)s[i];
 		if (state == __MBSTATE_TYPE_EMPTY) {
 			if (ch <= 0x7f) {
@@ -1304,19 +1304,19 @@ $size_t unicode_c8toc32([[nonnull]] $char32_t *__restrict pc32,
 			} else if (ch <= 0xbf) {
 				goto error_ilseq;
 			} else if (ch <= 0xdf) {
-				mbs->__word = __MBSTATE_TYPE_UTF8_2_2 | (ch & 0x1f);
+				mbs->@__word@ = __MBSTATE_TYPE_UTF8_2_2 | (ch & 0x1f);
 				continue;
 			} else if (ch <= 0xef) {
-				mbs->__word = __MBSTATE_TYPE_UTF8_3_2 | ((ch & 0xf) << 6);
+				mbs->@__word@ = __MBSTATE_TYPE_UTF8_3_2 | ((ch & 0xf) << 6);
 				continue;
 			} else if (ch <= 0xf7) {
-				mbs->__word = __MBSTATE_TYPE_UTF8_4_2 | ((ch & 0x7) << 12);
+				mbs->@__word@ = __MBSTATE_TYPE_UTF8_4_2 | ((ch & 0x7) << 12);
 				continue;
 			} else if (ch <= 0xfb) {
-				mbs->__word = __MBSTATE_TYPE_UTF8_5_2 | ((ch & 0x3) << 18);
+				mbs->@__word@ = __MBSTATE_TYPE_UTF8_5_2 | ((ch & 0x3) << 18);
 				continue;
 			} else if (ch <= 0xfd) {
-				mbs->__word = __MBSTATE_TYPE_UTF8_6_2 | ((ch & 0x1) << 24);
+				mbs->@__word@ = __MBSTATE_TYPE_UTF8_6_2 | ((ch & 0x1) << 24);
 				continue;
 			} else {
 				goto error_ilseq;
@@ -1325,66 +1325,66 @@ $size_t unicode_c8toc32([[nonnull]] $char32_t *__restrict pc32,
 		if ((ch & 0xc0) != 0x80)
 			goto error_ilseq; /* Must be a follow-up byte */
 		ch &= 0x3f;
-		switch (mbs->__word & __MBSTATE_TYPE_MASK) {
+		switch (mbs->@__word@ & __MBSTATE_TYPE_MASK) {
 
 		case __MBSTATE_TYPE_UTF8_2_2: /* expect 2nd character of a 2-byte utf-8 sequence. { WORD & 0x0000001f } */
-			*pc32 = ((mbs->__word & 0x1f) << __MBSTATE_TYPE_UTF8_SHIFT) | ch;
+			*pc32 = ((mbs->@__word@ & 0x1f) << __MBSTATE_TYPE_UTF8_SHIFT) | ch;
 			goto done_empty;
 
 		case __MBSTATE_TYPE_UTF8_3_2: /* expect 2nd character of a 3-byte utf-8 sequence. { WORD & 0x000003c0 } */
-			mbs->__word = __MBSTATE_TYPE_UTF8_3_3 | (mbs->__word & 0x3c0) | ch;
+			mbs->@__word@ = __MBSTATE_TYPE_UTF8_3_3 | (mbs->@__word@ & 0x3c0) | ch;
 			break;
 
 		case __MBSTATE_TYPE_UTF8_3_3: /* expect 3rd character of a 3-byte utf-8 sequence. { WORD & 0x000003c0, WORD & 0x0000003f } */
-			*pc32 = ((mbs->__word & 0x3ff) << __MBSTATE_TYPE_UTF8_SHIFT) | ch;
+			*pc32 = ((mbs->@__word@ & 0x3ff) << __MBSTATE_TYPE_UTF8_SHIFT) | ch;
 			goto done_empty;
 
 		case __MBSTATE_TYPE_UTF8_4_2: /* expect 2nd character of a 4-byte utf-8 sequence. { WORD & 0x00007000 } */
-			mbs->__word = __MBSTATE_TYPE_UTF8_4_3 | (mbs->__word & 0x7000) | ((uint32_t)ch << __MBSTATE_TYPE_UTF8_SHIFT);
+			mbs->@__word@ = __MBSTATE_TYPE_UTF8_4_3 | (mbs->@__word@ & 0x7000) | ((uint32_t)ch << __MBSTATE_TYPE_UTF8_SHIFT);
 			break;
 
 		case __MBSTATE_TYPE_UTF8_4_3: /* expect 3rd character of a 4-byte utf-8 sequence. { WORD & 0x00007000, WORD & 0x00000fc0 } */
-			mbs->__word = __MBSTATE_TYPE_UTF8_4_4 | (mbs->__word & 0x7fc0) | ch;
+			mbs->@__word@ = __MBSTATE_TYPE_UTF8_4_4 | (mbs->@__word@ & 0x7fc0) | ch;
 			break;
 
 		case __MBSTATE_TYPE_UTF8_4_4: /* expect 4th character of a 4-byte utf-8 sequence. { WORD & 0x00007000, WORD & 0x00000fc0, WORD & 0x0000003f } */
-			*pc32 = ((mbs->__word & 0x7fff) << __MBSTATE_TYPE_UTF8_SHIFT) | ch;
+			*pc32 = ((mbs->@__word@ & 0x7fff) << __MBSTATE_TYPE_UTF8_SHIFT) | ch;
 			goto done_empty;
 
 		case __MBSTATE_TYPE_UTF8_5_2: /* expect 2nd character of a 5-byte utf-8 sequence. { WORD & 0x000c0000 } */
-			mbs->__word = __MBSTATE_TYPE_UTF8_5_3 | (mbs->__word & 0xc0000) | ((uint32_t)ch << (2 * __MBSTATE_TYPE_UTF8_SHIFT));
+			mbs->@__word@ = __MBSTATE_TYPE_UTF8_5_3 | (mbs->@__word@ & 0xc0000) | ((uint32_t)ch << (2 * __MBSTATE_TYPE_UTF8_SHIFT));
 			break;
 
 		case __MBSTATE_TYPE_UTF8_5_3: /* expect 3rd character of a 5-byte utf-8 sequence. { WORD & 0x000c0000, WORD & 0x0003f000 } */
-			mbs->__word = __MBSTATE_TYPE_UTF8_5_4 | (mbs->__word & 0xff000) | ((uint32_t)ch << __MBSTATE_TYPE_UTF8_SHIFT);
+			mbs->@__word@ = __MBSTATE_TYPE_UTF8_5_4 | (mbs->@__word@ & 0xff000) | ((uint32_t)ch << __MBSTATE_TYPE_UTF8_SHIFT);
 			break;
 
 		case __MBSTATE_TYPE_UTF8_5_4: /* expect 4th character of a 5-byte utf-8 sequence. { WORD & 0x000c0000, WORD & 0x0003f000, WORD & 0x00000fc0 } */
-			mbs->__word = __MBSTATE_TYPE_UTF8_5_5 | (mbs->__word & 0xfffc0) | ch;
+			mbs->@__word@ = __MBSTATE_TYPE_UTF8_5_5 | (mbs->@__word@ & 0xfffc0) | ch;
 			break;
 
 		case __MBSTATE_TYPE_UTF8_5_5: /* expect 5th character of a 5-byte utf-8 sequence. { WORD & 0x000c0000, WORD & 0x0003f000, WORD & 0x00000fc0, WORD & 0x0000003f } */
-			*pc32 = ((mbs->__word & 0x000cffff) << __MBSTATE_TYPE_UTF8_SHIFT) | ch;
+			*pc32 = ((mbs->@__word@ & 0x000cffff) << __MBSTATE_TYPE_UTF8_SHIFT) | ch;
 			goto done_empty;
 
 		case __MBSTATE_TYPE_UTF8_6_2: /* expect 2nd character of a 6-byte utf-8 sequence. { WORD & 0x01000000 } */
-			mbs->__word = __MBSTATE_TYPE_UTF8_6_3 | (mbs->__word & 0x1000000) | ((uint32_t)ch << (3 * __MBSTATE_TYPE_UTF8_SHIFT));
+			mbs->@__word@ = __MBSTATE_TYPE_UTF8_6_3 | (mbs->@__word@ & 0x1000000) | ((uint32_t)ch << (3 * __MBSTATE_TYPE_UTF8_SHIFT));
 			break;
 
 		case __MBSTATE_TYPE_UTF8_6_3: /* expect 3rd character of a 6-byte utf-8 sequence. { WORD & 0x01000000, WORD & 0x00fc0000 } */
-			mbs->__word = __MBSTATE_TYPE_UTF8_6_4 | (mbs->__word & 0x1fc0000) | ((uint32_t)ch << (2 * __MBSTATE_TYPE_UTF8_SHIFT));
+			mbs->@__word@ = __MBSTATE_TYPE_UTF8_6_4 | (mbs->@__word@ & 0x1fc0000) | ((uint32_t)ch << (2 * __MBSTATE_TYPE_UTF8_SHIFT));
 			break;
 
 		case __MBSTATE_TYPE_UTF8_6_4: /* expect 4th character of a 6-byte utf-8 sequence. { WORD & 0x01000000, WORD & 0x00fc0000, WORD & 0x0003f000 } */
-			mbs->__word = __MBSTATE_TYPE_UTF8_6_5 | (mbs->__word & 0x1fff000) | ((uint32_t)ch << __MBSTATE_TYPE_UTF8_SHIFT);
+			mbs->@__word@ = __MBSTATE_TYPE_UTF8_6_5 | (mbs->@__word@ & 0x1fff000) | ((uint32_t)ch << __MBSTATE_TYPE_UTF8_SHIFT);
 			break;
 
 		case __MBSTATE_TYPE_UTF8_6_5: /* expect 5th character of a 6-byte utf-8 sequence. { WORD & 0x01000000, WORD & 0x00fc0000, WORD & 0x0003f000, WORD & 0x00000fc0 } */
-			mbs->__word = __MBSTATE_TYPE_UTF8_6_6 | (mbs->__word & 0x1ffffc0) | ch;
+			mbs->@__word@ = __MBSTATE_TYPE_UTF8_6_6 | (mbs->@__word@ & 0x1ffffc0) | ch;
 			break;
 
 		case __MBSTATE_TYPE_UTF8_6_6: /* expect 6th character of a 6-byte utf-8 sequence. { WORD & 0x01000000, WORD & 0x00fc0000, WORD & 0x0003f000, WORD & 0x00000fc0, WORD & 0x0000003f } */
-			*pc32 = ((mbs->__word & 0x1ffffff) << __MBSTATE_TYPE_UTF8_SHIFT) | ch;
+			*pc32 = ((mbs->@__word@ & 0x1ffffff) << __MBSTATE_TYPE_UTF8_SHIFT) | ch;
 			goto done_empty;
 
 		default:
@@ -1395,9 +1395,48 @@ error_ilseq:
 	/* Incomplete sequence (but `mbs' may have been updated) */
 	return (size_t)-2;
 done_empty:
-	mbs->__word = __MBSTATE_TYPE_EMPTY;
+	mbs->@__word@ = __MBSTATE_TYPE_EMPTY;
 done:
 	return i + 1;
+}
+
+
+@@>> unicode_c16toc8(3)
+@@@return: 0 :         Success, but no characters were generated
+@@@return: * :         Success (this many bytes were written to `*pc8'; max is `UNICODE_16TO8_MAXBUF(1)')
+@@@return: (size_t)-1: Unicode error (the given input string isn't a valid unicode sequence)
+[[decl_include("<bits/crt/mbstate.h>")]]
+$size_t unicode_c16toc8([[nonnull]] char pc8[3], $char16_t c16,
+                        [[nonnull]] $mbstate_t *__restrict mbs) {
+	char32_t ch32;
+	uint32_t state;
+	state = mbs->@__word@ & __MBSTATE_TYPE_MASK;
+	if (state == __MBSTATE_TYPE_UTF16_LO) {
+		if unlikely(!(c16 >= UTF16_LOW_SURROGATE_MIN &&
+		              c16 <= UTF16_LOW_SURROGATE_MAX))
+			return (size_t)-1;
+		ch32 = ((mbs->@__word@ & 0x000003ff) << 10) + 0x10000 + ((u16)c16 - 0xdc00);
+		mbs->@__word@ = 0;
+	} else if (c16 >= UTF16_HIGH_SURROGATE_MIN &&
+	           c16 <= UTF16_HIGH_SURROGATE_MAX) {
+		mbs->@__word@ = __MBSTATE_TYPE_UTF16_LO | ((u16)c16 - UTF16_HIGH_SURROGATE_MIN);
+		return 0;
+	} else {
+		ch32 = (char32_t)c16;
+	}
+	if likely(ch32 <= UTF8_1BYTE_MAX) {
+		pc8[0] = (char)(u8)ch32;
+		return 1;
+	}
+	if (ch32 <= UTF8_2BYTE_MAX) {
+		pc8[0] = (char)(0xc0 | (u8)((ch32 >> 6)/* & 0x1f*/));
+		pc8[1] = (char)(0x80 | (u8)((ch32) & 0x3f));
+		return 2;
+	}
+	pc8[0] = (char)(0xe0 | (u8)((ch32 >> 12)/* & 0x0f*/));
+	pc8[1] = (char)(0x80 | (u8)((ch32 >> 6) & 0x3f));
+	pc8[2] = (char)(0x80 | (u8)((ch32) & 0x3f));
+	return 3;
 }
 
 
