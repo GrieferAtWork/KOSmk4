@@ -36,6 +36,7 @@ struct __ATTR_PACKED __mbstate {
 };
 #define __MBSTATE_ISINIT(x) ((x)->__word == 0)
 #define __MBSTATE_INIT      { 0 }
+#define __mbstate_init(x)   ((x)->__word = 0)
 
 #define __MBSTATE_TYPE_MASK     0xfc000000
 #define __MBSTATE_TYPE_EMPTY    0x00000000
