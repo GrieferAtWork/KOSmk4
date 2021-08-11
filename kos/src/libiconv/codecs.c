@@ -99,14 +99,21 @@ struct codec_db_entry {
 };
 
 PRIVATE struct codec_db_entry codec_db[] = {
+	{ "437",              CODEC_CP437 },
 	{ "ansi_x3.4-1968",   CODEC_ASCII },
 	{ "ansi_x3.4-1986",   CODEC_ASCII },
 	{ "cp367",            CODEC_ASCII },
+	{ "cp437",            CODEC_CP437 },
+	{ "cspc8codepage437", CODEC_CP437 },
 	{ "ibm367",           CODEC_ASCII },
+	{ "ibm437",           CODEC_CP437 },
 	{ "iso-ir-006",       CODEC_ASCII },
 	{ "iso646-us",        CODEC_ASCII },
 	{ "iso_646.irv:1991", CODEC_ASCII },
+	{ "oem-us",           CODEC_CP437 },
+	{ "osf100201b5",      CODEC_CP437 },
 	{ "us",               CODEC_ASCII },
+	{ "us-ascii",         CODEC_ASCII },
 	{ "utf-16",           CODEC_UTF16 },
 	{ "utf-16be",         CODEC_UTF16BE },
 	{ "utf-16le",         CODEC_UTF16LE },

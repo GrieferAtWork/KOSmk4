@@ -44,16 +44,23 @@ __DECL_BEGIN
 
 
 #ifdef LIBICONV_EXPOSE_INTERNAL
+struct iconv_codepage;
 union iconv_decode_data {
 	struct {
 		byte_t           u_pbc;   /* # of pending bytes in `u_pb' */
 		byte_t           u_pb[3]; /* Pending byte(s). */
 		struct __mbstate u_16;    /* Surrogate storage for utf-16 input. */
-	} ied_utf; /* Pending bytes for UTF-16 and UTF-32 input data. */
+	} idd_utf; /* For UTF-16 and UTF-32 input data. */
+
+	struct iconv_codepage const *idd_cp; /* [1..1][const] Code page */
 };
 
 union iconv_encode_data {
 	struct __mbstate ied_utf8; /* UTF-8 input data buffer. */
+	struct {
+		struct __mbstate             ic_utf8; /* UTF-8 input data buffer. */
+		struct iconv_codepage const *ic_cp;   /* [1..1][const] Code page */
+	} ied_cp;
 };
 #endif /* LIBICONV_EXPOSE_INTERNAL */
 

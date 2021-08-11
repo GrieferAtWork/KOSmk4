@@ -40,6 +40,7 @@ gcc_opt.append("-O3"); // Force _all_ optimizations because stuff in here is per
 #include <libiconv/iconv.h>
 
 #include "convert.h"
+#include "cp.h"
 
 DECL_BEGIN
 
@@ -121,13 +122,98 @@ err_ilseq:
 		                     : ((c32) = '?', _uni_status = 1, 0))       \
 		                  : _uni_status == (size_t)-2)) {               \
 			/* Error or all data parsed. */                             \
-			if unlikely (_uni_status == (size_t)-1)                     \
+			if unlikely(_uni_status == (size_t)-1)                      \
 				goto err_ilseq; /* Error! */                            \
 			break;              /* Done! */                             \
 		} else if (((data) += _uni_status,                              \
 		            (size) -= _uni_status, 0))                          \
 			;                                                           \
 		else
+
+
+/************************************************************************/
+/* Generic code-page                                                    */
+/************************************************************************/
+INTERN NONNULL((1, 2)) ssize_t
+NOTHROW_NCX(FORMATPRINTER_CC libiconv_cp_encode)(struct iconv_encode *__restrict self,
+                                                 /*utf-8*/ char const *__restrict data, size_t size) {
+	char buf[64], *ptr = buf;
+	ssize_t temp, result = 0;
+	char32_t c32;
+	struct iconv_codepage const *cp;
+	if unlikely(self->ice_flags & ICONV_HASERR)
+		goto err_ilseq;
+	cp = self->ice_data.ied_cp.ic_cp;
+	FOREACH_UTF8(c32, self, data, size) {
+		/* Figure out how to encode this unicode character in this codepage. */
+		size_t lo, hi;
+		if (ptr >= COMPILER_ENDOF(buf)) {
+			DO_encode_output(buf, (size_t)(ptr - buf));
+			ptr = buf;
+		}
+		lo = 0;
+		hi = cp->icp_encode_max + 1;
+		while (lo < hi) {
+			size_t i;
+			i = (lo + hi) / 2;
+			if (c32 < cp->icp_encode[i].icee_uni) {
+				hi = i;
+			} else if (c32 > cp->icp_encode[i].icee_uni) {
+				lo = i + 1;
+			} else {
+				/* Found it! */
+				*ptr++ = (char)(unsigned char)cp->icp_encode[i].icee_cp;
+				goto next_c32;
+			}
+		}
+		/* Cannot encode :( */
+		if (IS_ICONV_ERR_ERRNO((self)->ice_flags)) {
+			DO_encode_output(buf, (size_t)(ptr - buf));
+			goto err_ilseq;
+		}
+		if (IS_ICONV_ERR_REPLACE((self)->ice_flags))
+			*ptr++ = cp->icp_replacement;
+		else {
+			*ptr++ = (char)(unsigned char)(uint32_t)c32;
+		}
+next_c32:
+		;
+	}
+	DO_encode_output(buf, (size_t)(ptr - buf));
+	return result;
+err:
+	return temp;
+err_ilseq:
+	self->ice_flags |= ICONV_HASERR;
+	errno = EILSEQ;
+	return -1;
+}
+
+INTERN NONNULL((1, 2)) ssize_t
+NOTHROW_NCX(FORMATPRINTER_CC libiconv_cp_decode)(struct iconv_decode *__restrict self,
+                                                 /*cp???*/ char const *__restrict data, size_t size) {
+	char buf[64], *ptr = buf;
+	ssize_t temp, result = 0;
+	struct iconv_codepage const *cp;
+	cp = self->icd_data.idd_cp;
+	while (size) {
+		char16_t c;
+		if ((ptr + UNICODE_UTF8_MAXLEN) >= COMPILER_ENDOF(buf)) {
+			DO_decode_output(buf, (size_t)(ptr - buf));
+			ptr = buf;
+		}
+		/* Decode the character via the codepage. */
+		c   = cp->icp_decode[(unsigned char)*data];
+		ptr = unicode_writeutf8(ptr, c);
+		++data;
+		--size;
+	}
+	DO_decode_output(buf, (size_t)(ptr - buf));
+	return result;
+err:
+	return temp;
+}
+
 
 
 DECL_END

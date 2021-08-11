@@ -95,7 +95,7 @@ NOTHROW_NCX(FORMATPRINTER_CC libiconv_utf16be_decode)(struct iconv_decode *__res
 	size_t error;
 	if unlikely(self->icd_flags & ICONV_HASERR)
 		goto err_ilseq;
-	if (self->icd_data.ied_utf.u_pbc) {
+	if (self->icd_data.idd_utf.u_pbc) {
 		union word {
 			uint16_t w;
 			uint8_t b[2];
@@ -104,13 +104,13 @@ NOTHROW_NCX(FORMATPRINTER_CC libiconv_utf16be_decode)(struct iconv_decode *__res
 		if unlikely(!size)
 			return 0;
 #if UTF_BYTEORDER == 1234
-		c16.b[0] = self->icd_data.ied_utf.u_pb[0];
+		c16.b[0] = self->icd_data.idd_utf.u_pb[0];
 		c16.b[1] = ((byte_t const *)data)[0];
 #else /* UTF_BYTEORDER == 1234 */
 		c16.b[0] = ((byte_t const *)data)[0];
-		c16.b[1] = self->icd_data.ied_utf.u_pb[0];
+		c16.b[1] = self->icd_data.idd_utf.u_pb[0];
 #endif /* UTF_BYTEORDER != 1234 */
-		error = unicode_c16toc8(ptr, c16.w, &self->icd_data.ied_utf.u_16);
+		error = unicode_c16toc8(ptr, c16.w, &self->icd_data.idd_utf.u_16);
 		if unlikely(error == (size_t)-1) {
 			if (IS_ICONV_ERR_ERRNO(self->icd_flags))
 				goto err_ilseq;
@@ -118,7 +118,7 @@ NOTHROW_NCX(FORMATPRINTER_CC libiconv_utf16be_decode)(struct iconv_decode *__res
 			error  = 1;
 		}
 		ptr += error;
-		self->icd_data.ied_utf.u_pbc = 0;
+		self->icd_data.idd_utf.u_pbc = 0;
 		data = (byte_t const *)data + 1;
 		--size;
 	}
@@ -134,7 +134,7 @@ NOTHROW_NCX(FORMATPRINTER_CC libiconv_utf16be_decode)(struct iconv_decode *__res
 #else /* UTF_BYTEORDER == 1234 */
 		c16 = (char16_t)UNALIGNED_GETBE16((uint16_t const *)data);
 #endif /* UTF_BYTEORDER != 1234 */
-		error = unicode_c16toc8(ptr, c16, &self->icd_data.ied_utf.u_16);
+		error = unicode_c16toc8(ptr, c16, &self->icd_data.idd_utf.u_16);
 		if unlikely(error == (size_t)-1) {
 			if (IS_ICONV_ERR_ERRNO(self->icd_flags))
 				goto err_ilseq;
@@ -147,8 +147,8 @@ NOTHROW_NCX(FORMATPRINTER_CC libiconv_utf16be_decode)(struct iconv_decode *__res
 	}
 	/* Handle unmatched utf-16 byte. */
 	if (size) {
-		self->icd_data.ied_utf.u_pb[0] = *(byte_t const *)data;
-		self->icd_data.ied_utf.u_pbc   = 1;
+		self->icd_data.idd_utf.u_pb[0] = *(byte_t const *)data;
+		self->icd_data.idd_utf.u_pbc   = 1;
 	}
 	/* Flush all remaining data. */
 	DO_decode_output(buf, (size_t)(ptr - buf));
@@ -178,7 +178,7 @@ NOTHROW_NCX(FORMATPRINTER_CC libiconv_utf32be_decode)(struct iconv_decode *__res
 {
 	ssize_t temp, result = 0;
 	/*utf-8*/ char buf[64], *ptr = buf;
-	if (self->icd_data.ied_utf.u_pbc) {
+	if (self->icd_data.idd_utf.u_pbc) {
 		union dword {
 			uint32_t l;
 			uint8_t b[4];
@@ -187,26 +187,26 @@ NOTHROW_NCX(FORMATPRINTER_CC libiconv_utf32be_decode)(struct iconv_decode *__res
 		for (;;) {
 			if unlikely(!size)
 				return 0;
-			if (self->icd_data.ied_utf.u_pbc >= 3)
+			if (self->icd_data.idd_utf.u_pbc >= 3)
 				break;
-			self->icd_data.ied_utf.u_pb[self->icd_data.ied_utf.u_pbc] = *(byte_t const *)data;
-			++self->icd_data.ied_utf.u_pbc;
+			self->icd_data.idd_utf.u_pb[self->icd_data.idd_utf.u_pbc] = *(byte_t const *)data;
+			++self->icd_data.idd_utf.u_pbc;
 			data = (byte_t const *)data + 1;
 			--size;
 		}
 #if UTF_BYTEORDER == 1234
-		c32.b[0] = self->icd_data.ied_utf.u_pb[0];
-		c32.b[1] = self->icd_data.ied_utf.u_pb[1];
-		c32.b[2] = self->icd_data.ied_utf.u_pb[2];
+		c32.b[0] = self->icd_data.idd_utf.u_pb[0];
+		c32.b[1] = self->icd_data.idd_utf.u_pb[1];
+		c32.b[2] = self->icd_data.idd_utf.u_pb[2];
 		c32.b[3] = ((byte_t const *)data)[0];
 #else /* UTF_BYTEORDER == 1234 */
 		c32.b[0] = ((byte_t const *)data)[0];
-		c32.b[1] = self->icd_data.ied_utf.u_pb[2];
-		c32.b[2] = self->icd_data.ied_utf.u_pb[1];
-		c32.b[3] = self->icd_data.ied_utf.u_pb[0];
+		c32.b[1] = self->icd_data.idd_utf.u_pb[2];
+		c32.b[2] = self->icd_data.idd_utf.u_pb[1];
+		c32.b[3] = self->icd_data.idd_utf.u_pb[0];
 #endif /* UTF_BYTEORDER != 1234 */
 		ptr = unicode_writeutf8(ptr, c32.l);
-		self->icd_data.ied_utf.u_pbc = 0;
+		self->icd_data.idd_utf.u_pbc = 0;
 		data = (byte_t const *)data + 1;
 		--size;
 	}
@@ -228,8 +228,8 @@ NOTHROW_NCX(FORMATPRINTER_CC libiconv_utf32be_decode)(struct iconv_decode *__res
 	}
 	/* Handle unmatched utf-16 byte. */
 	if (size) {
-		memcpy(self->icd_data.ied_utf.u_pb, data, size);
-		self->icd_data.ied_utf.u_pbc = size;
+		memcpy(self->icd_data.idd_utf.u_pb, data, size);
+		self->icd_data.idd_utf.u_pbc = size;
 	}
 	/* Flush all remaining data. */
 	DO_decode_output(buf, (size_t)(ptr - buf));

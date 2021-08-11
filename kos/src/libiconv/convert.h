@@ -55,6 +55,11 @@ INTDEF NONNULL((1, 2)) ssize_t NOTHROW_NCX(FORMATPRINTER_CC libiconv_utf32le_dec
 INTDEF NONNULL((1, 2)) ssize_t NOTHROW_NCX(FORMATPRINTER_CC libiconv_utf32be_decode)(struct iconv_decode *__restrict self, /*utf-32*/ void const *__restrict data, size_t size);
 
 
+/************************************************************************/
+/* Generic code-page                                                    */
+/************************************************************************/
+INTDEF NONNULL((1, 2)) ssize_t NOTHROW_NCX(FORMATPRINTER_CC libiconv_cp_encode)(struct iconv_encode *__restrict self, /*utf-8*/ char const *__restrict data, size_t size);
+INTDEF NONNULL((1, 2)) ssize_t NOTHROW_NCX(FORMATPRINTER_CC libiconv_cp_decode)(struct iconv_decode *__restrict self, /*cp???*/ char const *__restrict data, size_t size);
 
 
 DECL_END

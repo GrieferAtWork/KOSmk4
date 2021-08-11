@@ -35,6 +35,7 @@
 
 #include "codecs.h"
 #include "convert.h"
+#include "cp.h"
 #include "iconv.h"
 
 DECL_BEGIN
@@ -43,6 +44,129 @@ STATIC_ASSERT(offsetof(struct iconv_encode, ice_output) == offsetof(struct iconv
 STATIC_ASSERT(offsetof(struct iconv_encode, ice_flags) == offsetof(struct iconv_decode, icd_flags));
 STATIC_ASSERT(sizeof(union iconv_decode_data) <= (_ICONV_DECODE_OPAQUE_POINTERS * sizeof(void *)));
 STATIC_ASSERT(sizeof(union iconv_encode_data) <= (_ICONV_ENCODE_OPAQUE_POINTERS * sizeof(void *)));
+
+PRIVATE NONNULL((1, 2)) int
+NOTHROW_NCX(CC libiconv_decode_init)(/*in|out*/ struct iconv_decode *__restrict self,
+                                     /*out*/ struct iconv_printer *__restrict input, /* Accepts `input_codec_name' */
+                                     /*in*/ unsigned int input_codec) {
+	/* By default, the iconv decoder is used as input cookie. */
+	input->ii_arg = self;
+	switch (input_codec) {
+
+	case CODEC_ASCII:
+		if ((self->icd_flags & ICONV_ERRMASK) == ICONV_ERR_IGNORE) {
+			/* When  errors can be  ignored, the 7-bit ascii
+			 * character set is source-compatible with UTF-8 */
+			*input = self->icd_output;
+		} else {
+			input->ii_printer = (pformatprinter)&libiconv_ascii_decode_errchk;
+		}
+		break;
+
+	case CODEC_UTF8:
+		/* Simple no-op (because output is also UTF-8) */
+		*input = self->icd_output;
+		break;
+
+	case CODEC_UTF16LE:
+		input->ii_printer = (pformatprinter)&libiconv_utf16le_decode;
+		self->icd_data.idd_utf.u_pbc = 0;
+		__mbstate_init(&self->icd_data.idd_utf.u_16);
+		break;
+
+	case CODEC_UTF16BE:
+		input->ii_printer = (pformatprinter)&libiconv_utf16be_decode;
+		self->icd_data.idd_utf.u_pbc = 0;
+		__mbstate_init(&self->icd_data.idd_utf.u_16);
+		break;
+
+
+	case CODEC_UTF32LE:
+		input->ii_printer = (pformatprinter)&libiconv_utf32le_decode;
+		self->icd_data.idd_utf.u_pbc = 0;
+		break;
+
+	case CODEC_UTF32BE:
+		input->ii_printer = (pformatprinter)&libiconv_utf32be_decode;
+		self->icd_data.idd_utf.u_pbc = 0;
+		break;
+
+	default: {
+		struct iconv_codepage const *cp;
+		/* Check for a generic code page */
+		cp = libiconv_get_codepage(input_codec);
+		if (cp) {
+			self->icd_data.idd_cp       = cp;
+			self->icd_output.ii_printer = (pformatprinter)&libiconv_cp_decode;
+			break;
+		}
+		errno = ENOENT;
+		return -1;
+	}	break;
+	}
+	return 0;
+}
+
+
+PRIVATE NONNULL((1, 2)) int
+NOTHROW_NCX(CC libiconv_encode_init)(/*in|out*/ struct iconv_encode *__restrict self,
+                                     /*out*/ struct iconv_printer *__restrict input, /* Accepts `UTF-8' */
+                                     /*in*/ unsigned int output_codec) {
+	/* By default, the iconv encoder is used as input cookie. */
+	input->ii_arg = self;
+	/* Almost all codecs use the utf-8 parser mbstate. */
+	__mbstate_init(&self->ice_data.ied_utf8);
+	switch (output_codec) {
+
+	case CODEC_ASCII:
+		if ((self->ice_flags & ICONV_ERRMASK) == ICONV_ERR_IGNORE) {
+			/* When  errors can be  ignored, the 7-bit ascii
+			 * character set is source-compatible with UTF-8 */
+			*input = self->ice_output;
+		} else {
+			/* Encoding ASCII is the same as decoding it. We simply
+			 * have to handle anything characters that is `>= 0x80' */
+			input->ii_printer = (pformatprinter)&libiconv_ascii_decode_errchk;
+		}
+		break;
+
+	case CODEC_UTF8:
+		/* Simple no-op (because output is also UTF-8) */
+		*input = self->ice_output;
+		break;
+
+	case CODEC_UTF16LE:
+		self->ice_output.ii_printer = (pformatprinter)&libiconv_utf16le_encode;
+		break;
+
+	case CODEC_UTF16BE:
+		self->ice_output.ii_printer = (pformatprinter)&libiconv_utf16be_encode;
+		break;
+
+	case CODEC_UTF32LE:
+		self->ice_output.ii_printer = (pformatprinter)&libiconv_utf32le_encode;
+		break;
+
+	case CODEC_UTF32BE:
+		self->ice_output.ii_printer = (pformatprinter)&libiconv_utf32be_encode;
+		break;
+
+	default: {
+		struct iconv_codepage const *cp;
+		/* Check for a generic code page */
+		cp = libiconv_get_codepage(output_codec);
+		if (cp) {
+			self->ice_data.ied_cp.ic_cp = cp;
+			self->ice_output.ii_printer = (pformatprinter)&libiconv_cp_encode;
+			break;
+		}
+		errno = ENOENT;
+		return -1;
+	}	break;
+	}
+	return 0;
+}
+
 
 
 /* Initialize the given iconv decoder for the purpose of
@@ -60,56 +184,7 @@ NOTHROW_NCX(CC _libiconv_decode_init)(/*in|out*/ struct iconv_decode *__restrict
                                       /*in*/ char const *__restrict input_codec_name) {
 	unsigned int codec;
 	codec = libiconv_codecbyname(input_codec_name);
-	switch (codec) {
-
-	case CODEC_ASCII:
-		if ((self->icd_flags & ICONV_ERRMASK) == ICONV_ERR_IGNORE) {
-			/* When  errors can be  ignored, the 7-bit ascii
-			 * character set is source-compatible with UTF-8 */
-			*input = self->icd_output;
-		} else {
-			input->ii_printer = (pformatprinter)&libiconv_ascii_decode_errchk;
-			input->ii_arg     = self;
-		}
-		break;
-
-	case CODEC_UTF8:
-		/* Simple no-op (because output is also UTF-8) */
-		*input = self->icd_output;
-		break;
-
-	case CODEC_UTF16LE:
-		input->ii_arg     = self;
-		input->ii_printer = (pformatprinter)&libiconv_utf16le_decode;
-		self->icd_data.ied_utf.u_pbc = 0;
-		__mbstate_init(&self->icd_data.ied_utf.u_16);
-		break;
-
-	case CODEC_UTF16BE:
-		input->ii_arg     = self;
-		input->ii_printer = (pformatprinter)&libiconv_utf16be_decode;
-		self->icd_data.ied_utf.u_pbc = 0;
-		__mbstate_init(&self->icd_data.ied_utf.u_16);
-		break;
-
-
-	case CODEC_UTF32LE:
-		input->ii_arg     = self;
-		input->ii_printer = (pformatprinter)&libiconv_utf32le_decode;
-		self->icd_data.ied_utf.u_pbc = 0;
-		break;
-
-	case CODEC_UTF32BE:
-		input->ii_arg     = self;
-		input->ii_printer = (pformatprinter)&libiconv_utf32be_decode;
-		self->icd_data.ied_utf.u_pbc = 0;
-		break;
-
-	default:
-		errno = ENOENT;
-		return -1;
-	}
-	return 0;
+	return libiconv_decode_init(self, input, codec);
 }
 
 
@@ -129,55 +204,7 @@ NOTHROW_NCX(CC _libiconv_encode_init)(/*in|out*/ struct iconv_encode *__restrict
                                       /*in*/ char const *__restrict output_codec_name) {
 	unsigned int codec;
 	codec = libiconv_codecbyname(output_codec_name);
-	switch (codec) {
-
-	case CODEC_ASCII:
-		if ((self->ice_flags & ICONV_ERRMASK) == ICONV_ERR_IGNORE) {
-			/* When  errors can be  ignored, the 7-bit ascii
-			 * character set is source-compatible with UTF-8 */
-			*input = self->ice_output;
-		} else {
-			/* Encoding ASCII is the same as decoding it. We simply
-			 * have to handle anything characters that is `>= 0x80' */
-			input->ii_printer = (pformatprinter)&libiconv_ascii_decode_errchk;
-			input->ii_arg     = self;
-		}
-		break;
-
-	case CODEC_UTF8:
-		/* Simple no-op (because output is also UTF-8) */
-		*input = self->ice_output;
-		break;
-
-	case CODEC_UTF16LE:
-		self->ice_output.ii_printer = (pformatprinter)&libiconv_utf16le_encode;
-		self->ice_output.ii_arg     = self;
-		__mbstate_init(&self->ice_data.ied_utf8);
-		break;
-
-	case CODEC_UTF16BE:
-		self->ice_output.ii_printer = (pformatprinter)&libiconv_utf16be_encode;
-		self->ice_output.ii_arg     = self;
-		__mbstate_init(&self->ice_data.ied_utf8);
-		break;
-
-	case CODEC_UTF32LE:
-		self->ice_output.ii_printer = (pformatprinter)&libiconv_utf32le_encode;
-		self->ice_output.ii_arg     = self;
-		__mbstate_init(&self->ice_data.ied_utf8);
-		break;
-
-	case CODEC_UTF32BE:
-		self->ice_output.ii_printer = (pformatprinter)&libiconv_utf32be_encode;
-		self->ice_output.ii_arg     = self;
-		__mbstate_init(&self->ice_data.ied_utf8);
-		break;
-
-	default:
-		errno = ENOENT;
-		return -1;
-	}
-	return 0;
+	return libiconv_encode_init(self, input, codec);
 }
 
 
@@ -202,27 +229,33 @@ NOTHROW_NCX(CC _libiconv_transcode_init)(/*in|out*/ struct iconv_transcode *__re
                                          /*in*/ char const *__restrict input_codec_name,
                                          /*in*/ char const *__restrict output_codec_name) {
 	int result;
+	unsigned int input_codec;
+	unsigned int output_codec;
+
+	input_codec  = libiconv_codecbyname(input_codec_name);
+	output_codec = libiconv_codecbyname(output_codec_name);
 
 	/* Check for special case: when input and output  codecs are the same,  then
 	 *                         it really shouldn't matter if we don't know them! */
-	if (strcasecmp(input_codec_name, output_codec_name) == 0) {
+	if (input_codec == output_codec &&
+	    (input_codec != 0 || strcasecmp(input_codec_name, output_codec_name) == 0)) {
 		*input = self->it_encode.ice_output;
 		return 0;
 	}
 
 	/* Initialize the encoder and set-up its input pipe for use as output by the decoder. */
 	self->it_decode.icd_flags = self->it_encode.ice_flags;
-	result = _libiconv_encode_init(&self->it_encode,
-	                               &self->it_decode.icd_output,
-	                               output_codec_name);
+	result = libiconv_encode_init(&self->it_encode,
+	                              &self->it_decode.icd_output,
+	                              output_codec);
 	if unlikely(result != 0)
 		goto done;
 
 	/* Initialize the decoder (note that it's output printer was already set-up
 	 * as the input descriptor for the  encode function in the previous  step!) */
-	result = _libiconv_decode_init(&self->it_decode,
-	                               input,
-	                               input_codec_name);
+	result = libiconv_decode_init(&self->it_decode,
+	                              input,
+	                              input_codec);
 
 	/* And that's already it! */
 
