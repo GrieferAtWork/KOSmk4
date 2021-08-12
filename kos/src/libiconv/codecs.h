@@ -43,7 +43,7 @@ DECL_BEGIN
 enum {
 	CODEC_UNKNOWN, /* Invalid codec */
 /*[[[begin:codecs]]]*/
-	CODEC_ASCII,       /* "iso-ir-6", "iso-ir-006", "ANSI_X3.4", "ANSI_X3.4-1968", "ANSI_X3.4-1986", "ISO_646.irv:1991", "ISO646-US", "us", "IBM367", "cp367", "us-ascii", "ascii", "CSASCII", "OSF00010020" */
+	CODEC_ASCII,       /* "iso-ir-6", "ANSI_X3.4", "ANSI_X3.4-1968", "ANSI_X3.4-1986", "ISO_646.irv:1991", "ISO646-US", "us", "IBM367", "cp367", "us-ascii", "ascii", "CSASCII", "OSF00010020" */
 	CODEC_UTF8,        /* "UTF8", "UTF-8", "ISO-10646/UTF8", "ISO-10646/UTF-8", "iso-ir-193", "OSF05010001" */
 	CODEC_UTF16LE,     /* "UTF16LE", "UTF-16LE", "UCS-2LE", "UNICODELITTLE" */
 	CODEC_UTF16BE,     /* "UTF16BE", "UTF-16BE", "UCS-2BE", "UNICODEBIG" */
@@ -126,29 +126,50 @@ enum {
 
 	/* iso646 (keep these sorted alphabetically!) */
 #define CODEC_ISO646_MIN CODEC_ISO646_CA
-	CODEC_ISO646_CA,       /* "ISO646-CA", "iso-ir-121", "CSA_Z243.4-1985-1", "CSA7-1", "CA", "csISO121Canadian1", "CSA_Z243.419851" */
-	CODEC_ISO646_CA2,      /* "ISO646-CA2", "iso-ir-122", "CSA_Z243.4-1985-2", "CSA7-2", "csISO122Canadian2", "CSA_Z243.419852" */
-	CODEC_ISO646_CN,       /* "ISO646-CN", "iso-ir-57", "CN", "csISO58GB1988", "GB_1988-80", "GB_198880" */
-	CODEC_ISO646_CU,       /* "ISO646-CU", "CUBA", "NC_NC00-10", "NC_NC00-10:81", "iso-ir-151", "csISO151Cuba", "NC_NC0010" */
-	CODEC_ISO646_DE,       /* "ISO646-DE", "iso-ir-21", "DIN_66003", "IBM-1011", "MS-10206", "csISO21German", "GERMAN", "DE", "D7DEC" */
-	CODEC_ISO646_DK,       /* "ISO646-DK", "DS2089", "DS_2089", "DK", "csISO646Danish" */
-	CODEC_ISO646_ES,       /* "ISO646-ES", "iso-ir-17", "ES", "csISO17Spanish" */
-	CODEC_ISO646_ES2,      /* "ISO646-ES2", "iso-ir-85", "ES2", "csISO85Spanish2" */
-	CODEC_ISO646_FR,       /* "ISO646-FR", "iso-ir-69", "NF_Z_62-010", "FR", "csISO69French", "NF_Z_62010" */
-	CODEC_ISO646_FR1,      /* "ISO646-FR1", "iso-ir-25", "NF_Z_62-010_1973", "NF_Z_62-010_(1973)", "csISO25French", "NF_Z_62010_1973" */
-	CODEC_ISO646_GB,       /* "ISO646-GB", "iso-ir-4", "BS_4730", "GB", "UK", "csISO4Unitedkingdom" */
-	CODEC_ISO646_HU,       /* "ISO646-HU", "iso-ir-86", "MSZ_7795.3", "HU", "csISO86Hungarian" */
-	CODEC_ISO646_IT,       /* "ISO646-IT", "iso-ir-15", "IT", "csISO15Italian" */
-	CODEC_ISO646_JP,       /* "ISO646-JP", "iso-ir-14", "JIS_C6220-1969-RO", "JP", "csISO14JISC6220RO", "JIS_C62201969RO" */
-	CODEC_ISO646_JP_OCR_B, /* "ISO646-JP-OCR-B", "iso-ir-92", "JIS_C6229-1984-B", "JP-OCR-B", "csISO92JISC62991984B", "JIS_C62291984B" */
-	CODEC_ISO646_KR,       /* "ISO646-KR", "KSC5636", "CSKSC5636" */
-	CODEC_ISO646_NO,       /* "ISO646-NO", "iso-ir-60", "NS_4551-1", "NO", "csISO60DanishNorwegian", "csISO60Norwegian1", "NS_45511" */
-	CODEC_ISO646_NO2,      /* "ISO646-NO2", "NS_4551-2", "iso-ir-61", "NO2", "csISO61Norwegian2", "NS_45512" */
-	CODEC_ISO646_PT,       /* "ISO646-PT", "iso-ir-16", "PT", "csISO16Portugese" */
-	CODEC_ISO646_PT2,      /* "ISO646-PT2", "iso-ir-84", "PT2", "csISO84Portuguese2" */
-	CODEC_ISO646_SE,       /* "ISO646-SE", "iso-ir-10", "SEN_850200_B", "FI", "ISO646-FI", "SE", "csISO10Swedish", "SS636127" */
-	CODEC_ISO646_SE2,      /* "ISO646-SE2", "iso-ir-11", "SEN_850200_C", "SE2", "csISO11Swedishfornames" */
-	CODEC_ISO646_YU,       /* "ISO646-YU", "JUS_I.B1.002", "JS", "YU", "csISO141Jusib1002" */
+	CODEC_ISO646_CA,             /* "ISO646-CA", "iso-ir-121", "CSA_Z243.4-1985-1", "CSA7-1", "CA", "csISO121Canadian1", "CSA_Z243.419851", "cp1020" */
+	CODEC_ISO646_CA2,            /* "ISO646-CA2", "iso-ir-122", "CSA_Z243.4-1985-2", "CSA7-2", "csISO122Canadian2", "CSA_Z243.419852" */
+	CODEC_ISO646_CN,             /* "ISO646-CN", "iso-ir-57", "CN", "csISO58GB1988", "GB_1988-80", "GB_198880" */
+	CODEC_ISO646_CU,             /* "ISO646-CU", "CUBA", "NC_NC00-10", "NC_NC00-10:81", "iso-ir-151", "csISO151Cuba", "NC_NC0010" */
+	CODEC_ISO646_DANO_NATS,      /* "ISO-IR-9" */
+	CODEC_ISO646_DE,             /* "ISO646-DE", "iso-ir-21", "DIN_66003", "IBM1011", "MS-10206", "csISO21German", "GERMAN", "DE", "D7DEC", "cp1011", "cp20106" */
+	CODEC_ISO646_DK,             /* "ISO646-DK", "DS2089", "DS_2089", "DK", "csISO646Danish", "cp1017" */
+	CODEC_ISO646_DK_NO_ALT_NRCS, /* "cp1107", "IBM1107" */
+	CODEC_ISO646_DK_NO_NRCS,     /* "cp1105", "IBM1105" */
+	CODEC_ISO646_ES,             /* "ISO646-ES", "iso-ir-17", "ES", "csISO17Spanish", "cp1023" */
+	CODEC_ISO646_ES2,            /* "ISO646-ES2", "iso-ir-85", "ES2", "csISO85Spanish2", "cp1014" */
+	CODEC_ISO646_FI_NRCS,        /* "cp1103", "IBM1103" */
+	CODEC_ISO646_FR,             /* "ISO646-FR", "iso-ir-69", "NF_Z_62-010", "FR", "csISO69French", "NF_Z_62010" */
+	CODEC_ISO646_FR1,            /* "ISO646-FR1", "iso-ir-25", "NF_Z_62-010_1973", "NF_Z_62-010_(1973)", "csISO25French", "NF_Z_62010_1973" */
+	CODEC_ISO646_GB,             /* "ISO646-GB", "iso-ir-4", "BS_4730", "GB", "UK", "csISO4Unitedkingdom" */
+	CODEC_ISO646_GB_NRCS,        /* "cp1101", "IBM1101" */
+	CODEC_ISO646_HU,             /* "ISO646-HU", "iso-ir-86", "MSZ_7795.3", "HU", "csISO86Hungarian" */
+	CODEC_ISO646_IE,             /* "ISO646-IE", "iso-ir-207" */
+	CODEC_ISO646_INIS_SUBSET,    /* "ISO-IR-49" */
+	CODEC_ISO646_INV,            /* "ISO-IR-170" */
+	CODEC_ISO646_IRV_1973,       /* "ISO-IR-2" */
+	CODEC_ISO646_IRV_1983,       /* "cp1009", "IBM1009" */
+	CODEC_ISO646_IS,             /* "ISO646-IS" */
+	CODEC_ISO646_IT,             /* "ISO646-IT", "iso-ir-15", "IT", "csISO15Italian" */
+	CODEC_ISO646_JP,             /* "ISO646-JP", "iso-ir-14", "JIS_C6220-1969-RO", "JP", "csISO14JISC6220RO", "JIS_C62201969RO" */
+	CODEC_ISO646_JP_OCR_B,       /* "ISO646-JP-OCR-B", "iso-ir-92", "JIS_C6229-1984-B", "JP-OCR-B", "csISO92JISC62991984B", "JIS_C62291984B" */
+	CODEC_ISO646_KR,             /* "ISO646-KR", "KSC5636", "CSKSC5636", "KS-X-1003", "KSC5636-1989" */
+	CODEC_ISO646_LATIN_GR_MIXED, /* "ISO-IR-27" */
+	CODEC_ISO646_MT,             /* "ISO646-MT" */
+	CODEC_ISO646_NL,             /* "ISO646-NL", "cp1019", "IBM1019" */
+	CODEC_ISO646_NL_NRCS,        /* "cp1102", "IBM1102" */
+	CODEC_ISO646_NO,             /* "ISO646-NO", "iso-ir-60", "NS_4551-1", "NO", "csISO60DanishNorwegian", "csISO60Norwegian1", "NS_45511" */
+	CODEC_ISO646_NO2,            /* "ISO646-NO2", "NS_4551-2", "iso-ir-61", "NO2", "csISO61Norwegian2", "NS_45512" */
+	CODEC_ISO646_PL,             /* "BN-74/3101-01" */
+	CODEC_ISO646_PT,             /* "ISO646-PT", "iso-ir-16", "PT", "csISO16Portugese" */
+	CODEC_ISO646_PT2,            /* "ISO646-PT2", "iso-ir-84", "PT2", "csISO84Portuguese2" */
+	CODEC_ISO646_SE,             /* "ISO646-SE", "iso-ir-10", "SEN_850200_B", "FI", "ISO646-FI", "SE", "csISO10Swedish", "SS636127" */
+	CODEC_ISO646_SE2,            /* "ISO646-SE2", "iso-ir-11", "SEN_850200_C", "SE2", "csISO11Swedishfornames" */
+	CODEC_ISO646_SEFI_NATS,      /* "ISO-IR-8" */
+	CODEC_ISO646_SE_NRCS,        /* "cp1106", "IBM1106" */
+	CODEC_ISO646_SWI_NRCS,       /* "cp1021", "IBM1021" */
+	CODEC_ISO646_T_61,           /* "ISO-IR-102" */
+	CODEC_ISO646_VIEWDATA,       /* "ISO-IR-47" */
+	CODEC_ISO646_YU,             /* "ISO646-YU", "JUS_I.B1.002", "JS", "YU", "csISO141Jusib1002" */
 #define CODEC_ISO646_MAX CODEC_ISO646_YU
 #define CODEC_ISISO646(x) ((x) >= CODEC_ISO646_MIN && (x) <= CODEC_ISO646_MAX)
 
