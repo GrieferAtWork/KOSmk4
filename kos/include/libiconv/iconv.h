@@ -123,7 +123,11 @@ union iconv_encode_data {
                                         * doing this will most definitely result in data corruption as the
                                         * result will be encoded data mixed with data that's not encoded. */
 #define ICONV_ERR_DISCARD            3 /* Data that cannot be encoded/decoded is silently discarded. */
-#define ICONV_HASERR        0x00000010 /* Used for `ICONV_ERR_ERRNO': keep setting EILSEQ and returning -1. */
+#define ICONV_ERR_TRANSLIT  0x00000010 /* FLAG: Try to perform transliteration (s.a. `unicode_fold(3)') when
+                                        *       a unicode character cannot be encoded in the target codec.
+                                        *       If successful, characters will be replaced by one or more
+                                        *       similar-looking characters that can (hopefully) be encoded. */
+#define ICONV_HASERR        0x00000020 /* Used for `ICONV_ERR_ERRNO': keep setting EILSEQ and returning -1. */
 /* NOTE: Other flags may have arbitrary meaning depending on the codec used. */
 
 

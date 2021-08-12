@@ -42,8 +42,8 @@ DECL_BEGIN
 
 STATIC_ASSERT(offsetof(struct iconv_encode, ice_output) == offsetof(struct iconv_decode, icd_output));
 STATIC_ASSERT(offsetof(struct iconv_encode, ice_flags) == offsetof(struct iconv_decode, icd_flags));
-STATIC_ASSERT(sizeof(union iconv_decode_data) <= (_ICONV_DECODE_OPAQUE_POINTERS * sizeof(void *)));
-STATIC_ASSERT(sizeof(union iconv_encode_data) <= (_ICONV_ENCODE_OPAQUE_POINTERS * sizeof(void *)));
+STATIC_ASSERT(sizeof(union iconv_decode_data) == (_ICONV_DECODE_OPAQUE_POINTERS * sizeof(void *)));
+STATIC_ASSERT(sizeof(union iconv_encode_data) == (_ICONV_ENCODE_OPAQUE_POINTERS * sizeof(void *)));
 
 PRIVATE NONNULL((1, 2)) int
 NOTHROW_NCX(CC libiconv_decode_init)(/*in|out*/ struct iconv_decode *__restrict self,
