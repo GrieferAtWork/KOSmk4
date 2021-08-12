@@ -138,7 +138,7 @@ enum {
 	CODEC_ISO646_ES,             /* "ISO646-ES", "iso-ir-17", "ES", "csISO17Spanish", "cp1023" */
 	CODEC_ISO646_ES2,            /* "ISO646-ES2", "iso-ir-85", "ES2", "csISO85Spanish2", "cp1014" */
 	CODEC_ISO646_FI_NRCS,        /* "cp1103", "IBM1103" */
-	CODEC_ISO646_FR,             /* "ISO646-FR", "iso-ir-69", "NF_Z_62-010", "FR", "csISO69French", "NF_Z_62010" */
+	CODEC_ISO646_FR,             /* "ISO646-FR", "iso-ir-69", "NF_Z_62-010", "NF_Z_62-010_1983", "NF_Z_62-010_(1983)", "FR", "csISO69French", "NF_Z_62010" */
 	CODEC_ISO646_FR1,            /* "ISO646-FR1", "iso-ir-25", "NF_Z_62-010_1973", "NF_Z_62-010_(1973)", "csISO25French", "NF_Z_62010_1973" */
 	CODEC_ISO646_GB,             /* "ISO646-GB", "iso-ir-4", "BS_4730", "GB", "UK", "csISO4Unitedkingdom" */
 	CODEC_ISO646_GB_NRCS,        /* "cp1101", "IBM1101" */

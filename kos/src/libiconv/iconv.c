@@ -19,7 +19,6 @@
  */
 #ifndef GUARD_LIBICONV_ICONV_C
 #define GUARD_LIBICONV_ICONV_C 1
-#define _KOS_SOURCE 1
 
 #include "api.h"
 /**/

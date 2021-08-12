@@ -236,10 +236,10 @@ NOTHROW_NCX(FORMATPRINTER_CC libiconv_utf32be_decode)(struct iconv_decode *__res
 		c32 = (char32_t)UNALIGNED_GETBE32((uint32_t const *)data);
 #endif /* UTF_BYTEORDER != 1234 */
 		ptr = unicode_writeutf8(ptr, c32);
-		data = (byte_t const *)data + 2;
-		size -= 2;
+		data = (byte_t const *)data + 4;
+		size -= 4;
 	}
-	/* Handle unmatched utf-16 byte. */
+	/* Handle unmatched utf-32 bytes. */
 	if (size) {
 		memcpy(self->icd_data.idd_utf.u_pb, data, size);
 		self->icd_data.idd_utf.u_pbc = size;

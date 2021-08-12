@@ -471,7 +471,9 @@ PRIVATE struct codec_db_entry codec_db[] = {
 	{ "nec-867",                  CODEC_KEYBCS2 },
 	{ "nf_z_62-010",              CODEC_ISO646_FR },
 	{ "nf_z_62-010_(1973)",       CODEC_ISO646_FR1 },
+	{ "nf_z_62-010_(1983)",       CODEC_ISO646_FR },
 	{ "nf_z_62-010_1973",         CODEC_ISO646_FR1 },
+	{ "nf_z_62-010_1983",         CODEC_ISO646_FR },
 	{ "nf_z_62010",               CODEC_ISO646_FR },
 	{ "nf_z_62010_1973",          CODEC_ISO646_FR1 },
 	{ "no",                       CODEC_ISO646_NO },
@@ -548,7 +550,7 @@ PRIVATE struct codec_db_entry codec_db[] = {
 
 
 
-/* Return the ID of the codec associated with `name'
+/* Return the ID of the codec associated with  `name'
  * Casing is ignored and codec aliases are respected. */
 INTERN ATTR_PURE WUNUSED NONNULL((1)) unsigned int
 NOTHROW_NCX(FCALL libiconv_codecbyname)(char const *__restrict name) {
@@ -572,12 +574,18 @@ NOTHROW_NCX(FCALL libiconv_codecbyname)(char const *__restrict name) {
 	/* TODO: "ISO-IR-001" --> same as "ISO-IR-1" */
 	/* TODO: "cp-01234" --> same as "cp01234" */
 	/* TODO: "cp01234" --> same as "cp1234" */
+	/* TODO: Generally, if `name' contains a sequence of numbers that starts
+	 *       with at least  one leading `0',  re-attempt the search  without
+	 *       those leading zero-digits.
+	 *       Once implemented, adjust the name generator to remove leading
+	 *       zeroes from codec names in the database. */
+	/* TODO: '-' and '_' should work interchangeably. */
 
 	return CODEC_UNKNOWN;
 }
 
 /* Return the nth (0-based) alphabetically sorted name for the codec `id'
- * When `id' is invalid or doesn't have an `nth' name, return `NULL' */
+ * When `id' is  invalid or  doesn't have  an `nth'  name, return  `NULL' */
 INTERN ATTR_CONST WUNUSED char const *
 NOTHROW_NCX(FCALL libiconv_getcodecname)(unsigned int id, unsigned int nth) {
 	size_t i;
