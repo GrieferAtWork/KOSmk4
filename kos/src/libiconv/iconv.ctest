@@ -48,7 +48,7 @@ DEFINE_TEST(iconv) {
 	DLSYM(_iconv_transcode_init);
 #undef DLSYM
 	{
-		char buf[512], *ptr = buf;
+		char buf[64], *ptr = buf;
 		struct iconv_transcode tc;
 		struct iconv_printer in;
 		int error;
@@ -63,7 +63,7 @@ DEFINE_TEST(iconv) {
 	}
 
 	{
-		char buf[512], *ptr = buf;
+		char buf[64], *ptr = buf;
 		struct iconv_transcode tc;
 		struct iconv_printer in;
 		int error;
@@ -75,6 +75,22 @@ DEFINE_TEST(iconv) {
 		format_printf(in.ii_printer, in.ii_arg, "ss: \x7e");
 		*ptr = 0;
 		assertf(strcmp(buf, "ss: ss") == 0, "buf = %q", buf);
+	}
+
+	/* Also test multi-byte decode functionality. */
+	{
+		char buf[64], *ptr = buf;
+		struct iconv_transcode tc;
+		struct iconv_printer in;
+		int error;
+		tc.it_encode.ice_output.ii_printer = &format_sprintf_printer;
+		tc.it_encode.ice_output.ii_arg     = &ptr;
+		tc.it_encode.ice_flags             = ICONV_ERR_ERRNO | ICONV_ERR_TRANSLIT;
+		error = _iconv_transcode_init(&tc, &in, "utf-16", "utf-8");
+		assert(error == 0);
+		(*in.ii_printer)(in.ii_arg, (char *)u"Hello", 10);
+		*ptr = 0;
+		assertf(strcmp(buf, "Hello") == 0, "buf = %q", buf);
 	}
 
 	dlclose(libiconv);

@@ -41,6 +41,7 @@ gcc_opt.append("-O3"); // Force _all_ optimizations because stuff in here is per
 
 #include "convert.h"
 #include "cp.h"
+#include "iso646.h"
 
 DECL_BEGIN
 
@@ -437,6 +438,173 @@ NOTHROW_NCX(FORMATPRINTER_CC libiconv_cp_decode)(struct iconv_decode *__restrict
 				c = (unsigned char)*data;
 		}
 		ptr = unicode_writeutf8(ptr, c);
+consume_byte:
+		++data;
+		--size;
+	}
+	DO_decode_output(buf, (size_t)(ptr - buf));
+	return result;
+err:
+	return temp;
+err_ilseq:
+	self->icd_flags |= ICONV_HASERR;
+	errno = EILSEQ;
+	return -1;
+}
+
+
+
+/************************************************************************/
+/* iso646 code page encode/decode functions.                            */
+/************************************************************************/
+PRIVATE ATTR_NOINLINE NONNULL((1, 2)) ssize_t
+NOTHROW_NCX(FORMATPRINTER_CC libiconv_cp646_encode_u32)(struct iconv_encode *__restrict self,
+                                                        char32_t const *__restrict data,
+                                                        size_t len) {
+	size_t j;
+	char buf[64], *ptr = buf;
+	ssize_t temp, result = 0;
+	struct iconv_iso646_codepage const *cp;
+	cp = self->ice_data.ied_cp.ic_cp646;
+	for (j = 0; j < len; ++j) {
+		/* Figure out how to encode this unicode character in this codepage. */
+		char32_t c32 = data[j];
+		char encoded;
+		if (ptr >= COMPILER_ENDOF(buf)) {
+			DO_encode_output(buf, (size_t)(ptr - buf));
+			ptr = buf;
+		}
+		encoded = iso646_encode(cp, c32);
+		if (encoded || !c32) {
+			*ptr++ = encoded;
+			goto next_c32;
+		}
+		/* Cannot encode :( */
+		if (self->ice_flags & ICONV_ERR_TRANSLIT) {
+			/* Try to case-fold the character. */
+			char32_t folded[UNICODE_FOLDED_MAX];
+			size_t len = (size_t)(iconv_transliterate(c32, folded) - folded);
+			if (len != 1 || folded[0] != c32) {
+				DO_encode_output(buf, (size_t)(ptr - buf));
+				ptr = buf;
+				DO(libiconv_cp646_encode_u32(self, folded, len));
+				goto next_c32;
+			}
+		}
+		if (IS_ICONV_ERR_ERRNO(self->ice_flags)) {
+			DO_encode_output(buf, (size_t)(ptr - buf));
+			goto err_ilseq;
+		}
+		if (!IS_ICONV_ERR_DISCARD(self->ice_flags)) {
+			if (IS_ICONV_ERR_REPLACE(self->ice_flags))
+				*ptr++ = iconv_iso646_codepage_qmark(cp);
+			else {
+				*ptr++ = (char)(unsigned char)(uint32_t)c32;
+			}
+		}
+next_c32:
+		;
+	}
+	DO_encode_output(buf, (size_t)(ptr - buf));
+	return result;
+err:
+	return temp;
+err_ilseq:
+	self->ice_flags |= ICONV_HASERR;
+	errno = EILSEQ;
+	return -1;
+}
+
+INTERN NONNULL((1, 2)) ssize_t
+NOTHROW_NCX(FORMATPRINTER_CC libiconv_cp646_encode)(struct iconv_encode *__restrict self,
+                                                    /*utf-8*/ char const *__restrict data, size_t size) {
+	char buf[64], *ptr = buf;
+	ssize_t temp, result = 0;
+	char32_t c32;
+	struct iconv_iso646_codepage const *cp;
+	if unlikely(self->ice_flags & ICONV_HASERR)
+		goto err_ilseq;
+	cp = self->ice_data.ied_cp.ic_cp646;
+	FOREACH_UTF8(c32, self, data, size) {
+		/* Figure out how to encode this unicode character in this codepage. */
+		char encoded;
+		if (ptr >= COMPILER_ENDOF(buf)) {
+			DO_encode_output(buf, (size_t)(ptr - buf));
+			ptr = buf;
+		}
+		encoded = iso646_encode(cp, c32);
+		if (encoded || !c32) {
+			*ptr++ = encoded;
+			goto next_c32;
+		}
+		/* Cannot encode :( */
+		if (self->ice_flags & ICONV_ERR_TRANSLIT) {
+			/* Try to case-fold the character. */
+			char32_t folded[UNICODE_FOLDED_MAX];
+			size_t len = (size_t)(iconv_transliterate(c32, folded) - folded);
+			if (len != 1 || folded[0] != c32) {
+				DO_encode_output(buf, (size_t)(ptr - buf));
+				ptr = buf;
+				DO(libiconv_cp646_encode_u32(self, folded, len));
+				goto next_c32;
+			}
+		}
+		if (IS_ICONV_ERR_ERRNO(self->ice_flags)) {
+			DO_encode_output(buf, (size_t)(ptr - buf));
+			goto err_ilseq;
+		}
+		if (!IS_ICONV_ERR_DISCARD(self->ice_flags)) {
+			if (IS_ICONV_ERR_REPLACE(self->ice_flags))
+				*ptr++ = iconv_iso646_codepage_qmark(cp);
+			else {
+				*ptr++ = (char)(unsigned char)(uint32_t)c32;
+			}
+		}
+next_c32:
+		;
+	}
+	DO_encode_output(buf, (size_t)(ptr - buf));
+	return result;
+err:
+	return temp;
+err_ilseq:
+	self->ice_flags |= ICONV_HASERR;
+	errno = EILSEQ;
+	return -1;
+}
+
+INTERN NONNULL((1, 2)) ssize_t
+NOTHROW_NCX(FORMATPRINTER_CC libiconv_cp646_decode)(struct iconv_decode *__restrict self,
+                                                    /*cp???*/ char const *__restrict data, size_t size) {
+	char buf[64], *ptr = buf;
+	ssize_t temp, result = 0;
+	struct iconv_iso646_codepage const *cp;
+	if unlikely(self->icd_flags & ICONV_HASERR)
+		goto err_ilseq;
+	cp = self->icd_data.idd_cp646;
+	while (size) {
+		char16_t c16;
+		unsigned char c;
+		if ((ptr + UNICODE_UTF8_MAXLEN) >= COMPILER_ENDOF(buf)) {
+			DO_decode_output(buf, (size_t)(ptr - buf));
+			ptr = buf;
+		}
+		/* Decode the character via the codepage. */
+		c   = (unsigned char)*data;
+		c16 = unlikely(c >= 0x80) ? 0 : iso646_decode(cp, c);
+		if unlikely(c16 == 0 && c != 0) {
+			/* Invalid/undefined input byte */
+			DO_decode_output(buf, (size_t)(ptr - buf));
+			ptr = buf;
+			if (IS_ICONV_ERR_ERRNO(self->icd_flags))
+				goto err_ilseq;
+			if (IS_ICONV_ERR_DISCARD(self->icd_flags))
+				goto consume_byte;
+			c16 = '?';
+			if (IS_ICONV_ERR_IGNORE(self->icd_flags))
+				c16 = c;
+		}
+		ptr = unicode_writeutf8(ptr, c16);
 consume_byte:
 		++data;
 		--size;

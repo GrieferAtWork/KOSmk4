@@ -31,16 +31,24 @@
 
 DECL_BEGIN
 
+/* Sources:
+ *   - https://en.wikipedia.org/wiki/Category:DOS_code_pages
+ *   - https://en.wikipedia.org/wiki/Category:ISO/IEC_8859
+ *   - https://en.wikipedia.org/wiki/ISO/IEC_646
+ *   - GLibc
+ */
+
+
 /* Codec IDs. */
 enum {
 	CODEC_UNKNOWN, /* Invalid codec */
 /*[[[begin:codecs]]]*/
-	CODEC_ASCII,       /* "ISO-IR-006", "ANSI_X3.4-1968", "ANSI_X3.4-1986", "ISO_646.irv:1991", "ISO646-US", "us", "IBM367", "cp367", "us-ascii", "ascii" */
-	CODEC_UTF8,        /* "UTF8", "UTF-8" */
-	CODEC_UTF16LE,     /* "UTF16LE", "UTF-16LE" */
-	CODEC_UTF16BE,     /* "UTF16BE", "UTF-16BE" */
-	CODEC_UTF32LE,     /* "UTF32LE", "UTF-32LE" */
-	CODEC_UTF32BE,     /* "UTF32BE", "UTF-32BE" */
+	CODEC_ASCII,       /* "iso-ir-6", "iso-ir-006", "ANSI_X3.4", "ANSI_X3.4-1968", "ANSI_X3.4-1986", "ISO_646.irv:1991", "ISO646-US", "us", "IBM367", "cp367", "us-ascii", "ascii", "CSASCII", "OSF00010020" */
+	CODEC_UTF8,        /* "UTF8", "UTF-8", "ISO-10646/UTF8", "ISO-10646/UTF-8", "iso-ir-193", "OSF05010001" */
+	CODEC_UTF16LE,     /* "UTF16LE", "UTF-16LE", "UCS-2LE", "UNICODELITTLE" */
+	CODEC_UTF16BE,     /* "UTF16BE", "UTF-16BE", "UCS-2BE", "UNICODEBIG" */
+	CODEC_UTF32LE,     /* "UTF32LE", "UTF-32LE", "UCS-4LE" */
+	CODEC_UTF32BE,     /* "UTF32BE", "UTF-32BE", "UCS-4BE" */
 	CODEC_CP437,       /* "IBM437", "cp437", "437", "csPC8CodePage437", "OEM-US", "OSF100201B5" */
 	CODEC_CP667,       /* "MAZOVIA", "cp667", "cp790", "cp991", "MAZ" */
 	CODEC_CP668,       /* "cp668" */
@@ -96,13 +104,12 @@ enum {
 	CODEC_CP3012,      /* "cp3012", "RusLat" */
 	CODEC_KEYBCS2,     /* "NEC-867", "DOS-895", "KEYBCS2", "KAMENICKY" */
 	CODEC_MIK,         /* "MIK", "BULGARIA-PC" */
-	CODEC_DIN_66003,   /* "DIN_66003", "IBM-1011", "MS-10206", "ISO646-DE", "ISO-IR-21", "csISO21German", "GERMAN", "DE", "D7DEC" */
 	CODEC_DIN_66303,   /* "DIN_66303", "DRV8" */
 	CODEC_ISO_8859_1,  /* "ISO-8859-1", "iso-ir-100", "csISOLatin1", "latin1", "l1", "IBM819", "CP819" */
 	CODEC_ISO_8859_2,  /* "ISO-8859-2", "iso-ir-101", "csISOLatin2", "latin2", "l2", "IBM1111" */
 	CODEC_ISO_8859_3,  /* "ISO-8859-3", "iso-ir-109", "csISOLatin3", "latin3", "l3" */
 	CODEC_ISO_8859_4,  /* "ISO-8859-4", "iso-ir-110", "csISOLatin4", "latin4", "l4" */
-	CODEC_ISO_8859_5,  /* "ISO-8859-5", "ISO-IR-144", "csISOLatinCyrillic", "cyrillic" */
+	CODEC_ISO_8859_5,  /* "ISO-8859-5", "iso-ir-144", "csISOLatinCyrillic", "cyrillic" */
 	CODEC_ISO_8859_6,  /* "ISO-8859-6", "iso-ir-127", "csISOLatinArabic", "ECMA-114", "ASMO-708", "arabic" */
 	CODEC_ISO_8859_7,  /* "ISO-8859-7", "iso-ir-126", "csISOLatinGreek", "ELOT_928", "ECMA-118", "greek", "greek8" */
 	CODEC_ISO_8859_8,  /* "ISO-8859-8", "iso-ir-138", "csISOLatinHebrew", "hebrew" */
@@ -113,19 +120,54 @@ enum {
 	CODEC_ISO_8859_14, /* "ISO-8859-14", "iso-ir-199", "iso-celtic", "latin8", "l8" */
 	CODEC_ISO_8859_15, /* "ISO-8859-15", "latin-9", "latin-0" */
 	CODEC_ISO_8859_16, /* "ISO-8859-16", "iso-ir-226", "latin10", "l10" */
-	CODEC_ISO_IR_182,  /* "ISO-IR-182" */
-	CODEC_ISO_IR_197,  /* "ISO-IR-197" */
-	CODEC_ISO_IR_200,  /* "ISO-IR-200" */
-#if __BYTE_ORDER__ == __ORDER_LITTLE_ENDIAN__
-	CODEC_UTF16 = CODEC_UTF16LE, /* "UTF16", "UTF-16" */
-	CODEC_UTF32 = CODEC_UTF32LE, /* "UTF32", "UTF-32" */
-#endif /* __BYTE_ORDER__ == __ORDER_LITTLE_ENDIAN__ */
-/*[[[end:codecs]]]*/
+	CODEC_ISO_IR_182,  /* "iso-ir-182" */
+	CODEC_ISO_IR_197,  /* "iso-ir-197" */
+	CODEC_ISO_IR_200,  /* "iso-ir-200" */
 
-#if __BYTE_ORDER__ != __ORDER_LITTLE_ENDIAN__
-	CODEC_UTF16 = CODEC_UTF16BE,
-	CODEC_UTF32 = CODEC_UTF32BE,
+	/* iso646 (keep these sorted alphabetically!) */
+#define CODEC_ISO646_MIN CODEC_ISO646_CA
+	CODEC_ISO646_CA,       /* "ISO646-CA", "iso-ir-121", "CSA_Z243.4-1985-1", "CSA7-1", "CA", "csISO121Canadian1", "CSA_Z243.419851" */
+	CODEC_ISO646_CA2,      /* "ISO646-CA2", "iso-ir-122", "CSA_Z243.4-1985-2", "CSA7-2", "csISO122Canadian2", "CSA_Z243.419852" */
+	CODEC_ISO646_CN,       /* "ISO646-CN", "iso-ir-57", "CN", "csISO58GB1988", "GB_1988-80", "GB_198880" */
+	CODEC_ISO646_CU,       /* "ISO646-CU", "CUBA", "NC_NC00-10", "NC_NC00-10:81", "iso-ir-151", "csISO151Cuba", "NC_NC0010" */
+	CODEC_ISO646_DE,       /* "ISO646-DE", "iso-ir-21", "DIN_66003", "IBM-1011", "MS-10206", "csISO21German", "GERMAN", "DE", "D7DEC" */
+	CODEC_ISO646_DK,       /* "ISO646-DK", "DS2089", "DS_2089", "DK", "csISO646Danish" */
+	CODEC_ISO646_ES,       /* "ISO646-ES", "iso-ir-17", "ES", "csISO17Spanish" */
+	CODEC_ISO646_ES2,      /* "ISO646-ES2", "iso-ir-85", "ES2", "csISO85Spanish2" */
+	CODEC_ISO646_FR,       /* "ISO646-FR", "iso-ir-69", "NF_Z_62-010", "FR", "csISO69French", "NF_Z_62010" */
+	CODEC_ISO646_FR1,      /* "ISO646-FR1", "iso-ir-25", "NF_Z_62-010_1973", "NF_Z_62-010_(1973)", "csISO25French", "NF_Z_62010_1973" */
+	CODEC_ISO646_GB,       /* "ISO646-GB", "iso-ir-4", "BS_4730", "GB", "UK", "csISO4Unitedkingdom" */
+	CODEC_ISO646_HU,       /* "ISO646-HU", "iso-ir-86", "MSZ_7795.3", "HU", "csISO86Hungarian" */
+	CODEC_ISO646_IT,       /* "ISO646-IT", "iso-ir-15", "IT", "csISO15Italian" */
+	CODEC_ISO646_JP,       /* "ISO646-JP", "iso-ir-14", "JIS_C6220-1969-RO", "JP", "csISO14JISC6220RO", "JIS_C62201969RO" */
+	CODEC_ISO646_JP_OCR_B, /* "ISO646-JP-OCR-B", "iso-ir-92", "JIS_C6229-1984-B", "JP-OCR-B", "csISO92JISC62991984B", "JIS_C62291984B" */
+	CODEC_ISO646_KR,       /* "ISO646-KR", "KSC5636", "CSKSC5636" */
+	CODEC_ISO646_NO,       /* "ISO646-NO", "iso-ir-60", "NS_4551-1", "NO", "csISO60DanishNorwegian", "csISO60Norwegian1", "NS_45511" */
+	CODEC_ISO646_NO2,      /* "ISO646-NO2", "NS_4551-2", "iso-ir-61", "NO2", "csISO61Norwegian2", "NS_45512" */
+	CODEC_ISO646_PT,       /* "ISO646-PT", "iso-ir-16", "PT", "csISO16Portugese" */
+	CODEC_ISO646_PT2,      /* "ISO646-PT2", "iso-ir-84", "PT2", "csISO84Portuguese2" */
+	CODEC_ISO646_SE,       /* "ISO646-SE", "iso-ir-10", "SEN_850200_B", "FI", "ISO646-FI", "SE", "csISO10Swedish", "SS636127" */
+	CODEC_ISO646_SE2,      /* "ISO646-SE2", "iso-ir-11", "SEN_850200_C", "SE2", "csISO11Swedishfornames" */
+	CODEC_ISO646_YU,       /* "ISO646-YU", "JUS_I.B1.002", "JS", "YU", "csISO141Jusib1002" */
+#define CODEC_ISO646_MAX CODEC_ISO646_YU
+#define CODEC_ISISO646(x) ((x) >= CODEC_ISO646_MIN && (x) <= CODEC_ISO646_MAX)
+
+
+	/* Aliases */
+#if __BYTE_ORDER__ == __ORDER_LITTLE_ENDIAN__
+	CODEC_UTF16 = CODEC_UTF16LE, /* "UTF16", "UTF-16", "ISO-10646/UCS2", "UCS2", "UCS-2", "OSF00010100", "OSF00010101", "OSF00010102" */
+	CODEC_UTF32 = CODEC_UTF32LE, /* "UTF32", "UTF-32", "ISO-10646/UCS4", "UCS4", "UCS-4", "CSUCS4", "ISO-10646", "10646-1:1993", "10646-1:1993/UCS4", "OSF00010104", "OSF00010105", "OSF00010106" */
+#else /* __BYTE_ORDER__ == __ORDER_LITTLE_ENDIAN__ */
+/**/CODEC_UTF16 = CODEC_UTF16BE,
+/**/CODEC_UTF32 = CODEC_UTF32BE,
 #endif /* __BYTE_ORDER__ != __ORDER_LITTLE_ENDIAN__ */
+#if __SIZEOF_WCHAR_T__ == 2
+	CODEC_WCHAR_T = CODEC_UTF16, /* "WCHAR_T" */
+#else /* __SIZEOF_WCHAR_T__ == 2 */
+/**/CODEC_WCHAR_T = CODEC_UTF32,
+#endif /* __SIZEOF_WCHAR_T__ != 2 */
+
+/*[[[end:codecs]]]*/
 };
 
 /* Return the ID of the codec associated with `name'

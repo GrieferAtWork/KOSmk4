@@ -37,6 +37,7 @@
 #include "convert.h"
 #include "cp.h"
 #include "iconv.h"
+#include "iso646.h"
 
 DECL_BEGIN
 
@@ -89,6 +90,12 @@ NOTHROW_NCX(CC libiconv_decode_init)(/*in|out*/ struct iconv_decode *__restrict 
 	case CODEC_UTF32BE:
 		input->ii_printer = (pformatprinter)&libiconv_utf32be_decode;
 		self->icd_data.idd_utf.u_pbc = 0;
+		break;
+
+	case CODEC_ISO646_MIN ... CODEC_ISO646_MAX:
+		/* iso646 codepage. */
+		self->icd_data.idd_cp646 = libiconv_iso646_page(input_codec);
+		input->ii_printer        = (pformatprinter)&libiconv_cp646_decode;
 		break;
 
 	default: {
@@ -156,6 +163,12 @@ NOTHROW_NCX(CC libiconv_encode_init)(/*in|out*/ struct iconv_encode *__restrict 
 		input->ii_printer = (pformatprinter)&libiconv_utf32be_encode;
 		break;
 
+	case CODEC_ISO646_MIN ... CODEC_ISO646_MAX:
+		/* iso646 codepage. */
+		self->ice_data.ied_cp.ic_cp646 = libiconv_iso646_page(output_codec);
+		input->ii_printer = (pformatprinter)&libiconv_cp646_encode;
+		break;
+
 	default: {
 		struct iconv_codepage const *cp;
 		/* Check for a generic code page */
@@ -188,6 +201,7 @@ NOTHROW_NCX(CC _libiconv_decode_init)(/*in|out*/ struct iconv_decode *__restrict
                                       /*out*/ struct iconv_printer *__restrict input, /* Accepts `input_codec_name' */
                                       /*in*/ char const *__restrict input_codec_name) {
 	unsigned int codec;
+	/* TODO: Check for "//IGNORE" suffix in `input_codec_name' */
 	codec = libiconv_codecbyname(input_codec_name);
 	return libiconv_decode_init(self, input, codec);
 }
@@ -208,6 +222,8 @@ NOTHROW_NCX(CC _libiconv_encode_init)(/*in|out*/ struct iconv_encode *__restrict
                                       /*out*/ struct iconv_printer *__restrict input, /* Accepts `UTF-8' */
                                       /*in*/ char const *__restrict output_codec_name) {
 	unsigned int codec;
+	/* TODO: Check for "//IGNORE" suffix in `output_codec_name' */
+	/* TODO: Check for "//TRANSLIT" suffix in `output_codec_name' */
 	codec = libiconv_codecbyname(output_codec_name);
 	return libiconv_encode_init(self, input, codec);
 }
@@ -237,6 +253,9 @@ NOTHROW_NCX(CC _libiconv_transcode_init)(/*in|out*/ struct iconv_transcode *__re
 	unsigned int input_codec;
 	unsigned int output_codec;
 
+	/* TODO: Check for "//IGNORE" suffix in `input_codec_name' */
+	/* TODO: Check for "//IGNORE" suffix in `output_codec_name' */
+	/* TODO: Check for "//TRANSLIT" suffix in `output_codec_name' */
 	input_codec  = libiconv_codecbyname(input_codec_name);
 	output_codec = libiconv_codecbyname(output_codec_name);
 
