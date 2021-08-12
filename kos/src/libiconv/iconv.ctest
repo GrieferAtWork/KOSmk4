@@ -17,33 +17,55 @@
  *    misrepresented as being the original software.                          *
  * 3. This notice may not be removed or altered from any source distribution. *
  */
-#ifndef _LIBICONV_API_H
-#define _LIBICONV_API_H 1
+#ifndef GUARD_LIBICONV_ICONV_CTEST
+#define GUARD_LIBICONV_ICONV_CTEST 1
+#define _KOS_SOURCE 1
+#undef NDEBUG
 
-#include <__stdinc.h>
+#include <hybrid/compiler.h>
 
-#include <hybrid/host.h>
+#include <kos/types.h>
+#include <system-test/ctest.h>
 
-#if defined(__i386__) && !defined(__x86_64__)
-#define LIBICONV_CC __ATTR_FASTCALL
-#else
-#define LIBICONV_CC /* nothing */
-#endif
+#include <assert.h>
+#include <dlfcn.h>
+#include <format-printer.h>
+#include <string.h>
 
-#if 0
-#define LIBICONV_WANT_PROTOTYPES 1
-#endif
+#include <libiconv/iconv.h>
 
-#if defined(__KOS__) && defined(__KERNEL__) && \
-    defined(CONFIG_BUILDING_KERNEL_CORE)
-#define LIBICONV_DECL __PUBDEF
-#elif defined(__LIBICONV_STATIC)
-#define LIBICONV_DECL __INTDEF
-#else
-#define LIBICONV_DECL __IMPDEF
-#endif
 
-/* Library name for use with `dlopen()' */
-#define LIBICONV_LIBRARY_NAME "libiconv.so"
+DECL_BEGIN
 
-#endif /* !_LIBICONV_API_H */
+PRIVATE _LPICONV_TRANSCODE_INIT _iconv_transcode_init = NULL;
+
+
+DEFINE_TEST(iconv) {
+	void *libiconv;
+	libiconv = dlopen(LIBICONV_LIBRARY_NAME, RTLD_LOCAL);
+	assertf(libiconv, "dlerror(): %s", dlerror());
+#define DLSYM(x) (*(void **)&x = dlsym(libiconv, #x), assertf(x, "dlerror(): %s", dlerror()))
+	DLSYM(_iconv_transcode_init);
+#undef DLSYM
+	{
+		char buf[512], *ptr = buf;
+		struct iconv_transcode tc;
+		struct iconv_printer in;
+		int error;
+		tc.it_encode.ice_output.ii_printer = &format_sprintf_printer;
+		tc.it_encode.ice_output.ii_arg     = &ptr;
+		tc.it_encode.ice_flags             = ICONV_ERR_ERRNO;
+		error = _iconv_transcode_init(&tc, &in, "latin1", "de");
+		assert(error == 0);
+		format_printf(in.ii_printer, in.ii_arg, "aou: \xE4\xF6\xFC");
+		*ptr = 0;
+		assertf(strcmp(buf, "aou: \x7b\x7c\x7d") == 0, "buf = %q", buf);
+	}
+
+	dlclose(libiconv);
+}
+
+
+DECL_END
+
+#endif /* !GUARD_LIBICONV_ICONV_CTEST */

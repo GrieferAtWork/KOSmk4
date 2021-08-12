@@ -53,6 +53,7 @@ union iconv_decode_data {
 	} idd_utf; /* For UTF-16 and UTF-32 input data. */
 
 	struct iconv_codepage const *idd_cp; /* [1..1][const] Code page */
+	void *__idd_pad[_ICONV_DECODE_OPAQUE_POINTERS];
 };
 
 union iconv_encode_data {
@@ -61,6 +62,7 @@ union iconv_encode_data {
 		struct __mbstate             ic_utf8; /* UTF-8 input data buffer. */
 		struct iconv_codepage const *ic_cp;   /* [1..1][const] Code page */
 	} ied_cp;
+	void *__ied_pad[_ICONV_ENCODE_OPAQUE_POINTERS];
 };
 #endif /* LIBICONV_EXPOSE_INTERNAL */
 
@@ -154,9 +156,9 @@ struct iconv_decode {
  * @return: 0 : Success (you may now use `input->ii_printer' and `input->ii_arg' to feed data)
  * @return: -1: [errno=ENOENT] Unsupported/unknown codec `input_codec_name' */
 typedef __ATTR_NONNULL((1, 2, 3)) int
-/*__NOTHROW_NCX*/ (LIBICONV_CC _LPICONV_DECODE_INIT)(/*in|out*/ struct iconv_decode *__restrict self,
-                                                     /*out*/ struct iconv_printer *__restrict input, /* Accepts `input_codec_name' */
-                                                     /*in*/ char const *__restrict input_codec_name);
+/*__NOTHROW_NCX*/ (LIBICONV_CC *_LPICONV_DECODE_INIT)(/*in|out*/ struct iconv_decode *__restrict self,
+                                                      /*out*/ struct iconv_printer *__restrict input, /* Accepts `input_codec_name' */
+                                                      /*in*/ char const *__restrict input_codec_name);
 #ifdef LIBICONV_WANT_PROTOTYPES
 LIBICONV_DECL __ATTR_NONNULL((1, 2, 3)) int
 __NOTHROW_NCX(LIBICONV_CC _iconv_decode_init)(/*in|out*/ struct iconv_decode *__restrict self,
@@ -208,9 +210,9 @@ struct iconv_encode {
  * @return: 0 : Success (you may now use `input->ii_printer' and `input->ii_arg' to feed data)
  * @return: -1: [errno=ENOENT] Unsupported/unknown codec `output_codec_name' */
 typedef __ATTR_NONNULL((1, 2, 3)) int
-/*__NOTHROW_NCX*/ (LIBICONV_CC _LPICONV_ENCODE_INIT)(/*in|out*/ struct iconv_encode *__restrict self,
-                                                     /*out*/ struct iconv_printer *__restrict input, /* Accepts `UTF-8' */
-                                                     /*in*/ char const *__restrict output_codec_name);
+/*__NOTHROW_NCX*/ (LIBICONV_CC *_LPICONV_ENCODE_INIT)(/*in|out*/ struct iconv_encode *__restrict self,
+                                                      /*out*/ struct iconv_printer *__restrict input, /* Accepts `UTF-8' */
+                                                      /*in*/ char const *__restrict output_codec_name);
 #ifdef LIBICONV_WANT_PROTOTYPES
 LIBICONV_DECL __ATTR_NONNULL((1, 2, 3)) int
 __NOTHROW_NCX(LIBICONV_CC _iconv_encode_init)(/*in|out*/ struct iconv_encode *__restrict self,
@@ -258,10 +260,10 @@ struct iconv_transcode {
  * @return: 0 : Success (you may now use `input->ii_printer' and `input->ii_arg' to feed data)
  * @return: -1: [errno=ENOENT] Unsupported/unknown codec `input_codec_name' or `output_codec_name' */
 typedef __ATTR_NONNULL((1, 2, 3, 4)) int
-/*__NOTHROW_NCX*/ (LIBICONV_CC _LPICONV_TRANSCODE_INIT)(/*in|out*/ struct iconv_transcode *__restrict self,
-                                                        /*out*/ struct iconv_printer *__restrict input,   /* Accepts `input_codec_name' */
-                                                        /*in*/ char const *__restrict input_codec_name,   /* For decode */
-                                                        /*in*/ char const *__restrict output_codec_name); /* For encode */
+/*__NOTHROW_NCX*/ (LIBICONV_CC *_LPICONV_TRANSCODE_INIT)(/*in|out*/ struct iconv_transcode *__restrict self,
+                                                         /*out*/ struct iconv_printer *__restrict input,   /* Accepts `input_codec_name' */
+                                                         /*in*/ char const *__restrict input_codec_name,   /* For decode */
+                                                         /*in*/ char const *__restrict output_codec_name); /* For encode */
 #ifdef LIBICONV_WANT_PROTOTYPES
 LIBICONV_DECL __ATTR_NONNULL((1, 2, 3, 4)) int
 __NOTHROW_NCX(LIBICONV_CC _iconv_transcode_init)(/*in|out*/ struct iconv_transcode *__restrict self,

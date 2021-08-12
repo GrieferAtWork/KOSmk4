@@ -79,6 +79,7 @@ BEGIN GROUP("apps.system-test") { COMPILE, LINK, MCOPY };
 		"../libkeymap/*.ctest",
 		"../libjson/*.ctest",
 		"../libinstrlen/*.ctest",
+		"../libiconv/*.ctest",
 
 	})
 END

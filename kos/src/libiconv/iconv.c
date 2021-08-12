@@ -96,8 +96,8 @@ NOTHROW_NCX(CC libiconv_decode_init)(/*in|out*/ struct iconv_decode *__restrict 
 		/* Check for a generic code page */
 		cp = libiconv_get_codepage(input_codec);
 		if (cp) {
-			self->icd_data.idd_cp       = cp;
-			self->icd_output.ii_printer = (pformatprinter)&libiconv_cp_decode;
+			self->icd_data.idd_cp = cp;
+			input->ii_printer     = (pformatprinter)&libiconv_cp_decode;
 			break;
 		}
 		errno = ENOENT;
@@ -136,19 +136,19 @@ NOTHROW_NCX(CC libiconv_encode_init)(/*in|out*/ struct iconv_encode *__restrict 
 		break;
 
 	case CODEC_UTF16LE:
-		self->ice_output.ii_printer = (pformatprinter)&libiconv_utf16le_encode;
+		input->ii_printer = (pformatprinter)&libiconv_utf16le_encode;
 		break;
 
 	case CODEC_UTF16BE:
-		self->ice_output.ii_printer = (pformatprinter)&libiconv_utf16be_encode;
+		input->ii_printer = (pformatprinter)&libiconv_utf16be_encode;
 		break;
 
 	case CODEC_UTF32LE:
-		self->ice_output.ii_printer = (pformatprinter)&libiconv_utf32le_encode;
+		input->ii_printer = (pformatprinter)&libiconv_utf32le_encode;
 		break;
 
 	case CODEC_UTF32BE:
-		self->ice_output.ii_printer = (pformatprinter)&libiconv_utf32be_encode;
+		input->ii_printer = (pformatprinter)&libiconv_utf32be_encode;
 		break;
 
 	default: {
@@ -157,7 +157,7 @@ NOTHROW_NCX(CC libiconv_encode_init)(/*in|out*/ struct iconv_encode *__restrict 
 		cp = libiconv_get_codepage(output_codec);
 		if (cp) {
 			self->ice_data.ied_cp.ic_cp = cp;
-			self->ice_output.ii_printer = (pformatprinter)&libiconv_cp_encode;
+			input->ii_printer = (pformatprinter)&libiconv_cp_encode;
 			break;
 		}
 		errno = ENOENT;
