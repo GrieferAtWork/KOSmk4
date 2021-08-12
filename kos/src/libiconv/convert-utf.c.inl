@@ -49,6 +49,10 @@ NOTHROW_NCX(FORMATPRINTER_CC PP_CAT3(libiconv_utf, UTF_WIDTH, be_encode))(struct
 				if (IS_ICONV_ERR_ERRNO(self->ice_flags))
 					goto err_ilseq;
 				self->ice_data.ied_utf8.__word = __MBSTATE_TYPE_EMPTY;
+				if (IS_ICONV_ERR_DISCARD(self->ice_flags)) {
+					error = 1;
+					goto consume_error;
+				}
 				*dst = data[0];
 				if (IS_ICONV_ERR_REPLACE(self->ice_flags))
 					*dst = '?';
@@ -57,12 +61,13 @@ NOTHROW_NCX(FORMATPRINTER_CC PP_CAT3(libiconv_utf, UTF_WIDTH, be_encode))(struct
 				size = 0;
 				break;
 			}
-			data += error;
-			size -= error;
 #if UTF_BYTEORDER != __BYTE_ORDER__
 			*dst = (PP_CAT3(char, UTF_WIDTH, _t))PP_CAT2(BSWAP, UTF_WIDTH)((PP_CAT3(uint, UTF_WIDTH, _t))*dst);
 #endif /* UTF_BYTEORDER != __BYTE_ORDER__ */
 			++dst;
+consume_error:
+			data += error;
+			size -= error;
 		} while (dst < COMPILER_ENDOF(buf) && size);
 		DO_encode_output((char *)buf, (size_t)((byte_t *)dst - (byte_t *)buf));
 		dst = buf;
@@ -114,8 +119,12 @@ NOTHROW_NCX(FORMATPRINTER_CC libiconv_utf16be_decode)(struct iconv_decode *__res
 		if unlikely(error == (size_t)-1) {
 			if (IS_ICONV_ERR_ERRNO(self->icd_flags))
 				goto err_ilseq;
-			ptr[0] = '?';
-			error  = 1;
+			if (IS_ICONV_ERR_DISCARD(self->icd_flags)) {
+				error = 0;
+			} else {
+				ptr[0] = '?';
+				error  = 1;
+			}
 		}
 		ptr += error;
 		self->icd_data.idd_utf.u_pbc = 0;
@@ -138,8 +147,12 @@ NOTHROW_NCX(FORMATPRINTER_CC libiconv_utf16be_decode)(struct iconv_decode *__res
 		if unlikely(error == (size_t)-1) {
 			if (IS_ICONV_ERR_ERRNO(self->icd_flags))
 				goto err_ilseq;
-			ptr[0] = '?';
-			error  = 1;
+			if (IS_ICONV_ERR_DISCARD(self->icd_flags)) {
+				error = 0;
+			} else {
+				ptr[0] = '?';
+				error  = 1;
+			}
 		}
 		ptr += error;
 		data = (byte_t const *)data + 2;

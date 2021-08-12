@@ -122,6 +122,7 @@ union iconv_encode_data {
 #define ICONV_ERR_IGNORE             2 /* Forward data that cannot be encoded/decoded as-is, but note that
                                         * doing this will most definitely result in data corruption as the
                                         * result will be encoded data mixed with data that's not encoded. */
+#define ICONV_ERR_DISCARD            3 /* Data that cannot be encoded/decoded is silently discarded. */
 #define ICONV_HASERR        0x00000010 /* Used for `ICONV_ERR_ERRNO': keep setting EILSEQ and returning -1. */
 /* NOTE: Other flags may have arbitrary meaning depending on the codec used. */
 

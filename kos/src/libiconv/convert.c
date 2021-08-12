@@ -47,6 +47,7 @@ DECL_BEGIN
 #define IS_ICONV_ERR_ERRNO(flags)   (((flags) & ICONV_ERRMASK) == ICONV_ERR_ERRNO)
 #define IS_ICONV_ERR_REPLACE(flags) (((flags) & ICONV_ERRMASK) == ICONV_ERR_REPLACE)
 #define IS_ICONV_ERR_IGNORE(flags)  (((flags) & ICONV_ERRMASK) == ICONV_ERR_IGNORE)
+#define IS_ICONV_ERR_DISCARD(flags) (((flags) & ICONV_ERRMASK) == ICONV_ERR_DISCARD)
 
 
 #define decode_output_printer self->icd_output.ii_printer
@@ -87,7 +88,10 @@ NOTHROW_NCX(FORMATPRINTER_CC libiconv_ascii_decode_errchk)(struct iconv_decode *
 		DO_decode_output(flush_start, (size_t)(iter - flush_start));
 		if (IS_ICONV_ERR_ERRNO(self->icd_flags))
 			goto err_ilseq;
-		DO_decode_output("?", 1);
+		/* NOTE: No need to handle `IS_ICONV_ERR_IGNORE()'; our function
+		 *       isn't  used when converting  text in error-ignore mode. */
+		if (!IS_ICONV_ERR_DISCARD(self->icd_flags))
+			DO_decode_output("?", 1);
 		flush_start = iter + 1;
 	}
 	DO_decode_output(flush_start, (size_t)(end - flush_start));
@@ -117,14 +121,21 @@ err_ilseq:
 			;                                                           \
 		else if unlikely((ssize_t)_uni_status < 0 &&                    \
 		                 (_uni_status == (size_t)-1                     \
-		                  ? (IS_ICONV_ERR_ERRNO((self)->ice_flags)      \
+		                  ? (IS_ICONV_ERR_ERRNO((self)->ice_flags) ||   \
+		                     IS_ICONV_ERR_DISCARD((self)->ice_flags)    \
 		                     ? 1                                        \
 		                     : ((c32) = '?', _uni_status = 1, 0))       \
 		                  : _uni_status == (size_t)-2)) {               \
 			/* Error or all data parsed. */                             \
-			if unlikely(_uni_status == (size_t)-1)                      \
+			if unlikely(_uni_status == (size_t)-1) {                    \
+				if (IS_ICONV_ERR_DISCARD((self)->ice_flags)) {          \
+					(data) += 1;                                        \
+					(size) -= 1;                                        \
+					continue;                                           \
+				}                                                       \
 				goto err_ilseq; /* Error! */                            \
-			break;              /* Done! */                             \
+			}                                                           \
+			break; /* Done! */                                          \
 		} else if (((data) += _uni_status,                              \
 		            (size) -= _uni_status, 0))                          \
 			;                                                           \
@@ -171,10 +182,12 @@ NOTHROW_NCX(FORMATPRINTER_CC libiconv_cp_encode)(struct iconv_encode *__restrict
 			DO_encode_output(buf, (size_t)(ptr - buf));
 			goto err_ilseq;
 		}
-		if (IS_ICONV_ERR_REPLACE(self->ice_flags))
-			*ptr++ = cp->icp_replacement;
-		else {
-			*ptr++ = (char)(unsigned char)(uint32_t)c32;
+		if (!IS_ICONV_ERR_DISCARD(self->ice_flags)) {
+			if (IS_ICONV_ERR_REPLACE(self->ice_flags))
+				*ptr++ = cp->icp_replacement;
+			else {
+				*ptr++ = (char)(unsigned char)(uint32_t)c32;
+			}
 		}
 next_c32:
 		;
@@ -212,11 +225,14 @@ NOTHROW_NCX(FORMATPRINTER_CC libiconv_cp_decode)(struct iconv_decode *__restrict
 			ptr = buf;
 			if (IS_ICONV_ERR_ERRNO(self->icd_flags))
 				goto err_ilseq;
+			if (IS_ICONV_ERR_DISCARD(self->icd_flags))
+				goto consume_byte;
 			c = '?';
 			if (IS_ICONV_ERR_IGNORE(self->icd_flags))
 				c = (unsigned char)*data;
 		}
 		ptr = unicode_writeutf8(ptr, c);
+consume_byte:
 		++data;
 		--size;
 	}
