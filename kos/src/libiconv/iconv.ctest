@@ -62,6 +62,21 @@ DEFINE_TEST(iconv) {
 		assertf(strcmp(buf, "aou: \x7b\x7c\x7d") == 0, "buf = %q", buf);
 	}
 
+	{
+		char buf[512], *ptr = buf;
+		struct iconv_transcode tc;
+		struct iconv_printer in;
+		int error;
+		tc.it_encode.ice_output.ii_printer = &format_sprintf_printer;
+		tc.it_encode.ice_output.ii_arg     = &ptr;
+		tc.it_encode.ice_flags             = ICONV_ERR_ERRNO | ICONV_ERR_TRANSLIT;
+		error = _iconv_transcode_init(&tc, &in, "de", "ascii");
+		assert(error == 0);
+		format_printf(in.ii_printer, in.ii_arg, "ss: \x7e");
+		*ptr = 0;
+		assertf(strcmp(buf, "ss: ss") == 0, "buf = %q", buf);
+	}
+
 	dlclose(libiconv);
 }
 

@@ -35,6 +35,10 @@ INTDEF NONNULL((1, 2)) ssize_t
 NOTHROW_NCX(FORMATPRINTER_CC libiconv_ascii_decode_errchk)(struct iconv_decode *__restrict self,
                                                            /*ASCII*/ char const *__restrict data,
                                                            size_t size);
+INTDEF NONNULL((1, 2)) ssize_t
+NOTHROW_NCX(FORMATPRINTER_CC libiconv_ascii_encode_trans)(struct iconv_encode *__restrict self,
+                                                          /*ASCII*/ char const *__restrict data,
+                                                          size_t size);
 
 
 /************************************************************************/

@@ -119,14 +119,19 @@ NOTHROW_NCX(CC libiconv_encode_init)(/*in|out*/ struct iconv_encode *__restrict 
 	switch (output_codec) {
 
 	case CODEC_ASCII:
-		if ((self->ice_flags & ICONV_ERRMASK) == ICONV_ERR_IGNORE) {
+		if (self->ice_flags & ICONV_ERR_TRANSLIT) {
+			/* When transliteration is enabled, we have to properly decode unicode
+			 * characters, since we may need to replace them with longer variants.
+			 * As such, use a different parser for this case! */
+			input->ii_printer = (pformatprinter)&libiconv_ascii_encode_trans;
+		} else if ((self->ice_flags & ICONV_ERRMASK) != ICONV_ERR_IGNORE) {
+			/* Encoding ASCII is the same as decoding it. We simply
+			 * have  to  handle  any  character  that  is `>= 0x80' */
+			input->ii_printer = (pformatprinter)&libiconv_ascii_decode_errchk;
+		} else {
 			/* When  errors can be  ignored, the 7-bit ascii
 			 * character set is source-compatible with UTF-8 */
 			*input = self->ice_output;
-		} else {
-			/* Encoding ASCII is the same as decoding it. We simply
-			 * have to handle anything characters that is `>= 0x80' */
-			input->ii_printer = (pformatprinter)&libiconv_ascii_decode_errchk;
 		}
 		break;
 

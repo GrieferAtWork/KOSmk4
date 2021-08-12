@@ -35,7 +35,7 @@ DECL_BEGIN
 enum {
 	CODEC_UNKNOWN, /* Invalid codec */
 /*[[[begin:codecs]]]*/
-	CODEC_ASCII,       /* "ISO-IR-006", "ANSI_X3.4-1968", "ANSI_X3.4-1986", "ISO_646.irv:1991", "ISO646-US", "us", "IBM367", "cp367", "us-ascii" */
+	CODEC_ASCII,       /* "ISO-IR-006", "ANSI_X3.4-1968", "ANSI_X3.4-1986", "ISO_646.irv:1991", "ISO646-US", "us", "IBM367", "cp367", "us-ascii", "ascii" */
 	CODEC_UTF8,        /* "UTF8", "UTF-8" */
 	CODEC_UTF16LE,     /* "UTF16LE", "UTF-16LE" */
 	CODEC_UTF16BE,     /* "UTF16BE", "UTF-16BE" */

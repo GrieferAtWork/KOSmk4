@@ -115,6 +115,7 @@ PRIVATE struct codec_db_entry codec_db[] = {
 	{ "ansi_x3.4-1968",           CODEC_ASCII },
 	{ "ansi_x3.4-1986",           CODEC_ASCII },
 	{ "arabic",                   CODEC_ISO_8859_6 },
+	{ "ascii",                    CODEC_ASCII },
 	{ "asmo-708",                 CODEC_ISO_8859_6 },
 	{ "bulgaria-pc",              CODEC_MIK },
 	{ "cp-ar",                    CODEC_CP868 },
