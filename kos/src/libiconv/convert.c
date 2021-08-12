@@ -167,11 +167,11 @@ NOTHROW_NCX(FORMATPRINTER_CC libiconv_cp_encode)(struct iconv_encode *__restrict
 			}
 		}
 		/* Cannot encode :( */
-		if (IS_ICONV_ERR_ERRNO((self)->ice_flags)) {
+		if (IS_ICONV_ERR_ERRNO(self->ice_flags)) {
 			DO_encode_output(buf, (size_t)(ptr - buf));
 			goto err_ilseq;
 		}
-		if (IS_ICONV_ERR_REPLACE((self)->ice_flags))
+		if (IS_ICONV_ERR_REPLACE(self->ice_flags))
 			*ptr++ = cp->icp_replacement;
 		else {
 			*ptr++ = (char)(unsigned char)(uint32_t)c32;
@@ -195,6 +195,8 @@ NOTHROW_NCX(FORMATPRINTER_CC libiconv_cp_decode)(struct iconv_decode *__restrict
 	char buf[64], *ptr = buf;
 	ssize_t temp, result = 0;
 	struct iconv_codepage const *cp;
+	if unlikely(self->icd_flags & ICONV_HASERR)
+		goto err_ilseq;
 	cp = self->icd_data.idd_cp;
 	while (size) {
 		char16_t c;
@@ -203,7 +205,17 @@ NOTHROW_NCX(FORMATPRINTER_CC libiconv_cp_decode)(struct iconv_decode *__restrict
 			ptr = buf;
 		}
 		/* Decode the character via the codepage. */
-		c   = cp->icp_decode[(unsigned char)*data];
+		c = cp->icp_decode[(unsigned char)*data];
+		if unlikely(c == 0 && *data != 0) {
+			/* Invalid/undefined input byte */
+			DO_decode_output(buf, (size_t)(ptr - buf));
+			ptr = buf;
+			if (IS_ICONV_ERR_ERRNO(self->icd_flags))
+				goto err_ilseq;
+			c = '?';
+			if (IS_ICONV_ERR_IGNORE(self->icd_flags))
+				c = (unsigned char)*data;
+		}
 		ptr = unicode_writeutf8(ptr, c);
 		++data;
 		--size;
@@ -212,6 +224,10 @@ NOTHROW_NCX(FORMATPRINTER_CC libiconv_cp_decode)(struct iconv_decode *__restrict
 	return result;
 err:
 	return temp;
+err_ilseq:
+	self->icd_flags |= ICONV_HASERR;
+	errno = EILSEQ;
+	return -1;
 }
 
 
