@@ -49,7 +49,7 @@ struct iconv_7h_codepage {
 };
 
 struct iconv_cp7h_database;
-typedef uint16_t libiconv_cp7h_offset_t;
+typedef uint32_t libiconv_cp7h_offset_t;
 
 INTDEF struct iconv_cp7h_database const libiconv_cp7h_db;
 INTDEF libiconv_cp7h_offset_t const libiconv_cp7h_offsets[];
