@@ -19,6 +19,7 @@
  */
 #ifndef GUARD_LIBICONV_CODECS_C
 #define GUARD_LIBICONV_CODECS_C 1
+#define _KOS_SOURCE 1
 
 #include "api.h"
 /**/
@@ -27,6 +28,7 @@
 
 #include <kos/types.h>
 
+#include <alloca.h>
 #include <ctype.h>
 #include <string.h>
 
@@ -567,7 +569,7 @@ PRIVATE struct codec_db_entry codec_db[] = {
 
 
 /* Try to normalize the name of the given codec:
- * 
+ *
  * - Prefix: "OEM" <SEP> <NUMBER>    --> "OEM" <NUMBER>
  * - Prefix: "IBM" <SEP> <NUMBER>    --> "IBM" <NUMBER>
  * - Prefix: "CP" <SEP> <NUMBER>     --> "CP" <NUMBER>
@@ -590,6 +592,7 @@ NOTHROW_NCX(FCALL libiconv_normalize_codec_name)(char buf[CODE_NAME_MAXLEN + 1],
                                                  char const *__restrict name) {
 #define issep(ch) ((ch) == '-' || (ch) == '_' || (ch) == ' ')
 	char *ptr, *end;
+	char const *nameend;
 	ptr = buf;
 	end = buf + CODE_NAME_MAXLEN;
 	while (isspace(*name))
@@ -639,12 +642,15 @@ NOTHROW_NCX(FCALL libiconv_normalize_codec_name)(char buf[CODE_NAME_MAXLEN + 1],
 		name += 2;
 	}
 
+	/* Strip trailing spaces. */
+	nameend = strend(name);
+	while (nameend > name && isspace(nameend[-1]))
+		--nameend;
+
 	/* Convert the rest of the name. */
-	for (;;) {
+	while (name < nameend) {
 		char ch;
 		ch = *name++;
-		if (!ch)
-			break;
 		/* Generally, if `name' contains a sequence of numbers that starts
 		 * with at least  one leading `0',  re-attempt the search  without
 		 * those leading zero-digits. */
@@ -659,7 +665,10 @@ NOTHROW_NCX(FCALL libiconv_normalize_codec_name)(char buf[CODE_NAME_MAXLEN + 1],
 		*ptr++ = ch;
 	}
 
+	/* NUL-terminate the normalized name. */
 	*ptr = '\0';
+
+	/* Success! */
 	return true;
 }
 
@@ -688,7 +697,7 @@ again:
 		}
 	}
 
-	/* If not done alraedy, try to normalize the codec name */
+	/* If not done already, try to normalize the codec name */
 	if (name != normal_name) {
 		if (libiconv_normalize_codec_name(normal_name, name)) {
 			name = normal_name;
@@ -714,14 +723,73 @@ NOTHROW_NCX(FCALL libiconv_getcodecname)(unsigned int id, unsigned int nth) {
 }
 
 
+/* Same as `libiconv_codecbyname()', but the name has a fixed length. */
+PRIVATE ATTR_NOINLINE ATTR_PURE WUNUSED NONNULL((1)) unsigned int
+NOTHROW_NCX(FCALL libiconv_codecbynamez)(char const *__restrict name,
+                                         size_t namelen) {
+	char *buf;
+	/* For  simplicity,  just  create  a  stack-copy  of the
+	 * string that is NUL-terminated at the proper position. */
+	buf = (char *)alloca((namelen + 1) * sizeof(char));
+	*(char *)mempcpy(buf, name, namelen, sizeof(char)) = '\0';
+	return libiconv_codecbyname(buf);
+}
+
+
 /* Same as `libiconv_codecbyname()', but also parse possible flag-relation options. */
 INTERN WUNUSED NONNULL((1)) unsigned int
 NOTHROW_NCX(FCALL libiconv_codec_and_flags_byname)(char const *__restrict name,
                                                    /*[in|out]*/ uintptr_t *__restrict pflags) {
-	/* TODO: Check for "//IGNORE" suffix --> ICONV_ERR_DISCARD */
-	/* TODO: Check for "//TRANSLIT" suffix --> ICONV_ERR_TRANSLIT */
-	(void)pflags;
-	return libiconv_codecbyname(name);
+	unsigned int result;
+	/* Check for the simple case where the name doesn't contain any flags. */
+	result = libiconv_codecbyname(name);
+	if (result == CODEC_UNKNOWN) {
+		/* The codec couldn't be found. This  might be because the give  name
+		 * contains flags. If that's the  case, figure out where flags  begin
+		 * and re-try the lookup the the part before their starting position. */
+		char const *flags_start = strstr(name, "//");
+		if (flags_start) {
+			result = libiconv_codecbynamez(name, (size_t)(flags_start - name));
+			if unlikely(result == CODEC_UNKNOWN)
+				goto done; /* Still an unknown codec. :( */
+			do {
+				char const *next_flag;
+				size_t flaglen;
+				flags_start += 2;
+				next_flag = strstr(flags_start, "//");
+				if (!next_flag)
+					next_flag = strend(flags_start);
+				/* Strip leading and trailing spaces from the flag name. */
+				while (isspace(*flags_start))
+					++flags_start;
+				flaglen = (size_t)(next_flag - flags_start);
+				while (flaglen && isspace(flags_start[flaglen - 1]))
+					--flaglen;
+
+				/* Check which flag has been given. */
+#ifdef __OPTIMIZE_SIZE__
+#define ISFLAG(str) (memcasecmp(flags_start, str, COMPILER_STRLEN(str) * sizeof(char)) == 0)
+#else /* __OPTIMIZE_SIZE__ */
+#define ISFLAG(str) (flaglen == COMPILER_STRLEN(str) && memcasecmp(flags_start, str, COMPILER_STRLEN(str) * sizeof(char)) == 0)
+#endif /* !__OPTIMIZE_SIZE__ */
+				if (ISFLAG("ignore")) {
+					/* "//IGNORE" Means to discard invalid characters. */
+					*pflags &= ~ICONV_ERRMASK;
+					*pflags |= ICONV_ERR_DISCARD;
+				} else if (ISFLAG("translit")) {
+					/* "//TRANSLIT" Means to try and transliterate characters that can't be encoded. */
+					*pflags |= ICONV_ERR_TRANSLIT;
+				} else {
+					/* Unknown flag. (error out) */
+					return CODEC_UNKNOWN;
+				}
+#undef ISFLAG
+				flags_start = next_flag;
+			} while (*flags_start);
+		}
+	}
+done:
+	return result;
 }
 
 
