@@ -34,16 +34,28 @@ struct iconv_codepage_encode_entry {
 };
 
 struct iconv_codepage {
-	char16_t                                                    icp_decode[256]; /* Lookup table specifying how to decode a character. */
-	COMPILER_FLEXIBLE_ARRAY(struct iconv_codepage_encode_entry, icp_encode); /* Sorted (by `icee_uni') table for how to encode UNI into the cp. */
+	/* Lookup table specifying how to decode a character. */
+	char16_t icp_decode[256];
+
+	/* Sorted by `icee_uni': table for how to encode UNI into the cp. */
+	COMPILER_FLEXIBLE_ARRAY(struct iconv_codepage_encode_entry, icp_encode);
+
 #define icp_replacement icp_encode[0]._icee_pad /* Replacement character (for `ICONV_ERR_REPLACE') */
 #define icp_encode_max  icp_encode[1]._icee_pad /* # of encode entries minus 1. */
 };
 
+struct iconv_cp_database;
+typedef uint32_t libiconv_cp_offset_t; /* 16-bit would actually be too small °o° */
 
-/* If so, return the codepage associated with `codec' */
-INTDEF ATTR_CONST WUNUSED struct iconv_codepage const *
-NOTHROW(CC libiconv_get_codepage)(unsigned int codec);
+INTDEF struct iconv_cp_database const libiconv_cp_db;
+INTDEF libiconv_cp_offset_t const libiconv_cp_offsets[];
+
+
+/* Return the 8-bit code page associated with `codec'.
+ * The caller must ensure that `codec >= CODEC_CP_MIN && codec <= CODEC_CP_MAX' */
+#define libiconv_cp_page(codec)                                       \
+	(struct iconv_codepage const *)((byte_t const *)&libiconv_cp_db + \
+	                                libiconv_cp_offsets[(codec)-CODEC_CP_MIN])
 
 
 

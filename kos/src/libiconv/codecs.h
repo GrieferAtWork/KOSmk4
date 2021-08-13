@@ -49,6 +49,18 @@ enum {
 	CODEC_UTF16BE,     /* "UTF16BE", "UTF-16BE", "UCS-2BE", "UNICODEBIG" */
 	CODEC_UTF32LE,     /* "UTF32LE", "UTF-32LE", "UCS-4LE" */
 	CODEC_UTF32BE,     /* "UTF32BE", "UTF-32BE", "UCS-4BE" */
+
+	/* 8-bit codepage codecs (IMPORTANT: keep these sorted lexicographically!) */
+#define CODEC_CP_MIN CODEC_CP1041
+	CODEC_CP1041,      /* "cp1041" */
+	CODEC_CP1057,      /* "cp1057", "HP-PC-8" */
+	CODEC_CP1098,      /* "cp1098", "IBM1098" */
+	CODEC_CP1116,      /* "cp1116", "IBM1116" */
+	CODEC_CP1117,      /* "cp1117", "IBM1117" */
+	CODEC_CP1125,      /* "cp1125", "RST-2018-91", "CP866U", "CP866NAV", "RUSCII" */
+	CODEC_CP1131,      /* "cp1131" */
+	CODEC_CP17248,     /* "cp17248" */
+	CODEC_CP3012,      /* "cp3012", "RusLat" */
 	CODEC_CP437,       /* "IBM437", "cp437", "437", "csPC8CodePage437", "OEMUS", "OSF100201B5" */
 	CODEC_CP667,       /* "MAZOVIA", "cp667", "cp790", "cp991", "MAZ" */
 	CODEC_CP668,       /* "cp668" */
@@ -91,21 +103,14 @@ enum {
 	CODEC_CP915,       /* "cp915", "IBM915" */
 	CODEC_CP921,       /* "cp921", "IBM921" */
 	CODEC_CP922,       /* "cp922", "IBM922", "Estonia-ISO-8" */
-	CODEC_CP1041,      /* "cp1041" */
-	CODEC_CP1057,      /* "cp1057", "HP-PC-8" */
-	CODEC_CP1098,      /* "cp1098", "IBM1098" */
-	CODEC_CP1116,      /* "cp1116", "IBM1116" */
-	CODEC_CP1117,      /* "cp1117", "IBM1117" */
-	CODEC_CP1125,      /* "cp1125", "RST-2018-91", "CP866U", "CP866NAV", "RUSCII" */
-	CODEC_CP1131,      /* "cp1131" */
-	CODEC_CP17248,     /* "cp17248" */
-	CODEC_KOI_8_N1,    /* "KOI-8-N1" */
-	CODEC_KOI_8_N2,    /* "KOI-8-N2" */
-	CODEC_CP3012,      /* "cp3012", "RusLat" */
-	CODEC_KEYBCS2,     /* "NEC-867", "DOS-895", "KEYBCS2", "KAMENICKY" */
-	CODEC_MIK,         /* "MIK", "BULGARIA-PC" */
 	CODEC_DIN_66303,   /* "DIN_66303", "DRV8" */
 	CODEC_ISO_8859_1,  /* "ISO-8859-1", "iso-ir-100", "csISOLatin1", "latin1", "l1", "IBM819", "CP819" */
+	CODEC_ISO_8859_10, /* "ISO-8859-10", "iso-ir-157", "csISOLatin6", "latin6", "l6" */
+	CODEC_ISO_8859_11, /* "ISO-8859-11" */
+	CODEC_ISO_8859_13, /* "ISO-8859-13", "iso-ir-179", "csISOLatin7", "latin7", "l7" */
+	CODEC_ISO_8859_14, /* "ISO-8859-14", "iso-ir-199", "iso-celtic", "latin8", "l8" */
+	CODEC_ISO_8859_15, /* "ISO-8859-15", "latin9", "latin0" */
+	CODEC_ISO_8859_16, /* "ISO-8859-16", "iso-ir-226", "latin10", "l10" */
 	CODEC_ISO_8859_2,  /* "ISO-8859-2", "iso-ir-101", "csISOLatin2", "latin2", "l2", "IBM1111" */
 	CODEC_ISO_8859_3,  /* "ISO-8859-3", "iso-ir-109", "csISOLatin3", "latin3", "l3" */
 	CODEC_ISO_8859_4,  /* "ISO-8859-4", "iso-ir-110", "csISOLatin4", "latin4", "l4" */
@@ -114,17 +119,16 @@ enum {
 	CODEC_ISO_8859_7,  /* "ISO-8859-7", "iso-ir-126", "csISOLatinGreek", "ELOT_928", "ECMA-118", "greek", "greek8" */
 	CODEC_ISO_8859_8,  /* "ISO-8859-8", "iso-ir-138", "csISOLatinHebrew", "hebrew" */
 	CODEC_ISO_8859_9,  /* "ISO-8859-9", "iso-ir-148", "csISOLatin5", "latin5", "l5" */
-	CODEC_ISO_8859_10, /* "ISO-8859-10", "iso-ir-157", "csISOLatin6", "latin6", "l6" */
-	CODEC_ISO_8859_11, /* "ISO-8859-11" */
-	CODEC_ISO_8859_13, /* "ISO-8859-13", "iso-ir-179", "csISOLatin7", "latin7", "l7" */
-	CODEC_ISO_8859_14, /* "ISO-8859-14", "iso-ir-199", "iso-celtic", "latin8", "l8" */
-	CODEC_ISO_8859_15, /* "ISO-8859-15", "latin9", "latin0" */
-	CODEC_ISO_8859_16, /* "ISO-8859-16", "iso-ir-226", "latin10", "l10" */
 	CODEC_ISO_IR_182,  /* "iso-ir-182" */
 	CODEC_ISO_IR_197,  /* "iso-ir-197" */
 	CODEC_ISO_IR_200,  /* "iso-ir-200" */
+	CODEC_KEYBCS2,     /* "NEC-867", "DOS-895", "KEYBCS2", "KAMENICKY" */
+	CODEC_KOI_8_N1,    /* "KOI-8-N1" */
+	CODEC_KOI_8_N2,    /* "KOI-8-N2" */
+	CODEC_MIK,         /* "MIK", "BULGARIA-PC" */
+#define CODEC_CP_MAX CODEC_MIK
 
-	/* iso646 (keep these sorted alphabetically!) */
+	/* iso646 code pages (IMPORTANT: keep these sorted lexicographically!) */
 #define CODEC_ISO646_MIN CODEC_ISO646_CA
 	CODEC_ISO646_CA,             /* "ISO646-CA", "iso-ir-121", "CSA_Z243.4-1985-1", "CSA7-1", "CA", "csISO121Canadian1", "CSA_Z243.419851", "cp1020" */
 	CODEC_ISO646_CA2,            /* "ISO646-CA2", "iso-ir-122", "CSA_Z243.4-1985-2", "CSA7-2", "csISO122Canadian2", "CSA_Z243.419852" */
@@ -171,8 +175,6 @@ enum {
 	CODEC_ISO646_VIEWDATA,       /* "ISO-IR-47" */
 	CODEC_ISO646_YU,             /* "ISO646-YU", "JUS_I.B1.002", "JS", "YU", "csISO141Jusib1002" */
 #define CODEC_ISO646_MAX CODEC_ISO646_YU
-#define CODEC_ISISO646(x) ((x) >= CODEC_ISO646_MIN && (x) <= CODEC_ISO646_MAX)
-
 
 	/* Aliases */
 #if __BYTE_ORDER__ == __ORDER_LITTLE_ENDIAN__
@@ -191,13 +193,13 @@ enum {
 /*[[[end:codecs]]]*/
 };
 
-/* Return the ID of the codec associated with `name'
+/* Return the ID of the codec associated with  `name'
  * Casing is ignored and codec aliases are respected. */
 INTDEF ATTR_PURE WUNUSED NONNULL((1)) unsigned int
 NOTHROW_NCX(FCALL libiconv_codecbyname)(char const *__restrict name);
 
-/* Return the nth (0-based) alphabetically sorted name for the codec `id'
- * When `id' is invalid or doesn't have an `nth' name, return `NULL' */
+/* Return the nth (0-based) lexicographically sorted name for the codec `id'
+ * When `id'  is  invalid or  doesn't  have  an `nth'  name,  return  `NULL' */
 INTDEF ATTR_CONST WUNUSED char const *
 NOTHROW_NCX(FCALL libiconv_getcodecname)(unsigned int id, unsigned int nth);
 

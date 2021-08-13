@@ -44,14 +44,14 @@ DECL_BEGIN
 
 /* Opaque object used by the functions below. */
 struct stdiconv {
-	struct iconv_decode    si_decode;        /* Decoder */
-	struct iconv_encode    si_encode;        /* Encoder */
-	struct iconv_printer   si_decode_input;  /* [const] Input printer for decoding. */
-	struct iconv_printer   si_encode_input;  /* [const] Input printer for encoding. */
-	mbstate_t              si_converted_mbs; /* Internal mb-state used for `si_converted' */
-	size_t                 si_converted;     /* # of characters converted. */
-	char                  *si_outbuf;        /* [0..si_outsiz] Pointer to the output buffer. */
-	size_t                 si_outsiz;        /* # of bytes left in the output buffer. */
+	struct iconv_decode  si_decode;        /* Decoder */
+	struct iconv_encode  si_encode;        /* Encoder */
+	struct iconv_printer si_decode_input;  /* [const] Input printer for decoding. */
+	struct iconv_printer si_encode_input;  /* [const] Input printer for encoding. */
+	mbstate_t            si_converted_mbs; /* Internal mb-state used for `si_converted' */
+	size_t               si_converted;     /* # of characters converted. */
+	char                *si_outbuf;        /* [0..si_outsiz] Pointer to the output buffer. */
+	size_t               si_outsiz;        /* # of bytes left in the output buffer. */
 };
 
 PRIVATE ssize_t FORMATPRINTER_CC

@@ -91,24 +91,21 @@ NOTHROW_NCX(CC libiconv_decode_init)(/*in|out*/ struct iconv_decode *__restrict 
 		self->icd_data.idd_utf.u_pbc = 0;
 		break;
 
+	case CODEC_CP_MIN ... CODEC_CP_MAX:
+		/* 8-bit codepage */
+		self->icd_data.idd_cp = libiconv_cp_page(input_codec);
+		input->ii_printer     = (pformatprinter)&libiconv_cp_decode;
+		break;
+
 	case CODEC_ISO646_MIN ... CODEC_ISO646_MAX:
 		/* iso646 codepage. */
 		self->icd_data.idd_cp646 = libiconv_iso646_page(input_codec);
 		input->ii_printer        = (pformatprinter)&libiconv_cp646_decode;
 		break;
 
-	default: {
-		struct iconv_codepage const *cp;
-		/* Check for a generic code page */
-		cp = libiconv_get_codepage(input_codec);
-		if (cp) {
-			self->icd_data.idd_cp = cp;
-			input->ii_printer     = (pformatprinter)&libiconv_cp_decode;
-			break;
-		}
+	default:
 		errno = EINVAL;
 		return -1;
-	}	break;
 	}
 	return 0;
 }
@@ -162,24 +159,21 @@ NOTHROW_NCX(CC libiconv_encode_init)(/*in|out*/ struct iconv_encode *__restrict 
 		input->ii_printer = (pformatprinter)&libiconv_utf32be_encode;
 		break;
 
+	case CODEC_CP_MIN ... CODEC_CP_MAX:
+		/* 8-bit codepage */
+		self->ice_data.ied_cp.ic_cp = libiconv_cp_page(output_codec);
+		input->ii_printer           = (pformatprinter)&libiconv_cp_encode;
+		break;
+
 	case CODEC_ISO646_MIN ... CODEC_ISO646_MAX:
 		/* iso646 codepage. */
 		self->ice_data.ied_cp.ic_cp646 = libiconv_iso646_page(output_codec);
 		input->ii_printer = (pformatprinter)&libiconv_cp646_encode;
 		break;
 
-	default: {
-		struct iconv_codepage const *cp;
-		/* Check for a generic code page */
-		cp = libiconv_get_codepage(output_codec);
-		if (cp) {
-			self->ice_data.ied_cp.ic_cp = cp;
-			input->ii_printer = (pformatprinter)&libiconv_cp_encode;
-			break;
-		}
+	default:
 		errno = EINVAL;
 		return -1;
-	}	break;
 	}
 	return 0;
 }

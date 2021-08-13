@@ -103,7 +103,7 @@ print("	char         cdbe_name[CEIL_ALIGN(", longestNameLen, ", __SIZEOF_INT__)]
 print("	unsigned int cdbe_codec; /" "* The associated codec. *" "/");
 print("};");
 print();
-print("PRIVATE struct codec_db_entry codec_db[] = {");
+print("PRIVATE struct codec_db_entry codec_db[", #name2codec, "] = {");
 local longestNameReprLen = name2codec.keys.each.encode("c-escape").length > ...;
 for (local name: name2codec.keys.sorted()) {
 	local nameRepr = name.encode("c-escape");
@@ -117,7 +117,7 @@ struct codec_db_entry {
 	unsigned int cdbe_codec; /* The associated codec. */
 };
 
-PRIVATE struct codec_db_entry codec_db[] = {
+PRIVATE struct codec_db_entry codec_db[446] = {
 	{ "10646-1:1993",             CODEC_UTF32 },
 	{ "10646-1:1993/ucs4",        CODEC_UTF32 },
 	{ "437",                      CODEC_CP437 },
