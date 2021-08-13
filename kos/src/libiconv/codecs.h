@@ -52,10 +52,21 @@ enum {
 	CODEC_ISO_8859_1,  /* "ISO-8859-1", "iso-ir-100", "csISOLatin1", "latin1", "l1", "IBM819", "CP819" */
 
 	/* 8-bit codepage codecs (IMPORTANT: keep these sorted lexicographically!) */
-#define CODEC_CP_MIN CODEC_CP1041
+#define CODEC_CP_MIN CODEC_CP1038
+	CODEC_CP1038,      /* "cp1038", "IBM1038", "x-mac-symbol" */
+	CODEC_CP1040,      /* "cp1040" */
 	CODEC_CP1041,      /* "cp1041" */
+	CODEC_CP1042,      /* "cp1042" */
+	CODEC_CP1043,      /* "cp1043" */
+	CODEC_CP1046,      /* "cp1046" */
+	CODEC_CP1050,      /* "cp1050", "HP-Roman-8", "cp1051" */
 	CODEC_CP1057,      /* "cp1057", "HP-PC-8" */
+	CODEC_CP1088,      /* "cp1088" */
 	CODEC_CP1098,      /* "cp1098", "IBM1098" */
+	CODEC_CP1114,      /* "cp1114" */
+	CODEC_CP1115,      /* "cp1115" */
+	CODEC_CP1127,      /* "cp1127" */
+	CODEC_CP1276,      /* "cp1276", "PostScript-Standard-Encoding", "StandardEncoding", "PostScript" */
 	CODEC_CP17248,     /* "cp17248" */
 	CODEC_CP864,       /* "cp864", "IBM864" */
 	CODEC_CP897,       /* "cp897" */
@@ -67,11 +78,20 @@ enum {
 #define CODEC_CP_MAX CODEC_DIN_66303
 
 	/* 7h codepage codecs (IMPORTANT: keep these sorted lexicographically!) */
-#define CODEC_CP7H_MIN CODEC_CP1116
+#define CODEC_CP7H_MIN CODEC_CP10081
+	CODEC_CP10081,     /* "cp10081", "cp1281", "IBM1281", "Mac-OS-Turkish", "x-mac-turkish" */
+	CODEC_CP10082,     /* "cp10082", "cp1284", "IBM1284", "Mac-OS-Croatian", "x-mac-croatian" */
+	CODEC_CP1100,      /* "cp1100", "DEC-MCS", "IBM1100", "WE8DEC", "csDECMCS", "dec" */
 	CODEC_CP1116,      /* "cp1116", "IBM1116" */
 	CODEC_CP1117,      /* "cp1117", "IBM1117" */
+	CODEC_CP1124,      /* "cp1124" */
 	CODEC_CP1125,      /* "cp1125", "RST-2018-91", "CP866U", "CP866NAV", "RUSCII" */
 	CODEC_CP1131,      /* "cp1131" */
+	CODEC_CP1275,      /* "cp1275", "macintosh", "mac", "MacRoman", "x-mac-roman" */
+	CODEC_CP1287,      /* "cp1287", "DEC-Greek-(8-bit)", "DEC-Greek-8-bit", "DEC-Greek-8", "DEC-Greek", "EL8DEC" */
+	CODEC_CP1288,      /* "cp1288", "DEC-Turkish-(8-bit)", "DEC-Turkish-8-bit", "DEC-Turkish-8", "DEC-Turkish", "TR8DEC" */
+	CODEC_CP20261,     /* "cp20261" */
+	CODEC_CP20269,     /* "cp20269", "ISO_6937-2-25", "ISO_6937-2-add" */
 	CODEC_CP3012,      /* "cp3012", "RusLat" */
 	CODEC_CP437,       /* "IBM437", "cp437", "437", "csPC8CodePage437", "OEMUS", "OSF100201B5" */
 	CODEC_CP667,       /* "MAZOVIA", "cp667", "cp790", "cp991", "MAZ" */
@@ -123,23 +143,35 @@ enum {
 	CODEC_ISO_8859_7,  /* "ISO-8859-7", "iso-ir-126", "csISOLatinGreek", "ELOT_928", "ECMA-118", "greek", "greek8" */
 	CODEC_ISO_8859_8,  /* "ISO-8859-8", "iso-ir-138", "csISOLatinHebrew", "hebrew" */
 	CODEC_ISO_8859_9,  /* "ISO-8859-9", "iso-ir-148", "csISOLatin5", "latin5", "l5" */
+	CODEC_ISO_IR_153,  /* "iso-ir-153", "st-sev-358-88" */
 	CODEC_ISO_IR_182,  /* "iso-ir-182" */
 	CODEC_ISO_IR_197,  /* "iso-ir-197" */
 	CODEC_ISO_IR_200,  /* "iso-ir-200" */
+	CODEC_ISO_IR_201,  /* "iso-ir-201" */
 	CODEC_KEYBCS2,     /* "NEC-867", "DOS-895", "KEYBCS2", "KAMENICKY" */
-	CODEC_KOI_8_N1,    /* "KOI-8-N1" */
-	CODEC_KOI_8_N2,    /* "KOI-8-N2" */
+	CODEC_KOI8_B,      /* "KOI8-B" */
+	CODEC_KOI8_E,      /* "KOI8-E", "iso-ir-111" */
+	CODEC_KOI8_F,      /* "KOI8-F", "KOI8-Unified" */
+	CODEC_KOI8_N1,     /* "KOI8-N1" */
+	CODEC_KOI8_N2,     /* "KOI8-N2" */
+	CODEC_KOI8_R,      /* "KOI8-R", "cp20866", "cp878", "IBM878" */
+	CODEC_KOI8_RU,     /* "KOI8-RU", "cp1167" */
+	CODEC_KOI8_T,      /* "KOI8-T" */
+	CODEC_KOI8_U,      /* "KOI8-U", "cp21866", "cp1168", "IBM1168" */
 	CODEC_MIK,         /* "MIK", "BULGARIA-PC" */
 #define CODEC_CP7H_MAX CODEC_MIK
 
 #define CODEC_CP7L_MIN CODEC_BCDIC
 	CODEC_BCDIC,            /* "BCDIC" */
 	CODEC_BURROUGHS_B5500,  /* "Burroughs-B5500" */
+	CODEC_CP1090,           /* "cp1090", "IBM1090", "DEC-Special-Graphics" */
 	CODEC_CP353,            /* "cp353" */
 	CODEC_CP355,            /* "cp355", "PTTC/BCD" */
 	CODEC_CP357,            /* "cp357", "PTTC/BCD-H" */
 	CODEC_CP358,            /* "cp358", "PTTC/BCD-C" */
 	CODEC_CP359,            /* "cp359", "PTTC/BCD-M", "cp360", "PTTC/BCD-D" */
+	CODEC_CP903,            /* "cp903", "IBM903" */
+	CODEC_CP904,            /* "cp904", "IBM904", "904" */
 	CODEC_GBCD,             /* "GBCD" */
 	CODEC_IBM1401,          /* "IBM1401" */
 	CODEC_IBM704,           /* "IBM704" */
@@ -157,11 +189,11 @@ enum {
 	CODEC_ISO646_DK,             /* "ISO646-DK", "DS2089", "DS_2089", "DK", "csISO646Danish", "cp1017" */
 	CODEC_ISO646_DK_NO_ALT_NRCS, /* "cp1107", "IBM1107" */
 	CODEC_ISO646_DK_NO_NRCS,     /* "cp1105", "IBM1105" */
-	CODEC_ISO646_ES,             /* "ISO646-ES", "iso-ir-17", "ES", "csISO17Spanish", "cp1023" */
+	CODEC_ISO646_ES,             /* "ISO646-ES", "iso-ir-17", "ES", "csISO17Spanish", "cp1023", "E7DEC" */
 	CODEC_ISO646_ES2,            /* "ISO646-ES2", "iso-ir-85", "ES2", "csISO85Spanish2", "cp1014" */
 	CODEC_ISO646_FI_NRCS,        /* "cp1103", "IBM1103" */
 	CODEC_ISO646_FR,             /* "ISO646-FR", "iso-ir-69", "NF_Z_62-010", "NF_Z_62-010_1983", "NF_Z_62-010_(1983)", "FR", "csISO69French", "NF_Z_62010" */
-	CODEC_ISO646_FR1,            /* "ISO646-FR1", "iso-ir-25", "NF_Z_62-010_1973", "NF_Z_62-010_(1973)", "csISO25French", "NF_Z_62010_1973" */
+	CODEC_ISO646_FR1,            /* "ISO646-FR1", "iso-ir-25", "NF_Z_62-010_1973", "NF_Z_62-010_(1973)", "csISO25French", "NF_Z_62010_1973", "cp1104", "F7DEC" */
 	CODEC_ISO646_GB,             /* "ISO646-GB", "iso-ir-4", "BS_4730", "GB", "UK", "csISO4Unitedkingdom" */
 	CODEC_ISO646_GB_NRCS,        /* "cp1101", "IBM1101" */
 	CODEC_ISO646_HU,             /* "ISO646-HU", "iso-ir-86", "MSZ_7795.3", "HU", "csISO86Hungarian" */
@@ -169,7 +201,7 @@ enum {
 	CODEC_ISO646_INIS_SUBSET,    /* "ISO-IR-49" */
 	CODEC_ISO646_INV,            /* "ISO-IR-170" */
 	CODEC_ISO646_IRV_1973,       /* "ISO-IR-2" */
-	CODEC_ISO646_IRV_1983,       /* "cp1009", "IBM1009" */
+	CODEC_ISO646_IRV_1983,       /* "cp1009", "IBM1009", "cp20105" */
 	CODEC_ISO646_IS,             /* "ISO646-IS" */
 	CODEC_ISO646_IT,             /* "ISO646-IT", "iso-ir-15", "IT", "csISO15Italian" */
 	CODEC_ISO646_JP,             /* "ISO646-JP", "iso-ir-14", "JIS_C6220-1969-RO", "JP", "csISO14JISC6220RO", "JIS_C62201969RO" */
@@ -188,7 +220,7 @@ enum {
 	CODEC_ISO646_SE2,            /* "ISO646-SE2", "iso-ir-11", "SEN_850200_C", "SE2", "csISO11Swedishfornames" */
 	CODEC_ISO646_SEFI_NATS,      /* "ISO-IR-8" */
 	CODEC_ISO646_SE_NRCS,        /* "cp1106", "IBM1106" */
-	CODEC_ISO646_SWI_NRCS,       /* "cp1021", "IBM1021" */
+	CODEC_ISO646_SWI_NRCS,       /* "cp1021", "IBM1021", "CH7DEC" */
 	CODEC_ISO646_T_61,           /* "ISO-IR-102" */
 	CODEC_ISO646_VIEWDATA,       /* "ISO-IR-47" */
 	CODEC_ISO646_YU,             /* "ISO646-YU", "JUS_I.B1.002", "JS", "YU", "csISO141Jusib1002" */
@@ -196,8 +228,8 @@ enum {
 
 	/* Aliases */
 #if __BYTE_ORDER__ == __ORDER_LITTLE_ENDIAN__
-	CODEC_UTF16 = CODEC_UTF16LE, /* "UTF16", "UTF-16", "ISO-10646/UCS2", "UCS2", "UCS-2", "OSF00010100", "OSF00010101", "OSF00010102" */
-	CODEC_UTF32 = CODEC_UTF32LE, /* "UTF32", "UTF-32", "ISO-10646/UCS4", "UCS4", "UCS-4", "CSUCS4", "ISO-10646", "10646-1:1993", "10646-1:1993/UCS4", "OSF00010104", "OSF00010105", "OSF00010106" */
+	CODEC_UTF16 = CODEC_UTF16LE, /* "UTF16", "UTF-16", "ISO-10646/UCS2", "UCS2", "UCS-2", "OSF00010100", "OSF00010101", "OSF00010102", "cp13488", "cp1200", "cp1201" */
+	CODEC_UTF32 = CODEC_UTF32LE, /* "UTF32", "UTF-32", "ISO-10646/UCS4", "UCS4", "UCS-4", "CSUCS4", "ISO-10646", "10646-1:1993", "10646-1:1993/UCS4", "OSF00010104", "OSF00010105", "OSF00010106", "cp12000" */
 #else /* __BYTE_ORDER__ == __ORDER_LITTLE_ENDIAN__ */
 /**/CODEC_UTF16 = CODEC_UTF16BE,
 /**/CODEC_UTF32 = CODEC_UTF32BE,
