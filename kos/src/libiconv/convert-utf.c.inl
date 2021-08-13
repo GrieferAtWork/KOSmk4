@@ -27,14 +27,14 @@ DECL_BEGIN
 
 #if UTF_BYTEORDER == 1234
 INTERN NONNULL((1, 2)) ssize_t
-NOTHROW_NCX(FORMATPRINTER_CC PP_CAT3(libiconv_utf, UTF_WIDTH, le_encode))(struct iconv_encode *__restrict self,
-                                                                          /*utf-8*/ char const *__restrict data,
-                                                                          size_t size)
+(FORMATPRINTER_CC PP_CAT3(libiconv_utf, UTF_WIDTH, le_encode))(struct iconv_encode *__restrict self,
+                                                               /*utf-8*/ char const *__restrict data,
+                                                               size_t size)
 #else /* UTF_BYTEORDER == 1234 */
 INTERN NONNULL((1, 2)) ssize_t
-NOTHROW_NCX(FORMATPRINTER_CC PP_CAT3(libiconv_utf, UTF_WIDTH, be_encode))(struct iconv_encode *__restrict self,
-                                                                          /*utf-8*/ char const *__restrict data,
-                                                                          size_t size)
+(FORMATPRINTER_CC PP_CAT3(libiconv_utf, UTF_WIDTH, be_encode))(struct iconv_encode *__restrict self,
+                                                               /*utf-8*/ char const *__restrict data,
+                                                               size_t size)
 #endif /* UTF_BYTEORDER != 1234 */
 {
 	PP_CAT3(char, UTF_WIDTH, _t) buf[64], *dst = buf;
@@ -85,14 +85,14 @@ err_ilseq:
 #if UTF_WIDTH == 16
 #if UTF_BYTEORDER == 1234
 INTERN NONNULL((1, 2)) ssize_t
-NOTHROW_NCX(FORMATPRINTER_CC libiconv_utf16le_decode)(struct iconv_decode *__restrict self,
-                                                      /*utf-16*/ void const *__restrict data,
-                                                      size_t size)
+(FORMATPRINTER_CC libiconv_utf16le_decode)(struct iconv_decode *__restrict self,
+                                           /*utf-16*/ void const *__restrict data,
+                                           size_t size)
 #else /* UTF_BYTEORDER == 1234 */
 INTERN NONNULL((1, 2)) ssize_t
-NOTHROW_NCX(FORMATPRINTER_CC libiconv_utf16be_decode)(struct iconv_decode *__restrict self,
-                                                      /*utf-16*/ void const *__restrict data,
-                                                      size_t size)
+(FORMATPRINTER_CC libiconv_utf16be_decode)(struct iconv_decode *__restrict self,
+                                           /*utf-16*/ void const *__restrict data,
+                                           size_t size)
 #endif /* UTF_BYTEORDER != 1234 */
 {
 	ssize_t temp, result = 0;
@@ -179,14 +179,14 @@ err_ilseq:
 #if UTF_WIDTH == 32
 #if UTF_BYTEORDER == 1234
 INTERN NONNULL((1, 2)) ssize_t
-NOTHROW_NCX(FORMATPRINTER_CC libiconv_utf32le_decode)(struct iconv_decode *__restrict self,
-                                                      /*utf-32*/ void const *__restrict data,
-                                                      size_t size)
+(FORMATPRINTER_CC libiconv_utf32le_decode)(struct iconv_decode *__restrict self,
+                                           /*utf-32*/ void const *__restrict data,
+                                           size_t size)
 #else /* UTF_BYTEORDER == 1234 */
 INTERN NONNULL((1, 2)) ssize_t
-NOTHROW_NCX(FORMATPRINTER_CC libiconv_utf32be_decode)(struct iconv_decode *__restrict self,
-                                                      /*utf-32*/ void const *__restrict data,
-                                                      size_t size)
+(FORMATPRINTER_CC libiconv_utf32be_decode)(struct iconv_decode *__restrict self,
+                                           /*utf-32*/ void const *__restrict data,
+                                           size_t size)
 #endif /* UTF_BYTEORDER != 1234 */
 {
 	ssize_t temp, result = 0;

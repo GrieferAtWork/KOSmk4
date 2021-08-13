@@ -115,167 +115,13 @@ NOTHROW_NCX(__LIBCCALL iconv_transliterate)(char32_t ch, char32_t buf[UNICODE_FO
 
 
 
-
-
-
-/************************************************************************/
-/* ASCII                                                                */
-/************************************************************************/
-INTERN NONNULL((1, 2)) ssize_t
-NOTHROW_NCX(FORMATPRINTER_CC libiconv_ascii_decode_errchk)(struct iconv_decode *__restrict self,
-                                                           /*ASCII*/ char const *__restrict data,
-                                                           size_t size) {
-	ssize_t temp, result = 0;
-	char const *iter, *flush_start, *end;
-	if unlikely(self->icd_flags & ICONV_HASERR)
-		goto err_ilseq;
-	iter        = data;
-	flush_start = data;
-	end         = data + size;
-	while (iter < end) {
-		if likely((unsigned char)*iter <= 0x7f) {
-			++iter;
-			continue;
-		}
-		DO_decode_output(flush_start, (size_t)(iter - flush_start));
-		if (IS_ICONV_ERR_ERRNO(self->icd_flags))
-			goto err_ilseq;
-		/* NOTE: No need to handle `IS_ICONV_ERR_IGNORE()'; our function
-		 *       isn't  used when converting  text in error-ignore mode. */
-		if (!IS_ICONV_ERR_DISCARD(self->icd_flags))
-			DO_decode_output("?", 1);
-		flush_start = iter + 1;
-	}
-	DO_decode_output(flush_start, (size_t)(end - flush_start));
-	return result;
-err:
-	return temp;
-err_ilseq:
-	self->icd_flags |= ICONV_HASERR;
-	errno = EILSEQ;
-	return -1;
-}
-
-PRIVATE ATTR_NOINLINE NONNULL((1, 2)) ssize_t
-NOTHROW_NCX(FORMATPRINTER_CC libiconv_ascii_encode_trans_u32)(struct iconv_encode *__restrict self,
-                                                               char32_t const *__restrict data,
-                                                               size_t len) {
-	size_t j;
-	char buf[64], *ptr = buf;
-	ssize_t temp, result = 0;
-	for (j = 0; j < len; ++j) {
-		/* Figure out how to encode this unicode character in this codepage. */
-		char32_t c32 = data[j];
-		if (ptr >= COMPILER_ENDOF(buf)) {
-			DO_encode_output(buf, (size_t)(ptr - buf));
-			ptr = buf;
-		}
-		if (c32 <= 0x7f) {
-			/* Found it! */
-			*ptr++ = (char)(unsigned char)c32;
-			goto next_c32;
-		}
-		/* Cannot encode :( */
-		{
-			/* Try to case-fold the character. */
-			char32_t folded[UNICODE_FOLDED_MAX];
-			size_t len = (size_t)(iconv_transliterate(c32, folded) - folded);
-			if (len != 1 || folded[0] != c32) {
-				DO_encode_output(buf, (size_t)(ptr - buf));
-				ptr = buf;
-				DO(libiconv_ascii_encode_trans_u32(self, folded, len));
-				goto next_c32;
-			}
-		}
-		if (IS_ICONV_ERR_ERRNO(self->ice_flags)) {
-			DO_encode_output(buf, (size_t)(ptr - buf));
-			goto err_ilseq;
-		}
-		if (!IS_ICONV_ERR_DISCARD(self->ice_flags)) {
-			if (IS_ICONV_ERR_REPLACE(self->ice_flags))
-				*ptr++ = '?';
-			else {
-				*ptr++ = (char)(unsigned char)(uint32_t)c32;
-			}
-		}
-next_c32:
-		;
-	}
-	DO_encode_output(buf, (size_t)(ptr - buf));
-	return result;
-err:
-	return temp;
-err_ilseq:
-	self->ice_flags |= ICONV_HASERR;
-	errno = EILSEQ;
-	return -1;
-}
-
-INTERN NONNULL((1, 2)) ssize_t
-NOTHROW_NCX(FORMATPRINTER_CC libiconv_ascii_encode_trans)(struct iconv_encode *__restrict self,
-                                                          /*ASCII*/ char const *__restrict data,
-                                                          size_t size) {
-	char buf[64], *ptr = buf;
-	ssize_t temp, result = 0;
-	char32_t c32;
-	if unlikely(self->ice_flags & ICONV_HASERR)
-		goto err_ilseq;
-	FOREACH_UTF8(c32, self, data, size) {
-		/* Figure out how to encode this unicode character in this codepage. */
-		if (ptr >= COMPILER_ENDOF(buf)) {
-			DO_encode_output(buf, (size_t)(ptr - buf));
-			ptr = buf;
-		}
-		if (c32 <= 0x7f) {
-			/* Found it! */
-			*ptr++ = (char)(unsigned char)c32;
-			goto next_c32;
-		}
-		/* Cannot encode :( */
-		{
-			/* Try to case-fold the character. */
-			char32_t folded[UNICODE_FOLDED_MAX];
-			size_t len = (size_t)(iconv_transliterate(c32, folded) - folded);
-			if (len != 1 || folded[0] != c32) {
-				DO_encode_output(buf, (size_t)(ptr - buf));
-				ptr = buf;
-				DO(libiconv_ascii_encode_trans_u32(self, folded, len));
-				goto next_c32;
-			}
-		}
-		if (IS_ICONV_ERR_ERRNO(self->ice_flags)) {
-			DO_encode_output(buf, (size_t)(ptr - buf));
-			goto err_ilseq;
-		}
-		if (!IS_ICONV_ERR_DISCARD(self->ice_flags)) {
-			if (IS_ICONV_ERR_REPLACE(self->ice_flags))
-				*ptr++ = '?';
-			else {
-				*ptr++ = (char)(unsigned char)(uint32_t)c32;
-			}
-		}
-next_c32:
-		;
-	}
-	DO_encode_output(buf, (size_t)(ptr - buf));
-	return result;
-err:
-	return temp;
-err_ilseq:
-	self->ice_flags |= ICONV_HASERR;
-	errno = EILSEQ;
-	return -1;
-}
-
-
-
 /************************************************************************/
 /* Generic code-page                                                    */
 /************************************************************************/
 PRIVATE ATTR_NOINLINE NONNULL((1, 2)) ssize_t
-NOTHROW_NCX(FORMATPRINTER_CC libiconv_cp_encode_u32)(struct iconv_encode *__restrict self,
-                                                     char32_t const *__restrict data,
-                                                     size_t len) {
+(FORMATPRINTER_CC libiconv_cp_encode_u32)(struct iconv_encode *__restrict self,
+                                          char32_t const *__restrict data,
+                                          size_t len) {
 	size_t j;
 	char buf[64], *ptr = buf;
 	ssize_t temp, result = 0;
@@ -341,8 +187,8 @@ err_ilseq:
 }
 
 INTERN NONNULL((1, 2)) ssize_t
-NOTHROW_NCX(FORMATPRINTER_CC libiconv_cp_encode)(struct iconv_encode *__restrict self,
-                                                 /*utf-8*/ char const *__restrict data, size_t size) {
+(FORMATPRINTER_CC libiconv_cp_encode)(struct iconv_encode *__restrict self,
+                                      /*utf-8*/ char const *__restrict data, size_t size) {
 	char buf[64], *ptr = buf;
 	ssize_t temp, result = 0;
 	char32_t c32;
@@ -409,8 +255,8 @@ err_ilseq:
 }
 
 INTERN NONNULL((1, 2)) ssize_t
-NOTHROW_NCX(FORMATPRINTER_CC libiconv_cp_decode)(struct iconv_decode *__restrict self,
-                                                 /*cp???*/ char const *__restrict data, size_t size) {
+(FORMATPRINTER_CC libiconv_cp_decode)(struct iconv_decode *__restrict self,
+                                      /*cp???*/ char const *__restrict data, size_t size) {
 	char buf[64], *ptr = buf;
 	ssize_t temp, result = 0;
 	struct iconv_codepage const *cp;
@@ -458,9 +304,9 @@ err_ilseq:
 /* iso646 code page encode/decode functions.                            */
 /************************************************************************/
 PRIVATE ATTR_NOINLINE NONNULL((1, 2)) ssize_t
-NOTHROW_NCX(FORMATPRINTER_CC libiconv_cp646_encode_u32)(struct iconv_encode *__restrict self,
-                                                        char32_t const *__restrict data,
-                                                        size_t len) {
+(FORMATPRINTER_CC libiconv_cp646_encode_u32)(struct iconv_encode *__restrict self,
+                                             char32_t const *__restrict data,
+                                             size_t len) {
 	size_t j;
 	char buf[64], *ptr = buf;
 	ssize_t temp, result = 0;
@@ -516,8 +362,8 @@ err_ilseq:
 }
 
 INTERN NONNULL((1, 2)) ssize_t
-NOTHROW_NCX(FORMATPRINTER_CC libiconv_cp646_encode)(struct iconv_encode *__restrict self,
-                                                    /*utf-8*/ char const *__restrict data, size_t size) {
+(FORMATPRINTER_CC libiconv_cp646_encode)(struct iconv_encode *__restrict self,
+                                         /*utf-8*/ char const *__restrict data, size_t size) {
 	char buf[64], *ptr = buf;
 	ssize_t temp, result = 0;
 	char32_t c32;
@@ -574,8 +420,8 @@ err_ilseq:
 }
 
 INTERN NONNULL((1, 2)) ssize_t
-NOTHROW_NCX(FORMATPRINTER_CC libiconv_cp646_decode)(struct iconv_decode *__restrict self,
-                                                    /*cp???*/ char const *__restrict data, size_t size) {
+(FORMATPRINTER_CC libiconv_cp646_decode)(struct iconv_decode *__restrict self,
+                                         /*cp???*/ char const *__restrict data, size_t size) {
 	char buf[64], *ptr = buf;
 	ssize_t temp, result = 0;
 	struct iconv_iso646_codepage const *cp;
@@ -620,7 +466,6 @@ err_ilseq:
 }
 
 
-
 DECL_END
 
 #ifndef __INTELLISENSE__
@@ -636,6 +481,12 @@ DECL_END
 #define UTF_WIDTH     32
 #define UTF_BYTEORDER 4321
 #include "convert-utf.c.inl"
+
+
+#define DEFINE_FOR_ASCII
+#include "convert-like-ascii.c.inl"
+#define DEFINE_FOR_LATIN1
+#include "convert-like-ascii.c.inl"
 #endif /* !__INTELLISENSE__ */
 
 

@@ -49,6 +49,7 @@ enum {
 	CODEC_UTF16BE,     /* "UTF16BE", "UTF-16BE", "UCS-2BE", "UNICODEBIG" */
 	CODEC_UTF32LE,     /* "UTF32LE", "UTF-32LE", "UCS-4LE" */
 	CODEC_UTF32BE,     /* "UTF32BE", "UTF-32BE", "UCS-4BE" */
+	CODEC_ISO_8859_1,  /* "ISO-8859-1", "iso-ir-100", "csISOLatin1", "latin1", "l1", "IBM819", "CP819" */
 
 	/* 8-bit codepage codecs (IMPORTANT: keep these sorted lexicographically!) */
 #define CODEC_CP_MIN CODEC_CP1041
@@ -104,7 +105,6 @@ enum {
 	CODEC_CP921,       /* "cp921", "IBM921" */
 	CODEC_CP922,       /* "cp922", "IBM922", "Estonia-ISO-8" */
 	CODEC_DIN_66303,   /* "DIN_66303", "DRV8" */
-	CODEC_ISO_8859_1,  /* "ISO-8859-1", "iso-ir-100", "csISOLatin1", "latin1", "l1", "IBM819", "CP819" */
 	CODEC_ISO_8859_10, /* "ISO-8859-10", "iso-ir-157", "csISOLatin6", "latin6", "l6" */
 	CODEC_ISO_8859_11, /* "ISO-8859-11" */
 	CODEC_ISO_8859_13, /* "ISO-8859-13", "iso-ir-179", "csISOLatin7", "latin7", "l7" */

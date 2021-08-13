@@ -59,7 +59,7 @@ NOTHROW_NCX(CC libiconv_decode_init)(/*in|out*/ struct iconv_decode *__restrict 
 			 * character set is source-compatible with UTF-8 */
 			*input = self->icd_output;
 		} else {
-			input->ii_printer = (pformatprinter)&libiconv_ascii_decode_errchk;
+			input->ii_printer = (pformatprinter)&libiconv_ascii_decode;
 		}
 		break;
 
@@ -89,6 +89,10 @@ NOTHROW_NCX(CC libiconv_decode_init)(/*in|out*/ struct iconv_decode *__restrict 
 	case CODEC_UTF32BE:
 		input->ii_printer = (pformatprinter)&libiconv_utf32be_decode;
 		self->icd_data.idd_utf.u_pbc = 0;
+		break;
+
+	case CODEC_ISO_8859_1:
+		input->ii_printer = (pformatprinter)&libiconv_latin1_decode;
 		break;
 
 	case CODEC_CP_MIN ... CODEC_CP_MAX:
@@ -122,15 +126,11 @@ NOTHROW_NCX(CC libiconv_encode_init)(/*in|out*/ struct iconv_encode *__restrict 
 	switch (output_codec) {
 
 	case CODEC_ASCII:
-		if (self->ice_flags & ICONV_ERR_TRANSLIT) {
-			/* When transliteration is enabled, we have to properly decode unicode
-			 * characters, since we may need to replace them with longer variants.
-			 * As such, use a different parser for this case! */
-			input->ii_printer = (pformatprinter)&libiconv_ascii_encode_trans;
-		} else if ((self->ice_flags & ICONV_ERRMASK) != ICONV_ERR_IGNORE) {
+		if ((self->ice_flags & ICONV_ERRMASK) != ICONV_ERR_IGNORE ||
+		    (self->ice_flags & ICONV_ERR_TRANSLIT)) {
 			/* Encoding ASCII is the same as decoding it. We simply
 			 * have  to  handle  any  character  that  is `>= 0x80' */
-			input->ii_printer = (pformatprinter)&libiconv_ascii_decode_errchk;
+			input->ii_printer = (pformatprinter)&libiconv_ascii_encode;
 		} else {
 			/* When  errors can be  ignored, the 7-bit ascii
 			 * character set is source-compatible with UTF-8 */
@@ -157,6 +157,10 @@ NOTHROW_NCX(CC libiconv_encode_init)(/*in|out*/ struct iconv_encode *__restrict 
 
 	case CODEC_UTF32BE:
 		input->ii_printer = (pformatprinter)&libiconv_utf32be_encode;
+		break;
+
+	case CODEC_ISO_8859_1:
+		input->ii_printer = (pformatprinter)&libiconv_latin1_encode;
 		break;
 
 	case CODEC_CP_MIN ... CODEC_CP_MAX:
