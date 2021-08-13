@@ -3321,7 +3321,7 @@ reset_state:
 /* Output a single unicode character to the given TTY */
 INTERN NONNULL((1)) void CC
 libansitty_putuni(struct ansitty *__restrict self, char32_t ch) {
-	char utf8_seq[UNICODE_UTF8_MAXLEN];
+	char utf8_seq[UNICODE_UTF8_CURLEN];
 	size_t i, utf8_len;
 	/* Simple case: Default state and non-escaping character */
 	if (self->at_state == STATE_TEXT_UTF8) {

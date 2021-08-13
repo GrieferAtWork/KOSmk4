@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x52965549 */
+/* HASH CRC-32:0x354febee */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -347,7 +347,7 @@ NOTHROW_NCX(LIBDCALL libd_wcsrtombs)(char *dst,
 	char16_t const *src = *psrc;
 	while (dstlen) {
 		size_t error;
-		char buf[8];
+		char buf[7];
 		error = libd_wcrtomb(buf, *src, mbs);
 		if (!error)
 			break;
@@ -372,7 +372,7 @@ NOTHROW_NCX(LIBKCALL libc_wcsrtombs)(char *dst,
 	char32_t const *src = *psrc;
 	while (dstlen) {
 		size_t error;
-		char buf[8];
+		char buf[7];
 		error = libc_wcrtomb(buf, *src, mbs);
 		if (!error)
 			break;

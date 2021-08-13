@@ -1504,7 +1504,7 @@ done:
 INTERN ATTR_SECTION(".text.crt.wchar.FILE.core.read.file_ungetc32")
 WUNUSED NONNULL((1)) char32_t LIBCCALL file_ungetc32(FILE *__restrict self, char32_t ch) {
 	char32_t result = ch;
-	char buf[UNICODE_UTF8_MAXLEN], *end;
+	char buf[UNICODE_UTF8_CURLEN], *end;
 	end = unicode_writeutf8(buf, ch);
 	assert(end > buf);
 	do {

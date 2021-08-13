@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xe1c02e54 */
+/* HASH CRC-32:0xc0037d0f */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -73,7 +73,7 @@ __NOTHROW_NCX(__LIBKCALL __LIBC_LOCAL_NAME(c32rtombs))(char *__dst, __CHAR32_TYP
 	__CHAR32_TYPE__ const *__src = *__psrc;
 	while (__dstlen) {
 		__SIZE_TYPE__ __error;
-		char __buf[8];
+		char __buf[7];
 		__error = __localdep_uchar_c32rtomb(__buf, *__src, __mbs);
 		if (!__error)
 			break;

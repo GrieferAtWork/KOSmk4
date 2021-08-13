@@ -419,7 +419,7 @@ NOTHROW_NCX(FORMATPRINTER_CC libiconv_cp_decode)(struct iconv_decode *__restrict
 	cp = self->icd_data.idd_cp;
 	while (size) {
 		char16_t c;
-		if ((ptr + UNICODE_UTF8_MAXLEN) >= COMPILER_ENDOF(buf)) {
+		if ((ptr + UNICODE_UTF8_CURLEN) > COMPILER_ENDOF(buf)) {
 			DO_decode_output(buf, (size_t)(ptr - buf));
 			ptr = buf;
 		}
@@ -585,7 +585,7 @@ NOTHROW_NCX(FORMATPRINTER_CC libiconv_cp646_decode)(struct iconv_decode *__restr
 	while (size) {
 		char16_t c16;
 		unsigned char c;
-		if ((ptr + UNICODE_UTF8_MAXLEN) >= COMPILER_ENDOF(buf)) {
+		if ((ptr + UNICODE_UTF8_CURLEN) > COMPILER_ENDOF(buf)) {
 			DO_decode_output(buf, (size_t)(ptr - buf));
 			ptr = buf;
 		}

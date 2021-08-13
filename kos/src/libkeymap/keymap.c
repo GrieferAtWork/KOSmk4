@@ -336,7 +336,7 @@ found_character:
 
 					CASEF(KMP_ENCODING_UTF32LE, "ch='%" PRIc32 "'\n", UNALIGNED_GETLE32((u32 const *)reader)) {
 						u32 ch32;
-						char utf8[UNICODE_UTF8_MAXLEN], *end;
+						char utf8[UNICODE_UTF8_CURLEN], *end;
 						ch32 = UNALIGNED_GETLE32((u32 const *)reader);
 						goto do_print_ch32;
 					CASEF(KMP_ENCODING_UTF32BE, "ch='%" PRIc32 "'\n", UNALIGNED_GETBE32((u32 const *)reader))

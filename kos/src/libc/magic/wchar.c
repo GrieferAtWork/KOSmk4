@@ -428,7 +428,7 @@ size_t wcsrtombs([[outp(dstlen)]] char *dst,
 	wchar_t const *src = *psrc;
 	while (dstlen) {
 		size_t error;
-		char buf[UNICODE_UTF8_MAXLEN];
+		char buf[UNICODE_UTF8_CURLEN];
 		error = wcrtomb(buf, *src, mbs);
 		if (!error)
 			break;

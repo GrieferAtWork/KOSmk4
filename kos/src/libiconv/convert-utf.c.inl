@@ -134,7 +134,7 @@ NOTHROW_NCX(FORMATPRINTER_CC libiconv_utf16be_decode)(struct iconv_decode *__res
 	while (size >= 2) {
 		char16_t c16;
 		/* Check if the buffer must be flushed. */
-		if ((ptr + UNICODE_16TO8_MAXBUF(1)) >= COMPILER_ENDOF(buf)) {
+		if ((ptr + UNICODE_16TO8_MAXBUF(1)) > COMPILER_ENDOF(buf)) {
 			DO_decode_output(buf, (size_t)(ptr - buf));
 			ptr = buf;
 		}
@@ -226,7 +226,7 @@ NOTHROW_NCX(FORMATPRINTER_CC libiconv_utf32be_decode)(struct iconv_decode *__res
 	while (size >= 4) {
 		char32_t c32;
 		/* Check if the buffer must be flushed. */
-		if ((ptr + UNICODE_UTF8_MAXLEN) >= COMPILER_ENDOF(buf)) {
+		if ((ptr + UNICODE_UTF8_CURLEN) > COMPILER_ENDOF(buf)) {
 			DO_decode_output(buf, (size_t)(ptr - buf));
 			ptr = buf;
 		}
