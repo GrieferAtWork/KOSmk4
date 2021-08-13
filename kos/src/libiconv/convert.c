@@ -40,6 +40,7 @@ gcc_opt.append("-O3"); // Force _all_ optimizations because stuff in here is per
 #include <libiconv/iconv.h>
 
 #include "convert.h"
+#include "cp-7h.h"
 #include "cp-iso646.h"
 #include "cp.h"
 
@@ -486,6 +487,8 @@ DECL_END
 #define DEFINE_FOR_ASCII
 #include "convert-like-ascii.c.inl"
 #define DEFINE_FOR_LATIN1
+#include "convert-like-ascii.c.inl"
+#define DEFINE_FOR_CP7H
 #include "convert-like-ascii.c.inl"
 #endif /* !__INTELLISENSE__ */
 

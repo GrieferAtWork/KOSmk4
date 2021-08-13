@@ -56,11 +56,21 @@ enum {
 	CODEC_CP1041,      /* "cp1041" */
 	CODEC_CP1057,      /* "cp1057", "HP-PC-8" */
 	CODEC_CP1098,      /* "cp1098", "IBM1098" */
+	CODEC_CP17248,     /* "cp17248" */
+	CODEC_CP864,       /* "cp864", "IBM864" */
+	CODEC_CP897,       /* "cp897" */
+	CODEC_CP901,       /* "cp901" */
+	CODEC_CP902,       /* "cp902", "IBM902" */
+	CODEC_CP921,       /* "cp921", "IBM921" */
+	CODEC_CP922,       /* "cp922", "IBM922", "Estonia-ISO-8" */
+	CODEC_DIN_66303,   /* "DIN_66303", "DRV8" */
+#define CODEC_CP_MAX CODEC_DIN_66303
+
+#define CODEC_CP7H_MIN CODEC_CP1116
 	CODEC_CP1116,      /* "cp1116", "IBM1116" */
 	CODEC_CP1117,      /* "cp1117", "IBM1117" */
 	CODEC_CP1125,      /* "cp1125", "RST-2018-91", "CP866U", "CP866NAV", "RUSCII" */
 	CODEC_CP1131,      /* "cp1131" */
-	CODEC_CP17248,     /* "cp17248" */
 	CODEC_CP3012,      /* "cp3012", "RusLat" */
 	CODEC_CP437,       /* "IBM437", "cp437", "437", "csPC8CodePage437", "OEMUS", "OSF100201B5" */
 	CODEC_CP667,       /* "MAZOVIA", "cp667", "cp790", "cp991", "MAZ" */
@@ -90,21 +100,14 @@ enum {
 	CODEC_CP861,       /* "cp861", "IBM861", "861", "OEM861", "cp-is" */
 	CODEC_CP862,       /* "cp862", "IBM862", "862", "OEM862", "csPC862LatinHebrew" */
 	CODEC_CP863,       /* "cp863", "IBM863", "863", "OEM863" */
-	CODEC_CP864,       /* "cp864", "IBM864" */
 	CODEC_CP865,       /* "cp865", "IBM865", "865", "OEM865" */
 	CODEC_CP866,       /* "cp866", "866", "IBM866" */
 	CODEC_CP867,       /* "cp867" */
 	CODEC_CP868,       /* "cp868", "IBM868", "cp-ar" */
 	CODEC_CP869,       /* "cp869", "IBM869", "OEM869", "869", "cp-gr" */
 	CODEC_CP872,       /* "cp872" */
-	CODEC_CP897,       /* "cp897" */
-	CODEC_CP901,       /* "cp901" */
-	CODEC_CP902,       /* "cp902", "IBM902" */
 	CODEC_CP912,       /* "cp912", "IBM912" */
 	CODEC_CP915,       /* "cp915", "IBM915" */
-	CODEC_CP921,       /* "cp921", "IBM921" */
-	CODEC_CP922,       /* "cp922", "IBM922", "Estonia-ISO-8" */
-	CODEC_DIN_66303,   /* "DIN_66303", "DRV8" */
 	CODEC_ISO_8859_10, /* "ISO-8859-10", "iso-ir-157", "csISOLatin6", "latin6", "l6" */
 	CODEC_ISO_8859_11, /* "ISO-8859-11" */
 	CODEC_ISO_8859_13, /* "ISO-8859-13", "iso-ir-179", "csISOLatin7", "latin7", "l7" */
@@ -126,7 +129,7 @@ enum {
 	CODEC_KOI_8_N1,    /* "KOI-8-N1" */
 	CODEC_KOI_8_N2,    /* "KOI-8-N2" */
 	CODEC_MIK,         /* "MIK", "BULGARIA-PC" */
-#define CODEC_CP_MAX CODEC_MIK
+#define CODEC_CP7H_MAX CODEC_MIK
 
 	/* iso646 code pages (IMPORTANT: keep these sorted lexicographically!) */
 #define CODEC_ISO646_MIN CODEC_ISO646_CA

@@ -45,6 +45,7 @@ __DECL_BEGIN
 
 #ifdef LIBICONV_EXPOSE_INTERNAL
 struct iconv_codepage;
+struct iconv_7h_codepage;
 struct iconv_iso646_codepage;
 union iconv_decode_data {
 	struct {
@@ -53,7 +54,8 @@ union iconv_decode_data {
 		struct __mbstate u_16;    /* Surrogate storage for utf-16 input. */
 	} idd_utf; /* For UTF-16 and UTF-32 input data. */
 
-	struct iconv_codepage        const *idd_cp;    /* [1..1][const] Code page */
+	struct iconv_codepage const        *idd_cp;    /* [1..1][const] Code page (for 8-bit codecs) */
+	struct iconv_7h_codepage const     *idd_cp7h;  /* [1..1][const] Code page (for 7h codecs) */
 	struct iconv_iso646_codepage const *idd_cp646; /* [1..1][const] Code page (for iso686 codecs) */
 	void *__idd_pad[_ICONV_DECODE_OPAQUE_POINTERS];
 };
@@ -61,9 +63,10 @@ union iconv_decode_data {
 union iconv_encode_data {
 	struct __mbstate ied_utf8; /* UTF-8 input data buffer. */
 	struct {
-		struct __mbstate             ic_utf8; /* UTF-8 input data buffer. */
+		struct __mbstate ic_utf8; /* UTF-8 input data buffer. */
 		union {
-			struct iconv_codepage const        *ic_cp;    /* [1..1][const] Code page */
+			struct iconv_codepage const        *ic_cp;    /* [1..1][const] Code page (for 8-bit codecs) */
+			struct iconv_7h_codepage const     *ic_cp7h;  /* [1..1][const] Code page (for 7h codecs) */
 			struct iconv_iso646_codepage const *ic_cp646; /* [1..1][const] Code page (for iso686 codecs) */
 		};
 	} ied_cp;

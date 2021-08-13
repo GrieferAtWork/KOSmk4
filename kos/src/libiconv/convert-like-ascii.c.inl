@@ -19,8 +19,9 @@
  */
 #ifdef __INTELLISENSE__
 #include "convert.c"
-#define DEFINE_FOR_LATIN1
+//#define DEFINE_FOR_LATIN1
 //#define DEFINE_FOR_ASCII
+#define DEFINE_FOR_CP7H
 #endif /* __INTELLISENSE__ */
 
 DECL_BEGIN
@@ -39,6 +40,10 @@ DECL_BEGIN
 #define LOCAL_libiconv_encode    libiconv_ascii_encode
 #define LOCAL_libiconv_encode_32 libiconv_ascii_encode_u32
 #define LOCAL_libiconv_decode    libiconv_ascii_decode
+#elif defined(DEFINE_FOR_CP7H)
+#define LOCAL_libiconv_encode    libiconv_cp7h_encode
+#define LOCAL_libiconv_encode_32 libiconv_cp7h_encode_u32
+#define LOCAL_libiconv_decode    libiconv_cp7h_decode
 #else /* ... */
 #error "Invalid mode"
 #endif /* !... */
@@ -71,6 +76,28 @@ INTERN NONNULL((1, 2)) ssize_t
 			/* Found it! */
 			*ptr++ = (char)(unsigned char)(uint32_t)c32;
 		} else {
+#ifdef DEFINE_FOR_CP7H
+			size_t lo, hi;
+			struct iconv_7h_codepage const *cp;
+			cp = self->ice_data.ied_cp.ic_cp7h;
+			lo = 0;
+			hi = cp->i7cp_encode_max;
+			while (lo < hi) {
+				size_t i;
+				i = (lo + hi) / 2;
+				if (c32 < cp->i7cp_encode[i].icee_uni) {
+					hi = i;
+				} else if (c32 > cp->i7cp_encode[i].icee_uni) {
+					lo = i + 1;
+				} else {
+					/* Found it! */
+					*ptr++ = (char)(unsigned char)cp->i7cp_encode[i].icee_cp;
+					goto next_c32;
+#define NEED_next_c32
+				}
+			}
+#endif /* DEFINE_FOR_CP7H */
+
 			/* Try to case-fold the character. */
 			char32_t folded[UNICODE_FOLDED_MAX];
 			size_t len = (size_t)(iconv_transliterate(c32, folded) - folded);
@@ -92,6 +119,11 @@ INTERN NONNULL((1, 2)) ssize_t
 				}
 			}
 		}
+#ifdef NEED_next_c32
+#undef NEED_next_c32
+next_c32:
+		;
+#endif /* NEED_next_c32 */
 	}
 	DO_encode_output(buf, (size_t)(ptr - buf));
 	return result;
@@ -162,6 +194,27 @@ force_normal_output:
 				DO_encode_output(out, 1);
 				continue;
 			}
+#ifdef DEFINE_FOR_CP7H
+			size_t lo, hi;
+			struct iconv_7h_codepage const *cp;
+			cp = self->ice_data.ied_cp.ic_cp7h;
+			lo = 0;
+			hi = cp->i7cp_encode_max;
+			while (lo < hi) {
+				size_t i;
+				i = (lo + hi) / 2;
+				if (c32 < cp->i7cp_encode[i].icee_uni) {
+					hi = i;
+				} else if (c32 > cp->i7cp_encode[i].icee_uni) {
+					lo = i + 1;
+				} else {
+					/* Found it! */
+					DO_encode_output((char const *)&cp->i7cp_encode[i].icee_cp, 1);
+					goto next_data_noinc;
+#define NEED_next_data_noinc
+				}
+			}
+#endif /* DEFINE_FOR_CP7H */
 			if (self->ice_flags & ICONV_ERR_TRANSLIT) {
 				char32_t folded[UNICODE_FOLDED_MAX];
 				size_t len = (size_t)(iconv_transliterate(c32, folded) - folded);
@@ -181,6 +234,11 @@ force_normal_output:
 next_data:
 			++iter;
 		}
+#ifdef NEED_next_data_noinc
+#undef NEED_next_data_noinc
+next_data_noinc:
+		;
+#endif /* NEED_next_data_noinc */
 	}
 	DO_encode_output(flush_start, (size_t)(end - flush_start));
 	return result;
@@ -216,6 +274,32 @@ INTERN NONNULL((1, 2)) ssize_t
 		++iter;
 		flush_start = iter;
 #ifdef LOCAL_HAS_UNDEFINED_CODEPOINTS
+#ifdef DEFINE_FOR_CP7H
+		/* Try to decode using the code-page. */
+		{
+			struct iconv_7h_codepage const *cp;
+			char16_t c16;
+			cp  = self->icd_data.idd_cp7h;
+			c16 = cp->i7cp_decode[ch - 0x80];
+			if (c16 != 0) {
+				char buf[UNICODE_16TO8_MAXBUF(1)], *dst = buf;
+				/* Output `c16' in utf-8 */
+				if likely(c16 <= ((uint16_t)1 << 7)-1) {
+					*dst++ = (char)(uint8_t)c16;
+				} else if (c16 <= ((uint16_t)1 << 11)-1) {
+					*dst++ = (char)(0xc0 | (uint8_t)((c16 >> 6)/* & 0x1f*/));
+					*dst++ = (char)(0x80 | (uint8_t)((c16) & 0x3f));
+				} else {
+					*dst++ = (char)(0xe0 | (uint8_t)((c16 >> 12)/* & 0x0f*/));
+					*dst++ = (char)(0x80 | (uint8_t)((c16 >> 6) & 0x3f));
+					*dst++ = (char)(0x80 | (uint8_t)((c16) & 0x3f));
+				}
+				DO_decode_output(buf, (size_t)(dst - buf));
+				continue;
+			}
+		}
+#endif /* DEFINE_FOR_CP7H */
+
 		if (IS_ICONV_ERR_ERRNO(self->icd_flags))
 			goto err_ilseq;
 		/* NOTE: No need to handle `IS_ICONV_ERR_IGNORE()'; our function
@@ -247,13 +331,16 @@ err_ilseq:
 #endif /* LOCAL_HAS_UNDEFINED_CODEPOINTS */
 }
 
+
+
 #undef LOCAL_UNICODE_IDENT_MAXCHAR
 #undef LOCAL_libiconv_encode
 #undef LOCAL_libiconv_encode_32
 #undef LOCAL_libiconv_decode
+#undef LOCAL_HAS_UNDEFINED_CODEPOINTS
 
 DECL_END
 
-#undef LOCAL_HAS_UNDEFINED_CODEPOINTS
 #undef DEFINE_FOR_LATIN1
 #undef DEFINE_FOR_ASCII
+#undef DEFINE_FOR_CP7H

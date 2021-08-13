@@ -34,6 +34,7 @@
 
 #include "codecs.h"
 #include "convert.h"
+#include "cp-7h.h"
 #include "cp-iso646.h"
 #include "cp.h"
 #include "iconv.h"
@@ -99,6 +100,12 @@ NOTHROW_NCX(CC libiconv_decode_init)(/*in|out*/ struct iconv_decode *__restrict 
 		/* 8-bit codepage */
 		self->icd_data.idd_cp = libiconv_cp_page(input_codec);
 		input->ii_printer     = (pformatprinter)&libiconv_cp_decode;
+		break;
+
+	case CODEC_CP7H_MIN ... CODEC_CP7H_MAX:
+		/* 7h codepage */
+		self->icd_data.idd_cp7h = libiconv_cp7h_page(input_codec);
+		input->ii_printer       = (pformatprinter)&libiconv_cp7h_decode;
 		break;
 
 	case CODEC_ISO646_MIN ... CODEC_ISO646_MAX:
@@ -167,6 +174,12 @@ NOTHROW_NCX(CC libiconv_encode_init)(/*in|out*/ struct iconv_encode *__restrict 
 		/* 8-bit codepage */
 		self->ice_data.ied_cp.ic_cp = libiconv_cp_page(output_codec);
 		input->ii_printer           = (pformatprinter)&libiconv_cp_encode;
+		break;
+
+	case CODEC_CP7H_MIN ... CODEC_CP7H_MAX:
+		/* 7h codepage */
+		self->ice_data.ied_cp.ic_cp7h = libiconv_cp7h_page(output_codec);
+		input->ii_printer             = (pformatprinter)&libiconv_cp7h_encode;
 		break;
 
 	case CODEC_ISO646_MIN ... CODEC_ISO646_MAX:

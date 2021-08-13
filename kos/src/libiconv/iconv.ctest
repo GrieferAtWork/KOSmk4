@@ -77,10 +77,15 @@ DEFINE_TEST(iconv) {
 #undef DLSYM
 
 	convert("latin-1", "de", ICONV_ERR_ERRNO, "aou: \xE4\xF6\xFC!", buf);
-	assertf(strcmp(buf, "aou: \x7b\x7c\x7d!") == 0, "buf = %q", buf);
+	assertf(strcmp(buf, "aou: \x7B\x7C\x7D!") == 0, "buf = %q", buf);
 
-	convert("de", "ascii", ICONV_ERR_ERRNO | ICONV_ERR_TRANSLIT, "ss: \x7e!", buf);
+	convert("de", "ascii", ICONV_ERR_ERRNO | ICONV_ERR_TRANSLIT, "ss: \x7E!", buf);
 	assertf(strcmp(buf, "ss: ss!") == 0, "buf = %q", buf);
+
+	convert("utf-8", "iso-ir-182", ICONV_ERR_ERRNO, "Yy: \u0176\u0177!", buf);
+	assertf(strcmp(buf, "Yy: \xDE\xFE!") == 0, "buf = %q", buf);
+	convert("iso-ir-182", "utf-8", ICONV_ERR_ERRNO, "Yy: \xDE\xFE!", buf);
+	assertf(strcmp(buf, "Yy: \u0176\u0177!") == 0, "buf = %q", buf);
 
 	/* Also test multi-byte decode functionality. */
 	convertz("utf-16", "utf-8", ICONV_ERR_ERRNO, (char *)u"Hello", 10, buf);

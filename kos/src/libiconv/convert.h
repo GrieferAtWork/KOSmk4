@@ -68,6 +68,13 @@ INTDEF NONNULL((1, 2)) ssize_t (FORMATPRINTER_CC libiconv_cp_decode)(struct icon
 
 
 /************************************************************************/
+/* 7H-code-page encode/decode                                           */
+/************************************************************************/
+INTDEF NONNULL((1, 2)) ssize_t (FORMATPRINTER_CC libiconv_cp7h_encode)(struct iconv_encode *__restrict self, /*utf-8*/ char const *__restrict data, size_t size);
+INTDEF NONNULL((1, 2)) ssize_t (FORMATPRINTER_CC libiconv_cp7h_decode)(struct iconv_decode *__restrict self, /*cp???*/ char const *__restrict data, size_t size);
+
+
+/************************************************************************/
 /* iso646 code page encode/decode functions.                            */
 /************************************************************************/
 INTDEF NONNULL((1, 2)) ssize_t (FORMATPRINTER_CC libiconv_cp646_encode)(struct iconv_encode *__restrict self, /*utf-8*/ char const *__restrict data, size_t size);
