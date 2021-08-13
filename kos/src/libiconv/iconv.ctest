@@ -39,59 +39,52 @@ DECL_BEGIN
 
 PRIVATE _LPICONV_TRANSCODE_INIT _iconv_transcode_init = NULL;
 
+PRIVATE void convertz(char const *from_codec, char const *to_codec,
+                      unsigned int error_mode, char const *from_text,
+                      size_t from_len, char *to_buf) {
+	struct iconv_transcode tc;
+	struct iconv_printer in;
+	int error;
+	ssize_t status;
+	tc.it_encode.ice_output.ii_printer = &format_sprintf_printer;
+	tc.it_encode.ice_output.ii_arg     = &to_buf;
+	tc.it_encode.ice_flags             = error_mode;
+
+	/* Initialize the transcoder */
+	error = (*_iconv_transcode_init)(&tc, &in, from_codec, to_codec);
+	assertf(error == 0, "error = %d", error);
+
+	/* Print data */
+	status = (*in.ii_printer)(in.ii_arg, from_text, from_len);
+	assertf(status >= 0, "status = %" PRIdSIZ, status);
+	*to_buf = 0;
+}
+
+PRIVATE void convert(char const *from_codec, char const *to_codec,
+                     unsigned int error_mode, char const *from_text,
+                     char *to_buf) {
+	convertz(from_codec, to_codec, error_mode, from_text, strlen(from_text), to_buf);
+}
+
 
 DEFINE_TEST(iconv) {
+	char buf[256];
 	void *libiconv;
 	libiconv = dlopen(LIBICONV_LIBRARY_NAME, RTLD_LOCAL);
 	assertf(libiconv, "dlerror(): %s", dlerror());
 #define DLSYM(x) (*(void **)&x = dlsym(libiconv, #x), assertf(x, "dlerror(): %s", dlerror()))
 	DLSYM(_iconv_transcode_init);
 #undef DLSYM
-	{
-		char buf[64], *ptr = buf;
-		struct iconv_transcode tc;
-		struct iconv_printer in;
-		int error;
-		tc.it_encode.ice_output.ii_printer = &format_sprintf_printer;
-		tc.it_encode.ice_output.ii_arg     = &ptr;
-		tc.it_encode.ice_flags             = ICONV_ERR_ERRNO;
-		error = _iconv_transcode_init(&tc, &in, "latin-1", "de");
-		assert(error == 0);
-		format_printf(in.ii_printer, in.ii_arg, "aou: \xE4\xF6\xFC");
-		*ptr = 0;
-		assertf(strcmp(buf, "aou: \x7b\x7c\x7d") == 0, "buf = %q", buf);
-	}
 
-	{
-		char buf[64], *ptr = buf;
-		struct iconv_transcode tc;
-		struct iconv_printer in;
-		int error;
-		tc.it_encode.ice_output.ii_printer = &format_sprintf_printer;
-		tc.it_encode.ice_output.ii_arg     = &ptr;
-		tc.it_encode.ice_flags             = ICONV_ERR_ERRNO | ICONV_ERR_TRANSLIT;
-		error = _iconv_transcode_init(&tc, &in, "de", "ascii");
-		assert(error == 0);
-		format_printf(in.ii_printer, in.ii_arg, "ss: \x7e");
-		*ptr = 0;
-		assertf(strcmp(buf, "ss: ss") == 0, "buf = %q", buf);
-	}
+	convert("latin-1", "de", ICONV_ERR_ERRNO, "aou: \xE4\xF6\xFC!", buf);
+	assertf(strcmp(buf, "aou: \x7b\x7c\x7d!") == 0, "buf = %q", buf);
+
+	convert("de", "ascii", ICONV_ERR_ERRNO | ICONV_ERR_TRANSLIT, "ss: \x7e!", buf);
+	assertf(strcmp(buf, "ss: ss!") == 0, "buf = %q", buf);
 
 	/* Also test multi-byte decode functionality. */
-	{
-		char buf[64], *ptr = buf;
-		struct iconv_transcode tc;
-		struct iconv_printer in;
-		int error;
-		tc.it_encode.ice_output.ii_printer = &format_sprintf_printer;
-		tc.it_encode.ice_output.ii_arg     = &ptr;
-		tc.it_encode.ice_flags             = ICONV_ERR_ERRNO | ICONV_ERR_TRANSLIT;
-		error = _iconv_transcode_init(&tc, &in, "utf-16", "utf-8");
-		assert(error == 0);
-		(*in.ii_printer)(in.ii_arg, (char *)u"Hello", 10);
-		*ptr = 0;
-		assertf(strcmp(buf, "Hello") == 0, "buf = %q", buf);
-	}
+	convertz("utf-16", "utf-8", ICONV_ERR_ERRNO, (char *)u"Hello", 10, buf);
+	assertf(strcmp(buf, "Hello") == 0, "buf = %q", buf);
 
 	dlclose(libiconv);
 }
