@@ -19,6 +19,7 @@
  */
 #ifndef GUARD_LIBICONV_STDICONV_C
 #define GUARD_LIBICONV_STDICONV_C 1
+#define _KOS_SOURCE 1
 
 #include "api.h"
 /**/
@@ -27,6 +28,7 @@
 
 #include <assert.h>
 #include <errno.h>
+#include <inttypes.h>
 #include <stdlib.h>
 #include <string.h>
 #include <unicode.h>
@@ -199,8 +201,21 @@ NOTHROW_NCX(LIBCCALL libiconv_stdiconv)(struct stdiconv *self,
 	uintptr_t saved_decode_flags;
 	union iconv_decode_data saved_decode_data;
 	union iconv_encode_data saved_encode_data;
-	ssize_t status;
 	mbstate_t saved_converted_mbs;
+#define STDICONV_SAVE()                               \
+	(saved_decode_flags  = self->si_decode.icd_flags, \
+	 saved_decode_data   = self->si_decode.icd_data,  \
+	 saved_encode_flags  = self->si_encode.ice_flags, \
+	 saved_encode_data   = self->si_encode.ice_data,  \
+	 saved_converted_mbs = self->si_converted_mbs)
+#define STDICONV_LOAD()                              \
+	(self->si_decode.icd_flags = saved_decode_flags, \
+	 self->si_decode.icd_data  = saved_decode_data,  \
+	 self->si_encode.ice_flags = saved_encode_flags, \
+	 self->si_encode.ice_data  = saved_encode_data,  \
+	 self->si_converted_mbs    = saved_converted_mbs)
+
+	ssize_t status;
 	if unlikely(!self || self == (struct stdiconv *)(iconv_t)-1) {
 		errno = EBADF;
 		return -1;
@@ -214,11 +229,7 @@ NOTHROW_NCX(LIBCCALL libiconv_stdiconv)(struct stdiconv *self,
 	self->si_outsiz = *outbytesleft;
 
 	/* Save a couple of fields we may need if we have to rewind. */
-	saved_decode_flags  = self->si_decode.icd_flags;
-	saved_decode_data   = self->si_decode.icd_data;
-	saved_encode_flags  = self->si_encode.ice_flags;
-	saved_encode_data   = self->si_encode.ice_data;
-	saved_converted_mbs = self->si_converted_mbs;
+	STDICONV_SAVE();
 
 	/* Reset the conversion counter because we only care about the current instance. */
 	self->si_converted = 0;
@@ -233,11 +244,7 @@ NOTHROW_NCX(LIBCCALL libiconv_stdiconv)(struct stdiconv *self,
 			/* EILSEQ: For compliance, we have to  fix-up `inbuf' so that  it
 			 *         points to the start of the bad sequence. We do this by
 			 *         feeding input one byte at a time until it breaks. */
-			self->si_decode.icd_flags = saved_decode_flags;
-			self->si_decode.icd_data  = saved_decode_data;
-			self->si_encode.ice_flags = saved_encode_flags;
-			self->si_encode.ice_data  = saved_encode_data;
-			self->si_converted_mbs    = saved_converted_mbs;
+			STDICONV_LOAD();
 
 			/* Prevent data from making it out of the encoder */
 			if (self->si_encode_input.ii_printer == (pformatprinter)&stdiconv_copy_to_outbuf) {
@@ -268,20 +275,66 @@ NOTHROW_NCX(LIBCCALL libiconv_stdiconv)(struct stdiconv *self,
 			}
 
 			/* Restore the decoder into its original configuration. */
-			self->si_decode.icd_flags = saved_decode_flags;
-			self->si_decode.icd_data  = saved_decode_data;
-			self->si_encode.ice_flags = saved_encode_flags;
-			self->si_encode.ice_data  = saved_encode_data;
-			self->si_converted_mbs    = saved_converted_mbs;
+return_with_EILSEQ:
+			STDICONV_LOAD();
 			return (size_t)-1;
 		} else if (status == -2) {
 			/* E2BIG: Restore iconv state and set E2BIG. */
-			self->si_decode.icd_flags = saved_decode_flags;
-			self->si_decode.icd_data  = saved_decode_data;
-			self->si_encode.ice_flags = saved_encode_flags;
-			self->si_encode.ice_data  = saved_encode_data;
-			self->si_converted_mbs    = saved_converted_mbs;
-			errno                     = E2BIG;
+			STDICONV_LOAD();
+
+			/* In order to properly update the caller-given pointers, we need
+			 * to figure out the exact position at which we're no longer able
+			 * to  write to the  output buffer. For  this purpose, start over
+			 * but only offer one byte  at a time so  we can return with  the
+			 * iconv state such that only a single additional character  will
+			 * result in an overflow of the output buffer. */
+			self->si_outbuf = *outbuf;
+			self->si_outsiz = *outbytesleft;
+			self->si_converted = 0;
+			for (;;) {
+				if unlikely(!*inbytesleft)
+					goto success; /* Shouldn't happen... */
+				status = (*self->si_decode_input.ii_printer)(self->si_decode_input.ii_arg,
+				                                             *inbuf, 1);
+				if (status < 0) {
+					if unlikely(status == -1) {
+						/* Shouldn't happen... (EILSEQ during second pass?) */
+						goto return_with_EILSEQ;
+					}
+					assertf(status == -2, "status = %" PRIdSIZ, status);
+					break;
+				}
+				++*inbuf;
+				--*inbytesleft;
+
+				/* We're still good, so create another back-up. */
+				STDICONV_SAVE();
+
+#ifndef __OPTIMIZE_SIZE__
+				/* Optimization check: if the output is entirety filled, we can stop now. */
+				if (self->si_outsiz == 0) {
+					if unlikely(!*inbytesleft)
+						goto success; /* Shouldn't happen... */
+					break;
+				}
+#endif /* !__OPTIMIZE_SIZE__ */
+			}
+
+			/* Load the last-valid state prior to the buffer overflow happening. */
+			STDICONV_LOAD();
+
+			/* `*inbuf' and `*inbytesleft'  were already updated  in the loop  above.
+			 * And since we  know that trying  to write the  next byte (`*inbuf')  to
+			 * the decode function's input will result  in a buffer overflow, we  can
+			 * now  update the output-buffer  pointers to indicate  how much space is
+			 * still  unused. Usually,  nothing will be  unused, but in  case we need
+			 * to write a multi-byte character into  the output, it may be  non-empty
+			 * but still too small to be able to hold that character in its entirety. */
+			*outbuf       = self->si_outbuf;
+			*outbytesleft = self->si_outsiz;
+
+			/* Return with E2BIG. */
+			errno = E2BIG;
 			return (size_t)-1;
 		}
 	}
@@ -289,11 +342,14 @@ NOTHROW_NCX(LIBCCALL libiconv_stdiconv)(struct stdiconv *self,
 	/* Update buffer pointers to indicate that all was converted! */
 	*inbuf += *inbytesleft;
 	*inbytesleft  = 0;
+success:
 	*outbuf       = self->si_outbuf;
 	*outbytesleft = self->si_outsiz;
 
 	/* Must return the # of converted unicode characters. */
 	return self->si_converted;
+#undef STDICONV_LOAD
+#undef STDICONV_SAVE
 }
 
 
