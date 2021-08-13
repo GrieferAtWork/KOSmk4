@@ -40,8 +40,8 @@ gcc_opt.append("-O3"); // Force _all_ optimizations because stuff in here is per
 #include <libiconv/iconv.h>
 
 #include "convert.h"
+#include "cp-iso646.h"
 #include "cp.h"
-#include "iso646.h"
 
 DECL_BEGIN
 

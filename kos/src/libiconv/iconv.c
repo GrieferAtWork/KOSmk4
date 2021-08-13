@@ -34,9 +34,9 @@
 
 #include "codecs.h"
 #include "convert.h"
+#include "cp-iso646.h"
 #include "cp.h"
 #include "iconv.h"
-#include "iso646.h"
 
 DECL_BEGIN
 

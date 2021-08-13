@@ -17,8 +17,8 @@
  *    misrepresented as being the original software.                          *
  * 3. This notice may not be removed or altered from any source distribution. *
  */
-#ifndef GUARD_LIBICONV_ISO646_H
-#define GUARD_LIBICONV_ISO646_H 1
+#ifndef GUARD_LIBICONV_CP_ISO646_H
+#define GUARD_LIBICONV_CP_ISO646_H 1
 
 #include "api.h"
 /**/
@@ -94,4 +94,4 @@ NOTHROW_NCX(iso646_decode)(struct iconv_iso646_codepage const *__restrict cp, ch
 
 DECL_END
 
-#endif /* !GUARD_LIBICONV_ISO646_H */
+#endif /* !GUARD_LIBICONV_CP_ISO646_H */
