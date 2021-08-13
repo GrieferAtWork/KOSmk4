@@ -714,6 +714,16 @@ NOTHROW_NCX(FCALL libiconv_getcodecname)(unsigned int id, unsigned int nth) {
 }
 
 
+/* Same as `libiconv_codecbyname()', but also parse possible flag-relation options. */
+INTERN WUNUSED NONNULL((1)) unsigned int
+NOTHROW_NCX(FCALL libiconv_codec_and_flags_byname)(char const *__restrict name,
+                                                   /*[in|out]*/ uintptr_t *__restrict pflags) {
+	/* TODO: Check for "//IGNORE" suffix --> ICONV_ERR_DISCARD */
+	/* TODO: Check for "//TRANSLIT" suffix --> ICONV_ERR_TRANSLIT */
+	(void)pflags;
+	return libiconv_codecbyname(name);
+}
+
 
 DECL_END
 

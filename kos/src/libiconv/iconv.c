@@ -45,7 +45,7 @@ STATIC_ASSERT(offsetof(struct iconv_encode, ice_flags) == offsetof(struct iconv_
 STATIC_ASSERT(sizeof(union iconv_decode_data) == (_ICONV_DECODE_OPAQUE_POINTERS * sizeof(void *)));
 STATIC_ASSERT(sizeof(union iconv_encode_data) == (_ICONV_ENCODE_OPAQUE_POINTERS * sizeof(void *)));
 
-PRIVATE NONNULL((1, 2)) int
+INTERN NONNULL((1, 2)) int
 NOTHROW_NCX(CC libiconv_decode_init)(/*in|out*/ struct iconv_decode *__restrict self,
                                      /*out*/ struct iconv_printer *__restrict input, /* Accepts `input_codec_name' */
                                      /*in*/ unsigned int input_codec) {
@@ -106,7 +106,7 @@ NOTHROW_NCX(CC libiconv_decode_init)(/*in|out*/ struct iconv_decode *__restrict 
 			input->ii_printer     = (pformatprinter)&libiconv_cp_decode;
 			break;
 		}
-		errno = ENOENT;
+		errno = EINVAL;
 		return -1;
 	}	break;
 	}
@@ -114,7 +114,7 @@ NOTHROW_NCX(CC libiconv_decode_init)(/*in|out*/ struct iconv_decode *__restrict 
 }
 
 
-PRIVATE NONNULL((1, 2)) int
+INTERN NONNULL((1, 2)) int
 NOTHROW_NCX(CC libiconv_encode_init)(/*in|out*/ struct iconv_encode *__restrict self,
                                      /*out*/ struct iconv_printer *__restrict input, /* Accepts `UTF-8' */
                                      /*in*/ unsigned int output_codec) {
@@ -177,7 +177,7 @@ NOTHROW_NCX(CC libiconv_encode_init)(/*in|out*/ struct iconv_encode *__restrict 
 			input->ii_printer = (pformatprinter)&libiconv_cp_encode;
 			break;
 		}
-		errno = ENOENT;
+		errno = EINVAL;
 		return -1;
 	}	break;
 	}
@@ -194,14 +194,13 @@ NOTHROW_NCX(CC libiconv_encode_init)(/*in|out*/ struct iconv_encode *__restrict 
  *                                 The written function+cookie may only be used for as long
  *                                 as `self' remains valid.
  * @return: 0 : Success (you may now use `input->ii_printer' and `input->ii_arg' to feed data)
- * @return: -1: [errno=ENOENT] Unsupported/unknown codec `input_codec_name' */
+ * @return: -1: [errno=EINVAL] Unsupported/unknown codec `input_codec_name' */
 INTERN NONNULL((1, 2, 3)) int
 NOTHROW_NCX(CC _libiconv_decode_init)(/*in|out*/ struct iconv_decode *__restrict self,
                                       /*out*/ struct iconv_printer *__restrict input, /* Accepts `input_codec_name' */
                                       /*in*/ char const *__restrict input_codec_name) {
 	unsigned int codec;
-	/* TODO: Check for "//IGNORE" suffix in `input_codec_name' */
-	codec = libiconv_codecbyname(input_codec_name);
+	codec = libiconv_codec_and_flags_byname(input_codec_name, &self->icd_flags);
 	return libiconv_decode_init(self, input, codec);
 }
 
@@ -215,15 +214,13 @@ NOTHROW_NCX(CC _libiconv_decode_init)(/*in|out*/ struct iconv_decode *__restrict
  *                                  The written function+cookie may only be used for as long
  *                                  as `self' remains valid.
  * @return: 0 : Success (you may now use `input->ii_printer' and `input->ii_arg' to feed data)
- * @return: -1: [errno=ENOENT] Unsupported/unknown codec `output_codec_name' */
+ * @return: -1: [errno=EINVAL] Unsupported/unknown codec `output_codec_name' */
 INTERN NONNULL((1, 2, 3)) int
 NOTHROW_NCX(CC _libiconv_encode_init)(/*in|out*/ struct iconv_encode *__restrict self,
                                       /*out*/ struct iconv_printer *__restrict input, /* Accepts `UTF-8' */
                                       /*in*/ char const *__restrict output_codec_name) {
 	unsigned int codec;
-	/* TODO: Check for "//IGNORE" suffix in `output_codec_name' */
-	/* TODO: Check for "//TRANSLIT" suffix in `output_codec_name' */
-	codec = libiconv_codecbyname(output_codec_name);
+	codec = libiconv_codec_and_flags_byname(output_codec_name, &self->ice_flags);
 	return libiconv_encode_init(self, input, codec);
 }
 
@@ -242,7 +239,7 @@ NOTHROW_NCX(CC _libiconv_encode_init)(/*in|out*/ struct iconv_encode *__restrict
  *                                  The written function+cookie may only be used for as long
  *                                  as `self' remains valid.
  * @return: 0 : Success (you may now use `input->ii_printer' and `input->ii_arg' to feed data)
- * @return: -1: [errno=ENOENT] Unsupported/unknown codec `input_codec_name' or `output_codec_name' */
+ * @return: -1: [errno=EINVAL] Unsupported/unknown codec `input_codec_name' or `output_codec_name' */
 INTERN NONNULL((1, 2, 3, 4)) int
 NOTHROW_NCX(CC _libiconv_transcode_init)(/*in|out*/ struct iconv_transcode *__restrict self,
                                          /*out*/ struct iconv_printer *__restrict input, /* Accepts `input_codec_name' */
@@ -252,11 +249,12 @@ NOTHROW_NCX(CC _libiconv_transcode_init)(/*in|out*/ struct iconv_transcode *__re
 	unsigned int input_codec;
 	unsigned int output_codec;
 
-	/* TODO: Check for "//IGNORE" suffix in `input_codec_name' */
-	/* TODO: Check for "//IGNORE" suffix in `output_codec_name' */
-	/* TODO: Check for "//TRANSLIT" suffix in `output_codec_name' */
-	input_codec  = libiconv_codecbyname(input_codec_name);
-	output_codec = libiconv_codecbyname(output_codec_name);
+	/* The caller only fills in flags for the encoder. */
+	self->it_decode.icd_flags = self->it_encode.ice_flags;
+
+	/* Load codec names and parse additional flags. */
+	input_codec  = libiconv_codec_and_flags_byname(input_codec_name, &self->it_decode.icd_flags);
+	output_codec = libiconv_codec_and_flags_byname(output_codec_name, &self->it_encode.ice_flags);
 
 	/* Check for special case: when input and output  codecs are the same,  then
 	 *                         it really shouldn't matter if we don't know them! */
@@ -267,7 +265,6 @@ NOTHROW_NCX(CC _libiconv_transcode_init)(/*in|out*/ struct iconv_transcode *__re
 	}
 
 	/* Initialize the encoder and set-up its input pipe for use as output by the decoder. */
-	self->it_decode.icd_flags = self->it_encode.ice_flags;
 	result = libiconv_encode_init(&self->it_encode,
 	                              &self->it_decode.icd_output,
 	                              output_codec);

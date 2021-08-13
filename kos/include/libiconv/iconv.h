@@ -17,8 +17,8 @@
  *    misrepresented as being the original software.                          *
  * 3. This notice may not be removed or altered from any source distribution. *
  */
-#ifndef _LIBICONV_WRITER_H
-#define _LIBICONV_WRITER_H 1
+#ifndef _LIBICONV_ICONV_H
+#define _LIBICONV_ICONV_H 1
 
 #include "api.h"
 /**/
@@ -48,8 +48,8 @@ struct iconv_codepage;
 struct iconv_iso646_codepage;
 union iconv_decode_data {
 	struct {
-		byte_t           u_pbc;   /* # of pending bytes in `u_pb' */
-		byte_t           u_pb[3]; /* Pending byte(s). */
+		__byte_t         u_pbc;   /* # of pending bytes in `u_pb' */
+		__byte_t         u_pb[3]; /* Pending byte(s). */
 		struct __mbstate u_16;    /* Surrogate storage for utf-16 input. */
 	} idd_utf; /* For UTF-16 and UTF-32 input data. */
 
@@ -199,7 +199,7 @@ struct iconv_decode {
  *                                 The written function+cookie may only be used for as long
  *                                 as `self' remains valid.
  * @return: 0 : Success (you may now use `input->ii_printer' and `input->ii_arg' to feed data)
- * @return: -1: [errno=ENOENT] Unsupported/unknown codec `input_codec_name' */
+ * @return: -1: [errno=EINVAL] Unsupported/unknown codec `input_codec_name' */
 typedef __ATTR_NONNULL((1, 2, 3)) int
 /*__NOTHROW_NCX*/ (LIBICONV_CC *_LPICONV_DECODE_INIT)(/*in|out*/ struct iconv_decode *__restrict self,
                                                       /*out*/ struct iconv_printer *__restrict input, /* Accepts `input_codec_name' */
@@ -253,7 +253,7 @@ struct iconv_encode {
  *                                  The written function+cookie may only be used for as long
  *                                  as `self' remains valid.
  * @return: 0 : Success (you may now use `input->ii_printer' and `input->ii_arg' to feed data)
- * @return: -1: [errno=ENOENT] Unsupported/unknown codec `output_codec_name' */
+ * @return: -1: [errno=EINVAL] Unsupported/unknown codec `output_codec_name' */
 typedef __ATTR_NONNULL((1, 2, 3)) int
 /*__NOTHROW_NCX*/ (LIBICONV_CC *_LPICONV_ENCODE_INIT)(/*in|out*/ struct iconv_encode *__restrict self,
                                                       /*out*/ struct iconv_printer *__restrict input, /* Accepts `UTF-8' */
@@ -303,7 +303,7 @@ struct iconv_transcode {
  *                                  The written function+cookie may only be used for as long
  *                                  as `self' remains valid.
  * @return: 0 : Success (you may now use `input->ii_printer' and `input->ii_arg' to feed data)
- * @return: -1: [errno=ENOENT] Unsupported/unknown codec `input_codec_name' or `output_codec_name' */
+ * @return: -1: [errno=EINVAL] Unsupported/unknown codec `input_codec_name' or `output_codec_name' */
 typedef __ATTR_NONNULL((1, 2, 3, 4)) int
 /*__NOTHROW_NCX*/ (LIBICONV_CC *_LPICONV_TRANSCODE_INIT)(/*in|out*/ struct iconv_transcode *__restrict self,
                                                          /*out*/ struct iconv_printer *__restrict input,   /* Accepts `input_codec_name' */
@@ -338,4 +338,4 @@ __NOTHROW_NCX(iconv_transcode_init)(/*in|out*/ struct iconv_transcode *__restric
 
 __DECL_END
 
-#endif /* !_LIBICONV_WRITER_H */
+#endif /* !_LIBICONV_ICONV_H */

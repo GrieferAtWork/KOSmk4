@@ -39,7 +39,7 @@ DECL_BEGIN
  *                                 The written function+cookie may only be used for as long
  *                                 as `self' remains valid.
  * @return: 0 : Success (you may now use `input->ii_printer' and `input->ii_arg' to feed data)
- * @return: -1: [errno=ENOENT] Unsupported/unknown codec `input_codec_name' */
+ * @return: -1: [errno=EINVAL] Unsupported/unknown codec `input_codec_name' */
 INTDEF NONNULL((1, 2, 3)) int
 NOTHROW_NCX(CC _libiconv_decode_init)(/*in|out*/ struct iconv_decode *__restrict self,
                                       /*out*/ struct iconv_printer *__restrict input, /* Accepts `input_codec_name' */
@@ -55,7 +55,7 @@ NOTHROW_NCX(CC _libiconv_decode_init)(/*in|out*/ struct iconv_decode *__restrict
  *                                  The written function+cookie may only be used for as long
  *                                  as `self' remains valid.
  * @return: 0 : Success (you may now use `input->ii_printer' and `input->ii_arg' to feed data)
- * @return: -1: [errno=ENOENT] Unsupported/unknown codec `output_codec_name' */
+ * @return: -1: [errno=EINVAL] Unsupported/unknown codec `output_codec_name' */
 INTDEF NONNULL((1, 2, 3)) int
 NOTHROW_NCX(CC _libiconv_encode_init)(/*in|out*/ struct iconv_encode *__restrict self,
                                       /*out*/ struct iconv_printer *__restrict input, /* Accepts `UTF-8' */
@@ -74,7 +74,7 @@ NOTHROW_NCX(CC _libiconv_encode_init)(/*in|out*/ struct iconv_encode *__restrict
  *                                  The written function+cookie may only be used for as long
  *                                  as `self' remains valid.
  * @return: 0 : Success (you may now use `input->ii_printer' and `input->ii_arg' to feed data)
- * @return: -1: [errno=ENOENT] Unsupported/unknown codec `input_codec_name' or `output_codec_name' */
+ * @return: -1: [errno=EINVAL] Unsupported/unknown codec `input_codec_name' or `output_codec_name' */
 INTDEF NONNULL((1, 2, 3, 4)) int
 NOTHROW_NCX(CC _libiconv_transcode_init)(/*in|out*/ struct iconv_transcode *__restrict self,
                                          /*out*/ struct iconv_printer *__restrict input,   /* Accepts `input_codec_name' */
@@ -82,6 +82,14 @@ NOTHROW_NCX(CC _libiconv_transcode_init)(/*in|out*/ struct iconv_transcode *__re
                                          /*in*/ char const *__restrict output_codec_name); /* For encode */
 
 
+INTDEF NONNULL((1, 2)) int
+NOTHROW_NCX(CC libiconv_decode_init)(/*in|out*/ struct iconv_decode *__restrict self,
+                                     /*out*/ struct iconv_printer *__restrict input, /* Accepts `input_codec_name' */
+                                     /*in*/ unsigned int input_codec);
+INTDEF NONNULL((1, 2)) int
+NOTHROW_NCX(CC libiconv_encode_init)(/*in|out*/ struct iconv_encode *__restrict self,
+                                     /*out*/ struct iconv_printer *__restrict input, /* Accepts `UTF-8' */
+                                     /*in*/ unsigned int output_codec);
 
 DECL_END
 

@@ -202,6 +202,10 @@ INTDEF ATTR_CONST WUNUSED char const *
 NOTHROW_NCX(FCALL libiconv_getcodecname)(unsigned int id, unsigned int nth);
 
 
+/* Same as `libiconv_codecbyname()', but also parse possible flag-relation options. */
+INTDEF WUNUSED NONNULL((1)) unsigned int
+NOTHROW_NCX(FCALL libiconv_codec_and_flags_byname)(char const *__restrict name,
+                                                   /*[in|out]*/ uintptr_t *__restrict pflags);
 
 DECL_END
 

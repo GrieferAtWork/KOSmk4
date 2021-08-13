@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x12060711 */
+/* HASH CRC-32:0xc0bbe895 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -103,6 +103,11 @@ __LIBC __uint8_t const unicode_utf8seqlen[256] __CASMNAME_SAME("unicode_utf8seql
 #define UNICODE_16TO32_MAXBUF(num_chars)  (num_chars)
 #define UNICODE_32TO8_MAXBUF(num_chars)  ((num_chars) * 7)
 #define UNICODE_32TO16_MAXBUF(num_chars) ((num_chars) * 2)
+
+#ifndef __mbstate_t_defined
+#define __mbstate_t_defined 1
+typedef struct __mbstate mbstate_t;
+#endif /* !__mbstate_t_defined */
 #ifdef __CRT_HAVE_unicode_readutf8
 #if defined(__cplusplus) && defined(__CORRECT_ISO_CPP_UNICODE_H_PROTO)
 extern "C++" {
