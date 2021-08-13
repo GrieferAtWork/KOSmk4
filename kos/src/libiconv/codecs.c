@@ -586,15 +586,20 @@ PRIVATE struct codec_db_entry codec_db[] = {
  *   - "OEM-0123"  --->  "OEM123"
  *   - "OEM_0123"  --->  "OEM123"
  *   - "OEM 0123"  --->  "OEM123"
+ *
+ *
+ * NOTE: This function assumes that `name[namelen]' is either '\0' or '/'
  */
 PRIVATE WUNUSED NONNULL((1, 2)) bool
 NOTHROW_NCX(FCALL libiconv_normalize_codec_name)(char buf[CODE_NAME_MAXLEN + 1],
-                                                 char const *__restrict name) {
+                                                 char const *__restrict name,
+                                                 size_t namelen) {
 #define issep(ch) ((ch) == '-' || (ch) == '_' || (ch) == ' ')
 	char *ptr, *end;
 	char const *nameend;
 	ptr = buf;
 	end = buf + CODE_NAME_MAXLEN;
+	nameend = name + namelen;
 	while (isspace(*name))
 		++name;
 	if ((name[0] == 'O' || name[0] == 'o') &&
@@ -643,7 +648,6 @@ NOTHROW_NCX(FCALL libiconv_normalize_codec_name)(char buf[CODE_NAME_MAXLEN + 1],
 	}
 
 	/* Strip trailing spaces. */
-	nameend = strend(name);
 	while (nameend > name && isspace(nameend[-1]))
 		--nameend;
 
@@ -699,7 +703,8 @@ again:
 
 	/* If not done already, try to normalize the codec name */
 	if (name != normal_name) {
-		if (libiconv_normalize_codec_name(normal_name, name)) {
+		if (libiconv_normalize_codec_name(normal_name, name,
+		                                  strlen(name))) {
 			name = normal_name;
 			goto again;
 		}
@@ -730,8 +735,20 @@ NOTHROW_NCX(FCALL libiconv_codecbynamez)(char const *__restrict name,
 	char *buf;
 	/* For  simplicity,  just  create  a  stack-copy  of the
 	 * string that is NUL-terminated at the proper position. */
-	buf = (char *)alloca((namelen + 1) * sizeof(char));
-	*(char *)mempcpy(buf, name, namelen, sizeof(char)) = '\0';
+	if likely(namelen <= CODE_NAME_MAXLEN) {
+		buf = (char *)alloca((namelen + 1) * sizeof(char));
+		*(char *)mempcpy(buf, name, namelen, sizeof(char)) = '\0';
+	} else {
+		/* In this case we know that the name won't be found as-is.
+		 * So rather than risk allocating a lot of stack memory, we
+		 * just try to normalize it for the purpose of limiting its
+		 * max length.
+		 * If that fails, then we know no such codec can possibly
+		 * exist since the name would be too long. */
+		buf = (char *)alloca((CODE_NAME_MAXLEN + 1) * sizeof(char));
+		if (!libiconv_normalize_codec_name(buf, name, namelen))
+			return CODEC_UNKNOWN; /* Can't possibly be a supported codec. */
+	}
 	return libiconv_codecbyname(buf);
 }
 
