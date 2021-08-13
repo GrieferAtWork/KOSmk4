@@ -41,6 +41,7 @@ gcc_opt.append("-O3"); // Force _all_ optimizations because stuff in here is per
 
 #include "convert.h"
 #include "cp-7h.h"
+#include "cp-7l.h"
 #include "cp-iso646.h"
 #include "cp.h"
 
@@ -285,6 +286,193 @@ INTERN NONNULL((1, 2)) ssize_t
 				c = (unsigned char)*data;
 		}
 		ptr = unicode_writeutf8(ptr, c);
+consume_byte:
+		++data;
+		--size;
+	}
+	DO_decode_output(buf, (size_t)(ptr - buf));
+	return result;
+err:
+	return temp;
+err_ilseq:
+	self->icd_flags |= ICONV_HASERR;
+	errno = EILSEQ;
+	return -1;
+}
+
+
+
+/************************************************************************/
+/* 7L-code-page encode/decode                                           */
+/************************************************************************/
+PRIVATE ATTR_NOINLINE NONNULL((1, 2)) ssize_t
+(FORMATPRINTER_CC libiconv_cp7l_encode_u32)(struct iconv_encode *__restrict self,
+                                            char32_t const *__restrict data,
+                                            size_t len) {
+	size_t j;
+	char buf[64], *ptr = buf;
+	ssize_t temp, result = 0;
+	struct iconv_7l_codepage const *cp;
+	cp = self->ice_data.ied_cp.ic_cp7l;
+	for (j = 0; j < len; ++j) {
+		/* Figure out how to encode this unicode character in this codepage. */
+		size_t lo, hi;
+		char32_t c32 = data[j];
+		if (ptr >= COMPILER_ENDOF(buf)) {
+			DO_encode_output(buf, (size_t)(ptr - buf));
+			ptr = buf;
+		}
+		lo = 0;
+		hi = cp->i7lcp_encode_max;
+		while (lo < hi) {
+			size_t i;
+			i = (lo + hi) / 2;
+			if (c32 < cp->i7lcp_encode[i].icee_uni) {
+				hi = i;
+			} else if (c32 > cp->i7lcp_encode[i].icee_uni) {
+				lo = i + 1;
+			} else {
+				/* Found it! */
+				*ptr++ = (char)(unsigned char)cp->i7lcp_encode[i].icee_cp;
+				goto next_c32;
+			}
+		}
+		/* Cannot encode :( */
+		if (self->ice_flags & ICONV_ERR_TRANSLIT) {
+			/* Try to case-fold the character. */
+			char32_t folded[UNICODE_FOLDED_MAX];
+			size_t len = (size_t)(iconv_transliterate(c32, folded) - folded);
+			if (len != 1 || folded[0] != c32) {
+				DO_encode_output(buf, (size_t)(ptr - buf));
+				ptr = buf;
+				DO(libiconv_cp7l_encode_u32(self, folded, len));
+				goto next_c32;
+			}
+		}
+		if (IS_ICONV_ERR_ERRNO(self->ice_flags)) {
+			DO_encode_output(buf, (size_t)(ptr - buf));
+			goto err_ilseq;
+		}
+		if (!IS_ICONV_ERR_DISCARD(self->ice_flags)) {
+			if (IS_ICONV_ERR_REPLACE(self->ice_flags))
+				*ptr++ = cp->i7lcp_replacement;
+			else {
+				*ptr++ = (char)(unsigned char)(uint32_t)c32;
+			}
+		}
+next_c32:
+		;
+	}
+	DO_encode_output(buf, (size_t)(ptr - buf));
+	return result;
+err:
+	return temp;
+err_ilseq:
+	self->ice_flags |= ICONV_HASERR;
+	errno = EILSEQ;
+	return -1;
+}
+
+INTERN NONNULL((1, 2)) ssize_t
+(FORMATPRINTER_CC libiconv_cp7l_encode)(struct iconv_encode *__restrict self,
+                                        /*utf-8*/ char const *__restrict data, size_t size) {
+	char buf[64], *ptr = buf;
+	ssize_t temp, result = 0;
+	char32_t c32;
+	struct iconv_7l_codepage const *cp;
+	if unlikely(self->ice_flags & ICONV_HASERR)
+		goto err_ilseq;
+	cp = self->ice_data.ied_cp.ic_cp7l;
+	FOREACH_UTF8(c32, self, data, size) {
+		/* Figure out how to encode this unicode character in this codepage. */
+		size_t lo, hi;
+		if (ptr >= COMPILER_ENDOF(buf)) {
+			DO_encode_output(buf, (size_t)(ptr - buf));
+			ptr = buf;
+		}
+		lo = 0;
+		hi = cp->i7lcp_encode_max;
+		while (lo < hi) {
+			size_t i;
+			i = (lo + hi) / 2;
+			if (c32 < cp->i7lcp_encode[i].icee_uni) {
+				hi = i;
+			} else if (c32 > cp->i7lcp_encode[i].icee_uni) {
+				lo = i + 1;
+			} else {
+				/* Found it! */
+				*ptr++ = (char)(unsigned char)cp->i7lcp_encode[i].icee_cp;
+				goto next_c32;
+			}
+		}
+		/* Cannot encode :( */
+		if (self->ice_flags & ICONV_ERR_TRANSLIT) {
+			/* Try to case-fold the character. */
+			char32_t folded[UNICODE_FOLDED_MAX];
+			size_t len = (size_t)(iconv_transliterate(c32, folded) - folded);
+			if (len != 1 || folded[0] != c32) {
+				DO_encode_output(buf, (size_t)(ptr - buf));
+				ptr = buf;
+				DO(libiconv_cp7l_encode_u32(self, folded, len));
+				goto next_c32;
+			}
+		}
+		if (IS_ICONV_ERR_ERRNO(self->ice_flags)) {
+			DO_encode_output(buf, (size_t)(ptr - buf));
+			goto err_ilseq;
+		}
+		if (!IS_ICONV_ERR_DISCARD(self->ice_flags)) {
+			if (IS_ICONV_ERR_REPLACE(self->ice_flags))
+				*ptr++ = cp->i7lcp_replacement;
+			else {
+				*ptr++ = (char)(unsigned char)(uint32_t)c32;
+			}
+		}
+next_c32:
+		;
+	}
+	DO_encode_output(buf, (size_t)(ptr - buf));
+	return result;
+err:
+	return temp;
+err_ilseq:
+	self->ice_flags |= ICONV_HASERR;
+	errno = EILSEQ;
+	return -1;
+}
+
+INTERN NONNULL((1, 2)) ssize_t
+(FORMATPRINTER_CC libiconv_cp7l_decode)(struct iconv_decode *__restrict self,
+                                        /*cp???*/ char const *__restrict data, size_t size) {
+	char buf[64], *ptr = buf;
+	ssize_t temp, result = 0;
+	struct iconv_7l_codepage const *cp;
+	if unlikely(self->icd_flags & ICONV_HASERR)
+		goto err_ilseq;
+	cp = self->icd_data.idd_cp7l;
+	while (size) {
+		unsigned char ch;
+		char16_t c16;
+		if ((ptr + UNICODE_UTF8_CURLEN) > COMPILER_ENDOF(buf)) {
+			DO_decode_output(buf, (size_t)(ptr - buf));
+			ptr = buf;
+		}
+		/* Decode the character via the codepage. */
+		ch  = (unsigned char)*data;
+		c16 = likely(ch <= 0x7f) ? cp->i7lcp_decode[ch] : 0;
+		if unlikely(c16 == 0 && ch != 0) {
+			/* Invalid/undefined input byte */
+			DO_decode_output(buf, (size_t)(ptr - buf));
+			ptr = buf;
+			if (IS_ICONV_ERR_ERRNO(self->icd_flags))
+				goto err_ilseq;
+			if (IS_ICONV_ERR_DISCARD(self->icd_flags))
+				goto consume_byte;
+			c16 = '?';
+			if (IS_ICONV_ERR_IGNORE(self->icd_flags))
+				c16 = (unsigned char)*data;
+		}
+		ptr = unicode_writeutf8(ptr, c16);
 consume_byte:
 		++data;
 		--size;

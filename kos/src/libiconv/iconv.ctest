@@ -87,6 +87,15 @@ DEFINE_TEST(iconv) {
 	convert("iso-ir-182", "utf-8", ICONV_ERR_ERRNO, "Yy: \xDE\xFE!", buf);
 	assertf(strcmp(buf, "Yy: \u0176\u0177!") == 0, "buf = %q", buf);
 
+	{
+		char buf2[64];
+		convert("utf-8", "bcdic", ICONV_ERR_ERRNO, "ABCD", buf2);
+		assertf(strcmp(buf2, "\x31\x32\x33\x34") == 0, "buf2 = %q", buf2);
+		convert("bcdic", "utf-8", ICONV_ERR_ERRNO, buf2, buf);
+		assertf(strcmp(buf, "ABCD") == 0, "buf = %q", buf);
+	}
+
+
 	/* Also test multi-byte decode functionality. */
 	convertz("utf-16", "utf-8", ICONV_ERR_ERRNO, (char *)u"Hello", 10, buf);
 	assertf(strcmp(buf, "Hello") == 0, "buf = %q", buf);

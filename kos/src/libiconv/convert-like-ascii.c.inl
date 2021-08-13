@@ -81,17 +81,17 @@ INTERN NONNULL((1, 2)) ssize_t
 			struct iconv_7h_codepage const *cp;
 			cp = self->ice_data.ied_cp.ic_cp7h;
 			lo = 0;
-			hi = cp->i7cp_encode_max;
+			hi = cp->i7hcp_encode_max;
 			while (lo < hi) {
 				size_t i;
 				i = (lo + hi) / 2;
-				if (c32 < cp->i7cp_encode[i].icee_uni) {
+				if (c32 < cp->i7hcp_encode[i].icee_uni) {
 					hi = i;
-				} else if (c32 > cp->i7cp_encode[i].icee_uni) {
+				} else if (c32 > cp->i7hcp_encode[i].icee_uni) {
 					lo = i + 1;
 				} else {
 					/* Found it! */
-					*ptr++ = (char)(unsigned char)cp->i7cp_encode[i].icee_cp;
+					*ptr++ = (char)(unsigned char)cp->i7hcp_encode[i].icee_cp;
 					goto next_c32;
 #define NEED_next_c32
 				}
@@ -199,17 +199,17 @@ force_normal_output:
 			struct iconv_7h_codepage const *cp;
 			cp = self->ice_data.ied_cp.ic_cp7h;
 			lo = 0;
-			hi = cp->i7cp_encode_max;
+			hi = cp->i7hcp_encode_max;
 			while (lo < hi) {
 				size_t i;
 				i = (lo + hi) / 2;
-				if (c32 < cp->i7cp_encode[i].icee_uni) {
+				if (c32 < cp->i7hcp_encode[i].icee_uni) {
 					hi = i;
-				} else if (c32 > cp->i7cp_encode[i].icee_uni) {
+				} else if (c32 > cp->i7hcp_encode[i].icee_uni) {
 					lo = i + 1;
 				} else {
 					/* Found it! */
-					DO_encode_output((char const *)&cp->i7cp_encode[i].icee_cp, 1);
+					DO_encode_output((char const *)&cp->i7hcp_encode[i].icee_cp, 1);
 					goto next_data_noinc;
 #define NEED_next_data_noinc
 				}
@@ -280,7 +280,7 @@ INTERN NONNULL((1, 2)) ssize_t
 			struct iconv_7h_codepage const *cp;
 			char16_t c16;
 			cp  = self->icd_data.idd_cp7h;
-			c16 = cp->i7cp_decode[ch - 0x80];
+			c16 = cp->i7hcp_decode[ch - 0x80];
 			if (c16 != 0) {
 				char buf[UNICODE_16TO8_MAXBUF(1)], *dst = buf;
 				/* Output `c16' in utf-8 */

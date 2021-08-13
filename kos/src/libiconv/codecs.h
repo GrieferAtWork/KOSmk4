@@ -66,6 +66,7 @@ enum {
 	CODEC_DIN_66303,   /* "DIN_66303", "DRV8" */
 #define CODEC_CP_MAX CODEC_DIN_66303
 
+	/* 7h codepage codecs (IMPORTANT: keep these sorted lexicographically!) */
 #define CODEC_CP7H_MIN CODEC_CP1116
 	CODEC_CP1116,      /* "cp1116", "IBM1116" */
 	CODEC_CP1117,      /* "cp1117", "IBM1117" */
@@ -130,6 +131,20 @@ enum {
 	CODEC_KOI_8_N2,    /* "KOI-8-N2" */
 	CODEC_MIK,         /* "MIK", "BULGARIA-PC" */
 #define CODEC_CP7H_MAX CODEC_MIK
+
+#define CODEC_CP7L_MIN CODEC_BCDIC
+	CODEC_BCDIC,            /* "BCDIC" */
+	CODEC_BURROUGHS_B5500,  /* "Burroughs-B5500" */
+	CODEC_CP353,            /* "cp353" */
+	CODEC_CP355,            /* "cp355", "PTTC/BCD" */
+	CODEC_CP357,            /* "cp357", "PTTC/BCD-H" */
+	CODEC_CP358,            /* "cp358", "PTTC/BCD-C" */
+	CODEC_CP359,            /* "cp359", "PTTC/BCD-M", "cp360", "PTTC/BCD-D" */
+	CODEC_GBCD,             /* "GBCD" */
+	CODEC_IBM1401,          /* "IBM1401" */
+	CODEC_IBM704,           /* "IBM704" */
+	CODEC_IBM7090,          /* "IBM7090", "IBM7094" */
+#define CODEC_CP7L_MAX CODEC_IBM7090
 
 	/* iso646 code pages (IMPORTANT: keep these sorted lexicographically!) */
 #define CODEC_ISO646_MIN CODEC_ISO646_CA
