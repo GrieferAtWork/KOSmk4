@@ -55,7 +55,7 @@ DEFINE_TEST(iconv) {
 		tc.it_encode.ice_output.ii_printer = &format_sprintf_printer;
 		tc.it_encode.ice_output.ii_arg     = &ptr;
 		tc.it_encode.ice_flags             = ICONV_ERR_ERRNO;
-		error = _iconv_transcode_init(&tc, &in, "latin1", "de");
+		error = _iconv_transcode_init(&tc, &in, "latin-1", "de");
 		assert(error == 0);
 		format_printf(in.ii_printer, in.ii_arg, "aou: \xE4\xF6\xFC");
 		*ptr = 0;

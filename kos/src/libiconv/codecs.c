@@ -27,6 +27,7 @@
 
 #include <kos/types.h>
 
+#include <ctype.h>
 #include <string.h>
 
 #include <libiconv/iconv.h>
@@ -72,7 +73,21 @@ for (local l: File.open("./codecs.h")) {
 			name = l[:nameEnd].strip();
 			l = l[nameEnd:];
 		}
-		name = name.lower();
+		name = name.lower().replace("_", "-");
+		assert " " !in name, repr name;
+		assert "--" !in name, repr name;
+		local i = 0;
+		for (;;) {
+			i = name.find("0", i);
+			if (i < 0)
+				break;
+			if (i + 1 < #name && name.isdigit(i + 1) &&
+			    (i == 0 || !name.isdigit(i - 1)))
+				name = name[:i] + name[i+1:];
+			else {
+				++i;
+			}
+		}
 		if (name in name2codec)
 			throw Error("Duplicate mapping for " + repr name);
 		name2codec[name] = codec;
@@ -80,6 +95,7 @@ for (local l: File.open("./codecs.h")) {
 	}
 }
 local longestNameLen = (name2codec.keys.each.length > ...) + 1;
+print("#define CODE_NAME_MAXLEN ", longestNameLen-1);
 print("struct codec_db_entry {");
 print("	char         cdbe_name[CEIL_ALIGN(", longestNameLen, ", __SIZEOF_INT__)];");
 print("	unsigned int cdbe_codec; /" "* The associated codec. *" "/");
@@ -93,6 +109,7 @@ for (local name: name2codec.keys.sorted()) {
 }
 print("};");
 ]]]*/
+#define CODE_NAME_MAXLEN 24
 struct codec_db_entry {
 	char         cdbe_name[CEIL_ALIGN(25, __SIZEOF_INT__)];
 	unsigned int cdbe_codec; /* The associated codec. */
@@ -114,14 +131,14 @@ PRIVATE struct codec_db_entry codec_db[] = {
 	{ "865",                      CODEC_CP865 },
 	{ "866",                      CODEC_CP866 },
 	{ "869",                      CODEC_CP869 },
-	{ "ansi_x3.4",                CODEC_ASCII },
-	{ "ansi_x3.4-1968",           CODEC_ASCII },
-	{ "ansi_x3.4-1986",           CODEC_ASCII },
+	{ "ansi-x3.4",                CODEC_ASCII },
+	{ "ansi-x3.4-1968",           CODEC_ASCII },
+	{ "ansi-x3.4-1986",           CODEC_ASCII },
 	{ "arabic",                   CODEC_ISO_8859_6 },
 	{ "ascii",                    CODEC_ASCII },
 	{ "asmo-708",                 CODEC_ISO_8859_6 },
-	{ "bn-74/3101-01",            CODEC_ISO646_PL },
-	{ "bs_4730",                  CODEC_ISO646_GB },
+	{ "bn-74/3101-1",             CODEC_ISO646_PL },
+	{ "bs-4730",                  CODEC_ISO646_GB },
 	{ "bulgaria-pc",              CODEC_MIK },
 	{ "ca",                       CODEC_ISO646_CA },
 	{ "cn",                       CODEC_ISO646_CN },
@@ -202,12 +219,12 @@ PRIVATE struct codec_db_entry codec_db[] = {
 	{ "cp921",                    CODEC_CP921 },
 	{ "cp922",                    CODEC_CP922 },
 	{ "cp991",                    CODEC_CP667 },
+	{ "csa-z243.4-1985-1",        CODEC_ISO646_CA },
+	{ "csa-z243.4-1985-2",        CODEC_ISO646_CA2 },
+	{ "csa-z243.419851",          CODEC_ISO646_CA },
+	{ "csa-z243.419852",          CODEC_ISO646_CA2 },
 	{ "csa7-1",                   CODEC_ISO646_CA },
 	{ "csa7-2",                   CODEC_ISO646_CA2 },
-	{ "csa_z243.4-1985-1",        CODEC_ISO646_CA },
-	{ "csa_z243.4-1985-2",        CODEC_ISO646_CA2 },
-	{ "csa_z243.419851",          CODEC_ISO646_CA },
-	{ "csa_z243.419852",          CODEC_ISO646_CA2 },
 	{ "csascii",                  CODEC_ASCII },
 	{ "csiso10swedish",           CODEC_ISO646_SE },
 	{ "csiso11swedishfornames",   CODEC_ISO646_SE2 },
@@ -253,24 +270,24 @@ PRIVATE struct codec_db_entry codec_db[] = {
 	{ "cyrillic",                 CODEC_ISO_8859_5 },
 	{ "d7dec",                    CODEC_ISO646_DE },
 	{ "de",                       CODEC_ISO646_DE },
-	{ "din_66003",                CODEC_ISO646_DE },
-	{ "din_66303",                CODEC_DIN_66303 },
+	{ "din-66003",                CODEC_ISO646_DE },
+	{ "din-66303",                CODEC_DIN_66303 },
 	{ "dk",                       CODEC_ISO646_DK },
 	{ "dos-895",                  CODEC_KEYBCS2 },
 	{ "drv8",                     CODEC_DIN_66303 },
+	{ "ds-2089",                  CODEC_ISO646_DK },
 	{ "ds2089",                   CODEC_ISO646_DK },
-	{ "ds_2089",                  CODEC_ISO646_DK },
 	{ "ecma-114",                 CODEC_ISO_8859_6 },
 	{ "ecma-118",                 CODEC_ISO_8859_7 },
-	{ "elot_928",                 CODEC_ISO_8859_7 },
+	{ "elot-928",                 CODEC_ISO_8859_7 },
 	{ "es",                       CODEC_ISO646_ES },
 	{ "es2",                      CODEC_ISO646_ES2 },
 	{ "estonia-iso-8",            CODEC_CP922 },
 	{ "fi",                       CODEC_ISO646_SE },
 	{ "fr",                       CODEC_ISO646_FR },
 	{ "gb",                       CODEC_ISO646_GB },
-	{ "gb_1988-80",               CODEC_ISO646_CN },
-	{ "gb_198880",                CODEC_ISO646_CN },
+	{ "gb-1988-80",               CODEC_ISO646_CN },
+	{ "gb-198880",                CODEC_ISO646_CN },
 	{ "german",                   CODEC_ISO646_DE },
 	{ "greek",                    CODEC_ISO_8859_7 },
 	{ "greek8",                   CODEC_ISO_8859_7 },
@@ -327,6 +344,7 @@ PRIVATE struct codec_db_entry codec_db[] = {
 	{ "iso-10646/ucs4",           CODEC_UTF32 },
 	{ "iso-10646/utf-8",          CODEC_UTF8 },
 	{ "iso-10646/utf8",           CODEC_UTF8 },
+	{ "iso-646.irv:1991",         CODEC_ASCII },
 	{ "iso-8859-1",               CODEC_ISO_8859_1 },
 	{ "iso-8859-10",              CODEC_ISO_8859_10 },
 	{ "iso-8859-11",              CODEC_ISO_8859_11 },
@@ -419,16 +437,15 @@ PRIVATE struct codec_db_entry codec_db[] = {
 	{ "iso646-se2",               CODEC_ISO646_SE2 },
 	{ "iso646-us",                CODEC_ASCII },
 	{ "iso646-yu",                CODEC_ISO646_YU },
-	{ "iso_646.irv:1991",         CODEC_ASCII },
 	{ "it",                       CODEC_ISO646_IT },
-	{ "jis_c6220-1969-ro",        CODEC_ISO646_JP },
-	{ "jis_c62201969ro",          CODEC_ISO646_JP },
-	{ "jis_c6229-1984-b",         CODEC_ISO646_JP_OCR_B },
-	{ "jis_c62291984b",           CODEC_ISO646_JP_OCR_B },
+	{ "jis-c6220-1969-ro",        CODEC_ISO646_JP },
+	{ "jis-c62201969ro",          CODEC_ISO646_JP },
+	{ "jis-c6229-1984-b",         CODEC_ISO646_JP_OCR_B },
+	{ "jis-c62291984b",           CODEC_ISO646_JP_OCR_B },
 	{ "jp",                       CODEC_ISO646_JP },
 	{ "jp-ocr-b",                 CODEC_ISO646_JP_OCR_B },
 	{ "js",                       CODEC_ISO646_YU },
-	{ "jus_i.b1.002",             CODEC_ISO646_YU },
+	{ "jus-i.b1.2",               CODEC_ISO646_YU },
 	{ "kamenicky",                CODEC_KEYBCS2 },
 	{ "kbl",                      CODEC_CP771 },
 	{ "keybcs2",                  CODEC_KEYBCS2 },
@@ -446,8 +463,7 @@ PRIVATE struct codec_db_entry codec_db[] = {
 	{ "l6",                       CODEC_ISO_8859_10 },
 	{ "l7",                       CODEC_ISO_8859_13 },
 	{ "l8",                       CODEC_ISO_8859_14 },
-	{ "latin-0",                  CODEC_ISO_8859_15 },
-	{ "latin-9",                  CODEC_ISO_8859_15 },
+	{ "latin0",                   CODEC_ISO_8859_15 },
 	{ "latin1",                   CODEC_ISO_8859_1 },
 	{ "latin10",                  CODEC_ISO_8859_16 },
 	{ "latin2",                   CODEC_ISO_8859_2 },
@@ -457,6 +473,7 @@ PRIVATE struct codec_db_entry codec_db[] = {
 	{ "latin6",                   CODEC_ISO_8859_10 },
 	{ "latin7",                   CODEC_ISO_8859_13 },
 	{ "latin8",                   CODEC_ISO_8859_14 },
+	{ "latin9",                   CODEC_ISO_8859_15 },
 	{ "lst-1283",                 CODEC_CP774 },
 	{ "lst-1284",                 CODEC_CP772 },
 	{ "lst-1284:1993",            CODEC_CP772 },
@@ -464,57 +481,57 @@ PRIVATE struct codec_db_entry codec_db[] = {
 	{ "mazovia",                  CODEC_CP667 },
 	{ "mik",                      CODEC_MIK },
 	{ "ms-10206",                 CODEC_ISO646_DE },
-	{ "msz_7795.3",               CODEC_ISO646_HU },
-	{ "nc_nc00-10",               CODEC_ISO646_CU },
-	{ "nc_nc00-10:81",            CODEC_ISO646_CU },
-	{ "nc_nc0010",                CODEC_ISO646_CU },
+	{ "msz-7795.3",               CODEC_ISO646_HU },
+	{ "nc-nc0-10",                CODEC_ISO646_CU },
+	{ "nc-nc0-10:81",             CODEC_ISO646_CU },
+	{ "nc-nc10",                  CODEC_ISO646_CU },
 	{ "nec-867",                  CODEC_KEYBCS2 },
-	{ "nf_z_62-010",              CODEC_ISO646_FR },
-	{ "nf_z_62-010_(1973)",       CODEC_ISO646_FR1 },
-	{ "nf_z_62-010_(1983)",       CODEC_ISO646_FR },
-	{ "nf_z_62-010_1973",         CODEC_ISO646_FR1 },
-	{ "nf_z_62-010_1983",         CODEC_ISO646_FR },
-	{ "nf_z_62010",               CODEC_ISO646_FR },
-	{ "nf_z_62010_1973",          CODEC_ISO646_FR1 },
+	{ "nf-z-62-10",               CODEC_ISO646_FR },
+	{ "nf-z-62-10-(1973)",        CODEC_ISO646_FR1 },
+	{ "nf-z-62-10-(1983)",        CODEC_ISO646_FR },
+	{ "nf-z-62-10-1973",          CODEC_ISO646_FR1 },
+	{ "nf-z-62-10-1983",          CODEC_ISO646_FR },
+	{ "nf-z-62010",               CODEC_ISO646_FR },
+	{ "nf-z-62010-1973",          CODEC_ISO646_FR1 },
 	{ "no",                       CODEC_ISO646_NO },
 	{ "no2",                      CODEC_ISO646_NO2 },
-	{ "ns_4551-1",                CODEC_ISO646_NO },
-	{ "ns_4551-2",                CODEC_ISO646_NO2 },
-	{ "ns_45511",                 CODEC_ISO646_NO },
-	{ "ns_45512",                 CODEC_ISO646_NO2 },
-	{ "oem-720",                  CODEC_CP720 },
-	{ "oem-737",                  CODEC_CP737 },
-	{ "oem-775",                  CODEC_CP775 },
-	{ "oem-850",                  CODEC_CP850 },
-	{ "oem-855",                  CODEC_CP855 },
-	{ "oem-857",                  CODEC_CP857 },
-	{ "oem-858",                  CODEC_CP858 },
-	{ "oem-860",                  CODEC_CP860 },
-	{ "oem-861",                  CODEC_CP861 },
-	{ "oem-862",                  CODEC_CP862 },
-	{ "oem-863",                  CODEC_CP863 },
-	{ "oem-865",                  CODEC_CP865 },
-	{ "oem-869",                  CODEC_CP869 },
-	{ "oem-us",                   CODEC_CP437 },
-	{ "osf00010020",              CODEC_ASCII },
-	{ "osf00010100",              CODEC_UTF16 },
-	{ "osf00010101",              CODEC_UTF16 },
-	{ "osf00010102",              CODEC_UTF16 },
-	{ "osf00010104",              CODEC_UTF32 },
-	{ "osf00010105",              CODEC_UTF32 },
-	{ "osf00010106",              CODEC_UTF32 },
-	{ "osf05010001",              CODEC_UTF8 },
+	{ "ns-4551-1",                CODEC_ISO646_NO },
+	{ "ns-4551-2",                CODEC_ISO646_NO2 },
+	{ "ns-45511",                 CODEC_ISO646_NO },
+	{ "ns-45512",                 CODEC_ISO646_NO2 },
+	{ "oem720",                   CODEC_CP720 },
+	{ "oem737",                   CODEC_CP737 },
+	{ "oem775",                   CODEC_CP775 },
+	{ "oem850",                   CODEC_CP850 },
+	{ "oem855",                   CODEC_CP855 },
+	{ "oem857",                   CODEC_CP857 },
+	{ "oem858",                   CODEC_CP858 },
+	{ "oem860",                   CODEC_CP860 },
+	{ "oem861",                   CODEC_CP861 },
+	{ "oem862",                   CODEC_CP862 },
+	{ "oem863",                   CODEC_CP863 },
+	{ "oem865",                   CODEC_CP865 },
+	{ "oem869",                   CODEC_CP869 },
+	{ "oemus",                    CODEC_CP437 },
+	{ "osf10020",                 CODEC_ASCII },
 	{ "osf100201b5",              CODEC_CP437 },
+	{ "osf10100",                 CODEC_UTF16 },
+	{ "osf10101",                 CODEC_UTF16 },
+	{ "osf10102",                 CODEC_UTF16 },
+	{ "osf10104",                 CODEC_UTF32 },
+	{ "osf10105",                 CODEC_UTF32 },
+	{ "osf10106",                 CODEC_UTF32 },
+	{ "osf5010001",               CODEC_UTF8 },
 	{ "pc-multilingual-850+euro", CODEC_CP858 },
 	{ "pt",                       CODEC_ISO646_PT },
 	{ "pt2",                      CODEC_ISO646_PT2 },
-	{ "rst-2018-91 ",             CODEC_CP1125 },
+	{ "rst-2018-91",              CODEC_CP1125 },
 	{ "ruscii",                   CODEC_CP1125 },
 	{ "ruslat",                   CODEC_CP3012 },
 	{ "se",                       CODEC_ISO646_SE },
 	{ "se2",                      CODEC_ISO646_SE2 },
-	{ "sen_850200_b",             CODEC_ISO646_SE },
-	{ "sen_850200_c",             CODEC_ISO646_SE2 },
+	{ "sen-850200-b",             CODEC_ISO646_SE },
+	{ "sen-850200-c",             CODEC_ISO646_SE2 },
 	{ "ss636127",                 CODEC_ISO646_SE },
 	{ "ucs-2",                    CODEC_UTF16 },
 	{ "ucs-2be",                  CODEC_UTF16BE },
@@ -543,11 +560,108 @@ PRIVATE struct codec_db_entry codec_db[] = {
 	{ "utf32be",                  CODEC_UTF32BE },
 	{ "utf32le",                  CODEC_UTF32LE },
 	{ "utf8",                     CODEC_UTF8 },
-	{ "wchar_t",                  CODEC_WCHAR_T },
+	{ "wchar-t",                  CODEC_WCHAR_T },
 	{ "yu",                       CODEC_ISO646_YU },
 };
 /*[[[end]]]*/
 
+
+/* Try to normalize the name of the given codec:
+ * 
+ * - Prefix: "OEM" <SEP> <NUMBER>    --> "OEM" <NUMBER>
+ * - Prefix: "IBM" <SEP> <NUMBER>    --> "IBM" <NUMBER>
+ * - Prefix: "CP" <SEP> <NUMBER>     --> "CP" <NUMBER>
+ * - Prefix: "LATIN" <SEP> <NUMBER>  --> "LATIN" <NUMBER>
+ * - Prefix: "L" <SEP> <NUMBER>      --> "L" <NUMBER>
+ * - Replace "_" and " " with "-"; <SEP> can be one of "_", "-" or " "
+ * - Leading 0s are removed from embedded digit-sequences:
+ *    - "abc1002def" --> "abc1002def"
+ *    - "abc0123def" --> "abc123def"
+ *    - "abc0000def" --> "abc0def"
+ *    - "abc0def"    --> "abc0def"
+ *
+ * Examples:
+ *   - "OEM-0123"  --->  "OEM123"
+ *   - "OEM_0123"  --->  "OEM123"
+ *   - "OEM 0123"  --->  "OEM123"
+ */
+PRIVATE WUNUSED NONNULL((1, 2)) bool
+NOTHROW_NCX(FCALL libiconv_normalize_codec_name)(char buf[CODE_NAME_MAXLEN + 1],
+                                                 char const *__restrict name) {
+#define issep(ch) ((ch) == '-' || (ch) == '_' || (ch) == ' ')
+	char *ptr, *end;
+	ptr = buf;
+	end = buf + CODE_NAME_MAXLEN;
+	while (isspace(*name))
+		++name;
+	if ((name[0] == 'O' || name[0] == 'o') &&
+	    (name[1] == 'E' || name[1] == 'e') &&
+	    (name[2] == 'M' || name[2] == 'm') &&
+	    issep(name[3]) && isdigit(name[4])) {
+		/* Convert: `OEM-xxx' | `OEM_xxx' -> `OEMxxx' */
+		*ptr++ = 'o';
+		*ptr++ = 'e';
+		*ptr++ = 'm';
+		name += 4;
+	} else if ((name[0] == 'I' || name[0] == 'i') &&
+	           (name[1] == 'B' || name[1] == 'b') &&
+	           (name[2] == 'M' || name[2] == 'm') &&
+	           issep(name[3]) && isdigit(name[4])) {
+		/* Convert: `IBM-xxx' | `IBM_xxx' -> `IBMxxx' */
+		*ptr++ = 'i';
+		*ptr++ = 'b';
+		*ptr++ = 'm';
+		name += 4;
+	} else if ((name[0] == 'C' || name[0] == 'c') &&
+	           (name[1] == 'P' || name[1] == 'p') &&
+	           issep(name[2]) && isdigit(name[3])) {
+		/* Convert: `CP-xxx' | `CP_xxx' -> `CPxxx' */
+		*ptr++ = 'c';
+		*ptr++ = 'p';
+		name += 3;
+	} else if ((name[0] == 'L' || name[0] == 'l') &&
+	           (name[1] == 'A' || name[1] == 'a') &&
+	           (name[2] == 'T' || name[2] == 't') &&
+	           (name[3] == 'I' || name[3] == 'i') &&
+	           (name[4] == 'N' || name[4] == 'n') &&
+	           issep(name[5]) && isdigit(name[6])) {
+		/* Convert: `LATIN-xxx' | `LATIN_xxx' -> `LATINxxx' */
+		*ptr++ = 'l';
+		*ptr++ = 'a';
+		*ptr++ = 't';
+		*ptr++ = 'i';
+		*ptr++ = 'n';
+		name += 6;
+	} else if ((name[0] == 'L' || name[0] == 'l') &&
+	           issep(name[1]) && isdigit(name[2])) {
+		/* Convert: `l-xxx' | `l_xxx' -> `lxxx' */
+		*ptr++ = 'l';
+		name += 2;
+	}
+
+	/* Convert the rest of the name. */
+	for (;;) {
+		char ch;
+		ch = *name++;
+		if (!ch)
+			break;
+		/* Generally, if `name' contains a sequence of numbers that starts
+		 * with at least  one leading `0',  re-attempt the search  without
+		 * those leading zero-digits. */
+		if (ch == '0' && isdigit(*name) &&
+		    (ptr == buf || !isdigit(ptr[-1])))
+			continue; /* Skip leading 0s in number-strings. */
+		/* '-', '_' and ' ' work interchangeably. */
+		if (ch == '_' || ch == ' ')
+			ch = '-';
+		if (ptr >= end)
+			return false; /* Name too long */
+		*ptr++ = ch;
+	}
+
+	*ptr = '\0';
+	return true;
+}
 
 
 /* Return the ID of the codec associated with  `name'
@@ -555,6 +669,8 @@ PRIVATE struct codec_db_entry codec_db[] = {
 INTERN ATTR_PURE WUNUSED NONNULL((1)) unsigned int
 NOTHROW_NCX(FCALL libiconv_codecbyname)(char const *__restrict name) {
 	size_t lo, hi;
+	char normal_name[CODE_NAME_MAXLEN + 1];
+again:
 	lo = 0;
 	hi = COMPILER_LENOF(codec_db);
 	while (lo < hi) {
@@ -571,16 +687,14 @@ NOTHROW_NCX(FCALL libiconv_codecbyname)(char const *__restrict name) {
 			return codec_db[i].cdbe_codec;
 		}
 	}
-	/* TODO: "ISO-IR-001" --> same as "ISO-IR-1" */
-	/* TODO: "cp-01234" --> same as "cp01234" */
-	/* TODO: "cp01234" --> same as "cp1234" */
-	/* TODO: Generally, if `name' contains a sequence of numbers that starts
-	 *       with at least  one leading `0',  re-attempt the search  without
-	 *       those leading zero-digits.
-	 *       Once implemented, adjust the name generator to remove leading
-	 *       zeroes from codec names in the database. */
-	/* TODO: '-' and '_' should work interchangeably. */
 
+	/* If not done alraedy, try to normalize the codec name */
+	if (name != normal_name) {
+		if (libiconv_normalize_codec_name(normal_name, name)) {
+			name = normal_name;
+			goto again;
+		}
+	}
 	return CODEC_UNKNOWN;
 }
 

@@ -49,40 +49,40 @@ enum {
 	CODEC_UTF16BE,     /* "UTF16BE", "UTF-16BE", "UCS-2BE", "UNICODEBIG" */
 	CODEC_UTF32LE,     /* "UTF32LE", "UTF-32LE", "UCS-4LE" */
 	CODEC_UTF32BE,     /* "UTF32BE", "UTF-32BE", "UCS-4BE" */
-	CODEC_CP437,       /* "IBM437", "cp437", "437", "csPC8CodePage437", "OEM-US", "OSF100201B5" */
+	CODEC_CP437,       /* "IBM437", "cp437", "437", "csPC8CodePage437", "OEMUS", "OSF100201B5" */
 	CODEC_CP667,       /* "MAZOVIA", "cp667", "cp790", "cp991", "MAZ" */
 	CODEC_CP668,       /* "cp668" */
 	CODEC_CP708,       /* "cp708", "IBM708" */
-	CODEC_CP720,       /* "cp720", "IBM720", "OEM-720" */
-	CODEC_CP737,       /* "cp737", "IBM737", "OEM-737" */
+	CODEC_CP720,       /* "cp720", "IBM720", "OEM720" */
+	CODEC_CP737,       /* "cp737", "IBM737", "OEM737" */
 	CODEC_CP770,       /* "cp770" */
 	CODEC_CP771,       /* "cp771", "KBL" */
 	CODEC_CP772,       /* "cp772", "LST-1284", "LST-1284:1993", "cp1119" */
 	CODEC_CP773,       /* "cp773" */
 	CODEC_CP774,       /* "cp774", "cp1118", "IBM1118", "LST-1283" */
-	CODEC_CP775,       /* "cp775", "IBM775", "OEM-775" */
+	CODEC_CP775,       /* "cp775", "IBM775", "OEM775" */
 	CODEC_CP808,       /* "cp808" */
 	CODEC_CP848,       /* "cp848" */
 	CODEC_CP849,       /* "cp849" */
-	CODEC_CP850,       /* "cp850", "IBM850", "850", "csPC850Multilingual", "OEM-850" */
+	CODEC_CP850,       /* "cp850", "IBM850", "850", "csPC850Multilingual", "OEM850" */
 	CODEC_CP851,       /* "cp851", "IBM851", "851" */
 	CODEC_CP852,       /* "cp852", "IBM852", "852", "csPCp852" */
 	CODEC_CP853,       /* "cp853", "IBM853" */
-	CODEC_CP855,       /* "cp855", "IBM855", "855", "OEM-855" */
+	CODEC_CP855,       /* "cp855", "IBM855", "855", "OEM855" */
 	CODEC_CP856,       /* "cp856", "IBM856" */
-	CODEC_CP857,       /* "cp857", "IBM857", "857", "OEM-857" */
-	CODEC_CP858,       /* "cp858", "IBM858", "OEM-858", "PC-Multilingual-850+euro" */
+	CODEC_CP857,       /* "cp857", "IBM857", "857", "OEM857" */
+	CODEC_CP858,       /* "cp858", "IBM858", "OEM858", "PC-Multilingual-850+euro" */
 	CODEC_CP859,       /* "cp859", "IBM859" */
-	CODEC_CP860,       /* "cp860", "IBM860", "860", "OEM-860" */
-	CODEC_CP861,       /* "cp861", "IBM861", "861", "OEM-861", "cp-is" */
-	CODEC_CP862,       /* "cp862", "IBM862", "862", "OEM-862", "csPC862LatinHebrew" */
-	CODEC_CP863,       /* "cp863", "IBM863", "863", "OEM-863" */
+	CODEC_CP860,       /* "cp860", "IBM860", "860", "OEM860" */
+	CODEC_CP861,       /* "cp861", "IBM861", "861", "OEM861", "cp-is" */
+	CODEC_CP862,       /* "cp862", "IBM862", "862", "OEM862", "csPC862LatinHebrew" */
+	CODEC_CP863,       /* "cp863", "IBM863", "863", "OEM863" */
 	CODEC_CP864,       /* "cp864", "IBM864" */
-	CODEC_CP865,       /* "cp865", "IBM865", "865", "OEM-865" */
+	CODEC_CP865,       /* "cp865", "IBM865", "865", "OEM865" */
 	CODEC_CP866,       /* "cp866", "866", "IBM866" */
 	CODEC_CP867,       /* "cp867" */
 	CODEC_CP868,       /* "cp868", "IBM868", "cp-ar" */
-	CODEC_CP869,       /* "cp869", "IBM869", "OEM-869", "869", "cp-gr" */
+	CODEC_CP869,       /* "cp869", "IBM869", "OEM869", "869", "cp-gr" */
 	CODEC_CP872,       /* "cp872" */
 	CODEC_CP897,       /* "cp897" */
 	CODEC_CP901,       /* "cp901" */
@@ -96,7 +96,7 @@ enum {
 	CODEC_CP1098,      /* "cp1098", "IBM1098" */
 	CODEC_CP1116,      /* "cp1116", "IBM1116" */
 	CODEC_CP1117,      /* "cp1117", "IBM1117" */
-	CODEC_CP1125,      /* "cp1125", "RST-2018-91 ", "CP866U", "CP866NAV", "RUSCII" */
+	CODEC_CP1125,      /* "cp1125", "RST-2018-91", "CP866U", "CP866NAV", "RUSCII" */
 	CODEC_CP1131,      /* "cp1131" */
 	CODEC_CP17248,     /* "cp17248" */
 	CODEC_KOI_8_N1,    /* "KOI-8-N1" */
@@ -118,7 +118,7 @@ enum {
 	CODEC_ISO_8859_11, /* "ISO-8859-11" */
 	CODEC_ISO_8859_13, /* "ISO-8859-13", "iso-ir-179", "csISOLatin7", "latin7", "l7" */
 	CODEC_ISO_8859_14, /* "ISO-8859-14", "iso-ir-199", "iso-celtic", "latin8", "l8" */
-	CODEC_ISO_8859_15, /* "ISO-8859-15", "latin-9", "latin-0" */
+	CODEC_ISO_8859_15, /* "ISO-8859-15", "latin9", "latin0" */
 	CODEC_ISO_8859_16, /* "ISO-8859-16", "iso-ir-226", "latin10", "l10" */
 	CODEC_ISO_IR_182,  /* "iso-ir-182" */
 	CODEC_ISO_IR_197,  /* "iso-ir-197" */
