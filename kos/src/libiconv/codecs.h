@@ -68,6 +68,16 @@ DECL_BEGIN
  */
 
 
+/* TODO:
+ *   - Codec "c-escape" for encoding/decoding using the C \-notation
+ *     - Also  2  sub-codecs "c-escape-chr"  and c-escape-str"  that add
+ *       additional  '  or "  pairs during  encoding,  as well  as parse
+ *       surrounding pairs during decoding (and stop decoding data  with
+ *       an error when more input data is fed after the trailing ' or ")
+ *   - Codec "xml-escape" for &lt;xml-style&gt; escaping (https://en.wikipedia.org/wiki/XML)
+ *   - Codec "uri-escape" for %3Curi-style%3E escaping (https://en.wikipedia.org/wiki/Percent-encoding)
+ */
+
 
 /* Codec IDs. */
 enum {
@@ -361,7 +371,7 @@ NOTHROW_NCX(FCALL libiconv_getcodecname)(unsigned int id, unsigned int nth);
 /* Same as `libiconv_codecbyname()', but also parse possible flag-relation options. */
 INTDEF WUNUSED NONNULL((1)) unsigned int
 NOTHROW_NCX(FCALL libiconv_codec_and_flags_byname)(char const *__restrict name,
-                                                   /*[in|out]*/ uintptr_t *__restrict pflags);
+                                                   /*[in|out]*/ uintptr_half_t *__restrict pflags);
 
 DECL_END
 

@@ -54,8 +54,14 @@ INTDEF int NOTHROW_NCX(LIBCCALL libiconv_stdiconv_close)(struct stdiconv *self);
  *
  * @param: self:         Conversion controller. (s.a. `iconv_open(3)')
  * @param: inbuf:        [0..*inbytesleft][0..1] When NULL (or pointing to NULL),
- *                       do nothing. Otherwise, pointer to the start of data that
- *                       has yet to be converted. (updated during the call)
+ *                       flush the encoder to  check that no multi-byte  sequence
+ *                       is currently in progress, as  well as output bytes  that
+ *                       might be needed to reset  the shift state; if outbuf  is
+ *                       NULL  or points to NULL, then that data is silently send
+ *                       into oblivion. Otherwise, pointer  to the start of  data
+ *                       that has yet to be converted. (updated during the  call)
+ *                       s.a. `iconv_encode_flush()'
+ *                       s.a. `iconv_decode_isshiftzero()'
  * @param: inbytesleft:  [1..1][valid_if(inbuf)]
  *                       [in]  The max # of bytes to read from `*inbuf'
  *                       [out] # of bytes not taken  from `*inbuf'.
@@ -73,11 +79,10 @@ INTDEF int NOTHROW_NCX(LIBCCALL libiconv_stdiconv_close)(struct stdiconv *self);
  *                                     to the start of said sequence, but *inbytesleft
  *                                     is left unchanged)
  * @return: (size_t)-1: [errno=EINVAL] Incomplete multi-byte sequence encountered. This
- *                                     error doesn't happen  on KOS because  incomplete
- *                                     sequences are  handled by  remembering the  part
- *                                     already encountered and  expecting a later  call
- *                                     to  provide  the missing  part. If  that doesn't
- *                                     happen,  then it's an invalid sequence (EILSEQ).
+ *                                     error only happens when `!inbuf || !*inbuf',  in
+ *                                     which case a flush operation is performed. If it
+ *                                     turns out that input data didn't properly finish
+ *                                     a multi-byte sequence, then this error is set.
  * @return: (size_t)-1: [errno=E2BIG]  Output buffer is too small. (Arguments are left
  *                                     unchanged). */
 INTDEF size_t

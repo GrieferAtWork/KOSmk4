@@ -63,16 +63,15 @@ union iconv_decode_data {
 };
 
 union iconv_encode_data {
-	struct __mbstate ied_utf8; /* UTF-8 input data buffer. */
 	struct {
-		struct __mbstate ic_utf8; /* UTF-8 input data buffer. */
+		struct __mbstate ied_utf8; /* UTF-8 input data buffer. */
 		union {
-			struct iconv_codepage const        *ic_cp;    /* [1..1][const] Code page (for 8-bit codecs) */
-			struct iconv_7l_codepage const     *ic_cp7l;  /* [1..1][const] Code page (for 7l codecs) */
-			struct iconv_7h_codepage const     *ic_cp7h;  /* [1..1][const] Code page (for 7h codecs) */
-			struct iconv_iso646_codepage const *ic_cp646; /* [1..1][const] Code page (for iso686 codecs) */
+			struct iconv_codepage const        *ied_cp;    /* [1..1][const] Code page (for 8-bit codecs) */
+			struct iconv_7l_codepage const     *ied_cp7l;  /* [1..1][const] Code page (for 7l codecs) */
+			struct iconv_7h_codepage const     *ied_cp7h;  /* [1..1][const] Code page (for 7h codecs) */
+			struct iconv_iso646_codepage const *ied_cp646; /* [1..1][const] Code page (for iso686 codecs) */
 		};
-	} ied_cp;
+	};
 	void *__ied_pad[_ICONV_ENCODE_OPAQUE_POINTERS];
 };
 #endif /* LIBICONV_EXPOSE_INTERNAL */
@@ -150,30 +149,91 @@ union iconv_encode_data {
  * can use other pformatprinter-compatible interfaces everywhere, that prototype remains
  * accepted everything, even when it's not entirely correct.
  *
+ *
+ * pformatprinter return values:
+ *  - All encode/decode operations always require the user to provide an output  printer
+ *    In  turn, the return  value of the input  printers provided to  the caller are the
+ *    accumulations of calls to the output printer, with the usual handling for negative
+ *    values.
+ *    The only addition made is that `-<number-of-input-bytes-not-parsed>' is  returned
+ *    in  `ICONV_ERR_ERRNO'-mode when the input sequence cannot be decoded. This number
+ *    relates to the `datasize' argument passed in the last call to the decoder's input
+ *    function, thus allowing the  caller to figure out  the exact byte location  where
+ *    the error happened:
+ *    >> // Decode `data' and output to `out_printer'. Decode errors are handled locally.
+ *    >> ssize_t decode_and_print(pformatpritner out_printer, void *out_arg,
+ *    >>                          char const *data, size_t size,
+ *    >>                          char const *data_codec) {
+ *    >>     ssize_t result;
+ *    >>     struct iconv_decode decode;
+ *    >>     struct iconv_printer in;
+ *    >>     iconv_decode_init(&decode, &in, data_codec, out_printer, out_arg,
+ *    >>                       ICONV_ERR_ERROR); // Error-only (don't modify `errno')
+ *    >>     result = (*in.ii_printer)(in.ii_arg, data, size);
+ *    >>     if (result < 0) {
+ *    >>         // This can happen for one of 2 reason: Either there was a decode error,
+ *    >>         // or the `out_printer' given by our caller returned a negative value
+ *    >>         // that is equal to `result'.
+ *    >>         // If it's the former, `ICONV_HASERR' is set. If not, that flag will
+ *    >>         // still be cleared. But note the case where `data_codec' is `utf-8'!
+ *    >>         // In that case, error handling will still be up to `out_printer',
+ *    >>         // since the library handles the INPUT_CODEC=OUTPUT_CODEC by making it
+ *    >>         // so that `in.ii_printer == out_printer'.
+ *    >>         // IOW: `out_printer' should still do its own error checking and
+ *    >>         //      shouldn't blindly believe that its input is valid UTF-8!
+ *    >>         if (decode.icd_flags & ICONV_HASERR) {
+ *    >>             size_t error_offset = (size_t)(size + result);
+ *    >>             fprintf(stderr, "Failed to decode byte at offset %" PRIuSIZ ": %#" PRIx8 "\n"
+ *    >>                     error_offset, data[error_offset]);
+ *    >>             abort();
+ *    >>         }
+ *    >>     } else {
+ *    >>         // In this case, `result' is equal to the sum of return vaules from `out_printer'
+ *    >>     }
+ *    >>     return result;
+ *    >> }
+ *    The  same also goes for encode functions, though in this case a negative offset from
+ *    the  end of the input buffer is returned  both when input data isn't valid UTF-8, in
+ *    which  case the offset points to the start  of the byte sequence that doesn't form a
+ *    valid UTF-8 character,  _OR_ to the  start of  a _valid_ utf-8  sequence, that  just
+ *    happens to not be encodable  in the target codec.  Which of these two  possibilities
+ *    is the case can't be  determined by the encoder's flags  alone, and can't easily  be
+ *    tested either since doing so may rely on the internal mbstate_t of the encoder which
+ *    isn't exposed and might be non-empty in case the invalid/unencodable utf-8  sequence
+ *    isn't fully contained within the same data blob.
+ *
  */
 
 
 
 /* ICONV decode/encode flags. */
 #define ICONV_ERRMASK       0x0000000f /* Mask for error code. */
-#define ICONV_ERR_ERRNO              0 /* Set `errno=EILSEQ'  and have  the pformatprinter-compatible  function
-                                        * return  `-1', thus signaling that an error happened. This will happen
-                                        * forever until the iconv_encode/iconv_decode object is re-initialized. */
-#define ICONV_ERR_REPLACE            1 /* Replace characters that cannot be encoded/decoded with ascii  '?'
+#define ICONV_ERR_ERRNO              0 /* Set the `ICONV_HASERR' flag, make `errno=EILSEQ', and have the pformatprinter
+                                        * function return `-<number-of-input-bytes-not-parsed>', thus signaling that an
+                                        * error happened. This will happen forever until the  iconv_encode/iconv_decode
+                                        * object is re-initialized (or you  clear `ICONV_HASERR', though you  shouldn't
+                                        * do that since it doesn't re-initialize other internal components).
+                                        * NOTE: When  `ICONV_HASERR' gets set and a negative value is returned, there
+                                        *       is also a guaranty that the  output printer didn't return a  negative
+                                        *       value, meaning you can use the `ICONV_HASERR' flag to determine where
+                                        *       an  error came from, and the actual  returned value to figure out how
+                                        *       much of the input data could not be parsed. */
+#define ICONV_ERR_ERROR              1 /* Same as `ICONV_ERR_ERRNO', but leave `errno' unchanged. */
+#define ICONV_ERR_DISCARD            2 /* Data that cannot be encoded/decoded is silently discarded. */
+#define ICONV_ERR_REPLACE            3 /* Replace characters that cannot be encoded/decoded with ascii  '?'
                                         * If that character also doesn't exist in the target codec (this is
                                         * only  the case  for `iconv_encode'),  then use  some other codec-
                                         * specific replacement character. */
-#define ICONV_ERR_IGNORE             2 /* Forward data that cannot be encoded/decoded as-is, but note that
+#define ICONV_ERR_IGNORE             4 /* Forward data that cannot be encoded/decoded as-is, but note that
                                         * doing this will most definitely result in data corruption as the
                                         * result will be encoded data mixed with data that's not encoded. */
-#define ICONV_ERR_DISCARD            3 /* Data that cannot be encoded/decoded is silently discarded. */
 #define ICONV_ERR_TRANSLIT  0x00000010 /* FLAG: Try to perform transliteration (s.a. `unicode_fold(3)') when
                                         *       a unicode character cannot be  encoded in the target  codec.
                                         *       If successful, characters  will be replaced  by one or  more
                                         *       similar-looking  characters that can (hopefully) be encoded.
                                         * NOTE: This flag is meaningless for `iconv_decode', since anything
                                         *       can be encoded in the  UTF-8 stream generated by  decoders. */
-#define ICONV_HASERR        0x00000020 /* Used for `ICONV_ERR_ERRNO': keep setting EILSEQ and returning -1. */
+#define ICONV_HASERR        0x00000020 /* Used for `ICONV_ERR_ERRNO': keep setting EILSEQ and returning `-datasize'. */
 /* NOTE: Other flags may have arbitrary meaning depending on the codec used. */
 
 
@@ -188,10 +248,12 @@ struct iconv_printer {
 struct iconv_decode {
 	/* Convert from an arbitrary codec to UTF-8 */
 	struct iconv_printer    icd_output; /* [1..1][in][const] Output printer. */
-	__uintptr_t             icd_flags;  /* [const] Error mode and flags. */
+	__UINTPTR_HALF_TYPE__   icd_flags;  /* [const] Error mode and flags. */
 #ifdef LIBICONV_EXPOSE_INTERNAL
+	__UINTPTR_HALF_TYPE__   icd_codec;  /* [const] Internal codec ID. */
 	union iconv_decode_data icd_data;   /* Internal data. */
 #else /* LIBICONV_EXPOSE_INTERNAL */
+	__UINTPTR_HALF_TYPE__ __icd_codec;  /* [const] Internal codec ID. */
 	void                 *__icd_opaque[_ICONV_DECODE_OPAQUE_POINTERS]; /* [?..?] Codec-specific data fields. */
 #endif /* !LIBICONV_EXPOSE_INTERNAL */
 };
@@ -224,9 +286,28 @@ __NOTHROW_NCX(iconv_decode_init)(/*in|out*/ struct iconv_decode *__restrict self
                                  int error_mode __DFL(ICONV_ERR_ERRNO)) {
 	self->icd_output.ii_printer = output_printer;
 	self->icd_output.ii_arg     = output_printer_arg;
-	self->icd_flags             = (__uintptr_t)(unsigned int)error_mode;
+	self->icd_flags             = (__UINTPTR_HALF_TYPE__)(unsigned int)error_mode;
 	return _iconv_decode_init(self, input, input_codec_name);
 }
+#endif /* LIBICONV_WANT_PROTOTYPES */
+
+/* Check  if the given encoder is in its default (zero) shift state. If it isn't,
+ * then that must mean that it's still waiting for more input data to arrive, and
+ * that  you should either feed it said data,  or deal with the fact that there's
+ * something missing in your input.
+ * WARNING: This  function DOESN'T work  when the given decoder  is used to parse
+ *          UTF-8 input! This is because special optimizations are performed when
+ *          decoding  UTF-8 (since  decoders also  always output  UTF-8). In this
+ *          case this function will always return `true'
+ * Hint: the optimization is that  `iconv_decode_init:input == self->icd_output',
+ *       so if you want to programmatically handle this case you can check for it
+ *       by doing `self->icd_output.ii_printer == :input->ii_printer', where  the
+ *       given `:input' is the one filled in by `iconv_decode_init(3)' */
+typedef __ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1)) __BOOL
+/*__NOTHROW_NCX*/ (LIBICONV_CC *LPICONV_DECODE_ISSHIFTZERO)(struct iconv_decode const *__restrict self);
+#ifdef LIBICONV_WANT_PROTOTYPES
+LIBICONV_DECL __ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1)) __BOOL
+__NOTHROW_NCX(LIBICONV_CC iconv_decode_isshiftzero)(struct iconv_decode const *__restrict self);
 #endif /* LIBICONV_WANT_PROTOTYPES */
 /************************************************************************/
 
@@ -242,10 +323,12 @@ __NOTHROW_NCX(iconv_decode_init)(/*in|out*/ struct iconv_decode *__restrict self
 struct iconv_encode {
 	/* Convert from UTF-8 to an arbitrary codec */
 	struct iconv_printer    ice_output; /* [1..1][in][const] Output printer. */
-	__uintptr_t             ice_flags;  /* [const] Error mode and flags. */
+	__UINTPTR_HALF_TYPE__   ice_flags;  /* [const] Error mode and flags. */
 #ifdef LIBICONV_EXPOSE_INTERNAL
+	__UINTPTR_HALF_TYPE__   ice_codec;  /* [const] Internal codec ID. */
 	union iconv_encode_data ice_data;   /* Internal data. */
 #else /* LIBICONV_EXPOSE_INTERNAL */
+	__UINTPTR_HALF_TYPE__ __ice_codec;  /* [const] Internal codec ID. */
 	void                 *__ice_opaque[_ICONV_ENCODE_OPAQUE_POINTERS]; /* [?..?] Codec-specific data fields. */
 #endif /* !LIBICONV_EXPOSE_INTERNAL */
 };
@@ -278,9 +361,24 @@ __NOTHROW_NCX(iconv_encode_init)(/*in|out*/ struct iconv_encode *__restrict self
                                  int error_mode __DFL(ICONV_ERR_ERRNO)) {
 	self->ice_output.ii_printer = output_printer;
 	self->ice_output.ii_arg     = output_printer_arg;
-	self->ice_flags             = (__uintptr_t)(unsigned int)error_mode;
+	self->ice_flags             = (__UINTPTR_HALF_TYPE__)(unsigned int)error_mode;
 	return _iconv_encode_init(self, input, output_codec_name);
 }
+#endif /* LIBICONV_WANT_PROTOTYPES */
+
+/* Reset the internal shift state to its  default and print the associated byte  sequence
+ * to the output printer of the encode descriptor, returning the sum of its return values
+ * or the first negative return value.
+ * This  function should be  called once all input  data has been  printed and will ensure
+ * that input didn't end with an incomplete byte sequence, and that output doesn't contain
+ * any unmatched shift-state changes.
+ * Simply  call this once you're out of input  and treat its return value like you're
+ * treating the return values of the input printer returned by `iconv_encode_init(3)' */
+typedef __ATTR_NONNULL((1)) __ssize_t
+/*__NOTHROW_NCX*/ (LIBICONV_CC *LPICONV_ENCODE_FLUSH)(struct iconv_encode *__restrict self);
+#ifdef LIBICONV_WANT_PROTOTYPES
+LIBICONV_DECL __ATTR_NONNULL((1)) __ssize_t
+__NOTHROW_NCX(LIBICONV_CC iconv_encode_flush)(struct iconv_encode *__restrict self);
 #endif /* LIBICONV_WANT_PROTOTYPES */
 /************************************************************************/
 
@@ -331,7 +429,7 @@ __NOTHROW_NCX(iconv_transcode_init)(/*in|out*/ struct iconv_transcode *__restric
                                     int error_mode __DFL(ICONV_ERR_ERRNO)) {
 	self->it_encode.ice_output.ii_printer = output_printer;
 	self->it_encode.ice_output.ii_arg     = output_printer_arg;
-	self->it_encode.ice_flags             = (__uintptr_t)(unsigned int)error_mode;
+	self->it_encode.ice_flags             = (__UINTPTR_HALF_TYPE__)(unsigned int)error_mode;
 	return _iconv_transcode_init(self, input, input_codec_name, output_codec_name);
 }
 #endif /* LIBICONV_WANT_PROTOTYPES */

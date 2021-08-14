@@ -42,18 +42,15 @@
 
 DECL_BEGIN
 
-STATIC_ASSERT(offsetof(struct iconv_encode, ice_output) == offsetof(struct iconv_decode, icd_output));
-STATIC_ASSERT(offsetof(struct iconv_encode, ice_flags) == offsetof(struct iconv_decode, icd_flags));
 STATIC_ASSERT(sizeof(union iconv_decode_data) == (_ICONV_DECODE_OPAQUE_POINTERS * sizeof(void *)));
 STATIC_ASSERT(sizeof(union iconv_encode_data) == (_ICONV_ENCODE_OPAQUE_POINTERS * sizeof(void *)));
 
 INTERN NONNULL((1, 2)) int
 NOTHROW_NCX(CC libiconv_decode_init)(/*in|out*/ struct iconv_decode *__restrict self,
-                                     /*out*/ struct iconv_printer *__restrict input, /* Accepts `input_codec_name' */
-                                     /*in*/ unsigned int input_codec) {
+                                     /*out*/ struct iconv_printer *__restrict input) {
 	/* By default, the iconv decoder is used as input cookie. */
 	input->ii_arg = self;
-	switch (input_codec) {
+	switch (self->icd_codec) {
 
 	case CODEC_ASCII:
 		if ((self->icd_flags & ICONV_ERRMASK) == ICONV_ERR_IGNORE) {
@@ -82,7 +79,6 @@ NOTHROW_NCX(CC libiconv_decode_init)(/*in|out*/ struct iconv_decode *__restrict 
 		__mbstate_init(&self->icd_data.idd_utf.u_16);
 		break;
 
-
 	case CODEC_UTF32LE:
 		input->ii_printer = (pformatprinter)&libiconv_utf32le_decode;
 		self->icd_data.idd_utf.u_pbc = 0;
@@ -99,25 +95,25 @@ NOTHROW_NCX(CC libiconv_decode_init)(/*in|out*/ struct iconv_decode *__restrict 
 
 	case CODEC_CP_MIN ... CODEC_CP_MAX:
 		/* 8-bit codepage */
-		self->icd_data.idd_cp = libiconv_cp_page(input_codec);
+		self->icd_data.idd_cp = libiconv_cp_page(self->icd_codec);
 		input->ii_printer     = (pformatprinter)&libiconv_cp_decode;
 		break;
 
 	case CODEC_CP7H_MIN ... CODEC_CP7H_MAX:
 		/* 7h codepage */
-		self->icd_data.idd_cp7h = libiconv_cp7h_page(input_codec);
+		self->icd_data.idd_cp7h = libiconv_cp7h_page(self->icd_codec);
 		input->ii_printer       = (pformatprinter)&libiconv_cp7h_decode;
 		break;
 
 	case CODEC_CP7L_MIN ... CODEC_CP7L_MAX:
 		/* 7l codepage */
-		self->icd_data.idd_cp7l = libiconv_cp7l_page(input_codec);
+		self->icd_data.idd_cp7l = libiconv_cp7l_page(self->icd_codec);
 		input->ii_printer       = (pformatprinter)&libiconv_cp7l_decode;
 		break;
 
 	case CODEC_ISO646_MIN ... CODEC_ISO646_MAX:
 		/* iso646 codepage. */
-		self->icd_data.idd_cp646 = libiconv_iso646_page(input_codec);
+		self->icd_data.idd_cp646 = libiconv_iso646_page(self->icd_codec);
 		input->ii_printer        = (pformatprinter)&libiconv_cp646_decode;
 		break;
 
@@ -128,16 +124,49 @@ NOTHROW_NCX(CC libiconv_decode_init)(/*in|out*/ struct iconv_decode *__restrict 
 	return 0;
 }
 
+/* Check  if the given encoder is in its default (zero) shift state. If it isn't,
+ * then that must mean that it's still waiting for more input data to arrive, and
+ * that  you should either feed it said data,  or deal with the fact that there's
+ * something missing in your input.
+ * WARNING: This  function DOESN'T work  when the given decoder  is used to parse
+ *          UTF-8 input! This is because special optimizations are performed when
+ *          decoding  UTF-8 (since  decoders also  always output  UTF-8). In this
+ *          case this function will always return `true'
+ * Hint: the optimization is that  `iconv_decode_init:input == self->icd_output',
+ *       so if you want to programmatically handle this case you can check for it
+ *       by doing `self->icd_output.ii_printer == :input->ii_printer', where  the
+ *       given `:input' is the one filled in by `iconv_decode_init(3)' */
+INTERN ATTR_PURE WUNUSED NONNULL((1)) bool
+NOTHROW_NCX(CC libiconv_decode_isshiftzero)(struct iconv_decode const *__restrict self) {
+	switch (self->icd_codec) {
+
+	case CODEC_UTF16LE:
+	case CODEC_UTF16BE:
+		return self->icd_data.idd_utf.u_pbc == 0 &&
+		       __MBSTATE_ISINIT(&self->icd_data.idd_utf.u_16);
+
+	case CODEC_UTF32LE:
+	case CODEC_UTF32BE:
+		return self->icd_data.idd_utf.u_pbc == 0;
+
+	default:
+		break;
+	}
+	return true;
+}
+
+
+
+
 
 INTERN NONNULL((1, 2)) int
 NOTHROW_NCX(CC libiconv_encode_init)(/*in|out*/ struct iconv_encode *__restrict self,
-                                     /*out*/ struct iconv_printer *__restrict input, /* Accepts `UTF-8' */
-                                     /*in*/ unsigned int output_codec) {
+                                     /*out*/ struct iconv_printer *__restrict input) {
 	/* By default, the iconv encoder is used as input cookie. */
 	input->ii_arg = self;
 	/* Almost all codecs use the utf-8 parser mbstate. */
 	__mbstate_init(&self->ice_data.ied_utf8);
-	switch (output_codec) {
+	switch (self->ice_codec) {
 
 	case CODEC_ASCII:
 		if ((self->ice_flags & ICONV_ERRMASK) != ICONV_ERR_IGNORE ||
@@ -179,26 +208,26 @@ NOTHROW_NCX(CC libiconv_encode_init)(/*in|out*/ struct iconv_encode *__restrict 
 
 	case CODEC_CP_MIN ... CODEC_CP_MAX:
 		/* 8-bit codepage */
-		self->ice_data.ied_cp.ic_cp = libiconv_cp_page(output_codec);
-		input->ii_printer           = (pformatprinter)&libiconv_cp_encode;
+		self->ice_data.ied_cp = libiconv_cp_page(self->ice_codec);
+		input->ii_printer     = (pformatprinter)&libiconv_cp_encode;
 		break;
 
 	case CODEC_CP7H_MIN ... CODEC_CP7H_MAX:
 		/* 7h codepage */
-		self->ice_data.ied_cp.ic_cp7h = libiconv_cp7h_page(output_codec);
-		input->ii_printer             = (pformatprinter)&libiconv_cp7h_encode;
+		self->ice_data.ied_cp7h = libiconv_cp7h_page(self->ice_codec);
+		input->ii_printer       = (pformatprinter)&libiconv_cp7h_encode;
 		break;
 
 	case CODEC_CP7L_MIN ... CODEC_CP7L_MAX:
 		/* 7l codepage */
-		self->ice_data.ied_cp.ic_cp7l = libiconv_cp7l_page(output_codec);
-		input->ii_printer             = (pformatprinter)&libiconv_cp7l_encode;
+		self->ice_data.ied_cp7l = libiconv_cp7l_page(self->ice_codec);
+		input->ii_printer       = (pformatprinter)&libiconv_cp7l_encode;
 		break;
 
 	case CODEC_ISO646_MIN ... CODEC_ISO646_MAX:
 		/* iso646 codepage. */
-		self->ice_data.ied_cp.ic_cp646 = libiconv_iso646_page(output_codec);
-		input->ii_printer = (pformatprinter)&libiconv_cp646_encode;
+		self->ice_data.ied_cp646 = libiconv_iso646_page(self->ice_codec);
+		input->ii_printer        = (pformatprinter)&libiconv_cp646_encode;
 		break;
 
 	default:
@@ -207,6 +236,36 @@ NOTHROW_NCX(CC libiconv_encode_init)(/*in|out*/ struct iconv_encode *__restrict 
 	}
 	return 0;
 }
+
+/* Reset the internal shift state to its  default and print the associated byte  sequence
+ * to the output printer of the encode descriptor, returning the sum of its return values
+ * or the first negative return value.
+ * This  function should be  called once all input  data has been  printed and will ensure
+ * that input didn't end with an incomplete byte sequence, and that output doesn't contain
+ * any unmatched shift-state changes.
+ * Simply  call this once you're out of input  and treat its return value like you're
+ * treating the return values of the input printer returned by `iconv_encode_init(3)' */
+INTERN NONNULL((1)) ssize_t
+NOTHROW_NCX(CC libiconv_encode_flush)(struct iconv_encode *__restrict self) {
+	ssize_t result = 0;
+	/* All encode codecs need a UTF-8 multi-byte state descriptor  so
+	 * that they're able to decode the in-coming UTF-8 data. Here, we
+	 * have to reset that state! */
+	__mbstate_init(&self->ice_data.ied_utf8);
+	switch (self->ice_codec) {
+
+		/* No supported codec currently requires any additional work!
+		 * TODO: This will chance once support for more complicated
+		 *       codecs gets added. */
+
+	default:
+		break;
+	}
+	return result;
+}
+
+
+
 
 
 
@@ -223,10 +282,11 @@ INTERN NONNULL((1, 2, 3)) int
 NOTHROW_NCX(CC _libiconv_decode_init)(/*in|out*/ struct iconv_decode *__restrict self,
                                       /*out*/ struct iconv_printer *__restrict input, /* Accepts `input_codec_name' */
                                       /*in*/ char const *__restrict input_codec_name) {
-	unsigned int codec;
-	codec = libiconv_codec_and_flags_byname(input_codec_name, &self->icd_flags);
-	return libiconv_decode_init(self, input, codec);
+	self->icd_codec = libiconv_codec_and_flags_byname(input_codec_name, &self->icd_flags);
+	return libiconv_decode_init(self, input);
 }
+
+
 
 
 
@@ -243,11 +303,9 @@ INTERN NONNULL((1, 2, 3)) int
 NOTHROW_NCX(CC _libiconv_encode_init)(/*in|out*/ struct iconv_encode *__restrict self,
                                       /*out*/ struct iconv_printer *__restrict input, /* Accepts `UTF-8' */
                                       /*in*/ char const *__restrict output_codec_name) {
-	unsigned int codec;
-	codec = libiconv_codec_and_flags_byname(output_codec_name, &self->ice_flags);
-	return libiconv_encode_init(self, input, codec);
+	self->ice_codec = libiconv_codec_and_flags_byname(output_codec_name, &self->ice_flags);
+	return libiconv_encode_init(self, input);
 }
-
 
 
 
@@ -270,36 +328,32 @@ NOTHROW_NCX(CC _libiconv_transcode_init)(/*in|out*/ struct iconv_transcode *__re
                                          /*in*/ char const *__restrict input_codec_name,
                                          /*in*/ char const *__restrict output_codec_name) {
 	int result;
-	unsigned int input_codec;
-	unsigned int output_codec;
 
 	/* The caller only fills in flags for the encoder. */
 	self->it_decode.icd_flags = self->it_encode.ice_flags;
 
 	/* Load codec names and parse additional flags. */
-	input_codec  = libiconv_codec_and_flags_byname(input_codec_name, &self->it_decode.icd_flags);
-	output_codec = libiconv_codec_and_flags_byname(output_codec_name, &self->it_encode.ice_flags);
+	self->it_decode.icd_codec = libiconv_codec_and_flags_byname(input_codec_name, &self->it_decode.icd_flags);
+	self->it_encode.ice_codec = libiconv_codec_and_flags_byname(output_codec_name, &self->it_encode.ice_flags);
 
 	/* Check for special case: when input and output  codecs are the same,  then
 	 *                         it really shouldn't matter if we don't know them! */
-	if (input_codec == output_codec &&
-	    (input_codec != 0 || strcasecmp(input_codec_name, output_codec_name) == 0)) {
+	if (self->it_decode.icd_codec == self->it_encode.ice_codec &&
+	    (self->it_decode.icd_codec != CODEC_UNKNOWN ||
+	     /* TODO: strcasecmp the normalized equivalents of the codec names! */
+	     strcasecmp(input_codec_name, output_codec_name) == 0)) {
 		*input = self->it_encode.ice_output;
 		return 0;
 	}
 
 	/* Initialize the encoder and set-up its input pipe for use as output by the decoder. */
-	result = libiconv_encode_init(&self->it_encode,
-	                              &self->it_decode.icd_output,
-	                              output_codec);
+	result = libiconv_encode_init(&self->it_encode, &self->it_decode.icd_output);
 	if unlikely(result != 0)
 		goto done;
 
 	/* Initialize the decoder (note that it's output printer was already set-up
 	 * as the input descriptor for the  encode function in the previous  step!) */
-	result = libiconv_decode_init(&self->it_decode,
-	                              input,
-	                              input_codec);
+	result = libiconv_decode_init(&self->it_decode, input);
 
 	/* And that's already it! */
 
@@ -309,11 +363,11 @@ done:
 
 
 
-
-
 /* Exports... */
 DEFINE_PUBLIC_ALIAS(_iconv_decode_init, _libiconv_decode_init);
-DEFINE_PUBLIC_ALIAS(_iconv_decode_init, _libiconv_decode_init);
+DEFINE_PUBLIC_ALIAS(iconv_decode_isshiftzero, libiconv_decode_isshiftzero);
+DEFINE_PUBLIC_ALIAS(_iconv_encode_init, _libiconv_encode_init);
+DEFINE_PUBLIC_ALIAS(iconv_encode_flush, libiconv_encode_flush);
 DEFINE_PUBLIC_ALIAS(_iconv_transcode_init, _libiconv_transcode_init);
 
 DECL_END

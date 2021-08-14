@@ -1108,7 +1108,7 @@ NOTHROW_NCX(FCALL libiconv_codecbynamez)(char const *__restrict name,
 /* Same as `libiconv_codecbyname()', but also parse possible flag-relation options. */
 INTERN WUNUSED NONNULL((1)) unsigned int
 NOTHROW_NCX(FCALL libiconv_codec_and_flags_byname)(char const *__restrict name,
-                                                   /*[in|out]*/ uintptr_t *__restrict pflags) {
+                                                   /*[in|out]*/ uintptr_half_t *__restrict pflags) {
 	unsigned int result;
 	/* Check for the simple case where the name doesn't contain any flags. */
 	result = libiconv_codecbyname(name);

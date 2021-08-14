@@ -79,7 +79,7 @@ INTERN NONNULL((1, 2)) ssize_t
 #ifdef DEFINE_FOR_CP7H
 			size_t lo, hi;
 			struct iconv_7h_codepage const *cp;
-			cp = self->ice_data.ied_cp.ic_cp7h;
+			cp = self->ice_data.ied_cp7h;
 			lo = 0;
 			hi = cp->i7hcp_encode_max;
 			while (lo < hi) {
@@ -106,7 +106,7 @@ INTERN NONNULL((1, 2)) ssize_t
 				ptr = buf;
 				DO(LOCAL_libiconv_encode_32(self, folded, len));
 			} else {
-				if (IS_ICONV_ERR_ERRNO(self->ice_flags)) {
+				if (IS_ICONV_ERR_ERROR_OR_ERRNO(self->ice_flags)) {
 					DO_encode_output(buf, (size_t)(ptr - buf));
 					goto err_ilseq;
 				}
@@ -131,7 +131,8 @@ err:
 	return temp;
 err_ilseq:
 	self->ice_flags |= ICONV_HASERR;
-	errno = EILSEQ;
+	if (IS_ICONV_ERR_ERRNO(self->ice_flags))
+		errno = EILSEQ;
 	return -1;
 }
 
@@ -141,11 +142,11 @@ INTERN NONNULL((1, 2)) ssize_t
                                          size_t size) {
 	ssize_t temp, result = 0;
 	char const *iter, *flush_start, *end;
-	if unlikely(self->ice_flags & ICONV_HASERR)
-		goto err_ilseq;
 	iter        = data;
 	flush_start = data;
 	end         = data + size;
+	if unlikely(self->ice_flags & ICONV_HASERR)
+		goto err_ilseq;
 	if (self->ice_data.ied_utf8.__word != __MBSTATE_TYPE_EMPTY) {
 		/* Deal with incomplete characters. */
 		if unlikely(!size)
@@ -163,7 +164,7 @@ handle_unicode:
 			                         &self->ice_data.ied_utf8);
 			if ((ssize_t)status < 0) {
 				if (status == (size_t)-1) {
-					if (IS_ICONV_ERR_ERRNO(self->ice_flags))
+					if (IS_ICONV_ERR_ERROR_OR_ERRNO(self->ice_flags))
 						goto err_ilseq;
 					if (IS_ICONV_ERR_DISCARD(self->ice_flags)) {
 						self->ice_data.ied_utf8.__word = __MBSTATE_TYPE_EMPTY;
@@ -197,7 +198,7 @@ force_normal_output:
 #ifdef DEFINE_FOR_CP7H
 			size_t lo, hi;
 			struct iconv_7h_codepage const *cp;
-			cp = self->ice_data.ied_cp.ic_cp7h;
+			cp = self->ice_data.ied_cp7h;
 			lo = 0;
 			hi = cp->i7hcp_encode_max;
 			while (lo < hi) {
@@ -219,12 +220,20 @@ force_normal_output:
 				char32_t folded[UNICODE_FOLDED_MAX];
 				size_t len = (size_t)(iconv_transliterate(c32, folded) - folded);
 				if (len != 1 || folded[0] != c32) {
-					DO(LOCAL_libiconv_encode_32(self, folded, len));
+					temp = LOCAL_libiconv_encode_32(self, folded, len);
+					if unlikely(temp < 0) {
+						if (self->ice_flags & ICONV_HASERR)
+							goto err_ilseq_post;
+						goto err;
+					}
+					result += temp;
 					continue;
 				}
 			}
-			if (IS_ICONV_ERR_ERRNO(self->ice_flags))
+			if (IS_ICONV_ERR_ERROR_OR_ERRNO(self->ice_flags)) {
+				iter -= status;
 				goto err_ilseq;
+			}
 			if (!IS_ICONV_ERR_DISCARD(self->ice_flags)) {
 				if (IS_ICONV_ERR_IGNORE(self->ice_flags))
 					goto force_normal_output;
@@ -246,8 +255,10 @@ err:
 	return temp;
 err_ilseq:
 	self->ice_flags |= ICONV_HASERR;
-	errno = EILSEQ;
-	return -1;
+	if (IS_ICONV_ERR_ERRNO(self->ice_flags))
+		errno = EILSEQ;
+err_ilseq_post:
+	return -(ssize_t)(size_t)(end - iter);
 }
 
 
@@ -257,13 +268,13 @@ INTERN NONNULL((1, 2)) ssize_t
                                          size_t size) {
 	ssize_t temp, result = 0;
 	char const *iter, *flush_start, *end;
+	iter        = data;
+	flush_start = data;
+	end         = data + size;
 #ifdef LOCAL_HAS_UNDEFINED_CODEPOINTS
 	if unlikely(self->icd_flags & ICONV_HASERR)
 		goto err_ilseq;
 #endif /* LOCAL_HAS_UNDEFINED_CODEPOINTS */
-	iter        = data;
-	flush_start = data;
-	end         = data + size;
 	while (iter < end) {
 		unsigned char ch = (unsigned char)*iter;
 		if likely(ch <= 0x7f) {
@@ -300,8 +311,11 @@ INTERN NONNULL((1, 2)) ssize_t
 		}
 #endif /* DEFINE_FOR_CP7H */
 
-		if (IS_ICONV_ERR_ERRNO(self->icd_flags))
+		if (IS_ICONV_ERR_ERROR_OR_ERRNO(self->icd_flags)) {
+			--iter;
 			goto err_ilseq;
+		}
+
 		/* NOTE: No need to handle `IS_ICONV_ERR_IGNORE()'; our function
 		 *       isn't  used when converting  text in error-ignore mode. */
 		if (IS_ICONV_ERR_REPLACE(self->icd_flags))
@@ -326,8 +340,9 @@ err:
 #ifdef LOCAL_HAS_UNDEFINED_CODEPOINTS
 err_ilseq:
 	self->icd_flags |= ICONV_HASERR;
-	errno = EILSEQ;
-	return -1;
+	if (IS_ICONV_ERR_ERRNO(self->icd_flags))
+		errno = EILSEQ;
+	return -(ssize_t)(size_t)(end - iter);
 #endif /* LOCAL_HAS_UNDEFINED_CODEPOINTS */
 }
 

@@ -26,6 +26,7 @@
 #include <kos/types.h>
 
 #include <format-printer.h>
+#include <stdbool.h>
 
 #include <libiconv/iconv.h>
 
@@ -45,6 +46,20 @@ NOTHROW_NCX(CC _libiconv_decode_init)(/*in|out*/ struct iconv_decode *__restrict
                                       /*out*/ struct iconv_printer *__restrict input, /* Accepts `input_codec_name' */
                                       /*in*/ char const *__restrict input_codec_name);
 
+/* Check  if the given encoder is in its default (zero) shift state. If it isn't,
+ * then that must mean that it's still waiting for more input data to arrive, and
+ * that  you should either feed it said data,  or deal with the fact that there's
+ * something missing in your input.
+ * WARNING: This  function DOESN'T work  when the given decoder  is used to parse
+ *          UTF-8 input! This is because special optimizations are performed when
+ *          decoding  UTF-8 (since  decoders also  always output  UTF-8). In this
+ *          case this function will always return `true'
+ * Hint: the optimization is that  `iconv_decode_init:input == self->icd_output',
+ *       so if you want to programmatically handle this case you can check for it
+ *       by doing `self->icd_output.ii_printer == :input->ii_printer', where  the
+ *       given `:input' is the one filled in by `iconv_decode_init(3)' */
+INTDEF ATTR_PURE WUNUSED NONNULL((1)) bool
+NOTHROW_NCX(CC libiconv_decode_isshiftzero)(struct iconv_decode const *__restrict self);
 
 
 /* Initialize the given iconv encoder for the purpose of
@@ -60,6 +75,17 @@ INTDEF NONNULL((1, 2, 3)) int
 NOTHROW_NCX(CC _libiconv_encode_init)(/*in|out*/ struct iconv_encode *__restrict self,
                                       /*out*/ struct iconv_printer *__restrict input, /* Accepts `UTF-8' */
                                       /*in*/ char const *__restrict output_codec_name);
+
+/* Reset the internal shift state to its  default and print the associated byte  sequence
+ * to the output printer of the encode descriptor, returning the sum of its return values
+ * or the first negative return value.
+ * This  function should be  called once all input  data has been  printed and will ensure
+ * that input didn't end with an incomplete byte sequence, and that output doesn't contain
+ * any unmatched shift-state changes.
+ * Simply  call this once you're out of input  and treat its return value like you're
+ * treating the return values of the input printer returned by `iconv_encode_init(3)' */
+INTDEF NONNULL((1)) ssize_t
+NOTHROW_NCX(CC libiconv_encode_flush)(struct iconv_encode *__restrict self);
 
 
 
@@ -82,14 +108,17 @@ NOTHROW_NCX(CC _libiconv_transcode_init)(/*in|out*/ struct iconv_transcode *__re
                                          /*in*/ char const *__restrict output_codec_name); /* For encode */
 
 
+
+/************************************************************************/
+/* Internal functions                                                   */
+/************************************************************************/
 INTDEF NONNULL((1, 2)) int
 NOTHROW_NCX(CC libiconv_decode_init)(/*in|out*/ struct iconv_decode *__restrict self,
-                                     /*out*/ struct iconv_printer *__restrict input, /* Accepts `input_codec_name' */
-                                     /*in*/ unsigned int input_codec);
+                                     /*out*/ struct iconv_printer *__restrict input);
 INTDEF NONNULL((1, 2)) int
 NOTHROW_NCX(CC libiconv_encode_init)(/*in|out*/ struct iconv_encode *__restrict self,
-                                     /*out*/ struct iconv_printer *__restrict input, /* Accepts `UTF-8' */
-                                     /*in*/ unsigned int output_codec);
+                                     /*out*/ struct iconv_printer *__restrict input);
+
 
 DECL_END
 

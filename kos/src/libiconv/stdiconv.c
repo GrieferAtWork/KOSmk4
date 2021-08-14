@@ -29,6 +29,7 @@
 #include <assert.h>
 #include <errno.h>
 #include <inttypes.h>
+#include <limits.h>
 #include <stdlib.h>
 #include <string.h>
 #include <unicode.h>
@@ -70,8 +71,9 @@ stdiconv_count_characters_and_forward(struct stdiconv *__restrict self,
 		status = unicode_c8toc32(&c32, ptr, len, &self->si_converted_mbs);
 		if unlikely((ssize_t)status < 0) {
 			if (status == (size_t)-1) {
+				self->si_encode.ice_flags |= ICONV_HASERR;
 				errno = EILSEQ;
-				return -1;
+				return -(ssize_t)len;
 			} else if (status == (size_t)-2) {
 				break;
 			}
@@ -89,7 +91,7 @@ stdiconv_copy_to_outbuf(struct stdiconv *__restrict self,
                         /*ABSTRACT*/ char const *__restrict data,
                         size_t datalen) {
 	if (self->si_outsiz < datalen)
-		return -2; /* E2BIG */
+		return SSIZE_MIN; /* E2BIG */
 	memcpy(self->si_outbuf, data, datalen);
 	self->si_outbuf += datalen;
 	self->si_outsiz -= datalen;
@@ -101,11 +103,11 @@ stdiconv_copy_to_outbuf(struct stdiconv *__restrict self,
 INTERN WUNUSED struct stdiconv *
 NOTHROW_NCX(LIBCCALL libiconv_stdiconv_open)(const char *tocode,
                                              const char *fromcode) {
-	unsigned int input_codec;
-	unsigned int output_codec;
+	uintptr_half_t input_codec;
+	uintptr_half_t output_codec;
 	struct stdiconv *result;
-	uintptr_t decode_flags = ICONV_ERR_ERRNO;
-	uintptr_t encode_flags = ICONV_ERR_ERRNO;
+	uintptr_half_t decode_flags = ICONV_ERR_ERRNO;
+	uintptr_half_t encode_flags = ICONV_ERR_ERRNO;
 
 	/* Figure out codec names and parse additional flags. */
 	input_codec  = libiconv_codec_and_flags_byname(fromcode, &decode_flags);
@@ -120,22 +122,20 @@ NOTHROW_NCX(LIBCCALL libiconv_stdiconv_open)(const char *tocode,
 	/* Set-up  printers. Note that we need to inject an intermediate printer
 	 * between the decoder and encoder just so we can count the # of unicode
 	 * characters */
-	result->si_encode.ice_output.ii_printer = (pformatprinter)&stdiconv_count_characters_and_forward;
+	result->si_encode.ice_output.ii_printer = (pformatprinter)&stdiconv_copy_to_outbuf;
 	result->si_encode.ice_output.ii_arg     = result;
 	result->si_encode.ice_flags             = encode_flags;
-	result->si_decode.icd_output.ii_printer = (pformatprinter)&stdiconv_copy_to_outbuf;
+	result->si_decode.icd_output.ii_printer = (pformatprinter)&stdiconv_count_characters_and_forward;
 	result->si_decode.icd_output.ii_arg     = result;
 	result->si_decode.icd_flags             = decode_flags;
 	__mbstate_init(&result->si_converted_mbs);
 
 	/* Initialize the decoder and encoder. */
-	if unlikely(libiconv_decode_init(&result->si_decode,
-	                                 &result->si_decode_input,
-	                                 input_codec) != 0)
+	result->si_decode.icd_codec = input_codec;
+	if unlikely(libiconv_decode_init(&result->si_decode, &result->si_decode_input) != 0)
 		goto err_r;
-	if unlikely(libiconv_encode_init(&result->si_encode,
-	                                 &result->si_encode_input,
-	                                 output_codec) != 0)
+	result->si_encode.ice_codec = output_codec;
+	if unlikely(libiconv_encode_init(&result->si_encode, &result->si_encode_input) != 0)
 		goto err_r;
 
 	/* And that's it! */
@@ -167,8 +167,14 @@ NOTHROW_NCX(LIBCCALL libiconv_stdiconv_close)(struct stdiconv *self) {
  *
  * @param: self:         Conversion controller. (s.a. `iconv_open(3)')
  * @param: inbuf:        [0..*inbytesleft][0..1] When NULL (or pointing to NULL),
- *                       do nothing. Otherwise, pointer to the start of data that
- *                       has yet to be converted. (updated during the call)
+ *                       flush the encoder to  check that no multi-byte  sequence
+ *                       is currently in progress, as  well as output bytes  that
+ *                       might be needed to reset  the shift state; if outbuf  is
+ *                       NULL  or points to NULL, then that data is silently send
+ *                       into oblivion. Otherwise, pointer  to the start of  data
+ *                       that has yet to be converted. (updated during the  call)
+ *                       s.a. `iconv_encode_flush()'
+ *                       s.a. `iconv_decode_isshiftzero()'
  * @param: inbytesleft:  [1..1][valid_if(inbuf)]
  *                       [in]  The max # of bytes to read from `*inbuf'
  *                       [out] # of bytes not taken  from `*inbuf'.
@@ -186,11 +192,10 @@ NOTHROW_NCX(LIBCCALL libiconv_stdiconv_close)(struct stdiconv *self) {
  *                                     to the start of said sequence, but *inbytesleft
  *                                     is left unchanged)
  * @return: (size_t)-1: [errno=EINVAL] Incomplete multi-byte sequence encountered. This
- *                                     error doesn't happen  on KOS because  incomplete
- *                                     sequences are  handled by  remembering the  part
- *                                     already encountered and  expecting a later  call
- *                                     to  provide  the missing  part. If  that doesn't
- *                                     happen,  then it's an invalid sequence (EILSEQ).
+ *                                     error only happens when `!inbuf || !*inbuf',  in
+ *                                     which case a flush operation is performed. If it
+ *                                     turns out that input data didn't properly finish
+ *                                     a multi-byte sequence, then this error is set.
  * @return: (size_t)-1: [errno=E2BIG]  Output buffer is too small. (Arguments are left
  *                                     unchanged). */
 INTERN size_t
@@ -221,8 +226,53 @@ NOTHROW_NCX(LIBCCALL libiconv_stdiconv)(struct stdiconv *self,
 		return -1;
 	}
 
-	if unlikely(!inbuf || !*inbuf)
-		return 0; /* no-op */
+	/* Handle the case of a NULL inbuf, in which case we mush flush the encoder. */
+	if unlikely(!inbuf || !*inbuf) {
+		/* If the decoder is in a non-zero shift state, then that must mean
+		 * that input is incomplete and that we need to return with EINVAL. */
+		if (libiconv_decode_isshiftzero(&self->si_decode))
+			goto err_incomplete_input;
+
+		/* Like documentd, `libiconv_decode_isshiftzero()' doesn't work when the
+		 * associated codec is UTF-8. But as it  would be, we also have our  own
+		 * multi-byte state to keep track of the complete-ness of incoming UTF-8
+		 * data, so we can handle the case  where the decoder can't tell us  for
+		 * certain by checking our own state. */
+		if (!__MBSTATE_ISINIT(&self->si_converted_mbs))
+			goto err_incomplete_input;
+
+		if (!outbuf || !*outbuf) {
+			pformatprinter saved_encode_output;
+			saved_encode_output = self->si_encode.ice_output.ii_printer;
+			/* Simply reset but discard output. */
+			self->si_encode.ice_output.ii_printer = &format_length;
+			status = libiconv_encode_flush(&self->si_encode);
+			self->si_encode.ice_output.ii_printer = saved_encode_output;
+		} else {
+			self->si_outbuf = *outbuf;
+			self->si_outsiz = *outbytesleft;
+			status = libiconv_encode_flush(&self->si_encode);
+			if (status >= 0) {
+				*outbuf       = self->si_outbuf;
+				*outbytesleft = self->si_outsiz;
+			}
+		}
+		/* Check for errors that might have happened during the flush operation. */
+		if (status < 0) {
+			if (self->si_encode.ice_flags & ICONV_HASERR) {
+				/* Special case: An incomplete multibyte sequence has been encountered in the input.
+				 * The specs require use to set EINVAL in this case. */
+err_incomplete_input:
+				errno = EINVAL;
+			} else {
+				assert(status == SSIZE_MIN);
+				errno = E2BIG;
+			}
+			return (size_t)-1;
+		}
+		/* Without any input data, we didn't actually  */
+		return 0;
+	}
 
 	/* Fill in information about where data should go. */
 	self->si_outbuf = *outbuf;
@@ -240,45 +290,22 @@ NOTHROW_NCX(LIBCCALL libiconv_stdiconv)(struct stdiconv *self,
 
 	/* Check for errors. */
 	if (status < 0) {
-		if (status == -1) {
+		if (status != SSIZE_MIN) {
+			size_t not_converted;
 			/* EILSEQ: For compliance, we have to  fix-up `inbuf' so that  it
 			 *         points to the start of the bad sequence. We do this by
 			 *         feeding input one byte at a time until it breaks. */
-			STDICONV_LOAD();
 
-			/* Prevent data from making it out of the encoder */
-			if (self->si_encode_input.ii_printer == (pformatprinter)&stdiconv_copy_to_outbuf) {
-				/* This can happen in case the encode function is a no-op (e.g. `tocode' is `utf-8') */
-				self->si_encode_input.ii_printer = &format_length;
-			} else {
-				assert(self->si_decode.icd_output.ii_printer == (pformatprinter)&stdiconv_copy_to_outbuf);
-				self->si_decode.icd_output.ii_printer = &format_length;
-			}
-
-			/* Search for the specific location where the error happens. */
-			while (*inbytesleft) {
-				status = (*self->si_decode_input.ii_printer)(self->si_decode_input.ii_arg,
-				                                             *inbuf, 1);
-				if (status < 0)
-					break;
-				++*inbuf;
-				--*inbytesleft; /* Hey! Look at that: we're nice enough to keep this one valid, too! */
-			}
-
-			/* Restore the correct printer for output to buffers. */
-			if (self->si_encode_input.ii_printer == &format_length) {
-				/* This can happen in case the encode function is a no-op (e.g. `tocode' is `utf-8') */
-				self->si_encode_input.ii_printer = (pformatprinter)&stdiconv_copy_to_outbuf;
-			} else {
-				assert(self->si_decode.icd_output.ii_printer == &format_length);
-				self->si_decode.icd_output.ii_printer = (pformatprinter)&stdiconv_copy_to_outbuf;
-			}
+			/* Adjust the input buffer for data that wasn't converted. */
+			not_converted = (size_t)-status;
+			*inbuf += (*inbytesleft - not_converted);
+			*inbytesleft = not_converted;
 
 			/* Restore the decoder into its original configuration. */
 return_with_EILSEQ:
 			STDICONV_LOAD();
 			return (size_t)-1;
-		} else if (status == -2) {
+		} else {
 			/* E2BIG: Restore iconv state and set E2BIG. */
 			STDICONV_LOAD();
 
@@ -297,11 +324,8 @@ return_with_EILSEQ:
 				status = (*self->si_decode_input.ii_printer)(self->si_decode_input.ii_arg,
 				                                             *inbuf, 1);
 				if (status < 0) {
-					if unlikely(status == -1) {
-						/* Shouldn't happen... (EILSEQ during second pass?) */
-						goto return_with_EILSEQ;
-					}
-					assertf(status == -2, "status = %" PRIdSIZ, status);
+					if unlikely(status != SSIZE_MIN)
+						goto return_with_EILSEQ; /* Shouldn't happen... (EILSEQ during second pass?) */
 					break;
 				}
 				++*inbuf;

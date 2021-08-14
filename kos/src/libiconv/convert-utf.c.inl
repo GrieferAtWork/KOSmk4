@@ -43,10 +43,11 @@ INTERN NONNULL((1, 2)) ssize_t
 		goto err_ilseq;
 	while (size) {
 		do {
-			size_t error = PP_CAT2(unicode_c8toc, UTF_WIDTH)(dst, data, size,
-			                                                 &self->ice_data.ied_utf8);
+			size_t error;
+			error = PP_CAT2(unicode_c8toc, UTF_WIDTH)(dst, data, size,
+			                                          &self->ice_data.ied_utf8);
 			if unlikely(error == (size_t)-1) {
-				if (IS_ICONV_ERR_ERRNO(self->ice_flags))
+				if (IS_ICONV_ERR_ERROR_OR_ERRNO(self->ice_flags))
 					goto err_ilseq;
 				self->ice_data.ied_utf8.__word = __MBSTATE_TYPE_EMPTY;
 				if (IS_ICONV_ERR_DISCARD(self->ice_flags)) {
@@ -77,8 +78,9 @@ err:
 	return temp;
 err_ilseq:
 	self->ice_flags |= ICONV_HASERR;
-	errno = EILSEQ;
-	return -1;
+	if (IS_ICONV_ERR_ERRNO(self->ice_flags))
+		errno = EILSEQ;
+	return -(ssize_t)size;
 }
 
 
@@ -117,7 +119,7 @@ INTERN NONNULL((1, 2)) ssize_t
 #endif /* UTF_BYTEORDER != 1234 */
 		error = unicode_c16toc8(ptr, c16.w, &self->icd_data.idd_utf.u_16);
 		if unlikely(error == (size_t)-1) {
-			if (IS_ICONV_ERR_ERRNO(self->icd_flags))
+			if (IS_ICONV_ERR_ERROR_OR_ERRNO(self->icd_flags))
 				goto err_ilseq;
 			if (IS_ICONV_ERR_DISCARD(self->icd_flags)) {
 				error = 0;
@@ -145,7 +147,7 @@ INTERN NONNULL((1, 2)) ssize_t
 #endif /* UTF_BYTEORDER != 1234 */
 		error = unicode_c16toc8(ptr, c16, &self->icd_data.idd_utf.u_16);
 		if unlikely(error == (size_t)-1) {
-			if (IS_ICONV_ERR_ERRNO(self->icd_flags))
+			if (IS_ICONV_ERR_ERROR_OR_ERRNO(self->icd_flags))
 				goto err_ilseq;
 			if (IS_ICONV_ERR_DISCARD(self->icd_flags)) {
 				error = 0;
@@ -170,8 +172,9 @@ err:
 	return temp;
 err_ilseq:
 	self->icd_flags |= ICONV_HASERR;
-	errno = EILSEQ;
-	return -1;
+	if (IS_ICONV_ERR_ERRNO(self->icd_flags))
+		errno = EILSEQ;
+	return -(ssize_t)size;
 }
 #endif /* UTF_WIDTH == 16 */
 

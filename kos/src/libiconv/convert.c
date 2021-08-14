@@ -47,10 +47,12 @@ gcc_opt.append("-O3"); // Force _all_ optimizations because stuff in here is per
 
 DECL_BEGIN
 
-#define IS_ICONV_ERR_ERRNO(flags)   (((flags) & ICONV_ERRMASK) == ICONV_ERR_ERRNO)
-#define IS_ICONV_ERR_REPLACE(flags) (((flags) & ICONV_ERRMASK) == ICONV_ERR_REPLACE)
-#define IS_ICONV_ERR_IGNORE(flags)  (((flags) & ICONV_ERRMASK) == ICONV_ERR_IGNORE)
-#define IS_ICONV_ERR_DISCARD(flags) (((flags) & ICONV_ERRMASK) == ICONV_ERR_DISCARD)
+#define IS_ICONV_ERR_ERRNO(flags)                     (((flags) & ICONV_ERRMASK) == ICONV_ERR_ERRNO)
+#define IS_ICONV_ERR_ERROR_OR_ERRNO(flags)            (((flags) & ICONV_ERRMASK) <= ICONV_ERR_ERROR)
+#define IS_ICONV_ERR_ERROR_OR_ERRNO_OR_DISCARD(flags) (((flags) & ICONV_ERRMASK) <= ICONV_ERR_DISCARD)
+#define IS_ICONV_ERR_DISCARD(flags)                   (((flags) & ICONV_ERRMASK) == ICONV_ERR_DISCARD)
+#define IS_ICONV_ERR_REPLACE(flags)                   (((flags) & ICONV_ERRMASK) == ICONV_ERR_REPLACE)
+#define IS_ICONV_ERR_IGNORE(flags)                    (((flags) & ICONV_ERRMASK) == ICONV_ERR_IGNORE)
 
 
 #define decode_output_printer self->icd_output.ii_printer
@@ -87,32 +89,31 @@ NOTHROW_NCX(__LIBCCALL iconv_transliterate)(char32_t ch, char32_t buf[UNICODE_FO
  * >>     output(ENCODE(c32));
  * >> }
  */
-#define FOREACH_UTF8(c32, self, data, size)                             \
-	for (size_t _uni_status;;)                                          \
-		if ((_uni_status = unicode_c8toc32(&(c32), data, size,          \
-		                                   &(self)->ice_data.ied_utf8), \
-		     0))                                                        \
-			;                                                           \
-		else if unlikely((ssize_t)_uni_status < 0 &&                    \
-		                 (_uni_status == (size_t)-1                     \
-		                  ? (IS_ICONV_ERR_ERRNO((self)->ice_flags) ||   \
-		                     IS_ICONV_ERR_DISCARD((self)->ice_flags)    \
-		                     ? 1                                        \
-		                     : ((c32) = '?', _uni_status = 1, 0))       \
-		                  : _uni_status == (size_t)-2)) {               \
-			/* Error or all data parsed. */                             \
-			if unlikely(_uni_status == (size_t)-1) {                    \
-				if (IS_ICONV_ERR_DISCARD((self)->ice_flags)) {          \
-					(data) += 1;                                        \
-					(size) -= 1;                                        \
-					continue;                                           \
-				}                                                       \
-				goto err_ilseq; /* Error! */                            \
-			}                                                           \
-			break; /* Done! */                                          \
-		} else if (((data) += _uni_status,                              \
-		            (size) -= _uni_status, 0))                          \
-			;                                                           \
+#define FOREACH_UTF8(c32, self, data, size)                                            \
+	for (size_t _uni_status;;)                                                         \
+		if ((_uni_status = unicode_c8toc32(&(c32), data, size,                         \
+		                                   &(self)->ice_data.ied_utf8),                \
+		     0))                                                                       \
+			;                                                                          \
+		else if unlikely((ssize_t)_uni_status < 0 &&                                   \
+		                 (_uni_status == (size_t)-1                                    \
+		                  ? (IS_ICONV_ERR_ERROR_OR_ERRNO_OR_DISCARD((self)->ice_flags) \
+		                     ? 1                                                       \
+		                     : ((c32) = '?', _uni_status = 1, 0))                      \
+		                  : _uni_status == (size_t)-2)) {                              \
+			/* Error or all data parsed. */                                            \
+			if unlikely(_uni_status == (size_t)-1) {                                   \
+				if (IS_ICONV_ERR_DISCARD((self)->ice_flags)) {                         \
+					(data) += 1;                                                       \
+					(size) -= 1;                                                       \
+					continue;                                                          \
+				}                                                                      \
+				goto err_ilseq; /* Error! */                                           \
+			}                                                                          \
+			break; /* Done! */                                                         \
+		} else if (((data) += _uni_status,                                             \
+		            (size) -= _uni_status, 0))                                         \
+			;                                                                          \
 		else
 
 
@@ -128,7 +129,7 @@ PRIVATE ATTR_NOINLINE NONNULL((1, 2)) ssize_t
 	char buf[64], *ptr = buf;
 	ssize_t temp, result = 0;
 	struct iconv_codepage const *cp;
-	cp = self->ice_data.ied_cp.ic_cp;
+	cp = self->ice_data.ied_cp;
 	for (j = 0; j < len; ++j) {
 		/* Figure out how to encode this unicode character in this codepage. */
 		size_t lo, hi;
@@ -164,7 +165,7 @@ PRIVATE ATTR_NOINLINE NONNULL((1, 2)) ssize_t
 				goto next_c32;
 			}
 		}
-		if (IS_ICONV_ERR_ERRNO(self->ice_flags)) {
+		if (IS_ICONV_ERR_ERROR_OR_ERRNO(self->ice_flags)) {
 			DO_encode_output(buf, (size_t)(ptr - buf));
 			goto err_ilseq;
 		}
@@ -184,7 +185,8 @@ err:
 	return temp;
 err_ilseq:
 	self->ice_flags |= ICONV_HASERR;
-	errno = EILSEQ;
+	if (IS_ICONV_ERR_ERRNO(self->ice_flags))
+		errno = EILSEQ;
 	return -1;
 }
 
@@ -197,7 +199,7 @@ INTERN NONNULL((1, 2)) ssize_t
 	struct iconv_codepage const *cp;
 	if unlikely(self->ice_flags & ICONV_HASERR)
 		goto err_ilseq;
-	cp = self->ice_data.ied_cp.ic_cp;
+	cp = self->ice_data.ied_cp;
 	FOREACH_UTF8(c32, self, data, size) {
 		/* Figure out how to encode this unicode character in this codepage. */
 		size_t lo, hi;
@@ -227,13 +229,20 @@ INTERN NONNULL((1, 2)) ssize_t
 			size_t len = (size_t)(iconv_transliterate(c32, folded) - folded);
 			if (len != 1 || folded[0] != c32) {
 				DO_encode_output(buf, (size_t)(ptr - buf));
-				ptr = buf;
-				DO(libiconv_cp_encode_u32(self, folded, len));
+				ptr  = buf;
+				temp = libiconv_cp_encode_u32(self, folded, len);
+				if unlikely(temp < 0) {
+					if (self->ice_flags & ICONV_HASERR)
+						goto err_ilseq_post;
+					goto err;
+				}
+				result += temp;
 				goto next_c32;
 			}
 		}
-		if (IS_ICONV_ERR_ERRNO(self->ice_flags)) {
+		if (IS_ICONV_ERR_ERROR_OR_ERRNO(self->ice_flags)) {
 			DO_encode_output(buf, (size_t)(ptr - buf));
+			size += _uni_status; /* Revert back to the start of the current character. */
 			goto err_ilseq;
 		}
 		if (!IS_ICONV_ERR_DISCARD(self->ice_flags)) {
@@ -252,8 +261,10 @@ err:
 	return temp;
 err_ilseq:
 	self->ice_flags |= ICONV_HASERR;
-	errno = EILSEQ;
-	return -1;
+	if (IS_ICONV_ERR_ERRNO(self->ice_flags))
+		errno = EILSEQ;
+err_ilseq_post:
+	return -(ssize_t)size;
 }
 
 INTERN NONNULL((1, 2)) ssize_t
@@ -277,7 +288,7 @@ INTERN NONNULL((1, 2)) ssize_t
 			/* Invalid/undefined input byte */
 			DO_decode_output(buf, (size_t)(ptr - buf));
 			ptr = buf;
-			if (IS_ICONV_ERR_ERRNO(self->icd_flags))
+			if (IS_ICONV_ERR_ERROR_OR_ERRNO(self->icd_flags))
 				goto err_ilseq;
 			if (IS_ICONV_ERR_DISCARD(self->icd_flags))
 				goto consume_byte;
@@ -296,8 +307,9 @@ err:
 	return temp;
 err_ilseq:
 	self->icd_flags |= ICONV_HASERR;
-	errno = EILSEQ;
-	return -1;
+	if (IS_ICONV_ERR_ERRNO(self->icd_flags))
+		errno = EILSEQ;
+	return -(ssize_t)size;
 }
 
 
@@ -313,7 +325,7 @@ PRIVATE ATTR_NOINLINE NONNULL((1, 2)) ssize_t
 	char buf[64], *ptr = buf;
 	ssize_t temp, result = 0;
 	struct iconv_7l_codepage const *cp;
-	cp = self->ice_data.ied_cp.ic_cp7l;
+	cp = self->ice_data.ied_cp7l;
 	for (j = 0; j < len; ++j) {
 		/* Figure out how to encode this unicode character in this codepage. */
 		size_t lo, hi;
@@ -349,7 +361,7 @@ PRIVATE ATTR_NOINLINE NONNULL((1, 2)) ssize_t
 				goto next_c32;
 			}
 		}
-		if (IS_ICONV_ERR_ERRNO(self->ice_flags)) {
+		if (IS_ICONV_ERR_ERROR_OR_ERRNO(self->ice_flags)) {
 			DO_encode_output(buf, (size_t)(ptr - buf));
 			goto err_ilseq;
 		}
@@ -369,7 +381,8 @@ err:
 	return temp;
 err_ilseq:
 	self->ice_flags |= ICONV_HASERR;
-	errno = EILSEQ;
+	if (IS_ICONV_ERR_ERRNO(self->ice_flags))
+		errno = EILSEQ;
 	return -1;
 }
 
@@ -382,7 +395,7 @@ INTERN NONNULL((1, 2)) ssize_t
 	struct iconv_7l_codepage const *cp;
 	if unlikely(self->ice_flags & ICONV_HASERR)
 		goto err_ilseq;
-	cp = self->ice_data.ied_cp.ic_cp7l;
+	cp = self->ice_data.ied_cp7l;
 	FOREACH_UTF8(c32, self, data, size) {
 		/* Figure out how to encode this unicode character in this codepage. */
 		size_t lo, hi;
@@ -412,13 +425,20 @@ INTERN NONNULL((1, 2)) ssize_t
 			size_t len = (size_t)(iconv_transliterate(c32, folded) - folded);
 			if (len != 1 || folded[0] != c32) {
 				DO_encode_output(buf, (size_t)(ptr - buf));
-				ptr = buf;
-				DO(libiconv_cp7l_encode_u32(self, folded, len));
+				ptr  = buf;
+				temp = libiconv_cp7l_encode_u32(self, folded, len);
+				if unlikely(temp < 0) {
+					if (self->ice_flags & ICONV_HASERR)
+						goto err_ilseq_post;
+					goto err;
+				}
+				result += temp;
 				goto next_c32;
 			}
 		}
-		if (IS_ICONV_ERR_ERRNO(self->ice_flags)) {
+		if (IS_ICONV_ERR_ERROR_OR_ERRNO(self->ice_flags)) {
 			DO_encode_output(buf, (size_t)(ptr - buf));
+			size += _uni_status; /* Revert back to the start of the current character. */
 			goto err_ilseq;
 		}
 		if (!IS_ICONV_ERR_DISCARD(self->ice_flags)) {
@@ -437,8 +457,10 @@ err:
 	return temp;
 err_ilseq:
 	self->ice_flags |= ICONV_HASERR;
-	errno = EILSEQ;
-	return -1;
+	if (IS_ICONV_ERR_ERRNO(self->ice_flags))
+		errno = EILSEQ;
+err_ilseq_post:
+	return -(ssize_t)size;
 }
 
 INTERN NONNULL((1, 2)) ssize_t
@@ -464,7 +486,7 @@ INTERN NONNULL((1, 2)) ssize_t
 			/* Invalid/undefined input byte */
 			DO_decode_output(buf, (size_t)(ptr - buf));
 			ptr = buf;
-			if (IS_ICONV_ERR_ERRNO(self->icd_flags))
+			if (IS_ICONV_ERR_ERROR_OR_ERRNO(self->icd_flags))
 				goto err_ilseq;
 			if (IS_ICONV_ERR_DISCARD(self->icd_flags))
 				goto consume_byte;
@@ -483,8 +505,9 @@ err:
 	return temp;
 err_ilseq:
 	self->icd_flags |= ICONV_HASERR;
-	errno = EILSEQ;
-	return -1;
+	if (IS_ICONV_ERR_ERRNO(self->icd_flags))
+		errno = EILSEQ;
+	return -(ssize_t)size;
 }
 
 
@@ -500,7 +523,7 @@ PRIVATE ATTR_NOINLINE NONNULL((1, 2)) ssize_t
 	char buf[64], *ptr = buf;
 	ssize_t temp, result = 0;
 	struct iconv_iso646_codepage const *cp;
-	cp = self->ice_data.ied_cp.ic_cp646;
+	cp = self->ice_data.ied_cp646;
 	for (j = 0; j < len; ++j) {
 		/* Figure out how to encode this unicode character in this codepage. */
 		char32_t c32 = data[j];
@@ -526,7 +549,7 @@ PRIVATE ATTR_NOINLINE NONNULL((1, 2)) ssize_t
 				goto next_c32;
 			}
 		}
-		if (IS_ICONV_ERR_ERRNO(self->ice_flags)) {
+		if (IS_ICONV_ERR_ERROR_OR_ERRNO(self->ice_flags)) {
 			DO_encode_output(buf, (size_t)(ptr - buf));
 			goto err_ilseq;
 		}
@@ -546,7 +569,8 @@ err:
 	return temp;
 err_ilseq:
 	self->ice_flags |= ICONV_HASERR;
-	errno = EILSEQ;
+	if (IS_ICONV_ERR_ERRNO(self->ice_flags))
+		errno = EILSEQ;
 	return -1;
 }
 
@@ -559,7 +583,7 @@ INTERN NONNULL((1, 2)) ssize_t
 	struct iconv_iso646_codepage const *cp;
 	if unlikely(self->ice_flags & ICONV_HASERR)
 		goto err_ilseq;
-	cp = self->ice_data.ied_cp.ic_cp646;
+	cp = self->ice_data.ied_cp646;
 	FOREACH_UTF8(c32, self, data, size) {
 		/* Figure out how to encode this unicode character in this codepage. */
 		char encoded;
@@ -579,13 +603,20 @@ INTERN NONNULL((1, 2)) ssize_t
 			size_t len = (size_t)(iconv_transliterate(c32, folded) - folded);
 			if (len != 1 || folded[0] != c32) {
 				DO_encode_output(buf, (size_t)(ptr - buf));
-				ptr = buf;
-				DO(libiconv_cp646_encode_u32(self, folded, len));
+				ptr  = buf;
+				temp = libiconv_cp646_encode_u32(self, folded, len);
+				if unlikely(temp < 0) {
+					if (self->ice_flags & ICONV_HASERR)
+						goto err_ilseq_post;
+					goto err;
+				}
+				result += temp;
 				goto next_c32;
 			}
 		}
-		if (IS_ICONV_ERR_ERRNO(self->ice_flags)) {
+		if (IS_ICONV_ERR_ERROR_OR_ERRNO(self->ice_flags)) {
 			DO_encode_output(buf, (size_t)(ptr - buf));
+			size += _uni_status; /* Revert back to the start of the current character. */
 			goto err_ilseq;
 		}
 		if (!IS_ICONV_ERR_DISCARD(self->ice_flags)) {
@@ -604,8 +635,10 @@ err:
 	return temp;
 err_ilseq:
 	self->ice_flags |= ICONV_HASERR;
-	errno = EILSEQ;
-	return -1;
+	if (IS_ICONV_ERR_ERRNO(self->ice_flags))
+		errno = EILSEQ;
+err_ilseq_post:
+	return -(ssize_t)size;
 }
 
 INTERN NONNULL((1, 2)) ssize_t
@@ -631,7 +664,7 @@ INTERN NONNULL((1, 2)) ssize_t
 			/* Invalid/undefined input byte */
 			DO_decode_output(buf, (size_t)(ptr - buf));
 			ptr = buf;
-			if (IS_ICONV_ERR_ERRNO(self->icd_flags))
+			if (IS_ICONV_ERR_ERROR_OR_ERRNO(self->icd_flags))
 				goto err_ilseq;
 			if (IS_ICONV_ERR_DISCARD(self->icd_flags))
 				goto consume_byte;
@@ -650,8 +683,9 @@ err:
 	return temp;
 err_ilseq:
 	self->icd_flags |= ICONV_HASERR;
-	errno = EILSEQ;
-	return -1;
+	if (IS_ICONV_ERR_ERRNO(self->icd_flags))
+		errno = EILSEQ;
+	return -(ssize_t)size;
 }
 
 
