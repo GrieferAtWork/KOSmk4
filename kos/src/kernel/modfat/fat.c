@@ -44,6 +44,7 @@
 #include <hybrid/unaligned.h>
 
 #include <kos/dev.h>
+#include <kos/except/reason/fs.h>
 #include <kos/except/reason/inval.h>
 #include <linux/magic.h>
 #include <linux/msdos_fs.h>
@@ -2153,8 +2154,10 @@ Fat_CygwinSymlinkCreate(struct directory_node *__restrict target_directory,
 	struct inode_data *node;
 	FatSuperblock *super;
 	assert(link_node->sl_text);
+	super = (FatSuperblock *)target_directory->i_super;
+	if unlikely(super->f_features & FAT_FEATURE_NO_CYGWIN_SYMLINK)
+		THROW(E_FSERROR_UNSUPPORTED_OPERATION, E_FILESYSTEM_OPERATION_SYMLINK);
 	link_node->i_type = &Fat_CygwinSymlinkNodeOperators;
-	super             = (FatSuperblock *)target_directory->i_super;
 	/* Allocate FS-specific INode data for the new file. */
 	node = (struct inode_data *)kmalloc(sizeof(struct inode_data),
 	                                    FS_GFP | GFP_CALLOC);
@@ -2171,9 +2174,9 @@ Fat_CygwinSymlinkCreate(struct directory_node *__restrict target_directory,
 			Fat32_VWriteToINode(link_node, (byte_t const *)Fat_CygwinSymlinkMagic,
 			                    sizeof(Fat_CygwinSymlinkMagic), 0);
 #ifndef __OPTIMIZE_SIZE__
-			if ((text == link_node->sl_stext &&
-			     (link_node->i_heapsize > offsetof(struct symlink_node, sl_stext) + size)) ||
-			    (kmalloc_usable_size(text) > size)) {
+			if (text == link_node->sl_stext
+			    ? (link_node->i_heapsize > offsetof(struct symlink_node, sl_stext) + size)
+			    : (kmalloc_usable_size(text) > size)) {
 				/* Small optimization: Write the trailing NUL alongside the symlink text itself! */
 				text[size] = '\0';
 				Fat32_VWriteToINode(link_node, (byte_t const *)text, size + 1,
