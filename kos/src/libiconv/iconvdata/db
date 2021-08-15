@@ -43,24 +43,121 @@
 
 
 ###################################################################################################
+# TODO:
+#  - https://en.wikipedia.org/wiki/UTF-1                              "ISO-10646-UTF-1", "csISO-10646UTF1"
+#  - https://en.wikipedia.org/wiki/Shift_JIS                          "shift-jis", "sjis", "ms_kanji", "csShiftJis"
+#  - https://en.wikipedia.org/wiki/Code_page_932_(Microsoft_Windows)  "windows-31j", "cp932", "ms932", "sjis-open", "sjis-win", "csWindows31J"
+#  - https://en.wikipedia.org/wiki/KOI-7                              "KOI7", "KOI7-switched", "csKOI7switched"
+#  - https://en.wikipedia.org/wiki/GBK_(character_encoding)           "GBK", "CP936", "MS936", "windows-936", "csGBK"
+#  - https://en.wikipedia.org/wiki/Code_page_776                      "cp776"
+#  - https://en.wikipedia.org/wiki/Code_page_777                      "cp777"
+#  - https://en.wikipedia.org/wiki/Code_page_778                      "cp778", "LST-1590-2"
+#  - https://en.wikipedia.org/wiki/Code_page_907                      "cp907", "IBM907"
+#  - https://en.wikipedia.org/wiki/CSX%2B_Indic_character_set         "CSX+Indic"
+#  - https://en.wikipedia.org/wiki/HP_Roman
+#  - https://en.wikipedia.org/wiki/LST_1564
+#  - https://en.wikipedia.org/wiki/LST_1590-4
+#  - https://en.wikipedia.org/wiki/JIS_X_0208
+#  - https://en.wikipedia.org/wiki/ArmSCII
+#  - https://en.wikipedia.org/wiki/Mac_OS_Hebrew
+#  - https://en.wikipedia.org/wiki/Mac_OS_Keyboard_encoding
+#  - https://en.wikipedia.org/wiki/ISO/IEC_2022
+#  - https://en.wikipedia.org/wiki/ISO-IR-165
+#  - https://en.wikipedia.org/wiki/ISO-IR-169
+#  - https://www.rfc-editor.org/rfc/rfc1345.html                      "iso-ir-142", "ISO_6937-2-add", "csISOTextComm"
+#  - https://www.rfc-editor.org/rfc/rfc1345.html                      "JIS_Encoding", "csJISEncoding"
+#  - https://www.rfc-editor.org/rfc/rfc1345.html                      "Shift_JIS", "MS_Kanji", "csShiftJIS"
+#  - https://www.rfc-editor.org/rfc/rfc1345.html                      "EUC-JP", "csEUCPkdFmtJapanese", "EUC-JP"
+#  - https://www.rfc-editor.org/rfc/rfc1345.html                      "csEUCFixWidJapanese"
+#  - https://www.rfc-editor.org/rfc/rfc1345.html                      "KS_C_5601-1987", "iso-ir-149", "KS_C_5601-1989", "KSC_5601", "korean", "csKSC56011987"
+#  - https://www.rfc-editor.org/rfc/rfc1557.html                      "ISO-2022-KR", "csISO2022KR"
+#  - https://www.rfc-editor.org/rfc/rfc1557.html                      "EUC-KR", "csEUCKR"
+#  - https://www.rfc-editor.org/rfc/rfc1468.html                      "ISO-2022-JP","csISO2022JP"
+#  - https://www.rfc-editor.org/rfc/rfc1554.html                      "ISO-2022-JP-2", "csISO2022JP2"
+#  - https://www.rfc-editor.org/rfc/rfc1345.html                      "JIS_C6226-1978", "iso-ir-42", "csISO42JISC62261978"
+#  - https://www.rfc-editor.org/rfc/rfc1345.html                      "videotex-suppl", "iso-ir-70", "csISO70VideotexSupp1"
+#  - https://www.rfc-editor.org/rfc/rfc1345.html                      "JIS_C6226-1983", "iso-ir-87", "x0208", "JIS_X0208-1983", "csISO87JISX0208"
+#  - https://www.rfc-editor.org/rfc/rfc1345.html                      "ASMO_449", "ISO_9036", "arabic7", "iso-ir-89", "csISO89ASMO449"
+#  - https://www.rfc-editor.org/rfc/rfc1345.html                      "ANSI_X3.110-1983", "iso-ir-99", "CSA_T500-1983", "NAPLPS", "csISO99NAPLPS"
+#  - https://www.rfc-editor.org/rfc/rfc1556.html                      "ISO_8859-6-E", "csISO88596E"
+#  - https://www.rfc-editor.org/rfc/rfc1556.html                      "ISO_8859-6-I", "csISO88596I"
+#  - https://www.rfc-editor.org/rfc/rfc1556.html                      "ISO_8859-8-E", "csISO88598E"
+#  - https://www.rfc-editor.org/rfc/rfc1556.html                      "ISO_8859-8-I", "csISO88598I"
+#  - https://www.rfc-editor.org/rfc/rfc1345.html                      "T.101-G2", "iso-ir-128", "csISO128T101G2"
+#  - https://www.rfc-editor.org/rfc/rfc1345.html                      "JIS_X0212-1990", "x0212", "iso-ir-159", "csISO159JISX02121990"
+#  - https://www.rfc-editor.org/rfc/rfc1642.html                      "UNICODE-1-1-UTF-7", "csUnicode11UTF7", "UTF-7", "csUTF7", "UTF-7-IMAP", "csUTF7IMAP"
+#  - https://www.rfc-editor.org/rfc/rfc1922.html                      "ISO-2022-CN", "csISO2022CN"
+#  - https://www.rfc-editor.org/rfc/rfc1922.html                      "ISO-2022-CN-EXT", "csISO2022CNEXT"
+#  - https://en.wikipedia.org/wiki/GB_2312                            "GB2312", "csGB2312", "GB_2312-80", "iso-ir-58", "chinese", "csISO58GB231280"
+#  - https://en.wikipedia.org/wiki/Big5                               "Big5", "csBig5"
+#  - https://www.iana.org/assignments/charset-reg/GB18030             "GB18030", "csGB18030"
+#  - https://www.iana.org/assignments/charset-reg/ISO-11548-1         "ISO_11548-1", "ISO_TR_11548-1", "csISO115481"
+#  - http://www.unicode.org/notes/tn6/                                "BOCU-1", "csBOCU1", "csBOCU-1"
+#  - https://www.iana.org/assignments/character-sets/character-sets.xhtml   "ISO-8859-1-Windows-3.0-Latin-1", "csWindows30Latin1"
+#  - https://www.iana.org/assignments/character-sets/character-sets.xhtml   "ISO-8859-1-Windows-3.1-Latin-1", "csWindows31Latin1"
+#  - https://www.iana.org/assignments/character-sets/character-sets.xhtml   "ISO-8859-1-Windows-3.1-Latin-2", "csWindows31Latin2"
+#  - https://www.iana.org/assignments/character-sets/character-sets.xhtml   "ISO-8859-1-Windows-3.1-Latin-5", "csWindows31Latin5"
+#  - https://www.iana.org/assignments/character-sets/character-sets.xhtml   "PC8-Danish-Norwegian", "csPC8DanishNorwegian"
+#  - https://www.iana.org/assignments/character-sets/character-sets.xhtml   "PC8-Turkish", "csPC8Turkish"
+#  - https://www.iana.org/assignments/character-sets/character-sets.xhtml   "IBM-Symbols", "csIBMSymbols"
+#  - https://www.iana.org/assignments/character-sets/character-sets.xhtml   "IBM-Thai", "csIBMThai"
+#  - https://www.iana.org/assignments/character-sets/character-sets.xhtml   "HP-Legal", "csHPLegal"
+#  - https://www.iana.org/assignments/character-sets/character-sets.xhtml   "HP-Pi-font", "csHPPiFont"
+#  - https://www.iana.org/assignments/character-sets/character-sets.xhtml   "HP-Math8", "csHPMath8"
+#  - https://www.iana.org/assignments/character-sets/character-sets.xhtml   "Adobe-Symbol-Encoding", "csHPPSMath"
+#  - https://www.iana.org/assignments/character-sets/character-sets.xhtml   "HP-DeskTop", "csHPDesktop"
+#  - https://www.iana.org/assignments/character-sets/character-sets.xhtml   "Ventura-Math", "csVenturaMath"
+#  - https://www.iana.org/assignments/character-sets/character-sets.xhtml   "Microsoft-Publishing", "csMicrosoftPublishing"
+#  - https://www.iana.org/assignments/character-sets/character-sets.xhtml   "Windows-31J", "csWindows31J"
+#  - https://www.rfc-editor.org/rfc/rfc1456.html                            "VISCII", "csVISCII"
+#  - https://www.rfc-editor.org/rfc/rfc1456.html                            "VIQR", "csVIQR"
+#  - https://www.rfc-editor.org/rfc/rfc1842.html                            "HZ-GB-2312"
+#  - https://www.iana.org/assignments/charset-reg/CP50220                   "CP50220", "csCP50220"
+###################################################################################################
+#  - ???                     "IBM00924", "CCSID00924", "CP00924", "ebcdic-Latin9--euro", "csIBM00924"
+#  - ???                     "IBM01140", "CCSID01140", "CP01140", "ebcdic-us-37+euro", "csIBM01140"
+#  - ???                     "IBM01141", "CCSID01141", "CP01141", "ebcdic-de-273+euro", "csIBM01141"
+#  - ???                     "IBM01142", "CCSID01142", "CP01142", "ebcdic-dk-277+euro", "ebcdic-no-277+euro", "csIBM01142"
+#  - ???                     "IBM01143", "CCSID01143", "CP01143", "ebcdic-fi-278+euro", "ebcdic-se-278+euro", "csIBM01143"
+#  - ???                     "IBM01144", "CCSID01144", "CP01144", "ebcdic-it-280+euro", "csIBM01144"
+#  - ???                     "IBM01145", "CCSID01145", "CP01145", "ebcdic-es-284+euro", "csIBM01145"
+#  - ???                     "IBM01146", "CCSID01146", "CP01146", "ebcdic-gb-285+euro", "csIBM01146"
+#  - ???                     "IBM01147", "CCSID01147", "CP01147", "ebcdic-fr-297+euro", "csIBM01147"
+#  - ???                     "IBM01148", "CCSID01148", "CP01148", "ebcdic-international-500+euro", "csIBM01148"
+#  - ???                     "IBM01149", "CCSID01149", "CP01149", "ebcdic-is-871+euro", "csIBM01149"
+#  - ???                     "Big5-HKSCS", "csBig5HKSCS"
+#  - ???                     "IBM1047", "IBM-1047", "csIBM1047"
+#  - ???                     "PTCP154", "csPTCP154", "PT154", "CP154", "Cyrillic-Asian"
+#  - ???                     "BRF", "csBRF"
+#  - ???                     "TSCII", "csTSCII"
+#  - ???                     "CP51932", "csCP51932"
+#  - ???                     "TIS-620", "csTIS620", "ISO-8859-11"
+###################################################################################################
+
+
+###################################################################################################
 # ASCII
 @CODEC(CODEC_ASCII:
 		"ANSI_X3.4-1968", "iso-ir-6", "ANSI_X3.4-1986",
 		"ISO646.irv:1991", "ascii", "ISO646-US",
 		"us-ascii", "us", "IBM367", "cp367",
-		"ANSI_X3.4", "CSASCII", "OSF00010020",
+		"ANSI_X3.4", "csASCII", "OSF00010020",
 		"cp20127", "Windows-20127")
 
 # UTF-8
 @CODEC(CODEC_UTF8:
-	"UTF8", "UTF-8", "ISO10646/UTF8", "ISO10646/UTF-8",
-	"iso-ir-193", "OSF05010001", "cp65001", "Windows-65001")
+	"UTF8", "UTF-8", "ISO-10646/UTF8", "ISO-10646/UTF-8",
+	"iso-ir-193", "OSF05010001", "cp65001", "Windows-65001",
+	"csUTF8")
 
 # UTF-16 (LE)
-@CODEC(CODEC_UTF16LE: "UTF16LE", "UTF-16LE", "UCS-2LE", "UNICODELITTLE",
+@CODEC(CODEC_UTF16LE: "UTF16LE", "UTF-16LE", "UCS-2LE", "UNICODELITTLE", "csUTF16LE",
 	[if(__BYTE_ORDER__ == __ORDER_LITTLE_ENDIAN__)] "UTF16",
 	[if(__BYTE_ORDER__ == __ORDER_LITTLE_ENDIAN__)] "UTF-16",
-	[if(__BYTE_ORDER__ == __ORDER_LITTLE_ENDIAN__)] "ISO10646/UCS2",
+	[if(__BYTE_ORDER__ == __ORDER_LITTLE_ENDIAN__)] "csUTF16",
+	[if(__BYTE_ORDER__ == __ORDER_LITTLE_ENDIAN__)] "ISO-10646/UCS2",
+	[if(__BYTE_ORDER__ == __ORDER_LITTLE_ENDIAN__)] "ISO-10646-UCS-2",
+	[if(__BYTE_ORDER__ == __ORDER_LITTLE_ENDIAN__)] "csUnicode",
 	[if(__BYTE_ORDER__ == __ORDER_LITTLE_ENDIAN__)] "UCS2",
 	[if(__BYTE_ORDER__ == __ORDER_LITTLE_ENDIAN__)] "UCS-2",
 	[if(__BYTE_ORDER__ == __ORDER_LITTLE_ENDIAN__)] "OSF00010100",
@@ -74,10 +171,13 @@
 )
 
 # UTF-16 (BE)
-@CODEC(CODEC_UTF16BE: "UTF16BE", "UTF-16BE", "UCS-2BE", "UNICODEBIG",
+@CODEC(CODEC_UTF16BE: "UTF16BE", "UTF-16BE", "UCS-2BE", "UNICODEBIG", "csUTF16BE",
 	[if(__BYTE_ORDER__ == __ORDER_BIG_ENDIAN__)] "UTF16",
 	[if(__BYTE_ORDER__ == __ORDER_BIG_ENDIAN__)] "UTF-16",
-	[if(__BYTE_ORDER__ == __ORDER_BIG_ENDIAN__)] "ISO10646/UCS2",
+	[if(__BYTE_ORDER__ == __ORDER_BIG_ENDIAN__)] "csUTF16",
+	[if(__BYTE_ORDER__ == __ORDER_BIG_ENDIAN__)] "ISO-10646/UCS2",
+	[if(__BYTE_ORDER__ == __ORDER_BIG_ENDIAN__)] "ISO-10646-UCS-2",
+	[if(__BYTE_ORDER__ == __ORDER_BIG_ENDIAN__)] "csUnicode",
 	[if(__BYTE_ORDER__ == __ORDER_BIG_ENDIAN__)] "UCS2",
 	[if(__BYTE_ORDER__ == __ORDER_BIG_ENDIAN__)] "UCS-2",
 	[if(__BYTE_ORDER__ == __ORDER_BIG_ENDIAN__)] "OSF00010100",
@@ -91,14 +191,17 @@
 )
 
 # UTF-32 (LE)
-@CODEC(CODEC_UTF32LE: "UTF32LE", "UTF-32LE", "UCS-4LE",
+@CODEC(CODEC_UTF32LE: "UTF32LE", "UTF-32LE", "UCS-4LE", "csUTF32LE",
 	[if(__BYTE_ORDER__ == __ORDER_LITTLE_ENDIAN__)] "UTF32",
 	[if(__BYTE_ORDER__ == __ORDER_LITTLE_ENDIAN__)] "UTF-32",
-	[if(__BYTE_ORDER__ == __ORDER_LITTLE_ENDIAN__)] "ISO10646/UCS4",
+	[if(__BYTE_ORDER__ == __ORDER_LITTLE_ENDIAN__)] "csUTF32",
+	[if(__BYTE_ORDER__ == __ORDER_LITTLE_ENDIAN__)] "ISO-10646/UCS4",
+	[if(__BYTE_ORDER__ == __ORDER_LITTLE_ENDIAN__)] "ISO-10646-UCS-4",
+	[if(__BYTE_ORDER__ == __ORDER_LITTLE_ENDIAN__)] "csUCS4",
 	[if(__BYTE_ORDER__ == __ORDER_LITTLE_ENDIAN__)] "UCS4",
 	[if(__BYTE_ORDER__ == __ORDER_LITTLE_ENDIAN__)] "UCS-4",
 	[if(__BYTE_ORDER__ == __ORDER_LITTLE_ENDIAN__)] "CSUCS4",
-	[if(__BYTE_ORDER__ == __ORDER_LITTLE_ENDIAN__)] "ISO10646",
+	[if(__BYTE_ORDER__ == __ORDER_LITTLE_ENDIAN__)] "ISO-10646",
 	[if(__BYTE_ORDER__ == __ORDER_LITTLE_ENDIAN__)] "10646-1:1993",
 	[if(__BYTE_ORDER__ == __ORDER_LITTLE_ENDIAN__)] "10646-1:1993/UCS4",
 	[if(__BYTE_ORDER__ == __ORDER_LITTLE_ENDIAN__)] "OSF00010104",
@@ -109,14 +212,17 @@
 )
 
 # UTF-32 (BE)
-@CODEC(CODEC_UTF32BE: "UTF32BE", "UTF-32BE", "UCS-4BE", "cp12001", "Windows-12001",
+@CODEC(CODEC_UTF32BE: "UTF32BE", "UTF-32BE", "UCS-4BE", "cp12001", "Windows-12001", "csUTF32BE",
 	[if(__BYTE_ORDER__ == __ORDER_BIG_ENDIAN__)] "UTF32",
 	[if(__BYTE_ORDER__ == __ORDER_BIG_ENDIAN__)] "UTF-32",
-	[if(__BYTE_ORDER__ == __ORDER_BIG_ENDIAN__)] "ISO10646/UCS4",
+	[if(__BYTE_ORDER__ == __ORDER_BIG_ENDIAN__)] "csUTF32",
+	[if(__BYTE_ORDER__ == __ORDER_BIG_ENDIAN__)] "ISO-10646/UCS4",
+	[if(__BYTE_ORDER__ == __ORDER_BIG_ENDIAN__)] "ISO-10646-UCS-4",
+	[if(__BYTE_ORDER__ == __ORDER_BIG_ENDIAN__)] "csUCS4",
 	[if(__BYTE_ORDER__ == __ORDER_BIG_ENDIAN__)] "UCS4",
 	[if(__BYTE_ORDER__ == __ORDER_BIG_ENDIAN__)] "UCS-4",
 	[if(__BYTE_ORDER__ == __ORDER_BIG_ENDIAN__)] "CSUCS4",
-	[if(__BYTE_ORDER__ == __ORDER_BIG_ENDIAN__)] "ISO10646",
+	[if(__BYTE_ORDER__ == __ORDER_BIG_ENDIAN__)] "ISO-10646",
 	[if(__BYTE_ORDER__ == __ORDER_BIG_ENDIAN__)] "10646-1:1993",
 	[if(__BYTE_ORDER__ == __ORDER_BIG_ENDIAN__)] "10646-1:1993/UCS4",
 	[if(__BYTE_ORDER__ == __ORDER_BIG_ENDIAN__)] "OSF00010104",
@@ -128,10 +234,10 @@
 
 # LATIN-1
 @CODEC(CODEC_ISO_8859_1:
-		"ISO8859-1:1987", "iso-ir-100", "ISO8859-1", "latin1",
-		"l1", "IBM819", "CP819", "ISO88591", "csISOLatin1",
+		"ISO_8859-1:1987", "iso-ir-100", "ISO_8859-1", "latin1",
+		"l1", "IBM819", "CP819", "ISO_88591", "csISOLatin1",
 		"cp28591", "Windows-28591", "WE8ISO8859P1", "cp38591",
-		"Windows-38591", "ISO8859-1-I", "8859_1", "OSF00010001")
+		"Windows-38591", "ISO_8859-1-I", "8859_1", "OSF00010001")
 ###################################################################################################
 
 
@@ -176,7 +282,7 @@
 
 
 
-@CP(CODEC_ISO646_VIEWDATA: "BS_viewdata", "iso-ir-47")
+@CP(CODEC_ISO646_VIEWDATA: "BS_viewdata", "iso-ir-47", "csISO47BSViewdata")
 	@ORD(0x20)
 	0020 0021 0022 00A3 0024 0025 0026 0027   # 20-27   ␠ ! " £ $ % & ' #
 	0028 0029 002A 002B 002C 002D 002E 002F   # 28-2F   ( ) * + , - . / #
@@ -201,7 +307,7 @@
 
 
 @CP(CODEC_ISO646_CA: "CSA_Z243.4-1985-1", "iso-ir-121", "ISO646-CA", "csa7-1", "ca",
-                     "csISO121Canadian1", "CSA_Z243.419851", "cp1020")
+                     "csISO121Canadian1", "CSA_Z243.419851", "cp1020", "csa71")
 	@ORD(0x20)
 	0020 0021 0022 0023 0024 0025 0026 0027   # 20-27   ␠ ! " # $ % & ' #
 	0028 0029 002A 002B 002C 002D 002E 002F   # 28-2F   ( ) * + , - . / #
@@ -218,7 +324,7 @@
 
 
 @CP(CODEC_ISO646_CA2: "CSA_Z243.4-1985-2", "iso-ir-122", "ISO646-CA2", "csa7-2",
-                      "csISO122Canadian2", "CSA_Z243.419852")
+                      "csISO122Canadian2", "CSA_Z243.419852", "csa72")
 	@ORD(0x20)
 	0020 0021 0022 0023 0024 0025 0026 0027   # 20-27   ␠ ! " # $ % & ' #
 	0028 0029 002A 002B 002C 002D 002E 002F   # 28-2F   ( ) * + , - . / #
@@ -235,7 +341,7 @@
 
 
 
-@CP(CODEC_ISO_IR_123: "CSA_Z243.4-1985-gr", "iso-ir-123")
+@CP(CODEC_ISO_IR_123: "CSA_Z243.4-1985-gr", "iso-ir-123", "csISO123CSAZ24341985gr")
 	@ORD(0xA0)
 	00A0 00A1 00A8 00A3 00A2 00A5 00B1 00B4   # A0-A7     ¡ ¨ £ ¢ ¥ ± ´ #
 	207D 207E 00BD 207A 00B8 00AD 00B7 207B   # A8-AF   ⁽ ⁾ ½ ⁺ ¸ ­ · ⁻ #
@@ -252,7 +358,7 @@
 
 
 
-@CP(CODEC_ISO_IR_139: "CSN_369103", "iso-ir-139")
+@CP(CODEC_ISO_IR_139: "CSN_369103", "iso-ir-139", "csISO139CSN369103")
 	0000 0001 0002 0003 0004 0005 0006 0007   # 00-07   ␀ ␁ ␂ ␃ ␄ ␅ ␆ ␇ #
 	0008 0009 000A 000B 000C 000D 000E 000F   # 08-0F   ␈ ␉ ␊ ␋ ␌ ␍ ␎ ␏ #
 	0010 0011 0012 0013 0014 0015 0016 0017   # 10-17   ␐ ␑ ␒ ␓ ␔ ␕ ␖ ␗ #
@@ -359,7 +465,7 @@
 
 
 
-@CP(CODEC_KOI8_E: "ECMA-cyrillic", "iso-ir-111", "ECMA-113", "KOI8-E")
+@CP(CODEC_KOI8_E: "ECMA-cyrillic", "iso-ir-111", "ECMA-113", "KOI8-E", "csISO111ECMACyrillic")
 	@ORD(0xA0)
 	# From "https://en.wikipedia.org/wiki/ISO-IR-111":
 	00A0 0452 0453 0451 0454 0455 0456 0457   # A0-A7     ђ ѓ ё є ѕ і ї #
@@ -430,7 +536,7 @@
 
 
 @CP(CODEC_ISO646_CN: "GB_1988-80", "iso-ir-57", "cn", "ISO646-CN",
-                     "csISO58GB1988", "GB_198880")
+                     "csISO57GB1988", "csISO58GB1988", "GB_198880")
 	@ORD(0x20)
 	0020 0021 0022 0023 00A5 0025 0026 0027   # 20-27   ␠ ! " # ¥ % & ' #
 	0028 0029 002A 002B 002C 002D 002E 002F   # 28-2F   ( ) * + , - . / #
@@ -447,7 +553,7 @@
 
 
 
-@CP(CODEC_ISO_IR_153: "GOST_19768-74", "ST_SEV_358-88", "iso-ir-153")
+@CP(CODEC_ISO_IR_153: "GOST_19768-74", "ST_SEV_358-88", "iso-ir-153", "csISO153GOST1976874")
 	@ORD(0xA0)
 	00A0 0401 0000 0000 0000 0000 0000 0000   # A0-A7     Ё ␀ ␀ ␀ ␀ ␀ ␀ #
 	0000 0000 0000 0000 0000 00AD 0000 0000   # A8-AF   ␀ ␀ ␀ ␀ ␀ ­ ␀ ␀ #
@@ -464,8 +570,7 @@
 
 
 
-@CP(CODEC_CP437: "IBM437", "cp437", "437",
-                 "csPC8CodePage437", "OEMUS", "OSF100201B5")
+@CP(CODEC_CP437: "IBM437", "cp437", "437", "csPC8CodePage437", "OEMUS", "OSF100201B5")
 	0000 263A 263B 2665 2666 2663 2660 2022   # 00-07   ␀ ☺ ☻ ♥ ♦ ♣ ♠ • #
 	25D8 25CB 25D9 2642 2640 266A 266B 263C   # 08-0F   ◘ ○ ◙ ♂ ♀ ♪ ♫ ☼ #
 	25BA 25C4 2195 203C 00B6 00A7 25AC 21A8   # 10-17   ► ◄ ↕ ‼ ¶ § ▬ ↨ #
@@ -541,7 +646,7 @@
 
 
 
-@CP(CODEC_CP851: "IBM851", "cp851", "851")
+@CP(CODEC_CP851: "IBM851", "cp851", "851", "csIBM851")
 	@ORD(0x80)
 	# From "https://en.wikipedia.org/wiki/Code_page_851":
 	00C7 00FC 00E9 00E2 00E4 00E0 0386 00E7   # 80-87   Ç ü é â ä à Ά ç #
@@ -621,7 +726,7 @@
 
 
 
-@CP(CODEC_CP855: "IBM855", "cp855", "855", "OEM855")
+@CP(CODEC_CP855: "IBM855", "cp855", "855", "OEM855", "csIBM855")
 	@ORD(0x80)
 	# From "https://en.wikipedia.org/wiki/Code_page_855":
 	0452 0402 0453 0403 0451 0401 0454 0404   # 80-87   ђ Ђ ѓ Ѓ ё Ё є Є #
@@ -661,7 +766,7 @@
 
 
 
-@CP(CODEC_CP857: "IBM857", "cp857", "857", "OEM857")
+@CP(CODEC_CP857: "IBM857", "cp857", "857", "OEM857", "csIBM857")
 	@ORD(0x80)
 	# From "https://en.wikipedia.org/wiki/Code_page_857":
 	00C7 00FC 00E9 00E2 00E4 00E0 00E5 00E7   # 80-87   Ç ü é â ä à å ç #
@@ -701,7 +806,7 @@
 
 
 
-@CP(CODEC_CP860: "IBM860", "cp860", "860", "OEM860")
+@CP(CODEC_CP860: "IBM860", "cp860", "860", "OEM860", "csIBM860")
 	@ORD(0x80)
 	# From "https://en.wikipedia.org/wiki/Code_page_860":
 	00C7 00FC 00E9 00E2 00E3 00E0 00C1 00E7   # 80-87   Ç ü é â ã à Á ç #
@@ -741,7 +846,7 @@
 
 
 
-@CP(CODEC_CP861: "IBM861", "cp861", "861", "OEM861", "cp-is")
+@CP(CODEC_CP861: "IBM861", "cp861", "861", "OEM861", "cp-is", "csIBM861")
 	@ORD(0x80)
 	# From "https://en.wikipedia.org/wiki/Code_page_861":
 	00C7 00FC 00E9 00E2 00E4 00E0 00E5 00E7   # 80-87   Ç ü é â ä à å ç #
@@ -821,7 +926,7 @@
 
 
 
-@CP(CODEC_CP863: "IBM863", "cp863", "863", "OEM863")
+@CP(CODEC_CP863: "IBM863", "cp863", "863", "OEM863", "csIBM863")
 	@ORD(0x80)
 	# From "https://en.wikipedia.org/wiki/Code_page_863":
 	00C7 00FC 00E9 00E2 00C2 00E0 00B6 00E7   # 80-87   Ç ü é â Â à ¶ ç #
@@ -861,7 +966,7 @@
 
 
 
-@CP(CODEC_CP864: "IBM864", "cp864")
+@CP(CODEC_CP864: "IBM864", "cp864", "csIBM864")
 	# From "https://en.wikipedia.org/wiki/Code_page_864":
 	0000 263A 266A 266B 263C 2550 2551 256C   # 00-07   ␀ ☺ ♪ ♫ ☼ ═ ║ ╬ #
 	2563 2566 2560 2569 2557 2554 255A 255D   # 08-0F   ╣ ╦ ╠ ╩ ╗ ╔ ╚ ╝ #
@@ -916,7 +1021,7 @@
 
 
 
-@CP(CODEC_CP865: "IBM865", "cp865", "865", "OEM865")
+@CP(CODEC_CP865: "IBM865", "cp865", "865", "OEM865", "csIBM865")
 	@ORD(0x80)
 	# From "https://en.wikipedia.org/wiki/Code_page_865":
 	00C7 00FC 00E9 00E2 00E4 00E0 00E5 00E7   # 80-87   Ç ü é â ä à å ç #
@@ -956,7 +1061,7 @@
 
 
 
-@CP(CODEC_CP868: "IBM868", "CP868", "cp-ar")
+@CP(CODEC_CP868: "IBM868", "CP868", "cp-ar", "csIBM868")
 	@ORD(0x80)
 	# From "https://en.wikipedia.org/wiki/Code_page_868":
 	06F0 06F1 06F2 06F3 06F4 06F5 06F6 06F7   # 80-87   ۰ ۱ ۲ ۳ ۴ ۵ ۶ ۷ #
@@ -996,7 +1101,7 @@
 
 
 
-@CP(CODEC_CP869: "IBM869", "cp869", "869", "cp-gr", "OEM869")
+@CP(CODEC_CP869: "IBM869", "cp869", "869", "cp-gr", "OEM869", "csIBM869")
 	@ORD(0x80)
 	# From "https://en.wikipedia.org/wiki/Code_page_869":
 	0000 0000 0000 0000 0000 0000 0386 20AC   # 80-87   ␀ ␀ ␀ ␀ ␀ ␀ Ά € #
@@ -1036,7 +1141,7 @@
 
 
 #???
-#???@CP("IBM891", "cp891")
+#???@CP("IBM891", "cp891", "csIBM891")
 #???	@ORD(0x80)
 #???	0000 0000 0000 0000 0000 0000 0000 0000   # ␀ ␀ ␀ ␀ ␀ ␀ ␀ ␀
 #???	0000 0000 0000 0000 0000 0000 0000 0000   # ␀ ␀ ␀ ␀ ␀ ␀ ␀ ␀
@@ -1057,7 +1162,7 @@
 
 
 #???
-#???@CP("IBM903", "cp903")
+#???@CP("IBM903", "cp903", "csIBM903")
 #???	@ORD(0x80)
 #???	0000 0000 0000 0000 0000 0000 0000 0000   # ␀ ␀ ␀ ␀ ␀ ␀ ␀ ␀
 #???	0000 0000 0000 0000 0000 0000 0000 0000   # ␀ ␀ ␀ ␀ ␀ ␀ ␀ ␀
@@ -1078,7 +1183,7 @@
 
 
 
-@CP(CODEC_CP904: "IBM904", "cp904", "904")
+@CP(CODEC_CP904: "IBM904", "cp904", "904", "csIBBM904")
 	# From "https://en.wikipedia.org/wiki/Code_page_904":
 	0000 2554 2557 255A 255D 2551 2550 FFEC   # 00-07   ␀ ╔ ╗ ╚ ╝ ║ ═ ￬ #
 	0008 FFEE 000A 303F 000C 000D FFED 263C   # 08-0F   ␈ ￮ ␊ 〿 ␌ ␍ ￭ ☼ #
@@ -1118,7 +1223,7 @@
 
 
 
-@CP(CODEC_ISO_IR_143: "IEC_P27-1", "iso-ir-143")
+@CP(CODEC_ISO_IR_143: "IEC_P27-1", "iso-ir-143", "csISO143IECP271")
 	@ORD(0xA0)
 	02C7 2261 2227 2228 2229 222A 2282 2283   # A0-A7   ˇ ≡ ∧ ∨ ∩ ∪ ⊂ ⊃ #
 	21D0 21D2 2234 2235 2208 220B 2286 2287   # A8-AF   ⇐ ⇒ ∴ ∵ ∈ ∋ ⊆ ⊇ #
@@ -1135,7 +1240,7 @@
 
 
 
-@CP(CODEC_ISO646_INIS_SUBSET: "INIS", "iso-ir-49")
+@CP(CODEC_ISO646_INIS_SUBSET: "INIS", "iso-ir-49", "csISO49INIS")
 	@ORD(0x20)
 	0020 0000 0000 0000 0024 0025 0000 0027   # 20-27   ␠ ␀ ␀ ␀ $ % ␀ ' #
 	0028 0029 002A 002B 002C 002D 002E 002F   # 28-2F   ( ) * + , - . / #
@@ -1152,7 +1257,7 @@
 
 
 
-@CP(CODEC_ISO_IR_50: "INIS-8", "iso-ir-50")
+@CP(CODEC_ISO_IR_50: "INIS-8", "iso-ir-50", "csISO50INIS8")
 	0000 0001 0002 0003 0004 0005 0006 0007   # 00-07   ␀ ␁ ␂ ␃ ␄ ␅ ␆ ␇ #
 	0008 0009 000A 000B 000C 000D 000E 000F   # 08-0F   ␈ ␉ ␊ ␋ ␌ ␍ ␎ ␏ #
 	0010 0011 0012 0013 0014 0015 0016 0017   # 10-17   ␐ ␑ ␒ ␓ ␔ ␕ ␖ ␗ #
@@ -1172,7 +1277,7 @@
 
 
 
-@CP(CODEC_ISO_IR_51: "INIS-cyrillic", "iso-ir-51")
+@CP(CODEC_ISO_IR_51: "INIS-cyrillic", "iso-ir-51", "csISO51INISCyrillic")
 	0000 0001 0002 0003 0004 0005 0006 0007   # 00-07   ␀ ␁ ␂ ␃ ␄ ␅ ␆ ␇ #
 	0008 0009 000A 000B 000C 000D 000E 000F   # 08-0F   ␈ ␉ ␊ ␋ ␌ ␍ ␎ ␏ #
 	0010 0011 0012 0013 0014 0015 0016 0017   # 10-17   ␐ ␑ ␒ ␓ ␔ ␕ ␖ ␗ #
@@ -1192,7 +1297,7 @@
 
 
 
-@CP(CODEC_ISO_IR_155: "ISO10367-box", "iso-ir-155")
+@CP(CODEC_ISO_IR_155: "ISO10367-box", "iso-ir-155", "csISO10367Box")
 	@ORD(0xA0)
 	0000 0000 0000 0000 0000 0000 0000 0000   # A0-A7   ␀ ␀ ␀ ␀ ␀ ␀ ␀ ␀ #
 	0000 0000 0000 0000 0000 0000 0000 0000   # A8-AF   ␀ ␀ ␀ ␀ ␀ ␀ ␀ ␀ #
@@ -1209,7 +1314,7 @@
 
 
 
-@CP(CODEC_ISO_IR_98: "ISO2033-1983", "iso-ir-98", "e13b")
+@CP(CODEC_ISO_IR_98: "ISO2033-1983", "iso-ir-98", "e13b", "csISO2033")
 	0000 0001 0002 0003 0004 0005 0006 0007   # 00-07   ␀ ␁ ␂ ␃ ␄ ␅ ␆ ␇ #
 	0008 0009 000A 000B 000C 000D 000E 000F   # 08-0F   ␈ ␉ ␊ ␋ ␌ ␍ ␎ ␏ #
 	0010 0011 0012 0013 0014 0015 0016 0017   # 10-17   ␐ ␑ ␒ ␓ ␔ ␕ ␖ ␗ #
@@ -1229,7 +1334,7 @@
 
 
 
-@CP(CODEC_ISO5427: "ISO5427", "iso-ir-37", "KOI7-N1", "koi0", "csISO5427Cyrillic")
+@CP(CODEC_ISO_5427: "ISO_5427", "iso-ir-37", "KOI7-N1", "koi0", "csISO5427Cyrillic")
 	0000 0001 0002 0003 0004 0005 0006 0007   # 00-07   ␀ ␁ ␂ ␃ ␄ ␅ ␆ ␇ #
 	0008 0009 000A 000B 000C 000D 000E 000F   # 08-0F   ␈ ␉ ␊ ␋ ␌ ␍ ␎ ␏ #
 	0010 0011 0012 0013 0014 0015 0016 0017   # 10-17   ␐ ␑ ␒ ␓ ␔ ␕ ␖ ␗ #
@@ -1266,7 +1371,7 @@
 
 
 
-@CP(CODEC_ISO_IR_54: "ISO5427:1981", "iso-ir-54")
+@CP(CODEC_ISO_IR_54: "ISO_5427:1981", "iso-ir-54", "ISO5427Cyrillic1981", "csISO54271981")
 	0000 0001 0002 0003 0004 0005 0006 0007   # 00-07   ␀ ␁ ␂ ␃ ␄ ␅ ␆ ␇ #
 	0008 0009 000A 000B 000C 000D 000E 000F   # 08-0F   ␈ ␉ ␊ ␋ ␌ ␍ ␎ ␏ #
 	0010 0011 0012 0013 0014 0015 0016 0017   # 10-17   ␐ ␑ ␒ ␓ ␔ ␕ ␖ ␗ #
@@ -1286,7 +1391,7 @@
 
 
 
-@CP(CODEC_ISO_IR_55: "ISO5428:1980", "iso-ir-55")
+@CP(CODEC_ISO_IR_55: "ISO5428:1980", "iso-ir-55", "csISO5428Greek")
 	0000 0001 0002 0003 0004 0005 0006 0007   # 00-07   ␀ ␁ ␂ ␃ ␄ ␅ ␆ ␇ #
 	0008 0009 000A 000B 000C 000D 000E 000F   # 08-0F   ␈ ␉ ␊ ␋ ␌ ␍ ␎ ␏ #
 	0010 0011 0012 0013 0014 0015 0016 0017   # 10-17   ␐ ␑ ␒ ␓ ␔ ␕ ␖ ␗ #
@@ -1343,7 +1448,7 @@
 
 
 
-@CP(CODEC_ISO_IR_152: "ISO6937-2-25", "iso-ir-152")
+@CP(CODEC_ISO_IR_152: "ISO_6937-2-25", "iso-ir-152", "csISO6937Add")
 	0000 0001 0002 0003 0004 0005 0006 0007   # 00-07   ␀ ␁ ␂ ␃ ␄ ␅ ␆ ␇ #
 	0008 0009 000A 000B 000C 000D 000E 000F   # 08-0F   ␈ ␉ ␊ ␋ ␌ ␍ ␎ ␏ #
 	0010 0011 0012 0013 0014 0015 0016 0017   # 10-17   ␐ ␑ ␒ ␓ ␔ ␕ ␖ ␗ #
@@ -1382,8 +1487,8 @@
 # This actually isn't *pure* latin2, but "cp912" which is an extension. But glibc
 # defines the same codec for both of them, so in the interest of compatibility as
 # well as saving a bit of space, we also do the same.
-@CP(CODEC_ISO_8859_2: "ISO8859-2:1987", "iso-ir-101", "ISO8859-2", "latin2", "l2",
-                      "ISO88592", "csISOLatin2", "IBM1111", "cp1111", "cp28592",
+@CP(CODEC_ISO_8859_2: "ISO_8859-2:1987", "iso-ir-101", "ISO_8859-2", "latin2", "l2",
+                      "ISO_88592", "csISOLatin2", "IBM1111", "cp1111", "cp28592",
                       "Windows-28592", "8859_2", "OSF00010002", "cp912", "IBM912")
 	@ORD(0x80)
 	2591 2592 2593 2502 2524 2518 250C 2588   # 80-87   ░ ▒ ▓ │ ┤ ┘ ┌ █ #
@@ -1405,8 +1510,8 @@
 
 
 
-@CP(CODEC_ISO_8859_3: "ISO8859-3:1988", "iso-ir-109", "ISO8859-3", "latin3", "l3",
-                      "ISO88593", "csISOLatin3", "IBM913", "cp913", "cp28593",
+@CP(CODEC_ISO_8859_3: "ISO_8859-3:1988", "iso-ir-109", "ISO_8859-3", "latin3", "l3",
+                      "ISO_88593", "csISOLatin3", "IBM913", "cp913", "cp28593",
                       "Windows-28593", "8859_3", "OSF00010003")
 	@ORD(0xA0)
 	00A0 0126 02D8 00A3 00A4 0000 0124 00A7   # A0-A7     Ħ ˘ £ ¤ ␀ Ĥ § #
@@ -1424,8 +1529,8 @@
 
 
 
-@CP(CODEC_ISO_8859_4: "ISO8859-4:1988", "iso-ir-110", "ISO8859-4", "latin4", "l4",
-                      "ISO88594", "csISOLatin4", "IBM914", "cp914", "cp28594",
+@CP(CODEC_ISO_8859_4: "ISO_8859-4:1988", "iso-ir-110", "ISO_8859-4", "latin4", "l4",
+                      "ISO_88594", "csISOLatin4", "IBM914", "cp914", "cp28594",
                       "Windows-28594", "8859_4", "OSF00010004")
 	@ORD(0xA0)
 	00A0 0104 0138 0156 00A4 0128 013B 00A7   # A0-A7     Ą ĸ Ŗ ¤ Ĩ Ļ § #
@@ -1446,8 +1551,8 @@
 # This actually isn't *pure* iso-8859-5, but "cp915" which is an extension. But glibc
 # defines the same codec for both of them, so in the interest of compatibility as
 # well as saving a bit of space, we also do the same.
-@CP(CODEC_ISO_8859_5: "ISO8859-5:1988", "iso-ir-144", "ISO8859-5", "cyrillic",
-                      "ISO88595", "csISOLatinCyrillic", "cp28595", "Windows-28595",
+@CP(CODEC_ISO_8859_5: "ISO_8859-5:1988", "iso-ir-144", "ISO_8859-5", "cyrillic",
+                      "ISO_88595", "csISOLatinCyrillic", "cp28595", "Windows-28595",
                       "8859_5", "OSF00010005", "cp915", "IBM915")
 	@ORD(0x80)
 	2591 2592 2593 2502 2524 2518 250C 2588   # 80-87   ░ ▒ ▓ │ ┤ ┘ ┌ █ #
@@ -1469,9 +1574,9 @@
 
 
 
-@CP(CODEC_ISO_8859_6: "ISO8859-6:1987", "iso-ir-127", "ISO8859-6", "ECMA-114", "ASMO-708", "arabic",
-                      "ISO88596", "csISOLatinArabic", "IBM1089", "cp1089", "cp28596",
-                      "Windows-28596", "cp38596", "Windows-38596", "ISO8859-6-I", "8859_6", "OSF00010006")
+@CP(CODEC_ISO_8859_6: "ISO_8859-6:1987", "iso-ir-127", "ISO_8859-6", "ECMA-114", "ASMO-708", "arabic",
+                      "ISO_88596", "csISOLatinArabic", "IBM1089", "cp1089", "cp28596",
+                      "Windows-28596", "cp38596", "Windows-38596", "ISO_8859-6-I", "8859_6", "OSF00010006")
 	@ORD(0xA0)
 	00A0 0000 0000 0000 00A4 0000 0000 0000   # A0-A7     ␀ ␀ ␀ ¤ ␀ ␀ ␀ #
 	0000 0000 0000 0000 060C 00AD 0000 0000   # A8-AF   ␀ ␀ ␀ ␀ ، ­ ␀ ␀ #
@@ -1488,9 +1593,9 @@
 
 
 
-@CP(CODEC_ISO_8859_7: "ISO8859-7:1987", "iso-ir-126", "ISO8859-7", "ELOT_928", "ECMA-118", "greek", "greek8",
-                      "ISO8859-7:2003", "csISOLatinGreek", "IBM813", "cp813", "cp28597", "Windows-28597",
-                      "ISO88597", "8859_7", "OSF00010007")
+@CP(CODEC_ISO_8859_7: "ISO_8859-7:1987", "iso-ir-126", "ISO_8859-7", "ELOT_928", "ECMA-118", "greek", "greek8",
+                      "ISO_8859-7:2003", "csISOLatinGreek", "IBM813", "cp813", "cp28597", "Windows-28597",
+                      "ISO_88597", "8859_7", "OSF00010007")
 	@ORD(0xA0)
 	00A0 2018 2019 00A3 20AC 20AF 00A6 00A7   # A0-A7     ‘ ’ £ € ₯ ¦ § #
 	00A8 00A9 037A 00AB 00AC 00AD 0000 2015   # A8-AF   ¨ © ͺ « ¬ ­ ␀ ― #
@@ -1507,10 +1612,10 @@
 
 
 
-@CP(CODEC_ISO_8859_8: "ISO8859-8:1988", "iso-ir-138", "ISO8859-8", "hebrew",
-                      "ISO88598", "csISOLatinHebrew", "IBM916", "cp916",
+@CP(CODEC_ISO_8859_8: "ISO_8859-8:1988", "iso-ir-138", "ISO_8859-8", "hebrew",
+                      "ISO_88598", "csISOLatinHebrew", "IBM916", "cp916",
                       "cp28598", "Windows-28598", "cp38598", "Windows-38598",
-                      "ISO8859-8-I", "8859_8", "OSF00010008")
+                      "ISO_8859-8-I", "8859_8", "OSF00010008")
 	@ORD(0xA0)
 	00A0 0000 00A2 00A3 00A4 00A5 00A6 00A7   # A0-A7     ␀ ¢ £ ¤ ¥ ¦ § #
 	00A8 00A9 00D7 00AB 00AC 00AD 00AE 00AF   # A8-AF   ¨ © × « ¬ ­ ® ¯ #
@@ -1527,8 +1632,8 @@
 
 
 
-@CP(CODEC_ISO_8859_9: "ISO8859-9:1989", "iso-ir-148", "ISO8859-9", "latin5", "l5",
-                      "ISO88599", "csISOLatin5", "IBM920", "cp920", "cp28599",
+@CP(CODEC_ISO_8859_9: "ISO_8859-9:1989", "iso-ir-148", "ISO_8859-9", "latin5", "l5",
+                      "ISO_88599", "csISOLatin5", "IBM920", "cp920", "cp28599",
                       "Windows-28599", "8859_9", "OSF00010009", "TS-5881", "ECMA-128")
 	@ORD(0xA0)
 	00A0 00A1 00A2 00A3 00A4 00A5 00A6 00A7   # A0-A7     ¡ ¢ £ ¤ ¥ ¦ § #
@@ -1546,7 +1651,7 @@
 
 
 
-@CP(CODEC_ISO_IR_154: "ISO8859-supp", "iso-ir-154", "latin1-2-5")
+@CP(CODEC_ISO_IR_154: "ISO_8859-supp", "iso-ir-154", "latin1-2-5", "csISO8859Supp")
 	@ORD(0xA0)
 	0000 0000 0100 0108 010A 0000 0116 0112   # A0-A7   ␀ ␀ Ā Ĉ Ċ ␀ Ė Ē #
 	011C 2018 201C 2122 2190 2191 2192 2193   # A8-AF   Ĝ ‘ “ ™ ← ↑ → ↓ #
@@ -1580,7 +1685,8 @@
 
 
 
-@CP(CODEC_ISO_IR_13: "JIS_C6220-1969-jp", "JIS_C6220-1969", "iso-ir-13", "katakana", "x0201-7")
+@CP(CODEC_ISO_IR_13: "JIS_C6220-1969-jp", "JIS_C6220-1969", "iso-ir-13", "katakana", "x0201-7",
+	                 "csISO13JISC6220jp")
 	0000 0001 0002 0003 0004 0005 0006 0007   # 00-07   ␀ ␁ ␂ ␃ ␄ ␅ ␆ ␇ #
 	0008 0009 000A 000B 000C 000D 000E 000F   # 08-0F   ␈ ␉ ␊ ␋ ␌ ␍ ␎ ␏ #
 	0010 0011 0012 0013 0014 0015 0016 0017   # 10-17   ␐ ␑ ␒ ␓ ␔ ␕ ␖ ␗ #
@@ -1601,7 +1707,7 @@
 
 
 @CP(CODEC_ISO646_JP: "JIS_C6220-1969-ro", "iso-ir-14", "jp", "ISO646-JP",
-                     "csISO14JISC6220RO", "JIS_C62201969RO", "cp895", "IBM895")
+                     "csISO14JISC6220ro", "JIS_C62201969RO", "cp895", "IBM895")
 	@ORD(0x20)
 	0020 0021 0022 0023 0024 0025 0026 0027   # 20-27   ␠ ! " # $ % & ' #
 	0028 0029 002A 002B 002C 002D 002E 002F   # 28-2F   ( ) * + , - . / #
@@ -1618,7 +1724,7 @@
 
 
 
-@CP(CODEC_ISO_IR_91: "JIS_C6229-1984-a", "iso-ir-91", "jp-ocr-a")
+@CP(CODEC_ISO_IR_91: "JIS_C6229-1984-a", "iso-ir-91", "jp-ocr-a", "csISO91JISC62291984a")
 	0000 0001 0002 0003 0004 0005 0006 0007   # 00-07   ␀ ␁ ␂ ␃ ␄ ␅ ␆ ␇ #
 	0008 0009 000A 000B 000C 000D 000E 000F   # 08-0F   ␈ ␉ ␊ ␋ ␌ ␍ ␎ ␏ #
 	0010 0011 0012 0013 0014 0015 0016 0017   # 10-17   ␐ ␑ ␒ ␓ ␔ ␕ ␖ ␗ #
@@ -1656,7 +1762,7 @@
 
 
 
-@CP(CODEC_ISO_IR_93: "JIS_C6229-1984-b-add", "iso-ir-93", "jp-ocr-b-add")
+@CP(CODEC_ISO_IR_93: "JIS_C6229-1984-b-add", "iso-ir-93", "jp-ocr-b-add", "csISO93JIS62291984badd")
 	0000 0001 0002 0003 0004 0005 0006 0007   # 00-07   ␀ ␁ ␂ ␃ ␄ ␅ ␆ ␇ #
 	0008 0009 000A 000B 000C 000D 000E 000F   # 08-0F   ␈ ␉ ␊ ␋ ␌ ␍ ␎ ␏ #
 	0010 0011 0012 0013 0014 0015 0016 0017   # 10-17   ␐ ␑ ␒ ␓ ␔ ␕ ␖ ␗ #
@@ -1676,7 +1782,7 @@
 
 
 
-@CP(CODEC_ISO_IR_94: "JIS_C6229-1984-hand", "iso-ir-94", "jp-ocr-hand")
+@CP(CODEC_ISO_IR_94: "JIS_C6229-1984-hand", "iso-ir-94", "jp-ocr-hand", "csISO94JIS62291984hand")
 	0000 0001 0002 0003 0004 0005 0006 0007   # 00-07   ␀ ␁ ␂ ␃ ␄ ␅ ␆ ␇ #
 	0008 0009 000A 000B 000C 000D 000E 000F   # 08-0F   ␈ ␉ ␊ ␋ ␌ ␍ ␎ ␏ #
 	0010 0011 0012 0013 0014 0015 0016 0017   # 10-17   ␐ ␑ ␒ ␓ ␔ ␕ ␖ ␗ #
@@ -1696,27 +1802,27 @@
 
 
 
-#???@CP(CODEC_ISO_IR_95: "JIS_C6229-1984-hand-add", "iso-ir-95", "jp-ocr-hand-add")
-#???	0000 0001 0002 0003 0004 0005 0006 0007   # ␀ ␁ ␂ ␃ ␄ ␅ ␆ ␇
-#???	0008 0009 000A 000B 000C 000D 000E 000F   # ␈ ␉ ␊ ␋ ␌ ␍ ␎ ␏
-#???	0010 0011 0012 0013 0014 0015 0016 0017   # ␐ ␑ ␒ ␓ ␔ ␕ ␖ ␗
-#???	0018 0019 001A 001B 001C 001D 001E 001F   # ␘ ␙ ␚ ␛ ␜ ␝ ␞ ␟
-#???	0020 0000 0000 0000 0000 005C 0000 0000   # ␠ ␀ ␀ ␀ ␀ \ ␀ ␀
-#???	0000 0000 0000 0000 0000 0000 0000 0000   # ␀ ␀ ␀ ␀ ␀ ␀ ␀ ␀
-#???	0000 0000 0000 0000 0000 0000 0000 0000   # ␀ ␀ ␀ ␀ ␀ ␀ ␀ ␀
-#???	0000 0000 0000 0000 0000 0000 0000 0000   # ␀ ␀ ␀ ␀ ␀ ␀ ␀ ␀
-#???	0000 0000 0000 0000 0000 0000 0000 0000   # ␀ ␀ ␀ ␀ ␀ ␀ ␀ ␀
-#???	0000 0000 0000 0000 0000 0000 0000 0000   # ␀ ␀ ␀ ␀ ␀ ␀ ␀ ␀
-#???	0000 0000 0000 0000 0000 0000 0000 0000   # ␀ ␀ ␀ ␀ ␀ ␀ ␀ ␀
-#???	0000 0000 0000 0000 0000 0000 0000 0000   # ␀ ␀ ␀ ␀ ␀ ␀ ␀ ␀
-#???	0000 0000 0000 0000 0000 0000 0000 0000   # ␀ ␀ ␀ ␀ ␀ ␀ ␀ ␀
-#???	0000 0000 0000 0000 0000 0000 0000 0000   # ␀ ␀ ␀ ␀ ␀ ␀ ␀ ␀
-#???	0000 0000 0000 0000 0000 0000 0000 0000   # ␀ ␀ ␀ ␀ ␀ ␀ ␀ ␀
-#???	0000 0000 0000 0000 0000 0000 0000 007F   # ␀ ␀ ␀ ␀ ␀ ␀ ␀ ␡
+@CP(CODEC_ISO_IR_95: "JIS_C6229-1984-hand-add", "iso-ir-95", "jp-ocr-hand-add", "csISO95JIS62291984handadd")
+	0000 0001 0002 0003 0004 0005 0006 0007   # 00-07   ␀ ␁ ␂ ␃ ␄ ␅ ␆ ␇ #
+	0008 0009 000A 000B 000C 000D 000E 000F   # 08-0F   ␈ ␉ ␊ ␋ ␌ ␍ ␎ ␏ #
+	0010 0011 0012 0013 0014 0015 0016 0017   # 10-17   ␐ ␑ ␒ ␓ ␔ ␕ ␖ ␗ #
+	0018 0019 001A 001B 001C 001D 001E 001F   # 18-1F   ␘ ␙ ␚ ␛ ␜ ␝ ␞ ␟ #
+	0020 0000 0000 0000 0000 005C 0000 0000   # 20-27   ␠ ␀ ␀ ␀ ␀ \ ␀ ␀ #
+	0000 0000 0000 0000 0000 0000 0000 0000   # 28-2F   ␀ ␀ ␀ ␀ ␀ ␀ ␀ ␀ #
+	0000 0000 0000 0000 0000 0000 0000 0000   # 30-37   ␀ ␀ ␀ ␀ ␀ ␀ ␀ ␀ #
+	0000 0000 0000 0000 0000 0000 0000 0000   # 38-3F   ␀ ␀ ␀ ␀ ␀ ␀ ␀ ␀ #
+	0000 0000 0000 0000 0000 0000 0000 0000   # 40-47   ␀ ␀ ␀ ␀ ␀ ␀ ␀ ␀ #
+	0000 0000 0000 0000 0000 0000 0000 0000   # 48-4F   ␀ ␀ ␀ ␀ ␀ ␀ ␀ ␀ #
+	0000 0000 0000 0000 0000 0000 0000 0000   # 50-57   ␀ ␀ ␀ ␀ ␀ ␀ ␀ ␀ #
+	0000 0000 0000 0000 0000 0000 0000 0000   # 58-5F   ␀ ␀ ␀ ␀ ␀ ␀ ␀ ␀ #
+	0000 0000 0000 0000 0000 0000 0000 0000   # 60-67   ␀ ␀ ␀ ␀ ␀ ␀ ␀ ␀ #
+	0000 0000 0000 0000 0000 0000 0000 0000   # 68-6F   ␀ ␀ ␀ ␀ ␀ ␀ ␀ ␀ #
+	0000 0000 0000 0000 0000 0000 0000 0000   # 70-77   ␀ ␀ ␀ ␀ ␀ ␀ ␀ ␀ #
+	0000 0000 0000 0000 0000 0000 0000 007F   # 78-7F   ␀ ␀ ␀ ␀ ␀ ␀ ␀ ␡ #
 
 
 
-@CP(CODEC_ISO_IR_96: "JIS_C6229-1984-kana", "iso-ir-96")
+@CP(CODEC_ISO_IR_96: "JIS_C6229-1984-kana", "iso-ir-96", "csISO96JISC62291984kana")
 	0000 0001 0002 0003 0004 0005 0006 0007   # 00-07   ␀ ␁ ␂ ␃ ␄ ␅ ␆ ␇ #
 	0008 0009 000A 000B 000C 000D 000E 000F   # 08-0F   ␈ ␉ ␊ ␋ ␌ ␍ ␎ ␏ #
 	0010 0011 0012 0013 0014 0015 0016 0017   # 10-17   ␐ ␑ ␒ ␓ ␔ ␕ ␖ ␗ #
@@ -1736,7 +1842,7 @@
 
 
 
-@CP(CODEC_X0201: "JIS_X0201", "X0201")
+@CP(CODEC_X0201: "JIS_X0201", "X0201", "csHalfWidthKatakana")
 	0000 0001 0002 0003 0004 0005 0006 0007   # 00-07   ␀ ␁ ␂ ␃ ␄ ␅ ␆ ␇ #
 	0008 0009 000A 000B 000C 000D 000E 000F   # 08-0F   ␈ ␉ ␊ ␋ ␌ ␍ ␎ ␏ #
 	0010 0011 0012 0013 0014 0015 0016 0017   # 10-17   ␐ ␑ ␒ ␓ ␔ ␕ ␖ ␗ #
@@ -1790,7 +1896,7 @@
 
 
 
-@CP(CODEC_ISO_IR_147: "JUS_I.B1.003-mac", "macedonian", "iso-ir-147")
+@CP(CODEC_ISO_IR_147: "JUS_I.B1.003-mac", "macedonian", "iso-ir-147", "csISO147Macedonian")
 	0000 0001 0002 0003 0004 0005 0006 0007   # 00-07   ␀ ␁ ␂ ␃ ␄ ␅ ␆ ␇ #
 	0008 0009 000A 000B 000C 000D 000E 000F   # 08-0F   ␈ ␉ ␊ ␋ ␌ ␍ ␎ ␏ #
 	0010 0011 0012 0013 0014 0015 0016 0017   # 10-17   ␐ ␑ ␒ ␓ ␔ ␕ ␖ ␗ #
@@ -1810,7 +1916,7 @@
 
 
 
-@CP(CODEC_ISO_IR_146: "JUS_I.B1.003-serb", "iso-ir-146", "serbian")
+@CP(CODEC_ISO_IR_146: "JUS_I.B1.003-serb", "iso-ir-146", "serbian", "csISO146Serbian")
 	0000 0001 0002 0003 0004 0005 0006 0007   # 00-07   ␀ ␁ ␂ ␃ ␄ ␅ ␆ ␇ #
 	0008 0009 000A 000B 000C 000D 000E 000F   # 08-0F   ␈ ␉ ␊ ␋ ␌ ␍ ␎ ␏ #
 	0010 0011 0012 0013 0014 0015 0016 0017   # 10-17   ␐ ␑ ␒ ␓ ␔ ␕ ␖ ␗ #
@@ -1830,7 +1936,7 @@
 
 
 
-@CP(CODEC_ISO646_KR: "KSC5636", "ISO646-KR", "csKsc5636", "KS-X-1003", "KSC5636-1989")
+@CP(CODEC_ISO646_KR: "KSC5636", "ISO646-KR", "csKSC5636", "KS-X-1003", "KSC5636-1989")
 	@ORD(0x20)
 	0020 0021 0022 0023 0024 0025 0026 0027   # 20-27   ␠ ! " # $ % & ' #
 	0028 0029 002A 002B 002C 002D 002E 002F   # 28-2F   ( ) * + , - . / #
@@ -2061,7 +2167,7 @@
 
 
 
-@CP(CODEC_ISO646_PT: "PT", "iso-ir-16", "ISO646-PT", "csISO16Portugese")
+@CP(CODEC_ISO646_PT: "PT", "iso-ir-16", "ISO646-PT", "csISO16Portugese", "csISO16Portuguese")
 	@ORD(0x20)
 	0020 0021 0022 0023 0024 0025 0026 0027   # 20-27   ␠ ! " # $ % & ' #
 	0028 0029 002A 002B 002C 002D 002E 002F   # 28-2F   ( ) * + , - . / #
@@ -2134,7 +2240,7 @@
 
 
 
-@CP(CODEC_ISO646_T_61: "T.61-7bit", "iso-ir-102")
+@CP(CODEC_ISO646_T_61: "T.61-7bit", "iso-ir-102", "csISO102T617bit")
 	@ORD(0x20)
 	0020 0021 0022 0023 00A4 0025 0026 0027   # 20-27   ␠ ! " # ¤ % & ' #
 	0028 0029 002A 002B 002C 002D 002E 002F   # 28-2F   ( ) * + , - . / #
@@ -2151,7 +2257,7 @@
 
 
 
-@CP(CODEC_ISO_IR_150: "greek-ccitt", "iso-ir-150")
+@CP(CODEC_ISO_IR_150: "greek-ccitt", "iso-ir-150", "csISO150", "csISO150GreekCCITT")
 	0000 0001 0002 0003 0004 0005 0006 0007   # 00-07   ␀ ␁ ␂ ␃ ␄ ␅ ␆ ␇ #
 	0008 0009 000A 000B 000C 000D 000E 000F   # 08-0F   ␈ ␉ ␊ ␋ ␌ ␍ ␎ ␏ #
 	0010 0011 0012 0013 0014 0015 0016 0017   # 10-17   ␐ ␑ ␒ ␓ ␔ ␕ ␖ ␗ #
@@ -2171,7 +2277,7 @@
 
 
 
-@CP(CODEC_ISO_IR_88: "greek7", "iso-ir-88")
+@CP(CODEC_ISO_IR_88: "greek7", "iso-ir-88", "csISO88Greek7")
 	0000 0001 0002 0003 0004 0005 0006 0007   # 00-07   ␀ ␁ ␂ ␃ ␄ ␅ ␆ ␇ #
 	0008 0009 000A 000B 000C 000D 000E 000F   # 08-0F   ␈ ␉ ␊ ␋ ␌ ␍ ␎ ␏ #
 	0010 0011 0012 0013 0014 0015 0016 0017   # 10-17   ␐ ␑ ␒ ␓ ␔ ␕ ␖ ␗ #
@@ -2191,7 +2297,7 @@
 
 
 
-@CP(CODEC_ISO_IR_18: "greek7-old", "iso-ir-18")
+@CP(CODEC_ISO_IR_18: "greek7-old", "iso-ir-18", "csISO18Greek7Old")
 	0000 0001 0002 0003 0004 0005 0006 0007   # 00-07   ␀ ␁ ␂ ␃ ␄ ␅ ␆ ␇ #
 	0008 0009 000A 000B 000C 000D 000E 000F   # 08-0F   ␈ ␉ ␊ ␋ ␌ ␍ ␎ ␏ #
 	0010 0011 0012 0013 0014 0015 0016 0017   # 10-17   ␐ ␑ ␒ ␓ ␔ ␕ ␖ ␗ #
@@ -2211,7 +2317,7 @@
 
 
 
-@CP(CODEC_HP_ROMAN8: "hp-roman8", "roman8", "r8")
+@CP(CODEC_HP_ROMAN8: "hp-roman8", "roman8", "r8", "csHPRoman8")
 	@ORD(0xA0)
 	00A0 00C0 00C2 00C8 00CA 00CB 00CE 00CF   # A0-A7     À Â È Ê Ë Î Ï #
 	00B4 2035 2227 00A8 223C 00D9 00DB 20A4   # A8-AF   ´ ‵ ∧ ¨ ∼ Ù Û ₤ #
@@ -2228,7 +2334,7 @@
 
 
 
-@CP(CODEC_ISO_IR_19: "latin-greek", "iso-ir-19", "latingreek", "csIso19LatinGreek")
+@CP(CODEC_ISO_IR_19: "latin-greek", "iso-ir-19", "latingreek", "csISO19LatinGreek")
 	0000 0001 0002 0003 0004 0005 0006 0007   # 00-07   ␀ ␁ ␂ ␃ ␄ ␅ ␆ ␇ #
 	0008 0009 000A 000B 000C 000D 000E 000F   # 08-0F   ␈ ␉ ␊ ␋ ␌ ␍ ␎ ␏ #
 	0010 0011 0012 0013 0014 0015 0016 0017   # 10-17   ␐ ␑ ␒ ␓ ␔ ␕ ␖ ␗ #
@@ -2248,7 +2354,7 @@
 
 
 
-@CP(CODEC_ISO_IR_158: "latin-lap", "lap", "iso-ir-158")
+@CP(CODEC_ISO_IR_158: "latin-lap", "lap", "iso-ir-158", "csISO158Lap")
 	@ORD(0xA0)
 	00B4 0000 0000 0000 0000 0000 0000 0000   # A0-A7   ´ ␀ ␀ ␀ ␀ ␀ ␀ ␀ #
 	0000 0000 0000 0000 0000 0000 0000 0000   # A8-AF   ␀ ␀ ␀ ␀ ␀ ␀ ␀ ␀ #
@@ -2266,7 +2372,7 @@
 
 
 @CP(CODEC_ISO_8859_10: "latin6", "iso-ir-157", "l6",
-                       "ISO8859-10", "ISO8859-10:1992", "ISO885910",
+                       "ISO_8859-10", "ISO_8859-10:1992", "ISO_885910",
                        "csISOLatin6", "IBM919", "cp919", "cp28600",
                        "Windows-28600", "OSF0001000A")
 	@ORD(0xA0)
@@ -2285,9 +2391,8 @@
 
 
 
-@CP(CODEC_CP1275: "macintosh", "mac",
-                  "cp1275", "IBM1275", "cp10000", "Windows-10000",
-                  "x-mac-roman", "MacRoman")
+@CP(CODEC_CP1275: "macintosh", "mac", "csMacintosh", "cp1275", "IBM1275",
+                  "cp10000", "Windows-10000", "x-mac-roman", "MacRoman")
 	@ORD(0x80)
 	00C4 00C5 00C7 00C9 00D1 00D6 00DC 00E1   # 80-87   Ä Å Ç É Ñ Ö Ü á #
 	00E0 00E2 00E4 00E3 00E5 00E7 00E9 00E8   # 88-8F   à â ä ã å ç é è #
@@ -2306,12 +2411,52 @@
 	F8FF 00D2 00DA 00DB 00D9 0131 02C6 02DC   # F0-F7    Ò Ú Û Ù ı ˆ ˜ #
 	00AF 02D8 02D9 02DA 00B8 02DD 02DB 02C7   # F8-FF   ¯ ˘ ˙ ˚ ¸ ˝ ˛ ˇ #
 
+
+
+@CP(CODEC_DK_US: "dk-us", "csDKUS")
+	0000 0001 0002 0003 0004 0005 0006 0007   # 00-07   ␀ ␁ ␂ ␃ ␄ ␅ ␆ ␇ #
+	0008 0009 000A 000B 000C 000D 000E 000F   # 08-0F   ␈ ␉ ␊ ␋ ␌ ␍ ␎ ␏ #
+	0010 0011 0012 0013 0014 0015 0016 0017   # 10-17   ␐ ␑ ␒ ␓ ␔ ␕ ␖ ␗ #
+	0018 0019 001A 001B 001C 001D 001E 001F   # 18-1F   ␘ ␙ ␚ ␛ ␜ ␝ ␞ ␟ #
+	0020 0021 0022 0023 0024 0025 0026 0027   # 20-27   ␠ ! " # $ % & ' #
+	0028 0029 002A 002B 002C 002D 002E 002F   # 28-2F   ( ) * + , - . / #
+	0030 0031 0032 0033 0034 0035 0036 0037   # 30-37   0 1 2 3 4 5 6 7 #
+	0038 0039 003A 003B 003C 003D 003E 003F   # 38-3F   8 9 : ; < = > ? #
+	0040 0041 0042 0043 0044 0045 0046 0047   # 40-47   @ A B C D E F G #
+	0048 0049 004A 004B 004C 004D 004E 004F   # 48-4F   H I J K L M N O #
+	0050 0051 0052 0053 0054 0055 0056 0057   # 50-57   P Q R S T U V W #
+	0058 0059 005A 00C4 00D6 005D 005E 005F   # 58-5F   X Y Z Ä Ö ] ^ _ #
+	0060 0061 0062 0063 0064 0065 0066 0067   # 60-67   ` a b c d e f g #
+	0068 0069 006A 006B 006C 006D 006E 006F   # 68-6F   h i j k l m n o #
+	0070 0071 0072 0073 0074 0075 0076 0077   # 70-77   p q r s t u v w #
+	0078 0079 007A 00E4 00F6 007D 007E 007F   # 78-7F   x y z ä ö } ~ ␡ #
+
+
+
+@CP(CODEC_US_DK: "us-dk", "csUSDK")
+	0000 0001 0002 0003 0004 0005 0006 0007   # 00-07   ␀ ␁ ␂ ␃ ␄ ␅ ␆ ␇ #
+	0008 0009 000A 000B 000C 000D 000E 000F   # 08-0F   ␈ ␉ ␊ ␋ ␌ ␍ ␎ ␏ #
+	0010 0011 0012 0013 0014 0015 0016 0017   # 10-17   ␐ ␑ ␒ ␓ ␔ ␕ ␖ ␗ #
+	0018 0019 001A 001B 001C 001D 001E 001F   # 18-1F   ␘ ␙ ␚ ␛ ␜ ␝ ␞ ␟ #
+	0020 0021 0022 0023 0024 0025 0026 0027   # 20-27   ␠ ! " # $ % & ' #
+	0028 0029 002A 002B 002C 002D 002E 002F   # 28-2F   ( ) * + , - . / #
+	0030 0031 0032 0033 0034 0035 0036 0037   # 30-37   0 1 2 3 4 5 6 7 #
+	0038 0039 003A 003B 003C 003D 003E 003F   # 38-3F   8 9 : ; < = > ? #
+	0040 0041 0042 0043 0044 0045 0046 0047   # 40-47   @ A B C D E F G #
+	0048 0049 004A 004B 004C 004D 004E 004F   # 48-4F   H I J K L M N O #
+	0050 0051 0052 0053 0054 0055 0056 0057   # 50-57   P Q R S T U V W #
+	0058 0059 005A 00C4 00D6 00C5 005E 005F   # 58-5F   X Y Z Ä Ö Å ^ _ #
+	0060 0061 0062 0063 0064 0065 0066 0067   # 60-67   ` a b c d e f g #
+	0068 0069 006A 006B 006C 006D 006E 006F   # 68-6F   h i j k l m n o #
+	0070 0071 0072 0073 0074 0075 0076 0077   # 70-77   p q r s t u v w #
+	0078 0079 007A 00E4 00F6 00E5 007E 007F   # 78-7F   x y z ä ö å ~ ␡ #
+
 ###################################################################################################
 
 
 
-@CP(CODEC_ISO_8859_13: "ISO8859-13", "ISO885913", "iso-ir-179", "csISOLatin7",
-                       "latin7", "l7", "baltic", "cp28603", "Windows-28603")
+@CP(CODEC_ISO_8859_13: "ISO_8859-13", "ISO_885913", "iso-ir-179", "csISOLatin7",
+                       "latin7", "l7", "baltic", "cp28603", "Windows-28603", "csISO885913")
 	@ORD(0xA0)
 	00A0 201D 00A2 00A3 00A4 201E 00A6 00A7   # A0-A7     ” ¢ £ ¤ „ ¦ § #
 	00D8 00A9 0156 00AB 00AC 00AD 00AE 00C6   # A8-AF   Ø © Ŗ « ¬ ­ ® Æ #
@@ -2540,7 +2685,7 @@
 
 
 
-@CP(CODEC_CP775: "cp775", "IBM775", "OEM775")
+@CP(CODEC_CP775: "cp775", "IBM775", "OEM775", "csPC775Baltic")
 	@ORD(0x80)
 	0106 00FC 00E9 0101 00E4 0123 00E5 0107   # 80-87   Ć ü é ā ä ģ å ć #
 	0142 0113 0156 0157 012B 0179 00C4 00C5   # 88-8F   ł ē Ŗ ŗ ī Ź Ä Å #
@@ -2666,7 +2811,7 @@
 
 
 
-@CP(CODEC_CP858: "cp858", "IBM858", "OEM858", "PC-Multilingual-850+euro")
+@CP(CODEC_CP858: "CP00858", "IBM00858", "OEM858", "PC-Multilingual-850+euro", "CCSID00858", "csIBM00858")
 	@ORD(0x80)
 	00C7 00FC 00E9 00E2 00E4 00E0 00E5 00E7   # 80-87   Ç ü é â ä à å ç #
 	00EA 00EB 00E8 00EF 00EE 00EC 00C4 00C5   # 88-8F   ê ë è ï î ì Ä Å #
@@ -2708,7 +2853,7 @@
 
 
 
-@CP(CODEC_CP866: "cp866", "866", "IBM866")
+@CP(CODEC_CP866: "cp866", "866", "IBM866", "csIBM866")
 	@ORD(0x80)
 	0410 0411 0412 0413 0414 0415 0416 0417   # 80-87   А Б В Г Д Е Ж З #
 	0418 0419 041A 041B 041C 041D 041E 041F   # 88-8F   И Й К Л М Н О П #
@@ -2998,7 +3143,7 @@
 
 
 
-@CP(CODEC_KOI8_U: "KOI8-U", "cp21866", "cp1168", "IBM1168")
+@CP(CODEC_KOI8_U: "KOI8-U", "cp21866", "cp1168", "IBM1168", "csKOI8U")
 	@ORD(0x80)
 	2500 2502 250C 2510 2514 2518 251C 2524   # 80-87   ─ │ ┌ ┐ └ ┘ ├ ┤ #
 	252C 2534 253C 2580 2584 2588 258C 2590   # 88-8F   ┬ ┴ ┼ ▀ ▄ █ ▌ ▐ #
@@ -3099,7 +3244,7 @@
 
 
 
-@CP(CODEC_ISO_8859_11: "ISO8859-11", "ISO885911", "cp28601", "Windows-28601")
+@CP(CODEC_ISO_8859_11: "ISO_8859-11", "ISO_885911", "cp28601", "Windows-28601")
 	@ORD(0xA0)
 	00A0 0E01 0E02 0E03 0E04 0E05 0E06 0E07   # A0-A7     ก ข ฃ ค ฅ ฆ ง #
 	0E08 0E09 0E0A 0E0B 0E0C 0E0D 0E0E 0E0F   # A8-AF   จ ฉ ช ซ ฌ ญ ฎ ฏ #
@@ -3116,7 +3261,9 @@
 
 
 
-@CP(CODEC_ISO_8859_14: "ISO8859-14", "ISO8859-14:1998", "ISO885914", "iso-ir-199", "iso-celtic", "latin8", "l8", "cp28604", "Windows-28604")
+@CP(CODEC_ISO_8859_14: "ISO_8859-14", "ISO_8859-14:1998", "ISO_885914",
+                       "iso-ir-199", "iso-celtic", "latin8", "l8", "cp28604",
+                       "Windows-28604", "csISO885914")
 	@ORD(0xA0)
 	00A0 1E02 1E03 00A3 010A 010B 1E0A 00A7   # A0-A7     Ḃ ḃ £ Ċ ċ Ḋ § #
 	1E80 00A9 1E82 1E0B 1EF2 00AD 00AE 0178   # A8-AF   Ẁ © Ẃ ḋ Ỳ ­ ® Ÿ #
@@ -3133,7 +3280,9 @@
 
 
 
-@CP(CODEC_ISO_8859_15: "ISO8859-15", "ISO8859-15:1998", "ISO885915", "iso-ir-203", "latin9", "latin0", "IBM923", "cp923", "cp28605", "Windows-28605")
+@CP(CODEC_ISO_8859_15: "ISO_8859-15", "ISO_8859-15:1998", "ISO_885915",
+                       "iso-ir-203", "latin9", "latin0", "IBM923", "cp923",
+                       "cp28605", "Windows-28605", "csISO885915")
 	@ORD(0xA0)
 	00A0 00A1 00A2 00A3 20AC 00A5 0160 00A7   # A0-A7     ¡ ¢ £ € ¥ Š § #
 	0161 00A9 00AA 00AB 00AC 00AD 00AE 00AF   # A8-AF   š © ª « ¬ ­ ® ¯ #
@@ -3150,7 +3299,9 @@
 
 
 
-@CP(CODEC_ISO_8859_16: "ISO8859-16", "ISO8859-16:2001", "ISO885916", "iso-ir-226", "latin10", "l10", "SR-14111", "cp28606", "Windows-28606")
+@CP(CODEC_ISO_8859_16: "ISO_8859-16", "ISO_8859-16:2001", "ISO_885916",
+                       "iso-ir-226", "latin10", "l10", "SR-14111", "cp28606",
+                       "Windows-28606", "csISO885916")
 	@ORD(0xA0)
 	00A0 0104 0105 0141 20AC 201E 0160 00A7   # A0-A7     Ą ą Ł € „ Š § #
 	0161 00A9 0218 00AB 0179 00AD 017A 017B   # A8-AF   š © Ș « Ź ­ ź Ż #
@@ -3319,7 +3470,7 @@
 
 
 
-@CP(CODEC_CP20269: "cp20269", "T.51", "ISO6937", "iso-ir-156", "ISO6937:1992")
+@CP(CODEC_CP20269: "cp20269", "T.51", "ISO_6937", "iso-ir-156", "ISO_6937:1992")
 	@ORD(0x80)
 	0000 0000 0000 0000 0000 0000 0000 0000   # 80-87   ␀ ␀ ␀ ␀ ␀ ␀ ␀ ␀ #
 	0000 0000 0000 0000 0000 0000 0000 0000   # 88-8F   ␀ ␀ ␀ ␀ ␀ ␀ ␀ ␀ #
@@ -3340,7 +3491,7 @@
 
 
 
-@CP(CODEC_CP1250: "cp1250", "Windows-1250")
+@CP(CODEC_CP1250: "cp1250", "Windows-1250", "cswindows1250")
 	@ORD(0x80)
 	20AC 0000 201A 0000 201E 2026 2020 2021   # 80-87   € ␀ ‚ ␀ „ … † ‡ #
 	0000 2030 0160 2039 015A 0164 017D 0179   # 88-8F   ␀ ‰ Š ‹ Ś Ť Ž Ź #
@@ -3395,7 +3546,7 @@
 
 
 
-@CP(CODEC_CP1162: "cp1162", "IBM1162", "windows-874", "MS874", "x-windows-874")
+@CP(CODEC_CP1162: "cp1162", "IBM1162", "windows-874", "MS874", "x-windows-874", "cswindows874")
 	@ORD(0x80)
 	20AC 0081 0082 0083 0084 2026 0086 0087   # 80-87   €     …   #
 	0088 0089 008A 008B 008C 008D 008E 008F   # 88-8F           #
@@ -3475,7 +3626,7 @@
 
 
 
-@CP(CODEC_CP1251: "cp1251", "Windows-1251")
+@CP(CODEC_CP1251: "cp1251", "Windows-1251", "cswindows1251")
 	@ORD(0x80)
 	0402 0403 201A 0453 201E 2026 2020 2021   # 80-87   Ђ Ѓ ‚ ѓ „ … † ‡ #
 	20AC 2030 0409 2039 040A 040C 040B 040F   # 88-8F   € ‰ Љ ‹ Њ Ќ Ћ Џ #
@@ -3496,7 +3647,7 @@
 
 
 
-@CP(CODEC_KZ_1048: "KZ-1048", "STRK1048-2002")
+@CP(CODEC_KZ_1048: "KZ-1048", "STRK1048-2002", "RK1048", "csKZ1048")
 	@ORD(0x80)
 	0402 0403 201A 0453 201E 2026 2020 2021   # 80-87   Ђ Ѓ ‚ ѓ „ … † ‡ #
 	20AC 2030 0409 2039 040A 049A 04BA 040F   # 88-8F   € ‰ Љ ‹ Њ Қ Һ Џ #
@@ -3517,7 +3668,7 @@
 
 
 
-@CP(CODEC_AMIGA_1251: "Amiga-1251", "Ami1251")
+@CP(CODEC_AMIGA_1251: "Amiga-1251", "Ami1251", "Amiga1251", "Ami-1251", "csAmiga1251")
 	@ORD(0xA0)
 	00A0 00A1 00A2 00A3 20AC 00A5 00A6 00A7   # A0-A7     ¡ ¢ £ € ¥ ¦ § #
 	0401 00A9 2116 00AB 00AC 00AD 00AE 00AF   # A8-AF   Ё © № « ¬ ­ ® ¯ #
@@ -3534,7 +3685,7 @@
 
 
 
-@CP(CODEC_CP1252: "cp1252", "Windows-1252")
+@CP(CODEC_CP1252: "cp1252", "Windows-1252", "cswindows1252")
 	@ORD(0x80)
 	20AC 0000 201A 0192 201E 2026 2020 2021   # 80-87   € ␀ ‚ ƒ „ … † ‡ #
 	02C6 2030 0160 2039 0152 0000 017D 0000   # 88-8F   ˆ ‰ Š ‹ Œ ␀ Ž ␀ #
@@ -3576,7 +3727,7 @@
 
 
 
-@CP(CODEC_CP1253: "cp1253", "Windows-1253")
+@CP(CODEC_CP1253: "cp1253", "Windows-1253", "cswindows1253")
 	@ORD(0x80)
 	20AC 0000 201A 0192 201E 2026 2020 2021   # 80-87   € ␀ ‚ ƒ „ … † ‡ #
 	0000 2030 0000 2039 0000 0000 0000 0000   # 88-8F   ␀ ‰ ␀ ‹ ␀ ␀ ␀ ␀ #
@@ -3597,7 +3748,7 @@
 
 
 
-@CP(CODEC_CP1254: "cp1254", "Windows-1254")
+@CP(CODEC_CP1254: "cp1254", "Windows-1254", "cswindows1254")
 	@ORD(0x80)
 	20AC 0000 201A 0192 201E 2026 2020 2021   # 80-87   € ␀ ‚ ƒ „ … † ‡ #
 	02C6 2030 0160 2039 0152 0000 0000 0000   # 88-8F   ˆ ‰ Š ‹ Œ ␀ ␀ ␀ #
@@ -3618,7 +3769,7 @@
 
 
 
-@CP(CODEC_CP1255: "cp1255", "Windows-1255")
+@CP(CODEC_CP1255: "cp1255", "Windows-1255", "cswindows1255")
 	@ORD(0x80)
 	20AC 0000 201A 0192 201E 2026 2020 2021   # 80-87   € ␀ ‚ ƒ „ … † ‡ #
 	02C6 2030 0000 2039 0000 0000 0000 0000   # 88-8F   ˆ ‰ ␀ ‹ ␀ ␀ ␀ ␀ #
@@ -3639,7 +3790,7 @@
 
 
 
-@CP(CODEC_CP1256: "cp1256", "Windows-1256")
+@CP(CODEC_CP1256: "cp1256", "Windows-1256", "cswindows1256")
 	@ORD(0x80)
 	20AC 067E 201A 0192 201E 2026 2020 2021   # 80-87   € پ ‚ ƒ „ … † ‡ #
 	02C6 2030 0679 2039 0152 0686 0698 0688   # 88-8F   ˆ ‰ ٹ ‹ Œ چ ژ ڈ #
@@ -3660,7 +3811,7 @@
 
 
 
-@CP(CODEC_CP1257: "cp1257", "Windows-1257", "LST-1590-3")
+@CP(CODEC_CP1257: "cp1257", "Windows-1257", "LST-1590-3", "cswindows1257")
 	@ORD(0x80)
 	20AC 0000 201A 0000 201E 2026 2020 2021   # 80-87   € ␀ ‚ ␀ „ … † ‡ #
 	0000 2030 0000 2039 0000 00A8 02C7 00B8   # 88-8F   ␀ ‰ ␀ ‹ ␀ ¨ ˇ ¸ #
@@ -3681,7 +3832,7 @@
 
 
 
-@CP(CODEC_CP1258: "cp1258", "Windows-1258")
+@CP(CODEC_CP1258: "cp1258", "Windows-1258", "cswindows1258")
 	@ORD(0x80)
 	20AC 0000 201A 0192 201E 2026 2020 2021   # 80-87   € ␀ ‚ ƒ „ … † ‡ #
 	02C6 2030 0000 2039 0152 0000 0000 0000   # 88-8F   ˆ ‰ ␀ ‹ Œ ␀ ␀ ␀ #
@@ -3849,7 +4000,8 @@
 
 
 
-@CP(CODEC_CP1036: "cp1036", "IBM1036", "T.61", "T.618bit", "T.61-8bit", "cp20261", "Windows-20261", "iso-ir-103", "csIso103T618bit")
+@CP(CODEC_CP1036: "cp1036", "IBM1036", "T.61", "T.618bit", "T.61-8bit", "cp20261",
+                  "Windows-20261", "iso-ir-103", "csIso103T618bit")
 	@ORD(0x80)
 	0000 0000 0000 0000 0000 0000 0000 0000   # 80-87   ␀ ␀ ␀ ␀ ␀ ␀ ␀ ␀ #
 	0000 0000 0000 008B 008C 0000 0000 0000   # 88-8F   ␀ ␀ ␀   ␀ ␀ ␀ #
@@ -4387,7 +4539,7 @@
 
 
 
-@CP(CODEC_ISO6937_2: "ISO6937-2", "ISO69372", "ISO6937-2:1983", "iso-ir-90", "csIso90")
+@CP(CODEC_ISO_6937_2: "ISO_6937-2", "ISO_69372", "ISO_6937-2:1983", "iso-ir-90", "csIso90")
 	@ORD(0xA0)
 	0000 00A1 00A2 00A3 0024 00A5 0023 00A7   # A0-A7   ␀ ¡ ¢ £ $ ¥ # § #
 	00A4 2018 201C 00AB 2190 2191 2192 2193   # A8-AF   ¤ ‘ “ « ← ↑ → ↓ #
@@ -6175,6 +6327,240 @@
 ###################################################################################################
 
 
+# From:
+#   - https://www.iana.org/assignments/character-sets/character-sets.xhtml
+#   - https://www.iana.org/assignments/charset-reg/OSD-EBCDIC-DF04-15
+@CP(CODEC_OSD_EBCDIC_DF04_15: "OSD_EBCDIC_DF04_15", "csOSDEBCDICDF0415")
+	0000 0001 0002 0003 0085 0009 0086 007F   # 00-07   ␀ ␁ ␂ ␃  ␉  ␡ #
+	0087 008D 008E 000B 000C 000D 000E 000F   # 08-0F      ␋ ␌ ␍ ␎ ␏ #
+	0010 0011 0012 0013 008F 000A 0008 0097   # 10-17   ␐ ␑ ␒ ␓  ␊ ␈  #
+	0018 0019 009C 009D 001C 001D 001E 001F   # 18-1F   ␘ ␙   ␜ ␝ ␞ ␟ #
+	0080 0081 0082 0083 0084 0092 0017 001B   # 20-27         ␗ ␛ #
+	0088 0089 008A 008B 008C 0005 0006 0007   # 28-2F        ␅ ␆ ␇ #
+	0090 0091 0016 0093 0094 0095 0096 0004   # 30-37     ␖     ␄ #
+	0098 0099 009A 009B 0014 0015 009E 001A   # 38-3F       ␔ ␕  ␚ #
+	0020 00A0 00E2 00E4 00E0 00E1 00E3 00E5   # 40-47   ␠   â ä à á ã å #
+	00E7 00F1 0060 002E 003C 0028 002B 007C   # 48-4F   ç ñ ` . < ( + | #
+	0026 00E9 00EA 00EB 00E8 00ED 00EE 00EF   # 50-57   & é ê ë è í î ï #
+	00EC 00DF 0021 0024 002A 0029 003B 009F   # 58-5F   ì ß ! $ * ) ;  #
+	002D 002F 00C2 00C4 00C0 00C1 00C3 00C5   # 60-67   - / Â Ä À Á Ã Å #
+	00C7 00D1 005E 002C 0025 005F 003E 003F   # 68-6F   Ç Ñ ^ , % _ > ? #
+	00F8 00C9 00CA 00CB 00C8 00CD 00CE 00CF   # 70-77   ø É Ê Ë È Í Î Ï #
+	00CC 0161 003A 0023 0040 0027 003D 0022   # 78-7F   Ì š : # @ ' = " #
+	00D8 0061 0062 0063 0064 0065 0066 0067   # 80-87   Ø a b c d e f g #
+	0068 0069 00AB 00BB 00F0 00FD 00FE 00B1   # 88-8F   h i « » ð ý þ ± #
+	00B0 006A 006B 006C 006D 006E 006F 0070   # 90-97   ° j k l m n o p #
+	0071 0072 00AA 00BA 00E6 017E 00C6 20AC   # 98-9F   q r ª º æ ž Æ € #
+	00B5 00AF 0073 0074 0075 0076 0077 0078   # A0-A7   µ ¯ s t u v w x #
+	0079 007A 00A1 00BF 00D0 00DD 00DE 00AE   # A8-AF   y z ¡ ¿ Ð Ý Þ ® #
+	00A2 00A3 00A5 00B7 00A9 00A7 00B6 0152   # B0-B7   ¢ £ ¥ · © § ¶ Œ #
+	0153 0178 00AC 005B 005C 005D 017D 00D7   # B8-BF   œ Ÿ ¬ [ \ ] Ž × #
+	00F9 0041 0042 0043 0044 0045 0046 0047   # C0-C7   ù A B C D E F G #
+	0048 0049 00AD 00F4 00F6 00F2 00F3 00F5   # C8-CF   H I ­ ô ö ò ó õ #
+	0160 004A 004B 004C 004D 004E 004F 0050   # D0-D7   Š J K L M N O P #
+	0051 0052 00B9 00FB 00FC 00DB 00FA 00FF   # D8-DF   Q R ¹ û ü Û ú ÿ #
+	00D9 00F7 0053 0054 0055 0056 0057 0058   # E0-E7   Ù ÷ S T U V W X #
+	0059 005A 00B2 00D4 00D6 00D2 00D3 00D5   # E8-EF   Y Z ² Ô Ö Ò Ó Õ #
+	0030 0031 0032 0033 0034 0035 0036 0037   # F0-F7   0 1 2 3 4 5 6 7 #
+	0038 0039 00B3 007B 00DC 007D 00DA 007E   # F8-FF   8 9 ³ { Ü } Ú ~ #
+
+
+
+# From:
+#   - https://www.iana.org/assignments/character-sets/character-sets.xhtml
+#   - https://www.iana.org/assignments/charset-reg/OSD-EBCDIC-DF03-IRV
+@CP(CODEC_OSD_EBCDIC_DF03_IRV: "OSD_EBCDIC_DF03_IRV", "csOSDEBCDICDF03IRV")
+	0000 0001 0002 0003 0000 0009 0000 007F   # 00-07   ␀ ␁ ␂ ␃ ␀ ␉ ␀ ␡ #
+	0000 0000 0000 000B 000C 000D 000E 000F   # 08-0F   ␀ ␀ ␀ ␋ ␌ ␍ ␎ ␏ #
+	0010 0011 0012 0013 0000 000A 0008 0000   # 10-17   ␐ ␑ ␒ ␓ ␀ ␊ ␈ ␀ #
+	0018 0019 0000 0000 001C 001D 001E 001F   # 18-1F   ␘ ␙ ␀ ␀ ␜ ␝ ␞ ␟ #
+	0000 0000 0000 0000 0000 0000 0017 001B   # 20-27   ␀ ␀ ␀ ␀ ␀ ␀ ␗ ␛ #
+	0000 0000 0000 0000 0000 0005 0006 0007   # 28-2F   ␀ ␀ ␀ ␀ ␀ ␅ ␆ ␇ #
+	0000 0000 0016 0000 0000 0000 0000 0004   # 30-37   ␀ ␀ ␖ ␀ ␀ ␀ ␀ ␄ #
+	0000 0000 0000 0000 0014 0015 0000 001A   # 38-3F   ␀ ␀ ␀ ␀ ␔ ␕ ␀ ␚ #
+	0020 0000 0000 0000 0000 0000 0000 0000   # 40-47   ␠ ␀ ␀ ␀ ␀ ␀ ␀ ␀ #
+	0000 0000 0060 002E 003C 0028 002B 007C   # 48-4F   ␀ ␀ ` . < ( + | #
+	0026 0000 0000 0000 0000 0000 0000 0000   # 50-57   & ␀ ␀ ␀ ␀ ␀ ␀ ␀ #
+	0000 0000 0021 0024 002A 0029 003B 0000   # 58-5F   ␀ ␀ ! $ * ) ; ␀ #
+	002D 002F 0000 0000 0000 0000 0000 0000   # 60-67   - / ␀ ␀ ␀ ␀ ␀ ␀ #
+	0000 0000 005E 002C 0025 005F 003E 003F   # 68-6F   ␀ ␀ ^ , % _ > ? #
+	0000 0000 0000 0000 0000 0000 0000 0000   # 70-77   ␀ ␀ ␀ ␀ ␀ ␀ ␀ ␀ #
+	0000 0000 003A 0023 0040 0027 003D 0022   # 78-7F   ␀ ␀ : # @ ' = " #
+	0000 0061 0062 0063 0064 0065 0066 0067   # 80-87   ␀ a b c d e f g #
+	0068 0069 0000 0000 0000 0000 0000 0000   # 88-8F   h i ␀ ␀ ␀ ␀ ␀ ␀ #
+	0000 006A 006B 006C 006D 006E 006F 0070   # 90-97   ␀ j k l m n o p #
+	0071 0072 0000 0000 0000 0000 0000 0000   # 98-9F   q r ␀ ␀ ␀ ␀ ␀ ␀ #
+	0000 0000 0073 0074 0075 0076 0077 0078   # A0-A7   ␀ ␀ s t u v w x #
+	0079 007A 0000 0000 0000 0000 0000 0000   # A8-AF   y z ␀ ␀ ␀ ␀ ␀ ␀ #
+	0000 0000 0000 0000 0000 0000 0000 0000   # B0-B7   ␀ ␀ ␀ ␀ ␀ ␀ ␀ ␀ #
+	0000 0000 0000 005B 005C 005D 0000 0000   # B8-BF   ␀ ␀ ␀ [ \ ] ␀ ␀ #
+	0000 0041 0042 0043 0044 0045 0046 0047   # C0-C7   ␀ A B C D E F G #
+	0048 0049 0000 0000 0000 0000 0000 0000   # C8-CF   H I ␀ ␀ ␀ ␀ ␀ ␀ #
+	0000 004A 004B 004C 004D 004E 004F 0050   # D0-D7   ␀ J K L M N O P #
+	0051 0052 0000 0000 0000 0000 0000 0000   # D8-DF   Q R ␀ ␀ ␀ ␀ ␀ ␀ #
+	0000 0000 0053 0054 0055 0056 0057 0058   # E0-E7   ␀ ␀ S T U V W X #
+	0059 005A 0000 0000 0000 0000 0000 0000   # E8-EF   Y Z ␀ ␀ ␀ ␀ ␀ ␀ #
+	0030 0031 0032 0033 0034 0035 0036 0037   # F0-F7   0 1 2 3 4 5 6 7 #
+	0038 0039 0000 007B 0000 007D 0000 007E   # F8-FF   8 9 ␀ { ␀ } ␀ ~ #
+
+
+
+# From:
+#   - https://www.iana.org/assignments/character-sets/character-sets.xhtml
+#   - https://www.iana.org/assignments/charset-reg/OSD-EBCDIC-DF04-1
+@CP(CODEC_OSD_EBCDIC_DF04_1: "OSD_EBCDIC_DF04_1", "csOSDEBCDICDF041")
+	0000 0001 0002 0003 0085 0009 0086 007F   # 00-07   ␀ ␁ ␂ ␃  ␉  ␡ #
+	0087 008D 008E 000B 000C 000D 000E 000F   # 08-0F      ␋ ␌ ␍ ␎ ␏ #
+	0010 0011 0012 0013 008F 000A 0008 0097   # 10-17   ␐ ␑ ␒ ␓  ␊ ␈  #
+	0018 0019 009C 009D 001C 001D 001E 001F   # 18-1F   ␘ ␙   ␜ ␝ ␞ ␟ #
+	0080 0081 0082 0083 0084 0092 0017 001B   # 20-27         ␗ ␛ #
+	0088 0089 008A 008B 008C 0005 0006 0007   # 28-2F        ␅ ␆ ␇ #
+	0090 0091 0016 0093 0094 0095 0096 0004   # 30-37     ␖     ␄ #
+	0098 0099 009A 009B 0014 0015 009E 001A   # 38-3F       ␔ ␕  ␚ #
+	0020 00A0 00E2 00E4 00E0 00E1 00E3 00E5   # 40-47   ␠   â ä à á ã å #
+	00E7 00F1 0060 002E 003C 0028 002B 007C   # 48-4F   ç ñ ` . < ( + | #
+	0026 00E9 00EA 00EB 00E8 00ED 00EE 00EF   # 50-57   & é ê ë è í î ï #
+	00EC 00DF 0021 0024 002A 0029 003B 009F   # 58-5F   ì ß ! $ * ) ;  #
+	002D 002F 00C2 00C4 00C0 00C1 00C3 00C5   # 60-67   - / Â Ä À Á Ã Å #
+	00C7 00D1 005E 002C 0025 005F 003E 003F   # 68-6F   Ç Ñ ^ , % _ > ? #
+	00F8 00C9 00CA 00CB 00C8 00CD 00CE 00CF   # 70-77   ø É Ê Ë È Í Î Ï #
+	00CC 00A8 003A 0023 0040 0027 003D 0022   # 78-7F   Ì ¨ : # @ ' = " #
+	00D8 0061 0062 0063 0064 0065 0066 0067   # 80-87   Ø a b c d e f g #
+	0068 0069 00AB 00BB 00F0 00FD 00FE 00B1   # 88-8F   h i « » ð ý þ ± #
+	00B0 006A 006B 006C 006D 006E 006F 0070   # 90-97   ° j k l m n o p #
+	0071 0072 00AA 00BA 00E6 00B8 00C6 00A4   # 98-9F   q r ª º æ ¸ Æ ¤ #
+	00B5 00AF 0073 0074 0075 0076 0077 0078   # A0-A7   µ ¯ s t u v w x #
+	0079 007A 00A1 00BF 00D0 00DD 00DE 00AE   # A8-AF   y z ¡ ¿ Ð Ý Þ ® #
+	00A2 00A3 00A5 00B7 00A9 00A7 00B6 00BC   # B0-B7   ¢ £ ¥ · © § ¶ ¼ #
+	00BD 00BE 00AC 005B 005C 005D 00B4 00D7   # B8-BF   ½ ¾ ¬ [ \ ] ´ × #
+	00F9 0041 0042 0043 0044 0045 0046 0047   # C0-C7   ù A B C D E F G #
+	0048 0049 00AD 00F4 00F6 00F2 00F3 00F5   # C8-CF   H I ­ ô ö ò ó õ #
+	00A6 004A 004B 004C 004D 004E 004F 0050   # D0-D7   ¦ J K L M N O P #
+	0051 0052 00B9 00FB 00FC 00DB 00FA 00FF   # D8-DF   Q R ¹ û ü Û ú ÿ #
+	00D9 00F7 0053 0054 0055 0056 0057 0058   # E0-E7   Ù ÷ S T U V W X #
+	0059 005A 00B2 00D4 00D6 00D2 00D3 00D5   # E8-EF   Y Z ² Ô Ö Ò Ó Õ #
+	0030 0031 0032 0033 0034 0035 0036 0037   # F0-F7   0 1 2 3 4 5 6 7 #
+	0038 0039 00B3 007B 00DC 007D 00DA 007E   # F8-FF   8 9 ³ { Ü } Ú ~ #
+
+
+
+# From:
+#   - https://www.iana.org/assignments/character-sets/character-sets.xhtml
+#   - http://www.ascii.ca/adobestd.htm
+@CP(CODEC_ADOBE_STANDARD_ENCODING: "Adobe-Standard-Encoding", "csAdobeStandardEncoding")
+	0000 0001 0002 0003 0004 0005 0006 0007   # 00-07   ␀ ␁ ␂ ␃ ␄ ␅ ␆ ␇ #
+	0008 0009 000A 000B 000C 000D 000E 000F   # 08-0F   ␈ ␉ ␊ ␋ ␌ ␍ ␎ ␏ #
+	0010 0011 0012 0013 0014 0015 0016 0017   # 10-17   ␐ ␑ ␒ ␓ ␔ ␕ ␖ ␗ #
+	0018 0019 001A 001B 001C 001D 001E 001F   # 18-1F   ␘ ␙ ␚ ␛ ␜ ␝ ␞ ␟ #
+	0020 0021 0022 0023 0024 0025 0026 0027   # 20-27   ␠ ! " # $ % & ' #
+	0028 0029 002A 002B 002C 002D 002E 002F   # 28-2F   ( ) * + , - . / #
+	0030 0031 0032 0033 0034 0035 0036 0037   # 30-37   0 1 2 3 4 5 6 7 #
+	0038 0039 003A 003B 003C 003D 003E 003F   # 38-3F   8 9 : ; < = > ? #
+	0040 0041 0042 0043 0044 0045 0046 0047   # 40-47   @ A B C D E F G #
+	0048 0049 004A 004B 004C 004D 004E 004F   # 48-4F   H I J K L M N O #
+	0050 0051 0052 0053 0054 0055 0056 0057   # 50-57   P Q R S T U V W #
+	0058 0059 005A 005B 005C 005D 005E 005F   # 58-5F   X Y Z [ \ ] ^ _ #
+	0060 0061 0062 0063 0064 0065 0066 0067   # 60-67   ` a b c d e f g #
+	0068 0069 006A 006B 006C 006D 006E 006F   # 68-6F   h i j k l m n o #
+	0070 0071 0072 0073 0074 0075 0076 0077   # 70-77   p q r s t u v w #
+	0078 0079 007A 007B 007C 007D 007E 0000   # 78-7F   x y z { | } ~ ␀ #
+	0000 0000 0000 0000 0000 0000 0000 0000   # 80-87   ␀ ␀ ␀ ␀ ␀ ␀ ␀ ␀ #
+	0000 0000 0000 0000 0000 0000 0000 0000   # 88-8F   ␀ ␀ ␀ ␀ ␀ ␀ ␀ ␀ #
+	0000 0000 0000 0000 0000 0000 0000 0000   # 90-97   ␀ ␀ ␀ ␀ ␀ ␀ ␀ ␀ #
+	0000 0000 0000 0000 0000 0000 0000 0000   # 98-9F   ␀ ␀ ␀ ␀ ␀ ␀ ␀ ␀ #
+	0000 00A1 00A2 00A3 2044 00A5 0192 00A7   # A0-A7   ␀ ¡ ¢ £ ⁄ ¥ ƒ § #
+	00A4 0000 201C 00AB 2039 203A FB01 FB02   # A8-AF   ¤ ␀ “ « ‹ › ﬁ ﬂ #
+	0000 2013 2020 2021 00B7 0000 00B6 2219   # B0-B7   ␀ – † ‡ · ␀ ¶ ∙ #
+	201A 201E 201D 00BB 22EF 2030 0000 00BF   # B8-BF   ‚ „ ” » ⋯ ‰ ␀ ¿ #
+	0000 0300 00B4 0302 0303 00AF 02D8 02D9   # C0-C7   ␀ ̀ ´ ̂ ̃ ¯ ˘ ˙ #
+	00A8 0000 00B0 00B8 0000 02DD 02DB 02C7   # C8-CF   ¨ ␀ ° ¸ ␀ ˝ ˛ ˇ #
+	2014 0000 0000 0000 0000 0000 0000 0000   # D0-D7   — ␀ ␀ ␀ ␀ ␀ ␀ ␀ #
+	0000 0000 0000 0000 0000 0000 0000 0000   # D8-DF   ␀ ␀ ␀ ␀ ␀ ␀ ␀ ␀ #
+	0000 00C6 0000 00AA 0000 0000 0000 0000   # E0-E7   ␀ Æ ␀ ª ␀ ␀ ␀ ␀ #
+	0141 00D8 0152 00BA 0000 0000 0000 0000   # E8-EF   Ł Ø Œ º ␀ ␀ ␀ ␀ #
+	0000 00E6 0000 0000 0000 0131 0000 0000   # F0-F7   ␀ æ ␀ ␀ ␀ ı ␀ ␀ #
+	0142 00F8 0153 00DF 0000 0000 0000 0000   # F8-FF   ł ø œ ß ␀ ␀ ␀ ␀ #
+
+
+
+# From:
+#   - https://www.iana.org/assignments/character-sets/character-sets.xhtml
+#   - https://en.wikipedia.org/wiki/Ventura_International
+@CP(CODEC_VENTURA_US: "Ventura-US", "csVenturaUS")
+	0000 0001 0002 0003 0004 0005 0006 0007   # 00-07   ␀ ␁ ␂ ␃ ␄ ␅ ␆ ␇ #
+	0008 0009 000A 000B 000C 000D 000E 000F   # 08-0F   ␈ ␉ ␊ ␋ ␌ ␍ ␎ ␏ #
+	0010 0011 0012 0013 0014 0015 0016 0017   # 10-17   ␐ ␑ ␒ ␓ ␔ ␕ ␖ ␗ #
+	0018 0019 001A 001B 001C 001D 001E 001F   # 18-1F   ␘ ␙ ␚ ␛ ␜ ␝ ␞ ␟ #
+	0020 0021 0022 0023 0024 0025 0026 2019   # 20-27   ␠ ! " # $ % & ’ #
+	0028 0029 002A 002B 002C 002D 002E 002F   # 28-2F   ( ) * + , - . / #
+	0030 0031 0032 0033 0034 0035 0036 0037   # 30-37   0 1 2 3 4 5 6 7 #
+	0038 0039 003A 003B 003C 003D 003E 003F   # 38-3F   8 9 : ; < = > ? #
+	0040 0041 0042 0043 0044 0045 0046 0047   # 40-47   @ A B C D E F G #
+	0048 0049 004A 004B 004C 004D 004E 004F   # 48-4F   H I J K L M N O #
+	0050 0051 0052 0053 0054 0055 0056 0057   # 50-57   P Q R S T U V W #
+	0058 0059 005A 005B 005C 005D 005E 005F   # 58-5F   X Y Z [ \ ] ^ _ #
+	2018 0061 0062 0063 0064 0065 0066 0067   # 60-67   ‘ a b c d e f g #
+	0068 0069 006A 006B 006C 006D 006E 006F   # 68-6F   h i j k l m n o #
+	0070 0071 0072 0073 0074 0075 0076 0077   # 70-77   p q r s t u v w #
+	0078 0079 007A 007B 007C 007D 007E 0000   # 78-7F   x y z { | } ~ ␀ #
+	00C7 00FC 00E9 00E2 00E4 00E0 00E5 00E7   # 80-87   Ç ü é â ä à å ç #
+	00EA 00EB 00E8 00EF 00EE 00EC 00C4 00C5   # 88-8F   ê ë è ï î ì Ä Å #
+	00C9 00E6 00C6 00F4 00F6 00F2 00FB 00F9   # 90-97   É æ Æ ô ö ò û ù #
+	00FF 00D6 00DC 00A2 00A3 00A5 00A4 0192   # 98-9F   ÿ Ö Ü ¢ £ ¥ ¤ ƒ #
+	00E1 00ED 00F3 00FA 00F1 00D1 00AA 00BA   # A0-A7   á í ó ú ñ Ñ ª º #
+	00BF 201C 201D 2039 203A 00A1 00AB 00BB   # A8-AF   ¿ “ ” ‹ › ¡ « » #
+	00E3 00F5 00D8 00F8 0153 0152 00C0 00C3   # B0-B7   ã õ Ø ø œ Œ À Ã #
+	00D5 00A7 2021 2020 00B6 00A9 00AE 2122   # B8-BF   Õ § ‡ † ¶ © ® ™ #
+	201E 2026 2030 2022 2013 2014 00B0 00C1   # C0-C7   „ … ‰ • – — ° Á #
+	00C2 00C8 00CA 00CB 00CC 00CD 00CE 00CF   # C8-CF   Â È Ê Ë Ì Í Î Ï #
+	00D2 00D3 00D4 0160 0161 00D9 00DA 00DB   # D0-D7   Ò Ó Ô Š š Ù Ú Û #
+	0178 00DF 0000 0000 0000 0000 0000 0000   # D8-DF   Ÿ ß ␀ ␀ ␀ ␀ ␀ ␀ #
+	0000 0000 0000 0000 0000 0000 0000 0000   # E0-E7   ␀ ␀ ␀ ␀ ␀ ␀ ␀ ␀ #
+	0000 0000 0000 0000 0000 0000 0000 0000   # E8-EF   ␀ ␀ ␀ ␀ ␀ ␀ ␀ ␀ #
+	0000 0000 0000 0000 0000 0000 0000 0000   # F0-F7   ␀ ␀ ␀ ␀ ␀ ␀ ␀ ␀ #
+	0000 0000 0000 0000 0000 0000 0000 0000   # F8-FF   ␀ ␀ ␀ ␀ ␀ ␀ ␀ ␀ #
+
+
+
+@CP(CODEC_VENTURA_INTERNATIONAL: "Ventura-International", "VENTURA_INT", "csVenturaInternational")
+	0000 0001 0002 0003 0004 0005 0006 0007   # 00-07   ␀ ␁ ␂ ␃ ␄ ␅ ␆ ␇ #
+	0008 0009 000A 000B 000C 000D 000E 000F   # 08-0F   ␈ ␉ ␊ ␋ ␌ ␍ ␎ ␏ #
+	0010 0011 0012 0013 0014 0015 0016 0017   # 10-17   ␐ ␑ ␒ ␓ ␔ ␕ ␖ ␗ #
+	0018 0019 001A 001B 001C 001D 001E 001F   # 18-1F   ␘ ␙ ␚ ␛ ␜ ␝ ␞ ␟ #
+	0020 0021 0022 0023 0024 0025 0026 2019   # 20-27   ␠ ! " # $ % & ’ #
+	0028 0029 002A 002B 002C 002D 002E 002F   # 28-2F   ( ) * + , - . / #
+	0030 0031 0032 0033 0034 0035 0036 0037   # 30-37   0 1 2 3 4 5 6 7 #
+	0038 0039 003A 003B 003C 003D 003E 003F   # 38-3F   8 9 : ; < = > ? #
+	0040 0041 0042 0043 0044 0045 0046 0047   # 40-47   @ A B C D E F G #
+	0048 0049 004A 004B 004C 004D 004E 004F   # 48-4F   H I J K L M N O #
+	0050 0051 0052 0053 0054 0055 0056 0057   # 50-57   P Q R S T U V W #
+	0058 0059 005A 005B 005C 005D 005E 005F   # 58-5F   X Y Z [ \ ] ^ _ #
+	2018 0061 0062 0063 0064 0065 0066 0067   # 60-67   ‘ a b c d e f g #
+	0068 0069 006A 006B 006C 006D 006E 006F   # 68-6F   h i j k l m n o #
+	0070 0071 0072 0073 0074 0075 0076 0077   # 70-77   p q r s t u v w #
+	0078 0079 007A 007B 007C 007D 007E 0000   # 78-7F   x y z { | } ~ ␀ #
+	0000 0000 0000 0000 0000 0000 0000 0000   # 80-87   ␀ ␀ ␀ ␀ ␀ ␀ ␀ ␀ #
+	0000 0000 0000 0000 0000 0000 0000 0000   # 88-8F   ␀ ␀ ␀ ␀ ␀ ␀ ␀ ␀ #
+	0000 0000 0000 0000 0000 0000 0000 0000   # 90-97   ␀ ␀ ␀ ␀ ␀ ␀ ␀ ␀ #
+	0000 0000 0000 0000 0000 0000 0000 0000   # 98-9F   ␀ ␀ ␀ ␀ ␀ ␀ ␀ ␀ #
+	201E 00C0 00C2 00C8 00CA 00CB 00CE 00CF   # A0-A7   „ À Â È Ê Ë Î Ï #
+	00A9 00AE 2122 2039 203A 00D9 00DB 0000   # A8-AF   © ® ™ ‹ › Ù Û ␀ #
+	2030 201C 201D 00B0 00C7 00E7 00D1 00F1   # B0-B7   ‰ “ ” ° Ç ç Ñ ñ #
+	00A1 00BF 00A4 00A3 00A5 00A7 0192 00A2   # B8-BF   ¡ ¿ ¤ £ ¥ § ƒ ¢ #
+	00E2 00EA 00F4 00FB 00E1 00E9 00F3 00FA   # C0-C7   â ê ô û á é ó ú #
+	00E0 00E8 00F2 00F9 00E4 00EB 00F6 00FC   # C8-CF   à è ò ù ä ë ö ü #
+	00C5 00EE 00D8 00C6 00E5 00ED 00F8 00E6   # D0-D7   Å î Ø Æ å í ø æ #
+	00C4 00EC 00D6 00DC 00C9 00EF 00DF 00D4   # D8-DF   Ä ì Ö Ü É ï ß Ô #
+	00C1 00C3 00E3 0000 0000 00CD 00CC 00D3   # E0-E7   Á Ã ã ␀ ␀ Í Ì Ó #
+	00D2 00D5 00F5 0160 0161 00DA 0178 00FF   # E8-EF   Ò Õ õ Š š Ú Ÿ ÿ #
+	0152 0153 00B6 2020 2021 2014 2013 0000   # F0-F7   Œ œ ¶ † ‡ — – ␀ #
+	0000 00AA 00BA 00AB 2022 00BB 0000 2026   # F8-FF   ␀ ª º « • » ␀ … #
+
+
+
+###################################################################################################
+
+
 #@CP(CODEC_NEC_APC: "NEC-APC")
 #	0000 25B6 23E9 1F4D6 0004 2370 1F197 1F514   # 00-07   ␀ ▶ ⏩ 📖 ␄ ⍰ 🆗 🔔 #
 #	2B06 27A1 25C7 2B07 000C 2B05 1FBC5 000F   # 08-0F   ⬆ ➡ ◇ ⬇ ␌ ⬅ 🯅 ␏ #
@@ -6209,3 +6595,1378 @@
 #	2573 2508 250A 0000 0000 0000 0000 0000   # F0-F7   ╳ ┈ ┊ ␀ ␀ ␀ ␀ ␀ #
 #	2320 2321 23A1 23A3 23A4 23A6 23B2 23B3   # F8-FF   ⌠ ⌡ ⎡ ⎣ ⎤ ⎦ ⎲ ⎳ #
 
+
+
+###################################################################################################
+
+
+@CP(CODEC_EBCDIC_AT_DE: "EBCDIC-AT-DE", "csIBMEBCDICATDE")
+	0000 0001 0002 0003 0004 0005 0006 0007   # 00-07   ␀ ␁ ␂ ␃ ␄ ␅ ␆ ␇ #
+	0008 0009 000A 000B 000C 000D 000E 000F   # 08-0F   ␈ ␉ ␊ ␋ ␌ ␍ ␎ ␏ #
+	0010 0011 0012 0013 0014 0015 0016 0017   # 10-17   ␐ ␑ ␒ ␓ ␔ ␕ ␖ ␗ #
+	0018 0019 001A 001B 001C 001D 001E 001F   # 18-1F   ␘ ␙ ␚ ␛ ␜ ␝ ␞ ␟ #
+	0000 0000 0000 0000 0000 0000 0000 0000   # 20-27   ␀ ␀ ␀ ␀ ␀ ␀ ␀ ␀ #
+	0000 0000 0000 0000 0000 0000 0000 0000   # 28-2F   ␀ ␀ ␀ ␀ ␀ ␀ ␀ ␀ #
+	0000 0000 0000 0000 0000 0000 0000 0000   # 30-37   ␀ ␀ ␀ ␀ ␀ ␀ ␀ ␀ #
+	0000 0000 0000 0000 0000 0000 0000 0000   # 38-3F   ␀ ␀ ␀ ␀ ␀ ␀ ␀ ␀ #
+	0020 0000 0000 0000 0000 0000 0000 0000   # 40-47   ␠ ␀ ␀ ␀ ␀ ␀ ␀ ␀ #
+	0000 0000 00C4 002E 003C 0028 002B 0021   # 48-4F   ␀ ␀ Ä . < ( + ! #
+	0026 0000 0000 0000 0000 0000 0000 0000   # 50-57   & ␀ ␀ ␀ ␀ ␀ ␀ ␀ #
+	0000 0000 00DC 0024 002A 0029 003B 005E   # 58-5F   ␀ ␀ Ü $ * ) ; ^ #
+	002D 002F 0000 0000 0000 0000 0000 0000   # 60-67   - / ␀ ␀ ␀ ␀ ␀ ␀ #
+	0000 0000 00F6 002C 0025 005F 003E 003F   # 68-6F   ␀ ␀ ö , % _ > ? #
+	0000 0000 0000 0000 0000 0000 0000 0000   # 70-77   ␀ ␀ ␀ ␀ ␀ ␀ ␀ ␀ #
+	0000 0060 003A 0023 00A7 0027 003D 0022   # 78-7F   ␀ ` : # § ' = " #
+	0000 0061 0062 0063 0064 0065 0066 0067   # 80-87   ␀ a b c d e f g #
+	0068 0069 0000 0000 0000 0000 0000 0000   # 88-8F   h i ␀ ␀ ␀ ␀ ␀ ␀ #
+	0000 006A 006B 006C 006D 006E 006F 0070   # 90-97   ␀ j k l m n o p #
+	0071 0072 0000 0000 0000 0000 0000 0000   # 98-9F   q r ␀ ␀ ␀ ␀ ␀ ␀ #
+	0000 00DF 0073 0074 0075 0076 0077 0078   # A0-A7   ␀ ß s t u v w x #
+	0079 007A 0000 0000 0000 0000 0000 0000   # A8-AF   y z ␀ ␀ ␀ ␀ ␀ ␀ #
+	0000 0000 0000 0000 0000 0000 0000 0000   # B0-B7   ␀ ␀ ␀ ␀ ␀ ␀ ␀ ␀ #
+	0000 0000 0000 0000 0000 0000 0000 0000   # B8-BF   ␀ ␀ ␀ ␀ ␀ ␀ ␀ ␀ #
+	00E4 0041 0042 0043 0044 0045 0046 0047   # C0-C7   ä A B C D E F G #
+	0048 0049 0000 0000 0000 0000 0000 0000   # C8-CF   H I ␀ ␀ ␀ ␀ ␀ ␀ #
+	00FC 004A 004B 004C 004D 004E 004F 0050   # D0-D7   ü J K L M N O P #
+	0051 0052 0000 0000 0000 0000 0000 0000   # D8-DF   Q R ␀ ␀ ␀ ␀ ␀ ␀ #
+	00D6 0000 0053 0054 0055 0056 0057 0058   # E0-E7   Ö ␀ S T U V W X #
+	0059 005A 0000 0000 0000 0000 0000 0000   # E8-EF   Y Z ␀ ␀ ␀ ␀ ␀ ␀ #
+	0030 0031 0032 0033 0034 0035 0036 0037   # F0-F7   0 1 2 3 4 5 6 7 #
+	0038 0039 0000 0000 0000 0000 0000 007F   # F8-FF   8 9 ␀ ␀ ␀ ␀ ␀ ␡ #
+
+
+
+@CP(CODEC_EBCDIC_AT_DE_A: "EBCDIC-AT-DE-A", "csEBCDICATDEA")
+	0000 0001 0002 0003 0004 0005 0006 0007   # 00-07   ␀ ␁ ␂ ␃ ␄ ␅ ␆ ␇ #
+	0008 0009 000A 000B 000C 000D 000E 000F   # 08-0F   ␈ ␉ ␊ ␋ ␌ ␍ ␎ ␏ #
+	0010 0011 0012 0013 0014 0015 0016 0017   # 10-17   ␐ ␑ ␒ ␓ ␔ ␕ ␖ ␗ #
+	0018 0019 001A 001B 001C 001D 001E 001F   # 18-1F   ␘ ␙ ␚ ␛ ␜ ␝ ␞ ␟ #
+	0000 0000 0000 0000 0000 0000 0000 0000   # 20-27   ␀ ␀ ␀ ␀ ␀ ␀ ␀ ␀ #
+	0000 0000 0000 0000 0000 0000 0000 0000   # 28-2F   ␀ ␀ ␀ ␀ ␀ ␀ ␀ ␀ #
+	0000 0000 0000 0000 0000 0000 0000 0000   # 30-37   ␀ ␀ ␀ ␀ ␀ ␀ ␀ ␀ #
+	0000 0000 0000 0000 0000 0000 0000 0000   # 38-3F   ␀ ␀ ␀ ␀ ␀ ␀ ␀ ␀ #
+	0020 0000 0000 0000 0000 0000 0000 0000   # 40-47   ␠ ␀ ␀ ␀ ␀ ␀ ␀ ␀ #
+	0000 0000 00F6 002E 003C 0028 002B 007C   # 48-4F   ␀ ␀ ö . < ( + | #
+	0026 0000 0000 0000 0000 0000 0000 0000   # 50-57   & ␀ ␀ ␀ ␀ ␀ ␀ ␀ #
+	0000 0000 00FC 00DC 002A 0029 003B 00AC   # 58-5F   ␀ ␀ ü Ü * ) ; ¬ #
+	002D 002F 0000 0000 0000 0000 0000 0000   # 60-67   - / ␀ ␀ ␀ ␀ ␀ ␀ #
+	0000 0000 00DF 002C 0025 005F 003E 003F   # 68-6F   ␀ ␀ ß , % _ > ? #
+	0000 0000 0000 0000 0000 0000 0000 0000   # 70-77   ␀ ␀ ␀ ␀ ␀ ␀ ␀ ␀ #
+	0000 0000 003A 00C4 00D6 0027 003D 00E4   # 78-7F   ␀ ␀ : Ä Ö ' = ä #
+	0000 0061 0062 0063 0064 0065 0066 0067   # 80-87   ␀ a b c d e f g #
+	0068 0069 0000 0000 0000 0000 0000 0000   # 88-8F   h i ␀ ␀ ␀ ␀ ␀ ␀ #
+	0000 006A 006B 006C 006D 006E 006F 0070   # 90-97   ␀ j k l m n o p #
+	0071 0072 0000 0000 0000 0000 0000 0000   # 98-9F   q r ␀ ␀ ␀ ␀ ␀ ␀ #
+	0000 0000 0073 0074 0075 0076 0077 0078   # A0-A7   ␀ ␀ s t u v w x #
+	0079 007A 0000 0000 0000 0000 0000 0000   # A8-AF   y z ␀ ␀ ␀ ␀ ␀ ␀ #
+	0000 0000 0000 0000 0000 0000 0000 0000   # B0-B7   ␀ ␀ ␀ ␀ ␀ ␀ ␀ ␀ #
+	0000 0000 0000 0000 0000 0000 0000 0000   # B8-BF   ␀ ␀ ␀ ␀ ␀ ␀ ␀ ␀ #
+	0000 0041 0042 0043 0044 0045 0046 0047   # C0-C7   ␀ A B C D E F G #
+	0048 0049 0000 0000 0000 0000 0000 0000   # C8-CF   H I ␀ ␀ ␀ ␀ ␀ ␀ #
+	0000 004A 004B 004C 004D 004E 004F 0050   # D0-D7   ␀ J K L M N O P #
+	0051 0052 0000 0000 0000 0000 0000 0000   # D8-DF   Q R ␀ ␀ ␀ ␀ ␀ ␀ #
+	0000 0000 0053 0054 0055 0056 0057 0058   # E0-E7   ␀ ␀ S T U V W X #
+	0059 005A 0000 0000 0000 0000 0000 0000   # E8-EF   Y Z ␀ ␀ ␀ ␀ ␀ ␀ #
+	0030 0031 0032 0033 0034 0035 0036 0037   # F0-F7   0 1 2 3 4 5 6 7 #
+	0038 0039 0000 0000 0000 0000 0000 007F   # F8-FF   8 9 ␀ ␀ ␀ ␀ ␀ ␡ #
+
+
+
+@CP(CODEC_EBCDIC_CA_FR: "EBCDIC-CA-FR", "csEBCDICCAFR")
+	0000 0001 0002 0003 0004 0005 0006 0007   # 00-07   ␀ ␁ ␂ ␃ ␄ ␅ ␆ ␇ #
+	0008 0009 000A 000B 000C 000D 000E 000F   # 08-0F   ␈ ␉ ␊ ␋ ␌ ␍ ␎ ␏ #
+	0010 0011 0012 0013 0014 0015 0016 0017   # 10-17   ␐ ␑ ␒ ␓ ␔ ␕ ␖ ␗ #
+	0018 0019 001A 001B 001C 001D 001E 001F   # 18-1F   ␘ ␙ ␚ ␛ ␜ ␝ ␞ ␟ #
+	0000 0000 0000 0000 0000 0000 0000 0000   # 20-27   ␀ ␀ ␀ ␀ ␀ ␀ ␀ ␀ #
+	0000 0000 0000 0000 0000 0000 0000 0000   # 28-2F   ␀ ␀ ␀ ␀ ␀ ␀ ␀ ␀ #
+	0000 0000 0000 0000 0000 0000 0000 0000   # 30-37   ␀ ␀ ␀ ␀ ␀ ␀ ␀ ␀ #
+	0000 0000 0000 0000 0000 0000 0000 0000   # 38-3F   ␀ ␀ ␀ ␀ ␀ ␀ ␀ ␀ #
+	0020 0000 00E2 0000 0000 0000 0000 0000   # 40-47   ␠ ␀ â ␀ ␀ ␀ ␀ ␀ #
+	00E7 0000 00E0 002E 003C 0028 002B 0021   # 48-4F   ç ␀ à . < ( + ! #
+	0026 0000 00EA 00EB 0000 0000 00EE 00EF   # 50-57   & ␀ ê ë ␀ ␀ î ï #
+	0000 0000 00B4 0024 002A 0029 003B 005E   # 58-5F   ␀ ␀ ´ $ * ) ; ^ #
+	002D 002F 00C2 0000 00C0 0000 0000 0000   # 60-67   - / Â ␀ À ␀ ␀ ␀ #
+	00C7 0000 00F9 002C 0025 005F 003E 003F   # 68-6F   Ç ␀ ù , % _ > ? #
+	0000 00C9 00CA 00CB 0000 00CE 00CF 0000   # 70-77   ␀ É Ê Ë ␀ Î Ï ␀ #
+	0000 0060 003A 0023 0040 0027 003D 0022   # 78-7F   ␀ ` : # @ ' = " #
+	0000 0061 0062 0063 0064 0065 0066 0067   # 80-87   ␀ a b c d e f g #
+	0068 0069 0000 0000 0000 0000 0000 0000   # 88-8F   h i ␀ ␀ ␀ ␀ ␀ ␀ #
+	0000 006A 006B 006C 006D 006E 006F 0070   # 90-97   ␀ j k l m n o p #
+	0071 0072 0000 0000 0000 0000 0000 0000   # 98-9F   q r ␀ ␀ ␀ ␀ ␀ ␀ #
+	0000 00A8 0073 0074 0075 0076 0077 0078   # A0-A7   ␀ ¨ s t u v w x #
+	0079 007A 0000 0000 0000 0000 0000 0000   # A8-AF   y z ␀ ␀ ␀ ␀ ␀ ␀ #
+	0000 0000 0000 0000 0000 0000 0000 0000   # B0-B7   ␀ ␀ ␀ ␀ ␀ ␀ ␀ ␀ #
+	0000 0000 0000 0000 0000 0000 0000 0000   # B8-BF   ␀ ␀ ␀ ␀ ␀ ␀ ␀ ␀ #
+	00E9 0041 0042 0043 0044 0045 0046 0047   # C0-C7   é A B C D E F G #
+	0048 0049 0000 00F4 0000 0000 0000 0000   # C8-CF   H I ␀ ô ␀ ␀ ␀ ␀ #
+	00E8 004A 004B 004C 004D 004E 004F 0050   # D0-D7   è J K L M N O P #
+	0051 0052 0000 00FB 00FC 0000 0000 0000   # D8-DF   Q R ␀ û ü ␀ ␀ ␀ #
+	00B8 0000 0053 0054 0055 0056 0057 0058   # E0-E7   ¸ ␀ S T U V W X #
+	0059 005A 0000 00D4 0000 0000 0000 0000   # E8-EF   Y Z ␀ Ô ␀ ␀ ␀ ␀ #
+	0030 0031 0032 0033 0034 0035 0036 0037   # F0-F7   0 1 2 3 4 5 6 7 #
+	0038 0039 0000 00DB 00DC 00D9 0000 007F   # F8-FF   8 9 ␀ Û Ü Ù ␀ ␡ #
+
+
+
+@CP(CODEC_EBCDIC_DK_NO: "EBCDIC-DK-NO", "csEBCDICDKNO")
+	0000 0001 0002 0003 0004 0005 0006 0007   # 00-07   ␀ ␁ ␂ ␃ ␄ ␅ ␆ ␇ #
+	0008 0009 000A 000B 000C 000D 000E 000F   # 08-0F   ␈ ␉ ␊ ␋ ␌ ␍ ␎ ␏ #
+	0010 0011 0012 0013 0014 0015 0016 0017   # 10-17   ␐ ␑ ␒ ␓ ␔ ␕ ␖ ␗ #
+	0018 0019 001A 001B 001C 001D 001E 001F   # 18-1F   ␘ ␙ ␚ ␛ ␜ ␝ ␞ ␟ #
+	0000 0000 0000 0000 0000 0000 0000 0000   # 20-27   ␀ ␀ ␀ ␀ ␀ ␀ ␀ ␀ #
+	0000 0000 0000 0000 0000 0000 0000 0000   # 28-2F   ␀ ␀ ␀ ␀ ␀ ␀ ␀ ␀ #
+	0000 0000 0000 0000 0000 0000 0000 0000   # 30-37   ␀ ␀ ␀ ␀ ␀ ␀ ␀ ␀ #
+	0000 0000 0000 0000 0000 0000 0000 0000   # 38-3F   ␀ ␀ ␀ ␀ ␀ ␀ ␀ ␀ #
+	0020 0000 0000 0000 0000 0000 0000 0000   # 40-47   ␠ ␀ ␀ ␀ ␀ ␀ ␀ ␀ #
+	0000 0000 0023 002E 003C 0028 002B 0021   # 48-4F   ␀ ␀ # . < ( + ! #
+	0026 0000 0000 0000 0000 0000 0000 0000   # 50-57   & ␀ ␀ ␀ ␀ ␀ ␀ ␀ #
+	0000 0000 00A4 00C5 002A 0029 003B 005E   # 58-5F   ␀ ␀ ¤ Å * ) ; ^ #
+	002D 002F 0000 0000 0000 0000 0000 0000   # 60-67   - / ␀ ␀ ␀ ␀ ␀ ␀ #
+	0000 0000 00F8 002C 0025 005F 003E 003F   # 68-6F   ␀ ␀ ø , % _ > ? #
+	0000 0000 0000 0000 0000 0000 0000 0000   # 70-77   ␀ ␀ ␀ ␀ ␀ ␀ ␀ ␀ #
+	0000 0060 003A 00C6 00D8 0027 003D 0022   # 78-7F   ␀ ` : Æ Ø ' = " #
+	0000 0061 0062 0063 0064 0065 0066 0067   # 80-87   ␀ a b c d e f g #
+	0068 0069 0000 0000 0000 0000 0000 0000   # 88-8F   h i ␀ ␀ ␀ ␀ ␀ ␀ #
+	0000 006A 006B 006C 006D 006E 006F 0070   # 90-97   ␀ j k l m n o p #
+	0071 0072 0000 0000 0000 0000 0000 0000   # 98-9F   q r ␀ ␀ ␀ ␀ ␀ ␀ #
+	0000 00FC 0073 0074 0075 0076 0077 0078   # A0-A7   ␀ ü s t u v w x #
+	0079 007A 0000 0000 0000 0000 0000 0000   # A8-AF   y z ␀ ␀ ␀ ␀ ␀ ␀ #
+	0000 0000 0000 0000 0000 0000 0000 0000   # B0-B7   ␀ ␀ ␀ ␀ ␀ ␀ ␀ ␀ #
+	0000 0000 0000 0000 0000 0000 0000 0000   # B8-BF   ␀ ␀ ␀ ␀ ␀ ␀ ␀ ␀ #
+	00E6 0041 0042 0043 0044 0045 0046 0047   # C0-C7   æ A B C D E F G #
+	0048 0049 0000 0000 0000 0000 0000 0000   # C8-CF   H I ␀ ␀ ␀ ␀ ␀ ␀ #
+	00E5 004A 004B 004C 004D 004E 004F 0050   # D0-D7   å J K L M N O P #
+	0051 0052 0000 0000 0000 0000 0000 0000   # D8-DF   Q R ␀ ␀ ␀ ␀ ␀ ␀ #
+	005C 0000 0053 0054 0055 0056 0057 0058   # E0-E7   \ ␀ S T U V W X #
+	0059 005A 0000 0000 0000 0000 0000 0000   # E8-EF   Y Z ␀ ␀ ␀ ␀ ␀ ␀ #
+	0030 0031 0032 0033 0034 0035 0036 0037   # F0-F7   0 1 2 3 4 5 6 7 #
+	0038 0039 0000 0000 0000 0000 0000 007F   # F8-FF   8 9 ␀ ␀ ␀ ␀ ␀ ␡ #
+
+
+
+@CP(CODEC_EBCDIC_DK_NO_A: "EBCDIC-DK-NO-A", "csEBCDICDKNOA")
+	0000 0001 0002 0003 0004 0005 0006 0007   # 00-07   ␀ ␁ ␂ ␃ ␄ ␅ ␆ ␇ #
+	0008 0009 000A 000B 000C 000D 000E 000F   # 08-0F   ␈ ␉ ␊ ␋ ␌ ␍ ␎ ␏ #
+	0010 0011 0012 0013 0014 0015 0016 0017   # 10-17   ␐ ␑ ␒ ␓ ␔ ␕ ␖ ␗ #
+	0018 0019 001A 001B 001C 001D 001E 001F   # 18-1F   ␘ ␙ ␚ ␛ ␜ ␝ ␞ ␟ #
+	0000 0000 0000 0000 0000 0000 0000 0000   # 20-27   ␀ ␀ ␀ ␀ ␀ ␀ ␀ ␀ #
+	0000 0000 0000 0000 0000 0000 0000 0000   # 28-2F   ␀ ␀ ␀ ␀ ␀ ␀ ␀ ␀ #
+	0000 0000 0000 0000 0000 0000 0000 0000   # 30-37   ␀ ␀ ␀ ␀ ␀ ␀ ␀ ␀ #
+	0000 0000 0000 0000 0000 0000 0000 0000   # 38-3F   ␀ ␀ ␀ ␀ ␀ ␀ ␀ ␀ #
+	0020 0000 0000 0000 0000 0000 0000 0000   # 40-47   ␠ ␀ ␀ ␀ ␀ ␀ ␀ ␀ #
+	0000 0000 00F8 002E 003C 0028 002B 007C   # 48-4F   ␀ ␀ ø . < ( + | #
+	0026 0000 0000 0000 0000 0000 0000 0000   # 50-57   & ␀ ␀ ␀ ␀ ␀ ␀ ␀ #
+	0000 0000 00E5 00C5 002A 0029 003B 00AC   # 58-5F   ␀ ␀ å Å * ) ; ¬ #
+	002D 002F 0000 0000 0000 0000 0000 0000   # 60-67   - / ␀ ␀ ␀ ␀ ␀ ␀ #
+	0000 0000 00A6 002C 0025 005F 003E 003F   # 68-6F   ␀ ␀ ¦ , % _ > ? #
+	0000 0000 0000 0000 0000 0000 0000 0000   # 70-77   ␀ ␀ ␀ ␀ ␀ ␀ ␀ ␀ #
+	0000 0000 003A 00C6 00D8 0027 003D 00E6   # 78-7F   ␀ ␀ : Æ Ø ' = æ #
+	0000 0061 0062 0063 0064 0065 0066 0067   # 80-87   ␀ a b c d e f g #
+	0068 0069 0000 0000 0000 0000 0000 0000   # 88-8F   h i ␀ ␀ ␀ ␀ ␀ ␀ #
+	0000 006A 006B 006C 006D 006E 006F 0070   # 90-97   ␀ j k l m n o p #
+	0071 0072 0000 0000 0000 0000 0000 0000   # 98-9F   q r ␀ ␀ ␀ ␀ ␀ ␀ #
+	0000 0000 0073 0074 0075 0076 0077 0078   # A0-A7   ␀ ␀ s t u v w x #
+	0079 007A 0000 0000 0000 0000 0000 0000   # A8-AF   y z ␀ ␀ ␀ ␀ ␀ ␀ #
+	0000 0000 0000 0000 0000 0000 0000 0000   # B0-B7   ␀ ␀ ␀ ␀ ␀ ␀ ␀ ␀ #
+	0000 0000 0000 0000 0000 0000 0000 0000   # B8-BF   ␀ ␀ ␀ ␀ ␀ ␀ ␀ ␀ #
+	0000 0041 0042 0043 0044 0045 0046 0047   # C0-C7   ␀ A B C D E F G #
+	0048 0049 0000 0000 0000 0000 0000 0000   # C8-CF   H I ␀ ␀ ␀ ␀ ␀ ␀ #
+	0000 004A 004B 004C 004D 004E 004F 0050   # D0-D7   ␀ J K L M N O P #
+	0051 0052 0000 0000 0000 0000 0000 0000   # D8-DF   Q R ␀ ␀ ␀ ␀ ␀ ␀ #
+	0000 0000 0053 0054 0055 0056 0057 0058   # E0-E7   ␀ ␀ S T U V W X #
+	0059 005A 0000 0000 0000 0000 0000 0000   # E8-EF   Y Z ␀ ␀ ␀ ␀ ␀ ␀ #
+	0030 0031 0032 0033 0034 0035 0036 0037   # F0-F7   0 1 2 3 4 5 6 7 #
+	0038 0039 0000 0000 0000 0000 0000 007F   # F8-FF   8 9 ␀ ␀ ␀ ␀ ␀ ␡ #
+
+
+
+@CP(CODEC_EBCDIC_ES: "EBCDIC-ES", "csEBCDICES")
+	0000 0001 0002 0003 0004 0005 0006 0007   # 00-07   ␀ ␁ ␂ ␃ ␄ ␅ ␆ ␇ #
+	0008 0009 000A 000B 000C 000D 000E 000F   # 08-0F   ␈ ␉ ␊ ␋ ␌ ␍ ␎ ␏ #
+	0010 0011 0012 0013 0014 0015 0016 0017   # 10-17   ␐ ␑ ␒ ␓ ␔ ␕ ␖ ␗ #
+	0018 0019 001A 001B 001C 001D 001E 001F   # 18-1F   ␘ ␙ ␚ ␛ ␜ ␝ ␞ ␟ #
+	0000 0000 0000 0000 0000 0000 0000 0000   # 20-27   ␀ ␀ ␀ ␀ ␀ ␀ ␀ ␀ #
+	0000 0000 0000 0000 0000 0000 0000 0000   # 28-2F   ␀ ␀ ␀ ␀ ␀ ␀ ␀ ␀ #
+	0000 0000 0000 0000 0000 0000 0000 0000   # 30-37   ␀ ␀ ␀ ␀ ␀ ␀ ␀ ␀ #
+	0000 0000 0000 0000 0000 0000 0000 0000   # 38-3F   ␀ ␀ ␀ ␀ ␀ ␀ ␀ ␀ #
+	0020 0000 0000 0000 0000 0000 0000 0000   # 40-47   ␠ ␀ ␀ ␀ ␀ ␀ ␀ ␀ #
+	0000 0000 00A2 002E 003C 0028 002B 007C   # 48-4F   ␀ ␀ ¢ . < ( + | #
+	0026 0000 0000 0000 0000 0000 0000 0000   # 50-57   & ␀ ␀ ␀ ␀ ␀ ␀ ␀ #
+	0000 0000 0021 20A7 002A 0029 003B 00AC   # 58-5F   ␀ ␀ ! ₧ * ) ; ¬ #
+	002D 002F 0000 0000 0000 0000 0000 0000   # 60-67   - / ␀ ␀ ␀ ␀ ␀ ␀ #
+	0000 0000 00F1 002C 0025 005F 003E 003F   # 68-6F   ␀ ␀ ñ , % _ > ? #
+	0000 0000 0000 0000 0000 0000 0000 0000   # 70-77   ␀ ␀ ␀ ␀ ␀ ␀ ␀ ␀ #
+	0000 0060 003A 00D1 0040 0027 003D 0022   # 78-7F   ␀ ` : Ñ @ ' = " #
+	0000 0061 0062 0063 0064 0065 0066 0067   # 80-87   ␀ a b c d e f g #
+	0068 0069 0000 0000 0000 0000 0000 0000   # 88-8F   h i ␀ ␀ ␀ ␀ ␀ ␀ #
+	0000 006A 006B 006C 006D 006E 006F 0070   # 90-97   ␀ j k l m n o p #
+	0071 0072 0000 0000 0000 0000 0000 0000   # 98-9F   q r ␀ ␀ ␀ ␀ ␀ ␀ #
+	0000 00A8 0073 0074 0075 0076 0077 0078   # A0-A7   ␀ ¨ s t u v w x #
+	0079 007A 0000 0000 0000 0000 0000 0000   # A8-AF   y z ␀ ␀ ␀ ␀ ␀ ␀ #
+	0000 0000 0000 0000 0000 0000 0000 0000   # B0-B7   ␀ ␀ ␀ ␀ ␀ ␀ ␀ ␀ #
+	0000 0000 0000 0000 0000 0000 0000 0000   # B8-BF   ␀ ␀ ␀ ␀ ␀ ␀ ␀ ␀ #
+	007B 0041 0042 0043 0044 0045 0046 0047   # C0-C7   { A B C D E F G #
+	0048 0049 0000 0000 0000 0000 0000 0000   # C8-CF   H I ␀ ␀ ␀ ␀ ␀ ␀ #
+	007D 004A 004B 004C 004D 004E 004F 0050   # D0-D7   } J K L M N O P #
+	0051 0052 0000 0000 0000 0000 0000 0000   # D8-DF   Q R ␀ ␀ ␀ ␀ ␀ ␀ #
+	005C 0000 0053 0054 0055 0056 0057 0058   # E0-E7   \ ␀ S T U V W X #
+	0059 005A 0000 0000 0000 0000 0000 0000   # E8-EF   Y Z ␀ ␀ ␀ ␀ ␀ ␀ #
+	0030 0031 0032 0033 0034 0035 0036 0037   # F0-F7   0 1 2 3 4 5 6 7 #
+	0038 0039 0000 0000 0000 0000 0000 007F   # F8-FF   8 9 ␀ ␀ ␀ ␀ ␀ ␡ #
+
+
+
+@CP(CODEC_EBCDIC_ES_A: "EBCDIC-ES-A", "csEBCDICESA")
+	0000 0001 0002 0003 0004 0005 0006 0007   # 00-07   ␀ ␁ ␂ ␃ ␄ ␅ ␆ ␇ #
+	0008 0009 000A 000B 000C 000D 000E 000F   # 08-0F   ␈ ␉ ␊ ␋ ␌ ␍ ␎ ␏ #
+	0010 0011 0012 0013 0014 0015 0016 0017   # 10-17   ␐ ␑ ␒ ␓ ␔ ␕ ␖ ␗ #
+	0018 0019 001A 001B 001C 001D 001E 001F   # 18-1F   ␘ ␙ ␚ ␛ ␜ ␝ ␞ ␟ #
+	0000 0000 0000 0000 0000 0000 0000 0000   # 20-27   ␀ ␀ ␀ ␀ ␀ ␀ ␀ ␀ #
+	0000 0000 0000 0000 0000 0000 0000 0000   # 28-2F   ␀ ␀ ␀ ␀ ␀ ␀ ␀ ␀ #
+	0000 0000 0000 0000 0000 0000 0000 0000   # 30-37   ␀ ␀ ␀ ␀ ␀ ␀ ␀ ␀ #
+	0000 0000 0000 0000 0000 0000 0000 0000   # 38-3F   ␀ ␀ ␀ ␀ ␀ ␀ ␀ ␀ #
+	0020 0000 0000 0000 0000 0000 0000 0000   # 40-47   ␠ ␀ ␀ ␀ ␀ ␀ ␀ ␀ #
+	0000 0000 00A2 002E 003C 0028 002B 007C   # 48-4F   ␀ ␀ ¢ . < ( + | #
+	0026 0000 0000 0000 0000 0000 0000 0000   # 50-57   & ␀ ␀ ␀ ␀ ␀ ␀ ␀ #
+	0000 0000 0021 20A7 002A 0029 003B 00AC   # 58-5F   ␀ ␀ ! ₧ * ) ; ¬ #
+	002D 002F 0000 0000 0000 0000 0000 0000   # 60-67   - / ␀ ␀ ␀ ␀ ␀ ␀ #
+	0000 0000 00A6 002C 0025 005F 003E 003F   # 68-6F   ␀ ␀ ¦ , % _ > ? #
+	0000 0000 0000 0000 0000 0000 0000 0000   # 70-77   ␀ ␀ ␀ ␀ ␀ ␀ ␀ ␀ #
+	0000 0000 003A 00D1 0040 0027 003D 00F1   # 78-7F   ␀ ␀ : Ñ @ ' = ñ #
+	0000 0061 0062 0063 0064 0065 0066 0067   # 80-87   ␀ a b c d e f g #
+	0068 0069 0000 0000 0000 0000 0000 0000   # 88-8F   h i ␀ ␀ ␀ ␀ ␀ ␀ #
+	0000 006A 006B 006C 006D 006E 006F 0070   # 90-97   ␀ j k l m n o p #
+	0071 0072 0000 0000 0000 0000 0000 0000   # 98-9F   q r ␀ ␀ ␀ ␀ ␀ ␀ #
+	0000 0000 0073 0074 0075 0076 0077 0078   # A0-A7   ␀ ␀ s t u v w x #
+	0079 007A 0000 0000 0000 0000 0000 0000   # A8-AF   y z ␀ ␀ ␀ ␀ ␀ ␀ #
+	0000 0000 0000 0000 0000 0000 0000 0000   # B0-B7   ␀ ␀ ␀ ␀ ␀ ␀ ␀ ␀ #
+	0000 0000 0000 0000 0000 0000 0000 0000   # B8-BF   ␀ ␀ ␀ ␀ ␀ ␀ ␀ ␀ #
+	0000 0041 0042 0043 0044 0045 0046 0047   # C0-C7   ␀ A B C D E F G #
+	0048 0049 0000 0000 0000 0000 0000 0000   # C8-CF   H I ␀ ␀ ␀ ␀ ␀ ␀ #
+	0000 004A 004B 004C 004D 004E 004F 0050   # D0-D7   ␀ J K L M N O P #
+	0051 0052 0000 0000 0000 0000 0000 0000   # D8-DF   Q R ␀ ␀ ␀ ␀ ␀ ␀ #
+	0000 0000 0053 0054 0055 0056 0057 0058   # E0-E7   ␀ ␀ S T U V W X #
+	0059 005A 0000 0000 0000 0000 0000 0000   # E8-EF   Y Z ␀ ␀ ␀ ␀ ␀ ␀ #
+	0030 0031 0032 0033 0034 0035 0036 0037   # F0-F7   0 1 2 3 4 5 6 7 #
+	0038 0039 0000 0000 0000 0000 0000 007F   # F8-FF   8 9 ␀ ␀ ␀ ␀ ␀ ␡ #
+
+
+
+@CP(CODEC_EBCDIC_ES_S: "EBCDIC-ES-S", "csEBCDICESS")
+	0000 0001 0002 0003 0004 0005 0006 0007   # 00-07   ␀ ␁ ␂ ␃ ␄ ␅ ␆ ␇ #
+	0008 0009 000A 000B 000C 000D 000E 000F   # 08-0F   ␈ ␉ ␊ ␋ ␌ ␍ ␎ ␏ #
+	0010 0011 0012 0013 0014 0015 0016 0017   # 10-17   ␐ ␑ ␒ ␓ ␔ ␕ ␖ ␗ #
+	0018 0019 001A 001B 001C 001D 001E 001F   # 18-1F   ␘ ␙ ␚ ␛ ␜ ␝ ␞ ␟ #
+	0000 0000 0000 0000 0000 0000 0000 0000   # 20-27   ␀ ␀ ␀ ␀ ␀ ␀ ␀ ␀ #
+	0000 0000 0000 0000 0000 0000 0000 0000   # 28-2F   ␀ ␀ ␀ ␀ ␀ ␀ ␀ ␀ #
+	0000 0000 0000 0000 0000 0000 0000 0000   # 30-37   ␀ ␀ ␀ ␀ ␀ ␀ ␀ ␀ #
+	0000 0000 0000 0000 0000 0000 0000 0000   # 38-3F   ␀ ␀ ␀ ␀ ␀ ␀ ␀ ␀ #
+	0020 0000 0000 0000 0000 0000 0000 0000   # 40-47   ␠ ␀ ␀ ␀ ␀ ␀ ␀ ␀ #
+	0000 0000 00A2 002E 003C 0028 002B 007C   # 48-4F   ␀ ␀ ¢ . < ( + | #
+	0026 0000 0000 0000 0000 0000 0000 0000   # 50-57   & ␀ ␀ ␀ ␀ ␀ ␀ ␀ #
+	0000 0000 0021 0024 002A 0029 003B 00AC   # 58-5F   ␀ ␀ ! $ * ) ; ¬ #
+	002D 002F 0000 0000 0000 0000 0000 0000   # 60-67   - / ␀ ␀ ␀ ␀ ␀ ␀ #
+	0000 0000 00F1 002C 0025 005F 003E 003F   # 68-6F   ␀ ␀ ñ , % _ > ? #
+	0000 0000 0000 0000 0000 0000 0000 0000   # 70-77   ␀ ␀ ␀ ␀ ␀ ␀ ␀ ␀ #
+	0000 0060 003A 00D1 0040 0027 003D 0022   # 78-7F   ␀ ` : Ñ @ ' = " #
+	0000 0061 0062 0063 0064 0065 0066 0067   # 80-87   ␀ a b c d e f g #
+	0068 0069 0000 0000 0000 0000 0000 0000   # 88-8F   h i ␀ ␀ ␀ ␀ ␀ ␀ #
+	0000 006A 006B 006C 006D 006E 006F 0070   # 90-97   ␀ j k l m n o p #
+	0071 0072 0000 0000 0000 0000 0000 0000   # 98-9F   q r ␀ ␀ ␀ ␀ ␀ ␀ #
+	0000 00A8 0073 0074 0075 0076 0077 0078   # A0-A7   ␀ ¨ s t u v w x #
+	0079 007A 0000 0000 0000 0000 0000 0000   # A8-AF   y z ␀ ␀ ␀ ␀ ␀ ␀ #
+	0000 0000 0000 0000 0000 0000 0000 0000   # B0-B7   ␀ ␀ ␀ ␀ ␀ ␀ ␀ ␀ #
+	0000 0000 0000 0000 0000 0000 0000 0000   # B8-BF   ␀ ␀ ␀ ␀ ␀ ␀ ␀ ␀ #
+	007B 0041 0042 0043 0044 0045 0046 0047   # C0-C7   { A B C D E F G #
+	0048 0049 0000 0000 0000 0000 0000 0000   # C8-CF   H I ␀ ␀ ␀ ␀ ␀ ␀ #
+	007D 004A 004B 004C 004D 004E 004F 0050   # D0-D7   } J K L M N O P #
+	0051 0052 0000 0000 0000 0000 0000 0000   # D8-DF   Q R ␀ ␀ ␀ ␀ ␀ ␀ #
+	005C 0000 0053 0054 0055 0056 0057 0058   # E0-E7   \ ␀ S T U V W X #
+	0059 005A 0000 0000 0000 0000 0000 0000   # E8-EF   Y Z ␀ ␀ ␀ ␀ ␀ ␀ #
+	0030 0031 0032 0033 0034 0035 0036 0037   # F0-F7   0 1 2 3 4 5 6 7 #
+	0038 0039 0000 0000 0000 0000 0000 007F   # F8-FF   8 9 ␀ ␀ ␀ ␀ ␀ ␡ #
+
+
+
+@CP(CODEC_EBCDIC_FI_SE: "EBCDIC-FI-SE", "csEBCDICFISE")
+	0000 0001 0002 0003 0004 0005 0006 0007   # 00-07   ␀ ␁ ␂ ␃ ␄ ␅ ␆ ␇ #
+	0008 0009 000A 000B 000C 000D 000E 000F   # 08-0F   ␈ ␉ ␊ ␋ ␌ ␍ ␎ ␏ #
+	0010 0011 0012 0013 0014 0015 0016 0017   # 10-17   ␐ ␑ ␒ ␓ ␔ ␕ ␖ ␗ #
+	0018 0019 001A 001B 001C 001D 001E 001F   # 18-1F   ␘ ␙ ␚ ␛ ␜ ␝ ␞ ␟ #
+	0000 0000 0000 0000 0000 0000 0000 0000   # 20-27   ␀ ␀ ␀ ␀ ␀ ␀ ␀ ␀ #
+	0000 0000 0000 0000 0000 0000 0000 0000   # 28-2F   ␀ ␀ ␀ ␀ ␀ ␀ ␀ ␀ #
+	0000 0000 0000 0000 0000 0000 0000 0000   # 30-37   ␀ ␀ ␀ ␀ ␀ ␀ ␀ ␀ #
+	0000 0000 0000 0000 0000 0000 0000 0000   # 38-3F   ␀ ␀ ␀ ␀ ␀ ␀ ␀ ␀ #
+	0020 0000 0000 0000 0000 0000 0000 0000   # 40-47   ␠ ␀ ␀ ␀ ␀ ␀ ␀ ␀ #
+	0000 0000 00A7 002E 003C 0028 002B 0021   # 48-4F   ␀ ␀ § . < ( + ! #
+	0026 0000 0000 0000 0000 0000 0000 0000   # 50-57   & ␀ ␀ ␀ ␀ ␀ ␀ ␀ #
+	0000 0000 00A4 00C5 002A 0029 003B 005E   # 58-5F   ␀ ␀ ¤ Å * ) ; ^ #
+	002D 002F 0000 0000 0000 0000 0000 0000   # 60-67   - / ␀ ␀ ␀ ␀ ␀ ␀ #
+	0000 0000 00F6 002C 0025 005F 003E 003F   # 68-6F   ␀ ␀ ö , % _ > ? #
+	0000 0000 0000 0000 0000 0000 0000 0000   # 70-77   ␀ ␀ ␀ ␀ ␀ ␀ ␀ ␀ #
+	0000 00E9 003A 00C4 00D6 0027 003D 0022   # 78-7F   ␀ é : Ä Ö ' = " #
+	0000 0061 0062 0063 0064 0065 0066 0067   # 80-87   ␀ a b c d e f g #
+	0068 0069 0000 0000 0000 0000 0000 0000   # 88-8F   h i ␀ ␀ ␀ ␀ ␀ ␀ #
+	0000 006A 006B 006C 006D 006E 006F 0070   # 90-97   ␀ j k l m n o p #
+	0071 0072 0000 0000 0000 0000 0000 0000   # 98-9F   q r ␀ ␀ ␀ ␀ ␀ ␀ #
+	0000 00FC 0073 0074 0075 0076 0077 0078   # A0-A7   ␀ ü s t u v w x #
+	0079 007A 0000 0000 0000 0000 0000 0000   # A8-AF   y z ␀ ␀ ␀ ␀ ␀ ␀ #
+	0000 0000 0000 0000 0000 0000 0000 0000   # B0-B7   ␀ ␀ ␀ ␀ ␀ ␀ ␀ ␀ #
+	0000 0000 0000 0000 0000 0000 0000 0000   # B8-BF   ␀ ␀ ␀ ␀ ␀ ␀ ␀ ␀ #
+	00E4 0041 0042 0043 0044 0045 0046 0047   # C0-C7   ä A B C D E F G #
+	0048 0049 0000 0000 0000 0000 0000 0000   # C8-CF   H I ␀ ␀ ␀ ␀ ␀ ␀ #
+	00E5 004A 004B 004C 004D 004E 004F 0050   # D0-D7   å J K L M N O P #
+	0051 0052 0000 0000 0000 0000 0000 0000   # D8-DF   Q R ␀ ␀ ␀ ␀ ␀ ␀ #
+	00C9 0000 0053 0054 0055 0056 0057 0058   # E0-E7   É ␀ S T U V W X #
+	0059 005A 0000 0000 0000 0000 0000 0000   # E8-EF   Y Z ␀ ␀ ␀ ␀ ␀ ␀ #
+	0030 0031 0032 0033 0034 0035 0036 0037   # F0-F7   0 1 2 3 4 5 6 7 #
+	0038 0039 0000 0000 0000 0000 0000 007F   # F8-FF   8 9 ␀ ␀ ␀ ␀ ␀ ␡ #
+
+
+
+@CP(CODEC_EBCDIC_FI_SE_A: "EBCDIC-FI-SE-A", "csEBCDICFISEA")
+	0000 0001 0002 0003 0004 0005 0006 0007   # 00-07   ␀ ␁ ␂ ␃ ␄ ␅ ␆ ␇ #
+	0008 0009 000A 000B 000C 000D 000E 000F   # 08-0F   ␈ ␉ ␊ ␋ ␌ ␍ ␎ ␏ #
+	0010 0011 0012 0013 0014 0015 0016 0017   # 10-17   ␐ ␑ ␒ ␓ ␔ ␕ ␖ ␗ #
+	0018 0019 001A 001B 001C 001D 001E 001F   # 18-1F   ␘ ␙ ␚ ␛ ␜ ␝ ␞ ␟ #
+	0000 0000 0000 0000 0000 0000 0000 0000   # 20-27   ␀ ␀ ␀ ␀ ␀ ␀ ␀ ␀ #
+	0000 0000 0000 0000 0000 0000 0000 0000   # 28-2F   ␀ ␀ ␀ ␀ ␀ ␀ ␀ ␀ #
+	0000 0000 0000 0000 0000 0000 0000 0000   # 30-37   ␀ ␀ ␀ ␀ ␀ ␀ ␀ ␀ #
+	0000 0000 0000 0000 0000 0000 0000 0000   # 38-3F   ␀ ␀ ␀ ␀ ␀ ␀ ␀ ␀ #
+	0020 0000 0000 0000 0000 0000 0000 0000   # 40-47   ␠ ␀ ␀ ␀ ␀ ␀ ␀ ␀ #
+	0000 0000 00F6 002E 003C 0028 002B 007C   # 48-4F   ␀ ␀ ö . < ( + | #
+	0026 0000 0000 0000 0000 0000 0000 0000   # 50-57   & ␀ ␀ ␀ ␀ ␀ ␀ ␀ #
+	0000 0000 00E5 00C5 002A 0029 003B 00AC   # 58-5F   ␀ ␀ å Å * ) ; ¬ #
+	002D 002F 0000 0000 0000 0000 0000 0000   # 60-67   - / ␀ ␀ ␀ ␀ ␀ ␀ #
+	0000 0000 00A6 002C 0025 005F 003E 003F   # 68-6F   ␀ ␀ ¦ , % _ > ? #
+	0000 0000 0000 0000 0000 0000 0000 0000   # 70-77   ␀ ␀ ␀ ␀ ␀ ␀ ␀ ␀ #
+	0000 0000 003A 00C4 00D6 0027 003D 00E4   # 78-7F   ␀ ␀ : Ä Ö ' = ä #
+	0000 0061 0062 0063 0064 0065 0066 0067   # 80-87   ␀ a b c d e f g #
+	0068 0069 0000 0000 0000 0000 0000 0000   # 88-8F   h i ␀ ␀ ␀ ␀ ␀ ␀ #
+	0000 006A 006B 006C 006D 006E 006F 0070   # 90-97   ␀ j k l m n o p #
+	0071 0072 0000 0000 0000 0000 0000 0000   # 98-9F   q r ␀ ␀ ␀ ␀ ␀ ␀ #
+	0000 0000 0073 0074 0075 0076 0077 0078   # A0-A7   ␀ ␀ s t u v w x #
+	0079 007A 0000 0000 0000 0000 0000 0000   # A8-AF   y z ␀ ␀ ␀ ␀ ␀ ␀ #
+	0000 0000 0000 0000 0000 0000 0000 0000   # B0-B7   ␀ ␀ ␀ ␀ ␀ ␀ ␀ ␀ #
+	0000 0000 0000 0000 0000 0000 0000 0000   # B8-BF   ␀ ␀ ␀ ␀ ␀ ␀ ␀ ␀ #
+	0000 0041 0042 0043 0044 0045 0046 0047   # C0-C7   ␀ A B C D E F G #
+	0048 0049 0000 0000 0000 0000 0000 0000   # C8-CF   H I ␀ ␀ ␀ ␀ ␀ ␀ #
+	0000 004A 004B 004C 004D 004E 004F 0050   # D0-D7   ␀ J K L M N O P #
+	0051 0052 0000 0000 0000 0000 0000 0000   # D8-DF   Q R ␀ ␀ ␀ ␀ ␀ ␀ #
+	0000 0000 0053 0054 0055 0056 0057 0058   # E0-E7   ␀ ␀ S T U V W X #
+	0059 005A 0000 0000 0000 0000 0000 0000   # E8-EF   Y Z ␀ ␀ ␀ ␀ ␀ ␀ #
+	0030 0031 0032 0033 0034 0035 0036 0037   # F0-F7   0 1 2 3 4 5 6 7 #
+	0038 0039 0000 0000 0000 0000 0000 007F   # F8-FF   8 9 ␀ ␀ ␀ ␀ ␀ ␡ #
+
+
+
+@CP(CODEC_EBCDIC_FR: "EBCDIC-FR", "csEBCDICFR")
+	0000 0001 0002 0003 0004 0005 0006 0007   # 00-07   ␀ ␁ ␂ ␃ ␄ ␅ ␆ ␇ #
+	0008 0009 000A 000B 000C 000D 000E 000F   # 08-0F   ␈ ␉ ␊ ␋ ␌ ␍ ␎ ␏ #
+	0010 0011 0012 0013 0014 0015 0016 0017   # 10-17   ␐ ␑ ␒ ␓ ␔ ␕ ␖ ␗ #
+	0018 0019 001A 001B 001C 001D 001E 001F   # 18-1F   ␘ ␙ ␚ ␛ ␜ ␝ ␞ ␟ #
+	0000 0000 0000 0000 0000 0000 0000 0000   # 20-27   ␀ ␀ ␀ ␀ ␀ ␀ ␀ ␀ #
+	0000 0000 0000 0000 0000 0000 0000 0000   # 28-2F   ␀ ␀ ␀ ␀ ␀ ␀ ␀ ␀ #
+	0000 0000 0000 0000 0000 0000 0000 0000   # 30-37   ␀ ␀ ␀ ␀ ␀ ␀ ␀ ␀ #
+	0000 0000 0000 0000 0000 0000 0000 0000   # 38-3F   ␀ ␀ ␀ ␀ ␀ ␀ ␀ ␀ #
+	0020 0000 0000 0000 0000 0000 0000 0000   # 40-47   ␠ ␀ ␀ ␀ ␀ ␀ ␀ ␀ #
+	0000 0000 00B0 002E 003C 0028 002B 0021   # 48-4F   ␀ ␀ ° . < ( + ! #
+	0026 0000 0000 0000 0000 0000 0000 0000   # 50-57   & ␀ ␀ ␀ ␀ ␀ ␀ ␀ #
+	0000 0000 00A7 0024 002A 0029 003B 005E   # 58-5F   ␀ ␀ § $ * ) ; ^ #
+	002D 002F 0000 0000 0000 0000 0000 0000   # 60-67   - / ␀ ␀ ␀ ␀ ␀ ␀ #
+	0000 0000 00F9 002C 0025 005F 003E 003F   # 68-6F   ␀ ␀ ù , % _ > ? #
+	0000 0000 0000 0000 0000 0000 0000 0000   # 70-77   ␀ ␀ ␀ ␀ ␀ ␀ ␀ ␀ #
+	0000 0060 003A 00A3 00E0 0027 003D 0022   # 78-7F   ␀ ` : £ à ' = " #
+	0000 0061 0062 0063 0064 0065 0066 0067   # 80-87   ␀ a b c d e f g #
+	0068 0069 0000 0000 0000 0000 0000 0000   # 88-8F   h i ␀ ␀ ␀ ␀ ␀ ␀ #
+	0000 006A 006B 006C 006D 006E 006F 0070   # 90-97   ␀ j k l m n o p #
+	0071 0072 0000 0000 0000 0000 0000 0000   # 98-9F   q r ␀ ␀ ␀ ␀ ␀ ␀ #
+	0000 00A8 0073 0074 0075 0076 0077 0078   # A0-A7   ␀ ¨ s t u v w x #
+	0079 007A 0000 0000 0000 0000 0000 0000   # A8-AF   y z ␀ ␀ ␀ ␀ ␀ ␀ #
+	0000 0000 0000 0000 0000 0000 0000 0000   # B0-B7   ␀ ␀ ␀ ␀ ␀ ␀ ␀ ␀ #
+	0000 0000 0000 0000 0000 0000 0000 0000   # B8-BF   ␀ ␀ ␀ ␀ ␀ ␀ ␀ ␀ #
+	00E9 0041 0042 0043 0044 0045 0046 0047   # C0-C7   é A B C D E F G #
+	0048 0049 0000 0000 0000 0000 0000 0000   # C8-CF   H I ␀ ␀ ␀ ␀ ␀ ␀ #
+	00E8 004A 004B 004C 004D 004E 004F 0050   # D0-D7   è J K L M N O P #
+	0051 0052 0000 0000 0000 0000 0000 0000   # D8-DF   Q R ␀ ␀ ␀ ␀ ␀ ␀ #
+	00E7 0000 0053 0054 0055 0056 0057 0058   # E0-E7   ç ␀ S T U V W X #
+	0059 005A 0000 0000 0000 0000 0000 0000   # E8-EF   Y Z ␀ ␀ ␀ ␀ ␀ ␀ #
+	0030 0031 0032 0033 0034 0035 0036 0037   # F0-F7   0 1 2 3 4 5 6 7 #
+	0038 0039 0000 0000 0000 0000 0000 007F   # F8-FF   8 9 ␀ ␀ ␀ ␀ ␀ ␡ #
+
+
+
+@CP(CODEC_EBCDIC_IT: "EBCDIC-IT", "csEBCDICIT")
+	0000 0001 0002 0003 0004 0005 0006 0007   # 00-07   ␀ ␁ ␂ ␃ ␄ ␅ ␆ ␇ #
+	0008 0009 000A 000B 000C 000D 000E 000F   # 08-0F   ␈ ␉ ␊ ␋ ␌ ␍ ␎ ␏ #
+	0010 0011 0012 0013 0014 0015 0016 0017   # 10-17   ␐ ␑ ␒ ␓ ␔ ␕ ␖ ␗ #
+	0018 0019 001A 001B 001C 001D 001E 001F   # 18-1F   ␘ ␙ ␚ ␛ ␜ ␝ ␞ ␟ #
+	0000 0000 0000 0000 0000 0000 0000 0000   # 20-27   ␀ ␀ ␀ ␀ ␀ ␀ ␀ ␀ #
+	0000 0000 0000 0000 0000 0000 0000 0000   # 28-2F   ␀ ␀ ␀ ␀ ␀ ␀ ␀ ␀ #
+	0000 0000 0000 0000 0000 0000 0000 0000   # 30-37   ␀ ␀ ␀ ␀ ␀ ␀ ␀ ␀ #
+	0000 0000 0000 0000 0000 0000 0000 0000   # 38-3F   ␀ ␀ ␀ ␀ ␀ ␀ ␀ ␀ #
+	0020 0000 0000 0000 0000 0000 0000 0000   # 40-47   ␠ ␀ ␀ ␀ ␀ ␀ ␀ ␀ #
+	0000 0000 00B0 002E 003C 0028 002B 0021   # 48-4F   ␀ ␀ ° . < ( + ! #
+	0026 0000 0000 0000 0000 0000 0000 0000   # 50-57   & ␀ ␀ ␀ ␀ ␀ ␀ ␀ #
+	0000 0000 00E9 0024 002A 0029 003B 005E   # 58-5F   ␀ ␀ é $ * ) ; ^ #
+	002D 002F 0000 0000 0000 0000 0000 0000   # 60-67   - / ␀ ␀ ␀ ␀ ␀ ␀ #
+	0000 0000 00F2 002C 0025 005F 003E 003F   # 68-6F   ␀ ␀ ò , % _ > ? #
+	0000 0000 0000 0000 0000 0000 0000 0000   # 70-77   ␀ ␀ ␀ ␀ ␀ ␀ ␀ ␀ #
+	0000 00F9 003A 00A3 00A7 0027 003D 0022   # 78-7F   ␀ ù : £ § ' = " #
+	0000 0061 0062 0063 0064 0065 0066 0067   # 80-87   ␀ a b c d e f g #
+	0068 0069 0000 0000 0000 0000 0000 0000   # 88-8F   h i ␀ ␀ ␀ ␀ ␀ ␀ #
+	0000 006A 006B 006C 006D 006E 006F 0070   # 90-97   ␀ j k l m n o p #
+	0071 0072 0000 0000 0000 0000 0000 0000   # 98-9F   q r ␀ ␀ ␀ ␀ ␀ ␀ #
+	0000 00EC 0073 0074 0075 0076 0077 0078   # A0-A7   ␀ ì s t u v w x #
+	0079 007A 0000 0000 0000 0000 0000 0000   # A8-AF   y z ␀ ␀ ␀ ␀ ␀ ␀ #
+	0000 0000 0000 0000 0000 0000 0000 0000   # B0-B7   ␀ ␀ ␀ ␀ ␀ ␀ ␀ ␀ #
+	0000 0000 0000 0000 0000 0000 0000 0000   # B8-BF   ␀ ␀ ␀ ␀ ␀ ␀ ␀ ␀ #
+	00E0 0041 0042 0043 0044 0045 0046 0047   # C0-C7   à A B C D E F G #
+	0048 0049 0000 0000 0000 0000 0000 0000   # C8-CF   H I ␀ ␀ ␀ ␀ ␀ ␀ #
+	00E8 004A 004B 004C 004D 004E 004F 0050   # D0-D7   è J K L M N O P #
+	0051 0052 0000 0000 0000 0000 0000 0000   # D8-DF   Q R ␀ ␀ ␀ ␀ ␀ ␀ #
+	00E7 0000 0053 0054 0055 0056 0057 0058   # E0-E7   ç ␀ S T U V W X #
+	0059 005A 0000 0000 0000 0000 0000 0000   # E8-EF   Y Z ␀ ␀ ␀ ␀ ␀ ␀ #
+	0030 0031 0032 0033 0034 0035 0036 0037   # F0-F7   0 1 2 3 4 5 6 7 #
+	0038 0039 0000 0000 0000 0000 0000 007F   # F8-FF   8 9 ␀ ␀ ␀ ␀ ␀ ␡ #
+
+
+
+@CP(CODEC_EBCDIC_PT: "EBCDIC-PT", "csEBCDICPT")
+	0000 0001 0002 0003 0004 0005 0006 0007   # 00-07   ␀ ␁ ␂ ␃ ␄ ␅ ␆ ␇ #
+	0008 0009 000A 000B 000C 000D 000E 000F   # 08-0F   ␈ ␉ ␊ ␋ ␌ ␍ ␎ ␏ #
+	0010 0011 0012 0013 0014 0015 0016 0017   # 10-17   ␐ ␑ ␒ ␓ ␔ ␕ ␖ ␗ #
+	0018 0019 001A 001B 001C 001D 001E 001F   # 18-1F   ␘ ␙ ␚ ␛ ␜ ␝ ␞ ␟ #
+	0000 0000 0000 0000 0000 0000 0000 0000   # 20-27   ␀ ␀ ␀ ␀ ␀ ␀ ␀ ␀ #
+	0000 0000 0000 0000 0000 0000 0000 0000   # 28-2F   ␀ ␀ ␀ ␀ ␀ ␀ ␀ ␀ #
+	0000 0000 0000 0000 0000 0000 0000 0000   # 30-37   ␀ ␀ ␀ ␀ ␀ ␀ ␀ ␀ #
+	0000 0000 0000 0000 0000 0000 0000 0000   # 38-3F   ␀ ␀ ␀ ␀ ␀ ␀ ␀ ␀ #
+	0020 0000 0000 0000 0000 0000 0000 0000   # 40-47   ␠ ␀ ␀ ␀ ␀ ␀ ␀ ␀ #
+	0000 0000 005B 002E 003C 0028 002B 0021   # 48-4F   ␀ ␀ [ . < ( + ! #
+	0026 0000 0000 0000 0000 0000 0000 0000   # 50-57   & ␀ ␀ ␀ ␀ ␀ ␀ ␀ #
+	0000 0000 005D 0024 002A 0029 003B 005E   # 58-5F   ␀ ␀ ] $ * ) ; ^ #
+	002D 002F 0000 0000 0000 0000 0000 0000   # 60-67   - / ␀ ␀ ␀ ␀ ␀ ␀ #
+	0000 0000 00F5 002C 0025 005F 003E 003F   # 68-6F   ␀ ␀ õ , % _ > ? #
+	0000 0000 0000 0000 0000 0000 0000 0000   # 70-77   ␀ ␀ ␀ ␀ ␀ ␀ ␀ ␀ #
+	0000 0060 003A 00C3 00D5 0027 003D 0022   # 78-7F   ␀ ` : Ã Õ ' = " #
+	0000 0061 0062 0063 0064 0065 0066 0067   # 80-87   ␀ a b c d e f g #
+	0068 0069 0000 0000 0000 0000 0000 0000   # 88-8F   h i ␀ ␀ ␀ ␀ ␀ ␀ #
+	0000 006A 006B 006C 006D 006E 006F 0070   # 90-97   ␀ j k l m n o p #
+	0071 0072 0000 0000 0000 0000 0000 0000   # 98-9F   q r ␀ ␀ ␀ ␀ ␀ ␀ #
+	0000 00E7 0073 0074 0075 0076 0077 0078   # A0-A7   ␀ ç s t u v w x #
+	0079 007A 0000 0000 0000 0000 0000 0000   # A8-AF   y z ␀ ␀ ␀ ␀ ␀ ␀ #
+	0000 0000 0000 0000 0000 0000 0000 0000   # B0-B7   ␀ ␀ ␀ ␀ ␀ ␀ ␀ ␀ #
+	0000 0000 0000 0000 0000 0000 0000 0000   # B8-BF   ␀ ␀ ␀ ␀ ␀ ␀ ␀ ␀ #
+	00E3 0041 0042 0043 0044 0045 0046 0047   # C0-C7   ã A B C D E F G #
+	0048 0049 0000 0000 0000 0000 0000 0000   # C8-CF   H I ␀ ␀ ␀ ␀ ␀ ␀ #
+	00B4 004A 004B 004C 004D 004E 004F 0050   # D0-D7   ´ J K L M N O P #
+	0051 0052 0000 0000 0000 0000 0000 0000   # D8-DF   Q R ␀ ␀ ␀ ␀ ␀ ␀ #
+	00C7 0000 0053 0054 0055 0056 0057 0058   # E0-E7   Ç ␀ S T U V W X #
+	0059 005A 0000 0000 0000 0000 0000 0000   # E8-EF   Y Z ␀ ␀ ␀ ␀ ␀ ␀ #
+	0030 0031 0032 0033 0034 0035 0036 0037   # F0-F7   0 1 2 3 4 5 6 7 #
+	0038 0039 0000 0000 0000 0000 0000 007F   # F8-FF   8 9 ␀ ␀ ␀ ␀ ␀ ␡ #
+
+
+
+@CP(CODEC_EBCDIC_UK: "EBCDIC-UK", "csEBCDICUK")
+	0000 0001 0002 0003 0004 0005 0006 0007   # 00-07   ␀ ␁ ␂ ␃ ␄ ␅ ␆ ␇ #
+	0008 0009 000A 000B 000C 000D 000E 000F   # 08-0F   ␈ ␉ ␊ ␋ ␌ ␍ ␎ ␏ #
+	0010 0011 0012 0013 0014 0015 0016 0017   # 10-17   ␐ ␑ ␒ ␓ ␔ ␕ ␖ ␗ #
+	0018 0019 001A 001B 001C 001D 001E 001F   # 18-1F   ␘ ␙ ␚ ␛ ␜ ␝ ␞ ␟ #
+	0000 0000 0000 0000 0000 0000 0000 0000   # 20-27   ␀ ␀ ␀ ␀ ␀ ␀ ␀ ␀ #
+	0000 0000 0000 0000 0000 0000 0000 0000   # 28-2F   ␀ ␀ ␀ ␀ ␀ ␀ ␀ ␀ #
+	0000 0000 0000 0000 0000 0000 0000 0000   # 30-37   ␀ ␀ ␀ ␀ ␀ ␀ ␀ ␀ #
+	0000 0000 0000 0000 0000 0000 0000 0000   # 38-3F   ␀ ␀ ␀ ␀ ␀ ␀ ␀ ␀ #
+	0020 0000 0000 0000 0000 0000 0000 0000   # 40-47   ␠ ␀ ␀ ␀ ␀ ␀ ␀ ␀ #
+	0000 0000 0024 002E 003C 0028 002B 007C   # 48-4F   ␀ ␀ $ . < ( + | #
+	0026 0000 0000 0000 0000 0000 0000 0000   # 50-57   & ␀ ␀ ␀ ␀ ␀ ␀ ␀ #
+	0000 0000 0021 00A3 002A 0029 003B 00AC   # 58-5F   ␀ ␀ ! £ * ) ; ¬ #
+	002D 002F 0000 0000 0000 0000 0000 0000   # 60-67   - / ␀ ␀ ␀ ␀ ␀ ␀ #
+	0000 0000 00A6 002C 0025 005F 003E 003F   # 68-6F   ␀ ␀ ¦ , % _ > ? #
+	0000 0000 0000 0000 0000 0000 0000 0000   # 70-77   ␀ ␀ ␀ ␀ ␀ ␀ ␀ ␀ #
+	0000 0060 003A 0023 0040 0027 003D 0022   # 78-7F   ␀ ` : # @ ' = " #
+	0000 0061 0062 0063 0064 0065 0066 0067   # 80-87   ␀ a b c d e f g #
+	0068 0069 0000 0000 0000 0000 0000 0000   # 88-8F   h i ␀ ␀ ␀ ␀ ␀ ␀ #
+	0000 006A 006B 006C 006D 006E 006F 0070   # 90-97   ␀ j k l m n o p #
+	0071 0072 0000 0000 0000 0000 0000 0000   # 98-9F   q r ␀ ␀ ␀ ␀ ␀ ␀ #
+	0000 203E 0073 0074 0075 0076 0077 0078   # A0-A7   ␀ ‾ s t u v w x #
+	0079 007A 0000 0000 0000 0000 0000 0000   # A8-AF   y z ␀ ␀ ␀ ␀ ␀ ␀ #
+	0000 0000 0000 0000 0000 0000 0000 0000   # B0-B7   ␀ ␀ ␀ ␀ ␀ ␀ ␀ ␀ #
+	0000 0000 0000 0000 0000 0000 0000 0000   # B8-BF   ␀ ␀ ␀ ␀ ␀ ␀ ␀ ␀ #
+	007B 0041 0042 0043 0044 0045 0046 0047   # C0-C7   { A B C D E F G #
+	0048 0049 0000 0000 0000 0000 0000 0000   # C8-CF   H I ␀ ␀ ␀ ␀ ␀ ␀ #
+	007D 004A 004B 004C 004D 004E 004F 0050   # D0-D7   } J K L M N O P #
+	0051 0052 0000 0000 0000 0000 0000 0000   # D8-DF   Q R ␀ ␀ ␀ ␀ ␀ ␀ #
+	005C 0000 0053 0054 0055 0056 0057 0058   # E0-E7   \ ␀ S T U V W X #
+	0059 005A 0000 0000 0000 0000 0000 0000   # E8-EF   Y Z ␀ ␀ ␀ ␀ ␀ ␀ #
+	0030 0031 0032 0033 0034 0035 0036 0037   # F0-F7   0 1 2 3 4 5 6 7 #
+	0038 0039 0000 0000 0000 0000 0000 007F   # F8-FF   8 9 ␀ ␀ ␀ ␀ ␀ ␡ #
+
+
+
+@CP(CODEC_EBCDIC_US: "EBCDIC-US", "csEBCDICUS")
+	0000 0001 0002 0003 0004 0005 0006 0007   # 00-07   ␀ ␁ ␂ ␃ ␄ ␅ ␆ ␇ #
+	0008 0009 000A 000B 000C 000D 000E 000F   # 08-0F   ␈ ␉ ␊ ␋ ␌ ␍ ␎ ␏ #
+	0010 0011 0012 0013 0014 0015 0016 0017   # 10-17   ␐ ␑ ␒ ␓ ␔ ␕ ␖ ␗ #
+	0018 0019 001A 001B 001C 001D 001E 001F   # 18-1F   ␘ ␙ ␚ ␛ ␜ ␝ ␞ ␟ #
+	0000 0000 0000 0000 0000 0000 0000 0000   # 20-27   ␀ ␀ ␀ ␀ ␀ ␀ ␀ ␀ #
+	0000 0000 0000 0000 0000 0000 0000 0000   # 28-2F   ␀ ␀ ␀ ␀ ␀ ␀ ␀ ␀ #
+	0000 0000 0000 0000 0000 0000 0000 0000   # 30-37   ␀ ␀ ␀ ␀ ␀ ␀ ␀ ␀ #
+	0000 0000 0000 0000 0000 0000 0000 0000   # 38-3F   ␀ ␀ ␀ ␀ ␀ ␀ ␀ ␀ #
+	0020 0000 0000 0000 0000 0000 0000 0000   # 40-47   ␠ ␀ ␀ ␀ ␀ ␀ ␀ ␀ #
+	0000 0000 00A2 002E 003C 0028 002B 007C   # 48-4F   ␀ ␀ ¢ . < ( + | #
+	0026 0000 0000 0000 0000 0000 0000 0000   # 50-57   & ␀ ␀ ␀ ␀ ␀ ␀ ␀ #
+	0000 0000 0021 0024 002A 0029 003B 00AC   # 58-5F   ␀ ␀ ! $ * ) ; ¬ #
+	002D 002F 0000 0000 0000 0000 0000 0000   # 60-67   - / ␀ ␀ ␀ ␀ ␀ ␀ #
+	0000 0000 00A6 002C 0025 005F 003E 003F   # 68-6F   ␀ ␀ ¦ , % _ > ? #
+	0000 0000 0000 0000 0000 0000 0000 0000   # 70-77   ␀ ␀ ␀ ␀ ␀ ␀ ␀ ␀ #
+	0000 0060 003A 0023 0040 0027 003D 0022   # 78-7F   ␀ ` : # @ ' = " #
+	0000 0061 0062 0063 0064 0065 0066 0067   # 80-87   ␀ a b c d e f g #
+	0068 0069 0000 0000 0000 0000 0000 0000   # 88-8F   h i ␀ ␀ ␀ ␀ ␀ ␀ #
+	0000 006A 006B 006C 006D 006E 006F 0070   # 90-97   ␀ j k l m n o p #
+	0071 0072 0000 0000 0000 0000 0000 0000   # 98-9F   q r ␀ ␀ ␀ ␀ ␀ ␀ #
+	0000 007E 0073 0074 0075 0076 0077 0078   # A0-A7   ␀ ~ s t u v w x #
+	0079 007A 0000 0000 0000 0000 0000 0000   # A8-AF   y z ␀ ␀ ␀ ␀ ␀ ␀ #
+	0000 0000 0000 0000 0000 0000 0000 0000   # B0-B7   ␀ ␀ ␀ ␀ ␀ ␀ ␀ ␀ #
+	0000 0000 0000 0000 0000 0000 0000 0000   # B8-BF   ␀ ␀ ␀ ␀ ␀ ␀ ␀ ␀ #
+	007B 0041 0042 0043 0044 0045 0046 0047   # C0-C7   { A B C D E F G #
+	0048 0049 0000 0000 0000 0000 0000 0000   # C8-CF   H I ␀ ␀ ␀ ␀ ␀ ␀ #
+	007D 004A 004B 004C 004D 004E 004F 0050   # D0-D7   } J K L M N O P #
+	0051 0052 0000 0000 0000 0000 0000 0000   # D8-DF   Q R ␀ ␀ ␀ ␀ ␀ ␀ #
+	005C 0000 0053 0054 0055 0056 0057 0058   # E0-E7   \ ␀ S T U V W X #
+	0059 005A 0000 0000 0000 0000 0000 0000   # E8-EF   Y Z ␀ ␀ ␀ ␀ ␀ ␀ #
+	0030 0031 0032 0033 0034 0035 0036 0037   # F0-F7   0 1 2 3 4 5 6 7 #
+	0038 0039 0000 0000 0000 0000 0000 007F   # F8-FF   8 9 ␀ ␀ ␀ ␀ ␀ ␡ #
+
+
+
+@CP(CODEC_CP37: "IBM037", "cp037", "ebcdic-cp-us", "ebcdic-cp-ca", "ebcdic-cp-wt", "ebcdic-cp-nl", "csIBM037")
+	0000 0001 0002 0003 0004 0005 0006 0007   # 00-07   ␀ ␁ ␂ ␃ ␄ ␅ ␆ ␇ #
+	0008 0009 000A 000B 000C 000D 000E 000F   # 08-0F   ␈ ␉ ␊ ␋ ␌ ␍ ␎ ␏ #
+	0010 0011 0012 0013 0014 0015 0016 0017   # 10-17   ␐ ␑ ␒ ␓ ␔ ␕ ␖ ␗ #
+	0018 0019 001A 001B 001C 001D 001E 001F   # 18-1F   ␘ ␙ ␚ ␛ ␜ ␝ ␞ ␟ #
+	0000 0000 0000 0000 0000 0000 0000 0000   # 20-27   ␀ ␀ ␀ ␀ ␀ ␀ ␀ ␀ #
+	0000 0000 0000 0000 0000 0000 0000 0000   # 28-2F   ␀ ␀ ␀ ␀ ␀ ␀ ␀ ␀ #
+	0000 0000 0000 0000 0000 0000 0000 0000   # 30-37   ␀ ␀ ␀ ␀ ␀ ␀ ␀ ␀ #
+	0000 0000 0000 0000 0000 0000 0000 0000   # 38-3F   ␀ ␀ ␀ ␀ ␀ ␀ ␀ ␀ #
+	0020 00A0 00E2 00E4 00E0 00E1 00E3 00E5   # 40-47   ␠   â ä à á ã å #
+	00E7 00F1 00A2 002E 003C 0028 002B 007C   # 48-4F   ç ñ ¢ . < ( + | #
+	0026 00E9 00EA 00EB 00E8 00ED 00EE 00EF   # 50-57   & é ê ë è í î ï #
+	00EC 00DF 0021 0024 002A 0029 003B 00AC   # 58-5F   ì ß ! $ * ) ; ¬ #
+	002D 002F 00C2 00C4 00C0 00C1 00C3 00C5   # 60-67   - / Â Ä À Á Ã Å #
+	00C7 00D1 00A6 002C 0025 005F 003E 003F   # 68-6F   Ç Ñ ¦ , % _ > ? #
+	00F8 00C9 00CA 00CB 00C8 00CD 00CE 00CF   # 70-77   ø É Ê Ë È Í Î Ï #
+	00CC 0060 003A 0023 0040 0027 003D 0022   # 78-7F   Ì ` : # @ ' = " #
+	00D8 0061 0062 0063 0064 0065 0066 0067   # 80-87   Ø a b c d e f g #
+	0068 0069 00AB 00BB 00F0 00FD 00FE 00B1   # 88-8F   h i « » ð ý þ ± #
+	00B0 006A 006B 006C 006D 006E 006F 0070   # 90-97   ° j k l m n o p #
+	0071 0072 00AA 00BA 00E6 00B8 00C6 00A4   # 98-9F   q r ª º æ ¸ Æ ¤ #
+	00B5 007E 0073 0074 0075 0076 0077 0078   # A0-A7   µ ~ s t u v w x #
+	0079 007A 00A1 00BF 00D0 00DD 00DE 00AE   # A8-AF   y z ¡ ¿ Ð Ý Þ ® #
+	005E 00A3 00A5 00B7 00A9 00A7 00B6 00BC   # B0-B7   ^ £ ¥ · © § ¶ ¼ #
+	00BD 00BE 005B 005D 203E 00A8 00B4 00D7   # B8-BF   ½ ¾ [ ] ‾ ¨ ´ × #
+	007B 0041 0042 0043 0044 0045 0046 0047   # C0-C7   { A B C D E F G #
+	0048 0049 00AD 00F4 00F6 00F2 00F3 00F5   # C8-CF   H I ­ ô ö ò ó õ #
+	007D 004A 004B 004C 004D 004E 004F 0050   # D0-D7   } J K L M N O P #
+	0051 0052 00B9 00FB 00FC 00F9 00FA 00FF   # D8-DF   Q R ¹ û ü ù ú ÿ #
+	005C 00F7 0053 0054 0055 0056 0057 0058   # E0-E7   \ ÷ S T U V W X #
+	0059 005A 00B2 00D4 00D6 00D2 00D3 00D5   # E8-EF   Y Z ² Ô Ö Ò Ó Õ #
+	0030 0031 0032 0033 0034 0035 0036 0037   # F0-F7   0 1 2 3 4 5 6 7 #
+	0038 0039 00B3 00DB 00DC 00D9 00DA 007F   # F8-FF   8 9 ³ Û Ü Ù Ú ␡ #
+
+
+
+@CP(CODEC_CP38: "IBM038", "EBCDIC-INT", "cp038", "csIBM038")
+	0000 0001 0002 0003 0004 0005 0006 0007   # 00-07   ␀ ␁ ␂ ␃ ␄ ␅ ␆ ␇ #
+	0008 0009 000A 000B 000C 000D 000E 000F   # 08-0F   ␈ ␉ ␊ ␋ ␌ ␍ ␎ ␏ #
+	0010 0011 0012 0013 0014 0015 0016 0017   # 10-17   ␐ ␑ ␒ ␓ ␔ ␕ ␖ ␗ #
+	0018 0019 001A 001B 001C 001D 001E 001F   # 18-1F   ␘ ␙ ␚ ␛ ␜ ␝ ␞ ␟ #
+	0000 0000 0000 0000 0000 0000 0000 0000   # 20-27   ␀ ␀ ␀ ␀ ␀ ␀ ␀ ␀ #
+	0000 0000 0000 0000 0000 0000 0000 0000   # 28-2F   ␀ ␀ ␀ ␀ ␀ ␀ ␀ ␀ #
+	0000 0000 0000 0000 0000 0000 0000 0000   # 30-37   ␀ ␀ ␀ ␀ ␀ ␀ ␀ ␀ #
+	0000 0000 0000 0000 0000 0000 0000 0000   # 38-3F   ␀ ␀ ␀ ␀ ␀ ␀ ␀ ␀ #
+	0020 0000 0000 0000 0000 0000 0000 0000   # 40-47   ␠ ␀ ␀ ␀ ␀ ␀ ␀ ␀ #
+	0000 0000 005B 002E 003C 0028 002B 0021   # 48-4F   ␀ ␀ [ . < ( + ! #
+	0026 0000 0000 0000 0000 0000 0000 0000   # 50-57   & ␀ ␀ ␀ ␀ ␀ ␀ ␀ #
+	0000 0000 005D 0024 002A 0029 003B 005E   # 58-5F   ␀ ␀ ] $ * ) ; ^ #
+	002D 002F 0000 0000 0000 0000 0000 0000   # 60-67   - / ␀ ␀ ␀ ␀ ␀ ␀ #
+	0000 0000 00A6 002C 0025 005F 003E 003F   # 68-6F   ␀ ␀ ¦ , % _ > ? #
+	0000 0000 0000 0000 0000 0000 0000 0000   # 70-77   ␀ ␀ ␀ ␀ ␀ ␀ ␀ ␀ #
+	0000 0060 003A 0023 0040 0027 003D 0022   # 78-7F   ␀ ` : # @ ' = " #
+	0000 0061 0062 0063 0064 0065 0066 0067   # 80-87   ␀ a b c d e f g #
+	0068 0069 0000 0000 0000 0000 0000 0000   # 88-8F   h i ␀ ␀ ␀ ␀ ␀ ␀ #
+	0000 006A 006B 006C 006D 006E 006F 0070   # 90-97   ␀ j k l m n o p #
+	0071 0072 0000 0000 0000 0000 0000 0000   # 98-9F   q r ␀ ␀ ␀ ␀ ␀ ␀ #
+	0000 007E 0073 0074 0075 0076 0077 0078   # A0-A7   ␀ ~ s t u v w x #
+	0079 007A 0000 0000 0000 0000 0000 0000   # A8-AF   y z ␀ ␀ ␀ ␀ ␀ ␀ #
+	0000 0000 0000 0000 0000 0000 0000 0000   # B0-B7   ␀ ␀ ␀ ␀ ␀ ␀ ␀ ␀ #
+	0000 0000 0000 0000 0000 0000 0000 0000   # B8-BF   ␀ ␀ ␀ ␀ ␀ ␀ ␀ ␀ #
+	007B 0041 0042 0043 0044 0045 0046 0047   # C0-C7   { A B C D E F G #
+	0048 0049 0000 0000 0000 0000 0000 0000   # C8-CF   H I ␀ ␀ ␀ ␀ ␀ ␀ #
+	007D 004A 004B 004C 004D 004E 004F 0050   # D0-D7   } J K L M N O P #
+	0051 0052 0000 0000 0000 0000 0000 0000   # D8-DF   Q R ␀ ␀ ␀ ␀ ␀ ␀ #
+	005C 0000 0053 0054 0055 0056 0057 0058   # E0-E7   \ ␀ S T U V W X #
+	0059 005A 0000 0000 0000 0000 0000 0000   # E8-EF   Y Z ␀ ␀ ␀ ␀ ␀ ␀ #
+	0030 0031 0032 0033 0034 0035 0036 0037   # F0-F7   0 1 2 3 4 5 6 7 #
+	0038 0039 0000 0000 0000 0000 0000 007F   # F8-FF   8 9 ␀ ␀ ␀ ␀ ␀ ␡ #
+
+
+
+@CP(CODEC_CP1026: "IBM1026", "CP1026", "csIBM1026")
+	0000 0001 0002 0003 0004 0005 0006 0007   # 00-07   ␀ ␁ ␂ ␃ ␄ ␅ ␆ ␇ #
+	0008 0009 000A 000B 000C 000D 000E 000F   # 08-0F   ␈ ␉ ␊ ␋ ␌ ␍ ␎ ␏ #
+	0010 0011 0012 0013 0014 0015 0016 0017   # 10-17   ␐ ␑ ␒ ␓ ␔ ␕ ␖ ␗ #
+	0018 0019 001A 001B 001C 001D 001E 001F   # 18-1F   ␘ ␙ ␚ ␛ ␜ ␝ ␞ ␟ #
+	0000 0000 0000 0000 0000 0000 0000 0000   # 20-27   ␀ ␀ ␀ ␀ ␀ ␀ ␀ ␀ #
+	0000 0000 0000 0000 0000 0000 0000 0000   # 28-2F   ␀ ␀ ␀ ␀ ␀ ␀ ␀ ␀ #
+	0000 0000 0000 0000 0000 0000 0000 0000   # 30-37   ␀ ␀ ␀ ␀ ␀ ␀ ␀ ␀ #
+	0000 0000 0000 0000 0000 0000 0000 0000   # 38-3F   ␀ ␀ ␀ ␀ ␀ ␀ ␀ ␀ #
+	0020 00A0 00E2 00E4 00E0 00E1 00E3 00E5   # 40-47   ␠   â ä à á ã å #
+	007B 00F1 00C7 002E 003C 0028 002B 0021   # 48-4F   { ñ Ç . < ( + ! #
+	0026 00E9 00EA 00EB 00E8 00ED 00EE 00EF   # 50-57   & é ê ë è í î ï #
+	00EC 00DF 011E 0130 002A 0029 003B 005E   # 58-5F   ì ß Ğ İ * ) ; ^ #
+	002D 002F 00C2 00C4 00C0 00C1 00C3 00C5   # 60-67   - / Â Ä À Á Ã Å #
+	005B 00D1 015F 002C 0025 005F 003E 003F   # 68-6F   [ Ñ ş , % _ > ? #
+	00F8 00C9 00CA 00CB 00C8 00CD 00CE 00CF   # 70-77   ø É Ê Ë È Í Î Ï #
+	00CC 0131 003A 00D6 015E 0027 003D 00DC   # 78-7F   Ì ı : Ö Ş ' = Ü #
+	00D8 0061 0062 0063 0064 0065 0066 0067   # 80-87   Ø a b c d e f g #
+	0068 0069 00AB 00BB 007D 0060 00A6 00B1   # 88-8F   h i « » } ` ¦ ± #
+	00B0 006A 006B 006C 006D 006E 006F 0070   # 90-97   ° j k l m n o p #
+	0071 0072 00AA 00BA 00E6 02DB 00C6 00A4   # 98-9F   q r ª º æ ˛ Æ ¤ #
+	00B5 00F6 0073 0074 0075 0076 0077 0078   # A0-A7   µ ö s t u v w x #
+	0079 007A 00A1 00BF 005D 0024 0040 00AE   # A8-AF   y z ¡ ¿ ] $ @ ® #
+	00A2 00A3 00A5 00B7 00A9 00A7 00B6 00BC   # B0-B7   ¢ £ ¥ · © § ¶ ¼ #
+	00BD 00BE 00AC 007C 2014 00A8 00B4 00D7   # B8-BF   ½ ¾ ¬ | — ¨ ´ × #
+	00E7 0041 0042 0043 0044 0045 0046 0047   # C0-C7   ç A B C D E F G #
+	0048 0049 00AD 00F4 007E 00F2 00F3 00F5   # C8-CF   H I ­ ô ~ ò ó õ #
+	011F 004A 004B 004C 004D 004E 004F 0050   # D0-D7   ğ J K L M N O P #
+	0051 0052 00B9 00FB 005C 00F9 00FA 00FF   # D8-DF   Q R ¹ û \ ù ú ÿ #
+	00FC 00F7 0053 0054 0055 0056 0057 0058   # E0-E7   ü ÷ S T U V W X #
+	0059 005A 00B2 00D4 0023 00D2 00D3 00D5   # E8-EF   Y Z ² Ô # Ò Ó Õ #
+	0030 0031 0032 0033 0034 0035 0036 0037   # F0-F7   0 1 2 3 4 5 6 7 #
+	0038 0039 00B3 00DB 0022 00D9 00DA 007F   # F8-FF   8 9 ³ Û " Ù Ú ␡ #
+
+
+
+@CP(CODEC_CP273: "IBM273", "CP273", "csIBM273")
+	0000 0001 0002 0003 0004 0005 0006 0007   # 00-07   ␀ ␁ ␂ ␃ ␄ ␅ ␆ ␇ #
+	0008 0009 000A 000B 000C 000D 000E 000F   # 08-0F   ␈ ␉ ␊ ␋ ␌ ␍ ␎ ␏ #
+	0010 0011 0012 0013 0014 0015 0016 0017   # 10-17   ␐ ␑ ␒ ␓ ␔ ␕ ␖ ␗ #
+	0018 0019 001A 001B 001C 001D 001E 001F   # 18-1F   ␘ ␙ ␚ ␛ ␜ ␝ ␞ ␟ #
+	0000 0000 0000 0000 0000 0000 0000 0000   # 20-27   ␀ ␀ ␀ ␀ ␀ ␀ ␀ ␀ #
+	0000 0000 0000 0000 0000 0000 0000 0000   # 28-2F   ␀ ␀ ␀ ␀ ␀ ␀ ␀ ␀ #
+	0000 0000 0000 0000 0000 0000 0000 0000   # 30-37   ␀ ␀ ␀ ␀ ␀ ␀ ␀ ␀ #
+	0000 0000 0000 0000 0000 0000 0000 0000   # 38-3F   ␀ ␀ ␀ ␀ ␀ ␀ ␀ ␀ #
+	0020 00A0 00E2 007B 00E0 00E1 00E3 00E5   # 40-47   ␠   â { à á ã å #
+	00E7 00F1 00C4 002E 003C 0028 002B 0021   # 48-4F   ç ñ Ä . < ( + ! #
+	0026 00E9 00EA 00EB 00E8 00ED 00EE 00EF   # 50-57   & é ê ë è í î ï #
+	00EC 007E 00DC 0024 002A 0029 003B 005E   # 58-5F   ì ~ Ü $ * ) ; ^ #
+	002D 002F 00C2 005B 00C0 00C1 00C3 00C5   # 60-67   - / Â [ À Á Ã Å #
+	00C7 00D1 00F6 002C 0025 005F 003E 003F   # 68-6F   Ç Ñ ö , % _ > ? #
+	00F8 00C9 00CA 00CB 00C8 00CD 00CE 00CF   # 70-77   ø É Ê Ë È Í Î Ï #
+	00CC 0060 003A 0023 00A7 0027 003D 0022   # 78-7F   Ì ` : # § ' = " #
+	00D8 0061 0062 0063 0064 0065 0066 0067   # 80-87   Ø a b c d e f g #
+	0068 0069 00AB 00BB 00F0 00FD 00FE 00B1   # 88-8F   h i « » ð ý þ ± #
+	00B0 006A 006B 006C 006D 006E 006F 0070   # 90-97   ° j k l m n o p #
+	0071 0072 00AA 00BA 00E6 00B8 00C6 00A4   # 98-9F   q r ª º æ ¸ Æ ¤ #
+	00B5 00DF 0073 0074 0075 0076 0077 0078   # A0-A7   µ ß s t u v w x #
+	0079 007A 00A1 00BF 00D0 00DD 00DE 00AE   # A8-AF   y z ¡ ¿ Ð Ý Þ ® #
+	00A2 00A3 00A5 00B7 00A9 0040 00B6 00BC   # B0-B7   ¢ £ ¥ · © @ ¶ ¼ #
+	00BD 00BE 00AC 007C 203E 00A8 00B4 00D7   # B8-BF   ½ ¾ ¬ | ‾ ¨ ´ × #
+	00E4 0041 0042 0043 0044 0045 0046 0047   # C0-C7   ä A B C D E F G #
+	0048 0049 00AD 00F4 00A6 00F2 00F3 00F5   # C8-CF   H I ­ ô ¦ ò ó õ #
+	00FC 004A 004B 004C 004D 004E 004F 0050   # D0-D7   ü J K L M N O P #
+	0051 0052 00B9 00FB 007D 00F9 00FA 00FF   # D8-DF   Q R ¹ û } ù ú ÿ #
+	00D6 00F7 0053 0054 0055 0056 0057 0058   # E0-E7   Ö ÷ S T U V W X #
+	0059 005A 00B2 00D4 005C 00D2 00D3 00D5   # E8-EF   Y Z ² Ô \ Ò Ó Õ #
+	0030 0031 0032 0033 0034 0035 0036 0037   # F0-F7   0 1 2 3 4 5 6 7 #
+	0038 0039 00B3 00DB 005D 00D9 00DA 007F   # F8-FF   8 9 ³ Û ] Ù Ú ␡ #
+
+
+
+@CP(CODEC_CP274: "IBM274", "EBCDIC-BE", "CP274", "csIBM274")
+	0000 0001 0002 0003 0004 0005 0006 0007   # 00-07   ␀ ␁ ␂ ␃ ␄ ␅ ␆ ␇ #
+	0008 0009 000A 000B 000C 000D 000E 000F   # 08-0F   ␈ ␉ ␊ ␋ ␌ ␍ ␎ ␏ #
+	0010 0011 0012 0013 0014 0015 0016 0017   # 10-17   ␐ ␑ ␒ ␓ ␔ ␕ ␖ ␗ #
+	0018 0019 001A 001B 001C 001D 001E 001F   # 18-1F   ␘ ␙ ␚ ␛ ␜ ␝ ␞ ␟ #
+	0000 0000 0000 0000 0000 0000 0000 0000   # 20-27   ␀ ␀ ␀ ␀ ␀ ␀ ␀ ␀ #
+	0000 0000 0000 0000 0000 0000 0000 0000   # 28-2F   ␀ ␀ ␀ ␀ ␀ ␀ ␀ ␀ #
+	0000 0000 0000 0000 0000 0000 0000 0000   # 30-37   ␀ ␀ ␀ ␀ ␀ ␀ ␀ ␀ #
+	0000 0000 0000 0000 0000 0000 0000 0000   # 38-3F   ␀ ␀ ␀ ␀ ␀ ␀ ␀ ␀ #
+	0020 0000 0000 0000 0000 0000 0000 0000   # 40-47   ␠ ␀ ␀ ␀ ␀ ␀ ␀ ␀ #
+	0000 0000 005B 002E 003C 0028 002B 0021   # 48-4F   ␀ ␀ [ . < ( + ! #
+	0026 0000 0000 0000 0000 0000 0000 0000   # 50-57   & ␀ ␀ ␀ ␀ ␀ ␀ ␀ #
+	0000 0000 005D 0024 002A 0029 003B 005E   # 58-5F   ␀ ␀ ] $ * ) ; ^ #
+	002D 002F 0000 0000 0000 0000 0000 0000   # 60-67   - / ␀ ␀ ␀ ␀ ␀ ␀ #
+	0000 0000 00F9 002C 0025 005F 003E 003F   # 68-6F   ␀ ␀ ù , % _ > ? #
+	0000 0000 0000 0000 0000 0000 0000 0000   # 70-77   ␀ ␀ ␀ ␀ ␀ ␀ ␀ ␀ #
+	0000 0060 003A 0023 00E0 0027 003D 0022   # 78-7F   ␀ ` : # à ' = " #
+	0000 0061 0062 0063 0064 0065 0066 0067   # 80-87   ␀ a b c d e f g #
+	0068 0069 0000 0000 0000 0000 0000 0000   # 88-8F   h i ␀ ␀ ␀ ␀ ␀ ␀ #
+	0000 006A 006B 006C 006D 006E 006F 0070   # 90-97   ␀ j k l m n o p #
+	0071 0072 0000 0000 0000 0000 0000 0000   # 98-9F   q r ␀ ␀ ␀ ␀ ␀ ␀ #
+	0000 00A8 0073 0074 0075 0076 0077 0078   # A0-A7   ␀ ¨ s t u v w x #
+	0079 007A 0000 0000 0000 0000 0000 0000   # A8-AF   y z ␀ ␀ ␀ ␀ ␀ ␀ #
+	0000 0000 0000 0000 0000 0000 0000 0000   # B0-B7   ␀ ␀ ␀ ␀ ␀ ␀ ␀ ␀ #
+	0000 0000 0000 0000 0000 0000 0000 0000   # B8-BF   ␀ ␀ ␀ ␀ ␀ ␀ ␀ ␀ #
+	00E9 0041 0042 0043 0044 0045 0046 0047   # C0-C7   é A B C D E F G #
+	0048 0049 0000 0000 0000 0000 0000 0000   # C8-CF   H I ␀ ␀ ␀ ␀ ␀ ␀ #
+	00E8 004A 004B 004C 004D 004E 004F 0050   # D0-D7   è J K L M N O P #
+	0051 0052 0000 0000 0000 0000 0000 0000   # D8-DF   Q R ␀ ␀ ␀ ␀ ␀ ␀ #
+	00E7 0000 0053 0054 0055 0056 0057 0058   # E0-E7   ç ␀ S T U V W X #
+	0059 005A 0000 0000 0000 0000 0000 0000   # E8-EF   Y Z ␀ ␀ ␀ ␀ ␀ ␀ #
+	0030 0031 0032 0033 0034 0035 0036 0037   # F0-F7   0 1 2 3 4 5 6 7 #
+	0038 0039 0000 0000 0000 0000 0000 007F   # F8-FF   8 9 ␀ ␀ ␀ ␀ ␀ ␡ #
+
+
+
+@CP(CODEC_CP275: "IBM275", "EBCDIC-BR", "cp275", "csIBM275")
+	0000 0001 0002 0003 0004 0005 0006 0007   # 00-07   ␀ ␁ ␂ ␃ ␄ ␅ ␆ ␇ #
+	0008 0009 000A 000B 000C 000D 000E 000F   # 08-0F   ␈ ␉ ␊ ␋ ␌ ␍ ␎ ␏ #
+	0010 0011 0012 0013 0014 0015 0016 0017   # 10-17   ␐ ␑ ␒ ␓ ␔ ␕ ␖ ␗ #
+	0018 0019 001A 001B 001C 001D 001E 001F   # 18-1F   ␘ ␙ ␚ ␛ ␜ ␝ ␞ ␟ #
+	0000 0000 0000 0000 0000 0000 0000 0000   # 20-27   ␀ ␀ ␀ ␀ ␀ ␀ ␀ ␀ #
+	0000 0000 0000 0000 0000 0000 0000 0000   # 28-2F   ␀ ␀ ␀ ␀ ␀ ␀ ␀ ␀ #
+	0000 0000 0000 0000 0000 0000 0000 0000   # 30-37   ␀ ␀ ␀ ␀ ␀ ␀ ␀ ␀ #
+	0000 0000 0000 0000 0000 0000 0000 0000   # 38-3F   ␀ ␀ ␀ ␀ ␀ ␀ ␀ ␀ #
+	0020 0000 0000 0000 0000 0000 0000 0000   # 40-47   ␠ ␀ ␀ ␀ ␀ ␀ ␀ ␀ #
+	0000 0000 00C9 002E 003C 0028 002B 0021   # 48-4F   ␀ ␀ É . < ( + ! #
+	0026 0000 0000 0000 0000 0000 0000 0000   # 50-57   & ␀ ␀ ␀ ␀ ␀ ␀ ␀ #
+	0000 0000 0024 00C7 002A 0029 003B 005E   # 58-5F   ␀ ␀ $ Ç * ) ; ^ #
+	002D 002F 0000 0000 0000 0000 0000 0000   # 60-67   - / ␀ ␀ ␀ ␀ ␀ ␀ #
+	0000 0000 00E7 002C 0025 005F 003E 003F   # 68-6F   ␀ ␀ ç , % _ > ? #
+	0000 0000 0000 0000 0000 0000 0000 0000   # 70-77   ␀ ␀ ␀ ␀ ␀ ␀ ␀ ␀ #
+	0000 00E3 003A 00D5 00C3 0027 003D 0022   # 78-7F   ␀ ã : Õ Ã ' = " #
+	0000 0061 0062 0063 0064 0065 0066 0067   # 80-87   ␀ a b c d e f g #
+	0068 0069 0000 0000 0000 0000 0000 0000   # 88-8F   h i ␀ ␀ ␀ ␀ ␀ ␀ #
+	0000 006A 006B 006C 006D 006E 006F 0070   # 90-97   ␀ j k l m n o p #
+	0071 0072 0000 0000 0000 0000 0000 0000   # 98-9F   q r ␀ ␀ ␀ ␀ ␀ ␀ #
+	0000 007E 0073 0074 0075 0076 0077 0078   # A0-A7   ␀ ~ s t u v w x #
+	0079 007A 0000 0000 0000 0000 0000 0000   # A8-AF   y z ␀ ␀ ␀ ␀ ␀ ␀ #
+	0000 0000 0000 0000 0000 0000 0000 0000   # B0-B7   ␀ ␀ ␀ ␀ ␀ ␀ ␀ ␀ #
+	0000 0000 0000 0000 0000 0000 0000 0000   # B8-BF   ␀ ␀ ␀ ␀ ␀ ␀ ␀ ␀ #
+	00F5 0041 0042 0043 0044 0045 0046 0047   # C0-C7   õ A B C D E F G #
+	0048 0049 0000 0000 0000 0000 0000 0000   # C8-CF   H I ␀ ␀ ␀ ␀ ␀ ␀ #
+	00E9 004A 004B 004C 004D 004E 004F 0050   # D0-D7   é J K L M N O P #
+	0051 0052 0000 0000 0000 0000 0000 0000   # D8-DF   Q R ␀ ␀ ␀ ␀ ␀ ␀ #
+	005C 0000 0053 0054 0055 0056 0057 0058   # E0-E7   \ ␀ S T U V W X #
+	0059 005A 0000 0000 0000 0000 0000 0000   # E8-EF   Y Z ␀ ␀ ␀ ␀ ␀ ␀ #
+	0030 0031 0032 0033 0034 0035 0036 0037   # F0-F7   0 1 2 3 4 5 6 7 #
+	0038 0039 0000 0000 0000 0000 0000 007F   # F8-FF   8 9 ␀ ␀ ␀ ␀ ␀ ␡ #
+
+
+
+@CP(CODEC_EBCDIC_CP_DK_NO: "IBM277", "EBCDIC-CP-DK", "EBCDIC-CP-NO", "csIBM277")
+	0000 0001 0002 0003 0004 0005 0006 0007   # 00-07   ␀ ␁ ␂ ␃ ␄ ␅ ␆ ␇ #
+	0008 0009 000A 000B 000C 000D 000E 000F   # 08-0F   ␈ ␉ ␊ ␋ ␌ ␍ ␎ ␏ #
+	0010 0011 0012 0013 0014 0015 0016 0017   # 10-17   ␐ ␑ ␒ ␓ ␔ ␕ ␖ ␗ #
+	0018 0019 001A 001B 001C 001D 001E 001F   # 18-1F   ␘ ␙ ␚ ␛ ␜ ␝ ␞ ␟ #
+	0000 0000 0000 0000 0000 0000 0000 0000   # 20-27   ␀ ␀ ␀ ␀ ␀ ␀ ␀ ␀ #
+	0000 0000 0000 0000 0000 0000 0000 0000   # 28-2F   ␀ ␀ ␀ ␀ ␀ ␀ ␀ ␀ #
+	0000 0000 0000 0000 0000 0000 0000 0000   # 30-37   ␀ ␀ ␀ ␀ ␀ ␀ ␀ ␀ #
+	0000 0000 0000 0000 0000 0000 0000 0000   # 38-3F   ␀ ␀ ␀ ␀ ␀ ␀ ␀ ␀ #
+	0020 00A0 00E2 00E4 00E0 00E1 00E3 007D   # 40-47   ␠   â ä à á ã } #
+	00E7 00F1 0023 002E 003C 0028 002B 0021   # 48-4F   ç ñ # . < ( + ! #
+	0026 00E9 00EA 00EB 00E8 00ED 00EE 00EF   # 50-57   & é ê ë è í î ï #
+	00EC 00DF 00A4 00C5 002A 0029 003B 005E   # 58-5F   ì ß ¤ Å * ) ; ^ #
+	002D 002F 00C2 00C4 00C0 00C1 00C3 0024   # 60-67   - / Â Ä À Á Ã $ #
+	00C7 00D1 00F8 002C 0025 005F 003E 003F   # 68-6F   Ç Ñ ø , % _ > ? #
+	00A6 00C9 00CA 00CB 00C8 00CD 00CE 00CF   # 70-77   ¦ É Ê Ë È Í Î Ï #
+	00CC 0060 003A 00C6 00D8 0027 003D 0022   # 78-7F   Ì ` : Æ Ø ' = " #
+	0040 0061 0062 0063 0064 0065 0066 0067   # 80-87   @ a b c d e f g #
+	0068 0069 00AB 00BB 00F0 00FD 00FE 00B1   # 88-8F   h i « » ð ý þ ± #
+	00B0 006A 006B 006C 006D 006E 006F 0070   # 90-97   ° j k l m n o p #
+	0071 0072 00AA 00BA 007B 00B8 005B 005D   # 98-9F   q r ª º { ¸ [ ] #
+	00B5 00FC 0073 0074 0075 0076 0077 0078   # A0-A7   µ ü s t u v w x #
+	0079 007A 00A1 00BF 00D0 00DD 00DE 00AE   # A8-AF   y z ¡ ¿ Ð Ý Þ ® #
+	00A2 00A3 00A5 00B7 00A9 00A7 00B6 00BC   # B0-B7   ¢ £ ¥ · © § ¶ ¼ #
+	00BD 00BE 00AC 007C 203E 00A8 00B4 00D7   # B8-BF   ½ ¾ ¬ | ‾ ¨ ´ × #
+	00E6 0041 0042 0043 0044 0045 0046 0047   # C0-C7   æ A B C D E F G #
+	0048 0049 00AD 00F4 00F6 00F2 00F3 00F5   # C8-CF   H I ­ ô ö ò ó õ #
+	00E5 004A 004B 004C 004D 004E 004F 0050   # D0-D7   å J K L M N O P #
+	0051 0052 00B9 00FB 007E 00F9 00FA 00FF   # D8-DF   Q R ¹ û ~ ù ú ÿ #
+	005C 00F7 0053 0054 0055 0056 0057 0058   # E0-E7   \ ÷ S T U V W X #
+	0059 005A 00B2 00D4 00D6 00D2 00D3 00D5   # E8-EF   Y Z ² Ô Ö Ò Ó Õ #
+	0030 0031 0032 0033 0034 0035 0036 0037   # F0-F7   0 1 2 3 4 5 6 7 #
+	0038 0039 00B3 00DB 00DC 00D9 00DA 007F   # F8-FF   8 9 ³ Û Ü Ù Ú ␡ #
+
+
+
+@CP(CODEC_CP278: "IBM278", "CP278", "ebcdic-cp-fi", "ebcdic-cp-se", "csIBM278")
+	0000 0001 0002 0003 0004 0005 0006 0007   # 00-07   ␀ ␁ ␂ ␃ ␄ ␅ ␆ ␇ #
+	0008 0009 000A 000B 000C 000D 000E 000F   # 08-0F   ␈ ␉ ␊ ␋ ␌ ␍ ␎ ␏ #
+	0010 0011 0012 0013 0014 0015 0016 0017   # 10-17   ␐ ␑ ␒ ␓ ␔ ␕ ␖ ␗ #
+	0018 0019 001A 001B 001C 001D 001E 001F   # 18-1F   ␘ ␙ ␚ ␛ ␜ ␝ ␞ ␟ #
+	0000 0000 0000 0000 0000 0000 0000 0000   # 20-27   ␀ ␀ ␀ ␀ ␀ ␀ ␀ ␀ #
+	0000 0000 0000 0000 0000 0000 0000 0000   # 28-2F   ␀ ␀ ␀ ␀ ␀ ␀ ␀ ␀ #
+	0000 0000 0000 0000 0000 0000 0000 0000   # 30-37   ␀ ␀ ␀ ␀ ␀ ␀ ␀ ␀ #
+	0000 0000 0000 0000 0000 0000 0000 0000   # 38-3F   ␀ ␀ ␀ ␀ ␀ ␀ ␀ ␀ #
+	0020 00A0 00E2 007B 00E0 00E1 00E3 007D   # 40-47   ␠   â { à á ã } #
+	00E7 00F1 00A7 002E 003C 0028 002B 0021   # 48-4F   ç ñ § . < ( + ! #
+	0026 0060 00EA 00EB 00E8 00ED 00EE 00EF   # 50-57   & ` ê ë è í î ï #
+	00EC 00DF 00A4 00C5 002A 0029 003B 005E   # 58-5F   ì ß ¤ Å * ) ; ^ #
+	002D 002F 00C2 0023 00C0 00C1 00C3 0024   # 60-67   - / Â # À Á Ã $ #
+	00C7 00D1 00F6 002C 0025 005F 003E 003F   # 68-6F   Ç Ñ ö , % _ > ? #
+	00F8 00C9 00CA 00CB 00C8 00CD 00CE 00CF   # 70-77   ø É Ê Ë È Í Î Ï #
+	00CC 00E9 003A 00C4 00D6 0027 003D 0022   # 78-7F   Ì é : Ä Ö ' = " #
+	00D8 0061 0062 0063 0064 0065 0066 0067   # 80-87   Ø a b c d e f g #
+	0068 0069 00AB 00BB 00F0 00FD 00FE 00B1   # 88-8F   h i « » ð ý þ ± #
+	00B0 006A 006B 006C 006D 006E 006F 0070   # 90-97   ° j k l m n o p #
+	0071 0072 00AA 00BA 00E6 00B8 00C6 005D   # 98-9F   q r ª º æ ¸ Æ ] #
+	00B5 00FC 0073 0074 0075 0076 0077 0078   # A0-A7   µ ü s t u v w x #
+	0079 007A 00A1 00BF 00D0 00DD 00DE 00AE   # A8-AF   y z ¡ ¿ Ð Ý Þ ® #
+	00A2 00A3 00A5 00B7 00A9 005B 00B6 00BC   # B0-B7   ¢ £ ¥ · © [ ¶ ¼ #
+	00BD 00BE 00AC 007C 203E 00A8 00B4 00D7   # B8-BF   ½ ¾ ¬ | ‾ ¨ ´ × #
+	00E4 0041 0042 0043 0044 0045 0046 0047   # C0-C7   ä A B C D E F G #
+	0048 0049 00AD 00F4 00A6 00F2 00F3 00F5   # C8-CF   H I ­ ô ¦ ò ó õ #
+	00E5 004A 004B 004C 004D 004E 004F 0050   # D0-D7   å J K L M N O P #
+	0051 0052 00B9 00FB 007E 00F9 00FA 00FF   # D8-DF   Q R ¹ û ~ ù ú ÿ #
+	005C 00F7 0053 0054 0055 0056 0057 0058   # E0-E7   \ ÷ S T U V W X #
+	0059 005A 00B2 00D4 0040 00D2 00D3 00D5   # E8-EF   Y Z ² Ô @ Ò Ó Õ #
+	0030 0031 0032 0033 0034 0035 0036 0037   # F0-F7   0 1 2 3 4 5 6 7 #
+	0038 0039 00B3 00DB 00DC 00D9 00DA 007F   # F8-FF   8 9 ³ Û Ü Ù Ú ␡ #
+
+
+
+@CP(CODEC_CP280: "IBM280", "CP280", "ebcdic-cp-it", "csIBM280")
+	0000 0001 0002 0003 0004 0005 0006 0007   # 00-07   ␀ ␁ ␂ ␃ ␄ ␅ ␆ ␇ #
+	0008 0009 000A 000B 000C 000D 000E 000F   # 08-0F   ␈ ␉ ␊ ␋ ␌ ␍ ␎ ␏ #
+	0010 0011 0012 0013 0014 0015 0016 0017   # 10-17   ␐ ␑ ␒ ␓ ␔ ␕ ␖ ␗ #
+	0018 0019 001A 001B 001C 001D 001E 001F   # 18-1F   ␘ ␙ ␚ ␛ ␜ ␝ ␞ ␟ #
+	0000 0000 0000 0000 0000 0000 0000 0000   # 20-27   ␀ ␀ ␀ ␀ ␀ ␀ ␀ ␀ #
+	0000 0000 0000 0000 0000 0000 0000 0000   # 28-2F   ␀ ␀ ␀ ␀ ␀ ␀ ␀ ␀ #
+	0000 0000 0000 0000 0000 0000 0000 0000   # 30-37   ␀ ␀ ␀ ␀ ␀ ␀ ␀ ␀ #
+	0000 0000 0000 0000 0000 0000 0000 0000   # 38-3F   ␀ ␀ ␀ ␀ ␀ ␀ ␀ ␀ #
+	0020 00A0 00E2 00E4 007B 00E1 00E3 00E5   # 40-47   ␠   â ä { á ã å #
+	005C 00F1 00B0 002E 003C 0028 002B 0021   # 48-4F   \ ñ ° . < ( + ! #
+	0026 005D 00EA 00EB 007D 00ED 00EE 00EF   # 50-57   & ] ê ë } í î ï #
+	007E 00DF 00E9 0024 002A 0029 003B 005E   # 58-5F   ~ ß é $ * ) ; ^ #
+	002D 002F 00C2 00C4 00C0 00C1 00C3 00C5   # 60-67   - / Â Ä À Á Ã Å #
+	00C7 00D1 00F2 002C 0025 005F 003E 003F   # 68-6F   Ç Ñ ò , % _ > ? #
+	00F8 00C9 00CA 00CB 00C8 00CD 00CE 00CF   # 70-77   ø É Ê Ë È Í Î Ï #
+	00CC 00F9 003A 00A3 00A7 0027 003D 0022   # 78-7F   Ì ù : £ § ' = " #
+	00D8 0061 0062 0063 0064 0065 0066 0067   # 80-87   Ø a b c d e f g #
+	0068 0069 00AB 00BB 00F0 00FD 00FE 00B1   # 88-8F   h i « » ð ý þ ± #
+	005B 006A 006B 006C 006D 006E 006F 0070   # 90-97   [ j k l m n o p #
+	0071 0072 00AA 00BA 00E6 00B8 00C6 00A4   # 98-9F   q r ª º æ ¸ Æ ¤ #
+	00B5 00EC 0073 0074 0075 0076 0077 0078   # A0-A7   µ ì s t u v w x #
+	0079 007A 00A1 00BF 00D0 00DD 00DE 00AE   # A8-AF   y z ¡ ¿ Ð Ý Þ ® #
+	00A2 0023 00A5 00B7 00A9 0040 00B6 00BC   # B0-B7   ¢ # ¥ · © @ ¶ ¼ #
+	00BD 00BE 00AC 007C 203E 00A8 00B4 00D7   # B8-BF   ½ ¾ ¬ | ‾ ¨ ´ × #
+	00E0 0041 0042 0043 0044 0045 0046 0047   # C0-C7   à A B C D E F G #
+	0048 0049 00AD 00F4 00F6 00A6 00F3 00F5   # C8-CF   H I ­ ô ö ¦ ó õ #
+	00E8 004A 004B 004C 004D 004E 004F 0050   # D0-D7   è J K L M N O P #
+	0051 0052 00B9 00FB 00FC 0060 00FA 00FF   # D8-DF   Q R ¹ û ü ` ú ÿ #
+	00E7 00F7 0053 0054 0055 0056 0057 0058   # E0-E7   ç ÷ S T U V W X #
+	0059 005A 00B2 00D4 00D6 00D2 00D3 00D5   # E8-EF   Y Z ² Ô Ö Ò Ó Õ #
+	0030 0031 0032 0033 0034 0035 0036 0037   # F0-F7   0 1 2 3 4 5 6 7 #
+	0038 0039 00B3 00DB 00DC 00D9 00DA 007F   # F8-FF   8 9 ³ Û Ü Ù Ú ␡ #
+
+
+
+@CP(CODEC_CP281: "IBM281", "EBCDIC-JP-E", "cp281", "csIBM281")
+	0000 0001 0002 0003 0004 0005 0006 0007   # 00-07   ␀ ␁ ␂ ␃ ␄ ␅ ␆ ␇ #
+	0008 0009 000A 000B 000C 000D 000E 000F   # 08-0F   ␈ ␉ ␊ ␋ ␌ ␍ ␎ ␏ #
+	0010 0011 0012 0013 0014 0015 0016 0017   # 10-17   ␐ ␑ ␒ ␓ ␔ ␕ ␖ ␗ #
+	0018 0019 001A 001B 001C 001D 001E 001F   # 18-1F   ␘ ␙ ␚ ␛ ␜ ␝ ␞ ␟ #
+	0000 0000 0000 0000 0000 0000 0000 0000   # 20-27   ␀ ␀ ␀ ␀ ␀ ␀ ␀ ␀ #
+	0000 0000 0000 0000 0000 0000 0000 0000   # 28-2F   ␀ ␀ ␀ ␀ ␀ ␀ ␀ ␀ #
+	0000 0000 0000 0000 0000 0000 0000 0000   # 30-37   ␀ ␀ ␀ ␀ ␀ ␀ ␀ ␀ #
+	0000 0000 0000 0000 0000 0000 0000 0000   # 38-3F   ␀ ␀ ␀ ␀ ␀ ␀ ␀ ␀ #
+	0020 0000 0000 0000 0000 0000 0000 0000   # 40-47   ␠ ␀ ␀ ␀ ␀ ␀ ␀ ␀ #
+	0000 0000 00A3 002E 003C 0028 002B 007C   # 48-4F   ␀ ␀ £ . < ( + | #
+	0026 0000 0000 0000 0000 0000 0000 0000   # 50-57   & ␀ ␀ ␀ ␀ ␀ ␀ ␀ #
+	0000 0000 0021 00A5 002A 0029 003B 00AC   # 58-5F   ␀ ␀ ! ¥ * ) ; ¬ #
+	002D 002F 0000 0000 0000 0000 0000 0000   # 60-67   - / ␀ ␀ ␀ ␀ ␀ ␀ #
+	0000 0000 00A6 002C 0025 005F 003E 003F   # 68-6F   ␀ ␀ ¦ , % _ > ? #
+	0000 0000 0000 0000 0000 0000 0000 0000   # 70-77   ␀ ␀ ␀ ␀ ␀ ␀ ␀ ␀ #
+	0000 0060 003A 0023 0040 0027 003D 0022   # 78-7F   ␀ ` : # @ ' = " #
+	0000 0061 0062 0063 0064 0065 0066 0067   # 80-87   ␀ a b c d e f g #
+	0068 0069 0000 0000 0000 0000 0000 0000   # 88-8F   h i ␀ ␀ ␀ ␀ ␀ ␀ #
+	0000 006A 006B 006C 006D 006E 006F 0070   # 90-97   ␀ j k l m n o p #
+	0071 0072 0000 0000 0000 0000 0000 0000   # 98-9F   q r ␀ ␀ ␀ ␀ ␀ ␀ #
+	0000 203E 0073 0074 0075 0076 0077 0078   # A0-A7   ␀ ‾ s t u v w x #
+	0079 007A 0000 0000 0000 0000 0000 0000   # A8-AF   y z ␀ ␀ ␀ ␀ ␀ ␀ #
+	0000 0000 0000 0000 0000 0000 0000 0000   # B0-B7   ␀ ␀ ␀ ␀ ␀ ␀ ␀ ␀ #
+	0000 0000 0000 0000 0000 0000 0000 0000   # B8-BF   ␀ ␀ ␀ ␀ ␀ ␀ ␀ ␀ #
+	007B 0041 0042 0043 0044 0045 0046 0047   # C0-C7   { A B C D E F G #
+	0048 0049 0000 0000 0000 0000 0000 0000   # C8-CF   H I ␀ ␀ ␀ ␀ ␀ ␀ #
+	007D 004A 004B 004C 004D 004E 004F 0050   # D0-D7   } J K L M N O P #
+	0051 0052 0000 0000 0000 0000 0000 0000   # D8-DF   Q R ␀ ␀ ␀ ␀ ␀ ␀ #
+	0024 0000 0053 0054 0055 0056 0057 0058   # E0-E7   $ ␀ S T U V W X #
+	0059 005A 0000 0000 0000 0000 0000 0000   # E8-EF   Y Z ␀ ␀ ␀ ␀ ␀ ␀ #
+	0030 0031 0032 0033 0034 0035 0036 0037   # F0-F7   0 1 2 3 4 5 6 7 #
+	0038 0039 0000 0000 0000 0000 0000 007F   # F8-FF   8 9 ␀ ␀ ␀ ␀ ␀ ␡ #
+
+
+
+@CP(CODEC_CP284: "IBM284", "CP284", "ebcdic-cp-es", "csIBM284")
+	0000 0001 0002 0003 0004 0005 0006 0007   # 00-07   ␀ ␁ ␂ ␃ ␄ ␅ ␆ ␇ #
+	0008 0009 000A 000B 000C 000D 000E 000F   # 08-0F   ␈ ␉ ␊ ␋ ␌ ␍ ␎ ␏ #
+	0010 0011 0012 0013 0014 0015 0016 0017   # 10-17   ␐ ␑ ␒ ␓ ␔ ␕ ␖ ␗ #
+	0018 0019 001A 001B 001C 001D 001E 001F   # 18-1F   ␘ ␙ ␚ ␛ ␜ ␝ ␞ ␟ #
+	0000 0000 0000 0000 0000 0000 0000 0000   # 20-27   ␀ ␀ ␀ ␀ ␀ ␀ ␀ ␀ #
+	0000 0000 0000 0000 0000 0000 0000 0000   # 28-2F   ␀ ␀ ␀ ␀ ␀ ␀ ␀ ␀ #
+	0000 0000 0000 0000 0000 0000 0000 0000   # 30-37   ␀ ␀ ␀ ␀ ␀ ␀ ␀ ␀ #
+	0000 0000 0000 0000 0000 0000 0000 0000   # 38-3F   ␀ ␀ ␀ ␀ ␀ ␀ ␀ ␀ #
+	0020 00A0 00E2 00E4 00E0 00E1 00E3 00E5   # 40-47   ␠   â ä à á ã å #
+	00E7 00A6 005B 002E 003C 0028 002B 007C   # 48-4F   ç ¦ [ . < ( + | #
+	0026 00E9 00EA 00EB 00E8 00ED 00EE 00EF   # 50-57   & é ê ë è í î ï #
+	00EC 00DF 005D 0024 002A 0029 003B 00AC   # 58-5F   ì ß ] $ * ) ; ¬ #
+	002D 002F 00C2 00C4 00C0 00C1 00C3 00C5   # 60-67   - / Â Ä À Á Ã Å #
+	00C7 0023 00F1 002C 0025 005F 003E 003F   # 68-6F   Ç # ñ , % _ > ? #
+	00F8 00C9 00CA 00CB 00C8 00CD 00CE 00CF   # 70-77   ø É Ê Ë È Í Î Ï #
+	00CC 0060 003A 00D1 0040 0027 003D 0022   # 78-7F   Ì ` : Ñ @ ' = " #
+	00D8 0061 0062 0063 0064 0065 0066 0067   # 80-87   Ø a b c d e f g #
+	0068 0069 00AB 00BB 00F0 00FD 00FE 00B1   # 88-8F   h i « » ð ý þ ± #
+	00B0 006A 006B 006C 006D 006E 006F 0070   # 90-97   ° j k l m n o p #
+	0071 0072 00AA 00BA 00E6 00B8 00C6 00A4   # 98-9F   q r ª º æ ¸ Æ ¤ #
+	00B5 00A8 0073 0074 0075 0076 0077 0078   # A0-A7   µ ¨ s t u v w x #
+	0079 007A 00A1 00BF 00D0 00DD 00DE 00AE   # A8-AF   y z ¡ ¿ Ð Ý Þ ® #
+	00A2 00A3 00A5 00B7 00A9 00A7 00B6 00BC   # B0-B7   ¢ £ ¥ · © § ¶ ¼ #
+	00BD 00BE 005E 0021 203E 007E 00B4 00D7   # B8-BF   ½ ¾ ^ ! ‾ ~ ´ × #
+	007B 0041 0042 0043 0044 0045 0046 0047   # C0-C7   { A B C D E F G #
+	0048 0049 00AD 00F4 00F6 00F2 00F3 00F5   # C8-CF   H I ­ ô ö ò ó õ #
+	007D 004A 004B 004C 004D 004E 004F 0050   # D0-D7   } J K L M N O P #
+	0051 0052 00B9 00FB 00FC 00F9 00FA 00FF   # D8-DF   Q R ¹ û ü ù ú ÿ #
+	005C 00F7 0053 0054 0055 0056 0057 0058   # E0-E7   \ ÷ S T U V W X #
+	0059 005A 00B2 00D4 00D6 00D2 00D3 00D5   # E8-EF   Y Z ² Ô Ö Ò Ó Õ #
+	0030 0031 0032 0033 0034 0035 0036 0037   # F0-F7   0 1 2 3 4 5 6 7 #
+	0038 0039 00B3 00DB 00DC 00D9 00DA 007F   # F8-FF   8 9 ³ Û Ü Ù Ú ␡ #
+
+
+
+@CP(CODEC_CP285: "IBM285", "CP285", "ebcdic-cp-gb", "csIBM285")
+	0000 0001 0002 0003 0004 0005 0006 0007   # 00-07   ␀ ␁ ␂ ␃ ␄ ␅ ␆ ␇ #
+	0008 0009 000A 000B 000C 000D 000E 000F   # 08-0F   ␈ ␉ ␊ ␋ ␌ ␍ ␎ ␏ #
+	0010 0011 0012 0013 0014 0015 0016 0017   # 10-17   ␐ ␑ ␒ ␓ ␔ ␕ ␖ ␗ #
+	0018 0019 001A 001B 001C 001D 001E 001F   # 18-1F   ␘ ␙ ␚ ␛ ␜ ␝ ␞ ␟ #
+	0000 0000 0000 0000 0000 0000 0000 0000   # 20-27   ␀ ␀ ␀ ␀ ␀ ␀ ␀ ␀ #
+	0000 0000 0000 0000 0000 0000 0000 0000   # 28-2F   ␀ ␀ ␀ ␀ ␀ ␀ ␀ ␀ #
+	0000 0000 0000 0000 0000 0000 0000 0000   # 30-37   ␀ ␀ ␀ ␀ ␀ ␀ ␀ ␀ #
+	0000 0000 0000 0000 0000 0000 0000 0000   # 38-3F   ␀ ␀ ␀ ␀ ␀ ␀ ␀ ␀ #
+	0020 00A0 00E2 00E4 00E0 00E1 00E3 00E5   # 40-47   ␠   â ä à á ã å #
+	00E7 00F1 0024 002E 003C 0028 002B 007C   # 48-4F   ç ñ $ . < ( + | #
+	0026 00E9 00EA 00EB 00E8 00ED 00EE 00EF   # 50-57   & é ê ë è í î ï #
+	00EC 00DF 0021 00A3 002A 0029 003B 00AC   # 58-5F   ì ß ! £ * ) ; ¬ #
+	002D 002F 00C2 00C4 00C0 00C1 00C3 00C5   # 60-67   - / Â Ä À Á Ã Å #
+	00C7 00D1 00A6 002C 0025 005F 003E 003F   # 68-6F   Ç Ñ ¦ , % _ > ? #
+	00F8 00C9 00CA 00CB 00C8 00CD 00CE 00CF   # 70-77   ø É Ê Ë È Í Î Ï #
+	00CC 0060 003A 0023 0040 0027 003D 0022   # 78-7F   Ì ` : # @ ' = " #
+	00D8 0061 0062 0063 0064 0065 0066 0067   # 80-87   Ø a b c d e f g #
+	0068 0069 00AB 00BB 00F0 00FD 00FE 00B1   # 88-8F   h i « » ð ý þ ± #
+	00B0 006A 006B 006C 006D 006E 006F 0070   # 90-97   ° j k l m n o p #
+	0071 0072 00AA 00BA 00E6 00B8 00C6 00A4   # 98-9F   q r ª º æ ¸ Æ ¤ #
+	00B5 007E 0073 0074 0075 0076 0077 0078   # A0-A7   µ ~ s t u v w x #
+	0079 007A 00A1 00BF 00D0 00DD 00DE 00AE   # A8-AF   y z ¡ ¿ Ð Ý Þ ® #
+	00A2 005B 00A5 00B7 00A9 00A7 00B6 00BC   # B0-B7   ¢ [ ¥ · © § ¶ ¼ #
+	00BD 00BE 005E 005D 203E 00A8 00B4 00D7   # B8-BF   ½ ¾ ^ ] ‾ ¨ ´ × #
+	007B 0041 0042 0043 0044 0045 0046 0047   # C0-C7   { A B C D E F G #
+	0048 0049 00AD 00F4 00F6 00F2 00F3 00F5   # C8-CF   H I ­ ô ö ò ó õ #
+	007D 004A 004B 004C 004D 004E 004F 0050   # D0-D7   } J K L M N O P #
+	0051 0052 00B9 00FB 00FC 00F9 00FA 00FF   # D8-DF   Q R ¹ û ü ù ú ÿ #
+	005C 00F7 0053 0054 0055 0056 0057 0058   # E0-E7   \ ÷ S T U V W X #
+	0059 005A 00B2 00D4 00D6 00D2 00D3 00D5   # E8-EF   Y Z ² Ô Ö Ò Ó Õ #
+	0030 0031 0032 0033 0034 0035 0036 0037   # F0-F7   0 1 2 3 4 5 6 7 #
+	0038 0039 00B3 00DB 00DC 00D9 00DA 007F   # F8-FF   8 9 ³ Û Ü Ù Ú ␡ #
+
+
+
+@CP(CODEC_CP290: "IBM290", "cp290", "EBCDIC-JP-kana", "csIBM290")
+	0000 0001 0002 0003 0004 0005 0006 0007   # 00-07   ␀ ␁ ␂ ␃ ␄ ␅ ␆ ␇ #
+	0008 0009 000A 000B 000C 000D 000E 000F   # 08-0F   ␈ ␉ ␊ ␋ ␌ ␍ ␎ ␏ #
+	0010 0011 0012 0013 0014 0015 0016 0017   # 10-17   ␐ ␑ ␒ ␓ ␔ ␕ ␖ ␗ #
+	0018 0019 001A 001B 001C 001D 001E 001F   # 18-1F   ␘ ␙ ␚ ␛ ␜ ␝ ␞ ␟ #
+	0000 0000 0000 0000 0000 0000 0000 0000   # 20-27   ␀ ␀ ␀ ␀ ␀ ␀ ␀ ␀ #
+	0000 0000 0000 0000 0000 0000 0000 0000   # 28-2F   ␀ ␀ ␀ ␀ ␀ ␀ ␀ ␀ #
+	0000 0000 0000 0000 0000 0000 0000 0000   # 30-37   ␀ ␀ ␀ ␀ ␀ ␀ ␀ ␀ #
+	0000 0000 0000 0000 0000 0000 0000 0000   # 38-3F   ␀ ␀ ␀ ␀ ␀ ␀ ␀ ␀ #
+	0020 3002 300C 300D 3001 30FB 30F2 30A1   # 40-47   ␠ 。 「 」 、 ・ ヲ ァ #
+	30A3 30A5 00A3 002E 003C 0028 002B 007C   # 48-4F   ィ ゥ £ . < ( + | #
+	0026 30A7 30A9 30E3 30E5 30E7 30C3 0000   # 50-57   & ェ ォ ャ ュ ョ ッ ␀ #
+	30FC 0000 0021 00A5 002A 0029 003B 00AC   # 58-5F   ー ␀ ! ¥ * ) ; ¬ #
+	002D 002F 0000 0000 0000 0000 0000 0000   # 60-67   - / ␀ ␀ ␀ ␀ ␀ ␀ #
+	0000 0000 00A6 002C 0025 005F 003E 003F   # 68-6F   ␀ ␀ ¦ , % _ > ? #
+	0000 0000 0000 0000 0000 0000 0000 0000   # 70-77   ␀ ␀ ␀ ␀ ␀ ␀ ␀ ␀ #
+	0000 0060 003A 0023 0040 0027 003D 0022   # 78-7F   ␀ ` : # @ ' = " #
+	0000 30A2 30A4 30A6 30A8 30AA 30AB 30AD   # 80-87   ␀ ア イ ウ エ オ カ キ #
+	30AF 30B1 30B3 0000 30B5 30B7 30B9 30BB   # 88-8F   ク ケ コ ␀ サ シ ス セ #
+	30BD 30BF 30C1 30C4 30C6 30C8 30CA 30CB   # 90-97   ソ タ チ ツ テ ト ナ ニ #
+	30CC 30CD 30CE 0000 0000 30CF 30D2 30D5   # 98-9F   ヌ ネ ノ ␀ ␀ ハ ヒ フ #
+	0000 203E 30D8 30DB 30DE 30DF 30E0 30E1   # A0-A7   ␀ ‾ ヘ ホ マ ミ ム メ #
+	30E2 30E4 30E6 0000 30E8 30E9 30EA 30EB   # A8-AF   モ ヤ ユ ␀ ヨ ラ リ ル #
+	0000 0000 0000 0000 0000 0000 0000 0000   # B0-B7   ␀ ␀ ␀ ␀ ␀ ␀ ␀ ␀ #
+	0000 0000 30EC 30ED 30EF 30F3 309B 309C   # B8-BF   ␀ ␀ レ ロ ワ ン ゛ ゜ #
+	0000 0041 0042 0043 0044 0045 0046 0047   # C0-C7   ␀ A B C D E F G #
+	0048 0049 0000 0000 0000 0000 0000 0000   # C8-CF   H I ␀ ␀ ␀ ␀ ␀ ␀ #
+	0000 004A 004B 004C 004D 004E 004F 0050   # D0-D7   ␀ J K L M N O P #
+	0051 0052 0000 0000 0000 0000 0000 0000   # D8-DF   Q R ␀ ␀ ␀ ␀ ␀ ␀ #
+	0024 0000 0053 0054 0055 0056 0057 0058   # E0-E7   $ ␀ S T U V W X #
+	0059 005A 0000 0000 0000 0000 0000 0000   # E8-EF   Y Z ␀ ␀ ␀ ␀ ␀ ␀ #
+	0030 0031 0032 0033 0034 0035 0036 0037   # F0-F7   0 1 2 3 4 5 6 7 #
+	0038 0039 0000 0000 0000 0000 0000 007F   # F8-FF   8 9 ␀ ␀ ␀ ␀ ␀ ␡ #
+
+
+
+@CP(CODEC_CP297: "IBM297", "cp297", "ebcdic-cp-fr", "csIBM297")
+	0000 0001 0002 0003 0004 0005 0006 0007   # 00-07   ␀ ␁ ␂ ␃ ␄ ␅ ␆ ␇ #
+	0008 0009 000A 000B 000C 000D 000E 000F   # 08-0F   ␈ ␉ ␊ ␋ ␌ ␍ ␎ ␏ #
+	0010 0011 0012 0013 0014 0015 0016 0017   # 10-17   ␐ ␑ ␒ ␓ ␔ ␕ ␖ ␗ #
+	0018 0019 001A 001B 001C 001D 001E 001F   # 18-1F   ␘ ␙ ␚ ␛ ␜ ␝ ␞ ␟ #
+	0000 0000 0000 0000 0000 0000 0000 0000   # 20-27   ␀ ␀ ␀ ␀ ␀ ␀ ␀ ␀ #
+	0000 0000 0000 0000 0000 0000 0000 0000   # 28-2F   ␀ ␀ ␀ ␀ ␀ ␀ ␀ ␀ #
+	0000 0000 0000 0000 0000 0000 0000 0000   # 30-37   ␀ ␀ ␀ ␀ ␀ ␀ ␀ ␀ #
+	0000 0000 0000 0000 0000 0000 0000 0000   # 38-3F   ␀ ␀ ␀ ␀ ␀ ␀ ␀ ␀ #
+	0020 00A0 00E2 00E4 0040 00E1 00E3 00E5   # 40-47   ␠   â ä @ á ã å #
+	005C 00F1 00B0 002E 003C 0028 002B 0021   # 48-4F   \ ñ ° . < ( + ! #
+	0026 007B 00EA 00EB 007D 00ED 00EE 00EF   # 50-57   & { ê ë } í î ï #
+	00EC 00DF 00A7 0024 002A 0029 003B 005E   # 58-5F   ì ß § $ * ) ; ^ #
+	002D 002F 00C2 00C4 00C0 00C1 00C3 00C5   # 60-67   - / Â Ä À Á Ã Å #
+	00C7 00D1 00F9 002C 0025 005F 003E 003F   # 68-6F   Ç Ñ ù , % _ > ? #
+	00F8 00C9 00CA 00CB 00C8 00CD 00CE 00CF   # 70-77   ø É Ê Ë È Í Î Ï #
+	00CC 00B5 003A 00A3 00E0 0027 003D 0022   # 78-7F   Ì µ : £ à ' = " #
+	00D8 0061 0062 0063 0064 0065 0066 0067   # 80-87   Ø a b c d e f g #
+	0068 0069 00AB 00BB 00F0 00FD 00FE 00B1   # 88-8F   h i « » ð ý þ ± #
+	005B 006A 006B 006C 006D 006E 006F 0070   # 90-97   [ j k l m n o p #
+	0071 0072 00AA 00BA 00E6 00B8 00C6 00A4   # 98-9F   q r ª º æ ¸ Æ ¤ #
+	0060 00A8 0073 0074 0075 0076 0077 0078   # A0-A7   ` ¨ s t u v w x #
+	0079 007A 00A1 00BF 00D0 00DD 00DE 00AE   # A8-AF   y z ¡ ¿ Ð Ý Þ ® #
+	00A2 0023 00A5 00B7 00A9 005D 00B6 00BC   # B0-B7   ¢ # ¥ · © ] ¶ ¼ #
+	00BD 00BE 00AC 007C 203E 007E 00B4 00D7   # B8-BF   ½ ¾ ¬ | ‾ ~ ´ × #
+	00E9 0041 0042 0043 0044 0045 0046 0047   # C0-C7   é A B C D E F G #
+	0048 0049 00AD 00F4 00F6 00F2 00F3 00F5   # C8-CF   H I ­ ô ö ò ó õ #
+	00E8 004A 004B 004C 004D 004E 004F 0050   # D0-D7   è J K L M N O P #
+	0051 0052 00B9 00FB 00FC 00A6 00FA 00FF   # D8-DF   Q R ¹ û ü ¦ ú ÿ #
+	00E7 00F7 0053 0054 0055 0056 0057 0058   # E0-E7   ç ÷ S T U V W X #
+	0059 005A 00B2 00D4 00D6 00D2 00D3 00D5   # E8-EF   Y Z ² Ô Ö Ò Ó Õ #
+	0030 0031 0032 0033 0034 0035 0036 0037   # F0-F7   0 1 2 3 4 5 6 7 #
+	0038 0039 00B3 00DB 00DC 00D9 00DA 007F   # F8-FF   8 9 ³ Û Ü Ù Ú ␡ #
+
+
+
+@CP(CODEC_CP420: "IBM420", "cp420", "ebcdic-cp-ar1", "csIBM420")
+	0000 0001 0002 0003 0004 0005 0006 0007   # 00-07   ␀ ␁ ␂ ␃ ␄ ␅ ␆ ␇ #
+	0008 0009 000A 000B 000C 000D 000E 000F   # 08-0F   ␈ ␉ ␊ ␋ ␌ ␍ ␎ ␏ #
+	0010 0011 0012 0013 0014 0015 0016 0017   # 10-17   ␐ ␑ ␒ ␓ ␔ ␕ ␖ ␗ #
+	0018 0019 001A 001B 001C 001D 001E 001F   # 18-1F   ␘ ␙ ␚ ␛ ␜ ␝ ␞ ␟ #
+	0000 0000 0000 0000 0000 0000 0000 0000   # 20-27   ␀ ␀ ␀ ␀ ␀ ␀ ␀ ␀ #
+	0000 0000 0000 0000 0000 0000 0000 0000   # 28-2F   ␀ ␀ ␀ ␀ ␀ ␀ ␀ ␀ #
+	0000 0000 0000 0000 0000 0000 0000 0000   # 30-37   ␀ ␀ ␀ ␀ ␀ ␀ ␀ ␀ #
+	0000 0000 0000 0000 0000 0000 0000 0000   # 38-3F   ␀ ␀ ␀ ␀ ␀ ␀ ␀ ␀ #
+	0020 00A0 0651 FE7D 0640 0000 0621 0622   # 40-47   ␠   ّ ﹽ ـ ␀ ء آ #
+	FE82 0623 00A2 002E 003C 0028 002B 007C   # 48-4F   ﺂ أ ¢ . < ( + | #
+	0026 FE84 0624 0000 0000 0626 0627 FE8E   # 50-57   & ﺄ ؤ ␀ ␀ ئ ا ﺎ #
+	0628 FE90 0021 0024 002A 0029 003B 00AC   # 58-5F   ب ﺐ ! $ * ) ; ¬ #
+	002D 002F 0629 062A FE96 062B FE9A 062C   # 60-67   - / ة ت ﺖ ث ﺚ ج #
+	FE9E 062D 00A6 002C 0025 005F 003E 003F   # 68-6F   ﺞ ح ¦ , % _ > ? #
+	FEA2 062E FEA6 062F 0630 0631 0632 0633   # 70-77   ﺢ خ ﺦ د ذ ر ز س #
+	FEB2 060C 003A 0023 0040 0027 003D 0022   # 78-7F   ﺲ ، : # @ ' = " #
+	0634 0061 0062 0063 0064 0065 0066 0067   # 80-87   ش a b c d e f g #
+	0068 0069 FEB6 0635 FEBA 0636 FEBE 0637   # 88-8F   h i ﺶ ص ﺺ ض ﺾ ط #
+	0638 006A 006B 006C 006D 006E 006F 0070   # 90-97   ظ j k l m n o p #
+	0071 0072 0639 FECC FECA FECB 063A FED0   # 98-9F   q r ع ﻌ ﻊ ﻋ غ ﻐ #
+	FECE 00F7 0073 0074 0075 0076 0077 0078   # A0-A7   ﻎ ÷ s t u v w x #
+	0079 007A FECF 0641 FED2 0642 FED6 0643   # A8-AF   y z ﻏ ف ﻒ ق ﻖ ك #
+	FEDA 0644 FEF5 FEF6 FEF7 FEF8 0000 0000   # B0-B7   ﻚ ل ﻵ ﻶ ﻷ ﻸ ␀ ␀ #
+	FEFB FEFC FEDE 0645 FEE2 0646 FEE6 0647   # B8-BF   ﻻ ﻼ ﻞ م ﻢ ن ﻦ ه #
+	061B 0041 0042 0043 0044 0045 0046 0047   # C0-C7   ؛ A B C D E F G #
+	0048 0049 00AD FEEA 0000 FEEB 0000 0648   # C8-CF   H I ­ ﻪ ␀ ﻫ ␀ و #
+	061F 004A 004B 004C 004D 004E 004F 0050   # D0-D7   ؟ J K L M N O P #
+	0051 0052 0649 FEF0 064A FEF4 FEF2 06F0   # D8-DF   Q R ى ﻰ ي ﻴ ﻲ ۰ #
+	00D7 0000 0053 0054 0055 0056 0057 0058   # E0-E7   × ␀ S T U V W X #
+	0059 005A 06F1 06F2 0000 06F3 06F4 06F5   # E8-EF   Y Z ۱ ۲ ␀ ۳ ۴ ۵ #
+	0030 0031 0032 0033 0034 0035 0036 0037   # F0-F7   0 1 2 3 4 5 6 7 #
+	0038 0039 0000 06F6 06F7 06F8 06F9 007F   # F8-FF   8 9 ␀ ۶ ۷ ۸ ۹ ␡ #
+
+
+
+@CP(CODEC_CP424: "IBM424", "cp424", "ebcdic-cp-he", "csIBM424")
+	0000 0001 0002 0003 0004 0005 0006 0007   # 00-07   ␀ ␁ ␂ ␃ ␄ ␅ ␆ ␇ #
+	0008 0009 000A 000B 000C 000D 000E 000F   # 08-0F   ␈ ␉ ␊ ␋ ␌ ␍ ␎ ␏ #
+	0010 0011 0012 0013 0014 0015 0016 0017   # 10-17   ␐ ␑ ␒ ␓ ␔ ␕ ␖ ␗ #
+	0018 0019 001A 001B 001C 001D 001E 001F   # 18-1F   ␘ ␙ ␚ ␛ ␜ ␝ ␞ ␟ #
+	0000 0000 0000 0000 0000 0000 0000 0000   # 20-27   ␀ ␀ ␀ ␀ ␀ ␀ ␀ ␀ #
+	0000 0000 0000 0000 0000 0000 0000 0000   # 28-2F   ␀ ␀ ␀ ␀ ␀ ␀ ␀ ␀ #
+	0000 0000 0000 0000 0000 0000 0000 0000   # 30-37   ␀ ␀ ␀ ␀ ␀ ␀ ␀ ␀ #
+	0000 0000 0000 0000 0000 0000 0000 0000   # 38-3F   ␀ ␀ ␀ ␀ ␀ ␀ ␀ ␀ #
+	0020 05D0 05D1 05D2 05D3 05D4 05D5 05D6   # 40-47   ␠ א ב ג ד ה ו ז #
+	05D7 05D8 00A2 002E 003C 0028 002B 007C   # 48-4F   ח ט ¢ . < ( + | #
+	0026 05D9 05DA 05DB 05DC 05DD 05DE 05DF   # 50-57   & י ך כ ל ם מ ן #
+	05E0 05E1 0021 0024 002A 0029 003B 00AC   # 58-5F   נ ס ! $ * ) ; ¬ #
+	002D 002F 05E2 05E3 05E4 05E5 05E6 05E7   # 60-67   - / ע ף פ ץ צ ק #
+	05E8 05E9 00A6 002C 0025 005F 003E 003F   # 68-6F   ר ש ¦ , % _ > ? #
+	0000 05EA 0000 0000 00A0 0000 0000 0000   # 70-77   ␀ ת ␀ ␀   ␀ ␀ ␀ #
+	21D4 0060 003A 0023 0040 0027 003D 0022   # 78-7F   ⇔ ` : # @ ' = " #
+	0000 0061 0062 0063 0064 0065 0066 0067   # 80-87   ␀ a b c d e f g #
+	0068 0069 00AB 00BB 0000 0000 0000 0000   # 88-8F   h i « » ␀ ␀ ␀ ␀ #
+	00B0 006A 006B 006C 006D 006E 006F 0070   # 90-97   ° j k l m n o p #
+	0071 0072 0000 0000 0000 00B8 0000 00A4   # 98-9F   q r ␀ ␀ ␀ ¸ ␀ ¤ #
+	00B5 007E 0073 0074 0075 0076 0077 0078   # A0-A7   µ ~ s t u v w x #
+	0079 007A 0000 0000 0000 0000 0000 00AE   # A8-AF   y z ␀ ␀ ␀ ␀ ␀ ® #
+	005E 00A3 00A5 00B7 00A9 00A7 00B6 00BC   # B0-B7   ^ £ ¥ · © § ¶ ¼ #
+	00BD 00BE 005B 005D 203E 00A8 00B4 00D7   # B8-BF   ½ ¾ [ ] ‾ ¨ ´ × #
+	007B 0041 0042 0043 0044 0045 0046 0047   # C0-C7   { A B C D E F G #
+	0048 0049 00AD 0000 0000 0000 0000 0000   # C8-CF   H I ­ ␀ ␀ ␀ ␀ ␀ #
+	007D 004A 004B 004C 004D 004E 004F 0050   # D0-D7   } J K L M N O P #
+	0051 0052 00B9 0000 0000 0000 0000 0000   # D8-DF   Q R ¹ ␀ ␀ ␀ ␀ ␀ #
+	005C 00F7 0053 0054 0055 0056 0057 0058   # E0-E7   \ ÷ S T U V W X #
+	0059 005A 00B2 0000 0000 0000 0000 0000   # E8-EF   Y Z ² ␀ ␀ ␀ ␀ ␀ #
+	0030 0031 0032 0033 0034 0035 0036 0037   # F0-F7   0 1 2 3 4 5 6 7 #
+	0038 0039 00B3 0000 0000 0000 0000 007F   # F8-FF   8 9 ³ ␀ ␀ ␀ ␀ ␡ #
+
+
+
+@CP(CODEC_CP500: "IBM500", "CP500", "ebcdic-cp-be", "ebcdic-cp-ch", "csIBM500")
+	0000 0001 0002 0003 0004 0005 0006 0007   # 00-07   ␀ ␁ ␂ ␃ ␄ ␅ ␆ ␇ #
+	0008 0009 000A 000B 000C 000D 000E 000F   # 08-0F   ␈ ␉ ␊ ␋ ␌ ␍ ␎ ␏ #
+	0010 0011 0012 0013 0014 0015 0016 0017   # 10-17   ␐ ␑ ␒ ␓ ␔ ␕ ␖ ␗ #
+	0018 0019 001A 001B 001C 001D 001E 001F   # 18-1F   ␘ ␙ ␚ ␛ ␜ ␝ ␞ ␟ #
+	0000 0000 0000 0000 0000 0000 0000 0000   # 20-27   ␀ ␀ ␀ ␀ ␀ ␀ ␀ ␀ #
+	0000 0000 0000 0000 0000 0000 0000 0000   # 28-2F   ␀ ␀ ␀ ␀ ␀ ␀ ␀ ␀ #
+	0000 0000 0000 0000 0000 0000 0000 0000   # 30-37   ␀ ␀ ␀ ␀ ␀ ␀ ␀ ␀ #
+	0000 0000 0000 0000 0000 0000 0000 0000   # 38-3F   ␀ ␀ ␀ ␀ ␀ ␀ ␀ ␀ #
+	0020 00A0 00E2 00E4 00E0 00E1 00E3 00E5   # 40-47   ␠   â ä à á ã å #
+	00E7 00F1 005B 002E 003C 0028 002B 0021   # 48-4F   ç ñ [ . < ( + ! #
+	0026 00E9 00EA 00EB 00E8 00ED 00EE 00EF   # 50-57   & é ê ë è í î ï #
+	00EC 00DF 005D 0024 002A 0029 003B 005E   # 58-5F   ì ß ] $ * ) ; ^ #
+	002D 002F 00C2 00C4 00C0 00C1 00C3 00C5   # 60-67   - / Â Ä À Á Ã Å #
+	00C7 00D1 00A6 002C 0025 005F 003E 003F   # 68-6F   Ç Ñ ¦ , % _ > ? #
+	00F8 00C9 00CA 00CB 00C8 00CD 00CE 00CF   # 70-77   ø É Ê Ë È Í Î Ï #
+	00CC 0060 003A 0023 0040 0027 003D 0022   # 78-7F   Ì ` : # @ ' = " #
+	00D8 0061 0062 0063 0064 0065 0066 0067   # 80-87   Ø a b c d e f g #
+	0068 0069 00AB 00BB 00F0 00FD 00FE 00B1   # 88-8F   h i « » ð ý þ ± #
+	00B0 006A 006B 006C 006D 006E 006F 0070   # 90-97   ° j k l m n o p #
+	0071 0072 00AA 00BA 00E6 00B8 00C6 00A4   # 98-9F   q r ª º æ ¸ Æ ¤ #
+	00B5 007E 0073 0074 0075 0076 0077 0078   # A0-A7   µ ~ s t u v w x #
+	0079 007A 00A1 00BF 00D0 00DD 00DE 00AE   # A8-AF   y z ¡ ¿ Ð Ý Þ ® #
+	00A2 00A3 00A5 00B7 00A9 00A7 00B6 00BC   # B0-B7   ¢ £ ¥ · © § ¶ ¼ #
+	00BD 00BE 00AC 007C 203E 00A8 00B4 00D7   # B8-BF   ½ ¾ ¬ | ‾ ¨ ´ × #
+	007B 0041 0042 0043 0044 0045 0046 0047   # C0-C7   { A B C D E F G #
+	0048 0049 00AD 00F4 00F6 00F2 00F3 00F5   # C8-CF   H I ­ ô ö ò ó õ #
+	007D 004A 004B 004C 004D 004E 004F 0050   # D0-D7   } J K L M N O P #
+	0051 0052 00B9 00FB 00FC 00F9 00FA 00FF   # D8-DF   Q R ¹ û ü ù ú ÿ #
+	005C 00F7 0053 0054 0055 0056 0057 0058   # E0-E7   \ ÷ S T U V W X #
+	0059 005A 00B2 00D4 00D6 00D2 00D3 00D5   # E8-EF   Y Z ² Ô Ö Ò Ó Õ #
+	0030 0031 0032 0033 0034 0035 0036 0037   # F0-F7   0 1 2 3 4 5 6 7 #
+	0038 0039 00B3 00DB 00DC 00D9 00DA 007F   # F8-FF   8 9 ³ Û Ü Ù Ú ␡ #
+
+
+
+@CP(CODEC_CP870: "IBM870", "CP870", "ebcdic-cp-roece", "ebcdic-cp-yu", "csIBM870")
+	0000 0001 0002 0003 0004 0005 0006 0007   # 00-07   ␀ ␁ ␂ ␃ ␄ ␅ ␆ ␇ #
+	0008 0009 000A 000B 000C 000D 000E 000F   # 08-0F   ␈ ␉ ␊ ␋ ␌ ␍ ␎ ␏ #
+	0010 0011 0012 0013 0014 0015 0016 0017   # 10-17   ␐ ␑ ␒ ␓ ␔ ␕ ␖ ␗ #
+	0018 0019 001A 001B 001C 001D 001E 001F   # 18-1F   ␘ ␙ ␚ ␛ ␜ ␝ ␞ ␟ #
+	0000 0000 0000 0000 0000 0000 0000 0000   # 20-27   ␀ ␀ ␀ ␀ ␀ ␀ ␀ ␀ #
+	0000 0000 0000 0000 0000 0000 0000 0000   # 28-2F   ␀ ␀ ␀ ␀ ␀ ␀ ␀ ␀ #
+	0000 0000 0000 0000 0000 0000 0000 0000   # 30-37   ␀ ␀ ␀ ␀ ␀ ␀ ␀ ␀ #
+	0000 0000 0000 0000 0000 0000 0000 0000   # 38-3F   ␀ ␀ ␀ ␀ ␀ ␀ ␀ ␀ #
+	0020 00A0 0000 00E4 0000 00E1 0103 010D   # 40-47   ␠   ␀ ä ␀ á ă č #
+	00E7 0107 005B 002E 003C 0028 002B 0021   # 48-4F   ç ć [ . < ( + ! #
+	0026 00E9 0000 00EB 016F 00ED 0000 013E   # 50-57   & é ␀ ë ů í ␀ ľ #
+	013A 00DF 005D 0024 002A 0029 003B 005E   # 58-5F   ĺ ß ] $ * ) ; ^ #
+	002D 002F 0000 00C4 02DD 00C1 0000 010C   # 60-67   - / ␀ Ä ˝ Á ␀ Č #
+	00C7 0106 007C 002C 0025 005F 003E 003F   # 68-6F   Ç Ć | , % _ > ? #
+	02C7 00C9 0000 00CB 016E 00CD 0000 013D   # 70-77   ˇ É ␀ Ë Ů Í ␀ Ľ #
+	0139 0060 003A 0023 0040 0027 003D 0022   # 78-7F   Ĺ ` : # @ ' = " #
+	02D8 0061 0062 0063 0064 0065 0066 0067   # 80-87   ˘ a b c d e f g #
+	0068 0069 015B 0148 0111 00FD 0159 0000   # 88-8F   h i ś ň đ ý ř ␀ #
+	00B0 006A 006B 006C 006D 006E 006F 0070   # 90-97   ° j k l m n o p #
+	0071 0072 0142 0144 0161 00B8 02DB 00A4   # 98-9F   q r ł ń š ¸ ˛ ¤ #
+	0105 007E 0073 0074 0075 0076 0077 0078   # A0-A7   ą ~ s t u v w x #
+	0079 007A 015A 0147 0110 00DD 0158 0000   # A8-AF   y z Ś Ň Đ Ý Ř ␀ #
+	00B7 0104 017C 0000 017B 00A7 00B6 017E   # B0-B7   · Ą ż ␀ Ż § ¶ ž #
+	017A 017D 0179 0143 0160 00A8 00B4 00D7   # B8-BF   ź Ž Ź Ń Š ¨ ´ × #
+	007B 0041 0042 0043 0044 0045 0046 0047   # C0-C7   { A B C D E F G #
+	0048 0049 00AD 00F4 00F6 0155 00F3 0151   # C8-CF   H I ­ ô ö ŕ ó ő #
+	007D 004A 004B 004C 004D 004E 004F 0050   # D0-D7   } J K L M N O P #
+	0051 0052 011A 0171 00FC 0165 00FA 011B   # D8-DF   Q R Ě ű ü ť ú ě #
+	005C 00F7 0053 0054 0055 0056 0057 0058   # E0-E7   \ ÷ S T U V W X #
+	0059 005A 010F 00D4 00D6 0154 00D3 0150   # E8-EF   Y Z ď Ô Ö Ŕ Ó Ő #
+	0030 0031 0032 0033 0034 0035 0036 0037   # F0-F7   0 1 2 3 4 5 6 7 #
+	0038 0039 010E 0170 00DC 0164 00DA 007F   # F8-FF   8 9 Ď Ű Ü Ť Ú ␡ #
+
+
+
+@CP(CODEC_CP871: "IBM871", "CP871", "ebcdic-cp-is", "csIBM871")
+	0000 0001 0002 0003 0004 0005 0006 0007   # 00-07   ␀ ␁ ␂ ␃ ␄ ␅ ␆ ␇ #
+	0008 0009 000A 000B 000C 000D 000E 000F   # 08-0F   ␈ ␉ ␊ ␋ ␌ ␍ ␎ ␏ #
+	0010 0011 0012 0013 0014 0015 0016 0017   # 10-17   ␐ ␑ ␒ ␓ ␔ ␕ ␖ ␗ #
+	0018 0019 001A 001B 001C 001D 001E 001F   # 18-1F   ␘ ␙ ␚ ␛ ␜ ␝ ␞ ␟ #
+	0000 0000 0000 0000 0000 0000 0000 0000   # 20-27   ␀ ␀ ␀ ␀ ␀ ␀ ␀ ␀ #
+	0000 0000 0000 0000 0000 0000 0000 0000   # 28-2F   ␀ ␀ ␀ ␀ ␀ ␀ ␀ ␀ #
+	0000 0000 0000 0000 0000 0000 0000 0000   # 30-37   ␀ ␀ ␀ ␀ ␀ ␀ ␀ ␀ #
+	0000 0000 0000 0000 0000 0000 0000 0000   # 38-3F   ␀ ␀ ␀ ␀ ␀ ␀ ␀ ␀ #
+	0020 00A0 00E2 00E4 00E0 00E1 00E3 00E5   # 40-47   ␠   â ä à á ã å #
+	00E7 00F1 00FE 002E 003C 0028 002B 0021   # 48-4F   ç ñ þ . < ( + ! #
+	0026 00E9 00EA 00EB 00E8 00ED 00EE 00EF   # 50-57   & é ê ë è í î ï #
+	00EC 00DF 00C6 0024 002A 0029 003B 00D6   # 58-5F   ì ß Æ $ * ) ; Ö #
+	002D 002F 00C2 00C4 00C0 00C1 00C3 00C5   # 60-67   - / Â Ä À Á Ã Å #
+	00C7 00D1 00A6 002C 0025 005F 003E 003F   # 68-6F   Ç Ñ ¦ , % _ > ? #
+	00F8 00C9 00CA 00CB 00C8 00CD 00CE 00CF   # 70-77   ø É Ê Ë È Í Î Ï #
+	00CC 00F0 003A 0023 00D0 0027 003D 0022   # 78-7F   Ì ð : # Ð ' = " #
+	00D8 0061 0062 0063 0064 0065 0066 0067   # 80-87   Ø a b c d e f g #
+	0068 0069 00AB 00BB 0060 00FD 007B 00B1   # 88-8F   h i « » ` ý { ± #
+	00B0 006A 006B 006C 006D 006E 006F 0070   # 90-97   ° j k l m n o p #
+	0071 0072 00AA 00BA 007D 00B8 005D 00A4   # 98-9F   q r ª º } ¸ ] ¤ #
+	00B5 00F6 0073 0074 0075 0076 0077 0078   # A0-A7   µ ö s t u v w x #
+	0079 007A 00A1 00BF 0040 00DD 005B 00AE   # A8-AF   y z ¡ ¿ @ Ý [ ® #
+	00A2 00A3 00A5 00B7 00A9 00A7 00B6 00BC   # B0-B7   ¢ £ ¥ · © § ¶ ¼ #
+	00BD 00BE 00AC 007C 203E 00A8 005C 00D7   # B8-BF   ½ ¾ ¬ | ‾ ¨ \ × #
+	00DE 0041 0042 0043 0044 0045 0046 0047   # C0-C7   Þ A B C D E F G #
+	0048 0049 00AD 00F4 007E 00F2 00F3 00F5   # C8-CF   H I ­ ô ~ ò ó õ #
+	00E6 004A 004B 004C 004D 004E 004F 0050   # D0-D7   æ J K L M N O P #
+	0051 0052 00B9 00FB 00FC 00F9 00FA 00FF   # D8-DF   Q R ¹ û ü ù ú ÿ #
+	00B4 00F7 0053 0054 0055 0056 0057 0058   # E0-E7   ´ ÷ S T U V W X #
+	0059 005A 00B2 00D4 005E 00D2 00D3 00D5   # E8-EF   Y Z ² Ô ^ Ò Ó Õ #
+	0030 0031 0032 0033 0034 0035 0036 0037   # F0-F7   0 1 2 3 4 5 6 7 #
+	0038 0039 00B3 00DB 00DC 00D9 00DA 007F   # F8-FF   8 9 ³ Û Ü Ù Ú ␡ #
+
+
+
+@CP(CODEC_CP880: "IBM880", "cp880", "EBCDIC-Cyrillic", "csIBM880")
+	0000 0001 0002 0003 0004 0005 0006 0007   # 00-07   ␀ ␁ ␂ ␃ ␄ ␅ ␆ ␇ #
+	0008 0009 000A 000B 000C 000D 000E 000F   # 08-0F   ␈ ␉ ␊ ␋ ␌ ␍ ␎ ␏ #
+	0010 0011 0012 0013 0014 0015 0016 0017   # 10-17   ␐ ␑ ␒ ␓ ␔ ␕ ␖ ␗ #
+	0018 0019 001A 001B 001C 001D 001E 001F   # 18-1F   ␘ ␙ ␚ ␛ ␜ ␝ ␞ ␟ #
+	0000 0000 0000 0000 0000 0000 0000 0000   # 20-27   ␀ ␀ ␀ ␀ ␀ ␀ ␀ ␀ #
+	0000 0000 0000 0000 0000 0000 0000 0000   # 28-2F   ␀ ␀ ␀ ␀ ␀ ␀ ␀ ␀ #
+	0000 0000 0000 0000 0000 0000 0000 0000   # 30-37   ␀ ␀ ␀ ␀ ␀ ␀ ␀ ␀ #
+	0000 0000 0000 0000 0000 0000 0000 0000   # 38-3F   ␀ ␀ ␀ ␀ ␀ ␀ ␀ ␀ #
+	0020 0000 0452 0453 0451 0000 0455 0456   # 40-47   ␠ ␀ ђ ѓ ё ␀ ѕ і #
+	0457 0458 005B 002E 003C 0028 002B 0021   # 48-4F   ї ј [ . < ( + ! #
+	0026 0459 045A 045B 045C 0000 045F 042A   # 50-57   & љ њ ћ ќ ␀ џ Ъ #
+	2116 0402 005D 0024 002A 0029 003B 005E   # 58-5F   № Ђ ] $ * ) ; ^ #
+	002D 002F 0403 0401 0000 0405 0406 0407   # 60-67   - / Ѓ Ё ␀ Ѕ І Ї #
+	0408 0409 00A6 002C 0025 005F 003E 003F   # 68-6F   Ј Љ ¦ , % _ > ? #
+	040A 040B 040C 0000 0000 040F 044E 0430   # 70-77   Њ Ћ Ќ ␀ ␀ Џ ю а #
+	0431 0000 003A 0023 0040 0027 003D 0022   # 78-7F   б ␀ : # @ ' = " #
+	0446 0061 0062 0063 0064 0065 0066 0067   # 80-87   ц a b c d e f g #
+	0068 0069 0434 0435 0444 0433 0445 0438   # 88-8F   h i д е ф г х и #
+	0439 006A 006B 006C 006D 006E 006F 0070   # 90-97   й j k l m n o p #
+	0071 0072 043A 043B 043C 043D 043E 043F   # 98-9F   q r к л м н о п #
+	044F 0000 0073 0074 0075 0076 0077 0078   # A0-A7   я ␀ s t u v w x #
+	0079 007A 0440 0441 0442 0443 0436 0432   # A8-AF   y z р с т у ж в #
+	044C 044B 0437 0448 044D 0449 0447 044A   # B0-B7   ь ы з ш э щ ч ъ #
+	042E 0410 0411 0426 0414 0415 0424 0413   # B8-BF   Ю А Б Ц Д Е Ф Г #
+	0000 0041 0042 0043 0044 0045 0046 0047   # C0-C7   ␀ A B C D E F G #
+	0048 0049 0425 0418 0419 041A 041B 041C   # C8-CF   H I Х И Й К Л М #
+	0000 004A 004B 004C 004D 004E 004F 0050   # D0-D7   ␀ J K L M N O P #
+	0051 0052 041D 041E 041F 042F 0420 0421   # D8-DF   Q R Н О П Я Р С #
+	005C 00A4 0053 0054 0055 0056 0057 0058   # E0-E7   \ ¤ S T U V W X #
+	0059 005A 0422 0423 0416 0412 042C 042B   # E8-EF   Y Z Т У Ж В Ь Ы #
+	0030 0031 0032 0033 0034 0035 0036 0037   # F0-F7   0 1 2 3 4 5 6 7 #
+	0038 0039 0417 0428 042D 0429 0427 007F   # F8-FF   8 9 З Ш Э Щ Ч ␡ #
+
+
+
+@CP(CODEC_CP905: "IBM905", "CP905", "ebcdic-cp-tr", "csIBM905")
+	0000 0001 0002 0003 0004 0005 0006 0007   # 00-07   ␀ ␁ ␂ ␃ ␄ ␅ ␆ ␇ #
+	0008 0009 000A 000B 000C 000D 000E 000F   # 08-0F   ␈ ␉ ␊ ␋ ␌ ␍ ␎ ␏ #
+	0010 0011 0012 0013 0014 0015 0016 0017   # 10-17   ␐ ␑ ␒ ␓ ␔ ␕ ␖ ␗ #
+	0018 0019 001A 001B 001C 001D 001E 001F   # 18-1F   ␘ ␙ ␚ ␛ ␜ ␝ ␞ ␟ #
+	0000 0000 0000 0000 0000 0000 0000 0000   # 20-27   ␀ ␀ ␀ ␀ ␀ ␀ ␀ ␀ #
+	0000 0000 0000 0000 0000 0000 0000 0000   # 28-2F   ␀ ␀ ␀ ␀ ␀ ␀ ␀ ␀ #
+	0000 0000 0000 0000 0000 0000 0000 0000   # 30-37   ␀ ␀ ␀ ␀ ␀ ␀ ␀ ␀ #
+	0000 0000 0000 0000 0000 0000 0000 0000   # 38-3F   ␀ ␀ ␀ ␀ ␀ ␀ ␀ ␀ #
+	0020 0000 00E2 00E4 00E0 00E1 0000 010B   # 40-47   ␠ ␀ â ä à á ␀ ċ #
+	007B 00F1 00C7 002E 003C 0028 002B 0021   # 48-4F   { ñ Ç . < ( + ! #
+	0026 00E9 00EA 00EB 00E8 00ED 00EE 00EF   # 50-57   & é ê ë è í î ï #
+	00EC 00DF 011E 0130 002A 0029 003B 005E   # 58-5F   ì ß Ğ İ * ) ; ^ #
+	002D 002F 00C2 00C4 00C0 00C1 0000 010A   # 60-67   - / Â Ä À Á ␀ Ċ #
+	005B 00D1 015F 002C 0025 005F 003E 003F   # 68-6F   [ Ñ ş , % _ > ? #
+	0000 00C9 00CA 00CB 00C8 00CD 00CE 00CF   # 70-77   ␀ É Ê Ë È Í Î Ï #
+	00CC 0131 003A 00D6 015E 0027 003D 00DC   # 78-7F   Ì ı : Ö Ş ' = Ü #
+	02D8 0061 0062 0063 0064 0065 0066 0067   # 80-87   ˘ a b c d e f g #
+	0068 0069 0127 0109 015D 016D 0000 007C   # 88-8F   h i ħ ĉ ŝ ŭ ␀ | #
+	00B0 006A 006B 006C 006D 006E 006F 0070   # 90-97   ° j k l m n o p #
+	0071 0072 0125 011D 0135 02DB 0000 00A4   # 98-9F   q r ĥ ĝ ĵ ˛ ␀ ¤ #
+	00B5 00F6 0073 0074 0075 0076 0077 0078   # A0-A7   µ ö s t u v w x #
+	0079 007A 0126 0108 015C 016C 0000 0040   # A8-AF   y z Ħ Ĉ Ŝ Ŭ ␀ @ #
+	00B7 00A3 017C 007D 017B 00A7 005D 0000   # B0-B7   · £ ż } Ż § ] ␀ #
+	00BD 0024 0124 011C 0134 00A8 00B4 00D7   # B8-BF   ½ $ Ĥ Ĝ Ĵ ¨ ´ × #
+	00E7 0041 0042 0043 0044 0045 0046 0047   # C0-C7   ç A B C D E F G #
+	0048 0049 00AD 00F4 007E 00F2 00F3 0121   # C8-CF   H I ­ ô ~ ò ó ġ #
+	011F 004A 004B 004C 004D 004E 004F 0050   # D0-D7   ğ J K L M N O P #
+	0051 0052 0060 00FB 005C 00F9 00FA 0000   # D8-DF   Q R ` û \ ù ú ␀ #
+	00FC 00F7 0053 0054 0055 0056 0057 0058   # E0-E7   ü ÷ S T U V W X #
+	0059 005A 00B2 00D4 0023 00D2 00D3 0120   # E8-EF   Y Z ² Ô # Ò Ó Ġ #
+	0030 0031 0032 0033 0034 0035 0036 0037   # F0-F7   0 1 2 3 4 5 6 7 #
+	0038 0039 00B3 00DB 0022 00D9 00DA 007F   # F8-FF   8 9 ³ Û " Ù Ú ␡ #
+
+
+
+@CP(CODEC_CP918: "IBM918", "CP918", "ebcdic-cp-ar2", "csIBM918")
+	0000 0001 0002 0003 0004 0005 0006 0007   # 00-07   ␀ ␁ ␂ ␃ ␄ ␅ ␆ ␇ #
+	0008 0009 000A 000B 000C 000D 000E 000F   # 08-0F   ␈ ␉ ␊ ␋ ␌ ␍ ␎ ␏ #
+	0010 0011 0012 0013 0014 0015 0016 0017   # 10-17   ␐ ␑ ␒ ␓ ␔ ␕ ␖ ␗ #
+	0018 0019 001A 001B 001C 001D 001E 001F   # 18-1F   ␘ ␙ ␚ ␛ ␜ ␝ ␞ ␟ #
+	0000 0000 0000 0000 0000 0000 0000 0000   # 20-27   ␀ ␀ ␀ ␀ ␀ ␀ ␀ ␀ #
+	0000 0000 0000 0000 0000 0000 0000 0000   # 28-2F   ␀ ␀ ␀ ␀ ␀ ␀ ␀ ␀ #
+	0000 0000 0000 0000 0000 0000 0000 0000   # 30-37   ␀ ␀ ␀ ␀ ␀ ␀ ␀ ␀ #
+	0000 0000 0000 0000 0000 0000 0000 0000   # 38-3F   ␀ ␀ ␀ ␀ ␀ ␀ ␀ ␀ #
+	0020 00A0 060C 061B 061F 0623 0627 FE8E   # 40-47   ␠   ، ؛ ؟ أ ا ﺎ #
+	0000 0628 005B 002E 003C 0028 002B 0021   # 48-4F   ␀ ب [ . < ( + ! #
+	0026 FE90 067E 0000 0629 062A FE96 0000   # 50-57   & ﺐ پ ␀ ة ت ﺖ ␀ #
+	0000 062B 005D 0024 002A 0029 003B 005E   # 58-5F   ␀ ث ] $ * ) ; ^ #
+	002D 002F FE9A 062C FE9E 0000 0000 062D   # 60-67   - / ﺚ ج ﺞ ␀ ␀ ح #
+	FEA2 062E 0060 002C 0025 005F 003E 003F   # 68-6F   ﺢ خ ` , % _ > ? #
+	06F0 06F1 06F2 06F3 06F4 06F5 06F6 06F7   # 70-77   ۰ ۱ ۲ ۳ ۴ ۵ ۶ ۷ #
+	06F8 06F9 003A 0023 0040 0027 003D 0022   # 78-7F   ۸ ۹ : # @ ' = " #
+	FEA6 0061 0062 0063 0064 0065 0066 0067   # 80-87   ﺦ a b c d e f g #
+	0068 0069 062F 0000 0630 0631 0000 0632   # 88-8F   h i د ␀ ذ ر ␀ ز #
+	0000 006A 006B 006C 006D 006E 006F 0070   # 90-97   ␀ j k l m n o p #
+	0071 0072 0633 FEB2 0634 FEB6 0635 FEBA   # 98-9F   q r س ﺲ ش ﺶ ص ﺺ #
+	0636 007E 0073 0074 0075 0076 0077 0078   # A0-A7   ض ~ s t u v w x #
+	0079 007A FEBE 0637 0638 0639 FECC FECA   # A8-AF   y z ﺾ ط ظ ع ﻌ ﻊ #
+	FECB 063A FED0 FECE FECF 0641 FED2 0642   # B0-B7   ﻋ غ ﻐ ﻎ ﻏ ف ﻒ ق #
+	FED6 0643 FEDA 007C 0000 0000 0644 FEE0   # B8-BF   ﻖ ك ﻚ | ␀ ␀ ل ﻠ #
+	007B 0041 0042 0043 0044 0045 0046 0047   # C0-C7   { A B C D E F G #
+	0048 0049 00AD 0000 0645 FEE2 0000 0646   # C8-CF   H I ­ ␀ م ﻢ ␀ ن #
+	007D 004A 004B 004C 004D 004E 004F 0050   # D0-D7   } J K L M N O P #
+	0051 0052 FEE6 0000 0648 0000 0000 0000   # D8-DF   Q R ﻦ ␀ و ␀ ␀ ␀ #
+	005C 0000 0053 0054 0055 0056 0057 0058   # E0-E7   \ ␀ S T U V W X #
+	0059 005A 0621 0000 0000 0000 0000 0000   # E8-EF   Y Z ء ␀ ␀ ␀ ␀ ␀ #
+	0030 0031 0032 0033 0034 0035 0036 0037   # F0-F7   0 1 2 3 4 5 6 7 #
+	0038 0039 0000 0000 0000 0651 FE7D 007F   # F8-FF   8 9 ␀ ␀ ␀ ّ ﹽ ␡ #
+
+
+
+@CP(CODEC_CP423: "IBM423", "cp423", "ebcdic-cp-gr", "csIBM423")
+	0000 0001 0002 0003 0004 0005 0006 0007   # 00-07   ␀ ␁ ␂ ␃ ␄ ␅ ␆ ␇ #
+	0008 0009 000A 000B 000C 000D 000E 000F   # 08-0F   ␈ ␉ ␊ ␋ ␌ ␍ ␎ ␏ #
+	0010 0011 0012 0013 0014 0015 0016 0017   # 10-17   ␐ ␑ ␒ ␓ ␔ ␕ ␖ ␗ #
+	0018 0019 001A 001B 001C 001D 001E 001F   # 18-1F   ␘ ␙ ␚ ␛ ␜ ␝ ␞ ␟ #
+	0000 0000 0000 0000 0000 0000 0000 0000   # 20-27   ␀ ␀ ␀ ␀ ␀ ␀ ␀ ␀ #
+	0000 0000 0000 0000 0000 0000 0000 0000   # 28-2F   ␀ ␀ ␀ ␀ ␀ ␀ ␀ ␀ #
+	0000 0000 0000 0000 0000 0000 0000 0000   # 30-37   ␀ ␀ ␀ ␀ ␀ ␀ ␀ ␀ #
+	0000 0000 0000 0000 0000 0000 0000 0000   # 38-3F   ␀ ␀ ␀ ␀ ␀ ␀ ␀ ␀ #
+	0020 0391 0392 0393 0394 0395 0396 0397   # 40-47   ␠ Α Β Γ Δ Ε Ζ Η #
+	0398 0399 005B 002E 003C 0028 002B 0021   # 48-4F   Θ Ι [ . < ( + ! #
+	0026 039A 039B 039C 039D 039E 039F 03A0   # 50-57   & Κ Λ Μ Ν Ξ Ο Π #
+	03A1 03A3 005D 0024 002A 0029 003B 005E   # 58-5F   Ρ Σ ] $ * ) ; ^ #
+	002D 002F 03A4 03A5 03A6 03A7 03A8 03A9   # 60-67   - / Τ Υ Φ Χ Ψ Ω #
+	0000 0000 0000 002C 0025 005F 003E 003F   # 68-6F   ␀ ␀ ␀ , % _ > ? #
+	0000 0386 0388 0389 0000 038A 038C 038E   # 70-77   ␀ Ά Έ Ή ␀ Ί Ό Ύ #
+	038F 0060 003A 00A3 00A7 0027 003D 0022   # 78-7F   Ώ ` : £ § ' = " #
+	00C4 0061 0062 0063 0064 0065 0066 0067   # 80-87   Ä a b c d e f g #
+	0068 0069 03B1 03B2 03B3 03B4 03B5 03B6   # 88-8F   h i α β γ δ ε ζ #
+	00D6 006A 006B 006C 006D 006E 006F 0070   # 90-97   Ö j k l m n o p #
+	0071 0072 03B7 03B8 03B9 03BA 03BB 03BC   # 98-9F   q r η θ ι κ λ μ #
+	00DC 00A8 0073 0074 0075 0076 0077 0078   # A0-A7   Ü ¨ s t u v w x #
+	0079 007A 03BD 03BE 03BF 03C0 03C1 03C2   # A8-AF   y z ν ξ ο π ρ ς #
+	0000 03AC 03AD 03AE 03CA 03AF 03CC 03CD   # B0-B7   ␀ ά έ ή ϊ ί ό ύ #
+	03CB 03CE 03C3 03C4 03C5 03C6 03C7 03C8   # B8-BF   ϋ ώ σ τ υ φ χ ψ #
+#	# ?Error in "rfc1345.txt"? -- For some reason, there is a 17th line in, but
+#	# after manually comparing against the output of `iconv -t=utf32be -f=IBM423`,
+#	# it seems like these 2 lines (which have now been commented out) are incorrect
+#	044C 044B 0437 0448 044D 0449 0447 044A   # ??-??   ь ы з ш э щ ч ъ
+#	042E 0410 0411 0426 0414 0415 0424 0413   # ??-??   Ю А Б Ц Д Е Ф Г
+	00B8 0041 0042 0043 0044 0045 0046 0047   # C0-C7   ¸ A B C D E F G #
+	0048 0049 0000 03C9 00C2 00E0 00E4 00EA   # C8-CF   H I ␀ ω Â à ä ê #
+	00B4 004A 004B 004C 004D 004E 004F 0050   # D0-D7   ´ J K L M N O P #
+	0051 0052 00B1 00E9 00E8 00EB 00EE 00EF   # D8-DF   Q R ± é è ë î ï #
+	00B0 0000 0053 0054 0055 0056 0057 0058   # E0-E7   ° ␀ S T U V W X #
+	0059 005A 00BD 00F6 00F4 00FB 00F9 00FC   # E8-EF   Y Z ½ ö ô û ù ü #
+	0030 0031 0032 0033 0034 0035 0036 0037   # F0-F7   0 1 2 3 4 5 6 7 #
+	0038 0039 00FF 00E7 00C7 0000 0000 007F   # F8-FF   8 9 ÿ ç Ç ␀ ␀ ␡ #

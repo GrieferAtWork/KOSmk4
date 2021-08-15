@@ -80,6 +80,13 @@ function normalizeCodecName(name: string): string {
 	name = name.lower().replace("_", "-").replace(" ", "-");
 	assert " " !in name, repr name;
 	assert "--" !in name, repr name;
+	final local PREFIX_REPLACEMENTS = { "oem", "ibm", "iso", "cp", "latin", "koi", "l" };
+	for (local pr: PREFIX_REPLACEMENTS) {
+		if (name.startswith(pr) && #name >= #pr+2 &&
+		    name[#pr] == "-" && name.isdigit(#pr + 1))
+			name = pr + name[#pr+1:];
+	}
+	
 	local i = 0;
 	for (;;) {
 		i = name.find("0", i);
@@ -133,7 +140,10 @@ function uniEscape(o: int): string {
 		return string.chr(0x2400 + o);
 	if (o == 0x7f)
 		return string.chr(0x2421);
-	return string.chr(o);
+	local result = string.chr(o);
+	if (result.islf())
+		return string.chr(0x2424);
+	return result;
 }
 
 
@@ -507,8 +517,8 @@ function printCodepageDatabase(kind: int) {
 		for (local i, l: util.enumerate(table.segments(8))) {
 			local lo = shift + (i * 8);
 			print("		", ", ".join(for (local x: l) "0x" + x.hex()[2:].zfill(4)), ", /* ",
-				lo.hex()[2:], "h-",
-				(lo + 7).hex()[2:], "h */");
+				lo.hex()[2:].zfill(2), "h-",
+				(lo + 7).hex()[2:].zfill(2), "h */");
 		}
 		print("	}, {");
 		for (local i, ord: util.enumerate(encode_table.keys.sorted())) {

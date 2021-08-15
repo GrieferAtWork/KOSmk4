@@ -113,7 +113,7 @@ struct iconv_cp7h_database {
 	struct { char16_t _d[128]; struct iconv_codepage_encode_entry _e[128];  } db_HP_ROMAN8;
 	struct { char16_t _d[128]; struct iconv_codepage_encode_entry _e[106];  } db_ISO5428;
 	struct { char16_t _d[128]; struct iconv_codepage_encode_entry _e[93];   } db_ISO6438;
-	struct { char16_t _d[128]; struct iconv_codepage_encode_entry _e[104];  } db_ISO6937_2;
+	struct { char16_t _d[128]; struct iconv_codepage_encode_entry _e[104];  } db_ISO_6937_2;
 	struct { char16_t _d[128]; struct iconv_codepage_encode_entry _e[128];  } db_ISO_8859_10;
 	struct { char16_t _d[128]; struct iconv_codepage_encode_entry _e[121];  } db_ISO_8859_11;
 	struct { char16_t _d[128]; struct iconv_codepage_encode_entry _e[128];  } db_ISO_8859_13;
@@ -253,7 +253,7 @@ INTERN_CONST libiconv_cp7h_offset_t const libiconv_cp7h_offsets[134] = {
 	[CODEC_HP_ROMAN8 - CODEC_CP7H_MIN] = offsetof(struct iconv_cp7h_database, db_HP_ROMAN8),
 	[CODEC_ISO5428 - CODEC_CP7H_MIN] = offsetof(struct iconv_cp7h_database, db_ISO5428),
 	[CODEC_ISO6438 - CODEC_CP7H_MIN] = offsetof(struct iconv_cp7h_database, db_ISO6438),
-	[CODEC_ISO6937_2 - CODEC_CP7H_MIN] = offsetof(struct iconv_cp7h_database, db_ISO6937_2),
+	[CODEC_ISO_6937_2 - CODEC_CP7H_MIN] = offsetof(struct iconv_cp7h_database, db_ISO_6937_2),
 	[CODEC_ISO_8859_10 - CODEC_CP7H_MIN] = offsetof(struct iconv_cp7h_database, db_ISO_8859_10),
 	[CODEC_ISO_8859_11 - CODEC_CP7H_MIN] = offsetof(struct iconv_cp7h_database, db_ISO_8859_11),
 	[CODEC_ISO_8859_13 - CODEC_CP7H_MIN] = offsetof(struct iconv_cp7h_database, db_ISO_8859_13),
@@ -4070,7 +4070,7 @@ INTERN_CONST struct iconv_cp7h_database const libiconv_cp7h_db = {
 		{ 0x0294, 0xf9 }, { 0x0295, 0xf8 }, { 0x0298, 0xfa }, { 0xa7b3, 0xe5 },
 		{ 0xab53, 0xf5 },
 	} },
-	.db_ISO6937_2 = { {
+	.db_ISO_6937_2 = { {
 		0x0080, 0x0081, 0x0082, 0x0083, 0x0084, 0x0085, 0x0086, 0x0087, /* 80h-87h */
 		0x0088, 0x0089, 0x008a, 0x008b, 0x008c, 0x008d, 0x008e, 0x008f, /* 88h-8fh */
 		0x0090, 0x0091, 0x0092, 0x0093, 0x0094, 0x0095, 0x0096, 0x0097, /* 90h-97h */

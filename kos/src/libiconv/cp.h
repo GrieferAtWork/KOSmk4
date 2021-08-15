@@ -45,7 +45,7 @@ struct iconv_codepage {
 };
 
 struct iconv_cp_database;
-typedef uint16_t libiconv_cp_offset_t;
+typedef uint32_t libiconv_cp_offset_t;
 
 INTDEF struct iconv_cp_database const libiconv_cp_db;
 INTDEF libiconv_cp_offset_t const libiconv_cp_offsets[];
