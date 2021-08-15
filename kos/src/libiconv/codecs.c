@@ -1340,11 +1340,11 @@ PRIVATE struct codec_db_entry codec_db[] = {
 
 /* Try to normalize the name of the given codec:
  *
- * - Prefix: "OEM" <SEP> <NUMBER>    --> "OEM" <NUMBER>
- * - Prefix: "IBM" <SEP> <NUMBER>    --> "IBM" <NUMBER>
- * - Prefix: "CP" <SEP> <NUMBER>     --> "CP" <NUMBER>
- * - Prefix: "LATIN" <SEP> <NUMBER>  --> "LATIN" <NUMBER>
- * - Prefix: "L" <SEP> <NUMBER>      --> "L" <NUMBER>
+ * - If the name starts with one of <PFX> <SEP> <DIGIT>, then <SEP>
+ *   is removed, where <DIGIT> must be one of 0123456789, and <SEP>
+ *   is one of "_- ", and <PFX> is one of:
+ *      "OEM", "IBM", "ISO", "CP", "LATIN", "KOI", "L"
+ *
  * - Replace "_" and " " with "-"; <SEP> can be one of "_", "-" or " "
  * - Leading 0s are removed from embedded digit-sequences:
  *    - "abc1002def" --> "abc1002def"

@@ -134,12 +134,33 @@ function constructCodecObject(typ: Type, arg: string): Object {
 			parseCodecAlias(x)));
 }
 
+function italicChr(c: int): int {
+	if (c >= "A".ord() && c <= "Z".ord())
+		return 0x1D608 + c - "A".ord();
+	if (c >= "a".ord() && c <= "z".ord())
+		return 0x1D656 + c - "a".ord();
+	if (c >= "0".ord() && c <= "9".ord())
+		return 0x1D608 + c - "0".ord();
+	return c;
+}
+function italic(s: string): string {
+	return "".join(for (local c: s) string.chr(italicChr(c.ord())));
+}
 
 function uniEscape(o: int): string {
 	if (o <= 0x20)
 		return string.chr(0x2400 + o);
 	if (o == 0x7f)
 		return string.chr(0x2421);
+	if (o >= 0x80 && o <= 0x9f) {
+		local x = "PADHOPBPHNBHINDNELSSAESAHTSHTJVTSPLDPLURI SS2SS3"
+		          "DCSPU1PU2STSCCHMW SPAEPASOSSGCSCICSIST OSCPM APC";
+		local s = (o - 0x80) * 3;
+		return italic(x[s:s+3]);
+	}
+	local result = { 0x00A0 : "NBSP" }.get(o);
+	if (result !is none)
+		return italic(result);
 	local result = string.chr(o);
 	if (result.islf())
 		return string.chr(0x2424);
