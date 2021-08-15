@@ -40,8 +40,8 @@ struct iconv_codepage {
 	/* Sorted by `icee_uni': table for how to encode UNI into the cp. */
 	COMPILER_FLEXIBLE_ARRAY(struct iconv_codepage_encode_entry, icp_encode);
 
-#define icp_replacement icp_encode[0]._icee_pad /* Replacement character (for `ICONV_ERR_REPLACE') */
-#define icp_encode_max  icp_encode[1]._icee_pad /* # of encode entries minus 1. */
+#define icp_encode_max  icp_encode[0]._icee_pad /* # of encode entries minus 1. */
+#define icp_replacement icp_encode[1]._icee_pad /* Replacement character (for `ICONV_ERR_REPLACE') */
 };
 
 struct iconv_cp_database;

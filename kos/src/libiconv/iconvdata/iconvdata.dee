@@ -1,0 +1,570 @@
+/* Copyright (c) 2019-2021 Griefer@Work                                       *
+ *                                                                            *
+ * This software is provided 'as-is', without any express or implied          *
+ * warranty. In no event will the authors be held liable for any damages      *
+ * arising from the use of this software.                                     *
+ *                                                                            *
+ * Permission is granted to anyone to use this software for any purpose,      *
+ * including commercial applications, and to alter it and redistribute it     *
+ * freely, subject to the following restrictions:                             *
+ *                                                                            *
+ * 1. The origin of this software must not be misrepresented; you must not    *
+ *    claim that you wrote the original software. If you use this software    *
+ *    in a product, an acknowledgement (see the following) in the product     *
+ *    documentation is required:                                              *
+ *    Portions Copyright (c) 2019-2021 Griefer@Work                           *
+ * 2. Altered source versions must be plainly marked as such, and must not be *
+ *    misrepresented as being the original software.                          *
+ * 3. This notice may not be removed or altered from any source distribution. *
+ */
+
+import * from deemon;
+import fs;
+import util;
+
+
+global final CP_CLASS_8      = 0;
+global final CP_CLASS_7L     = 1;
+global final CP_CLASS_7H     = 2;
+global final CP_CLASS_ISO646 = 3;
+
+global final ISO646_OVERRIDE_ORDINALS = {
+	0x21, 0x22, 0x23, 0x24, 0x26, 0x3a, 0x3f, 0x40, 0x5b,
+	0x5c, 0x5d, 0x5e, 0x5f, 0x60, 0x7b, 0x7c, 0x7d, 0x7e
+};
+
+class CodecAlias {
+	this = default;
+	public member ppCond: string = "1";
+	public member name: string;
+}
+
+class Codec {
+	this = default;
+	public member name: string;
+	public member aliases: {CodecAlias...} = [];
+}
+
+class CodePage {
+	this = default;
+	public member name: string;
+	public member aliases: {CodecAlias...} = [];
+	public member table: {int...} = List([0] * 256);
+
+	@@Returns one of `CP_CLASS_*`
+	public function getCpClass(): int {
+		if (table[:128] == [:128])
+			return CP_CLASS_7H;
+		if (!(table[128:256] + ...)) {
+			/* Check for ISO646 */
+			local iso646_table = List([:128]);
+			for (local i: ISO646_OVERRIDE_ORDINALS)
+				iso646_table[i] = table[i];
+			if (iso646_table == table[:128])
+				return CP_CLASS_ISO646;
+			return CP_CLASS_7L;
+		}
+		return CP_CLASS_8;
+	}
+}
+
+function getEncodeTable(table: {int...}, shift: int): {int: int} {
+	local result = Dict();
+	for (local encoded, decoded: util.enumerate(table))
+		result.setdefault(decoded, encoded + shift);
+	return result;
+}
+
+
+function normalizeCodecName(name: string): string {
+	name = name.lower().replace("_", "-").replace(" ", "-");
+	assert " " !in name, repr name;
+	assert "--" !in name, repr name;
+	local i = 0;
+	for (;;) {
+		i = name.find("0", i);
+		if (i < 0)
+			break;
+		if (i + 1 < #name && name.isdigit(i + 1) &&
+			(i == 0 || !name.isdigit(i - 1)))
+			name = name[:i] + name[i+1:];
+		else {
+			++i;
+		}
+	}
+	return name;
+}
+
+
+function parseCodecAlias(s: string): CodecAlias {
+	local ppCond = "1";
+	s = s.strip();
+	if (s.startswith("[")) {
+		s = s[1:].lstrip();
+		if (!s.startswith("if"))
+			throw Error("Expected 'if' after '['");
+		s = s[2:].lstrip();
+		if (!s.startswith("("))
+			throw Error("Expected '(' after '[if'");
+		s = s[1:].lstrip();
+		local condEnd = s.findmatch("(", ")");
+		if (condEnd < 0)
+			throw Error("Missing ')' after '[if('");
+		ppCond = s[:condEnd].strip();
+		s = s[condEnd+1:].lstrip();
+		if (!s.startswith("]"))
+			throw Error("Expected ']' after '[if(...)'");
+		s = s[1:].lstrip();
+	}
+	return CodecAlias(ppCond: ppCond, name:
+		normalizeCodecName(s.decode("c-escape")));
+}
+
+function constructCodecObject(typ: Type, arg: string): Object {
+	local name, none, aliases = arg.partition(":")...;
+	return typ(name: name, aliases: Tuple(
+		for (local x: aliases.split(","))
+			parseCodecAlias(x)));
+}
+
+
+function uniEscape(o: int): string {
+	if (o <= 0x20)
+		return string.chr(0x2400 + o);
+	if (o == 0x7f)
+		return string.chr(0x2421);
+	return string.chr(o);
+}
+
+
+
+function parseDB(): {string: Object} {
+	local result = Dict();
+	local filename = fs.joinpath(fs.headof(__FILE__), "db");
+	local data = File.open(filename, "r").read().decode("utf-8");
+	local newData = File.Writer();
+	function errAt(i: int, msg: string) {
+		local sol = data.rfind("\n", 0, i) + 1;
+		local line = data.count("\n", 0, sol) + 1;
+		local col = 1 + (i - sol);
+		print(filename, "(", line, ",", col, ") : ", msg);
+		throw Error(msg);
+	}
+	local currentItem = none;
+	local currentIndex = none;
+	local i = 0, len = #data, flushStart = 0;
+	local usedNames = HashSet();
+	while (i < len) {
+		local ch = data[i];
+		if (ch.isspace()) {
+			++i;
+			continue;
+		}
+		if (ch == "#") {
+			i = data.find("\n", i);
+			if (i < 0)
+				i = len;
+			else {
+				++i;
+			}
+			continue;
+		}
+		if (ch == "@") {
+			++i;
+			if (i >= len || !data.issymstrt(i))
+				errAt(i, "Expected keyword after '@'");
+			local kwdStart = i;
+			++i;
+			while (i < len && data.issymcont(i))
+				++i;
+			local kwd = data[kwdStart:i];
+			while (i < len && data.isspace(i))
+				++i;
+			local arg = none;
+			local argStart = none;
+			if (i < len && data[i] == "(") {
+				argStart = i + 1;
+				local argEnd = data.findmatch("(", ")", argStart);
+				if (argEnd < 0)
+					errAt(i, "Unmatched '('");
+				arg = data[argStart:argEnd];
+				i = argEnd + 1;
+			}
+			function constructCurrentItem(typ: Type): Object {
+				local obj = constructCodecObject(typ, arg);
+				if (obj.name in result)
+					errAt(argStart, "Codec " + obj.name + " already defined");
+				result[obj.name] = obj;
+				for (local a: obj.aliases) {
+					if (a.ppCond != "1")
+						continue;
+					local lower_a = a.name.lower();
+					if (lower_a in usedNames)
+						errAt(argStart, "Alias " + a.name + " already defined");
+					usedNames.insert(lower_a);
+				}
+				return obj;
+			}
+
+			switch (kwd.lower()) {
+
+			case "codec":
+				currentItem  = constructCurrentItem(Codec);
+				currentIndex = 0;
+				break;
+
+			case "cp":
+				currentItem  = constructCurrentItem(CodePage);
+				currentIndex = 0;
+				break;
+
+			case "ord": {
+				local oldIndex = currentIndex;
+				try {
+					currentIndex = int(arg);
+				} catch (...) {
+					errAt(argStart, "Expected integer for @ord, but got " + repr arg);
+				}
+				if (currentItem is CodePage && oldIndex == 0) {
+					for (local i: [oldIndex:currentIndex]) {
+						if (currentItem.table[i] == 0)
+							currentItem.table[i] = i;
+					}
+				}
+			}	break;
+
+			default:
+				errAt(kwdStart, "Unknown command: " + repr kwd);
+			}
+			continue;
+		}
+		if (ch.isalnum()) {
+			local lineIds = [];
+			local lineStart = i;
+			for (;;) {
+				local uniStart = i;
+				++i;
+				while (i < len && data.isalnum(i))
+					++i;
+				local uni;
+				local istr = data[uniStart:i].lower();
+				if (istr.startswith("0x"))
+					istr = istr[2:];
+				try {
+					uni = int("0x" + istr);
+				} catch (...) {
+					errAt(uniStart, "Invalid hex integer: " + repr data[uniStart:i]);
+				}
+				lineIds.append(uni);
+				if (currentIndex >= 256)
+					errAt(uniStart, "Character index out-of-bounds");
+				if (currentItem !is CodePage)
+					errAt(uniStart, "Not inside of a codepage");
+				currentItem.table[currentIndex] = uni;
+				++currentIndex;
+				while (i < len && data.isspace(i) && !data.islf(i))
+					++i;
+				if (i < len && data[i] == ",") {
+					do {
+						++i;
+					} while (i < len && data.isspace(i) && !data.islf(i));
+				}
+				if (i >= len || !data.isalnum(i))
+					break;
+			}
+			if (i >= len || data[i] in "#\n") {
+				while (i > 0 && data.isspace(i - 1) && !data.islf(i - 1))
+					--i;
+				i = data.find("\n", i);
+				if (i < 0)
+					i = len;
+				newData << data[flushStart:lineStart];
+				for (local uni: lineIds)
+					newData << uni.hex()[2:].upper().zfill(4) << " ";
+				newData << "  # "
+					<< (currentIndex - #lineIds).hex()[2:].upper().zfill(2)
+					<< "-" << (currentIndex - 1).hex()[2:].upper().zfill(2)
+					<< "  ";
+				for (local uni: lineIds)
+					newData << " " << uniEscape(uni);
+				newData << " #";
+				flushStart = i;
+			}
+			continue;
+		}
+		errAt(i, "Unexpected character: " + repr ch);
+	}
+	newData << data[flushStart:];
+	newData = newData.string;
+	if (newData != data) {
+		newData = newData.encode("utf-8");
+		with (local fp = File.open(filename, "w"))
+			fp.write(newData);
+	}
+
+	local byTable = Dict();
+	for (local none, tab: result) {
+		if (tab is CodePage) {
+			tab.table = Tuple(tab.table);
+			if (tab.table == [:256])
+				throw Error("Codec " + repr tab.name + " is just latin-1/ascii");
+			local rp = repr tab.table;
+			if (rp in byTable) {
+				throw Error("Duplicate table: " +
+					tab.name + " and " +
+					byTable[rp].name + " (" + repr rp + ")");
+			}
+			byTable[rp] = tab;
+		}
+	}
+
+	return result;
+}
+
+global final CODECS = parseDB();
+
+/* Hacky way to work around deemon taking forever to exit (XXX: might be a deemon bug?) */
+Error.AppExit.atexit([]{ Error.AppExit.exit(0); });
+
+function printCodecEnums() {
+	local codecs_custom = [];
+	local codecs_cp8 = [];
+	local codecs_cp7l = [];
+	local codecs_cp7h = [];
+	local codecs_iso646 = [];
+	for (local name, codec: CODECS) {
+		if (codec is CodePage) {
+			switch (codec.getCpClass()) {
+			case CP_CLASS_8:
+				codecs_cp8.append(name);
+				break;
+			case CP_CLASS_7L:
+				codecs_cp7l.append(name);
+				break;
+			case CP_CLASS_7H:
+				codecs_cp7h.append(name);
+				break;
+			case CP_CLASS_ISO646:
+				codecs_iso646.append(name);
+				break;
+			}
+		} else {
+			codecs_custom.append(name);
+		}
+	}
+
+	function printCodec(name: string, len: int) {
+		local codec = CODECS[name];
+		print("	", name, ",", " " * (len - #name),
+			" /* ", ", ".join(
+				for (local x: codec.aliases)
+					if (x.ppCond == "1")
+						repr(x.name)),
+			" */");
+	}
+
+	function printCodecs(names: {string...}) {
+		local maxLen = names.each.length > ...;
+		for (local name: names)
+			printCodec(name, maxLen);
+	}
+
+	codecs_custom.sort();
+	codecs_cp8.sort();
+	codecs_cp7l.sort();
+	codecs_cp7h.sort();
+	codecs_iso646.sort();
+
+	print("	/* Custom codecs */");
+	printCodecs(codecs_custom);
+
+	print;
+	print("	/* 8-bit codepage codecs */");
+	print("#define CODEC_CP_MIN ", codecs_cp8.first);
+	printCodecs(codecs_cp8);
+	print("#define CODEC_CP_MAX ", codecs_cp8.last);
+
+	print;
+	print("	/* 7l codepage codecs */");
+	print("#define CODEC_CP7L_MIN ", codecs_cp7l.first);
+	printCodecs(codecs_cp7l);
+	print("#define CODEC_CP7L_MAX ", codecs_cp7l.last);
+
+	print;
+	print("	/* 7h codepage codecs */");
+	print("#define CODEC_CP7H_MIN ", codecs_cp7h.first);
+	printCodecs(codecs_cp7h);
+	print("#define CODEC_CP7H_MAX ", codecs_cp7h.last);
+
+	print;
+	print("	/* iso646 codepage codecs */");
+	print("#define CODEC_ISO646_MIN ", codecs_iso646.first);
+	printCodecs(codecs_iso646);
+	print("#define CODEC_ISO646_MAX ", codecs_iso646.last);
+}
+
+
+
+function printCodecNameDB() {
+	local map: {string: {string: Object}} = Dict();
+	for (local x: CODECS.values) {
+		for (local a: x.aliases) {
+			local v = map.get(a.name);
+			if (v is none)
+				map[a.name] = v = Dict();
+			v[a.ppCond] = x;
+		}
+	}
+	local longestAliasLength = map.keys.each.length > ...;
+	print("#define CODE_NAME_MAXLEN ", longestAliasLength);
+	print("struct codec_db_entry {");
+	print("	char         cdbe_name[CEIL_ALIGN(", (longestAliasLength + 1), ", __SIZEOF_INT__)];");
+	print("	unsigned int cdbe_codec; /* The associated codec. */");
+	print("};");
+	print;
+	print("PRIVATE struct codec_db_entry codec_db[] = {");
+	for (local name: map.keys.sorted()) {
+		local lastPpCond = none;
+		for (local ppCond, codec: map[name]) {
+			if (lastPpCond is none) {
+				if (ppCond != "1") {
+					print("#if ", ppCond);
+					lastPpCond = ppCond;
+				}
+			} else if (ppCond != "1") {
+				lastPpCond = "";
+				print("#elif ", ppCond);
+			}
+			print("	{ ", repr name, ", ", " " * (longestAliasLength - #name), codec.name, " },");
+		}
+		if (lastPpCond !is none)
+			print("#endif /* ", lastPpCond ?: "..." , " */");
+	}
+	print("};");
+}
+
+function printCodepageDatabase(kind: int) {
+	local cpInsert = {
+		CP_CLASS_8  : "",
+		CP_CLASS_7L : "7l",
+		CP_CLASS_7H : "7h",
+	}[kind];
+	local cpInsertUpper = cpInsert.upper();
+	local codecs = [];
+	for (local none, codec: CODECS) {
+		if (codec is CodePage && codec.getCpClass() == kind)
+			codecs.append(codec);
+	}
+	codecs.sort(CodePage.name);
+	function dbFieldName(name: string): string {
+		if (name.startswith("CODEC_"))
+			return "db_" + name[6:];
+		return "db_" + name;
+	}
+	
+	print("/* Codepage database blob. */");
+	print("struct iconv_cp", cpInsert, "_database {");
+	for (local cp: codecs) {
+		local table = cp.table;
+		local shift = 0;
+		if (kind == CP_CLASS_7L) {
+			table = table[:128];
+		} else if (kind == CP_CLASS_7H) {
+			table = table[128:];
+			shift = 128;
+		}
+		local encode_table = getEncodeTable(table, shift);
+		local len = str(#encode_table);
+		print("	struct { char16_t _d[", #table, "]; struct iconv_codepage_encode_entry _e[", len, "]; ",
+			" " * (3 - #len), " } ", dbFieldName(cp.name), ";");
+	}
+	print("};");
+
+	print;
+	print("/* Codepage database offsets. */");
+	print("STATIC_ASSERT((libiconv_cp", cpInsert, "_offset_t)-1 >= sizeof(struct iconv_cp", cpInsert, "_database));");
+	print("STATIC_ASSERT(CODEC_CP", cpInsertUpper, "_MIN + ", (#codecs-1), " == CODEC_CP", cpInsertUpper, "_MAX);");
+	print("INTERN_CONST libiconv_cp", cpInsert, "_offset_t const libiconv_cp", cpInsert, "_offsets[", #codecs, "] = {");
+	for (local cp: codecs) {
+		print("	[", cp.name, " - CODEC_CP", cpInsertUpper, "_MIN] = offsetof(struct iconv_cp", cpInsert, "_database, ", dbFieldName(cp.name), "),");
+	}
+	print("};");
+
+	print;
+	print("/* The actual codepage database. */");
+	print("INTERN_CONST struct iconv_cp", cpInsert, "_database const libiconv_cp", cpInsert, "_db = {");
+	for (local cp: codecs) {
+		local table = cp.table;
+		local shift = 0;
+		if (kind == CP_CLASS_7L) {
+			table = table[:128];
+		} else if (kind == CP_CLASS_7H) {
+			table = table[128:];
+			shift = 128;
+		}
+		local encode_table = getEncodeTable(table, shift);
+		print("	.", dbFieldName(cp.name), " = { {");
+		for (local i, l: util.enumerate(table.segments(8))) {
+			local lo = shift + (i * 8);
+			print("		", ", ".join(for (local x: l) "0x" + x.hex()[2:].zfill(4)), ", /* ",
+				lo.hex()[2:], "h-",
+				(lo + 7).hex()[2:], "h */");
+		}
+		print("	}, {");
+		for (local i, ord: util.enumerate(encode_table.keys.sorted())) {
+			if ((i % 4) == 0)
+				print("		"),;
+			local cp_ord = encode_table[ord];
+			print("{ 0x", ord.hex()[2:].zfill(4), ", 0x", cp_ord.hex()[2:].zfill(2)),;
+			if (i == 0) {
+				local count = #encode_table;
+				if (kind == CP_CLASS_8)
+					--count;
+				print(", ", count),;
+			} else if (i == 1 && kind != CP_CLASS_7H) {
+				local repl_char = encode_table.get("?".ord());
+				if (repl_char is none) repl_char = encode_table.get(".".ord());
+				if (repl_char is none) repl_char = encode_table.get("-".ord());
+				if (repl_char is none) repl_char = 0;
+				print(", 0x", repl_char.hex()[2:].zfill(2)),;
+			}
+			print(" },"),;
+			if ((i % 4) == 3)
+				print;
+			else if (i != #encode_table - 1) {
+				print(" "),;
+			}
+		}
+		if ((#encode_table % 4) != 0)
+			print;
+		print("	} },");
+	}
+	print("};");
+}
+
+function printCp8Database() -> printCodepageDatabase(CP_CLASS_8);
+function printCp7lDatabase() -> printCodepageDatabase(CP_CLASS_7L);
+function printCp7hDatabase() -> printCodepageDatabase(CP_CLASS_7H);
+
+function printCpIso646Database() {
+	local codecs = [];
+	for (local none, codec: CODECS) {
+		if (codec is CodePage && codec.getCpClass() == CP_CLASS_ISO646)
+			codecs.append(codec);
+	}
+	codecs.sort(CodePage.name);
+	print("INTERN_CONST struct iconv_iso646_codepage const libiconv_iso646_pages[", #codecs, "] = {");
+	local longestNameLen = codecs.each.name.length > ...;
+	for (local codec: codecs) {
+		print("	[", codec.name, " - CODEC_ISO646_MIN]",
+			" " * (longestNameLen - #codec.name), " = { { ",
+			", ".join(
+				for (local x: ISO646_OVERRIDE_ORDINALS)
+					"0x" + codec.table[x].hex()[2:].zfill(4)),
+			" } },");
+	}
+	print("};");
+}
+
+
+

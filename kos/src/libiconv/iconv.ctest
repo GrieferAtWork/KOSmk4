@@ -39,7 +39,6 @@ DECL_BEGIN
 
 PRIVATE _LPICONV_TRANSCODE_INIT _iconv_transcode_init = NULL;
 PRIVATE LPICONV_ENCODE_FLUSH iconv_encode_flush = NULL;
-;
 
 PRIVATE void convertz(char const *from_codec, char const *to_codec,
                       unsigned int error_mode, char const *from_text,

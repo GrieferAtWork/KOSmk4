@@ -335,7 +335,7 @@ PRIVATE ATTR_NOINLINE NONNULL((1, 2)) ssize_t
 			ptr = buf;
 		}
 		lo = 0;
-		hi = cp->i7lcp_encode_max;
+		hi = cp->i7lcp_encode_count;
 		while (lo < hi) {
 			size_t i;
 			i = (lo + hi) / 2;
@@ -404,7 +404,7 @@ INTERN NONNULL((1, 2)) ssize_t
 			ptr = buf;
 		}
 		lo = 0;
-		hi = cp->i7lcp_encode_max;
+		hi = cp->i7lcp_encode_count;
 		while (lo < hi) {
 			size_t i;
 			i = (lo + hi) / 2;

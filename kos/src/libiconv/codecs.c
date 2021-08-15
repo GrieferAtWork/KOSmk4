@@ -38,88 +38,24 @@
 
 DECL_BEGIN
 
-/*[[[deemon
-import * from deemon;
-local inCodecs = false;
-local name2codec = Dict();
-for (local l: File.open("./codecs.h")) {
-	l = l.strip();
-	if (l == "/" "*[[[begin:codecs]]]*" "/") {
-		inCodecs = true;
-		continue;
-	}
-	if (!inCodecs)
-		continue;
-	if (l == "/" "*[[[end:codecs]]]*" "/")
-		break;
-	if (!l || !l.issymstrt(0))
-		continue;
-	local codecEnd = 1;
-	while (codecEnd < #l && l.issymcont(codecEnd))
-		++codecEnd;
-	local codec = l[:codecEnd];
-	local i = l.find("/" "*");
-	if (i < 0)
-		continue;
-	l = l[i+2:].rsstrip("*" "/").strip();
-	while (l) {
-		local name;
-		if (l.startswith("\"")) {
-			local nameEnd = l.index("\"", 1) + 1;
-			name = l[:nameEnd].decode("c-escape");
-			l = l[nameEnd:];
-		} else {
-			local nameEnd = l.find(",");
-			if (nameEnd < 0)
-				nameEnd = #l;
-			name = l[:nameEnd].strip();
-			l = l[nameEnd:];
-		}
-		name = name.lower().replace("_", "-");
-		assert " " !in name, repr name;
-		assert "--" !in name, repr name;
-		local i = 0;
-		for (;;) {
-			i = name.find("0", i);
-			if (i < 0)
-				break;
-			if (i + 1 < #name && name.isdigit(i + 1) &&
-			    (i == 0 || !name.isdigit(i - 1)))
-				name = name[:i] + name[i+1:];
-			else {
-				++i;
-			}
-		}
-		if (name in name2codec)
-			throw Error("Duplicate mapping for " + repr name);
-		name2codec[name] = codec;
-		l = l.lstrip().lstrip(",").lstrip();
-	}
-}
-local longestNameLen = (name2codec.keys.each.length > ...) + 1;
-print("#define CODE_NAME_MAXLEN ", longestNameLen-1);
-print("struct codec_db_entry {");
-print("	char         cdbe_name[CEIL_ALIGN(", longestNameLen, ", __SIZEOF_INT__)];");
-print("	unsigned int cdbe_codec; /" "* The associated codec. *" "/");
-print("};");
-print();
-print("PRIVATE struct codec_db_entry codec_db[", #name2codec, "] = {");
-local longestNameReprLen = name2codec.keys.each.encode("c-escape").length > ...;
-for (local name: name2codec.keys.sorted()) {
-	local nameRepr = name.encode("c-escape");
-	print("	{ \"", nameRepr, "\", ", " " * (longestNameReprLen - #nameRepr), name2codec[name], " },");
-}
-print("};");
-]]]*/
+/*[[[deemon (printCodecNameDB from .iconvdata.iconvdata)();]]]*/
 #define CODE_NAME_MAXLEN 28
 struct codec_db_entry {
 	char         cdbe_name[CEIL_ALIGN(29, __SIZEOF_INT__)];
 	unsigned int cdbe_codec; /* The associated codec. */
 };
 
-PRIVATE struct codec_db_entry codec_db[779] = {
-	{ "10646-1:1993",                 CODEC_UTF32 },
-	{ "10646-1:1993/ucs4",            CODEC_UTF32 },
+PRIVATE struct codec_db_entry codec_db[] = {
+#if __BYTE_ORDER__ == __ORDER_BIG_ENDIAN__
+	{ "10646-1:1993",                 CODEC_UTF32BE },
+#elif __BYTE_ORDER__ == __ORDER_LITTLE_ENDIAN__
+	{ "10646-1:1993",                 CODEC_UTF32LE },
+#endif /* ... */
+#if __BYTE_ORDER__ == __ORDER_BIG_ENDIAN__
+	{ "10646-1:1993/ucs4",            CODEC_UTF32BE },
+#elif __BYTE_ORDER__ == __ORDER_LITTLE_ENDIAN__
+	{ "10646-1:1993/ucs4",            CODEC_UTF32LE },
+#endif /* ... */
 	{ "437",                          CODEC_CP437 },
 	{ "850",                          CODEC_CP850 },
 	{ "851",                          CODEC_CP851 },
@@ -133,6 +69,15 @@ PRIVATE struct codec_db_entry codec_db[779] = {
 	{ "865",                          CODEC_CP865 },
 	{ "866",                          CODEC_CP866 },
 	{ "869",                          CODEC_CP869 },
+	{ "8859-1",                       CODEC_ISO_8859_1 },
+	{ "8859-2",                       CODEC_ISO_8859_2 },
+	{ "8859-3",                       CODEC_ISO_8859_3 },
+	{ "8859-4",                       CODEC_ISO_8859_4 },
+	{ "8859-5",                       CODEC_ISO_8859_5 },
+	{ "8859-6",                       CODEC_ISO_8859_6 },
+	{ "8859-7",                       CODEC_ISO_8859_7 },
+	{ "8859-8",                       CODEC_ISO_8859_8 },
+	{ "8859-9",                       CODEC_ISO_8859_9 },
 	{ "904",                          CODEC_CP904 },
 	{ "ami1251",                      CODEC_AMIGA_1251 },
 	{ "amiga-1251",                   CODEC_AMIGA_1251 },
@@ -140,11 +85,15 @@ PRIVATE struct codec_db_entry codec_db[779] = {
 	{ "ansi-x3.4-1968",               CODEC_ASCII },
 	{ "ansi-x3.4-1986",               CODEC_ASCII },
 	{ "arabic",                       CODEC_ISO_8859_6 },
+	{ "arabic7",                      CODEC_ISO_IR_89 },
 	{ "ascii",                        CODEC_ASCII },
+	{ "asmo-449",                     CODEC_ISO_IR_89 },
 	{ "asmo-708",                     CODEC_ISO_8859_6 },
+	{ "baltic",                       CODEC_ISO_8859_13 },
 	{ "bcdic",                        CODEC_BCDIC },
 	{ "bn-74/3101-1",                 CODEC_ISO646_PL },
 	{ "bs-4730",                      CODEC_ISO646_GB },
+	{ "bs-viewdata",                  CODEC_ISO646_VIEWDATA },
 	{ "bulgaria-pc",                  CODEC_MIK },
 	{ "burroughs-b5500",              CODEC_BURROUGHS_B5500 },
 	{ "ca",                           CODEC_ISO646_CA },
@@ -167,9 +116,9 @@ PRIVATE struct codec_db_entry codec_db[779] = {
 	{ "cp10081",                      CODEC_CP1281 },
 	{ "cp10082",                      CODEC_CP1284 },
 	{ "cp1009",                       CODEC_ISO646_IRV_1983 },
-	{ "cp1010",                       CODEC_CP1010 },
+	{ "cp1010",                       CODEC_ISO646_FR },
 	{ "cp1011",                       CODEC_ISO646_DE },
-	{ "cp1012",                       CODEC_CP1012 },
+	{ "cp1012",                       CODEC_ISO646_IT },
 	{ "cp1013",                       CODEC_ISO646_GB },
 	{ "cp1014",                       CODEC_ISO646_ES2 },
 	{ "cp1015",                       CODEC_ISO646_PT2 },
@@ -220,10 +169,22 @@ PRIVATE struct codec_db_entry codec_db[779] = {
 	{ "cp1163",                       CODEC_CP1163 },
 	{ "cp1167",                       CODEC_KOI8_RU },
 	{ "cp1168",                       CODEC_KOI8_U },
-	{ "cp1200",                       CODEC_UTF16 },
-	{ "cp12000",                      CODEC_UTF32 },
+#if __BYTE_ORDER__ == __ORDER_BIG_ENDIAN__
+	{ "cp1200",                       CODEC_UTF16BE },
+#elif __BYTE_ORDER__ == __ORDER_LITTLE_ENDIAN__
+	{ "cp1200",                       CODEC_UTF16LE },
+#endif /* ... */
+#if __BYTE_ORDER__ == __ORDER_BIG_ENDIAN__
+	{ "cp12000",                      CODEC_UTF32BE },
+#elif __BYTE_ORDER__ == __ORDER_LITTLE_ENDIAN__
+	{ "cp12000",                      CODEC_UTF32LE },
+#endif /* ... */
 	{ "cp12001",                      CODEC_UTF32BE },
-	{ "cp1201",                       CODEC_UTF16 },
+#if __BYTE_ORDER__ == __ORDER_BIG_ENDIAN__
+	{ "cp1201",                       CODEC_UTF16BE },
+#elif __BYTE_ORDER__ == __ORDER_LITTLE_ENDIAN__
+	{ "cp1201",                       CODEC_UTF16LE },
+#endif /* ... */
 	{ "cp1250",                       CODEC_CP1250 },
 	{ "cp1251",                       CODEC_CP1251 },
 	{ "cp1252",                       CODEC_CP1252 },
@@ -244,7 +205,11 @@ PRIVATE struct codec_db_entry codec_db[779] = {
 	{ "cp1286",                       CODEC_CP1286 },
 	{ "cp1287",                       CODEC_CP1287 },
 	{ "cp1288",                       CODEC_CP1288 },
-	{ "cp13488",                      CODEC_UTF16 },
+#if __BYTE_ORDER__ == __ORDER_BIG_ENDIAN__
+	{ "cp13488",                      CODEC_UTF16BE },
+#elif __BYTE_ORDER__ == __ORDER_LITTLE_ENDIAN__
+	{ "cp13488",                      CODEC_UTF16LE },
+#endif /* ... */
 	{ "cp17248",                      CODEC_CP17248 },
 	{ "cp20105",                      CODEC_ISO646_IRV_1983 },
 	{ "cp20106",                      CODEC_ISO646_DE },
@@ -325,7 +290,7 @@ PRIVATE struct codec_db_entry codec_db[779] = {
 	{ "cp872",                        CODEC_CP872 },
 	{ "cp874",                        CODEC_CP874 },
 	{ "cp878",                        CODEC_KOI8_R },
-	{ "cp895",                        CODEC_CP895 },
+	{ "cp895",                        CODEC_ISO646_JP },
 	{ "cp896",                        CODEC_CP896 },
 	{ "cp897",                        CODEC_CP897 },
 	{ "cp901",                        CODEC_CP901 },
@@ -333,10 +298,10 @@ PRIVATE struct codec_db_entry codec_db[779] = {
 	{ "cp903",                        CODEC_CP903 },
 	{ "cp904",                        CODEC_CP904 },
 	{ "cp9066",                       CODEC_CP874 },
-	{ "cp912",                        CODEC_CP912 },
+	{ "cp912",                        CODEC_ISO_8859_2 },
 	{ "cp913",                        CODEC_ISO_8859_3 },
 	{ "cp914",                        CODEC_ISO_8859_4 },
-	{ "cp915",                        CODEC_CP915 },
+	{ "cp915",                        CODEC_ISO_8859_5 },
 	{ "cp916",                        CODEC_ISO_8859_8 },
 	{ "cp919",                        CODEC_ISO_8859_10 },
 	{ "cp920",                        CODEC_ISO_8859_9 },
@@ -346,12 +311,14 @@ PRIVATE struct codec_db_entry codec_db[779] = {
 	{ "cp991",                        CODEC_CP667 },
 	{ "csa-z243.4-1985-1",            CODEC_ISO646_CA },
 	{ "csa-z243.4-1985-2",            CODEC_ISO646_CA2 },
+	{ "csa-z243.4-1985-gr",           CODEC_ISO_IR_123 },
 	{ "csa-z243.419851",              CODEC_ISO646_CA },
 	{ "csa-z243.419852",              CODEC_ISO646_CA2 },
 	{ "csa7-1",                       CODEC_ISO646_CA },
 	{ "csa7-2",                       CODEC_ISO646_CA2 },
 	{ "csascii",                      CODEC_ASCII },
 	{ "csdecmcs",                     CODEC_CP1100 },
+	{ "csiso103t618bit",              CODEC_CP1036 },
 	{ "csiso10swedish",               CODEC_ISO646_SE },
 	{ "csiso11swedishfornames",       CODEC_ISO646_SE2 },
 	{ "csiso121canadian1",            CODEC_ISO646_CA },
@@ -362,9 +329,13 @@ PRIVATE struct codec_db_entry codec_db[779] = {
 	{ "csiso15italian",               CODEC_ISO646_IT },
 	{ "csiso16portugese",             CODEC_ISO646_PT },
 	{ "csiso17spanish",               CODEC_ISO646_ES },
+	{ "csiso19latingreek",            CODEC_ISO_IR_19 },
 	{ "csiso21german",                CODEC_ISO646_DE },
 	{ "csiso25french",                CODEC_ISO646_FR1 },
+	{ "csiso27latingreek1",           CODEC_ISO646_LATIN_GR_MIXED },
+	{ "csiso2intlrefversion",         CODEC_ISO_IR_2 },
 	{ "csiso4unitedkingdom",          CODEC_ISO646_GB },
+	{ "csiso5427cyrillic",            CODEC_ISO5427 },
 	{ "csiso58gb1988",                CODEC_ISO646_CN },
 	{ "csiso60danishnorwegian",       CODEC_ISO646_NO },
 	{ "csiso60norwegian1",            CODEC_ISO646_NO },
@@ -374,6 +345,7 @@ PRIVATE struct codec_db_entry codec_db[779] = {
 	{ "csiso84portuguese2",           CODEC_ISO646_PT2 },
 	{ "csiso85spanish2",              CODEC_ISO646_ES2 },
 	{ "csiso86hungarian",             CODEC_ISO646_HU },
+	{ "csiso90",                      CODEC_ISO6937_2 },
 	{ "csiso92jisc62991984b",         CODEC_ISO646_JP_OCR_B },
 	{ "csisolatin1",                  CODEC_ISO_8859_1 },
 	{ "csisolatin2",                  CODEC_ISO_8859_2 },
@@ -386,12 +358,18 @@ PRIVATE struct codec_db_entry codec_db[779] = {
 	{ "csisolatincyrillic",           CODEC_ISO_8859_5 },
 	{ "csisolatingreek",              CODEC_ISO_8859_7 },
 	{ "csisolatinhebrew",             CODEC_ISO_8859_8 },
+	{ "cskoi8r",                      CODEC_KOI8_R },
 	{ "csksc5636",                    CODEC_ISO646_KR },
+	{ "csn-369103",                   CODEC_ISO_IR_139 },
 	{ "cspc850multilingual",          CODEC_CP850 },
 	{ "cspc862latinhebrew",           CODEC_CP862 },
 	{ "cspc8codepage437",             CODEC_CP437 },
 	{ "cspcp852",                     CODEC_CP852 },
-	{ "csucs4",                       CODEC_UTF32 },
+#if __BYTE_ORDER__ == __ORDER_BIG_ENDIAN__
+	{ "csucs4",                       CODEC_UTF32BE },
+#elif __BYTE_ORDER__ == __ORDER_LITTLE_ENDIAN__
+	{ "csucs4",                       CODEC_UTF32LE },
+#endif /* ... */
 	{ "cuba",                         CODEC_ISO646_CU },
 	{ "cyrillic",                     CODEC_ISO_8859_5 },
 	{ "d7dec",                        CODEC_ISO646_DE },
@@ -414,9 +392,13 @@ PRIVATE struct codec_db_entry codec_db[779] = {
 	{ "drv8",                         CODEC_DIN_66303 },
 	{ "ds-2089",                      CODEC_ISO646_DK },
 	{ "ds2089",                       CODEC_ISO646_DK },
+	{ "e13b",                         CODEC_ISO_IR_98 },
 	{ "e7dec",                        CODEC_ISO646_ES },
+	{ "ecma-113",                     CODEC_KOI8_E },
 	{ "ecma-114",                     CODEC_ISO_8859_6 },
 	{ "ecma-118",                     CODEC_ISO_8859_7 },
+	{ "ecma-128",                     CODEC_ISO_8859_9 },
+	{ "ecma-cyrillic",                CODEC_KOI8_E },
 	{ "el8dec",                       CODEC_CP1287 },
 	{ "elot-928",                     CODEC_ISO_8859_7 },
 	{ "es",                           CODEC_ISO646_ES },
@@ -431,19 +413,24 @@ PRIVATE struct codec_db_entry codec_db[779] = {
 	{ "gb-198880",                    CODEC_ISO646_CN },
 	{ "gbcd",                         CODEC_GBCD },
 	{ "german",                       CODEC_ISO646_DE },
+	{ "gost-19768-74",                CODEC_ISO_IR_153 },
 	{ "greek",                        CODEC_ISO_8859_7 },
+	{ "greek-ccitt",                  CODEC_ISO_IR_150 },
+	{ "greek7",                       CODEC_ISO_IR_88 },
+	{ "greek7-old",                   CODEC_ISO_IR_18 },
 	{ "greek8",                       CODEC_ISO_8859_7 },
 	{ "hebrew",                       CODEC_ISO_8859_8 },
 	{ "hp-pc-8",                      CODEC_CP1057 },
 	{ "hp-roman-8",                   CODEC_CP1050 },
+	{ "hp-roman8",                    CODEC_HP_ROMAN8 },
 	{ "hu",                           CODEC_ISO646_HU },
-	{ "i7dec",                        CODEC_CP1012 },
+	{ "i7dec",                        CODEC_ISO646_IT },
 	{ "ibm1006",                      CODEC_CP1006 },
 	{ "ibm1008",                      CODEC_CP1008 },
 	{ "ibm1009",                      CODEC_ISO646_IRV_1983 },
-	{ "ibm1010",                      CODEC_CP1010 },
+	{ "ibm1010",                      CODEC_ISO646_FR },
 	{ "ibm1011",                      CODEC_ISO646_DE },
-	{ "ibm1012",                      CODEC_CP1012 },
+	{ "ibm1012",                      CODEC_ISO646_IT },
 	{ "ibm1013",                      CODEC_ISO646_GB },
 	{ "ibm1014",                      CODEC_ISO646_ES2 },
 	{ "ibm1015",                      CODEC_ISO646_PT2 },
@@ -517,65 +504,93 @@ PRIVATE struct codec_db_entry codec_db[779] = {
 	{ "ibm869",                       CODEC_CP869 },
 	{ "ibm874",                       CODEC_CP874 },
 	{ "ibm878",                       CODEC_KOI8_R },
-	{ "ibm895",                       CODEC_CP895 },
+	{ "ibm895",                       CODEC_ISO646_JP },
 	{ "ibm896",                       CODEC_CP896 },
 	{ "ibm901",                       CODEC_CP901 },
 	{ "ibm902",                       CODEC_CP902 },
 	{ "ibm903",                       CODEC_CP903 },
 	{ "ibm904",                       CODEC_CP904 },
 	{ "ibm9066",                      CODEC_CP874 },
-	{ "ibm912",                       CODEC_CP912 },
+	{ "ibm912",                       CODEC_ISO_8859_2 },
 	{ "ibm913",                       CODEC_ISO_8859_3 },
 	{ "ibm914",                       CODEC_ISO_8859_4 },
-	{ "ibm915",                       CODEC_CP915 },
+	{ "ibm915",                       CODEC_ISO_8859_5 },
 	{ "ibm916",                       CODEC_ISO_8859_8 },
 	{ "ibm919",                       CODEC_ISO_8859_10 },
 	{ "ibm920",                       CODEC_ISO_8859_9 },
 	{ "ibm921",                       CODEC_CP921 },
 	{ "ibm922",                       CODEC_CP922 },
 	{ "ibm923",                       CODEC_ISO_8859_15 },
+	{ "iec-p27-1",                    CODEC_ISO_IR_143 },
+	{ "inis",                         CODEC_ISO646_INIS_SUBSET },
+	{ "inis-8",                       CODEC_ISO_IR_50 },
+	{ "inis-cyrillic",                CODEC_ISO_IR_51 },
+	{ "invariant",                    CODEC_ISO646_INV },
+	{ "irv",                          CODEC_ISO_IR_2 },
 	{ "iso-8-bit-urdu",               CODEC_CP1006 },
 	{ "iso-celtic",                   CODEC_ISO_8859_14 },
 	{ "iso-ir-10",                    CODEC_ISO646_SE },
 	{ "iso-ir-100",                   CODEC_ISO_8859_1 },
 	{ "iso-ir-101",                   CODEC_ISO_8859_2 },
 	{ "iso-ir-102",                   CODEC_ISO646_T_61 },
+	{ "iso-ir-103",                   CODEC_CP1036 },
 	{ "iso-ir-109",                   CODEC_ISO_8859_3 },
 	{ "iso-ir-11",                    CODEC_ISO646_SE2 },
 	{ "iso-ir-110",                   CODEC_ISO_8859_4 },
 	{ "iso-ir-111",                   CODEC_KOI8_E },
 	{ "iso-ir-121",                   CODEC_ISO646_CA },
 	{ "iso-ir-122",                   CODEC_ISO646_CA2 },
+	{ "iso-ir-123",                   CODEC_ISO_IR_123 },
 	{ "iso-ir-126",                   CODEC_ISO_8859_7 },
 	{ "iso-ir-127",                   CODEC_ISO_8859_6 },
+	{ "iso-ir-13",                    CODEC_ISO_IR_13 },
 	{ "iso-ir-138",                   CODEC_ISO_8859_8 },
+	{ "iso-ir-139",                   CODEC_ISO_IR_139 },
 	{ "iso-ir-14",                    CODEC_ISO646_JP },
+	{ "iso-ir-141",                   CODEC_ISO646_YU },
+	{ "iso-ir-143",                   CODEC_ISO_IR_143 },
 	{ "iso-ir-144",                   CODEC_ISO_8859_5 },
+	{ "iso-ir-146",                   CODEC_ISO_IR_146 },
+	{ "iso-ir-147",                   CODEC_ISO_IR_147 },
 	{ "iso-ir-148",                   CODEC_ISO_8859_9 },
 	{ "iso-ir-15",                    CODEC_ISO646_IT },
+	{ "iso-ir-150",                   CODEC_ISO_IR_150 },
 	{ "iso-ir-151",                   CODEC_ISO646_CU },
+	{ "iso-ir-152",                   CODEC_ISO_IR_152 },
 	{ "iso-ir-153",                   CODEC_ISO_IR_153 },
+	{ "iso-ir-154",                   CODEC_ISO_IR_154 },
+	{ "iso-ir-155",                   CODEC_ISO_IR_155 },
+	{ "iso-ir-156",                   CODEC_CP20269 },
 	{ "iso-ir-157",                   CODEC_ISO_8859_10 },
+	{ "iso-ir-158",                   CODEC_ISO_IR_158 },
 	{ "iso-ir-16",                    CODEC_ISO646_PT },
 	{ "iso-ir-17",                    CODEC_ISO646_ES },
 	{ "iso-ir-170",                   CODEC_ISO646_INV },
 	{ "iso-ir-179",                   CODEC_ISO_8859_13 },
+	{ "iso-ir-18",                    CODEC_ISO_IR_18 },
 	{ "iso-ir-182",                   CODEC_ISO_IR_182 },
+	{ "iso-ir-19",                    CODEC_ISO_IR_19 },
 	{ "iso-ir-193",                   CODEC_UTF8 },
 	{ "iso-ir-197",                   CODEC_ISO_IR_197 },
 	{ "iso-ir-199",                   CODEC_ISO_8859_14 },
-	{ "iso-ir-2",                     CODEC_ISO646_IRV_1973 },
+	{ "iso-ir-2",                     CODEC_ISO_IR_2 },
 	{ "iso-ir-200",                   CODEC_ISO_IR_200 },
 	{ "iso-ir-201",                   CODEC_ISO_IR_201 },
+	{ "iso-ir-203",                   CODEC_ISO_8859_15 },
 	{ "iso-ir-206",                   CODEC_ISO_IR_206 },
 	{ "iso-ir-207",                   CODEC_ISO646_IE },
 	{ "iso-ir-21",                    CODEC_ISO646_DE },
 	{ "iso-ir-226",                   CODEC_ISO_8859_16 },
 	{ "iso-ir-25",                    CODEC_ISO646_FR1 },
 	{ "iso-ir-27",                    CODEC_ISO646_LATIN_GR_MIXED },
+	{ "iso-ir-37",                    CODEC_ISO5427 },
 	{ "iso-ir-4",                     CODEC_ISO646_GB },
 	{ "iso-ir-47",                    CODEC_ISO646_VIEWDATA },
 	{ "iso-ir-49",                    CODEC_ISO646_INIS_SUBSET },
+	{ "iso-ir-50",                    CODEC_ISO_IR_50 },
+	{ "iso-ir-51",                    CODEC_ISO_IR_51 },
+	{ "iso-ir-54",                    CODEC_ISO_IR_54 },
+	{ "iso-ir-55",                    CODEC_ISO_IR_55 },
 	{ "iso-ir-57",                    CODEC_ISO646_CN },
 	{ "iso-ir-6",                     CODEC_ASCII },
 	{ "iso-ir-60",                    CODEC_ISO646_NO },
@@ -583,21 +598,48 @@ PRIVATE struct codec_db_entry codec_db[779] = {
 	{ "iso-ir-68",                    CODEC_ISO_IR_68 },
 	{ "iso-ir-69",                    CODEC_ISO646_FR },
 	{ "iso-ir-8",                     CODEC_ISO646_SEFI_NATS },
+	{ "iso-ir-8-1",                   CODEC_ISO_IR_8_1 },
+	{ "iso-ir-8-2",                   CODEC_ISO_IR_8_2 },
 	{ "iso-ir-84",                    CODEC_ISO646_PT2 },
 	{ "iso-ir-85",                    CODEC_ISO646_ES2 },
 	{ "iso-ir-86",                    CODEC_ISO646_HU },
+	{ "iso-ir-88",                    CODEC_ISO_IR_88 },
+	{ "iso-ir-89",                    CODEC_ISO_IR_89 },
 	{ "iso-ir-9-1",                   CODEC_ISO646_DANO_NATS },
+	{ "iso-ir-9-2",                   CODEC_ISO_IR_9_2 },
+	{ "iso-ir-90",                    CODEC_ISO6937_2 },
+	{ "iso-ir-91",                    CODEC_ISO_IR_91 },
 	{ "iso-ir-92",                    CODEC_ISO646_JP_OCR_B },
-	{ "iso10646",                     CODEC_UTF32 },
-	{ "iso10646/ucs2",                CODEC_UTF16 },
-	{ "iso10646/ucs4",                CODEC_UTF32 },
+	{ "iso-ir-93",                    CODEC_ISO_IR_93 },
+	{ "iso-ir-94",                    CODEC_ISO_IR_94 },
+	{ "iso-ir-96",                    CODEC_ISO_IR_96 },
+	{ "iso-ir-98",                    CODEC_ISO_IR_98 },
+	{ "iso10367-box",                 CODEC_ISO_IR_155 },
+#if __BYTE_ORDER__ == __ORDER_BIG_ENDIAN__
+	{ "iso10646",                     CODEC_UTF32BE },
+#elif __BYTE_ORDER__ == __ORDER_LITTLE_ENDIAN__
+	{ "iso10646",                     CODEC_UTF32LE },
+#endif /* ... */
+#if __BYTE_ORDER__ == __ORDER_BIG_ENDIAN__
+	{ "iso10646/ucs2",                CODEC_UTF16BE },
+#elif __BYTE_ORDER__ == __ORDER_LITTLE_ENDIAN__
+	{ "iso10646/ucs2",                CODEC_UTF16LE },
+#endif /* ... */
+#if __BYTE_ORDER__ == __ORDER_BIG_ENDIAN__
+	{ "iso10646/ucs4",                CODEC_UTF32BE },
+#elif __BYTE_ORDER__ == __ORDER_LITTLE_ENDIAN__
+	{ "iso10646/ucs4",                CODEC_UTF32LE },
+#endif /* ... */
 	{ "iso10646/utf-8",               CODEC_UTF8 },
 	{ "iso10646/utf8",                CODEC_UTF8 },
 	{ "iso2033",                      CODEC_ISO2033 },
+	{ "iso2033-1983",                 CODEC_ISO_IR_98 },
 	{ "iso5426",                      CODEC_ISO5426 },
 	{ "iso5426-2",                    CODEC_ISO5426_2 },
 	{ "iso5427",                      CODEC_ISO5427 },
+	{ "iso5427:1981",                 CODEC_ISO_IR_54 },
 	{ "iso5428",                      CODEC_ISO5428 },
+	{ "iso5428:1980",                 CODEC_ISO_IR_55 },
 	{ "iso6438",                      CODEC_ISO6438 },
 	{ "iso646-ca",                    CODEC_ISO646_CA },
 	{ "iso646-ca2",                   CODEC_ISO646_CA2 },
@@ -628,44 +670,93 @@ PRIVATE struct codec_db_entry codec_db[779] = {
 	{ "iso646-se2",                   CODEC_ISO646_SE2 },
 	{ "iso646-us",                    CODEC_ASCII },
 	{ "iso646-yu",                    CODEC_ISO646_YU },
+	{ "iso646.basic:1983",            CODEC_ISO646_BASIC },
+	{ "iso646.irv:1983",              CODEC_ISO_IR_2 },
 	{ "iso646.irv:1991",              CODEC_ASCII },
 	{ "iso6937",                      CODEC_CP20269 },
-	{ "iso6937-2-25",                 CODEC_CP20269 },
-	{ "iso6937-2-add",                CODEC_CP20269 },
+	{ "iso6937-2",                    CODEC_ISO6937_2 },
+	{ "iso6937-2-25",                 CODEC_ISO_IR_152 },
+	{ "iso6937-2:1983",               CODEC_ISO6937_2 },
+	{ "iso69372",                     CODEC_ISO6937_2 },
+	{ "iso6937:1992",                 CODEC_CP20269 },
 	{ "iso8859-1",                    CODEC_ISO_8859_1 },
 	{ "iso8859-1-i",                  CODEC_ISO_8859_1 },
 	{ "iso8859-10",                   CODEC_ISO_8859_10 },
+	{ "iso8859-10:1992",              CODEC_ISO_8859_10 },
 	{ "iso8859-11",                   CODEC_ISO_8859_11 },
 	{ "iso8859-13",                   CODEC_ISO_8859_13 },
 	{ "iso8859-14",                   CODEC_ISO_8859_14 },
+	{ "iso8859-14:1998",              CODEC_ISO_8859_14 },
 	{ "iso8859-15",                   CODEC_ISO_8859_15 },
+	{ "iso8859-15:1998",              CODEC_ISO_8859_15 },
 	{ "iso8859-16",                   CODEC_ISO_8859_16 },
+	{ "iso8859-16:2001",              CODEC_ISO_8859_16 },
+	{ "iso8859-1:1987",               CODEC_ISO_8859_1 },
 	{ "iso8859-2",                    CODEC_ISO_8859_2 },
+	{ "iso8859-2:1987",               CODEC_ISO_8859_2 },
 	{ "iso8859-3",                    CODEC_ISO_8859_3 },
+	{ "iso8859-3:1988",               CODEC_ISO_8859_3 },
 	{ "iso8859-4",                    CODEC_ISO_8859_4 },
+	{ "iso8859-4:1988",               CODEC_ISO_8859_4 },
 	{ "iso8859-5",                    CODEC_ISO_8859_5 },
+	{ "iso8859-5:1988",               CODEC_ISO_8859_5 },
 	{ "iso8859-6",                    CODEC_ISO_8859_6 },
 	{ "iso8859-6-i",                  CODEC_ISO_8859_6 },
+	{ "iso8859-6:1987",               CODEC_ISO_8859_6 },
 	{ "iso8859-7",                    CODEC_ISO_8859_7 },
+	{ "iso8859-7:1987",               CODEC_ISO_8859_7 },
+	{ "iso8859-7:2003",               CODEC_ISO_8859_7 },
 	{ "iso8859-8",                    CODEC_ISO_8859_8 },
 	{ "iso8859-8-i",                  CODEC_ISO_8859_8 },
+	{ "iso8859-8:1988",               CODEC_ISO_8859_8 },
 	{ "iso8859-9",                    CODEC_ISO_8859_9 },
+	{ "iso8859-9:1989",               CODEC_ISO_8859_9 },
+	{ "iso8859-supp",                 CODEC_ISO_IR_154 },
+	{ "iso88591",                     CODEC_ISO_8859_1 },
+	{ "iso885910",                    CODEC_ISO_8859_10 },
+	{ "iso885911",                    CODEC_ISO_8859_11 },
+	{ "iso885913",                    CODEC_ISO_8859_13 },
+	{ "iso885914",                    CODEC_ISO_8859_14 },
+	{ "iso885915",                    CODEC_ISO_8859_15 },
+	{ "iso885916",                    CODEC_ISO_8859_16 },
+	{ "iso88592",                     CODEC_ISO_8859_2 },
+	{ "iso88593",                     CODEC_ISO_8859_3 },
+	{ "iso88594",                     CODEC_ISO_8859_4 },
+	{ "iso88595",                     CODEC_ISO_8859_5 },
+	{ "iso88596",                     CODEC_ISO_8859_6 },
+	{ "iso88597",                     CODEC_ISO_8859_7 },
+	{ "iso88598",                     CODEC_ISO_8859_8 },
+	{ "iso88599",                     CODEC_ISO_8859_9 },
+	{ "iso9036",                      CODEC_ISO_IR_89 },
 	{ "it",                           CODEC_ISO646_IT },
 	{ "jis-c-6229-ocr-a",             CODEC_ISO2033 },
+	{ "jis-c6220-1969",               CODEC_ISO_IR_13 },
+	{ "jis-c6220-1969-jp",            CODEC_ISO_IR_13 },
 	{ "jis-c6220-1969-ro",            CODEC_ISO646_JP },
 	{ "jis-c62201969ro",              CODEC_ISO646_JP },
+	{ "jis-c6229-1984-a",             CODEC_ISO_IR_91 },
 	{ "jis-c6229-1984-b",             CODEC_ISO646_JP_OCR_B },
+	{ "jis-c6229-1984-b-add",         CODEC_ISO_IR_93 },
+	{ "jis-c6229-1984-hand",          CODEC_ISO_IR_94 },
+	{ "jis-c6229-1984-kana",          CODEC_ISO_IR_96 },
 	{ "jis-c62291984b",               CODEC_ISO646_JP_OCR_B },
+	{ "jis-x201",                     CODEC_X0201 },
 	{ "jp",                           CODEC_ISO646_JP },
+	{ "jp-ocr-a",                     CODEC_ISO_IR_91 },
 	{ "jp-ocr-b",                     CODEC_ISO646_JP_OCR_B },
+	{ "jp-ocr-b-add",                 CODEC_ISO_IR_93 },
+	{ "jp-ocr-hand",                  CODEC_ISO_IR_94 },
 	{ "js",                           CODEC_ISO646_YU },
 	{ "jus-i.b1.2",                   CODEC_ISO646_YU },
+	{ "jus-i.b1.3-mac",               CODEC_ISO_IR_147 },
+	{ "jus-i.b1.3-serb",              CODEC_ISO_IR_146 },
 	{ "kamenicky",                    CODEC_KEYBCS2 },
+	{ "katakana",                     CODEC_ISO_IR_13 },
 	{ "kbl",                          CODEC_CP771 },
 	{ "keybcs2",                      CODEC_KEYBCS2 },
-	{ "koi0",                         CODEC_KOI7_N1 },
-	{ "koi7-n0",                      CODEC_KOI7 },
-	{ "koi7-n1",                      CODEC_KOI7_N1 },
+	{ "koi0",                         CODEC_ISO5427 },
+	{ "koi7-n0",                      CODEC_ISO646_IRV_1983 },
+	{ "koi7-n1",                      CODEC_ISO5427 },
 	{ "koi7-n2",                      CODEC_KOI7_N2 },
 	{ "koi8",                         CODEC_KOI8 },
 	{ "koi8-b",                       CODEC_KOI8_B },
@@ -691,8 +782,13 @@ PRIVATE struct codec_db_entry codec_db[779] = {
 	{ "l6",                           CODEC_ISO_8859_10 },
 	{ "l7",                           CODEC_ISO_8859_13 },
 	{ "l8",                           CODEC_ISO_8859_14 },
+	{ "lap",                          CODEC_ISO_IR_158 },
+	{ "latin-greek",                  CODEC_ISO_IR_19 },
+	{ "latin-greek-1",                CODEC_ISO646_LATIN_GR_MIXED },
+	{ "latin-lap",                    CODEC_ISO_IR_158 },
 	{ "latin0",                       CODEC_ISO_8859_15 },
 	{ "latin1",                       CODEC_ISO_8859_1 },
+	{ "latin1-2-5",                   CODEC_ISO_IR_154 },
 	{ "latin10",                      CODEC_ISO_8859_16 },
 	{ "latin2",                       CODEC_ISO_8859_2 },
 	{ "latin3",                       CODEC_ISO_8859_3 },
@@ -702,6 +798,7 @@ PRIVATE struct codec_db_entry codec_db[779] = {
 	{ "latin7",                       CODEC_ISO_8859_13 },
 	{ "latin8",                       CODEC_ISO_8859_14 },
 	{ "latin9",                       CODEC_ISO_8859_15 },
+	{ "latingreek",                   CODEC_ISO_IR_19 },
 	{ "lics",                         CODEC_LICS },
 	{ "lst-1283",                     CODEC_CP774 },
 	{ "lst-1284",                     CODEC_CP772 },
@@ -711,6 +808,7 @@ PRIVATE struct codec_db_entry codec_db[779] = {
 	{ "mac",                          CODEC_CP1275 },
 	{ "mac-os-thai",                  CODEC_MAC_OS_THAI },
 	{ "macarabic",                    CODEC_CP10004 },
+	{ "macedonian",                   CODEC_ISO_IR_147 },
 	{ "macfarsi",                     CODEC_X_MAC_FARSI },
 	{ "macintosh",                    CODEC_CP1275 },
 	{ "macintosh-font-x",             CODEC_MACINTOSH_FONT_X },
@@ -723,11 +821,14 @@ PRIVATE struct codec_db_entry codec_db[779] = {
 	{ "ms874",                        CODEC_CP1162 },
 	{ "msdos-1252",                   CODEC_MSDOS1252 },
 	{ "msz-7795.3",                   CODEC_ISO646_HU },
+	{ "nats-dano",                    CODEC_ISO646_DANO_NATS },
+	{ "nats-dano-add",                CODEC_ISO_IR_9_2 },
+	{ "nats-sefi",                    CODEC_ISO_IR_8_1 },
+	{ "nats-sefi-add",                CODEC_ISO_IR_8_2 },
 	{ "nc-nc0-10",                    CODEC_ISO646_CU },
 	{ "nc-nc0-10:81",                 CODEC_ISO646_CU },
 	{ "nc-nc10",                      CODEC_ISO646_CU },
 	{ "nec-867",                      CODEC_KEYBCS2 },
-	{ "nec-apc",                      CODEC_NEC_APC },
 	{ "nf-z-62-10",                   CODEC_ISO646_FR },
 	{ "nf-z-62-10-(1973)",            CODEC_ISO646_FR1 },
 	{ "nf-z-62-10-(1983)",            CODEC_ISO646_FR },
@@ -755,14 +856,48 @@ PRIVATE struct codec_db_entry codec_db[779] = {
 	{ "oem865",                       CODEC_CP865 },
 	{ "oem869",                       CODEC_CP869 },
 	{ "oemus",                        CODEC_CP437 },
+	{ "osf10001",                     CODEC_ISO_8859_1 },
+	{ "osf10002",                     CODEC_ISO_8859_2 },
+	{ "osf10003",                     CODEC_ISO_8859_3 },
+	{ "osf10004",                     CODEC_ISO_8859_4 },
+	{ "osf10005",                     CODEC_ISO_8859_5 },
+	{ "osf10006",                     CODEC_ISO_8859_6 },
+	{ "osf10007",                     CODEC_ISO_8859_7 },
+	{ "osf10008",                     CODEC_ISO_8859_8 },
+	{ "osf10009",                     CODEC_ISO_8859_9 },
+	{ "osf1000a",                     CODEC_ISO_8859_10 },
 	{ "osf10020",                     CODEC_ASCII },
 	{ "osf100201b5",                  CODEC_CP437 },
-	{ "osf10100",                     CODEC_UTF16 },
-	{ "osf10101",                     CODEC_UTF16 },
-	{ "osf10102",                     CODEC_UTF16 },
-	{ "osf10104",                     CODEC_UTF32 },
-	{ "osf10105",                     CODEC_UTF32 },
-	{ "osf10106",                     CODEC_UTF32 },
+#if __BYTE_ORDER__ == __ORDER_BIG_ENDIAN__
+	{ "osf10100",                     CODEC_UTF16BE },
+#elif __BYTE_ORDER__ == __ORDER_LITTLE_ENDIAN__
+	{ "osf10100",                     CODEC_UTF16LE },
+#endif /* ... */
+#if __BYTE_ORDER__ == __ORDER_BIG_ENDIAN__
+	{ "osf10101",                     CODEC_UTF16BE },
+#elif __BYTE_ORDER__ == __ORDER_LITTLE_ENDIAN__
+	{ "osf10101",                     CODEC_UTF16LE },
+#endif /* ... */
+#if __BYTE_ORDER__ == __ORDER_BIG_ENDIAN__
+	{ "osf10102",                     CODEC_UTF16BE },
+#elif __BYTE_ORDER__ == __ORDER_LITTLE_ENDIAN__
+	{ "osf10102",                     CODEC_UTF16LE },
+#endif /* ... */
+#if __BYTE_ORDER__ == __ORDER_BIG_ENDIAN__
+	{ "osf10104",                     CODEC_UTF32BE },
+#elif __BYTE_ORDER__ == __ORDER_LITTLE_ENDIAN__
+	{ "osf10104",                     CODEC_UTF32LE },
+#endif /* ... */
+#if __BYTE_ORDER__ == __ORDER_BIG_ENDIAN__
+	{ "osf10105",                     CODEC_UTF32BE },
+#elif __BYTE_ORDER__ == __ORDER_LITTLE_ENDIAN__
+	{ "osf10105",                     CODEC_UTF32LE },
+#endif /* ... */
+#if __BYTE_ORDER__ == __ORDER_BIG_ENDIAN__
+	{ "osf10106",                     CODEC_UTF32BE },
+#elif __BYTE_ORDER__ == __ORDER_LITTLE_ENDIAN__
+	{ "osf10106",                     CODEC_UTF32LE },
+#endif /* ... */
 	{ "osf5010001",                   CODEC_UTF8 },
 	{ "palmos",                       CODEC_PALMOS },
 	{ "pc-multilingual-850+euro",     CODEC_CP858 },
@@ -775,6 +910,9 @@ PRIVATE struct codec_db_entry codec_db[779] = {
 	{ "pttc/bcd-d",                   CODEC_CP359 },
 	{ "pttc/bcd-h",                   CODEC_CP357 },
 	{ "pttc/bcd-m",                   CODEC_CP359 },
+	{ "r8",                           CODEC_HP_ROMAN8 },
+	{ "ref",                          CODEC_ISO646_BASIC },
+	{ "roman8",                       CODEC_HP_ROMAN8 },
 	{ "rst-2018-91",                  CODEC_CP1125 },
 	{ "ruscii",                       CODEC_CP1125 },
 	{ "ruslat",                       CODEC_CP3012 },
@@ -782,6 +920,7 @@ PRIVATE struct codec_db_entry codec_db[779] = {
 	{ "se2",                          CODEC_ISO646_SE2 },
 	{ "sen-850200-b",                 CODEC_ISO646_SE },
 	{ "sen-850200-c",                 CODEC_ISO646_SE2 },
+	{ "serbian",                      CODEC_ISO_IR_146 },
 	{ "short-koi",                    CODEC_KOI7_N2 },
 	{ "sr-14111",                     CODEC_ISO_8859_16 },
 	{ "ss636127",                     CODEC_ISO646_SE },
@@ -790,35 +929,79 @@ PRIVATE struct codec_db_entry codec_db[779] = {
 	{ "strk1048-2002",                CODEC_KZ_1048 },
 	{ "t.51",                         CODEC_CP20269 },
 	{ "t.61",                         CODEC_CP1036 },
+	{ "t.61-7bit",                    CODEC_ISO646_T_61 },
+	{ "t.61-8bit",                    CODEC_CP1036 },
+	{ "t.618bit",                     CODEC_CP1036 },
 	{ "tr8dec",                       CODEC_CP1288 },
-	{ "ucs-2",                        CODEC_UTF16 },
+	{ "ts-5881",                      CODEC_ISO_8859_9 },
+#if __BYTE_ORDER__ == __ORDER_BIG_ENDIAN__
+	{ "ucs-2",                        CODEC_UTF16BE },
+#elif __BYTE_ORDER__ == __ORDER_LITTLE_ENDIAN__
+	{ "ucs-2",                        CODEC_UTF16LE },
+#endif /* ... */
 	{ "ucs-2be",                      CODEC_UTF16BE },
 	{ "ucs-2le",                      CODEC_UTF16LE },
-	{ "ucs-4",                        CODEC_UTF32 },
+#if __BYTE_ORDER__ == __ORDER_BIG_ENDIAN__
+	{ "ucs-4",                        CODEC_UTF32BE },
+#elif __BYTE_ORDER__ == __ORDER_LITTLE_ENDIAN__
+	{ "ucs-4",                        CODEC_UTF32LE },
+#endif /* ... */
 	{ "ucs-4be",                      CODEC_UTF32BE },
 	{ "ucs-4le",                      CODEC_UTF32LE },
-	{ "ucs2",                         CODEC_UTF16 },
-	{ "ucs4",                         CODEC_UTF32 },
+#if __BYTE_ORDER__ == __ORDER_BIG_ENDIAN__
+	{ "ucs2",                         CODEC_UTF16BE },
+#elif __BYTE_ORDER__ == __ORDER_LITTLE_ENDIAN__
+	{ "ucs2",                         CODEC_UTF16LE },
+#endif /* ... */
+#if __BYTE_ORDER__ == __ORDER_BIG_ENDIAN__
+	{ "ucs4",                         CODEC_UTF32BE },
+#elif __BYTE_ORDER__ == __ORDER_LITTLE_ENDIAN__
+	{ "ucs4",                         CODEC_UTF32LE },
+#endif /* ... */
 	{ "uk",                           CODEC_ISO646_GB },
 	{ "unicodebig",                   CODEC_UTF16BE },
 	{ "unicodelittle",                CODEC_UTF16LE },
 	{ "us",                           CODEC_ASCII },
 	{ "us-ascii",                     CODEC_ASCII },
-	{ "utf-16",                       CODEC_UTF16 },
+#if __BYTE_ORDER__ == __ORDER_BIG_ENDIAN__
+	{ "utf-16",                       CODEC_UTF16BE },
+#elif __BYTE_ORDER__ == __ORDER_LITTLE_ENDIAN__
+	{ "utf-16",                       CODEC_UTF16LE },
+#endif /* ... */
 	{ "utf-16be",                     CODEC_UTF16BE },
 	{ "utf-16le",                     CODEC_UTF16LE },
-	{ "utf-32",                       CODEC_UTF32 },
+#if __BYTE_ORDER__ == __ORDER_BIG_ENDIAN__
+	{ "utf-32",                       CODEC_UTF32BE },
+#elif __BYTE_ORDER__ == __ORDER_LITTLE_ENDIAN__
+	{ "utf-32",                       CODEC_UTF32LE },
+#endif /* ... */
 	{ "utf-32be",                     CODEC_UTF32BE },
 	{ "utf-32le",                     CODEC_UTF32LE },
 	{ "utf-8",                        CODEC_UTF8 },
-	{ "utf16",                        CODEC_UTF16 },
+#if __BYTE_ORDER__ == __ORDER_BIG_ENDIAN__
+	{ "utf16",                        CODEC_UTF16BE },
+#elif __BYTE_ORDER__ == __ORDER_LITTLE_ENDIAN__
+	{ "utf16",                        CODEC_UTF16LE },
+#endif /* ... */
 	{ "utf16be",                      CODEC_UTF16BE },
 	{ "utf16le",                      CODEC_UTF16LE },
-	{ "utf32",                        CODEC_UTF32 },
+#if __BYTE_ORDER__ == __ORDER_BIG_ENDIAN__
+	{ "utf32",                        CODEC_UTF32BE },
+#elif __BYTE_ORDER__ == __ORDER_LITTLE_ENDIAN__
+	{ "utf32",                        CODEC_UTF32LE },
+#endif /* ... */
 	{ "utf32be",                      CODEC_UTF32BE },
 	{ "utf32le",                      CODEC_UTF32LE },
 	{ "utf8",                         CODEC_UTF8 },
-	{ "wchar-t",                      CODEC_WCHAR_T },
+#if __BYTE_ORDER__ == __ORDER_LITTLE_ENDIAN__ && __SIZEOF_WCHAR_T__ == 4
+	{ "wchar-t",                      CODEC_UTF32LE },
+#elif __BYTE_ORDER__ == __ORDER_BIG_ENDIAN__ && __SIZEOF_WCHAR_T__ == 4
+	{ "wchar-t",                      CODEC_UTF32BE },
+#elif __BYTE_ORDER__ == __ORDER_LITTLE_ENDIAN__ && __SIZEOF_WCHAR_T__ == 2
+	{ "wchar-t",                      CODEC_UTF16LE },
+#elif __BYTE_ORDER__ == __ORDER_BIG_ENDIAN__ && __SIZEOF_WCHAR_T__ == 2
+	{ "wchar-t",                      CODEC_UTF16BE },
+#endif /* ... */
 	{ "we8dec",                       CODEC_CP1100 },
 	{ "we8iso8859p1",                 CODEC_ISO_8859_1 },
 	{ "windows-10000",                CODEC_CP1275 },
@@ -842,7 +1025,11 @@ PRIVATE struct codec_db_entry codec_db[779] = {
 	{ "windows-1257",                 CODEC_CP1257 },
 	{ "windows-1258",                 CODEC_CP1258 },
 	{ "windows-1270",                 CODEC_CP1270 },
-	{ "windows-13488",                CODEC_UTF16 },
+#if __BYTE_ORDER__ == __ORDER_BIG_ENDIAN__
+	{ "windows-13488",                CODEC_UTF16BE },
+#elif __BYTE_ORDER__ == __ORDER_LITTLE_ENDIAN__
+	{ "windows-13488",                CODEC_UTF16LE },
+#endif /* ... */
 	{ "windows-20105",                CODEC_ISO646_IRV_1983 },
 	{ "windows-20106",                CODEC_ISO646_DE },
 	{ "windows-20127",                CODEC_ASCII },
@@ -896,6 +1083,8 @@ PRIVATE struct codec_db_entry codec_db[779] = {
 	{ "x-mac-turkish",                CODEC_CP1281 },
 	{ "x-mac-ukrainian",              CODEC_CP10017 },
 	{ "x-windows-874",                CODEC_CP1162 },
+	{ "x201",                         CODEC_X0201 },
+	{ "x201-7",                       CODEC_ISO_IR_13 },
 	{ "yu",                           CODEC_ISO646_YU },
 };
 /*[[[end]]]*/

@@ -81,7 +81,7 @@ INTERN NONNULL((1, 2)) ssize_t
 			struct iconv_7h_codepage const *cp;
 			cp = self->ice_data.ied_cp7h;
 			lo = 0;
-			hi = cp->i7hcp_encode_max;
+			hi = cp->i7hcp_encode_count;
 			while (lo < hi) {
 				size_t i;
 				i = (lo + hi) / 2;
@@ -200,7 +200,7 @@ force_normal_output:
 			struct iconv_7h_codepage const *cp;
 			cp = self->ice_data.ied_cp7h;
 			lo = 0;
-			hi = cp->i7hcp_encode_max;
+			hi = cp->i7hcp_encode_count;
 			while (lo < hi) {
 				size_t i;
 				i = (lo + hi) / 2;

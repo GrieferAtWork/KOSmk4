@@ -45,7 +45,7 @@ struct iconv_7h_codepage {
 
 	/* Sorted by `icee_uni': table for how to encode UNI into the cp. */
 	COMPILER_FLEXIBLE_ARRAY(struct iconv_codepage_encode_entry, i7hcp_encode);
-#define i7hcp_encode_max i7hcp_encode[0]._icee_pad /* # of encode entries. */
+#define i7hcp_encode_count i7hcp_encode[0]._icee_pad /* # of encode entries. */
 };
 
 struct iconv_cp7h_database;

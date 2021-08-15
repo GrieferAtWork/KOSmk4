@@ -248,19 +248,19 @@ NOTHROW_NCX(CC libiconv_encode_init)(/*in|out*/ struct iconv_encode *__restrict 
 INTERN NONNULL((1)) ssize_t
 NOTHROW_NCX(CC libiconv_encode_flush)(struct iconv_encode *__restrict self) {
 	ssize_t result = 0;
-	/* All encode codecs need a UTF-8 multi-byte state descriptor  so
-	 * that they're able to decode the in-coming UTF-8 data. Here, we
-	 * have to reset that state! */
-	__mbstate_init(&self->ice_data.ied_utf8);
 	switch (self->ice_codec) {
 
 		/* No supported codec currently requires any additional work!
-		 * TODO: This will chance once support for more complicated
+		 * TODO: This will change once support for more complicated
 		 *       codecs gets added. */
 
 	default:
 		break;
 	}
+	/* All encode codecs need a UTF-8 multi-byte state descriptor  so
+	 * that they're able to decode the in-coming UTF-8 data. Here, we
+	 * have to reset that state! */
+	__mbstate_init(&self->ice_data.ied_utf8);
 	return result;
 }
 

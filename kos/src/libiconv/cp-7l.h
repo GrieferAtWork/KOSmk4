@@ -42,8 +42,8 @@ struct iconv_7l_codepage {
 
 	/* Sorted by `icee_uni': table for how to encode UNI into the cp. */
 	COMPILER_FLEXIBLE_ARRAY(struct iconv_codepage_encode_entry, i7lcp_encode);
-#define i7lcp_replacement i7lcp_encode[0]._icee_pad /* Replacement character. */
-#define i7lcp_encode_max  i7lcp_encode[1]._icee_pad /* # of encode entries. */
+#define i7lcp_encode_count i7lcp_encode[0]._icee_pad /* # of encode entries. */
+#define i7lcp_replacement  i7lcp_encode[1]._icee_pad /* Replacement character. */
 };
 
 struct iconv_cp7l_database;
