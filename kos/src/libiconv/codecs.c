@@ -1338,6 +1338,11 @@ PRIVATE struct codec_db_entry codec_db[] = {
 /*[[[end]]]*/
 
 
+PRIVATE char const remove_sep_prefixes[][6] = {
+	"oem", "ibm", "iso", "cp", "latin", "koi", "l"
+};
+
+
 /* Try to normalize the name of the given codec:
  *
  * - If the name starts with one of <PFX> <SEP> <DIGIT>, then <SEP>
@@ -1367,72 +1372,25 @@ NOTHROW_NCX(FCALL libiconv_normalize_codec_name)(char buf[CODE_NAME_MAXLEN + 1],
 #define issep(ch) ((ch) == '-' || (ch) == '_' || (ch) == ' ')
 	char *ptr, *end;
 	char const *nameend;
-	ptr = buf;
-	end = buf + CODE_NAME_MAXLEN;
+	unsigned int i;
+	ptr     = buf;
+	end     = buf + CODE_NAME_MAXLEN;
 	nameend = name + namelen;
+
+	/* Skip leading space. */
 	while (isspace(*name))
 		++name;
-	if ((name[0] == 'O' || name[0] == 'o') &&
-	    (name[1] == 'E' || name[1] == 'e') &&
-	    (name[2] == 'M' || name[2] == 'm') &&
-	    issep(name[3]) && isdigit(name[4])) {
-		/* Convert: `OEM-xxx' | `OEM_xxx' -> `OEMxxx' */
-		*ptr++ = 'o';
-		*ptr++ = 'e';
-		*ptr++ = 'm';
-		name += 4;
-	} else if ((name[0] == 'I' || name[0] == 'i') &&
-	           (name[1] == 'B' || name[1] == 'b') &&
-	           (name[2] == 'M' || name[2] == 'm') &&
-	           issep(name[3]) && isdigit(name[4])) {
-		/* Convert: `IBM-xxx' | `IBM_xxx' -> `IBMxxx' */
-		*ptr++ = 'i';
-		*ptr++ = 'b';
-		*ptr++ = 'm';
-		name += 4;
-	} else if ((name[0] == 'I' || name[0] == 'i') &&
-	           (name[1] == 'S' || name[1] == 's') &&
-	           (name[2] == 'O' || name[2] == 'o') &&
-	           issep(name[3]) && isdigit(name[4])) {
-		/* Convert: `ISO-xxx' | `ISO_xxx' -> `ISOxxx' */
-		*ptr++ = 'i';
-		*ptr++ = 's';
-		*ptr++ = 'o';
-		name += 4;
-	} else if ((name[0] == 'C' || name[0] == 'c') &&
-	           (name[1] == 'P' || name[1] == 'p') &&
-	           issep(name[2]) && isdigit(name[3])) {
-		/* Convert: `CP-xxx' | `CP_xxx' -> `CPxxx' */
-		*ptr++ = 'c';
-		*ptr++ = 'p';
-		name += 3;
-	} else if ((name[0] == 'L' || name[0] == 'l') &&
-	           (name[1] == 'A' || name[1] == 'a') &&
-	           (name[2] == 'T' || name[2] == 't') &&
-	           (name[3] == 'I' || name[3] == 'i') &&
-	           (name[4] == 'N' || name[4] == 'n') &&
-	           issep(name[5]) && isdigit(name[6])) {
-		/* Convert: `LATIN-xxx' | `LATIN_xxx' -> `LATINxxx' */
-		*ptr++ = 'l';
-		*ptr++ = 'a';
-		*ptr++ = 't';
-		*ptr++ = 'i';
-		*ptr++ = 'n';
-		name += 6;
-	} else if ((name[0] == 'K' || name[0] == 'k') &&
-	           (name[1] == 'O' || name[1] == 'o') &&
-	           (name[2] == 'I' || name[2] == 'i') &&
-	           issep(name[3]) && isdigit(name[4])) {
-		/* Convert: `KOI-xxx' -> `KOIxxx' */
-		*ptr++ = 'k';
-		*ptr++ = 'o';
-		*ptr++ = 'i';
-		name += 4;
-	} else if ((name[0] == 'L' || name[0] == 'l') &&
-	           issep(name[1]) && isdigit(name[2])) {
-		/* Convert: `l-xxx' | `l_xxx' -> `lxxx' */
-		*ptr++ = 'l';
-		name += 2;
+
+	/* Remove <SEP> characters are certain prefixes if those
+	 * prefixes are followed up with a digit character. */
+	for (i = 0; i < COMPILER_LENOF(remove_sep_prefixes); ++i) {
+		size_t len = strlen(remove_sep_prefixes[i]);
+		if (memcasecmp(name, remove_sep_prefixes[i], len * sizeof(char)) == 0 &&
+		    issep(name[len]) && isdigit(name[len + 1])) {
+			ptr = (char *)mempcpy(ptr, remove_sep_prefixes[i], len, sizeof(char));
+			name += len + 1; /* Skip the <SEP> character. */
+			break;
+		}
 	}
 
 	/* Strip trailing spaces. */
