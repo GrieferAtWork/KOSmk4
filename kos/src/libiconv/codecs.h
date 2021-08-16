@@ -64,7 +64,7 @@ enum {
 	CODEC_CP1042,                  /* "cp1042" */
 	CODEC_CP1043,                  /* "cp1043" */
 	CODEC_CP1046,                  /* "cp1046", "1046", "ibm1046" */
-	CODEC_CP1047,                  /* "cp1047", "ibm1047", "1047", "osf10020417" */
+	CODEC_CP1047,                  /* "cp1047", "ibm1047", "1047", "osf10020417", "csibm1047" */
 	CODEC_CP1057,                  /* "cp1057", "hp-pc-8" */
 	CODEC_CP1088,                  /* "cp1088" */
 	CODEC_CP1097,                  /* "cp1097", "ibm1097", "csibm1097" */
@@ -77,16 +77,16 @@ enum {
 	CODEC_CP1127,                  /* "cp1127" */
 	CODEC_CP1130,                  /* "cp1130", "ibm1130", "csibm1130" */
 	CODEC_CP1137,                  /* "cp1137", "ibm1137", "csibm1137" */
-	CODEC_CP1140,                  /* "cp1140", "ibm1140", "csibm1140" */
-	CODEC_CP1141,                  /* "cp1141", "ibm1141", "csibm1141" */
-	CODEC_CP1142,                  /* "cp1142", "ibm1142", "csibm1142" */
-	CODEC_CP1143,                  /* "cp1143", "ibm1143", "csibm1143" */
-	CODEC_CP1144,                  /* "cp1144", "ibm1144", "csibm1144" */
-	CODEC_CP1145,                  /* "cp1145", "ibm1145", "csibm1145" */
-	CODEC_CP1146,                  /* "cp1146", "ibm1146", "csibm1146" */
-	CODEC_CP1147,                  /* "cp1147", "ibm1147", "csibm1147" */
-	CODEC_CP1148,                  /* "cp1148", "ibm1148", "csibm1148" */
-	CODEC_CP1149,                  /* "cp1149", "ibm1149", "csibm1149" */
+	CODEC_CP1140,                  /* "cp1140", "ibm1140", "csibm1140", "ccsid1140", "ebcdic-us-37+euro" */
+	CODEC_CP1141,                  /* "cp1141", "ibm1141", "csibm1141", "ccsid1141", "ebcdic-de-273+euro" */
+	CODEC_CP1142,                  /* "cp1142", "ibm1142", "csibm1142", "ccsid1142", "ebcdic-dk-277+euro", "ebcdic-no-277+euro" */
+	CODEC_CP1143,                  /* "cp1143", "ibm1143", "csibm1143", "ccsid1143", "ebcdic-fi-278+euro", "ebcdic-se-278+euro" */
+	CODEC_CP1144,                  /* "cp1144", "ibm1144", "csibm1144", "ccsid1144", "ebcdic-it-280+euro" */
+	CODEC_CP1145,                  /* "cp1145", "ibm1145", "csibm1145", "ccsid1145", "ebcdic-es-284+euro" */
+	CODEC_CP1146,                  /* "cp1146", "ibm1146", "csibm1146", "ccsid1146", "ebcdic-gb-285+euro" */
+	CODEC_CP1147,                  /* "cp1147", "ibm1147", "csibm1147", "ccsid1147", "ebcdic-fr-297+euro" */
+	CODEC_CP1148,                  /* "cp1148", "ibm1148", "csibm1148", "ccsid1148", "ebcdic-international-500+euro" */
+	CODEC_CP1149,                  /* "cp1149", "ibm1149", "csibm1149", "ccsid1149", "ebcdic-is-871+euro" */
 	CODEC_CP1153,                  /* "cp1153", "ibm1153", "csibm1153" */
 	CODEC_CP1154,                  /* "cp1154", "ibm1154", "csibm1154" */
 	CODEC_CP1155,                  /* "cp1155", "ibm1155", "csibm1155" */
@@ -211,6 +211,7 @@ enum {
 	/* 7h codepage codecs */
 #define CODEC_CP7H_MIN CODEC_AMIGA_1251
 	CODEC_AMIGA_1251,             /* "amiga-1251", "ami1251", "amiga1251", "ami-1251", "csamiga1251" */
+	CODEC_ATARIST,                /* "atarist" */
 	CODEC_CP10004,                /* "cp10004", "windows-10004", "x-mac-arabic", "macarabic" */
 	CODEC_CP10006,                /* "cp10006", "windows-10006", "x-mac-greek" */
 	CODEC_CP10007,                /* "cp10007", "windows-10007", "cp1283", "ibm1283", "ms-mac-cyrillic", "msmaccyrillic" */
@@ -339,13 +340,14 @@ enum {
 	CODEC_KOI8_RU,                /* "koi8-ru", "cp1167", "ibm1167", "csibm1167" */
 	CODEC_KOI8_T,                 /* "koi8-t" */
 	CODEC_KOI8_U,                 /* "koi8-u", "koi8u", "cp21866", "cp1168", "ibm1168", "cskoi8u" */
-	CODEC_KZ_1048,                /* "kz-1048", "strk1048-2002", "rk1048", "cskz1048" */
+	CODEC_KZ_1048,                /* "kz-1048", "kz1048", "strk1048-2002", "rk1048", "cskz1048" */
 	CODEC_LICS,                   /* "lics" */
 	CODEC_MACINTOSH_LATIN,        /* "macintosh-latin" */
 	CODEC_MACIS,                  /* "macis", "mac-is" */
 	CODEC_MAC_OS_THAI,            /* "mac-os-thai" */
 	CODEC_MAC_SAMI,               /* "mac-sami" */
 	CODEC_MIK,                    /* "mik", "bulgaria-pc" */
+	CODEC_NEXTSTEP,               /* "nextstep" */
 	CODEC_PALMOS,                 /* "palmos" */
 	CODEC_PT154,                  /* "ptcp154", "csptcp154", "pt154", "cp154", "cyrillic-asian" */
 	CODEC_X_MAC_ARMENIAN,         /* "x-mac-armenian" */
