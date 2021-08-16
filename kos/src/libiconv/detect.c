@@ -47,6 +47,7 @@
 #include "codecs.h"
 #include "cp-7h.h"
 #include "cp-7l.h"
+#include "cp-iso646.h"
 #include "cp.h"
 #include "detect.h"
 #include "iconv.h"
@@ -215,7 +216,7 @@ PRIVATE ATTR_PURE NONNULL((2)) size_t
 NOTHROW_NCX(CC calculate_ascii_fuzzyness)(char16_t const decode[/*decode_count*/],
                                           uint16_t const byte_heuristic[/*decode_count*/],
                                           uint32_t byte_heuristic_sum,
-                                          size_t decode_count) {
+                                          size_t decode_count, bool is_iso646) {
 	uint32_t cp_heuristic_sum;
 	uint32_t cp_heuristic[128];
 	size_t i;
@@ -227,7 +228,16 @@ NOTHROW_NCX(CC calculate_ascii_fuzzyness)(char16_t const decode[/*decode_count*/
 		char16_t encoded;
 		if (byte_heuristic[i] == 0)
 			continue; /* Byte never appeared! */
-		encoded = decode ? decode[i] : (char16_t)i;
+		if (decode == NULL) {
+			encoded = (char16_t)i;
+		} else if (is_iso646) {
+			uint8_t index = libiconv_iso646_override[i];
+			encoded = (char16_t)i;
+			if (index < ISO646_OVERRIDE_COUNT)
+				encoded = decode[index];
+		} else {
+			encoded = decode[i];
+		}
 		if (!istxtchar(encoded))
 			goto nope; /* There are bytes that (when decoded) cannot appear in text. */
 		/* If it fits, copy over heuristic bytes. */
@@ -444,7 +454,7 @@ comment_check:
 comment_check_with_first_ch:
 				;
 				/* Skip characters which may indicate comments, as well
-				 * as whitespace that isn't related to new-lines. */
+				 * as  whitespace  that  isn't  related  to  new-lines. */
 			} while (is_comment_space_char(ch));
 
 			if ((ch == 'c' || ch == 'C') && (size_t)(end - data) >= 7) {
@@ -664,23 +674,38 @@ NOTHROW_NCX(CC libiconv_detect_codec)(void const *__restrict data, size_t size) 
 			iconv_codec_t codec;
 			iconv_codec_t best_codec = CODEC_UNKNOWN;
 			size_t fuzzy, best_fuzzyness = (size_t)-1;
+
+			/* Check cp7l pages. */
 			for (codec = CODEC_CP7L_MIN; codec <= CODEC_CP7L_MAX; ++codec) {
 				struct iconv_7l_codepage const *cp;
 				cp    = libiconv_cp7l_page(codec);
 				fuzzy = calculate_ascii_fuzzyness(cp->i7lcp_decode, heuristic,
-				                                  heuristic_sum, 128);
+				                                  heuristic_sum, 128, false);
 				if (best_fuzzyness > fuzzy) {
 					best_fuzzyness = fuzzy;
 					best_codec = codec;
 				}
 			}
+
+			/* Check iso646 code pages! (because they're a sub-set of cp7l pages) */
+			for (codec = CODEC_ISO646_MIN; codec <= CODEC_ISO646_MAX; ++codec) {
+				struct iconv_iso646_codepage const *cp;
+				cp    = libiconv_iso646_page(codec);
+				fuzzy = calculate_ascii_fuzzyness(cp->iic_override, heuristic,
+				                                  heuristic_sum, 128, true);
+				if (best_fuzzyness > fuzzy) {
+					best_fuzzyness = fuzzy;
+					best_codec = codec;
+				}
+			}
+
 			/* Also check how  "fuzzy" pure ASCII  is, but if  it's the best,  then
-			 * actually tell the caller that input is UTF-8 for 2 reasons. Firstly,
+			 * actually tell the caller that input is UTF-8 for 3 reasons. Firstly,
 			 * the part of the file which we tested might just have happened to not
 			 * contain any UTF-8  characters, and  there might be  more later,  and
 			 * secondly, UTF-8 is compatible with  ASCII, and thirdly, KOS is  much
-			 * faster is processing UTF-8 because that's the OS's native codec! */
-			fuzzy = calculate_ascii_fuzzyness(NULL, heuristic, heuristic_sum, 128);
+			 * faster in processing UTF-8 because that's the OS's native codec! */
+			fuzzy = calculate_ascii_fuzzyness(NULL, heuristic, heuristic_sum, 128, false);
 			if (best_fuzzyness >= fuzzy && fuzzy != (size_t)-1) { /* >= because we really like ASCII/UTF-8 :) */
 				best_fuzzyness = fuzzy;
 				best_codec = CODEC_UTF8;
@@ -709,15 +734,17 @@ is_8bit_codec:
 			if (hunch_check_utf8(data, size))
 				return CODEC_UTF8;
 
-			/* Because the low 128 entries in the heuristic seem to be  ASCII-compatible,
-			 * we  can now check if one of our  known cp7h codecs might be used to decode
-			 * input   data  (since   all  of  those   codecs  use  ASCII   as  a  basis)
+			/* Because the low 128 entries in the heuristic seem to be ASCII-compatible,
+			 * we  can now check if one of our known cp7h codecs might be used to decode
+			 * input data (since all of those codecs use ASCII as a basis)
+			 *
 			 * As such, piece together the set of  codecs that (if used) will decode  the
 			 * entire heuristic to text characters. If this set consists of only 1 codec,
 			 * then  that's the one we return. If there  is more than one codec, check if
 			 * the available codecs would all produce the same results if applied to  the
 			 * heuristic (i.e. do they differ for any of the non-empty bytes). If they're
 			 * all the same, then pick and return one at random.
+			 *
 			 * If all of this fails, indicate to the caller that the codec is unknown. */
 			{
 				iconv_codec_t cd;
@@ -816,7 +843,7 @@ next_cp7h_codec:
 
 				/* Check how fuzzy the decode-to-ascii part  */
 				fuzzy = calculate_ascii_fuzzyness(cp->icp_decode, heuristic,
-				                                  heuristic_sum, 256);
+				                                  heuristic_sum, 256, false);
 				if (fuzzy <= best_fuzzyness && fuzzy != (size_t)-1) {
 					/* Better, or as good as the current best candidate(s). */
 					if (fuzzy < best_fuzzyness) {
