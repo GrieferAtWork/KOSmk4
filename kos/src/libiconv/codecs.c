@@ -1794,7 +1794,7 @@ NOTHROW_NCX(CC libiconv_getcodecname)(iconv_codec_t id, unsigned int nth) {
 
 
 /* Same as `libiconv_codecbyname()', but the name has a fixed length. */
-PRIVATE ATTR_NOINLINE ATTR_PURE WUNUSED NONNULL((1)) iconv_codec_t
+INTERN ATTR_NOINLINE ATTR_PURE WUNUSED NONNULL((1)) iconv_codec_t
 NOTHROW_NCX(FCALL libiconv_codecbynamez)(char const *__restrict name,
                                          size_t namelen) {
 	char *buf;

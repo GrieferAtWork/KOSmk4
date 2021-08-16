@@ -294,7 +294,7 @@ INTERN_FUNCTION(libc___i386_syscall)
 	.byte  -4                /* ...                             nop           */
 #ifndef __OPTIMIZE_SIZE__
 	/* From this point forth, the remainder of the function is SYSENTER-only!
-	 * And  because we havn't  reached the "normal"  return address used when
+	 * And because we haven't reached  the "normal" return address used  when
 	 * unwinding system calls that  throw exceptions, assign CFI  expressions
 	 * to unwind registers that can be executed faster than the above! */
 	.cfi_reg_offset %edi, 0, %esp  /* %edi = [%esp + 0] */
@@ -344,7 +344,7 @@ INTERN_FUNCTION(libc___i386_Xsyscall)
 	.byte  -4                /* ...                             ret           */
 #ifndef __OPTIMIZE_SIZE__
 	/* From this point forth, the remainder of the function is SYSENTER-only!
-	 * And  because we havn't  reached the "normal"  return address used when
+	 * And because we haven't reached  the "normal" return address used  when
 	 * unwinding system calls that  throw exceptions, assign CFI  expressions
 	 * to unwind registers that can be executed faster than the above! */
 	.cfi_reg_offset %edi, 0, %esp  /* %edi = [%esp + 0] */

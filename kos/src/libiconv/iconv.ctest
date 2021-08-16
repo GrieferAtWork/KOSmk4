@@ -33,12 +33,16 @@
 #include <string.h>
 
 #include <libiconv/iconv.h>
+#include <libiconv/codec.h>
 
 
 DECL_BEGIN
 
 PRIVATE _LPICONV_TRANSCODE_INIT _iconv_transcode_init = NULL;
 PRIVATE LPICONV_ENCODE_FLUSH iconv_encode_flush = NULL;
+PRIVATE LPICONV_CODECBYNAME iconv_codecbyname = NULL;
+PRIVATE LPICONV_GETCODECNAME iconv_getcodecname = NULL;
+PRIVATE LPICONV_DETECT_CODEC iconv_detect_codec = NULL;
 
 PRIVATE void convertz(char const *from_codec, char const *to_codec,
                       unsigned int error_mode, char const *from_text,
@@ -82,6 +86,9 @@ DEFINE_TEST(iconv) {
 #define DLSYM(x) (*(void **)&x = dlsym(libiconv, #x), assertf(x, "dlerror(): %s", dlerror()))
 	DLSYM(_iconv_transcode_init);
 	DLSYM(iconv_encode_flush);
+	DLSYM(iconv_codecbyname);
+	DLSYM(iconv_getcodecname);
+	DLSYM(iconv_detect_codec);
 #undef DLSYM
 
 	convert("latin-1", "de", ICONV_ERR_ERRNO, "aou: \xE4\xF6\xFC!", buf);
@@ -107,6 +114,65 @@ DEFINE_TEST(iconv) {
 	/* Also test multi-byte decode functionality. */
 	convertz("utf-16", "utf-8", ICONV_ERR_ERRNO, (char *)u"Hello", 10, buf);
 	assertf(strcmp(buf, "Hello") == 0, "buf = %q", buf);
+
+
+#define ASSERT_DETECTED_CODEC(name, data) \
+	ASSERT_DETECTED_CODEC_Z(name, data, sizeof(data) - 1)
+#define ASSERT_DETECTED_CODEC_Z(name, data, size)                           \
+	do {                                                                    \
+		iconv_codec_t _dec, _cd = iconv_codecbyname(name);                  \
+		assertf(_cd != ICONV_CODEC_UNKNOWN, "Unknown codec: %q", name);     \
+		_dec = iconv_detect_codec(data, size);                              \
+		assertf(_dec != ICONV_CODEC_UNKNOWN, "Failed to detect any codec"); \
+		assertf(_dec == _cd, "Detected %u:%q instead of %q",                \
+		        _dec, iconv_getcodecname(_dec, 0), name);                   \
+	}	__WHILE0
+
+
+	/* Test special cases. */
+	assert(iconv_detect_codec("", 0) == ICONV_CODEC_UNKNOWN);
+	{
+		void *volatile null = NULL;
+		assert(iconv_detect_codec(null, 0) == ICONV_CODEC_UNKNOWN);
+	}
+
+	/* Test simple input data. Anything beyond this would rely too much on the
+	 * internal ASCII-text heuristic to allow  for any safety during  testing. */
+	ASSERT_DETECTED_CODEC_Z("utf-8", "Hello World!", 12);
+	ASSERT_DETECTED_CODEC_Z("utf-16", u"Hello World!", 24);
+	ASSERT_DETECTED_CODEC_Z("utf-32", U"Hello World!", 48);
+
+	/* Test the auto codec detection functionality. */
+	ASSERT_DETECTED_CODEC("de",
+	                      "Text before the codec marker # codec: de\n"
+	                      "Pure ascii!\n");
+	ASSERT_DETECTED_CODEC("de", "Text before the codec marker /* codec: de */ Pure ascii!\n");
+	ASSERT_DETECTED_CODEC("de", "Text before the codec marker (* codec: de *) Pure ascii!\n");
+	ASSERT_DETECTED_CODEC("de", "Text before the codec marker /*codec: de*/ Pure ascii!\n");
+	ASSERT_DETECTED_CODEC("de", "Text before the codec marker (*codec: de*) Pure ascii!\n");
+	ASSERT_DETECTED_CODEC("de", "Text before the codec marker /*codec de*/ Pure ascii!\n");
+	ASSERT_DETECTED_CODEC("de", "Text before the codec marker (*codec de*) Pure ascii!\n");
+	ASSERT_DETECTED_CODEC("de", "Text before the codec marker /* \t*#@+!$/codec: de \t*#@+!$/*/ Pure ascii!\n");
+	ASSERT_DETECTED_CODEC("de", "Text before the codec marker (* \t*#@+!$/codec: de \t*#@+!$/*) Pure ascii!\n");
+	ASSERT_DETECTED_CODEC("latin-1", "<meta charset=\"latin-1\"/>\n"
+	                                 "<html>\n"
+	                                 "\tHello World! aou: \xE4\xF6\xFC\n"
+	                                 "</html>\n");
+
+#define ICONV_DETECT_CODEC(s) iconv_detect_codec(s, sizeof(s) - 1)
+	EQu(ICONV_DETECT_CODEC("<meta charset=\xE4\"latin-1\"/>\n"
+	                       "<html>\n"
+	                       "\tHello World! aou: \xE4\xF6\xFC\n"
+	                       "</html>\n"),
+	    ICONV_CODEC_UNKNOWN);
+	EQu(ICONV_DETECT_CODEC("\xE4#codec l1\n"
+	                       "Hello World! aou: \xE4\xF6\xFC\n"),
+	    ICONV_CODEC_UNKNOWN);
+	ASSERT_DETECTED_CODEC("l1",
+	                      "#codec l1\n\xE4"
+	                      "Hello World! aou: \xE4\xF6\xFC\n");
+
+
 
 	dlclose(libiconv);
 }

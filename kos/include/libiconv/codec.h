@@ -27,7 +27,6 @@
 
 #include <hybrid/typecore.h>
 
-#include <bits/crt/format-printer.h>
 #include <bits/types.h>
 
 #ifdef __CC__
@@ -102,6 +101,34 @@ typedef __ATTR_CONST __ATTR_WUNUSED __ATTR_NONNULL((1, 2)) bool
 LIBICONV_DECL __ATTR_CONST __ATTR_WUNUSED __ATTR_NONNULL((1, 2)) bool
 __NOTHROW_NCX(LIBICONV_CC iconv_same_codec_name)(char const *__restrict a,
                                                  char const *__restrict b);
+#endif /* LIBICONV_WANT_PROTOTYPES */
+
+
+
+/* Try to automatically detect the codec of the given data-blob, which should
+ * represent the memory-mapping of a text-file. This function will then try to
+ * inspect its beginning for comment-style indicators which might inform about
+ * which codec the file uses (e.g. xml, python, etc.), as well as analysis of
+ * NUL-bytes for multi-byte codecs.
+ *
+ * In case of a single-byte codec, go through all bytes that appear in the file
+ * and count which of them occur how often before narrowing down candidates by
+ * excluding any where decoding would result in non-printable characters other
+ * than those needed for text (e.g. line-feeds, spaces, and unicode prefixes).
+ *
+ * Once the set of codecs capable of decoding the file into something that looks
+ * like text is determined, use each of them to try and decode the text to UTF-8
+ * and count how often each bytes occurs within the UTF-8 stream. The results of
+ * this are then fuzzy-compared against a known-good heuristic of byte usage in
+ * normal text, and the codec which is closest to this heuristic is used.
+ *
+ * If the function is unable to determine the codec to-be used, it will return
+ * with `ICONV_CODEC_UNKNOWN'. */
+typedef __ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1)) iconv_codec_t
+/*__NOTHROW_NCX*/ (LIBICONV_CC *LPICONV_DETECT_CODEC)(void const *__restrict data, size_t size);
+#ifdef LIBICONV_WANT_PROTOTYPES
+LIBICONV_DECL __ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1)) iconv_codec_t
+__NOTHROW_NCX(LIBICONV_CC iconv_detect_codec)(void const *__restrict data, size_t size);
 #endif /* LIBICONV_WANT_PROTOTYPES */
 
 

@@ -425,6 +425,8 @@ enum {
  * @return: ICONV_CODEC_UNKNOWN: Unrecognized codec. */
 INTDEF ATTR_PURE WUNUSED NONNULL((1)) iconv_codec_t
 NOTHROW_NCX(CC libiconv_codecbyname)(char const *__restrict name);
+INTDEF ATTR_PURE WUNUSED NONNULL((1)) iconv_codec_t
+NOTHROW_NCX(CC libiconv_codecbynamez)(char const *__restrict name, size_t namelen);
 
 /* Return the nth (0-based) lexicographically sorted name for the codec `id'
  * When `id'  is  invalid or  doesn't  have  an `nth'  name,  return  `NULL'
