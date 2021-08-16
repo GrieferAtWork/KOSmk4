@@ -340,8 +340,7 @@ NOTHROW_NCX(CC _libiconv_transcode_init)(/*in|out*/ struct iconv_transcode *__re
 	 *                         it really shouldn't matter if we don't know them! */
 	if (self->it_decode.icd_codec == self->it_encode.ice_codec &&
 	    (self->it_decode.icd_codec != CODEC_UNKNOWN ||
-	     /* TODO: strcasecmp the normalized equivalents of the codec names! */
-	     strcasecmp(input_codec_name, output_codec_name) == 0)) {
+	     libiconv_same_codec_name(input_codec_name, output_codec_name))) {
 		*input = self->it_encode.ice_output;
 		return 0;
 	}

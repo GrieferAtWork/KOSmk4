@@ -1852,6 +1852,49 @@ done:
 }
 
 
+/* Check  if  the 2  given strings  reference  the same  codec name.
+ * This differs from same codec ID as this function doesn't actually
+ * search the codec database but will simply strip potential  flags,
+ * normalize the underlying codec names, and check if the  resulting
+ * strings strcasecmp(3) to be equal. */
+INTERN ATTR_CONST WUNUSED NONNULL((1, 2)) bool
+NOTHROW_NCX(FCALL libiconv_same_codec_name)(char const *__restrict a,
+                                            char const *__restrict b) {
+	size_t lena, lenb;
+	char norm_a[CODE_NAME_MAXLEN + 1];
+	char norm_b[CODE_NAME_MAXLEN + 1];
+
+	/* Quick check: are they identical. */
+	if (strcasecmp(a, b) == 0)
+		return true;
+
+	/* Figure out how long the actual codec names are (without possible flags) */
+	lena = strlen(a);
+	lenb = strlen(b);
+	{
+		char const *temp;
+		temp = strstr(a, "//");
+		if (temp)
+			lena = (size_t)(temp - a);
+		temp = strstr(b, "//");
+		if (temp)
+			lenb = (size_t)(temp - b);
+	}
+
+	/* Normalize the codec names. */
+	if (!libiconv_normalize_codec_name(norm_a, a, lena))
+		goto nope;
+	if (!libiconv_normalize_codec_name(norm_b, b, lenb))
+		goto nope;
+
+	/* Check of the normalized names are identical. */
+	return strcasecmp(norm_a, norm_b) == 0;
+nope:
+	return false;
+}
+
+
+
 DECL_END
 
 #endif /* !GUARD_LIBICONV_CODECS_C */

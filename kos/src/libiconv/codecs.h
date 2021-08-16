@@ -27,6 +27,8 @@
 
 #include <kos/types.h>
 
+#include <stdbool.h>
+
 #include <libiconv/iconv.h>
 
 DECL_BEGIN
@@ -430,6 +432,16 @@ NOTHROW_NCX(FCALL libiconv_getcodecname)(unsigned int id, unsigned int nth);
 INTDEF WUNUSED NONNULL((1)) unsigned int
 NOTHROW_NCX(FCALL libiconv_codec_and_flags_byname)(char const *__restrict name,
                                                    /*[in|out]*/ uintptr_half_t *__restrict pflags);
+
+/* Check  if  the 2  given strings  reference  the same  codec name.
+ * This differs from same codec ID as this function doesn't actually
+ * search the codec database but will simply strip potential  flags,
+ * normalize the underlying codec names, and check if the  resulting
+ * strings strcasecmp(3) to be equal. */
+INTDEF ATTR_CONST WUNUSED NONNULL((1, 2)) bool
+NOTHROW_NCX(FCALL libiconv_same_codec_name)(char const *__restrict a,
+                                            char const *__restrict b);
+
 
 DECL_END
 
