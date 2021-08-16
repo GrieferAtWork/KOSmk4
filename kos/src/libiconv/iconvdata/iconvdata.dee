@@ -338,7 +338,9 @@ function parseDB(): {string: Object} {
 		if (tab is CodePage) {
 			tab.table = Tuple(tab.table);
 			if (tab.table == [:256])
-				throw Error("Codec " + repr tab.name + " is just latin-1/ascii");
+				throw Error("Codec " + repr tab.name + " is just latin-1");
+			if (tab.table == ([:128] + {0} * 128))
+				throw Error("Codec " + repr tab.name + " is just ascii");
 			local rp = repr tab.table;
 			if (rp in byTable) {
 				throw Error("Duplicate table: " +
