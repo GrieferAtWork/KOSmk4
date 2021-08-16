@@ -93,7 +93,7 @@
 #  - glibc-2.32/iconvdata/utf-7.c                                     "UNICODE-1-1-UTF-7", "csUnicode11UTF7", "UTF-7", "UTF7", "csUTF7", "UTF-7-IMAP", "csUTF7IMAP"  (https://www.rfc-editor.org/rfc/rfc1642.html)
 #  - glibc-2.32/iconvdata/gb18030.c                                   "GB18030", "csGB18030"  (https://www.iana.org/assignments/charset-reg/GB18030)
 #  - glibc-2.32/iconvdata/viscii.c                                    "VISCII", "csVISCII"  (https://www.rfc-editor.org/rfc/rfc1456.html)
-#  - glibc-2.32/iconvdata/armscii-8.c                                 "ARMSCII8", "ARMSCII-8"
+#  - glibc-2.32/iconvdata/armscii-8.c                                 "ARMSCII8", "ARMSCII-8"  (https://en.wikipedia.org/wiki/ArmSCII)
 #  - glibc-2.32/iconvdata/tcvn5712-1.c                                "tcvn", "tcvn5712-1", "tcvn-5712", "tcvn5712-1:1993"
 #  - glibc-2.32/iconvdata/euc-jisx0213.c                              "euc-jisx0213"
 #  - glibc-2.32/iconvdata/shift_jisx0213.c                            "ShiftJISX0213", "Shift_JISX0213"
@@ -104,15 +104,12 @@
 #  - glibc-2.32/iconvdata/ibm1390.c                                   "cp1390", "IBM1390", "csIBM1390"
 #  - glibc-2.32/iconvdata/ibm1399.c                                   "cp1399", "IBM1399", "csIBM1399"
 #  - glibc-2.32/iconvdata/iso_11548-1.c                               "ISO_11548-1", "ISO_TR_11548-1", "ISO/TR_11548-1", "ISO11548-1", "csISO115481" (https://www.iana.org/assignments/charset-reg/ISO-11548-1)
-#  - https://en.wikipedia.org/wiki/HP_Roman
+#  - https://www.rfc-editor.org/rfc/rfc1345.html                      "JIS_C6226-1983", "iso-ir-87", "x0208", "JIS_X0208-1983", "csISO87JISX0208"  (https://en.wikipedia.org/wiki/JIS_X_0208)
 #  - https://en.wikipedia.org/wiki/LST_1564
 #  - https://en.wikipedia.org/wiki/LST_1590-4
-#  - https://en.wikipedia.org/wiki/JIS_X_0208
-#  - https://en.wikipedia.org/wiki/ArmSCII
 #  - https://en.wikipedia.org/wiki/Mac_OS_Hebrew
 #  - https://en.wikipedia.org/wiki/Mac_OS_Keyboard_encoding
-#  - https://en.wikipedia.org/wiki/ISO/IEC_2022
-#  - https://en.wikipedia.org/wiki/ISO-IR-165
+#  - https://en.wikipedia.org/wiki/ISO-IR-165                         "iso-ir-165", "CN-GB-ISOIR165"
 #  - https://en.wikipedia.org/wiki/ISO-IR-169
 #  - https://www.rfc-editor.org/rfc/rfc1345.html                      "iso-ir-142", "ISO_6937-2-add", "csISOTextComm"
 #  - https://www.rfc-editor.org/rfc/rfc1345.html                      "JIS_Encoding", "csJISEncoding"
@@ -121,7 +118,6 @@
 #  - https://www.rfc-editor.org/rfc/rfc1345.html                      "KS_C_5601-1987", "iso-ir-149", "KS_C_5601-1989", "KSC_5601", "korean", "csKSC56011987"
 #  - https://www.rfc-editor.org/rfc/rfc1345.html                      "JIS_C6226-1978", "iso-ir-42", "csISO42JISC62261978"
 #  - https://www.rfc-editor.org/rfc/rfc1345.html                      "videotex-suppl", "iso-ir-70", "csISO70VideotexSupp1"
-#  - https://www.rfc-editor.org/rfc/rfc1345.html                      "JIS_C6226-1983", "iso-ir-87", "x0208", "JIS_X0208-1983", "csISO87JISX0208"
 #  - https://www.rfc-editor.org/rfc/rfc1556.html                      "ISO_8859-6-E", "csISO88596E"
 #  - https://www.rfc-editor.org/rfc/rfc1556.html                      "ISO_8859-6-I", "csISO88596I"
 #  - https://www.rfc-editor.org/rfc/rfc1556.html                      "ISO_8859-8-E", "csISO88598E"
