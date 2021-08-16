@@ -451,8 +451,8 @@ function printCodecNameDB() {
 	local longestAliasLength = map.keys.each.length > ...;
 	print("#define CODE_NAME_MAXLEN ", longestAliasLength);
 	print("struct codec_db_entry {");
-	print("	char         cdbe_name[CEIL_ALIGN(", (longestAliasLength + 1), ", __SIZEOF_INT__)];");
-	print("	unsigned int cdbe_codec; /* The associated codec. */");
+	print("	char          cdbe_name[CEIL_ALIGN(", (longestAliasLength + 1), ", sizeof(iconv_codec_t))];");
+	print("	iconv_codec_t cdbe_codec; /* The associated codec. */");
 	print("};");
 	print;
 	print("PRIVATE struct codec_db_entry codec_db[] = {");

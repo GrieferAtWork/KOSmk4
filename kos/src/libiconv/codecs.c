@@ -41,8 +41,8 @@ DECL_BEGIN
 /*[[[deemon (printCodecNameDB from .iconvdata.iconvdata)();]]]*/
 #define CODE_NAME_MAXLEN 28
 struct codec_db_entry {
-	char         cdbe_name[CEIL_ALIGN(29, __SIZEOF_INT__)];
-	unsigned int cdbe_codec; /* The associated codec. */
+	char          cdbe_name[CEIL_ALIGN(29, sizeof(iconv_codec_t))];
+	iconv_codec_t cdbe_codec; /* The associated codec. */
 };
 
 PRIVATE struct codec_db_entry codec_db[] = {
@@ -1678,7 +1678,7 @@ NOTHROW_NCX(FCALL libiconv_normalize_codec_name)(char buf[CODE_NAME_MAXLEN + 1],
 		++name;
 
 	/* Remove <SEP> characters are certain prefixes if those
-	 * prefixes are followed up with a digit character. */
+	 * prefixes  are  followed  up with  a  digit character. */
 	for (i = 0; i < COMPILER_LENOF(remove_sep_prefixes); ++i) {
 		size_t len = strlen(remove_sep_prefixes[i]);
 		if (memcasecmp(name, remove_sep_prefixes[i], len * sizeof(char)) == 0 &&
@@ -1719,10 +1719,12 @@ NOTHROW_NCX(FCALL libiconv_normalize_codec_name)(char buf[CODE_NAME_MAXLEN + 1],
 }
 
 
-/* Return the ID of the codec associated with  `name'
- * Casing is ignored and codec aliases are respected. */
-INTERN ATTR_PURE WUNUSED NONNULL((1)) unsigned int
-NOTHROW_NCX(FCALL libiconv_codecbyname)(char const *__restrict name) {
+/* Return the internal ID of the codec associated with `name'
+ * Casing   is  ignored  and  codec  aliases  are  respected.
+ * @return: * :                  Internal codec ID (s.a. `iconv_getcodecname()')
+ * @return: ICONV_CODEC_UNKNOWN: Unrecognized codec. */
+INTERN ATTR_PURE WUNUSED NONNULL((1)) iconv_codec_t
+NOTHROW_NCX(CC libiconv_codecbyname)(char const *__restrict name) {
 	size_t lo, hi;
 	char normal_name[CODE_NAME_MAXLEN + 1];
 again:
@@ -1754,11 +1756,32 @@ again:
 	return CODEC_UNKNOWN;
 }
 
-/* Return the nth (0-based) alphabetically sorted name for the codec `id'
- * When `id' is  invalid or  doesn't have  an `nth'  name, return  `NULL' */
+/* Return the nth (0-based) lexicographically sorted name for the codec `id'
+ * When `id'  is  invalid or  doesn't  have  an `nth'  name,  return  `NULL'
+ * Note  that all valid codecs have at least 1 (iow: `nth=0') valid name. As
+ * such,  supported  codecs as  well as  their names  can be  enumerated as:
+ * >> iconv_codec_t id;
+ * >> for (id = ICONV_CODEC_FIRST;;) {
+ * >>     unsigned int nth = 0;
+ * >>     char const *name;
+ * >>     for (nth = 0; (name = iconv_getcodecname(id, nth)) != NULL; ++nth) {
+ * >>         if (nth != 0)
+ * >>             putc('\t');
+ * >>         printf("%s", name);
+ * >>     }
+ * >>     putc('\n');
+ * >>     if (nth == 0)
+ * >>         break;
+ * >> } */
 INTERN ATTR_CONST WUNUSED char const *
-NOTHROW_NCX(FCALL libiconv_getcodecname)(unsigned int id, unsigned int nth) {
+NOTHROW_NCX(CC libiconv_getcodecname)(iconv_codec_t id, unsigned int nth) {
 	size_t i;
+	/* NOTE: If it ever becomes an issue, this function could be sped up by
+	 *       pre-computing an mapping:
+	 * CODEC_ID->OFFSET_INTO_LIST_OF_CODEC_NAME_OFFSETS->CODE_NAME_OFFSET^n
+	 * If done, this function could be implemented on O(1) time, though that
+	 * would also add a bunch to the file size of the library, so this isn't
+	 * being done (for now). */
 	for (i = 0; i < COMPILER_LENOF(codec_db); ++i) {
 		if (codec_db[i].cdbe_codec != id)
 			continue;
@@ -1771,7 +1794,7 @@ NOTHROW_NCX(FCALL libiconv_getcodecname)(unsigned int id, unsigned int nth) {
 
 
 /* Same as `libiconv_codecbyname()', but the name has a fixed length. */
-PRIVATE ATTR_NOINLINE ATTR_PURE WUNUSED NONNULL((1)) unsigned int
+PRIVATE ATTR_NOINLINE ATTR_PURE WUNUSED NONNULL((1)) iconv_codec_t
 NOTHROW_NCX(FCALL libiconv_codecbynamez)(char const *__restrict name,
                                          size_t namelen) {
 	char *buf;
@@ -1795,11 +1818,13 @@ NOTHROW_NCX(FCALL libiconv_codecbynamez)(char const *__restrict name,
 }
 
 
-/* Same as `libiconv_codecbyname()', but also parse possible flag-relation options. */
-INTERN WUNUSED NONNULL((1)) unsigned int
-NOTHROW_NCX(FCALL libiconv_codec_and_flags_byname)(char const *__restrict name,
-                                                   /*[in|out]*/ uintptr_half_t *__restrict pflags) {
-	unsigned int result;
+/* Same as `iconv_codecbyname()', but  also parse possible flag-relation  options.
+ * The given `*pflags' argument must already  be populated with valid data  before
+ * this function is called, and should usually point to `icd_flags' or `ice_flags' */
+INTERN WUNUSED NONNULL((1)) iconv_codec_t
+NOTHROW_NCX(CC libiconv_codec_and_flags_byname)(char const *__restrict name,
+                                                /*[in|out]*/ uintptr_half_t *__restrict pflags) {
+	iconv_codec_t result;
 	/* Check for the simple case where the name doesn't contain any flags. */
 	result = libiconv_codecbyname(name);
 	if (result == CODEC_UNKNOWN) {
@@ -1858,8 +1883,8 @@ done:
  * normalize the underlying codec names, and check if the  resulting
  * strings strcasecmp(3) to be equal. */
 INTERN ATTR_CONST WUNUSED NONNULL((1, 2)) bool
-NOTHROW_NCX(FCALL libiconv_same_codec_name)(char const *__restrict a,
-                                            char const *__restrict b) {
+NOTHROW_NCX(CC libiconv_same_codec_name)(char const *__restrict a,
+                                         char const *__restrict b) {
 	size_t lena, lenb;
 	char norm_a[CODE_NAME_MAXLEN + 1];
 	char norm_b[CODE_NAME_MAXLEN + 1];
@@ -1893,6 +1918,13 @@ nope:
 	return false;
 }
 
+
+
+
+DEFINE_PUBLIC_ALIAS(iconv_codecbyname, libiconv_codecbyname);
+DEFINE_PUBLIC_ALIAS(iconv_getcodecname, libiconv_getcodecname);
+DEFINE_PUBLIC_ALIAS(iconv_codec_and_flags_byname, libiconv_codec_and_flags_byname);
+DEFINE_PUBLIC_ALIAS(iconv_same_codec_name, libiconv_same_codec_name);
 
 
 DECL_END

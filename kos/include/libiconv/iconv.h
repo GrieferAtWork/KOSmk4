@@ -250,10 +250,10 @@ struct iconv_decode {
 	struct iconv_printer    icd_output; /* [1..1][in][const] Output printer. */
 	__UINTPTR_HALF_TYPE__   icd_flags;  /* [const] Error mode and flags. */
 #ifdef LIBICONV_EXPOSE_INTERNAL
-	__UINTPTR_HALF_TYPE__   icd_codec;  /* [const] Internal codec ID. */
+	__UINTPTR_HALF_TYPE__   icd_codec;  /* [const] Internal codec ID. (s.a. `iconv_codec_t') */
 	union iconv_decode_data icd_data;   /* Internal data. */
 #else /* LIBICONV_EXPOSE_INTERNAL */
-	__UINTPTR_HALF_TYPE__ __icd_codec;  /* [const] Internal codec ID. */
+	__UINTPTR_HALF_TYPE__ __icd_codec;  /* [const] Internal codec ID. (s.a. `iconv_codec_t') */
 	void                 *__icd_opaque[_ICONV_DECODE_OPAQUE_POINTERS]; /* [?..?] Codec-specific data fields. */
 #endif /* !LIBICONV_EXPOSE_INTERNAL */
 };
@@ -325,10 +325,10 @@ struct iconv_encode {
 	struct iconv_printer    ice_output; /* [1..1][in][const] Output printer. */
 	__UINTPTR_HALF_TYPE__   ice_flags;  /* [const] Error mode and flags. */
 #ifdef LIBICONV_EXPOSE_INTERNAL
-	__UINTPTR_HALF_TYPE__   ice_codec;  /* [const] Internal codec ID. */
+	__UINTPTR_HALF_TYPE__   ice_codec;  /* [const] Internal codec ID. (s.a. `iconv_codec_t') */
 	union iconv_encode_data ice_data;   /* Internal data. */
 #else /* LIBICONV_EXPOSE_INTERNAL */
-	__UINTPTR_HALF_TYPE__ __ice_codec;  /* [const] Internal codec ID. */
+	__UINTPTR_HALF_TYPE__ __ice_codec;  /* [const] Internal codec ID. (s.a. `iconv_codec_t') */
 	void                 *__ice_opaque[_ICONV_ENCODE_OPAQUE_POINTERS]; /* [?..?] Codec-specific data fields. */
 #endif /* !LIBICONV_EXPOSE_INTERNAL */
 };
