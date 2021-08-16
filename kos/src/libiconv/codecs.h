@@ -422,33 +422,37 @@ enum {
 };
 
 /* Return the internal ID of the codec associated with `name'
- * Casing   is  ignored  and  codec  aliases  are  respected.
- * @return: * :                  Internal codec ID (s.a. `iconv_getcodecname()')
+ * Casing is ignored and codec aliases are respected.
+ * @return: * :                  Internal codec ID (s.a. `iconv_getcodecnames()')
  * @return: ICONV_CODEC_UNKNOWN: Unrecognized codec. */
 INTDEF ATTR_PURE WUNUSED NONNULL((1)) iconv_codec_t
 NOTHROW_NCX(CC libiconv_codecbyname)(char const *__restrict name);
 INTDEF ATTR_PURE WUNUSED NONNULL((1)) iconv_codec_t
 NOTHROW_NCX(CC libiconv_codecbynamez)(char const *__restrict name, size_t namelen);
 
-/* Return the nth (0-based) lexicographically sorted name for the codec `id'
- * When `id'  is  invalid or  doesn't  have  an `nth'  name,  return  `NULL'
- * Note  that all valid codecs have at least 1 (iow: `nth=0') valid name. As
- * such,  supported  codecs as  well as  their names  can be  enumerated as:
+/* Return a "\0\0"-terminated list of names for the codec `id'. The list is
+ * sorted such that the most important name comes first and all other names
+ * can be enumerated by use of `strend(p)+1'.
+ *
+ * When `id' is invalid, return `NULL'. Note that all valid codecs have at
+ * least 1 valid name. As such, supported codecs as well as their names can
+ * be enumerated as:
  * >> iconv_codec_t id;
  * >> for (id = ICONV_CODEC_FIRST;;) {
- * >>     unsigned int nth = 0;
  * >>     char const *name;
- * >>     for (nth = 0; (name = iconv_getcodecname(id, nth)) != NULL; ++nth) {
- * >>         if (nth != 0)
- * >>             putc('\t');
+ * >>     if ((name = iconv_getcodecnames(id)) == NULL)
+ * >>         break;
+ * >>     for (;;) {
  * >>         printf("%s", name);
+ * >>         name = strend(name) + 1;
+ * >>         if (!*name)
+ * >>             break;
+ * >>         putc('\t');
  * >>     }
  * >>     putc('\n');
- * >>     if (nth == 0)
- * >>         break;
  * >> } */
 INTDEF ATTR_CONST WUNUSED char const *
-NOTHROW_NCX(CC libiconv_getcodecname)(iconv_codec_t id, unsigned int nth);
+NOTHROW_NCX(CC libiconv_getcodecnames)(iconv_codec_t id);
 
 
 /* Same as `iconv_codecbyname()', but also parse possible flag-relation options.
@@ -458,10 +462,10 @@ INTDEF WUNUSED NONNULL((1)) iconv_codec_t
 NOTHROW_NCX(CC libiconv_codec_and_flags_byname)(char const *__restrict name,
                                                 /*[in|out]*/ uintptr_half_t *__restrict pflags);
 
-/* Check  if  the 2  given strings  reference  the same  codec name.
+/* Check if the 2 given strings reference the same codec name.
  * This differs from same codec ID as this function doesn't actually
- * search the codec database but will simply strip potential  flags,
- * normalize the underlying codec names, and check if the  resulting
+ * search the codec database but will simply strip potential flags,
+ * normalize the underlying codec names, and check if the resulting
  * strings strcasecmp(3) to be equal. */
 INTDEF ATTR_CONST WUNUSED NONNULL((1, 2)) bool
 NOTHROW_NCX(CC libiconv_same_codec_name)(char const *__restrict a,

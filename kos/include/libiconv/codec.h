@@ -43,7 +43,7 @@ typedef __UINTPTR_HALF_TYPE__ iconv_codec_t;
 
 /* Return the internal ID of the codec associated with `name'
  * Casing   is  ignored  and  codec  aliases  are  respected.
- * @return: * :                  Internal codec ID (s.a. `iconv_getcodecname()')
+ * @return: * :                  Internal codec ID (s.a. `iconv_getcodecnames()')
  * @return: ICONV_CODEC_UNKNOWN: Unrecognized codec. */
 typedef __ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1)) iconv_codec_t
 /*__NOTHROW_NCX*/ (LIBICONV_CC *LPICONV_CODECBYNAME)(char const *__restrict name);
@@ -52,28 +52,32 @@ LIBICONV_DECL __ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1)) iconv_codec_t
 __NOTHROW_NCX(LIBICONV_CC iconv_codecbyname)(char const *__restrict name);
 #endif /* LIBICONV_WANT_PROTOTYPES */
 
-/* Return the nth (0-based) lexicographically sorted name for the codec `id'
- * When `id'  is  invalid or  doesn't  have  an `nth'  name,  return  `NULL'
- * Note  that all valid codecs have at least 1 (iow: `nth=0') valid name. As
- * such,  supported  codecs as  well as  their names  can be  enumerated as:
+/* Return a "\0\0"-terminated list of names for the codec `id'. The list is
+ * sorted such that the most important name comes first and all other names
+ * can be enumerated by use of `strend(p)+1'.
+ *
+ * When `id' is invalid, return `NULL'. Note that all valid codecs have at
+ * least 1 valid name. As such, supported codecs as well as their names can
+ * be enumerated as:
  * >> iconv_codec_t id;
  * >> for (id = ICONV_CODEC_FIRST;;) {
- * >>     unsigned int nth = 0;
  * >>     char const *name;
- * >>     for (nth = 0; (name = iconv_getcodecname(id, nth)) != NULL; ++nth) {
- * >>         if (nth != 0)
- * >>             putc('\t');
+ * >>     if ((name = iconv_getcodecnames(id)) == NULL)
+ * >>         break;
+ * >>     for (;;) {
  * >>         printf("%s", name);
+ * >>         name = strend(name) + 1;
+ * >>         if (!*name)
+ * >>             break;
+ * >>         putc('\t');
  * >>     }
  * >>     putc('\n');
- * >>     if (nth == 0)
- * >>         break;
  * >> } */
 typedef __ATTR_CONST __ATTR_WUNUSED char const *
-/*__NOTHROW_NCX*/ (LIBICONV_CC *LPICONV_GETCODECNAME)(iconv_codec_t id, unsigned int nth);
+/*__NOTHROW_NCX*/ (LIBICONV_CC *LPICONV_GETCODECNAMES)(iconv_codec_t id);
 #ifdef LIBICONV_WANT_PROTOTYPES
 LIBICONV_DECL __ATTR_CONST __ATTR_WUNUSED char const *
-__NOTHROW_NCX(LIBICONV_CC iconv_getcodecname)(iconv_codec_t id, unsigned int nth);
+__NOTHROW_NCX(LIBICONV_CC iconv_getcodecnames)(iconv_codec_t id);
 #endif /* LIBICONV_WANT_PROTOTYPES */
 
 

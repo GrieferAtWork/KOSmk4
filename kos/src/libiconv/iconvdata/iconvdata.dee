@@ -75,6 +75,12 @@ function getEncodeTable(table: {int...}, shift: int): {int: int} {
 	return result;
 }
 
+function dbFieldName(name: string): string {
+	if (name.startswith("CODEC_"))
+		return "db_" + name[6:];
+	return "db_" + name;
+}
+
 
 function normalizeCodecName(name: string): string {
 	name = name.lower().replace("_", "-").replace(" ", "-");
@@ -439,26 +445,89 @@ function printCodecEnums() {
 
 
 function printCodecNameDB() {
-	local map: {string: {string: Object}} = Dict();
-	for (local x: CODECS.values) {
-		for (local a: x.aliases) {
-			local v = map.get(a.name);
-			if (v is none)
-				map[a.name] = v = Dict();
-			v[a.ppCond] = x;
+	local longestAliasLength = 0;
+	@@Maps alias -> ppCond -> codec
+	local aliasToCodecMapping: {string: {string: Object}} = Dict();
+	print("struct codec_name_db_struct {");
+	print("	char _hdr_nul[2];");
+	local longestDbNameLength = 0;
+	for (local name: CODECS.keys.sorted()) {
+		local codec = CODECS[name];
+		print;
+		print("	/* ", name, " */");
+		local base = dbFieldName(name);
+		local longestAliasNameLenLen = #str((codec.aliases.each.name.length + 1) > ...);
+		local prevPpCond = "1";
+		for (local i, alias: util.enumerate(codec.aliases)) {
+			local name = alias.name;
+			local lenPlusOne = str(#name+1);
+			if (prevPpCond != alias.ppCond) {
+				if (prevPpCond != "1")
+					print("#endif /* ", prevPpCond, " */");
+				if (alias.ppCond != "1")
+					print("#if ", alias.ppCond);
+				prevPpCond = alias.ppCond;
+			}
+			local dbName = "{}_{}".format({ base, i });
+			if (longestDbNameLength < #dbName)
+				longestDbNameLength = #dbName;
+			print("	char ", dbName, "[", lenPlusOne, "]; ",
+				" " * (longestAliasNameLenLen - #lenPlusOne),
+				"/* ", repr name, " */");
+			local map = aliasToCodecMapping.get(name);
+			if (map is none)
+				aliasToCodecMapping[name] = map = Dict();
+			assert alias.ppCond !in map,
+				"name:" + repr name + "\n"
+				"map: " + repr map.keys + "\n"
+				"ppCond:" + repr alias.ppCond;
+			map[alias.ppCond] = codec;
 		}
+		if (prevPpCond != "1")
+			print("#endif /* ", prevPpCond ?: "...", " */");
+		print("	char ", base, "_nul;");
 	}
-	local longestAliasLength = map.keys.each.length > ...;
-	print("#define CODE_NAME_MAXLEN ", longestAliasLength);
-	print("struct codec_db_entry {");
-	print("	char          cdbe_name[CEIL_ALIGN(", (longestAliasLength + 1), ", sizeof(iconv_codec_t))];");
-	print("	iconv_codec_t cdbe_codec; /* The associated codec. */");
 	print("};");
 	print;
-	print("PRIVATE struct codec_db_entry codec_db[] = {");
-	for (local name: map.keys.sorted()) {
+	print("/* Name database */");
+	print("PRIVATE struct codec_name_db_struct const codec_name_db = {");
+	print("	{ 0, 0 },");
+	for (local name: CODECS.keys.sorted()) {
+		local codec = CODECS[name];
+		print;
+		print("	/* ", name, " */");
+		local prevPpCond = "1";
+		for (local i, alias: util.enumerate(codec.aliases)) {
+			local name = alias.name;
+			local lenPlusOne = str(#name+1);
+			if (prevPpCond != alias.ppCond) {
+				if (prevPpCond != "1")
+					print("#endif /* ", prevPpCond, " */");
+				if (alias.ppCond != "1")
+					print("#if ", alias.ppCond);
+				prevPpCond = alias.ppCond;
+			}
+			print("	", repr name, ",");
+		}
+		if (prevPpCond != "1")
+			print("#endif /* ", prevPpCond ?: "...", " */");
+		print("	0,");
+	}
+	print("};");
+	print;
+	print("STATIC_ASSERT((codec_name_db_offset_t)-1 >= sizeof(struct codec_name_db_struct));");
+	/* Offset tables. */
+	local longestAliasLength = aliasToCodecMapping.keys.each.length > ...;
+	print("#define CODE_NAME_MAXLEN ", longestAliasLength);
+	print("struct codec_db_entry {");
+	print("	codec_name_db_offset_t cdbe_name;  /* Offset to name within `codec_name_db' */");
+	print("	iconv_codec_t          cdbe_codec; /* The associated codec. */");
+	print("};");
+	print;
+	print("PRIVATE struct codec_db_entry const codec_db[] = {");
+	for (local name: aliasToCodecMapping.keys.sorted()) {
 		local lastPpCond = none;
-		for (local ppCond, codec: map[name]) {
+		for (local ppCond, codec: aliasToCodecMapping[name]) {
 			if (lastPpCond is none) {
 				if (ppCond != "1") {
 					print("#if ", ppCond);
@@ -468,7 +537,12 @@ function printCodecNameDB() {
 				lastPpCond = "";
 				print("#elif ", ppCond);
 			}
-			print("	{ ", repr name, ", ", " " * (longestAliasLength - #name), codec.name, " },");
+			local index = (codec.aliases.each.name as Sequence).index(name);
+			local dbName = "{}_{}".format({ dbFieldName(codec.name), index });
+			print("	{ offsetof(struct codec_name_db_struct, ", dbName, "),",
+				" /* ", " " * (longestDbNameLength - #dbName),
+				repr name, " " * (longestAliasLength - #name),
+				" */ ", codec.name, " },");
 		}
 		if (lastPpCond !is none)
 			print("#endif /* ", lastPpCond ?: "..." , " */");
@@ -489,12 +563,6 @@ function printCodepageDatabase(kind: int) {
 			codecs.append(codec);
 	}
 	codecs.sort(CodePage.name);
-	function dbFieldName(name: string): string {
-		if (name.startswith("CODEC_"))
-			return "db_" + name[6:];
-		return "db_" + name;
-	}
-	
 	print("/* Codepage database blob. */");
 	print("struct iconv_cp", cpInsert, "_database {");
 	for (local cp: codecs) {

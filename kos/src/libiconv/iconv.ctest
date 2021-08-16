@@ -41,7 +41,7 @@ DECL_BEGIN
 PRIVATE _LPICONV_TRANSCODE_INIT _iconv_transcode_init = NULL;
 PRIVATE LPICONV_ENCODE_FLUSH iconv_encode_flush = NULL;
 PRIVATE LPICONV_CODECBYNAME iconv_codecbyname = NULL;
-PRIVATE LPICONV_GETCODECNAME iconv_getcodecname = NULL;
+PRIVATE LPICONV_GETCODECNAMES iconv_getcodecnames = NULL;
 PRIVATE LPICONV_DETECT_CODEC iconv_detect_codec = NULL;
 
 PRIVATE void convertz(char const *from_codec, char const *to_codec,
@@ -87,7 +87,7 @@ DEFINE_TEST(iconv) {
 	DLSYM(_iconv_transcode_init);
 	DLSYM(iconv_encode_flush);
 	DLSYM(iconv_codecbyname);
-	DLSYM(iconv_getcodecname);
+	DLSYM(iconv_getcodecnames);
 	DLSYM(iconv_detect_codec);
 #undef DLSYM
 
@@ -125,7 +125,7 @@ DEFINE_TEST(iconv) {
 		_dec = iconv_detect_codec(data, size);                              \
 		assertf(_dec != ICONV_CODEC_UNKNOWN, "Failed to detect any codec"); \
 		assertf(_dec == _cd, "Detected %u:%q instead of %q",                \
-		        _dec, iconv_getcodecname(_dec, 0), name);                   \
+		        _dec, iconv_getcodecnames(_dec), name);                     \
 	}	__WHILE0
 
 
