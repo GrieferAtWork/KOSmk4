@@ -47,11 +47,6 @@
 
 ###################################################################################################
 # TODO:
-#  - Codec "c-escape" for encoding/decoding using the C \-notation
-#    - Also  2  sub-codecs "c-escape-chr"  and c-escape-str"  that add
-#      additional  '  or "  pairs during  encoding,  as well  as parse
-#      surrounding pairs during decoding (and stop decoding data  with
-#      an error when more input data is fed after the trailing ' or ")
 #  - Codec "xml-escape" for &lt;xml-style&gt; escaping (https://en.wikipedia.org/wiki/XML)
 #  - Codec "uri-escape" for %3Curi-style%3E escaping (https://en.wikipedia.org/wiki/Percent-encoding)
 # TODO:
@@ -257,6 +252,9 @@
 
 
 # c-escape
+# NOTE: This codec is special in that it is built on-top of utf-8 input/output,
+#       meaning that the decoder expects its input to be formatted as utf-8,
+#       while also producing utf-8 output itself.
 @CODEC(CODEC_C_ESCAPE: "c-escape")                                            # Hello\uFFFF\nWorld
 @CODEC(CODEC_C_ESCAPE_CHR: "c-escape-chr")                                    # 'Hello\uFFFF\nWorld'
 @CODEC(CODEC_C_ESCAPE_STR: "c-escape-str")                                    # "Hello\uFFFF\nWorld"
