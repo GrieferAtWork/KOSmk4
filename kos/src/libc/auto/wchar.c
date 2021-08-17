@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xb7f6e0e6 */
+/* HASH CRC-32:0x24c65a8d */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -136,7 +136,7 @@ NOTHROW_NCX(LIBDCALL libd_mbrtowc)(char16_t *pwc,
 		mbs = &mbrtowc_ps;
 	}
 	if (!str) {
-		mbs->__word = __MBSTATE_TYPE_EMPTY;
+		mbstate_init(mbs);
 		return 0;
 	}
 	if (!maxlen || !*str)
@@ -164,7 +164,7 @@ NOTHROW_NCX(LIBKCALL libc_mbrtowc)(char32_t *pwc,
 		mbs = &mbrtowc_ps;
 	}
 	if (!str) {
-		mbs->__word = __MBSTATE_TYPE_EMPTY;
+		mbstate_init(mbs);
 		return 0;
 	}
 	if (!maxlen || !*str)
@@ -194,7 +194,7 @@ NOTHROW_NCX(LIBDCALL libd_wcrtomb)(char *__restrict str,
 		mbs = &wcrtomb_ps;
 	}
 	if (!str) {
-		mbs->__word = __MBSTATE_TYPE_EMPTY;
+		mbstate_init(mbs);
 		return 1;
 	}
 	if ((mbs->__word & __MBSTATE_TYPE_MASK) == __MBSTATE_TYPE_UTF16_LO) {
@@ -430,7 +430,7 @@ NOTHROW_NCX(LIBKCALL libc_wcstoul)(char32_t const *__restrict nptr,
 }
 INTERN ATTR_SECTION(".text.crt.wchar.unicode.static.mbs") ATTR_PURE WUNUSED int
 NOTHROW_NCX(LIBCCALL libc_mbsinit)(mbstate_t const *mbs) {
-	return !mbs || __mbstate_isempty(mbs);
+	return !mbs || mbstate_isempty(mbs);
 }
 INTERN ATTR_SECTION(".text.crt.dos.wchar.string.memory") ATTR_RETNONNULL NONNULL((1, 2)) char16_t *
 NOTHROW_NCX(LIBDCALL libd_wcscpy)(char16_t *__restrict buf,

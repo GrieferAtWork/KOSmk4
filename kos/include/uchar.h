@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x957e5f1a */
+/* HASH CRC-32:0xe80ed566 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -58,6 +58,28 @@ __NAMESPACE_STD_USING(c32rtomb)
 #include <features.h>
 #include <hybrid/typecore.h>
 #include <bits/crt/mbstate.h>
+
+
+#ifdef __USE_KOS
+/* Static initializer for `mbstate_t':
+ * >> mbstate_t mbs = MBSTATE_INIT; */
+#if !defined(MBSTATE_INIT) && defined(__MBSTATE_INIT)
+#define MBSTATE_INIT __MBSTATE_INIT
+#endif /* !MBSTATE_INIT && __MBSTATE_INIT */
+
+/* Dynamic initializer for `mbstate_t':
+ * >> mbstate_t mbs;
+ * >> mbstate_init(&mbs); */
+#if !defined(mbstate_init) && defined(__mbstate_init)
+#define mbstate_init __mbstate_init
+#endif /* !mbstate_init && __mbstate_init */
+
+/* Check if the given mbstate_t is in its zero-shift state:
+ * >> if (mbstate_isempty(&mbs)) { ... } */
+#if !defined(mbstate_isempty) && defined(__mbstate_isempty)
+#define mbstate_isempty __mbstate_isempty
+#endif /* !mbstate_isempty && __mbstate_isempty */
+#endif /* __USE_KOS */
 
 
 #ifdef __CC__

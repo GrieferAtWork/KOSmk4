@@ -32,14 +32,6 @@
 
 DECL_BEGIN
 
-#ifndef mbstate_init
-#define mbstate_init __mbstate_init
-#endif /* !mbstate_init */
-
-#ifndef mbstate_isempty
-#define mbstate_isempty __mbstate_isempty
-#endif /* !mbstate_isempty */
-
 /* Initialize the given iconv decoder for the purpose of
  * converting  data from an  arbitrary codec into UTF-8.
  * @param: self:             [in|out] iconv decode controller.

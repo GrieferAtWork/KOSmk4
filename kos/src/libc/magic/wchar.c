@@ -43,6 +43,8 @@
 %[define_replacement(wchar_t = __WCHAR_TYPE__)]
 %[define_replacement(wint_t = __WINT_TYPE__)]
 %[define_replacement(WEOF = __WEOF)]
+%[define_replacement(mbstate_isempty = __mbstate_isempty)]
+%[define_replacement(mbstate_init = __mbstate_init)]
 %[define_wchar_replacement(WEOF = __WEOF16, __WEOF32)]
 %[define_wchar_replacement(__WEOF = __WEOF16, __WEOF32)]
 
@@ -314,7 +316,7 @@ size_t mbrtowc([[nullable]] wchar_t *pwc,
 		mbs = &mbrtowc_ps;
 	}
 	if (!str) {
-		mbs->@__word@ = __MBSTATE_TYPE_EMPTY;
+		mbstate_init(mbs);
 		return 0;
 	}
 	if (!maxlen || !*str)
@@ -351,7 +353,7 @@ size_t wcrtomb(char *__restrict str, wchar_t wc,
 		mbs = &wcrtomb_ps;
 	}
 	if (!str) {
-		mbs->@__word@ = __MBSTATE_TYPE_EMPTY;
+		mbstate_init(mbs);
 		return 1;
 	}
 	if ((mbs->@__word@ & __MBSTATE_TYPE_MASK) == __MBSTATE_TYPE_UTF16_LO) {
@@ -467,7 +469,7 @@ wcstoul(*) %{generate(str2wcs("strtoul"))}
 [[section(".text.crt{|.dos}.wchar.unicode.static.mbs")]]
 [[decl_include("<bits/crt/mbstate.h>")]]
 int mbsinit([[nullable]] mbstate_t const *mbs) {
-	return !mbs || __mbstate_isempty(mbs);
+	return !mbs || mbstate_isempty(mbs);
 }
 
 %[define_wchar_replacement(wmemcmp = memcmpw, memcmpl)]
@@ -1267,6 +1269,29 @@ $size_t wcsftime_l([[outp(maxsize)]] wchar_t *__restrict buf, $size_t maxsize,
 %
 
 %#ifdef __USE_KOS
+
+%{
+/* Static initializer for `mbstate_t':
+ * >> mbstate_t mbs = MBSTATE_INIT; */
+#if !defined(MBSTATE_INIT) && defined(__MBSTATE_INIT)
+#define MBSTATE_INIT __MBSTATE_INIT
+#endif /* !MBSTATE_INIT && __MBSTATE_INIT */
+
+/* Dynamic initializer for `mbstate_t':
+ * >> mbstate_t mbs;
+ * >> mbstate_init(&mbs); */
+#if !defined(mbstate_init) && defined(__mbstate_init)
+#define mbstate_init __mbstate_init
+#endif /* !mbstate_init && __mbstate_init */
+
+/* Check if the given mbstate_t is in its zero-shift state:
+ * >> if (mbstate_isempty(&mbs)) { ... } */
+#if !defined(mbstate_isempty) && defined(__mbstate_isempty)
+#define mbstate_isempty __mbstate_isempty
+#endif /* !mbstate_isempty && __mbstate_isempty */
+}
+
+
 %
 %/* KOS FILE extension functions. */
 %

@@ -23,15 +23,12 @@
 #include "../api.h"
 /**/
 
+#include <unicode.h> /* mbstate_init */
+
 #include "stdio-api.h"
 #include "stdio_ext.h"
 
 DECL_BEGIN
-
-#ifndef mbstate_init
-#define mbstate_init __mbstate_init
-#endif /* !mbstate_init */
-
 
 /*[[[head:libc___fbufsize,hash:CRC-32=0x7304eb39]]]*/
 /* >> __fbufsize(3)

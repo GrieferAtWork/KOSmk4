@@ -85,6 +85,30 @@ typedef __pc32formatprinter pc32formatprinter;
 )]%{
 
 
+
+/* Other headers only define these under _KOS_SOURCE, but since <unicode.h> is
+ * a kos-specific header, we can define these unconditionally (if  available)! */
+
+/* Static initializer for `mbstate_t':
+ * >> mbstate_t mbs = MBSTATE_INIT; */
+#if !defined(MBSTATE_INIT) && defined(__MBSTATE_INIT)
+#define MBSTATE_INIT __MBSTATE_INIT
+#endif /* !MBSTATE_INIT && __MBSTATE_INIT */
+
+/* Dynamic initializer for `mbstate_t':
+ * >> mbstate_t mbs;
+ * >> mbstate_init(&mbs); */
+#if !defined(mbstate_init) && defined(__mbstate_init)
+#define mbstate_init __mbstate_init
+#endif /* !mbstate_init && __mbstate_init */
+
+/* Check if the given mbstate_t is in its zero-shift state:
+ * >> if (mbstate_isempty(&mbs)) { ... } */
+#if !defined(mbstate_isempty) && defined(__mbstate_isempty)
+#define mbstate_isempty __mbstate_isempty
+#endif /* !mbstate_isempty && __mbstate_isempty */
+
+
 #ifdef __CC__
 __SYSDECL_BEGIN
 

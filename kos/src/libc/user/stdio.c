@@ -57,10 +57,6 @@
 
 DECL_BEGIN
 
-#ifndef mbstate_init
-#define mbstate_init __mbstate_init
-#endif /* !mbstate_init */
-
 #undef libc_ferror_unlocked
 #undef libc_feof_unlocked
 #define libc_ferror_unlocked libc_ferror

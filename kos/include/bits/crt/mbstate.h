@@ -21,7 +21,6 @@
 #define _BITS_CRT_MBSTATE_H 1
 
 #include <__stdinc.h>
-#include <features.h>
 
 #include <hybrid/byteorder.h>
 #include <hybrid/typecore.h>
@@ -35,7 +34,7 @@ struct __ATTR_PACKED __mbstate {
 	__UINT32_TYPE__  __word;
 };
 #define __MBSTATE_INIT       { 0 }
-#define __mbstate_init(x)    ((x)->__word = 0)
+#define __mbstate_init(x)    (void)((x)->__word = 0)
 #define __mbstate_isempty(x) ((x)->__word == 0)
 
 #define __MBSTATE_TYPE_MASK     0xfc000000
@@ -66,12 +65,6 @@ struct __ATTR_PACKED __mbstate {
 #define __MBSTATE_NBIT_MASK   0xf8000000
 #define __MBSTATE_NBIT_SHFT   27
 #define __MBSTATE_DATA_MASK   0x07ffffff
-
-#ifdef __USE_KOS
-#ifndef MBSTATE_INIT
-#define MBSTATE_INIT __MBSTATE_INIT
-#endif /* !MBSTATE_INIT */
-#endif /* __USE_KOS */
 #endif /* __CC__ */
 
 __SYSDECL_END
