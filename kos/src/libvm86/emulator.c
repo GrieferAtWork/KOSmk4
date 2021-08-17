@@ -93,7 +93,7 @@ libvm86_intr(vm86_state_t *__restrict self, uint8_t intno) {
 }
 
 
-/* Read/Write values to/from an emulated VIO port.
+/* Read/Write values to/from an emulated IO port.
  * @return: VM86_SUCCESS: Success.
  * @return: VM86_BADPORT: Bad port. */
 INTERN NONNULL((1, 3)) int CC

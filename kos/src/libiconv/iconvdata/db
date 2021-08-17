@@ -253,6 +253,19 @@
 		"l1", "IBM819", "CP819", "ISO_88591", "csISOLatin1",
 		"cp28591", "Windows-28591", "WE8ISO8859P1", "cp38591",
 		"Windows-38591", "ISO_8859-1-I", "8859_1", "OSF00010001")
+
+
+
+# c-escape
+@CODEC(CODEC_C_ESCAPE: "c-escape")                                            # Hello\uFFFF\nWorld
+@CODEC(CODEC_C_ESCAPE_CHR: "c-escape-chr")                                    # 'Hello\uFFFF\nWorld'
+@CODEC(CODEC_C_ESCAPE_STR: "c-escape-str")                                    # "Hello\uFFFF\nWorld"
+@CODEC(CODEC_C_ESCAPE_BYTES: "c-escape-bytes")                                # Hello\xEF\xBF\xBF\nWorld
+@CODEC(CODEC_C_ESCAPE_BYTES_CHR: "c-escape-bytes-chr", "c-escape-chr-bytes")  # 'Hello\xEF\xBF\xBF\nWorld'
+@CODEC(CODEC_C_ESCAPE_BYTES_STR: "c-escape-bytes-str", "c-escape-str-bytes")  # "Hello\xEF\xBF\xBF\nWorld"
+
+
+
 ###################################################################################################
 
 

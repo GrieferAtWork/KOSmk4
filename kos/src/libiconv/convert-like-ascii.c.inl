@@ -58,10 +58,10 @@ DECL_BEGIN
 
 
 
-INTERN NONNULL((1, 2)) ssize_t
-(FORMATPRINTER_CC LOCAL_libiconv_encode_32)(struct iconv_encode *__restrict self,
-                                            char32_t const *__restrict data,
-                                            size_t size) {
+INTERN NONNULL((1, 2)) ssize_t FORMATPRINTER_CC
+LOCAL_libiconv_encode_32(struct iconv_encode *__restrict self,
+                         char32_t const *__restrict data,
+                         size_t size) {
 	size_t i;
 	char buf[16], *ptr = buf;
 	ssize_t temp, result = 0;
@@ -136,13 +136,12 @@ err_ilseq:
 	return -1;
 }
 
-INTERN NONNULL((1, 2)) ssize_t
-(FORMATPRINTER_CC LOCAL_libiconv_encode)(struct iconv_encode *__restrict self,
-                                         /*utf-8*/ char const *__restrict data,
-                                         size_t size) {
+INTERN NONNULL((1, 2)) ssize_t FORMATPRINTER_CC
+LOCAL_libiconv_encode(struct iconv_encode *__restrict self,
+                      /*utf-8*/ char const *__restrict data,
+                      size_t size) {
 	ssize_t temp, result = 0;
-	char const *iter, *flush_start, *end;
-	iter        = data;
+	char const *flush_start, *end;
 	flush_start = data;
 	end         = data + size;
 	if unlikely(self->ice_flags & ICONV_HASERR)
@@ -153,45 +152,49 @@ INTERN NONNULL((1, 2)) ssize_t
 			return 0;
 		goto handle_unicode;
 	}
-	while (iter < end) {
-		if ((unsigned char)*iter >= 0x80) {
+	while (data < end) {
+		unsigned char ch;
+		ch = (unsigned char)*data;
+		if (ch >= 0x80) {
 			/* Start new unicode sequence. */
-			char32_t c32;
+			char32_t ch32;
 			size_t status;
+			DO_encode_output(flush_start, (size_t)(data - flush_start));
 handle_unicode:
-			DO_encode_output(flush_start, (size_t)(iter - flush_start));
-			status = unicode_c8toc32(&c32, iter, (size_t)(end - iter),
+			status = unicode_c8toc32(&ch32, data, (size_t)(end - data),
 			                         &self->ice_data.ied_utf8);
 			if ((ssize_t)status < 0) {
+				ch = (unsigned char)*data;
 				if (status == (size_t)-1) {
 					if (IS_ICONV_ERR_ERROR_OR_ERRNO(self->ice_flags))
 						goto err_ilseq;
 					if (IS_ICONV_ERR_DISCARD(self->ice_flags)) {
 						self->ice_data.ied_utf8.__word = __MBSTATE_TYPE_EMPTY;
+						flush_start                    = data;
 						goto next_data;
 					}
-					c32 = '?';
+					ch32 = '?';
 					if (IS_ICONV_ERR_IGNORE(self->ice_flags))
-						c32 = *iter;
+						ch32 = ch;
 					status = 1;
 				} else if (status == (size_t)-2) {
 					return result; /* Everything parsed! */
 				}
 			}
-			iter += status;
-			flush_start = iter;
+			data += status;
+			flush_start = data;
 			/* Encode `c32' */
 #ifdef DEFINE_FOR_ASCII
-			if unlikely(c32 <= LOCAL_UNICODE_IDENT_MAXCHAR)
+			if unlikely(ch32 <= LOCAL_UNICODE_IDENT_MAXCHAR)
 #elif defined(DEFINE_FOR_LATIN1)
-			if likely(c32 <= LOCAL_UNICODE_IDENT_MAXCHAR)
+			if likely(ch32 <= LOCAL_UNICODE_IDENT_MAXCHAR)
 #else /* DEFINE_FOR_ASCII */
-			if (c32 <= LOCAL_UNICODE_IDENT_MAXCHAR)
+			if (ch32 <= LOCAL_UNICODE_IDENT_MAXCHAR)
 #endif /* !DEFINE_FOR_ASCII */
 			{
 force_normal_output:
 				char out[1];
-				out[0] = (char)(unsigned char)(uint32_t)c32;
+				out[0] = (char)(unsigned char)(uint32_t)ch32;
 				DO_encode_output(out, 1);
 				continue;
 			}
@@ -204,9 +207,9 @@ force_normal_output:
 			while (lo < hi) {
 				size_t i;
 				i = (lo + hi) / 2;
-				if (c32 < cp->i7hcp_encode[i].icee_uni) {
+				if (ch32 < cp->i7hcp_encode[i].icee_uni) {
 					hi = i;
-				} else if (c32 > cp->i7hcp_encode[i].icee_uni) {
+				} else if (ch32 > cp->i7hcp_encode[i].icee_uni) {
 					lo = i + 1;
 				} else {
 					/* Found it! */
@@ -218,8 +221,8 @@ force_normal_output:
 #endif /* DEFINE_FOR_CP7H */
 			if (self->ice_flags & ICONV_ERR_TRANSLIT) {
 				char32_t folded[UNICODE_FOLDED_MAX];
-				size_t len = (size_t)(iconv_transliterate(c32, folded) - folded);
-				if (len != 1 || folded[0] != c32) {
+				size_t len = (size_t)(iconv_transliterate(ch32, folded) - folded);
+				if (len != 1 || folded[0] != ch32) {
 					temp = LOCAL_libiconv_encode_32(self, folded, len);
 					if unlikely(temp < 0) {
 						if (self->ice_flags & ICONV_HASERR)
@@ -231,7 +234,7 @@ force_normal_output:
 				}
 			}
 			if (IS_ICONV_ERR_ERROR_OR_ERRNO(self->ice_flags)) {
-				iter -= status;
+				data -= status;
 				goto err_ilseq;
 			}
 			if (!IS_ICONV_ERR_DISCARD(self->ice_flags)) {
@@ -241,7 +244,7 @@ force_normal_output:
 			}
 		} else {
 next_data:
-			++iter;
+			++data;
 		}
 #ifdef NEED_next_data_noinc
 #undef NEED_next_data_noinc
@@ -258,14 +261,14 @@ err_ilseq:
 	if (IS_ICONV_ERR_ERRNO(self->ice_flags))
 		errno = EILSEQ;
 err_ilseq_post:
-	return -(ssize_t)(size_t)(end - iter);
+	return -(ssize_t)(size_t)(end - data);
 }
 
 
-INTERN NONNULL((1, 2)) ssize_t
-(FORMATPRINTER_CC LOCAL_libiconv_decode)(struct iconv_decode *__restrict self,
-                                         /*<CODEC>*/ char const *__restrict data,
-                                         size_t size) {
+INTERN NONNULL((1, 2)) ssize_t FORMATPRINTER_CC
+LOCAL_libiconv_decode(struct iconv_decode *__restrict self,
+                      /*<CODEC>*/ char const *__restrict data,
+                      size_t size) {
 	ssize_t temp, result = 0;
 	char const *iter, *flush_start, *end;
 	iter        = data;

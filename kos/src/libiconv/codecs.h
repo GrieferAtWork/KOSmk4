@@ -41,13 +41,19 @@ enum {
 
 /*[[[deemon (printCodecEnums from .iconvdata.iconvdata)();]]]*/
 	/* Custom codecs */
-	CODEC_ASCII,      /* "ansi-x3.4-1968", "iso-ir-6", "ansi-x3.4-1986", "iso646.irv:1991", "ascii", "iso646-us", "us-ascii", "us", "ibm367", "cp367", "ansi-x3.4", "csascii", "osf10020", "cp20127", "windows-20127", "ibm891", "cp891", "csibm891", "osf1002037b", "ibm903", "cp903", "csibm903", "osf10020387" */
-	CODEC_ISO_8859_1, /* "iso8859-1:1987", "iso-ir-100", "iso8859-1", "latin1", "l1", "ibm819", "cp819", "iso88591", "csisolatin1", "cp28591", "windows-28591", "we8iso8859p1", "cp38591", "windows-38591", "iso8859-1-i", "8859-1", "osf10001" */
-	CODEC_UTF16BE,    /* "utf16be", "utf-16be", "ucs-2be", "unicodebig", "csutf16be" */
-	CODEC_UTF16LE,    /* "utf16le", "utf-16le", "ucs-2le", "unicodelittle", "csutf16le" */
-	CODEC_UTF32BE,    /* "utf32be", "utf-32be", "ucs-4be", "cp12001", "windows-12001", "csutf32be" */
-	CODEC_UTF32LE,    /* "utf32le", "utf-32le", "ucs-4le", "csutf32le" */
-	CODEC_UTF8,       /* "utf8", "utf-8", "iso10646/utf8", "iso10646/utf-8", "iso-ir-193", "osf5010001", "cp65001", "windows-65001", "csutf8" */
+	CODEC_ASCII,              /* "ansi-x3.4-1968", "iso-ir-6", "ansi-x3.4-1986", "iso646.irv:1991", "ascii", "iso646-us", "us-ascii", "us", "ibm367", "cp367", "ansi-x3.4", "csascii", "osf10020", "cp20127", "windows-20127", "ibm891", "cp891", "csibm891", "osf1002037b", "ibm903", "cp903", "csibm903", "osf10020387" */
+	CODEC_C_ESCAPE,           /* "c-escape" */
+	CODEC_C_ESCAPE_BYTES,     /* "c-escape-bytes" */
+	CODEC_C_ESCAPE_BYTES_CHR, /* "c-escape-bytes-chr", "c-escape-chr-bytes" */
+	CODEC_C_ESCAPE_BYTES_STR, /* "c-escape-bytes-str", "c-escape-str-bytes" */
+	CODEC_C_ESCAPE_CHR,       /* "c-escape-chr" */
+	CODEC_C_ESCAPE_STR,       /* "c-escape-str" */
+	CODEC_ISO_8859_1,         /* "iso8859-1:1987", "iso-ir-100", "iso8859-1", "latin1", "l1", "ibm819", "cp819", "iso88591", "csisolatin1", "cp28591", "windows-28591", "we8iso8859p1", "cp38591", "windows-38591", "iso8859-1-i", "8859-1", "osf10001" */
+	CODEC_UTF16BE,            /* "utf16be", "utf-16be", "ucs-2be", "unicodebig", "csutf16be" */
+	CODEC_UTF16LE,            /* "utf16le", "utf-16le", "ucs-2le", "unicodelittle", "csutf16le" */
+	CODEC_UTF32BE,            /* "utf32be", "utf-32be", "ucs-4be", "cp12001", "windows-12001", "csutf32be" */
+	CODEC_UTF32LE,            /* "utf32le", "utf-32le", "ucs-4le", "csutf32le" */
+	CODEC_UTF8,               /* "utf8", "utf-8", "iso10646/utf8", "iso10646/utf-8", "iso-ir-193", "osf5010001", "cp65001", "windows-65001", "csutf8" */
 
 	/* 8-bit codepage codecs */
 #define CODEC_CP_MIN CODEC_ADOBE_STANDARD_ENCODING

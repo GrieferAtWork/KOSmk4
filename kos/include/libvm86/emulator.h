@@ -24,9 +24,9 @@
 #include <bits/types.h>
 
 #if defined(__i386__) && !defined(__x86_64__)
-#define LIBVM86_TRANSLATE_CC  __ATTR_FASTCALL
+#define LIBVM86_TRANSLATE_CC __ATTR_FASTCALL
 #else /* __i386__ && !__x86_64__ */
-#define LIBVM86_TRANSLATE_CC  LIBVM86_CC
+#define LIBVM86_TRANSLATE_CC LIBVM86_CC
 #endif /* !__i386__ || __x86_64__ */
 
 __DECL_BEGIN
@@ -112,7 +112,8 @@ typedef struct vm86_state_struct vm86_state_t;
  *       (though also turning it into a potential bottleneck)
  *       One potential use of this function might be to virtually relocate VM86
  *       code away from the address space bottom, allowing real-mode code to be
- *       mapped anywhere in main memory. */
+ *       mapped anywhere in main memory.
+ *       It would be ill advised if this function doesn't execute in O(1) */
 typedef __ATTR_WUNUSED __ATTR_NONNULL((1)) void *
 (LIBVM86_TRANSLATE_CC *vm86_translate_t)(vm86_state_t *__restrict self, void *ptr);
 
@@ -127,11 +128,11 @@ typedef __ATTR_NONNULL((1, 4)) int
 #define VM86_HANDLE_IO_INB  0 /* *(uint8_t *)data = inb(port); */
 #define VM86_HANDLE_IO_INW  1 /* *(uint16_t *)data = inw(port); */
 #define VM86_HANDLE_IO_INL  2 /* *(uint32_t *)data = inl(port); */
-#define VM86_HANDLE_IO_OUTB 4 /* outb(port,*(uint8_t *)data); */
-#define VM86_HANDLE_IO_OUTW 5 /* outw(port,*(uint16_t *)data); */
-#define VM86_HANDLE_IO_OUTL 6 /* outl(port,*(uint32_t *)data); */
-#define VM86_HANDLE_IO_ISIN(x)  (!((x) & 4))
-#define VM86_HANDLE_IO_ISOUT(x)   ((x) & 4)
+#define VM86_HANDLE_IO_OUTB 4 /* outb(port, *(uint8_t const *)data); */
+#define VM86_HANDLE_IO_OUTW 5 /* outw(port, *(uint16_t const *)data); */
+#define VM86_HANDLE_IO_OUTL 6 /* outl(port, *(uint32_t const *)data); */
+#define VM86_HANDLE_IO_ISIN(x)  (((x) & 4) == 0)
+#define VM86_HANDLE_IO_ISOUT(x) (((x) & 4) != 0)
 
 /* Handle an interrupt by updating `self->vr_regs' to load the associated interrupt handler. */
 typedef __ATTR_NONNULL((1)) void
@@ -164,7 +165,9 @@ struct vm86_state_struct {
 #define VM86_INTR_ENABLED   99  /* Success (interrupts were re-enabled but shouldn't be checked until after the next instruction) */
 #define VM86_FROZEN        (-1) /* Emulation was frozen by `hlt' without #IF set */
 #define VM86_DOUBLE_FAULT  (-2) /* A double fault was caused. */
-#define VM86_SEGFAULT      (-3) /* Segmentation fault. */
+#define VM86_SEGFAULT      (-3) /* Segmentation fault. (or more specifically:  #PF)
+                                 * Because that exception didn't exist in realmode,
+                                 * it's handled as a fatal error. */
 #define VM86_BADPORT       (-4) /* Attempted to access an invalid port. */
 
 #ifdef __CC__
@@ -204,7 +207,7 @@ typedef __ATTR_NONNULL((1)) int (LIBVM86_CC *PVM86_INTR)(vm86_state_t *__restric
 LIBVM86_DECL __ATTR_NONNULL((1)) int LIBVM86_CC vm86_intr(vm86_state_t *__restrict self, __uint8_t intno);
 #endif /* LIBVM86_WANT_PROTOTYPES */
 
-/* Read/Write values to/from an emulated VIO port.
+/* Read/Write values to/from an emulated IO port.
  * @return: VM86_SUCCESS: Success.
  * @return: VM86_BADPORT: Bad port. */
 typedef __ATTR_NONNULL((1, 3)) int (LIBVM86_CC *PVM86_INB)(vm86_state_t *__restrict self, __uint16_t port, __uint8_t *__restrict presult);

@@ -29,11 +29,13 @@ gcc_opt.append("-O3"); // Force _all_ optimizations because stuff in here is per
 /**/
 
 #include <hybrid/byteswap.h>
+#include <hybrid/minmax.h>
 #include <hybrid/unaligned.h>
 
 #include <kos/types.h>
 
 #include <errno.h>
+#include <stdint.h>
 #include <string.h>
 #include <unicode.h>
 
@@ -121,10 +123,10 @@ NOTHROW_NCX(__LIBCCALL iconv_transliterate)(char32_t ch, char32_t buf[UNICODE_FO
 /************************************************************************/
 /* Generic code-page                                                    */
 /************************************************************************/
-PRIVATE ATTR_NOINLINE NONNULL((1, 2)) ssize_t
-(FORMATPRINTER_CC libiconv_cp_encode_u32)(struct iconv_encode *__restrict self,
-                                          char32_t const *__restrict data,
-                                          size_t len) {
+PRIVATE ATTR_NOINLINE NONNULL((1, 2)) ssize_t FORMATPRINTER_CC
+libiconv_cp_encode_u32(struct iconv_encode *__restrict self,
+                       char32_t const *__restrict data,
+                       size_t len) {
 	size_t j;
 	char buf[64], *ptr = buf;
 	ssize_t temp, result = 0;
@@ -190,9 +192,9 @@ err_ilseq:
 	return -1;
 }
 
-INTERN NONNULL((1, 2)) ssize_t
-(FORMATPRINTER_CC libiconv_cp_encode)(struct iconv_encode *__restrict self,
-                                      /*utf-8*/ char const *__restrict data, size_t size) {
+INTERN NONNULL((1, 2)) ssize_t FORMATPRINTER_CC
+libiconv_cp_encode(struct iconv_encode *__restrict self,
+                   /*utf-8*/ char const *__restrict data, size_t size) {
 	char buf[64], *ptr = buf;
 	ssize_t temp, result = 0;
 	char32_t c32;
@@ -267,9 +269,9 @@ err_ilseq_post:
 	return -(ssize_t)size;
 }
 
-INTERN NONNULL((1, 2)) ssize_t
-(FORMATPRINTER_CC libiconv_cp_decode)(struct iconv_decode *__restrict self,
-                                      /*cp???*/ char const *__restrict data, size_t size) {
+INTERN NONNULL((1, 2)) ssize_t FORMATPRINTER_CC
+libiconv_cp_decode(struct iconv_decode *__restrict self,
+                   /*cp???*/ char const *__restrict data, size_t size) {
 	char buf[64], *ptr = buf;
 	ssize_t temp, result = 0;
 	struct iconv_codepage const *cp;
@@ -317,10 +319,10 @@ err_ilseq:
 /************************************************************************/
 /* 7L-code-page encode/decode                                           */
 /************************************************************************/
-PRIVATE ATTR_NOINLINE NONNULL((1, 2)) ssize_t
-(FORMATPRINTER_CC libiconv_cp7l_encode_u32)(struct iconv_encode *__restrict self,
-                                            char32_t const *__restrict data,
-                                            size_t len) {
+PRIVATE ATTR_NOINLINE NONNULL((1, 2)) ssize_t FORMATPRINTER_CC
+libiconv_cp7l_encode_u32(struct iconv_encode *__restrict self,
+                         char32_t const *__restrict data,
+                         size_t len) {
 	size_t j;
 	char buf[64], *ptr = buf;
 	ssize_t temp, result = 0;
@@ -386,9 +388,9 @@ err_ilseq:
 	return -1;
 }
 
-INTERN NONNULL((1, 2)) ssize_t
-(FORMATPRINTER_CC libiconv_cp7l_encode)(struct iconv_encode *__restrict self,
-                                        /*utf-8*/ char const *__restrict data, size_t size) {
+INTERN NONNULL((1, 2)) ssize_t FORMATPRINTER_CC
+libiconv_cp7l_encode(struct iconv_encode *__restrict self,
+                     /*utf-8*/ char const *__restrict data, size_t size) {
 	char buf[64], *ptr = buf;
 	ssize_t temp, result = 0;
 	char32_t c32;
@@ -463,9 +465,9 @@ err_ilseq_post:
 	return -(ssize_t)size;
 }
 
-INTERN NONNULL((1, 2)) ssize_t
-(FORMATPRINTER_CC libiconv_cp7l_decode)(struct iconv_decode *__restrict self,
-                                        /*cp???*/ char const *__restrict data, size_t size) {
+INTERN NONNULL((1, 2)) ssize_t FORMATPRINTER_CC
+libiconv_cp7l_decode(struct iconv_decode *__restrict self,
+                     /*cp???*/ char const *__restrict data, size_t size) {
 	char buf[64], *ptr = buf;
 	ssize_t temp, result = 0;
 	struct iconv_7l_codepage const *cp;
@@ -515,10 +517,10 @@ err_ilseq:
 /************************************************************************/
 /* iso646 code page encode/decode functions.                            */
 /************************************************************************/
-PRIVATE ATTR_NOINLINE NONNULL((1, 2)) ssize_t
-(FORMATPRINTER_CC libiconv_cp646_encode_u32)(struct iconv_encode *__restrict self,
-                                             char32_t const *__restrict data,
-                                             size_t len) {
+PRIVATE ATTR_NOINLINE NONNULL((1, 2)) ssize_t FORMATPRINTER_CC
+libiconv_cp646_encode_u32(struct iconv_encode *__restrict self,
+                          char32_t const *__restrict data,
+                          size_t len) {
 	size_t j;
 	char buf[64], *ptr = buf;
 	ssize_t temp, result = 0;
@@ -574,9 +576,9 @@ err_ilseq:
 	return -1;
 }
 
-INTERN NONNULL((1, 2)) ssize_t
-(FORMATPRINTER_CC libiconv_cp646_encode)(struct iconv_encode *__restrict self,
-                                         /*utf-8*/ char const *__restrict data, size_t size) {
+INTERN NONNULL((1, 2)) ssize_t FORMATPRINTER_CC
+libiconv_cp646_encode(struct iconv_encode *__restrict self,
+                      /*utf-8*/ char const *__restrict data, size_t size) {
 	char buf[64], *ptr = buf;
 	ssize_t temp, result = 0;
 	char32_t c32;
@@ -641,9 +643,9 @@ err_ilseq_post:
 	return -(ssize_t)size;
 }
 
-INTERN NONNULL((1, 2)) ssize_t
-(FORMATPRINTER_CC libiconv_cp646_decode)(struct iconv_decode *__restrict self,
-                                         /*cp???*/ char const *__restrict data, size_t size) {
+INTERN NONNULL((1, 2)) ssize_t FORMATPRINTER_CC
+libiconv_cp646_decode(struct iconv_decode *__restrict self,
+                      /*cp???*/ char const *__restrict data, size_t size) {
 	char buf[64], *ptr = buf;
 	ssize_t temp, result = 0;
 	struct iconv_iso646_codepage const *cp;
@@ -712,6 +714,9 @@ DECL_END
 #include "convert-like-ascii.c.inl"
 #define DEFINE_FOR_CP7H
 #include "convert-like-ascii.c.inl"
+
+/* Misc codecs. */
+#include "convert-c-escape.c.inl"
 #endif /* !__INTELLISENSE__ */
 
 

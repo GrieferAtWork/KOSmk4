@@ -76,14 +76,14 @@ NOTHROW(CC istxtchar)(char32_t ch) {
 		assert(ch != 0); /* Just for safety... */
 		return true;
 	}
-	if (ch <= 0x32) {
+	if (ch < 0x20) {
 		/* Whitelist of text characters within the C1 area */
 		static char const c1_printable[] = {
 			0x09, /* TAB */
-			0x0A, /* LF */
-			0x0C, /* FF */
-			0x0D, /* CR */
-			0x1B, /* ESC (for the purpose of console escape codes) */
+			0x0a, /* LF */
+			0x0c, /* FF */
+			0x0d, /* CR */
+			0x1b, /* ESC (for the purpose of console escape codes) */
 		};
 		return memchr(c1_printable, (uint8_t)ch, sizeof(c1_printable)) != NULL;
 	}
@@ -215,7 +215,7 @@ NOTHROW(CC is_ascii_heuristic)(uint16_t const heuristic[128]) {
  * When `cp' is `NULL', don't decode and check for the ASCII codepage. */
 PRIVATE ATTR_PURE NONNULL((2)) size_t
 NOTHROW_NCX(CC calculate_ascii_fuzzyness)(char16_t const decode[/*decode_count*/],
-                                          uint16_t const byte_heuristic[/*decode_count*/],
+                                          uint16_t const byte_heuristic[128],
                                           uint32_t byte_heuristic_sum,
                                           size_t decode_count, bool is_iso646) {
 	uint32_t cp_heuristic_sum;
@@ -866,12 +866,13 @@ next_cp7h_codec:
 						goto next_cp8_codec;
 				}
 
-				/* Check how fuzzy the decode-to-ascii part  */
+				/* Check how fuzzy the decode-to-ascii part is */
 				fuzzy = calculate_ascii_fuzzyness(cp->icp_decode, heuristic,
 				                                  heuristic_sum, 256, false);
 				if (fuzzy <= best_fuzzyness && fuzzy != (size_t)-1) {
 					/* Better, or as good as the current best candidate(s). */
 					if (fuzzy < best_fuzzyness) {
+						/* New best (clear all previous candidates) */
 						best_codecs_count = 0;
 						best_fuzzyness = fuzzy;
 						cp8_bitset_clear(best_codecs);

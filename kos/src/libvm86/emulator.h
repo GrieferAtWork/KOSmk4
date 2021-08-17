@@ -55,7 +55,7 @@ INTDEF NONNULL((1)) int CC libvm86_exec(vm86_state_t *__restrict self);
  * @return: VM86_SEGFAULT:     Segmentation fault. */
 INTDEF NONNULL((1)) int CC libvm86_intr(vm86_state_t *__restrict self, uint8_t intno);
 
-/* Read/Write values to/from an emulated VIO port.
+/* Read/Write values to/from an emulated IO port.
  * @return: VM86_SUCCESS: Success.
  * @return: VM86_BADPORT: Bad port. */
 INTDEF NONNULL((1, 3)) int CC libvm86_inb(vm86_state_t *__restrict self, uint16_t port, uint8_t *__restrict presult);

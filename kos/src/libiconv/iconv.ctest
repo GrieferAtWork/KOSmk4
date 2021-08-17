@@ -172,6 +172,57 @@ DEFINE_TEST(iconv) {
 	                      "#codec l1\n\xE4"
 	                      "Hello World! aou: \xE4\xF6\xFC\n");
 
+	/* Test conversion to c-escape (and its variants) */
+
+
+	/* When encoding a unicode character that isn't printable, it will be escaped in output. */
+	convert("utf-8", "c-escape", ICONV_ERR_ERRNO, "Hello\uFFFF\nWorld", buf);
+	assertf(strcmp(buf, "Hello\\uFFFF\\nWorld") == 0, "buf = %q", buf);
+	convert("utf-8", "c-escape-chr", ICONV_ERR_ERRNO, "Hello\uFFFF\nWorld", buf);
+	assertf(strcmp(buf, "'Hello\\uFFFF\\nWorld'") == 0, "buf = %q", buf);
+	convert("utf-8", "c-escape-str", ICONV_ERR_ERRNO, "Hello\uFFFF\nWorld", buf);
+	assertf(strcmp(buf, "\"Hello\\uFFFF\\nWorld\"") == 0, "buf = %q", buf);
+	convert("utf-8", "c-escape-bytes", ICONV_ERR_ERRNO, "Hello\uFFFF\nWorld", buf);
+	assertf(strcmp(buf, "Hello\\xEF\\xBF\\xBF\\nWorld") == 0, "buf = %q", buf);
+	convert("utf-8", "c-escape-bytes-chr", ICONV_ERR_ERRNO, "Hello\uFFFF\nWorld", buf);
+	assertf(strcmp(buf, "'Hello\\xEF\\xBF\\xBF\\nWorld'") == 0, "buf = %q", buf);
+	convert("utf-8", "c-escape-bytes-str", ICONV_ERR_ERRNO, "Hello\uFFFF\nWorld", buf);
+	assertf(strcmp(buf, "\"Hello\\xEF\\xBF\\xBF\\nWorld\"") == 0, "buf = %q", buf);
+
+	/* When a unicode character is printable, it's simply re-printed as-it
+	 * HINT: '\u263A' == '☺' */
+	convert("utf-8", "c-escape", ICONV_ERR_ERRNO, "Hello\u263A\nWorld", buf);
+	assertf(strcmp(buf, "Hello\u263A\\nWorld") == 0, "buf = %q", buf);
+	convert("utf-8", "c-escape-chr", ICONV_ERR_ERRNO, "Hello\u263A\nWorld", buf);
+	assertf(strcmp(buf, "'Hello\u263A\\nWorld'") == 0, "buf = %q", buf);
+	convert("utf-8", "c-escape-str", ICONV_ERR_ERRNO, "Hello\u263A\nWorld", buf);
+	assertf(strcmp(buf, "\"Hello\u263A\\nWorld\"") == 0, "buf = %q", buf);
+	convert("utf-8", "c-escape-bytes", ICONV_ERR_ERRNO, "Hello\u263A\nWorld", buf);
+	assertf(strcmp(buf, "Hello\\xE2\\x98\\xBA\\nWorld") == 0, "buf = %q", buf);
+	convert("utf-8", "c-escape-bytes-chr", ICONV_ERR_ERRNO, "Hello\u263A\nWorld", buf);
+	assertf(strcmp(buf, "'Hello\\xE2\\x98\\xBA\\nWorld'") == 0, "buf = %q", buf);
+	convert("utf-8", "c-escape-bytes-str", ICONV_ERR_ERRNO, "Hello\u263A\nWorld", buf);
+	assertf(strcmp(buf, "\"Hello\\xE2\\x98\\xBA\\nWorld\"") == 0, "buf = %q", buf);
+
+	convert("utf-8", "c-escape-bytes", ICONV_ERR_ERRNO, "\xAB" "AB", buf);
+	assertf(strcmp(buf, "\\xAB\\x41\\x42") == 0, "buf = %q", buf);
+	convert("utf-8", "c-escape-bytes-str", ICONV_ERR_ERRNO, "\xAB" "AB", buf);
+	assertf(strcmp(buf, "\"\\xAB\" \"AB\"") == 0, "buf = %q", buf);
+	convert("utf-8", "c-escape-bytes-chr", ICONV_ERR_ERRNO, "\xAB" "AB", buf);
+	assertf(strcmp(buf, "\'\\xAB\' \'AB\'") == 0, "buf = %q", buf);
+
+	convert("utf-8", "c-escape", ICONV_ERR_ERRNO, "\\", buf);
+	assertf(strcmp(buf, "\\\\") == 0, "buf = %q", buf);
+	convert("utf-8", "c-escape-str", ICONV_ERR_ERRNO, "\\", buf);
+	assertf(strcmp(buf, "\"\\\\\"") == 0, "buf = %q", buf);
+	convert("utf-8", "c-escape-chr", ICONV_ERR_ERRNO, "\\", buf);
+	assertf(strcmp(buf, "\'\\\\\'") == 0, "buf = %q", buf);
+	convert("utf-8", "c-escape-bytes", ICONV_ERR_ERRNO, "\\", buf);
+	assertf(strcmp(buf, "\\\\") == 0, "buf = %q", buf);
+	convert("utf-8", "c-escape-bytes-str", ICONV_ERR_ERRNO, "\\", buf);
+	assertf(strcmp(buf, "\"\\\\\"") == 0, "buf = %q", buf);
+	convert("utf-8", "c-escape-bytes-chr", ICONV_ERR_ERRNO, "\\", buf);
+	assertf(strcmp(buf, "\'\\\\\'") == 0, "buf = %q", buf);
 
 
 	dlclose(libiconv);

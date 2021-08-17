@@ -230,6 +230,27 @@ NOTHROW_NCX(CC libiconv_encode_init)(/*in|out*/ struct iconv_encode *__restrict 
 		input->ii_printer        = (pformatprinter)&libiconv_cp646_encode;
 		break;
 
+		/* C-escape */
+	case CODEC_C_ESCAPE:
+	case CODEC_C_ESCAPE_CHR:
+	case CODEC_C_ESCAPE_STR:
+	case CODEC_C_ESCAPE_BYTES:
+	case CODEC_C_ESCAPE_BYTES_CHR:
+	case CODEC_C_ESCAPE_BYTES_STR:
+		input->ii_printer = (pformatprinter)&libiconv_c_escape_encode;
+		/* Set-up flags. */
+		if (self->ice_codec == CODEC_C_ESCAPE ||
+		    self->ice_codec == CODEC_C_ESCAPE_BYTES)
+			self->ice_flags |= _ICONV_CENCODE_NOQUOTE;
+		if (self->ice_codec == CODEC_C_ESCAPE_CHR ||
+		    self->ice_codec == CODEC_C_ESCAPE_BYTES_CHR)
+			self->ice_flags |= _ICONV_CENCODE_USECHAR;
+		if (self->ice_codec == CODEC_C_ESCAPE_BYTES ||
+		    self->ice_codec == CODEC_C_ESCAPE_BYTES_CHR ||
+		    self->ice_codec == CODEC_C_ESCAPE_BYTES_STR)
+			self->ice_flags |= _ICONV_CENCODE_NOUNICD;
+		break;
+
 	default:
 		errno = EINVAL;
 		return -1;
@@ -250,9 +271,19 @@ NOTHROW_NCX(CC libiconv_encode_flush)(struct iconv_encode *__restrict self) {
 	ssize_t result = 0;
 	switch (self->ice_codec) {
 
-		/* No supported codec currently requires any additional work!
-		 * TODO: This will change once support for more complicated
-		 *       codecs gets added. */
+	case CODEC_C_ESCAPE_CHR:
+	case CODEC_C_ESCAPE_STR:
+	case CODEC_C_ESCAPE_BYTES_CHR:
+	case CODEC_C_ESCAPE_BYTES_STR:
+		if (self->ice_flags & _ICONV_CENCODE_INQUOTE) {
+			char out[1] = { '\"' };
+			if (self->ice_flags & _ICONV_CENCODE_USECHAR)
+				out[0] = '\'';
+			result = (*self->ice_output.ii_printer)(self->ice_output.ii_arg, out, 1);
+			if likely(result >= 0)
+				self->ice_flags &= ~_ICONV_CENCODE_INQUOTE;
+		}
+		break;
 
 	default:
 		break;
