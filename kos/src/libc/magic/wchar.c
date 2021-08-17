@@ -356,7 +356,7 @@ size_t wcrtomb(char *__restrict str, wchar_t wc,
 		mbstate_init(mbs);
 		return 1;
 	}
-	if ((mbs->@__word@ & __MBSTATE_TYPE_MASK) == __MBSTATE_TYPE_UTF16_LO) {
+	if ((mbs->@__mb_word@ & __MBSTATE_TYPE_MASK) == __MBSTATE_TYPE_UTF16_LO) {
 		/* Complete surrogate */
 		char32_t ch32;
 		if unlikely(!((u16)wc >= UTF16_LOW_SURROGATE_MIN &&
@@ -367,13 +367,13 @@ size_t wcrtomb(char *__restrict str, wchar_t wc,
 @@pp_endif@@
 			return (size_t)-1;
 		}
-		ch32 = ((mbs->@__word@ & 0x000003ff) << 10) +
+		ch32 = ((mbs->@__mb_word@ & 0x000003ff) << 10) +
 		       0x10000 + ((u16)wc - 0xdc00);
-		mbs->@__word@ = __MBSTATE_TYPE_EMPTY;
+		mbs->@__mb_word@ = __MBSTATE_TYPE_EMPTY;
 		endptr = unicode_writeutf8(str, ch32);
 	} else if ((u16)wc >= UTF16_HIGH_SURROGATE_MIN &&
 	           (u16)wc <= UTF16_HIGH_SURROGATE_MAX) {
-		mbs->@__word@ = __MBSTATE_TYPE_UTF16_LO | ((u16)wc - UTF16_HIGH_SURROGATE_MIN);
+		mbs->@__mb_word@ = __MBSTATE_TYPE_UTF16_LO | ((u16)wc - UTF16_HIGH_SURROGATE_MIN);
 		return 0;
 	} else {
 		endptr = unicode_writeutf8(str, (char32_t)(u32)(u16)wc);

@@ -32,9 +32,9 @@ struct __mbstate {
 #ifdef __CRT_GLC_PRIMARY
 	/* Under native gLibc, this structure is 8 bytes large. */
 	union {
-		__UINT32_TYPE__ __word; /* Used by KOS auxillary functions.
-		                         * Share offset with  `__count' so  that when  `__count == 0',
-		                         * our custom `__mbstate_isempty()' still indicates correctly. */
+		__UINT32_TYPE__ __mb_word; /* Used by KOS auxillary functions.
+		                            * Share offset with  `__count' so  that when  `__count == 0',
+		                            * our custom `__mbstate_isempty()' still indicates correctly. */
 		int __count; /* Used by gLibc */
 	};
 	union {
@@ -44,13 +44,18 @@ struct __mbstate {
 #else /* __CRT_GLC_PRIMARY */
 	/* This structure  must not  exceed  4 bytes,  so  we
 	 * can conform to DOS's 4-byte `mbstate_t' structure. */
-	__UINT32_TYPE__ __word;
+	__UINT32_TYPE__ __mb_word;
 #endif /* !__CRT_GLC_PRIMARY */
 };
 
-#define __MBSTATE_INIT       { 0 }
-#define __mbstate_init(x)    (void)((x)->__word = 0)
-#define __mbstate_isempty(x) ((x)->__word == 0)
+
+#ifdef __CRT_GLC_PRIMARY
+#define __MBSTATE_INIT { { 0 } }
+#else /* __CRT_GLC_PRIMARY */
+#define __MBSTATE_INIT { 0 }
+#endif /* !__CRT_GLC_PRIMARY */
+#define __mbstate_init(x)    (void)((x)->__mb_word = 0)
+#define __mbstate_isempty(x) ((x)->__mb_word == 0)
 
 #define __MBSTATE_TYPE_MASK     0xfc000000
 #define __MBSTATE_TYPE_EMPTY    0x00000000
@@ -75,11 +80,20 @@ struct __mbstate {
  *       so  even just supporting 5-character and 6-character sequences is already an
  *       extension! */
 #define __MBSTATE_TYPE_UTF16_LO    0x40000000 /* expect the low-surrogate value of a 2-uint16_t utf-16 sequence. `RESULT_CHAR = ((WORD & 0x000003ff) << 10) + 0x10000 + (SECOND_U16 - 0xdc00);' */
-#define __MBSTATE_TYPE_WR_UTF16_LO 0xc0000000 /* Write the low-surrogate value of a 2-uint16_t utf-16 sequence. `OUT_CHAR = 0xdc00 + (WORD & 0x000003ff)' */
+#define __MBSTATE_TYPE_WR_UTF16_LO 0x44000000 /* Write the low-surrogate value of a 2-uint16_t utf-16 sequence. `OUT_CHAR = 0xdc00 + (WORD & 0x000003ff)' */
 
-#define __MBSTATE_NBIT_MASK   0xf8000000
-#define __MBSTATE_NBIT_SHFT   27
-#define __MBSTATE_DATA_MASK   0x07ffffff
+/* Reserved for future expansion: there's still a lot of space left for more type codes! */
+/*      __MBSTATE_TYPE_            0x48000000  * ... */
+/*      __MBSTATE_TYPE_            0x4c000000  * ... */
+/*      __MBSTATE_TYPE_            0x50000000  * ... */
+/*      __MBSTATE_TYPE_            0x54000000  * ... */
+/*      __MBSTATE_TYPE_            0x58000000  * ... */
+/*      __MBSTATE_TYPE_            0x5c000000  * ... */
+/*      __MBSTATE_TYPE_            ...         * ... */
+/*      __MBSTATE_TYPE_            0xf0000000  * ... */
+/*      __MBSTATE_TYPE_            0xf4000000  * ... */
+/*      __MBSTATE_TYPE_            0xf8000000  * ... */
+/*      __MBSTATE_TYPE_            0xfc000000  * ... */
 #endif /* __CC__ */
 
 __SYSDECL_END

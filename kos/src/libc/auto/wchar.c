@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x24c65a8d */
+/* HASH CRC-32:0xc48ab2f */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -197,7 +197,7 @@ NOTHROW_NCX(LIBDCALL libd_wcrtomb)(char *__restrict str,
 		mbstate_init(mbs);
 		return 1;
 	}
-	if ((mbs->__word & __MBSTATE_TYPE_MASK) == __MBSTATE_TYPE_UTF16_LO) {
+	if ((mbs->__mb_word & __MBSTATE_TYPE_MASK) == __MBSTATE_TYPE_UTF16_LO) {
 		/* Complete surrogate */
 		char32_t ch32;
 		if unlikely(!((u16)wc >= 0xdc00 &&
@@ -208,13 +208,13 @@ NOTHROW_NCX(LIBDCALL libd_wcrtomb)(char *__restrict str,
 #endif /* EILSEQ */
 			return (size_t)-1;
 		}
-		ch32 = ((mbs->__word & 0x000003ff) << 10) +
+		ch32 = ((mbs->__mb_word & 0x000003ff) << 10) +
 		       0x10000 + ((u16)wc - 0xdc00);
-		mbs->__word = __MBSTATE_TYPE_EMPTY;
+		mbs->__mb_word = __MBSTATE_TYPE_EMPTY;
 		endptr = libc_unicode_writeutf8(str, ch32);
 	} else if ((u16)wc >= 0xd800 &&
 	           (u16)wc <= 0xdbff) {
-		mbs->__word = __MBSTATE_TYPE_UTF16_LO | ((u16)wc - 0xd800);
+		mbs->__mb_word = __MBSTATE_TYPE_UTF16_LO | ((u16)wc - 0xd800);
 		return 0;
 	} else {
 		endptr = libc_unicode_writeutf8(str, (char32_t)(u32)(u16)wc);

@@ -1391,9 +1391,9 @@ WUNUSED NONNULL((1)) char16_t LIBCCALL file_getc16(FILE *__restrict self) {
 	ex = self->if_exdata;
 	assert(ex);
 	/* Check for a pending surrogate */
-	if ((ex->io_mbs.__word & __MBSTATE_TYPE_MASK) == __MBSTATE_TYPE_WR_UTF16_LO) {
-		result = (char16_t)(0xdc00 + (ex->io_mbs.__word & 0x000003ff));
-		ex->io_mbs.__word = __MBSTATE_TYPE_EMPTY;
+	if ((ex->io_mbs.__mb_word & __MBSTATE_TYPE_MASK) == __MBSTATE_TYPE_WR_UTF16_LO) {
+		result = (char16_t)(0xdc00 + (ex->io_mbs.__mb_word & 0x000003ff));
+		ex->io_mbs.__mb_word = __MBSTATE_TYPE_EMPTY;
 		goto done;
 	}
 	/* Try to complete an in-progress utf-8 sequence. */
@@ -1473,7 +1473,7 @@ WUNUSED NONNULL((1)) char16_t LIBCCALL file_ungetc16(FILE *__restrict self, char
 	ex = self->if_exdata;
 	assert(ex);
 	/* Check for a pending surrogate */
-	if ((ex->io_mbs.__word & __MBSTATE_TYPE_MASK) == __MBSTATE_TYPE_WR_UTF16_LO) {
+	if ((ex->io_mbs.__mb_word & __MBSTATE_TYPE_MASK) == __MBSTATE_TYPE_WR_UTF16_LO) {
 		char16_t lo_surrogate;
 		if unlikely(ch < UTF16_HIGH_SURROGATE_MIN || ch > UTF16_HIGH_SURROGATE_MAX) {
 set_ilseq:
@@ -1482,8 +1482,8 @@ set_ilseq:
 			result = EOF16;
 			goto done;
 		}
-		lo_surrogate = (char16_t)(0xdc00 + (ex->io_mbs.__word & 0x000003ff));
-		ex->io_mbs.__word = __MBSTATE_TYPE_EMPTY;
+		lo_surrogate = (char16_t)(0xdc00 + (ex->io_mbs.__mb_word & 0x000003ff));
+		ex->io_mbs.__mb_word = __MBSTATE_TYPE_EMPTY;
 		unget_char = ch;
 		unget_char -= 0xd800;
 		unget_char <<= 10;
@@ -1531,14 +1531,14 @@ file_print16(void *self, char16_t const *__restrict data, size_t datalen) {
 	arg.fd_printer   = &libc_file_printer_unlocked;
 	arg.fd_surrogate = 0;
 	/* Check for a the pending surrogate pair */
-	if ((ex->io_mbs.__word & __MBSTATE_TYPE_MASK) == __MBSTATE_TYPE_UTF16_LO) {
-		arg.fd_surrogate = 0xdc00 + (ex->io_mbs.__word & 0x000003ff);
-		ex->io_mbs.__word = __MBSTATE_TYPE_EMPTY;
+	if ((ex->io_mbs.__mb_word & __MBSTATE_TYPE_MASK) == __MBSTATE_TYPE_UTF16_LO) {
+		arg.fd_surrogate = 0xdc00 + (ex->io_mbs.__mb_word & 0x000003ff);
+		ex->io_mbs.__mb_word = __MBSTATE_TYPE_EMPTY;
 	}
 	result = format_16to8(&arg, data, datalen);
 	/* Update the pending surrogate pair */
 	if (arg.fd_surrogate)
-		ex->io_mbs.__word = __MBSTATE_TYPE_UTF16_LO | (arg.fd_surrogate - 0xdc00);
+		ex->io_mbs.__mb_word = __MBSTATE_TYPE_UTF16_LO | (arg.fd_surrogate - 0xdc00);
 	return result;
 }
 

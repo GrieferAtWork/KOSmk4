@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x60af1eb9 */
+/* HASH CRC-32:0xe1e51598 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -30,15 +30,14 @@ __NAMESPACE_LOCAL_BEGIN
 __LOCAL_LIBC(unicode_c16toc8) __ATTR_NONNULL((1, 3)) __SIZE_TYPE__
 __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(unicode_c16toc8))(char __pc8[3], __CHAR16_TYPE__ __c16, struct __mbstate *__restrict __mbs) {
 	__CHAR32_TYPE__ __ch32;
-	if ((__mbs->__word & __MBSTATE_TYPE_MASK) == __MBSTATE_TYPE_UTF16_LO) {
+	if ((__mbs->__mb_word & __MBSTATE_TYPE_MASK) == __MBSTATE_TYPE_UTF16_LO) {
 		if __unlikely(!(__c16 >= 0xdc00 &&
 		              __c16 <= 0xdfff))
 			return (__SIZE_TYPE__)-1;
-		__ch32 = ((__mbs->__word & 0x000003ff) << 10) + 0x10000 + ((__UINT16_TYPE__)__c16 - 0xdc00);
-		__mbs->__word = __MBSTATE_TYPE_EMPTY;
-	} else if (__c16 >= 0xd800 &&
-	           __c16 <= 0xdbff) {
-		__mbs->__word = __MBSTATE_TYPE_UTF16_LO | ((__UINT16_TYPE__)__c16 - 0xd800);
+		__ch32 = ((__mbs->__mb_word & 0x000003ff) << 10) + 0x10000 + ((__UINT16_TYPE__)__c16 - 0xdc00);
+		__mbs->__mb_word = __MBSTATE_TYPE_EMPTY;
+	} else if (__c16 >= 0xd800 && __c16 <= 0xdbff) {
+		__mbs->__mb_word = __MBSTATE_TYPE_UTF16_LO | ((__UINT16_TYPE__)__c16 - 0xd800);
 		return 0;
 	} else {
 		__ch32 = (__CHAR32_TYPE__)__c16;

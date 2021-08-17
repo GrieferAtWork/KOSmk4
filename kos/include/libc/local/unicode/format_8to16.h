@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x53e0d460 */
+/* HASH CRC-32:0x62eaa5fa */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -70,7 +70,7 @@ __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(format_8to16))(void *__arg, char cons
 		do {
 			__SIZE_TYPE__ __error = __localdep_unicode_c8toc16(__dst, __data, __datalen, &__closure->__fd_incomplete);
 			if __unlikely(__error == (__SIZE_TYPE__)-1) {
-				__closure->__fd_incomplete.__word = __MBSTATE_TYPE_EMPTY;
+				__mbstate_init(&__closure->__fd_incomplete);
 				*__dst = __data[0];
 				__error = 1;
 			} else if (__error == (__SIZE_TYPE__)-2) {
