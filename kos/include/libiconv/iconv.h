@@ -307,7 +307,7 @@ union iconv_encode_data {
  *       >>     // Another example would be an illegal escape sequence, like \p or \x1234567
  *       >> }
  */
-#define _ICONV_CDECODE_STMASK   0x0f00 /* Mask for state. */
+#define _ICONV_CDECODE_STMASK   0xff00 /* Mask for state. */
 #define _ICONV_CDECODE_ST_RAW   0x0000 /* Raw string type (no unescaped quotes allowed) */
 #define _ICONV_CDECODE_ST_STRIN 0x0100 /* "-string (inside; linefeed characters will cause errors) */
 #define _ICONV_CDECODE_ST_CHRIN 0x0200 /* '-string (inside; linefeed characters will cause errors) */
