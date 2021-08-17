@@ -128,7 +128,7 @@ NOTHROW_NCX(LIBCCALL libiconv_stdiconv_open)(const char *tocode,
 	result->si_decode.icd_output.ii_printer = (pformatprinter)&stdiconv_count_characters_and_forward;
 	result->si_decode.icd_output.ii_arg     = result;
 	result->si_decode.icd_flags             = decode_flags;
-	__mbstate_init(&result->si_converted_mbs);
+	mbstate_init(&result->si_converted_mbs);
 
 	/* Initialize the decoder and encoder. */
 	result->si_decode.icd_codec = input_codec;
@@ -238,7 +238,7 @@ NOTHROW_NCX(LIBCCALL libiconv_stdiconv)(struct stdiconv *self,
 		 * multi-byte state to keep track of the complete-ness of incoming UTF-8
 		 * data, so we can handle the case  where the decoder can't tell us  for
 		 * certain by checking our own state. */
-		if (!__MBSTATE_ISINIT(&self->si_converted_mbs))
+		if (!mbstate_isempty(&self->si_converted_mbs))
 			goto err_incomplete_input;
 
 		if (!outbuf || !*outbuf) {

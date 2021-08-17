@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xba5c25fd */
+/* HASH CRC-32:0x7b2f8440 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -25,7 +25,7 @@
 __NAMESPACE_LOCAL_BEGIN
 __LOCAL_LIBC(mbsinit) __ATTR_PURE __ATTR_WUNUSED int
 __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(mbsinit))(struct __mbstate const *__mbs) {
-	return !__mbs || __MBSTATE_ISINIT(__mbs);
+	return !__mbs || __mbstate_isempty(__mbs);
 }
 __NAMESPACE_LOCAL_END
 #ifndef __local___localdep_mbsinit_defined

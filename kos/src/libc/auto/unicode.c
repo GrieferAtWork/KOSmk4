@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x9778fe22 */
+/* HASH CRC-32:0xeefd4d64 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -999,14 +999,12 @@ NOTHROW_NCX(LIBCCALL libc_unicode_c16toc8)(char pc8[3],
                                            char16_t c16,
                                            mbstate_t *__restrict mbs) {
 	char32_t ch32;
-	uint32_t state;
-	state = mbs->__word & __MBSTATE_TYPE_MASK;
-	if (state == __MBSTATE_TYPE_UTF16_LO) {
+	if ((mbs->__word & __MBSTATE_TYPE_MASK) == __MBSTATE_TYPE_UTF16_LO) {
 		if unlikely(!(c16 >= 0xdc00 &&
 		              c16 <= 0xdfff))
 			return (size_t)-1;
 		ch32 = ((mbs->__word & 0x000003ff) << 10) + 0x10000 + ((u16)c16 - 0xdc00);
-		mbs->__word = 0;
+		mbs->__word = __MBSTATE_TYPE_EMPTY;
 	} else if (c16 >= 0xd800 &&
 	           c16 <= 0xdbff) {
 		mbs->__word = __MBSTATE_TYPE_UTF16_LO | ((u16)c16 - 0xd800);

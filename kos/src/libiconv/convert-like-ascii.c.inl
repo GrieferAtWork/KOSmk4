@@ -146,7 +146,7 @@ LOCAL_libiconv_encode(struct iconv_encode *__restrict self,
 	end         = data + size;
 	if unlikely(self->ice_flags & ICONV_HASERR)
 		goto err_ilseq;
-	if (self->ice_data.ied_utf8.__word != __MBSTATE_TYPE_EMPTY) {
+	if (!mbstate_isempty(&self->ice_data.ied_utf8)) {
 		/* Deal with incomplete characters. */
 		if unlikely(!size)
 			return 0;
@@ -169,8 +169,8 @@ handle_unicode:
 					if (IS_ICONV_ERR_ERROR_OR_ERRNO(self->ice_flags))
 						goto err_ilseq;
 					if (IS_ICONV_ERR_DISCARD(self->ice_flags)) {
-						self->ice_data.ied_utf8.__word = __MBSTATE_TYPE_EMPTY;
-						flush_start                    = data;
+						mbstate_init(&self->ice_data.ied_utf8);
+						flush_start = data;
 						goto next_data;
 					}
 					ch32 = '?';

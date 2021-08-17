@@ -49,6 +49,18 @@
 # TODO:
 #  - Codec "xml-escape" for &lt;xml-style&gt; escaping (https://en.wikipedia.org/wiki/XML)
 #  - Codec "uri-escape" for %3Curi-style%3E escaping (https://en.wikipedia.org/wiki/Percent-encoding)
+#
+###################################################################################################
+# Ideas:
+#  - Codec "ansitty-NxN" that uses malloc+libansitty to set-up a small in-memory monochrome terminal
+#    which it then feeds all of the input data into. Text written is then output to the in-memory
+#    display which behaves like a regular terminal (including scrolling and \r, etc). Decode would
+#    not be an allowed operation, and the size of the terminal is given via the codec name, but the
+#    screen data can be output by use of `iconv_encode_flush()'
+#    Problem is, this would require the addition of `iconv_encode_fini()', which is something that
+#    I really don't want to have to do, meaning that this will probably never happen :(
+#
+###################################################################################################
 # TODO:
 #  - https://en.wikipedia.org/wiki/UTF-1                              "ISO-10646-UTF-1", "csISO-10646UTF1"
 #  - https://en.wikipedia.org/wiki/Shift_JIS                          "shift-jis", "sjis", "ms_kanji", "csShiftJis"

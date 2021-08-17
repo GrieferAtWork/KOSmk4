@@ -314,7 +314,7 @@ size_t mbrtowc([[nullable]] wchar_t *pwc,
 		mbs = &mbrtowc_ps;
 	}
 	if (!str) {
-		mbs->@__word@ = 0;
+		mbs->@__word@ = __MBSTATE_TYPE_EMPTY;
 		return 0;
 	}
 	if (!maxlen || !*str)
@@ -351,7 +351,7 @@ size_t wcrtomb(char *__restrict str, wchar_t wc,
 		mbs = &wcrtomb_ps;
 	}
 	if (!str) {
-		mbs->@__word@ = 0;
+		mbs->@__word@ = __MBSTATE_TYPE_EMPTY;
 		return 1;
 	}
 	if ((mbs->@__word@ & __MBSTATE_TYPE_MASK) == __MBSTATE_TYPE_UTF16_LO) {
@@ -367,7 +367,7 @@ size_t wcrtomb(char *__restrict str, wchar_t wc,
 		}
 		ch32 = ((mbs->@__word@ & 0x000003ff) << 10) +
 		       0x10000 + ((u16)wc - 0xdc00);
-		mbs->@__word@ = 0;
+		mbs->@__word@ = __MBSTATE_TYPE_EMPTY;
 		endptr = unicode_writeutf8(str, ch32);
 	} else if ((u16)wc >= UTF16_HIGH_SURROGATE_MIN &&
 	           (u16)wc <= UTF16_HIGH_SURROGATE_MAX) {
@@ -467,7 +467,7 @@ wcstoul(*) %{generate(str2wcs("strtoul"))}
 [[section(".text.crt{|.dos}.wchar.unicode.static.mbs")]]
 [[decl_include("<bits/crt/mbstate.h>")]]
 int mbsinit([[nullable]] mbstate_t const *mbs) {
-	return !mbs || __MBSTATE_ISINIT(mbs);
+	return !mbs || __mbstate_isempty(mbs);
 }
 
 %[define_wchar_replacement(wmemcmp = memcmpw, memcmpl)]

@@ -49,7 +49,7 @@ PP_CAT3(libiconv_utf, UTF_WIDTH, be_encode)(struct iconv_encode *__restrict self
 			if unlikely(error == (size_t)-1) {
 				if (IS_ICONV_ERR_ERROR_OR_ERRNO(self->ice_flags))
 					goto err_ilseq;
-				self->ice_data.ied_utf8.__word = __MBSTATE_TYPE_EMPTY;
+				mbstate_init(&self->ice_data.ied_utf8);
 				if (IS_ICONV_ERR_DISCARD(self->ice_flags)) {
 					error = 1;
 					goto consume_error;

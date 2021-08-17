@@ -46,6 +46,7 @@ gcc_opt.append("-O3"); // Force _all_ optimizations because stuff in here is per
 #include "cp-7l.h"
 #include "cp-iso646.h"
 #include "cp.h"
+#include "iconv.h"
 
 DECL_BEGIN
 

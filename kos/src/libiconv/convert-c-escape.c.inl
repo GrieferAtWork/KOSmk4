@@ -96,7 +96,7 @@ libiconv_c_escape_encode(struct iconv_encode *__restrict self,
 	end         = data + size;
 	if unlikely(self->ice_flags & ICONV_HASERR)
 		goto err_ilseq;
-	if (self->ice_data.ied_utf8.__word != __MBSTATE_TYPE_EMPTY)
+	if (!mbstate_isempty(&self->ice_data.ied_utf8))
 		goto parse_unicode;
 	while (data < end) {
 		unsigned char ch;
@@ -115,8 +115,8 @@ parse_unicode:
 					if (IS_ICONV_ERR_ERROR_OR_ERRNO(self->ice_flags))
 						goto err_ilseq;
 					if (IS_ICONV_ERR_DISCARD(self->ice_flags)) {
-						self->ice_data.ied_utf8.__word = __MBSTATE_TYPE_EMPTY;
-						flush_start                    = data + 1;
+						mbstate_init(&self->ice_data.ied_utf8);
+						flush_start = data + 1;
 						goto next_data;
 					}
 					/* Special case: we can actually ignore utf-8 errors  by
@@ -307,7 +307,7 @@ libiconv_c_escape_decode(struct iconv_decode *__restrict self,
 	end         = data + size;
 	if unlikely(self->icd_flags & ICONV_HASERR)
 		goto err_ilseq;
-	if (self->icd_data.idd_cesc.ce_utf8.__word != __MBSTATE_TYPE_EMPTY) {
+	if (!mbstate_isempty(&self->icd_data.idd_cesc.ce_utf8)) {
 		ch_start = data;
 		goto parse_unicode;
 	}
@@ -325,7 +325,7 @@ parse_unicode:
 					if (IS_ICONV_ERR_ERROR_OR_ERRNO(self->icd_flags))
 						goto err_ilseq;
 					if (IS_ICONV_ERR_DISCARD(self->icd_flags)) {
-						self->icd_data.idd_cesc.ce_utf8.__word = __MBSTATE_TYPE_EMPTY;
+						mbstate_init(&self->icd_data.idd_cesc.ce_utf8);
 						if (SHOULD_FLUSH()) {
 							DO_decode_output(flush_start, (size_t)(end - flush_start));
 							flush_start = data + 1;

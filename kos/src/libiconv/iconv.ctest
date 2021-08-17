@@ -196,8 +196,8 @@ DEFINE_TEST(iconv) {
 	convert("utf-8", "c-escape-bytes-str", ICONV_ERR_ERRNO, "Hello\uFFFF\nWorld", buf);
 	assertf(strcmp(buf, "\"Hello\\xEF\\xBF\\xBF\\nWorld\"") == 0, "buf = %q", buf);
 
-	/* When a unicode character is printable, it's simply re-printed as-it
-	 * HINT: '\u263A' == '☺' */
+	/* When a unicode character is printable, it's simply re-printed as-is
+	 * HINT: '\u263A' == '☺' (which is considered printable, and should show up as a smiley) */
 	convert("utf-8", "c-escape", ICONV_ERR_ERRNO, "Hello\u263A\nWorld", buf);
 	assertf(strcmp(buf, "Hello\u263A\\nWorld") == 0, "buf = %q", buf);
 	convert("utf-8", "c-escape-chr", ICONV_ERR_ERRNO, "Hello\u263A\nWorld", buf);

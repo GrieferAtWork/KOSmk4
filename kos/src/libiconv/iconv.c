@@ -70,13 +70,13 @@ NOTHROW_NCX(CC libiconv_decode_init)(/*in|out*/ struct iconv_decode *__restrict 
 	case CODEC_UTF16LE:
 		input->ii_printer = (pformatprinter)&libiconv_utf16le_decode;
 		self->icd_data.idd_utf.u_pbc = 0;
-		__mbstate_init(&self->icd_data.idd_utf.u_16);
+		mbstate_init(&self->icd_data.idd_utf.u_16);
 		break;
 
 	case CODEC_UTF16BE:
 		input->ii_printer = (pformatprinter)&libiconv_utf16be_decode;
 		self->icd_data.idd_utf.u_pbc = 0;
-		__mbstate_init(&self->icd_data.idd_utf.u_16);
+		mbstate_init(&self->icd_data.idd_utf.u_16);
 		break;
 
 	case CODEC_UTF32LE:
@@ -134,7 +134,7 @@ NOTHROW_NCX(CC libiconv_decode_init)(/*in|out*/ struct iconv_decode *__restrict 
 	case CODEC_C_ESCAPE_BYTES_INSTR:
 		input->ii_printer = (pformatprinter)&libiconv_c_escape_decode;
 		/* Set-up the initial state for the parser. */
-		__mbstate_init(&self->icd_data.idd_cesc.ce_utf8);
+		mbstate_init(&self->icd_data.idd_cesc.ce_utf8);
 		if (self->icd_codec == CODEC_C_ESCAPE_STR || self->icd_codec == CODEC_C_ESCAPE_BYTES_STR) {
 			self->icd_flags |= _ICONV_CDECODE_ST_STR;
 		} else if (self->icd_codec == CODEC_C_ESCAPE_CHR || self->icd_codec == CODEC_C_ESCAPE_BYTES_CHR) {
@@ -181,7 +181,7 @@ NOTHROW_NCX(CC libiconv_decode_isshiftzero)(struct iconv_decode const *__restric
 	case CODEC_UTF16LE:
 	case CODEC_UTF16BE:
 		return self->icd_data.idd_utf.u_pbc == 0 &&
-		       __MBSTATE_ISINIT(&self->icd_data.idd_utf.u_16);
+		       mbstate_isempty(&self->icd_data.idd_utf.u_16);
 
 	case CODEC_UTF32LE:
 	case CODEC_UTF32BE:
@@ -196,7 +196,7 @@ NOTHROW_NCX(CC libiconv_decode_isshiftzero)(struct iconv_decode const *__restric
 	case CODEC_C_ESCAPE_BYTES_RAW:
 	case CODEC_C_ESCAPE_BYTES_CHR:
 	case CODEC_C_ESCAPE_BYTES_STR:
-		return __MBSTATE_ISINIT(&self->icd_data.idd_cesc.ce_utf8) &&
+		return mbstate_isempty(&self->icd_data.idd_cesc.ce_utf8) &&
 		       /* Make sure that the parser state indicate that we're outside of a string. */
 		       (/* String type never determined */
 		        (self->icd_flags & _ICONV_CDECODE_STMASK) == _ICONV_CDECODE_ST_UNDEF ||
@@ -216,7 +216,7 @@ NOTHROW_NCX(CC libiconv_decode_isshiftzero)(struct iconv_decode const *__restric
 		/* These codecs are a little more special since the base-line requires that we're
 		 * inside  of a character or string constant.  As such, the zero-shift state must
 		 * reflect this and only apply while we're still inside! */
-		return __MBSTATE_ISINIT(&self->icd_data.idd_cesc.ce_utf8) &&
+		return mbstate_isempty(&self->icd_data.idd_cesc.ce_utf8) &&
 		       ((self->icd_flags & _ICONV_CDECODE_STMASK) == _ICONV_CDECODE_ST_STRIN ||
 		        (self->icd_flags & _ICONV_CDECODE_STMASK) == _ICONV_CDECODE_ST_CHRIN ||
 		        (self->icd_flags & _ICONV_CDECODE_STMASK) == _ICONV_CDECODE_ST_ALLIN);
@@ -237,7 +237,7 @@ NOTHROW_NCX(CC libiconv_encode_init)(/*in|out*/ struct iconv_encode *__restrict 
 	/* By default, the iconv encoder is used as input cookie. */
 	input->ii_arg = self;
 	/* Almost all codecs use the utf-8 parser mbstate. */
-	__mbstate_init(&self->ice_data.ied_utf8);
+	mbstate_init(&self->ice_data.ied_utf8);
 	switch (self->ice_codec) {
 
 	case CODEC_ASCII:
@@ -317,22 +317,30 @@ NOTHROW_NCX(CC libiconv_encode_init)(/*in|out*/ struct iconv_encode *__restrict 
 	case CODEC_C_ESCAPE_BYTES_STR:
 	case CODEC_C_ESCAPE_BYTES_INCHR:
 	case CODEC_C_ESCAPE_BYTES_INSTR:
+		/* All c-escape variants use the same function for encoding. */
 		input->ii_printer = (pformatprinter)&libiconv_c_escape_encode;
+
 		/* Set-up  flags depending  on which  codec is  being used exactly.
 		 * Note that when it comes to encoding, some of the c-escape codecs
 		 * behave  exactly the same,  but don't when  it comes to decoding.
 		 * See the documentation in `iconvdata/db'! */
+
+		/* >> if ("_CHR" !in str(self->ice_codec) && "_STR" !in str(self->ice_codec)) */
 		if (self->ice_codec == CODEC_C_ESCAPE || self->ice_codec == CODEC_C_ESCAPE_BYTES ||
 		    self->ice_codec == CODEC_C_ESCAPE_RAW || self->ice_codec == CODEC_C_ESCAPE_BYTES_RAW ||
 		    self->ice_codec == CODEC_C_ESCAPE_ALL || self->ice_codec == CODEC_C_ESCAPE_BYTES_ALL)
-			self->ice_flags |= _ICONV_CENCODE_NOQUOTE;
+			self->ice_flags |= _ICONV_CENCODE_NOQUOTE; /* Don't emit quotes */
+
+		/* >> if ("_CHR" in str(self->ice_codec)) */
 		if (self->ice_codec == CODEC_C_ESCAPE_CHR || self->ice_codec == CODEC_C_ESCAPE_INCHR ||
 		    self->ice_codec == CODEC_C_ESCAPE_BYTES_CHR || self->ice_codec == CODEC_C_ESCAPE_BYTES_INCHR)
-			self->ice_flags |= _ICONV_CENCODE_USECHAR;
+			self->ice_flags |= _ICONV_CENCODE_USECHAR; /* Emit ' instead of " when printing quotes */
+
+		/* >> if ("_BYTES" in str(self->ice_codec)) */
 		if (self->ice_codec == CODEC_C_ESCAPE_BYTES || self->ice_codec == CODEC_C_ESCAPE_BYTES_RAW ||
 		    self->ice_codec == CODEC_C_ESCAPE_BYTES_CHR || self->ice_codec == CODEC_C_ESCAPE_BYTES_INCHR ||
 		    self->ice_codec == CODEC_C_ESCAPE_BYTES_STR || self->ice_codec == CODEC_C_ESCAPE_BYTES_INSTR)
-			self->ice_flags |= _ICONV_CENCODE_NOUNICD;
+			self->ice_flags |= _ICONV_CENCODE_NOUNICD; /* Don't emit \u or \U and encode everything as \x */
 		break;
 
 	default:
@@ -379,7 +387,7 @@ NOTHROW_NCX(CC libiconv_encode_flush)(struct iconv_encode *__restrict self) {
 	/* All encode codecs need a UTF-8 multi-byte state descriptor  so
 	 * that they're able to decode the in-coming UTF-8 data. Here, we
 	 * have to reset that state! */
-	__mbstate_init(&self->ice_data.ied_utf8);
+	mbstate_init(&self->ice_data.ied_utf8);
 	return result;
 }
 

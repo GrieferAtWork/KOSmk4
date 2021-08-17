@@ -57,6 +57,10 @@
 
 DECL_BEGIN
 
+#ifndef mbstate_init
+#define mbstate_init __mbstate_init
+#endif /* !mbstate_init */
+
 #undef libc_ferror_unlocked
 #undef libc_feof_unlocked
 #define libc_ferror_unlocked libc_ferror
@@ -1393,7 +1397,7 @@ WUNUSED NONNULL((1)) char16_t LIBCCALL file_getc16(FILE *__restrict self) {
 	/* Check for a pending surrogate */
 	if ((ex->io_mbs.__word & __MBSTATE_TYPE_MASK) == __MBSTATE_TYPE_WR_UTF16_LO) {
 		result = (char16_t)(0xdc00 + (ex->io_mbs.__word & 0x000003ff));
-		ex->io_mbs.__word = 0;
+		ex->io_mbs.__word = __MBSTATE_TYPE_EMPTY;
 		goto done;
 	}
 	/* Try to complete an in-progress utf-8 sequence. */
@@ -1483,7 +1487,7 @@ set_ilseq:
 			goto done;
 		}
 		lo_surrogate = (char16_t)(0xdc00 + (ex->io_mbs.__word & 0x000003ff));
-		ex->io_mbs.__word = 0;
+		ex->io_mbs.__word = __MBSTATE_TYPE_EMPTY;
 		unget_char = ch;
 		unget_char -= 0xd800;
 		unget_char <<= 10;
@@ -1533,7 +1537,7 @@ file_print16(void *self, char16_t const *__restrict data, size_t datalen) {
 	/* Check for a the pending surrogate pair */
 	if ((ex->io_mbs.__word & __MBSTATE_TYPE_MASK) == __MBSTATE_TYPE_UTF16_LO) {
 		arg.fd_surrogate = 0xdc00 + (ex->io_mbs.__word & 0x000003ff);
-		ex->io_mbs.__word = 0;
+		ex->io_mbs.__word = __MBSTATE_TYPE_EMPTY;
 	}
 	result = format_16to8(&arg, data, datalen);
 	/* Update the pending surrogate pair */
@@ -1816,7 +1820,7 @@ WUNUSED FILE *LIBCCALL file_reopenfd(FILE *__restrict self,
 	ex->io_chsz = 0;
 	ex->io_fblk = 0;
 	ex->io_fpos = 0;
-	ex->io_mbs.__word = 0;
+	mbstate_init(&ex->io_mbs);
 	return self;
 }
 

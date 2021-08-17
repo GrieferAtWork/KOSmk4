@@ -274,7 +274,7 @@ union iconv_encode_data {
 #define _ICONV_CENCODE_NOQUOTE 0x0100 /* [const] Flag: don't emit quotes. */
 #define _ICONV_CENCODE_POSTHEX 0x0200 /* Flag: Immediately after a \xAB sequence.
                                        * iow: follow-up 0-9, a-f, A-F must also be escaped, or a new string must be started). */
-#define _ICONV_CENCODE_POSTOCT 0x0400 /* Flag: Immediately after a \1 sequence (with less than 3 characters).
+#define _ICONV_CENCODE_POSTOCT 0x0400 /* Flag: Immediately after a \0-\77 sequence (but not \777; i.e. only for 1 or 2 oct digits).
                                        * iow: follow-up 0-7 must also be escaped, or a new string must be started). */
 #define _ICONV_CENCODE_INQUOTE 0x0800 /* Flag: a " or ' has been printed. */
 #define _ICONV_CENCODE_USECHAR 0x1000 /* Flag: escape using ' instead of ". */

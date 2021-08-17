@@ -28,6 +28,11 @@
 
 DECL_BEGIN
 
+#ifndef mbstate_init
+#define mbstate_init __mbstate_init
+#endif /* !mbstate_init */
+
+
 /*[[[head:libc___fbufsize,hash:CRC-32=0x7304eb39]]]*/
 /* >> __fbufsize(3)
  * Return the size of the buffer of `stream' in
@@ -127,14 +132,14 @@ NOTHROW_NCX(LIBCCALL libc___fpurge)(FILE *stream)
 		stream->if_cnt  = 0;
 		ex->io_chng = stream->if_base;
 		ex->io_chsz = 0;
-		ex->io_mbs.__word = 0;
+		mbstate_init(&ex->io_mbs);
 		file_lock_endwrite(stream);
 	} else {
 		stream->if_ptr += stream->if_cnt;
 		stream->if_cnt  = 0;
 		ex->io_chng = stream->if_base;
 		ex->io_chsz = 0;
-		ex->io_mbs.__word = 0;
+		mbstate_init(&ex->io_mbs);
 	}
 }
 /*[[[end:libc___fpurge]]]*/

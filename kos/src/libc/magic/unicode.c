@@ -22,6 +22,9 @@
 %[define_replacement(char32_t = __CHAR32_TYPE__)]
 %[define_replacement(COMPILER_ENDOF = __COMPILER_ENDOF)]
 %[define_replacement(unicode_utf8seqlen = __LOCAL_unicode_utf8seqlen)]
+%[define_replacement(mbstate_t = "struct __mbstate")]
+%[define_replacement(pc16formatprinter = __pc16formatprinter)]
+%[define_replacement(pc32formatprinter = __pc32formatprinter)]
 %[default:section(".text.crt{|.dos}.unicode.UTF")]
 %[define_wchar_replacement(__SIZEOF_WCHAR_T__ = "2", "4")]
 
@@ -1160,7 +1163,7 @@ $char16_t *unicode_32to16([[nonnull]] /*utf-16*/ $char16_t *__restrict utf16_dst
 [[decl_include("<bits/crt/mbstate.h>")]]
 $size_t unicode_c8toc16([[nonnull]] $char16_t *__restrict pc16,
                         [[nonnull]] /*utf-8*/ char const *__restrict s, $size_t n,
-                        [[nonnull]] $mbstate_t *__restrict mbs) {
+                        [[nonnull]] mbstate_t *__restrict mbs) {
 	char32_t resch;
 	size_t i;
 	if ((mbs->@__word@ & __MBSTATE_TYPE_MASK) == __MBSTATE_TYPE_WR_UTF16_LO) {
@@ -1295,7 +1298,7 @@ done:
 [[decl_include("<bits/crt/mbstate.h>")]]
 $size_t unicode_c8toc32([[nonnull]] $char32_t *__restrict pc32,
                         [[nonnull]] /*utf-8*/ char const *__restrict s, $size_t n,
-                        [[nonnull]] $mbstate_t *__restrict mbs) {
+                        [[nonnull]] mbstate_t *__restrict mbs) {
 	size_t i;
 	for (i = 0; i < n; ++i) {
 		uint32_t state;
@@ -1412,16 +1415,14 @@ done:
 @@@return: (size_t)-1: Unicode error (the given input string isn't a valid unicode sequence)
 [[decl_include("<bits/crt/mbstate.h>")]]
 $size_t unicode_c16toc8([[nonnull]] char pc8[3], $char16_t c16,
-                        [[nonnull]] $mbstate_t *__restrict mbs) {
+                        [[nonnull]] mbstate_t *__restrict mbs) {
 	char32_t ch32;
-	uint32_t state;
-	state = mbs->@__word@ & __MBSTATE_TYPE_MASK;
-	if (state == __MBSTATE_TYPE_UTF16_LO) {
+	if ((mbs->@__word@ & __MBSTATE_TYPE_MASK) == __MBSTATE_TYPE_UTF16_LO) {
 		if unlikely(!(c16 >= UTF16_LOW_SURROGATE_MIN &&
 		              c16 <= UTF16_LOW_SURROGATE_MAX))
 			return (size_t)-1;
 		ch32 = ((mbs->@__word@ & 0x000003ff) << 10) + 0x10000 + ((u16)c16 - 0xdc00);
-		mbs->@__word@ = 0;
+		mbs->@__word@ = __MBSTATE_TYPE_EMPTY;
 	} else if (c16 >= UTF16_HIGH_SURROGATE_MIN &&
 	           c16 <= UTF16_HIGH_SURROGATE_MAX) {
 		mbs->@__word@ = __MBSTATE_TYPE_UTF16_LO | ((u16)c16 - UTF16_HIGH_SURROGATE_MIN);
@@ -1466,9 +1467,9 @@ struct format_8to16_data {
 $ssize_t format_8to16(/*struct format_8to16_data **/ void *arg,
                       /*utf-8*/ char const *data, $size_t datalen) {
 	struct __local_format_8to16_data {
-		__pc16formatprinter fd_printer;    /* [1..1] Inner printer */
-		void               *fd_arg;        /* Argument for `fd_printer' */
-		$mbstate_t          fd_incomplete; /* Incomplete utf-8 sequence part (initialize to 0) */
+		$pc16formatprinter fd_printer;    /* [1..1] Inner printer */
+		void              *fd_arg;        /* Argument for `fd_printer' */
+		$mbstate_t         fd_incomplete; /* Incomplete utf-8 sequence part (initialize to 0) */
 	};
 	char16_t buf[__UNICODE_FORMAT_XTOY_BUFSIZE], *dst = buf;
 	struct __local_format_8to16_data *closure;
