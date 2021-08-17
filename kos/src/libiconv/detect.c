@@ -564,7 +564,7 @@ search_for_codec:
  * with `ICONV_CODEC_UNKNOWN'. */
 INTERN ATTR_PURE WUNUSED NONNULL((1)) iconv_codec_t
 NOTHROW_NCX(CC libiconv_detect_codec)(void const *__restrict data, size_t size) {
-#if !defined(NDEBUG) && 1
+#if !defined(NDEBUG) && 0
 #define HAVE_LOGGING
 #define goto_unknown                                                        \
 	do {                                                                    \
