@@ -1,0 +1,64 @@
+/* Copyright (c) 2019-2021 Griefer@Work                                       *
+ *                                                                            *
+ * This software is provided 'as-is', without any express or implied          *
+ * warranty. In no event will the authors be held liable for any damages      *
+ * arising from the use of this software.                                     *
+ *                                                                            *
+ * Permission is granted to anyone to use this software for any purpose,      *
+ * including commercial applications, and to alter it and redistribute it     *
+ * freely, subject to the following restrictions:                             *
+ *                                                                            *
+ * 1. The origin of this software must not be misrepresented; you must not    *
+ *    claim that you wrote the original software. If you use this software    *
+ *    in a product, an acknowledgement (see the following) in the product     *
+ *    documentation is required:                                              *
+ *    Portions Copyright (c) 2019-2021 Griefer@Work                           *
+ * 2. Altered source versions must be plainly marked as such, and must not be *
+ *    misrepresented as being the original software.                          *
+ * 3. This notice may not be removed or altered from any source distribution. *
+ */
+
+import * from deemon;
+import fs;
+
+function loadXmlEntities(): {string: (int, bool)} {
+	local result = Dict();
+	local data = File.open(fs.joinpath(fs.headof(__FILE__), "xml-entities"))
+		.read().decode("utf-8");
+	for (local l: data.splitlines(false)) {
+		l = l.strip();
+		if (!l || l.startswith("#"))
+			continue;
+		local cStrt = l.find("#");
+		if (cStrt >= 0)
+			l = l[:cStrt];
+		local name, ord;
+		name, none, l = l.partition(" ")...;
+		l = l.lstrip();
+		ord, none, l = l.partition(" ")...;
+		l = l.lstrip();
+		if (l) {
+			throw Error("Unexpected trailing data {!r} (name: {!r}, ord: {!r})"
+				.format({ l, name, ord }));
+		}
+		if (!name.startswith("&")) {
+			throw Error("Name {!r} doesn't start with '&'"
+				.format({ name }));
+		}
+		name = name[1:];
+		local semicolonIsOptional = true;
+		if (name.endswith(";")) {
+			name = name[:-1];
+			semicolonIsOptional = false;
+		}
+		ord = int("0x" + ord);
+		result[name] = (ord, semicolonIsOptional);
+	}
+	return result;
+}
+
+@@Mapping from entity <Name: string -> (ord: int, semicolonIsOptional: bool)>
+global final XML_ENTITIES: {string: (int, bool)} = loadXmlEntities();
+
+
+
