@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x39f82074 */
+/* HASH CRC-32:0x2f0fe156 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -30,12 +30,12 @@ __NAMESPACE_LOCAL_BEGIN
 #define __local___localdep_format_16to8_defined 1
 #if defined(__CRT_HAVE_format_wto8) && __SIZEOF_WCHAR_T__ == 2 && defined(__LIBCCALL_IS_LIBDCALL)
 /* >> format_16to8(3)
- * Format printer (compatible with `__pc16formatprinter') for
+ * Format printer (compatible with `pc16formatprinter') for
  * converting UTF-16 unicode input data into a UTF-8 output */
 __CREDIRECT(,__SSIZE_TYPE__,__NOTHROW_NCX,__localdep_format_16to8,(void *__arg, __CHAR16_TYPE__ const *__data, __SIZE_TYPE__ __datalen),format_wto8,(__arg,__data,__datalen))
 #elif defined(__CRT_HAVE_DOS$format_wto8)
 /* >> format_16to8(3)
- * Format printer (compatible with `__pc16formatprinter') for
+ * Format printer (compatible with `pc16formatprinter') for
  * converting UTF-16 unicode input data into a UTF-8 output */
 __CREDIRECT_DOS(,__SSIZE_TYPE__,__NOTHROW_NCX,__localdep_format_16to8,(void *__arg, __CHAR16_TYPE__ const *__data, __SIZE_TYPE__ __datalen),format_wto8,(__arg,__data,__datalen))
 #elif __SIZEOF_WCHAR_T__ == 2
@@ -43,7 +43,7 @@ __NAMESPACE_LOCAL_END
 #include <libc/local/unicode/format_wto8.h>
 __NAMESPACE_LOCAL_BEGIN
 /* >> format_16to8(3)
- * Format printer (compatible with `__pc16formatprinter') for
+ * Format printer (compatible with `pc16formatprinter') for
  * converting UTF-16 unicode input data into a UTF-8 output */
 #define __localdep_format_16to8 (*(__SSIZE_TYPE__(__LIBDCALL *)(void *, __CHAR16_TYPE__ const *, __SIZE_TYPE__))&__LIBC_LOCAL_NAME(format_wto8))
 #else /* ... */
@@ -51,7 +51,7 @@ __NAMESPACE_LOCAL_END
 #include <libc/local/unicode/format_16to8.h>
 __NAMESPACE_LOCAL_BEGIN
 /* >> format_16to8(3)
- * Format printer (compatible with `__pc16formatprinter') for
+ * Format printer (compatible with `pc16formatprinter') for
  * converting UTF-16 unicode input data into a UTF-8 output */
 #define __localdep_format_16to8 __LIBC_LOCAL_NAME(format_16to8)
 #endif /* !... */
@@ -61,12 +61,12 @@ __NAMESPACE_LOCAL_BEGIN
 #define __local___localdep_format_32to8_defined 1
 #if defined(__CRT_HAVE_format_wto8) && __SIZEOF_WCHAR_T__ == 4 && defined(__LIBCCALL_IS_LIBKCALL)
 /* >> format_32to8(3)
- * Format printer (compatible with `__pc32formatprinter') for
+ * Format printer (compatible with `pc32formatprinter') for
  * converting UTF-32 unicode input data into a UTF-8 output */
 __CREDIRECT(,__SSIZE_TYPE__,__NOTHROW_NCX,__localdep_format_32to8,(void *__arg, __CHAR32_TYPE__ const *__data, __SIZE_TYPE__ __datalen),format_wto8,(__arg,__data,__datalen))
 #elif defined(__CRT_HAVE_KOS$format_wto8)
 /* >> format_32to8(3)
- * Format printer (compatible with `__pc32formatprinter') for
+ * Format printer (compatible with `pc32formatprinter') for
  * converting UTF-32 unicode input data into a UTF-8 output */
 __CREDIRECT_KOS(,__SSIZE_TYPE__,__NOTHROW_NCX,__localdep_format_32to8,(void *__arg, __CHAR32_TYPE__ const *__data, __SIZE_TYPE__ __datalen),format_wto8,(__arg,__data,__datalen))
 #elif __SIZEOF_WCHAR_T__ == 4
@@ -74,7 +74,7 @@ __NAMESPACE_LOCAL_END
 #include <libc/local/unicode/format_wto8.h>
 __NAMESPACE_LOCAL_BEGIN
 /* >> format_32to8(3)
- * Format printer (compatible with `__pc32formatprinter') for
+ * Format printer (compatible with `pc32formatprinter') for
  * converting UTF-32 unicode input data into a UTF-8 output */
 #define __localdep_format_32to8 (*(__SSIZE_TYPE__(__LIBKCALL *)(void *, __CHAR32_TYPE__ const *, __SIZE_TYPE__))&__LIBC_LOCAL_NAME(format_wto8))
 #else /* ... */
@@ -82,7 +82,7 @@ __NAMESPACE_LOCAL_END
 #include <libc/local/unicode/format_32to8.h>
 __NAMESPACE_LOCAL_BEGIN
 /* >> format_32to8(3)
- * Format printer (compatible with `__pc32formatprinter') for
+ * Format printer (compatible with `pc32formatprinter') for
  * converting UTF-32 unicode input data into a UTF-8 output */
 #define __localdep_format_32to8 __LIBC_LOCAL_NAME(format_32to8)
 #endif /* !... */

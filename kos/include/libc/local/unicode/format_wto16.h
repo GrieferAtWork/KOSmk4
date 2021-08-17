@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xe0bd270c */
+/* HASH CRC-32:0x359697bf */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -52,7 +52,7 @@ __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(format_wto16))(void *__arg, __WCHAR_T
 #if __SIZEOF_WCHAR_T__ == 4
 	struct __local_format_32to16_data {
 		__pc16formatprinter __fd_printer; /* [1..1] Inner printer */
-		void               *__fd_arg;     /* Argument for `fd_printer' */
+		void              *__fd_arg;     /* Argument for `fd_printer' */
 	};
 	__CHAR16_TYPE__ __buf[64];
 	struct __local_format_32to16_data *__closure;
@@ -75,7 +75,7 @@ __err:
 #else /* __SIZEOF_WCHAR_T__ == 4 */
 	struct __local_format_16to16_data {
 		__pc16formatprinter __fd_printer;   /* [1..1] Inner printer */
-		void               *__fd_arg;       /* Argument for `fd_printer' */
+		void              *__fd_arg;       /* Argument for `fd_printer' */
 	};
 	struct __local_format_16to16_data *__closure;
 	__closure = (struct __local_format_16to16_data *)__arg;

@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x8853dc70 */
+/* HASH CRC-32:0x87bcb57d */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -57,8 +57,8 @@ __LOCAL_LIBC(format_8to32) __SSIZE_TYPE__
 __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(format_8to32))(void *__arg, char const *__data, __SIZE_TYPE__ __datalen) {
 	struct __local_format_8to32_data {
 		__pc32formatprinter __fd_printer;    /* [1..1] Inner printer */
-		void               *__fd_arg;        /* Argument for `fd_printer' */
-		struct __mbstate          __fd_incomplete; /* Incomplete utf-8 sequence part (initialize to 0) */
+		void              *__fd_arg;        /* Argument for `fd_printer' */
+		struct __mbstate         __fd_incomplete; /* Incomplete utf-8 sequence part (initialize to 0) */
 	};
 	__CHAR32_TYPE__ __buf[64], *__dst = __buf;
 	struct __local_format_8to32_data *__closure;

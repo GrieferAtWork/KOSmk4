@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x6ad3fbba */
+/* HASH CRC-32:0x22ab10a1 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -44,15 +44,15 @@ __NAMESPACE_LOCAL_END
 #include <bits/crt/format-printer.h>
 __NAMESPACE_LOCAL_BEGIN
 /* >> format_wto8(3)
- * Format printer (compatible with `__pc16formatprinter') for
+ * Format printer (compatible with `pc16formatprinter') for
  * converting wide-character unicode input data into a UTF-8 output */
 __LOCAL_LIBC(format_wto8) __SSIZE_TYPE__
 __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(format_wto8))(void *__arg, __WCHAR_TYPE__ const *__data, __SIZE_TYPE__ __datalen) {
 #if __SIZEOF_WCHAR_T__ == 2
 	struct __local_format_16to8_data {
 		__pformatprinter __fd_printer;   /* [1..1] Inner printer */
-		void            *__fd_arg;       /* Argument for `fd_printer' */
-		__CHAR16_TYPE__  __fd_surrogate; /* Pending high surrogate (or 0 if no surrogate is pending) */
+		void           *__fd_arg;       /* Argument for `fd_printer' */
+		__CHAR16_TYPE__       __fd_surrogate; /* Pending high surrogate (or 0 if no surrogate is pending) */
 	};
 	char __buf[64], *__dst = __buf;
 	struct __local_format_16to8_data *__closure;

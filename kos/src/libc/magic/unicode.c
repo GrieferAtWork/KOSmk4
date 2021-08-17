@@ -25,6 +25,7 @@
 %[define_replacement(mbstate_t = "struct __mbstate")]
 %[define_replacement(pc16formatprinter = __pc16formatprinter)]
 %[define_replacement(pc32formatprinter = __pc32formatprinter)]
+%[define_replacement(pformatprinter = __pformatprinter)]
 %[default:section(".text.crt{|.dos}.unicode.UTF")]
 %[define_wchar_replacement(__SIZEOF_WCHAR_T__ = "2", "4")]
 
@@ -40,6 +41,22 @@
 #define __mbstate_t_defined 1
 typedef struct __mbstate mbstate_t;
 #endif /* !__mbstate_t_defined */
+#ifndef __char16_t_defined
+#define __char16_t_defined 1
+typedef __CHAR16_TYPE__ char16_t;
+typedef __CHAR32_TYPE__ char32_t;
+#endif /* !__char16_t_defined */
+#ifndef __pformatprinter_defined
+#define __pformatprinter_defined 1
+typedef __pformatprinter pformatprinter;
+typedef __pformatgetc pformatgetc;
+typedef __pformatungetc pformatungetc;
+#endif /* !__pformatprinter_defined */
+#ifndef __pc16formatprinter_defined
+#define __pc16formatprinter_defined 1
+typedef __pc16formatprinter pc16formatprinter;
+typedef __pc32formatprinter pc32formatprinter;
+#endif /* !__pc16formatprinter_defined */
 }
 
 
@@ -1518,9 +1535,9 @@ struct format_8to32_data {
 $ssize_t format_8to32(/*struct format_8to32_data **/ void *arg,
                       /*utf-8*/ char const *data, $size_t datalen) {
 	struct __local_format_8to32_data {
-		__pc32formatprinter fd_printer;    /* [1..1] Inner printer */
-		void               *fd_arg;        /* Argument for `fd_printer' */
-		$mbstate_t          fd_incomplete; /* Incomplete utf-8 sequence part (initialize to 0) */
+		$pc32formatprinter fd_printer;    /* [1..1] Inner printer */
+		void              *fd_arg;        /* Argument for `fd_printer' */
+		$mbstate_t         fd_incomplete; /* Incomplete utf-8 sequence part (initialize to 0) */
 	};
 	char32_t buf[__UNICODE_FORMAT_XTOY_BUFSIZE], *dst = buf;
 	struct __local_format_8to32_data *closure;
@@ -1562,16 +1579,16 @@ err:
 //};
 
 @@>> format_wto8(3)
-@@Format printer (compatible with `__pc16formatprinter') for
+@@Format printer (compatible with `pc16formatprinter') for
 @@converting wide-character unicode input data into a UTF-8 output
 [[hidden, impl_include("<bits/crt/format-printer.h>"), wchar]]
 $ssize_t format_wto8(/*struct format_wto8_data **/ void *arg,
                      $wchar_t const *data, $size_t datalen) {
 @@pp_if __SIZEOF_WCHAR_T__ == 2@@
 	struct __local_format_16to8_data {
-		__pformatprinter fd_printer;   /* [1..1] Inner printer */
-		void            *fd_arg;       /* Argument for `fd_printer' */
-		__CHAR16_TYPE__  fd_surrogate; /* Pending high surrogate (or 0 if no surrogate is pending) */
+		$pformatprinter fd_printer;   /* [1..1] Inner printer */
+		void           *fd_arg;       /* Argument for `fd_printer' */
+		$char16_t       fd_surrogate; /* Pending high surrogate (or 0 if no surrogate is pending) */
 	};
 	char buf[__UNICODE_FORMAT_XTOY_BUFSIZE], *dst = buf;
 	struct __local_format_16to8_data *closure;
@@ -1654,7 +1671,7 @@ struct format_16to8_data {
 }
 
 @@>> format_16to8(3)
-@@Format printer (compatible with `__pc16formatprinter') for
+@@Format printer (compatible with `pc16formatprinter') for
 @@converting UTF-16 unicode input data into a UTF-8 output
 $ssize_t format_16to8(/*struct format_16to8_data **/ void *arg,
                       $char16_t const *data, $size_t datalen)
@@ -1670,7 +1687,7 @@ struct format_32to8_data {
 }
 
 @@>> format_32to8(3)
-@@Format printer (compatible with `__pc32formatprinter') for
+@@Format printer (compatible with `pc32formatprinter') for
 @@converting UTF-32 unicode input data into a UTF-8 output
 $ssize_t format_32to8(/*struct format_32to8_data **/ void *arg,
                       $char32_t const *data, $size_t datalen)
@@ -1687,16 +1704,16 @@ $ssize_t format_32to8(/*struct format_32to8_data **/ void *arg,
 //};
 
 @@>> format_wto32(3)
-@@Format printer (compatible with `__pc16formatprinter') for
+@@Format printer (compatible with `pc16formatprinter') for
 @@converting wide-character unicode input data into a UTF-32 output
 [[hidden, impl_include("<bits/crt/uformat-printer.h>"), wchar]]
 $ssize_t format_wto32(/*struct format_wto32_data **/ void *arg,
                       $wchar_t const *data, $size_t datalen) {
 @@pp_if __SIZEOF_WCHAR_T__ == 2@@
 	struct __local_format_16to32_data {
-		__pc32formatprinter fd_printer;   /* [1..1] Inner printer */
-		void               *fd_arg;       /* Argument for `fd_printer' */
-		__CHAR16_TYPE__     fd_surrogate; /* Pending high surrogate (or 0 if no surrogate is pending) */
+		$pc32formatprinter fd_printer;   /* [1..1] Inner printer */
+		void              *fd_arg;       /* Argument for `fd_printer' */
+		$char16_t          fd_surrogate; /* Pending high surrogate (or 0 if no surrogate is pending) */
 	};
 	char32_t buf[__UNICODE_FORMAT_XTOY_BUFSIZE], *dst = buf;
 	struct __local_format_16to32_data *closure;
@@ -1744,8 +1761,8 @@ err:
 	return temp;
 @@pp_else@@
 	struct __local_format_32to32_data {
-		__pc32formatprinter fd_printer;   /* [1..1] Inner printer */
-		void               *fd_arg;       /* Argument for `fd_printer' */
+		$pc32formatprinter fd_printer;   /* [1..1] Inner printer */
+		void              *fd_arg;       /* Argument for `fd_printer' */
 	};
 	struct __local_format_32to32_data *closure;
 	closure = (struct __local_format_32to32_data *)arg;
@@ -1784,8 +1801,8 @@ $ssize_t format_wto16(/*struct format_wto16_data **/ void *arg,
                       $wchar_t const *data, $size_t datalen) {
 @@pp_if __SIZEOF_WCHAR_T__ == 4@@
 	struct __local_format_32to16_data {
-		__pc16formatprinter fd_printer; /* [1..1] Inner printer */
-		void               *fd_arg;     /* Argument for `fd_printer' */
+		$pc16formatprinter fd_printer; /* [1..1] Inner printer */
+		void              *fd_arg;     /* Argument for `fd_printer' */
 	};
 	char16_t buf[__UNICODE_FORMAT_XTOY_BUFSIZE];
 	struct __local_format_32to16_data *closure;
@@ -1807,8 +1824,8 @@ err:
 	return temp;
 @@pp_else@@
 	struct __local_format_16to16_data {
-		__pc16formatprinter fd_printer;   /* [1..1] Inner printer */
-		void               *fd_arg;       /* Argument for `fd_printer' */
+		$pc16formatprinter fd_printer;   /* [1..1] Inner printer */
+		void              *fd_arg;       /* Argument for `fd_printer' */
 	};
 	struct __local_format_16to16_data *closure;
 	closure = (struct __local_format_16to16_data *)arg;

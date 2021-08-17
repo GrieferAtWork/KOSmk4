@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xeefd4d64 */
+/* HASH CRC-32:0x196706f5 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -1037,9 +1037,9 @@ NOTHROW_NCX(LIBCCALL libc_format_8to16)(void *arg,
                                         char const *data,
                                         size_t datalen) {
 	struct __local_format_8to16_data {
-		__pc16formatprinter fd_printer;    /* [1..1] Inner printer */
-		void               *fd_arg;        /* Argument for `fd_printer' */
-		mbstate_t          fd_incomplete; /* Incomplete utf-8 sequence part (initialize to 0) */
+		pc16formatprinter fd_printer;    /* [1..1] Inner printer */
+		void              *fd_arg;        /* Argument for `fd_printer' */
+		mbstate_t         fd_incomplete; /* Incomplete utf-8 sequence part (initialize to 0) */
 	};
 	char16_t buf[64], *dst = buf;
 	struct __local_format_8to16_data *closure;
@@ -1081,9 +1081,9 @@ NOTHROW_NCX(LIBCCALL libc_format_8to32)(void *arg,
                                         char const *data,
                                         size_t datalen) {
 	struct __local_format_8to32_data {
-		__pc32formatprinter fd_printer;    /* [1..1] Inner printer */
-		void               *fd_arg;        /* Argument for `fd_printer' */
-		mbstate_t          fd_incomplete; /* Incomplete utf-8 sequence part (initialize to 0) */
+		pc32formatprinter fd_printer;    /* [1..1] Inner printer */
+		void              *fd_arg;        /* Argument for `fd_printer' */
+		mbstate_t         fd_incomplete; /* Incomplete utf-8 sequence part (initialize to 0) */
 	};
 	char32_t buf[64], *dst = buf;
 	struct __local_format_8to32_data *closure;
@@ -1116,7 +1116,7 @@ err:
 }
 #include <bits/crt/format-printer.h>
 /* >> format_wto8(3)
- * Format printer (compatible with `__pc16formatprinter') for
+ * Format printer (compatible with `pc16formatprinter') for
  * converting wide-character unicode input data into a UTF-8 output */
 INTERN ATTR_SECTION(".text.crt.dos.unicode.UTF") ssize_t
 NOTHROW_NCX(LIBDCALL libd_format_wto8)(void *arg,
@@ -1124,9 +1124,9 @@ NOTHROW_NCX(LIBDCALL libd_format_wto8)(void *arg,
                                        size_t datalen) {
 
 	struct __local_format_16to8_data {
-		__pformatprinter fd_printer;   /* [1..1] Inner printer */
-		void            *fd_arg;       /* Argument for `fd_printer' */
-		__CHAR16_TYPE__  fd_surrogate; /* Pending high surrogate (or 0 if no surrogate is pending) */
+		pformatprinter fd_printer;   /* [1..1] Inner printer */
+		void           *fd_arg;       /* Argument for `fd_printer' */
+		char16_t       fd_surrogate; /* Pending high surrogate (or 0 if no surrogate is pending) */
 	};
 	char buf[64], *dst = buf;
 	struct __local_format_16to8_data *closure;
@@ -1199,7 +1199,7 @@ err:
 }
 #include <bits/crt/format-printer.h>
 /* >> format_wto8(3)
- * Format printer (compatible with `__pc16formatprinter') for
+ * Format printer (compatible with `pc16formatprinter') for
  * converting wide-character unicode input data into a UTF-8 output */
 INTERN ATTR_SECTION(".text.crt.unicode.UTF") ssize_t
 NOTHROW_NCX(LIBKCALL libc_format_wto8)(void *arg,
@@ -1282,7 +1282,7 @@ err:
 }
 #include <bits/crt/uformat-printer.h>
 /* >> format_wto32(3)
- * Format printer (compatible with `__pc16formatprinter') for
+ * Format printer (compatible with `pc16formatprinter') for
  * converting wide-character unicode input data into a UTF-32 output */
 INTERN ATTR_SECTION(".text.crt.dos.unicode.UTF") ssize_t
 NOTHROW_NCX(LIBDCALL libd_format_wto32)(void *arg,
@@ -1290,9 +1290,9 @@ NOTHROW_NCX(LIBDCALL libd_format_wto32)(void *arg,
                                         size_t datalen) {
 
 	struct __local_format_16to32_data {
-		__pc32formatprinter fd_printer;   /* [1..1] Inner printer */
-		void               *fd_arg;       /* Argument for `fd_printer' */
-		__CHAR16_TYPE__     fd_surrogate; /* Pending high surrogate (or 0 if no surrogate is pending) */
+		pc32formatprinter fd_printer;   /* [1..1] Inner printer */
+		void              *fd_arg;       /* Argument for `fd_printer' */
+		char16_t          fd_surrogate; /* Pending high surrogate (or 0 if no surrogate is pending) */
 	};
 	char32_t buf[64], *dst = buf;
 	struct __local_format_16to32_data *closure;
@@ -1350,7 +1350,7 @@ err:
 }
 #include <bits/crt/uformat-printer.h>
 /* >> format_wto32(3)
- * Format printer (compatible with `__pc16formatprinter') for
+ * Format printer (compatible with `pc16formatprinter') for
  * converting wide-character unicode input data into a UTF-32 output */
 INTERN ATTR_SECTION(".text.crt.unicode.UTF") ssize_t
 NOTHROW_NCX(LIBKCALL libc_format_wto32)(void *arg,
@@ -1408,8 +1408,8 @@ NOTHROW_NCX(LIBKCALL libc_format_wto32)(void *arg,
 
 
 	struct __local_format_32to32_data {
-		__pc32formatprinter fd_printer;   /* [1..1] Inner printer */
-		void               *fd_arg;       /* Argument for `fd_printer' */
+		pc32formatprinter fd_printer;   /* [1..1] Inner printer */
+		void              *fd_arg;       /* Argument for `fd_printer' */
 	};
 	struct __local_format_32to32_data *closure;
 	closure = (struct __local_format_32to32_data *)arg;
@@ -1450,8 +1450,8 @@ NOTHROW_NCX(LIBDCALL libd_format_wto16)(void *arg,
 
 
 	struct __local_format_16to16_data {
-		__pc16formatprinter fd_printer;   /* [1..1] Inner printer */
-		void               *fd_arg;       /* Argument for `fd_printer' */
+		pc16formatprinter fd_printer;   /* [1..1] Inner printer */
+		void              *fd_arg;       /* Argument for `fd_printer' */
 	};
 	struct __local_format_16to16_data *closure;
 	closure = (struct __local_format_16to16_data *)arg;
@@ -1469,8 +1469,8 @@ NOTHROW_NCX(LIBKCALL libc_format_wto16)(void *arg,
                                         size_t datalen) {
 
 	struct __local_format_32to16_data {
-		__pc16formatprinter fd_printer; /* [1..1] Inner printer */
-		void               *fd_arg;     /* Argument for `fd_printer' */
+		pc16formatprinter fd_printer; /* [1..1] Inner printer */
+		void              *fd_arg;     /* Argument for `fd_printer' */
 	};
 	char16_t buf[64];
 	struct __local_format_32to16_data *closure;
