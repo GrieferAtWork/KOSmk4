@@ -21,18 +21,33 @@
 #define _BITS_CRT_MBSTATE_H 1
 
 #include <__stdinc.h>
+#include <__crt.h>
 
-#include <hybrid/byteorder.h>
 #include <hybrid/typecore.h>
 
 __SYSDECL_BEGIN
 
 #ifdef __CC__
-struct __ATTR_PACKED __mbstate {
+struct __mbstate {
+#ifdef __CRT_GLC_PRIMARY
+	/* Under native gLibc, this structure is 8 bytes large. */
+	union {
+		__UINT32_TYPE__ __word; /* Used by KOS auxillary functions.
+		                         * Share offset with  `__count' so  that when  `__count == 0',
+		                         * our custom `__mbstate_isempty()' still indicates correctly. */
+		int __count; /* Used by gLibc */
+	};
+	union {
+		__WINT_TYPE__ __wch; /* Used by gLibc */
+		char __wchb[4];      /* Used by gLibc */
+	} __value;
+#else /* __CRT_GLC_PRIMARY */
 	/* This structure  must not  exceed  4 bytes,  so  we
 	 * can conform to DOS's 4-byte `mbstate_t' structure. */
-	__UINT32_TYPE__  __word;
+	__UINT32_TYPE__ __word;
+#endif /* !__CRT_GLC_PRIMARY */
 };
+
 #define __MBSTATE_INIT       { 0 }
 #define __mbstate_init(x)    (void)((x)->__word = 0)
 #define __mbstate_isempty(x) ((x)->__word == 0)
