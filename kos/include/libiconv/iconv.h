@@ -281,7 +281,8 @@ union iconv_encode_data {
 #define _ICONV_CENCODE_NOUNICD 0x2000 /* Flag: Don't escape \u or \U; interpret input as raw bytes and print \xAB sequences. */
 
 /* For c-escape codecs (decode only). NOTE: c-escape decode expects input to be UTF-8!
- * Initial state ("-bytes" suffix is ignored in codecs):
+ * Initial state ("-bytes" suffix is ignored in codecs when it comes to decoding, and
+ * only affects encoding where it causes \u and \U to be replaced by \x):
  *    - "c-escape":     _ICONV_CDECODE_ST_UNDEF
  *    - "c-escape-str": _ICONV_CDECODE_ST_STR
  *    - "c-escape-chr": _ICONV_CDECODE_ST_CHR
@@ -307,17 +308,19 @@ union iconv_encode_data {
  *       >>     // Another example would be an illegal escape sequence, like \p or \x1234567
  *       >> }
  */
+#define _ICONV_CDECODE_F_ONESTR 0x0080 /* Only parse a single string or character. */
 #define _ICONV_CDECODE_STMASK   0xff00 /* Mask for state. */
 #define _ICONV_CDECODE_ST_RAW   0x0000 /* Raw string type (no unescaped quotes allowed) */
 #define _ICONV_CDECODE_ST_STRIN 0x0100 /* "-string (inside; linefeed characters will cause errors) */
 #define _ICONV_CDECODE_ST_CHRIN 0x0200 /* '-string (inside; linefeed characters will cause errors) */
-#define _ICONV_CDECODE_ST_STR   0x0300 /* "-string (outside) */
-#define _ICONV_CDECODE_ST_CHR   0x0400 /* '-string (outside) */
-#define _ICONV_CDECODE_ST_UNDEF 0x0500 /* Unknown  string type; determine based on first fed character. Switches to
+#define _ICONV_CDECODE_ST_ALLIN 0x0300 /* Inside some undefined string (where neither ' nor " must be escaped) */
+#define _ICONV_CDECODE_ST_STR   0x0400 /* "-string (outside) */
+#define _ICONV_CDECODE_ST_CHR   0x0500 /* '-string (outside) */
+#define _ICONV_CDECODE_ST_UNDEF 0x0600 /* Unknown  string type; determine based on first fed character. Switches to
                                         * _ICONV_CDECODE_ST_RAW, _ICONV_CDECODE_ST_CHRIN or _ICONV_CDECODE_ST_STRIN */
 #define _ICONV_CDECODE_F_ESCAPE 0x0800 /* Flag: currently inside of an escape sequence. */
 /* Should "normal" characters be copied to output; iow: are we inside of a string? */
-#define _ICONV_CDECODE_SHOULD_FLUSH(st) ((st) <= _ICONV_CDECODE_ST_CHRIN)
+#define _ICONV_CDECODE_SHOULD_FLUSH(st) ((st) <= _ICONV_CDECODE_ST_ALLIN)
 #endif /* LIBICONV_EXPOSE_INTERNAL */
 
 

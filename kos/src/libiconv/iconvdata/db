@@ -251,16 +251,62 @@
 
 
 
+#
 # c-escape
+#
 # NOTE: This codec is special in that it is built on-top of utf-8 input/output,
 #       meaning that the decoder expects its input to be formatted as utf-8,
 #       while also producing utf-8 output itself.
+#       An exception to this are the c-escape*-bytes codecs which when used as
+#       decoders don't impose any requirements on input encoding, but will simply
+#       escape incoming data as would be required for that data to be written to
+#       a C string.
+#
+# NOTE: When decoding via "c-escape", there are actually 3 different modes which
+#       it will detect based on the first character fed to as input. When that
+#       character is ' or ", parse everything the same as when c-escape-chr or
+#       c-escape-str were being used. Otherwise, enter a raw c-escape mode which
+#       is also known as c-escape-raw, where the first character is already apart
+#       of the string being escaped. In this mode, both an unescaped " or ' cause
+#       decode errors. During encoding, c-escape-raw is the same as c-escape
 @CODEC(CODEC_C_ESCAPE: "c-escape")                                            # Hello\uFFFF\nWorld
-@CODEC(CODEC_C_ESCAPE_CHR: "c-escape-chr")                                    # 'Hello\uFFFF\nWorld'
 @CODEC(CODEC_C_ESCAPE_STR: "c-escape-str")                                    # "Hello\uFFFF\nWorld"
+@CODEC(CODEC_C_ESCAPE_CHR: "c-escape-chr")                                    # 'Hello\uFFFF\nWorld'
+@CODEC(CODEC_C_ESCAPE_RAW: "c-escape-raw")                                    # Hello\uFFFF\nWorld
 @CODEC(CODEC_C_ESCAPE_BYTES: "c-escape-bytes")                                # Hello\xEF\xBF\xBF\nWorld
-@CODEC(CODEC_C_ESCAPE_BYTES_CHR: "c-escape-bytes-chr", "c-escape-chr-bytes")  # 'Hello\xEF\xBF\xBF\nWorld'
 @CODEC(CODEC_C_ESCAPE_BYTES_STR: "c-escape-bytes-str", "c-escape-str-bytes")  # "Hello\xEF\xBF\xBF\nWorld"
+@CODEC(CODEC_C_ESCAPE_BYTES_CHR: "c-escape-bytes-chr", "c-escape-chr-bytes")  # 'Hello\xEF\xBF\xBF\nWorld'
+@CODEC(CODEC_C_ESCAPE_BYTES_RAW: "c-escape-bytes-raw", "c-escape-raw-bytes")  # Hello\xEF\xBF\xBF\nWorld
+
+#
+# -inchr or -instr variants of c-escape codec. These behave the same during encoding,
+# but when decoding will set-up the internal state machine such that parsing operates
+# as though "c-escape" was used, but the first character parsed had been a " or ', as
+# well as stop decoding data on-top of the next unescaped " or '.
+#
+# As such, these codecs may be used by C-like compilers to parse the _contents_ of a
+# C-string or character (such that input data starts _after_ the leading " or ', and
+# the decoder will refuse to continue parsing once the next unescaped " or ' is found).
+#
+# The alternative is to use "c-escape", "c-escape-str" or "c-escape-ch" and have input
+# data start at the leading " or ', in which case parsing will continue until the first
+# non-whitespace character is encountered outside of the string/character literal.
+#
+# Another alternative is to use "c-escape-raw" during decoding, but unlike -in(str|chr),
+# that codec will stop parsing when " or ' is encountered, whereas "c-escape-instr"
+# allows unescaped ', and "c-escape-inchr" likewise allows unescaped ".
+@CODEC(CODEC_C_ESCAPE_INSTR: "c-escape-instr")
+@CODEC(CODEC_C_ESCAPE_INCHR: "c-escape-inchr")
+@CODEC(CODEC_C_ESCAPE_BYTES_INSTR: "c-escape-instr-bytes", "c-escape-bytes-instr")
+@CODEC(CODEC_C_ESCAPE_BYTES_INCHR: "c-escape-inchr-bytes", "c-escape-bytes-inchr")
+
+#
+# Finally, there's "c-escape-all" which behaves like "c-escape-raw", but allows both "
+# and ' to be used without needing them to be escaped. Note however that when this codec
+# will obviously not stop parsing data when something conventionally thought of as a string
+# end marker is encountered.
+@CODEC(CODEC_C_ESCAPE_ALL: "c-escape-all")
+@CODEC(CODEC_C_ESCAPE_BYTES_ALL: "c-escape-all-bytes", "c-escape-bytes-all")
 
 
 

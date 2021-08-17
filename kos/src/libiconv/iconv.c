@@ -119,11 +119,19 @@ NOTHROW_NCX(CC libiconv_decode_init)(/*in|out*/ struct iconv_decode *__restrict 
 
 		/* C-escape */
 	case CODEC_C_ESCAPE:
+	case CODEC_C_ESCAPE_RAW:
+	case CODEC_C_ESCAPE_ALL:
 	case CODEC_C_ESCAPE_CHR:
 	case CODEC_C_ESCAPE_STR:
+	case CODEC_C_ESCAPE_INCHR:
+	case CODEC_C_ESCAPE_INSTR:
 	case CODEC_C_ESCAPE_BYTES:
+	case CODEC_C_ESCAPE_BYTES_RAW:
+	case CODEC_C_ESCAPE_BYTES_ALL:
 	case CODEC_C_ESCAPE_BYTES_CHR:
 	case CODEC_C_ESCAPE_BYTES_STR:
+	case CODEC_C_ESCAPE_BYTES_INCHR:
+	case CODEC_C_ESCAPE_BYTES_INSTR:
 		input->ii_printer = (pformatprinter)&libiconv_c_escape_decode;
 		/* Set-up the initial state for the parser. */
 		__mbstate_init(&self->icd_data.idd_cesc.ce_utf8);
@@ -131,6 +139,16 @@ NOTHROW_NCX(CC libiconv_decode_init)(/*in|out*/ struct iconv_decode *__restrict 
 			self->icd_flags |= _ICONV_CDECODE_ST_STR;
 		} else if (self->icd_codec == CODEC_C_ESCAPE_CHR || self->icd_codec == CODEC_C_ESCAPE_BYTES_CHR) {
 			self->icd_flags |= _ICONV_CDECODE_ST_CHR;
+		} else if (self->icd_codec == CODEC_C_ESCAPE_INSTR || self->icd_codec == CODEC_C_ESCAPE_BYTES_INSTR) {
+			/* Start out inside of a string, but stop once we go outside */
+			self->icd_flags |= (_ICONV_CDECODE_ST_STRIN | _ICONV_CDECODE_F_ONESTR);
+		} else if (self->icd_codec == CODEC_C_ESCAPE_INCHR || self->icd_codec == CODEC_C_ESCAPE_BYTES_INCHR) {
+			/* Start out inside of a character, but stop once we go outside */
+			self->icd_flags |= (_ICONV_CDECODE_ST_CHRIN | _ICONV_CDECODE_F_ONESTR);
+		} else if (self->icd_codec == CODEC_C_ESCAPE_ALL || self->icd_codec == CODEC_C_ESCAPE_BYTES_ALL) {
+			self->icd_flags |= _ICONV_CDECODE_ST_ALLIN;
+		} else if (self->icd_codec == CODEC_C_ESCAPE_RAW || self->icd_codec == CODEC_C_ESCAPE_BYTES_RAW) {
+			self->icd_flags |= _ICONV_CDECODE_ST_RAW; /* Immediately start off in raw-mode. */
 		} else {
 			/* Undefined; to-be determined by the first parsed byte. */
 			self->icd_flags |= _ICONV_CDECODE_ST_UNDEF;
@@ -171,9 +189,11 @@ NOTHROW_NCX(CC libiconv_decode_isshiftzero)(struct iconv_decode const *__restric
 
 		/* C-escape */
 	case CODEC_C_ESCAPE:
+	case CODEC_C_ESCAPE_RAW:
 	case CODEC_C_ESCAPE_CHR:
 	case CODEC_C_ESCAPE_STR:
 	case CODEC_C_ESCAPE_BYTES:
+	case CODEC_C_ESCAPE_BYTES_RAW:
 	case CODEC_C_ESCAPE_BYTES_CHR:
 	case CODEC_C_ESCAPE_BYTES_STR:
 		return __MBSTATE_ISINIT(&self->icd_data.idd_cesc.ce_utf8) &&
@@ -186,6 +206,20 @@ NOTHROW_NCX(CC libiconv_decode_isshiftzero)(struct iconv_decode const *__restric
 		        (self->icd_flags & _ICONV_CDECODE_STMASK) == _ICONV_CDECODE_ST_CHR ||
 		        /* Raw strings don't have a notion of inside or outside, so shift is always 0 */
 		        (self->icd_flags & _ICONV_CDECODE_STMASK) == _ICONV_CDECODE_ST_RAW);
+
+	case CODEC_C_ESCAPE_INSTR:
+	case CODEC_C_ESCAPE_INCHR:
+	case CODEC_C_ESCAPE_ALL:
+	case CODEC_C_ESCAPE_BYTES_INCHR:
+	case CODEC_C_ESCAPE_BYTES_INSTR:
+	case CODEC_C_ESCAPE_BYTES_ALL:
+		/* These codecs are a little more special since the base-line requires that we're
+		 * inside  of a character or string constant.  As such, the zero-shift state must
+		 * reflect this and only apply while we're still inside! */
+		return __MBSTATE_ISINIT(&self->icd_data.idd_cesc.ce_utf8) &&
+		       ((self->icd_flags & _ICONV_CDECODE_STMASK) == _ICONV_CDECODE_ST_STRIN ||
+		        (self->icd_flags & _ICONV_CDECODE_STMASK) == _ICONV_CDECODE_ST_CHRIN ||
+		        (self->icd_flags & _ICONV_CDECODE_STMASK) == _ICONV_CDECODE_ST_ALLIN);
 
 	default:
 		break;
@@ -270,22 +304,34 @@ NOTHROW_NCX(CC libiconv_encode_init)(/*in|out*/ struct iconv_encode *__restrict 
 
 		/* C-escape */
 	case CODEC_C_ESCAPE:
+	case CODEC_C_ESCAPE_RAW:
+	case CODEC_C_ESCAPE_ALL:
 	case CODEC_C_ESCAPE_CHR:
 	case CODEC_C_ESCAPE_STR:
+	case CODEC_C_ESCAPE_INCHR:
+	case CODEC_C_ESCAPE_INSTR:
 	case CODEC_C_ESCAPE_BYTES:
+	case CODEC_C_ESCAPE_BYTES_RAW:
+	case CODEC_C_ESCAPE_BYTES_ALL:
 	case CODEC_C_ESCAPE_BYTES_CHR:
 	case CODEC_C_ESCAPE_BYTES_STR:
+	case CODEC_C_ESCAPE_BYTES_INCHR:
+	case CODEC_C_ESCAPE_BYTES_INSTR:
 		input->ii_printer = (pformatprinter)&libiconv_c_escape_encode;
-		/* Set-up flags. */
-		if (self->ice_codec == CODEC_C_ESCAPE ||
-		    self->ice_codec == CODEC_C_ESCAPE_BYTES)
+		/* Set-up  flags depending  on which  codec is  being used exactly.
+		 * Note that when it comes to encoding, some of the c-escape codecs
+		 * behave  exactly the same,  but don't when  it comes to decoding.
+		 * See the documentation in `iconvdata/db'! */
+		if (self->ice_codec == CODEC_C_ESCAPE || self->ice_codec == CODEC_C_ESCAPE_BYTES ||
+		    self->ice_codec == CODEC_C_ESCAPE_RAW || self->ice_codec == CODEC_C_ESCAPE_BYTES_RAW ||
+		    self->ice_codec == CODEC_C_ESCAPE_ALL || self->ice_codec == CODEC_C_ESCAPE_BYTES_ALL)
 			self->ice_flags |= _ICONV_CENCODE_NOQUOTE;
-		if (self->ice_codec == CODEC_C_ESCAPE_CHR ||
-		    self->ice_codec == CODEC_C_ESCAPE_BYTES_CHR)
+		if (self->ice_codec == CODEC_C_ESCAPE_CHR || self->ice_codec == CODEC_C_ESCAPE_INCHR ||
+		    self->ice_codec == CODEC_C_ESCAPE_BYTES_CHR || self->ice_codec == CODEC_C_ESCAPE_BYTES_INCHR)
 			self->ice_flags |= _ICONV_CENCODE_USECHAR;
-		if (self->ice_codec == CODEC_C_ESCAPE_BYTES ||
-		    self->ice_codec == CODEC_C_ESCAPE_BYTES_CHR ||
-		    self->ice_codec == CODEC_C_ESCAPE_BYTES_STR)
+		if (self->ice_codec == CODEC_C_ESCAPE_BYTES || self->ice_codec == CODEC_C_ESCAPE_BYTES_RAW ||
+		    self->ice_codec == CODEC_C_ESCAPE_BYTES_CHR || self->ice_codec == CODEC_C_ESCAPE_BYTES_INCHR ||
+		    self->ice_codec == CODEC_C_ESCAPE_BYTES_STR || self->ice_codec == CODEC_C_ESCAPE_BYTES_INSTR)
 			self->ice_flags |= _ICONV_CENCODE_NOUNICD;
 		break;
 
@@ -311,8 +357,12 @@ NOTHROW_NCX(CC libiconv_encode_flush)(struct iconv_encode *__restrict self) {
 
 	case CODEC_C_ESCAPE_CHR:
 	case CODEC_C_ESCAPE_STR:
+	case CODEC_C_ESCAPE_INCHR:
+	case CODEC_C_ESCAPE_INSTR:
 	case CODEC_C_ESCAPE_BYTES_CHR:
 	case CODEC_C_ESCAPE_BYTES_STR:
+	case CODEC_C_ESCAPE_BYTES_INCHR:
+	case CODEC_C_ESCAPE_BYTES_INSTR:
 		if (self->ice_flags & _ICONV_CENCODE_INQUOTE) {
 			char out[1] = { '\"' };
 			if (self->ice_flags & _ICONV_CENCODE_USECHAR)

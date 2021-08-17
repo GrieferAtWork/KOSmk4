@@ -263,7 +263,8 @@ DEFINE_TEST(iconv) {
 		(status = (*in.ii_printer)(in.ii_arg, s, COMPILER_STRLEN(s)), \
 		 assertf(status >= 0, "status = %" PRIdSIZ, status))
 
-		/* The c-escape decoder is only is 0-shift state while outside of a string literal! */
+		/* The c-escape decoder is only is 0-shift state while outside of a string literal!
+		 * NOTE: This also tests that feeding the codec its data piece-wise works correctly. */
 		assert((*iconv_decode_isshiftzero)(&tc.it_decode));
 		PRINT("\"");
 		assert(!(*iconv_decode_isshiftzero)(&tc.it_decode));
@@ -275,20 +276,22 @@ DEFINE_TEST(iconv) {
 		assert(!(*iconv_decode_isshiftzero)(&tc.it_decode));
 		PRINT("\"");
 		assert((*iconv_decode_isshiftzero)(&tc.it_decode));
-		PRINT("   \t  \n \r \r\n \t  ");
+		PRINT("   \t  \n \r \r\n \t  "); /* Only whitespace is allowed to appear here; anything else causes errors! */
 		assert((*iconv_decode_isshiftzero)(&tc.it_decode));
 		PRINT("\"");
 		assert(!(*iconv_decode_isshiftzero)(&tc.it_decode));
 		PRINT("World");
 		assert(!(*iconv_decode_isshiftzero)(&tc.it_decode));
 		PRINT("\"");
-	
+
 		/* As per recommendations, flush data once everything has been printed. */
 		status = (*iconv_encode_flush)(&tc.it_encode);
 		assertf(status >= 0, "status = %" PRIdSIZ, status);
-	
+
 		/* NUL-terminate. */
 		*ptr = 0;
+
+		/* Ensure that the correct data was decoded. */
 		assertf(strcmp(buf, "HelloWorld") == 0, "buf = %q", buf);
 	}
 

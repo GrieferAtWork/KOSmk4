@@ -352,6 +352,7 @@ switch_on_state:
 		case _ICONV_CDECODE_ST_RAW:
 		case _ICONV_CDECODE_ST_STRIN:
 		case _ICONV_CDECODE_ST_CHRIN:
+		case _ICONV_CDECODE_ST_ALLIN:
 			/* Process inside of a string. */
 			if (ch == '\\') {
 				/* Begin an escape sequence. */
@@ -361,15 +362,19 @@ flush_until_special_character:
 				DO_decode_output(flush_start, (size_t)(ch_start - flush_start));
 			} else if (ch == '\"') {
 				if ((self->icd_flags & _ICONV_CDECODE_STMASK) == _ICONV_CDECODE_ST_STRIN) {
+					if (self->icd_flags & _ICONV_CDECODE_F_ONESTR)
+						goto err_ilseq_ch_start; /* Stop once the current string has ended */
 					self->icd_flags &= ~_ICONV_CDECODE_STMASK;
 					self->icd_flags |= _ICONV_CDECODE_ST_STR;
 					goto flush_until_special_character;
 				} else if ((self->icd_flags & _ICONV_CDECODE_STMASK) == _ICONV_CDECODE_ST_RAW) {
 					goto err_ilseq_ch_start; /* Not allowed in raw strings! */
 				}
-				/* " can appear unescaped in `_ICONV_CDECODE_ST_CHRIN' */
+				/* " can appear unescaped in _ICONV_CDECODE_ST_CHRIN and _ICONV_CDECODE_ST_ALLIN */
 			} else if (ch == '\'') {
 				if ((self->icd_flags & _ICONV_CDECODE_STMASK) == _ICONV_CDECODE_ST_CHRIN) {
+					if (self->icd_flags & _ICONV_CDECODE_F_ONESTR)
+						goto err_ilseq_ch_start; /* Stop once the current string has ended */
 					/* Exit the string literal */
 					self->icd_flags &= ~_ICONV_CDECODE_STMASK;
 					self->icd_flags |= _ICONV_CDECODE_ST_CHR;
@@ -377,7 +382,7 @@ flush_until_special_character:
 				} else if ((self->icd_flags & _ICONV_CDECODE_STMASK) == _ICONV_CDECODE_ST_RAW) {
 					goto err_ilseq_ch_start; /* Not allowed in raw strings! */
 				}
-				/* ' can appear unescaped in `_ICONV_CDECODE_ST_STRIN' */
+				/* ' can appear unescaped in _ICONV_CDECODE_ST_STRIN and _ICONV_CDECODE_ST_ALLIN */
 			} else if (unicode_islf(ch)) {
 				/* Unescaped linefeeds aren't allowed inside of strings! */
 				goto err_ilseq_ch_start;
@@ -386,7 +391,8 @@ flush_until_special_character:
 
 		case _ICONV_CDECODE_ST_RAW | _ICONV_CDECODE_F_ESCAPE:
 		case _ICONV_CDECODE_ST_STRIN | _ICONV_CDECODE_F_ESCAPE:
-		case _ICONV_CDECODE_ST_CHRIN | _ICONV_CDECODE_F_ESCAPE: {
+		case _ICONV_CDECODE_ST_CHRIN | _ICONV_CDECODE_F_ESCAPE:
+		case _ICONV_CDECODE_ST_ALLIN | _ICONV_CDECODE_F_ESCAPE: {
 			/* Parse an escape sequence. */
 			switch (self->icd_data.idd_cesc.ce_esc) {
 

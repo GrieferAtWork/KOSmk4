@@ -1268,14 +1268,38 @@ struct codec_name_db_struct {
 	char db_C_ESCAPE_0[9]; /* "c-escape" */
 	char db_C_ESCAPE_nul;
 
+	/* CODEC_C_ESCAPE_ALL */
+	char db_C_ESCAPE_ALL_0[13]; /* "c-escape-all" */
+	char db_C_ESCAPE_ALL_nul;
+
 	/* CODEC_C_ESCAPE_BYTES */
 	char db_C_ESCAPE_BYTES_0[15]; /* "c-escape-bytes" */
 	char db_C_ESCAPE_BYTES_nul;
+
+	/* CODEC_C_ESCAPE_BYTES_ALL */
+	char db_C_ESCAPE_BYTES_ALL_0[19]; /* "c-escape-all-bytes" */
+	char db_C_ESCAPE_BYTES_ALL_1[19]; /* "c-escape-bytes-all" */
+	char db_C_ESCAPE_BYTES_ALL_nul;
 
 	/* CODEC_C_ESCAPE_BYTES_CHR */
 	char db_C_ESCAPE_BYTES_CHR_0[19]; /* "c-escape-bytes-chr" */
 	char db_C_ESCAPE_BYTES_CHR_1[19]; /* "c-escape-chr-bytes" */
 	char db_C_ESCAPE_BYTES_CHR_nul;
+
+	/* CODEC_C_ESCAPE_BYTES_INCHR */
+	char db_C_ESCAPE_BYTES_INCHR_0[21]; /* "c-escape-inchr-bytes" */
+	char db_C_ESCAPE_BYTES_INCHR_1[21]; /* "c-escape-bytes-inchr" */
+	char db_C_ESCAPE_BYTES_INCHR_nul;
+
+	/* CODEC_C_ESCAPE_BYTES_INSTR */
+	char db_C_ESCAPE_BYTES_INSTR_0[21]; /* "c-escape-instr-bytes" */
+	char db_C_ESCAPE_BYTES_INSTR_1[21]; /* "c-escape-bytes-instr" */
+	char db_C_ESCAPE_BYTES_INSTR_nul;
+
+	/* CODEC_C_ESCAPE_BYTES_RAW */
+	char db_C_ESCAPE_BYTES_RAW_0[19]; /* "c-escape-bytes-raw" */
+	char db_C_ESCAPE_BYTES_RAW_1[19]; /* "c-escape-raw-bytes" */
+	char db_C_ESCAPE_BYTES_RAW_nul;
 
 	/* CODEC_C_ESCAPE_BYTES_STR */
 	char db_C_ESCAPE_BYTES_STR_0[19]; /* "c-escape-bytes-str" */
@@ -1285,6 +1309,18 @@ struct codec_name_db_struct {
 	/* CODEC_C_ESCAPE_CHR */
 	char db_C_ESCAPE_CHR_0[13]; /* "c-escape-chr" */
 	char db_C_ESCAPE_CHR_nul;
+
+	/* CODEC_C_ESCAPE_INCHR */
+	char db_C_ESCAPE_INCHR_0[15]; /* "c-escape-inchr" */
+	char db_C_ESCAPE_INCHR_nul;
+
+	/* CODEC_C_ESCAPE_INSTR */
+	char db_C_ESCAPE_INSTR_0[15]; /* "c-escape-instr" */
+	char db_C_ESCAPE_INSTR_nul;
+
+	/* CODEC_C_ESCAPE_RAW */
+	char db_C_ESCAPE_RAW_0[13]; /* "c-escape-raw" */
+	char db_C_ESCAPE_RAW_nul;
 
 	/* CODEC_C_ESCAPE_STR */
 	char db_C_ESCAPE_STR_0[13]; /* "c-escape-str" */
@@ -3913,13 +3949,37 @@ PRIVATE struct codec_name_db_struct const codec_name_db = {
 	"c-escape",
 	0,
 
+	/* CODEC_C_ESCAPE_ALL */
+	"c-escape-all",
+	0,
+
 	/* CODEC_C_ESCAPE_BYTES */
 	"c-escape-bytes",
+	0,
+
+	/* CODEC_C_ESCAPE_BYTES_ALL */
+	"c-escape-all-bytes",
+	"c-escape-bytes-all",
 	0,
 
 	/* CODEC_C_ESCAPE_BYTES_CHR */
 	"c-escape-bytes-chr",
 	"c-escape-chr-bytes",
+	0,
+
+	/* CODEC_C_ESCAPE_BYTES_INCHR */
+	"c-escape-inchr-bytes",
+	"c-escape-bytes-inchr",
+	0,
+
+	/* CODEC_C_ESCAPE_BYTES_INSTR */
+	"c-escape-instr-bytes",
+	"c-escape-bytes-instr",
+	0,
+
+	/* CODEC_C_ESCAPE_BYTES_RAW */
+	"c-escape-bytes-raw",
+	"c-escape-raw-bytes",
 	0,
 
 	/* CODEC_C_ESCAPE_BYTES_STR */
@@ -3929,6 +3989,18 @@ PRIVATE struct codec_name_db_struct const codec_name_db = {
 
 	/* CODEC_C_ESCAPE_CHR */
 	"c-escape-chr",
+	0,
+
+	/* CODEC_C_ESCAPE_INCHR */
+	"c-escape-inchr",
+	0,
+
+	/* CODEC_C_ESCAPE_INSTR */
+	"c-escape-instr",
+	0,
+
+	/* CODEC_C_ESCAPE_RAW */
+	"c-escape-raw",
 	0,
 
 	/* CODEC_C_ESCAPE_STR */
@@ -5407,11 +5479,23 @@ PRIVATE struct codec_db_entry const codec_db[] = {
 	{ offsetof(struct codec_name_db_struct, db_MIK_1), /*                     "bulgaria-pc"                   */ CODEC_MIK },
 	{ offsetof(struct codec_name_db_struct, db_BURROUGHS_B5500_0), /*         "burroughs-b5500"               */ CODEC_BURROUGHS_B5500 },
 	{ offsetof(struct codec_name_db_struct, db_C_ESCAPE_0), /*                "c-escape"                      */ CODEC_C_ESCAPE },
+	{ offsetof(struct codec_name_db_struct, db_C_ESCAPE_ALL_0), /*            "c-escape-all"                  */ CODEC_C_ESCAPE_ALL },
+	{ offsetof(struct codec_name_db_struct, db_C_ESCAPE_BYTES_ALL_0), /*      "c-escape-all-bytes"            */ CODEC_C_ESCAPE_BYTES_ALL },
 	{ offsetof(struct codec_name_db_struct, db_C_ESCAPE_BYTES_0), /*          "c-escape-bytes"                */ CODEC_C_ESCAPE_BYTES },
+	{ offsetof(struct codec_name_db_struct, db_C_ESCAPE_BYTES_ALL_1), /*      "c-escape-bytes-all"            */ CODEC_C_ESCAPE_BYTES_ALL },
 	{ offsetof(struct codec_name_db_struct, db_C_ESCAPE_BYTES_CHR_0), /*      "c-escape-bytes-chr"            */ CODEC_C_ESCAPE_BYTES_CHR },
+	{ offsetof(struct codec_name_db_struct, db_C_ESCAPE_BYTES_INCHR_1), /*    "c-escape-bytes-inchr"          */ CODEC_C_ESCAPE_BYTES_INCHR },
+	{ offsetof(struct codec_name_db_struct, db_C_ESCAPE_BYTES_INSTR_1), /*    "c-escape-bytes-instr"          */ CODEC_C_ESCAPE_BYTES_INSTR },
+	{ offsetof(struct codec_name_db_struct, db_C_ESCAPE_BYTES_RAW_0), /*      "c-escape-bytes-raw"            */ CODEC_C_ESCAPE_BYTES_RAW },
 	{ offsetof(struct codec_name_db_struct, db_C_ESCAPE_BYTES_STR_0), /*      "c-escape-bytes-str"            */ CODEC_C_ESCAPE_BYTES_STR },
 	{ offsetof(struct codec_name_db_struct, db_C_ESCAPE_CHR_0), /*            "c-escape-chr"                  */ CODEC_C_ESCAPE_CHR },
 	{ offsetof(struct codec_name_db_struct, db_C_ESCAPE_BYTES_CHR_1), /*      "c-escape-chr-bytes"            */ CODEC_C_ESCAPE_BYTES_CHR },
+	{ offsetof(struct codec_name_db_struct, db_C_ESCAPE_INCHR_0), /*          "c-escape-inchr"                */ CODEC_C_ESCAPE_INCHR },
+	{ offsetof(struct codec_name_db_struct, db_C_ESCAPE_BYTES_INCHR_0), /*    "c-escape-inchr-bytes"          */ CODEC_C_ESCAPE_BYTES_INCHR },
+	{ offsetof(struct codec_name_db_struct, db_C_ESCAPE_INSTR_0), /*          "c-escape-instr"                */ CODEC_C_ESCAPE_INSTR },
+	{ offsetof(struct codec_name_db_struct, db_C_ESCAPE_BYTES_INSTR_0), /*    "c-escape-instr-bytes"          */ CODEC_C_ESCAPE_BYTES_INSTR },
+	{ offsetof(struct codec_name_db_struct, db_C_ESCAPE_RAW_0), /*            "c-escape-raw"                  */ CODEC_C_ESCAPE_RAW },
+	{ offsetof(struct codec_name_db_struct, db_C_ESCAPE_BYTES_RAW_1), /*      "c-escape-raw-bytes"            */ CODEC_C_ESCAPE_BYTES_RAW },
 	{ offsetof(struct codec_name_db_struct, db_C_ESCAPE_STR_0), /*            "c-escape-str"                  */ CODEC_C_ESCAPE_STR },
 	{ offsetof(struct codec_name_db_struct, db_C_ESCAPE_BYTES_STR_1), /*      "c-escape-str-bytes"            */ CODEC_C_ESCAPE_BYTES_STR },
 	{ offsetof(struct codec_name_db_struct, db_ISO646_CA_4), /*               "ca"                            */ CODEC_ISO646_CA },
