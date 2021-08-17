@@ -59,6 +59,36 @@ union iconv_decode_data {
 	struct iconv_7l_codepage const     *idd_cp7l;  /* [1..1][const] Code page (for 7l codecs) */
 	struct iconv_7h_codepage const     *idd_cp7h;  /* [1..1][const] Code page (for 7h codecs) */
 	struct iconv_iso646_codepage const *idd_cp646; /* [1..1][const] Code page (for iso686 codecs) */
+
+	struct {
+		struct __mbstate ce_utf8;   /* UTF-8 input multi-byte state */
+#define _ICONV_DECODE_CESCAPE_ESC_MODE_INIT  0  /* Expect first character after \ */
+#define _ICONV_DECODE_CESCAPE_ESC_MODE_HEX   1  /* Encountered \x */
+#define _ICONV_DECODE_CESCAPE_ESC_MODE_HEX_1 2  /* Encountered \x<?> */
+#define _ICONV_DECODE_CESCAPE_ESC_MODE_HEX_2 3  /* Encountered \x<?><?> */
+#define _ICONV_DECODE_CESCAPE_ESC_MODE_OCT_1 4  /* Encountered \<0-7> */
+#define _ICONV_DECODE_CESCAPE_ESC_MODE_OCT_2 5  /* Encountered \<0-7><0-7> */
+#define _ICONV_DECODE_CESCAPE_ESC_MODE_U16   6  /* Encountered \u */
+#define _ICONV_DECODE_CESCAPE_ESC_MODE_U16_1 7  /* Encountered \u<?> */
+#define _ICONV_DECODE_CESCAPE_ESC_MODE_U16_2 8  /* Encountered \u<?><?> */
+#define _ICONV_DECODE_CESCAPE_ESC_MODE_U16_3 9  /* Encountered \u<?><?><?> */
+#define _ICONV_DECODE_CESCAPE_ESC_MODE_U32   10 /* Encountered \U */
+#define _ICONV_DECODE_CESCAPE_ESC_MODE_U32_1 11 /* Encountered \U<?> */
+#define _ICONV_DECODE_CESCAPE_ESC_MODE_U32_2 12 /* Encountered \U<?><?> */
+#define _ICONV_DECODE_CESCAPE_ESC_MODE_U32_3 13 /* Encountered \U<?><?><?> */
+#define _ICONV_DECODE_CESCAPE_ESC_MODE_U32_4 14 /* Encountered \U<?><?><?><?> */
+#define _ICONV_DECODE_CESCAPE_ESC_MODE_U32_5 15 /* Encountered \U<?><?><?><?><?> */
+#define _ICONV_DECODE_CESCAPE_ESC_MODE_U32_6 16 /* Encountered \U<?><?><?><?><?><?> */
+#define _ICONV_DECODE_CESCAPE_ESC_MODE_U32_7 17 /* Encountered \U<?><?><?><?><?><?><?> */
+#define _ICONV_DECODE_CESCAPE_ESC_MODE_SLF   18 /* Encountered \<CR> (skip <LF> if it's the next character) */
+		uint8_t          ce_esc;    /* [valid_if(_ICONV_CDECODE_F_ESCAPE)] Escape mode (one of `_ICONV_DECODE_CESCAPE_ESC_MODE_*') */
+		union { /* Escape-mode-specific data */
+			uint8_t  ce_esc_value;   /* Value for \x and \0 */
+			char16_t ce_esc_u16;     /* Value for \u */
+			char32_t ce_esc_u32;     /* Value for \U */
+		};
+	} idd_cesc; /* c-escape */
+
 	void *__idd_pad[_ICONV_DECODE_OPAQUE_POINTERS];
 };
 
@@ -249,6 +279,45 @@ union iconv_encode_data {
 #define _ICONV_CENCODE_INQUOTE 0x0800 /* Flag: a " or ' has been printed. */
 #define _ICONV_CENCODE_USECHAR 0x1000 /* Flag: escape using ' instead of ". */
 #define _ICONV_CENCODE_NOUNICD 0x2000 /* Flag: Don't escape \u or \U; interpret input as raw bytes and print \xAB sequences. */
+
+/* For c-escape codecs (decode only). NOTE: c-escape decode expects input to be UTF-8!
+ * Initial state ("-bytes" suffix is ignored in codecs):
+ *    - "c-escape":     _ICONV_CDECODE_ST_UNDEF
+ *    - "c-escape-str": _ICONV_CDECODE_ST_STR
+ *    - "c-escape-chr": _ICONV_CDECODE_ST_CHR
+ * NOTE: "c-escape-str" and "c-escape-chr" will both skip over whitespace that  appears
+ *       outside of '- or "-pairs, but will stop and indicate an error when a non-space
+ *       character is encountered outside of the actual string.
+ *       Similarly, "c-escape" will stop and indicate an  error when an unescaped " or  '
+ *       character is encountered.  When used with  `ICONV_ERR_ERROR', this behavior  can
+ *       be used to not just parse, but find  the end end of a string literal while  also
+ *       concatenating  (unless "c-escape"  is used)  multiple consecutive  strings as is
+ *       described  by the C standard (where >"foo" "bar"< is the same as >"foobar"<, and
+ *       the   "c-escape-str"  codec   will  decode   >"foo"  "bar"<   in  its  entirety)
+ *       But  note that unescaped line-feeds will also  cause errors, though in this case
+ *       the internal shift-state will be non-zero, such that after an error you can test
+ *       if it happened because the string was  fully parsed, or because a line-feed  was
+ *       found in the middle of the string:
+ *       >> if (iconv_decode_isshiftzero(&decode)) {
+ *       >>     // String ended normally; error position points at the
+ *       >>     // first non-space character after the string ended.
+ *       >> } else {
+ *       >>     // Invalid string (e.g. unescaped line-feed in the middle)
+ *       >>     // The error position points at the bad character (e.g. the line-feed)
+ *       >>     // Another example would be an illegal escape sequence, like \p or \x1234567
+ *       >> }
+ */
+#define _ICONV_CDECODE_STMASK   0x0f00 /* Mask for state. */
+#define _ICONV_CDECODE_ST_RAW   0x0000 /* Raw string type (no unescaped quotes allowed) */
+#define _ICONV_CDECODE_ST_STRIN 0x0100 /* "-string (inside; linefeed characters will cause errors) */
+#define _ICONV_CDECODE_ST_CHRIN 0x0200 /* '-string (inside; linefeed characters will cause errors) */
+#define _ICONV_CDECODE_ST_STR   0x0300 /* "-string (outside) */
+#define _ICONV_CDECODE_ST_CHR   0x0400 /* '-string (outside) */
+#define _ICONV_CDECODE_ST_UNDEF 0x0500 /* Unknown  string type; determine based on first fed character. Switches to
+                                        * _ICONV_CDECODE_ST_RAW, _ICONV_CDECODE_ST_CHRIN or _ICONV_CDECODE_ST_STRIN */
+#define _ICONV_CDECODE_F_ESCAPE 0x0800 /* Flag: currently inside of an escape sequence. */
+/* Should "normal" characters be copied to output; iow: are we inside of a string? */
+#define _ICONV_CDECODE_SHOULD_FLUSH(st) ((st) <= _ICONV_CDECODE_ST_CHRIN)
 #endif /* LIBICONV_EXPOSE_INTERNAL */
 
 

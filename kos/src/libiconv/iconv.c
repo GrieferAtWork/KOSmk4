@@ -117,6 +117,26 @@ NOTHROW_NCX(CC libiconv_decode_init)(/*in|out*/ struct iconv_decode *__restrict 
 		input->ii_printer        = (pformatprinter)&libiconv_cp646_decode;
 		break;
 
+		/* C-escape */
+	case CODEC_C_ESCAPE:
+	case CODEC_C_ESCAPE_CHR:
+	case CODEC_C_ESCAPE_STR:
+	case CODEC_C_ESCAPE_BYTES:
+	case CODEC_C_ESCAPE_BYTES_CHR:
+	case CODEC_C_ESCAPE_BYTES_STR:
+		input->ii_printer = (pformatprinter)&libiconv_c_escape_decode;
+		/* Set-up the initial state for the parser. */
+		__mbstate_init(&self->icd_data.idd_cesc.ce_utf8);
+		if (self->icd_codec == CODEC_C_ESCAPE_STR || self->icd_codec == CODEC_C_ESCAPE_BYTES_STR) {
+			self->icd_flags |= _ICONV_CDECODE_ST_STR;
+		} else if (self->icd_codec == CODEC_C_ESCAPE_CHR || self->icd_codec == CODEC_C_ESCAPE_BYTES_CHR) {
+			self->icd_flags |= _ICONV_CDECODE_ST_CHR;
+		} else {
+			/* Undefined; to-be determined by the first parsed byte. */
+			self->icd_flags |= _ICONV_CDECODE_ST_UNDEF;
+		}
+		break;
+
 	default:
 		errno = EINVAL;
 		return -1;
@@ -148,6 +168,24 @@ NOTHROW_NCX(CC libiconv_decode_isshiftzero)(struct iconv_decode const *__restric
 	case CODEC_UTF32LE:
 	case CODEC_UTF32BE:
 		return self->icd_data.idd_utf.u_pbc == 0;
+
+		/* C-escape */
+	case CODEC_C_ESCAPE:
+	case CODEC_C_ESCAPE_CHR:
+	case CODEC_C_ESCAPE_STR:
+	case CODEC_C_ESCAPE_BYTES:
+	case CODEC_C_ESCAPE_BYTES_CHR:
+	case CODEC_C_ESCAPE_BYTES_STR:
+		return __MBSTATE_ISINIT(&self->icd_data.idd_cesc.ce_utf8) &&
+		       /* Make sure that the parser state indicate that we're outside of a string. */
+		       (/* String type never determined */
+		        (self->icd_flags & _ICONV_CDECODE_STMASK) == _ICONV_CDECODE_ST_UNDEF ||
+		        /* "-string, but outside "-pairs */
+		        (self->icd_flags & _ICONV_CDECODE_STMASK) == _ICONV_CDECODE_ST_STR ||
+		        /* '-string, but outside '-pairs */
+		        (self->icd_flags & _ICONV_CDECODE_STMASK) == _ICONV_CDECODE_ST_CHR ||
+		        /* Raw strings don't have a notion of inside or outside, so shift is always 0 */
+		        (self->icd_flags & _ICONV_CDECODE_STMASK) == _ICONV_CDECODE_ST_RAW);
 
 	default:
 		break;

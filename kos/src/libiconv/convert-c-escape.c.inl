@@ -116,7 +116,7 @@ parse_unicode:
 						goto err_ilseq;
 					if (IS_ICONV_ERR_DISCARD(self->ice_flags)) {
 						self->ice_data.ied_utf8.__word = __MBSTATE_TYPE_EMPTY;
-						flush_start                    = data;
+						flush_start                    = data + 1;
 						goto next_data;
 					}
 					/* Special case: we can actually ignore utf-8 errors  by
@@ -296,10 +296,393 @@ err_ilseq:
 	return -(ssize_t)(size_t)(end - data);
 }
 
-//INTERN NONNULL((1, 2)) ssize_t FORMATPRINTER_CC
-//libiconv_c_escape_decode(struct iconv_decode *__restrict self,
-//                         /*ascii*/ char const *__restrict data, size_t size) {
-//	/* TODO */
-//}
+INTERN NONNULL((1, 2)) ssize_t FORMATPRINTER_CC
+libiconv_c_escape_decode(struct iconv_decode *__restrict self,
+                         /*utf-8*/ char const *__restrict data, size_t size) {
+#define SHOULD_FLUSH() _ICONV_CDECODE_SHOULD_FLUSH(self->icd_flags & _ICONV_CDECODE_STMASK)
+	ssize_t temp, result = 0;
+	char const *ch_start;
+	char const *end, *flush_start;
+	flush_start = data;
+	end         = data + size;
+	if unlikely(self->icd_flags & ICONV_HASERR)
+		goto err_ilseq;
+	if (self->icd_data.idd_cesc.ce_utf8.__word != __MBSTATE_TYPE_EMPTY) {
+		ch_start = data;
+		goto parse_unicode;
+	}
+	while (data < end) {
+		char32_t ch;
+		ch_start = data;
+		ch       = (char32_t)(unsigned char)*data;
+		if (ch >= 0x80) {
+			size_t status;
+parse_unicode:
+			status = unicode_c8toc32(&ch, data, (size_t)(end - data),
+			                         &self->icd_data.idd_cesc.ce_utf8);
+			if ((ssize_t)status < 0) {
+				if (status == (size_t)-1) {
+					if (IS_ICONV_ERR_ERROR_OR_ERRNO(self->icd_flags))
+						goto err_ilseq;
+					if (IS_ICONV_ERR_DISCARD(self->icd_flags)) {
+						self->icd_data.idd_cesc.ce_utf8.__word = __MBSTATE_TYPE_EMPTY;
+						if (SHOULD_FLUSH()) {
+							DO_decode_output(flush_start, (size_t)(end - flush_start));
+							flush_start = data + 1;
+						}
+						++data;
+						continue;
+					}
+					if (!IS_ICONV_ERR_IGNORE(self->icd_flags))
+						ch = '?';
+					status = 1;
+				} else if (status == (size_t)-2) {
+					goto done; /* Everything parsed! */
+				}
+			}
+			data += status;
+		} else {
+			++data;
+		}
+
+		/* Process `ch' */
+switch_on_state:
+		switch (self->icd_flags & _ICONV_CDECODE_STMASK) {
+
+		case _ICONV_CDECODE_ST_RAW:
+		case _ICONV_CDECODE_ST_STRIN:
+		case _ICONV_CDECODE_ST_CHRIN:
+			/* Process inside of a string. */
+			if (ch == '\\') {
+				/* Begin an escape sequence. */
+				self->icd_flags |= _ICONV_CDECODE_F_ESCAPE;
+				self->icd_data.idd_cesc.ce_esc = _ICONV_DECODE_CESCAPE_ESC_MODE_INIT;
+flush_until_special_character:
+				DO_decode_output(flush_start, (size_t)(ch_start - flush_start));
+			} else if (ch == '\"') {
+				if ((self->icd_flags & _ICONV_CDECODE_STMASK) == _ICONV_CDECODE_ST_STRIN) {
+					self->icd_flags &= ~_ICONV_CDECODE_STMASK;
+					self->icd_flags |= _ICONV_CDECODE_ST_STR;
+					goto flush_until_special_character;
+				} else if ((self->icd_flags & _ICONV_CDECODE_STMASK) == _ICONV_CDECODE_ST_RAW) {
+					goto err_ilseq_ch_start; /* Not allowed in raw strings! */
+				}
+				/* " can appear unescaped in `_ICONV_CDECODE_ST_CHRIN' */
+			} else if (ch == '\'') {
+				if ((self->icd_flags & _ICONV_CDECODE_STMASK) == _ICONV_CDECODE_ST_CHRIN) {
+					/* Exit the string literal */
+					self->icd_flags &= ~_ICONV_CDECODE_STMASK;
+					self->icd_flags |= _ICONV_CDECODE_ST_CHR;
+					goto flush_until_special_character;
+				} else if ((self->icd_flags & _ICONV_CDECODE_STMASK) == _ICONV_CDECODE_ST_RAW) {
+					goto err_ilseq_ch_start; /* Not allowed in raw strings! */
+				}
+				/* ' can appear unescaped in `_ICONV_CDECODE_ST_STRIN' */
+			} else if (unicode_islf(ch)) {
+				/* Unescaped linefeeds aren't allowed inside of strings! */
+				goto err_ilseq_ch_start;
+			}
+			break;
+
+		case _ICONV_CDECODE_ST_RAW | _ICONV_CDECODE_F_ESCAPE:
+		case _ICONV_CDECODE_ST_STRIN | _ICONV_CDECODE_F_ESCAPE:
+		case _ICONV_CDECODE_ST_CHRIN | _ICONV_CDECODE_F_ESCAPE: {
+			/* Parse an escape sequence. */
+			switch (self->icd_data.idd_cesc.ce_esc) {
+
+			case _ICONV_DECODE_CESCAPE_ESC_MODE_SLF:
+				/* Special handling so we can ignore `ch' iff it's \n */
+				if (ch == '\n')
+					goto exit_escape_at_data; /* Don't include the line-feed */
+
+				/* Do include whatever character this is! */
+exit_escape_at_ch_start:
+				self->icd_flags &= ~_ICONV_CDECODE_F_ESCAPE; /* Exit escape mode */
+				flush_start = ch_start;
+				goto switch_on_state;
+
+			case _ICONV_DECODE_CESCAPE_ESC_MODE_HEX:
+				if (ch >= '0' && ch <= '9') {
+					self->icd_data.idd_cesc.ce_esc_value = (uint8_t)(ch - '0');
+				} else if (ch >= 'a' && ch <= 'f') {
+					self->icd_data.idd_cesc.ce_esc_value = (uint8_t)(10 + ch - 'a');
+				} else if (ch >= 'A' && ch <= 'F') {
+					self->icd_data.idd_cesc.ce_esc_value = (uint8_t)(10 + ch - 'A');
+				} else {
+					goto err_ilseq_ch_start;
+				}
+				self->icd_data.idd_cesc.ce_esc_value <<= 4;
+				self->icd_data.idd_cesc.ce_esc = _ICONV_DECODE_CESCAPE_ESC_MODE_HEX_1;
+				break;
+
+			case _ICONV_DECODE_CESCAPE_ESC_MODE_HEX_1:
+				if (ch >= '0' && ch <= '9') {
+					self->icd_data.idd_cesc.ce_esc_value |= (uint8_t)(ch - '0');
+				} else if (ch >= 'a' && ch <= 'f') {
+					self->icd_data.idd_cesc.ce_esc_value |= (uint8_t)(10 + ch - 'a');
+				} else if (ch >= 'A' && ch <= 'F') {
+					self->icd_data.idd_cesc.ce_esc_value |= (uint8_t)(10 + ch - 'A');
+				} else {
+					goto err_ilseq_ch_start;
+				}
+				self->icd_data.idd_cesc.ce_esc = _ICONV_DECODE_CESCAPE_ESC_MODE_HEX_2;
+				break;
+
+			case _ICONV_DECODE_CESCAPE_ESC_MODE_HEX_2:
+				if unlikely((ch >= '0' && ch <= '9') ||
+				            (ch >= 'a' && ch <= 'f') ||
+				            (ch >= 'A' && ch <= 'F'))
+					goto err_ilseq_ch_start;
+				/* Output the custom byte and exit escape mode. */
+output_esc_value:
+				DO_decode_output((char const *)&self->icd_data.idd_cesc.ce_esc_value, 1);
+				/* Include the current character in the next flush! */
+				goto exit_escape_at_ch_start;
+
+			case _ICONV_DECODE_CESCAPE_ESC_MODE_OCT_1:
+				if (!(ch >= '0' && ch <= '7'))
+					goto output_esc_value; /* Input was \1 ... \7 */
+				self->icd_data.idd_cesc.ce_esc_value <<= 3;
+				self->icd_data.idd_cesc.ce_esc_value |= (uint8_t)(ch - '0');
+				self->icd_data.idd_cesc.ce_esc = _ICONV_DECODE_CESCAPE_ESC_MODE_OCT_2;
+				break;
+
+			case _ICONV_DECODE_CESCAPE_ESC_MODE_OCT_2:
+				if (!(ch >= '0' && ch <= '7'))
+					goto output_esc_value; /* Input was \00 ... \77 */
+				self->icd_data.idd_cesc.ce_esc_value <<= 3;
+				self->icd_data.idd_cesc.ce_esc_value |= (uint8_t)(ch - '0');
+				DO_decode_output((char const *)&self->icd_data.idd_cesc.ce_esc_value, 1);
+				self->icd_flags &= ~_ICONV_CDECODE_F_ESCAPE;
+				break; /* Don't re-switch on `ch'! */
+
+			case _ICONV_DECODE_CESCAPE_ESC_MODE_U16:
+			case _ICONV_DECODE_CESCAPE_ESC_MODE_U16_1:
+			case _ICONV_DECODE_CESCAPE_ESC_MODE_U16_2:
+			case _ICONV_DECODE_CESCAPE_ESC_MODE_U16_3: {
+				uint8_t digit;
+				unsigned int position;
+				STATIC_ASSERT(_ICONV_DECODE_CESCAPE_ESC_MODE_U16 + 1 == _ICONV_DECODE_CESCAPE_ESC_MODE_U16_1);
+				STATIC_ASSERT(_ICONV_DECODE_CESCAPE_ESC_MODE_U16 + 2 == _ICONV_DECODE_CESCAPE_ESC_MODE_U16_2);
+				STATIC_ASSERT(_ICONV_DECODE_CESCAPE_ESC_MODE_U16 + 3 == _ICONV_DECODE_CESCAPE_ESC_MODE_U16_3);
+				if (ch >= '0' && ch <= '9') {
+					digit = (uint8_t)(ch - '0');
+				} else if (ch >= 'a' && ch <= 'f') {
+					digit = (uint8_t)(10 + ch - 'a');
+				} else if (ch >= 'A' && ch <= 'F') {
+					digit = (uint8_t)(10 + ch - 'A');
+				} else {
+					goto err_ilseq_ch_start;
+				}
+				position = self->icd_data.idd_cesc.ce_esc -
+				           _ICONV_DECODE_CESCAPE_ESC_MODE_U16; /* Positions are: \u<0><1><2><3> */
+				position = 3 - position;                       /* Positions are: \u<3><2><1><0> */
+				position <<= 2;                                /* Positions are: \u<12><8><4><0> */
+				/* Add to the escape buffer. */
+				self->icd_data.idd_cesc.ce_esc_u16 |= (char16_t)((uint16_t)digit << position);
+				if (self->icd_data.idd_cesc.ce_esc == _ICONV_DECODE_CESCAPE_ESC_MODE_U16_3) {
+					/* Last digit was decoded. -> Output the character. */
+					self->icd_data.idd_cesc.ce_esc_u32 = self->icd_data.idd_cesc.ce_esc_u16;
+					goto output_esc_value_u32;
+				} else {
+					++self->icd_data.idd_cesc.ce_esc;
+				}
+			}	break;
+
+			case _ICONV_DECODE_CESCAPE_ESC_MODE_U32:
+			case _ICONV_DECODE_CESCAPE_ESC_MODE_U32_1:
+			case _ICONV_DECODE_CESCAPE_ESC_MODE_U32_2:
+			case _ICONV_DECODE_CESCAPE_ESC_MODE_U32_3:
+			case _ICONV_DECODE_CESCAPE_ESC_MODE_U32_4:
+			case _ICONV_DECODE_CESCAPE_ESC_MODE_U32_5:
+			case _ICONV_DECODE_CESCAPE_ESC_MODE_U32_6:
+			case _ICONV_DECODE_CESCAPE_ESC_MODE_U32_7: {
+				uint8_t digit;
+				unsigned int position;
+				STATIC_ASSERT(_ICONV_DECODE_CESCAPE_ESC_MODE_U32 + 1 == _ICONV_DECODE_CESCAPE_ESC_MODE_U32_1);
+				STATIC_ASSERT(_ICONV_DECODE_CESCAPE_ESC_MODE_U32 + 2 == _ICONV_DECODE_CESCAPE_ESC_MODE_U32_2);
+				STATIC_ASSERT(_ICONV_DECODE_CESCAPE_ESC_MODE_U32 + 3 == _ICONV_DECODE_CESCAPE_ESC_MODE_U32_3);
+				STATIC_ASSERT(_ICONV_DECODE_CESCAPE_ESC_MODE_U32 + 4 == _ICONV_DECODE_CESCAPE_ESC_MODE_U32_4);
+				STATIC_ASSERT(_ICONV_DECODE_CESCAPE_ESC_MODE_U32 + 5 == _ICONV_DECODE_CESCAPE_ESC_MODE_U32_5);
+				STATIC_ASSERT(_ICONV_DECODE_CESCAPE_ESC_MODE_U32 + 6 == _ICONV_DECODE_CESCAPE_ESC_MODE_U32_6);
+				STATIC_ASSERT(_ICONV_DECODE_CESCAPE_ESC_MODE_U32 + 7 == _ICONV_DECODE_CESCAPE_ESC_MODE_U32_7);
+				if (ch >= '0' && ch <= '9') {
+					digit = (uint8_t)(ch - '0');
+				} else if (ch >= 'a' && ch <= 'f') {
+					digit = (uint8_t)(10 + ch - 'a');
+				} else if (ch >= 'A' && ch <= 'F') {
+					digit = (uint8_t)(10 + ch - 'A');
+				} else {
+					goto err_ilseq_ch_start;
+				}
+				position = self->icd_data.idd_cesc.ce_esc -
+				           _ICONV_DECODE_CESCAPE_ESC_MODE_U32; /* Positions are: \U<0><1><2><3><4><5><6><7> */
+				position = 7 - position;                       /* Positions are: \U<7><6><5><4><3><2><1><0> */
+				position <<= 2;                                /* Positions are: \U<28><24><20><16><12><8><4><0> */
+				/* Add to the escape buffer. */
+				self->icd_data.idd_cesc.ce_esc_u32 |= (char32_t)((uint32_t)digit << position);
+				if (self->icd_data.idd_cesc.ce_esc == _ICONV_DECODE_CESCAPE_ESC_MODE_U16_3) {
+					size_t len;
+					char buf[UNICODE_UTF8_CURLEN];
+					/* Last digit was decoded. -> Output the character. */
+output_esc_value_u32:
+					/* Encode the escaped character as utf-8 */
+					len = (size_t)(unicode_writeutf8(buf, self->icd_data.idd_cesc.ce_esc_u32) - buf);
+					DO_decode_output(buf, len);
+					/* Exit escape mode, but don't include the current character in the next flush. */
+					goto exit_escape_at_data;
+				} else {
+					++self->icd_data.idd_cesc.ce_esc;
+				}
+			}	break;
+
+			/*case _ICONV_DECODE_CESCAPE_ESC_MODE_INIT:*/
+			default: {
+				char out[1];
+
+				/* Start of sequence. */
+				switch (ch) {
+
+				case '\\':
+				case '\"':
+				case '\'':
+					/* Self-escape */
+					out[0] = (char)(unsigned char)(uint32_t)ch;
+					goto do_output_special;
+
+				case 'a':
+					out[0] = 0x07;
+					goto do_output_special;
+
+				case 'b':
+					out[0] = 0x08;
+					goto do_output_special;
+
+				case 't':
+					out[0] = 0x09;
+					goto do_output_special;
+
+				case 'n':
+					out[0] = 0x0a;
+					goto do_output_special;
+
+				case 'v':
+					out[0] = 0x0b;
+					goto do_output_special;
+
+				case 'f':
+					out[0] = 0x0c;
+					goto do_output_special;
+
+				case 'r':
+					out[0] = 0x0d;
+					goto do_output_special;
+
+				case 'e':
+					out[0] = 0x1b;
+do_output_special:
+					/* Output the unescaped character */
+					DO_decode_output(out, 1);
+					/* Exit escape mode */
+exit_escape_at_data:
+					self->icd_flags &= ~_ICONV_CDECODE_F_ESCAPE;
+					flush_start = data;
+					break;
+
+				case 'x':
+				case 'X':
+					self->icd_data.idd_cesc.ce_esc = _ICONV_DECODE_CESCAPE_ESC_MODE_HEX;
+					break;
+
+				case '0' ... '7':
+					self->icd_data.idd_cesc.ce_esc = _ICONV_DECODE_CESCAPE_ESC_MODE_OCT_1;
+					self->icd_data.idd_cesc.ce_esc_value = (uint8_t)(ch - '0');
+					break;
+
+				case 'u':
+					self->icd_data.idd_cesc.ce_esc = _ICONV_DECODE_CESCAPE_ESC_MODE_U16;
+					self->icd_data.idd_cesc.ce_esc_value = 0;
+					break;
+
+				case 'U':
+					self->icd_data.idd_cesc.ce_esc = _ICONV_DECODE_CESCAPE_ESC_MODE_U32;
+					self->icd_data.idd_cesc.ce_esc_value = 0;
+					break;
+
+				case '\r':
+					/* Special case: If the next character is \n, then it must also be ignored.
+					 * We do this by setting the first byte of the saved escape sequence as \r */
+					self->icd_data.idd_cesc.ce_esc = _ICONV_DECODE_CESCAPE_ESC_MODE_SLF;
+					break;
+
+				default:
+					if (unicode_islf(ch))
+						goto exit_escape_at_data; /* Escaped linefeed. (just ignore) */
+
+					/* Unrecognized start of escape sequence. */
+					goto err_ilseq_ch_start;
+				}
+			}	break;
+
+			}
+		}	break;
+
+		case _ICONV_CDECODE_ST_STR:
+		case _ICONV_CDECODE_ST_CHR:
+			/* Skip space characters outside of strings */
+			if (unicode_isspace(ch))
+				break;
+
+			/* Check if another string starts here! */
+			if (ch == ((self->icd_flags & _ICONV_CDECODE_STMASK) == _ICONV_CDECODE_ST_STR ? '\"' : '\'')) {
+				/* Switch back to inside-of-string mode. */
+				self->icd_flags = (self->icd_flags & ~_ICONV_CDECODE_STMASK) |
+				                  ((self->icd_flags & _ICONV_CDECODE_STMASK) == _ICONV_CDECODE_ST_STR
+				                   ? _ICONV_CDECODE_ST_STRIN
+				                   : _ICONV_CDECODE_ST_CHRIN);
+				flush_start = data;
+				break;
+			}
+
+			/* Anything else isn't allowed outside of strings. */
+err_ilseq_ch_start:
+			data = ch_start;
+			goto err_ilseq;
+
+		case _ICONV_CDECODE_ST_UNDEF:
+			/* Determine string-mode via the first character encountered. */
+			self->icd_flags &= ~_ICONV_CDECODE_STMASK;
+			flush_start = data;
+			if (ch == '\"') {
+				self->icd_flags |= _ICONV_CDECODE_ST_STRIN;
+			} else if (ch == '\'') {
+				self->icd_flags |= _ICONV_CDECODE_ST_CHRIN;
+			} else {
+				/* Everything else counts as a raw string, in which case we
+				 * need to process the current character as the first apart
+				 * of the string. */
+				self->icd_flags |= _ICONV_CDECODE_ST_RAW;
+				flush_start = ch_start;
+				goto switch_on_state;
+			}
+			break;
+
+		default:
+			/* Normal character inside of string; -> nothing to do! */
+			break;
+		}
+	}
+done:
+	if (SHOULD_FLUSH())
+		DO_decode_output(flush_start, (size_t)(end - flush_start));
+	return result;
+err:
+	return temp;
+err_ilseq:
+	self->icd_flags |= ICONV_HASERR;
+	if (IS_ICONV_ERR_ERRNO(self->icd_flags))
+		errno = EILSEQ;
+	return -(ssize_t)(size_t)(end - data);
+}
 
 DECL_END
