@@ -100,8 +100,14 @@ libiconv_uri_escape_decode(struct iconv_decode *__restrict self,
 			} else if (ch >= 'a' && ch <= 'f') {
 				nibble = 10 + ch - 'a';
 			} else {
-				/* TODO: Custom error handling! */
-				goto err_ilseq;
+				if (IS_ICONV_ERR_ERROR_OR_ERRNO(self->icd_flags))
+					goto err_ilseq;
+				if (!IS_ICONV_ERR_DISCARD(self->icd_flags)) {
+					if (IS_ICONV_ERR_REPLACE(self->icd_flags))
+						ch = '?';
+					DO_decode_output((char const *)&ch, 1);
+				}
+				goto next_data;
 			}
 			if (self->icd_data.idd_uri.ue_mode == _ICONV_DECODE_URI_PCT) {
 				self->icd_data.idd_uri.ue_chr = nibble << 4;
@@ -139,10 +145,18 @@ libiconv_uri_escape_decode(struct iconv_decode *__restrict self,
 	
 			default:
 				/* Illegal character! */
-				/* TODO: Custom error handling! */
-				goto err_ilseq;
+				if (IS_ICONV_ERR_ERROR_OR_ERRNO(self->icd_flags))
+					goto err_ilseq;
+				if (!IS_ICONV_ERR_IGNORE(self->icd_flags)) {
+					DO_decode_output(flush_start, (size_t)(data - flush_start));
+					if (IS_ICONV_ERR_REPLACE(self->icd_flags))
+						DO_decode_output("?", 1);
+					flush_start = data + 1;
+				}
+				break;
 			}
 		}
+next_data:
 		++data;
 	}
 	DO_decode_output(flush_start, (size_t)(end - flush_start));
