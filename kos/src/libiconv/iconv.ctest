@@ -314,6 +314,20 @@ DEFINE_TEST(iconv) {
 	assertf(strcmp(buf, "Hello World") == 0, "buf = %q", buf);
 
 
+	/* Test the hex codec. */
+	convert("ascii", "hex", ICONV_ERR_ERRNO, "Hello World", buf);
+	assertf(strcmp(buf, "48656C6C6F20576F726C64") == 0, "buf = %q", buf);
+	convert("ascii", "hex-upper", ICONV_ERR_ERRNO, "Hello World", buf);
+	assertf(strcmp(buf, "48656C6C6F20576F726C64") == 0, "buf = %q", buf);
+	convert("ascii", "hex-lower", ICONV_ERR_ERRNO, "Hello World", buf);
+	assertf(strcmp(buf, "48656c6c6f20576f726c64") == 0, "buf = %q", buf);
+	convert("hex", "ascii", ICONV_ERR_ERRNO, "48656C6C6F20576F726C64", buf);
+	assertf(strcmp(buf, "Hello World") == 0, "buf = %q", buf);
+	convert("hex", "ascii", ICONV_ERR_ERRNO, "48656c6c6f20576f726c64", buf);
+	assertf(strcmp(buf, "Hello World") == 0, "buf = %q", buf);
+
+
+
 	dlclose(libiconv);
 }
 
