@@ -2658,7 +2658,7 @@ libiconv_xml_escape_encode(struct iconv_encode *__restrict self,
 	while (data < end) {
 		unsigned char ch;
 		ch = (unsigned char)*data;
-		if (ch >= 0x80 && !(self->ice_flags & _ICONV_CENCODE_NOUNICD)) {
+		if (ch >= 0x80) {
 			char32_t ch32;
 			size_t status;
 			DO_encode_output(flush_start, (size_t)(data - flush_start));
@@ -2684,8 +2684,17 @@ parse_unicode:
 				}
 			}
 			if unlikely(ch32 == 0) {
-				/* TODO: Custom error handling! */
-				goto err_ilseq; /* NUL cannot be encoded in XML */
+				/* NUL cannot be encoded in XML */
+				if (IS_ICONV_ERR_ERROR_OR_ERRNO(self->ice_flags))
+					goto err_ilseq;
+				if (IS_ICONV_ERR_DISCARD(self->ice_flags)) {
+					data += status;
+					flush_start = data;
+					continue;
+				}
+				if (IS_ICONV_ERR_REPLACE(self->ice_flags))
+					ch32 = '?';
+				/* In IS_ICONV_ERR_IGNORE-mode, we do allow NUL to be encoded. */
 			}
 			data += status;
 			flush_start = data;
@@ -2708,12 +2717,20 @@ do_print_esc:
 				/* Can just output as-is! */
 			} else {
 				/* Must escape! */
-				if unlikely(ch == 0) {
-					/* TODO: Custom error handling! */
-					goto err_ilseq; /* NUL cannot be encoded in XML */
-				}
 				DO_encode_output(flush_start, (size_t)(data - flush_start));
 				flush_start = ++data;
+				if unlikely(ch == 0) {
+					/* NUL cannot be encoded in XML */
+					if (IS_ICONV_ERR_ERROR_OR_ERRNO(self->ice_flags)) {
+						--data;
+						goto err_ilseq;
+					}
+					if (IS_ICONV_ERR_DISCARD(self->ice_flags))
+						continue;
+					if (IS_ICONV_ERR_REPLACE(self->ice_flags))
+						ch = '?';
+					/* In IS_ICONV_ERR_IGNORE-mode, we do allow NUL to be encoded. */
+				}
 				esc = xml_escape(esc_buf, ch);
 				goto do_print_esc;
 			}
@@ -2786,12 +2803,23 @@ switch_on_state:
 		switch (__builtin_expect(self->icd_data.idd_xml.xe_mode, _ICONV_DECODE_XML_TXT)) {
 
 		case _ICONV_DECODE_XML_TXT:
-			if unlikely(ch == 0) {
-err_ilseq_ch_start:
+			if unlikely(ch == 0 && !IS_ICONV_ERR_IGNORE(self->icd_flags)) {
 				/* XML doesn't allow NUL characters. _ever_ */
-				data = ch_start;
-				/* TODO: Custom error handling! */
-				goto err_ilseq;
+				DO_decode_output(flush_start, (size_t)(ch_start - flush_start));
+err_ilseq_ch_start:
+				if (IS_ICONV_ERR_ERROR_OR_ERRNO(self->icd_flags)) {
+					data = ch_start;
+					goto err_ilseq;
+				}
+				flush_start                    = ch_start;
+				self->icd_data.idd_xml.xe_mode = _ICONV_DECODE_XML_TXT;
+				if (IS_ICONV_ERR_DISCARD(self->icd_flags)) {
+					flush_start = data;
+				} else if (IS_ICONV_ERR_REPLACE(self->icd_flags)) {
+					DO_decode_output("?", 1);
+					flush_start = data;
+				}
+				continue;
 			}
 			if (ch == '&') {
 				/* Enter escape mode. */
@@ -2812,12 +2840,19 @@ err_ilseq_ch_start:
 				firstchar[0] = (char)(unsigned char)ch;
 				ent = xml_entity_lookup_startswith(firstchar, 1);
 				if unlikely(!ent)
-					goto err_ilseq_ch_start;
+					goto illegal_after_and;
 				self->icd_data.idd_xml.xe_ent.e_str = ent;
 				self->icd_data.idd_xml.xe_ent.e_len = 1;
 				self->icd_data.idd_xml.xe_mode      = _ICONV_DECODE_XML_ENT;
 			} else {
 				/* Anything else isn't allowed after '&' */
+illegal_after_and:
+				if (IS_ICONV_ERR_IGNORE(self->icd_flags)) {
+					DO_decode_output("&", 1);
+					flush_start                    = ch_start;
+					self->icd_data.idd_xml.xe_mode = _ICONV_DECODE_XML_TXT;
+					continue;
+				}
 				goto err_ilseq_ch_start;
 			}
 			break;
@@ -2831,6 +2866,12 @@ err_ilseq_ch_start:
 				self->icd_data.idd_xml.xe_chr  = ch - '0';
 			} else {
 				/* Anything else isn't allowed after '&#' */
+				if (IS_ICONV_ERR_IGNORE(self->icd_flags)) {
+					DO_decode_output("&#", 2);
+					flush_start                    = ch_start;
+					self->icd_data.idd_xml.xe_mode = _ICONV_DECODE_XML_TXT;
+					continue;
+				}
 				goto err_ilseq_ch_start;
 			}
 			break;
@@ -2841,7 +2882,7 @@ err_ilseq_ch_start:
 				size_t len;
 				/* Escape character sequence end. */
 output_escape_character:
-				if unlikely(self->icd_data.idd_xml.xe_chr == 0)
+				if unlikely(self->icd_data.idd_xml.xe_chr == 0 && !IS_ICONV_ERR_IGNORE(self->icd_flags))
 					goto err_ilseq_ch_start; /* Nope: you're not even allowed to encode NUL here! */
 				len = (size_t)(unicode_writeutf8(utf, self->icd_data.idd_xml.xe_chr) - utf);
 				DO_decode_output(utf, len);
@@ -2849,19 +2890,26 @@ output_escape_character:
 				flush_start                    = data;
 				break;
 			} else if (ch >= '0' && ch <= '9') {
-				if (OVERFLOW_UMUL((uint32_t)self->icd_data.idd_xml.xe_chr, 10,
-				                  (uint32_t *)&self->icd_data.idd_xml.xe_chr))
+				uint32_t newchr;
+				if (OVERFLOW_UMUL((uint32_t)self->icd_data.idd_xml.xe_chr, 10, &newchr) ||
+				    OVERFLOW_UADD(newchr, (uint8_t)(ch - '0'), &newchr)) {
+					if (IS_ICONV_ERR_IGNORE(self->icd_flags)) {
+						DO(format_printf(decode_output_printer, decode_output_arg,
+						                 "&#%" PRIu32, self->icd_data.idd_xml.xe_chr));
+						flush_start                    = ch_start;
+						self->icd_data.idd_xml.xe_mode = _ICONV_DECODE_XML_TXT;
+						continue;
+					}
 					goto err_ilseq_ch_start; /* Overflow */
-				if (OVERFLOW_UADD((uint32_t)self->icd_data.idd_xml.xe_chr,
-				                  (uint8_t)(ch - '0'),
-				                  (uint32_t *)&self->icd_data.idd_xml.xe_chr))
-					goto err_ilseq_ch_start; /* Overflow */
+				}
+				self->icd_data.idd_xml.xe_chr = (char32_t)newchr;
 			} else {
 				goto err_ilseq_ch_start;
 			}
 			break;
 
 		case _ICONV_DECODE_XML_HEX: {
+			uint32_t newchr;
 			uint8_t digit;
 			if (ch == ';') {
 				goto output_escape_character;
@@ -2874,12 +2922,18 @@ output_escape_character:
 			} else {
 				goto err_ilseq_ch_start;
 			}
-			if (OVERFLOW_UMUL((uint32_t)self->icd_data.idd_xml.xe_chr, 16,
-			                  (uint32_t *)&self->icd_data.idd_xml.xe_chr))
+			if (OVERFLOW_UMUL((uint32_t)self->icd_data.idd_xml.xe_chr, 16, &newchr) ||
+			    OVERFLOW_UADD(newchr, digit, &newchr)) {
+				if (IS_ICONV_ERR_IGNORE(self->icd_flags)) {
+					DO(format_printf(decode_output_printer, decode_output_arg,
+					                 "&#x%" PRIX32, self->icd_data.idd_xml.xe_chr));
+					flush_start                    = ch_start;
+					self->icd_data.idd_xml.xe_mode = _ICONV_DECODE_XML_TXT;
+					continue;
+				}
 				goto err_ilseq_ch_start; /* Overflow */
-			if (OVERFLOW_UADD((uint32_t)self->icd_data.idd_xml.xe_chr, digit,
-			                  (uint32_t *)&self->icd_data.idd_xml.xe_chr))
-				goto err_ilseq_ch_start; /* Overflow */
+			}
+			self->icd_data.idd_xml.xe_chr = (char32_t)newchr;
 		}	break;
 
 		case _ICONV_DECODE_XML_ENT: {
@@ -2893,8 +2947,18 @@ output_escape_character:
 					 * be another one that does. To handle this case, search the  database
 					 * once again but look for the exact string (instead of starts-with) */
 					ent = xml_entity_lookup(xml_entity_name(ent), self->icd_data.idd_xml.xe_ent.e_len);
-					if unlikely(!ent)
+					if unlikely(!ent) {
+						if (IS_ICONV_ERR_IGNORE(self->icd_flags)) {
+ignore_unknown_entity_name:
+							ent = self->icd_data.idd_xml.xe_ent.e_str;
+							DO_decode_output("&", 1);
+							DO_decode_output(xml_entity_name(ent), self->icd_data.idd_xml.xe_ent.e_len);
+							flush_start                    = ch_start;
+							self->icd_data.idd_xml.xe_mode = _ICONV_DECODE_XML_TXT;
+							continue;
+						}
 						goto err_ilseq_ch_start;
+					}
 				}
 				/* Load the utf replacement for this entry. */
 				utf = xml_entity_utf8(ent);
@@ -2922,8 +2986,8 @@ output_escape_character:
 				 * and that entity was named fully, then all is still well! */
 check_maybe_semi_opt:
 				ent = self->icd_data.idd_xml.xe_ent.e_str;
-				if (xml_entity_name(ent)[self->icd_data.idd_xml.xe_ent.e_len] == 0 &&
-				    xml_entity_semiopt(ent)) {
+				if ((xml_entity_name(ent)[self->icd_data.idd_xml.xe_ent.e_len] == 0 && xml_entity_semiopt(ent)) ||
+				    ((ent = xml_entity_lookup(xml_entity_name(ent), self->icd_data.idd_xml.xe_ent.e_len)) != NULL && xml_entity_semiopt(ent))) {
 					char const *utf = xml_entity_utf8(ent);
 					/* All right: We _do_ have a completed sequence with optional (and missing) ';' */
 					DO_decode_output(utf, strlen(utf));
@@ -2931,6 +2995,8 @@ check_maybe_semi_opt:
 					flush_start                    = ch_start; /* Include the already loaded next character. */
 					goto switch_on_state;
 				}
+				if (IS_ICONV_ERR_IGNORE(self->icd_flags))
+					goto ignore_unknown_entity_name;
 				goto err_ilseq_ch_start; /* No sequence starts with this prefix. */
 			}
 		}	break;
