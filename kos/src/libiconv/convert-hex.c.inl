@@ -98,8 +98,14 @@ libiconv_hex_decode(struct iconv_decode *__restrict self,
 		} else if (ch >= 'A' && ch <= 'F') {
 			nibble = 10 + ch - 'A';
 		} else {
-			/* TODO: Custom error handling! */
-			goto err_ilseq;
+			if (IS_ICONV_ERR_ERROR_OR_ERRNO(self->icd_flags))
+				goto err_ilseq;
+			if (!IS_ICONV_ERR_DISCARD(self->icd_flags)) {
+				if (IS_ICONV_ERR_REPLACE(self->icd_flags))
+					ch = '?';
+				DO_decode_output((char const *)&ch, 1);
+			}
+			goto next_data;
 		}
 		if (self->icd_data.idd_hex == 0x01) {
 			self->icd_data.idd_hex = nibble << 4;
@@ -108,6 +114,7 @@ libiconv_hex_decode(struct iconv_decode *__restrict self,
 			self->icd_data.idd_hex = 0x01;
 			DO_decode_output((char const *)&nibble, 1);
 		}
+next_data:
 		++data;
 		--size;
 	}
