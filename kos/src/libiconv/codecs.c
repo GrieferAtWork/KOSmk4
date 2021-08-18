@@ -1455,6 +1455,15 @@ struct codec_name_db_struct {
 	char db_GEORGIAN_PS_0[12]; /* "georgian-ps" */
 	char db_GEORGIAN_PS_nul;
 
+	/* CODEC_HEX_LOWER */
+	char db_HEX_LOWER_0[10]; /* "hex-lower" */
+	char db_HEX_LOWER_nul;
+
+	/* CODEC_HEX_UPPER */
+	char db_HEX_UPPER_0[10]; /* "hex-upper" */
+	char db_HEX_UPPER_1[4];  /* "hex" */
+	char db_HEX_UPPER_nul;
+
 	/* CODEC_HP_GREEK8 */
 	char db_HP_GREEK8_0[10]; /* "hp-greek8" */
 	char db_HP_GREEK8_1[9];  /* "hpgreek8" */
@@ -4148,6 +4157,15 @@ PRIVATE struct codec_name_db_struct const codec_name_db = {
 	"georgian-ps",
 	0,
 
+	/* CODEC_HEX_LOWER */
+	"hex-lower",
+	0,
+
+	/* CODEC_HEX_UPPER */
+	"hex-upper",
+	"hex",
+	0,
+
 	/* CODEC_HP_GREEK8 */
 	"hp-greek8",
 	"hpgreek8",
@@ -6209,6 +6227,9 @@ PRIVATE struct codec_db_entry const codec_db[] = {
 	{ offsetof(struct codec_name_db_struct, db_ISO_8859_7_6), /*              "greek8"                        */ CODEC_ISO_8859_7 },
 	{ offsetof(struct codec_name_db_struct, db_ISO_IR_150_4), /*              "greekccitt"                    */ CODEC_ISO_IR_150 },
 	{ offsetof(struct codec_name_db_struct, db_ISO_8859_8_3), /*              "hebrew"                        */ CODEC_ISO_8859_8 },
+	{ offsetof(struct codec_name_db_struct, db_HEX_UPPER_1), /*               "hex"                           */ CODEC_HEX_UPPER },
+	{ offsetof(struct codec_name_db_struct, db_HEX_LOWER_0), /*               "hex-lower"                     */ CODEC_HEX_LOWER },
+	{ offsetof(struct codec_name_db_struct, db_HEX_UPPER_0), /*               "hex-upper"                     */ CODEC_HEX_UPPER },
 	{ offsetof(struct codec_name_db_struct, db_HP_GREEK8_0), /*               "hp-greek8"                     */ CODEC_HP_GREEK8 },
 	{ offsetof(struct codec_name_db_struct, db_CP1057_1), /*                  "hp-pc-8"                       */ CODEC_CP1057 },
 	{ offsetof(struct codec_name_db_struct, db_HP_ROMAN8_8), /*               "hp-roman-8"                    */ CODEC_HP_ROMAN8 },

@@ -100,6 +100,7 @@ libiconv_uri_escape_decode(struct iconv_decode *__restrict self,
 			} else if (ch >= 'a' && ch <= 'f') {
 				nibble = 10 + ch - 'a';
 			} else {
+				/* TODO: Custom error handling! */
 				goto err_ilseq;
 			}
 			if (self->icd_data.idd_uri.ue_mode == _ICONV_DECODE_URI_PCT) {
@@ -138,6 +139,7 @@ libiconv_uri_escape_decode(struct iconv_decode *__restrict self,
 	
 			default:
 				/* Illegal character! */
+				/* TODO: Custom error handling! */
 				goto err_ilseq;
 			}
 		}

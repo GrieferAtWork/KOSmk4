@@ -98,6 +98,9 @@ INTDEF NONNULL((1, 2)) ssize_t FORMATPRINTER_CC libiconv_xml_escape_encode(struc
 INTDEF NONNULL((1, 2)) ssize_t FORMATPRINTER_CC libiconv_xml_escape_decode(struct iconv_decode *__restrict self, /*utf-8*/ char const *__restrict data, size_t size);
 INTDEF NONNULL((1, 2)) ssize_t FORMATPRINTER_CC libiconv_uri_escape_encode(struct iconv_encode *__restrict self, /*bytes*/ char const *__restrict data, size_t size);
 INTDEF NONNULL((1, 2)) ssize_t FORMATPRINTER_CC libiconv_uri_escape_decode(struct iconv_decode *__restrict self, /*ascii*/ char const *__restrict data, size_t size);
+INTDEF NONNULL((1, 2)) ssize_t FORMATPRINTER_CC libiconv_hex_lower_encode(struct iconv_encode *__restrict self, /*bytes*/ char const *__restrict data, size_t size);
+INTDEF NONNULL((1, 2)) ssize_t FORMATPRINTER_CC libiconv_hex_upper_encode(struct iconv_encode *__restrict self, /*bytes*/ char const *__restrict data, size_t size);
+INTDEF NONNULL((1, 2)) ssize_t FORMATPRINTER_CC libiconv_hex_decode(struct iconv_decode *__restrict self, /*ascii*/ char const *__restrict data, size_t size);
 
 
 

@@ -166,6 +166,12 @@ NOTHROW_NCX(CC libiconv_decode_init)(/*in|out*/ struct iconv_decode *__restrict 
 		self->icd_data.idd_uri.ue_mode = _ICONV_DECODE_URI_TXT;
 		break;
 
+	case CODEC_HEX_LOWER:
+	case CODEC_HEX_UPPER:
+		input->ii_printer = (pformatprinter)&libiconv_hex_decode;
+		self->icd_data.idd_hex = 0x01;
+		break;
+
 	default:
 		errno = EINVAL;
 		return -1;
@@ -240,6 +246,11 @@ NOTHROW_NCX(CC libiconv_decode_isshiftzero)(struct iconv_decode const *__restric
 	case CODEC_URI_ESCAPE:
 		/* Make sure that we're not inside of a %XX sequence. */
 		return self->icd_data.idd_uri.ue_mode == _ICONV_DECODE_URI_TXT;
+
+	case CODEC_HEX_LOWER:
+	case CODEC_HEX_UPPER:
+		/* Make sure that we've parsed an even number of nibbles */
+		return self->icd_data.idd_hex == 0x01;
 
 	default:
 		break;
@@ -369,6 +380,14 @@ NOTHROW_NCX(CC libiconv_encode_init)(/*in|out*/ struct iconv_encode *__restrict 
 
 	case CODEC_URI_ESCAPE:
 		input->ii_printer = (pformatprinter)&libiconv_uri_escape_encode;
+		break;
+
+	case CODEC_HEX_LOWER:
+		input->ii_printer = (pformatprinter)&libiconv_hex_lower_encode;
+		break;
+
+	case CODEC_HEX_UPPER:
+		input->ii_printer = (pformatprinter)&libiconv_hex_upper_encode;
 		break;
 
 	default:

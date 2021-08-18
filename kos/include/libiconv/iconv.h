@@ -118,6 +118,8 @@ union iconv_decode_data {
 		uint8_t     ue_chr;  /* In `_ICONV_DECODE_URI_PCT_1': alraedy-parsed hex nibble, shifted left by 4 */
 	} idd_uri; /* uri-escape */
 
+	uint8_t idd_hex; /* For "hex": 0x00-0xf0 when parsing the second nibble; 0x01 when parsing the first. */
+
 	void *__idd_pad[_ICONV_DECODE_OPAQUE_POINTERS];
 };
 

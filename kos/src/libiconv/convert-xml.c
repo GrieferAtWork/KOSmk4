@@ -2683,8 +2683,10 @@ parse_unicode:
 					return result; /* Everything parsed! */
 				}
 			}
-			if unlikely(ch32 == 0)
+			if unlikely(ch32 == 0) {
+				/* TODO: Custom error handling! */
 				goto err_ilseq; /* NUL cannot be encoded in XML */
+			}
 			data += status;
 			flush_start = data;
 			/* Output `ch32' in its escaped form. */
@@ -2706,8 +2708,10 @@ do_print_esc:
 				/* Can just output as-is! */
 			} else {
 				/* Must escape! */
-				if unlikely(ch == 0)
+				if unlikely(ch == 0) {
+					/* TODO: Custom error handling! */
 					goto err_ilseq; /* NUL cannot be encoded in XML */
+				}
 				DO_encode_output(flush_start, (size_t)(data - flush_start));
 				flush_start = ++data;
 				esc = xml_escape(esc_buf, ch);
@@ -2786,6 +2790,7 @@ switch_on_state:
 err_ilseq_ch_start:
 				/* XML doesn't allow NUL characters. _ever_ */
 				data = ch_start;
+				/* TODO: Custom error handling! */
 				goto err_ilseq;
 			}
 			if (ch == '&') {
