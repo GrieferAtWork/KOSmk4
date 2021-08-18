@@ -2705,9 +2705,9 @@ do_print_esc:
 			DO_encode_output(esc, strlen(esc));
 			DO_encode_output(";", 1);
 		} else {
-			/* During encoding, we only allow printable ASCII and space.
+			/* During encoding, we only allow printable ASCII and  space.
 			 * All other characters we _always_ escape. That way, the xml
-			 * codec will encode data that is pure ASCII without relying
+			 * codec will encode data that is pure ASCII without  relying
 			 * on unicode support during transmit!
 			 *
 			 * Additionally, we always encode <>&'" */
@@ -2803,8 +2803,9 @@ parse_unicode:
 
 		case _ICONV_DECODE_XML_TXT:
 handle_txt_char:
-			if unlikely(ch == 0 && !IS_ICONV_ERR_IGNORE(self->icd_flags)) {
-				/* XML doesn't allow NUL characters. _ever_ */
+			/* XML doesn't allow these characters without them being escaped.
+			 * Additionally,  NUL  isn't  allowed  even  when  it's  escaped! */
+			if unlikely((ch == 0 || ch == '<') && !IS_ICONV_ERR_IGNORE(self->icd_flags)) {
 				DO_decode_output(flush_start, (size_t)(ch_start - flush_start));
 err_ilseq_ch_start:
 				if (IS_ICONV_ERR_ERROR_OR_ERRNO(self->icd_flags)) {
@@ -2982,7 +2983,7 @@ output_entity_utf8_and_break:
 				}
 				++self->icd_data.idd_xml.xe_ent.e_len;
 				/* Check if the entry has been completed and it has an optional trailing ';'
-				 * If this is the case, then we must immediately output the replacement and
+				 * If this is the case, then we must immediately output the replacement  and
 				 * switch to a mode where we consume the optional ';' */
 				if (xml_entity_name(ent)[self->icd_data.idd_xml.xe_ent.e_len] == '\0' && xml_entity_semiopt(ent)) {
 					self->icd_data.idd_xml.xe_mode = _ICONV_DECODE_XML_OSM;
