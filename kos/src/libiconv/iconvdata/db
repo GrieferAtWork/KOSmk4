@@ -46,10 +46,6 @@
 
 
 ###################################################################################################
-# TODO:
-#  - Codec "uri-escape" for %3Curi-style%3E escaping (https://en.wikipedia.org/wiki/Percent-encoding)
-#
-###################################################################################################
 # Ideas:
 #  - Codec "ansitty-NxN" that uses malloc+libansitty to set-up a small in-memory monochrome terminal
 #    which it then feeds all of the input data into. Text written is then output to the in-memory
@@ -323,6 +319,9 @@
 
 # Codec "xml-escape" for &lt;xml-style&gt; escaping (https://en.wikipedia.org/wiki/XML)
 @CODEC(CODEC_XML_ESCAPE: "xml-escape", "html-escape")
+
+# Codec "uri-escape" for %3Curi-style%3E escaping (https://en.wikipedia.org/wiki/Percent-encoding)
+@CODEC(CODEC_URI_ESCAPE: "uri-escape", "url-escape", "Percent-encoding", "URL-encoding")
 
 ###################################################################################################
 

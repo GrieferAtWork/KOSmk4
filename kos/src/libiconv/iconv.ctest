@@ -307,6 +307,13 @@ DEFINE_TEST(iconv) {
 	        "buf = %q", buf);
 
 
+	/* Test the uri-escape codec. */
+	convert("ascii", "uri-escape", ICONV_ERR_ERRNO, "Hello World", buf);
+	assertf(strcmp(buf, "Hello%20World") == 0, "buf = %q", buf);
+	convert("uri-escape", "ascii", ICONV_ERR_ERRNO, "Hello%20World", buf);
+	assertf(strcmp(buf, "Hello World") == 0, "buf = %q", buf);
+
+
 	dlclose(libiconv);
 }
 

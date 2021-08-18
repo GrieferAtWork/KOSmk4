@@ -161,6 +161,11 @@ NOTHROW_NCX(CC libiconv_decode_init)(/*in|out*/ struct iconv_decode *__restrict 
 		self->icd_data.idd_xml.xe_mode = _ICONV_DECODE_XML_TXT;
 		break;
 
+	case CODEC_URI_ESCAPE:
+		input->ii_printer = (pformatprinter)&libiconv_uri_escape_decode;
+		self->icd_data.idd_uri.ue_mode = _ICONV_DECODE_URI_TXT;
+		break;
+
 	default:
 		errno = EINVAL;
 		return -1;
@@ -231,6 +236,10 @@ NOTHROW_NCX(CC libiconv_decode_isshiftzero)(struct iconv_decode const *__restric
 		/* Make sure that we're not inside of an XML escape sequence. */
 		return mbstate_isempty(&self->icd_data.idd_xml.xe_utf8) &&
 		       self->icd_data.idd_xml.xe_mode == _ICONV_DECODE_XML_TXT;
+
+	case CODEC_URI_ESCAPE:
+		/* Make sure that we're not inside of a %XX sequence. */
+		return self->icd_data.idd_uri.ue_mode == _ICONV_DECODE_URI_TXT;
 
 	default:
 		break;
@@ -358,6 +367,10 @@ NOTHROW_NCX(CC libiconv_encode_init)(/*in|out*/ struct iconv_encode *__restrict 
 		input->ii_printer = (pformatprinter)&libiconv_xml_escape_encode;
 		break;
 
+	case CODEC_URI_ESCAPE:
+		input->ii_printer = (pformatprinter)&libiconv_uri_escape_encode;
+		break;
+
 	default:
 		errno = EINVAL;
 		return -1;
@@ -399,8 +412,8 @@ NOTHROW_NCX(CC libiconv_encode_flush)(struct iconv_encode *__restrict self) {
 	default:
 		break;
 	}
-	/* All encode codecs need a UTF-8 multi-byte state descriptor  so
-	 * that they're able to decode the in-coming UTF-8 data. Here, we
+	/* (Almost) all encode codecs need a UTF-8 multi-byte state descriptor
+	 * so that they're able to decode  the in-coming UTF-8 data. Here,  we
 	 * have to reset that state! */
 	mbstate_init(&self->ice_data.ied_utf8);
 	return result;

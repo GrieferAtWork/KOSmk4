@@ -23,10 +23,13 @@
 
 DECL_BEGIN
 
+#ifndef UPPER_HEX_DEFINED
+#define UPPER_HEX_DEFINED
 PRIVATE char const upper_hex[16] = {
 	'0', '1', '2', '3', '4', '5', '6', '7',
 	'8', '9', 'A', 'B', 'C', 'D', 'E', 'F'
 };
+#endif /* !UPPER_HEX_DEFINED */
 
 INTERN NONNULL((1, 2)) size_t
 NOTHROW(CC libiconv_c_escape_byte)(struct iconv_encode *__restrict self,

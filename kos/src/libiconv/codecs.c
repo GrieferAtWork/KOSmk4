@@ -2513,6 +2513,13 @@ struct codec_name_db_struct {
 	char db_PT154_4[15]; /* "cyrillic-asian" */
 	char db_PT154_nul;
 
+	/* CODEC_URI_ESCAPE */
+	char db_URI_ESCAPE_0[11]; /* "uri-escape" */
+	char db_URI_ESCAPE_1[11]; /* "url-escape" */
+	char db_URI_ESCAPE_2[17]; /* "percent-encoding" */
+	char db_URI_ESCAPE_3[13]; /* "url-encoding" */
+	char db_URI_ESCAPE_nul;
+
 	/* CODEC_US_DK */
 	char db_US_DK_0[6]; /* "us-dk" */
 	char db_US_DK_1[7]; /* "csusdk" */
@@ -5199,6 +5206,13 @@ PRIVATE struct codec_name_db_struct const codec_name_db = {
 	"cyrillic-asian",
 	0,
 
+	/* CODEC_URI_ESCAPE */
+	"uri-escape",
+	"url-escape",
+	"percent-encoding",
+	"url-encoding",
+	0,
+
 	/* CODEC_US_DK */
 	"us-dk",
 	"csusdk",
@@ -6847,6 +6861,7 @@ PRIVATE struct codec_db_entry const codec_db[] = {
 	{ offsetof(struct codec_name_db_struct, db_UTF8_5), /*                    "osf5010001"                    */ CODEC_UTF8 },
 	{ offsetof(struct codec_name_db_struct, db_PALMOS_0), /*                  "palmos"                        */ CODEC_PALMOS },
 	{ offsetof(struct codec_name_db_struct, db_CP858_3), /*                   "pc-multilingual-850+euro"      */ CODEC_CP858 },
+	{ offsetof(struct codec_name_db_struct, db_URI_ESCAPE_2), /*              "percent-encoding"              */ CODEC_URI_ESCAPE },
 	{ offsetof(struct codec_name_db_struct, db_CP1276_3), /*                  "postscript"                    */ CODEC_CP1276 },
 	{ offsetof(struct codec_name_db_struct, db_CP1276_1), /*                  "postscript-standard-encoding"  */ CODEC_CP1276 },
 	{ offsetof(struct codec_name_db_struct, db_ISO646_PT_0), /*               "pt"                            */ CODEC_ISO646_PT },
@@ -6919,6 +6934,9 @@ PRIVATE struct codec_db_entry const codec_db[] = {
 	{ offsetof(struct codec_name_db_struct, db_ISO646_GB_4), /*               "uk"                            */ CODEC_ISO646_GB },
 	{ offsetof(struct codec_name_db_struct, db_UTF16BE_3), /*                 "unicodebig"                    */ CODEC_UTF16BE },
 	{ offsetof(struct codec_name_db_struct, db_UTF16LE_3), /*                 "unicodelittle"                 */ CODEC_UTF16LE },
+	{ offsetof(struct codec_name_db_struct, db_URI_ESCAPE_0), /*              "uri-escape"                    */ CODEC_URI_ESCAPE },
+	{ offsetof(struct codec_name_db_struct, db_URI_ESCAPE_3), /*              "url-encoding"                  */ CODEC_URI_ESCAPE },
+	{ offsetof(struct codec_name_db_struct, db_URI_ESCAPE_1), /*              "url-escape"                    */ CODEC_URI_ESCAPE },
 	{ offsetof(struct codec_name_db_struct, db_ASCII_7), /*                   "us"                            */ CODEC_ASCII },
 	{ offsetof(struct codec_name_db_struct, db_ASCII_6), /*                   "us-ascii"                      */ CODEC_ASCII },
 	{ offsetof(struct codec_name_db_struct, db_US_DK_0), /*                   "us-dk"                         */ CODEC_US_DK },

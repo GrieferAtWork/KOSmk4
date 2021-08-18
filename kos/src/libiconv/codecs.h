@@ -57,6 +57,7 @@ enum {
 	CODEC_C_ESCAPE_RAW,         /* "c-escape-raw" */
 	CODEC_C_ESCAPE_STR,         /* "c-escape-str" */
 	CODEC_ISO_8859_1,           /* "iso8859-1:1987", "iso-ir-100", "iso8859-1", "latin1", "l1", "ibm819", "cp819", "iso88591", "csisolatin1", "cp28591", "windows-28591", "we8iso8859p1", "cp38591", "windows-38591", "iso8859-1-i", "8859-1", "osf10001" */
+	CODEC_URI_ESCAPE,           /* "uri-escape", "url-escape", "percent-encoding", "url-encoding" */
 	CODEC_UTF16BE,              /* "utf16be", "utf-16be", "ucs-2be", "unicodebig", "csutf16be" */
 	CODEC_UTF16LE,              /* "utf16le", "utf-16le", "ucs-2le", "unicodelittle", "csutf16le" */
 	CODEC_UTF32BE,              /* "utf32be", "utf-32be", "ucs-4be", "cp12001", "windows-12001", "csutf32be" */

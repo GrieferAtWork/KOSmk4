@@ -110,6 +110,14 @@ union iconv_decode_data {
 		};
 	} idd_xml; /* xml-escape */
 
+	struct {
+#define _ICONV_DECODE_URI_TXT   0 /* Inside of normal text */
+#define _ICONV_DECODE_URI_PCT   1 /* Encountered % */
+#define _ICONV_DECODE_URI_PCT_1 2 /* Encountered %<?> */
+		uint8_t     ue_mode; /* Current state machine mode (one of `_ICONV_DECODE_URI_*') */
+		uint8_t     ue_chr;  /* In `_ICONV_DECODE_URI_PCT_1': alraedy-parsed hex nibble, shifted left by 4 */
+	} idd_uri; /* uri-escape */
+
 	void *__idd_pad[_ICONV_DECODE_OPAQUE_POINTERS];
 };
 

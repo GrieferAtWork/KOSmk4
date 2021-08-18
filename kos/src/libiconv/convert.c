@@ -718,6 +718,7 @@ DECL_END
 
 /* Misc codecs. */
 #include "convert-c-escape.c.inl"
+#include "convert-uri-escape.c.inl"
 #endif /* !__INTELLISENSE__ */
 
 
