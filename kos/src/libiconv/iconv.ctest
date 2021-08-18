@@ -309,6 +309,10 @@ DEFINE_TEST(iconv) {
 	assertf(strcmp(buf, "A\u00A0B") == 0, "buf = %q", buf);
 	convert("xml-escape", "utf-8", ICONV_ERR_ERRNO, "A&nbsp;B", buf);
 	assertf(strcmp(buf, "A\u00A0B") == 0, "buf = %q", buf);
+	convert("xml-escape", "utf-8", ICONV_ERR_ERRNO, "A&nbsp", buf);
+	assertf(strcmp(buf, "A\u00A0") == 0, "buf = %q", buf);
+	convert("xml-escape", "utf-8", ICONV_ERR_ERRNO, "A&nbsp;", buf);
+	assertf(strcmp(buf, "A\u00A0") == 0, "buf = %q", buf);
 
 
 	/* Test the uri-escape codec. */

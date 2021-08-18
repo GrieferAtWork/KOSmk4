@@ -2799,10 +2799,10 @@ parse_unicode:
 		}
 
 		/* Process `ch' */
-switch_on_state:
 		switch (__builtin_expect(self->icd_data.idd_xml.xe_mode, _ICONV_DECODE_XML_TXT)) {
 
 		case _ICONV_DECODE_XML_TXT:
+handle_txt_char:
 			if unlikely(ch == 0 && !IS_ICONV_ERR_IGNORE(self->icd_flags)) {
 				/* XML doesn't allow NUL characters. _ever_ */
 				DO_decode_output(flush_start, (size_t)(ch_start - flush_start));
@@ -2826,6 +2826,17 @@ err_ilseq_ch_start:
 				DO_decode_output(flush_start, (size_t)(ch_start - flush_start));
 				self->icd_data.idd_xml.xe_mode = _ICONV_DECODE_XML_AND;
 			}
+			break;
+
+		case _ICONV_DECODE_XML_OSM: /* OptionalSeMicollon */
+			self->icd_data.idd_xml.xe_mode = _ICONV_DECODE_XML_TXT;
+			if (ch != ';') {
+				/* Not a semicolon -> just handle it as a text character. */
+				flush_start = ch_start;
+				goto handle_txt_char;
+			}
+			/* Consume the ';' */
+			flush_start = data;
 			break;
 
 		case _ICONV_DECODE_XML_AND:
@@ -2937,66 +2948,56 @@ output_escape_character:
 		}	break;
 
 		case _ICONV_DECODE_XML_ENT: {
+			xml_entity_t const *ent;
 			if (ch == ';') {
-				xml_entity_t const *ent;
 				char const *utf;
 				/* End of sequence. Check that our entry also ends. */
 				ent = self->icd_data.idd_xml.xe_ent.e_str;
-				if (xml_entity_name(ent)[self->icd_data.idd_xml.xe_ent.e_len] != 0) {
+				if (xml_entity_name(ent)[self->icd_data.idd_xml.xe_ent.e_len] != '\0') {
 					/* If our entity doesn't end at the specified position, then there may
 					 * be another one that does. To handle this case, search the  database
 					 * once again but look for the exact string (instead of starts-with) */
 					ent = xml_entity_lookup(xml_entity_name(ent), self->icd_data.idd_xml.xe_ent.e_len);
-					if unlikely(!ent) {
-						if (IS_ICONV_ERR_IGNORE(self->icd_flags)) {
-ignore_unknown_entity_name:
-							ent = self->icd_data.idd_xml.xe_ent.e_str;
-							DO_decode_output("&", 1);
-							DO_decode_output(xml_entity_name(ent), self->icd_data.idd_xml.xe_ent.e_len);
-							flush_start                    = ch_start;
-							self->icd_data.idd_xml.xe_mode = _ICONV_DECODE_XML_TXT;
-							continue;
-						}
-						goto err_ilseq_ch_start;
-					}
+					if unlikely(!ent)
+						goto handle_unknown_entity_name;
 				}
+				self->icd_data.idd_xml.xe_mode = _ICONV_DECODE_XML_TXT;
+output_entity_utf8_and_break:
 				/* Load the utf replacement for this entry. */
 				utf = xml_entity_utf8(ent);
 				/* Output the utf replacement. */
 				DO_decode_output(utf, strlen(utf));
-				self->icd_data.idd_xml.xe_mode = _ICONV_DECODE_XML_TXT;
-				flush_start                    = data;
+				flush_start = data;
 				break;
 			} else if (isalnum(ch) && ch <= 0x7f) {
 				/* Another character apart of the entity name. */
-				xml_entity_t const *ent;
 				ent = self->icd_data.idd_xml.xe_ent.e_str;
 				if (xml_entity_name(ent)[self->icd_data.idd_xml.xe_ent.e_len] != (char)(unsigned char)ch) {
 					ent = xml_entity_lookup_startswith_plus1(xml_entity_name(ent),
 					                                         self->icd_data.idd_xml.xe_ent.e_len,
 					                                         (char)(unsigned char)ch);
 					if unlikely(!ent)
-						goto check_maybe_semi_opt;
+						goto handle_unknown_entity_name;
 					self->icd_data.idd_xml.xe_ent.e_str = ent;
 				}
 				++self->icd_data.idd_xml.xe_ent.e_len;
-			} else {
-				xml_entity_t const *ent;
-				/* If the trailing ';' of  the current entity is  optional,
-				 * and that entity was named fully, then all is still well! */
-check_maybe_semi_opt:
-				ent = self->icd_data.idd_xml.xe_ent.e_str;
-				if ((xml_entity_name(ent)[self->icd_data.idd_xml.xe_ent.e_len] == 0 && xml_entity_semiopt(ent)) ||
-				    ((ent = xml_entity_lookup(xml_entity_name(ent), self->icd_data.idd_xml.xe_ent.e_len)) != NULL && xml_entity_semiopt(ent))) {
-					char const *utf = xml_entity_utf8(ent);
-					/* All right: We _do_ have a completed sequence with optional (and missing) ';' */
-					DO_decode_output(utf, strlen(utf));
-					self->icd_data.idd_xml.xe_mode = _ICONV_DECODE_XML_TXT;
-					flush_start                    = ch_start; /* Include the already loaded next character. */
-					goto switch_on_state;
+				/* Check if the entry has been completed and it has an optional trailing ';'
+				 * If this is the case, then we must immediately output the replacement and
+				 * switch to a mode where we consume the optional ';' */
+				if (xml_entity_name(ent)[self->icd_data.idd_xml.xe_ent.e_len] == '\0' && xml_entity_semiopt(ent)) {
+					self->icd_data.idd_xml.xe_mode = _ICONV_DECODE_XML_OSM;
+					goto output_entity_utf8_and_break;
 				}
-				if (IS_ICONV_ERR_IGNORE(self->icd_flags))
-					goto ignore_unknown_entity_name;
+			} else {
+handle_unknown_entity_name:
+				if (IS_ICONV_ERR_IGNORE(self->icd_flags)) {
+					ent = self->icd_data.idd_xml.xe_ent.e_str;
+					DO_decode_output("&", 1);
+					DO_decode_output(xml_entity_name(ent), self->icd_data.idd_xml.xe_ent.e_len);
+					flush_start                    = ch_start;
+					self->icd_data.idd_xml.xe_mode = _ICONV_DECODE_XML_TXT;
+					continue;
+				}
 				goto err_ilseq_ch_start; /* No sequence starts with this prefix. */
 			}
 		}	break;

@@ -92,11 +92,12 @@ union iconv_decode_data {
 	struct {
 		struct __mbstate xe_utf8; /* UTF-8 input multi-byte state */
 #define _ICONV_DECODE_XML_TXT 0 /* Basic text-mode */
-#define _ICONV_DECODE_XML_AND 1 /* Encountered & */
-#define _ICONV_DECODE_XML_PND 2 /* Encountered &# */
-#define _ICONV_DECODE_XML_DEC 3 /* Encountered &#<0-9> */
-#define _ICONV_DECODE_XML_HEX 4 /* Encountered &#x */
-#define _ICONV_DECODE_XML_ENT 5 /* Encountered &<alnum> */
+#define _ICONV_DECODE_XML_OSM 1 /* Skip an optional ';' */
+#define _ICONV_DECODE_XML_AND 2 /* Encountered & */
+#define _ICONV_DECODE_XML_PND 3 /* Encountered &# */
+#define _ICONV_DECODE_XML_DEC 4 /* Encountered &#<0-9> */
+#define _ICONV_DECODE_XML_HEX 5 /* Encountered &#x */
+#define _ICONV_DECODE_XML_ENT 6 /* Encountered &<alnum> */
 		uint8_t     xe_mode; /* Current state machine mode (one of `_ICONV_DECODE_XML_*') */
 		union {
 			char32_t xe_chr; /* _ICONV_DECODE_XML_DEC, _ICONV_DECODE_XML_HEX: Escaped character */

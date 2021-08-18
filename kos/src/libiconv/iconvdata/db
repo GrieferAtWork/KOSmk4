@@ -64,11 +64,11 @@
 #  - https://en.wikipedia.org/wiki/Code_page_776                      "cp776"
 #  - https://en.wikipedia.org/wiki/Code_page_777                      "cp777"
 #  - https://en.wikipedia.org/wiki/Code_page_778                      "cp778", "LST-1590-2"
-#  - https://en.wikipedia.org/wiki/Code_page_907                      "cp907", "IBM907"
 #  - https://en.wikipedia.org/wiki/CSX%2B_Indic_character_set         "CSX+Indic"
-#  - https://en.wikipedia.org/wiki/Japanese_language_in_EBCDIC        "IBM930", "cp930", "csIBM930"
-#  - https://en.wikipedia.org/wiki/Code_page_932_(IBM)                "IBM932", "csIBM932"
-#  - https://en.wikipedia.org/wiki/KS_X_1001#Johab_encoding           "IBM933", "cp933", "csIBM933"
+#  - https://en.wikipedia.org/wiki/Code_page_907                      "cp907", "IBM907"
+#  - glibc-2.32/iconvdata/ibm930.c                                    "IBM930", "cp930", "csIBM930"  (https://en.wikipedia.org/wiki/Japanese_language_in_EBCDIC)
+#  - glibc-2.32/iconvdata/ibm932.c                                    "IBM932", "csIBM932"  (https://en.wikipedia.org/wiki/Code_page_932_(IBM))
+#  - glibc-2.32/iconvdata/ibm933.c                                    "IBM933", "cp933", "csIBM933"  (https://en.wikipedia.org/wiki/KS_X_1001#Johab_encoding)
 #  - glibc-2.32/iconvdata/ibm935.c                                    "IBM935", "cp935", "csIBM935"
 #  - glibc-2.32/iconvdata/ibm937.c                                    "IBM937", "cp937", "csIBM937"
 #  - glibc-2.32/iconvdata/ibm939.c                                    "IBM939", "cp939", "csIBM939"  (https://en.wikipedia.org/wiki/Japanese_language_in_EBCDIC)
