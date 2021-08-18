@@ -121,6 +121,7 @@ struct codec_name_db_struct {
 	char db_CP10006_0[8];  /* "cp10006" */
 	char db_CP10006_1[14]; /* "windows-10006" */
 	char db_CP10006_2[12]; /* "x-mac-greek" */
+	char db_CP10006_3[17]; /* "cp10006-macgreek" */
 	char db_CP10006_nul;
 
 	/* CODEC_CP10007 */
@@ -130,6 +131,7 @@ struct codec_name_db_struct {
 	char db_CP10007_3[8];  /* "ibm1283" */
 	char db_CP10007_4[16]; /* "ms-mac-cyrillic" */
 	char db_CP10007_5[14]; /* "msmaccyrillic" */
+	char db_CP10007_6[20]; /* "cp10007-maccyrillic" */
 	char db_CP10007_nul;
 
 	/* CODEC_CP10017 */
@@ -595,6 +597,7 @@ struct codec_name_db_struct {
 	char db_CP1275_6[14]; /* "windows-10000" */
 	char db_CP1275_7[12]; /* "x-mac-roman" */
 	char db_CP1275_8[9];  /* "macroman" */
+	char db_CP1275_9[17]; /* "cp10000-macroman" */
 	char db_CP1275_nul;
 
 	/* CODEC_CP1276 */
@@ -610,6 +613,7 @@ struct codec_name_db_struct {
 	char db_CP1281_2[8];  /* "cp10081" */
 	char db_CP1281_3[14]; /* "windows-10081" */
 	char db_CP1281_4[14]; /* "x-mac-turkish" */
+	char db_CP1281_5[19]; /* "cp10081-macturkish" */
 	char db_CP1281_nul;
 
 	/* CODEC_CP1282 */
@@ -619,6 +623,7 @@ struct codec_name_db_struct {
 	char db_CP1282_3[14]; /* "windows-10029" */
 	char db_CP1282_4[9];  /* "x-mac-ce" */
 	char db_CP1282_5[18]; /* "mac-centraleurope" */
+	char db_CP1282_6[18]; /* "cp10029-maclatin2" */
 	char db_CP1282_nul;
 
 	/* CODEC_CP1284 */
@@ -643,6 +648,7 @@ struct codec_name_db_struct {
 	char db_CP1286_2[8];  /* "cp10079" */
 	char db_CP1286_3[14]; /* "windows-10079" */
 	char db_CP1286_4[16]; /* "x-mac-icelandic" */
+	char db_CP1286_5[21]; /* "cp10079-macicelandic" */
 	char db_CP1286_nul;
 
 	/* CODEC_CP1287 */
@@ -2823,6 +2829,7 @@ PRIVATE struct codec_name_db_struct const codec_name_db = {
 	"cp10006",
 	"windows-10006",
 	"x-mac-greek",
+	"cp10006-macgreek",
 	0,
 
 	/* CODEC_CP10007 */
@@ -2832,6 +2839,7 @@ PRIVATE struct codec_name_db_struct const codec_name_db = {
 	"ibm1283",
 	"ms-mac-cyrillic",
 	"msmaccyrillic",
+	"cp10007-maccyrillic",
 	0,
 
 	/* CODEC_CP10017 */
@@ -3297,6 +3305,7 @@ PRIVATE struct codec_name_db_struct const codec_name_db = {
 	"windows-10000",
 	"x-mac-roman",
 	"macroman",
+	"cp10000-macroman",
 	0,
 
 	/* CODEC_CP1276 */
@@ -3312,6 +3321,7 @@ PRIVATE struct codec_name_db_struct const codec_name_db = {
 	"cp10081",
 	"windows-10081",
 	"x-mac-turkish",
+	"cp10081-macturkish",
 	0,
 
 	/* CODEC_CP1282 */
@@ -3321,6 +3331,7 @@ PRIVATE struct codec_name_db_struct const codec_name_db = {
 	"windows-10029",
 	"x-mac-ce",
 	"mac-centraleurope",
+	"cp10029-maclatin2",
 	0,
 
 	/* CODEC_CP1284 */
@@ -3345,6 +3356,7 @@ PRIVATE struct codec_name_db_struct const codec_name_db = {
 	"cp10079",
 	"windows-10079",
 	"x-mac-icelandic",
+	"cp10079-macicelandic",
 	0,
 
 	/* CODEC_CP1287 */
@@ -5559,17 +5571,23 @@ PRIVATE struct codec_db_entry const codec_db[] = {
 	{ offsetof(struct codec_name_db_struct, db_CWI_2), /*                     "cp-hu"                         */ CODEC_CWI },
 	{ offsetof(struct codec_name_db_struct, db_CP861_4), /*                   "cp-is"                         */ CODEC_CP861 },
 	{ offsetof(struct codec_name_db_struct, db_CP1275_5), /*                  "cp10000"                       */ CODEC_CP1275 },
+	{ offsetof(struct codec_name_db_struct, db_CP1275_9), /*                  "cp10000-macroman"              */ CODEC_CP1275 },
 	{ offsetof(struct codec_name_db_struct, db_CP10004_0), /*                 "cp10004"                       */ CODEC_CP10004 },
 	{ offsetof(struct codec_name_db_struct, db_CP10006_0), /*                 "cp10006"                       */ CODEC_CP10006 },
+	{ offsetof(struct codec_name_db_struct, db_CP10006_3), /*                 "cp10006-macgreek"              */ CODEC_CP10006 },
 	{ offsetof(struct codec_name_db_struct, db_CP10007_0), /*                 "cp10007"                       */ CODEC_CP10007 },
+	{ offsetof(struct codec_name_db_struct, db_CP10007_6), /*                 "cp10007-maccyrillic"           */ CODEC_CP10007 },
 	{ offsetof(struct codec_name_db_struct, db_CP1285_2), /*                  "cp10010"                       */ CODEC_CP1285 },
 	{ offsetof(struct codec_name_db_struct, db_CP10017_0), /*                 "cp10017"                       */ CODEC_CP10017 },
 	{ offsetof(struct codec_name_db_struct, db_CP1282_2), /*                  "cp10029"                       */ CODEC_CP1282 },
+	{ offsetof(struct codec_name_db_struct, db_CP1282_6), /*                  "cp10029-maclatin2"             */ CODEC_CP1282 },
 	{ offsetof(struct codec_name_db_struct, db_CP1004_0), /*                  "cp1004"                        */ CODEC_CP1004 },
 	{ offsetof(struct codec_name_db_struct, db_CP1006_0), /*                  "cp1006"                        */ CODEC_CP1006 },
 	{ offsetof(struct codec_name_db_struct, db_CP1286_2), /*                  "cp10079"                       */ CODEC_CP1286 },
+	{ offsetof(struct codec_name_db_struct, db_CP1286_5), /*                  "cp10079-macicelandic"          */ CODEC_CP1286 },
 	{ offsetof(struct codec_name_db_struct, db_CP1008_0), /*                  "cp1008"                        */ CODEC_CP1008 },
 	{ offsetof(struct codec_name_db_struct, db_CP1281_2), /*                  "cp10081"                       */ CODEC_CP1281 },
+	{ offsetof(struct codec_name_db_struct, db_CP1281_5), /*                  "cp10081-macturkish"            */ CODEC_CP1281 },
 	{ offsetof(struct codec_name_db_struct, db_CP1284_2), /*                  "cp10082"                       */ CODEC_CP1284 },
 	{ offsetof(struct codec_name_db_struct, db_ISO646_IRV_1983_0), /*         "cp1009"                        */ CODEC_ISO646_IRV_1983 },
 	{ offsetof(struct codec_name_db_struct, db_ISO646_FR_8), /*               "cp1010"                        */ CODEC_ISO646_FR },

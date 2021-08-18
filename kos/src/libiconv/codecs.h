@@ -231,8 +231,8 @@ enum {
 	CODEC_AMIGA_1251,             /* "amiga-1251", "ami1251", "amiga1251", "ami-1251", "csamiga1251" */
 	CODEC_ATARIST,                /* "atarist" */
 	CODEC_CP10004,                /* "cp10004", "windows-10004", "x-mac-arabic", "macarabic" */
-	CODEC_CP10006,                /* "cp10006", "windows-10006", "x-mac-greek" */
-	CODEC_CP10007,                /* "cp10007", "windows-10007", "cp1283", "ibm1283", "ms-mac-cyrillic", "msmaccyrillic" */
+	CODEC_CP10006,                /* "cp10006", "windows-10006", "x-mac-greek", "cp10006-macgreek" */
+	CODEC_CP10007,                /* "cp10007", "windows-10007", "cp1283", "ibm1283", "ms-mac-cyrillic", "msmaccyrillic", "cp10007-maccyrillic" */
 	CODEC_CP10017,                /* "cp10017", "windows-10017", "x-mac-ukrainian", "macuk", "mac-uk", "macukrainian", "mac-cyrillic", "maccyrillic" */
 	CODEC_CP1004,                 /* "cp1004", "windows-extended", "ibm1004", "os2latin1" */
 	CODEC_CP1036,                 /* "cp1036", "ibm1036", "t.61", "t.618bit", "t.61-8bit", "cp20261", "windows-20261", "iso-ir-103", "csiso103t618bit" */
@@ -258,12 +258,12 @@ enum {
 	CODEC_CP1257,                 /* "cp1257", "windows-1257", "lst-1590-3", "cswindows1257", "winbaltrim" */
 	CODEC_CP1258,                 /* "cp1258", "windows-1258", "cswindows1258" */
 	CODEC_CP1270,                 /* "cp1270", "windows-1270", "ws2", "winsami2", "win-sami-2" */
-	CODEC_CP1275,                 /* "macintosh", "mac", "csmacintosh", "cp1275", "ibm1275", "cp10000", "windows-10000", "x-mac-roman", "macroman" */
-	CODEC_CP1281,                 /* "cp1281", "ibm1281", "cp10081", "windows-10081", "x-mac-turkish" */
-	CODEC_CP1282,                 /* "cp1282", "ibm1282", "cp10029", "windows-10029", "x-mac-ce", "mac-centraleurope" */
+	CODEC_CP1275,                 /* "macintosh", "mac", "csmacintosh", "cp1275", "ibm1275", "cp10000", "windows-10000", "x-mac-roman", "macroman", "cp10000-macroman" */
+	CODEC_CP1281,                 /* "cp1281", "ibm1281", "cp10081", "windows-10081", "x-mac-turkish", "cp10081-macturkish" */
+	CODEC_CP1282,                 /* "cp1282", "ibm1282", "cp10029", "windows-10029", "x-mac-ce", "mac-centraleurope", "cp10029-maclatin2" */
 	CODEC_CP1284,                 /* "cp1284", "ibm1284", "cp10082", "windows-10082", "x-mac-croatian" */
 	CODEC_CP1285,                 /* "cp1285", "ibm1285", "cp10010", "windows-10010", "x-mac-romanian" */
-	CODEC_CP1286,                 /* "cp1286", "ibm1286", "cp10079", "windows-10079", "x-mac-icelandic" */
+	CODEC_CP1286,                 /* "cp1286", "ibm1286", "cp10079", "windows-10079", "x-mac-icelandic", "cp10079-macicelandic" */
 	CODEC_CP1287,                 /* "cp1287", "dec-greek-(8-bit)", "dec-greek-8-bit", "dec-greek-8", "dec-greek", "el8dec" */
 	CODEC_CP1288,                 /* "cp1288", "dec-turkish-(8-bit)", "dec-turkish-8-bit", "dec-turkish-8", "dec-turkish", "tr8dec" */
 	CODEC_CP20269,                /* "cp20269", "t.51", "iso6937", "iso-ir-156", "iso6937:1992" */
