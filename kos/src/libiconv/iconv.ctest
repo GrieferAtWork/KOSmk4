@@ -297,8 +297,14 @@ DEFINE_TEST(iconv) {
 
 
 	/* Test the xml-escape codec. */
-	convert("xml-escape", "utf-8", ICONV_ERR_ERRNO, "&quot;&amp;&apos;&lt;&gt;", buf); /* Escaped */
-	assertf(strcmp(buf, "\"&\'<>") == 0, "buf = %q", buf);
+	convert("xml-escape", "utf-8", ICONV_ERR_ERRNO, "Foo&quot;&amp;&apos;&lt;&gt;Bar", buf);
+	assertf(strcmp(buf, "Foo\"&\'<>Bar") == 0, "buf = %q", buf);
+	convert("utf-8", "xml-escape", ICONV_ERR_ERRNO, "Foo\"&\'<>Bar", buf);
+	/* Depending on  configuration, libiconv  may either  use
+	 * entity names or (where doing so is shorter), decimals. */
+	assertf(strcmp(buf, "Foo&quot;&amp;&apos;&lt;&gt;Bar") == 0 ||
+	        strcmp(buf, "Foo&#34;&#38;&#39;&#60;&#62;Bar") == 0,
+	        "buf = %q", buf);
 
 
 	dlclose(libiconv);

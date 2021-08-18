@@ -1,7 +1,7 @@
 /*[[[magic
 local gcc_opt = options.setdefault("GCC.options", []);
 gcc_opt.removeif([](x) -> x.startswith("-O"));
-gcc_opt.append("-Os");
+gcc_opt.append("-O3"); // Force _all_ optimizations because stuff in here is performance-critical
 ]]]*/
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
@@ -36,7 +36,9 @@ gcc_opt.append("-Os");
 #include <alloca.h>
 #include <ctype.h>
 #include <errno.h>
+#include <inttypes.h>
 #include <stddef.h>
+#include <stdio.h>
 #include <string.h>
 #include <unicode.h>
 
@@ -45,6 +47,15 @@ gcc_opt.append("-Os");
 #include "convert.h"
 
 DECL_BEGIN
+
+#ifdef CONFIG_NO_XML_FANCY_ENCODE
+#undef CONFIG_XML_FANCY_ENCODE
+#elif !defined(CONFIG_XML_FANCY_ENCODE)
+#ifndef __OPTIMIZE_SIZE__
+#define CONFIG_XML_FANCY_ENCODE
+#endif /* !__OPTIMIZE_SIZE__ */
+#endif /* ... */
+
 
 #define IS_ICONV_ERR_ERRNO(flags)                     (((flags) & ICONV_ERRMASK) == ICONV_ERR_ERRNO)
 #define IS_ICONV_ERR_ERROR_OR_ERRNO(flags)            (((flags) & ICONV_ERRMASK) <= ICONV_ERR_ERROR)
@@ -123,24 +134,105 @@ local keys = xe.keys.sorted();
 assert (keys.each.length < ...) >= 2;
 local longestKeyLen = keys.each.length > ...;
 
+local stringToOffset: {string: int} = Dict();
+
 local fp = File.Writer();
-if (!xe[keys.first][1])
+local offset = 0;
+if (!xe[keys.first].last) {
 	fp << "\0";
+	++offset;
+}
 for (local key: keys) {
 	local ord, semicolonIsOptional = xe[key]...;
-	if (semicolonIsOptional)
+	if (semicolonIsOptional) {
 		fp << "\1";
-	fp << key << "\0" << string.chr(ord).encode("utf-8") << "\0";
+		++offset;
+	}
+	stringToOffset[key] = offset;
+	local utf8 = string.chr(ord).encode("utf-8");
+	fp << key << "\0" << utf8 << "\0";
+	offset += #key + #utf8 + 2;
 }
+
 fp << "..\0.\0";
 fp = fp.string[:-1]; // Implicit trailing NUL isn't needed
-print("#define XML_ENTITY_MAXLEN ", longestKeyLen);
-print("PRIVATE char const xml_entity_db[", (#fp + 1).hex(), "] = \"\\");
+local dbSize = #fp + 1;
+print("PRIVATE char const xml_entity_db[", dbSize.hex(), "] = \"\\");
 for (local line: fp.segments(32))
 	print(line.encode("c-escape"), "\\");
 print("\";");
+
+
+//
+// In order to (efficiently) use the database for encoding,
+// we need another lookup table. However, because encoding can
+// also be done via "&#123;", this is an optional feature.
+//
+// This database encodes unicode ordinals --> offsets into the string table.
+//
+
+local dbOffsetType;
+if (dbSize > 0xffff) {
+	dbOffsetType = "uint32_t";
+} else if (dbSize > 0xff) {
+	dbOffsetType = "uint16_t";
+} else {
+	dbOffsetType = "uint8_t";
+}
+local uni16ToEntity: {int: string} = Dict(); // For U+0000 - U+FFFF
+local uni32ToEntity: {int: string} = Dict(); // For U+10000 - ...
+for (local key: keys) {
+	local ord = xe[key].first;
+	local tab = ord <= 0xffff ? uni16ToEntity : uni32ToEntity;
+	local exist = tab.get(ord);
+	if (exist !is none && #exist <= #key)
+		continue; // Already defined as a shorter string (we prefer short names during encoding)
+	tab[ord] = key;
+}
+
+// For compatibility, we force specific names for XML 1.0 entities
+uni16ToEntity[0x0022] = "quot";
+uni16ToEntity[0x0026] = "amp";
+uni16ToEntity[0x0027] = "apos";
+uni16ToEntity[0x003C] = "lt";
+uni16ToEntity[0x003E] = "gt";
+
+// Generate the encode database
+print;
+print("#ifdef CONFIG_XML_FANCY_ENCODE");
+print("struct xml_encode16_entry {");
+print("	char16_t xe16_chr; /" "* Unicode character. *" "/");
+print("	", dbOffsetType, " xe16_offset; /" "* Offset into `xml_entity_db' *" "/");
+print("};");
+print("struct xml_encode32_entry {");
+print("	char32_t xe32_chr; /" "* Unicode character. *" "/");
+print("	", dbOffsetType, " xe32_offset; /" "* Offset into `xml_entity_db' *" "/");
+print("};");
+print("PRIVATE struct xml_encode16_entry const xml_encode16_db[", #uni16ToEntity, "] = {");
+local largestStringOffsetLen = #(stringToOffset.values > ...).hex();
+for (local ord: uni16ToEntity.keys.sorted()) {
+	local name = uni16ToEntity[ord];
+	local offset = stringToOffset[name].hex();
+	print("	{ 0x", ord.hex()[2:].upper().zfill(4), ", ", offset, " }, ",
+		" " * (largestStringOffsetLen - #offset),
+		"/" "* ", repr(name), " *" "/");
+}
+print("};");
+print("PRIVATE struct xml_encode32_entry const xml_encode32_db[", #uni32ToEntity, "] = {");
+local largestOrd32Len = #(uni32ToEntity.keys > ...).hex() - 2;
+local largestStringOffsetLen = #(stringToOffset.values > ...).hex();
+for (local ord: uni32ToEntity.keys.sorted()) {
+	local name = uni32ToEntity[ord];
+	local offset = stringToOffset[name].hex();
+	print("	{ 0x", ord.hex()[2:].upper().zfill(largestOrd32Len), ", ", offset, " }, ",
+		" " * (largestStringOffsetLen - #offset),
+		"/" "* ", repr(name), " *" "/");
+}
+print("};");
+
+
+print("#endif /" "* CONFIG_XML_FANCY_ENCODE *" "/");
 ]]]*/
-#define XML_ENTITY_MAXLEN 31
 PRIVATE char const xml_entity_db[0x5f23] = "\
 \1AElig\0\xC3\x86\0\1AMP\0&\0\1Aacute\0\xC3\x81\0Abre\
 ve\0\xC4\x82\0\1Acirc\0\xC3\x82\0Acy\0\xD0\x90\0Afr\0\xF0\x9D\x94\x84\0\
@@ -905,6 +997,1468 @@ ml\0\xC3\xBF\0zacute\0\xC5\xBA\0zcaron\0\xC5\xBE\0zcy\0\xD0\xB7\
 \x95\xAB\0zscr\0\xF0\x9D\x93\x8F\0zwj\0\xE2\x80\x8D\0zwnj\0\xE2\x80\x8C\0..\
 \0.\
 ";
+
+#ifdef CONFIG_XML_FANCY_ENCODE
+struct xml_encode16_entry {
+	char16_t xe16_chr; /* Unicode character. */
+	uint16_t xe16_offset; /* Offset into `xml_entity_db' */
+};
+struct xml_encode32_entry {
+	char32_t xe32_chr; /* Unicode character. */
+	uint16_t xe32_offset; /* Offset into `xml_entity_db' */
+};
+PRIVATE struct xml_encode16_entry const xml_encode16_db[1314] = {
+	{ 0x0009, 0x1b18 }, /* "Tab" */
+	{ 0x000A, 0xfb6 },  /* "NewLine" */
+	{ 0x0021, 0x2ff5 }, /* "excl" */
+	{ 0x0022, 0x4bb5 }, /* "quot" */
+	{ 0x0023, 0x45c9 }, /* "num" */
+	{ 0x0024, 0x2c69 }, /* "dollar" */
+	{ 0x0025, 0x48e8 }, /* "percnt" */
+	{ 0x0026, 0x2019 }, /* "amp" */
+	{ 0x0027, 0x2160 }, /* "apos" */
+	{ 0x0028, 0x3ceb }, /* "lpar" */
+	{ 0x0029, 0x4f71 }, /* "rpar" */
+	{ 0x002A, 0x2193 }, /* "ast" */
+	{ 0x002B, 0x4984 }, /* "plus" */
+	{ 0x002C, 0x28d9 }, /* "comma" */
+	{ 0x002E, 0x48f1 }, /* "period" */
+	{ 0x002F, 0x528e }, /* "sol" */
+	{ 0x003A, 0x28ba }, /* "colon" */
+	{ 0x003B, 0x510e }, /* "semi" */
+	{ 0x003C, 0x3d9c }, /* "lt" */
+	{ 0x003D, 0x2438 }, /* "bne" */
+	{ 0x003E, 0x3335 }, /* "gt" */
+	{ 0x003F, 0x4ba0 }, /* "quest" */
+	{ 0x0040, 0x28e1 }, /* "commat" */
+	{ 0x005B, 0x3d75 }, /* "lsqb" */
+	{ 0x005C, 0x267e }, /* "bsol" */
+	{ 0x005D, 0x4fb7 }, /* "rsqb" */
+	{ 0x005E, 0x906 },  /* "Hat" */
+	{ 0x005F, 0x3cc5 }, /* "lowbar" */
+	{ 0x0060, 0x3306 }, /* "grave" */
+	{ 0x0066, 0x307e }, /* "fjlig" */
+	{ 0x007B, 0x3932 }, /* "lcub" */
+	{ 0x007C, 0x5c62 }, /* "vert" */
+	{ 0x007D, 0x4d53 }, /* "rcub" */
+	{ 0x00A0, 0x40b0 }, /* "nbsp" */
+	{ 0x00A1, 0x3541 }, /* "iexcl" */
+	{ 0x00A2, 0x279c }, /* "cent" */
+	{ 0x00A3, 0x4a0f }, /* "pound" */
+	{ 0x00A4, 0x2a92 }, /* "curren" */
+	{ 0x00A5, 0x5e69 }, /* "yen" */
+	{ 0x00A6, 0x264d }, /* "brvbar" */
+	{ 0x00A7, 0x5106 }, /* "sect" */
+	{ 0x00A8, 0x40a },  /* "Dot" */
+	{ 0x00A9, 0x142 },  /* "COPY" */
+	{ 0x00AA, 0x4819 }, /* "ordf" */
+	{ 0x00AB, 0x383b }, /* "laquo" */
+	{ 0x00AC, 0x42f1 }, /* "not" */
+	{ 0x00AD, 0x5190 }, /* "shy" */
+	{ 0x00AE, 0x1630 }, /* "REG" */
+	{ 0x00AF, 0x3e4e }, /* "macr" */
+	{ 0x00B0, 0x2b8d }, /* "deg" */
+	{ 0x00B1, 0x49f1 }, /* "pm" */
+	{ 0x00B2, 0x5553 }, /* "sup2" */
+	{ 0x00B3, 0x555c }, /* "sup3" */
+	{ 0x00B4, 0x1fb1 }, /* "acute" */
+	{ 0x00B5, 0x3efd }, /* "micro" */
+	{ 0x00B6, 0x48ae }, /* "para" */
+	{ 0x00B7, 0x3f23 }, /* "middot" */
+	{ 0x00B8, 0x2786 }, /* "cedil" */
+	{ 0x00B9, 0x554a }, /* "sup1" */
+	{ 0x00BA, 0x4822 }, /* "ordm" */
+	{ 0x00BB, 0x4c40 }, /* "raquo" */
+	{ 0x00BC, 0x30f7 }, /* "frac14" */
+	{ 0x00BD, 0x33f1 }, /* "half" */
+	{ 0x00BE, 0x3139 }, /* "frac34" */
+	{ 0x00BF, 0x368f }, /* "iquest" */
+	{ 0x00C0, 0x41 },   /* "Agrave" */
+	{ 0x00C1, 0x12 },   /* "Aacute" */
+	{ 0x00C2, 0x27 },   /* "Acirc" */
+	{ 0x00C3, 0xaa },   /* "Atilde" */
+	{ 0x00C4, 0xb5 },   /* "Auml" */
+	{ 0x00C5, 0x8b },   /* "Aring" */
+	{ 0x00C6, 0x1 },    /* "AElig" */
+	{ 0x00C7, 0x18c },  /* "Ccedil" */
+	{ 0x00C8, 0x6b7 },  /* "Egrave" */
+	{ 0x00C9, 0x680 },  /* "Eacute" */
+	{ 0x00CA, 0x695 },  /* "Ecirc" */
+	{ 0x00CB, 0x765 },  /* "Euml" */
+	{ 0x00CC, 0x9c2 },  /* "Igrave" */
+	{ 0x00CD, 0x996 },  /* "Iacute" */
+	{ 0x00CE, 0x9a1 },  /* "Icirc" */
+	{ 0x00CF, 0xa7b },  /* "Iuml" */
+	{ 0x00D0, 0x678 },  /* "ETH" */
+	{ 0x00D1, 0x13fa }, /* "Ntilde" */
+	{ 0x00D2, 0x1443 }, /* "Ograve" */
+	{ 0x00D3, 0x1414 }, /* "Oacute" */
+	{ 0x00D4, 0x141f }, /* "Ocirc" */
+	{ 0x00D5, 0x14bd }, /* "Otilde" */
+	{ 0x00D6, 0x14d3 }, /* "Ouml" */
+	{ 0x00D7, 0x5769 }, /* "times" */
+	{ 0x00D8, 0x14b2 }, /* "Oslash" */
+	{ 0x00D9, 0x1c3d }, /* "Ugrave" */
+	{ 0x00DA, 0x1be5 }, /* "Uacute" */
+	{ 0x00DB, 0x1c19 }, /* "Ucirc" */
+	{ 0x00DC, 0x1d9a }, /* "Uuml" */
+	{ 0x00DD, 0x1eda }, /* "Yacute" */
+	{ 0x00DE, 0x1af4 }, /* "THORN" */
+	{ 0x00DF, 0x5684 }, /* "szlig" */
+	{ 0x00E0, 0x1fdc }, /* "agrave" */
+	{ 0x00E1, 0x1f7b }, /* "aacute" */
+	{ 0x00E2, 0x1fa7 }, /* "acirc" */
+	{ 0x00E3, 0x21b0 }, /* "atilde" */
+	{ 0x00E4, 0x21bb }, /* "auml" */
+	{ 0x00E5, 0x2180 }, /* "aring" */
+	{ 0x00E6, 0x1fc2 }, /* "aelig" */
+	{ 0x00E7, 0x2754 }, /* "ccedil" */
+	{ 0x00E8, 0x2e3a }, /* "egrave" */
+	{ 0x00E9, 0x2dcc }, /* "eacute" */
+	{ 0x00EA, 0x2df5 }, /* "ecirc" */
+	{ 0x00EB, 0x2fe4 }, /* "euml" */
+	{ 0x00EC, 0x355c }, /* "igrave" */
+	{ 0x00ED, 0x3516 }, /* "iacute" */
+	{ 0x00EE, 0x3528 }, /* "icirc" */
+	{ 0x00EF, 0x36fc }, /* "iuml" */
+	{ 0x00F0, 0x2fdc }, /* "eth" */
+	{ 0x00F1, 0x4562 }, /* "ntilde" */
+	{ 0x00F2, 0x4733 }, /* "ograve" */
+	{ 0x00F3, 0x46b0 }, /* "oacute" */
+	{ 0x00F4, 0x46cd }, /* "ocirc" */
+	{ 0x00F5, 0x4870 }, /* "otilde" */
+	{ 0x00F6, 0x4893 }, /* "ouml" */
+	{ 0x00F7, 0x2c1c }, /* "div" */
+	{ 0x00F8, 0x485c }, /* "oslash" */
+	{ 0x00F9, 0x5996 }, /* "ugrave" */
+	{ 0x00FA, 0x592c }, /* "uacute" */
+	{ 0x00FB, 0x5953 }, /* "ucirc" */
+	{ 0x00FC, 0x5af7 }, /* "uuml" */
+	{ 0x00FD, 0x5e46 }, /* "yacute" */
+	{ 0x00FE, 0x5756 }, /* "thorn" */
+	{ 0x00FF, 0x5e9e }, /* "yuml" */
+	{ 0x0100, 0x54 },   /* "Amacr" */
+	{ 0x0101, 0x2005 }, /* "amacr" */
+	{ 0x0102, 0x1c },   /* "Abreve" */
+	{ 0x0103, 0x1f85 }, /* "abreve" */
+	{ 0x0104, 0x65 },   /* "Aogon" */
+	{ 0x0105, 0x2122 }, /* "aogon" */
+	{ 0x0106, 0x14a },  /* "Cacute" */
+	{ 0x0107, 0x26d8 }, /* "cacute" */
+	{ 0x0108, 0x196 },  /* "Ccirc" */
+	{ 0x0109, 0x275e }, /* "ccirc" */
+	{ 0x010A, 0x1ab },  /* "Cdot" */
+	{ 0x010B, 0x277d }, /* "cdot" */
+	{ 0x010C, 0x181 },  /* "Ccaron" */
+	{ 0x010D, 0x2749 }, /* "ccaron" */
+	{ 0x010E, 0x350 },  /* "Dcaron" */
+	{ 0x010F, 0x2b52 }, /* "dcaron" */
+	{ 0x0110, 0x666 },  /* "Dstrok" */
+	{ 0x0111, 0x2d5c }, /* "dstrok" */
+	{ 0x0112, 0x6cd },  /* "Emacr" */
+	{ 0x0113, 0x2e86 }, /* "emacr" */
+	{ 0x0116, 0x6a5 },  /* "Edot" */
+	{ 0x0117, 0x2e10 }, /* "edot" */
+	{ 0x0118, 0x704 },  /* "Eogon" */
+	{ 0x0119, 0x2ee0 }, /* "eogon" */
+	{ 0x011A, 0x68a },  /* "Ecaron" */
+	{ 0x011B, 0x2de1 }, /* "ecaron" */
+	{ 0x011C, 0x82b },  /* "Gcirc" */
+	{ 0x011D, 0x31e1 }, /* "gcirc" */
+	{ 0x011E, 0x817 },  /* "Gbreve" */
+	{ 0x011F, 0x31d7 }, /* "gbreve" */
+	{ 0x0120, 0x83b },  /* "Gdot" */
+	{ 0x0121, 0x31f1 }, /* "gdot" */
+	{ 0x0122, 0x821 },  /* "Gcedil" */
+	{ 0x0124, 0x90c },  /* "Hcirc" */
+	{ 0x0125, 0x3436 }, /* "hcirc" */
+	{ 0x0126, 0x953 },  /* "Hstrok" */
+	{ 0x0127, 0x34f5 }, /* "hstrok" */
+	{ 0x0128, 0xa67 },  /* "Itilde" */
+	{ 0x0129, 0x36e8 }, /* "itilde" */
+	{ 0x012A, 0x9d3 },  /* "Imacr" */
+	{ 0x012B, 0x35a0 }, /* "imacr" */
+	{ 0x012E, 0xa43 },  /* "Iogon" */
+	{ 0x012F, 0x3669 }, /* "iogon" */
+	{ 0x0130, 0x9b1 },  /* "Idot" */
+	{ 0x0131, 0x35cd }, /* "imath" */
+	{ 0x0132, 0x984 },  /* "IJlig" */
+	{ 0x0133, 0x3597 }, /* "ijlig" */
+	{ 0x0134, 0xa83 },  /* "Jcirc" */
+	{ 0x0135, 0x3704 }, /* "jcirc" */
+	{ 0x0136, 0xadc },  /* "Kcedil" */
+	{ 0x0137, 0x3760 }, /* "kcedil" */
+	{ 0x0138, 0x377a }, /* "kgreen" */
+	{ 0x0139, 0xb18 },  /* "Lacute" */
+	{ 0x013A, 0x37e8 }, /* "lacute" */
+	{ 0x013B, 0xb57 },  /* "Lcedil" */
+	{ 0x013C, 0x391e }, /* "lcedil" */
+	{ 0x013D, 0xb4d },  /* "Lcaron" */
+	{ 0x013E, 0x3914 }, /* "lcaron" */
+	{ 0x013F, 0xdcc },  /* "Lmidot" */
+	{ 0x0140, 0x3b9a }, /* "lmidot" */
+	{ 0x0141, 0xe90 },  /* "Lstrok" */
+	{ 0x0142, 0x3d91 }, /* "lstrok" */
+	{ 0x0143, 0xf06 },  /* "Nacute" */
+	{ 0x0144, 0x4049 }, /* "nacute" */
+	{ 0x0145, 0xf1a },  /* "Ncedil" */
+	{ 0x0146, 0x40e0 }, /* "ncedil" */
+	{ 0x0147, 0xf10 },  /* "Ncaron" */
+	{ 0x0148, 0x40d6 }, /* "ncaron" */
+	{ 0x0149, 0x4077 }, /* "napos" */
+	{ 0x014A, 0x670 },  /* "ENG" */
+	{ 0x014B, 0x2ed0 }, /* "eng" */
+	{ 0x014C, 0x144d }, /* "Omacr" */
+	{ 0x014D, 0x4791 }, /* "omacr" */
+	{ 0x0150, 0x142f }, /* "Odblac" */
+	{ 0x0151, 0x46e7 }, /* "odblac" */
+	{ 0x0152, 0x140a }, /* "OElig" */
+	{ 0x0153, 0x470e }, /* "oelig" */
+	{ 0x0154, 0x1637 }, /* "Racute" */
+	{ 0x0155, 0x4bf6 }, /* "racute" */
+	{ 0x0156, 0x1668 }, /* "Rcedil" */
+	{ 0x0157, 0x4d3f }, /* "rcedil" */
+	{ 0x0158, 0x165e }, /* "Rcaron" */
+	{ 0x0159, 0x4d35 }, /* "rcaron" */
+	{ 0x015A, 0x18f5 }, /* "Sacute" */
+	{ 0x015B, 0x5026 }, /* "sacute" */
+	{ 0x015C, 0x191a }, /* "Scirc" */
+	{ 0x015D, 0x5078 }, /* "scirc" */
+	{ 0x015E, 0x1910 }, /* "Scedil" */
+	{ 0x015F, 0x506e }, /* "scedil" */
+	{ 0x0160, 0x1906 }, /* "Scaron" */
+	{ 0x0161, 0x5052 }, /* "scaron" */
+	{ 0x0162, 0x1b2f }, /* "Tcedil" */
+	{ 0x0163, 0x56b2 }, /* "tcedil" */
+	{ 0x0164, 0x1b25 }, /* "Tcaron" */
+	{ 0x0165, 0x56a8 }, /* "tcaron" */
+	{ 0x0166, 0x1bda }, /* "Tstrok" */
+	{ 0x0167, 0x58da }, /* "tstrok" */
+	{ 0x0168, 0x1d8f }, /* "Utilde" */
+	{ 0x0169, 0x5acf }, /* "utilde" */
+	{ 0x016A, 0x1c47 }, /* "Umacr" */
+	{ 0x016B, 0x59eb }, /* "umacr" */
+	{ 0x016C, 0x1c0e }, /* "Ubreve" */
+	{ 0x016D, 0x5948 }, /* "ubreve" */
+	{ 0x016E, 0x1d7c }, /* "Uring" */
+	{ 0x016F, 0x5aa8 }, /* "uring" */
+	{ 0x0170, 0x1c29 }, /* "Udblac" */
+	{ 0x0171, 0x596d }, /* "udblac" */
+	{ 0x0172, 0x1ca8 }, /* "Uogon" */
+	{ 0x0173, 0x59fc }, /* "uogon" */
+	{ 0x0174, 0x1e6e }, /* "Wcirc" */
+	{ 0x0175, 0x5cf0 }, /* "wcirc" */
+	{ 0x0176, 0x1ee4 }, /* "Ycirc" */
+	{ 0x0177, 0x5e58 }, /* "ycirc" */
+	{ 0x0178, 0x1f11 }, /* "Yuml" */
+	{ 0x0179, 0x1f21 }, /* "Zacute" */
+	{ 0x017A, 0x5ea6 }, /* "zacute" */
+	{ 0x017B, 0x1f3c }, /* "Zdot" */
+	{ 0x017C, 0x5ec1 }, /* "zdot" */
+	{ 0x017D, 0x1f2b }, /* "Zcaron" */
+	{ 0x017E, 0x5eb0 }, /* "zcaron" */
+	{ 0x0192, 0x30a3 }, /* "fnof" */
+	{ 0x01B5, 0x35df }, /* "imped" */
+	{ 0x01F5, 0x31b2 }, /* "gacute" */
+	{ 0x0237, 0x371d }, /* "jmath" */
+	{ 0x02C6, 0x27f2 }, /* "circ" */
+	{ 0x02C7, 0x8fd },  /* "Hacek" */
+	{ 0x02D8, 0x11c },  /* "Breve" */
+	{ 0x02D9, 0x2c7c }, /* "dot" */
+	{ 0x02DA, 0x4ecf }, /* "ring" */
+	{ 0x02DB, 0x472a }, /* "ogon" */
+	{ 0x02DC, 0x575f }, /* "tilde" */
+	{ 0x02DD, 0x2b49 }, /* "dblac" */
+	{ 0x0311, 0x58b },  /* "DownBreve" */
+	{ 0x0391, 0x4b },   /* "Alpha" */
+	{ 0x0392, 0x101 },  /* "Beta" */
+	{ 0x0393, 0x804 },  /* "Gamma" */
+	{ 0x0394, 0x369 },  /* "Delta" */
+	{ 0x0395, 0x717 },  /* "Epsilon" */
+	{ 0x0396, 0x1f57 }, /* "Zeta" */
+	{ 0x0397, 0x75d },  /* "Eta" */
+	{ 0x0398, 0x1b57 }, /* "Theta" */
+	{ 0x0399, 0xa56 },  /* "Iota" */
+	{ 0x039A, 0xad3 },  /* "Kappa" */
+	{ 0x039B, 0xb22 },  /* "Lambda" */
+	{ 0x039C, 0xef8 },  /* "Mu" */
+	{ 0x039D, 0x1404 }, /* "Nu" */
+	{ 0x039E, 0x1ea7 }, /* "Xi" */
+	{ 0x039F, 0x145f }, /* "Omicron" */
+	{ 0x03A0, 0x153d }, /* "Pi" */
+	{ 0x03A1, 0x16cb }, /* "Rho" */
+	{ 0x03A3, 0x197e }, /* "Sigma" */
+	{ 0x03A4, 0x1b1e }, /* "Tau" */
+	{ 0x03A5, 0x1d71 }, /* "Upsilon" */
+	{ 0x03A6, 0x1536 }, /* "Phi" */
+	{ 0x03A7, 0x1d3 },  /* "Chi" */
+	{ 0x03A8, 0x15fa }, /* "Psi" */
+	{ 0x03A9, 0x474f }, /* "ohm" */
+	{ 0x03B1, 0x1ffc }, /* "alpha" */
+	{ 0x03B2, 0x22b2 }, /* "beta" */
+	{ 0x03B3, 0x31bc }, /* "gamma" */
+	{ 0x03B4, 0x2b94 }, /* "delta" */
+	{ 0x03B5, 0x2f11 }, /* "epsi" */
+	{ 0x03B6, 0x5ed4 }, /* "zeta" */
+	{ 0x03B7, 0x2fd4 }, /* "eta" */
+	{ 0x03B8, 0x56f9 }, /* "theta" */
+	{ 0x03B9, 0x367c }, /* "iota" */
+	{ 0x03BA, 0x374d }, /* "kappa" */
+	{ 0x03BB, 0x380a }, /* "lambda" */
+	{ 0x03BC, 0x3fa7 }, /* "mu" */
+	{ 0x03BD, 0x45c3 }, /* "nu" */
+	{ 0x03BE, 0x5d9d }, /* "xi" */
+	{ 0x03BF, 0x47a3 }, /* "omicron" */
+	{ 0x03C0, 0x4947 }, /* "pi" */
+	{ 0x03C1, 0x4e0f }, /* "rho" */
+	{ 0x03C2, 0x51a0 }, /* "sigmaf" */
+	{ 0x03C3, 0x5197 }, /* "sigma" */
+	{ 0x03C4, 0x5698 }, /* "tau" */
+	{ 0x03C5, 0x5a5a }, /* "upsi" */
+	{ 0x03C6, 0x4923 }, /* "phi" */
+	{ 0x03C7, 0x27da }, /* "chi" */
+	{ 0x03C8, 0x4b41 }, /* "psi" */
+	{ 0x03C9, 0x479a }, /* "omega" */
+	{ 0x03D1, 0x570e }, /* "thetav" */
+	{ 0x03D2, 0x1d69 }, /* "Upsi" */
+	{ 0x03D5, 0x492a }, /* "phiv" */
+	{ 0x03D6, 0x495b }, /* "piv" */
+	{ 0x03DC, 0x80d },  /* "Gammad" */
+	{ 0x03DD, 0x31c5 }, /* "gammad" */
+	{ 0x03F0, 0x3756 }, /* "kappav" */
+	{ 0x03F1, 0x4e16 }, /* "rhov" */
+	{ 0x03F5, 0x2f24 }, /* "epsiv" */
+	{ 0x03F6, 0x229e }, /* "bepsi" */
+	{ 0x0401, 0x98d },  /* "IOcy" */
+	{ 0x0402, 0x31a },  /* "DJcy" */
+	{ 0x0403, 0x7f6 },  /* "GJcy" */
+	{ 0x0404, 0xaba },  /* "Jukcy" */
+	{ 0x0405, 0x322 },  /* "DScy" */
+	{ 0x0406, 0xa71 },  /* "Iukcy" */
+	{ 0x0407, 0x1ec9 }, /* "YIcy" */
+	{ 0x0408, 0xab0 },  /* "Jsercy" */
+	{ 0x0409, 0xb0a },  /* "LJcy" */
+	{ 0x040A, 0xefe },  /* "NJcy" */
+	{ 0x040B, 0x1b07 }, /* "TSHcy" */
+	{ 0x040C, 0xacb },  /* "KJcy" */
+	{ 0x040E, 0x1c05 }, /* "Ubrcy" */
+	{ 0x040F, 0x32a },  /* "DZcy" */
+	{ 0x0410, 0x30 },   /* "Acy" */
+	{ 0x0411, 0xdf },   /* "Bcy" */
+	{ 0x0412, 0x1db5 }, /* "Vcy" */
+	{ 0x0413, 0x834 },  /* "Gcy" */
+	{ 0x0414, 0x35a },  /* "Dcy" */
+	{ 0x0415, 0x97c },  /* "IEcy" */
+	{ 0x0416, 0x1f19 }, /* "ZHcy" */
+	{ 0x0417, 0x1f35 }, /* "Zcy" */
+	{ 0x0418, 0x9aa },  /* "Icy" */
+	{ 0x0419, 0xa8c },  /* "Jcy" */
+	{ 0x041A, 0xae6 },  /* "Kcy" */
+	{ 0x041B, 0xb61 },  /* "Lcy" */
+	{ 0x041C, 0xea9 },  /* "Mcy" */
+	{ 0x041D, 0xf24 },  /* "Ncy" */
+	{ 0x041E, 0x1428 }, /* "Ocy" */
+	{ 0x041F, 0x1526 }, /* "Pcy" */
+	{ 0x0420, 0x1672 }, /* "Rcy" */
+	{ 0x0421, 0x1923 }, /* "Scy" */
+	{ 0x0422, 0x1b39 }, /* "Tcy" */
+	{ 0x0423, 0x1c22 }, /* "Ucy" */
+	{ 0x0424, 0x789 },  /* "Fcy" */
+	{ 0x0425, 0xac3 },  /* "KHcy" */
+	{ 0x0426, 0x1b10 }, /* "TScy" */
+	{ 0x0427, 0x139 },  /* "CHcy" */
+	{ 0x0428, 0x18e3 }, /* "SHcy" */
+	{ 0x0429, 0x18d9 }, /* "SHCHcy" */
+	{ 0x042A, 0x8f3 },  /* "HARDcy" */
+	{ 0x042B, 0x1eed }, /* "Ycy" */
+	{ 0x042C, 0x18eb }, /* "SOFTcy" */
+	{ 0x042D, 0x69e },  /* "Ecy" */
+	{ 0x042E, 0x1ed1 }, /* "YUcy" */
+	{ 0x042F, 0x1ec1 }, /* "YAcy" */
+	{ 0x0430, 0x1fba }, /* "acy" */
+	{ 0x0431, 0x226a }, /* "bcy" */
+	{ 0x0432, 0x5c20 }, /* "vcy" */
+	{ 0x0433, 0x31ea }, /* "gcy" */
+	{ 0x0434, 0x2b5c }, /* "dcy" */
+	{ 0x0435, 0x3538 }, /* "iecy" */
+	{ 0x0436, 0x5ee5 }, /* "zhcy" */
+	{ 0x0437, 0x5eba }, /* "zcy" */
+	{ 0x0438, 0x3531 }, /* "icy" */
+	{ 0x0439, 0x370d }, /* "jcy" */
+	{ 0x043A, 0x376a }, /* "kcy" */
+	{ 0x043B, 0x3939 }, /* "lcy" */
+	{ 0x043C, 0x3ec8 }, /* "mcy" */
+	{ 0x043D, 0x410a }, /* "ncy" */
+	{ 0x043E, 0x46d6 }, /* "ocy" */
+	{ 0x043F, 0x48e1 }, /* "pcy" */
+	{ 0x0440, 0x4d5a }, /* "rcy" */
+	{ 0x0441, 0x50b6 }, /* "scy" */
+	{ 0x0442, 0x56bc }, /* "tcy" */
+	{ 0x0443, 0x595c }, /* "ucy" */
+	{ 0x0444, 0x3039 }, /* "fcy" */
+	{ 0x0445, 0x3784 }, /* "khcy" */
+	{ 0x0446, 0x58c9 }, /* "tscy" */
+	{ 0x0447, 0x27ba }, /* "chcy" */
+	{ 0x0448, 0x5168 }, /* "shcy" */
+	{ 0x0449, 0x515e }, /* "shchcy" */
+	{ 0x044A, 0x3404 }, /* "hardcy" */
+	{ 0x044B, 0x5e61 }, /* "ycy" */
+	{ 0x044C, 0x5284 }, /* "softcy" */
+	{ 0x044D, 0x2e09 }, /* "ecy" */
+	{ 0x044E, 0x5e95 }, /* "yucy" */
+	{ 0x044F, 0x5e50 }, /* "yacy" */
+	{ 0x0451, 0x3661 }, /* "iocy" */
+	{ 0x0452, 0x2c4b }, /* "djcy" */
+	{ 0x0453, 0x3292 }, /* "gjcy" */
+	{ 0x0454, 0x3744 }, /* "jukcy" */
+	{ 0x0455, 0x2d4b }, /* "dscy" */
+	{ 0x0456, 0x36f2 }, /* "iukcy" */
+	{ 0x0457, 0x5e79 }, /* "yicy" */
+	{ 0x0458, 0x373a }, /* "jsercy" */
+	{ 0x0459, 0x3b5f }, /* "ljcy" */
+	{ 0x045A, 0x422a }, /* "njcy" */
+	{ 0x045B, 0x58d1 }, /* "tshcy" */
+	{ 0x045C, 0x378c }, /* "kjcy" */
+	{ 0x045E, 0x593f }, /* "ubrcy" */
+	{ 0x045F, 0x2da3 }, /* "dzcy" */
+	{ 0x2002, 0x2ed7 }, /* "ensp" */
+	{ 0x2003, 0x2eb1 }, /* "emsp" */
+	{ 0x2004, 0x2eba }, /* "emsp13" */
+	{ 0x2005, 0x2ec5 }, /* "emsp14" */
+	{ 0x2007, 0x45da }, /* "numsp" */
+	{ 0x2008, 0x4b48 }, /* "puncsp" */
+	{ 0x2009, 0x5735 }, /* "thinsp" */
+	{ 0x200A, 0x33e6 }, /* "hairsp" */
+	{ 0x200B, 0x1f44 }, /* "ZeroWidthSpace" */
+	{ 0x200C, 0x5f15 }, /* "zwnj" */
+	{ 0x200D, 0x5f0d }, /* "zwj" */
+	{ 0x200E, 0x3d29 }, /* "lrm" */
+	{ 0x200F, 0x4efc }, /* "rlm" */
+	{ 0x2010, 0x2b2a }, /* "dash" */
+	{ 0x2013, 0x4111 }, /* "ndash" */
+	{ 0x2014, 0x3ecf }, /* "mdash" */
+	{ 0x2015, 0x34d5 }, /* "horbar" */
+	{ 0x2016, 0x1de4 }, /* "Vert" */
+	{ 0x2018, 0x3d7c }, /* "lsquo" */
+	{ 0x2019, 0x4fbe }, /* "rsquo" */
+	{ 0x201A, 0x5030 }, /* "sbquo" */
+	{ 0x201C, 0x3949 }, /* "ldquo" */
+	{ 0x201D, 0x4d76 }, /* "rdquo" */
+	{ 0x201E, 0x2271 }, /* "bdquo" */
+	{ 0x2020, 0x2b0b }, /* "dagger" */
+	{ 0x2021, 0x332 },  /* "Dagger" */
+	{ 0x2022, 0x269c }, /* "bull" */
+	{ 0x2025, 0x424e }, /* "nldr" */
+	{ 0x2026, 0x3f62 }, /* "mldr" */
+	{ 0x2030, 0x48fa }, /* "permil" */
+	{ 0x2031, 0x490e }, /* "pertenk" */
+	{ 0x2032, 0x4aab }, /* "prime" */
+	{ 0x2033, 0x15ba }, /* "Prime" */
+	{ 0x2034, 0x57e4 }, /* "tprime" */
+	{ 0x2035, 0x2638 }, /* "bprime" */
+	{ 0x2039, 0x3d3b }, /* "lsaquo" */
+	{ 0x203A, 0x4f9a }, /* "rsaquo" */
+	{ 0x203E, 0x477f }, /* "oline" */
+	{ 0x2041, 0x272c }, /* "caret" */
+	{ 0x2043, 0x34ff }, /* "hybull" */
+	{ 0x2044, 0x3185 }, /* "frasl" */
+	{ 0x204F, 0x2661 }, /* "bsemi" */
+	{ 0x2057, 0x4b6f }, /* "qprime" */
+	{ 0x205F, 0x1b60 }, /* "ThickSpace" */
+	{ 0x2060, 0xfc9 },  /* "NoBreak" */
+	{ 0x2061, 0x1fcb }, /* "af" */
+	{ 0x2062, 0x36e1 }, /* "it" */
+	{ 0x2063, 0x3520 }, /* "ic" */
+	{ 0x20AC, 0x2fec }, /* "euro" */
+	{ 0x20DB, 0x56c3 }, /* "tdot" */
+	{ 0x20DC, 0x411 },  /* "DotDot" */
+	{ 0x2102, 0x2a4 },  /* "Copf" */
+	{ 0x2105, 0x35ef }, /* "incare" */
+	{ 0x210A, 0x330e }, /* "gscr" */
+	{ 0x210B, 0x94a },  /* "Hscr" */
+	{ 0x210C, 0x915 },  /* "Hfr" */
+	{ 0x210D, 0x92e },  /* "Hopf" */
+	{ 0x210E, 0x496d }, /* "planckh" */
+	{ 0x210F, 0x342d }, /* "hbar" */
+	{ 0x2110, 0xa5e },  /* "Iscr" */
+	{ 0x2111, 0x9cc },  /* "Im" */
+	{ 0x2112, 0xe7f },  /* "Lscr" */
+	{ 0x2113, 0x2e6b }, /* "ell" */
+	{ 0x2115, 0xfe9 },  /* "Nopf" */
+	{ 0x2116, 0x45cf }, /* "numero" */
+	{ 0x2117, 0x2959 }, /* "copysr" */
+	{ 0x2118, 0x5d37 }, /* "wp" */
+	{ 0x2119, 0x1562 }, /* "Popf" */
+	{ 0x211A, 0x1612 }, /* "Qopf" */
+	{ 0x211B, 0x18b8 }, /* "Rscr" */
+	{ 0x211C, 0x1679 }, /* "Re" */
+	{ 0x211D, 0x188e }, /* "Ropf" */
+	{ 0x211E, 0x501f }, /* "rx" */
+	{ 0x2122, 0x1afd }, /* "TRADE" */
+	{ 0x2124, 0x1f67 }, /* "Zopf" */
+	{ 0x2127, 0x3ef4 }, /* "mho" */
+	{ 0x2128, 0x1f5f }, /* "Zfr" */
+	{ 0x2129, 0x358d }, /* "iiota" */
+	{ 0x212C, 0x125 },  /* "Bscr" */
+	{ 0x212D, 0x1cb },  /* "Cfr" */
+	{ 0x212F, 0x2fb8 }, /* "escr" */
+	{ 0x2130, 0x74b },  /* "Escr" */
+	{ 0x2131, 0x7ed },  /* "Fscr" */
+	{ 0x2133, 0xeef },  /* "Mscr" */
+	{ 0x2134, 0x4852 }, /* "oscr" */
+	{ 0x2135, 0x1ff2 }, /* "aleph" */
+	{ 0x2136, 0x22ba }, /* "beth" */
+	{ 0x2137, 0x3288 }, /* "gimel" */
+	{ 0x2138, 0x2b16 }, /* "daleth" */
+	{ 0x2145, 0x306 },  /* "DD" */
+	{ 0x2146, 0x2b63 }, /* "dd" */
+	{ 0x2147, 0x2e18 }, /* "ee" */
+	{ 0x2148, 0x3566 }, /* "ii" */
+	{ 0x2153, 0x30eb }, /* "frac13" */
+	{ 0x2154, 0x3122 }, /* "frac23" */
+	{ 0x2155, 0x3101 }, /* "frac15" */
+	{ 0x2156, 0x312d }, /* "frac25" */
+	{ 0x2157, 0x3143 }, /* "frac35" */
+	{ 0x2158, 0x3159 }, /* "frac45" */
+	{ 0x2159, 0x310c }, /* "frac16" */
+	{ 0x215A, 0x3164 }, /* "frac56" */
+	{ 0x215B, 0x3117 }, /* "frac18" */
+	{ 0x215C, 0x314e }, /* "frac38" */
+	{ 0x215D, 0x316f }, /* "frac58" */
+	{ 0x215E, 0x317a }, /* "frac78" */
+	{ 0x2190, 0x3844 }, /* "larr" */
+	{ 0x2191, 0x5936 }, /* "uarr" */
+	{ 0x2192, 0x4c49 }, /* "rarr" */
+	{ 0x2193, 0x2b21 }, /* "darr" */
+	{ 0x2194, 0x340e }, /* "harr" */
+	{ 0x2195, 0x5b86 }, /* "varr" */
+	{ 0x2196, 0x4687 }, /* "nwarr" */
+	{ 0x2197, 0x4137 }, /* "nearr" */
+	{ 0x2198, 0x50ef }, /* "searr" */
+	{ 0x2199, 0x5662 }, /* "swarr" */
+	{ 0x219A, 0x4244 }, /* "nlarr" */
+	{ 0x219B, 0x43e0 }, /* "nrarr" */
+	{ 0x219D, 0x4cc0 }, /* "rarrw" */
+	{ 0x219E, 0xb44 },  /* "Larr" */
+	{ 0x219F, 0x1bef }, /* "Uarr" */
+	{ 0x21A0, 0x164a }, /* "Rarr" */
+	{ 0x21A1, 0x33d },  /* "Darr" */
+	{ 0x21A2, 0x389b }, /* "larrtl" */
+	{ 0x21A3, 0x4cb5 }, /* "rarrtl" */
+	{ 0x21A4, 0x3e96 }, /* "mapstoleft" */
+	{ 0x21A5, 0x3ea5 }, /* "mapstoup" */
+	{ 0x21A6, 0x3e74 }, /* "map" */
+	{ 0x21A7, 0x3e87 }, /* "mapstodown" */
+	{ 0x21A9, 0x386e }, /* "larrhk" */
+	{ 0x21AA, 0x4c88 }, /* "rarrhk" */
+	{ 0x21AB, 0x3879 }, /* "larrlp" */
+	{ 0x21AC, 0x4c93 }, /* "rarrlp" */
+	{ 0x21AD, 0x3423 }, /* "harrw" */
+	{ 0x21AE, 0x41f6 }, /* "nharr" */
+	{ 0x21B0, 0xe88 },  /* "Lsh" */
+	{ 0x21B1, 0x18c1 }, /* "Rsh" */
+	{ 0x21B2, 0x3977 }, /* "ldsh" */
+	{ 0x21B3, 0x4d8b }, /* "rdsh" */
+	{ 0x21B5, 0x2964 }, /* "crarr" */
+	{ 0x21B6, 0x29de }, /* "cularr" */
+	{ 0x21B7, 0x2a3e }, /* "curarr" */
+	{ 0x21BA, 0x475f }, /* "olarr" */
+	{ 0x21BB, 0x47f0 }, /* "orarr" */
+	{ 0x21BC, 0x3b40 }, /* "lharu" */
+	{ 0x21BD, 0x3b36 }, /* "lhard" */
+	{ 0x21BE, 0x59aa }, /* "uharr" */
+	{ 0x21BF, 0x59a0 }, /* "uharl" */
+	{ 0x21C0, 0x4dfa }, /* "rharu" */
+	{ 0x21C1, 0x4df0 }, /* "rhard" */
+	{ 0x21C2, 0x2bc7 }, /* "dharr" */
+	{ 0x21C3, 0x2bbd }, /* "dharl" */
+	{ 0x21C4, 0x4ee8 }, /* "rlarr" */
+	{ 0x21C5, 0x5963 }, /* "udarr" */
+	{ 0x21C6, 0x3cfd }, /* "lrarr" */
+	{ 0x21C7, 0x3b6e }, /* "llarr" */
+	{ 0x21C8, 0x5aec }, /* "uuarr" */
+	{ 0x21C9, 0x4f90 }, /* "rrarr" */
+	{ 0x21CA, 0x2b76 }, /* "ddarr" */
+	{ 0x21CB, 0x3d14 }, /* "lrhar" */
+	{ 0x21CC, 0x4ef2 }, /* "rlhar" */
+	{ 0x21CD, 0x4232 }, /* "nlArr" */
+	{ 0x21CE, 0x41ec }, /* "nhArr" */
+	{ 0x21CF, 0x43d6 }, /* "nrArr" */
+	{ 0x21D0, 0x37b2 }, /* "lArr" */
+	{ 0x21D1, 0x5919 }, /* "uArr" */
+	{ 0x21D2, 0x4bc6 }, /* "rArr" */
+	{ 0x21D3, 0x2af9 }, /* "dArr" */
+	{ 0x21D4, 0x354a }, /* "iff" */
+	{ 0x21D5, 0x5b0b }, /* "vArr" */
+	{ 0x21D6, 0x4672 }, /* "nwArr" */
+	{ 0x21D7, 0x4122 }, /* "neArr" */
+	{ 0x21D8, 0x50da }, /* "seArr" */
+	{ 0x21D9, 0x564d }, /* "swArr" */
+	{ 0x21DA, 0x37a8 }, /* "lAarr" */
+	{ 0x21DB, 0x4bbc }, /* "rAarr" */
+	{ 0x21DD, 0x5eed }, /* "zigrarr" */
+	{ 0x21E4, 0x384d }, /* "larrb" */
+	{ 0x21E5, 0x4c5d }, /* "rarrb" */
+	{ 0x21F5, 0x2d83 }, /* "duarr" */
+	{ 0x21FD, 0x3c0b }, /* "loarr" */
+	{ 0x21FE, 0x4f32 }, /* "roarr" */
+	{ 0x21FF, 0x3491 }, /* "hoarr" */
+	{ 0x2200, 0x7d3 },  /* "ForAll" */
+	{ 0x2201, 0x28ea }, /* "comp" */
+	{ 0x2202, 0x48d8 }, /* "part" */
+	{ 0x2203, 0x2ffc }, /* "exist" */
+	{ 0x2204, 0x4177 }, /* "nexist" */
+	{ 0x2205, 0x2e8f }, /* "empty" */
+	{ 0x2207, 0x361 },  /* "Del" */
+	{ 0x2208, 0x35e8 }, /* "in" */
+	{ 0x2209, 0x42f8 }, /* "notin" */
+	{ 0x220B, 0x420a }, /* "ni" */
+	{ 0x220C, 0x433e }, /* "notni" */
+	{ 0x220F, 0x4ade }, /* "prod" */
+	{ 0x2210, 0x2945 }, /* "coprod" */
+	{ 0x2211, 0x1ab9 }, /* "Sum" */
+	{ 0x2212, 0x3f2d }, /* "minus" */
+	{ 0x2213, 0x3f8b }, /* "mp" */
+	{ 0x2214, 0x49ae }, /* "plusdo" */
+	{ 0x2216, 0x512d }, /* "setmn" */
+	{ 0x2217, 0x3cba }, /* "lowast" */
+	{ 0x2218, 0x28f3 }, /* "compfn" */
+	{ 0x221A, 0x19a1 }, /* "Sqrt" */
+	{ 0x221D, 0x4b0e }, /* "prop" */
+	{ 0x221E, 0x35fa }, /* "infin" */
+	{ 0x221F, 0x20df }, /* "angrt" */
+	{ 0x2220, 0x2051 }, /* "ang" */
+	{ 0x2221, 0x206c }, /* "angmsd" */
+	{ 0x2222, 0x2102 }, /* "angsph" */
+	{ 0x2223, 0x3f06 }, /* "mid" */
+	{ 0x2224, 0x42dd }, /* "nmid" */
+	{ 0x2225, 0x48a5 }, /* "par" */
+	{ 0x2226, 0x436c }, /* "npar" */
+	{ 0x2227, 0x201f }, /* "and" */
+	{ 0x2228, 0x47e9 }, /* "or" */
+	{ 0x2229, 0x26e2 }, /* "cap" */
+	{ 0x222A, 0x29f5 }, /* "cup" */
+	{ 0x222B, 0x361b }, /* "int" */
+	{ 0x222C, 0x9f7 },  /* "Int" */
+	{ 0x222D, 0x5795 }, /* "tint" */
+	{ 0x222E, 0x4756 }, /* "oint" */
+	{ 0x222F, 0x285 },  /* "Conint" */
+	{ 0x2230, 0x19f },  /* "Cconint" */
+	{ 0x2231, 0x2ae4 }, /* "cwint" */
+	{ 0x2232, 0x2ad7 }, /* "cwconint" */
+	{ 0x2233, 0x21c3 }, /* "awconint" */
+	{ 0x2234, 0x56e0 }, /* "there4" */
+	{ 0x2235, 0x227b }, /* "becaus" */
+	{ 0x2236, 0x4cd5 }, /* "ratio" */
+	{ 0x2237, 0x262 },  /* "Colon" */
+	{ 0x2238, 0x3f42 }, /* "minusd" */
+	{ 0x223A, 0x3e43 }, /* "mDDot" */
+	{ 0x223B, 0x349b }, /* "homtht" */
+	{ 0x223C, 0x51b4 }, /* "sim" */
+	{ 0x223D, 0x266b }, /* "bsim" */
+	{ 0x223E, 0x1f8f }, /* "ac" */
+	{ 0x223F, 0x1f9e }, /* "acd" */
+	{ 0x2240, 0x5d3e }, /* "wr" */
+	{ 0x2241, 0x446c }, /* "nsim" */
+	{ 0x2242, 0x2fcb }, /* "esim" */
+	{ 0x2243, 0x51c7 }, /* "sime" */
+	{ 0x2244, 0x4475 }, /* "nsime" */
+	{ 0x2245, 0x291b }, /* "cong" */
+	{ 0x2246, 0x5200 }, /* "simne" */
+	{ 0x2247, 0x40ea }, /* "ncong" */
+	{ 0x2248, 0x2135 }, /* "ap" */
+	{ 0x2249, 0x405c }, /* "nap" */
+	{ 0x224A, 0x214f }, /* "ape" */
+	{ 0x224B, 0x2157 }, /* "apid" */
+	{ 0x224C, 0x2260 }, /* "bcong" */
+	{ 0x224D, 0x45fa }, /* "nvap" */
+	{ 0x224E, 0x26b0 }, /* "bump" */
+	{ 0x224F, 0x26c3 }, /* "bumpe" */
+	{ 0x2250, 0x2c83 }, /* "doteq" */
+	{ 0x2251, 0x2dc2 }, /* "eDot" */
+	{ 0x2252, 0x2e1f }, /* "efDot" */
+	{ 0x2253, 0x2fa4 }, /* "erDot" */
+	{ 0x2254, 0x9e },   /* "Assign" */
+	{ 0x2255, 0x2dfe }, /* "ecolon" */
+	{ 0x2256, 0x2deb }, /* "ecir" */
+	{ 0x2257, 0x2876 }, /* "cire" */
+	{ 0x2259, 0x5d0e }, /* "wedgeq" */
+	{ 0x225A, 0x5c44 }, /* "veeeq" */
+	{ 0x225C, 0x587a }, /* "trie" */
+	{ 0x225F, 0x2f76 }, /* "equest" */
+	{ 0x2260, 0x411b }, /* "ne" */
+	{ 0x2261, 0x2f81 }, /* "equiv" */
+	{ 0x2262, 0x4157 }, /* "nequiv" */
+	{ 0x2264, 0x3980 }, /* "le" */
+	{ 0x2265, 0x31f9 }, /* "ge" */
+	{ 0x2266, 0x37d0 }, /* "lE" */
+	{ 0x2267, 0x31a3 }, /* "gE" */
+	{ 0x2268, 0x3bbe }, /* "lnE" */
+	{ 0x2269, 0x32b9 }, /* "gnE" */
+	{ 0x226A, 0xe9a },  /* "Lt" */
+	{ 0x226B, 0x8ec },  /* "Gt" */
+	{ 0x226C, 0x58e4 }, /* "twixt" */
+	{ 0x226D, 0x100b }, /* "NotCupCap" */
+	{ 0x226E, 0x42c0 }, /* "nlt" */
+	{ 0x226F, 0x41db }, /* "ngt" */
+	{ 0x2270, 0x4257 }, /* "nle" */
+	{ 0x2271, 0x419f }, /* "nge" */
+	{ 0x2272, 0x3d58 }, /* "lsim" */
+	{ 0x2273, 0x3317 }, /* "gsim" */
+	{ 0x2274, 0x42b6 }, /* "nlsim" */
+	{ 0x2275, 0x41d1 }, /* "ngsim" */
+	{ 0x2276, 0x3b27 }, /* "lg" */
+	{ 0x2277, 0x329a }, /* "gl" */
+	{ 0x2278, 0x456c }, /* "ntlg" */
+	{ 0x2279, 0x4558 }, /* "ntgl" */
+	{ 0x227A, 0x4a18 }, /* "pr" */
+	{ 0x227B, 0x503a }, /* "sc" */
+	{ 0x227C, 0x4a30 }, /* "prcue" */
+	{ 0x227D, 0x505c }, /* "sccue" */
+	{ 0x227E, 0x4b22 }, /* "prsim" */
+	{ 0x227F, 0x50ac }, /* "scsim" */
+	{ 0x2280, 0x43a4 }, /* "npr" */
+	{ 0x2281, 0x4425 }, /* "nsc" */
+	{ 0x2282, 0x53fa }, /* "sub" */
+	{ 0x2283, 0x5541 }, /* "sup" */
+	{ 0x2284, 0x44b6 }, /* "nsub" */
+	{ 0x2285, 0x4512 }, /* "nsup" */
+	{ 0x2286, 0x5416 }, /* "sube" */
+	{ 0x2287, 0x5584 }, /* "supe" */
+	{ 0x2288, 0x44c9 }, /* "nsube" */
+	{ 0x2289, 0x4525 }, /* "nsupe" */
+	{ 0x228A, 0x5441 }, /* "subne" */
+	{ 0x228B, 0x55d3 }, /* "supne" */
+	{ 0x228D, 0x2a20 }, /* "cupdot" */
+	{ 0x228E, 0x5a50 }, /* "uplus" */
+	{ 0x228F, 0x52fe }, /* "sqsub" */
+	{ 0x2290, 0x532f }, /* "sqsup" */
+	{ 0x2291, 0x5308 }, /* "sqsube" */
+	{ 0x2292, 0x5339 }, /* "sqsupe" */
+	{ 0x2293, 0x52d4 }, /* "sqcap" */
+	{ 0x2294, 0x52e9 }, /* "sqcup" */
+	{ 0x2295, 0x47df }, /* "oplus" */
+	{ 0x2296, 0x47b7 }, /* "ominus" */
+	{ 0x2297, 0x487a }, /* "otimes" */
+	{ 0x2298, 0x4866 }, /* "osol" */
+	{ 0x2299, 0x46fa }, /* "odot" */
+	{ 0x229A, 0x46c3 }, /* "ocir" */
+	{ 0x229B, 0x46ba }, /* "oast" */
+	{ 0x229D, 0x46dd }, /* "odash" */
+	{ 0x229E, 0x4998 }, /* "plusb" */
+	{ 0x229F, 0x3f37 }, /* "minusb" */
+	{ 0x22A0, 0x5772 }, /* "timesb" */
+	{ 0x22A1, 0x50c6 }, /* "sdotb" */
+	{ 0x22A2, 0x5c27 }, /* "vdash" */
+	{ 0x22A3, 0x2b33 }, /* "dashv" */
+	{ 0x22A4, 0x57a7 }, /* "top" */
+	{ 0x22A5, 0x245d }, /* "bot" */
+	{ 0x22A7, 0x3f76 }, /* "models" */
+	{ 0x22A8, 0x5b27 }, /* "vDash" */
+	{ 0x22A9, 0x1dbc }, /* "Vdash" */
+	{ 0x22AA, 0x1e63 }, /* "Vvdash" */
+	{ 0x22AB, 0x1da2 }, /* "VDash" */
+	{ 0x22AC, 0x4603 }, /* "nvdash" */
+	{ 0x22AD, 0x45e4 }, /* "nvDash" */
+	{ 0x22AE, 0x4034 }, /* "nVdash" */
+	{ 0x22AF, 0x4029 }, /* "nVDash" */
+	{ 0x22B0, 0x4b2c }, /* "prurel" */
+	{ 0x22B2, 0x5c72 }, /* "vltri" */
+	{ 0x22B3, 0x5ca4 }, /* "vrtri" */
+	{ 0x22B4, 0x3dff }, /* "ltrie" */
+	{ 0x22B5, 0x4ff2 }, /* "rtrie" */
+	{ 0x22B6, 0x482a }, /* "origof" */
+	{ 0x22B7, 0x35d6 }, /* "imof" */
+	{ 0x22B8, 0x3fba }, /* "mumap" */
+	{ 0x22B9, 0x3463 }, /* "hercon" */
+	{ 0x22BA, 0x3623 }, /* "intcal" */
+	{ 0x22BB, 0x5c39 }, /* "veebar" */
+	{ 0x22BD, 0x2227 }, /* "barvee" */
+	{ 0x22BE, 0x20e9 }, /* "angrtvb" */
+	{ 0x22BF, 0x3d31 }, /* "lrtri" */
+	{ 0x22C0, 0x1e77 }, /* "Wedge" */
+	{ 0x22C1, 0x1dd1 }, /* "Vee" */
+	{ 0x22C2, 0x5d5a }, /* "xcap" */
+	{ 0x22C3, 0x5d6d }, /* "xcup" */
+	{ 0x22C4, 0x2bd1 }, /* "diam" */
+	{ 0x22C5, 0x50bd }, /* "sdot" */
+	{ 0x22C6, 0x1a38 }, /* "Star" */
+	{ 0x22C7, 0x2c40 }, /* "divonx" */
+	{ 0x22C8, 0x2470 }, /* "bowtie" */
+	{ 0x22C9, 0x3dc9 }, /* "ltimes" */
+	{ 0x22CA, 0x4fde }, /* "rtimes" */
+	{ 0x22CB, 0x3dbe }, /* "lthree" */
+	{ 0x22CC, 0x4fd3 }, /* "rthree" */
+	{ 0x22CD, 0x2674 }, /* "bsime" */
+	{ 0x22CE, 0x2ac3 }, /* "cuvee" */
+	{ 0x22CF, 0x2acd }, /* "cuwed" */
+	{ 0x22D0, 0x1a41 }, /* "Sub" */
+	{ 0x22D1, 0x1ac1 }, /* "Sup" */
+	{ 0x22D2, 0x154 },  /* "Cap" */
+	{ 0x22D3, 0x2f3 },  /* "Cup" */
+	{ 0x22D4, 0x30c0 }, /* "fork" */
+	{ 0x22D5, 0x2ef3 }, /* "epar" */
+	{ 0x22D6, 0x3db4 }, /* "ltdot" */
+	{ 0x22D7, 0x334d }, /* "gtdot" */
+	{ 0x22D8, 0xdb6 },  /* "Ll" */
+	{ 0x22D9, 0x84c },  /* "Gg" */
+	{ 0x22DA, 0x3a48 }, /* "leg" */
+	{ 0x22DB, 0x3200 }, /* "gel" */
+	{ 0x22DE, 0x29ca }, /* "cuepr" */
+	{ 0x22DF, 0x29d4 }, /* "cuesc" */
+	{ 0x22E0, 0x43ac }, /* "nprcue" */
+	{ 0x22E1, 0x442d }, /* "nsccue" */
+	{ 0x22E2, 0x449e }, /* "nsqsube" */
+	{ 0x22E3, 0x44aa }, /* "nsqsupe" */
+	{ 0x22E6, 0x3bf7 }, /* "lnsim" */
+	{ 0x22E7, 0x32f2 }, /* "gnsim" */
+	{ 0x22E8, 0x4ad3 }, /* "prnsim" */
+	{ 0x22E9, 0x5094 }, /* "scnsim" */
+	{ 0x22EA, 0x42c8 }, /* "nltri" */
+	{ 0x22EB, 0x4410 }, /* "nrtri" */
+	{ 0x22EC, 0x42d2 }, /* "nltrie" */
+	{ 0x22ED, 0x441a }, /* "nrtrie" */
+	{ 0x22EE, 0x5c4e }, /* "vellip" */
+	{ 0x22EF, 0x29a8 }, /* "ctdot" */
+	{ 0x22F0, 0x5ac5 }, /* "utdot" */
+	{ 0x22F1, 0x2d66 }, /* "dtdot" */
+	{ 0x22F2, 0x2c12 }, /* "disin" */
+	{ 0x22F3, 0x36cc }, /* "isinsv" */
+	{ 0x22F4, 0x36c2 }, /* "isins" */
+	{ 0x22F5, 0x36b6 }, /* "isindot" */
+	{ 0x22F6, 0x4332 }, /* "notinvc" */
+	{ 0x22F7, 0x4326 }, /* "notinvb" */
+	{ 0x22F9, 0x36ac }, /* "isinE" */
+	{ 0x22FA, 0x4219 }, /* "nisd" */
+	{ 0x22FB, 0x5dc0 }, /* "xnis" */
+	{ 0x22FC, 0x4211 }, /* "nis" */
+	{ 0x22FD, 0x4360 }, /* "notnivc" */
+	{ 0x22FE, 0x4354 }, /* "notnivb" */
+	{ 0x2305, 0x2232 }, /* "barwed" */
+	{ 0x2306, 0xd4 },   /* "Barwed" */
+	{ 0x2308, 0x3928 }, /* "lceil" */
+	{ 0x2309, 0x4d49 }, /* "rceil" */
+	{ 0x230A, 0x3b13 }, /* "lfloor" */
+	{ 0x230B, 0x4ddc }, /* "rfloor" */
+	{ 0x230C, 0x2d36 }, /* "drcrop" */
+	{ 0x230D, 0x2c5e }, /* "dlcrop" */
+	{ 0x230E, 0x5a9d }, /* "urcrop" */
+	{ 0x230F, 0x59d6 }, /* "ulcrop" */
+	{ 0x2310, 0x244a }, /* "bnot" */
+	{ 0x2312, 0x4af4 }, /* "profline" */
+	{ 0x2313, 0x4b01 }, /* "profsurf" */
+	{ 0x2315, 0x56cc }, /* "telrec" */
+	{ 0x2316, 0x568d }, /* "target" */
+	{ 0x231C, 0x59be }, /* "ulcorn" */
+	{ 0x231D, 0x5a85 }, /* "urcorn" */
+	{ 0x231E, 0x2c53 }, /* "dlcorn" */
+	{ 0x231F, 0x2d2b }, /* "drcorn" */
+	{ 0x2322, 0x318f }, /* "frown" */
+	{ 0x2323, 0x525f }, /* "smile" */
+	{ 0x232D, 0x2aee }, /* "cylcty" */
+	{ 0x232E, 0x4ae7 }, /* "profalar" */
+	{ 0x2336, 0x57af }, /* "topbot" */
+	{ 0x233D, 0x489b }, /* "ovbar" */
+	{ 0x233F, 0x529d }, /* "solbar" */
+	{ 0x237C, 0x2116 }, /* "angzarr" */
+	{ 0x23B0, 0x3ba4 }, /* "lmoust" */
+	{ 0x23B1, 0x4f04 }, /* "rmoust" */
+	{ 0x23B4, 0x569f }, /* "tbrk" */
+	{ 0x23B5, 0x224a }, /* "bbrk" */
+	{ 0x23B6, 0x2253 }, /* "bbrktbrk" */
+	{ 0x23DC, 0x1505 }, /* "OverParenthesis" */
+	{ 0x23DD, 0x1c7b }, /* "UnderParenthesis" */
+	{ 0x23DE, 0x14e7 }, /* "OverBrace" */
+	{ 0x23DF, 0x1c5b }, /* "UnderBrace" */
+	{ 0x23E2, 0x58b2 }, /* "trpezium" */
+	{ 0x23E7, 0x2e5e }, /* "elinters" */
+	{ 0x2423, 0x2406 }, /* "blank" */
+	{ 0x24C8, 0x46a8 }, /* "oS" */
+	{ 0x2500, 0x2574 }, /* "boxh" */
+	{ 0x2502, 0x25f3 }, /* "boxv" */
+	{ 0x250C, 0x256a }, /* "boxdr" */
+	{ 0x2510, 0x2560 }, /* "boxdl" */
+	{ 0x2514, 0x25e9 }, /* "boxur" */
+	{ 0x2518, 0x25df }, /* "boxul" */
+	{ 0x251C, 0x262e }, /* "boxvr" */
+	{ 0x2524, 0x2624 }, /* "boxvl" */
+	{ 0x252C, 0x2591 }, /* "boxhd" */
+	{ 0x2534, 0x259b }, /* "boxhu" */
+	{ 0x253C, 0x261a }, /* "boxvh" */
+	{ 0x2550, 0x24a3 }, /* "boxH" */
+	{ 0x2551, 0x24fc }, /* "boxV" */
+	{ 0x2552, 0x2556 }, /* "boxdR" */
+	{ 0x2553, 0x2499 }, /* "boxDr" */
+	{ 0x2554, 0x2485 }, /* "boxDR" */
+	{ 0x2555, 0x254c }, /* "boxdL" */
+	{ 0x2556, 0x248f }, /* "boxDl" */
+	{ 0x2557, 0x247b }, /* "boxDL" */
+	{ 0x2558, 0x25d5 }, /* "boxuR" */
+	{ 0x2559, 0x24f2 }, /* "boxUr" */
+	{ 0x255A, 0x24de }, /* "boxUR" */
+	{ 0x255B, 0x25cb }, /* "boxuL" */
+	{ 0x255C, 0x24e8 }, /* "boxUl" */
+	{ 0x255D, 0x24d4 }, /* "boxUL" */
+	{ 0x255E, 0x2610 }, /* "boxvR" */
+	{ 0x255F, 0x2537 }, /* "boxVr" */
+	{ 0x2560, 0x2519 }, /* "boxVR" */
+	{ 0x2561, 0x2606 }, /* "boxvL" */
+	{ 0x2562, 0x252d }, /* "boxVl" */
+	{ 0x2563, 0x250f }, /* "boxVL" */
+	{ 0x2564, 0x24c0 }, /* "boxHd" */
+	{ 0x2565, 0x257d }, /* "boxhD" */
+	{ 0x2566, 0x24ac }, /* "boxHD" */
+	{ 0x2567, 0x24ca }, /* "boxHu" */
+	{ 0x2568, 0x2587 }, /* "boxhU" */
+	{ 0x2569, 0x24b6 }, /* "boxHU" */
+	{ 0x256A, 0x25fc }, /* "boxvH" */
+	{ 0x256B, 0x2523 }, /* "boxVh" */
+	{ 0x256C, 0x2505 }, /* "boxVH" */
+	{ 0x2580, 0x59b4 }, /* "uhblk" */
+	{ 0x2584, 0x3b55 }, /* "lhblk" */
+	{ 0x2588, 0x242e }, /* "block" */
+	{ 0x2591, 0x241a }, /* "blk14" */
+	{ 0x2592, 0x2410 }, /* "blk12" */
+	{ 0x2593, 0x2424 }, /* "blk34" */
+	{ 0x25A1, 0x5360 }, /* "squ" */
+	{ 0x25AA, 0x537e }, /* "squf" */
+	{ 0x25AB, 0x6eb },  /* "EmptyVerySmallSquare" */
+	{ 0x25AD, 0x4dc0 }, /* "rect" */
+	{ 0x25AE, 0x3eb2 }, /* "marker" */
+	{ 0x25B1, 0x3099 }, /* "fltns" */
+	{ 0x25B3, 0x5e27 }, /* "xutri" */
+	{ 0x25B4, 0x5ae2 }, /* "utrif" */
+	{ 0x25B5, 0x5ad9 }, /* "utri" */
+	{ 0x25B8, 0x4ffc }, /* "rtrif" */
+	{ 0x25B9, 0x4fe9 }, /* "rtri" */
+	{ 0x25BD, 0x5d76 }, /* "xdtri" */
+	{ 0x25BE, 0x2d79 }, /* "dtrif" */
+	{ 0x25BF, 0x2d70 }, /* "dtri" */
+	{ 0x25C2, 0x3e09 }, /* "ltrif" */
+	{ 0x25C3, 0x3df6 }, /* "ltri" */
+	{ 0x25CA, 0x3cce }, /* "loz" */
+	{ 0x25CB, 0x27e1 }, /* "cir" */
+	{ 0x25EC, 0x586f }, /* "tridot" */
+	{ 0x25EF, 0x5d63 }, /* "xcirc" */
+	{ 0x25F8, 0x59e1 }, /* "ultri" */
+	{ 0x25F9, 0x5ab1 }, /* "urtri" */
+	{ 0x25FA, 0x3b90 }, /* "lltri" */
+	{ 0x25FB, 0x6d6 },  /* "EmptySmallSquare" */
+	{ 0x25FC, 0x799 },  /* "FilledSmallSquare" */
+	{ 0x2605, 0x53c5 }, /* "starf" */
+	{ 0x2606, 0x53bc }, /* "star" */
+	{ 0x260E, 0x493d }, /* "phone" */
+	{ 0x2640, 0x3040 }, /* "female" */
+	{ 0x2642, 0x3e56 }, /* "male" */
+	{ 0x2660, 0x52b2 }, /* "spades" */
+	{ 0x2663, 0x28a3 }, /* "clubs" */
+	{ 0x2665, 0x343f }, /* "hearts" */
+	{ 0x2666, 0x2bf6 }, /* "diams" */
+	{ 0x266A, 0x5538 }, /* "sung" */
+	{ 0x266D, 0x3086 }, /* "flat" */
+	{ 0x266E, 0x408c }, /* "natur" */
+	{ 0x266F, 0x5154 }, /* "sharp" */
+	{ 0x2713, 0x27c2 }, /* "check" */
+	{ 0x2717, 0x296e }, /* "cross" */
+	{ 0x2720, 0x3e5f }, /* "malt" */
+	{ 0x2736, 0x5137 }, /* "sext" */
+	{ 0x2758, 0x1e0c }, /* "VerticalSeparator" */
+	{ 0x2772, 0x38d6 }, /* "lbbrk" */
+	{ 0x2773, 0x4cf7 }, /* "rbbrk" */
+	{ 0x27C8, 0x268f }, /* "bsolhsub" */
+	{ 0x27C9, 0x5599 }, /* "suphsol" */
+	{ 0x27E6, 0x3c15 }, /* "lobrk" */
+	{ 0x27E7, 0x4f3c }, /* "robrk" */
+	{ 0x27E8, 0x3814 }, /* "lang" */
+	{ 0x27E9, 0x4c17 }, /* "rang" */
+	{ 0x27EA, 0xb2c },  /* "Lang" */
+	{ 0x27EB, 0x1641 }, /* "Rang" */
+	{ 0x27EC, 0x3c01 }, /* "loang" */
+	{ 0x27ED, 0x4f28 }, /* "roang" */
+	{ 0x27F5, 0x5dad }, /* "xlarr" */
+	{ 0x27F6, 0x5dfd }, /* "xrarr" */
+	{ 0x27F7, 0x5d93 }, /* "xharr" */
+	{ 0x27F8, 0x5da3 }, /* "xlArr" */
+	{ 0x27F9, 0x5df3 }, /* "xrArr" */
+	{ 0x27FA, 0x5d89 }, /* "xhArr" */
+	{ 0x27FC, 0x5db7 }, /* "xmap" */
+	{ 0x27FF, 0x2dab }, /* "dzigrarr" */
+	{ 0x2902, 0x462a }, /* "nvlArr" */
+	{ 0x2903, 0x4651 }, /* "nvrArr" */
+	{ 0x2904, 0x45ef }, /* "nvHarr" */
+	{ 0x2905, 0xea1 },  /* "Map" */
+	{ 0x290C, 0x38cc }, /* "lbarr" */
+	{ 0x290D, 0x4ced }, /* "rbarr" */
+	{ 0x290E, 0x37c6 }, /* "lBarr" */
+	{ 0x290F, 0x4bda }, /* "rBarr" */
+	{ 0x2910, 0x1625 }, /* "RBarr" */
+	{ 0x2911, 0x30d },  /* "DDotrahd" */
+	{ 0x2912, 0x1cc7 }, /* "UpArrowBar" */
+	{ 0x2913, 0x565 },  /* "DownArrowBar" */
+	{ 0x2916, 0x1653 }, /* "Rarrtl" */
+	{ 0x2919, 0x38ae }, /* "latail" */
+	{ 0x291A, 0x4cca }, /* "ratail" */
+	{ 0x291B, 0x37bb }, /* "lAtail" */
+	{ 0x291C, 0x4bcf }, /* "rAtail" */
+	{ 0x291D, 0x3863 }, /* "larrfs" */
+	{ 0x291E, 0x4c7d }, /* "rarrfs" */
+	{ 0x291F, 0x3857 }, /* "larrbfs" */
+	{ 0x2920, 0x4c67 }, /* "rarrbfs" */
+	{ 0x2923, 0x467c }, /* "nwarhk" */
+	{ 0x2924, 0x412c }, /* "nearhk" */
+	{ 0x2925, 0x50e4 }, /* "searhk" */
+	{ 0x2926, 0x5657 }, /* "swarhk" */
+	{ 0x2927, 0x469d }, /* "nwnear" */
+	{ 0x2928, 0x579e }, /* "toea" */
+	{ 0x2929, 0x57db }, /* "tosa" */
+	{ 0x292A, 0x5678 }, /* "swnwar" */
+	{ 0x2933, 0x4c73 }, /* "rarrc" */
+	{ 0x2935, 0x29be }, /* "cudarrr" */
+	{ 0x2936, 0x3940 }, /* "ldca" */
+	{ 0x2937, 0x4d61 }, /* "rdca" */
+	{ 0x2938, 0x29b2 }, /* "cudarrl" */
+	{ 0x2939, 0x3884 }, /* "larrpl" */
+	{ 0x293C, 0x2a49 }, /* "curarrm" */
+	{ 0x293D, 0x29e9 }, /* "cularrp" */
+	{ 0x2945, 0x4c9e }, /* "rarrpl" */
+	{ 0x2948, 0x3417 }, /* "harrcir" */
+	{ 0x2949, 0x1bf8 }, /* "Uarrocir" */
+	{ 0x294A, 0x3e13 }, /* "lurdshar" */
+	{ 0x294B, 0x396a }, /* "ldrushar" */
+	{ 0x294E, 0xc3a },  /* "LeftRightVector" */
+	{ 0x294F, 0x180a }, /* "RightUpDownVector" */
+	{ 0x2950, 0x598 },  /* "DownLeftRightVector" */
+	{ 0x2951, 0xcb8 },  /* "LeftUpDownVector" */
+	{ 0x2952, 0xd15 },  /* "LeftVectorBar" */
+	{ 0x2953, 0x186c }, /* "RightVectorBar" */
+	{ 0x2954, 0x1847 }, /* "RightUpVectorBar" */
+	{ 0x2955, 0x1774 }, /* "RightDownVectorBar" */
+	{ 0x2956, 0x5d9 },  /* "DownLeftVectorBar" */
+	{ 0x2957, 0x61a },  /* "DownRightVectorBar" */
+	{ 0x2958, 0xcf2 },  /* "LeftUpVectorBar" */
+	{ 0x2959, 0xc03 },  /* "LeftDownVectorBar" */
+	{ 0x295A, 0xc6b },  /* "LeftTeeVector" */
+	{ 0x295B, 0x17b9 }, /* "RightTeeVector" */
+	{ 0x295C, 0x1820 }, /* "RightUpTeeVector" */
+	{ 0x295D, 0x1749 }, /* "RightDownTeeVector" */
+	{ 0x295E, 0x5b0 },  /* "DownLeftTeeVector" */
+	{ 0x295F, 0x5ef },  /* "DownRightTeeVector" */
+	{ 0x2960, 0xccd },  /* "LeftUpTeeVector" */
+	{ 0x2961, 0xbda },  /* "LeftDownTeeVector" */
+	{ 0x2962, 0x37df }, /* "lHar" */
+	{ 0x2963, 0x5922 }, /* "uHar" */
+	{ 0x2964, 0x4be4 }, /* "rHar" */
+	{ 0x2965, 0x2b02 }, /* "dHar" */
+	{ 0x2966, 0x3e20 }, /* "luruhar" */
+	{ 0x2967, 0x395e }, /* "ldrdhar" */
+	{ 0x2968, 0x5013 }, /* "ruluhar" */
+	{ 0x2969, 0x4d6a }, /* "rdldhar" */
+	{ 0x296A, 0x3b4a }, /* "lharul" */
+	{ 0x296B, 0x3b85 }, /* "llhard" */
+	{ 0x296C, 0x4e04 }, /* "rharul" */
+	{ 0x296D, 0x3d1e }, /* "lrhard" */
+	{ 0x296E, 0x5977 }, /* "udhar" */
+	{ 0x296F, 0x2d8d }, /* "duhar" */
+	{ 0x2970, 0x1897 }, /* "RoundImplies" */
+	{ 0x2971, 0x2fae }, /* "erarr" */
+	{ 0x2972, 0x5216 }, /* "simrarr" */
+	{ 0x2973, 0x388f }, /* "larrsim" */
+	{ 0x2974, 0x4ca9 }, /* "rarrsim" */
+	{ 0x2975, 0x4c52 }, /* "rarrap" */
+	{ 0x2976, 0x3dd4 }, /* "ltlarr" */
+	{ 0x2978, 0x337c }, /* "gtrarr" */
+	{ 0x2979, 0x5457 }, /* "subrarr" */
+	{ 0x297B, 0x55b1 }, /* "suplarr" */
+	{ 0x297C, 0x3b08 }, /* "lfisht" */
+	{ 0x297D, 0x4dd1 }, /* "rfisht" */
+	{ 0x297E, 0x5981 }, /* "ufisht" */
+	{ 0x297F, 0x2ba9 }, /* "dfisht" */
+	{ 0x2985, 0x3c8f }, /* "lopar" */
+	{ 0x2986, 0x4f46 }, /* "ropar" */
+	{ 0x298B, 0x38f2 }, /* "lbrke" */
+	{ 0x298C, 0x4d13 }, /* "rbrke" */
+	{ 0x298D, 0x3908 }, /* "lbrkslu" */
+	{ 0x298E, 0x4d1d }, /* "rbrksld" */
+	{ 0x298F, 0x38fc }, /* "lbrksld" */
+	{ 0x2990, 0x4d29 }, /* "rbrkslu" */
+	{ 0x2991, 0x381d }, /* "langd" */
+	{ 0x2992, 0x4c20 }, /* "rangd" */
+	{ 0x2993, 0x3cf2 }, /* "lparlt" */
+	{ 0x2994, 0x4f78 }, /* "rpargt" */
+	{ 0x2995, 0x3357 }, /* "gtlPar" */
+	{ 0x2996, 0x3deb }, /* "ltrPar" */
+	{ 0x299A, 0x5ce4 }, /* "vzigzag" */
+	{ 0x299C, 0x5b31 }, /* "vangrt" */
+	{ 0x299D, 0x20f5 }, /* "angrtvbd" */
+	{ 0x29A4, 0x2059 }, /* "ange" */
+	{ 0x29A5, 0x4c2a }, /* "range" */
+	{ 0x29A6, 0x2d97 }, /* "dwangle" */
+	{ 0x29A7, 0x5aff }, /* "uwangle" */
+	{ 0x29A8, 0x2077 }, /* "angmsdaa" */
+	{ 0x29A9, 0x2084 }, /* "angmsdab" */
+	{ 0x29AA, 0x2091 }, /* "angmsdac" */
+	{ 0x29AB, 0x209e }, /* "angmsdad" */
+	{ 0x29AC, 0x20ab }, /* "angmsdae" */
+	{ 0x29AD, 0x20b8 }, /* "angmsdaf" */
+	{ 0x29AE, 0x20c5 }, /* "angmsdag" */
+	{ 0x29AF, 0x20d2 }, /* "angmsdah" */
+	{ 0x29B0, 0x2292 }, /* "bemptyv" */
+	{ 0x29B1, 0x2b9d }, /* "demptyv" */
+	{ 0x29B2, 0x278f }, /* "cemptyv" */
+	{ 0x29B3, 0x4c0a }, /* "raemptyv" */
+	{ 0x29B4, 0x37f2 }, /* "laemptyv" */
+	{ 0x29B5, 0x4745 }, /* "ohbar" */
+	{ 0x29B6, 0x47ae }, /* "omid" */
+	{ 0x29B7, 0x47cc }, /* "opar" */
+	{ 0x29B9, 0x47d5 }, /* "operp" */
+	{ 0x29BB, 0x4773 }, /* "olcross" */
+	{ 0x29BC, 0x4703 }, /* "odsold" */
+	{ 0x29BE, 0x4769 }, /* "olcir" */
+	{ 0x29BF, 0x4717 }, /* "ofcir" */
+	{ 0x29C0, 0x4789 }, /* "olt" */
+	{ 0x29C1, 0x473d }, /* "ogt" */
+	{ 0x29C2, 0x2897 }, /* "cirscir" */
+	{ 0x29C3, 0x27e9 }, /* "cirE" */
+	{ 0x29C4, 0x5294 }, /* "solb" */
+	{ 0x29C5, 0x2685 }, /* "bsolb" */
+	{ 0x29C9, 0x2541 }, /* "boxbox" */
+	{ 0x29CD, 0x589c }, /* "trisb" */
+	{ 0x29CE, 0x5006 }, /* "rtriltri" */
+	{ 0x29CF, 0xc8e },  /* "LeftTriangleBar" */
+	{ 0x29D0, 0x17de }, /* "RightTriangleBar" */
+	{ 0x29DC, 0x3582 }, /* "iinfin" */
+	{ 0x29DD, 0x3604 }, /* "infintie" */
+	{ 0x29DE, 0x461e }, /* "nvinfin" */
+	{ 0x29E3, 0x2efc }, /* "eparsl" */
+	{ 0x29E4, 0x5249 }, /* "smeparsl" */
+	{ 0x29E5, 0x2f97 }, /* "eqvparsl" */
+	{ 0x29EB, 0x3ce2 }, /* "lozf" */
+	{ 0x29F4, 0x18c9 }, /* "RuleDelayed" */
+	{ 0x29F6, 0x2d53 }, /* "dsol" */
+	{ 0x2A00, 0x5dc9 }, /* "xodot" */
+	{ 0x2A01, 0x5ddd }, /* "xoplus" */
+	{ 0x2A02, 0x5de8 }, /* "xotime" */
+	{ 0x2A04, 0x5e1c }, /* "xuplus" */
+	{ 0x2A06, 0x5e11 }, /* "xsqcup" */
+	{ 0x2A0C, 0x4b5c }, /* "qint" */
+	{ 0x2A0D, 0x30d3 }, /* "fpartint" */
+	{ 0x2A10, 0x287f }, /* "cirfnint" */
+	{ 0x2A11, 0x21d0 }, /* "awint" */
+	{ 0x2A12, 0x4f83 }, /* "rppolint" */
+	{ 0x2A13, 0x509f }, /* "scpolint" */
+	{ 0x2A14, 0x4398 }, /* "npolint" */
+	{ 0x2A15, 0x49f7 }, /* "pointint" */
+	{ 0x2A16, 0x4b94 }, /* "quatint" */
+	{ 0x2A17, 0x3648 }, /* "intlarhk" */
+	{ 0x2A22, 0x49a2 }, /* "pluscir" */
+	{ 0x2A23, 0x498b }, /* "plusacir" */
+	{ 0x2A24, 0x520a }, /* "simplus" */
+	{ 0x2A25, 0x49b9 }, /* "plusdu" */
+	{ 0x2A26, 0x49d9 }, /* "plussim" */
+	{ 0x2A27, 0x49e5 }, /* "plustwo" */
+	{ 0x2A29, 0x3ebd }, /* "mcomma" */
+	{ 0x2A2A, 0x3f4d }, /* "minusdu" */
+	{ 0x2A2D, 0x3ca3 }, /* "loplus" */
+	{ 0x2A2E, 0x4f5a }, /* "roplus" */
+	{ 0x2A2F, 0x2df },  /* "Cross" */
+	{ 0x2A30, 0x578a }, /* "timesd" */
+	{ 0x2A31, 0x577d }, /* "timesbar" */
+	{ 0x2A33, 0x523e }, /* "smashp" */
+	{ 0x2A34, 0x3cae }, /* "lotimes" */
+	{ 0x2A35, 0x4f65 }, /* "rotimes" */
+	{ 0x2A36, 0x4885 }, /* "otimesas" */
+	{ 0x2A37, 0x14c7 }, /* "Otimes" */
+	{ 0x2A38, 0x46f1 }, /* "odiv" */
+	{ 0x2A39, 0x5890 }, /* "triplus" */
+	{ 0x2A3A, 0x5883 }, /* "triminus" */
+	{ 0x2A3B, 0x58a6 }, /* "tritime" */
+	{ 0x2A3C, 0x3684 }, /* "iprod" */
+	{ 0x2A3F, 0x200e }, /* "amalg" */
+	{ 0x2A40, 0x2718 }, /* "capdot" */
+	{ 0x2A42, 0x4101 }, /* "ncup" */
+	{ 0x2A43, 0x40cd }, /* "ncap" */
+	{ 0x2A44, 0x26ea }, /* "capand" */
+	{ 0x2A45, 0x2a2b }, /* "cupor" */
+	{ 0x2A46, 0x2a0a }, /* "cupcap" */
+	{ 0x2A47, 0x270d }, /* "capcup" */
+	{ 0x2A48, 0x29fd }, /* "cupbrcap" */
+	{ 0x2A49, 0x26f5 }, /* "capbrcup" */
+	{ 0x2A4A, 0x2a15 }, /* "cupcup" */
+	{ 0x2A4B, 0x2702 }, /* "capcap" */
+	{ 0x2A4C, 0x2767 }, /* "ccups" */
+	{ 0x2A4D, 0x273f }, /* "ccaps" */
+	{ 0x2A50, 0x2771 }, /* "ccupssm" */
+	{ 0x2A53, 0x5d },   /* "And" */
+	{ 0x2A54, 0x14a0 }, /* "Or" */
+	{ 0x2A55, 0x2027 }, /* "andand" */
+	{ 0x2A56, 0x4835 }, /* "oror" */
+	{ 0x2A57, 0x483e }, /* "orslope" */
+	{ 0x2A58, 0x203b }, /* "andslope" */
+	{ 0x2A5A, 0x2048 }, /* "andv" */
+	{ 0x2A5B, 0x484a }, /* "orv" */
+	{ 0x2A5C, 0x2032 }, /* "andd" */
+	{ 0x2A5D, 0x47fa }, /* "ord" */
+	{ 0x2A5F, 0x5cf9 }, /* "wedbar" */
+	{ 0x2A66, 0x50d0 }, /* "sdote" */
+	{ 0x2A6A, 0x51bc }, /* "simdot" */
+	{ 0x2A6D, 0x2924 }, /* "congdot" */
+	{ 0x2A6E, 0x2dd6 }, /* "easter" */
+	{ 0x2A6F, 0x2144 }, /* "apacir" */
+	{ 0x2A70, 0x213c }, /* "apE" */
+	{ 0x2A71, 0x2f07 }, /* "eplus" */
+	{ 0x2A72, 0x49c4 }, /* "pluse" */
+	{ 0x2A73, 0x754 },  /* "Esim" */
+	{ 0x2A74, 0x26c },  /* "Colone" */
+	{ 0x2A75, 0x722 },  /* "Equal" */
+	{ 0x2A77, 0x2db8 }, /* "eDDot" */
+	{ 0x2A78, 0x2f8b }, /* "equivDD" */
+	{ 0x2A79, 0x3daa }, /* "ltcir" */
+	{ 0x2A7A, 0x3343 }, /* "gtcir" */
+	{ 0x2A7B, 0x3ddf }, /* "ltquest" */
+	{ 0x2A7C, 0x3362 }, /* "gtquest" */
+	{ 0x2A7D, 0x3a6e }, /* "les" */
+	{ 0x2A7E, 0x3226 }, /* "ges" */
+	{ 0x2A7F, 0x3a80 }, /* "lesdot" */
+	{ 0x2A80, 0x3238 }, /* "gesdot" */
+	{ 0x2A81, 0x3a8b }, /* "lesdoto" */
+	{ 0x2A82, 0x3243 }, /* "gesdoto" */
+	{ 0x2A83, 0x3a97 }, /* "lesdotor" */
+	{ 0x2A84, 0x324f }, /* "gesdotol" */
+	{ 0x2A85, 0x3832 }, /* "lap" */
+	{ 0x2A86, 0x31cf }, /* "gap" */
+	{ 0x2A87, 0x3bdc }, /* "lne" */
+	{ 0x2A88, 0x32d7 }, /* "gne" */
+	{ 0x2A89, 0x3bc6 }, /* "lnap" */
+	{ 0x2A8A, 0x32c1 }, /* "gnap" */
+	{ 0x2A8B, 0x37d7 }, /* "lEg" */
+	{ 0x2A8C, 0x31aa }, /* "gEl" */
+	{ 0x2A8D, 0x3d61 }, /* "lsime" */
+	{ 0x2A8E, 0x3320 }, /* "gsime" */
+	{ 0x2A8F, 0x3d6b }, /* "lsimg" */
+	{ 0x2A90, 0x332a }, /* "gsiml" */
+	{ 0x2A91, 0x3b2e }, /* "lgE" */
+	{ 0x2A92, 0x32a1 }, /* "glE" */
+	{ 0x2A93, 0x3aad }, /* "lesges" */
+	{ 0x2A94, 0x3265 }, /* "gesles" */
+	{ 0x2A95, 0x2e73 }, /* "els" */
+	{ 0x2A96, 0x2e44 }, /* "egs" */
+	{ 0x2A97, 0x2e7b }, /* "elsdot" */
+	{ 0x2A98, 0x2e4c }, /* "egsdot" */
+	{ 0x2A99, 0x2e57 }, /* "el" */
+	{ 0x2A9A, 0x2e32 }, /* "eg" */
+	{ 0x2A9D, 0x51ed }, /* "siml" */
+	{ 0x2A9E, 0x51da }, /* "simg" */
+	{ 0x2A9F, 0x51f6 }, /* "simlE" */
+	{ 0x2AA0, 0x51e3 }, /* "simgE" */
+	{ 0x2AA1, 0xd7f },  /* "LessLess" */
+	{ 0x2AA2, 0x898 },  /* "GreaterGreater" */
+	{ 0x2AA4, 0x32b1 }, /* "glj" */
+	{ 0x2AA5, 0x32a9 }, /* "gla" */
+	{ 0x2AA6, 0x3da1 }, /* "ltcc" */
+	{ 0x2AA7, 0x333a }, /* "gtcc" */
+	{ 0x2AA8, 0x3a76 }, /* "lescc" */
+	{ 0x2AA9, 0x322e }, /* "gescc" */
+	{ 0x2AAA, 0x5269 }, /* "smt" */
+	{ 0x2AAB, 0x38a6 }, /* "lat" */
+	{ 0x2AAC, 0x5271 }, /* "smte" */
+	{ 0x2AAD, 0x38b9 }, /* "late" */
+	{ 0x2AAE, 0x26b9 }, /* "bumpE" */
+	{ 0x2AAF, 0x4a3a }, /* "pre" */
+	{ 0x2AB0, 0x5066 }, /* "sce" */
+	{ 0x2AB3, 0x4a1f }, /* "prE" */
+	{ 0x2AB4, 0x5041 }, /* "scE" */
+	{ 0x2AB5, 0x4ac0 }, /* "prnE" */
+	{ 0x2AB6, 0x5081 }, /* "scnE" */
+	{ 0x2AB7, 0x4a27 }, /* "prap" */
+	{ 0x2AB8, 0x5049 }, /* "scap" */
+	{ 0x2AB9, 0x4ac9 }, /* "prnap" */
+	{ 0x2ABA, 0x508a }, /* "scnap" */
+	{ 0x2ABB, 0x156b }, /* "Pr" */
+	{ 0x2ABC, 0x18ff }, /* "Sc" */
+	{ 0x2ABD, 0x540b }, /* "subdot" */
+	{ 0x2ABE, 0x556d }, /* "supdot" */
+	{ 0x2ABF, 0x544b }, /* "subplus" */
+	{ 0x2AC0, 0x55dd }, /* "supplus" */
+	{ 0x2AC1, 0x542b }, /* "submult" */
+	{ 0x2AC2, 0x55bd }, /* "supmult" */
+	{ 0x2AC3, 0x541f }, /* "subedot" */
+	{ 0x2AC4, 0x558d }, /* "supedot" */
+	{ 0x2AC5, 0x5402 }, /* "subE" */
+	{ 0x2AC6, 0x5564 }, /* "supE" */
+	{ 0x2AC7, 0x54a6 }, /* "subsim" */
+	{ 0x2AC8, 0x562c }, /* "supsim" */
+	{ 0x2ACB, 0x5437 }, /* "subnE" */
+	{ 0x2ACC, 0x55c9 }, /* "supnE" */
+	{ 0x2ACF, 0x2982 }, /* "csub" */
+	{ 0x2AD0, 0x2995 }, /* "csup" */
+	{ 0x2AD1, 0x298b }, /* "csube" */
+	{ 0x2AD2, 0x299e }, /* "csupe" */
+	{ 0x2AD3, 0x54bc }, /* "subsup" */
+	{ 0x2AD4, 0x5637 }, /* "supsub" */
+	{ 0x2AD5, 0x54b1 }, /* "subsub" */
+	{ 0x2AD6, 0x5642 }, /* "supsup" */
+	{ 0x2AD7, 0x55a5 }, /* "suphsub" */
+	{ 0x2AD8, 0x5578 }, /* "supdsub" */
+	{ 0x2AD9, 0x30c9 }, /* "forkv" */
+	{ 0x2ADA, 0x57cf }, /* "topfork" */
+	{ 0x2ADB, 0x3f59 }, /* "mlcp" */
+	{ 0x2AE4, 0x346 },  /* "Dashv" */
+	{ 0x2AE6, 0x1dc6 }, /* "Vdashl" */
+	{ 0x2AE7, 0xcb },   /* "Barv" */
+	{ 0x2AE8, 0x5b14 }, /* "vBar" */
+	{ 0x2AE9, 0x5b1d }, /* "vBarv" */
+	{ 0x2AEB, 0x1dac }, /* "Vbar" */
+	{ 0x2AEC, 0xff2 },  /* "Not" */
+	{ 0x2AED, 0x21da }, /* "bNot" */
+	{ 0x2AEE, 0x4f1e }, /* "rnmid" */
+	{ 0x2AEF, 0x288c }, /* "cirmid" */
+	{ 0x2AF0, 0x3f17 }, /* "midcir" */
+	{ 0x2AF1, 0x57ba }, /* "topcir" */
+	{ 0x2AF2, 0x4200 }, /* "nhpar" */
+	{ 0x2AF3, 0x48c3 }, /* "parsim" */
+	{ 0x2AFD, 0x48ce }, /* "parsl" */
+	{ 0xFB00, 0x3056 }, /* "fflig" */
+	{ 0xFB01, 0x3074 }, /* "filig" */
+	{ 0xFB02, 0x308f }, /* "fllig" */
+	{ 0xFB03, 0x304b }, /* "ffilig" */
+	{ 0xFB04, 0x3060 }, /* "ffllig" */
+};
+PRIVATE struct xml_encode32_entry const xml_encode32_db[133] = {
+	{ 0x1D49C, 0x94 },   /* "Ascr" */
+	{ 0x1D49E, 0x2e9 },  /* "Cscr" */
+	{ 0x1D49F, 0x65c },  /* "Dscr" */
+	{ 0x1D4A2, 0x8e2 },  /* "Gscr" */
+	{ 0x1D4A5, 0xaa6 },  /* "Jscr" */
+	{ 0x1D4A6, 0xb00 },  /* "Kscr" */
+	{ 0x1D4A9, 0x13ef }, /* "Nscr" */
+	{ 0x1D4AA, 0x14a7 }, /* "Oscr" */
+	{ 0x1D4AB, 0x15f0 }, /* "Pscr" */
+	{ 0x1D4AC, 0x161b }, /* "Qscr" */
+	{ 0x1D4AE, 0x1a2e }, /* "Sscr" */
+	{ 0x1D4AF, 0x1bd0 }, /* "Tscr" */
+	{ 0x1D4B0, 0x1d85 }, /* "Uscr" */
+	{ 0x1D4B1, 0x1e59 }, /* "Vscr" */
+	{ 0x1D4B2, 0x1e94 }, /* "Wscr" */
+	{ 0x1D4B3, 0x1eb7 }, /* "Xscr" */
+	{ 0x1D4B4, 0x1f07 }, /* "Yscr" */
+	{ 0x1D4B5, 0x1f70 }, /* "Zscr" */
+	{ 0x1D4B6, 0x2189 }, /* "ascr" */
+	{ 0x1D4B7, 0x2657 }, /* "bscr" */
+	{ 0x1D4B8, 0x2978 }, /* "cscr" */
+	{ 0x1D4B9, 0x2d41 }, /* "dscr" */
+	{ 0x1D4BB, 0x3199 }, /* "fscr" */
+	{ 0x1D4BD, 0x34e0 }, /* "hscr" */
+	{ 0x1D4BE, 0x3699 }, /* "iscr" */
+	{ 0x1D4BF, 0x3730 }, /* "jscr" */
+	{ 0x1D4C0, 0x379e }, /* "kscr" */
+	{ 0x1D4C1, 0x3d46 }, /* "lscr" */
+	{ 0x1D4C2, 0x3f92 }, /* "mscr" */
+	{ 0x1D4C3, 0x4441 }, /* "nscr" */
+	{ 0x1D4C5, 0x4b37 }, /* "pscr" */
+	{ 0x1D4C6, 0x4b7a }, /* "qscr" */
+	{ 0x1D4C7, 0x4fa5 }, /* "rscr" */
+	{ 0x1D4C8, 0x5391 }, /* "sscr" */
+	{ 0x1D4C9, 0x58bf }, /* "tscr" */
+	{ 0x1D4CA, 0x5abb }, /* "uscr" */
+	{ 0x1D4CB, 0x5cae }, /* "vscr" */
+	{ 0x1D4CC, 0x5d50 }, /* "wscr" */
+	{ 0x1D4CD, 0x5e07 }, /* "xscr" */
+	{ 0x1D4CE, 0x5e8b }, /* "yscr" */
+	{ 0x1D4CF, 0x5f03 }, /* "zscr" */
+	{ 0x1D504, 0x37 },   /* "Afr" */
+	{ 0x1D505, 0x109 },  /* "Bfr" */
+	{ 0x1D507, 0x372 },  /* "Dfr" */
+	{ 0x1D508, 0x6ad },  /* "Efr" */
+	{ 0x1D509, 0x790 },  /* "Ffr" */
+	{ 0x1D50A, 0x843 },  /* "Gfr" */
+	{ 0x1D50D, 0xa93 },  /* "Jfr" */
+	{ 0x1D50E, 0xaed },  /* "Kfr" */
+	{ 0x1D50F, 0xdad },  /* "Lfr" */
+	{ 0x1D510, 0xece },  /* "Mfr" */
+	{ 0x1D511, 0xfc0 },  /* "Nfr" */
+	{ 0x1D512, 0x1439 }, /* "Ofr" */
+	{ 0x1D513, 0x152d }, /* "Pfr" */
+	{ 0x1D514, 0x1609 }, /* "Qfr" */
+	{ 0x1D516, 0x192a }, /* "Sfr" */
+	{ 0x1D517, 0x1b40 }, /* "Tfr" */
+	{ 0x1D518, 0x1c33 }, /* "Ufr" */
+	{ 0x1D519, 0x1e46 }, /* "Vfr" */
+	{ 0x1D51A, 0x1e81 }, /* "Wfr" */
+	{ 0x1D51B, 0x1e9e }, /* "Xfr" */
+	{ 0x1D51C, 0x1ef4 }, /* "Yfr" */
+	{ 0x1D51E, 0x1fd2 }, /* "afr" */
+	{ 0x1D51F, 0x22cf }, /* "bfr" */
+	{ 0x1D520, 0x27b1 }, /* "cfr" */
+	{ 0x1D521, 0x2bb4 }, /* "dfr" */
+	{ 0x1D522, 0x2e29 }, /* "efr" */
+	{ 0x1D523, 0x306b }, /* "ffr" */
+	{ 0x1D524, 0x3270 }, /* "gfr" */
+	{ 0x1D525, 0x346e }, /* "hfr" */
+	{ 0x1D526, 0x3552 }, /* "ifr" */
+	{ 0x1D527, 0x3714 }, /* "jfr" */
+	{ 0x1D528, 0x3771 }, /* "kfr" */
+	{ 0x1D529, 0x3b1e }, /* "lfr" */
+	{ 0x1D52A, 0x3eeb }, /* "mfr" */
+	{ 0x1D52B, 0x418e }, /* "nfr" */
+	{ 0x1D52C, 0x4721 }, /* "ofr" */
+	{ 0x1D52D, 0x491a }, /* "pfr" */
+	{ 0x1D52E, 0x4b53 }, /* "qfr" */
+	{ 0x1D52F, 0x4de7 }, /* "rfr" */
+	{ 0x1D530, 0x5140 }, /* "sfr" */
+	{ 0x1D531, 0x56d7 }, /* "tfr" */
+	{ 0x1D532, 0x598c }, /* "ufr" */
+	{ 0x1D533, 0x5c69 }, /* "vfr" */
+	{ 0x1D534, 0x5d24 }, /* "wfr" */
+	{ 0x1D535, 0x5d80 }, /* "xfr" */
+	{ 0x1D536, 0x5e70 }, /* "yfr" */
+	{ 0x1D537, 0x5edc }, /* "zfr" */
+	{ 0x1D538, 0x6e },   /* "Aopf" */
+	{ 0x1D539, 0x112 },  /* "Bopf" */
+	{ 0x1D53B, 0x400 },  /* "Dopf" */
+	{ 0x1D53C, 0x70d },  /* "Eopf" */
+	{ 0x1D53D, 0x7c9 },  /* "Fopf" */
+	{ 0x1D53E, 0x853 },  /* "Gopf" */
+	{ 0x1D540, 0xa4c },  /* "Iopf" */
+	{ 0x1D541, 0xa9c },  /* "Jopf" */
+	{ 0x1D542, 0xaf6 },  /* "Kopf" */
+	{ 0x1D543, 0xe4e },  /* "Lopf" */
+	{ 0x1D544, 0xee5 },  /* "Mopf" */
+	{ 0x1D546, 0x146a }, /* "Oopf" */
+	{ 0x1D54A, 0x1997 }, /* "Sopf" */
+	{ 0x1D54B, 0x1bb8 }, /* "Topf" */
+	{ 0x1D54C, 0x1cb1 }, /* "Uopf" */
+	{ 0x1D54D, 0x1e4f }, /* "Vopf" */
+	{ 0x1D54E, 0x1e8a }, /* "Wopf" */
+	{ 0x1D54F, 0x1ead }, /* "Xopf" */
+	{ 0x1D550, 0x1efd }, /* "Yopf" */
+	{ 0x1D552, 0x212b }, /* "aopf" */
+	{ 0x1D553, 0x2453 }, /* "bopf" */
+	{ 0x1D554, 0x293b }, /* "copf" */
+	{ 0x1D555, 0x2c72 }, /* "dopf" */
+	{ 0x1D556, 0x2ee9 }, /* "eopf" */
+	{ 0x1D557, 0x30ab }, /* "fopf" */
+	{ 0x1D558, 0x32fc }, /* "gopf" */
+	{ 0x1D559, 0x34cb }, /* "hopf" */
+	{ 0x1D55A, 0x3672 }, /* "iopf" */
+	{ 0x1D55B, 0x3726 }, /* "jopf" */
+	{ 0x1D55C, 0x3794 }, /* "kopf" */
+	{ 0x1D55D, 0x3c99 }, /* "lopf" */
+	{ 0x1D55E, 0x3f81 }, /* "mopf" */
+	{ 0x1D55F, 0x42e6 }, /* "nopf" */
+	{ 0x1D560, 0x47c2 }, /* "oopf" */
+	{ 0x1D561, 0x4a04 }, /* "popf" */
+	{ 0x1D562, 0x4b65 }, /* "qopf" */
+	{ 0x1D563, 0x4f50 }, /* "ropf" */
+	{ 0x1D564, 0x52a8 }, /* "sopf" */
+	{ 0x1D565, 0x57c5 }, /* "topf" */
+	{ 0x1D566, 0x5a05 }, /* "uopf" */
+	{ 0x1D567, 0x5c90 }, /* "vopf" */
+	{ 0x1D568, 0x5d2d }, /* "wopf" */
+	{ 0x1D569, 0x5dd3 }, /* "xopf" */
+	{ 0x1D56A, 0x5e81 }, /* "yopf" */
+	{ 0x1D56B, 0x5ef9 }, /* "zopf" */
+};
+#endif /* CONFIG_XML_FANCY_ENCODE */
 /*[[[end]]]*/
 
 
@@ -1004,11 +2558,175 @@ NOTHROW_NCX(CC xml_entity_lookup_startswith_plus1)(char const *__restrict name,
 }
 
 
+#ifdef CONFIG_XML_FANCY_ENCODE
+PRIVATE ATTR_CONST WUNUSED xml_entity_t const *
+NOTHROW_NCX(CC xml_entity_bychr16)(char16_t ch) {
+	size_t lo, hi;
+	lo = 0;
+	hi = COMPILER_LENOF(xml_encode16_db);
+	while (lo < hi) {
+		size_t i;
+		char16_t ord;
+		i   = (lo + hi) / 2;
+		ord = xml_encode16_db[i].xe16_chr;
+		if (ch < ord) {
+			hi = i;
+		} else if (ch > ord) {
+			lo = i + 1;
+		} else {
+			/* Found it! */
+			return xml_entity_db + xml_encode16_db[i].xe16_offset;
+		}
+	}
+	return NULL;
+}
 
-//TODO:INTERN NONNULL((1, 2)) ssize_t FORMATPRINTER_CC
-//TODO:libiconv_xml_escape_encode(struct iconv_encode *__restrict self,
-//TODO:                           /*utf-8*/ char const *__restrict data, size_t size) {
-//TODO:}
+PRIVATE ATTR_CONST WUNUSED xml_entity_t const *
+NOTHROW_NCX(CC xml_entity_bychr32)(char32_t ch) {
+	size_t lo, hi;
+	lo = 0;
+	hi = COMPILER_LENOF(xml_encode32_db);
+	while (lo < hi) {
+		size_t i;
+		char32_t ord;
+		i   = (lo + hi) / 2;
+		ord = xml_encode32_db[i].xe32_chr;
+		if (ch < ord) {
+			hi = i;
+		} else if (ch > ord) {
+			lo = i + 1;
+		} else {
+			/* Found it! */
+			return xml_entity_db + xml_encode32_db[i].xe32_offset;
+		}
+	}
+	return NULL;
+}
+#endif /* CONFIG_XML_FANCY_ENCODE */
+
+
+
+/* Escape the given `ch' in XML */
+PRIVATE ATTR_RETNONNULL WUNUSED NONNULL((1)) char const *
+NOTHROW_NCX(CC xml_escape)(char *__restrict buf, char32_t ch) {
+	/* Check for special case: don't need to escape! */
+	if (ch >= 0x20 && ch <= 0x7e &&
+	    ch != '<' && ch != '>' && ch != '&' &&
+	    ch != '\'' && ch != '\"') {
+		buf[0] = (char)(unsigned char)ch;
+		buf[1] = '\0';
+		return buf;
+	}
+
+#ifdef CONFIG_XML_FANCY_ENCODE
+	/* If we have fancy encode escapes, then use actual strings! */
+	{
+		xml_entity_t const *ent;
+		ent = ch > 0xffff ? xml_entity_bychr32(ch)
+		                  : xml_entity_bychr16(ch);
+		if (ent != NULL)
+			return xml_entity_name(ent);
+	}
+#endif /* CONFIG_XML_FANCY_ENCODE */
+
+	/* Manually escape as either decimal or hex. */
+	if (ch <= 99999) {
+		/* Up until this point, using decimal encoding is shorter. */
+		sprintf(buf, "#%u", (unsigned int)ch);
+	} else {
+		/* From this point onwards, hex is shorter. */
+		sprintf(buf, "#x%" PRIX32, (uint32_t)ch);
+	}
+	return buf;
+}
+
+
+
+INTERN NONNULL((1, 2)) ssize_t FORMATPRINTER_CC
+libiconv_xml_escape_encode(struct iconv_encode *__restrict self,
+                           /*utf-8*/ char const *__restrict data, size_t size) {
+	char esc_buf[COMPILER_STRLEN("#xFFFFFFFF\0")];
+	char const *esc;
+	ssize_t temp, result = 0;
+	char const *end, *flush_start;
+	flush_start = data;
+	end         = data + size;
+	if unlikely(self->ice_flags & ICONV_HASERR)
+		goto err_ilseq;
+	if (!mbstate_isempty(&self->ice_data.ied_utf8))
+		goto parse_unicode;
+	while (data < end) {
+		unsigned char ch;
+		ch = (unsigned char)*data;
+		if (ch >= 0x80 && !(self->ice_flags & _ICONV_CENCODE_NOUNICD)) {
+			char32_t ch32;
+			size_t status;
+			DO_encode_output(flush_start, (size_t)(data - flush_start));
+parse_unicode:
+			status = unicode_c8toc32(&ch32, data, (size_t)(end - data),
+			                         &self->ice_data.ied_utf8);
+			if ((ssize_t)status < 0) {
+				if (status == (size_t)-1) {
+					ch = (unsigned char)*data;
+					if (IS_ICONV_ERR_ERROR_OR_ERRNO(self->ice_flags))
+						goto err_ilseq;
+					if (IS_ICONV_ERR_DISCARD(self->ice_flags)) {
+						mbstate_init(&self->ice_data.ied_utf8);
+						flush_start = data + 1;
+						goto next_data;
+					}
+					ch32 = ch;
+					if (!IS_ICONV_ERR_IGNORE(self->ice_flags))
+						ch32 = '?';
+					status = 1;
+				} else if (status == (size_t)-2) {
+					return result; /* Everything parsed! */
+				}
+			}
+			if unlikely(ch32 == 0)
+				goto err_ilseq; /* NUL cannot be encoded in XML */
+			data += status;
+			flush_start = data;
+			/* Output `ch32' in its escaped form. */
+			esc = xml_escape(esc_buf, ch32);
+do_print_esc:
+			DO_encode_output("&", 1);
+			DO_encode_output(esc, strlen(esc));
+			DO_encode_output(";", 1);
+		} else {
+			/* During encoding, we only allow printable ASCII and space.
+			 * All other characters we _always_ escape. That way, the xml
+			 * codec will encode data that is pure ASCII without relying
+			 * on unicode support during transmit!
+			 *
+			 * Additionally, we always encode <>&'" */
+			if (ch >= 0x20 && ch <= 0x7e &&
+			    ch != '<' && ch != '>' && ch != '&' &&
+			    ch != '\'' && ch != '\"') {
+				/* Can just output as-is! */
+			} else {
+				/* Must escape! */
+				if unlikely(ch == 0)
+					goto err_ilseq; /* NUL cannot be encoded in XML */
+				DO_encode_output(flush_start, (size_t)(data - flush_start));
+				flush_start = ++data;
+				esc = xml_escape(esc_buf, ch);
+				goto do_print_esc;
+			}
+next_data:
+			++data;
+		}
+	}
+	DO_encode_output(flush_start, (size_t)(end - flush_start));
+	return result;
+err:
+	return temp;
+err_ilseq:
+	self->ice_flags |= ICONV_HASERR;
+	if (IS_ICONV_ERR_ERRNO(self->ice_flags))
+		errno = EILSEQ;
+	return -(ssize_t)(size_t)(end - data);
+}
 
 
 INTERN NONNULL((1, 2)) ssize_t FORMATPRINTER_CC

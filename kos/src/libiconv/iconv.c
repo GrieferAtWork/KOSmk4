@@ -354,9 +354,9 @@ NOTHROW_NCX(CC libiconv_encode_init)(/*in|out*/ struct iconv_encode *__restrict 
 			self->ice_flags |= _ICONV_CENCODE_NOUNICD; /* Don't emit \u or \U and encode everything as \x */
 		break;
 
-//TODO:	case CODEC_XML_ESCAPE:
-//TODO:		input->ii_printer = (pformatprinter)&libiconv_xml_escape_encode;
-//TODO:		break;
+	case CODEC_XML_ESCAPE:
+		input->ii_printer = (pformatprinter)&libiconv_xml_escape_encode;
+		break;
 
 	default:
 		errno = EINVAL;
