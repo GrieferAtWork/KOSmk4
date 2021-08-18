@@ -2659,6 +2659,11 @@ struct codec_name_db_struct {
 	char db_X0201_2[20]; /* "cshalfwidthkatakana" */
 	char db_X0201_nul;
 
+	/* CODEC_XML_ESCAPE */
+	char db_XML_ESCAPE_0[11]; /* "xml-escape" */
+	char db_XML_ESCAPE_1[12]; /* "html-escape" */
+	char db_XML_ESCAPE_nul;
+
 	/* CODEC_X_MAC_ARMENIAN */
 	char db_X_MAC_ARMENIAN_0[15]; /* "x-mac-armenian" */
 	char db_X_MAC_ARMENIAN_nul;
@@ -5340,6 +5345,11 @@ PRIVATE struct codec_name_db_struct const codec_name_db = {
 	"cshalfwidthkatakana",
 	0,
 
+	/* CODEC_XML_ESCAPE */
+	"xml-escape",
+	"html-escape",
+	0,
+
 	/* CODEC_X_MAC_ARMENIAN */
 	"x-mac-armenian",
 	0,
@@ -6197,6 +6207,7 @@ PRIVATE struct codec_db_entry const codec_db[] = {
 	{ offsetof(struct codec_name_db_struct, db_HP_ROMAN9_3), /*               "hproman9"                      */ CODEC_HP_ROMAN9 },
 	{ offsetof(struct codec_name_db_struct, db_HP_THAI8_1), /*                "hpthai8"                       */ CODEC_HP_THAI8 },
 	{ offsetof(struct codec_name_db_struct, db_HP_TURKISH8_1), /*             "hpturkish8"                    */ CODEC_HP_TURKISH8 },
+	{ offsetof(struct codec_name_db_struct, db_XML_ESCAPE_1), /*              "html-escape"                   */ CODEC_XML_ESCAPE },
 	{ offsetof(struct codec_name_db_struct, db_ISO646_HU_3), /*               "hu"                            */ CODEC_ISO646_HU },
 	{ offsetof(struct codec_name_db_struct, db_ISO646_IT_6), /*               "i7dec"                         */ CODEC_ISO646_IT },
 	{ offsetof(struct codec_name_db_struct, db_CP1004_2), /*                  "ibm1004"                       */ CODEC_CP1004 },
@@ -7040,6 +7051,7 @@ PRIVATE struct codec_db_entry const codec_db[] = {
 	{ offsetof(struct codec_name_db_struct, db_CP874_6), /*                   "x-windows-874"                 */ CODEC_CP874 },
 	{ offsetof(struct codec_name_db_struct, db_X0201_1), /*                   "x201"                          */ CODEC_X0201 },
 	{ offsetof(struct codec_name_db_struct, db_ISO_IR_13_4), /*               "x201-7"                        */ CODEC_ISO_IR_13 },
+	{ offsetof(struct codec_name_db_struct, db_XML_ESCAPE_0), /*              "xml-escape"                    */ CODEC_XML_ESCAPE },
 	{ offsetof(struct codec_name_db_struct, db_ISO646_YU_4), /*               "yu"                            */ CODEC_ISO646_YU },
 };
 /*[[[end]]]*/

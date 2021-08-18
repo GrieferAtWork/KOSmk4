@@ -155,6 +155,12 @@ NOTHROW_NCX(CC libiconv_decode_init)(/*in|out*/ struct iconv_decode *__restrict 
 		}
 		break;
 
+	case CODEC_XML_ESCAPE:
+		input->ii_printer = (pformatprinter)&libiconv_xml_escape_decode;
+		mbstate_init(&self->icd_data.idd_xml.xe_utf8);
+		self->icd_data.idd_xml.xe_mode = _ICONV_DECODE_XML_TXT;
+		break;
+
 	default:
 		errno = EINVAL;
 		return -1;
@@ -220,6 +226,11 @@ NOTHROW_NCX(CC libiconv_decode_isshiftzero)(struct iconv_decode const *__restric
 		       ((self->icd_flags & _ICONV_CDECODE_STMASK) == _ICONV_CDECODE_ST_STRIN ||
 		        (self->icd_flags & _ICONV_CDECODE_STMASK) == _ICONV_CDECODE_ST_CHRIN ||
 		        (self->icd_flags & _ICONV_CDECODE_STMASK) == _ICONV_CDECODE_ST_ALLIN);
+
+	case CODEC_XML_ESCAPE:
+		/* Make sure that we're not inside of an XML escape sequence. */
+		return mbstate_isempty(&self->icd_data.idd_xml.xe_utf8) &&
+		       self->icd_data.idd_xml.xe_mode == _ICONV_DECODE_XML_TXT;
 
 	default:
 		break;
@@ -342,6 +353,10 @@ NOTHROW_NCX(CC libiconv_encode_init)(/*in|out*/ struct iconv_encode *__restrict 
 		    self->ice_codec == CODEC_C_ESCAPE_BYTES_STR || self->ice_codec == CODEC_C_ESCAPE_BYTES_INSTR)
 			self->ice_flags |= _ICONV_CENCODE_NOUNICD; /* Don't emit \u or \U and encode everything as \x */
 		break;
+
+//TODO:	case CODEC_XML_ESCAPE:
+//TODO:		input->ii_printer = (pformatprinter)&libiconv_xml_escape_encode;
+//TODO:		break;
 
 	default:
 		errno = EINVAL;

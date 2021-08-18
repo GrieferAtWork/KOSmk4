@@ -29,13 +29,45 @@ gcc_opt.append("-Os");
 #include "api.h"
 /**/
 
+#include <hybrid/overflow.h>
+
 #include <kos/types.h>
 
+#include <alloca.h>
+#include <ctype.h>
+#include <errno.h>
 #include <stddef.h>
 #include <string.h>
 #include <unicode.h>
 
+#include <libiconv/iconv.h>
+
+#include "convert.h"
+
 DECL_BEGIN
+
+#define IS_ICONV_ERR_ERRNO(flags)                     (((flags) & ICONV_ERRMASK) == ICONV_ERR_ERRNO)
+#define IS_ICONV_ERR_ERROR_OR_ERRNO(flags)            (((flags) & ICONV_ERRMASK) <= ICONV_ERR_ERROR)
+#define IS_ICONV_ERR_ERROR_OR_ERRNO_OR_DISCARD(flags) (((flags) & ICONV_ERRMASK) <= ICONV_ERR_DISCARD)
+#define IS_ICONV_ERR_DISCARD(flags)                   (((flags) & ICONV_ERRMASK) == ICONV_ERR_DISCARD)
+#define IS_ICONV_ERR_REPLACE(flags)                   (((flags) & ICONV_ERRMASK) == ICONV_ERR_REPLACE)
+#define IS_ICONV_ERR_IGNORE(flags)                    (((flags) & ICONV_ERRMASK) == ICONV_ERR_IGNORE)
+
+#define decode_output_printer self->icd_output.ii_printer
+#define decode_output_arg     self->icd_output.ii_arg
+#define decode_output(p, s)   (*decode_output_printer)(decode_output_arg, p, s)
+#define encode_output_printer self->ice_output.ii_printer
+#define encode_output_arg     self->ice_output.ii_arg
+#define encode_output(p, s)   (*encode_output_printer)(encode_output_arg, p, s)
+#define DO(expr)                         \
+	do {                                 \
+		if unlikely((temp = (expr)) < 0) \
+			goto err;                    \
+		result += temp;                  \
+	}	__WHILE0
+#define DO_encode_output(p, s) DO(encode_output(p, s))
+#define DO_decode_output(p, s) DO(decode_output(p, s))
+
 
 /*****************************************************************************
  *
@@ -46,7 +78,7 @@ DECL_BEGIN
  *        <name>   // Name, with the leading "&" removed and no trailing ";"
  *        0x00     // NUL
  *        <ord>    // Ordinal replacement, encoded as UTF-8. When parsed
- *                 // as unicode, this is a 1-character long string
+ *                 // as  unicode,  this  is a  1-character  long string
  *        0x00     // NUL
  *    } [Repeat for every entity, sorted by <name>]
  *    0x2E         // '.'
@@ -55,14 +87,14 @@ DECL_BEGIN
  *    0x2E         // '.'
  *    0x00         // NUL
  *
- * Even though entries are variable-length, it is possible to find the
+ * Even  though entries are variable-length, it is possible to find the
  * start/end of any entry if given the pointer to any part within. This
  * is because every entry consists of 2 C-strings, meaning that the end
  * of both strings can always be located (in the above graphic, that is
- * one of the 0x00 aka NUL fields). The two strings can then be told
- * apart from each other by the fact that <name> is always at least 2
+ * one of the 0x00 aka  NUL fields). The two  strings can then be  told
+ * apart from each other by the fact  that <name> is always at least  2
  * characters long, and <ord> is always exactly 1 character long. Thus,
- * it's also always possible to find the start of an entry (for this
+ * it's also always possible  to find the start  of an entry (for  this
  * purpose, said start is considered to be the beginning of <name>)
  *
  * Because the entire database is sorted lexicographically by <name>,
@@ -89,6 +121,7 @@ import xe = XML_ENTITIES from ".iconvdata.xml-entities";
 // to work, all keys must have a length of at least 2!
 local keys = xe.keys.sorted();
 assert (keys.each.length < ...) >= 2;
+local longestKeyLen = keys.each.length > ...;
 
 local fp = File.Writer();
 if (!xe[keys.first][1])
@@ -101,11 +134,13 @@ for (local key: keys) {
 }
 fp << "..\0.\0";
 fp = fp.string[:-1]; // Implicit trailing NUL isn't needed
+print("#define XML_ENTITY_MAXLEN ", longestKeyLen);
 print("PRIVATE char const xml_entity_db[", (#fp + 1).hex(), "] = \"\\");
 for (local line: fp.segments(32))
 	print(line.encode("c-escape"), "\\");
 print("\";");
 ]]]*/
+#define XML_ENTITY_MAXLEN 31
 PRIVATE char const xml_entity_db[0x5f23] = "\
 \1AElig\0\xC3\x86\0\1AMP\0&\0\1Aacute\0\xC3\x81\0Abre\
 ve\0\xC4\x82\0\1Acirc\0\xC3\x82\0Acy\0\xD0\x90\0Afr\0\xF0\x9D\x94\x84\0\
@@ -907,13 +942,12 @@ NOTHROW_NCX(CC xml_entity_fromptr)(char const *__restrict ptr) {
 }
 
 
-/* Lookup an XML entity from the database, given its name as it would
- * appear within escaped text. If not found, return NULL. Otherwise,
+/* Lookup an XML entity from the database, given its name as it  would
+ * appear within escaped text. If  not found, return NULL.  Otherwise,
  * return a pointer to the database entry which is associated with the
  * given name.
  * Upon success, you may use the `xml_entity_*' functions to
  * interact with the database entry. */
-ATTR_UNUSED /* TODO: Remove me! */
 PRIVATE ATTR_PURE WUNUSED NONNULL((1)) xml_entity_t const *
 NOTHROW_NCX(CC xml_entity_lookup)(char const *__restrict name, size_t namelen) {
 	size_t lo, hi;
@@ -937,12 +971,263 @@ NOTHROW_NCX(CC xml_entity_lookup)(char const *__restrict name, size_t namelen) {
 	return NULL;
 }
 
+PRIVATE ATTR_PURE WUNUSED NONNULL((1)) xml_entity_t const *
+NOTHROW_NCX(CC xml_entity_lookup_startswith)(char const *__restrict name, size_t namelen) {
+	size_t lo, hi;
+	lo = 1;
+	hi = sizeof(xml_entity_db) - 5;
+	while (lo < hi) {
+		xml_entity_t const *entry;
+		size_t i = (lo + hi) / 2;
+		int cmp;
+		entry = xml_entity_fromptr(xml_entity_db + i);
+		cmp   = memcmp(entry, name, namelen * sizeof(char));
+		if (cmp > 0) {
+			hi = i;
+		} else if (cmp < 0) {
+			lo = i + 1;
+		} else {
+			/* Found it! */
+			return entry;
+		}
+	}
+	return NULL;
+}
 
-/* TODO: XML encode/decode functions. ("xml-escape")
- * NOTE: The encode function probably won't make use of those fancy-schmancy
- *       entity table, but simply use &#<ORD>; encoding for special characters.
- * TODO: Also add "html-escape" as an alias for this codec! */
+PRIVATE ATTR_NOINLINE ATTR_PURE WUNUSED NONNULL((1)) xml_entity_t const *
+NOTHROW_NCX(CC xml_entity_lookup_startswith_plus1)(char const *__restrict name,
+                                                   size_t namelen, char next_ch) {
+	char *buf;
+	buf = (char *)alloca((namelen + 1) * sizeof(char));
+	*(char *)mempcpy(buf, name, namelen, sizeof(char)) = next_ch;
+	return xml_entity_lookup_startswith(buf, namelen + 1);
+}
 
+
+
+//TODO:INTERN NONNULL((1, 2)) ssize_t FORMATPRINTER_CC
+//TODO:libiconv_xml_escape_encode(struct iconv_encode *__restrict self,
+//TODO:                           /*utf-8*/ char const *__restrict data, size_t size) {
+//TODO:}
+
+
+INTERN NONNULL((1, 2)) ssize_t FORMATPRINTER_CC
+libiconv_xml_escape_decode(struct iconv_decode *__restrict self,
+                           /*utf-8*/ char const *__restrict data, size_t size) {
+	ssize_t temp, result = 0;
+	char const *ch_start;
+	char const *end, *flush_start;
+	flush_start = data;
+	end         = data + size;
+	if unlikely(self->icd_flags & ICONV_HASERR)
+		goto err_ilseq;
+	if (!mbstate_isempty(&self->icd_data.idd_xml.xe_utf8)) {
+		ch_start = data;
+		goto parse_unicode;
+	}
+	while (data < end) {
+		char32_t ch;
+		ch_start = data;
+		ch       = (char32_t)(unsigned char)*data;
+		if (ch >= 0x80) {
+			size_t status;
+parse_unicode:
+			status = unicode_c8toc32(&ch, data, (size_t)(end - data),
+			                         &self->icd_data.idd_xml.xe_utf8);
+			if ((ssize_t)status < 0) {
+				if (status == (size_t)-1) {
+					if (IS_ICONV_ERR_ERROR_OR_ERRNO(self->icd_flags))
+						goto err_ilseq;
+					if (IS_ICONV_ERR_DISCARD(self->icd_flags)) {
+						mbstate_init(&self->icd_data.idd_xml.xe_utf8);
+						if (self->icd_data.idd_xml.xe_mode == _ICONV_DECODE_XML_TXT) {
+							DO_decode_output(flush_start, (size_t)(end - flush_start));
+							flush_start = data + 1;
+						}
+						++data;
+						continue;
+					}
+					if (!IS_ICONV_ERR_IGNORE(self->icd_flags))
+						ch = '?';
+					status = 1;
+				} else if (status == (size_t)-2) {
+					goto done; /* Everything parsed! */
+				}
+			}
+			data += status;
+		} else {
+			++data;
+		}
+
+		/* Process `ch' */
+switch_on_state:
+		switch (__builtin_expect(self->icd_data.idd_xml.xe_mode, _ICONV_DECODE_XML_TXT)) {
+
+		case _ICONV_DECODE_XML_TXT:
+			if unlikely(ch == 0) {
+err_ilseq_ch_start:
+				/* XML doesn't allow NUL characters. _ever_ */
+				data = ch_start;
+				goto err_ilseq;
+			}
+			if (ch == '&') {
+				/* Enter escape mode. */
+				DO_decode_output(flush_start, (size_t)(ch_start - flush_start));
+				self->icd_data.idd_xml.xe_mode = _ICONV_DECODE_XML_AND;
+			}
+			break;
+
+		case _ICONV_DECODE_XML_AND:
+			if (ch == '#') {
+				self->icd_data.idd_xml.xe_mode = _ICONV_DECODE_XML_PND;
+			} else if (ch <= 0x7f) { /* Only ASCII allowed in entity names! */
+				xml_entity_t const *ent;
+				char firstchar[1];
+				/* Technically, we'd need to check that `isalnum(ch)', but if that's
+				 * not the case,  then `xml_entity_lookup_startswith()' will  return
+				 * NULL so it would be a redundant check! */
+				firstchar[0] = (char)(unsigned char)ch;
+				ent = xml_entity_lookup_startswith(firstchar, 1);
+				if unlikely(!ent)
+					goto err_ilseq_ch_start;
+				self->icd_data.idd_xml.xe_ent.e_str = ent;
+				self->icd_data.idd_xml.xe_ent.e_len = 1;
+				self->icd_data.idd_xml.xe_mode      = _ICONV_DECODE_XML_ENT;
+			} else {
+				/* Anything else isn't allowed after '&' */
+				goto err_ilseq_ch_start;
+			}
+			break;
+
+		case _ICONV_DECODE_XML_PND:
+			if (ch == 'x') { /* Only lowercase 'x' is allowed here! */
+				self->icd_data.idd_xml.xe_mode = _ICONV_DECODE_XML_HEX;
+				self->icd_data.idd_xml.xe_chr  = 0;
+			} else if (ch >= '0' && ch <= '9') {
+				self->icd_data.idd_xml.xe_mode = _ICONV_DECODE_XML_DEC;
+				self->icd_data.idd_xml.xe_chr  = ch - '0';
+			} else {
+				/* Anything else isn't allowed after '&#' */
+				goto err_ilseq_ch_start;
+			}
+			break;
+
+		case _ICONV_DECODE_XML_DEC:
+			if (ch == ';') {
+				char utf[UNICODE_UTF8_CURLEN];
+				size_t len;
+				/* Escape character sequence end. */
+output_escape_character:
+				if unlikely(self->icd_data.idd_xml.xe_chr == 0)
+					goto err_ilseq_ch_start; /* Nope: you're not even allowed to encode NUL here! */
+				len = (size_t)(unicode_writeutf8(utf, self->icd_data.idd_xml.xe_chr) - utf);
+				DO_decode_output(utf, len);
+				self->icd_data.idd_xml.xe_mode = _ICONV_DECODE_XML_TXT;
+				flush_start                    = data;
+				break;
+			} else if (ch >= '0' && ch <= '9') {
+				if (OVERFLOW_UMUL((uint32_t)self->icd_data.idd_xml.xe_chr, 10,
+				                  (uint32_t *)&self->icd_data.idd_xml.xe_chr))
+					goto err_ilseq_ch_start; /* Overflow */
+				if (OVERFLOW_UADD((uint32_t)self->icd_data.idd_xml.xe_chr,
+				                  (uint8_t)(ch - '0'),
+				                  (uint32_t *)&self->icd_data.idd_xml.xe_chr))
+					goto err_ilseq_ch_start; /* Overflow */
+			} else {
+				goto err_ilseq_ch_start;
+			}
+			break;
+
+		case _ICONV_DECODE_XML_HEX: {
+			uint8_t digit;
+			if (ch == ';') {
+				goto output_escape_character;
+			} else if (ch >= '0' && ch <= '9') {
+				digit = ch - '0';
+			} else if (ch >= 'A' && ch <= 'F') {
+				digit = 10 + ch - 'A';
+			} else if (ch >= 'a' && ch <= 'f') {
+				digit = 10 + ch - 'a';
+			} else {
+				goto err_ilseq_ch_start;
+			}
+			if (OVERFLOW_UMUL((uint32_t)self->icd_data.idd_xml.xe_chr, 16,
+			                  (uint32_t *)&self->icd_data.idd_xml.xe_chr))
+				goto err_ilseq_ch_start; /* Overflow */
+			if (OVERFLOW_UADD((uint32_t)self->icd_data.idd_xml.xe_chr, digit,
+			                  (uint32_t *)&self->icd_data.idd_xml.xe_chr))
+				goto err_ilseq_ch_start; /* Overflow */
+		}	break;
+
+		case _ICONV_DECODE_XML_ENT: {
+			if (ch == ';') {
+				xml_entity_t const *ent;
+				char const *utf;
+				/* End of sequence. Check that our entry also ends. */
+				ent = self->icd_data.idd_xml.xe_ent.e_str;
+				if (xml_entity_name(ent)[self->icd_data.idd_xml.xe_ent.e_len] != 0) {
+					/* If our entity doesn't end at the specified position, then there may
+					 * be another one that does. To handle this case, search the  database
+					 * once again but look for the exact string (instead of starts-with) */
+					ent = xml_entity_lookup(xml_entity_name(ent), self->icd_data.idd_xml.xe_ent.e_len);
+					if unlikely(!ent)
+						goto err_ilseq_ch_start;
+				}
+				/* Load the utf replacement for this entry. */
+				utf = xml_entity_utf8(ent);
+				/* Output the utf replacement. */
+				DO_decode_output(utf, strlen(utf));
+				self->icd_data.idd_xml.xe_mode = _ICONV_DECODE_XML_TXT;
+				flush_start                    = data;
+				break;
+			} else if (isalnum(ch) && ch <= 0x7f) {
+				/* Another character apart of the entity name. */
+				xml_entity_t const *ent;
+				ent = self->icd_data.idd_xml.xe_ent.e_str;
+				if (xml_entity_name(ent)[self->icd_data.idd_xml.xe_ent.e_len] != (char)(unsigned char)ch) {
+					ent = xml_entity_lookup_startswith_plus1(xml_entity_name(ent),
+					                                         self->icd_data.idd_xml.xe_ent.e_len,
+					                                         (char)(unsigned char)ch);
+					if unlikely(!ent)
+						goto check_maybe_semi_opt;
+					self->icd_data.idd_xml.xe_ent.e_str = ent;
+				}
+				++self->icd_data.idd_xml.xe_ent.e_len;
+			} else {
+				xml_entity_t const *ent;
+				/* If the trailing ';' of  the current entity is  optional,
+				 * and that entity was named fully, then all is still well! */
+check_maybe_semi_opt:
+				ent = self->icd_data.idd_xml.xe_ent.e_str;
+				if (xml_entity_name(ent)[self->icd_data.idd_xml.xe_ent.e_len] == 0 &&
+				    xml_entity_semiopt(ent)) {
+					char const *utf = xml_entity_utf8(ent);
+					/* All right: We _do_ have a completed sequence with optional (and missing) ';' */
+					DO_decode_output(utf, strlen(utf));
+					self->icd_data.idd_xml.xe_mode = _ICONV_DECODE_XML_TXT;
+					flush_start                    = ch_start; /* Include the already loaded next character. */
+					goto switch_on_state;
+				}
+				goto err_ilseq_ch_start; /* No sequence starts with this prefix. */
+			}
+		}	break;
+
+		default:
+			break;
+		}
+	}
+done:
+	if (self->icd_data.idd_xml.xe_mode == _ICONV_DECODE_XML_TXT)
+		DO_decode_output(flush_start, (size_t)(end - flush_start));
+	return result;
+err:
+	return temp;
+err_ilseq:
+	self->icd_flags |= ICONV_HASERR;
+	if (IS_ICONV_ERR_ERRNO(self->icd_flags))
+		errno = EILSEQ;
+	return -(ssize_t)(size_t)(end - data);
+}
 
 
 

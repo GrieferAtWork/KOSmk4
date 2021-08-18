@@ -62,6 +62,7 @@ enum {
 	CODEC_UTF32BE,              /* "utf32be", "utf-32be", "ucs-4be", "cp12001", "windows-12001", "csutf32be" */
 	CODEC_UTF32LE,              /* "utf32le", "utf-32le", "ucs-4le", "csutf32le" */
 	CODEC_UTF8,                 /* "utf8", "utf-8", "iso10646/utf8", "iso10646/utf-8", "iso-ir-193", "osf5010001", "cp65001", "windows-65001", "csutf8" */
+	CODEC_XML_ESCAPE,           /* "xml-escape", "html-escape" */
 
 	/* 8-bit codepage codecs */
 #define CODEC_CP_MIN CODEC_ADOBE_STANDARD_ENCODING

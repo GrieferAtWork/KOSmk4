@@ -322,6 +322,9 @@
 
 
 
+# Codec "xml-escape" for &lt;xml-style&gt; escaping (https://en.wikipedia.org/wiki/XML)
+@CODEC(CODEC_XML_ESCAPE: "xml-escape", "html-escape")
+
 ###################################################################################################
 
 

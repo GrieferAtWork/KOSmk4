@@ -89,6 +89,27 @@ union iconv_decode_data {
 		};
 	} idd_cesc; /* c-escape */
 
+	struct {
+		struct __mbstate xe_utf8; /* UTF-8 input multi-byte state */
+#define _ICONV_DECODE_XML_TXT 0 /* Basic text-mode */
+#define _ICONV_DECODE_XML_AND 1 /* Encountered & */
+#define _ICONV_DECODE_XML_PND 2 /* Encountered &# */
+#define _ICONV_DECODE_XML_DEC 3 /* Encountered &#<0-9> */
+#define _ICONV_DECODE_XML_HEX 4 /* Encountered &#x */
+#define _ICONV_DECODE_XML_ENT 5 /* Encountered &<alnum> */
+		uint8_t     xe_mode; /* Current state machine mode (one of `_ICONV_DECODE_XML_*') */
+		union {
+			char32_t xe_chr; /* _ICONV_DECODE_XML_DEC, _ICONV_DECODE_XML_HEX: Escaped character */
+			struct {
+				uint8_t     e_len; /* # of entity characters already written. */
+				char const *e_str; /* [0..xe_elen] Entity characters already written. This string points
+				                    * into the internal database of known xml entities and is updated
+				                    * every time yet another character is encountered. Internally, the
+				                    * actual type of this field should be `xml_entity_t const *' */
+			} xe_ent; /* _ICONV_DECODE_XML_ENT */
+		};
+	} idd_xml; /* xml-escape */
+
 	void *__idd_pad[_ICONV_DECODE_OPAQUE_POINTERS];
 };
 

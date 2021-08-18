@@ -296,6 +296,11 @@ DEFINE_TEST(iconv) {
 	}
 
 
+	/* Test the xml-escape codec. */
+	convert("xml-escape", "utf-8", ICONV_ERR_ERRNO, "&quot;&amp;&apos;&lt;&gt;", buf); /* Escaped */
+	assertf(strcmp(buf, "\"&\'<>") == 0, "buf = %q", buf);
+
+
 	dlclose(libiconv);
 }
 
