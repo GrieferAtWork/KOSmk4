@@ -305,6 +305,10 @@ DEFINE_TEST(iconv) {
 	assertf(strcmp(buf, "Foo&quot;&amp;&apos;&lt;&gt;Bar") == 0 ||
 	        strcmp(buf, "Foo&#34;&#38;&#39;&#60;&#62;Bar") == 0,
 	        "buf = %q", buf);
+	convert("xml-escape", "utf-8", ICONV_ERR_ERRNO, "A&nbspB", buf); /* The trailing ';' is optional for '&nbsp' */
+	assertf(strcmp(buf, "A\u00A0B") == 0, "buf = %q", buf);
+	convert("xml-escape", "utf-8", ICONV_ERR_ERRNO, "A&nbsp;B", buf);
+	assertf(strcmp(buf, "A\u00A0B") == 0, "buf = %q", buf);
 
 
 	/* Test the uri-escape codec. */
