@@ -41,7 +41,7 @@ enum {
 
 /*[[[deemon (printCodecEnums from .iconvdata.iconvdata)();]]]*/
 	/* Custom codecs */
-	CODEC_ASCII,                /* "ansi-x3.4-1968", "iso-ir-6", "ansi-x3.4-1986", "iso646.irv:1991", "ascii", "iso646-us", "us-ascii", "us", "ibm367", "cp367", "ansi-x3.4", "csascii", "osf10020", "cp20127", "windows-20127", "ibm891", "cp891", "csibm891", "osf1002037b", "ibm903", "cp903", "csibm903", "osf10020387" */
+	CODEC_ASCII,                /* "ansi-x3.4-1968", "iso-ir-6", "ansi-x3.4-1986", "iso646.irv:1991", "ascii", "iso646-us", "us-ascii", "us", "ibm367", "cp367", "ansi-x3.4", "csascii", "osf10020", "cp20127", "windows-20127", "ibm891", "cp891", "csibm891", "osf1002037b", "ibm903", "cp903", "csibm903", "osf10020387", "default", "646", "ascii7", "direct" */
 	CODEC_C_ESCAPE,             /* "c-escape" */
 	CODEC_C_ESCAPE_ALL,         /* "c-escape-all" */
 	CODEC_C_ESCAPE_BYTES,       /* "c-escape-bytes" */
@@ -60,51 +60,50 @@ enum {
 	CODEC_HEX_UPPER,            /* "hex-upper", "hex" */
 	CODEC_ISO_8859_1,           /* "iso8859-1:1987", "iso-ir-100", "iso8859-1", "latin1", "l1", "ibm819", "cp819", "iso88591", "csisolatin1", "cp28591", "windows-28591", "we8iso8859p1", "cp38591", "windows-38591", "iso8859-1-i", "8859-1", "osf10001" */
 	CODEC_URI_ESCAPE,           /* "uri-escape", "url-escape", "percent-encoding", "url-encoding" */
-	CODEC_UTF16BE,              /* "utf16be", "utf-16be", "ucs-2be", "unicodebig", "csutf16be" */
-	CODEC_UTF16LE,              /* "utf16le", "utf-16le", "ucs-2le", "unicodelittle", "csutf16le" */
-	CODEC_UTF32BE,              /* "utf32be", "utf-32be", "ucs-4be", "cp12001", "windows-12001", "csutf32be" */
-	CODEC_UTF32LE,              /* "utf32le", "utf-32le", "ucs-4le", "csutf32le" */
+	CODEC_UTF16BE,              /* "utf16be", "utf-16be", "ucs-2be", "unicodebig", "csutf16be", "x-unicodebig", "unicodebigunmarked", "x-utf-16be" */
+	CODEC_UTF16LE,              /* "utf16le", "utf-16le", "ucs-2le", "unicodelittle", "csutf16le", "x-unicodelittle", "x-utf-16le", "unicodelittleunmarked" */
+	CODEC_UTF32BE,              /* "utf32be", "utf-32be", "ucs-4be", "cp12001", "windows-12001", "csutf32be", "x-utf-32be" */
+	CODEC_UTF32LE,              /* "utf32le", "utf-32le", "ucs-4le", "csutf32le", "x-utf-32le" */
 	CODEC_UTF8,                 /* "utf8", "utf-8", "iso10646/utf8", "iso10646/utf-8", "iso-ir-193", "osf5010001", "cp65001", "windows-65001", "csutf8" */
 	CODEC_XML_ESCAPE,           /* "xml-escape", "html-escape" */
 
 	/* 8-bit codepage codecs */
 #define CODEC_CP_MIN CODEC_ADOBE_STANDARD_ENCODING
 	CODEC_ADOBE_STANDARD_ENCODING, /* "adobe-standard-encoding", "csadobestandardencoding" */
-	CODEC_ADOBE_SYMBOL_ENCODING,   /* "adobe-symbol-encoding", "cshppsmath" */
+	CODEC_ADOBE_SYMBOL_ENCODING,   /* "macsymbol", "adobe-symbol-encoding", "cshppsmath", "cp1038", "ibm1038", "x-mac-symbol" */
 	CODEC_ADOBE_ZAPF_DINGBATS,     /* "adobe-zapf-dingbats" */
 	CODEC_CP1006,                  /* "cp1006", "ibm1006", "iso8-bit-urdu" */
 	CODEC_CP1008,                  /* "cp1008", "ibm1008", "csibm1008", "cp5104", "ibm5104" */
 	CODEC_CP1025,                  /* "cp1025", "ibm1025", "csibm1025" */
 	CODEC_CP1026,                  /* "ibm1026", "cp1026", "csibm1026", "1026", "osf10020402" */
-	CODEC_CP1038,                  /* "cp1038", "ibm1038", "x-mac-symbol" */
 	CODEC_CP1040,                  /* "cp1040" */
-	CODEC_CP1041,                  /* "cp1041" */
+	CODEC_CP1041,                  /* "ibm1041", "cp1041" */
 	CODEC_CP1042,                  /* "cp1042" */
-	CODEC_CP1043,                  /* "cp1043" */
+	CODEC_CP1043,                  /* "ibm1043", "cp1043" */
 	CODEC_CP1046,                  /* "cp1046", "1046", "ibm1046" */
 	CODEC_CP1047,                  /* "cp1047", "ibm1047", "1047", "osf10020417", "csibm1047" */
 	CODEC_CP1057,                  /* "cp1057", "hp-pc-8" */
-	CODEC_CP1088,                  /* "cp1088" */
+	CODEC_CP1088,                  /* "ibm1088", "cp1088" */
 	CODEC_CP1097,                  /* "cp1097", "ibm1097", "csibm1097" */
 	CODEC_CP1098,                  /* "cp1098", "ibm1098" */
 	CODEC_CP1112,                  /* "cp1112", "ibm1112", "csibm1112" */
-	CODEC_CP1114,                  /* "cp1114" */
-	CODEC_CP1115,                  /* "cp1115" */
+	CODEC_CP1114,                  /* "ibm1114", "cp1114" */
+	CODEC_CP1115,                  /* "ibm1115", "cp1115" */
 	CODEC_CP1122,                  /* "cp1122", "ibm1122", "csibm1122" */
 	CODEC_CP1123,                  /* "cp1123", "ibm1123", "csibm1123" */
 	CODEC_CP1127,                  /* "cp1127" */
 	CODEC_CP1130,                  /* "cp1130", "ibm1130", "csibm1130" */
 	CODEC_CP1137,                  /* "cp1137", "ibm1137", "csibm1137" */
-	CODEC_CP1140,                  /* "cp1140", "ibm1140", "csibm1140", "ccsid1140", "ebcdic-us-37+euro" */
-	CODEC_CP1141,                  /* "cp1141", "ibm1141", "csibm1141", "ccsid1141", "ebcdic-de-273+euro" */
-	CODEC_CP1142,                  /* "cp1142", "ibm1142", "csibm1142", "ccsid1142", "ebcdic-dk-277+euro", "ebcdic-no-277+euro" */
-	CODEC_CP1143,                  /* "cp1143", "ibm1143", "csibm1143", "ccsid1143", "ebcdic-fi-278+euro", "ebcdic-se-278+euro" */
-	CODEC_CP1144,                  /* "cp1144", "ibm1144", "csibm1144", "ccsid1144", "ebcdic-it-280+euro" */
-	CODEC_CP1145,                  /* "cp1145", "ibm1145", "csibm1145", "ccsid1145", "ebcdic-es-284+euro" */
-	CODEC_CP1146,                  /* "cp1146", "ibm1146", "csibm1146", "ccsid1146", "ebcdic-gb-285+euro" */
-	CODEC_CP1147,                  /* "cp1147", "ibm1147", "csibm1147", "ccsid1147", "ebcdic-fr-297+euro" */
-	CODEC_CP1148,                  /* "cp1148", "ibm1148", "csibm1148", "ccsid1148", "ebcdic-international-500+euro" */
-	CODEC_CP1149,                  /* "cp1149", "ibm1149", "csibm1149", "ccsid1149", "ebcdic-is-871+euro" */
+	CODEC_CP1140,                  /* "cp1140", "ibm1140", "1140", "csibm1140", "ccsid1140", "ebcdic-us-37+euro" */
+	CODEC_CP1141,                  /* "cp1141", "ibm1141", "1141", "csibm1141", "ccsid1141", "ebcdic-de-273+euro" */
+	CODEC_CP1142,                  /* "cp1142", "ibm1142", "1142", "csibm1142", "ccsid1142", "ebcdic-dk-277+euro", "ebcdic-no-277+euro" */
+	CODEC_CP1143,                  /* "cp1143", "ibm1143", "1143", "csibm1143", "ccsid1143", "ebcdic-fi-278+euro", "ebcdic-se-278+euro" */
+	CODEC_CP1144,                  /* "cp1144", "ibm1144", "1144", "csibm1144", "ccsid1144", "ebcdic-it-280+euro" */
+	CODEC_CP1145,                  /* "cp1145", "ibm1145", "1145", "csibm1145", "ccsid1145", "ebcdic-es-284+euro" */
+	CODEC_CP1146,                  /* "cp1146", "ibm1146", "1146", "csibm1146", "ccsid1146", "ebcdic-gb-285+euro" */
+	CODEC_CP1147,                  /* "cp1147", "ibm1147", "1147", "csibm1147", "ccsid1147", "ebcdic-fr-297+euro" */
+	CODEC_CP1148,                  /* "cp1148", "ibm1148", "1148", "csibm1148", "ccsid1148", "ebcdic-international-500+euro" */
+	CODEC_CP1149,                  /* "cp1149", "ibm1149", "1149", "csibm1149", "ccsid1149", "ebcdic-is-871+euro" */
 	CODEC_CP1153,                  /* "cp1153", "ibm1153", "csibm1153" */
 	CODEC_CP1154,                  /* "cp1154", "ibm1154", "csibm1154" */
 	CODEC_CP1155,                  /* "cp1155", "ibm1155", "csibm1155" */
@@ -144,16 +143,16 @@ enum {
 	CODEC_CP871,                   /* "ibm871", "cp871", "ebcdic-cp-is", "csibm871", "osf10020367" */
 	CODEC_CP875,                   /* "cp875", "ibm875", "ebcdic-greek", "osf1002036b" */
 	CODEC_CP880,                   /* "ibm880", "cp880", "ebcdic-cyrillic", "csibm880", "osf10020370" */
-	CODEC_CP897,                   /* "cp897" */
+	CODEC_CP897,                   /* "ibm897", "cp897" */
 	CODEC_CP9030,                  /* "cp9030", "ibm9030", "csibm9030" */
 	CODEC_CP905,                   /* "ibm905", "cp905", "ebcdic-cp-tr", "csibm905" */
 	CODEC_CP9066,                  /* "cp9066", "ibm9066", "csibm9066" */
-	CODEC_CP918,                   /* "ibm918", "cp918", "ebcdic-cp-ar2", "csibm918", "osf10020396" */
+	CODEC_CP918,                   /* "ibm918", "cp918", "918", "ebcdic-cp-ar2", "csibm918", "osf10020396" */
 	CODEC_DIN_66303,               /* "din-66303", "drv8" */
 	CODEC_EBCDIC_AT_DE,            /* "ebcdic-at-de", "csibmebcdicatde", "csebcdicatde", "ebcdicatde" */
 	CODEC_EBCDIC_AT_DE_A,          /* "ebcdic-at-de-a", "csebcdicatdea", "ebcdicatdea" */
 	CODEC_EBCDIC_CA_FR,            /* "ebcdic-ca-fr", "csebcdiccafr", "ebcdiccafr" */
-	CODEC_EBCDIC_CP_DK_NO,         /* "ibm277", "ebcdic-cp-dk", "ebcdic-cp-no", "csibm277", "osf10020115" */
+	CODEC_EBCDIC_CP_DK_NO,         /* "ibm277", "cp277", "ebcdic-cp-dk", "ebcdic-cp-no", "csibm277", "osf10020115" */
 	CODEC_EBCDIC_DK_NO,            /* "ebcdic-dk-no", "csebcdicdkno", "ebcdicdkno" */
 	CODEC_EBCDIC_DK_NO_A,          /* "ebcdic-dk-no-a", "csebcdicdknoa", "ebcdicdknoa" */
 	CODEC_EBCDIC_ES,               /* "ebcdic-es", "csebcdices", "ebcdices" */
@@ -179,7 +178,7 @@ enum {
 	CODEC_OSD_EBCDIC_DF04_15,      /* "osd-ebcdic-df4-15", "csosdebcdicdf415" */
 	CODEC_VENTURA_INTERNATIONAL,   /* "ventura-international", "ventura-int", "csventurainternational" */
 	CODEC_VENTURA_US,              /* "ventura-us", "csventuraus" */
-	CODEC_X0201,                   /* "jis-x201", "x201", "cshalfwidthkatakana" */
+	CODEC_X0201,                   /* "jis-x201", "x201", "cshalfwidthkatakana", "jis201" */
 #define CODEC_CP_MAX CODEC_X0201
 
 	/* 7l codepage codecs */
@@ -231,9 +230,9 @@ enum {
 	CODEC_AMIGA_1251,             /* "amiga-1251", "ami1251", "amiga1251", "ami-1251", "csamiga1251" */
 	CODEC_ATARIST,                /* "atarist" */
 	CODEC_CP10004,                /* "cp10004", "windows-10004", "x-mac-arabic", "macarabic" */
-	CODEC_CP10006,                /* "cp10006", "windows-10006", "x-mac-greek", "cp10006-macgreek" */
-	CODEC_CP10007,                /* "cp10007", "windows-10007", "cp1283", "ibm1283", "ms-mac-cyrillic", "msmaccyrillic", "cp10007-maccyrillic" */
-	CODEC_CP10017,                /* "cp10017", "windows-10017", "x-mac-ukrainian", "macuk", "mac-uk", "macukrainian", "mac-cyrillic", "maccyrillic" */
+	CODEC_CP10006,                /* "cp10006", "windows-10006", "x-mac-greek", "cp10006-macgreek", "macgreek", "ibm1280" */
+	CODEC_CP10007,                /* "cp10007", "windows-10007", "cp1283", "ibm1283", "ms-mac-cyrillic", "msmaccyrillic", "cp10007-maccyrillic", "mac-cyrillic", "maccyrillic" */
+	CODEC_CP10017,                /* "cp10017", "windows-10017", "x-mac-ukrainian", "macuk", "mac-uk", "macukrainian" */
 	CODEC_CP1004,                 /* "cp1004", "windows-extended", "ibm1004", "os2latin1" */
 	CODEC_CP1036,                 /* "cp1036", "ibm1036", "t.61", "t.618bit", "t.61-8bit", "cp20261", "windows-20261", "iso-ir-103", "csiso103t618bit" */
 	CODEC_CP1100,                 /* "dec-mcs", "dec", "cp1100", "ibm1100", "we8dec", "csdecmcs", "decmcs" */
@@ -241,29 +240,28 @@ enum {
 	CODEC_CP1117,                 /* "cp1117", "ibm1117" */
 	CODEC_CP1124,                 /* "cp1124", "ibm1124", "csibm1124" */
 	CODEC_CP1125,                 /* "cp1125", "rst-2018-91", "cp866u", "ruscii", "ibm848" */
-	CODEC_CP1129,                 /* "cp1129", "ibm1129", "csibm1129" */
 	CODEC_CP1131,                 /* "cp1131", "ibm1131" */
 	CODEC_CP1132,                 /* "cp1132", "ibm1132", "csibm1132" */
 	CODEC_CP1133,                 /* "cp1133", "ibm1133", "csibm1133" */
 	CODEC_CP1161,                 /* "cp1161", "ibm1161", "csibm1161" */
 	CODEC_CP1162,                 /* "cp1162", "ibm1162", "csibm11621162" */
 	CODEC_CP1163,                 /* "cp1163", "ibm1163", "csibm1163" */
-	CODEC_CP1250,                 /* "cp1250", "windows-1250", "cswindows1250", "ms-ee" */
-	CODEC_CP1251,                 /* "cp1251", "windows-1251", "cswindows1251", "ms-cyrl" */
-	CODEC_CP1252,                 /* "cp1252", "windows-1252", "cswindows1252", "ms-ansi" */
-	CODEC_CP1253,                 /* "cp1253", "windows-1253", "cswindows1253", "ms-greek" */
-	CODEC_CP1254,                 /* "cp1254", "windows-1254", "cswindows1254", "ms-turk" */
-	CODEC_CP1255,                 /* "cp1255", "windows-1255", "cswindows1255", "ms-hebr" */
-	CODEC_CP1256,                 /* "cp1256", "windows-1256", "cswindows1256", "ms-arab", "cp9448", "ibm9448", "csibm9448" */
-	CODEC_CP1257,                 /* "cp1257", "windows-1257", "lst-1590-3", "cswindows1257", "winbaltrim" */
-	CODEC_CP1258,                 /* "cp1258", "windows-1258", "cswindows1258" */
+	CODEC_CP1250,                 /* "cp1250", "ibm1250", "windows-1250", "cswindows1250", "ms-ee" */
+	CODEC_CP1251,                 /* "cp1251", "ibm1251", "windows-1251", "cswindows1251", "ms-cyrl" */
+	CODEC_CP1252,                 /* "cp1252", "ibm1252", "windows-1252", "cswindows1252", "ms-ansi" */
+	CODEC_CP1253,                 /* "cp1253", "ibm1253", "windows-1253", "cswindows1253", "ms-greek" */
+	CODEC_CP1254,                 /* "cp1254", "ibm1254", "windows-1254", "cswindows1254", "ms-turk" */
+	CODEC_CP1255,                 /* "cp1255", "ibm1255", "windows-1255", "cswindows1255", "ms-hebr" */
+	CODEC_CP1256,                 /* "cp1256", "ibm1256", "windows-1256", "cswindows1256", "ms-arab", "cp9448", "ibm9448", "csibm9448" */
+	CODEC_CP1257,                 /* "cp1257", "ibm1257", "windows-1257", "lst-1590-3", "cswindows1257", "winbaltrim" */
+	CODEC_CP1258,                 /* "cp1258", "ibm1258", "windows-1258", "cswindows1258", "cp1129", "ibm1129", "csibm1129" */
 	CODEC_CP1270,                 /* "cp1270", "windows-1270", "ws2", "winsami2", "win-sami-2" */
 	CODEC_CP1275,                 /* "macintosh", "mac", "csmacintosh", "cp1275", "ibm1275", "cp10000", "windows-10000", "x-mac-roman", "macroman", "cp10000-macroman" */
-	CODEC_CP1281,                 /* "cp1281", "ibm1281", "cp10081", "windows-10081", "x-mac-turkish", "cp10081-macturkish" */
-	CODEC_CP1282,                 /* "cp1282", "ibm1282", "cp10029", "windows-10029", "x-mac-ce", "mac-centraleurope", "cp10029-maclatin2" */
-	CODEC_CP1284,                 /* "cp1284", "ibm1284", "cp10082", "windows-10082", "x-mac-croatian" */
-	CODEC_CP1285,                 /* "cp1285", "ibm1285", "cp10010", "windows-10010", "x-mac-romanian" */
-	CODEC_CP1286,                 /* "cp1286", "ibm1286", "cp10079", "windows-10079", "x-mac-icelandic", "cp10079-macicelandic" */
+	CODEC_CP1281,                 /* "macturkish", "cp1281", "ibm1281", "cp10081", "windows-10081", "x-mac-turkish", "cp10081-macturkish" */
+	CODEC_CP1282,                 /* "maccentraleurope", "cp1282", "ibm1282", "cp10029", "windows-10029", "x-mac-ce", "mac-centraleurope", "cp10029-maclatin2" */
+	CODEC_CP1284,                 /* "maccroatian", "cp1284", "ibm1284", "cp10082", "windows-10082", "x-mac-croatian" */
+	CODEC_CP1285,                 /* "macromania", "cp1285", "ibm1285", "cp10010", "windows-10010", "x-mac-romanian" */
+	CODEC_CP1286,                 /* "maciceland", "cp1286", "ibm1286", "cp10079", "windows-10079", "x-mac-icelandic", "cp10079-macicelandic" */
 	CODEC_CP1287,                 /* "cp1287", "dec-greek-(8-bit)", "dec-greek-8-bit", "dec-greek-8", "dec-greek", "el8dec" */
 	CODEC_CP1288,                 /* "cp1288", "dec-turkish-(8-bit)", "dec-turkish-8-bit", "dec-turkish-8", "dec-turkish", "tr8dec" */
 	CODEC_CP20269,                /* "cp20269", "t.51", "iso6937", "iso-ir-156", "iso6937:1992" */
@@ -282,7 +280,7 @@ enum {
 	CODEC_CP774,                  /* "cp774", "cp1118", "ibm1118", "lst-1283" */
 	CODEC_CP775,                  /* "cp775", "ibm775", "oem775", "cspc775baltic" */
 	CODEC_CP806,                  /* "cp806", "ibm806" */
-	CODEC_CP808,                  /* "cp808" */
+	CODEC_CP808,                  /* "ibm808", "cp808" */
 	CODEC_CP848,                  /* "cp848" */
 	CODEC_CP849,                  /* "cp849" */
 	CODEC_CP850,                  /* "ibm850", "cp850", "850", "cspc850multilingual", "oem850", "osf10020352" */
@@ -301,14 +299,14 @@ enum {
 	CODEC_CP865,                  /* "ibm865", "cp865", "865", "oem865", "csibm865" */
 	CODEC_CP866,                  /* "cp866", "866", "ibm866", "csibm866" */
 	CODEC_CP866NAV,               /* "cp866nav", "866nav", "ibm866nav" */
-	CODEC_CP867,                  /* "cp867" */
+	CODEC_CP867,                  /* "ibm867", "cp867" */
 	CODEC_CP868,                  /* "ibm868", "cp868", "cp-ar", "csibm868", "osf10020364" */
 	CODEC_CP869,                  /* "ibm869", "cp869", "869", "cp-gr", "oem869", "csibm869", "osf10020365" */
 	CODEC_CP872,                  /* "cp872" */
 	CODEC_CP874,                  /* "cp874", "ibm874", "x-ibm874", "874", "windows-874", "ms874", "x-windows-874", "cswindows874" */
 	CODEC_CP901,                  /* "cp901", "ibm901", "csibm901", "iso-ir-206" */
 	CODEC_CP902,                  /* "cp902", "ibm902", "csibm902" */
-	CODEC_CP921,                  /* "cp921", "ibm921", "csibm921", "iso8859-13", "iso885913", "iso-ir-179", "csisolatin7", "latin7", "l7", "baltic", "cp28603", "windows-28603", "csiso885913" */
+	CODEC_CP921,                  /* "cp921", "ibm921", "csibm921", "8859-13", "iso8859-13", "iso885913", "iso-ir-179", "csisolatin7", "latin7", "l7", "baltic", "cp28603", "windows-28603", "csiso885913" */
 	CODEC_CP922,                  /* "cp922", "ibm922", "csibm922", "estonia-iso-8" */
 	CODEC_CWI,                    /* "cwi", "cwi-2", "cp-hu" */
 	CODEC_EXTENDED_LATIN_8,       /* "extended-latin-8" */
@@ -322,11 +320,11 @@ enum {
 	CODEC_ISIRI3342,              /* "isiri3342", "isiri-3342" */
 	CODEC_ISO6438,                /* "iso6438" */
 	CODEC_ISO_6937_2,             /* "iso6937-2", "iso69372", "iso6937-2:1983", "iso-ir-90", "csiso90" */
-	CODEC_ISO_8859_10,            /* "latin6", "iso-ir-157", "l6", "iso8859-10", "iso8859-10:1992", "iso885910", "csisolatin6", "ibm919", "cp919", "cp28600", "windows-28600", "osf1000a" */
-	CODEC_ISO_8859_11,            /* "iso8859-11", "iso885911", "cp28601", "windows-28601", "iso-ir-166", "tis-620", "cstis620", "tis620", "tis620-0", "tis620.2529-1", "tis620.2533-0" */
-	CODEC_ISO_8859_14,            /* "iso8859-14", "iso8859-14:1998", "iso885914", "iso-ir-199", "iso-celtic", "latin8", "l8", "cp28604", "windows-28604", "csiso885914" */
-	CODEC_ISO_8859_15,            /* "iso8859-15", "iso8859-15:1998", "iso885915", "iso-ir-203", "latin9", "latin0", "ibm923", "cp923", "cp28605", "windows-28605", "csiso885915" */
-	CODEC_ISO_8859_16,            /* "iso8859-16", "iso8859-16:2001", "iso885916", "iso-ir-226", "latin10", "l10", "sr-14111", "cp28606", "windows-28606", "csiso885916" */
+	CODEC_ISO_8859_10,            /* "latin6", "iso-ir-157", "l6", "8859-10", "iso8859-10", "iso8859-10:1992", "iso885910", "csisolatin6", "ibm919", "cp919", "cp28600", "windows-28600", "osf1000a" */
+	CODEC_ISO_8859_11,            /* "iso8859-11", "iso885911", "cp28601", "windows-28601", "iso-ir-166", "tis-620", "cstis620", "tis620", "tis620-0", "tis620.2529-1", "tis620.2533-0", "x-iso-8859-11", "tis620.2533" */
+	CODEC_ISO_8859_14,            /* "iso8859-14", "iso8859-14:1998", "iso885914", "iso-ir-199", "iso-celtic", "latin8", "l8", "cp28604", "windows-28604", "csiso885914", "8859-14", "isoceltic" */
+	CODEC_ISO_8859_15,            /* "iso8859-15", "iso8859-15:1998", "iso885915", "iso-ir-203", "latin9", "latin0", "ibm923", "cp923", "cp28605", "windows-28605", "csiso885915", "l9", "csisolatin9", "iso8859-15-fdis" */
+	CODEC_ISO_8859_16,            /* "iso8859-16", "iso8859-16:2001", "iso885916", "iso-ir-226", "latin10", "l10", "sr-14111", "cp28606", "windows-28606", "csiso885916", "8859-16" */
 	CODEC_ISO_8859_2,             /* "iso8859-2:1987", "iso-ir-101", "iso8859-2", "latin2", "l2", "iso88592", "csisolatin2", "ibm1111", "cp1111", "cp28592", "windows-28592", "8859-2", "osf10002", "cp912", "ibm912" */
 	CODEC_ISO_8859_3,             /* "iso8859-3:1988", "iso-ir-109", "iso8859-3", "latin3", "l3", "iso88593", "csisolatin3", "ibm913", "cp913", "cp28593", "windows-28593", "8859-3", "osf10003" */
 	CODEC_ISO_8859_4,             /* "iso8859-4:1988", "iso-ir-110", "iso8859-4", "latin4", "l4", "iso88594", "csisolatin4", "ibm914", "cp914", "cp28594", "windows-28594", "8859-4", "osf10004" */
@@ -348,13 +346,12 @@ enum {
 	CODEC_ISO_IR_201,             /* "iso-ir-201" */
 	CODEC_ISO_IR_209,             /* "iso-ir-209" */
 	CODEC_KEYBCS2,                /* "nec-867", "dos-895", "keybcs2", "kamenicky" */
-	CODEC_KOI8,                   /* "koi8" */
 	CODEC_KOI8_B,                 /* "koi8-b" */
 	CODEC_KOI8_E,                 /* "ecma-cyrillic", "ecmacyrillic", "iso-ir-111", "ecma-113", "koi8-e", "csiso111ecmacyrillic" */
 	CODEC_KOI8_F,                 /* "koi8-f", "koi8-unified" */
 	CODEC_KOI8_N1,                /* "koi8-n1" */
 	CODEC_KOI8_N2,                /* "koi8-n2" */
-	CODEC_KOI8_R,                 /* "koi8-r", "cp20866", "cp878", "ibm878", "cskoi8r" */
+	CODEC_KOI8_R,                 /* "koi8-r", "cp20866", "cp878", "ibm878", "cskoi8r", "koi8" */
 	CODEC_KOI8_RU,                /* "koi8-ru", "cp1167", "ibm1167", "csibm1167" */
 	CODEC_KOI8_T,                 /* "koi8-t" */
 	CODEC_KOI8_U,                 /* "koi8-u", "koi8u", "cp21866", "cp1168", "ibm1168", "cskoi8u" */
@@ -367,7 +364,7 @@ enum {
 	CODEC_MIK,                    /* "mik", "bulgaria-pc" */
 	CODEC_NEXTSTEP,               /* "nextstep" */
 	CODEC_PALMOS,                 /* "palmos" */
-	CODEC_PT154,                  /* "ptcp154", "csptcp154", "pt154", "cp154", "cyrillic-asian" */
+	CODEC_PT154,                  /* "ptcp154", "csptcp154", "pt154", "cp154", "cyrillic-asian", "ibm1169" */
 	CODEC_X_MAC_ARMENIAN,         /* "x-mac-armenian" */
 	CODEC_X_MAC_BARENTS_CYRILLIC, /* "x-mac-barents-cyrillic" */
 	CODEC_X_MAC_CELTIC,           /* "x-mac-celtic" */

@@ -41,6 +41,8 @@
 #  - https://en.wikipedia.org/wiki/Category:Windows_code_pages
 #  - https://en.wikipedia.org/wiki/ISO/IEC_646
 #  - https://ftp.unicode.org/Public/MAPPINGS/
+#  - https://www.iana.org/assignments/character-sets/character-sets.xhtml
+#  - https://www.ibm.com/docs/en/ibm-mq/8.0?topic=administering-available-code-pages  (WARNING: Contains errors!)
 #  - GLibc
 ###################################################################################################
 
@@ -59,64 +61,63 @@
 # TODO:
 #  - https://en.wikipedia.org/wiki/UTF-1                              "ISO-10646-UTF-1", "csISO10646UTF1"
 #  - https://en.wikipedia.org/wiki/Shift_JIS                          "shift-jis", "sjis", "ms_kanji", "csShiftJis"
-#  - https://en.wikipedia.org/wiki/Code_page_932_(Microsoft_Windows)  "windows-31j", "cp932", "ms932", "sjis-open", "sjis-win", "csWindows31J"
+#  - https://en.wikipedia.org/wiki/Code_page_932_(Microsoft_Windows)  "windows-31j", "cp932", "IBM932", "ms932", "sjis-open", "sjis-win", "csWindows31J", "windows-932"  (https://www.iana.org/assignments/character-sets/character-sets.xhtml)
 #  - https://en.wikipedia.org/wiki/KOI-7                              "KOI7", "KOI7-switched", "csKOI7switched"
 #  - https://en.wikipedia.org/wiki/Code_page_776                      "cp776"
 #  - https://en.wikipedia.org/wiki/Code_page_777                      "cp777"
 #  - https://en.wikipedia.org/wiki/Code_page_778                      "cp778", "LST-1590-2"
 #  - https://en.wikipedia.org/wiki/CSX%2B_Indic_character_set         "CSX+Indic"
 #  - https://en.wikipedia.org/wiki/Code_page_907                      "cp907", "IBM907"
-#  - glibc-2.32/iconvdata/ibm930.c                                    "IBM930", "cp930", "csIBM930"  (https://en.wikipedia.org/wiki/Japanese_language_in_EBCDIC)
+#  - glibc-2.32/iconvdata/ibm930.c                                    "IBM930", "cp930", "csIBM930", "x-IBM930", "930"  (https://en.wikipedia.org/wiki/Japanese_language_in_EBCDIC)
 #  - glibc-2.32/iconvdata/ibm932.c                                    "IBM932", "csIBM932"  (https://en.wikipedia.org/wiki/Code_page_932_(IBM))
 #  - glibc-2.32/iconvdata/ibm933.c                                    "IBM933", "cp933", "csIBM933"  (https://en.wikipedia.org/wiki/KS_X_1001#Johab_encoding)
 #  - glibc-2.32/iconvdata/ibm935.c                                    "IBM935", "cp935", "csIBM935"
 #  - glibc-2.32/iconvdata/ibm937.c                                    "IBM937", "cp937", "csIBM937"
-#  - glibc-2.32/iconvdata/ibm939.c                                    "IBM939", "cp939", "csIBM939"  (https://en.wikipedia.org/wiki/Japanese_language_in_EBCDIC)
+#  - glibc-2.32/iconvdata/ibm939.c                                    "IBM939", "cp939", "csIBM939", "x-IBM939", "939"  (https://en.wikipedia.org/wiki/Japanese_language_in_EBCDIC)
 #  - glibc-2.32/iconvdata/ibm943.c                                    "IBM943", "cp943", "csIBM943"  (https://en.wikipedia.org/wiki/Code_page_932_(Microsoft_Windows))
-#  - glibc-2.32/iconvdata/euc-kr.c                                    "EUC-KR", "EUCKR", "csEUCKR", "OSF0004000a" (https://www.rfc-editor.org/rfc/rfc1557.html)
-#  - glibc-2.32/iconvdata/uhc.c                                       "MSCP949", "UHC", "cp949", "OSF100203B5"
-#  - glibc-2.32/iconvdata/johab.c                                     "MSCP1361", "cp1361", "johab"
+#  - glibc-2.32/iconvdata/euc-kr.c                                    "EUC-KR", "euckr", "csEUCKR", "OSF0004000a", "IBMeuckr", "ksc-5601", "ks-c-5601-1987", "ksc5601-1987", "ksc5601-1987", "IBM970", "cp970", "5601" (https://www.rfc-editor.org/rfc/rfc1557.html)
+#  - glibc-2.32/iconvdata/uhc.c                                       "MSCP949", "UHC", "cp949", "OSF100203B5", "IBM1363", "cp1363"
+#  - glibc-2.32/iconvdata/johab.c                                     "MSCP1361", "cp1361", "johab", "x-johab"
 #  - glibc-2.32/iconvdata/big5.c                                      "Big5", "Big-5", "csBig5", "Big-Five", "BIGFIVE", "cn-Big5", "cp950"  (https://en.wikipedia.org/wiki/Big5)
+#  - https://en.wikipedia.org/wiki/Big5                               "IBM950"  (Slight variant of "Big5")
 #  - glibc-2.32/iconvdata/big5hkscs.c                                 "Big5HKSCS", "Big5-HKSCS", "csBig5HKSCS"
 #  - glibc-2.32/iconvdata/euc-jp-ms.c                                 "EUC-JP-MS", "EUCJP-MS", "EUCJP-OPEN", "EUCJP-WIN"
-#  - glibc-2.32/iconvdata/euc-jp.c                                    "EUCJP", "EUC-JP", "csEUCPkdFmtJapanese", "OSF00030010", "UJIS"  (https://www.rfc-editor.org/rfc/rfc1345.html)
-#  - glibc-2.32/iconvdata/euc-cn.c                                    "GB2312", "csGB2312", "GB_2312-80", "iso-ir-58", "chinese", "csISO58GB231280", "EUCCN", "CN-GB", "EUC-CN"  (https://en.wikipedia.org/wiki/GB_2312)
-#  - glibc-2.32/iconvdata/gbk.c                                       "GBK", "cp936", "MS936", "windows-936", "csGBK", "GB13000"  (https://en.wikipedia.org/wiki/GBK_(character_encoding))
-#  - glibc-2.32/iconvdata/euc-tw.c                                    "EUC-TW", "EUCTW", "OSF0005000a"
-#  - glibc-2.32/iconvdata/iso-2022-jptw.c                             "ISO-2022-JP","csISO2022JP", "ISO2022JP"  (https://www.rfc-editor.org/rfc/rfc1468.html)
-#  - glibc-2.32/iconvdata/iso-2022-jp.c                               "ISO-2022-JP-2", "csISO2022JP2", "ISO2022JP2"  (https://www.rfc-editor.org/rfc/rfc1554.html)
+#  - glibc-2.32/iconvdata/euc-jp.c                                    "EUC-JP", "eucjp", "csEUCPkdFmtJapanese", "OSF00030010", "UJIS", "x-euc-jp", "x-eucjp", "euc-jp-linux", "euc-jp-linux"  (https://www.rfc-editor.org/rfc/rfc1345.html)
+#  - glibc-2.32/iconvdata/euc-cn.c                                    "EUC-CN", "GB2312", "csGB2312", "GB_2312-80", "iso-ir-58", "chinese", "csISO58GB231280", "euccn", "CN-GB", "x-euc-cn", "IBMeuccn", "gb2312-1980", "gb2312-80"  (https://en.wikipedia.org/wiki/GB_2312)
+#  - glibc-2.32/iconvdata/gbk.c                                       "GBK", "cp936", "MS936", "windows-936", "csGBK", "GB13000", "x-mswin-936", "936"  (https://en.wikipedia.org/wiki/GBK_(character_encoding))
+#  - glibc-2.32/iconvdata/euc-tw.c                                    "EUC-TW", "euctw", "OSF0005000a", "x-euc-tw", "cns11643"
+#  - glibc-2.32/iconvdata/iso-2022-jptw.c                             "ISO-2022-JP", "iso2022-jp", "csISO2022JP", "ISO2022JP", "jis", "jis-encoding", "csJisEncoding"  (https://www.rfc-editor.org/rfc/rfc1468.html)
+#  - glibc-2.32/iconvdata/iso-2022-jp.c                               "ISO-2022-JP-2", ""iso2022-jp2"", "csISO2022JP2", "ISO2022JP2"  (https://www.rfc-editor.org/rfc/rfc1554.html)
 #  - glibc-2.32/iconvdata/iso-2022-jp-3.c                             "ISO-2022-JP-3"
-#  - glibc-2.32/iconvdata/iso-2022-kr.c                               "ISO-2022-KR", "csISO2022KR", "ISO2022KR"  (https://www.rfc-editor.org/rfc/rfc1557.html)
-#  - glibc-2.32/iconvdata/iso-2022-cn.c                               "ISO-2022-CN", "csISO2022CN", "ISO2022CN"  (https://www.rfc-editor.org/rfc/rfc1922.html)
+#  - glibc-2.32/iconvdata/iso-2022-kr.c                               "ISO-2022-KR", "csISO2022KR", "ISO2022KR", "iso2022-kr"  (https://www.rfc-editor.org/rfc/rfc1557.html)
+#  - glibc-2.32/iconvdata/iso-2022-cn.c                               "ISO-2022-CN", "csISO2022CN", "ISO2022CN", "x-ISO-2022-CN-CNS", "ISO-2022-CN", "iso2022-cn-cns", "iso2022cn-cns", "iso2022-cn"  (https://www.rfc-editor.org/rfc/rfc1922.html)
 #  - glibc-2.32/iconvdata/iso-2022-cn-ext.c                           "ISO-2022-CN-EXT", "csISO2022CNEXT", "ISO2022CNEXT"  (https://www.rfc-editor.org/rfc/rfc1922.html)
 #  - glibc-2.32/iconvdata/asmo_449.c                                  "ASMO_449", "ISO_9036", "arabic7", "iso-ir-89", "csISO89ASMO449"  (https://www.rfc-editor.org/rfc/rfc1345.html)
 #  - glibc-2.32/iconvdata/ansi_x3.110.c                               "ANSI_X3.110-1983", "iso-ir-99", "CSA_T500-1983", "CSA_T500", "NAPLPS", "csISO99NAPLPS", "ANSI_X3.110"  (https://www.rfc-editor.org/rfc/rfc1345.html)
 #  - glibc-2.32/iconvdata/utf-7.c                                     "UNICODE-1-1-UTF-7", "csUnicode11UTF7", "UTF-7", "UTF7", "csUTF7", "UTF-7-IMAP", "csUTF7IMAP"  (https://www.rfc-editor.org/rfc/rfc1642.html)
-#  - glibc-2.32/iconvdata/gb18030.c                                   "GB18030", "csGB18030"  (https://www.iana.org/assignments/charset-reg/GB18030)
+#  - glibc-2.32/iconvdata/gb18030.c                                   "GB18030", "csGB18030", "windows-54936", "gb18030-2000", "IBM1392"  (https://www.iana.org/assignments/charset-reg/GB18030)
 #  - glibc-2.32/iconvdata/viscii.c                                    "VISCII", "csVISCII"  (https://www.rfc-editor.org/rfc/rfc1456.html)
 #  - glibc-2.32/iconvdata/armscii-8.c                                 "ARMSCII8", "ARMSCII-8"  (https://en.wikipedia.org/wiki/ArmSCII)
 #  - glibc-2.32/iconvdata/tcvn5712-1.c                                "tcvn", "tcvn5712-1", "tcvn-5712", "tcvn5712-1:1993"
 #  - glibc-2.32/iconvdata/euc-jisx0213.c                              "euc-jisx0213"
 #  - glibc-2.32/iconvdata/shift_jisx0213.c                            "ShiftJISX0213", "Shift_JISX0213"
 #  - glibc-2.32/iconvdata/tscii.c                                     "TSCII", "csTSCII"
-#  - glibc-2.32/iconvdata/ibm1364.c                                   "cp1364", "IBM1364", "csIBM1364"
-#  - glibc-2.32/iconvdata/ibm1371.c                                   "cp1371", "IBM1371", "csIBM1371"
-#  - glibc-2.32/iconvdata/ibm1388.c                                   "cp1388", "IBM1388", "csIBM1388"
-#  - glibc-2.32/iconvdata/ibm1390.c                                   "cp1390", "IBM1390", "csIBM1390"
-#  - glibc-2.32/iconvdata/ibm1399.c                                   "cp1399", "IBM1399", "csIBM1399"
+#  - glibc-2.32/iconvdata/ibm1364.c                                   "IBM1364", "cp1364", "csIBM1364"
+#  - glibc-2.32/iconvdata/ibm1371.c                                   "IBM1371", "cp1371", "csIBM1371"
+#  - glibc-2.32/iconvdata/ibm1388.c                                   "IBM1388", "cp1388", "csIBM1388"
+#  - glibc-2.32/iconvdata/ibm1390.c                                   "IBM1390", "cp1390", "csIBM1390"
+#  - glibc-2.32/iconvdata/ibm1399.c                                   "IBM1399", "cp1399", "csIBM1399"
 #  - glibc-2.32/iconvdata/iso_11548-1.c                               "ISO_11548-1", "ISO_TR_11548-1", "ISO/TR_11548-1", "ISO11548-1", "csISO115481" (https://www.iana.org/assignments/charset-reg/ISO-11548-1)
-#  - https://www.rfc-editor.org/rfc/rfc1345.html                      "JIS_C6226-1983", "iso-ir-87", "x0208", "JIS_X0208-1983", "csISO87JISX0208"  (https://en.wikipedia.org/wiki/JIS_X_0208)
+#  - https://www.rfc-editor.org/rfc/rfc1345.html                      "JIS_C6226-1983", "iso-ir-87", "x0208", "JIS_X0208-1983", "csISO87JISX0208", "x-JIS0208", "jis-c6226-1983", "jis-x208-1983", "csISO87jisx208", "x208", "jis208"  (https://en.wikipedia.org/wiki/JIS_X_0208)
 #  - https://ftp.unicode.org/Public/MAPPINGS/VENDORS/MISC/KPS9566.TXT "KPS9566", "KPS-9566", "KPS-9566-2003"
 #  - https://ftp.unicode.org/Public/MAPPINGS/ETSI/GSM0338.TXT         "GSM0338"
 #  - https://en.wikipedia.org/wiki/LST_1564
 #  - https://en.wikipedia.org/wiki/LST_1590-4
-#  - https://en.wikipedia.org/wiki/Mac_OS_Hebrew
+#  - https://en.wikipedia.org/wiki/Mac_OS_Hebrew                      "x-MacHebrew", "machebrew"
 #  - https://en.wikipedia.org/wiki/Mac_OS_Keyboard_encoding
 #  - https://en.wikipedia.org/wiki/ISO-IR-165                         "iso-ir-165", "CN-GB-ISOIR165"
 #  - https://en.wikipedia.org/wiki/ISO-IR-169
 #  - https://www.rfc-editor.org/rfc/rfc1345.html                      "iso-ir-142", "ISO_6937-2-add", "csISOTextComm"
-#  - https://www.rfc-editor.org/rfc/rfc1345.html                      "JIS_Encoding", "csJISEncoding"
-#  - https://www.rfc-editor.org/rfc/rfc1345.html                      "Shift_JIS", "MS_Kanji", "csShiftJIS"
 #  - https://www.rfc-editor.org/rfc/rfc1345.html                      "csEUCFixWidJapanese"
 #  - https://www.rfc-editor.org/rfc/rfc1345.html                      "KS_C_5601-1987", "iso-ir-149", "KS_C_5601-1989", "KSC_5601", "korean", "csKSC56011987"
 #  - https://www.rfc-editor.org/rfc/rfc1345.html                      "JIS_C6226-1978", "iso-ir-42", "csISO42JISC62261978"
@@ -134,21 +135,96 @@
 #  - https://www.iana.org/assignments/character-sets/character-sets.xhtml   "ISO-8859-1-Windows-3.1-Latin-5", "csWindows31Latin5"
 #  - https://www.iana.org/assignments/character-sets/character-sets.xhtml   "PC8-Danish-Norwegian", "csPC8DanishNorwegian"
 #  - https://www.iana.org/assignments/character-sets/character-sets.xhtml   "PC8-Turkish", "csPC8Turkish"
-#  - https://www.iana.org/assignments/character-sets/character-sets.xhtml   "IBM-Symbols", "csIBMSymbols"
-#  - https://www.iana.org/assignments/character-sets/character-sets.xhtml   "IBM-Thai", "csIBMThai"
+#  - https://www.iana.org/assignments/character-sets/character-sets.xhtml   "IBMSymbols", "csIBMSymbols"
+#  - https://www.iana.org/assignments/character-sets/character-sets.xhtml   "IBMThai", "csIBMThai"
 #  - https://www.iana.org/assignments/character-sets/character-sets.xhtml   "HP-Legal", "csHPLegal"
 #  - https://www.iana.org/assignments/character-sets/character-sets.xhtml   "HP-Pi-font", "csHPPiFont"
 #  - https://www.iana.org/assignments/character-sets/character-sets.xhtml   "HP-Math8", "csHPMath8"
 #  - https://www.iana.org/assignments/character-sets/character-sets.xhtml   "HP-DeskTop", "csHPDesktop"
 #  - https://www.iana.org/assignments/character-sets/character-sets.xhtml   "Ventura-Math", "csVenturaMath"
 #  - https://www.iana.org/assignments/character-sets/character-sets.xhtml   "Microsoft-Publishing", "csMicrosoftPublishing"
-#  - https://www.iana.org/assignments/character-sets/character-sets.xhtml   "Windows-31J", "csWindows31J"
 #  - https://www.rfc-editor.org/rfc/rfc1456.html                            "VIQR", "csVIQR"
 #  - https://www.rfc-editor.org/rfc/rfc1842.html                            "HZ-GB-2312"
 #  - https://www.iana.org/assignments/charset-reg/CP50220                   "cp50220", "csCP50220"
+########
+# Weird stuff from IBM? (doesn't actually seem like these are that official as they're hardly
+#                        corroborated and some of this stuff even collides with known-good names.
+#                        The colliding stuff I've already removed, though)
+# s.a. https://www.ibm.com/docs/en/ibm-mq/8.0?topic=administering-available-code-pages
+#  - ???                    "IBM1383", "cp1383"
+#  - ???                    "windows-949", "ms949", "cp1361", "IBM1361", "ms1361", "ksc5601-1992", "x-windows-949"
+#  - ???                    "windows-950", "ms950", "x-windows-950"
+#  - ???                    "IBM838", "cp838"
+#  - ???                    "IBM834", "cp834"
+#  - ???                    "IBM1381", "cp1381"
+#  - ???                    "IBM942", "cp942"
+#  - ???                    "IBM942c", "cp942c"
+#  - ???                    "IBM948", "cp948"
+#  - ???                    "ISCII91", "iscii"
+#  - ???                    "ISO-2022-CN-GB", "iso2022-cn-gb", "iso2022cn-gb"
+#  - ???                    "JIS0212"
+#  - ???                    "x-MacUkraine", "macukraine"
+#  - ???                    "x-MacThai", "macthai"
+#  - ???                    "x-MacDingbat", "macdingbat"
+#  - ???                    "x-KSC5601", "ksc5601"
+#  - ???                    "x-ISO-8859-6S", "ISO-8859-6S", "iso8859-6s", "8859-6s"
+#  - ???                    "IBM954", "cp954"
+#  - ???                    "x-IBM954C", "IBM954c", "cp954c", "954c"
+#  - ???                    "x-IBM949C", "IBM949c", "cp949c", "949c"
+#  - ???                    "x-IBM943C", "IBM943c", "cp943c", "943c"
+#  - ???                    "x-IBM864S", "IBM864s", "cp864s", "864s", "csibm864s"
+#  - ???                    "x-IBM420S", "IBM420s", "cp420s", "420s", "csibm420s"
+#  - ???                    "x-IBM1363C", "IBM1363c", "cp1363c"
+#  - ???                    "x-IBM1046S", "IBM1046s", "cp1046s", "1046s"
+#  - ???                    "x-IBM-udcJP", "IBMudcjp"
+#  - ???                    "IBM939A", "IBM939a", "cp939a"
+#  - ???                    "IBM930A", "IBM930a", "cp930a"
+#  - ???                    "IBM924-lf", "cp924-lf"
+#  - ???                    "IBM924", "cp924", "IBM924", "CCSID924", "ebcdic-Latin9--euro", "csIBM924"
+#  - ???                    "IBM1141_LF", "cp1141-lf", "IBM1141-lf"
+#  - ???                    "IBM1047_LF", "cp1047-lf", "IBM1047-lf"
+#  - ???                    "x-windows-iso2022jp", "windows-iso2022jp"
+#  - ???                    "x-windows-50221", "ms50221", "cp50221"
+#  - ???                    "x-windows-50220", "ms50220", "cp50220"
+#  - ???                    "x-PCK", "pck"
+#  - ???                    "x-MS950-HKSCS", "ms950-hkscs"
+#  - ???                    "x-MS932_0213"
+#  - ???                    "x-JISAutoDetect", "jisautodetect"
+#  - ???                    "x-IBM964", "IBM964", "cp964", "964", "IBMeuctw"
+#  - ???                    "x-IBM33722", "IBM33722", "33722", "IBM33722-vascii-vpua", "IBM5050", "cp33722"
+#  - ???                    "IBM33722", "cp5050", "5050"
+#  - ???                    "IBM33722A", "cp33722a"
+#  - ???                    "IBM33722C", "cp33722c", "IBMeucjp"
+#  - ???                    "IBM837", "cp837"
+#  - ???                    "x-eucJP-Open", "euc-jp-solaris", "eucjp-open"
+#  - ???                    "x-Big5-Solaris", "big5-solaris"
+#  - ???                    "IBM836", "cp836"
+#  - ???                    "IBM835", "cp835"
+#  - ???                    "IBM833", "cp833"
+#  - ???                    "IBM301", "cp301"
+#  - ???                    "IBM300", "cp300"
+#  - ???                    "IBM1386", "cp1386"
+#  - ???                    "IBM1385", "cp1385"
+#  - ???                    "IBM1382", "cp1382"
+#  - ???                    "IBM1027", "cp1027"
+#  - ???                    "CESU-8", "cesu8"
+#  - ???                    "COMPOUND_TEXT", "x-compound-text", "x11-compound-text"
+#  - ???                    "IBM1351", "cp1351"
+#  - ???                    "IBM1362", "cp1362"
+#  - ???                    "IBM1370", "cp1370"
+#  - ???                    "IBM1380", "cp1380"
+#  - ???                    "IBM927", "cp927"
+#  - ???                    "IBM5026", "cp5026", "5026"
+#  - ???                    "IBM5035", "cp5035", "5035"
+#  - ???                    "IBM947", "cp947"
+#  - ???                    "IBM951", "cp951"
+#  - ???                    "IBM971", "cp971"
+#  - ???                    "UTF-8J", "utf8j"
+#  - ???                    "windows-1256S", "cp1256s", "IBM1256s"
 ###################################################################################################
-#  - ???                     "IBM924", "CCSID924", "cp924", "ebcdic-Latin9--euro", "csIBM924"
-#  - ???                     "cp51932", "csCP51932"
+#  - ???                    "X-UTF-32LE-BOM", "utf-32le-bom", "utf-32le-bom"
+#  - ???                    "X-UTF-32BE-BOM", "utf-32be-bom", "utf-32be-bom"
+#  - ???                    "cp51932", "csCP51932"
 ###################################################################################################
 
 
@@ -161,7 +237,8 @@
 		"ANSI_X3.4", "csASCII", "OSF00010020",
 		"cp20127", "Windows-20127",
 		"IBM891", "cp891", "csIBM891", "OSF1002037B",
-		"IBM903", "cp903", "csIBM903", "OSF10020387")
+		"IBM903", "cp903", "csIBM903", "OSF10020387",
+		"default", "646", "ascii7", "direct")
 
 # UTF-8
 @CODEC(CODEC_UTF8:
@@ -170,12 +247,15 @@
 	"csUTF8")
 
 # UTF-16 (LE)
-@CODEC(CODEC_UTF16LE: "UTF16LE", "UTF-16LE", "UCS-2LE", "UNICODELITTLE", "csUTF16LE",
+@CODEC(CODEC_UTF16LE: "UTF16LE", "UTF-16LE", "UCS-2LE", "UNICODELITTLE",
+                      "csUTF16LE", "X-UnicodeLittle", "x-utf-16le",
+                      "unicodelittleunmarked",
 	[if(__BYTE_ORDER__ == __ORDER_LITTLE_ENDIAN__)] "UTF16",
 	[if(__BYTE_ORDER__ == __ORDER_LITTLE_ENDIAN__)] "UTF-16",
 	[if(__BYTE_ORDER__ == __ORDER_LITTLE_ENDIAN__)] "csUTF16",
 	[if(__BYTE_ORDER__ == __ORDER_LITTLE_ENDIAN__)] "ISO-10646/UCS2",
 	[if(__BYTE_ORDER__ == __ORDER_LITTLE_ENDIAN__)] "ISO-10646-UCS-2",
+	[if(__BYTE_ORDER__ == __ORDER_LITTLE_ENDIAN__)] "Unicode",
 	[if(__BYTE_ORDER__ == __ORDER_LITTLE_ENDIAN__)] "csUnicode",
 	[if(__BYTE_ORDER__ == __ORDER_LITTLE_ENDIAN__)] "UCS2",
 	[if(__BYTE_ORDER__ == __ORDER_LITTLE_ENDIAN__)] "UCS-2",
@@ -190,12 +270,15 @@
 )
 
 # UTF-16 (BE)
-@CODEC(CODEC_UTF16BE: "UTF16BE", "UTF-16BE", "UCS-2BE", "UNICODEBIG", "csUTF16BE",
+@CODEC(CODEC_UTF16BE: "UTF16BE", "UTF-16BE", "UCS-2BE", "UNICODEBIG",
+                      "csUTF16BE", "X-UnicodeBig", "unicodebigunmarked",
+                      "x-utf-16be",
 	[if(__BYTE_ORDER__ == __ORDER_BIG_ENDIAN__)] "UTF16",
 	[if(__BYTE_ORDER__ == __ORDER_BIG_ENDIAN__)] "UTF-16",
 	[if(__BYTE_ORDER__ == __ORDER_BIG_ENDIAN__)] "csUTF16",
 	[if(__BYTE_ORDER__ == __ORDER_BIG_ENDIAN__)] "ISO-10646/UCS2",
 	[if(__BYTE_ORDER__ == __ORDER_BIG_ENDIAN__)] "ISO-10646-UCS-2",
+	[if(__BYTE_ORDER__ == __ORDER_BIG_ENDIAN__)] "Unicode",
 	[if(__BYTE_ORDER__ == __ORDER_BIG_ENDIAN__)] "csUnicode",
 	[if(__BYTE_ORDER__ == __ORDER_BIG_ENDIAN__)] "UCS2",
 	[if(__BYTE_ORDER__ == __ORDER_BIG_ENDIAN__)] "UCS-2",
@@ -210,7 +293,7 @@
 )
 
 # UTF-32 (LE)
-@CODEC(CODEC_UTF32LE: "UTF32LE", "UTF-32LE", "UCS-4LE", "csUTF32LE",
+@CODEC(CODEC_UTF32LE: "UTF32LE", "UTF-32LE", "UCS-4LE", "csUTF32LE", "x-utf-32le",
 	[if(__BYTE_ORDER__ == __ORDER_LITTLE_ENDIAN__)] "UTF32",
 	[if(__BYTE_ORDER__ == __ORDER_LITTLE_ENDIAN__)] "UTF-32",
 	[if(__BYTE_ORDER__ == __ORDER_LITTLE_ENDIAN__)] "csUTF32",
@@ -230,7 +313,8 @@
 )
 
 # UTF-32 (BE)
-@CODEC(CODEC_UTF32BE: "UTF32BE", "UTF-32BE", "UCS-4BE", "cp12001", "Windows-12001", "csUTF32BE",
+@CODEC(CODEC_UTF32BE: "UTF32BE", "UTF-32BE", "UCS-4BE", "cp12001",
+                      "Windows-12001", "csUTF32BE", "x-utf-32be",
 	[if(__BYTE_ORDER__ == __ORDER_BIG_ENDIAN__)] "UTF32",
 	[if(__BYTE_ORDER__ == __ORDER_BIG_ENDIAN__)] "UTF-32",
 	[if(__BYTE_ORDER__ == __ORDER_BIG_ENDIAN__)] "csUTF32",
@@ -1799,7 +1883,7 @@
 
 
 @CP(CODEC_ISO646_JP_OCR_B: "JIS_C6229-1984-b", "iso-ir-92", "ISO646-JP-OCR-B", "jp-ocr-b",
-                           "csIso92JisC62991984B", "JIS_C62291984B")
+                           "csISO92JisC62991984B", "JIS_C62291984B")
 	@ORD(0x20)
 	0020 0021 0022 0023 0024 0025 0026 0027   # 20-27   ␠ ! " # $ % & ' #
 	0028 0029 002A 002B 002C 002D 002E 002F   # 28-2F   ( ) * + , - . / #
@@ -1896,7 +1980,7 @@
 
 
 
-@CP(CODEC_X0201: "JIS_X0201", "X0201", "csHalfWidthKatakana")
+@CP(CODEC_X0201: "JIS_X0201", "X0201", "csHalfWidthKatakana", "jis201")
 	0000 0001 0002 0003 0004 0005 0006 0007   # 00-07   ␀ ␁ ␂ ␃ ␄ ␅ ␆ ␇ #
 	0008 0009 000A 000B 000C 000D 000E 000F   # 08-0F   ␈ ␉ ␊ ␋ ␌ ␍ ␎ ␏ #
 	0010 0011 0012 0013 0014 0015 0016 0017   # 10-17   ␐ ␑ ␒ ␓ ␔ ␕ ␖ ␗ #
@@ -2495,7 +2579,7 @@
 
 
 
-@CP(CODEC_ISO_8859_10: "latin6", "iso-ir-157", "l6",
+@CP(CODEC_ISO_8859_10: "latin6", "iso-ir-157", "l6", "8859-10",
                        "ISO_8859-10", "ISO_8859-10:1992", "ISO_885910",
                        "csISOLatin6", "IBM919", "cp919", "cp28600",
                        "Windows-28600", "OSF0001000A")
@@ -2810,7 +2894,7 @@
 
 
 
-@CP(CODEC_CP808: "cp808")
+@CP(CODEC_CP808: "IBM808", "cp808")
 	@ORD(0x80)
 	0410 0411 0412 0413 0414 0415 0416 0417   # 80-87   А Б В Г Д Е Ж З #
 	0418 0419 041A 041B 041C 041D 041E 041F   # 88-8F   И Й К Л М Н О П #
@@ -2979,7 +3063,7 @@
 
 
 
-@CP(CODEC_CP867: "cp867")
+@CP(CODEC_CP867: "IBM867", "cp867")
 	@ORD(0x80)
 	05D0 05D1 05D2 05D3 05D4 05D5 05D6 05D7   # 80-87   א ב ג ד ה ו ז ח #
 	05D8 05D9 05DA 05DB 05DC 05DD 05DE 05DF   # 88-8F   ט י ך כ ל ם מ ן #
@@ -3230,7 +3314,7 @@
 
 
 
-@CP(CODEC_KOI8_R: "KOI8-R", "cp20866", "cp878", "IBM878", "csKoi8R")
+@CP(CODEC_KOI8_R: "KOI8-R", "cp20866", "cp878", "IBM878", "csKoi8R", "KOI8")
 	@ORD(0x80)
 	2500 2502 250C 2510 2514 2518 251C 2524   # 80-87   ─ │ ┌ ┐ └ ┘ ├ ┤ #
 	252C 2534 253C 2580 2584 2588 258C 2590   # 88-8F   ┬ ┴ ┼ ▀ ▄ █ ▌ ▐ #
@@ -3371,7 +3455,7 @@
 
 @CP(CODEC_ISO_8859_14: "ISO_8859-14", "ISO_8859-14:1998", "ISO_885914",
                        "iso-ir-199", "iso-celtic", "latin8", "l8", "cp28604",
-                       "Windows-28604", "csISO885914")
+                       "Windows-28604", "csISO885914", "8859-14", "isoceltic")
 	@ORD(0xA0)
 	00A0 1E02 1E03 00A3 010A 010B 1E0A 00A7   # A0-A7   𝘕𝘉𝘚𝘗 Ḃ ḃ £ Ċ ċ Ḋ § #
 	1E80 00A9 1E82 1E0B 1EF2 00AD 00AE 0178   # A8-AF   Ẁ © Ẃ ḋ Ỳ ­ ® Ÿ #
@@ -3390,7 +3474,8 @@
 
 @CP(CODEC_ISO_8859_15: "ISO_8859-15", "ISO_8859-15:1998", "ISO_885915",
                        "iso-ir-203", "latin9", "latin0", "IBM923", "cp923",
-                       "cp28605", "Windows-28605", "csISO885915")
+                       "cp28605", "Windows-28605", "csISO885915", "l9",
+                       "csISOLatin9", "iso8859-15-fdis")
 	@ORD(0xA0)
 	00A0 00A1 00A2 00A3 20AC 00A5 0160 00A7   # A0-A7   𝘕𝘉𝘚𝘗 ¡ ¢ £ € ¥ Š § #
 	0161 00A9 00AA 00AB 00AC 00AD 00AE 00AF   # A8-AF   š © ª « ¬ ­ ® ¯ #
@@ -3409,7 +3494,7 @@
 
 @CP(CODEC_ISO_8859_16: "ISO_8859-16", "ISO_8859-16:2001", "ISO_885916",
                        "iso-ir-226", "latin10", "l10", "SR-14111", "cp28606",
-                       "Windows-28606", "csISO885916")
+                       "Windows-28606", "csISO885916", "8859-16")
 	@ORD(0xA0)
 	00A0 0104 0105 0141 20AC 201E 0160 00A7   # A0-A7   𝘕𝘉𝘚𝘗 Ą ą Ł € „ Š § #
 	0161 00A9 0218 00AB 0179 00AD 017A 017B   # A8-AF   š © Ș « Ź ­ ź Ż #
@@ -3536,7 +3621,8 @@
 
 
 
-@CP(CODEC_CP1281: "cp1281", "IBM1281", "cp10081", "Windows-10081", "x-mac-turkish", "cp10081_MacTurkish")
+@CP(CODEC_CP1281: "MacTurkish", "cp1281", "IBM1281", "cp10081", "Windows-10081",
+                  "x-mac-turkish", "cp10081_MacTurkish")
 	@ORD(0x80)
 	00C4 00C5 00C7 00C9 00D1 00D6 00DC 00E1   # 80-87   Ä Å Ç É Ñ Ö Ü á #
 	00E0 00E2 00E4 00E3 00E5 00E7 00E9 00E8   # 88-8F   à â ä ã å ç é è #
@@ -3557,7 +3643,7 @@
 
 
 
-@CP(CODEC_CP1284: "cp1284", "IBM1284", "cp10082", "Windows-10082", "x-mac-croatian")
+@CP(CODEC_CP1284: "MacCroatian", "cp1284", "IBM1284", "cp10082", "Windows-10082", "x-mac-croatian")
 	@ORD(0x80)
 	00C4 00C5 00C7 00C9 00D1 00D6 00DC 00E1   # 80-87   Ä Å Ç É Ñ Ö Ü á #
 	00E0 00E2 00E4 00E3 00E5 00E7 00E9 00E8   # 88-8F   à â ä ã å ç é è #
@@ -3599,7 +3685,7 @@
 
 
 
-@CP(CODEC_CP1250: "cp1250", "Windows-1250", "cswindows1250", "MS-EE")
+@CP(CODEC_CP1250: "cp1250", "IBM1250", "Windows-1250", "cswindows1250", "MS-EE")
 	@ORD(0x80)
 	20AC 0000 201A 0000 201E 2026 2020 2021   # 80-87   € ␀ ‚ ␀ „ … † ‡ #
 	0000 2030 0160 2039 015A 0164 017D 0179   # 88-8F   ␀ ‰ Š ‹ Ś Ť Ž Ź #
@@ -3700,7 +3786,7 @@
 
 
 
-@CP(CODEC_CP1251: "cp1251", "Windows-1251", "cswindows1251", "MS-CYRL")
+@CP(CODEC_CP1251: "cp1251", "IBM1251", "Windows-1251", "cswindows1251", "MS-CYRL")
 	@ORD(0x80)
 	0402 0403 201A 0453 201E 2026 2020 2021   # 80-87   Ђ Ѓ ‚ ѓ „ … † ‡ #
 	20AC 2030 0409 2039 040A 040C 040B 040F   # 88-8F   € ‰ Љ ‹ Њ Ќ Ћ Џ #
@@ -3759,7 +3845,7 @@
 
 
 
-@CP(CODEC_CP1252: "cp1252", "Windows-1252", "cswindows1252", "MS-ANSI")
+@CP(CODEC_CP1252: "cp1252", "IBM1252", "Windows-1252", "cswindows1252", "MS-ANSI")
 	@ORD(0x80)
 	20AC 0000 201A 0192 201E 2026 2020 2021   # 80-87   € ␀ ‚ ƒ „ … † ‡ #
 	02C6 2030 0160 2039 0152 0000 017D 0000   # 88-8F   ˆ ‰ Š ‹ Œ ␀ Ž ␀ #
@@ -3801,7 +3887,7 @@
 
 
 
-@CP(CODEC_CP1253: "cp1253", "Windows-1253", "cswindows1253", "MS-GREEK")
+@CP(CODEC_CP1253: "cp1253", "IBM1253", "Windows-1253", "cswindows1253", "MS-GREEK")
 	@ORD(0x80)
 	20AC 0000 201A 0192 201E 2026 2020 2021   # 80-87   € ␀ ‚ ƒ „ … † ‡ #
 	0000 2030 0000 2039 0000 0000 0000 0000   # 88-8F   ␀ ‰ ␀ ‹ ␀ ␀ ␀ ␀ #
@@ -3822,7 +3908,7 @@
 
 
 
-@CP(CODEC_CP1254: "cp1254", "Windows-1254", "cswindows1254", "MS-TURK")
+@CP(CODEC_CP1254: "cp1254", "IBM1254", "Windows-1254", "cswindows1254", "MS-TURK")
 	@ORD(0x80)
 	20AC 0000 201A 0192 201E 2026 2020 2021   # 80-87   € ␀ ‚ ƒ „ … † ‡ #
 	02C6 2030 0160 2039 0152 0000 0000 0000   # 88-8F   ˆ ‰ Š ‹ Œ ␀ ␀ ␀ #
@@ -3843,7 +3929,7 @@
 
 
 
-@CP(CODEC_CP1255: "cp1255", "Windows-1255", "cswindows1255", "MS-HEBR")
+@CP(CODEC_CP1255: "cp1255", "IBM1255", "Windows-1255", "cswindows1255", "MS-HEBR")
 	@ORD(0x80)
 	20AC 0000 201A 0192 201E 2026 2020 2021   # 80-87   € ␀ ‚ ƒ „ … † ‡ #
 	02C6 2030 0000 2039 0000 0000 0000 0000   # 88-8F   ˆ ‰ ␀ ‹ ␀ ␀ ␀ ␀ #
@@ -3864,7 +3950,7 @@
 
 
 
-@CP(CODEC_CP1257: "cp1257", "Windows-1257", "LST-1590-3", "cswindows1257", "WINBALTRIM")
+@CP(CODEC_CP1257: "cp1257", "IBM1257", "Windows-1257", "LST-1590-3", "cswindows1257", "WINBALTRIM")
 	@ORD(0x80)
 	20AC 0000 201A 0000 201E 2026 2020 2021   # 80-87   € ␀ ‚ ␀ „ … † ‡ #
 	0000 2030 0000 2039 0000 00A8 02C7 00B8   # 88-8F   ␀ ‰ ␀ ‹ ␀ ¨ ˇ ¸ #
@@ -3885,7 +3971,8 @@
 
 
 
-@CP(CODEC_CP1258: "cp1258", "Windows-1258", "cswindows1258")
+@CP(CODEC_CP1258: "cp1258", "IBM1258", "Windows-1258", "cswindows1258",
+                  "cp1129", "IBM1129", "csIBM1129")
 	@ORD(0x80)
 	20AC 0000 201A 0192 201E 2026 2020 2021   # 80-87   € ␀ ‚ ƒ „ … † ‡ #
 	02C6 2030 0000 2039 0152 0000 0000 0000   # 88-8F   ˆ ‰ ␀ ‹ Œ ␀ ␀ ␀ #
@@ -3948,7 +4035,8 @@
 
 
 
-@CP(CODEC_CP10006: "cp10006", "Windows-10006", "x-mac-greek", "cp10006_MacGreek")
+@CP(CODEC_CP10006: "cp10006", "Windows-10006", "x-mac-greek", "cp10006_MacGreek",
+                   "MacGreek", "IBM1280")
 	@ORD(0x80)
 	00C4 00B9 00B2 00C9 00B3 00D6 00DC 0385   # 80-87   Ä ¹ ² É ³ Ö Ü ΅ #
 	00E0 00E2 00E4 0384 00A8 00E7 00E9 00E8   # 88-8F   à â ä ΄ ¨ ç é è #
@@ -3969,7 +4057,7 @@
 
 
 
-@CP(CODEC_CP1285: "cp1285", "IBM1285", "cp10010", "Windows-10010", "x-mac-romanian")
+@CP(CODEC_CP1285: "MacRomania", "cp1285", "IBM1285", "cp10010", "Windows-10010", "x-mac-romanian")
 	@ORD(0x80)
 	00C4 00C5 00C7 00C9 00D1 00D6 00DC 00E1   # 80-87   Ä Å Ç É Ñ Ö Ü á #
 	00E0 00E2 00E4 00E3 00E5 00E7 00E9 00E8   # 88-8F   à â ä ã å ç é è #
@@ -3990,7 +4078,7 @@
 
 
 
-@CP(CODEC_CP1282: "cp1282", "IBM1282", "cp10029", "Windows-10029",
+@CP(CODEC_CP1282: "MacCentralEurope", "cp1282", "IBM1282", "cp10029", "Windows-10029",
                   "x-mac-ce", "mac-centraleurope", "cp10029_MacLatin2")
 	@ORD(0x80)
 	00C4 0100 0101 00C9 0104 00D6 00DC 00E1   # 80-87   Ä Ā ā É Ą Ö Ü á #
@@ -4012,7 +4100,8 @@
 
 
 
-@CP(CODEC_CP1286: "cp1286", "IBM1286", "cp10079", "Windows-10079", "x-mac-icelandic", "cp10079_MacIcelandic")
+@CP(CODEC_CP1286: "MacIceland", "cp1286", "IBM1286", "cp10079", "Windows-10079",
+                  "x-mac-icelandic", "cp10079_MacIcelandic")
 	@ORD(0x80)
 	00C4 00C5 00C7 00C9 00D1 00D6 00DC 00E1   # 80-87   Ä Å Ç É Ñ Ö Ü á #
 	00E0 00E2 00E4 00E3 00E5 00E7 00E9 00E8   # 88-8F   à â ä ã å ç é è #
@@ -4055,7 +4144,7 @@
 
 
 @CP(CODEC_CP1036: "cp1036", "IBM1036", "T.61", "T.618bit", "T.61-8bit", "cp20261",
-                  "Windows-20261", "iso-ir-103", "csIso103T618bit")
+                  "Windows-20261", "iso-ir-103", "csISO103T618bit")
 	@ORD(0x80)
 	0000 0000 0000 0000 0000 0000 0000 0000   # 80-87   ␀ ␀ ␀ ␀ ␀ ␀ ␀ ␀ #
 	0000 0000 0000 008B 008C 0000 0000 0000   # 88-8F   ␀ ␀ ␀ 𝘗𝘓𝘋 𝘗𝘓𝘜 ␀ ␀ ␀ #
@@ -4073,27 +4162,6 @@
 	0141 00D8 0152 00BA 00DE 0166 014A 0149   # E8-EF   Ł Ø Œ º Þ Ŧ Ŋ ŉ #
 	0138 00E6 0111 00F0 0127 0131 0133 0140   # F0-F7   ĸ æ đ ð ħ ı ĳ ŀ #
 	0142 00F8 0153 00DF 00FE 0167 014B 0000   # F8-FF   ł ø œ ß þ ŧ ŋ ␀ #
-
-
-
-@CP(CODEC_CP1129: "cp1129", "IBM1129", "csIBM1129")
-	@ORD(0x80)
-	0000 0000 0000 0000 0000 0000 0000 0000   # 80-87   ␀ ␀ ␀ ␀ ␀ ␀ ␀ ␀ #
-	0000 0000 0000 0000 0000 0000 0000 0000   # 88-8F   ␀ ␀ ␀ ␀ ␀ ␀ ␀ ␀ #
-	0000 0000 0000 0000 0000 0000 0000 0000   # 90-97   ␀ ␀ ␀ ␀ ␀ ␀ ␀ ␀ #
-	0000 0000 0000 0000 0000 0000 0000 0000   # 98-9F   ␀ ␀ ␀ ␀ ␀ ␀ ␀ ␀ #
-	00A0 00A1 00A2 00A3 00A4 00A5 00A6 00A7   # A0-A7   𝘕𝘉𝘚𝘗 ¡ ¢ £ ¤ ¥ ¦ § #
-	0153 00A9 00AA 00AB 00AC 00AD 00AE 00AF   # A8-AF   œ © ª « ¬ ­ ® ¯ #
-	00B0 00B1 00B2 00B3 0178 00B5 00B6 00B7   # B0-B7   ° ± ² ³ Ÿ µ ¶ · #
-	0152 00B9 00BA 00BB 00BC 00BD 00BE 00BF   # B8-BF   Œ ¹ º » ¼ ½ ¾ ¿ #
-	00C0 00C1 00C2 0102 00C4 00C5 00C6 00C7   # C0-C7   À Á Â Ă Ä Å Æ Ç #
-	00C8 00C9 00CA 00CB 0300 00CD 00CE 00CF   # C8-CF   È É Ê Ë ̀ Í Î Ï #
-	0110 00D1 0309 00D3 00D4 01A0 00D6 00D7   # D0-D7   Đ Ñ ̉ Ó Ô Ơ Ö × #
-	00D8 00D9 00DA 00DB 00DC 01AF 0303 00DF   # D8-DF   Ø Ù Ú Û Ü Ư ̃ ß #
-	00E0 00E1 00E2 0103 00E4 00E5 00E6 00E7   # E0-E7   à á â ă ä å æ ç #
-	00E8 00E9 00EA 00EB 0301 00ED 00EE 00EF   # E8-EF   è é ê ë ́ í î ï #
-	0111 00F1 0323 00F3 00F4 01A1 00F6 00F7   # F0-F7   đ ñ ̣ ó ô ơ ö ÷ #
-	00F8 00F9 00FA 00FB 00FC 01B0 20AB 00FF   # F8-FF   ø ù ú û ü ư ₫ ÿ #
 
 
 
@@ -4308,7 +4376,8 @@
 
 
 @CP(CODEC_CP10007: "cp10007", "Windows-10007", "cp1283", "IBM1283",
-                   "ms-mac-cyrillic", "msmaccyrillic", "cp10007_MacCyrillic")
+                   "ms-mac-cyrillic", "msmaccyrillic", "cp10007_MacCyrillic",
+                   "mac-cyrillic", "MacCyrillic")
 	@ORD(0x80)
 	0410 0411 0412 0413 0414 0415 0416 0417   # 80-87   А Б В Г Д Е Ж З #
 	0418 0419 041A 041B 041C 041D 041E 041F   # 88-8F   И Й К Л М Н О П #
@@ -4329,8 +4398,7 @@
 
 
 
-@CP(CODEC_CP10017: "cp10017", "Windows-10017", "x-mac-ukrainian", "macuk", "mac-uk",
-                   "macukrainian", "mac-cyrillic", "maccyrillic")
+@CP(CODEC_CP10017: "cp10017", "Windows-10017", "x-mac-ukrainian", "macuk", "mac-uk", "macukrainian")
 	@ORD(0x80)
 	0410 0411 0412 0413 0414 0415 0416 0417   # 80-87   А Б В Г Д Е Ж З #
 	0418 0419 041A 041B 041C 041D 041E 041F   # 88-8F   И Й К Л М Н О П #
@@ -4386,27 +4454,6 @@
 	0000 0000 0000 0000 0000 0000 0000 0000   # E8-EF   ␀ ␀ ␀ ␀ ␀ ␀ ␀ ␀ #
 	01AD 0288 0000 028A 028B AB53 01B4 0292   # F0-F7   ƭ ʈ ␀ ʊ ʋ ꭓ ƴ ʒ #
 	0295 0294 0298 01C0 01C2 01C3 01C1 0000   # F8-FF   ʕ ʔ ʘ ǀ ǂ ǃ ǁ ␀ #
-
-
-
-@CP(CODEC_KOI8: "KOI8")
-	@ORD(0x80)
-	0000 0000 0000 0000 0000 0000 0000 0000   # 80-87   ␀ ␀ ␀ ␀ ␀ ␀ ␀ ␀ #
-	0000 0000 0000 0000 0000 0000 0000 0000   # 88-8F   ␀ ␀ ␀ ␀ ␀ ␀ ␀ ␀ #
-	0000 0000 0000 0000 0000 0000 0000 0000   # 90-97   ␀ ␀ ␀ ␀ ␀ ␀ ␀ ␀ #
-	0000 0000 0000 0000 0000 0000 0000 0000   # 98-9F   ␀ ␀ ␀ ␀ ␀ ␀ ␀ ␀ #
-	0000 0000 0000 0000 0000 0000 0000 0000   # A0-A7   ␀ ␀ ␀ ␀ ␀ ␀ ␀ ␀ #
-	0000 0000 0000 0000 0000 0000 0000 0000   # A8-AF   ␀ ␀ ␀ ␀ ␀ ␀ ␀ ␀ #
-	0000 0000 0000 0000 0000 0000 0000 0000   # B0-B7   ␀ ␀ ␀ ␀ ␀ ␀ ␀ ␀ #
-	0000 0000 0000 0000 0000 0000 0000 0000   # B8-BF   ␀ ␀ ␀ ␀ ␀ ␀ ␀ ␀ #
-	044E 0430 0431 0446 0434 0435 0444 0433   # C0-C7   ю а б ц д е ф г #
-	0445 0438 0439 043A 043B 043C 043D 043E   # C8-CF   х и й к л м н о #
-	043F 044F 0440 0441 0442 0443 0436 0432   # D0-D7   п я р с т у ж в #
-	044C 044B 0437 0448 044D 0449 0447 044A   # D8-DF   ь ы з ш э щ ч ъ #
-	042E 0410 0411 0426 0414 0415 0424 0413   # E0-E7   Ю А Б Ц Д Е Ф Г #
-	0425 0418 0419 041A 041B 041C 041D 041E   # E8-EF   Х И Й К Л М Н О #
-	041F 042F 0420 0421 0422 0423 0416 0412   # F0-F7   П Я Р С Т У Ж В #
-	042C 042B 0417 0428 042D 0429 0427 0000   # F8-FF   Ь Ы З Ш Э Щ Ч ␀ #
 
 
 
@@ -4599,7 +4646,7 @@
 
 
 
-@CP(CODEC_ISO_6937_2: "ISO_6937-2", "ISO_69372", "ISO_6937-2:1983", "iso-ir-90", "csIso90")
+@CP(CODEC_ISO_6937_2: "ISO_6937-2", "ISO_69372", "ISO_6937-2:1983", "iso-ir-90", "csISO90")
 	@ORD(0xA0)
 	0000 00A1 00A2 00A3 0024 00A5 0023 00A7   # A0-A7   ␀ ¡ ¢ £ $ ¥ # § #
 	00A4 2018 201C 00AB 2190 2191 2192 2193   # A8-AF   ¤ ‘ “ « ← ↑ → ↓ #
@@ -5394,7 +5441,7 @@
 
 
 
-@CP(CODEC_CP1041: "cp1041")
+@CP(CODEC_CP1041: "IBM1041", "cp1041")
 	0000 2554 2557 255A 255D 2551 2550 FFEC   # 00-07   ␀ ╔ ╗ ╚ ╝ ║ ═ ￬ #
 	0008 FFEE 000A 303F 000C 000D FFED 263C   # 08-0F   ␈ ￮ ␊ 〿 ␌ ␍ ￭ ☼ #
 	256C 0011 2195 0013 2593 2569 2566 2563   # 10-17   ╬ ␑ ↕ ␓ ▓ ╩ ╦ ╣ #
@@ -5538,7 +5585,7 @@
 
 
 
-@CP(CODEC_CP897: "cp897")
+@CP(CODEC_CP897: "IBM897", "cp897")
 	0000 2554 2557 255A 255D 2551 2550 FFEC   # 00-07   ␀ ╔ ╗ ╚ ╝ ║ ═ ￬ #
 	0008 FFEE 000A 303F 000C 000D FFED 263C   # 08-0F   ␈ ￮ ␊ 〿 ␌ ␍ ￭ ☼ #
 	256C 0011 2195 0013 2593 2569 2566 2563   # 10-17   ╬ ␑ ↕ ␓ ▓ ╩ ╦ ╣ #
@@ -5612,7 +5659,7 @@
 # Fun fact: even though glibc supports both "cp921" and "ISO_8859-13", it doesn't
 #           notice that they actually use the exact same tables and doesn't alias
 #           them onto each other ;)
-@CP(CODEC_CP921: "cp921", "IBM921", "csIBM921",
+@CP(CODEC_CP921: "cp921", "IBM921", "csIBM921", "8859-13",
                  "ISO_8859-13", "ISO_885913", "iso-ir-179", "csISOLatin7",
                  "latin7", "l7", "baltic", "cp28603", "Windows-28603", "csISO885913")
 	@ORD(0xA0)
@@ -5684,7 +5731,7 @@
 
 
 
-@CP(CODEC_CP1088: "cp1088")
+@CP(CODEC_CP1088: "IBM1088", "cp1088")
 	0000 250C 2510 2514 2518 2502 2500 2022   # 00-07   ␀ ┌ ┐ └ ┘ │ ─ • #
 	25D8 25CB 25D9 2642 2640 266A 266B 263C   # 08-0F   ◘ ○ ◙ ♂ ♀ ♪ ♫ ☼ #
 	253C 25C4 2195 203C 00B6 2534 252C 2524   # 10-17   ┼ ◄ ↕ ‼ ¶ ┴ ┬ ┤ #
@@ -5792,7 +5839,7 @@
 
 
 
-@CP(CODEC_CP1043: "cp1043")
+@CP(CODEC_CP1043: "IBM1043", "cp1043")
 	0000 2554 2557 255A 255D 2551 2550 2193   # 00-07   ␀ ╔ ╗ ╚ ╝ ║ ═ ↓ #
 	0008 25CB 000A 303F 000C 000D 25A0 263C   # 08-0F   ␈ ○ ␊ 〿 ␌ ␍ ■ ☼ #
 	256C 0011 2195 0013 2593 2569 2566 2563   # 10-17   ╬ ␑ ↕ ␓ ▓ ╩ ╦ ╣ #
@@ -5864,43 +5911,7 @@
 
 
 
-@CP(CODEC_CP1038: "cp1038", "IBM1038", "x-mac-symbol")
-	0000 0001 0002 0003 0004 0005 0006 0007   # 00-07   ␀ ␁ ␂ ␃ ␄ ␅ ␆ ␇ #
-	0008 0009 000A 000B 000C 000D 000E 000F   # 08-0F   ␈ ␉ ␊ ␋ ␌ ␍ ␎ ␏ #
-	0010 0011 0012 0013 0014 0015 0016 0017   # 10-17   ␐ ␑ ␒ ␓ ␔ ␕ ␖ ␗ #
-	0018 0019 001A 001B 001C 001D 001E 001F   # 18-1F   ␘ ␙ ␚ ␛ ␜ ␝ ␞ ␟ #
-	0020 0021 2200 0023 2203 0025 0026 220D   # 20-27   ␠ ! ∀ # ∃ % & ∍ #
-	0028 0029 2217 002B 002C 2212 002E 002F   # 28-2F   ( ) ∗ + , − . / #
-	0030 0031 0032 0033 0034 0035 0036 0037   # 30-37   0 1 2 3 4 5 6 7 #
-	0038 0039 003A 003B 003C 003D 003E 003F   # 38-3F   8 9 : ; < = > ? #
-	2245 0391 0392 03A7 0394 0395 03A6 0393   # 40-47   ≅ Α Β Χ Δ Ε Φ Γ #
-	0397 0399 03D1 039A 039B 039C 039D 039F   # 48-4F   Η Ι ϑ Κ Λ Μ Ν Ο #
-	03A0 0398 03A1 03A3 03A4 03A5 03C2 03A9   # 50-57   Π Θ Ρ Σ Τ Υ ς Ω #
-	039E 03A8 0396 005B 2234 005D 22A5 005F   # 58-5F   Ξ Ψ Ζ [ ∴ ] ⊥ _ #
-	203E 03B1 03B2 03C7 03B4 03B5 03C6 03B3   # 60-67   ‾ α β χ δ ε φ γ #
-	03B7 03B9 03D5 03BA 03BB 03BC 03BD 03BF   # 68-6F   η ι ϕ κ λ μ ν ο #
-	03C0 03B8 03C1 03C3 03C4 03C5 03D6 03C9   # 70-77   π θ ρ σ τ υ ϖ ω #
-	03BE 03C8 03B6 007B 007C 007D 007E 0000   # 78-7F   ξ ψ ζ { | } ~ ␀ #
-	0000 0000 0000 0000 0000 0000 0000 0000   # 80-87   ␀ ␀ ␀ ␀ ␀ ␀ ␀ ␀ #
-	0000 0000 0000 0000 0000 0000 0000 0000   # 88-8F   ␀ ␀ ␀ ␀ ␀ ␀ ␀ ␀ #
-	0000 0000 0000 0000 0000 0000 0000 0000   # 90-97   ␀ ␀ ␀ ␀ ␀ ␀ ␀ ␀ #
-	0000 0000 0000 0000 0000 0000 0000 0000   # 98-9F   ␀ ␀ ␀ ␀ ␀ ␀ ␀ ␀ #
-	20AC 03D2 2032 2264 2044 221E 0192 2663   # A0-A7   € ϒ ′ ≤ ⁄ ∞ ƒ ♣ #
-	2666 2665 2660 2194 2190 2191 2192 2193   # A8-AF   ♦ ♥ ♠ ↔ ← ↑ → ↓ #
-	00B0 00B1 2033 2265 00D7 221D 2202 2022   # B0-B7   ° ± ″ ≥ × ∝ ∂ • #
-	00F7 2260 2261 2248 2026 23D0 23AF 21B5   # B8-BF   ÷ ≠ ≡ ≈ … ⏐ ⎯ ↵ #
-	2135 2111 211C 2118 2297 2295 2205 2229   # C0-C7   ℵ ℑ ℜ ℘ ⊗ ⊕ ∅ ∩ #
-	222A 2283 2287 2284 2282 2286 2208 2209   # C8-CF   ∪ ⊃ ⊇ ⊄ ⊂ ⊆ ∈ ∉ #
-	2220 2207 00AE 00A9 2122 220F 221A 22C5   # D0-D7   ∠ ∇ ® © ™ ∏ √ ⋅ #
-	00AC 2227 2228 21D4 21D0 21D1 21D2 21D3   # D8-DF   ¬ ∧ ∨ ⇔ ⇐ ⇑ ⇒ ⇓ #
-	25CA 3008 00AE 00A9 2122 2211 239B 239C   # E0-E7   ◊ 〈 ® © ™ ∑ ⎛ ⎜ #
-	239D 23A1 23A2 23A3 23A7 23A8 23A9 23AA   # E8-EF   ⎝ ⎡ ⎢ ⎣ ⎧ ⎨ ⎩ ⎪ #
-	F8FF 3009 222B 2320 23AE 2321 239E 239F   # F0-F7    〉 ∫ ⌠ ⎮ ⌡ ⎞ ⎟ #
-	23A0 23A4 23A5 23A6 23AB 23AC 23AD 0000   # F8-FF   ⎠ ⎤ ⎥ ⎦ ⎫ ⎬ ⎭ ␀ #
-
-
-
-@CP(CODEC_CP1114: "cp1114")
+@CP(CODEC_CP1114: "IBM1114", "cp1114")
 	0000 263A 263B 2665 2666 2663 2660 2022   # 00-07   ␀ ☺ ☻ ♥ ♦ ♣ ♠ • #
 	25D8 25CB 25D9 2642 2640 266A 266B 263C   # 08-0F   ◘ ○ ◙ ♂ ♀ ♪ ♫ ☼ #
 	25BA 25C4 2195 203C 00B6 00A7 25AC 21A8   # 10-17   ► ◄ ↕ ‼ ¶ § ▬ ↨ #
@@ -5936,7 +5947,7 @@
 
 
 
-@CP(CODEC_CP1115: "cp1115")
+@CP(CODEC_CP1115: "IBM1115", "cp1115")
 	0000 2554 2557 255A 255D 2551 2550 2193   # 00-07   ␀ ╔ ╗ ╚ ╝ ║ ═ ↓ #
 	25D8 25CB 25D9 303F 2588 2592 25A0 263C   # 08-0F   ◘ ○ ◙ 〿 █ ▒ ■ ☼ #
 	256C 2584 2195 203C 2593 2569 2566 2563   # 10-17   ╬ ▄ ↕ ‼ ▓ ╩ ╦ ╣ #
@@ -6405,7 +6416,8 @@
 # From:
 #   - https://www.iana.org/assignments/character-sets/character-sets.xhtml
 #   - https://ftp.unicode.org/Public/MAPPINGS/VENDORS/ADOBE/symbol.txt
-@CP(CODEC_ADOBE_SYMBOL_ENCODING: "Adobe-Symbol-Encoding", "csHPPSMath")
+@CP(CODEC_ADOBE_SYMBOL_ENCODING: "MacSymbol", "Adobe-Symbol-Encoding", "csHPPSMath",
+                                 "cp1038", "IBM1038", "x-mac-symbol")
 	0000 0001 0002 0003 0004 0005 0006 0007   # 00-07   ␀ ␁ ␂ ␃ ␄ ␅ ␆ ␇ #
 	0008 0009 000A 000B 000C 000D 000E 000F   # 08-0F   ␈ ␉ ␊ ␋ ␌ ␍ ␎ ␏ #
 	0010 0011 0012 0013 0014 0015 0016 0017   # 10-17   ␐ ␑ ␒ ␓ ␔ ␕ ␖ ␗ #
@@ -7352,7 +7364,7 @@
 
 
 
-@CP(CODEC_EBCDIC_CP_DK_NO: "IBM277", "EBCDIC-CP-DK", "EBCDIC-CP-NO", "csIBM277", "OSF10020115")
+@CP(CODEC_EBCDIC_CP_DK_NO: "IBM277", "cp277", "EBCDIC-CP-DK", "EBCDIC-CP-NO", "csIBM277", "OSF10020115")
 	0000 0001 0002 0003 0004 0005 0006 0007   # 00-07   ␀ ␁ ␂ ␃ ␄ ␅ ␆ ␇ #
 	0008 0009 000A 000B 000C 000D 000E 000F   # 08-0F   ␈ ␉ ␊ ␋ ␌ ␍ ␎ ␏ #
 	0010 0011 0012 0013 0014 0015 0016 0017   # 10-17   ␐ ␑ ␒ ␓ ␔ ␕ ␖ ␗ #
@@ -7929,7 +7941,7 @@
 
 
 
-@CP(CODEC_CP918: "IBM918", "cp918", "ebcdic-cp-ar2", "csIBM918", "OSF10020396")
+@CP(CODEC_CP918: "IBM918", "cp918", "918", "ebcdic-cp-ar2", "csIBM918", "OSF10020396")
 	0000 0001 0002 0003 0004 0005 0006 0007   # 00-07   ␀ ␁ ␂ ␃ ␄ ␅ ␆ ␇ #
 	0008 0009 000A 000B 000C 000D 000E 000F   # 08-0F   ␈ ␉ ␊ ␋ ␌ ␍ ␎ ␏ #
 	0010 0011 0012 0013 0014 0015 0016 0017   # 10-17   ␐ ␑ ␒ ␓ ␔ ␕ ␖ ␗ #
@@ -8247,7 +8259,8 @@
 
 @CP(CODEC_ISO_8859_11: "ISO_8859-11", "ISO_885911", "cp28601", "Windows-28601",
                        "iso-ir-166", "TIS-620", "csTIS620", "TIS620",
-                       "TIS620-0", "TIS620.2529-1", "TIS620.2533-0")
+                       "TIS620-0", "TIS620.2529-1", "TIS620.2533-0",
+                       "x-iso-8859-11", "tis620.2533")
 	@ORD(0x80)
 	0000 0000 0000 0000 0000 0000 0000 0000   # 80-87   ␀ ␀ ␀ ␀ ␀ ␀ ␀ ␀ #
 	0000 0000 0000 0000 0000 0000 0000 0000   # 88-8F   ␀ ␀ ␀ ␀ ␀ ␀ ␀ ␀ #
@@ -8352,7 +8365,7 @@
 
 
 
-@CP(CODEC_PT154: "PTCP154", "csPTCP154", "PT154", "cp154", "Cyrillic-Asian")
+@CP(CODEC_PT154: "PTCP154", "csPTCP154", "PT154", "cp154", "Cyrillic-Asian", "IBM1169")
 	@ORD(0x80)
 	0496 0492 04EE 0493 201E 2026 04B6 04AE   # 80-87   Җ Ғ Ӯ ғ „ … Ҷ Ү #
 	04B2 04AF 04A0 04E2 04A2 049A 04BA 04B8   # 88-8F   Ҳ ү Ҡ Ӣ Ң Қ Һ Ҹ #
@@ -8877,7 +8890,7 @@
 
 
 
-@CP(CODEC_CP1140: "cp1140", "IBM1140", "csIBM1140", "CCSID1140", "ebcdic-us-37+euro")
+@CP(CODEC_CP1140: "cp1140", "IBM1140", "1140", "csIBM1140", "CCSID1140", "ebcdic-us-37+euro")
 	0000 0001 0002 0003 009C 0009 0086 007F   # 00-07   ␀ ␁ ␂ ␃ 𝘚𝘛  ␉ 𝘚𝘚𝘈 ␡ #
 	0097 008D 008E 000B 000C 000D 000E 000F   # 08-0F   𝘌𝘗𝘈 𝘙𝘐  𝘚𝘚𝘊 ␋ ␌ ␍ ␎ ␏ #
 	0010 0011 0012 0013 009D 0085 0008 0087   # 10-17   ␐ ␑ ␒ ␓ 𝘖𝘚𝘊 𝘕𝘌𝘓 ␈ 𝘌𝘚𝘈 #
@@ -8913,7 +8926,7 @@
 
 
 
-@CP(CODEC_CP1141: "cp1141", "IBM1141", "csIBM1141", "CCSID1141", "ebcdic-de-273+euro")
+@CP(CODEC_CP1141: "cp1141", "IBM1141", "1141", "csIBM1141", "CCSID1141", "ebcdic-de-273+euro")
 	0000 0001 0002 0003 009C 0009 0086 007F   # 00-07   ␀ ␁ ␂ ␃ 𝘚𝘛  ␉ 𝘚𝘚𝘈 ␡ #
 	0097 008D 008E 000B 000C 000D 000E 000F   # 08-0F   𝘌𝘗𝘈 𝘙𝘐  𝘚𝘚𝘊 ␋ ␌ ␍ ␎ ␏ #
 	0010 0011 0012 0013 009D 0085 0008 0087   # 10-17   ␐ ␑ ␒ ␓ 𝘖𝘚𝘊 𝘕𝘌𝘓 ␈ 𝘌𝘚𝘈 #
@@ -8949,7 +8962,7 @@
 
 
 
-@CP(CODEC_CP1142: "cp1142", "IBM1142", "csIBM1142", "CCSID1142", "ebcdic-dk-277+euro", "ebcdic-no-277+euro")
+@CP(CODEC_CP1142: "cp1142", "IBM1142", "1142", "csIBM1142", "CCSID1142", "ebcdic-dk-277+euro", "ebcdic-no-277+euro")
 	0000 0001 0002 0003 009C 0009 0086 007F   # 00-07   ␀ ␁ ␂ ␃ 𝘚𝘛  ␉ 𝘚𝘚𝘈 ␡ #
 	0097 008D 008E 000B 000C 000D 000E 000F   # 08-0F   𝘌𝘗𝘈 𝘙𝘐  𝘚𝘚𝘊 ␋ ␌ ␍ ␎ ␏ #
 	0010 0011 0012 0013 009D 0085 0008 0087   # 10-17   ␐ ␑ ␒ ␓ 𝘖𝘚𝘊 𝘕𝘌𝘓 ␈ 𝘌𝘚𝘈 #
@@ -8985,7 +8998,7 @@
 
 
 
-@CP(CODEC_CP1143: "cp1143", "IBM1143", "csIBM1143", "CCSID1143", "ebcdic-fi-278+euro", "ebcdic-se-278+euro")
+@CP(CODEC_CP1143: "cp1143", "IBM1143", "1143", "csIBM1143", "CCSID1143", "ebcdic-fi-278+euro", "ebcdic-se-278+euro")
 	0000 0001 0002 0003 009C 0009 0086 007F   # 00-07   ␀ ␁ ␂ ␃ 𝘚𝘛  ␉ 𝘚𝘚𝘈 ␡ #
 	0097 008D 008E 000B 000C 000D 000E 000F   # 08-0F   𝘌𝘗𝘈 𝘙𝘐  𝘚𝘚𝘊 ␋ ␌ ␍ ␎ ␏ #
 	0010 0011 0012 0013 009D 0085 0008 0087   # 10-17   ␐ ␑ ␒ ␓ 𝘖𝘚𝘊 𝘕𝘌𝘓 ␈ 𝘌𝘚𝘈 #
@@ -9021,7 +9034,7 @@
 
 
 
-@CP(CODEC_CP1144: "cp1144", "IBM1144", "csIBM1144", "CCSID1144", "ebcdic-it-280+euro")
+@CP(CODEC_CP1144: "cp1144", "IBM1144", "1144", "csIBM1144", "CCSID1144", "ebcdic-it-280+euro")
 	0000 0001 0002 0003 009C 0009 0086 007F   # 00-07   ␀ ␁ ␂ ␃ 𝘚𝘛  ␉ 𝘚𝘚𝘈 ␡ #
 	0097 008D 008E 000B 000C 000D 000E 000F   # 08-0F   𝘌𝘗𝘈 𝘙𝘐  𝘚𝘚𝘊 ␋ ␌ ␍ ␎ ␏ #
 	0010 0011 0012 0013 009D 0085 0008 0087   # 10-17   ␐ ␑ ␒ ␓ 𝘖𝘚𝘊 𝘕𝘌𝘓 ␈ 𝘌𝘚𝘈 #
@@ -9057,7 +9070,7 @@
 
 
 
-@CP(CODEC_CP1145: "cp1145", "IBM1145", "csIBM1145", "CCSID1145", "ebcdic-es-284+euro")
+@CP(CODEC_CP1145: "cp1145", "IBM1145", "1145", "csIBM1145", "CCSID1145", "ebcdic-es-284+euro")
 	0000 0001 0002 0003 009C 0009 0086 007F   # 00-07   ␀ ␁ ␂ ␃ 𝘚𝘛  ␉ 𝘚𝘚𝘈 ␡ #
 	0097 008D 008E 000B 000C 000D 000E 000F   # 08-0F   𝘌𝘗𝘈 𝘙𝘐  𝘚𝘚𝘊 ␋ ␌ ␍ ␎ ␏ #
 	0010 0011 0012 0013 009D 0085 0008 0087   # 10-17   ␐ ␑ ␒ ␓ 𝘖𝘚𝘊 𝘕𝘌𝘓 ␈ 𝘌𝘚𝘈 #
@@ -9093,7 +9106,7 @@
 
 
 
-@CP(CODEC_CP1146: "cp1146", "IBM1146", "csIBM1146", "CCSID1146", "ebcdic-gb-285+euro")
+@CP(CODEC_CP1146: "cp1146", "IBM1146", "1146", "csIBM1146", "CCSID1146", "ebcdic-gb-285+euro")
 	0000 0001 0002 0003 009C 0009 0086 007F   # 00-07   ␀ ␁ ␂ ␃ 𝘚𝘛  ␉ 𝘚𝘚𝘈 ␡ #
 	0097 008D 008E 000B 000C 000D 000E 000F   # 08-0F   𝘌𝘗𝘈 𝘙𝘐  𝘚𝘚𝘊 ␋ ␌ ␍ ␎ ␏ #
 	0010 0011 0012 0013 009D 0085 0008 0087   # 10-17   ␐ ␑ ␒ ␓ 𝘖𝘚𝘊 𝘕𝘌𝘓 ␈ 𝘌𝘚𝘈 #
@@ -9129,7 +9142,7 @@
 
 
 
-@CP(CODEC_CP1147: "cp1147", "IBM1147", "csIBM1147", "CCSID1147", "ebcdic-fr-297+euro")
+@CP(CODEC_CP1147: "cp1147", "IBM1147", "1147", "csIBM1147", "CCSID1147", "ebcdic-fr-297+euro")
 	0000 0001 0002 0003 009C 0009 0086 007F   # 00-07   ␀ ␁ ␂ ␃ 𝘚𝘛  ␉ 𝘚𝘚𝘈 ␡ #
 	0097 008D 008E 000B 000C 000D 000E 000F   # 08-0F   𝘌𝘗𝘈 𝘙𝘐  𝘚𝘚𝘊 ␋ ␌ ␍ ␎ ␏ #
 	0010 0011 0012 0013 009D 0085 0008 0087   # 10-17   ␐ ␑ ␒ ␓ 𝘖𝘚𝘊 𝘕𝘌𝘓 ␈ 𝘌𝘚𝘈 #
@@ -9165,7 +9178,7 @@
 
 
 
-@CP(CODEC_CP1148: "cp1148", "IBM1148", "csIBM1148", "CCSID1148", "ebcdic-international-500+euro")
+@CP(CODEC_CP1148: "cp1148", "IBM1148", "1148", "csIBM1148", "CCSID1148", "ebcdic-international-500+euro")
 	0000 0001 0002 0003 009C 0009 0086 007F   # 00-07   ␀ ␁ ␂ ␃ 𝘚𝘛  ␉ 𝘚𝘚𝘈 ␡ #
 	0097 008D 008E 000B 000C 000D 000E 000F   # 08-0F   𝘌𝘗𝘈 𝘙𝘐  𝘚𝘚𝘊 ␋ ␌ ␍ ␎ ␏ #
 	0010 0011 0012 0013 009D 0085 0008 0087   # 10-17   ␐ ␑ ␒ ␓ 𝘖𝘚𝘊 𝘕𝘌𝘓 ␈ 𝘌𝘚𝘈 #
@@ -9201,7 +9214,7 @@
 
 
 
-@CP(CODEC_CP1149: "cp1149", "IBM1149", "csIBM1149", "CCSID1149", "ebcdic-is-871+euro")
+@CP(CODEC_CP1149: "cp1149", "IBM1149", "1149", "csIBM1149", "CCSID1149", "ebcdic-is-871+euro")
 	0000 0001 0002 0003 009C 0009 0086 007F   # 00-07   ␀ ␁ ␂ ␃ 𝘚𝘛  ␉ 𝘚𝘚𝘈 ␡ #
 	0097 008D 008E 000B 000C 000D 000E 000F   # 08-0F   𝘌𝘗𝘈 𝘙𝘐  𝘚𝘚𝘊 ␋ ␌ ␍ ␎ ␏ #
 	0010 0011 0012 0013 009D 0085 0008 0087   # 10-17   ␐ ␑ ␒ ␓ 𝘖𝘚𝘊 𝘕𝘌𝘓 ␈ 𝘌𝘚𝘈 #
@@ -9516,8 +9529,8 @@
 # Fun fact: even though glibc supports both "cp9448" and "cp1256", it doesn't
 #           notice that they actually use the exact same tables and doesn't
 #           alias them onto each other ;)
-@CP(CODEC_CP1256: "cp1256", "Windows-1256", "cswindows1256", "MS-ARAB",
-                  "cp9448", "IBM9448", "csIBM9448")
+@CP(CODEC_CP1256: "cp1256", "IBM1256", "Windows-1256", "cswindows1256",
+                  "MS-ARAB", "cp9448", "IBM9448", "csIBM9448")
 	@ORD(0x80)
 	20AC 067E 201A 0192 201E 2026 2020 2021   # 80-87   € پ ‚ ƒ „ … † ‡ #
 	02C6 2030 0679 2039 0152 0686 0698 0688   # 88-8F   ˆ ‰ ٹ ‹ Œ چ ژ ڈ #
