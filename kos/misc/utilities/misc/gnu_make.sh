@@ -605,8 +605,8 @@ if [ "$MODE_FORCE_MAKE" == yes ] || ! [ -d "$DESTDIR" ]; then
 						# Prevent debug symbols from being stripped
 						if ! [[ "$CONFIGURE" == *--enable-stripping* ]] && \
 						   ! [[ "$CONFIGURE" == *--disable-stripping* ]]; then
-							echo "	option: --enable-stripping"
-							CONFIGURE="$CONFIGURE --enable-stripping"
+							echo "	option: --disable-stripping"
+							CONFIGURE="$CONFIGURE --disable-stripping"
 						fi
 						;;
 
@@ -667,7 +667,7 @@ if [ "$MODE_FORCE_MAKE" == yes ] || ! [ -d "$DESTDIR" ]; then
 							# though KOS has a fully working mmap(2) system call that would
 							# pass all of autoconf's tests (at least I hope...)
 							# Anyways: Just hammer it home to autoconf and manually tell it
-							#          what we're capable of via a custom config.size entry.
+							#          what we're capable of via a custom config.site entry.
 							if ! [[ "$CONFIG_SITE" == *ac_cv_func_mmap_fixed_mapped* ]]; then
 								echo "	config.site: ac_cv_func_mmap_fixed_mapped=yes"
 								CONFIG_SITE="ac_cv_func_mmap_fixed_mapped=yes\n$CONFIG_SITE"
@@ -721,7 +721,7 @@ fi         # if [ "$MODE_FORCE_MAKE" == yes ] || ! [ -d "$DESTDIR" ]
 
 
 if test -z "$INSTALL_NONE"; then
-	# Go over all all of the files that got installed, and select
+	# Go over all of the files that got installed, and select
 	# which of them we want to put on the KOS disk image(s).
 	cmd cd "$DESTDIR"
 	while IFS= read -r line; do

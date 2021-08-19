@@ -1273,7 +1273,7 @@ NOTHROW_RPC(LIBCCALL libc_frealpath4)(fd_t fd,
 		if (!buflen) {
 			/* Automatically allocate + determine buffer size. */
 			buflen = PATH_MAX;
-			buffer  = (char *)malloc(buflen);
+			buffer = (char *)malloc(buflen);
 			if unlikely(!buffer)
 				buflen = 0;
 			for (;;) {
@@ -1292,7 +1292,7 @@ NOTHROW_RPC(LIBCCALL libc_frealpath4)(fd_t fd,
 					return NULL;
 				}
 				buflen = (size_t)result;
-				buffer  = resolved;
+				buffer = resolved;
 			}
 			if ((size_t)result != buflen) {
 				resolved = (char *)realloc(buffer, (size_t)result);
@@ -1326,11 +1326,11 @@ done:
 }
 /*[[[end:libc_frealpath4]]]*/
 
-/*[[[head:libc_frealpathat,hash:CRC-32=0xf1848335]]]*/
+/*[[[head:libc_frealpathat,hash:CRC-32=0x2088ea70]]]*/
 /* Returns the absolute filesystem path for the specified file
  * When `AT_SYMLINK_NOFOLLOW' is given, a final symlink is not dereferenced,
  * causing the path to the symlink itself to be printed. - Otherwise, the
- * filed pointed to by the symblic link is printed.
+ * file pointed to by the symblic link is printed.
  * NOTE: You may use `AT_ALTPATH' to cause the path to be printed in alternate
  *       representation mode. This means that if the path would have normally
  *       been printed as a unix path, it would instead be printed as a DOS path.
@@ -1358,7 +1358,7 @@ NOTHROW_RPC(LIBCCALL libc_frealpathat)(fd_t dirfd,
 		if (!buflen) {
 			/* Automatically allocate + determine buffer size. */
 			buflen = PATH_MAX;
-			buffer  = (char *)malloc(buflen);
+			buffer = (char *)malloc(buflen);
 			if unlikely(!buffer)
 				buflen = 0;
 			for (;;) {
@@ -1378,7 +1378,7 @@ NOTHROW_RPC(LIBCCALL libc_frealpathat)(fd_t dirfd,
 					return NULL;
 				}
 				buflen = (size_t)result;
-				buffer  = resolved;
+				buffer = resolved;
 			}
 			if ((size_t)result != buflen) {
 				resolved = (char *)realloc(buffer, (size_t)result);

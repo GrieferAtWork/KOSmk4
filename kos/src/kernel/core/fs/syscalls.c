@@ -2252,7 +2252,7 @@ DEFINE_SYSCALL4(ssize_t, frealpath4,
 		default:
 bad_handle_type:
 			THROW(E_INVALID_HANDLE_FILETYPE,
-			      (unsigned int)fd, /* Filled in by the caller */
+			      (unsigned int)fd,
 			      HANDLE_TYPE_PATH,
 			      hnd.h_type,
 			      HANDLE_TYPEKIND_PATH_GENERIC,
