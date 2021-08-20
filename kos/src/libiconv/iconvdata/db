@@ -43,6 +43,7 @@
 #  - https://ftp.unicode.org/Public/MAPPINGS/
 #  - https://www.iana.org/assignments/character-sets/character-sets.xhtml
 #  - https://www.ibm.com/docs/en/ibm-mq/8.0?topic=administering-available-code-pages  (WARNING: Contains errors!)
+#  - https://github.com/unicode-org/icu                                               (Really good source!)
 #  - GLibc
 ###################################################################################################
 
@@ -58,6 +59,33 @@
 #    I really don't want to have to do, meaning that this will probably never happen :(
 #
 ###################################################################################################
+#  - glibc-2.32/iconvdata/ibm932.c                                    "IBM932", "csIBM932"  (https://en.wikipedia.org/wiki/Code_page_932_(IBM))
+#  - glibc-2.32/iconvdata/ibm943.c                                    "IBM943", "cp943", "csIBM943"  (https://en.wikipedia.org/wiki/Code_page_932_(Microsoft_Windows))
+#
+# Codec: IBM932
+# Codec: IBM943
+#
+# NOTE: Each codec has a different <SINGLE_BYTE_LOOKUP_TABLE> / <DOUBLE_BYTE_LOOKUP_TABLE>
+#
+# VAR SAVED_BYTE: unsigned char = 0
+#
+# decode(unsigned char ch) {
+#    if (SAVED_BYTE != 0) {
+#        uint16_t ch16 = (SAVED_BYTE << 8) | ch;
+#        SAVED_BYTE = 0;
+#        return <DOUBLE_BYTE_LOOKUP_TABLE>[ch16];
+#    }
+#    result = <SINGLE_BYTE_LOOKUP_TABLE>[ch];
+#    if (result == 0) {
+#        if (!DOES_DOUBLE_WIDE_EXIST_FOR(ch << 8 | 0x??))
+#            return ERROR; // Illegal bytes
+#        SAVED_BYTE = ch;
+#        return;
+#    }
+#    return result;
+# }
+#
+###################################################################################################
 # TODO:
 #  - https://en.wikipedia.org/wiki/UTF-1                              "ISO-10646-UTF-1", "csISO10646UTF1"
 #  - https://en.wikipedia.org/wiki/Shift_JIS                          "shift-jis", "sjis", "ms_kanji", "csShiftJis"
@@ -68,13 +96,6 @@
 #  - https://en.wikipedia.org/wiki/Code_page_778                      "cp778", "LST-1590-2"
 #  - https://en.wikipedia.org/wiki/CSX%2B_Indic_character_set         "CSX+Indic"
 #  - https://en.wikipedia.org/wiki/Code_page_907                      "cp907", "IBM907"
-#  - glibc-2.32/iconvdata/ibm930.c                                    "IBM930", "cp930", "csIBM930", "x-IBM930", "930"  (https://en.wikipedia.org/wiki/Japanese_language_in_EBCDIC)
-#  - glibc-2.32/iconvdata/ibm932.c                                    "IBM932", "csIBM932"  (https://en.wikipedia.org/wiki/Code_page_932_(IBM))
-#  - glibc-2.32/iconvdata/ibm933.c                                    "IBM933", "cp933", "csIBM933"  (https://en.wikipedia.org/wiki/KS_X_1001#Johab_encoding)
-#  - glibc-2.32/iconvdata/ibm935.c                                    "IBM935", "cp935", "csIBM935"
-#  - glibc-2.32/iconvdata/ibm937.c                                    "IBM937", "cp937", "csIBM937"
-#  - glibc-2.32/iconvdata/ibm939.c                                    "IBM939", "cp939", "csIBM939", "x-IBM939", "939"  (https://en.wikipedia.org/wiki/Japanese_language_in_EBCDIC)
-#  - glibc-2.32/iconvdata/ibm943.c                                    "IBM943", "cp943", "csIBM943"  (https://en.wikipedia.org/wiki/Code_page_932_(Microsoft_Windows))
 #  - glibc-2.32/iconvdata/euc-kr.c                                    "EUC-KR", "euckr", "csEUCKR", "OSF0004000a", "IBMeuckr", "ksc-5601", "ks-c-5601-1987", "ksc5601-1987", "ksc5601-1987", "IBM970", "cp970", "5601" (https://www.rfc-editor.org/rfc/rfc1557.html)
 #  - glibc-2.32/iconvdata/uhc.c                                       "MSCP949", "UHC", "cp949", "OSF100203B5", "IBM1363", "cp1363"
 #  - glibc-2.32/iconvdata/johab.c                                     "MSCP1361", "cp1361", "johab", "x-johab"
@@ -102,11 +123,6 @@
 #  - glibc-2.32/iconvdata/euc-jisx0213.c                              "euc-jisx0213"
 #  - glibc-2.32/iconvdata/shift_jisx0213.c                            "ShiftJISX0213", "Shift_JISX0213"
 #  - glibc-2.32/iconvdata/tscii.c                                     "TSCII", "csTSCII"
-#  - glibc-2.32/iconvdata/ibm1364.c                                   "IBM1364", "cp1364", "csIBM1364"
-#  - glibc-2.32/iconvdata/ibm1371.c                                   "IBM1371", "cp1371", "csIBM1371"
-#  - glibc-2.32/iconvdata/ibm1388.c                                   "IBM1388", "cp1388", "csIBM1388"
-#  - glibc-2.32/iconvdata/ibm1390.c                                   "IBM1390", "cp1390", "csIBM1390"
-#  - glibc-2.32/iconvdata/ibm1399.c                                   "IBM1399", "cp1399", "csIBM1399"
 #  - glibc-2.32/iconvdata/iso_11548-1.c                               "ISO_11548-1", "ISO_TR_11548-1", "ISO/TR_11548-1", "ISO11548-1", "csISO115481" (https://www.iana.org/assignments/charset-reg/ISO-11548-1)
 #  - https://www.rfc-editor.org/rfc/rfc1345.html                      "JIS_C6226-1983", "iso-ir-87", "x0208", "JIS_X0208-1983", "csISO87JISX0208", "x-JIS0208", "jis-c6226-1983", "jis-x208-1983", "csISO87jisx208", "x208", "jis208"  (https://en.wikipedia.org/wiki/JIS_X_0208)
 #  - https://ftp.unicode.org/Public/MAPPINGS/VENDORS/MISC/KPS9566.TXT "KPS9566", "KPS-9566", "KPS-9566-2003"
@@ -9699,3 +9715,44 @@
 	0141 00D8 0152 00BA 00F2 00F3 00F4 00F5   # E8-EF   Ł Ø Œ º ò ó ô õ #
 	00F6 00E6 00F9 00FA 00FB 0131 00FC 00FD   # F0-F7   ö æ ù ú û ı ü ý #
 	0142 00F8 0153 00DF 00FE 00FF FFFD FFFD   # F8-FF   ł ø œ ß þ ÿ � � #
+
+
+
+###################################################################################################
+# Codecs declared as CODEC_STATEFUL work like this:
+# NOTE: Each codec has a different <SINGLE_BYTE_LOOKUP_TABLE> / <DOUBLE_BYTE_LOOKUP_TABLE>
+#
+# VAR STATE: enum { SINGLE_BYTE, DOUBLE_BYTE_1, DOUBLE_BYTE_2 } = SINGLE_BYTE
+# VAR SAVED_BYTE: unsigned char                                 = <undefined>
+#
+# decode(unsigned char ch) {
+#    if (ch == 0x0e)             // 0x0e = ascii.SO
+#        STATE = DOUBLE_BYTE_1;
+#    else if (ch == 0x0f)        // 0x0e = ascii.SI
+#        STATE = SINGLE_BYTE;
+#    else {
+#        if (STATE == SINGLE_BYTE) {
+#            return <SINGLE_BYTE_LOOKUP_TABLE>[ch];
+#        }
+#        if (STATE == DOUBLE_BYTE_1) {
+#            STATE = DOUBLE_BYTE_2;
+#            SAVED_BYTE = ch;
+#            return;
+#        }
+#        assert(STATE == DOUBLE_BYTE_2);
+#        uint16_t ch16 = (SAVED_BYTE << 8) | ch;
+#        return  <DOUBLE_BYTE_LOOKUP_TABLE>[ch];
+#    }
+# }
+@INCLUDE("./stateful-ibm930")
+@INCLUDE("./stateful-ibm930")
+@INCLUDE("./stateful-ibm933")
+@INCLUDE("./stateful-ibm935")
+@INCLUDE("./stateful-ibm937")
+@INCLUDE("./stateful-ibm939")
+@INCLUDE("./stateful-ibm1364")
+@INCLUDE("./stateful-ibm1371")
+@INCLUDE("./stateful-ibm1388")
+@INCLUDE("./stateful-ibm1390")
+@INCLUDE("./stateful-ibm1399")
+

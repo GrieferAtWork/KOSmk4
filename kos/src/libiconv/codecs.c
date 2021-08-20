@@ -1546,6 +1546,36 @@ struct codec_name_db_struct {
 	char db_HP_TURKISH8_3[12]; /* "osf10010006" */
 	char db_HP_TURKISH8_nul;
 
+	/* CODEC_IBM1364 */
+	char db_IBM1364_0[8];  /* "ibm1364" */
+	char db_IBM1364_1[7];  /* "cp1364" */
+	char db_IBM1364_2[10]; /* "csibm1364" */
+	char db_IBM1364_nul;
+
+	/* CODEC_IBM1371 */
+	char db_IBM1371_0[8];  /* "ibm1371" */
+	char db_IBM1371_1[7];  /* "cp1371" */
+	char db_IBM1371_2[10]; /* "csibm1371" */
+	char db_IBM1371_nul;
+
+	/* CODEC_IBM1388 */
+	char db_IBM1388_0[8];  /* "ibm1388" */
+	char db_IBM1388_1[7];  /* "cp1388" */
+	char db_IBM1388_2[10]; /* "csibm1388" */
+	char db_IBM1388_nul;
+
+	/* CODEC_IBM1390 */
+	char db_IBM1390_0[8];  /* "ibm1390" */
+	char db_IBM1390_1[7];  /* "cp1390" */
+	char db_IBM1390_2[10]; /* "csibm1390" */
+	char db_IBM1390_nul;
+
+	/* CODEC_IBM1399 */
+	char db_IBM1399_0[8];  /* "ibm1399" */
+	char db_IBM1399_1[7];  /* "cp1399" */
+	char db_IBM1399_2[10]; /* "csibm1399" */
+	char db_IBM1399_nul;
+
 	/* CODEC_IBM1401 */
 	char db_IBM1401_0[8]; /* "ibm1401" */
 	char db_IBM1401_nul;
@@ -1563,6 +1593,40 @@ struct codec_name_db_struct {
 	char db_IBM7090_0[8]; /* "ibm7090" */
 	char db_IBM7090_1[8]; /* "ibm7094" */
 	char db_IBM7090_nul;
+
+	/* CODEC_IBM930 */
+	char db_IBM930_0[7]; /* "ibm930" */
+	char db_IBM930_1[6]; /* "cp930" */
+	char db_IBM930_2[9]; /* "csibm930" */
+	char db_IBM930_3[9]; /* "x-ibm930" */
+	char db_IBM930_4[4]; /* "930" */
+	char db_IBM930_nul;
+
+	/* CODEC_IBM933 */
+	char db_IBM933_0[7]; /* "ibm933" */
+	char db_IBM933_1[6]; /* "cp933" */
+	char db_IBM933_2[9]; /* "csibm933" */
+	char db_IBM933_nul;
+
+	/* CODEC_IBM935 */
+	char db_IBM935_0[7]; /* "ibm935" */
+	char db_IBM935_1[6]; /* "cp935" */
+	char db_IBM935_2[9]; /* "csibm935" */
+	char db_IBM935_nul;
+
+	/* CODEC_IBM937 */
+	char db_IBM937_0[7]; /* "ibm937" */
+	char db_IBM937_1[6]; /* "cp937" */
+	char db_IBM937_2[9]; /* "csibm937" */
+	char db_IBM937_nul;
+
+	/* CODEC_IBM939 */
+	char db_IBM939_0[7]; /* "ibm939" */
+	char db_IBM939_1[6]; /* "cp939" */
+	char db_IBM939_2[9]; /* "csibm939" */
+	char db_IBM939_3[9]; /* "x-ibm939" */
+	char db_IBM939_4[4]; /* "939" */
+	char db_IBM939_nul;
 
 	/* CODEC_ISIRI3342 */
 	char db_ISIRI3342_0[10]; /* "isiri3342" */
@@ -4308,6 +4372,36 @@ PRIVATE struct codec_name_db_struct const codec_name_db = {
 	"osf10010006",
 	0,
 
+	/* CODEC_IBM1364 */
+	"ibm1364",
+	"cp1364",
+	"csibm1364",
+	0,
+
+	/* CODEC_IBM1371 */
+	"ibm1371",
+	"cp1371",
+	"csibm1371",
+	0,
+
+	/* CODEC_IBM1388 */
+	"ibm1388",
+	"cp1388",
+	"csibm1388",
+	0,
+
+	/* CODEC_IBM1390 */
+	"ibm1390",
+	"cp1390",
+	"csibm1390",
+	0,
+
+	/* CODEC_IBM1399 */
+	"ibm1399",
+	"cp1399",
+	"csibm1399",
+	0,
+
 	/* CODEC_IBM1401 */
 	"ibm1401",
 	0,
@@ -4324,6 +4418,40 @@ PRIVATE struct codec_name_db_struct const codec_name_db = {
 	/* CODEC_IBM7090 */
 	"ibm7090",
 	"ibm7094",
+	0,
+
+	/* CODEC_IBM930 */
+	"ibm930",
+	"cp930",
+	"csibm930",
+	"x-ibm930",
+	"930",
+	0,
+
+	/* CODEC_IBM933 */
+	"ibm933",
+	"cp933",
+	"csibm933",
+	0,
+
+	/* CODEC_IBM935 */
+	"ibm935",
+	"cp935",
+	"csibm935",
+	0,
+
+	/* CODEC_IBM937 */
+	"ibm937",
+	"cp937",
+	"csibm937",
+	0,
+
+	/* CODEC_IBM939 */
+	"ibm939",
+	"cp939",
+	"csibm939",
+	"x-ibm939",
+	"939",
 	0,
 
 	/* CODEC_ISIRI3342 */
@@ -5632,6 +5760,8 @@ PRIVATE struct codec_db_entry const codec_db[] = {
 	{ offsetof(struct codec_name_db_struct, db_ISO_8859_9_11), /*             "8859-9"                        */ CODEC_ISO_8859_9 },
 	{ offsetof(struct codec_name_db_struct, db_CP904_2), /*                   "904"                           */ CODEC_CP904 },
 	{ offsetof(struct codec_name_db_struct, db_CP918_2), /*                   "918"                           */ CODEC_CP918 },
+	{ offsetof(struct codec_name_db_struct, db_IBM930_4), /*                  "930"                           */ CODEC_IBM930 },
+	{ offsetof(struct codec_name_db_struct, db_IBM939_4), /*                  "939"                           */ CODEC_IBM939 },
 	{ offsetof(struct codec_name_db_struct, db_ADOBE_STANDARD_ENCODING_0), /* "adobe-standard-encoding"       */ CODEC_ADOBE_STANDARD_ENCODING },
 	{ offsetof(struct codec_name_db_struct, db_ADOBE_SYMBOL_ENCODING_1), /*   "adobe-symbol-encoding"         */ CODEC_ADOBE_SYMBOL_ENCODING },
 	{ offsetof(struct codec_name_db_struct, db_ADOBE_ZAPF_DINGBATS_0), /*     "adobe-zapf-dingbats"           */ CODEC_ADOBE_ZAPF_DINGBATS },
@@ -5843,6 +5973,11 @@ PRIVATE struct codec_db_entry const codec_db[] = {
 #elif __BYTE_ORDER__ == __ORDER_LITTLE_ENDIAN__
 	{ offsetof(struct codec_name_db_struct, db_UTF16LE_20), /*                "cp13488"                       */ CODEC_UTF16LE },
 #endif /* ... */
+	{ offsetof(struct codec_name_db_struct, db_IBM1364_1), /*                 "cp1364"                        */ CODEC_IBM1364 },
+	{ offsetof(struct codec_name_db_struct, db_IBM1371_1), /*                 "cp1371"                        */ CODEC_IBM1371 },
+	{ offsetof(struct codec_name_db_struct, db_IBM1388_1), /*                 "cp1388"                        */ CODEC_IBM1388 },
+	{ offsetof(struct codec_name_db_struct, db_IBM1390_1), /*                 "cp1390"                        */ CODEC_IBM1390 },
+	{ offsetof(struct codec_name_db_struct, db_IBM1399_1), /*                 "cp1399"                        */ CODEC_IBM1399 },
 	{ offsetof(struct codec_name_db_struct, db_PT154_3), /*                   "cp154"                         */ CODEC_PT154 },
 	{ offsetof(struct codec_name_db_struct, db_CP16804_0), /*                 "cp16804"                       */ CODEC_CP16804 },
 	{ offsetof(struct codec_name_db_struct, db_CP17248_0), /*                 "cp17248"                       */ CODEC_CP17248 },
@@ -5975,6 +6110,11 @@ PRIVATE struct codec_db_entry const codec_db[] = {
 	{ offsetof(struct codec_name_db_struct, db_CP921_0), /*                   "cp921"                         */ CODEC_CP921 },
 	{ offsetof(struct codec_name_db_struct, db_CP922_0), /*                   "cp922"                         */ CODEC_CP922 },
 	{ offsetof(struct codec_name_db_struct, db_ISO_8859_15_7), /*             "cp923"                         */ CODEC_ISO_8859_15 },
+	{ offsetof(struct codec_name_db_struct, db_IBM930_1), /*                  "cp930"                         */ CODEC_IBM930 },
+	{ offsetof(struct codec_name_db_struct, db_IBM933_1), /*                  "cp933"                         */ CODEC_IBM933 },
+	{ offsetof(struct codec_name_db_struct, db_IBM935_1), /*                  "cp935"                         */ CODEC_IBM935 },
+	{ offsetof(struct codec_name_db_struct, db_IBM937_1), /*                  "cp937"                         */ CODEC_IBM937 },
+	{ offsetof(struct codec_name_db_struct, db_IBM939_1), /*                  "cp939"                         */ CODEC_IBM939 },
 	{ offsetof(struct codec_name_db_struct, db_CP1256_5), /*                  "cp9448"                        */ CODEC_CP1256 },
 	{ offsetof(struct codec_name_db_struct, db_CP667_3), /*                   "cp991"                         */ CODEC_CP667 },
 	{ offsetof(struct codec_name_db_struct, db_CP861_6), /*                   "cpibm861"                      */ CODEC_CP861 },
@@ -6050,6 +6190,11 @@ PRIVATE struct codec_db_entry const codec_db[] = {
 	{ offsetof(struct codec_name_db_struct, db_CP1166_2), /*                  "csibm1166"                     */ CODEC_CP1166 },
 	{ offsetof(struct codec_name_db_struct, db_KOI8_RU_3), /*                 "csibm1167"                     */ CODEC_KOI8_RU },
 	{ offsetof(struct codec_name_db_struct, db_CP12712_2), /*                 "csibm12712"                    */ CODEC_CP12712 },
+	{ offsetof(struct codec_name_db_struct, db_IBM1364_2), /*                 "csibm1364"                     */ CODEC_IBM1364 },
+	{ offsetof(struct codec_name_db_struct, db_IBM1371_2), /*                 "csibm1371"                     */ CODEC_IBM1371 },
+	{ offsetof(struct codec_name_db_struct, db_IBM1388_2), /*                 "csibm1388"                     */ CODEC_IBM1388 },
+	{ offsetof(struct codec_name_db_struct, db_IBM1390_2), /*                 "csibm1390"                     */ CODEC_IBM1390 },
+	{ offsetof(struct codec_name_db_struct, db_IBM1399_2), /*                 "csibm1399"                     */ CODEC_IBM1399 },
 	{ offsetof(struct codec_name_db_struct, db_CP16804_2), /*                 "csibm16804"                    */ CODEC_CP16804 },
 	{ offsetof(struct codec_name_db_struct, db_CP273_2), /*                   "csibm273"                      */ CODEC_CP273 },
 	{ offsetof(struct codec_name_db_struct, db_CP274_3), /*                   "csibm274"                      */ CODEC_CP274 },
@@ -6101,6 +6246,11 @@ PRIVATE struct codec_db_entry const codec_db[] = {
 	{ offsetof(struct codec_name_db_struct, db_CP918_4), /*                   "csibm918"                      */ CODEC_CP918 },
 	{ offsetof(struct codec_name_db_struct, db_CP921_2), /*                   "csibm921"                      */ CODEC_CP921 },
 	{ offsetof(struct codec_name_db_struct, db_CP922_2), /*                   "csibm922"                      */ CODEC_CP922 },
+	{ offsetof(struct codec_name_db_struct, db_IBM930_2), /*                  "csibm930"                      */ CODEC_IBM930 },
+	{ offsetof(struct codec_name_db_struct, db_IBM933_2), /*                  "csibm933"                      */ CODEC_IBM933 },
+	{ offsetof(struct codec_name_db_struct, db_IBM935_2), /*                  "csibm935"                      */ CODEC_IBM935 },
+	{ offsetof(struct codec_name_db_struct, db_IBM937_2), /*                  "csibm937"                      */ CODEC_IBM937 },
+	{ offsetof(struct codec_name_db_struct, db_IBM939_2), /*                  "csibm939"                      */ CODEC_IBM939 },
 	{ offsetof(struct codec_name_db_struct, db_CP1256_7), /*                  "csibm9448"                     */ CODEC_CP1256 },
 	{ offsetof(struct codec_name_db_struct, db_EBCDIC_AT_DE_1), /*            "csibmebcdicatde"               */ CODEC_EBCDIC_AT_DE },
 	{ offsetof(struct codec_name_db_struct, db_ISO646_T_61_2), /*             "csiso102t617bit"               */ CODEC_ISO646_T_61 },
@@ -6488,6 +6638,11 @@ PRIVATE struct codec_db_entry const codec_db[] = {
 	{ offsetof(struct codec_name_db_struct, db_CP1284_2), /*                  "ibm1284"                       */ CODEC_CP1284 },
 	{ offsetof(struct codec_name_db_struct, db_CP1285_2), /*                  "ibm1285"                       */ CODEC_CP1285 },
 	{ offsetof(struct codec_name_db_struct, db_CP1286_2), /*                  "ibm1286"                       */ CODEC_CP1286 },
+	{ offsetof(struct codec_name_db_struct, db_IBM1364_0), /*                 "ibm1364"                       */ CODEC_IBM1364 },
+	{ offsetof(struct codec_name_db_struct, db_IBM1371_0), /*                 "ibm1371"                       */ CODEC_IBM1371 },
+	{ offsetof(struct codec_name_db_struct, db_IBM1388_0), /*                 "ibm1388"                       */ CODEC_IBM1388 },
+	{ offsetof(struct codec_name_db_struct, db_IBM1390_0), /*                 "ibm1390"                       */ CODEC_IBM1390 },
+	{ offsetof(struct codec_name_db_struct, db_IBM1399_0), /*                 "ibm1399"                       */ CODEC_IBM1399 },
 	{ offsetof(struct codec_name_db_struct, db_IBM1401_0), /*                 "ibm1401"                       */ CODEC_IBM1401 },
 	{ offsetof(struct codec_name_db_struct, db_CP16804_1), /*                 "ibm16804"                      */ CODEC_CP16804 },
 	{ offsetof(struct codec_name_db_struct, db_IBM256_0), /*                  "ibm256"                        */ CODEC_IBM256 },
@@ -6577,6 +6732,11 @@ PRIVATE struct codec_db_entry const codec_db[] = {
 	{ offsetof(struct codec_name_db_struct, db_CP921_1), /*                   "ibm921"                        */ CODEC_CP921 },
 	{ offsetof(struct codec_name_db_struct, db_CP922_1), /*                   "ibm922"                        */ CODEC_CP922 },
 	{ offsetof(struct codec_name_db_struct, db_ISO_8859_15_6), /*             "ibm923"                        */ CODEC_ISO_8859_15 },
+	{ offsetof(struct codec_name_db_struct, db_IBM930_0), /*                  "ibm930"                        */ CODEC_IBM930 },
+	{ offsetof(struct codec_name_db_struct, db_IBM933_0), /*                  "ibm933"                        */ CODEC_IBM933 },
+	{ offsetof(struct codec_name_db_struct, db_IBM935_0), /*                  "ibm935"                        */ CODEC_IBM935 },
+	{ offsetof(struct codec_name_db_struct, db_IBM937_0), /*                  "ibm937"                        */ CODEC_IBM937 },
+	{ offsetof(struct codec_name_db_struct, db_IBM939_0), /*                  "ibm939"                        */ CODEC_IBM939 },
 	{ offsetof(struct codec_name_db_struct, db_CP1256_6), /*                  "ibm9448"                       */ CODEC_CP1256 },
 	{ offsetof(struct codec_name_db_struct, db_ISO_IR_143_0), /*              "iec-p27-1"                     */ CODEC_ISO_IR_143 },
 	{ offsetof(struct codec_name_db_struct, db_ISO_IR_143_3), /*              "iec-p271"                      */ CODEC_ISO_IR_143 },
@@ -7246,6 +7406,8 @@ PRIVATE struct codec_db_entry const codec_db[] = {
 	{ offsetof(struct codec_name_db_struct, db_CP1270_3), /*                  "winsami2"                      */ CODEC_CP1270 },
 	{ offsetof(struct codec_name_db_struct, db_CP1270_2), /*                  "ws2"                           */ CODEC_CP1270 },
 	{ offsetof(struct codec_name_db_struct, db_CP874_2), /*                   "x-ibm874"                      */ CODEC_CP874 },
+	{ offsetof(struct codec_name_db_struct, db_IBM930_3), /*                  "x-ibm930"                      */ CODEC_IBM930 },
+	{ offsetof(struct codec_name_db_struct, db_IBM939_3), /*                  "x-ibm939"                      */ CODEC_IBM939 },
 	{ offsetof(struct codec_name_db_struct, db_ISO_8859_11_11), /*            "x-iso-8859-11"                 */ CODEC_ISO_8859_11 },
 	{ offsetof(struct codec_name_db_struct, db_CP10004_2), /*                 "x-mac-arabic"                  */ CODEC_CP10004 },
 	{ offsetof(struct codec_name_db_struct, db_X_MAC_ARMENIAN_0), /*          "x-mac-armenian"                */ CODEC_X_MAC_ARMENIAN },

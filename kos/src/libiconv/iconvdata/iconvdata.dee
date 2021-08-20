@@ -19,6 +19,7 @@
  */
 
 import * from deemon;
+import * from .util;
 import fs;
 import util;
 
@@ -68,6 +69,20 @@ class CodePage {
 	}
 }
 
+class StatefulCodec {
+	this = default;
+	public member name: string;
+	public member aliases: {CodecAlias...} = [];
+
+	@@Single-byte table
+	public member sb_table: {int...} = List([0] * 256);
+
+	@@Double-byte table
+	public member db_table: {int: int | {int...}} = Dict();
+}
+
+
+
 function getEncodeTable(table: {int...}, shift: int): {int: int} {
 	local result = Dict();
 	for (local encoded, decoded: util.enumerate(table))
@@ -79,33 +94,6 @@ function dbFieldName(name: string): string {
 	if (name.startswith("CODEC_"))
 		return "db_" + name[6:];
 	return "db_" + name;
-}
-
-
-function normalizeCodecName(name: string): string {
-	name = name.lower().replace("_", "-").replace(" ", "-");
-	assert " " !in name, repr name;
-	assert "--" !in name, repr name;
-	final local PREFIX_REPLACEMENTS = { "oem", "ibm", "iso", "cp", "latin", "koi", "l" };
-	for (local pr: PREFIX_REPLACEMENTS) {
-		if (name.startswith(pr) && #name >= #pr+2 &&
-		    name[#pr] == "-" && name.isdigit(#pr + 1))
-			name = pr + name[#pr+1:];
-	}
-	
-	local i = 0;
-	for (;;) {
-		i = name.find("0", i);
-		if (i < 0)
-			break;
-		if (i + 1 < #name && name.isdigit(i + 1) &&
-			(i == 0 || !name.isdigit(i - 1)))
-			name = name[:i] + name[i+1:];
-		else {
-			++i;
-		}
-	}
-	return name;
 }
 
 
@@ -140,44 +128,10 @@ function constructCodecObject(typ: Type, arg: string): Object {
 			parseCodecAlias(x)));
 }
 
-function italicChr(c: int): int {
-	if (c >= "A".ord() && c <= "Z".ord())
-		return 0x1D608 + c - "A".ord();
-	if (c >= "a".ord() && c <= "z".ord())
-		return 0x1D656 + c - "a".ord();
-	if (c >= "0".ord() && c <= "9".ord())
-		return 0x1D608 + c - "0".ord();
-	return c;
-}
-function italic(s: string): string {
-	return "".join(for (local c: s) string.chr(italicChr(c.ord())));
-}
 
-function uniEscape(o: int): string {
-	if (o <= 0x20)
-		return string.chr(0x2400 + o);
-	if (o == 0x7f)
-		return string.chr(0x2421);
-	if (o >= 0x80 && o <= 0x9f) {
-		local x = "PADHOPBPHNBHINDNELSSAESAHTSHTJVTSPLDPLURI SS2SS3"
-		          "DCSPU1PU2STSCCHMW SPAEPASOSSGCSCICSIST OSCPM APC";
-		local s = (o - 0x80) * 3;
-		return italic(x[s:s+3]);
-	}
-	local result = { 0x00A0 : "NBSP" }.get(o);
-	if (result !is none)
-		return italic(result);
-	local result = string.chr(o);
-	if (result.islf())
-		return string.chr(0x2424);
-	return result;
-}
-
-
-
-function parseDB(): {string: Object} {
+function parseDBFilename(filename: string): {string: Object} {
+	print File.stderr: "Loading database:", repr filename;
 	local result = Dict();
-	local filename = fs.joinpath(fs.headof(__FILE__), "db");
 	local data = File.open(filename, "r").read().decode("utf-8");
 	local newData = File.Writer();
 	function errAt(i: int, msg: string) {
@@ -189,6 +143,7 @@ function parseDB(): {string: Object} {
 	}
 	local currentItem = none;
 	local currentIndex = none;
+	local currentTable = none;
 	local i = 0, len = #data, flushStart = 0;
 	local usedNames = HashSet();
 	while (i < len) {
@@ -245,14 +200,44 @@ function parseDB(): {string: Object} {
 
 			switch (kwd.lower()) {
 
+			case "include": {
+				local argFilename = arg.decode("c-escape").replace("\\", "/");
+				while (argFilename.startswith("./"))
+					argFilename = argFilename[2:];
+				local otherFilename = fs.joinpath(fs.headof(filename), argFilename);
+				result.update(parseDBFilename(otherFilename));
+			}	break;
+
 			case "codec":
 				currentItem  = constructCurrentItem(Codec);
 				currentIndex = 0;
+				currentTable = none;
 				break;
 
 			case "cp":
 				currentItem  = constructCurrentItem(CodePage);
 				currentIndex = 0;
+				currentTable = currentItem.table;
+				break;
+
+			case "codec_stateful":
+				currentItem  = constructCurrentItem(StatefulCodec);
+				currentIndex = 0;
+				currentTable = none;
+				break;
+
+			case "sb":
+				if (currentItem !is StatefulCodec)
+					errAt(argStart, "@SB is only allowed for @CODEC_STATEFUL");
+				currentIndex = 0;
+				currentTable = currentItem.sb_table;
+				break;
+
+			case "db":
+				if (currentItem !is StatefulCodec)
+					errAt(argStart, "@SB is only allowed for @CODEC_STATEFUL");
+				currentIndex = 0;
+				currentTable = currentItem.db_table;
 				break;
 
 			case "ord": {
@@ -276,57 +261,138 @@ function parseDB(): {string: Object} {
 			continue;
 		}
 		if (ch.isalnum()) {
-			local lineIds = [];
-			local lineStart = i;
-			for (;;) {
-				local uniStart = i;
-				++i;
-				while (i < len && data.isalnum(i))
+			if (currentTable is none)
+				errAt(i, "Unable to define ordinals at this time");
+			if (currentTable is List) {
+				local lineIds = [];
+				local lineStart = i;
+				for (;;) {
+					local uniStart = i;
 					++i;
-				local uni;
-				local istr = data[uniStart:i].lower();
-				if (istr.startswith("0x"))
-					istr = istr[2:];
-				try {
-					uni = int("0x" + istr);
-				} catch (...) {
-					errAt(uniStart, "Invalid hex integer: " + repr data[uniStart:i]);
+					while (i < len && data.isalnum(i))
+						++i;
+					local uni;
+					local istr = data[uniStart:i].lower();
+					if (istr.startswith("0x"))
+						istr = istr[2:];
+					try {
+						uni = int("0x" + istr);
+					} catch (...) {
+						errAt(uniStart, "Invalid hex integer: " + repr data[uniStart:i]);
+					}
+					lineIds.append(uni);
+					if (currentIndex >= 256)
+						errAt(uniStart, "Character index out-of-bounds");
+					currentTable[currentIndex] = uni;
+					++currentIndex;
+					while (i < len && data.isspace(i) && !data.islf(i))
+						++i;
+					if (i < len && data[i] == ",") {
+						do {
+							++i;
+						} while (i < len && data.isspace(i) && !data.islf(i));
+					}
+					if (i >= len || !data.isalnum(i))
+						break;
 				}
-				lineIds.append(uni);
-				if (currentIndex >= 256)
-					errAt(uniStart, "Character index out-of-bounds");
-				if (currentItem !is CodePage)
-					errAt(uniStart, "Not inside of a codepage");
-				currentItem.table[currentIndex] = uni;
-				++currentIndex;
-				while (i < len && data.isspace(i) && !data.islf(i))
+				if (i >= len || data[i] in "#\n") {
+					while (i > 0 && data.isspace(i - 1) && !data.islf(i - 1))
+						--i;
+					i = data.find("\n", i);
+					if (i < 0)
+						i = len;
+					newData << data[flushStart:lineStart];
+					for (local uni: lineIds)
+						newData << uni.hex()[2:].upper().zfill(4) << " ";
+					newData << "  # "
+						<< (currentIndex - #lineIds).hex()[2:].upper().zfill(2)
+						<< "-" << (currentIndex - 1).hex()[2:].upper().zfill(2)
+						<< "  ";
+					for (local uni: lineIds)
+						newData << " " << uniEscape(uni);
+					newData << " #";
+					flushStart = i;
+				}
+				continue;
+			} else if (currentTable is Dict) {
+				/* Supported:
+				 *   - ABCD    = 1234       // Single code-point
+				 *   - ABCD+FF = 1234       // Map 255 consecutive points from ABCD to 1234+0, +1, +2, ...
+				 *   - ABCD    = 1234,1235  // Map code point to a sequence of unicode characters */
+				local ordStart = i;
+				do {
 					++i;
-				if (i < len && data[i] == ",") {
+				} while (i < len && data.isalnum(i));
+				local cp_ord, count = 1;
+				try {
+					cp_ord = int("0x" + data[ordStart:i]);
+				} catch (...) {
+					errAt(ordStart, "Invalid hex integer: " + repr data[ordStart:i]);
+				}
+				while (i < len && data.isspace(i))
+					++i;
+				if (i < len && data[i] == "+") {
 					do {
 						++i;
-					} while (i < len && data.isspace(i) && !data.islf(i));
+					} while (i < len && data.isspace(i));
+					if (i >= len || !data.isalnum(i))
+						errAt(i, "Expected digit after 'ABCD+'");
+					local countStart = i;
+					do {
+						++i;
+					} while (i < len && data.isalnum(i));
+					try {
+						count = int("0x" + data[countStart:i]);
+					} catch (...) {
+						errAt(countStart, "Invalid hex integer: " + repr data[countStart:i]);
+					}
+					while (i < len && data.isspace(i))
+						++i;
 				}
+				if (i >= len || data[i] != "=")
+					errAt(i, "Expected '=' after 'ABCD[+123]'");
+				do {
+					++i;
+				} while (i < len && data.isspace(i));
 				if (i >= len || !data.isalnum(i))
-					break;
+					errAt(i, "Expected digit after 'ABCD[+123]='");
+				local uniOrds = [];
+				for (;;) {
+					local uniStart = i;
+					do {
+						++i;
+					} while (i < len && data.isalnum(i));
+					try {
+						uniOrds.append(int("0x" + data[uniStart:i]));
+					} catch (...) {
+						errAt(uniStart, "Invalid hex integer: " + repr data[uniStart:i]);
+					}
+					while (i < len && data.isspace(i))
+						++i;
+					if (i >= len || data[i] != ",")
+						break;
+					do {
+						++i;
+					} while (i < len && data.isspace(i));
+					if (i >= len || !data.isalnum(i))
+						errAt(i, "Expected digit after 'ABCD=6789,'");
+				}
+				if (#uniOrds <= 1)
+					uniOrds = uniOrds.first;
+				else {
+					uniOrds = Tuple(uniOrds);
+				}
+				if (count == 1) {
+					currentTable[cp_ord] = uniOrds;
+				} else {
+					if (uniOrds !is int)
+						errAt(ordStart, "Cannot encode multiple unicode characters range mappings");
+					for (local offset: [:count])
+						currentTable[cp_ord + offset] = uniOrds + offset;
+				}
+				continue;
 			}
-			if (i >= len || data[i] in "#\n") {
-				while (i > 0 && data.isspace(i - 1) && !data.islf(i - 1))
-					--i;
-				i = data.find("\n", i);
-				if (i < 0)
-					i = len;
-				newData << data[flushStart:lineStart];
-				for (local uni: lineIds)
-					newData << uni.hex()[2:].upper().zfill(4) << " ";
-				newData << "  # "
-					<< (currentIndex - #lineIds).hex()[2:].upper().zfill(2)
-					<< "-" << (currentIndex - 1).hex()[2:].upper().zfill(2)
-					<< "  ";
-				for (local uni: lineIds)
-					newData << " " << uniEscape(uni);
-				newData << " #";
-				flushStart = i;
-			}
+			errAt(i, "Unsupported type of currentTable: " + str(type(currentTable)));
 			continue;
 		}
 		errAt(i, "Unexpected character: " + repr ch);
@@ -356,8 +422,11 @@ function parseDB(): {string: Object} {
 			byTable[rp] = tab;
 		}
 	}
-
 	return result;
+}
+
+function parseDB(): {string: Object} {
+	return parseDBFilename(fs.joinpath(fs.headof(__FILE__), "db"));
 }
 
 global final CODECS = parseDB();

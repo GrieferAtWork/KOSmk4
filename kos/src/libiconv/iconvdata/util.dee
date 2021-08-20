@@ -1,0 +1,81 @@
+/* Copyright (c) 2019-2021 Griefer@Work                                       *
+ *                                                                            *
+ * This software is provided 'as-is', without any express or implied          *
+ * warranty. In no event will the authors be held liable for any damages      *
+ * arising from the use of this software.                                     *
+ *                                                                            *
+ * Permission is granted to anyone to use this software for any purpose,      *
+ * including commercial applications, and to alter it and redistribute it     *
+ * freely, subject to the following restrictions:                             *
+ *                                                                            *
+ * 1. The origin of this software must not be misrepresented; you must not    *
+ *    claim that you wrote the original software. If you use this software    *
+ *    in a product, an acknowledgement (see the following) in the product     *
+ *    documentation is required:                                              *
+ *    Portions Copyright (c) 2019-2021 Griefer@Work                           *
+ * 2. Altered source versions must be plainly marked as such, and must not be *
+ *    misrepresented as being the original software.                          *
+ * 3. This notice may not be removed or altered from any source distribution. *
+ */
+
+import * from deemon;
+
+function normalizeCodecName(name: string): string {
+	name = name.lower().replace("_", "-").replace(" ", "-");
+	assert " " !in name, repr name;
+	assert "--" !in name, repr name;
+	final local PREFIX_REPLACEMENTS = { "oem", "ibm", "iso", "cp", "latin", "koi", "l" };
+	for (local pr: PREFIX_REPLACEMENTS) {
+		if (name.startswith(pr) && #name >= #pr+2 &&
+		    name[#pr] == "-" && name.isdigit(#pr + 1))
+			name = pr + name[#pr+1:];
+	}
+	
+	local i = 0;
+	for (;;) {
+		i = name.find("0", i);
+		if (i < 0)
+			break;
+		if (i + 1 < #name && name.isdigit(i + 1) &&
+			(i == 0 || !name.isdigit(i - 1)))
+			name = name[:i] + name[i+1:];
+		else {
+			++i;
+		}
+	}
+	return name;
+}
+
+function italicChr(c: int): int {
+	if (c >= "A".ord() && c <= "Z".ord())
+		return 0x1D608 + c - "A".ord();
+	if (c >= "a".ord() && c <= "z".ord())
+		return 0x1D656 + c - "a".ord();
+	if (c >= "0".ord() && c <= "9".ord())
+		return 0x1D608 + c - "0".ord();
+	return c;
+}
+function italic(s: string): string {
+	return "".join(for (local c: s) string.chr(italicChr(c.ord())));
+}
+
+function uniEscape(o: int): string {
+	if (o <= 0x20)
+		return string.chr(0x2400 + o);
+	if (o == 0x7f)
+		return string.chr(0x2421);
+	if (o >= 0x80 && o <= 0x9f) {
+		local x = "PADHOPBPHNBHINDNELSSAESAHTSHTJVTSPLDPLURI SS2SS3"
+		          "DCSPU1PU2STSCCHMW SPAEPASOSSGCSCICSIST OSCPM APC";
+		local s = (o - 0x80) * 3;
+		return italic(x[s:s+3]);
+	}
+	local result = { 0x00A0 : "NBSP" }.get(o);
+	if (result !is none)
+		return italic(result);
+	local result = string.chr(o);
+	if (result.islf())
+		return string.chr(0x2424);
+	return result;
+}
+

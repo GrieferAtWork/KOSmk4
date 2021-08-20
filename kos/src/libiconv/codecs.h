@@ -58,6 +58,16 @@ enum {
 	CODEC_C_ESCAPE_STR,         /* "c-escape-str" */
 	CODEC_HEX_LOWER,            /* "hex-lower" */
 	CODEC_HEX_UPPER,            /* "hex-upper", "hex" */
+	CODEC_IBM1364,              /* "ibm1364", "cp1364", "csibm1364" */
+	CODEC_IBM1371,              /* "ibm1371", "cp1371", "csibm1371" */
+	CODEC_IBM1388,              /* "ibm1388", "cp1388", "csibm1388" */
+	CODEC_IBM1390,              /* "ibm1390", "cp1390", "csibm1390" */
+	CODEC_IBM1399,              /* "ibm1399", "cp1399", "csibm1399" */
+	CODEC_IBM930,               /* "ibm930", "cp930", "csibm930", "x-ibm930", "930" */
+	CODEC_IBM933,               /* "ibm933", "cp933", "csibm933" */
+	CODEC_IBM935,               /* "ibm935", "cp935", "csibm935" */
+	CODEC_IBM937,               /* "ibm937", "cp937", "csibm937" */
+	CODEC_IBM939,               /* "ibm939", "cp939", "csibm939", "x-ibm939", "939" */
 	CODEC_ISO_8859_1,           /* "iso8859-1:1987", "iso-ir-100", "iso8859-1", "latin1", "l1", "ibm819", "cp819", "iso88591", "csisolatin1", "cp28591", "windows-28591", "we8iso8859p1", "cp38591", "windows-38591", "iso8859-1-i", "8859-1", "osf10001" */
 	CODEC_URI_ESCAPE,           /* "uri-escape", "url-escape", "percent-encoding", "url-encoding" */
 	CODEC_UTF16BE,              /* "utf16be", "utf-16be", "ucs-2be", "unicodebig", "csutf16be", "x-unicodebig", "unicodebigunmarked", "x-utf-16be" */
