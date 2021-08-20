@@ -440,6 +440,7 @@ function printCodecEnums() {
 	local codecs_cp7l = [];
 	local codecs_cp7h = [];
 	local codecs_iso646 = [];
+	local codecs_stateful = [];
 	for (local name, codec: CODECS) {
 		if (codec is CodePage) {
 			switch (codec.getCpClass()) {
@@ -456,6 +457,8 @@ function printCodecEnums() {
 				codecs_iso646.append(name);
 				break;
 			}
+		} else if (codec is StatefulCodec) {
+			codecs_stateful.append(name);
 		} else {
 			codecs_custom.append(name);
 		}
@@ -482,6 +485,7 @@ function printCodecEnums() {
 	codecs_cp7l.sort();
 	codecs_cp7h.sort();
 	codecs_iso646.sort();
+	codecs_stateful.sort();
 
 	print("	/* Custom codecs */");
 	printCodecs(codecs_custom);
@@ -509,6 +513,12 @@ function printCodecEnums() {
 	print("#define CODEC_ISO646_MIN ", codecs_iso646.first);
 	printCodecs(codecs_iso646);
 	print("#define CODEC_ISO646_MAX ", codecs_iso646.last);
+
+	print;
+	print("	/* Stateful codepage codecs */");
+	print("#define CODEC_STATEFUL_MIN ", codecs_stateful.first);
+	printCodecs(codecs_stateful);
+	print("#define CODEC_STATEFUL_MAX ", codecs_stateful.last);
 }
 
 
@@ -737,4 +747,269 @@ function printCpIso646Database() {
 }
 
 
+class ExStatefulCodec {
+	this = default;
+	public member codec: StatefulCodec;
+	public member isc_rab_minoff: int;
+	public member isc_rab_maxoff: int;
+	public member isc_db_ranges: {(int, int)...} = [];
+	public member isc_rab: {int...} = [];
+	public member isc_u16: {int...} = [];
+	public member isc_u32: {int...} = [];
+}
+
+
+function printCpStatefulDatabase() {
+	local codecs = [];
+	for (local none, codec: CODECS) {
+		if (codec is StatefulCodec)
+			codecs.append(codec);
+	}
+	codecs.sort(StatefulCodec.name);
+	local exCodecs: {ExStatefulCodec...} = [];
+
+	/* Generate extended codec data. */
+	for (local codec: codecs) {
+		@@List of (cp_min, count, uni_min | {uni_ord...})
+		local ranges: (int, int, int) = [];
+		for (local cp_ord = 0; cp_ord <= 0xffff;) {
+			local uni_ord = codec.db_table.get(cp_ord, 0);
+			if (uni_ord !is int) {
+				ranges.append((cp_ord, 1, (uni_ord,)));
+				++cp_ord;
+				continue;
+			}
+			if (uni_ord > 0xffff)
+				goto do_random_range;
+			local count = 1;
+			for (;;) {
+				local cp_next = cp_ord + count;
+				if (cp_next > 0xffff)
+					break;
+				local uni_next = codec.db_table.get(cp_next, 0);
+				if (uni_next !is int || uni_next > 0xffff)
+					break;
+				if (uni_next != (uni_ord ? uni_ord + count : 0))
+					break;
+				++count;
+			}
+			if (count == 1) {
+do_random_range:
+				local randomRangeStart = cp_ord;
+				local randomRangeUnicode = [uni_ord];
+				for (;;) {
+					++cp_ord;
+					local uni_ord_0 = codec.db_table.get(cp_ord, 0);
+					local uni_ord_1 = codec.db_table.get(cp_ord+1, 0);
+					local uni_ord_2 = codec.db_table.get(cp_ord+2, 0);
+					if (uni_ord_0 !is int || (uni_ord_0 > 0xffff != uni_ord > 0xffff))
+						break;
+					if (uni_ord_1 is int && uni_ord_2 is int &&
+					    ((uni_ord_0 == 0 && uni_ord_1 == 0 && uni_ord_2 == 0) ||
+					     (uni_ord_0+1 == uni_ord_1 && uni_ord_1+1 == uni_ord_2)))
+						break;
+					randomRangeUnicode.append(uni_ord_0);
+				}
+				randomRangeUnicode = Tuple(randomRangeUnicode);
+				if (#randomRangeUnicode == 1 && uni_ord <= 0xffff &&
+				    !(uni_ord == cp_ord && cp_ord != 0))
+					goto do_add_identity_range;
+				assert cp_ord - randomRangeStart == #randomRangeUnicode;
+				ranges.append((randomRangeStart, #randomRangeUnicode, randomRangeUnicode));
+			} else {
+do_add_identity_range:
+				if (uni_ord == cp_ord && cp_ord != 0)
+					goto do_random_range; /* unicode-offset == 0 has special meaning!  */
+				assert uni_ord <= 0xffff;
+				ranges.append((cp_ord, count, uni_ord));
+				cp_ord += count;
+			}
+		}
+		local uniOffsetsInUse = [];
+		local random_access_count = 0;
+		local random_access_blocks = 0;
+		for (local cp_min, count, content: ranges) {
+			if (content is int && content <= 0xffff) {
+				assert content != cp_min || cp_min == 0,
+					"This should have been handled by `goto do_random_range'";
+				local unicode_offset = content ? (content - cp_min) & 0xffff : 0;
+				uniOffsetsInUse.append(unicode_offset);
+			} else {
+				random_access_count += count;
+				++random_access_blocks;
+			}
+		}
+
+		/* Find the largest range of free slots between uniOffsetsInUse
+		 * This range must be large enough to hold TODO:random_access_count/random_access_blocks */
+		uniOffsetsInUse.sort();
+		local largestRangeStart = 0;
+		local largestRangeSize = 0;
+		for (local i = 0; i < #uniOffsetsInUse; ++i) {
+			local start = uniOffsetsInUse[i] + 1;
+			local end = (i+1) >= #uniOffsetsInUse ? 0x10000 : uniOffsetsInUse[i+1];
+			local count = end - start;
+			if (largestRangeSize < count) {
+				largestRangeStart = start;
+				largestRangeSize = count;
+			}
+		}
+		if (random_access_blocks > largestRangeSize) {
+			throw Error(codec.name + ": Largest range size " + largestRangeSize +
+				" is smaller than # of random access block " + random_access_blocks);
+		}
+
+		local exCodec = ExStatefulCodec(codec: codec);
+		exCodecs.append(exCodec);
+
+		/* Calculate extended codec data. */
+		for (local cp_min, count, content: ranges) {
+			if (content is int && content <= 0xffff) {
+				assert content != cp_min || cp_min == 0,
+					"This should have been handled by `goto do_random_range'";
+				local unicode_offset = content ? (content - cp_min) & 0xffff : 0;
+				assert !(unicode_offset >= largestRangeStart &&
+				         unicode_offset < largestRangeStart + largestRangeSize);
+				/* Unicode identity range */
+				exCodec.isc_db_ranges.append((cp_min, unicode_offset));
+			} else if (content is int) {
+				assert content > 0xffff; /* 32-bit unicode character */
+				assert !(content & 0x80000000), "Not allowed";
+				exCodec.isc_db_ranges.append((cp_min, largestRangeStart + #exCodec.isc_rab));
+				exCodec.isc_rab.append(0x80000000 + #exCodec.isc_u32);
+				exCodec.isc_u32.append(content | 0x80000000);
+			} else if (#content == 1 && content.first !is int) {
+				/* Decode-to-2-character sequence */
+				local a, b = content.first...;
+				assert !(a & 0x8000), "Not allowed";
+				exCodec.isc_db_ranges.append((cp_min, largestRangeStart + #exCodec.isc_rab));
+				exCodec.isc_rab.append(0x80000000 + #exCodec.isc_u32);
+				exCodec.isc_u32.append((a << 16) | b);
+			} else {
+				/* Random access range. */
+				local is32 = content.first > 0xffff;
+				for (local x: content)
+					assert (x > 0xffff) == is32, "All entires must share the same is32 property!";
+				exCodec.isc_db_ranges.append((cp_min, largestRangeStart + #exCodec.isc_rab));
+				if (is32) {
+					exCodec.isc_rab.append(0x80000000 + #exCodec.isc_u32);
+					for (local x: content)
+						exCodec.isc_u32.append(x | 0x80000000);
+				} else {
+					exCodec.isc_rab.append(#exCodec.isc_u16);
+					exCodec.isc_u16.extend(content);
+				}
+			}
+		}
+
+		assert #exCodec.isc_rab <= largestRangeSize, "Somehow we used more than we thought?";
+		exCodec.isc_rab_minoff = largestRangeStart;
+		exCodec.isc_rab_maxoff = exCodec.isc_rab_minoff + #exCodec.isc_rab - 1;
+
+		/* Relocate RAB offsets to use use the correct u16 table size */
+		for (local i: [:#exCodec.isc_rab]) {
+			local offset = exCodec.isc_rab[i];
+			if (offset >= 0x80000000) {
+				offset -= 0x80000000;
+				offset += #exCodec.isc_u16;
+				exCodec.isc_rab[i] = offset;
+			}
+		}
+	}
+
+	/* With everything calculated, print the database controller. */
+	print("struct iconv_stateful_database {");
+	for (local exCodec: exCodecs) {
+		print;
+		print("	/* ", exCodec.codec.name, " */");
+		print("	struct {");
+		/* For safety, manually count the # of different ranges. */
+		local numRandomAccess = 0;
+		local numIdentity = 0;
+		for (local isr_cp_ord, isr_uni_off: exCodec.isc_db_ranges) {
+			if (isr_uni_off >= exCodec.isc_rab_minoff &&
+			    isr_uni_off <= exCodec.isc_rab_maxoff)
+				++numRandomAccess;
+			else {
+				++numIdentity;
+			}
+		}
+		/* Then verify that the expected numbers are correct! */
+		assert numRandomAccess == #exCodec.isc_rab;
+		assert numRandomAccess + numIdentity == #exCodec.isc_db_ranges;
+		print("		/* Random access ranges: ", numRandomAccess.hex());
+		print("		 * Identity ranges:      ", numIdentity.hex(), " */");
+		print("		char16_t                    _sb[256];");
+		print("		uint16_t                    _db_count;   /* == ", (#exCodec.isc_db_ranges).hex(), " */");
+		print("		uint16_t                    _u16_count;  /* == ", (#exCodec.isc_u16).hex(), " */");
+		print("		uint16_t                    _rab_minoff; /* == ", exCodec.isc_rab_minoff.hex(), " */");
+		print("		uint16_t                    _rab_maxoff; /* == ", exCodec.isc_rab_maxoff.hex(), " */");
+		print("		struct iconv_stateful_range _db_ranges[", (#exCodec.isc_db_ranges).hex(), "];");
+		print("		uint16_t                    _db_ranges_end;");
+		print("		uint16_t                    _rab[", (#exCodec.isc_rab).hex(), "];");
+		print("		char16_t                    _u16[", (#exCodec.isc_u16).hex(), "];");
+		if (exCodec.isc_u32) {
+			print("		uint32_t                    _u32[", (#exCodec.isc_u32).hex(), "];");
+		}
+		print("	} ", dbFieldName(exCodec.codec.name), ";");
+	}
+	print("};");
+
+	/* TODO: Print the offset table. */
+
+	/* Now print the database controller contents. */
+	print("INTERN_CONST struct iconv_stateful_database const libiconv_stateful_db = {");
+	function printCompressed(items: {Object...}, linePrefix: string, maxLineLen: int = 256) {
+		local indent = #linePrefix;
+		local isFirst = true;
+		for (local x: items) {
+			if (!isFirst) {
+				print(","),;
+				++indent;
+			}
+			isFirst = false;
+			if (indent >= maxLineLen) {
+				print;
+				print(linePrefix),;
+				indent = #linePrefix;
+			}
+			x = str(x);
+			indent += #x;
+			print(x),;
+		}
+	}
+	
+	for (local exCodec: exCodecs) {
+		print;
+		print("	/* ", exCodec.codec.name, " */");
+		print("	.", dbFieldName(exCodec.codec.name), " = {");
+		print("		._sb = {"),;
+		printCompressed(exCodec.codec.sb_table, "		        ");
+		print("},");
+		print("		._db_count = ", #exCodec.isc_db_ranges, ",");
+		print("		._u16_count = ", #exCodec.isc_u16, ",");
+		print("		._rab_minoff = ", exCodec.isc_rab_minoff, ",");
+		print("		._rab_maxoff = ", exCodec.isc_rab_maxoff, ",");
+		print("		._db_ranges = {"),;
+		printCompressed(
+			(for (local isr_cp_ord, isr_uni_off: exCodec.isc_db_ranges)
+				"{" + isr_cp_ord + "," + isr_uni_off + "}"),
+			"		               ");
+		print("},"),;
+		print("		._db_ranges_end = 0xffff,");
+		print("		._rab = {"),;
+		printCompressed(exCodec.isc_rab, "		         ");
+		print("},");
+		print("		._u16 = {"),;
+		printCompressed(exCodec.isc_u16, "		         ");
+		print("},");
+		if (exCodec.isc_u32) {
+			print("		._u32 = {"),;
+			printCompressed(exCodec.isc_u32, "		         ");
+			print("},");
+		}
+		print("	},");
+	}
+	print("};");
+}
 

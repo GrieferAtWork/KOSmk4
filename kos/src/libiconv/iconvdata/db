@@ -27,8 +27,9 @@
 #  $ deemon -F kos/src/libiconv/cp-7l.c
 #  $ deemon -F kos/src/libiconv/cp-7h.c
 #  $ deemon -F kos/src/libiconv/cp-iso646.c
+#  $ deemon -F kos/src/libiconv/cp-stateful.c
 # Or the one-liner:
-#  $ deemon -F kos/src/libiconv/codecs.h kos/src/libiconv/codecs.c kos/src/libiconv/cp.c kos/src/libiconv/cp-7l.c kos/src/libiconv/cp-7h.c kos/src/libiconv/cp-iso646.c
+#  $ deemon -F kos/src/libiconv/codecs.h kos/src/libiconv/codecs.c kos/src/libiconv/cp.c kos/src/libiconv/cp-7l.c kos/src/libiconv/cp-7h.c kos/src/libiconv/cp-iso646.c kos/src/libiconv/cp-stateful.c
 ###################################################################################################
 
 
@@ -9726,9 +9727,9 @@
 # VAR SAVED_BYTE: unsigned char                                 = <undefined>
 #
 # decode(unsigned char ch) {
-#    if (ch == 0x0e)             // 0x0e = ascii.SO
+#    if (ch == 0x0E)             // 0x0E = ascii.SO
 #        STATE = DOUBLE_BYTE_1;
-#    else if (ch == 0x0f)        // 0x0e = ascii.SI
+#    else if (ch == 0x0F)        // 0x0F = ascii.SI
 #        STATE = SINGLE_BYTE;
 #    else {
 #        if (STATE == SINGLE_BYTE) {
@@ -9741,7 +9742,7 @@
 #        }
 #        assert(STATE == DOUBLE_BYTE_2);
 #        uint16_t ch16 = (SAVED_BYTE << 8) | ch;
-#        return  <DOUBLE_BYTE_LOOKUP_TABLE>[ch];
+#        return <DOUBLE_BYTE_LOOKUP_TABLE>[ch];
 #    }
 # }
 @INCLUDE("./stateful-ibm930")
