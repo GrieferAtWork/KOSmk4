@@ -33,7 +33,8 @@ struct iconv_stateful_database {
 		uint16_t                           _encode_tab_count;  /* == 0x1b3b */
 		uint16_t                           _encode_rab_minoff; /* == 0x7157 */
 		uint16_t                           _encode_rab_maxoff; /* == 0x75c3 */
-		uint16_t                           _encode_2ch_count;  /* == 0x0 */
+		uint8_t                            _encode_repl;       /* == 0x6f */
+		uint8_t                            _encode_2ch_count;  /* == 0x0 */
 		uint16_t                           _encode_c32_count;  /* == 0x0 */
 		struct iconv_stateful_range        _db_ranges[0x78e];
 		uint16_t                           _db_ranges_end;
@@ -59,7 +60,8 @@ struct iconv_stateful_database {
 		uint16_t                           _encode_tab_count;  /* == 0x42d3 */
 		uint16_t                           _encode_rab_minoff; /* == 0x4e6a */
 		uint16_t                           _encode_rab_maxoff; /* == 0x50f2 */
-		uint16_t                           _encode_2ch_count;  /* == 0x0 */
+		uint8_t                            _encode_repl;       /* == 0x6f */
+		uint8_t                            _encode_2ch_count;  /* == 0x0 */
 		uint16_t                           _encode_c32_count;  /* == 0x0 */
 		struct iconv_stateful_range        _db_ranges[0x1e5];
 		uint16_t                           _db_ranges_end;
@@ -85,7 +87,8 @@ struct iconv_stateful_database {
 		uint16_t                           _encode_tab_count;  /* == 0x2456 */
 		uint16_t                           _encode_rab_minoff; /* == 0x5e96 */
 		uint16_t                           _encode_rab_maxoff; /* == 0x62c9 */
-		uint16_t                           _encode_2ch_count;  /* == 0x0 */
+		uint8_t                            _encode_repl;       /* == 0x6f */
+		uint8_t                            _encode_2ch_count;  /* == 0x0 */
 		uint16_t                           _encode_c32_count;  /* == 0x0 */
 		struct iconv_stateful_range        _db_ranges[0xc7f];
 		uint16_t                           _db_ranges_end;
@@ -111,7 +114,8 @@ struct iconv_stateful_database {
 		uint16_t                           _encode_tab_count;  /* == 0x3d10 */
 		uint16_t                           _encode_rab_minoff; /* == 0x9182 */
 		uint16_t                           _encode_rab_maxoff; /* == 0x9580 */
-		uint16_t                           _encode_2ch_count;  /* == 0x2e */
+		uint8_t                            _encode_repl;       /* == 0x6f */
+		uint8_t                            _encode_2ch_count;  /* == 0x2e */
 		uint16_t                           _encode_c32_count;  /* == 0x12f */
 		struct iconv_stateful_range        _db_ranges[0x6c6];
 		uint16_t                           _db_ranges_end;
@@ -140,7 +144,8 @@ struct iconv_stateful_database {
 		uint16_t                           _encode_tab_count;  /* == 0x3d0d */
 		uint16_t                           _encode_rab_minoff; /* == 0x9182 */
 		uint16_t                           _encode_rab_maxoff; /* == 0x957f */
-		uint16_t                           _encode_2ch_count;  /* == 0x2e */
+		uint8_t                            _encode_repl;       /* == 0x6f */
+		uint8_t                            _encode_2ch_count;  /* == 0x2e */
 		uint16_t                           _encode_c32_count;  /* == 0x12f */
 		struct iconv_stateful_range        _db_ranges[0x6c6];
 		uint16_t                           _db_ranges_end;
@@ -169,7 +174,8 @@ struct iconv_stateful_database {
 		uint16_t                           _encode_tab_count;  /* == 0x258f */
 		uint16_t                           _encode_rab_minoff; /* == 0x43e1 */
 		uint16_t                           _encode_rab_maxoff; /* == 0x48e4 */
-		uint16_t                           _encode_2ch_count;  /* == 0x0 */
+		uint8_t                            _encode_repl;       /* == 0x6f */
+		uint8_t                            _encode_2ch_count;  /* == 0x0 */
 		uint16_t                           _encode_c32_count;  /* == 0x0 */
 		struct iconv_stateful_range        _db_ranges[0xe1];
 		uint16_t                           _db_ranges_end;
@@ -195,7 +201,8 @@ struct iconv_stateful_database {
 		uint16_t                           _encode_tab_count;  /* == 0x220d */
 		uint16_t                           _encode_rab_minoff; /* == 0x7157 */
 		uint16_t                           _encode_rab_maxoff; /* == 0x772d */
-		uint16_t                           _encode_2ch_count;  /* == 0x0 */
+		uint8_t                            _encode_repl;       /* == 0x6f */
+		uint8_t                            _encode_2ch_count;  /* == 0x0 */
 		uint16_t                           _encode_c32_count;  /* == 0x0 */
 		struct iconv_stateful_range        _db_ranges[0xbe7];
 		uint16_t                           _db_ranges_end;
@@ -221,7 +228,8 @@ struct iconv_stateful_database {
 		uint16_t                           _encode_tab_count;  /* == 0x2374 */
 		uint16_t                           _encode_rab_minoff; /* == 0x4541 */
 		uint16_t                           _encode_rab_maxoff; /* == 0x495e */
-		uint16_t                           _encode_2ch_count;  /* == 0x0 */
+		uint8_t                            _encode_repl;       /* == 0x6f */
+		uint8_t                            _encode_2ch_count;  /* == 0x0 */
 		uint16_t                           _encode_c32_count;  /* == 0x0 */
 		struct iconv_stateful_range        _db_ranges[0x14c];
 		uint16_t                           _db_ranges_end;
@@ -247,7 +255,8 @@ struct iconv_stateful_database {
 		uint16_t                           _encode_tab_count;  /* == 0x42d3 */
 		uint16_t                           _encode_rab_minoff; /* == 0x4e6a */
 		uint16_t                           _encode_rab_maxoff; /* == 0x50f2 */
-		uint16_t                           _encode_2ch_count;  /* == 0x0 */
+		uint8_t                            _encode_repl;       /* == 0x6f */
+		uint8_t                            _encode_2ch_count;  /* == 0x0 */
 		uint16_t                           _encode_c32_count;  /* == 0x0 */
 		struct iconv_stateful_range        _db_ranges[0x1e5];
 		uint16_t                           _db_ranges_end;
@@ -273,7 +282,8 @@ struct iconv_stateful_database {
 		uint16_t                           _encode_tab_count;  /* == 0x258c */
 		uint16_t                           _encode_rab_minoff; /* == 0x43e1 */
 		uint16_t                           _encode_rab_maxoff; /* == 0x48e3 */
-		uint16_t                           _encode_2ch_count;  /* == 0x0 */
+		uint8_t                            _encode_repl;       /* == 0x6f */
+		uint8_t                            _encode_2ch_count;  /* == 0x0 */
 		uint16_t                           _encode_c32_count;  /* == 0x0 */
 		struct iconv_stateful_range        _db_ranges[0xe1];
 		uint16_t                           _db_ranges_end;
@@ -314,6 +324,7 @@ INTERN_CONST struct iconv_stateful_database const libiconv_stateful_db = {
 		._encode_tab_count = 0x1b3b,
 		._encode_rab_minoff = 0x7157,
 		._encode_rab_maxoff = 0x75c3,
+		._encode_repl = 0x6f,
 		._encode_2ch_count = 0x0,
 		._encode_c32_count = 0x0,
 		._db_ranges = {{0,0},{16448,61376},{16449,0},{16705,61120},{16707,12547},{16723,61109},{16733,12548},{16753,61995},{16756,61978},{16758,12549},{16798,0},{16970,12550},{16977,0},{16986,12551},{16994,0},{17002,12552},{17008,0},{17017,12553},{17025,48320},{17034,0},
@@ -966,6 +977,7 @@ INTERN_CONST struct iconv_stateful_database const libiconv_stateful_db = {
 		._encode_tab_count = 0x42d3,
 		._encode_rab_minoff = 0x4e6a,
 		._encode_rab_maxoff = 0x50f2,
+		._encode_repl = 0x6f,
 		._encode_2ch_count = 0x0,
 		._encode_c32_count = 0x0,
 		._db_ranges = {{0,0},{16448,61376},{16449,0},{16705,49776},{16722,49777},{16729,0},{16737,49712},{16754,49713},{16761,0},{16768,49840},{16774,49867},{16775,49839},{16801,0},{16817,57279},{16827,0},{16832,49744},{16838,49723},{16839,49743},{16865,0},{16881,57199},
@@ -1802,6 +1814,7 @@ INTERN_CONST struct iconv_stateful_database const libiconv_stateful_db = {
 		._encode_tab_count = 0x2456,
 		._encode_rab_minoff = 0x5e96,
 		._encode_rab_maxoff = 0x62c9,
+		._encode_repl = 0x6f,
 		._encode_2ch_count = 0x0,
 		._encode_c32_count = 0x0,
 		._db_ranges = {{0,0},{16448,61376},{16449,0},{16705,49776},{16722,49777},{16729,0},{16737,49712},{16754,49713},{16761,0},{16768,49840},{16774,49867},{16775,49839},{16801,0},{16817,57279},{16827,0},{16832,49744},{16838,49723},{16839,49743},{16865,0},{16881,57199},
@@ -2686,6 +2699,7 @@ INTERN_CONST struct iconv_stateful_database const libiconv_stateful_db = {
 		._encode_tab_count = 0x3d10,
 		._encode_rab_minoff = 0x9182,
 		._encode_rab_maxoff = 0x9580,
+		._encode_repl = 0x6f,
 		._encode_2ch_count = 0x2e,
 		._encode_c32_count = 0x12f,
 		._db_ranges = {{0,0},{16448,61376},{16449,0},{16705,49776},{16722,49777},{16729,0},{16737,49712},{16754,49713},{16761,0},{16768,49840},{16774,49867},{16775,49839},{16801,0},{16817,57279},{16827,0},{16832,49744},{16838,49723},{16839,49743},{16865,0},{16881,57199},
@@ -3640,6 +3654,7 @@ INTERN_CONST struct iconv_stateful_database const libiconv_stateful_db = {
 		._encode_tab_count = 0x3d0d,
 		._encode_rab_minoff = 0x9182,
 		._encode_rab_maxoff = 0x957f,
+		._encode_repl = 0x6f,
 		._encode_2ch_count = 0x2e,
 		._encode_c32_count = 0x12f,
 		._db_ranges = {{0,0},{16448,61376},{16449,0},{16705,49776},{16722,49777},{16729,0},{16737,49712},{16754,49713},{16761,0},{16768,49840},{16774,49867},{16775,49839},{16801,0},{16817,57279},{16827,0},{16832,49744},{16838,49723},{16839,49743},{16865,0},{16881,57199},
@@ -4594,6 +4609,7 @@ INTERN_CONST struct iconv_stateful_database const libiconv_stateful_db = {
 		._encode_tab_count = 0x258f,
 		._encode_rab_minoff = 0x43e1,
 		._encode_rab_maxoff = 0x48e4,
+		._encode_repl = 0x6f,
 		._encode_2ch_count = 0x0,
 		._encode_c32_count = 0x0,
 		._db_ranges = {{0,0},{16448,61376},{16449,0},{16705,49776},{16722,49777},{16729,0},{16737,49712},{16754,49713},{16761,0},{16768,49840},{16774,49867},{16775,49839},{16801,0},{16817,57279},{16827,0},{16832,49744},{16838,49723},{16839,49743},{16865,0},{16881,57199},
@@ -5205,6 +5221,7 @@ INTERN_CONST struct iconv_stateful_database const libiconv_stateful_db = {
 		._encode_tab_count = 0x220d,
 		._encode_rab_minoff = 0x7157,
 		._encode_rab_maxoff = 0x772d,
+		._encode_repl = 0x6f,
 		._encode_2ch_count = 0x0,
 		._encode_c32_count = 0x0,
 		._db_ranges = {{0,0},{16448,61376},{16449,0},{16705,61120},{16707,12547},{16723,61109},{16733,12548},{16753,61995},{16756,61978},{16758,12549},{16798,0},{16970,12550},{16977,0},{16986,12551},{16994,0},{17002,12552},{17008,0},{17017,12553},{17025,48320},{17034,0},
@@ -6062,6 +6079,7 @@ INTERN_CONST struct iconv_stateful_database const libiconv_stateful_db = {
 		._encode_tab_count = 0x2374,
 		._encode_rab_minoff = 0x4541,
 		._encode_rab_maxoff = 0x495e,
+		._encode_repl = 0x6f,
 		._encode_2ch_count = 0x0,
 		._encode_c32_count = 0x0,
 		._db_ranges = {{0,0},{16448,61376},{16449,0},{16705,49776},{16722,49777},{16729,0},{16737,49712},{16754,49713},{16761,0},{16768,49840},{16774,49867},{16775,49839},{16801,0},{16817,57279},{16827,0},{16832,49744},{16838,49723},{16839,49743},{16865,0},{16881,57199},
@@ -6636,6 +6654,7 @@ INTERN_CONST struct iconv_stateful_database const libiconv_stateful_db = {
 		._encode_tab_count = 0x42d3,
 		._encode_rab_minoff = 0x4e6a,
 		._encode_rab_maxoff = 0x50f2,
+		._encode_repl = 0x6f,
 		._encode_2ch_count = 0x0,
 		._encode_c32_count = 0x0,
 		._db_ranges = {{0,0},{16448,61376},{16449,0},{16705,49776},{16722,49777},{16729,0},{16737,49712},{16754,49713},{16761,0},{16768,49840},{16774,49867},{16775,49839},{16801,0},{16817,57279},{16827,0},{16832,49744},{16838,49723},{16839,49743},{16865,0},{16881,57199},
@@ -7473,6 +7492,7 @@ INTERN_CONST struct iconv_stateful_database const libiconv_stateful_db = {
 		._encode_tab_count = 0x258c,
 		._encode_rab_minoff = 0x43e1,
 		._encode_rab_maxoff = 0x48e3,
+		._encode_repl = 0x6f,
 		._encode_2ch_count = 0x0,
 		._encode_c32_count = 0x0,
 		._db_ranges = {{0,0},{16448,61376},{16449,0},{16705,49776},{16722,49777},{16729,0},{16737,49712},{16754,49713},{16761,0},{16768,49840},{16774,49867},{16775,49839},{16801,0},{16817,57279},{16827,0},{16832,49744},{16838,49723},{16839,49743},{16865,0},{16881,57199},

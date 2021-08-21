@@ -323,8 +323,9 @@ NOTHROW_NCX(CC libiconv_decode_isshiftzero)(struct iconv_decode const *__restric
 
 #if CODEC_STATEFUL_COUNT != 0
 	case CODEC_STATEFUL_MIN ... CODEC_STATEFUL_MAX:
-		/* TODO */
-		break;
+		/* XXX: Should DB0 could as a zero-shift state? Or does text have to end with ShiftIn? */
+		return self->icd_data.idd_stateful.sf_state == _ICONV_DECODE_STATEFUL_SB ||
+		       self->icd_data.idd_stateful.sf_state == _ICONV_DECODE_STATEFUL_DB0;
 #endif /* CODEC_STATEFUL_COUNT != 0 */
 
 	default:

@@ -48,6 +48,8 @@ struct iconv_codepage;
 struct iconv_7l_codepage;
 struct iconv_7h_codepage;
 struct iconv_iso646_codepage;
+struct iconv_stateful_codepage;
+
 union iconv_decode_data {
 	struct {
 		__byte_t         u_pbc;   /* # of pending bytes in `u_pb' */
@@ -81,11 +83,11 @@ union iconv_decode_data {
 #define _ICONV_DECODE_CESCAPE_ESC_MODE_U32_6 16 /* Encountered \U<?><?><?><?><?><?> */
 #define _ICONV_DECODE_CESCAPE_ESC_MODE_U32_7 17 /* Encountered \U<?><?><?><?><?><?><?> */
 #define _ICONV_DECODE_CESCAPE_ESC_MODE_SLF   18 /* Encountered \<CR> (skip <LF> if it's the next character) */
-		uint8_t          ce_esc;    /* [valid_if(_ICONV_CDECODE_F_ESCAPE)] Escape mode (one of `_ICONV_DECODE_CESCAPE_ESC_MODE_*') */
+		__uint8_t ce_esc;    /* [valid_if(_ICONV_CDECODE_F_ESCAPE)] Escape mode (one of `_ICONV_DECODE_CESCAPE_ESC_MODE_*') */
 		union { /* Escape-mode-specific data */
-			uint8_t  ce_esc_value;   /* Value for \x and \0 */
-			char16_t ce_esc_u16;     /* Value for \u */
-			char32_t ce_esc_u32;     /* Value for \U */
+			__uint8_t       ce_esc_value; /* Value for \x and \0 */
+			__CHAR16_TYPE__ ce_esc_u16;   /* Value for \u */
+			__CHAR32_TYPE__ ce_esc_u32;   /* Value for \U */
 		};
 	} idd_cesc; /* c-escape */
 
@@ -98,11 +100,11 @@ union iconv_decode_data {
 #define _ICONV_DECODE_XML_DEC 4 /* Encountered &#<0-9> */
 #define _ICONV_DECODE_XML_HEX 5 /* Encountered &#x */
 #define _ICONV_DECODE_XML_ENT 6 /* Encountered &<alnum> */
-		uint8_t     xe_mode; /* Current state machine mode (one of `_ICONV_DECODE_XML_*') */
+		__uint8_t      xe_mode; /* Current state machine mode (one of `_ICONV_DECODE_XML_*') */
 		union {
-			char32_t xe_chr; /* _ICONV_DECODE_XML_DEC, _ICONV_DECODE_XML_HEX: Escaped character */
+			__CHAR32_TYPE__ xe_chr; /* _ICONV_DECODE_XML_DEC, _ICONV_DECODE_XML_HEX: Escaped character */
 			struct {
-				uint8_t     e_len; /* # of entity characters already written. */
+				__uint8_t   e_len; /* # of entity characters already written. */
 				char const *e_str; /* [0..xe_elen] Entity characters already written. This string points
 				                    * into the internal database of known xml entities and is updated
 				                    * every time yet another character is encountered. Internally, the
@@ -115,11 +117,24 @@ union iconv_decode_data {
 #define _ICONV_DECODE_URI_TXT   0 /* Inside of normal text */
 #define _ICONV_DECODE_URI_PCT   1 /* Encountered % */
 #define _ICONV_DECODE_URI_PCT_1 2 /* Encountered %<?> */
-		uint8_t     ue_mode; /* Current state machine mode (one of `_ICONV_DECODE_URI_*') */
-		uint8_t     ue_chr;  /* In `_ICONV_DECODE_URI_PCT_1': alraedy-parsed hex nibble, shifted left by 4 */
+		__uint8_t ue_mode; /* Current state machine mode (one of `_ICONV_DECODE_URI_*') */
+		__uint8_t ue_chr;  /* In `_ICONV_DECODE_URI_PCT_1': alraedy-parsed hex nibble, shifted left by 4 */
 	} idd_uri; /* uri-escape */
 
-	uint8_t idd_hex; /* For "hex": 0x00-0xf0 when parsing the second nibble; 0x01 when parsing the first. */
+	__uint8_t idd_hex; /* For "hex": 0x00-0xf0 when parsing the second nibble; 0x01 when parsing the first. */
+
+	struct {
+#define _ICONV_DECODE_STATEFUL_SB  0 /* Single-byte */
+#define _ICONV_DECODE_STATEFUL_DB0 1 /* Double-byte (expecting first) */
+#define _ICONV_DECODE_STATEFUL_DB1 2 /* Double-byte (expecting second) */
+		__uint8_t                             sf_state; /* Current state (one of `_ICONV_DECODE_STATEFUL_*') */
+		__uint8_t                             sf_b0;    /* [valid_if(_ICONV_DECODE_STATEFUL_DB1)] Previous byte. */
+		__uint8_t                            _sf_pad[sizeof(void *) - 2];
+		struct iconv_stateful_codepage const *sf_cp;    /* [1..1][const] Code page. */
+		__uint16_t const                     *sf_rab;   /* [1..1][const][== iconv_stateful_codepage__isc_rab(sf_cp)] */
+		__CHAR16_TYPE__ const                *sf_u16;   /* [1..1][const][== iconv_stateful_codepage__isc_u16(sf_cp)] */
+		__uint32_t const                     *sf_u32;   /* [1..1][const][== iconv_stateful_codepage__isc_u32(sf_cp)] */
+	} idd_stateful; /* stateful codecs: ibm(930|933|935|937|939|1364|1371|1388|1390|1399) */
 
 	void *__idd_pad[_ICONV_DECODE_OPAQUE_POINTERS];
 };

@@ -773,6 +773,7 @@ class ExStatefulCodec {
 	public member isc_u32: {int...} = [];
 	public member isc_encode_rab_minoff: int;
 	public member isc_encode_rab_maxoff: int;
+	public member isc_encode_repl: int;
 	public member isc_encode_ranges: {(int, int)...} = [];
 	public member isc_encode_rab: {int...} = [];
 	public member isc_encode_tab: {int...} = [];
@@ -926,6 +927,7 @@ do_add_identity_range:
 			}
 		}
 
+		assert exCodec.isc_db_ranges.first.first == 0, "The range table must start with CP_ORD=0";
 		assert #exCodec.isc_rab <= largestRangeSize, "Somehow we used more than we thought?";
 		exCodec.isc_rab_minoff = largestRangeStart;
 		exCodec.isc_rab_maxoff = exCodec.isc_rab_minoff + #exCodec.isc_rab - 1;
@@ -1089,6 +1091,12 @@ do_add_encode_identity_range:
 		}
 		exCodec.isc_encode_rab_minoff = largestRangeStart;
 		exCodec.isc_encode_rab_maxoff = largestRangeStart + #exCodec.isc_encode_rab - 1;
+		local repl_char = encodeTable.get("?".ord());
+		if (repl_char is none || repl_char > 0xff) repl_char = encodeTable.get(".".ord());
+		if (repl_char is none || repl_char > 0xff) repl_char = encodeTable.get("-".ord());
+		if (repl_char is none || repl_char > 0xff) repl_char = 0;
+		exCodec.isc_encode_repl = repl_char;
+		
 		assert #exCodec.isc_encode_rab <= largestRangeSize;
 
 		/* Relocate 2-character entry offsets. */
@@ -1104,7 +1112,7 @@ do_add_encode_identity_range:
 		for (local uni: encodeTable32.keys.sorted()) {
 			exCodec.isc_encode_c32.append((uni, encodeTable32[uni]));
 		}
-		assert #exCodec.isc_encode_2ch <= 0xffff;
+		assert #exCodec.isc_encode_2ch <= 0xff;
 		assert #exCodec.isc_encode_c32 <= 0xffff;
 
 		/* Ensure that tables containing 32-bit integers are properly aligned. */
@@ -1170,7 +1178,8 @@ do_add_encode_identity_range:
 		print("		uint16_t                           _encode_tab_count;  /* == ", (#exCodec.isc_encode_tab).hex(), " */");
 		print("		uint16_t                           _encode_rab_minoff; /* == ", exCodec.isc_encode_rab_minoff.hex(), " */");
 		print("		uint16_t                           _encode_rab_maxoff; /* == ", exCodec.isc_encode_rab_maxoff.hex(), " */");
-		print("		uint16_t                           _encode_2ch_count;  /* == ", (#exCodec.isc_encode_2ch).hex(), " */");
+		print("		uint8_t                            _encode_repl;       /* == ", exCodec.isc_encode_repl.hex(), " */");
+		print("		uint8_t                            _encode_2ch_count;  /* == ", (#exCodec.isc_encode_2ch).hex(), " */");
 		print("		uint16_t                           _encode_c32_count;  /* == ", (#exCodec.isc_encode_c32).hex(), " */");
 		print("		struct iconv_stateful_range        _db_ranges[", (#exCodec.isc_db_ranges).hex(), "];");
 		print("		uint16_t                           _db_ranges_end;");
@@ -1237,6 +1246,7 @@ do_add_encode_identity_range:
 		print("		._encode_tab_count = ", (#exCodec.isc_encode_tab).hex(), ",");
 		print("		._encode_rab_minoff = ", exCodec.isc_encode_rab_minoff.hex(), ",");
 		print("		._encode_rab_maxoff = ", exCodec.isc_encode_rab_maxoff.hex(), ",");
+		print("		._encode_repl = ", exCodec.isc_encode_repl.hex(), ",");
 		print("		._encode_2ch_count = ", (#exCodec.isc_encode_2ch).hex(), ",");
 		print("		._encode_c32_count = ", (#exCodec.isc_encode_c32).hex(), ",");
 		print("		._db_ranges = {"),;

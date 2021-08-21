@@ -160,7 +160,6 @@ struct iconv_stateful_codepage {
 	 * >>         return ILLEGAL_CHARACTER;
 	 * >>     return c32->isc32e_cp;
 	 * >> }
-	 *
 	 */
 	uint16_t isc_db_count;          /* # of code page ranges. */
 	uint16_t isc_u16_count;         /* # of entires in the 16-bit unicode table. */
@@ -171,7 +170,8 @@ struct iconv_stateful_codepage {
 	uint16_t isc_encode_tab_count;  /* # of encode uint16_t entries. */
 	uint16_t isc_encode_rab_minoff; /* Encode random access block max offset */
 	uint16_t isc_encode_rab_maxoff; /* Encode random access block max offset */
-	uint16_t isc_encode_2ch_count;  /* # of 2-character encode entires. */
+	uint8_t  isc_encode_repl;       /* Encode replacement character. */
+	uint8_t  isc_encode_2ch_count;  /* # of 2-character encode entires. */
 	uint16_t isc_encode_c32_count;  /* # of 32-bit unicode encode entries. */
 	COMPILER_FLEXIBLE_ARRAY(struct iconv_stateful_range, isc_db_ranges); /* [isc_db_count] */
 /*	uint16_t                    isc_db_ranges_end; // [== 0xffff] */
@@ -191,23 +191,22 @@ struct iconv_stateful_codepage {
 
 /* Helpers for accessing the hidden fields of the above structure.
  * NOTE: It is recommended to cache these values as they are needed! */
-#define iconv_stateful_codepage__isc_rab(self) \
-	((uint16_t const *)((self)->isc_db_ranges + (self)->isc_db_count) + 1)
-#define iconv_stateful_codepage__isc_u16(self)                   \
-	((char16_t const *)(iconv_stateful_codepage__isc_rab(self) + \
-	                    ((self)->isc_rab_maxoff - (self)->isc_rab_minoff) + 1))
-#define iconv_stateful_codepage__isc_u32(self) \
-	((uint32_t const *)(iconv_stateful_codepage__isc_u16(self) + (self)->isc_u16_count)
-#define iconv_stateful_codepage__isc_encode_ranges(self) \
-	((struct iconv_stateful_encode_range const *)(iconv_stateful_codepage__isc_u32(self) + (self)->isc_u32_count))
-#define iconv_stateful_codepage__isc_encode_rab(self) \
-	((uint16_t const *)(iconv_stateful_codepage__isc_encode_ranges(self) + (self)->isc_encode_count) + 1)
-#define iconv_stateful_codepage__isc_encode_tab(self) \
-	(iconv_stateful_codepage__isc_encode_rab(self) + ((self)->isc_encode_rab_maxoff - (self)->isc_encode_rab_minoff) + 1)
-#define iconv_stateful_codepage__isc_encode_2ch(self) \
-	((struct iconv_stateful_2char_encode const *)(iconv_stateful_codepage__isc_encode_tab(self) + (self)->isc_encode_tab_count))
-#define iconv_stateful_codepage__isc_encode_c32(self) \
-	((struct iconv_stateful_c32_encode const *)(iconv_stateful_codepage__isc_encode_2ch(self) + (self)->isc_encode_2ch_count))
+#define iconv_stateful_codepage__isc_u16__from__isc_rab(self, isc_rab)                               ((char16_t const *)((isc_rab) + ((self)->isc_rab_maxoff - (self)->isc_rab_minoff) + 1))
+#define iconv_stateful_codepage__isc_u32__from__isc_u16(self, isc_u16)                               ((uint32_t const *)((isc_u16) + (self)->isc_u16_count))
+#define iconv_stateful_codepage__isc_encode_ranges__from__isc_u32(self, isc_u32)                     ((struct iconv_stateful_encode_range const *)((isc_u32) + (self)->isc_u32_count))
+#define iconv_stateful_codepage__isc_encode_rab__from__isc_encode_ranges(self, isc_encode_ranges)    ((uint16_t const *)((isc_encode_ranges) + (self)->isc_encode_count) + 1)
+#define iconv_stateful_codepage__isc_encode_tab__from__isc_encode_rab(self, isc_encode_rab)          ((isc_encode_rab) + ((self)->isc_encode_rab_maxoff - (self)->isc_encode_rab_minoff) + 1)
+#define iconv_stateful_codepage__isc_encode_2ch__from__isc_encode_tab(self, isc_encode_tab)          ((struct iconv_stateful_2char_encode const *)((isc_encode_tab) + (self)->isc_encode_tab_count))
+#define iconv_stateful_codepage__isc_encode_c32__from__isc_encode_2ch(self, isc_encode_2ch)          ((struct iconv_stateful_c32_encode const *)((isc_encode_2ch) + (self)->isc_encode_2ch_count))
+
+#define iconv_stateful_codepage__isc_rab(self)           ((uint16_t const *)((self)->isc_db_ranges + (self)->isc_db_count) + 1)
+#define iconv_stateful_codepage__isc_u16(self)           iconv_stateful_codepage__isc_u16__from__isc_rab(self, iconv_stateful_codepage__isc_rab(self))
+#define iconv_stateful_codepage__isc_u32(self)           iconv_stateful_codepage__isc_u32__from__isc_u16(self, iconv_stateful_codepage__isc_u16(self))
+#define iconv_stateful_codepage__isc_encode_ranges(self) iconv_stateful_codepage__isc_encode_ranges__from__isc_u32(self, iconv_stateful_codepage__isc_u32(self))
+#define iconv_stateful_codepage__isc_encode_rab(self)    iconv_stateful_codepage__isc_encode_rab__from__isc_encode_ranges(self, iconv_stateful_codepage__isc_encode_ranges(self))
+#define iconv_stateful_codepage__isc_encode_tab(self)    iconv_stateful_codepage__isc_encode_tab__from__isc_encode_rab(self, iconv_stateful_codepage__isc_encode_rab(self))
+#define iconv_stateful_codepage__isc_encode_2ch(self)    iconv_stateful_codepage__isc_encode_2ch__from__isc_encode_tab(self, iconv_stateful_codepage__isc_encode_tab(self))
+#define iconv_stateful_codepage__isc_encode_c32(self)    iconv_stateful_codepage__isc_encode_c32__from__isc_encode_2ch(self, iconv_stateful_codepage__isc_encode_2ch(self))
 
 
 
@@ -226,13 +225,13 @@ INTDEF libiconv_stateful_offset_t const libiconv_stateful_offsets[];
 /************************************************************************/
 /* Stateful code page encode/decode functions.                          */
 /************************************************************************/
-INTDEF NONNULL((1, 2)) ssize_t FORMATPRINTER_CC libiconv_stateful_encode(struct iconv_encode *__restrict self, /*utf-8*/ char const *__restrict data, size_t size);
 INTDEF NONNULL((1, 2)) ssize_t FORMATPRINTER_CC libiconv_stateful_decode(struct iconv_decode *__restrict self, /*cp???*/ char const *__restrict data, size_t size);
+INTDEF NONNULL((1, 2)) ssize_t FORMATPRINTER_CC libiconv_stateful_encode(struct iconv_encode *__restrict self, /*utf-8*/ char const *__restrict data, size_t size);
 
 
 /* Initialize a stateful encoder/decoder. */
-INTDEF NONNULL((1, 2)) void CC libiconv_stateful_encode_init(struct iconv_encode *__restrict self, /*out*/ struct iconv_printer *__restrict input);
 INTDEF NONNULL((1, 2)) void CC libiconv_stateful_decode_init(struct iconv_decode *__restrict self, /*out*/ struct iconv_printer *__restrict input);
+INTDEF NONNULL((1, 2)) void CC libiconv_stateful_encode_init(struct iconv_encode *__restrict self, /*out*/ struct iconv_printer *__restrict input);
 
 
 DECL_END
