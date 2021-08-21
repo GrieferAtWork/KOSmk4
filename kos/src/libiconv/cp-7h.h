@@ -28,16 +28,18 @@
 #include <kos/types.h>
 
 #include <format-printer.h>
+
 #include <libiconv/iconv.h>
 
+#include "codecs.h"
 #include "cp.h"
 
+#if CODEC_CP7H_COUNT != 0
 DECL_BEGIN
 
-/* General-purpose codepage for codecs that are ASCII-compatible.
- * The name 7h means that 7-bit codepoints are ASCII-compatible,
- * while h means that only the high half of characters are defined.
- */
+/* General-purpose codepage for  codecs that are  ASCII-compatible.
+ * The name 7h  means that 7-bit  codepoints are  ASCII-compatible,
+ * while h means that only the high half of characters are defined. */
 
 struct iconv_7h_codepage {
 	/* Lookup table specifying how to decode a character. */
@@ -63,5 +65,6 @@ INTDEF libiconv_cp7h_offset_t const libiconv_cp7h_offsets[];
 
 
 DECL_END
+#endif /* CODEC_CP7H_COUNT != 0 */
 
 #endif /* !GUARD_LIBICONV_CP_7H_H */

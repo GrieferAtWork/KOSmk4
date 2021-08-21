@@ -30,6 +30,9 @@
 #include <format-printer.h>
 #include <libiconv/iconv.h>
 
+#include "codecs.h"
+
+#if CODEC_ISO646_COUNT != 0
 DECL_BEGIN
 
 /* General-purpose ISO646 code pages only override a limited number
@@ -93,5 +96,6 @@ NOTHROW_NCX(iso646_decode)(struct iconv_iso646_codepage const *__restrict cp, ch
 
 
 DECL_END
+#endif /* CODEC_ISO646_COUNT != 0 */
 
 #endif /* !GUARD_LIBICONV_CP_ISO646_H */

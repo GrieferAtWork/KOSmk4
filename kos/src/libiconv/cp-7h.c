@@ -32,6 +32,7 @@
 #include "codecs.h"
 #include "cp-7h.h"
 
+#if CODEC_CP7H_COUNT != 0
 DECL_BEGIN
 
 /*[[[deemon (printCp7hDatabase from .iconvdata.iconvdata)();]]]*/
@@ -7872,5 +7873,6 @@ INTERN_CONST struct iconv_cp7h_database const libiconv_cp7h_db = {
 
 
 DECL_END
+#endif /* CODEC_CP7H_COUNT != 0 */
 
 #endif /* !GUARD_LIBICONV_CP_7H_C */

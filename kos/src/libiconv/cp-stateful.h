@@ -27,8 +27,13 @@
 
 #include <kos/types.h>
 
+#include <format-printer.h>
+
 #include <libiconv/iconv.h>
 
+#include "codecs.h"
+
+#if CODEC_STATEFUL_COUNT != 0
 DECL_BEGIN
 
 /* Requires for use of `iconv_stateful_codepage':
@@ -93,7 +98,7 @@ struct iconv_stateful_codepage {
 	uint16_t isc_u16_count;  /* # of entires in the 16-bit unicode table. */
 	uint16_t isc_rab_minoff; /* Random access block min offset */
 	uint16_t isc_rab_maxoff; /* Random access block max offset */
-/*	struct iconv_stateful_range isc_db_ranges[isc_db_count]; */
+	COMPILER_FLEXIBLE_ARRAY(struct iconv_stateful_range, isc_db_ranges); /* [isc_db_count] */
 /*	uint16_t                    isc_db_ranges_end; // [== 0xffff] */
 /*	uint16_t                    isc_rab[(isc_rab_maxoff - isc_rab_minoff) + 1]; // Random access offset table */
 /*	char16_t                    isc_u16[isc_u16_count]; */
@@ -102,8 +107,39 @@ struct iconv_stateful_codepage {
  *	                                       // entires are 2x 16-bit  unicode (0xffff0000 is first  char) */
 	/* TODO: Cache data for encoding from unicode! (all of the above is only used for decoding) */
 };
+/* Helpers for accessing the hidden fields of the above structure. */
+#define iconv_stateful_codepage__isc_rab(self) \
+	((uint16_t const *)((self)->isc_db_ranges + (self)->isc_db_count) + 1)
+#define iconv_stateful_codepage__isc_u16(self)                   \
+	((char16_t const *)(iconv_stateful_codepage__isc_rab(self) + \
+	                    ((self)->isc_rab_maxoff - (self)->isc_rab_minoff) + 1))
+#define iconv_stateful_codepage__isc_u32(self) \
+	((uint32_t const *)(iconv_stateful_codepage__isc_u16(self) + (self)->isc_u16_count)
+
+
+
+
+
+typedef uint32_t libiconv_stateful_offset_t;
+struct iconv_stateful_database;
+INTDEF struct iconv_stateful_database const libiconv_stateful_db;
+INTDEF libiconv_stateful_offset_t const libiconv_stateful_offsets[];
+
+/* Return the 7-bit code page associated with `codec'.
+ * The caller must ensure that `codec >= CODEC_CP7L_MIN && codec <= CODEC_CP7L_MAX' */
+#define libiconv_stateful_page(codec)                                                \
+	(struct iconv_stateful_codepage const *)((byte_t const *)&libiconv_stateful_db + \
+	                                         libiconv_stateful_offsets[(codec)-CODEC_STATEFUL_MIN])
+
+
+/************************************************************************/
+/* Stateful code page encode/decode functions.                          */
+/************************************************************************/
+INTDEF NONNULL((1, 2)) ssize_t FORMATPRINTER_CC libiconv_stateful_encode(struct iconv_encode *__restrict self, /*utf-8*/ char const *__restrict data, size_t size);
+INTDEF NONNULL((1, 2)) ssize_t FORMATPRINTER_CC libiconv_stateful_decode(struct iconv_decode *__restrict self, /*cp???*/ char const *__restrict data, size_t size);
 
 
 DECL_END
+#endif /* CODEC_STATEFUL_COUNT != 0 */
 
 #endif /* !GUARD_LIBICONV_CP_STATEFUL_H */

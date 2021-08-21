@@ -26,6 +26,8 @@
 #include <format-printer.h>
 #include <kos/types.h>
 
+#include "codecs.h"
+
 DECL_BEGIN
 
 /************************************************************************/
@@ -60,32 +62,40 @@ INTDEF NONNULL((1, 2)) ssize_t FORMATPRINTER_CC libiconv_latin1_encode(struct ic
 INTDEF NONNULL((1, 2)) ssize_t FORMATPRINTER_CC libiconv_latin1_decode(struct iconv_decode *__restrict self, /*latin1*/ char const *__restrict data, size_t size);
 
 
+#if CODEC_CP_COUNT != 0
 /************************************************************************/
 /* Generic code-page                                                    */
 /************************************************************************/
 INTDEF NONNULL((1, 2)) ssize_t FORMATPRINTER_CC libiconv_cp_encode(struct iconv_encode *__restrict self, /*utf-8*/ char const *__restrict data, size_t size);
 INTDEF NONNULL((1, 2)) ssize_t FORMATPRINTER_CC libiconv_cp_decode(struct iconv_decode *__restrict self, /*cp???*/ char const *__restrict data, size_t size);
+#endif /* CODEC_CP_COUNT != 0 */
 
 
+#if CODEC_CP7L_COUNT != 0
 /************************************************************************/
 /* 7L-code-page encode/decode                                           */
 /************************************************************************/
 INTDEF NONNULL((1, 2)) ssize_t FORMATPRINTER_CC libiconv_cp7l_encode(struct iconv_encode *__restrict self, /*utf-8*/ char const *__restrict data, size_t size);
 INTDEF NONNULL((1, 2)) ssize_t FORMATPRINTER_CC libiconv_cp7l_decode(struct iconv_decode *__restrict self, /*cp???*/ char const *__restrict data, size_t size);
+#endif /* CODEC_CP7L_COUNT != 0 */
 
 
+#if CODEC_CP7H_COUNT != 0
 /************************************************************************/
 /* 7H-code-page encode/decode                                           */
 /************************************************************************/
 INTDEF NONNULL((1, 2)) ssize_t FORMATPRINTER_CC libiconv_cp7h_encode(struct iconv_encode *__restrict self, /*utf-8*/ char const *__restrict data, size_t size);
 INTDEF NONNULL((1, 2)) ssize_t FORMATPRINTER_CC libiconv_cp7h_decode(struct iconv_decode *__restrict self, /*cp???*/ char const *__restrict data, size_t size);
+#endif /* CODEC_CP7H_COUNT != 0 */
 
 
+#if CODEC_ISO646_COUNT != 0
 /************************************************************************/
 /* iso646 code page encode/decode functions.                            */
 /************************************************************************/
 INTDEF NONNULL((1, 2)) ssize_t FORMATPRINTER_CC libiconv_cp646_encode(struct iconv_encode *__restrict self, /*utf-8*/ char const *__restrict data, size_t size);
 INTDEF NONNULL((1, 2)) ssize_t FORMATPRINTER_CC libiconv_cp646_decode(struct iconv_decode *__restrict self, /*cp???*/ char const *__restrict data, size_t size);
+#endif /* CODEC_ISO646_COUNT != 0 */
 
 
 

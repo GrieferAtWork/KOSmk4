@@ -32,6 +32,7 @@
 #include "codecs.h"
 #include "cp-iso646.h"
 
+#if CODEC_ISO646_COUNT != 0
 DECL_BEGIN
 
 /*[[[deemon (printCpIso646Database from .iconvdata.iconvdata)();]]]*/
@@ -132,5 +133,6 @@ INTERN_CONST uint8_t const libiconv_iso646_override_chars[ISO646_OVERRIDE_COUNT]
 
 
 DECL_END
+#endif /* CODEC_ISO646_COUNT != 0 */
 
 #endif /* !GUARD_LIBICONV_CP_ISO646_C */

@@ -30,6 +30,7 @@
 #include "codecs.h"
 #include "cp.h"
 
+#if CODEC_CP_COUNT != 0
 DECL_BEGIN
 
 /*[[[deemon (printCp8Database from .iconvdata.iconvdata)();]]]*/
@@ -9924,5 +9925,6 @@ INTERN_CONST struct iconv_cp_database const libiconv_cp_db = {
 /*[[[end]]]*/
 
 DECL_END
+#endif /* CODEC_CP_COUNT != 0 */
 
 #endif /* !GUARD_LIBICONV_CP_C */

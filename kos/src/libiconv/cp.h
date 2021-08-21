@@ -25,6 +25,9 @@
 
 #include <kos/types.h>
 
+#include "codecs.h"
+
+#if CODEC_CP_COUNT != 0
 DECL_BEGIN
 
 struct iconv_codepage_encode_entry {
@@ -58,7 +61,7 @@ INTDEF libiconv_cp_offset_t const libiconv_cp_offsets[];
 	                                libiconv_cp_offsets[(codec)-CODEC_CP_MIN])
 
 
-
 DECL_END
+#endif /* CODEC_CP_COUNT != 0 */
 
 #endif /* !GUARD_LIBICONV_CP_H */

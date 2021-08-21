@@ -492,33 +492,48 @@ function printCodecEnums() {
 
 	print;
 	print("	/* 8-bit codepage codecs */");
-	print("#define CODEC_CP_MIN ", codecs_cp8.first);
-	printCodecs(codecs_cp8);
-	print("#define CODEC_CP_MAX ", codecs_cp8.last);
+	print("#define CODEC_CP_COUNT ", #codecs_cp8);
+	if (codecs_cp8) {
+		print("#define CODEC_CP_MIN ", codecs_cp8.first);
+		printCodecs(codecs_cp8);
+		print("#define CODEC_CP_MAX ", codecs_cp8.last);
+	}
 
 	print;
 	print("	/* 7l codepage codecs */");
-	print("#define CODEC_CP7L_MIN ", codecs_cp7l.first);
-	printCodecs(codecs_cp7l);
-	print("#define CODEC_CP7L_MAX ", codecs_cp7l.last);
+	print("#define CODEC_CP7L_COUNT ", #codecs_cp7l);
+	if (codecs_cp7l) {
+		print("#define CODEC_CP7L_MIN ", codecs_cp7l.first);
+		printCodecs(codecs_cp7l);
+		print("#define CODEC_CP7L_MAX ", codecs_cp7l.last);
+	}
 
 	print;
 	print("	/* 7h codepage codecs */");
-	print("#define CODEC_CP7H_MIN ", codecs_cp7h.first);
-	printCodecs(codecs_cp7h);
-	print("#define CODEC_CP7H_MAX ", codecs_cp7h.last);
+	print("#define CODEC_CP7H_COUNT ", #codecs_cp7h);
+	if (codecs_cp7h) {
+		print("#define CODEC_CP7H_MIN ", codecs_cp7h.first);
+		printCodecs(codecs_cp7h);
+		print("#define CODEC_CP7H_MAX ", codecs_cp7h.last);
+	}
 
 	print;
 	print("	/* iso646 codepage codecs */");
-	print("#define CODEC_ISO646_MIN ", codecs_iso646.first);
-	printCodecs(codecs_iso646);
-	print("#define CODEC_ISO646_MAX ", codecs_iso646.last);
+	print("#define CODEC_ISO646_COUNT ", #codecs_iso646);
+	if (codecs_iso646) {
+		print("#define CODEC_ISO646_MIN ", codecs_iso646.first);
+		printCodecs(codecs_iso646);
+		print("#define CODEC_ISO646_MAX ", codecs_iso646.last);
+	}
 
 	print;
 	print("	/* Stateful codepage codecs */");
-	print("#define CODEC_STATEFUL_MIN ", codecs_stateful.first);
-	printCodecs(codecs_stateful);
-	print("#define CODEC_STATEFUL_MAX ", codecs_stateful.last);
+	print("#define CODEC_STATEFUL_COUNT ", #codecs_stateful);
+	if (codecs_stateful) {
+		print("#define CODEC_STATEFUL_MIN ", codecs_stateful.first);
+		printCodecs(codecs_stateful);
+		print("#define CODEC_STATEFUL_MAX ", codecs_stateful.last);
+	}
 }
 
 
@@ -955,7 +970,11 @@ do_add_identity_range:
 	}
 	print("};");
 
-	/* TODO: Print the offset table. */
+	/* Print the offset table. */
+	print("INTERN_CONST libiconv_stateful_offset_t const libiconv_stateful_offsets[", #exCodecs, "] = {");
+	for (local exCodec: exCodecs)
+		print("	[", exCodec.codec.name, " - CODEC_STATEFUL_MIN] = offsetof(struct iconv_stateful_database, ", dbFieldName(exCodec.codec.name), "),");
+	print("};");
 
 	/* Now print the database controller contents. */
 	print("INTERN_CONST struct iconv_stateful_database const libiconv_stateful_db = {");

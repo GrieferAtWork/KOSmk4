@@ -68,6 +68,7 @@ enum {
 	CODEC_XML_ESCAPE,           /* "xml-escape", "html-escape" */
 
 	/* 8-bit codepage codecs */
+#define CODEC_CP_COUNT 110
 #define CODEC_CP_MIN CODEC_ADOBE_STANDARD_ENCODING
 	CODEC_ADOBE_STANDARD_ENCODING, /* "adobe-standard-encoding", "csadobestandardencoding" */
 	CODEC_ADOBE_SYMBOL_ENCODING,   /* "macsymbol", "adobe-symbol-encoding", "cshppsmath", "cp1038", "ibm1038", "x-mac-symbol" */
@@ -182,6 +183,7 @@ enum {
 #define CODEC_CP_MAX CODEC_X0201
 
 	/* 7l codepage codecs */
+#define CODEC_CP7L_COUNT 40
 #define CODEC_CP7L_MIN CODEC_BCDIC
 	CODEC_BCDIC,            /* "bcdic" */
 	CODEC_BRF,              /* "brf", "csbrf" */
@@ -226,6 +228,7 @@ enum {
 #define CODEC_CP7L_MAX CODEC_KOI7_N2
 
 	/* 7h codepage codecs */
+#define CODEC_CP7H_COUNT 153
 #define CODEC_CP7H_MIN CODEC_AMIGA_1251
 	CODEC_AMIGA_1251,             /* "amiga-1251", "ami1251", "amiga1251", "ami-1251", "csamiga1251" */
 	CODEC_ATARIST,                /* "atarist" */
@@ -383,6 +386,7 @@ enum {
 #define CODEC_CP7H_MAX CODEC_X_MAC_TURKIC_CYRILLIC
 
 	/* iso646 codepage codecs */
+#define CODEC_ISO646_COUNT 48
 #define CODEC_ISO646_MIN CODEC_DK_US
 	CODEC_DK_US,                 /* "dk-us", "csdkus" */
 	CODEC_ISO646_BASIC,          /* "iso646.basic:1983", "ref" */
@@ -435,6 +439,7 @@ enum {
 #define CODEC_ISO646_MAX CODEC_US_DK
 
 	/* Stateful codepage codecs */
+#define CODEC_STATEFUL_COUNT 10
 #define CODEC_STATEFUL_MIN CODEC_IBM1364
 	CODEC_IBM1364, /* "ibm1364", "cp1364", "csibm1364" */
 	CODEC_IBM1371, /* "ibm1371", "cp1371", "csibm1371" */

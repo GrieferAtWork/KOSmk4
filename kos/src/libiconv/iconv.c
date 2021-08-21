@@ -93,29 +93,37 @@ NOTHROW_NCX(CC libiconv_decode_init)(/*in|out*/ struct iconv_decode *__restrict 
 		input->ii_printer = (pformatprinter)&libiconv_latin1_decode;
 		break;
 
+#if CODEC_CP_COUNT != 0
 	case CODEC_CP_MIN ... CODEC_CP_MAX:
 		/* 8-bit codepage */
 		self->icd_data.idd_cp = libiconv_cp_page(self->icd_codec);
 		input->ii_printer     = (pformatprinter)&libiconv_cp_decode;
 		break;
+#endif /* CODEC_CP_COUNT != 0 */
 
+#if CODEC_CP7H_COUNT != 0
 	case CODEC_CP7H_MIN ... CODEC_CP7H_MAX:
 		/* 7h codepage */
 		self->icd_data.idd_cp7h = libiconv_cp7h_page(self->icd_codec);
 		input->ii_printer       = (pformatprinter)&libiconv_cp7h_decode;
 		break;
+#endif /* CODEC_CP7H_COUNT != 0 */
 
+#if CODEC_CP7L_COUNT != 0
 	case CODEC_CP7L_MIN ... CODEC_CP7L_MAX:
 		/* 7l codepage */
 		self->icd_data.idd_cp7l = libiconv_cp7l_page(self->icd_codec);
 		input->ii_printer       = (pformatprinter)&libiconv_cp7l_decode;
 		break;
+#endif /* CODEC_CP7L_COUNT != 0 */
 
+#if CODEC_ISO646_COUNT != 0
 	case CODEC_ISO646_MIN ... CODEC_ISO646_MAX:
 		/* iso646 codepage. */
 		self->icd_data.idd_cp646 = libiconv_iso646_page(self->icd_codec);
 		input->ii_printer        = (pformatprinter)&libiconv_cp646_decode;
 		break;
+#endif /* CODEC_ISO646_COUNT != 0 */
 
 		/* C-escape */
 	case CODEC_C_ESCAPE:
@@ -311,29 +319,37 @@ NOTHROW_NCX(CC libiconv_encode_init)(/*in|out*/ struct iconv_encode *__restrict 
 		input->ii_printer = (pformatprinter)&libiconv_latin1_encode;
 		break;
 
+#if CODEC_CP_COUNT != 0
 	case CODEC_CP_MIN ... CODEC_CP_MAX:
 		/* 8-bit codepage */
 		self->ice_data.ied_cp = libiconv_cp_page(self->ice_codec);
 		input->ii_printer     = (pformatprinter)&libiconv_cp_encode;
 		break;
+#endif /* CODEC_CP_COUNT != 0 */
 
+#if CODEC_CP7H_COUNT != 0
 	case CODEC_CP7H_MIN ... CODEC_CP7H_MAX:
 		/* 7h codepage */
 		self->ice_data.ied_cp7h = libiconv_cp7h_page(self->ice_codec);
 		input->ii_printer       = (pformatprinter)&libiconv_cp7h_encode;
 		break;
+#endif /* CODEC_CP7H_COUNT != 0 */
 
+#if CODEC_CP7L_COUNT != 0
 	case CODEC_CP7L_MIN ... CODEC_CP7L_MAX:
 		/* 7l codepage */
 		self->ice_data.ied_cp7l = libiconv_cp7l_page(self->ice_codec);
 		input->ii_printer       = (pformatprinter)&libiconv_cp7l_encode;
 		break;
+#endif /* CODEC_CP7L_COUNT != 0 */
 
+#if CODEC_ISO646_COUNT != 0
 	case CODEC_ISO646_MIN ... CODEC_ISO646_MAX:
 		/* iso646 codepage. */
 		self->ice_data.ied_cp646 = libiconv_iso646_page(self->ice_codec);
 		input->ii_printer        = (pformatprinter)&libiconv_cp646_encode;
 		break;
+#endif /* CODEC_ISO646_COUNT != 0 */
 
 		/* C-escape */
 	case CODEC_C_ESCAPE:

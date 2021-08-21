@@ -121,6 +121,7 @@ NOTHROW_NCX(__LIBCCALL iconv_transliterate)(char32_t ch, char32_t buf[UNICODE_FO
 
 
 
+#if CODEC_CP_COUNT != 0
 /************************************************************************/
 /* Generic code-page                                                    */
 /************************************************************************/
@@ -314,9 +315,11 @@ err_ilseq:
 		errno = EILSEQ;
 	return -(ssize_t)size;
 }
+#endif /* CODEC_CP_COUNT != 0 */
 
 
 
+#if CODEC_CP7L_COUNT != 0
 /************************************************************************/
 /* 7L-code-page encode/decode                                           */
 /************************************************************************/
@@ -512,9 +515,11 @@ err_ilseq:
 		errno = EILSEQ;
 	return -(ssize_t)size;
 }
+#endif /* CODEC_CP7L_COUNT != 0 */
 
 
 
+#if CODEC_ISO646_COUNT != 0
 /************************************************************************/
 /* iso646 code page encode/decode functions.                            */
 /************************************************************************/
@@ -690,6 +695,7 @@ err_ilseq:
 		errno = EILSEQ;
 	return -(ssize_t)size;
 }
+#endif /* CODEC_ISO646_COUNT != 0 */
 
 
 DECL_END
@@ -713,8 +719,10 @@ DECL_END
 #include "convert-like-ascii.c.inl"
 #define DEFINE_FOR_LATIN1
 #include "convert-like-ascii.c.inl"
+#if CODEC_CP7H_COUNT != 0
 #define DEFINE_FOR_CP7H
 #include "convert-like-ascii.c.inl"
+#endif /* CODEC_CP7H_COUNT != 0 */
 
 /* Misc codecs. */
 #include "convert-c-escape.c.inl"
