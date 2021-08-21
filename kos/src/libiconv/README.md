@@ -27,3 +27,5 @@ So as the end result, KOS is designed to work perfectly well with few large libr
 Finally, if you still think that `569KiB` is too large for a library like this, you should really get over it and instead complain about how large `libc`'s already gotten (because at the time of this writing its `.so` is `2.6MiB` large; oops...)
 
 
+A2: Alright, so there are *some* codecs so large that they would take up a significant portion of libiconv. So I've grouped them into separate sub-libraries that are lazily loaded when the associated codecs are first accessed. However, this is far from having one library for every supported codec!
+

@@ -325,7 +325,6 @@ nope:
 
 
 /* Helpers for working with a bitset of cp7h codecs. */
-#define CODEC_CP7H_COUNT ((CODEC_CP7H_MAX - CODEC_CP7H_MIN) + 1)
 typedef uintptr_t cp7h_bitset_t[CEILDIV(CODEC_CP7H_COUNT, sizeof(uintptr_t) * NBBY)];
 #define _cp7h_bitset_index(codec) (((codec) - CODEC_CP7H_MIN) / (sizeof(uintptr_t) * NBBY))
 #define _cp7h_bitset_shift(codec) (((codec) - CODEC_CP7H_MIN) % (sizeof(uintptr_t) * NBBY))
@@ -336,7 +335,6 @@ typedef uintptr_t cp7h_bitset_t[CEILDIV(CODEC_CP7H_COUNT, sizeof(uintptr_t) * NB
 
 
 
-#define CODEC_CP_COUNT ((CODEC_CP_MAX - CODEC_CP_MIN) + 1)
 typedef uintptr_t cp8_bitset_t[CEILDIV(CODEC_CP_COUNT, sizeof(uintptr_t) * NBBY)];
 #define _cp8_bitset_index(codec) (((codec) - CODEC_CP_MIN) / (sizeof(uintptr_t) * NBBY))
 #define _cp8_bitset_shift(codec) (((codec) - CODEC_CP_MIN) % (sizeof(uintptr_t) * NBBY))

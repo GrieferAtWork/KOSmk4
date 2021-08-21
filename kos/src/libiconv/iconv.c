@@ -23,11 +23,14 @@
 #include "api.h"
 /**/
 
+#include <hybrid/atomic.h>
 #include <hybrid/byteorder.h>
 
 #include <kos/types.h>
 
+#include <dlfcn.h>
 #include <errno.h>
+#include <stdbool.h>
 #include <stddef.h>
 #include <string.h>
 #include <unicode.h>
@@ -44,6 +47,49 @@ DECL_BEGIN
 
 STATIC_ASSERT(sizeof(union iconv_decode_data) == (_ICONV_DECODE_OPAQUE_POINTERS * sizeof(void *)));
 STATIC_ASSERT(sizeof(union iconv_encode_data) == (_ICONV_ENCODE_OPAQUE_POINTERS * sizeof(void *)));
+
+
+#if CODEC_STATEFUL_COUNT != 0
+typedef NONNULL((1, 2)) void (CC *LPICONV_STATEFUL_ENCODE_INIT)(struct iconv_encode *__restrict self, /*out*/ struct iconv_printer *__restrict input);
+typedef NONNULL((1, 2)) void (CC *LPICONV_STATEFUL_DECODE_INIT)(struct iconv_decode *__restrict self, /*out*/ struct iconv_printer *__restrict input);
+PRIVATE LPICONV_STATEFUL_ENCODE_INIT pdyn_iconv_stateful_encode_init = NULL;
+PRIVATE LPICONV_STATEFUL_DECODE_INIT pdyn_iconv_stateful_decode_init = NULL;
+PRIVATE void *pdyn_libiconv_stateful                                 = NULL;
+PRIVATE WUNUSED bool CC load_libiconv_stateful(void) {
+	if (pdyn_libiconv_stateful == NULL) {
+		void *lib = dlopen("libiconv-stateful.so", RTLD_LOCAL);
+		if (!lib) {
+not_available:
+			ATOMIC_CMPXCH(pdyn_libiconv_stateful, NULL, (void *)-1);
+		} else {
+			LPICONV_STATEFUL_ENCODE_INIT sencode_init;
+			LPICONV_STATEFUL_DECODE_INIT sdecode_init;
+			*(void **)&sencode_init = dlsym(lib, "iconv_stateful_encode_init");
+			*(void **)&sdecode_init = dlsym(lib, "iconv_stateful_decode_init");
+			if (!sencode_init || !sdecode_init) {
+				dlclose(lib);
+				goto not_available;
+			}
+			pdyn_iconv_stateful_encode_init = sencode_init;
+			pdyn_iconv_stateful_decode_init = sdecode_init;
+			COMPILER_WRITE_BARRIER();
+			if (!ATOMIC_CMPXCH(pdyn_libiconv_stateful, NULL, lib))
+				dlclose(lib); /* Another thread already succeeded */
+		}
+	}
+	return pdyn_libiconv_stateful != (void *)-1;
+}
+#endif /* CODEC_STATEFUL_COUNT != 0 */
+
+/* Called by: -Wl,-fini=libiconv_fini */
+INTERN void NOTHROW_NCX(libiconv_fini)(void) {
+#if CODEC_STATEFUL_COUNT != 0
+	if (pdyn_libiconv_stateful && pdyn_libiconv_stateful != (void *)-1)
+		dlclose(pdyn_libiconv_stateful);
+#endif /* CODEC_STATEFUL_COUNT != 0 */
+}
+
+
 
 INTERN NONNULL((1, 2)) int
 NOTHROW_NCX(CC libiconv_decode_init)(/*in|out*/ struct iconv_decode *__restrict self,
@@ -125,6 +171,15 @@ NOTHROW_NCX(CC libiconv_decode_init)(/*in|out*/ struct iconv_decode *__restrict 
 		break;
 #endif /* CODEC_ISO646_COUNT != 0 */
 
+#if CODEC_STATEFUL_COUNT != 0
+	case CODEC_STATEFUL_MIN ... CODEC_STATEFUL_MAX:
+		if (!load_libiconv_stateful())
+			goto default_case;
+#define WANT_default_case
+		(*pdyn_iconv_stateful_decode_init)(self, input);
+		break;
+#endif /* CODEC_STATEFUL_COUNT != 0 */
+
 		/* C-escape */
 	case CODEC_C_ESCAPE:
 	case CODEC_C_ESCAPE_RAW:
@@ -181,6 +236,10 @@ NOTHROW_NCX(CC libiconv_decode_init)(/*in|out*/ struct iconv_decode *__restrict 
 		break;
 
 	default:
+#ifdef WANT_default_case
+#undef WANT_default_case
+default_case:
+#endif /* WANT_default_case */
 		errno = EINVAL;
 		return -1;
 	}
@@ -261,6 +320,12 @@ NOTHROW_NCX(CC libiconv_decode_isshiftzero)(struct iconv_decode const *__restric
 	case CODEC_HEX_UPPER:
 		/* Make sure that we've parsed an even number of nibbles */
 		return self->icd_data.idd_hex == 0x01;
+
+#if CODEC_STATEFUL_COUNT != 0
+	case CODEC_STATEFUL_MIN ... CODEC_STATEFUL_MAX:
+		/* TODO */
+		break;
+#endif /* CODEC_STATEFUL_COUNT != 0 */
 
 	default:
 		break;
@@ -351,6 +416,15 @@ NOTHROW_NCX(CC libiconv_encode_init)(/*in|out*/ struct iconv_encode *__restrict 
 		break;
 #endif /* CODEC_ISO646_COUNT != 0 */
 
+#if CODEC_STATEFUL_COUNT != 0
+	case CODEC_STATEFUL_MIN ... CODEC_STATEFUL_MAX:
+		if (!load_libiconv_stateful())
+			goto default_case;
+#define WANT_default_case
+		(*pdyn_iconv_stateful_encode_init)(self, input);
+		break;
+#endif /* CODEC_STATEFUL_COUNT != 0 */
+
 		/* C-escape */
 	case CODEC_C_ESCAPE:
 	case CODEC_C_ESCAPE_RAW:
@@ -409,6 +483,10 @@ NOTHROW_NCX(CC libiconv_encode_init)(/*in|out*/ struct iconv_encode *__restrict 
 		break;
 
 	default:
+#ifdef WANT_default_case
+#undef WANT_default_case
+default_case:
+#endif /* WANT_default_case */
 		errno = EINVAL;
 		return -1;
 	}

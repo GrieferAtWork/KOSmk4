@@ -771,6 +771,13 @@ class ExStatefulCodec {
 	public member isc_rab: {int...} = [];
 	public member isc_u16: {int...} = [];
 	public member isc_u32: {int...} = [];
+	public member isc_encode_rab_minoff: int;
+	public member isc_encode_rab_maxoff: int;
+	public member isc_encode_ranges: {(int, int)...} = [];
+	public member isc_encode_rab: {int...} = [];
+	public member isc_encode_tab: {int...} = [];
+	public member isc_encode_2ch: {(int, int)...} = [];
+	public member isc_encode_c32: {(int, int)...} = [];
 }
 
 
@@ -827,8 +834,10 @@ do_random_range:
 				}
 				randomRangeUnicode = Tuple(randomRangeUnicode);
 				if (#randomRangeUnicode == 1 && uni_ord <= 0xffff &&
-				    !(uni_ord == cp_ord && cp_ord != 0))
+				    !(uni_ord == randomRangeStart && randomRangeStart != 0)) {
+					cp_ord = randomRangeStart;
 					goto do_add_identity_range;
+				}
 				assert cp_ord - randomRangeStart == #randomRangeUnicode;
 				ranges.append((randomRangeStart, #randomRangeUnicode, randomRangeUnicode));
 			} else {
@@ -856,7 +865,7 @@ do_add_identity_range:
 		}
 
 		/* Find the largest range of free slots between uniOffsetsInUse
-		 * This range must be large enough to hold TODO:random_access_count/random_access_blocks */
+		 * This range must be large enough to hold random_access_blocks */
 		uniOffsetsInUse.sort();
 		local largestRangeStart = 0;
 		local largestRangeSize = 0;
@@ -930,6 +939,203 @@ do_add_identity_range:
 				exCodec.isc_rab[i] = offset;
 			}
 		}
+
+		/* Generate encode data */
+
+		@@Sorted list of (uni_ord, cp_ord)
+		local encodeTable: {int: int} = Dict();
+		local encodeTable32: {int: int} = Dict();
+		local encodeTable2Char: {int: {int: int}} = Dict();
+		for (local cp_ord, uni_ord: codec.db_table) {
+			if (uni_ord !is int) {
+				assert #uni_ord == 2;
+				assert uni_ord.first <= 0xffff;
+				assert uni_ord.last <= 0xffff;
+				local subDict = encodeTable2Char.get(uni_ord.first);
+				if (subDict is none)
+					encodeTable2Char[uni_ord.first] = subDict = Dict();
+				subDict[uni_ord.last] = cp_ord;
+				continue;
+			}
+			if (cp_ord == 0)
+				continue;
+			local usedTable = uni_ord > 0xffff ? encodeTable32 : encodeTable;
+			if (uni_ord in usedTable)
+				cp_ord = { cp_ord, usedTable[uni_ord] } < ...;
+			usedTable[uni_ord] = cp_ord;
+		}
+		for (local i: [:256]) {
+			local uni = codec.sb_table[i];
+			if (uni != 0)
+				encodeTable[uni] = i;
+		}
+		encodeTable[0] = 0;
+
+		@@List of (uni_ord, count, cp_ord | {cp_ord...})
+		@@When `cp_ord' is 0, it's an undefined range
+		local encodeRanges: {(int, int, int | {int...})...} = [];
+		for (local uni_ord = 0; uni_ord <= 0xffff;) {
+			local cp_ord = encodeTable.get(uni_ord, 0);
+			local count = 1;
+			local twochar = encodeTable2Char.get(uni_ord);
+			if (twochar) {
+				/* Handle multi-char sequences. */
+				assert cp_ord != 0;
+				encodeRanges.append((uni_ord, 1, 0x80000000 + #exCodec.isc_encode_2ch));
+				for (local uni2_ord: twochar.keys.sorted()) {
+					exCodec.isc_encode_2ch.append((uni2_ord, twochar[uni2_ord]));
+				}
+				/* Fallback when the follow-up character isn't one of the special ones. */
+				exCodec.isc_encode_2ch.append((0, cp_ord));
+				++uni_ord;
+				continue;
+			}
+			for (;;) {
+				local uni_next = uni_ord + count;
+				if (uni_next > 0xffff)
+					break;
+				if (uni_next in encodeTable2Char)
+					break;
+				local cp_next = encodeTable.get(uni_next, 0);
+				if (cp_next != (cp_ord ? cp_ord + count : 0))
+					break;
+				++count;
+			}
+			if (count == 1) {
+do_encode_random_range:
+				local randomRangeStart = uni_ord;
+				local randomRangeCp = [cp_ord];
+				for (;;) {
+					++uni_ord;
+					if (uni_ord in encodeTable2Char)
+						break;
+					local cp_ord_0 = encodeTable.get(uni_ord, 0);
+					local cp_ord_1 = encodeTable.get(uni_ord+1, 0);
+					local cp_ord_2 = encodeTable.get(uni_ord+2, 0);
+					if (cp_ord_0 == 0 && cp_ord_1 == 0 && cp_ord_2 == 0)
+						break;
+					if (cp_ord_0+1 == cp_ord_1 && cp_ord_1+1 == cp_ord_2 && cp_ord_0 != uni_ord)
+						break;
+					randomRangeCp.append(cp_ord_0);
+				}
+				randomRangeCp = Tuple(randomRangeCp);
+				if (#randomRangeCp == 1 && !(cp_ord == randomRangeStart)) {
+					uni_ord = randomRangeStart;
+					goto do_add_encode_identity_range;
+				}
+				assert uni_ord - randomRangeStart == #randomRangeCp;
+				encodeRanges.append((randomRangeStart, #randomRangeCp, randomRangeCp));
+			} else {
+do_add_encode_identity_range:
+				if (uni_ord == cp_ord)
+					goto do_encode_random_range; /* cp-offset == 0 has special meaning!  */
+				encodeRanges.append((uni_ord, count, cp_ord));
+				uni_ord += count;
+			}
+		}
+
+		local cpOffsetsInUse = [];
+		local random_access_count = 0;
+		local random_access_blocks = 0;
+		for (local uni_min, count, content: encodeRanges) {
+			if (content is int && !(content & 0x80000000)) {
+				assert content != uni_min,
+					"This should have been handled by `goto do_encode_random_range'";
+				local cp_offset = content ? (content - uni_min) & 0xffff : 0;
+				cpOffsetsInUse.append(cp_offset);
+			} else {
+				random_access_count += count;
+				++random_access_blocks;
+			}
+		}
+
+		/* Find the largest range of free slots between cpOffsetsInUse
+		 * This range must be large enough to hold TODO:random_access_count/random_access_blocks */
+		cpOffsetsInUse.sort();
+		local largestRangeStart = 0;
+		local largestRangeSize = 0;
+		for (local i = 0; i < #cpOffsetsInUse; ++i) {
+			local start = cpOffsetsInUse[i] + 1;
+			local end = (i+1) >= #cpOffsetsInUse ? 0x10000 : cpOffsetsInUse[i+1];
+			local count = end - start;
+			if (largestRangeSize < count) {
+				largestRangeStart = start;
+				largestRangeSize = count;
+			}
+		}
+
+		/* Generate encode ranges. */
+		for (local uni_min, count, content: encodeRanges) {
+			if (content is int) {
+				if (content & 0x80000000) {
+					/* 2-character entry. */
+					assert count == 1;
+					exCodec.isc_encode_ranges.append((uni_min,
+						largestRangeStart + #exCodec.isc_encode_rab));
+					exCodec.isc_encode_rab.append(content);
+				} else {
+					local cp_offset = content ? (content - uni_min) & 0xffff : 0;
+					assert !(cp_offset >= largestRangeStart &&
+					         cp_offset < largestRangeStart + largestRangeSize);
+					exCodec.isc_encode_ranges.append((uni_min, cp_offset));
+				}
+			} else {
+				/* Random access range. */
+				exCodec.isc_encode_ranges.append((uni_min,
+					largestRangeStart + #exCodec.isc_encode_rab));
+				exCodec.isc_encode_rab.append(#exCodec.isc_encode_tab);
+				exCodec.isc_encode_tab.extend(content);
+			}
+		}
+		exCodec.isc_encode_rab_minoff = largestRangeStart;
+		exCodec.isc_encode_rab_maxoff = largestRangeStart + #exCodec.isc_encode_rab - 1;
+		assert #exCodec.isc_encode_rab <= largestRangeSize;
+
+		/* Relocate 2-character entry offsets. */
+		for (local i: [:#exCodec.isc_encode_rab]) {
+			local offset = exCodec.isc_encode_rab[i];
+			if (offset & 0x80000000) {
+				offset = (offset & ~0x80000000) + #exCodec.isc_encode_tab;
+				exCodec.isc_encode_rab[i] = offset;
+			}
+		}
+
+		/* Generate the encode-uni32 table. */
+		for (local uni: encodeTable32.keys.sorted()) {
+			exCodec.isc_encode_c32.append((uni, encodeTable32[uni]));
+		}
+		assert #exCodec.isc_encode_2ch <= 0xffff;
+		assert #exCodec.isc_encode_c32 <= 0xffff;
+
+		/* Ensure that tables containing 32-bit integers are properly aligned. */
+		local offset = 22 +                /* offsetof(isc_db_ranges) */
+			(#exCodec.isc_db_ranges * 4) + /* sizeof(isc_db_ranges) */
+			2 +                            /* sizeof(isc_db_ranges_end) */
+			(#exCodec.isc_rab * 2) +       /* sizeof(isc_rab) */
+			(#exCodec.isc_u16 * 2);        /* sizeof(isc_u16) */
+		if (exCodec.isc_u32) {
+			/* Ensure that `isc_u32' is aligned. */
+			if (offset & 2) {
+				/* Add an unused no-op entry to `isc_u16' */
+				exCodec.isc_u16.append(0);
+				offset += 2;
+			}
+			offset += (#exCodec.isc_u32 * 4); /* sizeof(isc_u32) */
+		}
+		offset += (#exCodec.isc_encode_ranges * 4);  /* sizeof(isc_encode_ranges) */
+		offset += 2;                                 /* sizeof(isc_encode_ranges_end) */
+		offset += (#exCodec.isc_encode_rab * 2);     /* sizeof(isc_encode_rab) */
+		offset += (#exCodec.isc_encode_tab * 2);     /* sizeof(isc_encode_tab) */
+		offset += (#exCodec.isc_encode_2ch * 4);     /* sizeof(isc_encode_2ch) */
+		if (exCodec.isc_encode_c32) {
+			/* Ensure that `isc_encode_c32' is aligned. */
+			if (offset & 2) {
+				/* Add an unused no-op entry to `isc_encode_tab' */
+				exCodec.isc_encode_tab.append(0);
+				offset += 2;
+			}
+			offset += (#exCodec.isc_encode_c32 * 8); /* sizeof(isc_encode_c32) */
+		}
 	}
 
 	/* With everything calculated, print the database controller. */
@@ -954,17 +1160,34 @@ do_add_identity_range:
 		assert numRandomAccess + numIdentity == #exCodec.isc_db_ranges;
 		print("		/* Random access ranges: ", numRandomAccess.hex());
 		print("		 * Identity ranges:      ", numIdentity.hex(), " */");
-		print("		char16_t                    _sb[256];");
-		print("		uint16_t                    _db_count;   /* == ", (#exCodec.isc_db_ranges).hex(), " */");
-		print("		uint16_t                    _u16_count;  /* == ", (#exCodec.isc_u16).hex(), " */");
-		print("		uint16_t                    _rab_minoff; /* == ", exCodec.isc_rab_minoff.hex(), " */");
-		print("		uint16_t                    _rab_maxoff; /* == ", exCodec.isc_rab_maxoff.hex(), " */");
-		print("		struct iconv_stateful_range _db_ranges[", (#exCodec.isc_db_ranges).hex(), "];");
-		print("		uint16_t                    _db_ranges_end;");
-		print("		uint16_t                    _rab[", (#exCodec.isc_rab).hex(), "];");
-		print("		char16_t                    _u16[", (#exCodec.isc_u16).hex(), "];");
+		print("		char16_t                           _sb[256];");
+		print("		uint16_t                           _db_count;          /* == ", (#exCodec.isc_db_ranges).hex(), " */");
+		print("		uint16_t                           _u16_count;         /* == ", (#exCodec.isc_u16).hex(), " */");
+		print("		uint16_t                           _u32_count;         /* == ", (#exCodec.isc_u32).hex(), " */");
+		print("		uint16_t                           _rab_minoff;        /* == ", exCodec.isc_rab_minoff.hex(), " */");
+		print("		uint16_t                           _rab_maxoff;        /* == ", exCodec.isc_rab_maxoff.hex(), " */");
+		print("		uint16_t                           _encode_count;      /* == ", (#exCodec.isc_encode_ranges).hex(), " */");
+		print("		uint16_t                           _encode_tab_count;  /* == ", (#exCodec.isc_encode_tab).hex(), " */");
+		print("		uint16_t                           _encode_rab_minoff; /* == ", exCodec.isc_encode_rab_minoff.hex(), " */");
+		print("		uint16_t                           _encode_rab_maxoff; /* == ", exCodec.isc_encode_rab_maxoff.hex(), " */");
+		print("		uint16_t                           _encode_2ch_count;  /* == ", (#exCodec.isc_encode_2ch).hex(), " */");
+		print("		uint16_t                           _encode_c32_count;  /* == ", (#exCodec.isc_encode_c32).hex(), " */");
+		print("		struct iconv_stateful_range        _db_ranges[", (#exCodec.isc_db_ranges).hex(), "];");
+		print("		uint16_t                           _db_ranges_end;");
+		print("		uint16_t                           _rab[", (#exCodec.isc_rab).hex(), "];");
+		print("		char16_t                           _u16[", (#exCodec.isc_u16).hex(), "];");
 		if (exCodec.isc_u32) {
-			print("		uint32_t                    _u32[", (#exCodec.isc_u32).hex(), "];");
+			print("		uint32_t                           _u32[", (#exCodec.isc_u32).hex(), "];");
+		}
+		print("		struct iconv_stateful_encode_range _encode_ranges[", (#exCodec.isc_encode_ranges).hex(), "];");
+		print("		uint16_t                           _encode_ranges_end;");
+		print("		uint16_t                           _encode_rab[", (#exCodec.isc_encode_rab).hex(), "];");
+		print("		uint16_t                           _encode_tab[", (#exCodec.isc_encode_tab).hex(), "];");
+		if (exCodec.isc_encode_2ch) {
+			print("		struct iconv_stateful_2char_encode _encode_2ch[", (#exCodec.isc_encode_2ch).hex(), "];");
+		}
+		if (exCodec.isc_encode_c32) {
+			print("		struct iconv_stateful_c32_encode   _encode_c32[", (#exCodec.isc_encode_c32).hex(), "];");
 		}
 		print("	} ", dbFieldName(exCodec.codec.name), ";");
 	}
@@ -997,7 +1220,7 @@ do_add_identity_range:
 			print(x),;
 		}
 	}
-	
+
 	for (local exCodec: exCodecs) {
 		print;
 		print("	/* ", exCodec.codec.name, " */");
@@ -1007,8 +1230,15 @@ do_add_identity_range:
 		print("},");
 		print("		._db_count = ", #exCodec.isc_db_ranges, ",");
 		print("		._u16_count = ", #exCodec.isc_u16, ",");
+		print("		._u32_count = ", #exCodec.isc_u32, ",");
 		print("		._rab_minoff = ", exCodec.isc_rab_minoff, ",");
 		print("		._rab_maxoff = ", exCodec.isc_rab_maxoff, ",");
+		print("		._encode_count = ", (#exCodec.isc_encode_ranges).hex(), ",");
+		print("		._encode_tab_count = ", (#exCodec.isc_encode_tab).hex(), ",");
+		print("		._encode_rab_minoff = ", exCodec.isc_encode_rab_minoff.hex(), ",");
+		print("		._encode_rab_maxoff = ", exCodec.isc_encode_rab_maxoff.hex(), ",");
+		print("		._encode_2ch_count = ", (#exCodec.isc_encode_2ch).hex(), ",");
+		print("		._encode_c32_count = ", (#exCodec.isc_encode_c32).hex(), ",");
 		print("		._db_ranges = {"),;
 		printCompressed(
 			(for (local isr_cp_ord, isr_uni_off: exCodec.isc_db_ranges)
@@ -1025,6 +1255,35 @@ do_add_identity_range:
 		if (exCodec.isc_u32) {
 			print("		._u32 = {"),;
 			printCompressed(exCodec.isc_u32, "		         ");
+			print("},");
+		}
+		print("		._encode_ranges = {"),;
+		printCompressed(
+			(for (local iser_uni_ord, iser_cp_off: exCodec.isc_encode_ranges)
+				"{" + iser_uni_ord + "," + iser_cp_off + "}")
+			, "		                   ");
+		print("},");
+		print("		._encode_ranges_end = 0xffff,");
+		print("		._encode_rab = {"),;
+		printCompressed(exCodec.isc_encode_rab, "		                ");
+		print("},");
+		print("		._encode_tab = {"),;
+		printCompressed(exCodec.isc_encode_tab, "		                ");
+		print("},");
+		if (exCodec.isc_encode_2ch) {
+			print("		._encode_2ch = {"),;
+			printCompressed(
+				(for (local is2ce_uni2, is2ce_cp: exCodec.isc_encode_2ch)
+					"{" + is2ce_uni2 + "," + is2ce_cp + "}")
+				, "		                ");
+			print("},");
+		}
+		if (exCodec.isc_encode_c32) {
+			print("		._encode_c32 = {"),;
+			printCompressed(
+				(for (local isc32e_uni, isc32e_cp: exCodec.isc_encode_c32)
+					"{" + isc32e_uni + "," + isc32e_cp + "}")
+				, "		                ");
 			print("},");
 		}
 		print("	},");
