@@ -1089,6 +1089,7 @@ do_add_encode_identity_range:
 				exCodec.isc_encode_tab.extend(content);
 			}
 		}
+		assert exCodec.isc_encode_ranges.first.first == 0, "The encode range table must start with UNI_ORD=0";
 		exCodec.isc_encode_rab_minoff = largestRangeStart;
 		exCodec.isc_encode_rab_maxoff = largestRangeStart + #exCodec.isc_encode_rab - 1;
 		local repl_char = encodeTable.get("?".ord());

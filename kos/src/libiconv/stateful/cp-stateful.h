@@ -59,6 +59,8 @@ struct iconv_stateful_encode_range {
 	uint16_t iser_uni_ord; /* Unicode ordinal */
 	uint16_t iser_cp_off;  /* Code page ordinal offset or index into random-access-block table. */
 };
+#define iconv_stateful_encode_range_start(self) ((self)->iser_uni_ord)   /* First unicode character apart of this range */
+#define iconv_stateful_encode_range_end(self)   ((self)[1].iser_uni_ord) /* First unicode character no longer apart of this range */
 
 struct iconv_stateful_2char_encode {
 	char16_t is2ce_uni2;   /* Second unicode character (or `0' for all others / fallback) */
@@ -113,9 +115,10 @@ struct iconv_stateful_codepage {
 	 * >> }
 	 *
 	 * >> encode(char32_t ch) {
-	 * >>     struct iconv_stateful_encode_range *range;
-	 * >>     range = FIND_ENCODE_RANGE_CONTAINING(self, ch);
-	 * >>     if (range) {
+	 * >>     if (ch < 0xffff) {
+	 * >>         struct iconv_stateful_encode_range *range;
+	 * >>         range = FIND_ENCODE_RANGE_CONTAINING(self, ch);
+	 * >>         assert(range); // Always defined for `ch < 0xffff'; yes: 0xffff doesn't have an entry!
 	 * >>         if (range->iser_cp_off >= self->isc_encode_rab_minoff &&
 	 * >>             range->iser_cp_off <= self->isc_encode_rab_maxoff) {
 	 * >>             // Random access character
@@ -154,6 +157,7 @@ struct iconv_stateful_codepage {
 	 * >>             return (uint16_t)ch + range->iser_cp_off;
 	 * >>         }
 	 * >>     }
+	 * >>     // Only necessary if ch > 0xffff:
 	 * >>     struct iconv_stateful_c32_encode *c32;
 	 * >>     c32 = BSEARCH_IN_TABLE(isc_encode_c32, isc_encode_c32_count, ch);
 	 * >>     if (c32 == NULL)
@@ -196,8 +200,14 @@ struct iconv_stateful_codepage {
 #define iconv_stateful_codepage__isc_encode_ranges__from__isc_u32(self, isc_u32)                     ((struct iconv_stateful_encode_range const *)((isc_u32) + (self)->isc_u32_count))
 #define iconv_stateful_codepage__isc_encode_rab__from__isc_encode_ranges(self, isc_encode_ranges)    ((uint16_t const *)((isc_encode_ranges) + (self)->isc_encode_count) + 1)
 #define iconv_stateful_codepage__isc_encode_tab__from__isc_encode_rab(self, isc_encode_rab)          ((isc_encode_rab) + ((self)->isc_encode_rab_maxoff - (self)->isc_encode_rab_minoff) + 1)
+#define iconv_stateful_codepage__isc_encode_tab__from__isc_encode_ranges(self, isc_encode_ranges)    iconv_stateful_codepage__isc_encode_tab__from__isc_encode_rab(self, iconv_stateful_codepage__isc_encode_rab__from__isc_encode_ranges(self, isc_encode_ranges))
 #define iconv_stateful_codepage__isc_encode_2ch__from__isc_encode_tab(self, isc_encode_tab)          ((struct iconv_stateful_2char_encode const *)((isc_encode_tab) + (self)->isc_encode_tab_count))
+#define iconv_stateful_codepage__isc_encode_2ch__from__isc_encode_rab(self, isc_encode_rab)          iconv_stateful_codepage__isc_encode_2ch__from__isc_encode_tab(self, iconv_stateful_codepage__isc_encode_tab__from__isc_encode_rab(self, isc_encode_rab))
+#define iconv_stateful_codepage__isc_encode_2ch__from__isc_encode_ranges(self, isc_encode_ranges)    iconv_stateful_codepage__isc_encode_2ch__from__isc_encode_tab(self, iconv_stateful_codepage__isc_encode_tab__from__isc_encode_ranges(self, isc_encode_ranges))
 #define iconv_stateful_codepage__isc_encode_c32__from__isc_encode_2ch(self, isc_encode_2ch)          ((struct iconv_stateful_c32_encode const *)((isc_encode_2ch) + (self)->isc_encode_2ch_count))
+#define iconv_stateful_codepage__isc_encode_c32__from__isc_encode_tab(self, isc_encode_tab)          iconv_stateful_codepage__isc_encode_c32__from__isc_encode_2ch(self, iconv_stateful_codepage__isc_encode_2ch__from__isc_encode_tab(self, isc_encode_tab))
+#define iconv_stateful_codepage__isc_encode_c32__from__isc_encode_rab(self, isc_encode_rab)          iconv_stateful_codepage__isc_encode_c32__from__isc_encode_2ch(self, iconv_stateful_codepage__isc_encode_2ch__from__isc_encode_rab(self, isc_encode_rab))
+#define iconv_stateful_codepage__isc_encode_c32__from__isc_encode_ranges(self, isc_encode_ranges)    iconv_stateful_codepage__isc_encode_c32__from__isc_encode_2ch(self, iconv_stateful_codepage__isc_encode_2ch__from__isc_encode_ranges(self, isc_encode_ranges))
 
 #define iconv_stateful_codepage__isc_rab(self)           ((uint16_t const *)((self)->isc_db_ranges + (self)->isc_db_count) + 1)
 #define iconv_stateful_codepage__isc_u16(self)           iconv_stateful_codepage__isc_u16__from__isc_rab(self, iconv_stateful_codepage__isc_rab(self))

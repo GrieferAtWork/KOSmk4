@@ -49,6 +49,7 @@ struct iconv_7l_codepage;
 struct iconv_7h_codepage;
 struct iconv_iso646_codepage;
 struct iconv_stateful_codepage;
+struct iconv_stateful_encode_range;
 
 union iconv_decode_data {
 	struct {
@@ -147,6 +148,17 @@ union iconv_encode_data {
 			struct iconv_7l_codepage const     *ied_cp7l;  /* [1..1][const] Code page (for 7l codecs) */
 			struct iconv_7h_codepage const     *ied_cp7h;  /* [1..1][const] Code page (for 7h codecs) */
 			struct iconv_iso646_codepage const *ied_cp646; /* [1..1][const] Code page (for iso686 codecs) */
+
+			struct {
+#define _ICONV_ENCODE_STATEFUL_SB     0 /* Single-byte */
+#define _ICONV_ENCODE_STATEFUL_DB     1 /* Double-byte */
+#define _ICONV_ENCODE_STATEFUL_DB_2CH 2 /* Double-byte (now handling second second character of double-uni sequence) */
+				__uint8_t                                 sf_state;         /* Current state (one of `_ICONV_ENCODE_STATEFUL_*') */
+				__uint8_t                                _sf_pad[sizeof(void *) - 1];
+				struct iconv_stateful_codepage const     *sf_cp;            /* [1..1][const] Code page. */
+				struct iconv_stateful_encode_range const *sf_encode_ranges; /* [1..1][const][== iconv_stateful_codepage__isc_encode_ranges(sf_cp)] */
+				struct iconv_stateful_2char_encode const *sf_2char;         /* [1..1][valid_if(_ICONV_ENCODE_STATEFUL_DB_2CH)] */
+			} ied_stateful; /* stateful codecs: ibm(930|933|935|937|939|1364|1371|1388|1390|1399) */
 		};
 	};
 	void *__ied_pad[_ICONV_ENCODE_OPAQUE_POINTERS];

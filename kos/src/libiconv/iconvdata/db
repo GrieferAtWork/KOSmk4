@@ -27,9 +27,9 @@
 #  $ deemon -F kos/src/libiconv/cp-7l.c
 #  $ deemon -F kos/src/libiconv/cp-7h.c
 #  $ deemon -F kos/src/libiconv/cp-iso646.c
-#  $ deemon -F kos/src/libiconv/cp-stateful.c
+#  $ deemon -F kos/src/libiconv/stateful/cp-stateful.c
 # Or the one-liner:
-#  $ deemon -F kos/src/libiconv/codecs.h kos/src/libiconv/codecs.c kos/src/libiconv/cp.c kos/src/libiconv/cp-7l.c kos/src/libiconv/cp-7h.c kos/src/libiconv/cp-iso646.c kos/src/libiconv/cp-stateful.c
+#  $ deemon -F kos/src/libiconv/codecs.h kos/src/libiconv/codecs.c kos/src/libiconv/cp.c kos/src/libiconv/cp-7l.c kos/src/libiconv/cp-7h.c kos/src/libiconv/cp-iso646.c kos/src/libiconv/stateful/cp-stateful.c
 ###################################################################################################
 
 

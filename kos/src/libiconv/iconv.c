@@ -43,6 +43,10 @@
 #include "cp.h"
 #include "iconv.h"
 
+#if CODEC_STATEFUL_COUNT != 0
+#include "stateful/cp-stateful.h" /* for `struct iconv_stateful_2char_encode' */
+#endif /* CODEC_STATEFUL_COUNT != 0 */
+
 DECL_BEGIN
 
 STATIC_ASSERT(sizeof(union iconv_decode_data) == (_ICONV_DECODE_OPAQUE_POINTERS * sizeof(void *)));
@@ -525,9 +529,36 @@ NOTHROW_NCX(CC libiconv_encode_flush)(struct iconv_encode *__restrict self) {
 		}
 		break;
 
+#if CODEC_STATEFUL_COUNT != 0
+	case CODEC_STATEFUL_MIN ... CODEC_STATEFUL_MAX: {
+		size_t buflen = 0;
+		unsigned char buf[3];
+		/* If necessary, flush the first character of a 2-uni sequence.
+		 * Also: switch to single-byte mode if we're still in 2-byte. */
+		if (self->ice_data.ied_stateful.sf_state == _ICONV_ENCODE_STATEFUL_DB_2CH) {
+			struct iconv_stateful_2char_encode const *twochar;
+			twochar = self->ice_data.ied_stateful.sf_2char;
+			while (twochar->is2ce_uni2)
+				++twochar;
+			buf[buflen++] = (unsigned char)((twochar->is2ce_cp & 0xff00) >> 8);
+			buf[buflen++] = (unsigned char)((twochar->is2ce_cp & 0x00ff));
+		}
+		if (self->ice_data.ied_stateful.sf_state == _ICONV_ENCODE_STATEFUL_DB)
+			buf[buflen++] = 0x0f; /* ShiftIn (ASCII) */
+		/* If we've got something to write, then do so now. */
+		if (buflen) {
+			result = (*self->ice_output.ii_printer)(self->ice_output.ii_arg,
+			                                        (char const *)buf, buflen);
+			if likely(result >= 0)
+				self->ice_data.ied_stateful.sf_state = _ICONV_ENCODE_STATEFUL_SB;
+		}
+	}	break;
+#endif /* CODEC_STATEFUL_COUNT != 0 */
+
 	default:
 		break;
 	}
+
 	/* (Almost) all encode codecs need a UTF-8 multi-byte state descriptor
 	 * so that they're able to decode  the in-coming UTF-8 data. Here,  we
 	 * have to reset that state! */
