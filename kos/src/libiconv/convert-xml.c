@@ -113,7 +113,7 @@ DECL_BEGIN
  * is adjusted to located the start of the center-most entry.
  *
  * In turn, searching the database still only takes O(log2(N)), where
- * N is the constant number of entities within.
+ * N is the total size (in bytes) of the database.
  *
  * NOTES:
  *  - The offset to <name> of the first entry is always `1'
