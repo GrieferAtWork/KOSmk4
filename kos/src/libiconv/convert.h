@@ -50,6 +50,10 @@ INTDEF NONNULL((1, 2)) ssize_t FORMATPRINTER_CC libiconv_utf16le_encode(struct i
 INTDEF NONNULL((1, 2)) ssize_t FORMATPRINTER_CC libiconv_utf16be_encode(struct iconv_encode *__restrict self, /*utf-8*/ char const *__restrict data, size_t size);
 INTDEF NONNULL((1, 2)) ssize_t FORMATPRINTER_CC libiconv_utf16le_decode(struct iconv_decode *__restrict self, /*utf-16*/ void const *__restrict data, size_t size);
 INTDEF NONNULL((1, 2)) ssize_t FORMATPRINTER_CC libiconv_utf16be_decode(struct iconv_decode *__restrict self, /*utf-16*/ void const *__restrict data, size_t size);
+INTDEF NONNULL((1, 2)) ssize_t FORMATPRINTER_CC libiconv_utf16le_bom_encode(struct iconv_encode *__restrict self, /*utf-8*/ char const *__restrict data, size_t size);
+INTDEF NONNULL((1, 2)) ssize_t FORMATPRINTER_CC libiconv_utf16be_bom_encode(struct iconv_encode *__restrict self, /*utf-8*/ char const *__restrict data, size_t size);
+INTDEF NONNULL((1, 2)) ssize_t FORMATPRINTER_CC libiconv_utf16le_bom_decode(struct iconv_decode *__restrict self, /*utf-16*/ void const *__restrict data, size_t size);
+INTDEF NONNULL((1, 2)) ssize_t FORMATPRINTER_CC libiconv_utf16be_bom_decode(struct iconv_decode *__restrict self, /*utf-16*/ void const *__restrict data, size_t size);
 
 
 /************************************************************************/
@@ -59,6 +63,10 @@ INTDEF NONNULL((1, 2)) ssize_t FORMATPRINTER_CC libiconv_utf32le_encode(struct i
 INTDEF NONNULL((1, 2)) ssize_t FORMATPRINTER_CC libiconv_utf32be_encode(struct iconv_encode *__restrict self, /*utf-8*/ char const *__restrict data, size_t size);
 INTDEF NONNULL((1, 2)) ssize_t FORMATPRINTER_CC libiconv_utf32le_decode(struct iconv_decode *__restrict self, /*utf-32*/ void const *__restrict data, size_t size);
 INTDEF NONNULL((1, 2)) ssize_t FORMATPRINTER_CC libiconv_utf32be_decode(struct iconv_decode *__restrict self, /*utf-32*/ void const *__restrict data, size_t size);
+INTDEF NONNULL((1, 2)) ssize_t FORMATPRINTER_CC libiconv_utf32le_bom_encode(struct iconv_encode *__restrict self, /*utf-8*/ char const *__restrict data, size_t size);
+INTDEF NONNULL((1, 2)) ssize_t FORMATPRINTER_CC libiconv_utf32be_bom_encode(struct iconv_encode *__restrict self, /*utf-8*/ char const *__restrict data, size_t size);
+INTDEF NONNULL((1, 2)) ssize_t FORMATPRINTER_CC libiconv_utf32le_bom_decode(struct iconv_decode *__restrict self, /*utf-32*/ void const *__restrict data, size_t size);
+INTDEF NONNULL((1, 2)) ssize_t FORMATPRINTER_CC libiconv_utf32be_bom_decode(struct iconv_decode *__restrict self, /*utf-32*/ void const *__restrict data, size_t size);
 
 
 /************************************************************************/

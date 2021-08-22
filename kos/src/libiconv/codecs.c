@@ -2679,6 +2679,21 @@ struct codec_name_db_struct {
 #endif /* __BYTE_ORDER__ == __ORDER_BIG_ENDIAN__ && __SIZEOF_WCHAR_T__ == 2 */
 	char db_UTF16BE_nul;
 
+	/* CODEC_UTF16BE_BOM */
+	char db_UTF16BE_BOM_0[12]; /* "utf16be-bom" */
+	char db_UTF16BE_BOM_1[13]; /* "utf-16be-bom" */
+	char db_UTF16BE_BOM_2[11]; /* "utf16bebom" */
+	char db_UTF16BE_BOM_3[12]; /* "utf-16bebom" */
+	char db_UTF16BE_BOM_4[15]; /* "x-utf-16be-bom" */
+#if __BYTE_ORDER__ == __ORDER_BIG_ENDIAN__
+	char db_UTF16BE_BOM_5[10]; /* "utf16-bom" */
+	char db_UTF16BE_BOM_6[11]; /* "utf-16-bom" */
+	char db_UTF16BE_BOM_7[9];  /* "utf16bom" */
+	char db_UTF16BE_BOM_8[10]; /* "utf-16bom" */
+	char db_UTF16BE_BOM_9[13]; /* "x-utf-16-bom" */
+#endif /* __BYTE_ORDER__ == __ORDER_BIG_ENDIAN__ */
+	char db_UTF16BE_BOM_nul;
+
 	/* CODEC_UTF16LE */
 	char db_UTF16LE_0[8];  /* "utf16le" */
 	char db_UTF16LE_1[9];  /* "utf-16le" */
@@ -2711,6 +2726,21 @@ struct codec_name_db_struct {
 #endif /* __BYTE_ORDER__ == __ORDER_LITTLE_ENDIAN__ && __SIZEOF_WCHAR_T__ == 2 */
 	char db_UTF16LE_nul;
 
+	/* CODEC_UTF16LE_BOM */
+	char db_UTF16LE_BOM_0[12]; /* "utf16le-bom" */
+	char db_UTF16LE_BOM_1[13]; /* "utf-16le-bom" */
+	char db_UTF16LE_BOM_2[11]; /* "utf16lebom" */
+	char db_UTF16LE_BOM_3[12]; /* "utf-16lebom" */
+	char db_UTF16LE_BOM_4[15]; /* "x-utf-16le-bom" */
+#if __BYTE_ORDER__ == __ORDER_LITTLE_ENDIAN__
+	char db_UTF16LE_BOM_5[10]; /* "utf16-bom" */
+	char db_UTF16LE_BOM_6[11]; /* "utf-16-bom" */
+	char db_UTF16LE_BOM_7[9];  /* "utf16bom" */
+	char db_UTF16LE_BOM_8[10]; /* "utf-16bom" */
+	char db_UTF16LE_BOM_9[13]; /* "x-utf-16-bom" */
+#endif /* __BYTE_ORDER__ == __ORDER_LITTLE_ENDIAN__ */
+	char db_UTF16LE_BOM_nul;
+
 	/* CODEC_UTF32BE */
 	char db_UTF32BE_0[8];  /* "utf32be" */
 	char db_UTF32BE_1[9];  /* "utf-32be" */
@@ -2741,6 +2771,21 @@ struct codec_name_db_struct {
 #endif /* __BYTE_ORDER__ == __ORDER_BIG_ENDIAN__ && __SIZEOF_WCHAR_T__ == 4 */
 	char db_UTF32BE_nul;
 
+	/* CODEC_UTF32BE_BOM */
+	char db_UTF32BE_BOM_0[12]; /* "utf32be-bom" */
+	char db_UTF32BE_BOM_1[13]; /* "utf-32be-bom" */
+	char db_UTF32BE_BOM_2[11]; /* "utf32bebom" */
+	char db_UTF32BE_BOM_3[12]; /* "utf-32bebom" */
+	char db_UTF32BE_BOM_4[15]; /* "x-utf-32be-bom" */
+#if __BYTE_ORDER__ == __ORDER_BIG_ENDIAN__
+	char db_UTF32BE_BOM_5[10]; /* "utf32-bom" */
+	char db_UTF32BE_BOM_6[11]; /* "utf-32-bom" */
+	char db_UTF32BE_BOM_7[9];  /* "utf32bom" */
+	char db_UTF32BE_BOM_8[10]; /* "utf-32bom" */
+	char db_UTF32BE_BOM_9[13]; /* "x-utf-32-bom" */
+#endif /* __BYTE_ORDER__ == __ORDER_BIG_ENDIAN__ */
+	char db_UTF32BE_BOM_nul;
+
 	/* CODEC_UTF32LE */
 	char db_UTF32LE_0[8];  /* "utf32le" */
 	char db_UTF32LE_1[9];  /* "utf-32le" */
@@ -2768,6 +2813,21 @@ struct codec_name_db_struct {
 	char db_UTF32LE_20[8];  /* "wchar-t" */
 #endif /* __BYTE_ORDER__ == __ORDER_LITTLE_ENDIAN__ && __SIZEOF_WCHAR_T__ == 4 */
 	char db_UTF32LE_nul;
+
+	/* CODEC_UTF32LE_BOM */
+	char db_UTF32LE_BOM_0[12]; /* "utf32le-bom" */
+	char db_UTF32LE_BOM_1[13]; /* "utf-32le-bom" */
+	char db_UTF32LE_BOM_2[11]; /* "utf32lebom" */
+	char db_UTF32LE_BOM_3[12]; /* "utf-32lebom" */
+	char db_UTF32LE_BOM_4[15]; /* "x-utf-32le-bom" */
+#if __BYTE_ORDER__ == __ORDER_LITTLE_ENDIAN__
+	char db_UTF32LE_BOM_5[10]; /* "utf32-bom" */
+	char db_UTF32LE_BOM_6[11]; /* "utf-32-bom" */
+	char db_UTF32LE_BOM_7[9];  /* "utf32bom" */
+	char db_UTF32LE_BOM_8[10]; /* "utf-32bom" */
+	char db_UTF32LE_BOM_9[13]; /* "x-utf-32-bom" */
+#endif /* __BYTE_ORDER__ == __ORDER_LITTLE_ENDIAN__ */
+	char db_UTF32LE_BOM_nul;
 
 	/* CODEC_UTF8 */
 	char db_UTF8_0[5];  /* "utf8" */
@@ -5512,6 +5572,21 @@ PRIVATE struct codec_name_db_struct const codec_name_db = {
 #endif /* __BYTE_ORDER__ == __ORDER_BIG_ENDIAN__ && __SIZEOF_WCHAR_T__ == 2 */
 	0,
 
+	/* CODEC_UTF16BE_BOM */
+	"utf16be-bom",
+	"utf-16be-bom",
+	"utf16bebom",
+	"utf-16bebom",
+	"x-utf-16be-bom",
+#if __BYTE_ORDER__ == __ORDER_BIG_ENDIAN__
+	"utf16-bom",
+	"utf-16-bom",
+	"utf16bom",
+	"utf-16bom",
+	"x-utf-16-bom",
+#endif /* __BYTE_ORDER__ == __ORDER_BIG_ENDIAN__ */
+	0,
+
 	/* CODEC_UTF16LE */
 	"utf16le",
 	"utf-16le",
@@ -5544,6 +5619,21 @@ PRIVATE struct codec_name_db_struct const codec_name_db = {
 #endif /* __BYTE_ORDER__ == __ORDER_LITTLE_ENDIAN__ && __SIZEOF_WCHAR_T__ == 2 */
 	0,
 
+	/* CODEC_UTF16LE_BOM */
+	"utf16le-bom",
+	"utf-16le-bom",
+	"utf16lebom",
+	"utf-16lebom",
+	"x-utf-16le-bom",
+#if __BYTE_ORDER__ == __ORDER_LITTLE_ENDIAN__
+	"utf16-bom",
+	"utf-16-bom",
+	"utf16bom",
+	"utf-16bom",
+	"x-utf-16-bom",
+#endif /* __BYTE_ORDER__ == __ORDER_LITTLE_ENDIAN__ */
+	0,
+
 	/* CODEC_UTF32BE */
 	"utf32be",
 	"utf-32be",
@@ -5574,6 +5664,21 @@ PRIVATE struct codec_name_db_struct const codec_name_db = {
 #endif /* __BYTE_ORDER__ == __ORDER_BIG_ENDIAN__ && __SIZEOF_WCHAR_T__ == 4 */
 	0,
 
+	/* CODEC_UTF32BE_BOM */
+	"utf32be-bom",
+	"utf-32be-bom",
+	"utf32bebom",
+	"utf-32bebom",
+	"x-utf-32be-bom",
+#if __BYTE_ORDER__ == __ORDER_BIG_ENDIAN__
+	"utf32-bom",
+	"utf-32-bom",
+	"utf32bom",
+	"utf-32bom",
+	"x-utf-32-bom",
+#endif /* __BYTE_ORDER__ == __ORDER_BIG_ENDIAN__ */
+	0,
+
 	/* CODEC_UTF32LE */
 	"utf32le",
 	"utf-32le",
@@ -5600,6 +5705,21 @@ PRIVATE struct codec_name_db_struct const codec_name_db = {
 #if __BYTE_ORDER__ == __ORDER_LITTLE_ENDIAN__ && __SIZEOF_WCHAR_T__ == 4
 	"wchar-t",
 #endif /* __BYTE_ORDER__ == __ORDER_LITTLE_ENDIAN__ && __SIZEOF_WCHAR_T__ == 4 */
+	0,
+
+	/* CODEC_UTF32LE_BOM */
+	"utf32le-bom",
+	"utf-32le-bom",
+	"utf32lebom",
+	"utf-32lebom",
+	"x-utf-32le-bom",
+#if __BYTE_ORDER__ == __ORDER_LITTLE_ENDIAN__
+	"utf32-bom",
+	"utf-32-bom",
+	"utf32bom",
+	"utf-32bom",
+	"x-utf-32-bom",
+#endif /* __BYTE_ORDER__ == __ORDER_LITTLE_ENDIAN__ */
 	0,
 
 	/* CODEC_UTF8 */
@@ -7325,15 +7445,43 @@ PRIVATE struct codec_db_entry const codec_db[] = {
 #elif __BYTE_ORDER__ == __ORDER_LITTLE_ENDIAN__
 	{ offsetof(struct codec_name_db_struct, db_UTF16LE_9), /*                 "utf-16"                        */ CODEC_UTF16LE },
 #endif /* ... */
+#if __BYTE_ORDER__ == __ORDER_BIG_ENDIAN__
+	{ offsetof(struct codec_name_db_struct, db_UTF16BE_BOM_6), /*             "utf-16-bom"                    */ CODEC_UTF16BE_BOM },
+#elif __BYTE_ORDER__ == __ORDER_LITTLE_ENDIAN__
+	{ offsetof(struct codec_name_db_struct, db_UTF16LE_BOM_6), /*             "utf-16-bom"                    */ CODEC_UTF16LE_BOM },
+#endif /* ... */
 	{ offsetof(struct codec_name_db_struct, db_UTF16BE_1), /*                 "utf-16be"                      */ CODEC_UTF16BE },
+	{ offsetof(struct codec_name_db_struct, db_UTF16BE_BOM_1), /*             "utf-16be-bom"                  */ CODEC_UTF16BE_BOM },
+	{ offsetof(struct codec_name_db_struct, db_UTF16BE_BOM_3), /*             "utf-16bebom"                   */ CODEC_UTF16BE_BOM },
+#if __BYTE_ORDER__ == __ORDER_BIG_ENDIAN__
+	{ offsetof(struct codec_name_db_struct, db_UTF16BE_BOM_8), /*             "utf-16bom"                     */ CODEC_UTF16BE_BOM },
+#elif __BYTE_ORDER__ == __ORDER_LITTLE_ENDIAN__
+	{ offsetof(struct codec_name_db_struct, db_UTF16LE_BOM_8), /*             "utf-16bom"                     */ CODEC_UTF16LE_BOM },
+#endif /* ... */
 	{ offsetof(struct codec_name_db_struct, db_UTF16LE_1), /*                 "utf-16le"                      */ CODEC_UTF16LE },
+	{ offsetof(struct codec_name_db_struct, db_UTF16LE_BOM_1), /*             "utf-16le-bom"                  */ CODEC_UTF16LE_BOM },
+	{ offsetof(struct codec_name_db_struct, db_UTF16LE_BOM_3), /*             "utf-16lebom"                   */ CODEC_UTF16LE_BOM },
 #if __BYTE_ORDER__ == __ORDER_BIG_ENDIAN__
 	{ offsetof(struct codec_name_db_struct, db_UTF32BE_8), /*                 "utf-32"                        */ CODEC_UTF32BE },
 #elif __BYTE_ORDER__ == __ORDER_LITTLE_ENDIAN__
 	{ offsetof(struct codec_name_db_struct, db_UTF32LE_6), /*                 "utf-32"                        */ CODEC_UTF32LE },
 #endif /* ... */
+#if __BYTE_ORDER__ == __ORDER_BIG_ENDIAN__
+	{ offsetof(struct codec_name_db_struct, db_UTF32BE_BOM_6), /*             "utf-32-bom"                    */ CODEC_UTF32BE_BOM },
+#elif __BYTE_ORDER__ == __ORDER_LITTLE_ENDIAN__
+	{ offsetof(struct codec_name_db_struct, db_UTF32LE_BOM_6), /*             "utf-32-bom"                    */ CODEC_UTF32LE_BOM },
+#endif /* ... */
 	{ offsetof(struct codec_name_db_struct, db_UTF32BE_1), /*                 "utf-32be"                      */ CODEC_UTF32BE },
+	{ offsetof(struct codec_name_db_struct, db_UTF32BE_BOM_1), /*             "utf-32be-bom"                  */ CODEC_UTF32BE_BOM },
+	{ offsetof(struct codec_name_db_struct, db_UTF32BE_BOM_3), /*             "utf-32bebom"                   */ CODEC_UTF32BE_BOM },
+#if __BYTE_ORDER__ == __ORDER_BIG_ENDIAN__
+	{ offsetof(struct codec_name_db_struct, db_UTF32BE_BOM_8), /*             "utf-32bom"                     */ CODEC_UTF32BE_BOM },
+#elif __BYTE_ORDER__ == __ORDER_LITTLE_ENDIAN__
+	{ offsetof(struct codec_name_db_struct, db_UTF32LE_BOM_8), /*             "utf-32bom"                     */ CODEC_UTF32LE_BOM },
+#endif /* ... */
 	{ offsetof(struct codec_name_db_struct, db_UTF32LE_1), /*                 "utf-32le"                      */ CODEC_UTF32LE },
+	{ offsetof(struct codec_name_db_struct, db_UTF32LE_BOM_1), /*             "utf-32le-bom"                  */ CODEC_UTF32LE_BOM },
+	{ offsetof(struct codec_name_db_struct, db_UTF32LE_BOM_3), /*             "utf-32lebom"                   */ CODEC_UTF32LE_BOM },
 	{ offsetof(struct codec_name_db_struct, db_UTF8_1), /*                    "utf-8"                         */ CODEC_UTF8 },
 	{ offsetof(struct codec_name_db_struct, db_UTF8_BOM_1), /*                "utf-8-bom"                     */ CODEC_UTF8_BOM },
 	{ offsetof(struct codec_name_db_struct, db_UTF8_BOM_3), /*                "utf-8bom"                      */ CODEC_UTF8_BOM },
@@ -7342,15 +7490,43 @@ PRIVATE struct codec_db_entry const codec_db[] = {
 #elif __BYTE_ORDER__ == __ORDER_LITTLE_ENDIAN__
 	{ offsetof(struct codec_name_db_struct, db_UTF16LE_8), /*                 "utf16"                         */ CODEC_UTF16LE },
 #endif /* ... */
+#if __BYTE_ORDER__ == __ORDER_BIG_ENDIAN__
+	{ offsetof(struct codec_name_db_struct, db_UTF16BE_BOM_5), /*             "utf16-bom"                     */ CODEC_UTF16BE_BOM },
+#elif __BYTE_ORDER__ == __ORDER_LITTLE_ENDIAN__
+	{ offsetof(struct codec_name_db_struct, db_UTF16LE_BOM_5), /*             "utf16-bom"                     */ CODEC_UTF16LE_BOM },
+#endif /* ... */
 	{ offsetof(struct codec_name_db_struct, db_UTF16BE_0), /*                 "utf16be"                       */ CODEC_UTF16BE },
+	{ offsetof(struct codec_name_db_struct, db_UTF16BE_BOM_0), /*             "utf16be-bom"                   */ CODEC_UTF16BE_BOM },
+	{ offsetof(struct codec_name_db_struct, db_UTF16BE_BOM_2), /*             "utf16bebom"                    */ CODEC_UTF16BE_BOM },
+#if __BYTE_ORDER__ == __ORDER_BIG_ENDIAN__
+	{ offsetof(struct codec_name_db_struct, db_UTF16BE_BOM_7), /*             "utf16bom"                      */ CODEC_UTF16BE_BOM },
+#elif __BYTE_ORDER__ == __ORDER_LITTLE_ENDIAN__
+	{ offsetof(struct codec_name_db_struct, db_UTF16LE_BOM_7), /*             "utf16bom"                      */ CODEC_UTF16LE_BOM },
+#endif /* ... */
 	{ offsetof(struct codec_name_db_struct, db_UTF16LE_0), /*                 "utf16le"                       */ CODEC_UTF16LE },
+	{ offsetof(struct codec_name_db_struct, db_UTF16LE_BOM_0), /*             "utf16le-bom"                   */ CODEC_UTF16LE_BOM },
+	{ offsetof(struct codec_name_db_struct, db_UTF16LE_BOM_2), /*             "utf16lebom"                    */ CODEC_UTF16LE_BOM },
 #if __BYTE_ORDER__ == __ORDER_BIG_ENDIAN__
 	{ offsetof(struct codec_name_db_struct, db_UTF32BE_7), /*                 "utf32"                         */ CODEC_UTF32BE },
 #elif __BYTE_ORDER__ == __ORDER_LITTLE_ENDIAN__
 	{ offsetof(struct codec_name_db_struct, db_UTF32LE_5), /*                 "utf32"                         */ CODEC_UTF32LE },
 #endif /* ... */
+#if __BYTE_ORDER__ == __ORDER_BIG_ENDIAN__
+	{ offsetof(struct codec_name_db_struct, db_UTF32BE_BOM_5), /*             "utf32-bom"                     */ CODEC_UTF32BE_BOM },
+#elif __BYTE_ORDER__ == __ORDER_LITTLE_ENDIAN__
+	{ offsetof(struct codec_name_db_struct, db_UTF32LE_BOM_5), /*             "utf32-bom"                     */ CODEC_UTF32LE_BOM },
+#endif /* ... */
 	{ offsetof(struct codec_name_db_struct, db_UTF32BE_0), /*                 "utf32be"                       */ CODEC_UTF32BE },
+	{ offsetof(struct codec_name_db_struct, db_UTF32BE_BOM_0), /*             "utf32be-bom"                   */ CODEC_UTF32BE_BOM },
+	{ offsetof(struct codec_name_db_struct, db_UTF32BE_BOM_2), /*             "utf32bebom"                    */ CODEC_UTF32BE_BOM },
+#if __BYTE_ORDER__ == __ORDER_BIG_ENDIAN__
+	{ offsetof(struct codec_name_db_struct, db_UTF32BE_BOM_7), /*             "utf32bom"                      */ CODEC_UTF32BE_BOM },
+#elif __BYTE_ORDER__ == __ORDER_LITTLE_ENDIAN__
+	{ offsetof(struct codec_name_db_struct, db_UTF32LE_BOM_7), /*             "utf32bom"                      */ CODEC_UTF32LE_BOM },
+#endif /* ... */
 	{ offsetof(struct codec_name_db_struct, db_UTF32LE_0), /*                 "utf32le"                       */ CODEC_UTF32LE },
+	{ offsetof(struct codec_name_db_struct, db_UTF32LE_BOM_0), /*             "utf32le-bom"                   */ CODEC_UTF32LE_BOM },
+	{ offsetof(struct codec_name_db_struct, db_UTF32LE_BOM_2), /*             "utf32lebom"                    */ CODEC_UTF32LE_BOM },
 	{ offsetof(struct codec_name_db_struct, db_UTF8_0), /*                    "utf8"                          */ CODEC_UTF8 },
 	{ offsetof(struct codec_name_db_struct, db_UTF8_BOM_0), /*                "utf8-bom"                      */ CODEC_UTF8_BOM },
 	{ offsetof(struct codec_name_db_struct, db_UTF8_BOM_2), /*                "utf8bom"                       */ CODEC_UTF8_BOM },
@@ -7455,10 +7631,24 @@ PRIVATE struct codec_db_entry const codec_db[] = {
 	{ offsetof(struct codec_name_db_struct, db_CP10017_2), /*                 "x-mac-ukrainian"               */ CODEC_CP10017 },
 	{ offsetof(struct codec_name_db_struct, db_UTF16BE_5), /*                 "x-unicodebig"                  */ CODEC_UTF16BE },
 	{ offsetof(struct codec_name_db_struct, db_UTF16LE_5), /*                 "x-unicodelittle"               */ CODEC_UTF16LE },
+#if __BYTE_ORDER__ == __ORDER_BIG_ENDIAN__
+	{ offsetof(struct codec_name_db_struct, db_UTF16BE_BOM_9), /*             "x-utf-16-bom"                  */ CODEC_UTF16BE_BOM },
+#elif __BYTE_ORDER__ == __ORDER_LITTLE_ENDIAN__
+	{ offsetof(struct codec_name_db_struct, db_UTF16LE_BOM_9), /*             "x-utf-16-bom"                  */ CODEC_UTF16LE_BOM },
+#endif /* ... */
 	{ offsetof(struct codec_name_db_struct, db_UTF16BE_7), /*                 "x-utf-16be"                    */ CODEC_UTF16BE },
+	{ offsetof(struct codec_name_db_struct, db_UTF16BE_BOM_4), /*             "x-utf-16be-bom"                */ CODEC_UTF16BE_BOM },
 	{ offsetof(struct codec_name_db_struct, db_UTF16LE_6), /*                 "x-utf-16le"                    */ CODEC_UTF16LE },
+	{ offsetof(struct codec_name_db_struct, db_UTF16LE_BOM_4), /*             "x-utf-16le-bom"                */ CODEC_UTF16LE_BOM },
+#if __BYTE_ORDER__ == __ORDER_BIG_ENDIAN__
+	{ offsetof(struct codec_name_db_struct, db_UTF32BE_BOM_9), /*             "x-utf-32-bom"                  */ CODEC_UTF32BE_BOM },
+#elif __BYTE_ORDER__ == __ORDER_LITTLE_ENDIAN__
+	{ offsetof(struct codec_name_db_struct, db_UTF32LE_BOM_9), /*             "x-utf-32-bom"                  */ CODEC_UTF32LE_BOM },
+#endif /* ... */
 	{ offsetof(struct codec_name_db_struct, db_UTF32BE_6), /*                 "x-utf-32be"                    */ CODEC_UTF32BE },
+	{ offsetof(struct codec_name_db_struct, db_UTF32BE_BOM_4), /*             "x-utf-32be-bom"                */ CODEC_UTF32BE_BOM },
 	{ offsetof(struct codec_name_db_struct, db_UTF32LE_4), /*                 "x-utf-32le"                    */ CODEC_UTF32LE },
+	{ offsetof(struct codec_name_db_struct, db_UTF32LE_BOM_4), /*             "x-utf-32le-bom"                */ CODEC_UTF32LE_BOM },
 	{ offsetof(struct codec_name_db_struct, db_CP874_6), /*                   "x-windows-874"                 */ CODEC_CP874 },
 	{ offsetof(struct codec_name_db_struct, db_X0201_1), /*                   "x201"                          */ CODEC_X0201 },
 	{ offsetof(struct codec_name_db_struct, db_ISO_IR_13_4), /*               "x201-7"                        */ CODEC_ISO_IR_13 },

@@ -56,6 +56,24 @@ union iconv_decode_data {
 		__byte_t         u_pbc;   /* # of pending bytes in `u_pb' */
 		__byte_t         u_pb[3]; /* Pending byte(s). */
 		struct __mbstate u_16;    /* Surrogate storage for utf-16 input. */
+#define _ICONV_DECODE_UTF_BOM_TEXT      0 /* In normal text */
+
+#define _ICONV_DECODE_UTF_BOM16LE_B1_FE 1 /* UTF16LE-BOM: Expecting 0xFE */
+#define _ICONV_DECODE_UTF_BOM16LE_B0_FF 2 /* UTF16LE-BOM: Expecting 0xFF */
+
+#define _ICONV_DECODE_UTF_BOM16BE_B1_FF 1 /* UTF16BE-BOM: Expecting 0xFF */
+#define _ICONV_DECODE_UTF_BOM16BE_B0_FE 2 /* UTF16BE-BOM: Expecting 0xFE */
+
+#define _ICONV_DECODE_UTF_BOM32LE_B3_00 1 /* UTF32LE-BOM: Expecting 0x00 */
+#define _ICONV_DECODE_UTF_BOM32LE_B2_00 2 /* UTF32LE-BOM: Expecting 0x00 */
+#define _ICONV_DECODE_UTF_BOM32LE_B1_FE 3 /* UTF32LE-BOM: Expecting 0xFE */
+#define _ICONV_DECODE_UTF_BOM32LE_B0_FF 4 /* UTF32LE-BOM: Expecting 0xFF */
+
+#define _ICONV_DECODE_UTF_BOM32BE_B3_FF 1 /* UTF32BE-BOM: Expecting 0xFF */
+#define _ICONV_DECODE_UTF_BOM32BE_B2_FE 2 /* UTF32BE-BOM: Expecting 0xFE */
+#define _ICONV_DECODE_UTF_BOM32BE_B1_00 3 /* UTF32BE-BOM: Expecting 0x00 */
+#define _ICONV_DECODE_UTF_BOM32BE_B0_00 4 /* UTF32BE-BOM: Expecting 0x00 */
+		__byte_t         u_bom;   /* BOM State (for -BOM codecs; one of `_ICONV_DECODE_UTF_BOM*') */
 	} idd_utf; /* For UTF-16 and UTF-32 input data. */
 
 	struct iconv_codepage const        *idd_cp;    /* [1..1][const] Code page (for 8-bit codecs) */
@@ -166,7 +184,7 @@ union iconv_encode_data {
 				struct iconv_stateful_2char_encode const *sf_2char;         /* [1..1][valid_if(_ICONV_ENCODE_STATEFUL_DB_2CH)] */
 			} ied_stateful; /* stateful codecs: ibm(930|933|935|937|939|1364|1371|1388|1390|1399) */
 
-			__BOOL ied_utf8_bom_printed; /* True if the UTF-8 BOM was printed. */
+			__BOOL ied_utf_bom_printed; /* True if the UTF* BOM was printed. */
 		};
 	};
 

@@ -239,8 +239,6 @@
 #  - ???                    "UTF-8J", "utf8j"
 #  - ???                    "windows-1256S", "cp1256s", "IBM1256s"
 ###################################################################################################
-#  - ???                    "X-UTF-32LE-BOM", "utf-32le-bom", "utf-32le-bom"
-#  - ???                    "X-UTF-32BE-BOM", "utf-32be-bom", "utf-32be-bom"
 #  - ???                    "cp51932", "csCP51932"
 ###################################################################################################
 
@@ -262,9 +260,6 @@
 	"UTF8", "UTF-8", "ISO-10646/UTF8", "ISO-10646/UTF-8",
 	"iso-ir-193", "OSF05010001", "cp65001", "Windows-65001",
 	"csUTF8")
-
-# UTF-8 (with BOM)
-@CODEC(CODEC_UTF8_BOM: "UTF8-BOM", "UTF-8-BOM", "UTF8BOM", "UTF-8BOM")
 
 # UTF-16 (LE)
 @CODEC(CODEC_UTF16LE: "UTF16LE", "UTF-16LE", "UCS-2LE", "UNICODELITTLE",
@@ -352,6 +347,43 @@
 	[if(__BYTE_ORDER__ == __ORDER_BIG_ENDIAN__)] "cp12000",
 	[if(__BYTE_ORDER__ == __ORDER_BIG_ENDIAN__ && __SIZEOF_WCHAR_T__ == 4)] "WCHAR_T"
 )
+
+# UTF-8 (with BOM)
+@CODEC(CODEC_UTF8_BOM: "UTF8-BOM", "UTF-8-BOM", "UTF8BOM", "UTF-8BOM")
+
+# UTF-16 (LE, with BOM)
+@CODEC(CODEC_UTF16LE_BOM: "UTF16LE-BOM", "UTF-16LE-BOM", "UTF16LEBOM", "UTF-16LEBOM", "X-UTF-16LE-BOM",
+	[if(__BYTE_ORDER__ == __ORDER_LITTLE_ENDIAN__)] "UTF16-BOM",
+	[if(__BYTE_ORDER__ == __ORDER_LITTLE_ENDIAN__)] "UTF-16-BOM",
+	[if(__BYTE_ORDER__ == __ORDER_LITTLE_ENDIAN__)] "UTF16BOM",
+	[if(__BYTE_ORDER__ == __ORDER_LITTLE_ENDIAN__)] "UTF-16BOM",
+	[if(__BYTE_ORDER__ == __ORDER_LITTLE_ENDIAN__)] "X-UTF-16-BOM")
+
+# UTF-16 (BE, with BOM)
+@CODEC(CODEC_UTF16BE_BOM: "UTF16BE-BOM", "UTF-16BE-BOM", "UTF16BEBOM", "UTF-16BEBOM", "X-UTF-16BE-BOM",
+	[if(__BYTE_ORDER__ == __ORDER_BIG_ENDIAN__)] "UTF16-BOM",
+	[if(__BYTE_ORDER__ == __ORDER_BIG_ENDIAN__)] "UTF-16-BOM",
+	[if(__BYTE_ORDER__ == __ORDER_BIG_ENDIAN__)] "UTF16BOM",
+	[if(__BYTE_ORDER__ == __ORDER_BIG_ENDIAN__)] "UTF-16BOM",
+	[if(__BYTE_ORDER__ == __ORDER_BIG_ENDIAN__)] "X-UTF-16-BOM")
+
+# UTF-32 (LE, with BOM)
+@CODEC(CODEC_UTF32LE_BOM: "UTF32LE-BOM", "UTF-32LE-BOM", "UTF32LEBOM", "UTF-32LEBOM", "X-UTF-32LE-BOM",
+	[if(__BYTE_ORDER__ == __ORDER_LITTLE_ENDIAN__)] "UTF32-BOM",
+	[if(__BYTE_ORDER__ == __ORDER_LITTLE_ENDIAN__)] "UTF-32-BOM",
+	[if(__BYTE_ORDER__ == __ORDER_LITTLE_ENDIAN__)] "UTF32BOM",
+	[if(__BYTE_ORDER__ == __ORDER_LITTLE_ENDIAN__)] "UTF-32BOM",
+	[if(__BYTE_ORDER__ == __ORDER_LITTLE_ENDIAN__)] "X-UTF-32-BOM")
+
+# UTF-32 (BE, with BOM)
+@CODEC(CODEC_UTF32BE_BOM: "UTF32BE-BOM", "UTF-32BE-BOM", "UTF32BEBOM", "UTF-32BEBOM", "X-UTF-32BE-BOM",
+	[if(__BYTE_ORDER__ == __ORDER_BIG_ENDIAN__)] "UTF32-BOM",
+	[if(__BYTE_ORDER__ == __ORDER_BIG_ENDIAN__)] "UTF-32-BOM",
+	[if(__BYTE_ORDER__ == __ORDER_BIG_ENDIAN__)] "UTF32BOM",
+	[if(__BYTE_ORDER__ == __ORDER_BIG_ENDIAN__)] "UTF-32BOM",
+	[if(__BYTE_ORDER__ == __ORDER_BIG_ENDIAN__)] "X-UTF-32-BOM")
+
+
 
 # LATIN-1
 @CODEC(CODEC_ISO_8859_1:

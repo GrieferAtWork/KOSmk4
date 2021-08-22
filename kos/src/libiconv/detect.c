@@ -611,6 +611,20 @@ NOTHROW_NCX(CC libiconv_detect_codec)(void const *__restrict data, size_t size) 
 			uint32_t word;
 		} hdr;
 		hdr.word = UNALIGNED_GET32((uint32_t const *)data);
+		/* Check for unicode ByteOrderMarker(s) */
+		if (hdr.bytes[0] == 0xEF && hdr.bytes[1] == 0xBB && hdr.bytes[2] == 0xBF)
+			return CODEC_UTF8_BOM; /* Special UTF-8 BOM marker. */
+		if (hdr.bytes[0] == 0xFE && hdr.bytes[1] == 0xFF)
+			return CODEC_UTF16BE_BOM;
+		if (hdr.bytes[0] == 0xFF && hdr.bytes[1] == 0xFE) {
+			if (hdr.bytes[2] == 0x00 && hdr.bytes[3] == 0x00)
+				return CODEC_UTF32LE_BOM;
+			return CODEC_UTF16LE_BOM;
+		}
+		if (hdr.bytes[0] == 0x00 && hdr.bytes[1] == 0x00 &&
+		    hdr.bytes[2] == 0xFE && hdr.bytes[3] == 0xFF)
+			return CODEC_UTF32BE_BOM;
+
 		/* Check for supported multi-byte encodings. */
 		if (hdr.bytes[0] == 0) {
 			if (hdr.bytes[1] == 0) {
@@ -630,8 +644,6 @@ NOTHROW_NCX(CC libiconv_detect_codec)(void const *__restrict data, size_t size) 
 					return CODEC_UTF16LE;
 			}
 		}
-		if (hdr.bytes[0] == 0xef && hdr.bytes[1] == 0xbb && hdr.bytes[2] == 0xbf)
-			return CODEC_UTF8_BOM; /* Special UTF-8 BOM marker. */
 		if (hdr.bytes[0] == 0 || hdr.bytes[1] == 0 ||
 		    hdr.bytes[2] == 0 || hdr.bytes[3] == 0) {
 			/* There's a NUL in the header, but we still haven't figured out what

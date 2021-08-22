@@ -61,9 +61,13 @@ enum {
 	CODEC_ISO_8859_1,           /* "iso8859-1:1987", "iso-ir-100", "iso8859-1", "latin1", "l1", "ibm819", "cp819", "iso88591", "csisolatin1", "cp28591", "windows-28591", "we8iso8859p1", "cp38591", "windows-38591", "iso8859-1-i", "8859-1", "osf10001" */
 	CODEC_URI_ESCAPE,           /* "uri-escape", "url-escape", "percent-encoding", "url-encoding" */
 	CODEC_UTF16BE,              /* "utf16be", "utf-16be", "ucs-2be", "unicodebig", "csutf16be", "x-unicodebig", "unicodebigunmarked", "x-utf-16be" */
+	CODEC_UTF16BE_BOM,          /* "utf16be-bom", "utf-16be-bom", "utf16bebom", "utf-16bebom", "x-utf-16be-bom" */
 	CODEC_UTF16LE,              /* "utf16le", "utf-16le", "ucs-2le", "unicodelittle", "csutf16le", "x-unicodelittle", "x-utf-16le", "unicodelittleunmarked" */
+	CODEC_UTF16LE_BOM,          /* "utf16le-bom", "utf-16le-bom", "utf16lebom", "utf-16lebom", "x-utf-16le-bom" */
 	CODEC_UTF32BE,              /* "utf32be", "utf-32be", "ucs-4be", "cp12001", "windows-12001", "csutf32be", "x-utf-32be" */
+	CODEC_UTF32BE_BOM,          /* "utf32be-bom", "utf-32be-bom", "utf32bebom", "utf-32bebom", "x-utf-32be-bom" */
 	CODEC_UTF32LE,              /* "utf32le", "utf-32le", "ucs-4le", "csutf32le", "x-utf-32le" */
+	CODEC_UTF32LE_BOM,          /* "utf32le-bom", "utf-32le-bom", "utf32lebom", "utf-32lebom", "x-utf-32le-bom" */
 	CODEC_UTF8,                 /* "utf8", "utf-8", "iso10646/utf8", "iso10646/utf-8", "iso-ir-193", "osf5010001", "cp65001", "windows-65001", "csutf8" */
 	CODEC_UTF8_BOM,             /* "utf8-bom", "utf-8-bom", "utf8bom", "utf-8bom" */
 	CODEC_XML_ESCAPE,           /* "xml-escape", "html-escape" */

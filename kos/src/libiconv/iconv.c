@@ -117,11 +117,6 @@ NOTHROW_NCX(CC libiconv_decode_init)(/*in|out*/ struct iconv_decode *__restrict 
 		*input = self->icd_output;
 		break;
 
-	case CODEC_UTF8_BOM:
-		self->icd_data.idd_utf8_bom_state = _ICONV_DECODE_UTF8_BOM_B0_EF;
-		input->ii_printer = (pformatprinter)&libiconv_utf8_bom_decode;
-		break;
-
 	case CODEC_UTF16LE:
 		input->ii_printer = (pformatprinter)&libiconv_utf16le_decode;
 		self->icd_data.idd_utf.u_pbc = 0;
@@ -142,6 +137,37 @@ NOTHROW_NCX(CC libiconv_decode_init)(/*in|out*/ struct iconv_decode *__restrict 
 	case CODEC_UTF32BE:
 		input->ii_printer = (pformatprinter)&libiconv_utf32be_decode;
 		self->icd_data.idd_utf.u_pbc = 0;
+		break;
+
+	case CODEC_UTF8_BOM:
+		self->icd_data.idd_utf8_bom_state = _ICONV_DECODE_UTF8_BOM_B0_EF;
+		input->ii_printer = (pformatprinter)&libiconv_utf8_bom_decode;
+		break;
+
+	case CODEC_UTF16LE_BOM:
+		input->ii_printer = (pformatprinter)&libiconv_utf16le_bom_decode;
+		self->icd_data.idd_utf.u_pbc = 0;
+		mbstate_init(&self->icd_data.idd_utf.u_16);
+		self->icd_data.idd_utf.u_bom = _ICONV_DECODE_UTF_BOM16LE_B0_FF;
+		break;
+
+	case CODEC_UTF16BE_BOM:
+		input->ii_printer = (pformatprinter)&libiconv_utf16be_bom_decode;
+		self->icd_data.idd_utf.u_pbc = 0;
+		mbstate_init(&self->icd_data.idd_utf.u_16);
+		self->icd_data.idd_utf.u_bom = _ICONV_DECODE_UTF_BOM16BE_B0_FE;
+		break;
+
+	case CODEC_UTF32LE_BOM:
+		input->ii_printer = (pformatprinter)&libiconv_utf32le_bom_decode;
+		self->icd_data.idd_utf.u_pbc = 0;
+		self->icd_data.idd_utf.u_bom = _ICONV_DECODE_UTF_BOM32LE_B0_FF;
+		break;
+
+	case CODEC_UTF32BE_BOM:
+		input->ii_printer = (pformatprinter)&libiconv_utf32be_bom_decode;
+		self->icd_data.idd_utf.u_pbc = 0;
+		self->icd_data.idd_utf.u_bom = _ICONV_DECODE_UTF_BOM32BE_B0_00;
 		break;
 
 	case CODEC_ISO_8859_1:
@@ -271,14 +297,38 @@ INTERN ATTR_PURE WUNUSED NONNULL((1)) bool
 NOTHROW_NCX(CC libiconv_decode_isshiftzero)(struct iconv_decode const *__restrict self) {
 	switch (self->icd_codec) {
 
+	case CODEC_UTF8_BOM:
+		/* Either the entire BOM was decoded, or no part of it was! */
+		return (self->icd_data.idd_utf8_bom_state == _ICONV_DECODE_UTF8_BOM_TEXT ||
+		        self->icd_data.idd_utf8_bom_state == _ICONV_DECODE_UTF8_BOM_B0_EF);
+
 	case CODEC_UTF16LE:
 	case CODEC_UTF16BE:
 		return self->icd_data.idd_utf.u_pbc == 0 &&
 		       mbstate_isempty(&self->icd_data.idd_utf.u_16);
 
+	case CODEC_UTF16LE_BOM:
+	case CODEC_UTF16BE_BOM: {
+		STATIC_ASSERT(_ICONV_DECODE_UTF_BOM16LE_B0_FF == _ICONV_DECODE_UTF_BOM16BE_B0_FE);
+		return self->icd_data.idd_utf.u_pbc == 0 &&
+		       mbstate_isempty(&self->icd_data.idd_utf.u_16) &&
+		       /* Either the entire BOM was decoded, or no part of it was! */
+		       (self->icd_data.idd_utf.u_bom == _ICONV_DECODE_UTF_BOM_TEXT ||
+		        self->icd_data.idd_utf.u_bom == _ICONV_DECODE_UTF_BOM16LE_B0_FF);
+	}	break;
+
 	case CODEC_UTF32LE:
 	case CODEC_UTF32BE:
 		return self->icd_data.idd_utf.u_pbc == 0;
+
+	case CODEC_UTF32LE_BOM:
+	case CODEC_UTF32BE_BOM: {
+		STATIC_ASSERT(_ICONV_DECODE_UTF_BOM32LE_B0_FF == _ICONV_DECODE_UTF_BOM32BE_B0_00);
+		return self->icd_data.idd_utf.u_pbc == 0 &&
+		       /* Either the entire BOM was decoded, or no part of it was! */
+		       (self->icd_data.idd_utf.u_bom == _ICONV_DECODE_UTF_BOM_TEXT ||
+		        self->icd_data.idd_utf.u_bom == _ICONV_DECODE_UTF_BOM32LE_B0_FF);
+	}	break;
 
 		/* C-escape */
 	case CODEC_C_ESCAPE:
@@ -374,11 +424,6 @@ NOTHROW_NCX(CC libiconv_encode_init)(/*in|out*/ struct iconv_encode *__restrict 
 		*input = self->ice_output;
 		break;
 
-	case CODEC_UTF8_BOM:
-		self->ice_data.ied_utf8_bom_printed = false;
-		input->ii_printer = (pformatprinter)&libiconv_utf8_bom_encode;
-		break;
-
 	case CODEC_UTF16LE:
 		input->ii_printer = (pformatprinter)&libiconv_utf16le_encode;
 		break;
@@ -397,6 +442,31 @@ NOTHROW_NCX(CC libiconv_encode_init)(/*in|out*/ struct iconv_encode *__restrict 
 
 	case CODEC_ISO_8859_1:
 		input->ii_printer = (pformatprinter)&libiconv_latin1_encode;
+		break;
+
+	case CODEC_UTF8_BOM:
+		self->ice_data.ied_utf_bom_printed = false;
+		input->ii_printer = (pformatprinter)&libiconv_utf8_bom_encode;
+		break;
+
+	case CODEC_UTF16LE_BOM:
+		self->ice_data.ied_utf_bom_printed = false;
+		input->ii_printer = (pformatprinter)&libiconv_utf16le_bom_encode;
+		break;
+
+	case CODEC_UTF16BE_BOM:
+		self->ice_data.ied_utf_bom_printed = false;
+		input->ii_printer = (pformatprinter)&libiconv_utf16be_bom_encode;
+		break;
+
+	case CODEC_UTF32LE_BOM:
+		self->ice_data.ied_utf_bom_printed = false;
+		input->ii_printer = (pformatprinter)&libiconv_utf32le_bom_encode;
+		break;
+
+	case CODEC_UTF32BE_BOM:
+		self->ice_data.ied_utf_bom_printed = false;
+		input->ii_printer = (pformatprinter)&libiconv_utf32be_bom_encode;
 		break;
 
 #if CODEC_CP_COUNT != 0
@@ -511,6 +581,10 @@ default_case:
 
 /* UTF-8 BOM sequence. */
 INTDEF unsigned char const libiconv_utf8_bom_seq[3];
+INTDEF unsigned char const libiconv_utf32le_bom_seq[4];
+INTDEF unsigned char const libiconv_utf32be_bom_seq[4];
+#define libiconv_utf16le_bom_seq (libiconv_utf32le_bom_seq + 0)
+#define libiconv_utf16be_bom_seq (libiconv_utf32be_bom_seq + 2)
 
 /* Reset the internal shift state to its  default and print the associated byte  sequence
  * to the output printer of the encode descriptor, returning the sum of its return values
@@ -526,14 +600,43 @@ NOTHROW_NCX(CC libiconv_encode_flush)(struct iconv_encode *__restrict self) {
 	switch (self->ice_codec) {
 
 	case CODEC_UTF8_BOM:
+	case CODEC_UTF16LE_BOM:
+	case CODEC_UTF16BE_BOM:
+	case CODEC_UTF32LE_BOM:
+	case CODEC_UTF32BE_BOM: {
 		/* If not done already, print the BOM sequence. */
-		if (self->ice_data.ied_utf8_bom_printed)
+		size_t len;
+		unsigned char const *bom;
+		if (self->ice_data.ied_utf_bom_printed)
 			break;
+		switch (self->ice_codec) {
+		default: __builtin_unreachable();
+		case CODEC_UTF8_BOM:
+			bom = libiconv_utf8_bom_seq;
+			len = 3;
+			break;
+		case CODEC_UTF16LE_BOM:
+			bom = libiconv_utf16le_bom_seq;
+			len = 2;
+			break;
+		case CODEC_UTF16BE_BOM:
+			bom = libiconv_utf16be_bom_seq;
+			len = 2;
+			break;
+		case CODEC_UTF32LE_BOM:
+			bom = libiconv_utf32le_bom_seq;
+			len = 4;
+			break;
+		case CODEC_UTF32BE_BOM:
+			bom = libiconv_utf32be_bom_seq;
+			len = 4;
+			break;
+		}
 		result = (*self->ice_output.ii_printer)(self->ice_output.ii_arg,
-		                                        (char const *)libiconv_utf8_bom_seq, 3);
+		                                        (char const *)bom, len);
 		if likely(result >= 0)
-			self->ice_data.ied_utf8_bom_printed = true;
-		break;
+			self->ice_data.ied_utf_bom_printed = true;
+	}	break;
 
 	case CODEC_C_ESCAPE_CHR:
 	case CODEC_C_ESCAPE_STR:
