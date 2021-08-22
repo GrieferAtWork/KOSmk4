@@ -350,13 +350,22 @@ typedef uintptr_t cp8_bitset_t[CEILDIV(CODEC_CP_COUNT, sizeof(uintptr_t) * NBBY)
  * character.
  *
  * Detected patterns (documented here using regex):
- *    - Comments:
- *         / *[ \t*#@+!$/]*(charset|coding|codec)[\t =:]+CODEC[ \t*#@+!$/]** /
- *         ( *[ \t*#@+!$/]*(charset|coding|codec)[\t =:]+CODEC[ \t*#@+!$/]** )
- *         [#@+!$][ \t*#@+!$/]*(charset|coding|codec)[\t =:]+CODEC\n
+ *    - From comments:
+ *         [#@+!$][ \t*#@+!$/-]*(charset|coding|codec)[\t =:]+CODEC[ \t*#@+!$/-]\n   # Python comments
+ *         //\t*#@+!$/]*(charset|coding|codec)[\t =:]+CODEC[ \t*#@+!$/-]\n           # C++ comments
+ *         (\*[ \t*#@+!$/-]*(charset|coding|codec)[\t =:]+CODEC[ \t*#@+!$/-]*\*)     # Pascal comments
+ *         /\*[ \t*#@+!$/-]*(charset|coding|codec)[\t =:]+CODEC[ \t*#@+!$/-]*\* /    # C comments
+ *                                                                             ^
+ *                                                        Not an actual space--/
  *
  *    - Free-standing:
- *         (charset|coding|codec)[\t =:]*("CODEC"|'CODEC')
+ *         (charset|coding|codec)[\t =:]*("CODEC"|'CODEC')    # Mainly meant for XML: <meta charset="UTF-8">
+ *         (charset|coding|codec)[\t ]*[=:][\t =:]*CODEC      # CODEC is [-_.a-zA-Z0-9]+
+ *
+ * Codec marker references:
+ *   - https://www.python.org/dev/peps/pep-0263/
+ *   - https://www.w3schools.com/TAGs/att_meta_charset.asp
+ *   - /Stuff-that-looks-like-it-makes-sense/ (TM)
  *
  * @return: * :                The determined codec.
  * @return: CODEC_UNKNOWN:     Marker references an unknown codec.
@@ -387,12 +396,20 @@ main_switch:
 		case 'c':
 			if ((size_t)(end - data) >= 7) {
 				if (memcasecmp(data, "harset", 6 * sizeof(char)) == 0) {
+					bool has_assign;
 					data += 6;
 check_free_standing_charset:
 					do {
 						nextch();
-					} while (ch == ' ' || ch == '\t' ||
-					         ch == ':' || ch == '=');
+					} while (ch == ' ' || ch == '\t');
+					has_assign = false;
+					if (ch == ':' || ch == '=') {
+						has_assign = true;
+						do {
+							nextch();
+						} while (ch == ' ' || ch == '\t' ||
+						         ch == ':' || ch == '=');
+					}
 					if (ch == '\"' || ch == '\'') {
 						/* Search until the matching quote. */
 						unsigned char endquote = ch;
@@ -402,6 +419,15 @@ check_free_standing_charset:
 							if (ch == '\n' || ch == '\r')
 								goto main_switch;
 						} while (ch != endquote);
+						codec_end = data - 1;
+						goto search_for_codec;
+#define is_freestanding_codec_ch(ch) /* [-_.a-zA-Z0-9]+ */ \
+						(isalnum(ch) || ch == '-' || ch == '_' || ch == '.')
+					} else if (has_assign && is_freestanding_codec_ch(ch)) {
+						codec_start = data - 1;
+						do {
+							nextch();
+						} while (is_freestanding_codec_ch(ch));
 						codec_end = data - 1;
 						goto search_for_codec;
 					}
@@ -447,7 +473,8 @@ comment_check:
 #define is_comment_space_char(ch)                  \
 	((ch) == ' ' || (ch) == '\t' || (ch) == '*' || \
 	 (ch) == '#' || (ch) == '@' || (ch) == '+' ||  \
-	 (ch) == '!' || (ch) == '$' || (ch) == '/')
+	 (ch) == '!' || (ch) == '$' || (ch) == '/' ||  \
+	 (ch) == '-')
 			do {
 				nextch();
 comment_check_with_first_ch:
@@ -512,7 +539,7 @@ trim_trailing_comment_space:
 							nextch();
 						} while (ch != '\r' && ch != '\n');
 						codec_end = data - 1;
-						break;
+						goto trim_trailing_comment_space;
 					}
 					goto search_for_codec;
 				} else if (memcasecmp(data, "oding", 5 * sizeof(char)) == 0) {
