@@ -77,7 +77,7 @@ DECL_BEGIN
  *        }
  *        assert(STATE == DOUBLE_BYTE_2);
  *        uint16_t ch16 = (SAVED_BYTE << 8) | ch;
- *        return <DOUBLE_BYTE_LOOKUP_TABLE>[ch];
+ *        return  <DOUBLE_BYTE_LOOKUP_TABLE>[ch];
  *    }
  * }
  *
@@ -86,7 +86,7 @@ DECL_BEGIN
 /*[[[deemon
 import File from deemon;
 import fs;
-// Put in a seperate file so this one doesn't bloat too much
+// Put in a separate file so this one doesn't bloat too much
 local dataFilename = "cp-stateful-data.c.inl";
 local savedStdout = File.stdout;
 File.stdout = File.open(dataFilename, "w");
@@ -472,6 +472,14 @@ err_ilseq:
 	return -(ssize_t)size;
 }
 
+
+
+/* TODO: ibm1390 and ibm1399 have the same double-byte tables and
+ *       only differ in how they encode their single-byte  parts.
+ *       As such, we can get rid of one of them and implement the
+ *       other by use  of a custom  encode/decode function  using
+ *       the data of the other, saving  a bunch of memory in  the
+ *       process! */
 
 
 

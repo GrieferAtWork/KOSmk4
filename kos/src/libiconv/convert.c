@@ -120,6 +120,101 @@ NOTHROW_NCX(__LIBCCALL iconv_transliterate)(char32_t ch, char32_t buf[UNICODE_FO
 		else
 
 
+/************************************************************************/
+/* UTF-8 w/ BOM                                                         */
+/************************************************************************/
+INTERN_CONST unsigned char const libiconv_utf8_bom_seq[3] = { 0xEF, 0xBB, 0xBF };
+
+INTERN NONNULL((1, 2)) ssize_t FORMATPRINTER_CC
+libiconv_utf8_bom_encode(struct iconv_encode *__restrict self,
+                         /*utf-8*/ char const *__restrict data, size_t size) {
+	if unlikely(!self->ice_data.ied_utf8_bom_printed) {
+		ssize_t temp, result;
+		result = encode_output((char const *)libiconv_utf8_bom_seq, 3);
+		if unlikely(result < 0)
+			return result;
+		self->ice_data.ied_utf8_bom_printed = true;
+		temp = encode_output(data, size);
+		if unlikely(temp < 0)
+			return temp;
+		return result + temp;
+	}
+	return encode_output(data, size);
+}
+
+INTERN NONNULL((1, 2)) ssize_t FORMATPRINTER_CC
+libiconv_utf8_bom_decode(struct iconv_decode *__restrict self,
+                         /*utf-8-bom*/ char const *__restrict data, size_t size) {
+	ssize_t result;
+	switch (__builtin_expect(self->icd_data.idd_utf8_bom_state, _ICONV_DECODE_UTF8_BOM_TEXT)) {
+	default:
+		__builtin_unreachable();
+	case _ICONV_DECODE_UTF8_BOM_TEXT:
+default_case:
+		result = decode_output(data, size);
+		break;
+
+	case _ICONV_DECODE_UTF8_BOM_B0_EF:
+		if unlikely(!size) {
+			result = 0;
+			break;
+		}
+		if unlikely((unsigned char)*data != 0xEF) {
+			/* Incorrect sequence (unconditionally ignore) */
+			self->icd_data.idd_utf8_bom_state = _ICONV_DECODE_UTF8_BOM_TEXT;
+			goto default_case;
+		}
+		--size;
+		++data;
+		self->icd_data.idd_utf8_bom_state = _ICONV_DECODE_UTF8_BOM_B1_BB;
+		ATTR_FALLTHROUGH
+	case _ICONV_DECODE_UTF8_BOM_B1_BB:
+		if unlikely(!size) {
+			result = 0;
+			break;
+		}
+		if unlikely((unsigned char)*data != 0xBB) {
+			ssize_t temp;
+			/* Incorrect sequence (unconditionally ignore and re-emit what was already there) */
+			result = decode_output((char const *)libiconv_utf8_bom_seq, 1);
+			if unlikely(result < 0)
+				return result;
+			temp = decode_output(data, size);
+			if unlikely(temp < 0)
+				return result;
+			self->icd_data.idd_utf8_bom_state = _ICONV_DECODE_UTF8_BOM_TEXT;
+			return result + temp;
+		}
+		--size;
+		++data;
+		self->icd_data.idd_utf8_bom_state = _ICONV_DECODE_UTF8_BOM_B2_BF;
+		ATTR_FALLTHROUGH
+	case _ICONV_DECODE_UTF8_BOM_B2_BF:
+		if unlikely(!size) {
+			result = 0;
+			break;
+		}
+		if unlikely((unsigned char)*data != 0xBB) {
+			ssize_t temp;
+			/* Incorrect sequence (unconditionally ignore and re-emit what was already there) */
+			result = decode_output((char const *)libiconv_utf8_bom_seq, 2);
+			if unlikely(result < 0)
+				return result;
+			temp = decode_output(data, size);
+			if unlikely(temp < 0)
+				return result;
+			self->icd_data.idd_utf8_bom_state = _ICONV_DECODE_UTF8_BOM_TEXT;
+			return result + temp;
+		}
+		--size;
+		++data;
+		self->icd_data.idd_utf8_bom_state = _ICONV_DECODE_UTF8_BOM_TEXT;
+		goto default_case;
+	}
+	return result;
+}
+
+
 
 #if CODEC_CP_COUNT != 0
 /************************************************************************/

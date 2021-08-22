@@ -2781,6 +2781,13 @@ struct codec_name_db_struct {
 	char db_UTF8_8[7];  /* "csutf8" */
 	char db_UTF8_nul;
 
+	/* CODEC_UTF8_BOM */
+	char db_UTF8_BOM_0[9];  /* "utf8-bom" */
+	char db_UTF8_BOM_1[10]; /* "utf-8-bom" */
+	char db_UTF8_BOM_2[8];  /* "utf8bom" */
+	char db_UTF8_BOM_3[9];  /* "utf-8bom" */
+	char db_UTF8_BOM_nul;
+
 	/* CODEC_VENTURA_INTERNATIONAL */
 	char db_VENTURA_INTERNATIONAL_0[22]; /* "ventura-international" */
 	char db_VENTURA_INTERNATIONAL_1[12]; /* "ventura-int" */
@@ -5607,6 +5614,13 @@ PRIVATE struct codec_name_db_struct const codec_name_db = {
 	"csutf8",
 	0,
 
+	/* CODEC_UTF8_BOM */
+	"utf8-bom",
+	"utf-8-bom",
+	"utf8bom",
+	"utf-8bom",
+	0,
+
 	/* CODEC_VENTURA_INTERNATIONAL */
 	"ventura-international",
 	"ventura-int",
@@ -7321,6 +7335,8 @@ PRIVATE struct codec_db_entry const codec_db[] = {
 	{ offsetof(struct codec_name_db_struct, db_UTF32BE_1), /*                 "utf-32be"                      */ CODEC_UTF32BE },
 	{ offsetof(struct codec_name_db_struct, db_UTF32LE_1), /*                 "utf-32le"                      */ CODEC_UTF32LE },
 	{ offsetof(struct codec_name_db_struct, db_UTF8_1), /*                    "utf-8"                         */ CODEC_UTF8 },
+	{ offsetof(struct codec_name_db_struct, db_UTF8_BOM_1), /*                "utf-8-bom"                     */ CODEC_UTF8_BOM },
+	{ offsetof(struct codec_name_db_struct, db_UTF8_BOM_3), /*                "utf-8bom"                      */ CODEC_UTF8_BOM },
 #if __BYTE_ORDER__ == __ORDER_BIG_ENDIAN__
 	{ offsetof(struct codec_name_db_struct, db_UTF16BE_8), /*                 "utf16"                         */ CODEC_UTF16BE },
 #elif __BYTE_ORDER__ == __ORDER_LITTLE_ENDIAN__
@@ -7336,6 +7352,8 @@ PRIVATE struct codec_db_entry const codec_db[] = {
 	{ offsetof(struct codec_name_db_struct, db_UTF32BE_0), /*                 "utf32be"                       */ CODEC_UTF32BE },
 	{ offsetof(struct codec_name_db_struct, db_UTF32LE_0), /*                 "utf32le"                       */ CODEC_UTF32LE },
 	{ offsetof(struct codec_name_db_struct, db_UTF8_0), /*                    "utf8"                          */ CODEC_UTF8 },
+	{ offsetof(struct codec_name_db_struct, db_UTF8_BOM_0), /*                "utf8-bom"                      */ CODEC_UTF8_BOM },
+	{ offsetof(struct codec_name_db_struct, db_UTF8_BOM_2), /*                "utf8bom"                       */ CODEC_UTF8_BOM },
 	{ offsetof(struct codec_name_db_struct, db_VENTURA_INTERNATIONAL_1), /*   "ventura-int"                   */ CODEC_VENTURA_INTERNATIONAL },
 	{ offsetof(struct codec_name_db_struct, db_VENTURA_INTERNATIONAL_0), /*   "ventura-international"         */ CODEC_VENTURA_INTERNATIONAL },
 	{ offsetof(struct codec_name_db_struct, db_VENTURA_US_0), /*              "ventura-us"                    */ CODEC_VENTURA_US },

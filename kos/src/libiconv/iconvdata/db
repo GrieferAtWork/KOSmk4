@@ -263,6 +263,9 @@
 	"iso-ir-193", "OSF05010001", "cp65001", "Windows-65001",
 	"csUTF8")
 
+# UTF-8 (with BOM)
+@CODEC(CODEC_UTF8_BOM: "UTF8-BOM", "UTF-8-BOM", "UTF8BOM", "UTF-8BOM")
+
 # UTF-16 (LE)
 @CODEC(CODEC_UTF16LE: "UTF16LE", "UTF-16LE", "UCS-2LE", "UNICODELITTLE",
                       "csUTF16LE", "X-UnicodeLittle", "x-utf-16le",

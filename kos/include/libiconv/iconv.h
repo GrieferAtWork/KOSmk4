@@ -63,6 +63,12 @@ union iconv_decode_data {
 	struct iconv_7h_codepage const     *idd_cp7h;  /* [1..1][const] Code page (for 7h codecs) */
 	struct iconv_iso646_codepage const *idd_cp646; /* [1..1][const] Code page (for iso686 codecs) */
 
+#define _ICONV_DECODE_UTF8_BOM_TEXT  0 /* Normal UTF-8 text. */
+#define _ICONV_DECODE_UTF8_BOM_B2_BF 1 /* Expecting third byte (0xBF) */
+#define _ICONV_DECODE_UTF8_BOM_B1_BB 2 /* Expecting second byte (0xBB) */
+#define _ICONV_DECODE_UTF8_BOM_B0_EF 3 /* Expecting first byte (0xEF) */
+	__byte_t idd_utf8_bom_state; /* UTF-8 BOM decode state. (one of `_ICONV_DECODE_UTF8_BOM_*') */
+
 	struct {
 		struct __mbstate ce_utf8;   /* UTF-8 input multi-byte state */
 #define _ICONV_DECODE_CESCAPE_ESC_MODE_INIT  0  /* Expect first character after \ */
@@ -159,8 +165,11 @@ union iconv_encode_data {
 				struct iconv_stateful_encode_range const *sf_encode_ranges; /* [1..1][const][== iconv_stateful_codepage__isc_encode_ranges(sf_cp)] */
 				struct iconv_stateful_2char_encode const *sf_2char;         /* [1..1][valid_if(_ICONV_ENCODE_STATEFUL_DB_2CH)] */
 			} ied_stateful; /* stateful codecs: ibm(930|933|935|937|939|1364|1371|1388|1390|1399) */
+
+			__BOOL ied_utf8_bom_printed; /* True if the UTF-8 BOM was printed. */
 		};
 	};
+
 	void *__ied_pad[_ICONV_ENCODE_OPAQUE_POINTERS];
 };
 #endif /* LIBICONV_EXPOSE_INTERNAL */

@@ -603,6 +603,8 @@ NOTHROW_NCX(CC libiconv_detect_codec)(void const *__restrict data, size_t size) 
 					return CODEC_UTF16LE;
 			}
 		}
+		if (hdr.bytes[0] == 0xef && hdr.bytes[1] == 0xbb && hdr.bytes[2] == 0xbf)
+			return CODEC_UTF8_BOM; /* Special UTF-8 BOM marker. */
 		if (hdr.bytes[0] == 0 || hdr.bytes[1] == 0 ||
 		    hdr.bytes[2] == 0 || hdr.bytes[3] == 0) {
 			/* There's a NUL in the header, but we still haven't figured out what

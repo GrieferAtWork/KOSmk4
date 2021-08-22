@@ -117,6 +117,11 @@ NOTHROW_NCX(CC libiconv_decode_init)(/*in|out*/ struct iconv_decode *__restrict 
 		*input = self->icd_output;
 		break;
 
+	case CODEC_UTF8_BOM:
+		self->icd_data.idd_utf8_bom_state = _ICONV_DECODE_UTF8_BOM_B0_EF;
+		input->ii_printer = (pformatprinter)&libiconv_utf8_bom_decode;
+		break;
+
 	case CODEC_UTF16LE:
 		input->ii_printer = (pformatprinter)&libiconv_utf16le_decode;
 		self->icd_data.idd_utf.u_pbc = 0;
@@ -369,6 +374,11 @@ NOTHROW_NCX(CC libiconv_encode_init)(/*in|out*/ struct iconv_encode *__restrict 
 		*input = self->ice_output;
 		break;
 
+	case CODEC_UTF8_BOM:
+		self->ice_data.ied_utf8_bom_printed = false;
+		input->ii_printer = (pformatprinter)&libiconv_utf8_bom_encode;
+		break;
+
 	case CODEC_UTF16LE:
 		input->ii_printer = (pformatprinter)&libiconv_utf16le_encode;
 		break;
@@ -498,6 +508,10 @@ default_case:
 	return 0;
 }
 
+
+/* UTF-8 BOM sequence. */
+INTDEF unsigned char const libiconv_utf8_bom_seq[3];
+
 /* Reset the internal shift state to its  default and print the associated byte  sequence
  * to the output printer of the encode descriptor, returning the sum of its return values
  * or the first negative return value.
@@ -510,6 +524,16 @@ INTERN NONNULL((1)) ssize_t
 NOTHROW_NCX(CC libiconv_encode_flush)(struct iconv_encode *__restrict self) {
 	ssize_t result = 0;
 	switch (self->ice_codec) {
+
+	case CODEC_UTF8_BOM:
+		/* If not done already, print the BOM sequence. */
+		if (self->ice_data.ied_utf8_bom_printed)
+			break;
+		result = (*self->ice_output.ii_printer)(self->ice_output.ii_arg,
+		                                        (char const *)libiconv_utf8_bom_seq, 3);
+		if likely(result >= 0)
+			self->ice_data.ied_utf8_bom_printed = true;
+		break;
 
 	case CODEC_C_ESCAPE_CHR:
 	case CODEC_C_ESCAPE_STR:

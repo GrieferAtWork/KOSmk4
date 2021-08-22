@@ -36,6 +36,12 @@ DECL_BEGIN
 INTDEF NONNULL((1, 2)) ssize_t FORMATPRINTER_CC libiconv_ascii_encode(struct iconv_encode *__restrict self, /*utf-8*/ char const *__restrict data, size_t size);
 INTDEF NONNULL((1, 2)) ssize_t FORMATPRINTER_CC libiconv_ascii_decode(struct iconv_decode *__restrict self, /*ASCII*/ char const *__restrict data, size_t size);
 
+/************************************************************************/
+/* UTF-8 w/ BOM                                                         */
+/************************************************************************/
+INTDEF NONNULL((1, 2)) ssize_t FORMATPRINTER_CC libiconv_utf8_bom_encode(struct iconv_encode *__restrict self, /*utf-8*/ char const *__restrict data, size_t size);
+INTDEF NONNULL((1, 2)) ssize_t FORMATPRINTER_CC libiconv_utf8_bom_decode(struct iconv_decode *__restrict self, /*utf-8-bom*/ char const *__restrict data, size_t size);
+
 
 /************************************************************************/
 /* UTF-16                                                               */

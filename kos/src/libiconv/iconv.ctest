@@ -153,6 +153,9 @@ DEFINE_TEST(iconv) {
 	ASSERT_DETECTED_CODEC("de",
 	                      "Text before the codec marker # codec: de\n"
 	                      "Pure ascii!\n");
+	ASSERT_DETECTED_CODEC("de",
+	                      "Text before the codec marker  codec: de\n"
+	                      "Pure ascii!\n");
 	ASSERT_DETECTED_CODEC("de", "Text before the codec marker /* codec: de */ Pure ascii!\n");
 	ASSERT_DETECTED_CODEC("de", "Text before the codec marker (* codec: de *) Pure ascii!\n");
 	ASSERT_DETECTED_CODEC("de", "Text before the codec marker /*codec: de*/ Pure ascii!\n");
