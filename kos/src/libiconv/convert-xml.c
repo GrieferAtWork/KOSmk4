@@ -2630,11 +2630,32 @@ NOTHROW_NCX(CC xml_escape)(char *__restrict buf, char32_t ch) {
 #endif /* CONFIG_XML_FANCY_ENCODE */
 
 	/* Manually escape as either decimal or hex. */
-	if (ch <= 99999) {
-		/* Up until this point, using decimal encoding is shorter. */
+	if (ch <= 9 || (ch >= 16 && ch <= 99) || (ch >= 256 && ch <= 999) ||
+		(ch >= 4096 && ch <= 9999) || (ch >= 65536 && ch <= 99999)) {
+		/* For all these ordinals, using decimal encoding is smaller:
+		 *  0...9         -->  &#0;  ... &#9;
+		 *                     &#x0; ... &#x9;
+		 *
+		 *  16...99       -->  &#16;  ...  &#99;
+		 *                     &#x10; ...  &#x63;
+		 *
+		 *  256...999     -->  &#256;  ...  &#999;
+		 *                     &#x100; ...  &#x3E7;
+		 *
+		 *  4096...9999   -->  &#4096;  ...  &#9999;
+		 *                     &#x1000; ...  &#x270F;
+		 *
+		 *  65536...99999 -->  &#65536;  ...  &#99999;
+		 *                     &#x10000; ...  &#x1869F;
+		 *
+		 * Every everything larger in this sequence, hex is always
+		 * more  compact, even when  accounting for the additional
+		 * leading "x" which it requires! */
 		sprintf(buf, "#%u", (unsigned int)ch);
 	} else {
-		/* From this point onwards, hex is shorter. */
+		/* For everything else, hex is just as long, or even shorter.
+		 * Because hex is easier to read we use it unless decimal  is
+		 * more efficient. */
 		sprintf(buf, "#x%" PRIX32, (uint32_t)ch);
 	}
 	return buf;
