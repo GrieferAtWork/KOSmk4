@@ -2648,8 +2648,8 @@ NOTHROW_NCX(CC xml_escape)(char *__restrict buf, char32_t ch) {
 		 *  65536...99999 -->  &#65536;  ...  &#99999;
 		 *                     &#x10000; ...  &#x1869F;
 		 *
-		 * Every everything larger in this sequence, hex is always
-		 * more  compact, even when  accounting for the additional
+		 * For everything larger in this sequence, hex is always
+		 * more compact, even when accounting for the additional
 		 * leading "x" which it requires! */
 		sprintf(buf, "#%u", (unsigned int)ch);
 	} else {
