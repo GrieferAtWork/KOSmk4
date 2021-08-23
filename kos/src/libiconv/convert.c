@@ -47,6 +47,7 @@ gcc_opt.append("-O3"); // Force _all_ optimizations because stuff in here is per
 #include "cp-iso646.h"
 #include "cp.h"
 #include "iconv.h"
+#include "transliterate.h"
 
 DECL_BEGIN
 
@@ -73,14 +74,6 @@ DECL_BEGIN
 #define DO_encode_output(p, s) DO(encode_output(p, s))
 #define DO_decode_output(p, s) DO(decode_output(p, s))
 
-
-/* Try to transliterate `ch' into a more ~basic~ representation. */
-PRIVATE ATTR_RETNONNULL NONNULL((2)) char32_t *
-NOTHROW_NCX(__LIBCCALL iconv_transliterate)(char32_t ch, char32_t buf[UNICODE_FOLDED_MAX]) {
-	char32_t *result;
-	result = unicode_fold(ch, buf);
-	return result;
-}
 
 
 
@@ -571,73 +564,36 @@ default_case:
 /************************************************************************/
 /* Generic code-page                                                    */
 /************************************************************************/
-PRIVATE ATTR_NOINLINE NONNULL((1, 2)) ssize_t FORMATPRINTER_CC
-libiconv_cp_encode_u32(struct iconv_encode *__restrict self,
-                       char32_t const *__restrict data,
-                       size_t len) {
-	size_t j;
-	char buf[64], *ptr = buf;
-	ssize_t temp, result = 0;
+PRIVATE NONNULL((1, 2, 3)) bool FORMATPRINTER_CC
+libiconv_cp_encode_buf(struct iconv_encode const *__restrict self,
+                       char *__restrict result,
+                       char32_t const *__restrict data, size_t len) {
+	size_t i;
 	struct iconv_codepage const *cp;
 	cp = self->ice_data.ied_cp;
-	for (j = 0; j < len; ++j) {
+	for (i = 0; i < len; ++i) {
 		/* Figure out how to encode this unicode character in this codepage. */
 		size_t lo, hi;
-		char32_t c32 = data[j];
-		if (ptr >= COMPILER_ENDOF(buf)) {
-			DO_encode_output(buf, (size_t)(ptr - buf));
-			ptr = buf;
-		}
+		char32_t c32 = data[i];
 		lo = 0;
 		hi = cp->icp_encode_max + 1;
-		while (lo < hi) {
-			size_t i;
-			i = (lo + hi) / 2;
-			if (c32 < cp->icp_encode[i].icee_uni) {
-				hi = i;
-			} else if (c32 > cp->icp_encode[i].icee_uni) {
-				lo = i + 1;
+		for (;;) {
+			size_t index;
+			if (lo >= hi)
+				return false; /* Cannot encode :( */
+			index = (lo + hi) / 2;
+			if (c32 < cp->icp_encode[index].icee_uni) {
+				hi = index;
+			} else if (c32 > cp->icp_encode[index].icee_uni) {
+				lo = index + 1;
 			} else {
 				/* Found it! */
-				*ptr++ = (char)(unsigned char)cp->icp_encode[i].icee_cp;
-				goto next_c32;
+				*result++ = (char)(unsigned char)cp->icp_encode[index].icee_cp;
+				break;
 			}
 		}
-		/* Cannot encode :( */
-		if (self->ice_flags & ICONV_ERR_TRANSLIT) {
-			/* Try to case-fold the character. */
-			char32_t folded[UNICODE_FOLDED_MAX];
-			size_t len = (size_t)(iconv_transliterate(c32, folded) - folded);
-			if (len != 1 || folded[0] != c32) {
-				DO_encode_output(buf, (size_t)(ptr - buf));
-				ptr = buf;
-				DO(libiconv_cp_encode_u32(self, folded, len));
-				goto next_c32;
-			}
-		}
-		if (IS_ICONV_ERR_ERROR_OR_ERRNO(self->ice_flags)) {
-			DO_encode_output(buf, (size_t)(ptr - buf));
-			goto err_ilseq;
-		}
-		if (!IS_ICONV_ERR_DISCARD(self->ice_flags)) {
-			if (IS_ICONV_ERR_REPLACE(self->ice_flags))
-				*ptr++ = cp->icp_replacement;
-			else {
-				*ptr++ = (char)(unsigned char)(uint32_t)c32;
-			}
-		}
-next_c32:
-		;
 	}
-	DO_encode_output(buf, (size_t)(ptr - buf));
-	return result;
-err:
-	return temp;
-err_ilseq:
-	self->ice_flags |= ICONV_HASERR;
-	if (IS_ICONV_ERR_ERRNO(self->ice_flags))
-		errno = EILSEQ;
-	return -1;
+	return true;
 }
 
 INTERN NONNULL((1, 2)) ssize_t FORMATPRINTER_CC
@@ -674,20 +630,18 @@ libiconv_cp_encode(struct iconv_encode *__restrict self,
 		}
 		/* Cannot encode :( */
 		if (self->ice_flags & ICONV_ERR_TRANSLIT) {
-			/* Try to case-fold the character. */
-			char32_t folded[UNICODE_FOLDED_MAX];
-			size_t len = (size_t)(iconv_transliterate(c32, folded) - folded);
-			if (len != 1 || folded[0] != c32) {
+			/* Try to transliterate the character. */
+			char32_t transbuf[ICONV_TRANSLITERATE_MAXLEN];
+			size_t nth, len;
+			if ((ptr + ICONV_TRANSLITERATE_MAXLEN) > COMPILER_ENDOF(buf)) {
 				DO_encode_output(buf, (size_t)(ptr - buf));
-				ptr  = buf;
-				temp = libiconv_cp_encode_u32(self, folded, len);
-				if unlikely(temp < 0) {
-					if (self->ice_flags & ICONV_HASERR)
-						goto err_ilseq_post;
-					goto err;
+				ptr = buf;
+			}
+			for (nth = 0; (len = libiconv_transliterate(transbuf, c32, nth)) != (size_t)-1; ++nth) {
+				if (libiconv_cp_encode_buf(self, ptr, transbuf, len)) {
+					ptr += len;
+					goto next_c32;
 				}
-				result += temp;
-				goto next_c32;
 			}
 		}
 		if (IS_ICONV_ERR_ERROR_OR_ERRNO(self->ice_flags)) {
@@ -713,7 +667,6 @@ err_ilseq:
 	self->ice_flags |= ICONV_HASERR;
 	if (IS_ICONV_ERR_ERRNO(self->ice_flags))
 		errno = EILSEQ;
-err_ilseq_post:
 	return -(ssize_t)size;
 }
 
@@ -769,73 +722,36 @@ err_ilseq:
 /************************************************************************/
 /* 7L-code-page encode/decode                                           */
 /************************************************************************/
-PRIVATE ATTR_NOINLINE NONNULL((1, 2)) ssize_t FORMATPRINTER_CC
-libiconv_cp7l_encode_u32(struct iconv_encode *__restrict self,
-                         char32_t const *__restrict data,
-                         size_t len) {
-	size_t j;
-	char buf[64], *ptr = buf;
-	ssize_t temp, result = 0;
+PRIVATE ATTR_NOINLINE NONNULL((1, 2)) bool FORMATPRINTER_CC
+libiconv_cp7l_encode_buf(struct iconv_encode const *__restrict self,
+                         char *__restrict result,
+                         char32_t const *__restrict data, size_t len) {
+	size_t i;
 	struct iconv_7l_codepage const *cp;
 	cp = self->ice_data.ied_cp7l;
-	for (j = 0; j < len; ++j) {
+	for (i = 0; i < len; ++i) {
 		/* Figure out how to encode this unicode character in this codepage. */
 		size_t lo, hi;
-		char32_t c32 = data[j];
-		if (ptr >= COMPILER_ENDOF(buf)) {
-			DO_encode_output(buf, (size_t)(ptr - buf));
-			ptr = buf;
-		}
+		char32_t c32 = data[i];
 		lo = 0;
 		hi = cp->i7lcp_encode_count;
-		while (lo < hi) {
-			size_t i;
-			i = (lo + hi) / 2;
-			if (c32 < cp->i7lcp_encode[i].icee_uni) {
-				hi = i;
-			} else if (c32 > cp->i7lcp_encode[i].icee_uni) {
-				lo = i + 1;
+		for (;;) {
+			size_t index;
+			if (lo >= hi)
+				return false; /* Cannot encode :( */
+			index = (lo + hi) / 2;
+			if (c32 < cp->i7lcp_encode[index].icee_uni) {
+				hi = index;
+			} else if (c32 > cp->i7lcp_encode[index].icee_uni) {
+				lo = index + 1;
 			} else {
 				/* Found it! */
-				*ptr++ = (char)(unsigned char)cp->i7lcp_encode[i].icee_cp;
-				goto next_c32;
+				*result++ = (char)(unsigned char)cp->i7lcp_encode[index].icee_cp;
+				break;
 			}
 		}
-		/* Cannot encode :( */
-		if (self->ice_flags & ICONV_ERR_TRANSLIT) {
-			/* Try to case-fold the character. */
-			char32_t folded[UNICODE_FOLDED_MAX];
-			size_t len = (size_t)(iconv_transliterate(c32, folded) - folded);
-			if (len != 1 || folded[0] != c32) {
-				DO_encode_output(buf, (size_t)(ptr - buf));
-				ptr = buf;
-				DO(libiconv_cp7l_encode_u32(self, folded, len));
-				goto next_c32;
-			}
-		}
-		if (IS_ICONV_ERR_ERROR_OR_ERRNO(self->ice_flags)) {
-			DO_encode_output(buf, (size_t)(ptr - buf));
-			goto err_ilseq;
-		}
-		if (!IS_ICONV_ERR_DISCARD(self->ice_flags)) {
-			if (IS_ICONV_ERR_REPLACE(self->ice_flags))
-				*ptr++ = cp->i7lcp_replacement;
-			else {
-				*ptr++ = (char)(unsigned char)(uint32_t)c32;
-			}
-		}
-next_c32:
-		;
 	}
-	DO_encode_output(buf, (size_t)(ptr - buf));
-	return result;
-err:
-	return temp;
-err_ilseq:
-	self->ice_flags |= ICONV_HASERR;
-	if (IS_ICONV_ERR_ERRNO(self->ice_flags))
-		errno = EILSEQ;
-	return -1;
+	return true;
 }
 
 INTERN NONNULL((1, 2)) ssize_t FORMATPRINTER_CC
@@ -872,20 +788,18 @@ libiconv_cp7l_encode(struct iconv_encode *__restrict self,
 		}
 		/* Cannot encode :( */
 		if (self->ice_flags & ICONV_ERR_TRANSLIT) {
-			/* Try to case-fold the character. */
-			char32_t folded[UNICODE_FOLDED_MAX];
-			size_t len = (size_t)(iconv_transliterate(c32, folded) - folded);
-			if (len != 1 || folded[0] != c32) {
+			/* Try to transliterate the character. */
+			char32_t transbuf[ICONV_TRANSLITERATE_MAXLEN];
+			size_t nth, len;
+			if ((ptr + ICONV_TRANSLITERATE_MAXLEN) > COMPILER_ENDOF(buf)) {
 				DO_encode_output(buf, (size_t)(ptr - buf));
-				ptr  = buf;
-				temp = libiconv_cp7l_encode_u32(self, folded, len);
-				if unlikely(temp < 0) {
-					if (self->ice_flags & ICONV_HASERR)
-						goto err_ilseq_post;
-					goto err;
+				ptr = buf;
+			}
+			for (nth = 0; (len = libiconv_transliterate(transbuf, c32, nth)) != (size_t)-1; ++nth) {
+				if (libiconv_cp7l_encode_buf(self, ptr, transbuf, len)) {
+					ptr += len;
+					goto next_c32;
 				}
-				result += temp;
-				goto next_c32;
 			}
 		}
 		if (IS_ICONV_ERR_ERROR_OR_ERRNO(self->ice_flags)) {
@@ -911,7 +825,6 @@ err_ilseq:
 	self->ice_flags |= ICONV_HASERR;
 	if (IS_ICONV_ERR_ERRNO(self->ice_flags))
 		errno = EILSEQ;
-err_ilseq_post:
 	return -(ssize_t)size;
 }
 
@@ -969,63 +882,22 @@ err_ilseq:
 /************************************************************************/
 /* iso646 code page encode/decode functions.                            */
 /************************************************************************/
-PRIVATE ATTR_NOINLINE NONNULL((1, 2)) ssize_t FORMATPRINTER_CC
-libiconv_cp646_encode_u32(struct iconv_encode *__restrict self,
-                          char32_t const *__restrict data,
-                          size_t len) {
-	size_t j;
-	char buf[64], *ptr = buf;
-	ssize_t temp, result = 0;
+PRIVATE ATTR_NOINLINE NONNULL((1, 2)) bool FORMATPRINTER_CC
+libiconv_cp646_encode_buf(struct iconv_encode const *__restrict self,
+                          char *__restrict result,
+                          char32_t const *__restrict data, size_t len) {
+	size_t i;
 	struct iconv_iso646_codepage const *cp;
 	cp = self->ice_data.ied_cp646;
-	for (j = 0; j < len; ++j) {
+	for (i = 0; i < len; ++i) {
 		/* Figure out how to encode this unicode character in this codepage. */
-		char32_t c32 = data[j];
-		char encoded;
-		if (ptr >= COMPILER_ENDOF(buf)) {
-			DO_encode_output(buf, (size_t)(ptr - buf));
-			ptr = buf;
-		}
-		encoded = iso646_encode(cp, c32);
-		if (encoded || !c32) {
-			*ptr++ = encoded;
-			goto next_c32;
-		}
-		/* Cannot encode :( */
-		if (self->ice_flags & ICONV_ERR_TRANSLIT) {
-			/* Try to case-fold the character. */
-			char32_t folded[UNICODE_FOLDED_MAX];
-			size_t len = (size_t)(iconv_transliterate(c32, folded) - folded);
-			if (len != 1 || folded[0] != c32) {
-				DO_encode_output(buf, (size_t)(ptr - buf));
-				ptr = buf;
-				DO(libiconv_cp646_encode_u32(self, folded, len));
-				goto next_c32;
-			}
-		}
-		if (IS_ICONV_ERR_ERROR_OR_ERRNO(self->ice_flags)) {
-			DO_encode_output(buf, (size_t)(ptr - buf));
-			goto err_ilseq;
-		}
-		if (!IS_ICONV_ERR_DISCARD(self->ice_flags)) {
-			if (IS_ICONV_ERR_REPLACE(self->ice_flags))
-				*ptr++ = iconv_iso646_codepage_qmark(cp);
-			else {
-				*ptr++ = (char)(unsigned char)(uint32_t)c32;
-			}
-		}
-next_c32:
-		;
+		char32_t c32 = data[i];
+		char encoded = iso646_encode(cp, c32);
+		if (encoded == 0 && c32 != 0)
+			return false; /* Cannot encode :( */
+		*result++ = encoded;
 	}
-	DO_encode_output(buf, (size_t)(ptr - buf));
-	return result;
-err:
-	return temp;
-err_ilseq:
-	self->ice_flags |= ICONV_HASERR;
-	if (IS_ICONV_ERR_ERRNO(self->ice_flags))
-		errno = EILSEQ;
-	return -1;
+	return true;
 }
 
 INTERN NONNULL((1, 2)) ssize_t FORMATPRINTER_CC
@@ -1052,20 +924,18 @@ libiconv_cp646_encode(struct iconv_encode *__restrict self,
 		}
 		/* Cannot encode :( */
 		if (self->ice_flags & ICONV_ERR_TRANSLIT) {
-			/* Try to case-fold the character. */
-			char32_t folded[UNICODE_FOLDED_MAX];
-			size_t len = (size_t)(iconv_transliterate(c32, folded) - folded);
-			if (len != 1 || folded[0] != c32) {
+			/* Try to transliterate the character. */
+			char32_t transbuf[ICONV_TRANSLITERATE_MAXLEN];
+			size_t nth, len;
+			if ((ptr + ICONV_TRANSLITERATE_MAXLEN) > COMPILER_ENDOF(buf)) {
 				DO_encode_output(buf, (size_t)(ptr - buf));
-				ptr  = buf;
-				temp = libiconv_cp646_encode_u32(self, folded, len);
-				if unlikely(temp < 0) {
-					if (self->ice_flags & ICONV_HASERR)
-						goto err_ilseq_post;
-					goto err;
+				ptr = buf;
+			}
+			for (nth = 0; (len = libiconv_transliterate(transbuf, c32, nth)) != (size_t)-1; ++nth) {
+				if (libiconv_cp646_encode_buf(self, ptr, transbuf, len)) {
+					ptr += len;
+					goto next_c32;
 				}
-				result += temp;
-				goto next_c32;
 			}
 		}
 		if (IS_ICONV_ERR_ERROR_OR_ERRNO(self->ice_flags)) {
@@ -1091,7 +961,6 @@ err_ilseq:
 	self->ice_flags |= ICONV_HASERR;
 	if (IS_ICONV_ERR_ERRNO(self->ice_flags))
 		errno = EILSEQ;
-err_ilseq_post:
 	return -(ssize_t)size;
 }
 

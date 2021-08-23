@@ -481,6 +481,14 @@ err_ilseq:
  *       the data of the other, saving  a bunch of memory in  the
  *       process! */
 
+/* TODO: Support for transliteration. Also: export the transliterate
+ *       function from the main libiconv.so, so this library is able
+ *       to import it!
+ *       For this purpose, use `dlgetmodule(3)' w/o the INCREF flag.
+ *       If that function fails, we  can just abort(3) since if  you
+ *       load this library  without first  loading libiconv,  you're
+ *       already doing something wrong! */
+
 
 
 /* Initialize a stateful encoder/decoder. */

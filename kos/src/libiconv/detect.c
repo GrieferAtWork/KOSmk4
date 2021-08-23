@@ -351,8 +351,8 @@ typedef uintptr_t cp8_bitset_t[CEILDIV(CODEC_CP_COUNT, sizeof(uintptr_t) * NBBY)
  *
  * Detected patterns (documented here using regex):
  *    - From comments:
- *         [#@+!$][ \t*#@+!$/-]*(charset|coding|codec)[\t =:]+CODEC[ \t*#@+!$/-]\n   # Python comments
- *         //\t*#@+!$/]*(charset|coding|codec)[\t =:]+CODEC[ \t*#@+!$/-]\n           # C++ comments
+ *         [#@+!$][ \t*#@+!$/-]*(charset|coding|codec)[\t =:]+CODEC[ \t*#@+!$/-]\n   # Python/shell/etc comments
+ *         //\t*#@+!$/]*(charset|coding|codec)[\t =:]+CODEC[ \t*#@+!$/-]\n           # C++/Java/etc comments
  *         (\*[ \t*#@+!$/-]*(charset|coding|codec)[\t =:]+CODEC[ \t*#@+!$/-]*\*)     # Pascal comments
  *         /\*[ \t*#@+!$/-]*(charset|coding|codec)[\t =:]+CODEC[ \t*#@+!$/-]*\* /    # C comments
  *                                                                             ^
@@ -665,7 +665,7 @@ NOTHROW_NCX(CC libiconv_detect_codec)(void const *__restrict data, size_t size) 
 	 * Time to get to the meat and scan the actual file's contents. */
 
 	/* Check for user-defined codec markers. Only search for these within
-	 * the  first `HUNCH_CHECK_MAXCHARS'  bytes of  the file,  but stop a
+	 * the first `MARKER_CHECK_MAXCHARS' bytes of the file, but stop if a
 	 * character is found that may not appear in ASCII text. */
 	{
 		iconv_codec_t result;
