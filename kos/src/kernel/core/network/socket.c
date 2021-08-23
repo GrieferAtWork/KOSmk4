@@ -1679,7 +1679,7 @@ extract_bool(USER CHECKED void const *optval,
 	socklen_t i;
 #ifndef __OPTIMIZE_SIZE__
 	if likely(optlen == sizeof(int))
-		return *(int const *)optval != 0;
+		return UNALIGNED_GET((USER CHECKED unsigned int const *)optval) != 0;
 #endif /* !__OPTIMIZE_SIZE__ */
 	for (i = 0; i < optlen; ++i) {
 		byte_t b = ((byte_t const *)optval)[i];
