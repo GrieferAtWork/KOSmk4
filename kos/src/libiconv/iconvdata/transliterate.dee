@@ -1,0 +1,341 @@
+/* Copyright (c) 2019-2021 Griefer@Work                                       *
+ *                                                                            *
+ * This software is provided 'as-is', without any express or implied          *
+ * warranty. In no event will the authors be held liable for any damages      *
+ * arising from the use of this software.                                     *
+ *                                                                            *
+ * Permission is granted to anyone to use this software for any purpose,      *
+ * including commercial applications, and to alter it and redistribute it     *
+ * freely, subject to the following restrictions:                             *
+ *                                                                            *
+ * 1. The origin of this software must not be misrepresented; you must not    *
+ *    claim that you wrote the original software. If you use this software    *
+ *    in a product, an acknowledgement (see the following) in the product     *
+ *    documentation is required:                                              *
+ *    Portions Copyright (c) 2019-2021 Griefer@Work                           *
+ * 2. Altered source versions must be plainly marked as such, and must not be *
+ *    misrepresented as being the original software.                          *
+ * 3. This notice may not be removed or altered from any source distribution. *
+ */
+
+import * from deemon;
+import uniEscape from .util;
+import fs;
+import util;
+
+function parseDB(): {int: {string...}} {
+	local final filename = fs.joinpath(fs.headof(__FILE__), "transliterate");
+	local data = File.open(filename, "r").read().decode("utf-8");
+	local newData = File.Writer();
+	function warnAt(i: int, msg: string) {
+		local sol = data.rfind("\n", 0, i) + 1;
+		local line = data.count("\n", 0, sol) + 1;
+		local col = 1 + (i - sol);
+		print File.stderr: (filename, "(", line, ",", col, ") : ", msg);
+	}
+	function errAt(i: int, msg: string) {
+		warnAt(i, msg);
+		throw Error(msg);
+	}
+	local i = 0;
+	local i = 0, len = #data, flushStart = 0;
+	local result: {int: {string...}} = Dict();
+	local currentOrdinal: int = none;
+	local currentMappingList: HashSet with string = none;
+	local currentBlockCommentIndent: int = 0;
+	while (i < len) {
+		local ch = data[i];
+		if (ch.isspace()) {
+			++i;
+			continue;
+		}
+		if (ch == "#") {
+			i = data.find("\n", i);
+			if (i < 0)
+				i = len;
+			else {
+				++i;
+			}
+			currentBlockCommentIndent = 0;
+			continue;
+		}
+		if (ch.isalnum()) {
+			/* Switch the current mapping set. */
+			local idStart = i;
+			do {
+				++i;
+			} while (i < len && data.isalnum(i));
+			local ord;
+			try {
+				ord = int(data[idStart:i], 16);
+			} catch (...) {
+				errAt(idStart, "Invalid integer: " + repr data[idStart:i]);
+			}
+			currentOrdinal = ord;
+			currentMappingList = result.get(currentOrdinal);
+			if (currentMappingList is none)
+				result[currentOrdinal] = currentMappingList = [];
+			else {
+				warnAt(idStart, "Unicode ord U+" +
+					currentOrdinal.hex()[2:].zfill(4).upper() +
+					" already loaded previously");
+			}
+		} else if (ch == "\"") {
+			local strEnd = data.find("\"", i + 1);
+			if (strEnd < 0)
+				errAt(i, "Unmatched '\"'");
+			local strText = data[i+1:strEnd].decode("c-escape");
+			if (#strText != 1)
+				errAt(i, "Invalid string length (expected 1, is " + #strText + " in text: " + repr strText + ")");
+			currentOrdinal = strText.ord();
+			local isFirst = true;
+			newData << data[flushStart:i] << currentOrdinal.hex()[2:].zfill(4).upper();
+			currentMappingList = result.get(currentOrdinal);
+			if (currentMappingList is none)
+				result[currentOrdinal] = currentMappingList = [];
+			else {
+				warnAt(i, "Unicode ord U+" +
+					currentOrdinal.hex()[2:].zfill(4).upper() +
+					" already loaded previously");
+			}
+			flushStart = i = strEnd + 1;
+		} else if (ch == "{") {
+			if (currentMappingList is none)
+				errAt(i, "No character selected");
+			local stringsInLine: {string...} = [];
+again_string_in_line:
+			local currentString = File.Writer();
+			++i;
+			for (;;) {
+				while (i < len && data.isspace(i))
+					++i;
+				if (i < len && data[i] == "}") {
+					++i;
+					break;
+				}
+				if (i >= len)
+					errAt(i, "Expected hex after '{'");
+				if (!data.isalnum(i)) {
+					if (data[i] != "\"")
+						errAt(i, "Expected hex after '{', but got " + repr data[i]);
+					newData << data[flushStart:i];
+					local strEnd = data.find("\"", i + 1);
+					if (strEnd < 0)
+						errAt(i, "Unmatched '\"'");
+					local strText = data[i+1:strEnd].decode("c-escape");
+					currentString << strText;
+					local isFirst = true;
+					for (local o: strText.ordinals) {
+						if (!isFirst)
+							newData << " ";
+						isFirst = false;
+						newData << o.hex()[2:].zfill(4).upper();
+					}
+					flushStart = i = strEnd + 1;
+				} else {
+					local ordStart = i;
+					do {
+						++i;
+					} while (i < len && data.isalnum(i));
+					local ord;
+					try {
+						ord = int(data[ordStart:i], 16);
+					} catch (...) {
+						errAt(ordStart, "Invalid integer: " + repr data[ordStart:i]);
+					}
+					currentString << string.chr(ord);
+				}
+			}
+			currentString = currentString.string;
+			if (currentString !in currentMappingList)
+				currentMappingList.append(currentString);
+			stringsInLine.append(currentString);
+			while (i < len) {
+				local eol;
+				if (data.islf(i)) {
+					eol = i;
+					goto handle_eol;
+				} else if (data.isspace(i)) {
+					++i;
+				} else if (data[i] == "#") {
+					if (!currentBlockCommentIndent || !stringsInLine) {
+						currentBlockCommentIndent = i - (data.rfind("\n", 0, i) + 1);
+					}
+					eol = data.find("\n", i);
+handle_eol:
+					if (stringsInLine) {
+						local currentIndent = i - (data.rfind("\n", 0, i) + 1);;
+						if (currentIndent < currentBlockCommentIndent) {
+							newData << data[flushStart:i];
+							newData << " " * (currentBlockCommentIndent - currentIndent);
+						} else {
+							local count = currentIndent - currentBlockCommentIndent;
+							while (count && i > flushStart && data.isspace(i - 1) && !data.islf(i - 1)) {
+								--count;
+								--i;
+							}
+							newData << data[flushStart:i];
+							if (count)
+								newData << " ";
+						}
+						newData << "#"
+							<< " "
+							<< uniEscape(currentOrdinal)
+							<< " → {"
+							<< "}  {".join(for (local s: stringsInLine)
+								"".join(for (local c: s.ordinals) uniEscape(c)))
+							<< "} #";
+						flushStart = eol;
+						stringsInLine = [];
+					}
+					i = eol + 1;
+				} else {
+					break;
+				}
+			}
+			if (i < len && data[i] == "{")
+				goto again_string_in_line;
+		} else if (ch == ";") {
+			currentMappingList = none;
+			++i;
+		} else {
+			errAt(i, "Unexpected character: " + repr ch);
+		}
+	}
+	newData << data[flushStart:];
+	newData = newData.string;
+	if (newData != data) {
+		newData = newData.encode("utf-8");
+		with (local fp = File.open(filename, "w"))
+			fp.write(newData);
+	}
+
+again_remove_empty:
+	for (local ord, maps: result) {
+		if (!maps) {
+			del result[ord];
+			goto again_remove_empty;
+		}
+	}
+
+	/* Recursively transliterate */
+again_recursive:
+	for (local ord, ord_repl: result) {
+		for (local ord_r: ord_repl) {
+			local changed = false;
+			for (local i: [:#ord_r]) {
+				local chOrd = ord_r.ord(i);
+				local chOrd_repl = result.get(chOrd);
+				if (chOrd_repl is none)
+					continue;
+				for (local chOrd_r: chOrd_repl) {
+					if (#chOrd_r == 1 && chOrd_r.ord() == ord)
+						continue;
+					local news = ord_r[:i] + chOrd_r + ord_r[i+1:];
+					if (news !in ord_repl) {
+						ord_repl.append(news);
+						changed = true;
+					}
+				}
+			}
+			if (changed)
+				goto again_recursive;
+		}
+	}
+
+	return result;
+}
+
+
+@@Mapping from unicode-ordinal to list of replacement strings.
+global final TRANSLIT: {int: {string...}} = parseDB();
+
+/*for (local ord: TRANSLIT.keys.sorted()) {
+	local repl = TRANSLIT[ord];
+	print(ord.hex()[2:].zfill(4).upper(), "\t{",
+		"} {".join(for (local r: repl) " ".join(for (local c: r.ordinals)
+			c.hex()[2:].zfill(4).upper())),
+		"}\t# ", uniEscape(ord), " → {",
+		"} {".join(for (local r: repl) "".join(for (local c: r.ordinals) uniEscape(c))),
+		"}");
+}*/
+
+
+/* FIXME: This  is a workaround  for a problem  where deemon doesn't understand
+ *        that there's a difference between \xFF and \u00FF. I'm sorry. I wrote
+ *        the string escape/unescape portion of  deemon ages ago when I  didn't
+ *        yet  know how they're  supposed to work. This  is something that will
+ *        get  fixed sooner  or later within  deemon itself, but  until then we
+ *        have this work-around... */
+function fixedCharEncode(s: string) {
+	local fp = File.Writer();
+	local i, len = #s;
+	for (i = 0; i < len;) {
+		local ch = s[i];
+		local ord = ch.ord();
+		if (ord >= 0x20 && ord <= 0x7E) {
+			if (ch in "\"\'\\")
+				fp << "\\";
+			fp << ch;
+			++i;
+		} else if (ord <= 7) {
+			fp << "\\" << ord;
+			++i;
+			if (i < len && s[i] in "01234567") {
+				ord = s.ord(i);
+				goto force_encode_hex;
+			}
+		} else {
+force_encode_hex:
+			fp << "\\x" << ord.hex()[2:].upper().zfill(2);
+			++i;
+			if (i < len && s[i] in "0123456789abcdefABCDEF") {
+				ord = s.ord(i);
+				goto force_encode_hex;
+			}
+		}
+	}
+	return fp.string;
+}
+
+function printTranslitDatabase() {
+	local entries: {{string...}...} = [];
+	local longestReplLen = 0;
+	local longestFoldedReplLen = 0;
+	for (local ord, repl: TRANSLIT) {
+		local strings = [];
+		strings.append(string.chr(ord).encode("utf-8"));
+		for (local r: repl) {
+			strings.append(r.encode("utf-8"));
+			local len = #r;
+			if (longestReplLen < len)
+				longestReplLen = len;
+			/* NOTE: This right here assumes that deemon's casefold() function
+			 *       behaves identical to `unicode_fold()' from KOS's libc.
+			 * As of right now, that is the case but if that ever were to change,
+			 * this right here might result in libiconv crashing at runtime due
+			 * to a miscalculation of required buffer sizes. */
+			local len = #r.casefold();
+			if (longestFoldedReplLen < len)
+				longestFoldedReplLen = len;
+		}
+		entries.append(strings);
+	}
+	entries.sort([](x) -> x.first);
+	local fp = File.Writer();
+	fp << "\0\0";
+	for (local strings: entries) {
+		for (local s: strings) {
+			fp << s << "\0";
+		}
+		fp << "\0";
+	}
+	fp = fp.string[:-1]; /* Trim 1 trailing NUL */
+	print("#define LIBICONV_TRANSLIT_LONGEST_REPLACEMENT_LENGTH        ", longestReplLen);
+	print("#define LIBICONV_TRANSLIT_LONGEST_FOLDED_REPLACEMENT_LENGTH ", longestFoldedReplLen);
+	print("PRIVATE char const libiconv_translit_db[", (#fp + 1).hex(), "] =");
+	for (local line: fp.segments(32)) {
+		print("\"", fixedCharEncode(line), "\"");
+	}
+	print(";");
+}

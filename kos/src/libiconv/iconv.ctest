@@ -31,9 +31,11 @@
 #include <dlfcn.h>
 #include <format-printer.h>
 #include <string.h>
+#include <unicode.h>
 
-#include <libiconv/iconv.h>
 #include <libiconv/codec.h>
+#include <libiconv/iconv.h>
+#include <libiconv/transliterate.h>
 
 
 DECL_BEGIN
@@ -44,6 +46,7 @@ PRIVATE LPICONV_ENCODE_FLUSH iconv_encode_flush = NULL;
 PRIVATE LPICONV_CODECBYNAME iconv_codecbyname = NULL;
 PRIVATE LPICONV_GETCODECNAMES iconv_getcodecnames = NULL;
 PRIVATE LPICONV_DETECT_CODEC iconv_detect_codec = NULL;
+PRIVATE LPICONV_TRANSLITERATE iconv_transliterate = NULL;
 
 PRIVATE void convertz(char const *from_codec, char const *to_codec,
                       unsigned int error_mode, char const *from_text,
@@ -83,6 +86,21 @@ PRIVATE void convert(char const *from_codec, char const *to_codec,
 	convertz(from_codec, to_codec, error_mode, from_text, strlen(from_text), to_buf);
 }
 
+PRIVATE bool has_transliteration(char32_t ch, char const *translit) {
+	char utf8_buf[UNICODE_32TO8_MAXBUF(ICONV_TRANSLITERATE_MAXLEN) + 1];
+	char32_t buf[ICONV_TRANSLITERATE_MAXLEN];
+	size_t len, nth;
+	for (nth = 0;; ++nth) {
+		len = iconv_transliterate(buf, ch, nth);
+		if (len == (size_t)-1)
+			break;
+		*unicode_32to8(utf8_buf, buf, len) = '\0';
+		if (strcmp(utf8_buf, translit) == 0)
+			return true;
+	}
+	return false;
+}
+
 
 DEFINE_TEST(iconv) {
 	char buf[256];
@@ -96,13 +114,27 @@ DEFINE_TEST(iconv) {
 	DLSYM(iconv_codecbyname);
 	DLSYM(iconv_getcodecnames);
 	DLSYM(iconv_detect_codec);
+	DLSYM(iconv_transliterate);
 #undef DLSYM
+
+	assert(has_transliteration(0x00E4, "a")); /* ä */
+	assert(has_transliteration(0x00F6, "o")); /* ö */
+	assert(has_transliteration(0x00FC, "u")); /* ü */
+	assert(has_transliteration(0x00C4, "A")); /* Ä */
+	assert(has_transliteration(0x00D6, "O")); /* Ö */
+	assert(has_transliteration(0x00DC, "U")); /* Ü */
+
 
 	convert("latin-1", "de", ICONV_ERR_ERRNO, "aou: \xE4\xF6\xFC!", buf);
 	assertf(strcmp(buf, "aou: \x7B\x7C\x7D!") == 0, "buf = %q", buf);
 
 	convert("de", "ascii", ICONV_ERR_ERRNO | ICONV_ERR_TRANSLIT, "ss: \x7E!", buf);
 	assertf(strcmp(buf, "ss: ss!") == 0, "buf = %q", buf);
+
+	convert("de", "ascii", ICONV_ERR_ERRNO | ICONV_ERR_TRANSLIT, "aou: \x7B\x7C\x7D!", buf);
+	assertf(strcmp(buf, "aou: aou!") == 0, "buf = %q", buf);
+	convert("latin-1", "ascii", ICONV_ERR_ERRNO | ICONV_ERR_TRANSLIT, "aou: \xE4\xF6\xFC!", buf);
+	assertf(strcmp(buf, "aou: aou!") == 0, "buf = %q", buf);
 
 	convert("utf-8", "iso-ir-182", ICONV_ERR_ERRNO, "Yy: \u0176\u0177!", buf);
 	assertf(strcmp(buf, "Yy: \xDE\xFE!") == 0, "buf = %q", buf);

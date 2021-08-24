@@ -144,8 +144,8 @@ function parseDBFilename(filename: string): {string: Object} {
 	local currentItem = none;
 	local currentIndex = none;
 	local currentTable = none;
-	local i = 0, len = #data, flushStart = 0;
 	local usedNames = HashSet();
+	local i = 0, len = #data, flushStart = 0;
 	while (i < len) {
 		local ch = data[i];
 		if (ch.isspace()) {
@@ -1052,7 +1052,7 @@ do_add_encode_identity_range:
 		}
 
 		/* Find the largest range of free slots between cpOffsetsInUse
-		 * This range must be large enough to hold TODO:random_access_count/random_access_blocks */
+		 * This range must be large enough to hold random_access_blocks */
 		cpOffsetsInUse.sort();
 		local largestRangeStart = 0;
 		local largestRangeSize = 0;
