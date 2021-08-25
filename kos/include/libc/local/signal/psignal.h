@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xd064925f */
+/* HASH CRC-32:0xe6422387 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -88,28 +88,39 @@ __NAMESPACE_LOCAL_BEGIN
 #undef __local___localdep_fprintf_defined
 #endif /* !... */
 #endif /* !__local___localdep_fprintf_defined */
-/* Dependency: strsignal_s from string */
-#ifndef __local___localdep_strsignal_s_defined
-#define __local___localdep_strsignal_s_defined 1
-#ifdef __CRT_HAVE_strsignal_s
-__CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,char const *,__NOTHROW,__localdep_strsignal_s,(__signo_t __signum),strsignal_s,(__signum))
-#else /* __CRT_HAVE_strsignal_s */
+/* Dependency: sigabbrev_np from string */
+#ifndef __local___localdep_sigabbrev_np_defined
+#define __local___localdep_sigabbrev_np_defined 1
+#ifdef __CRT_HAVE_sigabbrev_np
+/* >> sigabbrev_np(3)
+ * Return the name of a given signal, without the leading `SIG*' prefix.
+ * If the given `signum' isn't recognized, return `NULL' instead. */
+__CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,char const *,__NOTHROW,__localdep_sigabbrev_np,(__signo_t __signum),sigabbrev_np,(__signum))
+#elif defined(__CRT_HAVE_signalname)
+/* >> sigabbrev_np(3)
+ * Return the name of a given signal, without the leading `SIG*' prefix.
+ * If the given `signum' isn't recognized, return `NULL' instead. */
+__CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,char const *,__NOTHROW,__localdep_sigabbrev_np,(__signo_t __signum),signalname,(__signum))
+#else /* ... */
 __NAMESPACE_LOCAL_END
-#include <libc/local/string/strsignal_s.h>
+#include <libc/local/string/sigabbrev_np.h>
 __NAMESPACE_LOCAL_BEGIN
-#define __localdep_strsignal_s __LIBC_LOCAL_NAME(strsignal_s)
-#endif /* !__CRT_HAVE_strsignal_s */
-#endif /* !__local___localdep_strsignal_s_defined */
+/* >> sigabbrev_np(3)
+ * Return the name of a given signal, without the leading `SIG*' prefix.
+ * If the given `signum' isn't recognized, return `NULL' instead. */
+#define __localdep_sigabbrev_np __LIBC_LOCAL_NAME(sigabbrev_np)
+#endif /* !... */
+#endif /* !__local___localdep_sigabbrev_np_defined */
 /* >> psignal(3)
- * Same as `fprintf(stderr, "%s: %s\n", s, strsignal_s(signo) ?: strdupf("Unknown signal %d", signo))'
+ * Same as `fprintf(stderr, "%s: %s\n", s, sigabbrev_np(signo) ? "SIG"+. : strdupf("Unknown signal %d", signo))'
  * When `s' is `NULL' or an empty string, omit the leading "%s: " from the format. */
 __LOCAL_LIBC(psignal) void
 __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(psignal))(__signo_t __signo, char const *__s) {
-	char const *__signam = __localdep_strsignal_s(__signo);
+	char const *__signam = __localdep_sigabbrev_np(__signo);
 	if (__s && *__s)
 		__localdep_fprintf(__LOCAL_stderr, "%s: ", __s);
 	if (__signam) {
-		__localdep_fprintf(__LOCAL_stderr, "%s\n", __signam);
+		__localdep_fprintf(__LOCAL_stderr, "SIG%s\n", __signam);
 	} else {
 		__localdep_fprintf(__LOCAL_stderr, "Unknown signal %d\n", __signo);
 	}

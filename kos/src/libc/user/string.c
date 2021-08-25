@@ -39,6 +39,15 @@
 
 DECL_BEGIN
 
+/* TODO: Unify this function with "user/signal.c" */
+LOCAL int LIBCCALL
+libc_signo_dos2kos(int dos_signo) {
+	if (dos_signo == DOS_SIGABRT)
+		return SIGABRT;
+	return dos_signo;
+}
+
+
 
 /* TODO: Declare these functions through magic
  * -> Simply use the [[ignore]] annotation to hide these from headers! */
@@ -228,34 +237,55 @@ NOTHROW(LIBCCALL libc_strerrorname_np)(errno_t errnum)
 
 
 
+
 PRIVATE ATTR_SECTION(".rodata.crt.errno")
 struct ATTR_PACKED strsignal_names_db_struct {
-#define S(id, msg) char name_##id[sizeof(#id) / sizeof(char)];
+#define S(id, msg)                              \
+	char name_##id[sizeof(#id) / sizeof(char)]; \
+	char mesg_##id[sizeof(msg) / sizeof(char)];
 #include "../libc/sys_siglist.def"
 #undef S
 } const strsignal_names_db = {
-#define S(id, msg) /* .name_##id = */ #id,
+#define S(id, msg)          \
+	/* .name_##id = */ #id, \
+	/* .mesg_##id = */ msg,
 #include "../libc/sys_siglist.def"
 #undef S
 };
 
-typedef u8 strsignal_offset_t;
-STATIC_ASSERT(sizeof(strsignal_names_db) <= 0x100);
+typedef u16 strsignal_offset_t;
+STATIC_ASSERT(sizeof(strsignal_names_db) <= 0x10000);
 
 PRIVATE ATTR_SECTION(".rodata.crt.errno")
 strsignal_offset_t const strsignal_offsets_db[NSIG] = {
-#define S(id, msg)  offsetof(struct strsignal_names_db_struct, name_##id),
-#define S_UNDEF(id) (sizeof(strsignal_names_db) - 1),
+#define S(id, msg)  [SIG##id] = offsetof(struct strsignal_names_db_struct, name_##id),
+#define S_UNDEF(id) [id] = (sizeof(strsignal_names_db) - 1),
 #include "../libc/sys_siglist.def"
 #undef S_UNDEF
 #undef S
 };
 
 
-/*[[[head:libc_strsignal_s,hash:CRC-32=0x889d7ce2]]]*/
+/*[[[head:libd_sigabbrev_np,hash:CRC-32=0x49fe93d5]]]*/
+/* >> sigabbrev_np(3)
+ * Return the name of a given signal, without the leading `SIG*' prefix.
+ * If the given `signum' isn't recognized, return `NULL' instead. */
+INTERN ATTR_SECTION(".text.crt.dos.errno") ATTR_CONST WUNUSED char const *
+NOTHROW(LIBDCALL libd_sigabbrev_np)(signo_t signum)
+/*[[[body:libd_sigabbrev_np]]]*/
+{
+	signum = libc_signo_dos2kos(signum);
+	return libc_sigabbrev_np(signum);
+}
+/*[[[end:libd_sigabbrev_np]]]*/
+
+/*[[[head:libc_sigabbrev_np,hash:CRC-32=0x89bdbb00]]]*/
+/* >> sigabbrev_np(3)
+ * Return the name of a given signal, without the leading `SIG*' prefix.
+ * If the given `signum' isn't recognized, return `NULL' instead. */
 INTERN ATTR_SECTION(".text.crt.errno") ATTR_CONST WUNUSED char const *
-NOTHROW(LIBCCALL libc_strsignal_s)(signo_t signum)
-/*[[[body:libc_strsignal_s]]]*/
+NOTHROW(LIBCCALL libc_sigabbrev_np)(signo_t signum)
+/*[[[body:libc_sigabbrev_np]]]*/
 {
 	char const *result;
 	if ((unsigned int)signum >= COMPILER_LENOF(strsignal_offsets_db))
@@ -264,39 +294,52 @@ NOTHROW(LIBCCALL libc_strsignal_s)(signo_t signum)
 	                        strsignal_offsets_db[(unsigned int)signum]);
 	return result;
 }
-/*[[[end:libc_strsignal_s]]]*/
+/*[[[end:libc_sigabbrev_np]]]*/
 
-
-
-/* TODO: Unify this function with "user/signal.c" */
-LOCAL int LIBCCALL
-libc_signo_dos2kos(int dos_signo) {
-	if (dos_signo == DOS_SIGABRT)
-		return SIGABRT;
-	return dos_signo;
-}
-
-
-/*[[[head:libd_strsignal_s,hash:CRC-32=0x81e20372]]]*/
+/*[[[head:libd_sigdescr_np,hash:CRC-32=0x4e882862]]]*/
+/* >> sigdescr_np(3)
+ * Return a description for the given signal.
+ * If the given `signum' isn't recognized, return `NULL' instead. */
 INTERN ATTR_SECTION(".text.crt.dos.errno") ATTR_CONST WUNUSED char const *
-NOTHROW(LIBDCALL libd_strsignal_s)(signo_t signum)
-/*[[[body:libd_strsignal_s]]]*/
+NOTHROW(LIBDCALL libd_sigdescr_np)(signo_t signum)
+/*[[[body:libd_sigdescr_np]]]*/
 {
 	signum = libc_signo_dos2kos(signum);
-	return libc_strsignal_s(signum);
+	return libc_sigdescr_np(signum);
 }
-/*[[[end:libd_strsignal_s]]]*/
+/*[[[end:libd_sigdescr_np]]]*/
+
+/*[[[head:libc_sigdescr_np,hash:CRC-32=0x5d22cb1a]]]*/
+/* >> sigdescr_np(3)
+ * Return a description for the given signal.
+ * If the given `signum' isn't recognized, return `NULL' instead. */
+INTERN ATTR_SECTION(".text.crt.errno") ATTR_CONST WUNUSED char const *
+NOTHROW(LIBCCALL libc_sigdescr_np)(signo_t signum)
+/*[[[body:libc_sigdescr_np]]]*/
+{
+	char const *result;
+	result = libc_sigabbrev_np(signum);
+	if (result != NULL)
+		result = strend(result) + 1;
+	return result;
+}
+/*[[[end:libc_sigdescr_np]]]*/
 
 
 
 
-/*[[[start:exports,hash:CRC-32=0x95229849]]]*/
+
+/*[[[start:exports,hash:CRC-32=0x97e41b3f]]]*/
 DEFINE_PUBLIC_ALIAS(DOS$strerrordesc_np, libd_strerrordesc_np);
 DEFINE_PUBLIC_ALIAS(strerrordesc_np, libc_strerrordesc_np);
 DEFINE_PUBLIC_ALIAS(DOS$strerrorname_np, libd_strerrorname_np);
 DEFINE_PUBLIC_ALIAS(strerrorname_np, libc_strerrorname_np);
-DEFINE_PUBLIC_ALIAS(DOS$strsignal_s, libd_strsignal_s);
-DEFINE_PUBLIC_ALIAS(strsignal_s, libc_strsignal_s);
+DEFINE_PUBLIC_ALIAS(DOS$signalname, libd_sigabbrev_np);
+DEFINE_PUBLIC_ALIAS(DOS$sigabbrev_np, libd_sigabbrev_np);
+DEFINE_PUBLIC_ALIAS(signalname, libc_sigabbrev_np);
+DEFINE_PUBLIC_ALIAS(sigabbrev_np, libc_sigabbrev_np);
+DEFINE_PUBLIC_ALIAS(DOS$sigdescr_np, libd_sigdescr_np);
+DEFINE_PUBLIC_ALIAS(sigdescr_np, libc_sigdescr_np);
 /*[[[end:exports]]]*/
 
 DECL_END

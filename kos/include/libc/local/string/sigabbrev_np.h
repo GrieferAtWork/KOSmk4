@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xa27e45a8 */
+/* HASH CRC-32:0xa4d76d91 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -18,8 +18,8 @@
  *    misrepresented as being the original software.                          *
  * 3. This notice may not be removed or altered from any source distribution. *
  */
-#ifndef __local_strsignal_s_defined
-#define __local_strsignal_s_defined 1
+#ifndef __local_sigabbrev_np_defined
+#define __local_sigabbrev_np_defined 1
 #include <__crt.h>
 #include <bits/types.h>
 #include <asm/os/signal.h>
@@ -51,8 +51,11 @@ __LIBC char const *const _sys_siglist[__NSIG];
 #endif /* sys_siglist... */
 #endif /* !___local_sys_siglist_defined */
 __NAMESPACE_LOCAL_BEGIN
-__LOCAL_LIBC(strsignal_s) __ATTR_CONST __ATTR_WUNUSED char const *
-__NOTHROW(__LIBCCALL __LIBC_LOCAL_NAME(strsignal_s))(__signo_t __signum) {
+/* >> sigabbrev_np(3)
+ * Return the name of a given signal, without the leading `SIG*' prefix.
+ * If the given `signum' isn't recognized, return `NULL' instead. */
+__LOCAL_LIBC(sigabbrev_np) __ATTR_CONST __ATTR_WUNUSED char const *
+__NOTHROW(__LIBCCALL __LIBC_LOCAL_NAME(sigabbrev_np))(__signo_t __signum) {
 #if defined(__CRT_HAVE___p_sys_siglist) || defined(__CRT_HAVE_sys_siglist) || defined(__CRT_HAVE__sys_siglist)
 	return (unsigned int)__signum < __NSIG ? _sys_siglist[__signum] : __NULLPTR;
 #else /* __CRT_HAVE___p_sys_siglist || __CRT_HAVE_sys_siglist || __CRT_HAVE__sys_siglist */
@@ -182,8 +185,8 @@ __NOTHROW(__LIBCCALL __LIBC_LOCAL_NAME(strsignal_s))(__signo_t __signum) {
 #endif /* !__CRT_HAVE___p_sys_siglist && !__CRT_HAVE_sys_siglist && !__CRT_HAVE__sys_siglist */
 }
 __NAMESPACE_LOCAL_END
-#ifndef __local___localdep_strsignal_s_defined
-#define __local___localdep_strsignal_s_defined 1
-#define __localdep_strsignal_s __LIBC_LOCAL_NAME(strsignal_s)
-#endif /* !__local___localdep_strsignal_s_defined */
-#endif /* !__local_strsignal_s_defined */
+#ifndef __local___localdep_sigabbrev_np_defined
+#define __local___localdep_sigabbrev_np_defined 1
+#define __localdep_sigabbrev_np __LIBC_LOCAL_NAME(sigabbrev_np)
+#endif /* !__local___localdep_sigabbrev_np_defined */
+#endif /* !__local_sigabbrev_np_defined */

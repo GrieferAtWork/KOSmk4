@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xaef0eda9 */
+/* HASH CRC-32:0xa59ee7d4 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -433,7 +433,7 @@ NOTHROW_NCX(LIBDCALL libd_strsignal)(signo_t signo) {
 	static char strsignal_buf[64];
 	char *result = strsignal_buf;
 	char const *string;
-	string = libc_strsignal_s(signo);
+	string = libc_sigdescr_np(signo);
 	if (string) {
 		/* Copy the descriptor text. */
 		result[COMPILER_LENOF(strsignal_buf) - 1] = '\0';
@@ -448,7 +448,7 @@ NOTHROW_NCX(LIBCCALL libc_strsignal)(signo_t signo) {
 	static char strsignal_buf[64];
 	char *result = strsignal_buf;
 	char const *string;
-	string = libc_strsignal_s(signo);
+	string = libc_sigdescr_np(signo);
 	if (string) {
 		/* Copy the descriptor text. */
 		result[COMPILER_LENOF(strsignal_buf) - 1] = '\0';
@@ -4503,8 +4503,11 @@ NOTHROW_NCX(LIBCCALL libc_timingsafe_memcmp)(void const *s1,
 INTERN ATTR_SECTION(".text.crt.string.memory") ATTR_PURE WUNUSED NONNULL((1)) signo_t
 NOTHROW_NCX(LIBCCALL libc_strtosigno)(const char *name) {
 	signo_t i, result = 0;
+	if (name[0] != 'S' || name[1] != 'I' || name[2] != 'G')
+		return NULL;
+	name += 3;
 	for (i = 1; i < __NSIG; ++i) {
-		char const *s = libc_strsignal_s(i);
+		char const *s = libc_sigabbrev_np(i);
 		if (likely(s) && libc_strcmp(s, name) == 0) {
 			result = i;
 			break;

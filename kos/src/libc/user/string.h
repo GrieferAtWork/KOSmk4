@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x7e66032c */
+/* HASH CRC-32:0xb2e10887 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -35,8 +35,22 @@ INTDEF ATTR_CONST WUNUSED char const *NOTHROW(LIBDCALL libd_strerrordesc_np)(err
 INTDEF ATTR_CONST WUNUSED char const *NOTHROW(LIBCCALL libc_strerrordesc_np)(errno_t errnum);
 INTDEF ATTR_CONST WUNUSED char const *NOTHROW(LIBDCALL libd_strerrorname_np)(errno_t errnum);
 INTDEF ATTR_CONST WUNUSED char const *NOTHROW(LIBCCALL libc_strerrorname_np)(errno_t errnum);
-INTDEF ATTR_CONST WUNUSED char const *NOTHROW(LIBDCALL libd_strsignal_s)(signo_t signum);
-INTDEF ATTR_CONST WUNUSED char const *NOTHROW(LIBCCALL libc_strsignal_s)(signo_t signum);
+/* >> sigabbrev_np(3)
+ * Return the name of a given signal, without the leading `SIG*' prefix.
+ * If the given `signum' isn't recognized, return `NULL' instead. */
+INTDEF ATTR_CONST WUNUSED char const *NOTHROW(LIBDCALL libd_sigabbrev_np)(signo_t signum);
+/* >> sigabbrev_np(3)
+ * Return the name of a given signal, without the leading `SIG*' prefix.
+ * If the given `signum' isn't recognized, return `NULL' instead. */
+INTDEF ATTR_CONST WUNUSED char const *NOTHROW(LIBCCALL libc_sigabbrev_np)(signo_t signum);
+/* >> sigdescr_np(3)
+ * Return a description for the given signal.
+ * If the given `signum' isn't recognized, return `NULL' instead. */
+INTDEF ATTR_CONST WUNUSED char const *NOTHROW(LIBDCALL libd_sigdescr_np)(signo_t signum);
+/* >> sigdescr_np(3)
+ * Return a description for the given signal.
+ * If the given `signum' isn't recognized, return `NULL' instead. */
+INTDEF ATTR_CONST WUNUSED char const *NOTHROW(LIBCCALL libc_sigdescr_np)(signo_t signum);
 #endif /* !__KERNEL__ */
 
 DECL_END

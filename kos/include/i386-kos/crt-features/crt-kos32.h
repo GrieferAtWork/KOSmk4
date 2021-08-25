@@ -3243,12 +3243,14 @@
 #define __CRT_HAVE_shmdt
 #define __CRT_HAVE_shmget
 #define __CRT_HAVE_shutdown
+#define __CRT_HAVE_sigabbrev_np
 #define __CRT_HAVE_sigaction
 #define __CRT_HAVE_sigaddset
 #define __CRT_HAVE_sigaltstack
 #define __CRT_HAVE_sigandset
 #define __CRT_HAVE_sigblock
 #define __CRT_HAVE_sigdelset
+#define __CRT_HAVE_sigdescr_np
 #define __CRT_HAVE_sigemptyset
 #define __CRT_HAVE_sigfillset
 #define __CRT_HAVE_siggetmask
@@ -3417,7 +3419,6 @@
 #define __CRT_HAVE_strset
 #define __CRT_HAVE_strsigcode_s
 #define __CRT_HAVE_strsignal
-#define __CRT_HAVE_strsignal_s
 #define __CRT_HAVE_strspn
 #define __CRT_HAVE_strstartcmp
 #define __CRT_HAVE_strstartcmpz
@@ -5182,6 +5183,8 @@
 #define __CRT_HAVE_KOS$putwchar
 #define __CRT_HAVE_KOS$putwchar_unlocked
 #define __CRT_HAVE_KOS$raise
+#define __CRT_HAVE_KOS$sigabbrev_np
+#define __CRT_HAVE_KOS$sigdescr_np
 #define __CRT_HAVE_KOS$signal
 #define __CRT_HAVE_KOS$signalname
 #define __CRT_HAVE_KOS$ssignal
@@ -5192,7 +5195,6 @@
 #define __CRT_HAVE_KOS$strerrordesc_np
 #define __CRT_HAVE_KOS$strerrorname_np
 #define __CRT_HAVE_KOS$strsignal
-#define __CRT_HAVE_KOS$strsignal_s
 #define __CRT_HAVE_KOS$swprintf
 #define __CRT_HAVE_KOS$swscanf
 #define __CRT_HAVE_KOS$sys_errlist
@@ -5687,6 +5689,8 @@
 #define __CRT_HAVE_DOS$putwchar
 #define __CRT_HAVE_DOS$putwchar_unlocked
 #define __CRT_HAVE_DOS$raise
+#define __CRT_HAVE_DOS$sigabbrev_np
+#define __CRT_HAVE_DOS$sigdescr_np
 #define __CRT_HAVE_DOS$signal
 #define __CRT_HAVE_DOS$signalname
 #define __CRT_HAVE_DOS$ssignal
@@ -5697,7 +5701,6 @@
 #define __CRT_HAVE_DOS$strerrordesc_np
 #define __CRT_HAVE_DOS$strerrorname_np
 #define __CRT_HAVE_DOS$strsignal
-#define __CRT_HAVE_DOS$strsignal_s
 #define __CRT_HAVE_DOS$swprintf
 #define __CRT_HAVE_DOS$swscanf
 #define __CRT_HAVE_DOS$sys_errlist

@@ -1864,17 +1864,17 @@ int killpg($pid_t pgrp, $signo_t signo) {
 %
 %#ifdef __USE_XOPEN2K8
 @@>> psignal(3)
-@@Same as `fprintf(stderr, "%s: %s\n", s, strsignal_s(signo) ?: strdupf("Unknown signal %d", signo))'
+@@Same as `fprintf(stderr, "%s: %s\n", s, sigabbrev_np(signo) ? "SIG"+. : strdupf("Unknown signal %d", signo))'
 @@When `s' is `NULL' or an empty string, omit the leading "%s: " from the format.
 [[guard, decl_include("<bits/types.h>")]]
 [[requires_include("<__crt.h>")]]
 [[requires(!defined(__NO_STDSTREAMS) && $has_function(fprintf))]]
 void psignal($signo_t signo, [[nullable]] char const *s) {
-	char const *signam = strsignal_s(signo);
+	char const *signam = sigabbrev_np(signo);
 	if (s && *s)
 		fprintf(stderr, "%s: ", s);
 	if (signam) {
-		fprintf(stderr, "%s\n", signam);
+		fprintf(stderr, "SIG%s\n", signam);
 	} else {
 		fprintf(stderr, "Unknown signal %d\n", signo);
 	}
@@ -1890,11 +1890,11 @@ void psignal($signo_t signo, [[nullable]] char const *s) {
 void psiginfo([[nonnull]] siginfo_t const *pinfo,
               [[nullable]] char const *s) {
 	char const *text;
-	text = strsignal_s(pinfo->@si_signo@);
+	text = sigabbrev_np(pinfo->@si_signo@);
 	if (s && *s)
 		fprintf(stderr, "%s: ", s);
 	if (text) {
-		fprintf(stderr, "%s (", text);
+		fprintf(stderr, "SIG%s (", text);
 @@pp_if $has_function(__libc_current_sigrtmin) && $has_function(__libc_current_sigrtmax)@@
 	} else if (pinfo->@si_signo@ >= __libc_current_sigrtmin() &&
 	           pinfo->@si_signo@ <= __libc_current_sigrtmax()) {
@@ -2676,21 +2676,7 @@ DEFINE___PRIVATE_SIGSET_VALIDATE_SIGNO
 
 %
 %#ifdef __USE_NETBSD
-@@>> signalname(3)
-@@Same as `strsignal_s(3)', but don't include the leading
-@@`SIG*' prefix normally prepended before the signal name.
-[[crt_dos_variant, wunused, nothrow, const]]
-char const *signalname($signo_t signum) {
-	char const *result;
-	result = strsignal_s(signum);
-	if (result) {
-		if (result[0] == 'S' &&
-		    result[1] == 'I' &&
-		    result[2] == 'G')
-			result += 3;
-	}
-	return result;
-}
+%[insert:function(signalname = sigabbrev_np)]
 
 @@>> signalnumber(3)
 @@Similar to `strtosigno(3)', however ignore any leading `SIG*'
@@ -2705,7 +2691,7 @@ $signo_t signalnumber([[nonnull]] const char *name) {
 	    (name[2] == 'G' || name[2] == 'g'))
 		name += 3;
 	for (i = 1; i < __NSIG; ++i) {
-		char const *s = signalname(i);
+		char const *s = sigabbrev_np(i);
 		if (likely(s) && strcasecmp(s, name) == 0) {
 			result = i;
 			break;

@@ -2164,19 +2164,14 @@ done:
 	return result;
 }
 #else /* __KERNEL__ || ... */
-#define get_signo_name(signo) strsignal_s(signo)
+#define get_signo_name(signo) sigabbrev_np(signo)
 #endif /* !__KERNEL__ && !... */
 
 PRIVATE ssize_t CC
 print_signo_t(pformatprinter printer, void *arg, signo_t signo) {
 	char const *name = get_signo_name(signo);
-	if (name) {
-#ifdef __KERNEL__
+	if (name)
 		return format_printf(printer, arg, "SIG%s", name);
-#else /* __KERNEL__ */
-		return (*printer)(arg, name, strlen(name));
-#endif /* !__KERNEL__ */
-	}
 	if (signo >= __SIGRTMIN && signo <= __SIGRTMAX) {
 		return format_printf(printer, arg, "SIGRTMIN+%d",
 		                     (int)(signo - __SIGRTMIN));

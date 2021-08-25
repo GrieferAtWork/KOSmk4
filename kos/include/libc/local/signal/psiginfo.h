@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x42c236dc */
+/* HASH CRC-32:0x921eba1b */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -132,6 +132,35 @@ __NAMESPACE_LOCAL_BEGIN
 #undef __local___localdep_fprintf_defined
 #endif /* !... */
 #endif /* !__local___localdep_fprintf_defined */
+/* Dependency: sigabbrev_np from string */
+#ifndef __local___localdep_sigabbrev_np_defined
+#define __local___localdep_sigabbrev_np_defined 1
+#ifdef __CRT_HAVE_sigabbrev_np
+__NAMESPACE_LOCAL_END
+#include <bits/types.h>
+__NAMESPACE_LOCAL_BEGIN
+/* >> sigabbrev_np(3)
+ * Return the name of a given signal, without the leading `SIG*' prefix.
+ * If the given `signum' isn't recognized, return `NULL' instead. */
+__CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,char const *,__NOTHROW,__localdep_sigabbrev_np,(__signo_t __signum),sigabbrev_np,(__signum))
+#elif defined(__CRT_HAVE_signalname)
+__NAMESPACE_LOCAL_END
+#include <bits/types.h>
+__NAMESPACE_LOCAL_BEGIN
+/* >> sigabbrev_np(3)
+ * Return the name of a given signal, without the leading `SIG*' prefix.
+ * If the given `signum' isn't recognized, return `NULL' instead. */
+__CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,char const *,__NOTHROW,__localdep_sigabbrev_np,(__signo_t __signum),signalname,(__signum))
+#else /* ... */
+__NAMESPACE_LOCAL_END
+#include <libc/local/string/sigabbrev_np.h>
+__NAMESPACE_LOCAL_BEGIN
+/* >> sigabbrev_np(3)
+ * Return the name of a given signal, without the leading `SIG*' prefix.
+ * If the given `signum' isn't recognized, return `NULL' instead. */
+#define __localdep_sigabbrev_np __LIBC_LOCAL_NAME(sigabbrev_np)
+#endif /* !... */
+#endif /* !__local___localdep_sigabbrev_np_defined */
 /* Dependency: strsigcode_s from signal */
 #ifndef __local___localdep_strsigcode_s_defined
 #define __local___localdep_strsigcode_s_defined 1
@@ -152,21 +181,6 @@ __NAMESPACE_LOCAL_BEGIN
 #define __localdep_strsigcode_s __LIBC_LOCAL_NAME(strsigcode_s)
 #endif /* !__CRT_HAVE_strsigcode_s */
 #endif /* !__local___localdep_strsigcode_s_defined */
-/* Dependency: strsignal_s from string */
-#ifndef __local___localdep_strsignal_s_defined
-#define __local___localdep_strsignal_s_defined 1
-#ifdef __CRT_HAVE_strsignal_s
-__NAMESPACE_LOCAL_END
-#include <bits/types.h>
-__NAMESPACE_LOCAL_BEGIN
-__CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,char const *,__NOTHROW,__localdep_strsignal_s,(__signo_t __signum),strsignal_s,(__signum))
-#else /* __CRT_HAVE_strsignal_s */
-__NAMESPACE_LOCAL_END
-#include <libc/local/string/strsignal_s.h>
-__NAMESPACE_LOCAL_BEGIN
-#define __localdep_strsignal_s __LIBC_LOCAL_NAME(strsignal_s)
-#endif /* !__CRT_HAVE_strsignal_s */
-#endif /* !__local___localdep_strsignal_s_defined */
 __NAMESPACE_LOCAL_END
 #include <bits/crt/inttypes.h>
 #include <bits/types.h>
@@ -176,11 +190,11 @@ __NAMESPACE_LOCAL_BEGIN
 __LOCAL_LIBC(psiginfo) __ATTR_NONNULL((1)) void
 __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(psiginfo))(struct __siginfo_struct const *__pinfo, char const *__s) {
 	char const *__text;
-	__text = __localdep_strsignal_s(__pinfo->si_signo);
+	__text = __localdep_sigabbrev_np(__pinfo->si_signo);
 	if (__s && *__s)
 		__localdep_fprintf(__LOCAL_stderr, "%s: ", __s);
 	if (__text) {
-		__localdep_fprintf(__LOCAL_stderr, "%s (", __text);
+		__localdep_fprintf(__LOCAL_stderr, "SIG%s (", __text);
 #if (defined(__CRT_HAVE___libc_current_sigrtmin) || defined(__SIGRTMIN)) && (defined(__CRT_HAVE___libc_current_sigrtmax) || defined(__SIGRTMAX))
 	} else if (__pinfo->si_signo >= __localdep___libc_current_sigrtmin() &&
 	           __pinfo->si_signo <= __localdep___libc_current_sigrtmax()) {

@@ -972,7 +972,7 @@ char *strsignal($signo_t signo) {
 	static char strsignal_buf[64];
 	char *result = strsignal_buf;
 	char const *string;
-	string = strsignal_s(signo);
+	string = sigdescr_np(signo);
 	if (string) {
 		/* Copy the descriptor text. */
 		result[COMPILER_LENOF(strsignal_buf) - 1] = '\0';
@@ -2232,6 +2232,306 @@ char const *strerrorname_np($errno_t errnum) {
 @@pp_if defined(EDEADLK) && (!defined(EDEADLOCK) || EDEADLOCK != EDEADLK)@@
 	case EDEADLK:         result = "EDEADLK"; break;
 @@pp_endif@@
+
+	default:
+		result = NULL;
+		break;
+	}
+	return result;
+}
+
+@@>> sigabbrev_np(3)
+@@Return the name of a given signal, without the leading `SIG*' prefix.
+@@If the given `signum' isn't recognized, return `NULL' instead.
+[[decl_include("<bits/types.h>"), export_alias("signalname")]]
+[[wunused, nothrow, const, section(".text.crt{|.dos}.errno")]]
+[[userimpl, crt_dos_variant, impl_include("<asm/os/signal.h>"), impl_prefix(
+#ifndef ___local_sys_siglist_defined
+#define ___local_sys_siglist_defined 1
+#undef @sys_siglist@
+#undef @_sys_siglist@
+#if defined(__CRT_HAVE___p_sys_siglist)
+#ifndef ____p_sys_siglist_defined
+#define ____p_sys_siglist_defined 1
+__CDECLARE(__ATTR_CONST __ATTR_WUNUSED __ATTR_RETNONNULL,char const *const *,__NOTHROW_NCX,@__p_sys_siglist@,(void),())
+#endif /* !____p_sys_siglist_defined */
+#define @_sys_siglist@ @__p_sys_siglist@()
+#define @sys_siglist@  @__p_sys_siglist@()
+#elif defined(__CRT_HAVE_sys_siglist)
+#if defined(__CRT_HAVE__sys_siglist) || !defined(__NO_ASMNAME)
+__LIBC char const *const @_sys_siglist@[__NSIG] __ASMNAME("sys_siglist");
+#else /* __CRT_HAVE__sys_siglist || !__NO_ASMNAME */
+#define @_sys_siglist@ @sys_siglist@
+#endif /* !__CRT_HAVE__sys_siglist && __NO_ASMNAME */
+__LIBC char const *const @sys_siglist@[__NSIG];
+#elif defined(__CRT_HAVE__sys_siglist)
+#ifndef __NO_ASMNAME
+__LIBC char const *const @sys_siglist@[__NSIG] __ASMNAME("_sys_siglist");
+#else /* !__NO_ASMNAME */
+#define @sys_siglist@ @_sys_siglist@
+#endif /* __NO_ASMNAME */
+__LIBC char const *const @_sys_siglist@[__NSIG];
+#endif /* sys_siglist... */
+#endif /* !___local_sys_siglist_defined */
+)]]
+char const *sigabbrev_np($signo_t signum) {
+#if defined(__CRT_HAVE___p_sys_siglist) || defined(__CRT_HAVE_sys_siglist) || defined(__CRT_HAVE__sys_siglist)
+	return (unsigned int)signum < __NSIG ? @_sys_siglist@[signum] : NULL;
+#else /* __CRT_HAVE___p_sys_siglist || __CRT_HAVE_sys_siglist || __CRT_HAVE__sys_siglist */
+	char const *result;
+	switch (signum) {
+
+#ifdef __SIGABRT_COMPAT
+	case __SIGABRT_COMPAT : result = "SIGABRT_COMPAT"; break;
+#endif /* __SIGABRT_COMPAT */
+#ifdef __SIGBREAK
+	case __SIGBREAK : result = "SIGBREAK"; break;
+#endif /* __SIGBREAK */
+#ifdef __SIGHUP
+	case __SIGHUP   : result = "SIGHUP"; break;
+#endif /* __SIGHUP */
+#ifdef __SIGINT
+	case __SIGINT   : result = "SIGINT"; break;
+#endif /* __SIGINT */
+#ifdef __SIGQUIT
+	case __SIGQUIT  : result = "SIGQUIT"; break;
+#endif /* __SIGQUIT */
+#ifdef __SIGILL
+	case __SIGILL   : result = "SIGILL"; break;
+#endif /* __SIGILL */
+#ifdef __SIGTRAP
+	case __SIGTRAP  : result = "SIGTRAP"; break;
+#endif /* __SIGTRAP */
+#ifdef __SIGABRT
+	case __SIGABRT  : result = "SIGABRT"; break;
+#endif /* __SIGABRT */
+#ifdef __SIGBUS
+	case __SIGBUS   : result = "SIGBUS"; break;
+#endif /* __SIGBUS */
+#ifdef __SIGFPE
+	case __SIGFPE   : result = "SIGFPE"; break;
+#endif /* __SIGFPE */
+#ifdef __SIGKILL
+	case __SIGKILL  : result = "SIGKILL"; break;
+#endif /* __SIGKILL */
+#ifdef __SIGUSR1
+	case __SIGUSR1  : result = "SIGUSR1"; break;
+#endif /* __SIGUSR1 */
+#ifdef __SIGSEGV
+	case __SIGSEGV  : result = "SIGSEGV"; break;
+#endif /* __SIGSEGV */
+#ifdef __SIGUSR2
+	case __SIGUSR2  : result = "SIGUSR2"; break;
+#endif /* __SIGUSR2 */
+#ifdef __SIGPIPE
+	case __SIGPIPE  : result = "SIGPIPE"; break;
+#endif /* __SIGPIPE */
+#ifdef __SIGALRM
+	case __SIGALRM  : result = "SIGALRM"; break;
+#endif /* __SIGALRM */
+#ifdef __SIGTERM
+	case __SIGTERM  : result = "SIGTERM"; break;
+#endif /* __SIGTERM */
+#ifdef __SIGSTKFLT
+	case __SIGSTKFLT: result = "SIGSTKFLT"; break;
+#endif /* __SIGSTKFLT */
+#ifdef __SIGCHLD
+	case __SIGCHLD  : result = "SIGCHLD"; break;
+#endif /* __SIGCHLD */
+#ifdef __SIGCONT
+	case __SIGCONT  : result = "SIGCONT"; break;
+#endif /* __SIGCONT */
+#ifdef __SIGSTOP
+	case __SIGSTOP  : result = "SIGSTOP"; break;
+#endif /* __SIGSTOP */
+#ifdef __SIGTSTP
+	case __SIGTSTP  : result = "SIGTSTP"; break;
+#endif /* __SIGTSTP */
+#ifdef __SIGTTIN
+	case __SIGTTIN  : result = "SIGTTIN"; break;
+#endif /* __SIGTTIN */
+#ifdef __SIGTTOU
+	case __SIGTTOU  : result = "SIGTTOU"; break;
+#endif /* __SIGTTOU */
+#ifdef __SIGURG
+	case __SIGURG   : result = "SIGURG"; break;
+#endif /* __SIGURG */
+#ifdef __SIGXCPU
+	case __SIGXCPU  : result = "SIGXCPU"; break;
+#endif /* __SIGXCPU */
+#ifdef __SIGXFSZ
+	case __SIGXFSZ  : result = "SIGXFSZ"; break;
+#endif /* __SIGXFSZ */
+#ifdef __SIGVTALRM
+	case __SIGVTALRM: result = "SIGVTALRM"; break;
+#endif /* __SIGVTALRM */
+#ifdef __SIGPROF
+	case __SIGPROF  : result = "SIGPROF"; break;
+#endif /* __SIGPROF */
+#ifdef __SIGWINCH
+	case __SIGWINCH : result = "SIGWINCH"; break;
+#endif /* __SIGWINCH */
+#ifdef __SIGIO
+	case __SIGIO    : result = "SIGIO"; break;
+#endif /* __SIGIO */
+#ifdef __SIGSYS
+	case __SIGSYS   : result = "SIGSYS"; break;
+#endif /* __SIGSYS */
+#ifdef __SIGEMT
+	case __SIGEMT   : result = "SIGEMT"; break;
+#endif /* __SIGEMT */
+#ifdef __SIGLOST
+	case __SIGLOST  : result = "SIGLOST"; break;
+#endif /* __SIGLOST */
+#if defined(__SIGCLD) && (!defined(__SIGCHLD) || __SIGCLD != __SIGCHLD)
+	case __SIGCLD   : result = "SIGCLD"; break;
+#endif /* __SIGCLD && (!__SIGCHLD || __SIGCLD != __SIGCHLD) */
+#if defined(__SIGIOT) && (!defined(__SIGABRT) || __SIGIOT != __SIGABRT)
+	case __SIGIOT   : result = "SIGIOT"; break;
+#endif /* __SIGIOT && (!__SIGABRT || __SIGIOT != __SIGABRT) */
+#if defined(__SIGPOLL) && (!defined(__SIGIO) || __SIGPOLL != __SIGIO)
+	case __SIGPOLL   : result = "SIGPOLL"; break;
+#endif /* __SIGPOLL && (!__SIGIO || __SIGPOLL != __SIGIO) */
+#if defined(__SIGPWR) && (!defined(__SIGLOST) || __SIGPWR != __SIGLOST)
+	case __SIGPWR   : result = "SIGPWR"; break;
+#endif /* __SIGPWR && (!__SIGLOST || __SIGPWR != __SIGLOST) */
+
+	default:
+		result = NULL;
+		break;
+	}
+	return result;
+#endif /* !__CRT_HAVE___p_sys_siglist && !__CRT_HAVE_sys_siglist && !__CRT_HAVE__sys_siglist */
+}
+
+@@>> sigdescr_np(3)
+@@Return a description for the given signal.
+@@If the given `signum' isn't recognized, return `NULL' instead.
+[[decl_include("<bits/types.h>")]]
+[[wunused, nothrow, const, section(".text.crt{|.dos}.errno")]]
+[[userimpl, crt_dos_variant, impl_include("<asm/os/signal.h>")]]
+char const *sigdescr_np($signo_t signum) {
+	char const *result;
+	switch (signum) {
+
+#ifdef __SIGABRT_COMPAT
+	case __SIGABRT_COMPAT : result = "Abort"; break;
+#endif /* __SIGABRT_COMPAT */
+#ifdef __SIGBREAK
+	case __SIGBREAK : result = "Background read from tty"; break;
+#endif /* __SIGBREAK */
+#ifdef __SIGHUP
+	case __SIGHUP   : result = "Hangup"; break;
+#endif /* __SIGHUP */
+#ifdef __SIGINT
+	case __SIGINT   : result = "Interrupt"; break;
+#endif /* __SIGINT */
+#ifdef __SIGQUIT
+	case __SIGQUIT  : result = "Quit"; break;
+#endif /* __SIGQUIT */
+#ifdef __SIGILL
+	case __SIGILL   : result = "Illegal instruction"; break;
+#endif /* __SIGILL */
+#ifdef __SIGTRAP
+	case __SIGTRAP  : result = "Trace trap"; break;
+#endif /* __SIGTRAP */
+#ifdef __SIGABRT
+	case __SIGABRT  : result = "Abort"; break;
+#endif /* __SIGABRT */
+#ifdef __SIGBUS
+	case __SIGBUS   : result = "BUS error"; break;
+#endif /* __SIGBUS */
+#ifdef __SIGFPE
+	case __SIGFPE   : result = "Floating-point exception"; break;
+#endif /* __SIGFPE */
+#ifdef __SIGKILL
+	case __SIGKILL  : result = "Kill"; break;
+#endif /* __SIGKILL */
+#ifdef __SIGUSR1
+	case __SIGUSR1  : result = "User-defined signal 1"; break;
+#endif /* __SIGUSR1 */
+#ifdef __SIGSEGV
+	case __SIGSEGV  : result = "Segmentation violation"; break;
+#endif /* __SIGSEGV */
+#ifdef __SIGUSR2
+	case __SIGUSR2  : result = "User-defined signal 2"; break;
+#endif /* __SIGUSR2 */
+#ifdef __SIGPIPE
+	case __SIGPIPE  : result = "Broken pipe"; break;
+#endif /* __SIGPIPE */
+#ifdef __SIGALRM
+	case __SIGALRM  : result = "Alarm clock"; break;
+#endif /* __SIGALRM */
+#ifdef __SIGTERM
+	case __SIGTERM  : result = "Termination"; break;
+#endif /* __SIGTERM */
+#ifdef __SIGSTKFLT
+	case __SIGSTKFLT: result = "Stack fault"; break;
+#endif /* __SIGSTKFLT */
+#if defined(__SIGCHLD) || defined(__SIGCLD)
+#ifdef __SIGCHLD
+	case __SIGCHLD:
+#endif /* __SIGCHLD */
+#if defined(__SIGCLD) && (!defined(__SIGCHLD) || __SIGCLD != __SIGCHLD)
+	case __SIGCLD:
+#endif /* __SIGCLD && (!__SIGCHLD || __SIGCLD != __SIGCHLD) */
+		result = "Child status has changed";
+		break;
+#endif /* __SIGCHLD || __SIGCLD */
+#ifdef __SIGCONT
+	case __SIGCONT  : result = "Continue"; break;
+#endif /* __SIGCONT */
+#ifdef __SIGSTOP
+	case __SIGSTOP  : result = "Stop"; break;
+#endif /* __SIGSTOP */
+#ifdef __SIGTSTP
+	case __SIGTSTP  : result = "Keyboard stop"; break;
+#endif /* __SIGTSTP */
+#ifdef __SIGTTIN
+	case __SIGTTIN  : result = "Background read from tty"; break;
+#endif /* __SIGTTIN */
+#ifdef __SIGTTOU
+	case __SIGTTOU  : result = "Background write to tty"; break;
+#endif /* __SIGTTOU */
+#ifdef __SIGURG
+	case __SIGURG   : result = "Urgent condition on socket"; break;
+#endif /* __SIGURG */
+#ifdef __SIGXCPU
+	case __SIGXCPU  : result = "CPU limit exceeded"; break;
+#endif /* __SIGXCPU */
+#ifdef __SIGXFSZ
+	case __SIGXFSZ  : result = "File size limit exceeded"; break;
+#endif /* __SIGXFSZ */
+#ifdef __SIGVTALRM
+	case __SIGVTALRM: result = "Virtual alarm clock"; break;
+#endif /* __SIGVTALRM */
+#ifdef __SIGPROF
+	case __SIGPROF  : result = "Profiling alarm clock"; break;
+#endif /* __SIGPROF */
+#ifdef __SIGWINCH
+	case __SIGWINCH : result = "Window size change"; break;
+#endif /* __SIGWINCH */
+#ifdef __SIGIO
+	case __SIGIO    : result = "I/O now possible"; break;
+#endif /* __SIGIO */
+#ifdef __SIGSYS
+	case __SIGSYS   : result = "Bad system call"; break;
+#endif /* __SIGSYS */
+#ifdef __SIGEMT
+	case __SIGEMT   : result = "EMT instruction"; break;
+#endif /* __SIGEMT */
+#ifdef __SIGLOST
+	case __SIGLOST  : result = "Resource lost"; break;
+#endif /* __SIGLOST */
+#if defined(__SIGIOT) && (!defined(__SIGABRT) || __SIGIOT != __SIGABRT)
+	case __SIGIOT   : result = "IOT trap"; break;
+#endif /* __SIGIOT && (!__SIGABRT || __SIGIOT != __SIGABRT) */
+#if defined(__SIGPOLL) && (!defined(__SIGIO) || __SIGPOLL != __SIGIO)
+	case __SIGPOLL  : result = "Pollable event occurred"; break;
+#endif /* __SIGPOLL && (!__SIGIO || __SIGPOLL != __SIGIO) */
+#if defined(__SIGPWR) && (!defined(__SIGLOST) || __SIGPWR != __SIGLOST)
+	case __SIGPWR   : result = "Power failure restart"; break;
+#endif /* __SIGPWR && (!__SIGLOST || __SIGPWR != __SIGLOST) */
 
 	default:
 		result = NULL;
@@ -5327,169 +5627,6 @@ char *strcasestr_l([[nonnull]] char const *haystack, [[nonnull]] char const *nee
 %
 
 
-[[decl_include("<bits/types.h>")]]
-[[wunused, nothrow, const, section(".text.crt{|.dos}.errno")]]
-[[userimpl, crt_dos_variant, impl_include("<asm/os/signal.h>"), impl_prefix(
-#ifndef ___local_sys_siglist_defined
-#define ___local_sys_siglist_defined 1
-#undef @sys_siglist@
-#undef @_sys_siglist@
-#if defined(__CRT_HAVE___p_sys_siglist)
-#ifndef ____p_sys_siglist_defined
-#define ____p_sys_siglist_defined 1
-__CDECLARE(__ATTR_CONST __ATTR_WUNUSED __ATTR_RETNONNULL,char const *const *,__NOTHROW_NCX,@__p_sys_siglist@,(void),())
-#endif /* !____p_sys_siglist_defined */
-#define @_sys_siglist@ @__p_sys_siglist@()
-#define @sys_siglist@  @__p_sys_siglist@()
-#elif defined(__CRT_HAVE_sys_siglist)
-#if defined(__CRT_HAVE__sys_siglist) || !defined(__NO_ASMNAME)
-__LIBC char const *const @_sys_siglist@[__NSIG] __ASMNAME("sys_siglist");
-#else /* __CRT_HAVE__sys_siglist || !__NO_ASMNAME */
-#define @_sys_siglist@ @sys_siglist@
-#endif /* !__CRT_HAVE__sys_siglist && __NO_ASMNAME */
-__LIBC char const *const @sys_siglist@[__NSIG];
-#elif defined(__CRT_HAVE__sys_siglist)
-#ifndef __NO_ASMNAME
-__LIBC char const *const @sys_siglist@[__NSIG] __ASMNAME("_sys_siglist");
-#else /* !__NO_ASMNAME */
-#define @sys_siglist@ @_sys_siglist@
-#endif /* __NO_ASMNAME */
-__LIBC char const *const @_sys_siglist@[__NSIG];
-#endif /* sys_siglist... */
-#endif /* !___local_sys_siglist_defined */
-)]]
-char const *strsignal_s($signo_t signum) {
-#if defined(__CRT_HAVE___p_sys_siglist) || defined(__CRT_HAVE_sys_siglist) || defined(__CRT_HAVE__sys_siglist)
-	return (unsigned int)signum < __NSIG ? @_sys_siglist@[signum] : NULL;
-#else /* __CRT_HAVE___p_sys_siglist || __CRT_HAVE_sys_siglist || __CRT_HAVE__sys_siglist */
-	char const *result;
-	switch (signum) {
-
-#ifdef __SIGABRT_COMPAT
-	case __SIGABRT_COMPAT : result = "SIGABRT_COMPAT"; break;
-#endif /* __SIGABRT_COMPAT */
-#ifdef __SIGBREAK
-	case __SIGBREAK : result = "SIGBREAK"; break;
-#endif /* __SIGBREAK */
-#ifdef __SIGHUP
-	case __SIGHUP   : result = "SIGHUP"; break;
-#endif /* __SIGHUP */
-#ifdef __SIGINT
-	case __SIGINT   : result = "SIGINT"; break;
-#endif /* __SIGINT */
-#ifdef __SIGQUIT
-	case __SIGQUIT  : result = "SIGQUIT"; break;
-#endif /* __SIGQUIT */
-#ifdef __SIGILL
-	case __SIGILL   : result = "SIGILL"; break;
-#endif /* __SIGILL */
-#ifdef __SIGTRAP
-	case __SIGTRAP  : result = "SIGTRAP"; break;
-#endif /* __SIGTRAP */
-#ifdef __SIGABRT
-	case __SIGABRT  : result = "SIGABRT"; break;
-#endif /* __SIGABRT */
-#ifdef __SIGBUS
-	case __SIGBUS   : result = "SIGBUS"; break;
-#endif /* __SIGBUS */
-#ifdef __SIGFPE
-	case __SIGFPE   : result = "SIGFPE"; break;
-#endif /* __SIGFPE */
-#ifdef __SIGKILL
-	case __SIGKILL  : result = "SIGKILL"; break;
-#endif /* __SIGKILL */
-#ifdef __SIGUSR1
-	case __SIGUSR1  : result = "SIGUSR1"; break;
-#endif /* __SIGUSR1 */
-#ifdef __SIGSEGV
-	case __SIGSEGV  : result = "SIGSEGV"; break;
-#endif /* __SIGSEGV */
-#ifdef __SIGUSR2
-	case __SIGUSR2  : result = "SIGUSR2"; break;
-#endif /* __SIGUSR2 */
-#ifdef __SIGPIPE
-	case __SIGPIPE  : result = "SIGPIPE"; break;
-#endif /* __SIGPIPE */
-#ifdef __SIGALRM
-	case __SIGALRM  : result = "SIGALRM"; break;
-#endif /* __SIGALRM */
-#ifdef __SIGTERM
-	case __SIGTERM  : result = "SIGTERM"; break;
-#endif /* __SIGTERM */
-#ifdef __SIGSTKFLT
-	case __SIGSTKFLT: result = "SIGSTKFLT"; break;
-#endif /* __SIGSTKFLT */
-#ifdef __SIGCHLD
-	case __SIGCHLD  : result = "SIGCHLD"; break;
-#endif /* __SIGCHLD */
-#ifdef __SIGCONT
-	case __SIGCONT  : result = "SIGCONT"; break;
-#endif /* __SIGCONT */
-#ifdef __SIGSTOP
-	case __SIGSTOP  : result = "SIGSTOP"; break;
-#endif /* __SIGSTOP */
-#ifdef __SIGTSTP
-	case __SIGTSTP  : result = "SIGTSTP"; break;
-#endif /* __SIGTSTP */
-#ifdef __SIGTTIN
-	case __SIGTTIN  : result = "SIGTTIN"; break;
-#endif /* __SIGTTIN */
-#ifdef __SIGTTOU
-	case __SIGTTOU  : result = "SIGTTOU"; break;
-#endif /* __SIGTTOU */
-#ifdef __SIGURG
-	case __SIGURG   : result = "SIGURG"; break;
-#endif /* __SIGURG */
-#ifdef __SIGXCPU
-	case __SIGXCPU  : result = "SIGXCPU"; break;
-#endif /* __SIGXCPU */
-#ifdef __SIGXFSZ
-	case __SIGXFSZ  : result = "SIGXFSZ"; break;
-#endif /* __SIGXFSZ */
-#ifdef __SIGVTALRM
-	case __SIGVTALRM: result = "SIGVTALRM"; break;
-#endif /* __SIGVTALRM */
-#ifdef __SIGPROF
-	case __SIGPROF  : result = "SIGPROF"; break;
-#endif /* __SIGPROF */
-#ifdef __SIGWINCH
-	case __SIGWINCH : result = "SIGWINCH"; break;
-#endif /* __SIGWINCH */
-#ifdef __SIGIO
-	case __SIGIO    : result = "SIGIO"; break;
-#endif /* __SIGIO */
-#ifdef __SIGSYS
-	case __SIGSYS   : result = "SIGSYS"; break;
-#endif /* __SIGSYS */
-#ifdef __SIGEMT
-	case __SIGEMT   : result = "SIGEMT"; break;
-#endif /* __SIGEMT */
-#ifdef __SIGLOST
-	case __SIGLOST  : result = "SIGLOST"; break;
-#endif /* __SIGLOST */
-#if defined(__SIGCLD) && (!defined(__SIGCHLD) || __SIGCLD != __SIGCHLD)
-	case __SIGCLD   : result = "SIGCLD"; break;
-#endif /* __SIGCLD && (!__SIGCHLD || __SIGCLD != __SIGCHLD) */
-#if defined(__SIGIOT) && (!defined(__SIGABRT) || __SIGIOT != __SIGABRT)
-	case __SIGIOT   : result = "SIGIOT"; break;
-#endif /* __SIGIOT && (!__SIGABRT || __SIGIOT != __SIGABRT) */
-#if defined(__SIGPOLL) && (!defined(__SIGIO) || __SIGPOLL != __SIGIO)
-	case __SIGPOLL   : result = "SIGPOLL"; break;
-#endif /* __SIGPOLL && (!__SIGIO || __SIGPOLL != __SIGIO) */
-#if defined(__SIGPWR) && (!defined(__SIGLOST) || __SIGPWR != __SIGLOST)
-	case __SIGPWR   : result = "SIGPWR"; break;
-#endif /* __SIGPWR && (!__SIGLOST || __SIGPWR != __SIGLOST) */
-
-	default:
-		result = NULL;
-		break;
-	}
-	return result;
-#endif /* !__CRT_HAVE___p_sys_siglist && !__CRT_HAVE_sys_siglist && !__CRT_HAVE__sys_siglist */
-}
-
-
-
 [[wunused, ATTR_MALL_DEFAULT_ALIGNED, ATTR_MALLOC, ATTR_LIBC_PRINTF(1, 0)]]
 [[doc_alias("strdupf"), section(".text.crt{|.dos}.heap.strdup")]]
 [[requires_function(vasprintf)]]
@@ -7399,8 +7536,11 @@ int timingsafe_memcmp([[nonnull]] void const *s1,
 [[wunused, pure, impl_include("<asm/os/signal.h>")]]
 $signo_t strtosigno([[nonnull]] const char *name) {
 	$signo_t i, result = 0;
+	if (name[0] != 'S' || name[1] != 'I' || name[2] != 'G')
+		return NULL;
+	name += 3;
 	for (i = 1; i < __NSIG; ++i) {
-		char const *s = strsignal_s(i);
+		char const *s = sigabbrev_np(i);
 		if (likely(s) && strcmp(s, name) == 0) {
 			result = i;
 			break;

@@ -81,7 +81,7 @@ DEFINE_TEST(idata) {
 		assertf(sys_siglist_p == _sys_siglist_p, "%p != %p", sys_siglist_p, _sys_siglist_p);
 		for (i = 0; i < NSIG; ++i) {
 			char const *a = sys_siglist_p[i];
-			char const *b = strsignal_s(i);
+			char const *b = sigdescr_np(i);
 			assertf(a == b,
 			        "i = %u\n"
 			        "a = %p (%q)\n"

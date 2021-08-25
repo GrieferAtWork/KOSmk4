@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x41609708 */
+/* HASH CRC-32:0xa1bf00ca */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -22,24 +22,35 @@
 #define __local_signalnumber_defined 1
 #include <__crt.h>
 __NAMESPACE_LOCAL_BEGIN
-/* Dependency: signalname from signal */
-#ifndef __local___localdep_signalname_defined
-#define __local___localdep_signalname_defined 1
-#ifdef __CRT_HAVE_signalname
-/* >> signalname(3)
- * Same as `strsignal_s(3)', but don't include the leading
- * `SIG*' prefix normally prepended before the signal name. */
-__CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,char const *,__NOTHROW,__localdep_signalname,(__signo_t __signum),signalname,(__signum))
-#else /* __CRT_HAVE_signalname */
+/* Dependency: sigabbrev_np from string */
+#ifndef __local___localdep_sigabbrev_np_defined
+#define __local___localdep_sigabbrev_np_defined 1
+#ifdef __CRT_HAVE_sigabbrev_np
 __NAMESPACE_LOCAL_END
-#include <libc/local/signal/signalname.h>
+#include <bits/types.h>
 __NAMESPACE_LOCAL_BEGIN
-/* >> signalname(3)
- * Same as `strsignal_s(3)', but don't include the leading
- * `SIG*' prefix normally prepended before the signal name. */
-#define __localdep_signalname __LIBC_LOCAL_NAME(signalname)
-#endif /* !__CRT_HAVE_signalname */
-#endif /* !__local___localdep_signalname_defined */
+/* >> sigabbrev_np(3)
+ * Return the name of a given signal, without the leading `SIG*' prefix.
+ * If the given `signum' isn't recognized, return `NULL' instead. */
+__CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,char const *,__NOTHROW,__localdep_sigabbrev_np,(__signo_t __signum),sigabbrev_np,(__signum))
+#elif defined(__CRT_HAVE_signalname)
+__NAMESPACE_LOCAL_END
+#include <bits/types.h>
+__NAMESPACE_LOCAL_BEGIN
+/* >> sigabbrev_np(3)
+ * Return the name of a given signal, without the leading `SIG*' prefix.
+ * If the given `signum' isn't recognized, return `NULL' instead. */
+__CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,char const *,__NOTHROW,__localdep_sigabbrev_np,(__signo_t __signum),signalname,(__signum))
+#else /* ... */
+__NAMESPACE_LOCAL_END
+#include <libc/local/string/sigabbrev_np.h>
+__NAMESPACE_LOCAL_BEGIN
+/* >> sigabbrev_np(3)
+ * Return the name of a given signal, without the leading `SIG*' prefix.
+ * If the given `signum' isn't recognized, return `NULL' instead. */
+#define __localdep_sigabbrev_np __LIBC_LOCAL_NAME(sigabbrev_np)
+#endif /* !... */
+#endif /* !__local___localdep_sigabbrev_np_defined */
 /* Dependency: strcasecmp from string */
 #ifndef __local___localdep_strcasecmp_defined
 #define __local___localdep_strcasecmp_defined 1
@@ -80,7 +91,7 @@ __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(signalnumber))(const char *__name) {
 	    (__name[2] == 'G' || __name[2] == 'g'))
 		__name += 3;
 	for (__i = 1; __i < __NSIG; ++__i) {
-		char const *__s = __localdep_signalname(__i);
+		char const *__s = __localdep_sigabbrev_np(__i);
 		if (__likely(__s) && __localdep_strcasecmp(__s, __name) == 0) {
 			__result = __i;
 			break;

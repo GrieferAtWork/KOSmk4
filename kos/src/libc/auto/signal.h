@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xfd51256a */
+/* HASH CRC-32:0xaff0b5e */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -374,13 +374,13 @@ INTDEF int NOTHROW_NCX(LIBCCALL libc_killpg)(pid_t pgrp, signo_t signo);
 #endif /* !__KERNEL__ */
 #if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
 /* >> psignal(3)
- * Same as `fprintf(stderr, "%s: %s\n", s, strsignal_s(signo) ?: strdupf("Unknown signal %d", signo))'
+ * Same as `fprintf(stderr, "%s: %s\n", s, sigabbrev_np(signo) ? "SIG"+. : strdupf("Unknown signal %d", signo))'
  * When `s' is `NULL' or an empty string, omit the leading "%s: " from the format. */
 INTDEF void NOTHROW_NCX(LIBDCALL libd_psignal)(signo_t signo, char const *s);
 #endif /* !__LIBCCALL_IS_LIBDCALL && !__KERNEL__ */
 #ifndef __KERNEL__
 /* >> psignal(3)
- * Same as `fprintf(stderr, "%s: %s\n", s, strsignal_s(signo) ?: strdupf("Unknown signal %d", signo))'
+ * Same as `fprintf(stderr, "%s: %s\n", s, sigabbrev_np(signo) ? "SIG"+. : strdupf("Unknown signal %d", signo))'
  * When `s' is `NULL' or an empty string, omit the leading "%s: " from the format. */
 INTDEF void NOTHROW_NCX(LIBCCALL libc_psignal)(signo_t signo, char const *s);
 #endif /* !__KERNEL__ */
@@ -527,18 +527,6 @@ INTDEF errno_t NOTHROW_NCX(LIBDCALL libd_pthread_kill)(pthread_t pthread, signo_
  * @return: EINVAL: The given `signo' is invalid
  * @return: ESRCH:  The given `pthread' has already terminated, and could no longer handle the signal */
 INTDEF errno_t NOTHROW_NCX(LIBDCALL libd_pthread_sigqueue)(pthread_t pthread, signo_t signo, union sigval const val);
-#endif /* !__LIBCCALL_IS_LIBDCALL && !__KERNEL__ */
-#ifndef __KERNEL__
-/* >> signalname(3)
- * Same as `strsignal_s(3)', but don't include the leading
- * `SIG*' prefix normally prepended before the signal name. */
-INTDEF ATTR_CONST WUNUSED char const *NOTHROW(LIBDCALL libd_signalname)(signo_t signum);
-/* >> signalname(3)
- * Same as `strsignal_s(3)', but don't include the leading
- * `SIG*' prefix normally prepended before the signal name. */
-INTDEF ATTR_CONST WUNUSED char const *NOTHROW(LIBCCALL libc_signalname)(signo_t signum);
-#endif /* !__KERNEL__ */
-#if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
 /* >> signalnumber(3)
  * Similar to `strtosigno(3)', however ignore any leading `SIG*'
  * prefix of `name', and do a case-insensitive compare between

@@ -186,7 +186,7 @@ NOTHROW(LIBCCALL libc___p_sys_siglist)(void)
 		unsigned int i = NSIG;
 		/* Lazily initialize */
 		for (;;) {
-			result[i] = libc_strsignal_s(i);
+			result[i] = libc_sigdescr_np(i);
 			COMPILER_WRITE_BARRIER();
 			if (!i)
 				break;

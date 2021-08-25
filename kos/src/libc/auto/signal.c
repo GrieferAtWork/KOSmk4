@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xfc80ad3 */
+/* HASH CRC-32:0x76a059e0 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -261,16 +261,16 @@ NOTHROW_NCX(LIBCCALL libc_killpg)(pid_t pgrp,
 	return libc_kill(-pgrp, signo);
 }
 /* >> psignal(3)
- * Same as `fprintf(stderr, "%s: %s\n", s, strsignal_s(signo) ?: strdupf("Unknown signal %d", signo))'
+ * Same as `fprintf(stderr, "%s: %s\n", s, sigabbrev_np(signo) ? "SIG"+. : strdupf("Unknown signal %d", signo))'
  * When `s' is `NULL' or an empty string, omit the leading "%s: " from the format. */
 INTERN ATTR_SECTION(".text.crt.sched.signal") void
 NOTHROW_NCX(LIBCCALL libc_psignal)(signo_t signo,
                                    char const *s) {
-	char const *signam = libc_strsignal_s(signo);
+	char const *signam = libc_sigabbrev_np(signo);
 	if (s && *s)
 		libc_fprintf(stderr, "%s: ", s);
 	if (signam) {
-		libc_fprintf(stderr, "%s\n", signam);
+		libc_fprintf(stderr, "SIG%s\n", signam);
 	} else {
 		libc_fprintf(stderr, "Unknown signal %d\n", signo);
 	}
@@ -283,11 +283,11 @@ INTERN ATTR_SECTION(".text.crt.sched.signal") NONNULL((1)) void
 NOTHROW_NCX(LIBCCALL libc_psiginfo)(siginfo_t const *pinfo,
                                     char const *s) {
 	char const *text;
-	text = libc_strsignal_s(pinfo->si_signo);
+	text = libc_sigabbrev_np(pinfo->si_signo);
 	if (s && *s)
 		libc_fprintf(stderr, "%s: ", s);
 	if (text) {
-		libc_fprintf(stderr, "%s (", text);
+		libc_fprintf(stderr, "SIG%s (", text);
 #if (defined(__CRT_HAVE___libc_current_sigrtmin) || defined(__SIGRTMIN)) && (defined(__CRT_HAVE___libc_current_sigrtmax) || defined(__SIGRTMAX))
 	} else if (pinfo->si_signo >= libc___libc_current_sigrtmin() &&
 	           pinfo->si_signo <= libc___libc_current_sigrtmax()) {
@@ -908,36 +908,6 @@ INTERN ATTR_SECTION(".text.crt.sched.signal") ATTR_CONST WUNUSED signo_t
 NOTHROW_NCX(LIBCCALL libc___libc_current_sigrtmax)(void) {
 	return __SIGRTMAX;
 }
-/* >> signalname(3)
- * Same as `strsignal_s(3)', but don't include the leading
- * `SIG*' prefix normally prepended before the signal name. */
-INTERN ATTR_SECTION(".text.crt.dos.sched.signal") ATTR_CONST WUNUSED char const *
-NOTHROW(LIBDCALL libd_signalname)(signo_t signum) {
-	char const *result;
-	result = libc_strsignal_s(signum);
-	if (result) {
-		if (result[0] == 'S' &&
-		    result[1] == 'I' &&
-		    result[2] == 'G')
-			result += 3;
-	}
-	return result;
-}
-/* >> signalname(3)
- * Same as `strsignal_s(3)', but don't include the leading
- * `SIG*' prefix normally prepended before the signal name. */
-INTERN ATTR_SECTION(".text.crt.sched.signal") ATTR_CONST WUNUSED char const *
-NOTHROW(LIBCCALL libc_signalname)(signo_t signum) {
-	char const *result;
-	result = libc_strsignal_s(signum);
-	if (result) {
-		if (result[0] == 'S' &&
-		    result[1] == 'I' &&
-		    result[2] == 'G')
-			result += 3;
-	}
-	return result;
-}
 /* >> signalnumber(3)
  * Similar to `strtosigno(3)', however ignore any leading `SIG*'
  * prefix of `name', and do a case-insensitive compare between
@@ -951,7 +921,7 @@ NOTHROW_NCX(LIBCCALL libc_signalnumber)(const char *name) {
 	    (name[2] == 'G' || name[2] == 'g'))
 		name += 3;
 	for (i = 1; i < __NSIG; ++i) {
-		char const *s = libc_signalname(i);
+		char const *s = libc_sigabbrev_np(i);
 		if (likely(s) && libc_strcasecmp(s, name) == 0) {
 			result = i;
 			break;
@@ -1013,8 +983,6 @@ DEFINE_PUBLIC_ALIAS(sigignore, libc_sigignore);
 DEFINE_PUBLIC_ALIAS(sigset, libc_sigset);
 DEFINE_PUBLIC_ALIAS(__libc_current_sigrtmin, libc___libc_current_sigrtmin);
 DEFINE_PUBLIC_ALIAS(__libc_current_sigrtmax, libc___libc_current_sigrtmax);
-DEFINE_PUBLIC_ALIAS(DOS$signalname, libd_signalname);
-DEFINE_PUBLIC_ALIAS(signalname, libc_signalname);
 DEFINE_PUBLIC_ALIAS(signalnumber, libc_signalnumber);
 DEFINE_PUBLIC_ALIAS(signalnext, libc_signalnext);
 #endif /* !__KERNEL__ */

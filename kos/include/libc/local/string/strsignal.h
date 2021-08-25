@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x67980f28 */
+/* HASH CRC-32:0x35c5a946 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -23,6 +23,24 @@
 #include <__crt.h>
 #include <bits/types.h>
 __NAMESPACE_LOCAL_BEGIN
+/* Dependency: sigdescr_np from string */
+#ifndef __local___localdep_sigdescr_np_defined
+#define __local___localdep_sigdescr_np_defined 1
+#ifdef __CRT_HAVE_sigdescr_np
+/* >> sigdescr_np(3)
+ * Return a description for the given signal.
+ * If the given `signum' isn't recognized, return `NULL' instead. */
+__CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,char const *,__NOTHROW,__localdep_sigdescr_np,(__signo_t __signum),sigdescr_np,(__signum))
+#else /* __CRT_HAVE_sigdescr_np */
+__NAMESPACE_LOCAL_END
+#include <libc/local/string/sigdescr_np.h>
+__NAMESPACE_LOCAL_BEGIN
+/* >> sigdescr_np(3)
+ * Return a description for the given signal.
+ * If the given `signum' isn't recognized, return `NULL' instead. */
+#define __localdep_sigdescr_np __LIBC_LOCAL_NAME(sigdescr_np)
+#endif /* !__CRT_HAVE_sigdescr_np */
+#endif /* !__local___localdep_sigdescr_np_defined */
 /* Dependency: sprintf from stdio */
 #ifndef __local___localdep_sprintf_defined
 #define __local___localdep_sprintf_defined 1
@@ -95,24 +113,12 @@ __NAMESPACE_LOCAL_BEGIN
 #define __localdep_strncpy __LIBC_LOCAL_NAME(strncpy)
 #endif /* !... */
 #endif /* !__local___localdep_strncpy_defined */
-/* Dependency: strsignal_s from string */
-#ifndef __local___localdep_strsignal_s_defined
-#define __local___localdep_strsignal_s_defined 1
-#ifdef __CRT_HAVE_strsignal_s
-__CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,char const *,__NOTHROW,__localdep_strsignal_s,(__signo_t __signum),strsignal_s,(__signum))
-#else /* __CRT_HAVE_strsignal_s */
-__NAMESPACE_LOCAL_END
-#include <libc/local/string/strsignal_s.h>
-__NAMESPACE_LOCAL_BEGIN
-#define __localdep_strsignal_s __LIBC_LOCAL_NAME(strsignal_s)
-#endif /* !__CRT_HAVE_strsignal_s */
-#endif /* !__local___localdep_strsignal_s_defined */
 __LOCAL_LIBC(strsignal) __ATTR_COLD __ATTR_RETNONNULL __ATTR_WUNUSED char *
 __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(strsignal))(__signo_t __signo) {
 	static char __strsignal_buf[64];
 	char *__result = __strsignal_buf;
 	char const *__string;
-	__string = __localdep_strsignal_s(__signo);
+	__string = __localdep_sigdescr_np(__signo);
 	if (__string) {
 		/* Copy the descriptor text. */
 		__result[__COMPILER_LENOF(__strsignal_buf) - 1] = '\0';
