@@ -73,6 +73,8 @@ function uniEscape(o: int): string {
 	local result = { 0x00A0 : "NBSP" }.get(o);
 	if (result !is none)
 		return italic(result);
+	if (o == 0x2028)
+		return string.chr(0x2424);
 	local result = string.chr(o);
 	if (result.islf())
 		return string.chr(0x2424);

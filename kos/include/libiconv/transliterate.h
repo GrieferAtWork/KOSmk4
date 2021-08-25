@@ -28,7 +28,7 @@
 
 /* Transliteration is the process of enumerating alternative (possibly multi-character)
  * representations of some given unicode character. Using this, it is possible to  e.g.
- * convert a German "ß" into "ss".
+ * convert a German "ß" into "ss" or "ä" into "a".
  * This kind of functionality can be enabled for iconv encoders via `ICONV_ERR_TRANSLIT',
  * but  can  also  be  used  explicitly  via  the  function  exported  from  this header. */
 
