@@ -47,8 +47,9 @@
 
 
 
-#if (defined(__cplusplus) && !defined(_NO_IMPLICIT_GNU_SOURCE) && \
-     !defined(__USE_ISOC_PURE) && !defined(_EVERY_SOURCE) &&      \
+#if (defined(__cplusplus) && !defined(__INTELLISENSE__) &&   \
+     !defined(_NO_IMPLICIT_GNU_SOURCE) &&                    \
+     !defined(__USE_ISOC_PURE) && !defined(_EVERY_SOURCE) && \
      (defined(__GNUC__) || __has_include(<bits/vector.tcc>)))
 /* Hacky  work-around  to satisfy  header requirements  for libstdc++
  * And  before you say that this is a  bad way of doing it, know that

@@ -3361,8 +3361,8 @@
 #define __CRT_HAVE_strerror
 #define __CRT_HAVE_strerror_l
 #define __CRT_HAVE_strerror_r
-#define __CRT_HAVE_strerror_s
-#define __CRT_HAVE_strerrorname_s
+#define __CRT_HAVE_strerrordesc_np
+#define __CRT_HAVE_strerrorname_np
 #define __CRT_HAVE_stresep
 #define __CRT_HAVE_strfmon
 #define __CRT_HAVE_strfmon_l
@@ -5189,8 +5189,8 @@
 #define __CRT_HAVE_KOS$stat64
 #define __CRT_HAVE_KOS$strerror
 #define __CRT_HAVE_KOS$strerror_r
-#define __CRT_HAVE_KOS$strerror_s
-#define __CRT_HAVE_KOS$strerrorname_s
+#define __CRT_HAVE_KOS$strerrordesc_np
+#define __CRT_HAVE_KOS$strerrorname_np
 #define __CRT_HAVE_KOS$strsignal
 #define __CRT_HAVE_KOS$strsignal_s
 #define __CRT_HAVE_KOS$swprintf
@@ -5694,8 +5694,8 @@
 #define __CRT_HAVE_DOS$stat64
 #define __CRT_HAVE_DOS$strerror
 #define __CRT_HAVE_DOS$strerror_r
-#define __CRT_HAVE_DOS$strerror_s
-#define __CRT_HAVE_DOS$strerrorname_s
+#define __CRT_HAVE_DOS$strerrordesc_np
+#define __CRT_HAVE_DOS$strerrorname_np
 #define __CRT_HAVE_DOS$strsignal
 #define __CRT_HAVE_DOS$strsignal_s
 #define __CRT_HAVE_DOS$swprintf

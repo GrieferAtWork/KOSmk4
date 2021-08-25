@@ -64,12 +64,12 @@ DEFINE_TEST(fparseln_works) {
 	unsigned int empty_lines = 0;
 	char *line;
 	FILE *fp = fmemopen((char *)text, COMPILER_STRLEN(text), "r");
-	assertf(fp, "%d:%s:%s", errno, strerrorname_s(errno), strerror_s(errno));
+	assertf(fp, "%d:%s:%s", errno, strerrorname_np(errno), strerrordesc_np(errno));
 	for (;;) {
 		unsigned long lno;
 		char *endptr;
 		line = fparseln(fp, NULL, NULL, NULL, FPARSELN_UNESCALL);
-		assertf(line, "%d:%s:%s", errno, strerrorname_s(errno), strerror_s(errno));
+		assertf(line, "%d:%s:%s", errno, strerrorname_np(errno), strerrordesc_np(errno));
 		if (!*line) {
 			free(line);
 			if (readlines == 6) {

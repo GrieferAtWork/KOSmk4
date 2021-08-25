@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xff49a27 */
+/* HASH CRC-32:0xa8a5a337 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -18,15 +18,15 @@
  *    misrepresented as being the original software.                          *
  * 3. This notice may not be removed or altered from any source distribution. *
  */
-#ifndef __local_strerror_s_defined
-#define __local_strerror_s_defined 1
+#ifndef __local_strerrordesc_np_defined
+#define __local_strerrordesc_np_defined 1
 #include <__crt.h>
 #include <bits/types.h>
 #ifndef ___local_sys_errlist_defined
 #define ___local_sys_errlist_defined 1
 #if defined(__CRT_HAVE__sys_errlist) && defined(__CRT_HAVE__sys_nerr)
-__LIBC char const *const ___sys_errlist[];
-__LIBC int ___sys_nerr;
+__LIBC char const *const _sys_errlist[];
+__LIBC int _sys_nerr;
 #elif defined(__CRT_HAVE___sys_errlist) && defined(__CRT_HAVE___sys_nerr)
 __LIBC __ATTR_WUNUSED __ATTR_CONST char const *const *(__LIBCCALL __sys_errlist)(void);
 __LIBC __ATTR_WUNUSED __ATTR_CONST int *(__LIBCCALL __sys_nerr)(void);
@@ -35,8 +35,8 @@ __LIBC __ATTR_WUNUSED __ATTR_CONST int *(__LIBCCALL __sys_nerr)(void);
 #endif /* !... */
 #endif /* !___local_sys_errlist_defined */
 __NAMESPACE_LOCAL_BEGIN
-__LOCAL_LIBC(strerror_s) __ATTR_CONST __ATTR_WUNUSED char const *
-__NOTHROW(__LIBCCALL __LIBC_LOCAL_NAME(strerror_s))(__errno_t __errnum) {
+__LOCAL_LIBC(strerrordesc_np) __ATTR_CONST __ATTR_WUNUSED char const *
+__NOTHROW(__LIBCCALL __LIBC_LOCAL_NAME(strerrordesc_np))(__errno_t __errnum) {
 #if defined(__CRT_HAVE__sys_errlist) && defined(__CRT_HAVE__sys_nerr)
 	return (unsigned int)__errnum < (unsigned int)_sys_nerr ? _sys_errlist[__errnum] : __NULLPTR;
 #elif defined(__CRT_HAVE___sys_errlist) && defined(__CRT_HAVE___sys_nerr)
@@ -480,8 +480,8 @@ __NOTHROW(__LIBCCALL __LIBC_LOCAL_NAME(strerror_s))(__errno_t __errnum) {
 #endif /* !... */
 }
 __NAMESPACE_LOCAL_END
-#ifndef __local___localdep_strerror_s_defined
-#define __local___localdep_strerror_s_defined 1
-#define __localdep_strerror_s __LIBC_LOCAL_NAME(strerror_s)
-#endif /* !__local___localdep_strerror_s_defined */
-#endif /* !__local_strerror_s_defined */
+#ifndef __local___localdep_strerrordesc_np_defined
+#define __local___localdep_strerrordesc_np_defined 1
+#define __localdep_strerrordesc_np __LIBC_LOCAL_NAME(strerrordesc_np)
+#endif /* !__local___localdep_strerrordesc_np_defined */
+#endif /* !__local_strerrordesc_np_defined */

@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x6f6d2a79 */
+/* HASH CRC-32:0x69806a27 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -60,18 +60,18 @@ __NAMESPACE_LOCAL_BEGIN
 #define __localdep_sprintf __LIBC_LOCAL_NAME(sprintf)
 #endif /* !... */
 #endif /* !__local___localdep_sprintf_defined */
-/* Dependency: strerror_s from string */
-#ifndef __local___localdep_strerror_s_defined
-#define __local___localdep_strerror_s_defined 1
-#ifdef __CRT_HAVE_strerror_s
-__CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,char const *,__NOTHROW,__localdep_strerror_s,(__errno_t __errnum),strerror_s,(__errnum))
-#else /* __CRT_HAVE_strerror_s */
+/* Dependency: strerrordesc_np from string */
+#ifndef __local___localdep_strerrordesc_np_defined
+#define __local___localdep_strerrordesc_np_defined 1
+#ifdef __CRT_HAVE_strerrordesc_np
+__CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,char const *,__NOTHROW,__localdep_strerrordesc_np,(__errno_t __errnum),strerrordesc_np,(__errnum))
+#else /* __CRT_HAVE_strerrordesc_np */
 __NAMESPACE_LOCAL_END
-#include <libc/local/string/strerror_s.h>
+#include <libc/local/string/strerrordesc_np.h>
 __NAMESPACE_LOCAL_BEGIN
-#define __localdep_strerror_s __LIBC_LOCAL_NAME(strerror_s)
-#endif /* !__CRT_HAVE_strerror_s */
-#endif /* !__local___localdep_strerror_s_defined */
+#define __localdep_strerrordesc_np __LIBC_LOCAL_NAME(strerrordesc_np)
+#endif /* !__CRT_HAVE_strerrordesc_np */
+#endif /* !__local___localdep_strerrordesc_np_defined */
 /* Dependency: strncpy from string */
 #ifndef __local___localdep_strncpy_defined
 #define __local___localdep_strncpy_defined 1
@@ -113,7 +113,7 @@ __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(strerror))(__errno_t __errnum) {
 	char *__result;
 	char const *__string;
 	__result = __strerror_buf;
-	__string = __localdep_strerror_s(__errnum);
+	__string = __localdep_strerrordesc_np(__errnum);
 	if (__string) {
 		/* Copy the descriptor text. */
 		__result[__COMPILER_LENOF(__strerror_buf) - 1] = '\0';

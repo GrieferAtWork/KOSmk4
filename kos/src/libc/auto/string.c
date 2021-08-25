@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x37a77a35 */
+/* HASH CRC-32:0xaef0eda9 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -349,7 +349,7 @@ NOTHROW_NCX(LIBDCALL libd_strerror)(errno_t errnum) {
 	char *result;
 	char const *string;
 	result = strerror_buf;
-	string = libc_strerror_s(errnum);
+	string = libc_strerrordesc_np(errnum);
 	if (string) {
 		/* Copy the descriptor text. */
 		result[COMPILER_LENOF(strerror_buf) - 1] = '\0';
@@ -365,7 +365,7 @@ NOTHROW_NCX(LIBCCALL libc_strerror)(errno_t errnum) {
 	char *result;
 	char const *string;
 	result = strerror_buf;
-	string = libc_strerror_s(errnum);
+	string = libc_strerrordesc_np(errnum);
 	if (string) {
 		/* Copy the descriptor text. */
 		result[COMPILER_LENOF(strerror_buf) - 1] = '\0';
@@ -758,7 +758,7 @@ NOTHROW_NCX(LIBDCALL libd_strerror_r)(errno_t errnum,
 		goto fallback;
 	if (!buflen)
 		goto fallback;
-	string = libc_strerror_s(errnum);
+	string = libc_strerrordesc_np(errnum);
 	if (string) {
 		/* Copy the descriptor text. */
 		size_t msg_len = libc_strlen(string) + 1;
@@ -783,7 +783,7 @@ NOTHROW_NCX(LIBCCALL libc_strerror_r)(errno_t errnum,
 		goto fallback;
 	if (!buflen)
 		goto fallback;
-	string = libc_strerror_s(errnum);
+	string = libc_strerrordesc_np(errnum);
 	if (string) {
 		/* Copy the descriptor text. */
 		size_t msg_len = libc_strlen(string) + 1;
@@ -805,7 +805,7 @@ NOTHROW_NCX(LIBCCALL libc___xpg_strerror_r)(errno_t errnum,
                                             size_t buflen) {
 	size_t msg_len;
 	char const *string;
-	string = libc_strerror_s(errnum);
+	string = libc_strerrordesc_np(errnum);
 	if (!buf)
 		buflen = 0;
 	if (!string) {
@@ -4156,7 +4156,7 @@ NOTHROW_RPC(LIBCCALL libc__strerror_s)(char *__restrict buf,
 	char const *string;
 	size_t reqlen;
 	errno_t eno = __libc_geterrno();
-	string = libc_strerror_s(eno);
+	string = libc_strerrordesc_np(eno);
 	if (string) {
 		if (message) {
 			reqlen = libc_snprintf(buf, buflen, "%s: %s\n", message, string);

@@ -143,10 +143,10 @@ NOTHROW_NCX(LIBCCALL libc_re_compile_pattern)(char const *pattern,
 /*[[[body:libc_re_compile_pattern]]]*/
 {
 	if unlikely(!buffer)
-		return strerrorname_s(EINVAL);
+		return strerrorname_np(EINVAL);
 	buffer->buffer = (unsigned char *)strndup(pattern, length);
 	if unlikely(!buffer->buffer)
-		return strerrorname_s(libc_geterrno());
+		return strerrorname_np(libc_geterrno());
 	return NULL;
 }
 /*[[[end:libc_re_compile_pattern]]]*/

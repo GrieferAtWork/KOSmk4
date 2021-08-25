@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x81de823 */
+/* HASH CRC-32:0x150f6914 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -42,18 +42,18 @@ __NAMESPACE_LOCAL_BEGIN
 #define __localdep_memcpyc __LIBC_LOCAL_NAME(memcpyc)
 #endif /* !__CRT_HAVE_memcpyc */
 #endif /* !__local___localdep_memcpyc_defined */
-/* Dependency: strerror_s from string */
-#ifndef __local___localdep_strerror_s_defined
-#define __local___localdep_strerror_s_defined 1
-#ifdef __CRT_HAVE_strerror_s
-__CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,char const *,__NOTHROW,__localdep_strerror_s,(__errno_t __errnum),strerror_s,(__errnum))
-#else /* __CRT_HAVE_strerror_s */
+/* Dependency: strerrordesc_np from string */
+#ifndef __local___localdep_strerrordesc_np_defined
+#define __local___localdep_strerrordesc_np_defined 1
+#ifdef __CRT_HAVE_strerrordesc_np
+__CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,char const *,__NOTHROW,__localdep_strerrordesc_np,(__errno_t __errnum),strerrordesc_np,(__errnum))
+#else /* __CRT_HAVE_strerrordesc_np */
 __NAMESPACE_LOCAL_END
-#include <libc/local/string/strerror_s.h>
+#include <libc/local/string/strerrordesc_np.h>
 __NAMESPACE_LOCAL_BEGIN
-#define __localdep_strerror_s __LIBC_LOCAL_NAME(strerror_s)
-#endif /* !__CRT_HAVE_strerror_s */
-#endif /* !__local___localdep_strerror_s_defined */
+#define __localdep_strerrordesc_np __LIBC_LOCAL_NAME(strerrordesc_np)
+#endif /* !__CRT_HAVE_strerrordesc_np */
+#endif /* !__local___localdep_strerrordesc_np_defined */
 /* Dependency: strlen from string */
 #ifndef __local___localdep_strlen_defined
 #define __local___localdep_strlen_defined 1
@@ -80,7 +80,7 @@ __LOCAL_LIBC(__xpg_strerror_r) __ATTR_COLD __ATTR_NONNULL((2)) __errno_t
 __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(__xpg_strerror_r))(__errno_t __errnum, char *__buf, __SIZE_TYPE__ __buflen) {
 	__SIZE_TYPE__ __msg_len;
 	char const *__string;
-	__string = __localdep_strerror_s(__errnum);
+	__string = __localdep_strerrordesc_np(__errnum);
 	if (!__buf)
 		__buflen = 0;
 	if (!__string) {

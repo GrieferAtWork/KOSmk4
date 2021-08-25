@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x98d0c83b */
+/* HASH CRC-32:0x6688cae9 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -1687,6 +1687,18 @@ __CREDIRECT(__ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1, 2)),int,__NOTHROW_NCX,
 __NAMESPACE_LOCAL_USING_OR_IMPL(strncasecmp_l, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1, 2)) int __NOTHROW_NCX(__LIBCCALL strncasecmp_l)(char const *__s1, char const *__s2, __SIZE_TYPE__ __maxlen, __locale_t __locale) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(strncasecmp_l))(__s1, __s2, __maxlen, __locale); })
 #endif /* !... */
 #endif /* !__strncasecmp_l_defined */
+#ifdef __CRT_HAVE_strerrordesc_np
+__CDECLARE(__ATTR_CONST __ATTR_WUNUSED,char const *,__NOTHROW,strerrordesc_np,(__errno_t __errnum),(__errnum))
+#else /* __CRT_HAVE_strerrordesc_np */
+#include <libc/local/string/strerrordesc_np.h>
+__NAMESPACE_LOCAL_USING_OR_IMPL(strerrordesc_np, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_CONST __ATTR_WUNUSED char const *__NOTHROW(__LIBCCALL strerrordesc_np)(__errno_t __errnum) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(strerrordesc_np))(__errnum); })
+#endif /* !__CRT_HAVE_strerrordesc_np */
+#ifdef __CRT_HAVE_strerrorname_np
+__CDECLARE(__ATTR_CONST __ATTR_WUNUSED,char const *,__NOTHROW,strerrorname_np,(__errno_t __errnum),(__errnum))
+#else /* __CRT_HAVE_strerrorname_np */
+#include <libc/local/string/strerrorname_np.h>
+__NAMESPACE_LOCAL_USING_OR_IMPL(strerrorname_np, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_CONST __ATTR_WUNUSED char const *__NOTHROW(__LIBCCALL strerrorname_np)(__errno_t __errnum) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(strerrorname_np))(__errnum); })
+#endif /* !__CRT_HAVE_strerrorname_np */
 #endif /* __USE_GNU */
 
 #ifdef __USE_XOPEN2K
@@ -6637,18 +6649,6 @@ __NAMESPACE_LOCAL_USING_OR_IMPL(strcasestr_l, __FORCELOCAL __ATTR_ARTIFICIAL __A
 
 
 
-#ifdef __CRT_HAVE_strerror_s
-__CDECLARE(__ATTR_CONST __ATTR_WUNUSED,char const *,__NOTHROW,strerror_s,(__errno_t __errnum),(__errnum))
-#else /* __CRT_HAVE_strerror_s */
-#include <libc/local/string/strerror_s.h>
-__NAMESPACE_LOCAL_USING_OR_IMPL(strerror_s, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_CONST __ATTR_WUNUSED char const *__NOTHROW(__LIBCCALL strerror_s)(__errno_t __errnum) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(strerror_s))(__errnum); })
-#endif /* !__CRT_HAVE_strerror_s */
-#ifdef __CRT_HAVE_strerrorname_s
-__CDECLARE(__ATTR_CONST __ATTR_WUNUSED,char const *,__NOTHROW,strerrorname_s,(__errno_t __errnum),(__errnum))
-#else /* __CRT_HAVE_strerrorname_s */
-#include <libc/local/string/strerrorname_s.h>
-__NAMESPACE_LOCAL_USING_OR_IMPL(strerrorname_s, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_CONST __ATTR_WUNUSED char const *__NOTHROW(__LIBCCALL strerrorname_s)(__errno_t __errnum) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(strerrorname_s))(__errnum); })
-#endif /* !__CRT_HAVE_strerrorname_s */
 #ifdef __CRT_HAVE_strsignal_s
 __CDECLARE(__ATTR_CONST __ATTR_WUNUSED,char const *,__NOTHROW,strsignal_s,(__signo_t __signum),(__signum))
 #else /* __CRT_HAVE_strsignal_s */

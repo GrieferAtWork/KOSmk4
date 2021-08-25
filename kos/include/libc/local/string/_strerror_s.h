@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xa8d3d0f4 */
+/* HASH CRC-32:0x4a50201d */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -59,24 +59,24 @@ __NAMESPACE_LOCAL_BEGIN
 #define __localdep_snprintf __LIBC_LOCAL_NAME(snprintf)
 #endif /* !... */
 #endif /* !__local___localdep_snprintf_defined */
-/* Dependency: strerror_s from string */
-#ifndef __local___localdep_strerror_s_defined
-#define __local___localdep_strerror_s_defined 1
-#ifdef __CRT_HAVE_strerror_s
-__CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,char const *,__NOTHROW,__localdep_strerror_s,(__errno_t __errnum),strerror_s,(__errnum))
-#else /* __CRT_HAVE_strerror_s */
+/* Dependency: strerrordesc_np from string */
+#ifndef __local___localdep_strerrordesc_np_defined
+#define __local___localdep_strerrordesc_np_defined 1
+#ifdef __CRT_HAVE_strerrordesc_np
+__CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,char const *,__NOTHROW,__localdep_strerrordesc_np,(__errno_t __errnum),strerrordesc_np,(__errnum))
+#else /* __CRT_HAVE_strerrordesc_np */
 __NAMESPACE_LOCAL_END
-#include <libc/local/string/strerror_s.h>
+#include <libc/local/string/strerrordesc_np.h>
 __NAMESPACE_LOCAL_BEGIN
-#define __localdep_strerror_s __LIBC_LOCAL_NAME(strerror_s)
-#endif /* !__CRT_HAVE_strerror_s */
-#endif /* !__local___localdep_strerror_s_defined */
+#define __localdep_strerrordesc_np __LIBC_LOCAL_NAME(strerrordesc_np)
+#endif /* !__CRT_HAVE_strerrordesc_np */
+#endif /* !__local___localdep_strerrordesc_np_defined */
 __LOCAL_LIBC(_strerror_s) __ATTR_NONNULL((1)) __errno_t
 __NOTHROW_RPC(__LIBCCALL __LIBC_LOCAL_NAME(_strerror_s))(char *__restrict __buf, __SIZE_TYPE__ __buflen, char const *__message) {
 	char const *__string;
 	__SIZE_TYPE__ __reqlen;
 	__errno_t __eno = __libc_geterrno();
-	__string = __localdep_strerror_s(__eno);
+	__string = __localdep_strerrordesc_np(__eno);
 	if (__string) {
 		if (__message) {
 			__reqlen = __localdep_snprintf(__buf, __buflen, "%s: %s\n", __message, __string);

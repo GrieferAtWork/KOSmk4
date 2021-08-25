@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x1ce71f69 */
+/* HASH CRC-32:0x100d9385 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -18,14 +18,14 @@
  *    misrepresented as being the original software.                          *
  * 3. This notice may not be removed or altered from any source distribution. *
  */
-#ifndef __local_strerrorname_s_defined
-#define __local_strerrorname_s_defined 1
+#ifndef __local_strerrorname_np_defined
+#define __local_strerrorname_np_defined 1
 #include <__crt.h>
 #include <bits/types.h>
 #include <libc/errno.h>
 __NAMESPACE_LOCAL_BEGIN
-__LOCAL_LIBC(strerrorname_s) __ATTR_CONST __ATTR_WUNUSED char const *
-__NOTHROW(__LIBCCALL __LIBC_LOCAL_NAME(strerrorname_s))(__errno_t __errnum) {
+__LOCAL_LIBC(strerrorname_np) __ATTR_CONST __ATTR_WUNUSED char const *
+__NOTHROW(__LIBCCALL __LIBC_LOCAL_NAME(strerrorname_np))(__errno_t __errnum) {
 	char const *__result;
 	switch (__errnum) {
 
@@ -463,8 +463,8 @@ __NOTHROW(__LIBCCALL __LIBC_LOCAL_NAME(strerrorname_s))(__errno_t __errnum) {
 	return __result;
 }
 __NAMESPACE_LOCAL_END
-#ifndef __local___localdep_strerrorname_s_defined
-#define __local___localdep_strerrorname_s_defined 1
-#define __localdep_strerrorname_s __LIBC_LOCAL_NAME(strerrorname_s)
-#endif /* !__local___localdep_strerrorname_s_defined */
-#endif /* !__local_strerrorname_s_defined */
+#ifndef __local___localdep_strerrorname_np_defined
+#define __local___localdep_strerrorname_np_defined 1
+#define __localdep_strerrorname_np __LIBC_LOCAL_NAME(strerrorname_np)
+#endif /* !__local___localdep_strerrorname_np_defined */
+#endif /* !__local_strerrorname_np_defined */

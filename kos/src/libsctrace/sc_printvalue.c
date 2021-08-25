@@ -4876,7 +4876,7 @@ do_struct_timespecx64:
 				goto done;
 			eno = -eno;
 		}
-		name = strerrorname_s(eno);
+		name = strerrorname_np(eno);
 		if likely(name) {
 			temp = (*printer)(arg, name, strlen(name));
 		} else {

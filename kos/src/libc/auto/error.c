@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x2bbbd078 */
+/* HASH CRC-32:0xc49bbcb3 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -31,11 +31,11 @@
 
 DECL_BEGIN
 
-/* Use the KOS-special `libc_strerror_s()' functions, rather than strerror()
+/* Use the KOS-special `libc_strerrordesc_np()' functions, rather than strerror()
  * below (thus making these functions a bit more light-weight by having just
  * a bit less dependencies) */
-#define strerror        libc_strerror_s
-#define libc_strerror   libc_strerror_s
+#define strerror        libc_strerrordesc_np
+#define libc_strerror   libc_strerrordesc_np
 #include "../libc/globals.h" /* For norel access to global variables */
 #if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
 #include <libc/local/stdstreams.h>

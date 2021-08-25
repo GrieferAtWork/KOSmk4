@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x5b0a7b02 */
+/* HASH CRC-32:0xa27e45a8 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -32,20 +32,20 @@
 #define ____p_sys_siglist_defined 1
 __CDECLARE(__ATTR_CONST __ATTR_WUNUSED __ATTR_RETNONNULL,char const *const *,__NOTHROW_NCX,__p_sys_siglist,(void),())
 #endif /* !____p_sys_siglist_defined */
-#define _sys_siglist  __p_sys_siglist()
-#define sys_siglist   __p_sys_siglist()
+#define _sys_siglist __p_sys_siglist()
+#define sys_siglist  __p_sys_siglist()
 #elif defined(__CRT_HAVE_sys_siglist)
 #if defined(__CRT_HAVE__sys_siglist) || !defined(__NO_ASMNAME)
 __LIBC char const *const _sys_siglist[__NSIG] __ASMNAME("sys_siglist");
 #else /* __CRT_HAVE__sys_siglist || !__NO_ASMNAME */
-#define _sys_siglist  sys_siglist
+#define _sys_siglist sys_siglist
 #endif /* !__CRT_HAVE__sys_siglist && __NO_ASMNAME */
 __LIBC char const *const sys_siglist[__NSIG];
 #elif defined(__CRT_HAVE__sys_siglist)
 #ifndef __NO_ASMNAME
 __LIBC char const *const sys_siglist[__NSIG] __ASMNAME("_sys_siglist");
 #else /* !__NO_ASMNAME */
-#define sys_siglist     _sys_siglist
+#define sys_siglist _sys_siglist
 #endif /* __NO_ASMNAME */
 __LIBC char const *const _sys_siglist[__NSIG];
 #endif /* sys_siglist... */

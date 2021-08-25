@@ -28,11 +28,11 @@
 %[default:section(".text.crt{|.dos}.error")]
 
 %(auto_source){
-/* Use the KOS-special `libc_strerror_s()' functions, rather than strerror()
+/* Use the KOS-special `libc_strerrordesc_np()' functions, rather than strerror()
  * below (thus making these functions a bit more light-weight by having just
  * a bit less dependencies) */
-#define strerror        libc_strerror_s
-#define libc_strerror   libc_strerror_s
+#define strerror        libc_strerrordesc_np
+#define libc_strerror   libc_strerrordesc_np
 #include "../libc/globals.h" /* For norel access to global variables */
 }
 

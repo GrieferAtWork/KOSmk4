@@ -165,25 +165,36 @@ PRIVATE ATTR_SECTION(".rodata.crt.errno") strerror_offset_t const strerror_offse
 };
 
 
-
-/*[[[head:libc_strerrorname_s,hash:CRC-32=0xfe8886ba]]]*/
-INTERN ATTR_SECTION(".text.crt.errno") ATTR_CONST WUNUSED char const *
-NOTHROW(LIBCCALL libc_strerrorname_s)(errno_t errnum)
-/*[[[body:libc_strerrorname_s]]]*/
+/*[[[head:libd_strerrordesc_np,hash:CRC-32=0x41080b08]]]*/
+INTERN ATTR_SECTION(".text.crt.dos.errno") ATTR_CONST WUNUSED char const *
+NOTHROW(LIBDCALL libd_strerrordesc_np)(errno_t errnum)
+/*[[[body:libd_strerrordesc_np]]]*/
 {
 	char const *result;
-	if ((unsigned int)errnum >= COMPILER_LENOF(strerror_offsets_db))
-		return NULL;
-	result = (char const *)((byte_t const *)&strerror_names_db +
-	                        strerror_offsets_db[(unsigned int)errnum]);
+	result = libd_strerrorname_np(errnum);
+	if (result)
+		result = strend(result) + 1;
 	return result;
 }
-/*[[[end:libc_strerrorname_s]]]*/
+/*[[[end:libd_strerrordesc_np]]]*/
 
-/*[[[head:libd_strerrorname_s,hash:CRC-32=0x6b8637d7]]]*/
+/*[[[head:libc_strerrordesc_np,hash:CRC-32=0x729e185c]]]*/
+INTERN ATTR_SECTION(".text.crt.errno") ATTR_CONST WUNUSED char const *
+NOTHROW(LIBCCALL libc_strerrordesc_np)(errno_t errnum)
+/*[[[body:libc_strerrordesc_np]]]*/
+{
+	char const *result;
+	result = libc_strerrorname_np(errnum);
+	if (result)
+		result = strend(result) + 1;
+	return result;
+}
+/*[[[end:libc_strerrordesc_np]]]*/
+
+/*[[[head:libd_strerrorname_np,hash:CRC-32=0xa93cd2d]]]*/
 INTERN ATTR_SECTION(".text.crt.dos.errno") ATTR_CONST WUNUSED char const *
-NOTHROW(LIBDCALL libd_strerrorname_s)(errno_t errnum)
-/*[[[body:libd_strerrorname_s]]]*/
+NOTHROW(LIBDCALL libd_strerrorname_np)(errno_t errnum)
+/*[[[body:libd_strerrorname_np]]]*/
 {
 	/* Special handling for a hand full of errno
 	 * values that don't  have KOS  equivalents. */
@@ -196,35 +207,25 @@ NOTHROW(LIBDCALL libd_strerrorname_s)(errno_t errnum)
 		break;
 	}
 	errnum = libd_errno_dos2kos(errnum);
-	return libc_strerrorname_s(errnum);
+	return libc_strerrorname_np(errnum);
 }
-/*[[[end:libd_strerrorname_s]]]*/
+/*[[[end:libd_strerrorname_np]]]*/
 
-/*[[[head:libc_strerror_s,hash:CRC-32=0x68ec1d4d]]]*/
+/*[[[head:libc_strerrorname_np,hash:CRC-32=0x3905de79]]]*/
 INTERN ATTR_SECTION(".text.crt.errno") ATTR_CONST WUNUSED char const *
-NOTHROW(LIBCCALL libc_strerror_s)(errno_t errnum)
-/*[[[body:libc_strerror_s]]]*/
+NOTHROW(LIBCCALL libc_strerrorname_np)(errno_t errnum)
+/*[[[body:libc_strerrorname_np]]]*/
 {
 	char const *result;
-	result = libc_strerrorname_s(errnum);
-	if (result)
-		result = strend(result) + 1;
+	if ((unsigned int)errnum >= COMPILER_LENOF(strerror_offsets_db))
+		return NULL;
+	result = (char const *)((byte_t const *)&strerror_names_db +
+	                        strerror_offsets_db[(unsigned int)errnum]);
 	return result;
 }
-/*[[[end:libc_strerror_s]]]*/
+/*[[[end:libc_strerrorname_np]]]*/
 
-/*[[[head:libd_strerror_s,hash:CRC-32=0xa1dfa641]]]*/
-INTERN ATTR_SECTION(".text.crt.dos.errno") ATTR_CONST WUNUSED char const *
-NOTHROW(LIBDCALL libd_strerror_s)(errno_t errnum)
-/*[[[body:libd_strerror_s]]]*/
-{
-	char const *result;
-	result = libd_strerrorname_s(errnum);
-	if (result)
-		result = strend(result) + 1;
-	return result;
-}
-/*[[[end:libd_strerror_s]]]*/
+
 
 
 PRIVATE ATTR_SECTION(".rodata.crt.errno")
@@ -289,11 +290,11 @@ NOTHROW(LIBDCALL libd_strsignal_s)(signo_t signum)
 
 
 
-/*[[[start:exports,hash:CRC-32=0xd90888cf]]]*/
-DEFINE_PUBLIC_ALIAS(DOS$strerror_s, libd_strerror_s);
-DEFINE_PUBLIC_ALIAS(strerror_s, libc_strerror_s);
-DEFINE_PUBLIC_ALIAS(DOS$strerrorname_s, libd_strerrorname_s);
-DEFINE_PUBLIC_ALIAS(strerrorname_s, libc_strerrorname_s);
+/*[[[start:exports,hash:CRC-32=0x95229849]]]*/
+DEFINE_PUBLIC_ALIAS(DOS$strerrordesc_np, libd_strerrordesc_np);
+DEFINE_PUBLIC_ALIAS(strerrordesc_np, libc_strerrordesc_np);
+DEFINE_PUBLIC_ALIAS(DOS$strerrorname_np, libd_strerrorname_np);
+DEFINE_PUBLIC_ALIAS(strerrorname_np, libc_strerrorname_np);
 DEFINE_PUBLIC_ALIAS(DOS$strsignal_s, libd_strsignal_s);
 DEFINE_PUBLIC_ALIAS(strsignal_s, libc_strsignal_s);
 /*[[[end:exports]]]*/

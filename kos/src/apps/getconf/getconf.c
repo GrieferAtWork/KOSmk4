@@ -20,6 +20,7 @@
 #ifndef GUARD_APPS_GETCONF_GETCONF_C
 #define GUARD_APPS_GETCONF_GETCONF_C 1
 #define _KOS_SOURCE 1
+#define _GNU_SOURCE 1
 
 #include <hybrid/compiler.h>
 
@@ -509,7 +510,7 @@ printconfval_or_error(fd_t stdout_fileno,
 		        : type == CONFTYPE_CONFSTR
 		          ? "constr"
 		          : "sysconf",
-		        strerror_s(errno));
+		        strerrordesc_np(errno));
 	}
 	return error;
 }

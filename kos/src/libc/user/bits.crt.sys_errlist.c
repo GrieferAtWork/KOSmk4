@@ -71,7 +71,7 @@ NOTHROW(LIBDCALL libd___sys_errlist)(void)
 		/* Lazily initialize */
 		for (;;) {
 			--i;
-			result[i] = libd_strerror_s(i);
+			result[i] = libd_strerrordesc_np(i);
 			COMPILER_WRITE_BARRIER();
 			if (!i)
 				break;
@@ -92,7 +92,7 @@ NOTHROW(LIBCCALL libc___sys_errlist)(void)
 		/* Lazily initialize */
 		for (;;) {
 			--i;
-			result[i] = libc_strerror_s(i);
+			result[i] = libc_strerrordesc_np(i);
 			COMPILER_WRITE_BARRIER();
 			if (!i)
 				break;

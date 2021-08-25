@@ -60,7 +60,7 @@ DEFINE_TEST(idata) {
 	 * regularly  linked  global  data  objects. */
 	for (i = 0; i < (unsigned int)sys_nerr; ++i) {
 		char const *a = sys_errlist[i];
-		char const *b = strerror_s(i);
+		char const *b = strerrordesc_np(i);
 		assertf(a == b,
 		        "i = %u\n"
 		        "a = %p (%q)\n"
