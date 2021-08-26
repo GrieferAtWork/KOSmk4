@@ -78,7 +78,7 @@ __SYSDECL_BEGIN
 #endif /* __POSIX_SPAWN_SETSCHEDULER */
 #ifdef __USE_GNU
 #ifdef __POSIX_SPAWN_USEVFORK
-#define POSIX_SPAWN_USEVFORK __POSIX_SPAWN_USEVFORK /* Ignored */
+#define POSIX_SPAWN_USEVFORK __POSIX_SPAWN_USEVFORK /* Ignored on KOS, which always uses vfork(2) */
 #endif /* __POSIX_SPAWN_USEVFORK */
 #endif /* __USE_GNU */
 
@@ -304,6 +304,32 @@ do_exec:
 						goto child_error;
 					close(tempfd);
 				}
+			}	break;
+@@pp_endif@@
+
+
+@@pp_if !$has_function(chdir)@@
+#define __POSIX_SPAWN_HAVE_UNSUPPORTED_FILE_ACTION 1
+@@pp_else@@
+			case __POSIX_SPAWN_ACTION_CHDIR: {
+				/* Change direction using `chdir(2)' */
+				int error;
+				error = chdir(act->@__sa_action@.@__sa_chdir_action@.@__sa_path@);
+				if unlikely(error != 0)
+					goto child_error;
+			}	break;
+@@pp_endif@@
+
+
+@@pp_if !$has_function(fchdir)@@
+#define __POSIX_SPAWN_HAVE_UNSUPPORTED_FILE_ACTION 1
+@@pp_else@@
+			case __POSIX_SPAWN_ACTION_FCHDIR: {
+				/* Change direction using `fchdir(2)' */
+				int error;
+				error = fchdir(act->@__sa_action@.@__sa_fchdir_action@.@__sa_fd@);
+				if unlikely(error != 0)
+					goto child_error;
 			}	break;
 @@pp_endif@@
 
@@ -984,6 +1010,7 @@ err:
 @@pp_endif@@
 }
 
+%
 %#ifdef __USE_KOS
 @@>> posix_spawn_file_actions_addtcsetpgrp_np(3)
 @@Enqueue a call `tcsetpgrp(fd, getpid())' to be performed by the child process
@@ -1012,6 +1039,7 @@ err:
 }
 %#endif /* __USE_KOS */
 
+%
 %#ifdef __USE_SOLARIS
 @@>> posix_spawn_file_actions_addclosefrom_np(3)
 @@Enqueue a call `closefrom(lowfd)' to be performed by the child process
@@ -1039,6 +1067,66 @@ err:
 @@pp_endif@@
 }
 %#endif /* __USE_SOLARIS */
+
+
+%
+%#ifdef __USE_GNU
+@@>> posix_spawn_file_actions_addchdir_np(3)
+@@Enqueue a call `chdir(path)' to be performed by the child process
+@@@return: 0     : Success
+@@@return: ENOMEM: Insufficient memory to enqueue the action
+[[decl_include("<bits/crt/posix_spawn.h>", "<bits/types.h>")]]
+[[requires_include("<asm/crt/posix_spawn.h>")]]
+[[requires(defined(__POSIX_SPAWN_USE_KOS) && $has_function(posix_spawn_file_actions_alloc))]]
+$errno_t posix_spawn_file_actions_addchdir_np([[nonnull]] posix_spawn_file_actions_t *__restrict file_actions,
+                                              [[nonnull]] const char *__restrict path) {
+	struct __spawn_action *action;
+	if unlikely((path = strdup(path)) == NULL)
+		goto err;
+	action = posix_spawn_file_actions_alloc(file_actions);
+	if unlikely(!action)
+		goto err_path;
+	/* Fill in the new mode. */
+	action->@__sa_tag@ = __POSIX_SPAWN_ACTION_CHDIR;
+	action->@__sa_action@.@__sa_chdir_action@.@__sa_path@ = (char *)path;
+	return 0;
+err_path:
+@@pp_if $has_function(free)@@
+	free((char *)path);
+@@pp_endif@@
+err:
+@@pp_ifdef ENOMEM@@
+	return ENOMEM;
+@@pp_else@@
+	return 1;
+@@pp_endif@@
+}
+
+@@>> posix_spawn_file_actions_addfchdir_np(3)
+@@Enqueue a call `fchdir(dfd)' to be performed by the child process
+@@@return: 0     : Success
+@@@return: ENOMEM: Insufficient memory to enqueue the action
+[[decl_include("<bits/crt/posix_spawn.h>", "<bits/types.h>")]]
+[[requires_include("<asm/crt/posix_spawn.h>")]]
+[[requires(defined(__POSIX_SPAWN_USE_KOS) && $has_function(posix_spawn_file_actions_alloc))]]
+$errno_t posix_spawn_file_actions_addfchdir_np([[nonnull]] posix_spawn_file_actions_t *__restrict file_actions,
+                                               $fd_t dfd) {
+	struct __spawn_action *action;
+	action = posix_spawn_file_actions_alloc(file_actions);
+	if unlikely(!action)
+		goto err;
+	/* Fill in the new mode. */
+	action->@__sa_tag@ = __POSIX_SPAWN_ACTION_FCHDIR;
+	action->@__sa_action@.@__sa_fchdir_action@.@__sa_fd@ = dfd;
+	return 0;
+err:
+@@pp_ifdef ENOMEM@@
+	return ENOMEM;
+@@pp_else@@
+	return 1;
+@@pp_endif@@
+}
+%#endif /* __USE_GNU */
 
 
 /* XXX:

@@ -27,7 +27,7 @@
  * data object, but rather as a  direct invocation of its resolver  function,
  * which in turn would allow its initialization to be delayed until the point
  * of first use.
- * Now that is  good an all,  but we're not  here to have  the headers help  us
+ * Now that is good  and all, but we're  not here to have  the headers help  us
  * write the most optimal  code possible. -  No: we're here  to test the  idata
  * system, meaning that we want these 2 symbols to be linked as actual external
  * data objects.

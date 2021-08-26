@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xf86e94e3 */
+/* HASH CRC-32:0xe4d5cba3 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -200,6 +200,32 @@ do_exec:
 				}
 			}	break;
 #endif /* (__CRT_HAVE_open64 || __CRT_HAVE___open64 || __CRT_HAVE_open || __CRT_HAVE__open || __CRT_HAVE___open || (__AT_FDCWD && (__CRT_HAVE_openat64 || __CRT_HAVE_openat))) && (__CRT_HAVE_dup2 || __CRT_HAVE__dup2 || __CRT_HAVE___dup2) && (__CRT_HAVE_close || __CRT_HAVE__close || __CRT_HAVE___close) */
+
+
+#if !defined(__CRT_HAVE_chdir) && !defined(__CRT_HAVE__chdir)
+#define __POSIX_SPAWN_HAVE_UNSUPPORTED_FILE_ACTION 1
+#else /* !__CRT_HAVE_chdir && !__CRT_HAVE__chdir */
+			case __POSIX_SPAWN_ACTION_CHDIR: {
+				/* Change direction using `chdir(2)' */
+				int error;
+				error = libc_chdir(act->__sa_action.__sa_chdir_action.__sa_path);
+				if unlikely(error != 0)
+					goto child_error;
+			}	break;
+#endif /* __CRT_HAVE_chdir || __CRT_HAVE__chdir */
+
+
+#ifndef __CRT_HAVE_fchdir
+#define __POSIX_SPAWN_HAVE_UNSUPPORTED_FILE_ACTION 1
+#else /* !__CRT_HAVE_fchdir */
+			case __POSIX_SPAWN_ACTION_FCHDIR: {
+				/* Change direction using `fchdir(2)' */
+				int error;
+				error = libc_fchdir(act->__sa_action.__sa_fchdir_action.__sa_fd);
+				if unlikely(error != 0)
+					goto child_error;
+			}	break;
+#endif /* __CRT_HAVE_fchdir */
 
 
 #ifdef __POSIX_SPAWN_ACTION_TCSETPGRP
@@ -850,6 +876,56 @@ err:
 	return 1;
 #endif /* !ENOMEM */
 }
+/* >> posix_spawn_file_actions_addchdir_np(3)
+ * Enqueue a call `chdir(path)' to be performed by the child process
+ * @return: 0     : Success
+ * @return: ENOMEM: Insufficient memory to enqueue the action */
+INTERN ATTR_SECTION(".text.crt.fs.exec.posix_spawn") NONNULL((1, 2)) errno_t
+NOTHROW_NCX(LIBCCALL libc_posix_spawn_file_actions_addchdir_np)(posix_spawn_file_actions_t *__restrict file_actions,
+                                                                const char *__restrict path) {
+	struct __spawn_action *action;
+	if unlikely((path = libc_strdup(path)) == NULL)
+		goto err;
+	action = libc_posix_spawn_file_actions_alloc(file_actions);
+	if unlikely(!action)
+		goto err_path;
+	/* Fill in the new mode. */
+	action->__sa_tag = __POSIX_SPAWN_ACTION_CHDIR;
+	action->__sa_action.__sa_chdir_action.__sa_path = (char *)path;
+	return 0;
+err_path:
+#if defined(__CRT_HAVE_free) || defined(__CRT_HAVE_cfree)
+	libc_free((char *)path);
+#endif /* __CRT_HAVE_free || __CRT_HAVE_cfree */
+err:
+#ifdef ENOMEM
+	return ENOMEM;
+#else /* ENOMEM */
+	return 1;
+#endif /* !ENOMEM */
+}
+/* >> posix_spawn_file_actions_addfchdir_np(3)
+ * Enqueue a call `fchdir(dfd)' to be performed by the child process
+ * @return: 0     : Success
+ * @return: ENOMEM: Insufficient memory to enqueue the action */
+INTERN ATTR_SECTION(".text.crt.fs.exec.posix_spawn") NONNULL((1)) errno_t
+NOTHROW_NCX(LIBCCALL libc_posix_spawn_file_actions_addfchdir_np)(posix_spawn_file_actions_t *__restrict file_actions,
+                                                                 fd_t dfd) {
+	struct __spawn_action *action;
+	action = libc_posix_spawn_file_actions_alloc(file_actions);
+	if unlikely(!action)
+		goto err;
+	/* Fill in the new mode. */
+	action->__sa_tag = __POSIX_SPAWN_ACTION_FCHDIR;
+	action->__sa_action.__sa_fchdir_action.__sa_fd = dfd;
+	return 0;
+err:
+#ifdef ENOMEM
+	return ENOMEM;
+#else /* ENOMEM */
+	return 1;
+#endif /* !ENOMEM */
+}
 #endif /* !__KERNEL__ */
 
 DECL_END
@@ -879,6 +955,8 @@ DEFINE_PUBLIC_ALIAS(posix_spawn_file_actions_addclose, libc_posix_spawn_file_act
 DEFINE_PUBLIC_ALIAS(posix_spawn_file_actions_adddup2, libc_posix_spawn_file_actions_adddup2);
 DEFINE_PUBLIC_ALIAS(posix_spawn_file_actions_addtcsetpgrp_np, libc_posix_spawn_file_actions_addtcsetpgrp_np);
 DEFINE_PUBLIC_ALIAS(posix_spawn_file_actions_addclosefrom_np, libc_posix_spawn_file_actions_addclosefrom_np);
+DEFINE_PUBLIC_ALIAS(posix_spawn_file_actions_addchdir_np, libc_posix_spawn_file_actions_addchdir_np);
+DEFINE_PUBLIC_ALIAS(posix_spawn_file_actions_addfchdir_np, libc_posix_spawn_file_actions_addfchdir_np);
 #endif /* !__KERNEL__ */
 
 #endif /* !GUARD_LIBC_AUTO_SPAWN_C */

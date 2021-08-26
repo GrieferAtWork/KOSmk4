@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x5b1c0077 */
+/* HASH CRC-32:0xc2920e0f */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -74,6 +74,21 @@ __CREDIRECT_VOID(__ATTR_NORETURN,__THROWING,__localdep__Exit,(int __status),exit
 #undef __local___localdep__Exit_defined
 #endif /* !... */
 #endif /* !__local___localdep__Exit_defined */
+/* Dependency: chdir from unistd */
+#ifndef __local___localdep_chdir_defined
+#define __local___localdep_chdir_defined 1
+#ifdef __CRT_HAVE_chdir
+/* >> chdir(2)
+ * Change the current working directory to `path' */
+__CREDIRECT(__ATTR_NONNULL((1)),int,__NOTHROW_RPC,__localdep_chdir,(char const *__path),chdir,(__path))
+#elif defined(__CRT_HAVE__chdir)
+/* >> chdir(2)
+ * Change the current working directory to `path' */
+__CREDIRECT(__ATTR_NONNULL((1)),int,__NOTHROW_RPC,__localdep_chdir,(char const *__path),_chdir,(__path))
+#else /* ... */
+#undef __local___localdep_chdir_defined
+#endif /* !... */
+#endif /* !__local___localdep_chdir_defined */
 /* Dependency: close from unistd */
 #ifndef __local___localdep_close_defined
 #define __local___localdep_close_defined 1
@@ -143,6 +158,13 @@ __CREDIRECT(,__fd_t,__NOTHROW_NCX,__localdep_dup2,(__fd_t __oldfd, __fd_t __newf
 #undef __local___localdep_dup2_defined
 #endif /* !... */
 #endif /* !__local___localdep_dup2_defined */
+/* Dependency: fchdir from unistd */
+#if !defined(__local___localdep_fchdir_defined) && defined(__CRT_HAVE_fchdir)
+#define __local___localdep_fchdir_defined 1
+/* >> chdir(2)
+ * Change the current working directory to `path' */
+__CREDIRECT(,int,__NOTHROW_RPC,__localdep_fchdir,(__fd_t __fd),fchdir,(__fd))
+#endif /* !__local___localdep_fchdir_defined && __CRT_HAVE_fchdir */
 /* Dependency: fexecve from unistd */
 #if !defined(__local___localdep_fexecve_defined) && defined(__CRT_HAVE_fexecve)
 #define __local___localdep_fexecve_defined 1
@@ -982,6 +1004,32 @@ __do_exec:
 				}
 			}	break;
 #endif /* (__CRT_HAVE_open64 || __CRT_HAVE___open64 || __CRT_HAVE_open || __CRT_HAVE__open || __CRT_HAVE___open || (__AT_FDCWD && (__CRT_HAVE_openat64 || __CRT_HAVE_openat))) && (__CRT_HAVE_dup2 || __CRT_HAVE__dup2 || __CRT_HAVE___dup2) && (__CRT_HAVE_close || __CRT_HAVE__close || __CRT_HAVE___close) */
+
+
+#if !defined(__CRT_HAVE_chdir) && !defined(__CRT_HAVE__chdir)
+#define __POSIX_SPAWN_HAVE_UNSUPPORTED_FILE_ACTION 1
+#else /* !__CRT_HAVE_chdir && !__CRT_HAVE__chdir */
+			case __POSIX_SPAWN_ACTION_CHDIR: {
+				/* Change direction using `chdir(2)' */
+				int __error;
+				__error = __localdep_chdir(__act->__sa_action.__sa_chdir_action.__sa_path);
+				if __unlikely(__error != 0)
+					goto __child_error;
+			}	break;
+#endif /* __CRT_HAVE_chdir || __CRT_HAVE__chdir */
+
+
+#ifndef __CRT_HAVE_fchdir
+#define __POSIX_SPAWN_HAVE_UNSUPPORTED_FILE_ACTION 1
+#else /* !__CRT_HAVE_fchdir */
+			case __POSIX_SPAWN_ACTION_FCHDIR: {
+				/* Change direction using `fchdir(2)' */
+				int __error;
+				__error = __localdep_fchdir(__act->__sa_action.__sa_fchdir_action.__sa_fd);
+				if __unlikely(__error != 0)
+					goto __child_error;
+			}	break;
+#endif /* __CRT_HAVE_fchdir */
 
 
 #ifdef __POSIX_SPAWN_ACTION_TCSETPGRP

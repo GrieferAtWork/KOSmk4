@@ -630,7 +630,8 @@ done:
 				atty = &ttydev->at_ansi;
 		}
 		/* Encode a misc. key using the currently active ANSI tty settings. */
-		result = ansitty_translate_misc(atty, (char *)self->kd_pend, result, key, mod);
+		result = ansitty_translate_misc(atty, (char *)self->kd_pend,
+		                                result, key, mod);
 		xdecref_unlikely(tty);
 	}
 	return result;

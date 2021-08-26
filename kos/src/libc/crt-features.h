@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x5b570e27 */
+/* HASH CRC-32:0xc9dfcad9 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -1934,9 +1934,11 @@
 #define __CRT_HAVE_DOS$posix_memalign
 #define __CRT_HAVE_DOS$posix_openpt
 #define __CRT_HAVE_DOS$posix_spawn
+#define __CRT_HAVE_DOS$posix_spawn_file_actions_addchdir_np
 #define __CRT_HAVE_DOS$posix_spawn_file_actions_addclose
 #define __CRT_HAVE_DOS$posix_spawn_file_actions_addclosefrom_np
 #define __CRT_HAVE_DOS$posix_spawn_file_actions_adddup2
+#define __CRT_HAVE_DOS$posix_spawn_file_actions_addfchdir_np
 #define __CRT_HAVE_DOS$posix_spawn_file_actions_addopen
 #define __CRT_HAVE_DOS$posix_spawn_file_actions_addtcsetpgrp_np
 #define __CRT_HAVE_DOS$posix_spawn_file_actions_destroy
@@ -5123,9 +5125,11 @@
 #define __CRT_HAVE_posix_memalign
 #define __CRT_HAVE_posix_openpt
 #define __CRT_HAVE_posix_spawn
+#define __CRT_HAVE_posix_spawn_file_actions_addchdir_np
 #define __CRT_HAVE_posix_spawn_file_actions_addclose
 #define __CRT_HAVE_posix_spawn_file_actions_addclosefrom_np
 #define __CRT_HAVE_posix_spawn_file_actions_adddup2
+#define __CRT_HAVE_posix_spawn_file_actions_addfchdir_np
 #define __CRT_HAVE_posix_spawn_file_actions_addopen
 #define __CRT_HAVE_posix_spawn_file_actions_addtcsetpgrp_np
 #define __CRT_HAVE_posix_spawn_file_actions_alloc

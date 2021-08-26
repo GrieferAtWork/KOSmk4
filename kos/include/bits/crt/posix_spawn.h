@@ -57,12 +57,14 @@ struct __posix_spawnattr {
 /* Data structure to contain information about the actions to  be
  * performed in the new process with respect to file descriptors. */
 #ifdef __POSIX_SPAWN_USE_KOS
-#define __POSIX_SPAWN_ACTION_CLOSE 0 /* Close a file handle */
-#define __POSIX_SPAWN_ACTION_DUP2  1 /* Duplicate a file handle */
-#define __POSIX_SPAWN_ACTION_OPEN  2 /* Open a file using `open(2)' */
+#define __POSIX_SPAWN_ACTION_CLOSE  0 /* Close a file handle */
+#define __POSIX_SPAWN_ACTION_DUP2   1 /* Duplicate a file handle */
+#define __POSIX_SPAWN_ACTION_OPEN   2 /* Open a file using `open(2)' */
+#define __POSIX_SPAWN_ACTION_CHDIR  3 /* Change direction using `chdir(2)' */
+#define __POSIX_SPAWN_ACTION_FCHDIR 4 /* Change direction using `fchdir(2)' */
 #ifdef __CRT_KOS
-#define __POSIX_SPAWN_ACTION_TCSETPGRP 3 /* Call `tcsetpgrp(fd, getpid())' */
-#define __POSIX_SPAWN_ACTION_CLOSEFROM 4 /* Call `closefrom(fd)' */
+#define __POSIX_SPAWN_ACTION_TCSETPGRP 5 /* Call `tcsetpgrp(fd, getpid())' */
+#define __POSIX_SPAWN_ACTION_CLOSEFROM 6 /* Call `closefrom(fd)' */
 #endif /* __CRT_KOS */
 struct __spawn_action {
 	unsigned int __sa_tag; /* Action type (one of `__POSIX_SPAWN_ACTION_*') */
@@ -83,6 +85,14 @@ struct __spawn_action {
 			__oflag_t __sa_oflag; /* Open-flags to pass. */
 			__mode_t  __sa_mode;  /* Open mode. */
 		} __sa_open_action;  /* __POSIX_SPAWN_ACTION_OPEN */
+
+		struct {
+			char *__sa_path;  /* [1..1][owned] Path to chdir(2) to. */
+		} __sa_chdir_action;  /* __POSIX_SPAWN_ACTION_CHDIR */
+
+		struct {
+			__fd_t __sa_fd;   /* Fd to fchdir(2) to. */
+		} __sa_fchdir_action; /* __POSIX_SPAWN_ACTION_FCHDIR */
 
 #ifdef __CRT_KOS
 		struct {

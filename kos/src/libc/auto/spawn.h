@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x92cc2d34 */
+/* HASH CRC-32:0xf13345f1 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -450,6 +450,34 @@ INTDEF NONNULL((1)) errno_t NOTHROW_NCX(LIBDCALL libd_posix_spawn_file_actions_a
  * @return: 0     : Success
  * @return: ENOMEM: Insufficient memory to enqueue the action */
 INTDEF NONNULL((1)) errno_t NOTHROW_NCX(LIBCCALL libc_posix_spawn_file_actions_addclosefrom_np)(posix_spawn_file_actions_t *__restrict file_actions, fd_t lowfd);
+#endif /* !__KERNEL__ */
+#if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
+/* >> posix_spawn_file_actions_addchdir_np(3)
+ * Enqueue a call `chdir(path)' to be performed by the child process
+ * @return: 0     : Success
+ * @return: ENOMEM: Insufficient memory to enqueue the action */
+INTDEF NONNULL((1, 2)) errno_t NOTHROW_NCX(LIBDCALL libd_posix_spawn_file_actions_addchdir_np)(posix_spawn_file_actions_t *__restrict file_actions, const char *__restrict path);
+#endif /* !__LIBCCALL_IS_LIBDCALL && !__KERNEL__ */
+#ifndef __KERNEL__
+/* >> posix_spawn_file_actions_addchdir_np(3)
+ * Enqueue a call `chdir(path)' to be performed by the child process
+ * @return: 0     : Success
+ * @return: ENOMEM: Insufficient memory to enqueue the action */
+INTDEF NONNULL((1, 2)) errno_t NOTHROW_NCX(LIBCCALL libc_posix_spawn_file_actions_addchdir_np)(posix_spawn_file_actions_t *__restrict file_actions, const char *__restrict path);
+#endif /* !__KERNEL__ */
+#if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
+/* >> posix_spawn_file_actions_addfchdir_np(3)
+ * Enqueue a call `fchdir(dfd)' to be performed by the child process
+ * @return: 0     : Success
+ * @return: ENOMEM: Insufficient memory to enqueue the action */
+INTDEF NONNULL((1)) errno_t NOTHROW_NCX(LIBDCALL libd_posix_spawn_file_actions_addfchdir_np)(posix_spawn_file_actions_t *__restrict file_actions, fd_t dfd);
+#endif /* !__LIBCCALL_IS_LIBDCALL && !__KERNEL__ */
+#ifndef __KERNEL__
+/* >> posix_spawn_file_actions_addfchdir_np(3)
+ * Enqueue a call `fchdir(dfd)' to be performed by the child process
+ * @return: 0     : Success
+ * @return: ENOMEM: Insufficient memory to enqueue the action */
+INTDEF NONNULL((1)) errno_t NOTHROW_NCX(LIBCCALL libc_posix_spawn_file_actions_addfchdir_np)(posix_spawn_file_actions_t *__restrict file_actions, fd_t dfd);
 #endif /* !__KERNEL__ */
 
 DECL_END

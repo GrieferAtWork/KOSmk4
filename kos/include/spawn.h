@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x8178ad44 */
+/* HASH CRC-32:0x70db18bf */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -75,7 +75,7 @@ __SYSDECL_BEGIN
 #endif /* __POSIX_SPAWN_SETSCHEDULER */
 #ifdef __USE_GNU
 #ifdef __POSIX_SPAWN_USEVFORK
-#define POSIX_SPAWN_USEVFORK __POSIX_SPAWN_USEVFORK /* Ignored */
+#define POSIX_SPAWN_USEVFORK __POSIX_SPAWN_USEVFORK /* Ignored on KOS, which always uses vfork(2) */
 #endif /* __POSIX_SPAWN_USEVFORK */
 #endif /* __USE_GNU */
 
@@ -517,6 +517,7 @@ __CDECLARE(__ATTR_NONNULL((1)),__errno_t,__NOTHROW_NCX,posix_spawn_file_actions_
  * @return: ENOMEM: Insufficient memory to enqueue the action */
 __NAMESPACE_LOCAL_USING_OR_IMPL(posix_spawn_file_actions_adddup2, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_NONNULL((1)) __errno_t __NOTHROW_NCX(__LIBCCALL posix_spawn_file_actions_adddup2)(posix_spawn_file_actions_t *__restrict __file_actions, __fd_t __oldfd, __fd_t __newfd) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(posix_spawn_file_actions_adddup2))(__file_actions, __oldfd, __newfd); })
 #endif /* ... */
+
 #ifdef __USE_KOS
 #ifdef __CRT_HAVE_posix_spawn_file_actions_addtcsetpgrp_np
 /* >> posix_spawn_file_actions_addtcsetpgrp_np(3)
@@ -533,6 +534,7 @@ __CDECLARE(__ATTR_NONNULL((1)),__errno_t,__NOTHROW_NCX,posix_spawn_file_actions_
 __NAMESPACE_LOCAL_USING_OR_IMPL(posix_spawn_file_actions_addtcsetpgrp_np, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_NONNULL((1)) __errno_t __NOTHROW_NCX(__LIBCCALL posix_spawn_file_actions_addtcsetpgrp_np)(posix_spawn_file_actions_t *__restrict __file_actions, __fd_t __fd) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(posix_spawn_file_actions_addtcsetpgrp_np))(__file_actions, __fd); })
 #endif /* ... */
 #endif /* __USE_KOS */
+
 #ifdef __USE_SOLARIS
 #ifdef __CRT_HAVE_posix_spawn_file_actions_addclosefrom_np
 /* >> posix_spawn_file_actions_addclosefrom_np(3)
@@ -549,6 +551,37 @@ __CDECLARE(__ATTR_NONNULL((1)),__errno_t,__NOTHROW_NCX,posix_spawn_file_actions_
 __NAMESPACE_LOCAL_USING_OR_IMPL(posix_spawn_file_actions_addclosefrom_np, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_NONNULL((1)) __errno_t __NOTHROW_NCX(__LIBCCALL posix_spawn_file_actions_addclosefrom_np)(posix_spawn_file_actions_t *__restrict __file_actions, __fd_t __lowfd) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(posix_spawn_file_actions_addclosefrom_np))(__file_actions, __lowfd); })
 #endif /* ... */
 #endif /* __USE_SOLARIS */
+
+#ifdef __USE_GNU
+#ifdef __CRT_HAVE_posix_spawn_file_actions_addchdir_np
+/* >> posix_spawn_file_actions_addchdir_np(3)
+ * Enqueue a call `chdir(path)' to be performed by the child process
+ * @return: 0     : Success
+ * @return: ENOMEM: Insufficient memory to enqueue the action */
+__CDECLARE(__ATTR_NONNULL((1, 2)),__errno_t,__NOTHROW_NCX,posix_spawn_file_actions_addchdir_np,(posix_spawn_file_actions_t *__restrict __file_actions, const char *__restrict __path),(__file_actions,__path))
+#elif defined(__POSIX_SPAWN_USE_KOS) && defined(__CRT_HAVE_realloc)
+#include <libc/local/spawn/posix_spawn_file_actions_addchdir_np.h>
+/* >> posix_spawn_file_actions_addchdir_np(3)
+ * Enqueue a call `chdir(path)' to be performed by the child process
+ * @return: 0     : Success
+ * @return: ENOMEM: Insufficient memory to enqueue the action */
+__NAMESPACE_LOCAL_USING_OR_IMPL(posix_spawn_file_actions_addchdir_np, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_NONNULL((1, 2)) __errno_t __NOTHROW_NCX(__LIBCCALL posix_spawn_file_actions_addchdir_np)(posix_spawn_file_actions_t *__restrict __file_actions, const char *__restrict __path) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(posix_spawn_file_actions_addchdir_np))(__file_actions, __path); })
+#endif /* ... */
+#ifdef __CRT_HAVE_posix_spawn_file_actions_addfchdir_np
+/* >> posix_spawn_file_actions_addfchdir_np(3)
+ * Enqueue a call `fchdir(dfd)' to be performed by the child process
+ * @return: 0     : Success
+ * @return: ENOMEM: Insufficient memory to enqueue the action */
+__CDECLARE(__ATTR_NONNULL((1)),__errno_t,__NOTHROW_NCX,posix_spawn_file_actions_addfchdir_np,(posix_spawn_file_actions_t *__restrict __file_actions, __fd_t __dfd),(__file_actions,__dfd))
+#elif defined(__POSIX_SPAWN_USE_KOS) && defined(__CRT_HAVE_realloc)
+#include <libc/local/spawn/posix_spawn_file_actions_addfchdir_np.h>
+/* >> posix_spawn_file_actions_addfchdir_np(3)
+ * Enqueue a call `fchdir(dfd)' to be performed by the child process
+ * @return: 0     : Success
+ * @return: ENOMEM: Insufficient memory to enqueue the action */
+__NAMESPACE_LOCAL_USING_OR_IMPL(posix_spawn_file_actions_addfchdir_np, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_NONNULL((1)) __errno_t __NOTHROW_NCX(__LIBCCALL posix_spawn_file_actions_addfchdir_np)(posix_spawn_file_actions_t *__restrict __file_actions, __fd_t __dfd) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(posix_spawn_file_actions_addfchdir_np))(__file_actions, __dfd); })
+#endif /* ... */
+#endif /* __USE_GNU */
 
 #endif /* __CC__ */
 
