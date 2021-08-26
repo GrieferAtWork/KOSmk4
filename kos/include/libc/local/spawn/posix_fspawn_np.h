@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xc2920e0f */
+/* HASH CRC-32:0x82fc7a6 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -955,6 +955,12 @@ __err_join_zombie_child:
 	return __result;
 __do_exec:
 	/* Perform additional actions within the child. */
+#ifdef __COMPILER_HAVE_PRAGMA_PUSHMACRO
+#pragma push_macro("__used")
+#pragma push_macro("__actions")
+#endif /* __COMPILER_HAVE_PRAGMA_PUSHMACRO */
+#undef __used
+#undef __actions
 	if (__file_actions) {
 		unsigned int __i;
 		for (__i = 0; __i < __file_actions->__used; ++__i) {
@@ -1074,6 +1080,10 @@ __do_exec:
 			}
 		}
 	}
+#ifdef __COMPILER_HAVE_PRAGMA_PUSHMACRO
+#pragma pop_macro("__actions")
+#pragma pop_macro("__used")
+#endif /* __COMPILER_HAVE_PRAGMA_PUSHMACRO */
 	if (__attrp) {
 		if (__attrp->__flags & __POSIX_SPAWN_RESETIDS) {
 #if (defined(__CRT_HAVE_seteuid) && defined(__CRT_HAVE_getuid)) || (defined(__CRT_HAVE_setegid) && defined(__CRT_HAVE_getgid))

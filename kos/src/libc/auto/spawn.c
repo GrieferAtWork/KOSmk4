@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xe4d5cba3 */
+/* HASH CRC-32:0x7ab06585 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -151,6 +151,12 @@ err_join_zombie_child:
 	return result;
 do_exec:
 	/* Perform additional actions within the child. */
+#ifdef __COMPILER_HAVE_PRAGMA_PUSHMACRO
+#pragma push_macro("__used")
+#pragma push_macro("__actions")
+#endif /* __COMPILER_HAVE_PRAGMA_PUSHMACRO */
+#undef __used
+#undef __actions
 	if (file_actions) {
 		unsigned int i;
 		for (i = 0; i < file_actions->__used; ++i) {
@@ -270,6 +276,10 @@ do_exec:
 			}
 		}
 	}
+#ifdef __COMPILER_HAVE_PRAGMA_PUSHMACRO
+#pragma pop_macro("__actions")
+#pragma pop_macro("__used")
+#endif /* __COMPILER_HAVE_PRAGMA_PUSHMACRO */
 	if (attrp) {
 		if (attrp->__flags & __POSIX_SPAWN_RESETIDS) {
 #if (defined(__CRT_HAVE_seteuid) && defined(__CRT_HAVE_getuid)) || (defined(__CRT_HAVE_setegid) && defined(__CRT_HAVE_getgid))
@@ -703,6 +713,12 @@ INTERN ATTR_SECTION(".text.crt.fs.exec.posix_spawn") NONNULL((1)) errno_t
 NOTHROW_NCX(LIBCCALL libc_posix_spawn_file_actions_destroy)(posix_spawn_file_actions_t *__restrict file_actions) {
 #if defined(__CRT_HAVE_free) || defined(__CRT_HAVE_cfree)
 	unsigned int i;
+#ifdef __COMPILER_HAVE_PRAGMA_PUSHMACRO
+#pragma push_macro("__used")
+#pragma push_macro("__actions")
+#endif /* __COMPILER_HAVE_PRAGMA_PUSHMACRO */
+#undef __used
+#undef __actions
 	for (i = 0; i < (unsigned int)file_actions->__used; ++i) {
 		struct __spawn_action *act;
 		act = &file_actions->__actions[i];
@@ -717,6 +733,10 @@ NOTHROW_NCX(LIBCCALL libc_posix_spawn_file_actions_destroy)(posix_spawn_file_act
 		}
 	}
 	libc_free(file_actions->__actions);
+#ifdef __COMPILER_HAVE_PRAGMA_PUSHMACRO
+#pragma pop_macro("__actions")
+#pragma pop_macro("__used")
+#endif /* __COMPILER_HAVE_PRAGMA_PUSHMACRO */
 #endif /* __CRT_HAVE_free || __CRT_HAVE_cfree */
 #ifndef NDEBUG
 	libc_memset(file_actions, 0xcc, sizeof(*file_actions));
@@ -727,6 +747,14 @@ NOTHROW_NCX(LIBCCALL libc_posix_spawn_file_actions_destroy)(posix_spawn_file_act
 INTERN ATTR_SECTION(".text.crt.fs.exec.posix_spawn") WUNUSED NONNULL((1)) struct __spawn_action *
 NOTHROW_NCX(LIBCCALL libc_posix_spawn_file_actions_alloc)(posix_spawn_file_actions_t *__restrict file_actions) {
 	struct __spawn_action *result;
+#ifdef __COMPILER_HAVE_PRAGMA_PUSHMACRO
+#pragma push_macro("__used")
+#pragma push_macro("__actions")
+#pragma push_macro("__allocated")
+#endif /* __COMPILER_HAVE_PRAGMA_PUSHMACRO */
+#undef __used
+#undef __actions
+#undef __allocated
 	result = file_actions->__actions;
 	if ((unsigned int)file_actions->__used >= (unsigned int)file_actions->__allocated) {
 		unsigned int newalloc;
@@ -743,6 +771,11 @@ NOTHROW_NCX(LIBCCALL libc_posix_spawn_file_actions_alloc)(posix_spawn_file_actio
 		file_actions->__allocated = newalloc;
 	}
 	result += file_actions->__used++;
+#ifdef __COMPILER_HAVE_PRAGMA_PUSHMACRO
+#pragma pop_macro("__used")
+#pragma pop_macro("__actions")
+#pragma pop_macro("__allocated")
+#endif /* __COMPILER_HAVE_PRAGMA_PUSHMACRO */
 	return result;
 }
 /* >> posix_spawn_file_actions_addopen(3)

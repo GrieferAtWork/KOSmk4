@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xa8a5a337 */
+/* HASH CRC-32:0x1783a6f1 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -25,8 +25,12 @@
 #ifndef ___local_sys_errlist_defined
 #define ___local_sys_errlist_defined 1
 #if defined(__CRT_HAVE__sys_errlist) && defined(__CRT_HAVE__sys_nerr)
+#ifndef _sys_errlist
 __LIBC char const *const _sys_errlist[];
+#endif /* !_sys_errlist */
+#ifndef _sys_nerr
 __LIBC int _sys_nerr;
+#endif /* !_sys_nerr */
 #elif defined(__CRT_HAVE___sys_errlist) && defined(__CRT_HAVE___sys_nerr)
 __LIBC __ATTR_WUNUSED __ATTR_CONST char const *const *(__LIBCCALL __sys_errlist)(void);
 __LIBC __ATTR_WUNUSED __ATTR_CONST int *(__LIBCCALL __sys_nerr)(void);

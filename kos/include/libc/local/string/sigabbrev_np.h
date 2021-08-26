@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xa4d76d91 */
+/* HASH CRC-32:0x16e66b64 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -25,29 +25,39 @@
 #include <asm/os/signal.h>
 #ifndef ___local_sys_siglist_defined
 #define ___local_sys_siglist_defined 1
-#undef sys_siglist
-#undef _sys_siglist
 #if defined(__CRT_HAVE___p_sys_siglist)
 #ifndef ____p_sys_siglist_defined
 #define ____p_sys_siglist_defined 1
 __CDECLARE(__ATTR_CONST __ATTR_WUNUSED __ATTR_RETNONNULL,char const *const *,__NOTHROW_NCX,__p_sys_siglist,(void),())
 #endif /* !____p_sys_siglist_defined */
+#ifndef _sys_siglist
 #define _sys_siglist __p_sys_siglist()
+#endif /* !_sys_siglist */
+#ifndef sys_siglist
 #define sys_siglist  __p_sys_siglist()
+#endif /* !sys_siglist */
 #elif defined(__CRT_HAVE_sys_siglist)
 #if defined(__CRT_HAVE__sys_siglist) || !defined(__NO_ASMNAME)
 __LIBC char const *const _sys_siglist[__NSIG] __ASMNAME("sys_siglist");
 #else /* __CRT_HAVE__sys_siglist || !__NO_ASMNAME */
+#ifndef _sys_siglist
 #define _sys_siglist sys_siglist
+#endif /* !_sys_siglist */
 #endif /* !__CRT_HAVE__sys_siglist && __NO_ASMNAME */
+#ifndef sys_siglist
 __LIBC char const *const sys_siglist[__NSIG];
+#endif /* !sys_siglist */
 #elif defined(__CRT_HAVE__sys_siglist)
+#ifndef sys_siglist
 #ifndef __NO_ASMNAME
 __LIBC char const *const sys_siglist[__NSIG] __ASMNAME("_sys_siglist");
 #else /* !__NO_ASMNAME */
 #define sys_siglist _sys_siglist
 #endif /* __NO_ASMNAME */
+#endif /* !sys_siglist */
+#ifndef _sys_siglist
 __LIBC char const *const _sys_siglist[__NSIG];
+#endif /* !_sys_siglist */
 #endif /* sys_siglist... */
 #endif /* !___local_sys_siglist_defined */
 __NAMESPACE_LOCAL_BEGIN

@@ -1345,8 +1345,12 @@ int strncasecmp_l([[nonnull]] char const *s1,
 #ifndef ___local_sys_errlist_defined
 #define ___local_sys_errlist_defined 1
 #if defined(__CRT_HAVE__sys_errlist) && defined(__CRT_HAVE__sys_nerr)
+#ifndef @_sys_errlist@
 __LIBC char const *const @_sys_errlist@[];
+#endif /* !_sys_errlist */
+#ifndef @_sys_nerr@
 __LIBC int @_sys_nerr@;
+#endif /* !_sys_nerr */
 #elif defined(__CRT_HAVE___sys_errlist) && defined(__CRT_HAVE___sys_nerr)
 __LIBC __ATTR_WUNUSED __ATTR_CONST char const *const *(__LIBCCALL @__sys_errlist@)(void);
 __LIBC __ATTR_WUNUSED __ATTR_CONST int *(__LIBCCALL @__sys_nerr@)(void);
@@ -2248,29 +2252,39 @@ char const *strerrorname_np($errno_t errnum) {
 [[userimpl, crt_dos_variant, impl_include("<asm/os/signal.h>"), impl_prefix(
 #ifndef ___local_sys_siglist_defined
 #define ___local_sys_siglist_defined 1
-#undef @sys_siglist@
-#undef @_sys_siglist@
 #if defined(__CRT_HAVE___p_sys_siglist)
 #ifndef ____p_sys_siglist_defined
 #define ____p_sys_siglist_defined 1
 __CDECLARE(__ATTR_CONST __ATTR_WUNUSED __ATTR_RETNONNULL,char const *const *,__NOTHROW_NCX,@__p_sys_siglist@,(void),())
 #endif /* !____p_sys_siglist_defined */
+#ifndef @_sys_siglist@
 #define @_sys_siglist@ @__p_sys_siglist@()
+#endif /* !_sys_siglist */
+#ifndef @sys_siglist@
 #define @sys_siglist@  @__p_sys_siglist@()
+#endif /* !sys_siglist */
 #elif defined(__CRT_HAVE_sys_siglist)
 #if defined(__CRT_HAVE__sys_siglist) || !defined(__NO_ASMNAME)
 __LIBC char const *const @_sys_siglist@[__NSIG] __ASMNAME("sys_siglist");
 #else /* __CRT_HAVE__sys_siglist || !__NO_ASMNAME */
+#ifndef @_sys_siglist@
 #define @_sys_siglist@ @sys_siglist@
+#endif /* !_sys_siglist */
 #endif /* !__CRT_HAVE__sys_siglist && __NO_ASMNAME */
+#ifndef @sys_siglist@
 __LIBC char const *const @sys_siglist@[__NSIG];
+#endif /* !sys_siglist */
 #elif defined(__CRT_HAVE__sys_siglist)
+#ifndef @sys_siglist@
 #ifndef __NO_ASMNAME
 __LIBC char const *const @sys_siglist@[__NSIG] __ASMNAME("_sys_siglist");
 #else /* !__NO_ASMNAME */
 #define @sys_siglist@ @_sys_siglist@
 #endif /* __NO_ASMNAME */
+#endif /* !sys_siglist */
+#ifndef @_sys_siglist@
 __LIBC char const *const @_sys_siglist@[__NSIG];
+#endif /* !_sys_siglist */
 #endif /* sys_siglist... */
 #endif /* !___local_sys_siglist_defined */
 )]]

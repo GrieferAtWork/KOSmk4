@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xa2b5f941 */
+/* HASH CRC-32:0x4e39b55a */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -45,6 +45,14 @@ __CREDIRECT(__ATTR_MALL_DEFAULT_ALIGNED __ATTR_WUNUSED __ATTR_ALLOC_SIZE((2)),vo
 __LOCAL_LIBC(posix_spawn_file_actions_alloc) __ATTR_WUNUSED __ATTR_NONNULL((1)) struct __spawn_action *
 __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(posix_spawn_file_actions_alloc))(struct __posix_spawn_file_actions *__restrict __file_actions) {
 	struct __spawn_action *__result;
+#ifdef __COMPILER_HAVE_PRAGMA_PUSHMACRO
+#pragma push_macro("__used")
+#pragma push_macro("__actions")
+#pragma push_macro("__allocated")
+#endif /* __COMPILER_HAVE_PRAGMA_PUSHMACRO */
+#undef __used
+#undef __actions
+#undef __allocated
 	__result = __file_actions->__actions;
 	if ((unsigned int)__file_actions->__used >= (unsigned int)__file_actions->__allocated) {
 		unsigned int __newalloc;
@@ -61,6 +69,11 @@ __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(posix_spawn_file_actions_alloc))(stru
 		__file_actions->__allocated = __newalloc;
 	}
 	__result += __file_actions->__used++;
+#ifdef __COMPILER_HAVE_PRAGMA_PUSHMACRO
+#pragma pop_macro("__used")
+#pragma pop_macro("__actions")
+#pragma pop_macro("__allocated")
+#endif /* __COMPILER_HAVE_PRAGMA_PUSHMACRO */
 	return __result;
 }
 __NAMESPACE_LOCAL_END

@@ -257,6 +257,12 @@ err_join_zombie_child:
 	return result;
 do_exec:
 	/* Perform additional actions within the child. */
+#ifdef __COMPILER_HAVE_PRAGMA_PUSHMACRO
+#pragma @push_macro@("__used")
+#pragma @push_macro@("__actions")
+#endif /* __COMPILER_HAVE_PRAGMA_PUSHMACRO */
+#undef @__used@
+#undef @__actions@
 	if (file_actions) {
 		unsigned int i;
 		for (i = 0; i < file_actions->@__used@; ++i) {
@@ -376,6 +382,10 @@ do_exec:
 			}
 		}
 	}
+#ifdef __COMPILER_HAVE_PRAGMA_PUSHMACRO
+#pragma @pop_macro@("__actions")
+#pragma @pop_macro@("__used")
+#endif /* __COMPILER_HAVE_PRAGMA_PUSHMACRO */
 	if (attrp) {
 		if (attrp->@__flags@ & __POSIX_SPAWN_RESETIDS) {
 @@pp_if ($has_function(seteuid) && $has_function(getuid)) || ($has_function(setegid) && $has_function(getgid))@@
@@ -868,6 +878,12 @@ $errno_t posix_spawn_file_actions_init([[nonnull]] posix_spawn_file_actions_t *_
 $errno_t posix_spawn_file_actions_destroy([[nonnull]] posix_spawn_file_actions_t *__restrict file_actions) {
 @@pp_if $has_function(free)@@
 	unsigned int i;
+#ifdef __COMPILER_HAVE_PRAGMA_PUSHMACRO
+#pragma @push_macro@("__used")
+#pragma @push_macro@("__actions")
+#endif /* __COMPILER_HAVE_PRAGMA_PUSHMACRO */
+#undef @__used@
+#undef @__actions@
 	for (i = 0; i < (unsigned int)file_actions->@__used@; ++i) {
 		struct __spawn_action *act;
 		act = &file_actions->@__actions@[i];
@@ -882,6 +898,10 @@ $errno_t posix_spawn_file_actions_destroy([[nonnull]] posix_spawn_file_actions_t
 		}
 	}
 	free(file_actions->@__actions@);
+#ifdef __COMPILER_HAVE_PRAGMA_PUSHMACRO
+#pragma @pop_macro@("__actions")
+#pragma @pop_macro@("__used")
+#endif /* __COMPILER_HAVE_PRAGMA_PUSHMACRO */
 @@pp_endif@@
 @@pp_ifndef NDEBUG@@
 	memset(file_actions, 0xcc, sizeof(*file_actions));
@@ -897,6 +917,14 @@ $errno_t posix_spawn_file_actions_destroy([[nonnull]] posix_spawn_file_actions_t
 [[requires(defined(__POSIX_SPAWN_USE_KOS) && $has_function(realloc))]]
 struct __spawn_action *posix_spawn_file_actions_alloc([[nonnull]] posix_spawn_file_actions_t *__restrict file_actions) {
 	struct __spawn_action *result;
+#ifdef __COMPILER_HAVE_PRAGMA_PUSHMACRO
+#pragma @push_macro@("__used")
+#pragma @push_macro@("__actions")
+#pragma @push_macro@("__allocated")
+#endif /* __COMPILER_HAVE_PRAGMA_PUSHMACRO */
+#undef @__used@
+#undef @__actions@
+#undef @__allocated@
 	result = file_actions->@__actions@;
 	if ((unsigned int)file_actions->@__used@ >= (unsigned int)file_actions->@__allocated@) {
 		unsigned int newalloc;
@@ -913,6 +941,11 @@ struct __spawn_action *posix_spawn_file_actions_alloc([[nonnull]] posix_spawn_fi
 		file_actions->@__allocated@ = newalloc;
 	}
 	result += file_actions->@__used@++;
+#ifdef __COMPILER_HAVE_PRAGMA_PUSHMACRO
+#pragma @pop_macro@("__used")
+#pragma @pop_macro@("__actions")
+#pragma @pop_macro@("__allocated")
+#endif /* __COMPILER_HAVE_PRAGMA_PUSHMACRO */
 	return result;
 }
 

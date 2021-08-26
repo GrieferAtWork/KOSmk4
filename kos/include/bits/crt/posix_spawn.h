@@ -108,12 +108,29 @@ struct __spawn_action {
 };
 #endif /* __POSIX_SPAWN_USE_KOS */
 
+
 struct __posix_spawn_file_actions {
 #ifdef __POSIX_SPAWN_USE_KOS
+#ifdef __COMPILER_HAVE_PRAGMA_PUSHMACRO
+#pragma push_macro("__allocated")
+#pragma push_macro("__used")
+#pragma push_macro("__actions")
+#pragma push_macro("__pad")
+#endif /* __COMPILER_HAVE_PRAGMA_PUSHMACRO */
+#undef __allocated
+#undef __used
+#undef __actions
+#undef __pad
 	__STDC_INT_AS_UINT_T   __allocated;
 	__STDC_INT_AS_UINT_T   __used;
 	struct __spawn_action *__actions;
 	int                    __pad[16];
+#ifdef __COMPILER_HAVE_PRAGMA_PUSHMACRO
+#pragma pop_macro("__pad")
+#pragma pop_macro("__actions")
+#pragma pop_macro("__used")
+#pragma pop_macro("__allocated")
+#endif /* __COMPILER_HAVE_PRAGMA_PUSHMACRO */
 #elif defined(__CRT_CYG)
 	/* TODO: Cygwin structure layout! */
 	int __placeholder[64];

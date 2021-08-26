@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x59d41898 */
+/* HASH CRC-32:0x2a0c39a3 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -66,6 +66,12 @@ __LOCAL_LIBC(posix_spawn_file_actions_destroy) __ATTR_NONNULL((1)) __errno_t
 __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(posix_spawn_file_actions_destroy))(struct __posix_spawn_file_actions *__restrict __file_actions) {
 #if defined(__CRT_HAVE_free) || defined(__CRT_HAVE_cfree)
 	unsigned int __i;
+#ifdef __COMPILER_HAVE_PRAGMA_PUSHMACRO
+#pragma push_macro("__used")
+#pragma push_macro("__actions")
+#endif /* __COMPILER_HAVE_PRAGMA_PUSHMACRO */
+#undef __used
+#undef __actions
 	for (__i = 0; __i < (unsigned int)__file_actions->__used; ++__i) {
 		struct __spawn_action *__act;
 		__act = &__file_actions->__actions[__i];
@@ -80,6 +86,10 @@ __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(posix_spawn_file_actions_destroy))(st
 		}
 	}
 	__localdep_free(__file_actions->__actions);
+#ifdef __COMPILER_HAVE_PRAGMA_PUSHMACRO
+#pragma pop_macro("__actions")
+#pragma pop_macro("__used")
+#endif /* __COMPILER_HAVE_PRAGMA_PUSHMACRO */
 #endif /* __CRT_HAVE_free || __CRT_HAVE_cfree */
 #ifndef __NDEBUG
 	__localdep_memset(__file_actions, 0xcc, sizeof(*__file_actions));
