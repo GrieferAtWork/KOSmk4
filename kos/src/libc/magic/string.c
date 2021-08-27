@@ -2295,120 +2295,233 @@ char const *sigabbrev_np($signo_t signum) {
 	char const *result;
 	switch (signum) {
 
-#ifdef __SIGABRT_COMPAT
-	case __SIGABRT_COMPAT : result = "SIGABRT_COMPAT"; break;
-#endif /* __SIGABRT_COMPAT */
-#ifdef __SIGBREAK
-	case __SIGBREAK : result = "SIGBREAK"; break;
-#endif /* __SIGBREAK */
-#ifdef __SIGHUP
-	case __SIGHUP   : result = "SIGHUP"; break;
-#endif /* __SIGHUP */
-#ifdef __SIGINT
-	case __SIGINT   : result = "SIGINT"; break;
-#endif /* __SIGINT */
-#ifdef __SIGQUIT
-	case __SIGQUIT  : result = "SIGQUIT"; break;
-#endif /* __SIGQUIT */
-#ifdef __SIGILL
-	case __SIGILL   : result = "SIGILL"; break;
-#endif /* __SIGILL */
-#ifdef __SIGTRAP
-	case __SIGTRAP  : result = "SIGTRAP"; break;
-#endif /* __SIGTRAP */
-#ifdef __SIGABRT
-	case __SIGABRT  : result = "SIGABRT"; break;
-#endif /* __SIGABRT */
-#ifdef __SIGBUS
-	case __SIGBUS   : result = "SIGBUS"; break;
-#endif /* __SIGBUS */
-#ifdef __SIGFPE
-	case __SIGFPE   : result = "SIGFPE"; break;
-#endif /* __SIGFPE */
-#ifdef __SIGKILL
-	case __SIGKILL  : result = "SIGKILL"; break;
-#endif /* __SIGKILL */
-#ifdef __SIGUSR1
-	case __SIGUSR1  : result = "SIGUSR1"; break;
-#endif /* __SIGUSR1 */
-#ifdef __SIGSEGV
-	case __SIGSEGV  : result = "SIGSEGV"; break;
-#endif /* __SIGSEGV */
-#ifdef __SIGUSR2
-	case __SIGUSR2  : result = "SIGUSR2"; break;
-#endif /* __SIGUSR2 */
-#ifdef __SIGPIPE
-	case __SIGPIPE  : result = "SIGPIPE"; break;
-#endif /* __SIGPIPE */
-#ifdef __SIGALRM
-	case __SIGALRM  : result = "SIGALRM"; break;
-#endif /* __SIGALRM */
-#ifdef __SIGTERM
-	case __SIGTERM  : result = "SIGTERM"; break;
-#endif /* __SIGTERM */
-#ifdef __SIGSTKFLT
-	case __SIGSTKFLT: result = "SIGSTKFLT"; break;
-#endif /* __SIGSTKFLT */
-#ifdef __SIGCHLD
-	case __SIGCHLD  : result = "SIGCHLD"; break;
-#endif /* __SIGCHLD */
-#ifdef __SIGCONT
-	case __SIGCONT  : result = "SIGCONT"; break;
-#endif /* __SIGCONT */
-#ifdef __SIGSTOP
-	case __SIGSTOP  : result = "SIGSTOP"; break;
-#endif /* __SIGSTOP */
-#ifdef __SIGTSTP
-	case __SIGTSTP  : result = "SIGTSTP"; break;
-#endif /* __SIGTSTP */
-#ifdef __SIGTTIN
-	case __SIGTTIN  : result = "SIGTTIN"; break;
-#endif /* __SIGTTIN */
-#ifdef __SIGTTOU
-	case __SIGTTOU  : result = "SIGTTOU"; break;
-#endif /* __SIGTTOU */
-#ifdef __SIGURG
-	case __SIGURG   : result = "SIGURG"; break;
-#endif /* __SIGURG */
-#ifdef __SIGXCPU
-	case __SIGXCPU  : result = "SIGXCPU"; break;
-#endif /* __SIGXCPU */
-#ifdef __SIGXFSZ
-	case __SIGXFSZ  : result = "SIGXFSZ"; break;
-#endif /* __SIGXFSZ */
-#ifdef __SIGVTALRM
-	case __SIGVTALRM: result = "SIGVTALRM"; break;
-#endif /* __SIGVTALRM */
-#ifdef __SIGPROF
-	case __SIGPROF  : result = "SIGPROF"; break;
-#endif /* __SIGPROF */
-#ifdef __SIGWINCH
-	case __SIGWINCH : result = "SIGWINCH"; break;
-#endif /* __SIGWINCH */
-#ifdef __SIGIO
-	case __SIGIO    : result = "SIGIO"; break;
-#endif /* __SIGIO */
-#ifdef __SIGSYS
-	case __SIGSYS   : result = "SIGSYS"; break;
-#endif /* __SIGSYS */
-#ifdef __SIGEMT
-	case __SIGEMT   : result = "SIGEMT"; break;
-#endif /* __SIGEMT */
-#ifdef __SIGLOST
-	case __SIGLOST  : result = "SIGLOST"; break;
-#endif /* __SIGLOST */
-#if defined(__SIGCLD) && (!defined(__SIGCHLD) || __SIGCLD != __SIGCHLD)
-	case __SIGCLD   : result = "SIGCLD"; break;
-#endif /* __SIGCLD && (!__SIGCHLD || __SIGCLD != __SIGCHLD) */
-#if defined(__SIGIOT) && (!defined(__SIGABRT) || __SIGIOT != __SIGABRT)
-	case __SIGIOT   : result = "SIGIOT"; break;
-#endif /* __SIGIOT && (!__SIGABRT || __SIGIOT != __SIGABRT) */
-#if defined(__SIGPOLL) && (!defined(__SIGIO) || __SIGPOLL != __SIGIO)
-	case __SIGPOLL   : result = "SIGPOLL"; break;
-#endif /* __SIGPOLL && (!__SIGIO || __SIGPOLL != __SIGIO) */
-#if defined(__SIGPWR) && (!defined(__SIGLOST) || __SIGPWR != __SIGLOST)
-	case __SIGPWR   : result = "SIGPWR"; break;
-#endif /* __SIGPWR && (!__SIGLOST || __SIGPWR != __SIGLOST) */
+@@pp_ifdef SIGABRT_COMPAT@@
+	case SIGABRT_COMPAT:
+		result = "SIGABRT_COMPAT";
+		break;
+@@pp_endif@@
+
+@@pp_ifdef SIGBREAK@@
+	case SIGBREAK:
+		result = "SIGBREAK";
+		break;
+@@pp_endif@@
+
+@@pp_ifdef SIGHUP@@
+	case SIGHUP:
+		result = "SIGHUP";
+		break;
+@@pp_endif@@
+
+@@pp_ifdef SIGINT@@
+	case SIGINT:
+		result = "SIGINT";
+		break;
+@@pp_endif@@
+
+@@pp_ifdef SIGQUIT@@
+	case SIGQUIT:
+		result = "SIGQUIT";
+		break;
+@@pp_endif@@
+
+@@pp_ifdef SIGILL@@
+	case SIGILL:
+		result = "SIGILL";
+		break;
+@@pp_endif@@
+
+@@pp_ifdef SIGTRAP@@
+	case SIGTRAP:
+		result = "SIGTRAP";
+		break;
+@@pp_endif@@
+
+@@pp_ifdef SIGABRT@@
+	case SIGABRT:
+		result = "SIGABRT";
+		break;
+@@pp_endif@@
+
+@@pp_ifdef SIGBUS@@
+	case SIGBUS:
+		result = "SIGBUS";
+		break;
+@@pp_endif@@
+
+@@pp_ifdef SIGFPE@@
+	case SIGFPE:
+		result = "SIGFPE";
+		break;
+@@pp_endif@@
+
+@@pp_ifdef SIGKILL@@
+	case SIGKILL:
+		result = "SIGKILL";
+		break;
+@@pp_endif@@
+
+@@pp_ifdef SIGUSR1@@
+	case SIGUSR1:
+		result = "SIGUSR1";
+		break;
+@@pp_endif@@
+
+@@pp_ifdef SIGSEGV@@
+	case SIGSEGV:
+		result = "SIGSEGV";
+		break;
+@@pp_endif@@
+
+@@pp_ifdef SIGUSR2@@
+	case SIGUSR2:
+		result = "SIGUSR2";
+		break;
+@@pp_endif@@
+
+@@pp_ifdef SIGPIPE@@
+	case SIGPIPE:
+		result = "SIGPIPE";
+		break;
+@@pp_endif@@
+
+@@pp_ifdef SIGALRM@@
+	case SIGALRM:
+		result = "SIGALRM";
+		break;
+@@pp_endif@@
+
+@@pp_ifdef SIGTERM@@
+	case SIGTERM:
+		result = "SIGTERM";
+		break;
+@@pp_endif@@
+
+@@pp_ifdef SIGSTKFLT@@
+	case SIGSTKFLT:
+		result = "SIGSTKFLT";
+		break;
+@@pp_endif@@
+
+@@pp_ifdef SIGCHLD@@
+	case SIGCHLD:
+		result = "SIGCHLD";
+		break;
+@@pp_endif@@
+
+@@pp_ifdef SIGCONT@@
+	case SIGCONT:
+		result = "SIGCONT";
+		break;
+@@pp_endif@@
+
+@@pp_ifdef SIGSTOP@@
+	case SIGSTOP:
+		result = "SIGSTOP";
+		break;
+@@pp_endif@@
+
+@@pp_ifdef SIGTSTP@@
+	case SIGTSTP:
+		result = "SIGTSTP";
+		break;
+@@pp_endif@@
+
+@@pp_ifdef SIGTTOU@@
+	case SIGTTOU:
+		result = "SIGTTOU";
+		break;
+@@pp_endif@@
+
+@@pp_ifdef SIGURG@@
+	case SIGURG:
+		result = "SIGURG";
+		break;
+@@pp_endif@@
+
+@@pp_ifdef SIGXCPU@@
+	case SIGXCPU:
+		result = "SIGXCPU";
+		break;
+@@pp_endif@@
+
+@@pp_ifdef SIGXFSZ@@
+	case SIGXFSZ:
+		result = "SIGXFSZ";
+		break;
+@@pp_endif@@
+
+@@pp_ifdef SIGVTALRM@@
+	case SIGVTALRM:
+		result = "SIGVTALRM";
+		break;
+@@pp_endif@@
+
+@@pp_ifdef SIGPROF@@
+	case SIGPROF:
+		result = "SIGPROF";
+		break;
+@@pp_endif@@
+
+@@pp_ifdef SIGWINCH@@
+	case SIGWINCH:
+		result = "SIGWINCH";
+		break;
+@@pp_endif@@
+
+@@pp_ifdef SIGIO@@
+	case SIGIO:
+		result = "SIGIO";
+		break;
+@@pp_endif@@
+
+@@pp_ifdef SIGSYS@@
+	case SIGSYS:
+		result = "SIGSYS";
+		break;
+@@pp_endif@@
+
+@@pp_ifdef SIGEMT@@
+	case SIGEMT:
+		result = "SIGEMT";
+		break;
+@@pp_endif@@
+
+@@pp_ifdef SIGLOST@@
+	case SIGLOST:
+		result = "SIGLOST";
+		break;
+@@pp_endif@@
+
+@@pp_if defined(SIGTTIN) && (!defined(SIGBREAK) || SIGBREAK != SIGTTIN)@@
+	case SIGTTIN:
+		result = "SIGTTIN";
+		break;
+@@pp_endif@@
+
+@@pp_if defined(SIGCLD) && (!defined(SIGCHLD) || SIGCLD != SIGCHLD)@@
+	case SIGCLD:
+		result = "SIGCLD";
+		break;
+@@pp_endif@@
+
+@@pp_if defined(SIGIOT) && (!defined(SIGABRT) || SIGIOT != SIGABRT)@@
+	case SIGIOT:
+		result = "SIGIOT";
+		break;
+@@pp_endif@@
+
+@@pp_if defined(SIGPOLL) && (!defined(SIGIO) || SIGPOLL != SIGIO)@@
+	case SIGPOLL:
+		result = "SIGPOLL";
+		break;
+@@pp_endif@@
+
+@@pp_if defined(SIGPWR) && (!defined(SIGLOST) || SIGPWR != SIGLOST)@@
+	case SIGPWR:
+		result = "SIGPWR";
+		break;
+@@pp_endif@@
 
 	default:
 		result = NULL;
@@ -2428,124 +2541,231 @@ char const *sigdescr_np($signo_t signum) {
 	char const *result;
 	switch (signum) {
 
-#ifdef __SIGABRT_COMPAT
-	case __SIGABRT_COMPAT : result = "Abort"; break;
-#endif /* __SIGABRT_COMPAT */
-#ifdef __SIGBREAK
-	case __SIGBREAK : result = "Background read from tty"; break;
-#endif /* __SIGBREAK */
-#ifdef __SIGHUP
-	case __SIGHUP   : result = "Hangup"; break;
-#endif /* __SIGHUP */
-#ifdef __SIGINT
-	case __SIGINT   : result = "Interrupt"; break;
-#endif /* __SIGINT */
-#ifdef __SIGQUIT
-	case __SIGQUIT  : result = "Quit"; break;
-#endif /* __SIGQUIT */
-#ifdef __SIGILL
-	case __SIGILL   : result = "Illegal instruction"; break;
-#endif /* __SIGILL */
-#ifdef __SIGTRAP
-	case __SIGTRAP  : result = "Trace trap"; break;
-#endif /* __SIGTRAP */
-#ifdef __SIGABRT
-	case __SIGABRT  : result = "Abort"; break;
-#endif /* __SIGABRT */
-#ifdef __SIGBUS
-	case __SIGBUS   : result = "BUS error"; break;
-#endif /* __SIGBUS */
-#ifdef __SIGFPE
-	case __SIGFPE   : result = "Floating-point exception"; break;
-#endif /* __SIGFPE */
-#ifdef __SIGKILL
-	case __SIGKILL  : result = "Kill"; break;
-#endif /* __SIGKILL */
-#ifdef __SIGUSR1
-	case __SIGUSR1  : result = "User-defined signal 1"; break;
-#endif /* __SIGUSR1 */
-#ifdef __SIGSEGV
-	case __SIGSEGV  : result = "Segmentation violation"; break;
-#endif /* __SIGSEGV */
-#ifdef __SIGUSR2
-	case __SIGUSR2  : result = "User-defined signal 2"; break;
-#endif /* __SIGUSR2 */
-#ifdef __SIGPIPE
-	case __SIGPIPE  : result = "Broken pipe"; break;
-#endif /* __SIGPIPE */
-#ifdef __SIGALRM
-	case __SIGALRM  : result = "Alarm clock"; break;
-#endif /* __SIGALRM */
-#ifdef __SIGTERM
-	case __SIGTERM  : result = "Termination"; break;
-#endif /* __SIGTERM */
-#ifdef __SIGSTKFLT
-	case __SIGSTKFLT: result = "Stack fault"; break;
-#endif /* __SIGSTKFLT */
-#if defined(__SIGCHLD) || defined(__SIGCLD)
-#ifdef __SIGCHLD
-	case __SIGCHLD:
-#endif /* __SIGCHLD */
-#if defined(__SIGCLD) && (!defined(__SIGCHLD) || __SIGCLD != __SIGCHLD)
-	case __SIGCLD:
-#endif /* __SIGCLD && (!__SIGCHLD || __SIGCLD != __SIGCHLD) */
-		result = "Child status has changed";
+@@pp_ifdef SIGHUP@@
+	case SIGHUP:
+		result = "Hangup";
 		break;
-#endif /* __SIGCHLD || __SIGCLD */
-#ifdef __SIGCONT
-	case __SIGCONT  : result = "Continue"; break;
-#endif /* __SIGCONT */
-#ifdef __SIGSTOP
-	case __SIGSTOP  : result = "Stop"; break;
-#endif /* __SIGSTOP */
-#ifdef __SIGTSTP
-	case __SIGTSTP  : result = "Keyboard stop"; break;
-#endif /* __SIGTSTP */
-#ifdef __SIGTTIN
-	case __SIGTTIN  : result = "Background read from tty"; break;
-#endif /* __SIGTTIN */
-#ifdef __SIGTTOU
-	case __SIGTTOU  : result = "Background write to tty"; break;
-#endif /* __SIGTTOU */
-#ifdef __SIGURG
-	case __SIGURG   : result = "Urgent condition on socket"; break;
-#endif /* __SIGURG */
-#ifdef __SIGXCPU
-	case __SIGXCPU  : result = "CPU limit exceeded"; break;
-#endif /* __SIGXCPU */
-#ifdef __SIGXFSZ
-	case __SIGXFSZ  : result = "File size limit exceeded"; break;
-#endif /* __SIGXFSZ */
-#ifdef __SIGVTALRM
-	case __SIGVTALRM: result = "Virtual alarm clock"; break;
-#endif /* __SIGVTALRM */
-#ifdef __SIGPROF
-	case __SIGPROF  : result = "Profiling alarm clock"; break;
-#endif /* __SIGPROF */
-#ifdef __SIGWINCH
-	case __SIGWINCH : result = "Window size change"; break;
-#endif /* __SIGWINCH */
-#ifdef __SIGIO
-	case __SIGIO    : result = "I/O now possible"; break;
-#endif /* __SIGIO */
-#ifdef __SIGSYS
-	case __SIGSYS   : result = "Bad system call"; break;
-#endif /* __SIGSYS */
-#ifdef __SIGEMT
-	case __SIGEMT   : result = "EMT instruction"; break;
-#endif /* __SIGEMT */
-#ifdef __SIGLOST
-	case __SIGLOST  : result = "Resource lost"; break;
-#endif /* __SIGLOST */
-#if defined(__SIGIOT) && (!defined(__SIGABRT) || __SIGIOT != __SIGABRT)
-	case __SIGIOT   : result = "IOT trap"; break;
-#endif /* __SIGIOT && (!__SIGABRT || __SIGIOT != __SIGABRT) */
-#if defined(__SIGPOLL) && (!defined(__SIGIO) || __SIGPOLL != __SIGIO)
-	case __SIGPOLL  : result = "Pollable event occurred"; break;
-#endif /* __SIGPOLL && (!__SIGIO || __SIGPOLL != __SIGIO) */
-#if defined(__SIGPWR) && (!defined(__SIGLOST) || __SIGPWR != __SIGLOST)
-	case __SIGPWR   : result = "Power failure restart"; break;
-#endif /* __SIGPWR && (!__SIGLOST || __SIGPWR != __SIGLOST) */
+@@pp_endif@@
+
+@@pp_ifdef SIGINT@@
+	case SIGINT:
+		result = "Interrupt";
+		break;
+@@pp_endif@@
+
+@@pp_ifdef SIGQUIT@@
+	case SIGQUIT:
+		result = "Quit";
+		break;
+@@pp_endif@@
+
+@@pp_ifdef SIGILL@@
+	case SIGILL:
+		result = "Illegal instruction";
+		break;
+@@pp_endif@@
+
+@@pp_ifdef SIGTRAP@@
+	case SIGTRAP:
+		result = "Trace/breakpoint trap";
+		break;
+@@pp_endif@@
+
+@@pp_if defined(SIGABRT) || defined(SIGABRT_COMPAT)@@
+@@pp_ifdef SIGABRT@@
+	case SIGABRT:
+@@pp_endif@@
+@@pp_if defined(SIGABRT_COMPAT) && (!defined(SIGABRT) || SIGABRT_COMPAT != SIGABRT)@@
+	case SIGABRT_COMPAT:
+@@pp_endif@@
+		result = "Aborted";
+		break;
+@@pp_endif@@
+
+@@pp_ifdef SIGBUS@@
+	case SIGBUS:
+		result = "Bus error";
+		break;
+@@pp_endif@@
+
+@@pp_ifdef SIGFPE@@
+	case SIGFPE:
+		result = "Floating point exception";
+		break;
+@@pp_endif@@
+
+@@pp_ifdef SIGKILL@@
+	case SIGKILL:
+		result = "Killed";
+		break;
+@@pp_endif@@
+
+@@pp_ifdef SIGUSR1@@
+	case SIGUSR1:
+		result = "User defined signal 1";
+		break;
+@@pp_endif@@
+
+@@pp_ifdef SIGSEGV@@
+	case SIGSEGV:
+		result = "Segmentation violation";
+		break;
+@@pp_endif@@
+
+@@pp_ifdef SIGUSR2@@
+	case SIGUSR2:
+		result = "User defined signal 2";
+		break;
+@@pp_endif@@
+
+@@pp_ifdef SIGPIPE@@
+	case SIGPIPE:
+		result = "Broken pipe";
+		break;
+@@pp_endif@@
+
+@@pp_ifdef SIGALRM@@
+	case SIGALRM:
+		result = "Alarm clock";
+		break;
+@@pp_endif@@
+
+@@pp_ifdef SIGTERM@@
+	case SIGTERM:
+		result = "Terminated";
+		break;
+@@pp_endif@@
+
+@@pp_ifdef SIGSTKFLT@@
+	case SIGSTKFLT:
+		result = "Stack fault";
+		break;
+@@pp_endif@@
+
+@@pp_if defined(SIGCHLD) || defined(SIGCLD)@@
+@@pp_ifdef SIGCHLD@@
+	case SIGCHLD:
+@@pp_endif@@
+@@pp_if defined(SIGCLD) && (!defined(SIGCHLD) || SIGCLD != SIGCHLD)@@
+	case SIGCLD:
+@@pp_endif@@
+		result = "Child exited";
+		break;
+@@pp_endif@@
+
+@@pp_ifdef SIGCONT@@
+	case SIGCONT:
+		result = "Continued";
+		break;
+@@pp_endif@@
+
+@@pp_ifdef SIGSTOP@@
+	case SIGSTOP:
+		result = "Stopped (signal)";
+		break;
+@@pp_endif@@
+
+@@pp_ifdef SIGTSTP@@
+	case SIGTSTP:
+		result = "Stopped";
+		break;
+@@pp_endif@@
+
+@@pp_if defined(SIGTTIN) || defined(SIGBREAK)@@
+@@pp_ifdef SIGTTIN@@
+	case SIGTTIN:
+@@pp_endif@@
+@@pp_if defined(SIGBREAK) && (!defined(SIGTTIN) || SIGBREAK != SIGTTIN)@@
+	case SIGBREAK:
+@@pp_endif@@
+		result = "Stopped (tty input)";
+		break;
+@@pp_endif@@
+
+@@pp_ifdef SIGTTOU@@
+	case SIGTTOU:
+		result = "Stopped (tty output)";
+		break;
+@@pp_endif@@
+
+@@pp_ifdef SIGURG@@
+	case SIGURG:
+		result = "Urgent I/O condition";
+		break;
+@@pp_endif@@
+
+@@pp_ifdef SIGXCPU@@
+	case SIGXCPU:
+		result = "CPU time limit exceeded";
+		break;
+@@pp_endif@@
+
+@@pp_ifdef SIGXFSZ@@
+	case SIGXFSZ:
+		result = "File size limit exceeded";
+		break;
+@@pp_endif@@
+
+@@pp_ifdef SIGVTALRM@@
+	case SIGVTALRM:
+		result = "Virtual timer expired";
+		break;
+@@pp_endif@@
+
+@@pp_ifdef SIGPROF@@
+	case SIGPROF:
+		result = "Profiling timer expired";
+		break;
+@@pp_endif@@
+
+@@pp_ifdef SIGWINCH@@
+	case SIGWINCH:
+		result = "Window changed";
+		break;
+@@pp_endif@@
+
+@@pp_ifdef SIGIO@@
+	case SIGIO:
+		result = "I/O possible";
+		break;
+@@pp_endif@@
+
+@@pp_ifdef SIGSYS@@
+	case SIGSYS:
+		result = "Bad system call";
+		break;
+@@pp_endif@@
+
+@@pp_ifdef SIGEMT@@
+	case SIGEMT:
+		result = "EMT instruction";
+		break;
+@@pp_endif@@
+
+@@pp_ifdef SIGLOST@@
+	case SIGLOST:
+		result = "Resource lost";
+		break;
+@@pp_endif@@
+
+@@pp_if defined(SIGIOT) && (!defined(SIGABRT) || SIGIOT != SIGABRT)@@
+	case SIGIOT:
+		result = "IOT trap";
+		break;
+@@pp_endif@@
+
+@@pp_if defined(SIGPOLL) && (!defined(SIGIO) || SIGPOLL != SIGIO)@@
+	case SIGPOLL:
+		result = "Pollable event occurred";
+		break;
+@@pp_endif@@
+
+@@pp_if defined(SIGPWR) && (!defined(SIGLOST) || SIGPWR != SIGLOST)@@
+	case SIGPWR:
+		result = "Power failure";
+		break;
+@@pp_endif@@
+
 
 	default:
 		result = NULL;
