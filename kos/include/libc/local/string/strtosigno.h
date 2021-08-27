@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xb6a45b21 */
+/* HASH CRC-32:0x5ae94475 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -82,7 +82,7 @@ __LOCAL_LIBC(strtosigno) __ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1)) __signo_
 __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(strtosigno))(const char *__name) {
 	__signo_t __i, __result = 0;
 	if (__name[0] != 'S' || __name[1] != 'I' || __name[2] != 'G')
-		return __NULLPTR;
+		return 0;
 	__name += 3;
 	for (__i = 1; __i < __NSIG; ++__i) {
 		char const *__s = __localdep_sigabbrev_np(__i);

@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x9d2a1f4e */
+/* HASH CRC-32:0xffb6ac9b */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -104,6 +104,7 @@ __NAMESPACE_LOCAL_BEGIN
 #endif /* !__CRT_HAVE_strerror */
 #endif /* !__local___localdep_strerror_defined */
 __NAMESPACE_LOCAL_END
+#include <parts/printf-config.h>
 #include <libc/local/stdstreams.h>
 __NAMESPACE_LOCAL_BEGIN
 /* >> perror(3)
@@ -115,6 +116,7 @@ __NAMESPACE_LOCAL_BEGIN
  * >> } */
 __LOCAL_LIBC(perror) void
 __NOTHROW_RPC(__LIBCCALL __LIBC_LOCAL_NAME(perror))(char const *__message) {
+#ifdef __NO_PRINTF_STRERROR
 	char const *__enodesc;
 	__enodesc = __localdep_strerror(__libc_geterrno());
 	if (__message) {
@@ -124,6 +126,13 @@ __NOTHROW_RPC(__LIBCCALL __LIBC_LOCAL_NAME(perror))(char const *__message) {
 		__localdep_fprintf(__LOCAL_stderr, "%s\n",
 		        __enodesc);
 	}
+#else /* __NO_PRINTF_STRERROR */
+	if (__message) {
+		__localdep_fprintf(__LOCAL_stderr, "%s: %m\n", __message);
+	} else {
+		__localdep_fprintf(__LOCAL_stderr, "%m\n");
+	}
+#endif /* !__NO_PRINTF_STRERROR */
 }
 __NAMESPACE_LOCAL_END
 #ifndef __local___localdep_perror_defined

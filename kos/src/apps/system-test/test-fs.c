@@ -21,6 +21,7 @@
 #define GUARD_APPS_SYSTEM_TEST_TEST_FS_C 1
 #define _BSD_SOURCE 1
 #define _KOS_SOURCE 1
+#define _GNU_SOURCE 1
 #undef NDEBUG
 
 #include <hybrid/compiler.h>
@@ -52,27 +53,26 @@ assertFileText_impl(fd_t dfd, char const *name,
 	size_t len = strlen(text);
 	fd = openat(dfd, name, O_RDONLY);
 	assertf(fd != -1,
-	        "%s\n"
+	        "%m\n"
 	        "line:%d",
-	        strerror(errno),
 	        line);
 	{
 		char buf[16];
 		ssize_t temp;
 		temp = read(fd, buf, sizeof(buf));
 		assertf(temp == (ssize_t)len,
-		        "%Id (%s)\n"
+		        "%Id (%m)\n"
 		        "line:%d",
-		        temp, strerror(errno), line);
+		        temp, line);
 		assertf(memcmp(buf, text, len) == 0,
 		        "%$q != %q\n"
 		        "line:%d",
 		        len, buf, text, line);
 	}
 	error = close(fd);
-	assertf(error == 0, "%s\n"
+	assertf(error == 0, "%m\n"
 	                    "line:%d",
-	        strerror(errno), line);
+	        line);
 }
 
 #define checkTestFiles(inherited_dfd, files_must_exist) \
@@ -89,9 +89,8 @@ checkTestFiles_impl(char const *path,
 	char const *error_reason;
 	d = opendir(path);
 	assertf(d != NULL,
-	        "%s\n"
+	        "%m\n"
 	        "line:%d",
-	        strerror(errno),
 	        line);
 	for (;;) {
 		struct dirent *de;
@@ -99,9 +98,8 @@ checkTestFiles_impl(char const *path,
 		de = readdir(d);
 		if (!de) {
 			assertf(errno == 0,
-			        "%s\n"
+			        "%m\n"
 			        "line:%d",
-			        strerror(errno),
 			        line);
 			break;
 		}
@@ -125,9 +123,8 @@ checkTestFiles_impl(char const *path,
 	        line);
 	error = closedir(d);
 	assertf(error == 0,
-	        "%s\n"
+	        "%m\n"
 	        "line:%d",
-	        strerror(errno),
 	        line);
 }
 
@@ -141,7 +138,7 @@ PRIVATE void testPath(char const *path) {
 	testHardLink = fpathconf(dfd, _PC_LINK_MAX) > 1;
 	ctest_substatf("path: %s%s\n", path, testHardLink ? " (w/ hardlink)" : "");
 
-	assertf(dfd != -1, "%s", strerror(errno));
+	assertf(dfd != -1, "%m");
 	/* Cleanup artifacts from possibly failed prior tests... */
 	unlinkat(dfd, "test", 0);
 	unlinkat(dfd, "test2", 0);
@@ -149,38 +146,38 @@ PRIVATE void testPath(char const *path) {
 
 	/* Create a previous non-existent file. */
 	fd = openat(dfd, "test", O_WRONLY | O_CREAT | O_EXCL, 0644);
-	assertf(fd != -1, "%s", strerror(errno));
+	assertf(fd != -1, "%m");
 	temp = write(fd, "F1\n", 3);
-	assertf(temp == 3, "%s", strerror(errno));
+	assertf(temp == 3, "%m");
 	error = close(fd);
-	assertf(error == 0, "%s", strerror(errno));
+	assertf(error == 0, "%m");
 
 	/* At this point, the file should already exist */
 	fd = openat(dfd, "test", O_WRONLY | O_CREAT | O_EXCL, 0644);
 	assertf(fd == -1, "%d", fd);
-	assertf(errno == EEXIST, "%s", strerror(errno));
+	assertf(errno == EEXIST, "%m");
 
 	/* At this point, the file should already exist */
 	assertFileText(dfd, "test", "F1\n");
 
 	/* Now rename the file */
-	assertf(renameat(dfd, "test", dfd, "test2") == 0, "%s", strerror(errno));
+	assertf(renameat(dfd, "test", dfd, "test2") == 0, "%m");
 
 	/* The open should now fail. */
 	fd = openat(dfd, "test", O_RDONLY);
 	assertf(fd == -1, "%d", fd);
-	assertf(errno == ENOENT, "%s", strerror(errno));
+	assertf(errno == ENOENT, "%m");
 
 	/* But an open with the new filename shouldn't */
 	assertFileText(dfd, "test2", "F1\n");
 
 	/* Now try to create a second file. */
 	fd = openat(dfd, "test", O_WRONLY | O_CREAT | O_EXCL, 0644);
-	assertf(fd != -1, "%s", strerror(errno));
+	assertf(fd != -1, "%m");
 	temp = write(fd, "F2\n", 3);
-	assertf(temp == 3, "%s", strerror(errno));
+	assertf(temp == 3, "%m");
 	error = close(fd);
-	assertf(error == 0, "%s", strerror(errno));
+	assertf(error == 0, "%m");
 
 	/* Ensure that both file are still intact */
 	assertFileText(dfd, "test2", "F1\n");
@@ -188,12 +185,12 @@ PRIVATE void testPath(char const *path) {
 
 	/* At this point, a rename should fail with EEXIST */
 	assert(renameat(dfd, "test", dfd, "test2") == -1);
-	assertf(errno == EEXIST, "%s", strerror(errno));
+	assertf(errno == EEXIST, "%m");
 	assert(renameat(dfd, "test2", dfd, "test") == -1);
-	assertf(errno == EEXIST, "%s", strerror(errno));
+	assertf(errno == EEXIST, "%m");
 
 	/* Try to delete `test2' and re-attempt the rename */
-	assertf(unlinkat(dfd, "test2", 0) == 0, "%s", strerror(errno));
+	assertf(unlinkat(dfd, "test2", 0) == 0, "%m");
 
 	/* The "test" file should still be intact */
 	assertFileText(dfd, "test", "F2\n");
@@ -201,10 +198,10 @@ PRIVATE void testPath(char const *path) {
 	/* But the test2 file should no longer exist. */
 	fd = openat(dfd, "test2", O_RDONLY);
 	assertf(fd == -1, "%d", fd);
-	assertf(errno == ENOENT, "%s", strerror(errno));
+	assertf(errno == ENOENT, "%m");
 
 	/* Now try the rename once again */
-	assertf(renameat(dfd, "test", dfd, "test2") == 0, "%s", strerror(errno));
+	assertf(renameat(dfd, "test", dfd, "test2") == 0, "%m");
 
 	/* Verify the contents of the "test2" file */
 	assertFileText(dfd, "test2", "F2\n");
@@ -214,11 +211,11 @@ PRIVATE void testPath(char const *path) {
 	 * The important part here  is that a file  of
 	 * the same name already existed at one point! */
 	fd = openat(dfd, "test", O_WRONLY | O_CREAT | O_EXCL, 0644);
-	assertf(fd != -1, "%s", strerror(errno));
+	assertf(fd != -1, "%m");
 	temp = write(fd, "F3\n", 3);
-	assertf(temp == 3, "%s", strerror(errno));
+	assertf(temp == 3, "%m");
 	error = close(fd);
-	assertf(error == 0, "%s", strerror(errno));
+	assertf(error == 0, "%m");
 
 	/* Verify file contents one last time. */
 	assertFileText(dfd, "test2", "F2\n");
@@ -228,8 +225,8 @@ PRIVATE void testPath(char const *path) {
 	checkTestFiles(path, true);
 
 	/* Finally, delete the two remaining test files. */
-	assertf(unlinkat(dfd, "test2", 0) == 0, "%s", strerror(errno));
-	assertf(unlinkat(dfd, "test", 0) == 0, "%s", strerror(errno));
+	assertf(unlinkat(dfd, "test2", 0) == 0, "%m");
+	assertf(unlinkat(dfd, "test", 0) == 0, "%m");
 
 	/* And after that, ensure that neither still shows up in `readdir()' */
 	checkTestFiles(path, false);
@@ -239,11 +236,11 @@ PRIVATE void testPath(char const *path) {
 		char modestr[12];
 
 		fd = openat(dfd, "test", O_WRONLY | O_CREAT | O_EXCL, 0644);
-		assertf(fd != -1, "%s", strerror(errno));
+		assertf(fd != -1, "%m");
 		temp = write(fd, "HL1", 3);
-		assertf(temp == 3, "%s", strerror(errno));
+		assertf(temp == 3, "%m");
 		error = close(fd);
-		assertf(error == 0, "%s", strerror(errno));
+		assertf(error == 0, "%m");
 
 		/* Take away write-permissions from the file.
 		 * This verifies that it'll still be possible to unlink()
@@ -257,11 +254,11 @@ PRIVATE void testPath(char const *path) {
 		 *       that are being  tested support  POSIX permissions  exactly
 		 *       when, and only when, hard-links are also supported. */
 		error = fchmodat(dfd, "test", 0444, 0);
-		assertf(error == 0, "%s", strerror(errno));
+		assertf(error == 0, "%m");
 
 		/* Use linkat() to test hard-links. */
 		error = linkat(dfd, "test", dfd, "test2", 0);
-		assertf(error == 0, "%s", strerror(errno));
+		assertf(error == 0, "%m");
 
 		/* Pre-init the stat structures to account for padding
 		 * fields (that aren't written  by the kernel) in  the
@@ -270,9 +267,9 @@ PRIVATE void testPath(char const *path) {
 		memset(&st2, 0xcc, sizeof(st2));
 
 		error = fstatat(dfd, "test", &st1, 0);
-		assertf(error == 0, "%s", strerror(errno));
+		assertf(error == 0, "%m");
 		error = fstatat(dfd, "test2", &st2, 0);
-		assertf(error == 0, "%s", strerror(errno));
+		assertf(error == 0, "%m");
 
 		/* Should be the same file. */
 		assertf(memcmp(&st1, &st2, sizeof(struct stat)) == 0,
@@ -301,8 +298,8 @@ PRIVATE void testPath(char const *path) {
 		checkTestFiles(path, true);
 
 		/* And now to delete the files once again */
-		assertf(unlinkat(dfd, "test", 0) == 0, "%s", strerror(errno));
-		assertf(unlinkat(dfd, "test2", 0) == 0, "%s", strerror(errno));
+		assertf(unlinkat(dfd, "test", 0) == 0, "%m");
+		assertf(unlinkat(dfd, "test2", 0) == 0, "%m");
 
 		/* And after that, ensure that neither still shows up in `readdir()' */
 		checkTestFiles(path, false);
@@ -310,7 +307,7 @@ PRIVATE void testPath(char const *path) {
 
 	/* Finally, close our directory handle */
 	error = close(dfd);
-	assertf(error == 0, "%s", strerror(errno));
+	assertf(error == 0, "%m");
 }
 
 
@@ -319,7 +316,7 @@ DEFINE_TEST(fs) {
 	testPath("/tmp");
 
 	if (mkdir("/var", 755) == -1)
-		assertf(errno == EEXIST, "%s", strerror(errno));
+		assertf(errno == EEXIST, "%m");
 	testPath("/var");
 
 	/* /dev is a slightly different filesystem type when compared to /tmp

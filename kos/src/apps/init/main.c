@@ -99,8 +99,7 @@ int main(int argc, char *argv[], char *envp[]) {
 			if (mount(NULL, "/dev", "devfs", 0, NULL) >= 0)
 				goto done_devfs;
 		}
-		syslog(LOG_ERR, "[init] Failed to mount devfs: %s\n",
-		       strerror(errno));
+		syslog(LOG_ERR, "[init] Failed to mount devfs: %m\n");
 	}
 done_devfs:
 
@@ -113,8 +112,7 @@ done_devfs:
 				if (mount(NULL, "/proc", "procfs", 0, NULL) >= 0)
 					goto done_procfs;
 			}
-			syslog(LOG_ERR, "[init] Failed to mount procfs: %s\n",
-			       strerror(errno));
+			syslog(LOG_ERR, "[init] Failed to mount procfs: %m\n");
 			ksysctl_delmod("procfs");
 		}
 	}
@@ -128,8 +126,7 @@ done_procfs:
 			if (mount(NULL, "/tmp", "ramfs", 0, NULL) >= 0)
 				goto done_tmpfs;
 		}
-		syslog(LOG_ERR, "[init] Failed to mount ramfs: %s\n",
-		       strerror(errno));
+		syslog(LOG_ERR, "[init] Failed to mount ramfs: %m\n");
 	}
 done_tmpfs:
 
@@ -258,7 +255,7 @@ done_tmpfs:
 			execle("/bin/busybox", "bash", (char *)NULL, init_envp);
 			execle("/bin/sh", "sh", (char *)NULL, init_envp);
 			execle("/bin/bash", "bash", (char *)NULL, init_envp);
-			dprintf(STDOUT_FILENO, "Failed to launch shell: %s\n", strerror(errno));
+			dprintf(STDOUT_FILENO, "Failed to launch shell: %m\n");
 			for (;;) {
 				char buf[1];
 				read(STDIN_FILENO, buf, sizeof(buf));

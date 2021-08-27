@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x3f895f4a */
+/* HASH CRC-32:0x1c5c8bdb */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -591,6 +591,7 @@ err:
 }
 #include <parts/printf-config.h>
 #include <libc/parts.uchar.string.h>
+#include <libc/errno.h>
 #include <hybrid/__assert.h>
 #ifndef __NO_PRINTF_DISASM
 #if !defined(__KERNEL__) || !defined(__KOS__)
@@ -708,6 +709,7 @@ INTERN ATTR_SECTION(".text.crt.string.format") ATTR_LIBC_PRINTF(3, 0) NONNULL((1
 #define __FORMAT_ARGS              args
 #define __CHAR_TYPE                char
 #define __CHAR_SIZE                __SIZEOF_CHAR__
+#define __FORMAT_STRERROR          libc_strerror
 #define __FORMAT_REPEAT            libc_format_repeat
 #define __FORMAT_HEXDUMP           libc_format_hexdump
 #define __FORMAT_WIDTH             libc_format_width

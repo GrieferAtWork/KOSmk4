@@ -28,6 +28,7 @@
 /* #define __NO_PRINTF_ESCAPE 1 */
 /* #define __NO_PRINTF_UNICODE_CHARS 1 */
 /* #define __NO_PRINTF_UNICODE_STRING 1 */
+/* #define __NO_PRINTF_STRERROR 1 */
 /* #define __NO_PRINTF_HEX 1 */
 /* #define __NO_PRINTF_GEN 1 */
 /* #define __NO_PRINTF_DISASM 1 */
@@ -38,6 +39,8 @@
 #if defined(__KOS__) && defined(__KERNEL__)
 #undef __NO_PRINTF_UNICODE_STRING
 #define __NO_PRINTF_UNICODE_STRING 1
+#undef __NO_PRINTF_STRERROR
+#define __NO_PRINTF_STRERROR 1
 #undef __NO_PRINTF_UNICODE_CHARS
 #define __NO_PRINTF_UNICODE_CHARS 1
 #undef __NO_PRINTF_DISASM

@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xeac7a9b1 */
+/* HASH CRC-32:0x9980b3fd */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -611,6 +611,21 @@ __NAMESPACE_LOCAL_BEGIN
 #undef __local___localdep_printf_defined
 #endif /* !... */
 #endif /* !__local___localdep_printf_defined */
+/* Dependency: strerror from string */
+#ifndef __local___localdep_strerror_defined
+#define __local___localdep_strerror_defined 1
+#ifdef __CRT_HAVE_strerror
+__NAMESPACE_LOCAL_END
+#include <bits/types.h>
+__NAMESPACE_LOCAL_BEGIN
+__CREDIRECT(__ATTR_COLD __ATTR_RETNONNULL __ATTR_WUNUSED,char *,__NOTHROW_NCX,__localdep_strerror,(__errno_t __errnum),strerror,(__errnum))
+#else /* __CRT_HAVE_strerror */
+__NAMESPACE_LOCAL_END
+#include <libc/local/string/strerror.h>
+__NAMESPACE_LOCAL_BEGIN
+#define __localdep_strerror __LIBC_LOCAL_NAME(strerror)
+#endif /* !__CRT_HAVE_strerror */
+#endif /* !__local___localdep_strerror_defined */
 /* Dependency: unicode_writeutf16 from unicode */
 #ifndef __local___localdep_unicode_writeutf16_defined
 #define __local___localdep_unicode_writeutf16_defined 1
@@ -748,6 +763,7 @@ __LOCAL_LIBC(format_vc32printf) __ATTR_LIBC_WPRINTF(3, 0) __ATTR_NONNULL((1, 3))
 #define __FORMAT_ARGS               __args
 #define __CHAR_TYPE                 __CHAR32_TYPE__
 #define __CHAR_SIZE                 4
+#define __FORMAT_STRERROR           __localdep_strerror
 #define __FORMAT_REPEAT             __localdep_format_c32repeat
 #define __FORMAT_HEXDUMP            __localdep_format_c32hexdump
 #define __FORMAT_WIDTH              __localdep_format_c32width

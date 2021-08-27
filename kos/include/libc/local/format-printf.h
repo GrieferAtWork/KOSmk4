@@ -21,13 +21,18 @@
 #ifndef _FORMAT_PRINTER_H
 #include <format-printer.h>
 #endif /* !_FORMAT_PRINTER_H */
+#include <hybrid/__assert.h>
+
 #include <bits/crt/format-printer.h>
 #include <bits/crt/uformat-printer.h>
-#include <hybrid/__assert.h>
-#include <libc/string.h>
-#include <libc/parts.uchar.string.h>
 #include <parts/uchar/format-printer.h>
+
+#include <string.h>
 #include <unicode.h>
+
+#include <libc/errno.h>
+#include <libc/parts.uchar.string.h>
+#include <libc/string.h>
 #define __CHAR_TYPE                char
 #define __CHAR_SIZE                __SIZEOF_CHAR__
 #define __FORMAT_ESCAPE            format_escape
@@ -38,6 +43,7 @@
 #define __FORMAT_UNICODE_WRITECHAR unicode_writeutf8
 #define __FORMAT_UNICODE_FORMAT16  format_16to8
 #define __FORMAT_UNICODE_FORMAT32  format_32to8
+#define __FORMAT_STRERROR          strerror
 #define __FORMAT_WIDTH             format_width
 #define __FORMAT_WIDTH16           format_c16width
 #define __FORMAT_WIDTH32           format_c32width
@@ -572,6 +578,17 @@ __nextfmt:
 #endif /* !__NO_PRINTF_ESCAPE */
 	case 's':
 		__string = __builtin_va_arg(__FORMAT_ARGS, __CHAR_TYPE *);
+#if ((!defined(__NO_PRINTF_UNICODE_STRING) || __CHAR_SIZE == 1) &&   \
+     !defined(__NO_PRINTF_STRERROR) && defined(__FORMAT_STRERROR) && \
+     defined(__libc_geterrno))
+		__IF0 {
+	case 'm':
+			__string = (__CHAR_TYPE const *)__FORMAT_STRERROR(__libc_geterrno());
+#if __CHAR_SIZE != 1
+			__length = __PRINTF_LENGTH_I8;
+#endif /* __CHAR_SIZE != 1 */
+		}
+#endif /* ... */
 #ifndef __NO_PRINTF_UNICODE_STRING
 		/* Support for `%ls'   --> print wide-string */
 		/* Support for `%I8s'  --> print utf-8 string */
@@ -1806,6 +1823,7 @@ __err:
 #undef __FORMAT_UNICODE_WRITECHAR
 #undef __FORMAT_HEXDUMP
 #undef __FORMAT_REPEAT
+#undef __FORMAT_STRERROR
 #undef __FORMAT_ESCAPE
 #undef __FORMAT_ESCAPE8
 #undef __FORMAT_ESCAPE16

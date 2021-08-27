@@ -42,10 +42,10 @@
 DECL_BEGIN
 
 #define ASSERT_ERROR_OK(expr) \
-	assertf(expr, "errno = %d (%s)", errno, strerror(errno))
+	assertf(expr, "errno = %d (%m)", errno)
 #define ASSERT_ERROR_NOT_OK(expr, expected_errno) \
-	assertf(!(expr) && (errno) == expected_errno,  \
-	        "errno = %d (%s)", errno, strerror(errno))
+	assertf(!(expr) && (errno) == expected_errno, \
+	        "errno = %d (%m)", errno)
 
 
 /* Procfs has to have special  handling for open(2)ing files  from

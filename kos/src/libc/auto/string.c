@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xa59ee7d4 */
+/* HASH CRC-32:0x2a7168c */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -4504,7 +4504,7 @@ INTERN ATTR_SECTION(".text.crt.string.memory") ATTR_PURE WUNUSED NONNULL((1)) si
 NOTHROW_NCX(LIBCCALL libc_strtosigno)(const char *name) {
 	signo_t i, result = 0;
 	if (name[0] != 'S' || name[1] != 'I' || name[2] != 'G')
-		return NULL;
+		return 0;
 	name += 3;
 	for (i = 1; i < __NSIG; ++i) {
 		char const *s = libc_sigabbrev_np(i);

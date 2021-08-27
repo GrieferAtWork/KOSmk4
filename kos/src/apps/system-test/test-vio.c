@@ -109,15 +109,13 @@ DEFINE_TEST(vio) {
 	fd_t viofd;
 	addr = mmap(NULL, 3 * ps, PROT_READ | PROT_WRITE,
 	            MAP_PRIVATE | MAP_ANONYMOUS, -1, 0);
-	assertf(addr != MAP_FAILED, "errno = %u (%q)",
-	        errno, strerror(errno));
+	assertf(addr != MAP_FAILED, "errno = %u (%m)", errno);
 	/* Fill the newly mapped memory with all 1-bits */
 	memset(addr, 0xff, 3 * ps);
 
 	/* Punch a hole into the middle of the 3 pages. */
 	error = munmap((byte_t *)addr + ps, ps);
-	assertf(error == 0, "error = %d, errno = %u (%q)",
-			error, errno, strerror(errno));
+	assertf(error == 0, "error = %d, errno = %u (%m)", error, errno);
 
 	/* Load the VIO library */
 	libvio = dlopen(LIBVIO_LIBRARY_NAME, RTLD_LAZY | RTLD_GLOBAL);
@@ -129,15 +127,15 @@ DEFINE_TEST(vio) {
 
 	/* Create the VIO controller. */
 	viofd = vio_create(&myvio_ops, NULL, ps, O_CLOEXEC);
-	assertf(viofd >= 0, "viofd = %d, errno = %u (%q)",
-			viofd, errno, strerror(errno));
+	assertf(viofd >= 0, "viofd = %d, errno = %u (%m)",
+			viofd, errno);
 
 	/* Map our VIO region into the hole we punched above. */
 	viobase = mmap((byte_t *)addr + ps, ps, PROT_READ | PROT_WRITE,
 	               MAP_PRIVATE | MAP_FILE | MAP_FIXED, viofd, 0);
 	assertf(viobase == (byte_t *)addr + ps,
-	        "viobase = %p, errno = %u (%q)",
-	        viobase, errno, strerror(errno));
+	        "viobase = %p, errno = %u (%m)",
+	        viobase, errno);
 
 	/* All right! Everything's been set up */
 	assert(num_vio_read == 0);

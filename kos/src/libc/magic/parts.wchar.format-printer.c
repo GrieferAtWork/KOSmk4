@@ -161,6 +161,7 @@ $ssize_t format_vwprintf([[nonnull]] pwformatprinter printer, void *arg,
 #define __FORMAT_ARGS               args
 #define __CHAR_TYPE                 wchar_t
 #define __CHAR_SIZE                 __SIZEOF_WCHAR_T__
+#define __FORMAT_STRERROR           strerror
 #define __FORMAT_REPEAT             format_wrepeat
 #define __FORMAT_HEXDUMP            format_whexdump
 #define __FORMAT_WIDTH              format_wwidth

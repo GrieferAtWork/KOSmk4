@@ -42,6 +42,7 @@
 #define __NO_PRINTF_HEX            1 /* %[hex] */
 #define __NO_PRINTF_UNICODE_CHARS  1 /* %I16c, %I32c, %Lc */
 #define __NO_PRINTF_UNICODE_STRING 1 /* %I16s, %I32s, %Ls */
+#define __NO_PRINTF_STRERROR       1 /* %m */
 #define __NO_SCANF_FLOATING_POINT  1 /* %f, %e, %g, %E, %a */
 
 /* Invoke  system  calls as  inline (NOTE:  We  don't enable  support for

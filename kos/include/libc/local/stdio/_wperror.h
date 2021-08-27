@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x7708209f */
+/* HASH CRC-32:0xaa18420e */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -89,21 +89,33 @@ __NAMESPACE_LOCAL_BEGIN
 #endif /* !__local___localdep_strerror_defined */
 __NAMESPACE_LOCAL_END
 #include <libc/local/stdstreams.h>
+#include <parts/printf-config.h>
 __NAMESPACE_LOCAL_BEGIN
 __LOCAL_LIBC(_wperror) __ATTR_COLD void
 (__LIBCCALL __LIBC_LOCAL_NAME(_wperror))(__WCHAR_TYPE__ const *__restrict __message) __THROWS(...) {
+#ifdef __NO_PRINTF_STRERROR
 	char const *__enodesc;
 	__enodesc = __localdep_strerror(__libc_geterrno());
 	if (__message) {
 #if __SIZEOF_WCHAR_T__ == 2
-		__localdep_fprintf(__LOCAL_stderr, "%I16s: %s\n", __message, __enodesc);
+		__localdep_fprintf(__LOCAL_stderr, "%I16s: %I8s\n", __message, __enodesc);
 #else /* __SIZEOF_WCHAR_T__ == 2 */
-		__localdep_fprintf(__LOCAL_stderr, "%I32s: %s\n", __message, __enodesc);
+		__localdep_fprintf(__LOCAL_stderr, "%I32s: %I8s\n", __message, __enodesc);
 #endif /* __SIZEOF_WCHAR_T__ != 2 */
 	} else {
-		__localdep_fprintf(__LOCAL_stderr, "%s\n",
-		        __enodesc);
+		__localdep_fprintf(__LOCAL_stderr, "%I8s\n", __enodesc);
 	}
+#else /* __NO_PRINTF_STRERROR */
+	if (__message) {
+#if __SIZEOF_WCHAR_T__ == 2
+		__localdep_fprintf(__LOCAL_stderr, "%I16s: %m\n", __message);
+#else /* __SIZEOF_WCHAR_T__ == 2 */
+		__localdep_fprintf(__LOCAL_stderr, "%I32s: %m\n", __message);
+#endif /* __SIZEOF_WCHAR_T__ != 2 */
+	} else {
+		__localdep_fprintf(__LOCAL_stderr, "%m\n");
+	}
+#endif /* !__NO_PRINTF_STRERROR */
 }
 __NAMESPACE_LOCAL_END
 #ifndef __local___localdep__wperror_defined

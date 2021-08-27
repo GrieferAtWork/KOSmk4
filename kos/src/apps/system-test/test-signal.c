@@ -55,7 +55,7 @@ DEFINE_TEST(signal_works_correctly) {
 	new_action.sa_handler = &myhand;
 	new_action.sa_flags   = 0;
 	error = sigaction(SIGUSR1, &new_action, &old_action);
-	assertf(error == 0, "%d:%s", errno, strerror(errno));
+	assertf(error == 0, "%d:%m", errno);
 
 	assert(hand_called == 0);
 
@@ -70,7 +70,7 @@ DEFINE_TEST(signal_works_correctly) {
 	sigemptyset(&newset);
 	sigaddset(&newset, SIGUSR1);
 	error = sigprocmask(SIG_BLOCK, &newset, &oldset);
-	assertf(error == 0, "%d:%s", errno, strerror(errno));
+	assertf(error == 0, "%d:%m", errno);
 
 	/* Raise the signal again. */
 	assert(hand_called == 0);
@@ -79,14 +79,14 @@ DEFINE_TEST(signal_works_correctly) {
 
 	/* Unmask the signal */
 	error = sigprocmask(SIG_SETMASK, &oldset, NULL);
-	assertf(error == 0, "%d:%s", errno, strerror(errno));
+	assertf(error == 0, "%d:%m", errno);
 
 	/* Make sure that the handler was called after the signal was unmasked. */
 	assert(hand_called == 1);
 
 	/* Restore the previous handler. */
 	error = sigaction(SIGUSR1, &old_action, NULL);
-	assertf(error == 0, "%d:%s", errno, strerror(errno));
+	assertf(error == 0, "%d:%m", errno);
 }
 
 

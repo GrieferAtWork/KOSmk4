@@ -7551,7 +7551,7 @@ int timingsafe_memcmp([[nonnull]] void const *s1,
 $signo_t strtosigno([[nonnull]] const char *name) {
 	$signo_t i, result = 0;
 	if (name[0] != 'S' || name[1] != 'I' || name[2] != 'G')
-		return NULL;
+		return 0;
 	name += 3;
 	for (i = 1; i < __NSIG; ++i) {
 		char const *s = sigabbrev_np(i);

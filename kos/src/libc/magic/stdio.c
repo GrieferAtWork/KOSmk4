@@ -1085,10 +1085,12 @@ int ferror([[nonnull]] $FILE __KOS_FIXED_CONST *__restrict stream);
 @@>> }
 [[cp, std, guard]]
 [[requires_include("<__crt.h>", "<libc/errno.h>")]]
+[[impl_include("<parts/printf-config.h>")]]
 [[impl_include("<libc/local/stdstreams.h>", "<libc/errno.h>")]]
 [[requires(!defined(__NO_STDSTREAMS) && defined(__libc_geterrno) &&
            $has_function(fprintf) && $has_function(strerror))]]
 void perror([[nullable]] char const *message) {
+@@pp_ifdef __NO_PRINTF_STRERROR@@
 	char const *enodesc;
 	enodesc = strerror(__libc_geterrno());
 	if (message) {
@@ -1098,6 +1100,13 @@ void perror([[nullable]] char const *message) {
 		fprintf(stderr, "%s\n",
 		        enodesc);
 	}
+@@pp_else@@
+	if (message) {
+		fprintf(stderr, "%s: %m\n", message);
+	} else {
+		fprintf(stderr, "%m\n");
+	}
+@@pp_endif@@
 }
 
 
@@ -4922,20 +4931,32 @@ __STDC_INT_AS_SIZE_T vsnprintf_s([[outp_opt(min(return, buflen, bufsize))]] char
 [[requires_include("<__crt.h>", "<libc/errno.h>")]]
 [[impl_include("<libc/local/stdstreams.h>", "<libc/errno.h>")]]
 [[requires(!defined(__NO_STDSTREAMS) && defined(__libc_geterrno) && $has_function(fprintf) && $has_function(strerror))]]
+[[impl_include("<parts/printf-config.h>")]]
 [[decl_include("<hybrid/typecore.h>")]]
 void _wperror($wchar_t const *__restrict message) {
+@@pp_ifdef __NO_PRINTF_STRERROR@@
 	char const *enodesc;
 	enodesc = strerror(__libc_geterrno());
 	if (message) {
 @@pp_if __SIZEOF_WCHAR_T__ == 2@@
-		fprintf(stderr, "%I16s: %s\n", message, enodesc);
+		fprintf(stderr, "%I16s: %I8s\n", message, enodesc);
 @@pp_else@@
-		fprintf(stderr, "%I32s: %s\n", message, enodesc);
+		fprintf(stderr, "%I32s: %I8s\n", message, enodesc);
 @@pp_endif@@
 	} else {
-		fprintf(stderr, "%s\n",
-		        enodesc);
+		fprintf(stderr, "%I8s\n", enodesc);
 	}
+@@pp_else@@
+	if (message) {
+@@pp_if __SIZEOF_WCHAR_T__ == 2@@
+		fprintf(stderr, "%I16s: %m\n", message);
+@@pp_else@@
+		fprintf(stderr, "%I32s: %m\n", message);
+@@pp_endif@@
+	} else {
+		fprintf(stderr, "%m\n");
+	}
+@@pp_endif@@
 }
 
 %

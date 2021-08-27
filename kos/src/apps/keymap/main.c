@@ -59,8 +59,8 @@ int main(int argc, char *argv[]) {
 				close(kbdev);
 			kbdev = open(optarg, O_RDWR);
 			if (kbdev < 0) {
-				fprintf(stderr, "%s: Failed to open device %s: %s\n",
-				        argv[0], optarg, strerror(errno));
+				fprintf(stderr, "%s: Failed to open device %s: %m\n",
+				        argv[0], optarg);
 				exit(EXIT_FAILURE);
 			}
 			break;
@@ -85,13 +85,13 @@ int main(int argc, char *argv[]) {
 	map_filename = argv[optind];
 	keymap_fd = open(map_filename, O_RDONLY);
 	if (keymap_fd < 0) {
-		fprintf(stderr, "%s: Failed to open keymap file %s: %s\n",
-		        argv[0], map_filename, strerror(errno));
+		fprintf(stderr, "%s: Failed to open keymap file %s: %m\n",
+		        argv[0], map_filename);
 		exit(EXIT_FAILURE);
 	}
 	if (fstat(keymap_fd, &st) < 0) {
-		fprintf(stderr, "%s: Failed to stat keymap file %s: %s\n",
-		        argv[0], map_filename, strerror(errno));
+		fprintf(stderr, "%s: Failed to stat keymap file %s: %m\n",
+		        argv[0], map_filename);
 		exit(EXIT_FAILURE);
 	}
 	keymap_mapping = mmap(NULL,
@@ -101,8 +101,8 @@ int main(int argc, char *argv[]) {
 	                      keymap_fd,
 	                      0);
 	if (keymap_mapping == MAP_FAILED) {
-		fprintf(stderr, "%s: Failed to read keymap file %s: %s\n",
-		        argv[0], map_filename, strerror(errno));
+		fprintf(stderr, "%s: Failed to read keymap file %s: %m\n",
+		        argv[0], map_filename);
 		exit(EXIT_FAILURE);
 	}
 	if (!keymap_openblob(&keymap, keymap_mapping, st.st_size)) {
@@ -121,8 +121,8 @@ int main(int argc, char *argv[]) {
 	io.km_mapsize = (size_t)codesize;
 	io.km_defenc  = keymap.km_defencoding;
 	if (ioctl(kbdev, KBDIO_SETKEYMAP, &io) < 0) {
-		fprintf(stderr, "%s: Failed to set keymap file %s: %s\n",
-		        argv[0], map_filename, strerror(errno));
+		fprintf(stderr, "%s: Failed to set keymap file %s: %m\n",
+		        argv[0], map_filename);
 		exit(EXIT_FAILURE);
 	}
 	return EXIT_SUCCESS;

@@ -50,10 +50,10 @@ DEFINE_TEST(fifo) {
 	unlink(FIFO_NAME);
 
 	/* Create the FIFO filesystem object. */
-	assertf(mknod(FIFO_NAME, S_IFIFO | 0644, 0) == 0, "%s", strerror(errno));
+	assertf(mknod(FIFO_NAME, S_IFIFO | 0644, 0) == 0, "%m");
 
 	/* Use stat to verify that this is indeed the correct kind of file. */
-	assertf(stat(FIFO_NAME, &st) == 0, "%s", strerror(errno));
+	assertf(stat(FIFO_NAME, &st) == 0, "%m");
 	assert(S_ISFIFO(st.st_mode));
 
 	/* Attempting to open the write-end before a read-end must cause ENXIO
@@ -62,22 +62,22 @@ DEFINE_TEST(fifo) {
 	 *       fifo */
 	wr = open(FIFO_NAME, O_WRONLY | O_NONBLOCK);
 	assert(wr == -1);
-	assertf(errno = ENXIO, "%s", strerror(errno));
+	assertf(errno = ENXIO, "%m");
 
 	rd = open(FIFO_NAME, O_RDONLY | O_NONBLOCK);
-	assertf(rd != -1, "%s", strerror(errno));
+	assertf(rd != -1, "%m");
 	wr = open(FIFO_NAME, O_WRONLY | O_NONBLOCK);
-	assertf(wr != -1, "%s", strerror(errno));
+	assertf(wr != -1, "%m");
 
 	temp = write(wr, "foobar", 6);
-	assertf(temp == 6, "%Id\n%s", temp, strerror(errno));
+	assertf(temp == 6, "%Id\n%m", temp);
 
 	temp = read(rd, buf, 3);
-	assertf(temp == 3, "%Id\n%s", temp, strerror(errno));
+	assertf(temp == 3, "%Id\n%m", temp);
 	assertf(memcmp(buf, "foo", 3) == 0, "%$q", 3, buf);
 
 	temp = read(rd, buf, 3);
-	assertf(temp == 3, "%Id\n%s", temp, strerror(errno));
+	assertf(temp == 3, "%Id\n%m", temp);
 	assertf(memcmp(buf, "bar", 3) == 0, "%$q", 3, buf);
 
 	/* The fifo should now be empty,  but because `wr' is still  opened,
@@ -85,74 +85,74 @@ DEFINE_TEST(fifo) {
 	 * although those 2 are defined as the same error-code under KOS)! */
 	temp = read(rd, buf, 3);
 	assert(temp == -1);
-	assertf(errno == EWOULDBLOCK, "%s", strerror(errno));
+	assertf(errno == EWOULDBLOCK, "%m");
 
 	/* Now close the write-end */
-	assertf(close(wr) == 0, "%s", strerror(errno));
+	assertf(close(wr) == 0, "%m");
 
 	/* Try to read from our reader-end now should indicate END-OF-FILE */
 	temp = read(rd, buf, 3);
-	assertf(temp == 0, "%Id\n%s", temp, strerror(errno));
+	assertf(temp == 0, "%Id\n%m", temp);
 
 	/* Open the fifo for writing once again.
 	 * NOTE: Don't pass O_NONBLOCK this time around, since the presence
 	 *       of our  reader (rd)  should  prevent this  from  blocking! */
 	wr = open(FIFO_NAME, O_WRONLY);
-	assertf(wr != -1, "%s", strerror(errno));
+	assertf(wr != -1, "%m");
 
 	/* Trying to read from the FIFO should once again indicate
 	 * EWOULDBLOCK,   since  there's  a  writer  (once  again) */
 	temp = read(rd, buf, 3);
 	assert(temp == -1);
-	assertf(errno == EWOULDBLOCK, "%s", strerror(errno));
+	assertf(errno == EWOULDBLOCK, "%m");
 
 	/* Ensure that we can use frealpath() with named pipes! */
-	assertf(frealpath(wr, buf, sizeof(buf)) == buf, "%s", strerror(errno));
+	assertf(frealpath(wr, buf, sizeof(buf)) == buf, "%m");
 	assertf(strcmp(buf, FIFO_NAME) == 0, "%$q", buf);
-	assertf(frealpath(rd, buf, sizeof(buf)) == buf, "%s", strerror(errno));
+	assertf(frealpath(rd, buf, sizeof(buf)) == buf, "%m");
 	assertf(strcmp(buf, FIFO_NAME) == 0, "%$q", buf);
 
 	/* Also verify that readlink("/proc/self/fd") works with named pipes! */
 	sprintf(buf, "/proc/self/fd/%d", wr);
 	temp = readlink(buf, buf, sizeof(buf));
-	assertf((size_t)temp == strlen(FIFO_NAME), "%Id\n%s", temp, strerror(errno));
+	assertf((size_t)temp == strlen(FIFO_NAME), "%Id\n%m", temp);
 	assertf(memcmp(buf, FIFO_NAME, (size_t)temp) == 0, "%$q", buf);
 
 	sprintf(buf, "/proc/self/fd/%d", rd);
 	temp = readlink(buf, buf, sizeof(buf));
-	assertf((size_t)temp == strlen(FIFO_NAME), "%Id\n%s", temp, strerror(errno));
+	assertf((size_t)temp == strlen(FIFO_NAME), "%Id\n%m", temp);
 	assertf(memcmp(buf, FIFO_NAME, (size_t)temp) == 0, "%$q", buf);
 
 	/* Delete the FIFO */
-	assertf(unlink(FIFO_NAME) == 0, "%s", strerror(errno));
+	assertf(unlink(FIFO_NAME) == 0, "%m");
 
 	/* Communication  should till  be possible.  - The  fifo simply became
 	 * anonymous (i.e. more akin to a regular pipe, as created by pipe(2)) */
 	temp = read(rd, buf, 3);
 	assert(temp == -1);
-	assertf(errno == EWOULDBLOCK, "%s", strerror(errno));
+	assertf(errno == EWOULDBLOCK, "%m");
 
 	temp = write(wr, "foobar", 6);
-	assertf(temp == 6, "%Id\n%s", temp, strerror(errno));
+	assertf(temp == 6, "%Id\n%m", temp);
 
 	temp = read(rd, buf, 64);
-	assertf(temp == 6, "%Id\n%s", temp, strerror(errno));
+	assertf(temp == 6, "%Id\n%m", temp);
 	assertf(memcmp(buf, "foobar", 6) == 0, "%$q", 6, buf);
 
 	/* The fifo should now be empty, but still connected. */
 	temp = read(rd, buf, 3);
 	assert(temp == -1);
-	assertf(errno == EWOULDBLOCK, "%s", strerror(errno));
+	assertf(errno == EWOULDBLOCK, "%m");
 
 	/* Close the writer. */
-	assertf(close(wr) == 0, "%s", strerror(errno));
+	assertf(close(wr) == 0, "%m");
 
 	/* With the writer gone, we should now be able to read EOF */
 	temp = read(rd, buf, 3);
-	assertf(temp == 0, "%Id\n%s", temp, strerror(errno));
+	assertf(temp == 0, "%Id\n%m", temp);
 
 	/* Finally, close the reader as well. */
-	assertf(close(rd) == 0, "%s", strerror(errno));
+	assertf(close(rd) == 0, "%m");
 }
 
 

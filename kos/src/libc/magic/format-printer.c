@@ -827,6 +827,7 @@ err:
 [[impl_include("<parts/printf-config.h>")]]
 [[impl_include("<libc/parts.uchar.string.h>")]]
 [[impl_include("<libc/string.h>")]]
+[[impl_include("<libc/errno.h>")]]
 [[impl_include("<hybrid/__assert.h>")]]
 [[impl_prefix(
 #ifndef __NO_PRINTF_DISASM
@@ -854,6 +855,7 @@ $ssize_t format_vprintf([[nonnull]] pformatprinter printer, void *arg,
 #define __FORMAT_ARGS              args
 #define __CHAR_TYPE                char
 #define __CHAR_SIZE                __SIZEOF_CHAR__
+#define __FORMAT_STRERROR          strerror
 #define __FORMAT_REPEAT            format_repeat
 #define __FORMAT_HEXDUMP           format_hexdump
 #define __FORMAT_WIDTH             format_width

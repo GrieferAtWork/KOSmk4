@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xad3453a5 */
+/* HASH CRC-32:0x11d0e95 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -134,6 +134,7 @@ INTERN ATTR_SECTION(".text.crt.FILE.locked.write.write") NONNULL((1)) __STDC_INT
 	}
 	return result;
 }
+#include <parts/printf-config.h>
 #include <libc/local/stdstreams.h>
 #include <libc/errno.h>
 /* >> perror(3)
@@ -145,6 +146,7 @@ INTERN ATTR_SECTION(".text.crt.FILE.locked.write.write") NONNULL((1)) __STDC_INT
  * >> } */
 INTERN ATTR_SECTION(".text.crt.errno.utility") void
 NOTHROW_RPC(LIBCCALL libc_perror)(char const *message) {
+#ifdef __NO_PRINTF_STRERROR
 	char const *enodesc;
 	enodesc = libc_strerror(__libc_geterrno());
 	if (message) {
@@ -154,6 +156,13 @@ NOTHROW_RPC(LIBCCALL libc_perror)(char const *message) {
 		libc_fprintf(stderr, "%s\n",
 		        enodesc);
 	}
+#else /* __NO_PRINTF_STRERROR */
+	if (message) {
+		libc_fprintf(stderr, "%s: %m\n", message);
+	} else {
+		libc_fprintf(stderr, "%m\n");
+	}
+#endif /* !__NO_PRINTF_STRERROR */
 }
 /* >> fprintf(3), vfprintf(3)
  * Print data to `stream', following `format'
@@ -3268,37 +3277,61 @@ NOTHROW_NCX(LIBCCALL libc_vsnprintf_s)(char *__restrict buf,
 }
 #include <libc/local/stdstreams.h>
 #include <libc/errno.h>
+#include <parts/printf-config.h>
 INTERN ATTR_SECTION(".text.crt.dos.errno.utility") ATTR_COLD void
 (LIBDCALL libd__wperror)(char16_t const *__restrict message) THROWS(...) {
+#ifdef __NO_PRINTF_STRERROR
 	char const *enodesc;
 	enodesc = libc_strerror(__libc_geterrno());
 	if (message) {
 
-		libc_fprintf(stderr, "%I16s: %s\n", message, enodesc);
+		libc_fprintf(stderr, "%I16s: %I8s\n", message, enodesc);
 
 
 
 	} else {
-		libc_fprintf(stderr, "%s\n",
-		        enodesc);
+		libc_fprintf(stderr, "%I8s\n", enodesc);
 	}
+#else /* __NO_PRINTF_STRERROR */
+	if (message) {
+
+		libc_fprintf(stderr, "%I16s: %m\n", message);
+
+
+
+	} else {
+		libc_fprintf(stderr, "%m\n");
+	}
+#endif /* !__NO_PRINTF_STRERROR */
 }
 #include <libc/local/stdstreams.h>
 #include <libc/errno.h>
+#include <parts/printf-config.h>
 INTERN ATTR_SECTION(".text.crt.dos.errno.utility") ATTR_COLD void
 (LIBKCALL libc__wperror)(char32_t const *__restrict message) THROWS(...) {
+#ifdef __NO_PRINTF_STRERROR
 	char const *enodesc;
 	enodesc = libc_strerror(__libc_geterrno());
 	if (message) {
 
 
 
-		libc_fprintf(stderr, "%I32s: %s\n", message, enodesc);
+		libc_fprintf(stderr, "%I32s: %I8s\n", message, enodesc);
 
 	} else {
-		libc_fprintf(stderr, "%s\n",
-		        enodesc);
+		libc_fprintf(stderr, "%I8s\n", enodesc);
 	}
+#else /* __NO_PRINTF_STRERROR */
+	if (message) {
+
+
+
+		libc_fprintf(stderr, "%I32s: %m\n", message);
+
+	} else {
+		libc_fprintf(stderr, "%m\n");
+	}
+#endif /* !__NO_PRINTF_STRERROR */
 }
 INTERN ATTR_SECTION(".text.crt.dos.FILE.unlocked.read.read") WUNUSED NONNULL((1, 5)) size_t
 (LIBCCALL libc__fread_nolock_s)(void *__restrict buf,
