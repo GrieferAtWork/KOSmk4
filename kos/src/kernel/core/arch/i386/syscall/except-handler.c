@@ -57,6 +57,7 @@
 #include <stddef.h>
 #include <string.h>
 
+#include <libcpustate/apply.h>
 #include <librpc/rpc.h>
 
 DECL_BEGIN
@@ -710,7 +711,7 @@ NOTHROW(FCALL rpc_serve_user_redirection_all)(struct icpustate *__restrict state
  * RPC functions, and finally propagating the then set exception (if one still is)
  * into user-space with the help of `x86_userexcept_propagate()'.
  * Afterwards, load the updated icpustate at the base of the calling thread's stack,
- * and finally fully unwind into user-space by use of `'. */
+ * and  finally  fully unwind  into  user-space by  use  of `cpu_apply_icpustate()'. */
 PUBLIC ATTR_NORETURN NONNULL((1)) void
 NOTHROW(FCALL x86_userexcept_unwind)(struct ucpustate *__restrict ustate,
                                      struct rpc_syscall_info const *sc_info) {
@@ -870,9 +871,10 @@ NOTHROW(FCALL x86_userexcept_unwind_i)(struct icpustate *__restrict state,
 			state = x86_userexcept_propagate(state, NULL);
 	}
 
-	/* Unwind into to the target state, thus returning back to userspace, though
-	 * with the associated target potentially changed. */
-	x86_userexcept_unwind_interrupt(state);
+	/* Unwind into to the target state, thus returning back to userspace,
+	 * though with the associated  target potentially changed. Note  that
+	 * at this point no kernel exception remains set! */
+	cpu_apply_icpustate(state);
 }
 
 
