@@ -600,6 +600,7 @@ mfault_or_unlock(struct mfault *__restrict self)
 			task_yield();
 		goto nope;
 	}
+	mpart_assert_integrity(part);
 
 	/* Set-up our extended unlock controller. */
 	self->mfl_unlck.ui_unlock = &unlock_mman_cb;

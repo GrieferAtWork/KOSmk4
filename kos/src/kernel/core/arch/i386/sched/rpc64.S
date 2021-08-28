@@ -127,7 +127,7 @@ INTERN_FUNCTION(x86_serve_user_rpc_and_propagate_exceptions)
 
 	/* Check if an exception has been set for user-space. */
 	EXTERN(this_rpcs_pending)
-	cmpq   $(0), %gs:this_exception_code
+	cmpq   $(E_OK), %gs:this_exception_code
 	je     1f
 
 	/* Check if exceptions are propagated to user-space, or kernel-space */
@@ -138,6 +138,7 @@ INTERN_FUNCTION(x86_serve_user_rpc_and_propagate_exceptions)
 	/* Check if the only reason we're still directed to kernel-space
 	 * was  another  IRET redirection  to `x86_rpc_user_redirection' */
 	cmpq   $(x86_rpc_user_redirection), (OFFSET_ICPUSTATE_IRREGS + OFFSET_IRREGS_RIP)(%rsp)
+
 	/* Load the saved CPU state, which will bring us back up to the
 	 * start of `x86_rpc_user_redirection'.
 	 * From  there, we automatically  restore the actual user-space
@@ -217,9 +218,24 @@ INTERN_FUNCTION(x86_rpc_kernel_redirection_handler)
 	 * SS:     <SEGMENT_KERNEL_DATA0>
 	 * GS.BASE:<THIS_TASK>
 	 * *:      Undefined */
+#ifndef NDEBUG
+	cmpq   $(E_OK), %gs:this_exception_code
+	jne    1f
+	int3   /* Assertion failed: No exception set! */
+1:
+#endif /* !NDEBUG */
+
 	call   *%rax
 	movq   %rax, %rsp
 	.cfi_def_cfa_register %rsp
+
+#ifndef NDEBUG
+	cmpq   $(E_OK), %gs:this_exception_code
+	jne    1f
+	int3   /* Assertion failed: No exception set! */
+1:
+#endif /* !NDEBUG */
+
 	/* Continue unwinding the exception that brought us here. */
 	EXTERN(x86_userexcept_unwind_interrupt_rsp)
 	jmp    x86_userexcept_unwind_interrupt_rsp

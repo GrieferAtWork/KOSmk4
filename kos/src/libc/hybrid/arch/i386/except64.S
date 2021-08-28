@@ -580,6 +580,16 @@ END(libc_error_throw)
 
 .section .text
 PUBLIC_FUNCTION(x86_userexcept_unwind_interrupt)
+#ifndef NDEBUG
+	.cfi_startproc
+	/* Assert that an exception is actually set!
+	 * This is once again checked by `libc_error_unwind()', but by first checking it
+	 * here, we've still go the correct return address for where the problem lies. */
+	cmpq   $(E_OK), %gs:this_exception_code
+	jne    1f
+	int3   /* Assertion failed! */
+1:	.cfi_endproc
+#endif /* !NDEBUG */
 	.cfi_startproc simple
 	.cfi_signal_frame
 	.cfi_def_cfa %rdi, 0
