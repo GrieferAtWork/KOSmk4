@@ -104,8 +104,8 @@ lcall7_clone32(struct icpustate *__restrict state) {
 		                      (USER UNCHECKED pid_t *)sc_info.rsi_regs[2], /* parent_tidptr */
 		                      (USER UNCHECKED pid_t *)sc_info.rsi_regs[4], /* child_tidptr */
 		                      sc_info.rsi_regs[0] & CLONE_SETTLS ? sc_info.rsi_regs[3]
-		                                                         : get_user_gsbase(),
-		                      get_user_fsbase());
+		                                                         : x86_get_user_gsbase(),
+		                      x86_get_user_fsbase());
 	} EXCEPT {
 		sc_info.rsi_sysno = __NR32_clone;
 		if (icpustate_getpflags(state) & EFLAGS_DF)

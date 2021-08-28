@@ -370,10 +370,10 @@ err_complex:
 		return (u32)THIS_TASK;
 
 	case SEGMENT_USER_FSBASE:
-		return get_user_fsbase();
+		return x86_get_user_fsbase();
 
 	case SEGMENT_USER_GSBASE:
-		return get_user_gsbase();
+		return x86_get_user_gsbase();
 
 	default:
 		break;

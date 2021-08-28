@@ -1598,10 +1598,10 @@ i386_getsegment_base(struct icpustate32 *__restrict state,
 		return (u32)THIS_TASK;
 
 	case SEGMENT_USER_FSBASE:
-		return get_user_fsbase();
+		return x86_get_user_fsbase();
 
 	case SEGMENT_USER_GSBASE:
-		return get_user_gsbase();
+		return x86_get_user_gsbase();
 
 	default:
 		break;
@@ -1687,11 +1687,11 @@ i386_setsegment_base(struct icpustate32 *__restrict state,
 	switch (segment_index & ~3) {
 
 	case SEGMENT_USER_FSBASE:
-		set_user_fsbase_noreload(value);
+		x86_set_user_fsbase_noreload(value);
 		break;
 
 	case SEGMENT_USER_GSBASE:
-		set_user_gsbase_noreload(value);
+		x86_set_user_gsbase_noreload(value);
 		break;
 
 	default:

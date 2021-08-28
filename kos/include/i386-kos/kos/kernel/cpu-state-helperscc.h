@@ -41,8 +41,8 @@
 #ifndef __CPUSTATE_GET_USER_FSBASE
 #ifdef __KERNEL__
 #include <kernel/arch/gdt.h> /* x86_get_user_(fs|gs)base() */
-#define __CPUSTATE_GET_USER_FSBASE() get_user_fsbase()
-#define __CPUSTATE_GET_USER_GSBASE() get_user_gsbase()
+#define __CPUSTATE_GET_USER_FSBASE() x86_get_user_fsbase()
+#define __CPUSTATE_GET_USER_GSBASE() x86_get_user_gsbase()
 #else /* __KERNEL__ */
 #define __CPUSTATE_GET_USER_FSBASE() ((__uintptr_t)__rdfsbase())
 #define __CPUSTATE_GET_USER_GSBASE() ((__uintptr_t)__rdgsbase())

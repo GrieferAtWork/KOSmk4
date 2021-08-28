@@ -681,9 +681,9 @@ DEFINE_SYSCALL3(syscall_slong_t, modify_ldt,
 		entry = ATOMIC_READ(desc->entry_number);
 		/* We ignore everything except for `base_addr' */
 		if ((entry & ~7) == SEGMENT_USER_FSBASE) {
-			set_user_fsbase(ATOMIC_READ(desc->base_addr)); /* %fs */
+			x86_set_user_fsbase(ATOMIC_READ(desc->base_addr)); /* %fs */
 		} else if ((entry & ~7) == SEGMENT_USER_GSBASE) {
-			set_user_gsbase(ATOMIC_READ(desc->base_addr)); /* %gs */
+			x86_set_user_gsbase(ATOMIC_READ(desc->base_addr)); /* %gs */
 		} else {
 			THROW(E_INVALID_ARGUMENT_UNKNOWN_COMMAND, entry);
 		}

@@ -187,9 +187,9 @@ rpc_register_state64_apply_icpustate(struct rpc_register_state64 *__restrict sel
 #undef LIBRPC_PRIVATE_X86_RPC_REGISTER_FLAGS_MASK
 #ifdef __KERNEL__
 	if (RPC_REGISTER_STATE64_ISVALID(*self, RPC_X86_64_REGISTER_FSBASE))
-		set_user_fsbase(self->rs_regs[RPC_X86_64_REGISTER_FSBASE]);
+		x86_set_user_fsbase(self->rs_regs[RPC_X86_64_REGISTER_FSBASE]);
 	if (RPC_REGISTER_STATE64_ISVALID(*self, RPC_X86_64_REGISTER_GSBASE))
-		set_user_gsbase(self->rs_regs[RPC_X86_64_REGISTER_GSBASE]);
+		x86_set_user_gsbase(self->rs_regs[RPC_X86_64_REGISTER_GSBASE]);
 #else /* __KERNEL__ */
 	if (RPC_REGISTER_STATE64_ISVALID(*self, RPC_X86_64_REGISTER_FSBASE))
 		__wrfsbase((void *)(__uintptr_t)self->rs_regs[RPC_X86_64_REGISTER_FSBASE]);
@@ -264,8 +264,8 @@ rpc_register_state64_getreg_icpustate(struct icpustate *__restrict state,
 	case RPC_X86_64_REGISTER_CS:     result = icpustate_getcs(state); break;            /* CS segment. */
 	case RPC_X86_64_REGISTER_SS:     result = icpustate_getuserss(state); break;        /* SS segment. */
 #ifdef __KERNEL__
-	case RPC_X86_64_REGISTER_FSBASE: result = (__uint64_t)get_user_fsbase(); break;
-	case RPC_X86_64_REGISTER_GSBASE: result = (__uint64_t)get_user_gsbase(); break;
+	case RPC_X86_64_REGISTER_FSBASE: result = (__uint64_t)x86_get_user_fsbase(); break;
+	case RPC_X86_64_REGISTER_GSBASE: result = (__uint64_t)x86_get_user_gsbase(); break;
 #else /* __KERNEL__ */
 	case RPC_X86_64_REGISTER_FSBASE: result = (__uint64_t)__rdfsbase(); break;
 	case RPC_X86_64_REGISTER_GSBASE: result = (__uint64_t)__rdgsbase(); break;

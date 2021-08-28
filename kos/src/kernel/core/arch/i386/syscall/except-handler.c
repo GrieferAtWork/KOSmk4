@@ -802,8 +802,8 @@ NOTHROW(FCALL x86_userexcept_unwind)(struct ucpustate *__restrict ustate,
 	 *        unnecessary  in all  current use  cases. -  The solution would
 	 *        be to have  another kind  of cpustate structure  that is  like
 	 *        ucpustate, but don't contain segment base registers on x86_64! */
-	set_user_gsbase(ustate->ucs_sgbase.sg_gsbase);
-	set_user_fsbase(ustate->ucs_sgbase.sg_fsbase);
+	x86_set_user_gsbase(ustate->ucs_sgbase.sg_gsbase);
+	x86_set_user_fsbase(ustate->ucs_sgbase.sg_fsbase);
 #else /* __x86_64__ */
 	return_state->ics_gpregs = ustate->ucs_gpregs;
 	if (ustate->ucs_eflags & EFLAGS_VM) {

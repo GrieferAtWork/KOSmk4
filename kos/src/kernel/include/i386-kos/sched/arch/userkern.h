@@ -33,13 +33,13 @@
 
 /* Get/set the base address of the userkern segment. */
 #ifdef __x86_64__
-#define get_userkern_base()         get_user_gsbase()
-#define set_userkern_base(v)        set_user_gsbase(v)
-#define get_compat_userkern_base()  get_user_fsbase()
-#define set_compat_userkern_base(v) set_user_fsbase(v)
+#define get_userkern_base()         x86_get_user_gsbase()
+#define set_userkern_base(v)        x86_set_user_gsbase(v)
+#define get_compat_userkern_base()  x86_get_user_fsbase()
+#define set_compat_userkern_base(v) x86_set_user_fsbase(v)
 #else /* __x86_64__ */
-#define get_userkern_base()  get_user_fsbase()
-#define set_userkern_base(v) set_user_fsbase(v)
+#define get_userkern_base()  x86_get_user_fsbase()
+#define set_userkern_base(v) x86_set_user_fsbase(v)
 #endif /* !__x86_64__ */
 
 #endif /* !GUARD_KERNEL_INCLUDE_I386_KOS_SCHED_ARCH_USERKERN_H */

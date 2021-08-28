@@ -188,7 +188,7 @@ NOTHROW(KCALL x86_decode_segmentbase)(struct icpustate *__restrict state, emu86_
 		break;
 	case EMU86_F_SEGGS:
 		result = irregs_isuser(&state->ics_irregs)
-		         ? get_user_gsbase()
+		         ? x86_get_user_gsbase()
 		         : __rdgsbaseq();
 		break;
 #else /* __x86_64__ */

@@ -504,9 +504,9 @@ task_clone64_rpc(void *UNUSED(arg),
 		                           (USER UNCHECKED void *)sc_info->rsi_regs[1],  /* child_stack */
 		                           (USER UNCHECKED pid_t *)sc_info->rsi_regs[2], /* parent_tidptr */
 		                           (USER UNCHECKED pid_t *)sc_info->rsi_regs[3], /* child_tidptr */
-		                           get_user_gsbase(),
+		                           x86_get_user_gsbase(),
 		                           sc_info->rsi_regs[0] & CLONE_SETTLS ? sc_info->rsi_regs[4]
-		                                                               : get_user_fsbase());
+		                                                               : x86_get_user_fsbase());
 		gpregs_setpax(&state->ics_gpregs, child_tid);
 	}
 	return state;
@@ -553,8 +553,8 @@ task_clone32_rpc(void *UNUSED(arg),
 		                           (USER UNCHECKED pid_t *)sc_info->rsi_regs[2], /* parent_tidptr */
 		                           (USER UNCHECKED pid_t *)sc_info->rsi_regs[4], /* child_tidptr */
 		                           sc_info->rsi_regs[0] & CLONE_SETTLS ? sc_info->rsi_regs[3]
-		                                                               : get_user_gsbase(),
-		                           get_user_fsbase());
+		                                                               : x86_get_user_gsbase(),
+		                           x86_get_user_fsbase());
 		gpregs_setpax(&state->ics_gpregs, child_tid);
 	}
 	return state;
@@ -599,8 +599,8 @@ sys_fork_impl(struct icpustate *__restrict state) {
 	                           (USER UNCHECKED void *)icpustate_getusersp(state),
 	                           NULL,
 	                           NULL,
-	                           get_user_gsbase(),
-	                           get_user_fsbase());
+	                           x86_get_user_gsbase(),
+	                           x86_get_user_fsbase());
 	gpregs_setpax(&state->ics_gpregs, child_tid);
 	return state;
 }
@@ -645,8 +645,8 @@ sys_vfork_impl(struct icpustate *__restrict state) {
 	                           (USER UNCHECKED void *)icpustate_getusersp(state),
 	                           NULL,
 	                           NULL,
-	                           get_user_gsbase(),
-	                           get_user_fsbase());
+	                           x86_get_user_gsbase(),
+	                           x86_get_user_fsbase());
 	gpregs_setpax(&state->ics_gpregs, child_tid);
 	return state;
 }

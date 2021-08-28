@@ -288,8 +288,8 @@ sighand_raise_signal(struct icpustate *__restrict state,
 	user_ucontext->uc_mcontext.mc_context.ucs_sgregs.sg_fs     = icpustate_getfs(state);
 	user_ucontext->uc_mcontext.mc_context.ucs_sgregs.sg_es     = icpustate_getes(state);
 	user_ucontext->uc_mcontext.mc_context.ucs_sgregs.sg_ds     = icpustate_getds(state);
-	user_ucontext->uc_mcontext.mc_context.ucs_sgbase.sg_fsbase = get_user_fsbase();
-	user_ucontext->uc_mcontext.mc_context.ucs_sgbase.sg_gsbase = get_user_gsbase();
+	user_ucontext->uc_mcontext.mc_context.ucs_sgbase.sg_fsbase = x86_get_user_fsbase();
+	user_ucontext->uc_mcontext.mc_context.ucs_sgbase.sg_gsbase = x86_get_user_gsbase();
 	user_ucontext->uc_mcontext.mc_context.ucs_cs               = icpustate_getcs(state);
 	user_ucontext->uc_mcontext.mc_context.ucs_ss               = icpustate_getss(state);
 	user_ucontext->uc_mcontext.mc_context.ucs_rflags           = (u64)icpustate_getpflags(state);
