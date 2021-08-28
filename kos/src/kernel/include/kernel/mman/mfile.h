@@ -48,6 +48,13 @@
 #endif
 #endif /* !CONFIG_USE_NEW_FS */
 
+/* Trace program counters of write-locks to mfile objects. */
+#undef CONFIG_MFILE_TRACE_WRLOCK_PC
+#ifndef NDEBUG
+#define CONFIG_MFILE_TRACE_WRLOCK_PC
+#endif /* !NDEBUG */
+
+
 #ifdef __CC__
 DECL_BEGIN
 
@@ -580,6 +587,9 @@ struct mfile {
 	struct vio_operators const   *mf_vio;        /* [0..1][const] VIO operators. (deprecated field!) */
 #endif /* CONFIG_MFILE_LEGACY_VIO_OPS */
 	struct atomic_rwlock          mf_lock;       /* Lock for this file. */
+#ifdef CONFIG_MFILE_TRACE_WRLOCK_PC
+	void const                  *_mf_wrlockpc;   /* [lock(mf_lock)] Write-lock program counter. */
+#endif /* CONFIG_MFILE_TRACE_WRLOCK_PC */
 	RBTREE_ROOT(mpart)            mf_parts;      /* [0..n][lock(mf_lock)] File parts. */
 	struct sig                    mf_initdone;   /* Signal broadcast whenever one of the blocks of one of
 	                                              * the contained parts changes state from INIT to  LOAD. */
@@ -705,6 +715,17 @@ NOTHROW(mfile_changed)(struct mfile *__restrict self, uintptr_t what) {
 	                                        ? ((self)->mf_blockshift)           \
 	                                        : PAGESHIFT)) -                     \
 	                         1)
+#ifdef CONFIG_MFILE_TRACE_WRLOCK_PC
+#define __MFILE_INIT_WRLOCKPC        __NULLPTR,
+#define __mfile_init_wrlockpc(self)  (self)->_mf_wrlockpc = __NULLPTR,
+#define __mfile_cinit_wrlockpc(self) __hybrid_assert((self)->_mf_wrlockpc == __NULLPTR),
+#else /* CONFIG_MFILE_TRACE_WRLOCK_PC */
+#define __MFILE_INIT_WRLOCKPC        /* nothing */
+#define __mfile_init_wrlockpc(self)  /* nothing */
+#define __mfile_cinit_wrlockpc(self) /* nothing */
+#endif /* !CONFIG_MFILE_TRACE_WRLOCK_PC */
+
+
 #ifdef CONFIG_USE_NEW_FS
 /* Initialize common fields. The caller must still initialize:
  *  - mf_ops,  mf_parts,  mf_part_amask,   mf_blockshift,
@@ -727,16 +748,19 @@ NOTHROW(mfile_changed)(struct mfile *__restrict self, uintptr_t what) {
 #define _mfile_init(self, ops, block_shift) \
 	(_mfile_init_common(self),              \
 	 (self)->mf_ops = (ops),                \
+	 __mfile_init_wrlockpc(self)            \
 	 _mfile_init_blockshift(self, block_shift))
 #define _mfile_cinit(self, ops, block_shift) \
 	(_mfile_cinit_common(self),              \
 	 (self)->mf_ops = (ops),                 \
+	 __mfile_cinit_wrlockpc(self)            \
 	 _mfile_cinit_blockshift(self, block_shift))
 #else /* CONFIG_USE_NEW_FS */
 #define mfile_init(self, ops, block_shift) \
 	((self)->mf_refcnt = 1,                \
 	 (self)->mf_ops    = (ops),            \
 	 __mfile_init_vio(self)                \
+	 __mfile_init_wrlockpc(self)             \
 	 atomic_rwlock_init(&(self)->mf_lock), \
 	 (self)->mf_parts = __NULLPTR,         \
 	 sig_init(&(self)->mf_initdone),       \
@@ -747,6 +771,7 @@ NOTHROW(mfile_changed)(struct mfile *__restrict self, uintptr_t what) {
 	((self)->mf_refcnt = 1,                             \
 	 (self)->mf_ops    = (ops),                         \
 	 __mfile_cinit_vio(self)                            \
+	 __mfile_cinit_wrlockpc(self)                       \
 	 atomic_rwlock_cinit(&(self)->mf_lock),             \
 	 __hybrid_assert((self)->mf_parts == __NULLPTR),    \
 	 sig_cinit(&(self)->mf_initdone),                   \
@@ -769,7 +794,7 @@ NOTHROW(mfile_changed)(struct mfile *__restrict self, uintptr_t what) {
 		/* .mf_refcnt     = */ refcnt,                                                 \
 		/* .mf_ops        = */ ops,                                                    \
 		/* .mf_vio        = */ __NULLPTR,                                              \
-		/* .mf_lock       = */ ATOMIC_RWLOCK_INIT,                                     \
+		/* .mf_lock       = */ ATOMIC_RWLOCK_INIT, __MFILE_INIT_WRLOCKPC               \
 		/* .mf_parts      = */ parts,                                                  \
 		/* .mf_initdone   = */ SIG_INIT,                                               \
 		/* .mf_lockops    = */ SLIST_HEAD_INITIALIZER(~),                              \
@@ -779,18 +804,18 @@ NOTHROW(mfile_changed)(struct mfile *__restrict self, uintptr_t what) {
 	}
 
 /* TODO: Remove the following 2! */
-#define MFILE_INIT_VIO_EX(type, vio, parts, pageshift)    \
-	{                                                     \
-		/* .mf_refcnt     = */ 1,                         \
-		/* .mf_ops        = */ type,                      \
-		/* .mf_vio        = */ vio,                       \
-		/* .mf_lock       = */ ATOMIC_RWLOCK_INIT,        \
-		/* .mf_parts      = */ parts,                     \
-		/* .mf_initdone   = */ SIG_INIT,                  \
-		/* .mf_lockops    = */ SLIST_HEAD_INITIALIZER(~), \
-		/* .mf_changed    = */ SLIST_HEAD_INITIALIZER(~), \
-		/* .mf_blockshift = */ PAGESHIFT - (pageshift),   \
-		/* .mf_part_amask = */ PAGESIZE - 1,              \
+#define MFILE_INIT_VIO_EX(type, vio, parts, pageshift)                   \
+	{                                                                    \
+		/* .mf_refcnt     = */ 1,                                        \
+		/* .mf_ops        = */ type,                                     \
+		/* .mf_vio        = */ vio,                                      \
+		/* .mf_lock       = */ ATOMIC_RWLOCK_INIT, __MFILE_INIT_WRLOCKPC \
+		/* .mf_parts      = */ parts,                                    \
+		/* .mf_initdone   = */ SIG_INIT,                                 \
+		/* .mf_lockops    = */ SLIST_HEAD_INITIALIZER(~),                \
+		/* .mf_changed    = */ SLIST_HEAD_INITIALIZER(~),                \
+		/* .mf_blockshift = */ PAGESHIFT - (pageshift),                  \
+		/* .mf_part_amask = */ PAGESIZE - 1,                             \
 	}
 #define MFILE_INIT_VIO(vio) MFILE_INIT_VIO_EX(&mfile_ndef_ops, vio, __NULLPTR, 0)
 #else /* CONFIG_MFILE_LEGACY_VIO_OPS */
@@ -798,7 +823,7 @@ NOTHROW(mfile_changed)(struct mfile *__restrict self, uintptr_t what) {
 	{                                                                                  \
 		/* .mf_refcnt     = */ refcnt,                                                 \
 		/* .mf_ops        = */ ops,                                                    \
-		/* .mf_lock       = */ ATOMIC_RWLOCK_INIT,                                     \
+		/* .mf_lock       = */ ATOMIC_RWLOCK_INIT, __MFILE_INIT_WRLOCKPC               \
 		/* .mf_parts      = */ parts,                                                  \
 		/* .mf_initdone   = */ SIG_INIT,                                               \
 		/* .mf_lockops    = */ SLIST_HEAD_INITIALIZER(~),                              \
@@ -844,22 +869,39 @@ DEFINE_REFCOUNT_FUNCTIONS(struct mfile, mf_refcnt, mfile_destroy)
 #define mfile_lockops_mustreap(self) (__hybrid_atomic_load((self)->mf_lockops.slh_first, __ATOMIC_ACQUIRE) != __NULLPTR)
 
 /* Lock accessor helpers for `struct mfile' */
+#ifdef CONFIG_MFILE_TRACE_WRLOCK_PC
+#include <asm/intrin.h>
+#define __mfile_trace_wrlock_setpc(self) (void)((self)->_mf_wrlockpc = __rdip())
+#define __mfile_trace_wrlock_clrpc(self) (void)((self)->_mf_wrlockpc = __NULLPTR)
+#define mfile_lock_write(self)      (atomic_rwlock_write(&(self)->mf_lock), __mfile_trace_wrlock_setpc(self))
+#define mfile_lock_write_nx(self)   (atomic_rwlock_write_nx(&(self)->mf_lock) ? (__mfile_trace_wrlock_setpc(self), 1) : 0)
+#define mfile_lock_trywrite(self)   (atomic_rwlock_trywrite(&(self)->mf_lock) ? (__mfile_trace_wrlock_setpc(self), 1) : 0)
+#define mfile_lock_endwrite(self)   (__mfile_trace_wrlock_clrpc(self), atomic_rwlock_endwrite(&(self)->mf_lock), mfile_lockops_reap(self))
+#define mfile_lock_endwrite_f(self) (__mfile_trace_wrlock_clrpc(self), atomic_rwlock_endwrite(&(self)->mf_lock))
+#define mfile_lock_end(self)        (void)(mfile_lock_writing(self) ? __mfile_trace_wrlock_clrpc(self) : (void)0, atomic_rwlock_end(&(self)->mf_lock) && (mfile_lockops_reap(self), 0))
+#define mfile_lock_end_f(self)      (mfile_lock_writing(self) ? __mfile_trace_wrlock_clrpc(self) : (void)0, atomic_rwlock_end(&(self)->mf_lock))
+#define mfile_lock_upgrade(self)    ({ __BOOL __ok = atomic_rwlock_upgrade(&(self)->mf_lock); __mfile_trace_wrlock_setpc(self); __ok; })
+#define mfile_lock_upgrade_nx(self) ({ unsigned int __ok = atomic_rwlock_upgrade_nx(&(self)->mf_lock); if (__ok != 0) __mfile_trace_wrlock_setpc(self); __ok; })
+#define mfile_lock_tryupgrade(self) (atomic_rwlock_tryupgrade(&(self)->mf_lock) ? (__mfile_trace_wrlock_setpc(self), 1) : 0)
+#define mfile_lock_downgrade(self)  (__mfile_trace_wrlock_clrpc(self), atomic_rwlock_downgrade(&(self)->mf_lock))
+#else /* CONFIG_MFILE_TRACE_WRLOCK_PC */
 #define mfile_lock_write(self)      atomic_rwlock_write(&(self)->mf_lock)
 #define mfile_lock_write_nx(self)   atomic_rwlock_write_nx(&(self)->mf_lock)
 #define mfile_lock_trywrite(self)   atomic_rwlock_trywrite(&(self)->mf_lock)
 #define mfile_lock_endwrite(self)   (atomic_rwlock_endwrite(&(self)->mf_lock), mfile_lockops_reap(self))
 #define mfile_lock_endwrite_f(self) atomic_rwlock_endwrite(&(self)->mf_lock)
-#define mfile_lock_read(self)       atomic_rwlock_read(&(self)->mf_lock)
-#define mfile_lock_read_nx(self)    atomic_rwlock_read_nx(&(self)->mf_lock)
-#define mfile_lock_tryread(self)    atomic_rwlock_tryread(&(self)->mf_lock)
-#define mfile_lock_endread(self)    (void)(atomic_rwlock_endread(&(self)->mf_lock) && (mfile_lockops_reap(self), 0))
-#define mfile_lock_endread_f(self)  atomic_rwlock_endread(&(self)->mf_lock)
 #define mfile_lock_end(self)        (void)(atomic_rwlock_end(&(self)->mf_lock) && (mfile_lockops_reap(self), 0))
 #define mfile_lock_end_f(self)      atomic_rwlock_end(&(self)->mf_lock)
 #define mfile_lock_upgrade(self)    atomic_rwlock_upgrade(&(self)->mf_lock)
 #define mfile_lock_upgrade_nx(self) atomic_rwlock_upgrade_nx(&(self)->mf_lock)
 #define mfile_lock_tryupgrade(self) atomic_rwlock_tryupgrade(&(self)->mf_lock)
 #define mfile_lock_downgrade(self)  atomic_rwlock_downgrade(&(self)->mf_lock)
+#endif /* !CONFIG_MFILE_TRACE_WRLOCK_PC */
+#define mfile_lock_read(self)       atomic_rwlock_read(&(self)->mf_lock)
+#define mfile_lock_read_nx(self)    atomic_rwlock_read_nx(&(self)->mf_lock)
+#define mfile_lock_tryread(self)    atomic_rwlock_tryread(&(self)->mf_lock)
+#define mfile_lock_endread(self)    (void)(atomic_rwlock_endread(&(self)->mf_lock) && (mfile_lockops_reap(self), 0))
+#define mfile_lock_endread_f(self)  atomic_rwlock_endread(&(self)->mf_lock)
 #define mfile_lock_reading(self)    atomic_rwlock_reading(&(self)->mf_lock)
 #define mfile_lock_writing(self)    atomic_rwlock_writing(&(self)->mf_lock)
 #define mfile_lock_canread(self)    atomic_rwlock_canread(&(self)->mf_lock)
