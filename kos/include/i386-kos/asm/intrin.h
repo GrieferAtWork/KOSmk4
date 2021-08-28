@@ -131,20 +131,6 @@ __FORCELOCAL void (__wrbx)(__UINTPTR_TYPE__ __val) { __asm__ __volatile__("movl 
 __FORCELOCAL __ATTR_WUNUSED __UINTPTR_TYPE__ (__rdflags)(void) { __UINTPTR_TYPE__ __result; __asm__ __volatile__("pushfl; popl %0" : "=g" (__result)); return __result; }
 __FORCELOCAL void (__wrflags)(__UINTPTR_TYPE__ __fl) { __asm__ __volatile__("pushl %k0\n\tpopfl" : : "g" (__fl) : "cc"); }
 #endif /* !__x86_64__ */
-#ifdef __COMPILER_HAVE_ADDRESSIBLE_LABELS
-/*[[[warning push_ignored("-Wreturn-local-addr")]]]*/
-#ifdef __GNUC__
-#pragma GCC diagnostic push
-#pragma GCC diagnostic ignored "-Wreturn-local-addr"
-#endif /* __GNUC__ */
-/*[[[end]]]*/
-__FORCELOCAL __ATTR_WUNUSED void *(__rdip)(void) { __label: return (void *)&&__label; }
-/*[[[warning pop]]]*/
-#ifdef __GNUC__
-#pragma GCC diagnostic pop
-#endif /* __GNUC__ */
-/*[[[end]]]*/
-#else /* __COMPILER_HAVE_ADDRESSIBLE_LABELS */
 __FORCELOCAL __ATTR_WUNUSED void *(__rdip)(void) {
 	__register void *__result;
 #ifdef __x86_64__
@@ -166,7 +152,6 @@ __FORCELOCAL __ATTR_WUNUSED void *(__rdip)(void) {
 #endif /* !__x86_64__ */
 	return __result;
 }
-#endif /* !__COMPILER_HAVE_ADDRESSIBLE_LABELS */
 __FORCELOCAL __ATTR_NORETURN void (__wrip)(void *__val) { __asm__ __volatile__("jmp *%0" : : "g" (__val)); __builtin_unreachable(); }
 
 /* TODO: Check for `__GCC_ASM_FLAG_OUTPUTS__' */
