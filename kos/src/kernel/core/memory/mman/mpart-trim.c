@@ -40,6 +40,7 @@
 #include <hybrid/atomic.h>
 
 #include <assert.h>
+#include <inttypes.h>
 #include <stdbool.h>
 #include <stddef.h>
 #include <string.h>
@@ -760,6 +761,7 @@ NOTHROW(FCALL mpart_async_split_before)(struct mpart *__restrict self,
 	unsigned int status;
 	struct mpart *lopart, *hipart;
 	physpagecnt_t pages;
+	assert(!(addr & self->mp_file->mf_part_amask));
 
 	hipart = self;
 	status = async_alloc_mpart(&lopart, self);
@@ -882,7 +884,7 @@ NOTHROW(FCALL mpart_async_split_before)(struct mpart *__restrict self,
 	lopart->mp_file = incref(hipart->mp_file);
 	SLIST_INIT(&lopart->mp_lockops);
 	lopart->mp_minaddr = hipart->mp_minaddr;
-	lopart->mp_maxaddr = lopart->mp_minaddr + addr - 1;
+	lopart->mp_maxaddr = hipart->mp_minaddr + addr - 1;
 	DBG_memset(&lopart->mp_changed, 0xcc, sizeof(lopart->mp_changed));
 	LIST_ENTRY_UNBOUND_INIT(&lopart->mp_allparts); /* Overwritten below if necessary... */
 	_mpart_init_asanon(lopart);
@@ -903,6 +905,20 @@ again_enum_hipart_nodlst:
 					continue; /* Skip unmapped nodes... */
 				if (node->mn_partoff >= addr)
 					break; /* Keep all nodes starting w/ this one! */
+
+				assertf(!(addr >= mnode_getmapminaddr(node) &&
+				          addr <= mnode_getmapmaxaddr(node)),
+				        "Node is mapped directly in the middle of the split.\n"
+				        "This shouldn't be possible since our caller only ever "
+				        "creates splits such that they appear within entirely "
+				        "unmapped gaps!\n"
+				        "Node address range: %p-%p\n"
+				        "Node part range:    %#" PRIxSIZ "-%#" PRIxSIZ "\n"
+				        "addr:               %#" PRIxSIZ "\n",
+				        mnode_getminaddr(node), mnode_getmaxaddr(node),
+				        mnode_getmapminaddr(node), mnode_getmapmaxaddr(node),
+				        addr);
+
 				if unlikely(node->mn_flags & MNODE_F_MHINT)
 					mnode_load_mhint(node);
 
@@ -1231,6 +1247,33 @@ again_enum_nodes:
 			break; /* Last node reached. */
 		/* Figure out of there's some part that's not mapped. */
 		node_endaddr = mnode_getmapendaddr(node);
+
+again_check_next_same_base:
+		if (next->mn_partoff == node->mn_partoff) {
+			/* Special case: because the list of nodes is only sorted by `mn_partoff',
+			 *               it can happen that more  than one node mapping starts  at
+			 *               the same base address.
+			 * When this is the case, we have to scan all adjacent  same-base-address
+			 * nodes for the one that is the largest (iow: has the greatest mpart end
+			 * address; i.e. `mnode_getmapendaddr()').
+			 * Otherwise, we'd only use the last node from a set of same-base-address
+			 * nodes, which may not necessarily be the largest! */
+			mpart_reladdr_t next_endaddr;
+			next_endaddr = mnode_getmapendaddr(next);
+			if (node_endaddr < next_endaddr)
+				node_endaddr = next_endaddr; /* Use the end-address of the largest node! */
+
+			/* Look  at the next node and check if it too has the same base address.
+			 * Note that since the  list of nodes is  sorted by base address,  we're
+			 * allowed to assume any follow-up node's base address is >= the current
+			 * node's. */
+			node = next;
+			next = mpart_node_iterator_next(&iter);
+			if (!next)
+				break; /* Last node reached. */
+			goto again_check_next_same_base;
+		}
+
 		next_basaddr = mnode_getmapaddr(next);
 		if (node_endaddr < next_basaddr) {
 			/* Align addresses by the mandatory file alignment. */
