@@ -1132,7 +1132,16 @@ NOTHROW(FCALL mpartlockop_kram_cb)(Toblockop(mpart) *__restrict self,
                                    struct mpart *__restrict part) {
 	struct mman_unmap_kram_job *job, *res;
 	job = container_of(self, struct mman_unmap_kram_job, mukj_lop_mp);
-	res = mman_unmap_kram_locked_ex(job, part);
+	/* Note that at this point, we're not holding a lock to  the
+	 * kernel mman, meaning we have to try and acquire it first! */
+	if (mman_lock_tryacquire(&mman_kernel)) {
+		res = mman_unmap_kram_locked_ex(job, part);
+		mman_lock_release(&mman_kernel);
+	} else {
+		/* Failed to lock the kernel mman. -> Enqueue  the
+		 * rest of the task for when it becomes available. */
+		res = job;
+	}
 	if (res == MMAN_UNMAP_KRAM_LOCKED_EX_DONE) {
 		if likely(job->mukj_done != NULL) {
 			/* Set-up a post-lock callback to exec the done-callback */
