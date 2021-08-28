@@ -61,8 +61,8 @@ __DECL_BEGIN
  * @return: (size_t)-1: No (more) transliterations available.
  * @return: * : The # of characters written to `result' (may be 0). */
 typedef __ATTR_WUNUSED __ATTR_NONNULL((1)) __size_t
-/*__NOTHROW_NCX*/ (LIBICONV_CC *LPICONV_TRANSLITERATE)(__CHAR32_TYPE__ result[ICONV_TRANSLITERATE_MAXLEN],
-                                                       __CHAR32_TYPE__ uni_ch, __size_t nth);
+/*__NOTHROW_NCX*/ (LIBICONV_CC *PICONV_TRANSLITERATE)(__CHAR32_TYPE__ result[ICONV_TRANSLITERATE_MAXLEN],
+                                                      __CHAR32_TYPE__ uni_ch, __size_t nth);
 #ifdef LIBICONV_WANT_PROTOTYPES
 LIBICONV_DECL __ATTR_WUNUSED __ATTR_NONNULL((1)) __size_t
 __NOTHROW_NCX(LIBICONV_CC iconv_transliterate)(__CHAR32_TYPE__ result[ICONV_TRANSLITERATE_MAXLEN],

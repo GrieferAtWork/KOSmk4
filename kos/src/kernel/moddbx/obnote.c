@@ -296,12 +296,12 @@ badobj:
 }
 
 
-typedef void (FCALL *LPMODULE_OPERATOR_FREE)(struct module *__restrict self);
-PRIVATE LPMODULE_OPERATOR_FREE pdyn__userelf_module_free = (LPMODULE_OPERATOR_FREE)(void *)-1;
+typedef void (FCALL *PMODULE_OPERATOR_FREE)(struct module *__restrict self);
+PRIVATE PMODULE_OPERATOR_FREE pdyn__userelf_module_free = (PMODULE_OPERATOR_FREE)(void *)-1;
 
-PRIVATE NOBLOCK ATTR_PURE WUNUSED LPMODULE_OPERATOR_FREE
+PRIVATE NOBLOCK ATTR_PURE WUNUSED PMODULE_OPERATOR_FREE
 NOTHROW(FCALL get__userelf_module_free)(void) {
-	if (pdyn__userelf_module_free == (LPMODULE_OPERATOR_FREE)(void *)-1)
+	if (pdyn__userelf_module_free == (PMODULE_OPERATOR_FREE)(void *)-1)
 		*(void **)&pdyn__userelf_module_free = driver_dlsym_global("_userelf_module_free");
 	return pdyn__userelf_module_free;
 }

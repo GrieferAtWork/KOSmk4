@@ -59,8 +59,8 @@ struct rpc_syscall_info;
  * @return: true:  The system call was recognized, and `desc' was filled accordingly.
  * @return: false: Unknown system call (`desc' was filled with stub-values) */
 typedef __ATTR_NONNULL((1, 2)) __BOOL
-/*__NOTHROW_NCX*/ (LIBSCTRACE_CC *LPSC_GETDESC)(struct rpc_syscall_info const *__restrict sc_info,
-                                                struct sc_desc *__restrict desc);
+/*__NOTHROW_NCX*/ (LIBSCTRACE_CC *PSC_GETDESC)(struct rpc_syscall_info const *__restrict sc_info,
+                                               struct sc_desc *__restrict desc);
 #ifdef LIBSCTRACE_WANT_PROTOTYPES
 LIBSCTRACE_DECL __ATTR_NONNULL((1, 2)) __BOOL
 __NOTHROW_NCX(LIBSCTRACE_CC sc_getdesc)(struct rpc_syscall_info const *__restrict sc_info,
@@ -74,9 +74,9 @@ __NOTHROW_NCX(LIBSCTRACE_CC sc_getdesc)(struct rpc_syscall_info const *__restric
  *          argument to a system  call (i.e. a faulty  pointer
  *          when a structure pointer or string was expected) */
 typedef __ATTR_NONNULL((1)) __ssize_t
-(LIBSCTRACE_CC *LPSC_PRINTVALUE)(__pformatprinter printer, void *arg,
-                                 __uintptr_t argtype, union sc_argval value,
-                                 struct sc_argument *link);
+(LIBSCTRACE_CC *PSC_PRINTVALUE)(__pformatprinter printer, void *arg,
+                                __uintptr_t argtype, union sc_argval value,
+                                struct sc_argument *link);
 #ifdef LIBSCTRACE_WANT_PROTOTYPES
 LIBSCTRACE_DECL __ATTR_NONNULL((1)) __ssize_t LIBSCTRACE_CC
 sc_printvalue(__pformatprinter printer, void *arg,

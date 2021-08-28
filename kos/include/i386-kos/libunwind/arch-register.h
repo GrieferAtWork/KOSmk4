@@ -169,7 +169,10 @@ typedef PUNWIND_SETREG_KCPUSTATE PUNWIND_SETREG_ERROR_REGISTER_STATE;
 
 /* Only provided for kernel-space (for now); User-space support
  * could also be provided, but isn't needed and would  therefor
- * only add unnecessary bloat! */
+ * only add unnecessary bloat!
+ * Even in kernel-space, we technically only need it for debug
+ * support in the  builtin debugger, but  no mandatory  system
+ * features. */
 #if defined(__x86_64__) && (defined(__KERNEL__) || defined(__INTELLISENSE__))
 #define LIBUNWIND_WANT_COMPAT_REGISTER_WRAPPER 1
 #endif /* __x86_64__ && __KERNEL__ */

@@ -54,11 +54,11 @@ STATIC_ASSERT(sizeof(union iconv_encode_data) == (_ICONV_ENCODE_OPAQUE_POINTERS 
 
 
 #if CODEC_STATEFUL_COUNT != 0
-typedef NONNULL((1, 2)) void (CC *LPICONV_STATEFUL_ENCODE_INIT)(struct iconv_encode *__restrict self, /*out*/ struct iconv_printer *__restrict input);
-typedef NONNULL((1, 2)) void (CC *LPICONV_STATEFUL_DECODE_INIT)(struct iconv_decode *__restrict self, /*out*/ struct iconv_printer *__restrict input);
-PRIVATE LPICONV_STATEFUL_ENCODE_INIT pdyn_iconv_stateful_encode_init = NULL;
-PRIVATE LPICONV_STATEFUL_DECODE_INIT pdyn_iconv_stateful_decode_init = NULL;
-PRIVATE void *pdyn_libiconv_stateful                                 = NULL;
+typedef NONNULL((1, 2)) void (CC *PICONV_STATEFUL_ENCODE_INIT)(struct iconv_encode *__restrict self, /*out*/ struct iconv_printer *__restrict input);
+typedef NONNULL((1, 2)) void (CC *PICONV_STATEFUL_DECODE_INIT)(struct iconv_decode *__restrict self, /*out*/ struct iconv_printer *__restrict input);
+PRIVATE PICONV_STATEFUL_ENCODE_INIT pdyn_iconv_stateful_encode_init = NULL;
+PRIVATE PICONV_STATEFUL_DECODE_INIT pdyn_iconv_stateful_decode_init = NULL;
+PRIVATE void *pdyn_libiconv_stateful                                = NULL;
 PRIVATE WUNUSED bool CC load_libiconv_stateful(void) {
 	if (pdyn_libiconv_stateful == NULL) {
 		void *lib = dlopen("libiconv-stateful.so", RTLD_LOCAL);
@@ -66,8 +66,8 @@ PRIVATE WUNUSED bool CC load_libiconv_stateful(void) {
 not_available:
 			ATOMIC_CMPXCH(pdyn_libiconv_stateful, NULL, (void *)-1);
 		} else {
-			LPICONV_STATEFUL_ENCODE_INIT sencode_init;
-			LPICONV_STATEFUL_DECODE_INIT sdecode_init;
+			PICONV_STATEFUL_ENCODE_INIT sencode_init;
+			PICONV_STATEFUL_DECODE_INIT sdecode_init;
 			*(void **)&sencode_init = dlsym(lib, "iconv_stateful_encode_init");
 			*(void **)&sdecode_init = dlsym(lib, "iconv_stateful_decode_init");
 			if (!sencode_init || !sdecode_init) {
