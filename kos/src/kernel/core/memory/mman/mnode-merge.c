@@ -50,7 +50,7 @@
 #undef CONFIG_HAVE_MNODE_MERGE
 #elif !defined(CONFIG_HAVE_MNODE_MERGE)
 #define CONFIG_HAVE_MNODE_MERGE 1
-#elif (CONFIG_HAVE_MNODE_MERGE+0) == 0
+#elif (CONFIG_HAVE_MNODE_MERGE + 0) == 0
 #undef CONFIG_HAVE_MNODE_MERGE
 #define CONFIG_NO_MNODE_MERGE 1
 #endif
@@ -1299,6 +1299,7 @@ NOTHROW(FCALL mpart_domerge_with_all_locks)(/*inherit(on_success)*/ REF struct m
                                             struct mpart *orig_part) {
 	bool hasmeta;
 	size_t losize = mpart_getsize(lopart);
+	size_t hisize = mpart_getsize(hipart);
 	assert_assume(lopart->mp_file == hipart->mp_file);
 
 	/* Remove with parts from the associated file. (if not anon) */
@@ -1331,7 +1332,7 @@ NOTHROW(FCALL mpart_domerge_with_all_locks)(/*inherit(on_success)*/ REF struct m
 	    (lopart->mp_flags & MPART_F_BLKST_INL) ||
 	    (hipart->mp_flags & MPART_F_BLKST_INL)) {
 		size_t total_bytes, total_blocks, lo_blocks;
-		total_bytes  = losize + mpart_getsize(hipart);
+		total_bytes  = losize + hisize;
 		total_blocks = total_bytes >> lopart->mp_file->mf_blockshift;
 		lo_blocks    = losize >> lopart->mp_file->mf_blockshift;
 		if (total_blocks <= MPART_BLKST_BLOCKS_PER_WORD) {
@@ -1412,11 +1413,10 @@ NOTHROW(FCALL mpart_domerge_with_all_locks)(/*inherit(on_success)*/ REF struct m
 		        "mchunkvec_getsize(lovec, locnt) = %#" PRIxSIZ "\n"
 		        "losize                          = %#" PRIxSIZ,
 		        mchunkvec_getsize(lovec, locnt), losize);
-		assertf(mchunkvec_getsize(hivec, hicnt) == mpart_getsize(hipart),
+		assertf(mchunkvec_getsize(hivec, hicnt) == hisize,
 		        "mchunkvec_getsize(hivec, hicnt) = %#" PRIxSIZ "\n"
-		        "mpart_getsize(hipart)           = %#" PRIxSIZ,
-		        mchunkvec_getsize(hivec, hicnt),
-		        mpart_getsize(hipart));
+		        "hisize                          = %#" PRIxSIZ,
+		        mchunkvec_getsize(hivec, hicnt), hisize);
 #endif /* !NDEBUG */
 		if ((lovec[locnt - 1].mc_start + lovec[locnt - 1].mc_size) != hivec[0].mc_start) {
 			/* TODO: Try to re-map the mappings of the 2 parts  */
@@ -1577,11 +1577,12 @@ NOTHROW(FCALL mpart_domerge_with_all_locks)(/*inherit(on_success)*/ REF struct m
 		}
 #ifndef NDEBUG
 		assert(losize == mpart_getsize(lopart));
+		assert(hisize == mpart_getsize(hipart));
 		assert((lopart->mp_state == MPART_ST_MEM
 		        ? (lopart->mp_mem.mc_size * PAGESIZE)
 		        : mchunkvec_getsize(lopart->mp_mem_sc.ms_v,
 		                            lopart->mp_mem_sc.ms_c)) ==
-		       (losize + mpart_getsize(hipart)));
+		       (losize + hisize));
 #endif /* !NDEBUG */
 	} else if ((lopart->mp_state == MPART_ST_VOID && hipart->mp_state == MPART_ST_VOID) ||
 #ifdef LIBVIO_CONFIG_ENABLED
@@ -1604,7 +1605,7 @@ NOTHROW(FCALL mpart_domerge_with_all_locks)(/*inherit(on_success)*/ REF struct m
 	/* === Point of no return */
 
 	/* Update the maxaddr field of `lopart'. */
-	lopart->mp_maxaddr += mpart_getsize(hipart);
+	lopart->mp_maxaddr += hisize;
 
 	/* Merge metadata (and transfer futex objects) */
 	if (hasmeta) {
@@ -1682,8 +1683,8 @@ NOTHROW(FCALL mpart_domerge_with_all_locks)(/*inherit(on_success)*/ REF struct m
 	} else {
 		/* Update to reflect all of the data that's been stolen by `lopart' */
 		hipart->mp_state = MPART_ST_VOID;
-		hipart->mp_minaddr   = (pos_t)PAGESIZE;
-		hipart->mp_maxaddr   = (pos_t)(PAGESIZE - 1);
+		hipart->mp_maxaddr   = (pos_t)lopart->mp_file->mf_part_amask;
+		hipart->mp_minaddr   = hipart->mp_maxaddr + 1;
 		hipart->mp_blkst_ptr = NULL;
 		ATOMIC_AND(hipart->mp_flags, ~MPART_F_BLKST_INL);
 		hipart->mp_file = incref(&mfile_anon[lopart->mp_file->mf_blockshift]);

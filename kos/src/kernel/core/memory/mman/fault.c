@@ -970,14 +970,19 @@ pcopy_free_unused_block_status:
 
 		/* Try to merge the newly updated node with its successor/predecessor. */
 		{
-			byte_t *old_minaddr;
-			old_minaddr    = node->mn_minaddr;
 			node           = mnode_merge_with_partlock(node);
 			self->mfl_node = node;
 			self->mfl_part = node->mn_part;
-			assert(old_minaddr >= node->mn_minaddr);
-			if (old_minaddr > node->mn_minaddr)
-				self->mfl_offs += (size_t)(old_minaddr - node->mn_minaddr);
+			assert(self->mfl_addr >= node->mn_minaddr);
+			assert(self->mfl_addr <= node->mn_maxaddr);
+			/* Re-calculate the part-offset which should be mapped.
+			 *
+			 * This is needed because merging the mem-node might have  altered
+			 * the node's base address and/or its mn_partoff! The former being
+			 * changed when the node itself is merged, and the later when  the
+			 * pointed-to mem-part is merged. */
+			self->mfl_offs = (size_t)((byte_t *)self->mfl_addr - node->mn_minaddr) +
+			                 node->mn_partoff;
 		} /* Scope... */
 	} EXCEPT {
 		/* Must re-initialize `mfl_scdat' on error (it was originally finalized by
