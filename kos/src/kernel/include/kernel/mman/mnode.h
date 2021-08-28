@@ -379,7 +379,7 @@ struct mnode {
 #if (PAGEDIR_PROT_EXEC == MNODE_F_PEXEC && \
      PAGEDIR_PROT_READ == MNODE_F_PREAD && \
      PAGEDIR_PROT_WRITE == MNODE_F_PWRITE)
-#define mnode_getperm_force(self)                                            \
+#define mnode_getperm_force(self) \
 	((self)->mn_flags & (MNODE_F_PEXEC | MNODE_F_PREAD | MNODE_F_PWRITE))
 #else /* ... */
 #define mnode_getperm_force(self)                                   \
@@ -462,7 +462,7 @@ FUNDEF NOBLOCK NONNULL((1, 2)) unsigned int
 NOTHROW(FCALL mnode_clear_write_locked_p)(struct mnode *__restrict self,
                                           struct mman *__restrict mm);
 
-/* Same as  `mnode_clear_write_locked_p()', but  directory
+/* Same as  `mnode_clear_write_locked_p()',  but  directly
  * operate on the current page directory / memory manager. */
 FUNDEF NOBLOCK NONNULL((1)) unsigned int
 NOTHROW(FCALL mnode_clear_write_locked)(struct mnode *__restrict self);

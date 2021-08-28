@@ -1260,14 +1260,15 @@ again_check_next_same_base:
 			 * nodes, which may not necessarily be the largest! */
 			mpart_reladdr_t next_endaddr;
 			next_endaddr = mnode_getmapendaddr(next);
-			if (node_endaddr < next_endaddr)
+			if (node_endaddr < next_endaddr) {
 				node_endaddr = next_endaddr; /* Use the end-address of the largest node! */
+				node         = next;         /* Node needs to stay the one which extends the greatest amount. */
+			}
 
 			/* Look  at the next node and check if it too has the same base address.
 			 * Note that since the  list of nodes is  sorted by base address,  we're
 			 * allowed to assume any follow-up node's base address is >= the current
 			 * node's. */
-			node = next;
 			next = mpart_node_iterator_next(&iter);
 			if (!next)
 				break; /* Last node reached. */

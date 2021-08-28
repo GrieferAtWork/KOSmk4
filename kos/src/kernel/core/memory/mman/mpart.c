@@ -128,22 +128,27 @@ NOTHROW(FCALL mpart_assert_integrity)(struct mpart *__restrict self) {
 	{
 		unsigned int i;
 		for (i = 0; i < COMPILER_LENOF(self->_mp_nodlsts); ++i) {
-			struct mnode *iter;
-			LIST_FOREACH (iter, &self->_mp_nodlsts[i], mn_link) {
+			struct mnode *node;
+			LIST_FOREACH (node, &self->_mp_nodlsts[i], mn_link) {
 				byte_t *minaddr, *maxaddr;
 				mpart_reladdr_t part_minaddr;
 				mpart_reladdr_t part_maxaddr;
 				size_t node_size;
 				REF struct mman *mm;
-				if (ATOMIC_READ(iter->mn_flags) & MNODE_F_UNMAPPED)
+				if (ATOMIC_READ(node->mn_flags) & MNODE_F_UNMAPPED)
 					continue; /* Allow bad values for unmapped nodes. */
-				mm = iter->mn_mman;
+				mm = node->mn_mman;
 				if (!tryincref(mm))
 					continue; /* Allow bad values for dead mmans. */
-				minaddr      = iter->mn_minaddr;
-				maxaddr      = iter->mn_maxaddr;
-				part_minaddr = iter->mn_partoff;
+				minaddr      = node->mn_minaddr;
+				maxaddr      = node->mn_maxaddr;
+				part_minaddr = node->mn_partoff;
 				COMPILER_READ_BARRIER();
+				assertf(node->mn_part == self,
+				        "Node uses incorrect mem-part:\n"
+				        "iter->mn_part = %p\n"
+				        "self          = %p\n",
+				        node->mn_part, self);
 				assertf(maxaddr >= minaddr,
 				        "Invalid min/max addr bounds:\n"
 				        "minaddr = %p\n"
