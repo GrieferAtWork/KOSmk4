@@ -275,16 +275,17 @@
 
 /* printf(): char8_t / char16_t / char32_t */
 #ifdef __CRT_KOS
-#define PRIc8  "c"    /* c */
+#define PRIc7  "c"    /* ASCII character (by ordinal: U+0000 - U+007F) */
+#define PRIc8  "I8c"  /* 8-bit character (by ordinal: U+0000 - U+00FF; iow: LATIN-1) */
 #if __SIZEOF_SHORT__ == 2
-#define PRIc16 "hc"   /* I16c */
+#define PRIc16 "hc"   /* 16-bit character (by ordinal: U+0000 - U+FFFF) */
 #else /* __SIZEOF_SHORT__ == 2 */
-#define PRIc16 "I16c" /* I16c */
+#define PRIc16 "I16c" /* 16-bit character (by ordinal: U+0000 - U+FFFF) */
 #endif /* __SIZEOF_SHORT__ != 2 */
 #if __SIZEOF_LONG__ == 4
-#define PRIc32 "lc"   /* I32c */
+#define PRIc32 "lc"   /* 32-bit character (by ordinal: U+00000000 - U+FFFFFFFF) */
 #else /* __SIZEOF_LONG__ == 4 */
-#define PRIc32 "I32c" /* I32c */
+#define PRIc32 "I32c" /* 32-bit character (by ordinal: U+00000000 - U+FFFFFFFF) */
 #endif /* __SIZEOF_LONG__ != 4 */
 #endif /* __PRI4_PREFIX */
 
