@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xbe4a1290 */
+/* HASH CRC-32:0xa8f7db3f */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -3056,7 +3056,10 @@ __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_MALL_DEFAULT_ALIGNED __ATTR_WUNUSED __ATTR
  * used to invoke the system interpreter.
  * This function only returns on failure (similar to exec(2)), and will never
  * return on success (since in that case, the calling program will have been
- * replaced by the system shell) */
+ * replaced by the system shell)
+ * The shell paths attempted by this function are system-dependent, but before
+ * any of them are tested, this function will try to use `getenv("SHELL")', if
+ * and only if that variable is defined and starts with a '/'-character. */
 __CDECLARE(,int,__NOTHROW_RPC,shexec,(char const *__command),(__command))
 #elif defined(__CRT_HAVE_execl) || defined(__CRT_HAVE__execl) || defined(__CRT_HAVE_execv) || defined(__CRT_HAVE__execv) || ((defined(__CRT_HAVE_execve) || defined(__CRT_HAVE__execve)) && defined(__LOCAL_environ))
 #include <libc/local/stdlib/shexec.h>
@@ -3066,7 +3069,10 @@ __CDECLARE(,int,__NOTHROW_RPC,shexec,(char const *__command),(__command))
  * used to invoke the system interpreter.
  * This function only returns on failure (similar to exec(2)), and will never
  * return on success (since in that case, the calling program will have been
- * replaced by the system shell) */
+ * replaced by the system shell)
+ * The shell paths attempted by this function are system-dependent, but before
+ * any of them are tested, this function will try to use `getenv("SHELL")', if
+ * and only if that variable is defined and starts with a '/'-character. */
 __NAMESPACE_LOCAL_USING_OR_IMPL(shexec, __FORCELOCAL __ATTR_ARTIFICIAL int __NOTHROW_RPC(__LIBCCALL shexec)(char const *__command) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(shexec))(__command); })
 #else /* ... */
 #undef __shexec_defined

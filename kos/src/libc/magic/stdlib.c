@@ -2986,11 +2986,26 @@ void *__NOTHROW_NCX(__LIBCCALL calloc)(__SIZE_TYPE__ __num_bytes) { return (call
 @@This function only returns on failure (similar to exec(2)), and will never
 @@return on success (since in that case, the calling program will have been
 @@replaced by the system shell)
+@@The shell paths attempted by this function are system-dependent, but before
+@@any of them are tested, this function will try to use `getenv("SHELL")', if
+@@and only if that variable is defined and starts with a '/'-character.
 [[cp, guard, section(".text.crt{|.dos}.fs.exec.system")]]
 [[requires_function(execl)]]
 int shexec([[nullable]] char const *command) {
 	static char const arg_sh[] = "sh";
 	static char const arg__c[] = "-c";
+
+@@pp_if $has_function(getenv)@@
+	/* Try to make use of $SHELL, if defined and an absolute path. */
+	char const *environ_shell = getenv("SHELL");
+	if (environ_shell && *environ_shell == '/') {
+		char const *environ_shell_sh;
+		environ_shell_sh = strrchrnul(environ_shell, '/') + 1;
+		execl(environ_shell, environ_shell_sh,
+		      arg__c, command, (char *)NULL);
+	}
+@@pp_endif@@
+
 @@pp_ifdef __KOS__@@
 	/* By default, KOS uses busybox, so try to invoke that first. */
 	execl("/bin/busybox", arg_sh, arg__c, command, (char *)NULL);

@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x1c9da214 */
+/* HASH CRC-32:0xf7bb5a6d */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -123,7 +123,10 @@ __CREDIRECT(__ATTR_WUNUSED,__pid_t,__NOTHROW_NCX,__localdep_fork,(void),__fork,(
  * used to invoke the system interpreter.
  * This function only returns on failure (similar to exec(2)), and will never
  * return on success (since in that case, the calling program will have been
- * replaced by the system shell) */
+ * replaced by the system shell)
+ * The shell paths attempted by this function are system-dependent, but before
+ * any of them are tested, this function will try to use `getenv("SHELL")', if
+ * and only if that variable is defined and starts with a '/'-character. */
 __CREDIRECT(,int,__NOTHROW_RPC,__localdep_shexec,(char const *__command),shexec,(__command))
 #elif defined(__CRT_HAVE_execl) || defined(__CRT_HAVE__execl) || defined(__CRT_HAVE_execv) || defined(__CRT_HAVE__execv) || ((defined(__CRT_HAVE_execve) || defined(__CRT_HAVE__execve)) && defined(__LOCAL_environ))
 __NAMESPACE_LOCAL_END
@@ -135,7 +138,10 @@ __NAMESPACE_LOCAL_BEGIN
  * used to invoke the system interpreter.
  * This function only returns on failure (similar to exec(2)), and will never
  * return on success (since in that case, the calling program will have been
- * replaced by the system shell) */
+ * replaced by the system shell)
+ * The shell paths attempted by this function are system-dependent, but before
+ * any of them are tested, this function will try to use `getenv("SHELL")', if
+ * and only if that variable is defined and starts with a '/'-character. */
 #define __localdep_shexec __LIBC_LOCAL_NAME(shexec)
 #else /* ... */
 #undef __local___localdep_shexec_defined

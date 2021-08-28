@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x49e4a89f */
+/* HASH CRC-32:0x4dadb258 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -821,7 +821,10 @@ INTDEF WUNUSED NONNULL((2)) fd_t NOTHROW_RPC(LIBCCALL libc_system_mktemp)(unsign
  * used to invoke the system interpreter.
  * This function only returns on failure (similar to exec(2)), and will never
  * return on success (since in that case, the calling program will have been
- * replaced by the system shell) */
+ * replaced by the system shell)
+ * The shell paths attempted by this function are system-dependent, but before
+ * any of them are tested, this function will try to use `getenv("SHELL")', if
+ * and only if that variable is defined and starts with a '/'-character. */
 INTDEF int NOTHROW_RPC(LIBDCALL libd_shexec)(char const *command);
 #endif /* !__LIBCCALL_IS_LIBDCALL && !__KERNEL__ */
 #ifndef __KERNEL__
@@ -831,7 +834,10 @@ INTDEF int NOTHROW_RPC(LIBDCALL libd_shexec)(char const *command);
  * used to invoke the system interpreter.
  * This function only returns on failure (similar to exec(2)), and will never
  * return on success (since in that case, the calling program will have been
- * replaced by the system shell) */
+ * replaced by the system shell)
+ * The shell paths attempted by this function are system-dependent, but before
+ * any of them are tested, this function will try to use `getenv("SHELL")', if
+ * and only if that variable is defined and starts with a '/'-character. */
 INTDEF int NOTHROW_RPC(LIBCCALL libc_shexec)(char const *command);
 /* Returns the absolute filename of the main executable (s.a. `program_invocation_name') */
 INTDEF ATTR_CONST WUNUSED char const *NOTHROW_NCX(LIBCCALL libc_getexecname)(void);

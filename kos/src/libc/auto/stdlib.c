@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xb6a4871 */
+/* HASH CRC-32:0xaae6633d */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -1997,11 +1997,26 @@ do_try_again:
  * used to invoke the system interpreter.
  * This function only returns on failure (similar to exec(2)), and will never
  * return on success (since in that case, the calling program will have been
- * replaced by the system shell) */
+ * replaced by the system shell)
+ * The shell paths attempted by this function are system-dependent, but before
+ * any of them are tested, this function will try to use `getenv("SHELL")', if
+ * and only if that variable is defined and starts with a '/'-character. */
 INTERN ATTR_SECTION(".text.crt.fs.exec.system") int
 NOTHROW_RPC(LIBCCALL libc_shexec)(char const *command) {
 	static char const arg_sh[] = "sh";
 	static char const arg__c[] = "-c";
+
+#if defined(__CRT_HAVE_getenv) || defined(__LOCAL_environ)
+	/* Try to make use of $SHELL, if defined and an absolute path. */
+	char const *environ_shell = libc_getenv("SHELL");
+	if (environ_shell && *environ_shell == '/') {
+		char const *environ_shell_sh;
+		environ_shell_sh = libc_strrchrnul(environ_shell, '/') + 1;
+		libc_execl(environ_shell, environ_shell_sh,
+		      arg__c, command, (char *)NULL);
+	}
+#endif /* __CRT_HAVE_getenv || __LOCAL_environ */
+
 
 	/* By default, KOS uses busybox, so try to invoke that first. */
 	libc_execl("/bin/busybox", arg_sh, arg__c, command, (char *)NULL);
