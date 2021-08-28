@@ -145,7 +145,7 @@ __FORCELOCAL __ATTR_WUNUSED void *(__rdip)(void) {
 	        ".cfi_adjust_cfa_offset -4"
 	        : "=r" (__result));
 #else
-	__asm__("movl $991f, 60(%1)\n\t"
+	__asm__("movl $991f, %0\n\t"
 	        "991:"
 	        : "=g" (__result));
 #endif
