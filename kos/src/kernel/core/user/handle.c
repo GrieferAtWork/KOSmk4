@@ -224,7 +224,8 @@ again_check_changed:
 			--alloc;
 		}
 		assert(alloc >= (self->hm_count - self->hm_clofork_count));
-		vec = (struct handle *)kmalloc_nx(alloc * sizeof(struct handle), GFP_PREFLT | GFP_ATOMIC);
+		vec = (struct handle *)kmalloc_nx(alloc * sizeof(struct handle),
+		                                  GFP_PREFLT | GFP_ATOMIC);
 		if (!vec) {
 			unsigned int new_alloc;
 			sync_endread(&self->hm_lock);
@@ -292,6 +293,8 @@ check_new_alloc_linear:
 				alloc = new_alloc;
 			}
 		}
+
+		clear_unused_but_allocated_handle_vector_tail(vec, alloc);
 		result->hm_linear.hm_alloc  = alloc;
 		result->hm_linear.hm_vector = vec;
 
