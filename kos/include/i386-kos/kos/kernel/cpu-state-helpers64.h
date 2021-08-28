@@ -508,6 +508,7 @@ __NOTHROW_NCX(icpustate64_to_ucpustate64_ex)(struct icpustate64 const *__restric
 	__result->ucs_rip          = irregs64_getrip(&__self->ics_irregs);
 	__result->ucs_rflags       = irregs64_getrflags(&__self->ics_irregs);
 	__result->ucs_cs           = irregs64_getcs(&__self->ics_irregs);
+	__result->ucs_ss           = irregs64_getss(&__self->ics_irregs);
 	__result->ucs_sgregs.sg_gs = __v_gs;
 	__result->ucs_sgregs.sg_fs = __v_fs;
 	__result->ucs_sgregs.sg_ds = __v_ds;
