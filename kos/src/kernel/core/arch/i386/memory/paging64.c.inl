@@ -1274,7 +1274,7 @@ NOTHROW(FCALL p64_pagedir_isprepared)(VIRT void *addr) {
 		return false; /* 2MiB page */
 	vec1 = P64_PDIR_VEC1INDEX(addr);
 	word = ATOMIC_READ(P64_PDIR_E1_IDENTITY[vec4][vec3][vec2][vec1].p_word);
-	return word & P64_PAGE_FPREPARED || P64_PDIR_E1_ISHINT(word);
+	return (word & P64_PAGE_FPREPARED) || P64_PDIR_E1_ISHINT(word);
 }
 #define assert_prepared_if(cond, addr, num_bytes) \
 	((cond) ? assert_prepared(addr, num_bytes) : (void)0)

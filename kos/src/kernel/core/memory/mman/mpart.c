@@ -39,10 +39,12 @@
 
 #include <hybrid/align.h>
 #include <hybrid/atomic.h>
+#include <hybrid/overflow.h>
 
 #include <kos/except.h>
 
 #include <assert.h>
+#include <inttypes.h>
 #include <stddef.h>
 #include <string.h>
 
@@ -58,6 +60,120 @@ DECL_BEGIN
 #else /* !NDEBUG */
 #define DBG_memset(dst, byte, num_bytes) (void)0
 #endif /* NDEBUG */
+
+
+#ifndef NDEBUG
+/* Assert the integrity of the given mem-part and associated nodes.
+ * The caller must be holding a lock to `self'. */
+PUBLIC NOBLOCK NONNULL((1)) void
+NOTHROW(FCALL mpart_assert_integrity)(struct mpart *__restrict self) {
+	size_t size;
+	assert(mpart_lock_acquired(self));
+	assert(self->mp_refcnt != 0);
+	assertf(self->mp_maxaddr + 1 >= self->mp_minaddr ||
+	        self->mp_maxaddr == (pos_t)-1,
+	        "Invalid min/max addr range:\n"
+	        "self->mp_minaddr = %#" PRIxN(__SIZEOF_POS_T__) "\n"
+	        "self->mp_maxaddr = %#" PRIxN(__SIZEOF_POS_T__) "\n",
+	        self->mp_minaddr, self->mp_maxaddr);
+	size = mpart_getsize(self);
+#if __SIZEOF_SIZE_T__ < __SIZEOF_POS_T__
+	assertf(self->mp_minaddr + size - 1 == self->mp_maxaddr,
+	        "Size too large:\n"
+	        "self->mp_minaddr = %#" PRIxN(__SIZEOF_POS_T__) "\n"
+	        "self->mp_maxaddr = %#" PRIxN(__SIZEOF_POS_T__) "\n"
+	        "size = %#" PRIxSIZ "\n"
+	        "size = %#" PRIxN(__SIZEOF_POS_T__) " (actual)\n",
+	        self->mp_minaddr, self->mp_maxaddr,
+	        size, (self->mp_maxaddr - self->mp_minaddr) + 1);
+#endif /* __SIZEOF_SIZE_T__ < __SIZEOF_POS_T__ */
+	assertf(IS_ALIGNED(size, PAGESIZE),
+	        "Part size %#" PRIxSIZ " isn't page-aligned", size);
+	switch (self->mp_state) {
+
+	case MPART_ST_SWP:
+	case MPART_ST_MEM:
+		assertf((size / PAGESIZE) == self->mp_mem.mc_size,
+		        "Part size %#" PRIxSIZ " doesn't match mem size %#" PRIx64,
+		        size, (u64)self->mp_mem.mc_size * PAGESIZE);
+		break;
+
+#ifdef LIBVIO_CONFIG_ENABLED
+	case MPART_ST_VIO:
+		break;
+#endif /* LIBVIO_CONFIG_ENABLED */
+
+	case MPART_ST_SWP_SC:
+	case MPART_ST_MEM_SC: {
+		size_t i;
+		physpagecnt_t total_size = 0;
+		for (i = 0; i < self->mp_mem_sc.ms_c; ++i) {
+			if (OVERFLOW_UADD(total_size,
+			                  self->mp_mem_sc.ms_v[i].mc_size,
+			                  &total_size))
+				assert_failed("Part size overflow");
+		}
+		assertf((size / PAGESIZE) == total_size,
+		        "Part size %#" PRIxSIZ " doesn't match mem size %#" PRIx64,
+		        size, (u64)total_size * PAGESIZE);
+	}	break;
+
+	default:
+		assertf(self->mp_state == MPART_ST_VOID,
+		        "Invalid state: %u",
+		        (unsigned int)self->mp_state);
+	}
+
+	/* Assert that mem-node access ranges are all in-bounds. */
+	{
+		unsigned int i;
+		for (i = 0; i < COMPILER_LENOF(self->_mp_nodlsts); ++i) {
+			struct mnode *iter;
+			LIST_FOREACH (iter, &self->_mp_nodlsts[i], mn_link) {
+				byte_t *minaddr, *maxaddr;
+				mpart_reladdr_t part_minaddr;
+				mpart_reladdr_t part_maxaddr;
+				size_t node_size;
+				REF struct mman *mm;
+				if (ATOMIC_READ(iter->mn_flags) & MNODE_F_UNMAPPED)
+					continue; /* Allow bad values for unmapped nodes. */
+				mm = iter->mn_mman;
+				if (!tryincref(mm))
+					continue; /* Allow bad values for dead mmans. */
+				minaddr      = iter->mn_minaddr;
+				maxaddr      = iter->mn_maxaddr;
+				part_minaddr = iter->mn_partoff;
+				COMPILER_READ_BARRIER();
+				assertf(maxaddr >= minaddr,
+				        "Invalid min/max addr bounds:\n"
+				        "minaddr = %p\n"
+				        "maxaddr = %p\n",
+				        minaddr, maxaddr);
+				assertf(IS_ALIGNED((uintptr_t)minaddr, PAGESIZE),
+				        "Unaligned minaddr %p", minaddr);
+				assertf(IS_ALIGNED((uintptr_t)maxaddr + 1, PAGESIZE),
+				        "Unaligned maxaddr %p", maxaddr);
+				node_size = (size_t)(maxaddr - minaddr) + 1;
+				if (OVERFLOW_UADD(part_minaddr, node_size - 1, &part_maxaddr)) {
+					assert_failed("Mapped part range overflows\n"
+					              "part_minaddr = %#" PRIxSIZ "\n"
+					              "node_size    = %#" PRIxSIZ "\n",
+					              part_minaddr, node_size);
+				}
+				assertf(part_maxaddr <= size - 1,
+				        "Mem-node mapping is out-of-bounds:\n"
+				        "Node address range: %p-%p\n"
+				        "Node part range:    %#" PRIxSIZ "-%#" PRIxSIZ "\n"
+				        "Valid part range:   0x0-%#" PRIxSIZ "\n",
+				        minaddr, maxaddr, part_minaddr,
+				        part_maxaddr, size - 1);
+				decref_unlikely(mm);
+			}
+		}
+	}
+}
+#endif /* !NDEBUG */
+
 
 
 /* Reference counting control for `struct mpart' */

@@ -281,6 +281,7 @@ something_changed:
 
 		mman_mappings_insert(self, node);
 		node = mnode_merge_with_partlock(node);
+		mpart_assert_integrity(node->mn_part);
 		mpart_lock_release(node->mn_part);
 	}
 
@@ -485,6 +486,7 @@ NOTHROW(KCALL insert_and_maybe_map_nodes)(struct mman *__restrict self,
 					LIST_INSERT_HEAD(&self->mm_writable, node, mn_writable);
 			}
 			node = mnode_merge_with_partlock(node);
+			mpart_assert_integrity(node->mn_part);
 			mpart_lock_release(node->mn_part);
 		} else {
 			mnode_merge(node);
@@ -681,6 +683,7 @@ err_cannot_prepare:
 					if (map_prot & PAGEDIR_PROT_WRITE)
 						LIST_INSERT_HEAD(&self->mm_writable, node, mn_writable);
 					node = mnode_merge_with_partlock(node);
+					mpart_assert_integrity(node->mn_part);
 					mpart_lock_release(node->mn_part);
 				} else {
 					mnode_merge(node);
@@ -840,6 +843,7 @@ again_lock_mman_phase2:
 							if (map_prot & PAGEDIR_PROT_WRITE)
 								LIST_INSERT_HEAD(&self->mm_writable, node, mn_writable);
 							node = mnode_merge_with_partlock(node);
+							mpart_assert_integrity(node->mn_part);
 							mpart_lock_release(node->mn_part);
 						} else {
 							mnode_merge(node);

@@ -707,6 +707,7 @@ NOTHROW(FCALL mnode_domerge)(struct mnode *__restrict lonode,
 		if (result != MNODE_MERGE_CANNOT_MERGE &&
 		    result != MNODE_MERGE_ASYNC_WAITFOR)
 			lopart = result->mn_part;
+		mpart_assert_integrity(lopart);
 		mpart_lock_release(lopart);
 		return result;
 	}
@@ -781,6 +782,7 @@ NOTHROW(FCALL mnode_merge)(struct mnode *__restrict self) {
 	/* Try to acquire a lock to the associated part. */
 	if (mpart_lock_tryacquire(part)) {
 		result = mnode_merge_with_partlock(self);
+		mpart_assert_integrity(result->mn_part);
 		mpart_lock_release(result->mn_part);
 	} else {
 		/* If  we couldn't get a lock to the part, but the
@@ -1702,6 +1704,7 @@ NOTHROW(FCALL mpart_domerge_with_all_locks)(/*inherit(on_success)*/ REF struct m
 #endif /* ARCH_HAVE_RTM */
 			mpartmeta_ftxlock_endwrite(hipart->mp_meta, hipart);
 		}
+		mpart_assert_integrity(hipart);
 		mpart_lock_release(hipart);
 		/* Drop the reference that was originally given to us by the caller. */
 		decref_unlikely(hipart);
@@ -1709,12 +1712,15 @@ NOTHROW(FCALL mpart_domerge_with_all_locks)(/*inherit(on_success)*/ REF struct m
 done_destroy_hipart:
 	if (!mpart_isanon(lopart))
 		mpart_tree_insert(&lopart->mp_file->mf_parts, lopart);
+	mpart_assert_integrity(lopart);
 	return lopart;
 err_async_waitfor:
 	/* Restore parts. */
 	if (!mpart_isanon(lopart)) {
 		mpart_tree_insert(&lopart->mp_file->mf_parts, lopart);
 		mpart_tree_insert(&lopart->mp_file->mf_parts, hipart);
+		mpart_assert_integrity(lopart);
+		mpart_assert_integrity(hipart);
 	}
 	return MPART_MERGE_ASYNC_WAITFOR;
 err_cannot_merge:
@@ -1722,6 +1728,8 @@ err_cannot_merge:
 	if (!mpart_isanon(lopart)) {
 		mpart_tree_insert(&lopart->mp_file->mf_parts, lopart);
 		mpart_tree_insert(&lopart->mp_file->mf_parts, hipart);
+		mpart_assert_integrity(lopart);
+		mpart_assert_integrity(hipart);
 	}
 	return MPART_MERGE_CANNOT_MERGE;
 }
@@ -2423,6 +2431,7 @@ NOTHROW(FCALL mpart_merge)(REF struct mpart *__restrict self) {
 	if (mpart_lock_tryacquire(self)) {
 domerge_locked:
 		self = mpart_merge_locked(self);
+		mpart_assert_integrity(self);
 		mpart_lock_release(self);
 	} else {
 		/* Enqueue a lockop to eventually merge `self' once the

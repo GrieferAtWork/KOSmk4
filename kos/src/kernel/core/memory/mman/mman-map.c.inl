@@ -505,6 +505,7 @@ again_lock_mfile_map:
 
 			mman_mappings_insert(self, node);
 			node = mnode_merge_with_partlock(node);
+			mpart_assert_integrity(node->mn_part);
 			mpart_lock_release(node->mn_part);
 		}
 #endif /* HAVE_FILE */

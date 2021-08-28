@@ -998,6 +998,7 @@ again_enum_hipart_nodlst:
 	}
 
 	/* Release the lock with which we've created `lopart' */
+	mpart_assert_integrity(lopart);
 	mpart_lock_release(lopart);
 
 	/* Drop our own personal reference from `lopart' (created above)
@@ -1548,6 +1549,7 @@ NOTHROW(FCALL mpart_trim_mmplop)(Tobpostlockop(mman) *__restrict _lop,
 	if (mpart_lock_tryacquire(self)) {
 		/* Do the actual trimming! */
 		mpart_trim_locked(self);
+		mpart_assert_integrity(self);
 		mpart_lock_release(self);
 	} else {
 		/* The part lock isn't available.
@@ -1622,6 +1624,7 @@ NOTHROW(FCALL mpart_trim)(/*inherit(always)*/ REF struct mpart *__restrict self)
 
 		/* Do the actual trimming! */
 		mpart_trim_locked(self);
+		mpart_assert_integrity(self);
 		mpart_lock_release(self);
 	} else {
 		/* Schedule an async lock-op.

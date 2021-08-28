@@ -512,6 +512,16 @@ struct mpart {
 #define mpart_getblockcount(self, file) (size_t)(mpart_getsize(self) >> (file)->mf_blockshift)           /* WARNING: This one requires a lock! */
 
 
+#ifndef NDEBUG
+/* Assert the integrity of the given mem-part and associated nodes.
+ * The caller must be holding a lock to `self'. */
+FUNDEF NOBLOCK NONNULL((1)) void
+NOTHROW(FCALL mpart_assert_integrity)(struct mpart *__restrict self);
+#else /* !NDEBUG */
+#define mpart_assert_integrity(self) (void)0
+#endif /* NDEBUG */
+
+
 /* Check   if  `self'  is  anonymous  (that  is:  `self !in self->mp_file->mf_parts')
  * Note that as long as you're holding a lock to `self', you may make the assumption:
  *    `(!wasdestroyed(self) && !mpart_isanon(self)) -> !mfile_isanon(self->mp_file)'

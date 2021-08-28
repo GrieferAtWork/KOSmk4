@@ -445,6 +445,7 @@ again_extend_part:
 		}
 		if (result != MFILE_EXTENDPART_OR_UNLOCK_NOSIB) {
 			incref(result);
+			mpart_assert_integrity(result);
 			mpart_lock_release(result);
 			mfile_lock_endwrite(self);
 			return result;

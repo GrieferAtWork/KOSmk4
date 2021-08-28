@@ -1288,6 +1288,7 @@ clear_hipart_changed_bit:
 		_mpart_init_asanon(hipart);
 	}
 
+
 	/* Release locks. */
 	mpart_unlock_all_mmans(self);
 	mpart_foreach_mmans_decref(self);
@@ -1295,6 +1296,7 @@ clear_hipart_changed_bit:
 	/* Also release the lock to the (new) `hipart'
 	 * This lock was originally acquired (so-to-say) by initializing the new
 	 * part's `mp_flags' field with the `MPART_F_LOCKBIT' flag already  set. */
+	mpart_assert_integrity(hipart);
 	mpart_lock_release(hipart);
 
 	/* Truncate dynamically allocated parts of `self'
@@ -1343,6 +1345,7 @@ clear_hipart_changed_bit:
 	}
 #endif
 
+	mpart_assert_integrity(self);
 	mpart_lock_release(self);
 
 	/* Free nodes for the hi-part that we didn't end up using. */
