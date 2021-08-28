@@ -1835,6 +1835,9 @@ NOTHROW(FCALL mpart_domerge_with_mm_lock)(/*inherit(on_success)*/ REF struct mpa
 	blocking_mman = mpart_lock_all_mmans(lopart, locked_mman);
 	if unlikely(blocking_mman != NULL) {
 waitfor_blocking_mman:
+		/* Release the file-lock from above, if it was acquired. */
+		if (file != NULL)
+			mfile_lock_endwrite(file);
 		if (async_waitfor_mman_and_mergepart(blocking_mman, orig_part))
 			_mman_lockops_reap(blocking_mman);
 		return MPART_MERGE_ASYNC_WAITFOR;
@@ -1849,7 +1852,7 @@ waitfor_blocking_mman:
 	result = mpart_domerge_with_all_locks_noftx(lopart, hipart, orig_part);
 
 	/* Release the file-lock from above, if it was acquired. */
-	if (file)
+	if (file != NULL)
 		mfile_lock_endwrite(file);
 
 	/* Release locks and drop references... */
