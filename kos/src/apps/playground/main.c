@@ -438,11 +438,11 @@ int main_sleep(int argc, char *argv[], char *envp[]) {
 static int my_static = 0;
 int main_dl(int argc, char *argv[], char *envp[]) {
 	(void)argc, (void)argv, (void)envp;
-	printf("stdout   @ %p\n", &stdout);
-	printf("my_state @ %p\n", &my_static);
-	printf("printf   @ %p\n", (void *)&printf);
-	printf("printf   @ %p (dlsym)\n", dlsym(RTLD_DEFAULT, "printf"));
-	printf("vprintf  @ %p (dlsym)\n", dlsym(RTLD_DEFAULT, "vprintf"));
+	printf("stdout    @ %p\n", &stdout);
+	printf("my_static @ %p\n", &my_static);
+	printf("printf    @ %p\n", (void *)&printf);
+	printf("printf    @ %p (dlsym)\n", dlsym(RTLD_DEFAULT, "printf"));
+	printf("vprintf   @ %p (dlsym)\n", dlsym(RTLD_DEFAULT, "vprintf"));
 	return 0;
 }
 /************************************************************************/
