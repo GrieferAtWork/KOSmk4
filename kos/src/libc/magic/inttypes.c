@@ -274,14 +274,18 @@
 
 
 /* printf(): char8_t / char16_t / char32_t */
-#ifdef __PRI1_PREFIX
-#define PRIc8 __PRI1_PREFIX "c" /* I8c */
-#endif /* __PRI1_PREFIX */
-#ifdef __PRI2_PREFIX
-#define PRIc16 __PRI2_PREFIX "c" /* I16c */
-#endif /* __PRI2_PREFIX */
-#ifdef __PRI4_PREFIX
-#define PRIc32 __PRI4_PREFIX "c" /* I32c */
+#ifdef __CRT_KOS
+#define PRIc8  "c"    /* c */
+#if __SIZEOF_SHORT__ == 2
+#define PRIc16 "hc"   /* I16c */
+#else /* __SIZEOF_SHORT__ == 2 */
+#define PRIc16 "I16c" /* I16c */
+#endif /* __SIZEOF_SHORT__ != 2 */
+#if __SIZEOF_LONG__ == 4
+#define PRIc32 "lc"   /* I32c */
+#else /* __SIZEOF_LONG__ == 4 */
+#define PRIc32 "I32c" /* I32c */
+#endif /* __SIZEOF_LONG__ != 4 */
 #endif /* __PRI4_PREFIX */
 
 

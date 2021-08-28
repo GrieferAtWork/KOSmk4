@@ -535,9 +535,10 @@ __nextfmt:
 		__CHAR_TYPE __given_char[1];
 #endif
 		__CHAR32_TYPE__ __ch32;
-		/* `%I32c' --> print utf-32 character */
+		/* `%c'    --> print ascii character */
 		/* `%I16c' --> print utf-16 character (not surrogate support...) */
-		/* `%lc'   --> print utf-16/32 character */
+		/* `%I32c' --> print utf-32 character */
+		/* `%lc'   --> print utf-16/32 character (same width as `wchar_t') */
 		if (!__length)
 			__ch32 = __builtin_va_arg(__FORMAT_ARGS, unsigned int) & 0x7f;
 #if __VA_SIZE >= 4
