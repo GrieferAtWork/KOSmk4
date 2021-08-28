@@ -552,7 +552,7 @@ NOTHROW(FCALL mnode_domerge_samepart_locked)(struct mnode *__restrict lonode,
 	LIST_REMOVE(hinode, mn_link);
 
 	/* If the hinode was in the writable-list, then remove it.
-	 * Furthermore, if the lonode wasn't  in its, add it  now! */
+	 * Furthermore, if the  lonode wasn't in  it, add it  now! */
 	if (LIST_ISBOUND(hinode, mn_writable)) {
 		LIST_REMOVE(hinode, mn_writable);
 		if (!LIST_ISBOUND(lonode, mn_writable))
@@ -1643,6 +1643,8 @@ NOTHROW(FCALL mpart_domerge_with_all_locks)(/*inherit(on_success)*/ REF struct m
 				/* Re-insert the node into the proper node-list of `lopart' */
 				LIST_INSERT_HEAD(&lopart->_mp_nodlsts[i], node, mn_link);
 			}
+			DBG_memset(&hipart->_mp_nodlsts[i], 0xcc,
+			           sizeof(hipart->_mp_nodlsts[i]));
 		}
 	}
 

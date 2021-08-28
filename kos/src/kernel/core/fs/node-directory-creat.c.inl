@@ -136,7 +136,6 @@ directory_mkdir(struct directory_node *__restrict target_directory,
 #endif /* ... */
 	REF struct directory_entry *target_entry;
 #ifdef DEFINE_DIRECTORY_CREATFILE
-again:
 	assert((mode & ~07777) == 0);
 #elif defined(DEFINE_DIRECTORY_SYMLINK)
 	assert((mode & ~07777) == 0);
@@ -165,8 +164,8 @@ again:
 		THROW(E_FSERROR_UNSUPPORTED_OPERATION, E_FILESYSTEM_OPERATION_MKDIR);
 #endif /* ... */
 
+	inode_lock_write(target_directory);
 #ifdef DEFINE_DIRECTORY_CREATFILE
-	sync_read(target_directory);
 	TRY {
 		inode_check_deleted(target_directory, E_FILESYSTEM_DELETED_PATH);
 		if ((open_mode & (O_CREAT | O_EXCL)) != (O_CREAT | O_EXCL)) {
@@ -180,23 +179,19 @@ again:
 			if (target_entry)
 				goto return_existing_entry;
 		}
+		/* When not in create-mode, throw a file-not-found exception. */
+		if (!(open_mode & O_CREAT))
+			THROW(E_FSERROR_FILE_NOT_FOUND);
 	} EXCEPT {
-		if (inode_lock_endread(target_directory))
-			goto again;
+		inode_lock_endwrite(target_directory);
 		RETHROW();
 	}
-	/* When not in create-mode, throw a file-not-found exception. */
-	if (!(open_mode & O_CREAT)) {
-		sync_endread(target_directory);
-		THROW(E_FSERROR_FILE_NOT_FOUND);
-	}
-	sync_upgrade(target_directory);
-#else /* DEFINE_DIRECTORY_CREATFILE */
-	sync_write(target_directory);
-#endif /* !DEFINE_DIRECTORY_CREATFILE */
+#endif /* DEFINE_DIRECTORY_CREATFILE */
 
 	TRY {
+#ifndef DEFINE_DIRECTORY_CREATFILE
 		inode_check_deleted(target_directory, E_FILESYSTEM_DELETED_PATH);
+#endif /* !DEFINE_DIRECTORY_CREATFILE */
 		/* Must create a new entry. */
 		target_entry = directory_entry_alloc_s(target_name, target_namelen);
 		TRY {

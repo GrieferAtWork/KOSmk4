@@ -1281,7 +1281,9 @@ NOTHROW(KCALL Fat_SaveINodeToFatFile)(struct inode const *__restrict self,
 	file->f_size = HTOLE32((u32)self->i_filesize);
 #ifdef CONFIG_FAT_CYGWIN_SYMLINKS
 	if (INODE_ISLNK(self))
-		file->f_size = HTOLE32((u32)self->i_filesize + sizeof(Fat_CygwinSymlinkMagic) + 1);
+		file->f_size = HTOLE32((u32)self->i_filesize +
+		                       (u32)sizeof(Fat_CygwinSymlinkMagic) +
+		                       (u32)1);
 #endif /* CONFIG_FAT_CYGWIN_SYMLINKS */
 	/* Implement the read-only attribute. */
 	if (!(self->i_filemode & 0222))
@@ -1872,7 +1874,8 @@ Fat_AddFileToDirectory(struct directory_node *__restrict target_directory,
 		if (INODE_ISLNK(new_node)) {
 			/* Must account for the magic header and the trailing NUL character! */
 			files[file_count - 1].f_size = HTOLE32((u32)new_node->i_filesize +
-			                                       sizeof(Fat_CygwinSymlinkMagic) + 1);
+			                                       (u32)sizeof(Fat_CygwinSymlinkMagic) +
+			                                       (u32)1);
 			files[file_count - 1].f_attr |= FAT_ATTR_SYSTEM;
 		} else
 #endif /* CONFIG_FAT_CYGWIN_SYMLINKS */

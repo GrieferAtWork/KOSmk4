@@ -2490,6 +2490,7 @@ unlock_directory_and_start_again:
 	task_yield();
 	goto again;
 wait_for_removed_path:
+	rwlock_endread(__inode_lock(self));
 	TRY {
 		sync_write(removed_path);
 	} EXCEPT {

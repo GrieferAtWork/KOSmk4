@@ -247,7 +247,6 @@ int main_fork(int argc, char *argv[], char *envp[]) {
 	unsigned int depth = 0;
 	unsigned int max_depth = 1;
 	bool in_child = false;
-	bool did_trigger = false;
 	pid_t mygroup = getpgid(0);
 	static char const lockfile[] = "/tmp/.fork-lock";
 	(void)argc, (void)argv, (void)envp;
@@ -256,7 +255,7 @@ int main_fork(int argc, char *argv[], char *envp[]) {
 	unlink(lockfile);
 	for (;;) {
 		pid_t cpid;
-		if (depth == max_depth && !did_trigger) {
+		if (depth == max_depth) {
 			fd_t lock;
 			/* Kill the entire process group  which should contain about a  gazillion
 			 * threads at this point, but use a lock-file to only send a signal once.
