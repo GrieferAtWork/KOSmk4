@@ -185,9 +185,9 @@ NOTHROW(KCALL isr_vector_state_alloc_atomic_nx)(size_t handc) {
 	REF struct isr_vector_state *result;
 	struct heapptr ptr;
 	ptr = heap_alloc_nx(&kernel_locked_heap,
-                        offsetof(struct isr_vector_state, ivs_handv) +
-                        handc * sizeof(struct isr_vector_handler),
-                        GFP_LOCKED | GFP_PREFLT | GFP_ATOMIC);
+	                    offsetof(struct isr_vector_state, ivs_handv) +
+	                    handc * sizeof(struct isr_vector_handler),
+	                    GFP_LOCKED | GFP_PREFLT | GFP_ATOMIC);
 	if unlikely(!ptr.hp_siz)
 		return NULL;
 	result = (REF struct isr_vector_state *)ptr.hp_ptr;
@@ -199,15 +199,15 @@ NOTHROW(KCALL isr_vector_state_alloc_atomic_nx)(size_t handc) {
 
 
 PRIVATE struct isr_vector_state empty_vector_state = {
-	/* .ivs_refcnt     = */ 1 + ISR_COUNT,
-	/* .ivs_heapsize   = */ offsetof(struct isr_vector_state, ivs_handv),
-	/* .ivs_greedy_fun = */ NULL,
-	/* .ivs_greedy_arg = */ NULL,
-	/* .ivs_greedy_drv = */ NULL,
-	/* .ivs_greedy_cnt = */ 0,
-	/* .ivs_unhandled  = */ 0,
-	/* .ivs_handc      = */ 0,
-	/* .ivs_handv      = */ { }
+	.ivs_refcnt     = 1 + ISR_COUNT,
+	.ivs_heapsize   = offsetof(struct isr_vector_state, ivs_handv),
+	.ivs_greedy_fun = NULL,
+	.ivs_greedy_arg = NULL,
+	.ivs_greedy_drv = NULL,
+	.ivs_greedy_cnt = 0,
+	.ivs_unhandled  = 0,
+	.ivs_handc      = 0,
+	.ivs_handv      = { }
 };
 
 ARREF(isr_vector_state_arref, isr_vector_state);

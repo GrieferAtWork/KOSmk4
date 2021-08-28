@@ -53,7 +53,7 @@ STATIC_ASSERT(sizeof(struct iov_physbuffer) == SIZEOF_IOV_PHYSBUFFER);
 
 
 
-/* Read/write/set data associated with AIO buffers. */
+/* Read/write/set data associated with IOV buffers. */
 PUBLIC NONNULL((1)) void KCALL
 iov_buffer_copyfromphys(struct iov_buffer const *__restrict self,
                         uintptr_t dst_offset, physaddr_t src, size_t num_bytes)

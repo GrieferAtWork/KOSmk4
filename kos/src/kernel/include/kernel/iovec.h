@@ -154,7 +154,7 @@ struct iov_physbuffer {
 FUNDEF NOBLOCK WUNUSED NONNULL((1)) size_t NOTHROW(KCALL iov_buffer_size)(struct iov_buffer const *__restrict self);
 FUNDEF NOBLOCK WUNUSED NONNULL((1)) size_t NOTHROW(KCALL iov_physbuffer_size)(struct iov_physbuffer const *__restrict self);
 
-/* Initialize a given AIO buffer as a view of memory of another. */
+/* Initialize a given IOV buffer as a view of memory of another. */
 FUNDEF NOBLOCK NONNULL((1, 2)) void NOTHROW(KCALL iov_buffer_init_view_before)(struct iov_buffer *__restrict self, struct iov_buffer const *__restrict base, uintptr_t end_offset);
 FUNDEF NOBLOCK NONNULL((1, 2)) void NOTHROW(KCALL iov_buffer_init_view_after)(struct iov_buffer *__restrict self, struct iov_buffer const *__restrict base, uintptr_t start_offset);
 FUNDEF NOBLOCK NONNULL((1, 2)) void NOTHROW(KCALL iov_buffer_init_view)(struct iov_buffer *__restrict self, struct iov_buffer const *__restrict base, uintptr_t start_offset, size_t num_bytes);
@@ -162,7 +162,7 @@ FUNDEF NOBLOCK NONNULL((1, 2)) void NOTHROW(KCALL iov_physbuffer_init_view_befor
 FUNDEF NOBLOCK NONNULL((1, 2)) void NOTHROW(KCALL iov_physbuffer_init_view_after)(struct iov_physbuffer *__restrict self, struct iov_physbuffer const *__restrict base, uintptr_t start_offset);
 FUNDEF NOBLOCK NONNULL((1, 2)) void NOTHROW(KCALL iov_physbuffer_init_view)(struct iov_physbuffer *__restrict self, struct iov_physbuffer const *__restrict base, uintptr_t start_offset, size_t num_bytes);
 
-/* Read/write/set data associated with AIO buffers. */
+/* Read/write/set data associated with IOV buffers. */
 FUNDEF NONNULL((1)) void KCALL iov_buffer_memset(struct iov_buffer const *__restrict self, uintptr_t dst_offset, int byte, size_t num_bytes) THROWS(E_SEGFAULT);
 FUNDEF NONNULL((1)) void KCALL iov_buffer_copyfrommem(struct iov_buffer const *__restrict self, uintptr_t dst_offset, USER CHECKED void const *__restrict src, size_t num_bytes) THROWS(E_SEGFAULT);
 FUNDEF NONNULL((1)) void KCALL iov_buffer_copytomem(struct iov_buffer const *__restrict self, USER CHECKED void *__restrict dst, uintptr_t src_offset, size_t num_bytes) THROWS(E_SEGFAULT);

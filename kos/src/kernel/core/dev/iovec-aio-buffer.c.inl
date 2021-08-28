@@ -31,21 +31,27 @@ DECL_BEGIN
 
 
 #ifdef DEFINE_FOR_IOV_BUFFER
-#define STRUCT_IOV_BUFFER     struct iov_buffer
-#define STRUCT_IOV_ENTRY      struct iov_entry
-#define IOV_ARITH_TYPE        byte_t *
-#define IOV_BUFFER_FUNC(name) iov_buffer_##name
+#define LOCAL_struct_iov_buffer           struct iov_buffer
+#define LOCAL_struct_iov_entry            struct iov_entry
+#define LOCAL_iov_arith_t                 byte_t *
+#define LOCAL_iov_buffer_size             iov_buffer_size
+#define LOCAL_iov_buffer_init_view_before iov_buffer_init_view_before
+#define LOCAL_iov_buffer_init_view_after  iov_buffer_init_view_after
+#define LOCAL_iov_buffer_init_view        iov_buffer_init_view
 #else /* DEFINE_FOR_IOV_BUFFER */
-#define STRUCT_IOV_BUFFER     struct iov_physbuffer
-#define STRUCT_IOV_ENTRY      struct iov_physentry
-#define IOV_ARITH_TYPE        physaddr_t
-#define IOV_BUFFER_FUNC(name) iov_physbuffer_##name
+#define LOCAL_struct_iov_buffer           struct iov_physbuffer
+#define LOCAL_struct_iov_entry            struct iov_physentry
+#define LOCAL_iov_arith_t                 physaddr_t
+#define LOCAL_iov_buffer_size             iov_physbuffer_size
+#define LOCAL_iov_buffer_init_view_before iov_physbuffer_init_view_before
+#define LOCAL_iov_buffer_init_view_after  iov_physbuffer_init_view_after
+#define LOCAL_iov_buffer_init_view        iov_physbuffer_init_view
 #endif /* !DEFINE_FOR_IOV_BUFFER */
 
 
 /* Helper functions */
 PUBLIC NOBLOCK ATTR_PURE WUNUSED NONNULL((1)) size_t
-NOTHROW(KCALL IOV_BUFFER_FUNC(size))(STRUCT_IOV_BUFFER const *__restrict self) {
+NOTHROW(KCALL LOCAL_iov_buffer_size)(LOCAL_struct_iov_buffer const *__restrict self) {
 	size_t i, result;
 	result = self->iv_last + self->iv_head.ive_size;
 	for (i = 1; i < self->iv_entc - 1; ++i)
@@ -55,8 +61,8 @@ NOTHROW(KCALL IOV_BUFFER_FUNC(size))(STRUCT_IOV_BUFFER const *__restrict self) {
 
 
 PUBLIC NOBLOCK NONNULL((1, 2)) void
-NOTHROW(KCALL IOV_BUFFER_FUNC(init_view_before))(STRUCT_IOV_BUFFER *__restrict self,
-                                                 STRUCT_IOV_BUFFER const *__restrict base,
+NOTHROW(KCALL LOCAL_iov_buffer_init_view_before)(LOCAL_struct_iov_buffer *__restrict self,
+                                                 LOCAL_struct_iov_buffer const *__restrict base,
                                                  uintptr_t end_offset) {
 	size_t i;
 	uintptr_t total = 0;
@@ -81,14 +87,14 @@ NOTHROW(KCALL IOV_BUFFER_FUNC(init_view_before))(STRUCT_IOV_BUFFER *__restrict s
 }
 
 PUBLIC NOBLOCK NONNULL((1, 2)) void
-NOTHROW(KCALL IOV_BUFFER_FUNC(init_view_after))(STRUCT_IOV_BUFFER *__restrict self,
-                                                STRUCT_IOV_BUFFER const *__restrict base,
+NOTHROW(KCALL LOCAL_iov_buffer_init_view_after)(LOCAL_struct_iov_buffer *__restrict self,
+                                                LOCAL_struct_iov_buffer const *__restrict base,
                                                 uintptr_t start_offset) {
 	self->iv_last = base->iv_last;
 	if (start_offset < base->iv_head.ive_size) {
-		self->iv_entc         = base->iv_entc;
-		self->iv_entv         = base->iv_entv;
-		self->iv_head.ive_base = (IOV_ARITH_TYPE)base->iv_head.ive_base + start_offset;
+		self->iv_entc          = base->iv_entc;
+		self->iv_entv          = base->iv_entv;
+		self->iv_head.ive_base = (LOCAL_iov_arith_t)base->iv_head.ive_base + start_offset;
 		self->iv_head.ive_size = base->iv_head.ive_size - start_offset;
 	} else {
 		size_t i;
@@ -99,7 +105,7 @@ NOTHROW(KCALL IOV_BUFFER_FUNC(init_view_after))(STRUCT_IOV_BUFFER *__restrict se
 				self->iv_entc = base->iv_entc - i;
 				self->iv_entv = base->iv_entv + i;
 				self->iv_head = self->iv_entv[0];
-				self->iv_head.ive_base = (IOV_ARITH_TYPE)self->iv_head.ive_base + start_offset;
+				self->iv_head.ive_base = (LOCAL_iov_arith_t)self->iv_head.ive_base + start_offset;
 				self->iv_head.ive_size -= start_offset;
 				return;
 			}
@@ -109,8 +115,8 @@ NOTHROW(KCALL IOV_BUFFER_FUNC(init_view_after))(STRUCT_IOV_BUFFER *__restrict se
 }
 
 PUBLIC NOBLOCK NONNULL((1, 2)) void
-NOTHROW(KCALL IOV_BUFFER_FUNC(init_view))(STRUCT_IOV_BUFFER *__restrict self,
-                                          STRUCT_IOV_BUFFER const *__restrict base,
+NOTHROW(KCALL LOCAL_iov_buffer_init_view)(LOCAL_struct_iov_buffer *__restrict self,
+                                          LOCAL_struct_iov_buffer const *__restrict base,
                                           uintptr_t start_offset, size_t num_bytes) {
 	size_t i, entc_after_start;
 	uintptr_t total;
@@ -118,7 +124,7 @@ NOTHROW(KCALL IOV_BUFFER_FUNC(init_view))(STRUCT_IOV_BUFFER *__restrict self,
 	if (start_offset < base->iv_head.ive_size) {
 		entc_after_start       = base->iv_entc;
 		self->iv_entv          = base->iv_entv;
-		self->iv_head.ive_base = (IOV_ARITH_TYPE)base->iv_head.ive_base + start_offset;
+		self->iv_head.ive_base = (LOCAL_iov_arith_t)base->iv_head.ive_base + start_offset;
 		self->iv_head.ive_size = base->iv_head.ive_size - start_offset;
 	} else {
 		start_offset -= base->iv_head.ive_size;
@@ -128,7 +134,7 @@ NOTHROW(KCALL IOV_BUFFER_FUNC(init_view))(STRUCT_IOV_BUFFER *__restrict self,
 				entc_after_start       = base->iv_entc - i;
 				self->iv_entv          = base->iv_entv + i;
 				self->iv_head          = self->iv_entv[0];
-				self->iv_head.ive_base = (IOV_ARITH_TYPE)self->iv_head.ive_base + start_offset;
+				self->iv_head.ive_base = (LOCAL_iov_arith_t)self->iv_head.ive_base + start_offset;
 				self->iv_head.ive_size -= start_offset;
 				return;
 			}
@@ -153,10 +159,13 @@ NOTHROW(KCALL IOV_BUFFER_FUNC(init_view))(STRUCT_IOV_BUFFER *__restrict self,
 	self->iv_last = num_bytes - total;
 }
 
-#undef IOV_BUFFER_FUNC
-#undef IOV_ARITH_TYPE
-#undef STRUCT_IOV_ENTRY
-#undef STRUCT_IOV_BUFFER
+#undef LOCAL_iov_buffer_init_view
+#undef LOCAL_iov_buffer_init_view_after
+#undef LOCAL_iov_buffer_init_view_before
+#undef LOCAL_iov_buffer_size
+#undef LOCAL_iov_arith_t
+#undef LOCAL_struct_iov_entry
+#undef LOCAL_struct_iov_buffer
 
 DECL_END
 
