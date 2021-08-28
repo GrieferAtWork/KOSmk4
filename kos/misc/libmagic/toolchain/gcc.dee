@@ -234,8 +234,9 @@ global class GCCToolchain: Toolchain {
 									/* Make sure that LINENO starts with a digit */
 									if (lineno_end < #l && l.isdigit(lineno_end))
 									{
-										do ++lineno_end;
-										while (lineno_end < #l && l.isdigit(lineno_end));
+										do {
+											++lineno_end;
+										} while (lineno_end < #l && l.isdigit(lineno_end));
 										local ld_path = normalizeFilenameForLog(
 											l[:col].decode("utf-8"));
 										local script_path = normalizeFilenameForLog(

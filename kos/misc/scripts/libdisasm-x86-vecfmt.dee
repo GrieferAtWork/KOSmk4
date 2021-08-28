@@ -159,8 +159,9 @@ for (local l: File.stdin) {
 			local l = currentGroup[i];
 			local j = l.index("\"") + 1;
 			if (l.issymstrt(j)) {
-				do ++j;
-				while (l.issymcont(j));
+				do {
+					++j;
+				} while (l.issymcont(j));
 				if (l[j] == " ") {
 					l = l[:j] + "\\t" + l[j + 1:];
 				}

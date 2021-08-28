@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x5b6236fe */
+/* HASH CRC-32:0x96695c8f */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -40,7 +40,7 @@ __LOCAL_LIBC(qsort_r) __ATTR_NONNULL((1, 4)) void
 	 *
 	 * WARNING: This function's logic will break in situations where `item_count' is
 	 *          greater than or equal to:
-	 *  - sizeof(size_t) == 4: item_count >= 0x67ea0dc9         (> 2.5 GiB is data at least)
+	 *  - sizeof(size_t) == 4: item_count >= 0x67ea0dc9         (> 2.5 GiB of data at least)
 	 *  - sizeof(size_t) == 8: item_count >= 0xfd150e7b3dafdc31 (an insane amount of memory...)
 	 *
 	 * But I would argue that this isn't something that could ever feasibly happen, and

@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xaae6633d */
+/* HASH CRC-32:0xa7525dec */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -2235,7 +2235,7 @@ INTERN ATTR_SECTION(".text.crt.utility.stdlib") NONNULL((1, 4)) void
 	 *
 	 * WARNING: This function's logic will break in situations where `item_count' is
 	 *          greater than or equal to:
-	 *  - sizeof(size_t) == 4: item_count >= 0x67ea0dc9         (> 2.5 GiB is data at least)
+	 *  - sizeof(size_t) == 4: item_count >= 0x67ea0dc9         (> 2.5 GiB of data at least)
 	 *  - sizeof(size_t) == 8: item_count >= 0xfd150e7b3dafdc31 (an insane amount of memory...)
 	 *
 	 * But I would argue that this isn't something that could ever feasibly happen, and
@@ -2499,8 +2499,9 @@ NOTHROW_NCX(LIBCCALL libc__itoa_s)(int val,
 		val = -val;
 	}
 	temp = val;
-	do ++p;
-	while ((temp /= (unsigned int)radix) != 0);
+	do {
+		++p;
+	} while ((temp /= (unsigned int)radix) != 0);
 	if (buflen <= (size_t)(p - buf)) {
 #ifdef ERANGE
 		return ERANGE;
@@ -2542,8 +2543,9 @@ NOTHROW_NCX(LIBCCALL libc__ltoa_s)(long val,
 		val = -val;
 	}
 	temp = val;
-	do ++p;
-	while ((temp /= (unsigned int)radix) != 0);
+	do {
+		++p;
+	} while ((temp /= (unsigned int)radix) != 0);
 	if (buflen <= (size_t)(p - buf)) {
 #ifdef ERANGE
 		return ERANGE;
@@ -2572,8 +2574,9 @@ NOTHROW_NCX(LIBCCALL libc__ultoa_s)(unsigned long val,
 		radix = 10;
 	p = buf;
 	temp = val;
-	do ++p;
-	while ((temp /= (unsigned int)radix) != 0);
+	do {
+		++p;
+	} while ((temp /= (unsigned int)radix) != 0);
 	if (buflen <= (size_t)(p - buf)) {
 #ifdef ERANGE
 		return ERANGE;
@@ -2641,8 +2644,9 @@ NOTHROW_NCX(LIBCCALL libc__i64toa_s)(s64 val,
 		val = -val;
 	}
 	temp = val;
-	do ++p;
-	while ((temp /= (unsigned int)radix) != 0);
+	do {
+		++p;
+	} while ((temp /= (unsigned int)radix) != 0);
 	if (buflen <= (size_t)(p - buf)) {
 #ifdef ERANGE
 		return ERANGE;
@@ -2674,8 +2678,9 @@ NOTHROW_NCX(LIBCCALL libc__ui64toa_s)(u64 val,
 		radix = 10;
 	p = buf;
 	temp = val;
-	do ++p;
-	while ((temp /= (unsigned int)radix) != 0);
+	do {
+		++p;
+	} while ((temp /= (unsigned int)radix) != 0);
 	if (buflen <= (size_t)(p - buf)) {
 #ifdef ERANGE
 		return ERANGE;
@@ -3605,8 +3610,9 @@ NOTHROW_NCX(LIBDCALL libd__itow_s)(int val,
 		val = -val;
 	}
 	temp = val;
-	do ++p;
-	while ((temp /= (unsigned int)radix) != 0);
+	do {
+		++p;
+	} while ((temp /= (unsigned int)radix) != 0);
 	if (buflen <= (size_t)(p - buf)) {
 #ifdef ERANGE
 		return ERANGE;
@@ -3645,8 +3651,9 @@ NOTHROW_NCX(LIBKCALL libc__itow_s)(int val,
 		val = -val;
 	}
 	temp = val;
-	do ++p;
-	while ((temp /= (unsigned int)radix) != 0);
+	do {
+		++p;
+	} while ((temp /= (unsigned int)radix) != 0);
 	if (buflen <= (size_t)(p - buf)) {
 #ifdef ERANGE
 		return ERANGE;
@@ -3685,8 +3692,9 @@ NOTHROW_NCX(LIBDCALL libd__ltow_s)(long val,
 		val = -val;
 	}
 	temp = val;
-	do ++p;
-	while ((temp /= (unsigned int)radix) != 0);
+	do {
+		++p;
+	} while ((temp /= (unsigned int)radix) != 0);
 	if (buflen <= (size_t)(p - buf)) {
 #ifdef ERANGE
 		return ERANGE;
@@ -3725,8 +3733,9 @@ NOTHROW_NCX(LIBKCALL libc__ltow_s)(long val,
 		val = -val;
 	}
 	temp = val;
-	do ++p;
-	while ((temp /= (unsigned int)radix) != 0);
+	do {
+		++p;
+	} while ((temp /= (unsigned int)radix) != 0);
 	if (buflen <= (size_t)(p - buf)) {
 #ifdef ERANGE
 		return ERANGE;
@@ -3754,8 +3763,9 @@ NOTHROW_NCX(LIBDCALL libd__ultow_s)(unsigned long val,
 		radix = 10;
 	p = buf;
 	temp = val;
-	do ++p;
-	while ((temp /= (unsigned int)radix) != 0);
+	do {
+		++p;
+	} while ((temp /= (unsigned int)radix) != 0);
 	if (buflen <= (size_t)(p - buf)) {
 #ifdef ERANGE
 		return ERANGE;
@@ -3783,8 +3793,9 @@ NOTHROW_NCX(LIBKCALL libc__ultow_s)(unsigned long val,
 		radix = 10;
 	p = buf;
 	temp = val;
-	do ++p;
-	while ((temp /= (unsigned int)radix) != 0);
+	do {
+		++p;
+	} while ((temp /= (unsigned int)radix) != 0);
 	if (buflen <= (size_t)(p - buf)) {
 #ifdef ERANGE
 		return ERANGE;
@@ -3823,8 +3834,9 @@ NOTHROW_NCX(LIBDCALL libd__i64tow_s)(s64 val,
 		val = -val;
 	}
 	temp = val;
-	do ++p;
-	while ((temp /= (unsigned int)radix) != 0);
+	do {
+		++p;
+	} while ((temp /= (unsigned int)radix) != 0);
 	if (buflen <= (size_t)(p - buf)) {
 #ifdef ERANGE
 		return ERANGE;
@@ -3863,8 +3875,9 @@ NOTHROW_NCX(LIBKCALL libc__i64tow_s)(s64 val,
 		val = -val;
 	}
 	temp = val;
-	do ++p;
-	while ((temp /= (unsigned int)radix) != 0);
+	do {
+		++p;
+	} while ((temp /= (unsigned int)radix) != 0);
 	if (buflen <= (size_t)(p - buf)) {
 #ifdef ERANGE
 		return ERANGE;
@@ -3892,8 +3905,9 @@ NOTHROW_NCX(LIBDCALL libd__ui64tow_s)(u64 val,
 		radix = 10;
 	p = buf;
 	temp = val;
-	do ++p;
-	while ((temp /= (unsigned int)radix) != 0);
+	do {
+		++p;
+	} while ((temp /= (unsigned int)radix) != 0);
 	if (buflen <= (size_t)(p - buf)) {
 #ifdef ERANGE
 		return ERANGE;
@@ -3921,8 +3935,9 @@ NOTHROW_NCX(LIBKCALL libc__ui64tow_s)(u64 val,
 		radix = 10;
 	p = buf;
 	temp = val;
-	do ++p;
-	while ((temp /= (unsigned int)radix) != 0);
+	do {
+		++p;
+	} while ((temp /= (unsigned int)radix) != 0);
 	if (buflen <= (size_t)(p - buf)) {
 #ifdef ERANGE
 		return ERANGE;

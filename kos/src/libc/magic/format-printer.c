@@ -558,8 +558,9 @@ $ssize_t format_hexdump([[nonnull]] pformatprinter printer, void *arg,
 	dec = DECIMALS_SELECTOR[!(flags & FORMAT_HEXDUMP_FHEXLOWER)];
 	if (flags & FORMAT_HEXDUMP_FOFFSETS) {
 		value = size;
-		do ++offset_digits;
-		while ((value >>= 4) != 0);
+		do {
+			++offset_digits;
+		} while ((value >>= 4) != 0);
 	}
 	line_data = (byte_t const *)data;
 	for (;;) {

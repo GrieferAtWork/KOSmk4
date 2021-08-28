@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xa23c94cc */
+/* HASH CRC-32:0x91fff35d */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -98,8 +98,9 @@ __LOCAL_LIBC(format_whexdump) __ATTR_NONNULL((1)) __SSIZE_TYPE__
 	__dec = __DECIMALS_SELECTOR[!(__flags & 0x0001)];
 	if (__flags & 0x0004) {
 		__value = __size;
-		do ++__offset_digits;
-		while ((__value >>= 4) != 0);
+		do {
+			++__offset_digits;
+		} while ((__value >>= 4) != 0);
 	}
 	__line_data = (__BYTE_TYPE__ const *)__data;
 	for (;;) {

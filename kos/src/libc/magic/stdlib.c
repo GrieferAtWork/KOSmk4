@@ -3404,7 +3404,7 @@ void qsort_r([[nonnull]] void *pbase, $size_t item_count, $size_t item_size,
 	 *
 	 * WARNING: This function's logic will break in situations where `item_count' is
 	 *          greater than or equal to:
-	 *  - sizeof(size_t) == 4: item_count >= 0x67ea0dc9         (> 2.5 GiB is data at least)
+	 *  - sizeof(size_t) == 4: item_count >= 0x67ea0dc9         (> 2.5 GiB of data at least)
 	 *  - sizeof(size_t) == 8: item_count >= 0xfd150e7b3dafdc31 (an insane amount of memory...)
 	 *
 	 * But I would argue that this isn't something that could ever feasibly happen, and
@@ -4251,8 +4251,9 @@ errno_t _itoa_s(int val, [[nonnull]] char *buf, $size_t buflen, int radix) {
 		val = -val;
 	}
 	temp = val;
-	do ++p;
-	while ((temp /= (unsigned int)radix) != 0);
+	do {
+		++p;
+	} while ((temp /= (unsigned int)radix) != 0);
 	if (buflen <= ($size_t)(p - buf)) {
 @@pp_ifdef ERANGE@@
 		return ERANGE;
@@ -4293,8 +4294,9 @@ errno_t _ltoa_s(long val, [[nonnull]] char *buf, $size_t buflen, int radix) {
 		val = -val;
 	}
 	temp = val;
-	do ++p;
-	while ((temp /= (unsigned int)radix) != 0);
+	do {
+		++p;
+	} while ((temp /= (unsigned int)radix) != 0);
 	if (buflen <= ($size_t)(p - buf)) {
 @@pp_ifdef ERANGE@@
 		return ERANGE;
@@ -4323,8 +4325,9 @@ errno_t _ultoa_s(unsigned long val, [[nonnull]] char *buf, $size_t buflen, int r
 		radix = 10;
 	p = buf;
 	temp = val;
-	do ++p;
-	while ((temp /= (unsigned int)radix) != 0);
+	do {
+		++p;
+	} while ((temp /= (unsigned int)radix) != 0);
 	if (buflen <= ($size_t)(p - buf)) {
 @@pp_ifdef ERANGE@@
 		return ERANGE;
@@ -4386,8 +4389,9 @@ errno_t _i64toa_s($s64 val, [[nonnull]] char *buf, $size_t buflen, int radix) {
 		val = -val;
 	}
 	temp = val;
-	do ++p;
-	while ((temp /= (unsigned int)radix) != 0);
+	do {
+		++p;
+	} while ((temp /= (unsigned int)radix) != 0);
 	if (buflen <= ($size_t)(p - buf)) {
 @@pp_ifdef ERANGE@@
 		return ERANGE;
@@ -4416,8 +4420,9 @@ errno_t _ui64toa_s($u64 val, [[nonnull]] char *buf, $size_t buflen, int radix) {
 		radix = 10;
 	p = buf;
 	temp = val;
-	do ++p;
-	while ((temp /= (unsigned int)radix) != 0);
+	do {
+		++p;
+	} while ((temp /= (unsigned int)radix) != 0);
 	if (buflen <= ($size_t)(p - buf)) {
 @@pp_ifdef ERANGE@@
 		return ERANGE;

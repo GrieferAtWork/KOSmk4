@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x1ff5ae2d */
+/* HASH CRC-32:0x31d2e142 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -43,8 +43,9 @@ __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(_itoa_s))(int __val, char *__buf, __S
 		__val = -__val;
 	}
 	__temp = __val;
-	do ++__p;
-	while ((__temp /= (unsigned int)__radix) != 0);
+	do {
+		++__p;
+	} while ((__temp /= (unsigned int)__radix) != 0);
 	if (__buflen <= (__SIZE_TYPE__)(__p - __buf)) {
 #ifdef __ERANGE
 		return __ERANGE;

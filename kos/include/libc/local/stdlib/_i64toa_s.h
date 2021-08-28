@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x224d4469 */
+/* HASH CRC-32:0x9b3f96a */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -43,8 +43,9 @@ __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(_i64toa_s))(__INT64_TYPE__ __val, cha
 		__val = -__val;
 	}
 	__temp = __val;
-	do ++__p;
-	while ((__temp /= (unsigned int)__radix) != 0);
+	do {
+		++__p;
+	} while ((__temp /= (unsigned int)__radix) != 0);
 	if (__buflen <= (__SIZE_TYPE__)(__p - __buf)) {
 #ifdef __ERANGE
 		return __ERANGE;

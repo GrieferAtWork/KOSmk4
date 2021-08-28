@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x1c5c8bdb */
+/* HASH CRC-32:0x6728c0cc */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -424,8 +424,9 @@ INTERN ATTR_SECTION(".text.crt.string.format") NONNULL((1)) ssize_t
 	dec = DECIMALS_SELECTOR[!(flags & 0x0001)];
 	if (flags & 0x0004) {
 		value = size;
-		do ++offset_digits;
-		while ((value >>= 4) != 0);
+		do {
+			++offset_digits;
+		} while ((value >>= 4) != 0);
 	}
 	line_data = (byte_t const *)data;
 	for (;;) {
