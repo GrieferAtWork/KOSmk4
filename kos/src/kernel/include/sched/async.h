@@ -55,6 +55,7 @@ INTDEF ATTR_NORETURN void KCALL _asyncmain(void);
 #endif /* CONFIG_BUILDING_KERNEL_CORE */
 
 
+struct aio_handle_stat;
 struct async;
 struct async_ops {
 	/* [1..1] The driver responsible for this providing the below operators.
@@ -110,7 +111,8 @@ struct async_ops {
 	NONNULL((1)) void
 	(FCALL *ao_cancel)(struct async *__restrict self);
 
-	/* [0..1] Optional callback to facilitate the `ht_progress' operation of AIO handles. */
+	/* [0..1] Optional callback to facilitate the `ht_progress' operation of AIO handles.
+	 * @return: * :  One of `AIO_PROGRESS_STATUS_*' */
 	NOBLOCK NONNULL((1)) unsigned int
 	/*NOTHROW*/ (FCALL *ao_progress)(struct async *__restrict self,
 	                                 struct aio_handle_stat *__restrict stat);
@@ -182,7 +184,7 @@ struct async_ops {
 #define _ASYNC_ST_DELALL          5 /* A lockop is pending to remove the job from `async_all_list' */
 #define _ASYNC_ST_READY           6 /* The job is fully up & running. */
 /*efine _ASYNC_ST_                7  * ... */
-#define _ASYNC_ST_READY_TMO       8 /* Same as `_ASYNC_ST_READY', but a timeout was set. () */
+#define _ASYNC_ST_READY_TMO       8 /* Same as `_ASYNC_ST_READY', but a timeout was set. */
 /*efine _ASYNC_ST_                9  * ... */
 #define _ASYNC_ST_TRIGGERED      10 /* An async event was triggered. */
 #define _ASYNC_ST_TRIGGERED_STOP 11 /* Same as `_ASYNC_ST_TRIGGERED', but `async_cancel()' was called */
@@ -330,8 +332,9 @@ DATDEF struct lockop_slist /*  */ async_all_lops; /* Pending lock operations for
  * kernel object, as well as  the encapsulation of the underlying  async
  * controller object.
  *
- * NOTE: The `self' argument  for all  of the following  is always  the
- *       kernel object again with the associated async worker is bound.
+ * NOTE: The `self' argument for all of the following is always the
+ *       kernel object against which the associated async worker is
+ *       bound.
  *       Note that `!wasdestroyed((T *)self)' is guarantied here!
  *
  * Also note that the guaranty is made that none of the callbacks
