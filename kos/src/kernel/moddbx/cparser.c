@@ -20,6 +20,7 @@
 #ifndef GUARD_MODDBX_CPARSER_C
 #define GUARD_MODDBX_CPARSER_C 1
 #define _KOS_SOURCE 1
+#define _GNU_SOURCE 1
 
 /* DeBug eXtensions. */
 

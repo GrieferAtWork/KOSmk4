@@ -20,6 +20,7 @@
 #ifndef GUARD_KERNEL_CORE_ARCH_I386_DEBUG_COREDUMP_C
 #define GUARD_KERNEL_CORE_ARCH_I386_DEBUG_COREDUMP_C 1
 #define _KOS_SOURCE 1
+#define _GNU_SOURCE 1
 
 #include <kernel/compiler.h>
 

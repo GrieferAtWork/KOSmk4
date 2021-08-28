@@ -20,6 +20,7 @@
 #ifndef GUARD_KERNEL_CORE_ARCH_I386_MISC_ALTERNATIVES_C
 #define GUARD_KERNEL_CORE_ARCH_I386_MISC_ALTERNATIVES_C 1
 #define DISABLE_BRANCH_PROFILING 1 /* Don't profile this file */
+#define _GNU_SOURCE 1
 
 #include <kernel/compiler.h>
 

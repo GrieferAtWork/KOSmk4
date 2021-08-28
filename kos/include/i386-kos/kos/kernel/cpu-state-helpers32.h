@@ -499,8 +499,8 @@ __NOTHROW_NCX(icpustate32_setesp_p)(struct icpustate32 *__restrict __self,
 		icpustate32_setuseresp(__self, __v_esp);
 	} else {
 		struct icpustate32 *__result;
-		__result = (struct icpustate32 *)(uintptr_t)(__v_esp - (OFFSET_ICPUSTATE32_IRREGS +
-		                                                        SIZEOF_IRREGS32_KERNEL));
+		__result = (struct icpustate32 *)(__uintptr_t)(__v_esp - (OFFSET_ICPUSTATE32_IRREGS +
+		                                                          SIZEOF_IRREGS32_KERNEL));
 		__libc_memmove(__result, __self,
 		               OFFSET_ICPUSTATE32_IRREGS +
 		               SIZEOF_IRREGS32_KERNEL);
@@ -830,8 +830,8 @@ __NOTHROW_NCX(scpustate32_setesp_p)(struct scpustate32 *__restrict __self,
 		scpustate32_setuseresp(__self, __v_esp);
 	} else {
 		struct scpustate32 *__result;
-		__result = (struct scpustate32 *)(uintptr_t)(__v_esp - (OFFSET_SCPUSTATE32_IRREGS +
-		                                                        SIZEOF_IRREGS32_KERNEL));
+		__result = (struct scpustate32 *)(__uintptr_t)(__v_esp - (OFFSET_SCPUSTATE32_IRREGS +
+		                                                          SIZEOF_IRREGS32_KERNEL));
 		__libc_memmove(__result, __self,
 		               OFFSET_SCPUSTATE32_IRREGS +
 		               SIZEOF_IRREGS32_KERNEL);

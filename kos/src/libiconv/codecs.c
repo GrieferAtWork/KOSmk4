@@ -20,6 +20,7 @@
 #ifndef GUARD_LIBICONV_CODECS_C
 #define GUARD_LIBICONV_CODECS_C 1
 #define _KOS_SOURCE 1
+#define _GNU_SOURCE 1
 
 #include "api.h"
 /**/

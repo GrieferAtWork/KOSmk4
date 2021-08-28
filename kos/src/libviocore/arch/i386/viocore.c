@@ -25,8 +25,9 @@ opt.append("-Os");
  */
 #ifndef GUARD_LIBVIOCORE_ARCH_I386_VIOCORE_C
 #define GUARD_LIBVIOCORE_ARCH_I386_VIOCORE_C 1
-#define _KOS_SOURCE 1
 #define DISABLE_BRANCH_PROFILING 1
+#define _KOS_SOURCE 1
+#define _GNU_SOURCE 1
 
 #include <hybrid/host.h>
 

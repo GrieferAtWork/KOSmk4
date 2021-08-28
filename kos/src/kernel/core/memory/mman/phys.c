@@ -22,6 +22,7 @@
 #define __WANT_MNODE_INIT
 #define __OMIT_PHYS_COPY_CONSTANT_P_WRAPPERS
 #define _KOS_SOURCE 1
+#define _GNU_SOURCE 1
 
 #include <kernel/compiler.h>
 

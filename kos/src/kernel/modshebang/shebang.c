@@ -20,6 +20,7 @@
 #ifndef GUARD_MODELFEXEC_ELF_C
 #define GUARD_MODELFEXEC_ELF_C 1
 #define _KOS_SOURCE 1
+#define _GNU_SOURCE 1
 
 #include <kernel/compiler.h>
 

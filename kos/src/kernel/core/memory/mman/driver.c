@@ -26,6 +26,7 @@
 #define __WANT_DRIVER__d_internals
 #define __WANT_MNODE__mn_dead
 #define _KOS_SOURCE 1
+#define _GNU_SOURCE 1
 
 #include <kernel/compiler.h>
 
