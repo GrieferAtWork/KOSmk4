@@ -512,23 +512,23 @@ __ASM_L(.endm)
 
 __ASM_L(.macro .cfi_restore_iret_esp iret_offset=0)
 /*[[[cfi{arch='i386', register='%esp'}
-	dup                                         # CFA, CFA
-	plus   $OFFSET_IRREGS32_CS+\iret_offset     # CFA, CS
-	deref                                       # CFA, [CS]
-	and    $3                                   # CFA, [CS] & 3
-	bra    1f                                   # CFA, if (CS & 3) goto 1f;
-	dup                                         # CFA, CFA
-	plus   $OFFSET_IRREGS32_EFLAGS+\iret_offset # CFA, EFLAGS
-	deref                                       # CFA, [EFLAGS]
-	and    $EFLAGS_VM                           # CFA, [EFLAGS] & EFLAGS_VM
-	bra    1f                                   # CFA, if (EFLAGS & EFLAGS_VM) goto 1f;
+	dup                                       # CFA, CFA
+	plus   $OFFSET_IRREGS_CS+\iret_offset     # CFA, CS
+	deref                                     # CFA, [CS]
+	and    $3                                 # CFA, [CS] & 3
+	jnz    pop, 1f                            # CFA, if (CS & 3) goto 1f;
+	dup                                       # CFA, CFA
+	plus   $OFFSET_IRREGS_EFLAGS+\iret_offset # CFA, EFLAGS
+	deref                                     # CFA, [EFLAGS]
+	and    $EFLAGS_VM                         # CFA, [EFLAGS] & EFLAGS_VM
+	jnz    pop, 1f                            # CFA, if (EFLAGS & EFLAGS_VM) goto 1f;
 	# Kernel-space return location (must unwind ESP to point after irregs)
-	plus   $SIZEOF_IRREGS32_KERNEL+\iret_offset # CFA + SIZEOF_IRREGS_KERNEL
-	skip   2f
+	plus   $SIZEOF_IRREGS_KERNEL+\iret_offset # CFA + SIZEOF_IRREGS_KERNEL
+	ret
 1:	# User-space or VM86 return location
-	plus   $OFFSET_IRREGS32_ESP+\iret_offset    # ESP
-	deref                                       # [ESP]
-2:]]]*/
+	plus   $OFFSET_IRREGS_ESP+\iret_offset    # ESP
+	deref                                     # [ESP]
+]]]*/
 __ASM_L(.if __ASM_ARG(\iret_offset) >= -4 && __ASM_ARG(\iret_offset) <= 115)
 __ASM_L(	.cfi_escape 22,4,29,18,35,__ASM_ARG(\iret_offset)+4,6,51,26,40,17,0,18,35,__ASM_ARG(\iret_offset)+8,6)
 __ASM_L(	.cfi_escape 16,128,128,8,26,40,5,0,35,__ASM_ARG(\iret_offset)+12,47,3,0,35,__ASM_ARG(\iret_offset)+12,6)
@@ -629,22 +629,22 @@ __ASM_L(.endm)
 
 __ASM_L(.macro .cfi_restore_iret_ss iret_offset=0)
 /*[[[cfi{arch='i386', register='%ss'}
-	dup                                         # CFA, CFA
-	plus   $OFFSET_IRREGS32_CS+\iret_offset     # CFA, CS
-	deref                                       # CFA, [CS]
-	and    $3                                   # CFA, [CS] & 3
-	bra    1f                                   # CFA, if (CS & 3) goto 1f;
-	plus   $OFFSET_IRREGS32_EFLAGS+\iret_offset # EFLAGS
-	deref                                       # [EFLAGS]
-	and    $EFLAGS_VM                           # [EFLAGS] & EFLAGS_VM
-	bra    1f                                   # if (EFLAGS & EFLAGS_VM) goto 1f;
+	dup                                       # CFA, CFA
+	plus   $OFFSET_IRREGS_CS+\iret_offset     # CFA, CS
+	deref                                     # CFA, [CS]
+	and    $3                                 # CFA, [CS] & 3
+	jnz    pop, 1f                            # CFA, if (CS & 3) goto 1f;
+	plus   $OFFSET_IRREGS_EFLAGS+\iret_offset # EFLAGS
+	deref                                     # [EFLAGS]
+	and    $EFLAGS_VM                         # [EFLAGS] & EFLAGS_VM
+	jnz    pop, 1f                            # if (EFLAGS & EFLAGS_VM) goto 1f;
 	# Kernel-space return location
 	push   %ss
-	skip   2f
+	ret
 1:	# User-space or VM86 return location
-	plus   $OFFSET_IRREGS32_SS+\iret_offset     # SS
-	deref                                       # [SS]
-2:]]]*/
+	plus   $OFFSET_IRREGS_SS+\iret_offset     # SS
+	deref                                     # [SS]
+]]]*/
 __ASM_L(.if __ASM_ARG(\iret_offset) >= -4 && __ASM_ARG(\iret_offset) <= 111)
 __ASM_L(	.cfi_escape 22,42,29,18,35,__ASM_ARG(\iret_offset)+4,6,51,26,40,17,0,35,__ASM_ARG(\iret_offset)+8,6,16)
 __ASM_L(	.cfi_escape 128,128,8,26,40,6,0,146,42,0,47,3,0,35,__ASM_ARG(\iret_offset)+16,6)
@@ -745,18 +745,18 @@ __ASM_L(.endm)
 
 __ASM_L(.macro .cfi_restore_iret_es iret_offset=0)
 /*[[[cfi{arch='i386', register='%es'}
-	dup                                         # CFA, CFA
-	plus   $OFFSET_IRREGS32_EFLAGS+\iret_offset # CFA, EFLAGS
-	deref                                       # CFA, [EFLAGS]
-	and    $EFLAGS_VM                           # CFA, [EFLAGS] & EFLAGS_VM
+	dup                                       # CFA, CFA
+	plus   $OFFSET_IRREGS_EFLAGS+\iret_offset # CFA, EFLAGS
+	deref                                     # CFA, [EFLAGS]
+	and    $EFLAGS_VM                         # CFA, [EFLAGS] & EFLAGS_VM
 	not
-	bra    1f                                   # CFA, if (!(EFLAGS & EFLAGS_VM)) goto 1f;
+	jnz    pop, 1f                            # CFA, if (!(EFLAGS & EFLAGS_VM)) goto 1f;
 	# VM86 return location
-	plus   $OFFSET_IRREGS32_ES+\iret_offset     # ES
-	deref                                       # [ES]
-	skip   2f
+	plus   $OFFSET_IRREGS_ES+\iret_offset     # ES
+	deref                                     # [ES]
+	ret
 1:	push   %es
-2:]]]*/
+]]]*/
 __ASM_L(.if __ASM_ARG(\iret_offset) >= -8 && __ASM_ARG(\iret_offset) <= 107)
 __ASM_L(	.cfi_escape 22,40,22,18,35,__ASM_ARG(\iret_offset)+8,6,16,128,128,8,26,32,40,6,0)
 __ASM_L(	.cfi_escape 35,__ASM_ARG(\iret_offset)+20,6,47,3,0,146,40,0)
@@ -814,18 +814,18 @@ __ASM_L(.endm)
 
 __ASM_L(.macro .cfi_restore_iret_ds iret_offset=0)
 /*[[[cfi{arch='i386', register='%ds'}
-	dup                                         # CFA, CFA
-	plus   $OFFSET_IRREGS32_EFLAGS+\iret_offset # CFA, EFLAGS
-	deref                                       # CFA, [EFLAGS]
-	and    $EFLAGS_VM                           # CFA, [EFLAGS] & EFLAGS_VM
+	dup                                       # CFA, CFA
+	plus   $OFFSET_IRREGS_EFLAGS+\iret_offset # CFA, EFLAGS
+	deref                                     # CFA, [EFLAGS]
+	and    $EFLAGS_VM                         # CFA, [EFLAGS] & EFLAGS_VM
 	not
-	bra    1f                                   # CFA, if (!(EFLAGS & EFLAGS_VM)) goto 1f;
+	jnz    pop, 1f                            # CFA, if (!(EFLAGS & EFLAGS_VM)) goto 1f;
 	# VM86 return location
-	plus   $OFFSET_IRREGS32_DS+\iret_offset     # DS
-	deref                                       # [DS]
-	skip   2f
+	plus   $OFFSET_IRREGS_DS+\iret_offset     # DS
+	deref                                     # [DS]
+	ret
 1:	push   %ds
-2:]]]*/
+]]]*/
 __ASM_L(.if __ASM_ARG(\iret_offset) >= -8 && __ASM_ARG(\iret_offset) <= 103)
 __ASM_L(	.cfi_escape 22,43,22,18,35,__ASM_ARG(\iret_offset)+8,6,16,128,128,8,26,32,40,6,0)
 __ASM_L(	.cfi_escape 35,__ASM_ARG(\iret_offset)+24,6,47,3,0,146,43,0)
@@ -883,18 +883,18 @@ __ASM_L(.endm)
 
 __ASM_L(.macro .cfi_restore_iret_fs iret_offset=0)
 /*[[[cfi{arch='i386', register='%fs'}
-	dup                                         # CFA, CFA
-	plus   $OFFSET_IRREGS32_EFLAGS+\iret_offset # CFA, EFLAGS
-	deref                                       # CFA, [EFLAGS]
-	and    $EFLAGS_VM                           # CFA, [EFLAGS] & EFLAGS_VM
+	dup                                       # CFA, CFA
+	plus   $OFFSET_IRREGS_EFLAGS+\iret_offset # CFA, EFLAGS
+	deref                                     # CFA, [EFLAGS]
+	and    $EFLAGS_VM                         # CFA, [EFLAGS] & EFLAGS_VM
 	not
-	bra    1f                                   # CFA, if (!(EFLAGS & EFLAGS_VM)) goto 1f;
+	jnz    pop, 1f                            # CFA, if (!(EFLAGS & EFLAGS_VM)) goto 1f;
 	# VM86 return location
-	plus   $OFFSET_IRREGS32_FS+\iret_offset     # FS
-	deref                                       # [FS]
-	skip   2f
+	plus   $OFFSET_IRREGS_FS+\iret_offset     # FS
+	deref                                     # [FS]
+	ret
 1:	push   %fs
-2:]]]*/
+]]]*/
 __ASM_L(.if __ASM_ARG(\iret_offset) >= -8 && __ASM_ARG(\iret_offset) <= 99)
 __ASM_L(	.cfi_escape 22,44,22,18,35,__ASM_ARG(\iret_offset)+8,6,16,128,128,8,26,32,40,6,0)
 __ASM_L(	.cfi_escape 35,__ASM_ARG(\iret_offset)+28,6,47,3,0,146,44,0)
@@ -952,18 +952,18 @@ __ASM_L(.endm)
 
 __ASM_L(.macro .cfi_restore_iret_gs iret_offset=0)
 /*[[[cfi{arch='i386', register='%gs'}
-	dup                                         # CFA, CFA
-	plus   $OFFSET_IRREGS32_EFLAGS+\iret_offset # CFA, EFLAGS
-	deref                                       # CFA, [EFLAGS]
-	and    $EFLAGS_VM                           # CFA, [EFLAGS] & EFLAGS_VM
+	dup                                       # CFA, CFA
+	plus   $OFFSET_IRREGS_EFLAGS+\iret_offset # CFA, EFLAGS
+	deref                                     # CFA, [EFLAGS]
+	and    $EFLAGS_VM                         # CFA, [EFLAGS] & EFLAGS_VM
 	not
-	bra    1f                                   # CFA, if (!(EFLAGS & EFLAGS_VM)) goto 1f;
+	jnz    pop, 1f                            # CFA, if (!(EFLAGS & EFLAGS_VM)) goto 1f;
 	# VM86 return location
-	plus   $OFFSET_IRREGS32_GS+\iret_offset     # GS
-	deref                                       # [GS]
-	skip   2f
+	plus   $OFFSET_IRREGS_GS+\iret_offset     # GS
+	deref                                     # [GS]
+	ret
 1:	push   %gs
-2:]]]*/
+]]]*/
 __ASM_L(.if __ASM_ARG(\iret_offset) >= -8 && __ASM_ARG(\iret_offset) <= 95)
 __ASM_L(	.cfi_escape 22,45,22,18,35,__ASM_ARG(\iret_offset)+8,6,16,128,128,8,26,32,40,6,0)
 __ASM_L(	.cfi_escape 35,__ASM_ARG(\iret_offset)+32,6,47,3,0,146,45,0)
@@ -1021,15 +1021,15 @@ __ASM_L(.endm)
 
 __ASM_L(.macro .cfi_restore_iret_es_or_offset novm86_offset:req iret_offset=0)
 /*[[[cfi{arch='i386', register='%es'}
-	dup                                         # CFA, CFA
-	plus   $OFFSET_IRREGS32_EFLAGS+\iret_offset # CFA, EFLAGS
-	deref                                       # CFA, [EFLAGS]
-	and    $EFLAGS_VM                           # CFA, [EFLAGS] & EFLAGS_VM
-	bra    1f                                   # CFA, if (EFLAGS & EFLAGS_VM) goto 1f;
-	plus8  \novm86_offset
-	skip   2f
+	dup                                       # CFA, CFA
+	plus   $OFFSET_IRREGS_EFLAGS+\iret_offset # CFA, EFLAGS
+	deref                                     # CFA, [EFLAGS]
+	and    $EFLAGS_VM                         # CFA, [EFLAGS] & EFLAGS_VM
+	jnz    pop, 1f                            # CFA, if (EFLAGS & EFLAGS_VM) goto 1f;
+	plus8  \novm86_offset                     # CFA+\novm86_offset
+	jmp    2f
 1:	# VM86 return location
-	plus   $OFFSET_IRREGS32_ES+\iret_offset     # ES
+	plus   $OFFSET_IRREGS_ES+\iret_offset     # ES
 2:	deref]]]*/
 __ASM_L(.if __ASM_ARG(\iret_offset) >= -8 && __ASM_ARG(\iret_offset) <= 107 && __ASM_ARG(\novm86_offset) >= 0 && __ASM_ARG(\novm86_offset) <= 127)
 __ASM_L(	.cfi_escape 16,40,19,18,35,__ASM_ARG(\iret_offset)+8,6,16,128,128,8,26,40,5,0,35)
@@ -1085,15 +1085,15 @@ __ASM_L(.endm)
 
 __ASM_L(.macro .cfi_restore_iret_ds_or_offset novm86_offset:req iret_offset=0)
 /*[[[cfi{arch='i386', register='%ds'}
-	dup                                         # CFA, CFA
-	plus   $OFFSET_IRREGS32_EFLAGS+\iret_offset # CFA, EFLAGS
-	deref                                       # CFA, [EFLAGS]
-	and    $EFLAGS_VM                           # CFA, [EFLAGS] & EFLAGS_VM
-	bra    1f                                   # CFA, if (EFLAGS & EFLAGS_VM) goto 1f;
-	plus8  \novm86_offset
-	skip   2f
+	dup                                       # CFA, CFA
+	plus   $OFFSET_IRREGS_EFLAGS+\iret_offset # CFA, EFLAGS
+	deref                                     # CFA, [EFLAGS]
+	and    $EFLAGS_VM                         # CFA, [EFLAGS] & EFLAGS_VM
+	jnz    pop, 1f                            # CFA, if (EFLAGS & EFLAGS_VM) goto 1f;
+	plus8  \novm86_offset                     # CFA+\novm86_offset
+	jmp    2f
 1:	# VM86 return location
-	plus   $OFFSET_IRREGS32_DS+\iret_offset     # DS
+	plus   $OFFSET_IRREGS_DS+\iret_offset     # DS
 2:	deref]]]*/
 __ASM_L(.if __ASM_ARG(\iret_offset) >= -8 && __ASM_ARG(\iret_offset) <= 103 && __ASM_ARG(\novm86_offset) >= 0 && __ASM_ARG(\novm86_offset) <= 127)
 __ASM_L(	.cfi_escape 16,43,19,18,35,__ASM_ARG(\iret_offset)+8,6,16,128,128,8,26,40,5,0,35)
@@ -1149,15 +1149,15 @@ __ASM_L(.endm)
 
 __ASM_L(.macro .cfi_restore_iret_fs_or_offset novm86_offset:req iret_offset=0)
 /*[[[cfi{arch='i386', register='%fs'}
-	dup                                         # CFA, CFA
-	plus   $OFFSET_IRREGS32_EFLAGS+\iret_offset # CFA, EFLAGS
-	deref                                       # CFA, [EFLAGS]
-	and    $EFLAGS_VM                           # CFA, [EFLAGS] & EFLAGS_VM
-	bra    1f                                   # CFA, if (EFLAGS & EFLAGS_VM) goto 1f;
-	plus8  \novm86_offset
-	skip   2f
+	dup                                       # CFA, CFA
+	plus   $OFFSET_IRREGS_EFLAGS+\iret_offset # CFA, EFLAGS
+	deref                                     # CFA, [EFLAGS]
+	and    $EFLAGS_VM                         # CFA, [EFLAGS] & EFLAGS_VM
+	jnz    pop, 1f                            # CFA, if (EFLAGS & EFLAGS_VM) goto 1f;
+	plus8  \novm86_offset                     # CFA+\novm86_offset
+	jmp    2f
 1:	# VM86 return location
-	plus   $OFFSET_IRREGS32_FS+\iret_offset     # FS
+	plus   $OFFSET_IRREGS_FS+\iret_offset     # FS
 2:	deref]]]*/
 __ASM_L(.if __ASM_ARG(\iret_offset) >= -8 && __ASM_ARG(\iret_offset) <= 99 && __ASM_ARG(\novm86_offset) >= 0 && __ASM_ARG(\novm86_offset) <= 127)
 __ASM_L(	.cfi_escape 16,44,19,18,35,__ASM_ARG(\iret_offset)+8,6,16,128,128,8,26,40,5,0,35)
@@ -1213,15 +1213,15 @@ __ASM_L(.endm)
 
 __ASM_L(.macro .cfi_restore_iret_gs_or_offset novm86_offset:req iret_offset=0)
 /*[[[cfi{arch='i386', register='%gs'}
-	dup                                         # CFA, CFA
-	plus   $OFFSET_IRREGS32_EFLAGS+\iret_offset # CFA, EFLAGS
-	deref                                       # CFA, [EFLAGS]
-	and    $EFLAGS_VM                           # CFA, [EFLAGS] & EFLAGS_VM
-	bra    1f                                   # CFA, if (EFLAGS & EFLAGS_VM) goto 1f;
-	plus8  \novm86_offset
-	skip   2f
+	dup                                       # CFA, CFA
+	plus   $OFFSET_IRREGS_EFLAGS+\iret_offset # CFA, EFLAGS
+	deref                                     # CFA, [EFLAGS]
+	and    $EFLAGS_VM                         # CFA, [EFLAGS] & EFLAGS_VM
+	jnz    pop, 1f                            # CFA, if (EFLAGS & EFLAGS_VM) goto 1f;
+	plus8  \novm86_offset                     # CFA+\novm86_offset
+	jmp    2f
 1:	# VM86 return location
-	plus   $OFFSET_IRREGS32_GS+\iret_offset     # GS
+	plus   $OFFSET_IRREGS_GS+\iret_offset     # GS
 2:	deref]]]*/
 __ASM_L(.if __ASM_ARG(\iret_offset) >= -8 && __ASM_ARG(\iret_offset) <= 95 && __ASM_ARG(\novm86_offset) >= 0 && __ASM_ARG(\novm86_offset) <= 127)
 __ASM_L(	.cfi_escape 16,45,19,18,35,__ASM_ARG(\iret_offset)+8,6,16,128,128,8,26,40,5,0,35)

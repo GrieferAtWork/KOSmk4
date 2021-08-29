@@ -53,7 +53,7 @@
 /* Being/end a code-block during which EFLAGS.DF=1 is required */
 #if !defined(__KERNEL__) || 1
 
-/*[[[cfi{arch='x86_64', register='%rflags', mode='macro:CFI_RESTORE_EFLAGS_CLEARDF'}
+/*[[[cfi{register='%rflags', mode='macro:CFI_RESTORE_EFLAGS_CLEARDF'}
 	push %rflags
 	and  ~$EFLAGS_DF
 ]]]*/

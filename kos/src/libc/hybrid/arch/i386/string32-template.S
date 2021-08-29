@@ -60,7 +60,7 @@
 /* Being/end a code-block during which EFLAGS.DF=1 is required */
 #if !defined(__KERNEL__) || 1
 
-/*[[[cfi{arch='i386', register='%eflags', mode='macro:CFI_RESTORE_EFLAGS_CLEARDF'}
+/*[[[cfi{register='%eflags', mode='macro:CFI_RESTORE_EFLAGS_CLEARDF'}
 	push %eflags
 	and  ~$EFLAGS_DF
 ]]]*/

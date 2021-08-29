@@ -21,6 +21,7 @@
 import * from deemon;
 import * from ..autom8;
 import CFI = ..cfi.comp;
+import fs;
 
 /* Integration for the CFI compiler into autom8 source tags */
 
@@ -92,8 +93,18 @@ function main(parser: Autom8Parser, body: string) {
 			} while (i < #body && body.isspace(i));
 		}
 	}
-	if (arch is none)
-		throw Error("Attribute 'arch' not set by " + repr body[:i]);
+	if (arch is none) {
+		if ("i386" in parser.filename) {
+			local baseName = fs.tailof(parser.filename);
+			if ("32" in baseName && "64" !in baseName) {
+				arch = "i386";
+			} else if ("64" in baseName && "32" !in baseName) {
+				arch = "x86_64";
+			}
+		}
+		if (arch is none)
+			throw Error("Attribute 'arch' not set by " + repr body[:i]);
+	}
 	if (register is none)
 		throw Error("Attribute 'register' not set by " + repr body[:i]);
 	body = body[i:];

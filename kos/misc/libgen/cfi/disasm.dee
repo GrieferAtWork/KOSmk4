@@ -253,7 +253,7 @@ function disassemble(arch: string | Architecture, bytes: {int...}, i: int = 0,
 			case DW_OP_regx: {
 				local regno;
 				regno, i = dwarf_decode_uleb128(bytes, i)...;
-				print("regx	&%", regno !is int ? regno : arch.getRegisterByID(regno)),;
+				print("regx	&", regno !is int ? regno : arch.getRegisterByID(regno)),;
 			}	break;
 
 			case DW_OP_bregx: {
@@ -279,7 +279,7 @@ function disassemble(arch: string | Architecture, bytes: {int...}, i: int = 0,
 				if (b >= DW_OP_lit0 && b <= DW_OP_lit31) {
 					print("lit", b - DW_OP_lit0),;
 				} else if (b >= DW_OP_reg0 && b <= DW_OP_reg31) {
-					print("reg	&%", arch.getRegisterByID(b - DW_OP_reg0)),;
+					print("reg	&", arch.getRegisterByID(b - DW_OP_reg0)),;
 				} else if (b >= DW_OP_breg0 && b <= DW_OP_breg31) {
 					local offset;
 					offset, i = dwarf_decode_sleb128(bytes, i)...;

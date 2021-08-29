@@ -58,24 +58,23 @@ import outputForAssembly from .......misc.libgen.cfi.comp;
 for (local reg: ["rip", "cs", "rflags", "rsp", "ss"]) {
 	outputForAssembly('x86_64', '%' + reg, r'
 		ifnotimpl "KOS", 1f
-		const1u  @(this_x86_rpc_redirection_iret + OFFSET_IRREGS64_' + reg.upper() + r')
+		const1u @(this_x86_rpc_redirection_iret + OFFSET_IRREGS64_' + reg.upper() + r')
 		form_tls_address
 		deref
-		skip     2f
-	1:	push     %' + reg + r'
-	2:');
+		ret
+	1:	push   %' + reg);
 }
 ]]]*/
-__ASM_L(	.cfi_escape 22,16,19,47,3,0,75,79,83,47,7,0,8,this_x86_rpc_redirection_iret + OFFSET_IRREGS64_RIP,155,6)
-__ASM_L(	.cfi_escape 47,3,0,128,0,240)
-__ASM_L(	.cfi_escape 22,51,20,47,3,0,75,79,83,47,7,0,8,this_x86_rpc_redirection_iret + OFFSET_IRREGS64_CS,155,6)
-__ASM_L(	.cfi_escape 47,4,0,146,51,0,240)
-__ASM_L(	.cfi_escape 22,49,20,47,3,0,75,79,83,47,7,0,8,this_x86_rpc_redirection_iret + OFFSET_IRREGS64_RFLAGS,155,6)
-__ASM_L(	.cfi_escape 47,4,0,146,49,0,240)
-__ASM_L(	.cfi_escape 22,7,19,47,3,0,75,79,83,47,7,0,8,this_x86_rpc_redirection_iret + OFFSET_IRREGS64_RSP,155,6)
-__ASM_L(	.cfi_escape 47,3,0,119,0,240)
-__ASM_L(	.cfi_escape 22,52,20,47,3,0,75,79,83,47,7,0,8,this_x86_rpc_redirection_iret + OFFSET_IRREGS64_SS,155,6)
-__ASM_L(	.cfi_escape 47,4,0,146,52,0,240)
+__ASM_L(	.cfi_escape 22,16,18,47,3,0,75,79,83,47,7,0,8,this_x86_rpc_redirection_iret + OFFSET_IRREGS64_RIP,155,6)
+__ASM_L(	.cfi_escape 47,2,0,128,0)
+__ASM_L(	.cfi_escape 22,51,19,47,3,0,75,79,83,47,7,0,8,this_x86_rpc_redirection_iret + OFFSET_IRREGS64_CS,155,6)
+__ASM_L(	.cfi_escape 47,3,0,146,51,0)
+__ASM_L(	.cfi_escape 22,49,19,47,3,0,75,79,83,47,7,0,8,this_x86_rpc_redirection_iret + OFFSET_IRREGS64_RFLAGS,155,6)
+__ASM_L(	.cfi_escape 47,3,0,146,49,0)
+__ASM_L(	.cfi_escape 22,7,18,47,3,0,75,79,83,47,7,0,8,this_x86_rpc_redirection_iret + OFFSET_IRREGS64_RSP,155,6)
+__ASM_L(	.cfi_escape 47,2,0,119,0)
+__ASM_L(	.cfi_escape 22,52,19,47,3,0,75,79,83,47,7,0,8,this_x86_rpc_redirection_iret + OFFSET_IRREGS64_SS,155,6)
+__ASM_L(	.cfi_escape 47,3,0,146,52,0)
 //[[[end]]]
 	.cfi_def_cfa %rsp, 0
 

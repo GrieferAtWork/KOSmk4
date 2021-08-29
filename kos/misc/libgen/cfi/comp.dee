@@ -40,6 +40,186 @@
  * register unwind instrumentation from human-readable input, making it
  * much easier to write CFI expressions.
  *
+ * Syntax:
+ *   - '#' Marks the rest of the line as a comment
+ *   - ';' and '\n' act as a separators between instructions
+ *   - Empty instructions are ignored
+ *   - Mnemonics are separated from operands by whitespace
+ *   - Operands are separated from each other by ','
+ *   - GAS-style forward/backward labels are recognized (1: 1b, 1f)
+ *   - Labels are declared as mnemonics followed by ':' (e.g. 'foo:')
+ *
+ * Integer operands:
+ *   - '$1234':      Integer constant
+ *   - '$CONSTANT':  Named constant (appears as #define in arch-specific headers)
+ *   - '\variable':  Assembler macro variable (the compiler automatically
+ *                   generates optimized code for every supported value range)
+ *   All of these can be combined within the same operand by having them be
+ *   combined with '+' or '-'. Each such set of operand parts may contain at
+ *   most 1 \variable element, which must not appear after a '-', though any
+ *   number of $1234 or $CONSTANT addends are allowed. Additionally, $1234 or
+ *   $CONSTANT addends may also be prefixed by '~' which will result in the
+ *   bit-wise inverse to be used instead. (Very useful when wishing to mask
+ *   specific bits, e.g.: 'and ~$EFLAGS_DF' to clear the DF flag on x86)
+ *
+ * Special operands:
+ *   - '<symbol>':   Symbol operands are just the raw symbol name
+ *   - '%<regname>': Register-value operand
+ *   - '&<regname>': Register-address operands
+ *   - '@<value>':   Raw carry-though
+ *
+ * Recognized instructions:
+ *     push   top           alias for `dup'
+ *     push   $<value>      DW_OP_lit*,
+ *                          DW_OP_const1s, DW_OP_const1u,
+ *                          DW_OP_const2s, DW_OP_const2u,
+ *                          DW_OP_const4s, DW_OP_const4u,
+ *                          DW_OP_const8s, DW_OP_const8u,
+ *                          DW_OP_consts, DW_OP_constu
+ *     push   @foo          DW_OP_const1u foo
+ *     push   &reg          DW_OP_reg*, DW_OP_regx
+ *     push   %reg          DW_OP_breg*+0, DW_OP_bregx+0
+ *     push   %reg+X        DW_OP_breg*+X, DW_OP_bregx+X
+ *
+ *     push[8|16|32|64] ... Like `push', but don't exceed given address width
+ *                          without explicit width suffix, use `arch.addrsize'
+ *
+ *     addr   $<value>      DW_OP_addr, <value>
+ *
+ *     const1u $<value>     DW_OP_const1u, $<value>
+ *     const1u @foo         DW_OP_const1u, foo
+ *     const1s $<value>     DW_OP_const1s, $<value>
+ *     const1s @foo         DW_OP_const1s, foo
+ *     const2u $<value>     DW_OP_const2u, $<value>
+ *     const2s $<value>     DW_OP_const2s, $<value>
+ *     const4u $<value>     DW_OP_const4u, $<value>
+ *     const4s $<value>     DW_OP_const4s, $<value>
+ *     const8u $<value>     DW_OP_const8u, $<value>
+ *     const8s $<value>     DW_OP_const8s, $<value>
+ *     constu $<value>      DW_OP_constu, $<value>
+ *     consts $<value>      DW_OP_consts, $<value>
+ *
+ *     and                  DW_OP_and
+ *     div                  DW_OP_div
+ *     minus                DW_OP_minus
+ *     mod                  DW_OP_mod
+ *     mul                  DW_OP_mul
+ *     or                   DW_OP_or
+ *     shl                  DW_OP_shl
+ *     shr                  DW_OP_shr
+ *     shra                 DW_OP_shra
+ *     xor                  DW_OP_xor
+ *     eq                   DW_OP_eq
+ *     ge                   DW_OP_ge
+ *     gt                   DW_OP_gt
+ *     le                   DW_OP_le
+ *     lt                   DW_OP_lt
+ *     ne                   DW_OP_ne
+ *
+ *     and    <value>       alias for 'push <value>; and;'
+ *     div    <value>       alias for 'push <value>; div;'
+ *     minus  <value>       alias for 'push <value>; minus;'
+ *     mod    <value>       alias for 'push <value>; mod;'
+ *     mul    <value>       alias for 'push <value>; mul;'
+ *     or     <value>       alias for 'push <value>; or;'
+ *     shl    <value>       alias for 'push <value>; shl;'
+ *     shr    <value>       alias for 'push <value>; shr;'
+ *     shra   <value>       alias for 'push <value>; shra;'
+ *     xor    <value>       alias for 'push <value>; xor;'
+ *     eq     <value>       alias for 'push <value>; eq;'
+ *     ge     <value>       alias for 'push <value>; ge;'
+ *     gt     <value>       alias for 'push <value>; gt;'
+ *     le     <value>       alias for 'push <value>; le;'
+ *     lt     <value>       alias for 'push <value>; lt;'
+ *     ne     <value>       alias for 'push <value>; ne;'
+ *     *[8|16|32|64] ...    Use the given max address width in the emulated 'push'
+ *
+ *     plus                 DW_OP_plus
+ *     plus   <value>       DW_OP_plus_uconst  (or 'push <value>; plus;')
+ *     plus[8|16|32|64] ... Use the given max address width in the emulated 'push'
+ *
+ *     deref                DW_OP_deref
+ *     derefb               DW_OP_deref_size, 1
+ *     derefw               DW_OP_deref_size, 2
+ *     derefl               DW_OP_deref_size, 4
+ *     derefq               DW_OP_deref_size, 8
+ *     deref_size $<n>      DW_OP_deref_size, <n>
+ *
+ *     xderef               DW_OP_xderef
+ *     xderefb              DW_OP_xderef_size, 1
+ *     xderefw              DW_OP_xderef_size, 2
+ *     xderefl              DW_OP_xderef_size, 4
+ *     xderefq              DW_OP_xderef_size, 8
+ *     xderef_size $<n>     DW_OP_xderef_size, <n>
+ *
+ *     pick   $<n>          DW_OP_pick, <n>
+ *
+ *     bra    <symbol>      DW_OP_bra, <symbol>
+ *     skip   <symbol>      DW_OP_skip, <symbol>
+ *
+ *     reg    &reg          DW_OP_reg*, DW_OP_regx
+ *     reg    $<regno>      DW_OP_reg*, DW_OP_regx
+ *
+ *     fbreg  @<offset>     DW_OP_fbreg, <offset>
+ *     fbreg  $<offset>     DW_OP_fbreg, <offset>
+ *
+ *     breg   %reg, $<offset>     DW_OP_breg*, DW_OP_bregx
+ *     breg   $<regno>, $<offset> DW_OP_breg*, DW_OP_bregx
+ *
+ *     piece  $<nbytes>     DW_OP_piece, <nbytes>
+ *     bit_piece $<nbits>   DW_OP_bit_piece, <nbits>
+ *
+ *     dup                  DW_OP_dup
+ *     drop                 DW_OP_drop
+ *     over                 DW_OP_over
+ *     swap                 DW_OP_swap
+ *     rot                  DW_OP_rot
+ *     abs                  DW_OP_abs
+ *     neg                  DW_OP_neg
+ *     not                  DW_OP_not
+ *     nop                  DW_OP_nop
+ *     push_object_address  DW_OP_push_object_address
+ *     form_tls_address     DW_OP_form_tls_address
+ *     call_frame_cfa       DW_OP_call_frame_cfa
+ *     stack_value          DW_OP_stack_value
+ *     GNU_push_tls_address DW_OP_GNU_push_tls_address
+ *     GNU_uninit           DW_OP_GNU_uninit
+ *
+ *     implicit_value "ABCD"   DW_OP_implicit_value, 4, 'A', 'B', 'C', 'D'
+ *
+ *
+ * Advanced instructions:
+ *     ret                  Convenience instruction to perform a jump to the very end
+ *
+ *     .cfi_escape "foo"    Raw output bytes: 'f', 'o', 'o'
+ *     .cfi_escape $<x>     Raw output bytes: <x>
+ *     .cfi_escape $<x>, $<y>, $<z>  Raw output bytes: <x>, <y>, <z>
+ *
+ *     ifnotimpl "IMPL", <symbol>  Alias for: >>     skip 1f
+ *                                            >> .cfi_escape "IMPL"
+ *                                            >> 1:  skip <symbol>
+ *                          When "IMPL" is "KOS", the kos-specific implementation will not
+ *                          jump to <symbol>, but will instead execute after immediately
+ *                          after this instruction. Use this to encode program code only
+ *                          understood on KOS (but not by GDB)
+ *
+ *
+ * Aliases:
+ *     add    [...]         alias for 'plus'
+ *     sub    [...]         alias for 'minus'
+ *     pop                  alias for 'drop'
+ *     push_tls_address     DW_OP_GNU_push_tls_address
+ *     uninit               DW_OP_GNU_uninit
+ *     jf     pop, <symbol> Alias for 'not; bra <symbol>;'
+ *     jf     top, <symbol> Alias for 'dup; not; bra <symbol>;'
+ *     jt     pop, <symbol> Alias for 'bra <symbol>;'
+ *     jt     top, <symbol> Alias for 'dup; bra <symbol>;'
+ *     jz     ...           Alias for 'jf ...'
+ *     jnz    ...           Alias for 'jt ...'
+ *     jmp    <symbol>      Alias for 'skip <symbol>;'
+ *     regx   ...           alias for `reg ...'
+ *     bregx  ...           alias for `breg ...'
+ *
  */
 
 import * from deemon;
@@ -147,6 +327,7 @@ function parseInstructions(arch: Architecture, text: string): {Symbol | Instruct
 	local namedSymbols: {string: Symbol} = Dict();
 	local forwardSymbols: {string: Symbol} = Dict();
 	local backwardSymbols: {string: Symbol} = Dict();
+	local returnSymbol: Symbol | none = none;
 	function parseOperand(content: string): Object {
 		if (content.startswith("@"))
 			return content;
@@ -335,9 +516,19 @@ again_skip_leading_space:
 			++flushStart;
 		if (instr.operands || flushStart < instrEnd)
 			instr.operands.append(parseOperand(text[flushStart:instrEnd]));
+		if (instr.mnemonic == "ret" && !instr.operands) {
+			/* There is no `ret' instruction, but we can emulate it
+			 * by perform a jump to the end of generated bytecode. */
+			if (returnSymbol is none)
+				returnSymbol = Symbol(name: "<return>");
+			instr.mnemonic = "skip";
+			instr.operands = { returnSymbol };
+		}
 		yield instr;
 		i = instrEnd + 1;
 	}
+	if (returnSymbol !is none)
+		yield returnSymbol;
 }
 
 
@@ -782,6 +973,28 @@ encode_suleb:
 	function assemble_const8u(arg) { if (!testEncodeU8(arg)) throw ImpossibleConstraints(arg); yield DW_OP_const8u; yield encodeU8(arg)...; }
 	function assemble_const8s(arg) { if (!testEncodeS8(arg)) throw ImpossibleConstraints(arg); yield DW_OP_const8s; yield encodeS8(arg)...; }
 
+	function assemble_consts(arg) {
+		yield DW_OP_consts;
+		if (testEncodeU6bit(arg)) {
+			yield encodeU1(arg);
+		} else if (arg is int) {
+			yield encodeSLeb128(arg)...;
+		} else {
+			throw ImpossibleConstraints(arg);
+		}
+	}
+
+	function assemble_constu(arg) {
+		yield DW_OP_constu;
+		if (testEncodeU7bit(arg)) {
+			yield encodeU1(arg);
+		} else if (arg is int && arg >= 0) {
+			yield encodeULeb128(arg)...;
+		} else {
+			throw ImpossibleConstraints(arg);
+		}
+	}
+
 	function assemble_pick(arg) {
 		if (arg is int && arg == 0) {
 			yield DW_OP_dup;
@@ -822,11 +1035,32 @@ encode_suleb:
 		}
 	}
 
-	function assemble_jf(arg) {
-		yield DW_OP_not;
-		yield _asm_jmp(DW_OP_bra, arg)...;
+	function assemble_jnz(x, arg) -> assemble_jt(x, arg); /* Jump-if-true */
+	function assemble_jt(x, arg) {
+		if (x is string && x == "pop") {
+			yield _asm_jmp(DW_OP_bra, arg)...;
+		} else if (x is string && x == "top") {
+			yield DW_OP_dup;
+			yield _asm_jmp(DW_OP_bra, arg)...;
+		} else {
+			throw InvalidOperands();
+		}
 	}
-	function assemble_jt(arg)   -> _asm_jmp(DW_OP_bra, arg); /* Jump-if-true */
+
+	function assemble_jz(x, arg) -> assemble_jf(x, arg); /* Jump-if-false */
+	function assemble_jf(x, arg) {
+		if (x is string && x == "pop") {
+			yield DW_OP_not;
+			yield _asm_jmp(DW_OP_bra, arg)...;
+		} else if (x is string && x == "top") {
+			yield DW_OP_dup;
+			yield DW_OP_not;
+			yield _asm_jmp(DW_OP_bra, arg)...;
+		} else {
+			throw InvalidOperands();
+		}
+	}
+
 	function assemble_bra(arg)  -> _asm_jmp(DW_OP_bra, arg);
 	function assemble_skip(arg) -> _asm_jmp(DW_OP_skip, arg);
 	function assemble_jmp(arg)  -> _asm_jmp(DW_OP_skip, arg);
@@ -846,7 +1080,7 @@ encode_suleb:
 	function assemble_regx(arg) -> assemble_reg(arg);
 	function assemble_reg(arg) {
 		if (arg is string) {
-			if (!arg.startswith("%"))
+			if (!arg.startswith("&"))
 				throw InvalidOperands();
 			arg = arch.registers[arg[1:]];
 		}
@@ -992,7 +1226,14 @@ encode_suleb:
 
 	function assemble__cfi_escape(bytes...) {
 		for (local b: bytes) {
-			if (testEncodeU1(b)) {
+			if (b.startswith("\"") && b.endswith("\"")) {
+				try {
+					b = b[1:-1].decode("c-escape");
+				} catch (...) {
+					throw InvalidOperands();
+				}
+				yield b.encode("utf-8").bytes()...;
+			} else if (testEncodeU1(b)) {
 				yield encodeU1(b);
 			} else {
 				throw ImpossibleConstraints();

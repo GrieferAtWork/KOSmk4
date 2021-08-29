@@ -54,26 +54,24 @@ import outputForAssembly from .......misc.libgen.cfi.comp;
 for (local reg: ["eip", "cs", "eflags"]) {
 	outputForAssembly('i386', '%' + reg, r'
 		ifnotimpl "KOS", 1f
-		const1u  @(this_x86_rpc_redirection_iret + OFFSET_IRREGS_' + reg.upper() + r')
+		const1u @(this_x86_rpc_redirection_iret + OFFSET_IRREGS_' + reg.upper() + r')
 		form_tls_address
 		deref
-		skip     2f
-	1:	push     %' + reg + r'
-	2:');
+		ret
+	1:	push   %' + reg);
 }
 for (local reg: { "es", "ds", "fs", "gs" }) {
 	outputForAssembly('i386', '%' + reg, r'
 		ifnotimpl "KOS", 1f
-		const1u  @(this_x86_rpc_redirection_iret + OFFSET_IRREGS_EFLAGS)
+		const1u @(this_x86_rpc_redirection_iret + OFFSET_IRREGS_EFLAGS)
 		form_tls_address
 		deref
-		and      $EFLAGS_VM
-		jf       1f                        # Not a vm86 thread
-		breg     %esp, $OFFSET_IRREGS_' + reg.upper() + r' - $SIZEOF_IRREGS_KERNEL
-		deref                              # Load from the vm86 IRET tail
-		skip     2f
-	1:	push     %' + reg + r'             # Unchanged
-	2:');
+		and    $EFLAGS_VM
+		jz     pop, 1f                   # Not a vm86 thread
+		breg   %esp, $OFFSET_IRREGS_' + reg.upper() + r' - $SIZEOF_IRREGS_KERNEL
+		deref                            # Load from the vm86 IRET tail
+		ret
+	1:	push   %' + reg + r'             # Unchanged');
 }
 ]]]*/
 __ASM_L(	.cfi_escape 22,8,18,47,3,0,75,79,83,47,7,0,8,this_x86_rpc_redirection_iret + OFFSET_IRREGS_EIP,155,6)
