@@ -653,6 +653,8 @@ NOTHROW(KCALL __i386_kernel_main)(struct icpustate *__restrict state) {
 	 *       of a function if that block is immediately preceded by a #endif
 	 *       or another function's declaration. */
 
+	/* TODO: Add a KOS-specific libcrypt */
+
 	/* TODO: (the problem isn't the coredump, but the errors in .debug_info parsing!)
 Coredump /bin/playground tid:13
 assert.expr: "count == 0"

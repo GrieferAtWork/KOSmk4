@@ -28,6 +28,7 @@
 #include <asm/cpu-flags.h>
 #include <asm/instr/ttest.h>
 #include <kos/except.h>
+#include <kos/kernel/cpu-state-asm.h>
 #include <kos/kernel/cpu-state.h>
 
 #ifdef __KERNEL__
@@ -520,32 +521,21 @@ END(libc_error_throw)
 INTERN(x86_serve_user_rpc_and_propagate_exceptions)
 
 .section .text
+PUBLIC_FUNCTION(x86_userexcept_unwind_interrupt)
+#ifndef NDEBUG
+	.cfi_startproc
+	/* Assert that an exception is actually set!
+	 * This is once again checked by `libc_error_unwind()', but by first checking it
+	 * here, we've still go the correct return address for where the problem lies. */
+	cmpl   $(E_OK), %fs:this_exception_code
+	jne    1f
+	int3   /* Assertion failed! */
+1:	.cfi_endproc
+#endif /* !NDEBUG */
 	.cfi_startproc simple
 	.cfi_signal_frame
-	.cfi_restore_iret_eip
-	.cfi_restore_iret_cs
-	.cfi_restore_iret_eflags
-	.cfi_restore_iret_esp
-	.cfi_restore_iret_ss
-#ifndef NDEBUG
-	.cfi_def_cfa %esp, OFFSET_ICPUSTATE_IRREGS
-#else /* NDEBUG */
-	.cfi_def_cfa %ecx, OFFSET_ICPUSTATE_IRREGS
-#endif /* !NDEBUG */
-	.cfi_rel_offset %edi, OFFSET_ICPUSTATE_GPREGS + OFFSET_GPREGS_EDI
-	.cfi_rel_offset %esi, OFFSET_ICPUSTATE_GPREGS + OFFSET_GPREGS_ESI
-	.cfi_rel_offset %ebp, OFFSET_ICPUSTATE_GPREGS + OFFSET_GPREGS_EBP
-/*	.cfi_rel_offset %esp, OFFSET_ICPUSTATE_GPREGS + OFFSET_GPREGS_ESP */
-	.cfi_rel_offset %ebx, OFFSET_ICPUSTATE_GPREGS + OFFSET_GPREGS_EBX
-	.cfi_rel_offset %edx, OFFSET_ICPUSTATE_GPREGS + OFFSET_GPREGS_EDX
-	.cfi_rel_offset %ecx, OFFSET_ICPUSTATE_GPREGS + OFFSET_GPREGS_ECX
-	.cfi_rel_offset %eax, OFFSET_ICPUSTATE_GPREGS + OFFSET_GPREGS_EAX
-	.cfi_restore_iret_es_or_offset (OFFSET_ICPUSTATE_ES - OFFSET_ICPUSTATE_IRREGS)
-	.cfi_restore_iret_ds_or_offset (OFFSET_ICPUSTATE_DS - OFFSET_ICPUSTATE_IRREGS)
-	.cfi_restore_iret_fs_or_offset (OFFSET_ICPUSTATE_FS - OFFSET_ICPUSTATE_IRREGS)
-	.cfi_restore_iret_gs
-	nop
-PUBLIC_FUNCTION(x86_userexcept_unwind_interrupt)
+	.cfi_def_cfa %ecx, 0
+	ASM_CFI_REL_OFFSET_RESTORE_ICPUSTATE(0)
 	movl   %ecx, %esp
 	.cfi_def_cfa_register %esp
 PUBLIC_FUNCTION(x86_userexcept_unwind_interrupt_esp)

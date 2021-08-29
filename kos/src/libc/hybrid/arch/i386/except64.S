@@ -31,7 +31,6 @@
 #include <bits/va_list-struct64.h>
 #include <kos/except.h>
 #include <kos/kernel/cpu-state-asm.h>
-#include <kos/kernel/cpu-state-helpers.h>
 #include <kos/kernel/cpu-state.h>
 
 #ifdef __KERNEL__

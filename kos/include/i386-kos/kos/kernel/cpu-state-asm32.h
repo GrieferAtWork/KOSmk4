@@ -27,6 +27,8 @@
 #if defined(__i386__) && !defined(__x86_64__)
 #include <hybrid/__asm.h>
 
+#include <asm/cfi.h>
+
 #define ASM_CFI_REL_OFFSET_RESTORE_GPREGSNSP(offset)              \
 	__ASM_L(.cfi_rel_offset %edi, ((offset) + OFFSET_GPREGS_EDI)) \
 	__ASM_L(.cfi_rel_offset %esi, ((offset) + OFFSET_GPREGS_ESI)) \
@@ -115,6 +117,18 @@
 	__ASM_L(.cfi_rel_offset %esp, ((offset) + OFFSET_LCPUSTATE_ESP)) \
 	__ASM_L(.cfi_rel_offset %ebx, ((offset) + OFFSET_LCPUSTATE_EBX)) \
 	__ASM_L(.cfi_rel_offset %eip, ((offset) + OFFSET_LCPUSTATE_EIP))
+#define ASM_CFI_REL_OFFSET_RESTORE_ICPUSTATE(offset)                                                               \
+	__ASM_L(.cfi_restore_iret_eip ((offset) + OFFSET_ICPUSTATE_IRREGS))                                            \
+	__ASM_L(.cfi_restore_iret_cs ((offset) + OFFSET_ICPUSTATE_IRREGS))                                             \
+	__ASM_L(.cfi_restore_iret_eflags ((offset) + OFFSET_ICPUSTATE_IRREGS))                                         \
+	__ASM_L(.cfi_restore_iret_esp ((offset) + OFFSET_ICPUSTATE_IRREGS))                                            \
+	__ASM_L(.cfi_restore_iret_ss ((offset) + OFFSET_ICPUSTATE_IRREGS))                                             \
+	ASM_CFI_REL_OFFSET_RESTORE_GPREGSNSP((offset) + OFFSET_ICPUSTATE_GPREGS)                                       \
+	__ASM_L(.cfi_restore_iret_es_or_offset ((offset) + OFFSET_ICPUSTATE_ES), ((offset) + OFFSET_ICPUSTATE_IRREGS)) \
+	__ASM_L(.cfi_restore_iret_ds_or_offset ((offset) + OFFSET_ICPUSTATE_DS), ((offset) + OFFSET_ICPUSTATE_IRREGS)) \
+	__ASM_L(.cfi_restore_iret_fs_or_offset ((offset) + OFFSET_ICPUSTATE_FS), ((offset) + OFFSET_ICPUSTATE_IRREGS)) \
+	__ASM_L(.cfi_restore_iret_gs ((offset) + OFFSET_ICPUSTATE_IRREGS))
+
 
 
 /* Push everything necessary to create an `icpustate'
