@@ -57,15 +57,13 @@ PUBLIC_FUNCTION(x86_syscall64_syscall)
 	swapgs
 	EXTERN(this_x86_rpc_redirection_iret)
 	movq   %rsp, %gs:(this_x86_rpc_redirection_iret + OFFSET_IRREGS_RSP)
-/*[[[deemon
-import compileExpression from .......misc.libgen.cfi.compiler;
-compileExpression('x86_64', '%rsp', r'
+/*[[[cfi{arch='x86_64', register='%rsp'}
 	push   %gs.base
-	plus   $@(this_x86_rpc_redirection_iret + OFFSET_IRREGS_RSP)
-', deref_after: true);
+	plus   @(this_x86_rpc_redirection_iret + OFFSET_IRREGS_RSP)
+	deref
 ]]]*/
-__ASM_L(	.cfi_escape 0x10,0x07,0x04,0x90,0x3b,0x23,(this_x86_rpc_redirection_iret + OFFSET_IRREGS_RSP))
-//[[[end]]]
+	.cfi_escape 16,7,5,146,59,0,35,this_x86_rpc_redirection_iret + OFFSET_IRREGS_RSP
+/*[[[end]]]*/
 	EXTERN(this_x86_kernel_psp0)
 	movq   %gs:this_x86_kernel_psp0, %rsp /* Load our kernel-space stack. */
 	pushq_cfi $(SEGMENT_USER_DATA64_RPL)                              /* ir_ss */
@@ -125,15 +123,13 @@ PUBLIC_FUNCTION(x86_syscall64_syscall_traced)
 	swapgs
 	EXTERN(this_x86_rpc_redirection_iret)
 	movq   %rsp, %gs:(this_x86_rpc_redirection_iret + OFFSET_IRREGS_RSP)
-/*[[[deemon
-import compileExpression from .......misc.libgen.cfi.compiler;
-compileExpression('x86_64', '%rsp', r'
+/*[[[cfi{arch='x86_64', register='%rsp'}
 	push   %gs.base
-	plus   $@(this_x86_rpc_redirection_iret + OFFSET_IRREGS_RSP)
-', deref_after: true);
+	plus   @(this_x86_rpc_redirection_iret + OFFSET_IRREGS_RSP)
+	deref
 ]]]*/
-__ASM_L(	.cfi_escape 0x10,0x07,0x04,0x90,0x3b,0x23,(this_x86_rpc_redirection_iret + OFFSET_IRREGS_RSP))
-//[[[end]]]
+	.cfi_escape 16,7,5,146,59,0,35,this_x86_rpc_redirection_iret + OFFSET_IRREGS_RSP
+/*[[[end]]]*/
 	EXTERN(this_x86_kernel_psp0)
 	movq   %gs:this_x86_kernel_psp0, %rsp /* Load our kernel-space stack. */
 	pushq_cfi $(SEGMENT_USER_DATA64_RPL)                              /* ir_ss */

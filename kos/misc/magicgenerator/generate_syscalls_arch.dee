@@ -128,17 +128,13 @@ class SyscallArch {
 
 /* CFI code to inject in order to clear EFLAGS.DF upon return */
 /*[[[deemon
-import * from ..libgen.cfi.compiler;
-local bytes = compileExpressionEx('i386', '%eflags', r'
-	push %eflags     # %eflags
-	push $EFLAGS_DF  # %eflags, EFLAGS_DF
-	not              # %eflags, ~EFLAGS_DF
-	and              # (%eflags & ~EFLAGS_DF)
-', deref_after: false);
-print("final global i386CfiClearDF = ", repr(", ".join(
-	for (local b: bytes) "0x" + b.hex()[2:].zfill(2))), ";");
+print("final global i386CfiClearDF = ", repr(",".join(
+(assemble from ..libgen.cfi.comp)('i386', '%eflags', r'
+	push %eflags
+	and  ~$EFLAGS_DF
+'))), ";");
 ]]]*/
-final global i386CfiClearDF = "0x16, 0x09, 0x06, 0x59, 0x0a, 0x00, 0x04, 0x20, 0x1a";
+final global i386CfiClearDF = "22,9,6,121,0,11,255,251,26";
 /*[[[end]]]*/
 #define I386_SETDF_BEGIN(fp, enableExcept) if (enableExcept) fp << "\tstd /* Enable exceptions */\n";
 #define I386_SETDF_END(fp, enableExcept)   if (enableExcept) fp << "\tcld /* Disable exceptions */\n";
@@ -448,17 +444,13 @@ function i386_printKernelSyscallWrapper_sysenter(fp: File, f: Function, sysno: i
 /************************************************************************/
 /* CFI code to inject in order to clear EFLAGS.DF upon return */
 /*[[[deemon
-import * from ..libgen.cfi.compiler;
-local bytes = compileExpressionEx('x86_64', '%rflags', r'
-	push %rflags     # %rflags
-	push $EFLAGS_DF  # %rflags, EFLAGS_DF
-	not              # %rflags, ~EFLAGS_DF
-	and              # (%rflags & ~EFLAGS_DF)
-', deref_after: false);
-print("final global x86_64CfiClearDF = ", repr(", ".join(
-	for (local b: bytes) "0x" + b.hex()[2:].zfill(2))), ";");
+print("final global x86_64CfiClearDF = ", repr(",".join(
+(assemble from ..libgen.cfi.comp)('x86_64', '%rflags', r'
+	push %rflags
+	and  ~$EFLAGS_DF
+'))), ";");
 ]]]*/
-final global x86_64CfiClearDF = "0x16, 0x31, 0x07, 0x90, 0x31, 0x0a, 0x00, 0x04, 0x20, 0x1a";
+final global x86_64CfiClearDF = "22,49,7,146,49,0,11,255,251,26";
 /*[[[end]]]*/
 final global x86_64SyscallArgumentRegisters = { "%rdi", "%rsi", "%rdx", "%r10", "%r8", "%r9" };
 final global x86_64SysvABIRegisters = { "%rdi", "%rsi", "%rdx", "%rcx", "%r8", "%r9" };

@@ -32,7 +32,8 @@
 #include <asm/cfi.h>
 #include <asm/cpu-flags.h>
 #include <asm/instr/ttest.h>
-#include <kos/kernel/cpu-state.h>
+#include <kos/kernel/cpu-state-asm32.h>
+#include <kos/kernel/cpu-state32.h>
 
 
 
@@ -49,65 +50,50 @@ END(this_x86_rpc_redirection_iret)
 	EXTERN(x86_rpc_user_redirection_personality)
 	.cfi_personality 0, x86_rpc_user_redirection_personality
 /*[[[deemon
-import compileExpression from .......misc.libgen.cfi.compiler;
+import outputForAssembly from .......misc.libgen.cfi.comp;
 for (local reg: ["eip", "cs", "eflags"]) {
-	compileExpression('i386', '%' + reg, r'
+	outputForAssembly('i386', '%' + reg, r'
 		ifnotimpl "KOS", 1f
-		const1u  $@(this_x86_rpc_redirection_iret + OFFSET_IRREGS_' + reg.upper() + r')
+		const1u  @(this_x86_rpc_redirection_iret + OFFSET_IRREGS_' + reg.upper() + r')
 		form_tls_address
 		deref
 		skip     2f
 	1:	push     %' + reg + r'
-		uninit
 	2:');
 }
 for (local reg: { "es", "ds", "fs", "gs" }) {
-	compileExpression('i386', '%' + reg, r'
+	outputForAssembly('i386', '%' + reg, r'
 		ifnotimpl "KOS", 1f
-		const1u  $@(this_x86_rpc_redirection_iret + OFFSET_IRREGS_EFLAGS)
+		const1u  @(this_x86_rpc_redirection_iret + OFFSET_IRREGS_EFLAGS)
 		form_tls_address
 		deref
-		const2u  $@EFLAGS_VM
-		and
-		not
-		bra      1f                        # Not a vm86 thread
-		breg     %esp, $@(OFFSET_IRREGS_' + reg.upper() + r' - SIZEOF_IRREGS_KERNEL)
+		and      $EFLAGS_VM
+		jf       1f                        # Not a vm86 thread
+		breg     %esp, $OFFSET_IRREGS_' + reg.upper() + r' - $SIZEOF_IRREGS_KERNEL
 		deref                              # Load from the vm86 IRET tail
 		skip     2f
 	1:	push     %' + reg + r'             # Unchanged
-		uninit
 	2:');
 }
 ]]]*/
-__ASM_L(	.cfi_escape 0x16,0x08,0x12,0x2f,0x03,0x00,0x4b,0x4f)
-__ASM_L(	.cfi_escape 0x53,0x2f,0x07,0x00,0x08,(this_x86_rpc_redirection_iret + OFFSET_IRREGS_EIP),0x9b,0x06)
-__ASM_L(	.cfi_escape 0x2f,0x02,0x00,0x58,0xf0)
-__ASM_L(	.cfi_escape 0x16,0x29,0x13,0x2f,0x03,0x00,0x4b,0x4f)
-__ASM_L(	.cfi_escape 0x53,0x2f,0x07,0x00,0x08,(this_x86_rpc_redirection_iret + OFFSET_IRREGS_CS),0x9b,0x06)
-__ASM_L(	.cfi_escape 0x2f,0x03,0x00,0x90,0x29,0xf0)
-__ASM_L(	.cfi_escape 0x16,0x09,0x12,0x2f,0x03,0x00,0x4b,0x4f)
-__ASM_L(	.cfi_escape 0x53,0x2f,0x07,0x00,0x08,(this_x86_rpc_redirection_iret + OFFSET_IRREGS_EFLAGS),0x9b,0x06)
-__ASM_L(	.cfi_escape 0x2f,0x02,0x00,0x59,0xf0)
-__ASM_L(	.cfi_escape 0x16,0x28,0x1e,0x2f,0x03,0x00,0x4b,0x4f)
-__ASM_L(	.cfi_escape 0x53,0x2f,0x12,0x00,0x08,(this_x86_rpc_redirection_iret + OFFSET_IRREGS_EFLAGS),0x9b,0x06)
-__ASM_L(	.cfi_escape 0x0a,(EFLAGS_VM) & 0xff,(EFLAGS_VM >> 8) & 0xff,0x1a,0x20,0x28,0x06,0x00)
-__ASM_L(	.cfi_escape 0x74,(OFFSET_IRREGS_ES - SIZEOF_IRREGS_KERNEL),0x06,0x2f,0x03,0x00,0x90,0x28)
-__ASM_L(	.cfi_escape 0xf0)
-__ASM_L(	.cfi_escape 0x16,0x2b,0x1e,0x2f,0x03,0x00,0x4b,0x4f)
-__ASM_L(	.cfi_escape 0x53,0x2f,0x12,0x00,0x08,(this_x86_rpc_redirection_iret + OFFSET_IRREGS_EFLAGS),0x9b,0x06)
-__ASM_L(	.cfi_escape 0x0a,(EFLAGS_VM) & 0xff,(EFLAGS_VM >> 8) & 0xff,0x1a,0x20,0x28,0x06,0x00)
-__ASM_L(	.cfi_escape 0x74,(OFFSET_IRREGS_DS - SIZEOF_IRREGS_KERNEL),0x06,0x2f,0x03,0x00,0x90,0x2b)
-__ASM_L(	.cfi_escape 0xf0)
-__ASM_L(	.cfi_escape 0x16,0x2c,0x1e,0x2f,0x03,0x00,0x4b,0x4f)
-__ASM_L(	.cfi_escape 0x53,0x2f,0x12,0x00,0x08,(this_x86_rpc_redirection_iret + OFFSET_IRREGS_EFLAGS),0x9b,0x06)
-__ASM_L(	.cfi_escape 0x0a,(EFLAGS_VM) & 0xff,(EFLAGS_VM >> 8) & 0xff,0x1a,0x20,0x28,0x06,0x00)
-__ASM_L(	.cfi_escape 0x74,(OFFSET_IRREGS_FS - SIZEOF_IRREGS_KERNEL),0x06,0x2f,0x03,0x00,0x90,0x2c)
-__ASM_L(	.cfi_escape 0xf0)
-__ASM_L(	.cfi_escape 0x16,0x2d,0x1e,0x2f,0x03,0x00,0x4b,0x4f)
-__ASM_L(	.cfi_escape 0x53,0x2f,0x12,0x00,0x08,(this_x86_rpc_redirection_iret + OFFSET_IRREGS_EFLAGS),0x9b,0x06)
-__ASM_L(	.cfi_escape 0x0a,(EFLAGS_VM) & 0xff,(EFLAGS_VM >> 8) & 0xff,0x1a,0x20,0x28,0x06,0x00)
-__ASM_L(	.cfi_escape 0x74,(OFFSET_IRREGS_GS - SIZEOF_IRREGS_KERNEL),0x06,0x2f,0x03,0x00,0x90,0x2d)
-__ASM_L(	.cfi_escape 0xf0)
+__ASM_L(	.cfi_escape 22,8,18,47,3,0,75,79,83,47,7,0,8,this_x86_rpc_redirection_iret + OFFSET_IRREGS_EIP,155,6)
+__ASM_L(	.cfi_escape 47,2,0,120,0)
+__ASM_L(	.cfi_escape 22,41,19,47,3,0,75,79,83,47,7,0,8,this_x86_rpc_redirection_iret + OFFSET_IRREGS_CS,155,6)
+__ASM_L(	.cfi_escape 47,3,0,146,41,0)
+__ASM_L(	.cfi_escape 22,9,18,47,3,0,75,79,83,47,7,0,8,this_x86_rpc_redirection_iret + OFFSET_IRREGS_EFLAGS,155,6)
+__ASM_L(	.cfi_escape 47,2,0,121,0)
+__ASM_L(	.cfi_escape 22,40,31,47,3,0,75,79,83,47,19,0,8,this_x86_rpc_redirection_iret + OFFSET_IRREGS_EFLAGS,155,6)
+__ASM_L(	.cfi_escape 16,128,128,8,26,32,40,6,0,116,8,6,47,3,0,146)
+__ASM_L(	.cfi_escape 40,0)
+__ASM_L(	.cfi_escape 22,43,31,47,3,0,75,79,83,47,19,0,8,this_x86_rpc_redirection_iret + OFFSET_IRREGS_EFLAGS,155,6)
+__ASM_L(	.cfi_escape 16,128,128,8,26,32,40,6,0,116,12,6,47,3,0,146)
+__ASM_L(	.cfi_escape 43,0)
+__ASM_L(	.cfi_escape 22,44,31,47,3,0,75,79,83,47,19,0,8,this_x86_rpc_redirection_iret + OFFSET_IRREGS_EFLAGS,155,6)
+__ASM_L(	.cfi_escape 16,128,128,8,26,32,40,6,0,116,16,6,47,3,0,146)
+__ASM_L(	.cfi_escape 44,0)
+__ASM_L(	.cfi_escape 22,45,31,47,3,0,75,79,83,47,19,0,8,this_x86_rpc_redirection_iret + OFFSET_IRREGS_EFLAGS,155,6)
+__ASM_L(	.cfi_escape 16,128,128,8,26,32,40,6,0,116,20,6,47,3,0,146)
+__ASM_L(	.cfi_escape 45,0)
 //[[[end]]]
 	.cfi_reg_offset %esp, (OFFSET_IRREGS_ESP - SIZEOF_IRREGS_KERNEL), %esp
 	.cfi_reg_offset %ss, (OFFSET_IRREGS_SS - SIZEOF_IRREGS_KERNEL), %esp

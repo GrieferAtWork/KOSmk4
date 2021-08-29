@@ -34,8 +34,8 @@
 #include <asm/instr/interrupt.h>
 #include <asm/instr/movzxq.h>
 #include <asm/instr/ttest.h>
-#include <kos/kernel/cpu-state-asm.h>
-#include <kos/kernel/cpu-state.h>
+#include <kos/kernel/cpu-state-asm64.h>
+#include <kos/kernel/cpu-state64.h>
 
 
 
@@ -54,34 +54,28 @@ END(this_x86_rpc_redirection_iret)
 	EXTERN(x86_rpc_user_redirection_personality)
 	.cfi_personality 0, x86_rpc_user_redirection_personality
 /*[[[deemon
-import compileExpression from .......misc.libgen.cfi.compiler;
+import outputForAssembly from .......misc.libgen.cfi.comp;
 for (local reg: ["rip", "cs", "rflags", "rsp", "ss"]) {
-	compileExpression('x86_64', '%' + reg, r'
+	outputForAssembly('x86_64', '%' + reg, r'
 		ifnotimpl "KOS", 1f
-		const1u  $@(this_x86_rpc_redirection_iret + OFFSET_IRREGS_' + reg.upper() + r')
+		const1u  @(this_x86_rpc_redirection_iret + OFFSET_IRREGS64_' + reg.upper() + r')
 		form_tls_address
 		deref
 		skip     2f
 	1:	push     %' + reg + r'
-		uninit
 	2:');
 }
 ]]]*/
-__ASM_L(	.cfi_escape 0x16,0x10,0x12,0x2f,0x03,0x00,0x4b,0x4f)
-__ASM_L(	.cfi_escape 0x53,0x2f,0x07,0x00,0x08,(this_x86_rpc_redirection_iret + OFFSET_IRREGS_RIP),0x9b,0x06)
-__ASM_L(	.cfi_escape 0x2f,0x02,0x00,0x60,0xf0)
-__ASM_L(	.cfi_escape 0x16,0x33,0x13,0x2f,0x03,0x00,0x4b,0x4f)
-__ASM_L(	.cfi_escape 0x53,0x2f,0x07,0x00,0x08,(this_x86_rpc_redirection_iret + OFFSET_IRREGS_CS),0x9b,0x06)
-__ASM_L(	.cfi_escape 0x2f,0x03,0x00,0x90,0x33,0xf0)
-__ASM_L(	.cfi_escape 0x16,0x31,0x13,0x2f,0x03,0x00,0x4b,0x4f)
-__ASM_L(	.cfi_escape 0x53,0x2f,0x07,0x00,0x08,(this_x86_rpc_redirection_iret + OFFSET_IRREGS_RFLAGS),0x9b,0x06)
-__ASM_L(	.cfi_escape 0x2f,0x03,0x00,0x90,0x31,0xf0)
-__ASM_L(	.cfi_escape 0x16,0x07,0x12,0x2f,0x03,0x00,0x4b,0x4f)
-__ASM_L(	.cfi_escape 0x53,0x2f,0x07,0x00,0x08,(this_x86_rpc_redirection_iret + OFFSET_IRREGS_RSP),0x9b,0x06)
-__ASM_L(	.cfi_escape 0x2f,0x02,0x00,0x57,0xf0)
-__ASM_L(	.cfi_escape 0x16,0x34,0x13,0x2f,0x03,0x00,0x4b,0x4f)
-__ASM_L(	.cfi_escape 0x53,0x2f,0x07,0x00,0x08,(this_x86_rpc_redirection_iret + OFFSET_IRREGS_SS),0x9b,0x06)
-__ASM_L(	.cfi_escape 0x2f,0x03,0x00,0x90,0x34,0xf0)
+__ASM_L(	.cfi_escape 22,16,19,47,3,0,75,79,83,47,7,0,8,this_x86_rpc_redirection_iret + OFFSET_IRREGS64_RIP,155,6)
+__ASM_L(	.cfi_escape 47,3,0,128,0,240)
+__ASM_L(	.cfi_escape 22,51,20,47,3,0,75,79,83,47,7,0,8,this_x86_rpc_redirection_iret + OFFSET_IRREGS64_CS,155,6)
+__ASM_L(	.cfi_escape 47,4,0,146,51,0,240)
+__ASM_L(	.cfi_escape 22,49,20,47,3,0,75,79,83,47,7,0,8,this_x86_rpc_redirection_iret + OFFSET_IRREGS64_RFLAGS,155,6)
+__ASM_L(	.cfi_escape 47,4,0,146,49,0,240)
+__ASM_L(	.cfi_escape 22,7,19,47,3,0,75,79,83,47,7,0,8,this_x86_rpc_redirection_iret + OFFSET_IRREGS64_RSP,155,6)
+__ASM_L(	.cfi_escape 47,3,0,119,0,240)
+__ASM_L(	.cfi_escape 22,52,20,47,3,0,75,79,83,47,7,0,8,this_x86_rpc_redirection_iret + OFFSET_IRREGS64_SS,155,6)
+__ASM_L(	.cfi_escape 47,4,0,146,52,0,240)
 //[[[end]]]
 	.cfi_def_cfa %rsp, 0
 

@@ -20,6 +20,7 @@
 #ifndef _LIBUNWIND_CFI_H
 #define _LIBUNWIND_CFI_H 1
 
+#ifndef __DEEMON__
 #include "api.h"
 
 #include <hybrid/host.h>
@@ -33,6 +34,7 @@
 #else /* Arch... */
 #error "Unsupported architecture"
 #endif /* !Arch... */
+#endif /* !__DEEMON__ */
 
 
 #ifndef CFI_UNWIND_COMMON_REGISTER_MAXCOUNT

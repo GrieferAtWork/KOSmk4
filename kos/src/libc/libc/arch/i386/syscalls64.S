@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x28778c64 */
+/* HASH CRC-32:0xe21228dc */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -25,7 +25,7 @@
 
 .section .text.crt.syscalls
 .cfi_startproc
-.cfi_escape 0x16, 0x31, 0x07, 0x90, 0x31, 0x0a, 0x00, 0x04, 0x20, 0x1a /* Clear EFLAGS.DF on exit */
+.cfi_escape 22,49,7,146,49,0,11,255,251,26 /* Clear EFLAGS.DF on exit */
 
 /* Read up to `bufsize' bytes from `fd' into `buf'
  * When `fd' has the `O_NONBLOCK' flag set, only read as much data as was

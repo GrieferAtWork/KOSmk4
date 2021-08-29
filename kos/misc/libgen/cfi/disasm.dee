@@ -1,0 +1,310 @@
+/* Copyright (c) 2019-2021 Griefer@Work                                       *
+ *                                                                            *
+ * This software is provided 'as-is', without any express or implied          *
+ * warranty. In no event will the authors be held liable for any damages      *
+ * arising from the use of this software.                                     *
+ *                                                                            *
+ * Permission is granted to anyone to use this software for any purpose,      *
+ * including commercial applications, and to alter it and redistribute it     *
+ * freely, subject to the following restrictions:                             *
+ *                                                                            *
+ * 1. The origin of this software must not be misrepresented; you must not    *
+ *    claim that you wrote the original software. If you use this software    *
+ *    in a product, an acknowledgement (see the following) in the product     *
+ *    documentation is required:                                              *
+ *    Portions Copyright (c) 2019-2021 Griefer@Work                           *
+ * 2. Altered source versions must be plainly marked as such, and must not be *
+ *    misrepresented as being the original software.                          *
+ * 3. This notice may not be removed or altered from any source distribution. *
+ */
+
+#include "../../../include/libunwind/cfi.h" /* For opcode constants */
+
+import * from deemon;
+import Architecture from .comp;
+
+@@Decode and return @(value, newIndex)
+function dwarf_decode_sleb128(bytes: {int...}, index: int): (string | int, int) {
+	local byte;
+	local result = 0;
+	local shift = 0;
+	for (;;) {
+		byte = bytes[index];
+		++index;
+		if (byte !is int)
+			return (str byte, index);
+		result |= (byte & 0x7f) << shift;
+		shift  += 7;
+		if (!(byte & 0x80))
+			break;
+	}
+	if (byte & 0x40)
+		result |= -(1 << shift);
+	return (result, index);
+}
+
+@@Decode and return @(value, newIndex)
+function dwarf_decode_uleb128(bytes: {int...}, index: int): (string | int, int) {
+	local byte;
+	local shift = 0;
+	local result = 0;
+	for (;;) {
+		byte = bytes[index];
+		++index;
+		if (byte !is int)
+			return (str byte, index);
+		result |= (byte & 0x7f) << shift;
+		shift  += 7;
+		if (!(byte & 0x80))
+			break;
+	}
+	return (result, index);
+}
+
+global final NOARG_OPCODES: {int: string} = {
+	DW_OP_deref  : "deref",
+	DW_OP_dup    : "dup",
+	DW_OP_drop   : "drop",
+	DW_OP_over   : "over",
+	DW_OP_swap   : "swap",
+	DW_OP_rot    : "rot",
+	DW_OP_xderef : "xderef",
+	DW_OP_abs    : "abs",
+	DW_OP_and    : "and",
+	DW_OP_div    : "div",
+	DW_OP_minus  : "minus",
+	DW_OP_mod    : "mod",
+	DW_OP_mul    : "mul",
+	DW_OP_neg    : "neg",
+	DW_OP_not    : "not",
+	DW_OP_or     : "or",
+	DW_OP_plus   : "plus",
+	DW_OP_shl    : "shl",
+	DW_OP_shr    : "shr",
+	DW_OP_shra   : "shra",
+	DW_OP_xor    : "xor",
+	DW_OP_eq     : "eq",
+	DW_OP_ge     : "ge",
+	DW_OP_gt     : "gt",
+	DW_OP_le     : "le",
+	DW_OP_lt     : "lt",
+	DW_OP_ne     : "ne",
+	DW_OP_nop                  : "nop",
+	DW_OP_push_object_address  : "push_object_address",
+	DW_OP_form_tls_address     : "form_tls_address",
+	DW_OP_call_frame_cfa       : "call_frame_cfa",
+	DW_OP_stack_value          : "stack_value",
+	DW_OP_GNU_push_tls_address : "GNU_push_tls_address",
+	DW_OP_GNU_uninit           : "GNU_uninit",
+	DW_OP_GNU_variable_value   : "GNU_variable_value",
+};
+
+function bytesToInteger(b: {int...}, byteorder: string, signed: bool): string {
+	for (local x: b) {
+		if (x !is int)
+			return "{" + ",".join(b) + "}";
+	}
+	return int.frombytes(Bytes(b), byteorder: byteorder, signed: signed).hex();
+}
+
+
+function disassemble(arch: string | Architecture, bytes: {int...}, i: int = 0,
+                     linePrefix: string = "", lineSuffix: string = "",
+                     printInstructionAddresses: bool = true,
+                     printHeader: bool = true) {
+	if (arch !is Architecture)
+		arch = import(".arch." + arch).ARCH;
+	assert #bytes >= i + 3;
+	local typ = bytes[i];
+	if (printHeader) {
+		if (typ == DW_CFA_expression) {
+			print(linePrefix, ".cfi_escape DW_CFA_expression", lineSuffix);
+		} else if (typ == DW_CFA_val_expression) {
+			print(linePrefix, ".cfi_escape DW_CFA_val_expression", lineSuffix);
+		} else {
+			print(linePrefix, ".cfi_escape DW_CFA_???(", typ, ")", lineSuffix);
+		}
+	}
+	local regno, length;
+	regno, i  = dwarf_decode_uleb128(bytes, i + 1)...;
+	length, i = dwarf_decode_uleb128(bytes, i)...;
+	assert regno is int;
+	assert length is int;
+	if (printHeader) {
+		print(linePrefix, "	.cfi_escape_uleb128 %", arch.getRegisterByID(regno), lineSuffix);
+		print(linePrefix, "	.cfi_escape_uleb128 ", length, lineSuffix);
+	}
+	local base = i;
+	local end = i + length;
+	if (end > #bytes)
+		end = #bytes;
+	while (i < end) {
+		local b = bytes[i];
+		print(linePrefix, "	"),;
+		if (printInstructionAddresses)
+			print((i - base).hex()[2:].upper().zfill(4), "	"),;
+		++i;
+		if (b is int) {
+			switch (b) {
+
+			case DW_OP_addr: {
+				local p    = i + arch.addrsize;
+				print("addr	$", bytesToInteger(bytes[i:p], arch.byteorder, false)),;
+				i = p;
+			}	break;
+
+			case DW_OP_const1u:
+			case DW_OP_const1s:
+			case DW_OP_const2u:
+			case DW_OP_const2s:
+			case DW_OP_const4u:
+			case DW_OP_const4s:
+			case DW_OP_const8u:
+			case DW_OP_const8s:
+			case DW_OP_pick:
+			case DW_OP_deref_size:
+			case DW_OP_xderef_size:
+			case DW_OP_call2:
+			case DW_OP_call4:
+			{
+				local name, n, s = {
+					DW_OP_const1u : ("const1u", 1, false),
+					DW_OP_const1s : ("const1s", 1, true),
+					DW_OP_const2u : ("const2u", 2, false),
+					DW_OP_const2s : ("const2s", 2, true),
+					DW_OP_const4u : ("const4u", 4, false),
+					DW_OP_const4s : ("const4s", 4, true),
+					DW_OP_const8u : ("const8u", 8, false),
+					DW_OP_const8s : ("const8s", 8, true),
+					DW_OP_pick    : ("pick", 1, false),
+					DW_OP_deref_size: ("deref_size", 1, false),
+					DW_OP_xderef_size: ("xderef_size", 1, false),
+					DW_OP_call2: ("call2", 2, false),
+					DW_OP_call4: ("call4", 4, false),
+				}[b]...;
+				local p   = i + n;
+				print(name, "	$", bytesToInteger(bytes[i:p], arch.byteorder, false)),;
+				i = p;
+			}	break;
+
+			case DW_OP_constu:
+			case DW_OP_plus_uconst:
+			case DW_OP_piece:
+			case DW_OP_call_ref:
+			case DW_OP_bit_piece:
+			case DW_OP_addrx:
+			case DW_OP_constx:
+			case DW_OP_GNU_addr_index:
+			case DW_OP_GNU_const_index: {
+				local val;
+				val, i = dwarf_decode_uleb128(bytes, i)...;
+				local name = {
+					DW_OP_constu      : "constu",
+					DW_OP_plus_uconst : "plus_uconst",
+					DW_OP_piece       : "piece",
+					DW_OP_call_ref    : "call_ref",
+					DW_OP_bit_piece   : "bit_piece",
+					DW_OP_addrx       : "addrx",
+					DW_OP_constx      : "constx",
+					DW_OP_GNU_addr_index: "GNU_addr_index",
+					DW_OP_GNU_const_index: "GNU_const_index",
+				}[b];
+				print(name, "	$", val !is int ? val : val.hex()),;
+			}	break;
+
+			case DW_OP_consts:
+			case DW_OP_fbreg: {
+				local val;
+				val, i = dwarf_decode_sleb128(bytes, i)...;
+				local name = {
+					DW_OP_consts : "consts",
+					DW_OP_fbreg  : "fbreg",
+				}[b];
+				print(name, "	$", val !is int ? val : val.hex()),;
+			}	break;
+
+			case DW_OP_bra:
+			case DW_OP_skip: {
+				local p   = i + 2;
+				local off = int.frombytes(Bytes(bytes[i:p]), byteorder: arch.byteorder, signed: true);
+				if (b == DW_OP_skip && off >= 1 && p + off + 3 <= end && bytes[p + off] == DW_OP_skip) {
+					i = p + off;
+					local sysname = bytes[p:i];
+					++i; /* Second `DW_OP_skip' */
+					off = int.frombytes(Bytes(bytes[i:i+2]), byteorder: arch.byteorder, signed: true);
+					i += 2;
+					if ((for (local x: sysname) x is int) && ...) {
+						sysname = Bytes(sysname);
+						sysname = try sysname.decode("utf-8") catch (...) sysname.decode("latin-1");
+					} else {
+						sysname = repr List(sysname);
+					}
+					print("ifnotimpl	", repr sysname, ",	", (i + off - base).hex()[2:].upper().zfill(4)),;
+				} else {
+					i = p;
+					local name = {
+						DW_OP_bra  : "bra",
+						DW_OP_skip : "skip",
+					}[b];
+					print(name, "	", (i + off - base).hex()[2:].upper().zfill(4)),;
+				}
+			}	break;
+
+			case DW_OP_regx: {
+				local regno;
+				regno, i = dwarf_decode_uleb128(bytes, i)...;
+				print("regx	&%", regno !is int ? regno : arch.getRegisterByID(regno)),;
+			}	break;
+
+			case DW_OP_bregx: {
+				local regno, offset;
+				regno, i = dwarf_decode_uleb128(bytes, i)...;
+				offset, i = dwarf_decode_sleb128(bytes, i)...;
+				print("bregx	%", regno !is int ? regno : arch.getRegisterByID(regno),
+					",	$", offset !is int ? offset : offset.hex()),;
+			}	break;
+
+			case DW_OP_implicit_value: {
+				local size, p;
+				size, i = dwarf_decode_uleb128(bytes, i)...;
+				assert size is int;
+				p = i + size;
+				local data = bytes[i:p];
+				i = p;
+				data = try data.decode("utf-8") catch (...) data.decode("latin-1");
+				print("implicit_value	", repr data),;
+			}	break;
+
+			default: {
+				if (b >= DW_OP_lit0 && b <= DW_OP_lit31) {
+					print("lit", b - DW_OP_lit0),;
+				} else if (b >= DW_OP_reg0 && b <= DW_OP_reg31) {
+					print("reg	&%", arch.getRegisterByID(b - DW_OP_reg0)),;
+				} else if (b >= DW_OP_breg0 && b <= DW_OP_breg31) {
+					local offset;
+					offset, i = dwarf_decode_sleb128(bytes, i)...;
+					print("breg	%", arch.getRegisterByID(b - DW_OP_breg0), ", $", offset !is int ? offset : offset.hex()),;
+				} else {
+					local name = NOARG_OPCODES.get(b);
+					if (name is none)
+						goto fallback;
+					print(name),;
+				}
+			}	break;
+			}
+			print(lineSuffix);
+			continue;
+		}
+fallback:
+		if (b is int) {
+			print(".cfi_escape 0x", b.hex()[2:].zfill(2)),;
+		} else {
+			print(".cfi_escape ", b),;
+		}
+		print(lineSuffix);
+	}
+	if (i > end)
+		print("//	OVERSHOT by ", i - end, " bytes");
+}
+
+

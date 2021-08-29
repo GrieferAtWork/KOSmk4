@@ -44,24 +44,18 @@
 DECL_BEGIN
 
 /*[[[deemon
-import * from ....misc.libgen.cfi.compiler;
-local bytes = compileExpressionEx('i386', '%eflags', r'
-	push %eflags     # %eflags
-	push $EFLAGS_DF  # %eflags, EFLAGS_DF
-	not              # %eflags, ~EFLAGS_DF
-	and              # (%eflags & ~EFLAGS_DF)
-', deref_after: false);
-print("#define I386_CFI_CLEARDF   ", repr(", ".join(for (local b: bytes) "0x" + b.hex()[2:].zfill(2))));
-local bytes = compileExpressionEx('x86_64', '%rflags', r'
-	push %rflags     # %rflags
-	push $EFLAGS_DF  # %rflags, EFLAGS_DF
-	not              # %rflags, ~EFLAGS_DF
-	and              # (%rflags & ~EFLAGS_DF)
-', deref_after: false);
-print("#define X86_64_CFI_CLEARDF ", repr(", ".join(for (local b: bytes) "0x" + b.hex()[2:].zfill(2))));
+import assemble from ....misc.libgen.cfi.comp;
+print("#define I386_CFI_CLEARDF   ", repr(",".join(assemble('i386', '%eflags', r'
+	push %eflags
+	and  ~$EFLAGS_DF
+'))));
+print("#define X86_64_CFI_CLEARDF ", repr(",".join(assemble('x86_64', '%rflags', r'
+	push %rflags
+	and  ~$EFLAGS_DF
+'))));
 ]]]*/
-#define I386_CFI_CLEARDF   "0x16, 0x09, 0x06, 0x59, 0x0a, 0x00, 0x04, 0x20, 0x1a"
-#define X86_64_CFI_CLEARDF "0x16, 0x31, 0x07, 0x90, 0x31, 0x0a, 0x00, 0x04, 0x20, 0x1a"
+#define I386_CFI_CLEARDF   "22,9,6,121,0,11,255,251,26"
+#define X86_64_CFI_CLEARDF "22,49,7,146,49,0,11,255,251,26"
 /*[[[end]]]*/
 
 #define assert_error_code(code) \

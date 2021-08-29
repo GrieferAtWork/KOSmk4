@@ -1,0 +1,133 @@
+/* Copyright (c) 2019-2021 Griefer@Work                                       *
+ *                                                                            *
+ * This software is provided 'as-is', without any express or implied          *
+ * warranty. In no event will the authors be held liable for any damages      *
+ * arising from the use of this software.                                     *
+ *                                                                            *
+ * Permission is granted to anyone to use this software for any purpose,      *
+ * including commercial applications, and to alter it and redistribute it     *
+ * freely, subject to the following restrictions:                             *
+ *                                                                            *
+ * 1. The origin of this software must not be misrepresented; you must not    *
+ *    claim that you wrote the original software. If you use this software    *
+ *    in a product, an acknowledgement (see the following) in the product     *
+ *    documentation is required:                                              *
+ *    Portions Copyright (c) 2019-2021 Griefer@Work                           *
+ * 2. Altered source versions must be plainly marked as such, and must not be *
+ *    misrepresented as being the original software.                          *
+ * 3. This notice may not be removed or altered from any source distribution. *
+ */
+
+import Architecture from ..comp;
+
+global final ARCH = Architecture(
+	registers: {
+		"rax"     : 0,
+		"rdx"     : 1,
+		"rcx"     : 2,
+		"rbx"     : 3,
+		"rsi"     : 4,
+		"rdi"     : 5,
+		"rbp"     : 6,
+		"rsp"     : 7,
+		"r8"      : 8,
+		"r9"      : 9,
+		"r10"     : 10,
+		"r11"     : 11,
+		"r12"     : 12,
+		"r13"     : 13,
+		"r14"     : 14,
+		"r15"     : 15,
+		"rip"     : 16,
+		"xmm0"    : 17,
+		"xmm1"    : 18,
+		"xmm2"    : 19,
+		"xmm3"    : 20,
+		"xmm4"    : 21,
+		"xmm5"    : 22,
+		"xmm6"    : 23,
+		"xmm7"    : 24,
+		"xmm8"    : 25,
+		"xmm9"    : 26,
+		"xmm10"   : 27,
+		"xmm11"   : 28,
+		"xmm12"   : 29,
+		"xmm13"   : 30,
+		"xmm14"   : 31,
+		"xmm15"   : 32,
+		"st0"     : 33, "st(0)" : 33,
+		"st1"     : 34, "st(1)" : 34,
+		"st2"     : 35, "st(2)" : 35,
+		"st3"     : 36, "st(3)" : 36,
+		"st4"     : 37, "st(4)" : 37,
+		"st5"     : 38, "st(5)" : 38,
+		"st6"     : 39, "st(6)" : 39,
+		"st7"     : 40, "st(7)" : 40,
+		"mm0"     : 41,
+		"mm1"     : 42,
+		"mm2"     : 43,
+		"mm3"     : 44,
+		"mm4"     : 45,
+		"mm5"     : 46,
+		"mm6"     : 47,
+		"mm7"     : 48,
+		"rflags"  : 49,
+		"es"      : 50,
+		"cs"      : 51,
+		"ss"      : 52,
+		"ds"      : 53,
+		"fs"      : 54,
+		"gs"      : 55,
+		"fs.base" : 58,
+		"gs.base" : 59,
+		"tr"      : 62,
+		"ldtr"    : 63,
+		"mxcsr"   : 64,
+		"fcw"     : 65,
+		"fsw"     : 66,
+		"xmm16"   : 67,
+		"xmm17"   : 68,
+		"xmm18"   : 69,
+		"xmm19"   : 70,
+		"xmm20"   : 71,
+		"xmm21"   : 72,
+		"xmm22"   : 73,
+		"xmm23"   : 74,
+		"xmm24"   : 75,
+		"xmm25"   : 76,
+		"xmm26"   : 77,
+		"xmm27"   : 78,
+		"xmm28"   : 79,
+		"xmm29"   : 80,
+		"xmm30"   : 81,
+		"xmm31"   : 82,
+		"k0"      : 118,
+		"k1"      : 119,
+		"k2"      : 120,
+		"k3"      : 121,
+		"k4"      : 122,
+		"k5"      : 123,
+		"k6"      : 124,
+		"k7"      : 125
+	},
+	sysmacroFiles: {
+		"kos/include/i386-kos/asm/cpu-flags.h",
+		"kos/include/i386-kos/kos/kernel/cpu-state64.h",
+		"kos/include/i386-kos/asm/cpu-msr.h",
+		"kos/include/i386-kos/asm/cpu-cpuid.h",
+		"kos/include/i386-kos/asm/cpu-features.h",
+		"kos/include/i386-kos/asm/pagesize.h",
+		"kos/include/i386-kos/asm/registers.h",
+		"kos/include/i386-kos/asm/syscalls64.h",
+		"kos/include/i386-kos/asm/syscalls64_d.h",
+		"kos/include/i386-kos/kos/kernel/fpu-state64.h",
+		"kos/include/i386-kos/kos/kernel/gdb-cpu-state64.h",
+		"kos/include/i386-kos/kos/kernel/gdt.h",
+		"kos/include/i386-kos/kos/kernel/paging.h",
+		"kos/include/i386-kos/kos/kernel/segment.h",
+		"kos/include/i386-kos/kos/kernel/tss64.h",
+	},
+	addrsize: 8,
+	bigEndian: false,
+);
+

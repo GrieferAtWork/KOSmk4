@@ -18,7 +18,30 @@
  * 3. This notice may not be removed or altered from any source distribution. *
  */
 
-import * from .cfi;
+#include "../../../include/libunwind/cfi.h" /* For opcode constants */
+
+/* ============= CFI assembly compiler =============
+ *
+ * CFI is a an instrumentation system for the purpose of specifying how
+ * the kernel or userspace (libunwind) should unwind function calls for
+ * the purpose of exception unwinding (<kos/except.h>: THROW()) or for
+ * the purpose of generating tracebacks (<execinfo.h>: backtrace(3)).
+ *
+ * For this purpose, alongside some generic register restore location
+ * descriptors, CFI also includes a turing-complete bytecode interpreter
+ * that can be used to calculate arbitrarily complex register restore
+ * values.
+ *
+ * While the bytecode read by such an interpreter (/kos/src/libunwind/cfi.c)
+ * is standardized, there doesn't exist a portable representation to which
+ * this bytecode could be disassembled or assembled from.
+ *
+ * This deemon module includes an assembler which can be used to generate
+ * register unwind instrumentation from human-readable input, making it
+ * much easier to write CFI expressions.
+ *
+ */
+
 import * from deemon;
 import * from errors;
 import enumerateIntegerMacrosFromFile from ..strendN;
@@ -59,6 +82,15 @@ class Architecture {
 			this._sysmacroValueCache.setdefault(name, value);
 	}
 
+	@@Return the name of the given register id, or re-return @id
+	function getRegisterByID(id: int): string | int {
+		for (local name, regno: this.registers) {
+			if (regno == id)
+				return name;
+		}
+		return id;
+	}
+
 	@@Return the value of a system macro, given its @name (or @none if unknown)
 	function getSysMacro(name: string): int | none {
 		local r = _sysmacroValueCache.get(name);
@@ -94,17 +126,19 @@ class Instruction {
 	@@  - Symbol        (Reference to another code location)
 	@@  - int           (Integer constant)
 	@@  - (string, int) (Argument with addend: \foo+42)
-	@@  - string        (something else: \foo argument, %foo register, etc...)
+	@@  - string        (something else: \foo argument, @blablabla, %foo register, etc...)
 	public member operands: {Symbol | int | (string, int) | string...};
 }
 
 
-function getIntegerValue(arch: Architecture, data: string): int | none {
-	return try int(data) catch (...) arch.getSysMacro(data);
-}
-
-
 global final PAREN_MATCH: {string: string} = { "(" : ")", "[" : "]", "{" : "}" };
+
+function removeSurroundingParenthesis(s: string): string {
+	while (s && s.first in "([{" && s.last == PAREN_MATCH[s.first] &&
+	       s.findmatch(s.first, s.last, 1) == #s - 1)
+		s = s[1:-1].strip();
+	return s;
+}
 
 function parseInstructions(arch: Architecture, text: string): {Symbol | Instruction...} {
 	text = text.unifylines().replace("\\\n", "");
@@ -114,6 +148,9 @@ function parseInstructions(arch: Architecture, text: string): {Symbol | Instruct
 	local forwardSymbols: {string: Symbol} = Dict();
 	local backwardSymbols: {string: Symbol} = Dict();
 	function parseOperand(content: string): Object {
+		if (content.startswith("@"))
+			return content;
+		content = removeSurroundingParenthesis(content);
 		if ((content.endswith("f") || content.endswith("b")) &&
 		    (content.isnumeric(0, #content - 1))) {
 			local id = content[:-1];
@@ -137,35 +174,60 @@ function parseInstructions(arch: Architecture, text: string): {Symbol | Instruct
 			local ch;
 			if (i >= len) {
 flush_part:
+				local isNegative = false;
+				local isInverse = false;
 				local partEnd = i;
+again_skip_leading_space:
 				while (partStart < partEnd && content.isspace(partStart))
 					++partStart;
+				if (partStart < partEnd) {
+					local ch = content[partStart];
+					if (ch == "-") {
+						isNegative = !isNegative;
+						++partStart;
+						goto again_skip_leading_space;
+					}
+					if (ch == "~") {
+						isInverse = !isInverse;
+						++partStart;
+						goto again_skip_leading_space;
+					}
+				}
 				while (partEnd > partStart && content.isspace(partEnd - 1))
-					++partEnd;
+					--partEnd;
 				local part = content[partStart:partEnd];
 				if (part.startswith("\\")) {
 					if (base !is none)
-						return content;
+						throw Error("Multiple bases in " + repr content);
+					if (isNegative || isInverse)
+						throw Error("Negative or inverse base in " + repr content);
 					base = part[1:];
 				} else if (part.startswith("$")) {
 					local val = part[1:];
 					local val = try int(val) catch (...) arch.getSysMacro(val);
 					if (val is none)
-						return content;
+						throw Error("Unknown system macro " + repr part[1:]);
 					if (addend is none)
 						addend = 0;
+					if (isNegative)
+						val = -val;
+					if (isInverse)
+						val = ~val;
 					addend += val;
 				} else {
 					return content;
 				}
 				if (i >= len)
 					break;
-				++i;
+				if (content[i] == "+")
+					++i;
 				partStart = i;
+				if (content[i] != "+")
+					++i;
 				continue;
 			}
 			local ch = content[i];
-			if (ch == "+")
+			if (ch in "+-")
 				goto flush_part;
 			if (ch in "([{") {
 				i = content.indexmatch(ch, PAREN_MATCH[ch], i + 1) + 1;
@@ -279,6 +341,7 @@ flush_part:
 }
 
 
+/* Relocation IDs */
 #define R_CFI_REL16_A 0
 #define R_CFI_REL16_B 1
 
@@ -307,12 +370,26 @@ class ImpossibleConstraints {
 		varName = arg is Sequence ? arg.first : none;
 	}
 }
+
+@@Error class to indicate that operands are invalid for a given instruction
 class InvalidOperands {}
 
+@@Instructions that may be written as `<instr> <operand>;`,
+@@which is compiled as an alias for `push <operand>; <instr>;`
+@@Note that `plus` (aka. `add`) isn't in this list because that
+@@instruction has special handling due to `DW_OP_plus_uconst`!
+global final BINARY_AS_PUSH_INSTR_OPCODES: {int...} = {
+	DW_OP_and, DW_OP_div, DW_OP_minus, DW_OP_mod, DW_OP_mul,
+	DW_OP_or, DW_OP_shl, DW_OP_shr, DW_OP_shra, DW_OP_xor,
+	DW_OP_eq, DW_OP_ge, DW_OP_gt, DW_OP_le, DW_OP_lt, DW_OP_ne
+};
+
+@@Instructions with variants that don't take any arguments
 global final NOARG_INSTRUCTIONS: {string: int} = {
 	"deref"                : DW_OP_deref,
 	"dup"                  : DW_OP_dup,
 	"drop"                 : DW_OP_drop,
+	"pop"                  : DW_OP_drop, /* ALIAS! */
 	"over"                 : DW_OP_over,
 	"swap"                 : DW_OP_swap,
 	"rot"                  : DW_OP_rot,
@@ -321,6 +398,7 @@ global final NOARG_INSTRUCTIONS: {string: int} = {
 	"and"                  : DW_OP_and,
 	"div"                  : DW_OP_div,
 	"minus"                : DW_OP_minus,
+	"sub"                  : DW_OP_minus, /* ALIAS! */
 	"mod"                  : DW_OP_mod,
 	"mul"                  : DW_OP_mul,
 	"neg"                  : DW_OP_neg,
@@ -351,6 +429,37 @@ global final NOARG_INSTRUCTIONS: {string: int} = {
 #define ULEB128_3BYTE_MAX  2097151  /* Max value encodable as a 3-byte ULEB128 */
 #define SLEB128_3BYTE_MIN  -1048576 /* Min value encodable as a 3-byte SLEB128 */
 
+@@Generate bytes to encode @value as a ULEB128
+function encodeULeb128(value: int): {int...} {
+	for (;;) {
+		if (value <= 0x7f) {
+			yield value;
+			break;
+		}
+		yield 0x80 | (value & 0x7f);
+		value = value >> 7;
+	}
+}
+
+@@Generate bytes to encode @value as a SLEB128
+function encodeSLeb128(value: int): {int...} {
+	for (;;) {
+		local byte = value & 0x7f;
+		if (value >= 0) {
+			value = value / 128;
+		} else {
+			value = ~(~value / 128);
+		}
+		if ((value == 0 && (byte & 0x40) == 0) ||
+		    (value == -1 && (byte & 0x40) != 0)) {
+			yield byte;
+			break;
+		}
+		yield 0x80 | byte;
+	}
+}
+
+
 class Assembler {
 	@@Guaranties on value ranges never used by variables.
 	@@Variables not in this list may take any value
@@ -370,6 +479,9 @@ class Assembler {
 
 	@@The used architecture
 	public member arch: Architecture;
+
+	public member asmArgPrefix: string = "__ASM_ARG(";
+	public member asmArgSuffix: string = ")";
 
 	this(arch: string | Architecture, code: string) {
 		this.arch = arch is Architecture ? arch
@@ -447,6 +559,7 @@ class Assembler {
 	function testEncodeS2(arg: {int | (string, int)...}): bool -> testEncodeMinMax(arg, -32768, 32767);
 	function testEncodeS4(arg: {int | (string, int)...}): bool -> testEncodeMinMax(arg, -2147483648, 2147483647);
 	function testEncodeS8(arg: {int | (string, int)...}): bool -> testEncodeMinMax(arg, -9223372036854775808, 9223372036854775807);
+	function testEncodeU5bit(arg: {int | (string, int)...}): bool -> testEncodeMinMax(arg, 0, 0x1f);
 	function testEncodeU6bit(arg: {int | (string, int)...}): bool -> testEncodeMinMax(arg, 0, 0x3f);
 	function testEncodeU7bit(arg: {int | (string, int)...}): bool -> testEncodeMinMax(arg, 0, 0x7f);
 	function testEncodeU1(arg: {int | (string, int)...}): bool -> testEncodeMinMax(arg, 0, 0xff);
@@ -454,19 +567,28 @@ class Assembler {
 	function testEncodeU4(arg: {int | (string, int)...}): bool -> testEncodeMinMax(arg, 0, 0xffffffff);
 	function testEncodeU8(arg: {int | (string, int)...}): bool -> testEncodeMinMax(arg, 0, 0xffffffffffffffff);
 
+	function encodeU5Bit(arg: int | (string, int), base: int): int | string {
+		if (arg is int)
+			return base + arg;
+		local totalAddend = base + arg.last;
+		if (totalAddend == 0)
+			return "{}\\{}{}".format({ asmArgPrefix, arg.first, asmArgSuffix });
+		return "{}\\{}{}+{}".format({ asmArgPrefix, arg.first, asmArgSuffix, totalAddend });
+	}
 	function encodeX1(arg: int | (string, int), signed: bool): int | string {
 		if (arg is int)
 			return arg.tobytes(1, byteorder: arch.byteorder, signed: signed)[0];
 		if (arg.last == 0)
-			return "__ASM_ARG(\\{})".format({ arg.first });
-		return "__ASM_ARG(\\{})+{}".format(arg);
+			return "{}\\{}{}".format({ asmArgPrefix, arg.first, asmArgSuffix });
+		return "{}\\{}{}+{}".format({ asmArgPrefix, arg.first, asmArgSuffix, arg.last });
 	}
 	function encodeX2(arg: int | (string, int), signed: bool): {int | string...} {
 		if (arg is int)
 			return arg.tobytes(2, byteorder: arch.byteorder, signed: signed);
 		local minVal, maxVal = this.outLimits.get(arg.first, (0, 0xffff))...;
-		local b0 = minVal >= 0 && maxVal <= 0x00ff ? 0 : "((__ASM_ARG(\\{})+{})&0xff00)>>8".format(arg);
-		local b1 =                                       "(__ASM_ARG(\\{})+{})&0xff".format(arg);
+		local formatArgs = { asmArgPrefix, arg.first, asmArgSuffix, arg.last };
+		local b0 = minVal >= 0 && maxVal <= 0x00ff ? 0 : "(({}\\{}{}+{})&0xff00)>>8".format(formatArgs);
+		local b1 =                                       "({}\\{}{}+{})&0xff".format(formatArgs);
 		return arch.bigEndian ? { b0, b1 }
 		                      : { b1, b0 };
 	}
@@ -474,10 +596,11 @@ class Assembler {
 		if (arg is int)
 			return arg.tobytes(4, byteorder: arch.byteorder, signed: signed);
 		local minVal, maxVal = this.outLimits.get(arg.first, (0, 0xffffffff))...;
-		local b0 = minVal >= 0 && maxVal <= 0x00ffffff ? 0 : "((__ASM_ARG(\\{})+{})&0xff000000)>>24".format(arg);
-		local b1 = minVal >= 0 && maxVal <= 0x0000ffff ? 0 : "((__ASM_ARG(\\{})+{})&0xff0000)>>16".format(arg);
-		local b2 = minVal >= 0 && maxVal <= 0x000000ff ? 0 : "((__ASM_ARG(\\{})+{})&0xff00)>>8".format(arg);
-		local b3 =                                           "(__ASM_ARG(\\{})+{})&0xff".format(arg);
+		local formatArgs = { asmArgPrefix, arg.first, asmArgSuffix, arg.last };
+		local b0 = minVal >= 0 && maxVal <= 0x00ffffff ? 0 : "(({}\\{}{}+{})&0xff000000)>>24".format(formatArgs);
+		local b1 = minVal >= 0 && maxVal <= 0x0000ffff ? 0 : "(({}\\{}{}+{})&0xff0000)>>16".format(formatArgs);
+		local b2 = minVal >= 0 && maxVal <= 0x000000ff ? 0 : "(({}\\{}{}+{})&0xff00)>>8".format(formatArgs);
+		local b3 =                                           "({}\\{}{}+{})&0xff".format(formatArgs);
 		return arch.bigEndian ? { b0, b1, b2, b3 }
 		                      : { b3, b2, b1, b0 };
 	}
@@ -485,14 +608,15 @@ class Assembler {
 		if (arg is int)
 			return arg.tobytes(4, byteorder: arch.byteorder, signed: signed);
 		local minVal, maxVal = this.outLimits.get(arg.first, (0, 0xffffffffffffffff))...;
-		local b0 = minVal >= 0 && maxVal <= 0x00ffffffffffffff ? 0 : "((__ASM_ARG(\\{})+{})&0xff00000000000000)>>56".format(arg);
-		local b1 = minVal >= 0 && maxVal <= 0x0000ffffffffffff ? 0 : "((__ASM_ARG(\\{})+{})&0xff000000000000)>>48".format(arg);
-		local b2 = minVal >= 0 && maxVal <= 0x000000ffffffffff ? 0 : "((__ASM_ARG(\\{})+{})&0xff0000000000)>>40".format(arg);
-		local b3 = minVal >= 0 && maxVal <= 0x00000000ffffffff ? 0 : "((__ASM_ARG(\\{})+{})&0xff00000000)>>32".format(arg);
-		local b4 = minVal >= 0 && maxVal <= 0x0000000000ffffff ? 0 : "((__ASM_ARG(\\{})+{})&0xff000000)>>24".format(arg);
-		local b5 = minVal >= 0 && maxVal <= 0x000000000000ffff ? 0 : "((__ASM_ARG(\\{})+{})&0xff0000)>>16".format(arg);
-		local b6 = minVal >= 0 && maxVal <= 0x00000000000000ff ? 0 : "((__ASM_ARG(\\{})+{})&0xff00)>>8".format(arg);
-		local b7 =                                                   "(__ASM_ARG(\\{})+{})&0xff".format(arg);
+		local formatArgs = { asmArgPrefix, arg.first, asmArgSuffix, arg.last };
+		local b0 = minVal >= 0 && maxVal <= 0x00ffffffffffffff ? 0 : "(({}\\{}{}+{})&0xff00000000000000)>>56".format(formatArgs);
+		local b1 = minVal >= 0 && maxVal <= 0x0000ffffffffffff ? 0 : "(({}\\{}{}+{})&0xff000000000000)>>48".format(formatArgs);
+		local b2 = minVal >= 0 && maxVal <= 0x000000ffffffffff ? 0 : "(({}\\{}{}+{})&0xff0000000000)>>40".format(formatArgs);
+		local b3 = minVal >= 0 && maxVal <= 0x00000000ffffffff ? 0 : "(({}\\{}{}+{})&0xff00000000)>>32".format(formatArgs);
+		local b4 = minVal >= 0 && maxVal <= 0x0000000000ffffff ? 0 : "(({}\\{}{}+{})&0xff000000)>>24".format(formatArgs);
+		local b5 = minVal >= 0 && maxVal <= 0x000000000000ffff ? 0 : "(({}\\{}{}+{})&0xff0000)>>16".format(formatArgs);
+		local b6 = minVal >= 0 && maxVal <= 0x00000000000000ff ? 0 : "(({}\\{}{}+{})&0xff00)>>8".format(formatArgs);
+		local b7 =                                                   "({}\\{}{}+{})&0xff".format(formatArgs);
 		return arch.bigEndian ? { b0, b1, b2, b3, b4, b5, b6, b7 }
 		                      : { b7, b6, b5, b4, b3, b2, b1, b0 };
 	}
@@ -516,12 +640,16 @@ class Assembler {
 	function assemble_push64(arg) -> _assemble_push(arg, 8);
 	function _assemble_push(arg, maxsize: int) {
 		if (arg is string) {
+			/* push @xxx         -- DW_OP_const1u xxx */
 			/* push top          -- DW_OP_dup */
 			/* push &reg         -- Push register address  (DW_OP_regx) */
 			/* push %reg         -- Push register value    (DW_OP_bregx) */
 			/* push %reg+ADDEND  -- Push register value    (DW_OP_bregx) */
 			if (arg == "top") {
 				yield DW_OP_dup;
+			} else if (arg.startswith("@")) {
+				yield DW_OP_const1u;
+				yield removeSurroundingParenthesis(arg[1:]);
 			} else if (arg.startswith("&")) {
 				local regno = arch.registers[arg[1:]];
 				if (regno <= 31) {
@@ -573,8 +701,8 @@ class Assembler {
 					throw InvalidOperands();
 				}
 			}
-		} else if (arg is int && arg >= 0 && arg <= 31) {
-			yield DW_OP_lit0 + arg;
+		} else if (testEncodeU5bit(arg)) {
+			yield encodeU5Bit(arg, DW_OP_lit0);
 		} else if (testEncodeS1(arg)) {
 			yield DW_OP_const1s;
 			yield encodeS1(arg);
@@ -625,8 +753,28 @@ encode_suleb:
 		yield this.operator . (encodeUn)(arg)...;
 	}
 
-	function assemble_const1u(arg) { if (!testEncodeU1(arg)) throw ImpossibleConstraints(arg); yield DW_OP_const1u; yield encodeU1(arg); }
-	function assemble_const1s(arg) { if (!testEncodeS1(arg)) throw ImpossibleConstraints(arg); yield DW_OP_const1s; yield encodeS1(arg); }
+	function assemble_const1u(arg) {
+		if (arg is string && arg.startswith("@")) {
+			yield DW_OP_const1u;
+			yield removeSurroundingParenthesis(arg[1:]);
+		} else {
+			if (!testEncodeU1(arg))
+				throw ImpossibleConstraints(arg);
+			yield DW_OP_const1u;
+			yield encodeU1(arg);
+		}
+	}
+	function assemble_const1s(arg) {
+		if (arg is string && arg.startswith("@")) {
+			yield DW_OP_const1s;
+			yield removeSurroundingParenthesis(arg[1:]);
+		} else {
+			if (!testEncodeS1(arg))
+				throw ImpossibleConstraints(arg);
+			yield DW_OP_const1s;
+			yield encodeS1(arg);
+		}
+	}
 	function assemble_const2u(arg) { if (!testEncodeU2(arg)) throw ImpossibleConstraints(arg); yield DW_OP_const2u; yield encodeU2(arg)...; }
 	function assemble_const2s(arg) { if (!testEncodeS2(arg)) throw ImpossibleConstraints(arg); yield DW_OP_const2s; yield encodeS2(arg)...; }
 	function assemble_const4u(arg) { if (!testEncodeU4(arg)) throw ImpossibleConstraints(arg); yield DW_OP_const4u; yield encodeU4(arg)...; }
@@ -637,6 +785,9 @@ encode_suleb:
 	function assemble_pick(arg) {
 		if (arg is int && arg == 0) {
 			yield DW_OP_dup;
+		} else if (arg is string && arg.startswith("@")) {
+			yield DW_OP_pick;
+			yield removeSurroundingParenthesis(arg[1:]);
 		} else if (testEncodeU1(arg)) {
 			yield DW_OP_pick;
 			yield encodeU1(arg);
@@ -654,6 +805,9 @@ encode_suleb:
 	function _assemble_plus(arg, maxsize: int) {
 		if (arg is int && arg == 0) {
 			/* No-op */
+		} else if (arg is string && arg.startswith("@")) {
+			yield DW_OP_plus_uconst;
+			yield removeSurroundingParenthesis(arg[1:]);
 		} else if (testEncodeU7bit(arg)) {
 			yield DW_OP_plus_uconst;
 			yield encodeU1(arg);
@@ -668,6 +822,11 @@ encode_suleb:
 		}
 	}
 
+	function assemble_jf(arg) {
+		yield DW_OP_not;
+		yield _asm_jmp(DW_OP_bra, arg)...;
+	}
+	function assemble_jt(arg)   -> _asm_jmp(DW_OP_bra, arg); /* Jump-if-true */
 	function assemble_bra(arg)  -> _asm_jmp(DW_OP_bra, arg);
 	function assemble_skip(arg) -> _asm_jmp(DW_OP_skip, arg);
 	function assemble_jmp(arg)  -> _asm_jmp(DW_OP_skip, arg);
@@ -684,26 +843,223 @@ encode_suleb:
 		}
 	}
 
-	/* TODO: Missing instructions... */
-#define DW_OP_regx                 0x90 /* [+*]   PUSH(GET_CONTEXT_REGADDR(dwarf_decode_uleb128(&pc))); */
-#define DW_OP_fbreg                0x91 /* [+*]   PUSH(EVAL(CURRENT_FUNCTION.DW_AT_frame_base) + dwarf_decode_sleb128(&pc)) */
-#define DW_OP_bregx                0x92 /* [+*]   PUSH(GET_CONTEXT_REGVAL(dwarf_decode_uleb128(&pc)) + dwarf_decode_sleb128(&pc)); */
-#define DW_OP_piece                0x93 /* [+*]   num_bytes = dwarf_decode_uleb128(&pc); WRITE_RESULT(POP(), num_bytes * 8); // Assign TOP to `num_bytes' of the variable's value. */
-#define DW_OP_deref_size           0x94 /* [+1]   n = *(u8 const *)pc; pc += 1; p = POP(); PUSH(n == 1 ? *(u8 const *)p : n == 2 ? *(u16 const *)p : n == 4 ? *(u32 const *)p : n == 8 ? *(u64 const *)p : UNDEFINED); */
-#define DW_OP_xderef_size          0x95 /* [+1]   n = *(u8 const *)pc; pc += 1; p = POP(); id = POP(); PUSH(n == 1 ? *(u8 const *)id:p : n == 2 ? *(u16 const *)id:p : n == 4 ? *(u32 const *)id:p : n == 8 ? *(u64 const *)id:p : UNDEFINED); */
-#define DW_OP_bit_piece            0x9d /* [+*]   size = dwarf_decode_uleb128(&pc); offset = dwarf_decode_uleb128(&pc); WRITE_RESULT((TOP >> offset) & ((1 << size) - 1), size); */
-#define DW_OP_implicit_value       0x9e /* [+*]   size = dwarf_decode_uleb128(&pc); PUSH(LVALUE(pc, size)); pc += size; */
-#define DW_OP_addrx                0xa1 /* [+*]   PUSH(*(uintptr_t *)(ues_debug_addr_start + ue_cu->cu_addr_base + dwarf_decode_uleb128(&pc))) */
-#define DW_OP_constx               0xa2 /* [+*]   PUSH(*(uintptr_t *)(ues_debug_addr_start + ue_cu->cu_addr_base + dwarf_decode_uleb128(&pc))) */
-#define DW_OP_GNU_encoded_addr     0xf1 /* [+1+*] format = *pc++; PUSH(decode_pointer(format, &pc)); // Format is one of `DW_EH_PE_*' */
-#define DW_OP_GNU_entry_value      0xf3 /* [+*]   size = dwarf_decode_uleb128(&pc); EVAL_DW_OP_CODE_AT_SUBPROGRAM_ENTRY(pc, pc + size); pc += size; (Alias for `DW_OP_entry_value') */
+	function assemble_regx(arg) -> assemble_reg(arg);
+	function assemble_reg(arg) {
+		if (arg is string) {
+			if (!arg.startswith("%"))
+				throw InvalidOperands();
+			arg = arch.registers[arg[1:]];
+		}
+		if (testEncodeU5bit(arg)) {
+			yield encodeU5Bit(arg, DW_OP_reg0);
+		} else if (arg is string && arg.startswith("@")) {
+			yield DW_OP_regx;
+			yield removeSurroundingParenthesis(arg[1:]);
+		} else if (testEncodeU7bit(arg)) {
+			yield DW_OP_regx;
+			yield encodeU1(arg);
+		} else if (arg is int && arg >= 0) {
+			yield DW_OP_regx;
+			yield encodeULeb128(arg)...;
+		} else {
+			throw ImpossibleConstraints(arg);
+		}
+	}
+
+	function assemble_fbreg(arg) {
+		if (arg is string && arg.startswith("@")) {
+			yield DW_OP_fbreg;
+			yield removeSurroundingParenthesis(arg[1:]);
+		} else if (testEncodeU6bit(arg)) {
+			yield DW_OP_fbreg;
+			yield encodeU1(arg);
+		} else if (arg is int) {
+			yield DW_OP_fbreg;
+			yield encodeSLeb128(arg)...;
+		} else {
+			throw ImpossibleConstraints(arg);
+		}
+	}
+
+	function assemble_bregx(regno, offset) -> assemble_breg(regno, offset);
+	function assemble_breg(regno, offset) {
+		if (regno is string) {
+			if (!regno.startswith("%"))
+				throw InvalidOperands();
+			regno = arch.registers[regno[1:]];
+		}
+		if (testEncodeU5bit(regno)) {
+			yield encodeU5Bit(regno, DW_OP_breg0);
+		} else if (testEncodeU7bit(regno)) {
+			yield DW_OP_bregx;
+			yield encodeU1(regno);
+		} else {
+			if (regno !is int || regno < 0)
+				throw ImpossibleConstraints();
+			yield DW_OP_bregx;
+			yield encodeULeb128(regno)...;
+		}
+		if (offset is string && offset.startswith("@")) {
+			yield removeSurroundingParenthesis(offset[1:]);
+		} else if (testEncodeU6bit(offset)) {
+			yield encodeU1(offset);
+		} else {
+			if (offset !is int)
+				throw ImpossibleConstraints();
+			yield encodeSLeb128(offset)...;
+		}
+	}
+
+	function assemble_piece(numBytes) {
+		yield DW_OP_piece;
+		if (numBytes is string && numBytes.startswith("@")) {
+			yield removeSurroundingParenthesis(numBytes[1:]);
+		} else if (testEncodeU7bit(numBytes)) {
+			yield encodeU1(numBytes);
+		} else {
+			if (numBytes !is int)
+				throw ImpossibleConstraints();
+			yield encodeULeb128(numBytes)...;
+		}
+	}
+
+	function assemble_derefb() -> arch.addrsize == 1 ? { DW_OP_deref } : assemble_deref_size(1);
+	function assemble_derefw() -> arch.addrsize == 2 ? { DW_OP_deref } : assemble_deref_size(2);
+	function assemble_derefl() -> arch.addrsize == 4 ? { DW_OP_deref } : assemble_deref_size(4);
+	function assemble_derefq() -> arch.addrsize == 8 ? { DW_OP_deref } : assemble_deref_size(8);
+	function assemble_deref_size(n) {
+		if (n is int && n == arch.addrsize) {
+			yield DW_OP_deref;
+		} else if (n is string && n.startswith("@")) {
+			yield DW_OP_deref_size;
+			yield removeSurroundingParenthesis(n[1:]);
+		} else {
+			yield DW_OP_deref_size;
+			if (testEncodeU1(n)) {
+				yield encodeU1(n);
+			} else {
+				throw ImpossibleConstraints();
+			}
+		}
+	}
+
+	function assemble_xderefb() -> arch.addrsize == 1 ? { DW_OP_xderef } : assemble_xderef_size(1);
+	function assemble_xderefw() -> arch.addrsize == 2 ? { DW_OP_xderef } : assemble_xderef_size(2);
+	function assemble_xderefl() -> arch.addrsize == 4 ? { DW_OP_xderef } : assemble_xderef_size(4);
+	function assemble_xderefq() -> arch.addrsize == 8 ? { DW_OP_xderef } : assemble_xderef_size(8);
+	function assemble_xderef_size(n) {
+		if (n is int && n == arch.addrsize) {
+			yield DW_OP_xderef;
+		} else if (n is string && n.startswith("@")) {
+			yield DW_OP_xderef_size;
+			yield removeSurroundingParenthesis(n[1:]);
+		} else {
+			yield DW_OP_xderef_size;
+			if (testEncodeU1(n)) {
+				yield encodeU1(n);
+			} else {
+				throw ImpossibleConstraints();
+			}
+		}
+	}
+
+	function assemble_bit_piece(numBits) {
+		yield DW_OP_bit_piece;
+		if (testEncodeU7bit(numBits)) {
+			yield encodeU1(numBits);
+		} else if (numBits is string && numBits.startswith("@")) {
+			yield removeSurroundingParenthesis(numBits[1:]);
+		} else {
+			if (numBits !is int)
+				throw ImpossibleConstraints();
+			yield encodeULeb128(numBits)...;
+		}
+	}
+
+	function assemble_implicit_value(value) {
+		if (value !is string || !value.startswith("\"") || !value.endswith("\""))
+			throw InvalidOperands();
+		try {
+			value = value[1:-1].decode("c-escape");
+		} catch (...) {
+			throw InvalidOperands();
+		}
+		value = value.encode("utf-8").bytes();
+		yield DW_OP_implicit_value;
+		yield encodeULeb128(#value)...;
+		yield value...;
+	}
+
+	function assemble__cfi_escape(bytes...) {
+		for (local b: bytes) {
+			if (testEncodeU1(b)) {
+				yield encodeU1(b);
+			} else {
+				throw ImpossibleConstraints();
+			}
+		}
+	}
+
+	/* Special instruction: ifnotimpl
+	 * >> ifnotimpl "KOS", .Ltarget
+	 *
+	 * If the hosting implementation isn't KOS's, jump to `.Ltarget'
+	 * NOTE: This is implemented via a double-jump:
+	 * >>     skip 1f
+	 * >>     .byte 'K','O','S'
+	 * >> 1:  skip .Ltarget */
+	function assemble_ifnotimpl(implName /*: string*/, target /*: Symbol*/) {
+		if (implName !is string || !implName.startswith("\"") ||
+		    !implName.endswith("\"") || target !is Symbol)
+			throw InvalidOperands();
+		try {
+			implName = implName[1:-1].decode("c-escape");
+		} catch (...) {
+			throw InvalidOperands();
+		}
+		implName = implName.encode("utf-8").bytes();
+		yield DW_OP_skip; /* Skip over the impl indicator string */
+		yield (#implName).tobytes(2, byteorder: arch.byteorder, signed: false)...;
+		yield implName...;
+		yield DW_OP_skip;
+		if (arch.bigEndian) {
+			yield Relocation(R_CFI_REL16_B, target);
+			yield Relocation(R_CFI_REL16_A, target);
+		} else {
+			yield Relocation(R_CFI_REL16_A, target);
+			yield Relocation(R_CFI_REL16_B, target);
+		}
+	}
+
 /***********************************************************************************************/
 
 	function assembleInstruction(i: Instruction): {string | int | Relocation | Symbol...} {
-		local opcode = NOARG_INSTRUCTIONS.get(i.mnemonic);
-		if (opcode !is none && !i.operands)
-			return { opcode };
-		local attrName = "assemble_" + i.mnemonic.replace(".", "_");
+		local mnemonic = i.mnemonic;
+		local opcode = NOARG_INSTRUCTIONS.get(mnemonic);
+		local maxOperandSize;
+		if (opcode !is none) {
+			if (!i.operands)
+				return { opcode };
+			maxOperandSize = arch.addrsize;
+handle_fixed_operand_size:
+			if (#i.operands == 1 && opcode in BINARY_AS_PUSH_INSTR_OPCODES) {
+				/* Compile as `push <i.operands.first>; <opcode>;' */
+				return { _assemble_push(i.operands.first, maxOperandSize)..., opcode };
+			}
+		} else if (mnemonic.endswith("8")) {
+			opcode = NOARG_INSTRUCTIONS.get(mnemonic[:-1]);
+			if (opcode !is none) {
+				maxOperandSize = 1;
+				goto handle_fixed_operand_size;
+			}
+		} else if (mnemonic.endswith("16") || mnemonic.endswith("32") || mnemonic.endswith("64")) {
+			opcode = NOARG_INSTRUCTIONS.get(mnemonic[:-2]);
+			if (opcode !is none) {
+				maxOperandSize = { "6" : 2, "2" : 4, "4" : 8 }[mnemonic[-1:]];
+				goto handle_fixed_operand_size;
+			}
+		}
+		local attrName = "assemble_" + mnemonic.replace(".", "_");
 		try {
 			return this.operator . (attrName)(i.operands...);
 		} catch (AttributeError) {
@@ -712,7 +1068,7 @@ encode_suleb:
 		} catch (InvalidOperands) {
 		}
 		throw Error("Invalid operands for {!r}: {}".format({
-			i.mnemonic,
+			mnemonic,
 			", ".join(for (local o: i.operands) repr o)
 		}));
 	}
@@ -771,8 +1127,8 @@ encode_suleb:
 			yield ("1", bytes);
 		} else {
 			local condition = " && ".join(for (local name: this.outLimits.keys.sorted())
-				"__ASM_ARG(\\{0}) >= {1} && __ASM_ARG(\\{0}) <= {2}"
-					.format({ name, this.outLimits[name]... }));
+				"{0}\\{1}{2} >= {3} && {0}\\{1}{2} <= {4}"
+					.format({ asmArgPrefix, name, asmArgSuffix, this.outLimits[name]... }));
 			yield (condition, bytes);
 			/* Update input constraints */
 			local changed = false;
@@ -804,6 +1160,7 @@ encode_suleb:
 again_with_less_limits:
 				this.inLimits = newInLimits;
 				try {
+					print File.stderr: (__LINE__, ": HERE");
 					more = Tuple(this.doAssemble(outputRegister, fullyLimited));
 				} catch (ImpossibleConstraints as e) {
 					local name = e.varName;
@@ -841,38 +1198,68 @@ again_with_less_limits:
 	}
 }
 
+function assemble(arch: string, outputRegister: string, code: string): {int | string...} {
+	local asm = Assembler(arch, code);
+	local dat = asm.assemble(outputRegister);
+	assert #dat == 1;
+	dat = dat.first;
+	assert dat.first == "1";
+	return dat.last;
+}
+
+function outputBytesForAssembly(bytes: {int | string...},
+                                linePrefix: string = "__ASM_L(",
+                                lineSuffix: string = ")",
+                                outputFile: File = none) {
+	if (outputFile is none)
+		outputFile = File.stdout;
+#if 0
+	import(".disasm").disassemble(asm.arch, bytes);
+	for (local line: bytes.segments(8))
+		print outputFile: (linePrefix, "\t.cfi_escape ", ",".join(
+			for (local b: line) b !is int ? b : "0x" + b.hex()[2:].zfill(2)), lineSuffix);
+#else
+	for (local line: bytes.segments(16))
+		print outputFile: (linePrefix, "\t.cfi_escape ", ",".join(line), lineSuffix);
+#endif
+}
 
 function outputForAssembly(arch: string, outputRegister: string, code: string,
-                           linePrefix: string = "__ASM_L(", lineSuffix: string = ")") {
+                           linePrefix: string = "__ASM_L(", lineSuffix: string = ")",
+                           outputFile: File = none,
+                           asmArgPrefix: string | none = none,
+                           asmArgSuffix: string | none = none) {
+	if (outputFile is none)
+		outputFile = File.stdout;
 	local asm = Assembler(arch, code);
+	if (asmArgPrefix !is none)
+		asm.asmArgPrefix = asmArgPrefix;
+	if (asmArgSuffix !is none)
+		asm.asmArgSuffix = asmArgSuffix;
 	local isFirst = true;
 	local hasUncondition = false;
 	for (local cond, bytes: asm.assemble(outputRegister)) {
 		if (cond == "1") {
 			hasUncondition = true;
 			if (!isFirst)
-				print(linePrefix, ".else", lineSuffix);
+				print outputFile: (linePrefix, ".else", lineSuffix);
 		} else {
-			print(linePrefix, isFirst ? ".if " : ".elseif ", cond, lineSuffix);
+			print outputFile: (linePrefix, isFirst ? ".if " : ".elseif ", cond, lineSuffix);
 			isFirst = false;
 		}
-		for (local line: bytes.segments(8))
-			print(linePrefix, "\t.cfi_escape ", ",".join(
-				for (local b: line) b !is int ? b : "0x" + b.hex()[2:].zfill(2)), lineSuffix);
-//		for (local line: bytes.segments(16))
-//			print(linePrefix, "\t.cfi_escape ", ",".join(line), lineSuffix);
+		outputBytesForAssembly(bytes, linePrefix, lineSuffix, outputFile);
 		if (cond == "1")
 			break;
 	}
 	if (hasUncondition) {
 		if (!isFirst)
-			print(linePrefix, ".endif", lineSuffix);
+			print outputFile: (linePrefix, ".endif", lineSuffix);
 	} else {
 		if (!isFirst)
-			print(linePrefix, ".else", lineSuffix);
-		print(linePrefix, "\t.error \"Input arguments too large\"", lineSuffix);
+			print outputFile: (linePrefix, ".else", lineSuffix);
+		print outputFile: (linePrefix, "\t.error \"Input arguments too large\"", lineSuffix);
 		if (!isFirst)
-			print(linePrefix, ".endif", lineSuffix);
+			print outputFile: (linePrefix, ".endif", lineSuffix);
 	}
 }
 
@@ -881,4 +1268,6 @@ assert #encodeULeb128(ULEB128_3BYTE_MAX) == 3;
 assert #encodeULeb128(ULEB128_3BYTE_MAX + 1) == 4;
 assert #encodeSLeb128(SLEB128_3BYTE_MIN) == 3;
 assert #encodeSLeb128(SLEB128_3BYTE_MIN - 1) == 4;
+
+Error.AppExit.atexit([]{ Error.AppExit.exit(0); });
 

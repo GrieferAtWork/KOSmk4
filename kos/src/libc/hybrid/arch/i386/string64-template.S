@@ -53,26 +53,13 @@
 /* Being/end a code-block during which EFLAGS.DF=1 is required */
 #if !defined(__KERNEL__) || 1
 
-/*[[[deemon
-import * from deemon;
-import compileExpression from ......misc.libgen.cfi.compiler;
-local fp = File.Writer();
-local oldOut = File.stdout;
-File.stdout = fp;
-compileExpression('x86_64', '%rflags', r'
-	push %rflags     # %rflags
-	push $EFLAGS_DF  # %rflags, EFLAGS_DF
-	not              # %rflags, ~EFLAGS_DF
-	and              # (%rflags & ~EFLAGS_DF)
-', deref_after: false);
-File.stdout = oldOut;
-print("#define CFI_RESTORE_EFLAGS_CLEARDF \\");
-print("\t", " \\\n\t".join(fp.string.strip().splitlines(false)));
+/*[[[cfi{arch='x86_64', register='%rflags', mode='macro:CFI_RESTORE_EFLAGS_CLEARDF'}
+	push %rflags
+	and  ~$EFLAGS_DF
 ]]]*/
 #define CFI_RESTORE_EFLAGS_CLEARDF \
-	__ASM_L(	.cfi_escape 0x16,0x31,0x07,0x90,0x31,0x0a,0x00,0x04) \
-	__ASM_L(	.cfi_escape 0x20,0x1a)
-//[[[end]]]
+	__ASM_L(	.cfi_escape 22,49,7,146,49,0,11,255,251,26)
+/*[[[end]]]*/
 /* Setup a custom CFI restore function to clear EFLAGS.DF during unwinding */
 #define BEGIN_STD std; CFI_RESTORE_EFLAGS_CLEARDF
 #else /* !__KERNEL__ */

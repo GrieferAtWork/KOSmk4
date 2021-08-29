@@ -93,12 +93,12 @@ function enumerateMacrosFromFile(filename: string): {(string, string)...} {
 				continue;
 			}
 			macroValue = removeComments(macroValue);
-			knownMacros.pop(macroName, none);
-			macroValue = replaceKeywordsWithMacros(
-				macroValue.strip(), knownMacros);
-			knownMacros[macroName] = macroValue;
-			yield (macroName, macroValue);
+			knownMacros[macroName] = macroValue.strip();
 		}
+	}
+	for (local name, value: knownMacros) {
+		value = replaceKeywordsWithMacros(value.strip(), knownMacros);
+		yield (name, value);
 	}
 }
 
