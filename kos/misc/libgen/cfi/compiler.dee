@@ -69,6 +69,13 @@ function encodeIntOrArgument(val: int | string): int | string {
 		return val;
 	if (val.startswith("@"))
 		return val[1:];
+	if ("+" in val) {
+		local a, none, b = val.partition("+")...;
+		if (a.startswith("\\"))
+			return "__ASM_ARG({})+{}".format({ a, b });
+		if (b.startswith("\\"))
+			return "{}+__ASM_ARG({})".format({ a, b });
+	}
 	return "__ASM_ARG({})".format({ val });
 }
 function encodeIntOrArgument2b(val: int | string): {int | string...} {
@@ -577,6 +584,11 @@ function compileExpressionBase(arch: string, text: string): {int | Symbol | Relo
 
 		case OPERAND_NUMBER:
 		case OPERAND_NUMBER_OR_ARG:
+			if ("+" in operandText) {
+				local a, none, b = operandText.partition("+")...;
+				return str(getOperandValue(operandType, a)) + "+" +
+				       str(getOperandValue(operandType, b));
+			}
 			if (operandText.startswith("$")) {
 				local val = operandText[1:];
 				if (val.startswith("@"))
