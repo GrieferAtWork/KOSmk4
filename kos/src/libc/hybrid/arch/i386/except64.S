@@ -592,7 +592,7 @@ PUBLIC_FUNCTION(x86_userexcept_unwind_interrupt)
 	.cfi_startproc simple
 	.cfi_signal_frame
 	.cfi_def_cfa %rdi, 0
-	ASM_CFI_REL_OFFSET_RESTORE_ICPUSTATE(0)
+	ASM_CFI_OFFSET_RESTORE_ICPUSTATE(0)
 	movq   %rdi, %rsp
 	.cfi_def_cfa_register %rsp
 PUBLIC_FUNCTION(x86_userexcept_unwind_interrupt_rsp)

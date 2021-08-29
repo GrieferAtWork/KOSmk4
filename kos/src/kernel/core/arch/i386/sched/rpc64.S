@@ -176,7 +176,7 @@ END(x86_rpc_user_redirection)
 	.cfi_startproc simple
 	.cfi_signal_frame
 	.cfi_def_cfa %rbp, 0
-	ASM_CFI_REL_OFFSET_RESTORE_ICPUSTATE(0)
+	ASM_CFI_OFFSET_RESTORE_ICPUSTATE(0)
 	EXTERN(x86_rpc_kernel_redirection_personality)
 	.cfi_personality 0, x86_rpc_kernel_redirection_personality
 	nop /* Required to allow for detection during unwinding. */
@@ -206,7 +206,7 @@ INTERN_FUNCTION(x86_rpc_kernel_redirection_handler)
 	.cfi_startproc simple
 	.cfi_signal_frame
 	.cfi_def_cfa %rbp, 0
-	ASM_CFI_REL_OFFSET_RESTORE_ICPUSTATE(0)
+	ASM_CFI_OFFSET_RESTORE_ICPUSTATE(0)
 	/* RAX:    <task_rpc_t func>
 	 * RDI:    <void *arg>
 	 * RSI:    <struct icpustate *>    (contains the return location; also used for CFI)

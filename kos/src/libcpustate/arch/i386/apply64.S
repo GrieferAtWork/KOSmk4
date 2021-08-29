@@ -53,8 +53,8 @@
 TEXT_SECTION
 	.cfi_startproc simple
 	.cfi_signal_frame
-	.cfi_def_cfa %rdi, OFFSET_ICPUSTATE_IRREGS
-	ASM_CFI_REL_OFFSET_RESTORE_ICPUSTATE(0)
+	.cfi_def_cfa %rdi, 0
+	ASM_CFI_OFFSET_RESTORE_ICPUSTATE(0)
 BEGIN_TRAP(kernel_debugtrap_icpustate)
 INTERN_FUNCTION(libcpu_apply_icpustate)
 	movq  %rdi, %rsp

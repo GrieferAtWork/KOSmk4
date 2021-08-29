@@ -239,7 +239,7 @@ PUBLIC_FUNCTION(x86_syscall_emulate_int80h_r)
 	 * NOTE: ENDOF(%rdi->IRREGS) is located at the end (top) of our kernel-stack! */
 	.cfi_signal_frame
 	.cfi_def_cfa %rdi, 0
-	ASM_CFI_REL_OFFSET_RESTORE_ICPUSTATE(0)
+	ASM_CFI_OFFSET_RESTORE_ICPUSTATE(0)
 	movq   %rdi, %rsp /* No need to disable interrupts, since this stack switch is atomic! */
 	.cfi_def_cfa_register %rsp
 	/* Restore user-space registers. (except for RAX) */
@@ -285,7 +285,7 @@ PUBLIC_FUNCTION(x86_syscall_emulate32_int80h_r)
 	 * NOTE: ENDOF(%rdi->IRREGS) is located at the end (top) of our kernel-stack! */
 	.cfi_signal_frame
 	.cfi_def_cfa %rdi, 0
-	ASM_CFI_REL_OFFSET_RESTORE_ICPUSTATE(0)
+	ASM_CFI_OFFSET_RESTORE_ICPUSTATE(0)
 	movq   %rdi, %rsp /* No need to disable interrupts, since this stack switch is atomic! */
 	.cfi_def_cfa_register %rsp
 	/* Restore user-space registers. */
@@ -306,7 +306,7 @@ PUBLIC_FUNCTION(x86_syscall_emulate64_int80h_r)
 	 * NOTE: ENDOF(%rdi->IRREGS) is located at the end (top) of our kernel-stack! */
 	.cfi_signal_frame
 	.cfi_def_cfa %rdi, 0
-	ASM_CFI_REL_OFFSET_RESTORE_ICPUSTATE(0)
+	ASM_CFI_OFFSET_RESTORE_ICPUSTATE(0)
 	movq   %rdi, %rsp /* No need to disable interrupts, since this stack switch is atomic! */
 	.cfi_def_cfa_register %rsp
 	/* Restore user-space registers. */

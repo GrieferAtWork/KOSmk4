@@ -444,29 +444,11 @@ END(cpu_run_current_nopr)
 INTERN_FUNCTION(arch_sched_super_override_ipi)
 	.cfi_startproc
 	.cfi_signal_frame
-	.cfi_def_cfa %R_fcall0P, OFFSET_ICPUSTATE_IRREGS
-#ifdef __x86_64__
-	ASM_CFI_REL_OFFSET_RESTORE_ICPUSTATE(0)
-#else /* __x86_64__ */
-	.cfi_restore_iret_eip
-	.cfi_restore_iret_cs
-	.cfi_restore_iret_eflags
-	.cfi_restore_iret_esp
-	.cfi_restore_iret_ss
-	.cfi_restore_iret_es_or_offset (OFFSET_ICPUSTATE_ES - OFFSET_ICPUSTATE_IRREGS)
-	.cfi_restore_iret_ds_or_offset (OFFSET_ICPUSTATE_DS - OFFSET_ICPUSTATE_IRREGS)
-	.cfi_restore_iret_fs_or_offset (OFFSET_ICPUSTATE_FS - OFFSET_ICPUSTATE_IRREGS)
-	.cfi_restore_iret_gs
-	.cfi_rel_offset %edi, (OFFSET_ICPUSTATE_GPREGS + OFFSET_GPREGS_EDI)
-	.cfi_rel_offset %esi, (OFFSET_ICPUSTATE_GPREGS + OFFSET_GPREGS_ESI)
-	.cfi_rel_offset %ebp, (OFFSET_ICPUSTATE_GPREGS + OFFSET_GPREGS_EBP)
-	.cfi_rel_offset %ebx, (OFFSET_ICPUSTATE_GPREGS + OFFSET_GPREGS_EBX)
-	.cfi_rel_offset %edx, (OFFSET_ICPUSTATE_GPREGS + OFFSET_GPREGS_EDX)
-	.cfi_rel_offset %ecx, (OFFSET_ICPUSTATE_GPREGS + OFFSET_GPREGS_ECX)
-	.cfi_rel_offset %eax, (OFFSET_ICPUSTATE_GPREGS + OFFSET_GPREGS_EAX)
-#endif /* !__x86_64__ */
+	.cfi_def_cfa %R_fcall0P, 0
+	ASM_CFI_OFFSET_RESTORE_ICPUSTATE(0)
 	movP   %R_fcall0P, %Psp /* Return register state. (as an `icpustate') */
 	.cfi_def_cfa_register %Psp
+
 	/* Convert the caller's `icpustate' register state into a `scpustate' */
 #ifdef __x86_64__
 	ASM_PUSH_SGBASE_CFI_R

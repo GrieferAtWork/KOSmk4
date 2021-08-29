@@ -78,7 +78,7 @@
 	EXTERN(syscall_emulate_r_personality)
 	.cfi_personality 0, syscall_emulate_r_personality
 	.cfi_signal_frame
-	ASM_CFI_REL_OFFSET_RESTORE_ICPUSTATE(0)
+	ASM_CFI_OFFSET_RESTORE_ICPUSTATE(0)
 INTERN_FUNCTION(x86_syscall_emulate_traced_r)
 	.cfi_def_cfa %rsp, (SIZEOF_RPC_SYSCALL_INFO + OFFSET_ICPUSTATE_IRREGS)
 	rep;   movsq

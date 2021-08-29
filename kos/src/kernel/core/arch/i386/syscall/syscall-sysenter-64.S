@@ -262,7 +262,7 @@ PUBLIC_FUNCTION(x86_syscall_emulate_sysenter_r)
 	 * NOTE: ENDOF(%ecx->IRREGS) is located at the end (top) of our kernel-stack! */
 	.cfi_iret_signal_frame
 	.cfi_def_cfa %rdi, 0
-	ASM_CFI_REL_OFFSET_RESTORE_ICPUSTATE(0)
+	ASM_CFI_OFFSET_RESTORE_ICPUSTATE(0)
 	cli    /* Prevent corruptions while we're juggling with our stack. */
 	movq   %rdi, %rsp
 	.cfi_def_cfa_register %rsp
