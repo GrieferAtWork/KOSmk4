@@ -1275,6 +1275,33 @@ again_check_next_same_base:
 			goto again_check_next_same_base;
 		}
 
+		/* Special case:
+		 *    NODE[0]: { 0FFFC000-10001FFF, mn_partoff: 0x0000 }  // size == 0x6000  (mapendaddr: 0x6000)
+		 *    NODE[1]: { 0FFFF000-0FFFFFFF, mn_partoff: 0x3000 }  // size == 0x1000  (mapendaddr: 0x4000)
+		 *    NODE[2]: { 10000000-10003FFF, mn_partoff: 0x6000 }  // size == 0x4000  (mapendaddr: 0xA000)
+		 *
+		 * When the  next node  is entirely  contained within  the
+		 * current node, then we mustn't allow ourselves to switch
+		 * to a node with a  lower node_endaddr that the  current.
+		 *
+		 * See the  above example  data  for one  such  scenario.
+		 * Without this special  handling, the  below code  would
+		 * try to trim  part region [0x4000-0x5FFF]  as a  result
+		 * of  the  (apparent) gap  between NODE[1]  and NODE[2].
+		 * However, NODE[1] is entirely contained within NODE[0],
+		 * which  ends  at  0x6000, meaning  that  there actually
+		 * isn't any gap at all.
+		 *
+		 * Fix this problem by simply skipping nodes that are
+		 * entirely   contained   within   preceding   nodes. */
+again_check_next_inside_current:
+		if (mnode_getmapendaddr(next) <= node_endaddr) {
+			next = mpart_node_iterator_next(&iter);
+			if (!next)
+				break; /* Last node reached. */
+			goto again_check_next_inside_current;
+		}
+
 		next_basaddr = mnode_getmapaddr(next);
 		if (node_endaddr < next_basaddr) {
 			/* Align addresses by the mandatory file alignment. */
