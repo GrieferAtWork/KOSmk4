@@ -322,20 +322,28 @@ function printTranslitDatabase() {
 		entries.append(strings);
 	}
 	entries.sort([](x) -> x.first);
-	local fp = File.Writer();
-	fp << "\0\0";
-	for (local strings: entries) {
+	local lines = [];
+	local count = 2;
+	for (local i: [:#entries]) {
+		local strings = entries[i];
+		local line = "";
 		for (local s: strings) {
-			fp << s << "\0";
+			line += s;
+			line += "\0";
+			count += #s;
+			++count;
 		}
-		fp << "\0";
+		++count;
+		if (i != #entries - 1)
+			line += "\0";
+		line = "\"{}\"".format({ fixedCharEncode(line) });
+		lines.append(line);
 	}
-	fp = fp.string[:-1]; /* Trim 1 trailing NUL */
 	print("#define LIBICONV_TRANSLIT_LONGEST_REPLACEMENT_LENGTH        ", longestReplLen);
 	print("#define LIBICONV_TRANSLIT_LONGEST_FOLDED_REPLACEMENT_LENGTH ", longestFoldedReplLen);
-	print("PRIVATE char const libiconv_translit_db[", (#fp + 1).hex(), "] =");
-	for (local line: fp.segments(32)) {
-		print("\"", fixedCharEncode(line), "\"");
-	}
+	print("PRIVATE char const libiconv_translit_db[", count.hex(), "] =");
+	print("\"\\0\\0\"");
+	for (local l: lines)
+		print l;
 	print(";");
 }

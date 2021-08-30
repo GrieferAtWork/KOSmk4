@@ -23,7 +23,7 @@
 #ifdef __INTELLISENSE__
 #include "output.c"
 DECL_BEGIN
-#endif
+#endif /* __INTELLISENSE__ */
 
 /* Conversion table: LATIN-1 --> CP437 */
 PRIVATE u8 const cp437_from_latin1[256] = {
@@ -216,7 +216,7 @@ for (local i,x: util.enumerate(l)) {
 /* Encode the given unicode character `ch' using cp437 (the codepage
  * used by VGA) If the character can't be encoded, return 0 instead.
  * s.a.: https://en.wikipedia.org/wiki/Code_page_437 */
-LOCAL ATTR_COLDTEXT u8 NOTHROW(KCALL cp437_encode)(/*utf-32*/ u32 ch) {
+LOCAL ATTR_COLDTEXT u8 NOTHROW(KCALL cp437_encode)(char32_t ch) {
 	u8 result;
 	if (ch <= 0xff) {
 		result = cp437_from_latin1[ch];
@@ -329,6 +329,13 @@ LOCAL ATTR_COLDTEXT u8 NOTHROW(KCALL cp437_encode)(/*utf-32*/ u32 ch) {
 		case 0x2666: result = 4; break;
 		case 0x266A: result = 13; break;
 		case 0x266B: result = 14; break;
+
+		/* Additional aliasing characters. */
+		case 0x25C0: result = 17; break; /* U+25C4: ◄ vs U+25C0: ◀ */
+		case 0x25B6: result = 16; break; /* U+25BA: ► vs U+25B6: ▶ */
+		case 0x25B4: result = 30; break; /* U+25B2: ▲ vs U+25B4: ▴ */
+		case 0x25BE: result = 31; break; /* U+25BC: ▼ vs U+25BE: ▾ */
+
 		default: result = 0; break;
 		}
 	}
@@ -338,6 +345,6 @@ LOCAL ATTR_COLDTEXT u8 NOTHROW(KCALL cp437_encode)(/*utf-32*/ u32 ch) {
 
 #ifdef __INTELLISENSE__
 DECL_END
-#endif
+#endif /* __INTELLISENSE__ */
 
 #endif /* !GUARD_KERNEL_CORE_ARCH_I386_DEBUGGER_DECODE_CP437_C_INL */

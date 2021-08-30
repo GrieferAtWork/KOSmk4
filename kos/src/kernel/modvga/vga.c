@@ -972,6 +972,13 @@ LOCAL ATTR_CONST WUNUSED u8 NOTHROW(KCALL cp437_encode)(/*utf-32*/ u32 ch) {
 		case 0x2666: result = 4; break;
 		case 0x266A: result = 13; break;
 		case 0x266B: result = 14; break;
+
+		/* Additional aliasing characters. */
+		case 0x25C0: result = 17; break; /* U+25C4: ◄ vs U+25C0: ◀ */
+		case 0x25B6: result = 16; break; /* U+25BA: ► vs U+25B6: ▶ */
+		case 0x25B4: result = 30; break; /* U+25B2: ▲ vs U+25B4: ▴ */
+		case 0x25BE: result = 31; break; /* U+25BC: ▼ vs U+25BE: ▾ */
+
 		default: result = 0; break;
 		}
 	}
