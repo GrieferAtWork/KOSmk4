@@ -34,6 +34,7 @@
 #include <misc/unlockinfo.h>
 
 #include <hybrid/align.h>
+#include <hybrid/atomic.h>
 #include <hybrid/bit.h>
 #include <hybrid/overflow.h>
 
@@ -197,7 +198,7 @@ NOTHROW(FCALL mman_findunmapped)(struct mman const *__restrict self,
 	/*assert(mman_lock_acquired(self));*/ /* Cannot be asserted because of `mman_findunmapped_in_usertree()' */
 
 	/* Load additional flags. */
-	flags |= mman_findunmapped_extflags;
+	flags |= ATOMIC_READ(mman_findunmapped_extflags);
 
 	/* Ensure that the hinted address range is properly aligned. */
 	if unlikely(!IS_ALIGNED((uintptr_t)addr, PAGESIZE)) {

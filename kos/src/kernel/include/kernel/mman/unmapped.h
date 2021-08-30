@@ -26,6 +26,7 @@
 #include <kernel/paging.h>
 #include <kernel/types.h>
 
+#include <hybrid/__atomic.h>
 #include <hybrid/host.h> /* __ARCH_STACK_GROWS_DOWNWARDS */
 
 #include <asm/os/mman.h>       /* __MAP_* constants */
@@ -156,6 +157,12 @@ DATDEF USER CHECKED void *mman_getunmapped_user_stkbase;
  *       catastrophic.
  *       Also note that modifications to this variable must be done atomically! */
 DATDEF unsigned int mman_findunmapped_extflags;
+
+/* Helper macros to enable/disable ASLR globally. */
+#define mman_findunmapped_aslr_enable()      __hybrid_atomic_and(mman_findunmapped_extflags, ~MAP_NOASLR, __ATOMIC_SEQ_CST)
+#define mman_findunmapped_aslr_disable()     __hybrid_atomic_or(mman_findunmapped_extflags, MAP_NOASLR, __ATOMIC_SEQ_CST)
+#define mman_findunmapped_aslr_getenabled()  (!(__hybrid_atomic_load(mman_findunmapped_extflags, __ATOMIC_ACQUIRE) & MAP_NOASLR))
+#define mman_findunmapped_aslr_setenabled(v) ((v) ? mman_findunmapped_aslr_enable() : mman_findunmapped_aslr_disable())
 
 
 /* Try to find a suitable, unmapped address range. Note that this function  never
