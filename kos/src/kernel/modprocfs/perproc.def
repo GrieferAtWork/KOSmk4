@@ -81,6 +81,9 @@ MKREG_RO(cmdline, 0222, ProcFS_PerProc_Cmdline_Printer)
 PERPROC_DIRECTORY_ENTRY("cwd", DT_LNK, cwd)
 DYNAMIC_SYMLINK(cwd, 0777, ProcFS_PerProc_Cwd_Printer)
 
+PERPROC_DIRECTORY_ENTRY("environ", DT_REG, environ)
+MKREG_RO(environ, 0222, ProcFS_PerProc_Environ_Printer)
+
 PERPROC_DIRECTORY_ENTRY("exe", DT_LNK, exe)
 DYNAMIC_SYMLINK(exe, 0777, ProcFS_PerProc_Exe_Printer)
 

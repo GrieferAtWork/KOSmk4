@@ -36,7 +36,7 @@
 #define __OFFSET_PROCESS_RTLD_ELF_ABI      __OFFSET_PROCESS_RTLD_ELF32_ABI
 #define __OFFSET_PROCESS_RTLD_ELF_ABIVER   __OFFSET_PROCESS_RTLD_ELF32_ABIVER
 #define __OFFSET_PROCESS_RTLD_ELF_PHDR     __OFFSET_PROCESS_RTLD_ELF32_PHDR
-#define __elfexec_info_defined   1
+#define __elfexec_info_defined
 #define elfexec_info32           elfexec_info
 #define elfexec_info_getfilename elfexec_info32_getfilename
 #define elfexec_info_getentry    elfexec_info32_getentry

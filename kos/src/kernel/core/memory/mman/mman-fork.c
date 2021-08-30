@@ -30,6 +30,7 @@
 #include <kernel/compat.h>
 #include <kernel/malloc.h>
 #include <kernel/mman.h>
+#include <kernel/mman/execinfo.h>
 #include <kernel/mman/mnode.h>
 #include <kernel/mman/mpart.h>
 #include <kernel/mman/sync.h>
@@ -587,6 +588,18 @@ again:
 		 * that we can ensure that anything written to by either the old, or the
 		 * new mman will be handled via copy-on-write going forward. */
 		forktree_clearwrite(ft.ft_oldmm);
+
+		/* Copy exec information. */
+		{
+			struct mexecinfo *old_execinfo;
+			struct mexecinfo *new_execinfo;
+			old_execinfo = &FORMMAN(ft.ft_oldmm, thismman_execinfo);
+			new_execinfo = &FORMMAN(ft.ft_newmm, thismman_execinfo);
+			memcpy(new_execinfo, old_execinfo, sizeof(struct mexecinfo));
+			xincref(new_execinfo->mei_node);
+			xincref(new_execinfo->mei_dent);
+			xincref(new_execinfo->mei_path);
+		}
 
 		/* Release our lock to the old mman. */
 		mman_lock_release(ft.ft_oldmm);

@@ -17,17 +17,16 @@
  *    misrepresented as being the original software.                          *
  * 3. This notice may not be removed or altered from any source distribution. *
  */
-#ifndef _COMPAT_KOS_EXEC_BITS_ELF_H
-#define _COMPAT_KOS_EXEC_BITS_ELF_H 1
+#ifndef _COMPAT_KOS_EXEC_PEB_H
+#define _COMPAT_KOS_EXEC_PEB_H 1
+
+#include <__stdinc.h>
 
 #include <compat/config.h>
 
 #ifdef __ARCH_HAVE_COMPAT
-#include <kos/exec/bits/elf.h>
-#define __compat_elfexec_info_defined
-#define compat_elfexec_info             elfexec_info
-#define compat_elfexec_info_getfilename elfexec_info_getfilename
-#define compat_elfexec_info_getentry    elfexec_info_getentry
+#include <compat/bits/types.h>
+#include <compat/kos/exec/bits/peb.h>
 #endif /* __ARCH_HAVE_COMPAT */
 
-#endif /* !_COMPAT_KOS_EXEC_BITS_ELF_H */
+#endif /* !_COMPAT_KOS_EXEC_PEB_H */

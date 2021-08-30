@@ -28,11 +28,16 @@
 #endif /* __INTELLISENSE__ */
 
 #include <kernel/mman.h>
+#include <kernel/mman/nopf.h>
 #include <kernel/mman/rw.h>
+#include <sched/pertask.h>
+#include <sched/task.h>
 
 #include <kos/except.h>
 
+#include <alloca.h>
 #include <stdbool.h>
+#include <string.h>
 
 DECL_BEGIN
 
@@ -95,30 +100,109 @@ mman_memset(struct mman *__restrict self,
 #error "Invalid configuration"
 #endif /* !... */
 {
-	(void)self;
-	(void)addr;
-	(void)num_bytes;
-#ifdef LOCAL_IS_MEMSET
-	(void)byte;
-#else /* LOCAL_IS_MEMSET */
-	(void)buf;
-#endif /* !LOCAL_IS_MEMSET */
-#ifndef LOCAL_IS_NOPF
-#ifdef LOCAL_IS_WRITING
-	(void)force_writable_destination;
-#else /* LOCAL_IS_WRITING */
-	(void)force_readable_source;
-#endif /* !LOCAL_IS_WRITING */
+#ifdef LOCAL_IS_NOPF
+	size_t error;
+#else /* LOCAL_IS_NOPF */
+#ifdef LOCAL_IS_READING
+	(void)force_readable_source;      /* TODO: Support me! */
+#else /* LOCAL_IS_READING */
+	(void)force_writable_destination; /* TODO: Support me! */
+#endif /* !LOCAL_IS_READING */
 #endif /* !LOCAL_IS_NOPF */
 
-	/* TODO */
-	COMPILER_IMPURE();
+#ifndef LOCAL_IS_MEMSET
+	if (ADDRRANGE_ISKERN(buf, (byte_t *)buf + num_bytes))
+#endif /* !LOCAL_IS_MEMSET */
+	{
+		if (THIS_MMAN == self) {
+#if defined(LOCAL_IS_MEMSET) && defined(LOCAL_IS_NOPF)
+			error = memset_nopf(addr, byte, num_bytes);
+#elif defined(LOCAL_IS_MEMSET)
+			memset(addr, byte, num_bytes);
+#elif defined(LOCAL_IS_READING) && defined(LOCAL_IS_NOPF)
+			error = memcpy_nopf(buf, addr, num_bytes);
+#elif defined(LOCAL_IS_READING)
+			memcpy(buf, addr, num_bytes);
+#elif defined(LOCAL_IS_WRITING) && defined(LOCAL_IS_NOPF)
+			error = memcpy_nopf(addr, buf, num_bytes);
+#elif defined(LOCAL_IS_WRITING)
+			memcpy(addr, buf, num_bytes);
+#endif /* ... */
+		} else {
+			REF struct mman *oldmm;
+			oldmm = task_xchmman(self);
+#ifdef LOCAL_IS_NOPF
+#if defined(LOCAL_IS_MEMSET) && defined(LOCAL_IS_NOPF)
+			error = memset_nopf(addr, byte, num_bytes);
+#elif defined(LOCAL_IS_READING) && defined(LOCAL_IS_NOPF)
+			error = memcpy_nopf(buf, addr, num_bytes);
+#elif defined(LOCAL_IS_WRITING) && defined(LOCAL_IS_NOPF)
+			error = memcpy_nopf(addr, buf, num_bytes);
+#endif /* ... */
+#else /* LOCAL_IS_NOPF */
+			TRY {
+#if defined(LOCAL_IS_MEMSET)
+				memset(addr, byte, num_bytes);
+#elif defined(LOCAL_IS_READING)
+				memcpy(buf, addr, num_bytes);
+#elif defined(LOCAL_IS_WRITING)
+				memcpy(addr, buf, num_bytes);
+#endif /* ... */
+			} EXCEPT {
+				task_setmman_inherit(oldmm);
+				RETHROW();
+			}
+#endif /* !LOCAL_IS_NOPF */
+			task_setmman_inherit(oldmm);
+		}
+	}
+#ifndef LOCAL_IS_MEMSET
+	else {
+		size_t tempbuf_size;
+		byte_t *tempbuf;
+		/* Copy via an intermediate buffer. */
+		tempbuf_size = get_stack_avail() / 2;
+		if (tempbuf_size > num_bytes)
+			tempbuf_size = num_bytes;
+		if (tempbuf_size < 64)
+			tempbuf_size = 64;
+		tempbuf = (byte_t *)alloca(tempbuf_size);
+		while (num_bytes) {
+			size_t transfer;
+			transfer = tempbuf_size;
+			if (transfer > num_bytes)
+				transfer = num_bytes;
+
+#if defined(LOCAL_IS_READING) && defined(LOCAL_IS_NOPF)
+			error = mman_read_nopf(self, addr, tempbuf, transfer);
+			error += memcpy_nopf(buf, tempbuf, transfer - __builtin_expect(error, 0));
+#elif defined(LOCAL_IS_READING)
+			mman_read(self, addr, tempbuf, transfer, force_readable_source);
+#elif defined(LOCAL_IS_WRITING) && defined(LOCAL_IS_NOPF)
+			error = memcpy_nopf(tempbuf, buf, transfer);
+			error += mman_write_nopf(self, addr, tempbuf, transfer - __builtin_expect(error, 0));
+#elif defined(LOCAL_IS_WRITING)
+			mman_write(self, addr, tempbuf, transfer);
+#endif /* ... */
+
+			addr = (UNCHECKED byte_t *)addr + transfer;
+			buf  = (byte_t *)buf + transfer;
+			num_bytes -= transfer;
 
 #ifdef LOCAL_IS_NOPF
-	return num_bytes;
-#else /* LOCAL_IS_NOPF */
-	THROW(E_NOT_IMPLEMENTED_TODO);
-#endif /* !LOCAL_IS_NOPF */
+			/* Handle transfer error. */
+			if (error != 0) {
+				error += num_bytes; /* Total # of bytes not transferred */
+				break;
+			}
+#endif /* LOCAL_IS_NOPF */
+		}
+	}
+#endif /* !LOCAL_IS_MEMSET */
+
+#ifdef LOCAL_IS_NOPF
+	return error;
+#endif /* LOCAL_IS_NOPF */
 }
 
 #undef LOCAL_IS_NOPF

@@ -81,7 +81,7 @@
 
 #ifdef __CC__
 #ifndef __elfexec_info_defined
-#define __elfexec_info_defined 1
+#define __elfexec_info_defined
 __DECL_BEGIN
 struct elfexec_info /*[PREFIX(pr_)]*/ {
 	ElfW(Addr)  ei_rtldaddr;    /* Load address of the RTLD itself. */

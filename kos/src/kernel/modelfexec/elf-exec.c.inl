@@ -284,6 +284,10 @@ done_PT_LOAD_bss:
 				ei.mei_node = args->ea_xnode;
 				ei.mei_dent = args->ea_xdentry;
 				ei.mei_path = args->ea_xpath;
+				ei.mei_peb  = peb_base;
+#ifdef __ARCH_HAVE_COMPAT
+				ei.mei_peb_iscompat = LOCAL_POINTERSIZE != __SIZEOF_POINTER__;
+#endif /* __ARCH_HAVE_COMPAT */
 				mbuilder_apply(&builder,
 				               args->ea_mman,
 				               MBUILDER_APPLY_AA_TERMTHREADS |

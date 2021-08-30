@@ -67,7 +67,11 @@ DECL_BEGIN
 PUBLIC ATTR_PERMMAN struct mexecinfo thismman_execinfo = {
 	/* .mei_node = */ NULL,
 	/* .mei_dent = */ NULL,
-	/* .mei_path = */ NULL
+	/* .mei_path = */ NULL,
+	/* .mei_peb  = */ NULL,
+#ifdef __ARCH_HAVE_COMPAT
+	/* .mei_peb_iscompat */ false,
+#endif /* __ARCH_HAVE_COMPAT */
 };
 
 
