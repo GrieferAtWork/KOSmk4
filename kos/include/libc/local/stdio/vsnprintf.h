@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x3a0f70f3 */
+/* HASH CRC-32:0x25987626 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -268,8 +268,45 @@ __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(vsnprintf))(char *__restrict __buf, _
 	__data.__sd_bufsiz = __buflen;
 	__result = (__STDC_INT_AS_SSIZE_T)__localdep_format_vprintf(&__localdep_format_snprintf_printer,
 	                                               (void *)&__data, __format, __args);
-	if (__result >= 0 && __data.__sd_bufsiz != 0)
-		*__data.__sd_buffer = '\0';
+	if (__result >= 0) {
+		if (__data.__sd_bufsiz != 0)
+			*__data.__sd_buffer = '\0';
+		else {
+			/* Special handling for when the buffer was truncated.
+			 *
+			 * This part right here isn't mandated by any of the specs and wasn't
+			 * implemented in the original version of this function which  simply
+			 * left the string without any NUL terminator.
+			 *
+			 * However, as it turns out `nano(1)' around `/src/help.c:55` has line:
+			 * >> int length = help_line_len(ptr);
+			 * >> char *oneline = nmalloc(length + 1);
+			 * >>
+			 * >> snprintf(oneline, length + 1, "%s", ptr);  // <<---- This line
+			 * >> free(openfile->current->data);
+			 * >> openfile->current->data = oneline;
+			 *
+			 * Here, it uses a `length' (which is smaller than `strlen(ptr)') as
+			 * the limit in a call to snprintf(), using it to essentially copy a
+			 * small part of the larger help string into a line-buffer.
+			 *
+			 * However,  it also expects  and assumes that  this buffer gets NUL
+			 * terminated  even when truncated (which isn't explicitly specified
+			 * by the specs; i.e. `man 3 snprintf'), and any program that relies
+			 * on this relies on system-specific behavior.
+			 *
+			 * Amazingly enough,  even without  explicitly NUL  terminating it  at
+			 * the correct location, nano didn't crash but occasionally  displayed
+			 * some garbled lines, as well as the line-feed that always got copied
+			 * at the end of a paragraph in its escaped form '^@'.
+			 *
+			 * But then again, NUL-termination on truncation seems to be  something
+			 * that happens on linux, and after all: KOS tries to be a much API/ABI
+			 * compatible with linux as possible, so: in this goes! */
+			if (__buflen != 0)
+				__buf[__buflen - 1] = '\0';
+		}
+	}
 	return __result;
 }
 __NAMESPACE_LOCAL_END
