@@ -843,7 +843,7 @@ do_second_pass:
 		/* NOTE: The reason  why specifically  these 4  types of  stack-values
 		 *       can be dereferenced can be  traced back to the  documentation
 		 *       of these constants in "<libunwind/cfi.h>", following the line
-		 *       """Effective return values (after indirection) are:""""
+		 *       """Effective return values (for location expressions):""""
 		 * If you compare this list with it, you will see that this is the list
 		 * of expressions that are dereferenced during evaluation, meaning that
 		 * internally they always first evaluate to an address. */

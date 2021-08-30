@@ -448,6 +448,7 @@ __ASM_L(.endm)
 
 #ifdef __x86_64__
 
+/* NOTE: \iret_offset is the offset of the `struct irregs64' from CFA */
 __ASM_L(.macro .cfi_restore_iret_rip iret_offset=0)
 __ASM_L(	.cfi_offset %rip, 0+__ASM_ARG(\iret_offset))
 __ASM_L(.endm)
@@ -496,6 +497,7 @@ __ASM_L(.endm)
 
 #else /* __x86_64__ */
 
+/* NOTE: \iret_offset is the offset of the `struct irregs64' from CFA */
 __ASM_L(.macro .cfi_restore_iret_eip iret_offset=0)
 __ASM_L(	.cfi_offset %eip, 0+__ASM_ARG(\iret_offset))
 __ASM_L(.endm)

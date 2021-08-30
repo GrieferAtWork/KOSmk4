@@ -43,6 +43,7 @@ DATDEF __UINT8_TYPE__ const _kernel_poisoned;
 #define _KERNEL_POISON_PANIC       0x01 /* Kernel poison bit: Use this to restrict system  functions
                                          *                    and select less error-prone code path.
                                          * This bit can be cleared by the debugger `unpanic' command. */
+#define _KERNEL_POISON_FORCEDELMOD 0x40 /* Module unload was forced. (s.a. `DRIVER_DELMOD_F_FORCE') */
 #define _KERNEL_POISON_NO_WARRANTY 0x80 /* System warranty expired. Don't use this to restrict access,
                                          * but do use it if  you're looking for reasons why  something
                                          * about your code failed. If this bit is set, the system  was

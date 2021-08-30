@@ -87,6 +87,16 @@ mman_startdmav(struct mman *__restrict self, mdma_range_callback_t prange,
                void *cookie, struct mdmalock *__restrict lockvec, size_t lockcnt,
                struct iov_buffer const *__restrict addr_v, __BOOL for_writing)
 		THROWS(E_WOULDBLOCK, E_BADALLOC, ...);
+#ifdef __cplusplus
+extern "C++" {
+FUNDEF NONNULL((1, 2, 4, 6)) size_t KCALL
+mman_startdma(struct mman *__restrict self, mdma_range_callback_t prange,
+              void *cookie, struct mdmalock *__restrict lockvec, size_t lockcnt,
+              struct iov_buffer const *__restrict addr_v, __BOOL for_writing)
+		THROWS(E_WOULDBLOCK, E_BADALLOC, ...)
+		ASMNAME("mman_startdmav");
+} /* extern "C++" */
+#endif /* __cplusplus */
 
 /* Similar to `mman_startdma[v]', however instead used to enumerate the DMA memory range individually.
  * @param: prange:      A  callback that is  invoked for each  affected physical memory range
@@ -116,6 +126,17 @@ mman_enumdmav(struct mman *__restrict self,
               struct iov_buffer const *__restrict addr_v,
               __BOOL for_writing)
 		THROWS(E_WOULDBLOCK, E_BADALLOC, ...);
+#ifdef __cplusplus
+extern "C++" {
+FUNDEF NONNULL((1, 2, 4)) size_t KCALL
+mman_enumdma(struct mman *__restrict self,
+             mdma_range_callback_t prange, void *cookie,
+             struct iov_buffer const *__restrict addr_v,
+             __BOOL for_writing)
+		THROWS(E_WOULDBLOCK, E_BADALLOC, ...)
+		ASMNAME("mman_enumdmav");
+} /* extern "C++" */
+#endif /* __cplusplus */
 
 
 /* Stop DMAing by releasing all of the specified DMA locks.

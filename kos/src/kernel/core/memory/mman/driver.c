@@ -5890,6 +5890,10 @@ find_next_dependent_driver:
 		 * references, but even still: this is bad... */
 		printk(KERN_CRIT "[mod][%s] Force unload driver with %" PRIuSIZ " unaccounted references\n",
 		       self->d_name, remaining_references);
+		{
+			DATDEF u8 __kernel_poisoned ASMNAME("_kernel_poisoned");
+			ATOMIC_OR(__kernel_poisoned, _KERNEL_POISON_FORCEDELMOD);
+		}
 		ATOMIC_WRITE(self->d_module.md_refcnt, 0);
 		goto success;
 	}

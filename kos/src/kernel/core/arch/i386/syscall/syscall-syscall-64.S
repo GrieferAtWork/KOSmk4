@@ -58,12 +58,17 @@ PUBLIC_FUNCTION(x86_syscall64_syscall)
 	EXTERN(this_x86_rpc_redirection_iret)
 	movq   %rsp, %gs:(this_x86_rpc_redirection_iret + OFFSET_IRREGS_RSP)
 /*[[[cfi{arch='x86_64', register='%rsp'}
-	push   %gs.base
-	plus   @(this_x86_rpc_redirection_iret + OFFSET_IRREGS_RSP)
+	ifnotimpl "KOS", 1f   # GDB doesn't understand `form_tls_address', so hide that fact
+	push   @(this_x86_rpc_redirection_iret + OFFSET_IRREGS_RSP)
+	form_tls_address
 	deref
+	ret
+1:	push   %rsp
 ]]]*/
-	.cfi_escape 16,7,5,146,59,0,35,this_x86_rpc_redirection_iret + OFFSET_IRREGS_RSP
+	.cfi_escape 22,7,18,47,3,0,75,79,83,47,7,0,8,this_x86_rpc_redirection_iret + OFFSET_IRREGS_RSP,155,6
+	.cfi_escape 47,2,0,119,0
 /*[[[end]]]*/
+
 	EXTERN(this_x86_kernel_psp0)
 	movq   %gs:this_x86_kernel_psp0, %rsp /* Load our kernel-space stack. */
 	pushq_cfi $(SEGMENT_USER_DATA64_RPL)                              /* ir_ss */
@@ -124,12 +129,17 @@ PUBLIC_FUNCTION(x86_syscall64_syscall_traced)
 	EXTERN(this_x86_rpc_redirection_iret)
 	movq   %rsp, %gs:(this_x86_rpc_redirection_iret + OFFSET_IRREGS_RSP)
 /*[[[cfi{arch='x86_64', register='%rsp'}
-	push   %gs.base
-	plus   @(this_x86_rpc_redirection_iret + OFFSET_IRREGS_RSP)
+	ifnotimpl "KOS", 1f   # GDB doesn't understand `form_tls_address', so hide that fact
+	push   @(this_x86_rpc_redirection_iret + OFFSET_IRREGS_RSP)
+	form_tls_address
 	deref
+	ret
+1:	push   %rsp
 ]]]*/
-	.cfi_escape 16,7,5,146,59,0,35,this_x86_rpc_redirection_iret + OFFSET_IRREGS_RSP
+	.cfi_escape 22,7,18,47,3,0,75,79,83,47,7,0,8,this_x86_rpc_redirection_iret + OFFSET_IRREGS_RSP,155,6
+	.cfi_escape 47,2,0,119,0
 /*[[[end]]]*/
+
 	EXTERN(this_x86_kernel_psp0)
 	movq   %gs:this_x86_kernel_psp0, %rsp /* Load our kernel-space stack. */
 	pushq_cfi $(SEGMENT_USER_DATA64_RPL)                              /* ir_ss */

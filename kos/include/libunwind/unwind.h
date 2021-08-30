@@ -41,7 +41,7 @@
 __DECL_BEGIN
 
 #ifndef __unwind_regno_t_defined
-#define __unwind_regno_t_defined 1
+#define __unwind_regno_t_defined
 typedef __UINTPTR_HALF_TYPE__ unwind_regno_t;
 #endif /* !__unwind_regno_t_defined */
 

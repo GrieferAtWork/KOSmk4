@@ -583,7 +583,7 @@ PUBLIC_FUNCTION(x86_userexcept_unwind_interrupt)
 	.cfi_startproc
 	/* Assert that an exception is actually set!
 	 * This is once again checked by `libc_error_unwind()', but by first checking it
-	 * here, we've still go the correct return address for where the problem lies. */
+	 * here,  we've still go the correct return  address for where the problem lies. */
 	cmpq   $(E_OK), %gs:this_exception_code
 	jne    1f
 	int3   /* Assertion failed! */

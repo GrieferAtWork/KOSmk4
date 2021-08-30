@@ -213,7 +213,6 @@ libuw_unwind_emulator_make_const(unwind_emulator_t *__restrict self,
                                  unwind_ste_t *__restrict ste) {
 	unsigned int error;
 	if (ste->s_type != UNWIND_STE_CONSTANT) {
-		/* NOTE: `UNWIND_STE_REGPOINTER' isn't technically actually allowed here! */
 		if (ste->s_type == UNWIND_STE_REGISTER ||
 		    ste->s_type == UNWIND_STE_REGPOINTER) {
 			union {
@@ -866,7 +865,6 @@ do_make_top_const_or_register:
 					goto again_switch_opcode;
 				}
 do_make_top_const:
-				/* NOTE: `UNWIND_STE_REGPOINTER' isn't technically actually allowed here! */
 				if (TOP.s_type == UNWIND_STE_REGISTER ||
 				    TOP.s_type == UNWIND_STE_REGPOINTER) {
 					union {
@@ -1119,7 +1117,6 @@ do_make_top_const:
 			if (TOP.s_type != UNWIND_STE_CONSTANT)
 				goto do_make_top_const;
 			if (SECOND.s_type != UNWIND_STE_CONSTANT) {
-				/* NOTE: `UNWIND_STE_REGPOINTER' isn't technically actually allowed here! */
 do_make_second_const_or_register:
 				if (SECOND.s_type == UNWIND_STE_REGPOINTER) {
 					SECOND.s_type = UNWIND_STE_REGISTER;
@@ -1356,8 +1353,9 @@ do_make_second_const:
 			break;
 
 		CASE(DW_OP_reg0 ... DW_OP_reg31)
-			/* NOTE: These opcodes push the _ADDRESS_OF_ a register (within an imaginary register map)!
-			 *       Not the actual value of the register! */
+			/* NOTE: These opcodes push the address of a register (within an imaginary register map)!
+			 *       Not the actual value of the register (except when interpreted in arithmetic or
+			 *       as the result of a .eh_frame expression) */
 			if unlikely(stacksz >= self->ue_stackmax)
 				ERROR(err_stack_overflow);
 			self->ue_stack[stacksz].s_type      = UNWIND_STE_REGPOINTER;
@@ -1367,8 +1365,9 @@ do_make_second_const:
 			break;
 
 		CASE(DW_OP_regx)
-			/* NOTE: This opcode pushes the _ADDRESS_OF_ a register (within an imaginary register map)!
-			 *       Not the actual value of the register! */
+			/* NOTE: This opcode pushes the address of a register (within an imaginary register map)!
+			 *       Not the actual value of the register (except when interpreted in arithmetic or
+			 *       as the result of a .eh_frame expression) */
 			if unlikely(stacksz >= self->ue_stackmax)
 				ERROR(err_stack_overflow);
 			self->ue_stack[stacksz].s_type      = UNWIND_STE_REGPOINTER;

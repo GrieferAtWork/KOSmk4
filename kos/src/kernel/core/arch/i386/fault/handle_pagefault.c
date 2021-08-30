@@ -664,7 +664,10 @@ got_node_and_lock:
 #ifdef CONFIG_PHYS2VIRT_IDENTITY_MAXALLOC
 			/* Check for special case: `mf.mfl_node' belongs to the physical identity area. */
 			if (mf.mfl_node == &x86_phys2virt64_node) {
+				PREEMPTION_DISABLE();
 				x86_phys2virt64_require(addr);
+				if (state->ics_irregs.ir_pflags & EFLAGS_IF)
+					PREEMPTION_ENABLE();
 				goto pop_connections_and_return;
 			}
 #endif /* CONFIG_PHYS2VIRT_IDENTITY_MAXALLOC */

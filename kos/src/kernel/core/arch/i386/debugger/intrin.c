@@ -290,9 +290,8 @@ DBG_COMMAND(r,
 	re_printer.rdp_printer_arg = NULL;
 	re_printer.rdp_format      = &debug_regdump_print_format;
 	dbg_getallregs(DBG_REGLEVEL_VIEW, &fst);
-	/* Implement a custom  register dumping implementation  so that  we
-	 * can include %kernel_gs.base on x86_64 (because the value of that
-	 * register should have a constant value and be implied by ) */
+	/* Implement a custom  register dumping  implementation
+	 * so that we can include IA32_KERNEL_GS_BASE on x86_64 */
 #ifdef __x86_64__
 	{
 		struct sgregs sg;
@@ -311,20 +310,11 @@ DBG_COMMAND(r,
 		                                 fst.fcs_sgregs.sg_ldt);
 		debug_regdump_print_format(&re_printer, REGDUMP_FORMAT_INDENT);
 		regdump_sgbase(&re_printer, &fst.fcs_sgbase);
+		dbg_printf(DBGSTR(" [%s]"), fst.fcs_sgregs.sg_cs & 3 ? "user" : "kern");
 		dbg_putc('\n');
 		debug_regdump_print_format(&re_printer, REGDUMP_FORMAT_INDENT);
-		debug_regdump_print_format(&re_printer, REGDUMP_FORMAT_REGISTER_PREFIX);
-		/* Special case: Also print the %kernel_gs.base register! */
-		if (x86_dbg_getregbyid(DBG_REGLEVEL_VIEW, X86_REGISTER_MISC_KGSBASEQ, &kgsbase, 8) != 8)
-			kgsbase = (u64)dbg_current;
-		dbg_print(DBGSTR("%kernel_gs.base"));
-		debug_regdump_print_format(&re_printer, REGDUMP_FORMAT_REGISTER_SUFFIX);
-		dbg_putc(' ');
-		debug_regdump_print_format(&re_printer, REGDUMP_FORMAT_VALUE_PREFIX);
-		dbg_printf(DBGSTR("%p"), kgsbase);
-		debug_regdump_print_format(&re_printer, REGDUMP_FORMAT_VALUE_SUFFIX);
-		if (kgsbase != (u64)dbg_current) {
-			/* Print an error indicator if %kernel_gs.base is incorrect
+		if (fst.fcs_sgbase.sg_gsbase != (u64)dbg_current && !(fst.fcs_sgregs.sg_cs & 3)) {
+			/* Print an error indicator if IA32_KERNEL_GS_BASE is incorrect
 			 * NOTE: There should  never  be  a  scenario  where  this  register  has  a  different
 			 *       value   than  the  current   thread.  (even  though   the  kernel  is  entered
 			 *       with   the  user-space  %gs.base  register  value,  there  is  no  case  where
@@ -333,13 +323,37 @@ DBG_COMMAND(r,
 			 *       still happen somewhere, then  that is a  bug that would  be indicate by  this)
 			 *       Note that the debugger determines the calling thread using a different method.
 			 *       Namely: CURRENT_LAPIC_ID -> CURRENT_CPU -> thiscpu_sched_current */
-			dbg_putc(' ');
+			debug_regdump_print_format(&re_printer, REGDUMP_FORMAT_INDENT);
 			debug_regdump_print_format(&re_printer, REGDUMP_FORMAT_ERROR_PREFIX);
-			dbg_printf(DBGSTR("BAD: should be %p"), dbg_current);
+			dbg_printf(DBGSTR("BAD: " AC_WITHBG(ANSITTY_CL_FUCHSIA, "%gs.base") " should be %p"), dbg_current);
 			debug_regdump_print_format(&re_printer, REGDUMP_FORMAT_ERROR_SUFFIX);
+			dbg_putc('\n');
+			debug_regdump_print_format(&re_printer, REGDUMP_FORMAT_INDENT);
 		}
+
+		/* Special case: Also print the IA32_KERNEL_GS_BASE register! */
+		if (x86_dbg_getregbyid(DBG_REGLEVEL_VIEW, X86_REGISTER_MISC_KGSBASEQ, &kgsbase, 8) != 8)
+			kgsbase = (u64)dbg_current;
+		dbg_print(DBGSTR("              "));
+		debug_regdump_print_format(&re_printer, REGDUMP_FORMAT_REGISTER_PREFIX);
+		dbg_print(DBGSTR("%IA32_KERNEL_GS_BASE"));
+		debug_regdump_print_format(&re_printer, REGDUMP_FORMAT_REGISTER_SUFFIX);
+		dbg_putc(' ');
+		debug_regdump_print_format(&re_printer, REGDUMP_FORMAT_VALUE_PREFIX);
+		dbg_printf(DBGSTR("%p"), kgsbase);
+		debug_regdump_print_format(&re_printer, REGDUMP_FORMAT_VALUE_SUFFIX);
+		dbg_printf(DBGSTR(" [%s]"), fst.fcs_sgregs.sg_cs & 3 ? "kern" : "user");
 		dbg_putc('\n');
 		debug_regdump_print_format(&re_printer, REGDUMP_FORMAT_INDENT);
+		if (kgsbase != (u64)dbg_current && (fst.fcs_sgregs.sg_cs & 3)) {
+			/* Like above: print an error when the gs-value value is unexpected. */
+			debug_regdump_print_format(&re_printer, REGDUMP_FORMAT_INDENT);
+			debug_regdump_print_format(&re_printer, REGDUMP_FORMAT_ERROR_PREFIX);
+			dbg_printf(DBGSTR("BAD: " AC_WITHBG(ANSITTY_CL_FUCHSIA, "%IA32_KERNEL_GS_BASE") "should be %p"), dbg_current);
+			debug_regdump_print_format(&re_printer, REGDUMP_FORMAT_ERROR_SUFFIX);
+			dbg_putc('\n');
+			debug_regdump_print_format(&re_printer, REGDUMP_FORMAT_INDENT);
+		}
 		regdump_flags(&re_printer, fcpustate_getpflags(&fst));
 		dbg_putc('\n');
 		regdump_coregs(&re_printer, &fst.fcs_coregs);

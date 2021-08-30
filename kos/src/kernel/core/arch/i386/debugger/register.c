@@ -694,15 +694,8 @@ done:
 	return error;
 }
 
-/* Get/set a register, given its ID
- * NOTE: When `return > buflen', then
- *       dbg_getregbyname: The contents of `buf' are undefined.
- *       dbg_setregbyname: The register was not written.
- * NOTE: Accepted register names are those found in comments in `<asm/registers.h>'
- * @param: regno: One of `X86_REGISTER_*' (from <asm/registers.h>) or one of `X86_DBGREGISTER_*'
- * @return: * :   The required buffer size, or 0 when `name' isn't recognized. */
-PUBLIC size_t
-NOTHROW(KCALL x86_dbg_getregbyid)(unsigned int level, unsigned int regno,
+PRIVATE size_t
+NOTHROW(KCALL raw_dbg_getregbyid)(unsigned int level, unsigned int regno,
                                   void *__restrict buf, size_t buflen) {
 	size_t result;
 	switch (level) {
@@ -808,10 +801,70 @@ ok:
 	return result;
 }
 
+#ifdef __x86_64__
+PRIVATE WUNUSED unsigned int
+NOTHROW(KCALL transform_gsbase_register_indices)(unsigned int level, unsigned int regno) {
+	/* Special handling: when we're currently returning to kernel-space,
+	 *                   then we must switch %kernel_gs.base and %gs.base
+	 * This is required to maintain proper segment logic. */
+	switch (regno) {
+
+	case X86_REGISTER_MISC_GSBASEL:
+	case X86_REGISTER_MISC_GSBASEQ:
+	case X86_REGISTER_MISC_KGSBASEL:
+	case X86_REGISTER_MISC_KGSBASEQ: {
+		u16 cs;
+		if (raw_dbg_getregbyid(level, X86_REGISTER_SEGMENT_CS, &cs, 2) != 2)
+			return 0;
+		if (!(cs & 3)) {
+			switch (regno) {
+			case X86_REGISTER_MISC_GSBASEL: regno = X86_REGISTER_MISC_KGSBASEL; break;
+			case X86_REGISTER_MISC_GSBASEQ: regno = X86_REGISTER_MISC_KGSBASEQ; break;
+			case X86_REGISTER_MISC_KGSBASEL: regno = X86_REGISTER_MISC_GSBASEL; break;
+			case X86_REGISTER_MISC_KGSBASEQ: regno = X86_REGISTER_MISC_GSBASEQ; break;
+			default: __builtin_unreachable();
+			}
+		}
+	}	break;
+
+	default:
+		break;
+	}
+	return regno;
+}
+#endif /* __x86_64__ */
+
+/* Get/set a register, given its ID
+ * NOTE: When `return > buflen', then
+ *       dbg_getregbyname: The contents of `buf' are undefined.
+ *       dbg_setregbyname: The register was not written.
+ * NOTE: Accepted register names are those found in comments in `<asm/registers.h>'
+ * @param: regno: One of `X86_REGISTER_*' (from <asm/registers.h>) or one of `X86_DBGREGISTER_*'
+ * @return: * :   The required buffer size, or 0 when `name' isn't recognized. */
+PUBLIC size_t
+NOTHROW(KCALL x86_dbg_getregbyid)(unsigned int level, unsigned int regno,
+                                  void *__restrict buf, size_t buflen) {
+#ifdef __x86_64__
+	/* Special handling: when we're currently returning to kernel-space,
+	 *                   then we must switch %kernel_gs.base and %gs.base
+	 * This is required to maintain proper segment logic. */
+	regno = transform_gsbase_register_indices(level, regno);
+#endif /* __x86_64__ */
+	return raw_dbg_getregbyid(level, regno, buf, buflen);
+}
+
 PUBLIC size_t
 NOTHROW(KCALL x86_dbg_setregbyid)(unsigned int level, unsigned int regno,
                                   void const *__restrict buf, size_t buflen) {
 	size_t result;
+
+#ifdef __x86_64__
+	/* Special handling: when we're currently returning to kernel-space,
+	 *                   then we must switch %kernel_gs.base and %gs.base
+	 * This is required to maintain proper segment logic. */
+	regno = transform_gsbase_register_indices(level, regno);
+#endif /* __x86_64__ */
+
 	switch (level) {
 
 	case DBG_REGLEVEL_EXIT:
@@ -972,7 +1025,7 @@ NOTHROW(KCALL dbg_getallregs)(unsigned int level,
 				default: break;
 				}
 			}
-			return;
+			goto done;
 		}
 		break;
 	default:
@@ -981,11 +1034,35 @@ NOTHROW(KCALL dbg_getallregs)(unsigned int level,
 	loadview();
 	memcpy(state, VIEWSTATE(level),
 	       sizeof(struct fcpustate));
+done:
+#ifdef __x86_64__
+	/* Special handling: when we're currently returning to kernel-space,
+	 *                   then we must switch %kernel_gs.base and %gs.base
+	 * This is required to maintain proper segment logic. */
+	if (!(state->fcs_sgregs.sg_cs16 & 3)) {
+		raw_dbg_getregbyid(level, X86_REGISTER_MISC_KGSBASEQ,
+		                   &state->fcs_sgbase.sg_gsbase, 8);
+	}
+#endif /* __x86_64__ */
+	;
 }
 
 PUBLIC ATTR_DBGTEXT void
 NOTHROW(KCALL dbg_setallregs)(unsigned int level,
                               struct fcpustate const *__restrict state) {
+#ifdef __x86_64__
+	struct fcpustate real_state;
+	/* Special handling: when we're currently returning to kernel-space,
+	 *                   then we must switch %kernel_gs.base and %gs.base
+	 * This is required to maintain proper segment logic. */
+	if (!(state->fcs_sgregs.sg_cs16 & 3)) {
+		memcpy(&real_state, state, sizeof(struct fcpustate));
+		set_dbg_current_kernel_gs_base(real_state.fcs_sgbase.sg_gsbase);
+		raw_dbg_getregbyid(level, X86_REGISTER_MISC_KGSBASEQ,
+		                   &real_state.fcs_sgbase.sg_gsbase, 8);
+		state = &real_state;
+	}
+#endif /* __x86_64__ */
 	switch (level) {
 
 	case DBG_REGLEVEL_EXIT:

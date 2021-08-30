@@ -538,16 +538,43 @@
 
 
 
+
+
+
+/* === The confusing and weird difference between `DW_OP_reg0' and `DW_OP_breg0 $0' ===
+ *
+ * First and foremost, we're talking about the difference between
+ * `UNWIND_STE_REGISTER' and  `UNWIND_STE_REGPOINTER'  here.  For
+ * that purpose, take a look at  the 2 listings of how  different
+ * stack values are interpreted below.
+ *
+ * You  should be able  to see that  for unwinding (iow: .eh_frame
+ * expressions) and for arithmetic (iow:  when used in as  operand
+ * of another instruction such as DW_OP_plus), both register value
+ * an register pointer operands  behave exactly the same.  However
+ * there is a  difference when  these opcodse appear  inside of  a
+ * location  expression (iow: .debug_info).  Here, the second list
+ * of  interpretations  must  be used,  where  `DW_OP_breg0' would
+ * use a register's value (plus addend) as the address of a memory
+ * location  that  contains the  associated variable's  value. But
+ * `DW_OP_reg0' would specify that  the register's value _is_  the
+ * value of the associated variable.
+ *
+ * Also note that (for some  reason?) GDB _really_ doesn't like  it
+ * when you use DW_OP_reg0, and will often refuse to do the unwind.
+ */
+
+
 /* Type codes for `unwind_ste_t::s_type'
- * Effective stack values are:
+ * Effective stack values (for unwinding or arithmetic):
  *   UNWIND_STE_CONSTANT:     s_uconst or s_sconst
  *   UNWIND_STE_STACKVALUE:   s_uconst or s_sconst
  *   UNWIND_STE_REGISTER:     REGISTER[s_register] + s_regoffset
- *   UNWIND_STE_REGPOINTER:   &REGISTER[s_register]              // Register map address (can only be dereferenced)
+ *   UNWIND_STE_REGPOINTER:   REGISTER[s_register] + s_regoffset
  *   UNWIND_STE_RW_LVALUE:    (byte_t(*)[s_lsize])s_lvalue
  *   UNWIND_STE_RO_LVALUE:    (byte_t(*)[s_lsize])s_lvalue
  *
- * Effective return values (after indirection) are:
+ * Effective return values (for location expressions):
  *   UNWIND_STE_CONSTANT:     result = *(<unspecified> *)s_uconst
  *   UNWIND_STE_STACKVALUE:   result = s_uconst
  *   UNWIND_STE_REGISTER:     result = *(<unspecified> *)(REGISTER[s_register] + s_regoffset)
@@ -569,7 +596,7 @@
 __DECL_BEGIN
 
 #ifndef __unwind_regno_t_defined
-#define __unwind_regno_t_defined 1
+#define __unwind_regno_t_defined
 typedef __UINTPTR_HALF_TYPE__ unwind_regno_t;
 #endif /* !__unwind_regno_t_defined */
 
@@ -592,10 +619,10 @@ typedef struct {
 /* Read out the contents of a CFI register `dw_regno' and store their value in `dst'
  * The size of the `dst' buffer depends on `dw_regno' and can be calculated with the
  * arch-specific `CFI_REGISTER_SIZE()' macro.
- * @param: dw_regno: One of `CFI_[arch]_UNWIND_REGISTER_[name]'
+ * @param: dw_regno: One of `CFI_[ARCH]_UNWIND_REGISTER_[NAME]'
  * @param: dst:      A  buffer  of  `CFI_REGISTER_SIZE(dw_regno)'
  *                   bytes, to-be filled with the register value.
- * @return: UNWIND_SUCCESS:          Success (only in this case will `dst'/`src' have been used)
+ * @return: UNWIND_SUCCESS:          Success (only in this case will `*dst' be valid / `*src' have been used)
  * @return: UNWIND_INVALID_REGISTER: The given `dw_regno' is invalid/unsupported.
  * @return: UNWIND_OPTIMIZED_AWAY:   Register information has been optimized away.
  * @return: * :                      Some other error (propagate) */
