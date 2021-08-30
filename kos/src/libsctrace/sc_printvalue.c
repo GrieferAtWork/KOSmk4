@@ -117,11 +117,11 @@ if (gcc_opt.removeif([](x) -> x.startswith("-O")))
 
 
 /* Representation limits before printed data is truncated */
-#define LIMIT_STRLEN       64 /* Max # of bytes to print from user-supplied strings. */
-#define LIMIT_POLLFDS      16 /* Max # of `struct pollfd' structures to print from a vector. */
-#define LIMIT_IOVEC        16 /* Max # of `struct iovec' structures to print from a vector. */
-#define LIMIT_NFDS         16 /* Max # of fds to print from a `fd_set'. */
-#define LIMIT_STRINGVECTOR 32 /* Max # of strings to print from a string-vector (such as `argv' and `envp' in `sys_execve()'). */
+#define LIMIT_STRLEN       128 /* Max # of bytes to print from user-supplied strings. */
+#define LIMIT_POLLFDS      16  /* Max # of `struct pollfd' structures to print from a vector. */
+#define LIMIT_IOVEC        16  /* Max # of `struct iovec' structures to print from a vector. */
+#define LIMIT_NFDS         16  /* Max # of fds to print from a `fd_set'. */
+#define LIMIT_STRINGVECTOR 32  /* Max # of strings to print from a string-vector (such as `argv' and `envp' in `sys_execve()'). */
 
 
 /* Figure out what we actually need to define. */

@@ -185,7 +185,7 @@ handle_signalfd_read(struct signalfd *__restrict self,
 	assert(!task_wasconnected());
 	if unlikely(num_bytes < sizeof(struct signalfd_siginfo)) {
 		THROW(E_INVALID_ARGUMENT_BAD_VALUE,
-		      E_INVALID_ARGUMENT_CONTEXT_EVENTFD_BUFSIZE,
+		      E_INVALID_ARGUMENT_CONTEXT_SIGNALFD_BUFSIZE,
 		      num_bytes);
 	}
 	result = 0;

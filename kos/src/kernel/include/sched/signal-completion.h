@@ -252,7 +252,7 @@ NOTHROW(FCALL sig_multicompletion_fini)(struct sig_multicompletion *__restrict s
 
 /* Sever all (still-alive) connections that are active for `self'. Note that this  function
  * may not be called from inside of signal-completion-callbacks, or any other callback that
- * may  be executed in the context of holding an SMP-lock. (though you area allowed to call
+ * may  be executed in the context of holding  an SMP-lock. (though you are allowed to call
  * this function from a `sig_postcompletion_t' callback) */
 FUNDEF NOBLOCK NONNULL((1)) void
 NOTHROW(FCALL sig_multicompletion_disconnectall)(struct sig_multicompletion *__restrict self);
@@ -298,20 +298,20 @@ NOTHROW(FCALL sig_connect_multicompletion_nx)(struct sig *__restrict self,
                                               sig_completion_t cb);
 
 
-/* Connect  `completion' to  all signals currently  connected to by  the calling thread.
- * In other  words:  all  signals  the  caller  is  connected  to  via  `task_connect()'
- * Note  that  for this  purpose, only  signals from  the currently  active set  of task
- * connections  will  be  connected.  Connections  established  outside  the  bounds  of
- * the  current   `task_pushconnections()...task_popconnections()'   pair   will   _NOT_
- * be  connected.  If  one of  the  signals which  the  calling thread  is  connected to
- * has already  been sent  (i.e. `task_waitfor()'  wouldn't block),  then this  function
- * will return early, and the exact (if any) signals that were connected to `completion'
- * are left undefined  (meaning that the  caller can really  only handle this  happening
- * by using `sig_multicompletion_disconnectall()', but also meaning that `cb' may  still
- * get invoked  in case  the caller  was connected  to more  than one  signal, and  more
- * than one of those gets triggered before connections of `completion' get disconnected)
- * As such, the safe way to use this function is as
- * follows (exception handling not displayed for brevity):
+/* Connect `completion' to all signals currently connected to by the calling thread.
+ * In other words: all signals the caller is connected to via `task_connect()'. Note
+ * that  for  this purpose,  only  signals from  the  currently active  set  of task
+ * connections  will be connected. Connections established outside the bounds of the
+ * current  `task_pushconnections()...task_popconnections()'  pair  will  _NOT_   be
+ * connected. If one of  the signals which  the calling thread  is connected to  has
+ * already been sent (i.e. `task_waitfor()' wouldn't block), then this function will
+ * return early, and the exact (if any) signals that were connected to  `completion'
+ * are left undefined (meaning that the caller can really only handle this happening
+ * by using `sig_multicompletion_disconnectall()',  but also meaning  that `cb'  may
+ * still  get invoked in case the caller was  connected to more than one signal, and
+ * more than one  of those  gets triggered  before connections  of `completion'  get
+ * disconnected) As such, the safe way to use this function is as follows (exception
+ * handling not displayed for brevity):
  * >> task_connect(&foo);
  * >> task_connect(&bar);
  * >> task_connect(&foobar);

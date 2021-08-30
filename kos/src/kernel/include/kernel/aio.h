@@ -91,7 +91,7 @@ DECL_BEGIN
  *   v                                              │       >> sig_broadcast(&device->d_aio_avail);
  * [async_operation(device, aio)]                   │                                   │
  * >> // Always need some COMMAND_DESCRIPTOR        └────────┐                          │
- * >> // The used id doens't matter, though                  │                          │
+ * >> // The used id doesn't matter, though                  │                          │
  * >> aio->ah_data[0]    = incref(device);  ─────────────────│──────────────────────────│──────────────┐
  * >> aio->ah_data[1]    = incref([COMMAND_DESCRIPTOR]);  ───│──────────────────────────│──────────┐   │
  * >> aio->ah_data[2..n] = ...;                              │                          │          │   │
@@ -177,14 +177,14 @@ DECL_BEGIN
  * device's `d_aio_current' field.             [12] >>     goto do_cancel;
  *                                             [13] >> }
  *                                             [14] >> // If the cmd-pointer was already cleared, then the AIO operation
- *                                             [15] >> // is either current in progress (i.e. the async-worker is executing
+ *                                             [15] >> // is either currently in progress (i.e. the async-worker is executing
  *                                             [16] >> // `COMMAND_DESCRIPTOR_DO_NEXT_STEP()'), or the AIO operation was
- *                                             [17] >> // already completed.
+ *                                             [17] >> // already completed or is/was canceled already.
  *                                             [18] >> if (ATOMIC_CMPXCH(device->d_aio_current, aio, NULL)) {
  *                                             [19] >>     // Cancel the current operation on a hardware-level
  *                                             [20] >>     // Note that this function can assume that the async-worker thread
  *                                             [21] >>     // is currently inside of `[COMMAND_DESCRIPTOR_DO_NEXT_STEP]', and
- *                                             [22] >>     // will fall into `[HWIO_WAIT_FOR_CANCEL_COMPLETION]' shortly.
+ *                                             [22] >>     // will/has fall/en into `[HWIO_WAIT_FOR_CANCEL_COMPLETION]' shortly.
  *                                             [23] >>     [HWIO_CANCEL_CURRENT_OPERATION](device);
  *                                             [24] >>     PREEMPTION_POP(was);
  *                                             [25] >>     goto do_cancel;
@@ -247,6 +247,7 @@ struct aio_handle_type {
 
 
 
+/* Possible values for `aio_completion_t::status' */
 #define AIO_COMPLETION_SUCCESS  1 /* AIO operation has successfully completed. */
 #define AIO_COMPLETION_CANCEL   2 /* AIO operation was canceled manually. */
 #define AIO_COMPLETION_FAILURE  3 /* AIO operation has failed.
@@ -343,7 +344,7 @@ struct ATTR_ALIGNED(AIO_HANDLE_ALIGNMENT) aio_handle {
  *
  * Solution: AIO completion functions, while allowed to decref() arbitrary objects, are
  *           only allowed to do so after already having called  `aio_handle_release()',
- *           or when the object being decref's doesn't actually end up being destroyed. */
+ *           or when the object being decref'd doesn't actually end up being destroyed. */
 #define aio_handle_release(self)                      \
 	(__hybrid_atomic_store((self)->ah_next,           \
 	                       AIO_HANDLE_NEXT_COMPLETED, \

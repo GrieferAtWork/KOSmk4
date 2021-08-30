@@ -310,13 +310,13 @@ task_connect(struct sig *__restrict target) /*THROWS(E_BADALLOC)*/ {
  * will become lost, that intend  being for some (single)  thread to try to  acquire
  * an accompanying lock (for an example of this, see kernel header  <sched/mutex.h>)
  *
- * As far as semantics go, a signal connection established with this function  will
- * never satisfy a call to `sig_send()', and will instead be skipped if encountered
- * during its search for a recipient  (such that by default, poll-connections  will
- * only be  acted upon  when `sig_broadcast()'  is  used). However,  if a  call  to
- * `sig_send()' is unable to find  any non-poll-based connections, it will  proceed
- * to act like a call to `sig_broadcast()' and wake all polling thread, though will
- * still  end up returning  `false', indicative of not  having woken any (properly)
+ * As  far as semantics go, a signal  connection established with this function will
+ * never satisfy a call to `sig_send()', and will instead be skipped if  encountered
+ * during  its search for  a recipient (such that  by default, poll-connections will
+ * only  be  acted upon  when  `sig_broadcast()' is  used).  However, if  a  call to
+ * `sig_send()'  is unable to  find any non-poll-based  connections, it will proceed
+ * to act like a call to `sig_broadcast()' and wake all polling threads, though will
+ * still  end up  returning `false', indicative  of not having  woken any (properly)
  * waiting thread.
  *
  * With all of  this in  mind, this  function can  also be  though of  as a  sort-of
@@ -327,6 +327,17 @@ task_connect(struct sig *__restrict target) /*THROWS(E_BADALLOC)*/ {
  * In practice, this function must be used whenever it is unknown what will eventually
  * happen  after `task_waitfor()', or  if what happens  afterwards doesn't include the
  * acquisition  of some kind of lock, whose  release includes the sending of `target'.
+ *
+ * Note  however that `task_connect()' may still be used even if it is followed by
+ * a call to `task_disconnect()' (or similar). If in this scenario the signal  had
+ * already been send to the calling thread with `sig_send()' being the origin, the
+ * signal is forwarded to  the next waiting  thread the same  way another call  to
+ * `sig_send()'  would.  The only  slight problem  in this  situation is  that the
+ * original call to `sig_send()' had already  returned `true', and if this  second
+ * internal  call fails due to a lack of recipients, the initial true return value
+ * was  incorrect since no thread ended up  actually receiving the signal. This is
+ * not  something that can be fixed and as such should be kept in mind when making
+ * decisions based on the return value of `sig_send()'.
  *
  * s.a. The difference between `task_disconnectall()' and `task_receiveall()' */
 PUBLIC NONNULL((1)) void FCALL
@@ -1352,7 +1363,7 @@ NOTHROW(FCALL task_connection_disconnect_all)(struct task_connections *__restric
 	}
 }
 
-/* Disconnect from all connected signal.
+/* Disconnect from all connected signals.
  * Signals with a state of `TASK_CONNECTION_STAT_SENT' will be forwarded. */
 PUBLIC NOBLOCK void
 NOTHROW(FCALL task_disconnectall)(void) {
@@ -1421,7 +1432,7 @@ NOTHROW(FCALL task_wasconnected_to)(struct sig const *__restrict target) {
 /* Check if there is a signal that was delivered,
  * disconnecting all other  connected signals  if
  * this was the case.
- * @return: NULL: No signal is available
+ * @return: NULL: No signal is available.
  * @return: * :   The signal that was delivered. */
 PUBLIC NOBLOCK struct sig *NOTHROW(FCALL task_trywait)(void) {
 	struct task_connections *self;
@@ -1664,20 +1675,20 @@ NOTHROW(FCALL sig_connect_multicompletion_nx)(struct sig *__restrict self,
 }
 
 
-/* Connect  `completion' to  all signals currently  connected to by  the calling thread.
- * In other  words:  all  signals  the  caller  is  connected  to  via  `task_connect()'
- * Note  that  for this  purpose, only  signals from  the currently  active set  of task
- * connections  will  be  connected.  Connections  established  outside  the  bounds  of
- * the  current   `task_pushconnections()...task_popconnections()'   pair   will   _NOT_
- * be  connected.  If  one of  the  signals which  the  calling thread  is  connected to
- * has already  been sent  (i.e. `task_waitfor()'  wouldn't block),  then this  function
- * will return early, and the exact (if any) signals that were connected to `completion'
- * are left undefined  (meaning that the  caller can really  only handle this  happening
- * by using `sig_multicompletion_disconnectall()', but also meaning that `cb' may  still
- * get invoked  in case  the caller  was connected  to more  than one  signal, and  more
- * than one of those gets triggered before connections of `completion' get disconnected)
- * As such, the safe way to use this function is as
- * follows (exception handling not displayed for brevity):
+/* Connect `completion' to all signals currently connected to by the calling thread.
+ * In other words: all signals the caller is connected to via `task_connect()'. Note
+ * that  for  this purpose,  only  signals from  the  currently active  set  of task
+ * connections  will be connected. Connections established outside the bounds of the
+ * current  `task_pushconnections()...task_popconnections()'  pair  will  _NOT_   be
+ * connected. If one of  the signals which  the calling thread  is connected to  has
+ * already been sent (i.e. `task_waitfor()' wouldn't block), then this function will
+ * return early, and the exact (if any) signals that were connected to  `completion'
+ * are left undefined (meaning that the caller can really only handle this happening
+ * by using `sig_multicompletion_disconnectall()',  but also meaning  that `cb'  may
+ * still  get invoked in case the caller was  connected to more than one signal, and
+ * more than one  of those  gets triggered  before connections  of `completion'  get
+ * disconnected) As such, the safe way to use this function is as follows (exception
+ * handling not displayed for brevity):
  * >> task_connect(&foo);
  * >> task_connect(&bar);
  * >> task_connect(&foobar);

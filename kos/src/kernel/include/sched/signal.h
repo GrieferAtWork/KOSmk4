@@ -444,7 +444,7 @@ struct task_connection {
 	                                          * Next connection for the same signal. */
 	union {
 		struct task_connections *tc_cons; /* [1..1] Attached connection set/connection status.
-		                                   * The least significant bit is set in case of a poll-connection. */
+		                                   * TASK_CONNECTION_STAT_FPOLL is set in case of a poll-connection. */
 		WEAK uintptr_t           tc_stat; /* Connection status (one of `TASK_CONNECTION_STAT_*'). */
 	};
 };
@@ -563,13 +563,13 @@ task_connect(struct sig *__restrict target) /*THROWS(E_BADALLOC)*/;
  * will become lost, that intend  being for some (single)  thread to try to  acquire
  * an accompanying lock (for an example of this, see kernel header  <sched/mutex.h>)
  *
- * As far as semantics go, a signal connection established with this function  will
- * never satisfy a call to `sig_send()', and will instead be skipped if encountered
- * during its search for a recipient  (such that by default, poll-connections  will
- * only be  acted upon  when `sig_broadcast()'  is  used). However,  if a  call  to
- * `sig_send()' is unable to find  any non-poll-based connections, it will  proceed
- * to act like a call to `sig_broadcast()' and wake all polling thread, though will
- * still  end up returning  `false', indicative of not  having woken any (properly)
+ * As  far as semantics go, a signal  connection established with this function will
+ * never satisfy a call to `sig_send()', and will instead be skipped if  encountered
+ * during  its search for  a recipient (such that  by default, poll-connections will
+ * only  be  acted upon  when  `sig_broadcast()' is  used).  However, if  a  call to
+ * `sig_send()'  is unable to  find any non-poll-based  connections, it will proceed
+ * to act like a call to `sig_broadcast()' and wake all polling threads, though will
+ * still  end up  returning `false', indicative  of not having  woken any (properly)
  * waiting thread.
  *
  * With all of  this in  mind, this  function can  also be  though of  as a  sort-of
@@ -580,6 +580,17 @@ task_connect(struct sig *__restrict target) /*THROWS(E_BADALLOC)*/;
  * In practice, this function must be used whenever it is unknown what will eventually
  * happen  after `task_waitfor()', or  if what happens  afterwards doesn't include the
  * acquisition  of some kind of lock, whose  release includes the sending of `target'.
+ *
+ * Note  however that `task_connect()' may still be used even if it is followed by
+ * a call to `task_disconnect()' (or similar). If in this scenario the signal  had
+ * already been send to the calling thread with `sig_send()' being the origin, the
+ * signal is forwarded to  the next waiting  thread the same  way another call  to
+ * `sig_send()'  would.  The only  slight problem  in this  situation is  that the
+ * original call to `sig_send()' had already  returned `true', and if this  second
+ * internal  call fails due to a lack of recipients, the initial true return value
+ * was  incorrect since no thread ended up  actually receiving the signal. This is
+ * not  something that can be fixed and as such should be kept in mind when making
+ * decisions based on the return value of `sig_send()'.
  *
  * s.a. The difference between `task_disconnectall()' and `task_receiveall()' */
 FUNDEF NONNULL((1)) void FCALL
@@ -598,7 +609,7 @@ task_connect_for_poll(struct sig *__restrict target) /*THROWS(E_BADALLOC)*/;
 FUNDEF NOBLOCK NONNULL((1)) __BOOL
 NOTHROW(FCALL task_disconnect)(struct sig *__restrict target);
 
-/* Disconnect from all connected signal.
+/* Disconnect from all connected signals.
  * Signals with a state of `TASK_CONNECTION_STAT_SENT' will be forwarded. */
 FUNDEF NOBLOCK void
 NOTHROW(FCALL task_disconnectall)(void);
@@ -646,7 +657,7 @@ NOTHROW(FCALL task_wasconnected)(struct sig const *__restrict target)
 /* Check if there is a signal that was delivered,
  * disconnecting all other  connected signals  if
  * this was the case.
- * @return: NULL: No signal is available
+ * @return: NULL: No signal is available.
  * @return: * :   The signal that was delivered. */
 FUNDEF NOBLOCK struct sig *NOTHROW(FCALL task_trywait)(void);
 
