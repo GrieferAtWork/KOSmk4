@@ -23,6 +23,16 @@ import uniEscape from .util;
 import fs;
 import util;
 
+@@Check if @s only contains characters that also appear in @base
+function usesSameCharactersAs(s: string, base: string): bool {
+	for (local ch: s) {
+		if (ch !in base)
+			return false;
+	}
+	return true;
+}
+
+
 function parseDB(): {int: {string...}} {
 	local final filename = fs.joinpath(fs.headof(__FILE__), "transliterate");
 	local data = File.open(filename, "r").read().decode("utf-8");
@@ -240,6 +250,36 @@ again_recursive:
 			}
 			if (changed)
 				goto again_recursive;
+		}
+	}
+
+	/* For multi-character transliterations, remove those that
+	 * exclusively use ordinals also used by previously transliterations.
+	 * This can happen (e.g.) when exchanging differently long
+	 * arrows with "-->" and "---->" patterns. */
+	for (local none, ord_repl: result) {
+		local len = #ord_repl;
+		if (len <= 1)
+			continue;
+		for (local i = 0; i < len-1; ++i) {
+			local repl = ord_repl[i];
+			if (!repl) {
+				/* Empty replacement is always allowed, so strip all follow-up replacements. */
+				++i;
+				ord_repl.erase(i, len - i);
+				assert #ord_repl == i;
+				break;
+			}
+			for (local j = i + 1; j < len;) {
+				local repl2 = ord_repl[j];
+				if (repl2 && usesSameCharactersAs(repl2, repl)) {
+					/* repl2 is redundant. */
+					ord_repl.erase(j);
+					--len;
+				} else {
+					++j;
+				}
+			}
 		}
 	}
 
