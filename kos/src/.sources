@@ -115,6 +115,10 @@ BEGIN
 		SET_OUTPUT_LIBDLL("libiconv-stateful")
 		SOURCE({ "libiconv/stateful/*.c" })
 	END
+	BEGIN GROUP("libs.libiconv-mbcs") { COMPILE, LINK, ARCHIVE, MCOPY };
+		SET_OUTPUT_LIBDLL("libiconv-mbcs")
+		SOURCE({ "libiconv/mbcs/*.c" })
+	END
 
 
 //	DEFINE_SIMPLE_ARCH_LIBRARY("libstdc++")

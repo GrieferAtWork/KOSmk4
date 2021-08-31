@@ -50,6 +50,8 @@ struct iconv_7h_codepage;
 struct iconv_iso646_codepage;
 struct iconv_stateful_codepage;
 struct iconv_stateful_encode_range;
+struct iconv_mbcs_codepage;
+struct iconv_mbcs_byte2_range;
 
 union iconv_decode_data {
 	struct {
@@ -131,8 +133,8 @@ union iconv_decode_data {
 			struct {
 				__uint8_t   e_len; /* # of entity characters already written. */
 				char const *e_str; /* [0..xe_elen] Entity characters already written. This string points
-				                    * into the internal database of known xml entities and is updated
-				                    * every time yet another character is encountered. Internally, the
+				                    * into  the internal database  of known xml  entities and is updated
+				                    * every time yet another  character is encountered. Internally,  the
 				                    * actual type of this field should be `xml_entity_t const *' */
 			} xe_ent; /* _ICONV_DECODE_XML_ENT */
 		};
@@ -161,6 +163,13 @@ union iconv_decode_data {
 		__uint32_t const                     *sf_u32;   /* [1..1][const][== iconv_stateful_codepage__isc_u32(sf_cp)] */
 	} idd_stateful; /* stateful codecs: ibm(930|933|935|937|939|1364|1371|1388|1390|1399) */
 
+	struct {
+		struct iconv_mbcs_codepage const    *mc_cp; /* [1..1][const] Multi-byte code page. */
+		struct iconv_mbcs_byte2_range const *mc_b2; /* [0..1] When non-NULL, expecting second byte; else: first byte.
+		                                             * In the case of the second byte, this is the first range  which
+		                                             * which to try and decode it (s.a. `libiconv-mbcs.so' internals) */
+	} idd_mbcs;
+
 	void *__idd_pad[_ICONV_DECODE_OPAQUE_POINTERS];
 };
 
@@ -168,10 +177,11 @@ union iconv_encode_data {
 	struct {
 		struct __mbstate ied_utf8; /* UTF-8 input data buffer. */
 		union {
-			struct iconv_codepage const        *ied_cp;    /* [1..1][const] Code page (for 8-bit codecs) */
-			struct iconv_7l_codepage const     *ied_cp7l;  /* [1..1][const] Code page (for 7l codecs) */
-			struct iconv_7h_codepage const     *ied_cp7h;  /* [1..1][const] Code page (for 7h codecs) */
-			struct iconv_iso646_codepage const *ied_cp646; /* [1..1][const] Code page (for iso686 codecs) */
+			struct iconv_codepage const        *ied_cp;     /* [1..1][const] Code page (for 8-bit codecs) */
+			struct iconv_7l_codepage const     *ied_cp7l;   /* [1..1][const] Code page (for 7l codecs) */
+			struct iconv_7h_codepage const     *ied_cp7h;   /* [1..1][const] Code page (for 7h codecs) */
+			struct iconv_iso646_codepage const *ied_cp646;  /* [1..1][const] Code page (for iso686 codecs) */
+			struct iconv_mbcs_codepage const   *ied_cpmbcs; /* [1..1][const] Code page (for mbcs codecs). */
 
 			struct {
 #define _ICONV_ENCODE_STATEFUL_SB     0 /* Single-byte */
@@ -367,7 +377,7 @@ union iconv_encode_data {
 #define _ICONV_CENCODE_NOUNICD 0x2000 /* Flag: Don't escape \u or \U; interpret input as raw bytes and print \xAB sequences. */
 
 /* For c-escape codecs (decode only). NOTE: c-escape decode expects input to be UTF-8!
- * Initial state ("-bytes" suffix is ignored in codecs when it comes to decoding, and
+ * Initial  state ("-bytes" suffix is ignored in codecs when it comes to decoding, and
  * only affects encoding where it causes \u and \U to be replaced by \x):
  *    - "c-escape":     _ICONV_CDECODE_ST_UNDEF
  *    - "c-escape-str": _ICONV_CDECODE_ST_STR
