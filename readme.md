@@ -12,6 +12,12 @@ In general, KOS isn't designed to re-invent the wheel (no square wheels here), b
 - KOS's sources and headers contain a lot of documentation and I try to give every *magic* number that gets used a proper name. So to understand how KOS works, all that you need to do is to read the documentation of whatever you're looking at
 - KOS also includes binary compatibility for simple NT programs compiled with VisualC (but is currently lacking a PE loader such that only ELF binaries can be loaded right now)
 
+**NOTICE**: KOS uses git submodules (which are required to build KOS), so if you use the *download zip* function, you won't end up with everything that goes into building KOS. So in order to clone KOS in its entirety, you must clone this [git](https://git-scm.com/) through use of:
+
+```sh
+git clone --recursive https://github.com/GrieferAtWork/KOSmk4
+```
+
 
 ## Table of contents
 - [Ported Applications](#applications)
