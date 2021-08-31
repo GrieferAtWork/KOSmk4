@@ -810,6 +810,34 @@ Libs: -lpciaccess
 EOF
 
 
+# In order to ensure consistency and make certain that the libiconv
+# git submodule always includes up-to-date versions of its own headers
+# which are normally found in /kos/include/libiconv, we use hardlinks
+# in order to have files in that folder mirror /kos/src/libiconv/include
+libiconv_mirror_include() {
+	echo "Checking for hard link: $KOS_ROOT/kos/src/libiconv/include/$1"
+	NLINK=$(stat --printf="%h" "$KOS_ROOT/kos/src/libiconv/include/$1" 2>/dev/null)
+	if [[ "$NLINK" != 2 ]]; then
+		unlink "$KOS_ROOT/kos/src/libiconv/include/$1" > /dev/null 2>&1
+		if ln -P "$KOS_ROOT/kos/include/libiconv/$1" \
+		         "$KOS_ROOT/kos/src/libiconv/include/$1" \
+		         > /dev/null 2>&1; then
+			echo "	Hard link created"
+		else
+			echo "	Failed to create hard link (use copy instead)"
+			cmd cp "$KOS_ROOT/kos/include/libiconv/$1" \
+			       "$KOS_ROOT/kos/src/libiconv/include/$1"
+		fi
+		# As fallback (if the filesystem doesn't support hard links), just copy back the file
+		
+	fi
+}
+cmd cd "$KOS_ROOT/kos/include/libiconv"
+for name in *.h; do
+	libiconv_mirror_include "$name"
+done
+
+
 
 # On windows, try to build the gdbridge wrapper program
 if [[ `uname -s` == *CYGWIN* ]]; then
