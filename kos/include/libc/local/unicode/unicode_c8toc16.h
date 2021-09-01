@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xaccfa9ed */
+/* HASH CRC-32:0x580e5ca0 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -146,7 +146,7 @@ __done_empty_chk_surrogate:
 		/* Need a utf-16 surrogate pair. */
 		__resch -= 0x10000;
 		*__pc16 = 0xd800 + (__CHAR16_TYPE__)(__resch >> 10);
-		__mbs->__mb_word = __MBSTATE_TYPE_WR_UTF16_LO | (__CHAR16_TYPE__)(__resch & 0x3ff);
+		__mbs->__mb_word = __MBSTATE_TYPE_WR_UTF16_LO | (__UINT16_TYPE__)(__resch & 0x3ff);
 	} else {
 		*__pc16 = (__CHAR16_TYPE__)__resch;
 	}

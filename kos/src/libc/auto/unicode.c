@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x5b1a05fd */
+/* HASH CRC-32:0x228fd923 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -484,7 +484,7 @@ NOTHROW_NCX(LIBCCALL libc_unicode_readutf16_swap_rev)(char16_t const **__restric
 	result = (char32_t)__hybrid_bswap16((u16)*text);
 	if (result >= 0xdc00 &&
 	    result <= 0xdfff) {
-		char32_t high = (--text,__hybrid_bswap16(*text));
+		char32_t high = (--text, __hybrid_bswap16(*text));
 		high   -= 0xd800;
 		high   <<= 10;
 		high   += 0x10000 - 0xdc00;
@@ -527,7 +527,7 @@ NOTHROW_NCX(LIBCCALL libc_unicode_readutf16_swap_rev_n)(char16_t const **__restr
 	result = (char32_t)__hybrid_bswap16((u16)*text);
 	if (result >= 0xdc00 &&
 	    result <= 0xdfff && likely(text > text_start)) {
-		char32_t high = (--text,__hybrid_bswap16(*text));
+		char32_t high = (--text, __hybrid_bswap16(*text));
 		high   -= 0xd800;
 		high   <<= 10;
 		high   += 0x10000 - 0xdc00;
@@ -582,7 +582,7 @@ NOTHROW_NCX(LIBCCALL libc_unicode_writeutf8)(char *__restrict dst,
 }
 /* >> unicode_writeutf16(3)
  * Write a given Unicode character `ch' to `dst' and return a pointer to its end location.
- * This function will write at most `UNICODE_UTF16_CURLEN' bytes to `dst' */
+ * This function will write at most `UNICODE_UTF16_CURLEN' words to `dst' */
 INTERN ATTR_SECTION(".text.crt.unicode.UTF") ATTR_RETNONNULL NONNULL((1)) char16_t *
 NOTHROW_NCX(LIBCCALL libc_unicode_writeutf16)(char16_t *__restrict dst,
                                               char32_t ch) {
@@ -624,8 +624,8 @@ NOTHROW_NCX(LIBCCALL libc_unicode_8to16)(char16_t *__restrict utf16_dst,
 	char const *utf8_end = utf8_text + utf8_characters;
 	while (utf8_text < utf8_end) {
 		char32_t ch;
-		ch = libc_unicode_readutf8_n((char const **)&utf8_text,utf8_end);
-		utf16_dst = libc_unicode_writeutf16(utf16_dst,ch);
+		ch = libc_unicode_readutf8_n((char const **)&utf8_text, utf8_end);
+		utf16_dst = libc_unicode_writeutf16(utf16_dst, ch);
 	}
 	return utf16_dst;
 }
@@ -644,10 +644,10 @@ NOTHROW_NCX(LIBCCALL libc_unicode_8to16_chk)(char16_t *__restrict utf16_dst,
 	char const *utf8_end = utf8_text + utf8_characters;
 	while (utf8_text < utf8_end) {
 		char32_t ch;
-		ch = libc_unicode_readutf8_n((char const **)&utf8_text,utf8_end);
+		ch = libc_unicode_readutf8_n((char const **)&utf8_text, utf8_end);
 		if (ch > 0x10ffff || (ch >= 0xd800 && ch <= 0xdfff))
 			return NULL;
-		utf16_dst = libc_unicode_writeutf16(utf16_dst,ch);
+		utf16_dst = libc_unicode_writeutf16(utf16_dst, ch);
 	}
 	return utf16_dst;
 }
@@ -664,7 +664,7 @@ NOTHROW_NCX(LIBCCALL libc_unicode_8to32)(char32_t *__restrict utf32_dst,
                                          size_t utf8_characters) {
 	char const *utf8_end = utf8_text + utf8_characters;
 	while (utf8_text < utf8_end)
-		*utf32_dst++ = libc_unicode_readutf8_n((char const **)&utf8_text,utf8_end);
+		*utf32_dst++ = libc_unicode_readutf8_n((char const **)&utf8_text, utf8_end);
 	return utf32_dst;
 }
 /* >> unicode_16to8(3)
@@ -680,7 +680,7 @@ NOTHROW_NCX(LIBCCALL libc_unicode_16to8)(char *__restrict utf8_dst,
 	char16_t const *utf16_end = utf16_text + utf16_characters;
 	while (utf16_text < utf16_end) {
 		char32_t ch;
-		ch = libc_unicode_readutf16_n((char16_t const **)&utf16_text,utf16_end);
+		ch = libc_unicode_readutf16_n((char16_t const **)&utf16_text, utf16_end);
 		if (ch <= ((uint32_t)1 << 7)-1) {
 			*utf8_dst++ = (char)(u8)ch;
 		} else if (ch <= ((uint32_t)1 << 11)-1) {
@@ -706,7 +706,7 @@ NOTHROW_NCX(LIBCCALL libc_unicode_16to32)(char32_t *__restrict utf32_dst,
                                           size_t utf16_characters) {
 	char16_t const *utf16_end = utf16_text + utf16_characters;
 	while (utf16_text < utf16_end)
-		*utf32_dst++ = libc_unicode_readutf16_n((char16_t const **)&utf16_text,utf16_end);
+		*utf32_dst++ = libc_unicode_readutf16_n((char16_t const **)&utf16_text, utf16_end);
 	return utf32_dst;
 }
 /* >> unicode_32to8(3)
@@ -863,8 +863,8 @@ done_empty_chk_surrogate:
 			goto error_ilseq; /* Cannot be represented as UTF-16 */
 		/* Need a utf-16 surrogate pair. */
 		resch -= 0x10000;
-		*pc16 = 0xd800 + (__CHAR16_TYPE__)(resch >> 10);
-		mbs->__mb_word = __MBSTATE_TYPE_WR_UTF16_LO | (__CHAR16_TYPE__)(resch & 0x3ff);
+		*pc16 = 0xd800 + (char16_t)(resch >> 10);
+		mbs->__mb_word = __MBSTATE_TYPE_WR_UTF16_LO | (u16)(resch & 0x3ff);
 	} else {
 		*pc16 = (char16_t)resch;
 	}
@@ -1125,7 +1125,7 @@ NOTHROW_NCX(LIBDCALL libd_format_wto8)(void *arg,
 	struct __local_format_16to8_data {
 		pformatprinter fd_printer;   /* [1..1] Inner printer */
 		void           *fd_arg;       /* Argument for `fd_printer' */
-		char16_t       fd_surrogate; /* Pending high surrogate (or 0 if no surrogate is pending) */
+		char16_t        fd_surrogate; /* Pending high surrogate (or 0 if no surrogate is pending) */
 	};
 	char buf[64], *dst = buf;
 	struct __local_format_16to8_data *closure;
@@ -1291,7 +1291,7 @@ NOTHROW_NCX(LIBDCALL libd_format_wto32)(void *arg,
 	struct __local_format_16to32_data {
 		pc32formatprinter fd_printer;   /* [1..1] Inner printer */
 		void              *fd_arg;       /* Argument for `fd_printer' */
-		char16_t          fd_surrogate; /* Pending high surrogate (or 0 if no surrogate is pending) */
+		char16_t           fd_surrogate; /* Pending high surrogate (or 0 if no surrogate is pending) */
 	};
 	char32_t buf[64], *dst = buf;
 	struct __local_format_16to32_data *closure;

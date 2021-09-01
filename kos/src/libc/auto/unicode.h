@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x8cbdc84a */
+/* HASH CRC-32:0x1723c820 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -29,23 +29,14 @@
 
 DECL_BEGIN
 
-#ifndef __mbstate_t_defined
-#define __mbstate_t_defined 1
-typedef struct __mbstate mbstate_t;
-#endif /* !__mbstate_t_defined */
-#ifndef __char16_t_defined
-#define __char16_t_defined 1
-typedef __CHAR16_TYPE__ char16_t;
-typedef __CHAR32_TYPE__ char32_t;
-#endif /* !__char16_t_defined */
 #ifndef __pformatprinter_defined
-#define __pformatprinter_defined 1
+#define __pformatprinter_defined
 typedef __pformatprinter pformatprinter;
 typedef __pformatgetc pformatgetc;
 typedef __pformatungetc pformatungetc;
 #endif /* !__pformatprinter_defined */
 #ifndef __pc16formatprinter_defined
-#define __pc16formatprinter_defined 1
+#define __pc16formatprinter_defined
 typedef __pc16formatprinter pc16formatprinter;
 typedef __pc32formatprinter pc32formatprinter;
 #endif /* !__pc16formatprinter_defined */
@@ -166,12 +157,12 @@ INTDEF ATTR_RETNONNULL NONNULL((1)) char *NOTHROW_NCX(LIBCCALL libc_unicode_writ
 #if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
 /* >> unicode_writeutf16(3)
  * Write a given Unicode character `ch' to `dst' and return a pointer to its end location.
- * This function will write at most `UNICODE_UTF16_CURLEN' bytes to `dst' */
+ * This function will write at most `UNICODE_UTF16_CURLEN' words to `dst' */
 INTDEF ATTR_RETNONNULL NONNULL((1)) char16_t *NOTHROW_NCX(LIBDCALL libd_unicode_writeutf16)(char16_t *__restrict dst, char32_t ch);
 #endif /* !__LIBCCALL_IS_LIBDCALL && !__KERNEL__ */
 /* >> unicode_writeutf16(3)
  * Write a given Unicode character `ch' to `dst' and return a pointer to its end location.
- * This function will write at most `UNICODE_UTF16_CURLEN' bytes to `dst' */
+ * This function will write at most `UNICODE_UTF16_CURLEN' words to `dst' */
 INTDEF ATTR_RETNONNULL NONNULL((1)) char16_t *NOTHROW_NCX(LIBCCALL libc_unicode_writeutf16)(char16_t *__restrict dst, char32_t ch);
 #if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
 /* >> unicode_writeutf16_chk(3)

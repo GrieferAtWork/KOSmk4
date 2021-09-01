@@ -655,6 +655,13 @@ NOTHROW(KCALL __i386_kernel_main)(struct icpustate *__restrict state) {
 
 	/* TODO: Add a KOS-specific libcrypt */
 
+	/* TODO: Add a smaller version of libiconv's transliterate database  to
+	 *       the kernel core for use in VGA drivers to improve text display
+	 *       capabilities.
+	 *       This subset should be much more limiting, starting with only
+	 *       allowing 1 character to be replaced by exactly 0 or 1  other
+	 *       characters. (as opposed to 0-n) */
+
 	/* TODO: (the problem isn't the coredump, but the errors in .debug_info parsing!)
 Coredump /bin/playground tid:13
 assert.expr: "count == 0"

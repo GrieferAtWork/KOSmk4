@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xf601e2d9 */
+/* HASH CRC-32:0xbc76165e */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -661,7 +661,7 @@ __NAMESPACE_LOCAL_BEGIN
 #ifdef __CRT_HAVE_unicode_writeutf16
 /* >> unicode_writeutf16(3)
  * Write a given Unicode character `ch' to `dst' and return a pointer to its end location.
- * This function will write at most `UNICODE_UTF16_CURLEN' bytes to `dst' */
+ * This function will write at most `UNICODE_UTF16_CURLEN' words to `dst' */
 __CREDIRECT(__ATTR_RETNONNULL __ATTR_NONNULL((1)),__CHAR16_TYPE__ *,__NOTHROW_NCX,__localdep_unicode_writeutf16,(__CHAR16_TYPE__ *__restrict __dst, __CHAR32_TYPE__ __ch),unicode_writeutf16,(__dst,__ch))
 #else /* __CRT_HAVE_unicode_writeutf16 */
 __NAMESPACE_LOCAL_END
@@ -669,7 +669,7 @@ __NAMESPACE_LOCAL_END
 __NAMESPACE_LOCAL_BEGIN
 /* >> unicode_writeutf16(3)
  * Write a given Unicode character `ch' to `dst' and return a pointer to its end location.
- * This function will write at most `UNICODE_UTF16_CURLEN' bytes to `dst' */
+ * This function will write at most `UNICODE_UTF16_CURLEN' words to `dst' */
 #define __localdep_unicode_writeutf16 __LIBC_LOCAL_NAME(unicode_writeutf16)
 #endif /* !__CRT_HAVE_unicode_writeutf16 */
 #endif /* !__local___localdep_unicode_writeutf16_defined */

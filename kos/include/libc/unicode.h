@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x6844f265 */
+/* HASH CRC-32:0x206e0e58 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -47,7 +47,7 @@
 #define __libc_unicode_writeutf8 __libc_core_unicode_writeutf8
 /* >> unicode_writeutf16(3)
  * Write a given Unicode character `ch' to `dst' and return a pointer to its end location.
- * This function will write at most `UNICODE_UTF16_CURLEN' bytes to `dst' */
+ * This function will write at most `UNICODE_UTF16_CURLEN' words to `dst' */
 #define __libc_unicode_writeutf16 __libc_core_unicode_writeutf16
 #define __LIBC_UNICODE_UTF8_MAXLEN              8
 #define __LIBC_UNICODE_UTF8_CURLEN              7
@@ -94,7 +94,7 @@ struct __unitraits {
 	__INT32_TYPE__  const __ut_title; /* Delta added to the character to convert it to titlecase, or 0. */
 };
 #ifndef ____unicode_descriptor_defined
-#define ____unicode_descriptor_defined 1
+#define ____unicode_descriptor_defined
 __CDECLARE(__ATTR_RETNONNULL __ATTR_CONST,struct __unitraits *,__NOTHROW,__unicode_descriptor,(__CHAR32_TYPE__ __ch),(__ch))
 #endif /* !____unicode_descriptor_defined */
 #endif /* !__UNICODE_FPRINT */
@@ -111,7 +111,7 @@ __NOTHROW_NCX(__LIBCCALL __libc_unicode_fold)(__CHAR32_TYPE__ __ch, __CHAR32_TYP
 #endif /* !__CRT_HAVE_unicode_fold */
 #ifdef __CRT_HAVE___unicode_asciiflags
 #ifndef ____unicode_asciiflags_defined
-#define ____unicode_asciiflags_defined 1
+#define ____unicode_asciiflags_defined
 __LIBC __UINT16_TYPE__ const __unicode_asciiflags[256];
 #endif /* !____unicode_asciiflags_defined */
 #define __libc_unicode_flags(ch)        (sizeof(ch) == 1 ? __unicode_asciiflags[(__UINT8_TYPE__)(ch)] : __unicode_descriptor(ch)->__ut_flags)

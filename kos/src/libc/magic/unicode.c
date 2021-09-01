@@ -37,23 +37,14 @@
 %[declare_kernel_export("unicode_utf8seqlen")]
 
 %(auto_header){
-#ifndef __mbstate_t_defined
-#define __mbstate_t_defined 1
-typedef struct __mbstate mbstate_t;
-#endif /* !__mbstate_t_defined */
-#ifndef __char16_t_defined
-#define __char16_t_defined 1
-typedef __CHAR16_TYPE__ char16_t;
-typedef __CHAR32_TYPE__ char32_t;
-#endif /* !__char16_t_defined */
 #ifndef __pformatprinter_defined
-#define __pformatprinter_defined 1
+#define __pformatprinter_defined
 typedef __pformatprinter pformatprinter;
 typedef __pformatgetc pformatgetc;
 typedef __pformatungetc pformatungetc;
 #endif /* !__pformatprinter_defined */
 #ifndef __pc16formatprinter_defined
-#define __pc16formatprinter_defined 1
+#define __pc16formatprinter_defined
 typedef __pc16formatprinter pc16formatprinter;
 typedef __pc32formatprinter pc32formatprinter;
 #endif /* !__pc16formatprinter_defined */
@@ -113,7 +104,7 @@ typedef __pc32formatprinter pc32formatprinter;
 __SYSDECL_BEGIN
 
 #ifndef __utf8_seqlen_defined
-#define __utf8_seqlen_defined 1
+#define __utf8_seqlen_defined
 #ifdef __CRT_HAVE_unicode_utf8seqlen
 __LIBC __uint8_t const unicode_utf8seqlen[256] __CASMNAME_SAME("unicode_utf8seqlen");
 #else /* __CRT_HAVE_unicode_utf8seqlen */
@@ -131,7 +122,7 @@ __LIBC __uint8_t const unicode_utf8seqlen[256] __CASMNAME_SAME("unicode_utf8seql
  * As a consequence, the max number of bytes which may be written by `unicode_writeutf8()'
  * is `UNICODE_UTF8_CURLEN', as it takes a 32-bit unicode character.
  * >> char buf[UNICODE_UTF8_CURLEN];
- * >> size_t buflen = (size_t)(unicode_writeutf8(buf,ch) - buf); */
+ * >> size_t buflen = (size_t)(unicode_writeutf8(buf, ch) - buf); */
 #define UNICODE_UTF8_CURLEN   7
 
 /* The max length of any UTF-16 word sequence describing a single unicode character. */
@@ -173,9 +164,16 @@ __LIBC __uint8_t const unicode_utf8seqlen[256] __CASMNAME_SAME("unicode_utf8seql
 #define UNICODE_32TO16_MAXBUF(num_chars) ((num_chars) * 2)
 
 #ifndef __mbstate_t_defined
-#define __mbstate_t_defined 1
+#define __mbstate_t_defined
 typedef struct __mbstate mbstate_t;
 #endif /* !__mbstate_t_defined */
+
+#ifndef __char16_t_defined
+#define __char16_t_defined
+typedef __CHAR16_TYPE__ char16_t;
+typedef __CHAR32_TYPE__ char32_t;
+#endif /* !__char16_t_defined */
+
 }
 
 
@@ -197,9 +195,9 @@ typedef struct __mbstate mbstate_t;
 @@>> unicode_readutf8(3)
 @@Read a single Unicode character from a given UTF-8 string
 [[libc, kernel, impl_include("<libc/local/unicode_utf8seqlen.h>")]]
-$char32_t unicode_readutf8([[nonnull]] /*utf-8*/ char const **__restrict ptext)
-	[([[nonnull]] /*utf-8*/ char const **__restrict ptext): $char32_t]
-	[([[nonnull]] /*utf-8*/ char **__restrict ptext): $char32_t]
+char32_t unicode_readutf8([[nonnull]] /*utf-8*/ char const **__restrict ptext)
+	[([[nonnull]] /*utf-8*/ char const **__restrict ptext): char32_t]
+	[([[nonnull]] /*utf-8*/ char **__restrict ptext): char32_t]
 {
 	char32_t result;
 	char const *iter = *ptext;
@@ -285,9 +283,9 @@ $char32_t unicode_readutf8([[nonnull]] /*utf-8*/ char const **__restrict ptext)
 @@starting out as a pointer after the character to be read, before
 @@being updated to point to the start of the character that was read
 [[libc, kernel]]
-$char32_t unicode_readutf8_rev([[nonnull]] /*utf-8*/ char const **__restrict ptext)
-	[([[nonnull]] /*utf-8*/ char const **__restrict ptext): $char32_t]
-	[([[nonnull]] /*utf-8*/ char **__restrict ptext): $char32_t]
+char32_t unicode_readutf8_rev([[nonnull]] /*utf-8*/ char const **__restrict ptext)
+	[([[nonnull]] /*utf-8*/ char const **__restrict ptext): char32_t]
+	[([[nonnull]] /*utf-8*/ char **__restrict ptext): char32_t]
 {
 	char32_t result;
 	char const *iter = *ptext;
@@ -372,9 +370,9 @@ $char32_t unicode_readutf8_rev([[nonnull]] /*utf-8*/ char const **__restrict pte
 @@>> unicode_readutf8_n(3)
 @@Same as `unicode_readutf8()', but don't read past `text_end'
 [[libc, kernel, impl_include("<libc/local/unicode_utf8seqlen.h>")]]
-$char32_t unicode_readutf8_n([[nonnull]] /*utf-8*/ char const **__restrict ptext, [[nonnull]] char const *text_end)
-	[([[nonnull]] /*utf-8*/ char const **__restrict ptext, [[nonnull]] char const *text_end): $char32_t]
-	[([[nonnull]] /*utf-8*/ char **__restrict ptext, [[nonnull]] char const *text_end): $char32_t]
+char32_t unicode_readutf8_n([[nonnull]] /*utf-8*/ char const **__restrict ptext, [[nonnull]] char const *text_end)
+	[([[nonnull]] /*utf-8*/ char const **__restrict ptext, [[nonnull]] char const *text_end): char32_t]
+	[([[nonnull]] /*utf-8*/ char **__restrict ptext, [[nonnull]] char const *text_end): char32_t]
 {
 	char32_t result;
 	char const *iter = *ptext;
@@ -464,9 +462,9 @@ $char32_t unicode_readutf8_n([[nonnull]] /*utf-8*/ char const **__restrict ptext
 @@>> unicode_readutf8_rev_n(3)
 @@Same as `unicode_readutf8_rev()', but don't read ahead of `text_start'
 [[libc, kernel]]
-$char32_t unicode_readutf8_rev_n([[nonnull]] /*utf-8*/ char const **__restrict ptext, [[nonnull]] char const *text_start)
-	[([[nonnull]] /*utf-8*/ char const **__restrict ptext, [[nonnull]] char const *text_start): $char32_t]
-	[([[nonnull]] /*utf-8*/ char **__restrict ptext, [[nonnull]] char const *text_start): $char32_t]
+char32_t unicode_readutf8_rev_n([[nonnull]] /*utf-8*/ char const **__restrict ptext, [[nonnull]] char const *text_start)
+	[([[nonnull]] /*utf-8*/ char const **__restrict ptext, [[nonnull]] char const *text_start): char32_t]
+	[([[nonnull]] /*utf-8*/ char **__restrict ptext, [[nonnull]] char const *text_start): char32_t]
 {
 	char32_t result;
 	char const *iter = *ptext;
@@ -555,9 +553,9 @@ $char32_t unicode_readutf8_rev_n([[nonnull]] /*utf-8*/ char const **__restrict p
 @@>> unicode_readutf16(3)
 @@Read a single Unicode character from a given UTF-16 string
 [[kernel]]
-$char32_t unicode_readutf16([[nonnull]] /*utf-16*/ $char16_t const **__restrict ptext)
-	[([[nonnull]] /*utf-16*/ $char16_t const **__restrict ptext): $char32_t]
-	[([[nonnull]] /*utf-16*/ $char16_t **__restrict ptext): $char32_t]
+char32_t unicode_readutf16([[nonnull]] /*utf-16*/ char16_t const **__restrict ptext)
+	[([[nonnull]] /*utf-16*/ char16_t const **__restrict ptext): char32_t]
+	[([[nonnull]] /*utf-16*/ char16_t **__restrict ptext): char32_t]
 {
 	char32_t result;
 	char16_t const *text = *ptext;
@@ -576,9 +574,9 @@ $char32_t unicode_readutf16([[nonnull]] /*utf-16*/ $char16_t const **__restrict 
 @@>> unicode_readutf16_n(3)
 @@Same as `unicode_readutf16()', but don't read past `text_end'
 [[kernel]]
-$char32_t unicode_readutf16_n([[nonnull]] /*utf-16*/ $char16_t const **__restrict ptext, [[nonnull]] $char16_t const *text_end)
-	[([[nonnull]] /*utf-16*/ $char16_t const **__restrict ptext, [[nonnull]] $char16_t const *text_end): $char32_t]
-	[([[nonnull]] /*utf-16*/ $char16_t **__restrict ptext, [[nonnull]] $char16_t const *text_end): $char32_t]
+char32_t unicode_readutf16_n([[nonnull]] /*utf-16*/ char16_t const **__restrict ptext, [[nonnull]] char16_t const *text_end)
+	[([[nonnull]] /*utf-16*/ char16_t const **__restrict ptext, [[nonnull]] char16_t const *text_end): char32_t]
+	[([[nonnull]] /*utf-16*/ char16_t **__restrict ptext, [[nonnull]] char16_t const *text_end): char32_t]
 {
 	char32_t result;
 	char16_t const *text = *ptext;
@@ -601,9 +599,9 @@ $char32_t unicode_readutf16_n([[nonnull]] /*utf-16*/ $char16_t const **__restric
 @@>> unicode_readutf16_swap(3)
 @@Same as `unicode_readutf16()', but read in reverse endian as that of the host CPU
 [[kernel, impl_include("<hybrid/__byteswap.h>")]]
-$char32_t unicode_readutf16_swap([[nonnull]] /*utf-16-swap*/ $char16_t const **__restrict ptext)
-	[([[nonnull]] /*utf-16-swap*/ $char16_t const **__restrict ptext): $char32_t]
-	[([[nonnull]] /*utf-16-swap*/ $char16_t **__restrict ptext): $char32_t]
+char32_t unicode_readutf16_swap([[nonnull]] /*utf-16-swap*/ char16_t const **__restrict ptext)
+	[([[nonnull]] /*utf-16-swap*/ char16_t const **__restrict ptext): char32_t]
+	[([[nonnull]] /*utf-16-swap*/ char16_t **__restrict ptext): char32_t]
 {
 	char32_t result;
 	char16_t const *text = *ptext;
@@ -624,9 +622,9 @@ $char32_t unicode_readutf16_swap([[nonnull]] /*utf-16-swap*/ $char16_t const **_
 @@>> unicode_readutf16_swap_n(3)
 @@Same as `unicode_readutf16_n()', but read in reverse endian as that of the host CPU
 [[kernel, impl_include("<hybrid/__byteswap.h>")]]
-$char32_t unicode_readutf16_swap_n([[nonnull]] /*utf-16-swap*/ $char16_t const **__restrict ptext, [[nonnull]] $char16_t const *text_end)
-	[([[nonnull]] /*utf-16-swap*/ $char16_t const **__restrict ptext, [[nonnull]] $char16_t const *text_end): $char32_t]
-	[([[nonnull]] /*utf-16-swap*/ $char16_t **__restrict ptext, [[nonnull]] $char16_t const *text_end): $char32_t]
+char32_t unicode_readutf16_swap_n([[nonnull]] /*utf-16-swap*/ char16_t const **__restrict ptext, [[nonnull]] char16_t const *text_end)
+	[([[nonnull]] /*utf-16-swap*/ char16_t const **__restrict ptext, [[nonnull]] char16_t const *text_end): char32_t]
+	[([[nonnull]] /*utf-16-swap*/ char16_t **__restrict ptext, [[nonnull]] char16_t const *text_end): char32_t]
 {
 	char32_t result;
 	char16_t const *text = *ptext;
@@ -652,9 +650,9 @@ $char32_t unicode_readutf16_swap_n([[nonnull]] /*utf-16-swap*/ $char16_t const *
 @@starting out as a pointer after the character to be read, before
 @@being updated to point to the start of the character that was read
 [[kernel]]
-$char32_t unicode_readutf16_rev([[nonnull]] /*utf-16*/ $char16_t const **__restrict ptext)
-	[([[nonnull]] /*utf-16*/ $char16_t const **__restrict ptext): $char32_t]
-	[([[nonnull]] /*utf-16*/ $char16_t **__restrict ptext): $char32_t]
+char32_t unicode_readutf16_rev([[nonnull]] /*utf-16*/ char16_t const **__restrict ptext)
+	[([[nonnull]] /*utf-16*/ char16_t const **__restrict ptext): char32_t]
+	[([[nonnull]] /*utf-16*/ char16_t **__restrict ptext): char32_t]
 {
 	char32_t result;
 	char16_t const *text = *ptext;
@@ -674,9 +672,9 @@ $char32_t unicode_readutf16_rev([[nonnull]] /*utf-16*/ $char16_t const **__restr
 @@>> unicode_readutf16_swap_rev(3)
 @@Same as `unicode_readutf16_rev()', but read in reverse endian as that of the host CPU
 [[kernel]]
-$char32_t unicode_readutf16_swap_rev([[nonnull]] /*utf-16*/ $char16_t const **__restrict ptext)
-	[([[nonnull]] /*utf-16*/ $char16_t const **__restrict ptext): $char32_t]
-	[([[nonnull]] /*utf-16*/ $char16_t **__restrict ptext): $char32_t]
+char32_t unicode_readutf16_swap_rev([[nonnull]] /*utf-16*/ char16_t const **__restrict ptext)
+	[([[nonnull]] /*utf-16*/ char16_t const **__restrict ptext): char32_t]
+	[([[nonnull]] /*utf-16*/ char16_t **__restrict ptext): char32_t]
 {
 	char32_t result;
 	char16_t const *text = *ptext;
@@ -684,7 +682,7 @@ $char32_t unicode_readutf16_swap_rev([[nonnull]] /*utf-16*/ $char16_t const **__
 	result = (char32_t)__hybrid_bswap16((u16)*text);
 	if (result >= UTF16_LOW_SURROGATE_MIN &&
 	    result <= UTF16_LOW_SURROGATE_MAX) {
-		char32_t high = (--text,__hybrid_bswap16(*text));
+		char32_t high = (--text, __hybrid_bswap16(*text));
 		high   -= UTF16_HIGH_SURROGATE_MIN;
 		high   <<= 10;
 		high   += UTF16_SURROGATE_SHIFT - UTF16_LOW_SURROGATE_MIN;
@@ -697,9 +695,9 @@ $char32_t unicode_readutf16_swap_rev([[nonnull]] /*utf-16*/ $char16_t const **__
 @@>> unicode_readutf16_rev_n(3)
 @@Same as `unicode_readutf16_rev()', but don't read ahead of `text_start'
 [[kernel]]
-$char32_t unicode_readutf16_rev_n([[nonnull]] /*utf-16*/ $char16_t const **__restrict ptext, [[nonnull]] $char16_t const *text_start)
-	[([[nonnull]] /*utf-16*/ $char16_t const **__restrict ptext, [[nonnull]] $char16_t const *text_start): $char32_t]
-	[([[nonnull]] /*utf-16*/ $char16_t **__restrict ptext, [[nonnull]] $char16_t const *text_start): $char32_t]
+char32_t unicode_readutf16_rev_n([[nonnull]] /*utf-16*/ char16_t const **__restrict ptext, [[nonnull]] char16_t const *text_start)
+	[([[nonnull]] /*utf-16*/ char16_t const **__restrict ptext, [[nonnull]] char16_t const *text_start): char32_t]
+	[([[nonnull]] /*utf-16*/ char16_t **__restrict ptext, [[nonnull]] char16_t const *text_start): char32_t]
 {
 	char32_t result;
 	char16_t const *text = *ptext;
@@ -721,9 +719,9 @@ $char32_t unicode_readutf16_rev_n([[nonnull]] /*utf-16*/ $char16_t const **__res
 @@>> unicode_readutf16_swap_rev_n(3)
 @@Same as `unicode_readutf16_rev_n()', but read in reverse endian as that of the host CPU
 [[kernel]]
-$char32_t unicode_readutf16_swap_rev_n([[nonnull]] /*utf-16*/ $char16_t const **__restrict ptext, [[nonnull]] $char16_t const *text_start)
-	[([[nonnull]] /*utf-16*/ $char16_t const **__restrict ptext, [[nonnull]] $char16_t const *text_start): $char32_t]
-	[([[nonnull]] /*utf-16*/ $char16_t **__restrict ptext, [[nonnull]] $char16_t const *text_start): $char32_t]
+char32_t unicode_readutf16_swap_rev_n([[nonnull]] /*utf-16*/ char16_t const **__restrict ptext, [[nonnull]] char16_t const *text_start)
+	[([[nonnull]] /*utf-16*/ char16_t const **__restrict ptext, [[nonnull]] char16_t const *text_start): char32_t]
+	[([[nonnull]] /*utf-16*/ char16_t **__restrict ptext, [[nonnull]] char16_t const *text_start): char32_t]
 {
 	char32_t result;
 	char16_t const *text = *ptext;
@@ -733,7 +731,7 @@ $char32_t unicode_readutf16_swap_rev_n([[nonnull]] /*utf-16*/ $char16_t const **
 	result = (char32_t)__hybrid_bswap16((u16)*text);
 	if (result >= UTF16_LOW_SURROGATE_MIN &&
 	    result <= UTF16_LOW_SURROGATE_MAX && likely(text > text_start)) {
-		char32_t high = (--text,__hybrid_bswap16(*text));
+		char32_t high = (--text, __hybrid_bswap16(*text));
 		high   -= UTF16_HIGH_SURROGATE_MIN;
 		high   <<= 10;
 		high   += UTF16_SURROGATE_SHIFT - UTF16_LOW_SURROGATE_MIN;
@@ -757,7 +755,7 @@ $char32_t unicode_readutf16_swap_rev_n([[nonnull]] /*utf-16*/ $char16_t const **
 @@Write a given Unicode character `ch' to `dst' and return a pointer to its end location.
 @@This function will write at most `UNICODE_UTF8_CURLEN' bytes to `dst'
 [[kernel, libc, nonnull]]
-char *unicode_writeutf8([[nonnull]] /*utf-8*/ char *__restrict dst, $char32_t ch) {
+char *unicode_writeutf8([[nonnull]] /*utf-8*/ char *__restrict dst, char32_t ch) {
 	if likely(ch <= UTF8_1BYTE_MAX) {
 		*dst++ = (char)(u8)ch;
 	} else if (ch <= UTF8_2BYTE_MAX) {
@@ -799,9 +797,9 @@ char *unicode_writeutf8([[nonnull]] /*utf-8*/ char *__restrict dst, $char32_t ch
 
 @@>> unicode_writeutf16(3)
 @@Write a given Unicode character `ch' to `dst' and return a pointer to its end location.
-@@This function will write at most `UNICODE_UTF16_CURLEN' bytes to `dst'
+@@This function will write at most `UNICODE_UTF16_CURLEN' words to `dst'
 [[kernel, libc, nonnull]]
-$char16_t *unicode_writeutf16([[nonnull]] /*utf-16*/ $char16_t *__restrict dst, $char32_t ch) {
+char16_t *unicode_writeutf16([[nonnull]] /*utf-16*/ char16_t *__restrict dst, char32_t ch) {
 	if likely(ch <= 0xffff && (ch < 0xd800 || ch > 0xdfff)) {
 		*dst++ = (char16_t)ch;
 	} else {
@@ -815,7 +813,7 @@ $char16_t *unicode_writeutf16([[nonnull]] /*utf-16*/ $char16_t *__restrict dst, 
 @@>> unicode_writeutf16_chk(3)
 @@Same as `unicode_writeutf16()', but return `NULL' when `UNICODE_ISVALIDUTF16(ch)' is false
 [[kernel, wunused]]
-$char16_t *unicode_writeutf16_chk([[nonnull]] /*utf-16*/ $char16_t *__restrict dst, $char32_t ch) {
+char16_t *unicode_writeutf16_chk([[nonnull]] /*utf-16*/ char16_t *__restrict dst, char32_t ch) {
 	if unlikely(ch > UNICODE_MAXCHAR)
 		return NULL;
 	if likely(ch <= 0xffff && (ch < 0xd800 || ch > 0xdfff)) {
@@ -834,38 +832,38 @@ $char16_t *unicode_writeutf16_chk([[nonnull]] /*utf-16*/ $char16_t *__restrict d
 extern "C++" {
 /* >> unicode_readutf32(3)
  * Read a single Unicode character from a given UTF-32 string. */
-__LOCAL __ATTR_NONNULL((1)) __CHAR32_TYPE__ (__LIBCCALL unicode_readutf32)(/*utf-32*/ __CHAR32_TYPE__ const **__restrict __ptext) { return *(*__ptext)++; }
+__LOCAL __ATTR_NONNULL((1)) char32_t (__LIBCCALL unicode_readutf32)(/*utf-32*/ char32_t const **__restrict __ptext) { return *(*__ptext)++; }
 /* >> unicode_readutf32(3)
  * Read a single Unicode character from a given UTF-32 string. */
-__LOCAL __ATTR_NONNULL((1)) __CHAR32_TYPE__ (__LIBCCALL unicode_readutf32)(/*utf-32*/ __CHAR32_TYPE__ **__restrict __ptext) { return *(*__ptext)++; }
+__LOCAL __ATTR_NONNULL((1)) char32_t (__LIBCCALL unicode_readutf32)(/*utf-32*/ char32_t **__restrict __ptext) { return *(*__ptext)++; }
 /* >> unicode_readutf32_swap(3)
  * Same as `unicode_readutf32()', but read in reverse endian as that of the host CPU. */
-__LOCAL __ATTR_NONNULL((1)) __CHAR32_TYPE__ (__LIBCCALL unicode_readutf32_swap)(/*utf-32*/ __CHAR32_TYPE__ const **__restrict __ptext) { __CHAR32_TYPE__ __res = *(*__ptext++); return __hybrid_bswap32(__res); }
+__LOCAL __ATTR_NONNULL((1)) char32_t (__LIBCCALL unicode_readutf32_swap)(/*utf-32*/ char32_t const **__restrict __ptext) { char32_t __res = *(*__ptext++); return __hybrid_bswap32(__res); }
 /* >> unicode_readutf32_swap(3)
  * Same as `unicode_readutf32()', but read in reverse endian as that of the host CPU. */
-__LOCAL __ATTR_NONNULL((1)) __CHAR32_TYPE__ (__LIBCCALL unicode_readutf32_swap)(/*utf-32*/ __CHAR32_TYPE__ **__restrict __ptext) { __CHAR32_TYPE__ __res = *(*__ptext++); return __hybrid_bswap32(__res); }
+__LOCAL __ATTR_NONNULL((1)) char32_t (__LIBCCALL unicode_readutf32_swap)(/*utf-32*/ char32_t **__restrict __ptext) { char32_t __res = *(*__ptext++); return __hybrid_bswap32(__res); }
 /* >> unicode_readutf32_rev(3)
  * Same  as  `unicode_readutf16', but  read backwards,  with `*ptext'
  * starting out as a pointer after  the character to be read,  before
  * being updated to point to the start of the character that was read */
-__LOCAL __ATTR_NONNULL((1)) __CHAR32_TYPE__ (__LIBCCALL unicode_readutf32_rev)(/*utf-32*/ __CHAR32_TYPE__ const **__restrict __ptext) { return *(--*__ptext); }
+__LOCAL __ATTR_NONNULL((1)) char32_t (__LIBCCALL unicode_readutf32_rev)(/*utf-32*/ char32_t const **__restrict __ptext) { return *(--*__ptext); }
 /* >> unicode_readutf32_rev(3)
  * Same  as  `unicode_readutf16', but  read backwards,  with `*ptext'
  * starting out as a pointer after  the character to be read,  before
  * being updated to point to the start of the character that was read */
-__LOCAL __ATTR_NONNULL((1)) __CHAR32_TYPE__ (__LIBCCALL unicode_readutf32_rev)(/*utf-32*/ __CHAR32_TYPE__ **__restrict __ptext) { return *(--*__ptext); }
+__LOCAL __ATTR_NONNULL((1)) char32_t (__LIBCCALL unicode_readutf32_rev)(/*utf-32*/ char32_t **__restrict __ptext) { return *(--*__ptext); }
 /* >> unicode_readutf32_swap_rev(3)
  * Same as `unicode_readutf32_rev()', but read in reverse endian as that of the host CPU. */
-__LOCAL __ATTR_NONNULL((1)) __CHAR32_TYPE__ (__LIBCCALL unicode_readutf32_swap_rev)(/*utf-32*/ __CHAR32_TYPE__ const **__restrict __ptext) { __CHAR32_TYPE__ __res = *(--*__ptext); return __hybrid_bswap32(__res); }
+__LOCAL __ATTR_NONNULL((1)) char32_t (__LIBCCALL unicode_readutf32_swap_rev)(/*utf-32*/ char32_t const **__restrict __ptext) { char32_t __res = *(--*__ptext); return __hybrid_bswap32(__res); }
 /* >> unicode_readutf32_swap_rev(3)
  * Same as `unicode_readutf32_rev()', but read in reverse endian as that of the host CPU. */
-__LOCAL __ATTR_NONNULL((1)) __CHAR32_TYPE__ (__LIBCCALL unicode_readutf32_swap_rev)(/*utf-32*/ __CHAR32_TYPE__ **__restrict __ptext) { __CHAR32_TYPE__ __res = *(--*__ptext); return __hybrid_bswap32(__res); }
+__LOCAL __ATTR_NONNULL((1)) char32_t (__LIBCCALL unicode_readutf32_swap_rev)(/*utf-32*/ char32_t **__restrict __ptext) { char32_t __res = *(--*__ptext); return __hybrid_bswap32(__res); }
 /* >> unicode_readutf32_n(3)
  * Same as `unicode_readutf32()', but don't read past `text_end'. */
-__LOCAL __ATTR_NONNULL((1, 2)) __CHAR32_TYPE__
-(__LIBCCALL unicode_readutf32_n)(/*utf-32*/ __CHAR32_TYPE__ const **__restrict __ptext, __CHAR32_TYPE__ const *__text_end) {
-	__CHAR32_TYPE__ __result;
-	__CHAR32_TYPE__ const *__text = *__ptext;
+__LOCAL __ATTR_NONNULL((1, 2)) char32_t
+(__LIBCCALL unicode_readutf32_n)(/*utf-32*/ char32_t const **__restrict __ptext, char32_t const *__text_end) {
+	char32_t __result;
+	char32_t const *__text = *__ptext;
 	if (__text >= __text_end)
 		return 0;
 	__result = *__text++;
@@ -874,16 +872,16 @@ __LOCAL __ATTR_NONNULL((1, 2)) __CHAR32_TYPE__
 }
 /* >> unicode_readutf32_n(3)
  * Same as `unicode_readutf32()', but don't read past `text_end'. */
-__LOCAL __ATTR_NONNULL((1, 2)) __CHAR32_TYPE__
-(__LIBCCALL unicode_readutf32_n)(/*utf-32*/ __CHAR32_TYPE__ **__restrict __ptext, __CHAR32_TYPE__ const *__text_end) {
-	return unicode_readutf32_n((__CHAR32_TYPE__ const **)__ptext,__text_end);
+__LOCAL __ATTR_NONNULL((1, 2)) char32_t
+(__LIBCCALL unicode_readutf32_n)(/*utf-32*/ char32_t **__restrict __ptext, char32_t const *__text_end) {
+	return unicode_readutf32_n((char32_t const **)__ptext, __text_end);
 }
 /* >> unicode_readutf32_rev_n(3)
  * Same as `unicode_readutf32()', but don't read before `text_start'. */
-__LOCAL __ATTR_NONNULL((1, 2)) __CHAR32_TYPE__
-(__LIBCCALL unicode_readutf32_rev_n)(/*utf-32*/ __CHAR32_TYPE__ const **__restrict __ptext, __CHAR32_TYPE__ const *__text_start) {
-	__CHAR32_TYPE__ __result;
-	__CHAR32_TYPE__ const *__text = *__ptext;
+__LOCAL __ATTR_NONNULL((1, 2)) char32_t
+(__LIBCCALL unicode_readutf32_rev_n)(/*utf-32*/ char32_t const **__restrict __ptext, char32_t const *__text_start) {
+	char32_t __result;
+	char32_t const *__text = *__ptext;
 	if (__text <= __text_start)
 		return 0;
 	__result = *--__text;
@@ -892,16 +890,16 @@ __LOCAL __ATTR_NONNULL((1, 2)) __CHAR32_TYPE__
 }
 /* >> unicode_readutf32_rev_n(3)
  * Same as `unicode_readutf32()', but don't read before `text_start'. */
-__LOCAL __ATTR_NONNULL((1, 2)) __CHAR32_TYPE__
-(__LIBCCALL unicode_readutf32_rev_n)(/*utf-32*/ __CHAR32_TYPE__ **__restrict __ptext, __CHAR32_TYPE__ const *__text_start) {
-	return unicode_readutf32_rev_n((__CHAR32_TYPE__ const **)__ptext,__text_start);
+__LOCAL __ATTR_NONNULL((1, 2)) char32_t
+(__LIBCCALL unicode_readutf32_rev_n)(/*utf-32*/ char32_t **__restrict __ptext, char32_t const *__text_start) {
+	return unicode_readutf32_rev_n((char32_t const **)__ptext, __text_start);
 }
 /* >> unicode_readutf32_swap_n(3)
  * Same as `unicode_readutf32_n()', but read in reverse endian as that of the host CPU. */
-__LOCAL __ATTR_NONNULL((1, 2)) __CHAR32_TYPE__
-(__LIBCCALL unicode_readutf32_swap_n)(/*utf-32*/ __CHAR32_TYPE__ const **__restrict __ptext, __CHAR32_TYPE__ const *__text_end) {
-	__CHAR32_TYPE__ __result;
-	__CHAR32_TYPE__ const *__text = *__ptext;
+__LOCAL __ATTR_NONNULL((1, 2)) char32_t
+(__LIBCCALL unicode_readutf32_swap_n)(/*utf-32*/ char32_t const **__restrict __ptext, char32_t const *__text_end) {
+	char32_t __result;
+	char32_t const *__text = *__ptext;
 	if (__text >= __text_end)
 		return 0;
 	__result = *__text++;
@@ -910,16 +908,16 @@ __LOCAL __ATTR_NONNULL((1, 2)) __CHAR32_TYPE__
 }
 /* >> unicode_readutf32_swap_n(3)
  * Same as `unicode_readutf32_n()', but read in reverse endian as that of the host CPU. */
-__LOCAL __ATTR_NONNULL((1, 2)) __CHAR32_TYPE__
-(__LIBCCALL unicode_readutf32_swap_n)(/*utf-32*/ __CHAR32_TYPE__ **__restrict __ptext, __CHAR32_TYPE__ const *__text_end) {
-	return unicode_readutf32_swap_n((__CHAR32_TYPE__ const **)__ptext,__text_end);
+__LOCAL __ATTR_NONNULL((1, 2)) char32_t
+(__LIBCCALL unicode_readutf32_swap_n)(/*utf-32*/ char32_t **__restrict __ptext, char32_t const *__text_end) {
+	return unicode_readutf32_swap_n((char32_t const **)__ptext, __text_end);
 }
 /* >> unicode_readutf32_swap_rev_n(3)
  * Same as `unicode_readutf32_rev_n()', but read in reverse endian as that of the host CPU. */
-__LOCAL __ATTR_NONNULL((1, 2)) __CHAR32_TYPE__
-(__LIBCCALL unicode_readutf32_swap_rev_n)(/*utf-32*/ __CHAR32_TYPE__ const **__restrict __ptext, __CHAR32_TYPE__ const *__text_start) {
-	__CHAR32_TYPE__ __result;
-	__CHAR32_TYPE__ const *__text = *__ptext;
+__LOCAL __ATTR_NONNULL((1, 2)) char32_t
+(__LIBCCALL unicode_readutf32_swap_rev_n)(/*utf-32*/ char32_t const **__restrict __ptext, char32_t const *__text_start) {
+	char32_t __result;
+	char32_t const *__text = *__ptext;
 	if (__text <= __text_start)
 		return 0;
 	__result = *--__text;
@@ -928,46 +926,46 @@ __LOCAL __ATTR_NONNULL((1, 2)) __CHAR32_TYPE__
 }
 /* >> unicode_readutf32_swap_rev_n(3)
  * Same as `unicode_readutf32_rev_n()', but read in reverse endian as that of the host CPU. */
-__LOCAL __ATTR_NONNULL((1, 2)) __CHAR32_TYPE__
-(__LIBCCALL unicode_readutf32_swap_rev_n)(/*utf-32*/ __CHAR32_TYPE__ **__restrict __ptext, __CHAR32_TYPE__ const *__text_start) {
-	return unicode_readutf32_swap_rev_n((__CHAR32_TYPE__ const **)__ptext,__text_start);
+__LOCAL __ATTR_NONNULL((1, 2)) char32_t
+(__LIBCCALL unicode_readutf32_swap_rev_n)(/*utf-32*/ char32_t **__restrict __ptext, char32_t const *__text_start) {
+	return unicode_readutf32_swap_rev_n((char32_t const **)__ptext, __text_start);
 }
-}
+} /* extern "C++" */
 #else /* __cplusplus && __CORRECT_ISO_CPP_UNICODE_H_PROTO */
 /* >> unicode_readutf32(3)
  * Read a single Unicode character from a given UTF-32 string. */
-__LOCAL __ATTR_NONNULL((1)) __CHAR32_TYPE__
-(__LIBCCALL unicode_readutf32)(/*utf-32*/ __CHAR32_TYPE__ const **__restrict __ptext) {
+__LOCAL __ATTR_NONNULL((1)) char32_t
+(__LIBCCALL unicode_readutf32)(/*utf-32*/ char32_t const **__restrict __ptext) {
 	return *(*__ptext)++;
 }
 /* >> unicode_readutf32_swap(3)
  * Same as `unicode_readutf32()', but read in reverse endian as that of the host CPU. */
-__LOCAL __ATTR_NONNULL((1)) __CHAR32_TYPE__
-(__LIBCCALL unicode_readutf32_swap)(/*utf-32*/ __CHAR32_TYPE__ const **__restrict __ptext) {
-	__CHAR32_TYPE__ __res = *(*__ptext++);
+__LOCAL __ATTR_NONNULL((1)) char32_t
+(__LIBCCALL unicode_readutf32_swap)(/*utf-32*/ char32_t const **__restrict __ptext) {
+	char32_t __res = *(*__ptext++);
 	return __hybrid_bswap32(__res);
 }
 /* >> unicode_readutf32_rev(3)
  * Same  as  `unicode_readutf32', but  read backwards,  with `*ptext'
  * starting out as a pointer after  the character to be read,  before
  * being updated to point to the start of the character that was read */
-__LOCAL __ATTR_NONNULL((1)) __CHAR32_TYPE__
-(__LIBCCALL unicode_readutf32_rev)(/*utf-32*/ __CHAR32_TYPE__ const **__restrict __ptext) {
+__LOCAL __ATTR_NONNULL((1)) char32_t
+(__LIBCCALL unicode_readutf32_rev)(/*utf-32*/ char32_t const **__restrict __ptext) {
 	return *(--*__ptext);
 }
 /* >> unicode_readutf32_swap_rev(3)
  * Same as `unicode_readutf32_rev()', but read in reverse endian as that of the host CPU. */
-__LOCAL __ATTR_NONNULL((1)) __CHAR32_TYPE__
-(__LIBCCALL unicode_readutf32_swap_rev)(/*utf-32*/ __CHAR32_TYPE__ const **__restrict __ptext) {
-	__CHAR32_TYPE__ __res = *(--*__ptext);
+__LOCAL __ATTR_NONNULL((1)) char32_t
+(__LIBCCALL unicode_readutf32_swap_rev)(/*utf-32*/ char32_t const **__restrict __ptext) {
+	char32_t __res = *(--*__ptext);
 	return __hybrid_bswap32(__res);
 }
 /* >> unicode_readutf32_n(3)
  * Same as `unicode_readutf32()', but don't read past `text_end'. */
-__LOCAL __ATTR_NONNULL((1, 2)) __CHAR32_TYPE__
-(__LIBCCALL unicode_readutf32_n)(/*utf-32*/ __CHAR32_TYPE__ const **__restrict __ptext, __CHAR32_TYPE__ const *__text_end) {
-	__CHAR32_TYPE__ __result;
-	__CHAR32_TYPE__ const *__text = *__ptext;
+__LOCAL __ATTR_NONNULL((1, 2)) char32_t
+(__LIBCCALL unicode_readutf32_n)(/*utf-32*/ char32_t const **__restrict __ptext, char32_t const *__text_end) {
+	char32_t __result;
+	char32_t const *__text = *__ptext;
 	if (__text >= __text_end)
 		return 0;
 	__result = *__text++;
@@ -976,10 +974,10 @@ __LOCAL __ATTR_NONNULL((1, 2)) __CHAR32_TYPE__
 }
 /* >> unicode_readutf32_rev_n(3)
  * Same as `unicode_readutf32()', but don't read before `text_start'. */
-__LOCAL __ATTR_NONNULL((1, 2)) __CHAR32_TYPE__
-(__LIBCCALL unicode_readutf32_rev_n)(/*utf-32*/ __CHAR32_TYPE__ const **__restrict __ptext, __CHAR32_TYPE__ const *__text_start) {
-	__CHAR32_TYPE__ __result;
-	__CHAR32_TYPE__ const *__text = *__ptext;
+__LOCAL __ATTR_NONNULL((1, 2)) char32_t
+(__LIBCCALL unicode_readutf32_rev_n)(/*utf-32*/ char32_t const **__restrict __ptext, char32_t const *__text_start) {
+	char32_t __result;
+	char32_t const *__text = *__ptext;
 	if (__text <= __text_start)
 		return 0;
 	__result = *--__text;
@@ -988,10 +986,10 @@ __LOCAL __ATTR_NONNULL((1, 2)) __CHAR32_TYPE__
 }
 /* >> unicode_readutf32_swap_n(3)
  * Same as `unicode_readutf32_n()', but read in reverse endian as that of the host CPU. */
-__LOCAL __ATTR_NONNULL((1, 2)) __CHAR32_TYPE__
-(__LIBCCALL unicode_readutf32_swap_n)(/*utf-32*/ __CHAR32_TYPE__ const **__restrict __ptext, __CHAR32_TYPE__ const *__text_end) {
-	__CHAR32_TYPE__ __result;
-	__CHAR32_TYPE__ const *__text = *__ptext;
+__LOCAL __ATTR_NONNULL((1, 2)) char32_t
+(__LIBCCALL unicode_readutf32_swap_n)(/*utf-32*/ char32_t const **__restrict __ptext, char32_t const *__text_end) {
+	char32_t __result;
+	char32_t const *__text = *__ptext;
 	if (__text >= __text_end)
 		return 0;
 	__result = *__text++;
@@ -1000,10 +998,10 @@ __LOCAL __ATTR_NONNULL((1, 2)) __CHAR32_TYPE__
 }
 /* >> unicode_readutf32_swap_rev_n(3)
  * Same as `unicode_readutf32_rev_n()', but read in reverse endian as that of the host CPU. */
-__LOCAL __ATTR_NONNULL((1, 2)) __CHAR32_TYPE__
-(__LIBCCALL unicode_readutf32_swap_rev_n)(/*utf-32*/ __CHAR32_TYPE__ const **__restrict __ptext, __CHAR32_TYPE__ const *__text_start) {
-	__CHAR32_TYPE__ __result;
-	__CHAR32_TYPE__ const *__text = *__ptext;
+__LOCAL __ATTR_NONNULL((1, 2)) char32_t
+(__LIBCCALL unicode_readutf32_swap_rev_n)(/*utf-32*/ char32_t const **__restrict __ptext, char32_t const *__text_start) {
+	char32_t __result;
+	char32_t const *__text = *__ptext;
 	if (__text <= __text_start)
 		return 0;
 	__result = *--__text;
@@ -1050,9 +1048,9 @@ __LOCAL __ATTR_NONNULL((1, 2)) __CHAR32_TYPE__
 
 /* >> unicode_writeutf32(3)
  * Write a given Unicode character `ch' to `dst' and return a pointer to its end location.
- * This   function   will   write   at   most   `UNICODE_UTF32_CURLEN'   bytes   to  `dst' */
-__LOCAL __ATTR_RETNONNULL __ATTR_NONNULL((1)) __CHAR32_TYPE__ *
-(__LIBCCALL unicode_writeutf32)(/*utf-32*/ __CHAR32_TYPE__ *__restrict __dst, __CHAR32_TYPE__ __ch) {
+ * This  function   will   write   at  most   `UNICODE_UTF32_CURLEN'   dwords   to   `dst' */
+__LOCAL __ATTR_RETNONNULL __ATTR_NONNULL((1)) char32_t *
+(__LIBCCALL unicode_writeutf32)(/*utf-32*/ char32_t *__restrict __dst, char32_t __ch) {
 	*__dst++ = __ch;
 	return __dst;
 }
@@ -1066,14 +1064,14 @@ __LOCAL __ATTR_RETNONNULL __ATTR_NONNULL((1)) __CHAR32_TYPE__ *
 @@@param: utf8_characters: The amount of UTF-8 characters found in `utf8_text'
 @@@return: * : A pointer after the last written UTF-16 character
 [[kernel, nonnull]]
-$char16_t *unicode_8to16([[nonnull]] /*utf-16*/ $char16_t *__restrict utf16_dst,
+char16_t *unicode_8to16([[nonnull]] /*utf-16*/ char16_t *__restrict utf16_dst,
                          [[inp(utf8_characters)]] /*utf-8*/ char const *__restrict utf8_text,
                          $size_t utf8_characters) {
 	char const *utf8_end = utf8_text + utf8_characters;
 	while (utf8_text < utf8_end) {
 		char32_t ch;
-		ch = unicode_readutf8_n((char const **)&utf8_text,utf8_end);
-		utf16_dst = unicode_writeutf16(utf16_dst,ch);
+		ch = unicode_readutf8_n((char const **)&utf8_text, utf8_end);
+		utf16_dst = unicode_writeutf16(utf16_dst, ch);
 	}
 	return utf16_dst;
 }
@@ -1087,16 +1085,16 @@ $char16_t *unicode_8to16([[nonnull]] /*utf-16*/ $char16_t *__restrict utf16_dst,
 @@@return: * : A pointer after the last written UTF-16 character.
 @@@return: NULL: Attempted to write an invalid character
 [[wunused]]
-$char16_t *unicode_8to16_chk([[nonnull]] /*utf-16*/ $char16_t *__restrict utf16_dst,
+char16_t *unicode_8to16_chk([[nonnull]] /*utf-16*/ char16_t *__restrict utf16_dst,
                              [[inp(utf8_characters)]] /*utf-8*/ char const *__restrict utf8_text,
                              $size_t utf8_characters) {
 	char const *utf8_end = utf8_text + utf8_characters;
 	while (utf8_text < utf8_end) {
 		char32_t ch;
-		ch = unicode_readutf8_n((char const **)&utf8_text,utf8_end);
+		ch = unicode_readutf8_n((char const **)&utf8_text, utf8_end);
 		if (ch > UNICODE_MAXCHAR || (ch >= 0xd800 && ch <= 0xdfff))
 			return NULL;
-		utf16_dst = unicode_writeutf16(utf16_dst,ch);
+		utf16_dst = unicode_writeutf16(utf16_dst, ch);
 	}
 	return utf16_dst;
 }
@@ -1108,12 +1106,12 @@ $char16_t *unicode_8to16_chk([[nonnull]] /*utf-16*/ $char16_t *__restrict utf16_
 @@@param: utf8_characters: The amount of UTF-8 characters found in `utf8_text'
 @@@return: * : A pointer after the last written UTF-32 character.
 [[kernel, nonnull]]
-$char32_t *unicode_8to32([[nonnull]] /*utf-32*/ $char32_t *__restrict utf32_dst,
+char32_t *unicode_8to32([[nonnull]] /*utf-32*/ char32_t *__restrict utf32_dst,
                          [[inp(utf8_characters)]] /*utf-8*/ char const *__restrict utf8_text,
                          $size_t utf8_characters) {
 	char const *utf8_end = utf8_text + utf8_characters;
 	while (utf8_text < utf8_end)
-		*utf32_dst++ = unicode_readutf8_n((char const **)&utf8_text,utf8_end);
+		*utf32_dst++ = unicode_readutf8_n((char const **)&utf8_text, utf8_end);
 	return utf32_dst;
 }
 
@@ -1126,12 +1124,12 @@ $char32_t *unicode_8to32([[nonnull]] /*utf-32*/ $char32_t *__restrict utf32_dst,
 @@@return: * : A pointer after the last written UTF-8 character
 [[kernel, nonnull]]
 char *unicode_16to8([[nonnull]] /*utf-8*/ char *__restrict utf8_dst,
-                    [[inp(utf16_characters)]] /*utf-16*/ $char16_t const *__restrict utf16_text,
+                    [[inp(utf16_characters)]] /*utf-16*/ char16_t const *__restrict utf16_text,
                     $size_t utf16_characters) {
 	char16_t const *utf16_end = utf16_text + utf16_characters;
 	while (utf16_text < utf16_end) {
 		char32_t ch;
-		ch = unicode_readutf16_n((char16_t const **)&utf16_text,utf16_end);
+		ch = unicode_readutf16_n((char16_t const **)&utf16_text, utf16_end);
 		if (ch <= UTF8_1BYTE_MAX) {
 			*utf8_dst++ = (char)(u8)ch;
 		} else if (ch <= UTF8_2BYTE_MAX) {
@@ -1153,12 +1151,12 @@ char *unicode_16to8([[nonnull]] /*utf-8*/ char *__restrict utf8_dst,
 @@@param: utf16_characters: The amount of UTF-16 characters found in `utf16_text'
 @@@return: * : A pointer after the last written UTF-32 character
 [[kernel, nonnull]]
-$char32_t *unicode_16to32([[nonnull]] /*utf-32*/ $char32_t *__restrict utf32_dst,
-                          [[inp(utf16_characters)]] /*utf-16*/ $char16_t const *__restrict utf16_text,
+char32_t *unicode_16to32([[nonnull]] /*utf-32*/ char32_t *__restrict utf32_dst,
+                          [[inp(utf16_characters)]] /*utf-16*/ char16_t const *__restrict utf16_text,
                           $size_t utf16_characters) {
 	char16_t const *utf16_end = utf16_text + utf16_characters;
 	while (utf16_text < utf16_end)
-		*utf32_dst++ = unicode_readutf16_n((char16_t const **)&utf16_text,utf16_end);
+		*utf32_dst++ = unicode_readutf16_n((char16_t const **)&utf16_text, utf16_end);
 	return utf32_dst;
 }
 
@@ -1170,7 +1168,7 @@ $char32_t *unicode_16to32([[nonnull]] /*utf-32*/ $char32_t *__restrict utf32_dst
 @@@return: * : A pointer after the last written UTF-8 character
 [[kernel, nonnull]]
 char *unicode_32to8([[nonnull]] /*utf-8*/ char *__restrict utf8_dst,
-                    [[inp(utf32_characters)]] /*utf-32*/ $char32_t const *__restrict utf32_text,
+                    [[inp(utf32_characters)]] /*utf-32*/ char32_t const *__restrict utf32_text,
                     $size_t utf32_characters) {
 	while (utf32_characters--)
 		utf8_dst = unicode_writeutf8(utf8_dst, *utf32_text++);
@@ -1185,8 +1183,8 @@ char *unicode_32to8([[nonnull]] /*utf-8*/ char *__restrict utf8_dst,
 @@@param: utf32_characters: The amount of UTF-32 characters found in `utf32_text'
 @@@return: * : A pointer after the last written UTF-16 character
 [[kernel, nonnull]]
-$char16_t *unicode_32to16([[nonnull]] /*utf-16*/ $char16_t *__restrict utf16_dst,
-                          [[inp(utf32_characters)]] /*utf-32*/ $char32_t const *__restrict utf32_text,
+char16_t *unicode_32to16([[nonnull]] /*utf-16*/ char16_t *__restrict utf16_dst,
+                          [[inp(utf32_characters)]] /*utf-32*/ char32_t const *__restrict utf32_text,
                           $size_t utf32_characters) {
 	while (utf32_characters--)
 		utf16_dst = unicode_writeutf16(utf16_dst, *utf32_text++);
@@ -1202,7 +1200,7 @@ $char16_t *unicode_32to16([[nonnull]] /*utf-16*/ $char16_t *__restrict utf16_dst
 @@@return: (size_t)-1: Unicode error (the given input string isn't a valid unicode sequence)
 @@@return: (size_t)-2: Success, but no character was generated (s...+=n, together with `mbs' doesn't for a full character, but `mbs' was updated)
 [[decl_include("<bits/crt/mbstate.h>")]]
-$size_t unicode_c8toc16([[nonnull]] $char16_t *__restrict pc16,
+$size_t unicode_c8toc16([[nonnull]] char16_t *__restrict pc16,
                         [[nonnull]] /*utf-8*/ char const *__restrict s, $size_t n,
                         [[nonnull]] mbstate_t *__restrict mbs) {
 	char32_t resch;
@@ -1320,8 +1318,8 @@ done_empty_chk_surrogate:
 			goto error_ilseq; /* Cannot be represented as UTF-16 */
 		/* Need a utf-16 surrogate pair. */
 		resch -= 0x10000;
-		*pc16 = 0xd800 + (__CHAR16_TYPE__)(resch >> 10);
-		mbs->@__mb_word@ = __MBSTATE_TYPE_WR_UTF16_LO | (__CHAR16_TYPE__)(resch & 0x3ff);
+		*pc16 = 0xd800 + (char16_t)(resch >> 10);
+		mbs->@__mb_word@ = __MBSTATE_TYPE_WR_UTF16_LO | (u16)(resch & 0x3ff);
 	} else {
 		*pc16 = (char16_t)resch;
 	}
@@ -1337,7 +1335,7 @@ done:
 @@@return: (size_t)-1: Unicode error (the given input string isn't a valid unicode sequence)
 @@@return: (size_t)-2: Success, but no character was generated (s...+=n, together with `mbs' doesn't for a full character, but `mbs' was updated)
 [[decl_include("<bits/crt/mbstate.h>")]]
-$size_t unicode_c8toc32([[nonnull]] $char32_t *__restrict pc32,
+$size_t unicode_c8toc32([[nonnull]] char32_t *__restrict pc32,
                         [[nonnull]] /*utf-8*/ char const *__restrict s, $size_t n,
                         [[nonnull]] mbstate_t *__restrict mbs) {
 	size_t i;
@@ -1455,7 +1453,7 @@ done:
 @@@return: * :         Success (this many bytes were written to `*pc8'; max is `UNICODE_16TO8_MAXBUF(1)')
 @@@return: (size_t)-1: Unicode error (the given input string isn't a valid unicode sequence)
 [[decl_include("<bits/crt/mbstate.h>")]]
-$size_t unicode_c16toc8([[nonnull]] char pc8[3], $char16_t c16,
+$size_t unicode_c16toc8([[nonnull]] char pc8[3], char16_t c16,
                         [[nonnull]] mbstate_t *__restrict mbs) {
 	char32_t ch32;
 	if ((mbs->@__mb_word@ & __MBSTATE_TYPE_MASK) == __MBSTATE_TYPE_UTF16_LO) {
@@ -1597,7 +1595,7 @@ err:
 //	__pformatprinter fd_printer;   /* [1..1] Inner printer */
 //	void            *fd_arg;       /* Argument for `fd_printer' */
 //#if __SIZEOF_WCHAR_T__ == 2
-//	__CHAR16_TYPE__  fd_surrogate; /* Pending high surrogate (or 0 if no surrogate is pending) */
+//	char16_t         fd_surrogate; /* Pending high surrogate (or 0 if no surrogate is pending) */
 //#endif /* __SIZEOF_WCHAR_T__ == 2 */
 //};
 
@@ -1611,7 +1609,7 @@ $ssize_t format_wto8(/*struct format_wto8_data **/ void *arg,
 	struct __local_format_16to8_data {
 		$pformatprinter fd_printer;   /* [1..1] Inner printer */
 		void           *fd_arg;       /* Argument for `fd_printer' */
-		$char16_t       fd_surrogate; /* Pending high surrogate (or 0 if no surrogate is pending) */
+		char16_t        fd_surrogate; /* Pending high surrogate (or 0 if no surrogate is pending) */
 	};
 	char buf[__UNICODE_FORMAT_XTOY_BUFSIZE], *dst = buf;
 	struct __local_format_16to8_data *closure;
@@ -1689,7 +1687,7 @@ err:
 struct format_16to8_data {
 	__pformatprinter fd_printer;   /* [1..1] Inner printer */
 	void            *fd_arg;       /* Argument for `fd_printer' */
-	__CHAR16_TYPE__  fd_surrogate; /* Pending high surrogate (or 0 if no surrogate is pending) */
+	char16_t         fd_surrogate; /* Pending high surrogate (or 0 if no surrogate is pending) */
 };
 }
 
@@ -1697,7 +1695,7 @@ struct format_16to8_data {
 @@Format printer (compatible with `pc16formatprinter') for
 @@converting UTF-16 unicode input data into a UTF-8 output
 $ssize_t format_16to8(/*struct format_16to8_data **/ void *arg,
-                      $char16_t const *data, $size_t datalen)
+                      char16_t const *data, $size_t datalen)
 	%{uchar16("format_wto8")}
 
 
@@ -1713,7 +1711,7 @@ struct format_32to8_data {
 @@Format printer (compatible with `pc32formatprinter') for
 @@converting UTF-32 unicode input data into a UTF-8 output
 $ssize_t format_32to8(/*struct format_32to8_data **/ void *arg,
-                      $char32_t const *data, $size_t datalen)
+                      char32_t const *data, $size_t datalen)
 	%{uchar32("format_wto8")}
 
 
@@ -1722,7 +1720,7 @@ $ssize_t format_32to8(/*struct format_32to8_data **/ void *arg,
 //	__pc32formatprinter fd_printer;   /* [1..1] Inner printer */
 //	void               *fd_arg;       /* Argument for `fd_printer' */
 //#if __SIZEOF_WCHAR_T__ == 2
-//	__CHAR16_TYPE__     fd_surrogate; /* Pending high surrogate (or 0 if no surrogate is pending) */
+//	char16_t            fd_surrogate; /* Pending high surrogate (or 0 if no surrogate is pending) */
 //#endif /* __SIZEOF_WCHAR_T__ == 2 */
 //};
 
@@ -1736,7 +1734,7 @@ $ssize_t format_wto32(/*struct format_wto32_data **/ void *arg,
 	struct __local_format_16to32_data {
 		$pc32formatprinter fd_printer;   /* [1..1] Inner printer */
 		void              *fd_arg;       /* Argument for `fd_printer' */
-		$char16_t          fd_surrogate; /* Pending high surrogate (or 0 if no surrogate is pending) */
+		char16_t           fd_surrogate; /* Pending high surrogate (or 0 if no surrogate is pending) */
 	};
 	char32_t buf[__UNICODE_FORMAT_XTOY_BUFSIZE], *dst = buf;
 	struct __local_format_16to32_data *closure;
@@ -1799,7 +1797,7 @@ err:
 struct format_16to32_data {
 	__pc32formatprinter fd_printer;   /* [1..1] Inner printer */
 	void               *fd_arg;       /* Argument for `fd_printer' */
-	__CHAR16_TYPE__     fd_surrogate; /* Pending high surrogate (or 0 if no surrogate is pending) */
+	char16_t            fd_surrogate; /* Pending high surrogate (or 0 if no surrogate is pending) */
 };
 }
 
@@ -1807,7 +1805,7 @@ struct format_16to32_data {
 @@Format printer (compatible with `pc16formatprinter') for
 @@converting UTF-16 unicode input data into a UTF-32 output
 $ssize_t format_16to32(/*struct format_16to32_data **/ void *arg,
-                       $char16_t const *data, $size_t datalen)
+                       char16_t const *data, $size_t datalen)
 	%{uchar16("format_wto32")}
 
 
@@ -1869,7 +1867,7 @@ struct format_32to16_data {
 @@Format printer (compatible with `__pc32formatprinter') for
 @@converting UTF-32 unicode input data into a UTF-16 output
 $ssize_t format_32to16(/*struct format_32to16_data **/ void *arg,
-                       $char32_t const *data, $size_t datalen)
+                       char32_t const *data, $size_t datalen)
 	%{uchar32("format_wto16")}
 
 
@@ -1907,8 +1905,8 @@ struct __unitraits {
 	__INT32_TYPE__  const __ut_title; /* Delta added to the character to convert it to titlecase, or 0. */
 };
 #ifndef ____unicode_descriptor_defined
-#define ____unicode_descriptor_defined 1
-__CDECLARE(__ATTR_RETNONNULL __ATTR_CONST,struct __unitraits *,__NOTHROW,__unicode_descriptor,(__CHAR32_TYPE__ __ch),(__ch))
+#define ____unicode_descriptor_defined
+__CDECLARE(__ATTR_RETNONNULL __ATTR_CONST,struct __unitraits *,__NOTHROW,__unicode_descriptor,(char32_t __ch),(__ch))
 #endif /* !____unicode_descriptor_defined */
 #endif /* !__UNICODE_FPRINT */
 
@@ -1918,14 +1916,14 @@ __CDECLARE(__ATTR_RETNONNULL __ATTR_CONST,struct __unitraits *,__NOTHROW,__unico
 
 /* >> unicode_fold(3)
  * Fold the given unicode character `ch' */
-__CDECLARE(__ATTR_RETNONNULL __ATTR_NONNULL((2)),__CHAR32_TYPE__ *,__NOTHROW_NCX,unicode_fold,(__CHAR32_TYPE__ __ch, __CHAR32_TYPE__ __buf[UNICODE_FOLDED_MAX]),(__ch,__buf))
+__CDECLARE(__ATTR_RETNONNULL __ATTR_NONNULL((2)),char32_t *,__NOTHROW_NCX,unicode_fold,(char32_t __ch, char32_t __buf[UNICODE_FOLDED_MAX]),(__ch,__buf))
 #else /* __CRT_HAVE_unicode_fold */
 /* The max number of characters ever written by `unicode_fold' */
 #define UNICODE_FOLDED_MAX 1
 
 /* Fold the given unicode character `ch' */
-__LOCAL __ATTR_RETNONNULL __ATTR_NONNULL((2)) __CHAR32_TYPE__ *
-__NOTHROW_NCX(__LIBCCALL unicode_fold)(__CHAR32_TYPE__ __ch, __CHAR32_TYPE__ __buf[UNICODE_FOLDED_MAX]) {
+__LOCAL __ATTR_RETNONNULL __ATTR_NONNULL((2)) char32_t *
+__NOTHROW_NCX(__LIBCCALL unicode_fold)(char32_t __ch, char32_t __buf[UNICODE_FOLDED_MAX]) {
 	__buf[0] = __ch;
 	return __buf + 1;
 }
@@ -1934,7 +1932,7 @@ __NOTHROW_NCX(__LIBCCALL unicode_fold)(__CHAR32_TYPE__ __ch, __CHAR32_TYPE__ __b
 /* Unicode character conversion. */
 #ifdef __CRT_HAVE___unicode_asciiflags
 #ifndef ____unicode_asciiflags_defined
-#define ____unicode_asciiflags_defined 1
+#define ____unicode_asciiflags_defined
 __LIBC __UINT16_TYPE__ const __unicode_asciiflags[256];
 #endif /* !____unicode_asciiflags_defined */
 #define __unicode_flags(ch)        (sizeof(ch) == 1 ? __unicode_asciiflags[(__UINT8_TYPE__)(ch)] : __unicode_descriptor(ch)->__ut_flags)
@@ -1944,15 +1942,15 @@ __LIBC __UINT16_TYPE__ const __unicode_asciiflags[256];
 #define __unicode_asciitoupper(ch) (__unicode_asciiislower(ch) ? (__UINT8_TYPE__)(ch) - 0x20 : (__UINT8_TYPE__)(ch))
 #define __unicode_asciitotitle(ch) (__unicode_asciiislower(ch) ? (__UINT8_TYPE__)(ch) - 0x20 : (__UINT8_TYPE__)(ch))
 #define __unicode_asciiasdigit(ch) ((__UINT8_TYPE__)(ch) - 0x30)
-#define unicode_tolower(ch)        (sizeof(ch) == 1 ? (__CHAR32_TYPE__)__unicode_asciitolower(ch) : (__CHAR32_TYPE__)((ch) + __unicode_descriptor(ch)->__ut_lower))
-#define unicode_toupper(ch)        (sizeof(ch) == 1 ? (__CHAR32_TYPE__)__unicode_asciitoupper(ch) : (__CHAR32_TYPE__)((ch) + __unicode_descriptor(ch)->__ut_upper))
-#define unicode_totitle(ch)        (sizeof(ch) == 1 ? (__CHAR32_TYPE__)__unicode_asciitoupper(ch) : (__CHAR32_TYPE__)((ch) + __unicode_descriptor(ch)->__ut_title))
+#define unicode_tolower(ch)        (sizeof(ch) == 1 ? (char32_t)__unicode_asciitolower(ch) : (char32_t)((ch) + __unicode_descriptor(ch)->__ut_lower))
+#define unicode_toupper(ch)        (sizeof(ch) == 1 ? (char32_t)__unicode_asciitoupper(ch) : (char32_t)((ch) + __unicode_descriptor(ch)->__ut_upper))
+#define unicode_totitle(ch)        (sizeof(ch) == 1 ? (char32_t)__unicode_asciitoupper(ch) : (char32_t)((ch) + __unicode_descriptor(ch)->__ut_title))
 #define unicode_asdigit(ch)        (sizeof(ch) == 1 ? __unicode_asciiasdigit(ch) : __unicode_descriptor(ch)->__ut_digit)
 #else /* __CRT_HAVE___unicode_asciiflags */
 #define __unicode_flags(ch)        (__unicode_descriptor(ch)->__ut_flags)
-#define unicode_tolower(ch)        (__CHAR32_TYPE__)((ch) + __unicode_descriptor(ch)->__ut_lower)
-#define unicode_toupper(ch)        (__CHAR32_TYPE__)((ch) + __unicode_descriptor(ch)->__ut_upper)
-#define unicode_totitle(ch)        (__CHAR32_TYPE__)((ch) + __unicode_descriptor(ch)->__ut_title)
+#define unicode_tolower(ch)        (char32_t)((ch) + __unicode_descriptor(ch)->__ut_lower)
+#define unicode_toupper(ch)        (char32_t)((ch) + __unicode_descriptor(ch)->__ut_upper)
+#define unicode_totitle(ch)        (char32_t)((ch) + __unicode_descriptor(ch)->__ut_title)
 #define unicode_asdigit(ch)        (__unicode_descriptor(ch)->__ut_digit)
 #endif /* !__CRT_HAVE___unicode_asciiflags */
 
@@ -1977,15 +1975,15 @@ __LIBC __UINT16_TYPE__ const __unicode_asciiflags[256];
 #include <libc/ctype.h>
 
 #define UNICODE_FOLDED_MAX 1
-__LOCAL __ATTR_RETNONNULL __ATTR_NONNULL((2)) __CHAR32_TYPE__ *
-__NOTHROW_NCX(__LIBCCALL unicode_fold)(__CHAR32_TYPE__ __ch, __CHAR32_TYPE__ __buf[UNICODE_FOLDED_MAX]) {
+__LOCAL __ATTR_RETNONNULL __ATTR_NONNULL((2)) char32_t *
+__NOTHROW_NCX(__LIBCCALL unicode_fold)(char32_t __ch, char32_t __buf[UNICODE_FOLDED_MAX]) {
 	__buf[0] = __ch;
 	return __buf + 1;
 }
 
-#define unicode_tolower(ch)   (unicode_isupper(ch) ? (__CHAR32_TYPE__)(ch) + 0x20 : (__CHAR32_TYPE__)(ch))
-#define unicode_toupper(ch)   (unicode_islower(ch) ? (__CHAR32_TYPE__)(ch) - 0x20 : (__CHAR32_TYPE__)(ch))
-#define unicode_totitle(ch)   (unicode_islower(ch) ? (__CHAR32_TYPE__)(ch) - 0x20 : (__CHAR32_TYPE__)(ch))
+#define unicode_tolower(ch)   (unicode_isupper(ch) ? (char32_t)(ch) + 0x20 : (char32_t)(ch))
+#define unicode_toupper(ch)   (unicode_islower(ch) ? (char32_t)(ch) - 0x20 : (char32_t)(ch))
+#define unicode_totitle(ch)   (unicode_islower(ch) ? (char32_t)(ch) - 0x20 : (char32_t)(ch))
 #define unicode_asdigit(ch)   ((__UINT8_TYPE__)(ch) - 0x30)
 #define unicode_isalpha(ch)   __libc_isalpha(ch)
 #define unicode_islower(ch)   __libc_islower(ch)
@@ -2059,7 +2057,7 @@ struct __unitraits {
 	__INT32_TYPE__  const __ut_title; /* Delta added to the character to convert it to titlecase, or 0. */
 };
 #ifndef ____unicode_descriptor_defined
-#define ____unicode_descriptor_defined 1
+#define ____unicode_descriptor_defined
 __CDECLARE(__ATTR_RETNONNULL __ATTR_CONST,struct __unitraits *,__NOTHROW,__unicode_descriptor,(__CHAR32_TYPE__ __ch),(__ch))
 #endif /* !____unicode_descriptor_defined */
 #endif /* !__UNICODE_FPRINT */
@@ -2076,7 +2074,7 @@ __NOTHROW_NCX(__LIBCCALL __libc_unicode_fold)(__CHAR32_TYPE__ __ch, __CHAR32_TYP
 #endif /* !__CRT_HAVE_unicode_fold */
 #ifdef __CRT_HAVE___unicode_asciiflags
 #ifndef ____unicode_asciiflags_defined
-#define ____unicode_asciiflags_defined 1
+#define ____unicode_asciiflags_defined
 __LIBC __UINT16_TYPE__ const __unicode_asciiflags[256];
 #endif /* !____unicode_asciiflags_defined */
 #define __libc_unicode_flags(ch)        (sizeof(ch) == 1 ? __unicode_asciiflags[(__UINT8_TYPE__)(ch)] : __unicode_descriptor(ch)->__ut_flags)

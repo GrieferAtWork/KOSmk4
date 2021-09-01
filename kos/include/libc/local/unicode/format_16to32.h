@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x38f8aff0 */
+/* HASH CRC-32:0x6629781 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -32,7 +32,7 @@ __NOTHROW_NCX(__LIBDCALL __LIBC_LOCAL_NAME(format_16to32))(void *__arg, __CHAR16
 	struct __local_format_16to32_data {
 		__pc32formatprinter __fd_printer;   /* [1..1] Inner printer */
 		void              *__fd_arg;       /* Argument for `fd_printer' */
-		__CHAR16_TYPE__          __fd_surrogate; /* Pending high surrogate (or 0 if no surrogate is pending) */
+		__CHAR16_TYPE__           __fd_surrogate; /* Pending high surrogate (or 0 if no surrogate is pending) */
 	};
 	__CHAR32_TYPE__ __buf[64], *__dst = __buf;
 	struct __local_format_16to32_data *__closure;
