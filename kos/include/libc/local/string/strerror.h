@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x69806a27 */
+/* HASH CRC-32:0x4b202f32 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -23,6 +23,27 @@
 #include <__crt.h>
 #include <bits/types.h>
 __NAMESPACE_LOCAL_BEGIN
+/* Dependency: memcpy from string */
+#ifndef __local___localdep_memcpy_defined
+#define __local___localdep_memcpy_defined 1
+#ifdef __CRT_HAVE_memcpy
+__NAMESPACE_LOCAL_END
+#include <hybrid/typecore.h>
+__NAMESPACE_LOCAL_BEGIN
+/* >> memcpy(3)
+ * Copy memory between non-overlapping memory blocks.
+ * @return: * : Always re-returns `dst' */
+__CREDIRECT(__ATTR_LEAF __ATTR_RETNONNULL __ATTR_NONNULL((1, 2)),void *,__NOTHROW_NCX,__localdep_memcpy,(void *__restrict __dst, void const *__restrict __src, __SIZE_TYPE__ __n_bytes),memcpy,(__dst,__src,__n_bytes))
+#else /* __CRT_HAVE_memcpy */
+__NAMESPACE_LOCAL_END
+#include <libc/local/string/memcpy.h>
+__NAMESPACE_LOCAL_BEGIN
+/* >> memcpy(3)
+ * Copy memory between non-overlapping memory blocks.
+ * @return: * : Always re-returns `dst' */
+#define __localdep_memcpy __LIBC_LOCAL_NAME(memcpy)
+#endif /* !__CRT_HAVE_memcpy */
+#endif /* !__local___localdep_memcpy_defined */
 /* Dependency: sprintf from stdio */
 #ifndef __local___localdep_sprintf_defined
 #define __local___localdep_sprintf_defined 1
@@ -119,7 +140,23 @@ __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(strerror))(__errno_t __errnum) {
 		__result[__COMPILER_LENOF(__strerror_buf) - 1] = '\0';
 		__localdep_strncpy(__result, __string, __COMPILER_LENOF(__strerror_buf) - 1);
 	} else {
-		__localdep_sprintf(__result, "Unknown error %d", __errnum);
+
+
+
+		/* Can't use sprintf() because that would form a  dependency
+		 * loop with format_vprintf() which uses strerror() in order
+		 * to implement %m! */
+		__errno_t __iter = __errnum;
+		__result = __COMPILER_ENDOF(__strerror_buf);
+		*--__result = '\0';
+		do {
+			*--__result = '0' + (__iter % 10);
+		} while ((__iter /= 10) != 0);
+		if (__errnum < 0)
+			*--__result = '-';
+		__result -= 14;
+		__localdep_memcpy(__result, "Unknown error ", 14 * sizeof(char));
+
 	}
 	return __result;
 }

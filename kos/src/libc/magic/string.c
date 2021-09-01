@@ -875,7 +875,23 @@ char *strerror($errno_t errnum) {
 		result[COMPILER_LENOF(strerror_buf) - 1] = '\0';
 		strncpy(result, string, COMPILER_LENOF(strerror_buf) - 1);
 	} else {
+@@pp_ifdef __BUILDING_LIBC@@
 		sprintf(result, "Unknown error %d", errnum);
+@@pp_else@@
+		/* Can't use sprintf() because that would form a  dependency
+		 * loop with format_vprintf() which uses strerror() in order
+		 * to implement %m! */
+		$errno_t iter = errnum;
+		result = COMPILER_ENDOF(strerror_buf);
+		*--result = '\0';
+		do {
+			*--result = '0' + (iter % 10);
+		} while ((iter /= 10) != 0);
+		if (errnum < 0)
+			*--result = '-';
+		result -= 14;
+		memcpy(result, "Unknown error ", 14 * sizeof(char));
+@@pp_endif@@
 	}
 	return result;
 }
