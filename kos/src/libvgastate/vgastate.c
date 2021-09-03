@@ -854,7 +854,7 @@ for (local a, b: UNI_EQ_PAIRS) {
 	}
 }
 
-print("PRIVATE struct cpvga_encode_entry const cpvga_encode_db[", #uniToCpVGA, "] = {");
+print("PRIVATE struct cpvga_encode_entry const cpvga_encode_db[] = {");
 for (local uni: uniToCpVGA.keys.sorted()) {
 	if (uni >= CPVGA_ASCII_MIN && uni <= CPVGA_ASCII_MAX)
 		continue; // Handled explicitly
@@ -1123,7 +1123,7 @@ PRIVATE struct vga_font const textfont = {{
 	{ 0x00, 0x00, 0x00, 0xFE, 0xFE, 0xFE, 0xFE, 0xFE, 0xFE, 0xFE, 0xFE, 0xFE, 0x00, 0x00, 0x00, 0x00 }, /* U+25A0 ■ */
 	{ 0x10, 0x28, 0x44, 0x92, 0xAA, 0xAA, 0xA2, 0x54, 0x8A, 0xAA, 0xAA, 0x92, 0x44, 0x28, 0x10, 0x00 }, /* U+E888  */
 }};
-PRIVATE struct cpvga_encode_entry const cpvga_encode_db[266] = {
+PRIVATE struct cpvga_encode_entry const cpvga_encode_db[] = {
 	{ 0x00A0, 0x20 }, /* 𝘕𝘉𝘚𝘗 */
 	{ 0x00A1, 0xAD }, /* ¡ */
 	{ 0x00A2, 0x9B }, /* ¢ */
