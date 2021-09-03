@@ -744,7 +744,14 @@ struct cpvga_encode_entry {
 /* DISCLAIMER: parts of this font data have been generated from univga:
  * https://star.inp.nsk.su/~bolkhov/files/fonts/univga/ */
 /*[[[deemon
-local CPVGA = { // Somewhat based on cp437, but altered
+// Somewhat based on cp437, but altered, including more box drawing
+// stuff and less greek/math stuff. This is nothing official and this
+// code page in particular cannot be found in official listings as it
+// has been created for the sole purpose of existing as KOS's display
+// VGA codepage
+//
+// There may or may not be an easteregg in here as well... ;)
+local CPVGA = {
 	0xFFFD, 0x263A, 0x263B, 0x2665, 0x2666, 0x2663, 0x2660, 0x2022,
 	0x25D8, 0x25CB, 0x25D9, 0x2642, 0x2640, 0x266A, 0x266B, 0x263C,
 	0x25BA, 0x25C4, 0x2195, 0x203C, 0x00B6, 0x00A7, 0x25AC, 0x21A8,
@@ -819,60 +826,23 @@ for (local i: [:256]) {
 print("}};");
 local uniToCpVGA: {int: int} = Dict();
 for (local i: [:256]) {
-	if (i >= CPVGA_ASCII_MIN && i <= CPVGA_ASCII_MAX) {
+	if (i >= CPVGA_ASCII_MIN && i <= CPVGA_ASCII_MAX)
 		assert CPVGA[i] == i;
-	} else {
-		uniToCpVGA[CPVGA[i]] = i;
-	}
+	uniToCpVGA[CPVGA[i]] = i;
 }
 
 // Unicode -> vga w/ transliteration aliases
 final local UNI_EQ_PAIRS: {(int, int)...} = {
-	(0xFF01, 0x0021), // ！ → !
-	(0xFF02, 0x0022), // ＂ → "
-	(0xFF03, 0x0023), // ＃ → #
-	(0xFF04, 0x0024), // ＄ → $
-	(0xFF05, 0x0025), // ％ → %
-	(0xFF06, 0x0026), // ＆ → &
-	(0xFF08, 0x0028), // （ → (
-	(0xFF09, 0x0029), // ） → )
-	(0xFF0A, 0x002A), // ＊ → *
-	(0xFF0B, 0x002B), // ＋ → +
-	(0xFF0C, 0x002C), // ， → ,
-	(0xFF0D, 0x002D), // － → -
-	(0xFF0E, 0x002E), // ． → .
-	(0xFF0F, 0x002F), // ／ → /
-	(0xFF10, 0x0030), // ０ → 0
-	(0xFF11, 0x0031), // １ → 1
-	(0xFF12, 0x0032), // ２ → 2
-	(0xFF13, 0x0033), // ３ → 3
-	(0xFF14, 0x0034), // ４ → 4
-	(0xFF15, 0x0035), // ５ → 5
-	(0xFF16, 0x0036), // ６ → 6
-	(0xFF17, 0x0037), // ７ → 7
-	(0xFF18, 0x0038), // ８ → 8
-	(0xFF19, 0x0039), // ９ → 9
-	(0xFF1A, 0x003A), // ： → :
-	(0xFF1B, 0x003B), // ； → ;
-	(0xFF1C, 0x003C), // ＜ → <
-	(0xFF1D, 0x003D), // ＝ → =
-	(0xFF1E, 0x003E), // ＞ → >
-	(0xFF1F, 0x003F), // ？ → ?
-	(0xFF20, 0x0040), // ＠ → @
-	(0xFF3B, 0x005B), // ［ → [
-	(0xFF3C, 0x005C), // ＼ → \
-	(0xFF3D, 0x005D), // ］ → ]
-	(0xFF3E, 0x005E), // ＾ → ^
-	(0xFF3F, 0x005F), // ＿ → _
-	(0xFF40, 0x0060), // ｀ → `
-	(0xFF5C, 0x007C), // ｜ → |
-	(0xFF5E, 0x007E), // ～ → ~
+
+	// Space characters
 	(0x00A0, 0x0020), // 𝘕𝘉𝘚𝘗 → ␠
 	(0x2007, 0x0020), //   → ␠
-	(0x25B2, 0x25B4),                   (0x25B2, 0x25B3), (0x25B2, 0x25B5),                   // ▲ → {▴}  {△}  {▵} #
-	(0x25BA, 0x25B6), (0x25BA, 0x25B8), (0x25BA, 0x25BB), (0x25BA, 0x25B9), (0x25BA, 0x25B7), // ► → {▶}  {▸}  {▻}  {▹}  {▷} #
-	(0x25BC, 0x25BE),                   (0x25BC, 0x25BD), (0x25BC, 0x25BF),                   // ▼ → {▾}  {▽}  {▿} #
-	(0x25C4, 0x25C0), (0x25BA, 0x25C2), (0x25C4, 0x25C5), (0x25C4, 0x25C3), (0x25BA, 0x25C1), // ◄ → {◀}  {◂}  {◅}  {◃}  {◁} #
+
+	// Pointing-triang characters
+	(0x25B2, 0x25B4), (0x25B2, 0x25B3), // ▲ → ▴
+	(0x25BA, 0x25B6), (0x25BA, 0x25B8), // ► → ▶, ▸
+	(0x25BC, 0x25BE),                   // ▼ → ▾
+	(0x25C4, 0x25C0), (0x25BA, 0x25C2), // ◄ → ◀, ◂
 	(0x25A0, 0x25FC)
 };
 
@@ -886,8 +856,9 @@ for (local a, b: UNI_EQ_PAIRS) {
 
 print("PRIVATE struct cpvga_encode_entry const cpvga_encode_db[", #uniToCpVGA, "] = {");
 for (local uni: uniToCpVGA.keys.sorted()) {
-	if (uni > 0xffff)
-		continue;
+	if (uni >= CPVGA_ASCII_MIN && uni <= CPVGA_ASCII_MAX)
+		continue; // Handled explicitly
+	assert uni <= 0xffff;
 	print("	{ 0x", uni.hex()[2:].upper().zfill(4), ", 0x", uniToCpVGA[uni].hex()[2:].upper().zfill(2),
 		" }, /" "* ", uniEscape(uni)),;
 	print(" *" "/");
@@ -1152,7 +1123,8 @@ PRIVATE struct vga_font const textfont = {{
 	{ 0x00, 0x00, 0x00, 0xFE, 0xFE, 0xFE, 0xFE, 0xFE, 0xFE, 0xFE, 0xFE, 0xFE, 0x00, 0x00, 0x00, 0x00 }, /* U+25A0 ■ */
 	{ 0x10, 0x28, 0x44, 0x92, 0xAA, 0xAA, 0xA2, 0x54, 0x8A, 0xAA, 0xAA, 0x92, 0x44, 0x28, 0x10, 0x00 }, /* U+E888  */
 }};
-PRIVATE struct cpvga_encode_entry const cpvga_encode_db[178] = {
+PRIVATE struct cpvga_encode_entry const cpvga_encode_db[266] = {
+	{ 0x00A0, 0x20 }, /* 𝘕𝘉𝘚𝘗 */
 	{ 0x00A1, 0xAD }, /* ¡ */
 	{ 0x00A2, 0x9B }, /* ¢ */
 	{ 0x00A3, 0x9C }, /* £ */
@@ -1210,6 +1182,7 @@ PRIVATE struct cpvga_encode_entry const cpvga_encode_db[178] = {
 	{ 0x03B1, 0xE0 }, /* α */
 	{ 0x03B5, 0xEE }, /* ε */
 	{ 0x03C6, 0xED }, /* φ */
+	{ 0x2007, 0x20 }, /*   */
 	{ 0x2022, 0x07 }, /* • */
 	{ 0x203C, 0x13 }, /* ‼ */
 	{ 0x207F, 0xFC }, /* ⁿ */
@@ -1297,23 +1270,14 @@ PRIVATE struct cpvga_encode_entry const cpvga_encode_db[178] = {
 	{ 0x25B2, 0x1E }, /* ▲ */
 	{ 0x25B3, 0x1E }, /* △ */
 	{ 0x25B4, 0x1E }, /* ▴ */
-	{ 0x25B5, 0x1E }, /* ▵ */
 	{ 0x25B6, 0x10 }, /* ▶ */
-	{ 0x25B7, 0x10 }, /* ▷ */
 	{ 0x25B8, 0x10 }, /* ▸ */
-	{ 0x25B9, 0x10 }, /* ▹ */
 	{ 0x25BA, 0x10 }, /* ► */
-	{ 0x25BB, 0x10 }, /* ▻ */
 	{ 0x25BC, 0x1F }, /* ▼ */
-	{ 0x25BD, 0x1F }, /* ▽ */
 	{ 0x25BE, 0x1F }, /* ▾ */
-	{ 0x25BF, 0x1F }, /* ▿ */
 	{ 0x25C0, 0x11 }, /* ◀ */
-	{ 0x25C1, 0x10 }, /* ◁ */
 	{ 0x25C2, 0x10 }, /* ◂ */
-	{ 0x25C3, 0x11 }, /* ◃ */
 	{ 0x25C4, 0x11 }, /* ◄ */
-	{ 0x25C5, 0x11 }, /* ◅ */
 	{ 0x25CB, 0x09 }, /* ○ */
 	{ 0x25D8, 0x08 }, /* ◘ */
 	{ 0x25D9, 0x0A }, /* ◙ */
@@ -1358,7 +1322,7 @@ done:
  * don't appear in the VGA codepage, the ordinal of a replacement  character
  * will be returned instead.
  * This function also does some internal transliteration in order to provide
- * more support for similar-looking unicode characters (e.g. ► and ▶) */
+ * more support  for  similar-looking  unicode characters  (e.g.  ►  and  ▶) */
 INTERN ATTR_CONST byte_t NOTHROW(CC libvga_state_encode)(char32_t ch) {
 	size_t lo, hi;
 	if likely(ch >= CPVGA_ASCII_MIN && ch <= CPVGA_ASCII_MAX)
@@ -1377,6 +1341,13 @@ INTERN ATTR_CONST byte_t NOTHROW(CC libvga_state_encode)(char32_t ch) {
 			return cpvga_encode_db[i].cee_vga;
 		}
 	}
+
+	/* "full width" characters (we're VGA, so all characters are equal-sized, or "full width"):
+	 * ！＂＃＄％＆＇（）＊＋，－．／０１２３４５６７８９：；＜＝＞？＠ＡＢＣＤＥＦＧＨＩＪＫＬＭＮＯ
+	 * ＰＱＲＳＴＵＶＷＸＹＺ［＼］＾＿｀ａｂｃｄｅｆｇｈｉｊｋｌｍｎｏｐｑｒｓｔｕｖｗｘｙｚ｛｜｝～ */
+	if (ch >= 0xFF01 && ch <= 0xFF5E)
+		return 0x0021 + (ch - 0xFF01);
+
 	return 0x00; /* U+FFFD: � */
 }
 
