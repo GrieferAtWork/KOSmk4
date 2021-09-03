@@ -257,7 +257,7 @@ __CDECLARE(__ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1)),_Unwind_Ptr,__NOTHROW_
 __CDECLARE(__ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1)),_Unwind_Ptr,__NOTHROW_NCX,_Unwind_GetTextRelBase,(struct _Unwind_Context __KOS_FIXED_CONST *__restrict __context),(__context))
 #endif /* !__CRT_KOS_PRIMARY || __CRT_HAVE__Unwind_GetTextRelBase */
 #if !defined(__CRT_KOS_PRIMARY) || defined(__CRT_HAVE__Unwind_FindEnclosingFunction)
-__CDECLARE(__ATTR_PURE __ATTR_WUNUSED,void *,__NOTHROW_NCX,_Unwind_FindEnclosingFunction,(void *__pc),(__pc))
+__CDECLARE(__ATTR_PURE __ATTR_WUNUSED,void *,__NOTHROW_NCX,_Unwind_FindEnclosingFunction,(void __KOS_FIXED_CONST *__pc),(__pc))
 #endif /* !__CRT_KOS_PRIMARY || __CRT_HAVE__Unwind_FindEnclosingFunction */
 
 

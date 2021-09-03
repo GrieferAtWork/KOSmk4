@@ -34,6 +34,7 @@
 #include <kos/except.h>
 #include <kos/kernel/cpu-state-helpers.h>
 #include <kos/kernel/cpu-state.h>
+#include <kos/malloc.h>
 #include <kos/syscalls.h>
 #include <sys/syslog.h>
 
@@ -145,7 +146,15 @@ PRIVATE SECTION_EXCEPT_STRING char const name_unwind_fde_sigframe_exec[]  = "unw
 PRIVATE SECTION_EXCEPT_STRING char const name_unwind_cfa_sigframe_apply[] = "unwind_cfa_sigframe_apply";
 #endif /* !CFI_UNWIND_NO_SIGFRAME_COMMON_UNCOMMON_REGISTERS */
 
+PRIVATE SECTION_EXCEPT_TEXT ATTR_NORETURN
+void LIBCCALL libunwind_init_failed(void) {
+	PRIVATE SECTION_EXCEPT_STRING char const
+	message_libunwind_init_failed[] = "Failed to initialize libunwind: %s\n";
+	syslog(LOG_ERR, message_libunwind_init_failed, dlerror());
+	exit(EXIT_FAILURE);
+}
 
+/* Initialize libunwind bindings. */
 INTERN SECTION_EXCEPT_TEXT ATTR_NOINLINE
 void LIBCCALL initialize_libunwind(void) {
 	void *handle;
@@ -170,6 +179,8 @@ void LIBCCALL initialize_libunwind(void) {
 	*(void **)&pdyn_unwind_fde_sigframe_exec  = dlsym(handle, name_unwind_fde_sigframe_exec);
 	*(void **)&pdyn_unwind_cfa_sigframe_apply = dlsym(handle, name_unwind_cfa_sigframe_apply);
 	if unlikely(!pdyn_unwind_fde_sigframe_exec || !pdyn_unwind_cfa_sigframe_apply) {
+		STATIC_ASSERT_MSG(sizeof(unwind_cfa_sigframe_state_t) >= sizeof(unwind_cfa_state_t),
+		                  "This is a requirement for this substitution (see usage of these functions)");
 		pdyn_unwind_fde_sigframe_exec  = (PUNWIND_FDE_SIGFRAME_EXEC)pdyn_unwind_fde_exec;
 		pdyn_unwind_cfa_sigframe_apply = (PUNWIND_CFA_SIGFRAME_APPLY)pdyn_unwind_cfa_apply;
 	}
@@ -180,12 +191,7 @@ void LIBCCALL initialize_libunwind(void) {
 	COMPILER_WRITE_BARRIER();
 	return;
 err_init_failed:
-	{
-		PRIVATE SECTION_EXCEPT_STRING char const
-		message_libunwind_init_failed[] = "Failed to initialize libunwind: %s\n";
-		syslog(LOG_ERR, message_libunwind_init_failed, dlerror());
-	}
-	exit(EXIT_FAILURE);
+	libunwind_init_failed();
 }
 
 
@@ -874,7 +880,7 @@ NOTHROW_NCX(LIBCCALL libc_Unwind_GetTextRelBase)(struct _Unwind_Context const *_
 
 DEFINE_PUBLIC_ALIAS(_Unwind_FindEnclosingFunction, libc_Unwind_FindEnclosingFunction);
 INTERN SECTION_EXCEPT_TEXT ATTR_PURE WUNUSED void *
-NOTHROW_NCX(LIBCCALL libc_Unwind_FindEnclosingFunction)(void *pc) {
+NOTHROW_NCX(LIBCCALL libc_Unwind_FindEnclosingFunction)(void const *pc) {
 	unsigned int unwind_error;
 	unwind_fde_t fde;
 	ENSURE_LIBUNWIND_LOADED();
@@ -1121,6 +1127,138 @@ do_coredump_with_dlerror:
 }
 
 
+/* For ABI compatibility with linux (used to register .eh_frame sections)
+ * On KOS, all  of this is  done automatically by  libdl which exports  a
+ * functions that allows us to load the ".eh_frame" section of a  module.
+ *
+ * As such, we need support for an auxiliary table of eh_frame information
+ * that  can  be added  to  or removed  from  by use  of  these functions.
+ *
+ * Also note that even though these functions need to go into libc (so that
+ * programs can use  them without needing  to specify additional  libraries
+ * during link), the actual implementations need to go into `libunwind.so'! */
+struct rf_object {
+	void *_data[6];
+};
+
+/* NOTE: In the original version, malloc() failing at this point is entirely undefined! */
+#define rf_object_malloc() ((struct rf_object *)Malloc(sizeof(struct rf_object)))
+
+typedef NONNULL((1, 2)) void (LIBCCALL *P__REGISTER_FRAME_INFO_BASES)(void const *begin, struct rf_object *__restrict ob, void const *tbase, void const *dbase);
+typedef NONNULL((1, 2)) void (LIBCCALL *P__REGISTER_FRAME_INFO_TABLE_BASES)(void const *const *begin, struct rf_object *__restrict ob, void const *tbase, void const *dbase);
+typedef NONNULL((1)) struct rf_object * /*NOTHROW*/ (LIBCCALL *P__DEREGISTER_FRAME_INFO)(void const *begin);
+typedef NONNULL((2)) void const * /*NOTHROW_NCX*/ (LIBCCALL *P_UNWIND_FIND_FDE)(void const *pc, struct dwarf_eh_bases *__restrict bases);
+
+PRIVATE ATTR_SECTION(".bss.compat.linux") P__REGISTER_FRAME_INFO_BASES /*      */ pdyn___register_frame_info_bases       = NULL;
+PRIVATE ATTR_SECTION(".bss.compat.linux") P__REGISTER_FRAME_INFO_TABLE_BASES /**/ pdyn___register_frame_info_table_bases = NULL;
+PRIVATE ATTR_SECTION(".bss.compat.linux") P__DEREGISTER_FRAME_INFO /*          */ pdyn___deregister_frame_info           = NULL;
+PRIVATE ATTR_SECTION(".bss.compat.linux") P_UNWIND_FIND_FDE /*                 */ pdyn__Unwind_Find_FDE                  = NULL;
+
+PRIVATE ATTR_SECTION(".rodata.compat.linux") char const name___register_frame_info_bases[]       = "__register_frame_info_bases";
+PRIVATE ATTR_SECTION(".rodata.compat.linux") char const name___register_frame_info_table_bases[] = "__register_frame_info_table_bases";
+PRIVATE ATTR_SECTION(".rodata.compat.linux") char const name___deregister_frame_info[]           = "__deregister_frame_info";
+PRIVATE ATTR_SECTION(".rodata.compat.linux") char const name__Unwind_Find_FDE[]                  = "_Unwind_Find_FDE";
+
+/* Initialize RegisterFrame-bindings implemented in libunwind. */
+#define ENSURE_LIBUNWIND_LOADED_RF() \
+	(ATOMIC_READ(pdyn__Unwind_Find_FDE) != NULL || (initialize_libunwind_rf(), 0))
+INTERN SECTION_EXCEPT_TEXT ATTR_NOINLINE
+void LIBCCALL initialize_libunwind_rf(void) {
+	ENSURE_LIBUNWIND_LOADED();
+	/* Dynamically bind functions. */
+#define BIND(func, name)                                                  \
+	if unlikely ((*(void **)&func = dlsym(pdyn_libunwind, name)) == NULL) \
+		goto err_init_failed
+	BIND(pdyn___register_frame_info_bases, name___register_frame_info_bases);
+	BIND(pdyn___register_frame_info_table_bases, name___register_frame_info_table_bases);
+	BIND(pdyn___deregister_frame_info, name___deregister_frame_info);
+	COMPILER_WRITE_BARRIER();
+	BIND(pdyn__Unwind_Find_FDE, name__Unwind_Find_FDE);
+	COMPILER_WRITE_BARRIER();
+#undef BIND
+	return;
+err_init_failed:
+	libunwind_init_failed();
+}
+
+/* Register-frame ABI (as normally defined by libgcc,  but on KOS is defined in  libc
+ * as a couple of proxy functions that call forward to a smaller set of equalls named
+ * functions found in libunwind) */
+INTDEF NONNULL((2)) void LIBCCALL libc___register_frame_info_bases(/*nullable*/ void const *begin, struct rf_object *__restrict ob, void const *tbase, void const *dbase);
+INTDEF NONNULL((2)) void LIBCCALL libc___register_frame_info(/*nullable*/ void const *begin, struct rf_object *__restrict ob);
+INTDEF NONNULL((1)) void LIBCCALL libc___register_frame(void const *begin);
+INTDEF NONNULL((1, 2)) void LIBCCALL libc___register_frame_info_table_bases(void const *const *begin, struct rf_object *__restrict ob, void const *tbase, void const *dbase);
+INTDEF NONNULL((1, 2)) void LIBCCALL libc___register_frame_info_table(void const *const *begin, struct rf_object *__restrict ob);
+INTDEF NONNULL((1)) void LIBCCALL libc___register_frame_table(void const *const *begin);
+INTDEF struct rf_object *NOTHROW(LIBCCALL libc___deregister_frame_info)(/*nullable*/ void const *begin);
+INTDEF NONNULL((1)) void NOTHROW(LIBCCALL libc___deregister_frame)(void const *begin);
+INTDEF NONNULL((2)) void const *NOTHROW_NCX(LIBCCALL libc__Unwind_Find_FDE)(void const *pc, struct dwarf_eh_bases *__restrict bases);
+
+INTERN NONNULL((2)) void LIBCCALL
+libc___register_frame_info_bases(/*nullable*/ void const *begin, struct rf_object *__restrict ob,
+                                 void const *tbase, void const *dbase) {
+	ENSURE_LIBUNWIND_LOADED_RF();
+	(*pdyn___register_frame_info_bases)(begin, ob, tbase, dbase);
+}
+
+INTERN NONNULL((1, 2)) void LIBCCALL
+libc___register_frame_info_table_bases(void const *const *begin, struct rf_object *__restrict ob,
+                                       void const *tbase, void const *dbase) {
+	ENSURE_LIBUNWIND_LOADED_RF();
+	(*pdyn___register_frame_info_table_bases)(begin, ob, tbase, dbase);
+}
+
+INTERN struct rf_object *
+NOTHROW(LIBCCALL libc___deregister_frame_info)(/*nullable*/ void const *begin) {
+	ENSURE_LIBUNWIND_LOADED_RF();
+	return (*pdyn___deregister_frame_info)(begin);
+}
+
+INTERN NONNULL((2)) void const *
+NOTHROW_NCX(LIBCCALL libc__Unwind_Find_FDE)(void const *pc, struct dwarf_eh_bases *__restrict bases) {
+	ENSURE_LIBUNWIND_LOADED_RF();
+	return (*pdyn__Unwind_Find_FDE)(pc, bases);
+}
+
+INTERN NONNULL((2)) void LIBCCALL
+libc___register_frame_info(/*nullable*/ void const *begin, struct rf_object *__restrict ob) {
+	libc___register_frame_info_bases(begin, ob, NULL, NULL);
+}
+
+INTERN NONNULL((1)) void LIBCCALL
+libc___register_frame(void const *begin) {
+	if (*(uint32_t const *)begin != 0)
+		libc___register_frame_info(begin, rf_object_malloc());
+}
+
+INTERN NONNULL((1, 2)) void LIBCCALL
+libc___register_frame_info_table(void const *const *begin, struct rf_object *__restrict ob) {
+	libc___register_frame_info_table_bases(begin, ob, NULL, NULL);
+}
+
+INTERN NONNULL((1)) void LIBCCALL
+libc___register_frame_table(void const *const *begin) {
+	libc___register_frame_info_table(begin, rf_object_malloc());
+}
+
+INTERN NONNULL((1)) void
+NOTHROW(LIBCCALL libc___deregister_frame)(void const *begin) {
+	if (*(uint32_t const *)begin != 0)
+		free(libc___deregister_frame_info(begin));
+}
+
+
+
+DEFINE_PUBLIC_ALIAS(__register_frame_info_bases, libc___register_frame_info_bases);
+DEFINE_PUBLIC_ALIAS(__register_frame_info, libc___register_frame_info);
+DEFINE_PUBLIC_ALIAS(__register_frame, libc___register_frame);
+DEFINE_PUBLIC_ALIAS(__register_frame_info_table_bases, libc___register_frame_info_table_bases);
+DEFINE_PUBLIC_ALIAS(__register_frame_info_table, libc___register_frame_info_table);
+DEFINE_PUBLIC_ALIAS(__register_frame_table, libc___register_frame_table);
+DEFINE_PUBLIC_ALIAS(__deregister_frame_info_bases, libc___deregister_frame_info);
+DEFINE_PUBLIC_ALIAS(__deregister_frame_info, libc___deregister_frame_info);
+DEFINE_PUBLIC_ALIAS(__deregister_frame, libc___deregister_frame);
+DEFINE_PUBLIC_ALIAS(_Unwind_Find_FDE, libc__Unwind_Find_FDE);
 
 DECL_END
 

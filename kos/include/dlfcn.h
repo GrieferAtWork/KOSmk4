@@ -477,7 +477,7 @@ __NOTHROW_NCX(__DLFCN_CC dlmodulebase)(void *__handle);
 #ifndef __dl_section_defined
 #define __dl_section_defined 1
 struct dl_section {
-	void       *const ds_data;    /* [0..ds_size][const] Memory mapping for the section's contents. */
+	void       *const ds_data;    /* [0..ds_size][const] Memory mapping for the section's contents. (`(void *)-1' instead of `NULL') */
 	__size_t    const ds_size;    /* [const] Size of the section (in bytes) */
 	__size_t    const ds_entsize; /* [const] Section entity size (or 0 if unknown) */
 	__uintptr_t const ds_link;    /* [const] Index of another section that is linked by this one (or `0' if unused) */
@@ -747,6 +747,8 @@ __NOTHROW_NCX(__DLFCN_VCC dlauxctrl)(void *__handle,
 #define DLAUXCTRL_MOD_WEAKDECREF     0xa004 /* weakdecref() the module handle (always re-returns `handle') */
 #define DLAUXCTRL_MOD_TRYINCREF      0xa005 /* tryincref() the module handle (always re-returns `handle', or `NULL' if the module was destroyed) */
 #define DLAUXCTRL_MOD_NOTDESTROYED   0xa006 /* check if the module wasdestroyed() (re-returns `handle' if not, or `NULL' if so) */
+#define DLAUXCTRL_GET_TEXTBASE       0xa010 /* Return the text base address (that is: the lowest address mapped as RX\W); returns NULL if doesn't exist, but doesn't set an error */
+#define DLAUXCTRL_GET_DATABASE       0xa011 /* Return the data base address (that is: the lowest address mapped as RW\X); returns NULL if doesn't exist, but doesn't set an error */
 #define DLAUXCTRL_RUNFINI            0xd101 /* Run all library finalizers. `handle' is ignored but should be any valid module handle, or `NULL',
                                              * and  all  other arguments  are also  ignored; always  returns  `NULL', but  doesn't set  an error */
 #define DLAUXCTRL_RUNTLSFINI         0xd102 /* Run TLS library finalizers for the calling thread. `handle' is ignored but should

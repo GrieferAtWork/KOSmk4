@@ -704,11 +704,11 @@ __NOTHROW_NCX(LIBDEBUGINFO_CC dwarf_decode_pointer)(__byte_t const **__restrict 
 		break;
 
 	case DW_EH_PE_textrel:
-		result = textbase;
+		result = textbase; /* TODO: DLAUXCTRL_GET_TEXTBASE */
 		break;
 
 	case DW_EH_PE_datarel:
-		result = database;
+		result = database; /* TODO: DLAUXCTRL_GET_DATABASE */
 		break;
 
 	case DW_EH_PE_funcrel:

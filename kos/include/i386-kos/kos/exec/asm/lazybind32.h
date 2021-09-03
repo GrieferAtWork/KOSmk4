@@ -84,18 +84,18 @@
  * return  value as a text location to jump to, permanently re-writing itself such that any future
  * calls to `name' will always be forwarded to the initially returned address, without `getaddr()'
  * having to be called ever again. */
-#define __I386_DO_LAZYBIND(name, getaddr, ...)                                                        \
-	__ASM_BEGIN                                                                                       \
-	__I386_DEFINE_LAZYBIND_RUNTIME()                                                                  \
-	__ASM_L(.pushsection .xdata)                                                                      \
-	__ASM_L(.type name, @function __VA_ARGS__)                                                        \
-	__ASM_L(.set name, .)                                                                             \
-	__ASM_L(.byte 0xe9; .long 0)                                            /* jmp 1f; 1: */          \
-	__ASM_L(.byte 0xe8; .reloc ., R_386_RELATIVE, __x86_lazybind; .long -4) /* call __x86_lazybind */ \
-	__I386_IF_PIC(__ASM_L(.reloc ., R_386_RELATIVE, getaddr; .long 0))                                \
-	__I386_NIF_PIC(__ASM_L(.long getaddr))                                                            \
-	__ASM_L(.size name, . - name)                                                                     \
-	__ASM_L(.popsection)                                                                              \
+#define __I386_DO_LAZYBIND(name, getaddr, ...)                                                    \
+	__ASM_BEGIN                                                                                   \
+	__I386_DEFINE_LAZYBIND_RUNTIME()                                                              \
+	__ASM_L(.pushsection .xdata)                                                                  \
+	__ASM_L(.type name, @function __VA_ARGS__)                                                    \
+	__ASM_L(.set name, .)                                                                         \
+	__ASM_L(.byte 0xe9; .long 0)                                        /* jmp 1f; 1: */          \
+	__ASM_L(.byte 0xe8; .reloc ., R_386_PC32, __x86_lazybind; .long -4) /* call __x86_lazybind */ \
+	__I386_IF_PIC(__ASM_L(.reloc ., R_386_PC32, getaddr; .long 0))                                \
+	__I386_NIF_PIC(__ASM_L(.long getaddr))                                                        \
+	__ASM_L(.size name, . - name)                                                                 \
+	__ASM_L(.popsection)                                                                          \
 	__ASM_END
 
 

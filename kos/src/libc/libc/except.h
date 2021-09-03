@@ -124,7 +124,7 @@ INTDEF NONNULL((1)) _Unwind_Reason_Code NOTHROW_NCX(LIBCCALL libc_Unwind_Backtra
 INTDEF ATTR_PURE WUNUSED NONNULL((1)) _Unwind_Word NOTHROW_NCX(LIBCCALL libc_Unwind_GetCFA)(struct _Unwind_Context const *__restrict self);
 INTDEF ATTR_PURE WUNUSED NONNULL((1)) _Unwind_Ptr NOTHROW_NCX(LIBCCALL libc_Unwind_GetDataRelBase)(struct _Unwind_Context const *__restrict self);
 INTDEF ATTR_PURE WUNUSED NONNULL((1)) _Unwind_Ptr NOTHROW_NCX(LIBCCALL libc_Unwind_GetTextRelBase)(struct _Unwind_Context const *__restrict self);
-INTDEF ATTR_PURE WUNUSED void *NOTHROW_NCX(LIBCCALL libc_Unwind_FindEnclosingFunction)(void *pc);
+INTDEF ATTR_PURE WUNUSED void *NOTHROW_NCX(LIBCCALL libc_Unwind_FindEnclosingFunction)(void const *pc);
 
 /* Kernel-level exception handling (mode #2/#3 and mode #4). */
 INTDEF error_register_state_t *__EXCEPT_HANDLER_CC libc_except_handler3_impl(error_register_state_t *__restrict state, struct exception_data *__restrict error);

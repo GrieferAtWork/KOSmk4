@@ -37,6 +37,7 @@
 #include "eh_frame.h"
 
 #ifndef __KERNEL__
+#include <hybrid/sequence/list.h>
 #include <hybrid/sequence/rbtree.h>
 #include <hybrid/sync/atomic-rwlock.h>
 
@@ -45,6 +46,7 @@
 #include <assert.h>
 #include <dlfcn.h>
 #include <malloc.h>
+#include <stdbool.h>
 #include <stddef.h>
 #include <string.h>
 #endif /* !__KERNEL__ */
@@ -52,32 +54,11 @@
 DECL_BEGIN
 
 
-/* NOTE: In kernel-space, `libuw_unwind_fde_find()'  is
- *       in `/kos/src/kernel/core/memory/mman/driver.c' */
 #ifndef __KERNEL__
-PRIVATE NONNULL((1, 3)) unsigned int
-NOTHROW_NCX(CC libuw_unwind_fde_find_new)(void *dlmod, void const *absolute_pc,
-                                          unwind_fde_t *__restrict result) {
-	unsigned int error;
-	struct dl_section *eh_frame_sect;
-	/* Lock the module's .eh_frame section into memory. */
-	eh_frame_sect = dllocksection(dlmod,
-	                              ".eh_frame",
-	                              DLLOCKSECTION_FNORMAL);
-	if unlikely(!eh_frame_sect)
-		ERROR(err);
-	/* Scan the .eh_frame section of the associated module. */
-	error = libuw_unwind_fde_scan((byte_t const *)eh_frame_sect->ds_data,
-	                              (byte_t const *)eh_frame_sect->ds_data + eh_frame_sect->ds_size,
-	                              absolute_pc,
-	                              result,
-	                              sizeof(void *));
-	dlunlocksection(eh_frame_sect);
-	return error;
-err:
-	return UNWIND_NO_FRAME;
-}
 
+/************************************************************************/
+/* FDE Caching                                                          */
+/************************************************************************/
 struct fde_cache_entry {
 	unwind_fde_t                   fce_fde;    /* [const] The FDE entry being cached.
 	                                            * When `f_pcstart...f_pcend' range is
@@ -102,7 +83,7 @@ DECL_END
 #define RBTREE_Tkey            void const *
 #define RBTREE_GETNODE(self)   (self)->fce_link
 #define RBTREE_GETMINKEY(self) ((self)->fce_fde.f_pcstart)
-#define RBTREE_GETMAXKEY(self) ((byte_t *)(self)->fce_fde.f_pcend - 1)
+#define RBTREE_GETMAXKEY(self) ((byte_t const *)(self)->fce_fde.f_pcend - 1)
 #define RBTREE_ISRED(self)     ((self)->fce_fde.f_sigframe & 0x80)
 #define RBTREE_SETRED(self)    ((self)->fce_fde.f_sigframe |= 0x80)
 #define RBTREE_SETBLACK(self)  ((self)->fce_fde.f_sigframe &= ~0x80)
@@ -145,6 +126,289 @@ INTERN void libuw_fini(void) {
 	if (fde_cache)
 		uw_clear_cache_tree(fde_cache);
 }
+
+
+
+/************************************************************************/
+/* __register_frame API (lazily aliased by libc)                        */
+/************************************************************************/
+#ifndef LIBCCALL
+#define LIBCCALL __LIBCCALL
+#endif /* !LIBCCALL */
+
+typedef struct __ATTR_PACKED __ATTR_ALIGNED(__SIZEOF_POINTER__) {
+	/* This structure exists  as a (not  100% correct, as  length=0xffffffff
+	 * is indicative of an additional 64-bit length field immediately after)
+	 * struct representation of what is found in .eh_frame */
+	uint32_t length;
+	int32_t  CIE_delta;
+	COMPILER_FLEXIBLE_ARRAY(byte_t, pc_begin);
+} rf_fde;
+
+struct rf_object {
+	union {
+		rf_fde const        *ro_eh_frame;       /* [1..1] Pointer to .eh_frame */
+		rf_fde const *const *ro_eh_frame_array; /* [0..1][1..N] NULL-terminated array. */
+	};
+	void const              *ro_tbase;    /* [0..1] .text base address override. */
+	void const              *ro_dbase;    /* [0..1] .data base address override. */
+	SLIST_ENTRY(rf_object)   ro_link;     /* Link between objects. */
+	bool                     ro_isarray;  /* True if this is an array */
+};
+
+STATIC_ASSERT(sizeof(struct rf_object) <= 6 * sizeof(void *));
+
+struct dwarf_eh_bases {
+	void const *deb_tbase; /* [0..1] .text base address */
+	void const *deb_dbase; /* [0..1] .data base address */
+	void const *deb_func;  /* [0..1] function base address */
+};
+
+INTDEF NONNULL((2)) void LIBCCALL libuw___register_frame_info_bases(/*nullable*/ rf_fde const *begin, struct rf_object *__restrict ob, void const *tbase, void const *dbase);
+INTDEF NONNULL((1, 2)) void LIBCCALL libuw___register_frame_info_table_bases(rf_fde const *const *begin, struct rf_object *__restrict ob, void const *tbase, void const *dbase);
+INTDEF struct rf_object *NOTHROW(LIBCCALL libuw___deregister_frame_info)(/*nullable*/ void const *begin);
+INTDEF NONNULL((1, 2)) rf_fde const *NOTHROW_NCX(LIBCCALL libuw__Unwind_Find_FDE)(void const *pc, /*out*/ struct dwarf_eh_bases *__restrict bases);
+
+SLIST_HEAD(rf_object_slist, rf_object);
+
+/* [0..n] Auxiliary list of eh_frame data data registrations. */
+PRIVATE struct rf_object_slist register_frame_aux_list = SLIST_HEAD_INITIALIZER(register_frame_aux_list);
+PRIVATE struct atomic_rwlock register_frame_aux_lock   = ATOMIC_RWLOCK_INIT;
+
+
+
+/* Implementation */
+INTERN NONNULL((2)) void LIBCCALL
+libuw___register_frame_info_bases(/*nullable*/ rf_fde const *begin, struct rf_object *__restrict ob,
+                                  void const *tbase, void const *dbase) {
+	if (!begin || begin->length == 0)
+		return; /* Special case: empty .eh_frame section */
+	ob->ro_eh_frame = begin;
+	ob->ro_tbase    = tbase;
+	ob->ro_dbase    = dbase;
+	ob->ro_isarray  = false;
+
+	/* Insert into the list of auxiliary objects */
+	atomic_rwlock_write(&register_frame_aux_lock);
+	SLIST_INSERT(&register_frame_aux_list, ob, ro_link);
+	atomic_rwlock_endwrite(&register_frame_aux_lock);
+}
+
+INTERN NONNULL((1, 2)) void LIBCCALL
+libuw___register_frame_info_table_bases(rf_fde const *const *begin, struct rf_object *__restrict ob,
+                                        void const *tbase, void const *dbase) {
+	ob->ro_eh_frame_array = begin;
+	ob->ro_tbase          = tbase;
+	ob->ro_dbase          = dbase;
+	ob->ro_isarray        = true;
+
+	/* Insert into the list of auxiliary objects */
+	atomic_rwlock_write(&register_frame_aux_lock);
+	SLIST_INSERT(&register_frame_aux_list, ob, ro_link);
+	atomic_rwlock_endwrite(&register_frame_aux_lock);
+}
+
+
+/* Remove all cache references to FDE entries from `eh_frame' */
+PRIVATE void
+NOTHROW(LIBCCALL remove_cache_references)(byte_t const *eh_frame) {
+	unsigned int error;
+	unwind_fde_t fde;
+	for (;;) {
+		error = libuw_unwind_fde_load(&eh_frame, (byte_t *)-1, &fde, sizeof(void *));
+		if (error != UNWIND_SUCCESS)
+			break;
+		/* Try to remove entries from this range. */
+		if likely((byte_t const *)fde.f_pcstart <
+		          (byte_t const *)fde.f_pcend) {
+			struct fde_cache_entry *cent;
+			while ((cent = fde_cache_tree_rremove(&fde_cache,
+			                                      (byte_t const *)fde.f_pcstart,
+			                                      (byte_t const *)fde.f_pcend - 1)))
+				fde_cache_entry_destroy(cent);
+		}
+	}
+}
+
+INTERN struct rf_object *
+NOTHROW(LIBCCALL libuw___deregister_frame_info)(/*nullable*/ void const *begin) {
+	struct rf_object *result;
+	if (!begin || *(uint32_t const *)begin == 0)
+		return NULL;
+
+	/* Try to remove an entry for the given eh_frame base from the list. */
+	atomic_rwlock_write(&register_frame_aux_lock);
+	SLIST_TRYREMOVE_IF(&register_frame_aux_list, &result, ro_link,
+	                   result->ro_eh_frame == (rf_fde const *)begin,
+	                   { result = NULL; });
+	atomic_rwlock_endwrite(&register_frame_aux_lock);
+
+	/* Upon success, we must also remove all FDE caches associated with
+	 * entries FDE descriptors  for the object  that was just  removed. */
+	if (result != NULL) {
+		atomic_rwlock_write(&fde_cache_lock);
+		if (result->ro_isarray) {
+			size_t i;
+			for (i = 0;; ++i) {
+				rf_fde const *eh_frame;
+				eh_frame = result->ro_eh_frame_array[i];
+				if (!eh_frame)
+					break;
+				remove_cache_references((byte_t const *)eh_frame);
+			}
+		} else {
+			remove_cache_references((byte_t const *)result->ro_eh_frame);
+		}
+		atomic_rwlock_endwrite(&fde_cache_lock);
+	}
+
+	return result;
+}
+
+PRIVATE NONNULL((4)) rf_fde const *
+NOTHROW_NCX(CC fde_locate_pc)(void const *absolute_pc,
+                              byte_t const *eh_frame_start,
+                              byte_t const *eh_frame_end,
+                              void const **pfunc_base) {
+	unsigned int error;
+	unwind_fde_t fde;
+	for (;;) {
+		rf_fde const *result;
+		result = (rf_fde const *)eh_frame_start;
+		error  = libuw_unwind_fde_load(&eh_frame_start, eh_frame_end, &fde, sizeof(void *));
+		if (error != UNWIND_SUCCESS)
+			break;
+		/* Check if this FDE contained what we're looking for */
+		if (absolute_pc >= fde.f_pcstart &&
+		    absolute_pc < fde.f_pcend) {
+			*pfunc_base = fde.f_pcstart;
+			return result;
+		}
+	}
+	return NULL;
+}
+
+
+INTERN NONNULL((1, 2)) rf_fde const *
+NOTHROW_NCX(LIBCCALL libuw__Unwind_Find_FDE)(void const *pc, /*out*/ struct dwarf_eh_bases *__restrict bases) {
+	rf_fde const *result;
+	void *dlmod;
+	struct dl_section *eh_frame_sect;
+	struct rf_object *obj;
+
+	/* Check if we can find the FDE by searching for a module and loading that module's .eh_frame section. */
+	if ((dlmod = dlgethandle(pc, DLGETHANDLE_FNORMAL)) != NULL &&
+	    (eh_frame_sect = dllocksection(dlmod, ".eh_frame", DLLOCKSECTION_FNORMAL)) != NULL &&
+	    (eh_frame_sect->ds_data != (void *)-1)) {
+
+		/* Search through this modules .eh_frame section. */
+		result = fde_locate_pc(pc,
+		                       (byte_t const *)eh_frame_sect->ds_data,
+		                       (byte_t const *)eh_frame_sect->ds_data + eh_frame_sect->ds_size,
+		                       &bases->deb_func);
+		if (result != NULL) {
+			bases->deb_tbase = dlauxctrl(dlmod, DLAUXCTRL_GET_TEXTBASE);
+			bases->deb_dbase = dlauxctrl(dlmod, DLAUXCTRL_GET_DATABASE);
+			return result;
+		}
+	}
+
+	/* If that failed, search through auxillary information given by `__register_frame_info_bases()' */
+	result = NULL;
+	atomic_rwlock_read(&register_frame_aux_lock);
+	SLIST_FOREACH (obj, &register_frame_aux_list, ro_link) {
+		if (obj->ro_isarray) {
+			size_t i;
+			for (i = 0;; ++i) {
+				rf_fde const *eh_frame;
+				eh_frame = obj->ro_eh_frame_array[i];
+				if (!eh_frame)
+					break;
+				result = fde_locate_pc(pc, (byte_t const *)eh_frame, (byte_t const *)-1, &bases->deb_func);
+			}
+		} else {
+			result = fde_locate_pc(pc, (byte_t const *)obj->ro_eh_frame, (byte_t const *)-1, &bases->deb_func);
+		}
+		if (result != NULL) {
+			bases->deb_tbase = obj->ro_tbase;
+			bases->deb_dbase = obj->ro_dbase;
+			return result;
+		}
+	}
+	atomic_rwlock_endread(&register_frame_aux_lock);
+
+	/* Nothing found :( */
+	return NULL;
+}
+
+/* Exports */
+DEFINE_PUBLIC_ALIAS(__register_frame_info_bases, libuw___register_frame_info_bases);
+DEFINE_PUBLIC_ALIAS(__register_frame_info_table_bases, libuw___register_frame_info_table_bases);
+DEFINE_PUBLIC_ALIAS(__deregister_frame_info, libuw___deregister_frame_info);
+DEFINE_PUBLIC_ALIAS(_Unwind_Find_FDE, libuw__Unwind_Find_FDE);
+
+
+
+
+
+
+/* NOTE: In kernel-space, `libuw_unwind_fde_find()'  is
+ *       in `/kos/src/kernel/core/memory/mman/driver.c' */
+PRIVATE NONNULL((1, 3)) unsigned int
+NOTHROW_NCX(CC libuw_unwind_fde_find_new)(void *dlmod, void const *absolute_pc,
+                                          unwind_fde_t *__restrict result) {
+	unsigned int error;
+	struct dl_section *eh_frame_sect;
+
+	/* Lock the module's .eh_frame section into memory. */
+	eh_frame_sect = dllocksection(dlmod,
+	                              ".eh_frame",
+	                              DLLOCKSECTION_FNORMAL);
+	if unlikely(!eh_frame_sect)
+		ERROR(check_register_frame_objects);
+
+	/* Scan the .eh_frame section of the associated module. */
+	error = libuw_unwind_fde_scan((byte_t const *)eh_frame_sect->ds_data,
+	                              (byte_t const *)eh_frame_sect->ds_data + eh_frame_sect->ds_size,
+	                              absolute_pc, result, sizeof(void *));
+	dlunlocksection(eh_frame_sect);
+
+	/* If not found, try to search through __register_frame objects.. */
+	if (error == UNWIND_NO_FRAME)
+		goto check_register_frame_objects;
+
+	return error;
+	{
+		struct rf_object *obj;
+check_register_frame_objects:
+		atomic_rwlock_read(&register_frame_aux_lock);
+		/* Go through all explicitly registered register-frame objects
+		 * and see if one of them happens to contain the requested PC. */
+		SLIST_FOREACH (obj, &register_frame_aux_list, ro_link) {
+			if (obj->ro_isarray) {
+				size_t i;
+				for (i = 0;; ++i) {
+					rf_fde const *eh_frame;
+					eh_frame = obj->ro_eh_frame_array[i];
+					if (!eh_frame)
+						break;
+					error = libuw_unwind_fde_scan((byte_t const *)eh_frame, (byte_t const *)-1,
+					                              absolute_pc, result, sizeof(void *));
+					if (error != UNWIND_NO_FRAME)
+						break;
+				}
+			} else {
+				error = libuw_unwind_fde_scan((byte_t const *)obj->ro_eh_frame, (byte_t const *)-1,
+				                              absolute_pc, result, sizeof(void *));
+			}
+			if (error != UNWIND_NO_FRAME)
+				return error;
+		}
+		atomic_rwlock_endread(&register_frame_aux_lock);
+	}
+	return UNWIND_NO_FRAME;
+}
+
 
 
 
@@ -206,7 +470,6 @@ destroy_new_fce:
 		goto done;
 	}
 	if unlikely(!fde_cache_tree_tryinsert(&fde_cache, fce)) {
-		/* TODO: Handle this by downgrading the lock and starting over. */
 		struct fde_cache_entry *existing_fce;
 		/* Try to remove the existing cache entry. */
 		existing_fce = fde_cache_tree_rremove(&fde_cache, result->f_pcstart,
@@ -284,8 +547,6 @@ linuw_unwind(void const *absolute_pc,
 done:
 	return result;
 }
-
-
 
 DEFINE_PUBLIC_ALIAS(unwind, linuw_unwind);
 

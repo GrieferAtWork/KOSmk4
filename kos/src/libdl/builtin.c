@@ -1804,6 +1804,33 @@ libdl_dlauxctrl(DlModule *self, unsigned int cmd, ...) {
 			result = NULL;
 		break;
 
+	case DLAUXCTRL_GET_TEXTBASE: {
+		ElfW(Half) i;
+		ElfW(Word) rwx;
+		rwx = PF_R | PF_X;
+		__IF0 {
+	case DLAUXCTRL_GET_DATABASE:
+			rwx = PF_R | PF_W;
+		}
+		if unlikely(self->dm_ops) {
+			result = NULL;
+			break;
+		}
+		/* Search for the lowest program header with the correct flags. */
+		for (result = (void *)-1, i = 0; i < self->dm_elf.de_phnum; ++i) {
+			uintptr_t hdraddr;
+			if (self->dm_elf.de_phdr[i].p_type != PT_LOAD)
+				continue;
+			if ((self->dm_elf.de_phdr[i].p_flags & (PF_R | PF_W | PF_X)) != rwx)
+				continue;
+			hdraddr = self->dm_loadaddr + self->dm_elf.de_phdr[i].p_vaddr;
+			if ((uintptr_t)result > hdraddr)
+				result = (void *)hdraddr;
+		}
+		if (result == (void *)-1)
+			result = NULL;
+	}	break;
+
 	case DLAUXCTRL_ADD_FINALIZER: {
 		struct dlmodule_finalizers *flz;
 		void (LIBDL_CC *func)(void *);

@@ -209,6 +209,7 @@
 #define __CRT_HAVE__Unwind_Backtrace
 #define __CRT_HAVE__Unwind_DeleteException
 #define __CRT_HAVE__Unwind_FindEnclosingFunction
+#define __CRT_HAVE__Unwind_Find_FDE
 #define __CRT_HAVE__Unwind_ForcedUnwind
 #define __CRT_HAVE__Unwind_GetCFA
 #define __CRT_HAVE__Unwind_GetDataRelBase
@@ -306,6 +307,9 @@
 #define __CRT_HAVE___cxa_rethrow
 #define __CRT_HAVE___daylight
 #define __CRT_HAVE___dcgettext
+#define __CRT_HAVE___deregister_frame
+#define __CRT_HAVE___deregister_frame_info
+#define __CRT_HAVE___deregister_frame_info_bases
 #define __CRT_HAVE___dgettext
 #define __CRT_HAVE___difftime64
 #define __CRT_HAVE___doserrno
@@ -612,6 +616,12 @@
 #define __CRT_HAVE___rawmemchr
 #define __CRT_HAVE___read
 #define __CRT_HAVE___recv
+#define __CRT_HAVE___register_frame
+#define __CRT_HAVE___register_frame_info
+#define __CRT_HAVE___register_frame_info_bases
+#define __CRT_HAVE___register_frame_info_table
+#define __CRT_HAVE___register_frame_info_table_bases
+#define __CRT_HAVE___register_frame_table
 #define __CRT_HAVE___remainder
 #define __CRT_HAVE___remainderf
 #define __CRT_HAVE___remainderl
