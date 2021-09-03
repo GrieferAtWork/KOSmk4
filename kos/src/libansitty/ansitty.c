@@ -782,7 +782,7 @@ handle_control_character(struct ansitty *__restrict self, char32_t ch) {
 
 	case CC_SPC:
 		if (self->at_ttyflag & ANSITTY_FLAG_CRM) {
-			PUTUNILAST(0x2421);
+			PUTUNILAST(0x2420);
 			goto done;
 		}
 		break;
