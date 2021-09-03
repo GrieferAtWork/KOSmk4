@@ -1087,8 +1087,6 @@ NOTHROW(LIBANSITTY_CC VGA_FillCell)(struct ansitty *__restrict self,
 		ansitty_coord_t used_count, max_count;
 		u16 *ptr, *end, cell;
 		char cpch = vga_state_encode((u32)ch);
-		if unlikely(!cpch)
-			cpch = '?';
 		cell = VGA_CHR(me, cpch);
 		ptr = ATOMIC_READ(me->v_textptr);
 		end = ATOMIC_READ(me->v_textend);
