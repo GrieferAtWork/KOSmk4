@@ -102,13 +102,14 @@ struct slab {
 #ifdef CONFIG_TRACE_MALLOC
 #define SLAB_SEGMENT_STATUS_FREE  0 /* Segment is free. */
 #define SLAB_SEGMENT_STATUS_ALLOC 1 /* Segment is allocated. */
+/*      SLAB_SEGMENT_STATUS_      2  * ... */
 #define SLAB_SEGMENT_STATUS_REACH 3 /* Segment is reachable. */
 #define SLAB_SEGMENT_STATUS_MASK  3 /* Mask of bits */
 #define SLAB_SEGMENT_STATUS_BITS  2 /* # of status bits per slab. */
 #else /* CONFIG_TRACE_MALLOC */
 #define SLAB_SEGMENT_STATUS_FREE  0 /* Segment is free. */
 #define SLAB_SEGMENT_STATUS_ALLOC 1 /* Segment is allocated. */
-#define SLAB_SEGMENT_STATUS_MASK  3 /* Mask of bits */
+#define SLAB_SEGMENT_STATUS_MASK  1 /* Mask of bits */
 #define SLAB_SEGMENT_STATUS_BITS  1 /* # of status bits per slab. */
 #endif /* !CONFIG_TRACE_MALLOC */
 

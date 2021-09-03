@@ -918,8 +918,8 @@ int main_cc(int argc, char *argv[], char *envp[]) {
 
 /************************************************************************/
 int main_charmap(int argc, char *argv[], char *envp[]) {
-	char const *cp437[] = {
-		/**/ " \u263A\u263B\u2665\u2666\u2663\u2660\u2022\u25D8\u25CB\u25D9\u2642\u2640\u266A\u266B\u263C",
+	char const *cpvga[] = { /* s.a. /src/libvgastate/vgastate.c */
+		"\uFFFD\u263A\u263B\u2665\u2666\u2663\u2660\u2022\u25D8\u25CB\u25D9\u2642\u2640\u266A\u266B\u263C",
 		"\u25BA\u25C4\u2195\u203C\u00B6\u00A7\u25AC\u21A8\u2191\u2193\u2192\u2190\u221F\u2194\u25B2\u25BC",
 		"\u0020\u0021\u0022\u0023\u0024\u0025\u0026\u0027\u0028\u0029\u002A\u002B\u002C\u002D\u002E\u002F",
 		"\u0030\u0031\u0032\u0033\u0034\u0035\u0036\u0037\u0038\u0039\u003A\u003B\u003C\u003D\u003E\u003F",
@@ -933,8 +933,8 @@ int main_charmap(int argc, char *argv[], char *envp[]) {
 		"\u2591\u2592\u2593\u2502\u2524\u2561\u2562\u2556\u2555\u2563\u2551\u2557\u255D\u255C\u255B\u2510",
 		"\u2514\u2534\u252C\u251C\u2500\u253C\u255E\u255F\u255A\u2554\u2569\u2566\u2560\u2550\u256C\u2567",
 		"\u2568\u2564\u2565\u2559\u2558\u2552\u2553\u256B\u256A\u2518\u250C\u2588\u2584\u258C\u2590\u2580",
-		"\u03B1\u00DF\u0393\u03C0\u03A3\u03C3\u00B5\u03C4\u03A6\u0398\u03A9\u03B4\u221E\u03C6\u03B5\u2229",
-		"\u2261\u00B1\u2265\u2264\u2320\u2321\u00F7\u2248\u00B0\u2219\u00B7\u221A\u207F\u00B2\u25A0\u00A0",
+		"\u03B1\u00DF\u2596\u2597\u2598\u2599\u259A\u259B\u259C\u259D\u259E\u259F\u221E\u03C6\u03B5\u2229",
+		"\u2261\u00B1\u2265\u2264\u2320\u2321\u00F7\u2248\u00B0\u2219\u00B7\u221A\u207F\u00B2\u25A0\uE888",
 	};
 	unsigned int i;
 	(void)argc, (void)argv, (void)envp;
@@ -942,7 +942,7 @@ int main_charmap(int argc, char *argv[], char *envp[]) {
 		printf(AC_COLOR(ANSITTY_CL_WHITE, ANSITTY_CL_BLACK) "%s    "
 		       AC_COLOR(ANSITTY_CL_BLACK, ANSITTY_CL_WHITE) "%s"
 		       AC_DEFCOLOR "\n",
-		       cp437[i], cp437[i]);
+		       cpvga[i], cpvga[i]);
 	}
 	return 0;
 }

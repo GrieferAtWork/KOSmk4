@@ -87,16 +87,31 @@ struct vga_state {
 };
 
 
+/* Save/Load the current VGA display state, or set the display state to 80x25 text mode.
+ * @return: * : One of `VGA_STATE_ERROR_*' */
 typedef __ATTR_NONNULL((1)) unsigned int /*__NOTHROW_KERNEL*/ (LIBVGASTATE_CC *PVGA_STATE_SAVE)(struct vga_state *__restrict self);
 typedef __ATTR_NONNULL((1)) unsigned int /*__NOTHROW_KERNEL*/ (LIBVGASTATE_CC *PVGA_STATE_LOAD)(struct vga_state const *__restrict self);
 typedef __ATTR_NONNULL((1)) void /*__NOTHROW_KERNEL*/ (LIBVGASTATE_CC *PVGA_STATE_FINI)(struct vga_state const *__restrict self);
 typedef unsigned int /*__NOTHROW_KERNEL*/ (LIBVGASTATE_CC *PVGA_STATE_TEXT)(void);
-
 #ifdef LIBVGASTATE_WANT_PROTOTYPES
 LIBVGASTATE_DECL __ATTR_NONNULL((1)) unsigned int __NOTHROW_KERNEL(LIBVGASTATE_CC vga_state_save)(struct vga_state *__restrict self);
 LIBVGASTATE_DECL __ATTR_NONNULL((1)) unsigned int __NOTHROW_KERNEL(LIBVGASTATE_CC vga_state_load)(struct vga_state const *__restrict self);
 LIBVGASTATE_DECL __ATTR_NONNULL((1)) void __NOTHROW_KERNEL(LIBVGASTATE_CC vga_state_fini)(struct vga_state const *__restrict self);
 LIBVGASTATE_DECL unsigned int __NOTHROW_KERNEL(LIBVGASTATE_CC vga_state_text)(void);
+#endif /* LIBVGASTATE_WANT_PROTOTYPES */
+
+
+/* Encode a given unicode character and return the VGA codepage ordinal with
+ * which that character should be represented. As a fallback for glyphs that
+ * don't appear in the VGA codepage, the ordinal of a replacement  character
+ * will be returned instead.
+ * This function also does some internal transliteration in order to provide
+ * more support for similar-looking unicode characters (e.g. ► and ▶)
+ * Unknown characters are mapped to 0x00, which (if displayed on-screen)
+ * appears as a replacement character. */
+typedef __ATTR_CONST __byte_t /*__NOTHROW*/ (LIBVGASTATE_CC *PVGA_STATE_ENCODE)(__CHAR32_TYPE__ ch);
+#ifdef LIBVGASTATE_WANT_PROTOTYPES
+LIBVGASTATE_DECL __ATTR_CONST __byte_t __NOTHROW(LIBVGASTATE_CC vga_state_encode)(__CHAR32_TYPE__ ch);
 #endif /* LIBVGASTATE_WANT_PROTOTYPES */
 
 __DECL_END

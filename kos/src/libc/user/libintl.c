@@ -774,7 +774,7 @@ NOTHROW_NCX(__FCALL eval_plural_expression)(char const *__restrict expr, longptr
 
 
 /* Parse meta-data information. */
-PRIVATE WUNUSED NONNULL((1)) char const *
+PRIVATE ATTR_PURE WUNUSED NONNULL((1)) char const *
 NOTHROW_NCX(__FCALL mo_extract_plural_from_metadata)(char const *__restrict header,
                                                      size_t header_len) {
 	char const *header_end;

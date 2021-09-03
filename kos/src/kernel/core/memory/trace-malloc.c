@@ -913,7 +913,7 @@ NOTHROW(KCALL gc_reachable_pointer)(void *ptr) {
 	if (((uintptr_t)ptr & (sizeof(void *) - 1)) != 0)
 		return 0;
 
-#if __SIZEOF_POINTER__ == 4
+#if __SIZEOF_POINTER__ == 4 /* TODO: Generic check each word for ADDR_ISKERN() in a pp expression */
 #ifdef CONFIG_DEBUG_HEAP
 	if ((uintptr_t)ptr == DEBUGHEAP_NO_MANS_LAND)
 		return 0; /* Optimization: No mans land */
@@ -969,8 +969,8 @@ NOTHROW(KCALL gc_reachable_data)(void const *base, size_t num_bytes) {
 			/* FIXME: What if `base' isn't writable because it was written to SWAP?
 			 *        In this case  we'd have  to abort GC  detection, release  our
 			 *        scheduler super-lock, force  load `base' into  the core,  and
-			 *        finally: try again (though we should probably all pages to
-			 *        which  this   applies,  and   load  them   all  at   once)
+			 *        finally: try again (though we should gather probably all pages
+			 *        to   which  this   applies,  and   load  them   all  at  once)
 			 * NOTE:  We  can only load them when not holding a super-lock, since
 			 *        the act of loading memory  from SWAP might require the  use
 			 *        of an async worker, which don't work while holding a super-
@@ -1429,7 +1429,7 @@ kmalloc_leaks_gather(void) {
 PRIVATE ATTR_COLDTEXT ATTR_PURE WUNUSED NONNULL((1, 2)) bool KCALL
 trace_node_isbelow(struct trace_node *__restrict lhs,
                    struct trace_node *__restrict rhs) {
-	/* Leaks with more XREFS should code before ones with less. */
+	/* Leaks with more XREFS should come before ones with less. */
 	if (trace_node_leak_getxrefs(lhs) < trace_node_leak_getxrefs(rhs))
 		return true;
 	if (trace_node_leak_getxrefs(lhs) > trace_node_leak_getxrefs(rhs))

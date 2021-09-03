@@ -61,12 +61,6 @@ if (gcc_opt.removeif([](x) -> x.startswith("-O")))
 
 DECL_BEGIN
 
-#ifdef __INTELLISENSE__
-LOCAL ATTR_COLDTEXT u8 NOTHROW(KCALL cp437_encode)(char32_t ch);
-#else /* __INTELLISENSE__ */
-#include "cp437_encode.c.inl"
-#endif /* !__INTELLISENSE__ */
-
 #define VGA_VRAM_BASE  0xa0000
 #define VGA_VRAM_TEXT  0xb8000
 #define VGA_VRAM_SIZE  0x01000
@@ -556,7 +550,7 @@ NOTHROW(LIBANSITTY_CC vga_tty_putc)(struct ansitty *__restrict UNUSED(self),
 	/* Scroll to bottom before printing a character. */
 	if (vga_backlog_scrollpos && !vga_suppress_update)
 		vga_backlog_setscrollpos(0);
-	cp_ch = cp437_encode(ch);
+	cp_ch = vga_state_encode(ch);
 	if (cp_ch) {
 do_put_cp_ch:
 		dbg_putcp437(cp_ch);
@@ -596,14 +590,14 @@ do_put_cp_ch:
 				memsetw(vga_terminal_cur, VGA_EMPTY, VGA_WIDTH - VGA_GETCUR_X());
 			cury = VGA_GETCUR_Y();
 			if (VGA_GETCUR_X() <= dbg_indent &&
-			    cp437_encode(dbg_last_character) != 0 && cury)
+			    vga_state_encode(dbg_last_character) != 0 && cury)
 				--cury;
 			VGA_SETCUR(dbg_indent, cury);
 		}	break;
 
 		case '\n':
 			if (VGA_GETCUR_X() <= dbg_indent &&
-			    cp437_encode(dbg_last_character) != 0) {
+			    vga_state_encode(dbg_last_character) != 0) {
 				/* Special case: The previous line was filled entirely, and the cursor had to be  wrapped
 				 *               to the next line,  however the first character  then printed was also  a
 				 *               linefeed. - In this case, don't wrap the line, as the linefeed requested
@@ -629,7 +623,6 @@ do_put_cp_ch:
 			break;
 
 		default:
-			cp_ch = '?';
 			goto do_put_cp_ch;
 		}
 	}
@@ -710,11 +703,10 @@ NOTHROW(LIBANSITTY_CC vga_tty_copycell)(struct ansitty *__restrict UNUSED(self),
 PRIVATE ATTR_DBGTEXT void
 NOTHROW(LIBANSITTY_CC vga_tty_fillcell)(struct ansitty *__restrict UNUSED(self),
                                         char32_t ch, ansitty_coord_t count) {
-	u16 cell;
 	ansitty_coord_t used_count, max_count;
-	char cpch = cp437_encode((u32)ch);
-	if unlikely(!cpch)
-		cpch = '?';
+	byte_t cpch;
+	u16 cell;
+	cpch = vga_state_encode((u32)ch);
 	cell = VGA_CHR(cpch);
 	max_count = (size_t)(vga_terminal_end - vga_terminal_cur);
 	used_count = count;
@@ -776,7 +768,7 @@ NOTHROW(FCALL vga_pprinter_do_putuni)(dbg_pprinter_arg_t *__restrict printer, /*
 	/* Scroll to bottom before printing a character. */
 	if (vga_backlog_scrollpos && !vga_suppress_update)
 		vga_backlog_setscrollpos(0);
-	cp_ch = cp437_encode(ch);
+	cp_ch = vga_state_encode(ch);
 	if (cp_ch) {
 do_put_cp_ch:
 		dbg_pprinter_putcp437(printer, cp_ch);
@@ -1209,12 +1201,10 @@ NOTHROW(FCALL dbg_putuni)(/*utf-32*/ char32_t ch) {
 
 PUBLIC ATTR_DBGTEXT void
 NOTHROW(FCALL dbg_fillscreen)(/*utf-32*/ char32_t ch) {
-	u8 cp_ch;
+	byte_t cp_ch;
 	if (vga_backlog_scrollpos && !vga_suppress_update)
 		vga_backlog_setscrollpos(0);
-	cp_ch = cp437_encode(ch);
-	if (!cp_ch)
-		cp_ch = '?';
+	cp_ch = vga_state_encode(ch);
 	memsetw(vga_terminal_start,
 	        VGA_CHR(cp_ch),
 	        VGA_WIDTH * VGA_HEIGHT);
@@ -1418,7 +1408,7 @@ NOTHROW(FCALL dbg_fillrect2)(int x, int y, unsigned int size_x, unsigned int siz
 
 PUBLIC ATTR_DBGTEXT void
 NOTHROW(FCALL dbg_hline)(int x, int y, unsigned int size_x, /*utf-32*/ char32_t ch) {
-	u8 cp_ch;
+	byte_t cp_ch;
 	if (vga_backlog_scrollpos && !vga_suppress_update)
 		vga_backlog_setscrollpos(0);
 	if unlikely(!size_x)
@@ -1434,9 +1424,7 @@ NOTHROW(FCALL dbg_hline)(int x, int y, unsigned int size_x, /*utf-32*/ char32_t 
 		size_x -= (unsigned int)x;
 		x = 0;
 	}
-	cp_ch = cp437_encode(ch);
-	if (!cp_ch)
-		cp_ch = '?';
+	cp_ch = vga_state_encode(ch);
 	memsetw(vga_terminal_start +
 	        (unsigned int)x +
 	        (unsigned int)y * VGA_WIDTH,
@@ -1448,7 +1436,7 @@ done:
 
 PUBLIC ATTR_DBGTEXT void
 NOTHROW(FCALL dbg_vline)(int x, int y, unsigned int size_y, /*utf-32*/ char32_t ch) {
-	u8 cp_ch;
+	byte_t cp_ch;
 	unsigned int i;
 	u16 *dst, vga_ch;
 	if (vga_backlog_scrollpos && !vga_suppress_update)
@@ -1466,9 +1454,7 @@ NOTHROW(FCALL dbg_vline)(int x, int y, unsigned int size_y, /*utf-32*/ char32_t 
 		size_y -= (unsigned int)y;
 		y = 0;
 	}
-	cp_ch = cp437_encode(ch);
-	if (!cp_ch)
-		cp_ch = '?';
+	cp_ch = vga_state_encode(ch);
 	vga_ch = VGA_CHR(cp_ch);
 	dst    = vga_terminal_start + (unsigned int)x + (unsigned int)y * VGA_WIDTH;
 	for (i = 0; i < size_y; ++i) {
@@ -1484,7 +1470,7 @@ NOTHROW(FCALL dbg_fillbox)(int x, int y,
                            unsigned int size_x,
                            unsigned int size_y,
                            /*utf-32*/ char32_t ch) {
-	u8 cp_ch;
+	byte_t cp_ch;
 	int x_end, y_end;
 	u16 *screen;
 	if (vga_backlog_scrollpos && !vga_suppress_update)
@@ -1506,9 +1492,7 @@ NOTHROW(FCALL dbg_fillbox)(int x, int y,
 	}
 	screen = vga_terminal_start;
 	screen += y * VGA_WIDTH;
-	cp_ch = cp437_encode(ch);
-	if (!cp_ch)
-		cp_ch = '?';
+	cp_ch = vga_state_encode(ch);
 	if (x == 0 && size_x == VGA_WIDTH) {
 		memsetw(screen, VGA_CHR(cp_ch), (size_t)size_y * VGA_WIDTH);
 	} else {

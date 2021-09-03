@@ -35,6 +35,14 @@ INTDEF NONNULL((1)) unsigned int NOTHROW_KERNEL(CC libvga_state_load)(struct vga
 INTDEF NONNULL((1)) void NOTHROW_KERNEL(CC libvga_state_fini)(struct vga_state const *__restrict self);
 INTDEF unsigned int NOTHROW_KERNEL(CC libvga_state_text)(void);
 
+/* Encode a given unicode character and return the VGA codepage ordinal with
+ * which that character should be represented. As a fallback for glyphs that
+ * don't appear in the VGA codepage, the ordinal of a replacement  character
+ * will be returned instead.
+ * This function also does some internal transliteration in order to provide
+ * more support for similar-looking unicode characters (e.g. ► and ▶) */
+INTDEF ATTR_CONST byte_t NOTHROW(CC libvga_state_encode)(char32_t ch);
+
 DECL_END
 
 #endif /* !GUARD_LIBVGASTATE_VGASTATE_H */
