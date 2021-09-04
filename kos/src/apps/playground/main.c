@@ -83,6 +83,7 @@
 #include <unistd.h>
 
 #include <libansitty/ctl.h>
+#include <libdebuginfo/repr.h>
 #include <libvio/vio.h>
 
 DECL_BEGIN
@@ -950,6 +951,67 @@ int main_charmap(int argc, char *argv[], char *envp[]) {
 
 
 
+/************************************************************************/
+int main_dumpdebug(int argc, char *argv[], char *envp[]) {
+	void *libdebuginfo;
+	void *dlmod;
+	PDEBUG_REPR_DUMP debug_repr_dump;
+	(void)envp;
+	if (argc != 2) {
+		/* FIXME: Compiler error because of ambiguity as a result of
+		 * >> namespace std { }
+		 * >> using namespace std;
+		 * >> __CEIDECLARE_GCCNCX(__ATTR_NORETURN,void,__THROWING,exit,(int __status),{ __builtin_exit(__status); })
+		 * >> namespace std {
+		 * >> __NAMESPACE_GLB_USING_OR_IMPL(exit, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_NORETURN void (__LIBCCALL exit)(int __status) __THROWS(...) { (:: exit)(__status); })
+		 * >> }
+		 *
+		 * Because of the `using namespace std;', there are now 2 symbols `exit' within
+		 * the global namespace. *sigh* (all of this just because of GCC's debug info
+		 * bloat; s.a. https://gcc.gnu.org/bugzilla/show_bug.cgi?id=96417) */
+		/*exit(1);*/
+		return 1;
+	}
+	libdebuginfo = dlopen(LIBDEBUGINFO_LIBRARY_NAME, RTLD_LOCAL);
+	assertf(libdebuginfo, "%s", dlerror());
+	*(void **)&debug_repr_dump = dlsym(libdebuginfo, "debug_repr_dump");
+
+	dlmod = dlopen(argv[1], RTLD_LOCAL);
+	if (!dlmod) {
+		fprintf(stderr, "dumpdebug: dlopen(%q): %s\n", argv[1], dlerror());
+		return 1;
+	}
+	{
+	 	struct dl_section *debug_info   = dllocksection(dlmod, ".debug_info");
+	 	struct dl_section *debug_abbrev = dllocksection(dlmod, ".debug_abbrev");
+	 	struct dl_section *debug_str    = dllocksection(dlmod, ".debug_str");
+	 	struct dl_section *debug_loc    = dllocksection(dlmod, ".debug_loc");
+		size_t debug_info_size;   void *debug_info_data   = dlinflatesection(debug_info, &debug_info_size);
+		size_t debug_abbrev_size; void *debug_abbrev_data = dlinflatesection(debug_abbrev, &debug_abbrev_size);
+		size_t debug_str_size;    void *debug_str_data    = dlinflatesection(debug_str, &debug_str_size);
+		size_t debug_loc_size;    void *debug_loc_data    = dlinflatesection(debug_loc, &debug_loc_size);
+		debug_repr_dump(&file_printer, stdout,
+		                (byte_t const *)debug_info_data,
+		                (byte_t const *)debug_info_data + debug_info_size,
+		                (byte_t const *)debug_abbrev_data,
+		                (byte_t const *)debug_abbrev_data + debug_abbrev_size,
+		                (byte_t const *)debug_loc_data,
+		                (byte_t const *)debug_loc_data + debug_loc_size,
+		                (byte_t const *)debug_str_data,
+		                (byte_t const *)debug_str_data + debug_str_size);
+		dlunlocksection(debug_info);
+		dlunlocksection(debug_abbrev);
+		dlunlocksection(debug_str);
+		dlunlocksection(debug_loc);
+	}
+	dlclose(dlmod);
+	dlclose(libdebuginfo);
+	return 0;
+}
+/************************************************************************/
+
+
+
 typedef int (*FUN)(int argc, char *argv[], char *envp[]);
 typedef struct {
 	char const *n;
@@ -992,6 +1054,7 @@ PRIVATE DEF defs[] = {
 	{ "assert", &main_assert },
 	{ "cc", &main_cc },
 	{ "charmap", &main_charmap },
+	{ "dumpdebug", &main_dumpdebug },
 	/* TODO: On x86_64, add a playground that:
 	 *   - mmap(0x00007ffffffff000, PROT_READ|PROT_WRITE|PROT_EXEC, MAP_ANON|MAP_FIXED);
 	 *   - WRITE(0x00007ffffffffffe, [0x0f, 0x05]); // syscall

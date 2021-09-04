@@ -712,7 +712,11 @@ NOTHROW(KCALL __i386_kernel_main)(struct icpustate *__restrict state) {
 	 * and I don't actually know which ones they are, as moddbx and libdebuginfo are
 	 * able to parse everything and `eval' works as expected.
 	 * However, there really shouldn't be any parsing error at all, so whatever it's
-	 * complaining about shouldn't be happening! */
+	 * complaining about shouldn't be happening!
+	 *
+	 * Interestingly, all of these errors come from the .debug_info of libstdc++, so
+	 * this  may  be related  to debug  info generated  by some  c++-only construct.
+	 */
 
 
 	/* TODO: It looks like moddbx contains reference leaks for `struct module' objects.
