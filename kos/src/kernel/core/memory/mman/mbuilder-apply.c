@@ -313,9 +313,7 @@ mbuilder_termthreads_or_unlock(struct mbuilder *__restrict self,
 	caller     = THIS_TASK;
 	p_rpc_desc = &self->mb_killrpc;
 	was        = PREEMPTION_PUSHOFF();
-#ifndef CONFIG_NO_SMP
-	atomic_lock_acquire_nopr(&target->mm_threadslock);
-#endif /* !CONFIG_NO_SMP */
+	mman_threadslock_acquire_nopr(target);
 
 	/* Allocate missing descriptors */
 	LIST_FOREACH (thread, &target->mm_threads, t_mman_tasks) {
@@ -329,9 +327,7 @@ mbuilder_termthreads_or_unlock(struct mbuilder *__restrict self,
 			                             TASK_RPC_FNORMAL, GFP_ATOMIC);
 			if unlikely(!rpc) {
 				if (result) {
-#ifndef CONFIG_NO_SMP
-					atomic_lock_release(&target->mm_threadslock);
-#endif /* !CONFIG_NO_SMP */
+					mman_threadslock_release_nopr(target);
 					PREEMPTION_POP(was);
 					mbuilder_partlocks_release(self);
 					mman_lock_release(target);
@@ -344,11 +340,12 @@ mbuilder_termthreads_or_unlock(struct mbuilder *__restrict self,
 			}
 			/* Set the next-link to NULL. */
 			rpc->re_next = NULL;
+			if (!result)
+				goto done; /* We lost the locks, so we can't continue to enumerate threads */
 		}
 		p_rpc_desc = &rpc->re_next;
 	}
-	if (!result)
-		goto done;
+	assert(result);
 
 	/* === Pointer of no return:
 	 * Actually send out all of the RPCs to all of the target threads. */
@@ -385,9 +382,7 @@ mbuilder_termthreads_or_unlock(struct mbuilder *__restrict self,
 	}
 
 	/* And with that, all target threads have been killed. */
-#ifndef CONFIG_NO_SMP
-	atomic_lock_release(&target->mm_threadslock);
-#endif /* !CONFIG_NO_SMP */
+	mman_threadslock_release_nopr(target);
 	PREEMPTION_POP(was);
 done:
 	return result;
