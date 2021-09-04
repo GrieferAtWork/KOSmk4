@@ -513,8 +513,11 @@ success:
 		goto success;
 	}
 
-	/* Another CPU is holding the lock. ~try~ to yield. */
-	if (PREEMPTION_ENABLED()) {
+	/* Another CPU is holding the lock. ~try~ to yield.
+	 * NOTE: When the debugger is activated while another CPU holds a lock
+	 *       to the syslog buffer, then  attempting to yield would  result
+	 *       in an exception being thrown. */
+	if (PREEMPTION_ENABLED() && !dbg_active) {
 		task_yield();
 		goto again;
 	}
