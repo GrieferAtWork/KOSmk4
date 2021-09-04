@@ -46,7 +46,7 @@
 #include <stdlib.h>
 #include <string.h>
 
-#include <libdebuginfo/dwarf.h>
+#include <libunwind/dwarf.h>
 #include <libunwind/eh_frame.h>
 #include <libunwind/except.h>
 #include <libunwind/unwind.h>
@@ -114,19 +114,21 @@ DEFINE_PUBLIC_ALIAS(error_subclass, libc_error_subclass);
 /* Exception support. */
 
 /* Dynamically loaded dependencies to libunwind.so */
-INTERN SECTION_EXCEPT_BSS void                                    *pdyn_libunwind = NULL;
-PRIVATE SECTION_EXCEPT_BSS PUNWIND_FDE_FIND                        pdyn_unwind_fde_find = NULL;
-PRIVATE SECTION_EXCEPT_BSS PUNWIND_GETREG_ERROR_REGISTER_STATE     pdyn_unwind_getreg_error_register_state = NULL;
-PRIVATE SECTION_EXCEPT_BSS PUNWIND_SETREG_ERROR_REGISTER_STATE     pdyn_unwind_setreg_error_register_state = NULL;
-PRIVATE SECTION_EXCEPT_BSS PUNWIND_FDE_EXEC                        pdyn_unwind_fde_exec = NULL;
-PRIVATE SECTION_EXCEPT_BSS PUNWIND_CFA_APPLY                       pdyn_unwind_cfa_apply = NULL;
-PRIVATE SECTION_EXCEPT_BSS PUNWIND_FDE_EXEC_CFA                    pdyn_unwind_fde_exec_cfa = NULL;
-PRIVATE SECTION_EXCEPT_BSS PUNWIND_FDE_CALCULATE_CFA               pdyn_unwind_fde_calculate_cfa = NULL;
-PRIVATE SECTION_EXCEPT_BSS PUNWIND_FDE_LANDING_EXEC                pdyn_unwind_fde_landing_exec = NULL;
-PRIVATE SECTION_EXCEPT_BSS PUNWIND_CFA_LANDING_APPLY               pdyn_unwind_cfa_landing_apply = NULL;
+INTERN SECTION_EXCEPT_BSS void /*                          */ *pdyn_libunwind                          = NULL;
+PRIVATE SECTION_EXCEPT_BSS PUNWIND_FDE_FIND /*              */ pdyn_unwind_fde_find                    = NULL;
+PRIVATE SECTION_EXCEPT_BSS PUNWIND_GETREG_ERROR_REGISTER_STATE pdyn_unwind_getreg_error_register_state = NULL;
+PRIVATE SECTION_EXCEPT_BSS PUNWIND_SETREG_ERROR_REGISTER_STATE pdyn_unwind_setreg_error_register_state = NULL;
+PRIVATE SECTION_EXCEPT_BSS PUNWIND_FDE_EXEC /*              */ pdyn_unwind_fde_exec                    = NULL;
+PRIVATE SECTION_EXCEPT_BSS PUNWIND_CFA_APPLY /*             */ pdyn_unwind_cfa_apply                   = NULL;
+PRIVATE SECTION_EXCEPT_BSS PUNWIND_FDE_EXEC_CFA /*          */ pdyn_unwind_fde_exec_cfa                = NULL;
+PRIVATE SECTION_EXCEPT_BSS PUNWIND_FDE_CALCULATE_CFA /*     */ pdyn_unwind_fde_calculate_cfa           = NULL;
+PRIVATE SECTION_EXCEPT_BSS PUNWIND_FDE_LANDING_EXEC /*      */ pdyn_unwind_fde_landing_exec            = NULL;
+PRIVATE SECTION_EXCEPT_BSS PUNWIND_CFA_LANDING_APPLY /*     */ pdyn_unwind_cfa_landing_apply           = NULL;
+PRIVATE SECTION_EXCEPT_BSS PDWARF_DECODE_POINTER /*         */ pdyn_dwarf_decode_pointer               = NULL;
+PRIVATE SECTION_EXCEPT_BSS PDWARF_DECODE_ULEB128 /*         */ pdyn_dwarf_decode_uleb128               = NULL;
 #ifndef CFI_UNWIND_NO_SIGFRAME_COMMON_UNCOMMON_REGISTERS
-PRIVATE SECTION_EXCEPT_BSS PUNWIND_FDE_SIGFRAME_EXEC               pdyn_unwind_fde_sigframe_exec = NULL;
-PRIVATE SECTION_EXCEPT_BSS PUNWIND_CFA_SIGFRAME_APPLY              pdyn_unwind_cfa_sigframe_apply = NULL;
+PRIVATE SECTION_EXCEPT_BSS PUNWIND_FDE_SIGFRAME_EXEC /*     */ pdyn_unwind_fde_sigframe_exec  = NULL;
+PRIVATE SECTION_EXCEPT_BSS PUNWIND_CFA_SIGFRAME_APPLY /*    */ pdyn_unwind_cfa_sigframe_apply = NULL;
 #endif /* !CFI_UNWIND_NO_SIGFRAME_COMMON_UNCOMMON_REGISTERS */
 #define ENSURE_LIBUNWIND_LOADED() \
 	(ATOMIC_READ(pdyn_libunwind) != NULL || (initialize_libunwind(), 0))
@@ -141,6 +143,8 @@ PRIVATE SECTION_EXCEPT_STRING char const name_unwind_fde_exec_cfa[]             
 PRIVATE SECTION_EXCEPT_STRING char const name_unwind_fde_calculate_cfa[]               = "unwind_fde_calculate_cfa";
 PRIVATE SECTION_EXCEPT_STRING char const name_unwind_fde_landing_exec[]                = "unwind_fde_landing_exec";
 PRIVATE SECTION_EXCEPT_STRING char const name_unwind_cfa_landing_apply[]               = "unwind_cfa_landing_apply";
+PRIVATE SECTION_EXCEPT_STRING char const name_dwarf_decode_pointer[]                   = "dwarf_decode_pointer";
+PRIVATE SECTION_EXCEPT_STRING char const name_dwarf_decode_uleb128[]                   = "dwarf_decode_uleb128";
 #ifndef CFI_UNWIND_NO_SIGFRAME_COMMON_UNCOMMON_REGISTERS
 PRIVATE SECTION_EXCEPT_STRING char const name_unwind_fde_sigframe_exec[]  = "unwind_fde_sigframe_exec";
 PRIVATE SECTION_EXCEPT_STRING char const name_unwind_cfa_sigframe_apply[] = "unwind_cfa_sigframe_apply";
@@ -174,6 +178,8 @@ void LIBCCALL initialize_libunwind(void) {
 	BIND(pdyn_unwind_fde_calculate_cfa, name_unwind_fde_calculate_cfa);
 	BIND(pdyn_unwind_fde_landing_exec, name_unwind_fde_landing_exec);
 	BIND(pdyn_unwind_cfa_landing_apply, name_unwind_cfa_landing_apply);
+	BIND(pdyn_dwarf_decode_pointer, name_dwarf_decode_pointer);
+	BIND(pdyn_dwarf_decode_uleb128, name_dwarf_decode_uleb128);
 #ifndef CFI_UNWIND_NO_SIGFRAME_COMMON_UNCOMMON_REGISTERS
 	/* We can substitute the sigframe variants with the regular ones. */
 	*(void **)&pdyn_unwind_fde_sigframe_exec  = dlsym(handle, name_unwind_fde_sigframe_exec);
@@ -206,6 +212,8 @@ err_init_failed:
 #define unwind_cfa_landing_apply           (*pdyn_unwind_cfa_landing_apply)
 #define unwind_fde_sigframe_exec           (*pdyn_unwind_fde_sigframe_exec)
 #define unwind_cfa_sigframe_apply          (*pdyn_unwind_cfa_sigframe_apply)
+#define dwarf_decode_pointer               (*pdyn_dwarf_decode_pointer)
+#define dwarf_decode_uleb128               (*pdyn_dwarf_decode_uleb128)
 
 PRIVATE SECTION_EXCEPT_TEXT void LIBCCALL
 kos_unwind_exception_cleanup(_Unwind_Reason_Code UNUSED(reason),
@@ -251,6 +259,8 @@ libc_gxx_personality_kernexcept(struct _Unwind_Context *__restrict context, bool
 	byte_t const *landingpad, *pc;
 	byte_t const *reader, *callsite_end;
 	size_t callsite_size;
+	ENSURE_LIBUNWIND_LOADED();
+
 	reader     = (byte_t const *)context->uc_fde.f_lsdaaddr;
 	landingpad = (byte_t const *)context->uc_fde.f_pcstart;
 	pc         = (byte_t const *)__ERROR_REGISTER_STATE_TYPE_RDPC(*context->uc_state);

@@ -30,7 +30,11 @@
 #include <stdint.h>
 #include <string.h>
 
-#include <libdebuginfo/dwarf.h>
+#ifdef GUARD_LIBUNWIND_API_H
+#include "dwarf.h"
+#else /* GUARD_LIBUNWIND_API_H */
+#include <libunwind/dwarf.h>
+#endif /* !GUARD_LIBUNWIND_API_H */
 
 DECL_BEGIN
 

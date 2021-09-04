@@ -50,45 +50,6 @@
 
 DECL_BEGIN
 
-#ifndef __KERNEL__
-PRIVATE PUNWIND /*          */ pdyn_unwind           = NULL;
-PRIVATE PUNWIND_FDE_EXEC /* */ pdyn_unwind_fde_exec  = NULL;
-PRIVATE PUNWIND_CFA_APPLY /**/ pdyn_unwind_cfa_apply = NULL;
-#define unwind           (*pdyn_unwind)
-#define unwind_fde_exec  (*pdyn_unwind_fde_exec)
-#define unwind_cfa_apply (*pdyn_unwind_cfa_apply)
-
-INTDEF WUNUSED void *CC dlopen_libunwind(void); /* from "cfi_entry.c" */
-PRIVATE bool CC load_libunwind(void) {
-	void *lu;
-	if (pdyn_unwind)
-		return true;
-	COMPILER_BARRIER();
-	lu = dlopen_libunwind();
-	if unlikely(!lu)
-		goto nope;
-	COMPILER_BARRIER();
-#define LOAD(ptr, name)                               \
-	if ((*(void **)&(ptr) = dlsym(lu, name)) == NULL) \
-		goto nope
-
-	/* Lazily load functions from libunwind. */
-	LOAD(pdyn_unwind_cfa_apply, "unwind_cfa_apply");
-	LOAD(pdyn_unwind_fde_exec, "unwind_fde_exec");
-	COMPILER_WRITE_BARRIER();
-
-	/* Load  this  one last,  as its  used to
-	 * check if libunwind was already loaded. */
-	LOAD(pdyn_unwind, "unwind");
-
-	COMPILER_WRITE_BARRIER();
-#undef LOAD
-	return true;
-nope:
-	return false;
-}
-#endif /* !__KERNEL__ */
-
 
 #ifndef __KERNEL__
 PRIVATE ATTR_NOINLINE NONNULL((2, 4)) unsigned int CC
@@ -160,17 +121,11 @@ libdi_unwind_for_debug(void const *absolute_pc,
                        unwind_getreg_t reg_getter, void const *reg_getter_arg,
                        unwind_setreg_t reg_setter, void *reg_setter_arg) {
 	unsigned int result;
-#ifndef __KERNEL__
-	if (!load_libunwind()) {
-		result = UNWIND_NO_FRAME;
-	} else
-#endif /* !__KERNEL__ */
-	{
-		/* Try the regular unwind(3) function. */
-		result = unwind(absolute_pc,
-		                reg_getter, reg_getter_arg,
-		                reg_setter, reg_setter_arg);
-	}
+
+	/* Try the regular unwind(3) function (from `libunwind.so'). */
+	result = unwind(absolute_pc,
+	                reg_getter, reg_getter_arg,
+	                reg_setter, reg_setter_arg);
 
 	/* Supporting .debug_frame for kernel-space drivers doesn't make any  sense,
 	 * since  the same information  also exists in .eh_frame,  and since the KOS

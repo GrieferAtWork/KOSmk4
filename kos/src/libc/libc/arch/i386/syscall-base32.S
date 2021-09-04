@@ -23,15 +23,16 @@
 
 #include <hybrid/compiler.h>
 
+#include <hybrid/wordbits.h>
+
 #include <asm/cfi.h>
 #include <asm/cpu-cpuid.h>
 #include <asm/instr/ttest.h>
 #include <sys/syscall.h>
 
-#include <hybrid/wordbits.h>
-
 #include <libdebuginfo/dwarf.h>
 #include <libunwind/cfi.h>
+#include <libunwind/dwarf.h>
 
 
 /* ========= __i386_syscall design =========

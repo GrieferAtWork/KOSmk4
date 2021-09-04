@@ -21,9 +21,12 @@
 #define _LIBDEBUGINFO_DEBUG_LINE_H 1
 
 #include "api.h"
-#include "dwarf.h"
+/**/
+
 #include <bits/types.h>
+
 #include <libc/string.h>
+#include <libunwind/dwarf.h>
 
 #define DI_DEBUGLINE_INFO_FNORMAL  0x0000 /* Normal flags */
 #define DI_DEBUGLINE_INFO_FISSTMT  0x0001 /* Part of a statement */

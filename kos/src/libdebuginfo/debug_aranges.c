@@ -38,7 +38,6 @@ if (gcc_opt.removeif([](x) -> x.startswith("-O")))
 #include <stdint.h>
 
 #include <libdebuginfo/debug_aranges.h>
-#include <libdebuginfo/dwarf.h>
 
 #include "debug_aranges.h"
 

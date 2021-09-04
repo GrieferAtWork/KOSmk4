@@ -26,7 +26,7 @@
 #include <bits/crt/format-printer.h>
 #include <bits/types.h>
 
-#include "dwarf.h"
+#include <libunwind/dwarf.h>
 
 #ifdef __CC__
 __DECL_BEGIN

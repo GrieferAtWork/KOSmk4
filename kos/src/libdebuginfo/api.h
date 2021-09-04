@@ -19,6 +19,7 @@
  */
 #ifndef GUARD_LIBDEBUGINFO_API_H
 #define GUARD_LIBDEBUGINFO_API_H 1
+#define LIBUNWIND_WANT_PROTOTYPES 1
 
 #include <__crt.h>
 #include <hybrid/compiler.h>

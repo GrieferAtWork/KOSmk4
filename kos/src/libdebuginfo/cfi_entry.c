@@ -40,6 +40,7 @@
 #include <string.h>
 
 #include <libdebuginfo/cfi_entry.h>
+#include <libdebuginfo/dwarf.h>
 #include <libunwind/cfi.h>
 
 #include "cfi_entry.h"

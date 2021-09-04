@@ -90,7 +90,7 @@ BEGIN
 		__VA_ARGS__                                                   \
 	END
 	DEFINE_SIMPLE_LIBRARY("libcmdline")
-	DEFINE_SIMPLE_LIBRARY("libdebuginfo")
+	DEFINE_SIMPLE_LIBRARY("libdebuginfo", USELIB("libunwind"))
 	DEFINE_SIMPLE_LIBRARY("libdemangle")
 	DEFINE_SIMPLE_LIBRARY("libdisasm")
 	DEFINE_SIMPLE_LIBRARY("libinstrlen")

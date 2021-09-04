@@ -54,9 +54,9 @@
 #include <wait.h>
 
 #include <libcpustate/apply.h> /* cpu_apply_ucpustate() */
-#include <libdebuginfo/dwarf.h>
 #include <libinstrlen/instrlen.h>
 #include <libregdump/x86.h>
+#include <libunwind/dwarf.h>
 #include <libunwind/eh_frame.h>
 #include <libunwind/unwind.h>
 

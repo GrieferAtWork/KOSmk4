@@ -42,6 +42,7 @@ if (gcc_opt.removeif([](x) -> x.startswith("-O")))
 
 #include <libdebuginfo/debug_line.h>
 #include <libdebuginfo/dwarf.h>
+#include <libunwind/dwarf.h>
 
 #include "debug_line.h"
 

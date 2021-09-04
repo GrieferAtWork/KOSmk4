@@ -52,6 +52,7 @@
 #include <libunwind/eh_frame.h>
 
 #include "cfi.h"
+#include "dwarf.h"
 #include "eh_frame.h"
 #include "unwind.h"
 

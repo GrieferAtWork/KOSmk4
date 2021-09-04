@@ -32,8 +32,7 @@
 #include <kos/exec/module.h>
 
 #include <libc/string.h>
-
-#include "dwarf.h"
+#include <libunwind/dwarf.h>
 
 /* Section containers & overlap:
  *

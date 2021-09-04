@@ -21,7 +21,8 @@
 #define _LIBDEBUGINFO_DEBUG_SYMTAB_H 1
 
 #include "api.h"
-#include "dwarf.h"
+/**/
+
 #include <bits/types.h>
 
 

@@ -27,9 +27,6 @@
 
 #include <libunwind/cfi.h> /* unwind_getreg_t, unwind_setreg_t */
 
-#include "dwarf.h"
-
-
 #ifdef __CC__
 __DECL_BEGIN
 

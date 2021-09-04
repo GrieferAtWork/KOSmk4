@@ -21,9 +21,9 @@
 #define _LIBDEBUGINFO_DEBUG_ARANGES_H 1
 
 #include "api.h"
-#include "dwarf.h"
-#include <bits/types.h>
+/**/
 
+#include <bits/types.h>
 
 #ifdef __CC__
 __DECL_BEGIN

@@ -28,7 +28,7 @@
 
 #include <format-printer.h>
 
-#include <libdebuginfo/dwarf.h>
+#include <libunwind/dwarf.h>
 #include <libdebuginfo/repr.h>
 
 DECL_BEGIN

@@ -39,11 +39,11 @@
 #include <malloc.h>
 #include <string.h>
 
-#include <libdebuginfo/dwarf.h>
 #include <libunwind/cfi.h>
 #include <libunwind/eh_frame.h>
 
 #include "cfi.h"
+#include "dwarf.h"
 #include "eh_frame.h"
 
 #ifndef __KERNEL__

@@ -81,10 +81,13 @@ local ns = {
 
 for (local macroName, macroValue: enumerateMacrosFromFiles({
 	"../../include/libdebuginfo/dwarf.h",
+	"../../include/libunwind/dwarf.h",
 	"../../include/libunwind/cfi.h",
 })) {
 	macroValue = getMacroIntValue(macroValue);
 	if (macroValue !is int)
+		continue;
+	if (macroName.startswith("DW_CFA_register_rule_"))
 		continue;
 	for (local prefix, values: ns) {
 		if (!macroName.startswith(prefix))
@@ -158,32 +161,32 @@ PRIVATE REPR_RODATASECTION char const repr_DW_AT_0h[] =
 "ility\0address_class\0artificial\0base_types\0calling_convention\0cou"
 "nt\0data_member_location\0decl_column\0decl_file\0decl_line\0declarat"
 "ion\0discr_list\0encoding\0external\0frame_base\0friend\0identifier_ca"
-"se\0macro_info\0namelist_item\0priority\0segment\0specification\0stati"
-"c_link\0type\0use_location\0variable_parameter\0virtuality\0vtable_el"
-"em_location\0allocated\0associated\0data_location\0byte_stride\0entry"
-"_pc\0use_UTF8\0extension\0ranges\0trampoline\0call_column\0call_file\0c"
-"all_line\0description\0binary_scale\0decimal_scale\0small\0decimal_si"
-"gn\0digit_count\0picture_string\0mutable\0threads_scaled\0explicit\0ob"
-"ject_pointer\0endianity\0elemental\0pure\0recursive\0signature\0main_s"
-"ubprogram\0data_bit_offset\0const_expr\0enum_class\0linkage_name\0str"
-"ing_length_bit_size\0string_length_byte_size\0rank\0str_offsets_bas"
-"e\0addr_base\0rnglists_base\0\0dwo_name\0reference\0rvalue_reference\0m"
-"acros\0call_all_calls\0call_all_source_calls\0call_all_tail_calls\0c"
-"all_return_pc\0call_value\0call_origin\0call_parameter\0call_pc\0call"
-"_tail_call\0call_target\0call_target_clobbered\0call_data_location\0"
-"call_data_value\0noreturn\0alignment\0export_symbols\0deleted\0defaul"
-"ted\0loclists_base";
+"se\0macro_info\0namelist_items\0priority\0segment\0specification\0stat"
+"ic_link\0type\0use_location\0variable_parameter\0virtuality\0vtable_e"
+"lem_location\0allocated\0associated\0data_location\0byte_stride\0entr"
+"y_pc\0use_UTF8\0extension\0ranges\0trampoline\0call_column\0call_file\0"
+"call_line\0description\0binary_scale\0decimal_scale\0small\0decimal_s"
+"ign\0digit_count\0picture_string\0mutable\0threads_scaled\0explicit\0o"
+"bject_pointer\0endianity\0elemental\0pure\0recursive\0signature\0main_"
+"subprogram\0data_bit_offset\0const_expr\0enum_class\0linkage_name\0st"
+"ring_length_bit_size\0string_length_byte_size\0rank\0str_offsets_ba"
+"se\0addr_base\0rnglists_base\0\0dwo_name\0reference\0rvalue_reference\0"
+"macros\0call_all_calls\0call_all_source_calls\0call_all_tail_calls\0"
+"call_return_pc\0call_value\0call_origin\0call_parameter\0call_pc\0cal"
+"l_tail_call\0call_target\0call_target_clobbered\0call_data_location"
+"\0call_data_value\0noreturn\0alignment\0export_symbols\0deleted\0defau"
+"lted\0loclists_base";
 PRIVATE REPR_RODATASECTION char const repr_DW_AT_2000h[] =
-"HP_block_index\0HP_unmodifiable\0MIPS_loop_begin\0MIPS_tail_loop_be"
-"gin\0MIPS_epilog_begin\0HP_prologue\0MIPS_software_pipeline_depth\0M"
-"IPS_linkage_name\0HP_epilogue\0MIPS_abstract_name\0MIPS_clone_origi"
-"n\0MIPS_has_inlines\0MIPS_stride_byte\0MIPS_stride_elem\0MIPS_ptr_do"
-"petype\0MIPS_allocatable_dopetype\0HP_actuals_stmt_list\0HP_proc_pe"
-"r_section\0HP_raw_data_ptr\0HP_pass_by_reference\0HP_opt_level\0HP_p"
-"rof_version_id\0HP_opt_flags\0HP_cold_region_low_pc\0HP_cold_region"
-"_high_pc\0HP_all_variables_modifiable\0HP_linkage_name\0HP_prof_fla"
-"gs\0\0\0\0HP_unit_name\0HP_unit_size\0HP_widened_byte_size\0HP_definiti"
-"on_points\0HP_default_location\0\0\0\0\0\0HP_is_result_param";
+"HP_block_index\0MIPS_fde\0MIPS_loop_begin\0MIPS_tail_loop_begin\0MIP"
+"S_epilog_begin\0MIPS_loop_unroll_factor\0MIPS_software_pipeline_de"
+"pth\0MIPS_linkage_name\0HP_epilogue\0MIPS_abstract_name\0MIPS_clone_"
+"origin\0MIPS_has_inlines\0MIPS_stride_byte\0MIPS_stride_elem\0MIPS_p"
+"tr_dopetype\0MIPS_allocatable_dopetype\0HP_actuals_stmt_list\0MIPS_"
+"assumed_size\0HP_raw_data_ptr\0HP_pass_by_reference\0HP_opt_level\0H"
+"P_prof_version_id\0HP_opt_flags\0HP_cold_region_low_pc\0HP_cold_reg"
+"ion_high_pc\0HP_all_variables_modifiable\0HP_linkage_name\0HP_prof_"
+"flags\0\0\0\0HP_unit_name\0HP_unit_size\0HP_widened_byte_size\0HP_defin"
+"ition_points\0HP_default_location\0\0\0\0\0\0HP_is_result_param";
 PRIVATE REPR_RODATASECTION char const repr_DW_AT_2101h[] =
 "sf_names\0src_info\0mac_info\0src_coords\0body_begin\0body_end\0GNU_ve"
 "ctor\0GNU_guarded_by\0GNU_pt_guarded_by\0GNU_guarded\0GNU_pt_guarded"
