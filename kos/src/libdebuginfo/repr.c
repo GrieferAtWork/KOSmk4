@@ -27,12 +27,12 @@ if (gcc_opt.removeif([](x) -> x.startswith("-O")))
 #define _KOS_SOURCE 1
 #define DISABLE_BRANCH_PROFILING 1 /* Don't profile this file */
 
-#include "repr.h"
-
 #include "api.h"
 
+#ifndef __KERNEL__
 #include <hybrid/compiler.h>
 
+#include <ctype.h>
 #include <inttypes.h>
 #include <stdbool.h>
 #include <stddef.h>
@@ -45,9 +45,11 @@ if (gcc_opt.removeif([](x) -> x.startswith("-O")))
 
 #include "debug_info.h"
 
+/**/
+#include "repr.h"
+
 DECL_BEGIN
 
-#ifndef __KERNEL__
 /* !!!This file should be optimized for size as much as possible!!!
  *
  * Encode strings in this file using `strend()^INDEX' encoding,
@@ -379,26 +381,21 @@ NOTHROW(CC libdi_debug_repr_DW_EH_PE)(uint8_t value) {
 
 INTDEF char const unknown_string[];
 
-/* Dump the given debug information in a human-readable format to `printer'
- * >>  {
- * >>   void *m = dlopen(LIBDEBUGINFO_LIBRARY_NAME, RTLD_LOCAL);
- * >> #define LOAD(T, x) T x; *(void **)&x = dlsym(m, #x); assertf(x, "Error: %s", dlerror());
- * >>   LOAD(PDEBUG_REPR_DUMP, debug_repr_dump)
- * >>   struct dl_section *debug_info   = dllocksection(dlgetmodule("c"), ".debug_info");
- * >>   struct dl_section *debug_abbrev = dllocksection(dlgetmodule("c"), ".debug_abbrev");
- * >>   struct dl_section *debug_str    = dllocksection(dlgetmodule("c"), ".debug_str");
- * >>   struct dl_section *debug_loc    = dllocksection(dlgetmodule("c"), ".debug_loc");
- * >>   debug_repr_dump(&file_printer, stdout,
- * >>                   (byte_t const *)(debug_info ? debug_info->ds_data : NULL),
- * >>                   (byte_t const *)(debug_info ? debug_info->ds_data + debug_info->ds_size : 0),
- * >>                   (byte_t const *)(debug_abbrev ? debug_abbrev->ds_data : NULL),
- * >>                   (byte_t const *)(debug_abbrev ? debug_abbrev->ds_data + debug_abbrev->ds_size : 0),
- * >>                   (byte_t const *)(debug_str ? debug_str->ds_data : NULL),
- * >>                   (byte_t const *)(debug_str ? debug_str->ds_data + debug_str->ds_size : 0),
- * >>                   (byte_t const *)(debug_loc ? debug_loc->ds_data : NULL),
- * >>                   (byte_t const *)(debug_loc ? debug_loc->ds_data + debug_loc->ds_size : 0));
- * >>  }
-*/
+/* Dump the given debug information in a human-readable format to `printer':
+ * >> void *dump_module = dlgetmodule("libc");
+ * >> size_t debug_info_size, debug_abbrev_size, debug_str_size, debug_loc_size;
+ * >> byte_t const *debug_info_data, *debug_abbrev_data, *debug_str_data, *debug_loc_data;
+ * >> PDEBUG_REPR_DUMP debug_repr_dump;
+ * >> *(void **)&debug_repr_dump = dlsym(dlopen(LIBDEBUGINFO_LIBRARY_NAME, RTLD_LOCAL), "debug_repr_dump");
+ * >> debug_info_data   = (byte_t const *)dlinflatesection(dllocksection(dump_module, ".debug_info"), &debug_info_size);
+ * >> debug_abbrev_data = (byte_t const *)dlinflatesection(dllocksection(dump_module, ".debug_abbrev"), &debug_abbrev_size);
+ * >> debug_str_data    = (byte_t const *)dlinflatesection(dllocksection(dump_module, ".debug_str"), &debug_str_size);
+ * >> debug_loc_data    = (byte_t const *)dlinflatesection(dllocksection(dump_module, ".debug_loc"), &debug_loc_size);
+ * >> debug_repr_dump(&file_printer, stdout,
+ * >>                 debug_info_data, debug_info_data + debug_info_size,
+ * >>                 debug_abbrev_data, debug_abbrev_data + debug_abbrev_size,
+ * >>                 debug_loc_data, debug_loc_data + debug_loc_size,
+ * >>                 debug_str_data, debug_str_data + debug_str_size); */
 INTERN REPR_TEXTSECTION NONNULL((1)) ssize_t CC
 libdi_debug_repr_dump(pformatprinter printer, void *arg,
                       byte_t const *debug_info_start, byte_t const *debug_info_end,
@@ -407,9 +404,11 @@ libdi_debug_repr_dump(pformatprinter printer, void *arg,
                       byte_t const *debug_str_start, byte_t const *debug_str_end) {
 	ssize_t temp, result = 0;
 	char const *s;
+	byte_t const *debug_info_iter;
 	di_debuginfo_cu_parser_t parser;
 	di_debuginfo_cu_abbrev_t abbrev;
 	di_debuginfo_cu_parser_sections_t cu_sections;
+	debug_info_iter                    = debug_info_start;
 	cu_sections.cps_debug_abbrev_start = debug_abbrev_start;
 	cu_sections.cps_debug_abbrev_end   = debug_abbrev_end;
 	cu_sections.cps_debug_loc_start    = debug_loc_start;
@@ -423,12 +422,13 @@ libdi_debug_repr_dump(pformatprinter printer, void *arg,
 		result += temp;                  \
 	} __WHILE0
 #define PRINT(s) DO((*printer)(arg, REPR_STRING(s), COMPILER_STRLEN(s)))
-	while (libdi_debuginfo_cu_parser_loadunit(&debug_info_start, debug_info_end,
+	while (libdi_debuginfo_cu_parser_loadunit(&debug_info_iter, debug_info_end,
 	                                          &cu_sections, &parser,
 	                                          &abbrev, NULL) == DEBUG_INFO_ERROR_SUCCESS) {
 		do {
 			DO(format_repeat(printer, arg, '\t', parser.dup_child_depth));
-			DO(format_printf(printer, arg, REPR_STRING("%#p:"), parser.dup_cu_info_pos));
+			DO(format_printf(printer, arg, REPR_STRING("%#p:"),
+			                 parser.dup_cu_info_pos - debug_info_start));
 			s = libdi_debug_repr_DW_TAG(parser.dup_comp.dic_tag);
 			DO(s ? format_printf(printer, arg, REPR_STRING("DW_TAG_%s:\n"), s)
 			     : format_printf(printer, arg, REPR_STRING("%#" PRIxPTR ":\n"), (uintptr_t)parser.dup_comp.dic_tag));
@@ -499,11 +499,67 @@ libdi_debug_repr_dump(pformatprinter printer, void *arg,
 					if unlikely(!libdi_debuginfo_cu_parser_next(&p2)) {
 						PRINT("<BAD REFERENCE>");
 					} else {
-						DO(format_printf(printer, arg, REPR_STRING("%#p:"), p2.dup_cu_info_pos));
+						DO(format_printf(printer, arg, REPR_STRING("%#p:"),
+						                 p2.dup_cu_info_pos - debug_info_start));
 						s = libdi_debug_repr_DW_TAG(p2.dup_comp.dic_tag);
 						DO(s ? format_printf(printer, arg, REPR_STRING("DW_TAG_%s"), s)
-						     : format_printf(printer, arg, REPR_STRING("%#" PRIxPTR), (uintptr_t)p2.dup_comp.dic_tag));
+						     : format_printf(printer, arg, REPR_STRING("%#" PRIxPTR),
+						                     (uintptr_t)p2.dup_comp.dic_tag));
 					}
+				}	break;
+
+				case DW_FORM_block:
+				case DW_FORM_block1:
+				case DW_FORM_block2:
+				case DW_FORM_block4: {
+#define MAX_BLOCK_LINE_LENGTH 32
+					di_debuginfo_block_t block;
+					if (!libdi_debuginfo_cu_parser_getblock(&parser, attr.dica_form, &block))
+						goto err_bad_value;
+					if (block.b_size == 0) {
+						PRINT("{}");
+					} else {
+						int digits;
+						size_t offset = 0;
+						PRINT("{\n");
+						if (block.b_size > 0xffff)
+							digits = 8;
+						else if (block.b_size > 0xff)
+							digits = 4;
+						else {
+							digits = 2;
+						}
+						while (block.b_size) {
+							size_t i, linelen;
+							char repr[MAX_BLOCK_LINE_LENGTH];
+							DO(format_repeat(printer, arg, '\t', parser.dup_child_depth + 2));
+							linelen = block.b_size;
+							if (linelen > MAX_BLOCK_LINE_LENGTH)
+								linelen = MAX_BLOCK_LINE_LENGTH;
+							DO(format_printf(printer, arg, REPR_STRING("%.*" PRIxSIZ ":"),
+							                 digits, offset));
+							for (i = 0; i < linelen; ++i)
+								DO(format_printf(printer, arg, REPR_STRING(" %.2" PRIX8), block.b_addr[i]));
+							i = 1;
+							if (linelen < MAX_BLOCK_LINE_LENGTH && offset != 0)
+								i += MAX_BLOCK_LINE_LENGTH - linelen;
+							DO(format_repeat(printer, arg, ' ', i * 3));
+							for (i = 0; i < linelen; ++i) {
+								char ch = (char)block.b_addr[i];
+								if (!isprint(ch))
+									ch = '.';
+								repr[i] = ch;
+							}
+							DO((*printer)(arg, repr, linelen));
+							block.b_addr += linelen;
+							block.b_size -= linelen;
+							offset += linelen;
+							PRINT("\n");
+						}
+						DO(format_repeat(printer, arg, '\t', parser.dup_child_depth + 1));
+						PRINT("}");
+					}
+#undef MAX_BLOCK_LINE_LENGTH
 				}	break;
 
 				case DW_FORM_exprloc: {
@@ -542,11 +598,7 @@ DEFINE_PUBLIC_ALIAS(debug_repr_DW_CFA, libdi_debug_repr_DW_CFA);
 DEFINE_PUBLIC_ALIAS(debug_repr_DW_EH_PE, libdi_debug_repr_DW_EH_PE);
 DEFINE_PUBLIC_ALIAS(debug_repr_dump, libdi_debug_repr_dump);
 
-
-#undef CASE
-#endif /* __KERNEL__ */
-
-
 DECL_END
+#endif /* __KERNEL__ */
 
 #endif /* !GUARD_LIBDEBUGINFO_REPR_C */
