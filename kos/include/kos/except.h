@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x9f570e8a */
+/* HASH CRC-32:0xd2a146d7 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -325,10 +325,28 @@ __LIBC __ATTR_NONNULL((1)) void __NOTHROW(__ERROR_NESTING_END_CC error_nesting_e
  *       project... */
 #ifndef __TRY
 #define __TRY    try
-#endif /* !__TRY */
-#ifndef __EXCEPT
 #define __EXCEPT catch(...)
-#endif /* !__EXCEPT */
+#endif /* !__TRY */
+
+/* Using NOTHROW_BEGIN ... NOTHROW_END, you can construct blocks of code
+ * that will trigger undefined behavior  if they cause an exception.  In
+ * debug-mode,  this undefined behavior includes panic/coredump, similar
+ * to when an exception is propagated through a NOTHROW function. */
+#ifndef __NOTHROW_BEGIN
+#ifndef NDEBUG
+#define __NOTHROW_BEGIN do try
+#define __NOTHROW_END   catch(...) { __builtin_unreachable(); } __WHILE0
+#else /* !NDEBUG */
+/* Sadly, GCC doesn't see the optimization potential when  encountering
+ * a catch-block that consists of nothing but `__builtin_unreachable()'
+ *
+ * It should be obvious that such a construct could be optimized into
+ * a section of code that can be considered as NOTHROW, similar to an
+ * inline function declared as NOTHROW. */
+#define __NOTHROW_BEGIN do
+#define __NOTHROW_END   __WHILE0
+#endif /* NDEBUG */
+#endif /* !__NOTHROW_BEGIN */
 
 /* Nested exception support */
 #if defined(__error_nesting_begin_defined) && defined(__error_nesting_end_defined)
@@ -366,6 +384,12 @@ public:
 #if !defined(NESTED_EXCEPTION) && defined(__NESTED_EXCEPTION)
 #define NESTED_EXCEPTION __NESTED_EXCEPTION
 #endif /* !NESTED_EXCEPTION && __NESTED_EXCEPTION */
+#if !defined(NOTHROW_BEGIN) && defined(__NOTHROW_BEGIN)
+#define NOTHROW_BEGIN __NOTHROW_BEGIN
+#endif /* !NOTHROW_BEGIN && __NOTHROW_BEGIN */
+#if !defined(NOTHROW_END) && defined(__NOTHROW_END)
+#define NOTHROW_END __NOTHROW_END
+#endif /* !NOTHROW_END && __NOTHROW_END */
 
 
 #ifndef __INTELLISENSE__
