@@ -3141,9 +3141,8 @@ kernel_do_execveat(/*in|out*/ struct execargs *__restrict args) {
 			              args->ea_xdentry->de_namelen,
 			              &format_sprintf_printer,
 			              &dst);
-			*dst = '\0';
 			assert(dst == buf + reglen);
-			*dst = 0;
+			*dst = '\0';
 			/* Execute the specified program. */
 			kernel_do_execveat_impl(args);
 			{

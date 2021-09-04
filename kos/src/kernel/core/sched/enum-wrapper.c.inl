@@ -356,7 +356,7 @@ NOTHROW(FCALL LOCAL_task_list)(struct task_list_buffer *__restrict buf
 	data.el_used_task    = 0;
 	data.el_used_taskpid = 0;
 	LOCAL_task_enum_nb(&task_enum_list_cb,
-	                  &data LOCAL_EXTRA__ARGS);
+	                   &data LOCAL_EXTRA__ARGS);
 	__builtin_assume(data.el_buf == buf);
 	if likely(data.el_used_task <= buf->tlb_task_len &&
 	          data.el_used_taskpid <= buf->tlb_taskpid_len) {

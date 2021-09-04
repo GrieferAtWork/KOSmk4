@@ -371,14 +371,20 @@ NOTHROW(FCALL task_destroy_raw_impl)(Toblockop(mman) *__restrict _lop,
 	assert((self->t_flags & TASK_FTERMINATED) || !(self->t_flags & TASK_FSTARTED));
 
 	/* Unlink + unmap the trampoline node. */
+	if unlikely(LIST_ISBOUND(&FORTASK(self, this_trampoline_node), mn_writable))
+		LIST_REMOVE(&FORTASK(self, this_trampoline_node), mn_writable);
 	mman_mappings_removenode(&mman_kernel, &FORTASK(self, this_trampoline_node));
 	addr = mnode_getaddr(&FORTASK(self, this_trampoline_node));
 	pagedir_unmapone(addr);
 	mman_supersyncone(addr);
 	pagedir_kernelunprepareone(addr);
 #ifdef CONFIG_HAVE_KERNEL_STACK_GUARD
+	if unlikely(LIST_ISBOUND(&FORTASK(self, this_kernel_stackguard_), mn_writable))
+		LIST_REMOVE(&FORTASK(self, this_kernel_stackguard_), mn_writable);
 	mman_mappings_removenode(&mman_kernel, &FORTASK(self, this_kernel_stackguard_));
 #endif /* CONFIG_HAVE_KERNEL_STACK_GUARD */
+	if unlikely(LIST_ISBOUND(&FORTASK(self, this_kernel_stacknode_), mn_writable))
+		LIST_REMOVE(&FORTASK(self, this_kernel_stacknode_), mn_writable);
 	mman_mappings_removenode(&mman_kernel, &FORTASK(self, this_kernel_stacknode_));
 	addr = mnode_getaddr(&FORTASK(self, this_kernel_stacknode_));
 	size = mnode_getsize(&FORTASK(self, this_kernel_stacknode_));

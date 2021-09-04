@@ -3813,6 +3813,13 @@ again_find_nodes:
 				 * Otherwise, we'd be unable to unmap them as NOTHROW! */
 				assert(node->mn_flags & MNODE_F_MPREPARED);
 
+				/* If necessary, remove from the list of writable nodes.
+				 * This list is a no-op for kernel-space, but must still
+				 * be kept a valid linked  list (and not contain bad  or
+				 * dangling pointers) */
+				if unlikely(LIST_ISBOUND(node, mn_writable))
+					LIST_REMOVE(node, mn_writable);
+
 				/* Must get rid of this node! */
 				mman_mappings_removenode(&mman_kernel, node);
 

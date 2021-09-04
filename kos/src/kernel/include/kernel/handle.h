@@ -422,6 +422,14 @@ FUNDEF ATTR_MALLOC ATTR_RETNONNULL REF struct handle_manager *KCALL
 handle_manager_clone(struct handle_manager *__restrict self)
 		THROWS(E_BADALLOC, E_WOULDBLOCK);
 
+#ifdef NDEBUG
+#define handle_manager_assert_integrity(self) (void)0
+#else /* NDEBUG */
+FUNDEF NONNULL((1)) void FCALL
+handle_manager_assert_integrity(struct handle_manager *__restrict self);
+#endif /* !NDEBUG */
+
+
 /* The handle manager of the kernel itself. */
 DATDEF struct handle_manager handle_manager_kernel;
 

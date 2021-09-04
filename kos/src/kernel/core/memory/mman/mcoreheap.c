@@ -427,6 +427,15 @@ NOTHROW(FCALL mcoreheap_try_merge_nodes)(struct mnode *__restrict lo,
 	lo->mn_maxaddr = hi->mn_maxaddr;
 	lopart->mp_maxaddr += mnode_getsize(hi);
 	mman_mappings_insert(&mman_kernel, lo);
+
+	/* `hi' isn't re-inserted, so we must ensure that it  doesn't
+	 * continue to linger within the list of writable nodes. This
+	 * list  is a  no-op for the  kernel mman, but  must still be
+	 * kept valid and  not end up  containing dangling  pointers.
+	 * Otherwise, we might end up with memory corruptions. */
+	if unlikely(LIST_ISBOUND(hi, mn_writable))
+		LIST_REMOVE(hi, mn_writable);
+
 	/* Destroy the existing mapping. */
 	mcoreheap_free_locked(container_of(hipart, union mcorepart, mcp_part));
 	mcoreheap_free_locked(container_of(hi, union mcorepart, mcp_node));

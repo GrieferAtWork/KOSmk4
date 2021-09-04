@@ -64,8 +64,8 @@ LOCAL_FUNC(elf_exec_impl)(/*in|out*/ struct execargs *__restrict args)
 		mbuilder_init(&builder);
 		TRY {
 			bool need_dyn_linker = false;
-			linker_base = (UNCHECKED void *)-1;
 			LOCAL_ElfW(Half) i;
+			linker_base = (UNCHECKED void *)-1;
 			/* Read the program segment header table into memory. */
 			inode_readall(args->ea_xnode,
 			              phdr_vector,

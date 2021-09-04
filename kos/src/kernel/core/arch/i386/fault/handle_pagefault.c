@@ -1037,7 +1037,7 @@ decref_part_and_pop_connections_and_set_exception_pointers:
 
 		/* If write-access was granted, add the node to the list of writable nodes. */
 		if ((perm & PAGEDIR_PROT_WRITE) && !LIST_ISBOUND(mf.mfl_node, mn_writable))
-		    LIST_INSERT_HEAD(&mf.mfl_mman->mm_writable, mf.mfl_node, mn_writable);
+			LIST_INSERT_HEAD(&mf.mfl_mman->mm_writable, mf.mfl_node, mn_writable);
 
 		/* Sync the newly mapped address range if the mapping was created  with
 		 * write  permissions. Technically, we'd only need to sync if a mapping

@@ -454,10 +454,14 @@ NOTHROW(KCALL cpu_destroy)(struct cpu *__restrict self) {
 	/* Remove the #DF and IDLE stack nodes from the kernel VM */
 	while (!mman_lock_tryacquire(&mman_kernel))
 		task_pause();
+	assert(!LIST_ISBOUND(&FORCPU(self, thiscpu_x86_dfstacknode_), mn_writable));
+	assert(!LIST_ISBOUND(&FORCPU(self, this_kernel_stacknode_), mn_writable));
+	assert(!LIST_ISBOUND(&FORCPU(self, this_trampoline_node_), mn_writable));
 	mman_mappings_removenode(&mman_kernel, &FORCPU(self, thiscpu_x86_dfstacknode_));
 	mman_mappings_removenode(&mman_kernel, &FORTASK(myidle, this_kernel_stacknode_));
 	mman_mappings_removenode(&mman_kernel, &FORTASK(myidle, this_trampoline_node_));
 #ifdef CONFIG_HAVE_KERNEL_STACK_GUARD
+	assert(!LIST_ISBOUND(&FORCPU(self, this_kernel_stackguard_), mn_writable));
 	mman_mappings_removenode(&mman_kernel, &FORTASK(myidle, this_kernel_stackguard_));
 #endif /* CONFIG_HAVE_KERNEL_STACK_GUARD */
 	mman_lock_release(&mman_kernel);

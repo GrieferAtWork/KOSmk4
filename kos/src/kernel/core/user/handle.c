@@ -71,7 +71,7 @@ DECL_BEGIN
 #ifdef NDEBUG
 #define handle_manager_assert_integrity(self) (void)0
 #else /* NDEBUG */
-PRIVATE ATTR_NOINLINE void FCALL
+PUBLIC ATTR_NOINLINE NONNULL((1)) void FCALL
 handle_manager_assert_integrity(struct handle_manager *__restrict self) {
 	unsigned int i, counted, counted_cloexec, counted_clofork;
 	if (self->hm_mode == HANDLE_MANAGER_MODE_HASHVECTOR) {

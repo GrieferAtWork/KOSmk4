@@ -477,6 +477,8 @@ PRIVATE void KCALL clear_heap(void) {
 		pred->sh_next = NULL;
 
 		/* Remove the node. */
+		if unlikely(LIST_ISBOUND(&pred->sh_node, mn_writable))
+			LIST_REMOVE(&pred->sh_node, mn_writable);
 		mman_mappings_removenode(&mman_kernel, &pred->sh_node);
 
 		/* Free this heap extension. */

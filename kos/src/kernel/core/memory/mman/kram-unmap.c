@@ -491,6 +491,16 @@ NOTHROW(FCALL mman_unmap_mpart_subregion)(struct mnode *__restrict node,
 	assert(LIST_FIRST(mpart_getnodlst_from_mnodeflags(part, node->mn_flags)) == node);
 	assert(LIST_NEXT(node, mn_link) == NULL);
 
+	/* Even though it's not required, mem-nodes within the kernel mman are allowed
+	 * to  be linked into the writable list. When they are, we have to remove them
+	 * from  said list if we intend to unmap  them. For this purpose we don't have
+	 * to  re-add the node when `mman_mappings_insert()' is called, but to prevent
+	 * memory corruption, we do have to remove it and prevent bogus pointers  from
+	 * appearing  inside the  kernel mman's  writable list  (which could otherwise
+	 * result in memory corruption). */
+	if unlikely(LIST_ISBOUND(node, mn_writable))
+		LIST_UNBIND(node, mn_writable);
+
 	unmap_size = (size_t)(unmap_maxaddr - unmap_minaddr) + 1;
 	freefun    = mpart_getfreefun(part);
 
@@ -1341,6 +1351,13 @@ NOTHROW(FCALL mman_unmap_kram_locked_ex)(struct mman_unmap_kram_job *__restrict 
 			}
 #endif /* ARCH_PAGEDIR_NEED_PERPARE_FOR_KERNELSPACE */
 
+			/* Make sure the node isn't apart of the kernel mman's writable list!
+			 * Said list doesn't need  to be correct in  that it doesn't have  to
+			 * contain  all writable  nodes, however we  must still keep  it as a
+			 * valid  list, and if  we were to delete  `node' without removing it
+			 * first, it could  result in bogus  pointers and memory  corruption. */
+			if unlikely(LIST_ISBOUND(node, mn_writable))
+				LIST_UNBIND(node, mn_writable);
 			mman_mappings_removenode(&mman_kernel, node);
 			ATOMIC_OR(node->mn_flags, MNODE_F_UNMAPPED);
 

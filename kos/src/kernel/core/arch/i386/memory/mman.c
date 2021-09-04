@@ -579,6 +579,8 @@ INTDEF byte_t __kernel_pfree_numpages[];
 INTERN ATTR_SECTION(".text.xdata.x86.free_unloader") ATTR_NORETURN
 void KCALL x86_kernel_unload_free_and_jump_to_userspace(void) {
 #if 1
+	if unlikely(LIST_ISBOUND(&x86_kernel_free_mnode, mn_writable))
+		LIST_REMOVE(&x86_kernel_free_mnode, mn_writable);
 	mman_mappings_removenode(&mman_kernel, &x86_kernel_free_mnode);
 
 	/* Unmap the entire .free section (in the kernel page directory)
