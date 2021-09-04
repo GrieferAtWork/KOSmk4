@@ -810,9 +810,9 @@ nope:
  * If they don't, then this function will cause an assertion failure! */
 PUBLIC WUNUSED NONNULL((1)) bool FCALL
 mpart_load_or_unlock(struct mpart *__restrict self,
-                         struct unlockinfo *unlock,
-                         mpart_reladdr_t partrel_offset,
-                         size_t num_bytes)
+                     struct unlockinfo *unlock,
+                     mpart_reladdr_t partrel_offset,
+                     size_t num_bytes)
 		THROWS(E_WOULDBLOCK, E_BADALLOC) {
 	size_t i;
 	struct mfile *file = self->mp_file;

@@ -650,6 +650,37 @@ NOTHROW(KCALL __i386_kernel_main)(struct icpustate *__restrict state) {
 
 	/* TODO: Add a KOS-specific libcrypt */
 
+	/* FIXME: There is a design flaw in how the builtin debugger behaves when
+	 *        entered while another thread is currently initializing parts of
+	 *        a mem-part.
+	 * When this happens, said part contains `MPART_BLOCK_ST_INIT' blocks, but
+	 * those blocks won't actually end up being properly initialized until the
+	 * debugger is exited once again and the thread that was doing the init is
+	 * allowed to finish.
+	 * However, if the debugger ends up accessing that same region of memory,
+	 * it will begin to wait for the initialization to be completed or aborted,
+	 * neither of which will ever happen since the thread that is responsible
+	 * is currently suspended.
+	 *
+	 * Solution: alter `mo_loadblocks' and `mo_saveblocks' such that they will
+	 * return immediately but take an aio_handle that is invoked asynchronously
+	 * once initialization is completed. That callback could then be made to
+	 * undo the `MPART_BLOCK_ST_INIT' status and broadcast the finish signal.
+	 * After all: async stuff continues to work within the debugger!
+	 * Problem: This would still leave a race when the debugger is entered before
+	 *          the async job is started, but after INIT states have been set.
+	 *          Admittedly, this is a small time frame, but it could happen and
+	 *          would result in the same deadlock scenario that's happening at
+	 *          the moment already.
+	 *
+	 * Functions that set (and eventually clear) `MPART_BLOCK_ST_INIT':
+	 *   - mpart_memload_and_unlock   (Blocking call is `file->mf_ops->mo_loadblocks')
+	 *   - mpart_hinted_mmap          (Unaffected; is NOBLOCK+NOPREEMPT; iow: debugger can't be entered in here)
+	 *   - mpart_setcore_or_unlock    (Blocking call is `setcore_ex_load_from_swap()')
+	 *   - mpart_load_or_unlock       (Blocking call is `file->mf_ops->mo_loadblocks')
+	 *   - mpart_sync_impl            (Blocking call is `file->mf_ops->mo_saveblocks')
+	 *
+	 */
 
 	/* TODO: (the problem isn't the coredump, but the errors in .debug_info parsing!)
 Coredump /bin/playground tid:13
