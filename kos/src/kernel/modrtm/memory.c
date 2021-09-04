@@ -1403,7 +1403,7 @@ NOTHROW(FCALL rtm_memory_endwrite_modified_parts)(struct rtm_memory const *__res
 
 /* Verify that the given address range is writable
  * without  any   chance  of   triggering  a   #PF */
-PRIVATE ATTR_PURE NOBLOCK NONNULL((1)) bool
+PRIVATE NOBLOCK ATTR_PURE NONNULL((1)) bool
 NOTHROW(FCALL rtm_verify_writable_nopf)(USER CHECKED void *addr,
                                         size_t num_bytes) {
 	num_bytes += (uintptr_t)addr & PAGEMASK;

@@ -63,7 +63,7 @@ NOTHROW(FCALL try_read_pointer)(void **src, void **dst) {
 	return true;
 }
 
-PRIVATE ATTR_COLDTEXT NOBLOCK bool
+PRIVATE NOBLOCK ATTR_COLDTEXT bool
 NOTHROW(FCALL is_pc)(void *pc) {
 	bool result;
 	struct mnode *node;

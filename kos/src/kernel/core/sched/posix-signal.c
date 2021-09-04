@@ -751,7 +751,7 @@ sigmask_getrd(void) THROWS(...) {
 
 /* Make sure that `this_sigmask' is allocated, and isn't being shared.
  * Then, always return `PERTASK_GET(this_sigmask)' */
-PUBLIC WUNUSED ATTR_RETNONNULL struct kernel_sigmask *KCALL
+PUBLIC ATTR_RETNONNULL WUNUSED struct kernel_sigmask *KCALL
 sigmask_kernel_getwr(void) THROWS(E_BADALLOC) {
 	struct kernel_sigmask *mymask;
 	mymask = sigmask_kernel_getrd();

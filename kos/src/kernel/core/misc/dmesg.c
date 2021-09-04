@@ -98,7 +98,7 @@ PUBLIC ATTR_BSS WEAK unsigned int dmesg_consistent = 0;
 PUBLIC ATTR_BSS size_t dmesg_size = 0;
 
 #define getb() (dmesg_buffer[(offset++) % CONFIG_DMESG_BUFFER_SIZE])
-PRIVATE ATTR_COLDTEXT ATTR_COLD NOBLOCK ATTR_NOINLINE size_t
+PRIVATE NOBLOCK ATTR_COLD ATTR_COLDTEXT ATTR_NOINLINE size_t
 NOTHROW(FCALL decode_rel_seconds)(size_t offset, s64 *__restrict presult) {
 	unsigned int shift = 0;
 	*presult = 0;
@@ -117,7 +117,7 @@ NOTHROW(FCALL decode_rel_seconds)(size_t offset, s64 *__restrict presult) {
 }
 #undef getb
 
-PRIVATE ATTR_COLDTEXT ATTR_COLD NOBLOCK ATTR_NOINLINE void
+PRIVATE NOBLOCK ATTR_COLD ATTR_COLDTEXT ATTR_NOINLINE void
 NOTHROW(FCALL dmesg_compress_timestamps)(void) {
 	s64 seconds_diff;
 	size_t total_size, offset_from_end;

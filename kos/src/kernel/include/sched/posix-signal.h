@@ -122,7 +122,7 @@ DATDEF ATTR_PERTASK struct kernel_sigmask_arref this_sigmask;
 
 /* Make sure that `this_sigmask' is allocated, and isn't being shared.
  * Then, always return `PERTASK_GET(this_sigmask)' */
-FUNDEF WUNUSED ATTR_RETNONNULL struct kernel_sigmask *KCALL
+FUNDEF ATTR_RETNONNULL WUNUSED struct kernel_sigmask *KCALL
 sigmask_kernel_getwr(void) THROWS(E_BADALLOC);
 
 

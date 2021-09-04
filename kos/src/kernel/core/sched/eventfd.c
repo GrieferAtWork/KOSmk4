@@ -44,7 +44,7 @@
 
 DECL_BEGIN
 
-PRIVATE ATTR_MALLOC WUNUSED ATTR_RETNONNULL
+PRIVATE ATTR_MALLOC ATTR_RETNONNULL WUNUSED
 REF struct eventfd *KCALL eventfd_create(u64 value) THROWS(E_BADALLOC) {
 	struct eventfd *result;
 	result = (struct eventfd *)kmalloc(sizeof(struct eventfd), GFP_NORMAL);

@@ -354,7 +354,7 @@ NOTHROW(CC decode_hex1)(char ch) {
 	return 10 + ch - 'A';
 }
 
-PRIVATE WUNUSED ATTR_PURE NONNULL((1)) uint16_t
+PRIVATE ATTR_PURE WUNUSED NONNULL((1)) uint16_t
 NOTHROW(CC decode_hex4)(char const buf[4]) {
 	uint16_t result = 0;
 	result |= decode_hex1(buf[3]) << 0;
@@ -364,7 +364,7 @@ NOTHROW(CC decode_hex4)(char const buf[4]) {
 	return result;
 }
 
-PRIVATE WUNUSED ATTR_PURE NONNULL((1)) bool
+PRIVATE ATTR_PURE WUNUSED NONNULL((1)) bool
 NOTHROW(CC ishex4)(char const buf[4]) {
 	return isxdigit(buf[0]) && isxdigit(buf[1]) &&
 	       isxdigit(buf[2]) && isxdigit(buf[3]);

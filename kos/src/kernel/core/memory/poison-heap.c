@@ -542,7 +542,7 @@ INTDEF ATTR_CONST void NOTHROW(KCALL ph_kfree)(void *ptr);
 INTDEF ATTR_CONST void NOTHROW(KCALL ph_kffree)(void *ptr, gfp_t flags);
 #endif /* CONFIG_POISON_HEAP_NEED_VOID_FUNCTIONS */
 #ifdef CONFIG_TRACE_MALLOC
-INTDEF ATTR_CONST WUNUSED ATTR_RETNONNULL void *
+INTDEF ATTR_CONST ATTR_RETNONNULL WUNUSED void *
 NOTHROW(KCALL ph_kmalloc_trace_nx)(void *base, size_t num_bytes,
                                    gfp_t gfp, unsigned int tb_skip);
 #ifdef CONFIG_POISON_HEAP_NEED_ZERO_FUNCTIONS
@@ -858,7 +858,7 @@ NOTHROW(KCALL ph_kffree)(void *UNUSED(ptr), gfp_t UNUSED(flags)) {
 #endif /* CONFIG_POISON_HEAP_NEED_VOID_FUNCTIONS */
 
 #ifdef CONFIG_TRACE_MALLOC
-INTERN ATTR_CONST WUNUSED ATTR_RETNONNULL void *
+INTERN ATTR_CONST ATTR_RETNONNULL WUNUSED void *
 NOTHROW(KCALL ph_kmalloc_trace_nx)(void *base, size_t UNUSED(num_bytes),
                                    gfp_t UNUSED(gfp), unsigned int UNUSED(tb_skip)) {
 	return base;

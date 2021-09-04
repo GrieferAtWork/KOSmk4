@@ -500,7 +500,7 @@ INTERN NOBLOCK void NOTHROW(CC libpci_system_cleanup)(void) {
 /************************************************************************/
 /* PCI Device search API.                                               */
 /************************************************************************/
-PRIVATE WUNUSED ATTR_PURE NONNULL((1, 2)) bool
+PRIVATE ATTR_PURE WUNUSED NONNULL((1, 2)) bool
 NOTHROW(CC iterator_matches_device)(struct pci_device_iterator const *__restrict self,
                                     struct pci_device const *__restrict dev) {
 	if (!PCI_ID_COMPARE(self->pdi_vendor_id, dev->pd_vendor_id))

@@ -63,7 +63,7 @@ DATDEF ATTR_PERTASK struct fpustate *this_fpustate;
 
 /* Allocate / free FPU state structures. */
 #ifndef ARCH_FPU_ARCHHEADER_DEFINES_FPUSTATE_ALLOC
-FUNDEF ATTR_RETNONNULL ATTR_MALLOC WUNUSED struct fpustate *KCALL fpustate_alloc(void);
+FUNDEF ATTR_MALLOC ATTR_RETNONNULL WUNUSED struct fpustate *KCALL fpustate_alloc(void);
 FUNDEF ATTR_MALLOC WUNUSED struct fpustate *NOTHROW(KCALL fpustate_alloc_nx)(void);
 #endif /* !ARCH_FPU_ARCHHEADER_DEFINES_FPUSTATE_ALLOC */
 #ifndef ARCH_FPU_ARCHHEADER_DEFINES_FPUSTATE_FREE

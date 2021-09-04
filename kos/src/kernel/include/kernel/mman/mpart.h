@@ -1194,14 +1194,14 @@ NOTHROW(FCALL mpart_mmap_force)(struct mpart const *__restrict self,
  *    the   current   page   directory,   using    `perm'.
  * This function is used to implement handling of hinted
  * mem-nodes   when  encountered  by  the  #PF  handler. */
-FUNDEF NOPREEMPT NOBLOCK NONNULL((1)) void
+FUNDEF NOBLOCK NOPREEMPT NONNULL((1)) void
 NOTHROW(FCALL mpart_hinted_mmap)(struct mpart *__restrict self,
                                  PAGEDIR_PAGEALIGNED void *addr,
                                  PAGEDIR_PAGEALIGNED mpart_reladdr_t offset,
                                  u16 perm);
 
 /* Convenience wrapper for `mpart_hinted_mmap()' */
-FUNDEF NOPREEMPT NOBLOCK NONNULL((1)) void
+FUNDEF NOBLOCK NOPREEMPT NONNULL((1)) void
 NOTHROW(FCALL mnode_hinted_mmap)(struct mnode *__restrict self,
                                  PAGEDIR_PAGEALIGNED void *fault_page);
 

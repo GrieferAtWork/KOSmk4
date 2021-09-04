@@ -667,7 +667,7 @@ NOTHROW(FCALL ktime_to_timespec)(ktime_t t) {
  * NOTE: When the given `abs_timestamp' is located so far ahead of `boottime'
  *       that  the return value  would overflow, the value  is clamped to the
  *       maximum possible value of `KTIME_INFINITE' */
-PUBLIC NOBLOCK WUNUSED ATTR_PURE NONNULL((1)) ktime_t
+PUBLIC NOBLOCK ATTR_PURE WUNUSED NONNULL((1)) ktime_t
 NOTHROW(FCALL timespec_to_ktime)(struct timespec const *__restrict abs_timestamp) {
 	ktime_t result;
 	struct timespec diff;
@@ -723,7 +723,7 @@ NOTHROW(KCALL realtime)(void) {
  * Note  however  that if  `rel_time->tv_sec < 0', or  the result
  * of the  multiplication+addition  above  would  overflow,  then
  * this function will clamp the return value to `KTIME_INFINITE'. */
-PUBLIC NOBLOCK WUNUSED ATTR_PURE NONNULL((1)) ktime_t
+PUBLIC NOBLOCK ATTR_PURE WUNUSED NONNULL((1)) ktime_t
 NOTHROW(FCALL reltimespec_to_relktime)(struct timespec const *__restrict rel_time) {
 	ktime_t result;
 	/* NOTE: No need  to check  for negative  `rel_time->tv_sec'. If  that

@@ -2022,7 +2022,7 @@ struct ctype_attributes {
 	uint16_t ca_fun_cc; /* Calling convention for functions (one of `CTYPE_KIND_FUNPROTO_CC_*') */
 };
 
-PRIVATE WUNUSED ATTR_PURE NONNULL((1)) uint16_t
+PRIVATE ATTR_PURE WUNUSED NONNULL((1)) uint16_t
 NOTHROW(FCALL keyword_to_calling_convention)(char const *__restrict kwd_str,
                                              size_t kwd_len) {
 	(void)kwd_str;

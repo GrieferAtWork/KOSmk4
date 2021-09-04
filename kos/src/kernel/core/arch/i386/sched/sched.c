@@ -449,7 +449,7 @@ NOTHROW(FCALL task_push_asynchronous_rpc_v)(struct scpustate *__restrict state,
 }
 
 
-PRIVATE ATTR_COLD NOBLOCK u32
+PRIVATE NOBLOCK ATTR_COLD u32
 NOTHROW(KCALL get_userspace_eflags)(struct task const *__restrict self) {
 	struct ucpustate st, ost;
 	void const *unwind_pc;
@@ -484,7 +484,7 @@ NOTHROW(KCALL get_userspace_eflags)(struct task const *__restrict self) {
  * This is the pointer to the IRET structure located at the base of the caller's kernel stack.
  * NOTE: The caller must ensure that preemption is disabled,
  *       and that  `thread' is  hosted by  the calling  CPU. */
-PUBLIC ATTR_CONST ATTR_RETNONNULL NOBLOCK NONNULL((1)) struct irregs_user *
+PUBLIC NOBLOCK ATTR_CONST ATTR_RETNONNULL NONNULL((1)) struct irregs_user *
 NOTHROW(FCALL x86_get_irregs)(struct task const *__restrict self) {
 	struct irregs_user *result;
 	assert(!PREEMPTION_ENABLED());

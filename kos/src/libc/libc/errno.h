@@ -43,18 +43,18 @@ INTDEF NOBLOCK ATTR_CONST /*cyg*/ errno_t *NOTHROW(LIBDCALL libd_cygerrno_p)(voi
 INTDEF NOBLOCK ATTR_PURE /*cyg*/ errno_t NOTHROW(LIBDCALL libd_getcygerrno)(void);
 INTDEF NOBLOCK syscall_slong_t NOTHROW(LIBDCALL libd_setcygerrno)(/*cyg*/ errno_t value);
 
-INTDEF ATTR_CONST NOBLOCK /*kos*/ errno_t NOTHROW(LIBDCALL libd_errno_cyg2kos)(/*cyg*/ errno_t value);
-INTDEF ATTR_CONST NOBLOCK /*kos*/ errno_t NOTHROW(LIBDCALL libd_errno_dos2kos)(/*dos*/ errno_t value);
-INTDEF ATTR_CONST NOBLOCK /*kos*/ errno_t NOTHROW(LIBDCALL libd_errno_nt2kos)(/*nt*/ errno_t value);
-INTDEF ATTR_CONST NOBLOCK /*cyg*/ errno_t NOTHROW(LIBDCALL libd_errno_kos2cyg)(/*kos*/ errno_t value);
-INTDEF ATTR_CONST NOBLOCK /*cyg*/ errno_t NOTHROW(LIBDCALL libd_errno_dos2cyg)(/*dos*/ errno_t value);
-INTDEF ATTR_CONST NOBLOCK /*cyg*/ errno_t NOTHROW(LIBDCALL libd_errno_nt2cyg)(/*nt*/ errno_t value);
-INTDEF ATTR_CONST NOBLOCK /*dos*/ errno_t NOTHROW(LIBDCALL libd_errno_kos2dos)(/*kos*/ errno_t value);
-INTDEF ATTR_CONST NOBLOCK /*dos*/ errno_t NOTHROW(LIBDCALL libd_errno_cyg2dos)(/*cyg*/ errno_t value);
-INTDEF ATTR_CONST NOBLOCK /*dos*/ errno_t NOTHROW(LIBDCALL libd_errno_nt2dos)(/*nt*/ errno_t value);
-INTDEF ATTR_CONST NOBLOCK /*nt*/ errno_t NOTHROW(LIBDCALL libd_errno_kos2nt)(/*kos*/ errno_t value);
-INTDEF ATTR_CONST NOBLOCK /*nt*/ errno_t NOTHROW(LIBDCALL libd_errno_cyg2nt)(/*cyg*/ errno_t value);
-INTDEF ATTR_CONST NOBLOCK /*nt*/ errno_t NOTHROW(LIBDCALL libd_errno_dos2nt)(/*dos*/ errno_t value);
+INTDEF NOBLOCK ATTR_CONST /*kos*/ errno_t NOTHROW(LIBDCALL libd_errno_cyg2kos)(/*cyg*/ errno_t value);
+INTDEF NOBLOCK ATTR_CONST /*kos*/ errno_t NOTHROW(LIBDCALL libd_errno_dos2kos)(/*dos*/ errno_t value);
+INTDEF NOBLOCK ATTR_CONST /*kos*/ errno_t NOTHROW(LIBDCALL libd_errno_nt2kos)(/*nt*/ errno_t value);
+INTDEF NOBLOCK ATTR_CONST /*cyg*/ errno_t NOTHROW(LIBDCALL libd_errno_kos2cyg)(/*kos*/ errno_t value);
+INTDEF NOBLOCK ATTR_CONST /*cyg*/ errno_t NOTHROW(LIBDCALL libd_errno_dos2cyg)(/*dos*/ errno_t value);
+INTDEF NOBLOCK ATTR_CONST /*cyg*/ errno_t NOTHROW(LIBDCALL libd_errno_nt2cyg)(/*nt*/ errno_t value);
+INTDEF NOBLOCK ATTR_CONST /*dos*/ errno_t NOTHROW(LIBDCALL libd_errno_kos2dos)(/*kos*/ errno_t value);
+INTDEF NOBLOCK ATTR_CONST /*dos*/ errno_t NOTHROW(LIBDCALL libd_errno_cyg2dos)(/*cyg*/ errno_t value);
+INTDEF NOBLOCK ATTR_CONST /*dos*/ errno_t NOTHROW(LIBDCALL libd_errno_nt2dos)(/*nt*/ errno_t value);
+INTDEF NOBLOCK ATTR_CONST /*nt*/ errno_t NOTHROW(LIBDCALL libd_errno_kos2nt)(/*kos*/ errno_t value);
+INTDEF NOBLOCK ATTR_CONST /*nt*/ errno_t NOTHROW(LIBDCALL libd_errno_cyg2nt)(/*cyg*/ errno_t value);
+INTDEF NOBLOCK ATTR_CONST /*nt*/ errno_t NOTHROW(LIBDCALL libd_errno_dos2nt)(/*dos*/ errno_t value);
 
 INTDEF ATTR_CONST WUNUSED char const *const *NOTHROW(LIBCCALL libc___sys_errlist)(void);
 INTDEF ATTR_CONST WUNUSED int *NOTHROW(LIBCCALL libc___sys_nerr)(void);

@@ -61,13 +61,13 @@ DEFINE_REFCOUNT_FUNCTIONS(struct pipe_reader, pr_refcnt, pipe_reader_destroy)
 DEFINE_REFCOUNT_FUNCTIONS(struct pipe_writer, pw_refcnt, pipe_writer_destroy)
 
 /* Create a new pipe object. */
-FUNDEF ATTR_RETNONNULL ATTR_MALLOC WUNUSED REF struct pipe *KCALL
+FUNDEF ATTR_MALLOC ATTR_RETNONNULL WUNUSED REF struct pipe *KCALL
 pipe_create(size_t limit DFL(RINGBUFFER_DEFAULT_LIMIT)) THROWS(E_BADALLOC);
 
 /* Create a reader/writer for the given `pipe' */
-FUNDEF ATTR_RETNONNULL ATTR_MALLOC WUNUSED REF struct pipe_reader *KCALL
+FUNDEF ATTR_MALLOC ATTR_RETNONNULL WUNUSED REF struct pipe_reader *KCALL
 pipe_reader_create(struct pipe *__restrict self) THROWS(E_BADALLOC);
-FUNDEF ATTR_RETNONNULL ATTR_MALLOC WUNUSED REF struct pipe_writer *KCALL
+FUNDEF ATTR_MALLOC ATTR_RETNONNULL WUNUSED REF struct pipe_writer *KCALL
 pipe_writer_create(struct pipe *__restrict self) THROWS(E_BADALLOC);
 
 #endif /* __CC__ */

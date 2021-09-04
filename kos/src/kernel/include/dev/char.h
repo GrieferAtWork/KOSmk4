@@ -148,7 +148,7 @@ DEFINE_REFCOUNT_FUNCTIONS(struct character_device, cd_refcnt, character_device_d
  * As well as optionally:
  *   >> return->cd_name;
  */
-FUNDEF ATTR_RETNONNULL ATTR_MALLOC WUNUSED REF struct character_device *KCALL
+FUNDEF ATTR_MALLOC ATTR_RETNONNULL WUNUSED REF struct character_device *KCALL
 character_device_alloc(struct driver *__restrict owner,
                        size_t structure_size DFL(sizeof(struct character_device)),
                        size_t structure_align DFL(COMPILER_ALIGNOF(struct character_device)))

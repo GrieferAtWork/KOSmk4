@@ -56,7 +56,7 @@ ATTR_FREEBSS
 DEFINE_CMDLINE_FLAG_VAR(ide_nodma, "ide_nodma");
 
 
-PRIVATE ATTR_COLDTEXT NOBLOCK NONNULL((1)) void
+PRIVATE NOBLOCK ATTR_COLDTEXT NONNULL((1)) void
 NOTHROW(KCALL AtaBus_Fini)(struct character_device *__restrict self) {
 	AtaBus *me = (AtaBus *)self;
 	hisr_unregister((isr_function_t)AtaBus_HW_GetInterruptHandler(me), me);
@@ -64,7 +64,7 @@ NOTHROW(KCALL AtaBus_Fini)(struct character_device *__restrict self) {
 		vpage_free_untraced(me->ab_prdt, 1);
 }
 
-PRIVATE ATTR_COLDTEXT NOBLOCK NONNULL((1)) void
+PRIVATE NOBLOCK ATTR_COLDTEXT NONNULL((1)) void
 NOTHROW(KCALL AtaDrive_Fini)(struct block_device *__restrict self) {
 	AtaDrive *me = (AtaDrive *)self;
 	decref_unlikely(me->ad_bus);

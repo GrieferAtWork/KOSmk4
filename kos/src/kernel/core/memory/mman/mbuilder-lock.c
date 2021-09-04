@@ -130,7 +130,7 @@ NOTHROW(FCALL mbuilder_uparts_insert)(struct mbuilder_norpc *__restrict self,
 
 /* Find the mb-node currently registered as part of the `mb_uparts'
  * set, as  the owner  of the  lock that  is being  held on  `part' */
-PRIVATE NOBLOCK WUNUSED ATTR_PURE NONNULL((1, 2)) struct mbnode *
+PRIVATE NOBLOCK ATTR_PURE WUNUSED NONNULL((1, 2)) struct mbnode *
 NOTHROW(FCALL mbuilder_find_node_for_mpart)(struct mbuilder_norpc const *__restrict self,
                                             struct mpart const *__restrict part) {
 	struct mbnode *iter;
@@ -324,7 +324,7 @@ NOTHROW(FCALL mb_unlock_all_parts_info_unlock)(struct unlockinfo *__restrict sel
  * the given `fmnode' mapping is  continuous (that is: the  address
  * ranges described by mapped  nodes are entirely contained  within
  * those ranges for which an attempt at mapping is made) */
-PRIVATE NOBLOCK WUNUSED ATTR_PURE NONNULL((1)) bool
+PRIVATE NOBLOCK ATTR_PURE WUNUSED NONNULL((1)) bool
 NOTHROW(FCALL mbnode_is_continuous)(struct mbnode const *__restrict fmnode) {
 	pos_t fm_base;   /* File-map-base */
 	byte_t *mm_base; /* Memory-map-base */

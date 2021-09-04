@@ -75,7 +75,7 @@ PUBLIC_CONST char const syslog_level_names[SYSLOG_LEVEL_COUNT][8] = {
 
 
 /* Destroy the given syslog sink */
-PUBLIC ATTR_COLDTEXT NOBLOCK void
+PUBLIC NOBLOCK ATTR_COLDTEXT void
 NOTHROW(KCALL syslog_sink_destroy)(struct syslog_sink *__restrict self) {
 	/* Check   for  kernel  poisoning,  since  the  syslog  must
 	 * continue working normally even after panic() or assert().
@@ -139,7 +139,7 @@ PRIVATE struct syslog_sink_array_arref syslog_sinks =
 ARREF_INIT(&default_syslog_sink_array);
 
 
-PRIVATE NOBLOCK WUNUSED ATTR_PURE bool
+PRIVATE NOBLOCK ATTR_PURE WUNUSED bool
 NOTHROW(KCALL syslog_sink_array_contains)(struct syslog_sink_array *__restrict self,
                                           struct syslog_sink const *__restrict sink) {
 	size_t i;

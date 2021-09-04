@@ -396,10 +396,10 @@ public:
 	static NOBLOCK NONNULL((1)) void (KCALL endread)(T *__restrict self) __CXX_NOEXCEPT;
 	static NOBLOCK NONNULL((1)) void (KCALL endwrite)(T *__restrict self) __CXX_NOEXCEPT;
 	static NOBLOCK NONNULL((1)) void (KCALL end)(T *__restrict self) __CXX_NOEXCEPT;
-	static NOBLOCK WUNUSED ATTR_PURE NONNULL((1)) bool (KCALL reading)(T const *__restrict self) __CXX_NOEXCEPT;
-	static NOBLOCK WUNUSED ATTR_PURE NONNULL((1)) bool (KCALL writing)(T const *__restrict self) __CXX_NOEXCEPT;
-	static NOBLOCK WUNUSED ATTR_PURE NONNULL((1)) bool (KCALL canread)(T const *__restrict self) __CXX_NOEXCEPT;
-	static NOBLOCK WUNUSED ATTR_PURE NONNULL((1)) bool (KCALL canwrite)(T const *__restrict self) __CXX_NOEXCEPT;
+	static NOBLOCK ATTR_PURE WUNUSED NONNULL((1)) bool (KCALL reading)(T const *__restrict self) __CXX_NOEXCEPT;
+	static NOBLOCK ATTR_PURE WUNUSED NONNULL((1)) bool (KCALL writing)(T const *__restrict self) __CXX_NOEXCEPT;
+	static NOBLOCK ATTR_PURE WUNUSED NONNULL((1)) bool (KCALL canread)(T const *__restrict self) __CXX_NOEXCEPT;
+	static NOBLOCK ATTR_PURE WUNUSED NONNULL((1)) bool (KCALL canwrite)(T const *__restrict self) __CXX_NOEXCEPT;
 };
 #else /* __INTELLISENSE__ */
 template<class T> class sync_methods;
@@ -523,10 +523,10 @@ __NAMESPACE_INT_END
 		static __CXX_FORCEINLINE NOBLOCK ATTR_ARTIFICIAL NONNULL((1)) void (KCALL endread)(T *__restrict self) __CXX_NOEXCEPT { sync_endread(&(self)->field); }                \
 		static __CXX_FORCEINLINE NOBLOCK ATTR_ARTIFICIAL NONNULL((1)) void (KCALL endwrite)(T *__restrict self) __CXX_NOEXCEPT { sync_endwrite(&(self)->field); }              \
 		static __CXX_FORCEINLINE NOBLOCK ATTR_ARTIFICIAL NONNULL((1)) void (KCALL end)(T *__restrict self) __CXX_NOEXCEPT { sync_end(&(self)->field); }                        \
-		static __CXX_FORCEINLINE NOBLOCK ATTR_ARTIFICIAL WUNUSED ATTR_PURE NONNULL((1)) bool (KCALL reading)(T const *__restrict self) __CXX_NOEXCEPT { return sync_reading(&(self)->field); } \
-		static __CXX_FORCEINLINE NOBLOCK ATTR_ARTIFICIAL WUNUSED ATTR_PURE NONNULL((1)) bool (KCALL writing)(T const *__restrict self) __CXX_NOEXCEPT { return sync_writing(&(self)->field); } \
-		static __CXX_FORCEINLINE NOBLOCK ATTR_ARTIFICIAL WUNUSED ATTR_PURE NONNULL((1)) bool (KCALL canread)(T const *__restrict self) __CXX_NOEXCEPT { return sync_canread(&(self)->field); } \
-		static __CXX_FORCEINLINE NOBLOCK ATTR_ARTIFICIAL WUNUSED ATTR_PURE NONNULL((1)) bool (KCALL canwrite)(T const *__restrict self) __CXX_NOEXCEPT { return sync_canwrite(&(self)->field); } \
+		static __CXX_FORCEINLINE NOBLOCK ATTR_ARTIFICIAL ATTR_PURE WUNUSED NONNULL((1)) bool (KCALL reading)(T const *__restrict self) __CXX_NOEXCEPT { return sync_reading(&(self)->field); } \
+		static __CXX_FORCEINLINE NOBLOCK ATTR_ARTIFICIAL ATTR_PURE WUNUSED NONNULL((1)) bool (KCALL writing)(T const *__restrict self) __CXX_NOEXCEPT { return sync_writing(&(self)->field); } \
+		static __CXX_FORCEINLINE NOBLOCK ATTR_ARTIFICIAL ATTR_PURE WUNUSED NONNULL((1)) bool (KCALL canread)(T const *__restrict self) __CXX_NOEXCEPT { return sync_canread(&(self)->field); } \
+		static __CXX_FORCEINLINE NOBLOCK ATTR_ARTIFICIAL ATTR_PURE WUNUSED NONNULL((1)) bool (KCALL canwrite)(T const *__restrict self) __CXX_NOEXCEPT { return sync_canwrite(&(self)->field); } \
 	};                                                                                                                                                                         \
 	}
 
@@ -577,10 +577,10 @@ __NAMESPACE_INT_END
 		static __CXX_FORCEINLINE NOBLOCK ATTR_ARTIFICIAL NONNULL((1)) void (KCALL endread)(T *__restrict self) __CXX_NOEXCEPT { _endread(self); }                \
 		static __CXX_FORCEINLINE NOBLOCK ATTR_ARTIFICIAL NONNULL((1)) void (KCALL endwrite)(T *__restrict self) __CXX_NOEXCEPT { _endwrite(self); }              \
 		static __CXX_FORCEINLINE NOBLOCK ATTR_ARTIFICIAL NONNULL((1)) void (KCALL end)(T *__restrict self) __CXX_NOEXCEPT { _end(self); }                        \
-		static __CXX_FORCEINLINE NOBLOCK ATTR_ARTIFICIAL WUNUSED ATTR_PURE NONNULL((1)) bool (KCALL reading)(T const *__restrict self) __CXX_NOEXCEPT { return _reading(self); } \
-		static __CXX_FORCEINLINE NOBLOCK ATTR_ARTIFICIAL WUNUSED ATTR_PURE NONNULL((1)) bool (KCALL writing)(T const *__restrict self) __CXX_NOEXCEPT { return _writing(self); } \
-		static __CXX_FORCEINLINE NOBLOCK ATTR_ARTIFICIAL WUNUSED ATTR_PURE NONNULL((1)) bool (KCALL canread)(T const *__restrict self) __CXX_NOEXCEPT { return _canread(self); } \
-		static __CXX_FORCEINLINE NOBLOCK ATTR_ARTIFICIAL WUNUSED ATTR_PURE NONNULL((1)) bool (KCALL canwrite)(T const *__restrict self) __CXX_NOEXCEPT { return _canwrite(self); } \
+		static __CXX_FORCEINLINE NOBLOCK ATTR_ARTIFICIAL ATTR_PURE WUNUSED NONNULL((1)) bool (KCALL reading)(T const *__restrict self) __CXX_NOEXCEPT { return _reading(self); } \
+		static __CXX_FORCEINLINE NOBLOCK ATTR_ARTIFICIAL ATTR_PURE WUNUSED NONNULL((1)) bool (KCALL writing)(T const *__restrict self) __CXX_NOEXCEPT { return _writing(self); } \
+		static __CXX_FORCEINLINE NOBLOCK ATTR_ARTIFICIAL ATTR_PURE WUNUSED NONNULL((1)) bool (KCALL canread)(T const *__restrict self) __CXX_NOEXCEPT { return _canread(self); } \
+		static __CXX_FORCEINLINE NOBLOCK ATTR_ARTIFICIAL ATTR_PURE WUNUSED NONNULL((1)) bool (KCALL canwrite)(T const *__restrict self) __CXX_NOEXCEPT { return _canwrite(self); } \
 	};                                                                                                                                                           \
 	}
 
@@ -628,10 +628,10 @@ __NAMESPACE_INT_END
 		static __CXX_FORCEINLINE NOBLOCK ATTR_ARTIFICIAL NONNULL((1)) void (KCALL endread)(T *__restrict self) __CXX_NOEXCEPT { _release(self); }         \
 		static __CXX_FORCEINLINE NOBLOCK ATTR_ARTIFICIAL NONNULL((1)) void (KCALL endwrite)(T *__restrict self) __CXX_NOEXCEPT { _release(self); }        \
 		static __CXX_FORCEINLINE NOBLOCK ATTR_ARTIFICIAL NONNULL((1)) void (KCALL end)(T *__restrict self) __CXX_NOEXCEPT { _release(self); }             \
-		static __CXX_FORCEINLINE NOBLOCK ATTR_ARTIFICIAL WUNUSED ATTR_PURE NONNULL((1)) bool (KCALL reading)(T const *__restrict self) __CXX_NOEXCEPT { return _acquired(self); } \
-		static __CXX_FORCEINLINE NOBLOCK ATTR_ARTIFICIAL WUNUSED ATTR_PURE NONNULL((1)) bool (KCALL writing)(T const *__restrict self) __CXX_NOEXCEPT { return _acquired(self); } \
-		static __CXX_FORCEINLINE NOBLOCK ATTR_ARTIFICIAL WUNUSED ATTR_PURE NONNULL((1)) bool (KCALL canread)(T const *__restrict self) __CXX_NOEXCEPT { return _available(self); } \
-		static __CXX_FORCEINLINE NOBLOCK ATTR_ARTIFICIAL WUNUSED ATTR_PURE NONNULL((1)) bool (KCALL canwrite)(T const *__restrict self) __CXX_NOEXCEPT { return _available(self); } \
+		static __CXX_FORCEINLINE NOBLOCK ATTR_ARTIFICIAL ATTR_PURE WUNUSED NONNULL((1)) bool (KCALL reading)(T const *__restrict self) __CXX_NOEXCEPT { return _acquired(self); } \
+		static __CXX_FORCEINLINE NOBLOCK ATTR_ARTIFICIAL ATTR_PURE WUNUSED NONNULL((1)) bool (KCALL writing)(T const *__restrict self) __CXX_NOEXCEPT { return _acquired(self); } \
+		static __CXX_FORCEINLINE NOBLOCK ATTR_ARTIFICIAL ATTR_PURE WUNUSED NONNULL((1)) bool (KCALL canread)(T const *__restrict self) __CXX_NOEXCEPT { return _available(self); } \
+		static __CXX_FORCEINLINE NOBLOCK ATTR_ARTIFICIAL ATTR_PURE WUNUSED NONNULL((1)) bool (KCALL canwrite)(T const *__restrict self) __CXX_NOEXCEPT { return _available(self); } \
 	};                                                                                                                                                    \
 	}
 
@@ -679,10 +679,10 @@ __NAMESPACE_INT_END
 		static __CXX_FORCEINLINE NOBLOCK ATTR_ARTIFICIAL NONNULL((1)) void (KCALL endread)(T *__restrict self) __CXX_NOEXCEPT { _post(self); }            \
 		static __CXX_FORCEINLINE NOBLOCK ATTR_ARTIFICIAL NONNULL((1)) void (KCALL endwrite)(T *__restrict self) __CXX_NOEXCEPT { _post(self); }           \
 		static __CXX_FORCEINLINE NOBLOCK ATTR_ARTIFICIAL NONNULL((1)) void (KCALL end)(T *__restrict self) __CXX_NOEXCEPT { _post(self); }                \
-		static __CXX_FORCEINLINE NOBLOCK ATTR_ARTIFICIAL WUNUSED ATTR_PURE NONNULL((1)) bool (KCALL reading)(T const *__restrict UNUSED(self)) __CXX_NOEXCEPT { return true; } \
-		static __CXX_FORCEINLINE NOBLOCK ATTR_ARTIFICIAL WUNUSED ATTR_PURE NONNULL((1)) bool (KCALL writing)(T const *__restrict UNUSED(self)) __CXX_NOEXCEPT { return true; } \
-		static __CXX_FORCEINLINE NOBLOCK ATTR_ARTIFICIAL WUNUSED ATTR_PURE NONNULL((1)) bool (KCALL canread)(T const *__restrict self) __CXX_NOEXCEPT { return _available(self); } \
-		static __CXX_FORCEINLINE NOBLOCK ATTR_ARTIFICIAL WUNUSED ATTR_PURE NONNULL((1)) bool (KCALL canwrite)(T const *__restrict self) __CXX_NOEXCEPT { return _available(self); } \
+		static __CXX_FORCEINLINE NOBLOCK ATTR_ARTIFICIAL ATTR_PURE WUNUSED NONNULL((1)) bool (KCALL reading)(T const *__restrict UNUSED(self)) __CXX_NOEXCEPT { return true; } \
+		static __CXX_FORCEINLINE NOBLOCK ATTR_ARTIFICIAL ATTR_PURE WUNUSED NONNULL((1)) bool (KCALL writing)(T const *__restrict UNUSED(self)) __CXX_NOEXCEPT { return true; } \
+		static __CXX_FORCEINLINE NOBLOCK ATTR_ARTIFICIAL ATTR_PURE WUNUSED NONNULL((1)) bool (KCALL canread)(T const *__restrict self) __CXX_NOEXCEPT { return _available(self); } \
+		static __CXX_FORCEINLINE NOBLOCK ATTR_ARTIFICIAL ATTR_PURE WUNUSED NONNULL((1)) bool (KCALL canwrite)(T const *__restrict self) __CXX_NOEXCEPT { return _available(self); } \
 	};                                                                                                                                                    \
 	}
 

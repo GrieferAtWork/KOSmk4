@@ -145,7 +145,7 @@ PRIVATE ATTR_COLDBSS struct idt_segment *x86_idt_modify_copy = NULL;
 
 #ifndef CONFIG_NO_SMP
 PRIVATE ATTR_COLDBSS unsigned int x86_idt_setcurrent_ack = 0;
-PRIVATE ATTR_COLDTEXT NOBLOCK NONNULL((1, 2)) struct icpustate *
+PRIVATE NOBLOCK ATTR_COLDTEXT NONNULL((1, 2)) struct icpustate *
 NOTHROW(FCALL x86_idt_setcurrent_ipi)(struct icpustate *__restrict state,
                                       void *args[CPU_IPI_ARGCOUNT]) {
 	__lidt_p(args[0]);
@@ -158,7 +158,7 @@ NOTHROW(FCALL x86_idt_setcurrent_ipi)(struct icpustate *__restrict state,
 
 /* Set   the  IDT  base  pointer  currently  in  use  on  all  CPUs.
  * This function only returns once all CPUs have updated their IDTs. */
-PRIVATE ATTR_COLDTEXT NOBLOCK void
+PRIVATE NOBLOCK ATTR_COLDTEXT void
 NOTHROW(FCALL x86_idt_setcurrent)(struct desctab const *__restrict ptr) {
 	/* TODO: When a CPU goes into deep-sleep, we must save,  and
 	 *       during the next wake-up, restore, the current IDTR!
@@ -270,7 +270,7 @@ PUBLIC ATTR_COLDTEXT bool FCALL x86_idt_modify_begin(bool nx)
 	return true;
 }
 
-PUBLIC ATTR_COLDTEXT NOBLOCK void
+PUBLIC NOBLOCK ATTR_COLDTEXT void
 NOTHROW(FCALL x86_idt_modify_end)(bool discard_changes) {
 	struct idt_segment *copy;
 #ifdef CONFIG_HAVE_DEBUGGER

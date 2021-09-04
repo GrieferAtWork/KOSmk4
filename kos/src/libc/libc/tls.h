@@ -54,7 +54,7 @@ INTDEF WUNUSED ATTR_CONST ATTR_RETNONNULL void *NOTHROW(LIBCCALL libc_handle)(vo
 
 /* Return a pointer to `current', given a tls_segment
  * pointer,   as   allocated   by   `dltlsallocseg()' */
-FORCELOCAL WUNUSED ATTR_PURE NONNULL((1))
+FORCELOCAL ATTR_PURE WUNUSED NONNULL((1))
 struct pthread *LIBCCALL current_from_tls(void *tls_segment) {
 	return (struct pthread *)dltlsaddr2(libc_handle(), tls_segment);
 }

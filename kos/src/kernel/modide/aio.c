@@ -57,7 +57,7 @@ NOTHROW(FCALL AtaDrive_DmaAioHandle_ReleaseDmaLocks)(struct aio_handle *__restri
 }
 
 /* Complete the given, generic AIO handle with an ATA error code. */
-INTERN ATTR_COLD NOBLOCK NONNULL((1)) void
+INTERN NOBLOCK ATTR_COLD NONNULL((1)) void
 NOTHROW(FCALL AioHandle_CompleteWithAtaError)(struct aio_handle *__restrict self,
                                               AtaError_t error) {
 	struct exception_data old_data;
@@ -74,7 +74,7 @@ NOTHROW(FCALL AioHandle_CompleteWithAtaError)(struct aio_handle *__restrict self
 }
 
 /* Complete the given AIO handle with an ATA error code. */
-INTERN ATTR_COLD NOBLOCK NONNULL((1)) void
+INTERN NOBLOCK ATTR_COLD NONNULL((1)) void
 NOTHROW(FCALL AtaDrive_DmaAioHandle_CompleteWithError)(struct aio_handle *__restrict self,
                                                        AtaError_t error) {
 	/* Release DMA locks before calling the completion function. */

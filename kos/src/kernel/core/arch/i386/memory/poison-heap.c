@@ -90,7 +90,7 @@ DEFINE_CMDLINE_FLAG_VAR(boot_no_poison_heap, "no_poison_heap");
 /* Install poison heap overrides.
  * NOTE: This function must be called immediately
  *       after `_kernel_poisoned' is set to true. */
-INTERN ATTR_COLDTEXT NOBLOCK void NOTHROW(KCALL ph_install)(void) {
+INTERN NOBLOCK ATTR_COLDTEXT void NOTHROW(KCALL ph_install)(void) {
 	unsigned int i;
 	if (boot_no_poison_heap)
 		return;

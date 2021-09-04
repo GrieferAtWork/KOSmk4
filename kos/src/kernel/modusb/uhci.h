@@ -84,8 +84,8 @@ struct uhci_aio_data {
 
 
 /* Allocate/Free OSTD/OSQH descriptors. */
-FUNDEF ATTR_RETNONNULL ATTR_MALLOC WUNUSED struct uhci_ostd *FCALL uhci_ostd_alloc(void) THROWS(E_BADALLOC, E_WOULDBLOCK);
-FUNDEF ATTR_RETNONNULL ATTR_MALLOC WUNUSED struct uhci_osqh *FCALL uhci_osqh_alloc(void) THROWS(E_BADALLOC, E_WOULDBLOCK);
+FUNDEF ATTR_MALLOC ATTR_RETNONNULL WUNUSED struct uhci_ostd *FCALL uhci_ostd_alloc(void) THROWS(E_BADALLOC, E_WOULDBLOCK);
+FUNDEF ATTR_MALLOC ATTR_RETNONNULL WUNUSED struct uhci_osqh *FCALL uhci_osqh_alloc(void) THROWS(E_BADALLOC, E_WOULDBLOCK);
 FUNDEF NOBLOCK void NOTHROW(FCALL uhci_ostd_free)(struct uhci_ostd *__restrict self);
 FUNDEF NOBLOCK void NOTHROW(FCALL uhci_osqh_free)(struct uhci_osqh *__restrict self);
 

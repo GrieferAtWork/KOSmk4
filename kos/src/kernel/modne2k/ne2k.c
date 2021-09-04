@@ -316,7 +316,7 @@ NOTHROW(KCALL Ne2k_ReleaseUIO)(Ne2kDevice *__restrict self) {
 
 
 /* @param: tsr: Set of `ENISR_*' */
-PRIVATE NOPREEMPT NOBLOCK ATTR_NOINLINE void
+PRIVATE NOBLOCK NOPREEMPT ATTR_NOINLINE void
 NOTHROW(FCALL Ne2k_HandleAioTxError)(Ne2kDevice *__restrict self,
                                      struct aio_handle *__restrict aio,
                                      u8 tsr) {

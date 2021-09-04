@@ -130,9 +130,9 @@ FUNDEF NOBLOCK NONNULL((1)) void
 NOTHROW(FCALL task_setmman_inherit)(/*inherit(always)*/ REF struct mman *__restrict newmman);
 
 /* Same as `task_setmman()', but return a reference to the old mman. */
-FUNDEF NOBLOCK WUNUSED ATTR_RETNONNULL NONNULL((1)) REF struct mman *
+FUNDEF NOBLOCK ATTR_RETNONNULL WUNUSED NONNULL((1)) REF struct mman *
 NOTHROW(FCALL task_xchmman)(struct mman *__restrict newmman);
-FUNDEF NOBLOCK WUNUSED ATTR_RETNONNULL NONNULL((1)) REF struct mman *
+FUNDEF NOBLOCK ATTR_RETNONNULL WUNUSED NONNULL((1)) REF struct mman *
 NOTHROW(FCALL task_xchmman_inherit)(/*inherit(always)*/ REF struct mman *__restrict newmman);
 
 /* Return the active mman of the given `thread' */

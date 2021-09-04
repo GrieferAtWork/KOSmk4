@@ -479,7 +479,7 @@ NOTHROW(FCALL cmodule_findunit_from_pc)(struct cmodule const *__restrict self,
 
 /* Try  to   find  the   compilation  unit   that  contains   `dip'
  * If no such unit can be located, `NULL' will be returned instead. */
-FUNDEF WUNUSED ATTR_PURE NONNULL((1)) struct cmodunit *
+FUNDEF ATTR_PURE WUNUSED NONNULL((1)) struct cmodunit *
 NOTHROW(FCALL cmodule_findunit_from_dip)(struct cmodule const *__restrict self,
                                          byte_t const *__restrict dip);
 

@@ -440,7 +440,7 @@ NOTHROW(FCALL fifo_user_destroy)(struct fifo_user *__restrict self) {
  *       `fu_dirent'   directly   after  calling   this  function.
  * @param: iomode: Set of `IO_ACCMODE | IO_NONBLOCK'
  * @throw: E_INVALID_ARGUMENT_BAD_STATE:E_INVALID_ARGUMENT_CONTEXT_OPEN_FIFO_WRITER_NO_READERS: [...] */
-PUBLIC ATTR_RETNONNULL ATTR_MALLOC WUNUSED NONNULL((1)) REF struct fifo_user *FCALL
+PUBLIC ATTR_MALLOC ATTR_RETNONNULL WUNUSED NONNULL((1)) REF struct fifo_user *FCALL
 fifo_user_create(struct fifo_node *__restrict self, iomode_t iomode)
 		THROWS(E_BADALLOC, E_WOULDBLOCK, E_INVALID_ARGUMENT_BAD_STATE) {
 	REF struct fifo_user *result;

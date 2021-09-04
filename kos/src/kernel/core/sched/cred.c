@@ -187,7 +187,7 @@ clone_this_cred(struct task *__restrict new_thread, uintptr_t flags) {
 
 /* Check if the calling thread has a given capability
  * `capno' (one of  `CAP_*' from  <kos/capability.h>) */
-PUBLIC NOBLOCK ATTR_PURE __BOOL
+PUBLIC NOBLOCK ATTR_PURE WUNUSED bool
 NOTHROW(FCALL capable)(syscall_slong_t capno) {
 	return credcap_capable(&THIS_CRED->c_cap_effective, capno);
 }
@@ -293,10 +293,10 @@ PUBLIC NOBLOCK gid_t NOTHROW(FCALL cred_getfsgid)(void) {
 
 
 /* Check if the calling thread is considered to be apart of the given group `gid' */
-PUBLIC WUNUSED __BOOL FCALL cred_isfsgroupmember(gid_t gid) {
+PUBLIC WUNUSED bool FCALL cred_isfsgroupmember(gid_t gid) {
 	size_t i;
 	struct cred *self = THIS_CRED;
-	__BOOL result;
+	bool result;
 	if (ATOMIC_READ(THIS_CRED->c_fsgid) == gid)
 		return 1;
 	result = 0;

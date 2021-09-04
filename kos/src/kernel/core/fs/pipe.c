@@ -61,7 +61,7 @@ DEFINE_KERNEL_COMMANDLINE_OPTION(pipe_max_bufsize_unprivileged,
 
 
 /* Create a new pipe object. */
-PUBLIC ATTR_RETNONNULL ATTR_MALLOC WUNUSED REF struct pipe *KCALL
+PUBLIC ATTR_MALLOC ATTR_RETNONNULL WUNUSED REF struct pipe *KCALL
 pipe_create(size_t limit) THROWS(E_BADALLOC) {
 	REF struct pipe *result;
 	result = (REF struct pipe *)kmalloc(sizeof(struct pipe), GFP_NORMAL);
@@ -73,7 +73,7 @@ pipe_create(size_t limit) THROWS(E_BADALLOC) {
 }
 
 /* Create a reader/writer for the given `pipe' */
-PUBLIC ATTR_RETNONNULL ATTR_MALLOC WUNUSED REF struct pipe_reader *KCALL
+PUBLIC ATTR_MALLOC ATTR_RETNONNULL WUNUSED REF struct pipe_reader *KCALL
 pipe_reader_create(struct pipe *__restrict self) THROWS(E_BADALLOC) {
 	REF struct pipe_reader *result;
 	result = (REF struct pipe_reader *)kmalloc(sizeof(REF struct pipe_reader),
@@ -84,7 +84,7 @@ pipe_reader_create(struct pipe *__restrict self) THROWS(E_BADALLOC) {
 	return result;
 }
 
-PUBLIC ATTR_RETNONNULL ATTR_MALLOC WUNUSED REF struct pipe_writer *KCALL
+PUBLIC ATTR_MALLOC ATTR_RETNONNULL WUNUSED REF struct pipe_writer *KCALL
 pipe_writer_create(struct pipe *__restrict self) THROWS(E_BADALLOC) {
 	REF struct pipe_writer *result;
 	result = (REF struct pipe_writer *)kmalloc(sizeof(REF struct pipe_writer),

@@ -1737,7 +1737,7 @@ throw_illegal_op:
 #define EMU86_VALIDATE_IPCS(new_ip, new_cs)                x86_validate_ipcs(_state, new_ip, new_cs)
 #define EMU86_VALIDATE_DATASEG(new_segment, segment_regno) x86_validate_datseg(_state, new_segment, segment_regno)
 
-PRIVATE NOPREEMPT WUNUSED ATTR_RETNONNULL NONNULL((1)) struct segment *KCALL
+PRIVATE NOPREEMPT ATTR_RETNONNULL WUNUSED NONNULL((1)) struct segment *KCALL
 x86_lookup_segment_nopr(struct icpustate *__restrict state,
                         uint16_t segment_value, pflag_t was,
                         uintptr_t segment_regno) {

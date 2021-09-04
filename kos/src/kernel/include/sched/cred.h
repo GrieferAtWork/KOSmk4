@@ -328,7 +328,7 @@ DATDEF struct cred cred_kernel;
 
 /* Check if the calling thread has a given capability
  * `capno' (one of  `CAP_*' from  <kos/capability.h>) */
-EIDECLARE(NOBLOCK ATTR_ARTIFICIAL ATTR_PURE, __BOOL,
+EIDECLARE(NOBLOCK ATTR_ARTIFICIAL ATTR_PURE WUNUSED, __BOOL,
           NOTHROW, FCALL, capable, (syscall_slong_t capno), {
 	return credcap_capable(&THIS_CRED->c_cap_effective, capno);
 })

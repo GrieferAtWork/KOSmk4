@@ -293,13 +293,13 @@ NOTHROW(FCALL task_setmman_inherit)(/*inherit(always)*/ REF struct mman *__restr
 }
 
 /* Same as `task_setmman()', but return a reference to the old mman. */
-PUBLIC NOBLOCK WUNUSED ATTR_RETNONNULL NONNULL((1)) REF struct mman *
+PUBLIC NOBLOCK ATTR_RETNONNULL WUNUSED NONNULL((1)) REF struct mman *
 NOTHROW(FCALL task_xchmman)(struct mman *__restrict newmman) {
 	return task_xchmman_inherit(incref(newmman));
 }
 
 /* Same as `task_setmman()', but return a reference to the old mman. */
-PUBLIC NOBLOCK WUNUSED ATTR_RETNONNULL NONNULL((1)) REF struct mman *
+PUBLIC NOBLOCK ATTR_RETNONNULL WUNUSED NONNULL((1)) REF struct mman *
 NOTHROW(FCALL task_xchmman_inherit)(/*inherit(always)*/ REF struct mman *__restrict newmman) {
 	REF struct mman *oldmman;
 	struct task *me = THIS_TASK;
@@ -319,15 +319,15 @@ again:
 
 	/* Acquire all of the necessary locks. */
 	atomic_lock_acquire_nopr(task_mman_change_lock(me));
-	if unlikely(!atomic_lock_tryacquire(&newmman->mm_threadslock)) {
+	if unlikely(!mman_threadslock_tryacquire_nopr(newmman)) {
 		atomic_lock_release(task_mman_change_lock(me));
 		PREEMPTION_POP(was);
-		while (!atomic_lock_available(&newmman->mm_threadslock))
+		while (!mman_threadslock_available(newmman))
 			task_tryyield_or_pause();
 		goto again;
 	}
-	if unlikely(!atomic_lock_tryacquire(&oldmman->mm_threadslock)) {
-		atomic_lock_release(&newmman->mm_threadslock);
+	if unlikely(!mman_threadslock_tryacquire_nopr(oldmman)) {
+		mman_threadslock_release_nopr(newmman);
 		/* Keep a reference  in case  we re-enable  interrupts,
 		 * and an  RPC  changes  the mman  in  the  mean  time.
 		 * Shouldn't happen as far as control flow logic  goes,
@@ -335,7 +335,7 @@ again:
 		incref(oldmman);
 		atomic_lock_release(task_mman_change_lock(me));
 		PREEMPTION_POP(was);
-		while (!atomic_lock_available(&oldmman->mm_threadslock))
+		while (!mman_threadslock_available(oldmman))
 			task_tryyield_or_pause();
 		decref(oldmman);
 		goto again;
@@ -350,8 +350,8 @@ again:
 
 	/* Release locks */
 #ifndef CONFIG_NO_SMP
-	atomic_lock_release(&oldmman->mm_threadslock);
-	atomic_lock_release(&newmman->mm_threadslock);
+	mman_threadslock_release_nopr(oldmman);
+	mman_threadslock_release_nopr(newmman);
 	atomic_lock_release(task_mman_change_lock(me));
 #endif /* !CONFIG_NO_SMP */
 

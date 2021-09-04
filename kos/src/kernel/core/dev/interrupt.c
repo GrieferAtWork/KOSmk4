@@ -1031,7 +1031,7 @@ NOTHROW(KCALL isr_usage_of)(isr_vector_t vector) {
 	return arref_get(&isr_vectors[ISR_VECTOR_TO_INDEX(vector)]);
 }
 
-LOCAL ATTR_CONST NOBLOCK bool
+LOCAL NOBLOCK ATTR_CONST bool
 NOTHROW(KCALL compare_hitmiss_gr)(size_t hit_a, size_t miss_a,
                                   size_t hit_b, size_t miss_b) {
 	size_t total_a, total_b;
@@ -1055,7 +1055,7 @@ NOTHROW(KCALL compare_hitmiss_gr)(size_t hit_a, size_t miss_a,
 	return ratio_a > ratio_b;
 }
 
-LOCAL ATTR_PURE NOBLOCK bool
+LOCAL NOBLOCK ATTR_PURE bool
 NOTHROW(KCALL compare_handler_hitmiss_gr)(struct isr_vector_handler const *__restrict a,
                                           struct isr_vector_handler const *__restrict b) {
 	return compare_hitmiss_gr(a->ivh_hit, a->ivh_mis,

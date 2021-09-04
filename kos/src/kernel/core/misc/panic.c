@@ -91,7 +91,7 @@ DBG_COMMAND(unpoison,
 #define LOG_STACK_REMAINDER 1
 #endif
 
-LOCAL ATTR_COLDTEXT NOBLOCK NONNULL((1)) void
+LOCAL NOBLOCK ATTR_COLDTEXT NONNULL((1)) void
 NOTHROW(KCALL fixup_uninitialized_thread)(struct task *__restrict thread) {
 	if (thread->t_self != thread)
 		thread->t_self = thread; /* Shouldn't happen... */
@@ -412,7 +412,7 @@ PRIVATE ATTR_DBGRODATA char const *const assert_chk_options[] = {
 };
 
 PRIVATE ATTR_DBGBSS void const *always_ignored_assertions[64] = { 0 };
-PRIVATE ATTR_COLDTEXT ATTR_PURE NOBLOCK bool
+PRIVATE NOBLOCK ATTR_COLDTEXT ATTR_PURE bool
 NOTHROW(KCALL is_pc_always_ignored)(void const *pc) {
 	unsigned int i;
 	for (i = 0; i < COMPILER_LENOF(always_ignored_assertions); ++i) {

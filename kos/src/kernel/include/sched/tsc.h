@@ -281,7 +281,7 @@ NOTHROW(FCALL ktime_to_timespec)(ktime_t t);
  * NOTE: When the given `abs_timestamp' is located so far ahead of `boottime'
  *       that  the return value  would overflow, the value  is clamped to the
  *       maximum possible value of `KTIME_INFINITE' */
-FUNDEF NOBLOCK WUNUSED ATTR_PURE NONNULL((1)) ktime_t
+FUNDEF NOBLOCK ATTR_PURE WUNUSED NONNULL((1)) ktime_t
 NOTHROW(FCALL timespec_to_ktime)(struct timespec const *__restrict abs_timestamp);
 
 /* Similar to the  functions above, but  return a relative  time.
@@ -290,7 +290,7 @@ NOTHROW(FCALL timespec_to_ktime)(struct timespec const *__restrict abs_timestamp
  * Note  however  that if  `rel_time->tv_sec < 0', or  the result
  * of the  multiplication+addition  above  would  overflow,  then
  * this function will clamp the return value to `KTIME_INFINITE'. */
-FUNDEF NOBLOCK WUNUSED ATTR_PURE NONNULL((1)) ktime_t
+FUNDEF NOBLOCK ATTR_PURE WUNUSED NONNULL((1)) ktime_t
 NOTHROW(FCALL reltimespec_to_relktime)(struct timespec const *__restrict rel_time);
 
 /* Do the inverse of `reltimespec_to_relktime' */
@@ -300,10 +300,10 @@ NOTHROW(FCALL relktime_to_reltimespec)(ktime_t t);
 
 #ifdef __cplusplus
 extern "C++" {
-FUNDEF NOBLOCK WUNUSED ATTR_PURE ktime_t
+FUNDEF NOBLOCK ATTR_PURE WUNUSED ktime_t
 NOTHROW(FCALL timespec_to_ktime)(struct timespec const &__restrict abs_timestamp)
 	ASMNAME("timespec_to_ktime");
-FUNDEF NOBLOCK WUNUSED ATTR_PURE ktime_t
+FUNDEF NOBLOCK ATTR_PURE WUNUSED ktime_t
 NOTHROW(FCALL reltimespec_to_relktime)(struct timespec const &__restrict rel_time)
 	ASMNAME("reltimespec_to_relktime");
 } /* extern "C++" */

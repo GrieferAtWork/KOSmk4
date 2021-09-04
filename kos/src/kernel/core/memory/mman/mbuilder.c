@@ -216,7 +216,7 @@ mbuilder_insert_anon_file_node(struct mbuilder_norpc *__restrict self,
 
 
 
-PRIVATE WUNUSED ATTR_RETNONNULL struct mnode *FCALL
+PRIVATE ATTR_RETNONNULL WUNUSED struct mnode *FCALL
 mbuilder_create_res_file_node(PAGEDIR_PAGEALIGNED void *addr,
                               PAGEDIR_PAGEALIGNED size_t num_bytes) {
 	struct mnode *result;
@@ -237,7 +237,7 @@ mbuilder_create_res_file_node(PAGEDIR_PAGEALIGNED void *addr,
 
 
 
-PRIVATE WUNUSED ATTR_RETNONNULL struct mbnode *FCALL
+PRIVATE ATTR_RETNONNULL WUNUSED struct mbnode *FCALL
 mbuilder_create_zero_file_node(PAGEDIR_PAGEALIGNED void *addr,
                                PAGEDIR_PAGEALIGNED size_t num_bytes,
                                uintptr_t mnode_flags) {

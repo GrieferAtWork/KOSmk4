@@ -71,17 +71,17 @@ FUNDEF NOBLOCK void NOTHROW(FCALL ioperm_bitmap_destroy)(struct ioperm_bitmap *_
 DEFINE_REFCOUNT_FUNCTIONS(struct ioperm_bitmap, ib_refcnt, ioperm_bitmap_destroy)
 
 /* Allocate a new io permissions bitmap with all permission bits set to disallow access. */
-FUNDEF ATTR_RETNONNULL ATTR_MALLOC WUNUSED REF struct ioperm_bitmap *KCALL
+FUNDEF ATTR_MALLOC ATTR_RETNONNULL WUNUSED REF struct ioperm_bitmap *KCALL
 ioperm_bitmap_alloc(void) THROWS(E_BADALLOC);
-FUNDEF ATTR_RETNONNULL ATTR_MALLOC WUNUSED NOBLOCK_IF(flags & GFP_ATOMIC)
+FUNDEF ATTR_MALLOC ATTR_RETNONNULL WUNUSED NOBLOCK_IF(flags & GFP_ATOMIC)
 REF struct ioperm_bitmap *KCALL ioperm_bitmap_allocf(gfp_t flags) THROWS(E_BADALLOC);
 FUNDEF ATTR_MALLOC WUNUSED NOBLOCK_IF(flags & GFP_ATOMIC)
 REF struct ioperm_bitmap *NOTHROW(KCALL ioperm_bitmap_allocf_nx)(gfp_t flags);
 
 /* Create a copy of the given I/O permissions bitmap. */
-FUNDEF ATTR_RETNONNULL ATTR_MALLOC WUNUSED REF struct ioperm_bitmap *KCALL
+FUNDEF ATTR_MALLOC ATTR_RETNONNULL WUNUSED REF struct ioperm_bitmap *KCALL
 ioperm_bitmap_copy(struct ioperm_bitmap const *__restrict self) THROWS(E_BADALLOC);
-FUNDEF ATTR_RETNONNULL ATTR_MALLOC WUNUSED NOBLOCK_IF(flags & GFP_ATOMIC) REF struct ioperm_bitmap *KCALL
+FUNDEF ATTR_MALLOC ATTR_RETNONNULL WUNUSED NOBLOCK_IF(flags & GFP_ATOMIC) REF struct ioperm_bitmap *KCALL
 ioperm_bitmap_copyf(struct ioperm_bitmap const *__restrict self, gfp_t flags) THROWS(E_BADALLOC);
 FUNDEF ATTR_MALLOC WUNUSED NOBLOCK_IF(flags & GFP_ATOMIC) REF struct ioperm_bitmap *
 NOTHROW(KCALL ioperm_bitmap_copyf_nx)(struct ioperm_bitmap const *__restrict self, gfp_t flags);

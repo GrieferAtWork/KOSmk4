@@ -371,7 +371,7 @@ struct irregs_user;
  * This is the pointer to the IRET structure located at the base of the caller's kernel stack.
  * NOTE: The caller must ensure that preemption is disabled,
  *       and that  `thread' is  hosted by  the calling  CPU. */
-FUNDEF ATTR_CONST ATTR_RETNONNULL NOBLOCK NONNULL((1)) struct irregs_user *
+FUNDEF NOBLOCK ATTR_CONST ATTR_RETNONNULL NONNULL((1)) struct irregs_user *
 NOTHROW(FCALL x86_get_irregs)(struct task const *__restrict thread);
 #endif /* !__x86_64__ */
 

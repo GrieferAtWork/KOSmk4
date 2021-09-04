@@ -126,7 +126,7 @@ DATDEF ATTR_PERTASK struct scpustate *this_sstate; /* ALIAS:THIS_TASK->t_state *
 /* Allocate + initialize a new task.
  * TODO: Re-design this function so we don't leak uninitialized tasks through the mman
  * @param: task_mman: The mman inside of which the start will start initially. */
-FUNDEF ATTR_MALLOC WUNUSED ATTR_RETNONNULL REF struct task *KCALL
+FUNDEF ATTR_MALLOC ATTR_RETNONNULL WUNUSED REF struct task *KCALL
 task_alloc(struct mman *__restrict task_mman)
 		THROWS(E_WOULDBLOCK, E_BADALLOC);
 
@@ -427,7 +427,7 @@ FUNDEF WUNUSED __BOOL NOTHROW(KCALL task_yield_nx)(void);
 
 /* High-level kernel interface for the clone(2) system call.
  * @param: clone_flags: Set of `TASK_CLONE_*' */
-FUNDEF ATTR_MALLOC WUNUSED ATTR_RETNONNULL REF struct task *
+FUNDEF ATTR_MALLOC ATTR_RETNONNULL WUNUSED REF struct task *
 (KCALL task_create)(struct ucpustate const *__restrict init_state,
                     uintptr_t clone_flags, void *tls_val,
                     USER CHECKED pid_t *parent_tidptr,

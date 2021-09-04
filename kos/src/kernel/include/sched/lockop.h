@@ -297,25 +297,25 @@ FUNDEF NOBLOCK NONNULL((1, 2, 3)) void
 NOTHROW(FCALL _oblockop_reap)(struct oblockop_slist *__restrict self,
                               struct atomic_rwlock *__restrict lock, void *__restrict obj)
 	ASMNAME("oblockop_reap_atomic_rwlock");
-template<class T> FORCELOCAL ATTR_ARTIFICIAL NOBLOCK NONNULL((1, 2, 3)) void
+template<class T> FORCELOCAL NOBLOCK ATTR_ARTIFICIAL NONNULL((1, 2, 3)) void
 NOTHROW(FCALL _oblockop_reap_atomic_lock)(_Toblockop_slist<T> *__restrict self,
                                           struct atomic_lock *__restrict lock,
                                           T *__restrict obj) {
 	_oblockop_reap_atomic_lock((struct oblockop_slist *)self, lock, (void *)obj);
 }
-template<class T> FORCELOCAL ATTR_ARTIFICIAL NOBLOCK NONNULL((1, 2, 3)) void
+template<class T> FORCELOCAL NOBLOCK ATTR_ARTIFICIAL NONNULL((1, 2, 3)) void
 NOTHROW(FCALL _oblockop_reap_atomic_rwlock)(_Toblockop_slist<T> *__restrict self,
                                             struct atomic_rwlock *__restrict lock,
                                             T *__restrict obj) {
 	_oblockop_reap_atomic_rwlock((struct oblockop_slist *)self, lock, (void *)obj);
 }
-template<class T> FORCELOCAL ATTR_ARTIFICIAL NOBLOCK NONNULL((1, 2, 3)) void
+template<class T> FORCELOCAL NOBLOCK ATTR_ARTIFICIAL NONNULL((1, 2, 3)) void
 NOTHROW(FCALL _oblockop_reap)(_Toblockop_slist<T> *__restrict self,
                               struct atomic_lock *__restrict lock,
                               T *__restrict obj) {
 	_oblockop_reap_atomic_lock((struct oblockop_slist *)self, lock, (void *)obj);
 }
-template<class T> FORCELOCAL ATTR_ARTIFICIAL NOBLOCK NONNULL((1, 2, 3)) void
+template<class T> FORCELOCAL NOBLOCK ATTR_ARTIFICIAL NONNULL((1, 2, 3)) void
 NOTHROW(FCALL _oblockop_reap)(_Toblockop_slist<T> *__restrict self,
                               struct atomic_rwlock *__restrict lock,
                               T *__restrict obj) {

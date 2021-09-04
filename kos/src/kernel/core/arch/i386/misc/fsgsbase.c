@@ -110,7 +110,7 @@ PRIVATE ATTR_COLDRODATA fsgsbase_patches_t const fsgsbase_patches = {
  * @return: true:   Successfully patched the given code location.
  * @return: false:  The given code location was already patched,
  *                  or isn't  one  of  the  above  instructions. */
-PUBLIC ATTR_COLDTEXT NOBLOCK bool
+PUBLIC NOBLOCK ATTR_COLDTEXT bool
 NOTHROW(FCALL x86_fsgsbase_patch)(void *pc, void const *real_pc) {
 	/* F3 REX.W 0F AE /0 RDFSBASE r64 */
 	/* F3 REX.W 0F AE /1 RDGSBASE r64 */

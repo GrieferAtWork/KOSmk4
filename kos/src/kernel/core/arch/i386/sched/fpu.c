@@ -98,7 +98,7 @@ clone_fpustate(struct task *__restrict new_thread, uintptr_t UNUSED(flags)) {
 #endif
 
 
-PRIVATE ATTR_RETNONNULL ATTR_MALLOC WUNUSED struct fpustate *KCALL
+PRIVATE ATTR_MALLOC ATTR_RETNONNULL WUNUSED struct fpustate *KCALL
 fpustate_alloc_noinit(void) {
 	/* TODO: Slab-style cache */
 	return (struct fpustate *)kmemalign(ALIGNOF_FPUSTATE,
@@ -106,7 +106,7 @@ fpustate_alloc_noinit(void) {
 	                                    FPU_GFP);
 }
 
-PUBLIC ATTR_RETNONNULL ATTR_MALLOC WUNUSED struct fpustate *KCALL
+PUBLIC ATTR_MALLOC ATTR_RETNONNULL WUNUSED struct fpustate *KCALL
 fpustate_alloc(void) {
 	struct fpustate *result;
 	/* TODO: Slab-style cache */
@@ -369,7 +369,7 @@ DEFINE_VERY_EARLY_KERNEL_COMMANDLINE_OPTION(x86_config_nofpu,
                                             "nofpu");
 
 /* Convert sfpustate's FTW to xfpustate's */
-INTERN ATTR_PURE NOBLOCK u8
+INTERN NOBLOCK ATTR_PURE u8
 NOTHROW(FCALL x86_fxsave_compress_ftw)(struct sfpustate const *__restrict self) {
 	return fpustate_ftw2ftwx(self->fs_ftw);
 }
@@ -377,7 +377,7 @@ NOTHROW(FCALL x86_fxsave_compress_ftw)(struct sfpustate const *__restrict self) 
 /* Convert xfpustate's FTW to sfpustate's
  * NOTE: Return value is actually a `u16', but use `u32'
  *       so  assembly doesn't have  to movzwl the value! */
-INTERN ATTR_PURE NOBLOCK u32
+INTERN NOBLOCK ATTR_PURE u32
 NOTHROW(FCALL x86_fxsave_decompress_ftw)(struct xfpustate const *__restrict self) {
 	return fpustate_ftwx2ftw(self->fx_ftw, self->fx_regs);
 }

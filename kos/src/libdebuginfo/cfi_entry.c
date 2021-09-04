@@ -601,7 +601,7 @@ noinfo_fail:
 #endif /* __GNUC__ */
 
 /* Check if the given `expr' is a simple push-register instruction for `dw_regno' */
-PRIVATE WUNUSED ATTR_PURE NONNULL((1, 2)) bool
+PRIVATE ATTR_PURE WUNUSED NONNULL((1, 2)) bool
 NOTHROW_NCX(CC is_cfi_expression_a_simple_register_push)(struct cfientry *__restrict self,
                                                          di_debuginfo_location_t const *__restrict loc,
                                                          unwind_regno_t dw_regno) {

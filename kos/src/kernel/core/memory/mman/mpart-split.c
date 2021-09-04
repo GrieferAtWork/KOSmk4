@@ -82,7 +82,7 @@ DECL_BEGIN
 /* (manually) check if one the blocks of the given
  * mem-part  was marked as having changed, without
  * looking at the part's CHANGED flag. */
-PRIVATE NOBLOCK WUNUSED ATTR_PURE NONNULL((1)) bool
+PRIVATE NOBLOCK ATTR_PURE WUNUSED NONNULL((1)) bool
 NOTHROW(FCALL mpart_really_changed)(struct mpart const *__restrict self) {
 	size_t i, count;
 	if unlikely(!mpart_hasblockstate(self)) {
@@ -152,7 +152,7 @@ NOTHROW(FCALL mpart_foreach_mmans_decref)(struct mpart *__restrict self) {
 
 
 /* Check if the given mnode_list contains nodes that have the MLOCK flag set. */
-PRIVATE NOBLOCK WUNUSED ATTR_PURE NONNULL((1)) bool
+PRIVATE NOBLOCK ATTR_PURE WUNUSED NONNULL((1)) bool
 NOTHROW(FCALL mnode_list_contains_mlocked_nodes)(struct mnode_list const *__restrict self) {
 	struct mnode const *node;
 	LIST_FOREACH (node, self, mn_link) {
@@ -165,7 +165,7 @@ NOTHROW(FCALL mnode_list_contains_mlocked_nodes)(struct mnode_list const *__rest
 
 
 /* Check if `start_node...| stop_node' contains `mm' */
-PRIVATE NOBLOCK WUNUSED ATTR_PURE NONNULL((1, 2)) bool
+PRIVATE NOBLOCK ATTR_PURE WUNUSED NONNULL((1, 2)) bool
 NOTHROW(FCALL mnode_list_contains_mman)(struct mnode const *__restrict start_node,
                                         struct mman const *__restrict mm,
                                         struct mnode const *stop_node DFL(NULL)) {

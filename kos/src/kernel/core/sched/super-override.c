@@ -75,7 +75,7 @@ NOTHROW(FCALL arch_sched_super_override_ipi)(struct icpustate *__restrict state,
                                              void *args[CPU_IPI_ARGCOUNT]);
 
 /* Callback invoked by `arch_sched_super_override_ipi()' */
-INTERN ATTR_COLDTEXT NOBLOCK NOPREEMPT ATTR_COLDTEXT void
+INTERN NOBLOCK NOPREEMPT ATTR_COLDTEXT void
 NOTHROW(FCALL sched_super_override_ipi)(void) {
 	struct task_connections cons;
 
@@ -128,7 +128,7 @@ NOTHROW(FCALL sched_super_override_ipi)(void) {
 	ATOMIC_DEC(super_override_ack);
 }
 
-PRIVATE ATTR_COLDTEXT NOBLOCK NOCONNECT bool FCALL
+PRIVATE NOBLOCK NOCONNECT ATTR_COLDTEXT bool FCALL
 sched_super_override_start_impl(bool force) THROWS(E_WOULDBLOCK, ...) {
 	struct cpu *me;
 	bool was_already_override;
@@ -269,19 +269,19 @@ again:
  *                                 unconditionally  by  `sched_super_override_start()',
  *                                 unless `thiscpu_sched_override' was already non-NULL
  *                                 before  `sched_super_override_start()'  was  called. */
-PUBLIC ATTR_COLDTEXT NOBLOCK NOCONNECT void FCALL
+PUBLIC NOBLOCK NOCONNECT ATTR_COLDTEXT void FCALL
 sched_super_override_start(void) THROWS(E_WOULDBLOCK, ...) {
 	sched_super_override_start_impl(true);
 }
 
 /* Same as `sched_super_override_start()', but fail and return
  * `false' if  the  lock  can't be  acquired  at  the  moment. */
-PUBLIC ATTR_COLDTEXT NOBLOCK WUNUSED bool
+PUBLIC NOBLOCK ATTR_COLDTEXT WUNUSED bool
 NOTHROW(FCALL sched_super_override_trystart)(void) {
 	return sched_super_override_start_impl(false);
 }
 
-PUBLIC ATTR_COLDTEXT NOBLOCK void
+PUBLIC NOBLOCK ATTR_COLDTEXT void
 NOTHROW(FCALL sched_super_override_end)(bool release_sched_override) {
 	assert(super_override_active);
 	assert(super_override_cpu == THIS_CPU);
@@ -317,7 +317,7 @@ NOTHROW(FCALL sched_super_override_end)(bool release_sched_override) {
  * not restricted to only returning `true' for the thread holding the super-override
  * system lock, meaning that it can also be used from within IPIs send to other CPUs
  * where a completely different thread is the one who engaged the super-override. */
-PUBLIC ATTR_COLDTEXT NOBLOCK ATTR_PURE bool
+PUBLIC NOBLOCK ATTR_COLDTEXT ATTR_PURE bool
 NOTHROW(FCALL sched_super_override_active)(void) {
 	return super_override_active;
 }

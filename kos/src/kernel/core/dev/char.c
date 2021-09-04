@@ -119,7 +119,7 @@ NOTHROW(KCALL remove_character_device_from_tree)(struct character_device *__rest
 
 #define must_service_dead_character_devices() \
 	(ATOMIC_READ(dead_character_devices) != NULL)
-PRIVATE ATTR_COLD NOBLOCK void
+PRIVATE NOBLOCK ATTR_COLD void
 NOTHROW(KCALL service_dead_character_devices)(void) {
 	struct character_device *chain, *next;
 	chain = ATOMIC_XCH(dead_character_devices, NULL);
@@ -188,7 +188,7 @@ NOTHROW(KCALL character_device_destroy)(struct character_device *__restrict self
  * As well as optionally:
  *   >> return->cd_name
  */
-PUBLIC ATTR_RETNONNULL ATTR_MALLOC WUNUSED REF struct character_device *KCALL
+PUBLIC ATTR_MALLOC ATTR_RETNONNULL WUNUSED REF struct character_device *KCALL
 character_device_alloc(struct driver *__restrict owner,
                        size_t structure_size,
                        size_t structure_align)

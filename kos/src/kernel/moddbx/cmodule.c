@@ -2283,7 +2283,7 @@ done:
 
 /* Try  to   find  the   compilation  unit   that  contains   `dip'
  * If no such unit can be located, `NULL' will be returned instead. */
-PUBLIC WUNUSED ATTR_PURE NONNULL((1)) struct cmodunit *
+PUBLIC ATTR_PURE WUNUSED NONNULL((1)) struct cmodunit *
 NOTHROW(FCALL cmodule_findunit_from_dip)(struct cmodule const *__restrict self,
                                          byte_t const *__restrict dip) {
 	struct cmodunit const *result;

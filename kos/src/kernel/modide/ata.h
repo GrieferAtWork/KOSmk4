@@ -325,12 +325,12 @@ typedef u32 AtaError_t; /* ATA error  */
 #define ATA_ERROR_REASON(x)      (((x) >> 16) & 0xffff)
 
 /* Complete the given AIO handle with an ATA error code. */
-INTDEF ATTR_COLD NOBLOCK NONNULL((1)) void
+INTDEF NOBLOCK ATTR_COLD NONNULL((1)) void
 NOTHROW(FCALL AtaDrive_DmaAioHandle_CompleteWithError)(struct aio_handle *__restrict self,
                                                        AtaError_t error);
 
 /* Complete the given, generic AIO handle with an ATA error code. */
-INTDEF ATTR_COLD NOBLOCK NONNULL((1)) void
+INTDEF NOBLOCK ATTR_COLD NONNULL((1)) void
 NOTHROW(FCALL AioHandle_CompleteWithAtaError)(struct aio_handle *__restrict self,
                                               AtaError_t error);
 

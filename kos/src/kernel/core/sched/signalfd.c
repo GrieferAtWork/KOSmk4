@@ -46,7 +46,7 @@
 
 DECL_BEGIN
 
-PRIVATE ATTR_MALLOC WUNUSED ATTR_RETNONNULL REF struct signalfd *KCALL
+PRIVATE ATTR_MALLOC ATTR_RETNONNULL WUNUSED REF struct signalfd *KCALL
 signalfd_create(USER CHECKED sigset_t const *mask) THROWS(E_BADALLOC) {
 	struct signalfd *result;
 	result = (struct signalfd *)kmalloc(sizeof(struct signalfd), GFP_NORMAL);

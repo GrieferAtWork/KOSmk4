@@ -126,7 +126,7 @@ PUBLIC size_t mcoreheap_freecount = COMPILER_LENOF(_mcore_initpage.mcp_part);
 #define LAST_BITSET_WORD_ALLUSED (((uintptr_t)1 << LAST_BITSET_WORD_PARTS) - 1)
 
 /* Check if the given mcorepage is fully in-use. */
-LOCAL NOBLOCK WUNUSED ATTR_PURE NONNULL((1)) bool
+LOCAL NOBLOCK ATTR_PURE WUNUSED NONNULL((1)) bool
 NOTHROW(FCALL mcorepage_allused)(struct mcorepage const *__restrict self) {
 #if LAST_BITSET_WORD_PARTS == 0
 #if MCOREPAGE_BITSET_LENGTH == 1
@@ -155,7 +155,7 @@ NOTHROW(FCALL mcorepage_allused)(struct mcorepage const *__restrict self) {
 }
 
 /* Check if the given mcorepage is fully free. */
-LOCAL NOBLOCK WUNUSED ATTR_PURE NONNULL((1)) bool
+LOCAL NOBLOCK ATTR_PURE WUNUSED NONNULL((1)) bool
 NOTHROW(FCALL mcorepage_allfree)(struct mcorepage const *__restrict self) {
 #if LAST_BITSET_WORD_PARTS == 0
 #if MCOREPAGE_BITSET_LENGTH == 1
@@ -229,7 +229,7 @@ got_word:
 /* Unconditionally allocate a mem-core-part from `mcoreheap_freelist'.
  * The  caller must  ensure that parts  are available, and  that the 2
  * reserved parts aren't used inappropriately. */
-PRIVATE NOBLOCK WUNUSED ATTR_RETNONNULL ATTR_MALLOC union mcorepart *
+PRIVATE NOBLOCK ATTR_MALLOC ATTR_RETNONNULL WUNUSED union mcorepart *
 NOTHROW(FCALL mcoreheap_alloc_impl)(void) {
 	union mcorepart *result;
 	struct mcorepage *page;
@@ -591,7 +591,7 @@ NOTHROW(FCALL mcoreheap_replicate)(/*inherit(always)*/ struct mpart *__restrict 
  *                As such, a NULL-return-value here means that the system
  *                has run out  of memory on  the lowest, possible  level.
  *                That is: `page_malloc()' failed. */
-PUBLIC NOBLOCK WUNUSED ATTR_MALLOC union mcorepart *
+PUBLIC NOBLOCK ATTR_MALLOC WUNUSED union mcorepart *
 NOTHROW(FCALL mcoreheap_alloc_locked_nx)(void) {
 	union mcorepart *result;
 	assert(mcoreheap_freecount >= 2);
@@ -620,7 +620,7 @@ NOTHROW(FCALL mcoreheap_alloc_locked_nx)(void) {
 
 /* Do all of the  necessary locking and  throw an exception  if the allocation  failed.
  * Essentially, this is just a convenience wrapper around `mcoreheap_alloc_locked_nx()' */
-PUBLIC ATTR_RETNONNULL ATTR_MALLOC union mcorepart *FCALL
+PUBLIC ATTR_MALLOC ATTR_RETNONNULL union mcorepart *FCALL
 mcoreheap_alloc(void) THROWS(E_BADALLOC, E_WOULDBLOCK) {
 	union mcorepart *result;
 	mman_lock_acquire(&mman_kernel);
