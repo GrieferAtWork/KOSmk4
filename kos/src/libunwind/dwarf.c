@@ -88,7 +88,7 @@ NOTHROW_NCX(CC calculate_tbase)(void const *modptr) {
 	void *result;
 	result = module_fromaddr_nx(modptr);
 	if (result != NULL)
-		result = module_get_tbase(result);
+		result = (void *)module_get_tbase((module_t *)result);
 	return (byte_t *)result;
 }
 
@@ -97,7 +97,7 @@ NOTHROW_NCX(CC calculate_dbase)(void const *modptr) {
 	void *result;
 	result = module_fromaddr_nx(modptr);
 	if (result != NULL)
-		result = module_get_dbase(result);
+		result = (void *)module_get_dbase((module_t *)result);
 	return (byte_t *)result;
 }
 

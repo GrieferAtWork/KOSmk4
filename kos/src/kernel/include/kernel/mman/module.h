@@ -203,6 +203,12 @@ struct module_ops {
 	(FCALL *mo_sectinfo)(struct module *__restrict self,
 	                     uintptr_t module_relative_addr,
 	                     struct module_sectinfo *__restrict info);
+
+	/* [1..1] Return the text/data base address for `self' (as used by unwinding)
+	 * NOTE: `self' is only non-const in  order to allow for lazy  initialization.
+	 * These functions may not alter the state of `self' in any observable manner! */
+	WUNUSED NONNULL((1)) void const * /*NOTHROW*/ (FCALL *mo_get_tbase)(struct module *__restrict self);
+	WUNUSED NONNULL((1)) void const * /*NOTHROW*/ (FCALL *mo_get_dbase)(struct module *__restrict self);
 };
 
 struct module {
@@ -274,10 +280,15 @@ NOTHROW(FCALL module_clear_mnode_pointers_and_destroy)(struct module *__restrict
 WUNUSED NONNULL((1)) REF struct module_section *(module_locksection)(struct module *__restrict self, USER CHECKED char const *section_name);
 WUNUSED NONNULL((1)) REF struct module_section *(module_locksection_index)(struct module *__restrict self, unsigned int section_index);
 WUNUSED NONNULL((1, 3)) __BOOL (module_sectinfo)(struct module *__restrict self, uintptr_t module_relative_addr, struct module_sectinfo *__restrict info);
+/* Return the module's text/data base address, as used during unwinding. */
+WUNUSED NONNULL((1)) void const *NOTHROW(module_get_tbase)(struct module *__restrict self);
+WUNUSED NONNULL((1)) void const *NOTHROW(module_get_dbase)(struct module *__restrict self);
 #else /* __INTELLISENSE__ */
 #define module_locksection(self, section_name)            (*(self)->md_ops->mo_locksection)(self, section_name)
 #define module_locksection_index(self, section_index)     (*(self)->md_ops->mo_locksection_index)(self, section_index)
 #define module_sectinfo(self, module_relative_addr, info) (*(self)->md_ops->mo_sectinfo)(self, module_relative_addr, info)
+#define module_get_tbase(self)                            (*(self)->md_ops->mo_get_tbase)(self)
+#define module_get_dbase(self)                            (*(self)->md_ops->mo_get_dbase)(self)
 #endif /* !__INTELLISENSE__ */
 
 /* Same as `module_locksection()', but preserve/discard errors and return `NULL' instead. */
@@ -286,9 +297,6 @@ NOTHROW(FCALL module_locksection_nx)(struct module *__restrict self, char const 
 FUNDEF WUNUSED NONNULL((1)) REF struct module_section *
 NOTHROW(FCALL module_locksection_index_nx)(struct module *__restrict self, unsigned int section_index);
 
-/* Return the module's text/data base address, as used during unwinding. */
-#define module_get_tbase(self) ((void *)0) /* TODO */
-#define module_get_dbase(self) ((void *)0) /* TODO */
 
 /* Return the size of a pointer for the given module. */
 #ifdef _MODULE_HAVE_SIZEOF_POINTER

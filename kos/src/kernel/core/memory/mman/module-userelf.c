@@ -63,7 +63,6 @@
 
 #include <alloca.h>
 #include <assert.h>
-#include <malloca.h>
 #include <stddef.h>
 #include <string.h>
 
@@ -91,6 +90,10 @@
 #ifndef ELF_ARCH_MAXSHCOUNT
 #define ELF_ARCH_MAXSHCOUNT 128
 #endif /* !ELF_ARCH_MAXSHCOUNT */
+
+#ifndef ELF_ARCH_MAXDYNCOUNT
+#define ELF_ARCH_MAXDYNCOUNT 256
+#endif /* !ELF_ARCH_MAXDYNCOUNT */
 
 #ifndef ELF_ARCH_MAXSHSTRTAB_SIZ
 #define ELF_ARCH_MAXSHSTRTAB_SIZ 65536
@@ -171,6 +174,118 @@ uem_shstrtab(struct userelf_module *__restrict self) {
 }
 
 
+PRIVATE WUNUSED NONNULL((1)) void const *
+NOTHROW(FCALL get_segment_start_byflags)(struct userelf_module const *__restrict self,
+                                         ElfW(Word) pf_flags) {
+	void const *result;
+	ElfW(Half) i;
+	COMPILER_IMPURE();
+	/* Search for the lowest program header with the correct flags. */
+	for (result = (void const *)-1, i = 0; i < self->um_phnum; ++i) {
+		uintptr_t hdraddr;
+		if (UM_field(self, self->um_phdrs, [i].p_type) != PT_LOAD)
+			continue;
+		if ((UM_field(self, self->um_phdrs, [i].p_flags) & (PF_R | PF_W | PF_X)) != pf_flags)
+			continue;
+		hdraddr = self->md_loadaddr + UM_field(self, self->um_phdrs, [i].p_vaddr);
+		if ((uintptr_t)result > hdraddr)
+			result = (void *)hdraddr;
+	}
+	if (result == (void const *)-1)
+		result = NULL;
+	return result;
+}
+
+PRIVATE WUNUSED NONNULL((1)) void const *
+NOTHROW(FCALL uem_get_tbase)(struct userelf_module *__restrict self) {
+	return get_segment_start_byflags(self, PF_R | PF_X);
+}
+
+#if defined(__i386__) || (defined(__x86_64__) && defined(__ARCH_HAVE_COMPAT))
+PRIVATE WUNUSED NONNULL((1)) uint32_t FCALL
+scan_dynamic_for_DT_PLTGOT(struct mfile *__restrict file,
+                           pos_t dynamic_offset,
+                           size_t dynamic_count) {
+	Elf32_Dyn *dynamic;
+	uint32_t result = 0;
+	size_t i, total_size;
+	if unlikely(dynamic_count == 0)
+		goto done;
+	total_size = dynamic_count * sizeof(Elf32_Dyn);
+	dynamic    = (Elf32_Dyn *)alloca(total_size);
+#ifdef CONFIG_USE_NEW_FS
+	mfile_readall(file, dynamic, total_size, dynamic_offset);
+#else /* CONFIG_USE_NEW_FS */
+	if (!vm_datablock_isinode(file))
+		goto done;
+	inode_readallk((struct inode *)file, dynamic,
+	               total_size, dynamic_offset);
+#endif /* !CONFIG_USE_NEW_FS */
+	for (i = 0; i < dynamic_count; ++i) {
+		if (dynamic[i].d_tag == DT_PLTGOT) {
+			result = dynamic[i].d_un.d_ptr;
+			break;
+		}
+	}
+done:
+	return result;
+}
+
+PRIVATE WUNUSED NONNULL((1)) void const *
+NOTHROW(FCALL uem_get_dbase_386)(struct userelf_module *__restrict self) {
+#ifdef UM_HYBRID
+#define um_phdrs32 um_phdrs._32
+#else /* UM_HYBRID */
+#define um_phdrs32 um_phdrs
+#endif /* !UM_HYBRID */
+	/* Special case for data-base on i386:
+	 * For reference, see glibc: `/sysdeps/generic/unwind-dw2-fde-glibc.c' */
+	uintptr_t result;
+	if (self->_um_DT_PLTGOT == (uint32_t)-1) {
+		size_t i;
+		for (i = 0; i < self->um_phnum; ++i) {
+			if (self->um_phdrs32[i].p_type != PT_DYNAMIC)
+				continue;
+			if (self->um_phdrs32[i].p_filesz > (ELF_ARCH_MAXDYNCOUNT * sizeof(Elf32_Dyn)))
+				break;
+			NESTED_TRY {
+				self->_um_DT_PLTGOT = scan_dynamic_for_DT_PLTGOT(self->md_file,
+				                                                 (pos_t)self->um_phdrs32[i].p_offset,
+				                                                 self->um_phdrs32[i].p_filesz / sizeof(Elf32_Dyn));
+			} EXCEPT {
+				self->_um_DT_PLTGOT = 0;
+			}
+			goto done;
+		}
+		self->_um_DT_PLTGOT = 0;
+	}
+done:
+	result = self->_um_DT_PLTGOT;
+	if (result != 0)
+		result += self->md_loadaddr;
+	return (void const *)result;
+#undef um_phdrs32
+}
+#endif /* __i386__ || (__x86_64__ && __ARCH_HAVE_COMPAT) */
+
+PRIVATE WUNUSED NONNULL((1)) void const *
+NOTHROW(FCALL uem_get_dbase)(struct userelf_module *__restrict self) {
+#ifdef __i386__
+	return uem_get_dbase_386(self);
+#elif defined(__x86_64__) && defined(__ARCH_HAVE_COMPAT)
+	void const *result;
+	if (module_sizeof_pointer(self) == 4) {
+		result = uem_get_dbase_386(self);
+	} else {
+		result = get_segment_start_byflags(self, PF_R | PF_W);
+	}
+	return result;
+#else /* ... */
+	return get_segment_start_byflags(self, PF_R | PF_W);
+#endif /* !... */
+}
+
+
 
 
 /* Operator tables for userelf module objects. */
@@ -189,6 +304,8 @@ INTERN_CONST struct module_ops const uem_ops = {
 	.mo_locksection       = (REF struct module_section *(FCALL *)(struct module *__restrict, USER CHECKED char const *))&uem_locksection,
 	.mo_locksection_index = (REF struct module_section *(FCALL *)(struct module *__restrict, unsigned int))&uem_locksection_index,
 	.mo_sectinfo          = (bool (FCALL *)(struct module *__restrict, uintptr_t, struct module_sectinfo *__restrict))&uem_sectinfo,
+	.mo_get_tbase         = (void const *(FCALL *)(struct module *__restrict))&uem_get_tbase,
+	.mo_get_dbase         = (void const *(FCALL *)(struct module *__restrict))&uem_get_dbase
 };
 
 
@@ -469,6 +586,7 @@ NOTHROW(FCALL uem_destroy)(struct userelf_module *__restrict self) {
 	decref_unlikely(self->md_file);
 	xdecref_unlikely(self->md_fspath);
 	xdecref_unlikely(self->md_fsname);
+	kfree(UM_any(self->um_phdrs));
 	kfree(UM_any(self->um_shdrs));
 	kfree(self->um_shstrtab);
 
@@ -875,11 +993,11 @@ uem_create_from_mapping(struct mman *__restrict self,
 	 *       it's impossible  for file  mappings to  be created,  such
 	 *       that the PAGEMASK'd  part of the  addr/fpos don't  match. */
 	REF struct userelf_module *result;
-	pos_t file_size, shoff, shend;
+	pos_t file_size, phoff, shoff;
 	UM_ElfW_Ehdr ehdr;
 	uint16_t phnum, shnum;
 	UM_ElfW_PhdrP phdrv;
-	size_t shsize;
+	size_t phsize, shsize;
 #ifdef _MODULE_HAVE_SIZEOF_POINTER
 	byte_t sizeof_pointer = sizeof(void *);
 #endif /* _MODULE_HAVE_SIZEOF_POINTER */
@@ -963,30 +1081,32 @@ uem_create_from_mapping(struct mman *__restrict self,
 		goto not_an_elf_file;
 	shoff  = (pos_t)UM_field_r(sizeof_pointer, ehdr, .e_shoff);
 	shsize = UM_sizeof_r(sizeof_pointer, UM_ElfW_Shdr) * shnum;
-	if (OVERFLOW_UADD(shoff, shsize, &shend) || shend > file_size)
-		goto not_an_elf_file;
+	{
+		pos_t shend;
+		if (OVERFLOW_UADD(shoff, shsize, &shend) || shend > file_size)
+			goto not_an_elf_file;
+	}
 
 	/* Validate/decode program header indices/offsets */
 	phnum = UM_field_r(sizeof_pointer, ehdr, .e_phnum);
 	if (phnum > ELF_ARCH_MAXPHCOUNT)
 		goto not_an_elf_file; /* Must still limit the max # of program headers! */
+	phoff  = (pos_t)UM_field_r(sizeof_pointer, ehdr, .e_phoff);
+	phsize = UM_sizeof_r(sizeof_pointer, UM_ElfW_Phdr) * phnum;
 	{
-		size_t phsize;
-		pos_t phoff, phend;
-		phoff  = (pos_t)UM_field_r(sizeof_pointer, ehdr, .e_phoff);
-		phsize = UM_sizeof_r(sizeof_pointer, UM_ElfW_Phdr) * phnum;
+		pos_t phend;
 		if (OVERFLOW_UADD(phoff, phsize, &phend) || phend > file_size)
 			goto not_an_elf_file;
+	}
 
-		/* Allocate+load the Elf program header vector! */
-		UM_any(phdrv) = (typeof(UM_any(phdrv)))malloca(phsize);
-		TRY {
-			if (mfile_read(file, UM_any(phdrv), phsize, phoff) < phsize)
-				goto not_an_elf_file_phdrv;
-		} EXCEPT {
-			freea(UM_any(phdrv));
-			RETHROW();
-		}
+	/* Allocate+load the Elf program header vector! */
+	UM_any(phdrv) = (typeof(UM_any(phdrv)))kmalloc(phsize, GFP_NORMAL);
+	TRY {
+		if (mfile_read(file, UM_any(phdrv), phsize, phoff) < phsize)
+			goto not_an_elf_file_phdrv;
+	} EXCEPT {
+		kfree(UM_any(phdrv));
+		RETHROW();
 	}
 	TRY {
 		uint16_t i;
@@ -1012,10 +1132,10 @@ uem_create_from_mapping(struct mman *__restrict self,
 				goto not_an_elf_file_phdrv;
 			if (UM_field_r(sizeof_pointer, phdrv, [i].p_type) != PT_LOAD)
 				continue; /* Must be a load-header! */
-			aligned_phdr_file_pos = (pos_t)UM_field_r(sizeof_pointer, phdrv, [i].p_offset);
-			aligned_phdr_file_size   = UM_field_r(sizeof_pointer, phdrv, [i].p_filesz);
-			aligned_phdr_file_shift  = (size_t)(aligned_phdr_file_pos & (PAGESIZE - 1));
-			aligned_phdr_file_size   += aligned_phdr_file_shift;
+			aligned_phdr_file_pos   = (pos_t)UM_field_r(sizeof_pointer, phdrv, [i].p_offset);
+			aligned_phdr_file_size  = UM_field_r(sizeof_pointer, phdrv, [i].p_filesz);
+			aligned_phdr_file_shift = (size_t)(aligned_phdr_file_pos & (PAGESIZE - 1));
+			aligned_phdr_file_size += aligned_phdr_file_shift;
 			aligned_phdr_file_pos -= aligned_phdr_file_shift;
 			if (node_fpos < aligned_phdr_file_pos)
 				continue;
@@ -1046,14 +1166,17 @@ uem_create_from_mapping(struct mman *__restrict self,
 		result = (REF struct userelf_module *)kmalloc(offsetof(struct userelf_module, um_sections) +
 		                                              (shnum * sizeof(struct uems_awref)),
 		                                              GFP_CALLOC);
+		_userelf_module_init_arch(result);
 		result->um_shoff      = shoff;
+		result->um_phnum      = phnum;
 		result->um_shnum      = shnum;
 		result->um_shstrndx   = UM_field_r(sizeof_pointer, ehdr, .e_shstrndx);
-/*		UM_any(result->um_shdrs) = NULL;*/ /* Already done by GFP_CALLOC */
-/*		result->um_shstrtab   = NULL;*/    /* Already done by GFP_CALLOC */
-		result->md_refcnt     = 2; /* +1: return, +1: thismman_uemc */
+		result->um_phdrs      = phdrv;       /* Inherited on success */
+/*		UM_any(result->um_shdrs) = NULL;*/   /* Already done by GFP_CALLOC */
+/*		result->um_shstrtab   = NULL;*/      /* Already done by GFP_CALLOC */
+		result->md_refcnt     = 2;           /* +1: return, +1: thismman_uemc */
 		result->md_weakrefcnt = 1;
-/*		result->md_nodecount  = 0;*/ /* Already done by GFP_CALLOC; Incremented later! */
+/*		result->md_nodecount  = 0;*/         /* Already done by GFP_CALLOC; Incremented later! */
 		result->md_ops        = &uem_ops;
 		result->md_loadaddr   = loadaddr;
 		result->md_loadmin    = (byte_t *)-1;
@@ -1085,7 +1208,7 @@ uem_create_from_mapping(struct mman *__restrict self,
 something_changed:
 				mman_lock_release(self);
 				kfree(result);
-				freea(UM_any(phdrv));
+				kfree(UM_any(phdrv));
 				return UEM_TRYCREATE_UNLOCKED;
 			}
 			if unlikely(ATOMIC_READ(part->mp_file) != file)
@@ -1225,7 +1348,7 @@ set_node_nullptr:
 									goto set_node_nullptr;
 								mman_lock_release(self);
 								kfree(result);
-								freea(UM_any(phdrv));
+								kfree(UM_any(phdrv));
 								return new_result;
 							}
 						}
@@ -1271,7 +1394,7 @@ again_locate_minmax:
 something_changed_merge:
 							mman_lock_release(self);
 							kfree(result);
-							freea(UM_any(phdrv));
+							kfree(UM_any(phdrv));
 							return UEM_TRYCREATE_UNLOCKED_MERGE;
 						}
 						goto again_locate_minmax;
@@ -1282,6 +1405,7 @@ something_changed_merge:
 						goto again_locate_minmax;
 					}
 				} EXCEPT {
+					kfree(result);
 					mman_mergenodes(self);
 					RETHROW();
 				}
@@ -1346,10 +1470,10 @@ something_changed_merge:
 		mman_mergenodes_inrange(self, result->md_loadmin, result->md_loadmax);
 		mman_lock_release(self);
 	} EXCEPT {
-		freea(UM_any(phdrv));
+		kfree(UM_any(phdrv));
 		RETHROW();
 	}
-	freea(UM_any(phdrv));
+	/*kfree(UM_any(phdrv));*/ /* In this case, inherited by `result' */
 	return result;
 not_an_elf_file_phdrv_result_mmlock_mergenodes:
 	mman_mergenodes_locked(self);
@@ -1358,7 +1482,7 @@ not_an_elf_file_phdrv_result_mmlock:
 /*not_an_elf_file_phdrv_result:*/
 	kfree(result);
 not_an_elf_file_phdrv:
-	freea(UM_any(phdrv));
+	kfree(UM_any(phdrv));
 not_an_elf_file:
 	return UEM_TRYCREATE_UNLOCKED_NOUEM;
 }
@@ -1488,8 +1612,6 @@ uem_create_system_rtld(struct mman *__restrict self,
 			goto not_an_elf_file;
 		if (UM_field_r(sizeof_pointer, ehdr, .e_shentsize) != UM_sizeof_r(sizeof_pointer, UM_ElfW_Shdr))
 			goto not_an_elf_file;
-		if (UM_field_r(sizeof_pointer, ehdr, .e_shentsize) != UM_sizeof_r(sizeof_pointer, UM_ElfW_Shdr))
-			goto not_an_elf_file;
 		if (UM_field_r(sizeof_pointer, ehdr, .e_phnum) != RTLD_PHDR_COUNT)
 			goto not_an_elf_file;
 
@@ -1592,6 +1714,19 @@ uem_create_system_rtld(struct mman *__restrict self,
 			result = (REF struct userelf_module *)kmalloc(offsetof(struct userelf_module, um_sections) +
 			                                              (shnum * sizeof(struct uems_awref)),
 			                                              GFP_CALLOC);
+			TRY {
+				UM_any(result->um_phdrs) = (typeof(UM_any(result->um_phdrs)))kmalloc(RTLD_PHDR_COUNT *
+				                                                                     UM_sizeof_r(sizeof_pointer, UM_ElfW_Phdr),
+				                                                                     GFP_NORMAL);
+			} EXCEPT {
+				kfree(result);
+				RETHROW();
+			}
+			/* Copy program header information. */
+			memcpy(UM_any(result->um_phdrs), UM_any(phdrv), RTLD_PHDR_COUNT,
+			       UM_sizeof_r(sizeof_pointer, UM_ElfW_Phdr));
+			_userelf_module_init_arch(result);
+			result->um_phnum      = RTLD_PHDR_COUNT;
 			result->um_shoff      = shoff;
 			result->um_shnum      = shnum;
 			result->um_shstrndx   = UM_field_r(sizeof_pointer, ehdr, .e_shstrndx);
@@ -1610,6 +1745,7 @@ uem_create_system_rtld(struct mman *__restrict self,
 			TRY {
 				mman_lock_acquire(self);
 			} EXCEPT {
+				kfree(UM_any(result->um_phdrs));
 				kfree(result);
 				RETHROW();
 			}
@@ -1626,8 +1762,9 @@ uem_create_system_rtld(struct mman *__restrict self,
 				if unlikely(!part) {
 something_changed:
 					mman_lock_release(self);
-					kfree(UM_any(shdrs));
+					kfree(UM_any(result->um_phdrs));
 					kfree(result);
+					kfree(UM_any(shdrs));
 					decref_unlikely(file);
 					return UEM_TRYCREATE_UNLOCKED;
 				}
@@ -1673,8 +1810,9 @@ set_node_nullptr:
 								if (!tryincref(new_result))
 									goto set_node_nullptr;
 								mman_lock_release(self);
-								kfree(UM_any(shdrs));
+								kfree(UM_any(result->um_phdrs));
 								kfree(result);
+								kfree(UM_any(shdrs));
 								decref_unlikely(file);
 								return new_result;
 							} else {
@@ -1698,8 +1836,9 @@ set_node_nullptr:
 								if (!mnode_split_or_unlock(self, mima.mm_min, result->md_loadmin, NULL)) {
 something_changed_merge:
 									mman_lock_release(self);
-									kfree(UM_any(shdrs));
+									kfree(UM_any(result->um_phdrs));
 									kfree(result);
+									kfree(UM_any(shdrs));
 									decref_unlikely(file);
 									return UEM_TRYCREATE_UNLOCKED_MERGE;
 								}
@@ -1714,6 +1853,8 @@ something_changed_merge:
 							}
 						} EXCEPT {
 							mman_mergenodes(self);
+							kfree(UM_any(result->um_phdrs));
+							kfree(result);
 							RETHROW();
 						}
 					}
@@ -1755,6 +1896,7 @@ not_an_elf_file_shdrs_result_mmlock_mergenodes:
 	mman_mergenodes_locked(self);
 not_an_elf_file_shdrs_result_mmlock:
 	mman_lock_release(self);
+	kfree(UM_any(result->um_phdrs));
 	kfree(result);
 	kfree(UM_any(shdrs));
 not_an_elf_file:

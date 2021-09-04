@@ -665,6 +665,21 @@ driver_sectinfo(struct driver *__restrict self,
                 uintptr_t module_relative_addr,
                 struct module_sectinfo *__restrict info);
 
+extern byte_t __kernel_text_start[];
+extern byte_t __kernel_data_start[];
+
+PRIVATE ATTR_CONST WUNUSED NONNULL((1)) void const *
+NOTHROW(FCALL kernel_get_tbase)(struct driver const *__restrict UNUSED(self)) {
+	return __kernel_text_start;
+}
+
+PRIVATE ATTR_CONST WUNUSED NONNULL((1)) void const *
+NOTHROW(FCALL kernel_get_dbase)(struct driver const *__restrict UNUSED(self)) {
+	return __kernel_data_start;
+}
+
+
+
 #ifndef KERNEL_DRIVER_NAME
 #define KERNEL_DRIVER_NAME "kernel"
 #endif /* !KERNEL_DRIVER_NAME */
@@ -679,7 +694,9 @@ PRIVATE struct module_ops const kernel_module_ops = {
 	.mo_nonodes           = (typeof(((struct module_ops *)0)->mo_nonodes))BADPOINTER, /* Must never be called! */
 	.mo_locksection       = (REF struct module_section *(FCALL *)(struct module *__restrict, USER CHECKED char const *))&kernel_locksection,
 	.mo_locksection_index = (REF struct module_section *(FCALL *)(struct module *__restrict, unsigned int))&kernel_locksection_index,
-	.mo_sectinfo          = (bool (FCALL *)(struct module *__restrict, uintptr_t, struct module_sectinfo *__restrict))&driver_sectinfo
+	.mo_sectinfo          = (bool (FCALL *)(struct module *__restrict, uintptr_t, struct module_sectinfo *__restrict))&driver_sectinfo,
+	.mo_get_tbase         = (void const *(FCALL *)(struct module *__restrict))&kernel_get_tbase,
+	.mo_get_dbase         = (void const *(FCALL *)(struct module *__restrict))&kernel_get_dbase
 };
 
 PRIVATE ATTR_COLDRODATA char const kernel_driver_name[] = KERNEL_DRIVER_NAME;
@@ -4265,6 +4282,52 @@ again:
 }
 
 
+PRIVATE ATTR_PURE WUNUSED NONNULL((1)) void const *
+NOTHROW(FCALL get_segment_start_byflags)(struct driver const *__restrict self,
+                                         ElfW(Word) pf_flags) {
+	void const *result;
+	ElfW(Half) i;
+	/* Search for the lowest program header with the correct flags. */
+	for (result = (void const *)-1, i = 0; i < self->d_phnum; ++i) {
+		uintptr_t hdraddr;
+		if (self->d_phdr[i].p_type != PT_LOAD)
+			continue;
+		if ((self->d_phdr[i].p_flags & (PF_R | PF_W | PF_X)) != pf_flags)
+			continue;
+		hdraddr = self->d_module.md_loadaddr + self->d_phdr[i].p_vaddr;
+		if ((uintptr_t)result > hdraddr)
+			result = (void *)hdraddr;
+	}
+	if (result == (void const *)-1)
+		result = NULL;
+	return result;
+}
+
+PRIVATE ATTR_PURE WUNUSED NONNULL((1)) void const *
+NOTHROW(FCALL driver_get_tbase)(struct driver const *__restrict self) {
+	return get_segment_start_byflags(self, PF_R | PF_X);
+}
+
+PRIVATE ATTR_PURE WUNUSED NONNULL((1)) void const *
+NOTHROW(FCALL driver_get_dbase)(struct driver const *__restrict self) {
+#ifdef __i386__
+	/* Special case for data-base on i386:
+	 * For reference, see glibc: `/sysdeps/generic/unwind-dw2-fde-glibc.c' */
+	size_t i;
+	for (i = 0; i < self->d_dyncnt; ++i) {
+		if (self->d_dynhdr[i].d_tag == DT_PLTGOT) {
+			return (void const *)(self->d_module.md_loadaddr +
+			                      self->d_dynhdr[i].d_un.d_ptr);
+		}
+	}
+	return NULL;
+#else /* __i386__ */
+	return get_segment_start_byflags(self, PF_R | PF_W);
+#endif /* !__i386__ */
+}
+
+
+
 PRIVATE struct module_ops const driver_module_ops = {
 	.mo_free              = (void(FCALL *)(struct module *__restrict))&driver_free_,
 	.mo_destroy           = (void(FCALL *)(struct module *__restrict))&driver_destroy,
@@ -4272,6 +4335,8 @@ PRIVATE struct module_ops const driver_module_ops = {
 	.mo_locksection       = (REF struct module_section *(FCALL *)(struct module *__restrict, USER CHECKED char const *))&driver_locksection,
 	.mo_locksection_index = (REF struct module_section *(FCALL *)(struct module *__restrict, unsigned int))&driver_locksection_index,
 	.mo_sectinfo          = (bool (FCALL *)(struct module *__restrict, uintptr_t, struct module_sectinfo *__restrict))&driver_sectinfo,
+	.mo_get_tbase         = (void const *(FCALL *)(struct module *__restrict))&driver_get_tbase,
+	.mo_get_dbase         = (void const *(FCALL *)(struct module *__restrict))&driver_get_dbase
 };
 
 

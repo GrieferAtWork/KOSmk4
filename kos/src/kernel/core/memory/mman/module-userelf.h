@@ -109,8 +109,15 @@ struct userelf_module: module {
 		SLIST_ENTRY(userelf_module)           _um_dead;       /* Used internally to chain dead UserELF modules. */
 	};
 	pos_t                                      um_shoff;      /* [const] == Elf_Ehdr::e_shoff. */
+	uint16_t                                   um_phnum;      /* [const] == Elf_Ehdr::e_phnum. */
 	uint16_t                                   um_shnum;      /* [const] == Elf_Ehdr::e_shnum. */
 	uint16_t                                   um_shstrndx;   /* [const] == Elf_Ehdr::e_shstrndx. (< ue_shnum) */
+	uint16_t                                  _um_pad;        /* ... */
+#if defined(__i386__) || (defined(__x86_64__) && defined(__ARCH_HAVE_COMPAT))
+	uint32_t                                  _um_DT_PLTGOT;
+#define _userelf_module_init__um_DT_PLTGOT(self) ((self)->_um_DT_PLTGOT = (uint32_t)-1)
+#endif /* __i386__ || (__x86_64__ && __ARCH_HAVE_COMPAT) */
+	UM_ElfW_PhdrP                              um_phdrs;      /* [1..um_phnum][const][owned] Program headers */
 	UM_ElfW_ShdrP                              um_shdrs;      /* [0..1][lock(WRICE_ONCE)][owned] Section headers */
 	union {
 		char                                  *um_shstrtab;   /* [0..1][lock(WRITE_ONCE)][owned] Section headers string table. */
@@ -118,6 +125,15 @@ struct userelf_module: module {
 	};
 	COMPILER_FLEXIBLE_ARRAY(struct uems_awref, um_sections);  /* [0..1][lock(WRITE_ONCE)][ue_shnum] Section cache. */
 };
+
+#ifndef _userelf_module_init__um_DT_PLTGOT
+#define _userelf_module_init__um_DT_PLTGOT(self) (void)0
+#endif /* !_userelf_module_init__um_DT_PLTGOT */
+
+/* Initialize arch-specific fields of `self' */
+#define _userelf_module_init_arch(self) \
+	(_userelf_module_init__um_DT_PLTGOT(self))
+
 
 
 #ifdef CONFIG_BUILDING_KERNEL_CORE
