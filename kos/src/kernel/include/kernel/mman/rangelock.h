@@ -48,7 +48,7 @@ SLIST_HEAD(mnode_slist, mnode);
 
 struct mrangelock {
 	struct mnode_tree_minmax mrl_nodes;                              /* Min/max in-bounds nodes. */
-	struct mnode_slist       mrl_uprts[MRANGELOCK_UPRTS_NUMBUCKETS]; /* [0..n][*] Linked list of mem-nodes with unique  */
+	struct mnode_slist       mrl_uprts[MRANGELOCK_UPRTS_NUMBUCKETS]; /* [0..n][*] Linked list of mem-nodes with unique parts. */
 };
 
 #define mrangelock_uparts_indexof(self, part) \

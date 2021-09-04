@@ -31,6 +31,10 @@
 
 #include <asm/os/mman.h>
 
+#ifdef __WANT_MNODE__mn_ilink
+#include <hybrid/__assert.h>
+#endif /* __WANT_MNODE__mn_ilink */
+
 /* Values for `struct mnode::mn_flags' */
 #define MNODE_F_NORMAL    0x00000000 /* Normal flags. */
 #define MNODE_F_PEXEC     0x00000001 /* [lock(mn_mman->mm_lock)] Data can be executed. */
@@ -354,19 +358,23 @@ struct mnode {
 
 /* Begin/end  using free use of `_mn_ilink' of `self'.
  * The caller must be holding a lock to the associated
- * mman, but note that for the duration of free use of
- * `_mn_ilink'  being allowed, this lock must never be
- * released! */
+ * mman, which must not  be released before all  ilink
+ * fields are deactivated via  `mnode_use_ilink_end()' */
 #ifdef __WANT_MNODE__mn_ilink
-#define mnode_use_ilink_begin(self)                                       \
-	((self)->mn_writable.le_prev != __NULLPTR                             \
-	 ? (void)(*(self)->mn_writable.le_prev = (self)->mn_writable.le_next) \
+#define mnode_use_ilink_begin(self)                                                                    \
+	((self)->mn_writable.le_prev != __NULLPTR                                                          \
+	 ? (void)((*(self)->mn_writable.le_prev = (self)->mn_writable.le_next) != __NULLPTR                \
+	          ? (void)((self)->mn_writable.le_next->mn_writable.le_prev = (self)->mn_writable.le_prev) \
+	          : (void)0)                                                                               \
 	 : (void)0)
-#define mnode_use_ilink_end(self)                                                   \
-	((self)->_mn_iswritable != __NULLPTR                                            \
-	 ? (void)((self)->mn_writable.le_next = (self)->mn_mman->mm_writable.lh_first,  \
-	          (self)->mn_writable.le_prev = &(self)->mn_mman->mm_writable.lh_first, \
-	          (self)->mn_mman->mm_writable.lh_first = (self))                       \
+#define mnode_use_ilink_end(self)                                                                       \
+	((self)->_mn_iswritable != __NULLPTR                                                                \
+	 ? (void)(((self)->mn_writable.le_next = (self)->mn_mman->mm_writable.lh_first) != __NULLPTR        \
+	          ? (void)(__hybrid_assert((self)->mn_writable.le_next->mn_writable.le_prev ==              \
+	                                   &(self)->mn_mman->mm_writable.lh_first),                         \
+	                   (self)->mn_writable.le_next->mn_writable.le_prev = &(self)->mn_writable.le_next) \
+	          : (void)0,                                                                                \
+	          *((self)->mn_writable.le_prev = &(self)->mn_mman->mm_writable.lh_first) = (self))         \
 	 : (void)0)
 #endif /* __WANT_MNODE__mn_ilink */
 
