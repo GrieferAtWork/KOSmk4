@@ -298,7 +298,8 @@ NOTHROW_NCX(LIBCCALL libuw__Unwind_Find_FDE)(void const *pc, /*out*/ struct dwar
 
 	/* Check if we can find the FDE by searching for a module and loading that module's .eh_frame section. */
 	if ((dlmod = dlgethandle(pc, DLGETHANDLE_FNORMAL)) != NULL &&
-	    (eh_frame_sect = dllocksection(dlmod, ".eh_frame", DLLOCKSECTION_FNORMAL)) != NULL &&
+	    /* TODO: Support for: `.eh_frame_hdr' (and its alias: `PT_GNU_EH_FRAME') */
+	    (eh_frame_sect = dllocksection(dlmod, ".eh_frame", DLLOCKSECTION_FNODATA)) != NULL &&
 	    (eh_frame_sect->ds_data != (void *)-1)) {
 
 		/* Search through this modules .eh_frame section. */
@@ -350,6 +351,41 @@ DEFINE_PUBLIC_ALIAS(_Unwind_Find_FDE, libuw__Unwind_Find_FDE);
 
 
 
+/* Search auxiliary eh_frame sections registered via `__register_frame()'
+ * and  friends for  FDE entries  containing `absolute_pc'.  Used when we
+ * were unable to find FDE data through normal means. */
+PRIVATE NONNULL((2)) unsigned int
+NOTHROW_NCX(CC libuw_unwind_fde_find_rf)(void const *absolute_pc,
+                                         unwind_fde_t *__restrict result) {
+	unsigned int error = UNWIND_NO_FRAME;
+	struct rf_object *obj;
+	atomic_rwlock_read(&register_frame_aux_lock);
+	/* Go through all explicitly registered register-frame objects
+	 * and see if one of them happens to contain the requested PC. */
+	SLIST_FOREACH (obj, &register_frame_aux_list, ro_link) {
+		if (obj->ro_isarray) {
+			size_t i;
+			for (i = 0;; ++i) {
+				rf_fde const *eh_frame;
+				eh_frame = obj->ro_eh_frame_array[i];
+				if (!eh_frame)
+					break;
+				error = libuw_unwind_fde_scan((byte_t const *)eh_frame, (byte_t const *)-1,
+				                              absolute_pc, result, sizeof(void *));
+				if (error != UNWIND_NO_FRAME)
+					goto done;
+			}
+		} else {
+			error = libuw_unwind_fde_scan((byte_t const *)obj->ro_eh_frame, (byte_t const *)-1,
+			                              absolute_pc, result, sizeof(void *));
+			if (error != UNWIND_NO_FRAME)
+				goto done;
+		}
+	}
+done:
+	atomic_rwlock_endread(&register_frame_aux_lock);
+	return error;
+}
 
 
 /* NOTE: In kernel-space, `libuw_unwind_fde_find()'  is
@@ -361,11 +397,11 @@ NOTHROW_NCX(CC libuw_unwind_fde_find_new)(void *dlmod, void const *absolute_pc,
 	struct dl_section *eh_frame_sect;
 
 	/* Lock the module's .eh_frame section into memory. */
-	eh_frame_sect = dllocksection(dlmod,
-	                              ".eh_frame",
-	                              DLLOCKSECTION_FNORMAL);
-	if unlikely(!eh_frame_sect)
-		ERROR(check_register_frame_objects);
+	eh_frame_sect = dllocksection(dlmod, ".eh_frame", DLLOCKSECTION_FNODATA);
+	if unlikely(eh_frame_sect == NULL || eh_frame_sect->ds_data == (void *)-1) {
+		/* TODO: Support for: `.eh_frame_hdr' (and its alias: `PT_GNU_EH_FRAME') */
+		ERROR(err_no_section);
+	}
 
 	/* Scan the .eh_frame section of the associated module. */
 	error = libuw_unwind_fde_scan((byte_t const *)eh_frame_sect->ds_data,
@@ -373,39 +409,8 @@ NOTHROW_NCX(CC libuw_unwind_fde_find_new)(void *dlmod, void const *absolute_pc,
 	                              absolute_pc, result, sizeof(void *));
 	dlunlocksection(eh_frame_sect);
 
-	/* If not found, try to search through __register_frame objects.. */
-	if (error == UNWIND_NO_FRAME)
-		goto check_register_frame_objects;
-
 	return error;
-	{
-		struct rf_object *obj;
-check_register_frame_objects:
-		atomic_rwlock_read(&register_frame_aux_lock);
-		/* Go through all explicitly registered register-frame objects
-		 * and see if one of them happens to contain the requested PC. */
-		SLIST_FOREACH (obj, &register_frame_aux_list, ro_link) {
-			if (obj->ro_isarray) {
-				size_t i;
-				for (i = 0;; ++i) {
-					rf_fde const *eh_frame;
-					eh_frame = obj->ro_eh_frame_array[i];
-					if (!eh_frame)
-						break;
-					error = libuw_unwind_fde_scan((byte_t const *)eh_frame, (byte_t const *)-1,
-					                              absolute_pc, result, sizeof(void *));
-					if (error != UNWIND_NO_FRAME)
-						break;
-				}
-			} else {
-				error = libuw_unwind_fde_scan((byte_t const *)obj->ro_eh_frame, (byte_t const *)-1,
-				                              absolute_pc, result, sizeof(void *));
-			}
-			if (error != UNWIND_NO_FRAME)
-				return error;
-		}
-		atomic_rwlock_endread(&register_frame_aux_lock);
-	}
+err_no_section:
 	return UNWIND_NO_FRAME;
 }
 
@@ -450,20 +455,48 @@ NOTHROW_NCX(CC libuw_unwind_fde_find)(void const *absolute_pc,
 	}
 
 do_lookup_fde:
+
 	/* Lookup the module associated with the given program counter position. */
 	dlmod = dlgethandle(absolute_pc, DLGETHANDLE_FNORMAL);
-	if unlikely(!dlmod)
-		ERROR(err);
-	error = libuw_unwind_fde_find_new(dlmod, absolute_pc, result);
+	if likely(dlmod != NULL) {
+		/* Lookup through normal means (iow: via dllocksection(".eh_frame")) */
+		error = libuw_unwind_fde_find_new(dlmod, absolute_pc, result);
+	} else {
+		error = UNWIND_NO_FRAME;
+	}
+
+	/* Lookup through auxiliary means (iow: via `__register_frame()') */
+	if unlikely(error == UNWIND_NO_FRAME) {
+		error = libuw_unwind_fde_find_rf(absolute_pc, result);
+		if (error == UNWIND_SUCCESS) {
+			/* For auxiliary frame listings,  we still need some  kind
+			 * of module handle for use with the cache. Because  these
+			 * types of cache entries can only be removed manually  by
+			 * unregistering the  frame  listing,  it  doesn't  matter
+			 * which module we  link against cache  entries. The  only
+			 * thing that matters is that the module doesn't ever  get
+			 * destroyed, which case easily achieve by linking against
+			 * the base application. */
+			dlmod = dlopen(NULL, 0);
+			assert(dlmod);
+		}
+	}
+
+	/* Check if we succeeded */
 	if unlikely(error != UNWIND_SUCCESS)
 		goto done;
 
 	/* (try to) cache the results */
+#ifndef __OPTIMIZE_SIZE__
+	if unlikely(!atomic_rwlock_canwrite(&fde_cache_lock))
+		goto done; /* Bypass malloc() if acquiring the lock would likely fail. */
+#endif /* !__OPTIMIZE_SIZE__ */
 	fce = (struct fde_cache_entry *)malloc(sizeof(struct fde_cache_entry)); /* XXX: malloc_nonblock? */
 	if unlikely(fce == NULL)
 		goto done;
 	memcpy(&fce->fce_fde, result, sizeof(unwind_fde_t));
 	fce->fce_dlhand = dlauxctrl(dlmod, DLAUXCTRL_MOD_WEAKINCREF);
+
 	if unlikely(!atomic_rwlock_trywrite(&fde_cache_lock)) {
 destroy_new_fce:
 		fde_cache_entry_destroy(fce);
@@ -475,7 +508,7 @@ destroy_new_fce:
 		existing_fce = fde_cache_tree_rremove(&fde_cache, result->f_pcstart,
 		                                      (byte_t *)result->f_pcend - 1);
 		assert(existing_fce);
-		if (dlauxctrl(fce->fce_dlhand, DLAUXCTRL_MOD_NOTDESTROYED) != NULL) {
+		if likely(dlauxctrl(fce->fce_dlhand, DLAUXCTRL_MOD_NOTDESTROYED) != NULL) {
 			/* Entry isn't stale...
 			 * This might happen if another thread created this entry while
 			 * we  created  ours, but  after  we checked  for  another pre-
@@ -498,8 +531,6 @@ destroy_new_fce:
 	}
 done:
 	return error;
-err:
-	return UNWIND_NO_FRAME;
 }
 
 DEFINE_PUBLIC_ALIAS(unwind_fde_find, libuw_unwind_fde_find);

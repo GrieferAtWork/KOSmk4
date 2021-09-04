@@ -747,8 +747,8 @@ __NOTHROW_NCX(__DLFCN_VCC dlauxctrl)(void *__handle,
 #define DLAUXCTRL_MOD_WEAKDECREF     0xa004 /* weakdecref() the module handle (always re-returns `handle') */
 #define DLAUXCTRL_MOD_TRYINCREF      0xa005 /* tryincref() the module handle (always re-returns `handle', or `NULL' if the module was destroyed) */
 #define DLAUXCTRL_MOD_NOTDESTROYED   0xa006 /* check if the module wasdestroyed() (re-returns `handle' if not, or `NULL' if so) */
-#define DLAUXCTRL_GET_TEXTBASE       0xa010 /* Return the text base address (that is: the lowest address mapped as RX\W); returns NULL if doesn't exist, but doesn't set an error */
-#define DLAUXCTRL_GET_DATABASE       0xa011 /* Return the data base address (that is: the lowest address mapped as RW\X); returns NULL if doesn't exist, but doesn't set an error */
+#define DLAUXCTRL_GET_TEXTBASE       0xa010 /* Return the text base address, as needed for unwinding. Return NULL on failure, but don't set an error */
+#define DLAUXCTRL_GET_DATABASE       0xa011 /* Return the data base address, as needed for unwinding. Return NULL on failure, but don't set an error */
 #define DLAUXCTRL_RUNFINI            0xd101 /* Run all library finalizers. `handle' is ignored but should be any valid module handle, or `NULL',
                                              * and  all  other arguments  are also  ignored; always  returns  `NULL', but  doesn't set  an error */
 #define DLAUXCTRL_RUNTLSFINI         0xd102 /* Run TLS library finalizers for the calling thread. `handle' is ignored but should
@@ -779,8 +779,8 @@ __NOTHROW_NCX(__DLFCN_VCC dlauxctrl)(void *__handle,
                                              * NOTE: Upon success, the module containing `extension->df_open' becomes undeletable. */
 #define DLAUXCTRL_GET_DEPENDS        0xd202 /* [size_t *pcount [0..1]] Returns the module's vector of module dependencies (`MODULE **') */
 #define DLAUXCTRL_ELF_CHECK          0xef00 /* Check if this module is an ELF module (re-returns `handle' if so, otherwise returns `NULL' but leaves `dlerror()' unmodified) */
-#define DLAUXCTRL_ELF_GET_PHDR       0xef01 /* [size_t *pcount [0..1]] Returns the module's vector of program headers (`ElfW(Phdr) *') */
-#define DLAUXCTRL_ELF_GET_SHDR       0xef02 /* [size_t *pcount [0..1]] Returns the module's vector of section headers (`ElfW(Shdr) *') */
+#define DLAUXCTRL_ELF_GET_PHDRS      0xef01 /* [size_t *pcount [0..1]] Returns the module's vector of program headers (`ElfW(Phdr) *') */
+#define DLAUXCTRL_ELF_GET_SHDRS      0xef02 /* [size_t *pcount [0..1]] Returns the module's vector of section headers (`ElfW(Shdr) *') */
 #define DLAUXCTRL_ELF_GET_DYN        0xef03 /* [size_t *pcount [0..1]] Returns the module's vector of dynamic tags (`ElfW(Dyn) *') */
 #define DLAUXCTRL_ELF_GET_DYNSYM     0xef04 /* [size_t *pcount [0..1]] Returns the module's dynamic symbol table (`ElfW(Sym) *')
                                              * If  the  number  of  symbols  is  unknown,  `(size_t)-1'  written  to  `*pcount'. */

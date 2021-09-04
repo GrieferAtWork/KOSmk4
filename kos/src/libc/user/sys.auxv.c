@@ -120,7 +120,7 @@ NOTHROW_NCX(LIBCCALL libc_getauxval)(ulongptr_t type)
 		break;
 
 	case AT_PHDR:
-		result = (ulongptr_t)dlauxctrl(NULL, DLAUXCTRL_ELF_GET_PHDR, NULL, NULL);
+		result = (ulongptr_t)dlauxctrl(NULL, DLAUXCTRL_ELF_GET_PHDRS, NULL, NULL);
 		break;
 
 	case AT_PHENT:
@@ -129,7 +129,7 @@ NOTHROW_NCX(LIBCCALL libc_getauxval)(ulongptr_t type)
 
 	case AT_PHNUM: {
 		size_t count;
-		if (!dlauxctrl(NULL, DLAUXCTRL_ELF_GET_PHDR, NULL, &count))
+		if (!dlauxctrl(NULL, DLAUXCTRL_ELF_GET_PHDRS, NULL, &count))
 			count = 0;
 		result = (ulongptr_t)count;
 	}	break;

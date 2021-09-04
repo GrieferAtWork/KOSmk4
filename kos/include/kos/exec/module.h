@@ -104,9 +104,9 @@ __DECL_BEGIN
 
 #if defined(__BUILDING_LIBDL) || defined(DL_EXTENSION_FORMAT)
 struct dlsection;
-typedef struct dlsection *module_section_t;
+typedef struct dlsection module_section_t;
 struct dlmodule;
-typedef struct dlmodule *module_t;
+typedef struct dlmodule module_t;
 #else /* ... */
 #ifndef __dl_section_defined
 #define __dl_section_defined 1

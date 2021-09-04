@@ -1804,14 +1804,27 @@ libdl_dlauxctrl(DlModule *self, unsigned int cmd, ...) {
 			result = NULL;
 		break;
 
+#ifdef __i386__
+		/* Special case for data-base on i386:
+		 * For reference, see glibc: `/sysdeps/generic/unwind-dw2-fde-glibc.c' */
+#define DEFINED_DLAUXCTRL_GET_DATABASE
+	case DLAUXCTRL_GET_DATABASE:
+		/* Must return the relocated value for `DT_PLTGOT'.
+		 * This we already keep track of (s.a. module-init.c:DlModule_ElfInitialize) */
+		result = self->dm_elf.de_pltgot;
+		break;
+#endif /* __i386__ */
+
 	case DLAUXCTRL_GET_TEXTBASE: {
 		ElfW(Half) i;
 		ElfW(Word) rwx;
 		rwx = PF_R | PF_X;
+#ifndef DEFINED_DLAUXCTRL_GET_DATABASE
 		__IF0 {
 	case DLAUXCTRL_GET_DATABASE:
 			rwx = PF_R | PF_W;
 		}
+#endif /* !DEFINED_DLAUXCTRL_GET_DATABASE */
 		if unlikely(self->dm_ops) {
 			result = NULL;
 			break;
@@ -1943,7 +1956,7 @@ done_add_finalizer:
 		result = self;
 	}	break;
 
-	case DLAUXCTRL_ELF_GET_PHDR: {
+	case DLAUXCTRL_ELF_GET_PHDRS: {
 		size_t *pcount;
 		/* Check that this is an ELF module. */
 		if unlikely(self->dm_ops)
@@ -1954,7 +1967,7 @@ done_add_finalizer:
 			*pcount = (size_t)self->dm_elf.de_phnum;
 	}	break;
 
-	case DLAUXCTRL_ELF_GET_SHDR: {
+	case DLAUXCTRL_ELF_GET_SHDRS: {
 		size_t *pcount;
 		/* Check that this is an ELF module. */
 		if unlikely(self->dm_ops)

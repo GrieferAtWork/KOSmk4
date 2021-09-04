@@ -3538,6 +3538,8 @@ NOTHROW_NCX(CC libdi_debug_sections_lock)(module_t *dl_handle,
 			dl_sections->ds_eh_frame = NULL;
 		}
 	}
+	/* TODO: Support for: `.eh_frame_hdr' (and its alias: `PT_GNU_EH_FRAME') */
+
 	/* Lock sections into memory */
 #define LOCK_SECTION(name) module_locksection_nx(dl_handle, name, MODULE_LOCKSECTION_FNORMAL)
 	dl_sections->ds_debug_frame   = LOCK_SECTION(secname_debug_frame);
