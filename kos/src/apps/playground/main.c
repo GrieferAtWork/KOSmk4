@@ -976,36 +976,26 @@ int main_dumpdebug(int argc, char *argv[], char *envp[]) {
 	assertf(libdebuginfo, "%s", dlerror());
 	*(void **)&debug_repr_dump = dlsym(libdebuginfo, "debug_repr_dump");
 
-	dlmod = dlopen(argv[1], RTLD_LOCAL);
+	dlmod = dlgetmodule(argv[1]);
+	if (!dlmod)
+		dlmod = dlopen(argv[1], RTLD_LOCAL);
 	if (!dlmod) {
 		fprintf(stderr, "dumpdebug: dlopen(%q): %s\n", argv[1], dlerror());
 		return 1;
 	}
 	{
-	 	struct dl_section *debug_info   = dllocksection(dlmod, ".debug_info");
-	 	struct dl_section *debug_abbrev = dllocksection(dlmod, ".debug_abbrev");
-	 	struct dl_section *debug_str    = dllocksection(dlmod, ".debug_str");
-	 	struct dl_section *debug_loc    = dllocksection(dlmod, ".debug_loc");
-		size_t debug_info_size;   void *debug_info_data   = dlinflatesection(debug_info, &debug_info_size);
-		size_t debug_abbrev_size; void *debug_abbrev_data = dlinflatesection(debug_abbrev, &debug_abbrev_size);
-		size_t debug_str_size;    void *debug_str_data    = dlinflatesection(debug_str, &debug_str_size);
-		size_t debug_loc_size;    void *debug_loc_data    = dlinflatesection(debug_loc, &debug_loc_size);
+		size_t debug_info_size, debug_abbrev_size, debug_str_size, debug_loc_size;
+		byte_t const *debug_info_data, *debug_abbrev_data, *debug_str_data, *debug_loc_data;
+		debug_info_data   = (byte_t const *)dlinflatesection(dllocksection(dlmod, ".debug_info"), &debug_info_size);
+		debug_abbrev_data = (byte_t const *)dlinflatesection(dllocksection(dlmod, ".debug_abbrev"), &debug_abbrev_size);
+		debug_str_data    = (byte_t const *)dlinflatesection(dllocksection(dlmod, ".debug_str"), &debug_str_size);
+		debug_loc_data    = (byte_t const *)dlinflatesection(dllocksection(dlmod, ".debug_loc"), &debug_loc_size);
 		debug_repr_dump(&file_printer, stdout,
-		                (byte_t const *)debug_info_data,
-		                (byte_t const *)debug_info_data + debug_info_size,
-		                (byte_t const *)debug_abbrev_data,
-		                (byte_t const *)debug_abbrev_data + debug_abbrev_size,
-		                (byte_t const *)debug_loc_data,
-		                (byte_t const *)debug_loc_data + debug_loc_size,
-		                (byte_t const *)debug_str_data,
-		                (byte_t const *)debug_str_data + debug_str_size);
-		dlunlocksection(debug_info);
-		dlunlocksection(debug_abbrev);
-		dlunlocksection(debug_str);
-		dlunlocksection(debug_loc);
+		                debug_info_data, debug_info_data + debug_info_size,
+		                debug_abbrev_data, debug_abbrev_data + debug_abbrev_size,
+		                debug_loc_data, debug_loc_data + debug_loc_size,
+		                debug_str_data, debug_str_data + debug_str_size);
 	}
-	dlclose(dlmod);
-	dlclose(libdebuginfo);
 	return 0;
 }
 /************************************************************************/
