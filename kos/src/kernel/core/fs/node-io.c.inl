@@ -172,6 +172,9 @@ NOTHROW(KCALL FUNC2(inode_))(struct inode *__restrict self,
 #endif /* !DEFINE_IO_ASYNC */
 {
 #ifdef DEFINE_IO_ASYNC
+	/* Special case when nothing should actually be done */
+	if unlikely(!num_bytes)
+		return;
 	TRY {
 		REF struct mpart *part;
 		size_t max_io_bytes;
