@@ -433,7 +433,7 @@ PUBLIC struct handle_manager handle_manager_kernel = {
 };
 DEFINE_DBG_BZERO_OBJECT(handle_manager_kernel.hm_lock);
 DEFINE_DBG_BZERO_IF(THIS_HANDLE_MANAGER != NULL,
-                   &THIS_HANDLE_MANAGER->hm_lock,
+                    &THIS_HANDLE_MANAGER->hm_lock,
                     sizeof(handle_manager_kernel.hm_lock));
 
 
