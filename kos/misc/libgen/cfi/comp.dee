@@ -24,20 +24,20 @@
  *
  * CFI is a an instrumentation system for the purpose of specifying how
  * the kernel or userspace (libunwind) should unwind function calls for
- * the purpose of exception unwinding (<kos/except.h>: THROW()) or for
+ * the purpose of exception unwinding (<kos/except.h>: THROW()) or  for
  * the purpose of generating tracebacks (<execinfo.h>: backtrace(3)).
  *
- * For this purpose, alongside some generic register restore location
+ * For this purpose,  alongside some generic  register restore  location
  * descriptors, CFI also includes a turing-complete bytecode interpreter
- * that can be used to calculate arbitrarily complex register restore
+ * that can be  used to calculate  arbitrarily complex register  restore
  * values.
  *
  * While the bytecode read by such an interpreter (/kos/src/libunwind/cfi.c)
- * is standardized, there doesn't exist a portable representation to which
+ * is standardized, there doesn't exist  a portable representation to  which
  * this bytecode could be disassembled or assembled from.
  *
  * This deemon module includes an assembler which can be used to generate
- * register unwind instrumentation from human-readable input, making it
+ * register  unwind instrumentation from  human-readable input, making it
  * much easier to write CFI expressions.
  *
  * Syntax:
@@ -52,14 +52,14 @@
  * Integer operands:
  *   - '$1234':      Integer constant
  *   - '$CONSTANT':  Named constant (appears as #define in arch-specific headers)
- *   - '\variable':  Assembler macro variable (the compiler automatically
+ *   - '\variable':  Assembler  macro  variable  (the  compiler  automatically
  *                   generates optimized code for every supported value range)
- *   All of these can be combined within the same operand by having them be
- *   combined with '+' or '-'. Each such set of operand parts may contain at
- *   most 1 \variable element, which must not appear after a '-', though any
+ *   All of these can be combined within  the same operand by having them  be
+ *   combined  with '+' or '-'. Each such set of operand parts may contain at
+ *   most 1 \variable element, which must not appear after a '-', though  any
  *   number of $1234 or $CONSTANT addends are allowed. Additionally, $1234 or
  *   $CONSTANT addends may also be prefixed by '~' which will result in the
- *   bit-wise inverse to be used instead. (Very useful when wishing to mask
+ *   bit-wise inverse to be used instead.  (Very useful when wishing to  mask
  *   specific bits, e.g.: 'and ~$EFLAGS_DF' to clear the DF flag on x86)
  *
  * Special operands:
@@ -81,7 +81,7 @@
  *     push   %reg          DW_OP_breg*+0, DW_OP_bregx+0
  *     push   %reg+X        DW_OP_breg*+X, DW_OP_bregx+X
  *
- *     push[8|16|32|64] ... Like `push', but don't exceed given address width
+ *     push[8|16|32|64] ... Like  `push', but don't exceed given address width
  *                          without explicit width suffix, use `arch.addrsize'
  *
  *     addr   $<value>      DW_OP_addr, <value>
@@ -99,22 +99,22 @@
  *     constu $<value>      DW_OP_constu, $<value>
  *     consts $<value>      DW_OP_consts, $<value>
  *
- *     and                  DW_OP_and
- *     div                  DW_OP_div
- *     minus                DW_OP_minus
- *     mod                  DW_OP_mod
- *     mul                  DW_OP_mul
- *     or                   DW_OP_or
- *     shl                  DW_OP_shl
- *     shr                  DW_OP_shr
- *     shra                 DW_OP_shra
- *     xor                  DW_OP_xor
- *     eq                   DW_OP_eq
- *     ge                   DW_OP_ge
- *     gt                   DW_OP_gt
- *     le                   DW_OP_le
- *     lt                   DW_OP_lt
- *     ne                   DW_OP_ne
+ *     and DW_OP_and
+ *     div DW_OP_div
+ *     minus DW_OP_minus
+ *     mod     DW_OP_mod
+ *     mul     DW_OP_mul
+ *     or DW_OP_or
+ *     shl   DW_OP_shl
+ *     shr   DW_OP_shr
+ *     shra DW_OP_shra
+ *     xor   DW_OP_xor
+ *     eq     DW_OP_eq
+ *     ge     DW_OP_ge
+ *     gt     DW_OP_gt
+ *     le     DW_OP_le
+ *     lt     DW_OP_lt
+ *     ne DW_OP_ne
  *
  *     and    <value>       alias for 'push <value>; and;'
  *     div    <value>       alias for 'push <value>; div;'
@@ -169,21 +169,21 @@
  *     piece  $<nbytes>     DW_OP_piece, <nbytes>
  *     bit_piece $<nbits>   DW_OP_bit_piece, <nbits>
  *
- *     dup                  DW_OP_dup
- *     drop                 DW_OP_drop
- *     over                 DW_OP_over
- *     swap                 DW_OP_swap
- *     rot                  DW_OP_rot
- *     abs                  DW_OP_abs
- *     neg                  DW_OP_neg
- *     not                  DW_OP_not
- *     nop                  DW_OP_nop
- *     push_object_address  DW_OP_push_object_address
- *     form_tls_address     DW_OP_form_tls_address
- *     call_frame_cfa       DW_OP_call_frame_cfa
- *     stack_value          DW_OP_stack_value
+ *     dup   DW_OP_dup
+ *     drop DW_OP_drop
+ *     over DW_OP_over
+ *     swap DW_OP_swap
+ *     rot   DW_OP_rot
+ *     abs   DW_OP_abs
+ *     neg   DW_OP_neg
+ *     not   DW_OP_not
+ *     nop DW_OP_nop
+ *     push_object_address DW_OP_push_object_address
+ *     form_tls_address       DW_OP_form_tls_address
+ *     call_frame_cfa           DW_OP_call_frame_cfa
+ *     stack_value DW_OP_stack_value
  *     GNU_push_tls_address DW_OP_GNU_push_tls_address
- *     GNU_uninit           DW_OP_GNU_uninit
+ *     GNU_uninit DW_OP_GNU_uninit
  *
  *     implicit_value "ABCD"   DW_OP_implicit_value, 4, 'A', 'B', 'C', 'D'
  *
@@ -199,8 +199,8 @@
  *                                            >> .cfi_escape "IMPL"
  *                                            >> 1:  skip <symbol>
  *                          When "IMPL" is "KOS", the kos-specific implementation will not
- *                          jump to <symbol>, but will instead execute after immediately
- *                          after this instruction. Use this to encode program code only
+ *                          jump to <symbol>, but  will instead execute after  immediately
+ *                          after this instruction. Use this  to encode program code  only
  *                          understood on KOS (but not by GDB)
  *
  *
@@ -208,8 +208,8 @@
  *     add    [...]         alias for 'plus'
  *     sub    [...]         alias for 'minus'
  *     pop                  alias for 'drop'
- *     push_tls_address     DW_OP_GNU_push_tls_address
- *     uninit               DW_OP_GNU_uninit
+ *     push_tls_address DW_OP_GNU_push_tls_address
+ *     uninit DW_OP_GNU_uninit
  *     jf     pop, <symbol> Alias for 'not; bra <symbol>;'
  *     jf     top, <symbol> Alias for 'dup; not; bra <symbol>;'
  *     jt     pop, <symbol> Alias for 'bra <symbol>;'
@@ -518,7 +518,7 @@ again_skip_leading_space:
 			instr.operands.append(parseOperand(text[flushStart:instrEnd]));
 		if (instr.mnemonic == "ret" && !instr.operands) {
 			/* There is no `ret' instruction, but we can emulate it
-			 * by perform a jump to the end of generated bytecode. */
+			 * by perform a jump to the end of generated  bytecode. */
 			if (returnSymbol is none)
 				returnSymbol = Symbol(name: "<return>");
 			instr.mnemonic = "skip";
@@ -680,7 +680,7 @@ class Assembler {
 		this.instructions = List(parseInstructions(this.arch, code));
 
 		this.isDerefAfter = false;
-		/* If the last stream element is an instruction (iow: there
+		/* If the last stream element is an instruction (iow:  there
 		 * is no trailing label definition), and that instruction is
 		 * the deref instruction, then compile w/ isDerefAfter=true */
 		if (this.instructions) {
@@ -1511,4 +1511,3 @@ assert #encodeSLeb128(SLEB128_3BYTE_MIN) == 3;
 assert #encodeSLeb128(SLEB128_3BYTE_MIN - 1) == 4;
 
 Error.AppExit.atexit([]{ Error.AppExit.exit(0); });
-

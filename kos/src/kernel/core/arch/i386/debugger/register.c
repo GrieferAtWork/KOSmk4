@@ -804,7 +804,7 @@ ok:
 #ifdef __x86_64__
 PRIVATE WUNUSED unsigned int
 NOTHROW(KCALL transform_gsbase_register_indices)(unsigned int level, unsigned int regno) {
-	/* Special handling: when we're currently returning to kernel-space,
+	/* Special handling: when we're currently returning to  kernel-space,
 	 *                   then we must switch %kernel_gs.base and %gs.base
 	 * This is required to maintain proper segment logic. */
 	switch (regno) {
@@ -845,7 +845,7 @@ PUBLIC size_t
 NOTHROW(KCALL x86_dbg_getregbyid)(unsigned int level, unsigned int regno,
                                   void *__restrict buf, size_t buflen) {
 #ifdef __x86_64__
-	/* Special handling: when we're currently returning to kernel-space,
+	/* Special handling: when we're currently returning to  kernel-space,
 	 *                   then we must switch %kernel_gs.base and %gs.base
 	 * This is required to maintain proper segment logic. */
 	regno = transform_gsbase_register_indices(level, regno);
@@ -859,7 +859,7 @@ NOTHROW(KCALL x86_dbg_setregbyid)(unsigned int level, unsigned int regno,
 	size_t result;
 
 #ifdef __x86_64__
-	/* Special handling: when we're currently returning to kernel-space,
+	/* Special handling: when we're currently returning to  kernel-space,
 	 *                   then we must switch %kernel_gs.base and %gs.base
 	 * This is required to maintain proper segment logic. */
 	regno = transform_gsbase_register_indices(level, regno);
@@ -1036,7 +1036,7 @@ NOTHROW(KCALL dbg_getallregs)(unsigned int level,
 	       sizeof(struct fcpustate));
 done:
 #ifdef __x86_64__
-	/* Special handling: when we're currently returning to kernel-space,
+	/* Special handling: when we're currently returning to  kernel-space,
 	 *                   then we must switch %kernel_gs.base and %gs.base
 	 * This is required to maintain proper segment logic. */
 	if (!(state->fcs_sgregs.sg_cs16 & 3)) {
@@ -1052,7 +1052,7 @@ NOTHROW(KCALL dbg_setallregs)(unsigned int level,
                               struct fcpustate const *__restrict state) {
 #ifdef __x86_64__
 	struct fcpustate real_state;
-	/* Special handling: when we're currently returning to kernel-space,
+	/* Special handling: when we're currently returning to  kernel-space,
 	 *                   then we must switch %kernel_gs.base and %gs.base
 	 * This is required to maintain proper segment logic. */
 	if (!(state->fcs_sgregs.sg_cs16 & 3)) {

@@ -1085,8 +1085,8 @@ set_trapctl_and_wait_for_single_step:
 	}
 	if (_vmNewRip !is none || _vmNewRflags !is none) {
 		/* Setting rip or rflags directly doesn't work consistently.
-		 * Instead, this can be done via ring0 code injection:
-		 *          #  Remember the old value of `*(u8 const *)%rip`
+		 * Instead, this  can  be  done via  ring0  code injection:
+		 *          # Remember the old value of `*(u8 const *)%rip`
 		 *    Tel>$ dd rip
 		 *          # Insert a breakpoint instruction
 		 *    Tel>$ eb rip 0xcc

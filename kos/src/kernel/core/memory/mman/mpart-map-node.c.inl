@@ -45,10 +45,10 @@ DECL_BEGIN
  * >> return prot;
  * However, unlike that piece of code, this one determines if write
  * access can be granted on a per-page basis (see the documentation
- * of `mpart_iscopywritable()' and `mpart_issharewritable()' for
+ * of `mpart_iscopywritable()'  and  `mpart_issharewritable()'  for
  * when write-access can be given)
  * @return: * : The union (or aka. |-ed together) set of `PAGEDIR_PROT_*'
- *              flags used to map pages from the given address range. */
+ *              flags  used to  map pages  from the  given address range. */
 #ifdef DEFINE_mpart_mmap_node
 PUBLIC NOBLOCK NONNULL((1, 5)) u16
 NOTHROW(FCALL mpart_mmap_node)(struct mpart const *__restrict self,

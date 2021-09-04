@@ -87,8 +87,8 @@ DECL_BEGIN
  * @param: hint:          Hint  for  where  the  mapping  should  go.  This  argument is
  *                        passed  onto  `mman_findunmapped()',  alongside  certain  bits
  *                        from `flags': `GFP_MAP_BELOW | GFP_MAP_ABOVE | GFP_MAP_NOASLR'
- *                        You may  pass `NULL'  to  use either  `KERNEL_MHINT_HEAP'  or
- *                        `KERNEL_MHINT_LHEAP'   (based   on   `GFP_LOCKED')   instead.
+ *                        You may  pass  `NULL'  to use  either  `KERNEL_MHINT_HEAP'  or
+ *                        `KERNEL_MHINT_LHEAP'   (based   on   `GFP_LOCKED')    instead.
  *                        When `GFP_MAP_FIXED' is set, this is the (possibly  unaligned)
  *                        address of where the mapping  should go. If not  page-aligned,
  *                        then the sub-page-misalignment will  be carried over into  the

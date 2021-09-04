@@ -40,7 +40,7 @@ INTDEF unsigned int NOTHROW_KERNEL(CC libvga_state_text)(void);
  * don't appear in the VGA codepage, the ordinal of a replacement  character
  * will be returned instead.
  * This function also does some internal transliteration in order to provide
- * more support for similar-looking unicode characters (e.g. ► and ▶) */
+ * more support  for  similar-looking  unicode characters  (e.g.  ►  and  ▶) */
 INTDEF ATTR_CONST byte_t NOTHROW(CC libvga_state_encode)(char32_t ch);
 
 DECL_END

@@ -3529,7 +3529,7 @@ do_handle_alt_variant_of:
 					/* >> [[kernel]]
 					 * Same as:
 					 * >> [[crt_kos_impl_if(1)]]
-					 * Whereas the default  for `crt_export_if'  is:
+					 * Whereas the default for `crt_export_if'  is:
 					 * >> [[crt_kos_impl_if(!defined(__KERNEL__))]]
 					 */
 					if (currentConditions !is none)

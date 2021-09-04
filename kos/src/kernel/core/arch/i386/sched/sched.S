@@ -126,13 +126,13 @@ INTERN_FUNCTION(X86_ASMSYSCALL64(sched_yield))
 #endif /* !CONFIG_NO_SMP */
 
 #ifdef CONFIG_HAVE_DEBUGGER
-	/* Special case: calling `task_yield()' whilst in debugger-mode.
-	 * Assuming that the caller wants to wait for something specific
-	 * to happen, and knowing that the system is running in debugger
+	/* Special  case: calling `task_yield()' whilst in debugger-mode.
+	 * Assuming that the caller wants to wait for something  specific
+	 * to  happen, and knowing that the system is running in debugger
 	 * mode, we know that there aren't any other threads running that
 	 * may cause whatever our caller is waiting for end up happening.
 	 *
-	 * As such, in the interest of preventing a deadlock situation,
+	 * As such, in the interest  of preventing a deadlock  situation,
 	 * rather than allowing the caller to yield indefinitely, we will
 	 * throw an `E_WOULDBLOCK' exception. */
 	EXTERN(dbg_active)

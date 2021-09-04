@@ -29,7 +29,7 @@
 
 %(auto_source){
 /* Use the KOS-special `libc_strerrordesc_np()' functions, rather than strerror()
- * below (thus making these functions a bit more light-weight by having just
+ * below (thus making  these functions  a bit  more light-weight  by having  just
  * a bit less dependencies) */
 #define strerror        libc_strerrordesc_np
 #define libc_strerror   libc_strerrordesc_np

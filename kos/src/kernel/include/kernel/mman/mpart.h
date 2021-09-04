@@ -1243,8 +1243,8 @@ NOTHROW(FCALL mpart_trim)(/*inherit(always)*/ REF struct mpart *__restrict self)
 
 
 /* Check if the given `addr...+=num_bytes' sub-range (which _must_ be
- * entirely contained within the portion of `self' that is mapped by
- * the given `node') can be given write-access by `node', assuming
+ * entirely  contained within the portion of `self' that is mapped by
+ * the given `node')  can be given  write-access by `node',  assuming
  * that `node' is a copy-on-write mapping of `self'.
  *
  * For this purpose, direct write-access is only granted when the given
@@ -1267,7 +1267,7 @@ NOTHROW(FCALL _mpart_iscopywritable)(struct mpart const *__restrict self,
 
 /* Check if there are no copy-on-write nodes for the given address range
  * This must be ensured before shared write-access can be granted to the
- * specified range, and if this isn't the case, the copy-on-write nodes
+ * specified  range, and if this isn't the case, the copy-on-write nodes
  * for said range must be unshared via `mpart_unsharecow_or_unlock()' */
 #define mpart_issharewritable(self, addr, num_bytes) \
 	(LIST_EMPTY(&(self)->mp_copy) || _mpart_issharewritable(self, addr, num_bytes))
@@ -1292,10 +1292,10 @@ NOTHROW(FCALL _mpart_issharewritable)(struct mpart const *__restrict self,
  * >> return prot;
  * However, unlike that piece of code, this one determines if write
  * access can be granted on a per-page basis (see the documentation
- * of `mpart_iscopywritable()' and `mpart_issharewritable()' for
+ * of `mpart_iscopywritable()'  and  `mpart_issharewritable()'  for
  * when write-access can be given)
  * @return: * : The union (or aka. |-ed together) set of `PAGEDIR_PROT_*'
- *              flags used to map pages from the given address range. */
+ *              flags  used to  map pages  from the  given address range. */
 FUNDEF NOBLOCK NONNULL((1, 5)) u16
 NOTHROW(FCALL mpart_mmap_node)(struct mpart const *__restrict self,
                                PAGEDIR_PAGEALIGNED void *addr,

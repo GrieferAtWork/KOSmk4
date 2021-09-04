@@ -961,8 +961,8 @@ PUBLIC_CONST struct mfile_ops const uvio_datablock_type = {
 };
 
 /* Construct a new UVIO object.
- * Note that UVIO is derived  from `struct mfile', so the  returned
- * object can be stored in a handle slot as `HANDLE_TYPE_MFILE' */
+ * Note that UVIO is derived from `struct mfile', so the returned
+ * object can be stored in  a handle slot as  `HANDLE_TYPE_MFILE' */
 PUBLIC REF struct uvio *KCALL uvio_create(void) THROWS(E_BADALLOC) {
 	REF struct uvio *result;
 	result = (REF struct uvio *)kmalloc(sizeof(struct uvio),

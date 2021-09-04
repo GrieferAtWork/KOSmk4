@@ -1356,7 +1356,7 @@ do_make_second_const:
 
 		CASE(DW_OP_reg0 ... DW_OP_reg31)
 			/* NOTE: These opcodes push the address of a register (within an imaginary register map)!
-			 *       Not the actual value of the register (except when interpreted in arithmetic or
+			 *       Not  the actual value of the register  (except when interpreted in arithmetic or
 			 *       as the result of a .eh_frame expression) */
 			if unlikely(stacksz >= self->ue_stackmax)
 				ERROR(err_stack_overflow);
@@ -1368,7 +1368,7 @@ do_make_second_const:
 
 		CASE(DW_OP_regx)
 			/* NOTE: This opcode pushes the address of a register (within an imaginary register map)!
-			 *       Not the actual value of the register (except when interpreted in arithmetic or
+			 *       Not  the actual value of the register  (except when interpreted in arithmetic or
 			 *       as the result of a .eh_frame expression) */
 			if unlikely(stacksz >= self->ue_stackmax)
 				ERROR(err_stack_overflow);

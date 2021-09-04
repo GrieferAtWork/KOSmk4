@@ -106,8 +106,8 @@ LIBVGASTATE_DECL unsigned int __NOTHROW_KERNEL(LIBVGASTATE_CC vga_state_text)(vo
  * don't appear in the VGA codepage, the ordinal of a replacement  character
  * will be returned instead.
  * This function also does some internal transliteration in order to provide
- * more support for similar-looking unicode characters (e.g. ► and ▶)
- * Unknown characters are mapped to 0x00, which (if displayed on-screen)
+ * more support  for  similar-looking  unicode characters  (e.g.  ►  and  ▶)
+ * Unknown  characters are  mapped to  0x00, which  (if displayed on-screen)
  * appears as a replacement character. */
 typedef __ATTR_CONST __byte_t /*__NOTHROW*/ (LIBVGASTATE_CC *PVGA_STATE_ENCODE)(__CHAR32_TYPE__ ch);
 #ifdef LIBVGASTATE_WANT_PROTOTYPES

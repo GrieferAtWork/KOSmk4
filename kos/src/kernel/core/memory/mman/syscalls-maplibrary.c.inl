@@ -360,7 +360,7 @@ again_lock_mman:
 	 * NOTE: This call will also release all of the part-locks that
 	 *       were acquired above! */
 	mman_map_mbuilder(mm, &builder, result, MMAN_MAP_MBUILDER_F_NORMAL);
-	
+
 	/* Release our mman-lock. */
 	mman_lock_release(mm);
 

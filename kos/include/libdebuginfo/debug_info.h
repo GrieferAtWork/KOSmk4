@@ -540,7 +540,7 @@ typedef struct di_debuginfo_type_struct {
 	char const           *t_name;          /* [0..1] Name of the type. */
 	char const           *t_rawname;       /* [0..1] Raw (linkage) name of the type. */
 	__uintptr_t           t_decl_file;     /* Declaring file index (used with the addr2line program pointed
-	                                        * to by the associated CU's  `cu_stmt_list') (or 0 if  undefined) */
+	                                        * to by the associated CU's `cu_stmt_list') (or 0 if undefined) */
 	__uintptr_t           t_decl_line;     /* Declaring line number (or 0 if undefined) */
 	__uintptr_t           t_decl_column;   /* Declaring column offset (or 0 if undefined) */
 	__uintptr_t           t_sizeof;        /* Size of this type (in bytes) (or 0 if undefined) */

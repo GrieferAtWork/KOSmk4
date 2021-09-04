@@ -125,10 +125,10 @@ struct mman;
  * @param: self:        The relevant memory manager.
  * @param: old_address: Address of the already-existing mapping.
  * @param: old_size:    The size of the already-existing mapping (at `old_address')
- *                      Set to zero for duplication of PROT_SHARED mappings.
+ *                      Set  to  zero  for  duplication  of  PROT_SHARED  mappings.
  * @param: new_size:    The size of the to-be returned mapping.
  * @param: flags:       Set of `MREMAP_MAYMOVE | MREMAP_FIXED | MREMAP_32BIT | MREMAP_GROWSDOWN |
- *                      MREMAP_GROWSUP | MREMAP_STACK | MREMAP_POPULATE | MREMAP_NONBLOCK |
+ *                      MREMAP_GROWSUP  |  MREMAP_STACK  |  MREMAP_POPULATE  |  MREMAP_NONBLOCK |
  *                      MREMAP_FIXED_NOREPLACE | MREMAP_NOASLR'
  * @param: new_address: When `MREMAP_FIXED' is given: the new address of the mapping.
  * @throws: E_SEGFAULT_UNMAPPED: No mapping (or a kernel-mapping) at `old_address'

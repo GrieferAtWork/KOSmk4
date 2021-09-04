@@ -269,7 +269,7 @@ NOTHROW(KCALL syscache_clear_s)(syscache_version_t *__restrict pversion) {
 		return 1;
 	}
 	/* There is still the possibility that some other thread is still in
-	 * the middle of a call  to `syscache_clear()'. - In this  case,
+	 * the  middle  of a  call to  `syscache_clear()'.  - In  this case,
 	 * try  to yield to them so they can finish, and keep on checking if
 	 * the number of threads inside decreases. */
 	inside_counter = ATOMIC_READ(syscache_clear_isinside);

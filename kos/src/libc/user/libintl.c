@@ -204,7 +204,7 @@ struct mo_file_string {
 
 #ifndef __OPTIMIZE_SIZE__
 /* Because it's the most common case (s.a. `gettext(3)'),
- * we have a dedicated optimization for when `n == 1'  */
+ * we  have  a dedicated  optimization for  when `n == 1' */
 #define MO_FILE_HAVE_PLURAL1
 #endif /* !__OPTIMIZE_SIZE__ */
 

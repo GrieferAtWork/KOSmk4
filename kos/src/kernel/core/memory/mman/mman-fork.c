@@ -157,7 +157,7 @@ NOTHROW(FCALL forktree_mnode_destroy)(struct forktree *__restrict self,
 			/* Insert into the  lock-operations list of  `part'
 			 * The act of doing this is what essentially causes
 			 * ownership of our node to be transfered to `part'
-			 * Additionally, `mnode_unlink_from_part_lockop()'
+			 * Additionally,  `mnode_unlink_from_part_lockop()'
 			 * inherits our reference to `part'! */
 			lop = (Toblockop(mpart) *)node;
 			lop->olo_func = &mnode_unlink_from_part_lockop;

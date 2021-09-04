@@ -96,4 +96,3 @@ global final ARCH = Architecture(
 	addrsize: 4,
 	bigEndian: false,
 );
-

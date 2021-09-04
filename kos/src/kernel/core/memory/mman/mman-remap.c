@@ -478,7 +478,7 @@ NOTHROW(KCALL insert_and_maybe_map_nodes)(struct mman *__restrict self,
 				                             mnode_getsize(node),
 				                             node->mn_partoff,
 				                             node);
-	
+
 				/* If the node was mapped with write-permissions enabled,
 				 * then add it to the  list of writable nodes within  our
 				 * memory manager. */
@@ -613,7 +613,7 @@ err_cannot_prepare:
 				goto err_cannot_prepare;
 			}
 
-			/* With all of the mem-node splits done, it's time to
+			/* With all of  the mem-node splits  done, it's time  to
 			 * shuffle around nodes the way our caller want's us to. */
 			SLIST_INIT(&movenodes);
 			move_disp = (uintptr_t)((byte_t *)result - (byte_t *)old_address);
@@ -627,7 +627,7 @@ err_cannot_prepare:
 				}
 			}
 
-			/* Remove nodes from the end of the old mapping, as well as from
+			/* Remove  nodes from the end of the  old mapping, as well as from
 			 * the address range where the mapping in its entirety will go to. */
 			i = 0;
 			if (old_newmax == old_maxaddr)
@@ -710,7 +710,7 @@ err_cannot_prepare:
 		} else {
 			struct mfile_map_with_unlockinfo map;
 			/* Complicated case: Extend the existing mapping to become larger.
-			 * Start by constructing mnode/mpart pairs for all of the missing
+			 * Start by constructing mnode/mpart pairs for all of the  missing
 			 * parts. */
 			map.mmwu_map.mfm_file  = mapinfo.mi_file;
 			map.mmwu_map.mfm_addr  = mapinfo.mi_fpos + old_size;
@@ -751,7 +751,7 @@ again_lock_mman_phase2:
 				}
 
 				/* Check if we can just inject the newly created file nodes
-				 * at the end of the already-existing (partial) mapping.
+				 * at the end  of the  already-existing (partial)  mapping.
 				 * iow: at `old_maxaddr+1...+=map.mmwu_map.mfm_size' */
 				if (!(flags & MREMAP_FIXED) &&
 				    mman_mappings_rlocate(self, old_maxaddr + 1,
@@ -783,7 +783,7 @@ again_lock_mman_phase2:
 					bool did_prepare;
 
 					/* Must create a new mapping somewhere else,
-					 * and move everything to that location. */
+					 * and move  everything  to  that  location. */
 					map.ui_unlock = &mfile_map_with_unlockinfo_unlock_or_reserved;
 
 					/* Find a suitable location for the mapping as a whole. */
@@ -936,7 +936,7 @@ again_lock_mman_phase2:
  * @param: old_size:    The size of the already-existing mapping (at `old_address')
  *                      Set  to  zero  for  duplication  of  PROT_SHARED  mappings.
  * @param: new_size:    The size of the to-be returned mapping.
- * @param: flags:       Set of `MREMAP_MAYMOVE | MREMAP_FIXED | MREMAP_32BIT | MREMAP_GROWSDOWN |
+ * @param: flags:       Set of `MREMAP_MAYMOVE | MREMAP_FIXED | MREMAP_32BIT | MREMAP_GROWSDOWN  |
  *                      MREMAP_GROWSUP | MREMAP_STACK | MREMAP_POPULATE | MREMAP_FIXED_NOREPLACE |
  *                      MREMAP_NOASLR'
  * @param: new_address: When `MREMAP_FIXED' is given: the new address of the mapping.

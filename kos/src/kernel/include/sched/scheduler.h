@@ -155,7 +155,7 @@ struct scheduler {
 	struct task_runlist s_running;      /* [1..1] Chain of running threads (there is always at least 1 running thread!)
 	                                     * This chain  is sorted  ascendingly by  `this_stoptime'. The  IDLE thread  is
 	                                     * automatically added when no other threads are available.
-	                                     * NOTE: Whenever  the IDLE thread is loaded, it's `this_sched_link.le_prev'
+	                                     * NOTE: Whenever  the IDLE thread  is loaded, it's `this_sched_link.le_prev'
 	                                     *       will be non-NULL (also: when the IDLE thread's TASK_FRUNNING flag is
 	                                     *       set, then you may also assume that the IDLE thread is loaded) */
 	struct task        *s_running_last; /* [1..1] Last thread that is still running (equal to `s_running' when `s_runcount == 1')

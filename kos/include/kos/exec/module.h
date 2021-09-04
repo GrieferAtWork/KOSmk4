@@ -47,7 +47,7 @@
 #define module_getloadmax(self)         (self)->md_loadmax
 
 /* For compatibility with user-space, provide versions of `module_locksection()'
- * that take a flags-argument, however that argument is silently discarded! */
+ * that take  a flags-argument,  however that  argument is  silently  discarded! */
 #undef module_locksection
 #undef module_locksection_nx
 #undef module_locksection_index

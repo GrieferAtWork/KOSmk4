@@ -853,8 +853,8 @@ mpart_lock_acquire_and_setcore_unwrite_sync(struct mpart *__restrict self)
 
 
 /* Check if the given `addr...+=num_bytes' sub-range (which _must_ be
- * entirely contained within the portion of `self' that is mapped by
- * the given `node') can be given write-access by `node', assuming
+ * entirely  contained within the portion of `self' that is mapped by
+ * the given `node')  can be given  write-access by `node',  assuming
  * that `node' is a copy-on-write mapping of `self'.
  *
  * For this purpose, direct write-access is only granted when the given
@@ -869,7 +869,7 @@ NOTHROW(FCALL _mpart_iscopywritable)(struct mpart const *__restrict self,
                                      mpart_reladdr_t addr, size_t num_bytes,
                                      struct mnode const *__restrict node) {
 	unsigned int i;
-	/* Check for _any_ nodes that overlap with the
+	/* Check  for _any_ nodes that overlap with the
 	 * given address range, that aren't just `node' */
 	for (i = 0; i < COMPILER_LENOF(self->_mp_nodlsts); ++i) {
 		struct mnode *iter;
@@ -888,7 +888,7 @@ NOTHROW(FCALL _mpart_iscopywritable)(struct mpart const *__restrict self,
 
 /* Check if there are no copy-on-write nodes for the given address range
  * This must be ensured before shared write-access can be granted to the
- * specified range, and if this isn't the case, the copy-on-write nodes
+ * specified  range, and if this isn't the case, the copy-on-write nodes
  * for said range must be unshared via `mpart_unsharecow_or_unlock()' */
 PUBLIC NOBLOCK ATTR_PURE WUNUSED NONNULL((1)) bool
 NOTHROW(FCALL _mpart_issharewritable)(struct mpart const *__restrict self,

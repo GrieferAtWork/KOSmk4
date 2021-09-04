@@ -197,7 +197,7 @@ again:
 	 *       CPUs, and tell them to temporarily halt what they're doing
 	 *       until we're done here.
 	 *       That's the only way to ensure that what we do in here will
-	 *       really happen atomically in regards to anything else! */
+	 *       really  happen  atomically  in regards  to  anything else! */
 	bus_acquirelock();
 	error = memcpy_nopf(real_oldval, addr, num_bytes);
 	if unlikely(error != 0)

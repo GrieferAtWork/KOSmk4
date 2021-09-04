@@ -446,8 +446,3 @@ createVsFile("kos.vcxproj.user", [](fp) {
 	fp <<
 "</Project>";
 });
-
-
-
-
-

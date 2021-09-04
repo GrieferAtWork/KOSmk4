@@ -829,7 +829,7 @@ libiconv_mirror_include() {
 			       "$KOS_ROOT/kos/src/libiconv/include/$1"
 		fi
 		# As fallback (if the filesystem doesn't support hard links), just copy back the file
-		
+
 	fi
 }
 cmd cd "$KOS_ROOT/kos/include/libiconv"

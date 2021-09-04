@@ -56,7 +56,7 @@ __NOTHROW_NCX(LIBICONV_CC iconv_codecbyname)(char const *__restrict name);
  * sorted such that the most important name comes first and all other names
  * can be enumerated by use of `strend(p)+1'.
  *
- * When `id' is invalid, return `NULL'. Note that all valid codecs have at
+ * When `id' is invalid, return `NULL'. Note that all valid codecs have  at
  * least 1 valid name. As such, supported codecs as well as their names can
  * be enumerated as:
  * >> iconv_codec_t id;
@@ -109,21 +109,21 @@ __NOTHROW_NCX(LIBICONV_CC iconv_same_codec_name)(char const *__restrict a,
 
 
 
-/* Try to automatically detect the codec of the given data-blob, which should
+/* Try to automatically detect the codec of the given data-blob, which  should
  * represent the memory-mapping of a text-file. This function will then try to
  * inspect its beginning for comment-style indicators which might inform about
- * which codec the file uses (e.g. xml, python, etc.), as well as analysis of
+ * which  codec the file uses (e.g. xml, python, etc.), as well as analysis of
  * NUL-bytes for multi-byte codecs.
  *
  * In case of a single-byte codec, go through all bytes that appear in the file
- * and count which of them occur how often before narrowing down candidates by
- * excluding any where decoding would result in non-printable characters other
+ * and count which of them occur how often before narrowing down candidates  by
+ * excluding any where decoding would result in non-printable characters  other
  * than those needed for text (e.g. line-feeds, spaces, and unicode prefixes).
  *
  * Once the set of codecs capable of decoding the file into something that looks
  * like text is determined, use each of them to try and decode the text to UTF-8
  * and count how often each bytes occurs within the UTF-8 stream. The results of
- * this are then fuzzy-compared against a known-good heuristic of byte usage in
+ * this are then fuzzy-compared against a known-good heuristic of byte usage  in
  * normal text, and the codec which is closest to this heuristic is used.
  *
  * If the function is unable to determine the codec to-be used, it will return
