@@ -3503,10 +3503,11 @@ done:
 }
 
 
-INTERN_CONST STRINGSECTION char const secname_eh_frame[]    = ".eh_frame";
-INTERN_CONST STRINGSECTION char const secname_debug_frame[] = ".debug_frame";
-INTERN_CONST STRINGSECTION char const secname_debug_addr[]  = ".debug_addr";
-INTERN_CONST STRINGSECTION char const secname_debug_loc[]   = ".debug_loc";
+INTERN_CONST STRINGSECTION char const secname_eh_frame_hdr[] = ".eh_frame_hdr";
+INTERN_CONST STRINGSECTION char const secname_eh_frame[]     = ".eh_frame";
+INTERN_CONST STRINGSECTION char const secname_debug_frame[]  = ".debug_frame";
+INTERN_CONST STRINGSECTION char const secname_debug_addr[]   = ".debug_addr";
+INTERN_CONST STRINGSECTION char const secname_debug_loc[]    = ".debug_loc";
 INTDEF char const secname_debug_line[];
 INTDEF char const secname_debug_info[];
 INTDEF char const secname_debug_abbrev[];
@@ -3526,19 +3527,24 @@ NOTHROW_NCX(CC libdi_debug_sections_lock)(module_t *dl_handle,
 	memset(dl_sections, 0, sizeof(*dl_sections));
 	if unlikely(!dl_handle)
 		return;
-	/* Special handling for .eh_frame */
-	dl_sections->ds_eh_frame = module_locksection_nx(dl_handle,
-	                                                 secname_eh_frame,
-	                                                 MODULE_LOCKSECTION_FNODATA);
-	if (dl_sections->ds_eh_frame) {
+	/* Special handling for .eh_frame and .eh_frame_hdr */
+	dl_sections->ds_eh_frame_hdr = module_locksection_nx(dl_handle, secname_eh_frame_hdr, MODULE_LOCKSECTION_FNODATA);
+	dl_sections->ds_eh_frame     = module_locksection_nx(dl_handle, secname_eh_frame, MODULE_LOCKSECTION_FNODATA);
+	if (dl_sections->ds_eh_frame_hdr) {
 		/* Make  sure  that  user-level  data  for  the  section  is available.
 		 * This is essentially a portable way to assert that SHF_ALLOC was set. */
+		if unlikely(!(module_section_getflags(dl_sections->ds_eh_frame_hdr) & SHF_ALLOC)) {
+			module_section_decref(dl_sections->ds_eh_frame_hdr);
+			dl_sections->ds_eh_frame_hdr = NULL;
+		}
+	}
+	if (dl_sections->ds_eh_frame) {
+		/* Like with .eh_frame_hdr: Must be natively allocated. */
 		if unlikely(!(module_section_getflags(dl_sections->ds_eh_frame) & SHF_ALLOC)) {
 			module_section_decref(dl_sections->ds_eh_frame);
 			dl_sections->ds_eh_frame = NULL;
 		}
 	}
-	/* TODO: Support for: `.eh_frame_hdr' (and its alias: `PT_GNU_EH_FRAME') */
 
 	/* Lock sections into memory */
 #define LOCK_SECTION(name) module_locksection_nx(dl_handle, name, MODULE_LOCKSECTION_FNORMAL)
@@ -3574,6 +3580,10 @@ try_load_dynsym:
 	}
 #undef LOCK_SECTION
 	/* Bind section data */
+	if (dl_sections->ds_eh_frame_hdr) {
+		sections->ds_eh_frame_hdr_start = (byte_t const *)module_section_getaddr(dl_sections->ds_eh_frame_hdr);
+		sections->ds_eh_frame_hdr_end   = sections->ds_eh_frame_start + module_section_getsize(dl_sections->ds_eh_frame_hdr);
+	}
 	if (dl_sections->ds_eh_frame) {
 		sections->ds_eh_frame_start = (byte_t const *)module_section_getaddr(dl_sections->ds_eh_frame);
 		sections->ds_eh_frame_end   = sections->ds_eh_frame_start + module_section_getsize(dl_sections->ds_eh_frame);

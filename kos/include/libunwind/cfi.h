@@ -633,6 +633,8 @@ typedef struct unwind_emulator_sections_struct {
 	/* NOTE: When individual sections are empty, the associated instructions become illegal
 	 * NOTE: The order of members in this struct is important!
 	 *       s.a. `Section containers & overlap' in `/kos/include/libdebuginfo/debug_info.h' */
+	__byte_t const *ues_eh_frame_hdr_start; /* [0..1][const] `.eh_frame_hdr' start (for `DW_OP_call_frame_cfa') */
+	__byte_t const *ues_eh_frame_hdr_end;   /* [0..1][const] `.eh_frame_hdr' end */
 	__byte_t const *ues_eh_frame_start;     /* [0..1][const] `.eh_frame' start (for `DW_OP_call_frame_cfa') */
 	__byte_t const *ues_eh_frame_end;       /* [0..1][const] `.eh_frame' end */
 	__byte_t const *ues_debug_frame_start;  /* [0..1][const] `.debug_frame' start (for `DW_OP_call_frame_cfa') */

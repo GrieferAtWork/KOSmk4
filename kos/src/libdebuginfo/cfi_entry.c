@@ -122,6 +122,8 @@ struct unwind_register {
 
 struct cfientry_sections {
 	/*BEGIN:compat(unwind_emulator_sections_t)*/
+	__byte_t const *ds_eh_frame_hdr_start;  /* [0..1][valid_if(:ce_s_eh_frame_hdr)] `.eh_frame_hdr' start */
+	__byte_t const *ds_eh_frame_hdr_end;    /* [0..1][valid_if(:ce_s_eh_frame_hdr)] `.eh_frame_hdr' end */
 	__byte_t const *ds_eh_frame_start;      /* [0..1][valid_if(:ce_s_eh_frame)] `.eh_frame' start */
 	__byte_t const *ds_eh_frame_end;        /* [0..1][valid_if(:ce_s_eh_frame)] `.eh_frame' end */
 	__byte_t const *ds_debug_frame_start;   /* [0..1][valid_if(:ce_s_debug_frame)] `.debug_frame' start */
@@ -144,7 +146,7 @@ struct cfientry_sections {
 	__byte_t const *ds_debug_ranges_start;  /* [0..1][valid_if(:ce_s_debug_ranges)] `.debug_ranges' start */
 	__byte_t const *ds_debug_ranges_end;    /* [0..1][valid_if(:ce_s_debug_ranges)] `.debug_ranges' end */
 };
-#define cfientry_sections_as_unwind_emulator_sections_t(self)        ((unwind_emulator_sections_t *)&(self)->ds_eh_frame_start)
+#define cfientry_sections_as_unwind_emulator_sections_t(self)        ((unwind_emulator_sections_t *)&(self)->ds_eh_frame_hdr_start)
 #define cfientry_sections_as_di_debuginfo_cu_parser_sections_t(self) ((di_debuginfo_cu_parser_sections_t *)&(self)->ds_debug_loc_start)
 
 struct cfientry {
@@ -162,6 +164,7 @@ struct cfientry {
 	unwind_emulator_t                 *ce_emulator;              /* [1..1][const] The instruction emulator that is being used. */
 	REF module_t                      *ce_module;                /* [0..1][lock(WRITE_ONCE)] The module associated with the PC-register from `ce_unwind_regv' */
 	uintptr_t                          ce_modrelpc;              /* [valid_if(ce_module)][const] Module-relative PC-offset (of the PC-register from `ce_unwind_regv') */
+	REF module_section_t              *ce_s_eh_frame_hdr;        /* [0..1][valid_if(ce_module)] The .eh_frame_hdr section of `ce_module' */
 	REF module_section_t              *ce_s_eh_frame;            /* [0..1][valid_if(ce_module)] The .eh_frame section of `ce_module' */
 	REF module_section_t              *ce_s_debug_frame;         /* [0..1][valid_if(ce_module)] The .debug_frame section of `ce_module' */
 	REF module_section_t              *ce_s_debug_addr;          /* [0..1][valid_if(ce_module)] The .debug_addr section of `ce_module' */
@@ -212,6 +215,8 @@ struct cfientry {
 PRIVATE NONNULL((1)) void
 NOTHROW_NCX(CC cfientry_fini)(struct cfientry *__restrict self) {
 	if (self->ce_module && self->ce_module != (REF module_t *)-1) {
+		if (self->ce_s_eh_frame_hdr != (REF module_section_t *)-1)
+			module_section_xdecref(self->ce_s_eh_frame_hdr);
 		if (self->ce_s_eh_frame != (REF module_section_t *)-1)
 			module_section_xdecref(self->ce_s_eh_frame);
 		if (self->ce_s_debug_frame != (REF module_section_t *)-1)
@@ -272,6 +277,7 @@ INTDEF char const secname_debug_info[];
 INTDEF char const secname_debug_abbrev[];
 INTDEF char const secname_debug_loc[];
 INTDEF char const secname_debug_ranges[];
+INTDEF char const secname_eh_frame_hdr[];
 INTDEF char const secname_eh_frame[];
 INTDEF char const secname_debug_frame[];
 INTDEF char const secname_debug_addr[];
@@ -514,6 +520,7 @@ NOTHROW_NCX(CC cfientry_loadmodule)(struct cfientry *__restrict self) {
 		goto noinfo_fail_module_debug_info;
 	self->ce_s_debug_aranges = locksection(secname_debug_aranges);
 #undef locksection
+	self->ce_s_eh_frame_hdr = NULL; /* Loaded lazily. */
 	self->ce_s_eh_frame     = NULL; /* Loaded lazily. */
 	self->ce_s_debug_frame  = NULL; /* Loaded lazily. */
 	self->ce_s_debug_addr   = NULL; /* Loaded lazily. */
@@ -784,14 +791,23 @@ again_runexpr:
 	if (error == UNWIND_EMULATOR_UNKNOWN_INSTRUCTION ||
 	    error == UNWIND_EMULATOR_INVALID_FUNCTION ||
 	    error == UNWIND_EMULATOR_NO_CFA) {
-		if (!self->ce_s_eh_frame && !self->ce_s_debug_frame &&
-		    !self->ce_s_debug_addr && !self->ce_s_debug_loc) {
+		if (!self->ce_s_eh_frame_hdr && !self->ce_s_eh_frame &&
+		    !self->ce_s_debug_frame && !self->ce_s_debug_addr &&
+		    !self->ce_s_debug_loc) {
 #define locksection(name) module_locksection(self->ce_module, name, MODULE_LOCKSECTION_FNORMAL)
-			self->ce_s_eh_frame    = locksection(secname_eh_frame);
-			self->ce_s_debug_frame = locksection(secname_debug_frame);
-			self->ce_s_debug_addr  = locksection(secname_debug_addr);
-			self->ce_s_debug_loc   = locksection(secname_debug_loc);
+			self->ce_s_eh_frame_hdr = locksection(secname_eh_frame_hdr);
+			self->ce_s_eh_frame     = locksection(secname_eh_frame);
+			self->ce_s_debug_frame  = locksection(secname_debug_frame);
+			self->ce_s_debug_addr   = locksection(secname_debug_addr);
+			self->ce_s_debug_loc    = locksection(secname_debug_loc);
 #undef locksection
+			if (!self->ce_s_eh_frame_hdr)
+				self->ce_s_eh_frame_hdr = (REF module_section_t *)-1;
+			else {
+				LOAD_SECTION(self->ce_s_eh_frame_hdr,
+				             self->ce_sections.ds_eh_frame_hdr_start,
+				             self->ce_sections.ds_eh_frame_hdr_end);
+			}
 			if (!self->ce_s_eh_frame)
 				self->ce_s_eh_frame = (REF module_section_t *)-1;
 			else {

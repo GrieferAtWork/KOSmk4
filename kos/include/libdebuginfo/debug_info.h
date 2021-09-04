@@ -37,10 +37,10 @@
 
 /* Section containers & overlap:
  *
- * unwind_emulator_sections_t: .eh_frame, .debug_frame, .debug_addr, .debug_loc, .debug_abbrev, .debug_info
- * di_addr2line_sections_t:                                                      .debug_abbrev, .debug_info, .debug_str, .debug_aranges, .debug_ranges, .debug_line, .strtab, .symtab
- * di_enum_locals_sections_t:                           .debug_addr, .debug_loc, .debug_abbrev, .debug_info, .debug_str, .debug_aranges, .debug_ranges
- * di_debuginfo_cu_parser_sections_t:                                .debug_loc, .debug_abbrev,              .debug_str
+ * unwind_emulator_sections_t: .eh_frame_hdr, .eh_frame, .debug_frame, .debug_addr, .debug_loc, .debug_abbrev, .debug_info
+ * di_addr2line_sections_t:                                                                     .debug_abbrev, .debug_info, .debug_str, .debug_aranges, .debug_ranges, .debug_line, .strtab, .symtab
+ * di_enum_locals_sections_t:                                          .debug_addr, .debug_loc, .debug_abbrev, .debug_info, .debug_str, .debug_aranges, .debug_ranges
+ * di_debuginfo_cu_parser_sections_t:                                               .debug_loc, .debug_abbrev,              .debug_str
  */
 
 
@@ -748,6 +748,8 @@ debuginfo_enum_locals(di_enum_locals_sections_t const *__restrict sectinfo,
 /* Super-structure containing pointers for _all_ debug-related sections */
 typedef struct di_debug_sections_struct {
 	/*BEGIN:compat(unwind_emulator_sections_t)*/
+	__byte_t const *ds_eh_frame_hdr_start;  /* [0..1] `.eh_frame_hdr' start */
+	__byte_t const *ds_eh_frame_hdr_end;    /* [0..1] `.eh_frame_hdr' end */
 	__byte_t const *ds_eh_frame_start;      /* [0..1] `.eh_frame' start */
 	__byte_t const *ds_eh_frame_end;        /* [0..1] `.eh_frame' end */
 	__byte_t const *ds_debug_frame_start;   /* [0..1] `.debug_frame' start */
@@ -782,13 +784,14 @@ typedef struct di_debug_sections_struct {
 	/*END:compat(di_addr2line_sections_t)*/
 } di_debug_sections_t;
 
-#define di_debug_sections_as_unwind_emulator_sections(x)        ((unwind_emulator_sections_t *)&(x)->ds_eh_frame_start)
+#define di_debug_sections_as_unwind_emulator_sections(x)        ((unwind_emulator_sections_t *)&(x)->ds_eh_frame_hdr_start)
 #define di_debug_sections_as_di_enum_locals_sections(x)         ((di_enum_locals_sections_t *)&(x)->ds_debug_addr_start)
 #define di_debug_sections_as_di_debuginfo_cu_parser_sections(x) ((di_debuginfo_cu_parser_sections_t *)&(x)->ds_debug_loc_start)
 #define di_debug_sections_as_di_addr2line_sections(x)           ((di_addr2line_sections_t *)&(x)->ds_debug_abbrev_start)
 #define di_debug_sections_from_di_enum_locals_sections(x)       __COMPILER_CONTAINER_OF((__byte_t const **)(x), di_debug_sections_t, ds_debug_addr_start)
 
 typedef struct di_debug_dl_sections_struct {
+	__REF module_section_t *ds_eh_frame_hdr;  /* [0..1] `.eh_frame_hdr' */
 	__REF module_section_t *ds_eh_frame;      /* [0..1] `.eh_frame' */
 	__REF module_section_t *ds_debug_frame;   /* [0..1] `.debug_frame' */
 	__REF module_section_t *ds_debug_addr;    /* [0..1] `.debug_addr' */

@@ -353,6 +353,7 @@ libuw_unwind_emulator_calculate_cfa(unwind_emulator_t *__restrict self) {
 		ERRORF(err, "%u\n", error);
 
 	/* Search for an FDE descriptor for the program counter within the .eh_frame section. */
+	/* TODO: Support for `self->ue_sectinfo->ues_eh_frame_hdr_start' */
 	error = libuw_unwind_fde_scan(self->ue_sectinfo->ues_eh_frame_start,
 	                              self->ue_sectinfo->ues_eh_frame_end,
 	                              pc_buf.pc,
