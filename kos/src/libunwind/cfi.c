@@ -355,11 +355,11 @@ libuw_unwind_emulator_calculate_cfa(unwind_emulator_t *__restrict self) {
 
 	/* Search for an FDE descriptor for the program counter within the .eh_frame section. */
 	/* TODO: Support for `self->ue_sectinfo->ues_eh_frame_hdr_start' */
+	fde.f_bases.ub_tbase = self->ue_bases.ub_tbase;
+	fde.f_bases.ub_dbase = self->ue_bases.ub_dbase;
 	error = libuw_unwind_fde_scan(self->ue_sectinfo->ues_eh_frame_start,
 	                              self->ue_sectinfo->ues_eh_frame_end,
-	                              pc_buf.pc,
-	                              &fde,
-	                              self->ue_addrsize);
+	                              pc_buf.pc, &fde, self->ue_addrsize);
 	if unlikely(error != UNWIND_SUCCESS) {
 		if (error != UNWIND_NO_FRAME)
 			goto done;
@@ -772,14 +772,14 @@ dispatch_DW_OP_entry_value(unwind_emulator_t *__restrict self) {
  * to resolve `DW_OP_GNU_encoded_addr+DW_EH_PE_funcrel' addresses.
  *
  * If the given `pc' doesn't belong to a function, return `0' */
-PRIVATE ATTR_NOINLINE ATTR_PURE WUNUSED uintptr_t
-NOTHROW_NCX(CC libuw_get_funbase)(void const *pc) {
+PRIVATE ATTR_NOINLINE WUNUSED NONNULL((2)) unsigned int
+NOTHROW_NCX(CC libuw_get_bases)(void const *pc, struct unwind_bases *__restrict bases) {
 	unsigned int unwind_error;
 	unwind_fde_t fde;
 	unwind_error = libuw_unwind_fde_find(pc, &fde);
-	if unlikely(unwind_error != UNWIND_SUCCESS)
-		fde.f_pcstart = NULL;
-	return (uintptr_t)fde.f_pcstart;
+	if (unwind_error == UNWIND_SUCCESS)
+		*bases = fde.f_bases;
+	return unwind_error;
 }
 
 
@@ -1667,13 +1667,13 @@ do_read_bit_pieces:
 		CASE(DW_OP_GNU_encoded_addr) {
 			uint8_t format;
 			uintptr_t value;
-			uintptr_t funcbase;
 			if unlikely(stacksz >= self->ue_stackmax)
 				ERROR(err_stack_overflow);
-			format   = *pc++;
-			funcbase = self->ue_funbase;
-			if ((format & 0x70) == DW_EH_PE_funcrel && funcbase == 0) {
-				/* Figure out `funcbase' */
+			format = *pc++;
+			if (((format & 0x70) == DW_EH_PE_textrel && self->ue_bases.ub_tbase == NULL) ||
+			    ((format & 0x70) == DW_EH_PE_datarel && self->ue_bases.ub_dbase == NULL) ||
+			    ((format & 0x70) == DW_EH_PE_funcrel && self->ue_bases.ub_fbase == NULL)) {
+				/* Figure out base addresses. */
 				union {
 					void const *p;
 					byte_t buf[CFI_REGISTER_MAXSIZE];
@@ -1683,18 +1683,14 @@ do_read_bit_pieces:
 					                       regval.buf);
 				if unlikely(error != UNWIND_SUCCESS)
 					ERRORF(err, "Can't get PC register: %u\n", error);
-				funcbase = libuw_get_funbase(regval.p);
-				if unlikely(funcbase == 0) {
+				error = libuw_get_bases(regval.p, &self->ue_bases);
+				if unlikely(error != UNWIND_SUCCESS) {
 					/* Failed to determine function base address. */
 					error = UNWIND_NO_FRAME;
 					ERRORF(err, "No FDE at pc %p\n", regval.p);
 				}
-				self->ue_funbase = funcbase;
 			}
-			value = dwarf_decode_pointer(&pc, format,
-			                             self->ue_addrsize,
-			                             0, 0,
-			                             funcbase);
+			value = (uintptr_t)dwarf_decode_pointer(&pc, format, self->ue_addrsize, &self->ue_bases);
 			self->ue_stack[stacksz].s_type   = UNWIND_STE_CONSTANT;
 			self->ue_stack[stacksz].s_uconst = value;
 			++stacksz;
@@ -1957,70 +1953,8 @@ NOTHROW_NCX(CC libuw_unwind_instruction_succ)(byte_t const *__restrict unwind_pc
 	case DW_OP_le:
 	case DW_OP_lt:
 	case DW_OP_ne:
-	case DW_OP_lit0:
-	case DW_OP_lit1:
-	case DW_OP_lit2:
-	case DW_OP_lit3:
-	case DW_OP_lit4:
-	case DW_OP_lit5:
-	case DW_OP_lit6:
-	case DW_OP_lit7:
-	case DW_OP_lit8:
-	case DW_OP_lit9:
-	case DW_OP_lit10:
-	case DW_OP_lit11:
-	case DW_OP_lit12:
-	case DW_OP_lit13:
-	case DW_OP_lit14:
-	case DW_OP_lit15:
-	case DW_OP_lit16:
-	case DW_OP_lit17:
-	case DW_OP_lit18:
-	case DW_OP_lit19:
-	case DW_OP_lit20:
-	case DW_OP_lit21:
-	case DW_OP_lit22:
-	case DW_OP_lit23:
-	case DW_OP_lit24:
-	case DW_OP_lit25:
-	case DW_OP_lit26:
-	case DW_OP_lit27:
-	case DW_OP_lit28:
-	case DW_OP_lit29:
-	case DW_OP_lit30:
-	case DW_OP_lit31:
-	case DW_OP_reg0:
-	case DW_OP_reg1:
-	case DW_OP_reg2:
-	case DW_OP_reg3:
-	case DW_OP_reg4:
-	case DW_OP_reg5:
-	case DW_OP_reg6:
-	case DW_OP_reg7:
-	case DW_OP_reg8:
-	case DW_OP_reg9:
-	case DW_OP_reg10:
-	case DW_OP_reg11:
-	case DW_OP_reg12:
-	case DW_OP_reg13:
-	case DW_OP_reg14:
-	case DW_OP_reg15:
-	case DW_OP_reg16:
-	case DW_OP_reg17:
-	case DW_OP_reg18:
-	case DW_OP_reg19:
-	case DW_OP_reg20:
-	case DW_OP_reg21:
-	case DW_OP_reg22:
-	case DW_OP_reg23:
-	case DW_OP_reg24:
-	case DW_OP_reg25:
-	case DW_OP_reg26:
-	case DW_OP_reg27:
-	case DW_OP_reg28:
-	case DW_OP_reg29:
-	case DW_OP_reg30:
-	case DW_OP_reg31:
+	case DW_OP_lit0 ... DW_OP_lit31:
+	case DW_OP_reg0 ... DW_OP_reg31:
 	case DW_OP_nop:
 	case DW_OP_push_object_address:
 	case DW_OP_form_tls_address:
@@ -2057,6 +1991,23 @@ NOTHROW_NCX(CC libuw_unwind_instruction_succ)(byte_t const *__restrict unwind_pc
 		unwind_pc += 8;
 		break;
 
+	case DW_OP_call_ref:
+		unwind_pc += ptrsize;
+		break;
+
+	case DW_OP_bregx:
+		dwarf_decode_uleb128((byte_t const **)&unwind_pc);
+		ATTR_FALLTHROUGH
+	case DW_OP_consts:
+	case DW_OP_breg0 ... DW_OP_breg31:
+	case DW_OP_fbreg:
+skip_1_sleb128:
+		dwarf_decode_sleb128((byte_t const **)&unwind_pc);
+		break;
+
+	case DW_OP_bit_piece:
+		dwarf_decode_uleb128((byte_t const **)&unwind_pc);
+		ATTR_FALLTHROUGH
 	case DW_OP_constu:
 	case DW_OP_regx:
 	case DW_OP_piece:
@@ -2064,57 +2015,7 @@ NOTHROW_NCX(CC libuw_unwind_instruction_succ)(byte_t const *__restrict unwind_pc
 	case DW_OP_GNU_addr_index:
 	case DW_OP_constx:
 	case DW_OP_GNU_const_index:
-		dwarf_decode_uleb128((byte_t const **)&unwind_pc);
-		break;
-
-	case DW_OP_call_ref:
-		unwind_pc += ptrsize;
-		break;
-
-	case DW_OP_consts:
-	case DW_OP_breg0:
-	case DW_OP_breg1:
-	case DW_OP_breg2:
-	case DW_OP_breg3:
-	case DW_OP_breg4:
-	case DW_OP_breg5:
-	case DW_OP_breg6:
-	case DW_OP_breg7:
-	case DW_OP_breg8:
-	case DW_OP_breg9:
-	case DW_OP_breg10:
-	case DW_OP_breg11:
-	case DW_OP_breg12:
-	case DW_OP_breg13:
-	case DW_OP_breg14:
-	case DW_OP_breg15:
-	case DW_OP_breg16:
-	case DW_OP_breg17:
-	case DW_OP_breg18:
-	case DW_OP_breg19:
-	case DW_OP_breg20:
-	case DW_OP_breg21:
-	case DW_OP_breg22:
-	case DW_OP_breg23:
-	case DW_OP_breg24:
-	case DW_OP_breg25:
-	case DW_OP_breg26:
-	case DW_OP_breg27:
-	case DW_OP_breg28:
-	case DW_OP_breg29:
-	case DW_OP_breg30:
-	case DW_OP_breg31:
-	case DW_OP_fbreg:
-		dwarf_decode_sleb128((byte_t const **)&unwind_pc);
-		break;
-
-	case DW_OP_bregx:
-		dwarf_decode_uleb128((byte_t const **)&unwind_pc);
-		dwarf_decode_sleb128((byte_t const **)&unwind_pc);
-		break;
-
-	case DW_OP_bit_piece:
-		dwarf_decode_uleb128((byte_t const **)&unwind_pc);
+skip_1_uleb128:
 		dwarf_decode_uleb128((byte_t const **)&unwind_pc);
 		break;
 
@@ -2127,10 +2028,44 @@ NOTHROW_NCX(CC libuw_unwind_instruction_succ)(byte_t const *__restrict unwind_pc
 	}	break;
 
 	case DW_OP_GNU_encoded_addr: {
-		uint8_t format;
-		format = *unwind_pc++;
-		dwarf_decode_pointer((byte_t const **)&unwind_pc,
-		                     format, addrsize, 0, 0, 0);
+		uint8_t encoding;
+		encoding = *unwind_pc++;
+#if 0
+		dwarf_decode_pointer((byte_t const **)&unwind_pc, encoding, addrsize, NULL);
+#else
+		switch (encoding & 0x70) {
+		case DW_EH_PE_aligned:
+			unwind_pc = (byte_t const *)(((uintptr_t)unwind_pc + (addrsize - 1)) & ~(addrsize - 1));
+			break;
+		default:
+			break;
+		}
+		switch (encoding & 0xf) {
+		case DW_EH_PE_absptr:
+			unwind_pc += addrsize;
+			break;
+		case DW_EH_PE_udata2:
+		case DW_EH_PE_sdata2:
+			unwind_pc += 2;
+			break;
+		case DW_EH_PE_udata4:
+		case DW_EH_PE_sdata4:
+			unwind_pc += 4;
+			break;
+		case DW_EH_PE_udata8:
+		case DW_EH_PE_sdata8:
+			unwind_pc += 8;
+			break;
+		case DW_EH_PE_uleb128:
+			goto skip_1_uleb128;
+		case DW_EH_PE_sleb128:
+			goto skip_1_sleb128;
+
+		default:
+			unwind_pc += 1; /* ??? */
+			break;
+		}
+#endif
 	}	break;
 
 	default:

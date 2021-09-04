@@ -653,6 +653,8 @@ unwind_userspace_with_section(struct module *__restrict mod, void const *absolut
 		 * to restore registers that were spilled onto the stack, we might as well
 		 * also  make use of  the actual `.eh_frame' section  (assuming that it is
 		 * where it should be) */
+		fde.f_tbase = module_get_tbase(mod);
+		fde.f_dbase = module_get_dbase(mod);
 		if (is_debug_frame) {
 			result = unwind_fde_scan_df(eh_frame_data,
 			                            eh_frame_data + eh_frame_size,

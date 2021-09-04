@@ -632,7 +632,7 @@ halt_unhandled_exception(unsigned int unwind_error,
 }
 
 PRIVATE NONNULL((1)) unsigned int
-NOTHROW(FCALL unwind_landingpad)(unwind_fde_t const *__restrict fde,
+NOTHROW(FCALL unwind_landingpad)(unwind_fde_t *__restrict fde, /* Only non-const for lazy initialized fields! */
                                  struct kcpustate *__restrict state,
                                  void const *except_pc) {
 	void const *landing_pad_pc;
@@ -887,7 +887,9 @@ NOTHROW(KCALL __gxx_personality_v0)(struct unwind_fde_struct *__restrict fde,
 	/* NOTE: `reader' points to a `struct gcc_lsda' */
 	temp = *reader++; /* gl_landing_enc */
 	if (temp != DW_EH_PE_omit) {
-		landingpad = (byte_t const *)dwarf_decode_pointer((byte_t const **)&reader, temp, sizeof(void *), 0, 0, (uintptr_t)fde->f_pcstart); /* gl_landing_pad */
+		/* gl_landing_pad */
+		landingpad = dwarf_decode_pointer((byte_t const **)&reader, temp,
+		                                  sizeof(void *), &fde->f_bases);
 	}
 	temp = *reader++; /* gl_typetab_enc */
 	if (temp != DW_EH_PE_omit) {
@@ -899,10 +901,10 @@ NOTHROW(KCALL __gxx_personality_v0)(struct unwind_fde_struct *__restrict fde,
 	while (reader < callsite_end) {
 		uintptr_t start, size, handler, action;
 		byte_t const *startpc, *endpc;
-		start   = dwarf_decode_pointer((byte_t const **)&reader, callsite_encoding, sizeof(void *), 0, 0, (uintptr_t)fde->f_pcstart); /* gcs_start */
-		size    = dwarf_decode_pointer((byte_t const **)&reader, callsite_encoding, sizeof(void *), 0, 0, (uintptr_t)fde->f_pcstart); /* gcs_size */
-		handler = dwarf_decode_pointer((byte_t const **)&reader, callsite_encoding, sizeof(void *), 0, 0, (uintptr_t)fde->f_pcstart); /* gcs_handler */
-		action  = dwarf_decode_pointer((byte_t const **)&reader, callsite_encoding, sizeof(void *), 0, 0, (uintptr_t)fde->f_pcstart); /* gcs_action */
+		start   = (uintptr_t)dwarf_decode_pointer((byte_t const **)&reader, callsite_encoding, sizeof(void *), &fde->f_bases); /* gcs_start */
+		size    = (uintptr_t)dwarf_decode_pointer((byte_t const **)&reader, callsite_encoding, sizeof(void *), &fde->f_bases); /* gcs_size */
+		handler = (uintptr_t)dwarf_decode_pointer((byte_t const **)&reader, callsite_encoding, sizeof(void *), &fde->f_bases); /* gcs_handler */
+		action  = (uintptr_t)dwarf_decode_pointer((byte_t const **)&reader, callsite_encoding, sizeof(void *), &fde->f_bases); /* gcs_action */
 		startpc = landingpad + start;
 		endpc   = startpc + size;
 

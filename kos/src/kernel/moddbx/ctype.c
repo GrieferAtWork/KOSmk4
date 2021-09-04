@@ -42,6 +42,7 @@
 #include <string.h>
 
 #include <libdebuginfo/debug_info.h>
+#include <libdebuginfo/dwarf.h>
 
 /**/
 #include "include/cmodule.h"

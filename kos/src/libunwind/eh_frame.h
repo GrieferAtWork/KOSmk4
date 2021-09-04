@@ -68,7 +68,7 @@ NOTHROW_NCX(CC libuw_unwind_fde_scan)(byte_t const *__restrict eh_frame_start,
  * @return: UNWIND_CFA_ILLEGAL_INSTRUCTION: ...
  * @return: UNWIND_BADALLOC:                ... */
 INTDEF NONNULL((1, 2)) unsigned int
-NOTHROW_NCX(CC libuw_unwind_fde_exec)(unwind_fde_t const *__restrict self,
+NOTHROW_NCX(CC libuw_unwind_fde_exec)(unwind_fde_t *__restrict self, /* Only non-const for lazy initialized fields! */
                                       unwind_cfa_state_t *__restrict result,
                                       void const *absolute_pc);
 
@@ -86,7 +86,7 @@ NOTHROW_NCX(CC libuw_unwind_fde_exec)(unwind_fde_t const *__restrict self,
  * @return: UNWIND_CFA_ILLEGAL_INSTRUCTION: ...
  * @return: UNWIND_BADALLOC:                ... */
 INTDEF NONNULL((1, 2)) unsigned int
-NOTHROW_NCX(CC libuw_unwind_fde_sigframe_exec)(unwind_fde_t const *__restrict self,
+NOTHROW_NCX(CC libuw_unwind_fde_sigframe_exec)(unwind_fde_t *__restrict self, /* Only non-const for lazy initialized fields! */
                                                unwind_cfa_sigframe_state_t *__restrict result,
                                                void const *absolute_pc);
 
@@ -105,7 +105,7 @@ NOTHROW_NCX(CC libuw_unwind_fde_sigframe_exec)(unwind_fde_t const *__restrict se
  * @return: UNWIND_CFA_ILLEGAL_INSTRUCTION: ...
  * @return: UNWIND_BADALLOC:                ... */
 INTDEF NONNULL((1, 2)) unsigned int
-NOTHROW_NCX(CC libuw_unwind_fde_landing_exec)(unwind_fde_t const *__restrict self,
+NOTHROW_NCX(CC libuw_unwind_fde_landing_exec)(unwind_fde_t *__restrict self, /* Only non-const for lazy initialized fields! */
                                               unwind_cfa_landing_state_t *__restrict result,
                                               void const *absolute_pc, void const *landingpad_pc);
 
@@ -123,7 +123,7 @@ NOTHROW_NCX(CC libuw_unwind_fde_landing_exec)(unwind_fde_t const *__restrict sel
  * @return: UNWIND_CFA_ILLEGAL_INSTRUCTION: ...
  * @return: UNWIND_BADALLOC:                ... */
 INTDEF NONNULL((1, 2)) unsigned int
-NOTHROW_NCX(CC libuw_unwind_fde_rule)(unwind_fde_t const *__restrict self,
+NOTHROW_NCX(CC libuw_unwind_fde_rule)(unwind_fde_t *__restrict self, /* Only non-const for lazy initialized fields! */
                                       unwind_cfa_register_t *__restrict result,
                                       unwind_regno_t dw_regno,
                                       void const *absolute_pc);
@@ -135,7 +135,7 @@ NOTHROW_NCX(CC libuw_unwind_fde_rule)(unwind_fde_t const *__restrict self,
  * @return: UNWIND_CFA_ILLEGAL_INSTRUCTION: ...
  * @return: UNWIND_BADALLOC:                ... */
 INTDEF NONNULL((1, 2)) unsigned int
-NOTHROW_NCX(CC libuw_unwind_fde_exec_cfa)(unwind_fde_t const *__restrict self,
+NOTHROW_NCX(CC libuw_unwind_fde_exec_cfa)(unwind_fde_t *__restrict self, /* Only non-const for lazy initialized fields! */
                                           unwind_cfa_value_t *__restrict result,
                                           void const *absolute_pc);
 
@@ -155,7 +155,8 @@ NOTHROW_NCX(CC libuw_unwind_fde_exec_cfa)(unwind_fde_t const *__restrict self,
  * @return: UNWIND_APPLY_NOADDR_REGISTER: ... */
 INTDEF NONNULL((1, 2, 4, 6)) unsigned int CC
 libuw_unwind_cfa_apply(unwind_cfa_state_t *__restrict self,
-                       unwind_fde_t const *__restrict fde, void const *absolute_pc,
+                       unwind_fde_t *__restrict fde, /* Only non-const for lazy initialized fields! */
+                       void const *absolute_pc,
                        unwind_getreg_t reg_getter, void const *reg_getter_arg,
                        unwind_setreg_t reg_setter, void *reg_setter_arg);
 
@@ -169,7 +170,8 @@ libuw_unwind_cfa_apply(unwind_cfa_state_t *__restrict self,
  * @return: UNWIND_APPLY_NOADDR_REGISTER: ... */
 INTDEF NONNULL((1, 2, 4, 6)) unsigned int CC
 libuw_unwind_cfa_sigframe_apply(unwind_cfa_sigframe_state_t *__restrict self,
-                                unwind_fde_t const *__restrict fde, void const *absolute_pc,
+                                unwind_fde_t *__restrict fde, /* Only non-const for lazy initialized fields! */
+                                void const *absolute_pc,
                                 unwind_getreg_t reg_getter, void const *reg_getter_arg,
                                 unwind_setreg_t reg_setter, void *reg_setter_arg);
 
@@ -183,7 +185,8 @@ libuw_unwind_cfa_sigframe_apply(unwind_cfa_sigframe_state_t *__restrict self,
  * @return: UNWIND_APPLY_NOADDR_REGISTER: ... */
 INTDEF NONNULL((1, 2, 4, 6)) unsigned int CC
 libuw_unwind_cfa_landing_apply(unwind_cfa_landing_state_t *__restrict self,
-                               unwind_fde_t const *__restrict fde, void const *absolute_pc,
+                               unwind_fde_t *__restrict fde, /* Only non-const for lazy initialized fields! */
+                               void const *absolute_pc,
                                unwind_getreg_t reg_getter, void const *reg_getter_arg,
                                unwind_setreg_t reg_setter, void *reg_setter_arg);
 
@@ -195,7 +198,7 @@ libuw_unwind_cfa_landing_apply(unwind_cfa_landing_state_t *__restrict self,
  * @return: UNWIND_EMULATOR_*:            ...
  * @return: UNWIND_APPLY_NOADDR_REGISTER: ... */
 INTDEF NONNULL((1, 2, 3, 5)) unsigned int CC
-libuw_unwind_fde_calculate_cfa(unwind_fde_t const *__restrict fde,
+libuw_unwind_fde_calculate_cfa(unwind_fde_t *__restrict fde, /* Only non-const for lazy initialized fields! */
                                unwind_cfa_value_t const *__restrict self,
                                unwind_getreg_t reg_getter,
                                void const *reg_callback_arg,

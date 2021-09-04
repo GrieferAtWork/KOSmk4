@@ -269,8 +269,8 @@ libc_gxx_personality_kernexcept(struct _Unwind_Context *__restrict context, bool
 	temp = *reader++; /* gl_landing_enc */
 	if (temp != DW_EH_PE_omit) {
 		/* gl_landing_pad */
-		landingpad = (byte_t const *)dwarf_decode_pointer((byte_t const **)&reader, temp, sizeof(void *),
-		                                                  0, 0, (uintptr_t)context->uc_fde.f_pcstart);
+		landingpad = dwarf_decode_pointer((byte_t const **)&reader, temp, sizeof(void *),
+		                                  &context->uc_fde.f_bases);
 	}
 	temp = *reader++; /* gl_typetab_enc */
 	if (temp != DW_EH_PE_omit) {
@@ -282,10 +282,10 @@ libc_gxx_personality_kernexcept(struct _Unwind_Context *__restrict context, bool
 	while (reader < callsite_end) {
 		uintptr_t start, size, handler, action;
 		byte_t const *startpc, *endpc;
-		start   = dwarf_decode_pointer((byte_t const **)&reader, callsite_encoding, sizeof(void *), 0, 0, (uintptr_t)context->uc_fde.f_pcstart); /* gcs_start */
-		size    = dwarf_decode_pointer((byte_t const **)&reader, callsite_encoding, sizeof(void *), 0, 0, (uintptr_t)context->uc_fde.f_pcstart); /* gcs_size */
-		handler = dwarf_decode_pointer((byte_t const **)&reader, callsite_encoding, sizeof(void *), 0, 0, (uintptr_t)context->uc_fde.f_pcstart); /* gcs_handler */
-		action  = dwarf_decode_pointer((byte_t const **)&reader, callsite_encoding, sizeof(void *), 0, 0, (uintptr_t)context->uc_fde.f_pcstart); /* gcs_action */
+		start   = (uintptr_t)dwarf_decode_pointer((byte_t const **)&reader, callsite_encoding, sizeof(void *), &context->uc_fde.f_bases); /* gcs_start */
+		size    = (uintptr_t)dwarf_decode_pointer((byte_t const **)&reader, callsite_encoding, sizeof(void *), &context->uc_fde.f_bases); /* gcs_size */
+		handler = (uintptr_t)dwarf_decode_pointer((byte_t const **)&reader, callsite_encoding, sizeof(void *), &context->uc_fde.f_bases); /* gcs_handler */
+		action  = (uintptr_t)dwarf_decode_pointer((byte_t const **)&reader, callsite_encoding, sizeof(void *), &context->uc_fde.f_bases); /* gcs_action */
 		startpc = landingpad + start;
 		endpc   = startpc + size;
 
@@ -334,7 +334,7 @@ libc_gxx_personality_v0(int version /* = 1 */,
 
 
 PRIVATE SECTION_EXCEPT_TEXT unsigned int __ERROR_UNWIND_CC
-unwind_fde(unwind_fde_t const *__restrict fde,
+unwind_fde(unwind_fde_t *__restrict fde, /* Only non-const for lazy initialized fields! */
            error_register_state_t *__restrict new_state,
            error_register_state_t const *__restrict old_state,
            void const *pc) {
@@ -372,7 +372,7 @@ done:
 
 
 PRIVATE SECTION_EXCEPT_TEXT unsigned int __FCALL
-unwind_landingpad(unwind_fde_t const *__restrict fde,
+unwind_landingpad(unwind_fde_t *__restrict fde, /* Only non-const for lazy initialized fields! */
                   error_register_state_t *__restrict state,
                   void const *except_pc) {
 	void const *landing_pad_pc;
@@ -616,7 +616,7 @@ err:
 
 
 LOCAL SECTION_EXCEPT_TEXT ATTR_PURE NONNULL((1)) _Unwind_Word __ERROR_UNWIND_CC
-_Unwind_Context_Identify(struct _Unwind_Context const *__restrict self) {
+_Unwind_Context_Identify(struct _Unwind_Context *__restrict self) { /* Only non-const for lazy initialized fields! */
 #ifdef __ARCH_STACK_GROWS_DOWNWARDS
 	return libc_Unwind_GetCFA(self) - self->uc_fde.f_sigframe;
 #else /* __ARCH_STACK_GROWS_DOWNWARDS */
@@ -855,7 +855,7 @@ err_unwind:
 
 DEFINE_PUBLIC_ALIAS(_Unwind_GetCFA, libc_Unwind_GetCFA);
 INTERN SECTION_EXCEPT_TEXT ATTR_PURE WUNUSED NONNULL((1)) _Unwind_Word
-NOTHROW_NCX(LIBCCALL libc_Unwind_GetCFA)(struct _Unwind_Context const *__restrict self) {
+NOTHROW_NCX(LIBCCALL libc_Unwind_GetCFA)(struct _Unwind_Context *__restrict self) { /* Only non-const for lazy initialized fields! */
 	unsigned int unwind_error;
 	unwind_cfa_value_t cfa;
 	uintptr_t result;
@@ -874,18 +874,30 @@ NOTHROW_NCX(LIBCCALL libc_Unwind_GetCFA)(struct _Unwind_Context const *__restric
 
 DEFINE_PUBLIC_ALIAS(_Unwind_GetDataRelBase, libc_Unwind_GetDataRelBase);
 INTERN SECTION_EXCEPT_TEXT ATTR_PURE WUNUSED NONNULL((1)) _Unwind_Ptr
-NOTHROW_NCX(LIBCCALL libc_Unwind_GetDataRelBase)(struct _Unwind_Context const *__restrict UNUSED(self)) {
-	/* Unsupported */
-	COMPILER_IMPURE();
-	return 0;
+NOTHROW_NCX(LIBCCALL libc_Unwind_GetDataRelBase)(struct _Unwind_Context *__restrict self) { /* Only non-const for lazy initialized fields! */
+	void const *result = self->uc_fde.f_bases.ub_dbase;
+	if (!result) {
+		result = dlgethandle(self->uc_fde.f_pcstart, DLGETHANDLE_FNORMAL);
+		if (result) {
+			result = dlauxctrl((void *)result, DLAUXCTRL_GET_DATABASE);
+			self->uc_fde.f_bases.ub_dbase = result;
+		}
+	}
+	return (_Unwind_Ptr)result;
 }
 
 DEFINE_PUBLIC_ALIAS(_Unwind_GetTextRelBase, libc_Unwind_GetTextRelBase);
 INTERN SECTION_EXCEPT_TEXT ATTR_PURE WUNUSED NONNULL((1)) _Unwind_Ptr
-NOTHROW_NCX(LIBCCALL libc_Unwind_GetTextRelBase)(struct _Unwind_Context const *__restrict UNUSED(self)) {
-	/* Unsupported */
-	COMPILER_IMPURE();
-	return 0;
+NOTHROW_NCX(LIBCCALL libc_Unwind_GetTextRelBase)(struct _Unwind_Context *__restrict self) { /* Only non-const for lazy initialized fields! */
+	void const *result = self->uc_fde.f_bases.ub_tbase;
+	if (!result) {
+		result = dlgethandle(self->uc_fde.f_pcstart, DLGETHANDLE_FNORMAL);
+		if (result) {
+			result = dlauxctrl((void *)result, DLAUXCTRL_GET_TEXTBASE);
+			self->uc_fde.f_bases.ub_tbase = result;
+		}
+	}
+	return (_Unwind_Ptr)result;
 }
 
 DEFINE_PUBLIC_ALIAS(_Unwind_FindEnclosingFunction, libc_Unwind_FindEnclosingFunction);

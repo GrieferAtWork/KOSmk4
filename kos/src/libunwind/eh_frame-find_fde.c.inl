@@ -91,6 +91,10 @@ NOTHROW_NCX(CC libuw_unwind_fde_scan)(byte_t const *__restrict reader,
 	uint8_t used_sizeof_address;
 	char const *cie_augstr;
 	struct CIE const *cie;
+	/* Must initialize the FBASE field. Otherwise, maliciously crafted  CFI
+	 * instrumentation could access the FBASE field before it is *normally*
+	 * initialized. */
+	result->f_bases.ub_fbase = NULL;
 again:
 	if (reader >= eh_frame_end)
 		ERROR(err_noframe);
@@ -179,14 +183,11 @@ again:
 			if (*aug_iter == 'L') {
 				enclsda = *cie_reader++;
 			} else if (*aug_iter == 'P') {
-				uint8_t encperso;
-				encperso = *cie_reader++;
+				uint8_t encperso   = *cie_reader++;
 				result->f_persofun = (void *)dwarf_decode_pointer(&cie_reader,
 				                                                  encperso,
 				                                                  used_sizeof_address,
-				                                                  0,
-				                                                  0,
-				                                                  0);
+				                                                  &result->f_bases);
 			} else if (*aug_iter == 'R') {
 				result->f_encptr = *cie_reader++;
 			} else {
@@ -196,18 +197,8 @@ again:
 		/* `aug_end' now points at `c_initinstr' */
 		cie_reader = aug_end;
 	}
-	result->f_pcstart = (void *)dwarf_decode_pointer(&fde_reader,
-	                                                 result->f_encptr,
-	                                                 used_sizeof_address,
-	                                                 0,
-	                                                 0,
-	                                                 0);
-	result->f_pcend = (void *)dwarf_decode_pointer(&fde_reader,
-	                                               result->f_encptr & 0xf,
-	                                               used_sizeof_address,
-	                                               0,
-	                                               0,
-	                                               (uintptr_t)result->f_pcstart);
+	result->f_pcstart = dwarf_decode_pointer(&fde_reader, result->f_encptr & 0xff, used_sizeof_address, &result->f_bases);
+	result->f_pcend   = dwarf_decode_pointer(&fde_reader, result->f_encptr & 0x0f, used_sizeof_address, &result->f_bases);
 	if (OVERFLOW_UADD((uintptr_t)result->f_pcstart,
 	                  (uintptr_t)result->f_pcend,
 	                  (uintptr_t *)&result->f_pcend))
@@ -244,12 +235,9 @@ again:
 			if (*cie_augstr == 'L') {
 				if unlikely(fde_reader == aug_end)
 					break;
-				result->f_lsdaaddr = (void *)dwarf_decode_pointer(&fde_reader,
-				                                                  enclsda,
-				                                                  used_sizeof_address,
-				                                                  0,
-				                                                  0,
-				                                                  (uintptr_t)result->f_pcstart);
+				result->f_lsdaaddr = dwarf_decode_pointer(&fde_reader, enclsda,
+				                                          used_sizeof_address,
+				                                          &result->f_bases);
 			} else if (*cie_augstr == 'S') {
 				result->f_sigframe = 1;
 			}

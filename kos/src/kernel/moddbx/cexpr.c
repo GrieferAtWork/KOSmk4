@@ -52,6 +52,7 @@ for (o: { "-mno-sse", "-mno-sse2", "-mno-sse3", "-mno-sse4", "-mno-ssse3", "-mno
 #include <stddef.h>
 #include <string.h>
 
+#include <libdebuginfo/dwarf.h>
 #include <libunwind/cfi.h>
 
 #ifdef __ARCH_HAVE_COMPAT

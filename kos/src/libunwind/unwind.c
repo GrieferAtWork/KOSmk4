@@ -211,10 +211,14 @@ libuw___register_frame_info_table_bases(rf_fde const *const *begin, struct rf_ob
 
 /* Remove all cache references to FDE entries from `eh_frame' */
 PRIVATE void
-NOTHROW(LIBCCALL remove_cache_references)(byte_t const *eh_frame) {
+NOTHROW(LIBCCALL remove_cache_references)(byte_t const *eh_frame,
+                                          void const *tbase,
+                                          void const *dbase) {
 	unsigned int error;
 	unwind_fde_t fde;
 	for (;;) {
+		fde.f_tbase = tbase;
+		fde.f_dbase = dbase;
 		error = libuw_unwind_fde_load(&eh_frame, (byte_t *)-1, &fde, sizeof(void *));
 		if (error != UNWIND_SUCCESS)
 			break;
@@ -254,10 +258,14 @@ NOTHROW(LIBCCALL libuw___deregister_frame_info)(/*nullable*/ void const *begin) 
 				eh_frame = result->ro_eh_frame_array[i];
 				if (!eh_frame)
 					break;
-				remove_cache_references((byte_t const *)eh_frame);
+				remove_cache_references((byte_t const *)eh_frame,
+				                        result->ro_tbase,
+				                        result->ro_dbase);
 			}
 		} else {
-			remove_cache_references((byte_t const *)result->ro_eh_frame);
+			remove_cache_references((byte_t const *)result->ro_eh_frame,
+			                        result->ro_tbase,
+			                        result->ro_dbase);
 		}
 		atomic_rwlock_endwrite(&fde_cache_lock);
 	}
@@ -269,9 +277,11 @@ PRIVATE NONNULL((4)) rf_fde const *
 NOTHROW_NCX(CC fde_locate_pc)(void const *absolute_pc,
                               byte_t const *eh_frame_start,
                               byte_t const *eh_frame_end,
-                              void const **pfunc_base) {
+                              struct dwarf_eh_bases *__restrict bases) {
 	unsigned int error;
 	unwind_fde_t fde;
+	fde.f_dbase = bases->deb_dbase;
+	fde.f_tbase = bases->deb_tbase;
 	for (;;) {
 		rf_fde const *result;
 		result = (rf_fde const *)eh_frame_start;
@@ -281,7 +291,9 @@ NOTHROW_NCX(CC fde_locate_pc)(void const *absolute_pc,
 		/* Check if this FDE contained what we're looking for */
 		if (absolute_pc >= fde.f_pcstart &&
 		    absolute_pc < fde.f_pcend) {
-			*pfunc_base = fde.f_pcstart;
+			bases->deb_dbase = fde.f_dbase;
+			bases->deb_tbase = fde.f_tbase;
+			bases->deb_func  = fde.f_pcstart;
 			return result;
 		}
 	}
@@ -303,13 +315,17 @@ NOTHROW_NCX(LIBCCALL libuw__Unwind_Find_FDE)(void const *pc, /*out*/ struct dwar
 	    (eh_frame_sect->ds_data != (void *)-1)) {
 
 		/* Search through this modules .eh_frame section. */
+		bases->deb_tbase = NULL;
+		bases->deb_dbase = NULL;
 		result = fde_locate_pc(pc,
 		                       (byte_t const *)eh_frame_sect->ds_data,
 		                       (byte_t const *)eh_frame_sect->ds_data + eh_frame_sect->ds_size,
-		                       &bases->deb_func);
+		                       bases);
 		if (result != NULL) {
-			bases->deb_tbase = dlauxctrl(dlmod, DLAUXCTRL_GET_TEXTBASE);
-			bases->deb_dbase = dlauxctrl(dlmod, DLAUXCTRL_GET_DATABASE);
+			if (bases->deb_tbase == NULL)
+				bases->deb_tbase = dlauxctrl(dlmod, DLAUXCTRL_GET_TEXTBASE);
+			if (bases->deb_dbase == NULL)
+				bases->deb_dbase = dlauxctrl(dlmod, DLAUXCTRL_GET_DATABASE);
 			return result;
 		}
 	}
@@ -318,6 +334,8 @@ NOTHROW_NCX(LIBCCALL libuw__Unwind_Find_FDE)(void const *pc, /*out*/ struct dwar
 	result = NULL;
 	atomic_rwlock_read(&register_frame_aux_lock);
 	SLIST_FOREACH (obj, &register_frame_aux_list, ro_link) {
+		bases->deb_tbase = obj->ro_tbase;
+		bases->deb_dbase = obj->ro_dbase;
 		if (obj->ro_isarray) {
 			size_t i;
 			for (i = 0;; ++i) {
@@ -325,16 +343,13 @@ NOTHROW_NCX(LIBCCALL libuw__Unwind_Find_FDE)(void const *pc, /*out*/ struct dwar
 				eh_frame = obj->ro_eh_frame_array[i];
 				if (!eh_frame)
 					break;
-				result = fde_locate_pc(pc, (byte_t const *)eh_frame, (byte_t const *)-1, &bases->deb_func);
+				result = fde_locate_pc(pc, (byte_t const *)eh_frame, (byte_t const *)-1, bases);
 			}
 		} else {
-			result = fde_locate_pc(pc, (byte_t const *)obj->ro_eh_frame, (byte_t const *)-1, &bases->deb_func);
+			result = fde_locate_pc(pc, (byte_t const *)obj->ro_eh_frame, (byte_t const *)-1, bases);
 		}
-		if (result != NULL) {
-			bases->deb_tbase = obj->ro_tbase;
-			bases->deb_dbase = obj->ro_dbase;
+		if (result != NULL)
 			return result;
-		}
 	}
 	atomic_rwlock_endread(&register_frame_aux_lock);
 
@@ -370,12 +385,16 @@ NOTHROW_NCX(CC libuw_unwind_fde_find_rf)(void const *absolute_pc,
 				eh_frame = obj->ro_eh_frame_array[i];
 				if (!eh_frame)
 					break;
+				result->f_bases.ub_tbase = obj->ro_tbase;
+				result->f_bases.ub_dbase = obj->ro_dbase;
 				error = libuw_unwind_fde_scan((byte_t const *)eh_frame, (byte_t const *)-1,
 				                              absolute_pc, result, sizeof(void *));
 				if (error != UNWIND_NO_FRAME)
 					goto done;
 			}
 		} else {
+			result->f_bases.ub_tbase = obj->ro_tbase;
+			result->f_bases.ub_dbase = obj->ro_dbase;
 			error = libuw_unwind_fde_scan((byte_t const *)obj->ro_eh_frame, (byte_t const *)-1,
 			                              absolute_pc, result, sizeof(void *));
 			if (error != UNWIND_NO_FRAME)
@@ -404,6 +423,8 @@ NOTHROW_NCX(CC libuw_unwind_fde_find_new)(void *dlmod, void const *absolute_pc,
 	}
 
 	/* Scan the .eh_frame section of the associated module. */
+	result->f_bases.ub_tbase = NULL; /* Lazily loaded */
+	result->f_bases.ub_dbase = NULL; /* Lazily loaded */
 	error = libuw_unwind_fde_scan((byte_t const *)eh_frame_sect->ds_data,
 	                              (byte_t const *)eh_frame_sect->ds_data + eh_frame_sect->ds_size,
 	                              absolute_pc, result, sizeof(void *));

@@ -63,40 +63,19 @@ typedef struct {
 } di_debugline_unit_t;
 
 /* Decode a given file index into its filename and pathname components. */
-__LOCAL __ATTR_NONNULL((1, 3, 4)) void
+typedef __ATTR_NONNULL((1, 3, 4)) void
+/*__NOTHROW_NCX*/ (LIBDEBUGINFO_CC *PDEBUGLINE_LOADFILE)(di_debugline_unit_t *__restrict self,
+                                                         dwarf_uleb128_t index,
+                                                         char const **__restrict ppathname,
+                                                         char const **__restrict pfilename);
+#ifdef LIBDEBUGINFO_WANT_PROTOTYPES
+LIBDEBUGINFO_DECL __ATTR_NONNULL((1, 3, 4)) void
 __NOTHROW_NCX(LIBDEBUGINFO_CC debugline_loadfile)(di_debugline_unit_t *__restrict self,
                                                   dwarf_uleb128_t index,
                                                   char const **__restrict ppathname,
-                                                  char const **__restrict pfilename) {
-	/* TODO: Make this one an external in-library function! */
-	if (!index) {
-		*ppathname = __NULLPTR;
-		*pfilename = __NULLPTR;
-	} else {
-		char const *iter;
-		iter = (char const *)self->dlu_filetable;
-		while (--index && (__byte_t *)iter < self->dlu_textbase) {
-			if (!*iter)
-				break; /* Invalid file ID */
-			iter = __libc_strend(iter) + 1;
-			dwarf_decode_uleb128((__byte_t const **)&iter);
-			dwarf_decode_uleb128((__byte_t const **)&iter);
-			dwarf_decode_uleb128((__byte_t const **)&iter);
-		}
-		*pfilename = iter;
-		/* Parse the directory number. */
-		iter = __libc_strend(iter) + 1;
-		index = (__uintptr_t)dwarf_decode_uleb128((__byte_t const **)&iter);
-		if (!index || --index >= self->dlu_pathcount)
-			*ppathname = __NULLPTR;
-		else {
-			iter = self->dlu_pathtable;
-			while (index--)
-				iter = __libc_strend(iter) + 1;
-			*ppathname = iter;
-		}
-	}
-}
+                                                  char const **__restrict pfilename);
+#endif /* LIBDEBUGINFO_WANT_PROTOTYPES */
+
 
 typedef struct {
 	__uintptr_t     dl_linestart;     /* Starting address of the associated source location. */
@@ -130,11 +109,11 @@ typedef struct {
  * >>     if ((s = dllocksection(m, ".debug_line")) == NULL)
  * >>         goto done;
  * >>     reader = (byte_t *)s->ds_data;
- * >>     relpc = (uintptr_t)((__byte_t *)p - (__byte_t *)dlmodulebase(m));
+ * >>     relpc = (uintptr_t)((byte_t *)p - (byte_t *)dlmodulebase(m));
  * >>     while (debugline_loadunit(reader, reader + s->ds_size, &unit) == DEBUG_INFO_ERROR_SUCCESS) {
  * >>         di_debugline_info_t info;
  * >>         if (debugline_scanunit(&unit, &info, relpc) == DEBUG_INFO_ERROR_SUCCESS) {
- * >>             char *file,*path;
+ * >>             char *file, *path;
  * >>             debugline_loadfile(&unit, info.dl_srcfile, &file, &path);
  * >>             printf("path: %s\n", path);
  * >>             printf("file: %s\n", file);

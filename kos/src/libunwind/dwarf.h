@@ -36,11 +36,10 @@ NOTHROW_NCX(CC libuw_dwarf_decode_sleb128)(byte_t const **__restrict preader);
 INTDEF NONNULL((1)) dwarf_uleb128_t
 NOTHROW_NCX(CC libuw_dwarf_decode_uleb128)(byte_t const **__restrict preader);
 
-INTDEF NONNULL((1)) uintptr_t
+INTDEF NONNULL((1)) byte_t *
 NOTHROW_NCX(CC libuw_dwarf_decode_pointer)(byte_t const **__restrict preader,
                                            uint8_t encoding, uint8_t addrsize,
-                                           uintptr_t textbase, uintptr_t database,
-                                           uintptr_t funcbase);
+                                           struct unwind_bases *dw_bases);
 
 #undef dwarf_decode_sleb128
 #undef dwarf_decode_uleb128

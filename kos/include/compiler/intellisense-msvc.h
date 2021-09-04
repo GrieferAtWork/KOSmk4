@@ -1007,13 +1007,13 @@ template<> struct ____INTELLISENSE_static_if_helper<true> { bool __is_true__(); 
 #endif /* __cplusplus */
 
 #ifdef __x86_64__
-typedef char *__builtin_va_list[1],*__gnuc_va_list[1];
+typedef char *__builtin_va_list[1], *__gnuc_va_list[1];
 namespace __intern {
 template<class __T> __T ____INTELLISENSE_va_arg_heper(char *(&)[1]);
 template<class __T> __T ____INTELLISENSE_va_arg_heper(char **&);
 }
 #else /* __x86_64__ */
-typedef char *__builtin_va_list,*__gnuc_va_list;
+typedef char *__builtin_va_list, *__gnuc_va_list;
 namespace __intern {
 template<class __T> __T ____INTELLISENSE_va_arg_heper(__builtin_va_list &);
 }

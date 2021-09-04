@@ -174,10 +174,10 @@ NOTHROW_NCX(CC scan_cu_stmt_list)(di_debuginfo_compile_unit_t const *__restrict 
 				result->al_dclfile   = NULL;
 				result->al_dclline   = 0;
 				result->al_dclcol    = 0;
-				debugline_loadfile(&unit,
-				                   info.dl_srcfile,
-				                   &result->al_srcpath,
-				                   &result->al_srcfile);
+				libdi_debugline_loadfile(&unit,
+				                         info.dl_srcfile,
+				                         &result->al_srcpath,
+				                         &result->al_srcfile);
 				/* Try to substitute symbol name information by searching through .symtab */
 				search_symtab(sections, result, module_relative_pc, true);
 				return DEBUG_INFO_ERROR_SUCCESS;
@@ -298,9 +298,9 @@ fill_result_sp:
 						                                 &unit);
 						if (error != DEBUG_INFO_ERROR_SUCCESS)
 							goto fill_result_sp_any_cu;
-						debugline_loadfile(&unit, sp.sp_decl_file,
-						                   &result->al_dclpath,
-						                   &result->al_dclfile);
+						libdi_debugline_loadfile(&unit, sp.sp_decl_file,
+						                         &result->al_dclpath,
+						                         &result->al_dclfile);
 						/* Scan this CU for source-level information. */
 						error = libdi_debugline_scanunit(&unit, &info, module_relative_pc);
 						if (error == DEBUG_INFO_ERROR_SUCCESS) {
@@ -308,9 +308,9 @@ fill_result_debugline_success:
 							result->al_linestart = info.dl_linestart;
 							result->al_lineend   = info.dl_lineend;
 							result->al_linediscr = (uintptr_t)info.dl_discriminator;
-							debugline_loadfile(&unit, info.dl_srcfile,
-							                   &result->al_srcpath,
-							                   &result->al_srcfile);
+							libdi_debugline_loadfile(&unit, info.dl_srcfile,
+							                         &result->al_srcpath,
+							                         &result->al_srcfile);
 							result->al_srcline = info.dl_srcline;
 							result->al_srccol  = info.dl_srccol;
 						} else {
@@ -495,8 +495,8 @@ fill_result_sp_any_cu:
 					debug_line_reader = sections->ds_debug_line_start + cu.cu_stmt_list;
 					error             = libdi_debugline_loadunit(&debug_line_reader, sections->ds_debug_line_end, &unit);
 					if (error == DEBUG_INFO_ERROR_SUCCESS) {
-						debugline_loadfile(&unit, sp.sp_decl_file, &result->al_dclpath, &result->al_dclfile);
-						debugline_loadfile(&unit, is.is_call_file, &result->al_srcpath, &result->al_srcfile);
+						libdi_debugline_loadfile(&unit, sp.sp_decl_file, &result->al_dclpath, &result->al_dclfile);
+						libdi_debugline_loadfile(&unit, is.is_call_file, &result->al_srcpath, &result->al_srcfile);
 					}
 				}
 				return DEBUG_INFO_ERROR_SUCCESS;
@@ -709,9 +709,9 @@ err_nodata:
 				search_symtab(sections, result, module_relative_pc, false);
 				result->al_cuname = NULL;
 				result->al_cubase = NULL;
-				debugline_loadfile(&unit, info.dl_srcfile,
-				                   &result->al_srcpath,
-				                   &result->al_srcfile);
+				libdi_debugline_loadfile(&unit, info.dl_srcfile,
+				                         &result->al_srcpath,
+				                         &result->al_srcfile);
 				result->al_srcline = info.dl_srcline;
 				result->al_srccol  = info.dl_srccol;
 				result->al_dclpath = NULL;

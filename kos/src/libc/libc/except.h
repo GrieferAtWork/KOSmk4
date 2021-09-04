@@ -121,9 +121,9 @@ INTDEF NONNULL((1)) _Unwind_Reason_Code NOTHROW_NCX(LIBCCALL libc_Unwind_Resume_
 INTDEF NONNULL((1, 2)) _Unwind_Reason_Code NOTHROW_NCX(LIBCCALL libc_Unwind_ForcedUnwind)(struct _Unwind_Exception *__restrict exception_object, _Unwind_Stop_Fn stop, void *stop_arg);
 INTDEF NONNULL((1)) _Unwind_Reason_Code NOTHROW_NCX(LIBCCALL libc_Unwind_Backtrace)(_Unwind_Trace_Fn func, void *arg);
 
-INTDEF ATTR_PURE WUNUSED NONNULL((1)) _Unwind_Word NOTHROW_NCX(LIBCCALL libc_Unwind_GetCFA)(struct _Unwind_Context const *__restrict self);
-INTDEF ATTR_PURE WUNUSED NONNULL((1)) _Unwind_Ptr NOTHROW_NCX(LIBCCALL libc_Unwind_GetDataRelBase)(struct _Unwind_Context const *__restrict self);
-INTDEF ATTR_PURE WUNUSED NONNULL((1)) _Unwind_Ptr NOTHROW_NCX(LIBCCALL libc_Unwind_GetTextRelBase)(struct _Unwind_Context const *__restrict self);
+INTDEF ATTR_PURE WUNUSED NONNULL((1)) _Unwind_Word NOTHROW_NCX(LIBCCALL libc_Unwind_GetCFA)(struct _Unwind_Context *__restrict self); /* Only non-const for lazy initialized fields! */
+INTDEF ATTR_PURE WUNUSED NONNULL((1)) _Unwind_Ptr NOTHROW_NCX(LIBCCALL libc_Unwind_GetDataRelBase)(struct _Unwind_Context *__restrict self); /* Only non-const for lazy initialized fields! */
+INTDEF ATTR_PURE WUNUSED NONNULL((1)) _Unwind_Ptr NOTHROW_NCX(LIBCCALL libc_Unwind_GetTextRelBase)(struct _Unwind_Context *__restrict self); /* Only non-const for lazy initialized fields! */
 INTDEF ATTR_PURE WUNUSED void *NOTHROW_NCX(LIBCCALL libc_Unwind_FindEnclosingFunction)(void const *pc);
 
 /* Kernel-level exception handling (mode #2/#3 and mode #4). */

@@ -195,7 +195,7 @@ PRIVATE
 	NONNULL((1, 2, 3, 4, 5))
 #endif /* !... */
 	unsigned int
-NOTHROW_NCX(CC libuw_unwind_fde_exec_until)(unwind_fde_t const *__restrict self,
+NOTHROW_NCX(CC libuw_unwind_fde_exec_until)(unwind_fde_t *__restrict self, /* Only non-const for lazy initialized fields! */
 #if CFI_UNWIND_COMMON_REGISTER_MAXCOUNT != 0
                                             unwind_cfa_register_t *common_init_regs,
 #endif /* CFI_UNWIND_COMMON_REGISTER_MAXCOUNT != 0 */
@@ -230,7 +230,7 @@ PRIVATE
 	NONNULL((1, 2, 3, 4, 5))
 #endif /* !... */
 	unsigned int
-NOTHROW_NCX(CC libuw_unwind_sigframe_fde_exec_until)(unwind_fde_t const *__restrict self,
+NOTHROW_NCX(CC libuw_unwind_sigframe_fde_exec_until)(unwind_fde_t *__restrict self, /* Only non-const for lazy initialized fields! */
 #if CFI_UNWIND_SIGFRAME_COMMON_REGISTER_MAXCOUNT != 0
                                                      unwind_cfa_register_t *common_init_regs,
 #endif /* CFI_UNWIND_SIGFRAME_COMMON_REGISTER_MAXCOUNT != 0 */
@@ -253,7 +253,7 @@ PRIVATE
 	NONNULL((1, 2, 3, 4, 5))
 #endif /* !... */
 	unsigned int
-NOTHROW_NCX(CC libuw_unwind_landing_fde_exec_until)(unwind_fde_t const *__restrict self,
+NOTHROW_NCX(CC libuw_unwind_landing_fde_exec_until)(unwind_fde_t *__restrict self, /* Only non-const for lazy initialized fields! */
 #if CFI_UNWIND_LANDING_COMMON_REGISTER_MAXCOUNT != 0
                                                     unwind_cfa_register_t *common_init_regs,
 #endif /* CFI_UNWIND_LANDING_COMMON_REGISTER_MAXCOUNT != 0 */
@@ -274,7 +274,7 @@ NOTHROW_NCX(CC libuw_unwind_landing_fde_exec_until)(unwind_fde_t const *__restri
  * @return: UNWIND_CFA_ILLEGAL_INSTRUCTION: ...
  * @return: UNWIND_BADALLOC:                ... */
 PRIVATE NONNULL((1, 2, 3, 4)) unsigned int
-NOTHROW_NCX(CC libuw_unwind_fde_exec_cfa_until)(unwind_fde_t const *__restrict self,
+NOTHROW_NCX(CC libuw_unwind_fde_exec_cfa_until)(unwind_fde_t *__restrict self, /* Only non-const for lazy initialized fields! */
                                                 byte_t const *reader,
                                                 byte_t const *end,
                                                 unwind_cfa_value_t *__restrict result,
@@ -294,7 +294,7 @@ NOTHROW_NCX(CC libuw_unwind_fde_exec_cfa_until)(unwind_fde_t const *__restrict s
  * @return: UNWIND_CFA_ILLEGAL_INSTRUCTION: ...
  * @return: UNWIND_BADALLOC:                ... */
 PRIVATE NONNULL((1, 2, 3, 4)) unsigned int
-NOTHROW_NCX(CC libuw_unwind_fde_exec_rule_until)(unwind_fde_t const *__restrict self,
+NOTHROW_NCX(CC libuw_unwind_fde_exec_rule_until)(unwind_fde_t *__restrict self, /* Only non-const for lazy initialized fields! */
                                                  byte_t const *reader,
                                                  byte_t const *end,
                                                  unwind_cfa_register_t *__restrict rule,
@@ -476,12 +476,10 @@ NOTHROW_NCX(CC libuw_unwind_fde_exec_rule_until)(unwind_fde_t const *__restrict 
 
 			CASE(DW_CFA_set_loc)
 				/* Decode the PC pointer according to FDE pointer encoding. */
-				current_pc = dwarf_decode_pointer((byte_t const **)&reader,
-				                                  self->f_encptr,
-				                                  self->f_addrsize,
-				                                  0,
-				                                  0,
-				                                  (uintptr_t)self->f_pcstart);
+				current_pc = (uintptr_t)dwarf_decode_pointer((byte_t const **)&reader,
+				                                             self->f_encptr,
+				                                             self->f_addrsize,
+				                                             &self->f_bases);
 				current_pc += (uintptr_t)self->f_pcstart;
 				break;
 

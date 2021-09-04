@@ -264,6 +264,11 @@ __NOTHROW_NCX(__DLFCN_CC dlunlocksection)(/*REF*/ struct dl_section *__sect);
 #define module_decref_unlikely(self) dlclose(self)
 #endif /* !module_decref && __CRT_HAVE_dlclose */
 
+#if defined(__USE_KOS) && defined(__CRT_HAVE_dlauxctrl)
+#define module_get_tbase(self) dlauxctrl(self, DLAUXCTRL_GET_TEXTBASE)
+#define module_get_dbase(self) dlauxctrl(self, DLAUXCTRL_GET_DATABASE)
+#endif /* __USE_KOS && __CRT_HAVE_dlauxctrl */
+
 __DECL_END
 #endif /* __CC__ */
 

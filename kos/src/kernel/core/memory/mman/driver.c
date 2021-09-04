@@ -2531,6 +2531,8 @@ NOTHROW(FCALL driver_findfde)(struct driver *__restrict self, void const *absolu
 	}
 
 	/* Scan the .eh_frame section of the driver. */
+	result->f_tbase = NULL; /* Lazily loaded (if needed) */
+	result->f_dbase = NULL; /* Lazily loaded (if needed) */
 	status = unwind_fde_scan(self->d_eh_frame_start,
 	                         self->d_eh_frame_end,
 	                         absolute_pc, result,

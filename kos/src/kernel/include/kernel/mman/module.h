@@ -286,6 +286,10 @@ NOTHROW(FCALL module_locksection_nx)(struct module *__restrict self, char const 
 FUNDEF WUNUSED NONNULL((1)) REF struct module_section *
 NOTHROW(FCALL module_locksection_index_nx)(struct module *__restrict self, unsigned int section_index);
 
+/* Return the module's text/data base address, as used during unwinding. */
+#define module_get_tbase(self) ((void *)0) /* TODO */
+#define module_get_dbase(self) ((void *)0) /* TODO */
+
 /* Return the size of a pointer for the given module. */
 #ifdef _MODULE_HAVE_SIZEOF_POINTER
 #define module_sizeof_pointer(self) ((self)->md_sizeof_pointer)

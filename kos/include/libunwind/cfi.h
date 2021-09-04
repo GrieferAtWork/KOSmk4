@@ -657,6 +657,13 @@ typedef struct di_debuginfo_location_struct {
 } di_debuginfo_location_t;
 #endif /* !__di_debuginfo_location_t_defined */
 
+struct unwind_bases {
+	void const *ub_tbase; /* [0..1] Text base address (lazily calculated when set to `NULL'; s.a. `DLAUXCTRL_GET_TEXTBASE') */
+	void const *ub_dbase; /* [0..1] Data base address (lazily calculated when set to `NULL'; s.a. `DLAUXCTRL_GET_DATABASE') */
+	void const *ub_fbase; /* [0..1] Function base address (or `NULL' if unknown or not applicable). */
+};
+
+
 struct di_debuginfo_compile_unit_simple_struct;
 typedef struct unwind_emulator_struct {
 	unwind_ste_t           *ue_stack;              /* [0..ue_stacksz|ALLOC(ue_stackmax)][const] Value stack for the emulator. */
@@ -694,7 +701,7 @@ typedef struct unwind_emulator_struct {
 	                                                * When   set   to   ZERO(0),   this   value   is   calculated   as-needed,    using:
 	                                                *  - unwind_fde_scan(ue_eh_frame_start, ue_eh_frame_end, ...)
 	                                                *  - unwind_fde_exec(...) */
-	__uintptr_t             ue_funbase;            /* [0..1] Function base address (or `0' if not yet calculated) */
+	struct unwind_bases     ue_bases;              /* Base addresses. (may be calculated lazily) */
 	struct di_debuginfo_compile_unit_simple_struct const
 	                       *ue_cu;                 /* [0..1][const] The associated CU (when non-NULL, fields that may be used
 	                                                * are  listed  in the  documentation  of `debuginfo_location_getvalue()') */

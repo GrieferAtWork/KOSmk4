@@ -63,18 +63,17 @@ LIBUNWIND_DECL __ATTR_NONNULL((1)) dwarf_uleb128_t
 __NOTHROW_NCX(LIBUNWIND_CC dwarf_decode_uleb128)(__byte_t const **__restrict preader);
 #endif /* LIBUNWIND_WANT_PROTOTYPES */
 
+struct unwind_bases;
 
-typedef __ATTR_NONNULL((1)) __uintptr_t
+typedef __ATTR_NONNULL((1)) __byte_t *
 /*__NOTHROW_NCX*/ (LIBUNWIND_CC *PDWARF_DECODE_POINTER)(__byte_t const **__restrict preader,
                                                         __uint8_t encoding, __uint8_t addrsize,
-                                                        __uintptr_t textbase, __uintptr_t database,
-                                                        __uintptr_t funcbase);
+                                                        struct unwind_bases *dw_bases);
 #ifdef LIBUNWIND_WANT_PROTOTYPES
-LIBUNWIND_DECL __ATTR_NONNULL((1)) __uintptr_t
+LIBUNWIND_DECL __ATTR_NONNULL((1)) __byte_t *
 __NOTHROW_NCX(LIBUNWIND_CC dwarf_decode_pointer)(__byte_t const **__restrict preader,
                                                  __uint8_t encoding, __uint8_t addrsize,
-                                                 __uintptr_t textbase, __uintptr_t database,
-                                                 __uintptr_t funcbase);
+                                                 struct unwind_bases *dw_bases);
 #endif /* LIBUNWIND_WANT_PROTOTYPES */
 
 __DECL_END
