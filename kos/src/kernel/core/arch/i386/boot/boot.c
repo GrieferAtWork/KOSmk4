@@ -657,20 +657,20 @@ NOTHROW(KCALL __i386_kernel_main)(struct icpustate *__restrict state) {
 	 * those blocks won't actually end up being properly initialized until the
 	 * debugger is exited once again and the thread that was doing the init is
 	 * allowed to finish.
-	 * However, if the debugger ends up accessing that same region of memory,
+	 * However, if the debugger ends up  accessing that same region of  memory,
 	 * it will begin to wait for the initialization to be completed or aborted,
-	 * neither of which will ever happen since the thread that is responsible
+	 * neither of which will ever happen  since the thread that is  responsible
 	 * is currently suspended.
 	 *
-	 * Solution: alter `mo_loadblocks' and `mo_saveblocks' such that they will
+	 * Solution: alter  `mo_loadblocks' and `mo_saveblocks' such that they will
 	 * return immediately but take an aio_handle that is invoked asynchronously
-	 * once initialization is completed. That callback could then be made to
-	 * undo the `MPART_BLOCK_ST_INIT' status and broadcast the finish signal.
+	 * once  initialization is completed.  That callback could  then be made to
+	 * undo the `MPART_BLOCK_ST_INIT' status  and broadcast the finish  signal.
 	 * After all: async stuff continues to work within the debugger!
 	 * Problem: This would still leave a race when the debugger is entered before
-	 *          the async job is started, but after INIT states have been set.
-	 *          Admittedly, this is a small time frame, but it could happen and
-	 *          would result in the same deadlock scenario that's happening at
+	 *          the  async job is  started, but after INIT  states have been set.
+	 *          Admittedly, this is a small time  frame, but it could happen  and
+	 *          would result in  the same deadlock  scenario that's happening  at
 	 *          the moment already.
 	 *
 	 * Functions that set (and eventually clear) `MPART_BLOCK_ST_INIT':
@@ -680,6 +680,24 @@ NOTHROW(KCALL __i386_kernel_main)(struct icpustate *__restrict state) {
 	 *   - mpart_load_or_unlock       (Blocking call is `file->mf_ops->mo_loadblocks')
 	 *   - mpart_sync_impl            (Blocking call is `file->mf_ops->mo_saveblocks')
 	 *
+	 */
+
+	/* TODO: Finish implementing support for .eh_frame_hdr.
+	 * Done:
+	 *   - The section is being loaded alongside .eh_frame (if necessary)
+	 * Missing:
+	 *   - `libdl.so', `struct driver' and `struct userelf_module' must  include
+	 *     special handling when trying to lock a section named ".eh_frame_hdr",
+	 *     in  that if no such section exists in  SHDRS, check if a PHDR of type
+	 *     `PT_GNU_EH_FRAME' exists. If  so, use  that header to  create a  faux
+	 *     section object that is returned when requesting ".eh_frame_hdr"
+	 *   - The .eh_frame_hdr section isn't being processed / parsed. Note that
+	 *     it  behaves similar to  .eh_frame, but differs  in that it contains
+	 *     a lookup-table like:
+	 *         >> [{ pc_min: pointer, pc_max: pointer, eh_frame_data: pointer }...]
+	 *     I couldn't find documentation on  the actual format, but glibc  has
+	 *     a file that is used to parse this header, so it can tell how that's
+	 *     supposed to be done.
 	 */
 
 	/* TODO: (the problem isn't the coredump, but the errors in .debug_info parsing!)
