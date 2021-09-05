@@ -544,10 +544,7 @@ __IMPDEF __ATTR_WUNUSED __ATTR_NONNULL((1)) char const *
 __NOTHROW_NCX(__DLFCN_CC dlsectionname)(struct dl_section *__sect);
 #endif /* __CRT_HAVE_dlsectionname */
 
-/* Returns  the index of a given section, or `(size_t)-1' on error.
- * Note that certain sections are allowed not to have an index, and
- * can  only be accessed by-name. For such a section, this function
- * would also return `(size_t)-1' and set an error! */
+/* Returns  the index of a given section, or `(size_t)-1' on error. */
 #ifdef __CRT_HAVE_dlsectionindex
 __IMPDEF __ATTR_WUNUSED __ATTR_NONNULL((1)) __size_t
 __NOTHROW_NCX(__DLFCN_CC dlsectionindex)(struct dl_section *__sect);

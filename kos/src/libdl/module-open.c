@@ -536,7 +536,7 @@ DlModule_ElfOpenLoadedProgramHeaders(/*inherit(on_success,HEAP)*/ char *__restri
 	result->dm_elf.de_phnum    = info->ei_pnum;
 	result->dm_elf.de_abi      = info->ei_abi;
 	result->dm_elf.de_abiver   = info->ei_abiver;
-	result->dm_shnum           = (size_t)-1;     /* Unknown */
+	result->dm_elf.de_shnum    = (ElfW(Half))-1; /* Unknown */
 	result->dm_elf.de_shstrndx = (ElfW(Half))-1; /* Unknown */
 	if unlikely(DlModule_ElfLoadLoadedProgramHeaders(result))
 		goto err_r;
@@ -616,12 +616,12 @@ DlModule_ElfMapProgramHeaders(ElfW(Ehdr) const *__restrict ehdr,
 	result->dm_elf.de_abi      = ehdr->e_ident[EI_OSABI];
 	result->dm_elf.de_abiver   = ehdr->e_ident[EI_ABIVERSION];
 	result->dm_elf.de_phnum    = ehdr->e_phnum;
-	result->dm_shnum           = ehdr->e_shnum;
+	result->dm_elf.de_shnum    = ehdr->e_shnum;
 	result->dm_elf.de_shoff    = ehdr->e_shoff;
 	result->dm_elf.de_shstrndx = ehdr->e_shstrndx;
 	if unlikely(ehdr->e_shentsize != sizeof(ElfW(Shdr))) {
 		result->dm_elf.de_shoff    = 0;
-		result->dm_shnum           = (size_t)-1;
+		result->dm_elf.de_shnum    = 0;
 		result->dm_elf.de_shstrndx = (ElfW(Half))-1;
 	}
 	result->dm_refcnt     = 1;

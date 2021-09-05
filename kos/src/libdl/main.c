@@ -108,6 +108,7 @@ INTERN DlModule dl_rtld_module = {
 		.de_shstrndx   = (ElfW(Half))-1,
 		.de_shdr       = (ElfW(Shdr) *)(uintptr_t)-1,
 		.de_shstrtab   = (char *)(uintptr_t)-1,
+		.de_shnum      = (ElfW(Half))-1, /* Uses custom handling! */
 		.de_phnum      = 1,
 		.de_phdr       = {
 			ELFW(PHDR_INIT)(/* type:   */ PT_LOAD,

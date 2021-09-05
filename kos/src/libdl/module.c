@@ -190,7 +190,6 @@ done_fini:
 	}
 	if (self->dm_file > 0)
 		sys_close(self->dm_file);
-	/* TODO: Support for formats other than ELF. */
 	/* Free dynamically allocated heap-memory. */
 	if (self->dm_sections) {
 		size_t i;
@@ -281,7 +280,7 @@ err:
 
 /* Lazily allocate  if  necessary,  and  return  the vector  of  section  headers  for  `self'
  * NOTE: On success, this function guaranties that the following fields have been initialized:
- *  - self->dm_shnum
+ *  - self->dm_elf.de_shnum
  *  - self->dm_elf.de_shoff
  *  - self->dm_elf.de_shstrndx
  *  - self->dm_elf.de_shdr
@@ -298,7 +297,7 @@ DlModule_ElfGetShdrs(DlModule *__restrict self) {
 	fd = DlModule_GetFd(self);
 	if unlikely(fd < 0)
 		goto err;
-	if (self->dm_shnum == (size_t)-1 ||
+	if (self->dm_elf.de_shnum == (ElfW(Half))-1 ||
 	    self->dm_elf.de_shoff == 0 ||
 	    self->dm_elf.de_shstrndx == (ElfW(Half))-1) {
 		ElfW(Ehdr) ehdr;
@@ -314,19 +313,19 @@ DlModule_ElfGetShdrs(DlModule *__restrict self) {
 			             self->dm_filename, ehdr.e_shstrndx, ehdr.e_shnum);
 			goto err;
 		}
-		ATOMIC_CMPXCH(self->dm_shnum, (size_t)-1, ehdr.e_shnum);
+		ATOMIC_CMPXCH(self->dm_elf.de_shnum, (ElfW(Half))-1, ehdr.e_shnum);
 		ATOMIC_CMPXCH(self->dm_elf.de_shoff, 0, ehdr.e_shoff);
 		ATOMIC_CMPXCH(self->dm_elf.de_shstrndx, (ElfW(Half))-1, ehdr.e_shstrndx);
 	}
-	if unlikely(!self->dm_shnum) {
+	if unlikely(!self->dm_elf.de_shnum) {
 		ATOMIC_CMPXCH(self->dm_elf.de_shdr, NULL, (ElfW(Shdr) *)empty_shdr);
 		return empty_shdr;
 	}
 	/* Allocate the section header vector. */
-	result = (ElfW(Shdr) *)malloc(self->dm_shnum * sizeof(ElfW(Shdr)));
+	result = (ElfW(Shdr) *)malloc(self->dm_elf.de_shnum * sizeof(ElfW(Shdr)));
 	if unlikely(!result)
 		goto err_nomem;
-	if (preadall(fd, result, self->dm_shnum * sizeof(ElfW(Shdr)), self->dm_elf.de_shoff) <= 0)
+	if (preadall(fd, result, self->dm_elf.de_shnum * sizeof(ElfW(Shdr)), self->dm_elf.de_shoff) <= 0)
 		goto err_read_shdr;
 	{
 		ElfW(Shdr) *new_result;
@@ -460,7 +459,7 @@ DlModule_ElfGetDynSymCnt(DlModule *__restrict self) {
 				 * However   to  minimize  our  expectations  on  what  section
 				 * headers  are  actually  present,  simply  assume  that we're
 				 * looking for a `SHF_ALLOC' section containing `modrel_dynsym' */
-				count = self->dm_shnum;
+				count = self->dm_elf.de_shnum;
 				for (i = 0; i < count; ++i) {
 					if (!(sh[i].sh_flags & SHF_ALLOC))
 						continue;
@@ -497,6 +496,9 @@ dl_seterror_nosect_index(DlModule *__restrict self, size_t index) {
 	                    self->dm_filename, index, self->dm_shnum);
 }
 
+/* Return the section header associated with a given `name'
+ * @return: NULL:             Error (w/ dlerror() set)
+ * @return: (ElfW(Shdr) *)-1: Not found (w/o dlerror() set)  */
 INTERN WUNUSED NONNULL((1, 2)) ElfW(Shdr) *CC
 DlModule_ElfGetSection(DlModule *__restrict self,
                        char const *__restrict name) {
@@ -509,11 +511,11 @@ DlModule_ElfGetSection(DlModule *__restrict self,
 		goto err;
 	result = self->dm_elf.de_shdr;
 	assert(result);
-	for (i = 0; i < self->dm_shnum; ++i, ++result) {
+	for (i = 0; i < self->dm_elf.de_shnum; ++i, ++result) {
 		if (strcmp(strtab + result->sh_name, name) == 0)
 			return result; /* Got it! */
 	}
-	dl_seterror_nosect(self, name);
+	return (ElfW(Shdr) *)-1;
 err:
 	return NULL;
 }

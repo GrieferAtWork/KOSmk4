@@ -221,7 +221,7 @@ DlModule_GetFd(DlModule *__restrict self);
 
 /* Lazily allocate  if  necessary,  and  return  the vector  of  section  headers  for  `self'
  * NOTE: On success, this function guaranties that the following fields have been initialized:
- *  - self->dm_shnum
+ *  - self->dm_elf.de_shnum
  *  - self->dm_elf.de_shoff
  *  - self->dm_elf.de_shstrndx
  *  - self->dm_elf.de_shdr
@@ -235,7 +235,8 @@ INTDEF WUNUSED NONNULL((1)) char *CC
 DlModule_ElfGetShstrtab(DlModule *__restrict self);
 
 /* Return the section header associated with a given `name'
- * @return: NULL: Error (s.a. dl_error_message) */
+ * @return: NULL:             Error (w/ dlerror() set)
+ * @return: (ElfW(Shdr) *)-1: Not found (w/o dlerror() set)  */
 INTDEF WUNUSED NONNULL((1, 2)) ElfW(Shdr) *CC
 DlModule_ElfGetSection(DlModule *__restrict self,
                        char const *__restrict name);
@@ -491,10 +492,7 @@ libdl_dlunlocksection(REF DlSection *sect);
 INTDEF NONNULL((1)) char const *DLFCN_CC
 libdl_dlsectionname(DlSection *sect);
 
-/* Returns  the index of a given section, or `(size_t)-1' on error.
- * Note that certain sections are allowed not to have an index, and
- * can  only be accessed by-name. For such a section, this function
- * would also return `(size_t)-1' and set an error! */
+/* Returns  the index of a given section, or `(size_t)-1' on error. */
 INTDEF NONNULL((1)) size_t DLFCN_CC
 libdl_dlsectionindex(DlSection *sect);
 

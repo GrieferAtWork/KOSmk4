@@ -1138,6 +1138,35 @@ again:
 	free(self);
 }
 
+
+/* Returns `NULL'            on error     (w/ dlerror() set)
+ * Returns `(DlSection *)-1' if not found (w/o dlerror() set) */
+PRIVATE WUNUSED NONNULL((1)) REF DlSection *DLFCN_CC
+libdl_dllocksection_aux(DlModule *__restrict self,
+                        char const *__restrict name,
+                        unsigned int flags) {
+	(void)self;
+	(void)name;
+	(void)flags;
+	COMPILER_IMPURE();
+	/* TODO */
+	return (DlSection *)-1;
+}
+
+PRIVATE WUNUSED NONNULL((1, 2)) char const *DLFCN_CC
+libdl_dlsectionname_aux(DlSection *__restrict self,
+                        DlModule *__restrict mod,
+                        size_t index) {
+	(void)self;
+	(void)mod;
+	(void)index;
+	COMPILER_IMPURE();
+	/* TODO */
+	dl_seterrorf("Not implemented");
+	return NULL;
+}
+
+
 /* Lock a named section of a given dynamic library into memory.
  * @param: handle: Handle for the library who's section `name' should be locked & loaded.
  * @param: name:   Name of the section to load into memory.
@@ -1191,15 +1220,15 @@ again_lock_sections:
 		atomic_rwlock_read(&self->dm_sections_lock);
 		if (!self->dm_sections) {
 			DlSection **sec_vec;
+			size_t shnum = self->dm_shnum;
 			/* Must allocate the initial sections vector. */
 			atomic_rwlock_endread(&self->dm_sections_lock);
-			sec_vec = (DlSection **)calloc(self->dm_shnum,
-			                               sizeof(DlSection *));
+			sec_vec = (DlSection **)calloc(shnum, sizeof(DlSection *));
 			if unlikely(!sec_vec)
 				goto err_nomem;
 			atomic_rwlock_write(&self->dm_sections_lock);
 			COMPILER_READ_BARRIER();
-			if likely(!self->dm_sections) {
+			if likely(!self->dm_sections && self->dm_shnum == shnum) {
 				self->dm_sections = sec_vec;
 			} else {
 				atomic_rwlock_endwrite(&self->dm_sections_lock);
@@ -1297,26 +1326,44 @@ again_read_section:
 			sect = DlModule_ElfGetShdrs(self);
 			if unlikely(!sect)
 				goto err;
-			if unlikely((uintptr_t)name >= self->dm_shnum) {
-				dl_seterror_nosect_index(self, (size_t)name);
-				goto err;
+			if ((uintptr_t)name >= self->dm_elf.de_shnum) {
+				/* Check for auxiliary sections. */
+				result = libdl_dllocksection_aux(self,
+				                                 (char const *)((uintptr_t)name -
+				                                                self->dm_elf.de_shnum),
+				                                 flags);
+				if (result == (REF DlSection *)-1) {
+					dl_seterror_nosect_index(self, (size_t)name);
+					goto err;
+				}
+				return result;
 			}
 			sect += (uintptr_t)name;
 		} else {
 			sect = DlModule_ElfGetSection(self, name);
 			if unlikely(!sect)
 				goto err;
+			if (sect == (ElfW(Shdr) *)-1) {
+				/* Check for auxiliary sections. */
+				result = libdl_dllocksection_aux(self, name, flags);
+				if (result == (REF DlSection *)-1) {
+					dl_seterror_nosect(self, name);
+					goto err;
+				}
+				return result;
+			}
 		}
+		assert(self->dm_elf.de_shnum != (ElfW(Half))-1);
 		assert(sect >= self->dm_elf.de_shdr);
-		assert(sect < self->dm_elf.de_shdr + self->dm_shnum);
+		assert(sect < self->dm_elf.de_shdr + self->dm_elf.de_shnum);
 		index = (size_t)(sect - self->dm_elf.de_shdr);
 again_lock_elf_sections:
 		atomic_rwlock_read(&self->dm_sections_lock);
-		if (!self->dm_sections) {
+		if (!self->dm_sections || self->dm_elf.de_shnum > self->dm_shnum) {
 			DlSection **sec_vec;
 			/* Must allocate the initial sections vector. */
 			atomic_rwlock_endread(&self->dm_sections_lock);
-			sec_vec = (DlSection **)calloc(self->dm_shnum,
+			sec_vec = (DlSection **)calloc(self->dm_elf.de_shnum,
 			                               sizeof(DlSection *));
 			if unlikely(!sec_vec)
 				goto err_nomem;
@@ -1324,10 +1371,18 @@ again_lock_elf_sections:
 			COMPILER_READ_BARRIER();
 			if likely(!self->dm_sections) {
 				self->dm_sections = sec_vec;
+				self->dm_shnum    = self->dm_elf.de_shnum;
+			} else if (self->dm_elf.de_shnum > self->dm_shnum) {
+				DlSection **old_vec = self->dm_sections;
+				memcpy(sec_vec, old_vec, self->dm_shnum, sizeof(DlSection *));
+				self->dm_sections = sec_vec;
+				self->dm_shnum    = self->dm_elf.de_shnum;
+				atomic_rwlock_endwrite(&self->dm_sections_lock);
+				free(old_vec);
+				goto again_lock_elf_sections;
 			} else {
 				atomic_rwlock_endwrite(&self->dm_sections_lock);
 				free(sec_vec);
-				COMPILER_READ_BARRIER();
 				goto again_lock_elf_sections;
 			}
 			atomic_rwlock_downgrade(&self->dm_sections_lock);
@@ -1504,10 +1559,17 @@ err_mod_unloaded:
 				result = (*mod->dm_ops->df_dlsectname)(mod, sect->ds_index);
 			}
 		} else {
-			assert(mod->dm_elf.de_shdr != NULL);
-			assert(mod->dm_elf.de_shstrtab != NULL);
-			result  = mod->dm_elf.de_shstrtab;
-			result += mod->dm_elf.de_shdr[sect->ds_index].sh_name;
+			assert(mod->dm_elf.de_shnum != (ElfW(Half)) - 1);
+			if (sect->ds_index < mod->dm_elf.de_shnum) {
+				assert(mod->dm_elf.de_shdr != NULL);
+				assert(mod->dm_elf.de_shstrtab != NULL);
+				result = mod->dm_elf.de_shstrtab;
+				result += mod->dm_elf.de_shdr[sect->ds_index].sh_name;
+			} else {
+				result = libdl_dlsectionname_aux(sect, mod,
+				                                 sect->ds_index -
+				                                 mod->dm_elf.de_shnum);
+			}
 		}
 	}
 	if unlikely(ATOMIC_DECFETCH(mod->dm_refcnt) == 0) {
@@ -1521,10 +1583,7 @@ err:
 	return NULL;
 }
 
-/* Returns  the index of a given section, or `(size_t)-1' on error.
- * Note that certain sections are allowed not to have an index, and
- * can  only be accessed by-name. For such a section, this function
- * would also return `(size_t)-1' and set an error! */
+/* Returns  the index of a given section, or `(size_t)-1' on error. */
 INTERN NONNULL((1)) size_t DLFCN_CC
 libdl_dlsectionindex(DlSection *sect) {
 	size_t result;

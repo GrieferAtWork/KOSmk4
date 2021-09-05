@@ -186,12 +186,16 @@ struct dlmodule_elf {
 	/* ELF-specific Named data sections of the module (for use with `dllocksection()'). */
 	ElfW(Off)                 de_shoff;      /* File offset to section headers (or `0' if unknown). */
 	ElfW(Half)                de_shstrndx;   /* Index of the section header names section (or `(ElfW(Half))-1' if unknown). */
-	ElfW(Shdr)               *de_shdr;       /* [lock(WRITE_ONCE)][0..:dm_shnum][owned_if(!= empty_shdr)] Vector of section headers (or `NULL' if not loaded). */
+	ElfW(Shdr)               *de_shdr;       /* [lock(WRITE_ONCE)][0..de_shnum][owned_if(!= empty_shdr)] Vector of section headers (or `NULL' if not loaded). */
 	char                     *de_shstrtab;   /* [0..1][lock(WRITE_ONCE)][owned] Section headers name table (or `NULL' if not loaded). */
 	unsigned char             de_abi;        /* [const] The value of `EI_OSABI' */
 	unsigned char             de_abiver;     /* [const] The value of `EI_ABIVERSION' */
 
 	/* Module program headers */
+	ElfW(Half)                de_shnum;      /* [lock(WRITE_ONCE)] Number of section headers (or `(ElfW(Half))-1' if unknown).
+	                                          * Usually the same as `dm_shnum', except when auxiliary section were loaded, in
+	                                          * which case this is the number of ELF sections, while `dm_shnum' includes aux
+	                                          * sections, whos indices start after `de_shnum'. */
 	ElfW(Half)                de_phnum;      /* [const] (Max) number of program headers. */
 #ifdef DL_FIXED_PHDR_COUNT
 	ElfW(Phdr)                de_phdr[DL_FIXED_PHDR_COUNT]; /* [const][de_phnum] Vector of program headers. */
@@ -255,10 +259,10 @@ struct dlmodule {
 	    DlModule            **dm_depvec;     /* [1..1][const][0..dm_depcnt][owned][const] Vector of dependencies of this module. */
 
 	/* Named data sections of the module (for use with `dllocksection()'). */
-	struct atomic_rwlock      dm_sections_lock; /* Lock for `dm_sections' */
-	DlSection               **dm_sections;   /* [0..1][weak][0..dm_shnum][owned][lock(dm_sections_lock)] Vector of locked sections. */
-	__REF DlSection          *dm_sections_dangling; /* [0..1][lock(dm_sections_lock))] Chain of dangling sections. */
-	size_t                    dm_shnum;      /* (Max) number of section headers (or `(size_t)-1' if unknown). */
+	struct atomic_rwlock      dm_sections_lock;     /* Lock for `dm_sections' */
+	DlSection               **dm_sections;          /* [0..1][weak][0..dm_shnum][owned][lock(dm_sections_lock)] Vector of locked sections. */
+	__REF DlSection          *dm_sections_dangling; /* [0..1][lock(dm_sections_lock)] Chain of dangling sections. */
+	size_t                    dm_shnum;             /* [lock(dm_sections_lock)] Number of section. */
 
 	/* [0..1] Module operations V-table (or `NULL' for ELF modules)
 	 *        Used by libdl extensions for other formats. */
