@@ -43,7 +43,7 @@ DEFINE_TEST(libdl) {
 	sect = dllocksection(dlopen(NULL, 0), ".elf.ehdr",
 	                     DLLOCKSECTION_FNORMAL);
 	assertf(sect, "%s", dlerror());
-	assertf(sect->ds_size == sizeof(ElfW(Ehdr)), "%s", dlerror());
+	EQs(sect->ds_size, sizeof(ElfW(Ehdr)));
 	{
 		ElfW(Ehdr) *ehdr;
 		ehdr = (ElfW(Ehdr) *)sect->ds_data;
