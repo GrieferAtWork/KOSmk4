@@ -351,8 +351,31 @@ NOTHROW(KCALL kernel_initialize_scheduler_callbacks)(void) {
 
 
 
+PRIVATE NOBLOCK NONNULL((1, 2)) void
+NOTHROW(FCALL task_destroy_raw_impl_post)(Tobpostlockop(mman) *__restrict _lop,
+                                          struct mman *__restrict UNUSED(mm)) {
+	struct task *self;
+	REF struct mman *mm;
+	self = (struct task *)_lop;
 
-/* Called with a lock to the kernel VM's treelock held. */
+	/* Deallocate physical memory once used by the kernel stack. */
+	mpart_ll_freemem(&FORTASK(self, this_kernel_stackpart_));
+
+	/* Remove from the mman's task list. */
+	mm = self->t_mman;
+	if likely(LIST_ISBOUND(self, t_mman_tasks)) {
+		mman_threadslock_acquire(mm);
+		if likely(LIST_ISBOUND(self, t_mman_tasks))
+			LIST_REMOVE(self, t_mman_tasks);
+		mman_threadslock_release(mm);
+	}
+	decref(mm);
+
+	/* Free the backing memory of the task structure itself. */
+	heap_free(&kernel_locked_heap, self, self->t_heapsz, GFP_NORMAL);
+}
+
+/* Called while a lock to the kernel mman is held. */
 PRIVATE NOBLOCK NONNULL((1, 2)) Tobpostlockop(mman) *
 NOTHROW(FCALL task_destroy_raw_impl)(Toblockop(mman) *__restrict _lop,
                                      struct mman *__restrict UNUSED(mm)) {
@@ -360,24 +383,12 @@ NOTHROW(FCALL task_destroy_raw_impl)(Toblockop(mman) *__restrict _lop,
 	size_t size;
 	struct task *self;
 	self = (struct task *)_lop;
-	assertf(self != &boottask && self != &bootidle && self != &asyncwork,
-	        "Cannot destroy the BOOT or IDLE task of CPU0\n"
-	        "self       = %p\n"
-	        "&boottask  = %p\n"
-	        "&bootidle  = %p\n"
-	        "&asyncwork = %p\n",
-	        self, &boottask, &bootidle, &asyncwork);
-	assert(mman_lock_writing(&mman_kernel));
-	assert((self->t_flags & TASK_FTERMINATED) || !(self->t_flags & TASK_FSTARTED));
 
 	/* Unlink + unmap the trampoline node. */
-
+	mman_mappings_removenode(&mman_kernel, &FORTASK(self, this_trampoline_node));
 	/* The  `mn_writable' field is only valid when  a part is set, which must
 	 * not be the case for the trampoline node (which is a reserved mapping!) */
 	assert(FORTASK(self, this_trampoline_node).mn_part == NULL);
-	/*if unlikely(LIST_ISBOUND(&FORTASK(self, this_trampoline_node), mn_writable))
-		LIST_REMOVE(&FORTASK(self, this_trampoline_node), mn_writable);*/
-	mman_mappings_removenode(&mman_kernel, &FORTASK(self, this_trampoline_node));
 	addr = mnode_getaddr(&FORTASK(self, this_trampoline_node));
 	pagedir_unmapone(addr);
 	mman_supersyncone(addr);
@@ -387,8 +398,6 @@ NOTHROW(FCALL task_destroy_raw_impl)(Toblockop(mman) *__restrict _lop,
 	/* The  `mn_writable' field is only valid when  a part is set, which must
 	 * not be the case for the stackguard node (which is a reserved mapping!) */
 	assert(FORTASK(self, this_kernel_stackguard_).mn_part == NULL);
-	/*if unlikely(LIST_ISBOUND(&FORTASK(self, this_kernel_stackguard_), mn_writable))
-		LIST_REMOVE(&FORTASK(self, this_kernel_stackguard_), mn_writable);*/
 	mman_mappings_removenode(&mman_kernel, &FORTASK(self, this_kernel_stackguard_));
 #endif /* CONFIG_HAVE_KERNEL_STACK_GUARD */
 
@@ -402,24 +411,10 @@ NOTHROW(FCALL task_destroy_raw_impl)(Toblockop(mman) *__restrict _lop,
 	mman_supersync(addr, size);
 	pagedir_kernelunprepare(addr, size);
 
-	/* Deallocate the kernel stack. */
-	mpart_ll_freemem(&FORTASK(self, this_kernel_stackpart_));
-
-	/* TODO: Use 2-step cleanup and free the task structure _after_ releasing
-	 *       the  lock  to  the kernel  mman  (through use  of  a postlockop) */
-	{
-		REF struct mman *mm;
-		mm = self->t_mman;
-		if likely(LIST_ISBOUND(self, t_mman_tasks)) {
-			mman_threadslock_acquire(mm);
-			if likely(LIST_ISBOUND(self, t_mman_tasks))
-				LIST_REMOVE(self, t_mman_tasks);
-			mman_threadslock_release(mm);
-		}
-		heap_free(&kernel_locked_heap, self, self->t_heapsz, GFP_NORMAL);
-		decref(mm);
-	}
-	return NULL;
+	/* Use 2-step cleanup and free the task structure _after_ releasing
+	 * the  lock  to  the kernel  mman  (through use  of  a postlockop) */
+	((Tobpostlockop(mman) *)_lop)->oplo_func = &task_destroy_raw_impl_post;
+	return (Tobpostlockop(mman) *)_lop;
 }
 
 
@@ -430,6 +425,13 @@ INTDEF pertask_fini_t __kernel_pertask_fini_end[];
 PUBLIC NOBLOCK NONNULL((1)) void
 NOTHROW(KCALL task_destroy)(struct task *__restrict self) {
 	pertask_fini_t *iter;
+	assertf(self != &boottask && self != &bootidle && self != &asyncwork,
+	        "Cannot destroy the BOOT or IDLE task of CPU0\n"
+	        "self       = %p\n"
+	        "&boottask  = %p\n"
+	        "&bootidle  = %p\n"
+	        "&asyncwork = %p\n",
+	        self, &boottask, &bootidle, &asyncwork);
 	assert(self->t_refcnt == 0);
 	assert(self->t_self == self);
 	assert((self->t_flags & TASK_FTERMINATED) || !(self->t_flags & TASK_FSTARTED));
@@ -442,8 +444,11 @@ NOTHROW(KCALL task_destroy)(struct task *__restrict self) {
 	/* Destroy  the  task  structure,  and  unload  memory segments
 	 * occupied by the thread, including its stack, and trampoline. */
 	if (mman_lock_tryacquire(&mman_kernel)) {
-		task_destroy_raw_impl((Toblockop(mman) *)self, &mman_kernel);
+		Tobpostlockop(mman) *post;
+		post = task_destroy_raw_impl((Toblockop(mman) *)self, &mman_kernel);
 		mman_lock_release(&mman_kernel);
+		assert(post);
+		(*post->oplo_func)(post, &mman_kernel);
 	} else {
 		Toblockop(mman) *lop;
 		/* Schedule the task to-be destroyed later. */
