@@ -700,28 +700,6 @@ NOTHROW(KCALL __i386_kernel_main)(struct icpustate *__restrict state) {
 	 *     supposed to be done.
 	 */
 
-	/* TODO: It looks like moddbx contains reference leaks for `struct module' objects.
-	 *
-	 * To reproduce this problem:
-	 *     $ playground assert         # Jump into the debugger after userspace assert failure
-	 *     > eval main                 # Invoke moddbx functionality
-	 *     > ^D
-	 *     $ playground cc             # The objects getting leaked also live in caches,
-	 *                                 # so  clear  them,  else no  leaks  would appear.
-	 *     $ playground leak
-	 *
-	 * The actual number of leaks differs and depends on how slow/fast you are at
-	 * typing `eval main' (note also that leaks  happen for any symbol; not  just
-	 * `main'), and if you're _really_ fast, there's even a chance that no  leaks
-	 * are caused at  all. But the  longer you  let moddbx load  modules for  the
-	 * purpose of auto-completing  your query,  the more reference  it'll end  up
-	 * leaking (though interestingly, it only ever  leaks 1 reference for any  of
-	 * the `struct userelf_module' objects)
-	 *
-	 * Also note that other commands which use `struct userelf_module' (such as
-	 * `lslib')  don't leak references, meaning that this is a problem specific
-	 * to moddbx! */
-
 	/* TODO: When system memory gets low, unload unused (iow: not currently mapped)
 	 *       portions of mem-parts. This is why we have the `mpart_all_list' list!
 	 * Also: When unloading unused parts isn't enough, we could also try to

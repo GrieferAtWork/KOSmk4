@@ -48,7 +48,14 @@ INTDEF void KCALL dbx_heap_fini(void);
 
 INTDEF struct cmodule *cmodule_list;
 INTDEF REF struct cmodule *cmodule_cache;
-INTDEF NONNULL((1)) void NOTHROW(FCALL cmodule_fini)(struct cmodule *__restrict self);
+INTDEF NONNULL((1)) void NOTHROW(FCALL cmodule_fini_for_reset)(struct cmodule *__restrict self);
+INTDEF void NOTHROW(KCALL reset_builtin_types)(void);
+
+PRIVATE void NOTHROW(KCALL drop_module_references)(void) {
+	struct cmodule *mod;
+	for (mod = cmodule_list; mod; mod = mod->cm_next)
+		cmodule_fini_for_reset(mod);
+}
 
 
 DBG_INIT(init) {
@@ -59,13 +66,13 @@ DBG_INIT(init) {
 	cmodule_cache = NULL;
 }
 
-INTDEF void NOTHROW(KCALL reset_builtin_types)(void);
 
 DBG_RESET(reset) {
 	ceval_comma_is_select2nd = false;
 	cexpr_readonly           = false;
 	cexpr_typeonly           = false;
 	cexpr_forcewrite         = false;
+
 	/* Set-up `cexpr_stack' that `cexpr_stacktop' could be used. */
 	cexpr_stack     = cexpr_stack_stub + 1;
 	cexpr_stacksize = 0;
@@ -74,21 +81,23 @@ DBG_RESET(reset) {
 #if CVALUE_KIND_VOID != 0
 	cexpr_stack_stub[0].cv_kind = CVALUE_KIND_VOID;
 #endif /* CVALUE_KIND_VOID != 0 */
+
 	/* Drop all external references held by `cmodule_list' */
-	while (cmodule_list) {
-		struct cmodule *next;
-		next = cmodule_list->cm_next;
-		cmodule_fini(cmodule_list);
-		cmodule_list = next;
-	}
+	drop_module_references();
+	cmodule_list  = NULL;
 	cmodule_cache = NULL;
+
 	/* Re-initialize the debugger heap-system */
 	dbx_heap_reset();
+
 	/* Reset pointers within builtin C-types. */
 	reset_builtin_types();
 }
 
 DBG_FINI(fini) {
+	/* Drop references held to external libraries. */
+	drop_module_references();
+
 	/* Free all dynamically allocated heap-pages */
 	dbx_heap_fini();
 }

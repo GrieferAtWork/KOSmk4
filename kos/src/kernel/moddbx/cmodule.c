@@ -136,7 +136,7 @@ NOTHROW(FCALL cmodunit_fini)(struct cmodunit *__restrict self) {
 	debuginfo_cu_abbrev_fini(&self->cu_abbrev);
 }
 
-INTERN NONNULL((1)) void
+PRIVATE NONNULL((1)) void
 NOTHROW(FCALL cmodule_fini)(struct cmodule *__restrict self) {
 	size_t i;
 	if (self->cm_pself) {
@@ -144,12 +144,29 @@ NOTHROW(FCALL cmodule_fini)(struct cmodule *__restrict self) {
 			self->cm_next->cm_pself = self->cm_pself;
 	}
 	debug_sections_unlock(&self->cm_sectrefs);
-	module_decref_unlikely(self);
+	module_decref_unlikely(self->cm_module);
 	cmodsymtab_fini(&self->cm_symbols);
 	for (i = 0; i < self->cm_cuc; ++i)
 		cmodunit_fini(&self->cm_cuv[i]);
 	/* Free mixed symbol information. */
 	dbx_free(self->cm_mixed.mss_symv);
+}
+
+
+PRIVATE NONNULL((1)) void
+NOTHROW(FCALL cmodunit_fini_for_reset)(struct cmodunit *__restrict self) {
+	debuginfo_cu_abbrev_fini(&self->cu_abbrev);
+}
+
+INTERN NONNULL((1)) void
+NOTHROW(FCALL cmodule_fini_for_reset)(struct cmodule *__restrict self) {
+	size_t i;
+	/* Only need to free/release references to external objects.
+	 * iow: no need to call `dbx_free()'! */
+	debug_sections_unlock(&self->cm_sectrefs);
+	module_decref_unlikely(self->cm_module);
+	for (i = 0; i < self->cm_cuc; ++i)
+		cmodunit_fini_for_reset(&self->cm_cuv[i]);
 }
 
 /* Destroy the given CModule. (called when its reference counter hits `0') */
