@@ -30,7 +30,6 @@
 
 #include <debugger/hook.h>
 #include <debugger/output.h>
-#include <kernel/arch/syslog.h>
 #include <kernel/memory.h>
 #include <kernel/mman.h>
 #include <kernel/mman/mnode.h>
@@ -55,6 +54,7 @@
 DECL_BEGIN
 
 #if (defined(__i386__) || defined(__x86_64__)) && 0
+#include <kernel/arch/syslog.h>
 #define DBX_HEAP_TRACEALLOC(min, max)                                \
 	(x86_syslog_printf("\030%%{trace:alloc:dbx:%#p:%#p}", min, max), \
 	 printk(KERN_DEBUG "[dbx] malloc: %p...%p\n", min, max))
@@ -85,15 +85,24 @@ DECL_BEGIN
 #endif /* __SIZEOF_POINTER__ != ... */
 
 
+struct sheap;
+SLIST_HEAD(sheap_slist, sheap);
+
 struct sheap {
-	/* TODO: Use SLIST_ENTRY() for `sh_next' */
-	struct sheap *sh_next; /* [0..1] Next heap. */
-	struct mnode  sh_node; /* [valid_if(sh_next)] mnode for allocating another heap. */
-	size_t        sh_size; /* Heap size (== runtime_sizeof(*self)). */
-	byte_t        sh_heap[DBX_STATIC_HEAPSIZE - /* Heap data. */
-	                      (sizeof(struct sheap *) +
-	                       sizeof(struct mnode) +
-	                       sizeof(size_t))];
+	union {
+		struct {
+			byte_t _sh_link_pad[offsetof(struct mnode, mn_minaddr)];
+			union {
+				SLIST_ENTRY(sheap) sh_link; /* Pointer to additional heap extensions. */
+				struct sheap_slist sh_list; /* [0..N] List of additional heap extensions. */
+			};
+		};
+		struct mnode               sh_node; /* [valid_if(sh_link)] mnode for allocating another heap. */
+	};
+	size_t                         sh_size; /* Heap size (== runtime_sizeof(*self)). */
+	byte_t                         sh_heap[DBX_STATIC_HEAPSIZE - /* Heap data. */
+	                                       (sizeof(struct mnode) +
+	                                        sizeof(size_t))];
 };
 
 #define sheap_heapsize(self) ((self)->sh_size - offsetof(struct sheap, sh_heap))
@@ -115,19 +124,78 @@ NOTHROW(FCALL sheap_free)(struct sheap *__restrict self) {
 		pagedir_unmap(vaddr, PAGESIZE);
 		page_freeone(physaddr2page(phys));
 	}
+	pagedir_kernelunprepare(self, size);
 	pagedir_sync(self, size);
 }
 
 
 struct freerange {
-	struct freerange *fr_next; /* [0..1] Pointer to the next free segment. */
-	size_t            fr_size; /* Size of this free segment. */
+	SLIST_ENTRY(freerange) fr_link; /* [0..1] Pointer to the next free segment. */
+	size_t                 fr_size; /* Size of this free segment. */
 };
 #define freerange_end(self) ((byte_t *)(self) + (self)->fr_size)
 
+SLIST_HEAD(freerange_slist, freerange);
+
 /* Static DBX heap. */
 PRIVATE struct sheap static_heap;
-PRIVATE struct freerange *freemem = NULL;
+PRIVATE struct freerange_slist freemem = SLIST_HEAD_INITIALIZER(freemem);
+
+
+/* Internal function to add a given address range to the free list.
+ * The caller is required to perform validity checks before using
+ * this function! */
+PRIVATE void
+NOTHROW(FCALL dbx_add2free)(void *base, size_t num_bytes) {
+	struct freerange **piter, *iter;
+	DBX_STATIC_HEAP_SETPAT(base, DBX_STATIC_HEAP_PATTERN_FREE, num_bytes);
+	piter = SLIST_PFIRST(&freemem);
+	for (;;) {
+		byte_t *iter_end;
+		struct freerange *newnode;
+		iter = *piter;
+		if (!iter) {
+			/* Append at the end. */
+			newnode = (struct freerange *)base;
+			newnode->fr_link.sle_next = NULL;
+			newnode->fr_size = num_bytes;
+			*piter = newnode;
+			break;
+		}
+		iter_end = freerange_end(iter);
+		if ((byte_t *)base > iter_end) {
+			piter = SLIST_PNEXT(iter, fr_link);
+			continue;
+		}
+		if ((byte_t *)base == iter_end) {
+			/* Extend `iter' at the end. */
+			struct freerange *next;
+			iter->fr_size += num_bytes;
+			next = SLIST_NEXT(iter, fr_link);
+			if ((byte_t *)next == (byte_t *)iter + iter->fr_size) {
+				/* Merge `iter' with its follow-up node. */
+				iter->fr_size += next->fr_size;
+				iter->fr_link = next->fr_link;
+				DBX_STATIC_HEAP_SETPAT(next, DBX_STATIC_HEAP_PATTERN_FREE, sizeof(*next));
+			}
+			break;
+		}
+		/* Insert before `iter'. */
+		newnode = (struct freerange *)base;
+		if ((byte_t *)base + num_bytes == (byte_t *)iter) {
+			/* Merge together with `iter' at the front. */
+			newnode->fr_link = iter->fr_link;
+			newnode->fr_size = iter->fr_size + num_bytes;
+			DBX_STATIC_HEAP_SETPAT(iter, DBX_STATIC_HEAP_PATTERN_FREE, sizeof(*iter));
+		} else {
+			newnode->fr_link.sle_next = iter;
+			newnode->fr_size = num_bytes;
+		}
+		*piter = newnode;
+		break;
+	}
+}
+
 
 
 PRIVATE bool
@@ -170,8 +238,8 @@ NOTHROW(FCALL extend_heap)(size_t min_size) {
 	min_size  = CEIL_ALIGN(min_size, DBX_STATIC_HEAPSIZE);
 	min_size  = CEIL_ALIGN(min_size, PAGESIZE);
 	last_heap = &static_heap;
-	while (last_heap->sh_next)
-		last_heap = last_heap->sh_next;
+	while (SLIST_NEXT(last_heap, sh_link))
+		last_heap = SLIST_NEXT(last_heap, sh_link);
 	new_heap = (struct sheap *)mman_findunmapped_temporary(min_size);
 	if (new_heap == (struct sheap *)MAP_FAILED)
 		return false;
@@ -184,9 +252,7 @@ NOTHROW(FCALL extend_heap)(size_t min_size) {
 
 	/* Allocate the backing physical memory. */
 	if (!allocate_physical_memory(new_heap, min_size)) {
-#ifdef ARCH_PAGEDIR_NEED_PERPARE_FOR_KERNELSPACE
-		pagedir_unprepare(new_heap, min_size);
-#endif /* ARCH_PAGEDIR_NEED_PERPARE_FOR_KERNELSPACE */
+		pagedir_kernelunprepare(new_heap, min_size);
 		return false;
 	}
 
@@ -201,29 +267,23 @@ NOTHROW(FCALL extend_heap)(size_t min_size) {
 	last_heap->sh_node.mn_fspath  = NULL;
 	last_heap->sh_node.mn_fsname  = NULL;
 	last_heap->sh_node.mn_module  = NULL;
-	last_heap->sh_node.mn_link.le_prev = NULL;
-	last_heap->sh_node.mn_link.le_next = NULL;
-	memset(&last_heap->sh_node.mn_writable, 0xcc,
-	       sizeof(last_heap->sh_node.mn_writable));
+	last_heap->sh_node.mn_link.le_prev     = NULL; /* INVALID (mn_part == NULL) */
+	last_heap->sh_node.mn_link.le_next     = NULL; /* INVALID (mn_part == NULL) */
+	last_heap->sh_node.mn_writable.le_prev = NULL; /* INVALID (mn_part == NULL) */
+	last_heap->sh_node.mn_writable.le_next = NULL; /* INVALID (mn_part == NULL) */
+	printk(KERN_DEBUG "[dbx] Adding extension node %p-%p\n",
+	       mnode_getminaddr(&last_heap->sh_node),
+	       mnode_getmaxaddr(&last_heap->sh_node));
 	mman_mappings_insert(&mman_kernel, &last_heap->sh_node);
 
 	/* Remember the new heap. */
-	new_heap->sh_next  = NULL;
-	new_heap->sh_size  = min_size;
-	last_heap->sh_next = new_heap;
+	memset(new_heap, 0xcc, offsetof(struct sheap, sh_heap));
+	new_heap->sh_link.sle_next = NULL;
+	new_heap->sh_size          = min_size;
+/*	last_heap->sh_link.sle_next = new_heap; // Already set via `mn_minaddr' */
+
 	/* Register the new heap's body as free heap memory. */
-	{
-		struct freerange *fr;
-		size_t freesize;
-		freesize = min_size - offsetof(struct sheap, sh_heap);
-		DBX_STATIC_HEAP_SETPAT(new_heap->sh_heap,
-		                       DBX_STATIC_HEAP_PATTERN_FREE,
-		                       freesize);
-		fr          = (struct freerange *)new_heap->sh_heap;
-		fr->fr_next = freemem;
-		fr->fr_size = freesize;
-		freemem     = fr;
-	}
+	dbx_add2free(new_heap->sh_heap, sheap_heapsize(new_heap));
 	return true;
 }
 
@@ -238,27 +298,27 @@ NOTHROW(FCALL dbx_heap_alloc)(size_t num_bytes) {
 	if unlikely(num_bytes < sizeof(struct freerange))
 		num_bytes = sizeof(struct freerange);
 again:
-	for (presult = &freemem;;) {
+	for (presult = SLIST_PFIRST(&freemem);;) {
 		result = *presult;
 		if unlikely(!result)
 			goto nomem;
 		if (result->fr_size >= num_bytes)
 			break;
-		presult = &result->fr_next;
+		presult = SLIST_PNEXT(result, fr_link);
 	}
 	remaining     = result->fr_size - num_bytes;
 	resptr.hp_ptr = result;
 	if (remaining < sizeof(struct freerange)) {
 		/* Allocate the whole free-range */
 		resptr.hp_siz = result->fr_size;
-		*presult = result->fr_next;
+		*presult      = SLIST_NEXT(result, fr_link);
 	} else {
 		struct freerange *newrange;
 		/* Allocate from the front. */
 		resptr.hp_siz = num_bytes;
 		/* Replace the old free-range with a smaller one. */
 		newrange = (struct freerange *)((byte_t *)result + num_bytes);
-		newrange->fr_next = result->fr_next;
+		newrange->fr_link = result->fr_link;
 		newrange->fr_size = remaining;
 		*presult = newrange;
 	}
@@ -296,7 +356,7 @@ NOTHROW(FCALL dbx_heap_allocat)(void *addr, size_t num_bytes) {
 	if unlikely(!IS_ALIGNED((uintptr_t)addr, sizeof(void *)))
 		goto nope;
 	num_bytes = CEIL_ALIGN(num_bytes, sizeof(void *));
-	for (presult = &freemem;;) {
+	for (presult = SLIST_PFIRST(&freemem);;) {
 		result = *presult;
 		if unlikely(!result)
 			goto nope;
@@ -304,7 +364,7 @@ NOTHROW(FCALL dbx_heap_allocat)(void *addr, size_t num_bytes) {
 			goto nope;
 		if ((byte_t *)addr < freerange_end(result))
 			break; /* Found the range in question. */
-		presult = &result->fr_next;
+		presult = SLIST_PNEXT(result, fr_link);
 	}
 	avail = (size_t)(freerange_end(result) - (byte_t *)addr);
 	if (avail < num_bytes)
@@ -328,12 +388,12 @@ NOTHROW(FCALL dbx_heap_allocat)(void *addr, size_t num_bytes) {
 	if ((byte_t *)addr == (byte_t *)result) {
 		if ((byte_t *)addr + num_bytes >= freerange_end(result)) {
 			/* Allocate the whole thing. */
-			*presult = result->fr_next;
+			*presult = SLIST_NEXT(result, fr_link);
 		} else {
 			/* Take away from the front */
 			struct freerange *newrange;
 			newrange = (struct freerange *)((byte_t *)addr + num_bytes);
-			newrange->fr_next = result->fr_next;
+			newrange->fr_link = result->fr_link;
 			newrange->fr_size = avail - num_bytes;
 			*presult = newrange;
 		}
@@ -345,9 +405,9 @@ NOTHROW(FCALL dbx_heap_allocat)(void *addr, size_t num_bytes) {
 		struct freerange *newrange;
 		newrange = (struct freerange *)((byte_t *)addr + num_bytes);
 		newrange->fr_size = (size_t)(freerange_end(result) - (byte_t *)newrange);
-		newrange->fr_next = result->fr_next;
-		result->fr_next   = newrange;
-		result->fr_size   = (size_t)((byte_t *)addr - (byte_t *)result);
+		newrange->fr_link = result->fr_link;
+		result->fr_link.sle_next = newrange;
+		result->fr_size          = (size_t)((byte_t *)addr - (byte_t *)result);
 	}
 	DBX_STATIC_HEAP_SETPAT(addr, DBX_STATIC_HEAP_PATTERN_USED, num_bytes);
 	return num_bytes;
@@ -360,10 +420,12 @@ nope:
 /* Check if any part of the given address range was already freed. */
 PRIVATE ATTR_PURE WUNUSED bool
 NOTHROW(KCALL static_heap_isfree)(void *base, size_t num_bytes) {
-	struct freerange *iter = freemem;
-	while (iter && (byte_t *)base >= (byte_t *)freerange_end(iter))
-		iter = iter->fr_next;
-	return iter && ((byte_t *)base + num_bytes) > (byte_t *)iter;
+	struct freerange *iter;
+	SLIST_FOREACH (iter, &freemem, fr_link) {
+		if ((byte_t *)base < (byte_t *)freerange_end(iter))
+			break;
+	}
+	return iter != NULL && ((byte_t *)base + num_bytes) > (byte_t *)iter;
 }
 
 PRIVATE ATTR_PURE WUNUSED bool
@@ -376,7 +438,7 @@ NOTHROW(KCALL static_heap_contains)(void *base, size_t num_bytes) {
 			    endptr <= (uintptr_t)iter + iter->sh_size)
 				return true;
 		}
-	} while ((iter = iter->sh_next) != NULL);
+	} while ((iter = SLIST_NEXT(iter, sh_link)) != NULL);
 	return false;
 }
 
@@ -384,7 +446,6 @@ NOTHROW(KCALL static_heap_contains)(void *base, size_t num_bytes) {
 /* Free a given address range from the static heap. */
 PUBLIC void
 NOTHROW(FCALL dbx_heap_free)(void *base, size_t num_bytes) {
-	struct freerange **piter, *iter;
 	/* Make sure that the given pointer/size pair is in-bounds and valid. */
 	if unlikely(!IS_ALIGNED(num_bytes, sizeof(void *)))
 		goto internal_error;
@@ -398,56 +459,11 @@ NOTHROW(FCALL dbx_heap_free)(void *base, size_t num_bytes) {
 	if unlikely(static_heap_isfree(base, num_bytes))
 		goto internal_error; /* Already freed */
 	DBX_HEAP_TRACEFREE(base, (byte_t *)base + num_bytes - 1);
-	DBX_STATIC_HEAP_SETPAT(base, DBX_STATIC_HEAP_PATTERN_FREE, num_bytes);
-	piter = &freemem;
-	for (;;) {
-		byte_t *iter_end;
-		struct freerange *newnode;
-		iter = *piter;
-		if (!iter) {
-			/* Append at the end. */
-			newnode = (struct freerange *)base;
-			newnode->fr_next = NULL;
-			newnode->fr_size = num_bytes;
-			*piter = newnode;
-			break;
-		}
-		iter_end = freerange_end(iter);
-		if ((byte_t *)base > iter_end) {
-			piter = &iter->fr_next;
-			continue;
-		}
-		if ((byte_t *)base == iter_end) {
-			/* Extend `iter' at the end. */
-			struct freerange *next;
-			iter->fr_size += num_bytes;
-			next = iter->fr_next;
-			if ((byte_t *)next == (byte_t *)iter + iter->fr_size) {
-				/* Merge `iter' with its follow-up node. */
-				iter->fr_size += next->fr_size;
-				iter->fr_next = next->fr_next;
-				DBX_STATIC_HEAP_SETPAT(next, DBX_STATIC_HEAP_PATTERN_FREE, sizeof(*next));
-			}
-			break;
-		}
-		/* Insert before `iter'. */
-		newnode = (struct freerange *)base;
-		if ((byte_t *)base + num_bytes == (byte_t *)iter) {
-			/* Merge together with `iter' at the front. */
-			newnode->fr_next = iter->fr_next;
-			newnode->fr_size = iter->fr_size + num_bytes;
-			DBX_STATIC_HEAP_SETPAT(iter, DBX_STATIC_HEAP_PATTERN_FREE, sizeof(*iter));
-		} else {
-			newnode->fr_next = iter;
-			newnode->fr_size = num_bytes;
-		}
-		*piter = newnode;
-		break;
-	}
+	dbx_add2free(base, num_bytes);
 done:
 	return /*DBX_EOK*/;
 internal_error:
-	printk(KERN_ERR "[dbg] dbx_heap_free(%p, %" PRIuSIZ "): Internal error\n",
+	printk(KERN_ERR "[dbx] dbx_heap_free(%p, %" PRIuSIZ "): Internal error\n",
 	       base, num_bytes);
 	return /*DBX_EINTERN*/;
 }
@@ -455,40 +471,48 @@ internal_error:
 
 PRIVATE void KCALL reset_heap(void) {
 	/* Reset the static heap. */
-	static_heap.sh_next = NULL;
+	memset(&static_heap, 0xcc, offsetof(struct sheap, sh_heap));
+	static_heap.sh_link.sle_next = NULL;
 	static_heap.sh_size = sizeof(static_heap);
 	DBX_STATIC_HEAP_SETPAT(static_heap.sh_heap,
 	                       DBX_STATIC_HEAP_PATTERN_FREE,
 	                       sizeof(static_heap.sh_heap));
-	freemem = (struct freerange *)static_heap.sh_heap;
-	freemem->fr_next = NULL;
-	freemem->fr_size = sizeof(static_heap.sh_heap);
+
+	/* Set-up the static heap as a free range. */
+	freemem.slh_first = (struct freerange *)static_heap.sh_heap;
+	freemem.slh_first->fr_link.sle_next = NULL;
+	freemem.slh_first->fr_size = sizeof(static_heap.sh_heap);
 }
 
 PRIVATE void KCALL clear_heap(void) {
 	if (kernel_poisoned())
 		return; /* Don't touch the kernel MMan after poison */
 	/* Unmap all dynamically mapped heap nodes. */
-	while (static_heap.sh_next) {
+	while (SLIST_NEXT(&static_heap, sh_link)) {
 		struct sheap *pred = &static_heap;
-		struct sheap *iter = pred->sh_next;
+		struct sheap *iter = SLIST_NEXT(pred, sh_link);
+
 		/* Find the last heap extension with a valid next-pointer. */
-		while (iter->sh_next) {
+		while (SLIST_NEXT(iter, sh_link)) {
 			pred = iter;
-			iter = iter->sh_next;
+			iter = SLIST_NEXT(iter, sh_link);
 		}
-		pred->sh_next = NULL;
 
 		/* Remove the node. */
 		if unlikely(pred->sh_node.mn_part) {
-			printk(KERN_ERR "[dbg] Node at %p-%p has set part %p\n",
+			printk(KERN_ERR "[dbx] Node at %p-%p has set part %p\n",
 			       mnode_getminaddr(&pred->sh_node),
 			       mnode_getmaxaddr(&pred->sh_node),
 			       pred->sh_node.mn_part);
 		}
+
 		/* Because the part should be NULL, the node shouldn't
 		 * be apart of the kernel mman's writable list! */
+		printk(KERN_DEBUG "[dbx] Remove extension node %p-%p\n",
+			   mnode_getminaddr(&pred->sh_node),
+		       mnode_getmaxaddr(&pred->sh_node));
 		mman_mappings_removenode(&mman_kernel, &pred->sh_node);
+		pred->sh_link.sle_next = NULL;
 
 		/* Free this heap extension. */
 		sheap_free(iter);
@@ -591,11 +615,11 @@ DBG_NAMED_COMMAND(dbx_heapinfo, "dbx.heapinfo",
 	struct freerange *iter;
 	total_alloc = sizeof(static_heap.sh_heap);
 	num_heaps   = 1;
-	for (heap = static_heap.sh_next; heap; heap = heap->sh_next) {
+	SLIST_FOREACH (heap, &static_heap.sh_list, sh_link) {
 		total_alloc += sheap_heapsize(heap);
 		++num_heaps;
 	}
-	for (iter = freemem; iter; iter = iter->fr_next) {
+	SLIST_FOREACH (iter, &freemem, fr_link) {
 		total_freemem += iter->fr_size;
 		if (largest_fragment < iter->fr_size)
 			largest_fragment = iter->fr_size;
