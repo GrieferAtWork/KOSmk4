@@ -135,8 +135,15 @@ struct x86_dbg_cpustate {
 struct x86_dbg_psp0threadstate {
 	uintptr_t    dpts_this_psp0;             /* Saved `this_x86_kernel_psp0' */
 	struct mpart dpts_this_kernel_stackpart; /* Saved `this_kernel_stackpart' */
-	struct mnode dpts_this_kernel_stacknode; /* Saved `this_kernel_stacknode' */
+	/* We mustn't save/restore the `mn_mement' field! Otherwise, we might corrupt
+	 * the kernel mman if nodes get mapped/unmapped whilst in debugger mode. Note
+	 * that  all of the  other fields should never  be different before/after the
+	 * debugger is entered, unless of course the kernel mman has been  corrupted,
+	 * in which case this mechanism  right here is used  to try and recover  from
+	 * such an event (as far as possible). */
+	byte_t _dpts_this_kernel_stacknode[sizeof(struct mnode) - sizeof(((struct mnode *)0)->mn_mement)];
 };
+
 struct x86_dbg_psp0state {
 	struct x86_dbg_psp0threadstate dps_thistask; /* Saved psp0 information about `THIS_TASK' */
 	struct x86_dbg_psp0threadstate dps_thisidle; /* Saved psp0 information about `&PERCPU(thiscpu_idle)' */

@@ -548,11 +548,35 @@ PRIVATE ATTR_DBGBSS volatile u8 initok = 0;
 #define INITOK_CONNECTIONS           0x40
 
 PRIVATE ATTR_DBGTEXT void FCALL
+x86_dbg_psp0threadstate_save_stacknode(struct x86_dbg_psp0threadstate *__restrict self,
+                                       struct mnode const *__restrict src) {
+	memcpy(self->_dpts_this_kernel_stacknode, src, offsetof(struct mnode, mn_mement));
+	memcpy(self->_dpts_this_kernel_stacknode + offsetof(struct mnode, mn_mement),
+	       &src->mn_mement + 1, sizeof(struct mnode) - offsetafter(struct mnode, mn_mement));
+}
+PRIVATE ATTR_DBGTEXT void FCALL
+x86_dbg_psp0threadstate_load_stacknode(struct x86_dbg_psp0threadstate const *__restrict self,
+                                       struct mnode *__restrict dst) {
+	uintptr_t saved_flags;
+	saved_flags = dst->mn_flags;
+	memcpy(dst, self->_dpts_this_kernel_stacknode, offsetof(struct mnode, mn_mement));
+	memcpy(&dst->mn_mement + 1,
+	       self->_dpts_this_kernel_stacknode + offsetof(struct mnode, mn_mement),
+	       sizeof(struct mnode) - offsetafter(struct mnode, mn_mement));
+	/* The `MNODE_F__RBRED' flag must not be overwritten during  restore.
+	 * It falls under the same category as the `mn_mement' field, meaning
+	 * that the debugger may have  been in its right  to modify it if  it
+	 * wasn't corrupted before the debugger was entered! */
+	dst->mn_flags &= ~MNODE_F__RBRED;
+	dst->mn_flags |= saved_flags & MNODE_F__RBRED;
+}
+
+PRIVATE ATTR_DBGTEXT void FCALL
 x86_save_psp0_thread(struct x86_dbg_psp0threadstate *__restrict state,
                      struct task const *__restrict thread) {
 	state->dpts_this_psp0 = FORTASK(thread, this_x86_kernel_psp0_);
 	memcpy(&state->dpts_this_kernel_stackpart, &FORTASK(thread, this_kernel_stackpart_), sizeof(struct mpart));
-	memcpy(&state->dpts_this_kernel_stacknode, &FORTASK(thread, this_kernel_stacknode_), sizeof(struct mnode));
+	x86_dbg_psp0threadstate_save_stacknode(state, &FORTASK(thread, this_kernel_stacknode_));
 }
 
 PRIVATE ATTR_DBGTEXT void FCALL
@@ -560,7 +584,7 @@ x86_load_psp0_thread(struct x86_dbg_psp0threadstate const *__restrict state,
                      struct task *__restrict thread) {
 	FORTASK(thread, this_x86_kernel_psp0_) = state->dpts_this_psp0;
 	memcpy(&FORTASK(thread, this_kernel_stackpart_), &state->dpts_this_kernel_stackpart, sizeof(struct mpart));
-	memcpy(&FORTASK(thread, this_kernel_stacknode_), &state->dpts_this_kernel_stacknode, sizeof(struct mnode));
+	x86_dbg_psp0threadstate_load_stacknode(state, &FORTASK(thread, this_kernel_stacknode_));
 }
 
 INTDEF byte_t __kernel_boottask_stack[];
