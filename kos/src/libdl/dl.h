@@ -270,31 +270,288 @@ DlModule_FindFromFilename(char const *__restrict filename);
 INTDEF WUNUSED DlModule *CC DlModule_FindFromStaticPointer(void const *static_pointer);
 
 
-/* Functions made available to applications being loaded. */
-INTDEF REF_IF(!(return->dm_flags & RTLD_NODELETE)) DlModule *DLFCN_CC
-libdl_dlfopen(/*inherit(on_success)*/ fd_t fd, unsigned int mode);
+/************************************************************************/
+/* Functions made available to applications being loaded (<dlfcn.h>).   */
+/************************************************************************/
+
+/* Lazily load a shared library file, and return a handle to said file.
+ * @param: filename: The filename of the shared library.
+ *                   If  this string contains  at least 1 '/'-character,
+ *                   the string will be  interpreted as a raw  filename,
+ *                   such that passing it to open(2) would return a file
+ *                   handle for the named library file.
+ *                   In this case, `filename' may either be an absolute path,
+ *                   or a path relative to the current working directory,  as
+ *                   set by `chdir(2)'
+ *                   If  `filename'  doesn't  contain  any  '/'-characters,  the  string
+ *                   is  the  filename  of the  library  (e.g. "libc.so"),  and  will be
+ *                   searched for in the set  of system library locations, as  specified
+ *                   by  a  ':'-separated string  read  from `getenv("LD_LIBRARY_PATH")'
+ *                   at  the time of  the process having been  started, or defaulting to
+ *                   a set of paths that include at least "/usr/lib:/lib" in that order.
+ *                   When `NULL' is  passed for  this argument,  a handle  for the  main
+ *                   executable module (i.e.  the `readlink  /proc/self/exe` binary)  is
+ *                   returned.
+ * @param: mode:     Exactly  one  of  [RTLD_LAZY, RTLD_NOW],  or'd  with
+ *                   exactly one of [RTLD_GLOBAL, RTLD_LOCAL], optionally
+ *                   or'd with any of the other `RTLD_*' flags.
+ * @return: * :   A handle to the library that got loaded.
+ * @return: NULL: Failed to load the library. - Call `dlerror()' to get an error message. */
 INTDEF WUNUSED REF_IF(!(return->dm_flags & RTLD_NODELETE)) DlModule *DLFCN_CC
 libdl_dlopen(char const *filename, int mode);
+
+/* Close a  previously  opened  dynamic module  handle,  as  returned  by
+ * `dlopen()',  and  some  of the  other  functions found  in  this file.
+ * Note that  this call  is implemented  as a  decref() operation,  since
+ * multiple calls to `dlopen()' for the  same library will try to  ensure
+ * that only a  single instance  of some  unique library  is ever  loaded
+ * at  the same time. However, every call to `dlopen()' should eventually
+ * be followed by a call to `dlclose()' with that same handle, such  that
+ * once some specific handle is closed for the last time, the library can
+ * be unloaded.
+ * Note  also that  if this function  does actually unload  a library, user-
+ * defined callbacks may be invoked, including `__attribute__((destructor))'
+ * callbacks,  as well  as callbacks  registered dynamically  through use of
+ * `DLAUXCTRL_ADD_FINALIZER' (which in turn is used by `__cxa_atexit()')
+ * @return: 0 : Successfully closed the given handle.
+ * @return: * : Failed to close the handle  (which is likely to simply  be
+ *              invalid; s.a. `dlerror()') Warning: Don't just willy-nilly
+ *              pass invalid handles  to this function.  Depending on  how
+ *              libdl  was  configured,  only  minimal  validation  may be
+ *              performed.  The  only guaranty  made is  that NULL-handles
+ *              are always handled as fail-safe! */
 INTDEF NONNULL((1)) int DLFCN_CC libdl_dlclose(REF DlModule *handle);
-INTDEF NONNULL((1)) int DLFCN_CC libdl_dlexceptaware(DlModule *handle);
-INTDEF NONNULL((2)) void *DLFCN_CC libdl_dlsym(DlModule *handle, char const *__restrict name);
+
+/* Lookup the load address of a symbol within a shared library  `handle',
+ * given its `SYMBOL_NAME'. If no such symbol exists, `NULL' is returned,
+ * and `dlerror()' is modified to return a human-readable error message.
+ * WARNING: If  the actual address of the symbol is `NULL', then this
+ *          function will still return `NULL', though will not modify
+ *          the return value of `dlerror()'.
+ *          In normal applications, this would  normally never be the  case,
+ *          as libdl, as  well as  `ld' will take  care not  to link  object
+ *          files such that  symbols could end  up overlapping with  `NULL'.
+ *          However,  with  the  existence  of  `STT_GNU_IFUNC'  (as  usable
+ *          via `__attribute__((ifunc("resolver")))'), it is easily possible
+ *          to force some symbol to overlap with NULL.
+ *          Also  note that  upon success,  `dlerror()' will  not have been
+ *          modified, meaning that if a prior error has yet to be consumed,
+ *          a NULL return value, and  a non-NULL `dlerror()' may still  not
+ *          guaranty that the symbol really doesn't exist. To be absolutely
+ *          certain  that  NULL  would  be  correct,  use  the   following:
+ *          >> void *result;
+ *          >> dlerror();
+ *          >> result = dlsym(handle, symbol_name);
+ *          >> if (result == NULL) {
+ *          >>     char *message = dlerror();
+ *          >>     if (message != NULL) // Symbol lookup really failed.
+ *          >>         fprintf(stderr, "dlerror: %s\n", message);
+ *          >> }
+ * @param: handle: The dynamic  library handle  of the  library which  should  be
+ *                 search  for  the  specified  `SYMBOL_NAME',  before  moving on
+ *                 to also  search all  of that  libraries dependencies  for  the
+ *                 same `SYMBOL_NAME', and  moving on to  search those  libraries
+ *                 dependencies,  following  a  breadth-first  search   approach.
+ *                 Alternatively, you may also pass `RTLD_DEFAULT' or `RTLD_NEXT'
+ *                 to make use  of special symbol  lookup resolutions  documented
+ *                 more extensively alongside these constants.
+ * @return: * :    The address of the symbol in question.
+ * @return: NULL:  No  such symbol (dlerror()  != NULL), or  the symbol has been
+ *                 linked to be loaded at the address `NULL' (dlerror() == NULL) */
+INTDEF NONNULL((2)) void *DLFCN_CC
+libdl_dlsym(DlModule *handle, char const *__restrict name);
+
+/* Return  and clear the  current libdl error message  string, such that for
+ * any error that occurs, this function will only returns non-NULL once. The
+ * returned string has a human-readable format and is generated dynamically,
+ * meaning that it  may contain  information that  is more  specific than  a
+ * simple  `File or directory not found' message, but rather something along
+ * the  lines  of  `Symbol "foo" could not be found in library "libfoo.so"'.
+ * The implementation of this function looks like:
+ * >> return ATOMIC_XCH(error_message_pointer, NULL);
+ * Where internally, libdl will set `error_message_pointer' to a non-NULL pointer
+ * when an error happens.
+ * @return: * :   A pointer  to a  volatile (as  in: the  same memory  area may  be
+ *                overwritten once the next dl-error happens in either the calling,
+ *                !_or any other thread_!), human-readable description of the  last
+ *                error that  happened during  execution of  any of  the  functions
+ *                exported from libdl.
+ * @return: NULL: No error happened, or the last error has already been consumed. */
 INTDEF char *DLFCN_CC libdl_dlerror(void);
-INTDEF WUNUSED REF_IF(!(return->dm_flags & RTLD_NODELETE) && (flags & DLGETHANDLE_FINCREF))
-DlModule *DLFCN_CC libdl_dlgethandle(void const *static_pointer, unsigned int flags);
-INTDEF WUNUSED REF_IF(!(return->dm_flags & RTLD_NODELETE) && (flags & DLGETHANDLE_FINCREF))
-DlModule *DLFCN_CC libdl_dlgetmodule(char const *name, unsigned int flags);
-INTDEF NONNULL((2)) int DLFCN_CC libdl_dladdr(void const *address, Dl_info *info);
-INTDEF WUNUSED NONNULL((1)) fd_t DLFCN_CC libdl_dlmodulefd(DlModule *self);
-INTDEF WUNUSED NONNULL((1)) char const *DLFCN_CC libdl_dlmodulename(DlModule *self);
-INTDEF WUNUSED NONNULL((1)) uintptr_t DLFCN_CC libdl_dlmodulebase(DlModule *self);
-INTDEF WUNUSED REF DlSection *DLFCN_CC libdl_dllocksection(DlModule *self, char const *__restrict name, unsigned int flags);
-INTDEF NONNULL((1)) int DLFCN_CC libdl_dlunlocksection(REF DlSection *sect);
-INTDEF NONNULL((1)) char const *DLFCN_CC libdl_dlsectionname(DlSection *sect);
-INTDEF NONNULL((1)) size_t DLFCN_CC libdl_dlsectionindex(DlSection *sect);
-INTDEF NONNULL((1)) DlModule *DLFCN_CC libdl_dlsectionmodule(DlSection *sect, unsigned int flags);
-INTDEF WUNUSED NONNULL((1)) void *DLFCN_CC libdl_dlinflatesection(DlSection *sect, size_t *psize);
+
+/* Open a library, given a file descriptor previously acquired by `open()'
+ * NOTE: This function will inherit the given `fd' on success.
+ * @param: fd:   The file descriptor to use & inherit for the shared library
+ * @param: mode: Exactly  one  of  [RTLD_LAZY, RTLD_NOW],  or'd  with
+ *               exactly one of [RTLD_GLOBAL, RTLD_LOCAL], optionally
+ *               or'd with any of the other `RTLD_*' flags. */
+INTDEF REF_IF(!(return->dm_flags & RTLD_NODELETE)) DlModule *DLFCN_CC
+libdl_dlfopen(/*inherit(on_success)*/ fd_t fd, unsigned int mode);
+
+/* Check if a given module is exception aware.
+ * TODO: Figure out how we want to detect this condition...
+ * @param: handle: The module to check
+ * @return: 1 : The given module is exception aware
+ * @return: 0 : The given module isn't exception aware
+ * @return: * : The given module handler is invalid (s.a. `dlerror()') */
+INTDEF NONNULL((1)) int DLFCN_CC libdl_dlexceptaware(DlModule *handle);
+
+/* Return the handle of an already loaded library, given a static data/text pointer
+ * @param: flags: Set of `DLGETHANDLE_F*' */
+INTDEF WUNUSED REF_IF(!(return->dm_flags & RTLD_NODELETE) && (flags & DLGETHANDLE_FINCREF)) DlModule *DLFCN_CC
+libdl_dlgethandle(void const *static_pointer, unsigned int flags);
+
+/* Return the handle of an already loaded library, given its name
+ * @param: name:  One of the following (checked in this order):
+ *                 - "/lib/libc.so"
+ *                 - "libc.so"
+ *                 - "libc"
+ *                 - "c"
+ *                 - "/LIB/LIBC.SO"  (requires `DLGETHANDLE_FNOCASE')
+ *                 - "LIBC.SO"       (requires `DLGETHANDLE_FNOCASE')
+ *                 - "LIBC"          (requires `DLGETHANDLE_FNOCASE')
+ *                 - "C"             (requires `DLGETHANDLE_FNOCASE')
+ *                Alternatively, `NULL' can be passed to return a handle for the caller's module.
+ * @param: flags: Set of `DLGETHANDLE_F*' */
+INTDEF WUNUSED REF_IF(!(return->dm_flags & RTLD_NODELETE) && (flags & DLGETHANDLE_FINCREF)) DlModule *DLFCN_CC
+libdl_dlgetmodule(char const *name, unsigned int flags);
+
+INTDEF NONNULL((2)) int DLFCN_CC
+libdl_dladdr(void const *address, Dl_info *info);
+
+/* Return the internally used file descriptor for the given module `handle'
+ * Note  however that this  descriptor is usually  only opened for reading!
+ * @param: handle: A handle returned by `dlopen()'.
+ * @return: * : An open file descriptor for the given module `handle'
+ *              WARNING: Attempting  to  close()  this  handle  may  cause  future
+ *                       operations  performed with the associated module to fail!
+ *                       Additionally, using dlclose() to close `handle' after the
+ *                       module's fd was already  closed will attempt to  re-close
+ *                       that same fd, possibly closing  some other handle if  the
+ *                       same slot was re-used in the mean time.
+ * @return: * : Error (s.a. `dlerror()') */
+INTDEF WUNUSED NONNULL((1)) fd_t DLFCN_CC
+libdl_dlmodulefd(DlModule *self);
+
+/* Return the internally  used filename for  the given module  `handle'
+ * Note that this path is an absolute, canonical (realpath()) filename.
+ * @param: handle: A handle returned by `dlopen()'.
+ * @return: * :    The absolute, unambiguous filename for the given module `handle'
+ * @return: NULL:  Error (s.a. `dlerror()') */
+INTDEF WUNUSED NONNULL((1)) char const *DLFCN_CC
+libdl_dlmodulename(DlModule *self);
+
+/* Return the base address offset chosen by ASLR, which is added to addresses of the given module `handle'.
+ * WARNING: This function usually returns `NULL' for the root executable, in which case  dlerror()
+ *          is  not modified, meaning  that in order to  safely use this  function, you must first
+ *          call `dlerror()' in  order to clear  any existing errors,  then invoke this  function,
+ *          and call `dlerror()' again when NULL is returned to check if an error really occurred.
+ *          Or alternatively, you  can simply  make sure that  `handle' isn't  invalid, since  the
+ *          only  case when this  function can ever fail  is when `handle'  was already closed, is
+ *          `NULL',  or isn't a pointer returned by `dlopen()', `dlgetmodule()' or `dlgethandle()'
+ * @param: handle: A handle returned by `dlopen()'.
+ * @return: * : The load address / module base for the given `handle'.
+ * @return: 0 : Error (s.a. `dlerror()'), or load-address of ZERO */
+INTDEF WUNUSED NONNULL((1)) uintptr_t DLFCN_CC
+libdl_dlmodulebase(DlModule *self);
+
+/* Lock a named section of a given dynamic library into memory.
+ * @param: handle: Handle for the library who's section `name' should be locked & loaded.
+ * @param: name:   Name of the section to load into memory.
+ * @return: * :    A reference to a locked section object (s.a. the exposed portion of the struct above),
+ *                 and allows the user to access the contents of the section, as it is loaded in  memory.
+ *                 Note however that the actual  section data is usually mapped  as read-only, or at  the
+ *                 very least `MAP_PRIVATE', meaning that writes aren't written back to the library file!
+ * @return: NULL:  Error (s.a. `dlerror()'; usually: unknown section) */
+INTDEF WUNUSED REF DlSection *DLFCN_CC
+libdl_dllocksection(DlModule *self, char const *__restrict name, unsigned int flags);
+
+/* Unlock a locked section, as previously returned by `dllocksection()'
+ * HINT: Think of this function as a decref(), where `dllocksection()'
+ *       returns a reference you inherit as the caller
+ * @return: 0 : Successfully unlocked the given section `sect'
+ * @return: * : Error (s.a. `dlerror()') */
+INTDEF NONNULL((1)) int DLFCN_CC
+libdl_dlunlocksection(REF DlSection *sect);
+
+/* Return the name of a given section, or NULL on error
+ * WARNING: The name of a section can no longer be queried after the associated
+ *          module  has been unloaded! If this has happened, `NULL' is returned
+ *          and dlerror() is set accordingly.
+ *          Because the names  of sections  are stored  alongside the  module, if  you
+ *          can't guaranty that  the module  associated with the  section doesn't  get
+ *          unloaded while you're accessing the section's name, you must first acquire
+ *          your own  reference to  that module  through use  of  `dlsectionmodule()':
+ *          >> void *mod = dlsectionmodule(my_sect, DLGETHANDLE_FINCREF);
+ *          >> char const *name = dlsectionname(my_sect);
+ *          >> // Make use of `name' (also check if `name' is NULL; if it is, `mod'
+ *          >> // will probably also be NULL if the module had already been unloaded)
+ *          >> ...
+ *          >> dlclose(mod); */
+INTDEF NONNULL((1)) char const *DLFCN_CC
+libdl_dlsectionname(DlSection *sect);
+
+/* Returns  the index of a given section, or `(size_t)-1' on error.
+ * Note that certain sections are allowed not to have an index, and
+ * can  only be accessed by-name. For such a section, this function
+ * would also return `(size_t)-1' and set an error! */
+INTDEF NONNULL((1)) size_t DLFCN_CC
+libdl_dlsectionindex(DlSection *sect);
+
+/* Return the module associated with a given section, or `NULL' on error.
+ * @param: flags: Set of `DLGETHANDLE_F*'
+ * @return: * :   A pointer, or reference to the module handle (when `DLGETHANDLE_FINCREF' was given)
+ * @return: NULL: Error (s.a. `dlerror()'; usually, the module was already unloaded) */
+INTDEF NONNULL((1)) DlModule *DLFCN_CC
+libdl_dlsectionmodule(DlSection *sect, unsigned int flags);
+
+/* Try to inflate compressed  module sections (`SHF_COMPRESSED'), returning  a
+ * pointer  to a decompressed  data blob that is  lazily allocated for `sect',
+ * and will be freed once the section ends up being unloaded. The given `sect'
+ * may  not be loaded  with `DLLOCKSECTION_FNODATA' if  this function shall be
+ * used  later; if the (compressed) data used  for backing `sect' has not been
+ * loaded, this function will fail.
+ * When the given `sect' isn't actually compressed, this function will simply
+ * return  a pointer to `sect->ds_data', and fill `*psize' (if non-NULL) with
+ * `ds_size'. Otherwise, inflated data and its size are returned.
+ * NOTE: This function requires libdl to lazily load the KOS system library
+ *       `libzlib.so', as found apart of  the KOS source tree. Should  that
+ *       library not be loaded already,  or should loading of said  library
+ *       fail for any reason, this function will also fail, and `dlerror()'
+ *       will reflect what went wrong when trying to load said library.
+ * NOTE: The backing memory for the deflated data blob is allocated lazily and
+ *       will not be freed before  `sect' is `dlunlocksection()'ed the same  #
+ *       of times that it was `dllocksection()'ed.
+ * @param: psize: When non-NULL, store the size of the inflated (decompressed)
+ *                data blob that is returned.
+ * @return: * :   A pointer to the inflated data that is backing `sect'. When
+ *                `sect'  isn't compressed, this  function will simply return
+ *                the section's normal data blob, that is `sect->ds_data'
+ * @return: NULL: Error (s.a. `dlerror()') */
+INTDEF WUNUSED NONNULL((1)) void *DLFCN_CC
+libdl_dlinflatesection(DlSection *sect, size_t *psize);
+
+/* Clear internal caches used by loaded modules in order to free up
+ * available memory. This function is automatically called by  libc
+ * when `mmap()' fails due to lack of available virtual or physical
+ * memory. For more information, see `DL_REGISTER_CACHE()'
+ * @return: 0: No optional memory could be released.
+ * @return: 1: Some optional memory was released. */
 INTDEF int DLFCN_CC libdl_dlclearcaches(void);
+
+/* Perform an auxiliary control command about a given module `handle'
+ * This function is used internally, and invocation requirements for different values
+ * for `cmd' may change in the future. - It's purpose is to provide access to binary-
+ * specific information about loaded modules.
+ * @param: handle:   Handle of the module for which to query information,
+ *                   or  NULL  to   query  for   the  root   application.
+ *                   Some commands  may not  make use  of this  argument.
+ * @param: cmd:      The command with which information should be requested.
+ * @return: NULL: No information available, or no buffer was provided (depending on `cmd')
+ * @return: NULL: Error: Unknown `cmd' (s.a. dlerror())
+ * @return: NULL: Error: Invalid `handle' (s.a. dlerror()) */
 INTDEF void *DLFCN_CC libdl_dlauxctrl(DlModule *self, unsigned int type, ...);
+
 INTDEF void *LIBCCALL libdl____tls_get_addr(void);
 INTDEF void *LIBCCALL libdl___tls_get_addr(void);
 

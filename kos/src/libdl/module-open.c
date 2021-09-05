@@ -174,6 +174,12 @@ again_old_flags:
 
 
 
+/* Open a library, given a file descriptor previously acquired by `open()'
+ * NOTE: This function will inherit the given `fd' on success.
+ * @param: fd:   The file descriptor to use & inherit for the shared library
+ * @param: mode: Exactly  one  of  [RTLD_LAZY, RTLD_NOW],  or'd  with
+ *               exactly one of [RTLD_GLOBAL, RTLD_LOCAL], optionally
+ *               or'd with any of the other `RTLD_*' flags. */
 DEFINE_INTERN_ALIAS(libdl_dlfopen, DlModule_OpenFd);
 DEFINE_PUBLIC_ALIAS(dlfopen, libdl_dlfopen);
 INTERN WUNUSED REF_IF(!(return->dm_flags & RTLD_NODELETE)) DlModule *DLFCN_CC

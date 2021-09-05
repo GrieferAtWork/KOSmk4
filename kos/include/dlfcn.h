@@ -544,7 +544,10 @@ __IMPDEF __ATTR_WUNUSED __ATTR_NONNULL((1)) char const *
 __NOTHROW_NCX(__DLFCN_CC dlsectionname)(struct dl_section *__sect);
 #endif /* __CRT_HAVE_dlsectionname */
 
-/* Returns the index of a given section, or `(size_t)-1' on error. */
+/* Returns  the index of a given section, or `(size_t)-1' on error.
+ * Note that certain sections are allowed not to have an index, and
+ * can  only be accessed by-name. For such a section, this function
+ * would also return `(size_t)-1' and set an error! */
 #ifdef __CRT_HAVE_dlsectionindex
 __IMPDEF __ATTR_WUNUSED __ATTR_NONNULL((1)) __size_t
 __NOTHROW_NCX(__DLFCN_CC dlsectionindex)(struct dl_section *__sect);
@@ -605,19 +608,16 @@ __IMPDEF int __NOTHROW_NCX(__DLFCN_CC dlclearcaches)(void);
 #endif /* __CRT_HAVE_dlclearcaches */
 
 /* Allocate/Free a static TLS segment
- * These functions are called by by libc in order to safely create
- * a new thread, such that all current and future modules are able
- * to store thread-local storage within that thread.
- * NOTE: The caller is responsible to store the returned segment
- *       pointer in the appropriate TLS register.
+ * These functions are called by by libc in  order to safely create a new thread, such  that
+ * all current and future modules are able to store thread-local storage within that thread.
+ * NOTE: The caller is responsible to store the returned segment to the appropriate TLS register.
  * @return: * :   Pointer to the newly allocated TLS segment.
  * @return: NULL: Error (s.a. dlerror()) */
 #ifdef __CRT_HAVE_dltlsallocseg
 __IMPDEF void *__NOTHROW_NCX(__DLFCN_CC dltlsallocseg)(void);
 #endif /* __CRT_HAVE_dltlsallocseg */
 
-/* Free a previously allocated static TLS segment (usually called
- * by `pthread_exit()' and friends). */
+/* Free a previously allocated static TLS segment (usually called by `pthread_exit()' and friends). */
 #ifdef __CRT_HAVE_dltlsfreeseg
 __IMPDEF __ATTR_NONNULL((1)) int
 __NOTHROW_NCX(__DLFCN_CC dltlsfreeseg)(void *__ptr);
