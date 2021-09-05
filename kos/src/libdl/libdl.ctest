@@ -20,6 +20,7 @@
 #ifndef GUARD_LIBDL_LIBDL_CTEST
 #define GUARD_LIBDL_LIBDL_CTEST 1
 #define _KOS_SOURCE 1
+#define _GNU_SOURCE 1
 #undef NDEBUG
 
 #include <hybrid/compiler.h>
@@ -37,7 +38,7 @@
 
 DECL_BEGIN
 
-DEFINE_TEST(libdl) {
+DEFINE_TEST(libdl_aux_sections) {
 	struct dl_section *sect;
 	/* Test auxiliary sections. */
 	sect = dllocksection(dlopen(NULL, 0), ".elf.ehdr",
@@ -53,6 +54,29 @@ DEFINE_TEST(libdl) {
 		EQu(ehdr->e_ident[EI_MAG3], ELFMAG3);
 	}
 	dlunlocksection(sect);
+}
+
+static int my_static = 0;
+
+DEFINE_TEST(libdl_fromaddr) {
+	/* Test auxiliary sections. */
+	void *raw_dlopen, *mod;
+	char const *name;
+	/* Don't pass a pointer to `dlopen' because that  address
+	 * may (read: is) part of the main programs .plt where it
+	 * exists as an indirection to call the real function. */
+	raw_dlopen = dlsym(RTLD_DEFAULT, "dlopen");
+	assertf(raw_dlopen, "%s", dlerror());
+	mod = dlgethandle(raw_dlopen, DLGETHANDLE_FNORMAL);
+	assertf(mod, "%s", dlerror());
+	name = dlmodulename(mod);
+	assertf(name, "%s", dlerror());
+	assertf(strcmp(basename(name), "libdl.so") == 0, "%q", name);
+
+	/* Test for the primary application. */
+	mod = dlgethandle(&my_static, DLGETHANDLE_FNORMAL);
+	assertf(mod, "%s", dlerror());
+	EQp(mod, dlopen(NULL, 0));
 }
 
 DECL_END
