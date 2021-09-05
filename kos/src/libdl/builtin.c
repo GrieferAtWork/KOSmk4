@@ -1171,7 +1171,9 @@ PRIVATE struct aux_section_def const aux_sections[] = {
 	{ ".tdata",        PF_X | PF_W | PF_R, PF_W | PF_R,        PT_TLS },
 	{ ".note",         0, 0,                                   PT_NOTE },
 	{ ".xdata",        PF_X | PF_W | PF_R, PF_X | PF_W | PF_R, PT_LOAD },
-	{ ".test.dynamic", 0, 0,                                   PT_DYNAMIC }, /* For testing */
+#ifndef NDEBUG
+	{ ".test.dynamic", 0, 0,                                   PT_DYNAMIC }, /* For testing so see that it works. */
+#endif /* !NDEBUG */
 	/* TODO: More sections can be emulated via the contents of PT_DYNAMIC */
 	/* clang-format on */
 };
@@ -1266,15 +1268,16 @@ NOTHROW(CC create_aux_section)(DlModule *__restrict self, unsigned int index) {
 	} else {
 		void *base;
 		fd_t modfd = libdl_dlmodulefd(self);
+		unsigned int prot;
 		if unlikely(modfd < 0)
 			goto err_r;
 		/* Manually mmap() this section. */
-		base = sys_mmap(NULL,
-		                section_size,
-		                PROT_READ | PROT_WRITE,
+		prot = PROT_READ;
+		if (result->ds_elfflags & SHF_WRITE)
+			prot |= PROT_WRITE;
+		base = sys_mmap(NULL, section_size, prot,
 		                MAP_PRIVATE | MAP_FILE,
-		                modfd,
-		                section_offset);
+		                modfd, section_offset);
 		if unlikely(E_ISERR(base)) {
 			dl_seterr_section_mmap_failed(self->dm_filename,
 			                              rules->asd_name);
@@ -1538,6 +1541,7 @@ again_read_section:
 		atomic_rwlock_endread(&self->dm_sections_lock);
 		if (result->ds_data == (void *)-1 && !(flags & DLLOCKSECTION_FNODATA) &&
 		    (result->ds_flags & DLSECTION_FLAG_OWNED)) {
+			unsigned int prot;
 			void *base;
 			if (info.dsi_size == 0) {
 				int error;
@@ -1547,12 +1551,12 @@ again_read_section:
 			}
 
 			/* Must load section data. */
-			base = sys_mmap(NULL,
-			                info.dsi_size,
-			                PROT_READ | PROT_WRITE,
+			prot = PROT_READ;
+			if (result->ds_elfflags & SHF_WRITE)
+				prot |= PROT_WRITE;
+			base = sys_mmap(NULL, info.dsi_size, prot,
 			                MAP_PRIVATE | MAP_FILE,
-			                self->dm_file,
-			                info.dsi_offset);
+			                self->dm_file, info.dsi_offset);
 			if (E_ISERR(base)) {
 				DlSection_Decref(result);
 				if (flags & DLLOCKSECTION_FINDEX) {
@@ -1677,14 +1681,15 @@ again_read_elf_section:
 		atomic_rwlock_endread(&self->dm_sections_lock);
 		if (result->ds_data == (void *)-1 && !(flags & DLLOCKSECTION_FNODATA) &&
 		    (result->ds_flags & DLSECTION_FLAG_OWNED)) {
+			unsigned int prot;
 			void *base;
 			/* Must load section data. */
-			base = sys_mmap(NULL,
-			                sect->sh_size,
-			                PROT_READ | PROT_WRITE,
+			prot = PROT_READ;
+			if (result->ds_elfflags & SHF_WRITE)
+				prot |= PROT_WRITE;
+			base = sys_mmap(NULL, sect->sh_size, prot,
 			                MAP_PRIVATE | MAP_FILE,
-			                self->dm_file,
-			                sect->sh_offset);
+			                self->dm_file, sect->sh_offset);
 			if (E_ISERR(base)) {
 				DlSection_Decref(result);
 				if (flags & DLLOCKSECTION_FINDEX) {
