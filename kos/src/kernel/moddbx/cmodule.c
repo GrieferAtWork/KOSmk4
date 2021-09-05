@@ -1029,6 +1029,7 @@ again:
 
 			case DW_AT_declaration:
 				/* Only a declaration; not a definition! */
+				DI_DEBUGINFO_CU_PARSER_EACHATTR_BREAK(attr, self);
 				return NULL;
 
 			case DW_AT_abstract_origin:

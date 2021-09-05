@@ -235,6 +235,21 @@ typedef struct di_debuginfo_location_struct {
 			break;                                                                          \
 		else
 
+/* Helper to break out of a `DI_DEBUGINFO_CU_PARSER_EACHATTR()'
+ * loop, whilst keep the parser state consistent and valid. */
+#define DI_DEBUGINFO_CU_PARSER_EACHATTR_BREAK(attr, self)                              \
+	do {                                                                               \
+		for (;;) {                                                                     \
+			debuginfo_cu_parser_skipform(self, (attr).dica_form);                      \
+			if ((self)->dup_cu_info_pos >= (self)->dup_cu_info_end)                    \
+				break;                                                                 \
+			(attr).dica_name = dwarf_decode_uleb128((__byte_t const **)&_attr_reader); \
+			(attr).dica_form = dwarf_decode_uleb128((__byte_t const **)&_attr_reader); \
+			if (!(attr).dica_name && !(attr).dica_form)                                \
+				break;                                                                 \
+		}                                                                              \
+	}	__WHILE0
+
 
 /* Given  a pointer to the start of a  debug_info CU (or a pointer to the start
  * of the .debug_info section), as well as the start & end of the .debug_abbrev

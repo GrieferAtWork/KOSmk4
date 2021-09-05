@@ -700,25 +700,6 @@ NOTHROW(KCALL __i386_kernel_main)(struct icpustate *__restrict state) {
 	 *     supposed to be done.
 	 */
 
-	/* TODO: libdebuginfo logs a number of errors in `libdi_debuginfo_cu_parser_getstring()'
-	 *       when used by moddbx to parse debug information.
-	 *
-	 * To reproduce this problem:
-	 *     $ playground assert
-	 *     > eval x
-	 *
-	 * It doesn't matter what you type after `eval'. Once loading starts, the errors
-	 * start to appear in the system log. This only seems to affect very few symbols
-	 * and I don't actually know which ones they are, as moddbx and libdebuginfo are
-	 * able to parse everything and `eval' works as expected.
-	 * However, there really shouldn't be any parsing error at all, so whatever it's
-	 * complaining about shouldn't be happening!
-	 *
-	 * Interestingly, all of these errors come from the .debug_info of libstdc++, so
-	 * this  may  be related  to debug  info generated  by some  c++-only construct.
-	 */
-
-
 	/* TODO: It looks like moddbx contains reference leaks for `struct module' objects.
 	 *
 	 * To reproduce this problem:
@@ -740,6 +721,11 @@ NOTHROW(KCALL __i386_kernel_main)(struct icpustate *__restrict state) {
 	 * Also note that other commands which use `struct userelf_module' (such as
 	 * `lslib')  don't leak references, meaning that this is a problem specific
 	 * to moddbx! */
+
+	/* TODO: When system memory gets low, unload unused (iow: not currently mapped)
+	 *       portions of mem-parts. This is why we have the `mpart_all_list' list!
+	 * Also: When unloading unused parts isn't enough, we could also try to
+	 *       off-load not-recently-accessed parts into swap. */
 
 	return state;
 }
