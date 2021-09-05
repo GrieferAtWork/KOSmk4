@@ -1139,31 +1139,279 @@ again:
 }
 
 
-/* Returns `NULL'            on error     (w/ dlerror() set)
- * Returns `(DlSection *)-1' if not found (w/o dlerror() set) */
-PRIVATE WUNUSED NONNULL((1)) REF DlSection *DLFCN_CC
-libdl_dllocksection_aux(DlModule *__restrict self,
-                        char const *__restrict name,
-                        unsigned int flags) {
-	(void)self;
-	(void)name;
-	(void)flags;
-	COMPILER_IMPURE();
-	/* TODO */
-	return (DlSection *)-1;
+PRIVATE ATTR_COLD NONNULL((1, 2)) int
+NOTHROW(CC dl_seterr_section_mmap_failed)(char const *module_filename,
+                                          char const *section_filename) {
+	return dl_seterrorf("%q: Failed to map section %q into memory",
+	                    module_filename, section_filename);
 }
 
-PRIVATE WUNUSED NONNULL((1, 2)) char const *DLFCN_CC
-libdl_dlsectionname_aux(DlSection *__restrict self,
-                        DlModule *__restrict mod,
-                        size_t index) {
-	(void)self;
-	(void)mod;
-	(void)index;
-	COMPILER_IMPURE();
-	/* TODO */
-	dl_seterrorf("Not implemented");
+
+
+/* Auxiliary section definitions
+ * These are special sections that can be locked by-name, but
+ * rather than reference the SHDR table, they address special
+ * program headers that are detected by-type and/or flags. */
+struct aux_section_def {
+	char       asd_name[14];         /* Section name. */
+	byte_t     asd_phdr_flags_mask;  /* Masked program header flags. */
+	byte_t     asd_phdr_flags_flag;  /* Required program header flags. */
+	ElfW(Word) asd_phdr_type;        /* Required program header type. */
+};
+
+/* Auxiliary section detection rules. (sort by most-useful) */
+PRIVATE struct aux_section_def const aux_sections[] = {
+	/* clang-format off */
+	{ ".eh_frame_hdr", 0, 0,                                   PT_GNU_EH_FRAME },
+	{ ".text",         PF_X | PF_W | PF_R, PF_X | PF_R,        PT_LOAD },
+	{ ".rodata",       PF_X | PF_W | PF_R, PF_R,               PT_LOAD },
+	{ ".data",         PF_X | PF_W | PF_R, PF_W | PF_R,        PT_LOAD },
+	{ ".dynamic",      0, 0,                                   PT_DYNAMIC },
+	{ ".interp",       0, 0,                                   PT_INTERP },
+	{ ".tdata",        PF_X | PF_W | PF_R, PF_W | PF_R,        PT_TLS },
+	{ ".note",         0, 0,                                   PT_NOTE },
+	{ ".xdata",        PF_X | PF_W | PF_R, PF_X | PF_W | PF_R, PT_LOAD },
+	{ ".test.dynamic", 0, 0,                                   PT_DYNAMIC }, /* For testing */
+	/* TODO: More sections can be emulated via the contents of PT_DYNAMIC */
+	/* clang-format on */
+};
+
+
+PRIVATE ATTR_PURE WUNUSED NONNULL((1)) bool
+NOTHROW(CC aux_section_ismapped)(DlModule const *__restrict self,
+                                 uintptr_t module_rel_addr,
+                                 size_t num_bytes) {
+	ElfW(Word) i;
+again:
+	for (i = 0; i < self->dm_elf.de_phnum; ++i) {
+		size_t num_loaded;
+		uintptr_t endaddr;
+		if (self->dm_elf.de_phdr[i].p_type != PT_LOAD)
+			continue;
+		if (module_rel_addr < self->dm_elf.de_phdr[i].p_vaddr)
+			continue;
+		endaddr = self->dm_elf.de_phdr[i].p_vaddr +
+		          self->dm_elf.de_phdr[i].p_memsz;
+		if (module_rel_addr >= endaddr)
+			continue;
+		num_loaded = endaddr - module_rel_addr;
+		if (num_loaded >= num_bytes)
+			return true; /* All loaded! */
+		/* Parts are loaded; check if the rest is, too. */
+		module_rel_addr += num_loaded;
+		num_bytes -= num_loaded;
+		goto again;
+	}
+	return false;
+}
+
+
+/* Try to create an auxiliary section. This function must initialize:
+ *   - return->ds_data
+ *   - return->ds_size
+ *   - return->ds_entsize
+ *   - return->ds_link
+ *   - return->ds_info
+ *   - return->ds_elfflags
+ *   - return->ds_flags
+ * @return: NULL:            Error (dlerror was set)
+ * @return: (DlSection *)-1: The indexed section doesn't exist. */
+PRIVATE WUNUSED NONNULL((1)) REF DlSection *
+NOTHROW(CC create_aux_section)(DlModule *__restrict self, unsigned int index) {
+	REF DlSection *result;
+	ElfW(Word) phdr;
+	struct aux_section_def const *rules;
+	uintptr_t section_addr;
+	size_t section_size;
+	syscall_ulong_t section_offset;
+
+	/* Figure out which program header to map as this section. */
+	rules = &aux_sections[index];
+	for (phdr = 0;; ++phdr) {
+		if (phdr >= self->dm_elf.de_phnum)
+			return (DlSection *)-1;
+		if (self->dm_elf.de_phdr[phdr].p_type != rules->asd_phdr_type)
+			continue;
+		if ((self->dm_elf.de_phdr[phdr].p_flags & rules->asd_phdr_flags_mask) != rules->asd_phdr_flags_flag)
+			continue;
+		break; /* Found it! */
+	}
+
+	/* Construct the new section object. */
+	result = (REF DlSection *)malloc(sizeof(DlSection));
+	if unlikely(!result)
+		goto err_nomem;
+	result->ds_entsize  = 0;
+	result->ds_link     = 0;
+	result->ds_info     = 0;
+	result->ds_elfflags = 0;
+	result->ds_flags    = 0;
+	if (self->dm_elf.de_phdr[phdr].p_flags & PF_W)
+		result->ds_elfflags |= SHF_WRITE;
+	if (self->dm_elf.de_phdr[phdr].p_flags & PF_X)
+		result->ds_elfflags |= SHF_EXECINSTR;
+	if (self->dm_elf.de_phdr[phdr].p_type == PT_TLS)
+		result->ds_elfflags |= SHF_TLS;
+
+	/* Figure out where this section should map to. */
+	section_addr   = self->dm_elf.de_phdr[phdr].p_vaddr;
+	section_size   = self->dm_elf.de_phdr[phdr].p_filesz;
+	section_offset = self->dm_elf.de_phdr[phdr].p_offset;
+
+	/* Check if this section was loaded by PT_LOAD */
+	result->ds_size = section_size;
+	if (self->dm_elf.de_phdr[phdr].p_type == PT_LOAD ||
+	    aux_section_ismapped(self, section_addr, section_size)) {
+		result->ds_data = (void *)(self->dm_loadaddr + section_addr);
+	} else {
+		void *base;
+		fd_t modfd = libdl_dlmodulefd(self);
+		if unlikely(modfd < 0)
+			goto err_r;
+		/* Manually mmap() this section. */
+		base = sys_mmap(NULL,
+		                section_size,
+		                PROT_READ | PROT_WRITE,
+		                MAP_PRIVATE | MAP_FILE,
+		                modfd,
+		                section_offset);
+		if unlikely(E_ISERR(base)) {
+			dl_seterr_section_mmap_failed(self->dm_filename,
+			                              rules->asd_name);
+			goto err_r;
+		}
+		result->ds_data  = base;
+		result->ds_flags = DLSECTION_FLAG_OWNED;
+	}
+	return result;
+err_r:
+	free(result);
+	goto err;
+err_nomem:
+	dl_seterror_nomem();
+err:
 	return NULL;
+}
+
+PRIVATE WUNUSED NONNULL((1)) void
+NOTHROW(CC destroy_aux_section)(DlSection *__restrict self) {
+	/* Unmap section data. */
+	if ((self->ds_flags & DLSECTION_FLAG_OWNED) && (self->ds_data != (void *)-1))
+		sys_munmap(self->ds_data, self->ds_size);
+	free(self);
+}
+
+
+PRIVATE ATTR_PURE WUNUSED NONNULL((1)) unsigned int
+NOTHROW(CC get_aux_section_def)(char const *__restrict name, unsigned int flags) {
+	unsigned int i;
+	if (flags & DLLOCKSECTION_FINDEX) {
+		/* Special case: section index. */
+		uintptr_t index = (uintptr_t)name;
+		if (index >= COMPILER_LENOF(aux_sections))
+			return (unsigned int)-1;
+		return (unsigned int)index;
+	}
+	for (i = 0; i < COMPILER_LENOF(aux_sections); ++i) {
+		if (strcmp(aux_sections[i].asd_name, name) == 0)
+			return i;
+	}
+	return (unsigned int)-1;
+}
+
+/* Returns `NULL'            on error     (w/ dlerror() set)
+ * Returns `(DlSection *)-1' if not found (w/o dlerror() set) */
+PRIVATE WUNUSED NONNULL((1)) REF DlSection *
+NOTHROW(CC libdl_dllocksection_aux)(DlModule *__restrict self,
+                        char const *__restrict name,
+                        unsigned int flags) {
+	REF DlSection *result;
+	unsigned int index;
+	size_t real_index;
+	index = get_aux_section_def(name, flags);
+	if unlikely(index == (unsigned int)-1)
+		return (DlSection *)-1;
+
+	/* Check if this section had already been loaded. */
+	real_index = (size_t)self->dm_elf.de_shnum + index;
+	atomic_rwlock_read(&self->dm_sections_lock);
+	if ((real_index < self->dm_shnum) &&
+	    (result = self->dm_sections[real_index]) != NULL &&
+	    DlSection_TryIncref(result)) {
+		atomic_rwlock_endread(&self->dm_sections_lock);
+		return result;
+	}
+	atomic_rwlock_endread(&self->dm_sections_lock);
+
+	/* Must create the section from scratch (or at least try to) */
+	result = create_aux_section(self, index);
+	if (!result || result == (REF DlSection *)-1)
+		return result;
+
+	/* Save the newly created section */
+again_save_results:
+	atomic_rwlock_write(&self->dm_sections_lock);
+	if (real_index >= self->dm_shnum) {
+		/* Must allocate a larger section vector. */
+		DlSection **newvec, **oldvec;
+		atomic_rwlock_endwrite(&self->dm_sections_lock);
+		newvec = (DlSection **)calloc(real_index + 1, sizeof(DlSection *));
+		if unlikely(!newvec) {
+			destroy_aux_section(result);
+			dl_seterror_nomem();
+			return NULL;
+		}
+		atomic_rwlock_write(&self->dm_sections_lock);
+		if unlikely(real_index < self->dm_shnum) {
+			oldvec = newvec;
+		} else {
+			/* Install the new vector. */
+			oldvec = self->dm_sections;
+			memcpy(newvec, oldvec, self->dm_shnum, sizeof(DlSection *));
+			self->dm_sections = newvec;
+			self->dm_shnum    = real_index + 1;
+		}
+		atomic_rwlock_endwrite(&self->dm_sections_lock);
+		/* Free the old vector. */
+		free(oldvec);
+		goto again_save_results;
+	}
+	if unlikely(self->dm_sections[real_index] != NULL &&
+	            DlSection_TryIncref(self->dm_sections[real_index])) {
+		REF DlSection *real_result;
+		real_result = self->dm_sections[real_index];
+		atomic_rwlock_endwrite(&self->dm_sections_lock);
+		destroy_aux_section(result);
+		return real_result;
+	}
+	/* Fill in remaining fields and store in the sections vector. */
+/*	result->ds_data     = ...; */ /* Done by `create_aux_section()' */
+/*	result->ds_size     = ...; */ /* Done by `create_aux_section()' */
+/*	result->ds_entsize  = ...; */ /* Done by `create_aux_section()' */
+/*	result->ds_link     = ...; */ /* Done by `create_aux_section()' */
+/*	result->ds_info     = ...; */ /* Done by `create_aux_section()' */
+/*	result->ds_elfflags = ...; */ /* Done by `create_aux_section()' */
+	result->ds_refcnt   = 1;
+	atomic_rwlock_init(&result->ds_module_lock);
+	result->ds_module   = self;
+	if (!(result->ds_flags & DLSECTION_FLAG_OWNED))
+		incref(self);
+	result->ds_dangling = (REF DlSection *)-1;
+/*	result->ds_flags    = ...; */ /* Done by `create_aux_section()' */
+	result->ds_index    = (uintptr_half_t)real_index;
+	result->ds_cdata    = (void *)-1;
+	result->ds_csize    = 0;
+	self->dm_sections[real_index] = result;
+	atomic_rwlock_endwrite(&self->dm_sections_lock);
+	return result;
+}
+
+PRIVATE ATTR_CONST WUNUSED NONNULL((1, 2)) char const *
+NOTHROW(CC libdl_dlsectionname_aux)(DlSection *__restrict UNUSED(self),
+                                    DlModule *__restrict UNUSED(mod),
+                                    size_t index) {
+	assert(index < COMPILER_LENOF(aux_sections));
+	return aux_sections[index].asd_name;
 }
 
 
@@ -1309,10 +1557,9 @@ again_read_section:
 				DlSection_Decref(result);
 				if (flags & DLLOCKSECTION_FINDEX) {
 					dl_seterrorf("%q: Failed to map section #%" PRIuSIZ " into memory",
-					                self->dm_filename, (uintptr_t)name);
+					             self->dm_filename, (uintptr_t)name);
 				} else {
-					dl_seterrorf("%q: Failed to map section %q into memory",
-					                self->dm_filename, name);
+					dl_seterr_section_mmap_failed(self->dm_filename, name);
 				}
 				goto err;
 			}
@@ -1444,8 +1691,7 @@ again_read_elf_section:
 					dl_seterrorf("%q: Failed to map section #%" PRIuSIZ " into memory",
 					                self->dm_filename, (uintptr_t)name);
 				} else {
-					dl_seterrorf("%q: Failed to map section %q into memory",
-					                self->dm_filename, name);
+					dl_seterr_section_mmap_failed(self->dm_filename, name);
 				}
 				goto err;
 			}

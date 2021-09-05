@@ -686,11 +686,11 @@ NOTHROW(KCALL __i386_kernel_main)(struct icpustate *__restrict state) {
 	 * Done:
 	 *   - The section is being loaded alongside .eh_frame (if necessary)
 	 * Missing:
-	 *   - `libdl.so', `struct driver' and `struct userelf_module' must  include
-	 *     special handling when trying to lock a section named ".eh_frame_hdr",
-	 *     in  that if no such section exists in  SHDRS, check if a PHDR of type
-	 *     `PT_GNU_EH_FRAME' exists. If  so, use  that header to  create a  faux
-	 *     section object that is returned when requesting ".eh_frame_hdr"
+	 *   - Like `libdl.so', `struct userelf_module' must also include special handling
+	 *     when trying to  lock a section  named ".eh_frame_hdr", in  that if no  such
+	 *     section exists in SHDRS, check if a PHDR of type `PT_GNU_EH_FRAME'  exists.
+	 *     If so, use that  header to create  a faux section  object that is  returned
+	 *     when requesting ".eh_frame_hdr"
 	 *   - The .eh_frame_hdr section isn't being processed / parsed. Note that
 	 *     it  behaves similar to  .eh_frame, but differs  in that it contains
 	 *     a lookup-table like:
@@ -701,9 +701,9 @@ NOTHROW(KCALL __i386_kernel_main)(struct icpustate *__restrict state) {
 	 */
 
 	/* TODO: When system memory gets low, unload unused (iow: not currently mapped)
-	 *       portions of mem-parts. This is why we have the `mpart_all_list' list!
+	 *       portions  of mem-parts. This is why we have the `mpart_all_list' list!
 	 * Also: When unloading unused parts isn't enough, we could also try to
-	 *       off-load not-recently-accessed parts into swap. */
+	 *       off-load    not-recently-accessed     parts     into     swap. */
 
 	return state;
 }
