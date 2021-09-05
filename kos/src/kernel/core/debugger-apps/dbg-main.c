@@ -36,6 +36,7 @@ if (gcc_opt.removeif([](x) -> x.startswith("-O")))
 #include <kernel/except.h>
 
 #include <hybrid/align.h>
+#include <hybrid/overflow.h>
 
 #include <kos/kernel/cpu-state.h>
 #include <kos/keyboard.h>
@@ -68,11 +69,11 @@ DECL_BEGIN
 
 
 /* ColorConfiguration for the auto-completion box. */
-#define AUTOCOMPLETE_CC_BADCMD     ANSITTY_CL_RED              /* Text-color for unmatched commands */
-#define AUTOCOMPLETE_CC_BACKGROUND ANSITTY_CL_DARK_GRAY        /* Background color for the auto-completion box */
-#define AUTOCOMPLETE_CC_MATCHFG    ANSITTY_CL_WHITE            /* Foreground color for matched text */
+#define AUTOCOMPLETE_CC_BADCMD     ANSITTY_CL_RED             /* Text-color for unmatched commands */
+#define AUTOCOMPLETE_CC_BACKGROUND ANSITTY_CL_DARK_GRAY       /* Background color for the auto-completion box */
+#define AUTOCOMPLETE_CC_MATCHFG    ANSITTY_CL_WHITE           /* Foreground color for matched text */
 #define AUTOCOMPLETE_CC_MATCHBG    AUTOCOMPLETE_CC_BACKGROUND /* Background color for matched text */
-#define AUTOCOMPLETE_CC_SUGGESTFG  ANSITTY_CL_LIGHT_GRAY       /* Foreground color for suggested text */
+#define AUTOCOMPLETE_CC_SUGGESTFG  ANSITTY_CL_LIGHT_GRAY      /* Foreground color for suggested text */
 #define AUTOCOMPLETE_CC_SUGGESTBG  AUTOCOMPLETE_CC_BACKGROUND /* Background color for suggested text */
 
 
@@ -300,9 +301,13 @@ DBG_COMMAND(help, autocomplete_help, DBG_COMMANDHOOK_FLAG_AUTOEXCLUSIVE,
 
 
 struct dbg_autocomplete_cnt_cookie {
+#define DBG_AUTOCOMPLETE_COMMON_MAXLEN (DBG_MAXLINE / 4)
 	char   *acc_starts;    /* [1..1][const] Incomplete starting string. */
 	size_t  acc_startslen; /* [const] Length of `acc_starts' */
 	size_t  acc_count;     /* # of matching auto-completions */
+	char    acc_common[DBG_AUTOCOMPLETE_COMMON_MAXLEN];
+	                       /* First couple of character common to all completions.
+	                        * Either NUL- or EOF-terminated. */
 };
 
 PRIVATE ATTR_DBGTEXT void DBG_CALL
@@ -315,6 +320,24 @@ dbg_autocomplete_countmatches(void *arg,
 		return; /* Not a match */
 	if (memcmp(name, cookie->acc_starts, cookie->acc_startslen) != 0)
 		return; /* Not a match */
+	name += cookie->acc_startslen;
+	namelen -= cookie->acc_startslen;
+	if (cookie->acc_count == 0) {
+		/* First entry. */
+		if (namelen > DBG_AUTOCOMPLETE_COMMON_MAXLEN)
+			namelen = DBG_AUTOCOMPLETE_COMMON_MAXLEN;
+		memcpy(cookie->acc_common, name, namelen);
+		if (namelen < DBG_AUTOCOMPLETE_COMMON_MAXLEN)
+			cookie->acc_common[namelen] = '\0';
+	} else {
+		size_t i;
+		for (i = 0; i < DBG_AUTOCOMPLETE_COMMON_MAXLEN; ++i) {
+			if (cookie->acc_common[i] != name[i]) {
+				cookie->acc_common[i] = '\0'; /* Different text. */
+				break;
+			}
+		}
+	}
 	++cookie->acc_count;
 }
 
@@ -487,7 +510,7 @@ NOTHROW(KCALL dbg_autocomplete)(size_t cursor,
 	} cookie;
 	/* Set to `true' if the current word is incomplete (no
 	 * trailing space, or incomplete ", ', or \-sequence). */
-	bool incomplete_word = false;
+	bool incomplete_word;
 	{
 		size_t i = cursor;
 		/* Don't do anything  if the  cursor is  at the  start of  the
@@ -502,6 +525,7 @@ NOTHROW(KCALL dbg_autocomplete)(size_t cursor,
 		goto done;
 	}
 do_autocomplete:
+	incomplete_word = false;
 	cmdline_copy = (char *)alloca(cursor + 1);
 	*(char *)mempcpy(cmdline_copy, cmdline, cursor) = '\0';
 	argc = split_cmdline(cmdline_copy, argv, DBG_ARGC_MAX, &incomplete_word);
@@ -562,20 +586,36 @@ set_starts_empty_string:
 		goto done; /* Nothing to do here! */
 	}
 #ifdef CONFIG_DBG_ALWAYS_SHOW_AUTOCOMLETE
-	if (cookie.cnt.acc_count == 1 && insert_match)
-#else /* CONFIG_DBG_ALWAYS_SHOW_AUTOCOMLETE */
-	if (cookie.cnt.acc_count == 1)
-#endif /* !CONFIG_DBG_ALWAYS_SHOW_AUTOCOMLETE */
+	if (insert_match)
+#endif /* CONFIG_DBG_ALWAYS_SHOW_AUTOCOMLETE */
 	{
-		/* Auto-complete this single word. */
-		size_t new_cursor;
-		if unlikely(cursor < cookie.cnt.acc_startslen)
-			goto done; /* shouldn't happen... */
-		if unlikely(memcmp(cmdline + cursor - cookie.cnt.acc_startslen,
-		                   cookie.cnt.acc_starts, cookie.cnt.acc_startslen) != 0)
-			goto done; /* Shouldn't happen... */
-		new_cursor = cursor - cookie.cnt.acc_startslen;
-		{
+		if (cookie.cnt.acc_common[0] != '\0' &&
+		    (memchr(cookie.cnt.acc_common, '\0', sizeof(cookie.cnt.acc_common)) != NULL ||
+		     cookie.cnt.acc_count >= 2)) {
+			size_t comlen, avail, postlen = strlen(cmdline + cursor);
+			if (OVERFLOW_USUB(DBG_MAXLINE - 1, cursor + postlen, &avail))
+				goto done; /* Shouldn't happen... */
+			comlen = strnlen(cookie.cnt.acc_common, DBG_AUTOCOMPLETE_COMMON_MAXLEN);
+			if (comlen > avail)
+				comlen = avail;
+			if unlikely(!comlen)
+				goto done;
+			memmoveup(cmdline + cursor + comlen, cmdline + cursor, postlen, sizeof(char));
+			memcpy(cmdline + cursor, cookie.cnt.acc_common, comlen, sizeof(char));
+			cmdline[cursor + comlen + postlen] = '\0';
+			cursor += comlen;
+			if (comlen == DBG_AUTOCOMPLETE_COMMON_MAXLEN)
+				goto do_autocomplete;
+			return cursor;
+		} else if (cookie.cnt.acc_count == 1) {
+			/* Auto-complete this single word. */
+			size_t new_cursor;
+			if unlikely(cursor < cookie.cnt.acc_startslen)
+				goto done; /* shouldn't happen... */
+			if unlikely(memcmp(cmdline + cursor - cookie.cnt.acc_startslen,
+			                   cookie.cnt.acc_starts, cookie.cnt.acc_startslen) != 0)
+				goto done; /* Shouldn't happen... */
+			new_cursor = cursor - cookie.cnt.acc_startslen;
 			if unlikely(new_cursor >= (DBG_MAXLINE - 1))
 				goto done; /* Shouldn't happen... */
 			cookie.ins.acc_destavl   = (DBG_MAXLINE - 1) - new_cursor;
@@ -592,8 +632,8 @@ set_starts_empty_string:
 			if unlikely(cookie.ins.acc_destreq > cookie.ins.acc_destavl)
 				goto do_print_options; /* Prevent overflow */
 			new_cursor += cookie.ins.acc_destreq;
+			return new_cursor;
 		}
-		return new_cursor;
 	}
 do_print_options:
 	/* Print a list of all available options and
