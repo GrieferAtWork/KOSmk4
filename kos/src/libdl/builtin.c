@@ -1277,6 +1277,18 @@ again:
 	return false;
 }
 
+PRIVATE ATTR_PURE WUNUSED NONNULL((1)) ElfW(Dyn) const *
+NOTHROW(CC get_dynamic_tag)(DlModule const *__restrict self, ElfW(Sword) tag) {
+	size_t i;
+	for (i = 0; i < self->dm_elf.de_dyncnt; ++i) {
+		if (self->dm_dynhdr[i].d_tag == DT_NULL)
+			break;
+		if (self->dm_dynhdr[i].d_tag == tag)
+			return &self->dm_dynhdr[i];
+	}
+	return NULL;
+}
+
 
 
 
@@ -1285,7 +1297,7 @@ again:
  * rather than reference the SHDR table, they address special
  * program headers that are detected by-type and/or flags. */
 struct aux_section_def {
-	char       asd_name[14];         /* Section name. */
+	char       asd_name[18];         /* Section name. */
 	byte_t     asd_phdr_flags_mask;  /* Masked program header flags. */
 	byte_t     asd_phdr_flags_flag;  /* Required program header flags. */
 	ElfW(Word) asd_phdr_type;        /* Required program header type. */
@@ -1304,14 +1316,15 @@ PRIVATE struct aux_section_def const aux_sections[] = {
 	{ ".note",         0, 0,                                   PT_NOTE },
 	{ ".xdata",        PF_X | PF_W | PF_R, PF_X | PF_W | PF_R, PT_LOAD },
 	/* clang-format on */
-#define AUX_SECTION_ELF_EHDR  9
-#define AUX_SECTION_ELF_SHDRS 10
-#define AUX_SECTION_ELF_PHDRS 11
-#define AUX_SECTION_SHSTRTAB  12
-#define AUX_SECTION_HASH      13
-#define AUX_SECTION_GNU_HASH  14
-#define AUX_SECTION_DYNSYM    15
-#define AUX_SECTION_DYNSTR    16
+#define _AUX_SECTION_MIN      9
+#define AUX_SECTION_ELF_EHDR  (_AUX_SECTION_MIN + 0)
+#define AUX_SECTION_ELF_SHDRS (_AUX_SECTION_MIN + 1)
+#define AUX_SECTION_ELF_PHDRS (_AUX_SECTION_MIN + 2)
+#define AUX_SECTION_SHSTRTAB  (_AUX_SECTION_MIN + 3)
+#define AUX_SECTION_HASH      (_AUX_SECTION_MIN + 4)
+#define AUX_SECTION_GNU_HASH  (_AUX_SECTION_MIN + 5)
+#define AUX_SECTION_DYNSYM    (_AUX_SECTION_MIN + 6)
+#define AUX_SECTION_DYNSTR    (_AUX_SECTION_MIN + 7)
 	[AUX_SECTION_ELF_EHDR]  = { ".elf.ehdr", 0, 0, PT_NULL },
 	[AUX_SECTION_ELF_SHDRS] = { ".elf.shdrs", 0, 0, PT_NULL },
 	[AUX_SECTION_ELF_PHDRS] = { ".elf.phdrs", 0, 0, PT_NULL },
@@ -1320,6 +1333,12 @@ PRIVATE struct aux_section_def const aux_sections[] = {
 	[AUX_SECTION_GNU_HASH]  = { ".gnu.hash", 0, 0, PT_NULL },
 	[AUX_SECTION_DYNSYM]    = { ".dynsym", 0, 0, PT_NULL },
 	[AUX_SECTION_DYNSTR]    = { ".dynstr", 0, 0, PT_NULL },
+#define AUX_SECTION_INIT_ARRAY    (_AUX_SECTION_MIN + 8)
+#define AUX_SECTION_FINI_ARRAY    (_AUX_SECTION_MIN + 9)
+#define AUX_SECTION_PREINIT_ARRAY (_AUX_SECTION_MIN + 10)
+	[AUX_SECTION_INIT_ARRAY]    = { ".init_array", DT_INIT_ARRAY, DT_INIT_ARRAYSZ, PT_NULL },
+	[AUX_SECTION_FINI_ARRAY]    = { ".fini_array", DT_FINI_ARRAY, DT_FINI_ARRAYSZ, PT_NULL },
+	[AUX_SECTION_PREINIT_ARRAY] = { ".preinit_array", DT_PREINIT_ARRAY, DT_PREINIT_ARRAYSZ, PT_NULL },
 };
 
 
@@ -1389,6 +1408,12 @@ unknown_section:
 			if (self->dm_elf.de_dynstr == NULL)
 				goto unknown_section;
 			break;
+		case AUX_SECTION_INIT_ARRAY:
+		case AUX_SECTION_FINI_ARRAY:
+		case AUX_SECTION_PREINIT_ARRAY:
+			if (!get_dynamic_tag(self, rules->asd_phdr_flags_mask))
+				goto unknown_section;
+			break;
 		default: break;
 		}
 	}
@@ -1401,7 +1426,7 @@ unknown_section:
 	result->ds_link     = 0;
 	result->ds_info     = 0;
 	result->ds_elfflags = 0;
-	result->ds_flags    = 0;
+	result->ds_flags    = DLSECTION_FLAG_NORMAL;
 
 	if (rules->asd_phdr_type == PT_NULL) {
 		/* Figure out where this section should map to. */
@@ -1454,6 +1479,22 @@ create_section_from_addr:
 		case AUX_SECTION_DYNSTR: /* .dynstr */
 			result->ds_data = (void *)self->dm_elf.de_dynstr;
 			goto create_section_from_addr;
+
+		case AUX_SECTION_INIT_ARRAY:
+		case AUX_SECTION_FINI_ARRAY:
+		case AUX_SECTION_PREINIT_ARRAY: {
+			ElfW(Dyn) const *tag;
+			tag = get_dynamic_tag(self, rules->asd_phdr_flags_mask);
+			assert(tag); /* Already asserted above. */
+			result->ds_entsize = sizeof(void (*)());
+			result->ds_data    = (void *)(self->dm_loadaddr + tag->d_un.d_ptr);
+			/* Check if the array is explicitly sized. */
+			tag = get_dynamic_tag(self, rules->asd_phdr_flags_flag);
+			if (!tag)
+				goto create_section_from_addr;
+			result->ds_size = tag->d_un.d_val;
+			return result;
+		}	break;
 
 		default:
 			__builtin_unreachable();
