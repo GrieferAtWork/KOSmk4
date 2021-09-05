@@ -371,18 +371,28 @@ NOTHROW(FCALL task_destroy_raw_impl)(Toblockop(mman) *__restrict _lop,
 	assert((self->t_flags & TASK_FTERMINATED) || !(self->t_flags & TASK_FSTARTED));
 
 	/* Unlink + unmap the trampoline node. */
-	if unlikely(LIST_ISBOUND(&FORTASK(self, this_trampoline_node), mn_writable))
-		LIST_REMOVE(&FORTASK(self, this_trampoline_node), mn_writable);
+
+	/* The  `mn_writable' field is only valid when  a part is set, which must
+	 * not be the case for the trampoline node (which is a reserved mapping!) */
+	assert(FORTASK(self, this_trampoline_node).mn_part == NULL);
+	/*if unlikely(LIST_ISBOUND(&FORTASK(self, this_trampoline_node), mn_writable))
+		LIST_REMOVE(&FORTASK(self, this_trampoline_node), mn_writable);*/
 	mman_mappings_removenode(&mman_kernel, &FORTASK(self, this_trampoline_node));
 	addr = mnode_getaddr(&FORTASK(self, this_trampoline_node));
 	pagedir_unmapone(addr);
 	mman_supersyncone(addr);
 	pagedir_kernelunprepareone(addr);
+
 #ifdef CONFIG_HAVE_KERNEL_STACK_GUARD
-	if unlikely(LIST_ISBOUND(&FORTASK(self, this_kernel_stackguard_), mn_writable))
-		LIST_REMOVE(&FORTASK(self, this_kernel_stackguard_), mn_writable);
+	/* The  `mn_writable' field is only valid when  a part is set, which must
+	 * not be the case for the stackguard node (which is a reserved mapping!) */
+	assert(FORTASK(self, this_kernel_stackguard_).mn_part == NULL);
+	/*if unlikely(LIST_ISBOUND(&FORTASK(self, this_kernel_stackguard_), mn_writable))
+		LIST_REMOVE(&FORTASK(self, this_kernel_stackguard_), mn_writable);*/
 	mman_mappings_removenode(&mman_kernel, &FORTASK(self, this_kernel_stackguard_));
 #endif /* CONFIG_HAVE_KERNEL_STACK_GUARD */
+
+	assert(FORTASK(self, this_kernel_stacknode_).mn_part == &FORTASK(self, this_kernel_stackpart_));
 	if unlikely(LIST_ISBOUND(&FORTASK(self, this_kernel_stacknode_), mn_writable))
 		LIST_REMOVE(&FORTASK(self, this_kernel_stacknode_), mn_writable);
 	mman_mappings_removenode(&mman_kernel, &FORTASK(self, this_kernel_stacknode_));

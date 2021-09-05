@@ -154,7 +154,7 @@ DATDEF __BOOL cexpr_readonly;
 DATDEF __BOOL cexpr_typeonly;
 
 /* Set  to  true  if  memory  writes  should  be   forced.
- * This is the 4'th argument is calls to dbg_writememory()
+ * This is the 4'th argument in calls to dbg_writememory()
  * Defaults to `false' */
 DATDEF __BOOL cexpr_forcewrite;
 

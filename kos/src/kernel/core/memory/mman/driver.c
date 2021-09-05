@@ -3836,7 +3836,7 @@ again_find_nodes:
 				 * This list is a no-op for kernel-space, but must still
 				 * be kept a valid linked  list (and not contain bad  or
 				 * dangling pointers) */
-				if unlikely(LIST_ISBOUND(node, mn_writable))
+				if unlikely(node->mn_part != NULL && LIST_ISBOUND(node, mn_writable))
 					LIST_REMOVE(node, mn_writable);
 
 				/* Must get rid of this node! */

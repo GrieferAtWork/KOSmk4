@@ -203,7 +203,10 @@ NOTHROW(FCALL extend_heap)(size_t min_size) {
 	last_heap->sh_node.mn_module  = NULL;
 	last_heap->sh_node.mn_link.le_prev = NULL;
 	last_heap->sh_node.mn_link.le_next = NULL;
+	memset(&last_heap->sh_node.mn_writable, 0xcc,
+	       sizeof(last_heap->sh_node.mn_writable));
 	mman_mappings_insert(&mman_kernel, &last_heap->sh_node);
+
 	/* Remember the new heap. */
 	new_heap->sh_next  = NULL;
 	new_heap->sh_size  = min_size;
@@ -477,8 +480,14 @@ PRIVATE void KCALL clear_heap(void) {
 		pred->sh_next = NULL;
 
 		/* Remove the node. */
-		if unlikely(LIST_ISBOUND(&pred->sh_node, mn_writable))
-			LIST_REMOVE(&pred->sh_node, mn_writable);
+		if unlikely(pred->sh_node.mn_part) {
+			printk(KERN_ERR "[dbg] Node at %p-%p has set part %p\n",
+			       mnode_getminaddr(&pred->sh_node),
+			       mnode_getmaxaddr(&pred->sh_node),
+			       pred->sh_node.mn_part);
+		}
+		/* Because the part should be NULL, the node shouldn't
+		 * be apart of the kernel mman's writable list! */
 		mman_mappings_removenode(&mman_kernel, &pred->sh_node);
 
 		/* Free this heap extension. */

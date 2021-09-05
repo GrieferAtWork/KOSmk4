@@ -195,7 +195,7 @@ PUBLIC bool cexpr_readonly = false;
 PUBLIC bool cexpr_typeonly = false;
 
 /* Set  to  true  if  memory  writes  should  be   forced.
- * This is the 4'th argument is calls to dbg_writememory()
+ * This is the 4'th argument in calls to dbg_writememory()
  * Defaults to `false' */
 PUBLIC bool cexpr_forcewrite = false;
 
