@@ -1148,36 +1148,106 @@ NOTHROW(CC dl_seterr_section_mmap_failed)(char const *module_filename,
 
 
 
-/* Auxiliary section definitions
- * These are special sections that can be locked by-name, but
- * rather than reference the SHDR table, they address special
- * program headers that are detected by-type and/or flags. */
-struct aux_section_def {
-	char       asd_name[14];         /* Section name. */
-	byte_t     asd_phdr_flags_mask;  /* Masked program header flags. */
-	byte_t     asd_phdr_flags_flag;  /* Required program header flags. */
-	ElfW(Word) asd_phdr_type;        /* Required program header type. */
-};
 
-/* Auxiliary section detection rules. (sort by most-useful) */
-PRIVATE struct aux_section_def const aux_sections[] = {
-	/* clang-format off */
-	{ ".eh_frame_hdr", 0, 0,                                   PT_GNU_EH_FRAME },
-	{ ".text",         PF_X | PF_W | PF_R, PF_X | PF_R,        PT_LOAD },
-	{ ".rodata",       PF_X | PF_W | PF_R, PF_R,               PT_LOAD },
-	{ ".data",         PF_X | PF_W | PF_R, PF_W | PF_R,        PT_LOAD },
-	{ ".dynamic",      0, 0,                                   PT_DYNAMIC },
-	{ ".interp",       0, 0,                                   PT_INTERP },
-	{ ".tdata",        PF_X | PF_W | PF_R, PF_W | PF_R,        PT_TLS },
-	{ ".note",         0, 0,                                   PT_NOTE },
-	{ ".xdata",        PF_X | PF_W | PF_R, PF_X | PF_W | PF_R, PT_LOAD },
-#ifndef NDEBUG
-	{ ".test.dynamic", 0, 0,                                   PT_DYNAMIC }, /* For testing so see that it works. */
-#endif /* !NDEBUG */
-	/* TODO: More sections can be emulated via the contents of PT_DYNAMIC */
-	/* clang-format on */
-};
+PRIVATE ATTR_PURE WUNUSED NONNULL((1)) bool
+NOTHROW(CC aux_section_ismapped_file)(DlModule const *__restrict self,
+                                      syscall_ulong_t file_offset,
+                                      uintptr_t module_rel_addr,
+                                      size_t num_bytes) {
+	ElfW(Word) i;
+again:
+	for (i = 0; i < self->dm_elf.de_phnum; ++i) {
+		size_t num_loaded;
+		uintptr_t endaddr;
+		uintptr_t segment_file_offset;
+		if (self->dm_elf.de_phdr[i].p_type != PT_LOAD)
+			continue;
+		if (module_rel_addr < self->dm_elf.de_phdr[i].p_vaddr)
+			continue;
+		endaddr = self->dm_elf.de_phdr[i].p_vaddr +
+		          self->dm_elf.de_phdr[i].p_filesz;
+		if (module_rel_addr >= endaddr)
+			continue;
+		segment_file_offset = self->dm_elf.de_phdr[i].p_offset;
+		segment_file_offset += module_rel_addr;
+		segment_file_offset -= self->dm_elf.de_phdr[i].p_vaddr;
+		if (segment_file_offset != file_offset)
+			continue;
+		num_loaded = endaddr - module_rel_addr;
+		if (num_loaded >= num_bytes)
+			return true; /* All loaded! */
 
+		/* Parts are loaded; check if the rest is, too. */
+		file_offset += num_loaded;
+		module_rel_addr += num_loaded;
+		num_bytes -= num_loaded;
+		goto again;
+	}
+	return false;
+}
+
+/* Search for a mapping of the given file range and
+ * return the module-relative offset to it. If no
+ * such mapping exists, return (uintptr_t)-1 */
+PRIVATE ATTR_PURE WUNUSED NONNULL((1)) uintptr_t
+NOTHROW(CC find_file_mapping)(DlModule const *__restrict self,
+                              syscall_ulong_t file_offset,
+                              size_t num_bytes) {
+	ElfW(Word) i;
+	for (i = 0; i < self->dm_elf.de_phnum; ++i) {
+		size_t num_loaded;
+		uintptr_t endoffset;
+		uintptr_t result;
+		if (self->dm_elf.de_phdr[i].p_type != PT_LOAD)
+			continue;
+		if (file_offset < self->dm_elf.de_phdr[i].p_offset)
+			continue;
+		endoffset = self->dm_elf.de_phdr[i].p_offset +
+		            self->dm_elf.de_phdr[i].p_filesz;
+		if (file_offset >= endoffset)
+			continue;
+		result = self->dm_elf.de_phdr[i].p_vaddr;
+		result += file_offset;
+		result -= self->dm_elf.de_phdr[i].p_offset;
+		num_loaded = endoffset - file_offset;
+		if (num_loaded >= num_bytes)
+			return result; /* All loaded! */
+		/* Check if the rest may be loaded by other segments. */
+		if (aux_section_ismapped_file(self,
+		                              file_offset + num_loaded,
+		                              result + num_loaded,
+		                              num_bytes - num_loaded))
+			return result;
+	}
+	return false;
+}
+
+/* Return the # of bytes consecutively mapped starting at `module_rel_addr' */
+PRIVATE ATTR_PURE WUNUSED NONNULL((1)) size_t
+NOTHROW(CC sizeof_addr_mapping)(DlModule const *__restrict self,
+                                uintptr_t module_rel_addr) {
+	size_t result;
+	ElfW(Word) i;
+	result = 0;
+again:
+	for (i = 0; i < self->dm_elf.de_phnum; ++i) {
+		size_t num_loaded;
+		uintptr_t endaddr;
+		if (self->dm_elf.de_phdr[i].p_type != PT_LOAD)
+			continue;
+		if (module_rel_addr < self->dm_elf.de_phdr[i].p_vaddr)
+			continue;
+		endaddr = self->dm_elf.de_phdr[i].p_vaddr +
+		          self->dm_elf.de_phdr[i].p_memsz;
+		if (module_rel_addr >= endaddr)
+			continue;
+		num_loaded = endaddr - module_rel_addr;
+		result += num_loaded;
+		module_rel_addr += num_loaded;
+		goto again;
+	}
+	return result;
+}
 
 PRIVATE ATTR_PURE WUNUSED NONNULL((1)) bool
 NOTHROW(CC aux_section_ismapped)(DlModule const *__restrict self,
@@ -1208,6 +1278,51 @@ again:
 }
 
 
+
+
+/* Auxiliary section definitions
+ * These are special sections that can be locked by-name, but
+ * rather than reference the SHDR table, they address special
+ * program headers that are detected by-type and/or flags. */
+struct aux_section_def {
+	char       asd_name[14];         /* Section name. */
+	byte_t     asd_phdr_flags_mask;  /* Masked program header flags. */
+	byte_t     asd_phdr_flags_flag;  /* Required program header flags. */
+	ElfW(Word) asd_phdr_type;        /* Required program header type. */
+};
+
+/* Auxiliary section detection rules. (sort by most-useful) */
+PRIVATE struct aux_section_def const aux_sections[] = {
+	/* clang-format off */
+	{ ".eh_frame_hdr", 0, 0,                                   PT_GNU_EH_FRAME },
+	{ ".text",         PF_X | PF_W | PF_R, PF_X | PF_R,        PT_LOAD },
+	{ ".rodata",       PF_X | PF_W | PF_R, PF_R,               PT_LOAD },
+	{ ".data",         PF_X | PF_W | PF_R, PF_W | PF_R,        PT_LOAD },
+	{ ".dynamic",      0, 0,                                   PT_DYNAMIC },
+	{ ".interp",       0, 0,                                   PT_INTERP },
+	{ ".tdata",        PF_X | PF_W | PF_R, PF_W | PF_R,        PT_TLS },
+	{ ".note",         0, 0,                                   PT_NOTE },
+	{ ".xdata",        PF_X | PF_W | PF_R, PF_X | PF_W | PF_R, PT_LOAD },
+	/* clang-format on */
+#define AUX_SECTION_ELF_EHDR  9
+#define AUX_SECTION_ELF_SHDRS 10
+#define AUX_SECTION_ELF_PHDRS 11
+#define AUX_SECTION_SHSTRTAB  12
+#define AUX_SECTION_HASH      13
+#define AUX_SECTION_GNU_HASH  14
+#define AUX_SECTION_DYNSYM    15
+#define AUX_SECTION_DYNSTR    16
+	[AUX_SECTION_ELF_EHDR]  = { ".elf.ehdr", 0, 0, PT_NULL },
+	[AUX_SECTION_ELF_SHDRS] = { ".elf.shdrs", 0, 0, PT_NULL },
+	[AUX_SECTION_ELF_PHDRS] = { ".elf.phdrs", 0, 0, PT_NULL },
+	[AUX_SECTION_SHSTRTAB]  = { ".shstrtab", 0, 0, PT_NULL },
+	[AUX_SECTION_HASH]      = { ".hash", 0, 0, PT_NULL },
+	[AUX_SECTION_GNU_HASH]  = { ".gnu.hash", 0, 0, PT_NULL },
+	[AUX_SECTION_DYNSYM]    = { ".dynsym", 0, 0, PT_NULL },
+	[AUX_SECTION_DYNSTR]    = { ".dynstr", 0, 0, PT_NULL },
+};
+
+
 /* Try to create an auxiliary section. This function must initialize:
  *   - return->ds_data
  *   - return->ds_size
@@ -1230,13 +1345,52 @@ NOTHROW(CC create_aux_section)(DlModule *__restrict self, unsigned int index) {
 	/* Figure out which program header to map as this section. */
 	rules = &aux_sections[index];
 	for (phdr = 0;; ++phdr) {
-		if (phdr >= self->dm_elf.de_phnum)
+		if (phdr >= self->dm_elf.de_phnum) {
+			if (rules->asd_phdr_type == PT_NULL)
+				break; /* Custom rule. */
+unknown_section:
 			return (DlSection *)-1;
+		}
 		if (self->dm_elf.de_phdr[phdr].p_type != rules->asd_phdr_type)
 			continue;
 		if ((self->dm_elf.de_phdr[phdr].p_flags & rules->asd_phdr_flags_mask) != rules->asd_phdr_flags_flag)
 			continue;
 		break; /* Found it! */
+	}
+
+	if (rules->asd_phdr_type == PT_NULL) {
+		/* Check if the section exists for this module. */
+		switch (index) {
+		case AUX_SECTION_ELF_SHDRS:
+			if (self->dm_elf.de_shnum == 0)
+				goto unknown_section;
+			break;
+		case AUX_SECTION_ELF_PHDRS:
+			if (self->dm_elf.de_phnum == 0)
+				goto unknown_section;
+			break;
+		case AUX_SECTION_SHSTRTAB:
+			if (self->dm_elf.de_shstrndx >= self->dm_elf.de_shnum)
+				goto unknown_section;
+			break;
+		case AUX_SECTION_HASH:
+			if (self->dm_elf.de_hashtab == NULL)
+				goto unknown_section;
+			break;
+		case AUX_SECTION_GNU_HASH:
+			if (self->dm_elf.de_gnuhashtab == NULL)
+				goto unknown_section;
+			break;
+		case AUX_SECTION_DYNSYM:
+			if (self->dm_elf.de_dynsym_tab == NULL)
+				goto unknown_section;
+			break;
+		case AUX_SECTION_DYNSTR:
+			if (self->dm_elf.de_dynstr == NULL)
+				goto unknown_section;
+			break;
+		default: break;
+		}
 	}
 
 	/* Construct the new section object. */
@@ -1248,17 +1402,75 @@ NOTHROW(CC create_aux_section)(DlModule *__restrict self, unsigned int index) {
 	result->ds_info     = 0;
 	result->ds_elfflags = 0;
 	result->ds_flags    = 0;
-	if (self->dm_elf.de_phdr[phdr].p_flags & PF_W)
-		result->ds_elfflags |= SHF_WRITE;
-	if (self->dm_elf.de_phdr[phdr].p_flags & PF_X)
-		result->ds_elfflags |= SHF_EXECINSTR;
-	if (self->dm_elf.de_phdr[phdr].p_type == PT_TLS)
-		result->ds_elfflags |= SHF_TLS;
 
-	/* Figure out where this section should map to. */
-	section_addr   = self->dm_elf.de_phdr[phdr].p_vaddr;
-	section_size   = self->dm_elf.de_phdr[phdr].p_filesz;
-	section_offset = self->dm_elf.de_phdr[phdr].p_offset;
+	if (rules->asd_phdr_type == PT_NULL) {
+		/* Figure out where this section should map to. */
+		switch (index) {
+
+		case AUX_SECTION_ELF_EHDR: /* .elf.ehdr */
+			section_offset = 0;
+			section_size   = sizeof(ElfW(Ehdr));
+/*create_section_from_offset:*/
+			section_addr   = find_file_mapping(self, section_offset, section_size);
+			break;
+
+		case AUX_SECTION_ELF_SHDRS: /* .elf.shdrs */
+			result->ds_data = DlModule_ElfGetShdrs(self);
+			if unlikely(!result->ds_data)
+				goto err_r;
+			result->ds_size = self->dm_elf.de_shnum * sizeof(ElfW(Shdr));
+			return result;
+
+		case AUX_SECTION_ELF_PHDRS: /* .elf.phdrs */
+			result->ds_data = self->dm_elf.de_phdr;
+			result->ds_size = self->dm_elf.de_phnum;
+			return result;
+
+		case AUX_SECTION_SHSTRTAB: /* .shstrtab */
+			result->ds_data = DlModule_ElfGetShstrtab(self);
+			if unlikely(!result->ds_data)
+				goto err_r;
+			result->ds_size = self->dm_elf.de_shdr[self->dm_elf.de_shstrndx].sh_size;
+			return result;
+
+		case AUX_SECTION_HASH: /* .hash */
+			result->ds_data = (void *)self->dm_elf.de_hashtab;
+create_section_from_addr:
+			result->ds_size = sizeof_addr_mapping(self,
+			                                      (uintptr_t)self->dm_elf.de_gnuhashtab -
+			                                      self->dm_loadaddr);
+			return result;
+
+		case AUX_SECTION_GNU_HASH: /* .gnu.hash */
+			result->ds_data = (void *)self->dm_elf.de_gnuhashtab;
+			goto create_section_from_addr;
+
+		case AUX_SECTION_DYNSYM: /* .dynsym */
+			result->ds_data    = (void *)self->dm_elf.de_dynsym_tab;
+			result->ds_size    = DlModule_ElfGetDynSymCnt(self);
+			result->ds_entsize = sizeof(ElfW(Sym));
+			return result;
+
+		case AUX_SECTION_DYNSTR: /* .dynstr */
+			result->ds_data = (void *)self->dm_elf.de_dynstr;
+			goto create_section_from_addr;
+
+		default:
+			__builtin_unreachable();
+		}
+	} else {
+		if (self->dm_elf.de_phdr[phdr].p_flags & PF_W)
+			result->ds_elfflags |= SHF_WRITE;
+		if (self->dm_elf.de_phdr[phdr].p_flags & PF_X)
+			result->ds_elfflags |= SHF_EXECINSTR;
+		if (self->dm_elf.de_phdr[phdr].p_type == PT_TLS)
+			result->ds_elfflags |= SHF_TLS;
+
+		/* Figure out where this section should map to. */
+		section_addr   = self->dm_elf.de_phdr[phdr].p_vaddr;
+		section_size   = self->dm_elf.de_phdr[phdr].p_filesz;
+		section_offset = self->dm_elf.de_phdr[phdr].p_offset;
+	}
 
 	/* Check if this section was loaded by PT_LOAD */
 	result->ds_size = section_size;

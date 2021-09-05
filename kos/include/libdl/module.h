@@ -195,7 +195,7 @@ struct dlmodule_elf {
 	ElfW(Half)                de_shnum;      /* [lock(WRITE_ONCE)] Number of section headers (or `(ElfW(Half))-1' if unknown).
 	                                          * Usually the same as `dm_shnum', except when auxiliary section were loaded, in
 	                                          * which case this is the number of ELF sections, while `dm_shnum' includes aux
-	                                          * sections, whos indices start after `de_shnum'. */
+	                                          * sections, who's indices start after `de_shnum'. */
 	ElfW(Half)                de_phnum;      /* [const] (Max) number of program headers. */
 #ifdef DL_FIXED_PHDR_COUNT
 	ElfW(Phdr)                de_phdr[DL_FIXED_PHDR_COUNT]; /* [const][de_phnum] Vector of program headers. */

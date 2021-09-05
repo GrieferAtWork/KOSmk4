@@ -76,6 +76,7 @@ BEGIN GROUP("apps.system-test") { COMPILE, LINK, MCOPY };
 
 		/* Pull in test files from various other places. */
 		"../libc/libc/*.ctest",
+		"../libdl/*.ctest",
 		"../libkeymap/*.ctest",
 		"../libjson/*.ctest",
 		"../libinstrlen/*.ctest",
