@@ -37,6 +37,7 @@ if (gcc_opt.removeif([](x) -> x.startswith("-O")))
 #include <debugger/rt.h>
 #include <kernel/mman.h>
 #include <kernel/mman/phys.h>
+#include <kernel/panic.h>
 #include <kernel/types.h>
 #include <kernel/x86/apic.h>
 #include <kernel/x86/gdt.h>
@@ -1082,6 +1083,14 @@ INTERN ATTR_DBGTEXT void KCALL x86_dbg_fini(void) {
 	if (initok & INITOK_SCHED_OVERRIDE)
 		FORCPU(me, thiscpu_sched_override) = x86_dbg_hostbackup.dhs_override;
 	if (initok & INITOK_READLOCKS) {
+		/* Read-locks may result in per-task  heap allocations. This can  also
+		 * happen within the debugger itself, and when it does we have to free
+		 * them them to prevent memory leaks.
+		 * But note that we  only do so if  the kernel hasn't been  poisoned.
+		 * No need to stretch our luck if stuff is already in an inconsistent
+		 * state! */
+		if (!kernel_poisoned())
+			pertask_readlocks_fini(mythread);
 		memcpy(&FORTASK(mythread, this_read_locks),
 		       &x86_dbg_hostbackup.dhs_readlocks,
 		       sizeof(struct read_locks));
