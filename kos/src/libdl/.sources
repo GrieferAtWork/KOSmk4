@@ -53,22 +53,47 @@ BEGIN
 
 	/* Pull in the actual source files for libdl/RTLD */
 	BEGIN GROUP("libs.libdl") { COMPILE };
-		SOURCE({ "arch/" + XARCH + "/*.c", "./*.c" })
-	END
-	BEGIN GROUP("libs.libdl") { COMPILE };
 		/* Arch-specific files */
 		SET_LANGUAGE("assembler-with-cpp")
 		SOURCE({ "arch/" + XARCH_ASMFILES })
 	END
-	/* Use dlmalloc to get an malloc() function. */
-	BEGIN GROUP("libs.libdl") { COMPILE };
-		DEFINE({
-			"CONFIG_DLMALLOC_EXPORT_AS_INTERN" : "1",
-			"CONFIG_DLMALLOC_FREESTANDING_SYSTEM_CALLS" : "1",
-			"__CRT_HAVE___afail" : "1",
-			"__CRT_HAVE___afailf" : "1",
+
+	BEGIN GROUP("libs.libdl") { COMPILE_WITH_ASM_FILTER([](infp, outfp) {
+		local indat = infp.read();
+		local flushStart = 0, i = 0, len = #indat;
+		while (i < len) {
+			while (i < len && indat.isspace(i))
+				++i;
+			local eol = indat.find("\n", i);
+			if (eol < 0)
+				break;
+			local line = indat[i:eol];
+			/* Fix-up ".cfi_personality" to always reference locally. */
+			if (line.startswith(".cfi_personality")) {
+				outfp.write(indat[flushStart:i]);
+				/* 0x1b == DW_EH_PE_pcrel|DW_EH_PE_sdata4 */
+				outfp.write(".cfi_personality 0x1b,__gxx_personality_v0");
+				flushStart = eol;
+			}
+			i = eol + 1;
+		}
+		outfp.write(indat[flushStart:]);
+	}) };
+		SOURCE({
+			"arch/" + XARCH + "/*.c",
+			"./*.c"
 		})
-		SOURCE({ "../libdlmalloc/*.c" })
+
+		/* Use dlmalloc to get an malloc() function. */
+		BEGIN
+			DEFINE({
+				"CONFIG_DLMALLOC_EXPORT_AS_INTERN" : "1",
+				"CONFIG_DLMALLOC_FREESTANDING_SYSTEM_CALLS" : "1",
+				"__CRT_HAVE___afail" : "1",
+				"__CRT_HAVE___afailf" : "1",
+			})
+			SOURCE({ "../libdlmalloc/*.c" })
+		END
 	END
 
 	BEGIN GROUP("libs.libdl") { LINK, MCOPY, ELF_FLATTEN };

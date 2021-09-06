@@ -27,12 +27,6 @@
 #include "dl.h"
 /**/
 
-/* TODO: Don't #define __builtin_unreachable() in <__crt.h> to __crt_unreachable()
- *       Instead  look into `-fsanitize=unreachable' (which does something similar
- *       on  a compiler-basis  and don't make  the library call  mandatory for all
- *       code compiled with debug enabled) */
-/* TODO: Look into enabling `-fsanitize=signed-integer-overflow' for all code... */
-
 #include <asm/intrin.h>
 #include <asm/pagesize.h>
 #include <kos/debugtrap.h>

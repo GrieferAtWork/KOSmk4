@@ -648,6 +648,13 @@ NOTHROW(KCALL __i386_kernel_main)(struct icpustate *__restrict state) {
 	 *       of a function if that block is immediately preceded by a #endif
 	 *       or another function's declaration. */
 
+	/* TODO: Don't #define __builtin_unreachable() in <__crt.h> to __crt_unreachable()
+	 *       Instead  look into `-fsanitize=unreachable' (which does something similar
+	 *       on  a compiler-basis  and don't make  the library call  mandatory for all
+	 *       code compiled with debug enabled) */
+
+	/* TODO: Look into enabling `-fsanitize=signed-integer-overflow' for all code... */
+
 	/* TODO: Add a KOS-specific libcrypt */
 
 	/* FIXME: There is a design flaw in how the builtin debugger behaves when

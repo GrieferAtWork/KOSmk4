@@ -68,65 +68,65 @@
  * headers, that we are explicitly implementing. */
 
 /* Functions defined by libdl itself */
-#define __CRT_HAVE_dlfopen 1
-#define __CRT_HAVE_dlexceptaware 1
-#define __CRT_HAVE_dlgethandle 1
-#define __CRT_HAVE_dlgetmodule 1
-#define __CRT_HAVE_dlmodulefd 1
-#define __CRT_HAVE_dlmodulename 1
-#define __CRT_HAVE_dlmodulebase 1
-#define __CRT_HAVE_dllocksection 1
-#define __CRT_HAVE_dlunlocksection 1
-#define __CRT_HAVE_dlsectionname 1
-#define __CRT_HAVE_dlsectionindex 1
-#define __CRT_HAVE_dlsectionmodule 1
-#define __CRT_HAVE_dlinflatesection 1
-#define __CRT_HAVE_dlclearcaches 1
-#define __CRT_HAVE_dltlsallocseg 1
-#define __CRT_HAVE_dltlsfreeseg 1
-#define __CRT_HAVE_dltlsalloc 1
-#define __CRT_HAVE_dltlsfree 1
-#define __CRT_HAVE_dltlsaddr 1
-#define __CRT_HAVE_dlauxctrl 1
-#define __CRT_HAVE_dladdr 1
-#define __CRT_HAVE_dl_iterate_phdr 1
-#define __CRT_HAVE_dlopen 1
-#define __CRT_HAVE_dlclose 1
-#define __CRT_HAVE_dlsym 1
-#define __CRT_HAVE_dlerror 1
+#define __CRT_HAVE_dlfopen
+#define __CRT_HAVE_dlexceptaware
+#define __CRT_HAVE_dlgethandle
+#define __CRT_HAVE_dlgetmodule
+#define __CRT_HAVE_dlmodulefd
+#define __CRT_HAVE_dlmodulename
+#define __CRT_HAVE_dlmodulebase
+#define __CRT_HAVE_dllocksection
+#define __CRT_HAVE_dlunlocksection
+#define __CRT_HAVE_dlsectionname
+#define __CRT_HAVE_dlsectionindex
+#define __CRT_HAVE_dlsectionmodule
+#define __CRT_HAVE_dlinflatesection
+#define __CRT_HAVE_dlclearcaches
+#define __CRT_HAVE_dltlsallocseg
+#define __CRT_HAVE_dltlsfreeseg
+#define __CRT_HAVE_dltlsalloc
+#define __CRT_HAVE_dltlsfree
+#define __CRT_HAVE_dltlsaddr
+#define __CRT_HAVE_dlauxctrl
+#define __CRT_HAVE_dladdr
+#define __CRT_HAVE_dl_iterate_phdr
+#define __CRT_HAVE_dlopen
+#define __CRT_HAVE_dlclose
+#define __CRT_HAVE_dlsym
+#define __CRT_HAVE_dlerror
 
 /* Functions defined through dlmalloc */
-#define __CRT_HAVE_malloc 1
-#define __CRT_HAVE_free 1
-#define __CRT_HAVE_cfree 1
-#define __CRT_HAVE_calloc 1
-#define __CRT_HAVE_realloc 1
-#define __CRT_HAVE_realloc_in_place 1
-#define __CRT_HAVE_memalign 1
-#define __CRT_HAVE_posix_memalign 1
-#define __CRT_HAVE_valloc 1
-#define __CRT_HAVE_mallopt 1
-#define __CRT_HAVE_malloc_footprint 1
-#define __CRT_HAVE_malloc_max_footprint 1
-#define __CRT_HAVE_malloc_footprint_limit 1
-#define __CRT_HAVE_malloc_set_footprint_limit 1
-#define __CRT_HAVE_mallinfo 1
-#define __CRT_HAVE_independent_calloc 1
-#define __CRT_HAVE_independent_comalloc 1
-#define __CRT_HAVE_bulk_free 1
-#define __CRT_HAVE_pvalloc 1
-#define __CRT_HAVE_malloc_trim 1
-#define __CRT_HAVE_malloc_usable_size 1
-#define __CRT_HAVE__msize 1
+#define __CRT_HAVE_malloc
+#define __CRT_HAVE_free
+#define __CRT_HAVE_cfree
+#define __CRT_HAVE_calloc
+#define __CRT_HAVE_realloc
+#define __CRT_HAVE_realloc_in_place
+#define __CRT_HAVE_memalign
+#define __CRT_HAVE_posix_memalign
+#define __CRT_HAVE_valloc
+#define __CRT_HAVE_mallopt
+#define __CRT_HAVE_malloc_footprint
+#define __CRT_HAVE_malloc_max_footprint
+#define __CRT_HAVE_malloc_footprint_limit
+#define __CRT_HAVE_malloc_set_footprint_limit
+#define __CRT_HAVE_mallinfo
+#define __CRT_HAVE_independent_calloc
+#define __CRT_HAVE_independent_comalloc
+#define __CRT_HAVE_bulk_free
+#define __CRT_HAVE_pvalloc
+#define __CRT_HAVE_malloc_trim
+#define __CRT_HAVE_malloc_usable_size
+#define __CRT_HAVE__msize
 
 /* These are defined explicitly */
-#define __CRT_HAVE_syslog_printer 1 /* Required for using `syslog()' */
+#define __CRT_HAVE_syslog_printer /* Required for using `syslog()' */
 #ifndef NDEBUG
-#define __CRT_HAVE___afail 1
-#define __CRT_HAVE___afailf 1
-#define __CRT_HAVE___stack_chk_guard 1
-#define __CRT_HAVE___stack_chk_fail 1
-#define __CRT_HAVE___stack_chk_fail_local 1
+#define __CRT_HAVE___afail
+#define __CRT_HAVE___afailf
+#define __CRT_HAVE___stack_chk_guard
+#define __CRT_HAVE___stack_chk_fail
+#define __CRT_HAVE___stack_chk_fail_local
 #endif /* !NDEBUG */
 
 #undef __LIBC
@@ -174,13 +174,5 @@
 #ifndef DLFCN_VCC
 #define DLFCN_VCC __DLFCN_VCC
 #endif /* !DLFCN_VCC */
-
-/* TODO: Add a way of extending the RTLD driver with custom executable format
- *       back-ends, such as (once again)  allowing PE binaries to be  loaded.
- * -> There should  be  a  separate shared  librariy  `libdl-pe.so'  similar  to
- *    `libdl.so'  that  can  simply  be  loaded  using  `dlopen()'  and contains
- *    everything that's necessary to implement  dynamic linking of PE  binaries.
- *    As such, `DlModule' also  needs to be given  an optional v-table that  can
- *    be filled with overrides for functions such as dlsym() or dllocksection(). */
 
 #endif /* !GUARD_LIBDL_API_H */

@@ -503,6 +503,7 @@ class Config {
 
 	@@Returns the location of disassembly
 	final function getAssembledFilename(group: Group, srcFile: string): string    -> getBuildArtifact(group, srcFile, ".S");
+	final function getModAssembledFilename(group: Group, srcFile: string): string -> getBuildArtifact(group, srcFile, ".mod.S");
 	final function getPreprocessedFilename(group: Group, srcFile: string): string -> getBuildArtifact(group, srcFile, ".E");
 	final function getDependencyFilename(group: Group, srcFile: string): string   -> getBuildArtifact(group, srcFile, ".MF");
 	final function getObjectFilename(group: Group, srcFile: string): string       -> getBuildArtifact(group, srcFile, ".o");
