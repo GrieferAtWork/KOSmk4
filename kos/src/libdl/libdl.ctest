@@ -79,6 +79,64 @@ DEFINE_TEST(libdl_fromaddr) {
 	EQp(mod, dlopen(NULL, 0));
 }
 
+
+static char const *libdl_symbols[] = {
+	"__argc",
+	"__argv",
+	"__environ",
+	"__peb",
+	"__progname",
+	"__progname_full",
+	"__tls_get_addr",
+	"_environ",
+	"_pgmptr",
+	"dl_iterate_phdr",
+	"dladdr",
+	"dlauxctrl",
+	"dlclearcaches",
+	"dlclose",
+	"dlerror",
+	"dlexceptaware",
+	"dlfopen",
+	"dlgethandle",
+	"dlgetmodule",
+	"dlinflatesection",
+	"dllocksection",
+	"dlmodulebase",
+	"dlmodulefd",
+	"dlmodulename",
+	"dlopen",
+	"dlsectionindex",
+	"dlsectionmodule",
+	"dlsectionname",
+	"dlsym",
+	"dltlsaddr",
+	"dltlsaddr2",
+	"dltlsalloc",
+	"dltlsallocseg",
+	"dltlsfree",
+	"dltlsfreeseg",
+	"dlunlocksection",
+	"environ",
+	"program_invocation_name",
+	"program_invocation_short_name",
+};
+
+
+DEFINE_TEST(libdl_builtins) {
+	/* Test that all advertised libdl builtins can be loaded.
+	 * All symbols are tested (and not just a couple of them),
+	 * because some of them have special code paths used for
+	 * lazy initialization. */
+	unsigned int i;
+	void *libdl = dlgetmodule("dl", DLGETHANDLE_FNORMAL);
+	assertf(libdl, "%s", dlerror());
+	for (i = 0; i < COMPILER_LENOF(libdl_symbols); ++i) {
+		void *sym = dlsym(libdl, libdl_symbols[i]);
+		assertf(sym, "%s:%s", libdl_symbols[i], dlerror());
+	}
+}
+
 DECL_END
 
 #endif /* !GUARD_LIBDL_LIBDL_CTEST */

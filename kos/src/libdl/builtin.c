@@ -26,8 +26,10 @@
 #include "dl.h"
 /**/
 
+#include <hybrid/__asm.h>
 #include <hybrid/align.h>
 
+#include <asm/asmword.h>
 #include <kos/debugtrap.h>
 #include <kos/exec/peb.h>
 #include <kos/syscalls.h>
@@ -2931,56 +2933,190 @@ DEFINE_PUBLIC_ALIAS(dl_iterate_phdr, libdl_iterate_phdr);
 
 
 
-/* List of builtin ELF functions.
- * NOTE: After changing this List's contents, you must re-run the following command:
- * $ deemon -F kos/src/libdl/builtin.c
- */
-#define ELF_BUILTIN_FUNCTIONS                                             \
-	{                                                                     \
-		"dlopen"          : "result = (void *)&libdl_dlopen;",            \
-		"dlfopen"         : "result = (void *)&libdl_dlfopen;",           \
-		"dlclose"         : "result = (void *)&libdl_dlclose;",           \
-		"dlexceptaware"   : "result = (void *)&libdl_dlexceptaware;",     \
-		"dlsym"           : "result = (void *)&libdl_dlsym;",             \
-		"dlerror"         : "result = (void *)&libdl_dlerror;",           \
-		"dlgethandle"     : "result = (void *)&libdl_dlgethandle;",       \
-		"dlgetmodule"     : "result = (void *)&libdl_dlgetmodule;",       \
-		"dladdr"          : "result = (void *)&libdl_dladdr;",            \
-		"dlmodulefd"      : "result = (void *)&libdl_dlmodulefd;",        \
-		"dlmodulename"    : "result = (void *)&libdl_dlmodulename;",      \
-		"dlmodulebase"    : "result = (void *)&libdl_dlmodulebase;",      \
-		"dllocksection"   : "result = (void *)&libdl_dllocksection;",     \
-		"dlunlocksection" : "result = (void *)&libdl_dlunlocksection;",   \
-		"dlsectionname"   : "result = (void *)&libdl_dlsectionname;",     \
-		"dlsectionindex"  : "result = (void *)&libdl_dlsectionindex;",    \
-		"dlsectionmodule" : "result = (void *)&libdl_dlsectionmodule;",   \
-		"dlinflatesection" : "result = (void *)&libdl_dlinflatesection;", \
-		"dlclearcaches"   : "result = (void *)&libdl_dlclearcaches;",     \
-		"___tls_get_addr" : {                                             \
-			"result = (void *)&libdl____tls_get_addr;",                   \
-			"defined(__i386__) && !defined(__x86_64__)"                   \
-		},                                                                \
-		"__tls_get_addr"  : "result = (void *)&libdl___tls_get_addr;",    \
-		"dltlsallocseg"   : "result = (void *)&libdl_dltlsallocseg;",     \
-		"dltlsfreeseg"    : "result = (void *)&libdl_dltlsfreeseg;",      \
-		"dltlsalloc"      : "result = (void *)&libdl_dltlsalloc;",        \
-		"dltlsfree"       : "result = (void *)&libdl_dltlsfree;",         \
-		"dltlsaddr"       : "result = (void *)&libdl_dltlsaddr;",         \
-		"dltlsaddr2"      : "result = (void *)&libdl_dltlsaddr2;",        \
-		"dlauxctrl"       : "result = (void *)&libdl_dlauxctrl;",         \
-		"dl_iterate_phdr" : "result = (void *)&libdl_iterate_phdr;",      \
-		"__peb"           : "result = (void *)root_peb;",                 \
-		"environ"         : "result = (void *)&root_peb->pp_envp;",       \
-		"_environ"        : "result = (void *)&root_peb->pp_envp;",       \
-		"__environ"       : "result = (void *)&root_peb->pp_envp;",       \
-		"__argc"          : "result = (void *)&root_peb->pp_argc;",       \
-		"__argv"          : "result = (void *)&root_peb->pp_argv;",       \
-		"_pgmptr"         : "result = (void *)&root_peb->pp_argv[0];",    \
-		"__progname_full" : "result = (void *)&root_peb->pp_argv[0];",    \
-		"program_invocation_name" : "result = (void *)&root_peb->pp_argv[0];", \
-		"__progname"      : "result = (void *)dlget_p_program_invocation_short_name();", \
-		"program_invocation_short_name" : "result = (void *)dlget_p_program_invocation_short_name();", \
+
+/*[[[deemon
+import * from deemon;
+local BUILTIN_SYMBOLS = {
+	"dlopen"           : "libdl_dlopen",
+	"dlfopen"          : "libdl_dlfopen",
+	"dlclose"          : "libdl_dlclose",
+	"dlexceptaware"    : "libdl_dlexceptaware",
+	"dlsym"            : "libdl_dlsym",
+	"dlerror"          : "libdl_dlerror",
+	"dlgethandle"      : "libdl_dlgethandle",
+	"dlgetmodule"      : "libdl_dlgetmodule",
+	"dladdr"           : "libdl_dladdr",
+	"dlmodulefd"       : "libdl_dlmodulefd",
+	"dlmodulename"     : "libdl_dlmodulename",
+	"dlmodulebase"     : "libdl_dlmodulebase",
+	"dllocksection"    : "libdl_dllocksection",
+	"dlunlocksection"  : "libdl_dlunlocksection",
+	"dlsectionname"    : "libdl_dlsectionname",
+	"dlsectionindex"   : "libdl_dlsectionindex",
+	"dlsectionmodule"  : "libdl_dlsectionmodule",
+	"dlinflatesection" : "libdl_dlinflatesection",
+	"dlclearcaches"    : "libdl_dlclearcaches",
+	"___tls_get_addr"  : ("libdl____tls_get_addr", "defined(__i386__) && !defined(__x86_64__)"),
+	"__tls_get_addr"   : "libdl___tls_get_addr",
+	"dltlsallocseg"    : "libdl_dltlsallocseg",
+	"dltlsfreeseg"     : "libdl_dltlsfreeseg",
+	"dltlsalloc"       : "libdl_dltlsalloc",
+	"dltlsfree"        : "libdl_dltlsfree",
+	"dltlsaddr"        : "libdl_dltlsaddr",
+	"dltlsaddr2"       : "libdl_dltlsaddr2",
+	"dlauxctrl"        : "libdl_dlauxctrl",
+	"dl_iterate_phdr"  : "libdl_iterate_phdr",
+};
+local names = BUILTIN_SYMBOLS.keys.sorted();
+function printDb(longestNameLen: int) {
+	print("#define DLSYM_BUILTIN_NAMELEN ", longestNameLen);
+	for (local n: names) {
+		local target = BUILTIN_SYMBOLS[n];
+		local adjn = n.ljust(longestNameLen, "\0");
+		if (target !is string) {
+			local targetn, cond = target...;
+			print("#if ", cond);
+			print("__ASM_L(.ascii ", repr adjn, "; .wordrel ", targetn, ")");
+			print("#endif /" "* ... *" "/");
+		} else {
+			print("__ASM_L(.ascii ", repr adjn, "; .wordrel ", target, ")");
+		}
 	}
+}
+local longest_name_len = (names.each.length > ...) + 1;
+local aligned4 = (longest_name_len + 1 + 3) & ~3;
+local aligned8 = (longest_name_len + 1 + 7) & ~7;
+local baseCount = 0;
+local plusNConditions = Dict();
+for (local none, map: BUILTIN_SYMBOLS) {
+	if (map is string) {
+		++baseCount;
+	} else {
+		local cond = map.last;
+		plusNConditions[cond] = plusNConditions.get(cond, 0) + 1;
+	}
+}
+if (!plusNConditions) {
+	print("#define DLSYM_BUILTIN_COUNT ", baseCount);
+} else {
+	print("enum { DLSYM_BUILTIN_COUNT = ", baseCount);
+	for (local cond: plusNConditions.keys.sorted()) {
+		print("#if ", cond);
+		print("                             + ", plusNConditions[cond]);
+		print("#endif /" "* ... *" "/");
+	}
+	print("};");
+}
+print("__ASM_BEGIN");
+print("__ASM_L(.pushsection .rodata)");
+print("__ASM_L(.align __SIZEOF_POINTER__)");
+print("__ASM_L(.type dlsym_builtin_table, @object)");
+print("__ASM_L(dlsym_builtin_table:)");
+if (aligned4 == aligned8) {
+	printDb(aligned4);
+} else {
+	print("#if __SIZEOF_POINTER__ == 4");
+	printDb(aligned4);
+	print("#elif __SIZEOF_POINTER__ == 8");
+	printDb(aligned8);
+	print("#elif !defined(__DEEMON__)");
+	print("#error \"Unsupported __SIZEOF_POINTER__\"");
+	print("#endif /" "* ... *" "/");
+}
+print("__ASM_L(.size dlsym_builtin_table, . - dlsym_builtin_table)");
+print("__ASM_L(.popsection)");
+print("__ASM_END");
+]]]*/
+enum { DLSYM_BUILTIN_COUNT = 28
+#if defined(__i386__) && !defined(__x86_64__)
+                             + 1
+#endif /* ... */
+};
+__ASM_BEGIN
+__ASM_L(.pushsection .rodata)
+__ASM_L(.align __SIZEOF_POINTER__)
+__ASM_L(.type dlsym_builtin_table, @object)
+__ASM_L(dlsym_builtin_table:)
+#if __SIZEOF_POINTER__ == 4
+#define DLSYM_BUILTIN_NAMELEN 20
+#if defined(__i386__) && !defined(__x86_64__)
+__ASM_L(.ascii "___tls_get_addr\0\0\0\0\0"; .wordrel libdl____tls_get_addr)
+#endif /* ... */
+__ASM_L(.ascii "__tls_get_addr\0\0\0\0\0\0"; .wordrel libdl___tls_get_addr)
+__ASM_L(.ascii "dl_iterate_phdr\0\0\0\0\0"; .wordrel libdl_iterate_phdr)
+__ASM_L(.ascii "dladdr\0\0\0\0\0\0\0\0\0\0\0\0\0\0"; .wordrel libdl_dladdr)
+__ASM_L(.ascii "dlauxctrl\0\0\0\0\0\0\0\0\0\0\0"; .wordrel libdl_dlauxctrl)
+__ASM_L(.ascii "dlclearcaches\0\0\0\0\0\0\0"; .wordrel libdl_dlclearcaches)
+__ASM_L(.ascii "dlclose\0\0\0\0\0\0\0\0\0\0\0\0\0"; .wordrel libdl_dlclose)
+__ASM_L(.ascii "dlerror\0\0\0\0\0\0\0\0\0\0\0\0\0"; .wordrel libdl_dlerror)
+__ASM_L(.ascii "dlexceptaware\0\0\0\0\0\0\0"; .wordrel libdl_dlexceptaware)
+__ASM_L(.ascii "dlfopen\0\0\0\0\0\0\0\0\0\0\0\0\0"; .wordrel libdl_dlfopen)
+__ASM_L(.ascii "dlgethandle\0\0\0\0\0\0\0\0\0"; .wordrel libdl_dlgethandle)
+__ASM_L(.ascii "dlgetmodule\0\0\0\0\0\0\0\0\0"; .wordrel libdl_dlgetmodule)
+__ASM_L(.ascii "dlinflatesection\0\0\0\0"; .wordrel libdl_dlinflatesection)
+__ASM_L(.ascii "dllocksection\0\0\0\0\0\0\0"; .wordrel libdl_dllocksection)
+__ASM_L(.ascii "dlmodulebase\0\0\0\0\0\0\0\0"; .wordrel libdl_dlmodulebase)
+__ASM_L(.ascii "dlmodulefd\0\0\0\0\0\0\0\0\0\0"; .wordrel libdl_dlmodulefd)
+__ASM_L(.ascii "dlmodulename\0\0\0\0\0\0\0\0"; .wordrel libdl_dlmodulename)
+__ASM_L(.ascii "dlopen\0\0\0\0\0\0\0\0\0\0\0\0\0\0"; .wordrel libdl_dlopen)
+__ASM_L(.ascii "dlsectionindex\0\0\0\0\0\0"; .wordrel libdl_dlsectionindex)
+__ASM_L(.ascii "dlsectionmodule\0\0\0\0\0"; .wordrel libdl_dlsectionmodule)
+__ASM_L(.ascii "dlsectionname\0\0\0\0\0\0\0"; .wordrel libdl_dlsectionname)
+__ASM_L(.ascii "dlsym\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0"; .wordrel libdl_dlsym)
+__ASM_L(.ascii "dltlsaddr\0\0\0\0\0\0\0\0\0\0\0"; .wordrel libdl_dltlsaddr)
+__ASM_L(.ascii "dltlsaddr2\0\0\0\0\0\0\0\0\0\0"; .wordrel libdl_dltlsaddr2)
+__ASM_L(.ascii "dltlsalloc\0\0\0\0\0\0\0\0\0\0"; .wordrel libdl_dltlsalloc)
+__ASM_L(.ascii "dltlsallocseg\0\0\0\0\0\0\0"; .wordrel libdl_dltlsallocseg)
+__ASM_L(.ascii "dltlsfree\0\0\0\0\0\0\0\0\0\0\0"; .wordrel libdl_dltlsfree)
+__ASM_L(.ascii "dltlsfreeseg\0\0\0\0\0\0\0\0"; .wordrel libdl_dltlsfreeseg)
+__ASM_L(.ascii "dlunlocksection\0\0\0\0\0"; .wordrel libdl_dlunlocksection)
+#elif __SIZEOF_POINTER__ == 8
+#define DLSYM_BUILTIN_NAMELEN 24
+#if defined(__i386__) && !defined(__x86_64__)
+__ASM_L(.ascii "___tls_get_addr\0\0\0\0\0\0\0\0\0"; .wordrel libdl____tls_get_addr)
+#endif /* ... */
+__ASM_L(.ascii "__tls_get_addr\0\0\0\0\0\0\0\0\0\0"; .wordrel libdl___tls_get_addr)
+__ASM_L(.ascii "dl_iterate_phdr\0\0\0\0\0\0\0\0\0"; .wordrel libdl_iterate_phdr)
+__ASM_L(.ascii "dladdr\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0"; .wordrel libdl_dladdr)
+__ASM_L(.ascii "dlauxctrl\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0"; .wordrel libdl_dlauxctrl)
+__ASM_L(.ascii "dlclearcaches\0\0\0\0\0\0\0\0\0\0\0"; .wordrel libdl_dlclearcaches)
+__ASM_L(.ascii "dlclose\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0"; .wordrel libdl_dlclose)
+__ASM_L(.ascii "dlerror\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0"; .wordrel libdl_dlerror)
+__ASM_L(.ascii "dlexceptaware\0\0\0\0\0\0\0\0\0\0\0"; .wordrel libdl_dlexceptaware)
+__ASM_L(.ascii "dlfopen\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0"; .wordrel libdl_dlfopen)
+__ASM_L(.ascii "dlgethandle\0\0\0\0\0\0\0\0\0\0\0\0\0"; .wordrel libdl_dlgethandle)
+__ASM_L(.ascii "dlgetmodule\0\0\0\0\0\0\0\0\0\0\0\0\0"; .wordrel libdl_dlgetmodule)
+__ASM_L(.ascii "dlinflatesection\0\0\0\0\0\0\0\0"; .wordrel libdl_dlinflatesection)
+__ASM_L(.ascii "dllocksection\0\0\0\0\0\0\0\0\0\0\0"; .wordrel libdl_dllocksection)
+__ASM_L(.ascii "dlmodulebase\0\0\0\0\0\0\0\0\0\0\0\0"; .wordrel libdl_dlmodulebase)
+__ASM_L(.ascii "dlmodulefd\0\0\0\0\0\0\0\0\0\0\0\0\0\0"; .wordrel libdl_dlmodulefd)
+__ASM_L(.ascii "dlmodulename\0\0\0\0\0\0\0\0\0\0\0\0"; .wordrel libdl_dlmodulename)
+__ASM_L(.ascii "dlopen\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0"; .wordrel libdl_dlopen)
+__ASM_L(.ascii "dlsectionindex\0\0\0\0\0\0\0\0\0\0"; .wordrel libdl_dlsectionindex)
+__ASM_L(.ascii "dlsectionmodule\0\0\0\0\0\0\0\0\0"; .wordrel libdl_dlsectionmodule)
+__ASM_L(.ascii "dlsectionname\0\0\0\0\0\0\0\0\0\0\0"; .wordrel libdl_dlsectionname)
+__ASM_L(.ascii "dlsym\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0"; .wordrel libdl_dlsym)
+__ASM_L(.ascii "dltlsaddr\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0"; .wordrel libdl_dltlsaddr)
+__ASM_L(.ascii "dltlsaddr2\0\0\0\0\0\0\0\0\0\0\0\0\0\0"; .wordrel libdl_dltlsaddr2)
+__ASM_L(.ascii "dltlsalloc\0\0\0\0\0\0\0\0\0\0\0\0\0\0"; .wordrel libdl_dltlsalloc)
+__ASM_L(.ascii "dltlsallocseg\0\0\0\0\0\0\0\0\0\0\0"; .wordrel libdl_dltlsallocseg)
+__ASM_L(.ascii "dltlsfree\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0"; .wordrel libdl_dltlsfree)
+__ASM_L(.ascii "dltlsfreeseg\0\0\0\0\0\0\0\0\0\0\0\0"; .wordrel libdl_dltlsfreeseg)
+__ASM_L(.ascii "dlunlocksection\0\0\0\0\0\0\0\0\0"; .wordrel libdl_dlunlocksection)
+#elif !defined(__DEEMON__)
+#error "Unsupported __SIZEOF_POINTER__"
+#endif /* ... */
+__ASM_L(.size dlsym_builtin_table, . - dlsym_builtin_table)
+__ASM_L(.popsection)
+__ASM_END
+/*[[[end]]]*/
+
+struct dlsym_builtin_symbol {
+	char      dbs_name[DLSYM_BUILTIN_NAMELEN]; /* Symbol name */
+	uintptr_t dbs_addr;                        /* Symbol address (module relative) */
+};
+
+INTDEF struct dlsym_builtin_symbol const dlsym_builtin_table[DLSYM_BUILTIN_COUNT];
 
 
 
@@ -3008,434 +3144,107 @@ PRIVATE WUNUSED char **FCALL dlget_p_program_invocation_short_name(void) {
 
 
 
-/* XXX: The function `dlsym_builtin()' is extremely large (3.41K bytes)!
- *      Instead  of  implementing  it  in  C,  we  should  use  assembly
- *      to make  use  of  `.wordrel'  for  encoding  function  pointers! */
-
 /* Return the address of a builtin function (e.g. `dlopen()') */
 INTERN ATTR_PURE WUNUSED NONNULL((1)) void *FCALL
 dlsym_builtin(char const *__restrict name) {
-	void *result = NULL;
-/*[[[deemon
-import * from ...misc.libgen.stringswitch;
-stringSwitch("name",
-	for (local name, mapping: ELF_BUILTIN_FUNCTIONS)
-		(name + "\0", mapping));
-]]]*/
-	if (name[0] == '_') {
-		if (name[1] == '_') {
-#if defined(__i386__) && !defined(__x86_64__)
-			if (name[2] == '_') {
-				if (name[3] == 't' && name[4] == 'l' && name[5] == 's' &&
-				    name[6] == '_' && name[7] == 'g' && name[8] == 'e' &&
-				    name[9] == 't' && name[10] == '_' && name[11] == 'a' &&
-				    name[12] == 'd' && name[13] == 'd' && name[14] == 'r' &&
-				    name[15] == '\0') {
-					/* case "___tls_get_addr": ... */
-					result = (void *)&libdl____tls_get_addr;
-				}
-			} else
-#endif /* defined(__i386__) && !defined(__x86_64__) */
-			if (name[2] == 'a') {
-				if (name[3] == 'r') {
-					if (name[4] == 'g') {
-						if (name[5] == 'c') {
-							if (name[6] == '\0') {
-								/* case "__argc": ... */
-								result = (void *)&root_peb->pp_argc;
-							}
-						} else if (name[5] == 'v') {
-							if (name[6] == '\0') {
-								/* case "__argv": ... */
-								result = (void *)&root_peb->pp_argv;
-							}
-						}
-					}
-				}
-			} else if (name[2] == 'e') {
-				if (name[3] == 'n' && name[4] == 'v' && name[5] == 'i' &&
-				    name[6] == 'r' && name[7] == 'o' && name[8] == 'n' &&
-				    name[9] == '\0') {
-					/* case "__environ": ... */
-					result = (void *)&root_peb->pp_envp;
-				}
-			} else if (name[2] == 'p') {
-				if (name[3] == 'e') {
-					if (name[4] == 'b' && name[5] == '\0') {
-						/* case "__peb": ... */
-						result = (void *)root_peb;
-					}
-				} else if (name[3] == 'r') {
-					if (name[4] == 'o') {
-						if (name[5] == 'g') {
-							if (name[6] == 'n') {
-								if (name[7] == 'a') {
-									if (name[8] == 'm') {
-										if (name[9] == 'e') {
-											if (name[10] == '\0') {
-												/* case "__progname": ... */
-												result = (void *)dlget_p_program_invocation_short_name();
-											} else if (name[10] == '_') {
-												if (name[11] == 'f' && name[12] == 'u' && name[13] == 'l' &&
-												    name[14] == 'l' && name[15] == '\0') {
-													/* case "__progname_full": ... */
-													result = (void *)&root_peb->pp_argv[0];
-												}
-											}
-										}
-									}
-								}
-							}
-						}
-					}
-				}
-			} else if (name[2] == 't') {
-				if (name[3] == 'l' && name[4] == 's' && name[5] == '_' &&
-				    name[6] == 'g' && name[7] == 'e' && name[8] == 't' &&
-				    name[9] == '_' && name[10] == 'a' && name[11] == 'd' &&
-				    name[12] == 'd' && name[13] == 'r' && name[14] == '\0') {
-					/* case "__tls_get_addr": ... */
-					result = (void *)&libdl___tls_get_addr;
-				}
-			}
-		} else if (name[1] == 'e') {
-			if (name[2] == 'n' && name[3] == 'v' && name[4] == 'i' &&
-			    name[5] == 'r' && name[6] == 'o' && name[7] == 'n' &&
-			    name[8] == '\0') {
-				/* case "_environ": ... */
-				result = (void *)&root_peb->pp_envp;
-			}
-		} else if (name[1] == 'p') {
-			if (name[2] == 'g' && name[3] == 'm' && name[4] == 'p' &&
-			    name[5] == 't' && name[6] == 'r' && name[7] == '\0') {
-				/* case "_pgmptr": ... */
-				result = (void *)&root_peb->pp_argv[0];
-			}
-		}
-	} else if (name[0] == 'd') {
-		if (name[1] == 'l') {
-			switch (name[2]) {
-
-			case '_':
-				if (name[3] == 'i' && name[4] == 't' && name[5] == 'e' &&
-				    name[6] == 'r' && name[7] == 'a' && name[8] == 't' &&
-				    name[9] == 'e' && name[10] == '_' && name[11] == 'p' &&
-				    name[12] == 'h' && name[13] == 'd' && name[14] == 'r' &&
-				    name[15] == '\0') {
-					/* case "dl_iterate_phdr": ... */
-					result = (void *)&libdl_iterate_phdr;
-				}
-				break;
-
-			case 'a':
-				if (name[3] == 'd') {
-					if (name[4] == 'd' && name[5] == 'r' && name[6] == '\0') {
-						/* case "dladdr": ... */
-						result = (void *)&libdl_dladdr;
-					}
-				} else if (name[3] == 'u') {
-					if (name[4] == 'x' && name[5] == 'c' && name[6] == 't' &&
-					    name[7] == 'r' && name[8] == 'l' && name[9] == '\0') {
-						/* case "dlauxctrl": ... */
-						result = (void *)&libdl_dlauxctrl;
-					}
-				}
-				break;
-
-			case 'c':
-				if (name[3] == 'l') {
-					if (name[4] == 'e') {
-						if (name[5] == 'a' && name[6] == 'r' && name[7] == 'c' &&
-						    name[8] == 'a' && name[9] == 'c' && name[10] == 'h' &&
-						    name[11] == 'e' && name[12] == 's' && name[13] == '\0') {
-							/* case "dlclearcaches": ... */
-							result = (void *)&libdl_dlclearcaches;
-						}
-					} else if (name[4] == 'o') {
-						if (name[5] == 's' && name[6] == 'e' && name[7] == '\0') {
-							/* case "dlclose": ... */
-							result = (void *)&libdl_dlclose;
-						}
-					}
-				}
-				break;
-
-			case 'e':
-				if (name[3] == 'r') {
-					if (name[4] == 'r' && name[5] == 'o' && name[6] == 'r' &&
-					    name[7] == '\0') {
-						/* case "dlerror": ... */
-						result = (void *)&libdl_dlerror;
-					}
-				} else if (name[3] == 'x') {
-					if (name[4] == 'c' && name[5] == 'e' && name[6] == 'p' &&
-					    name[7] == 't' && name[8] == 'a' && name[9] == 'w' &&
-					    name[10] == 'a' && name[11] == 'r' && name[12] == 'e' &&
-					    name[13] == '\0') {
-						/* case "dlexceptaware": ... */
-						result = (void *)&libdl_dlexceptaware;
-					}
-				}
-				break;
-
-			case 'f':
-				if (name[3] == 'o' && name[4] == 'p' && name[5] == 'e' &&
-				    name[6] == 'n' && name[7] == '\0') {
-					/* case "dlfopen": ... */
-					result = (void *)&libdl_dlfopen;
-				}
-				break;
-
-			case 'g':
-				if (name[3] == 'e') {
-					if (name[4] == 't') {
-						if (name[5] == 'h') {
-							if (name[6] == 'a' && name[7] == 'n' && name[8] == 'd' &&
-							    name[9] == 'l' && name[10] == 'e' && name[11] == '\0') {
-								/* case "dlgethandle": ... */
-								result = (void *)&libdl_dlgethandle;
-							}
-						} else if (name[5] == 'm') {
-							if (name[6] == 'o' && name[7] == 'd' && name[8] == 'u' &&
-							    name[9] == 'l' && name[10] == 'e' && name[11] == '\0') {
-								/* case "dlgetmodule": ... */
-								result = (void *)&libdl_dlgetmodule;
-							}
-						}
-					}
-				}
-				break;
-
-			case 'i':
-				if (name[3] == 'n' && name[4] == 'f' && name[5] == 'l' &&
-				    name[6] == 'a' && name[7] == 't' && name[8] == 'e' &&
-				    name[9] == 's' && name[10] == 'e' && name[11] == 'c' &&
-				    name[12] == 't' && name[13] == 'i' && name[14] == 'o' &&
-				    name[15] == 'n' && name[16] == '\0') {
-					/* case "dlinflatesection": ... */
-					result = (void *)&libdl_dlinflatesection;
-				}
-				break;
-
-			case 'l':
-				if (name[3] == 'o' && name[4] == 'c' && name[5] == 'k' &&
-				    name[6] == 's' && name[7] == 'e' && name[8] == 'c' &&
-				    name[9] == 't' && name[10] == 'i' && name[11] == 'o' &&
-				    name[12] == 'n' && name[13] == '\0') {
-					/* case "dllocksection": ... */
-					result = (void *)&libdl_dllocksection;
-				}
-				break;
-
-			case 'm':
-				if (name[3] == 'o') {
-					if (name[4] == 'd') {
-						if (name[5] == 'u') {
-							if (name[6] == 'l') {
-								if (name[7] == 'e') {
-									if (name[8] == 'b') {
-										if (name[9] == 'a' && name[10] == 's' && name[11] == 'e' &&
-										    name[12] == '\0') {
-											/* case "dlmodulebase": ... */
-											result = (void *)&libdl_dlmodulebase;
-										}
-									} else if (name[8] == 'f') {
-										if (name[9] == 'd' && name[10] == '\0') {
-											/* case "dlmodulefd": ... */
-											result = (void *)&libdl_dlmodulefd;
-										}
-									} else if (name[8] == 'n') {
-										if (name[9] == 'a' && name[10] == 'm' && name[11] == 'e' &&
-										    name[12] == '\0') {
-											/* case "dlmodulename": ... */
-											result = (void *)&libdl_dlmodulename;
-										}
-									}
-								}
-							}
-						}
-					}
-				}
-				break;
-
-			case 'o':
-				if (name[3] == 'p' && name[4] == 'e' && name[5] == 'n' &&
-				    name[6] == '\0') {
-					/* case "dlopen": ... */
-					result = (void *)&libdl_dlopen;
-				}
-				break;
-
-			case 's':
-				if (name[3] == 'e') {
-					if (name[4] == 'c') {
-						if (name[5] == 't') {
-							if (name[6] == 'i') {
-								if (name[7] == 'o') {
-									if (name[8] == 'n') {
-										if (name[9] == 'i') {
-											if (name[10] == 'n' && name[11] == 'd' && name[12] == 'e' &&
-											    name[13] == 'x' && name[14] == '\0') {
-												/* case "dlsectionindex": ... */
-												result = (void *)&libdl_dlsectionindex;
-											}
-										} else if (name[9] == 'm') {
-											if (name[10] == 'o' && name[11] == 'd' && name[12] == 'u' &&
-											    name[13] == 'l' && name[14] == 'e' && name[15] == '\0') {
-												/* case "dlsectionmodule": ... */
-												result = (void *)&libdl_dlsectionmodule;
-											}
-										} else if (name[9] == 'n') {
-											if (name[10] == 'a' && name[11] == 'm' && name[12] == 'e' &&
-											    name[13] == '\0') {
-												/* case "dlsectionname": ... */
-												result = (void *)&libdl_dlsectionname;
-											}
-										}
-									}
-								}
-							}
-						}
-					}
-				} else if (name[3] == 'y') {
-					if (name[4] == 'm' && name[5] == '\0') {
-						/* case "dlsym": ... */
-						result = (void *)&libdl_dlsym;
-					}
-				}
-				break;
-
-			case 't':
-				if (name[3] == 'l') {
-					if (name[4] == 's') {
-						if (name[5] == 'a') {
-							if (name[6] == 'd') {
-								if (name[7] == 'd') {
-									if (name[8] == 'r') {
-										if (name[9] == '\0') {
-											/* case "dltlsaddr": ... */
-											result = (void *)&libdl_dltlsaddr;
-										} else if (name[9] == '2') {
-											if (name[10] == '\0') {
-												/* case "dltlsaddr2": ... */
-												result = (void *)&libdl_dltlsaddr2;
-											}
-										}
-									}
-								}
-							} else if (name[6] == 'l') {
-								if (name[7] == 'l') {
-									if (name[8] == 'o') {
-										if (name[9] == 'c') {
-											if (name[10] == '\0') {
-												/* case "dltlsalloc": ... */
-												result = (void *)&libdl_dltlsalloc;
-											} else if (name[10] == 's') {
-												if (name[11] == 'e' && name[12] == 'g' && name[13] == '\0') {
-													/* case "dltlsallocseg": ... */
-													result = (void *)&libdl_dltlsallocseg;
-												}
-											}
-										}
-									}
-								}
-							}
-						} else if (name[5] == 'f') {
-							if (name[6] == 'r') {
-								if (name[7] == 'e') {
-									if (name[8] == 'e') {
-										if (name[9] == '\0') {
-											/* case "dltlsfree": ... */
-											result = (void *)&libdl_dltlsfree;
-										} else if (name[9] == 's') {
-											if (name[10] == 'e' && name[11] == 'g' && name[12] == '\0') {
-												/* case "dltlsfreeseg": ... */
-												result = (void *)&libdl_dltlsfreeseg;
-											}
-										}
-									}
-								}
-							}
-						}
-					}
-				}
-				break;
-
-			case 'u':
-				if (name[3] == 'n' && name[4] == 'l' && name[5] == 'o' &&
-				    name[6] == 'c' && name[7] == 'k' && name[8] == 's' &&
-				    name[9] == 'e' && name[10] == 'c' && name[11] == 't' &&
-				    name[12] == 'i' && name[13] == 'o' && name[14] == 'n' &&
-				    name[15] == '\0') {
-					/* case "dlunlocksection": ... */
-					result = (void *)&libdl_dlunlocksection;
-				}
-				break;
-			default: break;
-			}
-		}
-	} else if (name[0] == 'e') {
-		if (name[1] == 'n' && name[2] == 'v' && name[3] == 'i' &&
-		    name[4] == 'r' && name[5] == 'o' && name[6] == 'n' &&
-		    name[7] == '\0') {
-			/* case "environ": ... */
-			result = (void *)&root_peb->pp_envp;
-		}
-	} else if (name[0] == 'p') {
-		if (name[1] == 'r') {
-			if (name[2] == 'o') {
-				if (name[3] == 'g') {
-					if (name[4] == 'r') {
-						if (name[5] == 'a') {
-							if (name[6] == 'm') {
-								if (name[7] == '_') {
-									if (name[8] == 'i') {
-										if (name[9] == 'n') {
-											if (name[10] == 'v') {
-												if (name[11] == 'o') {
-													if (name[12] == 'c') {
-														if (name[13] == 'a') {
-															if (name[14] == 't') {
-																if (name[15] == 'i') {
-																	if (name[16] == 'o') {
-																		if (name[17] == 'n') {
-																			if (name[18] == '_') {
-																				if (name[19] == 'n') {
-																					if (name[20] == 'a' && name[21] == 'm' && name[22] == 'e' &&
-																					    name[23] == '\0') {
-																						/* case "program_invocation_name": ... */
-																						result = (void *)&root_peb->pp_argv[0];
-																					}
-																				} else if (name[19] == 's') {
-																					if (name[20] == 'h' && name[21] == 'o' && name[22] == 'r' &&
-																					    name[23] == 't' && name[24] == '_' && name[25] == 'n' &&
-																					    name[26] == 'a' && name[27] == 'm' && name[28] == 'e' &&
-																					    name[29] == '\0') {
-																						/* case "program_invocation_short_name": ... */
-																						result = (void *)dlget_p_program_invocation_short_name();
-																					}
-																				}
-																			}
-																		}
-																	}
-																}
-															}
-														}
-													}
-												}
-											}
-										}
-									}
-								}
-							}
-						}
-					}
-				}
-			}
+	size_t lo, hi;
+	/* Do a binary search across `dlsym_builtin_table' */
+	lo = 0;
+	hi = COMPILER_LENOF(dlsym_builtin_table);
+	while (lo < hi) {
+		int cmp;
+		size_t index;
+		index = (lo + hi) / 2;
+		cmp   = strcmp(name, dlsym_builtin_table[index].dbs_name);
+		if (cmp < 0) {
+			hi = index;
+		} else if (cmp > 0) {
+			lo = index + 1;
+		} else {
+			/* Found it! */
+			return (void *)(dl_rtld_module.dm_loadaddr +
+			                dlsym_builtin_table[index].dbs_addr);
 		}
 	}
-//[[[end]]]
-	return result;
+
+	/* Check for special symbols. */
+	switch (*name++) {
+
+	case '_':
+		switch (*name++) {
+		case 'e':
+			goto check_environ; /* _environ */
+
+		case 'p':
+			if (strcmp(name, "gmptr") == 0) /* _pgmptr */
+				goto return_program_invocation_name;
+			break;
+
+		case '_':
+			switch (*name++) {
+
+			case 'e':
+				goto check_environ; /* __environ */
+
+			case 'a':
+				if (*name++ != 'r')
+					break;
+				if (*name++ != 'g')
+					break;
+				if (name[0] == '\0' || name[1] != '\0')
+					break;
+				if (*name == 'c') /* __argc */
+					return &root_peb->pp_argc;
+				if (*name == 'v') /* __argv */
+					return &root_peb->pp_argv;
+				break;
+
+			case 'p':
+				if (memcmp(name, "rogname", 7 * sizeof(char)) == 0) {
+					name += 7;
+					if (*name == '\0') /* __progname */
+						goto return_program_invocation_short_name;
+					if (strcmp(name, "_full") == 0) /* __progname_full */
+						goto return_program_invocation_name;
+				} else if (strcmp(name, "eb") == 0) { /* __peb */
+					return root_peb;
+				}
+				break;
+
+			default:
+				break;
+			}
+			break;
+
+		default:
+			break;
+		}
+		break;
+
+	case 'e':
+check_environ:
+		if (strcmp(name, "nviron") == 0)
+			return &root_peb->pp_envp; /* environ */
+		break;
+
+	case 'p':
+		if (memcmp(name, "rogram_invocation_", 18 * sizeof(char)) == 0) {
+			name += 18;
+			if (strcmp(name, "name") == 0) { /* program_invocation_name */
+return_program_invocation_name:
+				return &root_peb->pp_argv[0];
+			}
+			if (strcmp(name, "short_name") == 0) { /* program_invocation_short_name */
+return_program_invocation_short_name:
+				return dlget_p_program_invocation_short_name();
+			}
+		}
+		break;
+
+	default:
+		break;
+	}
+	return NULL;
 }
 
 
