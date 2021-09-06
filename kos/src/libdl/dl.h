@@ -729,6 +729,7 @@ INTDEF ATTR_COLD NONNULL((1)) int CC dl_vseterrorf(char const *__restrict format
 
 /* Return the address of a builtin function (e.g. `dlopen()') */
 INTDEF ATTR_PURE WUNUSED NONNULL((1)) void *FCALL dlsym_builtin(char const *__restrict name);
+INTDEF ATTR_PURE WUNUSED NONNULL((1)) size_t FCALL dlsym_builtin_size(char const *__restrict name);
 INTDEF ATTR_PURE WUNUSED NONNULL((1)) DlSection *FCALL dlsec_builtin(char const *__restrict name);
 INTDEF WUNUSED ATTR_CONST DlSection *FCALL dlsec_builtin_index(size_t sect_index);
 INTDEF WUNUSED ATTR_CONST char const *FCALL dlsec_builtin_name(size_t sect_index);

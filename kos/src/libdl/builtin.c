@@ -3173,10 +3173,10 @@ dlsym_builtin(char const *__restrict name) {
 	case '_':
 		switch (*name++) {
 		case 'e':
-			goto check_environ; /* _environ */
+			goto check_environ; /* char **_environ */
 
 		case 'p':
-			if (strcmp(name, "gmptr") == 0) /* _pgmptr */
+			if (strcmp(name, "gmptr") == 0) /* char *_pgmptr */
 				goto return_program_invocation_name;
 			break;
 
@@ -3184,7 +3184,7 @@ dlsym_builtin(char const *__restrict name) {
 			switch (*name++) {
 
 			case 'e':
-				goto check_environ; /* __environ */
+				goto check_environ; /* char **__environ */
 
 			case 'a':
 				if (*name++ != 'r')
@@ -3193,20 +3193,33 @@ dlsym_builtin(char const *__restrict name) {
 					break;
 				if (name[0] == '\0' || name[1] != '\0')
 					break;
-				if (*name == 'c') /* __argc */
+				if (*name == 'c') { /* int __argc */
+#if __SIZEOF_INT__ == __SIZEOF_SIZE_T__
 					return &root_peb->pp_argc;
-				if (*name == 'v') /* __argv */
+#elif __SIZEOF_INT__ < __SIZEOF_SIZE_T__
+					/* Must return a pointer to the least significant bits */
+#if __BYTE_ORDER__ == __ORDER_LITTLE_ENDIAN__
+					return &root_peb->pp_argc;
+#else /* __BYTE_ORDER__ == __ORDER_LITTLE_ENDIAN__ */
+					return (byte_t *)&root_peb->pp_argc + (__SIZEOF_SIZE_T__ -
+					                                       __SIZEOF_INT__);
+#endif /* __BYTE_ORDER__ != __ORDER_LITTLE_ENDIAN__ */
+#else /* __SIZEOF_INT__ <= __SIZEOF_SIZE_T__ */
+#error "Unsupported configuration: `int' doesn't fit into `size_t'"
+#endif /* __SIZEOF_INT__ > __SIZEOF_SIZE_T__ */
+				}
+				if (*name == 'v') /* char **__argv */
 					return &root_peb->pp_argv;
 				break;
 
 			case 'p':
 				if (memcmp(name, "rogname", 7 * sizeof(char)) == 0) {
 					name += 7;
-					if (*name == '\0') /* __progname */
+					if (*name == '\0') /* char *__progname */
 						goto return_program_invocation_short_name;
-					if (strcmp(name, "_full") == 0) /* __progname_full */
+					if (strcmp(name, "_full") == 0) /* char *__progname_full */
 						goto return_program_invocation_name;
-				} else if (strcmp(name, "eb") == 0) { /* __peb */
+				} else if (strcmp(name, "eb") == 0) { /* struct process_peb __peb */
 					return root_peb;
 				}
 				break;
@@ -3223,18 +3236,18 @@ dlsym_builtin(char const *__restrict name) {
 
 	case 'e':
 check_environ:
-		if (strcmp(name, "nviron") == 0)
-			return &root_peb->pp_envp; /* environ */
+		if (strcmp(name, "nviron") == 0) /* char **environ */
+			return &root_peb->pp_envp;
 		break;
 
 	case 'p':
 		if (memcmp(name, "rogram_invocation_", 18 * sizeof(char)) == 0) {
 			name += 18;
-			if (strcmp(name, "name") == 0) { /* program_invocation_name */
+			if (strcmp(name, "name") == 0) { /* char *program_invocation_name */
 return_program_invocation_name:
 				return &root_peb->pp_argv[0];
 			}
-			if (strcmp(name, "short_name") == 0) { /* program_invocation_short_name */
+			if (strcmp(name, "short_name") == 0) { /* char *program_invocation_short_name */
 return_program_invocation_short_name:
 				return dlget_p_program_invocation_short_name();
 			}
@@ -3246,6 +3259,94 @@ return_program_invocation_short_name:
 	}
 	return NULL;
 }
+
+
+/* Used internally for some relocations: the "size" of libdl builtin symbols. */
+INTERN ATTR_PURE WUNUSED NONNULL((1)) size_t FCALL
+dlsym_builtin_size(char const *__restrict name) {
+	/* Only a couple of symbols should actually have a non-zero size value. */
+	switch (*name++) {
+
+	case '_':
+		switch (*name++) {
+		case 'e':
+			goto check_environ; /* char **_environ */
+
+		case 'p':
+			if (strcmp(name, "gmptr") == 0) /* char *_pgmptr */
+				goto return_pointer;
+			break;
+
+		case '_':
+			switch (*name++) {
+
+			case 'e':
+				goto check_environ; /* char **__environ */
+
+			case 'a':
+				if (*name++ != 'r')
+					break;
+				if (*name++ != 'g')
+					break;
+				if (name[0] == '\0' || name[1] != '\0')
+					break;
+				if (*name == 'c') { /* int __argc */
+#if __SIZEOF_POINTER__ == __SIZEOF_INT__
+					goto return_pointer;
+#else /* __SIZEOF_POINTER__ == __SIZEOF_INT__ */
+					return sizeof(int);
+#endif /* __SIZEOF_POINTER__ != __SIZEOF_INT__ */
+				}
+				if (*name == 'v') /* char **__argv */
+					goto return_pointer;
+				break;
+
+			case 'p':
+				if (memcmp(name, "rogname", 7 * sizeof(char)) == 0) {
+					name += 7;
+					if (*name == '\0') /* char *__progname */
+						goto return_pointer;
+					if (strcmp(name, "_full") == 0) /* char *__progname_full */
+						goto return_pointer;
+				} else if (strcmp(name, "eb") == 0) { /* struct process_peb __peb */
+					return sizeof(struct process_peb);
+				}
+				break;
+
+			default:
+				break;
+			}
+			break;
+
+		default:
+			break;
+		}
+		break;
+
+	case 'e':
+check_environ:
+		if (strcmp(name, "nviron") == 0) /* char **environ */
+			goto return_pointer;
+		break;
+
+	case 'p':
+		if (memcmp(name, "rogram_invocation_", 18 * sizeof(char)) == 0) {
+			name += 18;
+			if (strcmp(name, "name") == 0) /* char *program_invocation_name */
+				goto return_pointer;
+			if (strcmp(name, "short_name") == 0) /* char *program_invocation_short_name */
+				goto return_pointer;
+		}
+		break;
+
+	default:
+		break;
+	}
+	return 0;
+return_pointer:
+	return sizeof(void *);
+}
+
 
 
 #define INIT_RTLD_SECTION(index, link_name, elf_type, elf_flags)                                                       \

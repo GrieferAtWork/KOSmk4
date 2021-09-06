@@ -40,36 +40,6 @@
 
 DECL_BEGIN
 
-PRIVATE ATTR_PURE WUNUSED NONNULL((1)) size_t CC
-builtin_symbol_size(char const *__restrict name) {
-	if (strcmp(name, "program_invocation_name") == 0)
-		return sizeof(void *);
-	if (strcmp(name, "program_invocation_short_name") == 0)
-		return sizeof(void *);
-	if (*name == '_') {
-		++name;
-		if (strcmp(name, "pgmptr") == 0)
-			return sizeof(void *);
-		if (*name == '_') {
-			++name;
-			if (strcmp(name, "peb") == 0)
-				return sizeof(struct process_peb);
-			if (strcmp(name, "argc") == 0)
-				return sizeof(size_t);
-			if (strcmp(name, "argv") == 0)
-				return sizeof(void *);
-			if (strcmp(name, "progname") == 0)
-				return sizeof(void *);
-			if (strcmp(name, "progname_full") == 0)
-				return sizeof(void *);
-		}
-	}
-	if (strcmp(name, "environ") == 0)
-		return sizeof(void *);
-	return 0;
-}
-
-
 struct dl_symbol {
 	DlModule        *ds_mod; /* [1..1] The associated module */
 	ElfW(Sym) const *ds_sym; /* [1..1] The actual symbol (or its address for custom module). */
@@ -130,7 +100,7 @@ dlmodule_find_symbol_in_dependencies(DlModule *__restrict self,
 			if (addr) {
 				*paddr = (ElfW(Addr))addr;
 				if unlikely(psize)
-					*psize = builtin_symbol_size(name);
+					*psize = dlsym_builtin_size(name);
 				if unlikely(pmodule)
 					*pmodule = &dl_rtld_module;
 				return DLMODULE_SEARCH_SYMBOL_IN_DEPENDENCIES_FOUND;
@@ -264,7 +234,7 @@ again_search_globals_module:
 					if (weak_symbol.ds_mod)
 						decref(weak_symbol.ds_mod);
 					if unlikely(psize)
-						*psize = builtin_symbol_size(name);
+						*psize = dlsym_builtin_size(name);
 					if unlikely(pmodule)
 						*pmodule = &dl_rtld_module;
 					goto done;
