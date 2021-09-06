@@ -27,4 +27,8 @@
 #define CC  LIBRT_CC
 #define VCC LIBRT_VCC
 
+/* TODO: Integrate this library  into libc.  (it doesn't  need
+ *       to be stand-alone, and on (e.g.) cygwin, it's already
+ *       integrated inside libc!) */
+
 #endif /* !GUARD_LIBRT_API_H */

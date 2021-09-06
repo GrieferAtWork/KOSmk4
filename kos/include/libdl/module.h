@@ -98,16 +98,16 @@ INTDEF NONNULL((1)) void LIBDL_CC DlSection_Decref(DlSection *__restrict self);
 	       (DL_API_SYMBOL(DlSection_Destroy)(self), 0))
 #endif /* !__INTELLISENSE__ */
 
-FORCELOCAL ATTR_ARTIFICIAL NONNULL((1)) bool LIBDL_CC
+FORCELOCAL ATTR_ARTIFICIAL NONNULL((1)) __BOOL LIBDL_CC
 DlSection_TryIncref(DlSection *__restrict self) {
 	refcnt_t refcnt;
 	do {
 		refcnt = __hybrid_atomic_load(self->ds_refcnt, __ATOMIC_ACQUIRE);
 		if (!refcnt)
-			return false;
+			return 0;
 	} while (!__hybrid_atomic_cmpxch_weak(self->ds_refcnt, refcnt, refcnt + 1,
 	                                      __ATOMIC_SEQ_CST, __ATOMIC_SEQ_CST));
-	return true;
+	return 1;
 }
 
 #ifdef __BUILDING_LIBDL

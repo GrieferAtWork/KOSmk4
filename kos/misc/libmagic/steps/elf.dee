@@ -136,15 +136,15 @@ function flattenElfBinary(
 						p_filesz = file_read4le(i);
 						p_memsz  = file_read4le(i);
 					}
-					print "PHDR: v:{}, p:{}, o:{}, ms:{}, fs:{}".format({
-						p_vaddr.hex(), p_paddr.hex(), p_offset.hex(),
-						p_memsz.hex(), p_filesz.hex()
-					});
 					if (p_type == PT_DYNAMIC) {
 						assert requireNoRelocations;
 						/* TODO */
 						continue;
 					}
+					print "PHDR: v:{}, p:{}, o:{}, ms:{}, fs:{}".format({
+						p_vaddr.hex(), p_paddr.hex(), p_offset.hex(),
+						p_memsz.hex(), p_filesz.hex()
+					});
 					if (p_paddr < physBase) {
 						print "Error: {!r}.PHDR[{}].p_paddr({}) < {}"
 							.format({ inputFile, phi, p_paddr.hex(), physBase.hex() });
