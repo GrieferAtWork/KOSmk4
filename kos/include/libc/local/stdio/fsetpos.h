@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x4b8e3c0e */
+/* HASH CRC-32:0x12360a24 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -27,7 +27,6 @@
 #include <kos/anno.h>
 #include <bits/crt/stdio.h>
 __NAMESPACE_LOCAL_BEGIN
-/* Dependency: crt_fseek from stdio */
 #ifndef __local___localdep_crt_fseek_defined
 #define __local___localdep_crt_fseek_defined 1
 #if defined(__CRT_HAVE_fseek_unlocked) && defined(__USE_STDIO_UNLOCKED)
@@ -68,7 +67,6 @@ __CREDIRECT(__ATTR_NONNULL((1)),int,__THROWING,__localdep_crt_fseek,(__FILE *__r
 #undef __local___localdep_crt_fseek_defined
 #endif /* !... */
 #endif /* !__local___localdep_crt_fseek_defined */
-/* Dependency: crt_fseeko from stdio */
 #ifndef __local___localdep_crt_fseeko_defined
 #define __local___localdep_crt_fseeko_defined 1
 #if defined(__CRT_HAVE_fseek_unlocked) && defined(__USE_STDIO_UNLOCKED) && __SIZEOF_OFF32_T__ == __SIZEOF_LONG__
@@ -109,7 +107,6 @@ __CREDIRECT(__ATTR_NONNULL((1)),int,__THROWING,__localdep_crt_fseeko,(__FILE *__
 #undef __local___localdep_crt_fseeko_defined
 #endif /* !... */
 #endif /* !__local___localdep_crt_fseeko_defined */
-/* Dependency: crt_fseeko64 from stdio */
 #ifndef __local___localdep_crt_fseeko64_defined
 #define __local___localdep_crt_fseeko64_defined 1
 #if defined(__CRT_HAVE_fseek_unlocked) && defined(__USE_STDIO_UNLOCKED) && __SIZEOF_OFF64_T__ == __SIZEOF_LONG__
@@ -150,7 +147,6 @@ __CREDIRECT(__ATTR_NONNULL((1)),int,__THROWING,__localdep_crt_fseeko64,(__FILE *
 #undef __local___localdep_crt_fseeko64_defined
 #endif /* !... */
 #endif /* !__local___localdep_crt_fseeko64_defined */
-/* Dependency: crt_fsetpos from stdio */
 #ifndef __local___localdep_crt_fsetpos_defined
 #define __local___localdep_crt_fsetpos_defined 1
 #if defined(__CRT_HAVE_fsetpos_unlocked) && defined(__USE_STDIO_UNLOCKED)
@@ -173,7 +169,6 @@ __CREDIRECT(__ATTR_NONNULL((1, 2)),int,__THROWING,__localdep_crt_fsetpos,(__FILE
 #undef __local___localdep_crt_fsetpos_defined
 #endif /* !... */
 #endif /* !__local___localdep_crt_fsetpos_defined */
-/* Dependency: crt_fsetpos64 from stdio */
 #ifndef __local___localdep_crt_fsetpos64_defined
 #define __local___localdep_crt_fsetpos64_defined 1
 #if defined(__CRT_HAVE_fsetpos_unlocked) && defined(__USE_STDIO_UNLOCKED) && __SIZEOF_OFF64_T__ == __SIZEOF_OFF32_T__
@@ -196,8 +191,6 @@ __CREDIRECT(__ATTR_NONNULL((1, 2)),int,__THROWING,__localdep_crt_fsetpos64,(__FI
 #undef __local___localdep_crt_fsetpos64_defined
 #endif /* !... */
 #endif /* !__local___localdep_crt_fsetpos64_defined */
-/* >> fsetpos(3), fsetpos64(3)
- * Set the file position of `stream' to `pos', as previously initialized with a call to `fgetpos()' */
 __LOCAL_LIBC(fsetpos) __ATTR_NONNULL((1, 2)) int
 (__LIBCCALL __LIBC_LOCAL_NAME(fsetpos))(__FILE *__restrict __stream, __FS_TYPE(fpos) const *__restrict __pos) __THROWS(...) {
 #if __FS_SIZEOF(OFF) == __SIZEOF_OFF64_T__ && ((defined(__CRT_HAVE_fseek) && __SIZEOF_OFF64_T__ == __SIZEOF_LONG__) || (defined(__CRT_HAVE_fseeko) && __SIZEOF_OFF64_T__ == __SIZEOF_OFF32_T__) || defined(__CRT_HAVE_fseeko64) || defined(__CRT_HAVE_fseek64) || defined(__CRT_HAVE__fseeki64) || (defined(__CRT_HAVE_fseek_unlocked) && __SIZEOF_OFF64_T__ == __SIZEOF_LONG__) || (defined(__CRT_HAVE__fseek_nolock) && __SIZEOF_OFF64_T__ == __SIZEOF_LONG__) || (defined(__CRT_HAVE_fseeko_unlocked) && __SIZEOF_OFF64_T__ == __SIZEOF_OFF32_T__) || defined(__CRT_HAVE_fseeko64_unlocked) || defined(__CRT_HAVE_fseek64_unlocked) || defined(__CRT_HAVE__fseeki64_nolock))

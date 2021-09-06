@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xf2484ee2 */
+/* HASH CRC-32:0x4140bade */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -22,7 +22,6 @@
 #define __local_ltoa_defined 1
 #include <__crt.h>
 __NAMESPACE_LOCAL_BEGIN
-/* Dependency: _ltoa_s from stdlib */
 #ifndef __local___localdep__ltoa_s_defined
 #define __local___localdep__ltoa_s_defined 1
 #ifdef __CRT_HAVE__ltoa_s

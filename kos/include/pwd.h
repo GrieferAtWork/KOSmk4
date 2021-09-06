@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xa8ba4cf1 */
+/* HASH CRC-32:0x59f0691e */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -99,7 +99,7 @@ __CDECLARE_VOID_OPT(,__NOTHROW_RPC,setpwent,(void),())
 __CDECLARE_VOID_OPT(,__NOTHROW_RPC_NOKOS,endpwent,(void),())
 /* Read an entry from the password-file stream, opening it if necessary
  * return: * :                         A pointer to the read password entry
- * return: NULL: (errno = <unchanged>) The last entry has already been read
+ * return: NULL: (errno = <unchanged>) The last  entry  has  already  been  read
  *                                     (use `setpwent()' to rewind the database)
  * return: NULL: (errno = <changed>)   Error (s.a. `errno') */
 __CDECLARE_OPT(,struct passwd *,__NOTHROW_RPC,getpwent,(void),())
@@ -216,13 +216,13 @@ __NAMESPACE_LOCAL_USING_OR_IMPL(fgetpwnam_r, __FORCELOCAL __ATTR_ARTIFICIAL __AT
 #ifdef __USE_GNU
 #ifdef __CRT_HAVE_getpw
 /* Re-construct the password-file line for the given uid in the
- * given buffer. This knows the format that the caller will
+ * given  buffer. This  knows the  format that  the caller will
  * expect, but this need not be the format of the password file */
 __CDECLARE(,int,__NOTHROW_RPC,getpw,(__uid_t __uid, char *__buffer),(__uid,__buffer))
 #elif defined(__CRT_HAVE_getpwuid)
 #include <libc/local/pwd/getpw.h>
 /* Re-construct the password-file line for the given uid in the
- * given buffer. This knows the format that the caller will
+ * given  buffer. This  knows the  format that  the caller will
  * expect, but this need not be the format of the password file */
 __NAMESPACE_LOCAL_USING_OR_IMPL(getpw, __FORCELOCAL __ATTR_ARTIFICIAL int __NOTHROW_RPC(__LIBCCALL getpw)(__uid_t __uid, char *__buffer) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(getpw))(__uid, __buffer); })
 #endif /* ... */

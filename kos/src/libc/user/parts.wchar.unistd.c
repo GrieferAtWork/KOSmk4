@@ -426,9 +426,9 @@ NOTHROW_RPC(LIBDCALL libd_wfchownat)(fd_t dfd,
 }
 /*[[[end:libd_wfchownat]]]*/
 
-/*[[[head:libc_wsymlinkat,hash:CRC-32=0x39a136fb]]]*/
+/*[[[head:libc_wsymlinkat,hash:CRC-32=0xcebf6b23]]]*/
 /* >> symlinkat(3)
- * Create a new symbolic link loaded with `link_text' as link
+ * Create  a  new  symbolic  link  loaded  with  `link_text'  as link
  * text, at the filesystem location referred to by `tofd:target_path' */
 INTERN ATTR_SECTION(".text.crt.unsorted") NONNULL((1, 3)) int
 NOTHROW_RPC(LIBKCALL libc_wsymlinkat)(char32_t const *link_text,
@@ -453,9 +453,9 @@ done:
 }
 /*[[[end:libc_wsymlinkat]]]*/
 
-/*[[[head:libd_wsymlinkat,hash:CRC-32=0xe4d8ece]]]*/
+/*[[[head:libd_wsymlinkat,hash:CRC-32=0x7e51fa3b]]]*/
 /* >> symlinkat(3)
- * Create a new symbolic link loaded with `link_text' as link
+ * Create  a  new  symbolic  link  loaded  with  `link_text'  as link
  * text, at the filesystem location referred to by `tofd:target_path' */
 INTERN ATTR_SECTION(".text.crt.dos.unsorted") NONNULL((1, 3)) int
 NOTHROW_RPC(LIBDCALL libd_wsymlinkat)(char16_t const *link_text,
@@ -480,10 +480,10 @@ done:
 }
 /*[[[end:libd_wsymlinkat]]]*/
 
-/*[[[head:libc_wreadlinkat,hash:CRC-32=0x231ba0c5]]]*/
+/*[[[head:libc_wreadlinkat,hash:CRC-32=0xa88cbc9e]]]*/
 /* >> readlinkat(2)
  * Read the text of a symbolic link under `dfd:path' into the provided buffer.
- * WARNING: This function is badly designed and will neither append a trailing
+ * WARNING: This  function is badly designed and will neither append a trailing
  *          NUL-character to the buffer, nor will it return the required buffer
  *          size. Instead, it will return the written size, and the caller must
  *          keep on over allocating until the function indicates that it didn't
@@ -500,10 +500,10 @@ NOTHROW_RPC(LIBKCALL libc_wreadlinkat)(fd_t dfd,
 }
 /*[[[end:libc_wreadlinkat]]]*/
 
-/*[[[head:libd_wreadlinkat,hash:CRC-32=0x795e2de5]]]*/
+/*[[[head:libd_wreadlinkat,hash:CRC-32=0x3404b927]]]*/
 /* >> readlinkat(2)
  * Read the text of a symbolic link under `dfd:path' into the provided buffer.
- * WARNING: This function is badly designed and will neither append a trailing
+ * WARNING: This  function is badly designed and will neither append a trailing
  *          NUL-character to the buffer, nor will it return the required buffer
  *          size. Instead, it will return the written size, and the caller must
  *          keep on over allocating until the function indicates that it didn't
@@ -854,9 +854,9 @@ NOTHROW_NCX(LIBDCALL libd_wsetdomainname)(char16_t const *name,
 }
 /*[[[end:libd_wsetdomainname]]]*/
 
-/*[[[head:libc_wchroot,hash:CRC-32=0x36860d26]]]*/
+/*[[[head:libc_wchroot,hash:CRC-32=0x7ada1220]]]*/
 /* >> chroot(2)
- * Change the root directory of the calling `CLONE_FS' group of threads
+ * Change  the root directory of the calling `CLONE_FS' group of threads
  * (usually the process) to a path that was previously address by `path' */
 INTERN ATTR_SECTION(".text.crt.unsorted") NONNULL((1)) int
 NOTHROW_RPC(LIBKCALL libc_wchroot)(char32_t const *__restrict path)
@@ -873,9 +873,9 @@ NOTHROW_RPC(LIBKCALL libc_wchroot)(char32_t const *__restrict path)
 }
 /*[[[end:libc_wchroot]]]*/
 
-/*[[[head:libd_wchroot,hash:CRC-32=0xd0a0727d]]]*/
+/*[[[head:libd_wchroot,hash:CRC-32=0x8bd5d60f]]]*/
 /* >> chroot(2)
- * Change the root directory of the calling `CLONE_FS' group of threads
+ * Change  the root directory of the calling `CLONE_FS' group of threads
  * (usually the process) to a path that was previously address by `path' */
 INTERN ATTR_SECTION(".text.crt.dos.unsorted") NONNULL((1)) int
 NOTHROW_RPC(LIBDCALL libd_wchroot)(char16_t const *__restrict path)
@@ -1084,10 +1084,10 @@ NOTHROW_RPC(LIBDCALL libd_wget_current_dir_name)(void)
 }
 /*[[[end:libd_wget_current_dir_name]]]*/
 
-/*[[[head:libc_wlchown,hash:CRC-32=0x1125d8b2]]]*/
+/*[[[head:libc_wlchown,hash:CRC-32=0x86ab6ba1]]]*/
 /* >> lchown(2)
  * Change the ownership of a given `file' to `group:owner',
- * but don't reference it if that file is a symbolic link */
+ * but don't reference it if  that file is a symbolic  link */
 INTERN ATTR_SECTION(".text.crt.unsorted") NONNULL((1)) int
 NOTHROW_RPC(LIBKCALL libc_wlchown)(char32_t const *file,
                                    uid_t owner,
@@ -1098,10 +1098,10 @@ NOTHROW_RPC(LIBKCALL libc_wlchown)(char32_t const *file,
 }
 /*[[[end:libc_wlchown]]]*/
 
-/*[[[head:libd_wlchown,hash:CRC-32=0xcba514fd]]]*/
+/*[[[head:libd_wlchown,hash:CRC-32=0x857a1fe7]]]*/
 /* >> lchown(2)
  * Change the ownership of a given `file' to `group:owner',
- * but don't reference it if that file is a symbolic link */
+ * but don't reference it if  that file is a symbolic  link */
 INTERN ATTR_SECTION(".text.crt.dos.unsorted") NONNULL((1)) int
 NOTHROW_RPC(LIBDCALL libd_wlchown)(char16_t const *file,
                                    uid_t owner,
@@ -1192,9 +1192,9 @@ NOTHROW_NCX(LIBDCALL libd_wtruncate64)(char16_t const *file,
 }
 /*[[[end:libd_wtruncate64]]]*/
 
-/*[[[head:libc_wsymlink,hash:CRC-32=0x1172867e]]]*/
+/*[[[head:libc_wsymlink,hash:CRC-32=0x4690eefe]]]*/
 /* >> symlink(3)
- * Create a new symbolic link loaded with `link_text' as link
+ * Create  a new  symbolic link  loaded with  `link_text' as link
  * text, at the filesystem location referred to by `target_path'.
  * Same as `symlinkat(link_text, AT_FDCWD, target_path)' */
 INTERN ATTR_SECTION(".text.crt.unsorted") NONNULL((1, 2)) int
@@ -1206,9 +1206,9 @@ NOTHROW_RPC(LIBKCALL libc_wsymlink)(char32_t const *link_text,
 }
 /*[[[end:libc_wsymlink]]]*/
 
-/*[[[head:libd_wsymlink,hash:CRC-32=0x8e58b68b]]]*/
+/*[[[head:libd_wsymlink,hash:CRC-32=0xbc82cf11]]]*/
 /* >> symlink(3)
- * Create a new symbolic link loaded with `link_text' as link
+ * Create  a new  symbolic link  loaded with  `link_text' as link
  * text, at the filesystem location referred to by `target_path'.
  * Same as `symlinkat(link_text, AT_FDCWD, target_path)' */
 INTERN ATTR_SECTION(".text.crt.dos.unsorted") NONNULL((1, 2)) int
@@ -1220,11 +1220,11 @@ NOTHROW_RPC(LIBDCALL libd_wsymlink)(char16_t const *link_text,
 }
 /*[[[end:libd_wsymlink]]]*/
 
-/*[[[head:libc_wreadlink,hash:CRC-32=0x8950bb60]]]*/
+/*[[[head:libc_wreadlink,hash:CRC-32=0xdfec3caa]]]*/
 /* >> readlink(3)
  * Read the text of a symbolic link under `path' into the provided buffer.
  * Same as `readlinkat(AT_FDCWD, path, buf, buflen)'
- * WARNING: This function is badly designed and will neither append a trailing
+ * WARNING: This  function is badly designed and will neither append a trailing
  *          NUL-character to the buffer, nor will it return the required buffer
  *          size. Instead, it will return the written size, and the caller must
  *          keep on over allocating until the function indicates that it didn't
@@ -1240,11 +1240,11 @@ NOTHROW_RPC(LIBKCALL libc_wreadlink)(char32_t const *path,
 }
 /*[[[end:libc_wreadlink]]]*/
 
-/*[[[head:libd_wreadlink,hash:CRC-32=0xe0c43d22]]]*/
+/*[[[head:libd_wreadlink,hash:CRC-32=0xd7362b30]]]*/
 /* >> readlink(3)
  * Read the text of a symbolic link under `path' into the provided buffer.
  * Same as `readlinkat(AT_FDCWD, path, buf, buflen)'
- * WARNING: This function is badly designed and will neither append a trailing
+ * WARNING: This  function is badly designed and will neither append a trailing
  *          NUL-character to the buffer, nor will it return the required buffer
  *          size. Instead, it will return the written size, and the caller must
  *          keep on over allocating until the function indicates that it didn't

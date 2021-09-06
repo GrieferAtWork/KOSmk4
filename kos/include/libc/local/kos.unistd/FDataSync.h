@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x42a57fe4 */
+/* HASH CRC-32:0x79009631 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -24,9 +24,6 @@
 #include <kos/anno.h>
 #include <bits/types.h>
 __NAMESPACE_LOCAL_BEGIN
-/* >> fdatasync(2)
- * Synchronize only the data of a file (not its descriptor which contains
- * timestamps, and its size), meaning that changes are written to disk */
 __LOCAL_LIBC(FDataSync) void
 (__LIBCCALL __LIBC_LOCAL_NAME(FDataSync))(__fd_t __fd) __THROWS(...) {
 	(void)__fd;

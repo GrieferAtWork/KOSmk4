@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xcbae1fd1 */
+/* HASH CRC-32:0xab6f520f */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -110,23 +110,23 @@ INTDEF ATTR_PURE WUNUSED NONNULL((1)) size_t NOTHROW_NCX(LIBDCALL libd_wcslen)(c
  * Return the length of the string in characters (Same as `rawmemlen[...](str, '\0')') */
 INTDEF ATTR_PURE WUNUSED NONNULL((1)) size_t NOTHROW_NCX(LIBKCALL libc_wcslen)(char32_t const *__restrict str);
 /* >> strspn(3)
- * Return the offset from `haystack' to the first
- * character for which `strchr(reject, ch) == NULL'.
+ * Return   the  offset  from  `haystack'  to  the  first
+ * character   for   which  `strchr(reject, ch) == NULL'.
  * If no such character exists, return `strlen(haystack)' */
 INTDEF ATTR_PURE WUNUSED NONNULL((1, 2)) size_t NOTHROW_NCX(LIBDCALL libd_wcsspn)(char16_t const *haystack, char16_t const *accept);
 /* >> strspn(3)
- * Return the offset from `haystack' to the first
- * character for which `strchr(reject, ch) == NULL'.
+ * Return   the  offset  from  `haystack'  to  the  first
+ * character   for   which  `strchr(reject, ch) == NULL'.
  * If no such character exists, return `strlen(haystack)' */
 INTDEF ATTR_PURE WUNUSED NONNULL((1, 2)) size_t NOTHROW_NCX(LIBKCALL libc_wcsspn)(char32_t const *haystack, char32_t const *accept);
 /* >> strcspn(3)
- * Return the offset from `haystack' to the first
- * character for which `strchr(reject, ch) != NULL'.
+ * Return   the  offset  from  `haystack'  to  the  first
+ * character   for   which  `strchr(reject, ch) != NULL'.
  * If no such character exists, return `strlen(haystack)' */
 INTDEF ATTR_PURE WUNUSED NONNULL((1, 2)) size_t NOTHROW_NCX(LIBDCALL libd_wcscspn)(char16_t const *haystack, char16_t const *reject);
 /* >> strcspn(3)
- * Return the offset from `haystack' to the first
- * character for which `strchr(reject, ch) != NULL'.
+ * Return   the  offset  from  `haystack'  to  the  first
+ * character   for   which  `strchr(reject, ch) != NULL'.
  * If no such character exists, return `strlen(haystack)' */
 INTDEF ATTR_PURE WUNUSED NONNULL((1, 2)) size_t NOTHROW_NCX(LIBKCALL libc_wcscspn)(char32_t const *haystack, char32_t const *reject);
 /* >> strchr(3)
@@ -275,82 +275,82 @@ INTDEF ATTR_PURE ATTR_RETNONNULL WUNUSED NONNULL((1)) char16_t *NOTHROW_NCX(LIBD
 INTDEF ATTR_PURE ATTR_RETNONNULL WUNUSED NONNULL((1)) char32_t *NOTHROW_NCX(LIBKCALL libc_wcsnend)(char32_t const *__restrict str, size_t maxlen);
 /* >> strto32_r(3), strtou32_r(3), strto64_r(3), strtou64_r(3)
  * Safely parse & return an integer from `nptr', and store any potential
- * errors in `*error' (if non-NULL). The following errors are defined:
+ * errors in `*error' (if non-NULL).  The following errors are  defined:
  *  - 0:         Success
  *  - ECANCELED: Nothing was parsed.
  *               In this case, `*endptr' is set to the original `nptr'
  *               (iow: leading spaces are _not_ skipped in `*endptr'),
  *               and the returned integer is `0'
  *  - ERANGE:    Integer over- or under-flow while parsing.
- *               In this case, `*endptr' is still updated correctly, and
- *               the returned integer is the closest representable value
+ *               In this case, `*endptr' is still updated correctly,  and
+ *               the  returned integer is the closest representable value
  *               to the integer given in `nptr' (i.e. `U?INTn_(MIN|MAX)')
  *               This error supercedes `EINVAL' if both conditions apply.
  *  - EINVAL:    Only when `endptr == NULL': The parsed number is followed
- *               by at least 1 additional non-whitespace character.
+ *               by   at  least  1  additional  non-whitespace  character.
  *               The returned integer value is not affected by this error. */
 INTDEF ATTR_LEAF NONNULL((1)) int32_t NOTHROW_NCX(LIBDCALL libd_wcsto32_r)(char16_t const *__restrict nptr, char16_t **endptr, __STDC_INT_AS_UINT_T base, errno_t *error);
 /* >> strto32_r(3), strtou32_r(3), strto64_r(3), strtou64_r(3)
  * Safely parse & return an integer from `nptr', and store any potential
- * errors in `*error' (if non-NULL). The following errors are defined:
+ * errors in `*error' (if non-NULL).  The following errors are  defined:
  *  - 0:         Success
  *  - ECANCELED: Nothing was parsed.
  *               In this case, `*endptr' is set to the original `nptr'
  *               (iow: leading spaces are _not_ skipped in `*endptr'),
  *               and the returned integer is `0'
  *  - ERANGE:    Integer over- or under-flow while parsing.
- *               In this case, `*endptr' is still updated correctly, and
- *               the returned integer is the closest representable value
+ *               In this case, `*endptr' is still updated correctly,  and
+ *               the  returned integer is the closest representable value
  *               to the integer given in `nptr' (i.e. `U?INTn_(MIN|MAX)')
  *               This error supercedes `EINVAL' if both conditions apply.
  *  - EINVAL:    Only when `endptr == NULL': The parsed number is followed
- *               by at least 1 additional non-whitespace character.
+ *               by   at  least  1  additional  non-whitespace  character.
  *               The returned integer value is not affected by this error. */
 INTDEF ATTR_LEAF NONNULL((1)) int32_t NOTHROW_NCX(LIBKCALL libc_wcsto32_r)(char32_t const *__restrict nptr, char32_t **endptr, __STDC_INT_AS_UINT_T base, errno_t *error);
 /* >> strto32_r(3), strtou32_r(3), strto64_r(3), strtou64_r(3)
  * Safely parse & return an integer from `nptr', and store any potential
- * errors in `*error' (if non-NULL). The following errors are defined:
+ * errors in `*error' (if non-NULL).  The following errors are  defined:
  *  - 0:         Success
  *  - ECANCELED: Nothing was parsed.
  *               In this case, `*endptr' is set to the original `nptr'
  *               (iow: leading spaces are _not_ skipped in `*endptr'),
  *               and the returned integer is `0'
  *  - ERANGE:    Integer over- or under-flow while parsing.
- *               In this case, `*endptr' is still updated correctly, and
- *               the returned integer is the closest representable value
+ *               In this case, `*endptr' is still updated correctly,  and
+ *               the  returned integer is the closest representable value
  *               to the integer given in `nptr' (i.e. `U?INTn_(MIN|MAX)')
  *               This error supercedes `EINVAL' if both conditions apply.
  *  - EINVAL:    Only when `endptr == NULL': The parsed number is followed
- *               by at least 1 additional non-whitespace character.
+ *               by   at  least  1  additional  non-whitespace  character.
  *               The returned integer value is not affected by this error. */
 INTDEF ATTR_LEAF NONNULL((1)) uint32_t NOTHROW_NCX(LIBDCALL libd_wcstou32_r)(char16_t const *__restrict nptr, char16_t **endptr, __STDC_INT_AS_UINT_T base, errno_t *error);
 /* >> strto32_r(3), strtou32_r(3), strto64_r(3), strtou64_r(3)
  * Safely parse & return an integer from `nptr', and store any potential
- * errors in `*error' (if non-NULL). The following errors are defined:
+ * errors in `*error' (if non-NULL).  The following errors are  defined:
  *  - 0:         Success
  *  - ECANCELED: Nothing was parsed.
  *               In this case, `*endptr' is set to the original `nptr'
  *               (iow: leading spaces are _not_ skipped in `*endptr'),
  *               and the returned integer is `0'
  *  - ERANGE:    Integer over- or under-flow while parsing.
- *               In this case, `*endptr' is still updated correctly, and
- *               the returned integer is the closest representable value
+ *               In this case, `*endptr' is still updated correctly,  and
+ *               the  returned integer is the closest representable value
  *               to the integer given in `nptr' (i.e. `U?INTn_(MIN|MAX)')
  *               This error supercedes `EINVAL' if both conditions apply.
  *  - EINVAL:    Only when `endptr == NULL': The parsed number is followed
- *               by at least 1 additional non-whitespace character.
+ *               by   at  least  1  additional  non-whitespace  character.
  *               The returned integer value is not affected by this error. */
 INTDEF ATTR_LEAF NONNULL((1)) uint32_t NOTHROW_NCX(LIBKCALL libc_wcstou32_r)(char32_t const *__restrict nptr, char32_t **endptr, __STDC_INT_AS_UINT_T base, errno_t *error);
 /* >> strto32(3), strto64(3), strtou32(3), strtou64(3)
- * Convert a string (radix=`base') from `nptr' into an integer,
- * and store a pointer to the end of the number in `*endptr'.
+ * Convert a string  (radix=`base') from `nptr'  into an  integer,
+ * and store a  pointer to  the end  of the  number in  `*endptr'.
  * If `errno(3)' support is available, integer overflow is handled
  * by setting `errno=ERANGE', and returning the greatest or lowest
- * valid integer (`U?INTn_(MIN|MAX))'. (though note that
- * `endptr' (if non-NULL) is still updated in this case!)
- * Upon success, `errno' is left unchanged, and the integer repr
- * of the parsed number is returned. When no integer was parsed,
- * then `0' is returned, `*endptr' is set to `nptr', but `errno'
+ * valid   integer   (`U?INTn_(MIN|MAX))'.   (though   note   that
+ * `endptr'  (if  non-NULL)  is  still  updated  in  this   case!)
+ * Upon success, `errno' is left  unchanged, and the integer  repr
+ * of the parsed number is  returned. When no integer was  parsed,
+ * then `0' is returned, `*endptr'  is set to `nptr', but  `errno'
  * will not have been modified.
  * @return: * :         Success: The parsed integer
  * @return: 0 :         [*endptr=nptr] error: Nothing was parsed
@@ -358,15 +358,15 @@ INTDEF ATTR_LEAF NONNULL((1)) uint32_t NOTHROW_NCX(LIBKCALL libc_wcstou32_r)(cha
  * @return: U?INTn_MAX: [errno=ERANGE] error: Value to great to represent */
 INTDEF ATTR_LEAF NONNULL((1)) int32_t NOTHROW_NCX(LIBDCALL libd_wcsto32)(char16_t const *__restrict nptr, char16_t **endptr, __STDC_INT_AS_UINT_T base);
 /* >> strto32(3), strto64(3), strtou32(3), strtou64(3)
- * Convert a string (radix=`base') from `nptr' into an integer,
- * and store a pointer to the end of the number in `*endptr'.
+ * Convert a string  (radix=`base') from `nptr'  into an  integer,
+ * and store a  pointer to  the end  of the  number in  `*endptr'.
  * If `errno(3)' support is available, integer overflow is handled
  * by setting `errno=ERANGE', and returning the greatest or lowest
- * valid integer (`U?INTn_(MIN|MAX))'. (though note that
- * `endptr' (if non-NULL) is still updated in this case!)
- * Upon success, `errno' is left unchanged, and the integer repr
- * of the parsed number is returned. When no integer was parsed,
- * then `0' is returned, `*endptr' is set to `nptr', but `errno'
+ * valid   integer   (`U?INTn_(MIN|MAX))'.   (though   note   that
+ * `endptr'  (if  non-NULL)  is  still  updated  in  this   case!)
+ * Upon success, `errno' is left  unchanged, and the integer  repr
+ * of the parsed number is  returned. When no integer was  parsed,
+ * then `0' is returned, `*endptr'  is set to `nptr', but  `errno'
  * will not have been modified.
  * @return: * :         Success: The parsed integer
  * @return: 0 :         [*endptr=nptr] error: Nothing was parsed
@@ -374,15 +374,15 @@ INTDEF ATTR_LEAF NONNULL((1)) int32_t NOTHROW_NCX(LIBDCALL libd_wcsto32)(char16_
  * @return: U?INTn_MAX: [errno=ERANGE] error: Value to great to represent */
 INTDEF ATTR_LEAF NONNULL((1)) int32_t NOTHROW_NCX(LIBKCALL libc_wcsto32)(char32_t const *__restrict nptr, char32_t **endptr, __STDC_INT_AS_UINT_T base);
 /* >> strto32(3), strto64(3), strtou32(3), strtou64(3)
- * Convert a string (radix=`base') from `nptr' into an integer,
- * and store a pointer to the end of the number in `*endptr'.
+ * Convert a string  (radix=`base') from `nptr'  into an  integer,
+ * and store a  pointer to  the end  of the  number in  `*endptr'.
  * If `errno(3)' support is available, integer overflow is handled
  * by setting `errno=ERANGE', and returning the greatest or lowest
- * valid integer (`U?INTn_(MIN|MAX))'. (though note that
- * `endptr' (if non-NULL) is still updated in this case!)
- * Upon success, `errno' is left unchanged, and the integer repr
- * of the parsed number is returned. When no integer was parsed,
- * then `0' is returned, `*endptr' is set to `nptr', but `errno'
+ * valid   integer   (`U?INTn_(MIN|MAX))'.   (though   note   that
+ * `endptr'  (if  non-NULL)  is  still  updated  in  this   case!)
+ * Upon success, `errno' is left  unchanged, and the integer  repr
+ * of the parsed number is  returned. When no integer was  parsed,
+ * then `0' is returned, `*endptr'  is set to `nptr', but  `errno'
  * will not have been modified.
  * @return: * :         Success: The parsed integer
  * @return: 0 :         [*endptr=nptr] error: Nothing was parsed
@@ -390,15 +390,15 @@ INTDEF ATTR_LEAF NONNULL((1)) int32_t NOTHROW_NCX(LIBKCALL libc_wcsto32)(char32_
  * @return: U?INTn_MAX: [errno=ERANGE] error: Value to great to represent */
 INTDEF ATTR_LEAF NONNULL((1)) uint32_t NOTHROW_NCX(LIBDCALL libd_wcstou32)(char16_t const *__restrict nptr, char16_t **endptr, __STDC_INT_AS_UINT_T base);
 /* >> strto32(3), strto64(3), strtou32(3), strtou64(3)
- * Convert a string (radix=`base') from `nptr' into an integer,
- * and store a pointer to the end of the number in `*endptr'.
+ * Convert a string  (radix=`base') from `nptr'  into an  integer,
+ * and store a  pointer to  the end  of the  number in  `*endptr'.
  * If `errno(3)' support is available, integer overflow is handled
  * by setting `errno=ERANGE', and returning the greatest or lowest
- * valid integer (`U?INTn_(MIN|MAX))'. (though note that
- * `endptr' (if non-NULL) is still updated in this case!)
- * Upon success, `errno' is left unchanged, and the integer repr
- * of the parsed number is returned. When no integer was parsed,
- * then `0' is returned, `*endptr' is set to `nptr', but `errno'
+ * valid   integer   (`U?INTn_(MIN|MAX))'.   (though   note   that
+ * `endptr'  (if  non-NULL)  is  still  updated  in  this   case!)
+ * Upon success, `errno' is left  unchanged, and the integer  repr
+ * of the parsed number is  returned. When no integer was  parsed,
+ * then `0' is returned, `*endptr'  is set to `nptr', but  `errno'
  * will not have been modified.
  * @return: * :         Success: The parsed integer
  * @return: 0 :         [*endptr=nptr] error: Nothing was parsed
@@ -407,82 +407,82 @@ INTDEF ATTR_LEAF NONNULL((1)) uint32_t NOTHROW_NCX(LIBDCALL libd_wcstou32)(char1
 INTDEF ATTR_LEAF NONNULL((1)) uint32_t NOTHROW_NCX(LIBKCALL libc_wcstou32)(char32_t const *__restrict nptr, char32_t **endptr, __STDC_INT_AS_UINT_T base);
 /* >> strto32_r(3), strtou32_r(3), strto64_r(3), strtou64_r(3)
  * Safely parse & return an integer from `nptr', and store any potential
- * errors in `*error' (if non-NULL). The following errors are defined:
+ * errors in `*error' (if non-NULL).  The following errors are  defined:
  *  - 0:         Success
  *  - ECANCELED: Nothing was parsed.
  *               In this case, `*endptr' is set to the original `nptr'
  *               (iow: leading spaces are _not_ skipped in `*endptr'),
  *               and the returned integer is `0'
  *  - ERANGE:    Integer over- or under-flow while parsing.
- *               In this case, `*endptr' is still updated correctly, and
- *               the returned integer is the closest representable value
+ *               In this case, `*endptr' is still updated correctly,  and
+ *               the  returned integer is the closest representable value
  *               to the integer given in `nptr' (i.e. `U?INTn_(MIN|MAX)')
  *               This error supercedes `EINVAL' if both conditions apply.
  *  - EINVAL:    Only when `endptr == NULL': The parsed number is followed
- *               by at least 1 additional non-whitespace character.
+ *               by   at  least  1  additional  non-whitespace  character.
  *               The returned integer value is not affected by this error. */
 INTDEF ATTR_LEAF NONNULL((1)) int64_t NOTHROW_NCX(LIBDCALL libd_wcsto64_r)(char16_t const *__restrict nptr, char16_t **endptr, __STDC_INT_AS_UINT_T base, errno_t *error);
 /* >> strto32_r(3), strtou32_r(3), strto64_r(3), strtou64_r(3)
  * Safely parse & return an integer from `nptr', and store any potential
- * errors in `*error' (if non-NULL). The following errors are defined:
+ * errors in `*error' (if non-NULL).  The following errors are  defined:
  *  - 0:         Success
  *  - ECANCELED: Nothing was parsed.
  *               In this case, `*endptr' is set to the original `nptr'
  *               (iow: leading spaces are _not_ skipped in `*endptr'),
  *               and the returned integer is `0'
  *  - ERANGE:    Integer over- or under-flow while parsing.
- *               In this case, `*endptr' is still updated correctly, and
- *               the returned integer is the closest representable value
+ *               In this case, `*endptr' is still updated correctly,  and
+ *               the  returned integer is the closest representable value
  *               to the integer given in `nptr' (i.e. `U?INTn_(MIN|MAX)')
  *               This error supercedes `EINVAL' if both conditions apply.
  *  - EINVAL:    Only when `endptr == NULL': The parsed number is followed
- *               by at least 1 additional non-whitespace character.
+ *               by   at  least  1  additional  non-whitespace  character.
  *               The returned integer value is not affected by this error. */
 INTDEF ATTR_LEAF NONNULL((1)) int64_t NOTHROW_NCX(LIBKCALL libc_wcsto64_r)(char32_t const *__restrict nptr, char32_t **endptr, __STDC_INT_AS_UINT_T base, errno_t *error);
 /* >> strto32_r(3), strtou32_r(3), strto64_r(3), strtou64_r(3)
  * Safely parse & return an integer from `nptr', and store any potential
- * errors in `*error' (if non-NULL). The following errors are defined:
+ * errors in `*error' (if non-NULL).  The following errors are  defined:
  *  - 0:         Success
  *  - ECANCELED: Nothing was parsed.
  *               In this case, `*endptr' is set to the original `nptr'
  *               (iow: leading spaces are _not_ skipped in `*endptr'),
  *               and the returned integer is `0'
  *  - ERANGE:    Integer over- or under-flow while parsing.
- *               In this case, `*endptr' is still updated correctly, and
- *               the returned integer is the closest representable value
+ *               In this case, `*endptr' is still updated correctly,  and
+ *               the  returned integer is the closest representable value
  *               to the integer given in `nptr' (i.e. `U?INTn_(MIN|MAX)')
  *               This error supercedes `EINVAL' if both conditions apply.
  *  - EINVAL:    Only when `endptr == NULL': The parsed number is followed
- *               by at least 1 additional non-whitespace character.
+ *               by   at  least  1  additional  non-whitespace  character.
  *               The returned integer value is not affected by this error. */
 INTDEF ATTR_LEAF NONNULL((1)) uint64_t NOTHROW_NCX(LIBDCALL libd_wcstou64_r)(char16_t const *__restrict nptr, char16_t **endptr, __STDC_INT_AS_UINT_T base, errno_t *error);
 /* >> strto32_r(3), strtou32_r(3), strto64_r(3), strtou64_r(3)
  * Safely parse & return an integer from `nptr', and store any potential
- * errors in `*error' (if non-NULL). The following errors are defined:
+ * errors in `*error' (if non-NULL).  The following errors are  defined:
  *  - 0:         Success
  *  - ECANCELED: Nothing was parsed.
  *               In this case, `*endptr' is set to the original `nptr'
  *               (iow: leading spaces are _not_ skipped in `*endptr'),
  *               and the returned integer is `0'
  *  - ERANGE:    Integer over- or under-flow while parsing.
- *               In this case, `*endptr' is still updated correctly, and
- *               the returned integer is the closest representable value
+ *               In this case, `*endptr' is still updated correctly,  and
+ *               the  returned integer is the closest representable value
  *               to the integer given in `nptr' (i.e. `U?INTn_(MIN|MAX)')
  *               This error supercedes `EINVAL' if both conditions apply.
  *  - EINVAL:    Only when `endptr == NULL': The parsed number is followed
- *               by at least 1 additional non-whitespace character.
+ *               by   at  least  1  additional  non-whitespace  character.
  *               The returned integer value is not affected by this error. */
 INTDEF ATTR_LEAF NONNULL((1)) uint64_t NOTHROW_NCX(LIBKCALL libc_wcstou64_r)(char32_t const *__restrict nptr, char32_t **endptr, __STDC_INT_AS_UINT_T base, errno_t *error);
 /* >> strto32(3), strto64(3), strtou32(3), strtou64(3)
- * Convert a string (radix=`base') from `nptr' into an integer,
- * and store a pointer to the end of the number in `*endptr'.
+ * Convert a string  (radix=`base') from `nptr'  into an  integer,
+ * and store a  pointer to  the end  of the  number in  `*endptr'.
  * If `errno(3)' support is available, integer overflow is handled
  * by setting `errno=ERANGE', and returning the greatest or lowest
- * valid integer (`U?INTn_(MIN|MAX))'. (though note that
- * `endptr' (if non-NULL) is still updated in this case!)
- * Upon success, `errno' is left unchanged, and the integer repr
- * of the parsed number is returned. When no integer was parsed,
- * then `0' is returned, `*endptr' is set to `nptr', but `errno'
+ * valid   integer   (`U?INTn_(MIN|MAX))'.   (though   note   that
+ * `endptr'  (if  non-NULL)  is  still  updated  in  this   case!)
+ * Upon success, `errno' is left  unchanged, and the integer  repr
+ * of the parsed number is  returned. When no integer was  parsed,
+ * then `0' is returned, `*endptr'  is set to `nptr', but  `errno'
  * will not have been modified.
  * @return: * :         Success: The parsed integer
  * @return: 0 :         [*endptr=nptr] error: Nothing was parsed
@@ -490,15 +490,15 @@ INTDEF ATTR_LEAF NONNULL((1)) uint64_t NOTHROW_NCX(LIBKCALL libc_wcstou64_r)(cha
  * @return: U?INTn_MAX: [errno=ERANGE] error: Value to great to represent */
 INTDEF ATTR_LEAF NONNULL((1)) uint64_t NOTHROW_NCX(LIBDCALL libd_wcstou64)(char16_t const *__restrict nptr, char16_t **endptr, __STDC_INT_AS_UINT_T base);
 /* >> strto32(3), strto64(3), strtou32(3), strtou64(3)
- * Convert a string (radix=`base') from `nptr' into an integer,
- * and store a pointer to the end of the number in `*endptr'.
+ * Convert a string  (radix=`base') from `nptr'  into an  integer,
+ * and store a  pointer to  the end  of the  number in  `*endptr'.
  * If `errno(3)' support is available, integer overflow is handled
  * by setting `errno=ERANGE', and returning the greatest or lowest
- * valid integer (`U?INTn_(MIN|MAX))'. (though note that
- * `endptr' (if non-NULL) is still updated in this case!)
- * Upon success, `errno' is left unchanged, and the integer repr
- * of the parsed number is returned. When no integer was parsed,
- * then `0' is returned, `*endptr' is set to `nptr', but `errno'
+ * valid   integer   (`U?INTn_(MIN|MAX))'.   (though   note   that
+ * `endptr'  (if  non-NULL)  is  still  updated  in  this   case!)
+ * Upon success, `errno' is left  unchanged, and the integer  repr
+ * of the parsed number is  returned. When no integer was  parsed,
+ * then `0' is returned, `*endptr'  is set to `nptr', but  `errno'
  * will not have been modified.
  * @return: * :         Success: The parsed integer
  * @return: 0 :         [*endptr=nptr] error: Nothing was parsed
@@ -506,15 +506,15 @@ INTDEF ATTR_LEAF NONNULL((1)) uint64_t NOTHROW_NCX(LIBDCALL libd_wcstou64)(char1
  * @return: U?INTn_MAX: [errno=ERANGE] error: Value to great to represent */
 INTDEF ATTR_LEAF NONNULL((1)) uint64_t NOTHROW_NCX(LIBKCALL libc_wcstou64)(char32_t const *__restrict nptr, char32_t **endptr, __STDC_INT_AS_UINT_T base);
 /* >> strto32(3), strto64(3), strtou32(3), strtou64(3)
- * Convert a string (radix=`base') from `nptr' into an integer,
- * and store a pointer to the end of the number in `*endptr'.
+ * Convert a string  (radix=`base') from `nptr'  into an  integer,
+ * and store a  pointer to  the end  of the  number in  `*endptr'.
  * If `errno(3)' support is available, integer overflow is handled
  * by setting `errno=ERANGE', and returning the greatest or lowest
- * valid integer (`U?INTn_(MIN|MAX))'. (though note that
- * `endptr' (if non-NULL) is still updated in this case!)
- * Upon success, `errno' is left unchanged, and the integer repr
- * of the parsed number is returned. When no integer was parsed,
- * then `0' is returned, `*endptr' is set to `nptr', but `errno'
+ * valid   integer   (`U?INTn_(MIN|MAX))'.   (though   note   that
+ * `endptr'  (if  non-NULL)  is  still  updated  in  this   case!)
+ * Upon success, `errno' is left  unchanged, and the integer  repr
+ * of the parsed number is  returned. When no integer was  parsed,
+ * then `0' is returned, `*endptr'  is set to `nptr', but  `errno'
  * will not have been modified.
  * @return: * :         Success: The parsed integer
  * @return: 0 :         [*endptr=nptr] error: Nothing was parsed
@@ -522,15 +522,15 @@ INTDEF ATTR_LEAF NONNULL((1)) uint64_t NOTHROW_NCX(LIBKCALL libc_wcstou64)(char3
  * @return: U?INTn_MAX: [errno=ERANGE] error: Value to great to represent */
 INTDEF ATTR_LEAF NONNULL((1)) int64_t NOTHROW_NCX(LIBDCALL libd_wcsto64)(char16_t const *__restrict nptr, char16_t **endptr, __STDC_INT_AS_UINT_T base);
 /* >> strto32(3), strto64(3), strtou32(3), strtou64(3)
- * Convert a string (radix=`base') from `nptr' into an integer,
- * and store a pointer to the end of the number in `*endptr'.
+ * Convert a string  (radix=`base') from `nptr'  into an  integer,
+ * and store a  pointer to  the end  of the  number in  `*endptr'.
  * If `errno(3)' support is available, integer overflow is handled
  * by setting `errno=ERANGE', and returning the greatest or lowest
- * valid integer (`U?INTn_(MIN|MAX))'. (though note that
- * `endptr' (if non-NULL) is still updated in this case!)
- * Upon success, `errno' is left unchanged, and the integer repr
- * of the parsed number is returned. When no integer was parsed,
- * then `0' is returned, `*endptr' is set to `nptr', but `errno'
+ * valid   integer   (`U?INTn_(MIN|MAX))'.   (though   note   that
+ * `endptr'  (if  non-NULL)  is  still  updated  in  this   case!)
+ * Upon success, `errno' is left  unchanged, and the integer  repr
+ * of the parsed number is  returned. When no integer was  parsed,
+ * then `0' is returned, `*endptr'  is set to `nptr', but  `errno'
  * will not have been modified.
  * @return: * :         Success: The parsed integer
  * @return: 0 :         [*endptr=nptr] error: Nothing was parsed

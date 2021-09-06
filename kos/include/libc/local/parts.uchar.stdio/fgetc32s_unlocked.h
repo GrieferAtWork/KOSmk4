@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x94a4b7b */
+/* HASH CRC-32:0x2b3ff4cd */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -26,30 +26,20 @@
 #include <hybrid/typecore.h>
 #include <kos/anno.h>
 __NAMESPACE_LOCAL_BEGIN
-/* Dependency: ferror_unlocked from stdio */
 #ifndef __local___localdep_ferror_unlocked_defined
 #define __local___localdep_ferror_unlocked_defined 1
 #if defined(__CRT_HAVE_ferror_unlocked) && defined(__USE_STDIO_UNLOCKED)
-/* >> ferror_unlocked(3)
- * Same as `ferror()', but performs I/O without acquiring a lock to `stream' */
 __CREDIRECT(__ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1)),int,__NOTHROW_NCX,__localdep_ferror_unlocked,(__FILE __KOS_FIXED_CONST *__restrict __stream),ferror_unlocked,(__stream))
 #elif defined(__CRT_HAVE_ferror)
-/* >> ferror_unlocked(3)
- * Same as `ferror()', but performs I/O without acquiring a lock to `stream' */
 __CREDIRECT(__ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1)),int,__NOTHROW_NCX,__localdep_ferror_unlocked,(__FILE __KOS_FIXED_CONST *__restrict __stream),ferror,(__stream))
 #elif defined(__CRT_HAVE__IO_ferror)
-/* >> ferror_unlocked(3)
- * Same as `ferror()', but performs I/O without acquiring a lock to `stream' */
 __CREDIRECT(__ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1)),int,__NOTHROW_NCX,__localdep_ferror_unlocked,(__FILE __KOS_FIXED_CONST *__restrict __stream),_IO_ferror,(__stream))
 #elif defined(__CRT_HAVE_ferror_unlocked)
-/* >> ferror_unlocked(3)
- * Same as `ferror()', but performs I/O without acquiring a lock to `stream' */
 __CREDIRECT(__ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1)),int,__NOTHROW_NCX,__localdep_ferror_unlocked,(__FILE __KOS_FIXED_CONST *__restrict __stream),ferror_unlocked,(__stream))
 #else /* ... */
 #undef __local___localdep_ferror_unlocked_defined
 #endif /* !... */
 #endif /* !__local___localdep_ferror_unlocked_defined */
-/* Dependency: fgetc32_unlocked from parts.uchar.stdio */
 #ifndef __local___localdep_fgetc32_unlocked_defined
 #define __local___localdep_fgetc32_unlocked_defined 1
 #if defined(__CRT_HAVE_fgetwc_unlocked) && __SIZEOF_WCHAR_T__ == 4 && defined(__LIBCCALL_IS_LIBKCALL)
@@ -64,7 +54,6 @@ __CREDIRECT_KOS(__ATTR_NONNULL((1)),__WINT_TYPE__,__THROWING,__localdep_fgetc32_
 #undef __local___localdep_fgetc32_unlocked_defined
 #endif /* !... */
 #endif /* !__local___localdep_fgetc32_unlocked_defined */
-/* Dependency: ungetc32_unlocked from parts.uchar.stdio */
 #ifndef __local___localdep_ungetc32_unlocked_defined
 #define __local___localdep_ungetc32_unlocked_defined 1
 #if defined(__CRT_HAVE_ungetwc_unlocked) && __SIZEOF_WCHAR_T__ == 4 && defined(__LIBCCALL_IS_LIBKCALL)

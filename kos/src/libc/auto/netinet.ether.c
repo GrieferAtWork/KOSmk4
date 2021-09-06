@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xe36d40f0 */
+/* HASH CRC-32:0xf4dd023d */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -53,7 +53,7 @@ NOTHROW_NCX(LIBCCALL libc_ether_ntoa_r)(struct ether_addr const *__restrict addr
 	return buf;
 }
 #include <net/ethernet.h>
-/* To the reverse of `ether_ntoa()' and convert
+/* To   the   reverse  of   `ether_ntoa()'   and  convert
  * a `AA:BB:CC:DD:EE:FF'-string into an ethernet address. */
 INTERN ATTR_SECTION(".text.crt.net.ether") ATTR_RETNONNULL WUNUSED NONNULL((1)) struct ether_addr *
 NOTHROW_NCX(LIBCCALL libc_ether_aton)(char const *__restrict asc) {
@@ -61,7 +61,7 @@ NOTHROW_NCX(LIBCCALL libc_ether_aton)(char const *__restrict asc) {
 	return libc_ether_aton_r(asc, &addr);
 }
 #include <net/ethernet.h>
-/* To the reverse of `ether_ntoa()' and convert
+/* To   the   reverse  of   `ether_ntoa()'   and  convert
  * a `AA:BB:CC:DD:EE:FF'-string into an ethernet address. */
 INTERN ATTR_SECTION(".text.crt.net.ether") WUNUSED NONNULL((1, 2)) struct ether_addr *
 NOTHROW_NCX(LIBCCALL libc_ether_aton_r)(char const *__restrict asc,
@@ -69,7 +69,7 @@ NOTHROW_NCX(LIBCCALL libc_ether_aton_r)(char const *__restrict asc,
 	return libc_ether_paton_r((char const **)&asc, addr);
 }
 #include <net/ethernet.h>
-/* To the reverse of `ether_ntoa()' and convert
+/* To   the   reverse  of   `ether_ntoa()'   and  convert
  * a `AA:BB:CC:DD:EE:FF'-string into an ethernet address. */
 INTERN ATTR_SECTION(".text.crt.net.ether") WUNUSED NONNULL((1, 2)) struct ether_addr *
 NOTHROW_NCX(LIBCCALL libc_ether_paton_r)(char const **__restrict pasc,
@@ -116,11 +116,11 @@ NOTHROW_NCX(LIBCCALL libc_ether_paton_r)(char const **__restrict pasc,
 	return addr;
 }
 #include <net/ethernet.h>
-/* Scan a given `line', as read from `/etc/ethers' for
- * its `addr' and `hostname' parts. For this purpose, the given
+/* Scan  a  given  `line',   as  read  from  `/etc/ethers'   for
+ * its `addr' and `hostname' parts. For this purpose, the  given
  * `line' must be formatted as `AA:BB:CC:DD:EE:FF  hostname  \n'
  * @return: 0 : Success
- * @return: -1: Failed to parse the `addr'-portion
+ * @return: -1: Failed to parse the  `addr'-portion
  *              (`ether_paton_r()' returned `NULL') */
 INTERN ATTR_SECTION(".text.crt.net.ether") WUNUSED NONNULL((1, 2, 3)) int
 NOTHROW_NCX(LIBCCALL libc_ether_line)(char const *line,

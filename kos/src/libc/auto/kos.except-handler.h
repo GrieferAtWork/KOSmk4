@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x8daa44de */
+/* HASH CRC-32:0x3579ea95 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -38,7 +38,7 @@ DECL_BEGIN
  *     Set mode #3: set_exception_handler(EXCEPT_HANDLER_MODE_SIGHAND | EXCEPT_HANDLER_FLAG_SETHANDLER, &except_handler3, NULL)
  *     Set mode #4: set_exception_handler(EXCEPT_HANDLER_MODE_SIGHAND | EXCEPT_HANDLER_FLAG_SETHANDLER, &except_handler4, NULL)
  * WARNING: Many system libraries assume that either mode #3 or #4 is enabled,
- *          as other modes may not allow for exceptions such as E_SEGFAULT to
+ *          as other modes may not allow for exceptions such as E_SEGFAULT  to
  *          be handled using the TRY-EXCEPT model.
  *          Examples for these include: `libinstrlen:instruction_trysucc()'
  * @param: mode:       One of `EXCEPT_HANDLER_MODE_*', optionally or'd with `EXCEPT_HANDLER_FLAG_*'

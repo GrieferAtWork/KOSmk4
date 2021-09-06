@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xd083cde1 */
+/* HASH CRC-32:0x2d5d8fca */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -24,7 +24,6 @@
 #ifdef __CRT_HAVE___p__wpgmptr
 #include <bits/types.h>
 __NAMESPACE_LOCAL_BEGIN
-/* Dependency: __p__wpgmptr from stdlib */
 #ifndef __local___localdep___p__wpgmptr_defined
 #define __local___localdep___p__wpgmptr_defined 1
 __CREDIRECT(__ATTR_CONST __ATTR_RETNONNULL __ATTR_WUNUSED,__WCHAR_TYPE__ **,__NOTHROW_NCX,__localdep___p__wpgmptr,(void),__p__wpgmptr,())

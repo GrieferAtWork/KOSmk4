@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x54a734a5 */
+/* HASH CRC-32:0x7f355cc4 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -24,27 +24,17 @@
 #ifdef __CRT_HAVE_pthread_detach
 #include <bits/crt/threads.h>
 __NAMESPACE_LOCAL_BEGIN
-/* Dependency: pthread_detach from pthread */
 #ifndef __local___localdep_pthread_detach_defined
 #define __local___localdep_pthread_detach_defined 1
 __NAMESPACE_LOCAL_END
 #include <bits/types.h>
 #include <bits/crt/pthreadtypes.h>
 __NAMESPACE_LOCAL_BEGIN
-/* >> pthread_detach(3)
- * Indicate that the thread `pthread' is never to be joined with `pthread_join(3)'.
- * The resources of `pthread' will therefore be freed immediately when it
- * terminates, instead of waiting for another thread to perform `pthread_join(3)' on it
- * @return: EOK: Success */
 __CREDIRECT(,__errno_t,__NOTHROW_NCX,__localdep_pthread_detach,(__pthread_t __pthread),pthread_detach,(__pthread))
 #endif /* !__local___localdep_pthread_detach_defined */
 __NAMESPACE_LOCAL_END
 #include <asm/crt/threads.h>
 __NAMESPACE_LOCAL_BEGIN
-/* >> thrd_detach(3)
- * Detach the given thread (s.a. `pthread_detach(3)')
- * @return: thrd_success: Success
- * @return: thrd_error:   Error */
 __LOCAL_LIBC(thrd_detach) int
 __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(thrd_detach))(__thrd_t __thr) {
 	__errno_t __error;

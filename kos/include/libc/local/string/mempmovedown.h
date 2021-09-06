@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x90dbbc12 */
+/* HASH CRC-32:0x660b2f5d */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -23,27 +23,19 @@
 #include <__crt.h>
 #include <hybrid/typecore.h>
 __NAMESPACE_LOCAL_BEGIN
-/* Dependency: memmovedown from string */
 #ifndef __local___localdep_memmovedown_defined
 #define __local___localdep_memmovedown_defined 1
 #ifdef __CRT_HAVE_memmovedown
-/* Move memory between potentially overlapping memory blocks (assumes that `dst <= src || !n_bytes')
- * @return: * : Always re-returns `dst' */
 __CREDIRECT(__ATTR_LEAF __ATTR_RETNONNULL __ATTR_NONNULL((1, 2)),void *,__NOTHROW_NCX,__localdep_memmovedown,(void *__dst, void const *__src, __SIZE_TYPE__ __n_bytes),memmovedown,(__dst,__src,__n_bytes))
 #elif defined(__CRT_HAVE_memmove)
-/* Move memory between potentially overlapping memory blocks (assumes that `dst <= src || !n_bytes')
- * @return: * : Always re-returns `dst' */
 __CREDIRECT(__ATTR_LEAF __ATTR_RETNONNULL __ATTR_NONNULL((1, 2)),void *,__NOTHROW_NCX,__localdep_memmovedown,(void *__dst, void const *__src, __SIZE_TYPE__ __n_bytes),memmove,(__dst,__src,__n_bytes))
 #else /* ... */
 __NAMESPACE_LOCAL_END
 #include <libc/local/string/memmovedown.h>
 __NAMESPACE_LOCAL_BEGIN
-/* Move memory between potentially overlapping memory blocks (assumes that `dst <= src || !n_bytes')
- * @return: * : Always re-returns `dst' */
 #define __localdep_memmovedown __LIBC_LOCAL_NAME(memmovedown)
 #endif /* !... */
 #endif /* !__local___localdep_memmovedown_defined */
-/* Same as `memmovedown', but return `dst + n_bytes', rather than `dst' (assumes that `dst <= src || !n_bytes') */
 __LOCAL_LIBC(mempmovedown) __ATTR_LEAF __ATTR_RETNONNULL __ATTR_NONNULL((1, 2)) void *
 __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(mempmovedown))(void *__dst, void const *__src, __SIZE_TYPE__ __n_bytes) {
 	return (void *)((__BYTE_TYPE__ *)__localdep_memmovedown(__dst, __src, __n_bytes) + __n_bytes);

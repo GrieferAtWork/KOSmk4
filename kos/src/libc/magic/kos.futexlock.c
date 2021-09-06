@@ -54,12 +54,12 @@ $ssize_t lfutexlock32([[nonnull]] lfutex_t *ulockaddr, [[nonnull]] lfutex_t *uad
                       /*struct timespec const *timeout, lfutex_t val2*/...);
 
 @@>> lfutexlock(3)
-@@Helper function to implement the behavior of `lfutexlockexpr()' for only a single futex.
-@@This function behaves identical to the lfutex() system call, except that it takes
+@@Helper  function to implement the behavior of  `lfutexlockexpr()' for only a single futex.
+@@This function  behaves  identical  to the  lfutex()  system  call, except  that  it  takes
 @@two futex addresses, where `ulockaddr' is used with `LFUTEX_WAIT_LOCK_WAITERS' to cache if
-@@there are threads that may be waiting to be awoken once `LFUTEX_WAKE' is invoked on that
-@@memory location (aka. `futexlock_wakeall(ulockaddr)'), whilst the other futex address
-@@(i.e. `uaddr') is used for the wait-while-condition checking, the same way those checks
+@@there  are threads that may be waiting to  be awoken once `LFUTEX_WAKE' is invoked on that
+@@memory location  (aka. `futexlock_wakeall(ulockaddr)'),  whilst  the other  futex  address
+@@(i.e. `uaddr') is used  for the wait-while-condition checking,  the same way those  checks
 @@would also be performed by the `lfutex() system call'
 @@@param: futex_op: One of:
 @@   - LFUTEX_NOP:                (lfutex_t *ulockaddr, lfutex_t *uaddr, syscall_ulong_t LFUTEX_NOP, size_t val = ignored)

@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x81595f55 */
+/* HASH CRC-32:0xb4b0e657 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -23,26 +23,16 @@
 #include <__crt.h>
 #include <hybrid/typecore.h>
 __NAMESPACE_LOCAL_BEGIN
-/* Dependency: strncat from string */
 #ifndef __local___localdep_strncat_defined
 #define __local___localdep_strncat_defined 1
 #if __has_builtin(__builtin_strncat) && defined(__LIBC_BIND_CRTBUILTINS) && defined(__CRT_HAVE_strncat)
-/* >> strncat(3)
- * Copy at most max_srclen (or rather: exactly `strnlen(src, max_srclen)')
- * characters to `strend(buf)', and always re-return `buf'. */
 __CEIREDIRECT(__ATTR_LEAF __ATTR_RETNONNULL __ATTR_NONNULL((1, 2)),char *,__NOTHROW_NCX,__localdep_strncat,(char *__restrict __buf, char const *__restrict __src, __SIZE_TYPE__ __max_srclen),strncat,{ return __builtin_strncat(__buf, __src, __max_srclen); })
 #elif defined(__CRT_HAVE_strncat)
-/* >> strncat(3)
- * Copy at most max_srclen (or rather: exactly `strnlen(src, max_srclen)')
- * characters to `strend(buf)', and always re-return `buf'. */
 __CREDIRECT(__ATTR_LEAF __ATTR_RETNONNULL __ATTR_NONNULL((1, 2)),char *,__NOTHROW_NCX,__localdep_strncat,(char *__restrict __buf, char const *__restrict __src, __SIZE_TYPE__ __max_srclen),strncat,(__buf,__src,__max_srclen))
 #else /* ... */
 __NAMESPACE_LOCAL_END
 #include <libc/local/string/strncat.h>
 __NAMESPACE_LOCAL_BEGIN
-/* >> strncat(3)
- * Copy at most max_srclen (or rather: exactly `strnlen(src, max_srclen)')
- * characters to `strend(buf)', and always re-return `buf'. */
 #define __localdep_strncat __LIBC_LOCAL_NAME(strncat)
 #endif /* !... */
 #endif /* !__local___localdep_strncat_defined */

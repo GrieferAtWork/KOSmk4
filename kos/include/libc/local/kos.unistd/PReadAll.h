@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x5a79619a */
+/* HASH CRC-32:0xb65070b0 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -25,35 +25,25 @@
 #include <kos/anno.h>
 #include <bits/types.h>
 __NAMESPACE_LOCAL_BEGIN
-/* Dependency: PReadAll32 from kos.unistd */
 #if !defined(__local___localdep_PReadAll32_defined) && defined(__CRT_HAVE_PReadAll)
 #define __local___localdep_PReadAll32_defined 1
 __CREDIRECT(__ATTR_NONNULL((2)),__SIZE_TYPE__,__THROWING,__localdep_PReadAll32,(__fd_t __fd, void *__buf, __SIZE_TYPE__ __bufsize, __pos32_t __offset),PReadAll,(__fd,__buf,__bufsize,__offset))
 #endif /* !__local___localdep_PReadAll32_defined && __CRT_HAVE_PReadAll */
-/* Dependency: PReadAll64 from kos.unistd */
 #ifndef __local___localdep_PReadAll64_defined
 #define __local___localdep_PReadAll64_defined 1
 #ifdef __CRT_HAVE_PReadAll64
-/* >> preadall64(3)
- * Same as `readall(3)', but using `pread64(2)' instead of `read()' */
 __CREDIRECT(__ATTR_NONNULL((2)),__SIZE_TYPE__,__THROWING,__localdep_PReadAll64,(__fd_t __fd, void *__buf, __SIZE_TYPE__ __bufsize, __pos64_t __offset),PReadAll64,(__fd,__buf,__bufsize,__offset))
 #elif defined(__CRT_HAVE_PReadAll) && __SIZEOF_OFF32_T__ == __SIZEOF_OFF64_T__
-/* >> preadall64(3)
- * Same as `readall(3)', but using `pread64(2)' instead of `read()' */
 __CREDIRECT(__ATTR_NONNULL((2)),__SIZE_TYPE__,__THROWING,__localdep_PReadAll64,(__fd_t __fd, void *__buf, __SIZE_TYPE__ __bufsize, __pos64_t __offset),PReadAll,(__fd,__buf,__bufsize,__offset))
 #elif defined(__CRT_HAVE_PRead64) || defined(__CRT_HAVE_PRead)
 __NAMESPACE_LOCAL_END
 #include <libc/local/kos.unistd/PReadAll64.h>
 __NAMESPACE_LOCAL_BEGIN
-/* >> preadall64(3)
- * Same as `readall(3)', but using `pread64(2)' instead of `read()' */
 #define __localdep_PReadAll64 __LIBC_LOCAL_NAME(PReadAll64)
 #else /* ... */
 #undef __local___localdep_PReadAll64_defined
 #endif /* !... */
 #endif /* !__local___localdep_PReadAll64_defined */
-/* >> preadall(3)
- * Same as `readall(3)', but using `pread(2)' instead of `read()' */
 __LOCAL_LIBC(PReadAll) __ATTR_NONNULL((2)) __SIZE_TYPE__
 (__LIBCCALL __LIBC_LOCAL_NAME(PReadAll))(__fd_t __fd, void *__buf, __SIZE_TYPE__ __bufsize, __FS_TYPE(pos) __offset) __THROWS(...) {
 #ifdef __CRT_HAVE_PReadAll

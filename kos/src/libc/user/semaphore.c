@@ -70,13 +70,13 @@ STATIC_ASSERT(sizeof(sem_t) <= __SIZEOF_SEM_T);
 
 
 
-/*[[[head:libc_sem_init,hash:CRC-32=0x634e9c4a]]]*/
+/*[[[head:libc_sem_init,hash:CRC-32=0x9df0c86f]]]*/
 /* >> sem_init(3)
  * Initialize the given semaphore `sem' to start out with `value' tickets
  * @param: sem:     The semaphore to initialize
- * @param: pshared: When non-zero, `sem' may point to a memory region shared
+ * @param: pshared: When  non-zero, `sem'  may point  to a  memory region shared
  *                  with another process, such that both caller, and any process
- *                  the pointed-to memory is shared with can safely operate on
+ *                  the pointed-to memory is shared  with can safely operate  on
  *                  the same semaphore.
  * @param: value:   The initial # of tickets available.
  * @return: 0:      Success
@@ -128,23 +128,23 @@ char const named_prefix[] = "/dev/shm/sem.";
 #define NAMED_PREFIX_OFFSETOF_SEM COMPILER_STRLEN("/dev/shm/")
 
 
-/*[[[head:libc_sem_open,hash:CRC-32=0x9fbe0f5]]]*/
+/*[[[head:libc_sem_open,hash:CRC-32=0x3ad38857]]]*/
 /* >> sem_open(3)
  * Open a named semaphore `name', which must be string that starts with `/'
- * NOTE: When called multiple times with identical strings for `name',
+ * NOTE: When called multiple times with identical strings for  `name',
  *       the behavior of this function differs between implementations:
  *       #ifdef __ARCH_HAVE_NON_UNIQUE_SEM_OPEN
- *          The returned pointer is allowed to be unique and different from
+ *          The  returned pointer is  allowed to be  unique and different from
  *          any previously returned semaphore, but the backing physical memory
  *          will be shared with other semaphores with the same name.
  *       #else // __ARCH_HAVE_NON_UNIQUE_SEM_OPEN
- *          The returned pointer may be identical to a pointer previously
+ *          The returned pointer  may be identical  to a pointer  previously
  *          returned for the same semaphore. In this case, `sem_close()' may
- *          only have to be called once to close all open handles for the
+ *          only have to be  called once to close  all open handles for  the
  *          semaphore
  *       #endif // !__ARCH_HAVE_NON_UNIQUE_SEM_OPEN
  * @param: oflags:      Set of `0 | O_CREAT | O_EXCL' (When `O_CREAT' is given, this functions
- *                      takes 2 additional arguments `..., mode_t mode, unsigned int value')
+ *                      takes 2  additional arguments  `..., mode_t mode, unsigned int value')
  * @return: * :         A pointer to the opened semaphore, which must be closed by `sem_close(3)'
  * @return: SEM_FAILED: [errno=EINVAL] The given `name' contains no characters after the initial `/'
  * @return: SEM_FAILED: Error (s.a. `errno') */
@@ -299,10 +299,10 @@ err:
 }
 /*[[[end:libc_sem_open]]]*/
 
-/*[[[head:libc_sem_close,hash:CRC-32=0xf833a333]]]*/
+/*[[[head:libc_sem_close,hash:CRC-32=0x41ee39f3]]]*/
 /* >> sem_close(3)
  * Close a semaphore previously returned by `sem_open(3)'. But note the case
- * of opening the same semaphore more than once within the same process, as
+ * of opening the same semaphore more than once within the same process,  as
  * described by in `sem_open(3)' and by `__ARCH_HAVE_NON_UNIQUE_SEM_OPEN'->
  * @return: 0: Success */
 INTERN ATTR_SECTION(".text.crt.sched.semaphore") NONNULL((1)) int
@@ -313,10 +313,10 @@ NOTHROW_NCX(LIBCCALL libc_sem_close)(sem_t *sem)
 }
 /*[[[end:libc_sem_close]]]*/
 
-/*[[[head:libc_sem_unlink,hash:CRC-32=0x2a44fd68]]]*/
+/*[[[head:libc_sem_unlink,hash:CRC-32=0x33d24593]]]*/
 /* >> sem_unlink(3)
  * Unlink (delete) a named semaphore `name' that was
- * previously created by `sem_open(name, O_CREAT)'
+ * previously  created  by `sem_open(name, O_CREAT)'
  * @return: 0:  Success
  * @return: -1: [errno=EINVAL] The given `name' contains no characters after the initial `/'
  * @return: -1: Error (s.a. `errno') */
@@ -350,9 +350,9 @@ err:
 }
 /*[[[end:libc_sem_unlink]]]*/
 
-/*[[[head:libc_sem_wait,hash:CRC-32=0xc53fab67]]]*/
+/*[[[head:libc_sem_wait,hash:CRC-32=0x725db4a0]]]*/
 /* >> sem_wait(3)
- * Wait for a ticket to become available to the given semaphore `sem'
+ * Wait  for a ticket  to become available to  the given semaphore `sem'
  * Once a ticket has become available, consume it and return. Until that
  * point in time, keep on blocking.
  * @return: 0:  Success
@@ -388,11 +388,11 @@ NOTHROW_RPC(LIBCCALL libc_sem_wait)(sem_t *sem)
 }
 /*[[[end:libc_sem_wait]]]*/
 
-/*[[[head:libc_sem_timedwait,hash:CRC-32=0xd8a26e13]]]*/
+/*[[[head:libc_sem_timedwait,hash:CRC-32=0x7cbb475]]]*/
 /* >> sem_timedwait(3)
- * Wait for a ticket to become available to the given semaphore `sem'
+ * Wait for a  ticket to  become available  to the  given semaphore  `sem'
  * Once a ticket has become available, consume it and return. If no ticket
- * becomes available until `abstime' has passed, return `errno=ETIMEDOUT'
+ * becomes  available until `abstime' has passed, return `errno=ETIMEDOUT'
  * @return: 0:  Success
  * @return: -1: [errno=EINTR]     Interrupted.
  * @return: -1: [errno=ETIMEDOUT] The given `abstime' expired before a ticket became available. */
@@ -430,14 +430,14 @@ NOTHROW_RPC(LIBCCALL libc_sem_timedwait)(sem_t *__restrict sem,
 }
 /*[[[end:libc_sem_timedwait]]]*/
 
-/*[[[head:libc_sem_timedwait64,hash:CRC-32=0x2dc149e9]]]*/
+/*[[[head:libc_sem_timedwait64,hash:CRC-32=0x31716bbc]]]*/
 #if __SIZEOF_TIME32_T__ == __SIZEOF_TIME64_T__
 DEFINE_INTERN_ALIAS(libc_sem_timedwait64, libc_sem_timedwait);
 #else /* MAGIC:alias */
 /* >> sem_timedwait(3)
- * Wait for a ticket to become available to the given semaphore `sem'
+ * Wait for a  ticket to  become available  to the  given semaphore  `sem'
  * Once a ticket has become available, consume it and return. If no ticket
- * becomes available until `abstime' has passed, return `errno=ETIMEDOUT'
+ * becomes  available until `abstime' has passed, return `errno=ETIMEDOUT'
  * @return: 0:  Success
  * @return: -1: [errno=EINTR]     Interrupted.
  * @return: -1: [errno=ETIMEDOUT] The given `abstime' expired before a ticket became available. */
@@ -501,10 +501,10 @@ again:
 }
 /*[[[end:libc_sem_trywait]]]*/
 
-/*[[[head:libc_sem_post,hash:CRC-32=0x3c1cd1ab]]]*/
+/*[[[head:libc_sem_post,hash:CRC-32=0x6fdea9c3]]]*/
 /* >> sem_post(3)
  * Post a ticket to the given semaphore `sem', waking up to 1 other thread
- * that may be waiting for tickets to become available before returning.
+ * that may be waiting for  tickets to become available before  returning.
  * @return: 0:  Success
  * @return: -1: [errno=EOVERFLOW] The maximum number of tickets have already been posted. */
 INTERN ATTR_SECTION(".text.crt.sched.semaphore") NONNULL((1)) int

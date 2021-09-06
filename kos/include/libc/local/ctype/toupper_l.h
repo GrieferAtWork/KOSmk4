@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x16a1a2f6 */
+/* HASH CRC-32:0x586902ec */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -22,7 +22,6 @@
 #define __local_toupper_l_defined 1
 #include <__crt.h>
 __NAMESPACE_LOCAL_BEGIN
-/* Dependency: toupper from ctype */
 #ifndef __local___localdep_toupper_defined
 #define __local___localdep_toupper_defined 1
 #if __has_builtin(__builtin_toupper) && defined(__LIBC_BIND_CRTBUILTINS) && defined(__CRT_HAVE_toupper)

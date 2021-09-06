@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xc2e5ed1 */
+/* HASH CRC-32:0x28fa261f */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -32,7 +32,6 @@ typedef struct _stringlist {
 } StringList;
 #endif /* !___stringlist_defined */
 __NAMESPACE_LOCAL_BEGIN
-/* Dependency: realloc from stdlib */
 #ifndef __local___localdep_realloc_defined
 #define __local___localdep_realloc_defined 1
 #if __has_builtin(__builtin_realloc) && defined(__LIBC_BIND_CRTBUILTINS)
@@ -41,9 +40,6 @@ __CEIREDIRECT(__ATTR_MALL_DEFAULT_ALIGNED __ATTR_WUNUSED __ATTR_ALLOC_SIZE((2)),
 __CREDIRECT(__ATTR_MALL_DEFAULT_ALIGNED __ATTR_WUNUSED __ATTR_ALLOC_SIZE((2)),void *,__NOTHROW_NCX,__localdep_realloc,(void *__mallptr, __SIZE_TYPE__ __num_bytes),realloc,(__mallptr,__num_bytes))
 #endif /* !__has_builtin(__builtin_realloc) || !__LIBC_BIND_CRTBUILTINS */
 #endif /* !__local___localdep_realloc_defined */
-/* >> sl_add(3)
- * Append a given `name' to `sl'. `name' is considered
- * inherited if the StringList is destroyed with `freeit=1' */
 __LOCAL_LIBC(sl_add) __ATTR_NONNULL((1, 2)) int
 __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(sl_add))(struct _stringlist *__sl, char *__name) {
 	if __unlikely(__sl->sl_cur >= __sl->sl_max) {

@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x8fe258c7 */
+/* HASH CRC-32:0x3eba27df */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -23,8 +23,6 @@
 #include <__crt.h>
 #include <hybrid/typecore.h>
 __NAMESPACE_LOCAL_BEGIN
-/* >> strchr(3)
- * Return the pointer of the first instance of `needle', or `NULL' if `needle' wasn't found. */
 __LOCAL_LIBC(c32schr) __ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1)) __CHAR32_TYPE__ *
 __NOTHROW_NCX(__LIBKCALL __LIBC_LOCAL_NAME(c32schr))(__CHAR32_TYPE__ const *__restrict __haystack, __CHAR32_TYPE__ __needle) {
 	for (;; ++__haystack) {

@@ -27,7 +27,7 @@ class TLFT {
 	public member chwidth: int;
 	@@Log2(Size of a character (in bytes))
 	public member log2chsize: int;
-	@@Mapping from a unicode character to a
+	@@Mapping  from  a unicode  character  to a
 	@@bitmap of that character's representation
 	public member map: {int: Bytes};
 }

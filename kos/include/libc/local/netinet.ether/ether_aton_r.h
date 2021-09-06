@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x1a2008dc */
+/* HASH CRC-32:0x38987080 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -23,27 +23,20 @@
 #include <__crt.h>
 struct ether_addr;
 __NAMESPACE_LOCAL_BEGIN
-/* Dependency: ether_paton_r from netinet.ether */
 #ifndef __local___localdep_ether_paton_r_defined
 #define __local___localdep_ether_paton_r_defined 1
 #ifdef __CRT_HAVE_ether_paton_r
-/* To the reverse of `ether_ntoa()' and convert
- * a `AA:BB:CC:DD:EE:FF'-string into an ethernet address. */
 __CREDIRECT(__ATTR_WUNUSED __ATTR_NONNULL((1, 2)),struct ether_addr *,__NOTHROW_NCX,__localdep_ether_paton_r,(char const **__restrict __pasc, struct ether_addr *__restrict __addr),ether_paton_r,(__pasc,__addr))
 #else /* __CRT_HAVE_ether_paton_r */
 __NAMESPACE_LOCAL_END
 #include <libc/local/netinet.ether/ether_paton_r.h>
 __NAMESPACE_LOCAL_BEGIN
-/* To the reverse of `ether_ntoa()' and convert
- * a `AA:BB:CC:DD:EE:FF'-string into an ethernet address. */
 #define __localdep_ether_paton_r __LIBC_LOCAL_NAME(ether_paton_r)
 #endif /* !__CRT_HAVE_ether_paton_r */
 #endif /* !__local___localdep_ether_paton_r_defined */
 __NAMESPACE_LOCAL_END
 #include <net/ethernet.h>
 __NAMESPACE_LOCAL_BEGIN
-/* To the reverse of `ether_ntoa()' and convert
- * a `AA:BB:CC:DD:EE:FF'-string into an ethernet address. */
 __LOCAL_LIBC(ether_aton_r) __ATTR_WUNUSED __ATTR_NONNULL((1, 2)) struct ether_addr *
 __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(ether_aton_r))(char const *__restrict __asc, struct ether_addr *__restrict __addr) {
 	return __localdep_ether_paton_r((char const **)&__asc, __addr);

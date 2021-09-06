@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x15fe4d80 */
+/* HASH CRC-32:0xf50d464b */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -23,7 +23,6 @@
 #include <__crt.h>
 #include <hybrid/typecore.h>
 __NAMESPACE_LOCAL_BEGIN
-/* Dependency: isblank from ctype */
 #ifndef __local___localdep_isblank_defined
 #define __local___localdep_isblank_defined 1
 #if __has_builtin(__builtin_isblank) && defined(__LIBC_BIND_CRTBUILTINS) && defined(__CRT_HAVE_isblank)

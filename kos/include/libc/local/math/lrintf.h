@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x10b17942 */
+/* HASH CRC-32:0x329b32c6 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -22,26 +22,19 @@
 #define __local_lrintf_defined 1
 #include <__crt.h>
 __NAMESPACE_LOCAL_BEGIN
-/* Dependency: rintf from math */
 #ifndef __local___localdep_rintf_defined
 #define __local___localdep_rintf_defined 1
 #if __has_builtin(__builtin_rintf) && defined(__LIBC_BIND_CRTBUILTINS) && defined(__CRT_HAVE_rintf)
-/* Return the integer nearest `x' in the direction of the prevailing rounding mode */
 __CEIREDIRECT(__ATTR_CONST __ATTR_WUNUSED,float,__NOTHROW,__localdep_rintf,(float __x),rintf,{ return __builtin_rintf(__x); })
 #elif __has_builtin(__builtin_nearbyintf) && defined(__LIBC_BIND_CRTBUILTINS) && defined(__CRT_HAVE_nearbyintf)
-/* Return the integer nearest `x' in the direction of the prevailing rounding mode */
 __CEIREDIRECT(__ATTR_CONST __ATTR_WUNUSED,float,__NOTHROW,__localdep_rintf,(float __x),nearbyintf,{ return __builtin_nearbyintf(__x); })
 #elif defined(__CRT_HAVE_rintf)
-/* Return the integer nearest `x' in the direction of the prevailing rounding mode */
 __CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,float,__NOTHROW,__localdep_rintf,(float __x),rintf,(__x))
 #elif defined(__CRT_HAVE_nearbyintf)
-/* Return the integer nearest `x' in the direction of the prevailing rounding mode */
 __CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,float,__NOTHROW,__localdep_rintf,(float __x),nearbyintf,(__x))
 #elif defined(__CRT_HAVE___rintf)
-/* Return the integer nearest `x' in the direction of the prevailing rounding mode */
 __CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,float,__NOTHROW,__localdep_rintf,(float __x),__rintf,(__x))
 #elif defined(__CRT_HAVE___nearbyintf)
-/* Return the integer nearest `x' in the direction of the prevailing rounding mode */
 __CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,float,__NOTHROW,__localdep_rintf,(float __x),__nearbyintf,(__x))
 #else /* ... */
 __NAMESPACE_LOCAL_END
@@ -51,7 +44,6 @@ __NAMESPACE_LOCAL_BEGIN
 __NAMESPACE_LOCAL_END
 #include <libc/local/math/rintf.h>
 __NAMESPACE_LOCAL_BEGIN
-/* Return the integer nearest `x' in the direction of the prevailing rounding mode */
 #define __localdep_rintf __LIBC_LOCAL_NAME(rintf)
 #else /* __IEEE754_DOUBLE_TYPE_IS_FLOAT__ || __IEEE754_FLOAT_TYPE_IS_FLOAT__ || __IEEE854_LONG_DOUBLE_TYPE_IS_FLOAT__ || __CRT_HAVE_rint || __CRT_HAVE_nearbyint || __CRT_HAVE___rint || __CRT_HAVE___nearbyint || __IEEE754_DOUBLE_TYPE_IS_DOUBLE__ || __IEEE754_FLOAT_TYPE_IS_DOUBLE__ || __IEEE854_LONG_DOUBLE_TYPE_IS_DOUBLE__ */
 #undef __local___localdep_rintf_defined
@@ -62,7 +54,6 @@ __NAMESPACE_LOCAL_END
 #include <hybrid/typecore.h>
 #include <libm/lrint.h>
 __NAMESPACE_LOCAL_BEGIN
-/* Round `x' to nearest integral value according to current rounding direction */
 __LOCAL_LIBC(lrintf) __ATTR_CONST __ATTR_WUNUSED long int
 __NOTHROW(__LIBCCALL __LIBC_LOCAL_NAME(lrintf))(float __x) {
 #ifdef __LIBM_MATHFUNIF

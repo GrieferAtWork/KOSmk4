@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xfd8727dc */
+/* HASH CRC-32:0xa8204164 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -27,137 +27,73 @@
 #if (defined(__CRT_HAVE_fgetpos64) || defined(__CRT_HAVE__IO_fgetpos64) || defined(__CRT_HAVE_fgetpos64_unlocked) || defined(__CRT_HAVE_ftello64) || defined(__CRT_HAVE_ftell64) || defined(__CRT_HAVE__ftelli64) || defined(__CRT_HAVE_ftello64_unlocked) || defined(__CRT_HAVE_ftell64_unlocked) || defined(__CRT_HAVE__ftelli64_nolock) || defined(__CRT_HAVE_fgetpos) || defined(__CRT_HAVE__IO_fgetpos) || defined(__CRT_HAVE_fgetpos_unlocked) || defined(__CRT_HAVE_ftello) || defined(__CRT_HAVE_ftello_unlocked) || defined(__CRT_HAVE_ftell) || defined(__CRT_HAVE__IO_ftell) || defined(__CRT_HAVE_ftell_unlocked) || defined(__CRT_HAVE__ftell_nolock)) && (defined(__CRT_HAVE_fsetpos64) || defined(__CRT_HAVE__IO_fsetpos64) || defined(__CRT_HAVE_fsetpos64_unlocked) || defined(__CRT_HAVE_fsetpos) || defined(__CRT_HAVE__IO_fsetpos) || defined(__CRT_HAVE_fsetpos_unlocked) || (defined(__SEEK_SET) && (defined(__CRT_HAVE_fseeko64) || defined(__CRT_HAVE_fseek64) || defined(__CRT_HAVE__fseeki64) || defined(__CRT_HAVE_fseeko64_unlocked) || defined(__CRT_HAVE_fseek64_unlocked) || defined(__CRT_HAVE__fseeki64_nolock) || defined(__CRT_HAVE_fseeko) || defined(__CRT_HAVE_fseeko_unlocked) || defined(__CRT_HAVE_fseek) || defined(__CRT_HAVE_fseek_unlocked) || defined(__CRT_HAVE__fseek_nolock)))) && (defined(__CRT_HAVE_fparseln) || ((defined(__CRT_HAVE_fgetc) || defined(__CRT_HAVE_getc) || defined(__CRT_HAVE__IO_getc) || defined(__CRT_HAVE_fgetc_unlocked) || defined(__CRT_HAVE_getc_unlocked) || (defined(__CRT_DOS) && defined(__CRT_HAVE__filbuf)) || defined(__CRT_HAVE_fread) || defined(__CRT_HAVE__IO_fread) || defined(__CRT_HAVE_fread_unlocked) || defined(__CRT_HAVE__fread_nolock)) && (defined(__CRT_HAVE_ungetc) || defined(__CRT_HAVE__IO_ungetc) || defined(__CRT_HAVE_ungetc_unlocked) || defined(__CRT_HAVE__ungetc_nolock)) && defined(__CRT_HAVE_realloc)))
 #include <bits/crt/db/passwd.h>
 __NAMESPACE_LOCAL_BEGIN
-/* Dependency: fgetpos64 from stdio */
 #ifndef __local___localdep_fgetpos64_defined
 #define __local___localdep_fgetpos64_defined 1
 #if defined(__CRT_HAVE_fgetpos_unlocked) && defined(__USE_STDIO_UNLOCKED) && __SIZEOF_FPOS64_T__ == __SIZEOF_FPOS32_T__
 __NAMESPACE_LOCAL_END
 #include <kos/anno.h>
 __NAMESPACE_LOCAL_BEGIN
-/* >> fgetpos(3), fgetpos64(3)
- * Initialize an opaque descriptor `pos' for the current in-file position of `stream'
- * Upon success (return == 0), `pos' can be used to restore the current position by calling `fsetpos()' */
 __CREDIRECT(__ATTR_NONNULL((1, 2)),int,__THROWING,__localdep_fgetpos64,(__FILE *__restrict __stream, __fpos64_t *__restrict __pos),fgetpos_unlocked,(__stream,__pos))
 #elif defined(__CRT_HAVE_fgetpos64_unlocked) && defined(__USE_STDIO_UNLOCKED)
 __NAMESPACE_LOCAL_END
 #include <kos/anno.h>
 __NAMESPACE_LOCAL_BEGIN
-/* >> fgetpos(3), fgetpos64(3)
- * Initialize an opaque descriptor `pos' for the current in-file position of `stream'
- * Upon success (return == 0), `pos' can be used to restore the current position by calling `fsetpos()' */
 __CREDIRECT(__ATTR_NONNULL((1, 2)),int,__THROWING,__localdep_fgetpos64,(__FILE *__restrict __stream, __fpos64_t *__restrict __pos),fgetpos64_unlocked,(__stream,__pos))
 #elif defined(__CRT_HAVE_fgetpos) && __SIZEOF_FPOS64_T__ == __SIZEOF_FPOS32_T__
 __NAMESPACE_LOCAL_END
 #include <kos/anno.h>
 __NAMESPACE_LOCAL_BEGIN
-/* >> fgetpos(3), fgetpos64(3)
- * Initialize an opaque descriptor `pos' for the current in-file position of `stream'
- * Upon success (return == 0), `pos' can be used to restore the current position by calling `fsetpos()' */
 __CREDIRECT(__ATTR_NONNULL((1, 2)),int,__THROWING,__localdep_fgetpos64,(__FILE *__restrict __stream, __fpos64_t *__restrict __pos),fgetpos,(__stream,__pos))
 #elif defined(__CRT_HAVE__IO_fgetpos) && __SIZEOF_FPOS64_T__ == __SIZEOF_FPOS32_T__
 __NAMESPACE_LOCAL_END
 #include <kos/anno.h>
 __NAMESPACE_LOCAL_BEGIN
-/* >> fgetpos(3), fgetpos64(3)
- * Initialize an opaque descriptor `pos' for the current in-file position of `stream'
- * Upon success (return == 0), `pos' can be used to restore the current position by calling `fsetpos()' */
 __CREDIRECT(__ATTR_NONNULL((1, 2)),int,__THROWING,__localdep_fgetpos64,(__FILE *__restrict __stream, __fpos64_t *__restrict __pos),_IO_fgetpos,(__stream,__pos))
 #elif defined(__CRT_HAVE_fgetpos64)
 __NAMESPACE_LOCAL_END
 #include <kos/anno.h>
 __NAMESPACE_LOCAL_BEGIN
-/* >> fgetpos(3), fgetpos64(3)
- * Initialize an opaque descriptor `pos' for the current in-file position of `stream'
- * Upon success (return == 0), `pos' can be used to restore the current position by calling `fsetpos()' */
 __CREDIRECT(__ATTR_NONNULL((1, 2)),int,__THROWING,__localdep_fgetpos64,(__FILE *__restrict __stream, __fpos64_t *__restrict __pos),fgetpos64,(__stream,__pos))
 #elif defined(__CRT_HAVE__IO_fgetpos64)
 __NAMESPACE_LOCAL_END
 #include <kos/anno.h>
 __NAMESPACE_LOCAL_BEGIN
-/* >> fgetpos(3), fgetpos64(3)
- * Initialize an opaque descriptor `pos' for the current in-file position of `stream'
- * Upon success (return == 0), `pos' can be used to restore the current position by calling `fsetpos()' */
 __CREDIRECT(__ATTR_NONNULL((1, 2)),int,__THROWING,__localdep_fgetpos64,(__FILE *__restrict __stream, __fpos64_t *__restrict __pos),_IO_fgetpos64,(__stream,__pos))
 #elif defined(__CRT_HAVE_fgetpos_unlocked) && __SIZEOF_FPOS64_T__ == __SIZEOF_FPOS32_T__
 __NAMESPACE_LOCAL_END
 #include <kos/anno.h>
 __NAMESPACE_LOCAL_BEGIN
-/* >> fgetpos(3), fgetpos64(3)
- * Initialize an opaque descriptor `pos' for the current in-file position of `stream'
- * Upon success (return == 0), `pos' can be used to restore the current position by calling `fsetpos()' */
 __CREDIRECT(__ATTR_NONNULL((1, 2)),int,__THROWING,__localdep_fgetpos64,(__FILE *__restrict __stream, __fpos64_t *__restrict __pos),fgetpos_unlocked,(__stream,__pos))
 #elif defined(__CRT_HAVE_fgetpos64_unlocked)
 __NAMESPACE_LOCAL_END
 #include <kos/anno.h>
 __NAMESPACE_LOCAL_BEGIN
-/* >> fgetpos(3), fgetpos64(3)
- * Initialize an opaque descriptor `pos' for the current in-file position of `stream'
- * Upon success (return == 0), `pos' can be used to restore the current position by calling `fsetpos()' */
 __CREDIRECT(__ATTR_NONNULL((1, 2)),int,__THROWING,__localdep_fgetpos64,(__FILE *__restrict __stream, __fpos64_t *__restrict __pos),fgetpos64_unlocked,(__stream,__pos))
 #elif defined(__CRT_HAVE_ftello64) || defined(__CRT_HAVE_ftell64) || defined(__CRT_HAVE__ftelli64) || defined(__CRT_HAVE_ftello64_unlocked) || defined(__CRT_HAVE_ftell64_unlocked) || defined(__CRT_HAVE__ftelli64_nolock) || defined(__CRT_HAVE_fgetpos) || defined(__CRT_HAVE__IO_fgetpos) || defined(__CRT_HAVE_fgetpos_unlocked) || defined(__CRT_HAVE_ftello) || defined(__CRT_HAVE_ftello_unlocked) || defined(__CRT_HAVE_ftell) || defined(__CRT_HAVE__IO_ftell) || defined(__CRT_HAVE_ftell_unlocked) || defined(__CRT_HAVE__ftell_nolock)
 __NAMESPACE_LOCAL_END
 #include <libc/local/stdio/fgetpos64.h>
 __NAMESPACE_LOCAL_BEGIN
-/* >> fgetpos(3), fgetpos64(3)
- * Initialize an opaque descriptor `pos' for the current in-file position of `stream'
- * Upon success (return == 0), `pos' can be used to restore the current position by calling `fsetpos()' */
 #define __localdep_fgetpos64 __LIBC_LOCAL_NAME(fgetpos64)
 #else /* ... */
 #undef __local___localdep_fgetpos64_defined
 #endif /* !... */
 #endif /* !__local___localdep_fgetpos64_defined */
-/* Dependency: fparseln from util */
 #ifndef __local___localdep_fparseln_defined
 #define __local___localdep_fparseln_defined 1
 #ifdef __CRT_HAVE_fparseln
 __NAMESPACE_LOCAL_END
 #include <hybrid/typecore.h>
 __NAMESPACE_LOCAL_BEGIN
-/* >> fparseln(3)
- * Parse one line of text from `stream', whilst accounting for
- * special character escapes, as well as custom line-comments.
- * @param: plen:    When non-NULL, store `strlen(return)' here
- * @param: plineno: When non-NULL, incremented for every line-feed read from `stream'
- * @param: delim:   Special characters (use NUL to disable, and NULL to use defaults)
- *                     delim[0]: The escape character (defaults to '\\')
- *                     delim[1]: The line-continuation character (defaults to '\\')
- *                     delim[2]: The line-comment character (defaults to '#')
- * @param: flags:   Set of `FPARSELN_UNESC*'
- * @return: * :     Pointer to a heap-allocated, and pre-escaped (according to `flags')
- *                  line, that must be `free(3)'ed by the caller once they are done
- *                  using it.
- *                  If the result would be empty as the result of `feof(stream)' upon
- *                  return of this function, `strdup("")' will be returned. (i.e. NULL
- *                  is only returned in case of an error; _NOT_ in case of end-of-file)
- * @return: NULL:   Error (s.a. `errno' and `ferror(stream)') */
 __CREDIRECT(__ATTR_WUNUSED __ATTR_NONNULL((1)),char *,__NOTHROW_RPC,__localdep_fparseln,(__FILE *__stream, __SIZE_TYPE__ *__plen, __SIZE_TYPE__ *__plineno, char const __delim[3], __STDC_INT_AS_UINT_T __flags),fparseln,(__stream,__plen,__plineno,__delim,__flags))
 #elif (defined(__CRT_HAVE_fgetc) || defined(__CRT_HAVE_getc) || defined(__CRT_HAVE__IO_getc) || defined(__CRT_HAVE_fgetc_unlocked) || defined(__CRT_HAVE_getc_unlocked) || (defined(__CRT_DOS) && defined(__CRT_HAVE__filbuf)) || defined(__CRT_HAVE_fread) || defined(__CRT_HAVE__IO_fread) || defined(__CRT_HAVE_fread_unlocked) || defined(__CRT_HAVE__fread_nolock)) && (defined(__CRT_HAVE_ungetc) || defined(__CRT_HAVE__IO_ungetc) || defined(__CRT_HAVE_ungetc_unlocked) || defined(__CRT_HAVE__ungetc_nolock)) && defined(__CRT_HAVE_realloc)
 __NAMESPACE_LOCAL_END
 #include <libc/local/util/fparseln.h>
 __NAMESPACE_LOCAL_BEGIN
-/* >> fparseln(3)
- * Parse one line of text from `stream', whilst accounting for
- * special character escapes, as well as custom line-comments.
- * @param: plen:    When non-NULL, store `strlen(return)' here
- * @param: plineno: When non-NULL, incremented for every line-feed read from `stream'
- * @param: delim:   Special characters (use NUL to disable, and NULL to use defaults)
- *                     delim[0]: The escape character (defaults to '\\')
- *                     delim[1]: The line-continuation character (defaults to '\\')
- *                     delim[2]: The line-comment character (defaults to '#')
- * @param: flags:   Set of `FPARSELN_UNESC*'
- * @return: * :     Pointer to a heap-allocated, and pre-escaped (according to `flags')
- *                  line, that must be `free(3)'ed by the caller once they are done
- *                  using it.
- *                  If the result would be empty as the result of `feof(stream)' upon
- *                  return of this function, `strdup("")' will be returned. (i.e. NULL
- *                  is only returned in case of an error; _NOT_ in case of end-of-file)
- * @return: NULL:   Error (s.a. `errno' and `ferror(stream)') */
 #define __localdep_fparseln __LIBC_LOCAL_NAME(fparseln)
 #else /* ... */
 #undef __local___localdep_fparseln_defined
 #endif /* !... */
 #endif /* !__local___localdep_fparseln_defined */
-/* Dependency: free from stdlib */
 #ifndef __local___localdep_free_defined
 #define __local___localdep_free_defined 1
 #if __has_builtin(__builtin_free) && defined(__LIBC_BIND_CRTBUILTINS) && defined(__CRT_HAVE_free)
@@ -170,193 +106,140 @@ __CREDIRECT_VOID(,__NOTHROW_NCX,__localdep_free,(void *__mallptr),cfree,(__mallp
 #undef __local___localdep_free_defined
 #endif /* !... */
 #endif /* !__local___localdep_free_defined */
-/* Dependency: fsetpos64 from stdio */
 #ifndef __local___localdep_fsetpos64_defined
 #define __local___localdep_fsetpos64_defined 1
 #if defined(__CRT_HAVE_fsetpos_unlocked) && defined(__USE_STDIO_UNLOCKED) && __SIZEOF_FPOS64_T__ == __SIZEOF_FPOS32_T__
 __NAMESPACE_LOCAL_END
 #include <kos/anno.h>
 __NAMESPACE_LOCAL_BEGIN
-/* >> fsetpos(3), fsetpos64(3)
- * Set the file position of `stream' to `pos', as previously initialized with a call to `fgetpos()' */
 __CREDIRECT(__ATTR_NONNULL((1, 2)),int,__THROWING,__localdep_fsetpos64,(__FILE *__restrict __stream, __fpos64_t const *__restrict __pos),fsetpos_unlocked,(__stream,__pos))
 #elif defined(__CRT_HAVE_fsetpos64_unlocked) && defined(__USE_STDIO_UNLOCKED)
 __NAMESPACE_LOCAL_END
 #include <kos/anno.h>
 __NAMESPACE_LOCAL_BEGIN
-/* >> fsetpos(3), fsetpos64(3)
- * Set the file position of `stream' to `pos', as previously initialized with a call to `fgetpos()' */
 __CREDIRECT(__ATTR_NONNULL((1, 2)),int,__THROWING,__localdep_fsetpos64,(__FILE *__restrict __stream, __fpos64_t const *__restrict __pos),fsetpos64_unlocked,(__stream,__pos))
 #elif defined(__CRT_HAVE_fsetpos) && __SIZEOF_FPOS64_T__ == __SIZEOF_FPOS32_T__
 __NAMESPACE_LOCAL_END
 #include <kos/anno.h>
 __NAMESPACE_LOCAL_BEGIN
-/* >> fsetpos(3), fsetpos64(3)
- * Set the file position of `stream' to `pos', as previously initialized with a call to `fgetpos()' */
 __CREDIRECT(__ATTR_NONNULL((1, 2)),int,__THROWING,__localdep_fsetpos64,(__FILE *__restrict __stream, __fpos64_t const *__restrict __pos),fsetpos,(__stream,__pos))
 #elif defined(__CRT_HAVE__IO_fsetpos) && __SIZEOF_FPOS64_T__ == __SIZEOF_FPOS32_T__
 __NAMESPACE_LOCAL_END
 #include <kos/anno.h>
 __NAMESPACE_LOCAL_BEGIN
-/* >> fsetpos(3), fsetpos64(3)
- * Set the file position of `stream' to `pos', as previously initialized with a call to `fgetpos()' */
 __CREDIRECT(__ATTR_NONNULL((1, 2)),int,__THROWING,__localdep_fsetpos64,(__FILE *__restrict __stream, __fpos64_t const *__restrict __pos),_IO_fsetpos,(__stream,__pos))
 #elif defined(__CRT_HAVE_fsetpos64)
 __NAMESPACE_LOCAL_END
 #include <kos/anno.h>
 __NAMESPACE_LOCAL_BEGIN
-/* >> fsetpos(3), fsetpos64(3)
- * Set the file position of `stream' to `pos', as previously initialized with a call to `fgetpos()' */
 __CREDIRECT(__ATTR_NONNULL((1, 2)),int,__THROWING,__localdep_fsetpos64,(__FILE *__restrict __stream, __fpos64_t const *__restrict __pos),fsetpos64,(__stream,__pos))
 #elif defined(__CRT_HAVE__IO_fsetpos64)
 __NAMESPACE_LOCAL_END
 #include <kos/anno.h>
 __NAMESPACE_LOCAL_BEGIN
-/* >> fsetpos(3), fsetpos64(3)
- * Set the file position of `stream' to `pos', as previously initialized with a call to `fgetpos()' */
 __CREDIRECT(__ATTR_NONNULL((1, 2)),int,__THROWING,__localdep_fsetpos64,(__FILE *__restrict __stream, __fpos64_t const *__restrict __pos),_IO_fsetpos64,(__stream,__pos))
 #elif defined(__CRT_HAVE_fsetpos_unlocked) && __SIZEOF_FPOS64_T__ == __SIZEOF_FPOS32_T__
 __NAMESPACE_LOCAL_END
 #include <kos/anno.h>
 __NAMESPACE_LOCAL_BEGIN
-/* >> fsetpos(3), fsetpos64(3)
- * Set the file position of `stream' to `pos', as previously initialized with a call to `fgetpos()' */
 __CREDIRECT(__ATTR_NONNULL((1, 2)),int,__THROWING,__localdep_fsetpos64,(__FILE *__restrict __stream, __fpos64_t const *__restrict __pos),fsetpos_unlocked,(__stream,__pos))
 #elif defined(__CRT_HAVE_fsetpos64_unlocked)
 __NAMESPACE_LOCAL_END
 #include <kos/anno.h>
 __NAMESPACE_LOCAL_BEGIN
-/* >> fsetpos(3), fsetpos64(3)
- * Set the file position of `stream' to `pos', as previously initialized with a call to `fgetpos()' */
 __CREDIRECT(__ATTR_NONNULL((1, 2)),int,__THROWING,__localdep_fsetpos64,(__FILE *__restrict __stream, __fpos64_t const *__restrict __pos),fsetpos64_unlocked,(__stream,__pos))
 #elif defined(__CRT_HAVE_fsetpos) || defined(__CRT_HAVE__IO_fsetpos) || defined(__CRT_HAVE_fsetpos_unlocked) || (defined(__SEEK_SET) && (defined(__CRT_HAVE_fseeko64) || defined(__CRT_HAVE_fseek64) || defined(__CRT_HAVE__fseeki64) || defined(__CRT_HAVE_fseeko64_unlocked) || defined(__CRT_HAVE_fseek64_unlocked) || defined(__CRT_HAVE__fseeki64_nolock) || defined(__CRT_HAVE_fseeko) || defined(__CRT_HAVE_fseeko_unlocked) || defined(__CRT_HAVE_fseek) || defined(__CRT_HAVE_fseek_unlocked) || defined(__CRT_HAVE__fseek_nolock)))
 __NAMESPACE_LOCAL_END
 #include <libc/local/stdio/fsetpos64.h>
 __NAMESPACE_LOCAL_BEGIN
-/* >> fsetpos(3), fsetpos64(3)
- * Set the file position of `stream' to `pos', as previously initialized with a call to `fgetpos()' */
 #define __localdep_fsetpos64 __LIBC_LOCAL_NAME(fsetpos64)
 #else /* ... */
 #undef __local___localdep_fsetpos64_defined
 #endif /* !... */
 #endif /* !__local___localdep_fsetpos64_defined */
-/* Dependency: mempcpy from string */
 #ifndef __local___localdep_mempcpy_defined
 #define __local___localdep_mempcpy_defined 1
 #ifdef __CRT_HAVE_mempcpy
 __NAMESPACE_LOCAL_END
 #include <hybrid/typecore.h>
 __NAMESPACE_LOCAL_BEGIN
-/* >> mempcpy(3)
- * Same as `memcpy', but return `dst + n_bytes', rather than `dst' */
 __CREDIRECT(__ATTR_LEAF __ATTR_RETNONNULL __ATTR_NONNULL((1, 2)),void *,__NOTHROW_NCX,__localdep_mempcpy,(void *__restrict __dst, void const *__restrict __src, __SIZE_TYPE__ __n_bytes),mempcpy,(__dst,__src,__n_bytes))
 #elif defined(__CRT_HAVE___mempcpy)
 __NAMESPACE_LOCAL_END
 #include <hybrid/typecore.h>
 __NAMESPACE_LOCAL_BEGIN
-/* >> mempcpy(3)
- * Same as `memcpy', but return `dst + n_bytes', rather than `dst' */
 __CREDIRECT(__ATTR_LEAF __ATTR_RETNONNULL __ATTR_NONNULL((1, 2)),void *,__NOTHROW_NCX,__localdep_mempcpy,(void *__restrict __dst, void const *__restrict __src, __SIZE_TYPE__ __n_bytes),__mempcpy,(__dst,__src,__n_bytes))
 #else /* ... */
 __NAMESPACE_LOCAL_END
 #include <libc/local/string/mempcpy.h>
 __NAMESPACE_LOCAL_BEGIN
-/* >> mempcpy(3)
- * Same as `memcpy', but return `dst + n_bytes', rather than `dst' */
 #define __localdep_mempcpy __LIBC_LOCAL_NAME(mempcpy)
 #endif /* !... */
 #endif /* !__local___localdep_mempcpy_defined */
-/* Dependency: rewind from stdio */
 #ifndef __local___localdep_rewind_defined
 #define __local___localdep_rewind_defined 1
 #if defined(__CRT_HAVE_rewind_unlocked) && defined(__USE_STDIO_UNLOCKED)
 __NAMESPACE_LOCAL_END
 #include <kos/anno.h>
 __NAMESPACE_LOCAL_BEGIN
-/* >> rewind(3)
- * Rewind the current in-file position of `stream' to its starting position */
 __CREDIRECT_VOID(__ATTR_NONNULL((1)),__THROWING,__localdep_rewind,(__FILE *__restrict __stream),rewind_unlocked,(__stream))
 #elif defined(__CRT_HAVE_rewind)
 __NAMESPACE_LOCAL_END
 #include <kos/anno.h>
 __NAMESPACE_LOCAL_BEGIN
-/* >> rewind(3)
- * Rewind the current in-file position of `stream' to its starting position */
 __CREDIRECT_VOID(__ATTR_NONNULL((1)),__THROWING,__localdep_rewind,(__FILE *__restrict __stream),rewind,(__stream))
 #elif defined(__CRT_HAVE_rewind_unlocked)
 __NAMESPACE_LOCAL_END
 #include <kos/anno.h>
 __NAMESPACE_LOCAL_BEGIN
-/* >> rewind(3)
- * Rewind the current in-file position of `stream' to its starting position */
 __CREDIRECT_VOID(__ATTR_NONNULL((1)),__THROWING,__localdep_rewind,(__FILE *__restrict __stream),rewind_unlocked,(__stream))
 #elif defined(__CRT_HAVE_fseeko64) || defined(__CRT_HAVE_fseek64) || defined(__CRT_HAVE__fseeki64) || defined(__CRT_HAVE_fseeko64_unlocked) || defined(__CRT_HAVE_fseek64_unlocked) || defined(__CRT_HAVE__fseeki64_nolock) || defined(__CRT_HAVE_fsetpos) || defined(__CRT_HAVE__IO_fsetpos) || defined(__CRT_HAVE_fsetpos_unlocked) || defined(__CRT_HAVE_fsetpos64) || defined(__CRT_HAVE__IO_fsetpos64) || defined(__CRT_HAVE_fsetpos64_unlocked) || defined(__CRT_HAVE_fseeko) || defined(__CRT_HAVE_fseeko_unlocked) || defined(__CRT_HAVE_fseek) || defined(__CRT_HAVE_fseek_unlocked) || defined(__CRT_HAVE__fseek_nolock)
 __NAMESPACE_LOCAL_END
 #include <libc/local/stdio/rewind.h>
 __NAMESPACE_LOCAL_BEGIN
-/* >> rewind(3)
- * Rewind the current in-file position of `stream' to its starting position */
 #define __localdep_rewind __LIBC_LOCAL_NAME(rewind)
 #else /* ... */
 #undef __local___localdep_rewind_defined
 #endif /* !... */
 #endif /* !__local___localdep_rewind_defined */
-/* Dependency: strchrnul from string */
 #ifndef __local___localdep_strchrnul_defined
 #define __local___localdep_strchrnul_defined 1
 #ifdef __CRT_HAVE_strchrnul
-/* >> strchrnul(3)
- * Same as `strchr', but return `strend(str)', rather than `NULL' if `needle' wasn't found. */
 __CREDIRECT(__ATTR_PURE __ATTR_RETNONNULL __ATTR_WUNUSED __ATTR_NONNULL((1)),char *,__NOTHROW_NCX,__localdep_strchrnul,(char const *__restrict __haystack, int __needle),strchrnul,(__haystack,__needle))
 #else /* __CRT_HAVE_strchrnul */
 __NAMESPACE_LOCAL_END
 #include <libc/local/string/strchrnul.h>
 __NAMESPACE_LOCAL_BEGIN
-/* >> strchrnul(3)
- * Same as `strchr', but return `strend(str)', rather than `NULL' if `needle' wasn't found. */
 #define __localdep_strchrnul __LIBC_LOCAL_NAME(strchrnul)
 #endif /* !__CRT_HAVE_strchrnul */
 #endif /* !__local___localdep_strchrnul_defined */
-/* Dependency: strcmp from string */
 #ifndef __local___localdep_strcmp_defined
 #define __local___localdep_strcmp_defined 1
 #if __has_builtin(__builtin_strcmp) && defined(__LIBC_BIND_CRTBUILTINS) && defined(__CRT_HAVE_strcmp)
-/* >> strcmp(3)
- * Compare 2 strings and return the difference of the first non-matching character, or `0' if they are identical */
 __CEIREDIRECT(__ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1, 2)),int,__NOTHROW_NCX,__localdep_strcmp,(char const *__s1, char const *__s2),strcmp,{ return __builtin_strcmp(__s1, __s2); })
 #elif defined(__CRT_HAVE_strcmp)
-/* >> strcmp(3)
- * Compare 2 strings and return the difference of the first non-matching character, or `0' if they are identical */
 __CREDIRECT(__ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1, 2)),int,__NOTHROW_NCX,__localdep_strcmp,(char const *__s1, char const *__s2),strcmp,(__s1,__s2))
 #else /* ... */
 __NAMESPACE_LOCAL_END
 #include <libc/local/string/strcmp.h>
 __NAMESPACE_LOCAL_BEGIN
-/* >> strcmp(3)
- * Compare 2 strings and return the difference of the first non-matching character, or `0' if they are identical */
 #define __localdep_strcmp __LIBC_LOCAL_NAME(strcmp)
 #endif /* !... */
 #endif /* !__local___localdep_strcmp_defined */
-/* Dependency: strlen from string */
 #ifndef __local___localdep_strlen_defined
 #define __local___localdep_strlen_defined 1
 #ifdef __CRT_HAVE_strlen
 __NAMESPACE_LOCAL_END
 #include <hybrid/typecore.h>
 __NAMESPACE_LOCAL_BEGIN
-/* >> strlen(3)
- * Return the length of the string in characters (Same as `rawmemlen[...](str, '\0')') */
 __CREDIRECT(__ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1)),__SIZE_TYPE__,__NOTHROW_NCX,__localdep_strlen,(char const *__restrict __str),strlen,(__str))
 #else /* __CRT_HAVE_strlen */
 __NAMESPACE_LOCAL_END
 #include <libc/local/string/strlen.h>
 __NAMESPACE_LOCAL_BEGIN
-/* >> strlen(3)
- * Return the length of the string in characters (Same as `rawmemlen[...](str, '\0')') */
 #define __localdep_strlen __LIBC_LOCAL_NAME(strlen)
 #endif /* !__CRT_HAVE_strlen */
 #endif /* !__local___localdep_strlen_defined */
-/* Dependency: strtoul from stdlib */
 #ifndef __local___localdep_strtoul_defined
 #define __local___localdep_strtoul_defined 1
 #ifdef __CRT_HAVE_strtoul
@@ -401,7 +284,6 @@ __NAMESPACE_LOCAL_BEGIN
 #define __localdep_strtoul __LIBC_LOCAL_NAME(strtoul)
 #endif /* !... */
 #endif /* !__local___localdep_strtoul_defined */
-/* Dependency: syslog from sys.syslog */
 #ifndef __local___localdep_syslog_defined
 #define __local___localdep_syslog_defined 1
 #ifdef __CRT_HAVE_syslog
@@ -420,15 +302,6 @@ __NAMESPACE_LOCAL_END
 #include <hybrid/typecore.h>
 #include <asm/os/syslog.h>
 __NAMESPACE_LOCAL_BEGIN
-/* Filtered read from `stream'
- * @param: filtered_uid:  When not equal to `(uid_t)-1', require this UID
- * @param: filtered_name: When not `NULL', require this username
- * @return: 0 :     Success (`*result' is made to point at `resultbuf')
- * @return: ENOENT: The last entry has already been read, or no entry matches the given `filtered_*'
- *                  Note that in this case, `errno' will have not been changed
- * @return: ERANGE: The given `buflen' is too small (pass a larger value and try again)
- *                  Note that in this case, `errno' will have also been set to `ERANGE'
- * @return: * :     Error (one of `E*' from `<errno.h>') */
 __LOCAL_LIBC(fgetpwfiltered_r) __ATTR_NONNULL((1, 2, 3, 5)) __errno_t
 __NOTHROW_RPC(__LIBCCALL __LIBC_LOCAL_NAME(fgetpwfiltered_r))(__FILE *__restrict __stream, struct passwd *__restrict __resultbuf, char *__restrict __buffer, __SIZE_TYPE__ __buflen, struct passwd **__restrict __result, __uid_t __filtered_uid, char const *__filtered_name) {
 	__errno_t __retval = 0;

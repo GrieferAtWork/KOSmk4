@@ -279,8 +279,8 @@ char32_t unicode_readutf8([[nonnull]] /*utf-8*/ char const **__restrict ptext)
 }
 
 @@>> unicode_readutf8_rev(3)
-@@Same as `unicode_readutf8', but read backwards, with `*ptext'
-@@starting out as a pointer after the character to be read, before
+@@Same  as  `unicode_readutf8',  but read  backwards,  with `*ptext'
+@@starting out as a pointer after  the character to be read,  before
 @@being updated to point to the start of the character that was read
 [[libc, kernel]]
 char32_t unicode_readutf8_rev([[nonnull]] /*utf-8*/ char const **__restrict ptext)
@@ -646,8 +646,8 @@ char32_t unicode_readutf16_swap_n([[nonnull]] /*utf-16-swap*/ char16_t const **_
 }
 
 @@>> unicode_readutf16_rev(3)
-@@Same as `unicode_readutf16', but read backwards, with `*ptext'
-@@starting out as a pointer after the character to be read, before
+@@Same  as  `unicode_readutf16', but  read backwards,  with `*ptext'
+@@starting out as a pointer after  the character to be read,  before
 @@being updated to point to the start of the character that was read
 [[kernel]]
 char32_t unicode_readutf16_rev([[nonnull]] /*utf-16*/ char16_t const **__restrict ptext)
@@ -753,7 +753,7 @@ char32_t unicode_readutf16_swap_rev_n([[nonnull]] /*utf-16*/ char16_t const **__
 
 @@>> unicode_writeutf8(3)
 @@Write a given Unicode character `ch' to `dst' and return a pointer to its end location.
-@@This function will write at most `UNICODE_UTF8_CURLEN' bytes to `dst'
+@@This   function   will   write   at   most   `UNICODE_UTF8_CURLEN'   bytes   to   `dst'
 [[kernel, libc, nonnull]]
 char *unicode_writeutf8([[nonnull]] /*utf-8*/ char *__restrict dst, char32_t ch) {
 	if likely(ch <= UTF8_1BYTE_MAX) {
@@ -797,7 +797,7 @@ char *unicode_writeutf8([[nonnull]] /*utf-8*/ char *__restrict dst, char32_t ch)
 
 @@>> unicode_writeutf16(3)
 @@Write a given Unicode character `ch' to `dst' and return a pointer to its end location.
-@@This function will write at most `UNICODE_UTF16_CURLEN' words to `dst'
+@@This   function   will   write   at   most   `UNICODE_UTF16_CURLEN'   words   to  `dst'
 [[kernel, libc, nonnull]]
 char16_t *unicode_writeutf16([[nonnull]] /*utf-16*/ char16_t *__restrict dst, char32_t ch) {
 	if likely(ch <= 0xffff && (ch < 0xd800 || ch > 0xdfff)) {
@@ -1499,7 +1499,7 @@ struct format_8to16_data {
 }
 
 @@>> format_8to16(3)
-@@Format printer (compatible with `__pformatprinter') for
+@@Format printer (compatible with `__pformatprinter')  for
 @@converting UTF-8 unicode input data into a UTF-16 output
 [[impl_include("<bits/crt/mbstate.h>", "<bits/crt/format-printer.h>", "<bits/crt/uformat-printer.h>")]]
 $ssize_t format_8to16(/*struct format_8to16_data **/ void *arg,
@@ -1550,7 +1550,7 @@ struct format_8to32_data {
 }
 
 @@>> format_8to32(3)
-@@Format printer (compatible with `__pformatprinter') for
+@@Format printer (compatible with `__pformatprinter')  for
 @@converting UTF-8 unicode input data into a UTF-32 output
 [[impl_include("<bits/crt/mbstate.h>", "<bits/crt/format-printer.h>", "<bits/crt/uformat-printer.h>")]]
 $ssize_t format_8to32(/*struct format_8to32_data **/ void *arg,
@@ -1600,7 +1600,7 @@ err:
 //};
 
 @@>> format_wto8(3)
-@@Format printer (compatible with `pc16formatprinter') for
+@@Format   printer   (compatible  with   `pc16formatprinter')  for
 @@converting wide-character unicode input data into a UTF-8 output
 [[hidden, impl_include("<bits/crt/format-printer.h>"), wchar]]
 $ssize_t format_wto8(/*struct format_wto8_data **/ void *arg,
@@ -1725,7 +1725,7 @@ $ssize_t format_32to8(/*struct format_32to8_data **/ void *arg,
 //};
 
 @@>> format_wto32(3)
-@@Format printer (compatible with `pc16formatprinter') for
+@@Format  printer   (compatible   with   `pc16formatprinter')   for
 @@converting wide-character unicode input data into a UTF-32 output
 [[hidden, impl_include("<bits/crt/uformat-printer.h>"), wchar]]
 $ssize_t format_wto32(/*struct format_wto32_data **/ void *arg,
@@ -1802,7 +1802,7 @@ struct format_16to32_data {
 }
 
 @@>> format_16to32(3)
-@@Format printer (compatible with `pc16formatprinter') for
+@@Format printer (compatible with `pc16formatprinter')  for
 @@converting UTF-16 unicode input data into a UTF-32 output
 $ssize_t format_16to32(/*struct format_16to32_data **/ void *arg,
                        char16_t const *data, $size_t datalen)
@@ -1815,7 +1815,7 @@ $ssize_t format_16to32(/*struct format_16to32_data **/ void *arg,
 //};
 
 @@>> format_wto16(3)
-@@Format printer (compatible with `pwformatprinter') for
+@@Format   printer   (compatible   with   `pwformatprinter')    for
 @@converting wide-character unicode input data into a UTF-16 output
 [[hidden, wchar, impl_include("<bits/crt/format-printer.h>", "<bits/crt/uformat-printer.h>")]]
 $ssize_t format_wto16(/*struct format_wto16_data **/ void *arg,
@@ -1865,7 +1865,7 @@ struct format_32to16_data {
 
 @@>> format_32to16(3)
 @@Format printer (compatible with `__pc32formatprinter') for
-@@converting UTF-32 unicode input data into a UTF-16 output
+@@converting UTF-32 unicode input data into a UTF-16  output
 $ssize_t format_32to16(/*struct format_32to16_data **/ void *arg,
                        char32_t const *data, $size_t datalen)
 	%{uchar32("format_wto16")}

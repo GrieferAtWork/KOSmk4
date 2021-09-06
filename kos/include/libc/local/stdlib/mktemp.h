@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x777d5ff2 */
+/* HASH CRC-32:0xc2b46e1d */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -24,36 +24,13 @@
 #include <asm/os/fcntl.h>
 #if defined(__CRT_HAVE_open64) || defined(__CRT_HAVE___open64) || defined(__CRT_HAVE_open) || defined(__CRT_HAVE__open) || defined(__CRT_HAVE___open) || (defined(__AT_FDCWD) && (defined(__CRT_HAVE_openat64) || defined(__CRT_HAVE_openat))) || (defined(__CRT_HAVE_kstat) && defined(__CRT_KOS_PRIMARY)) || (defined(__CRT_HAVE_kstat64) && defined(__CRT_KOS_PRIMARY)) || (defined(__CRT_HAVE__stat64) && defined(__CRT_DOS_PRIMARY) && defined(__USE_TIME_BITS64)) || (defined(__CRT_HAVE__stat64i32) && defined(__CRT_DOS_PRIMARY) && defined(__USE_TIME_BITS64)) || (defined(__CRT_HAVE__stati64) && defined(__CRT_DOS_PRIMARY) && !defined(__USE_TIME_BITS64) && defined(__USE_FILE_OFFSET64)) || (defined(__CRT_HAVE__stat32i64) && defined(__CRT_DOS_PRIMARY) && !defined(__USE_TIME_BITS64) && defined(__USE_FILE_OFFSET64)) || (defined(__CRT_HAVE__stat) && defined(__CRT_DOS_PRIMARY) && !defined(__USE_TIME_BITS64) && !defined(__USE_FILE_OFFSET64)) || (defined(__CRT_HAVE__stat32) && defined(__CRT_DOS_PRIMARY) && !defined(__USE_TIME_BITS64) && !defined(__USE_FILE_OFFSET64)) || (defined(__CRT_HAVE_stat64) && defined(__USE_FILE_OFFSET64)) || (defined(__CRT_HAVE_stat) && !defined(__USE_FILE_OFFSET64))
 __NAMESPACE_LOCAL_BEGIN
-/* Dependency: system_mktemp from stdlib */
 #ifndef __local___localdep_system_mktemp_defined
 #define __local___localdep_system_mktemp_defined 1
 __NAMESPACE_LOCAL_END
 #include <libc/local/stdlib/system_mktemp.h>
 __NAMESPACE_LOCAL_BEGIN
-/* Internal implementation for creating temporary files.
- * @param: what: Select what kind of temporary object to create.
- *                  `0': Create a temporary file. (The handle of that file will be returned)
- *                       Creating mode used is 0600
- *                       This mode is only recognized when `$has_function(open)'
- *                  `1': Create a temporary directory. (0 is returned on success)
- *                       Creating mode used is 0700
- *                       This mode is only recognized when `$has_function(mkdir)'
- *                       NOTE: `flags' is ignored in this mode
- *                  `2': Braindead `mktemp(3)'-mode: Like `0', but don't actually create the
- *                       file. Instead, return `0' on success
- *                       This mode is only recognized when `$has_function(open) || $has_function(stat)'
- *                       NOTE: `flags' is ignored in this mode */
 #define __localdep_system_mktemp __LIBC_LOCAL_NAME(system_mktemp)
 #endif /* !__local___localdep_system_mktemp_defined */
-/* >> mktemp(3)
- * Badly designed version of `mkstemp' that won't actually create
- * the temporary file, meaning that by the time the caller tries to
- * create the file themselves, another process may have already
- * created it.
- * Also: when no temporary filename can be created, rather than
- *       returning something sensible like `NULL', this function
- *       will instead set `template_' to an empty string, and still
- *       re-return it like it would if everything had worked! */
 __LOCAL_LIBC(mktemp) __ATTR_RETNONNULL __ATTR_NONNULL((1)) char *
 __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(mktemp))(char *__template_) {
 	if (__localdep_system_mktemp(2, __template_, 0, 0) )

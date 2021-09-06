@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x6c4e6cb9 */
+/* HASH CRC-32:0x7ea9adef */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -62,7 +62,7 @@ __SYSDECL_BEGIN
 #ifdef __CRT_HAVE_login_tty
 /* >> login_tty(3)
  * Set the given `fd' as the controlling terminal, stdin,
- * stdout, and stderr. Afterwards, `fd' is closed.
+ * stdout,   and  stderr.  Afterwards,  `fd'  is  closed.
  * @return: 0 : Success
  * @return: * : Error */
 __CDECLARE(,int,__NOTHROW_RPC_KOS,login_tty,(__fd_t __fd),(__fd))
@@ -72,7 +72,7 @@ __CDECLARE(,int,__NOTHROW_RPC_KOS,login_tty,(__fd_t __fd),(__fd))
 #include <libc/local/utmp/login_tty.h>
 /* >> login_tty(3)
  * Set the given `fd' as the controlling terminal, stdin,
- * stdout, and stderr. Afterwards, `fd' is closed.
+ * stdout,   and  stderr.  Afterwards,  `fd'  is  closed.
  * @return: 0 : Success
  * @return: * : Error */
 __NAMESPACE_LOCAL_USING_OR_IMPL(login_tty, __FORCELOCAL __ATTR_ARTIFICIAL int __NOTHROW_RPC_KOS(__LIBCCALL login_tty)(__fd_t __fd) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(login_tty))(__fd); })

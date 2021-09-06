@@ -20,7 +20,7 @@
 #ifdef __INTELLISENSE__
 #include "block.c"
 #define DEFINE_IO_READ 1
-//#define DEFINE_IO_WRITE 1
+//#define DEFINE_IO_WRITE  1
 //#define DEFINE_IO_SECTOR 1
 //#define DEFINE_IO_VECTOR 1
 //#define DEFINE_IO_PHYS 1

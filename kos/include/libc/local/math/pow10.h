@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x5af2a66 */
+/* HASH CRC-32:0xef0f2d15 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -24,38 +24,32 @@
 #include <ieee754.h>
 #if defined(__CRT_HAVE_pow) || defined(__CRT_HAVE___pow) || defined(__IEEE754_DOUBLE_TYPE_IS_DOUBLE__) || defined(__IEEE754_FLOAT_TYPE_IS_DOUBLE__) || defined(__IEEE854_LONG_DOUBLE_TYPE_IS_DOUBLE__)
 __NAMESPACE_LOCAL_BEGIN
-/* Dependency: pow from math */
 #ifndef __local___localdep_pow_defined
 #define __local___localdep_pow_defined 1
 #if __has_builtin(__builtin_pow) && defined(__LIBC_BIND_CRTBUILTINS) && defined(__CRT_HAVE_pow)
 __NAMESPACE_LOCAL_END
 #include <bits/crt/math-vector.h>
 __NAMESPACE_LOCAL_BEGIN
-/* Return `x' to the `y' power */
 __CEIREDIRECT(__ATTR_WUNUSED __DECL_SIMD_pow,double,__NOTHROW,__localdep_pow,(double __x, double __y),pow,{ return __builtin_pow(__x, __y); })
 #elif defined(__CRT_HAVE_pow)
 __NAMESPACE_LOCAL_END
 #include <bits/crt/math-vector.h>
 __NAMESPACE_LOCAL_BEGIN
-/* Return `x' to the `y' power */
 __CREDIRECT(__ATTR_WUNUSED __DECL_SIMD_pow,double,__NOTHROW,__localdep_pow,(double __x, double __y),pow,(__x,__y))
 #elif defined(__CRT_HAVE___pow)
 __NAMESPACE_LOCAL_END
 #include <bits/crt/math-vector.h>
 __NAMESPACE_LOCAL_BEGIN
-/* Return `x' to the `y' power */
 __CREDIRECT(__ATTR_WUNUSED __DECL_SIMD_pow,double,__NOTHROW,__localdep_pow,(double __x, double __y),__pow,(__x,__y))
 #elif defined(__IEEE754_DOUBLE_TYPE_IS_DOUBLE__) || defined(__IEEE754_FLOAT_TYPE_IS_DOUBLE__) || defined(__IEEE854_LONG_DOUBLE_TYPE_IS_DOUBLE__)
 __NAMESPACE_LOCAL_END
 #include <libc/local/math/pow.h>
 __NAMESPACE_LOCAL_BEGIN
-/* Return `x' to the `y' power */
 #define __localdep_pow __LIBC_LOCAL_NAME(pow)
 #else /* ... */
 #undef __local___localdep_pow_defined
 #endif /* !... */
 #endif /* !__local___localdep_pow_defined */
-/* Another name occasionally used */
 __LOCAL_LIBC(pow10) __ATTR_WUNUSED double
 __NOTHROW(__LIBCCALL __LIBC_LOCAL_NAME(pow10))(double __x) {
 	return __localdep_pow(10.0, __x);

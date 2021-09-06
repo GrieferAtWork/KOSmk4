@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xbe742eeb */
+/* HASH CRC-32:0x91636aae */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -25,7 +25,6 @@
 #include <bits/types.h>
 #include <bits/os/timespec.h>
 __NAMESPACE_LOCAL_BEGIN
-/* Dependency: sched_rr_get_interval32 from sched */
 #ifndef __local___localdep_sched_rr_get_interval32_defined
 #define __local___localdep_sched_rr_get_interval32_defined 1
 __CREDIRECT(,int,__NOTHROW_NCX,__localdep_sched_rr_get_interval32,(__pid_t __pid, struct __timespec32 *__tms),sched_rr_get_interval,(__pid,__tms))

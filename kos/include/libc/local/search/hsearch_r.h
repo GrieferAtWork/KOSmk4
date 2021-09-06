@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xf2b42e0e */
+/* HASH CRC-32:0x3adfca8e */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -24,42 +24,30 @@
 struct entry;
 struct hsearch_data;
 __NAMESPACE_LOCAL_BEGIN
-/* Dependency: strcmp from string */
 #ifndef __local___localdep_strcmp_defined
 #define __local___localdep_strcmp_defined 1
 #if __has_builtin(__builtin_strcmp) && defined(__LIBC_BIND_CRTBUILTINS) && defined(__CRT_HAVE_strcmp)
-/* >> strcmp(3)
- * Compare 2 strings and return the difference of the first non-matching character, or `0' if they are identical */
 __CEIREDIRECT(__ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1, 2)),int,__NOTHROW_NCX,__localdep_strcmp,(char const *__s1, char const *__s2),strcmp,{ return __builtin_strcmp(__s1, __s2); })
 #elif defined(__CRT_HAVE_strcmp)
-/* >> strcmp(3)
- * Compare 2 strings and return the difference of the first non-matching character, or `0' if they are identical */
 __CREDIRECT(__ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1, 2)),int,__NOTHROW_NCX,__localdep_strcmp,(char const *__s1, char const *__s2),strcmp,(__s1,__s2))
 #else /* ... */
 __NAMESPACE_LOCAL_END
 #include <libc/local/string/strcmp.h>
 __NAMESPACE_LOCAL_BEGIN
-/* >> strcmp(3)
- * Compare 2 strings and return the difference of the first non-matching character, or `0' if they are identical */
 #define __localdep_strcmp __LIBC_LOCAL_NAME(strcmp)
 #endif /* !... */
 #endif /* !__local___localdep_strcmp_defined */
-/* Dependency: strlen from string */
 #ifndef __local___localdep_strlen_defined
 #define __local___localdep_strlen_defined 1
 #ifdef __CRT_HAVE_strlen
 __NAMESPACE_LOCAL_END
 #include <hybrid/typecore.h>
 __NAMESPACE_LOCAL_BEGIN
-/* >> strlen(3)
- * Return the length of the string in characters (Same as `rawmemlen[...](str, '\0')') */
 __CREDIRECT(__ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1)),__SIZE_TYPE__,__NOTHROW_NCX,__localdep_strlen,(char const *__restrict __str),strlen,(__str))
 #else /* __CRT_HAVE_strlen */
 __NAMESPACE_LOCAL_END
 #include <libc/local/string/strlen.h>
 __NAMESPACE_LOCAL_BEGIN
-/* >> strlen(3)
- * Return the length of the string in characters (Same as `rawmemlen[...](str, '\0')') */
 #define __localdep_strlen __LIBC_LOCAL_NAME(strlen)
 #endif /* !__CRT_HAVE_strlen */
 #endif /* !__local___localdep_strlen_defined */
@@ -82,8 +70,6 @@ typedef struct entry {
 #endif /* !__ENTRY_defined */
 #include <libc/errno.h>
 __NAMESPACE_LOCAL_BEGIN
-/* >> hsearch_r(3)
- * Reentrant versions which can handle multiple hashing tables at the same time */
 __LOCAL_LIBC(hsearch_r) __ATTR_NONNULL((3, 4)) int
 __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(hsearch_r))(struct entry __item, int __action, struct entry **__retval, struct hsearch_data *__htab) {
 	typedef struct {

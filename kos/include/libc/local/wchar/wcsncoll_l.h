@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x3a097b57 */
+/* HASH CRC-32:0x7aec7e0c */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -23,7 +23,6 @@
 #include <__crt.h>
 #include <hybrid/typecore.h>
 __NAMESPACE_LOCAL_BEGIN
-/* Dependency: wcsncoll from wchar */
 #ifndef __local___localdep_wcsncoll_defined
 #define __local___localdep_wcsncoll_defined 1
 #ifdef __CRT_HAVE_wcsncoll

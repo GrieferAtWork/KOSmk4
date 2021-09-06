@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xdd917eb6 */
+/* HASH CRC-32:0xb44c8c61 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -23,7 +23,6 @@
 #include <__crt.h>
 #ifdef __CRT_HAVE__dpcomp
 __NAMESPACE_LOCAL_BEGIN
-/* Dependency: _dpcomp from math */
 #ifndef __local___localdep__dpcomp_defined
 #define __local___localdep__dpcomp_defined 1
 __CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,int,__NOTHROW_NCX,__localdep__dpcomp,(double __x, double __y),_dpcomp,(__x,__y))

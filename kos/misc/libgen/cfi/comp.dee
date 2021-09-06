@@ -565,10 +565,10 @@ class ImpossibleConstraints {
 @@Error class to indicate that operands are invalid for a given instruction
 class InvalidOperands {}
 
-@@Instructions that may be written as `<instr> <operand>;`,
-@@which is compiled as an alias for `push <operand>; <instr>;`
+@@Instructions  that  may be  written as  `<instr> <operand>;`,
+@@which is compiled as an alias for `push <operand>;  <instr>;`
 @@Note that `plus` (aka. `add`) isn't in this list because that
-@@instruction has special handling due to `DW_OP_plus_uconst`!
+@@instruction  has special handling due to `DW_OP_plus_uconst`!
 global final BINARY_AS_PUSH_INSTR_OPCODES: {int...} = {
 	DW_OP_and, DW_OP_div, DW_OP_minus, DW_OP_mod, DW_OP_mul,
 	DW_OP_or, DW_OP_shl, DW_OP_shr, DW_OP_shra, DW_OP_xor,
@@ -653,7 +653,7 @@ function encodeSLeb128(value: int): {int...} {
 
 class Assembler {
 	@@Guaranties on value ranges never used by variables.
-	@@Variables not in this list may take any value
+	@@Variables not  in  this  list may  take  any  value
 	public member inLimits: {string: (int, int)};
 
 	@@Min/Max allowed values for variables in generated code
@@ -1401,7 +1401,6 @@ handle_fixed_operand_size:
 again_with_less_limits:
 				this.inLimits = newInLimits;
 				try {
-					print File.stderr: (__LINE__, ": HERE");
 					more = Tuple(this.doAssemble(outputRegister, fullyLimited));
 				} catch (ImpossibleConstraints as e) {
 					local name = e.varName;

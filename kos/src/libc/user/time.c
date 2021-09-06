@@ -56,10 +56,10 @@ NOTHROW_NCX(libd___timezone)(void) {
 
 
 
-/*[[[head:libc_tzset,hash:CRC-32=0x5a534c25]]]*/
+/*[[[head:libc_tzset,hash:CRC-32=0x58b1d4b5]]]*/
 /* >> tzset(3)
  * Set time conversion information from the `$TZ' environment variable.
- * If `$TZ' is not defined, a locale-dependent default is used */
+ * If  `$TZ'  is  not  defined,  a  locale-dependent  default  is  used */
 INTERN ATTR_SECTION(".text.crt.time") void
 NOTHROW_NCX(LIBCCALL libc_tzset)(void)
 /*[[[body:libc_tzset]]]*/
@@ -72,9 +72,9 @@ NOTHROW_NCX(LIBCCALL libc_tzset)(void)
 
 
 
-/*[[[head:libc_clock,hash:CRC-32=0xf771aaae]]]*/
+/*[[[head:libc_clock,hash:CRC-32=0x4139ade9]]]*/
 /* >> clock(3)
- * Time used by the program so far (user time + system time)
+ * Time used by the program so  far (user time + system  time)
  * The `result / CLOCKS_PER_SECOND' is program time in seconds */
 INTERN ATTR_SECTION(".text.crt.time") WUNUSED clock_t
 NOTHROW_NCX(LIBCCALL libc_clock)(void)

@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xd3605563 */
+/* HASH CRC-32:0xf15fcde */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -22,7 +22,6 @@
 #define __local_wildc32scasecmp_defined 1
 #include <__crt.h>
 __NAMESPACE_LOCAL_BEGIN
-/* Dependency: towlower from wctype */
 #ifndef __local___localdep_towlower_defined
 #define __local___localdep_towlower_defined 1
 #if __has_builtin(__builtin_towlower) && defined(__LIBC_BIND_CRTBUILTINS) && defined(__CRT_HAVE_towlower)

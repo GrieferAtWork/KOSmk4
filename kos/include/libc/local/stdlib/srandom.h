@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xac6b25ba */
+/* HASH CRC-32:0xf8a4532c */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -22,7 +22,6 @@
 #define __local_srandom_defined 1
 #include <__crt.h>
 __NAMESPACE_LOCAL_BEGIN
-/* Dependency: srand from stdlib */
 #ifndef __local___localdep_srand_defined
 #define __local___localdep_srand_defined 1
 #ifdef __CRT_HAVE_srand

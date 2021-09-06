@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x83c74d45 */
+/* HASH CRC-32:0x92d91791 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -31,9 +31,9 @@ DECL_BEGIN
 
 #if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
 /* @EXCEPT: `realloc_in_place()' will return `NULL' if the reallocation isn't
- *           possible due to the requested memory above `MALLPTR' already being
+ *           possible due to the requested  memory above `MALLPTR' already  being
  *           in use. However, an `E_BADALLOC' exception is thrown if insufficient
- *           memory (for internal control structures) is available to complete
+ *           memory (for internal  control structures) is  available to  complete
  *           the operation */
 INTDEF ATTR_MALL_DEFAULT_ALIGNED ATTR_ALLOC_SIZE((2)) void *NOTHROW_NCX(LIBDCALL libd_realloc_in_place)(void *__restrict mallptr, size_t n_bytes);
 INTDEF ATTR_MALLOC WUNUSED ATTR_ALLOC_ALIGN(1) ATTR_ALLOC_SIZE((2)) void *NOTHROW_NCX(LIBDCALL libd_memalign)(size_t alignment, size_t n_bytes);

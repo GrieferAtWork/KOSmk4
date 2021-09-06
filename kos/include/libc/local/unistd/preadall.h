@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x49d29e */
+/* HASH CRC-32:0xacc50b82 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -35,23 +35,16 @@
 #endif /* !__USE_KOS_ALTERATIONS */
 #endif /* !__PIO_OFFSET */
 __NAMESPACE_LOCAL_BEGIN
-/* Dependency: preadall64 from unistd */
 #ifndef __local___localdep_preadall64_defined
 #define __local___localdep_preadall64_defined 1
 #ifdef __CRT_HAVE_preadall64
-/* >> preadall64(3)
- * Same as `readall(3)', but using `pread64(2)' instead of `read()' */
 __CREDIRECT(__ATTR_NONNULL((2)),__SSIZE_TYPE__,__NOTHROW_RPC,__localdep_preadall64,(__fd_t __fd, void *__buf, __SIZE_TYPE__ __bufsize, __PIO_OFFSET64 __offset),preadall64,(__fd,__buf,__bufsize,__offset))
 #elif defined(__CRT_HAVE_preadall) && __SIZEOF_OFF32_T__ == __SIZEOF_OFF64_T__
-/* >> preadall64(3)
- * Same as `readall(3)', but using `pread64(2)' instead of `read()' */
 __CREDIRECT(__ATTR_NONNULL((2)),__SSIZE_TYPE__,__NOTHROW_RPC,__localdep_preadall64,(__fd_t __fd, void *__buf, __SIZE_TYPE__ __bufsize, __PIO_OFFSET64 __offset),preadall,(__fd,__buf,__bufsize,__offset))
 #elif defined(__CRT_HAVE_pread64) || defined(__CRT_HAVE___pread64) || defined(__CRT_HAVE_pread) || ((defined(__CRT_HAVE_lseek64) || defined(__CRT_HAVE__lseeki64) || defined(__CRT_HAVE_lseek) || defined(__CRT_HAVE__lseek) || defined(__CRT_HAVE___lseek)) && (defined(__CRT_HAVE_read) || defined(__CRT_HAVE__read) || defined(__CRT_HAVE___read)) && defined(__SEEK_CUR) && defined(__SEEK_SET))
 __NAMESPACE_LOCAL_END
 #include <libc/local/unistd/preadall64.h>
 __NAMESPACE_LOCAL_BEGIN
-/* >> preadall64(3)
- * Same as `readall(3)', but using `pread64(2)' instead of `read()' */
 #define __localdep_preadall64 __LIBC_LOCAL_NAME(preadall64)
 #else /* ... */
 #undef __local___localdep_preadall64_defined
@@ -60,8 +53,6 @@ __NAMESPACE_LOCAL_BEGIN
 __NAMESPACE_LOCAL_END
 #include <libc/errno.h>
 __NAMESPACE_LOCAL_BEGIN
-/* >> preadall(3)
- * Same as `readall(3)', but using `pread(2)' instead of `read()' */
 __LOCAL_LIBC(preadall) __ATTR_NONNULL((2)) __SSIZE_TYPE__
 __NOTHROW_RPC(__LIBCCALL __LIBC_LOCAL_NAME(preadall))(__fd_t __fd, void *__buf, __SIZE_TYPE__ __bufsize, __PIO_OFFSET __offset) {
 	return __localdep_preadall64(__fd, __buf, __bufsize, (__PIO_OFFSET64)__offset);

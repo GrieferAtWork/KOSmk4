@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xc58aa7ab */
+/* HASH CRC-32:0xd189e3ec */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -25,35 +25,18 @@
 #if !defined(__NO_STDSTREAMS) && (defined(__CRT_HAVE_fgets) || defined(__CRT_HAVE_fgets_unlocked) || ((defined(__CRT_HAVE_fgetc) || defined(__CRT_HAVE_getc) || defined(__CRT_HAVE__IO_getc) || defined(__CRT_HAVE_fgetc_unlocked) || defined(__CRT_HAVE_getc_unlocked) || (defined(__CRT_DOS) && defined(__CRT_HAVE__filbuf)) || defined(__CRT_HAVE_fread) || defined(__CRT_HAVE__IO_fread) || defined(__CRT_HAVE_fread_unlocked) || defined(__CRT_HAVE__fread_nolock)) && (defined(__CRT_HAVE_ungetc) || defined(__CRT_HAVE__IO_ungetc) || defined(__CRT_HAVE_ungetc_unlocked) || defined(__CRT_HAVE__ungetc_nolock)) && (defined(__CRT_HAVE_ferror) || defined(__CRT_HAVE__IO_ferror) || defined(__CRT_HAVE_ferror_unlocked))))
 #include <kos/anno.h>
 __NAMESPACE_LOCAL_BEGIN
-/* Dependency: fgets from stdio */
 #ifndef __local___localdep_fgets_defined
 #define __local___localdep_fgets_defined 1
 #if defined(__CRT_HAVE_fgets_unlocked) && defined(__USE_STDIO_UNLOCKED)
-/* >> fgets(3)
- * Read up to `bufsize - 1' bytes of data from `stream', storing them into `buf' stopped when
- * the buffer is full or a line-feed was read (in this case, the line-feed is also written to `buf')
- * Afterwards, append a trailing NUL-character and re-return `buf', or return `NULL' if an error occurred. */
 __CREDIRECT(__ATTR_WUNUSED __ATTR_NONNULL((1, 3)),char *,__THROWING,__localdep_fgets,(char *__restrict __buf, __STDC_INT_AS_SIZE_T __bufsize, __FILE *__restrict __stream),fgets_unlocked,(__buf,__bufsize,__stream))
 #elif defined(__CRT_HAVE_fgets)
-/* >> fgets(3)
- * Read up to `bufsize - 1' bytes of data from `stream', storing them into `buf' stopped when
- * the buffer is full or a line-feed was read (in this case, the line-feed is also written to `buf')
- * Afterwards, append a trailing NUL-character and re-return `buf', or return `NULL' if an error occurred. */
 __CREDIRECT(__ATTR_WUNUSED __ATTR_NONNULL((1, 3)),char *,__THROWING,__localdep_fgets,(char *__restrict __buf, __STDC_INT_AS_SIZE_T __bufsize, __FILE *__restrict __stream),fgets,(__buf,__bufsize,__stream))
 #elif defined(__CRT_HAVE_fgets_unlocked)
-/* >> fgets(3)
- * Read up to `bufsize - 1' bytes of data from `stream', storing them into `buf' stopped when
- * the buffer is full or a line-feed was read (in this case, the line-feed is also written to `buf')
- * Afterwards, append a trailing NUL-character and re-return `buf', or return `NULL' if an error occurred. */
 __CREDIRECT(__ATTR_WUNUSED __ATTR_NONNULL((1, 3)),char *,__THROWING,__localdep_fgets,(char *__restrict __buf, __STDC_INT_AS_SIZE_T __bufsize, __FILE *__restrict __stream),fgets_unlocked,(__buf,__bufsize,__stream))
 #elif (defined(__CRT_HAVE_fgetc) || defined(__CRT_HAVE_getc) || defined(__CRT_HAVE__IO_getc) || defined(__CRT_HAVE_fgetc_unlocked) || defined(__CRT_HAVE_getc_unlocked) || (defined(__CRT_DOS) && defined(__CRT_HAVE__filbuf)) || defined(__CRT_HAVE_fread) || defined(__CRT_HAVE__IO_fread) || defined(__CRT_HAVE_fread_unlocked) || defined(__CRT_HAVE__fread_nolock)) && (defined(__CRT_HAVE_ungetc) || defined(__CRT_HAVE__IO_ungetc) || defined(__CRT_HAVE_ungetc_unlocked) || defined(__CRT_HAVE__ungetc_nolock)) && (defined(__CRT_HAVE_ferror) || defined(__CRT_HAVE__IO_ferror) || defined(__CRT_HAVE_ferror_unlocked))
 __NAMESPACE_LOCAL_END
 #include <libc/local/stdio/fgets.h>
 __NAMESPACE_LOCAL_BEGIN
-/* >> fgets(3)
- * Read up to `bufsize - 1' bytes of data from `stream', storing them into `buf' stopped when
- * the buffer is full or a line-feed was read (in this case, the line-feed is also written to `buf')
- * Afterwards, append a trailing NUL-character and re-return `buf', or return `NULL' if an error occurred. */
 #define __localdep_fgets __LIBC_LOCAL_NAME(fgets)
 #else /* ... */
 #undef __local___localdep_fgets_defined

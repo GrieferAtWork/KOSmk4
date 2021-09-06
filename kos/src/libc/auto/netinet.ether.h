@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xc39074ae */
+/* HASH CRC-32:0xeee0887d */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -50,50 +50,50 @@ INTDEF ATTR_RETNONNULL NONNULL((1, 2)) char *NOTHROW_NCX(LIBDCALL libd_ether_nto
 INTDEF ATTR_RETNONNULL NONNULL((1, 2)) char *NOTHROW_NCX(LIBCCALL libc_ether_ntoa_r)(struct ether_addr const *__restrict addr, char *__restrict buf);
 #endif /* !__KERNEL__ */
 #if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
-/* To the reverse of `ether_ntoa()' and convert
+/* To   the   reverse  of   `ether_ntoa()'   and  convert
  * a `AA:BB:CC:DD:EE:FF'-string into an ethernet address. */
 INTDEF ATTR_RETNONNULL WUNUSED NONNULL((1)) struct ether_addr *NOTHROW_NCX(LIBDCALL libd_ether_aton)(char const *__restrict asc);
 #endif /* !__LIBCCALL_IS_LIBDCALL && !__KERNEL__ */
 #ifndef __KERNEL__
-/* To the reverse of `ether_ntoa()' and convert
+/* To   the   reverse  of   `ether_ntoa()'   and  convert
  * a `AA:BB:CC:DD:EE:FF'-string into an ethernet address. */
 INTDEF ATTR_RETNONNULL WUNUSED NONNULL((1)) struct ether_addr *NOTHROW_NCX(LIBCCALL libc_ether_aton)(char const *__restrict asc);
 #endif /* !__KERNEL__ */
 #if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
-/* To the reverse of `ether_ntoa()' and convert
+/* To   the   reverse  of   `ether_ntoa()'   and  convert
  * a `AA:BB:CC:DD:EE:FF'-string into an ethernet address. */
 INTDEF WUNUSED NONNULL((1, 2)) struct ether_addr *NOTHROW_NCX(LIBDCALL libd_ether_aton_r)(char const *__restrict asc, struct ether_addr *__restrict addr);
 #endif /* !__LIBCCALL_IS_LIBDCALL && !__KERNEL__ */
 #ifndef __KERNEL__
-/* To the reverse of `ether_ntoa()' and convert
+/* To   the   reverse  of   `ether_ntoa()'   and  convert
  * a `AA:BB:CC:DD:EE:FF'-string into an ethernet address. */
 INTDEF WUNUSED NONNULL((1, 2)) struct ether_addr *NOTHROW_NCX(LIBCCALL libc_ether_aton_r)(char const *__restrict asc, struct ether_addr *__restrict addr);
 #endif /* !__KERNEL__ */
 #if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
-/* To the reverse of `ether_ntoa()' and convert
+/* To   the   reverse  of   `ether_ntoa()'   and  convert
  * a `AA:BB:CC:DD:EE:FF'-string into an ethernet address. */
 INTDEF WUNUSED NONNULL((1, 2)) struct ether_addr *NOTHROW_NCX(LIBDCALL libd_ether_paton_r)(char const **__restrict pasc, struct ether_addr *__restrict addr);
 #endif /* !__LIBCCALL_IS_LIBDCALL && !__KERNEL__ */
 #ifndef __KERNEL__
-/* To the reverse of `ether_ntoa()' and convert
+/* To   the   reverse  of   `ether_ntoa()'   and  convert
  * a `AA:BB:CC:DD:EE:FF'-string into an ethernet address. */
 INTDEF WUNUSED NONNULL((1, 2)) struct ether_addr *NOTHROW_NCX(LIBCCALL libc_ether_paton_r)(char const **__restrict pasc, struct ether_addr *__restrict addr);
 #endif /* !__KERNEL__ */
 #if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
-/* Scan a given `line', as read from `/etc/ethers' for
- * its `addr' and `hostname' parts. For this purpose, the given
+/* Scan  a  given  `line',   as  read  from  `/etc/ethers'   for
+ * its `addr' and `hostname' parts. For this purpose, the  given
  * `line' must be formatted as `AA:BB:CC:DD:EE:FF  hostname  \n'
  * @return: 0 : Success
- * @return: -1: Failed to parse the `addr'-portion
+ * @return: -1: Failed to parse the  `addr'-portion
  *              (`ether_paton_r()' returned `NULL') */
 INTDEF WUNUSED NONNULL((1, 2, 3)) int NOTHROW_NCX(LIBDCALL libd_ether_line)(char const *line, struct ether_addr *addr, char *hostname);
 #endif /* !__LIBCCALL_IS_LIBDCALL && !__KERNEL__ */
 #ifndef __KERNEL__
-/* Scan a given `line', as read from `/etc/ethers' for
- * its `addr' and `hostname' parts. For this purpose, the given
+/* Scan  a  given  `line',   as  read  from  `/etc/ethers'   for
+ * its `addr' and `hostname' parts. For this purpose, the  given
  * `line' must be formatted as `AA:BB:CC:DD:EE:FF  hostname  \n'
  * @return: 0 : Success
- * @return: -1: Failed to parse the `addr'-portion
+ * @return: -1: Failed to parse the  `addr'-portion
  *              (`ether_paton_r()' returned `NULL') */
 INTDEF WUNUSED NONNULL((1, 2, 3)) int NOTHROW_NCX(LIBCCALL libc_ether_line)(char const *line, struct ether_addr *addr, char *hostname);
 #endif /* !__KERNEL__ */

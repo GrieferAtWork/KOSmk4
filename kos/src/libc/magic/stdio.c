@@ -684,7 +684,7 @@ int remove([[nonnull]] char const *filename) {
 }
 
 @@>> rename(3)
-@@Rename a given file `oldname' to `newname_or_path', or in the event
+@@Rename  a given file `oldname' to `newname_or_path', or in the event
 @@that `newname_or_path' refers to a directory, place the file within.
 [[cp, std, guard]]
 [[userimpl, requires_include("<asm/os/fcntl.h>")]]
@@ -754,7 +754,7 @@ int setvbuf([[nonnull]] FILE *__restrict stream,
 
 @@>> fgetc(3)
 @@Read and return a single character from `stream'
-@@If the given `stream' has been exhausted or if an error occurred, `EOF' is
+@@If  the given `stream' has been exhausted or if an error occurred, `EOF' is
 @@returned and the exact cause can be determined by using `ferror' and `feof'
 [[std, cp_stdio, no_crt_self_import, no_crt_self_export, export_as(CNL_fgetc...)]]
 [[if($extended_include_prefix("<features.h>")defined(__USE_STDIO_UNLOCKED)), alias(CNL_fgetc_unlocked...)]]
@@ -823,8 +823,8 @@ int putchar(int ch) {
 %[default:section(".text.crt{|.dos}.FILE.locked.read.read")]
 
 @@>> fgets(3)
-@@Read up to `bufsize - 1' bytes of data from `stream', storing them into `buf' stopped when
-@@the buffer is full or a line-feed was read (in this case, the line-feed is also written to `buf')
+@@Read up  to  `bufsize - 1'  bytes  of  data  from  `stream',  storing  them  into  `buf'  stopped  when
+@@the buffer is  full or a  line-feed was read  (in this case,  the line-feed is  also written to  `buf')
 @@Afterwards, append a trailing NUL-character and re-return `buf', or return `NULL' if an error occurred.
 [[std, cp_stdio, wunused, decl_include("<features.h>")]]
 [[if($extended_include_prefix("<features.h>")defined(__USE_STDIO_UNLOCKED)), preferred_alias("fgets_unlocked")]]
@@ -1140,7 +1140,7 @@ FILE *freopen([[nonnull]] char const *__restrict filename,
 %[default:section(".text.crt{|.dos}.FILE.locked.seek.pos")]
 
 @@>> fgetpos(3), fgetpos64(3)
-@@Initialize an opaque descriptor `pos' for the current in-file position of `stream'
+@@Initialize   an   opaque  descriptor   `pos'   for  the   current   in-file  position   of  `stream'
 @@Upon success (return == 0), `pos' can be used to restore the current position by calling `fsetpos()'
 [[stdio_throws, std, decl_include("<bits/crt/stdio.h>")]]
 [[no_crt_self_import, no_crt_self_export, export_as(CNL_fgetpos...)]]
@@ -1223,7 +1223,7 @@ __STDC_INT_AS_SSIZE_T vfprintf([[nonnull]] FILE *__restrict stream,
 }
 
 @@>> fprintf(3), vfprintf(3)
-@@Print data to `stream', following `format'
+@@Print  data  to  `stream',  following  `format'
 @@Return the number of successfully printed bytes
 [[decl_include("<features.h>")]]
 [[std, cp_stdio, ATTR_LIBC_PRINTF(2, 3), export_alias("_IO_fprintf")]]
@@ -1247,7 +1247,7 @@ __STDC_INT_AS_SSIZE_T vprintf([[nonnull]] char const *__restrict format, $va_lis
 }
 
 @@>> printf(3), vprintf(3)
-@@Print data to `stdout', following `format'
+@@Print  data  to  `stdout',  following  `format'
 @@Return the number of successfully printed bytes
 [[decl_include("<features.h>")]]
 [[std, cp_stdio, ATTR_LIBC_PRINTF(1, 2), crtbuiltin]]
@@ -1312,7 +1312,7 @@ __STDC_INT_AS_SIZE_T vscanf([[nonnull]] char const *__restrict format, $va_list 
 %(std)
 
 @@>> fscanf(3), vfscanf(3)
-@@Scan data from `stream', following `format'
+@@Scan  data   from   `stream',   following   `format'
 @@Return the number of successfully scanned data items
 [[decl_include("<features.h>")]]
 [[std, cp_stdio, crtbuiltin, ATTR_LIBC_SCANF(2, 3), wunused]]
@@ -1445,7 +1445,7 @@ __STDC_INT_AS_SIZE_T vsscanf([[nonnull]] char const *__restrict input,
 %(std)
 @@>> sscanf(3), vsscanf(3)
 @@Scan data from a given `input' string, following `format'
-@@Return the number of successfully scanned data items
+@@Return  the  number  of successfully  scanned  data items
 [[decl_include("<features.h>")]]
 [[std, ATTR_LIBC_SCANF(2, 3), crtbuiltin, export_alias("_IO_sscanf")]]
 [[section(".text.crt{|.dos}.unicode.static.format.scanf")]]
@@ -1471,7 +1471,7 @@ __STDC_INT_AS_SSIZE_T vsprintf([[nonnull]] char *__restrict dest,
 }
 
 @@>> sprintf(3), vsprintf(3)
-@@Print a formatted string to a given in-member string buffer `buf'
+@@Print  a  formatted  string  to  a  given  in-member  string  buffer  `buf'
 @@Return the number of written characters, excluding a trailing NUL-character
 [[decl_include("<features.h>")]]
 [[std, ATTR_LIBC_PRINTF(2, 3), kernel, crtbuiltin, alias("_IO_sprintf")]]
@@ -1549,8 +1549,8 @@ __STDC_INT_AS_SIZE_T vsnprintf([[outp_opt(min(return, buflen))]] char *__restric
 }
 
 @@>> snprintf(3), vsnprintf(3)
-@@Print a formatted string to a given in-member string buffer `buf'
-@@Always return the REQUIRED buffer size (excluding a trailing NUL-
+@@Print  a formatted string to a given in-member string buffer `buf'
+@@Always return the REQUIRED buffer size (excluding a trailing  NUL-
 @@character), and never write more than `buflen' characters to `buf'
 [[decl_include("<features.h>", "<hybrid/typecore.h>")]]
 [[std, kernel, guard, crtbuiltin, ATTR_LIBC_PRINTF(3, 4)]]
@@ -1787,7 +1787,7 @@ char *tempnam(char const *dir, char const *pfx);
 
 @@>> fdopen(3)
 @@Open a new file stream by inheriting a given file descriptor `fd'
-@@Note that upon success (`return != NULL'), the given `fd'
+@@Note   that  upon  success  (`return != NULL'),  the  given  `fd'
 @@will be `close()'d once `fclose(return)' is called
 [[wunused, dos_only_export_alias("_fdopen"), export_alias("_IO_fdopen")]]
 $FILE *fdopen($fd_t fd, [[nonnull]] char const *__restrict modes);
@@ -1990,7 +1990,7 @@ int pclose([[nonnull]] $FILE *stream);
 
 @@>> popenve(3)
 @@Similar to `popen(3)', but rather than running `execl("/bin/sh", "-c", command)',
-@@this function will `execve(path, argv, envp)'. The returned FILE must still be
+@@this function will  `execve(path, argv, envp)'. The returned  FILE must still  be
 @@closed using `pclose(3)', rather than `fclose(3)'
 [[cp, wunused, argument_names(path, ___argv, ___envp, modes)]]
 [[decl_include("<features.h>"), decl_prefix(DEFINE_TARGV)]]
@@ -3249,12 +3249,12 @@ fgetln([[nonnull]] $FILE *__restrict fp,
 @@>> fmtcheck(3)
 @@Check if `user_format' may be used as a drop-in replacement for `good_format'
 @@in the context of a call to `printf(3)' (or `format_printf()'), such that all
-@@contained format qualifiers reference the same (or compatible) underlying C
+@@contained format qualifiers reference the  same (or compatible) underlying  C
 @@types, and in the same order.
-@@If all of this is the case, simply re-return `user_format'. Otherwise (i.e.
+@@If all of this is the  case, simply re-return `user_format'. Otherwise  (i.e.
 @@when `user_format' isn't compatible with `good_format'), return `good_format'
-@@instead. This function is meant to be used to validate user-provided printf
-@@format strings before actually using them, after they've been read from lang
+@@instead. This function is meant to  be used to validate user-provided  printf
+@@format strings before actually using them, after they've been read from  lang
 @@config files: `printf(fmtcheck(get_user_fmt(), "%s %s"), "Foo", "Bar");'
 [[guard, wunused, nonnull, attribute("__ATTR_FORMAT_ARG(2)")]] char const *
 fmtcheck([[nullable]] char const *user_format,
@@ -3945,7 +3945,7 @@ $FILE *funopen64(void const *cookie,
 @@pp_else@@
 	FILE *result;
 	struct __NAMESPACE_LOCAL_SYM __funopen64_holder *holder;
-@@pp_ifndef __BUILDING_LIBC@@
+@@pp_ifndef      __BUILDING_LIBC@@
 @@pp_if $has_function(funopen32)@@
 	if (!seekfn)
 		return funopen32(cookie, readfn, writefn, NULL, closefn);
@@ -3989,7 +3989,7 @@ $FILE *funopen64(void const *cookie,
 		result = crt_fopencookie(holder, readfn && writefn ? "r+" : readfn ? "r" : "w", ioc_functions);
 	}
 @@pp_else@@
-@@pp_if __SIZEOF_INT__ == __SIZEOF_SIZE_T__@@
+@@pp_if   __SIZEOF_INT__   ==  __SIZEOF_SIZE_T__@@
 @@pp_if __FS_SIZEOF(@OFF@) == __SIZEOF_OFF64_T__@@
 	result = funopen32(/* cookie:  */ holder,
 	                   /* readfn:  */ readfn  ? (__funopen_readfn_t)&__NAMESPACE_LOCAL_SYM funopen_to_funopen2_readfn  : NULL,

@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xbc9a6ca3 */
+/* HASH CRC-32:0xc5635cdd */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -26,73 +26,47 @@
 #include <features.h>
 #include <hybrid/typecore.h>
 __NAMESPACE_LOCAL_BEGIN
-/* Dependency: c32slen from parts.uchar.string */
 #ifndef __local___localdep_c32slen_defined
 #define __local___localdep_c32slen_defined 1
 #if defined(__CRT_HAVE_wcslen) && __SIZEOF_WCHAR_T__ == 4 && defined(__LIBCCALL_IS_LIBKCALL)
-/* >> strlen(3)
- * Return the length of the string in characters (Same as `rawmemlen[...](str, '\0')') */
 __CREDIRECT(__ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1)),__SIZE_TYPE__,__NOTHROW_NCX,__localdep_c32slen,(__CHAR32_TYPE__ const *__restrict __str),wcslen,(__str))
 #elif defined(__CRT_HAVE_KOS$wcslen)
-/* >> strlen(3)
- * Return the length of the string in characters (Same as `rawmemlen[...](str, '\0')') */
 __CREDIRECT_KOS(__ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1)),__SIZE_TYPE__,__NOTHROW_NCX,__localdep_c32slen,(__CHAR32_TYPE__ const *__restrict __str),wcslen,(__str))
 #elif __SIZEOF_WCHAR_T__ == 4
 __NAMESPACE_LOCAL_END
 #include <libc/local/wchar/wcslen.h>
 __NAMESPACE_LOCAL_BEGIN
-/* >> strlen(3)
- * Return the length of the string in characters (Same as `rawmemlen[...](str, '\0')') */
 #define __localdep_c32slen (*(__SIZE_TYPE__(__LIBKCALL *)(__CHAR32_TYPE__ const *__restrict))&__LIBC_LOCAL_NAME(wcslen))
 #else /* ... */
 __NAMESPACE_LOCAL_END
 #include <libc/local/parts.uchar.string/c32slen.h>
 __NAMESPACE_LOCAL_BEGIN
-/* >> strlen(3)
- * Return the length of the string in characters (Same as `rawmemlen[...](str, '\0')') */
 #define __localdep_c32slen __LIBC_LOCAL_NAME(c32slen)
 #endif /* !... */
 #endif /* !__local___localdep_c32slen_defined */
-/* Dependency: file_c32printer from parts.uchar.stdio */
 #ifndef __local___localdep_file_c32printer_defined
 #define __local___localdep_file_c32printer_defined 1
 #if defined(__CRT_HAVE_file_wprinter_unlocked) && defined(__USE_STDIO_UNLOCKED) && __SIZEOF_WCHAR_T__ == 4 && defined(__LIBCCALL_IS_LIBKCALL)
-/* >> file_wprinter(3)
- * For use with `format_wprintf()' and friends: Prints to a `FILE *' closure argument */
 __CREDIRECT(__ATTR_NONNULL((1, 2)),__SSIZE_TYPE__,__THROWING,__localdep_file_c32printer,(void *__arg, __CHAR32_TYPE__ const *__restrict __data, __SIZE_TYPE__ __datalen),file_wprinter_unlocked,(__arg,__data,__datalen))
 #elif defined(__CRT_HAVE_KOS$file_wprinter_unlocked) && defined(__USE_STDIO_UNLOCKED)
-/* >> file_wprinter(3)
- * For use with `format_wprintf()' and friends: Prints to a `FILE *' closure argument */
 __CREDIRECT_KOS(__ATTR_NONNULL((1, 2)),__SSIZE_TYPE__,__THROWING,__localdep_file_c32printer,(void *__arg, __CHAR32_TYPE__ const *__restrict __data, __SIZE_TYPE__ __datalen),file_wprinter_unlocked,(__arg,__data,__datalen))
 #elif defined(__CRT_HAVE_file_wprinter) && __SIZEOF_WCHAR_T__ == 4 && defined(__LIBCCALL_IS_LIBKCALL)
-/* >> file_wprinter(3)
- * For use with `format_wprintf()' and friends: Prints to a `FILE *' closure argument */
 __CREDIRECT(__ATTR_NONNULL((1, 2)),__SSIZE_TYPE__,__THROWING,__localdep_file_c32printer,(void *__arg, __CHAR32_TYPE__ const *__restrict __data, __SIZE_TYPE__ __datalen),file_wprinter,(__arg,__data,__datalen))
 #elif defined(__CRT_HAVE_KOS$file_wprinter)
-/* >> file_wprinter(3)
- * For use with `format_wprintf()' and friends: Prints to a `FILE *' closure argument */
 __CREDIRECT_KOS(__ATTR_NONNULL((1, 2)),__SSIZE_TYPE__,__THROWING,__localdep_file_c32printer,(void *__arg, __CHAR32_TYPE__ const *__restrict __data, __SIZE_TYPE__ __datalen),file_wprinter,(__arg,__data,__datalen))
 #elif defined(__CRT_HAVE_file_wprinter_unlocked) && __SIZEOF_WCHAR_T__ == 4 && defined(__LIBCCALL_IS_LIBKCALL)
-/* >> file_wprinter(3)
- * For use with `format_wprintf()' and friends: Prints to a `FILE *' closure argument */
 __CREDIRECT(__ATTR_NONNULL((1, 2)),__SSIZE_TYPE__,__THROWING,__localdep_file_c32printer,(void *__arg, __CHAR32_TYPE__ const *__restrict __data, __SIZE_TYPE__ __datalen),file_wprinter_unlocked,(__arg,__data,__datalen))
 #elif defined(__CRT_HAVE_KOS$file_wprinter_unlocked)
-/* >> file_wprinter(3)
- * For use with `format_wprintf()' and friends: Prints to a `FILE *' closure argument */
 __CREDIRECT_KOS(__ATTR_NONNULL((1, 2)),__SSIZE_TYPE__,__THROWING,__localdep_file_c32printer,(void *__arg, __CHAR32_TYPE__ const *__restrict __data, __SIZE_TYPE__ __datalen),file_wprinter_unlocked,(__arg,__data,__datalen))
 #elif (defined(__CRT_HAVE_fputwc) || defined(__CRT_HAVE_putwc)) && __SIZEOF_WCHAR_T__ == 4
 __NAMESPACE_LOCAL_END
 #include <libc/local/wchar/file_wprinter.h>
 __NAMESPACE_LOCAL_BEGIN
-/* >> file_wprinter(3)
- * For use with `format_wprintf()' and friends: Prints to a `FILE *' closure argument */
 #define __localdep_file_c32printer (*(__SSIZE_TYPE__(__LIBKCALL *)(void *, __CHAR32_TYPE__ const *__restrict, __SIZE_TYPE__))&__LIBC_LOCAL_NAME(file_wprinter))
 #elif (defined(__CRT_HAVE_fputwc) && __SIZEOF_WCHAR_T__ == 4 && defined(__LIBCCALL_IS_LIBKCALL)) || defined(__CRT_HAVE_KOS$fputwc) || (defined(__CRT_HAVE_putwc) && __SIZEOF_WCHAR_T__ == 4 && defined(__LIBCCALL_IS_LIBKCALL)) || defined(__CRT_HAVE_KOS$putwc)
 __NAMESPACE_LOCAL_END
 #include <libc/local/parts.uchar.stdio/file_c32printer.h>
 __NAMESPACE_LOCAL_BEGIN
-/* >> file_wprinter(3)
- * For use with `format_wprintf()' and friends: Prints to a `FILE *' closure argument */
 #define __localdep_file_c32printer __LIBC_LOCAL_NAME(file_c32printer)
 #else /* ... */
 #undef __local___localdep_file_c32printer_defined

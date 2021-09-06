@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x4c4d609f */
+/* HASH CRC-32:0xf3b8244e */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -24,34 +24,24 @@
 #if defined(__CRT_HAVE_malloc) || defined(__CRT_HAVE_calloc) || defined(__CRT_HAVE_realloc) || defined(__CRT_HAVE_memalign) || defined(__CRT_HAVE_aligned_alloc) || defined(__CRT_HAVE_posix_memalign)
 #include <hybrid/typecore.h>
 __NAMESPACE_LOCAL_BEGIN
-/* Dependency: c32snlen from parts.uchar.string */
 #ifndef __local___localdep_c32snlen_defined
 #define __local___localdep_c32snlen_defined 1
 #if defined(__CRT_HAVE_wcsnlen) && __SIZEOF_WCHAR_T__ == 4 && defined(__LIBCCALL_IS_LIBKCALL)
-/* >> strnlen(3)
- * Same as `strlen', but don't exceed `max_chars' characters (Same as `memlen[...](str, '\0', max_chars)´) */
 __CREDIRECT(__ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1)),__SIZE_TYPE__,__NOTHROW_NCX,__localdep_c32snlen,(__CHAR32_TYPE__ const *__restrict __str, __SIZE_TYPE__ __maxlen),wcsnlen,(__str,__maxlen))
 #elif defined(__CRT_HAVE_KOS$wcsnlen)
-/* >> strnlen(3)
- * Same as `strlen', but don't exceed `max_chars' characters (Same as `memlen[...](str, '\0', max_chars)´) */
 __CREDIRECT_KOS(__ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1)),__SIZE_TYPE__,__NOTHROW_NCX,__localdep_c32snlen,(__CHAR32_TYPE__ const *__restrict __str, __SIZE_TYPE__ __maxlen),wcsnlen,(__str,__maxlen))
 #elif __SIZEOF_WCHAR_T__ == 4
 __NAMESPACE_LOCAL_END
 #include <libc/local/wchar/wcsnlen.h>
 __NAMESPACE_LOCAL_BEGIN
-/* >> strnlen(3)
- * Same as `strlen', but don't exceed `max_chars' characters (Same as `memlen[...](str, '\0', max_chars)´) */
 #define __localdep_c32snlen (*(__SIZE_TYPE__(__LIBKCALL *)(__CHAR32_TYPE__ const *__restrict, __SIZE_TYPE__))&__LIBC_LOCAL_NAME(wcsnlen))
 #else /* ... */
 __NAMESPACE_LOCAL_END
 #include <libc/local/parts.uchar.string/c32snlen.h>
 __NAMESPACE_LOCAL_BEGIN
-/* >> strnlen(3)
- * Same as `strlen', but don't exceed `max_chars' characters (Same as `memlen[...](str, '\0', max_chars)´) */
 #define __localdep_c32snlen __LIBC_LOCAL_NAME(c32snlen)
 #endif /* !... */
 #endif /* !__local___localdep_c32snlen_defined */
-/* Dependency: malloc from stdlib */
 #ifndef __local___localdep_malloc_defined
 #define __local___localdep_malloc_defined 1
 #if __has_builtin(__builtin_malloc) && defined(__LIBC_BIND_CRTBUILTINS) && defined(__CRT_HAVE_malloc)
@@ -67,23 +57,16 @@ __NAMESPACE_LOCAL_BEGIN
 #undef __local___localdep_malloc_defined
 #endif /* !... */
 #endif /* !__local___localdep_malloc_defined */
-/* Dependency: mempcpy from string */
 #ifndef __local___localdep_mempcpy_defined
 #define __local___localdep_mempcpy_defined 1
 #ifdef __CRT_HAVE_mempcpy
-/* >> mempcpy(3)
- * Same as `memcpy', but return `dst + n_bytes', rather than `dst' */
 __CREDIRECT(__ATTR_LEAF __ATTR_RETNONNULL __ATTR_NONNULL((1, 2)),void *,__NOTHROW_NCX,__localdep_mempcpy,(void *__restrict __dst, void const *__restrict __src, __SIZE_TYPE__ __n_bytes),mempcpy,(__dst,__src,__n_bytes))
 #elif defined(__CRT_HAVE___mempcpy)
-/* >> mempcpy(3)
- * Same as `memcpy', but return `dst + n_bytes', rather than `dst' */
 __CREDIRECT(__ATTR_LEAF __ATTR_RETNONNULL __ATTR_NONNULL((1, 2)),void *,__NOTHROW_NCX,__localdep_mempcpy,(void *__restrict __dst, void const *__restrict __src, __SIZE_TYPE__ __n_bytes),__mempcpy,(__dst,__src,__n_bytes))
 #else /* ... */
 __NAMESPACE_LOCAL_END
 #include <libc/local/string/mempcpy.h>
 __NAMESPACE_LOCAL_BEGIN
-/* >> mempcpy(3)
- * Same as `memcpy', but return `dst + n_bytes', rather than `dst' */
 #define __localdep_mempcpy __LIBC_LOCAL_NAME(mempcpy)
 #endif /* !... */
 #endif /* !__local___localdep_mempcpy_defined */

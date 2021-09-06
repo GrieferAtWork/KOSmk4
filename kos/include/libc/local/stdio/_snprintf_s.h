@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xf0145a4f */
+/* HASH CRC-32:0xb1029173 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -24,7 +24,6 @@
 #include <features.h>
 #include <hybrid/typecore.h>
 __NAMESPACE_LOCAL_BEGIN
-/* Dependency: _vsnprintf_s from stdio */
 #ifndef __local___localdep__vsnprintf_s_defined
 #define __local___localdep__vsnprintf_s_defined 1
 #ifdef __CRT_HAVE__vsnprintf_s

@@ -34,12 +34,12 @@ class SyscallArch {
 	member platformSuffix: string = "";
 
 	@@Set of (name, prefix, arch) for other architectures for which
-	@@syscall compatibility meta-data should be generated in the
+	@@syscall compatibility meta-data  should be  generated in  the
 	@@form of a system header @"/kos/{name}" that contains a set of
-	@@definitions @"{prefix}{syscall-name} 1" for all system calls
-	@@defined by both architectures that share both the same name,
+	@@definitions @"{prefix}{syscall-name} 1" for all system  calls
+	@@defined by both architectures that share both the same  name,
 	@@as well as binary compatibility.
-	@@On multi-arch targets such as x86_64, this is used to determine if an
+	@@On  multi-arch targets such as x86_64, this  is used to determine if an
 	@@invocation of `DEFINE_SYSCALLn()` should also define the compatibility-
 	@@mode variant of another system call with the same name.
 	member platformSyscallCompatArch: {(string, string, string)...} = none;
@@ -47,9 +47,9 @@ class SyscallArch {
 	@@Set of (name, arch) for hybridized syscalls-types.h headers
 	member platformSyscallCompatTypes: {(string, string)...} = none;
 
-	@@Name of the architecture that is targeted by `__ARCH_HAVE_COMPAT`, and
-	@@for which compatibility-mode implementation requests are issued to the
-	@@kernel. (when defined, emit `#define __ARCH_WANT_COMPAT_SYSCALL_XXX 1`
+	@@Name of  the architecture  that is  targeted by  `__ARCH_HAVE_COMPAT`,  and
+	@@for which  compatibility-mode implementation  requests  are issued  to  the
+	@@kernel. (when  defined,  emit  `#define  __ARCH_WANT_COMPAT_SYSCALL_XXX  1`
 	@@alongside `#define __ARCH_WANT_SYSCALL_YYY 1` in `<kos/kernel/syscalls.h>`)
 	@@NOTE: Compatibility-mode system calls that are already share binary
 	@@      compatibility with other, regular system calls will not cause
@@ -94,18 +94,18 @@ class SyscallArch {
 	member platformKernelSyscallWrappersCommon: Callable = none;
 
 	@@Mapping of known system call wrappers.
-	@@@key:   The prefix to be pre-pended before the wrappers´s name
+	@@@key:   The prefix  to be  pre-pended before  the wrappers´s  name
 	@@        e.g. when `__fooasm_`, one symbol might be `__fooasm_exit`
 	@@@value: A tuple @(function(fp: File, f: Function, sysno: int),
 	@@                  arch_origin_name)
-	@@        This function should print the assembly body for servicing
-	@@        the system call in the context in which this wrapper might
+	@@        This function  should print  the  assembly body  for  servicing
+	@@        the system  call in  the context  in which  this wrapper  might
 	@@        be called. The given `f` is the function that is being defined.
 	@@        @arch_origin_name is the name of the ARCH who´s system calls
 	@@        should be wrapped. Normally this is the same name as the
-	@@        current arch, however in order to allow for multi-arch
-	@@        compatibility mode (such as x86_64´s IA32-mode), one is
-	@@        allowed to specify a different arch who´s system calls
+	@@        current arch, however in  order to allow for  multi-arch
+	@@        compatibility  mode (such as x86_64´s IA32-mode), one is
+	@@        allowed to specify a  different arch who´s system  calls
 	@@        are then going to be wrapped.
 	member platformKernelSyscallWrappers: {string: (Callable, string)};
 
@@ -1353,7 +1353,7 @@ function x86_64_printKernelSyscallWrapper_asm32_sysrun32(fp: File, f: Function, 
 	fp << "END(__x86_asm32_sysrun32_" << f.name << ")\n";
 }
 
-@@Listing of supported system call architectures, as well
+@@Listing  of  supported  system call  architectures,  as well
 @@as arch-specific configuration options, and code generators.
 global ARCH: {string: SyscallArch} = {
 

@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xda3d9b8 */
+/* HASH CRC-32:0xc8e34065 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -25,7 +25,6 @@
 #if defined(__CRT_HAVE_mkostemps) || defined(__CRT_HAVE_mkostemps64) || defined(__CRT_HAVE_open64) || defined(__CRT_HAVE___open64) || defined(__CRT_HAVE_open) || defined(__CRT_HAVE__open) || defined(__CRT_HAVE___open) || (defined(__AT_FDCWD) && (defined(__CRT_HAVE_openat64) || defined(__CRT_HAVE_openat)))
 #include <bits/types.h>
 __NAMESPACE_LOCAL_BEGIN
-/* Dependency: mkostemps from stdlib */
 #ifndef __local___localdep_mkostemps_defined
 #define __local___localdep_mkostemps_defined 1
 #if defined(__CRT_HAVE_mkostemps64) && defined(__USE_FILE_OFFSET64)
@@ -52,15 +51,6 @@ __NAMESPACE_LOCAL_BEGIN
 #undef __local___localdep_mkostemps_defined
 #endif /* !... */
 #endif /* !__local___localdep_mkostemps_defined */
-/* >> mkostemp(3), mkostemp64(3)
- * Replace the last 6 characters of `template_' (which are followed by exactly
- * `suffixlen' more characters that are left alone), which must be filled with
- * all 'X'-characters before the call (else errno=EINVAL + return -1), with
- * random characters such that the filename described by `template_' will not
- * already exists. Then, create a new file with `O_RDWR | flags' and return the file
- * descriptor of that file.
- * @param: flags: Additional flags to pass to `open(2)',
- *                but `O_ACCMODE' is always set to `O_RDWR' */
 __LOCAL_LIBC(mkostemp) __ATTR_WUNUSED __ATTR_NONNULL((1)) __fd_t
 __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(mkostemp))(char *__template_, __oflag_t __flags) {
 	return __localdep_mkostemps(__template_, 0, __flags);

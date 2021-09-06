@@ -30,10 +30,10 @@
 
 DECL_BEGIN
 
-/*[[[head:libc___fbufsize,hash:CRC-32=0x7304eb39]]]*/
+/*[[[head:libc___fbufsize,hash:CRC-32=0x977ae8e3]]]*/
 /* >> __fbufsize(3)
  * Return the size of the buffer of `stream' in
- * bytes currently in use by the given stream */
+ * bytes  currently in use  by the given stream */
 INTERN ATTR_SECTION(".text.crt.FILE.utility.ext") ATTR_PURE WUNUSED NONNULL((1)) size_t
 NOTHROW_NCX(LIBCCALL libc___fbufsize)(FILE *stream)
 /*[[[body:libc___fbufsize]]]*/
@@ -42,9 +42,9 @@ NOTHROW_NCX(LIBCCALL libc___fbufsize)(FILE *stream)
 }
 /*[[[end:libc___fbufsize]]]*/
 
-/*[[[head:libc___freading,hash:CRC-32=0xca225fc5]]]*/
+/*[[[head:libc___freading,hash:CRC-32=0xf11dd07e]]]*/
 /* >> __freading(3)
- * Return non-zero value when `stream' is opened readonly,
+ * Return  non-zero value when  `stream' is opened readonly,
  * or if the last operation on `stream' was a read operation */
 INTERN ATTR_SECTION(".text.crt.FILE.utility.ext") ATTR_PURE WUNUSED NONNULL((1)) int
 NOTHROW_NCX(LIBCCALL libc___freading)(FILE *stream)
@@ -55,9 +55,9 @@ NOTHROW_NCX(LIBCCALL libc___freading)(FILE *stream)
 }
 /*[[[end:libc___freading]]]*/
 
-/*[[[head:libc___fwriting,hash:CRC-32=0xf7f5bbba]]]*/
+/*[[[head:libc___fwriting,hash:CRC-32=0x12016c43]]]*/
 /* >> __fwriting(3)
- * Return non-zero value when `stream' is opened write-only or
+ * Return non-zero value when  `stream' is opened write-only  or
  * append-only, or if the last operation on `stream' was a write
  * operation */
 INTERN ATTR_SECTION(".text.crt.FILE.utility.ext") ATTR_PURE WUNUSED NONNULL((1)) int

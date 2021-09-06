@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xdd1ac0e5 */
+/* HASH CRC-32:0x8d7c7c98 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -23,7 +23,6 @@
 #include <__crt.h>
 #ifdef __CRT_HAVE___p__crtDbgFlag
 __NAMESPACE_LOCAL_BEGIN
-/* Dependency: __p__crtDbgFlag from crtdbg */
 #ifndef __local___localdep___p__crtDbgFlag_defined
 #define __local___localdep___p__crtDbgFlag_defined 1
 __COMPILER_REDIRECT(__LIBC,,int *,__NOTHROW_NCX,__LIBDCALL,__localdep___p__crtDbgFlag,(void),__p__crtDbgFlag,())

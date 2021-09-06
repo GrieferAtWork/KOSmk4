@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x3d115829 */
+/* HASH CRC-32:0xd68aa363 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -31,93 +31,93 @@ DECL_BEGIN
 
 #if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
 /* >> execv(3)
- * Replace the calling process with the application image referred to by `path' / `file'
+ * Replace the calling  process with  the application  image referred  to by  `path' /  `file'
  * and execute it's `main()' method, passing the given `argv', and setting `environ' to `envp' */
 INTDEF NONNULL((1, 2)) int NOTHROW_RPC(LIBDCALL libd_execv)(char const *__restrict path, __TARGV);
 #endif /* !__LIBCCALL_IS_LIBDCALL && !__KERNEL__ */
 #ifndef __KERNEL__
 /* >> execv(3)
- * Replace the calling process with the application image referred to by `path' / `file'
+ * Replace the calling  process with  the application  image referred  to by  `path' /  `file'
  * and execute it's `main()' method, passing the given `argv', and setting `environ' to `envp' */
 INTDEF NONNULL((1, 2)) int NOTHROW_RPC(LIBCCALL libc_execv)(char const *__restrict path, __TARGV);
 #endif /* !__KERNEL__ */
 #if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
 /* >> execve(2)
- * Replace the calling process with the application image referred to by `path' / `file'
+ * Replace the calling  process with  the application  image referred  to by  `path' /  `file'
  * and execute it's `main()' method, passing the given `argv', and setting `environ' to `envp' */
 INTDEF NONNULL((1, 2, 3)) int NOTHROW_RPC(LIBDCALL libd_execve)(char const *__restrict path, __TARGV, __TENVP);
 /* >> execvp(3)
- * Replace the calling process with the application image referred to by `path' / `file'
+ * Replace the calling  process with  the application  image referred  to by  `path' /  `file'
  * and execute it's `main()' method, passing the given `argv', and setting `environ' to `envp' */
 INTDEF NONNULL((1, 2)) int NOTHROW_RPC(LIBDCALL libd_execvp)(char const *__restrict file, __TARGV);
 #endif /* !__LIBCCALL_IS_LIBDCALL && !__KERNEL__ */
 #ifndef __KERNEL__
 /* >> execvp(3)
- * Replace the calling process with the application image referred to by `path' / `file'
+ * Replace the calling  process with  the application  image referred  to by  `path' /  `file'
  * and execute it's `main()' method, passing the given `argv', and setting `environ' to `envp' */
 INTDEF NONNULL((1, 2)) int NOTHROW_RPC(LIBCCALL libc_execvp)(char const *__restrict file, __TARGV);
 #endif /* !__KERNEL__ */
 #if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
 /* >> execl(3)
  * Replace the calling process with the application image referred to by `path' / `file'
- * and execute it's `main()' method, passing the list of NULL-terminated `args'-list */
+ * and execute it's  `main()' method,  passing the list  of NULL-terminated  `args'-list */
 INTDEF ATTR_SENTINEL NONNULL((1)) int NOTHROW_RPC(VLIBDCALL libd_execl)(char const *__restrict path, char const *args, ...);
 #endif /* !__LIBCCALL_IS_LIBDCALL && !__KERNEL__ */
 #ifndef __KERNEL__
 /* >> execl(3)
  * Replace the calling process with the application image referred to by `path' / `file'
- * and execute it's `main()' method, passing the list of NULL-terminated `args'-list */
+ * and execute it's  `main()' method,  passing the list  of NULL-terminated  `args'-list */
 INTDEF ATTR_SENTINEL NONNULL((1)) int NOTHROW_RPC(VLIBCCALL libc_execl)(char const *__restrict path, char const *args, ...);
 #endif /* !__KERNEL__ */
 #if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
 /* >> execle(3)
  * Replace the calling process with the application image referred to by `path' / `file'
- * and execute it's `main()' method, passing the list of NULL-terminated `args'-list,
+ * and  execute it's `main()'  method, passing the  list of NULL-terminated `args'-list,
  * and setting `environ' to a `char **' passed after the NULL sentinel */
 INTDEF ATTR_SENTINEL_O(1) NONNULL((1)) int NOTHROW_RPC(VLIBDCALL libd_execle)(char const *__restrict path, char const *args, ...);
 #endif /* !__LIBCCALL_IS_LIBDCALL && !__KERNEL__ */
 #ifndef __KERNEL__
 /* >> execle(3)
  * Replace the calling process with the application image referred to by `path' / `file'
- * and execute it's `main()' method, passing the list of NULL-terminated `args'-list,
+ * and  execute it's `main()'  method, passing the  list of NULL-terminated `args'-list,
  * and setting `environ' to a `char **' passed after the NULL sentinel */
 INTDEF ATTR_SENTINEL_O(1) NONNULL((1)) int NOTHROW_RPC(VLIBCCALL libc_execle)(char const *__restrict path, char const *args, ...);
 #endif /* !__KERNEL__ */
 #if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
 /* >> execlp(3)
  * Replace the calling process with the application image referred to by `path' / `file'
- * and execute it's `main()' method, passing the list of NULL-terminated `args'-list */
+ * and execute it's  `main()' method,  passing the list  of NULL-terminated  `args'-list */
 INTDEF ATTR_SENTINEL NONNULL((1)) int NOTHROW_RPC(VLIBDCALL libd_execlp)(char const *__restrict file, char const *args, ...);
 #endif /* !__LIBCCALL_IS_LIBDCALL && !__KERNEL__ */
 #ifndef __KERNEL__
 /* >> execlp(3)
  * Replace the calling process with the application image referred to by `path' / `file'
- * and execute it's `main()' method, passing the list of NULL-terminated `args'-list */
+ * and execute it's  `main()' method,  passing the list  of NULL-terminated  `args'-list */
 INTDEF ATTR_SENTINEL NONNULL((1)) int NOTHROW_RPC(VLIBCCALL libc_execlp)(char const *__restrict file, char const *args, ...);
 #endif /* !__KERNEL__ */
 #if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
 /* >> execvpe(3)
- * Replace the calling process with the application image referred to by `file' and
+ * Replace the  calling process  with the  application  image referred  to by  `file'  and
  * execute it's `main()' method, passing the given `argv', and setting `environ' to `envp' */
 INTDEF NONNULL((1, 2, 3)) int NOTHROW_RPC(LIBDCALL libd_execvpe)(char const *__restrict file, __TARGV, __TENVP);
 #endif /* !__LIBCCALL_IS_LIBDCALL && !__KERNEL__ */
 #ifndef __KERNEL__
 /* >> execvpe(3)
- * Replace the calling process with the application image referred to by `file' and
+ * Replace the  calling process  with the  application  image referred  to by  `file'  and
  * execute it's `main()' method, passing the given `argv', and setting `environ' to `envp' */
 INTDEF NONNULL((1, 2, 3)) int NOTHROW_RPC(LIBCCALL libc_execvpe)(char const *__restrict file, __TARGV, __TENVP);
 #endif /* !__KERNEL__ */
 #if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
 /* >> execlpe(3)
  * Replace the calling process with the application image referred to by `path' / `file'
- * and execute it's `main()' method, passing the list of NULL-terminated `args'-list,
+ * and  execute it's `main()'  method, passing the  list of NULL-terminated `args'-list,
  * and setting `environ' to a `char **' passed after the NULL sentinel */
 INTDEF ATTR_SENTINEL_O(1) NONNULL((1)) int NOTHROW_RPC(VLIBDCALL libd_execlpe)(char const *__restrict file, char const *args, ...);
 #endif /* !__LIBCCALL_IS_LIBDCALL && !__KERNEL__ */
 #ifndef __KERNEL__
 /* >> execlpe(3)
  * Replace the calling process with the application image referred to by `path' / `file'
- * and execute it's `main()' method, passing the list of NULL-terminated `args'-list,
+ * and  execute it's `main()'  method, passing the  list of NULL-terminated `args'-list,
  * and setting `environ' to a `char **' passed after the NULL sentinel */
 INTDEF ATTR_SENTINEL_O(1) NONNULL((1)) int NOTHROW_RPC(VLIBCCALL libc_execlpe)(char const *__restrict file, char const *args, ...);
 #endif /* !__KERNEL__ */
@@ -130,10 +130,10 @@ INTDEF NONNULL((1)) int NOTHROW_NCX(LIBDCALL libd_pipe)(fd_t pipedes[2]);
 INTDEF unsigned int NOTHROW_RPC(LIBDCALL libd_sleep)(unsigned int seconds);
 /* >> fsync(2)
  * Synchronize a file (including its descriptor which contains timestamps, and its size),
- * meaning that changes to its data and/or descriptor are written to disk */
+ * meaning  that  changes   to  its   data  and/or   descriptor  are   written  to   disk */
 INTDEF int NOTHROW_RPC(LIBDCALL libd_fsync)(fd_t fd);
 /* >> setpgid(2)
- * Change the ID of the process group associated with `pid's process.
+ * Change  the ID of  the process group  associated with `pid's process.
  * (That is the TID of the leader of the process group of `pid's leader)
  * THREAD[PID]->LEADER->GROUP_LEADER = THREAD[PGID]
  * When `pid' is ZERO(0), use `gettid()' for it instead.
@@ -163,7 +163,7 @@ INTDEF int NOTHROW_NCX(LIBDCALL libd_setgid)(gid_t gid);
  * You may pass `0' for `seconds' to disable a previously scheduled alarm */
 INTDEF unsigned int NOTHROW_NCX(LIBDCALL libd_alarm)(unsigned int seconds);
 /* >> fpathconf(2)
- * @param: name: One of `_PC_*' from <asm/crt/confname.h>
+ * @param: name: One   of    `_PC_*'    from    <asm/crt/confname.h>
  * Return a path configuration value associated with `name' for `fd'
  * return: * : The configuration limit associated with `name' for `fd'
  * return: -1: [errno=<unchanged>] The configuration specified by `name' is unlimited for `fd'
@@ -204,7 +204,7 @@ INTDEF NONNULL((1)) longptr_t NOTHROW_RPC(LIBDCALL libd_pathconf)(char const *pa
 INTDEF NONNULL((1, 2)) int NOTHROW_RPC(LIBDCALL libd_link)(char const *from, char const *to);
 /* >> read(2)
  * Read up to `bufsize' bytes from `fd' into `buf'
- * When `fd' has the `O_NONBLOCK' flag set, only read as much data as was
+ * When `fd' has the  `O_NONBLOCK' flag set,  only read as  much data as  was
  * available at the time the call was made, and throw E_WOULDBLOCK if no data
  * was available at the time.
  * @return: <= bufsize: The actual amount of read bytes
@@ -212,22 +212,22 @@ INTDEF NONNULL((1, 2)) int NOTHROW_RPC(LIBDCALL libd_link)(char const *from, cha
 INTDEF NONNULL((2)) ssize_t NOTHROW_RPC(LIBDCALL libd_read)(fd_t fd, void *buf, size_t bufsize);
 /* >> write(2)
  * Write up to `bufsize' bytes from `buf' into `fd'
- * When `fd' has the `O_NONBLOCK' flag set, only write as much data
+ * When `fd' has the `O_NONBLOCK' flag set, only write as much  data
  * as possible at the time the call was made, and throw E_WOULDBLOCK
  * if no data could be written at the time.
  * @return: <= bufsize: The actual amount of written bytes
  * @return: 0         : No more data can be written */
 INTDEF NONNULL((2)) ssize_t NOTHROW_RPC(LIBDCALL libd_write)(fd_t fd, void const *buf, size_t bufsize);
 /* >> readall(3)
- * Same as `read(2)', however keep on reading until `read()' indicates EOF (causing
+ * Same  as `read(2)', however  keep on reading until  `read()' indicates EOF (causing
  * `readall()' to immediately return `0') or the entirety of the given buffer has been
  * filled (in which case `bufsize' is returned).
- * If an error occurs before all data could be read, try to use SEEK_CUR to rewind
+ * If  an error occurs before all data could be read, try to use SEEK_CUR to rewind
  * the file descriptor by the amount of data that had already been loaded. - Errors
  * during this phase are silently ignored and don't cause `errno' to change */
 INTDEF NONNULL((2)) ssize_t NOTHROW_RPC(LIBDCALL libd_readall)(fd_t fd, void *buf, size_t bufsize);
 /* >> writeall(3)
- * Same as `write(2)', however keep on writing until `write()' indicates EOF (causing
+ * Same as `write(2)', however keep on  writing until `write()' indicates EOF  (causing
  * `writeall()' to immediately return `0') or the entirety of the given buffer has been
  * written (in which case `bufsize' is returned). */
 INTDEF NONNULL((2)) ssize_t NOTHROW_RPC(LIBDCALL libd_writeall)(fd_t fd, void const *buf, size_t bufsize);
@@ -290,12 +290,12 @@ INTDEF NONNULL((2)) int NOTHROW_RPC(LIBDCALL libd_fchownat)(fd_t dfd, char const
  * Create a hard link from `fromfd:from', leading to `tofd:to' */
 INTDEF NONNULL((2, 4)) int NOTHROW_RPC(LIBDCALL libd_linkat)(fd_t fromfd, char const *from, fd_t tofd, char const *to, atflag_t flags);
 /* >> symlinkat(3)
- * Create a new symbolic link loaded with `link_text' as link
+ * Create  a  new  symbolic  link  loaded  with  `link_text'  as link
  * text, at the filesystem location referred to by `tofd:target_path' */
 INTDEF NONNULL((1, 3)) int NOTHROW_RPC(LIBDCALL libd_symlinkat)(char const *link_text, fd_t tofd, char const *target_path);
 /* >> readlinkat(2)
  * Read the text of a symbolic link under `dfd:path' into the provided buffer.
- * WARNING: This function is badly designed and will neither append a trailing
+ * WARNING: This  function is badly designed and will neither append a trailing
  *          NUL-character to the buffer, nor will it return the required buffer
  *          size. Instead, it will return the written size, and the caller must
  *          keep on over allocating until the function indicates that it didn't
@@ -379,18 +379,18 @@ INTDEF int NOTHROW_RPC(LIBDCALL libd_fchown)(fd_t fd, uid_t owner, gid_t group);
  * Change the current working directory to `path' */
 INTDEF int NOTHROW_RPC(LIBDCALL libd_fchdir)(fd_t fd);
 /* >> getpgid(2)
- * Return the ID of the process group associated with `pid's process.
+ * Return  the ID of  the process group  associated with `pid's process.
  * (That is the TID of the leader of the process group of `pid's leader)
  * THREAD[PID]->LEADER->GROUP_LEADER->PID
  * When `pid' is ZERO(0), use `gettid()' for it instead */
 INTDEF WUNUSED pid_t NOTHROW_NCX(LIBDCALL libd_getpgid)(pid_t pid);
 /* >> getsid(2)
  * Return the ID of the session which a process `pid' is apart of.
- * return THREAD[PID]->LEADER->GROUP_LEADER->SESSION_LEADER->PID; */
+ * return  THREAD[PID]->LEADER->GROUP_LEADER->SESSION_LEADER->PID; */
 INTDEF WUNUSED pid_t NOTHROW_NCX(LIBDCALL libd_getsid)(pid_t pid);
 /* >> lchown(2)
  * Change the ownership of a given `file' to `group:owner',
- * but don't reference it if that file is a symbolic link */
+ * but don't reference it if  that file is a symbolic  link */
 INTDEF NONNULL((1)) int NOTHROW_RPC(LIBDCALL libd_lchown)(char const *file, uid_t owner, gid_t group);
 /* >> truncate(2)
  * Truncate the given file `file' to a length of `length' */
@@ -399,7 +399,7 @@ INTDEF NONNULL((1)) int NOTHROW_NCX(LIBDCALL libd_truncate)(char const *file, __
  * Truncate the given file `file' to a length of `length' */
 INTDEF NONNULL((1)) int NOTHROW_NCX(LIBDCALL libd_truncate64)(char const *file, __PIO_OFFSET64 length);
 /* >> fexecve(2)
- * Replace the calling process with the application image referred to by `fd' and
+ * Replace the  calling  process  with the  application  image  referred to  by  `fd'  and
  * execute it's `main()' method, passing the given `argv', and setting `environ' to `envp' */
 INTDEF NONNULL((2, 3)) int NOTHROW_RPC(LIBDCALL libd_fexecve)(fd_t fd, __TARGV, __TENVP);
 INTDEF int NOTHROW_NCX(LIBDCALL libd_nice)(int inc);
@@ -443,14 +443,14 @@ INTDEF int NOTHROW_NCX(LIBDCALL libd_seteuid)(uid_t euid);
  * @return: -1: [errno=EPERM]  : The current user is not privileged */
 INTDEF int NOTHROW_NCX(LIBDCALL libd_setegid)(gid_t egid);
 /* >> symlink(3)
- * Create a new symbolic link loaded with `link_text' as link
+ * Create  a new  symbolic link  loaded with  `link_text' as link
  * text, at the filesystem location referred to by `target_path'.
  * Same as `symlinkat(link_text, AT_FDCWD, target_path)' */
 INTDEF NONNULL((1, 2)) int NOTHROW_RPC(LIBDCALL libd_symlink)(char const *link_text, char const *target_path);
 /* >> readlink(3)
  * Read the text of a symbolic link under `path' into the provided buffer.
  * Same as `readlinkat(AT_FDCWD, path, buf, buflen)'
- * WARNING: This function is badly designed and will neither append a trailing
+ * WARNING: This  function is badly designed and will neither append a trailing
  *          NUL-character to the buffer, nor will it return the required buffer
  *          size. Instead, it will return the written size, and the caller must
  *          keep on over allocating until the function indicates that it didn't
@@ -496,7 +496,7 @@ INTDEF longptr_t NOTHROW_RPC(VLIBDCALL libd_syscall)(longptr_t sysno, ...);
 /* >> syscall(2), syscall64(2) */
 INTDEF __LONG64_TYPE__ NOTHROW_RPC(VLIBDCALL libd_syscall64)(syscall_ulong_t sysno, ...);
 /* >> chroot(2)
- * Change the root directory of the calling `CLONE_FS' group of threads
+ * Change  the root directory of the calling `CLONE_FS' group of threads
  * (usually the process) to a path that was previously address by `path' */
 INTDEF NONNULL((1)) int NOTHROW_RPC(LIBDCALL libd_chroot)(char const *__restrict path);
 /* >> getpass(3), getpassphrase(3) */
@@ -514,16 +514,16 @@ INTDEF int NOTHROW_NCX(LIBDCALL libd_ftruncate)(fd_t fd, __PIO_OFFSET length);
  * Truncate the given file `fd' to a length of `length' */
 INTDEF int NOTHROW_NCX(LIBDCALL libd_ftruncate64)(fd_t fd, __PIO_OFFSET64 length);
 /* >> brk(2), sbrk(2)
- * Change the program break, allowing for a rudimentary implementation of a heap.
+ * Change the  program  break,  allowing  for a  rudimentary  implementation  of  a  heap.
  * It is recommended to use the much more advanced functions found in <sys/mman.h> instead */
 INTDEF int NOTHROW_NCX(LIBDCALL libd_brk)(void *addr);
 /* >> brk(2), sbrk(2)
- * Change the program break, allowing for a rudimentary implementation of a heap.
+ * Change the  program  break,  allowing  for a  rudimentary  implementation  of  a  heap.
  * It is recommended to use the much more advanced functions found in <sys/mman.h> instead */
 INTDEF void *NOTHROW_NCX(LIBDCALL libd_sbrk)(intptr_t delta);
 /* >> fdatasync(2)
  * Synchronize only the data of a file (not its descriptor which contains
- * timestamps, and its size), meaning that changes are written to disk */
+ * timestamps,  and its size),  meaning that changes  are written to disk */
 INTDEF int NOTHROW_RPC(LIBDCALL libd_fdatasync)(fd_t fd);
 /* >> swab(3)
  * Copy `n_bytes & ~1' (FLOOR_ALIGN(n_bytes, 2)) from `from' to `to',
@@ -541,67 +541,67 @@ INTDEF NONNULL((1, 2)) void NOTHROW_NCX(LIBCCALL libc_swab)(void const *__restri
 #if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
 /* >> ctermid(3)
  * Writes the string "/dev/tty" to `s', or returns a pointer to
- * a writable data location that contains that same string. */
+ * a writable  data location  that contains  that same  string. */
 INTDEF ATTR_RETNONNULL char *NOTHROW_NCX(LIBDCALL libd_ctermid)(char *s);
 #endif /* !__LIBCCALL_IS_LIBDCALL && !__KERNEL__ */
 #ifndef __KERNEL__
 /* >> ctermid(3)
  * Writes the string "/dev/tty" to `s', or returns a pointer to
- * a writable data location that contains that same string. */
+ * a writable  data location  that contains  that same  string. */
 INTDEF ATTR_RETNONNULL char *NOTHROW_NCX(LIBCCALL libc_ctermid)(char *s);
 #endif /* !__KERNEL__ */
 #if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
 /* >> cuserid(3)
  * Return the name of the current user (`$LOGNAME' or `getpwuid(geteuid())'), storing
- * that name in `s'. When `s' is NULL, a static buffer is used instead
- * When given, `s' must be a buffer of at least `L_cuserid' bytes.
- * If the actual username is longer than this, it may be truncated, and programs
- * that wish to support longer usernames should make use of `getlogin_r()' instead.
+ * that  name  in  `s'.  When  `s'  is   NULL,  a  static  buffer  is  used   instead
+ * When  given,   `s'   must  be   a   buffer   of  at   least   `L_cuserid'   bytes.
+ * If the actual  username is longer  than this,  it may be  truncated, and  programs
+ * that wish to support longer usernames  should make use of `getlogin_r()'  instead.
  * s.a. `getlogin()' and `getlogin_r()' */
 INTDEF char *NOTHROW_NCX(LIBDCALL libd_cuserid)(char *s);
 #endif /* !__LIBCCALL_IS_LIBDCALL && !__KERNEL__ */
 #ifndef __KERNEL__
 /* >> cuserid(3)
  * Return the name of the current user (`$LOGNAME' or `getpwuid(geteuid())'), storing
- * that name in `s'. When `s' is NULL, a static buffer is used instead
- * When given, `s' must be a buffer of at least `L_cuserid' bytes.
- * If the actual username is longer than this, it may be truncated, and programs
- * that wish to support longer usernames should make use of `getlogin_r()' instead.
+ * that  name  in  `s'.  When  `s'  is   NULL,  a  static  buffer  is  used   instead
+ * When  given,   `s'   must  be   a   buffer   of  at   least   `L_cuserid'   bytes.
+ * If the actual  username is longer  than this,  it may be  truncated, and  programs
+ * that wish to support longer usernames  should make use of `getlogin_r()'  instead.
  * s.a. `getlogin()' and `getlogin_r()' */
 INTDEF char *NOTHROW_NCX(LIBCCALL libc_cuserid)(char *s);
 #endif /* !__KERNEL__ */
 #if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
 /* >> getpassfd(3)
- * This function behaves similar to `readpassphrase(3)', but is still
- * quite distinct from that function in how this one behaves, vs. how
- * that other function behaves. In general, this function is a bit more
- * user-friendly, in that it offers more (but different) `flags' to
+ * This function behaves  similar to `readpassphrase(3)',  but is  still
+ * quite  distinct from that  function in how this  one behaves, vs. how
+ * that other function behaves. In general, this function is a bit  more
+ * user-friendly, in  that it  offers more  (but different)  `flags'  to
  * control how the password prompt is generated, with the main advantage
- * of this function being that it implements some "advanced" readline
- * functionality, such as deleting typed characters without relying on
- * the system TTY canonical buffer (which `readpassphrase(3)' needs,
- * since it doesn't include support for _any_ control characters other
+ * of this function  being that it  implements some "advanced"  readline
+ * functionality, such as deleting  typed characters without relying  on
+ * the  system  TTY canonical  buffer (which  `readpassphrase(3)' needs,
+ * since it doesn't include support  for _any_ control characters  other
  * that CR/LF as indicators to stop reading text)
  * Which of the 2 functions should be used is a matter of taste, but
- * personally, I prefer this one over `readpassphrase(3)'.
+ * personally,   I   prefer  this   one   over  `readpassphrase(3)'.
  * @param: prompt:  [0..1]      Text-prompt to display to the user, or `NULL'
  * @param: buf:     [0..buflen] Buffer that will receive the user's password.
- *                              When set to `NULL', a dynamically allocated
+ *                              When set to  `NULL', a dynamically  allocated
  *                              buffer will be used and returned.
  * @param: buflen:              Size of `buf' (in characters) (ignored when `buf == NULL')
- * @param: fds:     [0..1]      When non-NULL, an [stdin,stdout,stderr] triple
+ * @param: fds:     [0..1]      When non-NULL,  an [stdin,stdout,stderr]  triple
  *                              of files, used for [read,write,beep] operations.
- *                              When `NULL', try to use `/dev/tty' instead, and
- *                              if that fails, use `STDIN_FILENO,STDERR_FILENO,
+ *                              When  `NULL', try to use `/dev/tty' instead, and
+ *                              if that fails, use  `STDIN_FILENO,STDERR_FILENO,
  *                              STDERR_FILENO' as final fallback.
- *                              When `GETPASS_NEED_TTY' is set, the function
+ *                              When `GETPASS_NEED_TTY' is set, the  function
  *                              will fail with `errno=ENOTTY' if the actually
  *                              used `fds[0]' (iow: stdin) isn't a TTY device
  *                              s.a. `isatty(3)'
  * @param: flags:               Set of `GETPASS_*' flags (from <unistd.h>)
- * @param: timeout_in_seconds:  When non-0, timeout (in seconds) to wait for the
- *                              user to type each character of their password. If
- *                              this timeout expires, fail with `errno=ETIMEDOUT'
+ * @param: timeout_in_seconds:  When non-0, timeout (in  seconds) to wait for  the
+ *                              user to type each character of their password.  If
+ *                              this timeout expires, fail with  `errno=ETIMEDOUT'
  *                              Negative values result in weak undefined behavior.
  * @return: * :   [buf == NULL] Success (dynamically allocated buffer; must be `free(3)'d)
  * @return: buf:                Success
@@ -615,36 +615,36 @@ INTDEF WUNUSED char *NOTHROW_RPC(LIBDCALL libd_getpassfd)(char const *prompt, ch
 #endif /* !__LIBCCALL_IS_LIBDCALL && !__KERNEL__ */
 #ifndef __KERNEL__
 /* >> getpassfd(3)
- * This function behaves similar to `readpassphrase(3)', but is still
- * quite distinct from that function in how this one behaves, vs. how
- * that other function behaves. In general, this function is a bit more
- * user-friendly, in that it offers more (but different) `flags' to
+ * This function behaves  similar to `readpassphrase(3)',  but is  still
+ * quite  distinct from that  function in how this  one behaves, vs. how
+ * that other function behaves. In general, this function is a bit  more
+ * user-friendly, in  that it  offers more  (but different)  `flags'  to
  * control how the password prompt is generated, with the main advantage
- * of this function being that it implements some "advanced" readline
- * functionality, such as deleting typed characters without relying on
- * the system TTY canonical buffer (which `readpassphrase(3)' needs,
- * since it doesn't include support for _any_ control characters other
+ * of this function  being that it  implements some "advanced"  readline
+ * functionality, such as deleting  typed characters without relying  on
+ * the  system  TTY canonical  buffer (which  `readpassphrase(3)' needs,
+ * since it doesn't include support  for _any_ control characters  other
  * that CR/LF as indicators to stop reading text)
  * Which of the 2 functions should be used is a matter of taste, but
- * personally, I prefer this one over `readpassphrase(3)'.
+ * personally,   I   prefer  this   one   over  `readpassphrase(3)'.
  * @param: prompt:  [0..1]      Text-prompt to display to the user, or `NULL'
  * @param: buf:     [0..buflen] Buffer that will receive the user's password.
- *                              When set to `NULL', a dynamically allocated
+ *                              When set to  `NULL', a dynamically  allocated
  *                              buffer will be used and returned.
  * @param: buflen:              Size of `buf' (in characters) (ignored when `buf == NULL')
- * @param: fds:     [0..1]      When non-NULL, an [stdin,stdout,stderr] triple
+ * @param: fds:     [0..1]      When non-NULL,  an [stdin,stdout,stderr]  triple
  *                              of files, used for [read,write,beep] operations.
- *                              When `NULL', try to use `/dev/tty' instead, and
- *                              if that fails, use `STDIN_FILENO,STDERR_FILENO,
+ *                              When  `NULL', try to use `/dev/tty' instead, and
+ *                              if that fails, use  `STDIN_FILENO,STDERR_FILENO,
  *                              STDERR_FILENO' as final fallback.
- *                              When `GETPASS_NEED_TTY' is set, the function
+ *                              When `GETPASS_NEED_TTY' is set, the  function
  *                              will fail with `errno=ENOTTY' if the actually
  *                              used `fds[0]' (iow: stdin) isn't a TTY device
  *                              s.a. `isatty(3)'
  * @param: flags:               Set of `GETPASS_*' flags (from <unistd.h>)
- * @param: timeout_in_seconds:  When non-0, timeout (in seconds) to wait for the
- *                              user to type each character of their password. If
- *                              this timeout expires, fail with `errno=ETIMEDOUT'
+ * @param: timeout_in_seconds:  When non-0, timeout (in  seconds) to wait for  the
+ *                              user to type each character of their password.  If
+ *                              this timeout expires, fail with  `errno=ETIMEDOUT'
  *                              Negative values result in weak undefined behavior.
  * @return: * :   [buf == NULL] Success (dynamically allocated buffer; must be `free(3)'d)
  * @return: buf:                Success
@@ -684,9 +684,9 @@ INTDEF NONNULL((2, 3)) int NOTHROW_NCX(LIBCCALL libc_getpeereid)(fd_t sockfd, ui
 INTDEF char *NOTHROW_NCX(LIBDCALL libd_ctermid_r)(char *s);
 /* >> sysconf(2)
  * @param: name: One of `_SC_*' from <asm/crt/confname.h>
- * Return a system configuration value `name'
+ * Return   a   system    configuration   value    `name'
  * return: * : The configuration limit associated with `name' for `path'
- * return: -1: [errno=<unchanged>] `name' refers to a maximum or minimum
+ * return: -1: [errno=<unchanged>] `name'  refers to a maximum or minimum
  *                                 limit, and that limit is indeterminate
  * return: -1: [errno=EINVAL]      The given `name' isn't a recognized config option */
 INTDEF WUNUSED longptr_t NOTHROW_RPC(LIBDCALL libd_sysconf)(__STDC_INT_AS_UINT_T name);
@@ -701,28 +701,28 @@ INTDEF void NOTHROW_NCX(LIBCCALL libc_closefrom)(fd_t lowfd);
 #endif /* !__KERNEL__ */
 #if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
 /* >> fchroot(2)
- * Change the root directory to `fd'. If `fd' was opened before a prior call to `chroot()',
- * and referrs to a directory, then this function can be used to escape a chroot() jail.
- * No special permissions are required to use this function, since a malicious application
+ * Change the root directory to  `fd'. If `fd' was opened  before a prior call to  `chroot()',
+ * and referrs to  a directory,  then this function  can be  used to escape  a chroot()  jail.
+ * No special permissions  are required to  use this function,  since a malicious  application
  * could achieve the same behavior by use of `*at' system calls, using `fd' as `dfd' argument. */
 INTDEF int NOTHROW_NCX(LIBDCALL libd_fchroot)(fd_t fd);
 #endif /* !__LIBCCALL_IS_LIBDCALL && !__KERNEL__ */
 #ifndef __KERNEL__
 /* >> fchroot(2)
- * Change the root directory to `fd'. If `fd' was opened before a prior call to `chroot()',
- * and referrs to a directory, then this function can be used to escape a chroot() jail.
- * No special permissions are required to use this function, since a malicious application
+ * Change the root directory to  `fd'. If `fd' was opened  before a prior call to  `chroot()',
+ * and referrs to  a directory,  then this function  can be  used to escape  a chroot()  jail.
+ * No special permissions  are required to  use this function,  since a malicious  application
  * could achieve the same behavior by use of `*at' system calls, using `fd' as `dfd' argument. */
 INTDEF int NOTHROW_NCX(LIBCCALL libc_fchroot)(fd_t fd);
 #endif /* !__KERNEL__ */
 #if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
 /* >> resolvepath(3)
- * Similar to `frealpathat(2)' (though use the later for more options)
- * Also note that this function appears to have a weird rule (which KOS simply
- * ignores) that is related to this function not writing more than `PATH_MAX'
+ * Similar  to  `frealpathat(2)'  (though  use  the  later  for  more   options)
+ * Also note that this function appears to  have a weird rule (which KOS  simply
+ * ignores)  that is related  to this function not  writing more than `PATH_MAX'
  * bytes to `buf'. (Why??? I mean: The whole point of having a `buflen' argument
  * is to be able to handle names of arbitrary lengths)
- * Additionally, the online docs don't mention what happens when `buflen' is too
+ * Additionally, the online docs don't mention what happens when `buflen' is  too
  * small, so I guess I can just make up what's supposed to happen, and I say that
  * the function will set errno=ERANGE and return -1
  * @return: * : Used buffer size (possibly including a NUL-byte, but maybe not)
@@ -731,12 +731,12 @@ INTDEF NONNULL((1)) __STDC_INT_AS_SSIZE_T NOTHROW_NCX(LIBDCALL libd_resolvepath)
 #endif /* !__LIBCCALL_IS_LIBDCALL && !__KERNEL__ */
 #ifndef __KERNEL__
 /* >> resolvepath(3)
- * Similar to `frealpathat(2)' (though use the later for more options)
- * Also note that this function appears to have a weird rule (which KOS simply
- * ignores) that is related to this function not writing more than `PATH_MAX'
+ * Similar  to  `frealpathat(2)'  (though  use  the  later  for  more   options)
+ * Also note that this function appears to  have a weird rule (which KOS  simply
+ * ignores)  that is related  to this function not  writing more than `PATH_MAX'
  * bytes to `buf'. (Why??? I mean: The whole point of having a `buflen' argument
  * is to be able to handle names of arbitrary lengths)
- * Additionally, the online docs don't mention what happens when `buflen' is too
+ * Additionally, the online docs don't mention what happens when `buflen' is  too
  * small, so I guess I can just make up what's supposed to happen, and I say that
  * the function will set errno=ERANGE and return -1
  * @return: * : Used buffer size (possibly including a NUL-byte, but maybe not)

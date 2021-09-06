@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xdb82e780 */
+/* HASH CRC-32:0x315339ff */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -24,23 +24,18 @@
 #include <ieee754.h>
 #if defined(__IEEE754_DOUBLE_TYPE_IS_LONG_DOUBLE__) || defined(__IEEE754_FLOAT_TYPE_IS_LONG_DOUBLE__) || defined(__IEEE854_LONG_DOUBLE_TYPE_IS_LONG_DOUBLE__) || defined(__CRT_HAVE_sqrt) || defined(__CRT_HAVE___sqrt) || defined(__IEEE754_DOUBLE_TYPE_IS_DOUBLE__) || defined(__IEEE754_FLOAT_TYPE_IS_DOUBLE__) || defined(__IEEE854_LONG_DOUBLE_TYPE_IS_DOUBLE__)
 __NAMESPACE_LOCAL_BEGIN
-/* Dependency: sqrt from math */
 #ifndef __local___localdep_sqrt_defined
 #define __local___localdep_sqrt_defined 1
 #if __has_builtin(__builtin_sqrt) && defined(__LIBC_BIND_CRTBUILTINS) && defined(__CRT_HAVE_sqrt)
-/* Return the square root of `x' */
 __CEIREDIRECT(__ATTR_WUNUSED,double,__NOTHROW,__localdep_sqrt,(double __x),sqrt,{ return __builtin_sqrt(__x); })
 #elif defined(__CRT_HAVE_sqrt)
-/* Return the square root of `x' */
 __CREDIRECT(__ATTR_WUNUSED,double,__NOTHROW,__localdep_sqrt,(double __x),sqrt,(__x))
 #elif defined(__CRT_HAVE___sqrt)
-/* Return the square root of `x' */
 __CREDIRECT(__ATTR_WUNUSED,double,__NOTHROW,__localdep_sqrt,(double __x),__sqrt,(__x))
 #elif defined(__IEEE754_DOUBLE_TYPE_IS_DOUBLE__) || defined(__IEEE754_FLOAT_TYPE_IS_DOUBLE__) || defined(__IEEE854_LONG_DOUBLE_TYPE_IS_DOUBLE__)
 __NAMESPACE_LOCAL_END
 #include <libc/local/math/sqrt.h>
 __NAMESPACE_LOCAL_BEGIN
-/* Return the square root of `x' */
 #define __localdep_sqrt __LIBC_LOCAL_NAME(sqrt)
 #else /* ... */
 #undef __local___localdep_sqrt_defined
@@ -52,7 +47,6 @@ __NAMESPACE_LOCAL_END
 #include <libm/matherr.h>
 #include <libm/sqrt.h>
 __NAMESPACE_LOCAL_BEGIN
-/* Return the square root of `x' */
 __LOCAL_LIBC(sqrtl) __ATTR_WUNUSED __LONGDOUBLE
 __NOTHROW(__LIBCCALL __LIBC_LOCAL_NAME(sqrtl))(__LONGDOUBLE __x) {
 #if defined(__IEEE754_DOUBLE_TYPE_IS_LONG_DOUBLE__) || defined(__IEEE754_FLOAT_TYPE_IS_LONG_DOUBLE__) || defined(__IEEE854_LONG_DOUBLE_TYPE_IS_LONG_DOUBLE__)

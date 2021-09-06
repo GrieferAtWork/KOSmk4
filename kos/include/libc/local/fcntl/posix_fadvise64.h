@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x169946bc */
+/* HASH CRC-32:0xb68172e3 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -33,7 +33,6 @@
 #endif /* !__USE_KOS_ALTERATIONS */
 #endif /* !__PIO_OFFSET */
 __NAMESPACE_LOCAL_BEGIN
-/* Dependency: posix_fadvise32 from fcntl */
 #if !defined(__local___localdep_posix_fadvise32_defined) && defined(__CRT_HAVE_posix_fadvise)
 #define __local___localdep_posix_fadvise32_defined 1
 __CREDIRECT(,int,__NOTHROW_NCX,__localdep_posix_fadvise32,(__fd_t __fd, __off32_t __offset, __off32_t __length, __STDC_INT_AS_UINT_T __advise),posix_fadvise,(__fd,__offset,__length,__advise))

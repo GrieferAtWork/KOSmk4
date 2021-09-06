@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x58fbb50c */
+/* HASH CRC-32:0xfc2baa32 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -25,31 +25,13 @@
 #if defined(__AT_FDCWD) && defined(__CRT_HAVE_readlinkat)
 #include <hybrid/typecore.h>
 __NAMESPACE_LOCAL_BEGIN
-/* Dependency: readlinkat from unistd */
 #ifndef __local___localdep_readlinkat_defined
 #define __local___localdep_readlinkat_defined 1
 __NAMESPACE_LOCAL_END
 #include <bits/types.h>
 __NAMESPACE_LOCAL_BEGIN
-/* >> readlinkat(2)
- * Read the text of a symbolic link under `dfd:path' into the provided buffer.
- * WARNING: This function is badly designed and will neither append a trailing
- *          NUL-character to the buffer, nor will it return the required buffer
- *          size. Instead, it will return the written size, and the caller must
- *          keep on over allocating until the function indicates that it didn't
- *          make use of the buffer in its entirety.
- * When targeting KOS, consider using `freadlinkat(2)' with `AT_READLINK_REQSIZE'. */
 __CREDIRECT(__ATTR_NONNULL((2, 3)),__SSIZE_TYPE__,__NOTHROW_RPC,__localdep_readlinkat,(__fd_t __dfd, char const *__path, char *__buf, __SIZE_TYPE__ __buflen),readlinkat,(__dfd,__path,__buf,__buflen))
 #endif /* !__local___localdep_readlinkat_defined */
-/* >> readlink(3)
- * Read the text of a symbolic link under `path' into the provided buffer.
- * Same as `readlinkat(AT_FDCWD, path, buf, buflen)'
- * WARNING: This function is badly designed and will neither append a trailing
- *          NUL-character to the buffer, nor will it return the required buffer
- *          size. Instead, it will return the written size, and the caller must
- *          keep on over allocating until the function indicates that it didn't
- *          make use of the buffer in its entirety.
- * When targeting KOS, consider using `freadlinkat(2)' with `AT_READLINK_REQSIZE' */
 __LOCAL_LIBC(readlink) __ATTR_NONNULL((1, 2)) __SSIZE_TYPE__
 __NOTHROW_RPC(__LIBCCALL __LIBC_LOCAL_NAME(readlink))(char const *__path, char *__buf, __SIZE_TYPE__ __buflen) {
 	return __localdep_readlinkat(__AT_FDCWD, __path, __buf, __buflen);

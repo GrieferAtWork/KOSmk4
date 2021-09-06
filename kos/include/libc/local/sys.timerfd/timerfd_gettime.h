@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xe1e036d7 */
+/* HASH CRC-32:0xa1b832cd */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -25,12 +25,10 @@
 #include <bits/types.h>
 #include <bits/os/itimerspec.h>
 __NAMESPACE_LOCAL_BEGIN
-/* Dependency: timerfd_gettime32 from sys.timerfd */
 #if !defined(__local___localdep_timerfd_gettime32_defined) && defined(__CRT_HAVE_timerfd_gettime)
 #define __local___localdep_timerfd_gettime32_defined 1
 __CREDIRECT(__ATTR_NONNULL((2)),int,__NOTHROW_NCX,__localdep_timerfd_gettime32,(__fd_t __ufd, struct __itimerspec32 *__restrict __otmr),timerfd_gettime,(__ufd,__otmr))
 #endif /* !__local___localdep_timerfd_gettime32_defined && __CRT_HAVE_timerfd_gettime */
-/* Dependency: timerfd_gettime64 from sys.timerfd */
 #ifndef __local___localdep_timerfd_gettime64_defined
 #define __local___localdep_timerfd_gettime64_defined 1
 #ifdef __CRT_HAVE_timerfd_gettime64

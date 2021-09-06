@@ -180,7 +180,7 @@ err:
 
 
 @@>> addmntent(3)
-@@Append a line `"%s %s %s %s %d %d\n" % (mnt_fsname, mnt_dir,
+@@Append a  line  `"%s %s %s %s %d %d\n"  %  (mnt_fsname,  mnt_dir,
 @@mnt_type, mnt_opts, mnt_freq, mnt_passno)' to the end of `stream'
 @@@return: 0: Success
 @@@return: 1: Error (WARNING: `errno' is left undefined)

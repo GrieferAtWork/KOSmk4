@@ -26,7 +26,7 @@ class UserString {
 	this = default;
 
 	@@The parser that can be used to provide a file/line/column
-	@@reference for the start of the referenced text.
+	@@reference  for  the   start  of   the  referenced   text.
 	public member parser: CParser;
 
 	@@Starting offset in @parser for where the text begins.
@@ -36,7 +36,7 @@ class UserString {
 	public member text: string;
 
 	@@Return a (line, column) pair describing the origin of
-	@@this UserString within the file @filename
+	@@this   UserString   within    the   file    @filename
 	public property lc: (int, int) = {
 		get(): (int, int) {
 			return parser.lcAt(start);
@@ -179,7 +179,7 @@ class CParser {
 
 	@@Return a pair of (line, column) (both of which are 1-based)
 	@@for the source location described by @offset
-	@@The given @offset should be a value relative
+	@@The  given @offset should be a value relative
 	@@to the current, or any past value for @tokEnd
 	public function lcAt(offset: int): (int, int) {
 		local numLines = text.count("\n", 0, offset);
@@ -215,7 +215,7 @@ class CParser {
 	}
 
 	@@Assert that @(this.tok == tok), and throw an error message if that isn't
-	@@the case. Afterwards, advance the current token by @(return this.tok())
+	@@the case. Afterwards, advance the current token by @(return  this.tok())
 	public function skip(tok: string): string {
 		if (this.tok != tok)
 			err("Unexpected token (expected {!r}, but got {!r})".format({ tok, this.tok }));
@@ -223,9 +223,9 @@ class CParser {
 	}
 
 	@@Skip pairs of @open/@close tokens, where the caller should position
-	@@the parser such that it points to the first token after an initial
-	@@instance of @open, where this function will then proceed to skip
-	@@ahead until the first unmached instance of @close, such that upon
+	@@the parser such that it points to the first token after an  initial
+	@@instance  of @open, where  this function will  then proceed to skip
+	@@ahead until the first unmached  instance of @close, such that  upon
 	@@return, @this.tok will evaluate to @close
 	@@ - When @open is @none, use @tok instead before calling @next
 	@@ - When @close is @none, automatically deduce from @open
@@ -261,7 +261,7 @@ class CParser {
 	}
 
 
-	@@Read the next token and return it as a string from start to finish
+	@@Read  the next token and return it as a string from start to finish
 	@@Note that this function will skip whitespace and new lines, as well
 	@@as C and C++-style comments.
 	@@When the end of the file is reached, and empty string is returned
@@ -420,7 +420,7 @@ twochar:
 
 
 	@@Parse a function like expression such as @"foo(bar, foobar)" or a C-string, such as @"\"foo\""
-	@@Return with the current token set to the first token after the expression/c-string
+	@@Return  with  the  current  token  set  to  the  first  token  after  the  expression/c-string
 	function parseCStringOrFunctionLikeExpression(): UserString | string {
 		local tok = this.tok;
 		if (tok.issymbol()) {
@@ -508,10 +508,10 @@ twochar:
 		return parseAllUntilRParenAsString();
 	}
 
-	@@Same as @parseCStringOrFunctionLikeExpression, but parse
-	@@multiple such expressions, which must be seperated by @","-tokens
+	@@Same   as    @parseCStringOrFunctionLikeExpression,   but    parse
+	@@multiple such expressions, which must be seperated by  @","-tokens
 	@@Stop if the token at the start of an element would be a @"]", @"}"
-	@@or @")", or if some element isn't followed with a @","-token
+	@@or  @")",  or if  some element  isn't  followed with  a @","-token
 	function parseCStringOrFunctionLikeExpressionList(): {(UserString | string)...} {
 		for (;;) {
 			if (tok in "]})")
@@ -523,7 +523,7 @@ twochar:
 		}
 	}
 
-	@@Require either a string- or keyword-token, where a string
+	@@Require either a string-  or keyword-token, where a  string
 	@@token will be decoded using @string.decode("c-escape"), and
 	@@a keyword token will be returned as-is.
 	@@If the current token is neither or these, throw and error instead

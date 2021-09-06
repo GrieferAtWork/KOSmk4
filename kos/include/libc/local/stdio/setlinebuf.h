@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xf89be718 */
+/* HASH CRC-32:0xe4f1d19c */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -24,47 +24,32 @@
 #include <features.h>
 #if defined(__CRT_HAVE_setvbuf) || defined(__CRT_HAVE__IO_setvbuf) || defined(__CRT_HAVE_setvbuf_unlocked)
 __NAMESPACE_LOCAL_BEGIN
-/* Dependency: setvbuf from stdio */
 #ifndef __local___localdep_setvbuf_defined
 #define __local___localdep_setvbuf_defined 1
 #if defined(__CRT_HAVE_setvbuf_unlocked) && defined(__USE_STDIO_UNLOCKED)
 __NAMESPACE_LOCAL_END
 #include <hybrid/typecore.h>
 __NAMESPACE_LOCAL_BEGIN
-/* >> setvbuf(3)
- * Set the buffer and buffer-mode to-be used by the given `stream'
- * @param modes: One of `_IOFBF', `_IOLBF' or `_IONBF' */
 __CREDIRECT(__ATTR_NONNULL((1)),int,__NOTHROW_NCX,__localdep_setvbuf,(__FILE *__restrict __stream, char *__restrict __buf, __STDC_INT_AS_UINT_T __modes, __SIZE_TYPE__ __bufsize),setvbuf_unlocked,(__stream,__buf,__modes,__bufsize))
 #elif defined(__CRT_HAVE_setvbuf)
 __NAMESPACE_LOCAL_END
 #include <hybrid/typecore.h>
 __NAMESPACE_LOCAL_BEGIN
-/* >> setvbuf(3)
- * Set the buffer and buffer-mode to-be used by the given `stream'
- * @param modes: One of `_IOFBF', `_IOLBF' or `_IONBF' */
 __CREDIRECT(__ATTR_NONNULL((1)),int,__NOTHROW_NCX,__localdep_setvbuf,(__FILE *__restrict __stream, char *__restrict __buf, __STDC_INT_AS_UINT_T __modes, __SIZE_TYPE__ __bufsize),setvbuf,(__stream,__buf,__modes,__bufsize))
 #elif defined(__CRT_HAVE__IO_setvbuf)
 __NAMESPACE_LOCAL_END
 #include <hybrid/typecore.h>
 __NAMESPACE_LOCAL_BEGIN
-/* >> setvbuf(3)
- * Set the buffer and buffer-mode to-be used by the given `stream'
- * @param modes: One of `_IOFBF', `_IOLBF' or `_IONBF' */
 __CREDIRECT(__ATTR_NONNULL((1)),int,__NOTHROW_NCX,__localdep_setvbuf,(__FILE *__restrict __stream, char *__restrict __buf, __STDC_INT_AS_UINT_T __modes, __SIZE_TYPE__ __bufsize),_IO_setvbuf,(__stream,__buf,__modes,__bufsize))
 #elif defined(__CRT_HAVE_setvbuf_unlocked)
 __NAMESPACE_LOCAL_END
 #include <hybrid/typecore.h>
 __NAMESPACE_LOCAL_BEGIN
-/* >> setvbuf(3)
- * Set the buffer and buffer-mode to-be used by the given `stream'
- * @param modes: One of `_IOFBF', `_IOLBF' or `_IONBF' */
 __CREDIRECT(__ATTR_NONNULL((1)),int,__NOTHROW_NCX,__localdep_setvbuf,(__FILE *__restrict __stream, char *__restrict __buf, __STDC_INT_AS_UINT_T __modes, __SIZE_TYPE__ __bufsize),setvbuf_unlocked,(__stream,__buf,__modes,__bufsize))
 #else /* ... */
 #undef __local___localdep_setvbuf_defined
 #endif /* !... */
 #endif /* !__local___localdep_setvbuf_defined */
-/* >> setlinebuf(3)
- * Change the given `stream' to become line-buffered */
 __LOCAL_LIBC(setlinebuf) __ATTR_NONNULL((1)) void
 __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(setlinebuf))(__FILE *__restrict __stream) {
 	__localdep_setvbuf(__stream, __NULLPTR, ___IOLBF, 0);

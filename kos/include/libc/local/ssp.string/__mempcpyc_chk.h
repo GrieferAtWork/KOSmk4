@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x82b4d89b */
+/* HASH CRC-32:0xe05f7e69 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -23,17 +23,14 @@
 #include <__crt.h>
 #include <hybrid/typecore.h>
 __NAMESPACE_LOCAL_BEGIN
-/* Dependency: mempcpyc from string */
 #ifndef __local___localdep_mempcpyc_defined
 #define __local___localdep_mempcpyc_defined 1
 #ifdef __CRT_HAVE_mempcpyc
-/* Same as `memcpyc', but return `dst + (ELEM_COUNT * ELEM_SIZE)', rather than `dst' */
 __CREDIRECT(__ATTR_LEAF __ATTR_RETNONNULL __ATTR_NONNULL((1, 2)),void *,__NOTHROW_NCX,__localdep_mempcpyc,(void *__restrict __dst, void const *__restrict __src, __SIZE_TYPE__ __elem_count, __SIZE_TYPE__ __elem_size),mempcpyc,(__dst,__src,__elem_count,__elem_size))
 #else /* __CRT_HAVE_mempcpyc */
 __NAMESPACE_LOCAL_END
 #include <libc/local/string/mempcpyc.h>
 __NAMESPACE_LOCAL_BEGIN
-/* Same as `memcpyc', but return `dst + (ELEM_COUNT * ELEM_SIZE)', rather than `dst' */
 #define __localdep_mempcpyc __LIBC_LOCAL_NAME(mempcpyc)
 #endif /* !__CRT_HAVE_mempcpyc */
 #endif /* !__local___localdep_mempcpyc_defined */

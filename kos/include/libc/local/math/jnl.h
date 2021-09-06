@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x241a2064 */
+/* HASH CRC-32:0x1b1af59d */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -23,7 +23,6 @@
 #include <__crt.h>
 #if defined(__CRT_HAVE_jn) || defined(__CRT_HAVE___jn)
 __NAMESPACE_LOCAL_BEGIN
-/* Dependency: jn from math */
 #ifndef __local___localdep_jn_defined
 #define __local___localdep_jn_defined 1
 #if __has_builtin(__builtin_jn) && defined(__LIBC_BIND_CRTBUILTINS) && defined(__CRT_HAVE_jn)

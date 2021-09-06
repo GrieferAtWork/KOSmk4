@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x29d5b2f1 */
+/* HASH CRC-32:0xed71f811 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -24,24 +24,17 @@
 #include <libc/local/environ.h>
 #if defined(__CRT_HAVE_getlogin_r) || defined(__CRT_HAVE_getenv) || defined(__LOCAL_environ) || (defined(__CRT_HAVE_getpwuid_r) && defined(__CRT_HAVE_geteuid))
 __NAMESPACE_LOCAL_BEGIN
-/* Dependency: getlogin_r from unistd */
 #ifndef __local___localdep_getlogin_r_defined
 #define __local___localdep_getlogin_r_defined 1
 #ifdef __CRT_HAVE_getlogin_r
 __NAMESPACE_LOCAL_END
 #include <hybrid/typecore.h>
 __NAMESPACE_LOCAL_BEGIN
-/* >> getlogin_r(3)
- * Reentrant version of `getlogin()'. May truncate the name if it's longer than `name_len'
- * s.a. `getlogin()' and `cuserid()' */
 __CREDIRECT(__ATTR_NONNULL((1)),int,__NOTHROW_RPC,__localdep_getlogin_r,(char *__name, __SIZE_TYPE__ __name_len),getlogin_r,(__name,__name_len))
 #elif defined(__CRT_HAVE_getenv) || defined(__LOCAL_environ) || (defined(__CRT_HAVE_getpwuid_r) && defined(__CRT_HAVE_geteuid))
 __NAMESPACE_LOCAL_END
 #include <libc/local/unistd/getlogin_r.h>
 __NAMESPACE_LOCAL_BEGIN
-/* >> getlogin_r(3)
- * Reentrant version of `getlogin()'. May truncate the name if it's longer than `name_len'
- * s.a. `getlogin()' and `cuserid()' */
 #define __localdep_getlogin_r __LIBC_LOCAL_NAME(getlogin_r)
 #else /* ... */
 #undef __local___localdep_getlogin_r_defined
@@ -50,13 +43,6 @@ __NAMESPACE_LOCAL_BEGIN
 __NAMESPACE_LOCAL_END
 #include <asm/crt/stdio.h>
 __NAMESPACE_LOCAL_BEGIN
-/* >> cuserid(3)
- * Return the name of the current user (`$LOGNAME' or `getpwuid(geteuid())'), storing
- * that name in `s'. When `s' is NULL, a static buffer is used instead
- * When given, `s' must be a buffer of at least `L_cuserid' bytes.
- * If the actual username is longer than this, it may be truncated, and programs
- * that wish to support longer usernames should make use of `getlogin_r()' instead.
- * s.a. `getlogin()' and `getlogin_r()' */
 __LOCAL_LIBC(cuserid) char *
 __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(cuserid))(char *__s) {
 #ifdef __L_cuserid

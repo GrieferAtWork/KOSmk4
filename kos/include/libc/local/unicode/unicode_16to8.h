@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x5d3556f4 */
+/* HASH CRC-32:0x913c3cab */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -22,28 +22,17 @@
 #define __local_unicode_16to8_defined 1
 #include <__crt.h>
 __NAMESPACE_LOCAL_BEGIN
-/* Dependency: unicode_readutf16_n from unicode */
 #ifndef __local___localdep_unicode_readutf16_n_defined
 #define __local___localdep_unicode_readutf16_n_defined 1
 #ifdef __CRT_HAVE_unicode_readutf16_n
-/* >> unicode_readutf16_n(3)
- * Same as `unicode_readutf16()', but don't read past `text_end' */
 __CREDIRECT(__ATTR_NONNULL((1, 2)),__CHAR32_TYPE__,__NOTHROW_NCX,__localdep_unicode_readutf16_n,(__CHAR16_TYPE__ const **__restrict __ptext, __CHAR16_TYPE__ const *__text_end),unicode_readutf16_n,(__ptext,__text_end))
 #else /* __CRT_HAVE_unicode_readutf16_n */
 __NAMESPACE_LOCAL_END
 #include <libc/local/unicode/unicode_readutf16_n.h>
 __NAMESPACE_LOCAL_BEGIN
-/* >> unicode_readutf16_n(3)
- * Same as `unicode_readutf16()', but don't read past `text_end' */
 #define __localdep_unicode_readutf16_n __LIBC_LOCAL_NAME(unicode_readutf16_n)
 #endif /* !__CRT_HAVE_unicode_readutf16_n */
 #endif /* !__local___localdep_unicode_readutf16_n_defined */
-/* >> unicode_16to8(3)
- * Convert a given utf-16 string to utf-8.
- * @param: utf8_dst: A buffer of at least `UNICODE_16TO8_MAXBUF(utf16_characters)' bytes
- * @param: utf16_text: The input UTF-16 string to convert
- * @param: utf16_characters: The amount of UTF-16 characters found in `utf16_text'
- * @return: * : A pointer after the last written UTF-8 character */
 __LOCAL_LIBC(unicode_16to8) __ATTR_RETNONNULL __ATTR_NONNULL((1, 2)) char *
 __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(unicode_16to8))(char *__restrict __utf8_dst, __CHAR16_TYPE__ const *__restrict __utf16_text, __SIZE_TYPE__ __utf16_characters) {
 	__CHAR16_TYPE__ const *__utf16_end = __utf16_text + __utf16_characters;

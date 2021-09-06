@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xf25b7937 */
+/* HASH CRC-32:0x73ef70c6 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -121,7 +121,7 @@ typedef __id_t id_t;
 /* >> waitid(2)
  * @param: idtype:  One of `P_ALL', `P_PID', `P_PGID'
  * @param: options: At least one of `WEXITED', `WSTOPPED', `WCONTINUED',
- *                  optionally or'd with `WNOHANG | WNOWAIT' */
+ *                  optionally     or'd     with     `WNOHANG | WNOWAIT' */
 __CDECLARE_OPT(,int,__NOTHROW_RPC,waitid,(idtype_t __idtype, id_t __id, siginfo_t *__infop, __STDC_INT_AS_UINT_T __options),(__idtype,__id,__infop,__options))
 #endif /* __USE_XOPEN || __USE_XOPEN2K8 */
 
@@ -209,7 +209,7 @@ __NAMESPACE_LOCAL_USING_OR_IMPL(wait4_64, __FORCELOCAL __ATTR_ARTIFICIAL __pid_t
 /* >> detach(2)
  * Detach the descriptor of `PID' from the thread that
  * would have received a signal when it changes state,
- * as well as prevent the thread from turning into a
+ * as well as prevent the  thread from turning into  a
  * zombie once it dies.
  * For simplicity, think of it like this:
  *   - pthread_create()  -->  clone()
@@ -217,13 +217,13 @@ __NAMESPACE_LOCAL_USING_OR_IMPL(wait4_64, __FORCELOCAL __ATTR_ARTIFICIAL __pid_t
  *   - pthread_detach()  -->  detach()  // Linux's missing link, now implemented
  * A total of 4 special cases exists to alter the behavior of this function:
  *   - PID == 0 || PID == gettid():
- *     Detach the calling thread from the set of running children within
- *     its own process. Note however that when this is done by the main
+ *     Detach the calling  thread from  the set of  running children  within
+ *     its own process.  Note however  that when this  is done  by the  main
  *     thread of the process, gettid() will equal getpid(), and the behavior
  *     will be different.
  *   - PID == getpid():
  *     Detach the calling process from its parent, essentially daemonizing
- *     the calling process the same way a double-fork would:
+ *     the  calling   process   the   same  way   a   double-fork   would:
  *     >> if (fork() == 0) {
  *     >> 	if (fork() == 0) {
  *     >> 		// This is a daemonized process
@@ -242,7 +242,7 @@ __NAMESPACE_LOCAL_USING_OR_IMPL(wait4_64, __FORCELOCAL __ATTR_ARTIFICIAL __pid_t
  *     >> 	...
  *     >> }
  *   - PID == -1:
- *     Detach all child processes/threads of the calling process, essentially
+ *     Detach all child processes/threads  of the calling process,  essentially
  *     turning its chain of children into a clean slate that no longer contains
  *     any wait(2)able child threads or processes.
  *     If no waitable children existed, `ECHILD' is set; else `0' is returned.
@@ -252,47 +252,47 @@ __NAMESPACE_LOCAL_USING_OR_IMPL(wait4_64, __FORCELOCAL __ATTR_ARTIFICIAL __pid_t
  *   - The creator of the process containing a thread that called
  *    `clone()' with `CLONE_PARENT', which then created the thread
  *     referred to by `PID'.
- *   - Even if the thread doesn't deliver a signal upon it terminating,
+ *   - Even if  the thread  doesn't deliver  a signal  upon it  terminating,
  *     the process that would have received such a signal is still relevant.
  *   -> In other words: The thread `PID' must be one of your children,
  *                      or had you assigned as its parent.
  * If the calling thread isn't part of that process that will receive
- * the signal if the thread dies without being detached first, then
- * the call fails by throwing an `E_ILLEGAL_OPERATION'.
- * If the thread had already been detached, then the call fails by
+ * the signal if the thread  dies without being detached first,  then
+ * the   call   fails    by   throwing   an    `E_ILLEGAL_OPERATION'.
+ * If  the thread had  already been detached, then  the call fails by
  * throwing an `E_ILLEGAL_OPERATION' as well.
- * Upon success, the thread referred to by `PID' will clean up its own
+ * Upon success, the thread  referred to by `PID'  will clean up its  own
  * PID descriptor without the need of anyone to wait() for it, a behavior
- * that linux implements using `CLONE_THREAD' (which you shouldn't use,
+ * that linux implements using  `CLONE_THREAD' (which you shouldn't  use,
  * because it's flawed by design)
- * Once detached, any further use of PID results in a race condition
+ * Once detached, any further use of  PID results in a race  condition
  * (which linux neglects to mention for `CLONE_THREAD'), because there
  * is no way of ensuring that PID still refers to the original thread,
- * as another thread may have been created using the same PID, after
+ * as another thread may have been  created using the same PID,  after
  * the detached thread exited.
  * NOTE: If a thread is created using clone() with `CLONE_DETACHED' set,
- *       it will behave effectively as though this function had already
+ *       it will behave effectively as though this function had  already
  *       be called.
  * NOTE: If the thread already has terminated, detaching it will kill
  *       its zombie the same way wait() would.
- * NOTE: Passing ZERO(0) for `PID' will detach the calling thread.
- *       However, this operation fails if the calling thread isn't
+ * NOTE: Passing ZERO(0)  for `PID'  will detach  the calling  thread.
+ *       However, this  operation fails  if the  calling thread  isn't
  *       part of the same process as the parent process of the thread.
- *       In other words, the child of a fork() can't do this, and
- *       neither can the spawnee of clone(CLONE_THREAD|CLONE_PARENT),
+ *       In other words,  the child  of a  fork() can't  do this,  and
+ *       neither can the spawnee of  clone(CLONE_THREAD|CLONE_PARENT),
  *       clone(0) or clone(CLONE_PARENT).
- * @errno: EPERM:               The calling process isn't the recipient of signals
- *                              delivered when `PID' changes state. This can either
+ * @errno: EPERM:               The  calling  process isn't  the recipient  of signals
+ *                              delivered when `PID'  changes state.  This can  either
  *                              be because `PID' has already been detached, or because
  *                              YOU CAN'T DETACH SOMEONE ELSE'S THREAD!
- *                              Another possibility is that the thread was already
+ *                              Another  possibility is that the thread was already
  *                              detached, then exited, following which a new thread
- *                              got created and had been assigned the PID of your
+ *                              got created and had been  assigned the PID of  your
  *                              ancient, no longer existent thread.
  * @errno: ECHILD:             `PID' was equal to `-1', but no waitable children existed
- * @throw: E_PROCESS_EXITED:    The process referred to by `PID' doesn't exist.
- *                              This could mean that it had already been detached
- *                              and exited, or that the `PID' is just invalid (which
+ * @throw: E_PROCESS_EXITED:    The  process  referred  to  by  `PID'  doesn't exist.
+ *                              This could  mean that  it had  already been  detached
+ *                              and exited, or that the `PID' is just invalid  (which
  *                              would also be the case if it was valid at some point) */
 __CDECLARE_OPT(,int,__NOTHROW_NCX,detach,(__pid_t __pid),(__pid))
 #endif /* __USE_KOS */

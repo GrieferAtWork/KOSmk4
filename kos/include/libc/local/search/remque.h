@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x50295843 */
+/* HASH CRC-32:0x4074cce1 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -22,12 +22,9 @@
 #define __local_remque_defined 1
 #include <__crt.h>
 __NAMESPACE_LOCAL_BEGIN
-/* Dependency: link from unistd */
 #ifndef __local___localdep_link_defined
 #define __local___localdep_link_defined 1
 #ifdef __CRT_HAVE_link
-/* >> link(2)
- * Create a hard link from `from', leading to `to' */
 __CREDIRECT(__ATTR_NONNULL((1, 2)),int,__NOTHROW_RPC,__localdep_link,(char const *__from, char const *__to),link,(__from,__to))
 #else /* __CRT_HAVE_link */
 __NAMESPACE_LOCAL_END
@@ -37,16 +34,12 @@ __NAMESPACE_LOCAL_BEGIN
 __NAMESPACE_LOCAL_END
 #include <libc/local/unistd/link.h>
 __NAMESPACE_LOCAL_BEGIN
-/* >> link(2)
- * Create a hard link from `from', leading to `to' */
 #define __localdep_link __LIBC_LOCAL_NAME(link)
 #else /* __AT_FDCWD && __CRT_HAVE_linkat */
 #undef __local___localdep_link_defined
 #endif /* !__AT_FDCWD || !__CRT_HAVE_linkat */
 #endif /* !__CRT_HAVE_link */
 #endif /* !__local___localdep_link_defined */
-/* >> remque(3)
- * Unlink ELEM from the doubly-linked list that it is in */
 __LOCAL_LIBC(remque) __ATTR_NONNULL((1)) void
 __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(remque))(void *__restrict __elem) {
 	struct __localdep_link {

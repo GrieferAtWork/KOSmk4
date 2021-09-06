@@ -21,8 +21,8 @@
 #include "dma.c"
 #define DEFINE_mman_startdma
 //#define DEFINE_mman_startdmav
-//#define DEFINE_mman_enumdma
-//#define DEFINE_mman_enumdmav
+//#define   DEFINE_mman_enumdma
+//#define  DEFINE_mman_enumdmav
 #endif /* __INTELLISENSE__ */
 
 #include <kernel/iovec.h>

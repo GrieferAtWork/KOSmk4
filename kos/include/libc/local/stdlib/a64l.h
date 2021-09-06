@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x58a1ca1 */
+/* HASH CRC-32:0xfc150d27 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -22,8 +22,6 @@
 #define __local_a64l_defined 1
 #include <__crt.h>
 __NAMESPACE_LOCAL_BEGIN
-/* >> l64a(3), a64l(3)
- * Convert between `long' and base-64 encoded integer strings. */
 __LOCAL_LIBC(a64l) __ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1)) long
 __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(a64l))(char const *__s) {
 	unsigned long __digit, __result = 0;

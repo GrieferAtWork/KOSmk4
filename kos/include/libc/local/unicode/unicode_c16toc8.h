@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xe1e51598 */
+/* HASH CRC-32:0xdbcce0da */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -23,10 +23,6 @@
 #include <__crt.h>
 #include <bits/crt/mbstate.h>
 __NAMESPACE_LOCAL_BEGIN
-/* >> unicode_c16toc8(3)
- * @return: 0 :         Success, but no characters were generated
- * @return: * :         Success (this many bytes were written to `*pc8'; max is `UNICODE_16TO8_MAXBUF(1)')
- * @return: (size_t)-1: Unicode error (the given input string isn't a valid unicode sequence) */
 __LOCAL_LIBC(unicode_c16toc8) __ATTR_NONNULL((1, 3)) __SIZE_TYPE__
 __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(unicode_c16toc8))(char __pc8[3], __CHAR16_TYPE__ __c16, struct __mbstate *__restrict __mbs) {
 	__CHAR32_TYPE__ __ch32;

@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xc6310722 */
+/* HASH CRC-32:0xca8a74f8 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -24,12 +24,10 @@
 #if defined(__CRT_HAVE_ntp_adjtime64) || defined(__CRT_HAVE_ntp_adjtime)
 #include <bits/os/timex.h>
 __NAMESPACE_LOCAL_BEGIN
-/* Dependency: ntp_adjtime32 from sys.timex */
 #if !defined(__local___localdep_ntp_adjtime32_defined) && defined(__CRT_HAVE_ntp_adjtime)
 #define __local___localdep_ntp_adjtime32_defined 1
 __CREDIRECT(__ATTR_NONNULL((1)),int,__NOTHROW_NCX,__localdep_ntp_adjtime32,(struct __timex32 *__restrict __tntx),ntp_adjtime,(__tntx))
 #endif /* !__local___localdep_ntp_adjtime32_defined && __CRT_HAVE_ntp_adjtime */
-/* Dependency: ntp_adjtime64 from sys.timex */
 #ifndef __local___localdep_ntp_adjtime64_defined
 #define __local___localdep_ntp_adjtime64_defined 1
 #ifdef __CRT_HAVE_ntp_adjtime64

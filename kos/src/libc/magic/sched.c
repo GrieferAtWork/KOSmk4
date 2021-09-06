@@ -334,16 +334,16 @@ $pid_t clone([[nonnull]] __clone_func_t fn, void *child_stack, int flags,
              void *arg, ... /* pid_t *ptid, void *newtls, pid_t *ctid */);
 
 @@>> unshare(2)
-@@Unshare certain components of the calling thread that may be shared with other
-@@threads or processes, such as the filesystem, or opened file descriptors.
-@@When being unshared, the calling thread's descriptor for a specific component
-@@is replaced with a copy of its previous contents at that moment in time, with
-@@the notable exception of certain KOS-specific extensions, where specifically
-@@marked data will be deleted (s.a. `O_CLOFORK' and `PROT_LOOSE')
-@@The behavior and meaning of individual bits in `flags' matches their meaning
+@@Unshare  certain components of the calling thread  that may be shared with other
+@@threads  or  processes,  such as  the  filesystem, or  opened  file descriptors.
+@@When  being unshared, the  calling thread's descriptor  for a specific component
+@@is replaced with a copy  of its previous contents at  that moment in time,  with
+@@the notable  exception of  certain KOS-specific  extensions, where  specifically
+@@marked   data   will   be   deleted   (s.a.   `O_CLOFORK'   and    `PROT_LOOSE')
+@@The  behavior and  meaning of individual  bits in `flags'  matches their meaning
 @@when passed to `clone()', except that for certain flags the meaning is reversed.
 @@For example: Passing `CLONE_FILES' to `clone(2)' will cause handles to be shared,
-@@             but passing it to `unshare(2)' will cause handles to be unshared.
+@@             but  passing it to  `unshare(2)' will cause  handles to be unshared.
 @@@param: flags: Set of `CLONE_*' flags:
 @@                - CLONE_FILES:     Unshare handles (and close all marked as `O_CLOFORK')
 @@                - CLONE_FS:        Unshare umask(), chroot(), chdir(), fsmode() and drive-cwds
@@ -363,16 +363,16 @@ int unshare(__STDC_INT_AS_UINT_T flags);
 @@>> sched_getcpu(3)
 @@Returns the number of the CPU for the calling thread.
 @@Note that due to unforeseeable scheduling conditions, this may change at any
-@@moment, even before this function returns, or before the caller was able to
-@@act on its return value. For that reason, this function must only be taken
+@@moment, even before this function returns, or before the caller was able  to
+@@act on its return value. For that  reason, this function must only be  taken
 @@as a hint
 [[decl_include("<features.h>")]]
 __STDC_INT_AS_UINT_T sched_getcpu();
 
 @@>> setns(2)
 @@With `fd' referring to a namespace, reassociate the calling thread with that namespace.
-@@For this purpose, `fd' was opened for one of the files in `/proc/[pid]/ns/'
-@@@param: nstype: The type of namespace to re-associate (either 0 to allow any
+@@For  this  purpose,  `fd'  was  opened  for  one  of  the  files  in  `/proc/[pid]/ns/'
+@@@param: nstype: The  type of namespace  to re-associate (either  0 to allow any
 @@                type of namespace, or one of `CLONE_NEWCGROUP', `CLONE_NEWIPC',
 @@               `CLONE_NEWNET', `CLONE_NEWNS', `CLONE_NEWPID', `CLONE_NEWUSER',
 @@               `CLONE_NEWUTS')
@@ -381,9 +381,9 @@ int setns($fd_t fd, __STDC_INT_AS_UINT_T nstype);
 
 %
 %#ifdef __USE_KOS
-@@Exits the current thread by invoking the SYS_exit system call,
-@@after performing some additional cleanup not done by the kernel.
-@@Assuming that the calling thread was constructed by `clone()',
+@@Exits  the current  thread by  invoking the  SYS_exit system call,
+@@after performing some additional cleanup  not done by the  kernel.
+@@Assuming that  the calling  thread was  constructed by  `clone()',
 @@calling this function has the same effect as returning `EXIT_CODE'
 @@from `clone()'s `FN' callback
 [[ATTR_NORETURN, section(".text.crt{|.dos}.sched.access")]]
@@ -460,7 +460,7 @@ int sched_getscheduler($pid_t pid);
 %
 %[default:section(".text.crt{|.dos}.sched.thread")];
 
-@@@return: 1: Another thread was executed prior to the function returning
+@@@return: 1: Another thread was  executed prior to  the function  returning
 @@            The thread may not necessarily be apart of the calling process
 @@@return: 0: The function returned immediately when no other thread was executed
 [[export_alias("thrd_yield", "pthread_yield", "__sched_yield", "yield")]]

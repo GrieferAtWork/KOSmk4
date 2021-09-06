@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xbea129fd */
+/* HASH CRC-32:0x126acb8a */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -22,8 +22,6 @@
 #define __local_c16scmp_defined 1
 #include <__crt.h>
 __NAMESPACE_LOCAL_BEGIN
-/* >> strcmp(3)
- * Compare 2 strings and return the difference of the first non-matching character, or `0' if they are identical */
 __LOCAL_LIBC(c16scmp) __ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1, 2)) int
 __NOTHROW_NCX(__LIBDCALL __LIBC_LOCAL_NAME(c16scmp))(__CHAR16_TYPE__ const *__s1, __CHAR16_TYPE__ const *__s2) {
 	__CHAR16_TYPE__ __c1, __c2;

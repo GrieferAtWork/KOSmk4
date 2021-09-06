@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x6f948d16 */
+/* HASH CRC-32:0x7790b6e2 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -24,7 +24,6 @@
 #include <hybrid/typecore.h>
 #include <bits/crt/wctype.h>
 __NAMESPACE_LOCAL_BEGIN
-/* Dependency: towctrans from wctype */
 #ifndef __local___localdep_towctrans_defined
 #define __local___localdep_towctrans_defined 1
 #ifdef __CRT_HAVE_towctrans

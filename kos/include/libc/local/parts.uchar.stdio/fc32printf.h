@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xcb5c8dee */
+/* HASH CRC-32:0x46b98202 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -26,7 +26,6 @@
 #include <features.h>
 #include <hybrid/typecore.h>
 __NAMESPACE_LOCAL_BEGIN
-/* Dependency: vfc32printf from parts.uchar.stdio */
 #ifndef __local___localdep_vfc32printf_defined
 #define __local___localdep_vfc32printf_defined 1
 #if defined(__CRT_HAVE_vfwprintf) && __SIZEOF_WCHAR_T__ == 4 && defined(__LIBCCALL_IS_LIBKCALL)

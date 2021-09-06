@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x7d4f5d07 */
+/* HASH CRC-32:0x75c0077c */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -25,34 +25,24 @@
 #if (defined(__CRT_HAVE_fuzzy_wmemcasecmp_l) && __SIZEOF_WCHAR_T__ == 2 && defined(__LIBCCALL_IS_LIBDCALL)) || defined(__CRT_HAVE_DOS$fuzzy_wmemcasecmp_l) || !defined(__NO_MALLOCA)
 #include <hybrid/typecore.h>
 __NAMESPACE_LOCAL_BEGIN
-/* Dependency: c16snlen from parts.uchar.string */
 #ifndef __local___localdep_c16snlen_defined
 #define __local___localdep_c16snlen_defined 1
 #if defined(__CRT_HAVE_wcsnlen) && __SIZEOF_WCHAR_T__ == 2 && defined(__LIBCCALL_IS_LIBDCALL)
-/* >> strnlen(3)
- * Same as `strlen', but don't exceed `max_chars' characters (Same as `memlen[...](str, '\0', max_chars)´) */
 __CREDIRECT(__ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1)),__SIZE_TYPE__,__NOTHROW_NCX,__localdep_c16snlen,(__CHAR16_TYPE__ const *__restrict __str, __SIZE_TYPE__ __maxlen),wcsnlen,(__str,__maxlen))
 #elif defined(__CRT_HAVE_DOS$wcsnlen)
-/* >> strnlen(3)
- * Same as `strlen', but don't exceed `max_chars' characters (Same as `memlen[...](str, '\0', max_chars)´) */
 __CREDIRECT_DOS(__ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1)),__SIZE_TYPE__,__NOTHROW_NCX,__localdep_c16snlen,(__CHAR16_TYPE__ const *__restrict __str, __SIZE_TYPE__ __maxlen),wcsnlen,(__str,__maxlen))
 #elif __SIZEOF_WCHAR_T__ == 2
 __NAMESPACE_LOCAL_END
 #include <libc/local/wchar/wcsnlen.h>
 __NAMESPACE_LOCAL_BEGIN
-/* >> strnlen(3)
- * Same as `strlen', but don't exceed `max_chars' characters (Same as `memlen[...](str, '\0', max_chars)´) */
 #define __localdep_c16snlen (*(__SIZE_TYPE__(__LIBDCALL *)(__CHAR16_TYPE__ const *__restrict, __SIZE_TYPE__))&__LIBC_LOCAL_NAME(wcsnlen))
 #else /* ... */
 __NAMESPACE_LOCAL_END
 #include <libc/local/parts.uchar.string/c16snlen.h>
 __NAMESPACE_LOCAL_BEGIN
-/* >> strnlen(3)
- * Same as `strlen', but don't exceed `max_chars' characters (Same as `memlen[...](str, '\0', max_chars)´) */
 #define __localdep_c16snlen __LIBC_LOCAL_NAME(c16snlen)
 #endif /* !... */
 #endif /* !__local___localdep_c16snlen_defined */
-/* Dependency: fuzzy_c16memcasecmp_l from parts.uchar.string */
 #ifndef __local___localdep_fuzzy_c16memcasecmp_l_defined
 #define __local___localdep_fuzzy_c16memcasecmp_l_defined 1
 #if defined(__CRT_HAVE_fuzzy_wmemcasecmp_l) && __SIZEOF_WCHAR_T__ == 2 && defined(__LIBCCALL_IS_LIBDCALL)

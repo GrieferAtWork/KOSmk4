@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x1e0133c3 */
+/* HASH CRC-32:0xb0d5921a */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -62,8 +62,8 @@ INTERN ATTR_SECTION(".text.crt.FILE.locked.write.putc") int
 #include <hybrid/typecore.h>
 #include <libc/errno.h>
 /* >> fgets(3)
- * Read up to `bufsize - 1' bytes of data from `stream', storing them into `buf' stopped when
- * the buffer is full or a line-feed was read (in this case, the line-feed is also written to `buf')
+ * Read up  to  `bufsize - 1'  bytes  of  data  from  `stream',  storing  them  into  `buf'  stopped  when
+ * the buffer is  full or a  line-feed was read  (in this case,  the line-feed is  also written to  `buf')
  * Afterwards, append a trailing NUL-character and re-return `buf', or return `NULL' if an error occurred. */
 INTERN ATTR_SECTION(".text.crt.FILE.locked.read.read") WUNUSED NONNULL((1, 3)) char *
 (LIBCCALL libc_fgets)(char *__restrict buf,
@@ -165,7 +165,7 @@ NOTHROW_RPC(LIBCCALL libc_perror)(char const *message) {
 #endif /* !__NO_PRINTF_STRERROR */
 }
 /* >> fprintf(3), vfprintf(3)
- * Print data to `stream', following `format'
+ * Print  data  to  `stream',  following  `format'
  * Return the number of successfully printed bytes */
 INTERN ATTR_SECTION(".text.crt.FILE.locked.write.printf") ATTR_LIBC_PRINTF(2, 0) NONNULL((1, 2)) __STDC_INT_AS_SSIZE_T
 (LIBCCALL libc_vfprintf)(FILE *__restrict stream,
@@ -176,7 +176,7 @@ INTERN ATTR_SECTION(".text.crt.FILE.locked.write.printf") ATTR_LIBC_PRINTF(2, 0)
 #endif /* !__KERNEL__ */
 #if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
 /* >> fprintf(3), vfprintf(3)
- * Print data to `stream', following `format'
+ * Print  data  to  `stream',  following  `format'
  * Return the number of successfully printed bytes */
 INTERN ATTR_SECTION(".text.crt.dos.FILE.locked.write.printf") ATTR_LIBC_PRINTF(2, 3) NONNULL((1, 2)) __STDC_INT_AS_SSIZE_T
 (VLIBDCALL libd_fprintf)(FILE *__restrict stream,
@@ -192,7 +192,7 @@ INTERN ATTR_SECTION(".text.crt.dos.FILE.locked.write.printf") ATTR_LIBC_PRINTF(2
 #endif /* !__LIBCCALL_IS_LIBDCALL && !__KERNEL__ */
 #ifndef __KERNEL__
 /* >> fprintf(3), vfprintf(3)
- * Print data to `stream', following `format'
+ * Print  data  to  `stream',  following  `format'
  * Return the number of successfully printed bytes */
 INTERN ATTR_SECTION(".text.crt.FILE.locked.write.printf") ATTR_LIBC_PRINTF(2, 3) NONNULL((1, 2)) __STDC_INT_AS_SSIZE_T
 (VLIBCCALL libc_fprintf)(FILE *__restrict stream,
@@ -207,7 +207,7 @@ INTERN ATTR_SECTION(".text.crt.FILE.locked.write.printf") ATTR_LIBC_PRINTF(2, 3)
 }
 #include <libc/local/stdstreams.h>
 /* >> printf(3), vprintf(3)
- * Print data to `stdout', following `format'
+ * Print  data  to  `stdout',  following  `format'
  * Return the number of successfully printed bytes */
 INTERN ATTR_SECTION(".text.crt.FILE.locked.write.printf") ATTR_LIBC_PRINTF(1, 0) NONNULL((1)) __STDC_INT_AS_SSIZE_T
 (LIBCCALL libc_vprintf)(char const *__restrict format,
@@ -217,7 +217,7 @@ INTERN ATTR_SECTION(".text.crt.FILE.locked.write.printf") ATTR_LIBC_PRINTF(1, 0)
 #endif /* !__KERNEL__ */
 #if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
 /* >> printf(3), vprintf(3)
- * Print data to `stdout', following `format'
+ * Print  data  to  `stdout',  following  `format'
  * Return the number of successfully printed bytes */
 INTERN ATTR_SECTION(".text.crt.dos.FILE.locked.write.printf") ATTR_LIBC_PRINTF(1, 2) NONNULL((1)) __STDC_INT_AS_SSIZE_T
 (VLIBDCALL libd_printf)(char const *__restrict format,
@@ -232,7 +232,7 @@ INTERN ATTR_SECTION(".text.crt.dos.FILE.locked.write.printf") ATTR_LIBC_PRINTF(1
 #endif /* !__LIBCCALL_IS_LIBDCALL && !__KERNEL__ */
 #ifndef __KERNEL__
 /* >> printf(3), vprintf(3)
- * Print data to `stdout', following `format'
+ * Print  data  to  `stdout',  following  `format'
  * Return the number of successfully printed bytes */
 INTERN ATTR_SECTION(".text.crt.FILE.locked.write.printf") ATTR_LIBC_PRINTF(1, 2) NONNULL((1)) __STDC_INT_AS_SSIZE_T
 (VLIBCCALL libc_printf)(char const *__restrict format,
@@ -258,7 +258,7 @@ __LOCAL_LIBC(vfscanf_ungetc) ssize_t
 }
 __NAMESPACE_LOCAL_END
 /* >> fscanf(3), vfscanf(3)
- * Scan data from `stream', following `format'
+ * Scan  data   from   `stream',   following   `format'
  * Return the number of successfully scanned data items */
 INTERN ATTR_SECTION(".text.crt.FILE.locked.read.scanf") WUNUSED ATTR_LIBC_SCANF(2, 0) NONNULL((1, 2)) __STDC_INT_AS_SIZE_T
 (LIBCCALL libc_vfscanf)(FILE *__restrict stream,
@@ -288,7 +288,7 @@ INTERN ATTR_SECTION(".text.crt.FILE.locked.read.scanf") WUNUSED ATTR_LIBC_SCANF(
 #endif /* !__KERNEL__ */
 #if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
 /* >> fscanf(3), vfscanf(3)
- * Scan data from `stream', following `format'
+ * Scan  data   from   `stream',   following   `format'
  * Return the number of successfully scanned data items */
 INTERN ATTR_SECTION(".text.crt.dos.FILE.locked.read.scanf") WUNUSED ATTR_LIBC_SCANF(2, 3) NONNULL((1, 2)) __STDC_INT_AS_SIZE_T
 (VLIBDCALL libd_fscanf)(FILE *__restrict stream,
@@ -304,7 +304,7 @@ INTERN ATTR_SECTION(".text.crt.dos.FILE.locked.read.scanf") WUNUSED ATTR_LIBC_SC
 #endif /* !__LIBCCALL_IS_LIBDCALL && !__KERNEL__ */
 #ifndef __KERNEL__
 /* >> fscanf(3), vfscanf(3)
- * Scan data from `stream', following `format'
+ * Scan  data   from   `stream',   following   `format'
  * Return the number of successfully scanned data items */
 INTERN ATTR_SECTION(".text.crt.FILE.locked.read.scanf") WUNUSED ATTR_LIBC_SCANF(2, 3) NONNULL((1, 2)) __STDC_INT_AS_SIZE_T
 (VLIBCCALL libc_fscanf)(FILE *__restrict stream,
@@ -377,7 +377,7 @@ __NAMESPACE_LOCAL_END
 #endif /* !____vsscanf_getc_defined */
 /* >> sscanf(3), vsscanf(3)
  * Scan data from a given `input' string, following `format'
- * Return the number of successfully scanned data items */
+ * Return  the  number  of successfully  scanned  data items */
 INTERN ATTR_SECTION(".text.crt.unicode.static.format.scanf") WUNUSED ATTR_LIBC_SCANF(2, 0) NONNULL((1, 2)) __STDC_INT_AS_SIZE_T
 NOTHROW_NCX(LIBCCALL libc_vsscanf)(char const *__restrict input,
                                    char const *__restrict format,
@@ -401,7 +401,7 @@ NOTHROW_NCX(LIBCCALL libc_vsscanf)(char const *__restrict input,
 #if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
 /* >> sscanf(3), vsscanf(3)
  * Scan data from a given `input' string, following `format'
- * Return the number of successfully scanned data items */
+ * Return  the  number  of successfully  scanned  data items */
 INTERN ATTR_SECTION(".text.crt.dos.unicode.static.format.scanf") ATTR_LIBC_SCANF(2, 3) NONNULL((1, 2)) __STDC_INT_AS_SIZE_T
 NOTHROW_NCX(VLIBDCALL libd_sscanf)(char const *__restrict input,
                                    char const *__restrict format,
@@ -417,7 +417,7 @@ NOTHROW_NCX(VLIBDCALL libd_sscanf)(char const *__restrict input,
 #ifndef __KERNEL__
 /* >> sscanf(3), vsscanf(3)
  * Scan data from a given `input' string, following `format'
- * Return the number of successfully scanned data items */
+ * Return  the  number  of successfully  scanned  data items */
 INTERN ATTR_SECTION(".text.crt.unicode.static.format.scanf") ATTR_LIBC_SCANF(2, 3) NONNULL((1, 2)) __STDC_INT_AS_SIZE_T
 NOTHROW_NCX(VLIBCCALL libc_sscanf)(char const *__restrict input,
                                    char const *__restrict format,
@@ -431,7 +431,7 @@ NOTHROW_NCX(VLIBCCALL libc_sscanf)(char const *__restrict input,
 }
 #endif /* !__KERNEL__ */
 /* >> sprintf(3), vsprintf(3)
- * Print a formatted string to a given in-member string buffer `buf'
+ * Print  a  formatted  string  to  a  given  in-member  string  buffer  `buf'
  * Return the number of written characters, excluding a trailing NUL-character */
 INTERN ATTR_SECTION(".text.crt.unicode.static.format.printf") ATTR_LIBC_PRINTF(2, 0) NONNULL((1, 2)) __STDC_INT_AS_SSIZE_T
 NOTHROW_NCX(LIBCCALL libc_vsprintf)(char *__restrict dest,
@@ -448,7 +448,7 @@ NOTHROW_NCX(LIBCCALL libc_vsprintf)(char *__restrict dest,
 }
 #if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
 /* >> sprintf(3), vsprintf(3)
- * Print a formatted string to a given in-member string buffer `buf'
+ * Print  a  formatted  string  to  a  given  in-member  string  buffer  `buf'
  * Return the number of written characters, excluding a trailing NUL-character */
 INTERN ATTR_SECTION(".text.crt.dos.unicode.static.format.printf") ATTR_LIBC_PRINTF(2, 3) NONNULL((1, 2)) __STDC_INT_AS_SIZE_T
 NOTHROW_NCX(VLIBDCALL libd_sprintf)(char *__restrict buf,
@@ -463,7 +463,7 @@ NOTHROW_NCX(VLIBDCALL libd_sprintf)(char *__restrict buf,
 }
 #endif /* !__LIBCCALL_IS_LIBDCALL && !__KERNEL__ */
 /* >> sprintf(3), vsprintf(3)
- * Print a formatted string to a given in-member string buffer `buf'
+ * Print  a  formatted  string  to  a  given  in-member  string  buffer  `buf'
  * Return the number of written characters, excluding a trailing NUL-character */
 INTERN ATTR_SECTION(".text.crt.unicode.static.format.printf") ATTR_LIBC_PRINTF(2, 3) NONNULL((1, 2)) __STDC_INT_AS_SIZE_T
 NOTHROW_NCX(VLIBCCALL libc_sprintf)(char *__restrict buf,
@@ -484,8 +484,8 @@ struct __format_snprintf_data {
 };
 #endif /* !____format_snprintf_data_defined */
 /* >> snprintf(3), vsnprintf(3)
- * Print a formatted string to a given in-member string buffer `buf'
- * Always return the REQUIRED buffer size (excluding a trailing NUL-
+ * Print  a formatted string to a given in-member string buffer `buf'
+ * Always return the REQUIRED buffer size (excluding a trailing  NUL-
  * character), and never write more than `buflen' characters to `buf' */
 INTERN ATTR_SECTION(".text.crt.unicode.static.format.printf") ATTR_LIBC_PRINTF(3, 0) NONNULL((3)) __STDC_INT_AS_SIZE_T
 NOTHROW_NCX(LIBCCALL libc_vsnprintf)(char *__restrict buf,
@@ -541,8 +541,8 @@ NOTHROW_NCX(LIBCCALL libc_vsnprintf)(char *__restrict buf,
 }
 #if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
 /* >> snprintf(3), vsnprintf(3)
- * Print a formatted string to a given in-member string buffer `buf'
- * Always return the REQUIRED buffer size (excluding a trailing NUL-
+ * Print  a formatted string to a given in-member string buffer `buf'
+ * Always return the REQUIRED buffer size (excluding a trailing  NUL-
  * character), and never write more than `buflen' characters to `buf' */
 INTERN ATTR_SECTION(".text.crt.dos.unicode.static.format.printf") ATTR_LIBC_PRINTF(3, 4) NONNULL((3)) __STDC_INT_AS_SIZE_T
 NOTHROW_NCX(VLIBDCALL libd_snprintf)(char *__restrict buf,
@@ -558,8 +558,8 @@ NOTHROW_NCX(VLIBDCALL libd_snprintf)(char *__restrict buf,
 }
 #endif /* !__LIBCCALL_IS_LIBDCALL && !__KERNEL__ */
 /* >> snprintf(3), vsnprintf(3)
- * Print a formatted string to a given in-member string buffer `buf'
- * Always return the REQUIRED buffer size (excluding a trailing NUL-
+ * Print  a formatted string to a given in-member string buffer `buf'
+ * Always return the REQUIRED buffer size (excluding a trailing  NUL-
  * character), and never write more than `buflen' characters to `buf' */
 INTERN ATTR_SECTION(".text.crt.unicode.static.format.printf") ATTR_LIBC_PRINTF(3, 4) NONNULL((3)) __STDC_INT_AS_SIZE_T
 NOTHROW_NCX(VLIBCCALL libc_snprintf)(char *__restrict buf,

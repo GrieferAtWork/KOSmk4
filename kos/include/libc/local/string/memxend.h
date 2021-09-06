@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x709bb326 */
+/* HASH CRC-32:0x80fa1179 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -23,7 +23,6 @@
 #include <__crt.h>
 #include <hybrid/typecore.h>
 __NAMESPACE_LOCAL_BEGIN
-/* Same as `memend', but search for non-matching locations. */
 __LOCAL_LIBC(memxend) __ATTR_PURE __ATTR_RETNONNULL __ATTR_WUNUSED __ATTR_NONNULL((1)) void *
 __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(memxend))(void const *__restrict __haystack, int __needle, __SIZE_TYPE__ __n_bytes) {
 	__BYTE_TYPE__ *__result = (__BYTE_TYPE__ *)__haystack;

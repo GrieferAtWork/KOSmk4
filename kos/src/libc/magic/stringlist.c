@@ -77,7 +77,7 @@ struct _stringlist *sl_init() {
 
 
 @@>> sl_add(3)
-@@Append a given `name' to `sl'. `name' is considered
+@@Append a  given `name'  to  `sl'. `name'  is  considered
 @@inherited if the StringList is destroyed with `freeit=1'
 [[decl_include("<hybrid/typecore.h>"), decl_prefix(DEFINE_STRINGLIST)]]
 [[requires_function(realloc)]]
@@ -120,9 +120,9 @@ void sl_free([[nullable]] struct _stringlist *sl, int freeit) {
 %[define_c_language_keyword(__KOS_FIXED_CONST)]
 
 @@>> sl_find(3)
-@@Search for `name' within the given StringList. Upon success,
-@@return a pointer to the equivalent string within `sl' (i.e. the
-@@pointer originally passed to `sl_add()' to insert that string).
+@@Search  for  `name'  within  the  given  StringList.  Upon  success,
+@@return a  pointer to  the equivalent  string within  `sl' (i.e.  the
+@@pointer originally  passed to  `sl_add()'  to insert  that  string).
 @@If `sl' doesn't contain an equivalent string, return `NULL' instead.
 [[decl_include("<features.h>")]]
 [[ATTR_PURE, decl_include("<hybrid/typecore.h>"), decl_prefix(DEFINE_STRINGLIST)]]

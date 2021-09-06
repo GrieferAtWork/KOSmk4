@@ -44,7 +44,7 @@ __SYSDECL_BEGIN
 }
 
 @@>> setfsuid(2)
-@@Set the user ID for the cred-context (s.a. `CLONE_CRED') of the
+@@Set the  user ID  for the  cred-context (s.a.  `CLONE_CRED') of  the
 @@calling thread. The calling thread needs the `CAP_SETUID' privilege.
 @@@return: 0:  Success.
 @@@return: -1: Error (s.a. `errno')
@@ -52,7 +52,7 @@ __SYSDECL_BEGIN
 int setfsuid($uid_t uid);
 
 @@>> setfsgid(2)
-@@Set the group ID for the cred-context (s.a. `CLONE_CRED') of the
+@@Set the group  ID for  the cred-context (s.a.  `CLONE_CRED') of  the
 @@calling thread. The calling thread needs the `CAP_SETGID' privilege.
 @@@return: 0:  Success.
 @@@return: -1: Error (s.a. `errno')

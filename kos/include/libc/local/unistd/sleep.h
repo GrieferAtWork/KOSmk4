@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xdac58f1a */
+/* HASH CRC-32:0x74dcf818 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -23,21 +23,16 @@
 #include <__crt.h>
 #if defined(__CRT_HAVE__sleep) || defined(__CRT_HAVE_sleep)
 __NAMESPACE_LOCAL_BEGIN
-/* Dependency: dos_sleep from dos */
 #ifndef __local___localdep_dos_sleep_defined
 #define __local___localdep_dos_sleep_defined 1
 #ifdef __CRT_HAVE__sleep
-/* Sleep for up to `duration' seconds */
 __CREDIRECT_VOID(,__NOTHROW_RPC,__localdep_dos_sleep,(unsigned int __duration),_sleep,(__duration))
 #elif defined(__CRT_HAVE_sleep)
-/* Sleep for up to `duration' seconds */
 __CREDIRECT_VOID(,__NOTHROW_RPC,__localdep_dos_sleep,(unsigned int __duration),sleep,(__duration))
 #else /* ... */
 #undef __local___localdep_dos_sleep_defined
 #endif /* !... */
 #endif /* !__local___localdep_dos_sleep_defined */
-/* >> sleep(3)
- * Sleep for up to `seconds' seconds */
 __LOCAL_LIBC(sleep) unsigned int
 __NOTHROW_RPC(__LIBCCALL __LIBC_LOCAL_NAME(sleep))(unsigned int __seconds) {
 	__localdep_dos_sleep((__UINT32_TYPE__)__seconds);

@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xba27b846 */
+/* HASH CRC-32:0xd0df4214 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -23,7 +23,6 @@
 #include <__crt.h>
 #include <hybrid/typecore.h>
 __NAMESPACE_LOCAL_BEGIN
-/* Dependency: wcscasecmp from wchar */
 #ifndef __local___localdep_wcscasecmp_defined
 #define __local___localdep_wcscasecmp_defined 1
 #ifdef __CRT_HAVE_wcscasecmp
@@ -37,8 +36,6 @@ __NAMESPACE_LOCAL_BEGIN
 #define __localdep_wcscasecmp __LIBC_LOCAL_NAME(wcscasecmp)
 #endif /* !... */
 #endif /* !__local___localdep_wcscasecmp_defined */
-/* >> strcasestr(3)
- * Same as `strstr', but ignore casing */
 __LOCAL_LIBC(wcscasestr) __ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1)) __WCHAR_TYPE__ *
 __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(wcscasestr))(__WCHAR_TYPE__ const *__haystack, __WCHAR_TYPE__ const *__needle) {
 	for (; *__haystack; ++__haystack) {

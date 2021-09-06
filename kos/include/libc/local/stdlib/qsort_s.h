@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xfa0511c9 */
+/* HASH CRC-32:0x96ef442c */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -27,7 +27,6 @@
 typedef int (__LIBDCALL *__dos_compar_d_fn_t)(void *__arg, void const *__a, void const *__b);
 #endif /* !__dos_compar_d_fn_t_defined */
 __NAMESPACE_LOCAL_BEGIN
-/* Dependency: qsort_r from stdlib */
 #ifndef __local___localdep_qsort_r_defined
 #define __local___localdep_qsort_r_defined 1
 #ifdef __CRT_HAVE_qsort_r

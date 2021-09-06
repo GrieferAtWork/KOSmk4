@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xbb22507e */
+/* HASH CRC-32:0xdf62f8d0 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -596,7 +596,7 @@ for (local name: classes.keys.sorted()) {
 #include <asm/os/signal.h>
 #include <bits/os/siginfo.h>
 /* Transform the given exception into a posix signal.
- * If doing this is possible, fill in `*result' and return `true'.
+ * If   doing  this  is   possible,  fill  in   `*result'  and  return  `true'.
  * Otherwise, `*result' is left in an undefined state, and `false' is returned. */
 INTERN ATTR_SECTION(".text.crt.except.io.utility") WUNUSED NONNULL((1, 2)) bool
 NOTHROW_NCX(LIBKCALL libc_error_as_signal)(struct exception_data const *__restrict self,
@@ -784,7 +784,7 @@ NOTHROW_NCX(LIBKCALL libc_error_as_signal)(struct exception_data const *__restri
 	return true;
 }
 /* Return the name of the given error, or `NULL' if unknown.
- * This name is the same as the `E_*' identifier.
+ * This  name  is   the  same  as   the  `E_*'   identifier.
  * E.g.: `error_name(ERROR_CODEOF(E_BADALLOC))' -> "E_BADALLOC" */
 INTERN ATTR_SECTION(".text.crt.except.io.utility") ATTR_CONST WUNUSED char const *
 NOTHROW(LIBKCALL libc_error_name)(error_code_t code) {
@@ -1064,8 +1064,8 @@ non_linear_prefix:
 /*[[[end]]]*/
 }
 /* Return the priority for a given error code, where exceptions
- * with greater priorities should take the place of ones with
- * lower priorities in situations where multiple simultaneous
+ * with greater priorities should take  the place of ones  with
+ * lower priorities in  situations where multiple  simultaneous
  * errors can't be prevented. */
 INTERN ATTR_SECTION(".text.crt.except.io.utility") ATTR_CONST WUNUSED unsigned int
 NOTHROW(LIBKCALL libc_error_priority)(error_code_t code) {

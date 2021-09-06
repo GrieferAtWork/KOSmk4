@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xc036e624 */
+/* HASH CRC-32:0xcbcec1da */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -22,24 +22,17 @@
 #define __local_asctime_defined 1
 #include <__crt.h>
 __NAMESPACE_LOCAL_BEGIN
-/* Dependency: asctime_r from time */
 #ifndef __local___localdep_asctime_r_defined
 #define __local___localdep_asctime_r_defined 1
 #ifdef __CRT_HAVE_asctime_r
 __NAMESPACE_LOCAL_END
 #include <bits/crt/tm.h>
 __NAMESPACE_LOCAL_BEGIN
-/* >> asctime_r(3)
- * Return in `buf' a string of the form "Day Mon dd hh:mm:ss yyyy\n"
- * that is the representation of `tp' in this format */
 __CREDIRECT(__ATTR_NONNULL((1, 2)),char *,__NOTHROW_NCX,__localdep_asctime_r,(struct __NAMESPACE_STD_SYM tm const *__restrict __tp, char __buf[26]),asctime_r,(__tp,__buf))
 #else /* __CRT_HAVE_asctime_r */
 __NAMESPACE_LOCAL_END
 #include <libc/local/time/asctime_r.h>
 __NAMESPACE_LOCAL_BEGIN
-/* >> asctime_r(3)
- * Return in `buf' a string of the form "Day Mon dd hh:mm:ss yyyy\n"
- * that is the representation of `tp' in this format */
 #define __localdep_asctime_r __LIBC_LOCAL_NAME(asctime_r)
 #endif /* !__CRT_HAVE_asctime_r */
 #endif /* !__local___localdep_asctime_r_defined */
@@ -51,9 +44,6 @@ __LOCAL_LIBC_DATA(__ctime_buf) char __ctime_buf[26] = { 0 };
 __NAMESPACE_LOCAL_END
 #endif /* !__LIBC_CTIME_BUFFER_DEFINED */
 __NAMESPACE_LOCAL_BEGIN
-/* >> asctime(3)
- * Return a string of the form "Day Mon dd hh:mm:ss yyyy\n"
- * that is the representation of `tp' in this format */
 __LOCAL_LIBC(asctime) __ATTR_RETNONNULL __ATTR_WUNUSED __ATTR_NONNULL((1)) char *
 __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(asctime))(struct __NAMESPACE_STD_SYM tm const *__tp) {
 	return __localdep_asctime_r(__tp, __NAMESPACE_LOCAL_SYM __ctime_buf);

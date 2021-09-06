@@ -49,8 +49,8 @@ import fs;
 
 global Autom8Parser;
 
-@@Set to @true if comment reflow should be undone.
-@@When given, instead of reflowing spaces evenly, always
+@@Set  to   @true  if   comment   reflow  should   be   undone.
+@@When  given,  instead  of  reflowing  spaces  evenly,  always
 @@assign exact one space-character for every possible position,
 @@thus causing text to flow to the left.
 global OPT_UNDO_REFLOW = false;
@@ -792,21 +792,98 @@ function shouldReflowComment(body: string): bool {
 
 function autom8Worker(parser: Autom8Parser,
 		getCommandByName: Callable with string): bool {
+	local text = parser.text;
+	local flushStart = parser.flushStart;
 	for (;;) {
-		parser.commentStart = parser.text.find("/*", parser.flushStart);
-		if (parser.commentStart < 0)
+		local commentStart;
+		commentStart = flushStart;
+		for (;;) {
+			local lineWiseCommentBlockPrefix;
+			local commentStart2 = text.find("@@", commentStart);
+			commentStart = text.find("/", commentStart);
+			if (commentStart2 >= 0 &&
+			    (commentStart < 0 || commentStart2 < commentStart)) {
+				/* Deemon documentation comment. */
+				commentStart = commentStart2 + 2;
+				lineWiseCommentBlockPrefix = "@@";
+				goto do_line_wise_comment_block;
+			}
+			if (commentStart < 0)
+				goto done_text;
+			++commentStart;
+			if (commentStart >= #text)
+				goto done_text;
+			if (text[commentStart] == "*") {
+				/* C-style comments. */
+				++commentStart;
+				break;
+			} else if (text[commentStart] == "/") {
+				++commentStart;
+				lineWiseCommentBlockPrefix = "//";
+do_line_wise_comment_block:
+				/* C++-style comments. */
+				/* Reflow comment paragraphs. */
+				local commentLineStart = text.rfind("\n", 0, commentStart) + 1;
+				local numLeadingTabs = 0;
+				while ((commentLineStart + numLeadingTabs) < commentStart &&
+				       (text[commentLineStart + numLeadingTabs] == "\t"))
+					++numLeadingTabs;
+				local numLeadingSpaces = (commentStart - 2) - (commentLineStart + numLeadingTabs);
+				local leadingPrefix =
+					("\t" * numLeadingTabs) +
+					(" " * numLeadingSpaces) +
+					lineWiseCommentBlockPrefix;
+				local commentEnd = text.find("\n", commentStart);
+				if (commentEnd < 0)
+					commentEnd = #text;
+				else {
+					++commentEnd;
+				}
+				local comLine = text[commentStart:commentEnd].rstrip();
+				local commentLines: {string...} = [comLine];
+				if (comLine.endswith("\\"))
+					commentLines = none;
+				while (text.startswith(leadingPrefix, commentEnd)) {
+					local eol = text.find("\n", commentEnd);
+					if (eol < 0)
+						eol = #text;
+					else {
+						++eol;
+					}
+					comLine = text[commentEnd+#leadingPrefix:eol];
+					if (comLine.endswith("\\"))
+						commentLines = none;
+					commentLines.append(comLine);
+					commentEnd = eol;
+				}
+				if (commentLines is none || #commentLines < 2) {
+					/* Block contained escaped line-feeds or only 1 line (== don't reflow) */
+					commentStart = commentEnd;
+					continue;
+				}
+				/* Reflow comment */
+				commentLines = reflowBlockComment(commentLines);
+				parser.newText
+					<< text[flushStart:commentStart]
+					<< ("\n" + leadingPrefix).join(commentLines)
+					<< "\n";
+				flushStart   = commentEnd;
+				commentStart = commentEnd;
+			}
+		}
+		local commentEnd = text.find("*/", commentStart);
+		if (commentEnd < 0)
 			break;
-		parser.commentStart += 2;
-		parser.commentEnd = parser.text.find("*/", parser.commentStart);
-		if (parser.commentEnd < 0)
-			break;
-		parser.newText << parser.text[parser.flushStart:parser.commentStart];
-		parser.flushStart = parser.commentStart;
-		local commentBody = parser.text[parser.commentStart:parser.commentEnd];
+		parser.newText << text[flushStart:commentStart];
+		flushStart = commentStart;
+		local commentBody = text[commentStart:commentEnd];
 		if (commentBody.startswith("[[[") && commentBody.endswith("]]]")) {
 			/* Special control comment. */
 			commentBody = commentBody[3:-3];
 			if (commentBody.issymstrt(0)) {
+				parser.commentStart = commentStart;
+				parser.commentEnd   = commentEnd;
+				parser.flushStart   = flushStart;
 				local cmdNameEnd = 1;
 				while (cmdNameEnd < #commentBody &&
 				       (commentBody.issymcont(cmdNameEnd) ||
@@ -816,7 +893,7 @@ function autom8Worker(parser: Autom8Parser,
 				try {
 					cmd = getCommandByName(commentBody[:cmdNameEnd]);
 				} catch (Error as e) {
-					local l, c = parser.lcAt(parser.commentStart + 3)...;
+					local l, c = parser.lcAt(commentStart + 3)...;
 					print(parser.filename, "(", l, ",", c, ") : Error : ", e.message);
 					throw;
 				}
@@ -824,16 +901,20 @@ function autom8Worker(parser: Autom8Parser,
 					commentBody = commentBody[cmdNameEnd:];
 					cmd(parser, commentBody.lstrip());
 				}
+				/* Reload control variables in case `cmd' modified them. */
+				text       = parser.text;
+				commentEnd = parser.commentEnd;
+				flushStart = parser.flushStart;
 			}
 		} else if ("\n" in commentBody && parser.commentReflowEnabled &&
 		           shouldReflowComment(commentBody)) {
 			/* Reflow comment paragraphs. */
-			local commentLineStart = parser.text.rfind("\n", 0, parser.commentStart) + 1;
+			local commentLineStart = text.rfind("\n", 0, commentStart) + 1;
 			local numLeadingTabs = 0;
-			while ((commentLineStart + numLeadingTabs) < parser.commentStart &&
-			       (parser.text[commentLineStart + numLeadingTabs] == "\t"))
+			while ((commentLineStart + numLeadingTabs) < commentStart &&
+			       (text[commentLineStart + numLeadingTabs] == "\t"))
 				++numLeadingTabs;
-			local numLeadingSpaces = (parser.commentStart - 2) -
+			local numLeadingSpaces = (commentStart - 2) -
 				(commentLineStart + numLeadingTabs);
 			local leadingTabs = "\t" * numLeadingTabs;
 			local leadingSpaces = " " * numLeadingSpaces;
@@ -907,7 +988,7 @@ normal_reflow:
 				 ************************************************************/
 				parser.newText << " ";
 			}
-			parser.flushStart = parser.commentEnd;
+			flushStart = commentEnd;
 		} else {
 			commentBody = commentBody.strip();
 			if (commentBody.startswith("clang-format ")) {
@@ -929,17 +1010,18 @@ normal_reflow:
 				}
 			} else if (commentBody.startswith("HASH ")) {
 				/* Disallow autom8 within auto-generated (hashed) files */
-				if (parser.commentStart == 2)
+				if (commentStart == 2)
 					return false;
 			}
 		}
 done_comment:
-		if (parser.flushStart < parser.commentEnd) {
-			parser.newText << parser.text[parser.flushStart:parser.commentEnd];
-			parser.flushStart = parser.commentEnd;
+		if (flushStart < commentEnd) {
+			parser.newText << text[flushStart:commentEnd];
+			flushStart = commentEnd;
 		}
 	}
-	parser.newText << parser.text[parser.flushStart:parser.len];
+done_text:
+	parser.newText << text[flushStart:parser.len];
 	return true;
 }
 

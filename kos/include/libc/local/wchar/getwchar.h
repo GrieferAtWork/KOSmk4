@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x18ad2c1 */
+/* HASH CRC-32:0x5aa85002 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -25,7 +25,6 @@
 #include <kos/anno.h>
 #include <hybrid/typecore.h>
 __NAMESPACE_LOCAL_BEGIN
-/* Dependency: fgetwc from wchar */
 #ifndef __local___localdep_fgetwc_defined
 #define __local___localdep_fgetwc_defined 1
 #ifdef __CRT_HAVE_fgetwc

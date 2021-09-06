@@ -245,9 +245,9 @@ void globfree32(void *pglob);
 
 
 @@@param: flags: Set of `GLOB_ERR | GLOB_MARK | GLOB_NOSORT | GLOB_DOOFFS |
-@@                       GLOB_NOCHECK | GLOB_APPEND | GLOB_NOESCAPE |
+@@                       GLOB_NOCHECK | GLOB_APPEND  | GLOB_NOESCAPE  |
 @@                       GLOB_PERIOD | GLOB_MAGCHAR | GLOB_ALTDIRFUNC |
-@@                       GLOB_BRACE | GLOB_NOMAGIC | GLOB_TILDE |
+@@                       GLOB_BRACE  |  GLOB_NOMAGIC  |  GLOB_TILDE   |
 @@                       GLOB_ONLYDIR | GLOB_TILDE_CHECK'
 @@@return: GLOB_NOSPACE : ...
 @@@return: GLOB_ABORTED : ...

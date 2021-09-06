@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x40a23730 */
+/* HASH CRC-32:0xf97b1ff9 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -31,12 +31,12 @@ DECL_BEGIN
 
 #if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
 /* >> lfutexlock(3)
- * Helper function to implement the behavior of `lfutexlockexpr()' for only a single futex.
- * This function behaves identical to the lfutex() system call, except that it takes
+ * Helper  function to implement the behavior of  `lfutexlockexpr()' for only a single futex.
+ * This function  behaves  identical  to the  lfutex()  system  call, except  that  it  takes
  * two futex addresses, where `ulockaddr' is used with `LFUTEX_WAIT_LOCK_WAITERS' to cache if
- * there are threads that may be waiting to be awoken once `LFUTEX_WAKE' is invoked on that
- * memory location (aka. `futexlock_wakeall(ulockaddr)'), whilst the other futex address
- * (i.e. `uaddr') is used for the wait-while-condition checking, the same way those checks
+ * there  are threads that may be waiting to  be awoken once `LFUTEX_WAKE' is invoked on that
+ * memory location  (aka. `futexlock_wakeall(ulockaddr)'),  whilst  the other  futex  address
+ * (i.e. `uaddr') is used  for the wait-while-condition checking,  the same way those  checks
  * would also be performed by the `lfutex() system call'
  * @param: futex_op: One of:
  *    - LFUTEX_NOP:                (lfutex_t *ulockaddr, lfutex_t *uaddr, syscall_ulong_t LFUTEX_NOP, size_t val = ignored)
@@ -58,12 +58,12 @@ DECL_BEGIN
  * @return: -1:ETIMEDOUT: A blocking futex-wait operation has timed out */
 INTDEF NONNULL((1, 2)) ssize_t NOTHROW_RPC(VLIBDCALL libd_lfutexlock)(lfutex_t *ulockaddr, lfutex_t *uaddr, syscall_ulong_t futex_op, lfutex_t val, ...);
 /* >> lfutexlock(3)
- * Helper function to implement the behavior of `lfutexlockexpr()' for only a single futex.
- * This function behaves identical to the lfutex() system call, except that it takes
+ * Helper  function to implement the behavior of  `lfutexlockexpr()' for only a single futex.
+ * This function  behaves  identical  to the  lfutex()  system  call, except  that  it  takes
  * two futex addresses, where `ulockaddr' is used with `LFUTEX_WAIT_LOCK_WAITERS' to cache if
- * there are threads that may be waiting to be awoken once `LFUTEX_WAKE' is invoked on that
- * memory location (aka. `futexlock_wakeall(ulockaddr)'), whilst the other futex address
- * (i.e. `uaddr') is used for the wait-while-condition checking, the same way those checks
+ * there  are threads that may be waiting to  be awoken once `LFUTEX_WAKE' is invoked on that
+ * memory location  (aka. `futexlock_wakeall(ulockaddr)'),  whilst  the other  futex  address
+ * (i.e. `uaddr') is used  for the wait-while-condition checking,  the same way those  checks
  * would also be performed by the `lfutex() system call'
  * @param: futex_op: One of:
  *    - LFUTEX_NOP:                (lfutex_t *ulockaddr, lfutex_t *uaddr, syscall_ulong_t LFUTEX_NOP, size_t val = ignored)

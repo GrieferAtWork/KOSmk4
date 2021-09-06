@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x94809059 */
+/* HASH CRC-32:0x430f3fb3 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -25,50 +25,32 @@
 #if defined(__CRT_HAVE_fgets) || defined(__CRT_HAVE_fgets_unlocked) || ((defined(__CRT_HAVE_fgetc) || defined(__CRT_HAVE_getc) || defined(__CRT_HAVE__IO_getc) || defined(__CRT_HAVE_fgetc_unlocked) || defined(__CRT_HAVE_getc_unlocked) || (defined(__CRT_DOS) && defined(__CRT_HAVE__filbuf)) || defined(__CRT_HAVE_fread) || defined(__CRT_HAVE__IO_fread) || defined(__CRT_HAVE_fread_unlocked) || defined(__CRT_HAVE__fread_nolock)) && (defined(__CRT_HAVE_ungetc) || defined(__CRT_HAVE__IO_ungetc) || defined(__CRT_HAVE_ungetc_unlocked) || defined(__CRT_HAVE__ungetc_nolock)) && (defined(__CRT_HAVE_ferror) || defined(__CRT_HAVE__IO_ferror) || defined(__CRT_HAVE_ferror_unlocked)))
 #include <bits/crt/db/mntent.h>
 __NAMESPACE_LOCAL_BEGIN
-/* Dependency: fgets from stdio */
 #ifndef __local___localdep_fgets_defined
 #define __local___localdep_fgets_defined 1
 #if defined(__CRT_HAVE_fgets_unlocked) && defined(__USE_STDIO_UNLOCKED)
 __NAMESPACE_LOCAL_END
 #include <kos/anno.h>
 __NAMESPACE_LOCAL_BEGIN
-/* >> fgets(3)
- * Read up to `bufsize - 1' bytes of data from `stream', storing them into `buf' stopped when
- * the buffer is full or a line-feed was read (in this case, the line-feed is also written to `buf')
- * Afterwards, append a trailing NUL-character and re-return `buf', or return `NULL' if an error occurred. */
 __CREDIRECT(__ATTR_WUNUSED __ATTR_NONNULL((1, 3)),char *,__THROWING,__localdep_fgets,(char *__restrict __buf, __STDC_INT_AS_SIZE_T __bufsize, __FILE *__restrict __stream),fgets_unlocked,(__buf,__bufsize,__stream))
 #elif defined(__CRT_HAVE_fgets)
 __NAMESPACE_LOCAL_END
 #include <kos/anno.h>
 __NAMESPACE_LOCAL_BEGIN
-/* >> fgets(3)
- * Read up to `bufsize - 1' bytes of data from `stream', storing them into `buf' stopped when
- * the buffer is full or a line-feed was read (in this case, the line-feed is also written to `buf')
- * Afterwards, append a trailing NUL-character and re-return `buf', or return `NULL' if an error occurred. */
 __CREDIRECT(__ATTR_WUNUSED __ATTR_NONNULL((1, 3)),char *,__THROWING,__localdep_fgets,(char *__restrict __buf, __STDC_INT_AS_SIZE_T __bufsize, __FILE *__restrict __stream),fgets,(__buf,__bufsize,__stream))
 #elif defined(__CRT_HAVE_fgets_unlocked)
 __NAMESPACE_LOCAL_END
 #include <kos/anno.h>
 __NAMESPACE_LOCAL_BEGIN
-/* >> fgets(3)
- * Read up to `bufsize - 1' bytes of data from `stream', storing them into `buf' stopped when
- * the buffer is full or a line-feed was read (in this case, the line-feed is also written to `buf')
- * Afterwards, append a trailing NUL-character and re-return `buf', or return `NULL' if an error occurred. */
 __CREDIRECT(__ATTR_WUNUSED __ATTR_NONNULL((1, 3)),char *,__THROWING,__localdep_fgets,(char *__restrict __buf, __STDC_INT_AS_SIZE_T __bufsize, __FILE *__restrict __stream),fgets_unlocked,(__buf,__bufsize,__stream))
 #elif (defined(__CRT_HAVE_fgetc) || defined(__CRT_HAVE_getc) || defined(__CRT_HAVE__IO_getc) || defined(__CRT_HAVE_fgetc_unlocked) || defined(__CRT_HAVE_getc_unlocked) || (defined(__CRT_DOS) && defined(__CRT_HAVE__filbuf)) || defined(__CRT_HAVE_fread) || defined(__CRT_HAVE__IO_fread) || defined(__CRT_HAVE_fread_unlocked) || defined(__CRT_HAVE__fread_nolock)) && (defined(__CRT_HAVE_ungetc) || defined(__CRT_HAVE__IO_ungetc) || defined(__CRT_HAVE_ungetc_unlocked) || defined(__CRT_HAVE__ungetc_nolock)) && (defined(__CRT_HAVE_ferror) || defined(__CRT_HAVE__IO_ferror) || defined(__CRT_HAVE_ferror_unlocked))
 __NAMESPACE_LOCAL_END
 #include <libc/local/stdio/fgets.h>
 __NAMESPACE_LOCAL_BEGIN
-/* >> fgets(3)
- * Read up to `bufsize - 1' bytes of data from `stream', storing them into `buf' stopped when
- * the buffer is full or a line-feed was read (in this case, the line-feed is also written to `buf')
- * Afterwards, append a trailing NUL-character and re-return `buf', or return `NULL' if an error occurred. */
 #define __localdep_fgets __LIBC_LOCAL_NAME(fgets)
 #else /* ... */
 #undef __local___localdep_fgets_defined
 #endif /* !... */
 #endif /* !__local___localdep_fgets_defined */
-/* Dependency: isdigit from ctype */
 #ifndef __local___localdep_isdigit_defined
 #define __local___localdep_isdigit_defined 1
 #if __has_builtin(__builtin_isdigit) && defined(__LIBC_BIND_CRTBUILTINS) && defined(__CRT_HAVE_isdigit)
@@ -82,7 +64,6 @@ __NAMESPACE_LOCAL_BEGIN
 #define __localdep_isdigit __LIBC_LOCAL_NAME(isdigit)
 #endif /* !... */
 #endif /* !__local___localdep_isdigit_defined */
-/* Dependency: isspace from ctype */
 #ifndef __local___localdep_isspace_defined
 #define __local___localdep_isspace_defined 1
 #if __has_builtin(__builtin_isspace) && defined(__LIBC_BIND_CRTBUILTINS) && defined(__CRT_HAVE_isspace)
@@ -96,7 +77,6 @@ __NAMESPACE_LOCAL_BEGIN
 #define __localdep_isspace __LIBC_LOCAL_NAME(isspace)
 #endif /* !... */
 #endif /* !__local___localdep_isspace_defined */
-/* >> getmntent(3), getmntent_r(3) */
 __LOCAL_LIBC(getmntent_r) __ATTR_NONNULL((1, 2, 3)) struct mntent *
 __NOTHROW_RPC(__LIBCCALL __LIBC_LOCAL_NAME(getmntent_r))(__FILE *__restrict __stream, struct mntent *__restrict __result, char *__restrict __buffer, __STDC_INT_AS_SIZE_T __bufsize) {
 	char *__line;

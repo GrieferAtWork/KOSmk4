@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x6b5eea75 */
+/* HASH CRC-32:0x4c692ca8 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -23,32 +23,18 @@
 #include <__crt.h>
 #include <bits/crt/tm.h>
 __NAMESPACE_LOCAL_BEGIN
-/* Dependency: crt_strftime_l from time */
 #ifndef __local___localdep_crt_strftime_l_defined
 #define __local___localdep_crt_strftime_l_defined 1
 #ifdef __CRT_HAVE_strftime_l
-/* >> strftime_l(3)
- * Similar to `strftime(3)' but take the information from
- * the provided locale and not the global locale */
 __CREDIRECT(__ATTR_NONNULL((1, 3, 4)),__SIZE_TYPE__,__NOTHROW_NCX,__localdep_crt_strftime_l,(char *__restrict __buf, __SIZE_TYPE__ __bufsize, char const *__restrict __format, struct __NAMESPACE_STD_SYM tm const *__restrict __tp, __locale_t __locale),strftime_l,(__buf,__bufsize,__format,__tp,__locale))
 #elif defined(__CRT_HAVE__strftime_l)
-/* >> strftime_l(3)
- * Similar to `strftime(3)' but take the information from
- * the provided locale and not the global locale */
 __CREDIRECT(__ATTR_NONNULL((1, 3, 4)),__SIZE_TYPE__,__NOTHROW_NCX,__localdep_crt_strftime_l,(char *__restrict __buf, __SIZE_TYPE__ __bufsize, char const *__restrict __format, struct __NAMESPACE_STD_SYM tm const *__restrict __tp, __locale_t __locale),_strftime_l,(__buf,__bufsize,__format,__tp,__locale))
 #elif defined(__CRT_HAVE___strftime_l)
-/* >> strftime_l(3)
- * Similar to `strftime(3)' but take the information from
- * the provided locale and not the global locale */
 __CREDIRECT(__ATTR_NONNULL((1, 3, 4)),__SIZE_TYPE__,__NOTHROW_NCX,__localdep_crt_strftime_l,(char *__restrict __buf, __SIZE_TYPE__ __bufsize, char const *__restrict __format, struct __NAMESPACE_STD_SYM tm const *__restrict __tp, __locale_t __locale),__strftime_l,(__buf,__bufsize,__format,__tp,__locale))
 #else /* ... */
 #undef __local___localdep_crt_strftime_l_defined
 #endif /* !... */
 #endif /* !__local___localdep_crt_strftime_l_defined */
-/* >> strftime(3)
- * Format `tp' into `s' according to `format'.
- * Write no more than `maxsize' characters and return the number
- * of characters written, or 0 if it would exceed `maxsize' */
 __LOCAL_LIBC(strftime) __ATTR_NONNULL((1, 3, 4)) __SIZE_TYPE__
 __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(strftime))(char *__restrict __buf, __SIZE_TYPE__ __bufsize, char const *__restrict __format, struct __NAMESPACE_STD_SYM tm const *__restrict __tp) {
 

@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x73aca21b */
+/* HASH CRC-32:0xed87eea2 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -23,7 +23,6 @@
 #include <__crt.h>
 #ifdef __CRT_HAVE__wsearchenv_s
 __NAMESPACE_LOCAL_BEGIN
-/* Dependency: _wsearchenv_s from stdlib */
 #ifndef __local___localdep__wsearchenv_s_defined
 #define __local___localdep__wsearchenv_s_defined 1
 __NAMESPACE_LOCAL_END

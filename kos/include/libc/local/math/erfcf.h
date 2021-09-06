@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x436e029a */
+/* HASH CRC-32:0xc455367a */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -23,7 +23,6 @@
 #include <__crt.h>
 #if defined(__CRT_HAVE_erfc) || defined(__CRT_HAVE___erfc)
 __NAMESPACE_LOCAL_BEGIN
-/* Dependency: erfc from math */
 #ifndef __local___localdep_erfc_defined
 #define __local___localdep_erfc_defined 1
 #if __has_builtin(__builtin_erfc) && defined(__LIBC_BIND_CRTBUILTINS) && defined(__CRT_HAVE_erfc)

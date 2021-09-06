@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xccc441cd */
+/* HASH CRC-32:0xa2758c40 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -49,12 +49,12 @@ typedef int (__LIBKCALL *__funopen_closefn_t)(void *__cookie);
 /* >> fmtcheck(3)
  * Check if `user_format' may be used as a drop-in replacement for `good_format'
  * in the context of a call to `printf(3)' (or `format_printf()'), such that all
- * contained format qualifiers reference the same (or compatible) underlying C
+ * contained format qualifiers reference the  same (or compatible) underlying  C
  * types, and in the same order.
- * If all of this is the case, simply re-return `user_format'. Otherwise (i.e.
+ * If all of this is the  case, simply re-return `user_format'. Otherwise  (i.e.
  * when `user_format' isn't compatible with `good_format'), return `good_format'
- * instead. This function is meant to be used to validate user-provided printf
- * format strings before actually using them, after they've been read from lang
+ * instead. This function is meant to  be used to validate user-provided  printf
+ * format strings before actually using them, after they've been read from  lang
  * config files: `printf(fmtcheck(get_user_fmt(), "%s %s"), "Foo", "Bar");' */
 __CDECLARE(__ATTR_RETNONNULL __ATTR_WUNUSED __ATTR_NONNULL((2)) __ATTR_FORMAT_ARG(2),char const *,__NOTHROW_NCX,fmtcheck,(char const *__user_format, char const *__good_format),(__user_format,__good_format))
 #endif /* !__fmtcheck_defined && __CRT_HAVE_fmtcheck */

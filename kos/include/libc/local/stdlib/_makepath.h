@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xb5838bd */
+/* HASH CRC-32:0x75127d42 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -22,7 +22,6 @@
 #define __local__makepath_defined 1
 #include <__crt.h>
 __NAMESPACE_LOCAL_BEGIN
-/* Dependency: _makepath_s from stdlib */
 #ifndef __local___localdep__makepath_s_defined
 #define __local___localdep__makepath_s_defined 1
 #ifdef __CRT_HAVE__makepath_s

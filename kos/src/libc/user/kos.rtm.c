@@ -38,19 +38,19 @@ DECL_BEGIN
 #define OS_HAVE_RTM 1
 #endif /* SYS_rtm_... */
 
-/*[[[head:libc_rtm_begin,hash:CRC-32=0x2d8a1ac1]]]*/
+/*[[[head:libc_rtm_begin,hash:CRC-32=0x157cee05]]]*/
 #ifndef LIBC_ARCH_HAVE_RTM_BEGIN
 /* >> rtm_begin(2)
- * Begin an RTM operation. Note that if the arch-specific RTM driver
+ * Begin  an  RTM operation.  Note that  if  the arch-specific  RTM driver
  * wasn't already loaded into the kernel, it will be loaded automatically,
  * though any error that may happen during this will result in `RTM_NOSYS'
  * begin returned.
- * Note that while an RTM operation is in progress, only a very small hand
- * full of system calls are allowed to be used. Attempting to use arbitrary
- * system calls will most likely result in an `RTM_ABORT_FAILED' error, and
+ * Note that while an RTM  operation is in progress,  only a very small  hand
+ * full  of system calls are allowed to  be used. Attempting to use arbitrary
+ * system calls will most likely  result in an `RTM_ABORT_FAILED' error,  and
  * attempting to access too much system memory in general will result in this
- * function returning with `RTM_ABORT_CAPACITY', rather than succeeding.
- * The following is a list of system calls which are whitelisted for use
+ * function returning  with  `RTM_ABORT_CAPACITY',  rather  than  succeeding.
+ * The following is  a list  of system calls  which are  whitelisted for  use
  * during a transaction:
  *   - rtm_begin(2):  Nested RTM operation
  *   - rtm_end(2):    End an RTM operation
@@ -73,13 +73,13 @@ NOTHROW(LIBCCALL libc_rtm_begin)(void)
 #endif /* MAGIC:impl_if */
 /*[[[end:libc_rtm_begin]]]*/
 
-/*[[[head:libc_rtm_end,hash:CRC-32=0xdf97e0a4]]]*/
+/*[[[head:libc_rtm_end,hash:CRC-32=0x1b9142a7]]]*/
 #ifndef LIBC_ARCH_HAVE_RTM_END
 /* >> rtm_end(2)
  * End a transaction
  * If the transaction was successful, return normally
  * If the transaction failed, `rtm_begin()' returns `RTM_ABORT_*'
- * If no transaction was in progress, the behavior is undefined */
+ * If no transaction was in  progress, the behavior is  undefined */
 INTERN ATTR_SECTION(".text.crt.system.rtm") void
 NOTHROW(LIBCCALL libc_rtm_end)(void)
 /*[[[body:libc_rtm_end]]]*/
@@ -96,12 +96,12 @@ NOTHROW(LIBCCALL libc_rtm_end)(void)
 #endif /* MAGIC:impl_if */
 /*[[[end:libc_rtm_end]]]*/
 
-/*[[[head:libc_rtm_abort,hash:CRC-32=0x2888099a]]]*/
+/*[[[head:libc_rtm_abort,hash:CRC-32=0x357b8f8d]]]*/
 #ifndef LIBC_ARCH_HAVE_RTM_ABORT
 /* >> rtm_abort(2)
- * Abort the current transaction by having `rtm_begin()' return with
+ * Abort  the   current  transaction   by   having  `rtm_begin()'   return   with
  * `RTM_ABORT_EXPLICIT | ((code << RTM_ABORT_CODE_S) & RTM_ABORT_CODE_M)'
- * If no transaction was in progress, behave as a no-op. Otherwise, this
+ * If no  transaction  was  in  progress, behave  as  a  no-op.  Otherwise,  this
  * function does not return normally, but returns from the original `rtm_begin()' */
 INTERN ATTR_SECTION(".text.crt.system.rtm") void
 NOTHROW(__FCALL libc_rtm_abort)(unsigned int code)

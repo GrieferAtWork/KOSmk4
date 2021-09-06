@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x1982ef65 */
+/* HASH CRC-32:0x833d0dbd */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -25,10 +25,6 @@
 #ifdef __POSIX_SPAWN_USE_KOS
 #include <bits/crt/posix_spawn.h>
 __NAMESPACE_LOCAL_BEGIN
-/* >> posix_spawnattr_getschedparam(3)
- * Get the `policy' argument of a call `sched_setscheduler(getpid(), policy, param)'
- * that the child process will perform when `POSIX_SPAWN_SETSCHEDULER' is set.
- * @return: 0 : Success */
 __LOCAL_LIBC(posix_spawnattr_getschedpolicy) __ATTR_NONNULL((1, 2)) __errno_t
 __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(posix_spawnattr_getschedpolicy))(struct __posix_spawnattr const *__restrict __attr, int *__restrict __schedpolicy) {
 	*__schedpolicy = __attr->__policy;

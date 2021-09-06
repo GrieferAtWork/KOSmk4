@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x1fde7bb3 */
+/* HASH CRC-32:0x6db6a003 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -29,10 +29,8 @@ typedef void (__LIBKCALL *__pthread_once_routine_t)(void);
 #include <bits/types.h>
 #include <bits/crt/pthreadtypes.h>
 __NAMESPACE_LOCAL_BEGIN
-/* Dependency: error_rethrow from kos.except */
 #if !defined(__local___localdep_error_rethrow_defined) && defined(__CRT_HAVE_error_rethrow)
 #define __local___localdep_error_rethrow_defined 1
-/* Rethrow the current exception (same as a c++ `throw;' expression) */
 __COMPILER_REDIRECT_VOID(__LIBC,__ATTR_COLD __ATTR_NORETURN,__THROWING,__LIBKCALL,__localdep_error_rethrow,(void),error_rethrow,())
 #endif /* !__local___localdep_error_rethrow_defined && __CRT_HAVE_error_rethrow */
 __NAMESPACE_LOCAL_END
@@ -41,12 +39,6 @@ __NAMESPACE_LOCAL_END
 #include <hybrid/sched/__yield.h>
 #include <asm/os/errno.h>
 __NAMESPACE_LOCAL_BEGIN
-/* >> pthread_once(3)
- * Guarantee that the initialization function `init_routine' will be called
- * only once, even if pthread_once is executed several times with the
- * same `once_control' argument. `once_control' must point to a static or
- * extern variable initialized to `PTHREAD_ONCE_INIT'.
- * @return: EOK: Success */
 __LOCAL_LIBC(pthread_once) __ATTR_NONNULL((1, 2)) __errno_t
 (__LIBCCALL __LIBC_LOCAL_NAME(pthread_once))(__pthread_once_t *__once_control, __pthread_once_routine_t __init_routine) __THROWS(...) {
 	__pthread_once_t __status;

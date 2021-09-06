@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xf73d33b0 */
+/* HASH CRC-32:0x81e6a1ee */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -62,7 +62,7 @@ __SYSDECL_BEGIN
 
 #ifdef __CRT_HAVE_fnmatch
 /* Match the given `name' against `pattern', returning
- * `0' if they match, and `FNM_NOMATCH' otherwise.
+ * `0'  if  they match,  and  `FNM_NOMATCH' otherwise.
  * @param: match_flags:   Set of `FNM_*'
  * @return: 0           : `name' is matched by `pattern'
  * @return: FNM_NOMATCH : `name' is not matched by `pattern' */
@@ -70,7 +70,7 @@ __CDECLARE(__ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1, 2)),int,__NOTHROW_NCX,f
 #else /* __CRT_HAVE_fnmatch */
 #include <libc/local/fnmatch/fnmatch.h>
 /* Match the given `name' against `pattern', returning
- * `0' if they match, and `FNM_NOMATCH' otherwise.
+ * `0'  if  they match,  and  `FNM_NOMATCH' otherwise.
  * @param: match_flags:   Set of `FNM_*'
  * @return: 0           : `name' is matched by `pattern'
  * @return: FNM_NOMATCH : `name' is not matched by `pattern' */

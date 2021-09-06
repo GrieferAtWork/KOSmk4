@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x9db00393 */
+/* HASH CRC-32:0x4f423bb4 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -24,15 +24,10 @@
 #ifdef __CRT_HAVE_ptsname_r
 #include <bits/types.h>
 __NAMESPACE_LOCAL_BEGIN
-/* Dependency: ptsname_r from stdlib */
 #ifndef __local___localdep_ptsname_r_defined
 #define __local___localdep_ptsname_r_defined 1
-/* Returns the name of the PTY slave (Pseudo TTY slave)
- * associated with the master descriptor `fd' */
 __CREDIRECT(__ATTR_NONNULL((2)),int,__NOTHROW_NCX,__localdep_ptsname_r,(__fd_t __fd, char *__buf, __SIZE_TYPE__ __buflen),ptsname_r,(__fd,__buf,__buflen))
 #endif /* !__local___localdep_ptsname_r_defined */
-/* Returns the name of the PTY slave (Pseudo TTY slave)
- * associated with the master descriptor `fd' */
 __LOCAL_LIBC(ptsname) __ATTR_WUNUSED char *
 __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(ptsname))(__fd_t __fd) {
 	static char __buf[64];

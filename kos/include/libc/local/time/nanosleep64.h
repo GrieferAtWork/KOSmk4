@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xcc66bf56 */
+/* HASH CRC-32:0xa4ab3355 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -25,23 +25,16 @@
 #include <bits/types.h>
 #include <bits/os/timespec.h>
 __NAMESPACE_LOCAL_BEGIN
-/* Dependency: nanosleep32 from time */
 #ifndef __local___localdep_nanosleep32_defined
 #define __local___localdep_nanosleep32_defined 1
 #ifdef __CRT_HAVE_nanosleep
-/* >> nanosleep(2), nanosleep64(2)
- * Pause execution for a number of nanoseconds */
 __CREDIRECT(__ATTR_NONNULL((1)),int,__NOTHROW_RPC,__localdep_nanosleep32,(struct timespec const *__requested_time, struct __timespec32 *__remaining),nanosleep,(__requested_time,__remaining))
 #elif defined(__CRT_HAVE___nanosleep)
-/* >> nanosleep(2), nanosleep64(2)
- * Pause execution for a number of nanoseconds */
 __CREDIRECT(__ATTR_NONNULL((1)),int,__NOTHROW_RPC,__localdep_nanosleep32,(struct timespec const *__requested_time, struct __timespec32 *__remaining),__nanosleep,(__requested_time,__remaining))
 #else /* ... */
 #undef __local___localdep_nanosleep32_defined
 #endif /* !... */
 #endif /* !__local___localdep_nanosleep32_defined */
-/* >> nanosleep(2), nanosleep64(2)
- * Pause execution for a number of nanoseconds */
 __LOCAL_LIBC(nanosleep64) __ATTR_NONNULL((1)) int
 __NOTHROW_RPC(__LIBCCALL __LIBC_LOCAL_NAME(nanosleep64))(struct __timespec64 const *__restrict __requested_time, struct __timespec64 *__remaining) {
 	int __result;

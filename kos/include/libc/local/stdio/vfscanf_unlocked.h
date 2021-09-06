@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xac1ec5ae */
+/* HASH CRC-32:0xe15241e9 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -26,100 +26,38 @@
 #include <kos/anno.h>
 #include <hybrid/typecore.h>
 __NAMESPACE_LOCAL_BEGIN
-/* Dependency: fgetc_unlocked from stdio */
 #ifndef __local___localdep_fgetc_unlocked_defined
 #define __local___localdep_fgetc_unlocked_defined 1
 #ifdef __CRT_HAVE_fgetc_unlocked
-/* >> fgetc_unlocked(3)
- * Same as `fgetc()', but performs I/O without acquiring a lock to `stream' */
 __CREDIRECT(__ATTR_NONNULL((1)),int,__THROWING,__localdep_fgetc_unlocked,(__FILE *__restrict __stream),fgetc_unlocked,(__stream))
 #elif defined(__CRT_HAVE_getc_unlocked)
-/* >> fgetc_unlocked(3)
- * Same as `fgetc()', but performs I/O without acquiring a lock to `stream' */
 __CREDIRECT(__ATTR_NONNULL((1)),int,__THROWING,__localdep_fgetc_unlocked,(__FILE *__restrict __stream),getc_unlocked,(__stream))
 #elif defined(__CRT_HAVE_fgetc) && (!defined(__CRT_DOS) || !defined(__CRT_HAVE__filbuf))
-/* >> fgetc_unlocked(3)
- * Same as `fgetc()', but performs I/O without acquiring a lock to `stream' */
 __CREDIRECT(__ATTR_NONNULL((1)),int,__THROWING,__localdep_fgetc_unlocked,(__FILE *__restrict __stream),fgetc,(__stream))
 #elif defined(__CRT_HAVE_getc) && (!defined(__CRT_DOS) || !defined(__CRT_HAVE__filbuf))
-/* >> fgetc_unlocked(3)
- * Same as `fgetc()', but performs I/O without acquiring a lock to `stream' */
 __CREDIRECT(__ATTR_NONNULL((1)),int,__THROWING,__localdep_fgetc_unlocked,(__FILE *__restrict __stream),getc,(__stream))
 #elif defined(__CRT_HAVE__IO_getc) && (!defined(__CRT_DOS) || !defined(__CRT_HAVE__filbuf))
-/* >> fgetc_unlocked(3)
- * Same as `fgetc()', but performs I/O without acquiring a lock to `stream' */
 __CREDIRECT(__ATTR_NONNULL((1)),int,__THROWING,__localdep_fgetc_unlocked,(__FILE *__restrict __stream),_IO_getc,(__stream))
 #elif (defined(__CRT_DOS) && defined(__CRT_HAVE__filbuf)) || defined(__CRT_HAVE_fread) || defined(__CRT_HAVE__IO_fread) || defined(__CRT_HAVE_fread_unlocked) || defined(__CRT_HAVE__fread_nolock)
 __NAMESPACE_LOCAL_END
 #include <libc/local/stdio/fgetc_unlocked.h>
 __NAMESPACE_LOCAL_BEGIN
-/* >> fgetc_unlocked(3)
- * Same as `fgetc()', but performs I/O without acquiring a lock to `stream' */
 #define __localdep_fgetc_unlocked __LIBC_LOCAL_NAME(fgetc_unlocked)
 #else /* ... */
 #undef __local___localdep_fgetc_unlocked_defined
 #endif /* !... */
 #endif /* !__local___localdep_fgetc_unlocked_defined */
-/* Dependency: format_vscanf from format-printer */
 #ifndef __local___localdep_format_vscanf_defined
 #define __local___localdep_format_vscanf_defined 1
 #ifdef __CRT_HAVE_format_vscanf
 __NAMESPACE_LOCAL_END
 #include <bits/crt/format-printer.h>
 __NAMESPACE_LOCAL_BEGIN
-/* >> format_scanf(3), format_vscanf(3)
- * Generic scanf implementation
- * Taking a regular scanf-style format string and argument, these
- * functions will call the given `pgetc' function which in
- * return should successively yield a character at a time from
- * some kind of input source.
- *  - If `pgetc' returns `< 0', scanning aborts and that value is returned.
- *    Otherwise, the function returns the amount of successfully parsed arguments.
- *  - The user may use `pgetc' to track the last read character to get
- *    additional information about what character caused the scan to fail.
- *  - The given `pgetc' should also indicate EOF by returning `NUL'
- *  - This implementation supports the following extensions:
- *    - `%[A-Z]'   -- Character ranges in scan patterns
- *    - `%[^abc]'  -- Inversion of a scan pattern
- *    - `"\n"'     -- Skip any kind of linefeed (`"\n"', `"\r"', `"\r\n"')
- *    - `%$s'      -- `$'-modifier, available for any format outputting a string.
- *                    This modifier reads a `size_t' from the argument list,
- *                    that specifies the size of the following string buffer:
- *                 >> char buffer[64];
- *                 >> sscanf(data, "My name is %.?s\n", sizeof(buffer), buffer);
- * format -> %[*|?][width][length]specifier
- * @return: 0 :  No data could be scanned.
- * @return: * :  The total number of successfully scanned arguments.
- * @return: EOF: `PGETC' returned EOF the first time an attempt at reading was made */
 __CREDIRECT(__ATTR_LIBC_SCANF(4, 0) __ATTR_NONNULL((1, 2, 4)),__SSIZE_TYPE__,__THROWING,__localdep_format_vscanf,(__pformatgetc __pgetc, __pformatungetc __pungetc, void *__arg, char const *__restrict __format, __builtin_va_list __args),format_vscanf,(__pgetc,__pungetc,__arg,__format,__args))
 #else /* __CRT_HAVE_format_vscanf */
 __NAMESPACE_LOCAL_END
 #include <libc/local/format-printer/format_vscanf.h>
 __NAMESPACE_LOCAL_BEGIN
-/* >> format_scanf(3), format_vscanf(3)
- * Generic scanf implementation
- * Taking a regular scanf-style format string and argument, these
- * functions will call the given `pgetc' function which in
- * return should successively yield a character at a time from
- * some kind of input source.
- *  - If `pgetc' returns `< 0', scanning aborts and that value is returned.
- *    Otherwise, the function returns the amount of successfully parsed arguments.
- *  - The user may use `pgetc' to track the last read character to get
- *    additional information about what character caused the scan to fail.
- *  - The given `pgetc' should also indicate EOF by returning `NUL'
- *  - This implementation supports the following extensions:
- *    - `%[A-Z]'   -- Character ranges in scan patterns
- *    - `%[^abc]'  -- Inversion of a scan pattern
- *    - `"\n"'     -- Skip any kind of linefeed (`"\n"', `"\r"', `"\r\n"')
- *    - `%$s'      -- `$'-modifier, available for any format outputting a string.
- *                    This modifier reads a `size_t' from the argument list,
- *                    that specifies the size of the following string buffer:
- *                 >> char buffer[64];
- *                 >> sscanf(data, "My name is %.?s\n", sizeof(buffer), buffer);
- * format -> %[*|?][width][length]specifier
- * @return: 0 :  No data could be scanned.
- * @return: * :  The total number of successfully scanned arguments.
- * @return: EOF: `PGETC' returned EOF the first time an attempt at reading was made */
 #define __localdep_format_vscanf __LIBC_LOCAL_NAME(format_vscanf)
 #endif /* !__CRT_HAVE_format_vscanf */
 #endif /* !__local___localdep_format_vscanf_defined */
@@ -137,7 +75,6 @@ __LOCAL_LIBC(vfscanf_ungetc_unlocked) __SSIZE_TYPE__
 }
 __NAMESPACE_LOCAL_END
 __NAMESPACE_LOCAL_BEGIN
-/* >> fscanf_unlocked(3), vfscanf_unlocked(3) */
 __LOCAL_LIBC(vfscanf_unlocked) __ATTR_WUNUSED __ATTR_LIBC_SCANF(2, 0) __ATTR_NONNULL((1, 2)) __STDC_INT_AS_SIZE_T
 (__LIBCCALL __LIBC_LOCAL_NAME(vfscanf_unlocked))(__FILE *__restrict __stream, char const *__restrict __format, __builtin_va_list __args) __THROWS(...) {
 #if defined(__LIBCCALL_IS_FORMATPRINTER_CC) && __SIZEOF_SIZE_T__ == __SIZEOF_INT__

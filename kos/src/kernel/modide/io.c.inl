@@ -28,7 +28,7 @@
 //#define DEFINE_DATA_PhysVector
 
 #define DEFINE_IOMETHOD_Dma
-//#define DEFINE_IOMETHOD_Chs
+//#define   DEFINE_IOMETHOD_Chs
 //#define DEFINE_IOMETHOD_Lba28
 //#define DEFINE_IOMETHOD_Lba48
 #endif /* __INTELLISENSE__ */

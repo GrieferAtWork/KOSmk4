@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x300e2eea */
+/* HASH CRC-32:0xe7a4f828 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -23,8 +23,6 @@
 #include <__crt.h>
 #include <hybrid/typecore.h>
 __NAMESPACE_LOCAL_BEGIN
-/* >> strncmp(3)
- * Same as `strcmp', but compare at most `maxlen' characters from either string */
 __LOCAL_LIBC(c32sncmp) __ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1, 2)) int
 __NOTHROW_NCX(__LIBKCALL __LIBC_LOCAL_NAME(c32sncmp))(__CHAR32_TYPE__ const *__s1, __CHAR32_TYPE__ const *__s2, __SIZE_TYPE__ __maxlen) {
 	__CHAR32_TYPE__ __c1, __c2;

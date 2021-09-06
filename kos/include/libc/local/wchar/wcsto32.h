@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xe438365b */
+/* HASH CRC-32:0xeb3c99e0 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -24,71 +24,23 @@
 #include <features.h>
 #include <hybrid/typecore.h>
 __NAMESPACE_LOCAL_BEGIN
-/* Dependency: wcsto32_r from wchar */
 #ifndef __local___localdep_wcsto32_r_defined
 #define __local___localdep_wcsto32_r_defined 1
 #ifdef __CRT_HAVE_wcsto32_r
 __NAMESPACE_LOCAL_END
 #include <bits/types.h>
 __NAMESPACE_LOCAL_BEGIN
-/* >> strto32_r(3), strtou32_r(3), strto64_r(3), strtou64_r(3)
- * Safely parse & return an integer from `nptr', and store any potential
- * errors in `*error' (if non-NULL). The following errors are defined:
- *  - 0:         Success
- *  - ECANCELED: Nothing was parsed.
- *               In this case, `*endptr' is set to the original `nptr'
- *               (iow: leading spaces are _not_ skipped in `*endptr'),
- *               and the returned integer is `0'
- *  - ERANGE:    Integer over- or under-flow while parsing.
- *               In this case, `*endptr' is still updated correctly, and
- *               the returned integer is the closest representable value
- *               to the integer given in `nptr' (i.e. `U?INTn_(MIN|MAX)')
- *               This error supercedes `EINVAL' if both conditions apply.
- *  - EINVAL:    Only when `endptr == NULL': The parsed number is followed
- *               by at least 1 additional non-whitespace character.
- *               The returned integer value is not affected by this error. */
 __CREDIRECT(__ATTR_LEAF __ATTR_NONNULL((1)),__INT32_TYPE__,__NOTHROW_NCX,__localdep_wcsto32_r,(__WCHAR_TYPE__ const *__restrict __nptr, __WCHAR_TYPE__ **__endptr, __STDC_INT_AS_UINT_T __base, __errno_t *__error),wcsto32_r,(__nptr,__endptr,__base,__error))
 #else /* __CRT_HAVE_wcsto32_r */
 __NAMESPACE_LOCAL_END
 #include <libc/local/wchar/wcsto32_r.h>
 __NAMESPACE_LOCAL_BEGIN
-/* >> strto32_r(3), strtou32_r(3), strto64_r(3), strtou64_r(3)
- * Safely parse & return an integer from `nptr', and store any potential
- * errors in `*error' (if non-NULL). The following errors are defined:
- *  - 0:         Success
- *  - ECANCELED: Nothing was parsed.
- *               In this case, `*endptr' is set to the original `nptr'
- *               (iow: leading spaces are _not_ skipped in `*endptr'),
- *               and the returned integer is `0'
- *  - ERANGE:    Integer over- or under-flow while parsing.
- *               In this case, `*endptr' is still updated correctly, and
- *               the returned integer is the closest representable value
- *               to the integer given in `nptr' (i.e. `U?INTn_(MIN|MAX)')
- *               This error supercedes `EINVAL' if both conditions apply.
- *  - EINVAL:    Only when `endptr == NULL': The parsed number is followed
- *               by at least 1 additional non-whitespace character.
- *               The returned integer value is not affected by this error. */
 #define __localdep_wcsto32_r __LIBC_LOCAL_NAME(wcsto32_r)
 #endif /* !__CRT_HAVE_wcsto32_r */
 #endif /* !__local___localdep_wcsto32_r_defined */
 __NAMESPACE_LOCAL_END
 #include <libc/errno.h>
 __NAMESPACE_LOCAL_BEGIN
-/* >> strto32(3), strto64(3), strtou32(3), strtou64(3)
- * Convert a string (radix=`base') from `nptr' into an integer,
- * and store a pointer to the end of the number in `*endptr'.
- * If `errno(3)' support is available, integer overflow is handled
- * by setting `errno=ERANGE', and returning the greatest or lowest
- * valid integer (`U?INTn_(MIN|MAX))'. (though note that
- * `endptr' (if non-NULL) is still updated in this case!)
- * Upon success, `errno' is left unchanged, and the integer repr
- * of the parsed number is returned. When no integer was parsed,
- * then `0' is returned, `*endptr' is set to `nptr', but `errno'
- * will not have been modified.
- * @return: * :         Success: The parsed integer
- * @return: 0 :         [*endptr=nptr] error: Nothing was parsed
- * @return: INTn_MIN:   [errno=ERANGE] error: Value to low to represent
- * @return: U?INTn_MAX: [errno=ERANGE] error: Value to great to represent */
 __LOCAL_LIBC(wcsto32) __ATTR_LEAF __ATTR_NONNULL((1)) __INT32_TYPE__
 __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(wcsto32))(__WCHAR_TYPE__ const *__restrict __nptr, __WCHAR_TYPE__ **__endptr, __STDC_INT_AS_UINT_T __base) {
 #if defined(__libc_geterrno) && defined(__ERANGE)

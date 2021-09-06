@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x8590e83 */
+/* HASH CRC-32:0xcb01b90d */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -31,7 +31,7 @@ DECL_BEGIN
 
 #if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
 /* Match the given `name' against `pattern', returning
- * `0' if they match, and `FNM_NOMATCH' otherwise.
+ * `0'  if  they match,  and  `FNM_NOMATCH' otherwise.
  * @param: match_flags:   Set of `FNM_*'
  * @return: 0           : `name' is matched by `pattern'
  * @return: FNM_NOMATCH : `name' is not matched by `pattern' */
@@ -39,7 +39,7 @@ INTDEF ATTR_PURE WUNUSED NONNULL((1, 2)) int NOTHROW_NCX(LIBDCALL libd_fnmatch)(
 #endif /* !__LIBCCALL_IS_LIBDCALL && !__KERNEL__ */
 #ifndef __KERNEL__
 /* Match the given `name' against `pattern', returning
- * `0' if they match, and `FNM_NOMATCH' otherwise.
+ * `0'  if  they match,  and  `FNM_NOMATCH' otherwise.
  * @param: match_flags:   Set of `FNM_*'
  * @return: 0           : `name' is matched by `pattern'
  * @return: FNM_NOMATCH : `name' is not matched by `pattern' */

@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x3473729b */
+/* HASH CRC-32:0x66c8d151 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -43,13 +43,13 @@
 __SYSDECL_BEGIN
 
 /* >> setfsuid(2)
- * Set the user ID for the cred-context (s.a. `CLONE_CRED') of the
+ * Set the  user ID  for the  cred-context (s.a.  `CLONE_CRED') of  the
  * calling thread. The calling thread needs the `CAP_SETUID' privilege.
  * @return: 0:  Success.
  * @return: -1: Error (s.a. `errno') */
 __CDECLARE_OPT(,int,__NOTHROW_NCX,setfsuid,(__uid_t __uid),(__uid))
 /* >> setfsgid(2)
- * Set the group ID for the cred-context (s.a. `CLONE_CRED') of the
+ * Set the group  ID for  the cred-context (s.a.  `CLONE_CRED') of  the
  * calling thread. The calling thread needs the `CAP_SETGID' privilege.
  * @return: 0:  Success.
  * @return: -1: Error (s.a. `errno') */

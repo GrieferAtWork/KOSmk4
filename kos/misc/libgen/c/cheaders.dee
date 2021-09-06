@@ -36,6 +36,11 @@ import * from .typeclass;
 import GCC_NCX from .gccncx;
 import util;
 
+#undef CONFIG_DOC_STRINGS_IN_LIBC_LOCAL
+#if 0 /* Output documentation strings in <libc/local/...> files. (disabled to prevent bloat) */
+#define CONFIG_DOC_STRINGS_IN_LIBC_LOCAL 1
+#endif
+
 
 global Function;
 global SystemHeader;
@@ -376,7 +381,7 @@ again_compare_typenames:
 
 	@@Output @this @CType to a @CWriter
 	@@Returns @true if the type string must be followed by whitespace if
-	@@immediately succeeded by a keyword. Returns @false otherwise.
+	@@immediately  succeeded  by  a keyword.  Returns  @false otherwise.
 	@@@param: escapeMode: One of @ESCAPE_MODE_NONE, @ESCAPE_MODE_PART, @ESCAPE_MODE_FULL
 	public function cprint(fp: CWriter, escapeMode: int, name: string | UserString = ""): bool {
 		local beforeNameStr = str beforeName;
@@ -435,10 +440,10 @@ class Argument {
 	@@NOTE: Ellipsis arguments have this field set to @""
 	public member name: string | UserString;
 
-	@@The argument name that should be combined with @ctype in the prototype
-	@@Usually this is the same as @name, but in the case of functions such
-	@@as @"execv", this would be an empty string to accout for the fact that
-	@@the set @ctype is actually the name of a macro that already includes
+	@@The  argument name that  should be combined with  @ctype in the prototype
+	@@Usually this is  the same as  @name, but  in the case  of functions  such
+	@@as @"execv", this would be  an empty string to  accout for the fact  that
+	@@the set @ctype  is actually  the name of  a macro  that already  includes
 	@@the name of the argument (meaning that the name mustn't be written twice)
 	public member protoTypeName: string | UserString;
 
@@ -471,12 +476,12 @@ class FunctionPrototype {
 	@@  - @"NOTHROW_RPC_KOS":    Function is nothrow when: #if !defined(__NON_CALL_EXCEPTIONS) && defined(__NO_RPC_EXCEPTIONS) && defined(__KOS__)
 	@@  - @"NOTHROW_RPC_NOKOS":  Function is nothrow when: #if !defined(__NON_CALL_EXCEPTIONS) && defined(__NO_RPC_EXCEPTIONS) && !defined(__KOS__)
 	@@  - @"NOTHROW_RPC_PURE":   Function is nothrow when: #if defined(__NO_RPC_EXCEPTIONS)
-	@@  - @"THROWS(...)":        Function can throw and should be warned about if used from NOTHROW.
+	@@  - @"THROWS(...)":        Function can  throw  and  should  be  warned  about  if  used  from  NOTHROW.
 	@@                           The given @"..." is a comma-seperated list of `E_*' codes from <kos/except.h>
 	public member nothrow: string | UserString = "";
 
 	@@Calling convention of this function prototype (e.g. @"ATTR_CDECL")
-	@@Set to an empty string to use the default calling convention.
+	@@Set to  an empty  string to  use the  default calling  convention.
 	public member cc: string | UserString;
 
 	@@The type that is returned by this function prototype
@@ -486,12 +491,12 @@ class FunctionPrototype {
 	public member argv: {Argument...} = ();
 
 	@@When set to non-@none, these are the types of the arguments passed through ellipsis
-	@@This information can be helpful when trying to construct an argument list
+	@@This information  can  be  helpful  when  trying  to  construct  an  argument  list
 	public member ellipsisArgumentTypes: {CType...} = none;
 
 	@@Pieces of code that must be written before @this @FunctionPrototype can be printed
 	@@NOTE: These prefixes are only printed in local function implementations, as well as
-	@@      their dependencies, as well as the dependencies of inline functions
+	@@      their  dependencies,  as  well  as  the  dependencies  of  inline   functions
 	public member declPrefix: {(string | UserString)...} = ();
 
 	@@Wrapper around @attributes that will automatically sort and unwind attributes
@@ -564,7 +569,7 @@ class FunctionPrototype {
 	}
 	private member m_isNothrowThrowing: bool;
 
-	@@Returns @true if @nothrow describes @"NOTHROW_NCX" or something
+	@@Returns  @true  if @nothrow  describes @"NOTHROW_NCX"  or something
 	@@else that needs the `__COMPILER_HAVE_GCCNCX_BUILTIN_BUG'-workaround
 	public property isNothrowGCCNCX: bool = {
 		get(): bool {
@@ -635,7 +640,7 @@ class FunctionPrototype {
 
 	@@Check if @this FunctionPrototype is compatible with @other
 	@@i.e.: uses identical items, attributes, and calling convention.
-	@@Note however that argument names are not checked here!
+	@@Note  however  that  argument  names  are  not  checked   here!
 	public function compatibleWith(other: FunctionPrototype): bool {
 		if (this === other)
 			return true;
@@ -671,7 +676,7 @@ class FunctionPrototype {
 	}
 
 	@@Print the attribute list (returns @false if
-	@@nothing was printed, and @true otherwise)
+	@@nothing was printed,  and @true  otherwise)
 	@@@param: escapeMode: One of @ESCAPE_MODE_NONE, @ESCAPE_MODE_PART, @ESCAPE_MODE_FULL
 	public function cprintAttributeList(fp: CWriter, escapeMode: int): bool {
 		local isFirst = true;
@@ -1204,7 +1209,7 @@ class FunctionPrototype {
 	}
 
 	@@Print a redirection- or declaration-binding, based on
-	@@the exposed- and assembly name being the same
+	@@the   exposed-  and  assembly  name  being  the  same
 	@@@param: escapeMode: One of @ESCAPE_MODE_NONE, @ESCAPE_MODE_PART, @ESCAPE_MODE_FULL
 	public function cprintRedirectionBinding(
 			fp: CWriter, escapeMode: int, decl: string,
@@ -1244,7 +1249,7 @@ class FunctionPrototype {
 	@@Print the start of an EXTERN-INLINE redirection- or declaration-binding,
 	@@based on the exposed- and assembly name being the same
 	@@Upon return, the caller should proceed to print the inline implementation body,
-	@@followed by a single @')'-terminator that will then complete the macro started
+	@@followed by a single @')'-terminator that will then complete the macro  started
 	@@by this function.
 	@@@param: escapeMode: One of @ESCAPE_MODE_NONE, @ESCAPE_MODE_PART, @ESCAPE_MODE_FULL
 	public function cprintExternInlineBindingStart(
@@ -1304,16 +1309,16 @@ class FunctionImplementation {
 	public member name: string | UserString;
 
 	@@Pieces of code that must be written before @impl can be generated
-	@@This code is inserted at the global namespace scope!
+	@@This  code   is  inserted   at   the  global   namespace   scope!
 	public member implPrefix: {(string | UserString)...} = ();
 
 	@@Other functions for which prototypes (though not necessarily c++ overloads) must
-	@@be provided in order to use this implementation. Functions that appear in this
+	@@be  provided in order to use this  implementation. Functions that appear in this
 	@@list will be linked locally by their specified names.
 	@@This mapping usually takes the form @("__localdep_strlen" : "strlen")
-	@@NOTE: When this points to a Callable object, then that function is
+	@@NOTE: When  this points to  a Callable object,  then that function is
 	@@      invoked and should then return one of the other accepted types.
-	@@NOTE: Additionally, this member may also be assigned a Callable object,
+	@@NOTE: Additionally, this member  may also be  assigned a Callable  object,
 	@@      in which case that object's return value is used as the dependencies
 	@@      @Mapping
 	public member dependencies
@@ -1382,8 +1387,10 @@ class FunctionImplementation {
 	public function cprintLocalFunctionImplementation(
 			fp: CWriter, escapeMode: int, name: string,
 			prototype: FunctionPrototype, dependencyDecl: string,
-			doc: string, namespace: Namespace,
-			keyDependency: Callable with string) {
+#ifdef CONFIG_DOC_STRINGS_IN_LIBC_LOCAL
+			doc: string,
+#endif /* CONFIG_DOC_STRINGS_IN_LIBC_LOCAL */
+			namespace: Namespace, keyDependency: Callable with string) {
 		fp.forceStartOfLine();
 		local oldNs = fp.namespace;
 		fp.namespace = namespace;
@@ -1394,9 +1401,11 @@ class FunctionImplementation {
 		local deps: {string: Function} = dependencyFunctions;
 		for (local depName: deps.keys.sorted()) {
 			local depFun = deps[depName];
+#ifdef CONFIG_DOC_STRINGS_IN_LIBC_LOCAL
 			fp << "/* Dependency: "
 				<< depFun.name << " from "
 				<< depFun.originalSystemHeaderName << " */\n";
+#endif /* CONFIG_DOC_STRINGS_IN_LIBC_LOCAL */
 			depName = keyDependency(depName);
 			depFun.cprintHeaderDeclaration(
 				fp, escapeMode, dependencyDecl,
@@ -1430,7 +1439,8 @@ class FunctionImplementation {
 				 *     dependencies  between  <libc/local/...>  implementations,   <libc/core/...>
 				 *     bindings, and <optimized/...> wrappers.
 				 */
-				ignoreFastBindings:        true
+				ignoreFastBindings:        true,
+				printDoc: __TPP_EVAL(defined(CONFIG_DOC_STRINGS_IN_LIBC_LOCAL))
 				);
 		}
 		if (implPrefix) {
@@ -1451,8 +1461,10 @@ class FunctionImplementation {
 			}
 			fp.namespace = namespace;
 		}
+#ifdef CONFIG_DOC_STRINGS_IN_LIBC_LOCAL
 		if (doc)
 			fp.printComment(doc);
+#endif /* CONFIG_DOC_STRINGS_IN_LIBC_LOCAL */
 		fp << "__LOCAL_LIBC(" << name << ") ";
 		if (prototype.cprintAttributeList(fp, escapeMode))
 			fp << " ";
@@ -1519,12 +1531,12 @@ class LocalFunction {
 	@@The prototype adhered to by all local implementation variants
 	public member prototype: FunctionPrototype | Callable;
 
-	@@Preprocessor conditions that must be met in order
+	@@Preprocessor conditions that  must be  met in  order
 	@@for this local function implementation to be chosed.
 	public member ppCond: string | UserString = "1";
 
 	@@Pieces of code that must be written before @ppCond can be evaluated
-	@@This code is inserted at the global namespace scope!
+	@@This  code   is   inserted   at   the   global   namespace   scope!
 	public member ppCondPrefix: {(string | UserString)...} = ();
 
 	@@The bound implementation for the local function
@@ -1600,7 +1612,10 @@ class LocalFunction {
 			/* Print the binding */
 			functionImpl.cprintLocalFunctionImplementation(
 				fp, escapeMode, name, usedPrototype,
-				dependencyDecl, documentationString,
+				dependencyDecl,
+#ifdef CONFIG_DOC_STRINGS_IN_LIBC_LOCAL
+				documentationString,
+#endif /* CONFIG_DOC_STRINGS_IN_LIBC_LOCAL */
 				namespace, keyDependency);
 			local myLocalDepName = keyLocalDep(name);
 			local myLocalDepGuard = namespace.keyDefaultGuard(myLocalDepName);
@@ -1723,15 +1738,15 @@ class InlineFunction {
 	public member mode: string = "LOCAL";
 
 	@@The different, possible methods by which this function can be implemented.
-	@@During compile-time, the first variant is chosen for which
+	@@During   compile-time,   the   first   variant   is   chosen   for   which
 	@@the @ppCond evaluates to a true-expression
 	public member impl: FunctionImplementation | Callable = ();
 
-	@@Name of the assembly symbol against which
+	@@Name of  the assembly  symbol against  which
 	@@to link in case @(mode == "__EXTERN_INLINE")
 	public member externInlineAsmname: string | UserString;
 
-	@@Set to true for so-called `fast` function bindings. Such bindings will
+	@@Set to true for so-called  `fast` function bindings. Such bindings  will
 	@@not be linked in `<libc/core/string.h>`, through fast bindings will then
 	@@still be linked everywhere else, including in `<libc/string.h>`
 	public member isFastBinding: bool = false;
@@ -1861,7 +1876,7 @@ class InlineFunction {
 }
 
 
-@@Return the @FunctionPrototype.cc that is common to all of the
+@@Return  the  @FunctionPrototype.cc that  is  common to  all  of the
 @@given @prototypes. If different CCs are used, return @none instead.
 function getCommonCCFromPrototypes(
 		prototypes: {(string | UserString, {FunctionPrototype...})...}): string | none {
@@ -1880,7 +1895,7 @@ function getCommonCCFromPrototypes(
 }
 
 @@Check if the given 2 lists of function prototypes
-@@and conditions are compatible with each other
+@@and  conditions  are compatible  with  each other
 function areFunctionPrototypesCompatible(
 		a: {(string | UserString, {FunctionPrototype...})...},
 		b: {(string | UserString, {FunctionPrototype...})...}): bool {
@@ -1918,8 +1933,8 @@ class NamespaceBinding {
 	@@Name of the function within @namespace
 	public member importName: string | UserString;
 
-	@@The prototype to match when doing a call-to import
-	@@Ignored when @namespace doesn't do any escaping.
+	@@The  prototype  to  match  when  doing  a  call-to  import
+	@@Ignored   when   @namespace  doesn't   do   any  escaping.
 	@@i.e. @(namespace.keyCSymbolName(importName) == importName)
 	public member prototype: FunctionPrototype | Callable;
 
@@ -2117,31 +2132,31 @@ class NamespaceBinding {
 class FunctionBinding {
 	this = default;
 
-	@@Preprocessor condition that must be evaluate to true at compile-time
+	@@Preprocessor  condition  that must  be  evaluate to  true  at compile-time
 	@@in order for this binding to be considered usable by the hosting compiler.
 	public member ppCond: string | UserString = "1";
 
 	@@Pieces of code that must be written before @ppCond can be evaluated
-	@@This code is inserted at the global namespace scope!
+	@@This  code   is   inserted   at   the   global   namespace   scope!
 	public member ppCondPrefix: {(string | UserString)...} = ();
 
 	@@Prototype selectors (usually simply @({ "1", { <primaryPrototype> } }))
 	@@This is a list of pairs (ppCond, prototypes) to select which prototypes
 	@@should be used to bind the function.
 	@@Different prototypes can be provided with a dependency on some preprocessor
-	@@expression in order to support CORRECT_ISO_CXX_OVERLOADS declarations.
+	@@expression in  order  to  support  CORRECT_ISO_CXX_OVERLOADS  declarations.
 	@@NOTE: In practice, the preprocessor conditions for prototype selection
-	@@      should always be done such that a prototype will exist in all
+	@@      should  always be done  such that a prototype  will exist in all
 	@@      conditions. However, this is not a requirement.
 	public member prototypes: {(string | UserString, {FunctionPrototype...})...} | Callable = ();
 
 	@@The actual binding provided by this function:
-	@@  - @LocalFunction:    Provide a local function implementation, via inclusion of
+	@@  - @LocalFunction:    Provide   a  local  function   implementation,  via  inclusion  of
 	@@                       <libc/local/@(binding.originalSystemHeaderName)/@(binding.name).h>
 	@@  - @InlineFunction:   Provide an in-line function implementation, possibly alongside
 	@@                       support for @"__EXTERN_INLINE"
 	@@  - @string:           External assembly symbol (bind the function against
-	@@                       an assembly symbol by the name of @binding)
+	@@                       an   assembly  symbol  by  the  name  of  @binding)
 	@@  - @UserString:       Same as @string
 	@@  - @NamespaceBinding: Import an existing declaration from some other namespace
 	@@  - @Callable:         A callback that takes no arguments, and returns one of the above
@@ -2156,12 +2171,12 @@ class FunctionBinding {
 		}
 	}
 
-	@@Check if this binding has a *primary* prototype (or return @none if it doesn't)
-	@@A primary prototype exists if at least one @prototypes has a condition string
-	@@that evaluates to @"1". The first set of prototypes that does this is then
-	@@considered the set of primary prototypes. Furthermore, should this set then be
+	@@Check if this binding has a *primary*  prototype (or return @none if it  doesn't)
+	@@A primary prototype  exists if at  least one @prototypes  has a condition  string
+	@@that  evaluates  to @"1".  The first  set of  prototypes that  does this  is then
+	@@considered  the set of  primary prototypes. Furthermore, should  this set then be
 	@@made up of exactly one prototype, that prototype is then *the* primary prototype.
-	@@In all other cases, no primary prototype exists, and this property returns @none
+	@@In all other cases, no primary prototype exists, and this property returns  @none
 	public property primaryPrototype: FunctionPrototype | none = {
 		get(): FunctionPrototype | none {
 			for (local ppCond, protos: functionPrototypes) {
@@ -2192,9 +2207,9 @@ class FunctionBinding {
 			bind.preload();
 	}
 
-	@@Simple helper to peek if the ppCond part of @this binding is known already
+	@@Simple helper to peek  if the ppCond  part of @this  binding is known  already
 	@@Note that it may become known at a later point in time, and that this function
-	@@may not necessary detect it as being known. Only note that a return value
+	@@may not necessary  detect it as  being known.  Only note that  a return  value
 	@@other than @none indicates a guarantied, known value
 	public function getRequiresConstant(): bool | none {
 		if (ppCond == "0")
@@ -2294,13 +2309,13 @@ do_universal_binding:
 	@@@param: decl:                      Declaration prefix (e.g. @"__LIBC")
 	@@@param: exposedName:               The name by which to expose this binding (e.g. @"strlen")
 	@@@param: doc:                       A human-readable description of the associated function
-	@@@param: guardName:                 The name of a macro that must be #undef'd if no prototype
+	@@@param: guardName:                 The  name  of  a  macro  that   must  be  #undef'd  if  no   prototype
 	@@                                   has been exposed at compile-time. Set to @none if no such macro exists
 	@@@param: preferBindingMacros:       Prefer function bindings to be done with macros, rather than
 	@@                                   through use of inline functions.
 	@@@param: printDeclarationPrefixes:  Print prototype declaration prefixes
 	@@@param: onlyPrintPrimaryPrototype: Only bind against @primaryPrototype (but fall back to binding
-	@@                                   against all prototypes if no @primaryPrototype exists)
+	@@                                   against   all  prototypes  if  no  @primaryPrototype  exists)
 	public function cprintBindFunction(
 			fp: CWriter, escapeMode: int, decl: string, exposedName: string,
 			guardName: string | none = none, doc: string = "",
@@ -2411,11 +2426,6 @@ do_universal_binding:
 		if (guardName !is none) {
 			if (!isFirst)
 				fp.ppElse();
-			if (guardName == "__local___localdep__vswprintf_c_defined") {
-				fp << "// !!!!HERE!!!!\n";
-				fp << "// isFirst = " << repr(isFirst) << "\n";
-				fp << "// usedPrototypes = " << repr(usedPrototypes) << "\n";
-			}
 			fp.ppUndef(guardName);
 		}
 		if (!isFirst)
@@ -2439,12 +2449,12 @@ class Function {
 	@@Set to @none if the function isn't actually being exported from its associated library
 	public member internalName: string | UserString | none | Callable = none;
 
-	@@Name of the original defining system header (may differ from the containing
+	@@Name  of the original  defining system header (may  differ from the containing
 	@@header in case @"%[insert:extern(...)]" was used to inject a foreign function)
 	public member originalSystemHeaderName: string | UserString;
 
 	@@Ordered list of bindings with which this function is exposed in system headers
-	@@This list is enumerated, and the first binding who's @FunctionBinding.ppCond
+	@@This list is enumerated, and  the first binding who's  @FunctionBinding.ppCond
 	@@field evaluates to @true will then be used as the binding exposed.
 	public member bindings: {(FunctionBinding | Callable)...} | Callable = [];
 
@@ -2471,7 +2481,7 @@ class Function {
 		}
 	}
 
-	@@Return the only prototype in use (if only one, common prototype is
+	@@Return  the only  prototype in use  (if only one,  common prototype is
 	@@defined across all @functionBinding), or @none if multiple prototypes,
 	@@or no prototypes at all have been defined
 	public property onlyPrototype: FunctionPrototype | none = {
@@ -2494,7 +2504,7 @@ class Function {
 	}
 
 	@@Similar to @onlyPrototype, but return the set of prototypes+conditions
-	@@common to all bindings, or @none if no such set exists.
+	@@common  to   all  bindings,   or  @none   if  no   such  set   exists.
 	public property onlyPrototypes: {(string | UserString, {FunctionPrototype...})...} | none = {
 		get(): {(string | UserString, {FunctionPrototype...})...} | none {
 			local result = none;
@@ -2660,7 +2670,7 @@ no_usable_bindings:
 	@@@param: decl:                      The declaration prefix (e.g. @"__LIBC") with which to link
 	@@@param: exposedName:               The name under which functions should be exposed (or @none
 	@@                                   if @this.name should be used instead)
-	@@@param: guardName:                 The name of a guard that should be used to wrap the declaration
+	@@@param: guardName:                 The name of a guard that should be used to wrap the  declaration
 	@@                                   When set to @true, use fp.namespace.keyDefaultGuard(exposedName)
 	@@@param: preferBindingMacros:       Prefer function bindings to be done with macros, rather than
 	@@                                   through use of inline functions.
@@ -2675,7 +2685,8 @@ no_usable_bindings:
 			printDeclarationPrefixes: bool = false,
 			onlyPrintPrimaryPrototype: bool = false,
 			ignoreNamespaceBindings: bool = false,
-			ignoreFastBindings: bool = false) {
+			ignoreFastBindings: bool = false,
+			printDoc: bool = true) {
 		try {
 			local usedBindings = [];
 			if (exposedName is none)
@@ -2698,6 +2709,8 @@ no_usable_bindings:
 			if (!usedBindings)
 				return; /* No bindings -> Noop */
 			local doc = documentationString;
+			if (!printDoc)
+				doc = "";
 			if (guardName is bool) {
 				guardName = guardName
 					? fp.namespace.keyDefaultGuard(exposedName)
@@ -2884,20 +2897,20 @@ class ExposedFunction {
 	@@The actual, exposed name of the function (or @none to use @func.name instead)
 	public member exposedName: string = none;
 
-	@@The name of a guard that should be used to wrap
+	@@The  name  of a  guard that  should  be used  to wrap
 	@@the declaration. Set to @false to not provide a guard
 	@@NOTE: When set to @true, use fp.namespace.keyDefaultGuard(exposedName)
 	public member guardName: string | bool = false;
 
 	@@Prefer function bindings to be done with macros,
-	@@rather than through use of inline functions.
+	@@rather  than  through use  of  inline functions.
 	public member preferBindingMacros: bool = false;
 
 	@@Print @FunctionPrototype.declPrefix
 	public member printDeclarationPrefixes: bool = false;
 
 	@@Only bind against @FunctionBinding.primaryPrototype (but fall back to binding
-	@@against all prototypes if no @FunctionBinding.primaryPrototype exists)
+	@@against   all  prototypes  if  no  @FunctionBinding.primaryPrototype  exists)
 	public member onlyPrintPrimaryPrototype: bool = false;
 
 	@@Don't bind against @NamespaceBinding
@@ -2972,17 +2985,17 @@ class ExposedFunction {
 class LibraryFunctionBinding {
 	this = default;
 
-	@@Preprocessor condition that must be evaluate to true at compile-time in
+	@@Preprocessor  condition  that  must be  evaluate  to true  at  compile-time in
 	@@order for this implementation to be considered usable by the hosting compiler.
 	public member ppCond: string | UserString = "1";
 
-	@@Binding, which is either a @FunctionImplementation,
+	@@Binding,   which   is  either   a  @FunctionImplementation,
 	@@specifying how the function should actually be implemented,
 	@@or is the symbol name of some other function for which this
 	@@one should be defined as an INTERN-ALIAS
 	public member binding: FunctionImplementation | string | UserString | Callable;
 
-	@@Name of the section in which this function's body should be
+	@@Name  of  the section  in which  this  function's body  should be
 	@@placed in order to provide the libc auto- or user-implementations
 	@@NOTE: Ignored when binding isn't a @FunctionImplementation
 	public member implSection: string | UserString | none = none;
@@ -3014,10 +3027,10 @@ class LibraryFunction {
 	public member name: string | UserString;
 
 	@@Preprocessor condition that must be evaluate to true at compile-time
-	@@in order for this library function to actually be implemented.
+	@@in  order  for this  library  function to  actually  be implemented.
 	public member ppCond: string | UserString;
 
-	@@Name of the original defining system header (may differ from the containing
+	@@Name  of the original  defining system header (may  differ from the containing
 	@@header in case @"%[insert:extern(...)]" was used to inject a foreign function)
 	public member originalSystemHeaderName: string | UserString;
 
@@ -3034,7 +3047,7 @@ class LibraryFunction {
 	public member exportSymbolNames: {(string | UserString, string | UserString)...} = [];
 
 	@@The preprocessor-condition that must be met for @this @LibraryFunction
-	@@to actually be implemented as part of its auto- or user-source
+	@@to actually  be  implemented  as  part of  its  auto-  or  user-source
 	@@This condition is essentially:
 	@@    @(this.ppCond && (functionBindings.each.ppCond || ...))
 	public property implementationPpCond: string = {
@@ -3267,7 +3280,7 @@ class SystemHeader {
 
 	@@Functions declared in this system header
 	@@If a function is declared multiple times under the same name,
-	@@it will appear as @DuplicateFunctionMarker in this mapping
+	@@it will appear  as @DuplicateFunctionMarker  in this  mapping
 	public member functionsByName: {string: (Function | _DuplicateFunctionMarker)} = Dict();
 
 	@@Same as @functionsByName, but for local functions

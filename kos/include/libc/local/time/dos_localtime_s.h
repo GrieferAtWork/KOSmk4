@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x825e603 */
+/* HASH CRC-32:0xa7576bfd */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -25,14 +25,10 @@
 #include <bits/types.h>
 #include <bits/crt/tm.h>
 __NAMESPACE_LOCAL_BEGIN
-/* Dependency: dos_localtime32_s from time */
 #if !defined(__local___localdep_dos_localtime32_s_defined) && defined(__CRT_HAVE__localtime32_s)
 #define __local___localdep_dos_localtime32_s_defined 1
-/* >> localtime_r(3), localtime64_r(3)
- * Return the `struct tm' representation of `*timer' in local time, using `*tp' to store the result */
 __CREDIRECT(__ATTR_NONNULL((1, 2)),__errno_t,__NOTHROW_NCX,__localdep_dos_localtime32_s,(struct __NAMESPACE_STD_SYM tm *__restrict __tp, __time32_t const *__restrict __timer),_localtime32_s,(__tp,__timer))
 #endif /* !__local___localdep_dos_localtime32_s_defined && __CRT_HAVE__localtime32_s */
-/* Dependency: dos_localtime64_s from time */
 #ifndef __local___localdep_dos_localtime64_s_defined
 #define __local___localdep_dos_localtime64_s_defined 1
 #ifdef __CRT_HAVE__localtime64_s
@@ -46,8 +42,6 @@ __NAMESPACE_LOCAL_BEGIN
 #undef __local___localdep_dos_localtime64_s_defined
 #endif /* !... */
 #endif /* !__local___localdep_dos_localtime64_s_defined */
-/* >> localtime_r(3), localtime64_r(3)
- * Return the `struct tm' representation of `*timer' in local time, using `*tp' to store the result */
 __LOCAL_LIBC(dos_localtime_s) __ATTR_NONNULL((1, 2)) __errno_t
 __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(dos_localtime_s))(struct __NAMESPACE_STD_SYM tm *__restrict __tp, __TM_TYPE(time) const *__restrict __timer) {
 

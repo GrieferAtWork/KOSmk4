@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x8013c74d */
+/* HASH CRC-32:0x847fef8a */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -23,90 +23,69 @@
 #include <__crt.h>
 #include <hybrid/typecore.h>
 __NAMESPACE_LOCAL_BEGIN
-/* Dependency: mempmovedown from string */
 #ifndef __local___localdep_mempmovedown_defined
 #define __local___localdep_mempmovedown_defined 1
 #ifdef __CRT_HAVE_mempmovedown
-/* Same as `memmovedown', but return `dst + n_bytes', rather than `dst' (assumes that `dst <= src || !n_bytes') */
 __CREDIRECT(__ATTR_LEAF __ATTR_RETNONNULL __ATTR_NONNULL((1, 2)),void *,__NOTHROW_NCX,__localdep_mempmovedown,(void *__dst, void const *__src, __SIZE_TYPE__ __n_bytes),mempmovedown,(__dst,__src,__n_bytes))
 #elif defined(__CRT_HAVE_mempmove)
-/* Same as `memmovedown', but return `dst + n_bytes', rather than `dst' (assumes that `dst <= src || !n_bytes') */
 __CREDIRECT(__ATTR_LEAF __ATTR_RETNONNULL __ATTR_NONNULL((1, 2)),void *,__NOTHROW_NCX,__localdep_mempmovedown,(void *__dst, void const *__src, __SIZE_TYPE__ __n_bytes),mempmove,(__dst,__src,__n_bytes))
 #else /* ... */
 __NAMESPACE_LOCAL_END
 #include <libc/local/string/mempmovedown.h>
 __NAMESPACE_LOCAL_BEGIN
-/* Same as `memmovedown', but return `dst + n_bytes', rather than `dst' (assumes that `dst <= src || !n_bytes') */
 #define __localdep_mempmovedown __LIBC_LOCAL_NAME(mempmovedown)
 #endif /* !... */
 #endif /* !__local___localdep_mempmovedown_defined */
-/* Dependency: mempmovedownl from string */
 #ifndef __local___localdep_mempmovedownl_defined
 #define __local___localdep_mempmovedownl_defined 1
 #ifdef __CRT_HAVE_mempmovedownl
-/* Same as `memmovew', but return `dst + N_DWORDS', rather than `dst' (assumes that `dst <= src || !N_DWORDS') */
 __CREDIRECT(__ATTR_LEAF __ATTR_RETNONNULL __ATTR_NONNULL((1, 2)),__UINT32_TYPE__ *,__NOTHROW_NCX,__localdep_mempmovedownl,(void *__dst, void const *__src, __SIZE_TYPE__ __n_dwords),mempmovedownl,(__dst,__src,__n_dwords))
 #elif defined(__CRT_HAVE_mempmovel)
-/* Same as `memmovew', but return `dst + N_DWORDS', rather than `dst' (assumes that `dst <= src || !N_DWORDS') */
 __CREDIRECT(__ATTR_LEAF __ATTR_RETNONNULL __ATTR_NONNULL((1, 2)),__UINT32_TYPE__ *,__NOTHROW_NCX,__localdep_mempmovedownl,(void *__dst, void const *__src, __SIZE_TYPE__ __n_dwords),mempmovel,(__dst,__src,__n_dwords))
 #elif defined(__CRT_HAVE_wmempmove) && __SIZEOF_WCHAR_T__ == 4
-/* Same as `memmovew', but return `dst + N_DWORDS', rather than `dst' (assumes that `dst <= src || !N_DWORDS') */
 __CREDIRECT(__ATTR_LEAF __ATTR_RETNONNULL __ATTR_NONNULL((1, 2)),__UINT32_TYPE__ *,__NOTHROW_NCX,__localdep_mempmovedownl,(void *__dst, void const *__src, __SIZE_TYPE__ __n_dwords),wmempmove,(__dst,__src,__n_dwords))
 #elif defined(__CRT_HAVE_KOS$wmempmove) && defined(__LIBCCALL_IS_LIBKCALL)
-/* Same as `memmovew', but return `dst + N_DWORDS', rather than `dst' (assumes that `dst <= src || !N_DWORDS') */
 __COMPILER_REDIRECT(__LIBC,__ATTR_LEAF __ATTR_RETNONNULL __ATTR_NONNULL((1, 2)),__UINT32_TYPE__ *,__NOTHROW_NCX,__LIBCCALL,__localdep_mempmovedownl,(void *__dst, void const *__src, __SIZE_TYPE__ __n_dwords),KOS$wmempmove,(__dst,__src,__n_dwords))
 #else /* ... */
 __NAMESPACE_LOCAL_END
 #include <libc/local/string/mempmovedownl.h>
 __NAMESPACE_LOCAL_BEGIN
-/* Same as `memmovew', but return `dst + N_DWORDS', rather than `dst' (assumes that `dst <= src || !N_DWORDS') */
 #define __localdep_mempmovedownl __LIBC_LOCAL_NAME(mempmovedownl)
 #endif /* !... */
 #endif /* !__local___localdep_mempmovedownl_defined */
-/* Dependency: mempmovedownq from string */
 #ifndef __local___localdep_mempmovedownq_defined
 #define __local___localdep_mempmovedownq_defined 1
 #ifdef __CRT_HAVE_mempmovedownq
-/* Same as `memmovew', but return `dst + n_qwords', rather than `dst' (assumes that `dst <= src || !n_qwords') */
 __CREDIRECT(__ATTR_LEAF __ATTR_RETNONNULL __ATTR_NONNULL((1, 2)),__UINT64_TYPE__ *,__NOTHROW_NCX,__localdep_mempmovedownq,(void *__restrict __dst, void const *__restrict __src, __SIZE_TYPE__ __n_qwords),mempmovedownq,(__dst,__src,__n_qwords))
 #elif defined(__CRT_HAVE_mempmoveq)
-/* Same as `memmovew', but return `dst + n_qwords', rather than `dst' (assumes that `dst <= src || !n_qwords') */
 __CREDIRECT(__ATTR_LEAF __ATTR_RETNONNULL __ATTR_NONNULL((1, 2)),__UINT64_TYPE__ *,__NOTHROW_NCX,__localdep_mempmovedownq,(void *__restrict __dst, void const *__restrict __src, __SIZE_TYPE__ __n_qwords),mempmoveq,(__dst,__src,__n_qwords))
 #else /* ... */
 __NAMESPACE_LOCAL_END
 #include <libc/local/string/mempmovedownq.h>
 __NAMESPACE_LOCAL_BEGIN
-/* Same as `memmovew', but return `dst + n_qwords', rather than `dst' (assumes that `dst <= src || !n_qwords') */
 #define __localdep_mempmovedownq __LIBC_LOCAL_NAME(mempmovedownq)
 #endif /* !... */
 #endif /* !__local___localdep_mempmovedownq_defined */
-/* Dependency: mempmovedownw from string */
 #ifndef __local___localdep_mempmovedownw_defined
 #define __local___localdep_mempmovedownw_defined 1
 #ifdef __CRT_HAVE_mempmovedownw
-/* Same as `memmovew', but return `dst + N_WORDS', rather than `dst' (assumes that `dst <= src || !N_WORDS') */
 __CREDIRECT(__ATTR_LEAF __ATTR_RETNONNULL __ATTR_NONNULL((1, 2)),__UINT16_TYPE__ *,__NOTHROW_NCX,__localdep_mempmovedownw,(void *__dst, void const *__src, __SIZE_TYPE__ __n_words),mempmovedownw,(__dst,__src,__n_words))
 #elif defined(__CRT_HAVE_mempmovew)
-/* Same as `memmovew', but return `dst + N_WORDS', rather than `dst' (assumes that `dst <= src || !N_WORDS') */
 __CREDIRECT(__ATTR_LEAF __ATTR_RETNONNULL __ATTR_NONNULL((1, 2)),__UINT16_TYPE__ *,__NOTHROW_NCX,__localdep_mempmovedownw,(void *__dst, void const *__src, __SIZE_TYPE__ __n_words),mempmovew,(__dst,__src,__n_words))
 #elif defined(__CRT_HAVE_wmempmove) && __SIZEOF_WCHAR_T__ == 2
-/* Same as `memmovew', but return `dst + N_WORDS', rather than `dst' (assumes that `dst <= src || !N_WORDS') */
 __CREDIRECT(__ATTR_LEAF __ATTR_RETNONNULL __ATTR_NONNULL((1, 2)),__UINT16_TYPE__ *,__NOTHROW_NCX,__localdep_mempmovedownw,(void *__dst, void const *__src, __SIZE_TYPE__ __n_words),wmempmove,(__dst,__src,__n_words))
 #elif defined(__CRT_HAVE_DOS$wmempmove) && defined(__LIBCCALL_IS_LIBDCALL)
-/* Same as `memmovew', but return `dst + N_WORDS', rather than `dst' (assumes that `dst <= src || !N_WORDS') */
 __COMPILER_REDIRECT(__LIBC,__ATTR_LEAF __ATTR_RETNONNULL __ATTR_NONNULL((1, 2)),__UINT16_TYPE__ *,__NOTHROW_NCX,__LIBCCALL,__localdep_mempmovedownw,(void *__dst, void const *__src, __SIZE_TYPE__ __n_words),DOS$wmempmove,(__dst,__src,__n_words))
 #else /* ... */
 __NAMESPACE_LOCAL_END
 #include <libc/local/string/mempmovedownw.h>
 __NAMESPACE_LOCAL_BEGIN
-/* Same as `memmovew', but return `dst + N_WORDS', rather than `dst' (assumes that `dst <= src || !N_WORDS') */
 #define __localdep_mempmovedownw __LIBC_LOCAL_NAME(mempmovedownw)
 #endif /* !... */
 #endif /* !__local___localdep_mempmovedownw_defined */
 __NAMESPACE_LOCAL_END
 #include <hybrid/host.h>
 __NAMESPACE_LOCAL_BEGIN
-/* Same as `memmovedownc', but return `dst + (ELEM_COUNT * ELEM_SIZE)', rather than `dst' (assumes that `dst <= src || !ELEM_COUNT || !ELEM_SIZE') */
 __LOCAL_LIBC(mempmovedownc) __ATTR_LEAF __ATTR_RETNONNULL __ATTR_NONNULL((1, 2)) void *
 __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(mempmovedownc))(void *__dst, void const *__src, __SIZE_TYPE__ __elem_count, __SIZE_TYPE__ __elem_size) {
 #ifdef __ARCH_HAVE_UNALIGNED_MEMORY_ACCESS

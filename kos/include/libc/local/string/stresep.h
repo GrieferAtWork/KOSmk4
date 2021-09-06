@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x646efc7a */
+/* HASH CRC-32:0xe9522dce */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -22,41 +22,23 @@
 #define __local_stresep_defined 1
 #include <__crt.h>
 __NAMESPACE_LOCAL_BEGIN
-/* Dependency: strchr from string */
 #ifndef __local___localdep_strchr_defined
 #define __local___localdep_strchr_defined 1
 #if __has_builtin(__builtin_strchr) && defined(__LIBC_BIND_CRTBUILTINS) && defined(__CRT_HAVE_strchr)
-/* >> strchr(3)
- * Return the pointer of the first instance of `needle', or `NULL' if `needle' wasn't found. */
 __CEIREDIRECT(__ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1)),char *,__NOTHROW_NCX,__localdep_strchr,(char const *__restrict __haystack, int __needle),strchr,{ return __builtin_strchr(__haystack, __needle); })
 #elif __has_builtin(__builtin_index) && defined(__LIBC_BIND_CRTBUILTINS) && defined(__CRT_HAVE_index)
-/* >> strchr(3)
- * Return the pointer of the first instance of `needle', or `NULL' if `needle' wasn't found. */
 __CEIREDIRECT(__ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1)),char *,__NOTHROW_NCX,__localdep_strchr,(char const *__restrict __haystack, int __needle),index,{ return __builtin_index(__haystack, __needle); })
 #elif defined(__CRT_HAVE_strchr)
-/* >> strchr(3)
- * Return the pointer of the first instance of `needle', or `NULL' if `needle' wasn't found. */
 __CREDIRECT(__ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1)),char *,__NOTHROW_NCX,__localdep_strchr,(char const *__restrict __haystack, int __needle),strchr,(__haystack,__needle))
 #elif defined(__CRT_HAVE_index)
-/* >> strchr(3)
- * Return the pointer of the first instance of `needle', or `NULL' if `needle' wasn't found. */
 __CREDIRECT(__ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1)),char *,__NOTHROW_NCX,__localdep_strchr,(char const *__restrict __haystack, int __needle),index,(__haystack,__needle))
 #else /* ... */
 __NAMESPACE_LOCAL_END
 #include <libc/local/string/strchr.h>
 __NAMESPACE_LOCAL_BEGIN
-/* >> strchr(3)
- * Return the pointer of the first instance of `needle', or `NULL' if `needle' wasn't found. */
 #define __localdep_strchr __LIBC_LOCAL_NAME(strchr)
 #endif /* !... */
 #endif /* !__local___localdep_strchr_defined */
-/* >> stresep(3)
- * Same as `strsep(3)', but allow the specification of an additional `escape'
- * character that will cause the following character from `*stringp' to be
- * escaped, and not be considered as a separator, even if it is included
- * within `delim'. Note that `escape'-characters (if present) are not removed
- * from the input string, meaning that they will still appear in returned
- * strings, should they have been present in the original input string. */
 __LOCAL_LIBC(stresep) __ATTR_LEAF __ATTR_NONNULL((1, 2)) char *
 __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(stresep))(char **__restrict __stringp, char const *__restrict __delim, int __escape) {
 	char *__result, *__iter;

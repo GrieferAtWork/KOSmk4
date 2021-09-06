@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xbb8175de */
+/* HASH CRC-32:0xebb06492 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -23,9 +23,6 @@
 #include <__crt.h>
 #include <bits/types.h>
 __NAMESPACE_LOCAL_BEGIN
-/* >> fsync(2)
- * Synchronize a file (including its descriptor which contains timestamps, and its size),
- * meaning that changes to its data and/or descriptor are written to disk */
 __LOCAL_LIBC(fsync) int
 __NOTHROW_RPC(__LIBCCALL __LIBC_LOCAL_NAME(fsync))(__fd_t __fd) {
 	(void)__fd;

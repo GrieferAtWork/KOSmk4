@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xbc6fb40d */
+/* HASH CRC-32:0xc397cdb */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -22,7 +22,6 @@
 #define __local_strtold_l_defined 1
 #include <__crt.h>
 __NAMESPACE_LOCAL_BEGIN
-/* Dependency: strtold from stdlib */
 #ifndef __local___localdep_strtold_defined
 #define __local___localdep_strtold_defined 1
 #ifdef __CRT_HAVE_strtold

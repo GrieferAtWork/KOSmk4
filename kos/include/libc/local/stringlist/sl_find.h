@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x11176bc8 */
+/* HASH CRC-32:0xf8478b31 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -32,31 +32,19 @@ typedef struct _stringlist {
 } StringList;
 #endif /* !___stringlist_defined */
 __NAMESPACE_LOCAL_BEGIN
-/* Dependency: strcmp from string */
 #ifndef __local___localdep_strcmp_defined
 #define __local___localdep_strcmp_defined 1
 #if __has_builtin(__builtin_strcmp) && defined(__LIBC_BIND_CRTBUILTINS) && defined(__CRT_HAVE_strcmp)
-/* >> strcmp(3)
- * Compare 2 strings and return the difference of the first non-matching character, or `0' if they are identical */
 __CEIREDIRECT(__ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1, 2)),int,__NOTHROW_NCX,__localdep_strcmp,(char const *__s1, char const *__s2),strcmp,{ return __builtin_strcmp(__s1, __s2); })
 #elif defined(__CRT_HAVE_strcmp)
-/* >> strcmp(3)
- * Compare 2 strings and return the difference of the first non-matching character, or `0' if they are identical */
 __CREDIRECT(__ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1, 2)),int,__NOTHROW_NCX,__localdep_strcmp,(char const *__s1, char const *__s2),strcmp,(__s1,__s2))
 #else /* ... */
 __NAMESPACE_LOCAL_END
 #include <libc/local/string/strcmp.h>
 __NAMESPACE_LOCAL_BEGIN
-/* >> strcmp(3)
- * Compare 2 strings and return the difference of the first non-matching character, or `0' if they are identical */
 #define __localdep_strcmp __LIBC_LOCAL_NAME(strcmp)
 #endif /* !... */
 #endif /* !__local___localdep_strcmp_defined */
-/* >> sl_find(3)
- * Search for `name' within the given StringList. Upon success,
- * return a pointer to the equivalent string within `sl' (i.e. the
- * pointer originally passed to `sl_add()' to insert that string).
- * If `sl' doesn't contain an equivalent string, return `NULL' instead. */
 __LOCAL_LIBC(sl_find) __ATTR_PURE __ATTR_NONNULL((1, 2)) char *
 __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(sl_find))(struct _stringlist __KOS_FIXED_CONST *__sl, char const *__name) {
 	__SIZE_TYPE__ __i, __count = __sl->sl_cur;

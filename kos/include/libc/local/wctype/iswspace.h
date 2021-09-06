@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x61658e72 */
+/* HASH CRC-32:0xa25dce84 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -23,7 +23,6 @@
 #include <__crt.h>
 #include <hybrid/typecore.h>
 __NAMESPACE_LOCAL_BEGIN
-/* Dependency: isspace from ctype */
 #ifndef __local___localdep_isspace_defined
 #define __local___localdep_isspace_defined 1
 #if __has_builtin(__builtin_isspace) && defined(__LIBC_BIND_CRTBUILTINS) && defined(__CRT_HAVE_isspace)

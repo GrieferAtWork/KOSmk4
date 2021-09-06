@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xdca2cdd1 */
+/* HASH CRC-32:0x80c5e8f3 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -25,13 +25,10 @@
 #include <kos/anno.h>
 #include <bits/types.h>
 __NAMESPACE_LOCAL_BEGIN
-/* Dependency: PRead32 from kos.unistd */
 #ifndef __local___localdep_PRead32_defined
 #define __local___localdep_PRead32_defined 1
 __CREDIRECT(__ATTR_NONNULL((2)),__SIZE_TYPE__,__THROWING,__localdep_PRead32,(__fd_t __fd, void *__buf, __SIZE_TYPE__ __bufsize, __pos32_t __offset),PRead,(__fd,__buf,__bufsize,__offset))
 #endif /* !__local___localdep_PRead32_defined */
-/* >> pread64(2)
- * Read data from a file at a specific offset */
 __LOCAL_LIBC(PRead64) __ATTR_NONNULL((2)) __SIZE_TYPE__
 (__LIBCCALL __LIBC_LOCAL_NAME(PRead64))(__fd_t __fd, void *__buf, __SIZE_TYPE__ __bufsize, __pos64_t __offset) __THROWS(...) {
 	return __localdep_PRead32(__fd, __buf, __bufsize, (__pos32_t)__offset);

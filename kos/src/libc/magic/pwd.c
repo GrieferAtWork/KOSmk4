@@ -105,7 +105,7 @@ void endpwent();
 
 @@Read an entry from the password-file stream, opening it if necessary
 @@return: * :                         A pointer to the read password entry
-@@return: NULL: (errno = <unchanged>) The last entry has already been read
+@@return: NULL: (errno = <unchanged>) The last  entry  has  already  been  read
 @@                                    (use `setpwent()' to rewind the database)
 @@return: NULL: (errno = <changed>)   Error (s.a. `errno')
 [[cp, decl_include("<bits/crt/db/passwd.h>")]]
@@ -445,7 +445,7 @@ nextline:
 
 %#ifdef __USE_GNU
 @@Re-construct the password-file line for the given uid in the
-@@given buffer. This knows the format that the caller will
+@@given  buffer. This  knows the  format that  the caller will
 @@expect, but this need not be the format of the password file
 [[cp, decl_include("<bits/types.h>")]]
 [[impl_include("<bits/types.h>", "<bits/crt/inttypes.h>")]]

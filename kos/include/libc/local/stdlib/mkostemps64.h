@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x480ef514 */
+/* HASH CRC-32:0xdbec5627 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -26,7 +26,6 @@
 #include <features.h>
 #include <bits/types.h>
 __NAMESPACE_LOCAL_BEGIN
-/* Dependency: mkostemps from stdlib */
 #ifndef __local___localdep_mkostemps_defined
 #define __local___localdep_mkostemps_defined 1
 #if defined(__CRT_HAVE_mkostemps64) && defined(__USE_FILE_OFFSET64)

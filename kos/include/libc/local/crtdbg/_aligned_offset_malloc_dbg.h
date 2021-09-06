@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x72fef16b */
+/* HASH CRC-32:0x39f71bb0 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -24,7 +24,6 @@
 #if defined(__CRT_HAVE__aligned_offset_malloc) || defined(__CRT_HAVE_malloc) || defined(__CRT_HAVE_calloc) || defined(__CRT_HAVE_realloc) || defined(__CRT_HAVE_memalign) || defined(__CRT_HAVE_aligned_alloc) || defined(__CRT_HAVE_posix_memalign)
 #include <hybrid/typecore.h>
 __NAMESPACE_LOCAL_BEGIN
-/* Dependency: _aligned_offset_malloc from stdlib */
 #ifndef __local___localdep__aligned_offset_malloc_defined
 #define __local___localdep__aligned_offset_malloc_defined 1
 #ifdef __CRT_HAVE__aligned_offset_malloc

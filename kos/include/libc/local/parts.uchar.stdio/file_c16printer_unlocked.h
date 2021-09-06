@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x2f506119 */
+/* HASH CRC-32:0xc57b1361 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -25,7 +25,6 @@
 #include <hybrid/typecore.h>
 #include <kos/anno.h>
 __NAMESPACE_LOCAL_BEGIN
-/* Dependency: fputc16_unlocked from parts.uchar.stdio */
 #ifndef __local___localdep_fputc16_unlocked_defined
 #define __local___localdep_fputc16_unlocked_defined 1
 #if defined(__CRT_HAVE_fputwc_unlocked) && __SIZEOF_WCHAR_T__ == 2 && defined(__LIBCCALL_IS_LIBDCALL)
@@ -43,8 +42,6 @@ __CREDIRECT_DOS(__ATTR_NONNULL((2)),__WINT_TYPE__,__THROWING,__localdep_fputc16_
 __NAMESPACE_LOCAL_END
 #include <asm/crt/stdio.h>
 __NAMESPACE_LOCAL_BEGIN
-/* >> file_wprinter_unlocked(3)
- * Same as `file_wprinter()', but performs I/O without acquiring a lock to `(FILE *)arg' */
 __LOCAL_LIBC(file_c16printer_unlocked) __ATTR_NONNULL((1, 2)) __SSIZE_TYPE__
 (__LIBDCALL __LIBC_LOCAL_NAME(file_c16printer_unlocked))(void *__arg, __CHAR16_TYPE__ const *__restrict __data, __SIZE_TYPE__ __datalen) __THROWS(...) {
 	__SIZE_TYPE__ __i;

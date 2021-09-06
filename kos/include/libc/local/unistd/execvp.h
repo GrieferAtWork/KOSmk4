@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xcb716e42 */
+/* HASH CRC-32:0xfa480733 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -35,34 +35,21 @@
 #endif /* !__USE_DOS_ALTERATIONS */
 #endif /* !__TARGV */
 __NAMESPACE_LOCAL_BEGIN
-/* Dependency: execvpe from unistd */
 #ifndef __local___localdep_execvpe_defined
 #define __local___localdep_execvpe_defined 1
 #ifdef __CRT_HAVE_execvpe
-/* >> execvpe(3)
- * Replace the calling process with the application image referred to by `file' and
- * execute it's `main()' method, passing the given `argv', and setting `environ' to `envp' */
 __CREDIRECT(__ATTR_NONNULL((1, 2, 3)),int,__NOTHROW_RPC,__localdep_execvpe,(char const *__restrict __file, __TARGV, __TENVP),execvpe,(__file,___argv,___envp))
 #elif defined(__CRT_HAVE__execvpe)
-/* >> execvpe(3)
- * Replace the calling process with the application image referred to by `file' and
- * execute it's `main()' method, passing the given `argv', and setting `environ' to `envp' */
 __CREDIRECT(__ATTR_NONNULL((1, 2, 3)),int,__NOTHROW_RPC,__localdep_execvpe,(char const *__restrict __file, __TARGV, __TENVP),_execvpe,(__file,___argv,___envp))
 #elif (defined(__CRT_HAVE_execve) || defined(__CRT_HAVE__execve)) && defined(__hybrid_alloca)
 __NAMESPACE_LOCAL_END
 #include <libc/local/unistd/execvpe.h>
 __NAMESPACE_LOCAL_BEGIN
-/* >> execvpe(3)
- * Replace the calling process with the application image referred to by `file' and
- * execute it's `main()' method, passing the given `argv', and setting `environ' to `envp' */
 #define __localdep_execvpe __LIBC_LOCAL_NAME(execvpe)
 #else /* ... */
 #undef __local___localdep_execvpe_defined
 #endif /* !... */
 #endif /* !__local___localdep_execvpe_defined */
-/* >> execvp(3)
- * Replace the calling process with the application image referred to by `path' / `file'
- * and execute it's `main()' method, passing the given `argv', and setting `environ' to `envp' */
 __LOCAL_LIBC(execvp) __ATTR_NONNULL((1, 2)) int
 __NOTHROW_RPC(__LIBCCALL __LIBC_LOCAL_NAME(execvp))(char const *__restrict __file, __TARGV) {
 	return __localdep_execvpe(__file, ___argv, __LOCAL_environ);

@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x14d94d07 */
+/* HASH CRC-32:0xb082191f */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -24,32 +24,18 @@
 #include <asm/os/socket.h>
 #if defined(__CRT_HAVE_getsockopt) && defined(__SOL_SOCKET) && defined(__SO_PEERCRED)
 __NAMESPACE_LOCAL_BEGIN
-/* Dependency: getsockopt from sys.socket */
 #ifndef __local___localdep_getsockopt_defined
 #define __local___localdep_getsockopt_defined 1
 __NAMESPACE_LOCAL_END
 #include <features.h>
 #include <bits/types.h>
 __NAMESPACE_LOCAL_BEGIN
-/* >> getsockopt(2)
- * Get the value of the named socket option `level:optname' and store it in `optval'
- * @param: level:   One of `SOL_*' (e.g.: `SOL_SOCKET')
- * @param: optname: Dependent on `level'
- * @param: optval:  Buffer for where to write the value of the socket option.
- * @param: optlen:  [in]  The amount of available memory starting at `optval'
- *                  [out] The amount of required memory for the option value.
- *                        This may be more than was given, in which case
- *                        the contents of `optval' are undefined.
- * @return: 0 : Success
- * @return: -1: [errno=ENOPROTOOPT] E_INVALID_ARGUMENT_SOCKET_OPT:E_INVALID_ARGUMENT_CONTEXT_GETSOCKOPT */
 __CREDIRECT(__ATTR_NONNULL((4, 5)),int,__NOTHROW_NCX,__localdep_getsockopt,(__fd_t __sockfd, __STDC_INT_AS_UINT_T __level, __STDC_INT_AS_UINT_T __optname, void *__restrict __optval, __socklen_t *__restrict __optlen),getsockopt,(__sockfd,__level,__optname,__optval,__optlen))
 #endif /* !__local___localdep_getsockopt_defined */
 __NAMESPACE_LOCAL_END
 #include <bits/os/ucred.h>
 #include <libc/errno.h>
 __NAMESPACE_LOCAL_BEGIN
-/* >> getpeereid(3)
- * Convenience wrapper for `getsockopt(sockfd, SOL_SOCKET, SO_PEERCRED)' */
 __LOCAL_LIBC(getpeereid) __ATTR_NONNULL((2, 3)) int
 __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(getpeereid))(__fd_t __sockfd, __uid_t *__euid, __gid_t *__egid) {
 	int __result;

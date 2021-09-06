@@ -263,7 +263,7 @@ typedef struct entry {
 @@>> hsearch(3)
 @@Search for entry matching `item.key' in internal hash table.
 @@If `action' is `FIND' return found entry or signal error by returning `NULL'.
-@@If `action' is `ENTER' replace existing data (if any) with `item.data'
+@@If  `action'  is  `ENTER' replace  existing  data (if  any)  with `item.data'
 [[decl_prefix(struct entry;)]]
 [[impl_prefix(DEFINE_HSEARCH_DATA), impl_prefix(DEFINE_HSEARCH_HTAB)]]
 [[requires_function(hsearch_r)]]
@@ -463,7 +463,7 @@ typedef int (__LIBCCALL *__compar_fn_t)(void const *__a, void const *__b);
 )]
 
 @@>> tsearch(3)
-@@Search for an entry matching the given `key' in the tree
+@@Search for an  entry matching  the given `key'  in the  tree
 @@pointed to by `*rootp' and insert a new element if not found
 [[decl_prefix(DEFINE_COMPAR_FN_T)]]
 [[requires_function(malloc), export_alias("__tsearch")]]
@@ -591,7 +591,7 @@ void *tsearch(void const *key,
 
 @@>> tfind(3)
 @@Search for an entry matching the given `key' in the tree pointed
-@@to by `*rootp'. If no matching entry is available return `NULL'
+@@to  by `*rootp'. If no matching entry is available return `NULL'
 [[decl_prefix(DEFINE_COMPAR_FN_T)]]
 [[export_alias("__tfind")]]
 void *tfind(void const *key,
@@ -917,7 +917,7 @@ void *lfind(void const *key, [[nonnull]] void const *base, [[nonnull]] size_t __
 
 @@>> lsearch(3)
 @@Perform linear search for `key' by comparing by `compar' function
-@@in array [base, base+nmemb*size) and insert entry if not found
+@@in array [base,  base+nmemb*size) and insert  entry if not  found
 [[decl_prefix(DEFINE_COMPAR_FN_T), decl_include("<hybrid/typecore.h>")]]
 void *lsearch(void const *key, [[nonnull]] void *base,
               [[nonnull]] size_t *nmemb,

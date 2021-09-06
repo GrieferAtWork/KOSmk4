@@ -61,7 +61,7 @@ char *ether_ntoa([[nonnull]] struct ether_addr const *__restrict addr) {
 	return buf;
 }
 
-@@To the reverse of `ether_ntoa()' and convert
+@@To   the   reverse  of   `ether_ntoa()'   and  convert
 @@a `AA:BB:CC:DD:EE:FF'-string into an ethernet address.
 [[decl_prefix(struct ether_addr;)]]
 [[wunused, nonnull, impl_include("<net/ethernet.h>")]]
@@ -125,11 +125,11 @@ struct ether_addr *ether_paton_r([[nonnull]] char const **__restrict pasc,
 }
 %#endif /* __USE_KOS */
 
-@@Scan a given `line', as read from `/etc/ethers' for
-@@its `addr' and `hostname' parts. For this purpose, the given
+@@Scan  a  given  `line',   as  read  from  `/etc/ethers'   for
+@@its `addr' and `hostname' parts. For this purpose, the  given
 @@`line' must be formatted as `AA:BB:CC:DD:EE:FF  hostname  \n'
 @@@return: 0 : Success
-@@@return: -1: Failed to parse the `addr'-portion
+@@@return: -1: Failed to parse the  `addr'-portion
 @@             (`ether_paton_r()' returned `NULL')
 [[decl_prefix(struct ether_addr;)]]
 [[wunused, impl_include("<net/ethernet.h>")]]

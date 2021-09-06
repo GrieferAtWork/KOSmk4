@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xc5cc9c63 */
+/* HASH CRC-32:0x65ddfe02 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -23,30 +23,24 @@
 #include <__crt.h>
 #include <hybrid/typecore.h>
 __NAMESPACE_LOCAL_BEGIN
-/* Dependency: c16schrnul from parts.uchar.string */
 #ifndef __local___localdep_c16schrnul_defined
 #define __local___localdep_c16schrnul_defined 1
 #if defined(__CRT_HAVE_wcschrnul) && __SIZEOF_WCHAR_T__ == 2 && defined(__LIBCCALL_IS_LIBDCALL)
-/* Same as `wcschr', but return `wcsend(str)', rather than `NULL' if `needle' wasn't found. */
 __CREDIRECT(__ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1)),__CHAR16_TYPE__ *,__NOTHROW_NCX,__localdep_c16schrnul,(__CHAR16_TYPE__ const *__haystack, __CHAR16_TYPE__ __needle),wcschrnul,(__haystack,__needle))
 #elif defined(__CRT_HAVE_DOS$wcschrnul)
-/* Same as `wcschr', but return `wcsend(str)', rather than `NULL' if `needle' wasn't found. */
 __CREDIRECT_DOS(__ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1)),__CHAR16_TYPE__ *,__NOTHROW_NCX,__localdep_c16schrnul,(__CHAR16_TYPE__ const *__haystack, __CHAR16_TYPE__ __needle),wcschrnul,(__haystack,__needle))
 #elif __SIZEOF_WCHAR_T__ == 2
 __NAMESPACE_LOCAL_END
 #include <libc/local/wchar/wcschrnul.h>
 __NAMESPACE_LOCAL_BEGIN
-/* Same as `wcschr', but return `wcsend(str)', rather than `NULL' if `needle' wasn't found. */
 #define __localdep_c16schrnul (*(__CHAR16_TYPE__ *(__LIBDCALL *)(__CHAR16_TYPE__ const *, __CHAR16_TYPE__))&__LIBC_LOCAL_NAME(wcschrnul))
 #else /* ... */
 __NAMESPACE_LOCAL_END
 #include <libc/local/parts.uchar.string/c16schrnul.h>
 __NAMESPACE_LOCAL_BEGIN
-/* Same as `wcschr', but return `wcsend(str)', rather than `NULL' if `needle' wasn't found. */
 #define __localdep_c16schrnul __LIBC_LOCAL_NAME(c16schrnul)
 #endif /* !... */
 #endif /* !__local___localdep_c16schrnul_defined */
-/* Same as `wcschrnul', but return the offset from `str', rather than the actual address */
 __LOCAL_LIBC(c16soff) __ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1)) __SIZE_TYPE__
 __NOTHROW_NCX(__LIBDCALL __LIBC_LOCAL_NAME(c16soff))(__CHAR16_TYPE__ const *__restrict __haystack, __CHAR16_TYPE__ __needle) {
 	return (__SIZE_TYPE__)(__localdep_c16schrnul(__haystack, __needle) - __haystack);

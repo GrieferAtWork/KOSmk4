@@ -340,7 +340,7 @@ INTDEF WUNUSED ATTR_CONST ATTR_RETNONNULL char ***NOTHROW(LIBCCALL libc_p_enviro
 
 
 @@>> execv(3)
-@@Replace the calling process with the application image referred to by `path' / `file'
+@@Replace the calling  process with  the application  image referred  to by  `path' /  `file'
 @@and execute it's `main()' method, passing the given `argv', and setting `environ' to `envp'
 [[cp, guard, dos_only_export_alias("_execv"), argument_names(path, ___argv)]]
 [[if(__has_builtin(__builtin_execv) && defined(__LIBC_BIND_CRTBUILTINS)),
@@ -353,7 +353,7 @@ int execv([[nonnull]] char const *__restrict path, [[nonnull]] __TARGV) {
 }
 
 @@>> execve(2)
-@@Replace the calling process with the application image referred to by `path' / `file'
+@@Replace the calling  process with  the application  image referred  to by  `path' /  `file'
 @@and execute it's `main()' method, passing the given `argv', and setting `environ' to `envp'
 [[cp, guard, dos_only_export_alias("_execve"), argument_names(path, ___argv, ___envp)]]
 [[decl_include("<features.h>"), decl_prefix(DEFINE_TARGV)]]
@@ -362,7 +362,7 @@ int execv([[nonnull]] char const *__restrict path, [[nonnull]] __TARGV) {
 int execve([[nonnull]] char const *__restrict path, [[nonnull]] __TARGV, [[nonnull]] __TENVP);
 
 @@>> execvp(3)
-@@Replace the calling process with the application image referred to by `path' / `file'
+@@Replace the calling  process with  the application  image referred  to by  `path' /  `file'
 @@and execute it's `main()' method, passing the given `argv', and setting `environ' to `envp'
 [[cp, guard, dos_only_export_alias("_execvp"), argument_names(file, ___argv)]]
 [[decl_include("<features.h>"), decl_prefix(DEFINE_TARGV)]]
@@ -377,7 +377,7 @@ int execvp([[nonnull]] char const *__restrict file, [[nonnull]] __TARGV) {
 
 @@>> execl(3)
 @@Replace the calling process with the application image referred to by `path' / `file'
-@@and execute it's `main()' method, passing the list of NULL-terminated `args'-list
+@@and execute it's  `main()' method,  passing the list  of NULL-terminated  `args'-list
 [[cp, guard, ATTR_SENTINEL, dos_only_export_alias("_execl"), impl_include("<parts/redirect-exec.h>")]]
 [[requires_dependent_function(execv), crtbuiltin]]
 int execl([[nonnull]] char const *__restrict path, char const *args, ... /*, (char *)NULL*/) {
@@ -386,7 +386,7 @@ int execl([[nonnull]] char const *__restrict path, char const *args, ... /*, (ch
 
 @@>> execle(3)
 @@Replace the calling process with the application image referred to by `path' / `file'
-@@and execute it's `main()' method, passing the list of NULL-terminated `args'-list,
+@@and  execute it's `main()'  method, passing the  list of NULL-terminated `args'-list,
 @@and setting `environ' to a `char **' passed after the NULL sentinel
 [[cp, guard, impl_include("<parts/redirect-exec.h>"), dos_only_export_alias("_execle"), crtbuiltin]]
 [[requires_dependent_function(execve), ATTR_SENTINEL_O(1)]]
@@ -396,7 +396,7 @@ int execle([[nonnull]] char const *__restrict path, char const *args, ... /*, (c
 
 @@>> execlp(3)
 @@Replace the calling process with the application image referred to by `path' / `file'
-@@and execute it's `main()' method, passing the list of NULL-terminated `args'-list
+@@and execute it's  `main()' method,  passing the list  of NULL-terminated  `args'-list
 [[cp, guard, impl_include("<parts/redirect-exec.h>"), dos_only_export_alias("_execlp")]]
 [[requires_dependent_function(execvp), ATTR_SENTINEL, crtbuiltin]]
 int execlp([[nonnull]] char const *__restrict file, char const *args, ... /*, (char *)NULL*/) {
@@ -406,7 +406,7 @@ int execlp([[nonnull]] char const *__restrict file, char const *args, ... /*, (c
 %
 %#if defined(__USE_KOS) || defined(__USE_DOS) || defined(__USE_GNU) || defined(__USE_NETBSD)
 @@>> execvpe(3)
-@@Replace the calling process with the application image referred to by `file' and
+@@Replace the  calling process  with the  application  image referred  to by  `file'  and
 @@execute it's `main()' method, passing the given `argv', and setting `environ' to `envp'
 [[cp, guard, dos_only_export_alias("_execvpe"), argument_names(file, ___argv, ___envp)]]
 [[requires_include("<hybrid/__alloca.h>"), dependency(mempcpyc)]]
@@ -485,7 +485,7 @@ int execvpe([[nonnull]] char const *__restrict file,
 %#if defined(__USE_KOS) || defined(__USE_DOS) || defined(__USE_NETBSD)
 @@>> execlpe(3)
 @@Replace the calling process with the application image referred to by `path' / `file'
-@@and execute it's `main()' method, passing the list of NULL-terminated `args'-list,
+@@and  execute it's `main()'  method, passing the  list of NULL-terminated `args'-list,
 @@and setting `environ' to a `char **' passed after the NULL sentinel
 [[cp, guard, impl_include("<parts/redirect-exec.h>"), dos_only_export_alias("_execlpe")]]
 [[requires_dependent_function(execvpe), ATTR_SENTINEL_O(1)]]
@@ -537,7 +537,7 @@ unsigned int sleep(unsigned int seconds) {
 
 @@>> fsync(2)
 @@Synchronize a file (including its descriptor which contains timestamps, and its size),
-@@meaning that changes to its data and/or descriptor are written to disk
+@@meaning  that  changes   to  its   data  and/or   descriptor  are   written  to   disk
 [[cp, dos_only_export_alias("_commit"), alias("fdatasync")]]
 [[userimpl, section(".text.crt{|.dos}.io.sync")]]
 [[decl_include("<bits/types.h>")]]
@@ -568,7 +568,7 @@ $pid_t getpgrp();
 %[insert:function(__getpgid = getpgid)]
 
 @@>> setpgid(2)
-@@Change the ID of the process group associated with `pid's process.
+@@Change  the ID of  the process group  associated with `pid's process.
 @@(That is the TID of the leader of the process group of `pid's leader)
 @@THREAD[PID]->LEADER->GROUP_LEADER = THREAD[PGID]
 @@When `pid' is ZERO(0), use `gettid()' for it instead.
@@ -579,7 +579,7 @@ int setpgid($pid_t pid, $pid_t pgid);
 
 @@>> setsid(2)
 @@Make the calling thread's process the leader of its associated
-@@process group, before also making it its own session leader.
+@@process group, before also making  it its own session  leader.
 @@Then return the TID of that new session leader, which is also the PID of the calling process.
 @@ - THIS_THREAD->LEADER->GROUP_LEADER                 = THIS_THREAD->LEADER;
 @@ - THIS_THREAD->LEADER->GROUP_LEADER->SESSION_LEADER = THIS_THREAD->LEADER->GROUP_LEADER;
@@ -635,11 +635,11 @@ int setgid($gid_t gid);
 
 @@>> fork(2)
 @@Clone the calling thread into a second process and return twice, once
-@@in the parent process where this function returns the (non-zero) PID
-@@of the forked child process, and a second time in the child process
+@@in  the parent process where this function returns the (non-zero) PID
+@@of  the forked child process, and a  second time in the child process
 @@itself, where ZERO(0) is returned.
 @@The child then usually proceeds by calling `exec(2)' to replace its
-@@application image with that of another program that the original
+@@application image with  that of another  program that the  original
 @@parent can then `wait(2)' for. (s.a. `vfork(2)')
 @@@return: 0 : You're the new process that was created
 @@@return: * : The `return' value is the pid of your new child process
@@ -664,7 +664,7 @@ unsigned int alarm(unsigned int seconds);
 int pause();
 
 @@>> fpathconf(2)
-@@@param: name: One of `_PC_*' from <asm/crt/confname.h>
+@@@param: name: One   of    `_PC_*'    from    <asm/crt/confname.h>
 @@Return a path configuration value associated with `name' for `fd'
 @@return: * : The configuration limit associated with `name' for `fd'
 @@return: -1: [errno=<unchanged>] The configuration specified by `name' is unlimited for `fd'
@@ -761,7 +761,7 @@ int link([[nonnull]] char const *from, [[nonnull]] char const *to) {
 
 @@>> read(2)
 @@Read up to `bufsize' bytes from `fd' into `buf'
-@@When `fd' has the `O_NONBLOCK' flag set, only read as much data as was
+@@When `fd' has the  `O_NONBLOCK' flag set,  only read as  much data as  was
 @@available at the time the call was made, and throw E_WOULDBLOCK if no data
 @@was available at the time.
 @@@return: <= bufsize: The actual amount of read bytes
@@ -772,7 +772,7 @@ ssize_t read($fd_t fd, [[outp(bufsize)]] void *buf, size_t bufsize);
 
 @@>> write(2)
 @@Write up to `bufsize' bytes from `buf' into `fd'
-@@When `fd' has the `O_NONBLOCK' flag set, only write as much data
+@@When `fd' has the `O_NONBLOCK' flag set, only write as much  data
 @@as possible at the time the call was made, and throw E_WOULDBLOCK
 @@if no data could be written at the time.
 @@@return: <= bufsize: The actual amount of written bytes
@@ -783,10 +783,10 @@ ssize_t write($fd_t fd, [[inp(bufsize)]] void const *buf, size_t bufsize);
 
 %#ifdef __USE_KOS
 @@>> readall(3)
-@@Same as `read(2)', however keep on reading until `read()' indicates EOF (causing
+@@Same  as `read(2)', however  keep on reading until  `read()' indicates EOF (causing
 @@`readall()' to immediately return `0') or the entirety of the given buffer has been
 @@filled (in which case `bufsize' is returned).
-@@If an error occurs before all data could be read, try to use SEEK_CUR to rewind
+@@If  an error occurs before all data could be read, try to use SEEK_CUR to rewind
 @@the file descriptor by the amount of data that had already been loaded. - Errors
 @@during this phase are silently ignored and don't cause `errno' to change
 [[cp, guard, section(".text.crt{|.dos}.io.read"), impl_include("<libc/errno.h>")]]
@@ -821,7 +821,7 @@ ssize_t readall($fd_t fd, [[outp(bufsize)]] void *buf, size_t bufsize) {
 }
 
 @@>> writeall(3)
-@@Same as `write(2)', however keep on writing until `write()' indicates EOF (causing
+@@Same as `write(2)', however keep on  writing until `write()' indicates EOF  (causing
 @@`writeall()' to immediately return `0') or the entirety of the given buffer has been
 @@written (in which case `bufsize' is returned).
 [[cp, guard, section(".text.crt{|.dos}.io.write"), impl_include("<libc/errno.h>")]]
@@ -1000,7 +1000,7 @@ int linkat($fd_t fromfd, [[nonnull]] char const *from,
            $fd_t tofd, [[nonnull]] char const *to, $atflag_t flags);
 
 @@>> symlinkat(3)
-@@Create a new symbolic link loaded with `link_text' as link
+@@Create  a  new  symbolic  link  loaded  with  `link_text'  as link
 @@text, at the filesystem location referred to by `tofd:target_path'
 [[cp, decl_include("<bits/types.h>")]]
 int symlinkat([[nonnull]] char const *link_text, $fd_t tofd,
@@ -1010,7 +1010,7 @@ int symlinkat([[nonnull]] char const *link_text, $fd_t tofd,
 
 @@>> readlinkat(2)
 @@Read the text of a symbolic link under `dfd:path' into the provided buffer.
-@@WARNING: This function is badly designed and will neither append a trailing
+@@WARNING: This  function is badly designed and will neither append a trailing
 @@         NUL-character to the buffer, nor will it return the required buffer
 @@         size. Instead, it will return the written size, and the caller must
 @@         keep on over allocating until the function indicates that it didn't
@@ -1466,29 +1466,29 @@ $useconds_t ualarm($useconds_t value, $useconds_t interval);
 
 @@>> vfork(2)
 @@Same as `fork(2)', but the child process may be executed within in the same VM
-@@as the parent process, with the parent process remaining suspended until the
+@@as the parent process, with the  parent process remaining suspended until  the
 @@child process invokes one of the following system calls:
 @@  - `_exit(2)'  Terminate the child process. Be sure to use `_exit' (or `_Exit')
-@@                instead of the regular `exit(3)', since the later would include
-@@                the invocation of `atexit(3)' handlers, which would then run in
+@@                instead of the regular `exit(3)', since the later would  include
+@@                the invocation of `atexit(3)' handlers, which would then run  in
 @@                the context of a VM that isn't actually about to be destroyed.
 @@  - `execve(2)' Create a new VM that is populated with the specified process
-@@                image. The parent process will only be resumed in case the
-@@                new program image could be loaded successfully. Otherwise,
-@@                the call to `execve(2)' returns normally in the child.
+@@                image. The parent process will  only be resumed in case  the
+@@                new  program image could  be loaded successfully. Otherwise,
+@@                the call  to  `execve(2)'  returns normally  in  the  child.
 @@                Other functions from the exec()-family behave the same
 @@
-@@Care must be taken when using this system call, since you have to make sure that
-@@the child process doesn't clobber any part of its (shared) stack that may be re-
-@@used once execution resumes in the parent process. The same also goes for heap
-@@functions, but generally speaking: you really shouldn't do anything that isn't
+@@Care  must be taken when using this system call, since you have to make sure that
+@@the  child process doesn't clobber any part of its (shared) stack that may be re-
+@@used once execution resumes in  the parent process. The  same also goes for  heap
+@@functions,  but generally speaking:  you really shouldn't  do anything that isn't
 @@reentrant after calling any one of the fork() functions (since anything but would
-@@rely on underlying implementations making proper use of pthread_atfork(3), which
-@@is something that KOS intentionally doesn't do, since I feel like doing so only
+@@rely on underlying implementations making proper use of pthread_atfork(3),  which
+@@is something that KOS intentionally doesn't do,  since I feel like doing so  only
 @@adds unnecessary bloat to code that doesn't rely on this)
 @@
 @@Additionally, this system call may be implemented as an alias for `fork(2)', in
-@@which case the parent process will not actually get suspended until the child
+@@which  case the parent process will not  actually get suspended until the child
 @@process performs any of the actions above.
 [[guard, section(".text.crt{|.dos}.sched.access"), export_alias("__vfork")]]
 [[ATTR_RETURNS_TWICE, wunused, decl_include("<bits/types.h>")]]
@@ -1508,7 +1508,7 @@ int fchown($fd_t fd, $uid_t owner, $gid_t group);
 int fchdir($fd_t fd);
 
 @@>> getpgid(2)
-@@Return the ID of the process group associated with `pid's process.
+@@Return  the ID of  the process group  associated with `pid's process.
 @@(That is the TID of the leader of the process group of `pid's leader)
 @@THREAD[PID]->LEADER->GROUP_LEADER->PID
 @@When `pid' is ZERO(0), use `gettid()' for it instead
@@ -1518,14 +1518,14 @@ $pid_t getpgid($pid_t pid);
 
 @@>> getsid(2)
 @@Return the ID of the session which a process `pid' is apart of.
-@@return THREAD[PID]->LEADER->GROUP_LEADER->SESSION_LEADER->PID;
+@@return  THREAD[PID]->LEADER->GROUP_LEADER->SESSION_LEADER->PID;
 [[wunused, section(".text.crt{|.dos}.sched.process")]]
 [[decl_include("<bits/types.h>")]]
 $pid_t getsid($pid_t pid);
 
 @@>> lchown(2)
 @@Change the ownership of a given `file' to `group:owner',
-@@but don't reference it if that file is a symbolic link
+@@but don't reference it if  that file is a symbolic  link
 [[cp, section(".text.crt{|.dos}.fs.modify"), decl_include("<bits/types.h>")]]
 [[userimpl, requires_include("<asm/os/fcntl.h>")]]
 [[requires(defined(__AT_FDCWD) && defined(__AT_SYMLINK_NOFOLLOW) && $has_function(fchownat))]]
@@ -1609,7 +1609,7 @@ int truncate64([[nonnull]] char const *file, __PIO_OFFSET64 length) {
 %#ifdef __USE_XOPEN2K8
 
 @@>> fexecve(2)
-@@Replace the calling process with the application image referred to by `fd' and
+@@Replace the  calling  process  with the  application  image  referred to  by  `fd'  and
 @@execute it's `main()' method, passing the given `argv', and setting `environ' to `envp'
 [[cp, guard, argument_names(fd, ___argv, ___envp)]]
 [[decl_include("<features.h>"), decl_prefix(DEFINE_TARGV)]]
@@ -1675,7 +1675,7 @@ int unistd_getopt(int argc, char *const argv[], char const *shortopts);
 %#if defined(__USE_MISC) || defined(__USE_XOPEN_EXTENDED)
 
 @@>> sync(2)
-@@Synchronize all disk operations of all mounted file systems and flush
+@@Synchronize all disk  operations of  all mounted file  systems and  flush
 @@unwritten buffers down to the hardware layer, ensuring that modifications
 @@made become visible on the underlying, persistent media
 [[cp, userimpl, section(".text.crt{|.dos}.fs.modify")]]
@@ -1784,7 +1784,7 @@ int ttyslot();
 %#if defined(__USE_XOPEN_EXTENDED) || defined(__USE_XOPEN2K)
 
 @@>> symlink(3)
-@@Create a new symbolic link loaded with `link_text' as link
+@@Create  a new  symbolic link  loaded with  `link_text' as link
 @@text, at the filesystem location referred to by `target_path'.
 @@Same as `symlinkat(link_text, AT_FDCWD, target_path)'
 [[cp, section(".text.crt{|.dos}.fs.modify")]]
@@ -1799,7 +1799,7 @@ int symlink([[nonnull]] char const *link_text,
 @@>> readlink(3)
 @@Read the text of a symbolic link under `path' into the provided buffer.
 @@Same as `readlinkat(AT_FDCWD, path, buf, buflen)'
-@@WARNING: This function is badly designed and will neither append a trailing
+@@WARNING: This  function is badly designed and will neither append a trailing
 @@         NUL-character to the buffer, nor will it return the required buffer
 @@         size. Instead, it will return the written size, and the caller must
 @@         keep on over allocating until the function indicates that it didn't
@@ -1950,7 +1950,7 @@ __LONG64_TYPE__ syscall64($syscall_ulong_t sysno, ...);
 %
 %#if (defined(__USE_MISC) || (defined(__USE_XOPEN) && !defined(__USE_XOPEN2K)))
 @@>> chroot(2)
-@@Change the root directory of the calling `CLONE_FS' group of threads
+@@Change  the root directory of the calling `CLONE_FS' group of threads
 @@(usually the process) to a path that was previously address by `path'
 [[cp, section(".text.crt{|.dos}.fs.utility")]]
 int chroot([[nonnull]] char const *__restrict path);
@@ -2005,7 +2005,7 @@ int ftruncate64($fd_t fd, __PIO_OFFSET64 length) {
 %
 %#if (defined(__USE_XOPEN_EXTENDED) && !defined(__USE_XOPEN2K)) || defined(__USE_MISC)
 @@>> brk(2), sbrk(2)
-@@Change the program break, allowing for a rudimentary implementation of a heap.
+@@Change the  program  break,  allowing  for a  rudimentary  implementation  of  a  heap.
 @@It is recommended to use the much more advanced functions found in <sys/mman.h> instead
 [[section(".text.crt{|.dos}.heap.utility")]]
 int brk(void *addr);
@@ -2019,7 +2019,7 @@ void *sbrk(intptr_t delta);
 %#if defined(__USE_POSIX199309) || defined(__USE_UNIX98)
 @@>> fdatasync(2)
 @@Synchronize only the data of a file (not its descriptor which contains
-@@timestamps, and its size), meaning that changes are written to disk
+@@timestamps,  and its size),  meaning that changes  are written to disk
 [[cp, decl_include("<bits/types.h>"), alias("fsync", "_commit")]]
 [[userimpl, section(".text.crt{|.dos}.io.sync")]]
 int fdatasync($fd_t fd) {
@@ -2061,7 +2061,7 @@ void swab([[nonnull]] void const *__restrict from,
 %#if defined(_EVERY_SOURCE) || defined(__USE_SOLARIS) || (defined(__USE_XOPEN) && !defined(__USE_XOPEN2K))
 @@>> ctermid(3)
 @@Writes the string "/dev/tty" to `s', or returns a pointer to
-@@a writable data location that contains that same string.
+@@a writable  data location  that contains  that same  string.
 [[guard, section(".text.crt{|.dos}.io.tty")]]
 [[nonnull]] char *ctermid([[nullable]] char *s) {
 	static char buf[9];
@@ -2072,10 +2072,10 @@ void swab([[nonnull]] void const *__restrict from,
 
 @@>> cuserid(3)
 @@Return the name of the current user (`$LOGNAME' or `getpwuid(geteuid())'), storing
-@@that name in `s'. When `s' is NULL, a static buffer is used instead
-@@When given, `s' must be a buffer of at least `L_cuserid' bytes.
-@@If the actual username is longer than this, it may be truncated, and programs
-@@that wish to support longer usernames should make use of `getlogin_r()' instead.
+@@that  name  in  `s'.  When  `s'  is   NULL,  a  static  buffer  is  used   instead
+@@When  given,   `s'   must  be   a   buffer   of  at   least   `L_cuserid'   bytes.
+@@If the actual  username is longer  than this,  it may be  truncated, and  programs
+@@that wish to support longer usernames  should make use of `getlogin_r()'  instead.
 @@s.a. `getlogin()' and `getlogin_r()'
 [[section(".text.crt{|.dos}.io.tty")]]
 [[guard, requires_function(getlogin_r)]]
@@ -2184,36 +2184,36 @@ typedef __sa_family_t sa_family_t; /* One of `AF_*' */
 }
 
 @@>> getpassfd(3)
-@@This function behaves similar to `readpassphrase(3)', but is still
-@@quite distinct from that function in how this one behaves, vs. how
-@@that other function behaves. In general, this function is a bit more
-@@user-friendly, in that it offers more (but different) `flags' to
+@@This function behaves  similar to `readpassphrase(3)',  but is  still
+@@quite  distinct from that  function in how this  one behaves, vs. how
+@@that other function behaves. In general, this function is a bit  more
+@@user-friendly, in  that it  offers more  (but different)  `flags'  to
 @@control how the password prompt is generated, with the main advantage
-@@of this function being that it implements some "advanced" readline
-@@functionality, such as deleting typed characters without relying on
-@@the system TTY canonical buffer (which `readpassphrase(3)' needs,
-@@since it doesn't include support for _any_ control characters other
+@@of this function  being that it  implements some "advanced"  readline
+@@functionality, such as deleting  typed characters without relying  on
+@@the  system  TTY canonical  buffer (which  `readpassphrase(3)' needs,
+@@since it doesn't include support  for _any_ control characters  other
 @@that CR/LF as indicators to stop reading text)
 @@Which of the 2 functions should be used is a matter of taste, but
-@@personally, I prefer this one over `readpassphrase(3)'.
+@@personally,   I   prefer  this   one   over  `readpassphrase(3)'.
 @@@param: prompt:  [0..1]      Text-prompt to display to the user, or `NULL'
 @@@param: buf:     [0..buflen] Buffer that will receive the user's password.
-@@                             When set to `NULL', a dynamically allocated
+@@                             When set to  `NULL', a dynamically  allocated
 @@                             buffer will be used and returned.
 @@@param: buflen:              Size of `buf' (in characters) (ignored when `buf == NULL')
-@@@param: fds:     [0..1]      When non-NULL, an [stdin,stdout,stderr] triple
+@@@param: fds:     [0..1]      When non-NULL,  an [stdin,stdout,stderr]  triple
 @@                             of files, used for [read,write,beep] operations.
-@@                             When `NULL', try to use `/dev/tty' instead, and
-@@                             if that fails, use `STDIN_FILENO,STDERR_FILENO,
+@@                             When  `NULL', try to use `/dev/tty' instead, and
+@@                             if that fails, use  `STDIN_FILENO,STDERR_FILENO,
 @@                             STDERR_FILENO' as final fallback.
-@@                             When `GETPASS_NEED_TTY' is set, the function
+@@                             When `GETPASS_NEED_TTY' is set, the  function
 @@                             will fail with `errno=ENOTTY' if the actually
 @@                             used `fds[0]' (iow: stdin) isn't a TTY device
 @@                             s.a. `isatty(3)'
 @@@param: flags:               Set of `GETPASS_*' flags (from <unistd.h>)
-@@@param: timeout_in_seconds:  When non-0, timeout (in seconds) to wait for the
-@@                             user to type each character of their password. If
-@@                             this timeout expires, fail with `errno=ETIMEDOUT'
+@@@param: timeout_in_seconds:  When non-0, timeout (in  seconds) to wait for  the
+@@                             user to type each character of their password.  If
+@@                             this timeout expires, fail with  `errno=ETIMEDOUT'
 @@                             Negative values result in weak undefined behavior.
 @@@return: * :   [buf == NULL] Success (dynamically allocated buffer; must be `free(3)'d)
 @@@return: buf:                Success
@@ -2857,7 +2857,7 @@ int getpeereid($fd_t sockfd,
 //TODO:extern int optreset;
 //TODO:extern char *suboptarg;
 
-//int reboot(int, char *); // Incompatible w/ linux: int reboot(int)
+//int   reboot(int,   char  *);   //   Incompatible  w/   linux:   int  reboot(int)
 //int swapon(char const *); // Incompatible w/ linux: int swapon(char const *, int)
 %#endif /* __USE_NETBSD */
 
@@ -2890,9 +2890,9 @@ char *ctermid_r([[nullable]] char *s) {
 
 @@>> sysconf(2)
 @@@param: name: One of `_SC_*' from <asm/crt/confname.h>
-@@Return a system configuration value `name'
+@@Return   a   system    configuration   value    `name'
 @@return: * : The configuration limit associated with `name' for `path'
-@@return: -1: [errno=<unchanged>] `name' refers to a maximum or minimum
+@@return: -1: [errno=<unchanged>] `name'  refers to a maximum or minimum
 @@                                limit, and that limit is indeterminate
 @@return: -1: [errno=EINVAL]      The given `name' isn't a recognized config option
 [[cp, wunused, section(".text.crt{|.dos}.system.configuration")]]
@@ -2979,9 +2979,9 @@ void closefrom($fd_t lowfd) {
 }
 
 @@>> fchroot(2)
-@@Change the root directory to `fd'. If `fd' was opened before a prior call to `chroot()',
-@@and referrs to a directory, then this function can be used to escape a chroot() jail.
-@@No special permissions are required to use this function, since a malicious application
+@@Change the root directory to  `fd'. If `fd' was opened  before a prior call to  `chroot()',
+@@and referrs to  a directory,  then this function  can be  used to escape  a chroot()  jail.
+@@No special permissions  are required to  use this function,  since a malicious  application
 @@could achieve the same behavior by use of `*at' system calls, using `fd' as `dfd' argument.
 [[requires($has_function(dup2) && defined(__AT_FDROOT))]]
 [[requires_include("<asm/os/fcntl.h>"), impl_include("<asm/os/fcntl.h>")]]
@@ -3018,12 +3018,12 @@ int fchroot($fd_t fd) {
 
 
 @@>> resolvepath(3)
-@@Similar to `frealpathat(2)' (though use the later for more options)
-@@Also note that this function appears to have a weird rule (which KOS simply
-@@ignores) that is related to this function not writing more than `PATH_MAX'
+@@Similar  to  `frealpathat(2)'  (though  use  the  later  for  more   options)
+@@Also note that this function appears to  have a weird rule (which KOS  simply
+@@ignores)  that is related  to this function not  writing more than `PATH_MAX'
 @@bytes to `buf'. (Why??? I mean: The whole point of having a `buflen' argument
 @@is to be able to handle names of arbitrary lengths)
-@@Additionally, the online docs don't mention what happens when `buflen' is too
+@@Additionally, the online docs don't mention what happens when `buflen' is  too
 @@small, so I guess I can just make up what's supposed to happen, and I say that
 @@the function will set errno=ERANGE and return -1
 @@@return: * : Used buffer size (possibly including a NUL-byte, but maybe not)

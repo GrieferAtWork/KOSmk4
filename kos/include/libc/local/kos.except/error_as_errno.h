@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x5cdd01a5 */
+/* HASH CRC-32:0x36fb3df */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -34,7 +34,6 @@ struct exception_data;
 #include <kos/except/codes.h>
 #include <kos/kernel/handle.h>
 __NAMESPACE_LOCAL_BEGIN
-/* Transform the given exception into a posix errno value */
 __LOCAL_LIBC(error_as_errno) __ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1)) __errno_t
 __NOTHROW_NCX(__LIBKCALL __LIBC_LOCAL_NAME(error_as_errno))(struct exception_data const *__restrict __self) {
 #ifdef __EPERM

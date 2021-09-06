@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x7673f49d */
+/* HASH CRC-32:0x9a42dfef */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -23,7 +23,6 @@
 #include <__crt.h>
 #include <hybrid/typecore.h>
 __NAMESPACE_LOCAL_BEGIN
-/* Dependency: free from stdlib */
 #ifndef __local___localdep_free_defined
 #define __local___localdep_free_defined 1
 #if __has_builtin(__builtin_free) && defined(__LIBC_BIND_CRTBUILTINS) && defined(__CRT_HAVE_free)
@@ -36,45 +35,28 @@ __CREDIRECT_VOID(,__NOTHROW_NCX,__localdep_free,(void *__mallptr),cfree,(__mallp
 #undef __local___localdep_free_defined
 #endif /* !... */
 #endif /* !__local___localdep_free_defined */
-/* Dependency: memmovedownc from string */
 #ifndef __local___localdep_memmovedownc_defined
 #define __local___localdep_memmovedownc_defined 1
 #ifdef __CRT_HAVE_memmovedownc
-/* Move memory between potentially overlapping memory blocks (assumes that `dst <= src || !ELEM_COUNT || !ELEM_SIZE')
- * @return: * : Always re-returns `dst' */
 __CREDIRECT(__ATTR_LEAF __ATTR_RETNONNULL __ATTR_NONNULL((1, 2)),void *,__NOTHROW_NCX,__localdep_memmovedownc,(void *__dst, void const *__src, __SIZE_TYPE__ __elem_count, __SIZE_TYPE__ __elem_size),memmovedownc,(__dst,__src,__elem_count,__elem_size))
 #else /* __CRT_HAVE_memmovedownc */
 __NAMESPACE_LOCAL_END
 #include <libc/local/string/memmovedownc.h>
 __NAMESPACE_LOCAL_BEGIN
-/* Move memory between potentially overlapping memory blocks (assumes that `dst <= src || !ELEM_COUNT || !ELEM_SIZE')
- * @return: * : Always re-returns `dst' */
 #define __localdep_memmovedownc __LIBC_LOCAL_NAME(memmovedownc)
 #endif /* !__CRT_HAVE_memmovedownc */
 #endif /* !__local___localdep_memmovedownc_defined */
-/* Dependency: strlen from string */
 #ifndef __local___localdep_strlen_defined
 #define __local___localdep_strlen_defined 1
 #ifdef __CRT_HAVE_strlen
-/* >> strlen(3)
- * Return the length of the string in characters (Same as `rawmemlen[...](str, '\0')') */
 __CREDIRECT(__ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1)),__SIZE_TYPE__,__NOTHROW_NCX,__localdep_strlen,(char const *__restrict __str),strlen,(__str))
 #else /* __CRT_HAVE_strlen */
 __NAMESPACE_LOCAL_END
 #include <libc/local/string/strlen.h>
 __NAMESPACE_LOCAL_BEGIN
-/* >> strlen(3)
- * Return the length of the string in characters (Same as `rawmemlen[...](str, '\0')') */
 #define __localdep_strlen __LIBC_LOCAL_NAME(strlen)
 #endif /* !__CRT_HAVE_strlen */
 #endif /* !__local___localdep_strlen_defined */
-/* >> argz_delete(3)
- * Find the index of `entry' inside of `pargz...+=pargz_len', and, if
- * found, remove that entry by shifting all following elements downwards
- * by one, as well as decrementing `*pargz_len' by one.
- * Note that `entry' must be the actual pointer to one of the elements
- * of the given `pargz...+=pargz_len', and not just a string equal to one
- * of the elements... (took me a while to realize this one) */
 __LOCAL_LIBC(argz_delete) __ATTR_NONNULL((1, 2)) void
 __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(argz_delete))(char **__restrict __pargz, __SIZE_TYPE__ *__restrict __pargz_len, char *__entry) {
 	__SIZE_TYPE__ __entrylen, __newlen;

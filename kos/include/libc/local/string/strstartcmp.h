@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x2fefeb57 */
+/* HASH CRC-32:0xb8a3d87e */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -22,9 +22,6 @@
 #define __local_strstartcmp_defined 1
 #include <__crt.h>
 __NAMESPACE_LOCAL_BEGIN
-/* >> strstartcmp(3)
- * Compare the first `strnlen(str, strlen(startswith_str))' characters of
- * `str' with `startswith_str', returning the usual >0, <0, ==0. */
 __LOCAL_LIBC(strstartcmp) __ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1, 2)) int
 __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(strstartcmp))(char const *__str, char const *__startswith) {
 	char __c1, __c2;

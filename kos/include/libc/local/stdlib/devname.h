@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xfdecd5f2 */
+/* HASH CRC-32:0xa88b21cc */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -23,13 +23,10 @@
 #include <__crt.h>
 #ifdef __CRT_HAVE_devname_r
 __NAMESPACE_LOCAL_BEGIN
-/* Dependency: devname_r from stdlib */
 #ifndef __local___localdep_devname_r_defined
 #define __local___localdep_devname_r_defined 1
-/* >> devname(3), devname_r(3) */
 __CREDIRECT(__ATTR_NONNULL((3)),int,__NOTHROW_NCX,__localdep_devname_r,(__dev_t __dev, __mode_t __type, char *__buf, __SIZE_TYPE__ __len),devname_r,(__dev,__type,__buf,__len))
 #endif /* !__local___localdep_devname_r_defined */
-/* >> devname(3), devname_r(3) */
 __LOCAL_LIBC(devname) __ATTR_CONST char *
 __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(devname))(__dev_t __dev, __mode_t __type) {
 	static char __buf[64];

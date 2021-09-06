@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x27c756f5 */
+/* HASH CRC-32:0x3678fd2f */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -22,7 +22,6 @@
 #define __local_fma_defined 1
 #include <__crt.h>
 __NAMESPACE_LOCAL_BEGIN
-/* Multiply-add function computed as a ternary operation */
 __LOCAL_LIBC(fma) __ATTR_CONST __ATTR_WUNUSED double
 __NOTHROW(__LIBCCALL __LIBC_LOCAL_NAME(fma))(double __x, double __y, double __z) {
 	/* TODO: ieee754-specific function */

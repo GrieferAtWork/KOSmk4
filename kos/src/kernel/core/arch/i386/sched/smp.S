@@ -676,12 +676,12 @@ INTERN_FUNCTION(x86_smp_entry32)
 	jz     x86_smp_boot_failure_no_longmode
 
 	/* Test the PAE bit. */
-//	ttest  mask=CPUID_80000001D_PAE, loc=%edx
-//	jz     x86_smp_boot_failure_no_pae
+//	ttest mask=CPUID_80000001D_PAE, loc=%edx
+//	jz x86_smp_boot_failure_no_pae
 
 	/* Test the PSE bit. */
-//	ttest  mask=CPUID_80000001D_PSE, loc=%edx
-//	jz     x86_smp_boot_failure_no_pse
+//	ttest mask=CPUID_80000001D_PSE, loc=%edx
+//	jz x86_smp_boot_failure_no_pse
 
 	movl   $(1), %eax
 	cpuid

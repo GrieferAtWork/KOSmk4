@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x2e14d754 */
+/* HASH CRC-32:0xb1d6d76f */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -23,7 +23,6 @@
 #include <__crt.h>
 #include <features.h>
 __NAMESPACE_LOCAL_BEGIN
-/* Dependency: format_vscanf from format-printer */
 #ifndef __local___localdep_format_vscanf_defined
 #define __local___localdep_format_vscanf_defined 1
 #ifdef __CRT_HAVE_format_vscanf
@@ -32,95 +31,33 @@ __NAMESPACE_LOCAL_END
 #include <bits/crt/format-printer.h>
 #include <hybrid/typecore.h>
 __NAMESPACE_LOCAL_BEGIN
-/* >> format_scanf(3), format_vscanf(3)
- * Generic scanf implementation
- * Taking a regular scanf-style format string and argument, these
- * functions will call the given `pgetc' function which in
- * return should successively yield a character at a time from
- * some kind of input source.
- *  - If `pgetc' returns `< 0', scanning aborts and that value is returned.
- *    Otherwise, the function returns the amount of successfully parsed arguments.
- *  - The user may use `pgetc' to track the last read character to get
- *    additional information about what character caused the scan to fail.
- *  - The given `pgetc' should also indicate EOF by returning `NUL'
- *  - This implementation supports the following extensions:
- *    - `%[A-Z]'   -- Character ranges in scan patterns
- *    - `%[^abc]'  -- Inversion of a scan pattern
- *    - `"\n"'     -- Skip any kind of linefeed (`"\n"', `"\r"', `"\r\n"')
- *    - `%$s'      -- `$'-modifier, available for any format outputting a string.
- *                    This modifier reads a `size_t' from the argument list,
- *                    that specifies the size of the following string buffer:
- *                 >> char buffer[64];
- *                 >> sscanf(data, "My name is %.?s\n", sizeof(buffer), buffer);
- * format -> %[*|?][width][length]specifier
- * @return: 0 :  No data could be scanned.
- * @return: * :  The total number of successfully scanned arguments.
- * @return: EOF: `PGETC' returned EOF the first time an attempt at reading was made */
 __CREDIRECT(__ATTR_LIBC_SCANF(4, 0) __ATTR_NONNULL((1, 2, 4)),__SSIZE_TYPE__,__THROWING,__localdep_format_vscanf,(__pformatgetc __pgetc, __pformatungetc __pungetc, void *__arg, char const *__restrict __format, __builtin_va_list __args),format_vscanf,(__pgetc,__pungetc,__arg,__format,__args))
 #else /* __CRT_HAVE_format_vscanf */
 __NAMESPACE_LOCAL_END
 #include <libc/local/format-printer/format_vscanf.h>
 __NAMESPACE_LOCAL_BEGIN
-/* >> format_scanf(3), format_vscanf(3)
- * Generic scanf implementation
- * Taking a regular scanf-style format string and argument, these
- * functions will call the given `pgetc' function which in
- * return should successively yield a character at a time from
- * some kind of input source.
- *  - If `pgetc' returns `< 0', scanning aborts and that value is returned.
- *    Otherwise, the function returns the amount of successfully parsed arguments.
- *  - The user may use `pgetc' to track the last read character to get
- *    additional information about what character caused the scan to fail.
- *  - The given `pgetc' should also indicate EOF by returning `NUL'
- *  - This implementation supports the following extensions:
- *    - `%[A-Z]'   -- Character ranges in scan patterns
- *    - `%[^abc]'  -- Inversion of a scan pattern
- *    - `"\n"'     -- Skip any kind of linefeed (`"\n"', `"\r"', `"\r\n"')
- *    - `%$s'      -- `$'-modifier, available for any format outputting a string.
- *                    This modifier reads a `size_t' from the argument list,
- *                    that specifies the size of the following string buffer:
- *                 >> char buffer[64];
- *                 >> sscanf(data, "My name is %.?s\n", sizeof(buffer), buffer);
- * format -> %[*|?][width][length]specifier
- * @return: 0 :  No data could be scanned.
- * @return: * :  The total number of successfully scanned arguments.
- * @return: EOF: `PGETC' returned EOF the first time an attempt at reading was made */
 #define __localdep_format_vscanf __LIBC_LOCAL_NAME(format_vscanf)
 #endif /* !__CRT_HAVE_format_vscanf */
 #endif /* !__local___localdep_format_vscanf_defined */
-/* Dependency: unicode_readutf8 from unicode */
 #ifndef __local___localdep_unicode_readutf8_defined
 #define __local___localdep_unicode_readutf8_defined 1
 #ifdef __CRT_HAVE_unicode_readutf8
-/* >> unicode_readutf8(3)
- * Read a single Unicode character from a given UTF-8 string */
 __CREDIRECT(__ATTR_NONNULL((1)),__CHAR32_TYPE__,__NOTHROW_NCX,__localdep_unicode_readutf8,(char const **__restrict __ptext),unicode_readutf8,(__ptext))
 #else /* __CRT_HAVE_unicode_readutf8 */
 __NAMESPACE_LOCAL_END
 #include <libc/local/unicode/unicode_readutf8.h>
 __NAMESPACE_LOCAL_BEGIN
-/* >> unicode_readutf8(3)
- * Read a single Unicode character from a given UTF-8 string */
 #define __localdep_unicode_readutf8 __LIBC_LOCAL_NAME(unicode_readutf8)
 #endif /* !__CRT_HAVE_unicode_readutf8 */
 #endif /* !__local___localdep_unicode_readutf8_defined */
-/* Dependency: unicode_readutf8_rev from unicode */
 #ifndef __local___localdep_unicode_readutf8_rev_defined
 #define __local___localdep_unicode_readutf8_rev_defined 1
 #ifdef __CRT_HAVE_unicode_readutf8_rev
-/* >> unicode_readutf8_rev(3)
- * Same as `unicode_readutf8', but read backwards, with `*ptext'
- * starting out as a pointer after the character to be read, before
- * being updated to point to the start of the character that was read */
 __CREDIRECT(__ATTR_NONNULL((1)),__CHAR32_TYPE__,__NOTHROW_NCX,__localdep_unicode_readutf8_rev,(char const **__restrict __ptext),unicode_readutf8_rev,(__ptext))
 #else /* __CRT_HAVE_unicode_readutf8_rev */
 __NAMESPACE_LOCAL_END
 #include <libc/local/unicode/unicode_readutf8_rev.h>
 __NAMESPACE_LOCAL_BEGIN
-/* >> unicode_readutf8_rev(3)
- * Same as `unicode_readutf8', but read backwards, with `*ptext'
- * starting out as a pointer after the character to be read, before
- * being updated to point to the start of the character that was read */
 #define __localdep_unicode_readutf8_rev __LIBC_LOCAL_NAME(unicode_readutf8_rev)
 #endif /* !__CRT_HAVE_unicode_readutf8_rev */
 #endif /* !__local___localdep_unicode_readutf8_rev_defined */
@@ -148,9 +85,6 @@ __LOCAL_LIBC(vsscanf_ungetc) __SSIZE_TYPE__
 __NAMESPACE_LOCAL_END
 #endif /* !____vsscanf_getc_defined */
 __NAMESPACE_LOCAL_BEGIN
-/* >> sscanf(3), vsscanf(3)
- * Scan data from a given `input' string, following `format'
- * Return the number of successfully scanned data items */
 __LOCAL_LIBC(vsscanf) __ATTR_WUNUSED __ATTR_LIBC_SCANF(2, 0) __ATTR_NONNULL((1, 2)) __STDC_INT_AS_SIZE_T
 __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(vsscanf))(char const *__restrict __input, char const *__restrict __format, __builtin_va_list __args) {
 	char const *__input_pointer = __input;

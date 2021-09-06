@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x504c3b80 */
+/* HASH CRC-32:0xcf94e733 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -24,7 +24,6 @@
 #ifdef __CRT_HAVE_posix_memalign
 #include <hybrid/typecore.h>
 __NAMESPACE_LOCAL_BEGIN
-/* Dependency: crt_posix_memalign from malloc */
 #ifndef __local___localdep_crt_posix_memalign_defined
 #define __local___localdep_crt_posix_memalign_defined 1
 __CREDIRECT(__ATTR_NONNULL((1)),int,__NOTHROW_NCX,__localdep_crt_posix_memalign,(void **__restrict __pp, __SIZE_TYPE__ __alignment, __SIZE_TYPE__ __n_bytes),posix_memalign,(__pp,__alignment,__n_bytes))

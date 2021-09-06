@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xd337e533 */
+/* HASH CRC-32:0xfd9d15f9 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -25,32 +25,17 @@
 #include <features.h>
 #include <bits/types.h>
 __NAMESPACE_LOCAL_BEGIN
-/* Dependency: waitpid from sys.wait */
 #ifndef __local___localdep_waitpid_defined
 #define __local___localdep_waitpid_defined 1
 #ifdef __CRT_HAVE_waitpid
 __NAMESPACE_LOCAL_END
 #include <parts/waitmacros.h>
 __NAMESPACE_LOCAL_BEGIN
-/* >> waitpid(2)
- * Wait for a child process:
- *  - `pid < -1':  Wait for any child process whose process group ID is `-PID'
- *  - `pid == -1': Wait for any child process
- *  - `pid == 0':  Wait for any child process whose process group ID is that of the caller
- *  - `pid > 0':   Wait for the child whose process ID is equal to `PID'
- * @param: options: Set of `WNOHANG | WUNTRACED | WCONTINUED' (as a KOS extension, `WNOWAIT' is also accepted) */
 __CREDIRECT(,__pid_t,__NOTHROW_RPC,__localdep_waitpid,(__pid_t __pid, __WAIT_STATUS __stat_loc, __STDC_INT_AS_UINT_T __options),waitpid,(__pid,__stat_loc,__options))
 #elif defined(__CRT_HAVE___waitpid)
 __NAMESPACE_LOCAL_END
 #include <parts/waitmacros.h>
 __NAMESPACE_LOCAL_BEGIN
-/* >> waitpid(2)
- * Wait for a child process:
- *  - `pid < -1':  Wait for any child process whose process group ID is `-PID'
- *  - `pid == -1': Wait for any child process
- *  - `pid == 0':  Wait for any child process whose process group ID is that of the caller
- *  - `pid > 0':   Wait for the child whose process ID is equal to `PID'
- * @param: options: Set of `WNOHANG | WUNTRACED | WCONTINUED' (as a KOS extension, `WNOWAIT' is also accepted) */
 __CREDIRECT(,__pid_t,__NOTHROW_RPC,__localdep_waitpid,(__pid_t __pid, __WAIT_STATUS __stat_loc, __STDC_INT_AS_UINT_T __options),__waitpid,(__pid,__stat_loc,__options))
 #else /* ... */
 #undef __local___localdep_waitpid_defined

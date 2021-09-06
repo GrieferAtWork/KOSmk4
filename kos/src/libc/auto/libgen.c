@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x2b48f932 */
+/* HASH CRC-32:0xfe2084a6 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -48,7 +48,7 @@ DECL_BEGIN
  * >> dirname("..");              // Returns "."
  * >> dirname("");                // Returns "."
  * >> dirname(NULL);              // Returns "."
- * Note that for this purpose, `path' may be modified in-place, meaning
+ * Note  that for this purpose, `path' may be modified in-place, meaning
  * that you should really always pass an strdup()'d, or writable string. */
 INTERN ATTR_SECTION(".text.crt.unsorted") ATTR_RETNONNULL char *
 NOTHROW_NCX(LIBCCALL libc_dirname)(char *path) {
@@ -107,11 +107,11 @@ fallback:
  * >> basename("");                // Returns "."
  * >> basename(NULL);              // Returns "."
  * Note that for this purpose, `filename' may be modified in-place, meaning
- * that you should really always pass an strdup()'d, or writable string.
+ * that  you should really  always pass an  strdup()'d, or writable string.
  *
  * Also note that a different version of this function exists in <string.h>,
- * where if you include both <libgen.h> and <string.h>, you can use the
- * alternate function from <string.h> by `#undef basename', or calling the
+ * where if you  include both  <libgen.h> and  <string.h>, you  can use  the
+ * alternate function from <string.h>  by `#undef basename', or calling  the
  * function as `(basename)(...)' (as opposed to `basename(...)') */
 INTERN ATTR_SECTION(".text.crt.unsorted") ATTR_RETNONNULL char *
 NOTHROW_NCX(LIBCCALL libc___xpg_basename)(char *filename) {

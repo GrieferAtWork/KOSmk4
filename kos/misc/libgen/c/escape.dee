@@ -76,7 +76,7 @@ global cLanguageTwoWordTypenameKeywords: {string...} = HashSet({
 });
 
 @@Special replacements for certain keywords during escaping.
-@@By default, all keywords are escaped by either:
+@@By   default,   all  keywords   are  escaped   by  either:
 @@  - Inserting 2 leading "__"
 @@  - Inserting 1 leading "_", and having the following character be upper-case
 @@Keywords that already appear escaped are not re-escaped
@@ -506,14 +506,14 @@ function skipEscapingPreproessorBlock(self: CParser): int {
 
 
 
-@@Escape keywords from the given text via the given @keyEscape.
-@@If the given callback returns @none for some given word, then
+@@Escape keywords  from the  given text  via the  given  @keyEscape.
+@@If the  given callback  returns @none  for some  given word,  then
 @@use @keywordEscapes and @escapeKeywordIfNotAlreadyEscaped instead.
 @@Language keywords are not passed to @keyEscape
 @@@param: mode:           One of @ESCAPE_MODE_NONE, @ESCAPE_MODE_PART, @ESCAPE_MODE_FULL
 @@@param: evalEnviron:    Global variables during execution of directives
 @@                        When not given, then an anonymous @Dict() is used instead.
-@@@param: forceKeyEscape: When set to @true, force use of @keyEscape for _all_ keywords
+@@@param: forceKeyEscape: When set to  @true, force  use of @keyEscape  for _all_  keywords
 @@                        before doing anything else, irregardless of what @mode is, except
 @@                        for when @mode is set to @ESCAPE_MODE_KEEP
 function escapeTextIntoFile(
@@ -1162,7 +1162,7 @@ function escapeNonRepeatingTextIntoFile(
 @@Scan for references to dependent functions within the given @text
 @@@param: prototype: The primary function prototype.
 @@                   Used to detect references to arguments, and prevent those
-@@                   from ever being considered references to dependencies.
+@@                   from ever  being considered  references to  dependencies.
 function scanForNamesOfDependentFunctions(
 		text: string | UserString | Callable,
 		selfFunctionName: string | UserString,

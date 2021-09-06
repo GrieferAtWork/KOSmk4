@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x989d28c5 */
+/* HASH CRC-32:0x3b823ee6 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -23,7 +23,6 @@
 #include <__crt.h>
 #include <hybrid/typecore.h>
 __NAMESPACE_LOCAL_BEGIN
-/* Dependency: c16rtombs from parts.uchar.wchar */
 #ifndef __local___localdep_c16rtombs_defined
 #define __local___localdep_c16rtombs_defined 1
 #if defined(__CRT_HAVE_wcsrtombs) && __SIZEOF_WCHAR_T__ == 2 && defined(__LIBCCALL_IS_LIBDCALL)

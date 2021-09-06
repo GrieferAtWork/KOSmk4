@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xc590451c */
+/* HASH CRC-32:0x7c51a976 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -24,27 +24,17 @@
 #ifdef __CRT_HAVE_pthread_join
 #include <bits/crt/threads.h>
 __NAMESPACE_LOCAL_BEGIN
-/* Dependency: pthread_join from pthread */
 #ifndef __local___localdep_pthread_join_defined
 #define __local___localdep_pthread_join_defined 1
 __NAMESPACE_LOCAL_END
 #include <bits/types.h>
 #include <bits/crt/pthreadtypes.h>
 __NAMESPACE_LOCAL_BEGIN
-/* >> pthread_join(3)
- * Make calling thread wait for termination of the thread `pthread'.
- * The exit status of the thread is stored in `*thread_return', if
- * `thread_return' is not `NULL'.
- * @return: EOK: Success */
 __CREDIRECT(,__errno_t,__NOTHROW_RPC,__localdep_pthread_join,(__pthread_t __pthread, void **__thread_return),pthread_join,(__pthread,__thread_return))
 #endif /* !__local___localdep_pthread_join_defined */
 __NAMESPACE_LOCAL_END
 #include <asm/crt/threads.h>
 __NAMESPACE_LOCAL_BEGIN
-/* >> thrd_join(3)
- * Wait for the given thread to finish (s.a. `pthread_join(3)')
- * @return: thrd_success: Success
- * @return: thrd_error:   Error */
 __LOCAL_LIBC(thrd_join) int
 __NOTHROW_RPC(__LIBCCALL __LIBC_LOCAL_NAME(thrd_join))(__thrd_t __thr, int *__res) {
 	__errno_t __error;

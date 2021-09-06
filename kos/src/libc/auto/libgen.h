@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x7d896cb2 */
+/* HASH CRC-32:0x20c916ae */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -48,7 +48,7 @@ DECL_BEGIN
  * >> dirname("..");              // Returns "."
  * >> dirname("");                // Returns "."
  * >> dirname(NULL);              // Returns "."
- * Note that for this purpose, `path' may be modified in-place, meaning
+ * Note  that for this purpose, `path' may be modified in-place, meaning
  * that you should really always pass an strdup()'d, or writable string. */
 INTDEF ATTR_RETNONNULL char *NOTHROW_NCX(LIBDCALL libd_dirname)(char *path);
 #endif /* !__LIBCCALL_IS_LIBDCALL && !__KERNEL__ */
@@ -71,7 +71,7 @@ INTDEF ATTR_RETNONNULL char *NOTHROW_NCX(LIBDCALL libd_dirname)(char *path);
  * >> dirname("..");              // Returns "."
  * >> dirname("");                // Returns "."
  * >> dirname(NULL);              // Returns "."
- * Note that for this purpose, `path' may be modified in-place, meaning
+ * Note  that for this purpose, `path' may be modified in-place, meaning
  * that you should really always pass an strdup()'d, or writable string. */
 INTDEF ATTR_RETNONNULL char *NOTHROW_NCX(LIBCCALL libc_dirname)(char *path);
 #endif /* !__KERNEL__ */
@@ -95,11 +95,11 @@ INTDEF ATTR_RETNONNULL char *NOTHROW_NCX(LIBCCALL libc_dirname)(char *path);
  * >> basename("");                // Returns "."
  * >> basename(NULL);              // Returns "."
  * Note that for this purpose, `filename' may be modified in-place, meaning
- * that you should really always pass an strdup()'d, or writable string.
+ * that  you should really  always pass an  strdup()'d, or writable string.
  *
  * Also note that a different version of this function exists in <string.h>,
- * where if you include both <libgen.h> and <string.h>, you can use the
- * alternate function from <string.h> by `#undef basename', or calling the
+ * where if you  include both  <libgen.h> and  <string.h>, you  can use  the
+ * alternate function from <string.h>  by `#undef basename', or calling  the
  * function as `(basename)(...)' (as opposed to `basename(...)') */
 INTDEF ATTR_RETNONNULL char *NOTHROW_NCX(LIBDCALL libd___xpg_basename)(char *filename);
 #endif /* !__LIBCCALL_IS_LIBDCALL && !__KERNEL__ */
@@ -123,11 +123,11 @@ INTDEF ATTR_RETNONNULL char *NOTHROW_NCX(LIBDCALL libd___xpg_basename)(char *fil
  * >> basename("");                // Returns "."
  * >> basename(NULL);              // Returns "."
  * Note that for this purpose, `filename' may be modified in-place, meaning
- * that you should really always pass an strdup()'d, or writable string.
+ * that  you should really  always pass an  strdup()'d, or writable string.
  *
  * Also note that a different version of this function exists in <string.h>,
- * where if you include both <libgen.h> and <string.h>, you can use the
- * alternate function from <string.h> by `#undef basename', or calling the
+ * where if you  include both  <libgen.h> and  <string.h>, you  can use  the
+ * alternate function from <string.h>  by `#undef basename', or calling  the
  * function as `(basename)(...)' (as opposed to `basename(...)') */
 INTDEF ATTR_RETNONNULL char *NOTHROW_NCX(LIBCCALL libc___xpg_basename)(char *filename);
 #endif /* !__KERNEL__ */

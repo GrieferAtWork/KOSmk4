@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xdea6fcb1 */
+/* HASH CRC-32:0xfb64ea9c */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -185,53 +185,53 @@ struct option {
 
 #if !defined(__getopt_defined) && defined(__CRT_HAVE_getopt)
 #define __getopt_defined 1
-/* Return the option character from OPTS just read.  Return -1 when
- * there are no more options.  For unrecognized options, or options
+/* Return the option  character from  OPTS just read.  Return -1  when
+ * there  are no  more options.  For unrecognized  options, or options
  * missing arguments, `optopt' is set to the option letter, and '?' is
  * returned.
  * - The OPTS string is a list of characters which are recognized option
  *   letters, optionally followed by colons, specifying that that letter
  *   takes an argument, to be placed in `optarg'.
  * - If a letter in OPTS is followed by two colons, its argument is
- *   optional.  This behavior is specific to the GNU `getopt'.
- * - The argument `--' causes premature termination of argument
+ *   optional. This  behavior  is  specific to  the  GNU  `getopt'.
+ * - The  argument `--' causes  premature termination of argument
  *   scanning, explicitly telling `getopt' that there are no more
  *   options.
  * - If OPTS begins with `--', then non-option arguments are treated as
- *   arguments to the option '\0'.  This behavior is specific to the GNU
+ *   arguments to the option '\0'. This behavior is specific to the GNU
  *   `getopt' */
 __CDECLARE(__ATTR_WUNUSED,int,__NOTHROW_NCX,getopt,(int ___argc, char *const ___argv[], char const *__shortopts),(___argc,___argv,__shortopts))
 #endif /* !__getopt_defined && __CRT_HAVE_getopt */
-/* Return the option character from OPTS just read.  Return -1 when
- * there are no more options.  For unrecognized options, or options
+/* Return the option  character from  OPTS just read.  Return -1  when
+ * there  are no  more options.  For unrecognized  options, or options
  * missing arguments, `optopt' is set to the option letter, and '?' is
  * returned.
  * - The OPTS string is a list of characters which are recognized option
  *   letters, optionally followed by colons, specifying that that letter
  *   takes an argument, to be placed in `optarg'.
  * - If a letter in OPTS is followed by two colons, its argument is
- *   optional.  This behavior is specific to the GNU `getopt'.
- * - The argument `--' causes premature termination of argument
+ *   optional. This  behavior  is  specific to  the  GNU  `getopt'.
+ * - The  argument `--' causes  premature termination of argument
  *   scanning, explicitly telling `getopt' that there are no more
  *   options.
  * - If OPTS begins with `--', then non-option arguments are treated as
- *   arguments to the option '\0'.  This behavior is specific to the GNU
+ *   arguments to the option '\0'. This behavior is specific to the GNU
  *   `getopt' */
 __CDECLARE_OPT(__ATTR_WUNUSED,int,__NOTHROW_NCX,getopt_long,(int ___argc, char *const ___argv[], char const *__shortopts, struct option const *__longopts, int *__longind),(___argc,___argv,__shortopts,__longopts,__longind))
-/* Return the option character from OPTS just read.  Return -1 when
- * there are no more options.  For unrecognized options, or options
+/* Return the option  character from  OPTS just read.  Return -1  when
+ * there  are no  more options.  For unrecognized  options, or options
  * missing arguments, `optopt' is set to the option letter, and '?' is
  * returned.
  * - The OPTS string is a list of characters which are recognized option
  *   letters, optionally followed by colons, specifying that that letter
  *   takes an argument, to be placed in `optarg'.
  * - If a letter in OPTS is followed by two colons, its argument is
- *   optional.  This behavior is specific to the GNU `getopt'.
- * - The argument `--' causes premature termination of argument
+ *   optional. This  behavior  is  specific to  the  GNU  `getopt'.
+ * - The  argument `--' causes  premature termination of argument
  *   scanning, explicitly telling `getopt' that there are no more
  *   options.
  * - If OPTS begins with `--', then non-option arguments are treated as
- *   arguments to the option '\0'.  This behavior is specific to the GNU
+ *   arguments to the option '\0'. This behavior is specific to the GNU
  *   `getopt' */
 __CDECLARE_OPT(__ATTR_WUNUSED,int,__NOTHROW_NCX,getopt_long_only,(int ___argc, char *const ___argv[], char const *__shortopts, struct option const *__longopts, int *__longind),(___argc,___argv,__shortopts,__longopts,__longind))
 

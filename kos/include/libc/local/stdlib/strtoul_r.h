@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xf645ca92 */
+/* HASH CRC-32:0x9a830b71 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -23,97 +23,31 @@
 #include <__crt.h>
 #include <features.h>
 __NAMESPACE_LOCAL_BEGIN
-/* Dependency: strtou32_r from stdlib */
 #ifndef __local___localdep_strtou32_r_defined
 #define __local___localdep_strtou32_r_defined 1
 #ifdef __CRT_HAVE_strtou32_r
 __NAMESPACE_LOCAL_END
 #include <bits/types.h>
 __NAMESPACE_LOCAL_BEGIN
-/* >> strto32_r(3), strtou32_r(3), strto64_r(3), strtou64_r(3)
- * Safely parse & return an integer from `nptr', and store any potential
- * errors in `*error' (if non-NULL). The following errors are defined:
- *  - 0:         Success
- *  - ECANCELED: Nothing was parsed.
- *               In this case, `*endptr' is set to the original `nptr'
- *               (iow: leading spaces are _not_ skipped in `*endptr'),
- *               and the returned integer is `0'
- *  - ERANGE:    Integer over- or under-flow while parsing.
- *               In this case, `*endptr' is still updated correctly, and
- *               the returned integer is the closest representable value
- *               to the integer given in `nptr' (i.e. `U?INTn_(MIN|MAX)')
- *               This error supercedes `EINVAL' if both conditions apply.
- *  - EINVAL:    Only when `endptr == NULL': The parsed number is followed
- *               by at least 1 additional non-whitespace character.
- *               The returned integer value is not affected by this error. */
 __CREDIRECT(__ATTR_LEAF __ATTR_NONNULL((1)),__UINT32_TYPE__,__NOTHROW_NCX,__localdep_strtou32_r,(char const *__restrict __nptr, char **__endptr, __STDC_INT_AS_UINT_T __base, __errno_t *__error),strtou32_r,(__nptr,__endptr,__base,__error))
 #else /* __CRT_HAVE_strtou32_r */
 __NAMESPACE_LOCAL_END
 #include <libc/local/stdlib/strtou32_r.h>
 __NAMESPACE_LOCAL_BEGIN
-/* >> strto32_r(3), strtou32_r(3), strto64_r(3), strtou64_r(3)
- * Safely parse & return an integer from `nptr', and store any potential
- * errors in `*error' (if non-NULL). The following errors are defined:
- *  - 0:         Success
- *  - ECANCELED: Nothing was parsed.
- *               In this case, `*endptr' is set to the original `nptr'
- *               (iow: leading spaces are _not_ skipped in `*endptr'),
- *               and the returned integer is `0'
- *  - ERANGE:    Integer over- or under-flow while parsing.
- *               In this case, `*endptr' is still updated correctly, and
- *               the returned integer is the closest representable value
- *               to the integer given in `nptr' (i.e. `U?INTn_(MIN|MAX)')
- *               This error supercedes `EINVAL' if both conditions apply.
- *  - EINVAL:    Only when `endptr == NULL': The parsed number is followed
- *               by at least 1 additional non-whitespace character.
- *               The returned integer value is not affected by this error. */
 #define __localdep_strtou32_r __LIBC_LOCAL_NAME(strtou32_r)
 #endif /* !__CRT_HAVE_strtou32_r */
 #endif /* !__local___localdep_strtou32_r_defined */
-/* Dependency: strtou64_r from stdlib */
 #ifndef __local___localdep_strtou64_r_defined
 #define __local___localdep_strtou64_r_defined 1
 #ifdef __CRT_HAVE_strtou64_r
 __NAMESPACE_LOCAL_END
 #include <bits/types.h>
 __NAMESPACE_LOCAL_BEGIN
-/* >> strto32_r(3), strtou32_r(3), strto64_r(3), strtou64_r(3)
- * Safely parse & return an integer from `nptr', and store any potential
- * errors in `*error' (if non-NULL). The following errors are defined:
- *  - 0:         Success
- *  - ECANCELED: Nothing was parsed.
- *               In this case, `*endptr' is set to the original `nptr'
- *               (iow: leading spaces are _not_ skipped in `*endptr'),
- *               and the returned integer is `0'
- *  - ERANGE:    Integer over- or under-flow while parsing.
- *               In this case, `*endptr' is still updated correctly, and
- *               the returned integer is the closest representable value
- *               to the integer given in `nptr' (i.e. `U?INTn_(MIN|MAX)')
- *               This error supercedes `EINVAL' if both conditions apply.
- *  - EINVAL:    Only when `endptr == NULL': The parsed number is followed
- *               by at least 1 additional non-whitespace character.
- *               The returned integer value is not affected by this error. */
 __CREDIRECT(__ATTR_LEAF __ATTR_NONNULL((1)),__UINT64_TYPE__,__NOTHROW_NCX,__localdep_strtou64_r,(char const *__restrict __nptr, char **__endptr, __STDC_INT_AS_UINT_T __base, __errno_t *__error),strtou64_r,(__nptr,__endptr,__base,__error))
 #else /* __CRT_HAVE_strtou64_r */
 __NAMESPACE_LOCAL_END
 #include <libc/local/stdlib/strtou64_r.h>
 __NAMESPACE_LOCAL_BEGIN
-/* >> strto32_r(3), strtou32_r(3), strto64_r(3), strtou64_r(3)
- * Safely parse & return an integer from `nptr', and store any potential
- * errors in `*error' (if non-NULL). The following errors are defined:
- *  - 0:         Success
- *  - ECANCELED: Nothing was parsed.
- *               In this case, `*endptr' is set to the original `nptr'
- *               (iow: leading spaces are _not_ skipped in `*endptr'),
- *               and the returned integer is `0'
- *  - ERANGE:    Integer over- or under-flow while parsing.
- *               In this case, `*endptr' is still updated correctly, and
- *               the returned integer is the closest representable value
- *               to the integer given in `nptr' (i.e. `U?INTn_(MIN|MAX)')
- *               This error supercedes `EINVAL' if both conditions apply.
- *  - EINVAL:    Only when `endptr == NULL': The parsed number is followed
- *               by at least 1 additional non-whitespace character.
- *               The returned integer value is not affected by this error. */
 #define __localdep_strtou64_r __LIBC_LOCAL_NAME(strtou64_r)
 #endif /* !__CRT_HAVE_strtou64_r */
 #endif /* !__local___localdep_strtou64_r_defined */

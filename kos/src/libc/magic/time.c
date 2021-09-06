@@ -527,7 +527,7 @@ $time32_t mktime32([[nonnull]] struct $tm __KOS_FIXED_CONST *tp);
 %[insert:std]
 
 @@>> clock(3)
-@@Time used by the program so far (user time + system time)
+@@Time used by the program so  far (user time + system  time)
 @@The `result / CLOCKS_PER_SECOND' is program time in seconds
 [[std, wunused]] clock_t clock();
 
@@ -657,7 +657,7 @@ __LOCAL_LIBC_DATA(__gmtime_buf) struct tm __gmtime_buf = { 0 };
 
 
 @@>> gmtime(3), gmtime64(3)
-@@Return the `struct tm' representation of `*timer'
+@@Return  the  `struct tm'  representation  of   `*timer'
 @@in Universal Coordinated Time (aka Greenwich Mean Time)
 [[decl_include("<bits/types.h>")]]
 [[std, decl_include("<bits/crt/tm.h>")]]
@@ -720,7 +720,7 @@ $size_t crt_strftime_l([[outp(bufsize)]] char *__restrict buf, $size_t bufsize,
 @@>> strftime(3)
 @@Format `tp' into `s' according to `format'.
 @@Write no more than `maxsize' characters and return the number
-@@of characters written, or 0 if it would exceed `maxsize'
+@@of characters  written, or  0 if  it would  exceed  `maxsize'
 [[std, decl_include("<bits/crt/tm.h>"), crtbuiltin, alias("_Strftime")]]
 size_t strftime([[outp(bufsize)]] char *__restrict buf, size_t bufsize,
                 [[nonnull]] char const *__restrict format,
@@ -757,7 +757,7 @@ __LOCAL_LIBC_DATA(__ctime_buf) char __ctime_buf[26] = { 0 };
 
 @@>> asctime(3)
 @@Return a string of the form "Day Mon dd hh:mm:ss yyyy\n"
-@@that is the representation of `tp' in this format
+@@that is  the  representation  of  `tp'  in  this  format
 [[std, wunused, impl_prefix(DEFINE_CTIME_BUFFER)]]
 [[nonnull]] char *asctime([[nonnull]] struct tm const *tp) {
 	return asctime_r(tp, __NAMESPACE_LOCAL_SYM __ctime_buf);
@@ -984,7 +984,7 @@ __LIBC char *tzname[2] __ASMNAME("__tzname");
 
 @@>> tzset(3)
 @@Set time conversion information from the `$TZ' environment variable.
-@@If `$TZ' is not defined, a locale-dependent default is used
+@@If  `$TZ'  is  not  defined,  a  locale-dependent  default  is  used
 void tzset();
 %#endif /* __USE_POSIX */
 
@@ -1084,7 +1084,7 @@ $time_t timegm([[nonnull]] struct $tm *tp) {
 }
 
 @@>> timelocal(3), timelocal64(3)
-@@Another name for `mktime'
+@@Another   name   for   `mktime'
 [[wunused, ATTR_PURE, decl_include("<bits/types.h>", "<features.h>")]]
 $time_t timelocal([[nonnull]] struct $tm __KOS_FIXED_CONST *tp) = mktime;
 
@@ -1659,7 +1659,7 @@ INTDEF longptr_t libc_timezone;
 
 @@>> strftime_l(3)
 @@Similar to `strftime(3)' but take the information from
-@@the provided locale and not the global locale
+@@the   provided  locale  and   not  the  global  locale
 [[decl_include("<bits/crt/tm.h>")]]
 [[dos_only_export_alias("_strftime_l"), export_alias("__strftime_l")]]
 $size_t strftime_l([[outp(bufsize)]] char *__restrict buf, $size_t bufsize,
@@ -1683,7 +1683,7 @@ char *crt_strptime_l([[nonnull]] char const *__restrict s,
 %#ifdef __USE_XOPEN
 @@>> strptime(3)
 @@Parse `s' according to `format' and store binary time information in `tp'.
-@@The return value is a pointer to the first unparsed character in `s'
+@@The return  value is  a pointer  to the  first unparsed  character in  `s'
 [[decl_include("<bits/crt/tm.h>")]]
 char *strptime([[nonnull]] char const *__restrict s,
                [[nonnull]] char const *__restrict format,
@@ -1713,7 +1713,7 @@ char *strptime([[nonnull]] char const *__restrict s,
 %#ifdef __USE_GNU
 @@>> strptime_l(3)
 @@Similar to `strptime' but take the information from
-@@the provided locale and not the global locale
+@@the  provided  locale  and  not  the  global locale
 [[decl_include("<bits/crt/tm.h>")]]
 char *strptime_l([[nonnull]] char const *__restrict s,
                  [[nonnull]] char const *__restrict format,
@@ -1724,11 +1724,11 @@ char *strptime_l([[nonnull]] char const *__restrict s,
 }
 
 @@>> getdate_r(3)
-@@Since `getdate' is not reentrant because of the use of `getdate_err'
+@@Since  `getdate' is not  reentrant because of  the use of `getdate_err'
 @@and the static buffer to return the result in, we provide a thread-safe
-@@variant.  The functionality is the same.  The result is returned in
-@@the buffer pointed to by `resbufp' and in case of an error the return
-@@value is != 0 with the same values as given above for `getdate_err'.
+@@variant.  The  functionality is  the same.  The  result is  returned in
+@@the buffer pointed to by `resbufp' and  in case of an error the  return
+@@value is != 0  with the same values  as given above for  `getdate_err'.
 [[guard, decl_include("<bits/crt/tm.h>")]]
 int getdate_r([[nonnull]] char const *__restrict string,
               [[nonnull]] struct $tm *__restrict resbufp) {
@@ -1823,7 +1823,7 @@ struct $tm *gmtime_r([[nonnull]] $time_t const *__restrict timer,
 			tp->@tm_isdst@ = previousSunday >= 8;
 		} else {
 			//In November we must be before the first Sunday to be dst.
-			//That means the previous Sunday must be before the 1st.
+			//That means the  previous Sunday must  be before the  1st.
 			tp->@tm_isdst@ = previousSunday <= 0;
 		}
 	}
@@ -1924,7 +1924,7 @@ struct $tm *gmtime64_r([[nonnull]] $time64_t const *__restrict timer,
 			tp->@tm_isdst@ = previousSunday >= 8;
 		} else {
 			//In November we must be before the first Sunday to be dst.
-			//That means the previous Sunday must be before the 1st.
+			//That means the  previous Sunday must  be before the  1st.
 			tp->@tm_isdst@ = previousSunday <= 0;
 		}
 	}
@@ -1967,7 +1967,7 @@ struct $tm *gmtime64_r([[nonnull]] $time64_t const *__restrict timer,
 			tp->@tm_isdst@ = previousSunday >= 8;
 		} else {
 			//In November we must be before the first Sunday to be dst.
-			//That means the previous Sunday must be before the 1st.
+			//That means the  previous Sunday must  be before the  1st.
 			tp->@tm_isdst@ = previousSunday <= 0;
 		}
 	}
@@ -2035,7 +2035,7 @@ __LOCAL_LIBC_CONST_DATA(__abbr_month_names) char const __abbr_month_names[12][4]
 
 @@>> asctime_r(3)
 @@Return in `buf' a string of the form "Day Mon dd hh:mm:ss yyyy\n"
-@@that is the representation of `tp' in this format
+@@that   is   the   representation   of   `tp'   in   this   format
 [[decl_include("<bits/crt/tm.h>")]]
 [[impl_prefix(
 @@pp_if defined(__BUILDING_LIBC) || !$has_function(crt_asctime_s)@@

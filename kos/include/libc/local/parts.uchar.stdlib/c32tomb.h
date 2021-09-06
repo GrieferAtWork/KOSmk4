@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xe6631509 */
+/* HASH CRC-32:0x629d7013 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -22,7 +22,6 @@
 #define __local_c32tomb_defined 1
 #include <__crt.h>
 __NAMESPACE_LOCAL_BEGIN
-/* Dependency: uchar_c32rtomb from uchar */
 #ifndef __local___localdep_uchar_c32rtomb_defined
 #define __local___localdep_uchar_c32rtomb_defined 1
 #if defined(__CRT_HAVE_wcrtomb) && __SIZEOF_WCHAR_T__ == 4 && defined(__LIBCCALL_IS_LIBKCALL)

@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x64c610fe */
+/* HASH CRC-32:0xc366cf41 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -24,23 +24,17 @@
 #include <bits/crt/format-printer.h>
 #include <hybrid/typecore.h>
 __NAMESPACE_LOCAL_BEGIN
-/* Dependency: mempcpyc from string */
 #ifndef __local___localdep_mempcpyc_defined
 #define __local___localdep_mempcpyc_defined 1
 #ifdef __CRT_HAVE_mempcpyc
-/* Same as `memcpyc', but return `dst + (ELEM_COUNT * ELEM_SIZE)', rather than `dst' */
 __CREDIRECT(__ATTR_LEAF __ATTR_RETNONNULL __ATTR_NONNULL((1, 2)),void *,__NOTHROW_NCX,__localdep_mempcpyc,(void *__restrict __dst, void const *__restrict __src, __SIZE_TYPE__ __elem_count, __SIZE_TYPE__ __elem_size),mempcpyc,(__dst,__src,__elem_count,__elem_size))
 #else /* __CRT_HAVE_mempcpyc */
 __NAMESPACE_LOCAL_END
 #include <libc/local/string/mempcpyc.h>
 __NAMESPACE_LOCAL_BEGIN
-/* Same as `memcpyc', but return `dst + (ELEM_COUNT * ELEM_SIZE)', rather than `dst' */
 #define __localdep_mempcpyc __LIBC_LOCAL_NAME(mempcpyc)
 #endif /* !__CRT_HAVE_mempcpyc */
 #endif /* !__local___localdep_mempcpyc_defined */
-/* >> format_sprintf_printer(3)
- * Format-printer implementation for printing to a string buffer like `sprintf' would
- * WARNING: No trailing NUL-character is implicitly appended */
 __LOCAL_LIBC(format_sprintf_printer) __ATTR_NONNULL((1, 2)) __SSIZE_TYPE__
 __NOTHROW_NCX(__FORMATPRINTER_CC __LIBC_LOCAL_NAME(format_sprintf_printer))(void *__arg, char const *__restrict __data, __SIZE_TYPE__ __datalen) {
 	*(char **)__arg = (char *)__localdep_mempcpyc(*(char **)__arg, __data, __datalen, sizeof(char));

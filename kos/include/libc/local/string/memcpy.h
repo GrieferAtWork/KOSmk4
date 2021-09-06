@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xda4437c9 */
+/* HASH CRC-32:0x10d2aa58 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -23,9 +23,6 @@
 #include <__crt.h>
 #include <hybrid/typecore.h>
 __NAMESPACE_LOCAL_BEGIN
-/* >> memcpy(3)
- * Copy memory between non-overlapping memory blocks.
- * @return: * : Always re-returns `dst' */
 __LOCAL_LIBC(memcpy) __ATTR_LEAF __ATTR_RETNONNULL __ATTR_NONNULL((1, 2)) void *
 __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(memcpy))(void *__restrict __dst, void const *__restrict __src, __SIZE_TYPE__ __n_bytes) {
 	__BYTE_TYPE__ *__pdst = (__BYTE_TYPE__ *)__dst;

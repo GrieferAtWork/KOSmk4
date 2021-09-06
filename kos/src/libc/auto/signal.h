@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xaff0b5e */
+/* HASH CRC-32:0xcb7fa2e5 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -41,45 +41,45 @@ DECL_BEGIN
 #if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
 /* >> sigblock(3)
  * Deprecated method of SIG_BLOCK-ing a given set of signals.
- * Modern code should use `sigprocmask()' instead.
+ * Modern   code   should   use   `sigprocmask()'    instead.
  * @return: 0: Success */
 INTDEF ATTR_DEPRECATED("Using `sigprocmask(SIG_BLOCK)\' instead") int NOTHROW_NCX(LIBDCALL libd_sigblock)(int mask);
 #endif /* !__LIBCCALL_IS_LIBDCALL && !__KERNEL__ */
 #ifndef __KERNEL__
 /* >> sigblock(3)
  * Deprecated method of SIG_BLOCK-ing a given set of signals.
- * Modern code should use `sigprocmask()' instead.
+ * Modern   code   should   use   `sigprocmask()'    instead.
  * @return: 0: Success */
 INTDEF ATTR_DEPRECATED("Using `sigprocmask(SIG_BLOCK)\' instead") int NOTHROW_NCX(LIBCCALL libc_sigblock)(int mask);
 #endif /* !__KERNEL__ */
 #if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
 /* >> sigsetmask(3)
  * Deprecated method of SIG_SETMASK-ing a given set of signals.
- * Modern code should use `sigprocmask(SIG_SETMASK)' instead.
+ * Modern code should  use `sigprocmask(SIG_SETMASK)'  instead.
  * @return: 0: Success */
 INTDEF ATTR_DEPRECATED("Using `sigprocmask()\' instead") int NOTHROW_NCX(LIBDCALL libd_sigsetmask)(int mask);
 #endif /* !__LIBCCALL_IS_LIBDCALL && !__KERNEL__ */
 #ifndef __KERNEL__
 /* >> sigsetmask(3)
  * Deprecated method of SIG_SETMASK-ing a given set of signals.
- * Modern code should use `sigprocmask(SIG_SETMASK)' instead.
+ * Modern code should  use `sigprocmask(SIG_SETMASK)'  instead.
  * @return: 0: Success */
 INTDEF ATTR_DEPRECATED("Using `sigprocmask()\' instead") int NOTHROW_NCX(LIBCCALL libc_sigsetmask)(int mask);
 /* >> sigsetmask(3)
- * Deprecated method of retrieving the masking-state of
+ * Deprecated method of  retrieving the masking-state  of
  * the lowest-numberred `sizeof(int) * NBBY - 1' signals.
  * @return: <= INT_MAX: An incomplete signal mask bitset for a couple
- *                      of the lowest-numbered couple of signal.
+ *                      of  the  lowest-numbered  couple  of  signal.
  * @return: -1:         Error */
 INTDEF ATTR_DEPRECATED("Using `sigprocmask()\' instead") int NOTHROW_NCX(LIBCCALL libc_siggetmask)(void);
 #endif /* !__KERNEL__ */
 #if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
-/* Don't call directly. Used internally to resume
+/* Don't  call directly. Used internally to resume
  * execution when returning from a signal handler. */
 INTDEF ATTR_NORETURN void NOTHROW_NCX(LIBDCALL libd_sigreturn)(struct sigcontext const *scp);
 /* >> sigpause(3)
  * Atomically save and set the caller's signal mask to consist solely
- * of the signal signal `signo', then wait for that signal to arrive
+ * of the signal signal `signo', then wait for that signal to  arrive
  * before restoring the old signal mask.
  * @return: -1: [errno=EINTR] The signal handler for `signo' was executed. */
 INTDEF int NOTHROW_NCX(LIBDCALL libd___xpg_sigpause)(signo_t signo);
@@ -87,7 +87,7 @@ INTDEF int NOTHROW_NCX(LIBDCALL libd___xpg_sigpause)(signo_t signo);
 #ifndef __KERNEL__
 /* >> sigpause(3)
  * Atomically save and set the caller's signal mask to consist solely
- * of the signal signal `signo', then wait for that signal to arrive
+ * of the signal signal `signo', then wait for that signal to  arrive
  * before restoring the old signal mask.
  * @return: -1: [errno=EINTR] The signal handler for `signo' was executed. */
 INTDEF int NOTHROW_NCX(LIBCCALL libc___xpg_sigpause)(signo_t signo);
@@ -97,10 +97,10 @@ INTDEF int NOTHROW_NCX(LIBCCALL libc___xpg_sigpause)(signo_t signo);
  * Raise a signal `signo' within the process(es) specified by `pid':
  *   - pid > 0:   Deliver `signo' to a process who's PID matches `pid'.
  *   - pid == 0:  Deliver `signo' to every process within the caller's process group.
- *   - pid == -1: Deliver `signo' to every process the caller has permission to send
+ *   - pid == -1: Deliver  `signo'  to  every process  the  caller has  permission  to send
  *                signals to, with the exception of a process with pid=1 (i.e. `/bin/init')
  *   - pid < -1:  Deliver `signo' to every process within the process group `-pid'
- * @param: signo: The signal number to deliver. When set to `0', no signal is delivered,
+ * @param: signo: The signal number to deliver. When set to `0', no signal is  delivered,
  *                and this function can be used to test if the caller would be allowed to
  *                send signals to the process(es) specified by `pid'
  * @return: 0:    Success
@@ -176,25 +176,25 @@ INTDEF ATTR_PURE WUNUSED NONNULL((1)) int NOTHROW_NCX(LIBDCALL libd_sigismember)
  *              Not returned by the kernel-version of this function! */
 INTDEF ATTR_PURE WUNUSED NONNULL((1)) int NOTHROW_NCX(LIBCCALL libc_sigismember)(sigset_t const *set, signo_t signo);
 #if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
-/* Change the signal mask for the calling thread. Note that portable
+/* Change  the signal mask for the calling thread. Note that portable
  * programs that also make use of multithreading must instead use the
- * pthread-specific `pthread_sigmask()' function instead, as POSIX
- * states that this function behaves undefined in such scenarios.
- * However, on KOS, `pthread_sigmask()' is simply an alias for this
- * function, and `sigprocmask()' always operates thread-local.
- * Note also that on KOS 2 additional functions `getsigmaskptr()'
- * and `setsigmaskptr()' exist, which can be used to get/set the
+ * pthread-specific  `pthread_sigmask()'  function instead,  as POSIX
+ * states that  this function  behaves undefined  in such  scenarios.
+ * However, on KOS, `pthread_sigmask()' is  simply an alias for  this
+ * function,  and  `sigprocmask()'   always  operates   thread-local.
+ * Note also  that on  KOS 2  additional functions  `getsigmaskptr()'
+ * and `setsigmaskptr()'  exist, which  can be  used to  get/set  the
  * address of the signal mask used by the kernel.
  * @param how: One of `SIG_BLOCK', `SIG_UNBLOCK' or `SIG_SETMASK'
  * @return: 0:  Success
  * @return: -1: [errno=EINVAL] Invalid `how' */
 INTDEF int NOTHROW_NCX(LIBDCALL libd_sigprocmask)(__STDC_INT_AS_UINT_T how, sigset_t const *set, sigset_t *oset);
 /* >> setsigmaskptr(3)
- * Set the current signal mask pointer to `sigmaskptr'
- * This is a kos-specific function that can be used to
- * speed up/replace calls to `sigprocmask()'. But using
+ * Set  the  current  signal  mask  pointer  to `sigmaskptr'
+ * This  is  a kos-specific  function  that can  be  used to
+ * speed up/replace  calls  to  `sigprocmask()'.  But  using
  * this function safely requires knowledge of its underlying
- * semantics. If you're unsure on those, you should instead
+ * semantics. If you're unsure on those, you should  instead
  * just use the portable `sigprocmask()' and forget you ever
  * read this comment :)
  * Example usage:
@@ -213,13 +213,13 @@ INTDEF int NOTHROW_NCX(LIBDCALL libd_sigprocmask)(__STDC_INT_AS_UINT_T how, sigs
  * @return: * : Address of the previously used signal mask. */
 INTDEF ATTR_RETNONNULL NONNULL((1)) sigset_t *NOTHROW_NCX(LIBDCALL libd_setsigmaskptr)(sigset_t *sigmaskptr);
 /* >> sigsuspend(2)
- * Atomically save and set the caller's signal mask to `set', then wait for
+ * Atomically save and  set the caller's  signal mask to  `set', then wait  for
  * one of the contained signals to arrive before restoring the old signal mask.
  * @param: set: The set of signals on which to wait
  * @return: -1: [errno=EINTR] The signal handler for `signo' was executed. */
 INTDEF NONNULL((1)) int NOTHROW_RPC(LIBDCALL libd_sigsuspend)(sigset_t const *set);
 /* >> sigaction(2)
- * Get/Set the action that shall be performed when a
+ * Get/Set the  action that  shall  be performed  when  a
  * signal `signo' must be handled by the calling process.
  * This function will modifiy the caller's kernel-space signal handler descriptor,
  * who's shared/unshared behavior between threads is controlled by `CLONE_SIGHAND'
@@ -228,7 +228,7 @@ INTDEF NONNULL((1)) int NOTHROW_RPC(LIBDCALL libd_sigsuspend)(sigset_t const *se
 INTDEF int NOTHROW_NCX(LIBDCALL libd_sigaction)(signo_t signo, struct sigaction const *act, struct sigaction *oact);
 /* >> sigpending(2)
  * Retrieve the set of signals that are pending
- * in either the calling thread and process
+ * in  either  the calling  thread  and process
  * @return: 0: Success */
 INTDEF NONNULL((1)) int NOTHROW_NCX(LIBDCALL libd_sigpending)(sigset_t *__restrict set);
 /* >> sigwait(3)
@@ -278,7 +278,7 @@ INTDEF NONNULL((1, 2, 3)) int NOTHROW_NCX(LIBDCALL libd_signandset)(sigset_t *se
 INTDEF NONNULL((1, 2, 3)) int NOTHROW_NCX(LIBCCALL libc_signandset)(sigset_t *set, sigset_t const *left, sigset_t const *right);
 #if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
 /* >> sigwaitinfo(2)
- * Same as `sigsuspend(2)', but write-back extended information in the signal,
+ * Same as `sigsuspend(2)',  but write-back extended  information in the  signal,
  * as it would/has also been passed to a signal handler's second (info) argument.
  * @param: set:  The set of signals on which to wait
  * @param: info: Information about the signal on which to wait.
@@ -293,15 +293,15 @@ INTDEF NONNULL((1)) int NOTHROW_RPC(LIBDCALL libd_sigwaitinfo)(sigset_t const *_
  * @return: -1: [errno=EAGAIN] A total of `rel_timeout' has passed. */
 INTDEF NONNULL((1)) int NOTHROW_RPC(LIBDCALL libd_sigtimedwait)(sigset_t const *__restrict set, siginfo_t *__restrict info, struct timespec const *rel_timeout);
 /* >> sigqueue(2)
- * Similar to `kill(2)', but `pid' must be positive and reference a process's PID,
+ * Similar to  `kill(2)',  but  `pid'  must  be positive  and  reference  a  process's  PID,
  * meaning that this function can only be uesd to send a signal to single, specific process.
  * @param: pid:   The PID of the process that shall receive the signal.
- * @param: signo: The signal number to deliver. When set to `0', no signal is delivered,
+ * @param: signo: The signal number to deliver. When set to `0', no signal is  delivered,
  *                and this function can be used to test if the caller would be allowed to
  *                send signals to the process(es) specified by `pid'
  * @param: val:   An additional value to pass alongside the signal itself. This value can
  *                read as `info->si_value' from within a 3-arg signal handler established
- *                by `pid', or may also be returned by a call to `sigwaitinfo(2)' and
+ *                by `pid', or  may also be  returned by a  call to `sigwaitinfo(2)'  and
  *                friends made by `pid'.
  * @return: 0:    Success
  * @return: -1:   [errno=EINVAL] The given `signo' is invalid
@@ -317,13 +317,13 @@ INTDEF int NOTHROW_NCX(LIBDCALL libd_sigqueue)(pid_t pid, signo_t signo, union s
  * @return: -1: [errno=EAGAIN] A total of `rel_timeout' has passed. */
 INTDEF NONNULL((1)) int NOTHROW_RPC(LIBDCALL libd_sigtimedwait64)(sigset_t const *__restrict set, siginfo_t *__restrict info, struct timespec64 const *rel_timeout);
 /* >> sigqueueinfo(2)
- * Similar to `sigqueue(2)', but instead of only being able to specify a custom
- * signal value, everything about signal meta-data can be specified by this function.
- * Note however that various privileges are required to provide custom values for
+ * Similar to  `sigqueue(2)',  but  instead  of  only being  able  to  specify  a  custom
+ * signal  value, everything  about signal meta-data  can be specified  by this function.
+ * Note however  that  various privileges  are  required  to provide  custom  values  for
  * different values of `uinfo' that don't match what the equivalent call to `sigqueue(2)'
  * would have used.
  * @param: pid:   The PID of the process that shall receive the signal.
- * @param: signo: The signal number to deliver. When set to `0', no signal is delivered,
+ * @param: signo: The signal number to deliver. When set to `0', no signal is  delivered,
  *                and this function can be used to test if the caller would be allowed to
  *                send signals to the process(es) specified by `pid'
  * @param: uinfo: Signal information to pass alongside the signal itself.
@@ -335,10 +335,10 @@ INTDEF NONNULL((1)) int NOTHROW_RPC(LIBDCALL libd_sigtimedwait64)(sigset_t const
  * @return: -1:   [errno=ESRCH]  No process is identified by `pid' */
 INTDEF NONNULL((3)) int NOTHROW_NCX(LIBDCALL libd_sigqueueinfo)(pid_t pid, signo_t signo, siginfo_t const *uinfo);
 /* >> tgsigqueueinfo(2)
- * Similar to `sigqueueinfo(2)', rather than sending a signal to a process
+ * Similar  to `sigqueueinfo(2)', rather than sending a signal to a process
  * as a whole, only send the signal to a single thread within that process.
  * @param: pid:   The PID of the process that shall receive the signal.
- * @param: signo: The signal number to deliver. When set to `0', no signal is delivered,
+ * @param: signo: The signal number to deliver. When set to `0', no signal is  delivered,
  *                and this function can be used to test if the caller would be allowed to
  *                send signals to the process(es) specified by `pid'
  * @param: uinfo: Signal information to pass alongside the signal itself.
@@ -351,7 +351,7 @@ INTDEF NONNULL((3)) int NOTHROW_NCX(LIBDCALL libd_sigqueueinfo)(pid_t pid, signo
 INTDEF NONNULL((4)) int NOTHROW_NCX(LIBDCALL libd_tgsigqueueinfo)(pid_t pid, pid_t tid, signo_t signo, siginfo_t const *uinfo);
 /* >> killpg(3)
  * Alias for `kill(-pgrp, signo)'
- * @param: signo: The signal number to deliver. When set to `0', no signal is delivered,
+ * @param: signo: The signal number to deliver. When set to `0', no signal is  delivered,
  *                and this function can be used to test if the caller would be allowed to
  *                send signals to the process(es) specified by `pid'
  * @return: 0:    Success
@@ -363,7 +363,7 @@ INTDEF int NOTHROW_NCX(LIBDCALL libd_killpg)(pid_t pgrp, signo_t signo);
 #ifndef __KERNEL__
 /* >> killpg(3)
  * Alias for `kill(-pgrp, signo)'
- * @param: signo: The signal number to deliver. When set to `0', no signal is delivered,
+ * @param: signo: The signal number to deliver. When set to `0', no signal is  delivered,
  *                and this function can be used to test if the caller would be allowed to
  *                send signals to the process(es) specified by `pid'
  * @return: 0:    Success
@@ -414,7 +414,7 @@ INTDEF ATTR_CONST WUNUSED char const *NOTHROW_NCX(LIBCCALL libc_strsigcode_s)(si
  * as well as cause any future handler established by `bsd_signal()' or one of
  * its aliases to immediately be established with `SA_RESTART' set/cleared
  * @param: interrupt: When == 0: clear `SA_RESTART' for the signal handler of `signo'
- *                    When != 0: set `SA_RESTART' for the signal handler of `signo'
+ *                    When != 0: set `SA_RESTART'  for the signal handler of  `signo'
  * @return: 0:  Success
  * @return: -1: [errno=EINVAL] The given `signo' is invalid */
 INTDEF int NOTHROW_NCX(LIBDCALL libd_siginterrupt)(signo_t signo, __STDC_INT_AS_UINT_T interrupt);
@@ -434,7 +434,7 @@ INTDEF int NOTHROW_NCX(LIBCCALL libc_sigstack)(struct sigstack *ss, struct sigst
 #if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
 /* >> sigaltstack(2)
  * Get/Set the alternate signal stack for the calling thread. When set,
- * the alternate signal stack can be used to host signal handlers that
+ * the alternate signal stack can be used to host signal handlers  that
  * have been established with the `SA_ONSTACK' flag in `sa_flags'.
  * @return: 0:  Success
  * @return: -1: Error (s.a. `errno') */
@@ -445,7 +445,7 @@ INTDEF int NOTHROW_NCX(LIBCCALL libc_set_single_signal_action)(int sig, int how)
 #endif /* !__KERNEL__ */
 #if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
 /* >> sighold(3)
- * Mask a single signal `signo', which is the same
+ * Mask a single signal  `signo', which is the  same
  * as `sigprocmask(SIG_BLOCK, MASKFOR(signo), NULL)'
  * @return: 0:  Success
  * @return: -1: Error (s.a. `errno') */
@@ -453,7 +453,7 @@ INTDEF int NOTHROW_NCX(LIBDCALL libd_sighold)(signo_t signo);
 #endif /* !__LIBCCALL_IS_LIBDCALL && !__KERNEL__ */
 #ifndef __KERNEL__
 /* >> sighold(3)
- * Mask a single signal `signo', which is the same
+ * Mask a single signal  `signo', which is the  same
  * as `sigprocmask(SIG_BLOCK, MASKFOR(signo), NULL)'
  * @return: 0:  Success
  * @return: -1: Error (s.a. `errno') */
@@ -461,7 +461,7 @@ INTDEF int NOTHROW_NCX(LIBCCALL libc_sighold)(signo_t signo);
 #endif /* !__KERNEL__ */
 #if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
 /* >> sighold(3)
- * Unmask a single signal `signo', which is the same
+ * Unmask a single signal  `signo', which is the  same
  * as `sigprocmask(SIG_UNBLOCK, MASKFOR(signo), NULL)'
  * @return: 0:  Success
  * @return: -1: Error (s.a. `errno') */
@@ -469,7 +469,7 @@ INTDEF int NOTHROW_NCX(LIBDCALL libd_sigrelse)(signo_t signo);
 #endif /* !__LIBCCALL_IS_LIBDCALL && !__KERNEL__ */
 #ifndef __KERNEL__
 /* >> sighold(3)
- * Unmask a single signal `signo', which is the same
+ * Unmask a single signal  `signo', which is the  same
  * as `sigprocmask(SIG_UNBLOCK, MASKFOR(signo), NULL)'
  * @return: 0:  Success
  * @return: -1: Error (s.a. `errno') */
@@ -491,7 +491,7 @@ INTDEF int NOTHROW_NCX(LIBCCALL libc_sigignore)(signo_t signo);
 #endif /* !__KERNEL__ */
 #if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
 /* >> sigset(3)
- * Set the handler of `signo' to `disp', or add `signo' to
+ * Set the handler of `signo'  to `disp', or add `signo'  to
  * the calling threads's signal mask when `disp == SIG_HOLD'
  * @return: 0:  Success
  * @return: -1: Error (s.a. `errno') */
@@ -499,7 +499,7 @@ INTDEF sighandler_t NOTHROW_NCX(LIBDCALL libd_sigset)(signo_t signo, sighandler_
 #endif /* !__LIBCCALL_IS_LIBDCALL && !__KERNEL__ */
 #ifndef __KERNEL__
 /* >> sigset(3)
- * Set the handler of `signo' to `disp', or add `signo' to
+ * Set the handler of `signo'  to `disp', or add `signo'  to
  * the calling threads's signal mask when `disp == SIG_HOLD'
  * @return: 0:  Success
  * @return: -1: Error (s.a. `errno') */
@@ -514,14 +514,14 @@ INTDEF ATTR_CONST WUNUSED signo_t NOTHROW_NCX(LIBCCALL libc___libc_current_sigrt
  * @return: EINVAL: The given `signo' is invalid */
 INTDEF errno_t NOTHROW_NCX(LIBDCALL libd_pthread_kill)(pthread_t pthread, signo_t signo);
 /* >> pthread_sigqueue(3)
- * This function is for `pthread_kill(3)', what `sigqueue(2)' is for `kill(2)',
+ * This function is for `pthread_kill(3)', what `sigqueue(2)' is for  `kill(2)',
  * in that it sends a signal to `pthread', alongside a custom signal value `val'
- * @param: signo: The signal number to deliver. When set to `0', no signal is delivered,
+ * @param: signo: The signal number to deliver. When set to `0', no signal is  delivered,
  *                and this function can be used to test if the caller would be allowed to
  *                send signals to the process(es) specified by `pid'
  * @param: val:   An additional value to pass alongside the signal itself. This value can
  *                read as `info->si_value' from within a 3-arg signal handler established
- *                by `pid', or may also be returned by a call to `sigwaitinfo(2)' and
+ *                by `pid', or  may also be  returned by a  call to `sigwaitinfo(2)'  and
  *                friends made by `pid'.
  * @return: EOK:    Success
  * @return: EINVAL: The given `signo' is invalid
@@ -529,30 +529,30 @@ INTDEF errno_t NOTHROW_NCX(LIBDCALL libd_pthread_kill)(pthread_t pthread, signo_
 INTDEF errno_t NOTHROW_NCX(LIBDCALL libd_pthread_sigqueue)(pthread_t pthread, signo_t signo, union sigval const val);
 /* >> signalnumber(3)
  * Similar to `strtosigno(3)', however ignore any leading `SIG*'
- * prefix of `name', and do a case-insensitive compare between
- * the given `name', and the signal's actual name.
- * When `name' isn't recognized, return `0' instead. */
+ * prefix of `name', and  do a case-insensitive compare  between
+ * the   given   `name',   and   the   signal's   actual   name.
+ * When   `name'   isn't   recognized,   return   `0'   instead. */
 INTDEF ATTR_PURE WUNUSED NONNULL((1)) signo_t NOTHROW_NCX(LIBDCALL libd_signalnumber)(const char *name);
 #endif /* !__LIBCCALL_IS_LIBDCALL && !__KERNEL__ */
 #ifndef __KERNEL__
 /* >> signalnumber(3)
  * Similar to `strtosigno(3)', however ignore any leading `SIG*'
- * prefix of `name', and do a case-insensitive compare between
- * the given `name', and the signal's actual name.
- * When `name' isn't recognized, return `0' instead. */
+ * prefix of `name', and  do a case-insensitive compare  between
+ * the   given   `name',   and   the   signal's   actual   name.
+ * When   `name'   isn't   recognized,   return   `0'   instead. */
 INTDEF ATTR_PURE WUNUSED NONNULL((1)) signo_t NOTHROW_NCX(LIBCCALL libc_signalnumber)(const char *name);
 #endif /* !__KERNEL__ */
 #if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
 /* >> signalnext(3)
  * Return the next-greater signal number that comes after `signo'
- * When no such signal number exists, return `0'. When the given
+ * When  no such signal number exists, return `0'. When the given
  * `signo' is `0', return the lowest valid signal number. */
 INTDEF ATTR_CONST WUNUSED signo_t NOTHROW_NCX(LIBDCALL libd_signalnext)(signo_t signo);
 #endif /* !__LIBCCALL_IS_LIBDCALL && !__KERNEL__ */
 #ifndef __KERNEL__
 /* >> signalnext(3)
  * Return the next-greater signal number that comes after `signo'
- * When no such signal number exists, return `0'. When the given
+ * When  no such signal number exists, return `0'. When the given
  * `signo' is `0', return the lowest valid signal number. */
 INTDEF ATTR_CONST WUNUSED signo_t NOTHROW_NCX(LIBCCALL libc_signalnext)(signo_t signo);
 #endif /* !__KERNEL__ */

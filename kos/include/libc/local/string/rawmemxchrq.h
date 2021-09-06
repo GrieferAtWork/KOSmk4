@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xc27cec2 */
+/* HASH CRC-32:0x3d94a46c */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -23,7 +23,6 @@
 #include <__crt.h>
 #include <hybrid/typecore.h>
 __NAMESPACE_LOCAL_BEGIN
-/* Same as `rawmemchrq', but search for non-matching locations. */
 __LOCAL_LIBC(rawmemxchrq) __ATTR_PURE __ATTR_RETNONNULL __ATTR_WUNUSED __ATTR_NONNULL((1)) __UINT64_TYPE__ *
 __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(rawmemxchrq))(void const *__restrict __haystack, __UINT64_TYPE__ __needle) {
 	__UINT64_TYPE__ *__iter = (__UINT64_TYPE__ *)__haystack;

@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xd40e3345 */
+/* HASH CRC-32:0x1413c0c3 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -673,30 +673,30 @@ __CREDIRECT_KOS(__ATTR_NONNULL((2, 4)),int,__NOTHROW_RPC,c32linkat,(__fd_t __fro
 #endif /* ... */
 #if defined(__CRT_HAVE_wsymlinkat) && __SIZEOF_WCHAR_T__ == 2 && defined(__LIBCCALL_IS_LIBDCALL)
 /* >> symlinkat(3)
- * Create a new symbolic link loaded with `link_text' as link
+ * Create  a  new  symbolic  link  loaded  with  `link_text'  as link
  * text, at the filesystem location referred to by `tofd:target_path' */
 __CREDIRECT(__ATTR_NONNULL((1, 3)),int,__NOTHROW_RPC,c16symlinkat,(char16_t const *__link_text, __fd_t __tofd, char16_t const *__target_path),wsymlinkat,(__link_text,__tofd,__target_path))
 #elif defined(__CRT_HAVE_DOS$wsymlinkat)
 /* >> symlinkat(3)
- * Create a new symbolic link loaded with `link_text' as link
+ * Create  a  new  symbolic  link  loaded  with  `link_text'  as link
  * text, at the filesystem location referred to by `tofd:target_path' */
 __CREDIRECT_DOS(__ATTR_NONNULL((1, 3)),int,__NOTHROW_RPC,c16symlinkat,(char16_t const *__link_text, __fd_t __tofd, char16_t const *__target_path),wsymlinkat,(__link_text,__tofd,__target_path))
 #endif /* ... */
 #if defined(__CRT_HAVE_wsymlinkat) && __SIZEOF_WCHAR_T__ == 4 && defined(__LIBCCALL_IS_LIBKCALL)
 /* >> symlinkat(3)
- * Create a new symbolic link loaded with `link_text' as link
+ * Create  a  new  symbolic  link  loaded  with  `link_text'  as link
  * text, at the filesystem location referred to by `tofd:target_path' */
 __CREDIRECT(__ATTR_NONNULL((1, 3)),int,__NOTHROW_RPC,c32symlinkat,(char32_t const *__link_text, __fd_t __tofd, char32_t const *__target_path),wsymlinkat,(__link_text,__tofd,__target_path))
 #elif defined(__CRT_HAVE_KOS$wsymlinkat)
 /* >> symlinkat(3)
- * Create a new symbolic link loaded with `link_text' as link
+ * Create  a  new  symbolic  link  loaded  with  `link_text'  as link
  * text, at the filesystem location referred to by `tofd:target_path' */
 __CREDIRECT_KOS(__ATTR_NONNULL((1, 3)),int,__NOTHROW_RPC,c32symlinkat,(char32_t const *__link_text, __fd_t __tofd, char32_t const *__target_path),wsymlinkat,(__link_text,__tofd,__target_path))
 #endif /* ... */
 #if defined(__CRT_HAVE_wreadlinkat) && __SIZEOF_WCHAR_T__ == 2 && defined(__LIBCCALL_IS_LIBDCALL)
 /* >> readlinkat(2)
  * Read the text of a symbolic link under `dfd:path' into the provided buffer.
- * WARNING: This function is badly designed and will neither append a trailing
+ * WARNING: This  function is badly designed and will neither append a trailing
  *          NUL-character to the buffer, nor will it return the required buffer
  *          size. Instead, it will return the written size, and the caller must
  *          keep on over allocating until the function indicates that it didn't
@@ -706,7 +706,7 @@ __CREDIRECT(__ATTR_NONNULL((2, 3)),ssize_t,__NOTHROW_RPC,c16readlinkat,(__fd_t _
 #elif defined(__CRT_HAVE_DOS$wreadlinkat)
 /* >> readlinkat(2)
  * Read the text of a symbolic link under `dfd:path' into the provided buffer.
- * WARNING: This function is badly designed and will neither append a trailing
+ * WARNING: This  function is badly designed and will neither append a trailing
  *          NUL-character to the buffer, nor will it return the required buffer
  *          size. Instead, it will return the written size, and the caller must
  *          keep on over allocating until the function indicates that it didn't
@@ -717,7 +717,7 @@ __CREDIRECT_DOS(__ATTR_NONNULL((2, 3)),ssize_t,__NOTHROW_RPC,c16readlinkat,(__fd
 #if defined(__CRT_HAVE_wreadlinkat) && __SIZEOF_WCHAR_T__ == 4 && defined(__LIBCCALL_IS_LIBKCALL)
 /* >> readlinkat(2)
  * Read the text of a symbolic link under `dfd:path' into the provided buffer.
- * WARNING: This function is badly designed and will neither append a trailing
+ * WARNING: This  function is badly designed and will neither append a trailing
  *          NUL-character to the buffer, nor will it return the required buffer
  *          size. Instead, it will return the written size, and the caller must
  *          keep on over allocating until the function indicates that it didn't
@@ -727,7 +727,7 @@ __CREDIRECT(__ATTR_NONNULL((2, 3)),ssize_t,__NOTHROW_RPC,c32readlinkat,(__fd_t _
 #elif defined(__CRT_HAVE_KOS$wreadlinkat)
 /* >> readlinkat(2)
  * Read the text of a symbolic link under `dfd:path' into the provided buffer.
- * WARNING: This function is badly designed and will neither append a trailing
+ * WARNING: This  function is badly designed and will neither append a trailing
  *          NUL-character to the buffer, nor will it return the required buffer
  *          size. Instead, it will return the written size, and the caller must
  *          keep on over allocating until the function indicates that it didn't
@@ -781,12 +781,12 @@ __CREDIRECT_KOS(__ATTR_NONNULL((2)),int,__NOTHROW_RPC,c32unlinkat,(__fd_t __dfd,
 #if defined(__CRT_HAVE_wlchown) && __SIZEOF_WCHAR_T__ == 2 && defined(__LIBCCALL_IS_LIBDCALL)
 /* >> lchown(2)
  * Change the ownership of a given `file' to `group:owner',
- * but don't reference it if that file is a symbolic link */
+ * but don't reference it if  that file is a symbolic  link */
 __CREDIRECT(__ATTR_NONNULL((1)),int,__NOTHROW_RPC,c16lchown,(char16_t const *__file, __uid_t __owner, __gid_t __group),wlchown,(__file,__owner,__group))
 #elif defined(__CRT_HAVE_DOS$wlchown)
 /* >> lchown(2)
  * Change the ownership of a given `file' to `group:owner',
- * but don't reference it if that file is a symbolic link */
+ * but don't reference it if  that file is a symbolic  link */
 __CREDIRECT_DOS(__ATTR_NONNULL((1)),int,__NOTHROW_RPC,c16lchown,(char16_t const *__file, __uid_t __owner, __gid_t __group),wlchown,(__file,__owner,__group))
 #else /* ... */
 #include <asm/os/fcntl.h>
@@ -794,25 +794,25 @@ __CREDIRECT_DOS(__ATTR_NONNULL((1)),int,__NOTHROW_RPC,c16lchown,(char16_t const 
 #include <libc/local/parts.wchar.unistd/wlchown.h>
 /* >> lchown(2)
  * Change the ownership of a given `file' to `group:owner',
- * but don't reference it if that file is a symbolic link */
+ * but don't reference it if  that file is a symbolic  link */
 __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_NONNULL((1)) int __NOTHROW_RPC(__LIBDCALL c16lchown)(char16_t const *__file, __uid_t __owner, __gid_t __group) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(wlchown))((__WCHAR_TYPE__ const *)__file, __owner, __group); }
 #elif defined(__AT_FDCWD) && defined(__AT_SYMLINK_NOFOLLOW) && ((defined(__CRT_HAVE_wfchownat) && __SIZEOF_WCHAR_T__ == 2 && defined(__LIBCCALL_IS_LIBDCALL)) || defined(__CRT_HAVE_DOS$wfchownat))
 #include <libc/local/parts.uchar.unistd/c16lchown.h>
 /* >> lchown(2)
  * Change the ownership of a given `file' to `group:owner',
- * but don't reference it if that file is a symbolic link */
+ * but don't reference it if  that file is a symbolic  link */
 __NAMESPACE_LOCAL_USING_OR_IMPL(c16lchown, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_NONNULL((1)) int __NOTHROW_RPC(__LIBDCALL c16lchown)(char16_t const *__file, __uid_t __owner, __gid_t __group) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(c16lchown))(__file, __owner, __group); })
 #endif /* ... */
 #endif /* !... */
 #if defined(__CRT_HAVE_wlchown) && __SIZEOF_WCHAR_T__ == 4 && defined(__LIBCCALL_IS_LIBKCALL)
 /* >> lchown(2)
  * Change the ownership of a given `file' to `group:owner',
- * but don't reference it if that file is a symbolic link */
+ * but don't reference it if  that file is a symbolic  link */
 __CREDIRECT(__ATTR_NONNULL((1)),int,__NOTHROW_RPC,c32lchown,(char32_t const *__file, __uid_t __owner, __gid_t __group),wlchown,(__file,__owner,__group))
 #elif defined(__CRT_HAVE_KOS$wlchown)
 /* >> lchown(2)
  * Change the ownership of a given `file' to `group:owner',
- * but don't reference it if that file is a symbolic link */
+ * but don't reference it if  that file is a symbolic  link */
 __CREDIRECT_KOS(__ATTR_NONNULL((1)),int,__NOTHROW_RPC,c32lchown,(char32_t const *__file, __uid_t __owner, __gid_t __group),wlchown,(__file,__owner,__group))
 #else /* ... */
 #include <asm/os/fcntl.h>
@@ -820,13 +820,13 @@ __CREDIRECT_KOS(__ATTR_NONNULL((1)),int,__NOTHROW_RPC,c32lchown,(char32_t const 
 #include <libc/local/parts.wchar.unistd/wlchown.h>
 /* >> lchown(2)
  * Change the ownership of a given `file' to `group:owner',
- * but don't reference it if that file is a symbolic link */
+ * but don't reference it if  that file is a symbolic  link */
 __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_NONNULL((1)) int __NOTHROW_RPC(__LIBKCALL c32lchown)(char32_t const *__file, __uid_t __owner, __gid_t __group) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(wlchown))((__WCHAR_TYPE__ const *)__file, __owner, __group); }
 #elif defined(__AT_FDCWD) && defined(__AT_SYMLINK_NOFOLLOW) && ((defined(__CRT_HAVE_wfchownat) && __SIZEOF_WCHAR_T__ == 4 && defined(__LIBCCALL_IS_LIBKCALL)) || defined(__CRT_HAVE_KOS$wfchownat))
 #include <libc/local/parts.uchar.unistd/c32lchown.h>
 /* >> lchown(2)
  * Change the ownership of a given `file' to `group:owner',
- * but don't reference it if that file is a symbolic link */
+ * but don't reference it if  that file is a symbolic  link */
 __NAMESPACE_LOCAL_USING_OR_IMPL(c32lchown, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_NONNULL((1)) int __NOTHROW_RPC(__LIBKCALL c32lchown)(char32_t const *__file, __uid_t __owner, __gid_t __group) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(c32lchown))(__file, __owner, __group); })
 #endif /* ... */
 #endif /* !... */
@@ -960,13 +960,13 @@ __NAMESPACE_LOCAL_USING_OR_IMPL(c32truncate64, __FORCELOCAL __ATTR_ARTIFICIAL __
 #if defined(__USE_XOPEN_EXTENDED) || defined(__USE_XOPEN2K)
 #if defined(__CRT_HAVE_wsymlink) && __SIZEOF_WCHAR_T__ == 2 && defined(__LIBCCALL_IS_LIBDCALL)
 /* >> symlink(3)
- * Create a new symbolic link loaded with `link_text' as link
+ * Create  a new  symbolic link  loaded with  `link_text' as link
  * text, at the filesystem location referred to by `target_path'.
  * Same as `symlinkat(link_text, AT_FDCWD, target_path)' */
 __CREDIRECT(__ATTR_NONNULL((1, 2)),int,__NOTHROW_RPC,c16symlink,(char16_t const *__link_text, char16_t const *__target_path),wsymlink,(__link_text,__target_path))
 #elif defined(__CRT_HAVE_DOS$wsymlink)
 /* >> symlink(3)
- * Create a new symbolic link loaded with `link_text' as link
+ * Create  a new  symbolic link  loaded with  `link_text' as link
  * text, at the filesystem location referred to by `target_path'.
  * Same as `symlinkat(link_text, AT_FDCWD, target_path)' */
 __CREDIRECT_DOS(__ATTR_NONNULL((1, 2)),int,__NOTHROW_RPC,c16symlink,(char16_t const *__link_text, char16_t const *__target_path),wsymlink,(__link_text,__target_path))
@@ -975,14 +975,14 @@ __CREDIRECT_DOS(__ATTR_NONNULL((1, 2)),int,__NOTHROW_RPC,c16symlink,(char16_t co
 #if defined(__AT_FDCWD) && defined(__CRT_HAVE_wsymlinkat) && __SIZEOF_WCHAR_T__ == 2
 #include <libc/local/parts.wchar.unistd/wsymlink.h>
 /* >> symlink(3)
- * Create a new symbolic link loaded with `link_text' as link
+ * Create  a new  symbolic link  loaded with  `link_text' as link
  * text, at the filesystem location referred to by `target_path'.
  * Same as `symlinkat(link_text, AT_FDCWD, target_path)' */
 __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_NONNULL((1, 2)) int __NOTHROW_RPC(__LIBDCALL c16symlink)(char16_t const *__link_text, char16_t const *__target_path) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(wsymlink))((__WCHAR_TYPE__ const *)__link_text, (__WCHAR_TYPE__ const *)__target_path); }
 #elif defined(__AT_FDCWD) && ((defined(__CRT_HAVE_wsymlinkat) && __SIZEOF_WCHAR_T__ == 2 && defined(__LIBCCALL_IS_LIBDCALL)) || defined(__CRT_HAVE_DOS$wsymlinkat))
 #include <libc/local/parts.uchar.unistd/c16symlink.h>
 /* >> symlink(3)
- * Create a new symbolic link loaded with `link_text' as link
+ * Create  a new  symbolic link  loaded with  `link_text' as link
  * text, at the filesystem location referred to by `target_path'.
  * Same as `symlinkat(link_text, AT_FDCWD, target_path)' */
 __NAMESPACE_LOCAL_USING_OR_IMPL(c16symlink, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_NONNULL((1, 2)) int __NOTHROW_RPC(__LIBDCALL c16symlink)(char16_t const *__link_text, char16_t const *__target_path) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(c16symlink))(__link_text, __target_path); })
@@ -990,13 +990,13 @@ __NAMESPACE_LOCAL_USING_OR_IMPL(c16symlink, __FORCELOCAL __ATTR_ARTIFICIAL __ATT
 #endif /* !... */
 #if defined(__CRT_HAVE_wsymlink) && __SIZEOF_WCHAR_T__ == 4 && defined(__LIBCCALL_IS_LIBKCALL)
 /* >> symlink(3)
- * Create a new symbolic link loaded with `link_text' as link
+ * Create  a new  symbolic link  loaded with  `link_text' as link
  * text, at the filesystem location referred to by `target_path'.
  * Same as `symlinkat(link_text, AT_FDCWD, target_path)' */
 __CREDIRECT(__ATTR_NONNULL((1, 2)),int,__NOTHROW_RPC,c32symlink,(char32_t const *__link_text, char32_t const *__target_path),wsymlink,(__link_text,__target_path))
 #elif defined(__CRT_HAVE_KOS$wsymlink)
 /* >> symlink(3)
- * Create a new symbolic link loaded with `link_text' as link
+ * Create  a new  symbolic link  loaded with  `link_text' as link
  * text, at the filesystem location referred to by `target_path'.
  * Same as `symlinkat(link_text, AT_FDCWD, target_path)' */
 __CREDIRECT_KOS(__ATTR_NONNULL((1, 2)),int,__NOTHROW_RPC,c32symlink,(char32_t const *__link_text, char32_t const *__target_path),wsymlink,(__link_text,__target_path))
@@ -1005,14 +1005,14 @@ __CREDIRECT_KOS(__ATTR_NONNULL((1, 2)),int,__NOTHROW_RPC,c32symlink,(char32_t co
 #if defined(__AT_FDCWD) && defined(__CRT_HAVE_wsymlinkat) && __SIZEOF_WCHAR_T__ == 4
 #include <libc/local/parts.wchar.unistd/wsymlink.h>
 /* >> symlink(3)
- * Create a new symbolic link loaded with `link_text' as link
+ * Create  a new  symbolic link  loaded with  `link_text' as link
  * text, at the filesystem location referred to by `target_path'.
  * Same as `symlinkat(link_text, AT_FDCWD, target_path)' */
 __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_NONNULL((1, 2)) int __NOTHROW_RPC(__LIBKCALL c32symlink)(char32_t const *__link_text, char32_t const *__target_path) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(wsymlink))((__WCHAR_TYPE__ const *)__link_text, (__WCHAR_TYPE__ const *)__target_path); }
 #elif defined(__AT_FDCWD) && ((defined(__CRT_HAVE_wsymlinkat) && __SIZEOF_WCHAR_T__ == 4 && defined(__LIBCCALL_IS_LIBKCALL)) || defined(__CRT_HAVE_KOS$wsymlinkat))
 #include <libc/local/parts.uchar.unistd/c32symlink.h>
 /* >> symlink(3)
- * Create a new symbolic link loaded with `link_text' as link
+ * Create  a new  symbolic link  loaded with  `link_text' as link
  * text, at the filesystem location referred to by `target_path'.
  * Same as `symlinkat(link_text, AT_FDCWD, target_path)' */
 __NAMESPACE_LOCAL_USING_OR_IMPL(c32symlink, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_NONNULL((1, 2)) int __NOTHROW_RPC(__LIBKCALL c32symlink)(char32_t const *__link_text, char32_t const *__target_path) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(c32symlink))(__link_text, __target_path); })
@@ -1022,7 +1022,7 @@ __NAMESPACE_LOCAL_USING_OR_IMPL(c32symlink, __FORCELOCAL __ATTR_ARTIFICIAL __ATT
 /* >> readlink(3)
  * Read the text of a symbolic link under `path' into the provided buffer.
  * Same as `readlinkat(AT_FDCWD, path, buf, buflen)'
- * WARNING: This function is badly designed and will neither append a trailing
+ * WARNING: This  function is badly designed and will neither append a trailing
  *          NUL-character to the buffer, nor will it return the required buffer
  *          size. Instead, it will return the written size, and the caller must
  *          keep on over allocating until the function indicates that it didn't
@@ -1033,7 +1033,7 @@ __CREDIRECT(__ATTR_NONNULL((1, 2)),ssize_t,__NOTHROW_RPC,c16readlink,(char16_t c
 /* >> readlink(3)
  * Read the text of a symbolic link under `path' into the provided buffer.
  * Same as `readlinkat(AT_FDCWD, path, buf, buflen)'
- * WARNING: This function is badly designed and will neither append a trailing
+ * WARNING: This  function is badly designed and will neither append a trailing
  *          NUL-character to the buffer, nor will it return the required buffer
  *          size. Instead, it will return the written size, and the caller must
  *          keep on over allocating until the function indicates that it didn't
@@ -1047,7 +1047,7 @@ __CREDIRECT_DOS(__ATTR_NONNULL((1, 2)),ssize_t,__NOTHROW_RPC,c16readlink,(char16
 /* >> readlink(3)
  * Read the text of a symbolic link under `path' into the provided buffer.
  * Same as `readlinkat(AT_FDCWD, path, buf, buflen)'
- * WARNING: This function is badly designed and will neither append a trailing
+ * WARNING: This  function is badly designed and will neither append a trailing
  *          NUL-character to the buffer, nor will it return the required buffer
  *          size. Instead, it will return the written size, and the caller must
  *          keep on over allocating until the function indicates that it didn't
@@ -1059,7 +1059,7 @@ __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_NONNULL((1, 2)) ssize_t __NOTHROW_RPC(__LI
 /* >> readlink(3)
  * Read the text of a symbolic link under `path' into the provided buffer.
  * Same as `readlinkat(AT_FDCWD, path, buf, buflen)'
- * WARNING: This function is badly designed and will neither append a trailing
+ * WARNING: This  function is badly designed and will neither append a trailing
  *          NUL-character to the buffer, nor will it return the required buffer
  *          size. Instead, it will return the written size, and the caller must
  *          keep on over allocating until the function indicates that it didn't
@@ -1072,7 +1072,7 @@ __NAMESPACE_LOCAL_USING_OR_IMPL(c16readlink, __FORCELOCAL __ATTR_ARTIFICIAL __AT
 /* >> readlink(3)
  * Read the text of a symbolic link under `path' into the provided buffer.
  * Same as `readlinkat(AT_FDCWD, path, buf, buflen)'
- * WARNING: This function is badly designed and will neither append a trailing
+ * WARNING: This  function is badly designed and will neither append a trailing
  *          NUL-character to the buffer, nor will it return the required buffer
  *          size. Instead, it will return the written size, and the caller must
  *          keep on over allocating until the function indicates that it didn't
@@ -1083,7 +1083,7 @@ __CREDIRECT(__ATTR_NONNULL((1, 2)),ssize_t,__NOTHROW_RPC,c32readlink,(char32_t c
 /* >> readlink(3)
  * Read the text of a symbolic link under `path' into the provided buffer.
  * Same as `readlinkat(AT_FDCWD, path, buf, buflen)'
- * WARNING: This function is badly designed and will neither append a trailing
+ * WARNING: This  function is badly designed and will neither append a trailing
  *          NUL-character to the buffer, nor will it return the required buffer
  *          size. Instead, it will return the written size, and the caller must
  *          keep on over allocating until the function indicates that it didn't
@@ -1097,7 +1097,7 @@ __CREDIRECT_KOS(__ATTR_NONNULL((1, 2)),ssize_t,__NOTHROW_RPC,c32readlink,(char32
 /* >> readlink(3)
  * Read the text of a symbolic link under `path' into the provided buffer.
  * Same as `readlinkat(AT_FDCWD, path, buf, buflen)'
- * WARNING: This function is badly designed and will neither append a trailing
+ * WARNING: This  function is badly designed and will neither append a trailing
  *          NUL-character to the buffer, nor will it return the required buffer
  *          size. Instead, it will return the written size, and the caller must
  *          keep on over allocating until the function indicates that it didn't
@@ -1109,7 +1109,7 @@ __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_NONNULL((1, 2)) ssize_t __NOTHROW_RPC(__LI
 /* >> readlink(3)
  * Read the text of a symbolic link under `path' into the provided buffer.
  * Same as `readlinkat(AT_FDCWD, path, buf, buflen)'
- * WARNING: This function is badly designed and will neither append a trailing
+ * WARNING: This  function is badly designed and will neither append a trailing
  *          NUL-character to the buffer, nor will it return the required buffer
  *          size. Instead, it will return the written size, and the caller must
  *          keep on over allocating until the function indicates that it didn't
@@ -1214,23 +1214,23 @@ __CREDIRECT_KOS(__ATTR_NONNULL((1)),int,__NOTHROW_NCX,c32setdomainname,(char32_t
    (defined(__USE_XOPEN) && !defined(__USE_XOPEN2K))
 #if defined(__CRT_HAVE_wchroot) && __SIZEOF_WCHAR_T__ == 2 && defined(__LIBCCALL_IS_LIBDCALL)
 /* >> chroot(2)
- * Change the root directory of the calling `CLONE_FS' group of threads
+ * Change  the root directory of the calling `CLONE_FS' group of threads
  * (usually the process) to a path that was previously address by `path' */
 __CREDIRECT(__ATTR_NONNULL((1)),int,__NOTHROW_RPC,c16chroot,(char16_t const *__restrict __path),wchroot,(__path))
 #elif defined(__CRT_HAVE_DOS$wchroot)
 /* >> chroot(2)
- * Change the root directory of the calling `CLONE_FS' group of threads
+ * Change  the root directory of the calling `CLONE_FS' group of threads
  * (usually the process) to a path that was previously address by `path' */
 __CREDIRECT_DOS(__ATTR_NONNULL((1)),int,__NOTHROW_RPC,c16chroot,(char16_t const *__restrict __path),wchroot,(__path))
 #endif /* ... */
 #if defined(__CRT_HAVE_wchroot) && __SIZEOF_WCHAR_T__ == 4 && defined(__LIBCCALL_IS_LIBKCALL)
 /* >> chroot(2)
- * Change the root directory of the calling `CLONE_FS' group of threads
+ * Change  the root directory of the calling `CLONE_FS' group of threads
  * (usually the process) to a path that was previously address by `path' */
 __CREDIRECT(__ATTR_NONNULL((1)),int,__NOTHROW_RPC,c32chroot,(char32_t const *__restrict __path),wchroot,(__path))
 #elif defined(__CRT_HAVE_KOS$wchroot)
 /* >> chroot(2)
- * Change the root directory of the calling `CLONE_FS' group of threads
+ * Change  the root directory of the calling `CLONE_FS' group of threads
  * (usually the process) to a path that was previously address by `path' */
 __CREDIRECT_KOS(__ATTR_NONNULL((1)),int,__NOTHROW_RPC,c32chroot,(char32_t const *__restrict __path),wchroot,(__path))
 #endif /* ... */

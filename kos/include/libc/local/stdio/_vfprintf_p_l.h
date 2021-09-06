@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x56d0693 */
+/* HASH CRC-32:0xf376eaf1 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -25,7 +25,6 @@
 #if defined(__CRT_HAVE__vfprintf_p) || defined(__CRT_HAVE_fputc) || defined(__CRT_HAVE_putc) || defined(__CRT_HAVE__IO_putc) || defined(__CRT_HAVE_fputc_unlocked) || defined(__CRT_HAVE_putc_unlocked) || (defined(__CRT_DOS) && defined(__CRT_HAVE__flsbuf)) || defined(__CRT_HAVE_fwrite) || defined(__CRT_HAVE__IO_fwrite) || defined(__CRT_HAVE_fwrite_s) || defined(__CRT_HAVE_fwrite_unlocked) || defined(__CRT_HAVE__fwrite_nolock)
 #include <kos/anno.h>
 __NAMESPACE_LOCAL_BEGIN
-/* Dependency: _vfprintf_p from stdio */
 #ifndef __local___localdep__vfprintf_p_defined
 #define __local___localdep__vfprintf_p_defined 1
 #ifdef __CRT_HAVE__vfprintf_p

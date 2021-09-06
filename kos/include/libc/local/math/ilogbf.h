@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x24385358 */
+/* HASH CRC-32:0x4dcbd98 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -24,23 +24,18 @@
 #include <ieee754.h>
 #if defined(__IEEE754_DOUBLE_TYPE_IS_FLOAT__) || defined(__IEEE854_LONG_DOUBLE_TYPE_IS_FLOAT__) || defined(__IEEE754_FLOAT_TYPE_IS_FLOAT__) || defined(__CRT_HAVE_ilogb) || defined(__CRT_HAVE___ilogb) || defined(__IEEE754_DOUBLE_TYPE_IS_DOUBLE__) || defined(__IEEE854_LONG_DOUBLE_TYPE_IS_DOUBLE__) || defined(__IEEE754_FLOAT_TYPE_IS_DOUBLE__)
 __NAMESPACE_LOCAL_BEGIN
-/* Dependency: ilogb from math */
 #ifndef __local___localdep_ilogb_defined
 #define __local___localdep_ilogb_defined 1
 #if __has_builtin(__builtin_ilogb) && defined(__LIBC_BIND_CRTBUILTINS) && defined(__CRT_HAVE_ilogb)
-/* Return the binary exponent of `x', which must be nonzero */
 __CEIREDIRECT(__ATTR_WUNUSED,int,__NOTHROW,__localdep_ilogb,(double __x),ilogb,{ return __builtin_ilogb(__x); })
 #elif defined(__CRT_HAVE_ilogb)
-/* Return the binary exponent of `x', which must be nonzero */
 __CREDIRECT(__ATTR_WUNUSED,int,__NOTHROW,__localdep_ilogb,(double __x),ilogb,(__x))
 #elif defined(__CRT_HAVE___ilogb)
-/* Return the binary exponent of `x', which must be nonzero */
 __CREDIRECT(__ATTR_WUNUSED,int,__NOTHROW,__localdep_ilogb,(double __x),__ilogb,(__x))
 #elif defined(__IEEE754_DOUBLE_TYPE_IS_DOUBLE__) || defined(__IEEE854_LONG_DOUBLE_TYPE_IS_DOUBLE__) || defined(__IEEE754_FLOAT_TYPE_IS_DOUBLE__)
 __NAMESPACE_LOCAL_END
 #include <libc/local/math/ilogb.h>
 __NAMESPACE_LOCAL_BEGIN
-/* Return the binary exponent of `x', which must be nonzero */
 #define __localdep_ilogb __LIBC_LOCAL_NAME(ilogb)
 #else /* ... */
 #undef __local___localdep_ilogb_defined
@@ -51,7 +46,6 @@ __NAMESPACE_LOCAL_END
 #include <libm/matherr.h>
 #include <bits/crt/mathdef.h>
 __NAMESPACE_LOCAL_BEGIN
-/* Return the binary exponent of `x', which must be nonzero */
 __LOCAL_LIBC(ilogbf) __ATTR_WUNUSED int
 __NOTHROW(__LIBCCALL __LIBC_LOCAL_NAME(ilogbf))(float __x) {
 #if defined(__IEEE754_DOUBLE_TYPE_IS_FLOAT__) || defined(__IEEE854_LONG_DOUBLE_TYPE_IS_FLOAT__) || defined(__IEEE754_FLOAT_TYPE_IS_FLOAT__)

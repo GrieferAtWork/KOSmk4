@@ -143,7 +143,7 @@ PRIVATE struct freerange_slist freemem = SLIST_HEAD_INITIALIZER(freemem);
 
 
 /* Internal function to add a given address range to the free list.
- * The caller is required to perform validity checks before using
+ * The caller is required to  perform validity checks before  using
  * this function! */
 PRIVATE void
 NOTHROW(FCALL dbx_add2free)(void *base, size_t num_bytes) {
@@ -507,7 +507,7 @@ PRIVATE void KCALL clear_heap(void) {
 		}
 
 		/* Because the part should be NULL, the node shouldn't
-		 * be apart of the kernel mman's writable list! */
+		 * be  apart  of  the  kernel  mman's  writable  list! */
 		printk(KERN_DEBUG "[dbx] Remove extension node %p-%p\n",
 			   mnode_getminaddr(&pred->sh_node),
 		       mnode_getmaxaddr(&pred->sh_node));

@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xc3e70cb2 */
+/* HASH CRC-32:0x61dd7a1f */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -24,42 +24,19 @@
 #if defined(__CRT_HAVE_raise) || (defined(__CRT_HAVE_pthread_kill) && (defined(__CRT_HAVE_pthread_self) || defined(__CRT_HAVE_thrd_current))) || (defined(__CRT_HAVE_kill) && (defined(__CRT_HAVE_getpid) || defined(__CRT_HAVE__getpid) || defined(__CRT_HAVE___getpid)))
 #include <bits/types.h>
 __NAMESPACE_LOCAL_BEGIN
-/* Dependency: raise from signal */
 #ifndef __local___localdep_raise_defined
 #define __local___localdep_raise_defined 1
 #ifdef __CRT_HAVE_raise
-/* >> raise(3)
- * Raise a signal within the current thread.
- * In a *-theaded process this is same as:
- *   *=multi:  `pthread_kill(pthread_self(), signo)'
- *   *=single: `kill(getpid(), signo)'
- * @return: 0:  Success
- * @return: -1: [errno=EINVAL] The given `signo' is invalid */
 __CREDIRECT(,int,__NOTHROW_NCX,__localdep_raise,(__signo_t __signo),raise,(__signo))
 #elif (defined(__CRT_HAVE_pthread_kill) && (defined(__CRT_HAVE_pthread_self) || defined(__CRT_HAVE_thrd_current))) || (defined(__CRT_HAVE_kill) && (defined(__CRT_HAVE_getpid) || defined(__CRT_HAVE__getpid) || defined(__CRT_HAVE___getpid)))
 __NAMESPACE_LOCAL_END
 #include <libc/local/signal/raise.h>
 __NAMESPACE_LOCAL_BEGIN
-/* >> raise(3)
- * Raise a signal within the current thread.
- * In a *-theaded process this is same as:
- *   *=multi:  `pthread_kill(pthread_self(), signo)'
- *   *=single: `kill(getpid(), signo)'
- * @return: 0:  Success
- * @return: -1: [errno=EINVAL] The given `signo' is invalid */
 #define __localdep_raise __LIBC_LOCAL_NAME(raise)
 #else /* ... */
 #undef __local___localdep_raise_defined
 #endif /* !... */
 #endif /* !__local___localdep_raise_defined */
-/* >> gsignal(3)
- * Raise a software-signal by invocing a previously established
- * software-signal-handler, as set by `ssignal(signo, ...)'.
- * This method by which a software signal is raised may or may not
- * be distinct from normal signal handlers.
- * On KOS, this function behaves identical to `raise()'
- * @return: 0:  Success
- * @return: -1: [errno=EINVAL] The given `signo' is invalid */
 __LOCAL_LIBC(gsignal) int
 __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(gsignal))(__signo_t __signo) {
 	return __localdep_raise(__signo);

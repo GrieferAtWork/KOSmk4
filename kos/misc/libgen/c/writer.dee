@@ -66,7 +66,7 @@ class CGenerator {
 	@@The underlying file to which to output generated text
 	public member fp: File;
 
-	@@Set to @true if the last thing written to @fp was a new-line character
+	@@Set to @true if the last thing  written to @fp was a new-line  character
 	@@Also set to @true upon construction (i.e. for our purposes, the start of
 	@@a file is assumed to begin with a new-line character)
 	public member fpAfterNewline: bool = true;
@@ -75,7 +75,7 @@ class CGenerator {
 	@@This is a list of @(CGP_*, arg), where @arg depends on the type code
 	public member pendingParts: {(int, Object)...} = [];
 
-	@@Return a file printer with which simple strings can be appened
+	@@Return a file printer with  which simple strings can be  appened
 	@@Note that after any of the other add* functions are called, this
 	@@property must be re-read to obtain a new printer!
 	public property addPrinter: File = {
@@ -476,11 +476,11 @@ class CWriter {
 	public member generator: CGenerator;
 
 	@@Flush all output of the CWriter to the bound file
-	@@NOTE: Doing this will prevent any further optimizations to be
+	@@NOTE: Doing this  will prevent  any  further optimizations  to  be
 	@@      done on anything that has already been written at this time.
-	@@      As such, you should only call this function once no more
-	@@      text is going to be written, or if you know for sure that
-	@@      no further optimizations are possible, or don't wish any
+	@@      As such, you  should only  call this function  once no  more
+	@@      text is going to  be written, or if  you know for sure  that
+	@@      no further  optimizations are  possible, or  don't wish  any
 	@@      further optimizations to be performed.
 	public function flush(): CWriter {
 		generator.flush();
@@ -491,7 +491,7 @@ class CWriter {
 	public member keepNewLinesFromDeadCode: bool;
 
 	@@Returns @true if the output is ignored within the current context.
-	@@This can happen following something like @ppIf("0"), and will
+	@@This can  happen following  something  like @ppIf("0"),  and  will
 	@@continue on until the corresponding call to @ppEndif()
 	public property isDeadCode: bool = {
 		get(): bool -> m_IfdefDead != 0;

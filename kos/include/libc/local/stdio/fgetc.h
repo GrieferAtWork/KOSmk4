@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x3864438 */
+/* HASH CRC-32:0x36e4de07 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -24,12 +24,10 @@
 #if (defined(__CRT_DOS) && defined(__CRT_HAVE__filbuf)) || defined(__CRT_HAVE_fread) || defined(__CRT_HAVE__IO_fread) || defined(__CRT_HAVE_fread_unlocked) || defined(__CRT_HAVE__fread_nolock)
 #include <kos/anno.h>
 __NAMESPACE_LOCAL_BEGIN
-/* Dependency: _filbuf from stdio */
 #if !defined(__local___localdep__filbuf_defined) && defined(__CRT_HAVE__filbuf)
 #define __local___localdep__filbuf_defined 1
 __CREDIRECT(__ATTR_NONNULL((1)),int,__THROWING,__localdep__filbuf,(__FILE *__restrict __stream),_filbuf,(__stream))
 #endif /* !__local___localdep__filbuf_defined && __CRT_HAVE__filbuf */
-/* Dependency: crt_fread from stdio */
 #ifndef __local___localdep_crt_fread_defined
 #define __local___localdep_crt_fread_defined 1
 #if defined(__CRT_HAVE_fread_unlocked) && defined(__USE_STDIO_UNLOCKED)
@@ -69,10 +67,6 @@ __CREDIRECT(__ATTR_WUNUSED __ATTR_NONNULL((1, 4)),__SIZE_TYPE__,__THROWING,__loc
 __NAMESPACE_LOCAL_END
 #include <bits/crt/io-file.h>
 __NAMESPACE_LOCAL_BEGIN
-/* >> fgetc(3)
- * Read and return a single character from `stream'
- * If the given `stream' has been exhausted or if an error occurred, `EOF' is
- * returned and the exact cause can be determined by using `ferror' and `feof' */
 __LOCAL_LIBC(fgetc) __ATTR_NONNULL((1)) int
 (__LIBCCALL __LIBC_LOCAL_NAME(fgetc))(__FILE *__restrict __stream) __THROWS(...) {
 #if defined(__CRT_DOS) && defined(__CRT_HAVE__filbuf) && (!defined(__USE_STDIO_UNLOCKED) || (!defined(__CRT_HAVE_fread) && !defined(__CRT_HAVE__IO_fread) && !defined(__CRT_HAVE_fread_unlocked) && !defined(__CRT_HAVE__fread_nolock)))

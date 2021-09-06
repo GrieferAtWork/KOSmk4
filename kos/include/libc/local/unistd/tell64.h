@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x6e2d2fe7 */
+/* HASH CRC-32:0xdbc3fe85 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -25,34 +25,23 @@
 #if (defined(__CRT_HAVE_lseek64) || defined(__CRT_HAVE__lseeki64) || defined(__CRT_HAVE_lseek) || defined(__CRT_HAVE__lseek) || defined(__CRT_HAVE___lseek)) && defined(__SEEK_CUR)
 #include <bits/types.h>
 __NAMESPACE_LOCAL_BEGIN
-/* Dependency: lseek64 from unistd */
 #ifndef __local___localdep_lseek64_defined
 #define __local___localdep_lseek64_defined 1
 #ifdef __CRT_HAVE_lseek64
-/* >> lseek64(2)
- * Change the position of the file read/write pointer within a file referred to by `fd' */
 __CREDIRECT(,__off64_t,__NOTHROW_NCX,__localdep_lseek64,(__fd_t __fd, __off64_t __offset, __STDC_INT_AS_UINT_T __whence),lseek64,(__fd,__offset,__whence))
 #elif defined(__CRT_HAVE_lseek) && __SIZEOF_OFF32_T__ == __SIZEOF_OFF64_T__
-/* >> lseek64(2)
- * Change the position of the file read/write pointer within a file referred to by `fd' */
 __CREDIRECT(,__off64_t,__NOTHROW_NCX,__localdep_lseek64,(__fd_t __fd, __off64_t __offset, __STDC_INT_AS_UINT_T __whence),lseek,(__fd,__offset,__whence))
 #elif defined(__CRT_HAVE__lseeki64)
-/* >> lseek64(2)
- * Change the position of the file read/write pointer within a file referred to by `fd' */
 __CREDIRECT(,__off64_t,__NOTHROW_NCX,__localdep_lseek64,(__fd_t __fd, __off64_t __offset, __STDC_INT_AS_UINT_T __whence),_lseeki64,(__fd,__offset,__whence))
 #elif defined(__CRT_HAVE_lseek) || defined(__CRT_HAVE__lseek) || defined(__CRT_HAVE___lseek)
 __NAMESPACE_LOCAL_END
 #include <libc/local/unistd/lseek64.h>
 __NAMESPACE_LOCAL_BEGIN
-/* >> lseek64(2)
- * Change the position of the file read/write pointer within a file referred to by `fd' */
 #define __localdep_lseek64 __LIBC_LOCAL_NAME(lseek64)
 #else /* ... */
 #undef __local___localdep_lseek64_defined
 #endif /* !... */
 #endif /* !__local___localdep_lseek64_defined */
-/* >> tell(3), tell64(3)
- * Return the current file position (alias for `lseek(fd, 0, SEEK_CUR)') */
 __LOCAL_LIBC(tell64) __ATTR_WUNUSED __off64_t
 __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(tell64))(__fd_t __fd) {
 	return __localdep_lseek64(__fd, 0, __SEEK_CUR);

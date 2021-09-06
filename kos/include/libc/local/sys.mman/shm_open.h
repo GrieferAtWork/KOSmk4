@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x75f182db */
+/* HASH CRC-32:0xc3d3ae8b */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -24,54 +24,39 @@
 #include <asm/os/fcntl.h>
 #if defined(__CRT_HAVE_open64) || defined(__CRT_HAVE___open64) || defined(__CRT_HAVE_open) || defined(__CRT_HAVE__open) || defined(__CRT_HAVE___open) || (defined(__AT_FDCWD) && (defined(__CRT_HAVE_openat64) || defined(__CRT_HAVE_openat)))
 __NAMESPACE_LOCAL_BEGIN
-/* Dependency: memcpy from string */
 #ifndef __local___localdep_memcpy_defined
 #define __local___localdep_memcpy_defined 1
 #ifdef __CRT_HAVE_memcpy
 __NAMESPACE_LOCAL_END
 #include <hybrid/typecore.h>
 __NAMESPACE_LOCAL_BEGIN
-/* >> memcpy(3)
- * Copy memory between non-overlapping memory blocks.
- * @return: * : Always re-returns `dst' */
 __CREDIRECT(__ATTR_LEAF __ATTR_RETNONNULL __ATTR_NONNULL((1, 2)),void *,__NOTHROW_NCX,__localdep_memcpy,(void *__restrict __dst, void const *__restrict __src, __SIZE_TYPE__ __n_bytes),memcpy,(__dst,__src,__n_bytes))
 #else /* __CRT_HAVE_memcpy */
 __NAMESPACE_LOCAL_END
 #include <libc/local/string/memcpy.h>
 __NAMESPACE_LOCAL_BEGIN
-/* >> memcpy(3)
- * Copy memory between non-overlapping memory blocks.
- * @return: * : Always re-returns `dst' */
 #define __localdep_memcpy __LIBC_LOCAL_NAME(memcpy)
 #endif /* !__CRT_HAVE_memcpy */
 #endif /* !__local___localdep_memcpy_defined */
-/* Dependency: mempcpy from string */
 #ifndef __local___localdep_mempcpy_defined
 #define __local___localdep_mempcpy_defined 1
 #ifdef __CRT_HAVE_mempcpy
 __NAMESPACE_LOCAL_END
 #include <hybrid/typecore.h>
 __NAMESPACE_LOCAL_BEGIN
-/* >> mempcpy(3)
- * Same as `memcpy', but return `dst + n_bytes', rather than `dst' */
 __CREDIRECT(__ATTR_LEAF __ATTR_RETNONNULL __ATTR_NONNULL((1, 2)),void *,__NOTHROW_NCX,__localdep_mempcpy,(void *__restrict __dst, void const *__restrict __src, __SIZE_TYPE__ __n_bytes),mempcpy,(__dst,__src,__n_bytes))
 #elif defined(__CRT_HAVE___mempcpy)
 __NAMESPACE_LOCAL_END
 #include <hybrid/typecore.h>
 __NAMESPACE_LOCAL_BEGIN
-/* >> mempcpy(3)
- * Same as `memcpy', but return `dst + n_bytes', rather than `dst' */
 __CREDIRECT(__ATTR_LEAF __ATTR_RETNONNULL __ATTR_NONNULL((1, 2)),void *,__NOTHROW_NCX,__localdep_mempcpy,(void *__restrict __dst, void const *__restrict __src, __SIZE_TYPE__ __n_bytes),__mempcpy,(__dst,__src,__n_bytes))
 #else /* ... */
 __NAMESPACE_LOCAL_END
 #include <libc/local/string/mempcpy.h>
 __NAMESPACE_LOCAL_BEGIN
-/* >> mempcpy(3)
- * Same as `memcpy', but return `dst + n_bytes', rather than `dst' */
 #define __localdep_mempcpy __LIBC_LOCAL_NAME(mempcpy)
 #endif /* !... */
 #endif /* !__local___localdep_mempcpy_defined */
-/* Dependency: mkdir from sys.stat */
 #ifndef __local___localdep_mkdir_defined
 #define __local___localdep_mkdir_defined 1
 #ifdef __CRT_HAVE_mkdir
@@ -88,122 +73,46 @@ __NAMESPACE_LOCAL_BEGIN
 #undef __local___localdep_mkdir_defined
 #endif /* !... */
 #endif /* !__local___localdep_mkdir_defined */
-/* Dependency: open from fcntl */
 #ifndef __local___localdep_open_defined
 #define __local___localdep_open_defined 1
 #if defined(__CRT_HAVE_open64) && defined(__USE_FILE_OFFSET64)
 __NAMESPACE_LOCAL_END
 #include <bits/types.h>
 __NAMESPACE_LOCAL_BEGIN
-/* >> open(2), open64(2), openat(2), openat64(2)
- * Open a new file handle to the file specified by `filename'
- * When `oflags & O_CREAT', then `mode' specifies the initial
- * file access permissions with which the file should be opened.
- * On KOS, the returned handle can be anything, but is usually one of:
- *   - HANDLE_TYPE_PATH:                   When `O_PATH' was given
- *   - HANDLE_TYPE_BLOCKDEVICE:            For `S_IFBLK' files
- *   - HANDLE_TYPE_CHARACTERDEVICE:        For `S_IFCHR' files (in this case, `O_NOCTTY' gains meaning)
- *   - HANDLE_TYPE_FIFO_USER:              For `S_IFIFO' files
- *   - HANDLE_TYPE_MFILE:                  For `S_IFLNK' files (only when `O_SYMLINK' was given)
- *   - HANDLE_TYPE_ONESHOT_DIRECTORY_FILE: For `S_IFDIR' files from special one-shot directories
- *   - HANDLE_TYPE_FILE:                   For `S_IFREG' and `S_IFDIR' (~normal~) files
- *   - *:                                  Certain filesystem names can literally return anything, such
- *                                         as `/proc/self/fd/1234', which is more like `dup(1234)' */
 __CVREDIRECT(__ATTR_WUNUSED __ATTR_NONNULL((1)),__fd_t,__NOTHROW_RPC,__localdep_open,(char const *__filename, __oflag_t __oflags),open64,(__filename,__oflags),__oflags,1,(__mode_t))
 #elif defined(__CRT_HAVE_open) && !defined(__USE_FILE_OFFSET64)
 __NAMESPACE_LOCAL_END
 #include <bits/types.h>
 __NAMESPACE_LOCAL_BEGIN
-/* >> open(2), open64(2), openat(2), openat64(2)
- * Open a new file handle to the file specified by `filename'
- * When `oflags & O_CREAT', then `mode' specifies the initial
- * file access permissions with which the file should be opened.
- * On KOS, the returned handle can be anything, but is usually one of:
- *   - HANDLE_TYPE_PATH:                   When `O_PATH' was given
- *   - HANDLE_TYPE_BLOCKDEVICE:            For `S_IFBLK' files
- *   - HANDLE_TYPE_CHARACTERDEVICE:        For `S_IFCHR' files (in this case, `O_NOCTTY' gains meaning)
- *   - HANDLE_TYPE_FIFO_USER:              For `S_IFIFO' files
- *   - HANDLE_TYPE_MFILE:                  For `S_IFLNK' files (only when `O_SYMLINK' was given)
- *   - HANDLE_TYPE_ONESHOT_DIRECTORY_FILE: For `S_IFDIR' files from special one-shot directories
- *   - HANDLE_TYPE_FILE:                   For `S_IFREG' and `S_IFDIR' (~normal~) files
- *   - *:                                  Certain filesystem names can literally return anything, such
- *                                         as `/proc/self/fd/1234', which is more like `dup(1234)' */
 __CVREDIRECT(__ATTR_WUNUSED __ATTR_NONNULL((1)),__fd_t,__NOTHROW_RPC,__localdep_open,(char const *__filename, __oflag_t __oflags),open,(__filename,__oflags),__oflags,1,(__mode_t))
 #elif defined(__CRT_HAVE__open) && !defined(__USE_FILE_OFFSET64)
 __NAMESPACE_LOCAL_END
 #include <bits/types.h>
 __NAMESPACE_LOCAL_BEGIN
-/* >> open(2), open64(2), openat(2), openat64(2)
- * Open a new file handle to the file specified by `filename'
- * When `oflags & O_CREAT', then `mode' specifies the initial
- * file access permissions with which the file should be opened.
- * On KOS, the returned handle can be anything, but is usually one of:
- *   - HANDLE_TYPE_PATH:                   When `O_PATH' was given
- *   - HANDLE_TYPE_BLOCKDEVICE:            For `S_IFBLK' files
- *   - HANDLE_TYPE_CHARACTERDEVICE:        For `S_IFCHR' files (in this case, `O_NOCTTY' gains meaning)
- *   - HANDLE_TYPE_FIFO_USER:              For `S_IFIFO' files
- *   - HANDLE_TYPE_MFILE:                  For `S_IFLNK' files (only when `O_SYMLINK' was given)
- *   - HANDLE_TYPE_ONESHOT_DIRECTORY_FILE: For `S_IFDIR' files from special one-shot directories
- *   - HANDLE_TYPE_FILE:                   For `S_IFREG' and `S_IFDIR' (~normal~) files
- *   - *:                                  Certain filesystem names can literally return anything, such
- *                                         as `/proc/self/fd/1234', which is more like `dup(1234)' */
 __CVREDIRECT(__ATTR_WUNUSED __ATTR_NONNULL((1)),__fd_t,__NOTHROW_RPC,__localdep_open,(char const *__filename, __oflag_t __oflags),_open,(__filename,__oflags),__oflags,1,(__mode_t))
 #elif defined(__CRT_HAVE___open) && !defined(__USE_FILE_OFFSET64)
 __NAMESPACE_LOCAL_END
 #include <bits/types.h>
 __NAMESPACE_LOCAL_BEGIN
-/* >> open(2), open64(2), openat(2), openat64(2)
- * Open a new file handle to the file specified by `filename'
- * When `oflags & O_CREAT', then `mode' specifies the initial
- * file access permissions with which the file should be opened.
- * On KOS, the returned handle can be anything, but is usually one of:
- *   - HANDLE_TYPE_PATH:                   When `O_PATH' was given
- *   - HANDLE_TYPE_BLOCKDEVICE:            For `S_IFBLK' files
- *   - HANDLE_TYPE_CHARACTERDEVICE:        For `S_IFCHR' files (in this case, `O_NOCTTY' gains meaning)
- *   - HANDLE_TYPE_FIFO_USER:              For `S_IFIFO' files
- *   - HANDLE_TYPE_MFILE:                  For `S_IFLNK' files (only when `O_SYMLINK' was given)
- *   - HANDLE_TYPE_ONESHOT_DIRECTORY_FILE: For `S_IFDIR' files from special one-shot directories
- *   - HANDLE_TYPE_FILE:                   For `S_IFREG' and `S_IFDIR' (~normal~) files
- *   - *:                                  Certain filesystem names can literally return anything, such
- *                                         as `/proc/self/fd/1234', which is more like `dup(1234)' */
 __CVREDIRECT(__ATTR_WUNUSED __ATTR_NONNULL((1)),__fd_t,__NOTHROW_RPC,__localdep_open,(char const *__filename, __oflag_t __oflags),__open,(__filename,__oflags),__oflags,1,(__mode_t))
 #else /* ... */
 __NAMESPACE_LOCAL_END
 #include <libc/local/fcntl/open.h>
 __NAMESPACE_LOCAL_BEGIN
-/* >> open(2), open64(2), openat(2), openat64(2)
- * Open a new file handle to the file specified by `filename'
- * When `oflags & O_CREAT', then `mode' specifies the initial
- * file access permissions with which the file should be opened.
- * On KOS, the returned handle can be anything, but is usually one of:
- *   - HANDLE_TYPE_PATH:                   When `O_PATH' was given
- *   - HANDLE_TYPE_BLOCKDEVICE:            For `S_IFBLK' files
- *   - HANDLE_TYPE_CHARACTERDEVICE:        For `S_IFCHR' files (in this case, `O_NOCTTY' gains meaning)
- *   - HANDLE_TYPE_FIFO_USER:              For `S_IFIFO' files
- *   - HANDLE_TYPE_MFILE:                  For `S_IFLNK' files (only when `O_SYMLINK' was given)
- *   - HANDLE_TYPE_ONESHOT_DIRECTORY_FILE: For `S_IFDIR' files from special one-shot directories
- *   - HANDLE_TYPE_FILE:                   For `S_IFREG' and `S_IFDIR' (~normal~) files
- *   - *:                                  Certain filesystem names can literally return anything, such
- *                                         as `/proc/self/fd/1234', which is more like `dup(1234)' */
 #define __localdep_open __LIBC_LOCAL_NAME(open)
 #endif /* !... */
 #endif /* !__local___localdep_open_defined */
-/* Dependency: strlen from string */
 #ifndef __local___localdep_strlen_defined
 #define __local___localdep_strlen_defined 1
 #ifdef __CRT_HAVE_strlen
 __NAMESPACE_LOCAL_END
 #include <hybrid/typecore.h>
 __NAMESPACE_LOCAL_BEGIN
-/* >> strlen(3)
- * Return the length of the string in characters (Same as `rawmemlen[...](str, '\0')') */
 __CREDIRECT(__ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1)),__SIZE_TYPE__,__NOTHROW_NCX,__localdep_strlen,(char const *__restrict __str),strlen,(__str))
 #else /* __CRT_HAVE_strlen */
 __NAMESPACE_LOCAL_END
 #include <libc/local/string/strlen.h>
 __NAMESPACE_LOCAL_BEGIN
-/* >> strlen(3)
- * Return the length of the string in characters (Same as `rawmemlen[...](str, '\0')') */
 #define __localdep_strlen __LIBC_LOCAL_NAME(strlen)
 #endif /* !__CRT_HAVE_strlen */
 #endif /* !__local___localdep_strlen_defined */

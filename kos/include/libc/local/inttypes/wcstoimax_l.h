@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x7bdf836a */
+/* HASH CRC-32:0xa05d9bde */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -24,7 +24,6 @@
 #include <features.h>
 #include <hybrid/typecore.h>
 __NAMESPACE_LOCAL_BEGIN
-/* Dependency: wcstoimax from inttypes */
 #ifndef __local___localdep_wcstoimax_defined
 #define __local___localdep_wcstoimax_defined 1
 #ifdef __CRT_HAVE_wcstoimax

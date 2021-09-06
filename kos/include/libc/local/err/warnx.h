@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xe7f4786 */
+/* HASH CRC-32:0xd8bdd7d0 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -26,23 +26,19 @@
 #if defined(__CRT_HAVE_vwarnx) || (!defined(__NO_STDSTREAMS) && defined(__LOCAL_program_invocation_short_name) && (defined(__CRT_HAVE_fputc) || defined(__CRT_HAVE_putc) || defined(__CRT_HAVE__IO_putc) || defined(__CRT_HAVE_fputc_unlocked) || defined(__CRT_HAVE_putc_unlocked) || (defined(__CRT_DOS) && defined(__CRT_HAVE__flsbuf)) || defined(__CRT_HAVE_fwrite) || defined(__CRT_HAVE__IO_fwrite) || defined(__CRT_HAVE_fwrite_s) || defined(__CRT_HAVE_fwrite_unlocked) || defined(__CRT_HAVE__fwrite_nolock)))
 #include <kos/anno.h>
 __NAMESPACE_LOCAL_BEGIN
-/* Dependency: vwarnx from err */
 #ifndef __local___localdep_vwarnx_defined
 #define __local___localdep_vwarnx_defined 1
 #ifdef __CRT_HAVE_vwarnx
-/* Print to stderr: `<program_invocation_short_name>: <format...>\n' */
 __CREDIRECT_VOID(__ATTR_LIBC_PRINTF(1, 0),__THROWING,__localdep_vwarnx,(char const *__format, __builtin_va_list __args),vwarnx,(__format,__args))
 #elif !defined(__NO_STDSTREAMS) && defined(__LOCAL_program_invocation_short_name) && (defined(__CRT_HAVE_fputc) || defined(__CRT_HAVE_putc) || defined(__CRT_HAVE__IO_putc) || defined(__CRT_HAVE_fputc_unlocked) || defined(__CRT_HAVE_putc_unlocked) || (defined(__CRT_DOS) && defined(__CRT_HAVE__flsbuf)) || defined(__CRT_HAVE_fwrite) || defined(__CRT_HAVE__IO_fwrite) || defined(__CRT_HAVE_fwrite_s) || defined(__CRT_HAVE_fwrite_unlocked) || defined(__CRT_HAVE__fwrite_nolock))
 __NAMESPACE_LOCAL_END
 #include <libc/local/err/vwarnx.h>
 __NAMESPACE_LOCAL_BEGIN
-/* Print to stderr: `<program_invocation_short_name>: <format...>\n' */
 #define __localdep_vwarnx __LIBC_LOCAL_NAME(vwarnx)
 #else /* ... */
 #undef __local___localdep_vwarnx_defined
 #endif /* !... */
 #endif /* !__local___localdep_vwarnx_defined */
-/* Print to stderr: `<program_invocation_short_name>: <format...>\n' */
 __LOCAL_LIBC(warnx) __ATTR_LIBC_PRINTF(1, 2) void
 (__VLIBCCALL __LIBC_LOCAL_NAME(warnx))(char const *__format, ...) __THROWS(...) {
 	__builtin_va_list __args;

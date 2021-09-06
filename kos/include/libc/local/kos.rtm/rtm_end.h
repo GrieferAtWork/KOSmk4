@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xf75e975e */
+/* HASH CRC-32:0x94c0ec6 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -24,11 +24,6 @@
 #include <kos/bits/rtm.h>
 #ifdef __arch_rtm_end
 __NAMESPACE_LOCAL_BEGIN
-/* >> rtm_end(2)
- * End a transaction
- * If the transaction was successful, return normally
- * If the transaction failed, `rtm_begin()' returns `RTM_ABORT_*'
- * If no transaction was in progress, the behavior is undefined */
 __LOCAL_LIBC(rtm_end) void
 __NOTHROW(__LIBCCALL __LIBC_LOCAL_NAME(rtm_end))(void) {
 	__arch_rtm_end();

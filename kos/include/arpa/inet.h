@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x38284d0c */
+/* HASH CRC-32:0x3db802fc */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -73,63 +73,63 @@ __NAMESPACE_LOCAL_USING_OR_IMPL(inet_lnaof, __FORCELOCAL __ATTR_ARTIFICIAL __ATT
 #endif /* !__CRT_HAVE_inet_lnaof */
 #ifdef __CRT_HAVE_inet_makeaddr
 /* >> inet_makeaddr(3)
- * Construct an Internet-host-address in network byte order from
+ * Construct  an  Internet-host-address in  network byte  order from
  * the combination of its network (`net'), and host (`host') number.
- * The `net' and `host' arguments can later be re-extracted by use
+ * The `net' and `host' arguments  can later be re-extracted by  use
  * of `inet_netof(3)' and `inet_lnaof(3)' */
 __CDECLARE(__ATTR_CONST __ATTR_WUNUSED,struct in_addr,__NOTHROW_NCX,inet_makeaddr,(__UINT32_TYPE__ __net, __UINT32_TYPE__ __host),(__net,__host))
 #else /* __CRT_HAVE_inet_makeaddr */
 #include <libc/local/arpa.inet/inet_makeaddr.h>
 /* >> inet_makeaddr(3)
- * Construct an Internet-host-address in network byte order from
+ * Construct  an  Internet-host-address in  network byte  order from
  * the combination of its network (`net'), and host (`host') number.
- * The `net' and `host' arguments can later be re-extracted by use
+ * The `net' and `host' arguments  can later be re-extracted by  use
  * of `inet_netof(3)' and `inet_lnaof(3)' */
 __NAMESPACE_LOCAL_USING_OR_IMPL(inet_makeaddr, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_CONST __ATTR_WUNUSED struct in_addr __NOTHROW_NCX(__LIBCCALL inet_makeaddr)(__UINT32_TYPE__ __net, __UINT32_TYPE__ __host) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(inet_makeaddr))(__net, __host); })
 #endif /* !__CRT_HAVE_inet_makeaddr */
 #ifdef __CRT_HAVE_inet_addr
 /* >> inet_addr(3)
- * Convert an Internet host address `CP' from its numbers-and-dots
+ * Convert an  Internet host  address  `CP' from  its  numbers-and-dots
  * notational form into its binary representation in network byte order
  * Accepted notations are:
- *     a.b.c.d  (1.2.3.4)
+ *     a.b.c.d (1.2.3.4)
  *     a.b.cd   (1.2.52)
- *     a.bcd    (1.564)
- *     abcd     (4660)
+ *     a.bcd     (1.564)
+ *     abcd (4660)
  * With each number allowed to be written in as one of:
  *     123      (decimal)
- *     0x123    (hex)
- *     0123     (oct) */
+ *     0x123 (hex)
+ *     0123  (oct) */
 __CDECLARE(__ATTR_PURE __ATTR_NONNULL((1)),in_addr_t,__NOTHROW_NCX,inet_addr,(char const *__restrict __cp),(__cp))
 #else /* __CRT_HAVE_inet_addr */
 #include <libc/local/arpa.inet/inet_addr.h>
 /* >> inet_addr(3)
- * Convert an Internet host address `CP' from its numbers-and-dots
+ * Convert an  Internet host  address  `CP' from  its  numbers-and-dots
  * notational form into its binary representation in network byte order
  * Accepted notations are:
- *     a.b.c.d  (1.2.3.4)
+ *     a.b.c.d (1.2.3.4)
  *     a.b.cd   (1.2.52)
- *     a.bcd    (1.564)
- *     abcd     (4660)
+ *     a.bcd     (1.564)
+ *     abcd (4660)
  * With each number allowed to be written in as one of:
  *     123      (decimal)
- *     0x123    (hex)
- *     0123     (oct) */
+ *     0x123 (hex)
+ *     0123  (oct) */
 __NAMESPACE_LOCAL_USING_OR_IMPL(inet_addr, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_PURE __ATTR_NONNULL((1)) in_addr_t __NOTHROW_NCX(__LIBCCALL inet_addr)(char const *__restrict __cp) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(inet_addr))(__cp); })
 #endif /* !__CRT_HAVE_inet_addr */
 #ifdef __CRT_HAVE_inet_ntoa
 /* >> inet_ntoa(3)
- * Return the conventional numbers-and-dots representation of a
- * given Internet host address `inaddr'. The returned pointer is
- * apart of a static buffer and may change in subsequence (or parallel)
+ * Return   the   conventional  numbers-and-dots   representation   of  a
+ * given  Internet  host  address  `inaddr'.  The  returned  pointer   is
+ * apart of a static buffer and  may change in subsequence (or  parallel)
  * calls. For a re-entrant version of this function, see `inet_ntoa_r(3)' */
 __CDECLARE(__ATTR_RETNONNULL __ATTR_WUNUSED,char *,__NOTHROW_NCX,inet_ntoa,(struct in_addr __inaddr),(__inaddr))
 #else /* __CRT_HAVE_inet_ntoa */
 #include <libc/local/arpa.inet/inet_ntoa.h>
 /* >> inet_ntoa(3)
- * Return the conventional numbers-and-dots representation of a
- * given Internet host address `inaddr'. The returned pointer is
- * apart of a static buffer and may change in subsequence (or parallel)
+ * Return   the   conventional  numbers-and-dots   representation   of  a
+ * given  Internet  host  address  `inaddr'.  The  returned  pointer   is
+ * apart of a static buffer and  may change in subsequence (or  parallel)
  * calls. For a re-entrant version of this function, see `inet_ntoa_r(3)' */
 __NAMESPACE_LOCAL_USING_OR_IMPL(inet_ntoa, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_RETNONNULL __ATTR_WUNUSED char *__NOTHROW_NCX(__LIBCCALL inet_ntoa)(struct in_addr __inaddr) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(inet_ntoa))(__inaddr); })
 #endif /* !__CRT_HAVE_inet_ntoa */
@@ -148,13 +148,13 @@ __NAMESPACE_LOCAL_USING_OR_IMPL(inet_ntoa_r, __FORCELOCAL __ATTR_ARTIFICIAL __AT
 #endif /* __USE_KOS */
 #ifdef __CRT_HAVE_inet_network
 /* >> inet_network(3)
- * This function is the same as `inet_addr()', except that
+ * This function is  the same as  `inet_addr()', except  that
  * the return value is in host-endian, rather than net-endian */
 __CDECLARE(__ATTR_PURE __ATTR_NONNULL((1)),__UINT32_TYPE__,__NOTHROW_NCX,inet_network,(char const *__restrict __cp),(__cp))
 #else /* __CRT_HAVE_inet_network */
 #include <libc/local/arpa.inet/inet_network.h>
 /* >> inet_network(3)
- * This function is the same as `inet_addr()', except that
+ * This function is  the same as  `inet_addr()', except  that
  * the return value is in host-endian, rather than net-endian */
 __NAMESPACE_LOCAL_USING_OR_IMPL(inet_network, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_PURE __ATTR_NONNULL((1)) __UINT32_TYPE__ __NOTHROW_NCX(__LIBCCALL inet_network)(char const *__restrict __cp) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(inet_network))(__cp); })
 #endif /* !__CRT_HAVE_inet_network */
@@ -164,17 +164,17 @@ __NAMESPACE_LOCAL_USING_OR_IMPL(inet_network, __FORCELOCAL __ATTR_ARTIFICIAL __A
 #ifdef __CRT_HAVE_inet_aton
 /* >> inet_aton(3)
  * Convert an Internet host address `CP' from its numbers-and-dots
- * notational form into its binary representation in network byte
+ * notational form into its binary representation in network  byte
  * order. The result is then stored in `*INP'
  * Accepted notations are:
- *     a.b.c.d  (1.2.3.4)
+ *     a.b.c.d (1.2.3.4)
  *     a.b.cd   (1.2.52)
- *     a.bcd    (1.564)
- *     abcd     (4660)
+ *     a.bcd     (1.564)
+ *     abcd (4660)
  * With each number allowed to be written in as one of:
  *     123      (decimal)
- *     0x123    (hex)
- *     0123     (oct)
+ *     0x123 (hex)
+ *     0123  (oct)
  * @return: 0: Bad input format
  * @return: 1: Success */
 __CDECLARE(__ATTR_NONNULL((1, 2)),int,__NOTHROW_NCX,inet_aton,(char const *__restrict __cp, struct in_addr *__restrict __inp),(__cp,__inp))
@@ -182,17 +182,17 @@ __CDECLARE(__ATTR_NONNULL((1, 2)),int,__NOTHROW_NCX,inet_aton,(char const *__res
 #include <libc/local/arpa.inet/inet_aton.h>
 /* >> inet_aton(3)
  * Convert an Internet host address `CP' from its numbers-and-dots
- * notational form into its binary representation in network byte
+ * notational form into its binary representation in network  byte
  * order. The result is then stored in `*INP'
  * Accepted notations are:
- *     a.b.c.d  (1.2.3.4)
+ *     a.b.c.d (1.2.3.4)
  *     a.b.cd   (1.2.52)
- *     a.bcd    (1.564)
- *     abcd     (4660)
+ *     a.bcd     (1.564)
+ *     abcd (4660)
  * With each number allowed to be written in as one of:
  *     123      (decimal)
- *     0x123    (hex)
- *     0123     (oct)
+ *     0x123 (hex)
+ *     0123  (oct)
  * @return: 0: Bad input format
  * @return: 1: Success */
 __NAMESPACE_LOCAL_USING_OR_IMPL(inet_aton, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_NONNULL((1, 2)) int __NOTHROW_NCX(__LIBCCALL inet_aton)(char const *__restrict __cp, struct in_addr *__restrict __inp) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(inet_aton))(__cp, __inp); })
@@ -202,14 +202,14 @@ __NAMESPACE_LOCAL_USING_OR_IMPL(inet_aton, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR
 /* >> inet_paton(3)
  * Same as `inet_aton()', but update `*pcp' to point past the address
  * Accepted notations are:
- *     a.b.c.d  (1.2.3.4)
+ *     a.b.c.d (1.2.3.4)
  *     a.b.cd   (1.2.52)
- *     a.bcd    (1.564)
- *     abcd     (4660)
+ *     a.bcd     (1.564)
+ *     abcd (4660)
  * With each number allowed to be written in as one of:
  *     123      (decimal)
- *     0x123    (hex)
- *     0123     (oct)
+ *     0x123 (hex)
+ *     0123  (oct)
  * @param: network_addr: When non-zero, `*pcp' is a network address
  * @return: 0: Bad input format
  * @return: 1: Success */
@@ -219,14 +219,14 @@ __CDECLARE(__ATTR_WUNUSED __ATTR_NONNULL((1, 2)),int,__NOTHROW_NCX,inet_paton,(c
 /* >> inet_paton(3)
  * Same as `inet_aton()', but update `*pcp' to point past the address
  * Accepted notations are:
- *     a.b.c.d  (1.2.3.4)
+ *     a.b.c.d (1.2.3.4)
  *     a.b.cd   (1.2.52)
- *     a.bcd    (1.564)
- *     abcd     (4660)
+ *     a.bcd     (1.564)
+ *     abcd (4660)
  * With each number allowed to be written in as one of:
  *     123      (decimal)
- *     0x123    (hex)
- *     0123     (oct)
+ *     0x123 (hex)
+ *     0123  (oct)
  * @param: network_addr: When non-zero, `*pcp' is a network address
  * @return: 0: Bad input format
  * @return: 1: Success */

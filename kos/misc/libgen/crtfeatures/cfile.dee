@@ -38,7 +38,7 @@ final global TOK_NUMBER = 4;
 final global TOK_KEYWORD = 5;
 
 @@[repr: (@string, @string)] Preprocessor directive
-@@The repr is the (directive_cmd, directive_args).
+@@The repr is the (directive_cmd,  directive_args).
 @@e.g.: @((TOK_DIRECTIVE, ("define", "foo 42")))
 @@for:  @"#define foo 42"
 final global TOK_DIRECTIVE = 6;

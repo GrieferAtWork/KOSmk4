@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x43d54efb */
+/* HASH CRC-32:0xaaae477a */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -26,21 +26,10 @@
 #include <bits/crt/pthreadtypes.h>
 #include <bits/os/timespec.h>
 __NAMESPACE_LOCAL_BEGIN
-/* Dependency: pthread_rwlock_timedwrlock32 from pthread */
 #ifndef __local___localdep_pthread_rwlock_timedwrlock32_defined
 #define __local___localdep_pthread_rwlock_timedwrlock32_defined 1
-/* >> pthread_rwlock_timedwrlock(3), pthread_rwlock_timedwrlock64(3)
- * Try to acquire write lock for `rwlock' or return after the specified time
- * @return: EOK:       Success
- * @return: EINVAL:    The given `abstime' is invalid
- * @return: ETIMEDOUT: The given `abstime' has expired */
 __CREDIRECT(__ATTR_WUNUSED __ATTR_NONNULL((1, 2)),__errno_t,__NOTHROW_RPC,__localdep_pthread_rwlock_timedwrlock32,(__pthread_rwlock_t *__restrict __rwlock, struct __timespec32 const *__restrict __abstime),pthread_rwlock_timedwrlock,(__rwlock,__abstime))
 #endif /* !__local___localdep_pthread_rwlock_timedwrlock32_defined */
-/* >> pthread_rwlock_timedwrlock(3), pthread_rwlock_timedwrlock64(3)
- * Try to acquire write lock for `rwlock' or return after the specified time
- * @return: EOK:       Success
- * @return: EINVAL:    The given `abstime' is invalid
- * @return: ETIMEDOUT: The given `abstime' has expired */
 __LOCAL_LIBC(pthread_rwlock_timedwrlock64) __ATTR_WUNUSED __ATTR_NONNULL((1, 2)) __errno_t
 __NOTHROW_RPC(__LIBCCALL __LIBC_LOCAL_NAME(pthread_rwlock_timedwrlock64))(__pthread_rwlock_t *__restrict __rwlock, struct __timespec64 const *__restrict __abstime) {
 	__errno_t __result;

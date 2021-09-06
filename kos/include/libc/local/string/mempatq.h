@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xbe4157dd */
+/* HASH CRC-32:0x799d827 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -23,24 +23,20 @@
 #include <__crt.h>
 #include <hybrid/typecore.h>
 __NAMESPACE_LOCAL_BEGIN
-/* Dependency: mempsetq from string */
 #ifndef __local___localdep_mempsetq_defined
 #define __local___localdep_mempsetq_defined 1
 #ifdef __CRT_HAVE_mempsetq
-/* Same as `memsetq', but return `dst + n_qwords', rather than `dst' */
 __CREDIRECT(__ATTR_LEAF __ATTR_RETNONNULL __ATTR_NONNULL((1)),__UINT64_TYPE__ *,__NOTHROW_NCX,__localdep_mempsetq,(void *__restrict __dst, __UINT64_TYPE__ __qword, __SIZE_TYPE__ __n_qwords),mempsetq,(__dst,__qword,__n_qwords))
 #else /* __CRT_HAVE_mempsetq */
 __NAMESPACE_LOCAL_END
 #include <libc/local/string/mempsetq.h>
 __NAMESPACE_LOCAL_BEGIN
-/* Same as `memsetq', but return `dst + n_qwords', rather than `dst' */
 #define __localdep_mempsetq __LIBC_LOCAL_NAME(mempsetq)
 #endif /* !__CRT_HAVE_mempsetq */
 #endif /* !__local___localdep_mempsetq_defined */
 __NAMESPACE_LOCAL_END
 #include <hybrid/__wordbits.h>
 __NAMESPACE_LOCAL_BEGIN
-/* Same as `memsetq', but repeat an 8-byte pattern on aligned addresses. */
 __LOCAL_LIBC(mempatq) __ATTR_LEAF __ATTR_RETNONNULL __ATTR_NONNULL((1)) void *
 __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(mempatq))(void *__restrict __dst, __UINT64_TYPE__ __pattern, __SIZE_TYPE__ __n_bytes) {
 	__BYTE_TYPE__ *__iter = (__BYTE_TYPE__ *)__dst;

@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x88edc431 */
+/* HASH CRC-32:0x5d8fb140 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -49,17 +49,17 @@ struct winsize;
 #if !defined(__openpty_defined) && defined(__CRT_HAVE_openpty)
 #define __openpty_defined 1
 /* >> openpty(2)
- * Create a new ptty (psuedo tty), storing the handles for the
- * master/slave adapters in `*amaster' and `*aslave'. Additionally,
- * the caller may specific the initial terminal settings `termp'
- * and window size `winp', as well as a location where the kernel
- * should store the filename of the PTY master socket (as already
+ * Create  a  new  ptty (psuedo  tty),  storing the  handles  for the
+ * master/slave adapters in  `*amaster' and `*aslave'.  Additionally,
+ * the caller  may specific  the  initial terminal  settings  `termp'
+ * and  window size  `winp', as well  as a location  where the kernel
+ * should store the  filename of  the PTY master  socket (as  already
  * returned in `*amaster'). Note that the max length of this filename
- * is implementation defined, with no way for the use to specify how
- * much space is is available in the passed buffer. As such, a
- * portable application can only ever pass `NULL' for this value.
- * On KOS, the value written to `name' is the absolute filename of
- * the master-device in the `/dev' filesystem, which usually means
+ * is implementation defined, with no way for the use to specify  how
+ * much  space  is is  available  in the  passed  buffer. As  such, a
+ * portable  application can  only ever  pass `NULL'  for this value.
+ * On  KOS, the value  written to `name' is  the absolute filename of
+ * the master-device in  the `/dev' filesystem,  which usually  means
  * that the written filename is something like `/dev/ptyp0'.
  * NOTE: On KOS, this function is a system call, though in other
  *       operating system it is often implemented via `open(2)',
@@ -71,10 +71,10 @@ __CDECLARE(__ATTR_NONNULL((1, 2)),int,__NOTHROW_NCX,openpty,(__fd_t *__amaster, 
 #ifdef __CRT_HAVE_forkpty
 /* >> forkpty(3)
  * A helper for combining `openpty(2)' with `fork(2)' and `login_tty(3)',
- * such that the newly created PTY is open under all std-handles in
+ * such  that  the newly  created PTY  is open  under all  std-handles in
  * the newly created child process.
- * Aside from this, this function returns the same as fork(2), that is
- * it returns in both the parent and child processes, returning `0'
+ * Aside from this, this function returns the same as fork(2), that  is
+ * it returns in  both the  parent and child  processes, returning  `0'
  * for the child, and the child's PID for the parent (or -1 in only the
  * parent if something went wrong) */
 __CDECLARE(__ATTR_NONNULL((1)),__pid_t,__NOTHROW_NCX,forkpty,(__fd_t *__amaster, char *__name, struct termios const *__termp, struct winsize const *__winp),(__amaster,__name,__termp,__winp))
@@ -84,10 +84,10 @@ __CDECLARE(__ATTR_NONNULL((1)),__pid_t,__NOTHROW_NCX,forkpty,(__fd_t *__amaster,
 #include <libc/local/pty/forkpty.h>
 /* >> forkpty(3)
  * A helper for combining `openpty(2)' with `fork(2)' and `login_tty(3)',
- * such that the newly created PTY is open under all std-handles in
+ * such  that  the newly  created PTY  is open  under all  std-handles in
  * the newly created child process.
- * Aside from this, this function returns the same as fork(2), that is
- * it returns in both the parent and child processes, returning `0'
+ * Aside from this, this function returns the same as fork(2), that  is
+ * it returns in  both the  parent and child  processes, returning  `0'
  * for the child, and the child's PID for the parent (or -1 in only the
  * parent if something went wrong) */
 __NAMESPACE_LOCAL_USING_OR_IMPL(forkpty, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_NONNULL((1)) __pid_t __NOTHROW_NCX(__LIBCCALL forkpty)(__fd_t *__amaster, char *__name, struct termios const *__termp, struct winsize const *__winp) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(forkpty))(__amaster, __name, __termp, __winp); })

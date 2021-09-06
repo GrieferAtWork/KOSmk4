@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x5dfe8263 */
+/* HASH CRC-32:0xefa465de */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -48,8 +48,6 @@ __LIBC_LOCAL_NAME(__trecurse)(void const *__root, __action_fn_t __action, int __
 }
 __NAMESPACE_LOCAL_END
 __NAMESPACE_LOCAL_BEGIN
-/* >> twalk(3)
- * Walk through the whole tree and call the `action' callback for every node or leaf */
 __LOCAL_LIBC(twalk) void
 __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(twalk))(void const *__root, __action_fn_t __action) {
 	if (__root && __action)

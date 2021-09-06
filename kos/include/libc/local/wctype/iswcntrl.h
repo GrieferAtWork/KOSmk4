@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xc9faa197 */
+/* HASH CRC-32:0xbc026a2b */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -23,7 +23,6 @@
 #include <__crt.h>
 #include <hybrid/typecore.h>
 __NAMESPACE_LOCAL_BEGIN
-/* Dependency: iscntrl from ctype */
 #ifndef __local___localdep_iscntrl_defined
 #define __local___localdep_iscntrl_defined 1
 #if __has_builtin(__builtin_iscntrl) && defined(__LIBC_BIND_CRTBUILTINS) && defined(__CRT_HAVE_iscntrl)

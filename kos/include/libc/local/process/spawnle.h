@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xdda4ced8 */
+/* HASH CRC-32:0xe8cff2a1 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -28,7 +28,6 @@
 #include <features.h>
 #include <bits/types.h>
 __NAMESPACE_LOCAL_BEGIN
-/* Dependency: spawnve from process */
 #ifndef __local___localdep_spawnve_defined
 #define __local___localdep_spawnve_defined 1
 #ifdef __CRT_HAVE_spawnve

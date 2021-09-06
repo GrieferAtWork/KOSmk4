@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x1da070fe */
+/* HASH CRC-32:0xb76a41c7 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -23,27 +23,21 @@
 #include <__crt.h>
 #include <hybrid/typecore.h>
 __NAMESPACE_LOCAL_BEGIN
-/* Dependency: memmovel from string */
 #ifndef __local___localdep_memmovel_defined
 #define __local___localdep_memmovel_defined 1
 #ifdef __CRT_HAVE_memmovel
-/* Move memory between potentially overlapping memory blocks. */
 __CREDIRECT(__ATTR_LEAF __ATTR_RETNONNULL __ATTR_NONNULL((1, 2)),__UINT32_TYPE__ *,__NOTHROW_NCX,__localdep_memmovel,(void *__dst, void const *__src, __SIZE_TYPE__ __n_dwords),memmovel,(__dst,__src,__n_dwords))
 #elif defined(__CRT_HAVE_wmemmove) && __SIZEOF_WCHAR_T__ == 4
-/* Move memory between potentially overlapping memory blocks. */
 __CREDIRECT(__ATTR_LEAF __ATTR_RETNONNULL __ATTR_NONNULL((1, 2)),__UINT32_TYPE__ *,__NOTHROW_NCX,__localdep_memmovel,(void *__dst, void const *__src, __SIZE_TYPE__ __n_dwords),wmemmove,(__dst,__src,__n_dwords))
 #elif defined(__CRT_HAVE_KOS$wmemmove) && defined(__LIBCCALL_IS_LIBKCALL)
-/* Move memory between potentially overlapping memory blocks. */
 __COMPILER_REDIRECT(__LIBC,__ATTR_LEAF __ATTR_RETNONNULL __ATTR_NONNULL((1, 2)),__UINT32_TYPE__ *,__NOTHROW_NCX,__LIBCCALL,__localdep_memmovel,(void *__dst, void const *__src, __SIZE_TYPE__ __n_dwords),KOS$wmemmove,(__dst,__src,__n_dwords))
 #else /* ... */
 __NAMESPACE_LOCAL_END
 #include <libc/local/string/memmovel.h>
 __NAMESPACE_LOCAL_BEGIN
-/* Move memory between potentially overlapping memory blocks. */
 #define __localdep_memmovel __LIBC_LOCAL_NAME(memmovel)
 #endif /* !... */
 #endif /* !__local___localdep_memmovel_defined */
-/* Same as `memmovew', but return `dst + N_DWORDS', rather than `dst' */
 __LOCAL_LIBC(mempmovel) __ATTR_LEAF __ATTR_RETNONNULL __ATTR_NONNULL((1, 2)) __UINT32_TYPE__ *
 __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(mempmovel))(void *__dst, void const *__src, __SIZE_TYPE__ __n_dwords) {
 	return (__UINT32_TYPE__ *)__localdep_memmovel(__dst, __src, __n_dwords) + __n_dwords;

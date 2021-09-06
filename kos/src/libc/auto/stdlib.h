@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x4dadb258 */
+/* HASH CRC-32:0x4a300740 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -93,17 +93,17 @@ INTDEF NONNULL((1, 2)) size_t NOTHROW_NCX(LIBKCALL libc_wcstombs)(char *__restri
 #if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
 /* >> system(3)
  * Execute a given `command' on the system interpreter (as in `sh -c $command')
- * The return value is the exit status after running `command'
+ * The   return   value   is   the   exit   status   after   running  `command'
  * When `command' is `NULL' only check if a system interpreter is available.
- * When no system interpreter is available, `127' is returned. */
+ * When  no   system   interpreter   is  available,   `127'   is   returned. */
 INTDEF int NOTHROW_RPC(LIBDCALL libd_system)(char const *command);
 #endif /* !__LIBCCALL_IS_LIBDCALL && !__KERNEL__ */
 #ifndef __KERNEL__
 /* >> system(3)
  * Execute a given `command' on the system interpreter (as in `sh -c $command')
- * The return value is the exit status after running `command'
+ * The   return   value   is   the   exit   status   after   running  `command'
  * When `command' is `NULL' only check if a system interpreter is available.
- * When no system interpreter is available, `127' is returned. */
+ * When  no   system   interpreter   is  available,   `127'   is   returned. */
 INTDEF int NOTHROW_RPC(LIBCCALL libc_system)(char const *command);
 INTDEF ATTR_NORETURN void (LIBCCALL libc_abort)(void) THROWS(...);
 #endif /* !__KERNEL__ */
@@ -184,158 +184,158 @@ INTDEF ATTR_LEAF NONNULL((1)) __LONGDOUBLE NOTHROW_NCX(LIBCCALL libc_strtold)(ch
 #if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
 /* >> strto32_r(3), strtou32_r(3), strto64_r(3), strtou64_r(3)
  * Safely parse & return an integer from `nptr', and store any potential
- * errors in `*error' (if non-NULL). The following errors are defined:
+ * errors in `*error' (if non-NULL).  The following errors are  defined:
  *  - 0:         Success
  *  - ECANCELED: Nothing was parsed.
  *               In this case, `*endptr' is set to the original `nptr'
  *               (iow: leading spaces are _not_ skipped in `*endptr'),
  *               and the returned integer is `0'
  *  - ERANGE:    Integer over- or under-flow while parsing.
- *               In this case, `*endptr' is still updated correctly, and
- *               the returned integer is the closest representable value
+ *               In this case, `*endptr' is still updated correctly,  and
+ *               the  returned integer is the closest representable value
  *               to the integer given in `nptr' (i.e. `U?INTn_(MIN|MAX)')
  *               This error supercedes `EINVAL' if both conditions apply.
  *  - EINVAL:    Only when `endptr == NULL': The parsed number is followed
- *               by at least 1 additional non-whitespace character.
+ *               by   at  least  1  additional  non-whitespace  character.
  *               The returned integer value is not affected by this error. */
 INTDEF ATTR_LEAF NONNULL((1)) uint32_t NOTHROW_NCX(LIBDCALL libd_strtou32_r)(char const *__restrict nptr, char **endptr, __STDC_INT_AS_UINT_T base, errno_t *error);
 #endif /* !__LIBCCALL_IS_LIBDCALL && !__KERNEL__ */
 /* >> strto32_r(3), strtou32_r(3), strto64_r(3), strtou64_r(3)
  * Safely parse & return an integer from `nptr', and store any potential
- * errors in `*error' (if non-NULL). The following errors are defined:
+ * errors in `*error' (if non-NULL).  The following errors are  defined:
  *  - 0:         Success
  *  - ECANCELED: Nothing was parsed.
  *               In this case, `*endptr' is set to the original `nptr'
  *               (iow: leading spaces are _not_ skipped in `*endptr'),
  *               and the returned integer is `0'
  *  - ERANGE:    Integer over- or under-flow while parsing.
- *               In this case, `*endptr' is still updated correctly, and
- *               the returned integer is the closest representable value
+ *               In this case, `*endptr' is still updated correctly,  and
+ *               the  returned integer is the closest representable value
  *               to the integer given in `nptr' (i.e. `U?INTn_(MIN|MAX)')
  *               This error supercedes `EINVAL' if both conditions apply.
  *  - EINVAL:    Only when `endptr == NULL': The parsed number is followed
- *               by at least 1 additional non-whitespace character.
+ *               by   at  least  1  additional  non-whitespace  character.
  *               The returned integer value is not affected by this error. */
 INTDEF ATTR_LEAF NONNULL((1)) uint32_t NOTHROW_NCX(LIBCCALL libc_strtou32_r)(char const *__restrict nptr, char **endptr, __STDC_INT_AS_UINT_T base, errno_t *error);
 #if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
 /* >> strto32_r(3), strtou32_r(3), strto64_r(3), strtou64_r(3)
  * Safely parse & return an integer from `nptr', and store any potential
- * errors in `*error' (if non-NULL). The following errors are defined:
+ * errors in `*error' (if non-NULL).  The following errors are  defined:
  *  - 0:         Success
  *  - ECANCELED: Nothing was parsed.
  *               In this case, `*endptr' is set to the original `nptr'
  *               (iow: leading spaces are _not_ skipped in `*endptr'),
  *               and the returned integer is `0'
  *  - ERANGE:    Integer over- or under-flow while parsing.
- *               In this case, `*endptr' is still updated correctly, and
- *               the returned integer is the closest representable value
+ *               In this case, `*endptr' is still updated correctly,  and
+ *               the  returned integer is the closest representable value
  *               to the integer given in `nptr' (i.e. `U?INTn_(MIN|MAX)')
  *               This error supercedes `EINVAL' if both conditions apply.
  *  - EINVAL:    Only when `endptr == NULL': The parsed number is followed
- *               by at least 1 additional non-whitespace character.
+ *               by   at  least  1  additional  non-whitespace  character.
  *               The returned integer value is not affected by this error. */
 INTDEF ATTR_LEAF NONNULL((1)) int32_t NOTHROW_NCX(LIBDCALL libd_strto32_r)(char const *__restrict nptr, char **endptr, __STDC_INT_AS_UINT_T base, errno_t *error);
 #endif /* !__LIBCCALL_IS_LIBDCALL && !__KERNEL__ */
 /* >> strto32_r(3), strtou32_r(3), strto64_r(3), strtou64_r(3)
  * Safely parse & return an integer from `nptr', and store any potential
- * errors in `*error' (if non-NULL). The following errors are defined:
+ * errors in `*error' (if non-NULL).  The following errors are  defined:
  *  - 0:         Success
  *  - ECANCELED: Nothing was parsed.
  *               In this case, `*endptr' is set to the original `nptr'
  *               (iow: leading spaces are _not_ skipped in `*endptr'),
  *               and the returned integer is `0'
  *  - ERANGE:    Integer over- or under-flow while parsing.
- *               In this case, `*endptr' is still updated correctly, and
- *               the returned integer is the closest representable value
+ *               In this case, `*endptr' is still updated correctly,  and
+ *               the  returned integer is the closest representable value
  *               to the integer given in `nptr' (i.e. `U?INTn_(MIN|MAX)')
  *               This error supercedes `EINVAL' if both conditions apply.
  *  - EINVAL:    Only when `endptr == NULL': The parsed number is followed
- *               by at least 1 additional non-whitespace character.
+ *               by   at  least  1  additional  non-whitespace  character.
  *               The returned integer value is not affected by this error. */
 INTDEF ATTR_LEAF NONNULL((1)) int32_t NOTHROW_NCX(LIBCCALL libc_strto32_r)(char const *__restrict nptr, char **endptr, __STDC_INT_AS_UINT_T base, errno_t *error);
 #if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
 /* >> strto32_r(3), strtou32_r(3), strto64_r(3), strtou64_r(3)
  * Safely parse & return an integer from `nptr', and store any potential
- * errors in `*error' (if non-NULL). The following errors are defined:
+ * errors in `*error' (if non-NULL).  The following errors are  defined:
  *  - 0:         Success
  *  - ECANCELED: Nothing was parsed.
  *               In this case, `*endptr' is set to the original `nptr'
  *               (iow: leading spaces are _not_ skipped in `*endptr'),
  *               and the returned integer is `0'
  *  - ERANGE:    Integer over- or under-flow while parsing.
- *               In this case, `*endptr' is still updated correctly, and
- *               the returned integer is the closest representable value
+ *               In this case, `*endptr' is still updated correctly,  and
+ *               the  returned integer is the closest representable value
  *               to the integer given in `nptr' (i.e. `U?INTn_(MIN|MAX)')
  *               This error supercedes `EINVAL' if both conditions apply.
  *  - EINVAL:    Only when `endptr == NULL': The parsed number is followed
- *               by at least 1 additional non-whitespace character.
+ *               by   at  least  1  additional  non-whitespace  character.
  *               The returned integer value is not affected by this error. */
 INTDEF ATTR_LEAF NONNULL((1)) uint64_t NOTHROW_NCX(LIBDCALL libd_strtou64_r)(char const *__restrict nptr, char **endptr, __STDC_INT_AS_UINT_T base, errno_t *error);
 #endif /* !__LIBCCALL_IS_LIBDCALL && !__KERNEL__ */
 /* >> strto32_r(3), strtou32_r(3), strto64_r(3), strtou64_r(3)
  * Safely parse & return an integer from `nptr', and store any potential
- * errors in `*error' (if non-NULL). The following errors are defined:
+ * errors in `*error' (if non-NULL).  The following errors are  defined:
  *  - 0:         Success
  *  - ECANCELED: Nothing was parsed.
  *               In this case, `*endptr' is set to the original `nptr'
  *               (iow: leading spaces are _not_ skipped in `*endptr'),
  *               and the returned integer is `0'
  *  - ERANGE:    Integer over- or under-flow while parsing.
- *               In this case, `*endptr' is still updated correctly, and
- *               the returned integer is the closest representable value
+ *               In this case, `*endptr' is still updated correctly,  and
+ *               the  returned integer is the closest representable value
  *               to the integer given in `nptr' (i.e. `U?INTn_(MIN|MAX)')
  *               This error supercedes `EINVAL' if both conditions apply.
  *  - EINVAL:    Only when `endptr == NULL': The parsed number is followed
- *               by at least 1 additional non-whitespace character.
+ *               by   at  least  1  additional  non-whitespace  character.
  *               The returned integer value is not affected by this error. */
 INTDEF ATTR_LEAF NONNULL((1)) uint64_t NOTHROW_NCX(LIBCCALL libc_strtou64_r)(char const *__restrict nptr, char **endptr, __STDC_INT_AS_UINT_T base, errno_t *error);
 #if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
 /* >> strto32_r(3), strtou32_r(3), strto64_r(3), strtou64_r(3)
  * Safely parse & return an integer from `nptr', and store any potential
- * errors in `*error' (if non-NULL). The following errors are defined:
+ * errors in `*error' (if non-NULL).  The following errors are  defined:
  *  - 0:         Success
  *  - ECANCELED: Nothing was parsed.
  *               In this case, `*endptr' is set to the original `nptr'
  *               (iow: leading spaces are _not_ skipped in `*endptr'),
  *               and the returned integer is `0'
  *  - ERANGE:    Integer over- or under-flow while parsing.
- *               In this case, `*endptr' is still updated correctly, and
- *               the returned integer is the closest representable value
+ *               In this case, `*endptr' is still updated correctly,  and
+ *               the  returned integer is the closest representable value
  *               to the integer given in `nptr' (i.e. `U?INTn_(MIN|MAX)')
  *               This error supercedes `EINVAL' if both conditions apply.
  *  - EINVAL:    Only when `endptr == NULL': The parsed number is followed
- *               by at least 1 additional non-whitespace character.
+ *               by   at  least  1  additional  non-whitespace  character.
  *               The returned integer value is not affected by this error. */
 INTDEF ATTR_LEAF NONNULL((1)) int64_t NOTHROW_NCX(LIBDCALL libd_strto64_r)(char const *__restrict nptr, char **endptr, __STDC_INT_AS_UINT_T base, errno_t *error);
 #endif /* !__LIBCCALL_IS_LIBDCALL && !__KERNEL__ */
 /* >> strto32_r(3), strtou32_r(3), strto64_r(3), strtou64_r(3)
  * Safely parse & return an integer from `nptr', and store any potential
- * errors in `*error' (if non-NULL). The following errors are defined:
+ * errors in `*error' (if non-NULL).  The following errors are  defined:
  *  - 0:         Success
  *  - ECANCELED: Nothing was parsed.
  *               In this case, `*endptr' is set to the original `nptr'
  *               (iow: leading spaces are _not_ skipped in `*endptr'),
  *               and the returned integer is `0'
  *  - ERANGE:    Integer over- or under-flow while parsing.
- *               In this case, `*endptr' is still updated correctly, and
- *               the returned integer is the closest representable value
+ *               In this case, `*endptr' is still updated correctly,  and
+ *               the  returned integer is the closest representable value
  *               to the integer given in `nptr' (i.e. `U?INTn_(MIN|MAX)')
  *               This error supercedes `EINVAL' if both conditions apply.
  *  - EINVAL:    Only when `endptr == NULL': The parsed number is followed
- *               by at least 1 additional non-whitespace character.
+ *               by   at  least  1  additional  non-whitespace  character.
  *               The returned integer value is not affected by this error. */
 INTDEF ATTR_LEAF NONNULL((1)) int64_t NOTHROW_NCX(LIBCCALL libc_strto64_r)(char const *__restrict nptr, char **endptr, __STDC_INT_AS_UINT_T base, errno_t *error);
 #if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
 /* >> strto32(3), strto64(3), strtou32(3), strtou64(3)
- * Convert a string (radix=`base') from `nptr' into an integer,
- * and store a pointer to the end of the number in `*endptr'.
+ * Convert a string  (radix=`base') from `nptr'  into an  integer,
+ * and store a  pointer to  the end  of the  number in  `*endptr'.
  * If `errno(3)' support is available, integer overflow is handled
  * by setting `errno=ERANGE', and returning the greatest or lowest
- * valid integer (`U?INTn_(MIN|MAX))'. (though note that
- * `endptr' (if non-NULL) is still updated in this case!)
- * Upon success, `errno' is left unchanged, and the integer repr
- * of the parsed number is returned. When no integer was parsed,
- * then `0' is returned, `*endptr' is set to `nptr', but `errno'
+ * valid   integer   (`U?INTn_(MIN|MAX))'.   (though   note   that
+ * `endptr'  (if  non-NULL)  is  still  updated  in  this   case!)
+ * Upon success, `errno' is left  unchanged, and the integer  repr
+ * of the parsed number is  returned. When no integer was  parsed,
+ * then `0' is returned, `*endptr'  is set to `nptr', but  `errno'
  * will not have been modified.
  * @return: * :         Success: The parsed integer
  * @return: 0 :         [*endptr=nptr] error: Nothing was parsed
@@ -344,15 +344,15 @@ INTDEF ATTR_LEAF NONNULL((1)) int64_t NOTHROW_NCX(LIBCCALL libc_strto64_r)(char 
 INTDEF ATTR_LEAF NONNULL((1)) uint32_t NOTHROW_NCX(LIBDCALL libd_strtou32)(char const *__restrict nptr, char **endptr, __STDC_INT_AS_UINT_T base);
 #endif /* !__LIBCCALL_IS_LIBDCALL && !__KERNEL__ */
 /* >> strto32(3), strto64(3), strtou32(3), strtou64(3)
- * Convert a string (radix=`base') from `nptr' into an integer,
- * and store a pointer to the end of the number in `*endptr'.
+ * Convert a string  (radix=`base') from `nptr'  into an  integer,
+ * and store a  pointer to  the end  of the  number in  `*endptr'.
  * If `errno(3)' support is available, integer overflow is handled
  * by setting `errno=ERANGE', and returning the greatest or lowest
- * valid integer (`U?INTn_(MIN|MAX))'. (though note that
- * `endptr' (if non-NULL) is still updated in this case!)
- * Upon success, `errno' is left unchanged, and the integer repr
- * of the parsed number is returned. When no integer was parsed,
- * then `0' is returned, `*endptr' is set to `nptr', but `errno'
+ * valid   integer   (`U?INTn_(MIN|MAX))'.   (though   note   that
+ * `endptr'  (if  non-NULL)  is  still  updated  in  this   case!)
+ * Upon success, `errno' is left  unchanged, and the integer  repr
+ * of the parsed number is  returned. When no integer was  parsed,
+ * then `0' is returned, `*endptr'  is set to `nptr', but  `errno'
  * will not have been modified.
  * @return: * :         Success: The parsed integer
  * @return: 0 :         [*endptr=nptr] error: Nothing was parsed
@@ -361,15 +361,15 @@ INTDEF ATTR_LEAF NONNULL((1)) uint32_t NOTHROW_NCX(LIBDCALL libd_strtou32)(char 
 INTDEF ATTR_LEAF NONNULL((1)) uint32_t NOTHROW_NCX(LIBCCALL libc_strtou32)(char const *__restrict nptr, char **endptr, __STDC_INT_AS_UINT_T base);
 #if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
 /* >> strto32(3), strto64(3), strtou32(3), strtou64(3)
- * Convert a string (radix=`base') from `nptr' into an integer,
- * and store a pointer to the end of the number in `*endptr'.
+ * Convert a string  (radix=`base') from `nptr'  into an  integer,
+ * and store a  pointer to  the end  of the  number in  `*endptr'.
  * If `errno(3)' support is available, integer overflow is handled
  * by setting `errno=ERANGE', and returning the greatest or lowest
- * valid integer (`U?INTn_(MIN|MAX))'. (though note that
- * `endptr' (if non-NULL) is still updated in this case!)
- * Upon success, `errno' is left unchanged, and the integer repr
- * of the parsed number is returned. When no integer was parsed,
- * then `0' is returned, `*endptr' is set to `nptr', but `errno'
+ * valid   integer   (`U?INTn_(MIN|MAX))'.   (though   note   that
+ * `endptr'  (if  non-NULL)  is  still  updated  in  this   case!)
+ * Upon success, `errno' is left  unchanged, and the integer  repr
+ * of the parsed number is  returned. When no integer was  parsed,
+ * then `0' is returned, `*endptr'  is set to `nptr', but  `errno'
  * will not have been modified.
  * @return: * :         Success: The parsed integer
  * @return: 0 :         [*endptr=nptr] error: Nothing was parsed
@@ -378,15 +378,15 @@ INTDEF ATTR_LEAF NONNULL((1)) uint32_t NOTHROW_NCX(LIBCCALL libc_strtou32)(char 
 INTDEF ATTR_LEAF NONNULL((1)) int32_t NOTHROW_NCX(LIBDCALL libd_strto32)(char const *__restrict nptr, char **endptr, __STDC_INT_AS_UINT_T base);
 #endif /* !__LIBCCALL_IS_LIBDCALL && !__KERNEL__ */
 /* >> strto32(3), strto64(3), strtou32(3), strtou64(3)
- * Convert a string (radix=`base') from `nptr' into an integer,
- * and store a pointer to the end of the number in `*endptr'.
+ * Convert a string  (radix=`base') from `nptr'  into an  integer,
+ * and store a  pointer to  the end  of the  number in  `*endptr'.
  * If `errno(3)' support is available, integer overflow is handled
  * by setting `errno=ERANGE', and returning the greatest or lowest
- * valid integer (`U?INTn_(MIN|MAX))'. (though note that
- * `endptr' (if non-NULL) is still updated in this case!)
- * Upon success, `errno' is left unchanged, and the integer repr
- * of the parsed number is returned. When no integer was parsed,
- * then `0' is returned, `*endptr' is set to `nptr', but `errno'
+ * valid   integer   (`U?INTn_(MIN|MAX))'.   (though   note   that
+ * `endptr'  (if  non-NULL)  is  still  updated  in  this   case!)
+ * Upon success, `errno' is left  unchanged, and the integer  repr
+ * of the parsed number is  returned. When no integer was  parsed,
+ * then `0' is returned, `*endptr'  is set to `nptr', but  `errno'
  * will not have been modified.
  * @return: * :         Success: The parsed integer
  * @return: 0 :         [*endptr=nptr] error: Nothing was parsed
@@ -395,15 +395,15 @@ INTDEF ATTR_LEAF NONNULL((1)) int32_t NOTHROW_NCX(LIBDCALL libd_strto32)(char co
 INTDEF ATTR_LEAF NONNULL((1)) int32_t NOTHROW_NCX(LIBCCALL libc_strto32)(char const *__restrict nptr, char **endptr, __STDC_INT_AS_UINT_T base);
 #if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
 /* >> strto32(3), strto64(3), strtou32(3), strtou64(3)
- * Convert a string (radix=`base') from `nptr' into an integer,
- * and store a pointer to the end of the number in `*endptr'.
+ * Convert a string  (radix=`base') from `nptr'  into an  integer,
+ * and store a  pointer to  the end  of the  number in  `*endptr'.
  * If `errno(3)' support is available, integer overflow is handled
  * by setting `errno=ERANGE', and returning the greatest or lowest
- * valid integer (`U?INTn_(MIN|MAX))'. (though note that
- * `endptr' (if non-NULL) is still updated in this case!)
- * Upon success, `errno' is left unchanged, and the integer repr
- * of the parsed number is returned. When no integer was parsed,
- * then `0' is returned, `*endptr' is set to `nptr', but `errno'
+ * valid   integer   (`U?INTn_(MIN|MAX))'.   (though   note   that
+ * `endptr'  (if  non-NULL)  is  still  updated  in  this   case!)
+ * Upon success, `errno' is left  unchanged, and the integer  repr
+ * of the parsed number is  returned. When no integer was  parsed,
+ * then `0' is returned, `*endptr'  is set to `nptr', but  `errno'
  * will not have been modified.
  * @return: * :         Success: The parsed integer
  * @return: 0 :         [*endptr=nptr] error: Nothing was parsed
@@ -412,15 +412,15 @@ INTDEF ATTR_LEAF NONNULL((1)) int32_t NOTHROW_NCX(LIBCCALL libc_strto32)(char co
 INTDEF ATTR_LEAF NONNULL((1)) uint64_t NOTHROW_NCX(LIBDCALL libd_strtou64)(char const *__restrict nptr, char **endptr, __STDC_INT_AS_UINT_T base);
 #endif /* !__LIBCCALL_IS_LIBDCALL && !__KERNEL__ */
 /* >> strto32(3), strto64(3), strtou32(3), strtou64(3)
- * Convert a string (radix=`base') from `nptr' into an integer,
- * and store a pointer to the end of the number in `*endptr'.
+ * Convert a string  (radix=`base') from `nptr'  into an  integer,
+ * and store a  pointer to  the end  of the  number in  `*endptr'.
  * If `errno(3)' support is available, integer overflow is handled
  * by setting `errno=ERANGE', and returning the greatest or lowest
- * valid integer (`U?INTn_(MIN|MAX))'. (though note that
- * `endptr' (if non-NULL) is still updated in this case!)
- * Upon success, `errno' is left unchanged, and the integer repr
- * of the parsed number is returned. When no integer was parsed,
- * then `0' is returned, `*endptr' is set to `nptr', but `errno'
+ * valid   integer   (`U?INTn_(MIN|MAX))'.   (though   note   that
+ * `endptr'  (if  non-NULL)  is  still  updated  in  this   case!)
+ * Upon success, `errno' is left  unchanged, and the integer  repr
+ * of the parsed number is  returned. When no integer was  parsed,
+ * then `0' is returned, `*endptr'  is set to `nptr', but  `errno'
  * will not have been modified.
  * @return: * :         Success: The parsed integer
  * @return: 0 :         [*endptr=nptr] error: Nothing was parsed
@@ -429,15 +429,15 @@ INTDEF ATTR_LEAF NONNULL((1)) uint64_t NOTHROW_NCX(LIBDCALL libd_strtou64)(char 
 INTDEF ATTR_LEAF NONNULL((1)) uint64_t NOTHROW_NCX(LIBCCALL libc_strtou64)(char const *__restrict nptr, char **endptr, __STDC_INT_AS_UINT_T base);
 #if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
 /* >> strto32(3), strto64(3), strtou32(3), strtou64(3)
- * Convert a string (radix=`base') from `nptr' into an integer,
- * and store a pointer to the end of the number in `*endptr'.
+ * Convert a string  (radix=`base') from `nptr'  into an  integer,
+ * and store a  pointer to  the end  of the  number in  `*endptr'.
  * If `errno(3)' support is available, integer overflow is handled
  * by setting `errno=ERANGE', and returning the greatest or lowest
- * valid integer (`U?INTn_(MIN|MAX))'. (though note that
- * `endptr' (if non-NULL) is still updated in this case!)
- * Upon success, `errno' is left unchanged, and the integer repr
- * of the parsed number is returned. When no integer was parsed,
- * then `0' is returned, `*endptr' is set to `nptr', but `errno'
+ * valid   integer   (`U?INTn_(MIN|MAX))'.   (though   note   that
+ * `endptr'  (if  non-NULL)  is  still  updated  in  this   case!)
+ * Upon success, `errno' is left  unchanged, and the integer  repr
+ * of the parsed number is  returned. When no integer was  parsed,
+ * then `0' is returned, `*endptr'  is set to `nptr', but  `errno'
  * will not have been modified.
  * @return: * :         Success: The parsed integer
  * @return: 0 :         [*endptr=nptr] error: Nothing was parsed
@@ -446,15 +446,15 @@ INTDEF ATTR_LEAF NONNULL((1)) uint64_t NOTHROW_NCX(LIBCCALL libc_strtou64)(char 
 INTDEF ATTR_LEAF NONNULL((1)) int64_t NOTHROW_NCX(LIBDCALL libd_strto64)(char const *__restrict nptr, char **endptr, __STDC_INT_AS_UINT_T base);
 #endif /* !__LIBCCALL_IS_LIBDCALL && !__KERNEL__ */
 /* >> strto32(3), strto64(3), strtou32(3), strtou64(3)
- * Convert a string (radix=`base') from `nptr' into an integer,
- * and store a pointer to the end of the number in `*endptr'.
+ * Convert a string  (radix=`base') from `nptr'  into an  integer,
+ * and store a  pointer to  the end  of the  number in  `*endptr'.
  * If `errno(3)' support is available, integer overflow is handled
  * by setting `errno=ERANGE', and returning the greatest or lowest
- * valid integer (`U?INTn_(MIN|MAX))'. (though note that
- * `endptr' (if non-NULL) is still updated in this case!)
- * Upon success, `errno' is left unchanged, and the integer repr
- * of the parsed number is returned. When no integer was parsed,
- * then `0' is returned, `*endptr' is set to `nptr', but `errno'
+ * valid   integer   (`U?INTn_(MIN|MAX))'.   (though   note   that
+ * `endptr'  (if  non-NULL)  is  still  updated  in  this   case!)
+ * Upon success, `errno' is left  unchanged, and the integer  repr
+ * of the parsed number is  returned. When no integer was  parsed,
+ * then `0' is returned, `*endptr'  is set to `nptr', but  `errno'
  * will not have been modified.
  * @return: * :         Success: The parsed integer
  * @return: 0 :         [*endptr=nptr] error: Nothing was parsed
@@ -552,11 +552,11 @@ INTDEF NONNULL((1)) int NOTHROW_NCX(LIBDCALL libd_on_exit)(__on_exit_func_t func
 /* >> mkstemps(3), mkstemps64(3)
  * Replace the last 6 characters of `template_' (which are followed by exactly
  * `suffixlen' more characters that are left alone), which must be filled with
- * all 'X'-characters before the call (else errno=EINVAL + return -1), with
- * random characters such that the filename described by `template_' will not
- * already exists. Then, create a new file with `O_RDWR' and return the file
+ * all  'X'-characters before the  call (else errno=EINVAL  + return -1), with
+ * random  characters such that the filename described by `template_' will not
+ * already  exists. Then, create a new file  with `O_RDWR' and return the file
  * descriptor of that file.
- * @param: suffixlen: The # of trailing characters to-be ignored
+ * @param: suffixlen: The #  of trailing  characters to-be  ignored
  *                    after the required 6 trailing 'X'-characters. */
 INTDEF WUNUSED NONNULL((1)) fd_t NOTHROW_NCX(LIBDCALL libd_mkstemps)(char *template_, __STDC_INT_AS_SIZE_T suffixlen);
 #endif /* !__LIBCCALL_IS_LIBDCALL && !__KERNEL__ */
@@ -564,11 +564,11 @@ INTDEF WUNUSED NONNULL((1)) fd_t NOTHROW_NCX(LIBDCALL libd_mkstemps)(char *templ
 /* >> mkstemps(3), mkstemps64(3)
  * Replace the last 6 characters of `template_' (which are followed by exactly
  * `suffixlen' more characters that are left alone), which must be filled with
- * all 'X'-characters before the call (else errno=EINVAL + return -1), with
- * random characters such that the filename described by `template_' will not
- * already exists. Then, create a new file with `O_RDWR' and return the file
+ * all  'X'-characters before the  call (else errno=EINVAL  + return -1), with
+ * random  characters such that the filename described by `template_' will not
+ * already  exists. Then, create a new file  with `O_RDWR' and return the file
  * descriptor of that file.
- * @param: suffixlen: The # of trailing characters to-be ignored
+ * @param: suffixlen: The #  of trailing  characters to-be  ignored
  *                    after the required 6 trailing 'X'-characters. */
 INTDEF WUNUSED NONNULL((1)) fd_t NOTHROW_NCX(LIBCCALL libc_mkstemps)(char *template_, __STDC_INT_AS_SIZE_T suffixlen);
 #endif /* !__KERNEL__ */
@@ -613,62 +613,62 @@ INTDEF ATTR_PURE WUNUSED NONNULL((1)) long NOTHROW_NCX(LIBCCALL libc_a64l)(char 
 #endif /* !__KERNEL__ */
 #if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
 /* Load the filesystem location of a given file handle.
- * This function behaves similar to `readlink()', but will also function for
+ * This  function behaves similar to `readlink()', but will also function for
  * non-symlink paths, as well as always return an absolute (unambiguous) path
  * @param: resolved: A buffer of `PATH_MAX' bytes to-be filled with the resulting
- *                   path, or NULL to automatically `malloc()'ate and return a
+ *                   path, or NULL  to automatically `malloc()'ate  and return  a
  *                   buffer of sufficient size. */
 INTDEF WUNUSED NONNULL((1)) char *NOTHROW_RPC(LIBDCALL libd_realpath)(char const *filename, char *resolved);
 /* Load the filesystem location of a given file handle.
  * This function behaves similar to `readlink("/proc/self/fd/%d" % fd)'
- * NOTE: You may also pass `NULL' for `resolved' to have a buffer of `buflen'
- *       bytes automatically allocated in the heap, ontop of which you may also
+ * NOTE: You may  also pass  `NULL' for  `resolved' to  have a  buffer of  `buflen'
+ *       bytes  automatically allocated  in the heap,  ontop of which  you may also
  *       pass `0' for `buflen' to automatically determine the required buffer size. */
 INTDEF WUNUSED char *NOTHROW_RPC(LIBDCALL libd_frealpath)(fd_t fd, char *resolved, size_t buflen);
 /* Load the filesystem location of a given file handle.
  * This function behaves similar to `readlink("/proc/self/fd/%d" % fd)'
  * @param flags: Set of `0 | AT_ALTPATH | AT_DOSPATH'
- * NOTE: You may use `AT_ALTPATH' to cause the path to be printed in alternate
- *       representation mode. This means that if the path would have normally
+ * NOTE: You  may use `AT_ALTPATH' to cause the  path to be printed in alternate
+ *       representation  mode. This means  that if the  path would have normally
  *       been printed as a unix path, it would instead be printed as a DOS path.
  *       Similarly, the reverse also applies.
- * NOTE: You may also pass `NULL' for `resolved' to have a buffer of `buflen'
- *       bytes automatically allocated in the heap, ontop of which you may also
+ * NOTE: You may  also pass  `NULL' for  `resolved' to  have a  buffer of  `buflen'
+ *       bytes  automatically allocated  in the heap,  ontop of which  you may also
  *       pass `0' for `buflen' to automatically determine the required buffer size. */
 INTDEF WUNUSED char *NOTHROW_RPC(LIBDCALL libd_frealpath4)(fd_t fd, char *resolved, size_t buflen, atflag_t flags);
 /* Returns the absolute filesystem path for the specified file
  * When `AT_SYMLINK_NOFOLLOW' is given, a final symlink is not dereferenced,
- * causing the path to the symlink itself to be printed. - Otherwise, the
+ * causing the path to  the symlink itself to  be printed. - Otherwise,  the
  * file pointed to by the symblic link is printed.
- * NOTE: You may use `AT_ALTPATH' to cause the path to be printed in alternate
- *       representation mode. This means that if the path would have normally
+ * NOTE: You  may use `AT_ALTPATH' to cause the  path to be printed in alternate
+ *       representation  mode. This means  that if the  path would have normally
  *       been printed as a unix path, it would instead be printed as a DOS path.
  *       Similarly, the reverse also applies.
- * NOTE: You may also pass `NULL' for `resolved' to have a buffer of `buflen'
- *       bytes automatically allocated in the heap, ontop of which you may also
+ * NOTE: You may  also pass  `NULL' for  `resolved' to  have a  buffer of  `buflen'
+ *       bytes  automatically allocated  in the heap,  ontop of which  you may also
  *       pass `0' for `buflen' to automatically determine the required buffer size.
  * @param flags: Set of `0 | AT_ALTPATH | AT_SYMLINK_NOFOLLOW | AT_DOSPATH'
  * @return: NULL: [errno=ERANGE]: `buflen' is too small to fit the entire path */
 INTDEF WUNUSED NONNULL((2)) char *NOTHROW_RPC(LIBDCALL libd_frealpathat)(fd_t dirfd, char const *filename, char *resolved, size_t buflen, atflag_t flags);
 /* >> mktemp(3)
- * Badly designed version of `mkstemp' that won't actually create
+ * Badly designed version of  `mkstemp' that won't actually  create
  * the temporary file, meaning that by the time the caller tries to
- * create the file themselves, another process may have already
+ * create the  file themselves,  another process  may have  already
  * created it.
- * Also: when no temporary filename can be created, rather than
- *       returning something sensible like `NULL', this function
+ * Also: when no  temporary filename  can be  created, rather  than
+ *       returning something  sensible like  `NULL', this  function
  *       will instead set `template_' to an empty string, and still
  *       re-return it like it would if everything had worked! */
 INTDEF ATTR_RETNONNULL NONNULL((1)) char *NOTHROW_NCX(LIBDCALL libd_mktemp)(char *template_);
 #endif /* !__LIBCCALL_IS_LIBDCALL && !__KERNEL__ */
 #ifndef __KERNEL__
 /* >> mktemp(3)
- * Badly designed version of `mkstemp' that won't actually create
+ * Badly designed version of  `mkstemp' that won't actually  create
  * the temporary file, meaning that by the time the caller tries to
- * create the file themselves, another process may have already
+ * create the  file themselves,  another process  may have  already
  * created it.
- * Also: when no temporary filename can be created, rather than
- *       returning something sensible like `NULL', this function
+ * Also: when no  temporary filename  can be  created, rather  than
+ *       returning something  sensible like  `NULL', this  function
  *       will instead set `template_' to an empty string, and still
  *       re-return it like it would if everything had worked! */
 INTDEF ATTR_RETNONNULL NONNULL((1)) char *NOTHROW_NCX(LIBCCALL libc_mktemp)(char *template_);
@@ -693,18 +693,18 @@ INTDEF WUNUSED NONNULL((1, 2, 3)) int NOTHROW_NCX(LIBCCALL libc_getsubopt)(char 
 #endif /* !__KERNEL__ */
 #if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
 /* >> mkstemp(3), mkstemp64(3)
- * Replace the last 6 characters of `template_', which must be filled with
- * all 'X'-characters before the call (else errno=EINVAL + return -1),
- * with random characters such that the filename described by `template_'
+ * Replace the last 6 characters of  `template_', which must be filled  with
+ * all  'X'-characters  before the  call  (else errno=EINVAL  +  return -1),
+ * with random characters  such that the  filename described by  `template_'
  * will not already exists. Then, create a new file with `O_RDWR' and return
  * the file descriptor of that file. */
 INTDEF WUNUSED NONNULL((1)) fd_t NOTHROW_RPC(LIBDCALL libd_mkstemp)(char *template_);
 #endif /* !__LIBCCALL_IS_LIBDCALL && !__KERNEL__ */
 #ifndef __KERNEL__
 /* >> mkstemp(3), mkstemp64(3)
- * Replace the last 6 characters of `template_', which must be filled with
- * all 'X'-characters before the call (else errno=EINVAL + return -1),
- * with random characters such that the filename described by `template_'
+ * Replace the last 6 characters of  `template_', which must be filled  with
+ * all  'X'-characters  before the  call  (else errno=EINVAL  +  return -1),
+ * with random characters  such that the  filename described by  `template_'
  * will not already exists. Then, create a new file with `O_RDWR' and return
  * the file descriptor of that file. */
 INTDEF WUNUSED NONNULL((1)) fd_t NOTHROW_RPC(LIBCCALL libc_mkstemp)(char *template_);
@@ -712,8 +712,8 @@ INTDEF WUNUSED NONNULL((1)) fd_t NOTHROW_RPC(LIBCCALL libc_mkstemp)(char *templa
 #if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
 /* >> mkdtemp(3)
  * Replace the last 6 characters of `template_', which must be filled with
- * all 'X'-characters before the call (else errno=EINVAL + return -1),
- * with random characters such that the pathname described by `template_'
+ * all  'X'-characters before  the call  (else errno=EINVAL  + return -1),
+ * with random characters such that the pathname described by  `template_'
  * will not already exists. Then, create a new directory with `mode=0700',
  * and re-return `template_' to indicate success.
  * On error, `NULL' will be returned, and the contents of `template_' are undefined. */
@@ -722,8 +722,8 @@ INTDEF WUNUSED NONNULL((1)) char *NOTHROW_RPC(LIBDCALL libd_mkdtemp)(char *templ
 #ifndef __KERNEL__
 /* >> mkdtemp(3)
  * Replace the last 6 characters of `template_', which must be filled with
- * all 'X'-characters before the call (else errno=EINVAL + return -1),
- * with random characters such that the pathname described by `template_'
+ * all  'X'-characters before  the call  (else errno=EINVAL  + return -1),
+ * with random characters such that the pathname described by  `template_'
  * will not already exists. Then, create a new directory with `mode=0700',
  * and re-return `template_' to indicate success.
  * On error, `NULL' will be returned, and the contents of `template_' are undefined. */
@@ -738,18 +738,18 @@ INTDEF int NOTHROW_NCX(LIBCCALL libc_unlockpt)(fd_t fd);
 #endif /* !__KERNEL__ */
 #if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
 /* Returns the name of the PTY slave (Pseudo TTY slave)
- * associated with the master descriptor `fd' */
+ * associated   with   the   master   descriptor   `fd' */
 INTDEF WUNUSED char *NOTHROW_NCX(LIBDCALL libd_ptsname)(fd_t fd);
 #endif /* !__LIBCCALL_IS_LIBDCALL && !__KERNEL__ */
 #ifndef __KERNEL__
 /* Returns the name of the PTY slave (Pseudo TTY slave)
- * associated with the master descriptor `fd' */
+ * associated   with   the   master   descriptor   `fd' */
 INTDEF WUNUSED char *NOTHROW_NCX(LIBCCALL libc_ptsname)(fd_t fd);
 #endif /* !__KERNEL__ */
 #if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
 INTDEF WUNUSED fd_t NOTHROW_RPC(LIBDCALL libd_posix_openpt)(oflag_t oflags);
 /* Returns the name of the PTY slave (Pseudo TTY slave)
- * associated with the master descriptor `fd' */
+ * associated   with   the   master   descriptor   `fd' */
 INTDEF NONNULL((2)) int NOTHROW_NCX(LIBDCALL libd_ptsname_r)(fd_t fd, char *buf, size_t buflen);
 INTDEF NONNULL((1)) long NOTHROW_NCX(LIBDCALL libd_strtol_l)(char const *__restrict nptr, char **endptr, __STDC_INT_AS_UINT_T base, locale_t locale);
 #endif /* !__LIBCCALL_IS_LIBDCALL && !__KERNEL__ */
@@ -817,10 +817,10 @@ INTDEF WUNUSED NONNULL((2)) fd_t NOTHROW_RPC(LIBCCALL libc_system_mktemp)(unsign
 #if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
 /* >> shexec(3)
  * Execute command with the system interpreter (such as: `/bin/sh -c $command')
- * This function is used to implement `system(3)' and `popen(3)', and may be
+ * This  function is used  to implement `system(3)' and  `popen(3)', and may be
  * used to invoke the system interpreter.
  * This function only returns on failure (similar to exec(2)), and will never
- * return on success (since in that case, the calling program will have been
+ * return on success (since in that case, the calling program will have  been
  * replaced by the system shell)
  * The shell paths attempted by this function are system-dependent, but before
  * any of them are tested, this function will try to use `getenv("SHELL")', if
@@ -830,10 +830,10 @@ INTDEF int NOTHROW_RPC(LIBDCALL libd_shexec)(char const *command);
 #ifndef __KERNEL__
 /* >> shexec(3)
  * Execute command with the system interpreter (such as: `/bin/sh -c $command')
- * This function is used to implement `system(3)' and `popen(3)', and may be
+ * This  function is used  to implement `system(3)' and  `popen(3)', and may be
  * used to invoke the system interpreter.
  * This function only returns on failure (similar to exec(2)), and will never
- * return on success (since in that case, the calling program will have been
+ * return on success (since in that case, the calling program will have  been
  * replaced by the system shell)
  * The shell paths attempted by this function are system-dependent, but before
  * any of them are tested, this function will try to use `getenv("SHELL")', if
@@ -844,15 +844,15 @@ INTDEF ATTR_CONST WUNUSED char const *NOTHROW_NCX(LIBCCALL libc_getexecname)(voi
 #endif /* !__KERNEL__ */
 #if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
 /* Enumerate all open file descriptors by invoking `(*func)(cookie, <fd>)' for each of them
- * If during any of these invocations, `(*func)(...)' returns non-zero, enumeration stops,
- * and `fdwalk()' returns with that same value. If `(*func)(...)' is never called, or all
+ * If  during any of these invocations, `(*func)(...)' returns non-zero, enumeration stops,
+ * and `fdwalk()' returns with that same value.  If `(*func)(...)' is never called, or  all
  * invocations return 0, `fdwalk()' will also return 0. */
 INTDEF NONNULL((1)) int NOTHROW_NCX(LIBDCALL libd_fdwalk)(__fdwalk_func_t func, void *cookie);
 #endif /* !__LIBCCALL_IS_LIBDCALL && !__KERNEL__ */
 #ifndef __KERNEL__
 /* Enumerate all open file descriptors by invoking `(*func)(cookie, <fd>)' for each of them
- * If during any of these invocations, `(*func)(...)' returns non-zero, enumeration stops,
- * and `fdwalk()' returns with that same value. If `(*func)(...)' is never called, or all
+ * If  during any of these invocations, `(*func)(...)' returns non-zero, enumeration stops,
+ * and `fdwalk()' returns with that same value.  If `(*func)(...)' is never called, or  all
  * invocations return 0, `fdwalk()' will also return 0. */
 INTDEF NONNULL((1)) int NOTHROW_NCX(LIBCCALL libc_fdwalk)(__fdwalk_func_t func, void *cookie);
 #endif /* !__KERNEL__ */
@@ -876,14 +876,14 @@ INTDEF ATTR_MALL_DEFAULT_ALIGNED WUNUSED ATTR_ALLOC_SIZE((2)) void *NOTHROW_NCX(
 #endif /* !__KERNEL__ */
 #if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
 /* >> recallocarray(3)
- * Same as `recallocv(mallptr, new_elem_count, elem_size)', but also ensure that
- * when `mallptr != NULL', memory pointed to by the old `mallptr...+=old_elem_count*elem_size'
+ * Same   as    `recallocv(mallptr, new_elem_count, elem_size)',   but    also   ensure    that
+ * when `mallptr != NULL', memory pointed to by the old  `mallptr...+=old_elem_count*elem_size'
  * is explicitly freed to zero (s.a. `freezero()') when reallocation must move the memory block */
 INTDEF ATTR_MALL_DEFAULT_ALIGNED WUNUSED ATTR_ALLOC_SIZE((3, 4)) void *NOTHROW_NCX(LIBDCALL libd_recallocarray)(void *mallptr, size_t old_elem_count, size_t new_elem_count, size_t elem_size);
 /* >> freezero(3)
- * Same as `free(mallptr)', but also ensure that the memory region
+ * Same as  `free(mallptr)', but  also ensure  that the  memory  region
  * described by `mallptr...+=num_bytes' is explicitly freed to zero, or
- * immediately returned to the OS, rather than being left in cache
+ * immediately returned  to the  OS, rather  than being  left in  cache
  * while still containing its previous contents. */
 INTDEF void NOTHROW_NCX(LIBDCALL libd_freezero)(void *mallptr, size_t num_bytes);
 INTDEF WUNUSED NONNULL((1, 2)) char *NOTHROW_NCX(LIBDCALL libd_getbsize)(int *headerlenp, __LONGPTR_TYPE__ *blocksizep);
@@ -930,7 +930,7 @@ INTDEF NONNULL((1, 4)) int (LIBCCALL libc_mergesort)(void *pbase, size_t item_co
 INTDEF NONNULL((1)) int NOTHROW_NCX(LIBDCALL libd_radixsort)(unsigned char const **base, int item_count, unsigned char const *table, unsigned endbyte);
 INTDEF NONNULL((1)) int NOTHROW_NCX(LIBDCALL libd_sradixsort)(unsigned char const **base, int item_count, unsigned char const *table, unsigned endbyte);
 /* >> strtonum(3)
- * Similar to `strtoi()' with `base=10', but return human-
+ * Similar to `strtoi()'  with `base=10',  but return  human-
  * readable error messages in `*p_errstr' on error (alongside
  * `return==0') (or `NULL' on success).
  * The following messages are defined:
@@ -944,7 +944,7 @@ INTDEF WUNUSED NONNULL((1, 4)) __LONGLONG NOTHROW_NCX(LIBDCALL libd_strtonum)(ch
 #endif /* !__LIBCCALL_IS_LIBDCALL && !__KERNEL__ */
 #ifndef __KERNEL__
 /* >> strtonum(3)
- * Similar to `strtoi()' with `base=10', but return human-
+ * Similar to `strtoi()'  with `base=10',  but return  human-
  * readable error messages in `*p_errstr' on error (alongside
  * `return==0') (or `NULL' on success).
  * The following messages are defined:
@@ -962,25 +962,25 @@ INTDEF NONNULL((1, 4)) void (LIBDCALL libd_qsort_r)(void *pbase, size_t item_cou
 INTDEF NONNULL((1, 4)) void (LIBCCALL libc_qsort_r)(void *pbase, size_t item_count, size_t item_size, __compar_d_fn_t cmp, void *arg) THROWS(...);
 #if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
 /* >> mkostemp(3), mkostemp64(3)
- * Replace the last 6 characters of `template_' (which are followed by exactly
- * `suffixlen' more characters that are left alone), which must be filled with
- * all 'X'-characters before the call (else errno=EINVAL + return -1), with
- * random characters such that the filename described by `template_' will not
+ * Replace  the  last 6  characters of  `template_' (which  are followed  by exactly
+ * `suffixlen'  more  characters that  are left  alone), which  must be  filled with
+ * all  'X'-characters  before  the  call  (else  errno=EINVAL  +  return  -1), with
+ * random  characters  such  that the  filename  described by  `template_'  will not
  * already exists. Then, create a new file with `O_RDWR | flags' and return the file
  * descriptor of that file.
- * @param: flags: Additional flags to pass to `open(2)',
+ * @param: flags: Additional  flags  to pass  to `open(2)',
  *                but `O_ACCMODE' is always set to `O_RDWR' */
 INTDEF WUNUSED NONNULL((1)) fd_t NOTHROW_NCX(LIBDCALL libd_mkostemp)(char *template_, oflag_t flags);
 #endif /* !__LIBCCALL_IS_LIBDCALL && !__KERNEL__ */
 #ifndef __KERNEL__
 /* >> mkostemp(3), mkostemp64(3)
- * Replace the last 6 characters of `template_' (which are followed by exactly
- * `suffixlen' more characters that are left alone), which must be filled with
- * all 'X'-characters before the call (else errno=EINVAL + return -1), with
- * random characters such that the filename described by `template_' will not
+ * Replace  the  last 6  characters of  `template_' (which  are followed  by exactly
+ * `suffixlen'  more  characters that  are left  alone), which  must be  filled with
+ * all  'X'-characters  before  the  call  (else  errno=EINVAL  +  return  -1), with
+ * random  characters  such  that the  filename  described by  `template_'  will not
  * already exists. Then, create a new file with `O_RDWR | flags' and return the file
  * descriptor of that file.
- * @param: flags: Additional flags to pass to `open(2)',
+ * @param: flags: Additional  flags  to pass  to `open(2)',
  *                but `O_ACCMODE' is always set to `O_RDWR' */
 INTDEF WUNUSED NONNULL((1)) fd_t NOTHROW_NCX(LIBCCALL libc_mkostemp)(char *template_, oflag_t flags);
 #endif /* !__KERNEL__ */
@@ -1011,14 +1011,14 @@ INTDEF int NOTHROW_NCX(LIBDCALL libd_humanize_number)(char *buf, size_t len, int
 INTDEF int NOTHROW_NCX(LIBDCALL libd_dehumanize_number)(char const *str, int64_t *size);
 /* >> strsuftoll(3)
  * Same as `strsuftollx(3)', but if an error happens, make
- * use of `errx(3)' to terminate the program, rather than
+ * use of `errx(3)' to terminate the program, rather  than
  * return to the caller. */
 INTDEF WUNUSED NONNULL((1, 2)) __LONGLONG NOTHROW_NCX(LIBDCALL libd_strsuftoll)(char const *desc, char const *val, __LONGLONG lo, __LONGLONG hi);
 #endif /* !__LIBCCALL_IS_LIBDCALL && !__KERNEL__ */
 #ifndef __KERNEL__
 /* >> strsuftoll(3)
  * Same as `strsuftollx(3)', but if an error happens, make
- * use of `errx(3)' to terminate the program, rather than
+ * use of `errx(3)' to terminate the program, rather  than
  * return to the caller. */
 INTDEF WUNUSED NONNULL((1, 2)) __LONGLONG NOTHROW_NCX(LIBCCALL libc_strsuftoll)(char const *desc, char const *val, __LONGLONG lo, __LONGLONG hi);
 #endif /* !__KERNEL__ */

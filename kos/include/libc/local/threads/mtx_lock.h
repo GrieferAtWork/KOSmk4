@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xd30ba387 */
+/* HASH CRC-32:0x4f07f30b */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -24,26 +24,18 @@
 #ifdef __CRT_HAVE_pthread_mutex_lock
 #include <bits/crt/threads.h>
 __NAMESPACE_LOCAL_BEGIN
-/* Dependency: pthread_mutex_lock from pthread */
 #ifndef __local___localdep_pthread_mutex_lock_defined
 #define __local___localdep_pthread_mutex_lock_defined 1
 __NAMESPACE_LOCAL_END
 #include <bits/types.h>
 #include <bits/crt/pthreadtypes.h>
 __NAMESPACE_LOCAL_BEGIN
-/* >> pthread_mutex_lock(3)
- * Lock the given `mutex'
- * @return: EOK: Success */
 __CREDIRECT(__ATTR_NONNULL((1)),__errno_t,__NOTHROW_RPC,__localdep_pthread_mutex_lock,(__pthread_mutex_t *__mutex),pthread_mutex_lock,(__mutex))
 #endif /* !__local___localdep_pthread_mutex_lock_defined */
 __NAMESPACE_LOCAL_END
 #include <asm/crt/threads.h>
 #include <bits/crt/pthreadtypes.h>
 __NAMESPACE_LOCAL_BEGIN
-/* >> mtx_lock(3)
- * Acquire a lock to a given mutex (s.a. `pthread_mutex_lock(3)')
- * @return: thrd_success: Success
- * @return: thrd_error:   Error */
 __LOCAL_LIBC(mtx_lock) __ATTR_NONNULL((1)) int
 __NOTHROW_RPC(__LIBCCALL __LIBC_LOCAL_NAME(mtx_lock))(__mtx_t *__restrict __mutex) {
 	__errno_t __error;

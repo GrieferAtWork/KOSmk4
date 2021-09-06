@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x5832a07e */
+/* HASH CRC-32:0x9d1d1cd9 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -23,7 +23,6 @@
 #include <__crt.h>
 #include <libm/copysign.h>
 __NAMESPACE_LOCAL_BEGIN
-/* Return `x' with its signed changed to `y's */
 __LOCAL_LIBC(copysignl) __ATTR_CONST __ATTR_WUNUSED __LONGDOUBLE
 __NOTHROW(__LIBCCALL __LIBC_LOCAL_NAME(copysignl))(__LONGDOUBLE __num, __LONGDOUBLE __sign) {
 #ifdef __LIBM_MATHFUN2L

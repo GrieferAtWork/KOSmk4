@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x317df3f0 */
+/* HASH CRC-32:0x8513ebc7 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -24,72 +24,47 @@
 #ifdef __CRT_HAVE_realloc
 #include <hybrid/typecore.h>
 __NAMESPACE_LOCAL_BEGIN
-/* Dependency: argz_add from argz */
 #ifndef __local___localdep_argz_add_defined
 #define __local___localdep_argz_add_defined 1
 #ifdef __CRT_HAVE_argz_add
 __NAMESPACE_LOCAL_END
 #include <bits/types.h>
 __NAMESPACE_LOCAL_BEGIN
-/* >> argz_add(3)
- * Append `str' (including the trailing NUL-character) to the argz string in `*pargz...+=pargz_len'
- * This is the same as `argz_append(pargz, pargz_len, str, strlen(str) + 1)'
- * @return: 0 :     Success
- * @return: ENOMEM: Insufficient heap memory */
 __CREDIRECT(__ATTR_NONNULL((1, 2, 3)),__errno_t,__NOTHROW_NCX,__localdep_argz_add,(char **__restrict __pargz, __SIZE_TYPE__ *__restrict __pargz_len, char const *__restrict __str),argz_add,(__pargz,__pargz_len,__str))
 #elif defined(__CRT_HAVE___argz_add)
 __NAMESPACE_LOCAL_END
 #include <bits/types.h>
 __NAMESPACE_LOCAL_BEGIN
-/* >> argz_add(3)
- * Append `str' (including the trailing NUL-character) to the argz string in `*pargz...+=pargz_len'
- * This is the same as `argz_append(pargz, pargz_len, str, strlen(str) + 1)'
- * @return: 0 :     Success
- * @return: ENOMEM: Insufficient heap memory */
 __CREDIRECT(__ATTR_NONNULL((1, 2, 3)),__errno_t,__NOTHROW_NCX,__localdep_argz_add,(char **__restrict __pargz, __SIZE_TYPE__ *__restrict __pargz_len, char const *__restrict __str),__argz_add,(__pargz,__pargz_len,__str))
 #else /* ... */
 __NAMESPACE_LOCAL_END
 #include <libc/local/argz/argz_add.h>
 __NAMESPACE_LOCAL_BEGIN
-/* >> argz_add(3)
- * Append `str' (including the trailing NUL-character) to the argz string in `*pargz...+=pargz_len'
- * This is the same as `argz_append(pargz, pargz_len, str, strlen(str) + 1)'
- * @return: 0 :     Success
- * @return: ENOMEM: Insufficient heap memory */
 #define __localdep_argz_add __LIBC_LOCAL_NAME(argz_add)
 #endif /* !... */
 #endif /* !__local___localdep_argz_add_defined */
-/* Dependency: envz_remove from envz */
 #ifndef __local___localdep_envz_remove_defined
 #define __local___localdep_envz_remove_defined 1
 #ifdef __CRT_HAVE_envz_remove
-/* Remove an entry matching `name' from `penvz',
- * or do nothing if no such entry exists. */
 __CREDIRECT_VOID(__ATTR_NONNULL((1, 2, 3)),__NOTHROW_NCX,__localdep_envz_remove,(char **__restrict __penvz, __SIZE_TYPE__ *__restrict __penvz_len, char const *__restrict __name),envz_remove,(__penvz,__penvz_len,__name))
 #else /* __CRT_HAVE_envz_remove */
 __NAMESPACE_LOCAL_END
 #include <libc/local/envz/envz_remove.h>
 __NAMESPACE_LOCAL_BEGIN
-/* Remove an entry matching `name' from `penvz',
- * or do nothing if no such entry exists. */
 #define __localdep_envz_remove __LIBC_LOCAL_NAME(envz_remove)
 #endif /* !__CRT_HAVE_envz_remove */
 #endif /* !__local___localdep_envz_remove_defined */
-/* Dependency: mempcpyc from string */
 #ifndef __local___localdep_mempcpyc_defined
 #define __local___localdep_mempcpyc_defined 1
 #ifdef __CRT_HAVE_mempcpyc
-/* Same as `memcpyc', but return `dst + (ELEM_COUNT * ELEM_SIZE)', rather than `dst' */
 __CREDIRECT(__ATTR_LEAF __ATTR_RETNONNULL __ATTR_NONNULL((1, 2)),void *,__NOTHROW_NCX,__localdep_mempcpyc,(void *__restrict __dst, void const *__restrict __src, __SIZE_TYPE__ __elem_count, __SIZE_TYPE__ __elem_size),mempcpyc,(__dst,__src,__elem_count,__elem_size))
 #else /* __CRT_HAVE_mempcpyc */
 __NAMESPACE_LOCAL_END
 #include <libc/local/string/mempcpyc.h>
 __NAMESPACE_LOCAL_BEGIN
-/* Same as `memcpyc', but return `dst + (ELEM_COUNT * ELEM_SIZE)', rather than `dst' */
 #define __localdep_mempcpyc __LIBC_LOCAL_NAME(mempcpyc)
 #endif /* !__CRT_HAVE_mempcpyc */
 #endif /* !__local___localdep_mempcpyc_defined */
-/* Dependency: realloc from stdlib */
 #ifndef __local___localdep_realloc_defined
 #define __local___localdep_realloc_defined 1
 #if __has_builtin(__builtin_realloc) && defined(__LIBC_BIND_CRTBUILTINS)
@@ -98,29 +73,20 @@ __CEIREDIRECT(__ATTR_MALL_DEFAULT_ALIGNED __ATTR_WUNUSED __ATTR_ALLOC_SIZE((2)),
 __CREDIRECT(__ATTR_MALL_DEFAULT_ALIGNED __ATTR_WUNUSED __ATTR_ALLOC_SIZE((2)),void *,__NOTHROW_NCX,__localdep_realloc,(void *__mallptr, __SIZE_TYPE__ __num_bytes),realloc,(__mallptr,__num_bytes))
 #endif /* !__has_builtin(__builtin_realloc) || !__LIBC_BIND_CRTBUILTINS */
 #endif /* !__local___localdep_realloc_defined */
-/* Dependency: strlen from string */
 #ifndef __local___localdep_strlen_defined
 #define __local___localdep_strlen_defined 1
 #ifdef __CRT_HAVE_strlen
-/* >> strlen(3)
- * Return the length of the string in characters (Same as `rawmemlen[...](str, '\0')') */
 __CREDIRECT(__ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1)),__SIZE_TYPE__,__NOTHROW_NCX,__localdep_strlen,(char const *__restrict __str),strlen,(__str))
 #else /* __CRT_HAVE_strlen */
 __NAMESPACE_LOCAL_END
 #include <libc/local/string/strlen.h>
 __NAMESPACE_LOCAL_BEGIN
-/* >> strlen(3)
- * Return the length of the string in characters (Same as `rawmemlen[...](str, '\0')') */
 #define __localdep_strlen __LIBC_LOCAL_NAME(strlen)
 #endif /* !__CRT_HAVE_strlen */
 #endif /* !__local___localdep_strlen_defined */
 __NAMESPACE_LOCAL_END
 #include <libc/errno.h>
 __NAMESPACE_LOCAL_BEGIN
-/* Add an entry `name=value' to `penvz'. If another entry for `name'
- * already existed before, that entry is removed. If `name' is NULL,
- * the entry created doesn't have a value-portion (i.e. `name' is
- * added to `penvz' as-is, without the trailing `=value') */
 __LOCAL_LIBC(envz_add) __ATTR_NONNULL((1, 2, 3)) __errno_t
 __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(envz_add))(char **__restrict __penvz, __SIZE_TYPE__ *__restrict __penvz_len, char const *__restrict __name, char const *__value) {
 	char *__new_envz;

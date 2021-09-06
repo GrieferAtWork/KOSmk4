@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x8e4dea9e */
+/* HASH CRC-32:0x89cc5f86 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -26,47 +26,25 @@
 #include <bits/os/iovec.h>
 #include <bits/types.h>
 __NAMESPACE_LOCAL_BEGIN
-/* Dependency: pwritev32 from sys.uio */
 #if !defined(__local___localdep_pwritev32_defined) && defined(__CRT_HAVE_pwritev)
 #define __local___localdep_pwritev32_defined 1
-/* >> pwritev(2)
- * Same as `writev(2)', but write data to a file at a
- * specific `offset', rather than the current R/W position
- * @return: <= SUM(iov[*].iov_len): The actual amount of written bytes */
 __CREDIRECT(__ATTR_NONNULL((2)),__SSIZE_TYPE__,__NOTHROW_RPC,__localdep_pwritev32,(__fd_t __fd, struct iovec const *__iov, __STDC_INT_AS_SIZE_T __count, __off32_t __offset),pwritev,(__fd,__iov,__count,__offset))
 #endif /* !__local___localdep_pwritev32_defined && __CRT_HAVE_pwritev */
-/* Dependency: pwritev64 from sys.uio */
 #ifndef __local___localdep_pwritev64_defined
 #define __local___localdep_pwritev64_defined 1
 #ifdef __CRT_HAVE_pwritev64
-/* >> pwritev(2)
- * Same as `writev(2)', but write data to a file at a
- * specific `offset', rather than the current R/W position
- * @return: <= SUM(iov[*].iov_len): The actual amount of written bytes */
 __CREDIRECT(__ATTR_NONNULL((2)),__SSIZE_TYPE__,__NOTHROW_RPC,__localdep_pwritev64,(__fd_t __fd, struct iovec const *__iov, __STDC_INT_AS_SIZE_T __count, __off64_t __offset),pwritev64,(__fd,__iov,__count,__offset))
 #elif defined(__CRT_HAVE_pwritev) && __SIZEOF_OFF32_T__ == __SIZEOF_OFF64_T__
-/* >> pwritev(2)
- * Same as `writev(2)', but write data to a file at a
- * specific `offset', rather than the current R/W position
- * @return: <= SUM(iov[*].iov_len): The actual amount of written bytes */
 __CREDIRECT(__ATTR_NONNULL((2)),__SSIZE_TYPE__,__NOTHROW_RPC,__localdep_pwritev64,(__fd_t __fd, struct iovec const *__iov, __STDC_INT_AS_SIZE_T __count, __off64_t __offset),pwritev,(__fd,__iov,__count,__offset))
 #elif defined(__CRT_HAVE_pwritev)
 __NAMESPACE_LOCAL_END
 #include <libc/local/sys.uio/pwritev64.h>
 __NAMESPACE_LOCAL_BEGIN
-/* >> pwritev(2)
- * Same as `writev(2)', but write data to a file at a
- * specific `offset', rather than the current R/W position
- * @return: <= SUM(iov[*].iov_len): The actual amount of written bytes */
 #define __localdep_pwritev64 __LIBC_LOCAL_NAME(pwritev64)
 #else /* ... */
 #undef __local___localdep_pwritev64_defined
 #endif /* !... */
 #endif /* !__local___localdep_pwritev64_defined */
-/* >> pwritev(2)
- * Same as `writev(2)', but write data to a file at a
- * specific `offset', rather than the current R/W position
- * @return: <= SUM(iov[*].iov_len): The actual amount of written bytes */
 __LOCAL_LIBC(pwritev) __ATTR_NONNULL((2)) __SSIZE_TYPE__
 __NOTHROW_RPC(__LIBCCALL __LIBC_LOCAL_NAME(pwritev))(__fd_t __fd, struct iovec const *__iov, __STDC_INT_AS_SIZE_T __count, __FS_TYPE(off) __offset) {
 

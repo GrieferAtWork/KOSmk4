@@ -54,7 +54,7 @@ function isStubFunctionImplementation(body: string): bool {
 
 
 @@Check if the given function body is merely auto-generated
-@@NOTE: Passing @none for @func means that the actual function is
+@@NOTE: Passing @none for @func means  that the actual function  is
 @@      unknown, as may be the case after the function was deleted.
 function isFunctionBodyGenerated(func: LibraryFunction | none, body: string): bool {
 	return body.lstrip().startswith("/*AUTO*/");

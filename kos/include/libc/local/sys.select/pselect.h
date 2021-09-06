@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x4060febe */
+/* HASH CRC-32:0xb1512935 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -27,12 +27,10 @@
 #include <bits/os/sigset.h>
 #include <bits/os/fd_set.h>
 __NAMESPACE_LOCAL_BEGIN
-/* Dependency: pselect32 from sys.select */
 #if !defined(__local___localdep_pselect32_defined) && defined(__CRT_HAVE_pselect)
 #define __local___localdep_pselect32_defined 1
 __CREDIRECT(,__STDC_INT_AS_SSIZE_T,__NOTHROW_RPC,__localdep_pselect32,(__STDC_INT_AS_SIZE_T __nfds, struct __fd_set_struct *__restrict __readfds, struct __fd_set_struct *__restrict __writefds, struct __fd_set_struct *__restrict __exceptfds, struct __timespec32 const *__restrict __timeout, struct __sigset_struct const *__restrict __sigmask),pselect,(__nfds,__readfds,__writefds,__exceptfds,__timeout,__sigmask))
 #endif /* !__local___localdep_pselect32_defined && __CRT_HAVE_pselect */
-/* Dependency: pselect64 from sys.select */
 #ifndef __local___localdep_pselect64_defined
 #define __local___localdep_pselect64_defined 1
 #ifdef __CRT_HAVE_pselect64

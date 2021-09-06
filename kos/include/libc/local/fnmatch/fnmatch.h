@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x5a98b46a */
+/* HASH CRC-32:0x9a905afd */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -23,7 +23,6 @@
 #include <__crt.h>
 #include <features.h>
 __NAMESPACE_LOCAL_BEGIN
-/* Dependency: tolower from ctype */
 #ifndef __local___localdep_tolower_defined
 #define __local___localdep_tolower_defined 1
 #if __has_builtin(__builtin_tolower) && defined(__LIBC_BIND_CRTBUILTINS) && defined(__CRT_HAVE_tolower)
@@ -39,11 +38,6 @@ __NAMESPACE_LOCAL_BEGIN
 #define __localdep_tolower __LIBC_LOCAL_NAME(tolower)
 #endif /* !... */
 #endif /* !__local___localdep_tolower_defined */
-/* Match the given `name' against `pattern', returning
- * `0' if they match, and `FNM_NOMATCH' otherwise.
- * @param: match_flags:   Set of `FNM_*'
- * @return: 0           : `name' is matched by `pattern'
- * @return: FNM_NOMATCH : `name' is not matched by `pattern' */
 __LOCAL_LIBC(fnmatch) __ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1, 2)) int
 __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(fnmatch))(char const *__pattern, char const *__name, __STDC_INT_AS_UINT_T __match_flags) {
 	char __card_post;

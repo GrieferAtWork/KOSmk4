@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x6ba63121 */
+/* HASH CRC-32:0x597e2470 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -53,14 +53,14 @@ INTDEF NONNULL((1)) void NOTHROW_NCX(LIBCCALL libc_remque)(void *__restrict elem
 /* >> hsearch(3)
  * Search for entry matching `item.key' in internal hash table.
  * If `action' is `FIND' return found entry or signal error by returning `NULL'.
- * If `action' is `ENTER' replace existing data (if any) with `item.data' */
+ * If  `action'  is  `ENTER' replace  existing  data (if  any)  with `item.data' */
 INTDEF ENTRY *NOTHROW_NCX(LIBDCALL libd_hsearch)(ENTRY item, ACTION action);
 #endif /* !__LIBCCALL_IS_LIBDCALL && !__KERNEL__ */
 #ifndef __KERNEL__
 /* >> hsearch(3)
  * Search for entry matching `item.key' in internal hash table.
  * If `action' is `FIND' return found entry or signal error by returning `NULL'.
- * If `action' is `ENTER' replace existing data (if any) with `item.data' */
+ * If  `action'  is  `ENTER' replace  existing  data (if  any)  with `item.data' */
 INTDEF ENTRY *NOTHROW_NCX(LIBCCALL libc_hsearch)(ENTRY item, ACTION action);
 #endif /* !__KERNEL__ */
 #if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
@@ -104,26 +104,26 @@ INTDEF void NOTHROW_NCX(LIBCCALL libc_hdestroy_r)(struct hsearch_data *htab);
 #endif /* !__KERNEL__ */
 #if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
 /* >> tsearch(3)
- * Search for an entry matching the given `key' in the tree
+ * Search for an  entry matching  the given `key'  in the  tree
  * pointed to by `*rootp' and insert a new element if not found */
 INTDEF NONNULL((3)) void *NOTHROW_NCX(LIBDCALL libd_tsearch)(void const *key, void **vrootp, __compar_fn_t compar);
 #endif /* !__LIBCCALL_IS_LIBDCALL && !__KERNEL__ */
 #ifndef __KERNEL__
 /* >> tsearch(3)
- * Search for an entry matching the given `key' in the tree
+ * Search for an  entry matching  the given `key'  in the  tree
  * pointed to by `*rootp' and insert a new element if not found */
 INTDEF NONNULL((3)) void *NOTHROW_NCX(LIBCCALL libc_tsearch)(void const *key, void **vrootp, __compar_fn_t compar);
 #endif /* !__KERNEL__ */
 #if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
 /* >> tfind(3)
  * Search for an entry matching the given `key' in the tree pointed
- * to by `*rootp'. If no matching entry is available return `NULL' */
+ * to  by `*rootp'. If no matching entry is available return `NULL' */
 INTDEF NONNULL((3)) void *NOTHROW_NCX(LIBDCALL libd_tfind)(void const *key, void *const *vrootp, __compar_fn_t compar);
 #endif /* !__LIBCCALL_IS_LIBDCALL && !__KERNEL__ */
 #ifndef __KERNEL__
 /* >> tfind(3)
  * Search for an entry matching the given `key' in the tree pointed
- * to by `*rootp'. If no matching entry is available return `NULL' */
+ * to  by `*rootp'. If no matching entry is available return `NULL' */
 INTDEF NONNULL((3)) void *NOTHROW_NCX(LIBCCALL libc_tfind)(void const *key, void *const *vrootp, __compar_fn_t compar);
 #endif /* !__KERNEL__ */
 #if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
@@ -169,13 +169,13 @@ INTDEF NONNULL((2, 3, 5)) void *NOTHROW_NCX(LIBCCALL libc_lfind)(void const *key
 #if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
 /* >> lsearch(3)
  * Perform linear search for `key' by comparing by `compar' function
- * in array [base, base+nmemb*size) and insert entry if not found */
+ * in array [base,  base+nmemb*size) and insert  entry if not  found */
 INTDEF NONNULL((2, 3, 5)) void *NOTHROW_NCX(LIBDCALL libd_lsearch)(void const *key, void *base, size_t *nmemb, size_t size, __compar_fn_t compar);
 #endif /* !__LIBCCALL_IS_LIBDCALL && !__KERNEL__ */
 #ifndef __KERNEL__
 /* >> lsearch(3)
  * Perform linear search for `key' by comparing by `compar' function
- * in array [base, base+nmemb*size) and insert entry if not found */
+ * in array [base,  base+nmemb*size) and insert  entry if not  found */
 INTDEF NONNULL((2, 3, 5)) void *NOTHROW_NCX(LIBCCALL libc_lsearch)(void const *key, void *base, size_t *nmemb, size_t size, __compar_fn_t compar);
 #endif /* !__KERNEL__ */
 

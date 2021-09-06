@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xb8b0c9a2 */
+/* HASH CRC-32:0x129bf298 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -23,19 +23,14 @@
 #include <__crt.h>
 #include <hybrid/typecore.h>
 __NAMESPACE_LOCAL_BEGIN
-/* Dependency: memcpyc from string */
 #ifndef __local___localdep_memcpyc_defined
 #define __local___localdep_memcpyc_defined 1
 #ifdef __CRT_HAVE_memcpyc
-/* Copy memory between non-overlapping memory blocks.
- * @return: * : Always re-returns `dst' */
 __CREDIRECT(__ATTR_LEAF __ATTR_RETNONNULL __ATTR_NONNULL((1, 2)),void *,__NOTHROW_NCX,__localdep_memcpyc,(void *__restrict __dst, void const *__restrict __src, __SIZE_TYPE__ __elem_count, __SIZE_TYPE__ __elem_size),memcpyc,(__dst,__src,__elem_count,__elem_size))
 #else /* __CRT_HAVE_memcpyc */
 __NAMESPACE_LOCAL_END
 #include <libc/local/string/memcpyc.h>
 __NAMESPACE_LOCAL_BEGIN
-/* Copy memory between non-overlapping memory blocks.
- * @return: * : Always re-returns `dst' */
 #define __localdep_memcpyc __LIBC_LOCAL_NAME(memcpyc)
 #endif /* !__CRT_HAVE_memcpyc */
 #endif /* !__local___localdep_memcpyc_defined */

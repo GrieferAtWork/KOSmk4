@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xcd9efb44 */
+/* HASH CRC-32:0xec8277c0 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -23,7 +23,6 @@
 #include <__crt.h>
 #if (defined(__CRT_HAVE_recallocv) || defined(__CRT_HAVE__recalloc) || defined(__CRT_HAVE_realloc)) && (defined(__CRT_HAVE_malloc) || defined(__CRT_HAVE_calloc) || defined(__CRT_HAVE_realloc) || defined(__CRT_HAVE_memalign) || defined(__CRT_HAVE_aligned_alloc) || defined(__CRT_HAVE_posix_memalign)) && (defined(__CRT_HAVE_malloc_usable_size) || defined(__CRT_HAVE__msize))
 __NAMESPACE_LOCAL_BEGIN
-/* Dependency: calloc from stdlib */
 #ifndef __local___localdep_calloc_defined
 #define __local___localdep_calloc_defined 1
 #if __has_builtin(__builtin_calloc) && defined(__LIBC_BIND_CRTBUILTINS) && defined(__CRT_HAVE_calloc)
@@ -45,67 +44,34 @@ __NAMESPACE_LOCAL_BEGIN
 #undef __local___localdep_calloc_defined
 #endif /* !... */
 #endif /* !__local___localdep_calloc_defined */
-/* Dependency: explicit_bzero from strings */
 #ifndef __local___localdep_explicit_bzero_defined
 #define __local___localdep_explicit_bzero_defined 1
 #ifdef __CRT_HAVE_bzero
-/* >> explicit_bzero(3)
- * Same as `bzero(dst, n_bytes)', however compilers will not optimize
- * away uses of this function when they (think) that clearing the memory
- * wouldn't have any visible side-effects (though those side-effects
- * may be a security-concious application trying to wipe sensitive data) */
 __CREDIRECT_VOID(,__NOTHROW_NCX,__localdep_explicit_bzero,(void *__dst, __SIZE_TYPE__ __n_bytes),bzero,(__dst,__n_bytes))
 #elif defined(__CRT_HAVE_explicit_bzero)
-/* >> explicit_bzero(3)
- * Same as `bzero(dst, n_bytes)', however compilers will not optimize
- * away uses of this function when they (think) that clearing the memory
- * wouldn't have any visible side-effects (though those side-effects
- * may be a security-concious application trying to wipe sensitive data) */
 __CREDIRECT_VOID(,__NOTHROW_NCX,__localdep_explicit_bzero,(void *__dst, __SIZE_TYPE__ __n_bytes),explicit_bzero,(__dst,__n_bytes))
 #elif defined(__CRT_HAVE___bzero)
-/* >> explicit_bzero(3)
- * Same as `bzero(dst, n_bytes)', however compilers will not optimize
- * away uses of this function when they (think) that clearing the memory
- * wouldn't have any visible side-effects (though those side-effects
- * may be a security-concious application trying to wipe sensitive data) */
 __CREDIRECT_VOID(,__NOTHROW_NCX,__localdep_explicit_bzero,(void *__dst, __SIZE_TYPE__ __n_bytes),__bzero,(__dst,__n_bytes))
 #else /* ... */
 __NAMESPACE_LOCAL_END
 #include <libc/local/strings/explicit_bzero.h>
 __NAMESPACE_LOCAL_BEGIN
-/* >> explicit_bzero(3)
- * Same as `bzero(dst, n_bytes)', however compilers will not optimize
- * away uses of this function when they (think) that clearing the memory
- * wouldn't have any visible side-effects (though those side-effects
- * may be a security-concious application trying to wipe sensitive data) */
 #define __localdep_explicit_bzero __LIBC_LOCAL_NAME(explicit_bzero)
 #endif /* !... */
 #endif /* !__local___localdep_explicit_bzero_defined */
-/* Dependency: freezero from stdlib */
 #ifndef __local___localdep_freezero_defined
 #define __local___localdep_freezero_defined 1
 #ifdef __CRT_HAVE_freezero
-/* >> freezero(3)
- * Same as `free(mallptr)', but also ensure that the memory region
- * described by `mallptr...+=num_bytes' is explicitly freed to zero, or
- * immediately returned to the OS, rather than being left in cache
- * while still containing its previous contents. */
 __CREDIRECT_VOID(,__NOTHROW_NCX,__localdep_freezero,(void *__mallptr, __SIZE_TYPE__ __num_bytes),freezero,(__mallptr,__num_bytes))
 #elif defined(__CRT_HAVE_free) || defined(__CRT_HAVE_cfree)
 __NAMESPACE_LOCAL_END
 #include <libc/local/stdlib/freezero.h>
 __NAMESPACE_LOCAL_BEGIN
-/* >> freezero(3)
- * Same as `free(mallptr)', but also ensure that the memory region
- * described by `mallptr...+=num_bytes' is explicitly freed to zero, or
- * immediately returned to the OS, rather than being left in cache
- * while still containing its previous contents. */
 #define __localdep_freezero __LIBC_LOCAL_NAME(freezero)
 #else /* ... */
 #undef __local___localdep_freezero_defined
 #endif /* !... */
 #endif /* !__local___localdep_freezero_defined */
-/* Dependency: malloc_usable_size from malloc */
 #ifndef __local___localdep_malloc_usable_size_defined
 #define __local___localdep_malloc_usable_size_defined 1
 #ifdef __CRT_HAVE_malloc_usable_size
@@ -122,28 +88,20 @@ __CREDIRECT(__ATTR_PURE __ATTR_WUNUSED,__SIZE_TYPE__,__NOTHROW_NCX,__localdep_ma
 #undef __local___localdep_malloc_usable_size_defined
 #endif /* !... */
 #endif /* !__local___localdep_malloc_usable_size_defined */
-/* Dependency: memcpy from string */
 #ifndef __local___localdep_memcpy_defined
 #define __local___localdep_memcpy_defined 1
 #ifdef __CRT_HAVE_memcpy
 __NAMESPACE_LOCAL_END
 #include <hybrid/typecore.h>
 __NAMESPACE_LOCAL_BEGIN
-/* >> memcpy(3)
- * Copy memory between non-overlapping memory blocks.
- * @return: * : Always re-returns `dst' */
 __CREDIRECT(__ATTR_LEAF __ATTR_RETNONNULL __ATTR_NONNULL((1, 2)),void *,__NOTHROW_NCX,__localdep_memcpy,(void *__restrict __dst, void const *__restrict __src, __SIZE_TYPE__ __n_bytes),memcpy,(__dst,__src,__n_bytes))
 #else /* __CRT_HAVE_memcpy */
 __NAMESPACE_LOCAL_END
 #include <libc/local/string/memcpy.h>
 __NAMESPACE_LOCAL_BEGIN
-/* >> memcpy(3)
- * Copy memory between non-overlapping memory blocks.
- * @return: * : Always re-returns `dst' */
 #define __localdep_memcpy __LIBC_LOCAL_NAME(memcpy)
 #endif /* !__CRT_HAVE_memcpy */
 #endif /* !__local___localdep_memcpy_defined */
-/* Dependency: recallocv from malloc */
 #ifndef __local___localdep_recallocv_defined
 #define __local___localdep_recallocv_defined 1
 #ifdef __CRT_HAVE_recallocv
@@ -165,10 +123,6 @@ __NAMESPACE_LOCAL_BEGIN
 #undef __local___localdep_recallocv_defined
 #endif /* !... */
 #endif /* !__local___localdep_recallocv_defined */
-/* >> recallocarray(3)
- * Same as `recallocv(mallptr, new_elem_count, elem_size)', but also ensure that
- * when `mallptr != NULL', memory pointed to by the old `mallptr...+=old_elem_count*elem_size'
- * is explicitly freed to zero (s.a. `freezero()') when reallocation must move the memory block */
 __LOCAL_LIBC(recallocarray) __ATTR_MALL_DEFAULT_ALIGNED __ATTR_WUNUSED __ATTR_ALLOC_SIZE((3, 4)) void *
 __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(recallocarray))(void *__mallptr, __SIZE_TYPE__ __old_elem_count, __SIZE_TYPE__ __new_elem_count, __SIZE_TYPE__ __elem_size) {
 	if (__mallptr != __NULLPTR && __old_elem_count != 0) {

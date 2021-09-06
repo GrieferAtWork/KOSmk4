@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x5029825c */
+/* HASH CRC-32:0x6a61c63 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -38,7 +38,7 @@ INTDEF ATTR_PURE WUNUSED error_subclass_t NOTHROW(LIBKCALL libc_error_subclass)(
 INTDEF ATTR_CONST ATTR_RETNONNULL WUNUSED error_register_state_t *NOTHROW(LIBKCALL libc_error_register_state)(void);
 INTDEF ATTR_CONST ATTR_RETNONNULL WUNUSED struct exception_info *NOTHROW(LIBKCALL libc_error_info)(void);
 /* Unwind the given register state to propagate the currently set error.
- * Following this, the returned register state should then be loaded. */
+ * Following this, the  returned register state  should then be  loaded. */
 INTDEF ATTR_RETNONNULL WUNUSED NONNULL((1)) error_register_state_t *NOTHROW_NCX(__ERROR_UNWIND_CC libc_error_unwind)(error_register_state_t *__restrict state);
 /* Throw the currently set (in `error_data()') exception. */
 INTDEF ATTR_COLD ATTR_NORETURN void (LIBKCALL libc_error_throw_current)(void) THROWS(...);

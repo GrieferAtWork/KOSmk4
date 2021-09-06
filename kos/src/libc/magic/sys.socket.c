@@ -927,7 +927,7 @@ typedef union { __SOCKADDR_ALLTYPES } __CONST_SOCKADDR_ARG __ATTR_TRANSPARENT_UN
 @@                  May optionally be or'd with `SOCK_CLOEXEC | SOCK_CLOFORK | SOCK_NONBLOCK'
 @@@param: protocol: Socket protocol (`0' for automatic). Available socket protocols mainly
 @@                  depend on the selected `domain', and may be further specialized by the
-@@                  `type' argument. for example, `AF_INET' takes one of `IPPROTO_*'
+@@                  `type' argument.  for  example,  `AF_INET' takes  one  of  `IPPROTO_*'
 @@                  >> socket(AF_INET, SOCK_STREAM, IPPROTO_TCP);
 @@                  Also note that protocol IDs can be enumerated by `getprotoent(3)' from `<netdb.h>'
 @@@return: * : A file descriptor for the newly created socket.
@@ -938,7 +938,7 @@ $fd_t socket(__STDC_INT_AS_UINT_T domain, __STDC_INT_AS_UINT_T type,
              __STDC_INT_AS_UINT_T protocol);
 
 @@>> socketpair(2)
-@@Create pair of connected sockets with the given domain/type/protocol triple
+@@Create  pair of  connected sockets  with the  given domain/type/protocol triple
 @@The sockets handles are stroed in `fds[0]' and `fds[1]', are already connected,
 @@and are indistinguishable from each other.
 @@@param: domain:   Socket address domain (one of `AF_*' from `<sys/socket.h>')
@@ -946,7 +946,7 @@ $fd_t socket(__STDC_INT_AS_UINT_T domain, __STDC_INT_AS_UINT_T type,
 @@                  May optionally be or'd with `SOCK_CLOEXEC | SOCK_CLOFORK | SOCK_NONBLOCK'
 @@@param: protocol: Socket protocol (`0' for automatic). Available socket protocols mainly
 @@                  depend on the selected `domain', and may be further specialized by the
-@@                  `type' argument. for example, `AF_INET' takes one of `IPPROTO_*'
+@@                  `type' argument.  for  example,  `AF_INET' takes  one  of  `IPPROTO_*'
 @@                  >> socket(AF_INET, SOCK_STREAM, IPPROTO_TCP);
 @@                  Also note that protocol IDs can be enumerated by `getprotoent(3)' from `<netdb.h>'
 @@@return: 0 : Success (the sockets are stored in `fds[0]' and `fds[1]')
@@ -969,15 +969,15 @@ int bind($fd_t sockfd, [[inp(addr_len)]] __CONST_SOCKADDR_ARG addr,
 
 @@>> getsockname(2)
 @@Determine the local address (aka. name) for the given socket `sockfd'.
-@@This is usually the same address as was previously set by `bind(2)'
+@@This  is usually the  same address as was  previously set by `bind(2)'
 @@NOTE: Before the socket has actually be bound or connected, the exact
-@@      address that is returned by this function is weakly undefined.
+@@      address that is returned by this function is weakly  undefined.
 @@      e.g.: For AF_INET, sin_addr=0.0.0.0, sin_port=0 is returned.
 @@@param: addr:     [out] Buffer where to store the sock address.
 @@@param: addr_len: [in]  The amount of available memory starting at `addr'
 @@                  [out] The amount of required memory for the address.
 @@                        This may be more than was given, in which case
-@@                        the address was truncated and may be invalid.
+@@                        the  address was truncated and may be invalid.
 @@return: 0 : Success
 @@return: -1: Error (s.a. `errno')
 [[decl_include("<bits/types.h>", "<bits/os/sockaddr.h>")]]
@@ -987,7 +987,7 @@ int getsockname($fd_t sockfd, [[outp(*addr_len)]] __SOCKADDR_ARG addr,
 @@>> connect(2)
 @@Connect to the specified address.
 @@If the given `sockfd' isn't connection-oriented, this will set the address
-@@that will implicitly be used as destination by `send(2)' and `write(2)'
+@@that  will implicitly be  used as destination  by `send(2)' and `write(2)'
 @@@return: 0 : Success
 @@@return: -1: [errno=EADDRINUSE]    E_NET_ADDRESS_IN_USE:E_NET_ADDRESS_IN_USE_CONTEXT_CONNECT
 @@@return: -1: [errno=EINVAL]        E_INVALID_ARGUMENT_UNEXPECTED_COMMAND:E_INVALID_ARGUMENT_CONTEXT_BIND_WRONG_ADDRESS_FAMILY
@@ -1005,7 +1005,7 @@ int connect($fd_t sockfd, [[inp(addr_len)]] __CONST_SOCKADDR_ARG addr,
 @@@param: addr_len: [in]  The amount of available memory starting at `addr'
 @@                  [out] The amount of required memory for the address.
 @@                        This may be more than was given, in which case
-@@                        the address was truncated and may be invalid.
+@@                        the  address was truncated and may be invalid.
 @@@return: 0 : Success
 @@@return: -1: [errno=ENOTCONN]  E_INVALID_ARGUMENT_BAD_STATE:E_INVALID_ARGUMENT_CONTEXT_GETPEERNAME_NOT_CONNECTED
 @@@return: -1: Error (s.a. `errno')
@@ -1045,7 +1045,7 @@ ssize_t recv($fd_t sockfd, [[outp(bufsize)]] void *buf,
 @@                           MSG_EOR | MSG_MORE | MSG_NOSIGNAL | MSG_OOB'
 @@@param: addr:      Address where to send data (or NULL when `addr_len' is 0)
 @@@param: addr_len:  Size of `addr', or `0' to have this behave as an alias
-@@                   for `send(sockfd, buf, bufsize, msg_flags)'
+@@                   for            `send(sockfd, buf, bufsize, msg_flags)'
 @@@return: * : [<= bufsize] The actual # of send bytes
 @@@return: -1: [errno=EINVAL]       E_INVALID_ARGUMENT_UNEXPECTED_COMMAND:E_INVALID_ARGUMENT_CONTEXT_SENDTO_WRONG_ADDRESS_FAMILY
 @@@return: -1: [errno=EDESTADDRREQ] E_INVALID_ARGUMENT_BAD_STATE:E_INVALID_ARGUMENT_CONTEXT_SEND_NOT_CONNECTED
@@ -1083,7 +1083,7 @@ ssize_t recvfrom($fd_t sockfd, [[outp(bufsize)]] void *__restrict buf,
 
 @@>> sendmsg(2)
 @@Same as `send(2)' and `sendto(2)', but also allows for sending ancillary
-@@data as well as for data buffers to be represented by an IOV vector.
+@@data as well as  for data buffers  to be represented  by an IOV  vector.
 @@@param: msg_flags: Set of `MSG_CONFIRM | MSG_DONTROUTE | MSG_DONTWAIT |
 @@                           MSG_EOR | MSG_MORE | MSG_NOSIGNAL | MSG_OOB'
 @@@return: * : [<= bufsize] The actual # of send payload bytes
@@ -1094,10 +1094,10 @@ ssize_t sendmsg($fd_t sockfd, [[nonnull]] struct msghdr const *message,
 
 @@>> recvmsg(2)
 @@Same as `recv(2)' and `recvfrom(2)', but also allows for receiving ancillary
-@@data as well as for data buffers to be represented by an IOV vector.
+@@data as  well as  for  data buffers  to be  represented  by an  IOV  vector.
 @@@param: msg_flags: Set of `MSG_CMSG_CLOEXEC | MSG_CMSG_CLOFORK |
 @@                           MSG_DONTWAIT | MSG_ERRQUEUE | MSG_OOB |
-@@                           MSG_PEEK | MSG_TRUNC | MSG_WAITALL'
+@@                           MSG_PEEK  |  MSG_TRUNC  |  MSG_WAITALL'
 @@@return: * : [<= bufsize] The actual # of received payload bytes
 @@@return: -1: ... Same as for `recv(2)' and `recvfrom(2)'
 [[cp, wunused, decl_include("<features.h>", "<bits/types.h>", "<bits/os/msghdr.h>")]]
@@ -1112,7 +1112,7 @@ ssize_t recvmsg($fd_t sockfd, [[nonnull]] struct msghdr *message,
 @@@param: optlen:  [in]  The amount of available memory starting at `optval'
 @@                 [out] The amount of required memory for the option value.
 @@                       This may be more than was given, in which case
-@@                       the contents of `optval' are undefined.
+@@                       the  contents  of   `optval'  are   undefined.
 @@@return: 0 : Success
 @@@return: -1: [errno=ENOPROTOOPT] E_INVALID_ARGUMENT_SOCKET_OPT:E_INVALID_ARGUMENT_CONTEXT_GETSOCKOPT
 [[decl_include("<features.h>", "<bits/types.h>")]]
@@ -1134,9 +1134,9 @@ int setsockopt($fd_t sockfd, __STDC_INT_AS_UINT_T level, __STDC_INT_AS_UINT_T op
 
 @@>> listen(2)
 @@Begin to listen for incoming client (aka. peer) connection requests.
-@@@param: max_backlog: The max number of clients pending to be accept(2)-ed, before
+@@@param: max_backlog: The max number of clients  pending to be accept(2)-ed,  before
 @@                     the kernel will refuse to enqueue additional clients, and will
-@@                     instead automatically refuse any further requests until the
+@@                     instead automatically refuse  any further  requests until  the
 @@                     less than `max_backlog' clients are still pending.
 @@@return: 0 : Success
 @@@return: -1: [errno=EADDRINUSE]  E_NET_ADDRESS_IN_USE:E_NET_ADDRESS_IN_USE_CONTEXT_LISTEN
@@ -1149,10 +1149,10 @@ int listen($fd_t sockfd, __STDC_INT_AS_UINT_T max_backlog);
 @@@param: addr:      Peer address of the sender (or `NULL' when `addr_len' is `NULL')
 @@@param: addr_len:  [NULL] Don't fill in the client's peer address
 @@                   [in]   The amount of available memory starting at `addr'
-@@                   [out]  The amount of required memory for the address.
-@@                          This may be more than was given, in which case
-@@                          the address was truncated and may be invalid.
-@@                          If this happens, the caller can still determine
+@@                   [out]  The  amount  of required  memory for  the address.
+@@                          This  may be  more than  was given,  in which case
+@@                          the  address  was  truncated and  may  be invalid.
+@@                          If this happens,  the caller  can still  determine
 @@                          the correct address through use of `getpeername()'
 @@@return: * : A file descriptor for the newly accept(2)-ed connection
 @@@return: -1: [errno=EINVAL]       E_INVALID_ARGUMENT_BAD_STATE:E_INVALID_ARGUMENT_CONTEXT_SOCKET_NOT_LISTENING
@@ -1164,7 +1164,7 @@ $fd_t accept($fd_t sockfd, [[outp_opt(*addr_len)]] __SOCKADDR_ARG addr,
 
 @@>> shutdown(2)
 @@Disallow further reception of data (causing `recv(2)' to return `0' as soon
-@@as all currently queued data has been read), and/or further transmission
+@@as  all currently queued  data has been  read), and/or further transmission
 @@of data (causing `send(2)' to throw an `E_NET_SHUTDOWN' exception)
 @@@param: how: One of `SHUT_RD', `SHUT_WR' or `SHUT_RDWR'
 @@@return: 0 : Success
@@ -1179,10 +1179,10 @@ int shutdown($fd_t sockfd, __STDC_INT_AS_UINT_T how);
 @@@param: addr:       Peer address of the sender (or `NULL' when `addr_len' is `NULL')
 @@@param: addr_len:   [NULL] Don't fill in the client's peer address
 @@                    [in]   The amount of available memory starting at `addr'
-@@                    [out]  The amount of required memory for the address.
-@@                           This may be more than was given, in which case
-@@                           the address was truncated and may be invalid.
-@@                           If this happens, the caller can still determine
+@@                    [out]  The  amount  of required  memory for  the address.
+@@                           This  may be  more than  was given,  in which case
+@@                           the  address  was  truncated and  may  be invalid.
+@@                           If this happens,  the caller  can still  determine
 @@                           the correct address through use of `getpeername()'
 @@@param: sock_flags: Set of `SOCK_NONBLOCK | SOCK_CLOEXEC | SOCK_CLOFORK'
 @@@return: * : A file descriptor for the newly accept(2)-ed connection
@@ -1195,7 +1195,7 @@ $fd_t accept4($fd_t sockfd, [[outp_opt(*addr_len)]] __SOCKADDR_ARG addr,
 
 @@>> sendmmsg(2)
 @@Same as `sendmsg(2)', but may be used to send many
-@@messages (datagrams) with a single system call.
+@@messages (datagrams)  with a  single system  call.
 @@@param: msg_flags: Set of `MSG_CONFIRM | MSG_DONTROUTE | MSG_DONTWAIT |
 @@                           MSG_EOR | MSG_MORE | MSG_NOSIGNAL | MSG_OOB'
 @@@return: * : The # of datagrams successfully sent.
@@ -1213,10 +1213,10 @@ int recvmmsg32($fd_t sockfd, [inp(vlen)] struct mmsghdr *vmessages,
 
 @@>> recvmmsg(2)
 @@Same as `recvmsg(2)', but may be used to receive many
-@@messages (datagrams) with a single system call.
+@@messages  (datagrams)  with  a  single  system  call.
 @@@param: msg_flags: Set of `MSG_CMSG_CLOEXEC | MSG_CMSG_CLOFORK |
 @@                           MSG_DONTWAIT | MSG_ERRQUEUE | MSG_OOB |
-@@                           MSG_PEEK | MSG_TRUNC | MSG_WAITALL |
+@@                           MSG_PEEK  |  MSG_TRUNC |  MSG_WAITALL |
 @@                           MSG_WAITFORONE'
 @@@return: * : The # of datagrams successfully received.
 @@@return: -1: Error (s.a. `recvmsg(2)')

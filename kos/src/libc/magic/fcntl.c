@@ -1653,9 +1653,9 @@ $fd_t open32([[nonnull]] char const *filename, $oflag_t oflags, ...);
 
 
 @@>> open(2), open64(2), openat(2), openat64(2)
-@@Open a new file handle to the file specified by `filename'
-@@When `oflags & O_CREAT', then `mode' specifies the initial
-@@file access permissions with which the file should be opened.
+@@Open  a  new  file  handle  to  the  file  specified  by `filename'
+@@When  `oflags & O_CREAT',   then  `mode'   specifies  the   initial
+@@file  access  permissions with  which  the file  should  be opened.
 @@On KOS, the returned handle can be anything, but is usually one of:
 @@  - HANDLE_TYPE_PATH:                   When `O_PATH' was given
 @@  - HANDLE_TYPE_BLOCKDEVICE:            For `S_IFBLK' files
@@ -1665,7 +1665,7 @@ $fd_t open32([[nonnull]] char const *filename, $oflag_t oflags, ...);
 @@  - HANDLE_TYPE_ONESHOT_DIRECTORY_FILE: For `S_IFDIR' files from special one-shot directories
 @@  - HANDLE_TYPE_FILE:                   For `S_IFREG' and `S_IFDIR' (~normal~) files
 @@  - *:                                  Certain filesystem names can literally return anything, such
-@@                                        as `/proc/self/fd/1234', which is more like `dup(1234)'
+@@                                        as `/proc/self/fd/1234',  which  is  more  like  `dup(1234)'
 [[cp, guard, wunused, vartypes($mode_t), no_crt_self_import]]
 [[if(defined(__USE_FILE_OFFSET64)), preferred_alias("open64")]]
 [[if(!defined(__USE_FILE_OFFSET64)), preferred_alias("open", "_open", "__open")]]

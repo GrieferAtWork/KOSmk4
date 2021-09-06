@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xf6f79c1b */
+/* HASH CRC-32:0x6a532490 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -23,43 +23,25 @@
 #include <__crt.h>
 #include <hybrid/typecore.h>
 __NAMESPACE_LOCAL_BEGIN
-/* Dependency: wcscspn from wchar */
 #ifndef __local___localdep_wcscspn_defined
 #define __local___localdep_wcscspn_defined 1
 #ifdef __CRT_HAVE_wcscspn
-/* >> strcspn(3)
- * Return the offset from `haystack' to the first
- * character for which `strchr(reject, ch) != NULL'.
- * If no such character exists, return `strlen(haystack)' */
 __CREDIRECT(__ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1, 2)),__SIZE_TYPE__,__NOTHROW_NCX,__localdep_wcscspn,(__WCHAR_TYPE__ const *__haystack, __WCHAR_TYPE__ const *__reject),wcscspn,(__haystack,__reject))
 #else /* __CRT_HAVE_wcscspn */
 __NAMESPACE_LOCAL_END
 #include <libc/local/wchar/wcscspn.h>
 __NAMESPACE_LOCAL_BEGIN
-/* >> strcspn(3)
- * Return the offset from `haystack' to the first
- * character for which `strchr(reject, ch) != NULL'.
- * If no such character exists, return `strlen(haystack)' */
 #define __localdep_wcscspn __LIBC_LOCAL_NAME(wcscspn)
 #endif /* !__CRT_HAVE_wcscspn */
 #endif /* !__local___localdep_wcscspn_defined */
-/* Dependency: wcsspn from wchar */
 #ifndef __local___localdep_wcsspn_defined
 #define __local___localdep_wcsspn_defined 1
 #ifdef __CRT_HAVE_wcsspn
-/* >> strspn(3)
- * Return the offset from `haystack' to the first
- * character for which `strchr(reject, ch) == NULL'.
- * If no such character exists, return `strlen(haystack)' */
 __CREDIRECT(__ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1, 2)),__SIZE_TYPE__,__NOTHROW_NCX,__localdep_wcsspn,(__WCHAR_TYPE__ const *__haystack, __WCHAR_TYPE__ const *__accept),wcsspn,(__haystack,__accept))
 #else /* __CRT_HAVE_wcsspn */
 __NAMESPACE_LOCAL_END
 #include <libc/local/wchar/wcsspn.h>
 __NAMESPACE_LOCAL_BEGIN
-/* >> strspn(3)
- * Return the offset from `haystack' to the first
- * character for which `strchr(reject, ch) == NULL'.
- * If no such character exists, return `strlen(haystack)' */
 #define __localdep_wcsspn __LIBC_LOCAL_NAME(wcsspn)
 #endif /* !__CRT_HAVE_wcsspn */
 #endif /* !__local___localdep_wcsspn_defined */

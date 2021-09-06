@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x2d79f859 */
+/* HASH CRC-32:0xa71deb7d */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -23,7 +23,6 @@
 #include <__crt.h>
 #include <hybrid/typecore.h>
 __NAMESPACE_LOCAL_BEGIN
-/* Dependency: wcstombs from stdlib */
 #ifndef __local___localdep_wcstombs_defined
 #define __local___localdep_wcstombs_defined 1
 #ifdef __CRT_HAVE_wcstombs

@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xae7884c */
+/* HASH CRC-32:0xc7701130 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -23,23 +23,18 @@
 #include <__crt.h>
 #if defined(__CRT_HAVE_acos) || defined(__CRT_HAVE___acos)
 __NAMESPACE_LOCAL_BEGIN
-/* Dependency: acos from math */
 #ifndef __local___localdep_acos_defined
 #define __local___localdep_acos_defined 1
 #if __has_builtin(__builtin_acos) && defined(__LIBC_BIND_CRTBUILTINS) && defined(__CRT_HAVE_acos)
-/* Arc cosine of `x' */
 __CEIREDIRECT(__ATTR_WUNUSED,double,__NOTHROW,__localdep_acos,(double __x),acos,{ return __builtin_acos(__x); })
 #elif defined(__CRT_HAVE_acos)
-/* Arc cosine of `x' */
 __CREDIRECT(__ATTR_WUNUSED,double,__NOTHROW,__localdep_acos,(double __x),acos,(__x))
 #elif defined(__CRT_HAVE___acos)
-/* Arc cosine of `x' */
 __CREDIRECT(__ATTR_WUNUSED,double,__NOTHROW,__localdep_acos,(double __x),__acos,(__x))
 #else /* ... */
 #undef __local___localdep_acos_defined
 #endif /* !... */
 #endif /* !__local___localdep_acos_defined */
-/* Arc cosine of `x' */
 __LOCAL_LIBC(acosf) __ATTR_WUNUSED float
 __NOTHROW(__LIBCCALL __LIBC_LOCAL_NAME(acosf))(float __x) {
 	return (float)__localdep_acos((double)__x);

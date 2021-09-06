@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x3deb8520 */
+/* HASH CRC-32:0x986a25b6 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -343,12 +343,12 @@ INTDEF NONNULL((1)) int NOTHROW_RPC(LIBCCALL libc_futex_timedwaitwhile_anybit64)
  * @return: -1:EINTR:  Operation was interrupted */
 INTDEF NONNULL((1)) int NOTHROW_RPC(LIBCCALL libc_futex_timedwaitwhile_allbits64)(lfutex_t *uaddr, lfutex_t bitmask, struct timespec64 const *rel_timeout);
 /* Get/Set the number of times to spin the following futex operations without
- * entering kernel-space, setting waiter-bits, and entering sleep mode:
+ * entering  kernel-space,  setting  waiter-bits,  and  entering  sleep mode:
  *   - LFUTEX_WAIT_WHILE: SPIN({ if (*uaddr != val) DONE(); });
  *   - LFUTEX_WAIT_UNTIL: SPIN({ if (*uaddr == val) DONE(); });
  *   - ...
- * Futex spinning improves performance by bypassing expensive blocking operations
- * when associated locks are often only held for a couple of moments at a time.
+ * Futex  spinning  improves  performance  by  bypassing  expensive  blocking   operations
+ * when  associated  locks  are  often only  held  for  a  couple of  moments  at  a time.
  * Take for example `lfutex(LFUTEX_WAIT_WHILE)' (or preferably `futex_waitwhile()'), which
  * is wrapped like this:
  * >> unsigned int spins;
@@ -364,12 +364,12 @@ INTDEF NONNULL((1)) int NOTHROW_RPC(LIBCCALL libc_futex_timedwaitwhile_allbits64
  * @return: * : The current (get) / old (set) spin value */
 INTDEF WUNUSED unsigned int NOTHROW(LIBCCALL libc_futex_getspin)(void);
 /* Get/Set the number of times to spin the following futex operations without
- * entering kernel-space, setting waiter-bits, and entering sleep mode:
+ * entering  kernel-space,  setting  waiter-bits,  and  entering  sleep mode:
  *   - LFUTEX_WAIT_WHILE: SPIN({ if (*uaddr != val) DONE(); });
  *   - LFUTEX_WAIT_UNTIL: SPIN({ if (*uaddr == val) DONE(); });
  *   - ...
- * Futex spinning improves performance by bypassing expensive blocking operations
- * when associated locks are often only held for a couple of moments at a time.
+ * Futex  spinning  improves  performance  by  bypassing  expensive  blocking   operations
+ * when  associated  locks  are  often only  held  for  a  couple of  moments  at  a time.
  * Take for example `lfutex(LFUTEX_WAIT_WHILE)' (or preferably `futex_waitwhile()'), which
  * is wrapped like this:
  * >> unsigned int spins;

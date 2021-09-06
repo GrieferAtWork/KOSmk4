@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x8e898ef4 */
+/* HASH CRC-32:0xd80180f1 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -24,16 +24,11 @@
 #if defined(__CRT_HAVE_tmpfile64) || defined(__CRT_HAVE_tmpfile)
 #include <bits/types.h>
 __NAMESPACE_LOCAL_BEGIN
-/* Dependency: tmpfile64 from stdio */
 #ifndef __local___localdep_tmpfile64_defined
 #define __local___localdep_tmpfile64_defined 1
 #ifdef __CRT_HAVE_tmpfile64
-/* >> tmpfile(3), tmpfile64(3)
- * Create and return a new file-stream for accessing a temporary file for reading/writing */
 __CREDIRECT(__ATTR_WUNUSED,__FILE *,__NOTHROW_RPC,__localdep_tmpfile64,(void),tmpfile64,())
 #elif defined(__CRT_HAVE_tmpfile)
-/* >> tmpfile(3), tmpfile64(3)
- * Create and return a new file-stream for accessing a temporary file for reading/writing */
 __CREDIRECT(__ATTR_WUNUSED,__FILE *,__NOTHROW_RPC,__localdep_tmpfile64,(void),tmpfile,())
 #else /* ... */
 #undef __local___localdep_tmpfile64_defined

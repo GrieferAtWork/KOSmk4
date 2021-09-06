@@ -29,10 +29,10 @@ DECL_BEGIN
 
 
 
-/*[[[head:libc_signalfd,hash:CRC-32=0xc165ff79]]]*/
+/*[[[head:libc_signalfd,hash:CRC-32=0x396fb159]]]*/
 /* >> signalfd(2)
  * Create a poll(2)-able file descriptor which can be used to wait for the
- * delivery of signals masked by `sigmask' to the waiting thread/process.
+ * delivery of signals masked by `sigmask' to the waiting  thread/process.
  * @param: flags: Set of `0 | SFD_NONBLOCK | SFD_CLOEXEC | SFD_CLOFORK' */
 INTERN ATTR_SECTION(".text.crt.sched.signalfd") WUNUSED NONNULL((2)) fd_t
 NOTHROW_NCX(LIBCCALL libc_signalfd)(fd_t fd,

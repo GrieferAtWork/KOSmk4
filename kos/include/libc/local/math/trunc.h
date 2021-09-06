@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xbe7cefbb */
+/* HASH CRC-32:0x8d5fe6a1 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -24,8 +24,6 @@
 #include <hybrid/typecore.h>
 #include <libm/trunc.h>
 __NAMESPACE_LOCAL_BEGIN
-/* Round `x' to the integral value in floating-point
- * format nearest but not larger in magnitude */
 __LOCAL_LIBC(trunc) __ATTR_CONST __ATTR_WUNUSED double
 __NOTHROW(__LIBCCALL __LIBC_LOCAL_NAME(trunc))(double __x) {
 #ifdef __LIBM_MATHFUN

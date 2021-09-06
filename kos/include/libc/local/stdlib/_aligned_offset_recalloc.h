@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xcf51e075 */
+/* HASH CRC-32:0x7c380534 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -23,7 +23,6 @@
 #include <__crt.h>
 #if (defined(__CRT_HAVE__aligned_offset_malloc) || defined(__CRT_HAVE_malloc) || defined(__CRT_HAVE_calloc) || defined(__CRT_HAVE_realloc) || defined(__CRT_HAVE_memalign) || defined(__CRT_HAVE_aligned_alloc) || defined(__CRT_HAVE_posix_memalign)) && (defined(__CRT_HAVE__aligned_free) || defined(__CRT_HAVE_free) || defined(__CRT_HAVE_cfree))
 __NAMESPACE_LOCAL_BEGIN
-/* Dependency: _aligned_free from stdlib */
 #ifndef __local___localdep__aligned_free_defined
 #define __local___localdep__aligned_free_defined 1
 #ifdef __CRT_HAVE__aligned_free
@@ -37,7 +36,6 @@ __NAMESPACE_LOCAL_BEGIN
 #undef __local___localdep__aligned_free_defined
 #endif /* !... */
 #endif /* !__local___localdep__aligned_free_defined */
-/* Dependency: _aligned_msize from stdlib */
 #ifndef __local___localdep__aligned_msize_defined
 #define __local___localdep__aligned_msize_defined 1
 #ifdef __CRT_HAVE__aligned_msize
@@ -49,7 +47,6 @@ __NAMESPACE_LOCAL_BEGIN
 #define __localdep__aligned_msize __LIBC_LOCAL_NAME(_aligned_msize)
 #endif /* !__CRT_HAVE__aligned_msize */
 #endif /* !__local___localdep__aligned_msize_defined */
-/* Dependency: _aligned_offset_malloc from stdlib */
 #ifndef __local___localdep__aligned_offset_malloc_defined
 #define __local___localdep__aligned_offset_malloc_defined 1
 #ifdef __CRT_HAVE__aligned_offset_malloc
@@ -63,45 +60,31 @@ __NAMESPACE_LOCAL_BEGIN
 #undef __local___localdep__aligned_offset_malloc_defined
 #endif /* !... */
 #endif /* !__local___localdep__aligned_offset_malloc_defined */
-/* Dependency: memcpy from string */
 #ifndef __local___localdep_memcpy_defined
 #define __local___localdep_memcpy_defined 1
 #ifdef __CRT_HAVE_memcpy
 __NAMESPACE_LOCAL_END
 #include <hybrid/typecore.h>
 __NAMESPACE_LOCAL_BEGIN
-/* >> memcpy(3)
- * Copy memory between non-overlapping memory blocks.
- * @return: * : Always re-returns `dst' */
 __CREDIRECT(__ATTR_LEAF __ATTR_RETNONNULL __ATTR_NONNULL((1, 2)),void *,__NOTHROW_NCX,__localdep_memcpy,(void *__restrict __dst, void const *__restrict __src, __SIZE_TYPE__ __n_bytes),memcpy,(__dst,__src,__n_bytes))
 #else /* __CRT_HAVE_memcpy */
 __NAMESPACE_LOCAL_END
 #include <libc/local/string/memcpy.h>
 __NAMESPACE_LOCAL_BEGIN
-/* >> memcpy(3)
- * Copy memory between non-overlapping memory blocks.
- * @return: * : Always re-returns `dst' */
 #define __localdep_memcpy __LIBC_LOCAL_NAME(memcpy)
 #endif /* !__CRT_HAVE_memcpy */
 #endif /* !__local___localdep_memcpy_defined */
-/* Dependency: memset from string */
 #ifndef __local___localdep_memset_defined
 #define __local___localdep_memset_defined 1
 #ifdef __CRT_HAVE_memset
 __NAMESPACE_LOCAL_END
 #include <hybrid/typecore.h>
 __NAMESPACE_LOCAL_BEGIN
-/* >> memset(3)
- * Fill memory with a given byte
- * @return: * : Always re-returns `dst' */
 __CREDIRECT(__ATTR_LEAF __ATTR_RETNONNULL __ATTR_NONNULL((1)),void *,__NOTHROW_NCX,__localdep_memset,(void *__restrict __dst, int __byte, __SIZE_TYPE__ __n_bytes),memset,(__dst,__byte,__n_bytes))
 #else /* __CRT_HAVE_memset */
 __NAMESPACE_LOCAL_END
 #include <libc/local/string/memset.h>
 __NAMESPACE_LOCAL_BEGIN
-/* >> memset(3)
- * Fill memory with a given byte
- * @return: * : Always re-returns `dst' */
 #define __localdep_memset __LIBC_LOCAL_NAME(memset)
 #endif /* !__CRT_HAVE_memset */
 #endif /* !__local___localdep_memset_defined */

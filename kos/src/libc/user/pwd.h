@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xbca137ef */
+/* HASH CRC-32:0xf716713e */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -37,7 +37,7 @@ INTDEF void NOTHROW_RPC(LIBCCALL libc_setpwent)(void);
 INTDEF void NOTHROW_RPC_NOKOS(LIBCCALL libc_endpwent)(void);
 /* Read an entry from the password-file stream, opening it if necessary
  * return: * :                         A pointer to the read password entry
- * return: NULL: (errno = <unchanged>) The last entry has already been read
+ * return: NULL: (errno = <unchanged>) The last  entry  has  already  been  read
  *                                     (use `setpwent()' to rewind the database)
  * return: NULL: (errno = <changed>)   Error (s.a. `errno') */
 INTDEF struct passwd *NOTHROW_RPC(LIBCCALL libc_getpwent)(void);

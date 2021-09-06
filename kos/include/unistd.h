@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xfc5ce7d8 */
+/* HASH CRC-32:0x7e4e1c2e */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -293,17 +293,17 @@ __CDECLARE(__ATTR_WUNUSED __ATTR_CONST __ATTR_RETNONNULL,char ***,__NOTHROW,__p_
 #define __execv_defined 1
 #if __has_builtin(__builtin_execv) && defined(__LIBC_BIND_CRTBUILTINS) && defined(__CRT_HAVE_execv)
 /* >> execv(3)
- * Replace the calling process with the application image referred to by `path' / `file'
+ * Replace the calling  process with  the application  image referred  to by  `path' /  `file'
  * and execute it's `main()' method, passing the given `argv', and setting `environ' to `envp' */
 __CEIDECLARE_GCCNCX(__ATTR_NONNULL((1, 2)),int,__NOTHROW_RPC,execv,(char const *__restrict __path, __TARGV),{ return __builtin_execv(__path, (char *const *)___argv); })
 #elif defined(__CRT_HAVE_execv)
 /* >> execv(3)
- * Replace the calling process with the application image referred to by `path' / `file'
+ * Replace the calling  process with  the application  image referred  to by  `path' /  `file'
  * and execute it's `main()' method, passing the given `argv', and setting `environ' to `envp' */
 __CDECLARE_GCCNCX(__ATTR_NONNULL((1, 2)),int,__NOTHROW_RPC,execv,(char const *__restrict __path, __TARGV),(__path,___argv))
 #elif defined(__CRT_HAVE__execv)
 /* >> execv(3)
- * Replace the calling process with the application image referred to by `path' / `file'
+ * Replace the calling  process with  the application  image referred  to by  `path' /  `file'
  * and execute it's `main()' method, passing the given `argv', and setting `environ' to `envp' */
 __CREDIRECT_GCCNCX(__ATTR_NONNULL((1, 2)),int,__NOTHROW_RPC,execv,(char const *__restrict __path, __TARGV),_execv,(__path,___argv))
 #else /* ... */
@@ -311,7 +311,7 @@ __CREDIRECT_GCCNCX(__ATTR_NONNULL((1, 2)),int,__NOTHROW_RPC,execv,(char const *_
 #if (defined(__CRT_HAVE_execve) || defined(__CRT_HAVE__execve)) && defined(__LOCAL_environ)
 #include <libc/local/unistd/execv.h>
 /* >> execv(3)
- * Replace the calling process with the application image referred to by `path' / `file'
+ * Replace the calling  process with  the application  image referred  to by  `path' /  `file'
  * and execute it's `main()' method, passing the given `argv', and setting `environ' to `envp' */
 __NAMESPACE_LOCAL_USING_OR_IMPL(execv, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_NONNULL((1, 2)) int __NOTHROW_RPC(__LIBCCALL execv)(char const *__restrict __path, __TARGV) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(execv))(__path, ___argv); })
 #else /* (__CRT_HAVE_execve || __CRT_HAVE__execve) && __LOCAL_environ */
@@ -323,17 +323,17 @@ __NAMESPACE_LOCAL_USING_OR_IMPL(execv, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_NON
 #define __execve_defined 1
 #if __has_builtin(__builtin_execve) && defined(__LIBC_BIND_CRTBUILTINS) && defined(__CRT_HAVE_execve)
 /* >> execve(2)
- * Replace the calling process with the application image referred to by `path' / `file'
+ * Replace the calling  process with  the application  image referred  to by  `path' /  `file'
  * and execute it's `main()' method, passing the given `argv', and setting `environ' to `envp' */
 __CEIDECLARE_GCCNCX(__ATTR_NONNULL((1, 2, 3)),int,__NOTHROW_RPC,execve,(char const *__restrict __path, __TARGV, __TENVP),{ return __builtin_execve(__path, (char *const *)___argv, (char *const *)___envp); })
 #elif defined(__CRT_HAVE_execve)
 /* >> execve(2)
- * Replace the calling process with the application image referred to by `path' / `file'
+ * Replace the calling  process with  the application  image referred  to by  `path' /  `file'
  * and execute it's `main()' method, passing the given `argv', and setting `environ' to `envp' */
 __CDECLARE_GCCNCX(__ATTR_NONNULL((1, 2, 3)),int,__NOTHROW_RPC,execve,(char const *__restrict __path, __TARGV, __TENVP),(__path,___argv,___envp))
 #elif defined(__CRT_HAVE__execve)
 /* >> execve(2)
- * Replace the calling process with the application image referred to by `path' / `file'
+ * Replace the calling  process with  the application  image referred  to by  `path' /  `file'
  * and execute it's `main()' method, passing the given `argv', and setting `environ' to `envp' */
 __CREDIRECT_GCCNCX(__ATTR_NONNULL((1, 2, 3)),int,__NOTHROW_RPC,execve,(char const *__restrict __path, __TARGV, __TENVP),_execve,(__path,___argv,___envp))
 #else /* ... */
@@ -344,17 +344,17 @@ __CREDIRECT_GCCNCX(__ATTR_NONNULL((1, 2, 3)),int,__NOTHROW_RPC,execve,(char cons
 #define __execvp_defined 1
 #if __has_builtin(__builtin_execvp) && defined(__LIBC_BIND_CRTBUILTINS) && defined(__CRT_HAVE_execvp)
 /* >> execvp(3)
- * Replace the calling process with the application image referred to by `path' / `file'
+ * Replace the calling  process with  the application  image referred  to by  `path' /  `file'
  * and execute it's `main()' method, passing the given `argv', and setting `environ' to `envp' */
 __CEIDECLARE_GCCNCX(__ATTR_NONNULL((1, 2)),int,__NOTHROW_RPC,execvp,(char const *__restrict __file, __TARGV),{ return __builtin_execvp(__file, (char *const *)___argv); })
 #elif defined(__CRT_HAVE_execvp)
 /* >> execvp(3)
- * Replace the calling process with the application image referred to by `path' / `file'
+ * Replace the calling  process with  the application  image referred  to by  `path' /  `file'
  * and execute it's `main()' method, passing the given `argv', and setting `environ' to `envp' */
 __CDECLARE_GCCNCX(__ATTR_NONNULL((1, 2)),int,__NOTHROW_RPC,execvp,(char const *__restrict __file, __TARGV),(__file,___argv))
 #elif defined(__CRT_HAVE__execvp)
 /* >> execvp(3)
- * Replace the calling process with the application image referred to by `path' / `file'
+ * Replace the calling  process with  the application  image referred  to by  `path' /  `file'
  * and execute it's `main()' method, passing the given `argv', and setting `environ' to `envp' */
 __CREDIRECT_GCCNCX(__ATTR_NONNULL((1, 2)),int,__NOTHROW_RPC,execvp,(char const *__restrict __file, __TARGV),_execvp,(__file,___argv))
 #else /* ... */
@@ -363,7 +363,7 @@ __CREDIRECT_GCCNCX(__ATTR_NONNULL((1, 2)),int,__NOTHROW_RPC,execvp,(char const *
 #if (defined(__CRT_HAVE_execvpe) || defined(__CRT_HAVE__execvpe) || ((defined(__CRT_HAVE_execve) || defined(__CRT_HAVE__execve)) && defined(__hybrid_alloca))) && defined(__LOCAL_environ)
 #include <libc/local/unistd/execvp.h>
 /* >> execvp(3)
- * Replace the calling process with the application image referred to by `path' / `file'
+ * Replace the calling  process with  the application  image referred  to by  `path' /  `file'
  * and execute it's `main()' method, passing the given `argv', and setting `environ' to `envp' */
 __NAMESPACE_LOCAL_USING_OR_IMPL(execvp, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_NONNULL((1, 2)) int __NOTHROW_RPC(__LIBCCALL execvp)(char const *__restrict __file, __TARGV) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(execvp))(__file, ___argv); })
 #else /* (__CRT_HAVE_execvpe || __CRT_HAVE__execvpe || ((__CRT_HAVE_execve || __CRT_HAVE__execve) && __hybrid_alloca)) && __LOCAL_environ */
@@ -376,12 +376,12 @@ __NAMESPACE_LOCAL_USING_OR_IMPL(execvp, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_NO
 #if __has_builtin(__builtin_execl) && defined(__LIBC_BIND_CRTBUILTINS) && defined(__CRT_HAVE_execl) && __has_builtin(__builtin_va_arg_pack)
 /* >> execl(3)
  * Replace the calling process with the application image referred to by `path' / `file'
- * and execute it's `main()' method, passing the list of NULL-terminated `args'-list */
+ * and execute it's  `main()' method,  passing the list  of NULL-terminated  `args'-list */
 __CEIDECLARE_GCCNCX(__ATTR_SENTINEL __ATTR_NONNULL((1)),int,__NOTHROW_RPC,execl,(char const *__restrict __path, char const *__args, ...),{ return __builtin_execl(__path, __args, __builtin_va_arg_pack()); })
 #elif defined(__CRT_HAVE_execl)
 /* >> execl(3)
  * Replace the calling process with the application image referred to by `path' / `file'
- * and execute it's `main()' method, passing the list of NULL-terminated `args'-list */
+ * and execute it's  `main()' method,  passing the list  of NULL-terminated  `args'-list */
 #ifdef __COMPILER_HAVE_GCCNCX_BUILTIN_BUG
 extern "C++" {
 #endif /* __COMPILER_HAVE_GCCNCX_BUILTIN_BUG */
@@ -392,7 +392,7 @@ __LIBC __ATTR_SENTINEL __ATTR_NONNULL((1)) int __NOTHROW_RPC(__VLIBCCALL execl)(
 #elif defined(__CRT_HAVE__execl)
 /* >> execl(3)
  * Replace the calling process with the application image referred to by `path' / `file'
- * and execute it's `main()' method, passing the list of NULL-terminated `args'-list */
+ * and execute it's  `main()' method,  passing the list  of NULL-terminated  `args'-list */
 #ifdef __COMPILER_HAVE_GCCNCX_BUILTIN_BUG
 extern "C++" {
 #endif /* __COMPILER_HAVE_GCCNCX_BUILTIN_BUG */
@@ -406,7 +406,7 @@ __LIBC __ATTR_SENTINEL __ATTR_NONNULL((1)) int __NOTHROW_RPC(__VLIBCCALL execl)(
 #include <libc/local/unistd/execl.h>
 /* >> execl(3)
  * Replace the calling process with the application image referred to by `path' / `file'
- * and execute it's `main()' method, passing the list of NULL-terminated `args'-list */
+ * and execute it's  `main()' method,  passing the list  of NULL-terminated  `args'-list */
 #ifdef __cplusplus
 __NAMESPACE_LOCAL_USING_OR_IMPL(execl, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_SENTINEL __ATTR_NONNULL((1)) int __NOTHROW_RPC(__VLIBCCALL execl)(char const *__restrict __path, char const *__args, ...) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(execl))(__path, __args, __builtin_va_arg_pack()); })
 #else /* __cplusplus */
@@ -422,13 +422,13 @@ __NAMESPACE_LOCAL_USING_OR_IMPL(execl, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_SEN
 #if __has_builtin(__builtin_execle) && defined(__LIBC_BIND_CRTBUILTINS) && defined(__CRT_HAVE_execle) && __has_builtin(__builtin_va_arg_pack)
 /* >> execle(3)
  * Replace the calling process with the application image referred to by `path' / `file'
- * and execute it's `main()' method, passing the list of NULL-terminated `args'-list,
+ * and  execute it's `main()'  method, passing the  list of NULL-terminated `args'-list,
  * and setting `environ' to a `char **' passed after the NULL sentinel */
 __CEIDECLARE_GCCNCX(__ATTR_SENTINEL_O(1) __ATTR_NONNULL((1)),int,__NOTHROW_RPC,execle,(char const *__restrict __path, char const *__args, ...),{ return __builtin_execle(__path, __args, __builtin_va_arg_pack()); })
 #elif defined(__CRT_HAVE_execle)
 /* >> execle(3)
  * Replace the calling process with the application image referred to by `path' / `file'
- * and execute it's `main()' method, passing the list of NULL-terminated `args'-list,
+ * and  execute it's `main()'  method, passing the  list of NULL-terminated `args'-list,
  * and setting `environ' to a `char **' passed after the NULL sentinel */
 #ifdef __COMPILER_HAVE_GCCNCX_BUILTIN_BUG
 extern "C++" {
@@ -440,7 +440,7 @@ __LIBC __ATTR_SENTINEL_O(1) __ATTR_NONNULL((1)) int __NOTHROW_RPC(__VLIBCCALL ex
 #elif defined(__CRT_HAVE__execle)
 /* >> execle(3)
  * Replace the calling process with the application image referred to by `path' / `file'
- * and execute it's `main()' method, passing the list of NULL-terminated `args'-list,
+ * and  execute it's `main()'  method, passing the  list of NULL-terminated `args'-list,
  * and setting `environ' to a `char **' passed after the NULL sentinel */
 #ifdef __COMPILER_HAVE_GCCNCX_BUILTIN_BUG
 extern "C++" {
@@ -453,7 +453,7 @@ __LIBC __ATTR_SENTINEL_O(1) __ATTR_NONNULL((1)) int __NOTHROW_RPC(__VLIBCCALL ex
 #include <libc/local/unistd/execle.h>
 /* >> execle(3)
  * Replace the calling process with the application image referred to by `path' / `file'
- * and execute it's `main()' method, passing the list of NULL-terminated `args'-list,
+ * and  execute it's `main()'  method, passing the  list of NULL-terminated `args'-list,
  * and setting `environ' to a `char **' passed after the NULL sentinel */
 #ifdef __cplusplus
 __NAMESPACE_LOCAL_USING_OR_IMPL(execle, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_SENTINEL_O(1) __ATTR_NONNULL((1)) int __NOTHROW_RPC(__VLIBCCALL execle)(char const *__restrict __path, char const *__args, ...) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(execle))(__path, __args, __builtin_va_arg_pack()); })
@@ -469,12 +469,12 @@ __NAMESPACE_LOCAL_USING_OR_IMPL(execle, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_SE
 #if __has_builtin(__builtin_execlp) && defined(__LIBC_BIND_CRTBUILTINS) && defined(__CRT_HAVE_execlp) && __has_builtin(__builtin_va_arg_pack)
 /* >> execlp(3)
  * Replace the calling process with the application image referred to by `path' / `file'
- * and execute it's `main()' method, passing the list of NULL-terminated `args'-list */
+ * and execute it's  `main()' method,  passing the list  of NULL-terminated  `args'-list */
 __CEIDECLARE_GCCNCX(__ATTR_SENTINEL __ATTR_NONNULL((1)),int,__NOTHROW_RPC,execlp,(char const *__restrict __file, char const *__args, ...),{ return __builtin_execlp(__file, __args, __builtin_va_arg_pack()); })
 #elif defined(__CRT_HAVE_execlp)
 /* >> execlp(3)
  * Replace the calling process with the application image referred to by `path' / `file'
- * and execute it's `main()' method, passing the list of NULL-terminated `args'-list */
+ * and execute it's  `main()' method,  passing the list  of NULL-terminated  `args'-list */
 #ifdef __COMPILER_HAVE_GCCNCX_BUILTIN_BUG
 extern "C++" {
 #endif /* __COMPILER_HAVE_GCCNCX_BUILTIN_BUG */
@@ -485,7 +485,7 @@ __LIBC __ATTR_SENTINEL __ATTR_NONNULL((1)) int __NOTHROW_RPC(__VLIBCCALL execlp)
 #elif defined(__CRT_HAVE__execlp)
 /* >> execlp(3)
  * Replace the calling process with the application image referred to by `path' / `file'
- * and execute it's `main()' method, passing the list of NULL-terminated `args'-list */
+ * and execute it's  `main()' method,  passing the list  of NULL-terminated  `args'-list */
 #ifdef __COMPILER_HAVE_GCCNCX_BUILTIN_BUG
 extern "C++" {
 #endif /* __COMPILER_HAVE_GCCNCX_BUILTIN_BUG */
@@ -500,7 +500,7 @@ __LIBC __ATTR_SENTINEL __ATTR_NONNULL((1)) int __NOTHROW_RPC(__VLIBCCALL execlp)
 #include <libc/local/unistd/execlp.h>
 /* >> execlp(3)
  * Replace the calling process with the application image referred to by `path' / `file'
- * and execute it's `main()' method, passing the list of NULL-terminated `args'-list */
+ * and execute it's  `main()' method,  passing the list  of NULL-terminated  `args'-list */
 #ifdef __cplusplus
 __NAMESPACE_LOCAL_USING_OR_IMPL(execlp, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_SENTINEL __ATTR_NONNULL((1)) int __NOTHROW_RPC(__VLIBCCALL execlp)(char const *__restrict __file, char const *__args, ...) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(execlp))(__file, __args, __builtin_va_arg_pack()); })
 #else /* __cplusplus */
@@ -517,12 +517,12 @@ __NAMESPACE_LOCAL_USING_OR_IMPL(execlp, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_SE
 #define __execvpe_defined 1
 #ifdef __CRT_HAVE_execvpe
 /* >> execvpe(3)
- * Replace the calling process with the application image referred to by `file' and
+ * Replace the  calling process  with the  application  image referred  to by  `file'  and
  * execute it's `main()' method, passing the given `argv', and setting `environ' to `envp' */
 __CDECLARE(__ATTR_NONNULL((1, 2, 3)),int,__NOTHROW_RPC,execvpe,(char const *__restrict __file, __TARGV, __TENVP),(__file,___argv,___envp))
 #elif defined(__CRT_HAVE__execvpe)
 /* >> execvpe(3)
- * Replace the calling process with the application image referred to by `file' and
+ * Replace the  calling process  with the  application  image referred  to by  `file'  and
  * execute it's `main()' method, passing the given `argv', and setting `environ' to `envp' */
 __CREDIRECT(__ATTR_NONNULL((1, 2, 3)),int,__NOTHROW_RPC,execvpe,(char const *__restrict __file, __TARGV, __TENVP),_execvpe,(__file,___argv,___envp))
 #else /* ... */
@@ -531,7 +531,7 @@ __CREDIRECT(__ATTR_NONNULL((1, 2, 3)),int,__NOTHROW_RPC,execvpe,(char const *__r
 #if (defined(__CRT_HAVE_getenv) || defined(__LOCAL_environ)) && (defined(__CRT_HAVE_execve) || defined(__CRT_HAVE__execve)) && defined(__hybrid_alloca)
 #include <libc/local/unistd/execvpe.h>
 /* >> execvpe(3)
- * Replace the calling process with the application image referred to by `file' and
+ * Replace the  calling process  with the  application  image referred  to by  `file'  and
  * execute it's `main()' method, passing the given `argv', and setting `environ' to `envp' */
 __NAMESPACE_LOCAL_USING_OR_IMPL(execvpe, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_NONNULL((1, 2, 3)) int __NOTHROW_RPC(__LIBCCALL execvpe)(char const *__restrict __file, __TARGV, __TENVP) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(execvpe))(__file, ___argv, ___envp); })
 #else /* (__CRT_HAVE_getenv || __LOCAL_environ) && (__CRT_HAVE_execve || __CRT_HAVE__execve) && __hybrid_alloca */
@@ -547,13 +547,13 @@ __NAMESPACE_LOCAL_USING_OR_IMPL(execvpe, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_N
 #ifdef __CRT_HAVE_execlpe
 /* >> execlpe(3)
  * Replace the calling process with the application image referred to by `path' / `file'
- * and execute it's `main()' method, passing the list of NULL-terminated `args'-list,
+ * and  execute it's `main()'  method, passing the  list of NULL-terminated `args'-list,
  * and setting `environ' to a `char **' passed after the NULL sentinel */
 __LIBC __ATTR_SENTINEL_O(1) __ATTR_NONNULL((1)) int __NOTHROW_RPC(__VLIBCCALL execlpe)(char const *__restrict __file, char const *__args, ...) __CASMNAME_SAME("execlpe");
 #elif defined(__CRT_HAVE__execlpe)
 /* >> execlpe(3)
  * Replace the calling process with the application image referred to by `path' / `file'
- * and execute it's `main()' method, passing the list of NULL-terminated `args'-list,
+ * and  execute it's `main()'  method, passing the  list of NULL-terminated `args'-list,
  * and setting `environ' to a `char **' passed after the NULL sentinel */
 __LIBC __ATTR_SENTINEL_O(1) __ATTR_NONNULL((1)) int __NOTHROW_RPC(__VLIBCCALL execlpe)(char const *__restrict __file, char const *__args, ...) __CASMNAME("_execlpe");
 #else /* ... */
@@ -563,7 +563,7 @@ __LIBC __ATTR_SENTINEL_O(1) __ATTR_NONNULL((1)) int __NOTHROW_RPC(__VLIBCCALL ex
 #include <libc/local/unistd/execlpe.h>
 /* >> execlpe(3)
  * Replace the calling process with the application image referred to by `path' / `file'
- * and execute it's `main()' method, passing the list of NULL-terminated `args'-list,
+ * and  execute it's `main()'  method, passing the  list of NULL-terminated `args'-list,
  * and setting `environ' to a `char **' passed after the NULL sentinel */
 #ifdef __cplusplus
 __NAMESPACE_LOCAL_USING_OR_IMPL(execlpe, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_SENTINEL_O(1) __ATTR_NONNULL((1)) int __NOTHROW_RPC(__VLIBCCALL execlpe)(char const *__restrict __file, char const *__args, ...) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(execlpe))(__file, __args, __builtin_va_arg_pack()); })
@@ -638,23 +638,23 @@ __NAMESPACE_LOCAL_USING_OR_IMPL(sleep, __FORCELOCAL __ATTR_ARTIFICIAL unsigned i
 #ifdef __CRT_HAVE_fsync
 /* >> fsync(2)
  * Synchronize a file (including its descriptor which contains timestamps, and its size),
- * meaning that changes to its data and/or descriptor are written to disk */
+ * meaning  that  changes   to  its   data  and/or   descriptor  are   written  to   disk */
 __CDECLARE(,int,__NOTHROW_RPC,fsync,(__fd_t __fd),(__fd))
 #elif defined(__CRT_HAVE__commit)
 /* >> fsync(2)
  * Synchronize a file (including its descriptor which contains timestamps, and its size),
- * meaning that changes to its data and/or descriptor are written to disk */
+ * meaning  that  changes   to  its   data  and/or   descriptor  are   written  to   disk */
 __CREDIRECT(,int,__NOTHROW_RPC,fsync,(__fd_t __fd),_commit,(__fd))
 #elif defined(__CRT_HAVE_fdatasync)
 /* >> fsync(2)
  * Synchronize a file (including its descriptor which contains timestamps, and its size),
- * meaning that changes to its data and/or descriptor are written to disk */
+ * meaning  that  changes   to  its   data  and/or   descriptor  are   written  to   disk */
 __CREDIRECT(,int,__NOTHROW_RPC,fsync,(__fd_t __fd),fdatasync,(__fd))
 #else /* ... */
 #include <libc/local/unistd/fsync.h>
 /* >> fsync(2)
  * Synchronize a file (including its descriptor which contains timestamps, and its size),
- * meaning that changes to its data and/or descriptor are written to disk */
+ * meaning  that  changes   to  its   data  and/or   descriptor  are   written  to   disk */
 __NAMESPACE_LOCAL_USING_OR_IMPL(fsync, __FORCELOCAL __ATTR_ARTIFICIAL int __NOTHROW_RPC(__LIBCCALL fsync)(__fd_t __fd) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(fsync))(__fd); })
 #endif /* !... */
 /* >> getppid(2)
@@ -669,14 +669,14 @@ __CDECLARE_OPT(__ATTR_WUNUSED,__pid_t,__NOTHROW_NCX,getppid,(void),())
 __CDECLARE_OPT(__ATTR_WUNUSED,__pid_t,__NOTHROW_NCX,getpgrp,(void),())
 #ifdef __CRT_HAVE_getpgid
 /* >> getpgid(2)
- * Return the ID of the process group associated with `pid's process.
+ * Return  the ID of  the process group  associated with `pid's process.
  * (That is the TID of the leader of the process group of `pid's leader)
  * THREAD[PID]->LEADER->GROUP_LEADER->PID
  * When `pid' is ZERO(0), use `gettid()' for it instead */
 __CREDIRECT(__ATTR_WUNUSED,__pid_t,__NOTHROW_NCX,__getpgid,(__pid_t __pid),getpgid,(__pid))
 #elif defined(__CRT_HAVE___getpgid)
 /* >> getpgid(2)
- * Return the ID of the process group associated with `pid's process.
+ * Return  the ID of  the process group  associated with `pid's process.
  * (That is the TID of the leader of the process group of `pid's leader)
  * THREAD[PID]->LEADER->GROUP_LEADER->PID
  * When `pid' is ZERO(0), use `gettid()' for it instead */
@@ -684,7 +684,7 @@ __CDECLARE(__ATTR_WUNUSED,__pid_t,__NOTHROW_NCX,__getpgid,(__pid_t __pid),(__pid
 #endif /* ... */
 #ifdef __CRT_HAVE_setpgid
 /* >> setpgid(2)
- * Change the ID of the process group associated with `pid's process.
+ * Change  the ID of  the process group  associated with `pid's process.
  * (That is the TID of the leader of the process group of `pid's leader)
  * THREAD[PID]->LEADER->GROUP_LEADER = THREAD[PGID]
  * When `pid' is ZERO(0), use `gettid()' for it instead.
@@ -692,7 +692,7 @@ __CDECLARE(__ATTR_WUNUSED,__pid_t,__NOTHROW_NCX,__getpgid,(__pid_t __pid),(__pid
 __CDECLARE(,int,__NOTHROW_NCX,setpgid,(__pid_t __pid, __pid_t __pgid),(__pid,__pgid))
 #elif defined(__CRT_HAVE___setpgid)
 /* >> setpgid(2)
- * Change the ID of the process group associated with `pid's process.
+ * Change  the ID of  the process group  associated with `pid's process.
  * (That is the TID of the leader of the process group of `pid's leader)
  * THREAD[PID]->LEADER->GROUP_LEADER = THREAD[PGID]
  * When `pid' is ZERO(0), use `gettid()' for it instead.
@@ -701,7 +701,7 @@ __CREDIRECT(,int,__NOTHROW_NCX,setpgid,(__pid_t __pid, __pid_t __pgid),__setpgid
 #endif /* ... */
 /* >> setsid(2)
  * Make the calling thread's process the leader of its associated
- * process group, before also making it its own session leader.
+ * process group, before also making  it its own session  leader.
  * Then return the TID of that new session leader, which is also the PID of the calling process.
  *  - THIS_THREAD->LEADER->GROUP_LEADER                 = THIS_THREAD->LEADER;
  *  - THIS_THREAD->LEADER->GROUP_LEADER->SESSION_LEADER = THIS_THREAD->LEADER->GROUP_LEADER;
@@ -739,11 +739,11 @@ __CDECLARE_OPT(,int,__NOTHROW_NCX,setgid,(__gid_t __gid),(__gid))
 #if __has_builtin(__builtin_fork) && defined(__LIBC_BIND_CRTBUILTINS) && defined(__CRT_HAVE_fork)
 /* >> fork(2)
  * Clone the calling thread into a second process and return twice, once
- * in the parent process where this function returns the (non-zero) PID
- * of the forked child process, and a second time in the child process
+ * in  the parent process where this function returns the (non-zero) PID
+ * of  the forked child process, and a  second time in the child process
  * itself, where ZERO(0) is returned.
  * The child then usually proceeds by calling `exec(2)' to replace its
- * application image with that of another program that the original
+ * application image with  that of another  program that the  original
  * parent can then `wait(2)' for. (s.a. `vfork(2)')
  * @return: 0 : You're the new process that was created
  * @return: * : The `return' value is the pid of your new child process */
@@ -751,11 +751,11 @@ __CEIDECLARE_GCCNCX(__ATTR_WUNUSED,__pid_t,__NOTHROW_NCX,fork,(void),{ return __
 #elif defined(__CRT_HAVE_fork)
 /* >> fork(2)
  * Clone the calling thread into a second process and return twice, once
- * in the parent process where this function returns the (non-zero) PID
- * of the forked child process, and a second time in the child process
+ * in  the parent process where this function returns the (non-zero) PID
+ * of  the forked child process, and a  second time in the child process
  * itself, where ZERO(0) is returned.
  * The child then usually proceeds by calling `exec(2)' to replace its
- * application image with that of another program that the original
+ * application image with  that of another  program that the  original
  * parent can then `wait(2)' for. (s.a. `vfork(2)')
  * @return: 0 : You're the new process that was created
  * @return: * : The `return' value is the pid of your new child process */
@@ -763,11 +763,11 @@ __CDECLARE_GCCNCX(__ATTR_WUNUSED,__pid_t,__NOTHROW_NCX,fork,(void),())
 #elif defined(__CRT_HAVE___fork)
 /* >> fork(2)
  * Clone the calling thread into a second process and return twice, once
- * in the parent process where this function returns the (non-zero) PID
- * of the forked child process, and a second time in the child process
+ * in  the parent process where this function returns the (non-zero) PID
+ * of  the forked child process, and a  second time in the child process
  * itself, where ZERO(0) is returned.
  * The child then usually proceeds by calling `exec(2)' to replace its
- * application image with that of another program that the original
+ * application image with  that of another  program that the  original
  * parent can then `wait(2)' for. (s.a. `vfork(2)')
  * @return: 0 : You're the new process that was created
  * @return: * : The `return' value is the pid of your new child process */
@@ -783,7 +783,7 @@ __CDECLARE_OPT(,unsigned int,__NOTHROW_NCX,alarm,(unsigned int __seconds),(__sec
  * Suspend execution until the delivery of a POSIX_SIGNAL */
 __CDECLARE_OPT(,int,__NOTHROW_RPC,pause,(void),())
 /* >> fpathconf(2)
- * @param: name: One of `_PC_*' from <asm/crt/confname.h>
+ * @param: name: One   of    `_PC_*'    from    <asm/crt/confname.h>
  * Return a path configuration value associated with `name' for `fd'
  * return: * : The configuration limit associated with `name' for `fd'
  * return: -1: [errno=<unchanged>] The configuration specified by `name' is unlimited for `fd'
@@ -895,7 +895,7 @@ __CREDIRECT_VOID_GCCNCX(__ATTR_NORETURN,__THROWING,exit,(int __status),_Exit,(__
 #ifdef __CRT_HAVE_read
 /* >> read(2)
  * Read up to `bufsize' bytes from `fd' into `buf'
- * When `fd' has the `O_NONBLOCK' flag set, only read as much data as was
+ * When `fd' has the  `O_NONBLOCK' flag set,  only read as  much data as  was
  * available at the time the call was made, and throw E_WOULDBLOCK if no data
  * was available at the time.
  * @return: <= bufsize: The actual amount of read bytes
@@ -904,7 +904,7 @@ __CDECLARE(__ATTR_NONNULL((2)),ssize_t,__NOTHROW_RPC,read,(__fd_t __fd, void *__
 #elif defined(__CRT_HAVE__read)
 /* >> read(2)
  * Read up to `bufsize' bytes from `fd' into `buf'
- * When `fd' has the `O_NONBLOCK' flag set, only read as much data as was
+ * When `fd' has the  `O_NONBLOCK' flag set,  only read as  much data as  was
  * available at the time the call was made, and throw E_WOULDBLOCK if no data
  * was available at the time.
  * @return: <= bufsize: The actual amount of read bytes
@@ -913,7 +913,7 @@ __CREDIRECT(__ATTR_NONNULL((2)),ssize_t,__NOTHROW_RPC,read,(__fd_t __fd, void *_
 #elif defined(__CRT_HAVE___read)
 /* >> read(2)
  * Read up to `bufsize' bytes from `fd' into `buf'
- * When `fd' has the `O_NONBLOCK' flag set, only read as much data as was
+ * When `fd' has the  `O_NONBLOCK' flag set,  only read as  much data as  was
  * available at the time the call was made, and throw E_WOULDBLOCK if no data
  * was available at the time.
  * @return: <= bufsize: The actual amount of read bytes
@@ -928,7 +928,7 @@ __CREDIRECT(__ATTR_NONNULL((2)),ssize_t,__NOTHROW_RPC,read,(__fd_t __fd, void *_
 #ifdef __CRT_HAVE_write
 /* >> write(2)
  * Write up to `bufsize' bytes from `buf' into `fd'
- * When `fd' has the `O_NONBLOCK' flag set, only write as much data
+ * When `fd' has the `O_NONBLOCK' flag set, only write as much  data
  * as possible at the time the call was made, and throw E_WOULDBLOCK
  * if no data could be written at the time.
  * @return: <= bufsize: The actual amount of written bytes
@@ -937,7 +937,7 @@ __CDECLARE(__ATTR_NONNULL((2)),ssize_t,__NOTHROW_RPC,write,(__fd_t __fd, void co
 #elif defined(__CRT_HAVE__write)
 /* >> write(2)
  * Write up to `bufsize' bytes from `buf' into `fd'
- * When `fd' has the `O_NONBLOCK' flag set, only write as much data
+ * When `fd' has the `O_NONBLOCK' flag set, only write as much  data
  * as possible at the time the call was made, and throw E_WOULDBLOCK
  * if no data could be written at the time.
  * @return: <= bufsize: The actual amount of written bytes
@@ -946,7 +946,7 @@ __CREDIRECT(__ATTR_NONNULL((2)),ssize_t,__NOTHROW_RPC,write,(__fd_t __fd, void c
 #elif defined(__CRT_HAVE___write)
 /* >> write(2)
  * Write up to `bufsize' bytes from `buf' into `fd'
- * When `fd' has the `O_NONBLOCK' flag set, only write as much data
+ * When `fd' has the `O_NONBLOCK' flag set, only write as much  data
  * as possible at the time the call was made, and throw E_WOULDBLOCK
  * if no data could be written at the time.
  * @return: <= bufsize: The actual amount of written bytes
@@ -961,20 +961,20 @@ __CREDIRECT(__ATTR_NONNULL((2)),ssize_t,__NOTHROW_RPC,write,(__fd_t __fd, void c
 #define __readall_defined 1
 #ifdef __CRT_HAVE_readall
 /* >> readall(3)
- * Same as `read(2)', however keep on reading until `read()' indicates EOF (causing
+ * Same  as `read(2)', however  keep on reading until  `read()' indicates EOF (causing
  * `readall()' to immediately return `0') or the entirety of the given buffer has been
  * filled (in which case `bufsize' is returned).
- * If an error occurs before all data could be read, try to use SEEK_CUR to rewind
+ * If  an error occurs before all data could be read, try to use SEEK_CUR to rewind
  * the file descriptor by the amount of data that had already been loaded. - Errors
  * during this phase are silently ignored and don't cause `errno' to change */
 __CDECLARE(__ATTR_NONNULL((2)),ssize_t,__NOTHROW_RPC,readall,(__fd_t __fd, void *__buf, size_t __bufsize),(__fd,__buf,__bufsize))
 #elif (defined(__CRT_HAVE_read) || defined(__CRT_HAVE__read) || defined(__CRT_HAVE___read)) && (defined(__CRT_HAVE_lseek64) || defined(__CRT_HAVE__lseeki64) || defined(__CRT_HAVE_lseek) || defined(__CRT_HAVE__lseek) || defined(__CRT_HAVE___lseek))
 #include <libc/local/unistd/readall.h>
 /* >> readall(3)
- * Same as `read(2)', however keep on reading until `read()' indicates EOF (causing
+ * Same  as `read(2)', however  keep on reading until  `read()' indicates EOF (causing
  * `readall()' to immediately return `0') or the entirety of the given buffer has been
  * filled (in which case `bufsize' is returned).
- * If an error occurs before all data could be read, try to use SEEK_CUR to rewind
+ * If  an error occurs before all data could be read, try to use SEEK_CUR to rewind
  * the file descriptor by the amount of data that had already been loaded. - Errors
  * during this phase are silently ignored and don't cause `errno' to change */
 __NAMESPACE_LOCAL_USING_OR_IMPL(readall, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_NONNULL((2)) ssize_t __NOTHROW_RPC(__LIBCCALL readall)(__fd_t __fd, void *__buf, size_t __bufsize) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(readall))(__fd, __buf, __bufsize); })
@@ -986,14 +986,14 @@ __NAMESPACE_LOCAL_USING_OR_IMPL(readall, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_N
 #define __writeall_defined 1
 #ifdef __CRT_HAVE_writeall
 /* >> writeall(3)
- * Same as `write(2)', however keep on writing until `write()' indicates EOF (causing
+ * Same as `write(2)', however keep on  writing until `write()' indicates EOF  (causing
  * `writeall()' to immediately return `0') or the entirety of the given buffer has been
  * written (in which case `bufsize' is returned). */
 __CDECLARE(__ATTR_NONNULL((2)),ssize_t,__NOTHROW_RPC,writeall,(__fd_t __fd, void const *__buf, size_t __bufsize),(__fd,__buf,__bufsize))
 #elif (defined(__CRT_HAVE_write) || defined(__CRT_HAVE__write) || defined(__CRT_HAVE___write)) && (defined(__CRT_HAVE_lseek64) || defined(__CRT_HAVE__lseeki64) || defined(__CRT_HAVE_lseek) || defined(__CRT_HAVE__lseek) || defined(__CRT_HAVE___lseek))
 #include <libc/local/unistd/writeall.h>
 /* >> writeall(3)
- * Same as `write(2)', however keep on writing until `write()' indicates EOF (causing
+ * Same as `write(2)', however keep on  writing until `write()' indicates EOF  (causing
  * `writeall()' to immediately return `0') or the entirety of the given buffer has been
  * written (in which case `bufsize' is returned). */
 __NAMESPACE_LOCAL_USING_OR_IMPL(writeall, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_NONNULL((2)) ssize_t __NOTHROW_RPC(__LIBCCALL writeall)(__fd_t __fd, void const *__buf, size_t __bufsize) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(writeall))(__fd, __buf, __bufsize); })
@@ -1279,12 +1279,12 @@ __CDECLARE_OPT(__ATTR_NONNULL((2)),int,__NOTHROW_RPC,fchownat,(__fd_t __dfd, cha
  * Create a hard link from `fromfd:from', leading to `tofd:to' */
 __CDECLARE_OPT(__ATTR_NONNULL((2, 4)),int,__NOTHROW_RPC,linkat,(__fd_t __fromfd, char const *__from, __fd_t __tofd, char const *__to, __atflag_t __flags),(__fromfd,__from,__tofd,__to,__flags))
 /* >> symlinkat(3)
- * Create a new symbolic link loaded with `link_text' as link
+ * Create  a  new  symbolic  link  loaded  with  `link_text'  as link
  * text, at the filesystem location referred to by `tofd:target_path' */
 __CDECLARE_OPT(__ATTR_NONNULL((1, 3)),int,__NOTHROW_RPC,symlinkat,(char const *__link_text, __fd_t __tofd, char const *__target_path),(__link_text,__tofd,__target_path))
 /* >> readlinkat(2)
  * Read the text of a symbolic link under `dfd:path' into the provided buffer.
- * WARNING: This function is badly designed and will neither append a trailing
+ * WARNING: This  function is badly designed and will neither append a trailing
  *          NUL-character to the buffer, nor will it return the required buffer
  *          size. Instead, it will return the written size, and the caller must
  *          keep on over allocating until the function indicates that it didn't
@@ -1579,57 +1579,57 @@ __CDECLARE_OPT(,__useconds_t,__NOTHROW_NCX,ualarm,(__useconds_t __value, __useco
 #ifdef __CRT_HAVE_vfork
 /* >> vfork(2)
  * Same as `fork(2)', but the child process may be executed within in the same VM
- * as the parent process, with the parent process remaining suspended until the
+ * as the parent process, with the  parent process remaining suspended until  the
  * child process invokes one of the following system calls:
  *   - `_exit(2)'  Terminate the child process. Be sure to use `_exit' (or `_Exit')
- *                 instead of the regular `exit(3)', since the later would include
- *                 the invocation of `atexit(3)' handlers, which would then run in
+ *                 instead of the regular `exit(3)', since the later would  include
+ *                 the invocation of `atexit(3)' handlers, which would then run  in
  *                 the context of a VM that isn't actually about to be destroyed.
  *   - `execve(2)' Create a new VM that is populated with the specified process
- *                 image. The parent process will only be resumed in case the
- *                 new program image could be loaded successfully. Otherwise,
- *                 the call to `execve(2)' returns normally in the child.
+ *                 image. The parent process will  only be resumed in case  the
+ *                 new  program image could  be loaded successfully. Otherwise,
+ *                 the call  to  `execve(2)'  returns normally  in  the  child.
  *                 Other functions from the exec()-family behave the same
  *
- * Care must be taken when using this system call, since you have to make sure that
- * the child process doesn't clobber any part of its (shared) stack that may be re-
- * used once execution resumes in the parent process. The same also goes for heap
- * functions, but generally speaking: you really shouldn't do anything that isn't
+ * Care  must be taken when using this system call, since you have to make sure that
+ * the  child process doesn't clobber any part of its (shared) stack that may be re-
+ * used once execution resumes in  the parent process. The  same also goes for  heap
+ * functions,  but generally speaking:  you really shouldn't  do anything that isn't
  * reentrant after calling any one of the fork() functions (since anything but would
- * rely on underlying implementations making proper use of pthread_atfork(3), which
- * is something that KOS intentionally doesn't do, since I feel like doing so only
+ * rely on underlying implementations making proper use of pthread_atfork(3),  which
+ * is something that KOS intentionally doesn't do,  since I feel like doing so  only
  * adds unnecessary bloat to code that doesn't rely on this)
  *
  * Additionally, this system call may be implemented as an alias for `fork(2)', in
- * which case the parent process will not actually get suspended until the child
+ * which  case the parent process will not  actually get suspended until the child
  * process performs any of the actions above. */
 __CDECLARE(__ATTR_RETURNS_TWICE __ATTR_WUNUSED,__pid_t,__NOTHROW_NCX,vfork,(void),())
 #elif defined(__CRT_HAVE___vfork)
 /* >> vfork(2)
  * Same as `fork(2)', but the child process may be executed within in the same VM
- * as the parent process, with the parent process remaining suspended until the
+ * as the parent process, with the  parent process remaining suspended until  the
  * child process invokes one of the following system calls:
  *   - `_exit(2)'  Terminate the child process. Be sure to use `_exit' (or `_Exit')
- *                 instead of the regular `exit(3)', since the later would include
- *                 the invocation of `atexit(3)' handlers, which would then run in
+ *                 instead of the regular `exit(3)', since the later would  include
+ *                 the invocation of `atexit(3)' handlers, which would then run  in
  *                 the context of a VM that isn't actually about to be destroyed.
  *   - `execve(2)' Create a new VM that is populated with the specified process
- *                 image. The parent process will only be resumed in case the
- *                 new program image could be loaded successfully. Otherwise,
- *                 the call to `execve(2)' returns normally in the child.
+ *                 image. The parent process will  only be resumed in case  the
+ *                 new  program image could  be loaded successfully. Otherwise,
+ *                 the call  to  `execve(2)'  returns normally  in  the  child.
  *                 Other functions from the exec()-family behave the same
  *
- * Care must be taken when using this system call, since you have to make sure that
- * the child process doesn't clobber any part of its (shared) stack that may be re-
- * used once execution resumes in the parent process. The same also goes for heap
- * functions, but generally speaking: you really shouldn't do anything that isn't
+ * Care  must be taken when using this system call, since you have to make sure that
+ * the  child process doesn't clobber any part of its (shared) stack that may be re-
+ * used once execution resumes in  the parent process. The  same also goes for  heap
+ * functions,  but generally speaking:  you really shouldn't  do anything that isn't
  * reentrant after calling any one of the fork() functions (since anything but would
- * rely on underlying implementations making proper use of pthread_atfork(3), which
- * is something that KOS intentionally doesn't do, since I feel like doing so only
+ * rely on underlying implementations making proper use of pthread_atfork(3),  which
+ * is something that KOS intentionally doesn't do,  since I feel like doing so  only
  * adds unnecessary bloat to code that doesn't rely on this)
  *
  * Additionally, this system call may be implemented as an alias for `fork(2)', in
- * which case the parent process will not actually get suspended until the child
+ * which  case the parent process will not  actually get suspended until the child
  * process performs any of the actions above. */
 __CREDIRECT(__ATTR_RETURNS_TWICE __ATTR_WUNUSED,__pid_t,__NOTHROW_NCX,vfork,(void),__vfork,())
 #else /* ... */
@@ -1645,14 +1645,14 @@ __CDECLARE_OPT(,int,__NOTHROW_RPC,fchown,(__fd_t __fd, __uid_t __owner, __gid_t 
 __CDECLARE_OPT(,int,__NOTHROW_RPC,fchdir,(__fd_t __fd),(__fd))
 #ifdef __CRT_HAVE_getpgid
 /* >> getpgid(2)
- * Return the ID of the process group associated with `pid's process.
+ * Return  the ID of  the process group  associated with `pid's process.
  * (That is the TID of the leader of the process group of `pid's leader)
  * THREAD[PID]->LEADER->GROUP_LEADER->PID
  * When `pid' is ZERO(0), use `gettid()' for it instead */
 __CDECLARE(__ATTR_WUNUSED,__pid_t,__NOTHROW_NCX,getpgid,(__pid_t __pid),(__pid))
 #elif defined(__CRT_HAVE___getpgid)
 /* >> getpgid(2)
- * Return the ID of the process group associated with `pid's process.
+ * Return  the ID of  the process group  associated with `pid's process.
  * (That is the TID of the leader of the process group of `pid's leader)
  * THREAD[PID]->LEADER->GROUP_LEADER->PID
  * When `pid' is ZERO(0), use `gettid()' for it instead */
@@ -1660,12 +1660,12 @@ __CREDIRECT(__ATTR_WUNUSED,__pid_t,__NOTHROW_NCX,getpgid,(__pid_t __pid),__getpg
 #endif /* ... */
 /* >> getsid(2)
  * Return the ID of the session which a process `pid' is apart of.
- * return THREAD[PID]->LEADER->GROUP_LEADER->SESSION_LEADER->PID; */
+ * return  THREAD[PID]->LEADER->GROUP_LEADER->SESSION_LEADER->PID; */
 __CDECLARE_OPT(__ATTR_WUNUSED,__pid_t,__NOTHROW_NCX,getsid,(__pid_t __pid),(__pid))
 #ifdef __CRT_HAVE_lchown
 /* >> lchown(2)
  * Change the ownership of a given `file' to `group:owner',
- * but don't reference it if that file is a symbolic link */
+ * but don't reference it if  that file is a symbolic  link */
 __CDECLARE(__ATTR_NONNULL((1)),int,__NOTHROW_RPC,lchown,(char const *__file, __uid_t __owner, __gid_t __group),(__file,__owner,__group))
 #else /* __CRT_HAVE_lchown */
 #include <asm/os/fcntl.h>
@@ -1673,7 +1673,7 @@ __CDECLARE(__ATTR_NONNULL((1)),int,__NOTHROW_RPC,lchown,(char const *__file, __u
 #include <libc/local/unistd/lchown.h>
 /* >> lchown(2)
  * Change the ownership of a given `file' to `group:owner',
- * but don't reference it if that file is a symbolic link */
+ * but don't reference it if  that file is a symbolic  link */
 __NAMESPACE_LOCAL_USING_OR_IMPL(lchown, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_NONNULL((1)) int __NOTHROW_RPC(__LIBCCALL lchown)(char const *__file, __uid_t __owner, __gid_t __group) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(lchown))(__file, __owner, __group); })
 #endif /* __AT_FDCWD && __AT_SYMLINK_NOFOLLOW && __CRT_HAVE_fchownat */
 #endif /* !__CRT_HAVE_lchown */
@@ -1728,7 +1728,7 @@ __NAMESPACE_LOCAL_USING_OR_IMPL(truncate64, __FORCELOCAL __ATTR_ARTIFICIAL __ATT
 #if !defined(__fexecve_defined) && defined(__CRT_HAVE_fexecve)
 #define __fexecve_defined 1
 /* >> fexecve(2)
- * Replace the calling process with the application image referred to by `fd' and
+ * Replace the  calling  process  with the  application  image  referred to  by  `fd'  and
  * execute it's `main()' method, passing the given `argv', and setting `environ' to `envp' */
 __CDECLARE(__ATTR_NONNULL((2, 3)),int,__NOTHROW_RPC,fexecve,(__fd_t __fd, __TARGV, __TENVP),(__fd,___argv,___envp))
 #endif /* !__fexecve_defined && __CRT_HAVE_fexecve */
@@ -1816,14 +1816,14 @@ __CDECLARE(__ATTR_WUNUSED,int,__NOTHROW_NCX,getopt,(int ___argc, char *const ___
 #if defined(__USE_MISC) || defined(__USE_XOPEN_EXTENDED)
 #ifdef __CRT_HAVE_sync
 /* >> sync(2)
- * Synchronize all disk operations of all mounted file systems and flush
+ * Synchronize all disk  operations of  all mounted file  systems and  flush
  * unwritten buffers down to the hardware layer, ensuring that modifications
  * made become visible on the underlying, persistent media */
 __CDECLARE_VOID(,__NOTHROW_RPC,sync,(void),())
 #else /* __CRT_HAVE_sync */
 #include <libc/local/unistd/sync.h>
 /* >> sync(2)
- * Synchronize all disk operations of all mounted file systems and flush
+ * Synchronize all disk  operations of  all mounted file  systems and  flush
  * unwritten buffers down to the hardware layer, ensuring that modifications
  * made become visible on the underlying, persistent media */
 __NAMESPACE_LOCAL_USING_OR_IMPL(sync, __FORCELOCAL __ATTR_ARTIFICIAL void __NOTHROW_RPC(__LIBCCALL sync)(void) { (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(sync))(); })
@@ -1905,7 +1905,7 @@ __CDECLARE_OPT(__ATTR_WUNUSED,int,__NOTHROW_NCX,ttyslot,(void),())
 #if defined(__USE_XOPEN_EXTENDED) || defined(__USE_XOPEN2K)
 #ifdef __CRT_HAVE_symlink
 /* >> symlink(3)
- * Create a new symbolic link loaded with `link_text' as link
+ * Create  a new  symbolic link  loaded with  `link_text' as link
  * text, at the filesystem location referred to by `target_path'.
  * Same as `symlinkat(link_text, AT_FDCWD, target_path)' */
 __CDECLARE(__ATTR_NONNULL((1, 2)),int,__NOTHROW_RPC,symlink,(char const *__link_text, char const *__target_path),(__link_text,__target_path))
@@ -1914,7 +1914,7 @@ __CDECLARE(__ATTR_NONNULL((1, 2)),int,__NOTHROW_RPC,symlink,(char const *__link_
 #if defined(__AT_FDCWD) && defined(__CRT_HAVE_symlinkat)
 #include <libc/local/unistd/symlink.h>
 /* >> symlink(3)
- * Create a new symbolic link loaded with `link_text' as link
+ * Create  a new  symbolic link  loaded with  `link_text' as link
  * text, at the filesystem location referred to by `target_path'.
  * Same as `symlinkat(link_text, AT_FDCWD, target_path)' */
 __NAMESPACE_LOCAL_USING_OR_IMPL(symlink, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_NONNULL((1, 2)) int __NOTHROW_RPC(__LIBCCALL symlink)(char const *__link_text, char const *__target_path) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(symlink))(__link_text, __target_path); })
@@ -1924,7 +1924,7 @@ __NAMESPACE_LOCAL_USING_OR_IMPL(symlink, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_N
 /* >> readlink(3)
  * Read the text of a symbolic link under `path' into the provided buffer.
  * Same as `readlinkat(AT_FDCWD, path, buf, buflen)'
- * WARNING: This function is badly designed and will neither append a trailing
+ * WARNING: This  function is badly designed and will neither append a trailing
  *          NUL-character to the buffer, nor will it return the required buffer
  *          size. Instead, it will return the written size, and the caller must
  *          keep on over allocating until the function indicates that it didn't
@@ -1938,7 +1938,7 @@ __CDECLARE(__ATTR_NONNULL((1, 2)),ssize_t,__NOTHROW_RPC,readlink,(char const *__
 /* >> readlink(3)
  * Read the text of a symbolic link under `path' into the provided buffer.
  * Same as `readlinkat(AT_FDCWD, path, buf, buflen)'
- * WARNING: This function is badly designed and will neither append a trailing
+ * WARNING: This  function is badly designed and will neither append a trailing
  *          NUL-character to the buffer, nor will it return the required buffer
  *          size. Instead, it will return the written size, and the caller must
  *          keep on over allocating until the function indicates that it didn't
@@ -2031,15 +2031,15 @@ __CVREDIRECT(,__LONG64_TYPE__,__NOTHROW_RPC,syscall64,(__syscall_ulong_t __sysno
 #define __getentropy_defined 1
 #ifdef __CRT_HAVE_getentropy
 /* >> getentropy(3)
- * Similar to `getrandom(buf, num_bytes, GRND_RANDOM)', however
- * the case where the calling thread is interrupted, causing
- * less than `num_bytes' of data to be read is handled by reading
- * more random data until all of `num_bytes' have been read.
- * Note that portable applications should be aware that certain
+ * Similar   to   `getrandom(buf, num_bytes, GRND_RANDOM)',  however
+ * the  case  where  the  calling  thread  is  interrupted,  causing
+ * less  than `num_bytes' of  data to be read  is handled by reading
+ * more  random  data  until  all  of  `num_bytes'  have  been read.
+ * Note that  portable applications  should  be aware  that  certain
  * implementations of this function disallow calls where `num_bytes'
  * is larger than `256'
  * Also note that any error other than `EFAULT'
- * and `ENOSYS' may be translated into `EIO'
+ * and `ENOSYS'  may be  translated into  `EIO'
  * @return:  0: Success
  * @return: -1: Error (see `errno') */
 __CDECLARE(__ATTR_WUNUSED __ATTR_NONNULL((1)),int,__NOTHROW_NCX,getentropy,(void *__buf, size_t __num_bytes),(__buf,__num_bytes))
@@ -2048,15 +2048,15 @@ __CDECLARE(__ATTR_WUNUSED __ATTR_NONNULL((1)),int,__NOTHROW_NCX,getentropy,(void
 #if defined(__GRND_RANDOM) && defined(__CRT_HAVE_getrandom)
 #include <libc/local/sys.random/getentropy.h>
 /* >> getentropy(3)
- * Similar to `getrandom(buf, num_bytes, GRND_RANDOM)', however
- * the case where the calling thread is interrupted, causing
- * less than `num_bytes' of data to be read is handled by reading
- * more random data until all of `num_bytes' have been read.
- * Note that portable applications should be aware that certain
+ * Similar   to   `getrandom(buf, num_bytes, GRND_RANDOM)',  however
+ * the  case  where  the  calling  thread  is  interrupted,  causing
+ * less  than `num_bytes' of  data to be read  is handled by reading
+ * more  random  data  until  all  of  `num_bytes'  have  been read.
+ * Note that  portable applications  should  be aware  that  certain
  * implementations of this function disallow calls where `num_bytes'
  * is larger than `256'
  * Also note that any error other than `EFAULT'
- * and `ENOSYS' may be translated into `EIO'
+ * and `ENOSYS'  may be  translated into  `EIO'
  * @return:  0: Success
  * @return: -1: Error (see `errno') */
 __NAMESPACE_LOCAL_USING_OR_IMPL(getentropy, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_WUNUSED __ATTR_NONNULL((1)) int __NOTHROW_NCX(__LIBCCALL getentropy)(void *__buf, size_t __num_bytes) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(getentropy))(__buf, __num_bytes); })
@@ -2069,7 +2069,7 @@ __NAMESPACE_LOCAL_USING_OR_IMPL(getentropy, __FORCELOCAL __ATTR_ARTIFICIAL __ATT
 
 #if (defined(__USE_MISC) || (defined(__USE_XOPEN) && !defined(__USE_XOPEN2K)))
 /* >> chroot(2)
- * Change the root directory of the calling `CLONE_FS' group of threads
+ * Change  the root directory of the calling `CLONE_FS' group of threads
  * (usually the process) to a path that was previously address by `path' */
 __CDECLARE_OPT(__ATTR_NONNULL((1)),int,__NOTHROW_RPC,chroot,(char const *__restrict __path),(__path))
 #ifndef __getpass_defined
@@ -2142,17 +2142,17 @@ __NAMESPACE_LOCAL_USING_OR_IMPL(ftruncate64, __FORCELOCAL __ATTR_ARTIFICIAL int 
 
 #if (defined(__USE_XOPEN_EXTENDED) && !defined(__USE_XOPEN2K)) || defined(__USE_MISC)
 /* >> brk(2), sbrk(2)
- * Change the program break, allowing for a rudimentary implementation of a heap.
+ * Change the  program  break,  allowing  for a  rudimentary  implementation  of  a  heap.
  * It is recommended to use the much more advanced functions found in <sys/mman.h> instead */
 __CDECLARE_OPT(,int,__NOTHROW_NCX,brk,(void *__addr),(__addr))
 #ifdef __CRT_HAVE_sbrk
 /* >> brk(2), sbrk(2)
- * Change the program break, allowing for a rudimentary implementation of a heap.
+ * Change the  program  break,  allowing  for a  rudimentary  implementation  of  a  heap.
  * It is recommended to use the much more advanced functions found in <sys/mman.h> instead */
 __CDECLARE(,void *,__NOTHROW_NCX,sbrk,(intptr_t __delta),(__delta))
 #elif defined(__CRT_HAVE___sbrk)
 /* >> brk(2), sbrk(2)
- * Change the program break, allowing for a rudimentary implementation of a heap.
+ * Change the  program  break,  allowing  for a  rudimentary  implementation  of  a  heap.
  * It is recommended to use the much more advanced functions found in <sys/mman.h> instead */
 __CREDIRECT(,void *,__NOTHROW_NCX,sbrk,(intptr_t __delta),__sbrk,(__delta))
 #endif /* ... */
@@ -2162,23 +2162,23 @@ __CREDIRECT(,void *,__NOTHROW_NCX,sbrk,(intptr_t __delta),__sbrk,(__delta))
 #ifdef __CRT_HAVE_fdatasync
 /* >> fdatasync(2)
  * Synchronize only the data of a file (not its descriptor which contains
- * timestamps, and its size), meaning that changes are written to disk */
+ * timestamps,  and its size),  meaning that changes  are written to disk */
 __CDECLARE(,int,__NOTHROW_RPC,fdatasync,(__fd_t __fd),(__fd))
 #elif defined(__CRT_HAVE_fsync)
 /* >> fdatasync(2)
  * Synchronize only the data of a file (not its descriptor which contains
- * timestamps, and its size), meaning that changes are written to disk */
+ * timestamps,  and its size),  meaning that changes  are written to disk */
 __CREDIRECT(,int,__NOTHROW_RPC,fdatasync,(__fd_t __fd),fsync,(__fd))
 #elif defined(__CRT_HAVE__commit)
 /* >> fdatasync(2)
  * Synchronize only the data of a file (not its descriptor which contains
- * timestamps, and its size), meaning that changes are written to disk */
+ * timestamps,  and its size),  meaning that changes  are written to disk */
 __CREDIRECT(,int,__NOTHROW_RPC,fdatasync,(__fd_t __fd),_commit,(__fd))
 #else /* ... */
 #include <libc/local/unistd/fdatasync.h>
 /* >> fdatasync(2)
  * Synchronize only the data of a file (not its descriptor which contains
- * timestamps, and its size), meaning that changes are written to disk */
+ * timestamps,  and its size),  meaning that changes  are written to disk */
 __NAMESPACE_LOCAL_USING_OR_IMPL(fdatasync, __FORCELOCAL __ATTR_ARTIFICIAL int __NOTHROW_RPC(__LIBCCALL fdatasync)(__fd_t __fd) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(fdatasync))(__fd); })
 #endif /* !... */
 #endif /* __USE_POSIX199309 || __USE_UNIX98 */
@@ -2224,13 +2224,13 @@ __NAMESPACE_LOCAL_USING_OR_IMPL(swab, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_NONN
 #ifdef __CRT_HAVE_ctermid
 /* >> ctermid(3)
  * Writes the string "/dev/tty" to `s', or returns a pointer to
- * a writable data location that contains that same string. */
+ * a writable  data location  that contains  that same  string. */
 __CDECLARE(__ATTR_RETNONNULL,char *,__NOTHROW_NCX,ctermid,(char *__s),(__s))
 #else /* __CRT_HAVE_ctermid */
 #include <libc/local/unistd/ctermid.h>
 /* >> ctermid(3)
  * Writes the string "/dev/tty" to `s', or returns a pointer to
- * a writable data location that contains that same string. */
+ * a writable  data location  that contains  that same  string. */
 __NAMESPACE_LOCAL_USING_OR_IMPL(ctermid, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_RETNONNULL char *__NOTHROW_NCX(__LIBCCALL ctermid)(char *__s) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(ctermid))(__s); })
 #endif /* !__CRT_HAVE_ctermid */
 #endif /* !__ctermid_defined */
@@ -2239,10 +2239,10 @@ __NAMESPACE_LOCAL_USING_OR_IMPL(ctermid, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_R
 #ifdef __CRT_HAVE_cuserid
 /* >> cuserid(3)
  * Return the name of the current user (`$LOGNAME' or `getpwuid(geteuid())'), storing
- * that name in `s'. When `s' is NULL, a static buffer is used instead
- * When given, `s' must be a buffer of at least `L_cuserid' bytes.
- * If the actual username is longer than this, it may be truncated, and programs
- * that wish to support longer usernames should make use of `getlogin_r()' instead.
+ * that  name  in  `s'.  When  `s'  is   NULL,  a  static  buffer  is  used   instead
+ * When  given,   `s'   must  be   a   buffer   of  at   least   `L_cuserid'   bytes.
+ * If the actual  username is longer  than this,  it may be  truncated, and  programs
+ * that wish to support longer usernames  should make use of `getlogin_r()'  instead.
  * s.a. `getlogin()' and `getlogin_r()' */
 __CDECLARE(,char *,__NOTHROW_NCX,cuserid,(char *__s),(__s))
 #else /* __CRT_HAVE_cuserid */
@@ -2251,10 +2251,10 @@ __CDECLARE(,char *,__NOTHROW_NCX,cuserid,(char *__s),(__s))
 #include <libc/local/unistd/cuserid.h>
 /* >> cuserid(3)
  * Return the name of the current user (`$LOGNAME' or `getpwuid(geteuid())'), storing
- * that name in `s'. When `s' is NULL, a static buffer is used instead
- * When given, `s' must be a buffer of at least `L_cuserid' bytes.
- * If the actual username is longer than this, it may be truncated, and programs
- * that wish to support longer usernames should make use of `getlogin_r()' instead.
+ * that  name  in  `s'.  When  `s'  is   NULL,  a  static  buffer  is  used   instead
+ * When  given,   `s'   must  be   a   buffer   of  at   least   `L_cuserid'   bytes.
+ * If the actual  username is longer  than this,  it may be  truncated, and  programs
+ * that wish to support longer usernames  should make use of `getlogin_r()'  instead.
  * s.a. `getlogin()' and `getlogin_r()' */
 __NAMESPACE_LOCAL_USING_OR_IMPL(cuserid, __FORCELOCAL __ATTR_ARTIFICIAL char *__NOTHROW_NCX(__LIBCCALL cuserid)(char *__s) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(cuserid))(__s); })
 #else /* __CRT_HAVE_getlogin_r || __CRT_HAVE_getenv || __LOCAL_environ || (__CRT_HAVE_getpwuid_r && __CRT_HAVE_geteuid) */
@@ -2311,33 +2311,33 @@ __CDECLARE(__ATTR_NONNULL((1)),int,__NOTHROW_RPC,initgroups,(char const *__user,
 /* >> mkstemps(3), mkstemps64(3)
  * Replace the last 6 characters of `template_' (which are followed by exactly
  * `suffixlen' more characters that are left alone), which must be filled with
- * all 'X'-characters before the call (else errno=EINVAL + return -1), with
- * random characters such that the filename described by `template_' will not
- * already exists. Then, create a new file with `O_RDWR' and return the file
+ * all  'X'-characters before the  call (else errno=EINVAL  + return -1), with
+ * random  characters such that the filename described by `template_' will not
+ * already  exists. Then, create a new file  with `O_RDWR' and return the file
  * descriptor of that file.
- * @param: suffixlen: The # of trailing characters to-be ignored
+ * @param: suffixlen: The #  of trailing  characters to-be  ignored
  *                    after the required 6 trailing 'X'-characters. */
 __CREDIRECT(__ATTR_WUNUSED __ATTR_NONNULL((1)),__fd_t,__NOTHROW_NCX,mkstemps,(char *__template_, __STDC_INT_AS_SIZE_T __suffixlen),mkstemps64,(__template_,__suffixlen))
 #elif defined(__CRT_HAVE_mkstemps)
 /* >> mkstemps(3), mkstemps64(3)
  * Replace the last 6 characters of `template_' (which are followed by exactly
  * `suffixlen' more characters that are left alone), which must be filled with
- * all 'X'-characters before the call (else errno=EINVAL + return -1), with
- * random characters such that the filename described by `template_' will not
- * already exists. Then, create a new file with `O_RDWR' and return the file
+ * all  'X'-characters before the  call (else errno=EINVAL  + return -1), with
+ * random  characters such that the filename described by `template_' will not
+ * already  exists. Then, create a new file  with `O_RDWR' and return the file
  * descriptor of that file.
- * @param: suffixlen: The # of trailing characters to-be ignored
+ * @param: suffixlen: The #  of trailing  characters to-be  ignored
  *                    after the required 6 trailing 'X'-characters. */
 __CDECLARE(__ATTR_WUNUSED __ATTR_NONNULL((1)),__fd_t,__NOTHROW_NCX,mkstemps,(char *__template_, __STDC_INT_AS_SIZE_T __suffixlen),(__template_,__suffixlen))
 #elif defined(__CRT_HAVE_mkstemps64)
 /* >> mkstemps(3), mkstemps64(3)
  * Replace the last 6 characters of `template_' (which are followed by exactly
  * `suffixlen' more characters that are left alone), which must be filled with
- * all 'X'-characters before the call (else errno=EINVAL + return -1), with
- * random characters such that the filename described by `template_' will not
- * already exists. Then, create a new file with `O_RDWR' and return the file
+ * all  'X'-characters before the  call (else errno=EINVAL  + return -1), with
+ * random  characters such that the filename described by `template_' will not
+ * already  exists. Then, create a new file  with `O_RDWR' and return the file
  * descriptor of that file.
- * @param: suffixlen: The # of trailing characters to-be ignored
+ * @param: suffixlen: The #  of trailing  characters to-be  ignored
  *                    after the required 6 trailing 'X'-characters. */
 __CREDIRECT(__ATTR_WUNUSED __ATTR_NONNULL((1)),__fd_t,__NOTHROW_NCX,mkstemps,(char *__template_, __STDC_INT_AS_SIZE_T __suffixlen),mkstemps64,(__template_,__suffixlen))
 #else /* ... */
@@ -2347,11 +2347,11 @@ __CREDIRECT(__ATTR_WUNUSED __ATTR_NONNULL((1)),__fd_t,__NOTHROW_NCX,mkstemps,(ch
 /* >> mkstemps(3), mkstemps64(3)
  * Replace the last 6 characters of `template_' (which are followed by exactly
  * `suffixlen' more characters that are left alone), which must be filled with
- * all 'X'-characters before the call (else errno=EINVAL + return -1), with
- * random characters such that the filename described by `template_' will not
- * already exists. Then, create a new file with `O_RDWR' and return the file
+ * all  'X'-characters before the  call (else errno=EINVAL  + return -1), with
+ * random  characters such that the filename described by `template_' will not
+ * already  exists. Then, create a new file  with `O_RDWR' and return the file
  * descriptor of that file.
- * @param: suffixlen: The # of trailing characters to-be ignored
+ * @param: suffixlen: The #  of trailing  characters to-be  ignored
  *                    after the required 6 trailing 'X'-characters. */
 __NAMESPACE_LOCAL_USING_OR_IMPL(mkstemps, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_WUNUSED __ATTR_NONNULL((1)) __fd_t __NOTHROW_NCX(__LIBCCALL mkstemps)(char *__template_, __STDC_INT_AS_SIZE_T __suffixlen) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(mkstemps))(__template_, __suffixlen); })
 #else /* __CRT_HAVE_mkostemps || __CRT_HAVE_mkostemps64 || __CRT_HAVE_open64 || __CRT_HAVE___open64 || __CRT_HAVE_open || __CRT_HAVE__open || __CRT_HAVE___open || (__AT_FDCWD && (__CRT_HAVE_openat64 || __CRT_HAVE_openat)) */
@@ -2382,10 +2382,10 @@ __NAMESPACE_LOCAL_USING_OR_IMPL(psignal, __FORCELOCAL __ATTR_ARTIFICIAL void __N
 #if !defined(__rcmd_defined) && defined(__CRT_HAVE_rcmd)
 #define __rcmd_defined 1
 /* Call `rshd' at port `rport' on remote machine `*ahost' to execute `cmd'.
- * The local user is `locuser', on the remote machine the command is
- * executed as `remuser'. In `*fd2p' the descriptor to the socket for the
- * connection is returned. The caller must have the right to use a
- * reserved port. When the function returns `*ahost' contains the
+ * The  local  user is  `locuser',  on the  remote  machine the  command is
+ * executed as `remuser'. In `*fd2p' the  descriptor to the socket for  the
+ * connection is  returned.  The  caller  must have  the  right  to  use  a
+ * reserved  port.  When  the   function  returns  `*ahost'  contains   the
  * official host name.
  * This function is not part of POSIX and therefore no official
  * cancellation point */
@@ -2394,9 +2394,9 @@ __CDECLARE(,int,__NOTHROW_RPC,rcmd,(char **__restrict __ahost, __UINT16_TYPE__ _
 #if !defined(__rresvport_defined) && defined(__CRT_HAVE_rresvport)
 #define __rresvport_defined 1
 /* Try to allocate reserved port, returning a descriptor for a socket opened
- * at this port or -1 if unsuccessful. The search for an available port
- * will start at `alport' and continues with lower numbers.
- * This function is not part of POSIX and therefore no official
+ * at this port  or -1  if unsuccessful. The  search for  an available  port
+ * will   start   at   `alport'   and   continues   with   lower    numbers.
+ * This   function  is  not   part  of  POSIX   and  therefore  no  official
  * cancellation point */
 __CDECLARE(,int,__NOTHROW_RPC,rresvport,(int *__alport),(__alport))
 #endif /* !__rresvport_defined && __CRT_HAVE_rresvport */
@@ -2408,7 +2408,7 @@ __CDECLARE(,int,__NOTHROW_RPC,setgroups,(size_t __count, __gid_t const *__groups
 #if !defined(__ruserok_defined) && defined(__CRT_HAVE_ruserok)
 #define __ruserok_defined 1
 /* Check whether user `remuser' on system `rhost' is allowed to login
- * as `locuser'. If `suser' is not zero the user tries to become
+ * as `locuser'. If  `suser' is  not zero  the user  tries to  become
  * superuser. Return 0 if it is possible.
  * This function is not part of POSIX and therefore no official
  * cancellation point */
@@ -2417,7 +2417,7 @@ __CDECLARE(,int,__NOTHROW_RPC,ruserok,(char const *__rhost, int __suser, char co
 #ifndef __strmode_defined
 #define __strmode_defined 1
 #ifdef __CRT_HAVE_strmode
-/* Generate a file mode representation similar to what's printed by `ls -l'
+/* Generate  a file mode representation similar to what's printed by `ls -l'
  * The representation is written to `p', and `mode' is the value as returned
  * by `stat(2)' in `struct stat::st_mode'
  * The format written is:
@@ -2428,12 +2428,12 @@ __CDECLARE(,int,__NOTHROW_RPC,ruserok,(char const *__rhost, int __suser, char co
  *    p[2]  = mode & S_IWUSR ? 'w' : '-';
  *    p[3]  = <mode & S_IXUSR | S_ISUID>: { 0: '-', S_IXUSR: 'x', S_ISUID: 'S',
  *                                          S_IXUSR | S_ISUID: 's' };
- *    p[4]  = mode & S_IRGRP ? 'r' : '-';
- *    p[5]  = mode & S_IWGRP ? 'w' : '-';
+ *    p[4] = mode & S_IRGRP ? 'r' : '-';
+ *    p[5] = mode & S_IWGRP ? 'w' : '-';
  *    p[6]  = <mode & S_IXGRP | S_ISGID>: { 0: '-', S_IXGRP: 'x', S_ISGID: 'S',
  *                                          S_IXGRP | S_ISGID: 's' };
- *    p[7]  = mode & S_IROTH ? 'r' : '-';
- *    p[8]  = mode & S_IWOTH ? 'w' : '-';
+ *    p[7] = mode & S_IROTH ? 'r' : '-';
+ *    p[8] = mode & S_IWOTH ? 'w' : '-';
  *    p[9]  = <mode & S_IXOTH | S_ISVTX>: { 0: '-', S_IXOTH: 'x', S_ISVTX: 'T',
  *                                          S_IXOTH | S_ISVTX: 't' };
  *    p[10] = ' '; // '+', if "alternate or additional access control
@@ -2442,7 +2442,7 @@ __CDECLARE(,int,__NOTHROW_RPC,ruserok,(char const *__rhost, int __suser, char co
 __CDECLARE_VOID(__ATTR_NONNULL((2)),__NOTHROW_NCX,strmode,(__mode_t __mode, char __p[12]),(__mode,__p))
 #else /* __CRT_HAVE_strmode */
 #include <libc/local/string/strmode.h>
-/* Generate a file mode representation similar to what's printed by `ls -l'
+/* Generate  a file mode representation similar to what's printed by `ls -l'
  * The representation is written to `p', and `mode' is the value as returned
  * by `stat(2)' in `struct stat::st_mode'
  * The format written is:
@@ -2453,12 +2453,12 @@ __CDECLARE_VOID(__ATTR_NONNULL((2)),__NOTHROW_NCX,strmode,(__mode_t __mode, char
  *    p[2]  = mode & S_IWUSR ? 'w' : '-';
  *    p[3]  = <mode & S_IXUSR | S_ISUID>: { 0: '-', S_IXUSR: 'x', S_ISUID: 'S',
  *                                          S_IXUSR | S_ISUID: 's' };
- *    p[4]  = mode & S_IRGRP ? 'r' : '-';
- *    p[5]  = mode & S_IWGRP ? 'w' : '-';
+ *    p[4] = mode & S_IRGRP ? 'r' : '-';
+ *    p[5] = mode & S_IWGRP ? 'w' : '-';
  *    p[6]  = <mode & S_IXGRP | S_ISGID>: { 0: '-', S_IXGRP: 'x', S_ISGID: 'S',
  *                                          S_IXGRP | S_ISGID: 's' };
- *    p[7]  = mode & S_IROTH ? 'r' : '-';
- *    p[8]  = mode & S_IWOTH ? 'w' : '-';
+ *    p[7] = mode & S_IROTH ? 'r' : '-';
+ *    p[8] = mode & S_IWOTH ? 'w' : '-';
  *    p[9]  = <mode & S_IXOTH | S_ISVTX>: { 0: '-', S_IXOTH: 'x', S_ISVTX: 'T',
  *                                          S_IXOTH | S_ISVTX: 't' };
  *    p[10] = ' '; // '+', if "alternate or additional access control
@@ -2524,36 +2524,36 @@ __CDECLARE(,int,__NOTHROW_RPC,rcmd_af,(char **__restrict __ahost, __UINT16_TYPE_
 #endif /* !GETPASS_ECHO_NL && __GETPASS_ECHO_NL */
 #ifdef __CRT_HAVE_getpassfd
 /* >> getpassfd(3)
- * This function behaves similar to `readpassphrase(3)', but is still
- * quite distinct from that function in how this one behaves, vs. how
- * that other function behaves. In general, this function is a bit more
- * user-friendly, in that it offers more (but different) `flags' to
+ * This function behaves  similar to `readpassphrase(3)',  but is  still
+ * quite  distinct from that  function in how this  one behaves, vs. how
+ * that other function behaves. In general, this function is a bit  more
+ * user-friendly, in  that it  offers more  (but different)  `flags'  to
  * control how the password prompt is generated, with the main advantage
- * of this function being that it implements some "advanced" readline
- * functionality, such as deleting typed characters without relying on
- * the system TTY canonical buffer (which `readpassphrase(3)' needs,
- * since it doesn't include support for _any_ control characters other
+ * of this function  being that it  implements some "advanced"  readline
+ * functionality, such as deleting  typed characters without relying  on
+ * the  system  TTY canonical  buffer (which  `readpassphrase(3)' needs,
+ * since it doesn't include support  for _any_ control characters  other
  * that CR/LF as indicators to stop reading text)
  * Which of the 2 functions should be used is a matter of taste, but
- * personally, I prefer this one over `readpassphrase(3)'.
+ * personally,   I   prefer  this   one   over  `readpassphrase(3)'.
  * @param: prompt:  [0..1]      Text-prompt to display to the user, or `NULL'
  * @param: buf:     [0..buflen] Buffer that will receive the user's password.
- *                              When set to `NULL', a dynamically allocated
+ *                              When set to  `NULL', a dynamically  allocated
  *                              buffer will be used and returned.
  * @param: buflen:              Size of `buf' (in characters) (ignored when `buf == NULL')
- * @param: fds:     [0..1]      When non-NULL, an [stdin,stdout,stderr] triple
+ * @param: fds:     [0..1]      When non-NULL,  an [stdin,stdout,stderr]  triple
  *                              of files, used for [read,write,beep] operations.
- *                              When `NULL', try to use `/dev/tty' instead, and
- *                              if that fails, use `STDIN_FILENO,STDERR_FILENO,
+ *                              When  `NULL', try to use `/dev/tty' instead, and
+ *                              if that fails, use  `STDIN_FILENO,STDERR_FILENO,
  *                              STDERR_FILENO' as final fallback.
- *                              When `GETPASS_NEED_TTY' is set, the function
+ *                              When `GETPASS_NEED_TTY' is set, the  function
  *                              will fail with `errno=ENOTTY' if the actually
  *                              used `fds[0]' (iow: stdin) isn't a TTY device
  *                              s.a. `isatty(3)'
  * @param: flags:               Set of `GETPASS_*' flags (from <unistd.h>)
- * @param: timeout_in_seconds:  When non-0, timeout (in seconds) to wait for the
- *                              user to type each character of their password. If
- *                              this timeout expires, fail with `errno=ETIMEDOUT'
+ * @param: timeout_in_seconds:  When non-0, timeout (in  seconds) to wait for  the
+ *                              user to type each character of their password.  If
+ *                              this timeout expires, fail with  `errno=ETIMEDOUT'
  *                              Negative values result in weak undefined behavior.
  * @return: * :   [buf == NULL] Success (dynamically allocated buffer; must be `free(3)'d)
  * @return: buf:                Success
@@ -2567,36 +2567,36 @@ __CDECLARE(__ATTR_WUNUSED,char *,__NOTHROW_RPC,getpassfd,(char const *__prompt, 
 #elif defined(__CRT_HAVE_read) || defined(__CRT_HAVE__read) || defined(__CRT_HAVE___read)
 #include <libc/local/unistd/getpassfd.h>
 /* >> getpassfd(3)
- * This function behaves similar to `readpassphrase(3)', but is still
- * quite distinct from that function in how this one behaves, vs. how
- * that other function behaves. In general, this function is a bit more
- * user-friendly, in that it offers more (but different) `flags' to
+ * This function behaves  similar to `readpassphrase(3)',  but is  still
+ * quite  distinct from that  function in how this  one behaves, vs. how
+ * that other function behaves. In general, this function is a bit  more
+ * user-friendly, in  that it  offers more  (but different)  `flags'  to
  * control how the password prompt is generated, with the main advantage
- * of this function being that it implements some "advanced" readline
- * functionality, such as deleting typed characters without relying on
- * the system TTY canonical buffer (which `readpassphrase(3)' needs,
- * since it doesn't include support for _any_ control characters other
+ * of this function  being that it  implements some "advanced"  readline
+ * functionality, such as deleting  typed characters without relying  on
+ * the  system  TTY canonical  buffer (which  `readpassphrase(3)' needs,
+ * since it doesn't include support  for _any_ control characters  other
  * that CR/LF as indicators to stop reading text)
  * Which of the 2 functions should be used is a matter of taste, but
- * personally, I prefer this one over `readpassphrase(3)'.
+ * personally,   I   prefer  this   one   over  `readpassphrase(3)'.
  * @param: prompt:  [0..1]      Text-prompt to display to the user, or `NULL'
  * @param: buf:     [0..buflen] Buffer that will receive the user's password.
- *                              When set to `NULL', a dynamically allocated
+ *                              When set to  `NULL', a dynamically  allocated
  *                              buffer will be used and returned.
  * @param: buflen:              Size of `buf' (in characters) (ignored when `buf == NULL')
- * @param: fds:     [0..1]      When non-NULL, an [stdin,stdout,stderr] triple
+ * @param: fds:     [0..1]      When non-NULL,  an [stdin,stdout,stderr]  triple
  *                              of files, used for [read,write,beep] operations.
- *                              When `NULL', try to use `/dev/tty' instead, and
- *                              if that fails, use `STDIN_FILENO,STDERR_FILENO,
+ *                              When  `NULL', try to use `/dev/tty' instead, and
+ *                              if that fails, use  `STDIN_FILENO,STDERR_FILENO,
  *                              STDERR_FILENO' as final fallback.
- *                              When `GETPASS_NEED_TTY' is set, the function
+ *                              When `GETPASS_NEED_TTY' is set, the  function
  *                              will fail with `errno=ENOTTY' if the actually
  *                              used `fds[0]' (iow: stdin) isn't a TTY device
  *                              s.a. `isatty(3)'
  * @param: flags:               Set of `GETPASS_*' flags (from <unistd.h>)
- * @param: timeout_in_seconds:  When non-0, timeout (in seconds) to wait for the
- *                              user to type each character of their password. If
- *                              this timeout expires, fail with `errno=ETIMEDOUT'
+ * @param: timeout_in_seconds:  When non-0, timeout (in  seconds) to wait for  the
+ *                              user to type each character of their password.  If
+ *                              this timeout expires, fail with  `errno=ETIMEDOUT'
  *                              Negative values result in weak undefined behavior.
  * @return: * :   [buf == NULL] Success (dynamically allocated buffer; must be `free(3)'d)
  * @return: buf:                Success
@@ -2650,15 +2650,15 @@ typedef void (__LIBKCALL *__pthread_atfork_func_t)(void);
 #if !defined(__pthread_atfork_defined) && defined(__CRT_HAVE_pthread_atfork)
 #define __pthread_atfork_defined 1
 /* >> pthread_atfork(3)
- * Install handlers to be called when a new process is created with `fork(2)'.
+ * Install handlers to be called when a new process is created with  `fork(2)'.
  * The `prepare' handler is called in the parent process just before performing
- * `fork(2)'. The `parent' handler is called in the parent process just after
- * `fork(2)'. The `child' handler is called in the child process. Each of the
- * three handlers can be `NULL', meaning that no handler needs to be called at
+ * `fork(2)'. The `parent' handler is called  in the parent process just  after
+ * `fork(2)'.  The `child' handler is called in  the child process. Each of the
+ * three  handlers can be `NULL', meaning that no handler needs to be called at
  * that point.
  * `pthread_atfork(3)' can be called several times, in which case the `prepare'
- * handlers are called in LIFO order (last added with `pthread_atfork(3)',
- * first called before `fork(2)'), and the `parent' and `child' handlers are
+ * handlers are  called in  LIFO order  (last added  with  `pthread_atfork(3)',
+ * first  called before `fork(2)'),  and the `parent'  and `child' handlers are
  * called in FIFO order (first added -> first called)
  * @return: EOK:    Success
  * @return: ENOMEM: Insufficient memory to register callbacks */
@@ -2687,18 +2687,18 @@ __NAMESPACE_LOCAL_USING_OR_IMPL(ctermid_r, __FORCELOCAL __ATTR_ARTIFICIAL char *
 #ifdef __CRT_HAVE_sysconf
 /* >> sysconf(2)
  * @param: name: One of `_SC_*' from <asm/crt/confname.h>
- * Return a system configuration value `name'
+ * Return   a   system    configuration   value    `name'
  * return: * : The configuration limit associated with `name' for `path'
- * return: -1: [errno=<unchanged>] `name' refers to a maximum or minimum
+ * return: -1: [errno=<unchanged>] `name'  refers to a maximum or minimum
  *                                 limit, and that limit is indeterminate
  * return: -1: [errno=EINVAL]      The given `name' isn't a recognized config option */
 __CDECLARE(__ATTR_WUNUSED,__LONGPTR_TYPE__,__NOTHROW_RPC,sysconf,(__STDC_INT_AS_UINT_T __name),(__name))
 #elif defined(__CRT_HAVE___sysconf)
 /* >> sysconf(2)
  * @param: name: One of `_SC_*' from <asm/crt/confname.h>
- * Return a system configuration value `name'
+ * Return   a   system    configuration   value    `name'
  * return: * : The configuration limit associated with `name' for `path'
- * return: -1: [errno=<unchanged>] `name' refers to a maximum or minimum
+ * return: -1: [errno=<unchanged>] `name'  refers to a maximum or minimum
  *                                 limit, and that limit is indeterminate
  * return: -1: [errno=EINVAL]      The given `name' isn't a recognized config option */
 __CREDIRECT(__ATTR_WUNUSED,__LONGPTR_TYPE__,__NOTHROW_RPC,sysconf,(__STDC_INT_AS_UINT_T __name),__sysconf,(__name))
@@ -2809,9 +2809,9 @@ __NAMESPACE_LOCAL_USING_OR_IMPL(closefrom, __FORCELOCAL __ATTR_ARTIFICIAL void _
 #if defined(__USE_SOLARIS) || defined(__USE_NETBSD)
 #ifdef __CRT_HAVE_fchroot
 /* >> fchroot(2)
- * Change the root directory to `fd'. If `fd' was opened before a prior call to `chroot()',
- * and referrs to a directory, then this function can be used to escape a chroot() jail.
- * No special permissions are required to use this function, since a malicious application
+ * Change the root directory to  `fd'. If `fd' was opened  before a prior call to  `chroot()',
+ * and referrs to  a directory,  then this function  can be  used to escape  a chroot()  jail.
+ * No special permissions  are required to  use this function,  since a malicious  application
  * could achieve the same behavior by use of `*at' system calls, using `fd' as `dfd' argument. */
 __CDECLARE(,int,__NOTHROW_NCX,fchroot,(__fd_t __fd),(__fd))
 #else /* __CRT_HAVE_fchroot */
@@ -2819,9 +2819,9 @@ __CDECLARE(,int,__NOTHROW_NCX,fchroot,(__fd_t __fd),(__fd))
 #if (defined(__CRT_HAVE_dup2) || defined(__CRT_HAVE__dup2) || defined(__CRT_HAVE___dup2)) && defined(__AT_FDROOT)
 #include <libc/local/unistd/fchroot.h>
 /* >> fchroot(2)
- * Change the root directory to `fd'. If `fd' was opened before a prior call to `chroot()',
- * and referrs to a directory, then this function can be used to escape a chroot() jail.
- * No special permissions are required to use this function, since a malicious application
+ * Change the root directory to  `fd'. If `fd' was opened  before a prior call to  `chroot()',
+ * and referrs to  a directory,  then this function  can be  used to escape  a chroot()  jail.
+ * No special permissions  are required to  use this function,  since a malicious  application
  * could achieve the same behavior by use of `*at' system calls, using `fd' as `dfd' argument. */
 __NAMESPACE_LOCAL_USING_OR_IMPL(fchroot, __FORCELOCAL __ATTR_ARTIFICIAL int __NOTHROW_NCX(__LIBCCALL fchroot)(__fd_t __fd) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(fchroot))(__fd); })
 #endif /* (__CRT_HAVE_dup2 || __CRT_HAVE__dup2 || __CRT_HAVE___dup2) && __AT_FDROOT */
@@ -2848,9 +2848,9 @@ __CDECLARE(__ATTR_NONNULL((1)),int,__NOTHROW_RPC_KOS,fdetach,(char const *__rest
 #if !defined(__ioctl_defined) && defined(__CRT_HAVE_ioctl)
 #define __ioctl_defined 1
 /* >> ioctl(2)
- * Perform the I/O control operation specified by `request' on `fd'.
- * Many I/O control operations except an additional argument, though
- * this argument's type and meaning depends on `REQUEST'. If used, it's
+ * Perform the  I/O control  operation specified  by `request'  on  `fd'.
+ * Many I/O  control operations  except  an additional  argument,  though
+ * this argument's type and meaning  depends on `REQUEST'. If used,  it's
  * usually either a pointer to a larger argument structure, or an integer
  * that fits into a single register.
  * @return: * : The return value depends on the given `request'.
@@ -2935,12 +2935,12 @@ __CDECLARE_VOID(,__NOTHROW,yield,(void),())
 #endif /* ... */
 #ifdef __CRT_HAVE_resolvepath
 /* >> resolvepath(3)
- * Similar to `frealpathat(2)' (though use the later for more options)
- * Also note that this function appears to have a weird rule (which KOS simply
- * ignores) that is related to this function not writing more than `PATH_MAX'
+ * Similar  to  `frealpathat(2)'  (though  use  the  later  for  more   options)
+ * Also note that this function appears to  have a weird rule (which KOS  simply
+ * ignores)  that is related  to this function not  writing more than `PATH_MAX'
  * bytes to `buf'. (Why??? I mean: The whole point of having a `buflen' argument
  * is to be able to handle names of arbitrary lengths)
- * Additionally, the online docs don't mention what happens when `buflen' is too
+ * Additionally, the online docs don't mention what happens when `buflen' is  too
  * small, so I guess I can just make up what's supposed to happen, and I say that
  * the function will set errno=ERANGE and return -1
  * @return: * : Used buffer size (possibly including a NUL-byte, but maybe not)
@@ -2951,12 +2951,12 @@ __CDECLARE(__ATTR_NONNULL((1)),__STDC_INT_AS_SSIZE_T,__NOTHROW_NCX,resolvepath,(
 #if defined(__CRT_HAVE_frealpathat) && defined(__AT_FDCWD)
 #include <libc/local/unistd/resolvepath.h>
 /* >> resolvepath(3)
- * Similar to `frealpathat(2)' (though use the later for more options)
- * Also note that this function appears to have a weird rule (which KOS simply
- * ignores) that is related to this function not writing more than `PATH_MAX'
+ * Similar  to  `frealpathat(2)'  (though  use  the  later  for  more   options)
+ * Also note that this function appears to  have a weird rule (which KOS  simply
+ * ignores)  that is related  to this function not  writing more than `PATH_MAX'
  * bytes to `buf'. (Why??? I mean: The whole point of having a `buflen' argument
  * is to be able to handle names of arbitrary lengths)
- * Additionally, the online docs don't mention what happens when `buflen' is too
+ * Additionally, the online docs don't mention what happens when `buflen' is  too
  * small, so I guess I can just make up what's supposed to happen, and I say that
  * the function will set errno=ERANGE and return -1
  * @return: * : Used buffer size (possibly including a NUL-byte, but maybe not)

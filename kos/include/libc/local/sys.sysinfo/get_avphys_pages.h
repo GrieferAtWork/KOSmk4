@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xbc5770ce */
+/* HASH CRC-32:0x98083ce3 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -25,56 +25,42 @@
 #if defined(__CRT_HAVE_sysinfo) && !defined(__solaris__) && (defined(__CRT_HAVE_getpagesize) || defined(__CRT_HAVE___getpagesize) || defined(__ARCH_PAGESIZE))
 #include <bits/types.h>
 __NAMESPACE_LOCAL_BEGIN
-/* Dependency: getpagesize from unistd */
 #ifndef __local___localdep_getpagesize_defined
 #define __local___localdep_getpagesize_defined 1
 #if defined(__CRT_HAVE_getpagesize) && defined(__ARCH_PAGESIZE)
 __NAMESPACE_LOCAL_END
 #include <features.h>
 __NAMESPACE_LOCAL_BEGIN
-/* >> getpagesize(3)
- * Return the size of a PAGE (in bytes) */
 __CEIREDIRECT(__ATTR_CONST __ATTR_WUNUSED,__STDC_INT_AS_SIZE_T,__NOTHROW,__localdep_getpagesize,(void),getpagesize,{ return __ARCH_PAGESIZE; })
 #elif defined(__CRT_HAVE_getpagesize)
 __NAMESPACE_LOCAL_END
 #include <features.h>
 __NAMESPACE_LOCAL_BEGIN
-/* >> getpagesize(3)
- * Return the size of a PAGE (in bytes) */
 __CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,__STDC_INT_AS_SIZE_T,__NOTHROW,__localdep_getpagesize,(void),getpagesize,())
 #elif defined(__CRT_HAVE___getpagesize)
 __NAMESPACE_LOCAL_END
 #include <features.h>
 __NAMESPACE_LOCAL_BEGIN
-/* >> getpagesize(3)
- * Return the size of a PAGE (in bytes) */
 __CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,__STDC_INT_AS_SIZE_T,__NOTHROW,__localdep_getpagesize,(void),__getpagesize,())
 #elif defined(__ARCH_PAGESIZE)
 __NAMESPACE_LOCAL_END
 #include <features.h>
 __NAMESPACE_LOCAL_BEGIN
-/* >> getpagesize(3)
- * Return the size of a PAGE (in bytes) */
 __FORCELOCAL __ATTR_CONST __ATTR_WUNUSED __STDC_INT_AS_SIZE_T __NOTHROW(__LIBCCALL __localdep_getpagesize)(void) { return __ARCH_PAGESIZE; }
 #else /* ... */
 #undef __local___localdep_getpagesize_defined
 #endif /* !... */
 #endif /* !__local___localdep_getpagesize_defined */
-/* Dependency: sysinfo from sys.sysinfo */
 #ifndef __local___localdep_sysinfo_defined
 #define __local___localdep_sysinfo_defined 1
 __NAMESPACE_LOCAL_END
 #include <linux/sysinfo.h>
 __NAMESPACE_LOCAL_BEGIN
-/* >> sysinfo(2)
- * Return current system information */
 __CREDIRECT(__ATTR_NONNULL((1)),int,__NOTHROW_NCX,__localdep_sysinfo,(struct sysinfo *__info),sysinfo,(__info))
 #endif /* !__local___localdep_sysinfo_defined */
 __NAMESPACE_LOCAL_END
 #include <linux/sysinfo.h>
 __NAMESPACE_LOCAL_BEGIN
-/* >> get_avphys_pages(3)
- * Return the total # of free pages of physical memory */
 __LOCAL_LIBC(get_avphys_pages) __ATTR_WUNUSED __INTPTR_TYPE__
 __NOTHROW(__LIBCCALL __LIBC_LOCAL_NAME(get_avphys_pages))(void) {
 	struct sysinfo __info;

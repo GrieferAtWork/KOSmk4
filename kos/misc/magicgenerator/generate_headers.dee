@@ -40,7 +40,7 @@ fs.chdir(fs.headof(__FILE__) + "/../../");
 
 final global HASH_FUNCTION = "CRC-32";
 
-@@Macro definition assumptions that may be made
+@@Macro   definition  assumptions  that  may  be  made
 @@in headers and <libc/local/...> implementation files
 final global ppAssumeHeaderFiles: PPAssume = createPPAssume({
 	"__BUILDING_LIBC" : false, /* not defined */
@@ -117,9 +117,9 @@ class CriticalSection {
 		} while (counter.cmpxch(oldval, oldval - 1) !== oldval);
 	}
 
-	@@Exit the application, but wait for all threads
+	@@Exit  the application, but wait for all threads
 	@@to have exited @this critical section first, as
-	@@well as prevent any threads from ever entering
+	@@well  as prevent any threads from ever entering
 	@@the section again
 	function exitApplication(status: int) {
 		local oldval;
@@ -338,7 +338,7 @@ global final knownKernelOnlyExports: {string...} = HashSet();
 global final knownLibcSections: {string...} = HashSet();
 
 @@Parse custom directives that are so obscure that
-@@they shouldn't be part of the standard loader
+@@they shouldn't be  part of  the standard  loader
 @@@return: * : Indicative of the directive having been recognized.
 function customDirectivesParser(context: LoaderContext): bool {
 	local self = context.self;
@@ -398,7 +398,6 @@ function customDirectivesParser(context: LoaderContext): bool {
 		}
 		context.insertText_c(fp.string);
 	}	break;
-
 
 	case "declare_user_export":
 	case "declare_kernel_export":

@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x88992597 */
+/* HASH CRC-32:0x379a93cf */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -38,13 +38,13 @@ __SYSDECL_BEGIN
 #define __strtoi_defined 1
 #ifdef __CRT_HAVE_strtoi
 /* >> strtoi(3), strtou(3), strtoi_l(3), strtou_l(3)
- * Safely convert `nptr' to an integer which is then returned.
- * If no integer could be read, set `*rstatus' (if non-`NULL')
- * to `ECANCELED'. If non-`NULL', `*endptr' is made to point
- * past the read integer, and if it points to a non-'\0'-
- * character, `*rstatus' (if non-`NULL') is set to `ENOTSUP'.
- * Also make sure that the returned integer lies within the
- * bounds of `[lo,hi]' (inclusively). If it does not, clamp it
+ * Safely convert `nptr'  to an integer  which is then  returned.
+ * If no integer  could be read,  set `*rstatus' (if  non-`NULL')
+ * to `ECANCELED'.  If non-`NULL',  `*endptr'  is made  to  point
+ * past the  read  integer,  and  if it  points  to  a  non-'\0'-
+ * character,  `*rstatus'  (if non-`NULL')  is set  to `ENOTSUP'.
+ * Also  make  sure that  the  returned integer  lies  within the
+ * bounds of `[lo,hi]'  (inclusively). If it  does not, clamp  it
  * to those bounds and set `*rstatus' (if non-`NULL') to `ERANGE'
  * @param: lo, hi:  Lo/Hi-bounds for the to-be returned integer.
  * @param: rstatus: When non-`NULL', set to a conversion error (if any) */
@@ -52,13 +52,13 @@ __CDECLARE(__ATTR_LEAF __ATTR_NONNULL((1)),__INTMAX_TYPE__,__NOTHROW_NCX,strtoi,
 #else /* __CRT_HAVE_strtoi */
 #include <libc/local/inttypes/strtoi.h>
 /* >> strtoi(3), strtou(3), strtoi_l(3), strtou_l(3)
- * Safely convert `nptr' to an integer which is then returned.
- * If no integer could be read, set `*rstatus' (if non-`NULL')
- * to `ECANCELED'. If non-`NULL', `*endptr' is made to point
- * past the read integer, and if it points to a non-'\0'-
- * character, `*rstatus' (if non-`NULL') is set to `ENOTSUP'.
- * Also make sure that the returned integer lies within the
- * bounds of `[lo,hi]' (inclusively). If it does not, clamp it
+ * Safely convert `nptr'  to an integer  which is then  returned.
+ * If no integer  could be read,  set `*rstatus' (if  non-`NULL')
+ * to `ECANCELED'.  If non-`NULL',  `*endptr'  is made  to  point
+ * past the  read  integer,  and  if it  points  to  a  non-'\0'-
+ * character,  `*rstatus'  (if non-`NULL')  is set  to `ENOTSUP'.
+ * Also  make  sure that  the  returned integer  lies  within the
+ * bounds of `[lo,hi]'  (inclusively). If it  does not, clamp  it
  * to those bounds and set `*rstatus' (if non-`NULL') to `ERANGE'
  * @param: lo, hi:  Lo/Hi-bounds for the to-be returned integer.
  * @param: rstatus: When non-`NULL', set to a conversion error (if any) */
@@ -69,13 +69,13 @@ __NAMESPACE_LOCAL_USING_OR_IMPL(strtoi, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_LE
 #define __strtou_defined 1
 #ifdef __CRT_HAVE_strtou
 /* >> strtoi(3), strtou(3), strtoi_l(3), strtou_l(3)
- * Safely convert `nptr' to an integer which is then returned.
- * If no integer could be read, set `*rstatus' (if non-`NULL')
- * to `ECANCELED'. If non-`NULL', `*endptr' is made to point
- * past the read integer, and if it points to a non-'\0'-
- * character, `*rstatus' (if non-`NULL') is set to `ENOTSUP'.
- * Also make sure that the returned integer lies within the
- * bounds of `[lo,hi]' (inclusively). If it does not, clamp it
+ * Safely convert `nptr'  to an integer  which is then  returned.
+ * If no integer  could be read,  set `*rstatus' (if  non-`NULL')
+ * to `ECANCELED'.  If non-`NULL',  `*endptr'  is made  to  point
+ * past the  read  integer,  and  if it  points  to  a  non-'\0'-
+ * character,  `*rstatus'  (if non-`NULL')  is set  to `ENOTSUP'.
+ * Also  make  sure that  the  returned integer  lies  within the
+ * bounds of `[lo,hi]'  (inclusively). If it  does not, clamp  it
  * to those bounds and set `*rstatus' (if non-`NULL') to `ERANGE'
  * @param: lo, hi:  Lo/Hi-bounds for the to-be returned integer.
  * @param: rstatus: When non-`NULL', set to a conversion error (if any) */
@@ -83,13 +83,13 @@ __CDECLARE(__ATTR_LEAF __ATTR_NONNULL((1)),__UINTMAX_TYPE__,__NOTHROW_NCX,strtou
 #else /* __CRT_HAVE_strtou */
 #include <libc/local/inttypes/strtou.h>
 /* >> strtoi(3), strtou(3), strtoi_l(3), strtou_l(3)
- * Safely convert `nptr' to an integer which is then returned.
- * If no integer could be read, set `*rstatus' (if non-`NULL')
- * to `ECANCELED'. If non-`NULL', `*endptr' is made to point
- * past the read integer, and if it points to a non-'\0'-
- * character, `*rstatus' (if non-`NULL') is set to `ENOTSUP'.
- * Also make sure that the returned integer lies within the
- * bounds of `[lo,hi]' (inclusively). If it does not, clamp it
+ * Safely convert `nptr'  to an integer  which is then  returned.
+ * If no integer  could be read,  set `*rstatus' (if  non-`NULL')
+ * to `ECANCELED'.  If non-`NULL',  `*endptr'  is made  to  point
+ * past the  read  integer,  and  if it  points  to  a  non-'\0'-
+ * character,  `*rstatus'  (if non-`NULL')  is set  to `ENOTSUP'.
+ * Also  make  sure that  the  returned integer  lies  within the
+ * bounds of `[lo,hi]'  (inclusively). If it  does not, clamp  it
  * to those bounds and set `*rstatus' (if non-`NULL') to `ERANGE'
  * @param: lo, hi:  Lo/Hi-bounds for the to-be returned integer.
  * @param: rstatus: When non-`NULL', set to a conversion error (if any) */

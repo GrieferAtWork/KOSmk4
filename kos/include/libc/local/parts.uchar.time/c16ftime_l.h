@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xba818800 */
+/* HASH CRC-32:0x595b653 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -24,7 +24,6 @@
 #include <bits/crt/tm.h>
 #include <hybrid/typecore.h>
 __NAMESPACE_LOCAL_BEGIN
-/* Dependency: c16ftime from parts.uchar.time */
 #ifndef __local___localdep_c16ftime_defined
 #define __local___localdep_c16ftime_defined 1
 #if defined(__CRT_HAVE_wcsftime) && __SIZEOF_WCHAR_T__ == 2 && defined(__LIBCCALL_IS_LIBDCALL)

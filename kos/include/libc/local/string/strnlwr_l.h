@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xa8b23c04 */
+/* HASH CRC-32:0x374a9d8d */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -23,7 +23,6 @@
 #include <__crt.h>
 #include <hybrid/typecore.h>
 __NAMESPACE_LOCAL_BEGIN
-/* Dependency: tolower_l from ctype */
 #ifndef __local___localdep_tolower_l_defined
 #define __local___localdep_tolower_l_defined 1
 #ifdef __CRT_HAVE_tolower_l

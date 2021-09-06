@@ -65,7 +65,7 @@
 
 #if !defined(NDEBUG) && 1
 //#define UHCI_DEBUG_LOG_TD_COMPLETE 1
-//#define UHCI_DEBUG_LOG_INTERRUPT 1
+//#define  UHCI_DEBUG_LOG_INTERRUPT  1
 #define UHCI_DEBUG(...)             printk(__VA_ARGS__)
 #else /* !NDEBUG */
 #define UHCI_DEBUG(...) (void)0
@@ -3238,7 +3238,7 @@ usb_probe_uhci(struct pci_device *__restrict dev) {
 
 //	sleep_milli(2000);
 //
-//	printk(KERN_RAW "%%{monitor:info usb\n}");
+//	printk(KERN_RAW    "%%{monitor:info usb\n}");
 //	printk(KERN_RAW "%%{monitor:usb_del 0.1\n}");
 //
 //	for (;;)

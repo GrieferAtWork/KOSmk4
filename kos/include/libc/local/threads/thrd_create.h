@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xe1c7d3c0 */
+/* HASH CRC-32:0x3fb20d68 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -24,7 +24,6 @@
 #ifdef __CRT_HAVE_pthread_create
 #include <bits/crt/threads.h>
 __NAMESPACE_LOCAL_BEGIN
-/* Dependency: pthread_create from pthread */
 #ifndef __local___localdep_pthread_create_defined
 #define __local___localdep_pthread_create_defined 1
 __NAMESPACE_LOCAL_END
@@ -35,22 +34,12 @@ __NAMESPACE_LOCAL_END
 typedef void *(__LIBKCALL *__pthread_start_routine_t)(void *);
 #endif /* !____pthread_start_routine_t_defined */
 __NAMESPACE_LOCAL_BEGIN
-/* >> pthread_create(3)
- * Create a new thread, starting with execution of `start_routine'
- * getting passed `arg'. Creation attributed come from `attr'. The new
- * handle is stored in `*newthread'
- * @return: EOK:    Success
- * @return: EAGAIN: Insufficient resources, or operation-not-permitted */
 __CREDIRECT(__ATTR_NONNULL((1, 3)),__errno_t,__NOTHROW_NCX,__localdep_pthread_create,(__pthread_t *__restrict __newthread, __pthread_attr_t const *__restrict __attr, __pthread_start_routine_t __start_routine, void *__restrict __arg),pthread_create,(__newthread,__attr,__start_routine,__arg))
 #endif /* !__local___localdep_pthread_create_defined */
 __NAMESPACE_LOCAL_END
 #include <asm/crt/threads.h>
 #include <libc/errno.h>
 __NAMESPACE_LOCAL_BEGIN
-/* >> thrd_create(3)
- * Create and start a new thread (s.a. `pthread_create(3)')
- * @return: thrd_success: Success
- * @return: thrd_error:   Error */
 __LOCAL_LIBC(thrd_create) int
 __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(thrd_create))(__thrd_t *__thr, __thrd_start_t __func, void *__arg) {
 	__errno_t __error;

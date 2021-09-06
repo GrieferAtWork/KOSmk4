@@ -4147,8 +4147,8 @@ checklock_modrm_memory_parsed:
 // ???:	I(0x1b, IF_X32|IF_F3|IF_MODRM, "bndmk\t" OP_RM32 OP_RBND),
 // ???:	I(0x1b, IF_X64|IF_F3|IF_MODRM, "bndmk\t" OP_RM64 OP_RBND),
 
-// ???:	I(0x24, IF_MODRM|IF_RMR,  "movl\t" OP_RTR OP_RM32),
-// ???:	I(0x26, IF_MODRM|IF_RMR,  "movl\t" OP_RM32 OP_RTR),
+// ???:	I(0x24, IF_MODRM|IF_RMR, "movl\t" OP_RTR OP_RM32),
+// ???:	I(0x26, IF_MODRM|IF_RMR, "movl\t" OP_RM32 OP_RTR),
 
 
 

@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xb0a5ffd1 */
+/* HASH CRC-32:0x4fca8647 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -25,7 +25,6 @@
 #if defined(__SIG_BLOCK) && (defined(__CRT_HAVE_sigprocmask) || defined(__CRT_HAVE_pthread_sigmask))
 #include <bits/types.h>
 __NAMESPACE_LOCAL_BEGIN
-/* Dependency: set_single_signal_action from signal */
 #ifndef __local___localdep_set_single_signal_action_defined
 #define __local___localdep_set_single_signal_action_defined 1
 __NAMESPACE_LOCAL_END
@@ -33,11 +32,6 @@ __NAMESPACE_LOCAL_END
 __NAMESPACE_LOCAL_BEGIN
 #define __localdep_set_single_signal_action __LIBC_LOCAL_NAME(set_single_signal_action)
 #endif /* !__local___localdep_set_single_signal_action_defined */
-/* >> sighold(3)
- * Mask a single signal `signo', which is the same
- * as `sigprocmask(SIG_BLOCK, MASKFOR(signo), NULL)'
- * @return: 0:  Success
- * @return: -1: Error (s.a. `errno') */
 __LOCAL_LIBC(sighold) int
 __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(sighold))(__signo_t __signo) {
 	return __localdep_set_single_signal_action(__signo, __SIG_BLOCK);

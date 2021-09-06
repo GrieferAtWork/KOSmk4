@@ -861,7 +861,7 @@ int ilogbl(__LONGDOUBLE x) %{generate(double2ldouble("ilogb"))}
             defined(__IEEE854_LONG_DOUBLE_TYPE__)) ||
             $has_function(nextafterl))]]
 double nexttoward(double x, __LONGDOUBLE y) {
-@@pp_ifdef __IEEE854_LONG_DOUBLE_TYPE__@@
+@@pp_ifdef      __IEEE854_LONG_DOUBLE_TYPE__@@
 @@pp_ifdef __IEEE754_DOUBLE_TYPE_IS_DOUBLE__@@
 	return (double)__ieee754_nexttoward((__IEEE754_DOUBLE_TYPE__)x, (__IEEE854_LONG_DOUBLE_TYPE__)y);
 @@pp_else@@
@@ -943,7 +943,7 @@ double round(double x) {
 }
 
 @@Round `x' to the integral value in floating-point
-@@format nearest but not larger in magnitude
+@@format   nearest  but  not  larger  in  magnitude
 [[std, wunused, nothrow, const, crtbuiltin, export_alias("__trunc")]]
 [[impl_include("<hybrid/typecore.h>", "<libm/trunc.h>")]]
 double trunc(double x) {
@@ -955,7 +955,7 @@ double trunc(double x) {
 }
 
 @@Compute remainder of `x' and `y' and put in `*pquo' a value with
-@@sign of x/y and magnitude congruent `mod 2^n' to the magnitude
+@@sign of x/y and magnitude  congruent `mod 2^n' to the  magnitude
 @@of the integral quotient x/y, with n >= 3
 [[std, wunused, nothrow, crtbuiltin, export_alias("__remquo")]]
 double remquo(double x, double y, [[nonnull]] int *pquo); /* TODO */
@@ -1045,7 +1045,7 @@ __LONGLONG llround(double x) {
             defined(__IEEE854_LONG_DOUBLE_TYPE__)) ||
             $has_function(nextafterl))]]
 float nexttowardf(float x, __LONGDOUBLE y) {
-@@pp_ifdef __IEEE854_LONG_DOUBLE_TYPE__@@
+@@pp_ifdef    __IEEE854_LONG_DOUBLE_TYPE__@@
 @@pp_ifdef __IEEE754_FLOAT_TYPE_IS_FLOAT__@@
 	return (float)__ieee754_nexttowardf((__IEEE754_FLOAT_TYPE__)x, (__IEEE854_LONG_DOUBLE_TYPE__)y);
 @@pp_else@@

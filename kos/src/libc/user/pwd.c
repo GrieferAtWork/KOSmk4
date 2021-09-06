@@ -218,10 +218,10 @@ NOTHROW_RPC(LIBCCALL libc_getpwnam)(const char *name)
 }
 /*[[[end:libc_getpwnam]]]*/
 
-/*[[[head:libc_getpwent,hash:CRC-32=0x4be55cf4]]]*/
+/*[[[head:libc_getpwent,hash:CRC-32=0xd5c9e913]]]*/
 /* Read an entry from the password-file stream, opening it if necessary
  * return: * :                         A pointer to the read password entry
- * return: NULL: (errno = <unchanged>) The last entry has already been read
+ * return: NULL: (errno = <unchanged>) The last  entry  has  already  been  read
  *                                     (use `setpwent()' to rewind the database)
  * return: NULL: (errno = <changed>)   Error (s.a. `errno') */
 INTERN ATTR_SECTION(".text.crt.database.pwd") struct passwd *

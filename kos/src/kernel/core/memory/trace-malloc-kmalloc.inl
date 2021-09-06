@@ -21,7 +21,7 @@
 #include "trace-malloc-heap.c.inl"
 //#define DEFINE_METHOD_kmalloc
 //#define DEFINE_METHOD_kmalloc_in_place
-//#define DEFINE_METHOD_kmemalign
+//#define        DEFINE_METHOD_kmemalign
 #define DEFINE_METHOD_kmemalign_offset
 #endif /* __INTELLISENSE__ */
 

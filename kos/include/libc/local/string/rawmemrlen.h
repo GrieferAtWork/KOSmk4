@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x747ad91d */
+/* HASH CRC-32:0xe7681a36 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -23,21 +23,17 @@
 #include <__crt.h>
 #include <hybrid/typecore.h>
 __NAMESPACE_LOCAL_BEGIN
-/* Dependency: rawmemrchr from string */
 #ifndef __local___localdep_rawmemrchr_defined
 #define __local___localdep_rawmemrchr_defined 1
 #ifdef __CRT_HAVE_rawmemrchr
-/* Same as `memrchr' without a search limit, starting at `haystack - 1' */
 __CREDIRECT(__ATTR_PURE __ATTR_RETNONNULL __ATTR_WUNUSED __ATTR_NONNULL((1)),void *,__NOTHROW_NCX,__localdep_rawmemrchr,(void const *__restrict __haystack, int __needle),rawmemrchr,(__haystack,__needle))
 #else /* __CRT_HAVE_rawmemrchr */
 __NAMESPACE_LOCAL_END
 #include <libc/local/string/rawmemrchr.h>
 __NAMESPACE_LOCAL_BEGIN
-/* Same as `memrchr' without a search limit, starting at `haystack - 1' */
 #define __localdep_rawmemrchr __LIBC_LOCAL_NAME(rawmemrchr)
 #endif /* !__CRT_HAVE_rawmemrchr */
 #endif /* !__local___localdep_rawmemrchr_defined */
-/* Same as `rawmemrchr', but return the offset from `haystack', rather than the actual address. */
 __LOCAL_LIBC(rawmemrlen) __ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1)) __SIZE_TYPE__
 __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(rawmemrlen))(void const *__restrict __haystack, int __needle) {
 	return (__SIZE_TYPE__)((__BYTE_TYPE__ *)__localdep_rawmemrchr(__haystack, __needle) - (__BYTE_TYPE__ *)__haystack);

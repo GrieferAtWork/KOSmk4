@@ -49,7 +49,7 @@ final global SMP = "smp"; /* SMP_DEFAULT */
 
 @@The default value of @SMP
 @@NOTE: In situations where this value is never accepted, @SMP
-@@      will instead default to some accepted value.
+@@      will   instead   default  to   some   accepted  value.
 final global SMP_DEFAULT = "2";
 
 

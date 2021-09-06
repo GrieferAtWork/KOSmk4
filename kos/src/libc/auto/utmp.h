@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x5cd49dce */
+/* HASH CRC-32:0x8c9f1978 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -32,7 +32,7 @@ DECL_BEGIN
 #if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
 /* >> login_tty(3)
  * Set the given `fd' as the controlling terminal, stdin,
- * stdout, and stderr. Afterwards, `fd' is closed.
+ * stdout,   and  stderr.  Afterwards,  `fd'  is  closed.
  * @return: 0 : Success
  * @return: * : Error */
 INTDEF int NOTHROW_RPC_KOS(LIBDCALL libd_login_tty)(fd_t fd);
@@ -40,7 +40,7 @@ INTDEF int NOTHROW_RPC_KOS(LIBDCALL libd_login_tty)(fd_t fd);
 #ifndef __KERNEL__
 /* >> login_tty(3)
  * Set the given `fd' as the controlling terminal, stdin,
- * stdout, and stderr. Afterwards, `fd' is closed.
+ * stdout,   and  stderr.  Afterwards,  `fd'  is  closed.
  * @return: 0 : Success
  * @return: * : Error */
 INTDEF int NOTHROW_RPC_KOS(LIBCCALL libc_login_tty)(fd_t fd);

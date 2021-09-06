@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x6f5c9686 */
+/* HASH CRC-32:0x85f8beaf */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -22,27 +22,21 @@
 #define __local_fdimf_defined 1
 #include <__crt.h>
 __NAMESPACE_LOCAL_BEGIN
-/* Dependency: fabsf from math */
 #ifndef __local___localdep_fabsf_defined
 #define __local___localdep_fabsf_defined 1
 #if __has_builtin(__builtin_fabsf) && defined(__LIBC_BIND_CRTBUILTINS) && defined(__CRT_HAVE_fabsf)
-/* Absolute value of `x' */
 __CEIREDIRECT(__ATTR_CONST __ATTR_WUNUSED,float,__NOTHROW,__localdep_fabsf,(float __x),fabsf,{ return __builtin_fabsf(__x); })
 #elif defined(__CRT_HAVE_fabsf)
-/* Absolute value of `x' */
 __CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,float,__NOTHROW,__localdep_fabsf,(float __x),fabsf,(__x))
 #elif defined(__CRT_HAVE___fabsf)
-/* Absolute value of `x' */
 __CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,float,__NOTHROW,__localdep_fabsf,(float __x),__fabsf,(__x))
 #else /* ... */
 __NAMESPACE_LOCAL_END
 #include <libc/local/math/fabsf.h>
 __NAMESPACE_LOCAL_BEGIN
-/* Absolute value of `x' */
 #define __localdep_fabsf __LIBC_LOCAL_NAME(fabsf)
 #endif /* !... */
 #endif /* !__local___localdep_fabsf_defined */
-/* Return positive difference between `x' and `y' */
 __LOCAL_LIBC(fdimf) __ATTR_CONST __ATTR_WUNUSED float
 __NOTHROW(__LIBCCALL __LIBC_LOCAL_NAME(fdimf))(float __x, float __y) {
 	/* TODO: ieee754-specific function */

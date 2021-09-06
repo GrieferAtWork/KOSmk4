@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x93484dfd */
+/* HASH CRC-32:0xe4702a */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -23,7 +23,6 @@
 #include <__crt.h>
 #include <hybrid/typecore.h>
 __NAMESPACE_LOCAL_BEGIN
-/* Compare memory buffers and return the difference of the first non-matching dword */
 __LOCAL_LIBC(memcmpl) __ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1, 2)) __INT32_TYPE__
 __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(memcmpl))(void const *__s1, void const *__s2, __SIZE_TYPE__ __n_dwords) {
 	__INT32_TYPE__ const *__p1 = (__INT32_TYPE__ const *)__s1;

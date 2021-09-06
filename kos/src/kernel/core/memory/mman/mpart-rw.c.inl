@@ -21,11 +21,11 @@
 #include "mpart-rw.c"
 //#define DEFINE_mpart_read
 #define DEFINE_mpart_write
-//#define DEFINE_mpart_read_p
-//#define DEFINE_mpart_write_p
-//#define DEFINE_mpart_readv
-//#define DEFINE_mpart_writev
-//#define DEFINE_mpart_readv_p
+//#define   DEFINE_mpart_read_p
+//#define  DEFINE_mpart_write_p
+//#define    DEFINE_mpart_readv
+//#define   DEFINE_mpart_writev
+//#define  DEFINE_mpart_readv_p
 //#define DEFINE_mpart_writev_p
 #endif /* __INTELLISENSE__ */
 

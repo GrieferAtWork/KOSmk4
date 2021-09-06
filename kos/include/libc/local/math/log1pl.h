@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x4a7002b1 */
+/* HASH CRC-32:0x361c56ce */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -23,23 +23,18 @@
 #include <__crt.h>
 #if defined(__CRT_HAVE_log1p) || defined(__CRT_HAVE___log1p)
 __NAMESPACE_LOCAL_BEGIN
-/* Dependency: log1p from math */
 #ifndef __local___localdep_log1p_defined
 #define __local___localdep_log1p_defined 1
 #if __has_builtin(__builtin_log1p) && defined(__LIBC_BIND_CRTBUILTINS) && defined(__CRT_HAVE_log1p)
-/* Return `log(1 + x)' */
 __CEIREDIRECT(__ATTR_WUNUSED,double,__NOTHROW,__localdep_log1p,(double __x),log1p,{ return __builtin_log1p(__x); })
 #elif defined(__CRT_HAVE_log1p)
-/* Return `log(1 + x)' */
 __CREDIRECT(__ATTR_WUNUSED,double,__NOTHROW,__localdep_log1p,(double __x),log1p,(__x))
 #elif defined(__CRT_HAVE___log1p)
-/* Return `log(1 + x)' */
 __CREDIRECT(__ATTR_WUNUSED,double,__NOTHROW,__localdep_log1p,(double __x),__log1p,(__x))
 #else /* ... */
 #undef __local___localdep_log1p_defined
 #endif /* !... */
 #endif /* !__local___localdep_log1p_defined */
-/* Return `log(1 + x)' */
 __LOCAL_LIBC(log1pl) __ATTR_WUNUSED __LONGDOUBLE
 __NOTHROW(__LIBCCALL __LIBC_LOCAL_NAME(log1pl))(__LONGDOUBLE __x) {
 	return (__LONGDOUBLE)__localdep_log1p((double)__x);

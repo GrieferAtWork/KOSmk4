@@ -27,7 +27,7 @@ for (local format: "diouxX") {
 }
 
 @@Optimize a printf() format string, and return its c-string
-@@variant (possibly using the macros from <inttypes.h>)
+@@variant (possibly  using  the  macros  from  <inttypes.h>)
 function optimizePrintf(format: string): string {
 	File.Writer fp;
 	local inString = false;

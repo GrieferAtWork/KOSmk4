@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x6f7ab0ea */
+/* HASH CRC-32:0xc5f47b60 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -26,47 +26,25 @@
 #include <bits/os/iovec.h>
 #include <bits/types.h>
 __NAMESPACE_LOCAL_BEGIN
-/* Dependency: preadv32 from sys.uio */
 #if !defined(__local___localdep_preadv32_defined) && defined(__CRT_HAVE_preadv)
 #define __local___localdep_preadv32_defined 1
-/* >> preadv(2)
- * Same as `readv(2)', but read data from a file at a
- * specific `offset', rather than the current R/W position
- * @return: <= SUM(iov[*].iov_len): The actual amount of read bytes */
 __CREDIRECT(__ATTR_NONNULL((2)),__SSIZE_TYPE__,__NOTHROW_RPC,__localdep_preadv32,(__fd_t __fd, struct iovec const *__iov, __STDC_INT_AS_SIZE_T __count, __off32_t __offset),preadv,(__fd,__iov,__count,__offset))
 #endif /* !__local___localdep_preadv32_defined && __CRT_HAVE_preadv */
-/* Dependency: preadv64 from sys.uio */
 #ifndef __local___localdep_preadv64_defined
 #define __local___localdep_preadv64_defined 1
 #ifdef __CRT_HAVE_preadv64
-/* >> preadv(2)
- * Same as `readv(2)', but read data from a file at a
- * specific `offset', rather than the current R/W position
- * @return: <= SUM(iov[*].iov_len): The actual amount of read bytes */
 __CREDIRECT(__ATTR_WUNUSED __ATTR_NONNULL((2)),__SSIZE_TYPE__,__NOTHROW_RPC,__localdep_preadv64,(__fd_t __fd, struct iovec const *__iov, __STDC_INT_AS_SIZE_T __count, __off64_t __offset),preadv64,(__fd,__iov,__count,__offset))
 #elif defined(__CRT_HAVE_preadv) && __SIZEOF_OFF32_T__ == __SIZEOF_OFF64_T__
-/* >> preadv(2)
- * Same as `readv(2)', but read data from a file at a
- * specific `offset', rather than the current R/W position
- * @return: <= SUM(iov[*].iov_len): The actual amount of read bytes */
 __CREDIRECT(__ATTR_WUNUSED __ATTR_NONNULL((2)),__SSIZE_TYPE__,__NOTHROW_RPC,__localdep_preadv64,(__fd_t __fd, struct iovec const *__iov, __STDC_INT_AS_SIZE_T __count, __off64_t __offset),preadv,(__fd,__iov,__count,__offset))
 #elif defined(__CRT_HAVE_preadv)
 __NAMESPACE_LOCAL_END
 #include <libc/local/sys.uio/preadv64.h>
 __NAMESPACE_LOCAL_BEGIN
-/* >> preadv(2)
- * Same as `readv(2)', but read data from a file at a
- * specific `offset', rather than the current R/W position
- * @return: <= SUM(iov[*].iov_len): The actual amount of read bytes */
 #define __localdep_preadv64 __LIBC_LOCAL_NAME(preadv64)
 #else /* ... */
 #undef __local___localdep_preadv64_defined
 #endif /* !... */
 #endif /* !__local___localdep_preadv64_defined */
-/* >> preadv(2)
- * Same as `readv(2)', but read data from a file at a
- * specific `offset', rather than the current R/W position
- * @return: <= SUM(iov[*].iov_len): The actual amount of read bytes */
 __LOCAL_LIBC(preadv) __ATTR_WUNUSED __ATTR_NONNULL((2)) __SSIZE_TYPE__
 __NOTHROW_RPC(__LIBCCALL __LIBC_LOCAL_NAME(preadv))(__fd_t __fd, struct iovec const *__iov, __STDC_INT_AS_SIZE_T __count, __FS_TYPE(off) __offset) {
 

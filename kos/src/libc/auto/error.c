@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xfdb8821b */
+/* HASH CRC-32:0xe87b0a8 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -66,7 +66,7 @@ __LIBC unsigned int error_message_count;
 #endif /* ... */
 #endif /* !__LOCAL_error_message_count */
 #include <libc/local/program_invocation_name.h>
-/* Helper function for printing an error message to `stderr' and possibly exiting the program
+/* Helper  function  for printing  an error  message to  `stderr' and  possibly exiting  the program
  * The message is printed as: `<program_invocation_short_name>: <format...>[: <strerror(errnum)>]\n'
  * Also note that `stdout' is flushed before the message is printed.
  * If `STATUS' is non-zero, follow up with a call to `exit(status)' */
@@ -129,7 +129,7 @@ __LIBC unsigned int error_message_count;
 #endif /* ... */
 #endif /* !__LOCAL_error_message_count */
 #include <libc/local/program_invocation_name.h>
-/* Helper function for printing an error message to `stderr' and possibly exiting the program
+/* Helper  function  for printing  an error  message to  `stderr' and  possibly exiting  the program
  * The message is printed as: `<program_invocation_short_name>: <format...>[: <strerror(errnum)>]\n'
  * Also note that `stdout' is flushed before the message is printed.
  * If `STATUS' is non-zero, follow up with a call to `exit(status)' */
@@ -207,7 +207,7 @@ __LIBC unsigned int error_message_count;
 #endif /* !__LOCAL_error_message_count */
 /* Same as `error()', but also include the given filename in the error message.
  * The message is printed as: `<program_invocation_short_name>:<filename>:<line>: <format...>[: <strerror(errnum)>]\n'
- * Additionally, when `error_one_per_line' is non-zero, consecutive calls to this function that
+ * Additionally,    when   `error_one_per_line'   is    non-zero,   consecutive   calls    to   this   function   that
  * pass the same values for `filename' and `line' will not produce the error message. */
 INTERN ATTR_SECTION(".text.crt.dos.error") ATTR_LIBC_PRINTF(5, 6) void
 (VLIBDCALL libd_error_at_line)(int status,
@@ -303,7 +303,7 @@ __LIBC unsigned int error_message_count;
 #endif /* !__LOCAL_error_message_count */
 /* Same as `error()', but also include the given filename in the error message.
  * The message is printed as: `<program_invocation_short_name>:<filename>:<line>: <format...>[: <strerror(errnum)>]\n'
- * Additionally, when `error_one_per_line' is non-zero, consecutive calls to this function that
+ * Additionally,    when   `error_one_per_line'   is    non-zero,   consecutive   calls    to   this   function   that
  * pass the same values for `filename' and `line' will not produce the error message. */
 INTERN ATTR_SECTION(".text.crt.error") ATTR_LIBC_PRINTF(5, 6) void
 (VLIBCCALL libc_error_at_line)(int status,

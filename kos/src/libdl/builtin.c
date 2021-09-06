@@ -1189,7 +1189,7 @@ again:
 }
 
 /* Search for a mapping of the given file range and
- * return the module-relative offset to it. If no
+ * return  the module-relative offset  to it. If no
  * such mapping exists, return (uintptr_t)-1 */
 PRIVATE ATTR_PURE WUNUSED NONNULL((1)) uintptr_t
 NOTHROW(CC find_file_mapping)(DlModule const *__restrict self,

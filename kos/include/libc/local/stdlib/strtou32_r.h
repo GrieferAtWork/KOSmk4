@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x71c92556 */
+/* HASH CRC-32:0x219fb9f2 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -24,7 +24,6 @@
 #include <features.h>
 #include <bits/types.h>
 __NAMESPACE_LOCAL_BEGIN
-/* Dependency: isspace from ctype */
 #ifndef __local___localdep_isspace_defined
 #define __local___localdep_isspace_defined 1
 #if __has_builtin(__builtin_isspace) && defined(__LIBC_BIND_CRTBUILTINS) && defined(__CRT_HAVE_isspace)
@@ -42,22 +41,6 @@ __NAMESPACE_LOCAL_END
 #include <asm/os/errno.h>
 #include <hybrid/__overflow.h>
 __NAMESPACE_LOCAL_BEGIN
-/* >> strto32_r(3), strtou32_r(3), strto64_r(3), strtou64_r(3)
- * Safely parse & return an integer from `nptr', and store any potential
- * errors in `*error' (if non-NULL). The following errors are defined:
- *  - 0:         Success
- *  - ECANCELED: Nothing was parsed.
- *               In this case, `*endptr' is set to the original `nptr'
- *               (iow: leading spaces are _not_ skipped in `*endptr'),
- *               and the returned integer is `0'
- *  - ERANGE:    Integer over- or under-flow while parsing.
- *               In this case, `*endptr' is still updated correctly, and
- *               the returned integer is the closest representable value
- *               to the integer given in `nptr' (i.e. `U?INTn_(MIN|MAX)')
- *               This error supercedes `EINVAL' if both conditions apply.
- *  - EINVAL:    Only when `endptr == NULL': The parsed number is followed
- *               by at least 1 additional non-whitespace character.
- *               The returned integer value is not affected by this error. */
 __LOCAL_LIBC(strtou32_r) __ATTR_LEAF __ATTR_NONNULL((1)) __UINT32_TYPE__
 __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(strtou32_r))(char const *__restrict __nptr, char **__endptr, __STDC_INT_AS_UINT_T __base, __errno_t *__error) {
 	__UINT32_TYPE__ __result;

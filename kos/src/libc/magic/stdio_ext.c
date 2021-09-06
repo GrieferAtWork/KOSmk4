@@ -113,18 +113,18 @@ enum {
 
 @@>> __fbufsize(3)
 @@Return the size of the buffer of `stream' in
-@@bytes currently in use by the given stream
+@@bytes  currently in use  by the given stream
 [[wunused, ATTR_PURE]]
 $size_t __fbufsize([[nonnull]] $FILE *stream);
 
 @@>> __freading(3)
-@@Return non-zero value when `stream' is opened readonly,
+@@Return  non-zero value when  `stream' is opened readonly,
 @@or if the last operation on `stream' was a read operation
 [[wunused, ATTR_PURE]]
 int __freading([[nonnull]] $FILE *stream);
 
 @@>> __fwriting(3)
-@@Return non-zero value when `stream' is opened write-only or
+@@Return non-zero value when  `stream' is opened write-only  or
 @@append-only, or if the last operation on `stream' was a write
 @@operation
 [[wunused, ATTR_PURE]]

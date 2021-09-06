@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xc298c732 */
+/* HASH CRC-32:0xd5034830 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -35,7 +35,7 @@ __SYSDECL_BEGIN
 #include <bits/types.h>
 /* >> raise(3)
  * Raise a signal within the current thread.
- * In a *-theaded process this is same as:
+ * In  a *-theaded process  this is same as:
  *   *=multi:  `pthread_kill(pthread_self(), signo)'
  *   *=single: `kill(getpid(), signo)'
  * @return: 0:  Success
@@ -45,7 +45,7 @@ __CREDIRECT(,int,__NOTHROW_NCX,__libc_core_raise,(__signo_t __signo),raise,(__si
 #include <libc/local/signal/raise.h>
 /* >> raise(3)
  * Raise a signal within the current thread.
- * In a *-theaded process this is same as:
+ * In  a *-theaded process  this is same as:
  *   *=multi:  `pthread_kill(pthread_self(), signo)'
  *   *=single: `kill(getpid(), signo)'
  * @return: 0:  Success
@@ -75,14 +75,14 @@ __CREDIRECT(__ATTR_NONNULL((1)),int,__NOTHROW_NCX,__libc_core_sigfillset,(struct
 #ifdef __CRT_HAVE_sigprocmask
 #include <features.h>
 struct __sigset_struct;
-/* Change the signal mask for the calling thread. Note that portable
+/* Change  the signal mask for the calling thread. Note that portable
  * programs that also make use of multithreading must instead use the
- * pthread-specific `pthread_sigmask()' function instead, as POSIX
- * states that this function behaves undefined in such scenarios.
- * However, on KOS, `pthread_sigmask()' is simply an alias for this
- * function, and `sigprocmask()' always operates thread-local.
- * Note also that on KOS 2 additional functions `getsigmaskptr()'
- * and `setsigmaskptr()' exist, which can be used to get/set the
+ * pthread-specific  `pthread_sigmask()'  function instead,  as POSIX
+ * states that  this function  behaves undefined  in such  scenarios.
+ * However, on KOS, `pthread_sigmask()' is  simply an alias for  this
+ * function,  and  `sigprocmask()'   always  operates   thread-local.
+ * Note also  that on  KOS 2  additional functions  `getsigmaskptr()'
+ * and `setsigmaskptr()'  exist, which  can be  used to  get/set  the
  * address of the signal mask used by the kernel.
  * @param how: One of `SIG_BLOCK', `SIG_UNBLOCK' or `SIG_SETMASK'
  * @return: 0:  Success
@@ -91,14 +91,14 @@ __CREDIRECT(,int,__NOTHROW_NCX,__libc_core_sigprocmask,(__STDC_INT_AS_UINT_T __h
 #elif defined(__CRT_HAVE_pthread_sigmask)
 #include <features.h>
 struct __sigset_struct;
-/* Change the signal mask for the calling thread. Note that portable
+/* Change  the signal mask for the calling thread. Note that portable
  * programs that also make use of multithreading must instead use the
- * pthread-specific `pthread_sigmask()' function instead, as POSIX
- * states that this function behaves undefined in such scenarios.
- * However, on KOS, `pthread_sigmask()' is simply an alias for this
- * function, and `sigprocmask()' always operates thread-local.
- * Note also that on KOS 2 additional functions `getsigmaskptr()'
- * and `setsigmaskptr()' exist, which can be used to get/set the
+ * pthread-specific  `pthread_sigmask()'  function instead,  as POSIX
+ * states that  this function  behaves undefined  in such  scenarios.
+ * However, on KOS, `pthread_sigmask()' is  simply an alias for  this
+ * function,  and  `sigprocmask()'   always  operates   thread-local.
+ * Note also  that on  KOS 2  additional functions  `getsigmaskptr()'
+ * and `setsigmaskptr()'  exist, which  can be  used to  get/set  the
  * address of the signal mask used by the kernel.
  * @param how: One of `SIG_BLOCK', `SIG_UNBLOCK' or `SIG_SETMASK'
  * @return: 0:  Success
@@ -112,7 +112,7 @@ __CREDIRECT(,int,__NOTHROW_NCX,__libc_core_sigprocmask,(__STDC_INT_AS_UINT_T __h
 #define ____libc_core_getsigmaskptr_defined 1
 #include <bits/os/sigset.h>
 /* >> getsigmaskptr(3)
- * Return the current signal mask pointer.
+ * Return   the   current  signal   mask  pointer.
  * See the documentation of `setsigmaskptr(3)' for
  * what this function is all about.
  * @return: * : A pointer to the calling thread's current signal mask */
@@ -122,11 +122,11 @@ __CREDIRECT(__ATTR_RETNONNULL __ATTR_WUNUSED,struct __sigset_struct *,__NOTHROW_
 #define ____libc_core_setsigmaskptr_defined 1
 #include <bits/os/sigset.h>
 /* >> setsigmaskptr(3)
- * Set the current signal mask pointer to `sigmaskptr'
- * This is a kos-specific function that can be used to
- * speed up/replace calls to `sigprocmask()'. But using
+ * Set  the  current  signal  mask  pointer  to `sigmaskptr'
+ * This  is  a kos-specific  function  that can  be  used to
+ * speed up/replace  calls  to  `sigprocmask()'.  But  using
  * this function safely requires knowledge of its underlying
- * semantics. If you're unsure on those, you should instead
+ * semantics. If you're unsure on those, you should  instead
  * just use the portable `sigprocmask()' and forget you ever
  * read this comment :)
  * Example usage:
@@ -150,11 +150,11 @@ __CREDIRECT(__ATTR_RETNONNULL __ATTR_NONNULL((1)),struct __sigset_struct *,__NOT
 #ifdef __CRT_HAVE_setsigmaskfullptr
 #include <bits/os/sigset.h>
 /* >> setsigmaskfullptr(3)
- * Same as `setsigmaskptr()', but set a statically allocated, fully
- * filled signal mask as the calling thread's current signal mask.
- * This essentially means that this function can be used to temporarily
- * disable the reception of all signals within the calling thread, thus
- * allowing the thread to run without being interrupted (by another but
+ * Same as  `setsigmaskptr()',  but  set a  statically  allocated,  fully
+ * filled signal  mask  as  the calling  thread's  current  signal  mask.
+ * This essentially means that this  function can be used to  temporarily
+ * disable the reception of all  signals within the calling thread,  thus
+ * allowing the thread to run  without being interrupted (by another  but
  * SIGKILL and SIGSTOP, which can't be masked), until the returned signal
  * mask is restored.
  * >> sigset_t *os;
@@ -165,11 +165,11 @@ __CREDIRECT(__ATTR_RETNONNULL,struct __sigset_struct *,__NOTHROW_NCX,__libc_core
 #elif defined(__CRT_HAVE_setsigmaskptr)
 #include <libc/local/signal/setsigmaskfullptr.h>
 /* >> setsigmaskfullptr(3)
- * Same as `setsigmaskptr()', but set a statically allocated, fully
- * filled signal mask as the calling thread's current signal mask.
- * This essentially means that this function can be used to temporarily
- * disable the reception of all signals within the calling thread, thus
- * allowing the thread to run without being interrupted (by another but
+ * Same as  `setsigmaskptr()',  but  set a  statically  allocated,  fully
+ * filled signal  mask  as  the calling  thread's  current  signal  mask.
+ * This essentially means that this  function can be used to  temporarily
+ * disable the reception of all  signals within the calling thread,  thus
+ * allowing the thread to run  without being interrupted (by another  but
  * SIGKILL and SIGSTOP, which can't be masked), until the returned signal
  * mask is restored.
  * >> sigset_t *os;

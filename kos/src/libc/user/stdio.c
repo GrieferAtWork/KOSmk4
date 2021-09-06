@@ -2281,9 +2281,9 @@ INTERN ATTR_SECTION(".text.crt.FILE.locked.seek.seek") NONNULL((1)) int
 /*[[[end:libc_fseeko64]]]*/
 
 
-/*[[[head:libc_fgetpos,hash:CRC-32=0x8bc8e736]]]*/
+/*[[[head:libc_fgetpos,hash:CRC-32=0xa2b2dacb]]]*/
 /* >> fgetpos(3), fgetpos64(3)
- * Initialize an opaque descriptor `pos' for the current in-file position of `stream'
+ * Initialize   an   opaque  descriptor   `pos'   for  the   current   in-file  position   of  `stream'
  * Upon success (return == 0), `pos' can be used to restore the current position by calling `fsetpos()' */
 INTERN ATTR_SECTION(".text.crt.FILE.locked.seek.pos") NONNULL((1, 2)) int
 (LIBCCALL libc_fgetpos)(FILE *__restrict stream,
@@ -2311,12 +2311,12 @@ INTERN ATTR_SECTION(".text.crt.FILE.locked.seek.pos") NONNULL((1, 2)) int
 }
 /*[[[end:libc_fsetpos]]]*/
 
-/*[[[head:libc_fgetpos64,hash:CRC-32=0x43beaf6f]]]*/
+/*[[[head:libc_fgetpos64,hash:CRC-32=0x19dbc7c9]]]*/
 #if __SIZEOF_FPOS32_T__ == __SIZEOF_FPOS64_T__
 DEFINE_INTERN_ALIAS(libc_fgetpos64, libc_fgetpos);
 #else /* MAGIC:alias */
 /* >> fgetpos(3), fgetpos64(3)
- * Initialize an opaque descriptor `pos' for the current in-file position of `stream'
+ * Initialize   an   opaque  descriptor   `pos'   for  the   current   in-file  position   of  `stream'
  * Upon success (return == 0), `pos' can be used to restore the current position by calling `fsetpos()' */
 INTERN ATTR_SECTION(".text.crt.FILE.locked.seek.pos") NONNULL((1, 2)) int
 (LIBCCALL libc_fgetpos64)(FILE *__restrict stream,
@@ -2705,16 +2705,16 @@ NOTHROW_NCX(LIBCCALL libc_fgetln)(FILE *__restrict fp,
 }
 /*[[[end:libc_fgetln]]]*/
 
-/*[[[head:libc_fmtcheck,hash:CRC-32=0xf6a96542]]]*/
+/*[[[head:libc_fmtcheck,hash:CRC-32=0xef198050]]]*/
 /* >> fmtcheck(3)
  * Check if `user_format' may be used as a drop-in replacement for `good_format'
  * in the context of a call to `printf(3)' (or `format_printf()'), such that all
- * contained format qualifiers reference the same (or compatible) underlying C
+ * contained format qualifiers reference the  same (or compatible) underlying  C
  * types, and in the same order.
- * If all of this is the case, simply re-return `user_format'. Otherwise (i.e.
+ * If all of this is the  case, simply re-return `user_format'. Otherwise  (i.e.
  * when `user_format' isn't compatible with `good_format'), return `good_format'
- * instead. This function is meant to be used to validate user-provided printf
- * format strings before actually using them, after they've been read from lang
+ * instead. This function is meant to  be used to validate user-provided  printf
+ * format strings before actually using them, after they've been read from  lang
  * config files: `printf(fmtcheck(get_user_fmt(), "%s %s"), "Foo", "Bar");' */
 INTERN ATTR_SECTION(".text.crt.FILE.unlocked.read.scanf") ATTR_RETNONNULL WUNUSED NONNULL((2)) __ATTR_FORMAT_ARG(2) char const *
 NOTHROW_NCX(LIBCCALL libc_fmtcheck)(char const *user_format,
@@ -3015,10 +3015,10 @@ NOTHROW_RPC(LIBCCALL libc_fopen)(char const *__restrict filename,
 }
 /*[[[end:libc_fopen]]]*/
 
-/*[[[head:libc_fdopen,hash:CRC-32=0xa368f2ec]]]*/
+/*[[[head:libc_fdopen,hash:CRC-32=0xd9878f49]]]*/
 /* >> fdopen(3)
  * Open a new file stream by inheriting a given file descriptor `fd'
- * Note that upon success (`return != NULL'), the given `fd'
+ * Note   that  upon  success  (`return != NULL'),  the  given  `fd'
  * will be `close()'d once `fclose(return)' is called */
 INTERN ATTR_SECTION(".text.crt.FILE.locked.utility") WUNUSED NONNULL((2)) FILE *
 NOTHROW_NCX(LIBCCALL libc_fdopen)(fd_t fd,
@@ -3092,10 +3092,10 @@ NOTHROW_NCX(LIBCCALL libc_fileno)(FILE *__restrict stream)
 
 
 
-/*[[[head:libc_fgetc,hash:CRC-32=0x4b1b3faa]]]*/
+/*[[[head:libc_fgetc,hash:CRC-32=0xafb31771]]]*/
 /* >> fgetc(3)
  * Read and return a single character from `stream'
- * If the given `stream' has been exhausted or if an error occurred, `EOF' is
+ * If  the given `stream' has been exhausted or if an error occurred, `EOF' is
  * returned and the exact cause can be determined by using `ferror' and `feof' */
 INTERN ATTR_SECTION(".text.crt.FILE.locked.read.getc") NONNULL((1)) int
 (LIBCCALL libc_fgetc)(FILE *__restrict stream) THROWS(...)
@@ -3152,10 +3152,10 @@ NOTHROW_RPC(LIBCCALL libc_popen)(char const *command,
 }
 /*[[[end:libc_popen]]]*/
 
-/*[[[head:libc_popenve,hash:CRC-32=0x48cd2d34]]]*/
+/*[[[head:libc_popenve,hash:CRC-32=0x71bba238]]]*/
 /* >> popenve(3)
  * Similar to `popen(3)', but rather than running `execl("/bin/sh", "-c", command)',
- * this function will `execve(path, argv, envp)'. The returned FILE must still be
+ * this function will  `execve(path, argv, envp)'. The returned  FILE must still  be
  * closed using `pclose(3)', rather than `fclose(3)' */
 INTERN ATTR_SECTION(".text.crt.FILE.locked.access") WUNUSED NONNULL((1, 2, 3, 4)) FILE *
 NOTHROW_RPC(LIBCCALL libc_popenve)(char const *path,
@@ -3504,9 +3504,9 @@ NOTHROW_NCX(LIBCCALL libc_tempnam)(char const *dir,
 
 
 
-/*[[[head:libc_rename,hash:CRC-32=0xd946aa28]]]*/
+/*[[[head:libc_rename,hash:CRC-32=0x877dd557]]]*/
 /* >> rename(3)
- * Rename a given file `oldname' to `newname_or_path', or in the event
+ * Rename  a given file `oldname' to `newname_or_path', or in the event
  * that `newname_or_path' refers to a directory, place the file within. */
 INTERN ATTR_SECTION(".text.crt.fs.modify") NONNULL((1, 2)) int
 NOTHROW_RPC(LIBCCALL libc_rename)(char const *oldname,

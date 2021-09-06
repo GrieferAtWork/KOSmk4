@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x5b50c1c */
+/* HASH CRC-32:0xa200ba51 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -23,7 +23,6 @@
 #include <__crt.h>
 #include <hybrid/typecore.h>
 __NAMESPACE_LOCAL_BEGIN
-/* Dependency: memrev from string */
 #ifndef __local___localdep_memrev_defined
 #define __local___localdep_memrev_defined 1
 #ifdef __CRT_HAVE_memrev
@@ -35,7 +34,6 @@ __NAMESPACE_LOCAL_BEGIN
 #define __localdep_memrev __LIBC_LOCAL_NAME(memrev)
 #endif /* !__CRT_HAVE_memrev */
 #endif /* !__local___localdep_memrev_defined */
-/* Dependency: memrevl from string */
 #ifndef __local___localdep_memrevl_defined
 #define __local___localdep_memrevl_defined 1
 #ifdef __CRT_HAVE_memrevl
@@ -47,7 +45,6 @@ __NAMESPACE_LOCAL_BEGIN
 #define __localdep_memrevl __LIBC_LOCAL_NAME(memrevl)
 #endif /* !__CRT_HAVE_memrevl */
 #endif /* !__local___localdep_memrevl_defined */
-/* Dependency: memrevw from string */
 #ifndef __local___localdep_memrevw_defined
 #define __local___localdep_memrevw_defined 1
 #ifdef __CRT_HAVE_memrevw
@@ -59,19 +56,14 @@ __NAMESPACE_LOCAL_BEGIN
 #define __localdep_memrevw __LIBC_LOCAL_NAME(memrevw)
 #endif /* !__CRT_HAVE_memrevw */
 #endif /* !__local___localdep_memrevw_defined */
-/* Dependency: wcsnlen from wchar */
 #ifndef __local___localdep_wcsnlen_defined
 #define __local___localdep_wcsnlen_defined 1
 #ifdef __CRT_HAVE_wcsnlen
-/* >> strnlen(3)
- * Same as `strlen', but don't exceed `max_chars' characters (Same as `memlen[...](str, '\0', max_chars)´) */
 __CREDIRECT(__ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1)),__SIZE_TYPE__,__NOTHROW_NCX,__localdep_wcsnlen,(__WCHAR_TYPE__ const *__restrict __str, __SIZE_TYPE__ __maxlen),wcsnlen,(__str,__maxlen))
 #else /* __CRT_HAVE_wcsnlen */
 __NAMESPACE_LOCAL_END
 #include <libc/local/wchar/wcsnlen.h>
 __NAMESPACE_LOCAL_BEGIN
-/* >> strnlen(3)
- * Same as `strlen', but don't exceed `max_chars' characters (Same as `memlen[...](str, '\0', max_chars)´) */
 #define __localdep_wcsnlen __LIBC_LOCAL_NAME(wcsnlen)
 #endif /* !__CRT_HAVE_wcsnlen */
 #endif /* !__local___localdep_wcsnlen_defined */

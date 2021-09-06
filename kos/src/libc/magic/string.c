@@ -743,9 +743,9 @@ miss:
 
 @@>> strncpy(3)
 @@Always write exactly `buflen' characters to `buf'. As far as
-@@space for doing so is available, up to the `strlen(src)' of
-@@the first characters are copied from `src'. All remaining
-@@characters are always set to '\0'. Always re-returns `buf'
+@@space  for doing so is available, up to the `strlen(src)' of
+@@the first characters  are copied from  `src'. All  remaining
+@@characters are always set  to '\0'. Always re-returns  `buf'
 [[std, crtbuiltin, ATTR_LEAF]]
 [[decl_include("<hybrid/typecore.h>")]]
 [[crt_kos_impl_requires(!defined(LIBC_ARCH_HAVE_STRNCPY))]]
@@ -758,7 +758,7 @@ miss:
 }
 
 @@>> strcat(3)
-@@Same as `strcpy(3)', but rather than copying `src' ontop of `dst',
+@@Same as `strcpy(3)',  but rather  than copying `src'  ontop of  `dst',
 @@append it at the end of `dst', or more precisely copy to `strend(dst)'
 @@Always re-returns `dst'
 [[std, crtbuiltin, ATTR_LEAF]]
@@ -771,7 +771,7 @@ miss:
 
 @@>> strncat(3)
 @@Copy at most max_srclen (or rather: exactly `strnlen(src, max_srclen)')
-@@characters to `strend(buf)', and always re-return `buf'.
+@@characters   to    `strend(buf)',   and    always   re-return    `buf'.
 [[std, crtbuiltin, ATTR_LEAF]]
 [[decl_include("<hybrid/typecore.h>")]]
 [[crt_kos_impl_requires(!defined(LIBC_ARCH_HAVE_STRNCAT))]]
@@ -786,8 +786,8 @@ miss:
 }
 
 @@>> strcspn(3)
-@@Return the offset from `haystack' to the first
-@@character for which `strchr(reject, ch) != NULL'.
+@@Return   the  offset  from  `haystack'  to  the  first
+@@character   for   which  `strchr(reject, ch) != NULL'.
 @@If no such character exists, return `strlen(haystack)'
 [[std, wunused, crtbuiltin, pure]]
 [[impl_include("<hybrid/typecore.h>")]]
@@ -801,8 +801,8 @@ size_t strcspn([[nonnull]] char const *haystack,
 }
 
 @@>> strspn(3)
-@@Return the offset from `haystack' to the first
-@@character for which `strchr(reject, ch) == NULL'.
+@@Return   the  offset  from  `haystack'  to  the  first
+@@character   for   which  `strchr(reject, ch) == NULL'.
 @@If no such character exists, return `strlen(haystack)'
 [[std, wunused, crtbuiltin, pure]]
 [[decl_include("<hybrid/typecore.h>")]]
@@ -1190,9 +1190,9 @@ void *memrchr([[nonnull]] void const *__restrict haystack, int needle, $size_t n
 @@Alternate `basename(3)' function that doesn't modify its `filename' argument
 @@For a version that is allowed to modify its argument, but is also allowed to
 @@strip trailing slashes, include <libgen.h> instead, which will override this
-@@GNU-specific basename() function (you can explicitly make use of this GNU
-@@version by doing `#undef basename', or writing `(basename)(filename)', as
-@@opposed to `basename(filename)', when both version have been defined)
+@@GNU-specific  basename() function (you  can explicitly make  use of this GNU
+@@version by doing  `#undef basename', or  writing `(basename)(filename)',  as
+@@opposed to  `basename(filename)',  when  both  version  have  been  defined)
 @@>> basename("/usr/include///"); // Returns ""
 @@>> basename("/usr/include/");   // Returns ""
 @@>> basename("/usr/include");    // Returns "include"
@@ -2262,7 +2262,7 @@ char const *strerrorname_np($errno_t errnum) {
 
 @@>> sigabbrev_np(3)
 @@Return the name of a given signal, without the leading `SIG*' prefix.
-@@If the given `signum' isn't recognized, return `NULL' instead.
+@@If the  given  `signum'  isn't  recognized,  return  `NULL'  instead.
 [[decl_include("<bits/types.h>"), export_alias("signalname")]]
 [[wunused, nothrow, const, section(".text.crt{|.dos}.errno")]]
 [[userimpl, crt_dos_variant, impl_include("<asm/os/signal.h>"), impl_prefix(
@@ -3962,7 +3962,7 @@ $size_t memlenb([[nonnull]] /*aligned(1)*/ void const *__restrict haystack,
                 int needle, $size_t n_bytes) = memlen;
 
 @@Same as `memendw', but return the offset from `haystack', rather than the actual address.
-@@Returns `haystack + N_DWORDS * 2' if the given `needle' wasn't found
+@@Returns    `haystack + N_DWORDS * 2'    if    the    given    `needle'    wasn't    found
 [[kernel, wunused, pure, decl_include("<hybrid/typecore.h>")]]
 [[crt_kos_impl_requires(!defined(LIBC_ARCH_HAVE_MEMLENW))]]
 $size_t memlenw([[nonnull]] /*aligned(2)*/ void const *__restrict haystack,
@@ -3971,7 +3971,7 @@ $size_t memlenw([[nonnull]] /*aligned(2)*/ void const *__restrict haystack,
 }
 
 @@Same as `memendl', but return the offset from `haystack', rather than the actual address.
-@@Returns `haystack + N_DWORDS * 4' if the given `needle' wasn't found
+@@Returns    `haystack + N_DWORDS * 4'    if    the    given    `needle'    wasn't    found
 [[kernel, wunused, pure, decl_include("<hybrid/typecore.h>")]]
 [[crt_kos_impl_requires(!defined(LIBC_ARCH_HAVE_MEMLENL))]]
 $size_t memlenl([[nonnull]] /*aligned(4)*/ void const *__restrict haystack,
@@ -5187,7 +5187,7 @@ memmoveupc:([[nonnull]] void *dst,
 	return memmoveup(dst, src, elem_count * elem_size);
 }
 
-@@Same as `memmoveupc', but return `dst + (ELEM_COUNT * ELEM_SIZE)',
+@@Same   as   `memmoveupc',  but   return  `dst + (ELEM_COUNT * ELEM_SIZE)',
 @@rather than `dst' (assumes that `dst >= src || !ELEM_COUNT || !ELEM_SIZE')
 [[preferred_fastbind, libc, ATTR_LEAF]]
 [[impl_include("<hybrid/host.h>"), decl_include("<hybrid/typecore.h>")]]
@@ -5471,8 +5471,8 @@ mempset:([[nonnull]] void *__restrict dst, int byte, $size_t n_bytes) -> [[== ds
 //	[([[nonnull]] void *__restrict data, void const *__restrict baseline, $size_t n_bytes) -> void *]
 //	[([[nonnull]] void const *__restrict data, void const *__restrict baseline, $size_t n_bytes) -> void const *]
 //{
-//	byte_t *diter = (byte_t *)data;
-//	byte_t *biter = (byte_t *)baseline;
+//	byte_t  *diter   =  (byte_t   *)data;
+//	byte_t *biter  = (byte_t  *)baseline;
 //	for (; n_bytes--; ++diter, ++biter) {
 //		if unlikely(*diter != *biter)
 //			return diter;
@@ -5484,7 +5484,7 @@ mempset:([[nonnull]] void *__restrict dst, int byte, $size_t n_bytes) -> [[== ds
 //	[([[nonnull]] void *__restrict data, void const *__restrict baseline, $size_t n_bytes) -> void *]
 //	[([[nonnull]] void const *__restrict data, void const *__restrict baseline, $size_t n_bytes) -> void const *]
 //{
-//	byte_t *diter = (byte_t *)data + n_bytes;
+//	byte_t  *diter  = (byte_t  *)data  + n_bytes;
 //	byte_t *biter = (byte_t *)baseline + n_bytes;
 //	while (n_bytes--) {
 //		if unlikely(*--diter != *--biter)
@@ -5811,7 +5811,7 @@ int memcasecmp_l([[nonnull]] void const *s1,
 
 
 @@Return the address of a sub-string `needle...+=needlelen' stored within `haystack...+=haystacklen'
-@@During comparisons, casing of character is ignored using the given `locale' (s.a. `memmem()')
+@@During comparisons, casing  of character  is ignored using  the given  `locale' (s.a.  `memmem()')
 @@If no such sub-string exists, return `NULL' instead.
 @@#ifdef _MEMMEM_EMPTY_NEEDLE_NULL_SOURCE
 @@When `needlelen' is ZERO(0), also return `NULL' unconditionally.
@@ -6723,7 +6723,7 @@ memrevq:([[nonnull]] void *__restrict base, $size_t n_qwords) -> [[== base]] $ui
 
 @@>> strcmpz(3)
 @@Similar to `strcmp(3)', but the given `rhs' string mustn't necessarily be NUL-terminated.
-@@Instead, that string's length is fixed at `rhs_len', and the compare is equivalent to:
+@@Instead, that string's length is  fixed at `rhs_len', and  the compare is equivalent  to:
 @@> char *dup = (char *)malloc((rhs_len + 1) * sizeof(char));
 @@> *(char *)mempcpy(dup, rhs, rhs_len, sizeof(char)) = '\0';
 @@> return strcmp(lhs, dup);
@@ -6747,7 +6747,7 @@ int strcmpz([[nonnull]] char const *lhs,
 
 @@>> strstartcmp(3)
 @@Compare the first `strnlen(str, strlen(startswith_str))' characters of
-@@`str' with `startswith_str', returning the usual >0, <0, ==0.
+@@`str'  with  `startswith_str',  returning  the  usual  >0,  <0,   ==0.
 [[kernel, wunused, pure]]
 int strstartcmp([[nonnull]] char const *str,
                 [[nonnull]] char const *startswith) {
@@ -6775,7 +6775,7 @@ int strstartcmp([[nonnull]] char const *str,
 
 @@>> strstartcmpz(3)
 @@Compare the first `strnlen(str, startswith_len)' characters of
-@@`str' with `startswith', returning the usual >0, <0, ==0.
+@@`str' with  `startswith', returning  the  usual >0,  <0,  ==0.
 [[kernel, wunused, pure]]
 int strstartcmpz([[nonnull]] char const *str,
                  [[nonnull]] char const *startswith,
@@ -7520,7 +7520,7 @@ __SYSDECL_BEGIN
 
 @@>> strnstr(3)
 @@Search for `needle...+=strlen(needle)' within `haystack...+=strnlen(haystack, haystack_maxlen)'
-@@If found, return a pointer to its location within `str', else return `NULL'
+@@If   found,   return  a   pointer   to  its   location   within  `str',   else   return  `NULL'
 @@This function originates from BSD, but is also provided as a KOS extension
 [[wunused, pure, guard, decl_include("<hybrid/typecore.h>")]]
 char *strnstr([[nonnull]] char const *haystack, [[nonnull]] char const *needle, $size_t haystack_maxlen)
@@ -7554,7 +7554,7 @@ miss:
 %#ifdef __USE_BSD
 %(auto_source)#include <sys/stat.h>
 
-@@Generate a file mode representation similar to what's printed by `ls -l'
+@@Generate  a file mode representation similar to what's printed by `ls -l'
 @@The representation is written to `p', and `mode' is the value as returned
 @@by `stat(2)' in `struct stat::st_mode'
 @@The format written is:
@@ -7565,12 +7565,12 @@ miss:
 @@   p[2]  = mode & S_IWUSR ? 'w' : '-';
 @@   p[3]  = <mode & S_IXUSR | S_ISUID>: { 0: '-', S_IXUSR: 'x', S_ISUID: 'S',
 @@                                         S_IXUSR | S_ISUID: 's' };
-@@   p[4]  = mode & S_IRGRP ? 'r' : '-';
-@@   p[5]  = mode & S_IWGRP ? 'w' : '-';
+@@   p[4] = mode & S_IRGRP ? 'r' : '-';
+@@   p[5] = mode & S_IWGRP ? 'w' : '-';
 @@   p[6]  = <mode & S_IXGRP | S_ISGID>: { 0: '-', S_IXGRP: 'x', S_ISGID: 'S',
 @@                                         S_IXGRP | S_ISGID: 's' };
-@@   p[7]  = mode & S_IROTH ? 'r' : '-';
-@@   p[8]  = mode & S_IWOTH ? 'w' : '-';
+@@   p[7] = mode & S_IROTH ? 'r' : '-';
+@@   p[8] = mode & S_IWOTH ? 'w' : '-';
 @@   p[9]  = <mode & S_IXOTH | S_ISVTX>: { 0: '-', S_IXOTH: 'x', S_ISVTX: 'T',
 @@                                         S_IXOTH | S_ISVTX: 't' };
 @@   p[10] = ' '; // '+', if "alternate or additional access control
@@ -7781,7 +7781,7 @@ int timingsafe_memcmp([[nonnull]] void const *s1,
 %#ifdef __USE_CYGWIN
 @@>> strtosigno(3)
 @@Return the signal number for a given name.
-@@e.g. `strtosigno("SIGINT") == SIGINT'
+@@e.g.      `strtosigno("SIGINT") == SIGINT'
 @@When `name' isn't recognized, return `0' instead.
 [[wunused, pure, impl_include("<asm/os/signal.h>")]]
 $signo_t strtosigno([[nonnull]] const char *name) {
@@ -7815,10 +7815,10 @@ $signo_t strtosigno([[nonnull]] const char *name) {
 
 @@>> stresep(3)
 @@Same as `strsep(3)', but allow the specification of an additional `escape'
-@@character that will cause the following character from `*stringp' to be
-@@escaped, and not be considered as a separator, even if it is included
+@@character  that will cause  the following character  from `*stringp' to be
+@@escaped, and not  be considered  as a separator,  even if  it is  included
 @@within `delim'. Note that `escape'-characters (if present) are not removed
-@@from the input string, meaning that they will still appear in returned
+@@from  the input  string, meaning that  they will still  appear in returned
 @@strings, should they have been present in the original input string.
 [[ATTR_LEAF]]
 char *stresep([[nonnull]] char **__restrict stringp,
@@ -7891,12 +7891,15 @@ __SYSDECL_END
 
 // [[requires_include("<hybrid/typecore.h>")]] /* defined(__UINT64_TYPE__) */
 // [[requires(defined(__UINT64_TYPE__))]]
+
 // [[impl_include("<hybrid/typecore.h>")]] /* __SIZEOF_BUSINT__ */
+
 // [[impl_include("<optimized/string.h>")]]
+
 // memcpyq(dst, src, n_qwords) >>>> {
 // 	if __untraced(__builtin_constant_p(dst == src) && (dst == src))
 // 		return (u64 *)dst;
-// 	__ASSERT_MEMCPY_CT(dst, src, n_qwords * 8);
+// 	__ASSERT_MEMCPY_CT(dst,  src,  n_qwords  *  8);
 // 	if __untraced(__builtin_constant_p(n_qwords)) {
 // 		/* Optimizations for small data blocks (those possible with <= 2 assignments). */
 // 		switch __untraced(n_qwords) {

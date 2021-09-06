@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xb19fd338 */
+/* HASH CRC-32:0xdef6b4ed */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -23,7 +23,6 @@
 #include <__crt.h>
 #include <hybrid/typecore.h>
 __NAMESPACE_LOCAL_BEGIN
-/* Same as `memendq', but search for non-matching locations. */
 __LOCAL_LIBC(memxendq) __ATTR_PURE __ATTR_RETNONNULL __ATTR_WUNUSED __ATTR_NONNULL((1)) __UINT64_TYPE__ *
 __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(memxendq))(void const *__restrict __haystack, __UINT64_TYPE__ __needle, __SIZE_TYPE__ __n_bytes) {
 	__UINT64_TYPE__ *__result = (__UINT64_TYPE__ *)__haystack;

@@ -1000,8 +1000,8 @@
 #define _SAL_L_Source_(Name, args, annotes)
 
 
-//#define __GENSYM(x)  __MKID(x,__COUNTER__)
-//#define __MKID(x,y)  ___MKID(x,y)
+//#define __GENSYM(x) __MKID(x,__COUNTER__)
+//#define     __MKID(x,y)      ___MKID(x,y)
 //#define ___MKID(x,y) x##y
 
 #define _Check_return_ __ATTR_WUNUSED

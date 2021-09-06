@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x417dd3ff */
+/* HASH CRC-32:0xa58ea333 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -23,7 +23,6 @@
 #include <__crt.h>
 #include <hybrid/typecore.h>
 __NAMESPACE_LOCAL_BEGIN
-/* Dependency: fuzzy_memcmp from string */
 #ifndef __local___localdep_fuzzy_memcmp_defined
 #define __local___localdep_fuzzy_memcmp_defined 1
 #ifdef __CRT_HAVE_fuzzy_memcmp
@@ -42,7 +41,6 @@ __NAMESPACE_LOCAL_BEGIN
 #endif /* __NO_MALLOCA */
 #endif /* !__CRT_HAVE_fuzzy_memcmp */
 #endif /* !__local___localdep_fuzzy_memcmp_defined */
-/* Dependency: fuzzy_memcmpl from string */
 #ifndef __local___localdep_fuzzy_memcmpl_defined
 #define __local___localdep_fuzzy_memcmpl_defined 1
 #ifdef __CRT_HAVE_fuzzy_memcmpl
@@ -65,7 +63,6 @@ __NAMESPACE_LOCAL_BEGIN
 #endif /* __NO_MALLOCA */
 #endif /* !... */
 #endif /* !__local___localdep_fuzzy_memcmpl_defined */
-/* Dependency: fuzzy_memcmpw from string */
 #ifndef __local___localdep_fuzzy_memcmpw_defined
 #define __local___localdep_fuzzy_memcmpw_defined 1
 #ifdef __CRT_HAVE_fuzzy_memcmpw

@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xe79ba52 */
+/* HASH CRC-32:0x3345f4ea */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -24,9 +24,6 @@
 #include <bits/types.h>
 #include <asm/os/signal.h>
 __NAMESPACE_LOCAL_BEGIN
-/* >> sigdescr_np(3)
- * Return a description for the given signal.
- * If the given `signum' isn't recognized, return `NULL' instead. */
 __LOCAL_LIBC(sigdescr_np) __ATTR_CONST __ATTR_WUNUSED char const *
 __NOTHROW(__LIBCCALL __LIBC_LOCAL_NAME(sigdescr_np))(__signo_t __signum) {
 	char const *__result;

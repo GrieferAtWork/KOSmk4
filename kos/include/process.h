@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xcb87cdb5 */
+/* HASH CRC-32:0x729fa811 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -211,17 +211,17 @@ __CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,__pid_t,__NOTHROW,_getpid,(void),__getpi
 #endif /* ... */
 #if __has_builtin(__builtin_execv) && defined(__LIBC_BIND_CRTBUILTINS) && defined(__CRT_HAVE_execv)
 /* >> execv(3)
- * Replace the calling process with the application image referred to by `path' / `file'
+ * Replace the calling  process with  the application  image referred  to by  `path' /  `file'
  * and execute it's `main()' method, passing the given `argv', and setting `environ' to `envp' */
 __CEIREDIRECT(__ATTR_NONNULL((1, 2)),int,__NOTHROW_NCX,_execv,(char const *__restrict __path, char const *const *___argv),execv,{ return __builtin_execv(__path, (char *const *)___argv); })
 #elif defined(__CRT_HAVE_execv)
 /* >> execv(3)
- * Replace the calling process with the application image referred to by `path' / `file'
+ * Replace the calling  process with  the application  image referred  to by  `path' /  `file'
  * and execute it's `main()' method, passing the given `argv', and setting `environ' to `envp' */
 __CREDIRECT(__ATTR_NONNULL((1, 2)),int,__NOTHROW_NCX,_execv,(char const *__restrict __path, char const *const *___argv),execv,(__path,___argv))
 #elif defined(__CRT_HAVE__execv)
 /* >> execv(3)
- * Replace the calling process with the application image referred to by `path' / `file'
+ * Replace the calling  process with  the application  image referred  to by  `path' /  `file'
  * and execute it's `main()' method, passing the given `argv', and setting `environ' to `envp' */
 __CDECLARE(__ATTR_NONNULL((1, 2)),int,__NOTHROW_NCX,_execv,(char const *__restrict __path, char const *const *___argv),(__path,___argv))
 #else /* ... */
@@ -229,24 +229,24 @@ __CDECLARE(__ATTR_NONNULL((1, 2)),int,__NOTHROW_NCX,_execv,(char const *__restri
 #if (defined(__CRT_HAVE_execve) || defined(__CRT_HAVE__execve)) && defined(__LOCAL_environ)
 #include <libc/local/unistd/execv.h>
 /* >> execv(3)
- * Replace the calling process with the application image referred to by `path' / `file'
+ * Replace the calling  process with  the application  image referred  to by  `path' /  `file'
  * and execute it's `main()' method, passing the given `argv', and setting `environ' to `envp' */
 __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_NONNULL((1, 2)) int __NOTHROW_NCX(__LIBCCALL _execv)(char const *__restrict __path, char const *const *___argv) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(execv))(__path, (__TARGV)___argv); }
 #endif /* (__CRT_HAVE_execve || __CRT_HAVE__execve) && __LOCAL_environ */
 #endif /* !... */
 #if __has_builtin(__builtin_execvp) && defined(__LIBC_BIND_CRTBUILTINS) && defined(__CRT_HAVE_execvp)
 /* >> execvp(3)
- * Replace the calling process with the application image referred to by `path' / `file'
+ * Replace the calling  process with  the application  image referred  to by  `path' /  `file'
  * and execute it's `main()' method, passing the given `argv', and setting `environ' to `envp' */
 __CEIREDIRECT(__ATTR_NONNULL((1, 2)),int,__NOTHROW_NCX,_execvp,(char const *__restrict __file, char const *const *___argv),execvp,{ return __builtin_execvp(__file, (char *const *)___argv); })
 #elif defined(__CRT_HAVE_execvp)
 /* >> execvp(3)
- * Replace the calling process with the application image referred to by `path' / `file'
+ * Replace the calling  process with  the application  image referred  to by  `path' /  `file'
  * and execute it's `main()' method, passing the given `argv', and setting `environ' to `envp' */
 __CREDIRECT(__ATTR_NONNULL((1, 2)),int,__NOTHROW_NCX,_execvp,(char const *__restrict __file, char const *const *___argv),execvp,(__file,___argv))
 #elif defined(__CRT_HAVE__execvp)
 /* >> execvp(3)
- * Replace the calling process with the application image referred to by `path' / `file'
+ * Replace the calling  process with  the application  image referred  to by  `path' /  `file'
  * and execute it's `main()' method, passing the given `argv', and setting `environ' to `envp' */
 __CDECLARE(__ATTR_NONNULL((1, 2)),int,__NOTHROW_NCX,_execvp,(char const *__restrict __file, char const *const *___argv),(__file,___argv))
 #else /* ... */
@@ -255,35 +255,35 @@ __CDECLARE(__ATTR_NONNULL((1, 2)),int,__NOTHROW_NCX,_execvp,(char const *__restr
 #if (defined(__CRT_HAVE_execvpe) || defined(__CRT_HAVE__execvpe) || ((defined(__CRT_HAVE_execve) || defined(__CRT_HAVE__execve)) && defined(__hybrid_alloca))) && defined(__LOCAL_environ)
 #include <libc/local/unistd/execvp.h>
 /* >> execvp(3)
- * Replace the calling process with the application image referred to by `path' / `file'
+ * Replace the calling  process with  the application  image referred  to by  `path' /  `file'
  * and execute it's `main()' method, passing the given `argv', and setting `environ' to `envp' */
 __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_NONNULL((1, 2)) int __NOTHROW_NCX(__LIBCCALL _execvp)(char const *__restrict __file, char const *const *___argv) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(execvp))(__file, (__TARGV)___argv); }
 #endif /* (__CRT_HAVE_execvpe || __CRT_HAVE__execvpe || ((__CRT_HAVE_execve || __CRT_HAVE__execve) && __hybrid_alloca)) && __LOCAL_environ */
 #endif /* !... */
 #if __has_builtin(__builtin_execve) && defined(__LIBC_BIND_CRTBUILTINS) && defined(__CRT_HAVE_execve)
 /* >> execve(2)
- * Replace the calling process with the application image referred to by `path' / `file'
+ * Replace the calling  process with  the application  image referred  to by  `path' /  `file'
  * and execute it's `main()' method, passing the given `argv', and setting `environ' to `envp' */
 __CEIREDIRECT(__ATTR_NONNULL((1, 2, 3)),int,__NOTHROW_NCX,_execve,(char const *__restrict __path, char const *const *___argv, char const *const *___envp),execve,{ return __builtin_execve(__path, (char *const *)___argv, (char *const *)___envp); })
 #elif defined(__CRT_HAVE_execve)
 /* >> execve(2)
- * Replace the calling process with the application image referred to by `path' / `file'
+ * Replace the calling  process with  the application  image referred  to by  `path' /  `file'
  * and execute it's `main()' method, passing the given `argv', and setting `environ' to `envp' */
 __CREDIRECT(__ATTR_NONNULL((1, 2, 3)),int,__NOTHROW_NCX,_execve,(char const *__restrict __path, char const *const *___argv, char const *const *___envp),execve,(__path,___argv,___envp))
 #elif defined(__CRT_HAVE__execve)
 /* >> execve(2)
- * Replace the calling process with the application image referred to by `path' / `file'
+ * Replace the calling  process with  the application  image referred  to by  `path' /  `file'
  * and execute it's `main()' method, passing the given `argv', and setting `environ' to `envp' */
 __CDECLARE(__ATTR_NONNULL((1, 2, 3)),int,__NOTHROW_NCX,_execve,(char const *__restrict __path, char const *const *___argv, char const *const *___envp),(__path,___argv,___envp))
 #endif /* ... */
 #ifdef __CRT_HAVE_execvpe
 /* >> execvpe(3)
- * Replace the calling process with the application image referred to by `file' and
+ * Replace the  calling process  with the  application  image referred  to by  `file'  and
  * execute it's `main()' method, passing the given `argv', and setting `environ' to `envp' */
 __CREDIRECT(__ATTR_NONNULL((1, 2, 3)),int,__NOTHROW_NCX,_execvpe,(char const *__restrict __file, char const *const *___argv, char const *const *___envp),execvpe,(__file,___argv,___envp))
 #elif defined(__CRT_HAVE__execvpe)
 /* >> execvpe(3)
- * Replace the calling process with the application image referred to by `file' and
+ * Replace the  calling process  with the  application  image referred  to by  `file'  and
  * execute it's `main()' method, passing the given `argv', and setting `environ' to `envp' */
 __CDECLARE(__ATTR_NONNULL((1, 2, 3)),int,__NOTHROW_NCX,_execvpe,(char const *__restrict __file, char const *const *___argv, char const *const *___envp),(__file,___argv,___envp))
 #else /* ... */
@@ -292,7 +292,7 @@ __CDECLARE(__ATTR_NONNULL((1, 2, 3)),int,__NOTHROW_NCX,_execvpe,(char const *__r
 #if (defined(__CRT_HAVE_getenv) || defined(__LOCAL_environ)) && (defined(__CRT_HAVE_execve) || defined(__CRT_HAVE__execve)) && defined(__hybrid_alloca)
 #include <libc/local/unistd/execvpe.h>
 /* >> execvpe(3)
- * Replace the calling process with the application image referred to by `file' and
+ * Replace the  calling process  with the  application  image referred  to by  `file'  and
  * execute it's `main()' method, passing the given `argv', and setting `environ' to `envp' */
 __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_NONNULL((1, 2, 3)) int __NOTHROW_NCX(__LIBCCALL _execvpe)(char const *__restrict __file, char const *const *___argv, char const *const *___envp) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(execvpe))(__file, (__TARGV)___argv, (__TENVP)___envp); }
 #endif /* (__CRT_HAVE_getenv || __LOCAL_environ) && (__CRT_HAVE_execve || __CRT_HAVE__execve) && __hybrid_alloca */
@@ -300,17 +300,17 @@ __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_NONNULL((1, 2, 3)) int __NOTHROW_NCX(__LIB
 #if __has_builtin(__builtin_execl) && defined(__LIBC_BIND_CRTBUILTINS) && defined(__CRT_HAVE_execl) && __has_builtin(__builtin_va_arg_pack)
 /* >> execl(3)
  * Replace the calling process with the application image referred to by `path' / `file'
- * and execute it's `main()' method, passing the list of NULL-terminated `args'-list */
+ * and execute it's  `main()' method,  passing the list  of NULL-terminated  `args'-list */
 __CEIREDIRECT(__ATTR_SENTINEL __ATTR_NONNULL((1)),int,__NOTHROW_RPC,_execl,(char const *__restrict __path, char const *__args, ...),execl,{ return __builtin_execl(__path, __args, __builtin_va_arg_pack()); })
 #elif defined(__CRT_HAVE_execl)
 /* >> execl(3)
  * Replace the calling process with the application image referred to by `path' / `file'
- * and execute it's `main()' method, passing the list of NULL-terminated `args'-list */
+ * and execute it's  `main()' method,  passing the list  of NULL-terminated  `args'-list */
 __LIBC __ATTR_SENTINEL __ATTR_NONNULL((1)) int __NOTHROW_RPC(__VLIBCCALL _execl)(char const *__restrict __path, char const *__args, ...) __CASMNAME("execl");
 #elif defined(__CRT_HAVE__execl)
 /* >> execl(3)
  * Replace the calling process with the application image referred to by `path' / `file'
- * and execute it's `main()' method, passing the list of NULL-terminated `args'-list */
+ * and execute it's  `main()' method,  passing the list  of NULL-terminated  `args'-list */
 __LIBC __ATTR_SENTINEL __ATTR_NONNULL((1)) int __NOTHROW_RPC(__VLIBCCALL _execl)(char const *__restrict __path, char const *__args, ...) __CASMNAME_SAME("_execl");
 #else /* ... */
 #include <libc/local/environ.h>
@@ -318,24 +318,24 @@ __LIBC __ATTR_SENTINEL __ATTR_NONNULL((1)) int __NOTHROW_RPC(__VLIBCCALL _execl)
 #include <libc/local/unistd/execl.h>
 /* >> execl(3)
  * Replace the calling process with the application image referred to by `path' / `file'
- * and execute it's `main()' method, passing the list of NULL-terminated `args'-list */
+ * and execute it's  `main()' method,  passing the list  of NULL-terminated  `args'-list */
 #define _execl (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(execl))
 #endif /* __CRT_HAVE_execv || __CRT_HAVE__execv || ((__CRT_HAVE_execve || __CRT_HAVE__execve) && __LOCAL_environ) */
 #endif /* !... */
 #if __has_builtin(__builtin_execlp) && defined(__LIBC_BIND_CRTBUILTINS) && defined(__CRT_HAVE_execlp) && __has_builtin(__builtin_va_arg_pack)
 /* >> execlp(3)
  * Replace the calling process with the application image referred to by `path' / `file'
- * and execute it's `main()' method, passing the list of NULL-terminated `args'-list */
+ * and execute it's  `main()' method,  passing the list  of NULL-terminated  `args'-list */
 __CEIREDIRECT(__ATTR_SENTINEL __ATTR_NONNULL((1)),int,__NOTHROW_RPC,_execlp,(char const *__restrict __file, char const *__args, ...),execlp,{ return __builtin_execlp(__file, __args, __builtin_va_arg_pack()); })
 #elif defined(__CRT_HAVE_execlp)
 /* >> execlp(3)
  * Replace the calling process with the application image referred to by `path' / `file'
- * and execute it's `main()' method, passing the list of NULL-terminated `args'-list */
+ * and execute it's  `main()' method,  passing the list  of NULL-terminated  `args'-list */
 __LIBC __ATTR_SENTINEL __ATTR_NONNULL((1)) int __NOTHROW_RPC(__VLIBCCALL _execlp)(char const *__restrict __file, char const *__args, ...) __CASMNAME("execlp");
 #elif defined(__CRT_HAVE__execlp)
 /* >> execlp(3)
  * Replace the calling process with the application image referred to by `path' / `file'
- * and execute it's `main()' method, passing the list of NULL-terminated `args'-list */
+ * and execute it's  `main()' method,  passing the list  of NULL-terminated  `args'-list */
 __LIBC __ATTR_SENTINEL __ATTR_NONNULL((1)) int __NOTHROW_RPC(__VLIBCCALL _execlp)(char const *__restrict __file, char const *__args, ...) __CASMNAME_SAME("_execlp");
 #else /* ... */
 #include <libc/local/environ.h>
@@ -344,46 +344,46 @@ __LIBC __ATTR_SENTINEL __ATTR_NONNULL((1)) int __NOTHROW_RPC(__VLIBCCALL _execlp
 #include <libc/local/unistd/execlp.h>
 /* >> execlp(3)
  * Replace the calling process with the application image referred to by `path' / `file'
- * and execute it's `main()' method, passing the list of NULL-terminated `args'-list */
+ * and execute it's  `main()' method,  passing the list  of NULL-terminated  `args'-list */
 #define _execlp (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(execlp))
 #endif /* __CRT_HAVE_execvp || __CRT_HAVE__execvp || ((__CRT_HAVE_execvpe || __CRT_HAVE__execvpe || ((__CRT_HAVE_execve || __CRT_HAVE__execve) && __hybrid_alloca)) && __LOCAL_environ) */
 #endif /* !... */
 #if __has_builtin(__builtin_execle) && defined(__LIBC_BIND_CRTBUILTINS) && defined(__CRT_HAVE_execle) && __has_builtin(__builtin_va_arg_pack)
 /* >> execle(3)
  * Replace the calling process with the application image referred to by `path' / `file'
- * and execute it's `main()' method, passing the list of NULL-terminated `args'-list,
+ * and  execute it's `main()'  method, passing the  list of NULL-terminated `args'-list,
  * and setting `environ' to a `char **' passed after the NULL sentinel */
 __CEIREDIRECT(__ATTR_SENTINEL_O(1) __ATTR_NONNULL((1)),int,__NOTHROW_RPC,_execle,(char const *__restrict __path, char const *__args, ...),execle,{ return __builtin_execle(__path, __args, __builtin_va_arg_pack()); })
 #elif defined(__CRT_HAVE_execle)
 /* >> execle(3)
  * Replace the calling process with the application image referred to by `path' / `file'
- * and execute it's `main()' method, passing the list of NULL-terminated `args'-list,
+ * and  execute it's `main()'  method, passing the  list of NULL-terminated `args'-list,
  * and setting `environ' to a `char **' passed after the NULL sentinel */
 __LIBC __ATTR_SENTINEL_O(1) __ATTR_NONNULL((1)) int __NOTHROW_RPC(__VLIBCCALL _execle)(char const *__restrict __path, char const *__args, ...) __CASMNAME("execle");
 #elif defined(__CRT_HAVE__execle)
 /* >> execle(3)
  * Replace the calling process with the application image referred to by `path' / `file'
- * and execute it's `main()' method, passing the list of NULL-terminated `args'-list,
+ * and  execute it's `main()'  method, passing the  list of NULL-terminated `args'-list,
  * and setting `environ' to a `char **' passed after the NULL sentinel */
 __LIBC __ATTR_SENTINEL_O(1) __ATTR_NONNULL((1)) int __NOTHROW_RPC(__VLIBCCALL _execle)(char const *__restrict __path, char const *__args, ...) __CASMNAME_SAME("_execle");
 #elif defined(__CRT_HAVE_execve) || defined(__CRT_HAVE__execve)
 #include <libc/local/unistd/execle.h>
 /* >> execle(3)
  * Replace the calling process with the application image referred to by `path' / `file'
- * and execute it's `main()' method, passing the list of NULL-terminated `args'-list,
+ * and  execute it's `main()'  method, passing the  list of NULL-terminated `args'-list,
  * and setting `environ' to a `char **' passed after the NULL sentinel */
 #define _execle (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(execle))
 #endif /* ... */
 #ifdef __CRT_HAVE_execlpe
 /* >> execlpe(3)
  * Replace the calling process with the application image referred to by `path' / `file'
- * and execute it's `main()' method, passing the list of NULL-terminated `args'-list,
+ * and  execute it's `main()'  method, passing the  list of NULL-terminated `args'-list,
  * and setting `environ' to a `char **' passed after the NULL sentinel */
 __LIBC __ATTR_SENTINEL_O(1) __ATTR_NONNULL((1)) int __NOTHROW_RPC(__VLIBCCALL _execlpe)(char const *__restrict __file, char const *__args, ...) __CASMNAME("execlpe");
 #elif defined(__CRT_HAVE__execlpe)
 /* >> execlpe(3)
  * Replace the calling process with the application image referred to by `path' / `file'
- * and execute it's `main()' method, passing the list of NULL-terminated `args'-list,
+ * and  execute it's `main()'  method, passing the  list of NULL-terminated `args'-list,
  * and setting `environ' to a `char **' passed after the NULL sentinel */
 __LIBC __ATTR_SENTINEL_O(1) __ATTR_NONNULL((1)) int __NOTHROW_RPC(__VLIBCCALL _execlpe)(char const *__restrict __file, char const *__args, ...) __CASMNAME_SAME("_execlpe");
 #else /* ... */
@@ -393,7 +393,7 @@ __LIBC __ATTR_SENTINEL_O(1) __ATTR_NONNULL((1)) int __NOTHROW_RPC(__VLIBCCALL _e
 #include <libc/local/unistd/execlpe.h>
 /* >> execlpe(3)
  * Replace the calling process with the application image referred to by `path' / `file'
- * and execute it's `main()' method, passing the list of NULL-terminated `args'-list,
+ * and  execute it's `main()'  method, passing the  list of NULL-terminated `args'-list,
  * and setting `environ' to a `char **' passed after the NULL sentinel */
 #define _execlpe (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(execlpe))
 #endif /* __CRT_HAVE_execvpe || __CRT_HAVE__execvpe || ((__CRT_HAVE_getenv || __LOCAL_environ) && (__CRT_HAVE_execve || __CRT_HAVE__execve) && __hybrid_alloca) */
@@ -525,16 +525,16 @@ __LIBC __ATTR_SENTINEL_O(1) __ATTR_NONNULL((2)) intptr_t __NOTHROW_NCX(__VLIBCCA
 #ifdef __std_system_defined
 /* >> system(3)
  * Execute a given `command' on the system interpreter (as in `sh -c $command')
- * The return value is the exit status after running `command'
+ * The   return   value   is   the   exit   status   after   running  `command'
  * When `command' is `NULL' only check if a system interpreter is available.
- * When no system interpreter is available, `127' is returned. */
+ * When  no   system   interpreter   is  available,   `127'   is   returned. */
 __NAMESPACE_STD_USING(system)
 #elif defined(__CRT_HAVE_system)
 /* >> system(3)
  * Execute a given `command' on the system interpreter (as in `sh -c $command')
- * The return value is the exit status after running `command'
+ * The   return   value   is   the   exit   status   after   running  `command'
  * When `command' is `NULL' only check if a system interpreter is available.
- * When no system interpreter is available, `127' is returned. */
+ * When  no   system   interpreter   is  available,   `127'   is   returned. */
 __CDECLARE(,int,__NOTHROW_RPC,system,(char const *__command),(__command))
 #else /* ... */
 #include <libc/local/environ.h>
@@ -542,9 +542,9 @@ __CDECLARE(,int,__NOTHROW_RPC,system,(char const *__command),(__command))
 #include <libc/local/stdlib/system.h>
 /* >> system(3)
  * Execute a given `command' on the system interpreter (as in `sh -c $command')
- * The return value is the exit status after running `command'
+ * The   return   value   is   the   exit   status   after   running  `command'
  * When `command' is `NULL' only check if a system interpreter is available.
- * When no system interpreter is available, `127' is returned. */
+ * When  no   system   interpreter   is  available,   `127'   is   returned. */
 __NAMESPACE_LOCAL_USING_OR_IMPL(system, __FORCELOCAL __ATTR_ARTIFICIAL int __NOTHROW_RPC(__LIBCCALL system)(char const *__command) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(system))(__command); })
 #else /* (__CRT_HAVE_shexec || __CRT_HAVE_execl || __CRT_HAVE__execl || __CRT_HAVE_execv || __CRT_HAVE__execv || ((__CRT_HAVE_execve || __CRT_HAVE__execve) && __LOCAL_environ)) && (__CRT_HAVE__Exit || __CRT_HAVE__exit || __CRT_HAVE_quick_exit || __CRT_HAVE_exit) && (__CRT_HAVE_waitpid || __CRT_HAVE___waitpid) && (__CRT_HAVE_vfork || __CRT_HAVE___vfork || __CRT_HAVE_fork || __CRT_HAVE___fork) */
 #undef __system_defined
@@ -754,17 +754,17 @@ __CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,__pid_t,__NOTHROW,getpid,(void),__getpid
 #define __execv_defined 1
 #if __has_builtin(__builtin_execv) && defined(__LIBC_BIND_CRTBUILTINS) && defined(__CRT_HAVE_execv)
 /* >> execv(3)
- * Replace the calling process with the application image referred to by `path' / `file'
+ * Replace the calling  process with  the application  image referred  to by  `path' /  `file'
  * and execute it's `main()' method, passing the given `argv', and setting `environ' to `envp' */
 __CEIDECLARE_GCCNCX(__ATTR_NONNULL((1, 2)),int,__NOTHROW_RPC,execv,(char const *__restrict __path, __TARGV),{ return __builtin_execv(__path, (char *const *)___argv); })
 #elif defined(__CRT_HAVE_execv)
 /* >> execv(3)
- * Replace the calling process with the application image referred to by `path' / `file'
+ * Replace the calling  process with  the application  image referred  to by  `path' /  `file'
  * and execute it's `main()' method, passing the given `argv', and setting `environ' to `envp' */
 __CDECLARE_GCCNCX(__ATTR_NONNULL((1, 2)),int,__NOTHROW_RPC,execv,(char const *__restrict __path, __TARGV),(__path,___argv))
 #elif defined(__CRT_HAVE__execv)
 /* >> execv(3)
- * Replace the calling process with the application image referred to by `path' / `file'
+ * Replace the calling  process with  the application  image referred  to by  `path' /  `file'
  * and execute it's `main()' method, passing the given `argv', and setting `environ' to `envp' */
 __CREDIRECT_GCCNCX(__ATTR_NONNULL((1, 2)),int,__NOTHROW_RPC,execv,(char const *__restrict __path, __TARGV),_execv,(__path,___argv))
 #else /* ... */
@@ -772,7 +772,7 @@ __CREDIRECT_GCCNCX(__ATTR_NONNULL((1, 2)),int,__NOTHROW_RPC,execv,(char const *_
 #if (defined(__CRT_HAVE_execve) || defined(__CRT_HAVE__execve)) && defined(__LOCAL_environ)
 #include <libc/local/unistd/execv.h>
 /* >> execv(3)
- * Replace the calling process with the application image referred to by `path' / `file'
+ * Replace the calling  process with  the application  image referred  to by  `path' /  `file'
  * and execute it's `main()' method, passing the given `argv', and setting `environ' to `envp' */
 __NAMESPACE_LOCAL_USING_OR_IMPL(execv, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_NONNULL((1, 2)) int __NOTHROW_RPC(__LIBCCALL execv)(char const *__restrict __path, __TARGV) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(execv))(__path, ___argv); })
 #else /* (__CRT_HAVE_execve || __CRT_HAVE__execve) && __LOCAL_environ */
@@ -784,17 +784,17 @@ __NAMESPACE_LOCAL_USING_OR_IMPL(execv, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_NON
 #define __execvp_defined 1
 #if __has_builtin(__builtin_execvp) && defined(__LIBC_BIND_CRTBUILTINS) && defined(__CRT_HAVE_execvp)
 /* >> execvp(3)
- * Replace the calling process with the application image referred to by `path' / `file'
+ * Replace the calling  process with  the application  image referred  to by  `path' /  `file'
  * and execute it's `main()' method, passing the given `argv', and setting `environ' to `envp' */
 __CEIDECLARE_GCCNCX(__ATTR_NONNULL((1, 2)),int,__NOTHROW_RPC,execvp,(char const *__restrict __file, __TARGV),{ return __builtin_execvp(__file, (char *const *)___argv); })
 #elif defined(__CRT_HAVE_execvp)
 /* >> execvp(3)
- * Replace the calling process with the application image referred to by `path' / `file'
+ * Replace the calling  process with  the application  image referred  to by  `path' /  `file'
  * and execute it's `main()' method, passing the given `argv', and setting `environ' to `envp' */
 __CDECLARE_GCCNCX(__ATTR_NONNULL((1, 2)),int,__NOTHROW_RPC,execvp,(char const *__restrict __file, __TARGV),(__file,___argv))
 #elif defined(__CRT_HAVE__execvp)
 /* >> execvp(3)
- * Replace the calling process with the application image referred to by `path' / `file'
+ * Replace the calling  process with  the application  image referred  to by  `path' /  `file'
  * and execute it's `main()' method, passing the given `argv', and setting `environ' to `envp' */
 __CREDIRECT_GCCNCX(__ATTR_NONNULL((1, 2)),int,__NOTHROW_RPC,execvp,(char const *__restrict __file, __TARGV),_execvp,(__file,___argv))
 #else /* ... */
@@ -803,7 +803,7 @@ __CREDIRECT_GCCNCX(__ATTR_NONNULL((1, 2)),int,__NOTHROW_RPC,execvp,(char const *
 #if (defined(__CRT_HAVE_execvpe) || defined(__CRT_HAVE__execvpe) || ((defined(__CRT_HAVE_execve) || defined(__CRT_HAVE__execve)) && defined(__hybrid_alloca))) && defined(__LOCAL_environ)
 #include <libc/local/unistd/execvp.h>
 /* >> execvp(3)
- * Replace the calling process with the application image referred to by `path' / `file'
+ * Replace the calling  process with  the application  image referred  to by  `path' /  `file'
  * and execute it's `main()' method, passing the given `argv', and setting `environ' to `envp' */
 __NAMESPACE_LOCAL_USING_OR_IMPL(execvp, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_NONNULL((1, 2)) int __NOTHROW_RPC(__LIBCCALL execvp)(char const *__restrict __file, __TARGV) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(execvp))(__file, ___argv); })
 #else /* (__CRT_HAVE_execvpe || __CRT_HAVE__execvpe || ((__CRT_HAVE_execve || __CRT_HAVE__execve) && __hybrid_alloca)) && __LOCAL_environ */
@@ -815,17 +815,17 @@ __NAMESPACE_LOCAL_USING_OR_IMPL(execvp, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_NO
 #define __execve_defined 1
 #if __has_builtin(__builtin_execve) && defined(__LIBC_BIND_CRTBUILTINS) && defined(__CRT_HAVE_execve)
 /* >> execve(2)
- * Replace the calling process with the application image referred to by `path' / `file'
+ * Replace the calling  process with  the application  image referred  to by  `path' /  `file'
  * and execute it's `main()' method, passing the given `argv', and setting `environ' to `envp' */
 __CEIDECLARE_GCCNCX(__ATTR_NONNULL((1, 2, 3)),int,__NOTHROW_RPC,execve,(char const *__restrict __path, __TARGV, __TENVP),{ return __builtin_execve(__path, (char *const *)___argv, (char *const *)___envp); })
 #elif defined(__CRT_HAVE_execve)
 /* >> execve(2)
- * Replace the calling process with the application image referred to by `path' / `file'
+ * Replace the calling  process with  the application  image referred  to by  `path' /  `file'
  * and execute it's `main()' method, passing the given `argv', and setting `environ' to `envp' */
 __CDECLARE_GCCNCX(__ATTR_NONNULL((1, 2, 3)),int,__NOTHROW_RPC,execve,(char const *__restrict __path, __TARGV, __TENVP),(__path,___argv,___envp))
 #elif defined(__CRT_HAVE__execve)
 /* >> execve(2)
- * Replace the calling process with the application image referred to by `path' / `file'
+ * Replace the calling  process with  the application  image referred  to by  `path' /  `file'
  * and execute it's `main()' method, passing the given `argv', and setting `environ' to `envp' */
 __CREDIRECT_GCCNCX(__ATTR_NONNULL((1, 2, 3)),int,__NOTHROW_RPC,execve,(char const *__restrict __path, __TARGV, __TENVP),_execve,(__path,___argv,___envp))
 #else /* ... */
@@ -836,12 +836,12 @@ __CREDIRECT_GCCNCX(__ATTR_NONNULL((1, 2, 3)),int,__NOTHROW_RPC,execve,(char cons
 #define __execvpe_defined 1
 #ifdef __CRT_HAVE_execvpe
 /* >> execvpe(3)
- * Replace the calling process with the application image referred to by `file' and
+ * Replace the  calling process  with the  application  image referred  to by  `file'  and
  * execute it's `main()' method, passing the given `argv', and setting `environ' to `envp' */
 __CDECLARE(__ATTR_NONNULL((1, 2, 3)),int,__NOTHROW_RPC,execvpe,(char const *__restrict __file, __TARGV, __TENVP),(__file,___argv,___envp))
 #elif defined(__CRT_HAVE__execvpe)
 /* >> execvpe(3)
- * Replace the calling process with the application image referred to by `file' and
+ * Replace the  calling process  with the  application  image referred  to by  `file'  and
  * execute it's `main()' method, passing the given `argv', and setting `environ' to `envp' */
 __CREDIRECT(__ATTR_NONNULL((1, 2, 3)),int,__NOTHROW_RPC,execvpe,(char const *__restrict __file, __TARGV, __TENVP),_execvpe,(__file,___argv,___envp))
 #else /* ... */
@@ -850,7 +850,7 @@ __CREDIRECT(__ATTR_NONNULL((1, 2, 3)),int,__NOTHROW_RPC,execvpe,(char const *__r
 #if (defined(__CRT_HAVE_getenv) || defined(__LOCAL_environ)) && (defined(__CRT_HAVE_execve) || defined(__CRT_HAVE__execve)) && defined(__hybrid_alloca)
 #include <libc/local/unistd/execvpe.h>
 /* >> execvpe(3)
- * Replace the calling process with the application image referred to by `file' and
+ * Replace the  calling process  with the  application  image referred  to by  `file'  and
  * execute it's `main()' method, passing the given `argv', and setting `environ' to `envp' */
 __NAMESPACE_LOCAL_USING_OR_IMPL(execvpe, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_NONNULL((1, 2, 3)) int __NOTHROW_RPC(__LIBCCALL execvpe)(char const *__restrict __file, __TARGV, __TENVP) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(execvpe))(__file, ___argv, ___envp); })
 #else /* (__CRT_HAVE_getenv || __LOCAL_environ) && (__CRT_HAVE_execve || __CRT_HAVE__execve) && __hybrid_alloca */
@@ -863,12 +863,12 @@ __NAMESPACE_LOCAL_USING_OR_IMPL(execvpe, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_N
 #if __has_builtin(__builtin_execl) && defined(__LIBC_BIND_CRTBUILTINS) && defined(__CRT_HAVE_execl) && __has_builtin(__builtin_va_arg_pack)
 /* >> execl(3)
  * Replace the calling process with the application image referred to by `path' / `file'
- * and execute it's `main()' method, passing the list of NULL-terminated `args'-list */
+ * and execute it's  `main()' method,  passing the list  of NULL-terminated  `args'-list */
 __CEIDECLARE_GCCNCX(__ATTR_SENTINEL __ATTR_NONNULL((1)),int,__NOTHROW_RPC,execl,(char const *__restrict __path, char const *__args, ...),{ return __builtin_execl(__path, __args, __builtin_va_arg_pack()); })
 #elif defined(__CRT_HAVE_execl)
 /* >> execl(3)
  * Replace the calling process with the application image referred to by `path' / `file'
- * and execute it's `main()' method, passing the list of NULL-terminated `args'-list */
+ * and execute it's  `main()' method,  passing the list  of NULL-terminated  `args'-list */
 #ifdef __COMPILER_HAVE_GCCNCX_BUILTIN_BUG
 extern "C++" {
 #endif /* __COMPILER_HAVE_GCCNCX_BUILTIN_BUG */
@@ -879,7 +879,7 @@ __LIBC __ATTR_SENTINEL __ATTR_NONNULL((1)) int __NOTHROW_RPC(__VLIBCCALL execl)(
 #elif defined(__CRT_HAVE__execl)
 /* >> execl(3)
  * Replace the calling process with the application image referred to by `path' / `file'
- * and execute it's `main()' method, passing the list of NULL-terminated `args'-list */
+ * and execute it's  `main()' method,  passing the list  of NULL-terminated  `args'-list */
 #ifdef __COMPILER_HAVE_GCCNCX_BUILTIN_BUG
 extern "C++" {
 #endif /* __COMPILER_HAVE_GCCNCX_BUILTIN_BUG */
@@ -893,7 +893,7 @@ __LIBC __ATTR_SENTINEL __ATTR_NONNULL((1)) int __NOTHROW_RPC(__VLIBCCALL execl)(
 #include <libc/local/unistd/execl.h>
 /* >> execl(3)
  * Replace the calling process with the application image referred to by `path' / `file'
- * and execute it's `main()' method, passing the list of NULL-terminated `args'-list */
+ * and execute it's  `main()' method,  passing the list  of NULL-terminated  `args'-list */
 #ifdef __cplusplus
 __NAMESPACE_LOCAL_USING_OR_IMPL(execl, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_SENTINEL __ATTR_NONNULL((1)) int __NOTHROW_RPC(__VLIBCCALL execl)(char const *__restrict __path, char const *__args, ...) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(execl))(__path, __args, __builtin_va_arg_pack()); })
 #else /* __cplusplus */
@@ -909,12 +909,12 @@ __NAMESPACE_LOCAL_USING_OR_IMPL(execl, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_SEN
 #if __has_builtin(__builtin_execlp) && defined(__LIBC_BIND_CRTBUILTINS) && defined(__CRT_HAVE_execlp) && __has_builtin(__builtin_va_arg_pack)
 /* >> execlp(3)
  * Replace the calling process with the application image referred to by `path' / `file'
- * and execute it's `main()' method, passing the list of NULL-terminated `args'-list */
+ * and execute it's  `main()' method,  passing the list  of NULL-terminated  `args'-list */
 __CEIDECLARE_GCCNCX(__ATTR_SENTINEL __ATTR_NONNULL((1)),int,__NOTHROW_RPC,execlp,(char const *__restrict __file, char const *__args, ...),{ return __builtin_execlp(__file, __args, __builtin_va_arg_pack()); })
 #elif defined(__CRT_HAVE_execlp)
 /* >> execlp(3)
  * Replace the calling process with the application image referred to by `path' / `file'
- * and execute it's `main()' method, passing the list of NULL-terminated `args'-list */
+ * and execute it's  `main()' method,  passing the list  of NULL-terminated  `args'-list */
 #ifdef __COMPILER_HAVE_GCCNCX_BUILTIN_BUG
 extern "C++" {
 #endif /* __COMPILER_HAVE_GCCNCX_BUILTIN_BUG */
@@ -925,7 +925,7 @@ __LIBC __ATTR_SENTINEL __ATTR_NONNULL((1)) int __NOTHROW_RPC(__VLIBCCALL execlp)
 #elif defined(__CRT_HAVE__execlp)
 /* >> execlp(3)
  * Replace the calling process with the application image referred to by `path' / `file'
- * and execute it's `main()' method, passing the list of NULL-terminated `args'-list */
+ * and execute it's  `main()' method,  passing the list  of NULL-terminated  `args'-list */
 #ifdef __COMPILER_HAVE_GCCNCX_BUILTIN_BUG
 extern "C++" {
 #endif /* __COMPILER_HAVE_GCCNCX_BUILTIN_BUG */
@@ -940,7 +940,7 @@ __LIBC __ATTR_SENTINEL __ATTR_NONNULL((1)) int __NOTHROW_RPC(__VLIBCCALL execlp)
 #include <libc/local/unistd/execlp.h>
 /* >> execlp(3)
  * Replace the calling process with the application image referred to by `path' / `file'
- * and execute it's `main()' method, passing the list of NULL-terminated `args'-list */
+ * and execute it's  `main()' method,  passing the list  of NULL-terminated  `args'-list */
 #ifdef __cplusplus
 __NAMESPACE_LOCAL_USING_OR_IMPL(execlp, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_SENTINEL __ATTR_NONNULL((1)) int __NOTHROW_RPC(__VLIBCCALL execlp)(char const *__restrict __file, char const *__args, ...) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(execlp))(__file, __args, __builtin_va_arg_pack()); })
 #else /* __cplusplus */
@@ -956,13 +956,13 @@ __NAMESPACE_LOCAL_USING_OR_IMPL(execlp, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_SE
 #if __has_builtin(__builtin_execle) && defined(__LIBC_BIND_CRTBUILTINS) && defined(__CRT_HAVE_execle) && __has_builtin(__builtin_va_arg_pack)
 /* >> execle(3)
  * Replace the calling process with the application image referred to by `path' / `file'
- * and execute it's `main()' method, passing the list of NULL-terminated `args'-list,
+ * and  execute it's `main()'  method, passing the  list of NULL-terminated `args'-list,
  * and setting `environ' to a `char **' passed after the NULL sentinel */
 __CEIDECLARE_GCCNCX(__ATTR_SENTINEL_O(1) __ATTR_NONNULL((1)),int,__NOTHROW_RPC,execle,(char const *__restrict __path, char const *__args, ...),{ return __builtin_execle(__path, __args, __builtin_va_arg_pack()); })
 #elif defined(__CRT_HAVE_execle)
 /* >> execle(3)
  * Replace the calling process with the application image referred to by `path' / `file'
- * and execute it's `main()' method, passing the list of NULL-terminated `args'-list,
+ * and  execute it's `main()'  method, passing the  list of NULL-terminated `args'-list,
  * and setting `environ' to a `char **' passed after the NULL sentinel */
 #ifdef __COMPILER_HAVE_GCCNCX_BUILTIN_BUG
 extern "C++" {
@@ -974,7 +974,7 @@ __LIBC __ATTR_SENTINEL_O(1) __ATTR_NONNULL((1)) int __NOTHROW_RPC(__VLIBCCALL ex
 #elif defined(__CRT_HAVE__execle)
 /* >> execle(3)
  * Replace the calling process with the application image referred to by `path' / `file'
- * and execute it's `main()' method, passing the list of NULL-terminated `args'-list,
+ * and  execute it's `main()'  method, passing the  list of NULL-terminated `args'-list,
  * and setting `environ' to a `char **' passed after the NULL sentinel */
 #ifdef __COMPILER_HAVE_GCCNCX_BUILTIN_BUG
 extern "C++" {
@@ -987,7 +987,7 @@ __LIBC __ATTR_SENTINEL_O(1) __ATTR_NONNULL((1)) int __NOTHROW_RPC(__VLIBCCALL ex
 #include <libc/local/unistd/execle.h>
 /* >> execle(3)
  * Replace the calling process with the application image referred to by `path' / `file'
- * and execute it's `main()' method, passing the list of NULL-terminated `args'-list,
+ * and  execute it's `main()'  method, passing the  list of NULL-terminated `args'-list,
  * and setting `environ' to a `char **' passed after the NULL sentinel */
 #ifdef __cplusplus
 __NAMESPACE_LOCAL_USING_OR_IMPL(execle, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_SENTINEL_O(1) __ATTR_NONNULL((1)) int __NOTHROW_RPC(__VLIBCCALL execle)(char const *__restrict __path, char const *__args, ...) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(execle))(__path, __args, __builtin_va_arg_pack()); })
@@ -1003,13 +1003,13 @@ __NAMESPACE_LOCAL_USING_OR_IMPL(execle, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_SE
 #ifdef __CRT_HAVE_execlpe
 /* >> execlpe(3)
  * Replace the calling process with the application image referred to by `path' / `file'
- * and execute it's `main()' method, passing the list of NULL-terminated `args'-list,
+ * and  execute it's `main()'  method, passing the  list of NULL-terminated `args'-list,
  * and setting `environ' to a `char **' passed after the NULL sentinel */
 __LIBC __ATTR_SENTINEL_O(1) __ATTR_NONNULL((1)) int __NOTHROW_RPC(__VLIBCCALL execlpe)(char const *__restrict __file, char const *__args, ...) __CASMNAME_SAME("execlpe");
 #elif defined(__CRT_HAVE__execlpe)
 /* >> execlpe(3)
  * Replace the calling process with the application image referred to by `path' / `file'
- * and execute it's `main()' method, passing the list of NULL-terminated `args'-list,
+ * and  execute it's `main()'  method, passing the  list of NULL-terminated `args'-list,
  * and setting `environ' to a `char **' passed after the NULL sentinel */
 __LIBC __ATTR_SENTINEL_O(1) __ATTR_NONNULL((1)) int __NOTHROW_RPC(__VLIBCCALL execlpe)(char const *__restrict __file, char const *__args, ...) __CASMNAME("_execlpe");
 #else /* ... */
@@ -1019,7 +1019,7 @@ __LIBC __ATTR_SENTINEL_O(1) __ATTR_NONNULL((1)) int __NOTHROW_RPC(__VLIBCCALL ex
 #include <libc/local/unistd/execlpe.h>
 /* >> execlpe(3)
  * Replace the calling process with the application image referred to by `path' / `file'
- * and execute it's `main()' method, passing the list of NULL-terminated `args'-list,
+ * and  execute it's `main()'  method, passing the  list of NULL-terminated `args'-list,
  * and setting `environ' to a `char **' passed after the NULL sentinel */
 #ifdef __cplusplus
 __NAMESPACE_LOCAL_USING_OR_IMPL(execlpe, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_SENTINEL_O(1) __ATTR_NONNULL((1)) int __NOTHROW_RPC(__VLIBCCALL execlpe)(char const *__restrict __file, char const *__args, ...) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(execlpe))(__file, __args, __builtin_va_arg_pack()); })

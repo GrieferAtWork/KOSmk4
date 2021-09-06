@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x4a38ec51 */
+/* HASH CRC-32:0x94f8e5bc */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -26,66 +26,31 @@
 #include <kos/anno.h>
 #include <hybrid/typecore.h>
 __NAMESPACE_LOCAL_BEGIN
-/* Dependency: fgetc from stdio */
 #ifndef __local___localdep_fgetc_defined
 #define __local___localdep_fgetc_defined 1
 #if defined(__CRT_HAVE_fgetc_unlocked) && defined(__USE_STDIO_UNLOCKED)
-/* >> fgetc(3)
- * Read and return a single character from `stream'
- * If the given `stream' has been exhausted or if an error occurred, `EOF' is
- * returned and the exact cause can be determined by using `ferror' and `feof' */
 __CREDIRECT(__ATTR_NONNULL((1)),int,__THROWING,__localdep_fgetc,(__FILE *__restrict __stream),fgetc_unlocked,(__stream))
 #elif defined(__CRT_HAVE_getc_unlocked) && defined(__USE_STDIO_UNLOCKED)
-/* >> fgetc(3)
- * Read and return a single character from `stream'
- * If the given `stream' has been exhausted or if an error occurred, `EOF' is
- * returned and the exact cause can be determined by using `ferror' and `feof' */
 __CREDIRECT(__ATTR_NONNULL((1)),int,__THROWING,__localdep_fgetc,(__FILE *__restrict __stream),getc_unlocked,(__stream))
 #elif defined(__CRT_HAVE_fgetc)
-/* >> fgetc(3)
- * Read and return a single character from `stream'
- * If the given `stream' has been exhausted or if an error occurred, `EOF' is
- * returned and the exact cause can be determined by using `ferror' and `feof' */
 __CREDIRECT(__ATTR_NONNULL((1)),int,__THROWING,__localdep_fgetc,(__FILE *__restrict __stream),fgetc,(__stream))
 #elif defined(__CRT_HAVE_getc)
-/* >> fgetc(3)
- * Read and return a single character from `stream'
- * If the given `stream' has been exhausted or if an error occurred, `EOF' is
- * returned and the exact cause can be determined by using `ferror' and `feof' */
 __CREDIRECT(__ATTR_NONNULL((1)),int,__THROWING,__localdep_fgetc,(__FILE *__restrict __stream),getc,(__stream))
 #elif defined(__CRT_HAVE__IO_getc)
-/* >> fgetc(3)
- * Read and return a single character from `stream'
- * If the given `stream' has been exhausted or if an error occurred, `EOF' is
- * returned and the exact cause can be determined by using `ferror' and `feof' */
 __CREDIRECT(__ATTR_NONNULL((1)),int,__THROWING,__localdep_fgetc,(__FILE *__restrict __stream),_IO_getc,(__stream))
 #elif defined(__CRT_HAVE_fgetc_unlocked)
-/* >> fgetc(3)
- * Read and return a single character from `stream'
- * If the given `stream' has been exhausted or if an error occurred, `EOF' is
- * returned and the exact cause can be determined by using `ferror' and `feof' */
 __CREDIRECT(__ATTR_NONNULL((1)),int,__THROWING,__localdep_fgetc,(__FILE *__restrict __stream),fgetc_unlocked,(__stream))
 #elif defined(__CRT_HAVE_getc_unlocked)
-/* >> fgetc(3)
- * Read and return a single character from `stream'
- * If the given `stream' has been exhausted or if an error occurred, `EOF' is
- * returned and the exact cause can be determined by using `ferror' and `feof' */
 __CREDIRECT(__ATTR_NONNULL((1)),int,__THROWING,__localdep_fgetc,(__FILE *__restrict __stream),getc_unlocked,(__stream))
 #elif (defined(__CRT_DOS) && defined(__CRT_HAVE__filbuf)) || defined(__CRT_HAVE_fread) || defined(__CRT_HAVE__IO_fread) || defined(__CRT_HAVE_fread_unlocked) || defined(__CRT_HAVE__fread_nolock)
 __NAMESPACE_LOCAL_END
 #include <libc/local/stdio/fgetc.h>
 __NAMESPACE_LOCAL_BEGIN
-/* >> fgetc(3)
- * Read and return a single character from `stream'
- * If the given `stream' has been exhausted or if an error occurred, `EOF' is
- * returned and the exact cause can be determined by using `ferror' and `feof' */
 #define __localdep_fgetc __LIBC_LOCAL_NAME(fgetc)
 #else /* ... */
 #undef __local___localdep_fgetc_defined
 #endif /* !... */
 #endif /* !__local___localdep_fgetc_defined */
-/* >> fread(3)
- * Read up to `elemsize * elemcount' bytes of data from `stream' into `buf' */
 __LOCAL_LIBC(fread) __ATTR_WUNUSED __ATTR_NONNULL((1, 4)) __SIZE_TYPE__
 (__LIBCCALL __LIBC_LOCAL_NAME(fread))(void *__restrict __buf, __SIZE_TYPE__ __elemsize, __SIZE_TYPE__ __elemcount, __FILE *__restrict __stream) __THROWS(...) {
 	__SIZE_TYPE__ __i, __result = 0;

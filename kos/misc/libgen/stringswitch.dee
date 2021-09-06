@@ -64,9 +64,9 @@ function fixExpression(expr: string, indent: string): string {
 
 
 @@Generate C code for branching to each element of @cases when
-@@the string at `(char *)(strExpr + strOffset)' equals the
+@@the string  at  `(char *)(strExpr + strOffset)'  equals  the
 @@associated entry of @cases
-@@Note that the strings passed in @cases should include a trailing
+@@Note  that the strings  passed in @cases  should include a trailing
 @@NUL-character if @strExpr is expected to represent a NUL-terminated
 @@string.
 @@@param cases: Mapping of (case_string: case_expr | (case_expr,) | (case_expr, case_cond)), where

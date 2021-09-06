@@ -73,7 +73,7 @@ handle_mpart_tryas(struct mpart *__restrict self,
 
 
 //INTERN pos_t KCALL /* TODO: Pre-initialize specified reanges. */
-//handle_mpart_allocate(struct mpart *__restrict self,
+//handle_mpart_allocate(struct     mpart     *__restrict     self,
 //                      fallocate_mode_t mode, pos_t start, pos_t length) {
 //}
 

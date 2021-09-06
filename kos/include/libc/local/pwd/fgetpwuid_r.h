@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x7530633f */
+/* HASH CRC-32:0x130c687e */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -27,30 +27,16 @@
 #if (defined(__CRT_HAVE_fgetpos64) || defined(__CRT_HAVE__IO_fgetpos64) || defined(__CRT_HAVE_fgetpos64_unlocked) || defined(__CRT_HAVE_ftello64) || defined(__CRT_HAVE_ftell64) || defined(__CRT_HAVE__ftelli64) || defined(__CRT_HAVE_ftello64_unlocked) || defined(__CRT_HAVE_ftell64_unlocked) || defined(__CRT_HAVE__ftelli64_nolock) || defined(__CRT_HAVE_fgetpos) || defined(__CRT_HAVE__IO_fgetpos) || defined(__CRT_HAVE_fgetpos_unlocked) || defined(__CRT_HAVE_ftello) || defined(__CRT_HAVE_ftello_unlocked) || defined(__CRT_HAVE_ftell) || defined(__CRT_HAVE__IO_ftell) || defined(__CRT_HAVE_ftell_unlocked) || defined(__CRT_HAVE__ftell_nolock)) && (defined(__CRT_HAVE_fsetpos64) || defined(__CRT_HAVE__IO_fsetpos64) || defined(__CRT_HAVE_fsetpos64_unlocked) || defined(__CRT_HAVE_fsetpos) || defined(__CRT_HAVE__IO_fsetpos) || defined(__CRT_HAVE_fsetpos_unlocked) || (defined(__SEEK_SET) && (defined(__CRT_HAVE_fseeko64) || defined(__CRT_HAVE_fseek64) || defined(__CRT_HAVE__fseeki64) || defined(__CRT_HAVE_fseeko64_unlocked) || defined(__CRT_HAVE_fseek64_unlocked) || defined(__CRT_HAVE__fseeki64_nolock) || defined(__CRT_HAVE_fseeko) || defined(__CRT_HAVE_fseeko_unlocked) || defined(__CRT_HAVE_fseek) || defined(__CRT_HAVE_fseek_unlocked) || defined(__CRT_HAVE__fseek_nolock)))) && (defined(__CRT_HAVE_fparseln) || ((defined(__CRT_HAVE_fgetc) || defined(__CRT_HAVE_getc) || defined(__CRT_HAVE__IO_getc) || defined(__CRT_HAVE_fgetc_unlocked) || defined(__CRT_HAVE_getc_unlocked) || (defined(__CRT_DOS) && defined(__CRT_HAVE__filbuf)) || defined(__CRT_HAVE_fread) || defined(__CRT_HAVE__IO_fread) || defined(__CRT_HAVE_fread_unlocked) || defined(__CRT_HAVE__fread_nolock)) && (defined(__CRT_HAVE_ungetc) || defined(__CRT_HAVE__IO_ungetc) || defined(__CRT_HAVE_ungetc_unlocked) || defined(__CRT_HAVE__ungetc_nolock)) && defined(__CRT_HAVE_realloc)))
 #include <bits/crt/db/passwd.h>
 __NAMESPACE_LOCAL_BEGIN
-/* Dependency: fgetpwfiltered_r from pwd */
 #ifndef __local___localdep_fgetpwfiltered_r_defined
 #define __local___localdep_fgetpwfiltered_r_defined 1
 __NAMESPACE_LOCAL_END
 #include <libc/local/pwd/fgetpwfiltered_r.h>
 __NAMESPACE_LOCAL_BEGIN
-/* Filtered read from `stream'
- * @param: filtered_uid:  When not equal to `(uid_t)-1', require this UID
- * @param: filtered_name: When not `NULL', require this username
- * @return: 0 :     Success (`*result' is made to point at `resultbuf')
- * @return: ENOENT: The last entry has already been read, or no entry matches the given `filtered_*'
- *                  Note that in this case, `errno' will have not been changed
- * @return: ERANGE: The given `buflen' is too small (pass a larger value and try again)
- *                  Note that in this case, `errno' will have also been set to `ERANGE'
- * @return: * :     Error (one of `E*' from `<errno.h>') */
 #define __localdep_fgetpwfiltered_r __LIBC_LOCAL_NAME(fgetpwfiltered_r)
 #endif /* !__local___localdep_fgetpwfiltered_r_defined */
 __NAMESPACE_LOCAL_END
 #include <libc/errno.h>
 __NAMESPACE_LOCAL_BEGIN
-/* Search for an entry with a matching user ID
- * @return: 0 : (*result != NULL) Success
- * @return: 0 : (*result == NULL) No entry for `uid'
- * @return: * : Error (one of `E*' from `<errno.h>') */
 __LOCAL_LIBC(fgetpwuid_r) __ATTR_NONNULL((1, 3, 4, 6)) __errno_t
 __NOTHROW_RPC(__LIBCCALL __LIBC_LOCAL_NAME(fgetpwuid_r))(__FILE *__restrict __stream, __uid_t __uid, struct passwd *__restrict __resultbuf, char *__restrict __buffer, __SIZE_TYPE__ __buflen, struct passwd **__restrict __result) {
 	__errno_t __error;

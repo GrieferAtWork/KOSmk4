@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x61022dda */
+/* HASH CRC-32:0x41c57e11 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -25,7 +25,6 @@
 #include <kos/anno.h>
 #include <hybrid/typecore.h>
 __NAMESPACE_LOCAL_BEGIN
-/* Dependency: Memdup from kos.malloc */
 #ifndef __local___localdep_Memdup_defined
 #define __local___localdep_Memdup_defined 1
 #ifdef __CRT_HAVE_Memdup
@@ -39,25 +38,17 @@ __NAMESPACE_LOCAL_BEGIN
 #undef __local___localdep_Memdup_defined
 #endif /* !... */
 #endif /* !__local___localdep_Memdup_defined */
-/* Dependency: memchr from string */
 #ifndef __local___localdep_memchr_defined
 #define __local___localdep_memchr_defined 1
 #ifdef __CRT_HAVE_memchr
-/* >> memchr(3)
- * Ascendingly search for `needle', starting at `haystack'.
- * Return `NULL' if `needle' wasn't found. */
 __CREDIRECT(__ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1)),void *,__NOTHROW_NCX,__localdep_memchr,(void const *__restrict __haystack, int __needle, __SIZE_TYPE__ __n_bytes),memchr,(__haystack,__needle,__n_bytes))
 #else /* __CRT_HAVE_memchr */
 __NAMESPACE_LOCAL_END
 #include <libc/local/string/memchr.h>
 __NAMESPACE_LOCAL_BEGIN
-/* >> memchr(3)
- * Ascendingly search for `needle', starting at `haystack'.
- * Return `NULL' if `needle' wasn't found. */
 #define __localdep_memchr __LIBC_LOCAL_NAME(memchr)
 #endif /* !__CRT_HAVE_memchr */
 #endif /* !__local___localdep_memchr_defined */
-/* @throws: E_BADALLOC: ... */
 __LOCAL_LIBC(Memcdup) __ATTR_MALLOC __ATTR_MALL_DEFAULT_ALIGNED __ATTR_RETNONNULL __ATTR_WUNUSED __ATTR_NONNULL((1)) void *
 (__LIBCCALL __LIBC_LOCAL_NAME(Memcdup))(void const *__restrict __ptr, int __needle, __SIZE_TYPE__ __num_bytes) __THROWS(__E_BADALLOC) {
 	if __likely(__num_bytes) {

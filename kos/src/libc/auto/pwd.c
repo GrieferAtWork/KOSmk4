@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x448f7306 */
+/* HASH CRC-32:0x595f974b */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -305,7 +305,7 @@ nextline:
 #include <bits/types.h>
 #include <bits/crt/inttypes.h>
 /* Re-construct the password-file line for the given uid in the
- * given buffer. This knows the format that the caller will
+ * given  buffer. This  knows the  format that  the caller will
  * expect, but this need not be the format of the password file */
 INTERN ATTR_SECTION(".text.crt.database.pwd") int
 NOTHROW_RPC(LIBCCALL libc_getpw)(uid_t uid,

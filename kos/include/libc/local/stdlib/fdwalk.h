@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x48e42fd7 */
+/* HASH CRC-32:0x59afc8b4 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -28,7 +28,6 @@
 typedef int (__LIBKCALL *__fdwalk_func_t)(void *__cookie, __fd_t __fd);
 #endif /* !____fdwalk_func_t_defined */
 __NAMESPACE_LOCAL_BEGIN
-/* Dependency: fcntl from fcntl */
 #ifndef __local___localdep_fcntl_defined
 #define __local___localdep_fcntl_defined 1
 #ifdef __CRT_HAVE_fcntl
@@ -50,10 +49,6 @@ __CVREDIRECT(,__STDC_INT_AS_SSIZE_T,__NOTHROW_NCX,__localdep_fcntl,(__fd_t __fd,
 __NAMESPACE_LOCAL_END
 #include <libc/errno.h>
 __NAMESPACE_LOCAL_BEGIN
-/* Enumerate all open file descriptors by invoking `(*func)(cookie, <fd>)' for each of them
- * If during any of these invocations, `(*func)(...)' returns non-zero, enumeration stops,
- * and `fdwalk()' returns with that same value. If `(*func)(...)' is never called, or all
- * invocations return 0, `fdwalk()' will also return 0. */
 __LOCAL_LIBC(fdwalk) __ATTR_NONNULL((1)) int
 __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(fdwalk))(__fdwalk_func_t __func, void *__cookie) {
 	/* TODO: Implementation alternative using `opendir("/proc/self/fd")' */

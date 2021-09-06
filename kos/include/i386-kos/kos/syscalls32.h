@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xf11d2cd5 */
+/* HASH CRC-32:0x9fc6424a */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -179,10 +179,10 @@ __CDECLARE_SC(,__errno_t,_sysctl,(int __TODO_PROTOTYPE),(__TODO_PROTOTYPE))
  * @param: addr:       Peer address of the sender (or `NULL' when `addr_len' is `NULL')
  * @param: addr_len:   [NULL] Don't fill in the client's peer address
  *                     [in]   The amount of available memory starting at `addr'
- *                     [out]  The amount of required memory for the address.
- *                            This may be more than was given, in which case
- *                            the address was truncated and may be invalid.
- *                            If this happens, the caller can still determine
+ *                     [out]  The  amount  of required  memory for  the address.
+ *                            This  may be  more than  was given,  in which case
+ *                            the  address  was  truncated and  may  be invalid.
+ *                            If this happens,  the caller  can still  determine
  *                            the correct address through use of `getpeername()'
  * @param: sock_flags: Set of `SOCK_NONBLOCK | SOCK_CLOEXEC | SOCK_CLOFORK'
  * @throw: E_INVALID_ARGUMENT_BAD_STATE:E_INVALID_ARGUMENT_CONTEXT_SOCKET_NOT_LISTENING
@@ -302,7 +302,7 @@ __CDECLARE_SC(,__errno_t,close_range,(int __TODO_PROTOTYPE),(__TODO_PROTOTYPE))
 #if __CRT_HAVE_SC(connect)
 /* Connect to the specified address.
  * If the given `sockfd' isn't connection-oriented, this will set the address
- * that will implicitly be used as destination by `send(2)' and `write(2)'
+ * that  will implicitly be  used as destination  by `send(2)' and `write(2)'
  * @throw: E_NET_ADDRESS_IN_USE:E_NET_ADDRESS_IN_USE_CONTEXT_CONNECT
  * @throw: E_INVALID_ARGUMENT_UNEXPECTED_COMMAND:E_INVALID_ARGUMENT_CONTEXT_BIND_WRONG_ADDRESS_FAMILY
  * @throw: E_INVALID_ARGUMENT_BAD_STATE:E_INVALID_ARGUMENT_CONTEXT_BIND_ALREADY_BOUND
@@ -317,29 +317,29 @@ __CDECLARE_SC(,__errno_t,copy_file_range,(int __TODO_PROTOTYPE),(__TODO_PROTOTYP
 #endif /* __CRT_HAVE_SC(copy_file_range) */
 #if __CRT_HAVE_SC(coredump)
 /* Trigger a coredump of the calling process.
- * @param: curr_state:       The state as is still valid after any possible unwinding has already been done
+ * @param: curr_state:       The  state as is still valid after any possible unwinding has already been done
  *                           Note that this state does not necessarily point to the location that originally
  *                           caused the problem that escalated into a coredump, but is the last valid stack-
  *                           unwind location at which unwinding could no longer continue.
  *                           When `NULL', `orig_state' is used instead, and `traceback_vector' and `traceback_length' are ignored.
  * @param: orig_state:       The original CPU state at where the associated `reason' got triggered
  *                           When `NULL', `curr_state' is used instead, and `traceback_vector' and `traceback_length' are ignored.
- *                           When `curr_state' is also `NULL', then the current CPU state is used instead.
- * @param: traceback_vector: (potentially incomplete) vector of additional program pointers that were
- *                           traversed when the stack was walked from `orig_state' to `curr_state'
- *                           Note that earlier entires within this vector are further up the call-stack, with
+ *                           When   `curr_state'   is   also   `NULL',   then   the   current   CPU   state   is   used   instead.
+ * @param: traceback_vector: (potentially  incomplete)   vector  of   additional  program   pointers  that   were
+ *                           traversed   when   the  stack   was   walked  from   `orig_state'   to  `curr_state'
+ *                           Note that earlier  entires within this  vector are further  up the call-stack,  with
  *                           traceback_vector[0] being meant to be the call-site of the function of `orig_state'.
  *                           Note that when `traceback_length != 0 && traceback_vector[traceback_length-1] == ucpustate_getpc(curr_state)',
- *                           it can be assumed that the traceback is complete and contains all traversed instruction locations.
- *                           In this case, a traceback displayed to a human should not include the text location at
- *                           `traceback_vector[traceback_length-1]', since that location would also be printed when
+ *                           it  can  be  assumed  that  the  traceback is  complete  and  contains  all  traversed  instruction locations.
+ *                           In   this   case,  a   traceback  displayed   to   a  human   should  not   include   the  text   location  at
+ *                           `traceback_vector[traceback_length-1]',    since    that    location    would    also    be    printed    when
  *                           unwinding is completed for the purposes of displaying a traceback.
  * @param: traceback_length: The number of program counters stored within `traceback_vector'
  * @param: reason:           The reason that resulted in the coredump (or `NULL' to get the same behavior as `E_OK')
- *                           For certain `unwind_error' values, this can also point to other things, but is always
+ *                           For certain `unwind_error' values, this can also  point to other things, but is  always
  *                           allowed to be `NULL' to indicate default/stub values.
- * @param: unwind_error:     The unwind error that caused the coredump, or `UNWIND_SUCCESS' if unwinding
- *                           was never actually performed, and `reason' is actually a `siginfo_t *'
+ * @param: unwind_error:     The  unwind  error that  caused the  coredump,  or `UNWIND_SUCCESS'  if unwinding
+ *                           was  never  actually  performed,  and   `reason'  is  actually  a   `siginfo_t *'
  *                           Ignored when `reason == NULL', in which case `UNWIND_SUCCESS' is assumed instead. */
 __CDECLARE_SC(,__errno_t,coredump,(struct ucpustate32 const *__curr_state, struct ucpustate32 const *__orig_state, __HYBRID_PTR32(void const) const *__traceback_vector, __size_t __traceback_length, union coredump_info32 const *__reason, __syscall_ulong_t __unwind_error),(__curr_state,__orig_state,__traceback_vector,__traceback_length,__reason,__unwind_error))
 #endif /* __CRT_HAVE_SC(coredump) */
@@ -350,11 +350,11 @@ __CDECLARE_SC(,__fd_t,creat,(char const *__filename, __mode_t __mode),(__filenam
 __CDECLARE_SC(,__errno_t,create_module,(void),())
 #endif /* __CRT_HAVE_SC(create_module) */
 #if __CRT_HAVE_SC(debugtrap)
-/* Trigger a debugger trap `trapno', optionally extended with `regs'
+/* Trigger a debugger trap `trapno', optionally extended with  `regs'
  * at either the system call return location, or at the given `state'
- * In the later case, this system call will by default return to the
- * given `state', though given the purpose of this system call being
- * to inform a connected debugger of some breakable event, allowing
+ * In the later case, this system call will by default return to  the
+ * given  `state', though given the purpose of this system call being
+ * to inform a connected debugger  of some breakable event,  allowing
  * it to do whatever it wishes before execution is resumed.
  * @param: reason:   When non-NULL, the reason for the debug trap (else: use `SIGTRAP:DEBUGTRAP_REASON_NONE')
  * @param: state:    When non-NULL, the CPU state where the trap should return to by default
@@ -368,21 +368,21 @@ __CDECLARE_SC(,__errno_t,debugtrap,(struct ucpustate32 const *__state, struct de
  * as an alias for `KSYSCTL_DRIVER_DELMOD:KSYSCTL_DRIVER_FORMAT_FILE'
  * @param: name:  The name of the driver
  * @param: flags: Set of `O_NONBLOCK | O_TRUNC', where:
- *                 - O_NONBLOCK: Don't wait for the driver to be unloaded.
- *                               Currently, KOS simply ignores this flag,
+ *                 - O_NONBLOCK: Don't  wait  for  the driver  to  be unloaded.
+ *                               Currently,  KOS  simply  ignores  this   flag,
  *                               since drivers on KOS should always be unloaded
- *                               immediately. - However, driver finalizers may
+ *                               immediately. - However, driver finalizers  may
  *                               do blocking operations before then...
  *                 - O_TRUNC:    Force the driver to be unloaded immediately
- *                               (may compromise system integrity)
- *                               s.a. `KSYSCTL_DRIVER_DELMOD_FFORCE' */
+ *                               (may    compromise    system     integrity)
+ *                               s.a.         `KSYSCTL_DRIVER_DELMOD_FFORCE' */
 __CDECLARE_SC(,__errno_t,delete_module,(char const *__name, __oflag_t __flags),(__name,__flags))
 #endif /* __CRT_HAVE_SC(delete_module) */
 #if __CRT_HAVE_SC(detach)
 /* >> detach(2)
  * Detach the descriptor of `PID' from the thread that
  * would have received a signal when it changes state,
- * as well as prevent the thread from turning into a
+ * as well as prevent the  thread from turning into  a
  * zombie once it dies.
  * For simplicity, think of it like this:
  *   - pthread_create()  -->  clone()
@@ -390,13 +390,13 @@ __CDECLARE_SC(,__errno_t,delete_module,(char const *__name, __oflag_t __flags),(
  *   - pthread_detach()  -->  detach()  // Linux's missing link, now implemented
  * A total of 4 special cases exists to alter the behavior of this function:
  *   - PID == 0 || PID == gettid():
- *     Detach the calling thread from the set of running children within
- *     its own process. Note however that when this is done by the main
+ *     Detach the calling  thread from  the set of  running children  within
+ *     its own process.  Note however  that when this  is done  by the  main
  *     thread of the process, gettid() will equal getpid(), and the behavior
  *     will be different.
  *   - PID == getpid():
  *     Detach the calling process from its parent, essentially daemonizing
- *     the calling process the same way a double-fork would:
+ *     the  calling   process   the   same  way   a   double-fork   would:
  *     >> if (fork() == 0) {
  *     >> 	if (fork() == 0) {
  *     >> 		// This is a daemonized process
@@ -415,7 +415,7 @@ __CDECLARE_SC(,__errno_t,delete_module,(char const *__name, __oflag_t __flags),(
  *     >> 	...
  *     >> }
  *   - PID == -1:
- *     Detach all child processes/threads of the calling process, essentially
+ *     Detach all child processes/threads  of the calling process,  essentially
  *     turning its chain of children into a clean slate that no longer contains
  *     any wait(2)able child threads or processes.
  *     If no waitable children existed, `ECHILD' is set; else `0' is returned.
@@ -425,47 +425,47 @@ __CDECLARE_SC(,__errno_t,delete_module,(char const *__name, __oflag_t __flags),(
  *   - The creator of the process containing a thread that called
  *    `clone()' with `CLONE_PARENT', which then created the thread
  *     referred to by `PID'.
- *   - Even if the thread doesn't deliver a signal upon it terminating,
+ *   - Even if  the thread  doesn't deliver  a signal  upon it  terminating,
  *     the process that would have received such a signal is still relevant.
  *   -> In other words: The thread `PID' must be one of your children,
  *                      or had you assigned as its parent.
  * If the calling thread isn't part of that process that will receive
- * the signal if the thread dies without being detached first, then
- * the call fails by throwing an `E_ILLEGAL_OPERATION'.
- * If the thread had already been detached, then the call fails by
+ * the signal if the thread  dies without being detached first,  then
+ * the   call   fails    by   throwing   an    `E_ILLEGAL_OPERATION'.
+ * If  the thread had  already been detached, then  the call fails by
  * throwing an `E_ILLEGAL_OPERATION' as well.
- * Upon success, the thread referred to by `PID' will clean up its own
+ * Upon success, the thread  referred to by `PID'  will clean up its  own
  * PID descriptor without the need of anyone to wait() for it, a behavior
- * that linux implements using `CLONE_THREAD' (which you shouldn't use,
+ * that linux implements using  `CLONE_THREAD' (which you shouldn't  use,
  * because it's flawed by design)
- * Once detached, any further use of PID results in a race condition
+ * Once detached, any further use of  PID results in a race  condition
  * (which linux neglects to mention for `CLONE_THREAD'), because there
  * is no way of ensuring that PID still refers to the original thread,
- * as another thread may have been created using the same PID, after
+ * as another thread may have been  created using the same PID,  after
  * the detached thread exited.
  * NOTE: If a thread is created using clone() with `CLONE_DETACHED' set,
- *       it will behave effectively as though this function had already
+ *       it will behave effectively as though this function had  already
  *       be called.
  * NOTE: If the thread already has terminated, detaching it will kill
  *       its zombie the same way wait() would.
- * NOTE: Passing ZERO(0) for `PID' will detach the calling thread.
- *       However, this operation fails if the calling thread isn't
+ * NOTE: Passing ZERO(0)  for `PID'  will detach  the calling  thread.
+ *       However, this  operation fails  if the  calling thread  isn't
  *       part of the same process as the parent process of the thread.
- *       In other words, the child of a fork() can't do this, and
- *       neither can the spawnee of clone(CLONE_THREAD|CLONE_PARENT),
+ *       In other words,  the child  of a  fork() can't  do this,  and
+ *       neither can the spawnee of  clone(CLONE_THREAD|CLONE_PARENT),
  *       clone(0) or clone(CLONE_PARENT).
- * @return: -EPERM:             The calling process isn't the recipient of signals
- *                              delivered when `PID' changes state. This can either
+ * @return: -EPERM:             The  calling  process isn't  the recipient  of signals
+ *                              delivered when `PID'  changes state.  This can  either
  *                              be because `PID' has already been detached, or because
  *                              YOU CAN'T DETACH SOMEONE ELSE'S THREAD!
- *                              Another possibility is that the thread was already
+ *                              Another  possibility is that the thread was already
  *                              detached, then exited, following which a new thread
- *                              got created and had been assigned the PID of your
+ *                              got created and had been  assigned the PID of  your
  *                              ancient, no longer existent thread.
  * @return: -ECHILD:           `PID' was equal to `-1', but no waitable children existed
- * @throw: E_PROCESS_EXITED:    The process referred to by `PID' doesn't exist.
- *                              This could mean that it had already been detached
- *                              and exited, or that the `PID' is just invalid (which
+ * @throw: E_PROCESS_EXITED:    The  process  referred  to  by  `PID'  doesn't exist.
+ *                              This could  mean that  it had  already been  detached
+ *                              and exited, or that the `PID' is just invalid  (which
  *                              would also be the case if it was valid at some point) */
 __CDECLARE_SC(,__errno_t,detach,(__pid_t __pid),(__pid))
 #endif /* __CRT_HAVE_SC(detach) */
@@ -488,7 +488,7 @@ __CDECLARE_SC(,__fd_t,epoll_create,(__syscall_ulong_t __size),(__size))
 #endif /* __CRT_HAVE_SC(epoll_create) */
 #if __CRT_HAVE_SC(epoll_create1)
 /* >> epoll_create1(2)
- * Create a new epoll control descriptor which can be used for
+ * Create  a new epoll control descriptor which can be used for
  * monitoring of pollable events happening in registered files.
  * @param: flags: Set of `EPOLL_CLOEXEC | EPOLL_CLOFORK'
  * @return: * :   The newly created epoll control descriptor.
@@ -497,7 +497,7 @@ __CDECLARE_SC(,__fd_t,epoll_create1,(__syscall_ulong_t __flags),(__flags))
 #endif /* __CRT_HAVE_SC(epoll_create1) */
 #if __CRT_HAVE_SC(epoll_ctl)
 /* >> epoll_ctl(2)
- * Manipulate a given epoll controller `epfd', as previously returned by `epoll_create1(2)'
+ * Manipulate a given  epoll controller  `epfd', as previously  returned by  `epoll_create1(2)'
  * in order to register (`EPOLL_CTL_ADD'), remove (`EPOLL_CTL_DEL') or modify (`EPOLL_CTL_MOD')
  * the file descriptors being monitored
  * @param: op:       One of `EPOLL_CTL_ADD', `EPOLL_CTL_DEL' or `EPOLL_CTL_MOD'
@@ -506,7 +506,7 @@ __CDECLARE_SC(,__fd_t,epoll_create1,(__syscall_ulong_t __flags),(__flags))
  * @return: 0 :      Success
  * @return: -EEXIST: [op=EPOLL_CTL_ADD] The given `fd' (and its kernel object) has already been registered
  * @return: -ENOENT: [op=EPOLL_CTL_MOD|EPOLL_CTL_DEL] The given `fd' (and its kernel object) aren't registered
- * @throw: E_ILLEGAL_REFERENCE_LOOP: The given `fd' is another epoll that either
+ * @throw: E_ILLEGAL_REFERENCE_LOOP: The  given  `fd'  is  another  epoll  that either
  *                                   forms a loop with `epfd', or has too many nested.
  * @throw: E_INVALID_ARGUMENT_UNKNOWN_COMMAND:E_INVALID_ARGUMENT_CONTEXT_EPOLL_CTL_OP: [...] */
 __CDECLARE_SC(,__errno_t,epoll_ctl,(__fd_t __epfd, __syscall_ulong_t __op, __fd_t __fd, struct epoll_event *__info),(__epfd,__op,__fd,__info))
@@ -514,12 +514,12 @@ __CDECLARE_SC(,__errno_t,epoll_ctl,(__fd_t __epfd, __syscall_ulong_t __op, __fd_
 #if __CRT_HAVE_SC(epoll_pwait)
 /* >> epoll_pwait(2)
  * Same as `epoll_wait(2)', but change the calling thread's signal mask to `ss' while
- * waiting. Wait until at least one of the conditions monitored by `epfd' to be met.
+ * waiting.  Wait until at least one of the conditions monitored by `epfd' to be met.
  * @param: epfd:      The epoll controller on which to wait.
  * @param: events:    A buffer where the kernel can store information on the
  *                    events that actually took place.
  * @param: maxevents: The # of events that can be stored in `events' (must be >= 1)
- * @param: timeout:   The max amount of time (in milliseconds) before returning
+ * @param: timeout:   The max amount of time (in milliseconds) before  returning
  *                    in the case where no event occurred in the mean time. When
  *                    set to `-1', wait indefinitely
  * @param: ss:        The signal mask to apply while waiting for an event to happen.
@@ -536,7 +536,7 @@ __CDECLARE_SC(,__ssize_t,epoll_pwait,(__fd_t __epfd, struct epoll_event *__event
  * @param: events:    A buffer where the kernel can store information on the
  *                    events that actually took place.
  * @param: maxevents: The # of events that can be stored in `events' (must be >= 1)
- * @param: timeout:   The max amount of time (in milliseconds) before returning
+ * @param: timeout:   The max amount of time (in milliseconds) before  returning
  *                    in the case where no event occurred in the mean time. When
  *                    set to `-1', wait indefinitely
  * @return: >= 1:     The # of events that happened (written to the first `return'
@@ -553,12 +553,12 @@ __CDECLARE_SC(,__fd_t,eventfd,(__syscall_ulong_t __initval),(__initval))
 __CDECLARE_SC(,__fd_t,eventfd2,(__syscall_ulong_t __initval, __syscall_ulong_t __flags),(__initval,__flags))
 #endif /* __CRT_HAVE_SC(eventfd2) */
 #if __CRT_HAVE_SC(execve)
-/* Replace the calling process with the application image referred to by `path' / `file'
+/* Replace the calling  process with  the application  image referred  to by  `path' /  `file'
  * and execute it's `main()' method, passing the given `argv', and setting `environ' to `envp' */
 __CDECLARE_SC(,__errno_t,execve,(char const *__path, __HYBRID_PTR32(char const) const *___argv, __HYBRID_PTR32(char const) const *___envp),(__path,___argv,___envp))
 #endif /* __CRT_HAVE_SC(execve) */
 #if __CRT_HAVE_SC(execveat)
-/* Replace the calling process with the application image referred to by `path' / `file'
+/* Replace the calling  process with  the application  image referred  to by  `path' /  `file'
  * and execute it's `main()' method, passing the given `argv', and setting `environ' to `envp'
  * @param: flags: Set of `0 | AT_EMPTY_PATH | AT_SYMLINK_NOFOLLOW | AT_DOSPATH' */
 __CDECLARE_SC(,__errno_t,execveat,(__fd_t __dirfd, char const *__pathname, __HYBRID_PTR32(char const) const *___argv, __HYBRID_PTR32(char const) const *___envp, __atflag_t __flags),(__dirfd,__pathname,___argv,___envp,__flags))
@@ -632,19 +632,19 @@ __CDECLARE_SC(,__syscall_slong_t,fcntl64,(__fd_t __fd, __syscall_ulong_t __comma
 #endif /* __CRT_HAVE_SC(fcntl64) */
 #if __CRT_HAVE_SC(fdatasync)
 /* Synchronize only the data of a file (not its descriptor which contains
- * timestamps, and its size), meaning that changes are written to disk */
+ * timestamps,  and its size),  meaning that changes  are written to disk */
 __CDECLARE_SC(,__errno_t,fdatasync,(__fd_t __fd),(__fd))
 #endif /* __CRT_HAVE_SC(fdatasync) */
 #if __CRT_HAVE_SC(fgetxattr)
 __CDECLARE_SC(,__ssize_t,fgetxattr,(__fd_t __fd, char const *__name, void *__buf, __size_t __bufsize),(__fd,__name,__buf,__bufsize))
 #endif /* __CRT_HAVE_SC(fgetxattr) */
 #if __CRT_HAVE_SC(finit_module)
-/* Load a kernel driver from an ELF image `module_image...+=len'
+/* Load a  kernel driver  from  an ELF  image  `module_image...+=len'
  * This system call exists for linux compatiblity, and is implemented
  * as an alias for `KSYSCTL_DRIVER_INSMOD:KSYSCTL_DRIVER_FORMAT_FILE'
  * 
- * Note however that that is where linux compatiblity ends. Since the
- * linux kernel does not implement any semblance of a stable ABI, you
+ * Note  however that that is where linux compatiblity ends. Since the
+ * linux kernel does not implement any semblance of a stable ABI,  you
  * have to realize that on KOS, this system call can only load drivers
  * specifically built to run within the KOS kernel!
  * @param: uargs: The driver commandline */
@@ -666,11 +666,11 @@ __CDECLARE_SC(,__errno_t,fmknodat,(__fd_t __dirfd, char const *__nodename, __mod
 #endif /* __CRT_HAVE_SC(fmknodat) */
 #if __CRT_HAVE_SC(fork)
 /* Clone the calling thread into a second process and return twice, once
- * in the parent process where this function returns the (non-zero) PID
- * of the forked child process, and a second time in the child process
+ * in  the parent process where this function returns the (non-zero) PID
+ * of  the forked child process, and a  second time in the child process
  * itself, where ZERO(0) is returned.
  * The child then usually proceeds by calling `exec(2)' to replace its
- * application image with that of another program that the original
+ * application image with  that of another  program that the  original
  * parent can then `wait(2)' for. (s.a. `vfork(2)')
  * @return: 0 : You're the new process that was created
  * @return: * : The `return' value is the pid of your new child process */
@@ -682,17 +682,17 @@ __CDECLARE_SC(,__ssize_t,freadlinkat,(__fd_t __dirfd, char const *__path, char *
 #endif /* __CRT_HAVE_SC(freadlinkat) */
 #if __CRT_HAVE_SC(frealpath4)
 /* You may pass `AT_READLINK_REQSIZE' to always have the function return
- * the required buffer size, rather than the used size.
+ * the   required   buffer   size,   rather   than   the   used    size.
  * @param: flags: Set of `0 | AT_ALTPATH | AT_READLINK_REQSIZE | AT_DOSPATH' */
 __CDECLARE_SC(,__ssize_t,frealpath4,(__fd_t __fd, char *__resolved, __size_t __buflen, __atflag_t __flags),(__fd,__resolved,__buflen,__flags))
 #endif /* __CRT_HAVE_SC(frealpath4) */
 #if __CRT_HAVE_SC(frealpathat)
-/* Returns the absolute filesystem path for the specified file
- * When `AT_SYMLINK_NOFOLLOW' is given, a final symlink is dereferenced,
+/* Returns  the  absolute   filesystem  path  for   the  specified   file
+ * When `AT_SYMLINK_NOFOLLOW' is given, a final symlink is  dereferenced,
  * causing the pointed-to file location to be retrieved. - Otherwise, the
  * location of the link is printed instead.
  * You may pass `AT_READLINK_REQSIZE' to always have the function return
- * the required buffer size, rather than the used size.
+ * the   required   buffer   size,   rather   than   the   used    size.
  * @param: flags: Set of `0 | AT_ALTPATH | AT_SYMLINK_NOFOLLOW | AT_READLINK_REQSIZE | AT_DOSPATH' */
 __CDECLARE_SC(,__ssize_t,frealpathat,(__fd_t __dirfd, char const *__filename, char *__buf, __size_t __buflen, __atflag_t __flags),(__dirfd,__filename,__buf,__buflen,__flags))
 #endif /* __CRT_HAVE_SC(frealpathat) */
@@ -744,7 +744,7 @@ __CDECLARE_SC(,__errno_t,fsymlinkat,(char const *__link_text, __fd_t __tofd, cha
 #endif /* __CRT_HAVE_SC(fsymlinkat) */
 #if __CRT_HAVE_SC(fsync)
 /* Synchronize a file (including its descriptor which contains timestamps, and its size),
- * meaning that changes to its data and/or descriptor are written to disk */
+ * meaning  that  changes   to  its   data  and/or   descriptor  are   written  to   disk */
 __CDECLARE_SC(,__errno_t,fsync,(__fd_t __fd),(__fd))
 #endif /* __CRT_HAVE_SC(fsync) */
 #if __CRT_HAVE_SC(ftime)
@@ -778,11 +778,11 @@ __CDECLARE_SC(,__errno_t,futimesat64,(__fd_t __dirfd, char const *__filename, st
  * @param: pmode:       When non-`NULL', store the current mode, which is encoded as:
  *                       - One of `EXCEPT_HANDLER_MODE_(DISABLED|ENABLED|SIGHAND)'
  *                       - Or'd with a set of `EXCEPT_HANDLER_FLAG_(ONESHOT|SETHANDLER|SETSTACK)'
- * @param: phandler:    When non-`NULL', store the address of the user-space exception handler.
+ * @param: phandler:    When   non-`NULL',   store  the   address   of  the   user-space   exception  handler.
  *                      Note that when no handler has been set (`!(*pmode & EXCEPT_HANDLER_FLAG_SETHANDLER)'),
  *                      then this pointer is set to `NULL'.
  * @param: phandler_sp: When non-`NULL', store the starting address of the user-space exception handler stack.
- *                      Note that when no stack has been set (`!(*pmode & EXCEPT_HANDLER_FLAG_SETSTACK)'),
+ *                      Note that  when no  stack has  been set  (`!(*pmode & EXCEPT_HANDLER_FLAG_SETSTACK)'),
  *                      or when the stack was defined to re-use the previous stack,
  *                      then this pointer is set to `EXCEPT_HANDLER_SP_CURRENT'.
  * @return: 0 :         Success.
@@ -823,25 +823,25 @@ __CDECLARE_SC(,__syscall_slong_t,getdrives,(void),())
 #endif /* __CRT_HAVE_SC(getdrives) */
 #if __CRT_HAVE_SC(getegid)
 /* >> getegid(2)
- * @return: * : The effective GID of the calling thread.
+ * @return: * : The   effective  GID  of  the  calling  thread.
  *              This is the one used for most permission checks */
 __CDECLARE_SC(,__uint16_t,getegid,(void),())
 #endif /* __CRT_HAVE_SC(getegid) */
 #if __CRT_HAVE_SC(getegid32)
 /* >> getegid(2)
- * @return: * : The effective GID of the calling thread.
+ * @return: * : The   effective  GID  of  the  calling  thread.
  *              This is the one used for most permission checks */
 __CDECLARE_SC(,__uint32_t,getegid32,(void),())
 #endif /* __CRT_HAVE_SC(getegid32) */
 #if __CRT_HAVE_SC(geteuid)
 /* >> geteuid(2)
- * @return: * : The effective UID of the calling thread.
+ * @return: * : The   effective  UID  of  the  calling  thread.
  *              This is the one used for most permission checks */
 __CDECLARE_SC(,__uint16_t,geteuid,(void),())
 #endif /* __CRT_HAVE_SC(geteuid) */
 #if __CRT_HAVE_SC(geteuid32)
 /* >> geteuid(2)
- * @return: * : The effective UID of the calling thread.
+ * @return: * : The   effective  UID  of  the  calling  thread.
  *              This is the one used for most permission checks */
 __CDECLARE_SC(,__uint32_t,geteuid32,(void),())
 #endif /* __CRT_HAVE_SC(geteuid32) */
@@ -881,7 +881,7 @@ __CDECLARE_SC(,__errno_t,getitimer64,(__syscall_ulong_t __which, struct __itimer
  * @param: addr_len: [in]  The amount of available memory starting at `addr'
  *                   [out] The amount of required memory for the address.
  *                         This may be more than was given, in which case
- *                         the address was truncated and may be invalid.
+ *                         the  address was truncated and may be invalid.
  * @throw: E_INVALID_ARGUMENT_BAD_STATE:E_INVALID_ARGUMENT_CONTEXT_GETPEERNAME_NOT_CONNECTED
  * @return: 0 : Success */
 __CDECLARE_SC(,__errno_t,getpeername,(__fd_t __sockfd, struct sockaddr *__addr, __socklen_t *__addr_len),(__sockfd,__addr,__addr_len))
@@ -950,15 +950,15 @@ __CDECLARE_SC(,__pid_t,getsid,(__pid_t __pid),(__pid))
 #endif /* __CRT_HAVE_SC(getsid) */
 #if __CRT_HAVE_SC(getsockname)
 /* Determine the local address (aka. name) for the given socket `sockfd'.
- * This is usually the same address as was previously set by `bind(2)'
+ * This  is usually the  same address as was  previously set by `bind(2)'
  * NOTE: Before the socket has actually be bound or connected, the exact
- *       address that is returned by this function is weakly undefined.
+ *       address that is returned by this function is weakly  undefined.
  *       e.g.: For AF_INET, sin_addr=0.0.0.0, sin_port=0 is returned.
  * @param: addr:     [out] Buffer where to store the sock address.
  * @param: addr_len: [in]  The amount of available memory starting at `addr'
  *                   [out] The amount of required memory for the address.
  *                         This may be more than was given, in which case
- *                         the address was truncated and may be invalid.
+ *                         the  address was truncated and may be invalid.
  * return: 0 : Success */
 __CDECLARE_SC(,__errno_t,getsockname,(__fd_t __sockfd, struct sockaddr *__addr, __socklen_t *__addr_len),(__sockfd,__addr,__addr_len))
 #endif /* __CRT_HAVE_SC(getsockname) */
@@ -970,7 +970,7 @@ __CDECLARE_SC(,__errno_t,getsockname,(__fd_t __sockfd, struct sockaddr *__addr, 
  * @param: optlen:  [in]  The amount of available memory starting at `optval'
  *                  [out] The amount of required memory for the option value.
  *                        This may be more than was given, in which case
- *                        the contents of `optval' are undefined.
+ *                        the  contents  of   `optval'  are   undefined.
  * @throw: E_INVALID_ARGUMENT_SOCKET_OPT:E_INVALID_ARGUMENT_CONTEXT_GETSOCKOPT
  * @return: 0 : Success */
 __CDECLARE_SC(,__errno_t,getsockopt,(__fd_t __sockfd, __syscall_ulong_t __level, __syscall_ulong_t __optname, void *__optval, __socklen_t *__optlen),(__sockfd,__level,__optname,__optval,__optlen))
@@ -1010,12 +1010,12 @@ __CDECLARE_SC(,__syscall_slong_t,hopf,(__fd_t __fd, __syscall_ulong_t __command,
 __CDECLARE_SC(,__errno_t,idle,(void),())
 #endif /* __CRT_HAVE_SC(idle) */
 #if __CRT_HAVE_SC(init_module)
-/* Load a kernel driver from an ELF image `module_image...+=len'
+/* Load a  kernel driver  from  an ELF  image  `module_image...+=len'
  * This system call exists for linux compatiblity, and is implemented
  * as an alias for `KSYSCTL_DRIVER_INSMOD:KSYSCTL_DRIVER_FORMAT_BLOB'
  * 
- * Note however that that is where linux compatiblity ends. Since the
- * linux kernel does not implement any semblance of a stable ABI, you
+ * Note  however that that is where linux compatiblity ends. Since the
+ * linux kernel does not implement any semblance of a stable ABI,  you
  * have to realize that on KOS, this system call can only load drivers
  * specifically built to run within the KOS kernel!
  * @param: uargs: The driver commandline */
@@ -1089,7 +1089,7 @@ __CDECLARE_SC(,__errno_t,ioprio_set,(__syscall_ulong_t __who, __syscall_ulong_t 
 __CDECLARE_SC(,__errno_t,ipc,(int __TODO_PROTOTYPE),(__TODO_PROTOTYPE))
 #endif /* __CRT_HAVE_SC(ipc) */
 #if __CRT_HAVE_SC(kcmp)
-/* @param: type: One of `KCMP_FILE', `KCMP_FILES', `KCMP_FS', `KCMP_IO',
+/* @param: type: One of  `KCMP_FILE',  `KCMP_FILES',  `KCMP_FS',  `KCMP_IO',
  *               `KCMP_SIGHAND', `KCMP_SYSVSEM', `KCMP_VM', `KCMP_EPOLL_TFD' */
 __CDECLARE_SC(,__syscall_slong_t,kcmp,(__pid_t __pid1, __pid_t __pid2, __syscall_ulong_t __type, __syscall_ulong_t __idx1, __syscall_ulong_t __idx2),(__pid1,__pid2,__type,__idx1,__idx2))
 #endif /* __CRT_HAVE_SC(kcmp) */
@@ -1114,12 +1114,12 @@ __CDECLARE_SC(,__errno_t,klstat,(char const *__filename, struct __kos_statx32 *_
 #endif /* __CRT_HAVE_SC(klstat) */
 #if __CRT_HAVE_SC(kreaddir)
 /* @param: mode: One of `READDIR_DEFAULT', `READDIR_CONTINUE', `READDIR_PEEK' or `READDIR_MULTIPLE',
- *               optionally or'd with any of `READDIR_SKIPREL | READDIR_WANTEOF' */
+ *               optionally     or'd     with     any     of     `READDIR_SKIPREL | READDIR_WANTEOF' */
 __CDECLARE_SC(,__ssize_t,kreaddir,(__fd_t __fd, struct dirent *__buf, __size_t __bufsize, __syscall_ulong_t __mode),(__fd,__buf,__bufsize,__mode))
 #endif /* __CRT_HAVE_SC(kreaddir) */
 #if __CRT_HAVE_SC(kreaddirf)
 /* @param: mode: One of `READDIR_DEFAULT', `READDIR_CONTINUE', `READDIR_PEEK' or `READDIR_MULTIPLE',
- *               optionally or'd with any of `READDIR_SKIPREL | READDIR_WANTEOF' */
+ *               optionally     or'd     with     any     of     `READDIR_SKIPREL | READDIR_WANTEOF' */
 __CDECLARE_SC(,__ssize_t,kreaddirf,(__fd_t __fd, struct dirent *__buf, __size_t __bufsize, __syscall_ulong_t __mode, __iomode_t __iomode),(__fd,__buf,__bufsize,__mode,__iomode))
 #endif /* __CRT_HAVE_SC(kreaddirf) */
 #if __CRT_HAVE_SC(kstat)
@@ -1161,26 +1161,26 @@ __CDECLARE_SC(,__syscall_slong_t,lfutex,(__uint32_t *__uaddr, __syscall_ulong_t 
 #endif /* __CRT_HAVE_SC(lfutex) */
 #if __CRT_HAVE_SC(lfutexexpr)
 /* >> lfutexexpr(2)
- * The lfutexexpr() system call can be used to specify arbitrarily complex
- * expressions that must atomically (in relation to other futex operations)
- * hold true before the scheduler will suspend the calling thread, as well as
+ * The lfutexexpr()  system call  can be  used to  specify arbitrarily  complex
+ * expressions  that must  atomically (in  relation to  other futex operations)
+ * hold  true before the scheduler will suspend  the calling thread, as well as
  * have the calling thread wait for any number of futex objects associated with
- * any address that is checked as part of the expression. (s.a. `lfutex()')
+ * any  address that  is checked as  part of the  expression. (s.a. `lfutex()')
  * Notes:
- *   - This is the only futex function that can be used to wait on multiple futex
+ *   - This is the only futex  function that can be used  to wait on multiple  futex
  *     objects (i.e. resume execution when `LFUTEX_WAKE' is called on _any_ of them)
- *   - For more precise control over waiting on futex objects, as well as waiting on
- *     futexes in conjunction with waiting on other things such as files, see the
+ *   - For more precise control over waiting on  futex objects, as well as waiting  on
+ *     futexes in conjunction  with waiting  on other things  such as  files, see  the
  *     documentation on this topic (lfutex() and select()) at the top of <kos/futex.h>
  * @param: base:          Base pointer added to the `fe_offset' fields of given expressions
  * @param: exprv:         Vector of expressions for which to check
  * @param: exprc:         Number of expressions given in `exprv'
  * @param: timeout:       Timeout for wait operations (s.a. `LFUTEX_WAIT_FLAG_TIMEOUT_*')
  * @param: timeout_flags: Set of `LFUTEX_WAIT_FLAG_TIMEOUT_*'
- * @return: * : The first non-zero return value from executing all of the given `exprv'
- *              in order (s.a. the documentations of the individual `LFUTEX_WAIT_*' functions
- *              to see their possible return values, which are always `0' when they would
- *              perform a wait operation, and usually `1' otherwise) or `0' if the calling
+ * @return: * : The  first  non-zero return  value  from executing  all  of the  given `exprv'
+ *              in order (s.a. the documentations of the individual `LFUTEX_WAIT_*'  functions
+ *              to see their  possible return  values, which are  always `0'  when they  would
+ *              perform a wait  operation, and usually  `1' otherwise) or  `0' if the  calling
  *              thread had to perform a wait operation, at which point this function returning
  *              that value means that you've once again been re-awoken.
  * @return: -1:EFAULT:    A faulty pointer was given
@@ -1191,15 +1191,15 @@ __CDECLARE_SC(,__errno_t,lfutexexpr,(void *__base, __size_t __exprc, struct lfut
 #endif /* __CRT_HAVE_SC(lfutexexpr) */
 #if __CRT_HAVE_SC(lfutexlockexpr)
 /* >> lfutexlockexpr(2)
- * A function that is similar to `lfutexexpr()', but allows for the use of one central
+ * A  function that is similar to `lfutexexpr()', but  allows for the use of one central
  * locking futex that is used for waiting and may be distinct from any other given futex
  * object pointer.
  * Notes:
- *   - This function only has the calling thread wait on a single futex `ulockaddr',
+ *   - This function  only  has  the  calling  thread wait  on  a  single  futex  `ulockaddr',
  *     rather than having it wait on an arbitrary number of futexes, as would be the case when
  *     the `lfutexexpr()' function is used.
  *   - For more precise control over waiting on futex objects, as well as waiting on futexes
- *     in conjunction with waiting on other things such as files, see the documentation on
+ *     in conjunction with waiting on other things  such as files, see the documentation  on
  *     this topic (lfutex() and select()) at the top of <kos/futex.h>
  * @param: ulockaddr:     Address of the futex lock to-be used / The futex on which to wait
  * @param: base:          Base pointer added to the `fe_offset' fields of given expressions
@@ -1207,10 +1207,10 @@ __CDECLARE_SC(,__errno_t,lfutexexpr,(void *__base, __size_t __exprc, struct lfut
  * @param: exprc:         Number of expressions given in `exprv'
  * @param: timeout:       Timeout for wait operations (s.a. `LFUTEX_WAIT_FLAG_TIMEOUT_*')
  * @param: timeout_flags: Set of `LFUTEX_WAIT_FLAG_TIMEOUT_*'
- * @return: * : The first non-zero return value from executing all of the given `exprv'
- *              in order (s.a. the documentations of the individual `LFUTEX_WAIT_*' functions
- *              to see their possible return values, which are always `0' when they would
- *              perform a wait operation, and usually `1' otherwise) or `0' if the calling
+ * @return: * : The  first  non-zero return  value  from executing  all  of the  given `exprv'
+ *              in order (s.a. the documentations of the individual `LFUTEX_WAIT_*'  functions
+ *              to see their  possible return  values, which are  always `0'  when they  would
+ *              perform a wait  operation, and usually  `1' otherwise) or  `0' if the  calling
  *              thread had to perform a wait operation, at which point this function returning
  *              that value means that you've once again been re-awoken.
  * @return: -1:EFAULT:    A faulty pointer was given
@@ -1231,9 +1231,9 @@ __CDECLARE_SC(,__errno_t,linkat,(__fd_t __fromfd, char const *__existing_file, _
 #endif /* __CRT_HAVE_SC(linkat) */
 #if __CRT_HAVE_SC(listen)
 /* Begin to listen for incoming client (aka. peer) connection requests.
- * @param: max_backlog: The max number of clients pending to be accept(2)-ed, before
+ * @param: max_backlog: The max number of clients  pending to be accept(2)-ed,  before
  *                      the kernel will refuse to enqueue additional clients, and will
- *                      instead automatically refuse any further requests until the
+ *                      instead automatically refuse  any further  requests until  the
  *                      less than `max_backlog' clients are still pending.
  * @throw: E_NET_ADDRESS_IN_USE:E_NET_ADDRESS_IN_USE_CONTEXT_LISTEN
  * @throw: E_INVALID_HANDLE_NET_OPERATION:E_NET_OPERATION_LISTEN
@@ -1278,11 +1278,11 @@ __CDECLARE_SC(,__errno_t,madvise,(void *__addr, __size_t __len, __syscall_ulong_
 /* Map the segments of a given library into memory
  * @param: addr:  Hint address (ignored unless `MAP_FIXED' is passed)
  * @param: flags: Set of `MAP_FIXED | MAP_32BIT | MAP_GROWSDOWN |
- *                MAP_GROWSUP | MAP_LOCKED | MAP_NORESERVE |
- *                MAP_POPULATE | MAP_NONBLOCK | MAP_SYNC |
+ *                MAP_GROWSUP  |  MAP_LOCKED  |  MAP_NORESERVE  |
+ *                MAP_POPULATE  |  MAP_NONBLOCK   |  MAP_SYNC   |
  *                MAP_FIXED_NOREPLACE | MAP_NOASLR'
  * @param: fd:    A handle for the library file being mapped (must be mmap(2)-able)
- * @param: hdrv:  Pointer to a vector of `Elf32_Phdr' or `Elf64_Phdr'
+ * @param: hdrv:  Pointer  to  a vector  of `Elf32_Phdr'  or `Elf64_Phdr'
  *                (depending on the caller running in 32- or 64-bit mode)
  * @param: hdrc:  The number of program headers */
 __CDECLARE_SC(,void *,maplibrary,(void *__addr, __syscall_ulong_t __flags, __fd_t __fd, struct elf32_phdr const *__hdrv, __size_t __hdrc),(__addr,__flags,__fd,__hdrv,__hdrc))
@@ -1317,8 +1317,8 @@ __CDECLARE_SC(,__errno_t,mknodat,(__fd_t __dirfd, char const *__nodename, __mode
 #endif /* __CRT_HAVE_SC(mknodat) */
 #if __CRT_HAVE_SC(mktty)
 /* Create and return a new tty terminal controller connected to the given keyboard and display
- * The newly created device automatically gets assigned an arbitrary device number, before
- * being made available under a file `/dev/${name}' (or rather: as ${name} within the devfs)
+ * The  newly created  device automatically gets  assigned an arbitrary  device number, before
+ * being made available under a file `/dev/${name}'  (or rather: as ${name} within the  devfs)
  * @param: reserved: Reserved set of flags (Must pass `0'; for future expansion) */
 __CDECLARE_SC(,__fd_t,mktty,(char const *__name, __fd_t __keyboard, __fd_t __display, __syscall_ulong_t __rsvd),(__name,__keyboard,__display,__rsvd))
 #endif /* __CRT_HAVE_SC(mktty) */
@@ -1335,8 +1335,8 @@ __CDECLARE_SC(,__errno_t,mlockall,(__syscall_ulong_t __flags),(__flags))
 #if __CRT_HAVE_SC(mmap)
 /* @param: prot:  Either `PROT_NONE', or set of `PROT_EXEC | PROT_WRITE | PROT_READ | PROT_SEM | PROT_LOOSE | PROT_SHARED'
  * @param: flags: One of `MAP_SHARED`, 'MAP_SHARED_VALIDATE' or `MAP_PRIVATE', optionally or'd
- *               with a set of `MAP_ANONYMOUS | MAP_FIXED | MAP_GROWSDOWN | MAP_LOCKED |
- *               MAP_NONBLOCK | MAP_NORESERVE | MAP_POPULATE | MAP_STACK | MAP_SYNC |
+ *               with  a  set of  `MAP_ANONYMOUS  | MAP_FIXED  |  MAP_GROWSDOWN |  MAP_LOCKED |
+ *               MAP_NONBLOCK  |  MAP_NORESERVE  |  MAP_POPULATE  |  MAP_STACK  |  MAP_SYNC   |
  *               MAP_UNINITIALIZED | MAP_DONT_MAP | MAP_FIXED_NOREPLACE | MAP_OFFSET64_POINTER' */
 __CDECLARE_SC(,void *,mmap,(void *__addr, __size_t __len, __syscall_ulong_t __prot, __syscall_ulong_t __flags, __fd_t __fd, __syscall_ulong_t __offset),(__addr,__len,__prot,__flags,__fd,__offset))
 #endif /* __CRT_HAVE_SC(mmap) */
@@ -1446,9 +1446,9 @@ __CDECLARE_SC(,__errno_t,oldstat,(char const *__filename, struct linux_oldstat *
 __CDECLARE_SC(,__errno_t,olduname,(struct linux_olduname *__name),(__name))
 #endif /* __CRT_HAVE_SC(olduname) */
 #if __CRT_HAVE_SC(open)
-/* Open a new file handle to the file specified by `filename'
- * When `oflags & O_CREAT', then `mode' specifies the initial
- * file access permissions with which the file should be opened.
+/* Open  a  new  file  handle  to  the  file  specified  by `filename'
+ * When  `oflags & O_CREAT',   then  `mode'   specifies  the   initial
+ * file  access  permissions with  which  the file  should  be opened.
  * On KOS, the returned handle can be anything, but is usually one of:
  *   - HANDLE_TYPE_PATH:                   When `O_PATH' was given
  *   - HANDLE_TYPE_BLOCKDEVICE:            For `S_IFBLK' files
@@ -1458,7 +1458,7 @@ __CDECLARE_SC(,__errno_t,olduname,(struct linux_olduname *__name),(__name))
  *   - HANDLE_TYPE_ONESHOT_DIRECTORY_FILE: For `S_IFDIR' files from special one-shot directories
  *   - HANDLE_TYPE_FILE:                   For `S_IFREG' and `S_IFDIR' (~normal~) files
  *   - *:                                  Certain filesystem names can literally return anything, such
- *                                         as `/proc/self/fd/1234', which is more like `dup(1234)' */
+ *                                         as `/proc/self/fd/1234',  which  is  more  like  `dup(1234)' */
 __CDECLARE_SC(,__fd_t,open,(char const *__filename, __oflag_t __oflags, __mode_t __mode),(__filename,__oflags,__mode))
 #endif /* __CRT_HAVE_SC(open) */
 #if __CRT_HAVE_SC(open_by_handle_at)
@@ -1468,9 +1468,9 @@ __CDECLARE_SC(,__fd_t,open_by_handle_at,(__fd_t __mountdirfd, struct file_handle
 __CDECLARE_SC(,__errno_t,open_tree,(int __TODO_PROTOTYPE),(__TODO_PROTOTYPE))
 #endif /* __CRT_HAVE_SC(open_tree) */
 #if __CRT_HAVE_SC(openat)
-/* Open a new file handle to the file specified by `filename'
- * When `oflags & O_CREAT', then `mode' specifies the initial
- * file access permissions with which the file should be opened.
+/* Open  a  new  file  handle  to  the  file  specified  by `filename'
+ * When  `oflags & O_CREAT',   then  `mode'   specifies  the   initial
+ * file  access  permissions with  which  the file  should  be opened.
  * On KOS, the returned handle can be anything, but is usually one of:
  *   - HANDLE_TYPE_PATH:                   When `O_PATH' was given
  *   - HANDLE_TYPE_BLOCKDEVICE:            For `S_IFBLK' files
@@ -1480,7 +1480,7 @@ __CDECLARE_SC(,__errno_t,open_tree,(int __TODO_PROTOTYPE),(__TODO_PROTOTYPE))
  *   - HANDLE_TYPE_ONESHOT_DIRECTORY_FILE: For `S_IFDIR' files from special one-shot directories
  *   - HANDLE_TYPE_FILE:                   For `S_IFREG' and `S_IFDIR' (~normal~) files
  *   - *:                                  Certain filesystem names can literally return anything, such
- *                                         as `/proc/self/fd/1234', which is more like `dup(1234)' */
+ *                                         as `/proc/self/fd/1234',  which  is  more  like  `dup(1234)' */
 __CDECLARE_SC(,__fd_t,openat,(__fd_t __dirfd, char const *__filename, __oflag_t __oflags, __mode_t __mode),(__dirfd,__filename,__oflags,__mode))
 #endif /* __CRT_HAVE_SC(openat) */
 #if __CRT_HAVE_SC(openat2)
@@ -1488,7 +1488,7 @@ __CDECLARE_SC(,__errno_t,openat2,(int __TODO_PROTOTYPE),(__TODO_PROTOTYPE))
 #endif /* __CRT_HAVE_SC(openat2) */
 #if __CRT_HAVE_SC(openpty)
 /* Create a new pseudo-terminal driver and store handles to both the
- * master and slave ends of the connection in the given pointers. */
+ * master  and slave ends  of the connection  in the given pointers. */
 __CDECLARE_SC(,__errno_t,openpty,(__fd_t *__amaster, __fd_t *__aslave, char *__name, struct termios const *__termp, struct winsize const *__winp),(__amaster,__aslave,__name,__termp,__winp))
 #endif /* __CRT_HAVE_SC(openpty) */
 #if __CRT_HAVE_SC(pause)
@@ -1502,7 +1502,7 @@ __CDECLARE_SC(,__errno_t,perf_event_open,(int __TODO_PROTOTYPE),(__TODO_PROTOTYP
 __CDECLARE_SC(,__errno_t,personality,(int __TODO_PROTOTYPE),(__TODO_PROTOTYPE))
 #endif /* __CRT_HAVE_SC(personality) */
 #if __CRT_HAVE_SC(pidfd_getfd)
-/* Duplicate the handle of a foreign process into a handle for the caller.
+/* Duplicate the  handle  of  a  foreign  process into  a  handle  for  the  caller.
  * This system call duplicates the functionality of `open("/proc/[pid]/fd/[fdno]")',
  * which may also be used to duplicate file handles from another process.
  * @param: pidfd: A `HANDLE_TYPE_TASK'-handle
@@ -1518,7 +1518,7 @@ __CDECLARE_SC(,__fd_t,pidfd_getfd,(__fd_t __pidfd, __fd_t __foreign_fd, __syscal
 #endif /* __CRT_HAVE_SC(pidfd_getfd) */
 #if __CRT_HAVE_SC(pidfd_open)
 /* Return a `HANDLE_TYPE_TASK' handle for the given `pid'
- * This system call exists for compatibility with linux, which does not allow
+ * This system call exists for compatibility with linux, which does not  allow
  * this call to succeed when `pid' isn't a process leader (i.e. main() thread)
  * @param: flags: Must always be `0' (for now)
  * @return: * :   A handle for the process `pid'
@@ -1580,7 +1580,7 @@ __CDECLARE_SC(,__ssize_t,pread64,(__fd_t __fd, void *__buf, __size_t __bufsize, 
 __CDECLARE_SC(,__ssize_t,pread64f,(__fd_t __fd, void *__buf, __size_t __bufsize, __uint64_t __offset, __iomode_t __mode),(__fd,__buf,__bufsize,__offset,__mode))
 #endif /* __CRT_HAVE_SC(pread64f) */
 #if __CRT_HAVE_SC(preadv)
-/* Same as `readv(2)', but read data from a file at a
+/* Same as  `readv(2)', but  read data  from a  file at  a
  * specific `offset', rather than the current R/W position
  * @return: <= SUM(iov[*].iov_len): The actual amount of read bytes */
 __CDECLARE_SC(,__ssize_t,preadv,(__fd_t __fd, struct __iovecx32 const *__iovec, __size_t __count, __uint64_t __offset),(__fd,__iovec,__count,__offset))
@@ -1589,7 +1589,7 @@ __CDECLARE_SC(,__ssize_t,preadv,(__fd_t __fd, struct __iovecx32 const *__iovec, 
 __CDECLARE_SC(,__errno_t,preadv2,(int __TODO_PROTOTYPE),(__TODO_PROTOTYPE))
 #endif /* __CRT_HAVE_SC(preadv2) */
 #if __CRT_HAVE_SC(preadvf)
-/* Same as `readv(2)', but read data from a file at a
+/* Same as  `readv(2)', but  read data  from a  file at  a
  * specific `offset', rather than the current R/W position
  * @return: <= SUM(iov[*].iov_len): The actual amount of read bytes */
 __CDECLARE_SC(,__ssize_t,preadvf,(__fd_t __fd, struct __iovecx32 const *__iovec, __size_t __count, __uint64_t __offset, __iomode_t __mode),(__fd,__iovec,__count,__offset,__mode))
@@ -1635,7 +1635,7 @@ __CDECLARE_SC(,__ssize_t,pwrite64,(__fd_t __fd, void const *__buf, __size_t __bu
 __CDECLARE_SC(,__ssize_t,pwrite64f,(__fd_t __fd, void const *__buf, __size_t __bufsize, __uint64_t __offset, __iomode_t __mode),(__fd,__buf,__bufsize,__offset,__mode))
 #endif /* __CRT_HAVE_SC(pwrite64f) */
 #if __CRT_HAVE_SC(pwritev)
-/* Same as `writev(2)', but write data to a file at a
+/* Same as  `writev(2)', but  write data  to a  file at  a
  * specific `offset', rather than the current R/W position
  * @return: <= SUM(iov[*].iov_len): The actual amount of written bytes */
 __CDECLARE_SC(,__ssize_t,pwritev,(__fd_t __fd, struct __iovecx32 const *__iovec, __size_t __count, __uint64_t __offset),(__fd,__iovec,__count,__offset))
@@ -1644,7 +1644,7 @@ __CDECLARE_SC(,__ssize_t,pwritev,(__fd_t __fd, struct __iovecx32 const *__iovec,
 __CDECLARE_SC(,__errno_t,pwritev2,(int __TODO_PROTOTYPE),(__TODO_PROTOTYPE))
 #endif /* __CRT_HAVE_SC(pwritev2) */
 #if __CRT_HAVE_SC(pwritevf)
-/* Same as `writev(2)', but write data to a file at a
+/* Same as  `writev(2)', but  write data  to a  file at  a
  * specific `offset', rather than the current R/W position
  * @return: <= SUM(iov[*].iov_len): The actual amount of written bytes */
 __CDECLARE_SC(,__ssize_t,pwritevf,(__fd_t __fd, struct __iovecx32 const *__iovec, __size_t __count, __uint64_t __offset, __iomode_t __mode),(__fd,__iovec,__count,__offset,__mode))
@@ -1666,7 +1666,7 @@ __CDECLARE_SC(,__errno_t,raiseat,(struct ucpustate32 const *__state, struct __si
 #endif /* __CRT_HAVE_SC(raiseat) */
 #if __CRT_HAVE_SC(read)
 /* Read up to `bufsize' bytes from `fd' into `buf'
- * When `fd' has the `O_NONBLOCK' flag set, only read as much data as was
+ * When  `fd' has the `O_NONBLOCK' flag set, only read as much data as was
  * available at the time the call was made, and throw `E_WOULDBLOCK' if no
  * data was available at the time.
  * @return: <= bufsize: The actual amount of read bytes
@@ -1679,15 +1679,15 @@ __CDECLARE_SC(,__ssize_t,readahead,(__fd_t __fd, __uint64_t __offset, __size_t _
 #if __CRT_HAVE_SC(readdir)
 /* Read exactly one directory entry from `fd'
  * Note that the linux version of this system call has one additional argument `count'.
- * However, within the linux kernel implementation, that argument is unconditionally
- * ignored, and the system call will _always_ read exactly 1 directory entry from `fd'
+ * However, within the  linux kernel implementation,  that argument is  unconditionally
+ * ignored,  and the system call will _always_ read exactly 1 directory entry from `fd'
  * @return: 1 : Read on directory entry
  * @return: 0 : End-of-directory */
 __CDECLARE_SC(,__syscall_slong_t,readdir,(__fd_t __fd, struct old_linux_direntx32 *__buf),(__fd,__buf))
 #endif /* __CRT_HAVE_SC(readdir) */
 #if __CRT_HAVE_SC(readf)
 /* Read up to `bufsize' bytes from `fd' into `buf'
- * When `fd' has the `O_NONBLOCK' flag set, only read as much data as was
+ * When  `fd' has the `O_NONBLOCK' flag set, only read as much data as was
  * available at the time the call was made, and throw `E_WOULDBLOCK' if no
  * data was available at the time.
  * @return: <= bufsize: The actual amount of read bytes
@@ -1702,10 +1702,10 @@ __CDECLARE_SC(,__ssize_t,readlinkat,(__fd_t __dirfd, char const *__path, char *_
 #endif /* __CRT_HAVE_SC(readlinkat) */
 #if __CRT_HAVE_SC(readv)
 /* Same as `read(2)', but rather than specifying a single, continuous buffer,
- * read data into `count' separate buffers, though still return the actual
+ * read  data into `count'  separate buffers, though  still return the actual
  * number of read bytes.
  * When `fd' has the `O_NONBLOCK' flag set, only read as much data as was
- * available at the time the call was made, and throw `E_WOULDBLOCK'
+ * available at  the time  the call  was made,  and throw  `E_WOULDBLOCK'
  * no data was available at the time.
  * @return: <= SUM(iov[*].iov_len): The actual amount of read bytes
  * @return: 0                     : EOF */
@@ -1713,10 +1713,10 @@ __CDECLARE_SC(,__ssize_t,readv,(__fd_t __fd, struct __iovecx32 const *__iovec, _
 #endif /* __CRT_HAVE_SC(readv) */
 #if __CRT_HAVE_SC(readvf)
 /* Same as `read(2)', but rather than specifying a single, continuous buffer,
- * read data into `count' separate buffers, though still return the actual
+ * read  data into `count'  separate buffers, though  still return the actual
  * number of read bytes.
  * When `fd' has the `O_NONBLOCK' flag set, only read as much data as was
- * available at the time the call was made, and throw `E_WOULDBLOCK'
+ * available at  the time  the call  was made,  and throw  `E_WOULDBLOCK'
  * no data was available at the time.
  * @return: <= SUM(iov[*].iov_len): The actual amount of read bytes
  * @return: 0                     : EOF */
@@ -1746,10 +1746,10 @@ __CDECLARE_SC(,__ssize_t,recvfrom,(__fd_t __sockfd, void *__buf, __size_t __bufs
 #endif /* __CRT_HAVE_SC(recvfrom) */
 #if __CRT_HAVE_SC(recvmmsg)
 /* Same as `recvmsg(2)', but may be used to receive many
- * messages (datagrams) with a single system call.
+ * messages  (datagrams)  with  a  single  system  call.
  * @param: msg_flags: Set of `MSG_CMSG_CLOEXEC | MSG_CMSG_CLOFORK |
  *                            MSG_DONTWAIT | MSG_ERRQUEUE | MSG_OOB |
- *                            MSG_PEEK | MSG_TRUNC | MSG_WAITALL |
+ *                            MSG_PEEK  |  MSG_TRUNC |  MSG_WAITALL |
  *                            MSG_WAITFORONE'
  * @throw: Error (s.a. `recvmsg(2)')
  * @return: * : The # of datagrams successfully received. */
@@ -1757,10 +1757,10 @@ __CDECLARE_SC(,__ssize_t,recvmmsg,(__fd_t __sockfd, struct __mmsghdrx32 *__vmess
 #endif /* __CRT_HAVE_SC(recvmmsg) */
 #if __CRT_HAVE_SC(recvmmsg_time64)
 /* Same as `recvmsg(2)', but may be used to receive many
- * messages (datagrams) with a single system call.
+ * messages  (datagrams)  with  a  single  system  call.
  * @param: msg_flags: Set of `MSG_CMSG_CLOEXEC | MSG_CMSG_CLOFORK |
  *                            MSG_DONTWAIT | MSG_ERRQUEUE | MSG_OOB |
- *                            MSG_PEEK | MSG_TRUNC | MSG_WAITALL |
+ *                            MSG_PEEK  |  MSG_TRUNC |  MSG_WAITALL |
  *                            MSG_WAITFORONE'
  * @throw: Error (s.a. `recvmsg(2)')
  * @return: * : The # of datagrams successfully received. */
@@ -1768,10 +1768,10 @@ __CDECLARE_SC(,__ssize_t,recvmmsg_time64,(__fd_t __sockfd, struct __mmsghdrx32 *
 #endif /* __CRT_HAVE_SC(recvmmsg_time64) */
 #if __CRT_HAVE_SC(recvmsg)
 /* Same as `recv(2)' and `recvfrom(2)', but also allows for receiving ancillary
- * data as well as for data buffers to be represented by an IOV vector.
+ * data as  well as  for  data buffers  to be  represented  by an  IOV  vector.
  * @param: msg_flags: Set of `MSG_CMSG_CLOEXEC | MSG_CMSG_CLOFORK |
  *                            MSG_DONTWAIT | MSG_ERRQUEUE | MSG_OOB |
- *                            MSG_PEEK | MSG_TRUNC | MSG_WAITALL'
+ *                            MSG_PEEK  |  MSG_TRUNC  |  MSG_WAITALL'
  * @throw: ... Same as for `recv(2)' and `recvfrom(2)'
  * @return: * : [<= bufsize] The actual # of received payload bytes */
 __CDECLARE_SC(,__ssize_t,recvmsg,(__fd_t __sockfd, struct __msghdrx32 *__message, __syscall_ulong_t __msg_flags),(__sockfd,__message,__msg_flags))
@@ -1841,11 +1841,11 @@ __CDECLARE_SC(,__errno_t,rt_sigqueueinfo,(__pid_t __pid, __signo_t __usigno, str
 #endif /* __CRT_HAVE_SC(rt_sigqueueinfo) */
 #if __CRT_HAVE_SC(rt_sigreturn)
 /* Restore the specified register state when returning from a signal handler
- * Note that the order and locations of arguments taken by this system call
+ * Note that the order and locations of arguments taken by this system  call
  * are of great importance, as they must match what is encoded by the kernel
  * within `sighand_raise_signal()'
  * The order chosen is also important, as it is selected such that arguments
- * are only passed through registers that are preserved by CDECL */
+ * are  only  passed   through  registers  that   are  preserved  by   CDECL */
 __CDECLARE_VOID_SC(,rt_sigreturn,(struct fpustate32 const *__restore_fpu, __syscall_ulong_t __unused1, __syscall_ulong_t __unused2, struct __sigset_struct const *__restore_sigmask, struct rpc_syscall_info32 const *__sc_info, struct ucpustate32 const *__restore_cpu),(__restore_fpu,__unused1,__unused2,__restore_sigmask,__sc_info,__restore_cpu))
 #endif /* __CRT_HAVE_SC(rt_sigreturn) */
 #if __CRT_HAVE_SC(rt_sigsuspend)
@@ -1867,24 +1867,24 @@ __CDECLARE_SC(,__syscall_slong_t,rt_sigtimedwait_time64,(struct __sigset_struct 
 __CDECLARE_SC(,__errno_t,rt_tgsigqueueinfo,(__pid_t __pid, __pid_t __tid, __signo_t __usigno, struct __siginfox32_struct const *__uinfo),(__pid,__tid,__usigno,__uinfo))
 #endif /* __CRT_HAVE_SC(rt_tgsigqueueinfo) */
 #if __CRT_HAVE_SC(rtm_abort)
-/* Abort the current transaction by having `sys_rtm_begin()' return with
+/* Abort the current transaction  by having `sys_rtm_begin()' return  with
  * `RTM_ABORT_EXPLICIT | ((code << RTM_ABORT_CODE_S) & RTM_ABORT_CODE_M)'
  * If no transaction was in progress, behave as a no-op and return `-EOK'.
- * Otherwise, this system call does not return normally, but returns from
+ * Otherwise,  this system call does not return normally, but returns from
  * the original `sys_rtm_begin()' */
 __CDECLARE_SC(,__errno_t,rtm_abort,(__syscall_ulong_t __code),(__code))
 #endif /* __CRT_HAVE_SC(rtm_abort) */
 #if __CRT_HAVE_SC(rtm_begin)
-/* Begin an RTM operation. Note that if the arch-specific RTM driver
+/* Begin  an  RTM operation.  Note that  if  the arch-specific  RTM driver
  * wasn't already loaded into the kernel, it will be loaded automatically,
  * though any error that may happen during this will result in `RTM_NOSYS'
  * begin returned.
- * Note that while an RTM operation is in progress, only a very small hand
- * full of system calls are allowed to be used. Attempting to use arbitrary
- * system calls will most likely result in an `RTM_ABORT_FAILED' error, and
+ * Note that while an RTM  operation is in progress,  only a very small  hand
+ * full  of system calls are allowed to  be used. Attempting to use arbitrary
+ * system calls will most likely  result in an `RTM_ABORT_FAILED' error,  and
  * attempting to access too much system memory in general will result in this
- * function returning with `RTM_ABORT_CAPACITY', rather than succeeding.
- * The following is a list of system calls which are whitelisted for use
+ * function returning  with  `RTM_ABORT_CAPACITY',  rather  than  succeeding.
+ * The following is  a list  of system calls  which are  whitelisted for  use
  * during a transaction:
  *   - sys_rtm_begin:  Nested RTM operation
  *   - sys_rtm_end:    End an RTM operation
@@ -1898,8 +1898,8 @@ __CDECLARE_SC(,__rtm_status_t,rtm_begin,(void),())
 #endif /* __CRT_HAVE_SC(rtm_begin) */
 #if __CRT_HAVE_SC(rtm_end)
 /* End a transaction
- * If the transaction was successful, return normally (by returning `-EOK').
- * If the transaction failed, `sys_rtm_begin()' returns `RTM_ABORT_*'
+ * If  the  transaction was  successful,  return normally  (by  returning `-EOK').
+ * If    the   transaction   failed,   `sys_rtm_begin()'   returns   `RTM_ABORT_*'
  * If no transaction was in progress, an `E_ILLEGAL_OPERATION' exception is thrown */
 __CDECLARE_SC(,__errno_t,rtm_end,(void),())
 #endif /* __CRT_HAVE_SC(rtm_end) */
@@ -1944,7 +1944,7 @@ __CDECLARE_SC(,__errno_t,sched_setparam,(__pid_t __pid, struct sched_param const
 #endif /* __CRT_HAVE_SC(sched_setparam) */
 #if __CRT_HAVE_SC(sched_setscheduler)
 /* @param: policy: One of `SCHED_OTHER', `SCHED_FIFO', `SCHED_RR', `SCHED_BATCH',
- *                 `SCHED_IDLE', optionally or'd with `SCHED_RESET_ON_FORK' */
+ *                 `SCHED_IDLE',  optionally   or'd  with   `SCHED_RESET_ON_FORK' */
 __CDECLARE_SC(,__errno_t,sched_setscheduler,(__pid_t __pid, __syscall_ulong_t __policy, struct sched_param const *__param),(__pid,__policy,__param))
 #endif /* __CRT_HAVE_SC(sched_setscheduler) */
 #if __CRT_HAVE_SC(sched_yield)
@@ -1976,7 +1976,7 @@ __CDECLARE_SC(,__ssize_t,sendfile64,(__fd_t __out_fd, __fd_t __in_fd, __ULONG64_
 #endif /* __CRT_HAVE_SC(sendfile64) */
 #if __CRT_HAVE_SC(sendmmsg)
 /* Same as `sendmsg(2)', but may be used to send many
- * messages (datagrams) with a single system call.
+ * messages (datagrams)  with a  single system  call.
  * @param: msg_flags: Set of `MSG_CONFIRM | MSG_DONTROUTE | MSG_DONTWAIT |
  *                            MSG_EOR | MSG_MORE | MSG_NOSIGNAL | MSG_OOB'
  * @throw: ... Same as `sendmsg(2)'
@@ -1985,7 +1985,7 @@ __CDECLARE_SC(,__ssize_t,sendmmsg,(__fd_t __sockfd, struct __mmsghdrx32 *__vmess
 #endif /* __CRT_HAVE_SC(sendmmsg) */
 #if __CRT_HAVE_SC(sendmsg)
 /* Same as `send(2)' and `sendto(2)', but also allows for sending ancillary
- * data as well as for data buffers to be represented by an IOV vector.
+ * data as well as  for data buffers  to be represented  by an IOV  vector.
  * @param: msg_flags: Set of `MSG_CONFIRM | MSG_DONTROUTE | MSG_DONTWAIT |
  *                            MSG_EOR | MSG_MORE | MSG_NOSIGNAL | MSG_OOB'
  * @throw: ... Same as for `send(2)' and `sendto(2)'
@@ -2000,7 +2000,7 @@ __CDECLARE_SC(,__ssize_t,sendmsg,(__fd_t __sockfd, struct __msghdrx32 const *__m
  *                            MSG_EOR | MSG_MORE | MSG_NOSIGNAL | MSG_OOB'
  * @param: addr:      Address where to send data (or NULL when `addr_len' is 0)
  * @param: addr_len:  Size of `addr', or `0' to have this behave as an alias
- *                    for `send(sockfd, buf, bufsize, msg_flags)'
+ *                    for            `send(sockfd, buf, bufsize, msg_flags)'
  * @throw: E_INVALID_ARGUMENT_UNEXPECTED_COMMAND:E_INVALID_ARGUMENT_CONTEXT_SENDTO_WRONG_ADDRESS_FAMILY
  * @throw: E_INVALID_ARGUMENT_BAD_STATE:E_INVALID_ARGUMENT_CONTEXT_SEND_NOT_CONNECTED
  * @throw: E_NET_MESSAGE_TOO_LONG
@@ -2014,7 +2014,7 @@ __CDECLARE_SC(,__ssize_t,sendto,(__fd_t __sockfd, void const *__buf, __size_t __
 /* Set the exception handler mode for the calling thread.
  * Examples:
  *   Set mode #3 from you `main()': `set_exception_handler(EXCEPT_HANDLER_MODE_SIGHAND, NULL, NULL)'
- *   Set mode #4 (as done by libc): `set_exception_handler(EXCEPT_HANDLER_MODE_SIGHAND |
+ *   Set  mode   #4  (as   done  by   libc):  `set_exception_handler(EXCEPT_HANDLER_MODE_SIGHAND   |
  *                                                         EXCEPT_HANDLER_FLAG_SETHANDLER,
  *                                                         &except_handler4, NULL)'
  * @param: mode:       One of `EXCEPT_HANDLER_MODE_*', optionally or'd with `EXCEPT_HANDLER_FLAG_*'
@@ -2037,32 +2037,32 @@ __CDECLARE_SC(,__errno_t,set_thread_area,(int __TODO_PROTOTYPE),(__TODO_PROTOTYP
 __CDECLARE_SC(,__pid_t,set_tid_address,(__pid_t *__tidptr),(__tidptr))
 #endif /* __CRT_HAVE_SC(set_tid_address) */
 #if __CRT_HAVE_SC(set_userprocmask_address)
-/* Register the address of the calling thread's userprocmask controller.
- * This also initializes `*ctl->pm_sigmask' and `ctl->pm_pending', such
- * that `*ctl->pm_sigmask' is filled with the current kernel-level signal
+/* Register the address of  the calling thread's userprocmask  controller.
+ * This also  initializes `*ctl->pm_sigmask'  and `ctl->pm_pending',  such
+ * that `*ctl->pm_sigmask' is filled with the current kernel-level  signal
  * mask, as would be returned by `sigprocmask(2)', while `ctl->pm_pending'
  * is filled in with the equivalent of `sigpending(2)'
- * Additionally, the address of `&ctl->pm_mytid' is stored as an override
+ * Additionally,  the address  of `&ctl->pm_mytid'  is stored  as an override
  * for `set_tid_address(2)', and the kernel may read from `*ctl->pm_sigmask',
- * and write to `ctl->pm_pending' (using atomic-or for the later) from this
+ * and write to `ctl->pm_pending' (using  atomic-or for the later) from  this
  * point forth.
  * NOTE: Before calling this function, the caller must:
  *       >> bzero(ctl, sizeof(struct userprocmask));
  *       >> ctl->pm_sigsize = sizeof(sigset_t);
  *       >> ctl->pm_sigmask = &initial_sigmask;
  *       Where the initial bzero() is needed to initialize potential
- *       additional, arch-specific fields to all zeroes.
+ *       additional,   arch-specific   fields    to   all    zeroes.
  * NOTE: This system call will then initialize:
  *       >> ctl->pm_mytid = gettid();
  *       >> sigprocmask(0, NULL, ctl->pm_sigmask);
  *       >> sigpending(&ctl->pm_pending);
  * NOTE: Passing `NULL' for `ctl' disables userprocmask-mode, though
- *       before this is done, the kernel will copy the `pm_sigmask'
- *       of the previously set controller into its internal signal
+ *       before this is done, the kernel will copy the  `pm_sigmask'
+ *       of the previously set  controller into its internal  signal
  *       mask. (i.e. the one used outside of userprocmask-mode)
- * Note though that `pm_sigmask' is ignored for `SIGKILL' and `SIGSTOP'
- * Note also that this function replaces `set_tid_address(2)', such that
- * it negates a prior call to said function, while a future call to said
+ * Note though  that  `pm_sigmask'  is ignored  for  `SIGKILL'  and  `SIGSTOP'
+ * Note also  that  this  function replaces  `set_tid_address(2)',  such  that
+ * it negates a  prior call  to said  function, while  a future  call to  said
  * function will once again disable userprocmask, same as passing `NULL' would */
 __CDECLARE_SC(,__errno_t,set_userprocmask_address,(struct userprocmask *__ctl),(__ctl))
 #endif /* __CRT_HAVE_SC(set_userprocmask_address) */
@@ -2071,7 +2071,7 @@ __CDECLARE_SC(,__errno_t,setdomainname,(char const *__name, __size_t __len),(__n
 #endif /* __CRT_HAVE_SC(setdomainname) */
 #if __CRT_HAVE_SC(setfsgid)
 /* >> setfsgid(2)
- * Set the group ID for the cred-context (s.a. `CLONE_CRED') of the
+ * Set the group  ID for  the cred-context (s.a.  `CLONE_CRED') of  the
  * calling thread. The calling thread needs the `CAP_SETGID' privilege.
  * @return: 0:  Success.
  * @throw: E_INSUFFICIENT_RIGHTS:CAP_SETGID: [...] */
@@ -2079,7 +2079,7 @@ __CDECLARE_SC(,__errno_t,setfsgid,(__uint16_t __gid),(__gid))
 #endif /* __CRT_HAVE_SC(setfsgid) */
 #if __CRT_HAVE_SC(setfsgid32)
 /* >> setfsgid(2)
- * Set the group ID for the cred-context (s.a. `CLONE_CRED') of the
+ * Set the group  ID for  the cred-context (s.a.  `CLONE_CRED') of  the
  * calling thread. The calling thread needs the `CAP_SETGID' privilege.
  * @return: 0:  Success.
  * @throw: E_INSUFFICIENT_RIGHTS:CAP_SETGID: [...] */
@@ -2087,7 +2087,7 @@ __CDECLARE_SC(,__errno_t,setfsgid32,(__uint32_t __gid),(__gid))
 #endif /* __CRT_HAVE_SC(setfsgid32) */
 #if __CRT_HAVE_SC(setfsuid)
 /* >> setfsuid(2)
- * Set the user ID for the cred-context (s.a. `CLONE_CRED') of the
+ * Set the  user ID  for the  cred-context (s.a.  `CLONE_CRED') of  the
  * calling thread. The calling thread needs the `CAP_SETUID' privilege.
  * @return: 0:  Success.
  * @throw: E_INSUFFICIENT_RIGHTS:CAP_SETUID: [...] */
@@ -2095,7 +2095,7 @@ __CDECLARE_SC(,__errno_t,setfsuid,(__uint16_t __uid),(__uid))
 #endif /* __CRT_HAVE_SC(setfsuid) */
 #if __CRT_HAVE_SC(setfsuid32)
 /* >> setfsuid(2)
- * Set the user ID for the cred-context (s.a. `CLONE_CRED') of the
+ * Set the  user ID  for the  cred-context (s.a.  `CLONE_CRED') of  the
  * calling thread. The calling thread needs the `CAP_SETUID' privilege.
  * @return: 0:  Success.
  * @throw: E_INSUFFICIENT_RIGHTS:CAP_SETUID: [...] */
@@ -2257,7 +2257,7 @@ __CDECLARE_SC(,__errno_t,shmget,(__key_t __key, __size_t __size, __syscall_ulong
 #endif /* __CRT_HAVE_SC(shmget) */
 #if __CRT_HAVE_SC(shutdown)
 /* Disallow further reception of data (causing `recv(2)' to return `0' as soon
- * as all currently queued data has been read), and/or further transmission
+ * as  all currently queued  data has been  read), and/or further transmission
  * of data (causing `send(2)' to throw an `E_NET_SHUTDOWN' exception)
  * @param: how: One of `SHUT_RD', `SHUT_WR' or `SHUT_RDWR'
  * @throw: E_INVALID_ARGUMENT_BAD_STATE:E_INVALID_ARGUMENT_CONTEXT_SHUTDOWN_NOT_CONNECTED
@@ -2272,8 +2272,8 @@ __CDECLARE_SC(,__errno_t,sigaltstack,(struct __sigaltstackx32 const *__ss, struc
 #endif /* __CRT_HAVE_SC(sigaltstack) */
 #if __CRT_HAVE_SC(sigmask_check)
 /* Check for pending signals, and keep on handling them until none are left
- * The [restart(must)] is necessary in order to ensure that _all_ unmasked
- * signals get handled until none are left, in case more than one signal
+ * The  [restart(must)] is necessary in order to ensure that _all_ unmasked
+ * signals get handled until  none are left, in  case more than one  signal
  * became available.
  * This system call is only needed when `set_userprocmask_address(2)' was used. */
 __CDECLARE_SC(,__errno_t,sigmask_check,(void),())
@@ -2283,12 +2283,12 @@ __CDECLARE_SC(,__sighandler_t,signal,(__signo_t __signo, __sighandler_t __handle
 #endif /* __CRT_HAVE_SC(signal) */
 #if __CRT_HAVE_SC(signalfd)
 /* Create a poll(2)-able file descriptor which can be used to wait for the
- * delivery of signals masked by `sigmask' to the waiting thread/process. */
+ * delivery of signals masked by `sigmask' to the waiting  thread/process. */
 __CDECLARE_SC(,__errno_t,signalfd,(__fd_t __fd, struct __sigset_struct const *__sigmask, __size_t __sigmasksize),(__fd,__sigmask,__sigmasksize))
 #endif /* __CRT_HAVE_SC(signalfd) */
 #if __CRT_HAVE_SC(signalfd4)
 /* Create a poll(2)-able file descriptor which can be used to wait for the
- * delivery of signals masked by `sigmask' to the waiting thread/process.
+ * delivery of signals masked by `sigmask' to the waiting  thread/process.
  * @param: flags: Set of `0 | SFD_NONBLOCK | SFD_CLOEXEC | SFD_CLOFORK' */
 __CDECLARE_SC(,__errno_t,signalfd4,(__fd_t __fd, struct __sigset_struct const *__sigmask, __size_t __sigmasksize, __syscall_ulong_t __flags),(__fd,__sigmask,__sigmasksize,__flags))
 #endif /* __CRT_HAVE_SC(signalfd4) */
@@ -2301,11 +2301,11 @@ __CDECLARE_SC(,__errno_t,sigprocmask,(__syscall_ulong_t __how, struct __sigset_s
 #endif /* __CRT_HAVE_SC(sigprocmask) */
 #if __CRT_HAVE_SC(sigreturn)
 /* Restore the specified register state when returning from a signal handler
- * Note that the order and locations of arguments taken by this system call
+ * Note that the order and locations of arguments taken by this system  call
  * are of great importance, as they must match what is encoded by the kernel
  * within `sighand_raise_signal()'
  * The order chosen is also important, as it is selected such that arguments
- * are only passed through registers that are preserved by CDECL */
+ * are  only  passed   through  registers  that   are  preserved  by   CDECL */
 __CDECLARE_VOID_SC(,sigreturn,(struct fpustate32 const *__restore_fpu, __syscall_ulong_t __unused1, __syscall_ulong_t __unused2, struct __sigset_struct const *__restore_sigmask, struct rpc_syscall_info32 const *__sc_info, struct ucpustate32 const *__restore_cpu),(__restore_fpu,__unused1,__unused2,__restore_sigmask,__sc_info,__restore_cpu))
 #endif /* __CRT_HAVE_SC(sigreturn) */
 #if __CRT_HAVE_SC(sigsuspend)
@@ -2318,7 +2318,7 @@ __CDECLARE_SC(,__errno_t,sigsuspend,(struct __sigset_struct const *__set),(__set
  *                   May optionally be or'd with `SOCK_CLOEXEC | SOCK_CLOFORK | SOCK_NONBLOCK'
  * @param: protocol: Socket protocol (`0' for automatic). Available socket protocols mainly
  *                   depend on the selected `domain', and may be further specialized by the
- *                   `type' argument. for example, `AF_INET' takes one of `IPPROTO_*'
+ *                   `type' argument.  for  example,  `AF_INET' takes  one  of  `IPPROTO_*'
  *                   >> socket(AF_INET, SOCK_STREAM, IPPROTO_TCP);
  *                   Also note that protocol IDs can be enumerated by `getprotoent(3)' from `<netdb.h>'
  * @return: * : A file descriptor for the newly created socket. */
@@ -2334,7 +2334,7 @@ __CDECLARE_SC(,__LONG32_TYPE__,socketcall,(__ULONG32_TYPE__ __call, __ULONG32_TY
  *                   May optionally be or'd with `SOCK_CLOEXEC | SOCK_CLOFORK | SOCK_NONBLOCK'
  * @param: protocol: Socket protocol (`0' for automatic). Available socket protocols mainly
  *                   depend on the selected `domain', and may be further specialized by the
- *                   `type' argument. for example, `AF_INET' takes one of `IPPROTO_*'
+ *                   `type' argument.  for  example,  `AF_INET' takes  one  of  `IPPROTO_*'
  *                   >> socket(AF_INET, SOCK_STREAM, IPPROTO_TCP);
  *                   Also note that protocol IDs can be enumerated by `getprotoent(3)' from `<netdb.h>'
  * @return: * : A file descriptor for the newly created socket. */
@@ -2454,14 +2454,14 @@ __CDECLARE_SC(,__errno_t,timerfd_gettime64,(__fd_t __timerfd, struct __itimerspe
 #endif /* __CRT_HAVE_SC(timerfd_gettime64) */
 #if __CRT_HAVE_SC(timerfd_settime)
 /* Set next expiration time of interval timer source `timerfd' to `utmr'.
- * If `flags' has the `TFD_TIMER_ABSTIME' flag set the timeout value
+ * If `flags'  has the  `TFD_TIMER_ABSTIME' flag  set the  timeout  value
  * is absolute. Optionally return the old expiration time in `otmr''
  * @param: flags: Set of `0 | TFD_TIMER_ABSTIME' */
 __CDECLARE_SC(,__errno_t,timerfd_settime,(__fd_t __timerfd, __syscall_ulong_t __flags, struct __itimerspecx32 const *__utmr, struct __itimerspecx32 *__otmr),(__timerfd,__flags,__utmr,__otmr))
 #endif /* __CRT_HAVE_SC(timerfd_settime) */
 #if __CRT_HAVE_SC(timerfd_settime64)
 /* Set next expiration time of interval timer source `timerfd' to `utmr'.
- * If `flags' has the `TFD_TIMER_ABSTIME' flag set the timeout value
+ * If `flags'  has the  `TFD_TIMER_ABSTIME' flag  set the  timeout  value
  * is absolute. Optionally return the old expiration time in `otmr''
  * @param: flags: Set of `0 | TFD_TIMER_ABSTIME' */
 __CDECLARE_SC(,__errno_t,timerfd_settime64,(__fd_t __timerfd, __syscall_ulong_t __flags, struct __itimerspecx32_64 const *__utmr, struct __itimerspecx32_64 *__otmr),(__timerfd,__flags,__utmr,__otmr))
@@ -2514,9 +2514,9 @@ __CDECLARE_SC(,__errno_t,uselib,(char const *__library),(__library))
 __CDECLARE_SC(,__errno_t,userfaultfd,(int __TODO_PROTOTYPE),(__TODO_PROTOTYPE))
 #endif /* __CRT_HAVE_SC(userfaultfd) */
 #if __CRT_HAVE_SC(userviofd)
-/* Construct a user-vio-fd object supporting mmap(2), with actual
- * memory accesses being dispatched by adding them as pending requests
- * to an internal queue that should be read(2) from by a worker thread,
+/* Construct   a   user-vio-fd  object   supporting  mmap(2),   with  actual
+ * memory  accesses  being dispatched  by  adding them  as  pending requests
+ * to an internal  queue that  should be read(2)  from by  a worker  thread,
  * which should then service those requests before responding by write(2)ing
  * the results of the operation back to the same fd.
  * HINT: The format of the structures that are read(2) and
@@ -2524,7 +2524,7 @@ __CDECLARE_SC(,__errno_t,userfaultfd,(int __TODO_PROTOTYPE),(__TODO_PROTOTYPE))
  * NOTE: Don't use this system call directly. Use `vio_create(3)'
  *       from `<libvio/vio.h>' instead.
  * @param: initial_size: The initial mmap(2)able size of the returned handle.
- *                       This size may be altered at a later point in time
+ *                       This  size may be  altered at a  later point in time
  *                       through use of `ftruncate(return)'
  * @param: flags:        Set of `0 | O_CLOEXEC | O_CLOFORK | O_NONBLOCK' */
 __CDECLARE_SC(,__fd_t,userviofd,(__size_t __initial_size, __syscall_ulong_t __flags),(__initial_size,__flags))
@@ -2562,27 +2562,27 @@ __CDECLARE_SC(,__errno_t,utimes64,(char const *__filename, struct __timevalx32_6
 #endif /* __CRT_HAVE_SC(utimes64) */
 #if __CRT_HAVE_SC(vfork)
 /* Same as `fork(2)', but the child process may be executed within in the same VM
- * as the parent process, with the parent process remaining suspended until the
+ * as the parent process, with the  parent process remaining suspended until  the
  * child process invokes one of the following system calls:
  *   - `exit(2)'       Terminate the child process
  *   - `exit_group(2)' Terminate the child process
  *   - `execve(2)'     Create a new VM that is populated with the specified process
- *                     image. The parent process will only be resumed in case the
- *                     new program image could be loaded successfully. Otherwise,
- *                     the call to `execve(2)' returns normally in the child.
+ *                     image. The parent process will  only be resumed in case  the
+ *                     new  program image could  be loaded successfully. Otherwise,
+ *                     the call  to  `execve(2)'  returns normally  in  the  child.
  *                     Other functions from the exec()-family behave the same
  * 
- * Care must be taken when using this system call, since you have to make sure that
- * the child process doesn't clobber any part of its (shared) stack that may be re-
- * used once execution resumes in the parent process. The same also goes for heap
- * functions, but generally speaking: you really shouldn't do anything that isn't
+ * Care  must be taken when using this system call, since you have to make sure that
+ * the  child process doesn't clobber any part of its (shared) stack that may be re-
+ * used once execution resumes in  the parent process. The  same also goes for  heap
+ * functions,  but generally speaking:  you really shouldn't  do anything that isn't
  * reentrant after calling any one of the fork() functions (since anything but would
- * rely on underlying implementations making proper use of pthread_atfork(3), which
- * is something that KOS intentionally doesn't do, since I feel like doing so only
+ * rely on underlying implementations making proper use of pthread_atfork(3),  which
+ * is something that KOS intentionally doesn't do,  since I feel like doing so  only
  * adds unnecessary bloat to code that doesn't rely on this)
  * 
  * Additionally, this system call may be implemented as an alias for `fork(2)', in
- * which case the parent process will not actually get suspended until the child
+ * which  case the parent process will not  actually get suspended until the child
  * process performs any of the actions above. */
 __CDECLARE_SC(,__pid_t,vfork,(void),())
 #endif /* __CRT_HAVE_SC(vfork) */
@@ -2615,13 +2615,13 @@ __CDECLARE_SC(,__pid_t,wait4_64,(__pid_t __pid, __int32_t *__stat_loc, __syscall
 #if __CRT_HAVE_SC(waitid)
 /* @param: idtype:  One of `P_ALL', `P_PID', `P_PGID'
  * @param: options: At least one of `WEXITED', `WSTOPPED', `WCONTINUED',
- *                  optionally or'd with `WNOHANG | WNOWAIT' */
+ *                  optionally     or'd     with     `WNOHANG | WNOWAIT' */
 __CDECLARE_SC(,__errno_t,waitid,(__syscall_ulong_t __idtype, __id_t __id, struct __siginfox32_struct *__infop, __syscall_ulong_t __options, struct __rusagex32 *__ru),(__idtype,__id,__infop,__options,__ru))
 #endif /* __CRT_HAVE_SC(waitid) */
 #if __CRT_HAVE_SC(waitid64)
 /* @param: idtype:  One of `P_ALL', `P_PID', `P_PGID'
  * @param: options: At least one of `WEXITED', `WSTOPPED', `WCONTINUED',
- *                  optionally or'd with `WNOHANG | WNOWAIT' */
+ *                  optionally     or'd     with     `WNOHANG | WNOWAIT' */
 __CDECLARE_SC(,__errno_t,waitid64,(__syscall_ulong_t __idtype, __id_t __id, struct __siginfox32_struct *__infop, __syscall_ulong_t __options, struct __rusagex32_64 *__ru),(__idtype,__id,__infop,__options,__ru))
 #endif /* __CRT_HAVE_SC(waitid64) */
 #if __CRT_HAVE_SC(waitpid)
@@ -2653,9 +2653,9 @@ __CDECLARE_SC(,__ssize_t,writef,(__fd_t __fd, void const *__buf, __size_t __bufs
 #endif /* __CRT_HAVE_SC(writef) */
 #if __CRT_HAVE_SC(writev)
 /* Same as `write(2)', but rather than specifying a single, continuous buffer,
- * write data from `count' separate buffers, though still return the actual
+ * write  data from `count'  separate buffers, though  still return the actual
  * number of written bytes.
- * When `fd' has the `O_NONBLOCK' flag set, only write as much data
+ * When  `fd' has the  `O_NONBLOCK' flag set, only  write as much data
  * as possible at the time the call was made, and throw `E_WOULDBLOCK'
  * if no data could be written at the time.
  * @return: <= SUM(iov[*].iov_len): The actual amount of written bytes
@@ -2664,9 +2664,9 @@ __CDECLARE_SC(,__ssize_t,writev,(__fd_t __fd, struct __iovecx32 const *__iovec, 
 #endif /* __CRT_HAVE_SC(writev) */
 #if __CRT_HAVE_SC(writevf)
 /* Same as `write(2)', but rather than specifying a single, continuous buffer,
- * write data from `count' separate buffers, though still return the actual
+ * write  data from `count'  separate buffers, though  still return the actual
  * number of written bytes.
- * When `fd' has the `O_NONBLOCK' flag set, only write as much data
+ * When  `fd' has the  `O_NONBLOCK' flag set, only  write as much data
  * as possible at the time the call was made, and throw `E_WOULDBLOCK'
  * if no data could be written at the time.
  * @return: <= SUM(iov[*].iov_len): The actual amount of written bytes
@@ -2687,10 +2687,10 @@ __CDECLARE_XSC(,__errno_t,_sysctl,(int __TODO_PROTOTYPE),(__TODO_PROTOTYPE))
  * @param: addr:       Peer address of the sender (or `NULL' when `addr_len' is `NULL')
  * @param: addr_len:   [NULL] Don't fill in the client's peer address
  *                     [in]   The amount of available memory starting at `addr'
- *                     [out]  The amount of required memory for the address.
- *                            This may be more than was given, in which case
- *                            the address was truncated and may be invalid.
- *                            If this happens, the caller can still determine
+ *                     [out]  The  amount  of required  memory for  the address.
+ *                            This  may be  more than  was given,  in which case
+ *                            the  address  was  truncated and  may  be invalid.
+ *                            If this happens,  the caller  can still  determine
  *                            the correct address through use of `getpeername()'
  * @param: sock_flags: Set of `SOCK_NONBLOCK | SOCK_CLOEXEC | SOCK_CLOFORK'
  * @throw: E_INVALID_ARGUMENT_BAD_STATE:E_INVALID_ARGUMENT_CONTEXT_SOCKET_NOT_LISTENING
@@ -2810,7 +2810,7 @@ __CDECLARE_XSC(,__errno_t,close_range,(int __TODO_PROTOTYPE),(__TODO_PROTOTYPE))
 #if __CRT_HAVE_XSC(connect)
 /* Connect to the specified address.
  * If the given `sockfd' isn't connection-oriented, this will set the address
- * that will implicitly be used as destination by `send(2)' and `write(2)'
+ * that  will implicitly be  used as destination  by `send(2)' and `write(2)'
  * @throw: E_NET_ADDRESS_IN_USE:E_NET_ADDRESS_IN_USE_CONTEXT_CONNECT
  * @throw: E_INVALID_ARGUMENT_UNEXPECTED_COMMAND:E_INVALID_ARGUMENT_CONTEXT_BIND_WRONG_ADDRESS_FAMILY
  * @throw: E_INVALID_ARGUMENT_BAD_STATE:E_INVALID_ARGUMENT_CONTEXT_BIND_ALREADY_BOUND
@@ -2825,29 +2825,29 @@ __CDECLARE_XSC(,__errno_t,copy_file_range,(int __TODO_PROTOTYPE),(__TODO_PROTOTY
 #endif /* __CRT_HAVE_XSC(copy_file_range) */
 #if __CRT_HAVE_XSC(coredump)
 /* Trigger a coredump of the calling process.
- * @param: curr_state:       The state as is still valid after any possible unwinding has already been done
+ * @param: curr_state:       The  state as is still valid after any possible unwinding has already been done
  *                           Note that this state does not necessarily point to the location that originally
  *                           caused the problem that escalated into a coredump, but is the last valid stack-
  *                           unwind location at which unwinding could no longer continue.
  *                           When `NULL', `orig_state' is used instead, and `traceback_vector' and `traceback_length' are ignored.
  * @param: orig_state:       The original CPU state at where the associated `reason' got triggered
  *                           When `NULL', `curr_state' is used instead, and `traceback_vector' and `traceback_length' are ignored.
- *                           When `curr_state' is also `NULL', then the current CPU state is used instead.
- * @param: traceback_vector: (potentially incomplete) vector of additional program pointers that were
- *                           traversed when the stack was walked from `orig_state' to `curr_state'
- *                           Note that earlier entires within this vector are further up the call-stack, with
+ *                           When   `curr_state'   is   also   `NULL',   then   the   current   CPU   state   is   used   instead.
+ * @param: traceback_vector: (potentially  incomplete)   vector  of   additional  program   pointers  that   were
+ *                           traversed   when   the  stack   was   walked  from   `orig_state'   to  `curr_state'
+ *                           Note that earlier  entires within this  vector are further  up the call-stack,  with
  *                           traceback_vector[0] being meant to be the call-site of the function of `orig_state'.
  *                           Note that when `traceback_length != 0 && traceback_vector[traceback_length-1] == ucpustate_getpc(curr_state)',
- *                           it can be assumed that the traceback is complete and contains all traversed instruction locations.
- *                           In this case, a traceback displayed to a human should not include the text location at
- *                           `traceback_vector[traceback_length-1]', since that location would also be printed when
+ *                           it  can  be  assumed  that  the  traceback is  complete  and  contains  all  traversed  instruction locations.
+ *                           In   this   case,  a   traceback  displayed   to   a  human   should  not   include   the  text   location  at
+ *                           `traceback_vector[traceback_length-1]',    since    that    location    would    also    be    printed    when
  *                           unwinding is completed for the purposes of displaying a traceback.
  * @param: traceback_length: The number of program counters stored within `traceback_vector'
  * @param: reason:           The reason that resulted in the coredump (or `NULL' to get the same behavior as `E_OK')
- *                           For certain `unwind_error' values, this can also point to other things, but is always
+ *                           For certain `unwind_error' values, this can also  point to other things, but is  always
  *                           allowed to be `NULL' to indicate default/stub values.
- * @param: unwind_error:     The unwind error that caused the coredump, or `UNWIND_SUCCESS' if unwinding
- *                           was never actually performed, and `reason' is actually a `siginfo_t *'
+ * @param: unwind_error:     The  unwind  error that  caused the  coredump,  or `UNWIND_SUCCESS'  if unwinding
+ *                           was  never  actually  performed,  and   `reason'  is  actually  a   `siginfo_t *'
  *                           Ignored when `reason == NULL', in which case `UNWIND_SUCCESS' is assumed instead. */
 __CDECLARE_XSC(,__errno_t,coredump,(struct ucpustate32 const *__curr_state, struct ucpustate32 const *__orig_state, __HYBRID_PTR32(void const) const *__traceback_vector, __size_t __traceback_length, union coredump_info32 const *__reason, __syscall_ulong_t __unwind_error),(__curr_state,__orig_state,__traceback_vector,__traceback_length,__reason,__unwind_error))
 #endif /* __CRT_HAVE_XSC(coredump) */
@@ -2858,11 +2858,11 @@ __CDECLARE_XSC(,__fd_t,creat,(char const *__filename, __mode_t __mode),(__filena
 __CDECLARE_XSC(,__errno_t,create_module,(void),())
 #endif /* __CRT_HAVE_XSC(create_module) */
 #if __CRT_HAVE_XSC(debugtrap)
-/* Trigger a debugger trap `trapno', optionally extended with `regs'
+/* Trigger a debugger trap `trapno', optionally extended with  `regs'
  * at either the system call return location, or at the given `state'
- * In the later case, this system call will by default return to the
- * given `state', though given the purpose of this system call being
- * to inform a connected debugger of some breakable event, allowing
+ * In the later case, this system call will by default return to  the
+ * given  `state', though given the purpose of this system call being
+ * to inform a connected debugger  of some breakable event,  allowing
  * it to do whatever it wishes before execution is resumed.
  * @param: reason:   When non-NULL, the reason for the debug trap (else: use `SIGTRAP:DEBUGTRAP_REASON_NONE')
  * @param: state:    When non-NULL, the CPU state where the trap should return to by default
@@ -2876,21 +2876,21 @@ __CDECLARE_XSC(,__errno_t,debugtrap,(struct ucpustate32 const *__state, struct d
  * as an alias for `KSYSCTL_DRIVER_DELMOD:KSYSCTL_DRIVER_FORMAT_FILE'
  * @param: name:  The name of the driver
  * @param: flags: Set of `O_NONBLOCK | O_TRUNC', where:
- *                 - O_NONBLOCK: Don't wait for the driver to be unloaded.
- *                               Currently, KOS simply ignores this flag,
+ *                 - O_NONBLOCK: Don't  wait  for  the driver  to  be unloaded.
+ *                               Currently,  KOS  simply  ignores  this   flag,
  *                               since drivers on KOS should always be unloaded
- *                               immediately. - However, driver finalizers may
+ *                               immediately. - However, driver finalizers  may
  *                               do blocking operations before then...
  *                 - O_TRUNC:    Force the driver to be unloaded immediately
- *                               (may compromise system integrity)
- *                               s.a. `KSYSCTL_DRIVER_DELMOD_FFORCE' */
+ *                               (may    compromise    system     integrity)
+ *                               s.a.         `KSYSCTL_DRIVER_DELMOD_FFORCE' */
 __CDECLARE_XSC(,__errno_t,delete_module,(char const *__name, __oflag_t __flags),(__name,__flags))
 #endif /* __CRT_HAVE_XSC(delete_module) */
 #if __CRT_HAVE_XSC(detach)
 /* >> detach(2)
  * Detach the descriptor of `PID' from the thread that
  * would have received a signal when it changes state,
- * as well as prevent the thread from turning into a
+ * as well as prevent the  thread from turning into  a
  * zombie once it dies.
  * For simplicity, think of it like this:
  *   - pthread_create()  -->  clone()
@@ -2898,13 +2898,13 @@ __CDECLARE_XSC(,__errno_t,delete_module,(char const *__name, __oflag_t __flags),
  *   - pthread_detach()  -->  detach()  // Linux's missing link, now implemented
  * A total of 4 special cases exists to alter the behavior of this function:
  *   - PID == 0 || PID == gettid():
- *     Detach the calling thread from the set of running children within
- *     its own process. Note however that when this is done by the main
+ *     Detach the calling  thread from  the set of  running children  within
+ *     its own process.  Note however  that when this  is done  by the  main
  *     thread of the process, gettid() will equal getpid(), and the behavior
  *     will be different.
  *   - PID == getpid():
  *     Detach the calling process from its parent, essentially daemonizing
- *     the calling process the same way a double-fork would:
+ *     the  calling   process   the   same  way   a   double-fork   would:
  *     >> if (fork() == 0) {
  *     >> 	if (fork() == 0) {
  *     >> 		// This is a daemonized process
@@ -2923,7 +2923,7 @@ __CDECLARE_XSC(,__errno_t,delete_module,(char const *__name, __oflag_t __flags),
  *     >> 	...
  *     >> }
  *   - PID == -1:
- *     Detach all child processes/threads of the calling process, essentially
+ *     Detach all child processes/threads  of the calling process,  essentially
  *     turning its chain of children into a clean slate that no longer contains
  *     any wait(2)able child threads or processes.
  *     If no waitable children existed, `ECHILD' is set; else `0' is returned.
@@ -2933,47 +2933,47 @@ __CDECLARE_XSC(,__errno_t,delete_module,(char const *__name, __oflag_t __flags),
  *   - The creator of the process containing a thread that called
  *    `clone()' with `CLONE_PARENT', which then created the thread
  *     referred to by `PID'.
- *   - Even if the thread doesn't deliver a signal upon it terminating,
+ *   - Even if  the thread  doesn't deliver  a signal  upon it  terminating,
  *     the process that would have received such a signal is still relevant.
  *   -> In other words: The thread `PID' must be one of your children,
  *                      or had you assigned as its parent.
  * If the calling thread isn't part of that process that will receive
- * the signal if the thread dies without being detached first, then
- * the call fails by throwing an `E_ILLEGAL_OPERATION'.
- * If the thread had already been detached, then the call fails by
+ * the signal if the thread  dies without being detached first,  then
+ * the   call   fails    by   throwing   an    `E_ILLEGAL_OPERATION'.
+ * If  the thread had  already been detached, then  the call fails by
  * throwing an `E_ILLEGAL_OPERATION' as well.
- * Upon success, the thread referred to by `PID' will clean up its own
+ * Upon success, the thread  referred to by `PID'  will clean up its  own
  * PID descriptor without the need of anyone to wait() for it, a behavior
- * that linux implements using `CLONE_THREAD' (which you shouldn't use,
+ * that linux implements using  `CLONE_THREAD' (which you shouldn't  use,
  * because it's flawed by design)
- * Once detached, any further use of PID results in a race condition
+ * Once detached, any further use of  PID results in a race  condition
  * (which linux neglects to mention for `CLONE_THREAD'), because there
  * is no way of ensuring that PID still refers to the original thread,
- * as another thread may have been created using the same PID, after
+ * as another thread may have been  created using the same PID,  after
  * the detached thread exited.
  * NOTE: If a thread is created using clone() with `CLONE_DETACHED' set,
- *       it will behave effectively as though this function had already
+ *       it will behave effectively as though this function had  already
  *       be called.
  * NOTE: If the thread already has terminated, detaching it will kill
  *       its zombie the same way wait() would.
- * NOTE: Passing ZERO(0) for `PID' will detach the calling thread.
- *       However, this operation fails if the calling thread isn't
+ * NOTE: Passing ZERO(0)  for `PID'  will detach  the calling  thread.
+ *       However, this  operation fails  if the  calling thread  isn't
  *       part of the same process as the parent process of the thread.
- *       In other words, the child of a fork() can't do this, and
- *       neither can the spawnee of clone(CLONE_THREAD|CLONE_PARENT),
+ *       In other words,  the child  of a  fork() can't  do this,  and
+ *       neither can the spawnee of  clone(CLONE_THREAD|CLONE_PARENT),
  *       clone(0) or clone(CLONE_PARENT).
- * @return: -EPERM:             The calling process isn't the recipient of signals
- *                              delivered when `PID' changes state. This can either
+ * @return: -EPERM:             The  calling  process isn't  the recipient  of signals
+ *                              delivered when `PID'  changes state.  This can  either
  *                              be because `PID' has already been detached, or because
  *                              YOU CAN'T DETACH SOMEONE ELSE'S THREAD!
- *                              Another possibility is that the thread was already
+ *                              Another  possibility is that the thread was already
  *                              detached, then exited, following which a new thread
- *                              got created and had been assigned the PID of your
+ *                              got created and had been  assigned the PID of  your
  *                              ancient, no longer existent thread.
  * @return: -ECHILD:           `PID' was equal to `-1', but no waitable children existed
- * @throw: E_PROCESS_EXITED:    The process referred to by `PID' doesn't exist.
- *                              This could mean that it had already been detached
- *                              and exited, or that the `PID' is just invalid (which
+ * @throw: E_PROCESS_EXITED:    The  process  referred  to  by  `PID'  doesn't exist.
+ *                              This could  mean that  it had  already been  detached
+ *                              and exited, or that the `PID' is just invalid  (which
  *                              would also be the case if it was valid at some point) */
 __CDECLARE_XSC(,__errno_t,detach,(__pid_t __pid),(__pid))
 #endif /* __CRT_HAVE_XSC(detach) */
@@ -2996,7 +2996,7 @@ __CDECLARE_XSC(,__fd_t,epoll_create,(__syscall_ulong_t __size),(__size))
 #endif /* __CRT_HAVE_XSC(epoll_create) */
 #if __CRT_HAVE_XSC(epoll_create1)
 /* >> epoll_create1(2)
- * Create a new epoll control descriptor which can be used for
+ * Create  a new epoll control descriptor which can be used for
  * monitoring of pollable events happening in registered files.
  * @param: flags: Set of `EPOLL_CLOEXEC | EPOLL_CLOFORK'
  * @return: * :   The newly created epoll control descriptor.
@@ -3005,7 +3005,7 @@ __CDECLARE_XSC(,__fd_t,epoll_create1,(__syscall_ulong_t __flags),(__flags))
 #endif /* __CRT_HAVE_XSC(epoll_create1) */
 #if __CRT_HAVE_XSC(epoll_ctl)
 /* >> epoll_ctl(2)
- * Manipulate a given epoll controller `epfd', as previously returned by `epoll_create1(2)'
+ * Manipulate a given  epoll controller  `epfd', as previously  returned by  `epoll_create1(2)'
  * in order to register (`EPOLL_CTL_ADD'), remove (`EPOLL_CTL_DEL') or modify (`EPOLL_CTL_MOD')
  * the file descriptors being monitored
  * @param: op:       One of `EPOLL_CTL_ADD', `EPOLL_CTL_DEL' or `EPOLL_CTL_MOD'
@@ -3014,7 +3014,7 @@ __CDECLARE_XSC(,__fd_t,epoll_create1,(__syscall_ulong_t __flags),(__flags))
  * @return: 0 :      Success
  * @return: -EEXIST: [op=EPOLL_CTL_ADD] The given `fd' (and its kernel object) has already been registered
  * @return: -ENOENT: [op=EPOLL_CTL_MOD|EPOLL_CTL_DEL] The given `fd' (and its kernel object) aren't registered
- * @throw: E_ILLEGAL_REFERENCE_LOOP: The given `fd' is another epoll that either
+ * @throw: E_ILLEGAL_REFERENCE_LOOP: The  given  `fd'  is  another  epoll  that either
  *                                   forms a loop with `epfd', or has too many nested.
  * @throw: E_INVALID_ARGUMENT_UNKNOWN_COMMAND:E_INVALID_ARGUMENT_CONTEXT_EPOLL_CTL_OP: [...] */
 __CDECLARE_XSC(,__errno_t,epoll_ctl,(__fd_t __epfd, __syscall_ulong_t __op, __fd_t __fd, struct epoll_event *__info),(__epfd,__op,__fd,__info))
@@ -3022,12 +3022,12 @@ __CDECLARE_XSC(,__errno_t,epoll_ctl,(__fd_t __epfd, __syscall_ulong_t __op, __fd
 #if __CRT_HAVE_XSC(epoll_pwait)
 /* >> epoll_pwait(2)
  * Same as `epoll_wait(2)', but change the calling thread's signal mask to `ss' while
- * waiting. Wait until at least one of the conditions monitored by `epfd' to be met.
+ * waiting.  Wait until at least one of the conditions monitored by `epfd' to be met.
  * @param: epfd:      The epoll controller on which to wait.
  * @param: events:    A buffer where the kernel can store information on the
  *                    events that actually took place.
  * @param: maxevents: The # of events that can be stored in `events' (must be >= 1)
- * @param: timeout:   The max amount of time (in milliseconds) before returning
+ * @param: timeout:   The max amount of time (in milliseconds) before  returning
  *                    in the case where no event occurred in the mean time. When
  *                    set to `-1', wait indefinitely
  * @param: ss:        The signal mask to apply while waiting for an event to happen.
@@ -3044,7 +3044,7 @@ __CDECLARE_XSC(,__ssize_t,epoll_pwait,(__fd_t __epfd, struct epoll_event *__even
  * @param: events:    A buffer where the kernel can store information on the
  *                    events that actually took place.
  * @param: maxevents: The # of events that can be stored in `events' (must be >= 1)
- * @param: timeout:   The max amount of time (in milliseconds) before returning
+ * @param: timeout:   The max amount of time (in milliseconds) before  returning
  *                    in the case where no event occurred in the mean time. When
  *                    set to `-1', wait indefinitely
  * @return: >= 1:     The # of events that happened (written to the first `return'
@@ -3061,12 +3061,12 @@ __CDECLARE_XSC(,__fd_t,eventfd,(__syscall_ulong_t __initval),(__initval))
 __CDECLARE_XSC(,__fd_t,eventfd2,(__syscall_ulong_t __initval, __syscall_ulong_t __flags),(__initval,__flags))
 #endif /* __CRT_HAVE_XSC(eventfd2) */
 #if __CRT_HAVE_XSC(execve)
-/* Replace the calling process with the application image referred to by `path' / `file'
+/* Replace the calling  process with  the application  image referred  to by  `path' /  `file'
  * and execute it's `main()' method, passing the given `argv', and setting `environ' to `envp' */
 __CDECLARE_XSC(,__errno_t,execve,(char const *__path, __HYBRID_PTR32(char const) const *___argv, __HYBRID_PTR32(char const) const *___envp),(__path,___argv,___envp))
 #endif /* __CRT_HAVE_XSC(execve) */
 #if __CRT_HAVE_XSC(execveat)
-/* Replace the calling process with the application image referred to by `path' / `file'
+/* Replace the calling  process with  the application  image referred  to by  `path' /  `file'
  * and execute it's `main()' method, passing the given `argv', and setting `environ' to `envp'
  * @param: flags: Set of `0 | AT_EMPTY_PATH | AT_SYMLINK_NOFOLLOW | AT_DOSPATH' */
 __CDECLARE_XSC(,__errno_t,execveat,(__fd_t __dirfd, char const *__pathname, __HYBRID_PTR32(char const) const *___argv, __HYBRID_PTR32(char const) const *___envp, __atflag_t __flags),(__dirfd,__pathname,___argv,___envp,__flags))
@@ -3140,19 +3140,19 @@ __CDECLARE_XSC(,__syscall_slong_t,fcntl64,(__fd_t __fd, __syscall_ulong_t __comm
 #endif /* __CRT_HAVE_XSC(fcntl64) */
 #if __CRT_HAVE_XSC(fdatasync)
 /* Synchronize only the data of a file (not its descriptor which contains
- * timestamps, and its size), meaning that changes are written to disk */
+ * timestamps,  and its size),  meaning that changes  are written to disk */
 __CDECLARE_XSC(,__errno_t,fdatasync,(__fd_t __fd),(__fd))
 #endif /* __CRT_HAVE_XSC(fdatasync) */
 #if __CRT_HAVE_XSC(fgetxattr)
 __CDECLARE_XSC(,__ssize_t,fgetxattr,(__fd_t __fd, char const *__name, void *__buf, __size_t __bufsize),(__fd,__name,__buf,__bufsize))
 #endif /* __CRT_HAVE_XSC(fgetxattr) */
 #if __CRT_HAVE_XSC(finit_module)
-/* Load a kernel driver from an ELF image `module_image...+=len'
+/* Load a  kernel driver  from  an ELF  image  `module_image...+=len'
  * This system call exists for linux compatiblity, and is implemented
  * as an alias for `KSYSCTL_DRIVER_INSMOD:KSYSCTL_DRIVER_FORMAT_FILE'
  * 
- * Note however that that is where linux compatiblity ends. Since the
- * linux kernel does not implement any semblance of a stable ABI, you
+ * Note  however that that is where linux compatiblity ends. Since the
+ * linux kernel does not implement any semblance of a stable ABI,  you
  * have to realize that on KOS, this system call can only load drivers
  * specifically built to run within the KOS kernel!
  * @param: uargs: The driver commandline */
@@ -3174,11 +3174,11 @@ __CDECLARE_XSC(,__errno_t,fmknodat,(__fd_t __dirfd, char const *__nodename, __mo
 #endif /* __CRT_HAVE_XSC(fmknodat) */
 #if __CRT_HAVE_XSC(fork)
 /* Clone the calling thread into a second process and return twice, once
- * in the parent process where this function returns the (non-zero) PID
- * of the forked child process, and a second time in the child process
+ * in  the parent process where this function returns the (non-zero) PID
+ * of  the forked child process, and a  second time in the child process
  * itself, where ZERO(0) is returned.
  * The child then usually proceeds by calling `exec(2)' to replace its
- * application image with that of another program that the original
+ * application image with  that of another  program that the  original
  * parent can then `wait(2)' for. (s.a. `vfork(2)')
  * @return: 0 : You're the new process that was created
  * @return: * : The `return' value is the pid of your new child process */
@@ -3190,17 +3190,17 @@ __CDECLARE_XSC(,__ssize_t,freadlinkat,(__fd_t __dirfd, char const *__path, char 
 #endif /* __CRT_HAVE_XSC(freadlinkat) */
 #if __CRT_HAVE_XSC(frealpath4)
 /* You may pass `AT_READLINK_REQSIZE' to always have the function return
- * the required buffer size, rather than the used size.
+ * the   required   buffer   size,   rather   than   the   used    size.
  * @param: flags: Set of `0 | AT_ALTPATH | AT_READLINK_REQSIZE | AT_DOSPATH' */
 __CDECLARE_XSC(,__ssize_t,frealpath4,(__fd_t __fd, char *__resolved, __size_t __buflen, __atflag_t __flags),(__fd,__resolved,__buflen,__flags))
 #endif /* __CRT_HAVE_XSC(frealpath4) */
 #if __CRT_HAVE_XSC(frealpathat)
-/* Returns the absolute filesystem path for the specified file
- * When `AT_SYMLINK_NOFOLLOW' is given, a final symlink is dereferenced,
+/* Returns  the  absolute   filesystem  path  for   the  specified   file
+ * When `AT_SYMLINK_NOFOLLOW' is given, a final symlink is  dereferenced,
  * causing the pointed-to file location to be retrieved. - Otherwise, the
  * location of the link is printed instead.
  * You may pass `AT_READLINK_REQSIZE' to always have the function return
- * the required buffer size, rather than the used size.
+ * the   required   buffer   size,   rather   than   the   used    size.
  * @param: flags: Set of `0 | AT_ALTPATH | AT_SYMLINK_NOFOLLOW | AT_READLINK_REQSIZE | AT_DOSPATH' */
 __CDECLARE_XSC(,__ssize_t,frealpathat,(__fd_t __dirfd, char const *__filename, char *__buf, __size_t __buflen, __atflag_t __flags),(__dirfd,__filename,__buf,__buflen,__flags))
 #endif /* __CRT_HAVE_XSC(frealpathat) */
@@ -3252,7 +3252,7 @@ __CDECLARE_XSC(,__errno_t,fsymlinkat,(char const *__link_text, __fd_t __tofd, ch
 #endif /* __CRT_HAVE_XSC(fsymlinkat) */
 #if __CRT_HAVE_XSC(fsync)
 /* Synchronize a file (including its descriptor which contains timestamps, and its size),
- * meaning that changes to its data and/or descriptor are written to disk */
+ * meaning  that  changes   to  its   data  and/or   descriptor  are   written  to   disk */
 __CDECLARE_XSC(,__errno_t,fsync,(__fd_t __fd),(__fd))
 #endif /* __CRT_HAVE_XSC(fsync) */
 #if __CRT_HAVE_XSC(ftime)
@@ -3286,11 +3286,11 @@ __CDECLARE_XSC(,__errno_t,futimesat64,(__fd_t __dirfd, char const *__filename, s
  * @param: pmode:       When non-`NULL', store the current mode, which is encoded as:
  *                       - One of `EXCEPT_HANDLER_MODE_(DISABLED|ENABLED|SIGHAND)'
  *                       - Or'd with a set of `EXCEPT_HANDLER_FLAG_(ONESHOT|SETHANDLER|SETSTACK)'
- * @param: phandler:    When non-`NULL', store the address of the user-space exception handler.
+ * @param: phandler:    When   non-`NULL',   store  the   address   of  the   user-space   exception  handler.
  *                      Note that when no handler has been set (`!(*pmode & EXCEPT_HANDLER_FLAG_SETHANDLER)'),
  *                      then this pointer is set to `NULL'.
  * @param: phandler_sp: When non-`NULL', store the starting address of the user-space exception handler stack.
- *                      Note that when no stack has been set (`!(*pmode & EXCEPT_HANDLER_FLAG_SETSTACK)'),
+ *                      Note that  when no  stack has  been set  (`!(*pmode & EXCEPT_HANDLER_FLAG_SETSTACK)'),
  *                      or when the stack was defined to re-use the previous stack,
  *                      then this pointer is set to `EXCEPT_HANDLER_SP_CURRENT'.
  * @return: 0 :         Success.
@@ -3331,25 +3331,25 @@ __CDECLARE_XSC(,__syscall_slong_t,getdrives,(void),())
 #endif /* __CRT_HAVE_XSC(getdrives) */
 #if __CRT_HAVE_XSC(getegid)
 /* >> getegid(2)
- * @return: * : The effective GID of the calling thread.
+ * @return: * : The   effective  GID  of  the  calling  thread.
  *              This is the one used for most permission checks */
 __CDECLARE_XSC(,__uint16_t,getegid,(void),())
 #endif /* __CRT_HAVE_XSC(getegid) */
 #if __CRT_HAVE_XSC(getegid32)
 /* >> getegid(2)
- * @return: * : The effective GID of the calling thread.
+ * @return: * : The   effective  GID  of  the  calling  thread.
  *              This is the one used for most permission checks */
 __CDECLARE_XSC(,__uint32_t,getegid32,(void),())
 #endif /* __CRT_HAVE_XSC(getegid32) */
 #if __CRT_HAVE_XSC(geteuid)
 /* >> geteuid(2)
- * @return: * : The effective UID of the calling thread.
+ * @return: * : The   effective  UID  of  the  calling  thread.
  *              This is the one used for most permission checks */
 __CDECLARE_XSC(,__uint16_t,geteuid,(void),())
 #endif /* __CRT_HAVE_XSC(geteuid) */
 #if __CRT_HAVE_XSC(geteuid32)
 /* >> geteuid(2)
- * @return: * : The effective UID of the calling thread.
+ * @return: * : The   effective  UID  of  the  calling  thread.
  *              This is the one used for most permission checks */
 __CDECLARE_XSC(,__uint32_t,geteuid32,(void),())
 #endif /* __CRT_HAVE_XSC(geteuid32) */
@@ -3389,7 +3389,7 @@ __CDECLARE_XSC(,__errno_t,getitimer64,(__syscall_ulong_t __which, struct __itime
  * @param: addr_len: [in]  The amount of available memory starting at `addr'
  *                   [out] The amount of required memory for the address.
  *                         This may be more than was given, in which case
- *                         the address was truncated and may be invalid.
+ *                         the  address was truncated and may be invalid.
  * @throw: E_INVALID_ARGUMENT_BAD_STATE:E_INVALID_ARGUMENT_CONTEXT_GETPEERNAME_NOT_CONNECTED
  * @return: 0 : Success */
 __CDECLARE_XSC(,__errno_t,getpeername,(__fd_t __sockfd, struct sockaddr *__addr, __socklen_t *__addr_len),(__sockfd,__addr,__addr_len))
@@ -3458,15 +3458,15 @@ __CDECLARE_XSC(,__pid_t,getsid,(__pid_t __pid),(__pid))
 #endif /* __CRT_HAVE_XSC(getsid) */
 #if __CRT_HAVE_XSC(getsockname)
 /* Determine the local address (aka. name) for the given socket `sockfd'.
- * This is usually the same address as was previously set by `bind(2)'
+ * This  is usually the  same address as was  previously set by `bind(2)'
  * NOTE: Before the socket has actually be bound or connected, the exact
- *       address that is returned by this function is weakly undefined.
+ *       address that is returned by this function is weakly  undefined.
  *       e.g.: For AF_INET, sin_addr=0.0.0.0, sin_port=0 is returned.
  * @param: addr:     [out] Buffer where to store the sock address.
  * @param: addr_len: [in]  The amount of available memory starting at `addr'
  *                   [out] The amount of required memory for the address.
  *                         This may be more than was given, in which case
- *                         the address was truncated and may be invalid.
+ *                         the  address was truncated and may be invalid.
  * return: 0 : Success */
 __CDECLARE_XSC(,__errno_t,getsockname,(__fd_t __sockfd, struct sockaddr *__addr, __socklen_t *__addr_len),(__sockfd,__addr,__addr_len))
 #endif /* __CRT_HAVE_XSC(getsockname) */
@@ -3478,7 +3478,7 @@ __CDECLARE_XSC(,__errno_t,getsockname,(__fd_t __sockfd, struct sockaddr *__addr,
  * @param: optlen:  [in]  The amount of available memory starting at `optval'
  *                  [out] The amount of required memory for the option value.
  *                        This may be more than was given, in which case
- *                        the contents of `optval' are undefined.
+ *                        the  contents  of   `optval'  are   undefined.
  * @throw: E_INVALID_ARGUMENT_SOCKET_OPT:E_INVALID_ARGUMENT_CONTEXT_GETSOCKOPT
  * @return: 0 : Success */
 __CDECLARE_XSC(,__errno_t,getsockopt,(__fd_t __sockfd, __syscall_ulong_t __level, __syscall_ulong_t __optname, void *__optval, __socklen_t *__optlen),(__sockfd,__level,__optname,__optval,__optlen))
@@ -3518,12 +3518,12 @@ __CDECLARE_XSC(,__syscall_slong_t,hopf,(__fd_t __fd, __syscall_ulong_t __command
 __CDECLARE_XSC(,__errno_t,idle,(void),())
 #endif /* __CRT_HAVE_XSC(idle) */
 #if __CRT_HAVE_XSC(init_module)
-/* Load a kernel driver from an ELF image `module_image...+=len'
+/* Load a  kernel driver  from  an ELF  image  `module_image...+=len'
  * This system call exists for linux compatiblity, and is implemented
  * as an alias for `KSYSCTL_DRIVER_INSMOD:KSYSCTL_DRIVER_FORMAT_BLOB'
  * 
- * Note however that that is where linux compatiblity ends. Since the
- * linux kernel does not implement any semblance of a stable ABI, you
+ * Note  however that that is where linux compatiblity ends. Since the
+ * linux kernel does not implement any semblance of a stable ABI,  you
  * have to realize that on KOS, this system call can only load drivers
  * specifically built to run within the KOS kernel!
  * @param: uargs: The driver commandline */
@@ -3597,7 +3597,7 @@ __CDECLARE_XSC(,__errno_t,ioprio_set,(__syscall_ulong_t __who, __syscall_ulong_t
 __CDECLARE_XSC(,__errno_t,ipc,(int __TODO_PROTOTYPE),(__TODO_PROTOTYPE))
 #endif /* __CRT_HAVE_XSC(ipc) */
 #if __CRT_HAVE_XSC(kcmp)
-/* @param: type: One of `KCMP_FILE', `KCMP_FILES', `KCMP_FS', `KCMP_IO',
+/* @param: type: One of  `KCMP_FILE',  `KCMP_FILES',  `KCMP_FS',  `KCMP_IO',
  *               `KCMP_SIGHAND', `KCMP_SYSVSEM', `KCMP_VM', `KCMP_EPOLL_TFD' */
 __CDECLARE_XSC(,__syscall_slong_t,kcmp,(__pid_t __pid1, __pid_t __pid2, __syscall_ulong_t __type, __syscall_ulong_t __idx1, __syscall_ulong_t __idx2),(__pid1,__pid2,__type,__idx1,__idx2))
 #endif /* __CRT_HAVE_XSC(kcmp) */
@@ -3622,12 +3622,12 @@ __CDECLARE_XSC(,__errno_t,klstat,(char const *__filename, struct __kos_statx32 *
 #endif /* __CRT_HAVE_XSC(klstat) */
 #if __CRT_HAVE_XSC(kreaddir)
 /* @param: mode: One of `READDIR_DEFAULT', `READDIR_CONTINUE', `READDIR_PEEK' or `READDIR_MULTIPLE',
- *               optionally or'd with any of `READDIR_SKIPREL | READDIR_WANTEOF' */
+ *               optionally     or'd     with     any     of     `READDIR_SKIPREL | READDIR_WANTEOF' */
 __CDECLARE_XSC(,__ssize_t,kreaddir,(__fd_t __fd, struct dirent *__buf, __size_t __bufsize, __syscall_ulong_t __mode),(__fd,__buf,__bufsize,__mode))
 #endif /* __CRT_HAVE_XSC(kreaddir) */
 #if __CRT_HAVE_XSC(kreaddirf)
 /* @param: mode: One of `READDIR_DEFAULT', `READDIR_CONTINUE', `READDIR_PEEK' or `READDIR_MULTIPLE',
- *               optionally or'd with any of `READDIR_SKIPREL | READDIR_WANTEOF' */
+ *               optionally     or'd     with     any     of     `READDIR_SKIPREL | READDIR_WANTEOF' */
 __CDECLARE_XSC(,__ssize_t,kreaddirf,(__fd_t __fd, struct dirent *__buf, __size_t __bufsize, __syscall_ulong_t __mode, __iomode_t __iomode),(__fd,__buf,__bufsize,__mode,__iomode))
 #endif /* __CRT_HAVE_XSC(kreaddirf) */
 #if __CRT_HAVE_XSC(kstat)
@@ -3669,26 +3669,26 @@ __CDECLARE_XSC(,__syscall_slong_t,lfutex,(__uint32_t *__uaddr, __syscall_ulong_t
 #endif /* __CRT_HAVE_XSC(lfutex) */
 #if __CRT_HAVE_XSC(lfutexexpr)
 /* >> lfutexexpr(2)
- * The lfutexexpr() system call can be used to specify arbitrarily complex
- * expressions that must atomically (in relation to other futex operations)
- * hold true before the scheduler will suspend the calling thread, as well as
+ * The lfutexexpr()  system call  can be  used to  specify arbitrarily  complex
+ * expressions  that must  atomically (in  relation to  other futex operations)
+ * hold  true before the scheduler will suspend  the calling thread, as well as
  * have the calling thread wait for any number of futex objects associated with
- * any address that is checked as part of the expression. (s.a. `lfutex()')
+ * any  address that  is checked as  part of the  expression. (s.a. `lfutex()')
  * Notes:
- *   - This is the only futex function that can be used to wait on multiple futex
+ *   - This is the only futex  function that can be used  to wait on multiple  futex
  *     objects (i.e. resume execution when `LFUTEX_WAKE' is called on _any_ of them)
- *   - For more precise control over waiting on futex objects, as well as waiting on
- *     futexes in conjunction with waiting on other things such as files, see the
+ *   - For more precise control over waiting on  futex objects, as well as waiting  on
+ *     futexes in conjunction  with waiting  on other things  such as  files, see  the
  *     documentation on this topic (lfutex() and select()) at the top of <kos/futex.h>
  * @param: base:          Base pointer added to the `fe_offset' fields of given expressions
  * @param: exprv:         Vector of expressions for which to check
  * @param: exprc:         Number of expressions given in `exprv'
  * @param: timeout:       Timeout for wait operations (s.a. `LFUTEX_WAIT_FLAG_TIMEOUT_*')
  * @param: timeout_flags: Set of `LFUTEX_WAIT_FLAG_TIMEOUT_*'
- * @return: * : The first non-zero return value from executing all of the given `exprv'
- *              in order (s.a. the documentations of the individual `LFUTEX_WAIT_*' functions
- *              to see their possible return values, which are always `0' when they would
- *              perform a wait operation, and usually `1' otherwise) or `0' if the calling
+ * @return: * : The  first  non-zero return  value  from executing  all  of the  given `exprv'
+ *              in order (s.a. the documentations of the individual `LFUTEX_WAIT_*'  functions
+ *              to see their  possible return  values, which are  always `0'  when they  would
+ *              perform a wait  operation, and usually  `1' otherwise) or  `0' if the  calling
  *              thread had to perform a wait operation, at which point this function returning
  *              that value means that you've once again been re-awoken.
  * @return: -1:EFAULT:    A faulty pointer was given
@@ -3699,15 +3699,15 @@ __CDECLARE_XSC(,__errno_t,lfutexexpr,(void *__base, __size_t __exprc, struct lfu
 #endif /* __CRT_HAVE_XSC(lfutexexpr) */
 #if __CRT_HAVE_XSC(lfutexlockexpr)
 /* >> lfutexlockexpr(2)
- * A function that is similar to `lfutexexpr()', but allows for the use of one central
+ * A  function that is similar to `lfutexexpr()', but  allows for the use of one central
  * locking futex that is used for waiting and may be distinct from any other given futex
  * object pointer.
  * Notes:
- *   - This function only has the calling thread wait on a single futex `ulockaddr',
+ *   - This function  only  has  the  calling  thread wait  on  a  single  futex  `ulockaddr',
  *     rather than having it wait on an arbitrary number of futexes, as would be the case when
  *     the `lfutexexpr()' function is used.
  *   - For more precise control over waiting on futex objects, as well as waiting on futexes
- *     in conjunction with waiting on other things such as files, see the documentation on
+ *     in conjunction with waiting on other things  such as files, see the documentation  on
  *     this topic (lfutex() and select()) at the top of <kos/futex.h>
  * @param: ulockaddr:     Address of the futex lock to-be used / The futex on which to wait
  * @param: base:          Base pointer added to the `fe_offset' fields of given expressions
@@ -3715,10 +3715,10 @@ __CDECLARE_XSC(,__errno_t,lfutexexpr,(void *__base, __size_t __exprc, struct lfu
  * @param: exprc:         Number of expressions given in `exprv'
  * @param: timeout:       Timeout for wait operations (s.a. `LFUTEX_WAIT_FLAG_TIMEOUT_*')
  * @param: timeout_flags: Set of `LFUTEX_WAIT_FLAG_TIMEOUT_*'
- * @return: * : The first non-zero return value from executing all of the given `exprv'
- *              in order (s.a. the documentations of the individual `LFUTEX_WAIT_*' functions
- *              to see their possible return values, which are always `0' when they would
- *              perform a wait operation, and usually `1' otherwise) or `0' if the calling
+ * @return: * : The  first  non-zero return  value  from executing  all  of the  given `exprv'
+ *              in order (s.a. the documentations of the individual `LFUTEX_WAIT_*'  functions
+ *              to see their  possible return  values, which are  always `0'  when they  would
+ *              perform a wait  operation, and usually  `1' otherwise) or  `0' if the  calling
  *              thread had to perform a wait operation, at which point this function returning
  *              that value means that you've once again been re-awoken.
  * @return: -1:EFAULT:    A faulty pointer was given
@@ -3739,9 +3739,9 @@ __CDECLARE_XSC(,__errno_t,linkat,(__fd_t __fromfd, char const *__existing_file, 
 #endif /* __CRT_HAVE_XSC(linkat) */
 #if __CRT_HAVE_XSC(listen)
 /* Begin to listen for incoming client (aka. peer) connection requests.
- * @param: max_backlog: The max number of clients pending to be accept(2)-ed, before
+ * @param: max_backlog: The max number of clients  pending to be accept(2)-ed,  before
  *                      the kernel will refuse to enqueue additional clients, and will
- *                      instead automatically refuse any further requests until the
+ *                      instead automatically refuse  any further  requests until  the
  *                      less than `max_backlog' clients are still pending.
  * @throw: E_NET_ADDRESS_IN_USE:E_NET_ADDRESS_IN_USE_CONTEXT_LISTEN
  * @throw: E_INVALID_HANDLE_NET_OPERATION:E_NET_OPERATION_LISTEN
@@ -3786,11 +3786,11 @@ __CDECLARE_XSC(,__errno_t,madvise,(void *__addr, __size_t __len, __syscall_ulong
 /* Map the segments of a given library into memory
  * @param: addr:  Hint address (ignored unless `MAP_FIXED' is passed)
  * @param: flags: Set of `MAP_FIXED | MAP_32BIT | MAP_GROWSDOWN |
- *                MAP_GROWSUP | MAP_LOCKED | MAP_NORESERVE |
- *                MAP_POPULATE | MAP_NONBLOCK | MAP_SYNC |
+ *                MAP_GROWSUP  |  MAP_LOCKED  |  MAP_NORESERVE  |
+ *                MAP_POPULATE  |  MAP_NONBLOCK   |  MAP_SYNC   |
  *                MAP_FIXED_NOREPLACE | MAP_NOASLR'
  * @param: fd:    A handle for the library file being mapped (must be mmap(2)-able)
- * @param: hdrv:  Pointer to a vector of `Elf32_Phdr' or `Elf64_Phdr'
+ * @param: hdrv:  Pointer  to  a vector  of `Elf32_Phdr'  or `Elf64_Phdr'
  *                (depending on the caller running in 32- or 64-bit mode)
  * @param: hdrc:  The number of program headers */
 __CDECLARE_XSC(,void *,maplibrary,(void *__addr, __syscall_ulong_t __flags, __fd_t __fd, struct elf32_phdr const *__hdrv, __size_t __hdrc),(__addr,__flags,__fd,__hdrv,__hdrc))
@@ -3825,8 +3825,8 @@ __CDECLARE_XSC(,__errno_t,mknodat,(__fd_t __dirfd, char const *__nodename, __mod
 #endif /* __CRT_HAVE_XSC(mknodat) */
 #if __CRT_HAVE_XSC(mktty)
 /* Create and return a new tty terminal controller connected to the given keyboard and display
- * The newly created device automatically gets assigned an arbitrary device number, before
- * being made available under a file `/dev/${name}' (or rather: as ${name} within the devfs)
+ * The  newly created  device automatically gets  assigned an arbitrary  device number, before
+ * being made available under a file `/dev/${name}'  (or rather: as ${name} within the  devfs)
  * @param: reserved: Reserved set of flags (Must pass `0'; for future expansion) */
 __CDECLARE_XSC(,__fd_t,mktty,(char const *__name, __fd_t __keyboard, __fd_t __display, __syscall_ulong_t __rsvd),(__name,__keyboard,__display,__rsvd))
 #endif /* __CRT_HAVE_XSC(mktty) */
@@ -3843,8 +3843,8 @@ __CDECLARE_XSC(,__errno_t,mlockall,(__syscall_ulong_t __flags),(__flags))
 #if __CRT_HAVE_XSC(mmap)
 /* @param: prot:  Either `PROT_NONE', or set of `PROT_EXEC | PROT_WRITE | PROT_READ | PROT_SEM | PROT_LOOSE | PROT_SHARED'
  * @param: flags: One of `MAP_SHARED`, 'MAP_SHARED_VALIDATE' or `MAP_PRIVATE', optionally or'd
- *               with a set of `MAP_ANONYMOUS | MAP_FIXED | MAP_GROWSDOWN | MAP_LOCKED |
- *               MAP_NONBLOCK | MAP_NORESERVE | MAP_POPULATE | MAP_STACK | MAP_SYNC |
+ *               with  a  set of  `MAP_ANONYMOUS  | MAP_FIXED  |  MAP_GROWSDOWN |  MAP_LOCKED |
+ *               MAP_NONBLOCK  |  MAP_NORESERVE  |  MAP_POPULATE  |  MAP_STACK  |  MAP_SYNC   |
  *               MAP_UNINITIALIZED | MAP_DONT_MAP | MAP_FIXED_NOREPLACE | MAP_OFFSET64_POINTER' */
 __CDECLARE_XSC(,void *,mmap,(void *__addr, __size_t __len, __syscall_ulong_t __prot, __syscall_ulong_t __flags, __fd_t __fd, __syscall_ulong_t __offset),(__addr,__len,__prot,__flags,__fd,__offset))
 #endif /* __CRT_HAVE_XSC(mmap) */
@@ -3954,9 +3954,9 @@ __CDECLARE_XSC(,__errno_t,oldstat,(char const *__filename, struct linux_oldstat 
 __CDECLARE_XSC(,__errno_t,olduname,(struct linux_olduname *__name),(__name))
 #endif /* __CRT_HAVE_XSC(olduname) */
 #if __CRT_HAVE_XSC(open)
-/* Open a new file handle to the file specified by `filename'
- * When `oflags & O_CREAT', then `mode' specifies the initial
- * file access permissions with which the file should be opened.
+/* Open  a  new  file  handle  to  the  file  specified  by `filename'
+ * When  `oflags & O_CREAT',   then  `mode'   specifies  the   initial
+ * file  access  permissions with  which  the file  should  be opened.
  * On KOS, the returned handle can be anything, but is usually one of:
  *   - HANDLE_TYPE_PATH:                   When `O_PATH' was given
  *   - HANDLE_TYPE_BLOCKDEVICE:            For `S_IFBLK' files
@@ -3966,7 +3966,7 @@ __CDECLARE_XSC(,__errno_t,olduname,(struct linux_olduname *__name),(__name))
  *   - HANDLE_TYPE_ONESHOT_DIRECTORY_FILE: For `S_IFDIR' files from special one-shot directories
  *   - HANDLE_TYPE_FILE:                   For `S_IFREG' and `S_IFDIR' (~normal~) files
  *   - *:                                  Certain filesystem names can literally return anything, such
- *                                         as `/proc/self/fd/1234', which is more like `dup(1234)' */
+ *                                         as `/proc/self/fd/1234',  which  is  more  like  `dup(1234)' */
 __CDECLARE_XSC(,__fd_t,open,(char const *__filename, __oflag_t __oflags, __mode_t __mode),(__filename,__oflags,__mode))
 #endif /* __CRT_HAVE_XSC(open) */
 #if __CRT_HAVE_XSC(open_by_handle_at)
@@ -3976,9 +3976,9 @@ __CDECLARE_XSC(,__fd_t,open_by_handle_at,(__fd_t __mountdirfd, struct file_handl
 __CDECLARE_XSC(,__errno_t,open_tree,(int __TODO_PROTOTYPE),(__TODO_PROTOTYPE))
 #endif /* __CRT_HAVE_XSC(open_tree) */
 #if __CRT_HAVE_XSC(openat)
-/* Open a new file handle to the file specified by `filename'
- * When `oflags & O_CREAT', then `mode' specifies the initial
- * file access permissions with which the file should be opened.
+/* Open  a  new  file  handle  to  the  file  specified  by `filename'
+ * When  `oflags & O_CREAT',   then  `mode'   specifies  the   initial
+ * file  access  permissions with  which  the file  should  be opened.
  * On KOS, the returned handle can be anything, but is usually one of:
  *   - HANDLE_TYPE_PATH:                   When `O_PATH' was given
  *   - HANDLE_TYPE_BLOCKDEVICE:            For `S_IFBLK' files
@@ -3988,7 +3988,7 @@ __CDECLARE_XSC(,__errno_t,open_tree,(int __TODO_PROTOTYPE),(__TODO_PROTOTYPE))
  *   - HANDLE_TYPE_ONESHOT_DIRECTORY_FILE: For `S_IFDIR' files from special one-shot directories
  *   - HANDLE_TYPE_FILE:                   For `S_IFREG' and `S_IFDIR' (~normal~) files
  *   - *:                                  Certain filesystem names can literally return anything, such
- *                                         as `/proc/self/fd/1234', which is more like `dup(1234)' */
+ *                                         as `/proc/self/fd/1234',  which  is  more  like  `dup(1234)' */
 __CDECLARE_XSC(,__fd_t,openat,(__fd_t __dirfd, char const *__filename, __oflag_t __oflags, __mode_t __mode),(__dirfd,__filename,__oflags,__mode))
 #endif /* __CRT_HAVE_XSC(openat) */
 #if __CRT_HAVE_XSC(openat2)
@@ -3996,7 +3996,7 @@ __CDECLARE_XSC(,__errno_t,openat2,(int __TODO_PROTOTYPE),(__TODO_PROTOTYPE))
 #endif /* __CRT_HAVE_XSC(openat2) */
 #if __CRT_HAVE_XSC(openpty)
 /* Create a new pseudo-terminal driver and store handles to both the
- * master and slave ends of the connection in the given pointers. */
+ * master  and slave ends  of the connection  in the given pointers. */
 __CDECLARE_XSC(,__errno_t,openpty,(__fd_t *__amaster, __fd_t *__aslave, char *__name, struct termios const *__termp, struct winsize const *__winp),(__amaster,__aslave,__name,__termp,__winp))
 #endif /* __CRT_HAVE_XSC(openpty) */
 #if __CRT_HAVE_XSC(pause)
@@ -4010,7 +4010,7 @@ __CDECLARE_XSC(,__errno_t,perf_event_open,(int __TODO_PROTOTYPE),(__TODO_PROTOTY
 __CDECLARE_XSC(,__errno_t,personality,(int __TODO_PROTOTYPE),(__TODO_PROTOTYPE))
 #endif /* __CRT_HAVE_XSC(personality) */
 #if __CRT_HAVE_XSC(pidfd_getfd)
-/* Duplicate the handle of a foreign process into a handle for the caller.
+/* Duplicate the  handle  of  a  foreign  process into  a  handle  for  the  caller.
  * This system call duplicates the functionality of `open("/proc/[pid]/fd/[fdno]")',
  * which may also be used to duplicate file handles from another process.
  * @param: pidfd: A `HANDLE_TYPE_TASK'-handle
@@ -4026,7 +4026,7 @@ __CDECLARE_XSC(,__fd_t,pidfd_getfd,(__fd_t __pidfd, __fd_t __foreign_fd, __sysca
 #endif /* __CRT_HAVE_XSC(pidfd_getfd) */
 #if __CRT_HAVE_XSC(pidfd_open)
 /* Return a `HANDLE_TYPE_TASK' handle for the given `pid'
- * This system call exists for compatibility with linux, which does not allow
+ * This system call exists for compatibility with linux, which does not  allow
  * this call to succeed when `pid' isn't a process leader (i.e. main() thread)
  * @param: flags: Must always be `0' (for now)
  * @return: * :   A handle for the process `pid'
@@ -4088,7 +4088,7 @@ __CDECLARE_XSC(,__ssize_t,pread64,(__fd_t __fd, void *__buf, __size_t __bufsize,
 __CDECLARE_XSC(,__ssize_t,pread64f,(__fd_t __fd, void *__buf, __size_t __bufsize, __uint64_t __offset, __iomode_t __mode),(__fd,__buf,__bufsize,__offset,__mode))
 #endif /* __CRT_HAVE_XSC(pread64f) */
 #if __CRT_HAVE_XSC(preadv)
-/* Same as `readv(2)', but read data from a file at a
+/* Same as  `readv(2)', but  read data  from a  file at  a
  * specific `offset', rather than the current R/W position
  * @return: <= SUM(iov[*].iov_len): The actual amount of read bytes */
 __CDECLARE_XSC(,__ssize_t,preadv,(__fd_t __fd, struct __iovecx32 const *__iovec, __size_t __count, __uint64_t __offset),(__fd,__iovec,__count,__offset))
@@ -4097,7 +4097,7 @@ __CDECLARE_XSC(,__ssize_t,preadv,(__fd_t __fd, struct __iovecx32 const *__iovec,
 __CDECLARE_XSC(,__errno_t,preadv2,(int __TODO_PROTOTYPE),(__TODO_PROTOTYPE))
 #endif /* __CRT_HAVE_XSC(preadv2) */
 #if __CRT_HAVE_XSC(preadvf)
-/* Same as `readv(2)', but read data from a file at a
+/* Same as  `readv(2)', but  read data  from a  file at  a
  * specific `offset', rather than the current R/W position
  * @return: <= SUM(iov[*].iov_len): The actual amount of read bytes */
 __CDECLARE_XSC(,__ssize_t,preadvf,(__fd_t __fd, struct __iovecx32 const *__iovec, __size_t __count, __uint64_t __offset, __iomode_t __mode),(__fd,__iovec,__count,__offset,__mode))
@@ -4143,7 +4143,7 @@ __CDECLARE_XSC(,__ssize_t,pwrite64,(__fd_t __fd, void const *__buf, __size_t __b
 __CDECLARE_XSC(,__ssize_t,pwrite64f,(__fd_t __fd, void const *__buf, __size_t __bufsize, __uint64_t __offset, __iomode_t __mode),(__fd,__buf,__bufsize,__offset,__mode))
 #endif /* __CRT_HAVE_XSC(pwrite64f) */
 #if __CRT_HAVE_XSC(pwritev)
-/* Same as `writev(2)', but write data to a file at a
+/* Same as  `writev(2)', but  write data  to a  file at  a
  * specific `offset', rather than the current R/W position
  * @return: <= SUM(iov[*].iov_len): The actual amount of written bytes */
 __CDECLARE_XSC(,__ssize_t,pwritev,(__fd_t __fd, struct __iovecx32 const *__iovec, __size_t __count, __uint64_t __offset),(__fd,__iovec,__count,__offset))
@@ -4152,7 +4152,7 @@ __CDECLARE_XSC(,__ssize_t,pwritev,(__fd_t __fd, struct __iovecx32 const *__iovec
 __CDECLARE_XSC(,__errno_t,pwritev2,(int __TODO_PROTOTYPE),(__TODO_PROTOTYPE))
 #endif /* __CRT_HAVE_XSC(pwritev2) */
 #if __CRT_HAVE_XSC(pwritevf)
-/* Same as `writev(2)', but write data to a file at a
+/* Same as  `writev(2)', but  write data  to a  file at  a
  * specific `offset', rather than the current R/W position
  * @return: <= SUM(iov[*].iov_len): The actual amount of written bytes */
 __CDECLARE_XSC(,__ssize_t,pwritevf,(__fd_t __fd, struct __iovecx32 const *__iovec, __size_t __count, __uint64_t __offset, __iomode_t __mode),(__fd,__iovec,__count,__offset,__mode))
@@ -4174,7 +4174,7 @@ __CDECLARE_XSC(,__errno_t,raiseat,(struct ucpustate32 const *__state, struct __s
 #endif /* __CRT_HAVE_XSC(raiseat) */
 #if __CRT_HAVE_XSC(read)
 /* Read up to `bufsize' bytes from `fd' into `buf'
- * When `fd' has the `O_NONBLOCK' flag set, only read as much data as was
+ * When  `fd' has the `O_NONBLOCK' flag set, only read as much data as was
  * available at the time the call was made, and throw `E_WOULDBLOCK' if no
  * data was available at the time.
  * @return: <= bufsize: The actual amount of read bytes
@@ -4187,15 +4187,15 @@ __CDECLARE_XSC(,__ssize_t,readahead,(__fd_t __fd, __uint64_t __offset, __size_t 
 #if __CRT_HAVE_XSC(readdir)
 /* Read exactly one directory entry from `fd'
  * Note that the linux version of this system call has one additional argument `count'.
- * However, within the linux kernel implementation, that argument is unconditionally
- * ignored, and the system call will _always_ read exactly 1 directory entry from `fd'
+ * However, within the  linux kernel implementation,  that argument is  unconditionally
+ * ignored,  and the system call will _always_ read exactly 1 directory entry from `fd'
  * @return: 1 : Read on directory entry
  * @return: 0 : End-of-directory */
 __CDECLARE_XSC(,__syscall_slong_t,readdir,(__fd_t __fd, struct old_linux_direntx32 *__buf),(__fd,__buf))
 #endif /* __CRT_HAVE_XSC(readdir) */
 #if __CRT_HAVE_XSC(readf)
 /* Read up to `bufsize' bytes from `fd' into `buf'
- * When `fd' has the `O_NONBLOCK' flag set, only read as much data as was
+ * When  `fd' has the `O_NONBLOCK' flag set, only read as much data as was
  * available at the time the call was made, and throw `E_WOULDBLOCK' if no
  * data was available at the time.
  * @return: <= bufsize: The actual amount of read bytes
@@ -4210,10 +4210,10 @@ __CDECLARE_XSC(,__ssize_t,readlinkat,(__fd_t __dirfd, char const *__path, char *
 #endif /* __CRT_HAVE_XSC(readlinkat) */
 #if __CRT_HAVE_XSC(readv)
 /* Same as `read(2)', but rather than specifying a single, continuous buffer,
- * read data into `count' separate buffers, though still return the actual
+ * read  data into `count'  separate buffers, though  still return the actual
  * number of read bytes.
  * When `fd' has the `O_NONBLOCK' flag set, only read as much data as was
- * available at the time the call was made, and throw `E_WOULDBLOCK'
+ * available at  the time  the call  was made,  and throw  `E_WOULDBLOCK'
  * no data was available at the time.
  * @return: <= SUM(iov[*].iov_len): The actual amount of read bytes
  * @return: 0                     : EOF */
@@ -4221,10 +4221,10 @@ __CDECLARE_XSC(,__ssize_t,readv,(__fd_t __fd, struct __iovecx32 const *__iovec, 
 #endif /* __CRT_HAVE_XSC(readv) */
 #if __CRT_HAVE_XSC(readvf)
 /* Same as `read(2)', but rather than specifying a single, continuous buffer,
- * read data into `count' separate buffers, though still return the actual
+ * read  data into `count'  separate buffers, though  still return the actual
  * number of read bytes.
  * When `fd' has the `O_NONBLOCK' flag set, only read as much data as was
- * available at the time the call was made, and throw `E_WOULDBLOCK'
+ * available at  the time  the call  was made,  and throw  `E_WOULDBLOCK'
  * no data was available at the time.
  * @return: <= SUM(iov[*].iov_len): The actual amount of read bytes
  * @return: 0                     : EOF */
@@ -4254,10 +4254,10 @@ __CDECLARE_XSC(,__ssize_t,recvfrom,(__fd_t __sockfd, void *__buf, __size_t __buf
 #endif /* __CRT_HAVE_XSC(recvfrom) */
 #if __CRT_HAVE_XSC(recvmmsg)
 /* Same as `recvmsg(2)', but may be used to receive many
- * messages (datagrams) with a single system call.
+ * messages  (datagrams)  with  a  single  system  call.
  * @param: msg_flags: Set of `MSG_CMSG_CLOEXEC | MSG_CMSG_CLOFORK |
  *                            MSG_DONTWAIT | MSG_ERRQUEUE | MSG_OOB |
- *                            MSG_PEEK | MSG_TRUNC | MSG_WAITALL |
+ *                            MSG_PEEK  |  MSG_TRUNC |  MSG_WAITALL |
  *                            MSG_WAITFORONE'
  * @throw: Error (s.a. `recvmsg(2)')
  * @return: * : The # of datagrams successfully received. */
@@ -4265,10 +4265,10 @@ __CDECLARE_XSC(,__ssize_t,recvmmsg,(__fd_t __sockfd, struct __mmsghdrx32 *__vmes
 #endif /* __CRT_HAVE_XSC(recvmmsg) */
 #if __CRT_HAVE_XSC(recvmmsg_time64)
 /* Same as `recvmsg(2)', but may be used to receive many
- * messages (datagrams) with a single system call.
+ * messages  (datagrams)  with  a  single  system  call.
  * @param: msg_flags: Set of `MSG_CMSG_CLOEXEC | MSG_CMSG_CLOFORK |
  *                            MSG_DONTWAIT | MSG_ERRQUEUE | MSG_OOB |
- *                            MSG_PEEK | MSG_TRUNC | MSG_WAITALL |
+ *                            MSG_PEEK  |  MSG_TRUNC |  MSG_WAITALL |
  *                            MSG_WAITFORONE'
  * @throw: Error (s.a. `recvmsg(2)')
  * @return: * : The # of datagrams successfully received. */
@@ -4276,10 +4276,10 @@ __CDECLARE_XSC(,__ssize_t,recvmmsg_time64,(__fd_t __sockfd, struct __mmsghdrx32 
 #endif /* __CRT_HAVE_XSC(recvmmsg_time64) */
 #if __CRT_HAVE_XSC(recvmsg)
 /* Same as `recv(2)' and `recvfrom(2)', but also allows for receiving ancillary
- * data as well as for data buffers to be represented by an IOV vector.
+ * data as  well as  for  data buffers  to be  represented  by an  IOV  vector.
  * @param: msg_flags: Set of `MSG_CMSG_CLOEXEC | MSG_CMSG_CLOFORK |
  *                            MSG_DONTWAIT | MSG_ERRQUEUE | MSG_OOB |
- *                            MSG_PEEK | MSG_TRUNC | MSG_WAITALL'
+ *                            MSG_PEEK  |  MSG_TRUNC  |  MSG_WAITALL'
  * @throw: ... Same as for `recv(2)' and `recvfrom(2)'
  * @return: * : [<= bufsize] The actual # of received payload bytes */
 __CDECLARE_XSC(,__ssize_t,recvmsg,(__fd_t __sockfd, struct __msghdrx32 *__message, __syscall_ulong_t __msg_flags),(__sockfd,__message,__msg_flags))
@@ -4366,24 +4366,24 @@ __CDECLARE_XSC(,__syscall_slong_t,rt_sigtimedwait_time64,(struct __sigset_struct
 __CDECLARE_XSC(,__errno_t,rt_tgsigqueueinfo,(__pid_t __pid, __pid_t __tid, __signo_t __usigno, struct __siginfox32_struct const *__uinfo),(__pid,__tid,__usigno,__uinfo))
 #endif /* __CRT_HAVE_XSC(rt_tgsigqueueinfo) */
 #if __CRT_HAVE_XSC(rtm_abort)
-/* Abort the current transaction by having `sys_rtm_begin()' return with
+/* Abort the current transaction  by having `sys_rtm_begin()' return  with
  * `RTM_ABORT_EXPLICIT | ((code << RTM_ABORT_CODE_S) & RTM_ABORT_CODE_M)'
  * If no transaction was in progress, behave as a no-op and return `-EOK'.
- * Otherwise, this system call does not return normally, but returns from
+ * Otherwise,  this system call does not return normally, but returns from
  * the original `sys_rtm_begin()' */
 __CDECLARE_XSC(,__errno_t,rtm_abort,(__syscall_ulong_t __code),(__code))
 #endif /* __CRT_HAVE_XSC(rtm_abort) */
 #if __CRT_HAVE_XSC(rtm_begin)
-/* Begin an RTM operation. Note that if the arch-specific RTM driver
+/* Begin  an  RTM operation.  Note that  if  the arch-specific  RTM driver
  * wasn't already loaded into the kernel, it will be loaded automatically,
  * though any error that may happen during this will result in `RTM_NOSYS'
  * begin returned.
- * Note that while an RTM operation is in progress, only a very small hand
- * full of system calls are allowed to be used. Attempting to use arbitrary
- * system calls will most likely result in an `RTM_ABORT_FAILED' error, and
+ * Note that while an RTM  operation is in progress,  only a very small  hand
+ * full  of system calls are allowed to  be used. Attempting to use arbitrary
+ * system calls will most likely  result in an `RTM_ABORT_FAILED' error,  and
  * attempting to access too much system memory in general will result in this
- * function returning with `RTM_ABORT_CAPACITY', rather than succeeding.
- * The following is a list of system calls which are whitelisted for use
+ * function returning  with  `RTM_ABORT_CAPACITY',  rather  than  succeeding.
+ * The following is  a list  of system calls  which are  whitelisted for  use
  * during a transaction:
  *   - sys_rtm_begin:  Nested RTM operation
  *   - sys_rtm_end:    End an RTM operation
@@ -4397,8 +4397,8 @@ __CDECLARE_XSC(,__rtm_status_t,rtm_begin,(void),())
 #endif /* __CRT_HAVE_XSC(rtm_begin) */
 #if __CRT_HAVE_XSC(rtm_end)
 /* End a transaction
- * If the transaction was successful, return normally (by returning `-EOK').
- * If the transaction failed, `sys_rtm_begin()' returns `RTM_ABORT_*'
+ * If  the  transaction was  successful,  return normally  (by  returning `-EOK').
+ * If    the   transaction   failed,   `sys_rtm_begin()'   returns   `RTM_ABORT_*'
  * If no transaction was in progress, an `E_ILLEGAL_OPERATION' exception is thrown */
 __CDECLARE_XSC(,__errno_t,rtm_end,(void),())
 #endif /* __CRT_HAVE_XSC(rtm_end) */
@@ -4443,7 +4443,7 @@ __CDECLARE_XSC(,__errno_t,sched_setparam,(__pid_t __pid, struct sched_param cons
 #endif /* __CRT_HAVE_XSC(sched_setparam) */
 #if __CRT_HAVE_XSC(sched_setscheduler)
 /* @param: policy: One of `SCHED_OTHER', `SCHED_FIFO', `SCHED_RR', `SCHED_BATCH',
- *                 `SCHED_IDLE', optionally or'd with `SCHED_RESET_ON_FORK' */
+ *                 `SCHED_IDLE',  optionally   or'd  with   `SCHED_RESET_ON_FORK' */
 __CDECLARE_XSC(,__errno_t,sched_setscheduler,(__pid_t __pid, __syscall_ulong_t __policy, struct sched_param const *__param),(__pid,__policy,__param))
 #endif /* __CRT_HAVE_XSC(sched_setscheduler) */
 #if __CRT_HAVE_XSC(sched_yield)
@@ -4475,7 +4475,7 @@ __CDECLARE_XSC(,__ssize_t,sendfile64,(__fd_t __out_fd, __fd_t __in_fd, __ULONG64
 #endif /* __CRT_HAVE_XSC(sendfile64) */
 #if __CRT_HAVE_XSC(sendmmsg)
 /* Same as `sendmsg(2)', but may be used to send many
- * messages (datagrams) with a single system call.
+ * messages (datagrams)  with a  single system  call.
  * @param: msg_flags: Set of `MSG_CONFIRM | MSG_DONTROUTE | MSG_DONTWAIT |
  *                            MSG_EOR | MSG_MORE | MSG_NOSIGNAL | MSG_OOB'
  * @throw: ... Same as `sendmsg(2)'
@@ -4484,7 +4484,7 @@ __CDECLARE_XSC(,__ssize_t,sendmmsg,(__fd_t __sockfd, struct __mmsghdrx32 *__vmes
 #endif /* __CRT_HAVE_XSC(sendmmsg) */
 #if __CRT_HAVE_XSC(sendmsg)
 /* Same as `send(2)' and `sendto(2)', but also allows for sending ancillary
- * data as well as for data buffers to be represented by an IOV vector.
+ * data as well as  for data buffers  to be represented  by an IOV  vector.
  * @param: msg_flags: Set of `MSG_CONFIRM | MSG_DONTROUTE | MSG_DONTWAIT |
  *                            MSG_EOR | MSG_MORE | MSG_NOSIGNAL | MSG_OOB'
  * @throw: ... Same as for `send(2)' and `sendto(2)'
@@ -4499,7 +4499,7 @@ __CDECLARE_XSC(,__ssize_t,sendmsg,(__fd_t __sockfd, struct __msghdrx32 const *__
  *                            MSG_EOR | MSG_MORE | MSG_NOSIGNAL | MSG_OOB'
  * @param: addr:      Address where to send data (or NULL when `addr_len' is 0)
  * @param: addr_len:  Size of `addr', or `0' to have this behave as an alias
- *                    for `send(sockfd, buf, bufsize, msg_flags)'
+ *                    for            `send(sockfd, buf, bufsize, msg_flags)'
  * @throw: E_INVALID_ARGUMENT_UNEXPECTED_COMMAND:E_INVALID_ARGUMENT_CONTEXT_SENDTO_WRONG_ADDRESS_FAMILY
  * @throw: E_INVALID_ARGUMENT_BAD_STATE:E_INVALID_ARGUMENT_CONTEXT_SEND_NOT_CONNECTED
  * @throw: E_NET_MESSAGE_TOO_LONG
@@ -4513,7 +4513,7 @@ __CDECLARE_XSC(,__ssize_t,sendto,(__fd_t __sockfd, void const *__buf, __size_t _
 /* Set the exception handler mode for the calling thread.
  * Examples:
  *   Set mode #3 from you `main()': `set_exception_handler(EXCEPT_HANDLER_MODE_SIGHAND, NULL, NULL)'
- *   Set mode #4 (as done by libc): `set_exception_handler(EXCEPT_HANDLER_MODE_SIGHAND |
+ *   Set  mode   #4  (as   done  by   libc):  `set_exception_handler(EXCEPT_HANDLER_MODE_SIGHAND   |
  *                                                         EXCEPT_HANDLER_FLAG_SETHANDLER,
  *                                                         &except_handler4, NULL)'
  * @param: mode:       One of `EXCEPT_HANDLER_MODE_*', optionally or'd with `EXCEPT_HANDLER_FLAG_*'
@@ -4536,32 +4536,32 @@ __CDECLARE_XSC(,__errno_t,set_thread_area,(int __TODO_PROTOTYPE),(__TODO_PROTOTY
 __CDECLARE_XSC(,__pid_t,set_tid_address,(__pid_t *__tidptr),(__tidptr))
 #endif /* __CRT_HAVE_XSC(set_tid_address) */
 #if __CRT_HAVE_XSC(set_userprocmask_address)
-/* Register the address of the calling thread's userprocmask controller.
- * This also initializes `*ctl->pm_sigmask' and `ctl->pm_pending', such
- * that `*ctl->pm_sigmask' is filled with the current kernel-level signal
+/* Register the address of  the calling thread's userprocmask  controller.
+ * This also  initializes `*ctl->pm_sigmask'  and `ctl->pm_pending',  such
+ * that `*ctl->pm_sigmask' is filled with the current kernel-level  signal
  * mask, as would be returned by `sigprocmask(2)', while `ctl->pm_pending'
  * is filled in with the equivalent of `sigpending(2)'
- * Additionally, the address of `&ctl->pm_mytid' is stored as an override
+ * Additionally,  the address  of `&ctl->pm_mytid'  is stored  as an override
  * for `set_tid_address(2)', and the kernel may read from `*ctl->pm_sigmask',
- * and write to `ctl->pm_pending' (using atomic-or for the later) from this
+ * and write to `ctl->pm_pending' (using  atomic-or for the later) from  this
  * point forth.
  * NOTE: Before calling this function, the caller must:
  *       >> bzero(ctl, sizeof(struct userprocmask));
  *       >> ctl->pm_sigsize = sizeof(sigset_t);
  *       >> ctl->pm_sigmask = &initial_sigmask;
  *       Where the initial bzero() is needed to initialize potential
- *       additional, arch-specific fields to all zeroes.
+ *       additional,   arch-specific   fields    to   all    zeroes.
  * NOTE: This system call will then initialize:
  *       >> ctl->pm_mytid = gettid();
  *       >> sigprocmask(0, NULL, ctl->pm_sigmask);
  *       >> sigpending(&ctl->pm_pending);
  * NOTE: Passing `NULL' for `ctl' disables userprocmask-mode, though
- *       before this is done, the kernel will copy the `pm_sigmask'
- *       of the previously set controller into its internal signal
+ *       before this is done, the kernel will copy the  `pm_sigmask'
+ *       of the previously set  controller into its internal  signal
  *       mask. (i.e. the one used outside of userprocmask-mode)
- * Note though that `pm_sigmask' is ignored for `SIGKILL' and `SIGSTOP'
- * Note also that this function replaces `set_tid_address(2)', such that
- * it negates a prior call to said function, while a future call to said
+ * Note though  that  `pm_sigmask'  is ignored  for  `SIGKILL'  and  `SIGSTOP'
+ * Note also  that  this  function replaces  `set_tid_address(2)',  such  that
+ * it negates a  prior call  to said  function, while  a future  call to  said
  * function will once again disable userprocmask, same as passing `NULL' would */
 __CDECLARE_XSC(,__errno_t,set_userprocmask_address,(struct userprocmask *__ctl),(__ctl))
 #endif /* __CRT_HAVE_XSC(set_userprocmask_address) */
@@ -4570,7 +4570,7 @@ __CDECLARE_XSC(,__errno_t,setdomainname,(char const *__name, __size_t __len),(__
 #endif /* __CRT_HAVE_XSC(setdomainname) */
 #if __CRT_HAVE_XSC(setfsgid)
 /* >> setfsgid(2)
- * Set the group ID for the cred-context (s.a. `CLONE_CRED') of the
+ * Set the group  ID for  the cred-context (s.a.  `CLONE_CRED') of  the
  * calling thread. The calling thread needs the `CAP_SETGID' privilege.
  * @return: 0:  Success.
  * @throw: E_INSUFFICIENT_RIGHTS:CAP_SETGID: [...] */
@@ -4578,7 +4578,7 @@ __CDECLARE_XSC(,__errno_t,setfsgid,(__uint16_t __gid),(__gid))
 #endif /* __CRT_HAVE_XSC(setfsgid) */
 #if __CRT_HAVE_XSC(setfsgid32)
 /* >> setfsgid(2)
- * Set the group ID for the cred-context (s.a. `CLONE_CRED') of the
+ * Set the group  ID for  the cred-context (s.a.  `CLONE_CRED') of  the
  * calling thread. The calling thread needs the `CAP_SETGID' privilege.
  * @return: 0:  Success.
  * @throw: E_INSUFFICIENT_RIGHTS:CAP_SETGID: [...] */
@@ -4586,7 +4586,7 @@ __CDECLARE_XSC(,__errno_t,setfsgid32,(__uint32_t __gid),(__gid))
 #endif /* __CRT_HAVE_XSC(setfsgid32) */
 #if __CRT_HAVE_XSC(setfsuid)
 /* >> setfsuid(2)
- * Set the user ID for the cred-context (s.a. `CLONE_CRED') of the
+ * Set the  user ID  for the  cred-context (s.a.  `CLONE_CRED') of  the
  * calling thread. The calling thread needs the `CAP_SETUID' privilege.
  * @return: 0:  Success.
  * @throw: E_INSUFFICIENT_RIGHTS:CAP_SETUID: [...] */
@@ -4594,7 +4594,7 @@ __CDECLARE_XSC(,__errno_t,setfsuid,(__uint16_t __uid),(__uid))
 #endif /* __CRT_HAVE_XSC(setfsuid) */
 #if __CRT_HAVE_XSC(setfsuid32)
 /* >> setfsuid(2)
- * Set the user ID for the cred-context (s.a. `CLONE_CRED') of the
+ * Set the  user ID  for the  cred-context (s.a.  `CLONE_CRED') of  the
  * calling thread. The calling thread needs the `CAP_SETUID' privilege.
  * @return: 0:  Success.
  * @throw: E_INSUFFICIENT_RIGHTS:CAP_SETUID: [...] */
@@ -4756,7 +4756,7 @@ __CDECLARE_XSC(,__errno_t,shmget,(__key_t __key, __size_t __size, __syscall_ulon
 #endif /* __CRT_HAVE_XSC(shmget) */
 #if __CRT_HAVE_XSC(shutdown)
 /* Disallow further reception of data (causing `recv(2)' to return `0' as soon
- * as all currently queued data has been read), and/or further transmission
+ * as  all currently queued  data has been  read), and/or further transmission
  * of data (causing `send(2)' to throw an `E_NET_SHUTDOWN' exception)
  * @param: how: One of `SHUT_RD', `SHUT_WR' or `SHUT_RDWR'
  * @throw: E_INVALID_ARGUMENT_BAD_STATE:E_INVALID_ARGUMENT_CONTEXT_SHUTDOWN_NOT_CONNECTED
@@ -4771,8 +4771,8 @@ __CDECLARE_XSC(,__errno_t,sigaltstack,(struct __sigaltstackx32 const *__ss, stru
 #endif /* __CRT_HAVE_XSC(sigaltstack) */
 #if __CRT_HAVE_XSC(sigmask_check)
 /* Check for pending signals, and keep on handling them until none are left
- * The [restart(must)] is necessary in order to ensure that _all_ unmasked
- * signals get handled until none are left, in case more than one signal
+ * The  [restart(must)] is necessary in order to ensure that _all_ unmasked
+ * signals get handled until  none are left, in  case more than one  signal
  * became available.
  * This system call is only needed when `set_userprocmask_address(2)' was used. */
 __CDECLARE_XSC(,__errno_t,sigmask_check,(void),())
@@ -4782,12 +4782,12 @@ __CDECLARE_XSC(,__sighandler_t,signal,(__signo_t __signo, __sighandler_t __handl
 #endif /* __CRT_HAVE_XSC(signal) */
 #if __CRT_HAVE_XSC(signalfd)
 /* Create a poll(2)-able file descriptor which can be used to wait for the
- * delivery of signals masked by `sigmask' to the waiting thread/process. */
+ * delivery of signals masked by `sigmask' to the waiting  thread/process. */
 __CDECLARE_XSC(,__errno_t,signalfd,(__fd_t __fd, struct __sigset_struct const *__sigmask, __size_t __sigmasksize),(__fd,__sigmask,__sigmasksize))
 #endif /* __CRT_HAVE_XSC(signalfd) */
 #if __CRT_HAVE_XSC(signalfd4)
 /* Create a poll(2)-able file descriptor which can be used to wait for the
- * delivery of signals masked by `sigmask' to the waiting thread/process.
+ * delivery of signals masked by `sigmask' to the waiting  thread/process.
  * @param: flags: Set of `0 | SFD_NONBLOCK | SFD_CLOEXEC | SFD_CLOFORK' */
 __CDECLARE_XSC(,__errno_t,signalfd4,(__fd_t __fd, struct __sigset_struct const *__sigmask, __size_t __sigmasksize, __syscall_ulong_t __flags),(__fd,__sigmask,__sigmasksize,__flags))
 #endif /* __CRT_HAVE_XSC(signalfd4) */
@@ -4808,7 +4808,7 @@ __CDECLARE_XSC(,__errno_t,sigsuspend,(struct __sigset_struct const *__set),(__se
  *                   May optionally be or'd with `SOCK_CLOEXEC | SOCK_CLOFORK | SOCK_NONBLOCK'
  * @param: protocol: Socket protocol (`0' for automatic). Available socket protocols mainly
  *                   depend on the selected `domain', and may be further specialized by the
- *                   `type' argument. for example, `AF_INET' takes one of `IPPROTO_*'
+ *                   `type' argument.  for  example,  `AF_INET' takes  one  of  `IPPROTO_*'
  *                   >> socket(AF_INET, SOCK_STREAM, IPPROTO_TCP);
  *                   Also note that protocol IDs can be enumerated by `getprotoent(3)' from `<netdb.h>'
  * @return: * : A file descriptor for the newly created socket. */
@@ -4824,7 +4824,7 @@ __CDECLARE_XSC(,__LONG32_TYPE__,socketcall,(__ULONG32_TYPE__ __call, __ULONG32_T
  *                   May optionally be or'd with `SOCK_CLOEXEC | SOCK_CLOFORK | SOCK_NONBLOCK'
  * @param: protocol: Socket protocol (`0' for automatic). Available socket protocols mainly
  *                   depend on the selected `domain', and may be further specialized by the
- *                   `type' argument. for example, `AF_INET' takes one of `IPPROTO_*'
+ *                   `type' argument.  for  example,  `AF_INET' takes  one  of  `IPPROTO_*'
  *                   >> socket(AF_INET, SOCK_STREAM, IPPROTO_TCP);
  *                   Also note that protocol IDs can be enumerated by `getprotoent(3)' from `<netdb.h>'
  * @return: * : A file descriptor for the newly created socket. */
@@ -4944,14 +4944,14 @@ __CDECLARE_XSC(,__errno_t,timerfd_gettime64,(__fd_t __timerfd, struct __itimersp
 #endif /* __CRT_HAVE_XSC(timerfd_gettime64) */
 #if __CRT_HAVE_XSC(timerfd_settime)
 /* Set next expiration time of interval timer source `timerfd' to `utmr'.
- * If `flags' has the `TFD_TIMER_ABSTIME' flag set the timeout value
+ * If `flags'  has the  `TFD_TIMER_ABSTIME' flag  set the  timeout  value
  * is absolute. Optionally return the old expiration time in `otmr''
  * @param: flags: Set of `0 | TFD_TIMER_ABSTIME' */
 __CDECLARE_XSC(,__errno_t,timerfd_settime,(__fd_t __timerfd, __syscall_ulong_t __flags, struct __itimerspecx32 const *__utmr, struct __itimerspecx32 *__otmr),(__timerfd,__flags,__utmr,__otmr))
 #endif /* __CRT_HAVE_XSC(timerfd_settime) */
 #if __CRT_HAVE_XSC(timerfd_settime64)
 /* Set next expiration time of interval timer source `timerfd' to `utmr'.
- * If `flags' has the `TFD_TIMER_ABSTIME' flag set the timeout value
+ * If `flags'  has the  `TFD_TIMER_ABSTIME' flag  set the  timeout  value
  * is absolute. Optionally return the old expiration time in `otmr''
  * @param: flags: Set of `0 | TFD_TIMER_ABSTIME' */
 __CDECLARE_XSC(,__errno_t,timerfd_settime64,(__fd_t __timerfd, __syscall_ulong_t __flags, struct __itimerspecx32_64 const *__utmr, struct __itimerspecx32_64 *__otmr),(__timerfd,__flags,__utmr,__otmr))
@@ -5004,9 +5004,9 @@ __CDECLARE_XSC(,__errno_t,uselib,(char const *__library),(__library))
 __CDECLARE_XSC(,__errno_t,userfaultfd,(int __TODO_PROTOTYPE),(__TODO_PROTOTYPE))
 #endif /* __CRT_HAVE_XSC(userfaultfd) */
 #if __CRT_HAVE_XSC(userviofd)
-/* Construct a user-vio-fd object supporting mmap(2), with actual
- * memory accesses being dispatched by adding them as pending requests
- * to an internal queue that should be read(2) from by a worker thread,
+/* Construct   a   user-vio-fd  object   supporting  mmap(2),   with  actual
+ * memory  accesses  being dispatched  by  adding them  as  pending requests
+ * to an internal  queue that  should be read(2)  from by  a worker  thread,
  * which should then service those requests before responding by write(2)ing
  * the results of the operation back to the same fd.
  * HINT: The format of the structures that are read(2) and
@@ -5014,7 +5014,7 @@ __CDECLARE_XSC(,__errno_t,userfaultfd,(int __TODO_PROTOTYPE),(__TODO_PROTOTYPE))
  * NOTE: Don't use this system call directly. Use `vio_create(3)'
  *       from `<libvio/vio.h>' instead.
  * @param: initial_size: The initial mmap(2)able size of the returned handle.
- *                       This size may be altered at a later point in time
+ *                       This  size may be  altered at a  later point in time
  *                       through use of `ftruncate(return)'
  * @param: flags:        Set of `0 | O_CLOEXEC | O_CLOFORK | O_NONBLOCK' */
 __CDECLARE_XSC(,__fd_t,userviofd,(__size_t __initial_size, __syscall_ulong_t __flags),(__initial_size,__flags))
@@ -5052,27 +5052,27 @@ __CDECLARE_XSC(,__errno_t,utimes64,(char const *__filename, struct __timevalx32_
 #endif /* __CRT_HAVE_XSC(utimes64) */
 #if __CRT_HAVE_XSC(vfork)
 /* Same as `fork(2)', but the child process may be executed within in the same VM
- * as the parent process, with the parent process remaining suspended until the
+ * as the parent process, with the  parent process remaining suspended until  the
  * child process invokes one of the following system calls:
  *   - `exit(2)'       Terminate the child process
  *   - `exit_group(2)' Terminate the child process
  *   - `execve(2)'     Create a new VM that is populated with the specified process
- *                     image. The parent process will only be resumed in case the
- *                     new program image could be loaded successfully. Otherwise,
- *                     the call to `execve(2)' returns normally in the child.
+ *                     image. The parent process will  only be resumed in case  the
+ *                     new  program image could  be loaded successfully. Otherwise,
+ *                     the call  to  `execve(2)'  returns normally  in  the  child.
  *                     Other functions from the exec()-family behave the same
  * 
- * Care must be taken when using this system call, since you have to make sure that
- * the child process doesn't clobber any part of its (shared) stack that may be re-
- * used once execution resumes in the parent process. The same also goes for heap
- * functions, but generally speaking: you really shouldn't do anything that isn't
+ * Care  must be taken when using this system call, since you have to make sure that
+ * the  child process doesn't clobber any part of its (shared) stack that may be re-
+ * used once execution resumes in  the parent process. The  same also goes for  heap
+ * functions,  but generally speaking:  you really shouldn't  do anything that isn't
  * reentrant after calling any one of the fork() functions (since anything but would
- * rely on underlying implementations making proper use of pthread_atfork(3), which
- * is something that KOS intentionally doesn't do, since I feel like doing so only
+ * rely on underlying implementations making proper use of pthread_atfork(3),  which
+ * is something that KOS intentionally doesn't do,  since I feel like doing so  only
  * adds unnecessary bloat to code that doesn't rely on this)
  * 
  * Additionally, this system call may be implemented as an alias for `fork(2)', in
- * which case the parent process will not actually get suspended until the child
+ * which  case the parent process will not  actually get suspended until the child
  * process performs any of the actions above. */
 __CDECLARE_XSC(,__pid_t,vfork,(void),())
 #endif /* __CRT_HAVE_XSC(vfork) */
@@ -5105,13 +5105,13 @@ __CDECLARE_XSC(,__pid_t,wait4_64,(__pid_t __pid, __int32_t *__stat_loc, __syscal
 #if __CRT_HAVE_XSC(waitid)
 /* @param: idtype:  One of `P_ALL', `P_PID', `P_PGID'
  * @param: options: At least one of `WEXITED', `WSTOPPED', `WCONTINUED',
- *                  optionally or'd with `WNOHANG | WNOWAIT' */
+ *                  optionally     or'd     with     `WNOHANG | WNOWAIT' */
 __CDECLARE_XSC(,__errno_t,waitid,(__syscall_ulong_t __idtype, __id_t __id, struct __siginfox32_struct *__infop, __syscall_ulong_t __options, struct __rusagex32 *__ru),(__idtype,__id,__infop,__options,__ru))
 #endif /* __CRT_HAVE_XSC(waitid) */
 #if __CRT_HAVE_XSC(waitid64)
 /* @param: idtype:  One of `P_ALL', `P_PID', `P_PGID'
  * @param: options: At least one of `WEXITED', `WSTOPPED', `WCONTINUED',
- *                  optionally or'd with `WNOHANG | WNOWAIT' */
+ *                  optionally     or'd     with     `WNOHANG | WNOWAIT' */
 __CDECLARE_XSC(,__errno_t,waitid64,(__syscall_ulong_t __idtype, __id_t __id, struct __siginfox32_struct *__infop, __syscall_ulong_t __options, struct __rusagex32_64 *__ru),(__idtype,__id,__infop,__options,__ru))
 #endif /* __CRT_HAVE_XSC(waitid64) */
 #if __CRT_HAVE_XSC(waitpid)
@@ -5143,9 +5143,9 @@ __CDECLARE_XSC(,__ssize_t,writef,(__fd_t __fd, void const *__buf, __size_t __buf
 #endif /* __CRT_HAVE_XSC(writef) */
 #if __CRT_HAVE_XSC(writev)
 /* Same as `write(2)', but rather than specifying a single, continuous buffer,
- * write data from `count' separate buffers, though still return the actual
+ * write  data from `count'  separate buffers, though  still return the actual
  * number of written bytes.
- * When `fd' has the `O_NONBLOCK' flag set, only write as much data
+ * When  `fd' has the  `O_NONBLOCK' flag set, only  write as much data
  * as possible at the time the call was made, and throw `E_WOULDBLOCK'
  * if no data could be written at the time.
  * @return: <= SUM(iov[*].iov_len): The actual amount of written bytes
@@ -5154,9 +5154,9 @@ __CDECLARE_XSC(,__ssize_t,writev,(__fd_t __fd, struct __iovecx32 const *__iovec,
 #endif /* __CRT_HAVE_XSC(writev) */
 #if __CRT_HAVE_XSC(writevf)
 /* Same as `write(2)', but rather than specifying a single, continuous buffer,
- * write data from `count' separate buffers, though still return the actual
+ * write  data from `count'  separate buffers, though  still return the actual
  * number of written bytes.
- * When `fd' has the `O_NONBLOCK' flag set, only write as much data
+ * When  `fd' has the  `O_NONBLOCK' flag set, only  write as much data
  * as possible at the time the call was made, and throw `E_WOULDBLOCK'
  * if no data could be written at the time.
  * @return: <= SUM(iov[*].iov_len): The actual amount of written bytes

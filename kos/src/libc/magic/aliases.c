@@ -74,9 +74,9 @@ void setaliasent();
 void endaliasent();
 
 @@>> getaliasent(3)
-@@Read the entry entry from the mail alias alias database.
+@@Read  the  entry entry  from  the mail  alias  alias database.
 @@If the database hadn't already been opened, this function will
-@@open it the same way that a call to `setaliasent(3)' would.
+@@open  it the same  way that a  call to `setaliasent(3)' would.
 @@@return: * :   A pointer to an internal, statically allocated structure
 @@@return: NULL: [errno=<unchanged>] Database end has been reached
 @@@return: NULL: [errno=ENOENT]      Database end has been reached

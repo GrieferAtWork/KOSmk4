@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x4b24a301 */
+/* HASH CRC-32:0xbad5d558 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -22,45 +22,17 @@
 #define __local___xpg_basename_defined 1
 #include <__crt.h>
 __NAMESPACE_LOCAL_BEGIN
-/* Dependency: strend from string */
 #ifndef __local___localdep_strend_defined
 #define __local___localdep_strend_defined 1
 #ifdef __CRT_HAVE_strend
-/* Same as `str + strlen(str)' */
 __CREDIRECT(__ATTR_PURE __ATTR_RETNONNULL __ATTR_WUNUSED __ATTR_NONNULL((1)),char *,__NOTHROW_NCX,__localdep_strend,(char const *__restrict __str),strend,(__str))
 #else /* __CRT_HAVE_strend */
 __NAMESPACE_LOCAL_END
 #include <libc/local/string/strend.h>
 __NAMESPACE_LOCAL_BEGIN
-/* Same as `str + strlen(str)' */
 #define __localdep_strend __LIBC_LOCAL_NAME(strend)
 #endif /* !__CRT_HAVE_strend */
 #endif /* !__local___localdep_strend_defined */
-/* Return the filename-part, that is everything following
- * the last slash of `filename'. If no such part exists, "."
- * is returned instead. Trailing slashes are ignored
- * >> basename("/usr/include///"); // Returns "include"
- * >> basename("/usr/include/");   // Returns "include"
- * >> basename("/usr/include");    // Returns "include"
- * >> basename("/usr/");           // Returns "usr"
- * >> basename("/usr");            // Returns "usr"
- * >> basename("/");               // Returns "/"
- * >> basename("///");             // Returns "/"
- * >> basename("foo/bar/");        // Returns "bar"
- * >> basename("foo/bar");         // Returns "bar"
- * >> basename("foo/");            // Returns "foo"
- * >> basename("foo");             // Returns "foo"
- * >> basename(".");               // Returns "."
- * >> basename("..");              // Returns ".."
- * >> basename("");                // Returns "."
- * >> basename(NULL);              // Returns "."
- * Note that for this purpose, `filename' may be modified in-place, meaning
- * that you should really always pass an strdup()'d, or writable string.
- *
- * Also note that a different version of this function exists in <string.h>,
- * where if you include both <libgen.h> and <string.h>, you can use the
- * alternate function from <string.h> by `#undef basename', or calling the
- * function as `(basename)(...)' (as opposed to `basename(...)') */
 __LOCAL_LIBC(__xpg_basename) __ATTR_RETNONNULL char *
 __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(__xpg_basename))(char *__filename) {
 	char *__iter;

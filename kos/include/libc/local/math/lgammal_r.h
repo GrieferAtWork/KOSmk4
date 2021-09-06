@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xb1b1ec2d */
+/* HASH CRC-32:0xe8e6e679 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -23,31 +23,18 @@
 #include <__crt.h>
 #if defined(__CRT_HAVE_lgamma_r) || defined(__CRT_HAVE___lgamma_r)
 __NAMESPACE_LOCAL_BEGIN
-/* Dependency: lgamma_r from math */
 #ifndef __local___localdep_lgamma_r_defined
 #define __local___localdep_lgamma_r_defined 1
 #if __has_builtin(__builtin_lgamma_r) && defined(__LIBC_BIND_CRTBUILTINS) && defined(__CRT_HAVE_lgamma_r)
-/* Reentrant version of lgamma. This function uses the global variable
- * `signgam'. The reentrant version instead takes a pointer and stores
- * the value through it */
 __CEIREDIRECT(__ATTR_WUNUSED,double,__NOTHROW_NCX,__localdep_lgamma_r,(double __x, int *__signgamp),lgamma_r,{ return __builtin_lgamma_r(__x, __signgamp); })
 #elif defined(__CRT_HAVE_lgamma_r)
-/* Reentrant version of lgamma. This function uses the global variable
- * `signgam'. The reentrant version instead takes a pointer and stores
- * the value through it */
 __CREDIRECT(__ATTR_WUNUSED,double,__NOTHROW_NCX,__localdep_lgamma_r,(double __x, int *__signgamp),lgamma_r,(__x,__signgamp))
 #elif defined(__CRT_HAVE___lgamma_r)
-/* Reentrant version of lgamma. This function uses the global variable
- * `signgam'. The reentrant version instead takes a pointer and stores
- * the value through it */
 __CREDIRECT(__ATTR_WUNUSED,double,__NOTHROW_NCX,__localdep_lgamma_r,(double __x, int *__signgamp),__lgamma_r,(__x,__signgamp))
 #else /* ... */
 #undef __local___localdep_lgamma_r_defined
 #endif /* !... */
 #endif /* !__local___localdep_lgamma_r_defined */
-/* Reentrant version of lgamma. This function uses the global variable
- * `signgam'. The reentrant version instead takes a pointer and stores
- * the value through it */
 __LOCAL_LIBC(lgammal_r) __ATTR_WUNUSED __LONGDOUBLE
 __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(lgammal_r))(__LONGDOUBLE __x, int *__signgamp) {
 	return (__LONGDOUBLE)__localdep_lgamma_r((double)__x, __signgamp);

@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xbeb4ed69 */
+/* HASH CRC-32:0xf812339b */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -483,29 +483,29 @@ INTDEF ATTR_LEAF ATTR_RETNONNULL NONNULL((1, 2)) char *NOTHROW_NCX(LIBCCALL libc
 #if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
 /* >> strncpy(3)
  * Always write exactly `buflen' characters to `buf'. As far as
- * space for doing so is available, up to the `strlen(src)' of
- * the first characters are copied from `src'. All remaining
- * characters are always set to '\0'. Always re-returns `buf' */
+ * space  for doing so is available, up to the `strlen(src)' of
+ * the first characters  are copied from  `src'. All  remaining
+ * characters are always set  to '\0'. Always re-returns  `buf' */
 INTDEF ATTR_LEAF ATTR_RETNONNULL NONNULL((1, 2)) char *NOTHROW_NCX(LIBDCALL libd_strncpy)(char *__restrict buf, char const *__restrict src, size_t buflen);
 #endif /* !__LIBCCALL_IS_LIBDCALL && !__KERNEL__ */
 #ifndef __KERNEL__
 /* >> strncpy(3)
  * Always write exactly `buflen' characters to `buf'. As far as
- * space for doing so is available, up to the `strlen(src)' of
- * the first characters are copied from `src'. All remaining
- * characters are always set to '\0'. Always re-returns `buf' */
+ * space  for doing so is available, up to the `strlen(src)' of
+ * the first characters  are copied from  `src'. All  remaining
+ * characters are always set  to '\0'. Always re-returns  `buf' */
 INTDEF ATTR_LEAF ATTR_RETNONNULL NONNULL((1, 2)) char *NOTHROW_NCX(LIBCCALL libc_strncpy)(char *__restrict buf, char const *__restrict src, size_t buflen);
 #endif /* !__KERNEL__ */
 #if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
 /* >> strcat(3)
- * Same as `strcpy(3)', but rather than copying `src' ontop of `dst',
+ * Same as `strcpy(3)',  but rather  than copying `src'  ontop of  `dst',
  * append it at the end of `dst', or more precisely copy to `strend(dst)'
  * Always re-returns `dst' */
 INTDEF ATTR_LEAF ATTR_RETNONNULL NONNULL((1, 2)) char *NOTHROW_NCX(LIBDCALL libd_strcat)(char *__restrict dst, char const *__restrict src);
 #endif /* !__LIBCCALL_IS_LIBDCALL && !__KERNEL__ */
 #ifndef __KERNEL__
 /* >> strcat(3)
- * Same as `strcpy(3)', but rather than copying `src' ontop of `dst',
+ * Same as `strcpy(3)',  but rather  than copying `src'  ontop of  `dst',
  * append it at the end of `dst', or more precisely copy to `strend(dst)'
  * Always re-returns `dst' */
 INTDEF ATTR_LEAF ATTR_RETNONNULL NONNULL((1, 2)) char *NOTHROW_NCX(LIBCCALL libc_strcat)(char *__restrict dst, char const *__restrict src);
@@ -513,40 +513,40 @@ INTDEF ATTR_LEAF ATTR_RETNONNULL NONNULL((1, 2)) char *NOTHROW_NCX(LIBCCALL libc
 #if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
 /* >> strncat(3)
  * Copy at most max_srclen (or rather: exactly `strnlen(src, max_srclen)')
- * characters to `strend(buf)', and always re-return `buf'. */
+ * characters   to    `strend(buf)',   and    always   re-return    `buf'. */
 INTDEF ATTR_LEAF ATTR_RETNONNULL NONNULL((1, 2)) char *NOTHROW_NCX(LIBDCALL libd_strncat)(char *__restrict buf, char const *__restrict src, size_t max_srclen);
 #endif /* !__LIBCCALL_IS_LIBDCALL && !__KERNEL__ */
 #ifndef __KERNEL__
 /* >> strncat(3)
  * Copy at most max_srclen (or rather: exactly `strnlen(src, max_srclen)')
- * characters to `strend(buf)', and always re-return `buf'. */
+ * characters   to    `strend(buf)',   and    always   re-return    `buf'. */
 INTDEF ATTR_LEAF ATTR_RETNONNULL NONNULL((1, 2)) char *NOTHROW_NCX(LIBCCALL libc_strncat)(char *__restrict buf, char const *__restrict src, size_t max_srclen);
 #endif /* !__KERNEL__ */
 #if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
 /* >> strcspn(3)
- * Return the offset from `haystack' to the first
- * character for which `strchr(reject, ch) != NULL'.
+ * Return   the  offset  from  `haystack'  to  the  first
+ * character   for   which  `strchr(reject, ch) != NULL'.
  * If no such character exists, return `strlen(haystack)' */
 INTDEF ATTR_PURE WUNUSED NONNULL((1, 2)) size_t NOTHROW_NCX(LIBDCALL libd_strcspn)(char const *haystack, char const *reject);
 #endif /* !__LIBCCALL_IS_LIBDCALL && !__KERNEL__ */
 #ifndef __KERNEL__
 /* >> strcspn(3)
- * Return the offset from `haystack' to the first
- * character for which `strchr(reject, ch) != NULL'.
+ * Return   the  offset  from  `haystack'  to  the  first
+ * character   for   which  `strchr(reject, ch) != NULL'.
  * If no such character exists, return `strlen(haystack)' */
 INTDEF ATTR_PURE WUNUSED NONNULL((1, 2)) size_t NOTHROW_NCX(LIBCCALL libc_strcspn)(char const *haystack, char const *reject);
 #endif /* !__KERNEL__ */
 #if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
 /* >> strspn(3)
- * Return the offset from `haystack' to the first
- * character for which `strchr(reject, ch) == NULL'.
+ * Return   the  offset  from  `haystack'  to  the  first
+ * character   for   which  `strchr(reject, ch) == NULL'.
  * If no such character exists, return `strlen(haystack)' */
 INTDEF ATTR_PURE WUNUSED NONNULL((1, 2)) size_t NOTHROW_NCX(LIBDCALL libd_strspn)(char const *haystack, char const *accept);
 #endif /* !__LIBCCALL_IS_LIBDCALL && !__KERNEL__ */
 #ifndef __KERNEL__
 /* >> strspn(3)
- * Return the offset from `haystack' to the first
- * character for which `strchr(reject, ch) == NULL'.
+ * Return   the  offset  from  `haystack'  to  the  first
+ * character   for   which  `strchr(reject, ch) == NULL'.
  * If no such character exists, return `strlen(haystack)' */
 INTDEF ATTR_PURE WUNUSED NONNULL((1, 2)) size_t NOTHROW_NCX(LIBCCALL libc_strspn)(char const *haystack, char const *accept);
 #endif /* !__KERNEL__ */
@@ -711,9 +711,9 @@ INTDEF ATTR_PURE ATTR_RETNONNULL WUNUSED NONNULL((1)) void *NOTHROW_NCX(LIBCCALL
  * Alternate `basename(3)' function that doesn't modify its `filename' argument
  * For a version that is allowed to modify its argument, but is also allowed to
  * strip trailing slashes, include <libgen.h> instead, which will override this
- * GNU-specific basename() function (you can explicitly make use of this GNU
- * version by doing `#undef basename', or writing `(basename)(filename)', as
- * opposed to `basename(filename)', when both version have been defined)
+ * GNU-specific  basename() function (you  can explicitly make  use of this GNU
+ * version by doing  `#undef basename', or  writing `(basename)(filename)',  as
+ * opposed to  `basename(filename)',  when  both  version  have  been  defined)
  * >> basename("/usr/include///"); // Returns ""
  * >> basename("/usr/include/");   // Returns ""
  * >> basename("/usr/include");    // Returns "include"
@@ -736,9 +736,9 @@ INTDEF ATTR_PURE WUNUSED NONNULL((1)) char *NOTHROW_NCX(LIBDCALL libd_basename)(
  * Alternate `basename(3)' function that doesn't modify its `filename' argument
  * For a version that is allowed to modify its argument, but is also allowed to
  * strip trailing slashes, include <libgen.h> instead, which will override this
- * GNU-specific basename() function (you can explicitly make use of this GNU
- * version by doing `#undef basename', or writing `(basename)(filename)', as
- * opposed to `basename(filename)', when both version have been defined)
+ * GNU-specific  basename() function (you  can explicitly make  use of this GNU
+ * version by doing  `#undef basename', or  writing `(basename)(filename)',  as
+ * opposed to  `basename(filename)',  when  both  version  have  been  defined)
  * >> basename("/usr/include///"); // Returns ""
  * >> basename("/usr/include/");   // Returns ""
  * >> basename("/usr/include");    // Returns "include"
@@ -1102,19 +1102,19 @@ INTDEF ATTR_PURE ATTR_RETNONNULL WUNUSED NONNULL((1)) uint32_t *NOTHROW_NCX(LIBD
 INTDEF ATTR_PURE ATTR_RETNONNULL WUNUSED NONNULL((1)) uint32_t *NOTHROW_NCX(LIBCCALL libc_memrendl)(void const *__restrict haystack, uint32_t needle, size_t n_dwords);
 #if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
 /* Same as `memendw', but return the offset from `haystack', rather than the actual address.
- * Returns `haystack + N_DWORDS * 2' if the given `needle' wasn't found */
+ * Returns    `haystack + N_DWORDS * 2'    if    the    given    `needle'    wasn't    found */
 INTDEF ATTR_PURE WUNUSED NONNULL((1)) size_t NOTHROW_NCX(LIBDCALL libd_memlenw)(void const *__restrict haystack, uint16_t needle, size_t n_words);
 #endif /* !__LIBCCALL_IS_LIBDCALL && !__KERNEL__ */
 /* Same as `memendw', but return the offset from `haystack', rather than the actual address.
- * Returns `haystack + N_DWORDS * 2' if the given `needle' wasn't found */
+ * Returns    `haystack + N_DWORDS * 2'    if    the    given    `needle'    wasn't    found */
 INTDEF ATTR_PURE WUNUSED NONNULL((1)) size_t NOTHROW_NCX(LIBCCALL libc_memlenw)(void const *__restrict haystack, uint16_t needle, size_t n_words);
 #if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
 /* Same as `memendl', but return the offset from `haystack', rather than the actual address.
- * Returns `haystack + N_DWORDS * 4' if the given `needle' wasn't found */
+ * Returns    `haystack + N_DWORDS * 4'    if    the    given    `needle'    wasn't    found */
 INTDEF ATTR_PURE WUNUSED NONNULL((1)) size_t NOTHROW_NCX(LIBDCALL libd_memlenl)(void const *__restrict haystack, uint32_t needle, size_t n_dwords);
 #endif /* !__LIBCCALL_IS_LIBDCALL && !__KERNEL__ */
 /* Same as `memendl', but return the offset from `haystack', rather than the actual address.
- * Returns `haystack + N_DWORDS * 4' if the given `needle' wasn't found */
+ * Returns    `haystack + N_DWORDS * 4'    if    the    given    `needle'    wasn't    found */
 INTDEF ATTR_PURE WUNUSED NONNULL((1)) size_t NOTHROW_NCX(LIBCCALL libc_memlenl)(void const *__restrict haystack, uint32_t needle, size_t n_dwords);
 #if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
 /* Same as `memrendw', but return the offset from `haystack', rather than the actual address.
@@ -1669,12 +1669,12 @@ INTDEF ATTR_LEAF ATTR_RETNONNULL NONNULL((1, 2)) void *NOTHROW_NCX(LIBDCALL libd
 INTDEF ATTR_LEAF ATTR_RETNONNULL NONNULL((1, 2)) void *NOTHROW_NCX(LIBCCALL libc_memmoveupc)(void *dst, void const *src, size_t elem_count, size_t elem_size);
 #endif /* !__KERNEL__ */
 #if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
-/* Same as `memmoveupc', but return `dst + (ELEM_COUNT * ELEM_SIZE)',
+/* Same   as   `memmoveupc',  but   return  `dst + (ELEM_COUNT * ELEM_SIZE)',
  * rather than `dst' (assumes that `dst >= src || !ELEM_COUNT || !ELEM_SIZE') */
 INTDEF ATTR_LEAF ATTR_RETNONNULL NONNULL((1, 2)) void *NOTHROW_NCX(LIBDCALL libd_mempmoveupc)(void *dst, void const *src, size_t elem_count, size_t elem_size);
 #endif /* !__LIBCCALL_IS_LIBDCALL && !__KERNEL__ */
 #ifndef __KERNEL__
-/* Same as `memmoveupc', but return `dst + (ELEM_COUNT * ELEM_SIZE)',
+/* Same   as   `memmoveupc',  but   return  `dst + (ELEM_COUNT * ELEM_SIZE)',
  * rather than `dst' (assumes that `dst >= src || !ELEM_COUNT || !ELEM_SIZE') */
 INTDEF ATTR_LEAF ATTR_RETNONNULL NONNULL((1, 2)) void *NOTHROW_NCX(LIBCCALL libc_mempmoveupc)(void *dst, void const *src, size_t elem_count, size_t elem_size);
 #endif /* !__KERNEL__ */
@@ -1922,7 +1922,7 @@ INTDEF ATTR_PURE WUNUSED NONNULL((1, 2)) int NOTHROW_NCX(LIBCCALL libc_memcasecm
 #endif /* !__KERNEL__ */
 #if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
 /* Return the address of a sub-string `needle...+=needlelen' stored within `haystack...+=haystacklen'
- * During comparisons, casing of character is ignored using the given `locale' (s.a. `memmem()')
+ * During comparisons, casing  of character  is ignored using  the given  `locale' (s.a.  `memmem()')
  * If no such sub-string exists, return `NULL' instead.
  * #ifdef _MEMMEM_EMPTY_NEEDLE_NULL_SOURCE
  * When `needlelen' is ZERO(0), also return `NULL' unconditionally.
@@ -1933,7 +1933,7 @@ INTDEF ATTR_PURE WUNUSED NONNULL((1, 3)) void *NOTHROW_NCX(LIBDCALL libd_memcase
 #endif /* !__LIBCCALL_IS_LIBDCALL && !__KERNEL__ */
 #ifndef __KERNEL__
 /* Return the address of a sub-string `needle...+=needlelen' stored within `haystack...+=haystacklen'
- * During comparisons, casing of character is ignored using the given `locale' (s.a. `memmem()')
+ * During comparisons, casing  of character  is ignored using  the given  `locale' (s.a.  `memmem()')
  * If no such sub-string exists, return `NULL' instead.
  * #ifdef _MEMMEM_EMPTY_NEEDLE_NULL_SOURCE
  * When `needlelen' is ZERO(0), also return `NULL' unconditionally.
@@ -2159,7 +2159,7 @@ INTDEF ATTR_LEAF ATTR_RETNONNULL NONNULL((1)) uint64_t *NOTHROW_NCX(LIBCCALL lib
 #if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
 /* >> strcmpz(3)
  * Similar to `strcmp(3)', but the given `rhs' string mustn't necessarily be NUL-terminated.
- * Instead, that string's length is fixed at `rhs_len', and the compare is equivalent to:
+ * Instead, that string's length is  fixed at `rhs_len', and  the compare is equivalent  to:
  * > char *dup = (char *)malloc((rhs_len + 1) * sizeof(char));
  * > *(char *)mempcpy(dup, rhs, rhs_len, sizeof(char)) = '\0';
  * > return strcmp(lhs, dup); */
@@ -2167,7 +2167,7 @@ INTDEF ATTR_PURE WUNUSED NONNULL((1, 2)) int NOTHROW_NCX(LIBDCALL libd_strcmpz)(
 #endif /* !__LIBCCALL_IS_LIBDCALL && !__KERNEL__ */
 /* >> strcmpz(3)
  * Similar to `strcmp(3)', but the given `rhs' string mustn't necessarily be NUL-terminated.
- * Instead, that string's length is fixed at `rhs_len', and the compare is equivalent to:
+ * Instead, that string's length is  fixed at `rhs_len', and  the compare is equivalent  to:
  * > char *dup = (char *)malloc((rhs_len + 1) * sizeof(char));
  * > *(char *)mempcpy(dup, rhs, rhs_len, sizeof(char)) = '\0';
  * > return strcmp(lhs, dup); */
@@ -2175,22 +2175,22 @@ INTDEF ATTR_PURE WUNUSED NONNULL((1, 2)) int NOTHROW_NCX(LIBCCALL libc_strcmpz)(
 #if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
 /* >> strstartcmp(3)
  * Compare the first `strnlen(str, strlen(startswith_str))' characters of
- * `str' with `startswith_str', returning the usual >0, <0, ==0. */
+ * `str'  with  `startswith_str',  returning  the  usual  >0,  <0,   ==0. */
 INTDEF ATTR_PURE WUNUSED NONNULL((1, 2)) int NOTHROW_NCX(LIBDCALL libd_strstartcmp)(char const *str, char const *startswith);
 #endif /* !__LIBCCALL_IS_LIBDCALL && !__KERNEL__ */
 /* >> strstartcmp(3)
  * Compare the first `strnlen(str, strlen(startswith_str))' characters of
- * `str' with `startswith_str', returning the usual >0, <0, ==0. */
+ * `str'  with  `startswith_str',  returning  the  usual  >0,  <0,   ==0. */
 INTDEF ATTR_PURE WUNUSED NONNULL((1, 2)) int NOTHROW_NCX(LIBCCALL libc_strstartcmp)(char const *str, char const *startswith);
 #if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
 /* >> strstartcmpz(3)
  * Compare the first `strnlen(str, startswith_len)' characters of
- * `str' with `startswith', returning the usual >0, <0, ==0. */
+ * `str' with  `startswith', returning  the  usual >0,  <0,  ==0. */
 INTDEF ATTR_PURE WUNUSED NONNULL((1, 2)) int NOTHROW_NCX(LIBDCALL libd_strstartcmpz)(char const *str, char const *startswith, size_t startswith_len);
 #endif /* !__LIBCCALL_IS_LIBDCALL && !__KERNEL__ */
 /* >> strstartcmpz(3)
  * Compare the first `strnlen(str, startswith_len)' characters of
- * `str' with `startswith', returning the usual >0, <0, ==0. */
+ * `str' with  `startswith', returning  the  usual >0,  <0,  ==0. */
 INTDEF ATTR_PURE WUNUSED NONNULL((1, 2)) int NOTHROW_NCX(LIBCCALL libc_strstartcmpz)(char const *str, char const *startswith, size_t startswith_len);
 #if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
 INTDEF ATTR_RETNONNULL NONNULL((1)) char *NOTHROW_NCX(LIBDCALL libd_strlwr)(char *__restrict str);
@@ -2309,19 +2309,19 @@ INTDEF errno_t NOTHROW_NCX(LIBCCALL libc__strnset_s)(char *__restrict buf, size_
 #if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
 /* >> strnstr(3)
  * Search for `needle...+=strlen(needle)' within `haystack...+=strnlen(haystack, haystack_maxlen)'
- * If found, return a pointer to its location within `str', else return `NULL'
+ * If   found,   return  a   pointer   to  its   location   within  `str',   else   return  `NULL'
  * This function originates from BSD, but is also provided as a KOS extension */
 INTDEF ATTR_PURE WUNUSED NONNULL((1, 2)) char *NOTHROW_NCX(LIBDCALL libd_strnstr)(char const *haystack, char const *needle, size_t haystack_maxlen);
 #endif /* !__LIBCCALL_IS_LIBDCALL && !__KERNEL__ */
 #ifndef __KERNEL__
 /* >> strnstr(3)
  * Search for `needle...+=strlen(needle)' within `haystack...+=strnlen(haystack, haystack_maxlen)'
- * If found, return a pointer to its location within `str', else return `NULL'
+ * If   found,   return  a   pointer   to  its   location   within  `str',   else   return  `NULL'
  * This function originates from BSD, but is also provided as a KOS extension */
 INTDEF ATTR_PURE WUNUSED NONNULL((1, 2)) char *NOTHROW_NCX(LIBCCALL libc_strnstr)(char const *haystack, char const *needle, size_t haystack_maxlen);
 #endif /* !__KERNEL__ */
 #if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
-/* Generate a file mode representation similar to what's printed by `ls -l'
+/* Generate  a file mode representation similar to what's printed by `ls -l'
  * The representation is written to `p', and `mode' is the value as returned
  * by `stat(2)' in `struct stat::st_mode'
  * The format written is:
@@ -2332,12 +2332,12 @@ INTDEF ATTR_PURE WUNUSED NONNULL((1, 2)) char *NOTHROW_NCX(LIBCCALL libc_strnstr
  *    p[2]  = mode & S_IWUSR ? 'w' : '-';
  *    p[3]  = <mode & S_IXUSR | S_ISUID>: { 0: '-', S_IXUSR: 'x', S_ISUID: 'S',
  *                                          S_IXUSR | S_ISUID: 's' };
- *    p[4]  = mode & S_IRGRP ? 'r' : '-';
- *    p[5]  = mode & S_IWGRP ? 'w' : '-';
+ *    p[4] = mode & S_IRGRP ? 'r' : '-';
+ *    p[5] = mode & S_IWGRP ? 'w' : '-';
  *    p[6]  = <mode & S_IXGRP | S_ISGID>: { 0: '-', S_IXGRP: 'x', S_ISGID: 'S',
  *                                          S_IXGRP | S_ISGID: 's' };
- *    p[7]  = mode & S_IROTH ? 'r' : '-';
- *    p[8]  = mode & S_IWOTH ? 'w' : '-';
+ *    p[7] = mode & S_IROTH ? 'r' : '-';
+ *    p[8] = mode & S_IWOTH ? 'w' : '-';
  *    p[9]  = <mode & S_IXOTH | S_ISVTX>: { 0: '-', S_IXOTH: 'x', S_ISVTX: 'T',
  *                                          S_IXOTH | S_ISVTX: 't' };
  *    p[10] = ' '; // '+', if "alternate or additional access control
@@ -2346,7 +2346,7 @@ INTDEF ATTR_PURE WUNUSED NONNULL((1, 2)) char *NOTHROW_NCX(LIBCCALL libc_strnstr
 INTDEF NONNULL((2)) void NOTHROW_NCX(LIBDCALL libd_strmode)(mode_t mode, char p[12]);
 #endif /* !__LIBCCALL_IS_LIBDCALL && !__KERNEL__ */
 #ifndef __KERNEL__
-/* Generate a file mode representation similar to what's printed by `ls -l'
+/* Generate  a file mode representation similar to what's printed by `ls -l'
  * The representation is written to `p', and `mode' is the value as returned
  * by `stat(2)' in `struct stat::st_mode'
  * The format written is:
@@ -2357,12 +2357,12 @@ INTDEF NONNULL((2)) void NOTHROW_NCX(LIBDCALL libd_strmode)(mode_t mode, char p[
  *    p[2]  = mode & S_IWUSR ? 'w' : '-';
  *    p[3]  = <mode & S_IXUSR | S_ISUID>: { 0: '-', S_IXUSR: 'x', S_ISUID: 'S',
  *                                          S_IXUSR | S_ISUID: 's' };
- *    p[4]  = mode & S_IRGRP ? 'r' : '-';
- *    p[5]  = mode & S_IWGRP ? 'w' : '-';
+ *    p[4] = mode & S_IRGRP ? 'r' : '-';
+ *    p[5] = mode & S_IWGRP ? 'w' : '-';
  *    p[6]  = <mode & S_IXGRP | S_ISGID>: { 0: '-', S_IXGRP: 'x', S_ISGID: 'S',
  *                                          S_IXGRP | S_ISGID: 's' };
- *    p[7]  = mode & S_IROTH ? 'r' : '-';
- *    p[8]  = mode & S_IWOTH ? 'w' : '-';
+ *    p[7] = mode & S_IROTH ? 'r' : '-';
+ *    p[8] = mode & S_IWOTH ? 'w' : '-';
  *    p[9]  = <mode & S_IXOTH | S_ISVTX>: { 0: '-', S_IXOTH: 'x', S_ISVTX: 'T',
  *                                          S_IXOTH | S_ISVTX: 't' };
  *    p[10] = ' '; // '+', if "alternate or additional access control
@@ -2389,34 +2389,34 @@ INTDEF WUNUSED NONNULL((1, 2)) int NOTHROW_NCX(LIBCCALL libc_timingsafe_memcmp)(
 #if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
 /* >> strtosigno(3)
  * Return the signal number for a given name.
- * e.g. `strtosigno("SIGINT") == SIGINT'
+ * e.g.      `strtosigno("SIGINT") == SIGINT'
  * When `name' isn't recognized, return `0' instead. */
 INTDEF ATTR_PURE WUNUSED NONNULL((1)) signo_t NOTHROW_NCX(LIBDCALL libd_strtosigno)(const char *name);
 #endif /* !__LIBCCALL_IS_LIBDCALL && !__KERNEL__ */
 #ifndef __KERNEL__
 /* >> strtosigno(3)
  * Return the signal number for a given name.
- * e.g. `strtosigno("SIGINT") == SIGINT'
+ * e.g.      `strtosigno("SIGINT") == SIGINT'
  * When `name' isn't recognized, return `0' instead. */
 INTDEF ATTR_PURE WUNUSED NONNULL((1)) signo_t NOTHROW_NCX(LIBCCALL libc_strtosigno)(const char *name);
 #endif /* !__KERNEL__ */
 #if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
 /* >> stresep(3)
  * Same as `strsep(3)', but allow the specification of an additional `escape'
- * character that will cause the following character from `*stringp' to be
- * escaped, and not be considered as a separator, even if it is included
+ * character  that will cause  the following character  from `*stringp' to be
+ * escaped, and not  be considered  as a separator,  even if  it is  included
  * within `delim'. Note that `escape'-characters (if present) are not removed
- * from the input string, meaning that they will still appear in returned
+ * from  the input  string, meaning that  they will still  appear in returned
  * strings, should they have been present in the original input string. */
 INTDEF ATTR_LEAF NONNULL((1, 2)) char *NOTHROW_NCX(LIBDCALL libd_stresep)(char **__restrict stringp, char const *__restrict delim, int escape);
 #endif /* !__LIBCCALL_IS_LIBDCALL && !__KERNEL__ */
 #ifndef __KERNEL__
 /* >> stresep(3)
  * Same as `strsep(3)', but allow the specification of an additional `escape'
- * character that will cause the following character from `*stringp' to be
- * escaped, and not be considered as a separator, even if it is included
+ * character  that will cause  the following character  from `*stringp' to be
+ * escaped, and not  be considered  as a separator,  even if  it is  included
  * within `delim'. Note that `escape'-characters (if present) are not removed
- * from the input string, meaning that they will still appear in returned
+ * from  the input  string, meaning that  they will still  appear in returned
  * strings, should they have been present in the original input string. */
 INTDEF ATTR_LEAF NONNULL((1, 2)) char *NOTHROW_NCX(LIBCCALL libc_stresep)(char **__restrict stringp, char const *__restrict delim, int escape);
 #endif /* !__KERNEL__ */

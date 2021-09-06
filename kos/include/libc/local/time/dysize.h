@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x7ffb182 */
+/* HASH CRC-32:0x88e9d03 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -26,7 +26,6 @@
 #define __isleap(__year) ((__year)%4 == 0 && ((__year)%100 != 0 || (__year)%400 == 0))
 #endif /* !__isleap */
 __NAMESPACE_LOCAL_BEGIN
-/* Return the number of days in YEAR */
 __LOCAL_LIBC(dysize) __ATTR_CONST __ATTR_WUNUSED int
 __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(dysize))(__STDC_INT_AS_UINT_T __year) {
 	return __isleap(__year) ? 366 : 365;

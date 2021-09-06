@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x70b54f7 */
+/* HASH CRC-32:0x80e5fa8e */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -24,20 +24,17 @@
 #include <asm/os/stdio.h>
 #if defined(__CRT_HAVE_getpass_r) || defined(__CRT_HAVE_getpassfd) || defined(__CRT_HAVE_read) || defined(__CRT_HAVE__read) || defined(__CRT_HAVE___read) || defined(__CRT_HAVE_readpassphrase)
 __NAMESPACE_LOCAL_BEGIN
-/* Dependency: getpass_r from unistd */
 #ifndef __local___localdep_getpass_r_defined
 #define __local___localdep_getpass_r_defined 1
 #ifdef __CRT_HAVE_getpass_r
 __NAMESPACE_LOCAL_END
 #include <hybrid/typecore.h>
 __NAMESPACE_LOCAL_BEGIN
-/* >> getpass_r(3) */
 __CREDIRECT(__ATTR_WUNUSED,char *,__NOTHROW_RPC,__localdep_getpass_r,(char const *__prompt, char *__buf, __SIZE_TYPE__ __bufsize),getpass_r,(__prompt,__buf,__bufsize))
 #elif defined(__CRT_HAVE_getpassfd) || defined(__CRT_HAVE_read) || defined(__CRT_HAVE__read) || defined(__CRT_HAVE___read) || defined(__CRT_HAVE_readpassphrase)
 __NAMESPACE_LOCAL_END
 #include <libc/local/unistd/getpass_r.h>
 __NAMESPACE_LOCAL_BEGIN
-/* >> getpass_r(3) */
 #define __localdep_getpass_r __LIBC_LOCAL_NAME(getpass_r)
 #else /* ... */
 #undef __local___localdep_getpass_r_defined
@@ -46,7 +43,6 @@ __NAMESPACE_LOCAL_BEGIN
 __NAMESPACE_LOCAL_END
 #include <asm/crt/readpassphrase.h>
 __NAMESPACE_LOCAL_BEGIN
-/* >> getpass(3), getpassphrase(3) */
 __LOCAL_LIBC(getpass) __ATTR_WUNUSED char *
 __NOTHROW_RPC(__LIBCCALL __LIBC_LOCAL_NAME(getpass))(char const *__restrict __prompt) {
 	static char __buf[257]; /* `getpassphrase()' requires passwords at least this long! */

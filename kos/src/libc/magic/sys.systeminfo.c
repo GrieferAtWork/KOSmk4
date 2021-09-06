@@ -51,7 +51,7 @@
 
 //???#ifndef HW_INVALID_HOSTID
 //???#define HW_INVALID_HOSTID 0xffffffff
-//???#endif /* !HW_INVALID_HOSTID */
+//???#endif   /*   !HW_INVALID_HOSTID  */
 //???#ifndef HW_HOSTID_LEN
 //???#define HW_HOSTID_LEN 11 /* == strlen(sprintf("%d", HW_INVALID_HOSTID)) + 1 */
 //???#endif /* !HW_HOSTID_LEN */

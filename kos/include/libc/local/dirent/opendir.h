@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xbba0df81 */
+/* HASH CRC-32:0x4a308118 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -25,26 +25,19 @@
 #if defined(__AT_FDCWD) && (defined(__CRT_HAVE_opendirat) || defined(__CRT_HAVE_fopendirat) || (defined(__CRT_HAVE_fdopendir) && (defined(__CRT_HAVE_openat64) || defined(__CRT_HAVE_openat))))
 struct __dirstream;
 __NAMESPACE_LOCAL_BEGIN
-/* Dependency: opendirat from dirent */
 #ifndef __local___localdep_opendirat_defined
 #define __local___localdep_opendirat_defined 1
 #ifdef __CRT_HAVE_opendirat
-/* >> opendirat(3)
- * Directory-handle-relative, and flags-enabled versions of `opendir(3)' */
 __CREDIRECT(__ATTR_WUNUSED __ATTR_NONNULL((2)),struct __dirstream *,__NOTHROW_RPC,__localdep_opendirat,(__fd_t __dirfd, char const *__name),opendirat,(__dirfd,__name))
 #elif defined(__CRT_HAVE_fopendirat) || (defined(__CRT_HAVE_fdopendir) && (defined(__CRT_HAVE_openat64) || defined(__CRT_HAVE_openat)))
 __NAMESPACE_LOCAL_END
 #include <libc/local/dirent/opendirat.h>
 __NAMESPACE_LOCAL_BEGIN
-/* >> opendirat(3)
- * Directory-handle-relative, and flags-enabled versions of `opendir(3)' */
 #define __localdep_opendirat __LIBC_LOCAL_NAME(opendirat)
 #else /* ... */
 #undef __local___localdep_opendirat_defined
 #endif /* !... */
 #endif /* !__local___localdep_opendirat_defined */
-/* >> opendir(3)
- * Open and return a new directory stream for reading, referring to `name' */
 __LOCAL_LIBC(opendir) __ATTR_WUNUSED __ATTR_NONNULL((1)) struct __dirstream *
 __NOTHROW_RPC(__LIBCCALL __LIBC_LOCAL_NAME(opendir))(char const *__name) {
 	/* TODO: Emulate using DOS's _find* functions */

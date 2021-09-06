@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xce696159 */
+/* HASH CRC-32:0xd9ed26fe */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -23,10 +23,6 @@
 #include <__crt.h>
 #include <asm/os/signal.h>
 __NAMESPACE_LOCAL_BEGIN
-/* >> signalnext(3)
- * Return the next-greater signal number that comes after `signo'
- * When no such signal number exists, return `0'. When the given
- * `signo' is `0', return the lowest valid signal number. */
 __LOCAL_LIBC(signalnext) __ATTR_CONST __ATTR_WUNUSED __signo_t
 __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(signalnext))(__signo_t __signo) {
 	if (__signo >= (__NSIG - 1))

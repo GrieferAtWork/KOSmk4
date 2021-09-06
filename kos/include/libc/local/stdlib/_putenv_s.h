@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x4068184f */
+/* HASH CRC-32:0xf4b392aa */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -25,7 +25,6 @@
 #if defined(__CRT_HAVE_setenv) || ((defined(__CRT_HAVE_getenv) || defined(__LOCAL_environ)) && defined(__CRT_HAVE__putenv_s))
 #include <bits/types.h>
 __NAMESPACE_LOCAL_BEGIN
-/* Dependency: setenv from stdlib */
 #ifndef __local___localdep_setenv_defined
 #define __local___localdep_setenv_defined 1
 #ifdef __CRT_HAVE_setenv

@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x9415bfd5 */
+/* HASH CRC-32:0x3e332752 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -26,7 +26,6 @@
 #include <bits/os/timeval.h>
 #include <bits/os/fd_set.h>
 __NAMESPACE_LOCAL_BEGIN
-/* Dependency: select32 from sys.select */
 #ifndef __local___localdep_select32_defined
 #define __local___localdep_select32_defined 1
 #ifdef __CRT_HAVE_select

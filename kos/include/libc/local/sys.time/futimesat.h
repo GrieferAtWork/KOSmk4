@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x7381e4e4 */
+/* HASH CRC-32:0xa8e903fb */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -25,12 +25,10 @@
 #include <bits/os/timeval.h>
 #include <bits/types.h>
 __NAMESPACE_LOCAL_BEGIN
-/* Dependency: futimesat32 from sys.time */
 #if !defined(__local___localdep_futimesat32_defined) && defined(__CRT_HAVE_futimesat)
 #define __local___localdep_futimesat32_defined 1
 __CREDIRECT(__ATTR_NONNULL((2, 3)),int,__NOTHROW_NCX,__localdep_futimesat32,(__fd_t __fd, char const *__file, struct __timeval32 const __tvp[2]),futimesat,(__fd,__file,__tvp))
 #endif /* !__local___localdep_futimesat32_defined && __CRT_HAVE_futimesat */
-/* Dependency: futimesat64 from sys.time */
 #ifndef __local___localdep_futimesat64_defined
 #define __local___localdep_futimesat64_defined 1
 #ifdef __CRT_HAVE_futimesat64

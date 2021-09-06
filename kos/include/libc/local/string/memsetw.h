@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x74027cae */
+/* HASH CRC-32:0xf1c74f68 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -23,7 +23,6 @@
 #include <__crt.h>
 #include <hybrid/typecore.h>
 __NAMESPACE_LOCAL_BEGIN
-/* Fill memory with a given word */
 __LOCAL_LIBC(memsetw) __ATTR_LEAF __ATTR_RETNONNULL __ATTR_NONNULL((1)) __UINT16_TYPE__ *
 __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(memsetw))(void *__restrict __dst, __UINT16_TYPE__ __word, __SIZE_TYPE__ __n_words) {
 	__UINT16_TYPE__ *__pdst = (__UINT16_TYPE__ *)__dst;

@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x504ad9bb */
+/* HASH CRC-32:0x7ddf7c81 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -38,9 +38,9 @@ INTDEF void NOTHROW_RPC_KOS(LIBCCALL libc_setaliasent)(void);
  * Close the internal mail alias database file (s.a. `setaliasent(3)') */
 INTDEF void NOTHROW_NCX(LIBCCALL libc_endaliasent)(void);
 /* >> getaliasent(3)
- * Read the entry entry from the mail alias alias database.
+ * Read  the  entry entry  from  the mail  alias  alias database.
  * If the database hadn't already been opened, this function will
- * open it the same way that a call to `setaliasent(3)' would.
+ * open  it the same  way that a  call to `setaliasent(3)' would.
  * @return: * :   A pointer to an internal, statically allocated structure
  * @return: NULL: [errno=<unchanged>] Database end has been reached
  * @return: NULL: [errno=ENOENT]      Database end has been reached

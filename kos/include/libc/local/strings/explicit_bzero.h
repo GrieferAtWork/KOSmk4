@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x1c636e20 */
+/* HASH CRC-32:0x18d137f7 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -22,7 +22,6 @@
 #define __local_explicit_bzero_defined 1
 #include <__crt.h>
 __NAMESPACE_LOCAL_BEGIN
-/* Dependency: bzero from string */
 #ifndef __local___localdep_bzero_defined
 #define __local___localdep_bzero_defined 1
 #ifdef __CRT_HAVE_bzero
@@ -47,11 +46,6 @@ __NAMESPACE_LOCAL_BEGIN
 #define __localdep_bzero __LIBC_LOCAL_NAME(bzero)
 #endif /* !... */
 #endif /* !__local___localdep_bzero_defined */
-/* >> explicit_bzero(3)
- * Same as `bzero(dst, n_bytes)', however compilers will not optimize
- * away uses of this function when they (think) that clearing the memory
- * wouldn't have any visible side-effects (though those side-effects
- * may be a security-concious application trying to wipe sensitive data) */
 __LOCAL_LIBC(explicit_bzero) void
 __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(explicit_bzero))(void *__dst, __SIZE_TYPE__ __n_bytes) {
 	void *volatile __vdst = __dst;

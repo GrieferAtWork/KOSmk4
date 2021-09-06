@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x7bc6b623 */
+/* HASH CRC-32:0xcac37461 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -26,12 +26,10 @@
 #include <bits/os/timespec.h>
 #include <bits/os/sigset.h>
 __NAMESPACE_LOCAL_BEGIN
-/* Dependency: ppoll32 from sys.poll */
 #if !defined(__local___localdep_ppoll32_defined) && defined(__CRT_HAVE_ppoll)
 #define __local___localdep_ppoll32_defined 1
 __CREDIRECT(__ATTR_NONNULL((1)),int,__NOTHROW_RPC,__localdep_ppoll32,(struct pollfd *__fds, __UINTPTR_TYPE__ __nfds, struct __timespec32 const *__timeout, struct __sigset_struct const *__ss),ppoll,(__fds,__nfds,__timeout,__ss))
 #endif /* !__local___localdep_ppoll32_defined && __CRT_HAVE_ppoll */
-/* Dependency: ppoll64 from sys.poll */
 #ifndef __local___localdep_ppoll64_defined
 #define __local___localdep_ppoll64_defined 1
 #ifdef __CRT_HAVE_ppoll64

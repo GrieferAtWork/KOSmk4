@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x83113604 */
+/* HASH CRC-32:0x87fe24af */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -25,7 +25,6 @@
 #if defined(__IEEE754_DOUBLE_TYPE_IS_DOUBLE__) || defined(__IEEE754_FLOAT_TYPE_IS_DOUBLE__) || defined(__IEEE854_LONG_DOUBLE_TYPE_IS_DOUBLE__)
 #include <libm/nan.h>
 __NAMESPACE_LOCAL_BEGIN
-/* Return representation of qNaN for double type */
 __LOCAL_LIBC(nan) __ATTR_CONST __ATTR_WUNUSED double
 __NOTHROW(__LIBCCALL __LIBC_LOCAL_NAME(nan))(char const *__tagb) {
 	return __LIBM_MATHFUN1I(nan, __tagb);

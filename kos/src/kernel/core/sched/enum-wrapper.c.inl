@@ -19,15 +19,15 @@
  */
 #ifdef __INTELLISENSE__
 #include "enum.c"
-//#define DEFINE_task_enum_all 1
+//#define DEFINE_task_enum_all  1
 //#define DEFINE_task_enum_user 1
-//#define DEFINE_task_enum_process_threads 1
+//#define    DEFINE_task_enum_process_threads     1
 //#define DEFINE_task_enum_process_worker_threads 1
-//#define DEFINE_task_enum_process_children 1
-//#define DEFINE_task_enum_procgroup_processes 1
-//#define DEFINE_task_enum_processes 1
-//#define DEFINE_task_enum_namespace 1
-//#define DEFINE_task_enum_kernel 1
+//#define    DEFINE_task_enum_process_children    1
+//#define  DEFINE_task_enum_procgroup_processes   1
+//#define       DEFINE_task_enum_processes        1
+//#define       DEFINE_task_enum_namespace        1
+//#define         DEFINE_task_enum_kernel         1
 //#define DEFINE_task_enum_cpu 1
 #define DEFINE_task_enum_mman 1
 #endif /* __INTELLISENSE__ */

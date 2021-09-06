@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xe89700e6 */
+/* HASH CRC-32:0x2cbfe544 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -24,28 +24,17 @@
 #include <bits/crt/format-printer.h>
 #include <hybrid/typecore.h>
 __NAMESPACE_LOCAL_BEGIN
-/* Dependency: memcpyc from string */
 #ifndef __local___localdep_memcpyc_defined
 #define __local___localdep_memcpyc_defined 1
 #ifdef __CRT_HAVE_memcpyc
-/* Copy memory between non-overlapping memory blocks.
- * @return: * : Always re-returns `dst' */
 __CREDIRECT(__ATTR_LEAF __ATTR_RETNONNULL __ATTR_NONNULL((1, 2)),void *,__NOTHROW_NCX,__localdep_memcpyc,(void *__restrict __dst, void const *__restrict __src, __SIZE_TYPE__ __elem_count, __SIZE_TYPE__ __elem_size),memcpyc,(__dst,__src,__elem_count,__elem_size))
 #else /* __CRT_HAVE_memcpyc */
 __NAMESPACE_LOCAL_END
 #include <libc/local/string/memcpyc.h>
 __NAMESPACE_LOCAL_BEGIN
-/* Copy memory between non-overlapping memory blocks.
- * @return: * : Always re-returns `dst' */
 #define __localdep_memcpyc __LIBC_LOCAL_NAME(memcpyc)
 #endif /* !__CRT_HAVE_memcpyc */
 #endif /* !__local___localdep_memcpyc_defined */
-/* >> format_snprintf_printer(3)
- * Format-printer implementation for printing to a string buffer like `snprintf(3)' would
- * WARNING: No trailing NUL-character is implicitly appended
- * NOTE: The number of written characters is `<orig_bufsize> - arg->sd_bufsiz'
- * NOTE: The number of required characters is `arg->sd_buffer - <orig_buf>', or
- *       alternatively the sum of return values of all calls to `format_snprintf_printer(3)' */
 __LOCAL_LIBC(format_snprintf_printer) __ATTR_NONNULL((1, 2)) __SSIZE_TYPE__
 __NOTHROW_NCX(__FORMATPRINTER_CC __LIBC_LOCAL_NAME(format_snprintf_printer))(void *__arg, char const *__restrict __data, __SIZE_TYPE__ __datalen) {
 	struct __local_format_snprintf_data {

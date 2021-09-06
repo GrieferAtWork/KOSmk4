@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xbe762b2c */
+/* HASH CRC-32:0xa4ab2271 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -23,7 +23,6 @@
 #include <__crt.h>
 #include <hybrid/typecore.h>
 __NAMESPACE_LOCAL_BEGIN
-/* Dependency: c32scasecmp from parts.uchar.string */
 #ifndef __local___localdep_c32scasecmp_defined
 #define __local___localdep_c32scasecmp_defined 1
 #if defined(__CRT_HAVE_wcscasecmp) && __SIZEOF_WCHAR_T__ == 4 && defined(__LIBCCALL_IS_LIBKCALL)
@@ -46,8 +45,6 @@ __NAMESPACE_LOCAL_BEGIN
 #define __localdep_c32scasecmp __LIBC_LOCAL_NAME(c32scasecmp)
 #endif /* !... */
 #endif /* !__local___localdep_c32scasecmp_defined */
-/* >> strcasestr(3)
- * Same as `strstr', but ignore casing */
 __LOCAL_LIBC(c32scasestr) __ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1)) __CHAR32_TYPE__ *
 __NOTHROW_NCX(__LIBKCALL __LIBC_LOCAL_NAME(c32scasestr))(__CHAR32_TYPE__ const *__haystack, __CHAR32_TYPE__ const *__needle) {
 	for (; *__haystack; ++__haystack) {

@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x3d2840ed */
+/* HASH CRC-32:0x7b325ec1 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -98,7 +98,7 @@ typedef struct __sigset_struct sigset_t;
 
 /* >> signalfd(2)
  * Create a poll(2)-able file descriptor which can be used to wait for the
- * delivery of signals masked by `sigmask' to the waiting thread/process.
+ * delivery of signals masked by `sigmask' to the waiting  thread/process.
  * @param: flags: Set of `0 | SFD_NONBLOCK | SFD_CLOEXEC | SFD_CLOFORK' */
 __CDECLARE_OPT(__ATTR_WUNUSED __ATTR_NONNULL((2)),__fd_t,__NOTHROW_NCX,signalfd,(__fd_t __fd, sigset_t const *__sigmask, __STDC_INT_AS_UINT_T __flags),(__fd,__sigmask,__flags))
 

@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x6f05adc8 */
+/* HASH CRC-32:0x773ebc6a */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -23,7 +23,6 @@
 #include <__crt.h>
 #include <features.h>
 __NAMESPACE_LOCAL_BEGIN
-/* Dependency: c32stol from parts.uchar.wchar */
 #ifndef __local___localdep_c32stol_defined
 #define __local___localdep_c32stol_defined 1
 #if defined(__CRT_HAVE_wcstol) && __SIZEOF_WCHAR_T__ == 4 && defined(__LIBCCALL_IS_LIBKCALL)

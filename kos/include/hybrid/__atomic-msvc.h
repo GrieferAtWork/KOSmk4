@@ -293,7 +293,7 @@ __FORCELOCAL __ATTR_ARTIFICIAL __int64
 __NOTHROW_NCX(_InterlockedDecrement64)(__int64 volatile *__px) {
 	return _InterlockedExchangeAdd64(__px, -1);
 }
-//#define _InterlockedIncrement64(__px) _InterlockedExchangeAdd64(__px, 1)
+//#define _InterlockedIncrement64(__px) _InterlockedExchangeAdd64(__px,  1)
 //#define _InterlockedDecrement64(__px) _InterlockedExchangeAdd64(__px, -1)
 #endif
 #endif /* Emulated... */

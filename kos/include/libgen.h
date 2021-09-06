@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xe3f0c7a4 */
+/* HASH CRC-32:0xe7f9ebb7 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -64,7 +64,7 @@ __SYSDECL_BEGIN
  * >> dirname("..");              // Returns "."
  * >> dirname("");                // Returns "."
  * >> dirname(NULL);              // Returns "."
- * Note that for this purpose, `path' may be modified in-place, meaning
+ * Note  that for this purpose, `path' may be modified in-place, meaning
  * that you should really always pass an strdup()'d, or writable string. */
 __CDECLARE(__ATTR_RETNONNULL,char *,__NOTHROW_NCX,dirname,(char *__path),(__path))
 #else /* __CRT_HAVE_dirname */
@@ -87,7 +87,7 @@ __CDECLARE(__ATTR_RETNONNULL,char *,__NOTHROW_NCX,dirname,(char *__path),(__path
  * >> dirname("..");              // Returns "."
  * >> dirname("");                // Returns "."
  * >> dirname(NULL);              // Returns "."
- * Note that for this purpose, `path' may be modified in-place, meaning
+ * Note  that for this purpose, `path' may be modified in-place, meaning
  * that you should really always pass an strdup()'d, or writable string. */
 __NAMESPACE_LOCAL_USING_OR_IMPL(dirname, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_RETNONNULL char *__NOTHROW_NCX(__LIBCCALL dirname)(char *__path) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(dirname))(__path); })
 #endif /* !__CRT_HAVE_dirname */
@@ -111,11 +111,11 @@ __NAMESPACE_LOCAL_USING_OR_IMPL(dirname, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_R
  * >> basename("");                // Returns "."
  * >> basename(NULL);              // Returns "."
  * Note that for this purpose, `filename' may be modified in-place, meaning
- * that you should really always pass an strdup()'d, or writable string.
+ * that  you should really  always pass an  strdup()'d, or writable string.
  *
  * Also note that a different version of this function exists in <string.h>,
- * where if you include both <libgen.h> and <string.h>, you can use the
- * alternate function from <string.h> by `#undef basename', or calling the
+ * where if you  include both  <libgen.h> and  <string.h>, you  can use  the
+ * alternate function from <string.h>  by `#undef basename', or calling  the
  * function as `(basename)(...)' (as opposed to `basename(...)') */
 __CDECLARE(__ATTR_RETNONNULL,char *,__NOTHROW_NCX,__xpg_basename,(char *__filename),(__filename))
 #elif defined(__CRT_HAVE___gnu_basename)
@@ -138,11 +138,11 @@ __CDECLARE(__ATTR_RETNONNULL,char *,__NOTHROW_NCX,__xpg_basename,(char *__filena
  * >> basename("");                // Returns "."
  * >> basename(NULL);              // Returns "."
  * Note that for this purpose, `filename' may be modified in-place, meaning
- * that you should really always pass an strdup()'d, or writable string.
+ * that  you should really  always pass an  strdup()'d, or writable string.
  *
  * Also note that a different version of this function exists in <string.h>,
- * where if you include both <libgen.h> and <string.h>, you can use the
- * alternate function from <string.h> by `#undef basename', or calling the
+ * where if you  include both  <libgen.h> and  <string.h>, you  can use  the
+ * alternate function from <string.h>  by `#undef basename', or calling  the
  * function as `(basename)(...)' (as opposed to `basename(...)') */
 __CREDIRECT(__ATTR_RETNONNULL,char *,__NOTHROW_NCX,__xpg_basename,(char *__filename),__gnu_basename,(__filename))
 #else /* ... */
@@ -166,11 +166,11 @@ __CREDIRECT(__ATTR_RETNONNULL,char *,__NOTHROW_NCX,__xpg_basename,(char *__filen
  * >> basename("");                // Returns "."
  * >> basename(NULL);              // Returns "."
  * Note that for this purpose, `filename' may be modified in-place, meaning
- * that you should really always pass an strdup()'d, or writable string.
+ * that  you should really  always pass an  strdup()'d, or writable string.
  *
  * Also note that a different version of this function exists in <string.h>,
- * where if you include both <libgen.h> and <string.h>, you can use the
- * alternate function from <string.h> by `#undef basename', or calling the
+ * where if you  include both  <libgen.h> and  <string.h>, you  can use  the
+ * alternate function from <string.h>  by `#undef basename', or calling  the
  * function as `(basename)(...)' (as opposed to `basename(...)') */
 __NAMESPACE_LOCAL_USING_OR_IMPL(__xpg_basename, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_RETNONNULL char *__NOTHROW_NCX(__LIBCCALL __xpg_basename)(char *__filename) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(__xpg_basename))(__filename); })
 #endif /* !... */

@@ -501,10 +501,15 @@ int dos_fstat64i64($fd_t fd, [[nonnull]] struct __dos_stat64 *__restrict buf);
 
 //[[ignore, nocrt, alias("stat")]]    int glibc_stat([[nonnull]] char const *__restrict filename, [[nonnull]] struct __glc_stat *__restrict buf);
 //[[ignore, nocrt, alias("stat64")]]  int glibc_stat64([[nonnull]] char const *__restrict filename, [[nonnull]] struct __glc_stat64 *__restrict buf);
+
 //[[ignore, nocrt, alias("lstat")]]   int glibc_lstat([[nonnull]] char const *__restrict filename, [[nonnull]] struct __glc_stat *__restrict buf);
+
 //[[ignore, nocrt, alias("lstat64")]] int glibc_lstat64([[nonnull]] char const *__restrict filename, [[nonnull]] struct __glc_stat64 *__restrict buf);
+
 //[[ignore, nocrt, alias("fstat")]]   int glibc_fstat($fd_t fd, [[nonnull]] struct __glc_stat *__restrict buf);
+
 //[[ignore, nocrt, alias("fstat64")]] int glibc_fstat64($fd_t fd, [[nonnull]] struct __glc_stat64 *__restrict buf);
+
 
 
 [[no_crt_impl, no_crt_self_import, decl_include("<bits/os/stat.h>")]]
@@ -764,7 +769,7 @@ int utimensat($fd_t dirfd, [[nonnull]] char const *filename,
               [[nullable]] struct timespec const times[2 /*or:3*/],
               $atflag_t flags) {
 @@pp_if $has_function(utimensat64)@@
-@@pp_ifdef __AT_CHANGE_CTIME@@
+@@pp_ifdef       __AT_CHANGE_CTIME@@
 	struct timespec64 tms[3];
 	if (!times)
 		return utimensat64(dirfd, filename, NULL, flags);

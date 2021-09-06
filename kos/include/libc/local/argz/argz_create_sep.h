@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xf03eefe3 */
+/* HASH CRC-32:0x9fbeaa31 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -24,7 +24,6 @@
 #if (defined(__CRT_HAVE_malloc) || defined(__CRT_HAVE_calloc) || defined(__CRT_HAVE_realloc) || defined(__CRT_HAVE_memalign) || defined(__CRT_HAVE_aligned_alloc) || defined(__CRT_HAVE_posix_memalign)) && (defined(__CRT_HAVE_free) || defined(__CRT_HAVE_cfree))
 #include <bits/types.h>
 __NAMESPACE_LOCAL_BEGIN
-/* Dependency: free from stdlib */
 #ifndef __local___localdep_free_defined
 #define __local___localdep_free_defined 1
 #if __has_builtin(__builtin_free) && defined(__LIBC_BIND_CRTBUILTINS) && defined(__CRT_HAVE_free)
@@ -37,7 +36,6 @@ __CREDIRECT_VOID(,__NOTHROW_NCX,__localdep_free,(void *__mallptr),cfree,(__mallp
 #undef __local___localdep_free_defined
 #endif /* !... */
 #endif /* !__local___localdep_free_defined */
-/* Dependency: malloc from stdlib */
 #ifndef __local___localdep_malloc_defined
 #define __local___localdep_malloc_defined 1
 #if __has_builtin(__builtin_malloc) && defined(__LIBC_BIND_CRTBUILTINS) && defined(__CRT_HAVE_malloc)
@@ -59,40 +57,23 @@ __NAMESPACE_LOCAL_BEGIN
 #undef __local___localdep_malloc_defined
 #endif /* !... */
 #endif /* !__local___localdep_malloc_defined */
-/* Dependency: strlen from string */
 #ifndef __local___localdep_strlen_defined
 #define __local___localdep_strlen_defined 1
 #ifdef __CRT_HAVE_strlen
 __NAMESPACE_LOCAL_END
 #include <hybrid/typecore.h>
 __NAMESPACE_LOCAL_BEGIN
-/* >> strlen(3)
- * Return the length of the string in characters (Same as `rawmemlen[...](str, '\0')') */
 __CREDIRECT(__ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1)),__SIZE_TYPE__,__NOTHROW_NCX,__localdep_strlen,(char const *__restrict __str),strlen,(__str))
 #else /* __CRT_HAVE_strlen */
 __NAMESPACE_LOCAL_END
 #include <libc/local/string/strlen.h>
 __NAMESPACE_LOCAL_BEGIN
-/* >> strlen(3)
- * Return the length of the string in characters (Same as `rawmemlen[...](str, '\0')') */
 #define __localdep_strlen __LIBC_LOCAL_NAME(strlen)
 #endif /* !__CRT_HAVE_strlen */
 #endif /* !__local___localdep_strlen_defined */
 __NAMESPACE_LOCAL_END
 #include <libc/errno.h>
 __NAMESPACE_LOCAL_BEGIN
-/* >> argz_create_sep(3)
- * Create an argz-string from `string' by splitting that string at each
- * occurance of `sep'. This function behaves the same as the following
- * pseudo-code:
- *     [*pargz, *pargz_len] = string.replace(sep, "\0").replaceall("\0\0", "\0");
- * As can be seen in the pseudo-code, duplicate, successive instance of `sep'
- * are merged, such that no empty sub-strings will be present in the resulting
- * argz-string.
- * For more information on the semantics of argz-strings, see the
- * documentation of `argz_create()'
- * @return: 0 :     Success
- * @return: ENOMEM: Insufficient heap memory */
 __LOCAL_LIBC(argz_create_sep) __ATTR_NONNULL((1, 3, 4)) __errno_t
 __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(argz_create_sep))(char const *__restrict __string, int __sep, char **__restrict __pargz, __SIZE_TYPE__ *__restrict __pargz_len) {
 	/* return string.replace(sep, "\0").replaceall("\0\0", "\0"); */

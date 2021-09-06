@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x878ca848 */
+/* HASH CRC-32:0x10cc6820 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -24,7 +24,6 @@
 #include <asm/os/fcntl.h>
 #if (defined(__CRT_HAVE_fcntl) || defined(__CRT_HAVE___fcntl)) && defined(__F_CLOSEM)
 __NAMESPACE_LOCAL_BEGIN
-/* Dependency: fcntl from fcntl */
 #ifndef __local___localdep_fcntl_defined
 #define __local___localdep_fcntl_defined 1
 #ifdef __CRT_HAVE_fcntl
@@ -43,8 +42,6 @@ __CVREDIRECT(,__STDC_INT_AS_SSIZE_T,__NOTHROW_NCX,__localdep_fcntl,(__fd_t __fd,
 #undef __local___localdep_fcntl_defined
 #endif /* !... */
 #endif /* !__local___localdep_fcntl_defined */
-/* >> closefrom(2)
- * Close all file descriptors with indices `>= lowfd' (s.a. `fcntl(F_CLOSEM)') */
 __LOCAL_LIBC(closefrom) void
 __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(closefrom))(__fd_t __lowfd) {
 	__localdep_fcntl(__lowfd, __F_CLOSEM);

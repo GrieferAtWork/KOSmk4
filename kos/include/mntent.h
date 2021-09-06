@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xcace8d92 */
+/* HASH CRC-32:0xfc681282 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -125,7 +125,7 @@ __NAMESPACE_LOCAL_USING_OR_IMPL(getmntent_r, __FORCELOCAL __ATTR_ARTIFICIAL __AT
 
 #ifdef __CRT_HAVE_addmntent
 /* >> addmntent(3)
- * Append a line `"%s %s %s %s %d %d\n" % (mnt_fsname, mnt_dir,
+ * Append a  line  `"%s %s %s %s %d %d\n"  %  (mnt_fsname,  mnt_dir,
  * mnt_type, mnt_opts, mnt_freq, mnt_passno)' to the end of `stream'
  * @return: 0: Success
  * @return: 1: Error (WARNING: `errno' is left undefined) */
@@ -136,7 +136,7 @@ __CDECLARE(__ATTR_NONNULL((1, 2)),int,__THROWING,addmntent,(__FILE *__restrict _
 #if defined(__SEEK_END) && (defined(__CRT_HAVE_fseek) || defined(__CRT_HAVE_fseek_unlocked) || defined(__CRT_HAVE__fseek_nolock) || defined(__CRT_HAVE_fseeko) || defined(__CRT_HAVE_fseeko_unlocked) || defined(__CRT_HAVE_fseeko64) || defined(__CRT_HAVE_fseek64) || defined(__CRT_HAVE__fseeki64) || defined(__CRT_HAVE_fseeko64_unlocked) || defined(__CRT_HAVE_fseek64_unlocked) || defined(__CRT_HAVE__fseeki64_nolock)) && (defined(__CRT_HAVE_fprintf) || defined(__CRT_HAVE__IO_fprintf) || defined(__CRT_HAVE_fprintf_s) || defined(__CRT_HAVE_fprintf_unlocked) || defined(__CRT_HAVE_vfprintf) || defined(__CRT_HAVE_vfprintf_s) || defined(__CRT_HAVE__IO_vfprintf) || defined(__CRT_HAVE_vfprintf_unlocked) || defined(__CRT_HAVE_file_printer) || defined(__CRT_HAVE_file_printer_unlocked) || defined(__CRT_HAVE_fputc) || defined(__CRT_HAVE_putc) || defined(__CRT_HAVE__IO_putc) || defined(__CRT_HAVE_fputc_unlocked) || defined(__CRT_HAVE_putc_unlocked) || (defined(__CRT_DOS) && defined(__CRT_HAVE__flsbuf)) || defined(__CRT_HAVE_fwrite) || defined(__CRT_HAVE__IO_fwrite) || defined(__CRT_HAVE_fwrite_s) || defined(__CRT_HAVE_fwrite_unlocked) || defined(__CRT_HAVE__fwrite_nolock))
 #include <libc/local/mntent/addmntent.h>
 /* >> addmntent(3)
- * Append a line `"%s %s %s %s %d %d\n" % (mnt_fsname, mnt_dir,
+ * Append a  line  `"%s %s %s %s %d %d\n"  %  (mnt_fsname,  mnt_dir,
  * mnt_type, mnt_opts, mnt_freq, mnt_passno)' to the end of `stream'
  * @return: 0: Success
  * @return: 1: Error (WARNING: `errno' is left undefined) */

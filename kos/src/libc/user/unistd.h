@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x21251023 */
+/* HASH CRC-32:0xd7b23093 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -35,7 +35,7 @@ INTDEF WUNUSED ATTR_CONST ATTR_RETNONNULL char ***NOTHROW(LIBCCALL libc_p_enviro
 #endif /* !__KERNEL__ */
 #ifndef __KERNEL__
 /* >> execve(2)
- * Replace the calling process with the application image referred to by `path' / `file'
+ * Replace the calling  process with  the application  image referred  to by  `path' /  `file'
  * and execute it's `main()' method, passing the given `argv', and setting `environ' to `envp' */
 INTDEF NONNULL((1, 2, 3)) int NOTHROW_RPC(LIBCCALL libc_execve)(char const *__restrict path, __TARGV, __TENVP);
 /* >> getpid(2)
@@ -54,7 +54,7 @@ INTDEF NONNULL((1)) int NOTHROW_NCX(LIBCCALL libc_pipe)(fd_t pipedes[2]);
 INTDEF unsigned int NOTHROW_RPC(LIBCCALL libc_sleep)(unsigned int seconds);
 /* >> fsync(2)
  * Synchronize a file (including its descriptor which contains timestamps, and its size),
- * meaning that changes to its data and/or descriptor are written to disk */
+ * meaning  that  changes   to  its   data  and/or   descriptor  are   written  to   disk */
 INTDEF int NOTHROW_RPC(LIBCCALL libc_fsync)(fd_t fd);
 /* >> getppid(2)
  * Return the PID of the calling process's parent.
@@ -67,7 +67,7 @@ INTDEF WUNUSED pid_t NOTHROW_NCX(LIBCCALL libc_getppid)(void);
  * THIS_THREAD->LEADER->GROUP_LEADER->PID */
 INTDEF WUNUSED pid_t NOTHROW_NCX(LIBCCALL libc_getpgrp)(void);
 /* >> setpgid(2)
- * Change the ID of the process group associated with `pid's process.
+ * Change  the ID of  the process group  associated with `pid's process.
  * (That is the TID of the leader of the process group of `pid's leader)
  * THREAD[PID]->LEADER->GROUP_LEADER = THREAD[PGID]
  * When `pid' is ZERO(0), use `gettid()' for it instead.
@@ -75,7 +75,7 @@ INTDEF WUNUSED pid_t NOTHROW_NCX(LIBCCALL libc_getpgrp)(void);
 INTDEF int NOTHROW_NCX(LIBCCALL libc_setpgid)(pid_t pid, pid_t pgid);
 /* >> setsid(2)
  * Make the calling thread's process the leader of its associated
- * process group, before also making it its own session leader.
+ * process group, before also making  it its own session  leader.
  * Then return the TID of that new session leader, which is also the PID of the calling process.
  *  - THIS_THREAD->LEADER->GROUP_LEADER                 = THIS_THREAD->LEADER;
  *  - THIS_THREAD->LEADER->GROUP_LEADER->SESSION_LEADER = THIS_THREAD->LEADER->GROUP_LEADER;
@@ -112,11 +112,11 @@ INTDEF int NOTHROW_NCX(LIBCCALL libc_setuid)(uid_t uid);
 INTDEF int NOTHROW_NCX(LIBCCALL libc_setgid)(gid_t gid);
 /* >> fork(2)
  * Clone the calling thread into a second process and return twice, once
- * in the parent process where this function returns the (non-zero) PID
- * of the forked child process, and a second time in the child process
+ * in  the parent process where this function returns the (non-zero) PID
+ * of  the forked child process, and a  second time in the child process
  * itself, where ZERO(0) is returned.
  * The child then usually proceeds by calling `exec(2)' to replace its
- * application image with that of another program that the original
+ * application image with  that of another  program that the  original
  * parent can then `wait(2)' for. (s.a. `vfork(2)')
  * @return: 0 : You're the new process that was created
  * @return: * : The `return' value is the pid of your new child process */
@@ -131,7 +131,7 @@ INTDEF unsigned int NOTHROW_NCX(LIBCCALL libc_alarm)(unsigned int seconds);
  * Suspend execution until the delivery of a POSIX_SIGNAL */
 INTDEF int NOTHROW_RPC(LIBCCALL libc_pause)(void);
 /* >> fpathconf(2)
- * @param: name: One of `_PC_*' from <asm/crt/confname.h>
+ * @param: name: One   of    `_PC_*'    from    <asm/crt/confname.h>
  * Return a path configuration value associated with `name' for `fd'
  * return: * : The configuration limit associated with `name' for `fd'
  * return: -1: [errno=<unchanged>] The configuration specified by `name' is unlimited for `fd'
@@ -164,7 +164,7 @@ INTDEF NONNULL((1)) longptr_t NOTHROW_RPC(LIBCCALL libc_pathconf)(char const *pa
 INTDEF NONNULL((1, 2)) int NOTHROW_RPC(LIBCCALL libc_link)(char const *from, char const *to);
 /* >> read(2)
  * Read up to `bufsize' bytes from `fd' into `buf'
- * When `fd' has the `O_NONBLOCK' flag set, only read as much data as was
+ * When `fd' has the  `O_NONBLOCK' flag set,  only read as  much data as  was
  * available at the time the call was made, and throw E_WOULDBLOCK if no data
  * was available at the time.
  * @return: <= bufsize: The actual amount of read bytes
@@ -172,22 +172,22 @@ INTDEF NONNULL((1, 2)) int NOTHROW_RPC(LIBCCALL libc_link)(char const *from, cha
 INTDEF NONNULL((2)) ssize_t NOTHROW_RPC(LIBCCALL libc_read)(fd_t fd, void *buf, size_t bufsize);
 /* >> write(2)
  * Write up to `bufsize' bytes from `buf' into `fd'
- * When `fd' has the `O_NONBLOCK' flag set, only write as much data
+ * When `fd' has the `O_NONBLOCK' flag set, only write as much  data
  * as possible at the time the call was made, and throw E_WOULDBLOCK
  * if no data could be written at the time.
  * @return: <= bufsize: The actual amount of written bytes
  * @return: 0         : No more data can be written */
 INTDEF NONNULL((2)) ssize_t NOTHROW_RPC(LIBCCALL libc_write)(fd_t fd, void const *buf, size_t bufsize);
 /* >> readall(3)
- * Same as `read(2)', however keep on reading until `read()' indicates EOF (causing
+ * Same  as `read(2)', however  keep on reading until  `read()' indicates EOF (causing
  * `readall()' to immediately return `0') or the entirety of the given buffer has been
  * filled (in which case `bufsize' is returned).
- * If an error occurs before all data could be read, try to use SEEK_CUR to rewind
+ * If  an error occurs before all data could be read, try to use SEEK_CUR to rewind
  * the file descriptor by the amount of data that had already been loaded. - Errors
  * during this phase are silently ignored and don't cause `errno' to change */
 INTDEF NONNULL((2)) ssize_t NOTHROW_RPC(LIBCCALL libc_readall)(fd_t fd, void *buf, size_t bufsize);
 /* >> writeall(3)
- * Same as `write(2)', however keep on writing until `write()' indicates EOF (causing
+ * Same as `write(2)', however keep on  writing until `write()' indicates EOF  (causing
  * `writeall()' to immediately return `0') or the entirety of the given buffer has been
  * written (in which case `bufsize' is returned). */
 INTDEF NONNULL((2)) ssize_t NOTHROW_RPC(LIBCCALL libc_writeall)(fd_t fd, void const *buf, size_t bufsize);
@@ -236,12 +236,12 @@ INTDEF NONNULL((2)) int NOTHROW_RPC(LIBCCALL libc_fchownat)(fd_t dfd, char const
  * Create a hard link from `fromfd:from', leading to `tofd:to' */
 INTDEF NONNULL((2, 4)) int NOTHROW_RPC(LIBCCALL libc_linkat)(fd_t fromfd, char const *from, fd_t tofd, char const *to, atflag_t flags);
 /* >> symlinkat(3)
- * Create a new symbolic link loaded with `link_text' as link
+ * Create  a  new  symbolic  link  loaded  with  `link_text'  as link
  * text, at the filesystem location referred to by `tofd:target_path' */
 INTDEF NONNULL((1, 3)) int NOTHROW_RPC(LIBCCALL libc_symlinkat)(char const *link_text, fd_t tofd, char const *target_path);
 /* >> readlinkat(2)
  * Read the text of a symbolic link under `dfd:path' into the provided buffer.
- * WARNING: This function is badly designed and will neither append a trailing
+ * WARNING: This  function is badly designed and will neither append a trailing
  *          NUL-character to the buffer, nor will it return the required buffer
  *          size. Instead, it will return the written size, and the caller must
  *          keep on over allocating until the function indicates that it didn't
@@ -315,29 +315,29 @@ INTDEF ATTR_DEPRECATED("Use getcwd()") NONNULL((1)) char *NOTHROW_RPC(LIBCCALL l
 INTDEF useconds_t NOTHROW_NCX(LIBCCALL libc_ualarm)(useconds_t value, useconds_t interval);
 /* >> vfork(2)
  * Same as `fork(2)', but the child process may be executed within in the same VM
- * as the parent process, with the parent process remaining suspended until the
+ * as the parent process, with the  parent process remaining suspended until  the
  * child process invokes one of the following system calls:
  *   - `_exit(2)'  Terminate the child process. Be sure to use `_exit' (or `_Exit')
- *                 instead of the regular `exit(3)', since the later would include
- *                 the invocation of `atexit(3)' handlers, which would then run in
+ *                 instead of the regular `exit(3)', since the later would  include
+ *                 the invocation of `atexit(3)' handlers, which would then run  in
  *                 the context of a VM that isn't actually about to be destroyed.
  *   - `execve(2)' Create a new VM that is populated with the specified process
- *                 image. The parent process will only be resumed in case the
- *                 new program image could be loaded successfully. Otherwise,
- *                 the call to `execve(2)' returns normally in the child.
+ *                 image. The parent process will  only be resumed in case  the
+ *                 new  program image could  be loaded successfully. Otherwise,
+ *                 the call  to  `execve(2)'  returns normally  in  the  child.
  *                 Other functions from the exec()-family behave the same
  *
- * Care must be taken when using this system call, since you have to make sure that
- * the child process doesn't clobber any part of its (shared) stack that may be re-
- * used once execution resumes in the parent process. The same also goes for heap
- * functions, but generally speaking: you really shouldn't do anything that isn't
+ * Care  must be taken when using this system call, since you have to make sure that
+ * the  child process doesn't clobber any part of its (shared) stack that may be re-
+ * used once execution resumes in  the parent process. The  same also goes for  heap
+ * functions,  but generally speaking:  you really shouldn't  do anything that isn't
  * reentrant after calling any one of the fork() functions (since anything but would
- * rely on underlying implementations making proper use of pthread_atfork(3), which
- * is something that KOS intentionally doesn't do, since I feel like doing so only
+ * rely on underlying implementations making proper use of pthread_atfork(3),  which
+ * is something that KOS intentionally doesn't do,  since I feel like doing so  only
  * adds unnecessary bloat to code that doesn't rely on this)
  *
  * Additionally, this system call may be implemented as an alias for `fork(2)', in
- * which case the parent process will not actually get suspended until the child
+ * which  case the parent process will not  actually get suspended until the child
  * process performs any of the actions above. */
 INTDEF ATTR_RETURNS_TWICE WUNUSED pid_t NOTHROW_NCX(LIBCCALL libc_vfork)(void);
 /* >> fchown(2)
@@ -347,18 +347,18 @@ INTDEF int NOTHROW_RPC(LIBCCALL libc_fchown)(fd_t fd, uid_t owner, gid_t group);
  * Change the current working directory to `path' */
 INTDEF int NOTHROW_RPC(LIBCCALL libc_fchdir)(fd_t fd);
 /* >> getpgid(2)
- * Return the ID of the process group associated with `pid's process.
+ * Return  the ID of  the process group  associated with `pid's process.
  * (That is the TID of the leader of the process group of `pid's leader)
  * THREAD[PID]->LEADER->GROUP_LEADER->PID
  * When `pid' is ZERO(0), use `gettid()' for it instead */
 INTDEF WUNUSED pid_t NOTHROW_NCX(LIBCCALL libc_getpgid)(pid_t pid);
 /* >> getsid(2)
  * Return the ID of the session which a process `pid' is apart of.
- * return THREAD[PID]->LEADER->GROUP_LEADER->SESSION_LEADER->PID; */
+ * return  THREAD[PID]->LEADER->GROUP_LEADER->SESSION_LEADER->PID; */
 INTDEF WUNUSED pid_t NOTHROW_NCX(LIBCCALL libc_getsid)(pid_t pid);
 /* >> lchown(2)
  * Change the ownership of a given `file' to `group:owner',
- * but don't reference it if that file is a symbolic link */
+ * but don't reference it if  that file is a symbolic  link */
 INTDEF NONNULL((1)) int NOTHROW_RPC(LIBCCALL libc_lchown)(char const *file, uid_t owner, gid_t group);
 /* >> truncate(2)
  * Truncate the given file `file' to a length of `length' */
@@ -367,7 +367,7 @@ INTDEF NONNULL((1)) int NOTHROW_NCX(LIBCCALL libc_truncate)(char const *file, __
  * Truncate the given file `file' to a length of `length' */
 INTDEF NONNULL((1)) int NOTHROW_NCX(LIBCCALL libc_truncate64)(char const *file, __PIO_OFFSET64 length);
 /* >> fexecve(2)
- * Replace the calling process with the application image referred to by `fd' and
+ * Replace the  calling  process  with the  application  image  referred to  by  `fd'  and
  * execute it's `main()' method, passing the given `argv', and setting `environ' to `envp' */
 INTDEF NONNULL((2, 3)) int NOTHROW_RPC(LIBCCALL libc_fexecve)(fd_t fd, __TARGV, __TENVP);
 INTDEF int NOTHROW_NCX(LIBCCALL libc_nice)(int inc);
@@ -380,7 +380,7 @@ INTDEF int NOTHROW_NCX(LIBCCALL libc_nice)(int inc);
  * @return: 0 :    [errno=EINVAL] Bad configuration `name'. */
 INTDEF size_t NOTHROW_NCX(LIBCCALL libc_confstr)(__STDC_INT_AS_UINT_T name, char *buf, size_t buflen);
 /* >> sync(2)
- * Synchronize all disk operations of all mounted file systems and flush
+ * Synchronize all disk  operations of  all mounted file  systems and  flush
  * unwritten buffers down to the hardware layer, ensuring that modifications
  * made become visible on the underlying, persistent media */
 INTDEF void NOTHROW_RPC(LIBCCALL libc_sync)(void);
@@ -415,14 +415,14 @@ INTDEF int NOTHROW_NCX(LIBCCALL libc_setegid)(gid_t egid);
 /* >> ttyslot(3) */
 INTDEF WUNUSED int NOTHROW_NCX(LIBCCALL libc_ttyslot)(void);
 /* >> symlink(3)
- * Create a new symbolic link loaded with `link_text' as link
+ * Create  a new  symbolic link  loaded with  `link_text' as link
  * text, at the filesystem location referred to by `target_path'.
  * Same as `symlinkat(link_text, AT_FDCWD, target_path)' */
 INTDEF NONNULL((1, 2)) int NOTHROW_RPC(LIBCCALL libc_symlink)(char const *link_text, char const *target_path);
 /* >> readlink(3)
  * Read the text of a symbolic link under `path' into the provided buffer.
  * Same as `readlinkat(AT_FDCWD, path, buf, buflen)'
- * WARNING: This function is badly designed and will neither append a trailing
+ * WARNING: This  function is badly designed and will neither append a trailing
  *          NUL-character to the buffer, nor will it return the required buffer
  *          size. Instead, it will return the written size, and the caller must
  *          keep on over allocating until the function indicates that it didn't
@@ -464,7 +464,7 @@ INTDEF longptr_t NOTHROW_RPC(VLIBCCALL libc_syscall)(longptr_t sysno, ...);
 /* >> syscall(2), syscall64(2) */
 INTDEF __LONG64_TYPE__ NOTHROW_RPC(VLIBCCALL libc_syscall64)(syscall_ulong_t sysno, ...);
 /* >> chroot(2)
- * Change the root directory of the calling `CLONE_FS' group of threads
+ * Change  the root directory of the calling `CLONE_FS' group of threads
  * (usually the process) to a path that was previously address by `path' */
 INTDEF NONNULL((1)) int NOTHROW_RPC(LIBCCALL libc_chroot)(char const *__restrict path);
 /* >> ftruncate(2), ftruncate64(2)
@@ -474,16 +474,16 @@ INTDEF int NOTHROW_NCX(LIBCCALL libc_ftruncate)(fd_t fd, __PIO_OFFSET length);
  * Truncate the given file `fd' to a length of `length' */
 INTDEF int NOTHROW_NCX(LIBCCALL libc_ftruncate64)(fd_t fd, __PIO_OFFSET64 length);
 /* >> brk(2), sbrk(2)
- * Change the program break, allowing for a rudimentary implementation of a heap.
+ * Change the  program  break,  allowing  for a  rudimentary  implementation  of  a  heap.
  * It is recommended to use the much more advanced functions found in <sys/mman.h> instead */
 INTDEF int NOTHROW_NCX(LIBCCALL libc_brk)(void *addr);
 /* >> brk(2), sbrk(2)
- * Change the program break, allowing for a rudimentary implementation of a heap.
+ * Change the  program  break,  allowing  for a  rudimentary  implementation  of  a  heap.
  * It is recommended to use the much more advanced functions found in <sys/mman.h> instead */
 INTDEF void *NOTHROW_NCX(LIBCCALL libc_sbrk)(intptr_t delta);
 /* >> fdatasync(2)
  * Synchronize only the data of a file (not its descriptor which contains
- * timestamps, and its size), meaning that changes are written to disk */
+ * timestamps,  and its size),  meaning that changes  are written to disk */
 INTDEF int NOTHROW_RPC(LIBCCALL libc_fdatasync)(fd_t fd);
 /* >> setmode(3), getmode(3) */
 INTDEF WUNUSED NONNULL((1)) void *NOTHROW_NCX(LIBCCALL libc_setmode)(char const *mode_str);
@@ -494,9 +494,9 @@ INTDEF WUNUSED NONNULL((1)) mode_t NOTHROW_NCX(LIBCCALL libc_getmode)(void const
 INTDEF char *NOTHROW_NCX(LIBCCALL libc_ctermid_r)(char *s);
 /* >> sysconf(2)
  * @param: name: One of `_SC_*' from <asm/crt/confname.h>
- * Return a system configuration value `name'
+ * Return   a   system    configuration   value    `name'
  * return: * : The configuration limit associated with `name' for `path'
- * return: -1: [errno=<unchanged>] `name' refers to a maximum or minimum
+ * return: -1: [errno=<unchanged>] `name'  refers to a maximum or minimum
  *                                 limit, and that limit is indeterminate
  * return: -1: [errno=EINVAL]      The given `name' isn't a recognized config option */
 INTDEF WUNUSED longptr_t NOTHROW_RPC(LIBCCALL libc_sysconf)(__STDC_INT_AS_UINT_T name);

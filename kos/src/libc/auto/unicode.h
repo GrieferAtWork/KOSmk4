@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x1723c820 */
+/* HASH CRC-32:0x3c7264fe */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -50,14 +50,14 @@ INTDEF NONNULL((1)) char32_t NOTHROW_NCX(LIBDCALL libd_unicode_readutf8)(char co
 INTDEF NONNULL((1)) char32_t NOTHROW_NCX(LIBCCALL libc_unicode_readutf8)(char const **__restrict ptext);
 #if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
 /* >> unicode_readutf8_rev(3)
- * Same as `unicode_readutf8', but read backwards, with `*ptext'
- * starting out as a pointer after the character to be read, before
+ * Same  as  `unicode_readutf8',  but read  backwards,  with `*ptext'
+ * starting out as a pointer after  the character to be read,  before
  * being updated to point to the start of the character that was read */
 INTDEF NONNULL((1)) char32_t NOTHROW_NCX(LIBDCALL libd_unicode_readutf8_rev)(char const **__restrict ptext);
 #endif /* !__LIBCCALL_IS_LIBDCALL && !__KERNEL__ */
 /* >> unicode_readutf8_rev(3)
- * Same as `unicode_readutf8', but read backwards, with `*ptext'
- * starting out as a pointer after the character to be read, before
+ * Same  as  `unicode_readutf8',  but read  backwards,  with `*ptext'
+ * starting out as a pointer after  the character to be read,  before
  * being updated to point to the start of the character that was read */
 INTDEF NONNULL((1)) char32_t NOTHROW_NCX(LIBCCALL libc_unicode_readutf8_rev)(char const **__restrict ptext);
 #if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
@@ -110,14 +110,14 @@ INTDEF NONNULL((1, 2)) char32_t NOTHROW_NCX(LIBDCALL libd_unicode_readutf16_swap
 INTDEF NONNULL((1, 2)) char32_t NOTHROW_NCX(LIBCCALL libc_unicode_readutf16_swap_n)(char16_t const **__restrict ptext, char16_t const *text_end);
 #if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
 /* >> unicode_readutf16_rev(3)
- * Same as `unicode_readutf16', but read backwards, with `*ptext'
- * starting out as a pointer after the character to be read, before
+ * Same  as  `unicode_readutf16', but  read backwards,  with `*ptext'
+ * starting out as a pointer after  the character to be read,  before
  * being updated to point to the start of the character that was read */
 INTDEF NONNULL((1)) char32_t NOTHROW_NCX(LIBDCALL libd_unicode_readutf16_rev)(char16_t const **__restrict ptext);
 #endif /* !__LIBCCALL_IS_LIBDCALL && !__KERNEL__ */
 /* >> unicode_readutf16_rev(3)
- * Same as `unicode_readutf16', but read backwards, with `*ptext'
- * starting out as a pointer after the character to be read, before
+ * Same  as  `unicode_readutf16', but  read backwards,  with `*ptext'
+ * starting out as a pointer after  the character to be read,  before
  * being updated to point to the start of the character that was read */
 INTDEF NONNULL((1)) char32_t NOTHROW_NCX(LIBCCALL libc_unicode_readutf16_rev)(char16_t const **__restrict ptext);
 #if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
@@ -147,22 +147,22 @@ INTDEF NONNULL((1, 2)) char32_t NOTHROW_NCX(LIBCCALL libc_unicode_readutf16_swap
 #if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
 /* >> unicode_writeutf8(3)
  * Write a given Unicode character `ch' to `dst' and return a pointer to its end location.
- * This function will write at most `UNICODE_UTF8_CURLEN' bytes to `dst' */
+ * This   function   will   write   at   most   `UNICODE_UTF8_CURLEN'   bytes   to   `dst' */
 INTDEF ATTR_RETNONNULL NONNULL((1)) char *NOTHROW_NCX(LIBDCALL libd_unicode_writeutf8)(char *__restrict dst, char32_t ch);
 #endif /* !__LIBCCALL_IS_LIBDCALL && !__KERNEL__ */
 /* >> unicode_writeutf8(3)
  * Write a given Unicode character `ch' to `dst' and return a pointer to its end location.
- * This function will write at most `UNICODE_UTF8_CURLEN' bytes to `dst' */
+ * This   function   will   write   at   most   `UNICODE_UTF8_CURLEN'   bytes   to   `dst' */
 INTDEF ATTR_RETNONNULL NONNULL((1)) char *NOTHROW_NCX(LIBCCALL libc_unicode_writeutf8)(char *__restrict dst, char32_t ch);
 #if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
 /* >> unicode_writeutf16(3)
  * Write a given Unicode character `ch' to `dst' and return a pointer to its end location.
- * This function will write at most `UNICODE_UTF16_CURLEN' words to `dst' */
+ * This   function   will   write   at   most   `UNICODE_UTF16_CURLEN'   words   to  `dst' */
 INTDEF ATTR_RETNONNULL NONNULL((1)) char16_t *NOTHROW_NCX(LIBDCALL libd_unicode_writeutf16)(char16_t *__restrict dst, char32_t ch);
 #endif /* !__LIBCCALL_IS_LIBDCALL && !__KERNEL__ */
 /* >> unicode_writeutf16(3)
  * Write a given Unicode character `ch' to `dst' and return a pointer to its end location.
- * This function will write at most `UNICODE_UTF16_CURLEN' words to `dst' */
+ * This   function   will   write   at   most   `UNICODE_UTF16_CURLEN'   words   to  `dst' */
 INTDEF ATTR_RETNONNULL NONNULL((1)) char16_t *NOTHROW_NCX(LIBCCALL libc_unicode_writeutf16)(char16_t *__restrict dst, char32_t ch);
 #if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
 /* >> unicode_writeutf16_chk(3)
@@ -334,49 +334,49 @@ INTDEF NONNULL((1, 3)) size_t NOTHROW_NCX(LIBCCALL libc_unicode_c16toc8)(char pc
 #endif /* !__KERNEL__ */
 #if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
 /* >> format_8to16(3)
- * Format printer (compatible with `__pformatprinter') for
+ * Format printer (compatible with `__pformatprinter')  for
  * converting UTF-8 unicode input data into a UTF-16 output */
 INTDEF ssize_t NOTHROW_NCX(LIBDCALL libd_format_8to16)(void *arg, char const *data, size_t datalen);
 #endif /* !__LIBCCALL_IS_LIBDCALL && !__KERNEL__ */
 #ifndef __KERNEL__
 /* >> format_8to16(3)
- * Format printer (compatible with `__pformatprinter') for
+ * Format printer (compatible with `__pformatprinter')  for
  * converting UTF-8 unicode input data into a UTF-16 output */
 INTDEF ssize_t NOTHROW_NCX(LIBCCALL libc_format_8to16)(void *arg, char const *data, size_t datalen);
 #endif /* !__KERNEL__ */
 #if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
 /* >> format_8to32(3)
- * Format printer (compatible with `__pformatprinter') for
+ * Format printer (compatible with `__pformatprinter')  for
  * converting UTF-8 unicode input data into a UTF-32 output */
 INTDEF ssize_t NOTHROW_NCX(LIBDCALL libd_format_8to32)(void *arg, char const *data, size_t datalen);
 #endif /* !__LIBCCALL_IS_LIBDCALL && !__KERNEL__ */
 #ifndef __KERNEL__
 /* >> format_8to32(3)
- * Format printer (compatible with `__pformatprinter') for
+ * Format printer (compatible with `__pformatprinter')  for
  * converting UTF-8 unicode input data into a UTF-32 output */
 INTDEF ssize_t NOTHROW_NCX(LIBCCALL libc_format_8to32)(void *arg, char const *data, size_t datalen);
 /* >> format_wto8(3)
- * Format printer (compatible with `pc16formatprinter') for
+ * Format   printer   (compatible  with   `pc16formatprinter')  for
  * converting wide-character unicode input data into a UTF-8 output */
 INTDEF ssize_t NOTHROW_NCX(LIBDCALL libd_format_wto8)(void *arg, char16_t const *data, size_t datalen);
 /* >> format_wto8(3)
- * Format printer (compatible with `pc16formatprinter') for
+ * Format   printer   (compatible  with   `pc16formatprinter')  for
  * converting wide-character unicode input data into a UTF-8 output */
 INTDEF ssize_t NOTHROW_NCX(LIBKCALL libc_format_wto8)(void *arg, char32_t const *data, size_t datalen);
 /* >> format_wto32(3)
- * Format printer (compatible with `pc16formatprinter') for
+ * Format  printer   (compatible   with   `pc16formatprinter')   for
  * converting wide-character unicode input data into a UTF-32 output */
 INTDEF ssize_t NOTHROW_NCX(LIBDCALL libd_format_wto32)(void *arg, char16_t const *data, size_t datalen);
 /* >> format_wto32(3)
- * Format printer (compatible with `pc16formatprinter') for
+ * Format  printer   (compatible   with   `pc16formatprinter')   for
  * converting wide-character unicode input data into a UTF-32 output */
 INTDEF ssize_t NOTHROW_NCX(LIBKCALL libc_format_wto32)(void *arg, char32_t const *data, size_t datalen);
 /* >> format_wto16(3)
- * Format printer (compatible with `pwformatprinter') for
+ * Format   printer   (compatible   with   `pwformatprinter')    for
  * converting wide-character unicode input data into a UTF-16 output */
 INTDEF ssize_t NOTHROW_NCX(LIBDCALL libd_format_wto16)(void *arg, char16_t const *data, size_t datalen);
 /* >> format_wto16(3)
- * Format printer (compatible with `pwformatprinter') for
+ * Format   printer   (compatible   with   `pwformatprinter')    for
  * converting wide-character unicode input data into a UTF-16 output */
 INTDEF ssize_t NOTHROW_NCX(LIBKCALL libc_format_wto16)(void *arg, char32_t const *data, size_t datalen);
 #endif /* !__KERNEL__ */

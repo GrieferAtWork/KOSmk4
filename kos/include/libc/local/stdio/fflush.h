@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x80e1cb54 */
+/* HASH CRC-32:0xd53ca167 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -23,7 +23,6 @@
 #include <__crt.h>
 #include <kos/anno.h>
 __NAMESPACE_LOCAL_BEGIN
-/* Dependency: crt_flushall from stdio */
 #ifndef __local___localdep_crt_flushall_defined
 #define __local___localdep_crt_flushall_defined 1
 #ifdef __CRT_HAVE__flushall
@@ -34,8 +33,6 @@ __CREDIRECT(,int,__THROWING,__localdep_crt_flushall,(void),_IO_flush_all,())
 #undef __local___localdep_crt_flushall_defined
 #endif /* !... */
 #endif /* !__local___localdep_crt_flushall_defined */
-/* >> fflush(3)
- * Flush any unwritten data from `stream' to the underlying filesystem/TTY */
 __LOCAL_LIBC(fflush) int
 (__LIBCCALL __LIBC_LOCAL_NAME(fflush))(__FILE *__stream) __THROWS(...) {
 	/* NO-OP  (When  not  implemented  by  the  CRT,  assume  no

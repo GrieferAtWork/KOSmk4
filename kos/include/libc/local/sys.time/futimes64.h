@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xde63dc8c */
+/* HASH CRC-32:0xfd5628bd */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -25,7 +25,6 @@
 #include <bits/os/timeval.h>
 #include <bits/types.h>
 __NAMESPACE_LOCAL_BEGIN
-/* Dependency: futimes32 from sys.time */
 #ifndef __local___localdep_futimes32_defined
 #define __local___localdep_futimes32_defined 1
 __CREDIRECT(,int,__NOTHROW_NCX,__localdep_futimes32,(__fd_t __fd, struct __timeval32 const __tvp[2]),futimes,(__fd,__tvp))

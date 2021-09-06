@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x733d60dc */
+/* HASH CRC-32:0xb15fbd27 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -23,33 +23,25 @@
 #include <__crt.h>
 #include <bits/types.h>
 __NAMESPACE_LOCAL_BEGIN
-/* Dependency: strnlen from string */
 #ifndef __local___localdep_strnlen_defined
 #define __local___localdep_strnlen_defined 1
 #if __has_builtin(__builtin_strnlen) && defined(__LIBC_BIND_CRTBUILTINS) && defined(__CRT_HAVE_strnlen)
 __NAMESPACE_LOCAL_END
 #include <hybrid/typecore.h>
 __NAMESPACE_LOCAL_BEGIN
-/* >> strnlen(3)
- * Same as `strlen', but don't exceed `max_chars' characters (Same as `memlen[...](str, '\0', max_chars)´) */
 __CEIREDIRECT(__ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1)),__SIZE_TYPE__,__NOTHROW_NCX,__localdep_strnlen,(char const *__restrict __str, __SIZE_TYPE__ __maxlen),strnlen,{ return __builtin_strnlen(__str, __maxlen); })
 #elif defined(__CRT_HAVE_strnlen)
 __NAMESPACE_LOCAL_END
 #include <hybrid/typecore.h>
 __NAMESPACE_LOCAL_BEGIN
-/* >> strnlen(3)
- * Same as `strlen', but don't exceed `max_chars' characters (Same as `memlen[...](str, '\0', max_chars)´) */
 __CREDIRECT(__ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1)),__SIZE_TYPE__,__NOTHROW_NCX,__localdep_strnlen,(char const *__restrict __str, __SIZE_TYPE__ __maxlen),strnlen,(__str,__maxlen))
 #else /* ... */
 __NAMESPACE_LOCAL_END
 #include <libc/local/string/strnlen.h>
 __NAMESPACE_LOCAL_BEGIN
-/* >> strnlen(3)
- * Same as `strlen', but don't exceed `max_chars' characters (Same as `memlen[...](str, '\0', max_chars)´) */
 #define __localdep_strnlen __LIBC_LOCAL_NAME(strnlen)
 #endif /* !... */
 #endif /* !__local___localdep_strnlen_defined */
-/* Dependency: tolower from ctype */
 #ifndef __local___localdep_tolower_defined
 #define __local___localdep_tolower_defined 1
 #if __has_builtin(__builtin_tolower) && defined(__LIBC_BIND_CRTBUILTINS) && defined(__CRT_HAVE_tolower)

@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x95d6b76e */
+/* HASH CRC-32:0x1a035b54 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -22,7 +22,6 @@
 #define __local_wildstrcasecmp_l_defined 1
 #include <__crt.h>
 __NAMESPACE_LOCAL_BEGIN
-/* Dependency: strcasecmp_l from string */
 #ifndef __local___localdep_strcasecmp_l_defined
 #define __local___localdep_strcasecmp_l_defined 1
 #ifdef __CRT_HAVE_strcasecmp_l
@@ -38,7 +37,6 @@ __NAMESPACE_LOCAL_BEGIN
 #define __localdep_strcasecmp_l __LIBC_LOCAL_NAME(strcasecmp_l)
 #endif /* !... */
 #endif /* !__local___localdep_strcasecmp_l_defined */
-/* Dependency: tolower_l from ctype */
 #ifndef __local___localdep_tolower_l_defined
 #define __local___localdep_tolower_l_defined 1
 #ifdef __CRT_HAVE_tolower_l

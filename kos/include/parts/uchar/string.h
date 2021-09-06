@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x8587c1e8 */
+/* HASH CRC-32:0x1ddd9e0b */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -2069,109 +2069,109 @@ __NAMESPACE_LOCAL_USING_OR_IMPL(c32sncat, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_
 #endif /* !... */
 #if defined(__CRT_HAVE_wcsspn) && __SIZEOF_WCHAR_T__ == 2 && defined(__LIBCCALL_IS_LIBDCALL)
 /* >> strspn(3)
- * Return the offset from `haystack' to the first
- * character for which `strchr(reject, ch) == NULL'.
+ * Return   the  offset  from  `haystack'  to  the  first
+ * character   for   which  `strchr(reject, ch) == NULL'.
  * If no such character exists, return `strlen(haystack)' */
 __CREDIRECT(__ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1, 2)),size_t,__NOTHROW_NCX,c16sspn,(char16_t const *__haystack, char16_t const *__accept),wcsspn,(__haystack,__accept))
 #elif defined(__CRT_HAVE_DOS$wcsspn)
 /* >> strspn(3)
- * Return the offset from `haystack' to the first
- * character for which `strchr(reject, ch) == NULL'.
+ * Return   the  offset  from  `haystack'  to  the  first
+ * character   for   which  `strchr(reject, ch) == NULL'.
  * If no such character exists, return `strlen(haystack)' */
 __CREDIRECT_DOS(__ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1, 2)),size_t,__NOTHROW_NCX,c16sspn,(char16_t const *__haystack, char16_t const *__accept),wcsspn,(__haystack,__accept))
 #elif __SIZEOF_WCHAR_T__ == 2
 #include <libc/local/wchar/wcsspn.h>
 /* >> strspn(3)
- * Return the offset from `haystack' to the first
- * character for which `strchr(reject, ch) == NULL'.
+ * Return   the  offset  from  `haystack'  to  the  first
+ * character   for   which  `strchr(reject, ch) == NULL'.
  * If no such character exists, return `strlen(haystack)' */
 __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1, 2)) size_t __NOTHROW_NCX(__LIBDCALL c16sspn)(char16_t const *__haystack, char16_t const *__accept) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(wcsspn))((__WCHAR_TYPE__ const *)__haystack, (__WCHAR_TYPE__ const *)__accept); }
 #else /* ... */
 #include <libc/local/parts.uchar.string/c16sspn.h>
 /* >> strspn(3)
- * Return the offset from `haystack' to the first
- * character for which `strchr(reject, ch) == NULL'.
+ * Return   the  offset  from  `haystack'  to  the  first
+ * character   for   which  `strchr(reject, ch) == NULL'.
  * If no such character exists, return `strlen(haystack)' */
 __NAMESPACE_LOCAL_USING_OR_IMPL(c16sspn, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1, 2)) size_t __NOTHROW_NCX(__LIBDCALL c16sspn)(char16_t const *__haystack, char16_t const *__accept) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(c16sspn))(__haystack, __accept); })
 #endif /* !... */
 #if defined(__CRT_HAVE_wcsspn) && __SIZEOF_WCHAR_T__ == 4 && defined(__LIBCCALL_IS_LIBKCALL)
 /* >> strspn(3)
- * Return the offset from `haystack' to the first
- * character for which `strchr(reject, ch) == NULL'.
+ * Return   the  offset  from  `haystack'  to  the  first
+ * character   for   which  `strchr(reject, ch) == NULL'.
  * If no such character exists, return `strlen(haystack)' */
 __CREDIRECT(__ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1, 2)),size_t,__NOTHROW_NCX,c32sspn,(char32_t const *__haystack, char32_t const *__accept),wcsspn,(__haystack,__accept))
 #elif defined(__CRT_HAVE_KOS$wcsspn)
 /* >> strspn(3)
- * Return the offset from `haystack' to the first
- * character for which `strchr(reject, ch) == NULL'.
+ * Return   the  offset  from  `haystack'  to  the  first
+ * character   for   which  `strchr(reject, ch) == NULL'.
  * If no such character exists, return `strlen(haystack)' */
 __CREDIRECT_KOS(__ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1, 2)),size_t,__NOTHROW_NCX,c32sspn,(char32_t const *__haystack, char32_t const *__accept),wcsspn,(__haystack,__accept))
 #elif __SIZEOF_WCHAR_T__ == 4
 #include <libc/local/wchar/wcsspn.h>
 /* >> strspn(3)
- * Return the offset from `haystack' to the first
- * character for which `strchr(reject, ch) == NULL'.
+ * Return   the  offset  from  `haystack'  to  the  first
+ * character   for   which  `strchr(reject, ch) == NULL'.
  * If no such character exists, return `strlen(haystack)' */
 __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1, 2)) size_t __NOTHROW_NCX(__LIBKCALL c32sspn)(char32_t const *__haystack, char32_t const *__accept) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(wcsspn))((__WCHAR_TYPE__ const *)__haystack, (__WCHAR_TYPE__ const *)__accept); }
 #else /* ... */
 #include <libc/local/parts.uchar.string/c32sspn.h>
 /* >> strspn(3)
- * Return the offset from `haystack' to the first
- * character for which `strchr(reject, ch) == NULL'.
+ * Return   the  offset  from  `haystack'  to  the  first
+ * character   for   which  `strchr(reject, ch) == NULL'.
  * If no such character exists, return `strlen(haystack)' */
 __NAMESPACE_LOCAL_USING_OR_IMPL(c32sspn, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1, 2)) size_t __NOTHROW_NCX(__LIBKCALL c32sspn)(char32_t const *__haystack, char32_t const *__accept) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(c32sspn))(__haystack, __accept); })
 #endif /* !... */
 #if defined(__CRT_HAVE_wcscspn) && __SIZEOF_WCHAR_T__ == 2 && defined(__LIBCCALL_IS_LIBDCALL)
 /* >> strcspn(3)
- * Return the offset from `haystack' to the first
- * character for which `strchr(reject, ch) != NULL'.
+ * Return   the  offset  from  `haystack'  to  the  first
+ * character   for   which  `strchr(reject, ch) != NULL'.
  * If no such character exists, return `strlen(haystack)' */
 __CREDIRECT(__ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1, 2)),size_t,__NOTHROW_NCX,c16scspn,(char16_t const *__haystack, char16_t const *__reject),wcscspn,(__haystack,__reject))
 #elif defined(__CRT_HAVE_DOS$wcscspn)
 /* >> strcspn(3)
- * Return the offset from `haystack' to the first
- * character for which `strchr(reject, ch) != NULL'.
+ * Return   the  offset  from  `haystack'  to  the  first
+ * character   for   which  `strchr(reject, ch) != NULL'.
  * If no such character exists, return `strlen(haystack)' */
 __CREDIRECT_DOS(__ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1, 2)),size_t,__NOTHROW_NCX,c16scspn,(char16_t const *__haystack, char16_t const *__reject),wcscspn,(__haystack,__reject))
 #elif __SIZEOF_WCHAR_T__ == 2
 #include <libc/local/wchar/wcscspn.h>
 /* >> strcspn(3)
- * Return the offset from `haystack' to the first
- * character for which `strchr(reject, ch) != NULL'.
+ * Return   the  offset  from  `haystack'  to  the  first
+ * character   for   which  `strchr(reject, ch) != NULL'.
  * If no such character exists, return `strlen(haystack)' */
 __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1, 2)) size_t __NOTHROW_NCX(__LIBDCALL c16scspn)(char16_t const *__haystack, char16_t const *__reject) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(wcscspn))((__WCHAR_TYPE__ const *)__haystack, (__WCHAR_TYPE__ const *)__reject); }
 #else /* ... */
 #include <libc/local/parts.uchar.string/c16scspn.h>
 /* >> strcspn(3)
- * Return the offset from `haystack' to the first
- * character for which `strchr(reject, ch) != NULL'.
+ * Return   the  offset  from  `haystack'  to  the  first
+ * character   for   which  `strchr(reject, ch) != NULL'.
  * If no such character exists, return `strlen(haystack)' */
 __NAMESPACE_LOCAL_USING_OR_IMPL(c16scspn, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1, 2)) size_t __NOTHROW_NCX(__LIBDCALL c16scspn)(char16_t const *__haystack, char16_t const *__reject) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(c16scspn))(__haystack, __reject); })
 #endif /* !... */
 #if defined(__CRT_HAVE_wcscspn) && __SIZEOF_WCHAR_T__ == 4 && defined(__LIBCCALL_IS_LIBKCALL)
 /* >> strcspn(3)
- * Return the offset from `haystack' to the first
- * character for which `strchr(reject, ch) != NULL'.
+ * Return   the  offset  from  `haystack'  to  the  first
+ * character   for   which  `strchr(reject, ch) != NULL'.
  * If no such character exists, return `strlen(haystack)' */
 __CREDIRECT(__ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1, 2)),size_t,__NOTHROW_NCX,c32scspn,(char32_t const *__haystack, char32_t const *__reject),wcscspn,(__haystack,__reject))
 #elif defined(__CRT_HAVE_KOS$wcscspn)
 /* >> strcspn(3)
- * Return the offset from `haystack' to the first
- * character for which `strchr(reject, ch) != NULL'.
+ * Return   the  offset  from  `haystack'  to  the  first
+ * character   for   which  `strchr(reject, ch) != NULL'.
  * If no such character exists, return `strlen(haystack)' */
 __CREDIRECT_KOS(__ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1, 2)),size_t,__NOTHROW_NCX,c32scspn,(char32_t const *__haystack, char32_t const *__reject),wcscspn,(__haystack,__reject))
 #elif __SIZEOF_WCHAR_T__ == 4
 #include <libc/local/wchar/wcscspn.h>
 /* >> strcspn(3)
- * Return the offset from `haystack' to the first
- * character for which `strchr(reject, ch) != NULL'.
+ * Return   the  offset  from  `haystack'  to  the  first
+ * character   for   which  `strchr(reject, ch) != NULL'.
  * If no such character exists, return `strlen(haystack)' */
 __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1, 2)) size_t __NOTHROW_NCX(__LIBKCALL c32scspn)(char32_t const *__haystack, char32_t const *__reject) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(wcscspn))((__WCHAR_TYPE__ const *)__haystack, (__WCHAR_TYPE__ const *)__reject); }
 #else /* ... */
 #include <libc/local/parts.uchar.string/c32scspn.h>
 /* >> strcspn(3)
- * Return the offset from `haystack' to the first
- * character for which `strchr(reject, ch) != NULL'.
+ * Return   the  offset  from  `haystack'  to  the  first
+ * character   for   which  `strchr(reject, ch) != NULL'.
  * If no such character exists, return `strlen(haystack)' */
 __NAMESPACE_LOCAL_USING_OR_IMPL(c32scspn, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1, 2)) size_t __NOTHROW_NCX(__LIBKCALL c32scspn)(char32_t const *__haystack, char32_t const *__reject) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(c32scspn))(__haystack, __reject); })
 #endif /* !... */

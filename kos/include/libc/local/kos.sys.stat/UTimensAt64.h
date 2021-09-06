@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x6ac5d56c */
+/* HASH CRC-32:0x7c06d11 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -24,16 +24,13 @@
 #ifdef __CRT_HAVE_UTimensAt
 #include <kos/anno.h>
 __NAMESPACE_LOCAL_BEGIN
-/* Dependency: UTimensAt32 from kos.sys.stat */
 #ifndef __local___localdep_UTimensAt32_defined
 #define __local___localdep_UTimensAt32_defined 1
-/* @param flags: Set of `0|AT_SYMLINK_NOFOLLOW|AT_CHANGE_CTIME|AT_DOSPATH' */
 __CREDIRECT_VOID(__ATTR_NONNULL((2)),__THROWING,__localdep_UTimensAt32,(__fd_t __dirfd, char const *__filename, struct timespec const __times[2 /*or:3*/], __atflag_t __flags),UTimensAt,(__dirfd,__filename,__times,__flags))
 #endif /* !__local___localdep_UTimensAt32_defined */
 __NAMESPACE_LOCAL_END
 #include <asm/os/fcntl.h>
 __NAMESPACE_LOCAL_BEGIN
-/* @param flags: Set of `0|AT_SYMLINK_NOFOLLOW|AT_CHANGE_CTIME|AT_DOSPATH' */
 __LOCAL_LIBC(UTimensAt64) __ATTR_NONNULL((2)) void
 (__LIBCCALL __LIBC_LOCAL_NAME(UTimensAt64))(__fd_t __dirfd, char const *__filename, struct __timespec64 const __times[2 /*or:3*/], __atflag_t __flags) __THROWS(...) {
 #ifdef __AT_CHANGE_CTIME

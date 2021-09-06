@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xebf21cc0 */
+/* HASH CRC-32:0xbdb2603e */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -23,11 +23,6 @@
 #include <__crt.h>
 #include <hybrid/typecore.h>
 __NAMESPACE_LOCAL_BEGIN
-/* >> timingsafe_memcmp(3)
- * Compare `s1...+=n_bytes' with `s2...+=n_bytes' in constant, armored `O(n_bytes)'-time
- * @return: <  0: Block `s1' should be considered less than `s2'
- * @return: == 0: Memory blocks are equal.
- * @return: >  0: Block `s1' should be considered greater than `s2' */
 __LOCAL_LIBC(timingsafe_memcmp) __ATTR_WUNUSED __ATTR_NONNULL((1, 2)) int
 __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(timingsafe_memcmp))(void const *__s1, void const *__s2, __SIZE_TYPE__ __n_bytes) {
 	int __result = 0, __finished = 0;

@@ -70,7 +70,7 @@ __SYSDECL_BEGIN
 
 
 @@Match the given `name' against `pattern', returning
-@@`0' if they match, and `FNM_NOMATCH' otherwise.
+@@`0'  if  they match,  and  `FNM_NOMATCH' otherwise.
 @@@param: match_flags:   Set of `FNM_*'
 @@@return: 0           : `name' is matched by `pattern'
 @@@return: FNM_NOMATCH : `name' is not matched by `pattern'

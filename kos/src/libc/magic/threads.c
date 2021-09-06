@@ -545,7 +545,7 @@ int cnd_init([[nonnull]] cnd_t *__restrict cond) {
 }
 
 @@>> cnd_signal(3)
-@@Wakeup one thread currently waiting on the given
+@@Wakeup  one thread currently  waiting on the given
 @@condition variable (s.a. `pthread_cond_signal(3)')
 @@@return: thrd_success: Success
 @@@return: thrd_error:   Error
@@ -561,7 +561,7 @@ int cnd_signal([[nonnull]] cnd_t *__restrict cond) {
 }
 
 @@>> cnd_broadcast(3)
-@@Wakeup all threads currently waiting on the given
+@@Wakeup  all  threads currently  waiting on  the given
 @@condition variable (s.a. `pthread_cond_broadcast(3)')
 @@@return: thrd_success: Success
 @@@return: thrd_error:   Error
@@ -722,13 +722,13 @@ $size_t thr_min_stack() {
 }
 
 @@>> thr_main(3)
-@@Another one of these non-restricted, but solaris-specific functions:
-@@This one returns 1 if the calling thread is the main() thread (i.e.
-@@the thread that was started by the kernel in order to execute the
-@@calling program), and 0 otherwise. Additionally, -1 is returned if
+@@Another  one of these non-restricted, but solaris-specific functions:
+@@This  one returns 1 if the calling  thread is the main() thread (i.e.
+@@the thread that  was started by  the kernel in  order to execute  the
+@@calling program), and  0 otherwise. Additionally,  -1 is returned  if
 @@the calling thread "hasn't been initialized", or if the caller wasn't
-@@created by one of the pthread- or threads-related init functions.
-@@Internally, this is the return value if the caller doesn't have a
+@@created  by one  of the  pthread- or  threads-related init functions.
+@@Internally,  this is  the return value  if the caller  doesn't have a
 @@proper pthread-controller attached.
 thr_main(*) = pthread_main_np;
 %#endif /* __USE_SOLARIS */

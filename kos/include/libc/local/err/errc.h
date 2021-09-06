@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xec5b78c3 */
+/* HASH CRC-32:0x76ea9453 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -27,23 +27,19 @@
 #include <kos/anno.h>
 #include <bits/types.h>
 __NAMESPACE_LOCAL_BEGIN
-/* Dependency: verrc from err */
 #ifndef __local___localdep_verrc_defined
 #define __local___localdep_verrc_defined 1
 #ifdef __CRT_HAVE_verrc
-/* Same as `warnc()', but follow up by calling `exit(status)' */
 __CREDIRECT_VOID(__ATTR_NORETURN __ATTR_LIBC_PRINTF(2, 0),__THROWING,__localdep_verrc,(int __status, __errno_t __used_errno, char const *__format, __builtin_va_list __args),verrc,(__status,__used_errno,__format,__args))
 #elif (defined(__CRT_HAVE_vwarnc) || (!defined(__NO_STDSTREAMS) && defined(__LOCAL_program_invocation_short_name) && (defined(__CRT_HAVE_vfprintf) || defined(__CRT_HAVE_vfprintf_s) || defined(__CRT_HAVE__IO_vfprintf) || defined(__CRT_HAVE_vfprintf_unlocked) || defined(__CRT_HAVE_file_printer) || defined(__CRT_HAVE_file_printer_unlocked) || defined(__CRT_HAVE_fputc) || defined(__CRT_HAVE_putc) || defined(__CRT_HAVE__IO_putc) || defined(__CRT_HAVE_fputc_unlocked) || defined(__CRT_HAVE_putc_unlocked) || (defined(__CRT_DOS) && defined(__CRT_HAVE__flsbuf)) || defined(__CRT_HAVE_fwrite) || defined(__CRT_HAVE__IO_fwrite) || defined(__CRT_HAVE_fwrite_s) || defined(__CRT_HAVE_fwrite_unlocked) || defined(__CRT_HAVE__fwrite_nolock)))) && (defined(__CRT_HAVE_exit) || defined(__CRT_HAVE_quick_exit) || defined(__CRT_HAVE__exit) || defined(__CRT_HAVE__Exit))
 __NAMESPACE_LOCAL_END
 #include <libc/local/err/verrc.h>
 __NAMESPACE_LOCAL_BEGIN
-/* Same as `warnc()', but follow up by calling `exit(status)' */
 #define __localdep_verrc __LIBC_LOCAL_NAME(verrc)
 #else /* ... */
 #undef __local___localdep_verrc_defined
 #endif /* !... */
 #endif /* !__local___localdep_verrc_defined */
-/* Same as `warnc()', but follow up by calling `exit(status)' */
 __LOCAL_LIBC(errc) __ATTR_NORETURN __ATTR_LIBC_PRINTF(2, 3) void
 (__VLIBCCALL __LIBC_LOCAL_NAME(errc))(int __status, __errno_t __used_errno, char const *__format, ...) __THROWS(...) {
 	__builtin_va_list __args;

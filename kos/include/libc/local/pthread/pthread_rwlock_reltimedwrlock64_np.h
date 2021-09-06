@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x4155459d */
+/* HASH CRC-32:0x149a8811 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -26,21 +26,10 @@
 #include <bits/crt/pthreadtypes.h>
 #include <bits/os/timespec.h>
 __NAMESPACE_LOCAL_BEGIN
-/* Dependency: pthread_rwlock_reltimedwrlock32_np from pthread */
 #ifndef __local___localdep_pthread_rwlock_reltimedwrlock32_np_defined
 #define __local___localdep_pthread_rwlock_reltimedwrlock32_np_defined 1
-/* >> pthread_rwlock_reltimedwrlock_np(3), pthread_rwlock_reltimedwrlock64_np(3)
- * Try to acquire write lock for `rwlock' or return after the specified time
- * @return: EOK:       Success
- * @return: EINVAL:    The given `reltime' is invalid
- * @return: ETIMEDOUT: The given `reltime' has expired */
 __CREDIRECT(__ATTR_WUNUSED __ATTR_NONNULL((1, 2)),__errno_t,__NOTHROW_RPC,__localdep_pthread_rwlock_reltimedwrlock32_np,(__pthread_rwlock_t *__restrict __rwlock, struct __timespec32 const *__restrict __reltime),pthread_rwlock_reltimedwrlock_np,(__rwlock,__reltime))
 #endif /* !__local___localdep_pthread_rwlock_reltimedwrlock32_np_defined */
-/* >> pthread_rwlock_reltimedwrlock_np(3), pthread_rwlock_reltimedwrlock64_np(3)
- * Try to acquire write lock for `rwlock' or return after the specified time
- * @return: EOK:       Success
- * @return: EINVAL:    The given `reltime' is invalid
- * @return: ETIMEDOUT: The given `reltime' has expired */
 __LOCAL_LIBC(pthread_rwlock_reltimedwrlock64_np) __ATTR_WUNUSED __ATTR_NONNULL((1, 2)) __errno_t
 __NOTHROW_RPC(__LIBCCALL __LIBC_LOCAL_NAME(pthread_rwlock_reltimedwrlock64_np))(__pthread_rwlock_t *__restrict __rwlock, struct __timespec64 const *__restrict __reltime) {
 	__errno_t __result;

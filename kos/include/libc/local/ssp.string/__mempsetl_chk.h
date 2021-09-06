@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xb797b966 */
+/* HASH CRC-32:0x90594a07 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -23,23 +23,18 @@
 #include <__crt.h>
 #include <hybrid/typecore.h>
 __NAMESPACE_LOCAL_BEGIN
-/* Dependency: mempsetl from string */
 #ifndef __local___localdep_mempsetl_defined
 #define __local___localdep_mempsetl_defined 1
 #ifdef __CRT_HAVE_mempsetl
-/* Same as `memsetl', but return `dst + N_DWORDS', rather than `dst' */
 __CREDIRECT(__ATTR_LEAF __ATTR_RETNONNULL __ATTR_NONNULL((1)),__UINT32_TYPE__ *,__NOTHROW_NCX,__localdep_mempsetl,(void *__restrict __dst, __UINT32_TYPE__ __dword, __SIZE_TYPE__ __n_dwords),mempsetl,(__dst,__dword,__n_dwords))
 #elif defined(__CRT_HAVE_wmempset) && __SIZEOF_WCHAR_T__ == 4
-/* Same as `memsetl', but return `dst + N_DWORDS', rather than `dst' */
 __CREDIRECT(__ATTR_LEAF __ATTR_RETNONNULL __ATTR_NONNULL((1)),__UINT32_TYPE__ *,__NOTHROW_NCX,__localdep_mempsetl,(void *__restrict __dst, __UINT32_TYPE__ __dword, __SIZE_TYPE__ __n_dwords),wmempset,(__dst,__dword,__n_dwords))
 #elif defined(__CRT_HAVE_KOS$wmempset) && defined(__LIBCCALL_IS_LIBKCALL)
-/* Same as `memsetl', but return `dst + N_DWORDS', rather than `dst' */
 __COMPILER_REDIRECT(__LIBC,__ATTR_LEAF __ATTR_RETNONNULL __ATTR_NONNULL((1)),__UINT32_TYPE__ *,__NOTHROW_NCX,__LIBCCALL,__localdep_mempsetl,(void *__restrict __dst, __UINT32_TYPE__ __dword, __SIZE_TYPE__ __n_dwords),KOS$wmempset,(__dst,__dword,__n_dwords))
 #else /* ... */
 __NAMESPACE_LOCAL_END
 #include <libc/local/string/mempsetl.h>
 __NAMESPACE_LOCAL_BEGIN
-/* Same as `memsetl', but return `dst + N_DWORDS', rather than `dst' */
 #define __localdep_mempsetl __LIBC_LOCAL_NAME(mempsetl)
 #endif /* !... */
 #endif /* !__local___localdep_mempsetl_defined */

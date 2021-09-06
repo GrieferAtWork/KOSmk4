@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x1120266e */
+/* HASH CRC-32:0xfd0270d8 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -35,7 +35,7 @@ DECL_BEGIN
  * Remove a file or directory `filename' */
 INTDEF NONNULL((1)) int NOTHROW_RPC(LIBCCALL libc_remove)(char const *filename);
 /* >> rename(3)
- * Rename a given file `oldname' to `newname_or_path', or in the event
+ * Rename  a given file `oldname' to `newname_or_path', or in the event
  * that `newname_or_path' refers to a directory, place the file within. */
 INTDEF NONNULL((1, 2)) int NOTHROW_RPC(LIBCCALL libc_rename)(char const *oldname, char const *newname_or_path);
 INTDEF WUNUSED NONNULL((1)) char *NOTHROW_NCX(LIBCCALL libc_tmpnam)(char *buf);
@@ -51,7 +51,7 @@ INTDEF int (LIBCCALL libc_fflush)(FILE *stream) THROWS(...);
 INTDEF NONNULL((1)) int NOTHROW_NCX(LIBCCALL libc_setvbuf)(FILE *__restrict stream, char *__restrict buf, __STDC_INT_AS_UINT_T modes, size_t bufsize);
 /* >> fgetc(3)
  * Read and return a single character from `stream'
- * If the given `stream' has been exhausted or if an error occurred, `EOF' is
+ * If  the given `stream' has been exhausted or if an error occurred, `EOF' is
  * returned and the exact cause can be determined by using `ferror' and `feof' */
 INTDEF NONNULL((1)) int (LIBCCALL libc_fgetc)(FILE *__restrict stream) THROWS(...);
 /* >> fputc(3)
@@ -94,7 +94,7 @@ INTDEF WUNUSED NONNULL((1, 2)) FILE *NOTHROW_RPC(LIBCCALL libc_fopen)(char const
  * Re-open the given `stream' as a file-stream for accessing `filename' */
 INTDEF NONNULL((1, 2, 3)) FILE *NOTHROW_RPC(LIBCCALL libc_freopen)(char const *__restrict filename, char const *__restrict modes, FILE *__restrict stream);
 /* >> fgetpos(3), fgetpos64(3)
- * Initialize an opaque descriptor `pos' for the current in-file position of `stream'
+ * Initialize   an   opaque  descriptor   `pos'   for  the   current   in-file  position   of  `stream'
  * Upon success (return == 0), `pos' can be used to restore the current position by calling `fsetpos()' */
 INTDEF NONNULL((1, 2)) int (LIBCCALL libc_fgetpos)(FILE *__restrict stream, fpos_t *__restrict pos) THROWS(...);
 /* >> fsetpos(3), fsetpos64(3)
@@ -129,7 +129,7 @@ INTDEF NONNULL((2)) int (LIBCCALL libc_fputc_unlocked)(int ch, FILE *__restrict 
 INTDEF ATTR_MALLOC WUNUSED char *NOTHROW_NCX(LIBCCALL libc_tempnam)(char const *dir, char const *pfx);
 /* >> fdopen(3)
  * Open a new file stream by inheriting a given file descriptor `fd'
- * Note that upon success (`return != NULL'), the given `fd'
+ * Note   that  upon  success  (`return != NULL'),  the  given  `fd'
  * will be `close()'d once `fclose(return)' is called */
 INTDEF WUNUSED NONNULL((2)) FILE *NOTHROW_NCX(LIBCCALL libc_fdopen)(fd_t fd, char const *__restrict modes);
 /* >> fileno(3)
@@ -156,7 +156,7 @@ INTDEF WUNUSED NONNULL((1, 2)) FILE *NOTHROW_RPC(LIBCCALL libc_popen)(char const
 INTDEF NONNULL((1)) int NOTHROW_NCX(LIBCCALL libc_pclose)(FILE *stream);
 /* >> popenve(3)
  * Similar to `popen(3)', but rather than running `execl("/bin/sh", "-c", command)',
- * this function will `execve(path, argv, envp)'. The returned FILE must still be
+ * this function will  `execve(path, argv, envp)'. The returned  FILE must still  be
  * closed using `pclose(3)', rather than `fclose(3)' */
 INTDEF WUNUSED NONNULL((1, 2, 3, 4)) FILE *NOTHROW_RPC(LIBCCALL libc_popenve)(char const *path, __TARGV, __TENVP, char const *modes);
 /* >> fcloseall(3)
@@ -185,7 +185,7 @@ INTDEF WUNUSED NONNULL((1, 2)) FILE *NOTHROW_RPC(LIBCCALL libc_fopen64)(char con
  * Re-open the given `stream' as a file-stream for accessing `filename' */
 INTDEF NONNULL((1, 2, 3)) FILE *NOTHROW_RPC(LIBCCALL libc_freopen64)(char const *__restrict filename, char const *__restrict modes, FILE *__restrict stream);
 /* >> fgetpos(3), fgetpos64(3)
- * Initialize an opaque descriptor `pos' for the current in-file position of `stream'
+ * Initialize   an   opaque  descriptor   `pos'   for  the   current   in-file  position   of  `stream'
  * Upon success (return == 0), `pos' can be used to restore the current position by calling `fsetpos()' */
 INTDEF NONNULL((1, 2)) int (LIBCCALL libc_fgetpos64)(FILE *__restrict stream, fpos64_t *__restrict pos) THROWS(...);
 /* >> fsetpos(3), fsetpos64(3)
@@ -241,12 +241,12 @@ INTDEF WUNUSED NONNULL((1, 2)) char *NOTHROW_NCX(LIBCCALL libc_fgetln)(FILE *__r
 /* >> fmtcheck(3)
  * Check if `user_format' may be used as a drop-in replacement for `good_format'
  * in the context of a call to `printf(3)' (or `format_printf()'), such that all
- * contained format qualifiers reference the same (or compatible) underlying C
+ * contained format qualifiers reference the  same (or compatible) underlying  C
  * types, and in the same order.
- * If all of this is the case, simply re-return `user_format'. Otherwise (i.e.
+ * If all of this is the  case, simply re-return `user_format'. Otherwise  (i.e.
  * when `user_format' isn't compatible with `good_format'), return `good_format'
- * instead. This function is meant to be used to validate user-provided printf
- * format strings before actually using them, after they've been read from lang
+ * instead. This function is meant to  be used to validate user-provided  printf
+ * format strings before actually using them, after they've been read from  lang
  * config files: `printf(fmtcheck(get_user_fmt(), "%s %s"), "Foo", "Bar");' */
 INTDEF ATTR_RETNONNULL WUNUSED NONNULL((2)) __ATTR_FORMAT_ARG(2) char const *NOTHROW_NCX(LIBCCALL libc_fmtcheck)(char const *user_format, char const *good_format);
 /* >> funopen2(3), funopen2_64(3) */

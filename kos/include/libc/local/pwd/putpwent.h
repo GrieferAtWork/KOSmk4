@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x8fb3a0af */
+/* HASH CRC-32:0xe27b1004 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -26,46 +26,24 @@
 #include <kos/anno.h>
 #include <bits/crt/db/passwd.h>
 __NAMESPACE_LOCAL_BEGIN
-/* Dependency: fprintf from stdio */
 #ifndef __local___localdep_fprintf_defined
 #define __local___localdep_fprintf_defined 1
 #if __has_builtin(__builtin_fprintf) && defined(__LIBC_BIND_CRTBUILTINS) && defined(__CRT_HAVE_fprintf) && __has_builtin(__builtin_va_arg_pack)
-/* >> fprintf(3), vfprintf(3)
- * Print data to `stream', following `format'
- * Return the number of successfully printed bytes */
 __CEIREDIRECT(__ATTR_LIBC_PRINTF(2, 3) __ATTR_NONNULL((1, 2)),__STDC_INT_AS_SSIZE_T,__THROWING,__localdep_fprintf,(__FILE *__restrict __stream, char const *__restrict __format, ...),fprintf,{ return __builtin_fprintf(__stream, __format, __builtin_va_arg_pack()); })
 #elif defined(__CRT_HAVE_fprintf_unlocked) && defined(__USE_STDIO_UNLOCKED)
-/* >> fprintf(3), vfprintf(3)
- * Print data to `stream', following `format'
- * Return the number of successfully printed bytes */
 __LIBC __ATTR_LIBC_PRINTF(2, 3) __ATTR_NONNULL((1, 2)) __STDC_INT_AS_SSIZE_T (__VLIBCCALL __localdep_fprintf)(__FILE *__restrict __stream, char const *__restrict __format, ...) __THROWS(...) __CASMNAME("fprintf_unlocked");
 #elif defined(__CRT_HAVE_fprintf)
-/* >> fprintf(3), vfprintf(3)
- * Print data to `stream', following `format'
- * Return the number of successfully printed bytes */
 __LIBC __ATTR_LIBC_PRINTF(2, 3) __ATTR_NONNULL((1, 2)) __STDC_INT_AS_SSIZE_T (__VLIBCCALL __localdep_fprintf)(__FILE *__restrict __stream, char const *__restrict __format, ...) __THROWS(...) __CASMNAME("fprintf");
 #elif defined(__CRT_HAVE__IO_fprintf)
-/* >> fprintf(3), vfprintf(3)
- * Print data to `stream', following `format'
- * Return the number of successfully printed bytes */
 __LIBC __ATTR_LIBC_PRINTF(2, 3) __ATTR_NONNULL((1, 2)) __STDC_INT_AS_SSIZE_T (__VLIBCCALL __localdep_fprintf)(__FILE *__restrict __stream, char const *__restrict __format, ...) __THROWS(...) __CASMNAME("_IO_fprintf");
 #elif defined(__CRT_HAVE_fprintf_s)
-/* >> fprintf(3), vfprintf(3)
- * Print data to `stream', following `format'
- * Return the number of successfully printed bytes */
 __LIBC __ATTR_LIBC_PRINTF(2, 3) __ATTR_NONNULL((1, 2)) __STDC_INT_AS_SSIZE_T (__VLIBCCALL __localdep_fprintf)(__FILE *__restrict __stream, char const *__restrict __format, ...) __THROWS(...) __CASMNAME("fprintf_s");
 #elif defined(__CRT_HAVE_fprintf_unlocked)
-/* >> fprintf(3), vfprintf(3)
- * Print data to `stream', following `format'
- * Return the number of successfully printed bytes */
 __LIBC __ATTR_LIBC_PRINTF(2, 3) __ATTR_NONNULL((1, 2)) __STDC_INT_AS_SSIZE_T (__VLIBCCALL __localdep_fprintf)(__FILE *__restrict __stream, char const *__restrict __format, ...) __THROWS(...) __CASMNAME("fprintf_unlocked");
 #elif defined(__CRT_HAVE_vfprintf) || defined(__CRT_HAVE_vfprintf_s) || defined(__CRT_HAVE__IO_vfprintf) || defined(__CRT_HAVE_vfprintf_unlocked) || defined(__CRT_HAVE_file_printer) || defined(__CRT_HAVE_file_printer_unlocked) || defined(__CRT_HAVE_fputc) || defined(__CRT_HAVE_putc) || defined(__CRT_HAVE__IO_putc) || defined(__CRT_HAVE_fputc_unlocked) || defined(__CRT_HAVE_putc_unlocked) || (defined(__CRT_DOS) && defined(__CRT_HAVE__flsbuf)) || defined(__CRT_HAVE_fwrite) || defined(__CRT_HAVE__IO_fwrite) || defined(__CRT_HAVE_fwrite_s) || defined(__CRT_HAVE_fwrite_unlocked) || defined(__CRT_HAVE__fwrite_nolock)
 __NAMESPACE_LOCAL_END
 #include <libc/local/stdio/fprintf.h>
 __NAMESPACE_LOCAL_BEGIN
-/* >> fprintf(3), vfprintf(3)
- * Print data to `stream', following `format'
- * Return the number of successfully printed bytes */
 #define __localdep_fprintf __LIBC_LOCAL_NAME(fprintf)
 #else /* ... */
 #undef __local___localdep_fprintf_defined
@@ -74,10 +52,6 @@ __NAMESPACE_LOCAL_BEGIN
 __NAMESPACE_LOCAL_END
 #include <bits/crt/inttypes.h>
 __NAMESPACE_LOCAL_BEGIN
-/* >> putpwent(3)
- * Write the given entry `ent' into the given `stream'
- * @return: 0 : Success
- * @return: -1: Error (s.a. `errno') */
 __LOCAL_LIBC(putpwent) __ATTR_NONNULL((1, 2)) int
 (__LIBCCALL __LIBC_LOCAL_NAME(putpwent))(struct passwd const *__restrict __ent, __FILE *__restrict __stream) __THROWS(...) {
 	__STDC_INT_AS_SSIZE_T __error;

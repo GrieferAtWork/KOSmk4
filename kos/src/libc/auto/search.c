@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x7585353a */
+/* HASH CRC-32:0xff231c34 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -88,7 +88,7 @@ __NAMESPACE_LOCAL_END
 /* >> hsearch(3)
  * Search for entry matching `item.key' in internal hash table.
  * If `action' is `FIND' return found entry or signal error by returning `NULL'.
- * If `action' is `ENTER' replace existing data (if any) with `item.data' */
+ * If  `action'  is  `ENTER' replace  existing  data (if  any)  with `item.data' */
 INTERN ATTR_SECTION(".text.crt.utility.search") ENTRY *
 NOTHROW_NCX(LIBCCALL libc_hsearch)(ENTRY item,
                                    ACTION action) {
@@ -377,7 +377,7 @@ __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(maybe_split_for_insert))(void **rootp
 }
 __NAMESPACE_LOCAL_END
 /* >> tsearch(3)
- * Search for an entry matching the given `key' in the tree
+ * Search for an  entry matching  the given `key'  in the  tree
  * pointed to by `*rootp' and insert a new element if not found */
 INTERN ATTR_SECTION(".text.crt.utility.search") NONNULL((3)) void *
 NOTHROW_NCX(LIBCCALL libc_tsearch)(void const *key,
@@ -437,7 +437,7 @@ NOTHROW_NCX(LIBCCALL libc_tsearch)(void const *key,
 }
 /* >> tfind(3)
  * Search for an entry matching the given `key' in the tree pointed
- * to by `*rootp'. If no matching entry is available return `NULL' */
+ * to  by `*rootp'. If no matching entry is available return `NULL' */
 INTERN ATTR_SECTION(".text.crt.utility.search") NONNULL((3)) void *
 NOTHROW_NCX(LIBCCALL libc_tfind)(void const *key,
                                  void *const *vrootp,
@@ -718,7 +718,7 @@ NOTHROW_NCX(LIBCCALL libc_lfind)(void const *key,
 }
 /* >> lsearch(3)
  * Perform linear search for `key' by comparing by `compar' function
- * in array [base, base+nmemb*size) and insert entry if not found */
+ * in array [base,  base+nmemb*size) and insert  entry if not  found */
 INTERN ATTR_SECTION(".text.crt.utility.search") NONNULL((2, 3, 5)) void *
 NOTHROW_NCX(LIBCCALL libc_lsearch)(void const *key,
                                    void *base,

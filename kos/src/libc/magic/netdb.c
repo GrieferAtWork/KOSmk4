@@ -285,7 +285,7 @@ struct gaicb {
 %
 %#ifdef __USE_MISC
 @@Print error indicated by `h_errno' variable on standard error.
-@@if non-`NULL', `str' is printed before the error string.
+@@if non-`NULL',  `str'  is  printed before  the  error  string.
 [[cp]]
 void herror(char const *str);
 
@@ -295,7 +295,7 @@ char const *hstrerror(int err_num);
 %#endif /* __USE_MISC */
 
 
-@@Open host data base files and mark them as staying
+@@Open host  data  base  files and  mark  them  as  staying
 @@open even after a later search if `stay_open' is non-zero
 [[cp]]
 void sethostent(int stay_open);
@@ -318,16 +318,16 @@ struct hostent *gethostbyname(char const *name);
 
 %#ifdef __USE_MISC
 @@Return entry from host data base for host with `name'. `af' must be
-@@set to the address type which is `AF_INET' for IPv4 or `AF_INET6'
+@@set to the address type which  is `AF_INET' for IPv4 or  `AF_INET6'
 @@for IPv6.
 @@This function is not part of POSIX and therefore no official
 @@cancellation point
 [[cp]]
 struct hostent *gethostbyname2(char const *name, int af);
 
-@@Reentrant versions of the functions above. The additional arguments
+@@Reentrant versions of  the functions above.  The additional  arguments
 @@specify a buffer of `buflen' starting at `buf'. The last argument is a
-@@pointer to a variable which gets the value which would be stored in
+@@pointer to a variable  which gets the value  which would be stored  in
 @@the global variable `herrno' by the non-reentrant functions.
 @@These functions are not part of POSIX and therefore no official cancellation point
 [[cp]]
@@ -359,7 +359,7 @@ int gethostbyname2_r(char const *__restrict name, int af,
 %#endif /* __USE_MISC */
 
 
-@@Open network data base files and mark them as staying
+@@Open  network data  base files  and mark  them as staying
 @@open even after a later search if `stay_open' is non-zero
 [[cp]]
 void setnetent(int stay_open);
@@ -382,10 +382,10 @@ struct netent *getnetbyname(char const *name);
 
 %
 %#ifdef __USE_MISC
-@@Reentrant versions of the functions above. The additional
+@@Reentrant   versions  of  the   functions  above.  The  additional
 @@arguments specify a buffer of `buflen' starting at `buf'. The last
-@@argument is a pointer to a variable which gets the value which
-@@would be stored in the global variable `herrno' by the
+@@argument  is a  pointer to a  variable which gets  the value which
+@@would  be  stored   in  the  global   variable  `herrno'  by   the
 @@non-reentrant functions.
 @@These functions are not part of POSIX and therefore no official
 @@cancellation point
@@ -434,8 +434,8 @@ struct servent *getservbyport(int port, char const *proto);
 
 %
 %#ifdef __USE_MISC
-@@Reentrant versions of the functions above. The additional
-@@arguments specify a buffer of `buflen' starting at `buf'.
+@@Reentrant  versions  of  the  functions  above.  The additional
+@@arguments specify  a  buffer  of `buflen'  starting  at  `buf'.
 @@These functions are not part of POSIX and therefore no official
 @@cancellation point
 [[cp]]
@@ -481,8 +481,8 @@ struct protoent *getprotobynumber(int proto);
 
 %
 %#ifdef __USE_MISC
-@@Reentrant versions of the functions above. The additional
-@@arguments specify a buffer of `buflen' starting at `buf'.
+@@Reentrant  versions  of  the  functions  above.  The additional
+@@arguments specify  a  buffer  of `buflen'  starting  at  `buf'.
 @@These functions are not part of POSIX and therefore no official
 @@cancellation point
 [[cp]]
@@ -502,21 +502,21 @@ int getprotobynumber_r(int proto,
                        char *__restrict buf, size_t buflen,
                        struct protoent **__restrict result);
 
-@@Establish network group `netgroup' for enumeration.
+@@Establish  network   group   `netgroup'   for   enumeration.
 @@This function is not part of POSIX and therefore no official
 @@cancellation point
 [[cp]]
 int setnetgrent(char const *netgroup);
 
-@@Free all space allocated by previous `setnetgrent' call.
+@@Free  all  space allocated  by previous  `setnetgrent' call.
 @@This function is not part of POSIX and therefore no official
 @@cancellation point
 [[cp_nokos]]
 void endnetgrent();
 
-@@Get next member of netgroup established by last `setnetgrent' call
+@@Get next member of netgroup established by last `setnetgrent'  call
 @@and return pointers to elements in `hostp', `userp', and `domainp'.
-@@This function is not part of POSIX and therefore no official
+@@This  function  is  not part  of  POSIX and  therefore  no official
 @@cancellation point
 [[cp]]
 int getnetgrent(char **__restrict hostp,
@@ -524,7 +524,7 @@ int getnetgrent(char **__restrict hostp,
                 char **__restrict domainp);
 
 @@Test whether `netgroup' contains the triple `(host, user, domain)'.
-@@This function is not part of POSIX and therefore no official
+@@This  function  is  not part  of  POSIX and  therefore  no official
 @@cancellation point
 [[cp]]
 int innetgr(char const *netgroup,
@@ -533,7 +533,7 @@ int innetgr(char const *netgroup,
             char const *domain);
 
 @@Reentrant version of `getnetgrent' where result is placed in `buf'.
-@@This function is not part of POSIX and therefore no official
+@@This  function  is  not part  of  POSIX and  therefore  no official
 @@cancellation point
 [[cp]]
 int getnetgrent_r(char **__restrict hostp,
@@ -546,10 +546,10 @@ int getnetgrent_r(char **__restrict hostp,
 %
 %#ifdef __USE_MISC
 @@Call `rshd' at port `rport' on remote machine `*ahost' to execute `cmd'.
-@@The local user is `locuser', on the remote machine the command is
-@@executed as `remuser'. In `*fd2p' the descriptor to the socket for the
-@@connection is returned. The caller must have the right to use a
-@@reserved port. When the function returns `*ahost' contains the
+@@The  local  user is  `locuser',  on the  remote  machine the  command is
+@@executed as `remuser'. In `*fd2p' the  descriptor to the socket for  the
+@@connection is  returned.  The  caller  must have  the  right  to  use  a
+@@reserved  port.  When  the   function  returns  `*ahost'  contains   the
 @@official host name.
 @@This function is not part of POSIX and therefore no official
 @@cancellation point
@@ -571,12 +571,12 @@ int rcmd_af(char **__restrict ahost, $uint16_t rport,
             char const *__restrict cmd,
             int *__restrict fd2p, sa_family_t af);
 
-@@Call `rexecd' at port `rport' on remote machine `*ahost' to execute
-@@`cmd'. The process runs at the remote machine using the ID of user
+@@Call  `rexecd' at port  `rport' on remote  machine `*ahost' to execute
+@@`cmd'. The process  runs at the  remote machine using  the ID of  user
 @@`name' whose cleartext password is `passwd'. In `*fd2p' the descriptor
-@@to the socket for the connection is returned. When the function
-@@returns `*ahost' contains the official host name.
-@@This function is not part of POSIX and therefore no official
+@@to  the  socket  for the  connection  is returned.  When  the function
+@@returns    `*ahost'     contains    the     official    host     name.
+@@This  function  is  not  part  of  POSIX  and  therefore  no  official
 @@cancellation point
 [[cp]]
 int rexec(char **__restrict ahost, int rport,
@@ -598,7 +598,7 @@ int rexec_af(char **__restrict ahost, int rport,
              $sa_family_t af);
 
 @@Check whether user `remuser' on system `rhost' is allowed to login
-@@as `locuser'. If `suser' is not zero the user tries to become
+@@as `locuser'. If  `suser' is  not zero  the user  tries to  become
 @@superuser. Return 0 if it is possible.
 @@This function is not part of POSIX and therefore no official
 @@cancellation point
@@ -617,9 +617,9 @@ int ruserok_af(char const *rhost, int suser,
                char const *locuser,
                sa_family_t af);
 
-@@Check whether user `remuser' on system indicated by IPv4 address
+@@Check whether user  `remuser' on system  indicated by IPv4  address
 @@`raddr' is allowed to login as `locuser'. Non-IPv4 (e.g., IPv6) are
-@@not supported. If `suser' is not zero the user tries to become
+@@not supported. If  `suser' is  not zero  the user  tries to  become
 @@superuser. Return 0 if it is possible.
 @@This function is not part of POSIX and therefore no official
 @@cancellation point
@@ -628,7 +628,7 @@ int iruserok(uint32_t raddr, int suser,
              char const *remuser,
              char const *locuser);
 
-@@This is the equivalent function where the pfamiliy if the address
+@@This is  the equivalent  function where  the pfamiliy  if the  address
 @@pointed to by `raddr' is determined by the value of `af'. It therefore
 @@can be used for IPv6
 @@This function is not part of POSIX and therefore no official
@@ -640,9 +640,9 @@ int iruserok_af(void const *raddr, int suser,
                 sa_family_t af);
 
 @@Try to allocate reserved port, returning a descriptor for a socket opened
-@@at this port or -1 if unsuccessful. The search for an available port
-@@will start at `alport' and continues with lower numbers.
-@@This function is not part of POSIX and therefore no official
+@@at this port  or -1  if unsuccessful. The  search for  an available  port
+@@will   start   at   `alport'   and   continues   with   lower    numbers.
+@@This   function  is  not   part  of  POSIX   and  therefore  no  official
 @@cancellation point
 [[cp, guard]]
 int rresvport(int *alport);
@@ -690,19 +690,19 @@ int getnameinfo(struct sockaddr const *__restrict sa, socklen_t salen,
 %
 
 @@Enqueue `ent' requests from the `list'. If `mode' is GAI_WAIT wait until all
-@@requests are handled. If `wait' is GAI_NOWAIT return immediately after
-@@queueing the requests and signal completion according to `sig'.
-@@This function is not part of POSIX and therefore no official
+@@requests  are  handled. If  `wait'  is GAI_NOWAIT  return  immediately after
+@@queueing  the   requests  and   signal   completion  according   to   `sig'.
+@@This   function   is  not   part  of   POSIX   and  therefore   no  official
 @@cancellation point
 [[cp, decl_include("<bits/os/sigevent.h>")]]
 int getaddrinfo_a(int mode,
                   struct gaicb *list[__restrict_arr], int ent,
                   struct sigevent *__restrict sig);
 
-@@Suspend execution of the thread until at least one of the `ent' requests
+@@Suspend execution of the thread until at least one of the `ent'  requests
 @@in `list' is handled. If `timeout' is not a null pointer it specifies the
-@@longest time the function keeps waiting before returning with an error.
-@@This function is not part of POSIX and therefore no official
+@@longest time the function keeps  waiting before returning with an  error.
+@@This   function  is  not   part  of  POSIX   and  therefore  no  official
 @@cancellation point
 [[cp, no_crt_self_import]]
 [[if(defined(__USE_TIME_BITS64)), preferred_alias("gai_suspend64")]]

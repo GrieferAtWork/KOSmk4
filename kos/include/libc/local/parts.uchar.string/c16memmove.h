@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x9e09d06b */
+/* HASH CRC-32:0xa8118419 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -23,61 +23,44 @@
 #include <__crt.h>
 #include <hybrid/typecore.h>
 __NAMESPACE_LOCAL_BEGIN
-/* Dependency: memmove from string */
 #ifndef __local___localdep_memmove_defined
 #define __local___localdep_memmove_defined 1
 #ifdef __CRT_HAVE_memmove
-/* >> memmove(3)
- * Move memory between potentially overlapping memory blocks.
- * @return: * : Always re-returns `dst' */
 __CREDIRECT(__ATTR_LEAF __ATTR_RETNONNULL __ATTR_NONNULL((1, 2)),void *,__NOTHROW_NCX,__localdep_memmove,(void *__dst, void const *__src, __SIZE_TYPE__ __n_bytes),memmove,(__dst,__src,__n_bytes))
 #else /* __CRT_HAVE_memmove */
 __NAMESPACE_LOCAL_END
 #include <libc/local/string/memmove.h>
 __NAMESPACE_LOCAL_BEGIN
-/* >> memmove(3)
- * Move memory between potentially overlapping memory blocks.
- * @return: * : Always re-returns `dst' */
 #define __localdep_memmove __LIBC_LOCAL_NAME(memmove)
 #endif /* !__CRT_HAVE_memmove */
 #endif /* !__local___localdep_memmove_defined */
-/* Dependency: memmovel from string */
 #ifndef __local___localdep_memmovel_defined
 #define __local___localdep_memmovel_defined 1
 #ifdef __CRT_HAVE_memmovel
-/* Move memory between potentially overlapping memory blocks. */
 __CREDIRECT(__ATTR_LEAF __ATTR_RETNONNULL __ATTR_NONNULL((1, 2)),__UINT32_TYPE__ *,__NOTHROW_NCX,__localdep_memmovel,(void *__dst, void const *__src, __SIZE_TYPE__ __n_dwords),memmovel,(__dst,__src,__n_dwords))
 #elif defined(__CRT_HAVE_wmemmove) && __SIZEOF_WCHAR_T__ == 4
-/* Move memory between potentially overlapping memory blocks. */
 __CREDIRECT(__ATTR_LEAF __ATTR_RETNONNULL __ATTR_NONNULL((1, 2)),__UINT32_TYPE__ *,__NOTHROW_NCX,__localdep_memmovel,(void *__dst, void const *__src, __SIZE_TYPE__ __n_dwords),wmemmove,(__dst,__src,__n_dwords))
 #elif defined(__CRT_HAVE_KOS$wmemmove) && defined(__LIBCCALL_IS_LIBKCALL)
-/* Move memory between potentially overlapping memory blocks. */
 __COMPILER_REDIRECT(__LIBC,__ATTR_LEAF __ATTR_RETNONNULL __ATTR_NONNULL((1, 2)),__UINT32_TYPE__ *,__NOTHROW_NCX,__LIBCCALL,__localdep_memmovel,(void *__dst, void const *__src, __SIZE_TYPE__ __n_dwords),KOS$wmemmove,(__dst,__src,__n_dwords))
 #else /* ... */
 __NAMESPACE_LOCAL_END
 #include <libc/local/string/memmovel.h>
 __NAMESPACE_LOCAL_BEGIN
-/* Move memory between potentially overlapping memory blocks. */
 #define __localdep_memmovel __LIBC_LOCAL_NAME(memmovel)
 #endif /* !... */
 #endif /* !__local___localdep_memmovel_defined */
-/* Dependency: memmovew from string */
 #ifndef __local___localdep_memmovew_defined
 #define __local___localdep_memmovew_defined 1
 #ifdef __CRT_HAVE_memmovew
-/* Move memory between potentially overlapping memory blocks. */
 __CREDIRECT(__ATTR_LEAF __ATTR_RETNONNULL __ATTR_NONNULL((1, 2)),__UINT16_TYPE__ *,__NOTHROW_NCX,__localdep_memmovew,(void *__dst, void const *__src, __SIZE_TYPE__ __n_words),memmovew,(__dst,__src,__n_words))
 #elif defined(__CRT_HAVE_wmemmove) && __SIZEOF_WCHAR_T__ == 2
-/* Move memory between potentially overlapping memory blocks. */
 __CREDIRECT(__ATTR_LEAF __ATTR_RETNONNULL __ATTR_NONNULL((1, 2)),__UINT16_TYPE__ *,__NOTHROW_NCX,__localdep_memmovew,(void *__dst, void const *__src, __SIZE_TYPE__ __n_words),wmemmove,(__dst,__src,__n_words))
 #elif defined(__CRT_HAVE_DOS$wmemmove) && defined(__LIBCCALL_IS_LIBDCALL)
-/* Move memory between potentially overlapping memory blocks. */
 __COMPILER_REDIRECT(__LIBC,__ATTR_LEAF __ATTR_RETNONNULL __ATTR_NONNULL((1, 2)),__UINT16_TYPE__ *,__NOTHROW_NCX,__LIBCCALL,__localdep_memmovew,(void *__dst, void const *__src, __SIZE_TYPE__ __n_words),DOS$wmemmove,(__dst,__src,__n_words))
 #else /* ... */
 __NAMESPACE_LOCAL_END
 #include <libc/local/string/memmovew.h>
 __NAMESPACE_LOCAL_BEGIN
-/* Move memory between potentially overlapping memory blocks. */
 #define __localdep_memmovew __LIBC_LOCAL_NAME(memmovew)
 #endif /* !... */
 #endif /* !__local___localdep_memmovew_defined */

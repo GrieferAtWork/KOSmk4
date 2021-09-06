@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xe57a8341 */
+/* HASH CRC-32:0xf7b5e9b6 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -23,7 +23,6 @@
 #include <__crt.h>
 #include <hybrid/typecore.h>
 __NAMESPACE_LOCAL_BEGIN
-/* Dependency: strxfrm from string */
 #ifndef __local___localdep_strxfrm_defined
 #define __local___localdep_strxfrm_defined 1
 #ifdef __CRT_HAVE_strxfrm

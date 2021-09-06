@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xc332a486 */
+/* HASH CRC-32:0x65bc420c */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -22,12 +22,6 @@
 #define __local_strcmpz_defined 1
 #include <__crt.h>
 __NAMESPACE_LOCAL_BEGIN
-/* >> strcmpz(3)
- * Similar to `strcmp(3)', but the given `rhs' string mustn't necessarily be NUL-terminated.
- * Instead, that string's length is fixed at `rhs_len', and the compare is equivalent to:
- * > char *dup = (char *)malloc((rhs_len + 1) * sizeof(char));
- * > *(char *)mempcpy(dup, rhs, rhs_len, sizeof(char)) = '\0';
- * > return strcmp(lhs, dup); */
 __LOCAL_LIBC(strcmpz) __ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1, 2)) int
 __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(strcmpz))(char const *__lhs, char const *__rhs, __SIZE_TYPE__ __rhs_len) {
 	char __c1, __c2;

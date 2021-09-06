@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x57da455b */
+/* HASH CRC-32:0xe081e708 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -34,7 +34,6 @@
 #endif /* !__USE_KOS_ALTERATIONS */
 #endif /* !__PIO_OFFSET */
 __NAMESPACE_LOCAL_BEGIN
-/* Dependency: crt_locking from fcntl */
 #ifndef __local___localdep_crt_locking_defined
 #define __local___localdep_crt_locking_defined 1
 #ifdef __CRT_HAVE_locking
@@ -45,7 +44,6 @@ __CREDIRECT(,int,__NOTHROW_RPC,__localdep_crt_locking,(__fd_t __fd, __STDC_INT_A
 #undef __local___localdep_crt_locking_defined
 #endif /* !... */
 #endif /* !__local___localdep_crt_locking_defined */
-/* Dependency: lockf32 from fcntl */
 #if !defined(__local___localdep_lockf32_defined) && defined(__CRT_HAVE_lockf)
 #define __local___localdep_lockf32_defined 1
 __CREDIRECT(,int,__NOTHROW_RPC,__localdep_lockf32,(__fd_t __fd, __STDC_INT_AS_UINT_T __cmd, __pos32_t __length),lockf,(__fd,__cmd,__length))

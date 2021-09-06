@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xcd7e3e95 */
+/* HASH CRC-32:0x6a9c9da */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -23,7 +23,6 @@
 #include <__crt.h>
 #if defined(__CRT_HAVE__aligned_free) || defined(__CRT_HAVE_free) || defined(__CRT_HAVE_cfree)
 __NAMESPACE_LOCAL_BEGIN
-/* Dependency: _aligned_free from stdlib */
 #ifndef __local___localdep__aligned_free_defined
 #define __local___localdep__aligned_free_defined 1
 #ifdef __CRT_HAVE__aligned_free

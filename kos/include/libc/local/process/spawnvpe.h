@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x6ff87556 */
+/* HASH CRC-32:0xd80a1354 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -39,7 +39,6 @@
 #endif /* !__USE_DOS_ALTERATIONS */
 #endif /* !__TARGV */
 __NAMESPACE_LOCAL_BEGIN
-/* Dependency: getenv from stdlib */
 #ifndef __local___localdep_getenv_defined
 #define __local___localdep_getenv_defined 1
 #ifdef __CRT_HAVE_getenv
@@ -53,7 +52,6 @@ __NAMESPACE_LOCAL_BEGIN
 #undef __local___localdep_getenv_defined
 #endif /* !... */
 #endif /* !__local___localdep_getenv_defined */
-/* Dependency: spawnve from process */
 #ifndef __local___localdep_spawnve_defined
 #define __local___localdep_spawnve_defined 1
 #ifdef __CRT_HAVE_spawnve
@@ -69,66 +67,45 @@ __NAMESPACE_LOCAL_BEGIN
 #undef __local___localdep_spawnve_defined
 #endif /* !... */
 #endif /* !__local___localdep_spawnve_defined */
-/* Dependency: strchr from string */
 #ifndef __local___localdep_strchr_defined
 #define __local___localdep_strchr_defined 1
 #if __has_builtin(__builtin_strchr) && defined(__LIBC_BIND_CRTBUILTINS) && defined(__CRT_HAVE_strchr)
-/* >> strchr(3)
- * Return the pointer of the first instance of `needle', or `NULL' if `needle' wasn't found. */
 __CEIREDIRECT(__ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1)),char *,__NOTHROW_NCX,__localdep_strchr,(char const *__restrict __haystack, int __needle),strchr,{ return __builtin_strchr(__haystack, __needle); })
 #elif __has_builtin(__builtin_index) && defined(__LIBC_BIND_CRTBUILTINS) && defined(__CRT_HAVE_index)
-/* >> strchr(3)
- * Return the pointer of the first instance of `needle', or `NULL' if `needle' wasn't found. */
 __CEIREDIRECT(__ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1)),char *,__NOTHROW_NCX,__localdep_strchr,(char const *__restrict __haystack, int __needle),index,{ return __builtin_index(__haystack, __needle); })
 #elif defined(__CRT_HAVE_strchr)
-/* >> strchr(3)
- * Return the pointer of the first instance of `needle', or `NULL' if `needle' wasn't found. */
 __CREDIRECT(__ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1)),char *,__NOTHROW_NCX,__localdep_strchr,(char const *__restrict __haystack, int __needle),strchr,(__haystack,__needle))
 #elif defined(__CRT_HAVE_index)
-/* >> strchr(3)
- * Return the pointer of the first instance of `needle', or `NULL' if `needle' wasn't found. */
 __CREDIRECT(__ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1)),char *,__NOTHROW_NCX,__localdep_strchr,(char const *__restrict __haystack, int __needle),index,(__haystack,__needle))
 #else /* ... */
 __NAMESPACE_LOCAL_END
 #include <libc/local/string/strchr.h>
 __NAMESPACE_LOCAL_BEGIN
-/* >> strchr(3)
- * Return the pointer of the first instance of `needle', or `NULL' if `needle' wasn't found. */
 #define __localdep_strchr __LIBC_LOCAL_NAME(strchr)
 #endif /* !... */
 #endif /* !__local___localdep_strchr_defined */
-/* Dependency: strchrnul from string */
 #ifndef __local___localdep_strchrnul_defined
 #define __local___localdep_strchrnul_defined 1
 #ifdef __CRT_HAVE_strchrnul
-/* >> strchrnul(3)
- * Same as `strchr', but return `strend(str)', rather than `NULL' if `needle' wasn't found. */
 __CREDIRECT(__ATTR_PURE __ATTR_RETNONNULL __ATTR_WUNUSED __ATTR_NONNULL((1)),char *,__NOTHROW_NCX,__localdep_strchrnul,(char const *__restrict __haystack, int __needle),strchrnul,(__haystack,__needle))
 #else /* __CRT_HAVE_strchrnul */
 __NAMESPACE_LOCAL_END
 #include <libc/local/string/strchrnul.h>
 __NAMESPACE_LOCAL_BEGIN
-/* >> strchrnul(3)
- * Same as `strchr', but return `strend(str)', rather than `NULL' if `needle' wasn't found. */
 #define __localdep_strchrnul __LIBC_LOCAL_NAME(strchrnul)
 #endif /* !__CRT_HAVE_strchrnul */
 #endif /* !__local___localdep_strchrnul_defined */
-/* Dependency: strlen from string */
 #ifndef __local___localdep_strlen_defined
 #define __local___localdep_strlen_defined 1
 #ifdef __CRT_HAVE_strlen
 __NAMESPACE_LOCAL_END
 #include <hybrid/typecore.h>
 __NAMESPACE_LOCAL_BEGIN
-/* >> strlen(3)
- * Return the length of the string in characters (Same as `rawmemlen[...](str, '\0')') */
 __CREDIRECT(__ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1)),__SIZE_TYPE__,__NOTHROW_NCX,__localdep_strlen,(char const *__restrict __str),strlen,(__str))
 #else /* __CRT_HAVE_strlen */
 __NAMESPACE_LOCAL_END
 #include <libc/local/string/strlen.h>
 __NAMESPACE_LOCAL_BEGIN
-/* >> strlen(3)
- * Return the length of the string in characters (Same as `rawmemlen[...](str, '\0')') */
 #define __localdep_strlen __LIBC_LOCAL_NAME(strlen)
 #endif /* !__CRT_HAVE_strlen */
 #endif /* !__local___localdep_strlen_defined */

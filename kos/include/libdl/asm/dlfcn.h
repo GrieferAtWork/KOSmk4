@@ -56,51 +56,51 @@ __DECL_BEGIN
                                   *       later time by calling `dlopen()' again without passing this flag.
                                   * WARNING: Initializers of newly loaded dependencies will not be executed either! */
 
-#define __CRT_HAVE_dlfopen 1
-#define __CRT_HAVE_dlexceptaware 1
-#define __CRT_HAVE_dlgethandle 1
-#define __CRT_HAVE_dlgetmodule 1
-#define __CRT_HAVE_dlmodulefd 1
-#define __CRT_HAVE_dlmodulename 1
-#define __CRT_HAVE_dlmodulebase 1
-#define __CRT_HAVE_dllocksection 1
-#define __CRT_HAVE_dlunlocksection 1
-#define __CRT_HAVE_dlsectionname 1
-#define __CRT_HAVE_dlsectionindex 1
-#define __CRT_HAVE_dlsectionmodule 1
-#define __CRT_HAVE_dlinflatesection 1
-#define __CRT_HAVE_dlclearcaches 1
-#define __CRT_HAVE_dltlsallocseg 1
-#define __CRT_HAVE_dltlsfreeseg 1
-#define __CRT_HAVE_dltlsalloc 1
-#define __CRT_HAVE_dltlsfree 1
-#define __CRT_HAVE_dltlsaddr 1
-#define __CRT_HAVE_dltlsaddr2 1
-#define __CRT_HAVE_dlauxctrl 1
+#define __CRT_HAVE_dlfopen
+#define __CRT_HAVE_dlexceptaware
+#define __CRT_HAVE_dlgethandle
+#define __CRT_HAVE_dlgetmodule
+#define __CRT_HAVE_dlmodulefd
+#define __CRT_HAVE_dlmodulename
+#define __CRT_HAVE_dlmodulebase
+#define __CRT_HAVE_dllocksection
+#define __CRT_HAVE_dlunlocksection
+#define __CRT_HAVE_dlsectionname
+#define __CRT_HAVE_dlsectionindex
+#define __CRT_HAVE_dlsectionmodule
+#define __CRT_HAVE_dlinflatesection
+#define __CRT_HAVE_dlclearcaches
+#define __CRT_HAVE_dltlsallocseg
+#define __CRT_HAVE_dltlsfreeseg
+#define __CRT_HAVE_dltlsalloc
+#define __CRT_HAVE_dltlsfree
+#define __CRT_HAVE_dltlsaddr
+#define __CRT_HAVE_dltlsaddr2
+#define __CRT_HAVE_dlauxctrl
 #if defined(__i386__) && !defined(__x86_64__)
 #define __DLFCN_DLTLSADDR_CC  __ATTR_FASTCALL
 #define __DLFCN_DLTLSADDR2_CC __ATTR_FASTCALL
 #endif /* __i386__ && !__x86_64__ */
 
 #else /* __KOS_VERSION__ >= 400 */
-#define __CRT_HAVE_fdlopen 1 /* WARNING: In KOS v300, `fdlopen()' didn't inherit the given `FD' on success! */
+#define __CRT_HAVE_fdlopen /* WARNING: In KOS v300, `fdlopen()' didn't inherit the given `FD' on success! */
 #endif /* __KOS_VERSION__ < 400 */
 #endif /* __KOS__ || __CRT_KOS || (__KOS__ && __BUILDING_LIBDL) */
 
 /* Stuff from GLibc that also exist under KOS */
-#define __CRT_HAVE_dladdr 1
-#define __CRT_HAVE_dl_iterate_phdr 1
+#define __CRT_HAVE_dladdr
+#define __CRT_HAVE_dl_iterate_phdr
 
 /* Stuff from GLibc that doesn't exist under KOS (for now...) */
 #if !defined(__KOS__) && !defined(__CRT_KOS)
 #define __Lmid_t      __LONGPTR_TYPE__
 #define __LM_ID_BASE  0    /* Initial namespace. */
 #define __LM_ID_NEWLM (-1) /* For dlmopen: request new namespace. */
-#define __CRT_HAVE_dlmopen                  1
-#define __CRT_HAVE_dlvsym                   1
-#define __CRT_HAVE_dladdr1                  1
-#define __CRT_HAVE_dlinfo                   1
-#define __CRT_HAVE__dl_mcount_wrapper_check 1
+#define __CRT_HAVE_dlmopen
+#define __CRT_HAVE_dlvsym
+#define __CRT_HAVE_dladdr1
+#define __CRT_HAVE_dlinfo
+#define __CRT_HAVE__dl_mcount_wrapper_check
 #endif /* !__KOS__ && !__CRT_KOS */
 
 
@@ -124,7 +124,8 @@ __DECL_BEGIN
 #endif /* __CRT_HAVE_dladdr1 */
 
 #elif defined(__CRT_CYG)
-#define __RTLD_NEXT    (__CCAST(void *)-1)
+#define __CRT_HAVE_dladdr
+#define __RTLD_NEXT         (__CCAST(void *)-1)
 #define __RTLD_LAZY         0x00001 /* Lazy function call binding. */
 #define __RTLD_NOW          0x00002 /* Immediate function call binding. */
 #define __RTLD_BINDING_MASK 0x00003 /* Mask of binding time value. */
@@ -135,55 +136,50 @@ __DECL_BEGIN
                                      * the  symbols of the loaded object and its dependencies are made
                                      * visible as if the object were linked directly into the program. */
 #define __RTLD_LOCAL        0x00000 /* Unix98 demands the following flag which is the inverse to RTLD_GLOBAL. */
-#define __CRT_HAVE_dladdr 1
 #elif defined(__NetBSD__)
-#define __CRT_HAVE_dlopen            1
-#define __CRT_HAVE_dlclose           1
-#define __CRT_HAVE_dlsym             1
-#define __CRT_HAVE_dladdr            1
-#define __CRT_HAVE_dlctl             1
-#define __CRT_HAVE_dlinfo            1
-#define __CRT_HAVE_dlvsym            1
-#define __CRT_HAVE_dlerror           1
-#define __CRT_HAVE__dlauxinfo        1
-#define __CRT_HAVE___dl_cxa_refcount 1
-#define __RTLD_DI_LINKMAP            3
-#define __RTLD_LAZY                  1
-#define __RTLD_NOW                   2
-#define __RTLD_GLOBAL                0x0100
-#define __RTLD_LOCAL                 0x0200
-#define __RTLD_NODELETE              0x1000
-#define __RTLD_NOLOAD                0x2000
-#define __RTLD_NEXT                  (__CCAST(void *)-1)
-#define __RTLD_DEFAULT               (__CCAST(void *)-2)
-#define __RTLD_SELF                  (__CCAST(void *)-3)
-#define __DL_GETERRNO                1
-#define __DL_GETSYMBOL               2
+#define __CRT_HAVE_dladdr
+#define __CRT_HAVE_dlctl
+#define __CRT_HAVE_dlinfo
+#define __CRT_HAVE_dlvsym
+#define __CRT_HAVE__dlauxinfo
+#define __CRT_HAVE___dl_cxa_refcount
+#define __RTLD_DI_LINKMAP 3
+#define __RTLD_LAZY       1
+#define __RTLD_NOW        2
+#define __RTLD_GLOBAL     0x0100
+#define __RTLD_LOCAL      0x0200
+#define __RTLD_NODELETE   0x1000
+#define __RTLD_NOLOAD     0x2000
+#define __RTLD_NEXT       (__CCAST(void *)-1)
+#define __RTLD_DEFAULT    (__CCAST(void *)-2)
+#define __RTLD_SELF       (__CCAST(void *)-3)
+#define __DL_GETERRNO     1
+#define __DL_GETSYMBOL    2
 #endif /* ... */
 
 
 
 /* These functions exist by default, unless explicitly defined as not existing! */
 #ifndef __CRT_HAVE_dlopen
-#define __CRT_HAVE_dlopen 1
+#define __CRT_HAVE_dlopen
 #elif (__CRT_HAVE_dlopen + 0) == 0
 #undef __CRT_HAVE_dlopen
 #endif /* !__CRT_HAVE_dlopen */
 
 #ifndef __CRT_HAVE_dlclose
-#define __CRT_HAVE_dlclose 1
+#define __CRT_HAVE_dlclose
 #elif (__CRT_HAVE_dlclose + 0) == 0
 #undef __CRT_HAVE_dlclose
 #endif /* !__CRT_HAVE_dlclose */
 
 #ifndef __CRT_HAVE_dlsym
-#define __CRT_HAVE_dlsym 1
+#define __CRT_HAVE_dlsym
 #elif (__CRT_HAVE_dlsym + 0) == 0
 #undef __CRT_HAVE_dlsym
 #endif /* !__CRT_HAVE_dlsym */
 
 #ifndef __CRT_HAVE_dlerror
-#define __CRT_HAVE_dlerror 1
+#define __CRT_HAVE_dlerror
 #elif (__CRT_HAVE_dlerror + 0) == 0
 #undef __CRT_HAVE_dlerror
 #endif /* !__CRT_HAVE_dlerror */

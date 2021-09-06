@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x972db20e */
+/* HASH CRC-32:0x56ae65f4 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -138,12 +138,12 @@ INTDEF NONNULL((1)) void NOTHROW_NCX(LIBCCALL libc_cfmakeraw)(struct termios *__
 #if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
 /* >> cfmakesane(3)
  * Set ~sane~ mode for the given `termios_p' (out-only; meaning that `termios_p' gets initialized by this function)
- * Sane here refers to setting all values to their defaults, as they are defined in <sys/ttydefaults.h> */
+ * Sane here  refers  to  setting  all values  to  their  defaults,  as they  are  defined  in  <sys/ttydefaults.h> */
 INTDEF NONNULL((1)) void NOTHROW_NCX(LIBDCALL libd_cfmakesane)(struct termios *__restrict termios_p);
 #endif /* !__LIBCCALL_IS_LIBDCALL && !__KERNEL__ */
 /* >> cfmakesane(3)
  * Set ~sane~ mode for the given `termios_p' (out-only; meaning that `termios_p' gets initialized by this function)
- * Sane here refers to setting all values to their defaults, as they are defined in <sys/ttydefaults.h> */
+ * Sane here  refers  to  setting  all values  to  their  defaults,  as they  are  defined  in  <sys/ttydefaults.h> */
 INTDEF NONNULL((1)) void NOTHROW_NCX(LIBCCALL libc_cfmakesane)(struct termios *__restrict termios_p);
 
 DECL_END

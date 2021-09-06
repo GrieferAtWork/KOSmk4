@@ -89,9 +89,9 @@ $uint32_t inet_lnaof(struct in_addr inaddr) {
 }
 
 @@>> inet_makeaddr(3)
-@@Construct an Internet-host-address in network byte order from
+@@Construct  an  Internet-host-address in  network byte  order from
 @@the combination of its network (`net'), and host (`host') number.
-@@The `net' and `host' arguments can later be re-extracted by use
+@@The `net' and `host' arguments  can later be re-extracted by  use
 @@of `inet_netof(3)' and `inet_lnaof(3)'
 [[wunused, ATTR_CONST]]
 [[decl_include("<hybrid/typecore.h>", "<netinet/bits/in.h>")]]
@@ -113,17 +113,17 @@ struct in_addr inet_makeaddr($uint32_t net, $uint32_t host) {
 }
 
 @@>> inet_addr(3)
-@@Convert an Internet host address `CP' from its numbers-and-dots
+@@Convert an  Internet host  address  `CP' from  its  numbers-and-dots
 @@notational form into its binary representation in network byte order
 @@Accepted notations are:
-@@    a.b.c.d  (1.2.3.4)
+@@    a.b.c.d (1.2.3.4)
 @@    a.b.cd   (1.2.52)
-@@    a.bcd    (1.564)
-@@    abcd     (4660)
+@@    a.bcd     (1.564)
+@@    abcd (4660)
 @@With each number allowed to be written in as one of:
 @@    123      (decimal)
-@@    0x123    (hex)
-@@    0123     (oct)
+@@    0x123 (hex)
+@@    0123  (oct)
 [[ATTR_PURE, impl_include("<netinet/in.h>"), decl_include("<net/bits/types.h>")]]
 in_addr_t inet_addr([[nonnull]] char const *__restrict cp) {
 	struct @in_addr@ addr;
@@ -133,9 +133,9 @@ in_addr_t inet_addr([[nonnull]] char const *__restrict cp) {
 }
 
 @@>> inet_ntoa(3)
-@@Return the conventional numbers-and-dots representation of a
-@@given Internet host address `inaddr'. The returned pointer is
-@@apart of a static buffer and may change in subsequence (or parallel)
+@@Return   the   conventional  numbers-and-dots   representation   of  a
+@@given  Internet  host  address  `inaddr'.  The  returned  pointer   is
+@@apart of a static buffer and  may change in subsequence (or  parallel)
 @@calls. For a re-entrant version of this function, see `inet_ntoa_r(3)'
 [[wunused, nonnull]]
 char *inet_ntoa(struct in_addr inaddr) {
@@ -163,7 +163,7 @@ char *inet_ntoa_r(struct in_addr inaddr, [[nonnull]] char buf[16]) {
 %#endif /* __USE_KOS */
 
 @@>> inet_network(3)
-@@This function is the same as `inet_addr()', except that
+@@This function is  the same as  `inet_addr()', except  that
 @@the return value is in host-endian, rather than net-endian
 [[decl_include("<hybrid/typecore.h>")]]
 [[ATTR_PURE, impl_include("<netinet/in.h>", "<hybrid/__byteswap.h>")]]
@@ -180,17 +180,17 @@ $uint32_t inet_network([[nonnull]] char const *__restrict cp) {
 
 @@>> inet_aton(3)
 @@Convert an Internet host address `CP' from its numbers-and-dots
-@@notational form into its binary representation in network byte
+@@notational form into its binary representation in network  byte
 @@order. The result is then stored in `*INP'
 @@Accepted notations are:
-@@    a.b.c.d  (1.2.3.4)
+@@    a.b.c.d (1.2.3.4)
 @@    a.b.cd   (1.2.52)
-@@    a.bcd    (1.564)
-@@    abcd     (4660)
+@@    a.bcd     (1.564)
+@@    abcd (4660)
 @@With each number allowed to be written in as one of:
 @@    123      (decimal)
-@@    0x123    (hex)
-@@    0123     (oct)
+@@    0x123 (hex)
+@@    0123  (oct)
 @@@return: 0: Bad input format
 @@@return: 1: Success
 [[decl_include("<netinet/bits/in.h>")]]
@@ -203,14 +203,14 @@ int inet_aton([[nonnull]] char const *__restrict cp,
 @@>> inet_paton(3)
 @@Same as `inet_aton()', but update `*pcp' to point past the address
 @@Accepted notations are:
-@@    a.b.c.d  (1.2.3.4)
+@@    a.b.c.d (1.2.3.4)
 @@    a.b.cd   (1.2.52)
-@@    a.bcd    (1.564)
-@@    abcd     (4660)
+@@    a.bcd     (1.564)
+@@    abcd (4660)
 @@With each number allowed to be written in as one of:
 @@    123      (decimal)
-@@    0x123    (hex)
-@@    0123     (oct)
+@@    0x123 (hex)
+@@    0123  (oct)
 @@@param: network_addr: When non-zero, `*pcp' is a network address
 @@@return: 0: Bad input format
 @@@return: 1: Success

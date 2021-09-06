@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x6e302e3c */
+/* HASH CRC-32:0x196ad0c3 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -31,9 +31,9 @@ DECL_BEGIN
 
 #if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
 /* >> ioctl(2)
- * Perform the I/O control operation specified by `request' on `fd'.
- * Many I/O control operations except an additional argument, though
- * this argument's type and meaning depends on `REQUEST'. If used, it's
+ * Perform the  I/O control  operation specified  by `request'  on  `fd'.
+ * Many I/O  control operations  except  an additional  argument,  though
+ * this argument's type and meaning  depends on `REQUEST'. If used,  it's
  * usually either a pointer to a larger argument structure, or an integer
  * that fits into a single register.
  * @return: * : The return value depends on the given `request'.

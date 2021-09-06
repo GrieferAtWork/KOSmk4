@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x87ebd5a5 */
+/* HASH CRC-32:0x75dc4984 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -24,7 +24,6 @@
 #if defined(__CRT_HAVE_adjtimex64) || defined(__CRT_HAVE___adjtimex64) || defined(__CRT_HAVE_adjtimex) || defined(__CRT_HAVE___adjtimex)
 #include <bits/os/timex.h>
 __NAMESPACE_LOCAL_BEGIN
-/* Dependency: adjtimex32 from sys.timex */
 #ifndef __local___localdep_adjtimex32_defined
 #define __local___localdep_adjtimex32_defined 1
 #ifdef __CRT_HAVE_adjtimex
@@ -35,7 +34,6 @@ __CREDIRECT(__ATTR_NONNULL((1)),int,__NOTHROW_NCX,__localdep_adjtimex32,(struct 
 #undef __local___localdep_adjtimex32_defined
 #endif /* !... */
 #endif /* !__local___localdep_adjtimex32_defined */
-/* Dependency: adjtimex64 from sys.timex */
 #ifndef __local___localdep_adjtimex64_defined
 #define __local___localdep_adjtimex64_defined 1
 #ifdef __CRT_HAVE_adjtimex64

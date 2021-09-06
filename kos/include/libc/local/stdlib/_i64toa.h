@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xb5a78476 */
+/* HASH CRC-32:0x4f5edf9b */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -22,7 +22,6 @@
 #define __local__i64toa_defined 1
 #include <__crt.h>
 __NAMESPACE_LOCAL_BEGIN
-/* Dependency: _i64toa_s from stdlib */
 #ifndef __local___localdep__i64toa_s_defined
 #define __local___localdep__i64toa_s_defined 1
 #ifdef __CRT_HAVE__i64toa_s

@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x9a53c695 */
+/* HASH CRC-32:0x770a2d87 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -24,20 +24,6 @@
 #include <netinet/bits/in.h>
 #include <hybrid/__byteswap.h>
 __NAMESPACE_LOCAL_BEGIN
-/* >> inet_paton(3)
- * Same as `inet_aton()', but update `*pcp' to point past the address
- * Accepted notations are:
- *     a.b.c.d  (1.2.3.4)
- *     a.b.cd   (1.2.52)
- *     a.bcd    (1.564)
- *     abcd     (4660)
- * With each number allowed to be written in as one of:
- *     123      (decimal)
- *     0x123    (hex)
- *     0123     (oct)
- * @param: network_addr: When non-zero, `*pcp' is a network address
- * @return: 0: Bad input format
- * @return: 1: Success */
 __LOCAL_LIBC(inet_paton) __ATTR_WUNUSED __ATTR_NONNULL((1, 2)) int
 __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(inet_paton))(char const **__restrict __pcp, struct in_addr *__restrict __inp, int __network_addr) {
 	__UINT32_TYPE__ __result;

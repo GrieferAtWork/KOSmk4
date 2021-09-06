@@ -73,7 +73,7 @@ class ExceptClass: WeakRefAble {
 	@@Exception message
 	public member message: string = "";
 
-	@@Default exception code (either `ERROR_CLASS()`
+	@@Default exception  code (either  `ERROR_CLASS()`
 	@@when @baseClass is @none, or `ERROR_SUBCLASS()`)
 	public member code: int;
 
@@ -150,7 +150,7 @@ class ExceptClass: WeakRefAble {
 	}
 
 	@@The name for the containing exception data struct
-	@@e.g. E_BADALLOC uses `exception_badalloc_data`
+	@@e.g.  E_BADALLOC  uses  `exception_badalloc_data`
 	public member _exceptionDataStructName: string;
 	public property exceptionDataStructName: string = {
 		get(): string {
@@ -188,7 +188,7 @@ yes:
 
 
 	@@Return the short exception info member name of @this @ExceptClass
-	@@e.g. E_BADALLOC_INSUFFICIENT_HEAP_MEMORY.getClassMemberName()
+	@@e.g.     E_BADALLOC_INSUFFICIENT_HEAP_MEMORY.getClassMemberName()
 	@@     returns: "insufficient_heap_memory"
 	public function getClassMemberShortName(): string {
 		if (baseClass is none)
@@ -204,7 +204,7 @@ yes:
 			.lstrip("_").lower();
 	}
 
-	@@Return the exception info member name of @this @ExceptClass
+	@@Return the exception info  member name of @this  @ExceptClass
 	@@e.g. E_BADALLOC_INSUFFICIENT_HEAP_MEMORY.getClassMemberName()
 	@@     returns: "ba_insufficient_heap_memory"
 	public function getClassMemberName(): string {
@@ -226,7 +226,7 @@ yes:
 	}
 
 
-	@@Find a field and exception-pointer-index, given its raw @name
+	@@Find  a  field  and  exception-pointer-index,  given  its  raw  @name
 	@@e.g. E_BADALLOC_INSUFFICIENT_HEAP_MEMORY.findFieldByName("num_bytes")
 	@@     returns: ("e_badalloc.ba_insufficient_heap_memory.ihm_num_bytes", 0)
 	public function findFieldByName(name: string): (string, int) {
@@ -249,7 +249,7 @@ yes:
 			.format({ this, name }));
 	}
 
-	@@Print the errno expression. The given @cbField is called
+	@@Print  the  errno  expression.   The  given  @cbField  is   called
 	@@to print $fieldName references, where the argument is @"fieldName"
 	public function printErrnoExpr(
 			fp: File, cbField: Callable with string = none)
@@ -495,8 +495,8 @@ function decodeMultiPartCString(s: string): string {
 global _cachedExceptionClasses = Dict();
 
 
-@@Parse all exception classes described by `fp' and
-@@return them as a mapping for name->ppCond->ExceptClass
+@@Parse  all  exception  classes  described  by  `fp'  and
+@@return them as  a mapping for  name->ppCond->ExceptClass
 @@e.g. parseExceptionClasses("include/kos/except/codes.h")
 function parseExceptionClasses(
 		fp: File | string = none, filename: string = none)
@@ -857,7 +857,7 @@ again_parse_tag_directive:
 
 
 @@Print all exception data structures, as well as the
-@@combinatory `union exception_data_pointers'
+@@combinatory         `union exception_data_pointers'
 @@@param: keyStructName: A key function which may be used to skew struct names
 function printExceptionDataStructs(
 		fp: File = none,

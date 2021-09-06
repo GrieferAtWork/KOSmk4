@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x66dfd09e */
+/* HASH CRC-32:0xa2140811 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -28,7 +28,6 @@ typedef int (__LIBCCALL *__compar_fn_t)(void const *__a, void const *__b);
 #include <kos/anno.h>
 #include <hybrid/typecore.h>
 __NAMESPACE_LOCAL_BEGIN
-/* Dependency: qsort_r from stdlib */
 #ifndef __local___localdep_qsort_r_defined
 #define __local___localdep_qsort_r_defined 1
 #ifdef __CRT_HAVE_qsort_r

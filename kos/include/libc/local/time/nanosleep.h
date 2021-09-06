@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xa3705869 */
+/* HASH CRC-32:0xca1f041e */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -24,51 +24,37 @@
 #if defined(__CRT_HAVE_nanosleep64) || defined(__CRT_HAVE_nanosleep) || defined(__CRT_HAVE___nanosleep)
 #include <bits/os/timespec.h>
 __NAMESPACE_LOCAL_BEGIN
-/* Dependency: nanosleep32 from time */
 #ifndef __local___localdep_nanosleep32_defined
 #define __local___localdep_nanosleep32_defined 1
 #ifdef __CRT_HAVE_nanosleep
-/* >> nanosleep(2), nanosleep64(2)
- * Pause execution for a number of nanoseconds */
 __CREDIRECT(__ATTR_NONNULL((1)),int,__NOTHROW_RPC,__localdep_nanosleep32,(struct timespec const *__requested_time, struct __timespec32 *__remaining),nanosleep,(__requested_time,__remaining))
 #elif defined(__CRT_HAVE___nanosleep)
-/* >> nanosleep(2), nanosleep64(2)
- * Pause execution for a number of nanoseconds */
 __CREDIRECT(__ATTR_NONNULL((1)),int,__NOTHROW_RPC,__localdep_nanosleep32,(struct timespec const *__requested_time, struct __timespec32 *__remaining),__nanosleep,(__requested_time,__remaining))
 #else /* ... */
 #undef __local___localdep_nanosleep32_defined
 #endif /* !... */
 #endif /* !__local___localdep_nanosleep32_defined */
-/* Dependency: nanosleep64 from time */
 #ifndef __local___localdep_nanosleep64_defined
 #define __local___localdep_nanosleep64_defined 1
 #ifdef __CRT_HAVE_nanosleep64
 __NAMESPACE_LOCAL_END
 #include <bits/types.h>
 __NAMESPACE_LOCAL_BEGIN
-/* >> nanosleep(2), nanosleep64(2)
- * Pause execution for a number of nanoseconds */
 __CREDIRECT(__ATTR_NONNULL((1)),int,__NOTHROW_RPC,__localdep_nanosleep64,(struct __timespec64 const *__restrict __requested_time, struct __timespec64 *__remaining),nanosleep64,(__requested_time,__remaining))
 #elif defined(__CRT_HAVE_nanosleep) && __SIZEOF_TIME32_T__ == __SIZEOF_TIME64_T__
 __NAMESPACE_LOCAL_END
 #include <bits/types.h>
 __NAMESPACE_LOCAL_BEGIN
-/* >> nanosleep(2), nanosleep64(2)
- * Pause execution for a number of nanoseconds */
 __CREDIRECT(__ATTR_NONNULL((1)),int,__NOTHROW_RPC,__localdep_nanosleep64,(struct __timespec64 const *__restrict __requested_time, struct __timespec64 *__remaining),nanosleep,(__requested_time,__remaining))
 #elif defined(__CRT_HAVE_nanosleep) || defined(__CRT_HAVE___nanosleep)
 __NAMESPACE_LOCAL_END
 #include <libc/local/time/nanosleep64.h>
 __NAMESPACE_LOCAL_BEGIN
-/* >> nanosleep(2), nanosleep64(2)
- * Pause execution for a number of nanoseconds */
 #define __localdep_nanosleep64 __LIBC_LOCAL_NAME(nanosleep64)
 #else /* ... */
 #undef __local___localdep_nanosleep64_defined
 #endif /* !... */
 #endif /* !__local___localdep_nanosleep64_defined */
-/* >> nanosleep(2), nanosleep64(2)
- * Pause execution for a number of nanoseconds */
 __LOCAL_LIBC(nanosleep) __ATTR_NONNULL((1)) int
 __NOTHROW_RPC(__LIBCCALL __LIBC_LOCAL_NAME(nanosleep))(struct timespec const *__requested_time, struct timespec *__remaining) {
 #if defined(__CRT_HAVE_nanosleep) || defined(__CRT_HAVE___nanosleep)

@@ -98,9 +98,9 @@ fallback:
 
 
 
-/*[[[head:libc_getauxval,hash:CRC-32=0xec2c9a1a]]]*/
+/*[[[head:libc_getauxval,hash:CRC-32=0x5db66f12]]]*/
 /* >> getauxval(3)
- * Return the value associated with a named `type' from the
+ * Return the value associated with  a named `type' from  the
  * auxiliary information vector passed to the calling program
  * by the kernel.
  * @param: type: One of `AT_*' from <elf.h> */

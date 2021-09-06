@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xe69224bb */
+/* HASH CRC-32:0xfb59b96a */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -47,7 +47,7 @@ INTDEF NONNULL((1, 2, 3)) struct mntent *NOTHROW_RPC(LIBCCALL libc_getmntent_r)(
 #endif /* !__KERNEL__ */
 #if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
 /* >> addmntent(3)
- * Append a line `"%s %s %s %s %d %d\n" % (mnt_fsname, mnt_dir,
+ * Append a  line  `"%s %s %s %s %d %d\n"  %  (mnt_fsname,  mnt_dir,
  * mnt_type, mnt_opts, mnt_freq, mnt_passno)' to the end of `stream'
  * @return: 0: Success
  * @return: 1: Error (WARNING: `errno' is left undefined) */
@@ -55,7 +55,7 @@ INTDEF NONNULL((1, 2)) int (LIBDCALL libd_addmntent)(FILE *__restrict stream, st
 #endif /* !__LIBCCALL_IS_LIBDCALL && !__KERNEL__ */
 #ifndef __KERNEL__
 /* >> addmntent(3)
- * Append a line `"%s %s %s %s %d %d\n" % (mnt_fsname, mnt_dir,
+ * Append a  line  `"%s %s %s %s %d %d\n"  %  (mnt_fsname,  mnt_dir,
  * mnt_type, mnt_opts, mnt_freq, mnt_passno)' to the end of `stream'
  * @return: 0: Success
  * @return: 1: Error (WARNING: `errno' is left undefined) */

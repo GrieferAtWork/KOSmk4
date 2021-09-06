@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x64635983 */
+/* HASH CRC-32:0x3f922074 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -131,13 +131,13 @@ INTDEF NONNULL((1, 2, 3, 5)) errno_t NOTHROW_RPC(LIBCCALL libc_fgetpwfiltered_r)
 #endif /* !__KERNEL__ */
 #if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
 /* Re-construct the password-file line for the given uid in the
- * given buffer. This knows the format that the caller will
+ * given  buffer. This  knows the  format that  the caller will
  * expect, but this need not be the format of the password file */
 INTDEF int NOTHROW_RPC(LIBDCALL libd_getpw)(uid_t uid, char *buffer);
 #endif /* !__LIBCCALL_IS_LIBDCALL && !__KERNEL__ */
 #ifndef __KERNEL__
 /* Re-construct the password-file line for the given uid in the
- * given buffer. This knows the format that the caller will
+ * given  buffer. This  knows the  format that  the caller will
  * expect, but this need not be the format of the password file */
 INTDEF int NOTHROW_RPC(LIBCCALL libc_getpw)(uid_t uid, char *buffer);
 #endif /* !__KERNEL__ */

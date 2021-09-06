@@ -927,7 +927,7 @@ for (local field, add, flags: ops) {
 %#if defined(__USE_KOS) || defined(__USE_BSD)
 @@>> cfmakesane(3)
 @@Set ~sane~ mode for the given `termios_p' (out-only; meaning that `termios_p' gets initialized by this function)
-@@Sane here refers to setting all values to their defaults, as they are defined in <sys/ttydefaults.h>
+@@Sane here  refers  to  setting  all values  to  their  defaults,  as they  are  defined  in  <sys/ttydefaults.h>
 [[kernel, impl_include("<bits/posix_opt.h>")]]
 [[impl_include("<asm/os/termios.h>"), decl_include("<bits/os/termios.h>")]]
 void cfmakesane([[nonnull]] struct termios *__restrict termios_p) {

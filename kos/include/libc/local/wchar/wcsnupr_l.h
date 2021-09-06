@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x57aa4ccd */
+/* HASH CRC-32:0xfff0b53d */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -23,7 +23,6 @@
 #include <__crt.h>
 #include <hybrid/typecore.h>
 __NAMESPACE_LOCAL_BEGIN
-/* Dependency: towupper_l from wctype */
 #ifndef __local___localdep_towupper_l_defined
 #define __local___localdep_towupper_l_defined 1
 #ifdef __CRT_HAVE_towupper_l

@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xe756b570 */
+/* HASH CRC-32:0xf43eb546 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -49,9 +49,9 @@ DECL_BEGIN
 #include <hybrid/__alloca.h>
 #include <libc/string.h>
 /* >> format_repeat(3)
- * Repeat `ch' a number of `num_repetitions' times
+ * Repeat  `ch'  a   number  of  `num_repetitions'   times
  * The usual format-printer rules apply, and this function
- * is allowed to call `printer' as often as it chooses */
+ * is  allowed to  call `printer'  as often  as it chooses */
 INTERN ATTR_SECTION(".text.crt.dos.wchar.string.format") NONNULL((1)) ssize_t
 (LIBDCALL libd_format_wrepeat)(pc16formatprinter printer,
                                void *arg,
@@ -101,9 +101,9 @@ err:
 #include <hybrid/__alloca.h>
 #include <libc/string.h>
 /* >> format_repeat(3)
- * Repeat `ch' a number of `num_repetitions' times
+ * Repeat  `ch'  a   number  of  `num_repetitions'   times
  * The usual format-printer rules apply, and this function
- * is allowed to call `printer' as often as it chooses */
+ * is  allowed to  call `printer'  as often  as it chooses */
 INTERN ATTR_SECTION(".text.crt.wchar.string.format") NONNULL((1)) ssize_t
 (LIBKCALL libc_format_wrepeat)(pc32formatprinter printer,
                                void *arg,
@@ -156,11 +156,11 @@ err:
  * >> Hello "World" W
  * >> hat a great day.
  * Output #1: >> \"Hello \"World\" W\nhat a great day.\"
- * Output #2: >> Hello \"World\" W\nhat a great day
+ * Output #2:  >> Hello  \"World\"  W\nhat a  great  day
  * NOTE: Output #2 is generated if the `FORMAT_ESCAPE_FPRINTRAW' is set
- * This function escapes all control and non-ascii characters,
- * preferring octal encoding for control characters and hex-encoding
- * for other non-ascii characters, a behavior that may be modified
+ * This   function  escapes  all   control  and  non-ascii  characters,
+ * preferring octal encoding  for control  characters and  hex-encoding
+ * for other  non-ascii characters,  a behavior  that may  be  modified
  * with the `FORMAT_ESCAPE_FFORCE*' flags
  * @param: printer: A function called for all quoted portions of the text
  * @param: textlen: The total number of bytes to escape, starting at `text' */
@@ -442,11 +442,11 @@ err:
  * >> Hello "World" W
  * >> hat a great day.
  * Output #1: >> \"Hello \"World\" W\nhat a great day.\"
- * Output #2: >> Hello \"World\" W\nhat a great day
+ * Output #2:  >> Hello  \"World\"  W\nhat a  great  day
  * NOTE: Output #2 is generated if the `FORMAT_ESCAPE_FPRINTRAW' is set
- * This function escapes all control and non-ascii characters,
- * preferring octal encoding for control characters and hex-encoding
- * for other non-ascii characters, a behavior that may be modified
+ * This   function  escapes  all   control  and  non-ascii  characters,
+ * preferring octal encoding  for control  characters and  hex-encoding
+ * for other  non-ascii characters,  a behavior  that may  be  modified
  * with the `FORMAT_ESCAPE_FFORCE*' flags
  * @param: printer: A function called for all quoted portions of the text
  * @param: textlen: The total number of bytes to escape, starting at `text' */
@@ -1157,15 +1157,15 @@ err:
 #endif /* __KERNEL__ && __KOS__ */
 #endif /* !__NO_PRINTF_VINFO */
 /* >> format_printf(3), format_vprintf(3)
- * Generic printf implementation
- * Taking a regular printf-style format string and arguments, these
+ * Generic     printf      implementation
+ * Taking a  regular printf-style  format  string and  arguments,  these
  * functions will call the given `printer' callback with various strings
  * that, when put together, result in the desired formated text.
  *  - `printer' obviously is called with the text parts in their correct order
- *  - If `printer' returns '< 0', the function returns immediately,
+ *  - If `printer' returns '<  0', the function returns  immediately,
  *    yielding that same value. Otherwise, `format_printf(3)' returns
  *    the sum of all return values from `printer'.
- *  - The strings passed to `printer' may not necessarily be zero-terminated, and
+ *  - The strings passed to `printer'  may not necessarily be zero-terminated,  and
  *    a second argument is passed that indicates the absolute length in characters.
  * Supported extensions:
  *  - `%q'-format mode: Semantics equivalent to `%s', this modifier escapes the string using
@@ -1201,16 +1201,16 @@ err:
  *                   >> DO((*g)(printer, arg));
  *             - `%[gen:c]'
  *                 - Same as `%[gen]', but insert an additional argument `T' that depends
- *                   on the integer size prefix (`%I32[gen:c]') and defaults to `void *'
+ *                   on the integer size prefix (`%I32[gen:c]') and defaults to  `void *'
  *                   >> typedef ssize_t (*PGEN)(T a, pformatprinter printer, void *arg);
  *                   >> PGEN g = va_arg(args, PGEN);
  *                   >> T    a = va_arg(args, T);
  *                   >> DO((*g)(a, printer, arg));
  *             - `%[disasm]' / `%$[disasm]'
- *                 - Print the mnemonic and operands of a single native assembly
+ *                 - Print the  mnemonic and  operands of  a single  native  assembly
  *                   instruction read from `va_arg(args, void *)' (using `libdisasm')
  *                   s.a. `disasm_single()'
- *                 - When the second form (with a fixed buffer size) is used, do a full
+ *                 - When the second form (with  a fixed buffer size)  is used, do a  full
  *                   disassembly of that number of bytes, following `DISASSEMBLER_FNORMAL'
  *                   s.a. `disasm()'
  *             - `%[vinfo]' / `%[vinfo:<format=%f(%l,%c) : %n>]'
@@ -1240,7 +1240,7 @@ err:
  * >>> Possible (and actual) uses:
  *  - printf:           Unbuffered output into any kind of stream/file.
  *  - sprintf/snprintf: Unsafe/Counted string formatting into a user-supplied buffer.
- *  - strdupf:          Output into dynamically allocated heap memory,
+ *  - strdupf:          Output  into  dynamically   allocated  heap   memory,
  *                      increasing the buffer when it gets filled completely.
  *  - syslog:           Unbuffered system-log output.
  *  - ...               There are a _lot_ more...
@@ -1300,15 +1300,15 @@ INTERN ATTR_SECTION(".text.crt.dos.wchar.string.format") ATTR_LIBC_WPRINTF(3, 0)
 #endif /* __KERNEL__ && __KOS__ */
 #endif /* !__NO_PRINTF_VINFO */
 /* >> format_printf(3), format_vprintf(3)
- * Generic printf implementation
- * Taking a regular printf-style format string and arguments, these
+ * Generic     printf      implementation
+ * Taking a  regular printf-style  format  string and  arguments,  these
  * functions will call the given `printer' callback with various strings
  * that, when put together, result in the desired formated text.
  *  - `printer' obviously is called with the text parts in their correct order
- *  - If `printer' returns '< 0', the function returns immediately,
+ *  - If `printer' returns '<  0', the function returns  immediately,
  *    yielding that same value. Otherwise, `format_printf(3)' returns
  *    the sum of all return values from `printer'.
- *  - The strings passed to `printer' may not necessarily be zero-terminated, and
+ *  - The strings passed to `printer'  may not necessarily be zero-terminated,  and
  *    a second argument is passed that indicates the absolute length in characters.
  * Supported extensions:
  *  - `%q'-format mode: Semantics equivalent to `%s', this modifier escapes the string using
@@ -1344,16 +1344,16 @@ INTERN ATTR_SECTION(".text.crt.dos.wchar.string.format") ATTR_LIBC_WPRINTF(3, 0)
  *                   >> DO((*g)(printer, arg));
  *             - `%[gen:c]'
  *                 - Same as `%[gen]', but insert an additional argument `T' that depends
- *                   on the integer size prefix (`%I32[gen:c]') and defaults to `void *'
+ *                   on the integer size prefix (`%I32[gen:c]') and defaults to  `void *'
  *                   >> typedef ssize_t (*PGEN)(T a, pformatprinter printer, void *arg);
  *                   >> PGEN g = va_arg(args, PGEN);
  *                   >> T    a = va_arg(args, T);
  *                   >> DO((*g)(a, printer, arg));
  *             - `%[disasm]' / `%$[disasm]'
- *                 - Print the mnemonic and operands of a single native assembly
+ *                 - Print the  mnemonic and  operands of  a single  native  assembly
  *                   instruction read from `va_arg(args, void *)' (using `libdisasm')
  *                   s.a. `disasm_single()'
- *                 - When the second form (with a fixed buffer size) is used, do a full
+ *                 - When the second form (with  a fixed buffer size)  is used, do a  full
  *                   disassembly of that number of bytes, following `DISASSEMBLER_FNORMAL'
  *                   s.a. `disasm()'
  *             - `%[vinfo]' / `%[vinfo:<format=%f(%l,%c) : %n>]'
@@ -1383,7 +1383,7 @@ INTERN ATTR_SECTION(".text.crt.dos.wchar.string.format") ATTR_LIBC_WPRINTF(3, 0)
  * >>> Possible (and actual) uses:
  *  - printf:           Unbuffered output into any kind of stream/file.
  *  - sprintf/snprintf: Unsafe/Counted string formatting into a user-supplied buffer.
- *  - strdupf:          Output into dynamically allocated heap memory,
+ *  - strdupf:          Output  into  dynamically   allocated  heap   memory,
  *                      increasing the buffer when it gets filled completely.
  *  - syslog:           Unbuffered system-log output.
  *  - ...               There are a _lot_ more...
@@ -1425,15 +1425,15 @@ INTERN ATTR_SECTION(".text.crt.wchar.string.format") ATTR_LIBC_WPRINTF(3, 0) NON
 #endif /* !__INTELLISENSE__ */
 }
 /* >> format_printf(3), format_vprintf(3)
- * Generic printf implementation
- * Taking a regular printf-style format string and arguments, these
+ * Generic     printf      implementation
+ * Taking a  regular printf-style  format  string and  arguments,  these
  * functions will call the given `printer' callback with various strings
  * that, when put together, result in the desired formated text.
  *  - `printer' obviously is called with the text parts in their correct order
- *  - If `printer' returns '< 0', the function returns immediately,
+ *  - If `printer' returns '<  0', the function returns  immediately,
  *    yielding that same value. Otherwise, `format_printf(3)' returns
  *    the sum of all return values from `printer'.
- *  - The strings passed to `printer' may not necessarily be zero-terminated, and
+ *  - The strings passed to `printer'  may not necessarily be zero-terminated,  and
  *    a second argument is passed that indicates the absolute length in characters.
  * Supported extensions:
  *  - `%q'-format mode: Semantics equivalent to `%s', this modifier escapes the string using
@@ -1469,16 +1469,16 @@ INTERN ATTR_SECTION(".text.crt.wchar.string.format") ATTR_LIBC_WPRINTF(3, 0) NON
  *                   >> DO((*g)(printer, arg));
  *             - `%[gen:c]'
  *                 - Same as `%[gen]', but insert an additional argument `T' that depends
- *                   on the integer size prefix (`%I32[gen:c]') and defaults to `void *'
+ *                   on the integer size prefix (`%I32[gen:c]') and defaults to  `void *'
  *                   >> typedef ssize_t (*PGEN)(T a, pformatprinter printer, void *arg);
  *                   >> PGEN g = va_arg(args, PGEN);
  *                   >> T    a = va_arg(args, T);
  *                   >> DO((*g)(a, printer, arg));
  *             - `%[disasm]' / `%$[disasm]'
- *                 - Print the mnemonic and operands of a single native assembly
+ *                 - Print the  mnemonic and  operands of  a single  native  assembly
  *                   instruction read from `va_arg(args, void *)' (using `libdisasm')
  *                   s.a. `disasm_single()'
- *                 - When the second form (with a fixed buffer size) is used, do a full
+ *                 - When the second form (with  a fixed buffer size)  is used, do a  full
  *                   disassembly of that number of bytes, following `DISASSEMBLER_FNORMAL'
  *                   s.a. `disasm()'
  *             - `%[vinfo]' / `%[vinfo:<format=%f(%l,%c) : %n>]'
@@ -1508,7 +1508,7 @@ INTERN ATTR_SECTION(".text.crt.wchar.string.format") ATTR_LIBC_WPRINTF(3, 0) NON
  * >>> Possible (and actual) uses:
  *  - printf:           Unbuffered output into any kind of stream/file.
  *  - sprintf/snprintf: Unsafe/Counted string formatting into a user-supplied buffer.
- *  - strdupf:          Output into dynamically allocated heap memory,
+ *  - strdupf:          Output  into  dynamically   allocated  heap   memory,
  *                      increasing the buffer when it gets filled completely.
  *  - syslog:           Unbuffered system-log output.
  *  - ...               There are a _lot_ more...
@@ -1527,15 +1527,15 @@ INTERN ATTR_SECTION(".text.crt.dos.wchar.string.format") ATTR_LIBC_WPRINTF(3, 0)
 	return result;
 }
 /* >> format_printf(3), format_vprintf(3)
- * Generic printf implementation
- * Taking a regular printf-style format string and arguments, these
+ * Generic     printf      implementation
+ * Taking a  regular printf-style  format  string and  arguments,  these
  * functions will call the given `printer' callback with various strings
  * that, when put together, result in the desired formated text.
  *  - `printer' obviously is called with the text parts in their correct order
- *  - If `printer' returns '< 0', the function returns immediately,
+ *  - If `printer' returns '<  0', the function returns  immediately,
  *    yielding that same value. Otherwise, `format_printf(3)' returns
  *    the sum of all return values from `printer'.
- *  - The strings passed to `printer' may not necessarily be zero-terminated, and
+ *  - The strings passed to `printer'  may not necessarily be zero-terminated,  and
  *    a second argument is passed that indicates the absolute length in characters.
  * Supported extensions:
  *  - `%q'-format mode: Semantics equivalent to `%s', this modifier escapes the string using
@@ -1571,16 +1571,16 @@ INTERN ATTR_SECTION(".text.crt.dos.wchar.string.format") ATTR_LIBC_WPRINTF(3, 0)
  *                   >> DO((*g)(printer, arg));
  *             - `%[gen:c]'
  *                 - Same as `%[gen]', but insert an additional argument `T' that depends
- *                   on the integer size prefix (`%I32[gen:c]') and defaults to `void *'
+ *                   on the integer size prefix (`%I32[gen:c]') and defaults to  `void *'
  *                   >> typedef ssize_t (*PGEN)(T a, pformatprinter printer, void *arg);
  *                   >> PGEN g = va_arg(args, PGEN);
  *                   >> T    a = va_arg(args, T);
  *                   >> DO((*g)(a, printer, arg));
  *             - `%[disasm]' / `%$[disasm]'
- *                 - Print the mnemonic and operands of a single native assembly
+ *                 - Print the  mnemonic and  operands of  a single  native  assembly
  *                   instruction read from `va_arg(args, void *)' (using `libdisasm')
  *                   s.a. `disasm_single()'
- *                 - When the second form (with a fixed buffer size) is used, do a full
+ *                 - When the second form (with  a fixed buffer size)  is used, do a  full
  *                   disassembly of that number of bytes, following `DISASSEMBLER_FNORMAL'
  *                   s.a. `disasm()'
  *             - `%[vinfo]' / `%[vinfo:<format=%f(%l,%c) : %n>]'
@@ -1610,7 +1610,7 @@ INTERN ATTR_SECTION(".text.crt.dos.wchar.string.format") ATTR_LIBC_WPRINTF(3, 0)
  * >>> Possible (and actual) uses:
  *  - printf:           Unbuffered output into any kind of stream/file.
  *  - sprintf/snprintf: Unsafe/Counted string formatting into a user-supplied buffer.
- *  - strdupf:          Output into dynamically allocated heap memory,
+ *  - strdupf:          Output  into  dynamically   allocated  heap   memory,
  *                      increasing the buffer when it gets filled completely.
  *  - syslog:           Unbuffered system-log output.
  *  - ...               There are a _lot_ more...
@@ -1649,7 +1649,7 @@ NOTHROW_NCX(LIBKCALL libc_format_wsprintf_printer)(void *arg,
 /* Format-printer implementation for printing to a string buffer like `wsnprintf' would
  * WARNING: No trailing NUL-character is implicitly appended
  * NOTE: The number of written characters is `<orig_bufsize> - arg->sd_bufsiz'
- * NOTE: The number of required characters is `arg->sd_buffer - <orig_buf>', or
+ * NOTE: The   number   of   required   characters   is   `arg->sd_buffer - <orig_buf>',   or
  *       alternatively the sum of return values of all calls to `format_wsnprintf_printer(3)' */
 INTERN ATTR_SECTION(".text.crt.dos.wchar.string.format") NONNULL((1, 2)) ssize_t
 NOTHROW_NCX(LIBDCALL libd_format_wsnprintf_printer)(void *arg,
@@ -1672,7 +1672,7 @@ NOTHROW_NCX(LIBDCALL libd_format_wsnprintf_printer)(void *arg,
 /* Format-printer implementation for printing to a string buffer like `wsnprintf' would
  * WARNING: No trailing NUL-character is implicitly appended
  * NOTE: The number of written characters is `<orig_bufsize> - arg->sd_bufsiz'
- * NOTE: The number of required characters is `arg->sd_buffer - <orig_buf>', or
+ * NOTE: The   number   of   required   characters   is   `arg->sd_buffer - <orig_buf>',   or
  *       alternatively the sum of return values of all calls to `format_wsnprintf_printer(3)' */
 INTERN ATTR_SECTION(".text.crt.wchar.string.format") NONNULL((1, 2)) ssize_t
 NOTHROW_NCX(LIBKCALL libc_format_wsnprintf_printer)(void *arg,
@@ -1694,7 +1694,7 @@ NOTHROW_NCX(LIBKCALL libc_format_wsnprintf_printer)(void *arg,
 }
 /* >> format_width(3)
  * Returns the width (number of characters; not bytes) of the given unicode string
- * The `arg' argument is ignored, and you may safely pass `NULL' */
+ * The  `arg'   argument   is   ignored,   and  you   may   safely   pass   `NULL' */
 INTERN ATTR_SECTION(".text.crt.dos.wchar.string.format") ATTR_PURE NONNULL((2)) ssize_t
 NOTHROW_NCX(LIBDCALL libd_format_wwidth)(void *arg,
                                          char16_t const *__restrict data,
@@ -1728,9 +1728,9 @@ NOTHROW_NCX(LIBDCALL libd_format_wwidth)(void *arg,
 
 }
 #include <hybrid/__assert.h>
-/* Pack and finalize a given aprintf format printer
+/* Pack  and  finalize  a  given  aprintf  format printer
  * Together with `format_waprintf_printer()', the aprintf
- * format printer sub-system should be used as follows:
+ * format  printer sub-system should  be used as follows:
  * >> char *result;
  * >> ssize_t error;
  * >> struct format_waprintf_data p = FORMAT_WAPRINTF_DATA_INIT;
@@ -1742,11 +1742,11 @@ NOTHROW_NCX(LIBDCALL libd_format_wwidth)(void *arg,
  * >> result = format_waprintf_pack(&p, NULL);
  * >> return result;
  * WARNING: Note that `format_waprintf_pack()' is able to return `NULL' as well,
- *          but will finalize the given aprintf printer an all cases.
+ *          but  will  finalize  the  given   aprintf  printer  an  all   cases.
  * NOTE:    The caller must destroy the returned string by passing it to `free()'
  * @param: pstrlen: When non-NULL, store the length of the constructed string here
  *                  Note that this is the actual length if the constructed string,
- *                  but may differ from `wcslen(return)' when NUL characters were
+ *                  but may differ from `wcslen(return)' when NUL characters  were
  *                  printed to the waprintf-printer at one point.
  *                  (e.g. `format_waprintf_printer(&my_printer, L"\0", 1)') */
 INTERN ATTR_SECTION(".text.crt.dos.wchar.string.format") ATTR_MALLOC ATTR_MALL_DEFAULT_ALIGNED WUNUSED NONNULL((1)) char16_t *
@@ -1792,9 +1792,9 @@ NOTHROW_NCX(LIBDCALL libd_format_waprintf_pack)(struct format_c16aprintf_data *_
 	return result;
 }
 #include <hybrid/__assert.h>
-/* Pack and finalize a given aprintf format printer
+/* Pack  and  finalize  a  given  aprintf  format printer
  * Together with `format_waprintf_printer()', the aprintf
- * format printer sub-system should be used as follows:
+ * format  printer sub-system should  be used as follows:
  * >> char *result;
  * >> ssize_t error;
  * >> struct format_waprintf_data p = FORMAT_WAPRINTF_DATA_INIT;
@@ -1806,11 +1806,11 @@ NOTHROW_NCX(LIBDCALL libd_format_waprintf_pack)(struct format_c16aprintf_data *_
  * >> result = format_waprintf_pack(&p, NULL);
  * >> return result;
  * WARNING: Note that `format_waprintf_pack()' is able to return `NULL' as well,
- *          but will finalize the given aprintf printer an all cases.
+ *          but  will  finalize  the  given   aprintf  printer  an  all   cases.
  * NOTE:    The caller must destroy the returned string by passing it to `free()'
  * @param: pstrlen: When non-NULL, store the length of the constructed string here
  *                  Note that this is the actual length if the constructed string,
- *                  but may differ from `wcslen(return)' when NUL characters were
+ *                  but may differ from `wcslen(return)' when NUL characters  were
  *                  printed to the waprintf-printer at one point.
  *                  (e.g. `format_waprintf_printer(&my_printer, L"\0", 1)') */
 INTERN ATTR_SECTION(".text.crt.wchar.string.format") ATTR_MALLOC ATTR_MALL_DEFAULT_ALIGNED WUNUSED NONNULL((1)) char32_t *
@@ -1857,9 +1857,9 @@ NOTHROW_NCX(LIBKCALL libc_format_waprintf_pack)(struct format_c32aprintf_data *_
 }
 #include <hybrid/__assert.h>
 /* >> format_waprintf_alloc(3)
- * Allocate a buffer of `num_wchars' wide-characters at the end of `self'
+ * Allocate  a  buffer  of  `num_wchars'  wide-characters  at  the  end  of `self'
  * The returned pointer remains valid until the next time this function is called,
- * the format_aprintf buffer `self' is finalized, or some other function is used
+ * the format_aprintf buffer `self' is finalized,  or some other function is  used
  * to append additional data to the end of `self'
  * @return: NULL: Failed to allocate additional memory */
 INTERN ATTR_SECTION(".text.crt.dos.wchar.string.format") ATTR_MALLOC ATTR_MALL_DEFAULT_ALIGNED WUNUSED NONNULL((1)) char16_t *
@@ -1894,9 +1894,9 @@ err:
 }
 #include <hybrid/__assert.h>
 /* >> format_waprintf_alloc(3)
- * Allocate a buffer of `num_wchars' wide-characters at the end of `self'
+ * Allocate  a  buffer  of  `num_wchars'  wide-characters  at  the  end  of `self'
  * The returned pointer remains valid until the next time this function is called,
- * the format_aprintf buffer `self' is finalized, or some other function is used
+ * the format_aprintf buffer `self' is finalized,  or some other function is  used
  * to append additional data to the end of `self'
  * @return: NULL: Failed to allocate additional memory */
 INTERN ATTR_SECTION(".text.crt.wchar.string.format") ATTR_MALLOC ATTR_MALL_DEFAULT_ALIGNED WUNUSED NONNULL((1)) char32_t *

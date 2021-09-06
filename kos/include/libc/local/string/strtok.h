@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x21796d14 */
+/* HASH CRC-32:0x83a45367 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -22,7 +22,6 @@
 #define __local_strtok_defined 1
 #include <__crt.h>
 __NAMESPACE_LOCAL_BEGIN
-/* Dependency: strtok_r from string */
 #ifndef __local___localdep_strtok_r_defined
 #define __local___localdep_strtok_r_defined 1
 #ifdef __CRT_HAVE_strtok_r

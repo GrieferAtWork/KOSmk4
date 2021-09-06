@@ -36,7 +36,7 @@ import net;
 global writeStdout: Callable;
 
 @@Search for an executable @name in @path, returning
-@@its absolute path if found, or @none other.
+@@its  absolute  path  if  found,  or  @none  other.
 function findExecutableInPath(path: string, name: string): string | none {
 	local filename = fs.joinpath(path, name);
 	if (fs.stat.exists(filename))
@@ -300,7 +300,7 @@ class TraceController {
 
 
 @@While it is impossible to get rid of the `cmd:' prefix on anything
-@@that we write to stdout ourself, it _is_ possible to hi-jack the
+@@that we write to stdout ourself,  it _is_ possible to hi-jack  the
 @@stdout output stream of GDB:
 @@>> // NOTE: `hGDB' needs permissions:
 @@>> //   - PROCESS_QUERY_LIMITED_INFORMATION (identification)
@@ -328,13 +328,13 @@ class TraceController {
 @@>> CloseHandle(hGDB);
 @@Output written with this method will appear unfiltered in the Output window
 @@in such a way that click-to-go-to-source is possible!
-@@NOTE: I've also tested what happens when GDB exits while we still have
-@@      a handle to its standard output handle. - It behaves normally, in
+@@NOTE: I've  also tested what  happens when GDB exits  while we still have
+@@      a handle to its standard output  handle. - It behaves normally,  in
 @@      that Visual Studio appears to wait for GDB to terminate, and simply
 @@      ignores anyone else still having an open handle to GDB's old stdout
-@@      As a matter of fact, Visual Studio uses a Pipe for capturing the
-@@      output from GDB, and that pipe is closed once Visual Studio closes
-@@      its reader-end of said pipe (causing us attempting to write more
+@@      As a matter of  fact, Visual Studio uses  a Pipe for capturing  the
+@@      output from GDB, and that pipe is closed once Visual Studio  closes
+@@      its  reader-end of said  pipe (causing us  attempting to write more
 @@      data in WriteFile() throwing an exception!)
 function reOpenProcessStdoutAndWrapAsGdbMIMessageStream(processName: string): Callable | none {
 	local _reopenhandle, win32, hGDB;

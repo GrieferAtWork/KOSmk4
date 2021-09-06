@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xddcc0acb */
+/* HASH CRC-32:0x3873d142 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -24,21 +24,14 @@
 #if defined(__CRT_HAVE_futex_wakeall) || defined(__CRT_HAVE_futex_wake) || defined(__CRT_HAVE_lfutex64) || defined(__CRT_HAVE_lfutex)
 #include <bits/types.h>
 __NAMESPACE_LOCAL_BEGIN
-/* Dependency: futex_wakeall from kos.futex */
 #ifndef __local___localdep_futex_wakeall_defined
 #define __local___localdep_futex_wakeall_defined 1
 #ifdef __CRT_HAVE_futex_wakeall
-/* Wake all threads waiting for `*UADDR' (same as `futex_wake(uaddr, (size_t)-1)')
- * @return: * : The number of woken threads
- * @return: -1:EFAULT: A faulty pointer was given */
 __CREDIRECT(__ATTR_NONNULL((1)),__SSIZE_TYPE__,__NOTHROW_NCX,__localdep_futex_wakeall,(__uintptr_t *__uaddr),futex_wakeall,(__uaddr))
 #elif defined(__CRT_HAVE_futex_wake) || defined(__CRT_HAVE_lfutex64) || defined(__CRT_HAVE_lfutex)
 __NAMESPACE_LOCAL_END
 #include <libc/local/kos.futex/futex_wakeall.h>
 __NAMESPACE_LOCAL_BEGIN
-/* Wake all threads waiting for `*UADDR' (same as `futex_wake(uaddr, (size_t)-1)')
- * @return: * : The number of woken threads
- * @return: -1:EFAULT: A faulty pointer was given */
 #define __localdep_futex_wakeall __LIBC_LOCAL_NAME(futex_wakeall)
 #else /* ... */
 #undef __local___localdep_futex_wakeall_defined
@@ -48,9 +41,6 @@ __NAMESPACE_LOCAL_END
 #include <hybrid/__atomic.h>
 #include <kos/bits/futex.h>
 __NAMESPACE_LOCAL_BEGIN
-/* A more efficient variant of `futex_wake()' that can be used to wake up threads waiting
- * on some given futex-lock. - This method of waking is faster, since it doesn't invoke a
- * system call when no thread is waiting on the given lock */
 __LOCAL_LIBC(futexlock_wakeall) __ATTR_NONNULL((1)) __SSIZE_TYPE__
 __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(futexlock_wakeall))(__uintptr_t *__ulockaddr) {
 #ifndef __OPTIMIZE_SIZE__

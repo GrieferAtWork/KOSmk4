@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x655ef1ee */
+/* HASH CRC-32:0xc11b8e36 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -23,7 +23,6 @@
 #include <__crt.h>
 #include <hybrid/typecore.h>
 __NAMESPACE_LOCAL_BEGIN
-/* Dependency: wcsncasecoll from wchar */
 #ifndef __local___localdep_wcsncasecoll_defined
 #define __local___localdep_wcsncasecoll_defined 1
 #ifdef __CRT_HAVE_wcsncasecoll

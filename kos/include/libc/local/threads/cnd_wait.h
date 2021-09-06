@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xbb9e886b */
+/* HASH CRC-32:0x112f20c2 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -24,27 +24,18 @@
 #ifdef __CRT_HAVE_pthread_cond_wait
 #include <bits/crt/threads.h>
 __NAMESPACE_LOCAL_BEGIN
-/* Dependency: pthread_cond_wait from pthread */
 #ifndef __local___localdep_pthread_cond_wait_defined
 #define __local___localdep_pthread_cond_wait_defined 1
 __NAMESPACE_LOCAL_END
 #include <bits/types.h>
 #include <bits/crt/pthreadtypes.h>
 __NAMESPACE_LOCAL_BEGIN
-/* >> pthread_cond_wait(3)
- * Wait for condition variable `cond' to be signaled or broadcast.
- * `mutex' is assumed to be locked before.
- * @return: EOK: Success */
 __CREDIRECT(__ATTR_NONNULL((1, 2)),__errno_t,__NOTHROW_RPC,__localdep_pthread_cond_wait,(__pthread_cond_t *__restrict __cond, __pthread_mutex_t *__restrict __mutex),pthread_cond_wait,(__cond,__mutex))
 #endif /* !__local___localdep_pthread_cond_wait_defined */
 __NAMESPACE_LOCAL_END
 #include <asm/crt/threads.h>
 #include <bits/crt/pthreadtypes.h>
 __NAMESPACE_LOCAL_BEGIN
-/* >> cnd_wait(3)
- * Wait on the given condition variable (s.a. `pthread_cond_wait(3)')
- * @return: thrd_success: Success
- * @return: thrd_error:   Error */
 __LOCAL_LIBC(cnd_wait) __ATTR_NONNULL((1, 2)) int
 __NOTHROW_RPC(__LIBCCALL __LIBC_LOCAL_NAME(cnd_wait))(__cnd_t *__restrict __cond, __mtx_t *__restrict __mutex) {
 	__errno_t __error;

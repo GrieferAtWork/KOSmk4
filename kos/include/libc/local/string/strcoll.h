@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x225aed05 */
+/* HASH CRC-32:0xbd562002 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -22,23 +22,16 @@
 #define __local_strcoll_defined 1
 #include <__crt.h>
 __NAMESPACE_LOCAL_BEGIN
-/* Dependency: strcmp from string */
 #ifndef __local___localdep_strcmp_defined
 #define __local___localdep_strcmp_defined 1
 #if __has_builtin(__builtin_strcmp) && defined(__LIBC_BIND_CRTBUILTINS) && defined(__CRT_HAVE_strcmp)
-/* >> strcmp(3)
- * Compare 2 strings and return the difference of the first non-matching character, or `0' if they are identical */
 __CEIREDIRECT(__ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1, 2)),int,__NOTHROW_NCX,__localdep_strcmp,(char const *__s1, char const *__s2),strcmp,{ return __builtin_strcmp(__s1, __s2); })
 #elif defined(__CRT_HAVE_strcmp)
-/* >> strcmp(3)
- * Compare 2 strings and return the difference of the first non-matching character, or `0' if they are identical */
 __CREDIRECT(__ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1, 2)),int,__NOTHROW_NCX,__localdep_strcmp,(char const *__s1, char const *__s2),strcmp,(__s1,__s2))
 #else /* ... */
 __NAMESPACE_LOCAL_END
 #include <libc/local/string/strcmp.h>
 __NAMESPACE_LOCAL_BEGIN
-/* >> strcmp(3)
- * Compare 2 strings and return the difference of the first non-matching character, or `0' if they are identical */
 #define __localdep_strcmp __LIBC_LOCAL_NAME(strcmp)
 #endif /* !... */
 #endif /* !__local___localdep_strcmp_defined */

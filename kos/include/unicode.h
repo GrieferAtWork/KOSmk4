@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x92b1966f */
+/* HASH CRC-32:0x1557ad57 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -175,20 +175,20 @@ __NAMESPACE_LOCAL_USING_OR_IMPL(unicode_readutf8, __FORCELOCAL __ATTR_ARTIFICIAL
 #if defined(__cplusplus) && defined(__CORRECT_ISO_CPP_UNICODE_H_PROTO)
 extern "C++" {
 /* >> unicode_readutf8_rev(3)
- * Same as `unicode_readutf8', but read backwards, with `*ptext'
- * starting out as a pointer after the character to be read, before
+ * Same  as  `unicode_readutf8',  but read  backwards,  with `*ptext'
+ * starting out as a pointer after  the character to be read,  before
  * being updated to point to the start of the character that was read */
 __CREDIRECT(__ATTR_NONNULL((1)),char32_t,__NOTHROW_NCX,unicode_readutf8_rev,(char const **__restrict __ptext),unicode_readutf8_rev,(__ptext))
 /* >> unicode_readutf8_rev(3)
- * Same as `unicode_readutf8', but read backwards, with `*ptext'
- * starting out as a pointer after the character to be read, before
+ * Same  as  `unicode_readutf8',  but read  backwards,  with `*ptext'
+ * starting out as a pointer after  the character to be read,  before
  * being updated to point to the start of the character that was read */
 __CREDIRECT(__ATTR_NONNULL((1)),char32_t,__NOTHROW_NCX,unicode_readutf8_rev,(char **__restrict __ptext),unicode_readutf8_rev,(__ptext))
 } /* extern "C++" */
 #else /* __cplusplus && __CORRECT_ISO_CPP_UNICODE_H_PROTO */
 /* >> unicode_readutf8_rev(3)
- * Same as `unicode_readutf8', but read backwards, with `*ptext'
- * starting out as a pointer after the character to be read, before
+ * Same  as  `unicode_readutf8',  but read  backwards,  with `*ptext'
+ * starting out as a pointer after  the character to be read,  before
  * being updated to point to the start of the character that was read */
 __CDECLARE(__ATTR_NONNULL((1)),char32_t,__NOTHROW_NCX,unicode_readutf8_rev,(char const **__restrict __ptext),(__ptext))
 #endif /* !__cplusplus || !__CORRECT_ISO_CPP_UNICODE_H_PROTO */
@@ -197,20 +197,20 @@ __CDECLARE(__ATTR_NONNULL((1)),char32_t,__NOTHROW_NCX,unicode_readutf8_rev,(char
 #if defined(__cplusplus) && defined(__CORRECT_ISO_CPP_UNICODE_H_PROTO)
 extern "C++" {
 /* >> unicode_readutf8_rev(3)
- * Same as `unicode_readutf8', but read backwards, with `*ptext'
- * starting out as a pointer after the character to be read, before
+ * Same  as  `unicode_readutf8',  but read  backwards,  with `*ptext'
+ * starting out as a pointer after  the character to be read,  before
  * being updated to point to the start of the character that was read */
 __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_NONNULL((1)) char32_t __NOTHROW_NCX(__LIBCCALL unicode_readutf8_rev)(char const **__restrict __ptext) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(unicode_readutf8_rev))(__ptext); }
 /* >> unicode_readutf8_rev(3)
- * Same as `unicode_readutf8', but read backwards, with `*ptext'
- * starting out as a pointer after the character to be read, before
+ * Same  as  `unicode_readutf8',  but read  backwards,  with `*ptext'
+ * starting out as a pointer after  the character to be read,  before
  * being updated to point to the start of the character that was read */
 __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_NONNULL((1)) char32_t __NOTHROW_NCX(__LIBCCALL unicode_readutf8_rev)(char **__restrict __ptext) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(unicode_readutf8_rev))((char const **)__ptext); }
 } /* extern "C++" */
 #else /* __cplusplus && __CORRECT_ISO_CPP_UNICODE_H_PROTO */
 /* >> unicode_readutf8_rev(3)
- * Same as `unicode_readutf8', but read backwards, with `*ptext'
- * starting out as a pointer after the character to be read, before
+ * Same  as  `unicode_readutf8',  but read  backwards,  with `*ptext'
+ * starting out as a pointer after  the character to be read,  before
  * being updated to point to the start of the character that was read */
 __NAMESPACE_LOCAL_USING_OR_IMPL(unicode_readutf8_rev, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_NONNULL((1)) char32_t __NOTHROW_NCX(__LIBCCALL unicode_readutf8_rev)(char const **__restrict __ptext) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(unicode_readutf8_rev))(__ptext); })
 #endif /* !__cplusplus || !__CORRECT_ISO_CPP_UNICODE_H_PROTO */
@@ -411,20 +411,20 @@ __NAMESPACE_LOCAL_USING_OR_IMPL(unicode_readutf16_swap_n, __FORCELOCAL __ATTR_AR
 #if defined(__cplusplus) && defined(__CORRECT_ISO_CPP_UNICODE_H_PROTO)
 extern "C++" {
 /* >> unicode_readutf16_rev(3)
- * Same as `unicode_readutf16', but read backwards, with `*ptext'
- * starting out as a pointer after the character to be read, before
+ * Same  as  `unicode_readutf16', but  read backwards,  with `*ptext'
+ * starting out as a pointer after  the character to be read,  before
  * being updated to point to the start of the character that was read */
 __CREDIRECT(__ATTR_NONNULL((1)),char32_t,__NOTHROW_NCX,unicode_readutf16_rev,(char16_t const **__restrict __ptext),unicode_readutf16_rev,(__ptext))
 /* >> unicode_readutf16_rev(3)
- * Same as `unicode_readutf16', but read backwards, with `*ptext'
- * starting out as a pointer after the character to be read, before
+ * Same  as  `unicode_readutf16', but  read backwards,  with `*ptext'
+ * starting out as a pointer after  the character to be read,  before
  * being updated to point to the start of the character that was read */
 __CREDIRECT(__ATTR_NONNULL((1)),char32_t,__NOTHROW_NCX,unicode_readutf16_rev,(char16_t **__restrict __ptext),unicode_readutf16_rev,(__ptext))
 } /* extern "C++" */
 #else /* __cplusplus && __CORRECT_ISO_CPP_UNICODE_H_PROTO */
 /* >> unicode_readutf16_rev(3)
- * Same as `unicode_readutf16', but read backwards, with `*ptext'
- * starting out as a pointer after the character to be read, before
+ * Same  as  `unicode_readutf16', but  read backwards,  with `*ptext'
+ * starting out as a pointer after  the character to be read,  before
  * being updated to point to the start of the character that was read */
 __CDECLARE(__ATTR_NONNULL((1)),char32_t,__NOTHROW_NCX,unicode_readutf16_rev,(char16_t const **__restrict __ptext),(__ptext))
 #endif /* !__cplusplus || !__CORRECT_ISO_CPP_UNICODE_H_PROTO */
@@ -433,20 +433,20 @@ __CDECLARE(__ATTR_NONNULL((1)),char32_t,__NOTHROW_NCX,unicode_readutf16_rev,(cha
 #if defined(__cplusplus) && defined(__CORRECT_ISO_CPP_UNICODE_H_PROTO)
 extern "C++" {
 /* >> unicode_readutf16_rev(3)
- * Same as `unicode_readutf16', but read backwards, with `*ptext'
- * starting out as a pointer after the character to be read, before
+ * Same  as  `unicode_readutf16', but  read backwards,  with `*ptext'
+ * starting out as a pointer after  the character to be read,  before
  * being updated to point to the start of the character that was read */
 __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_NONNULL((1)) char32_t __NOTHROW_NCX(__LIBCCALL unicode_readutf16_rev)(char16_t const **__restrict __ptext) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(unicode_readutf16_rev))(__ptext); }
 /* >> unicode_readutf16_rev(3)
- * Same as `unicode_readutf16', but read backwards, with `*ptext'
- * starting out as a pointer after the character to be read, before
+ * Same  as  `unicode_readutf16', but  read backwards,  with `*ptext'
+ * starting out as a pointer after  the character to be read,  before
  * being updated to point to the start of the character that was read */
 __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_NONNULL((1)) char32_t __NOTHROW_NCX(__LIBCCALL unicode_readutf16_rev)(char16_t **__restrict __ptext) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(unicode_readutf16_rev))((__CHAR16_TYPE__ const **)__ptext); }
 } /* extern "C++" */
 #else /* __cplusplus && __CORRECT_ISO_CPP_UNICODE_H_PROTO */
 /* >> unicode_readutf16_rev(3)
- * Same as `unicode_readutf16', but read backwards, with `*ptext'
- * starting out as a pointer after the character to be read, before
+ * Same  as  `unicode_readutf16', but  read backwards,  with `*ptext'
+ * starting out as a pointer after  the character to be read,  before
  * being updated to point to the start of the character that was read */
 __NAMESPACE_LOCAL_USING_OR_IMPL(unicode_readutf16_rev, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_NONNULL((1)) char32_t __NOTHROW_NCX(__LIBCCALL unicode_readutf16_rev)(char16_t const **__restrict __ptext) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(unicode_readutf16_rev))(__ptext); })
 #endif /* !__cplusplus || !__CORRECT_ISO_CPP_UNICODE_H_PROTO */
@@ -550,25 +550,25 @@ __NAMESPACE_LOCAL_USING_OR_IMPL(unicode_readutf16_swap_rev_n, __FORCELOCAL __ATT
 #ifdef __CRT_HAVE_unicode_writeutf8
 /* >> unicode_writeutf8(3)
  * Write a given Unicode character `ch' to `dst' and return a pointer to its end location.
- * This function will write at most `UNICODE_UTF8_CURLEN' bytes to `dst' */
+ * This   function   will   write   at   most   `UNICODE_UTF8_CURLEN'   bytes   to   `dst' */
 __CDECLARE(__ATTR_RETNONNULL __ATTR_NONNULL((1)),char *,__NOTHROW_NCX,unicode_writeutf8,(char *__restrict __dst, char32_t __ch),(__dst,__ch))
 #else /* __CRT_HAVE_unicode_writeutf8 */
 #include <libc/local/unicode/unicode_writeutf8.h>
 /* >> unicode_writeutf8(3)
  * Write a given Unicode character `ch' to `dst' and return a pointer to its end location.
- * This function will write at most `UNICODE_UTF8_CURLEN' bytes to `dst' */
+ * This   function   will   write   at   most   `UNICODE_UTF8_CURLEN'   bytes   to   `dst' */
 __NAMESPACE_LOCAL_USING_OR_IMPL(unicode_writeutf8, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_RETNONNULL __ATTR_NONNULL((1)) char *__NOTHROW_NCX(__LIBCCALL unicode_writeutf8)(char *__restrict __dst, char32_t __ch) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(unicode_writeutf8))(__dst, __ch); })
 #endif /* !__CRT_HAVE_unicode_writeutf8 */
 #ifdef __CRT_HAVE_unicode_writeutf16
 /* >> unicode_writeutf16(3)
  * Write a given Unicode character `ch' to `dst' and return a pointer to its end location.
- * This function will write at most `UNICODE_UTF16_CURLEN' words to `dst' */
+ * This   function   will   write   at   most   `UNICODE_UTF16_CURLEN'   words   to  `dst' */
 __CDECLARE(__ATTR_RETNONNULL __ATTR_NONNULL((1)),char16_t *,__NOTHROW_NCX,unicode_writeutf16,(char16_t *__restrict __dst, char32_t __ch),(__dst,__ch))
 #else /* __CRT_HAVE_unicode_writeutf16 */
 #include <libc/local/unicode/unicode_writeutf16.h>
 /* >> unicode_writeutf16(3)
  * Write a given Unicode character `ch' to `dst' and return a pointer to its end location.
- * This function will write at most `UNICODE_UTF16_CURLEN' words to `dst' */
+ * This   function   will   write   at   most   `UNICODE_UTF16_CURLEN'   words   to  `dst' */
 __NAMESPACE_LOCAL_USING_OR_IMPL(unicode_writeutf16, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_RETNONNULL __ATTR_NONNULL((1)) char16_t *__NOTHROW_NCX(__LIBCCALL unicode_writeutf16)(char16_t *__restrict __dst, char32_t __ch) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(unicode_writeutf16))(__dst, __ch); })
 #endif /* !__CRT_HAVE_unicode_writeutf16 */
 #ifdef __CRT_HAVE_unicode_writeutf16_chk
@@ -989,13 +989,13 @@ struct format_8to16_data {
 };
 #ifdef __CRT_HAVE_format_8to16
 /* >> format_8to16(3)
- * Format printer (compatible with `__pformatprinter') for
+ * Format printer (compatible with `__pformatprinter')  for
  * converting UTF-8 unicode input data into a UTF-16 output */
 __CDECLARE(,__SSIZE_TYPE__,__NOTHROW_NCX,format_8to16,(void *__arg, char const *__data, __SIZE_TYPE__ __datalen),(__arg,__data,__datalen))
 #else /* __CRT_HAVE_format_8to16 */
 #include <libc/local/unicode/format_8to16.h>
 /* >> format_8to16(3)
- * Format printer (compatible with `__pformatprinter') for
+ * Format printer (compatible with `__pformatprinter')  for
  * converting UTF-8 unicode input data into a UTF-16 output */
 __NAMESPACE_LOCAL_USING_OR_IMPL(format_8to16, __FORCELOCAL __ATTR_ARTIFICIAL __SSIZE_TYPE__ __NOTHROW_NCX(__LIBCCALL format_8to16)(void *__arg, char const *__data, __SIZE_TYPE__ __datalen) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(format_8to16))(__arg, __data, __datalen); })
 #endif /* !__CRT_HAVE_format_8to16 */
@@ -1007,13 +1007,13 @@ struct format_8to32_data {
 };
 #ifdef __CRT_HAVE_format_8to32
 /* >> format_8to32(3)
- * Format printer (compatible with `__pformatprinter') for
+ * Format printer (compatible with `__pformatprinter')  for
  * converting UTF-8 unicode input data into a UTF-32 output */
 __CDECLARE(,__SSIZE_TYPE__,__NOTHROW_NCX,format_8to32,(void *__arg, char const *__data, __SIZE_TYPE__ __datalen),(__arg,__data,__datalen))
 #else /* __CRT_HAVE_format_8to32 */
 #include <libc/local/unicode/format_8to32.h>
 /* >> format_8to32(3)
- * Format printer (compatible with `__pformatprinter') for
+ * Format printer (compatible with `__pformatprinter')  for
  * converting UTF-8 unicode input data into a UTF-32 output */
 __NAMESPACE_LOCAL_USING_OR_IMPL(format_8to32, __FORCELOCAL __ATTR_ARTIFICIAL __SSIZE_TYPE__ __NOTHROW_NCX(__LIBCCALL format_8to32)(void *__arg, char const *__data, __SIZE_TYPE__ __datalen) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(format_8to32))(__arg, __data, __datalen); })
 #endif /* !__CRT_HAVE_format_8to32 */
@@ -1082,24 +1082,24 @@ struct format_16to32_data {
 };
 #if defined(__CRT_HAVE_format_wto32) && __SIZEOF_WCHAR_T__ == 2 && defined(__LIBCCALL_IS_LIBDCALL)
 /* >> format_16to32(3)
- * Format printer (compatible with `pc16formatprinter') for
+ * Format printer (compatible with `pc16formatprinter')  for
  * converting UTF-16 unicode input data into a UTF-32 output */
 __CREDIRECT(,__SSIZE_TYPE__,__NOTHROW_NCX,format_16to32,(void *__arg, __CHAR16_TYPE__ const *__data, __SIZE_TYPE__ __datalen),format_wto32,(__arg,__data,__datalen))
 #elif defined(__CRT_HAVE_DOS$format_wto32)
 /* >> format_16to32(3)
- * Format printer (compatible with `pc16formatprinter') for
+ * Format printer (compatible with `pc16formatprinter')  for
  * converting UTF-16 unicode input data into a UTF-32 output */
 __CREDIRECT_DOS(,__SSIZE_TYPE__,__NOTHROW_NCX,format_16to32,(void *__arg, __CHAR16_TYPE__ const *__data, __SIZE_TYPE__ __datalen),format_wto32,(__arg,__data,__datalen))
 #elif __SIZEOF_WCHAR_T__ == 2
 #include <libc/local/unicode/format_wto32.h>
 /* >> format_16to32(3)
- * Format printer (compatible with `pc16formatprinter') for
+ * Format printer (compatible with `pc16formatprinter')  for
  * converting UTF-16 unicode input data into a UTF-32 output */
 __FORCELOCAL __ATTR_ARTIFICIAL __SSIZE_TYPE__ __NOTHROW_NCX(__LIBDCALL format_16to32)(void *__arg, __CHAR16_TYPE__ const *__data, __SIZE_TYPE__ __datalen) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(format_wto32))(__arg, (__WCHAR_TYPE__ const *)__data, __datalen); }
 #else /* ... */
 #include <libc/local/unicode/format_16to32.h>
 /* >> format_16to32(3)
- * Format printer (compatible with `pc16formatprinter') for
+ * Format printer (compatible with `pc16formatprinter')  for
  * converting UTF-16 unicode input data into a UTF-32 output */
 __NAMESPACE_LOCAL_USING_OR_IMPL(format_16to32, __FORCELOCAL __ATTR_ARTIFICIAL __SSIZE_TYPE__ __NOTHROW_NCX(__LIBDCALL format_16to32)(void *__arg, char16_t const *__data, __SIZE_TYPE__ __datalen) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(format_16to32))(__arg, __data, __datalen); })
 #endif /* !... */
@@ -1111,24 +1111,24 @@ struct format_32to16_data {
 #if defined(__CRT_HAVE_format_wto16) && __SIZEOF_WCHAR_T__ == 4 && defined(__LIBCCALL_IS_LIBKCALL)
 /* >> format_32to16(3)
  * Format printer (compatible with `__pc32formatprinter') for
- * converting UTF-32 unicode input data into a UTF-16 output */
+ * converting UTF-32 unicode input data into a UTF-16  output */
 __CREDIRECT(,__SSIZE_TYPE__,__NOTHROW_NCX,format_32to16,(void *__arg, __CHAR32_TYPE__ const *__data, __SIZE_TYPE__ __datalen),format_wto16,(__arg,__data,__datalen))
 #elif defined(__CRT_HAVE_KOS$format_wto16)
 /* >> format_32to16(3)
  * Format printer (compatible with `__pc32formatprinter') for
- * converting UTF-32 unicode input data into a UTF-16 output */
+ * converting UTF-32 unicode input data into a UTF-16  output */
 __CREDIRECT_KOS(,__SSIZE_TYPE__,__NOTHROW_NCX,format_32to16,(void *__arg, __CHAR32_TYPE__ const *__data, __SIZE_TYPE__ __datalen),format_wto16,(__arg,__data,__datalen))
 #elif __SIZEOF_WCHAR_T__ == 4
 #include <libc/local/unicode/format_wto16.h>
 /* >> format_32to16(3)
  * Format printer (compatible with `__pc32formatprinter') for
- * converting UTF-32 unicode input data into a UTF-16 output */
+ * converting UTF-32 unicode input data into a UTF-16  output */
 __FORCELOCAL __ATTR_ARTIFICIAL __SSIZE_TYPE__ __NOTHROW_NCX(__LIBKCALL format_32to16)(void *__arg, __CHAR32_TYPE__ const *__data, __SIZE_TYPE__ __datalen) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(format_wto16))(__arg, (__WCHAR_TYPE__ const *)__data, __datalen); }
 #else /* ... */
 #include <libc/local/unicode/format_32to16.h>
 /* >> format_32to16(3)
  * Format printer (compatible with `__pc32formatprinter') for
- * converting UTF-32 unicode input data into a UTF-16 output */
+ * converting UTF-32 unicode input data into a UTF-16  output */
 __NAMESPACE_LOCAL_USING_OR_IMPL(format_32to16, __FORCELOCAL __ATTR_ARTIFICIAL __SSIZE_TYPE__ __NOTHROW_NCX(__LIBKCALL format_32to16)(void *__arg, char32_t const *__data, __SIZE_TYPE__ __datalen) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(format_32to16))(__arg, __data, __datalen); })
 #endif /* !... */
 

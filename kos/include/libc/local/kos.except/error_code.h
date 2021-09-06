@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x9d7f60d6 */
+/* HASH CRC-32:0xc2cc4622 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -25,7 +25,6 @@
 #if defined(__arch_error_code) || defined(__CRT_HAVE_error_data) || defined(__arch_error_data)
 #include <kos/bits/exception_data.h>
 __NAMESPACE_LOCAL_BEGIN
-/* Dependency: error_data from kos.except */
 #ifndef __local___localdep_error_data_defined
 #define __local___localdep_error_data_defined 1
 #ifdef __CRT_HAVE_error_data

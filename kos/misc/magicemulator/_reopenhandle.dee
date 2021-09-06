@@ -64,7 +64,7 @@ function getWord(b: Bytes, i: int = 0, s: int = -1): int {
 }
 
 @@Returns a triple @(STD_INPUT_HANDLE, STD_OUTPUT_HANDLE, STD_ERROR_HANDLE)
-@@describing the current standard handles for the given @hProcess.
+@@describing  the  current  standard  handles  for  the  given   @hProcess.
 @@These handles can then be used with DuplicateHandle() to re-open the same
 @@underlying kernel object within the calling process.
 @@NOTE: The given @hProcess needs @PROCESS_QUERY_LIMITED_INFORMATION,

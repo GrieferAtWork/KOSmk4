@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xaa8888f8 */
+/* HASH CRC-32:0xc2711926 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -131,16 +131,16 @@ INTDEF NONNULL((2, 4)) int NOTHROW_RPC(LIBDCALL libd_wlinkat)(fd_t fromfd, char1
  * Create a hard link from `fromfd:from', leading to `tofd:to' */
 INTDEF NONNULL((2, 4)) int NOTHROW_RPC(LIBKCALL libc_wlinkat)(fd_t fromfd, char32_t const *from, fd_t tofd, char32_t const *to, atflag_t flags);
 /* >> symlinkat(3)
- * Create a new symbolic link loaded with `link_text' as link
+ * Create  a  new  symbolic  link  loaded  with  `link_text'  as link
  * text, at the filesystem location referred to by `tofd:target_path' */
 INTDEF NONNULL((1, 3)) int NOTHROW_RPC(LIBDCALL libd_wsymlinkat)(char16_t const *link_text, fd_t tofd, char16_t const *target_path);
 /* >> symlinkat(3)
- * Create a new symbolic link loaded with `link_text' as link
+ * Create  a  new  symbolic  link  loaded  with  `link_text'  as link
  * text, at the filesystem location referred to by `tofd:target_path' */
 INTDEF NONNULL((1, 3)) int NOTHROW_RPC(LIBKCALL libc_wsymlinkat)(char32_t const *link_text, fd_t tofd, char32_t const *target_path);
 /* >> readlinkat(2)
  * Read the text of a symbolic link under `dfd:path' into the provided buffer.
- * WARNING: This function is badly designed and will neither append a trailing
+ * WARNING: This  function is badly designed and will neither append a trailing
  *          NUL-character to the buffer, nor will it return the required buffer
  *          size. Instead, it will return the written size, and the caller must
  *          keep on over allocating until the function indicates that it didn't
@@ -149,7 +149,7 @@ INTDEF NONNULL((1, 3)) int NOTHROW_RPC(LIBKCALL libc_wsymlinkat)(char32_t const 
 INTDEF NONNULL((2, 3)) ssize_t NOTHROW_RPC(LIBDCALL libd_wreadlinkat)(fd_t dfd, char16_t const *path, char16_t *buf, size_t buflen);
 /* >> readlinkat(2)
  * Read the text of a symbolic link under `dfd:path' into the provided buffer.
- * WARNING: This function is badly designed and will neither append a trailing
+ * WARNING: This  function is badly designed and will neither append a trailing
  *          NUL-character to the buffer, nor will it return the required buffer
  *          size. Instead, it will return the written size, and the caller must
  *          keep on over allocating until the function indicates that it didn't
@@ -172,11 +172,11 @@ INTDEF NONNULL((2)) int NOTHROW_RPC(LIBDCALL libd_wunlinkat)(fd_t dfd, char16_t 
 INTDEF NONNULL((2)) int NOTHROW_RPC(LIBKCALL libc_wunlinkat)(fd_t dfd, char32_t const *name, atflag_t flags);
 /* >> lchown(2)
  * Change the ownership of a given `file' to `group:owner',
- * but don't reference it if that file is a symbolic link */
+ * but don't reference it if  that file is a symbolic  link */
 INTDEF NONNULL((1)) int NOTHROW_RPC(LIBDCALL libd_wlchown)(char16_t const *file, uid_t owner, gid_t group);
 /* >> lchown(2)
  * Change the ownership of a given `file' to `group:owner',
- * but don't reference it if that file is a symbolic link */
+ * but don't reference it if  that file is a symbolic  link */
 INTDEF NONNULL((1)) int NOTHROW_RPC(LIBKCALL libc_wlchown)(char32_t const *file, uid_t owner, gid_t group);
 /* >> truncate(2)
  * Truncate the given file `file' to a length of `length' */
@@ -191,19 +191,19 @@ INTDEF NONNULL((1)) int NOTHROW_NCX(LIBDCALL libd_wtruncate64)(char16_t const *f
  * Truncate the given file `file' to a length of `length' */
 INTDEF NONNULL((1)) int NOTHROW_NCX(LIBKCALL libc_wtruncate64)(char32_t const *file, __PIO_OFFSET64 length);
 /* >> symlink(3)
- * Create a new symbolic link loaded with `link_text' as link
+ * Create  a new  symbolic link  loaded with  `link_text' as link
  * text, at the filesystem location referred to by `target_path'.
  * Same as `symlinkat(link_text, AT_FDCWD, target_path)' */
 INTDEF NONNULL((1, 2)) int NOTHROW_RPC(LIBDCALL libd_wsymlink)(char16_t const *link_text, char16_t const *target_path);
 /* >> symlink(3)
- * Create a new symbolic link loaded with `link_text' as link
+ * Create  a new  symbolic link  loaded with  `link_text' as link
  * text, at the filesystem location referred to by `target_path'.
  * Same as `symlinkat(link_text, AT_FDCWD, target_path)' */
 INTDEF NONNULL((1, 2)) int NOTHROW_RPC(LIBKCALL libc_wsymlink)(char32_t const *link_text, char32_t const *target_path);
 /* >> readlink(3)
  * Read the text of a symbolic link under `path' into the provided buffer.
  * Same as `readlinkat(AT_FDCWD, path, buf, buflen)'
- * WARNING: This function is badly designed and will neither append a trailing
+ * WARNING: This  function is badly designed and will neither append a trailing
  *          NUL-character to the buffer, nor will it return the required buffer
  *          size. Instead, it will return the written size, and the caller must
  *          keep on over allocating until the function indicates that it didn't
@@ -213,7 +213,7 @@ INTDEF NONNULL((1, 2)) ssize_t NOTHROW_RPC(LIBDCALL libd_wreadlink)(char16_t con
 /* >> readlink(3)
  * Read the text of a symbolic link under `path' into the provided buffer.
  * Same as `readlinkat(AT_FDCWD, path, buf, buflen)'
- * WARNING: This function is badly designed and will neither append a trailing
+ * WARNING: This  function is badly designed and will neither append a trailing
  *          NUL-character to the buffer, nor will it return the required buffer
  *          size. Instead, it will return the written size, and the caller must
  *          keep on over allocating until the function indicates that it didn't
@@ -249,11 +249,11 @@ INTDEF NONNULL((1)) int NOTHROW_NCX(LIBDCALL libd_wsetdomainname)(char16_t const
  * Set the name of the hosting machine's domain */
 INTDEF NONNULL((1)) int NOTHROW_NCX(LIBKCALL libc_wsetdomainname)(char32_t const *name, size_t len);
 /* >> chroot(2)
- * Change the root directory of the calling `CLONE_FS' group of threads
+ * Change  the root directory of the calling `CLONE_FS' group of threads
  * (usually the process) to a path that was previously address by `path' */
 INTDEF NONNULL((1)) int NOTHROW_RPC(LIBDCALL libd_wchroot)(char16_t const *__restrict path);
 /* >> chroot(2)
- * Change the root directory of the calling `CLONE_FS' group of threads
+ * Change  the root directory of the calling `CLONE_FS' group of threads
  * (usually the process) to a path that was previously address by `path' */
 INTDEF NONNULL((1)) int NOTHROW_RPC(LIBKCALL libc_wchroot)(char32_t const *__restrict path);
 #endif /* !__KERNEL__ */

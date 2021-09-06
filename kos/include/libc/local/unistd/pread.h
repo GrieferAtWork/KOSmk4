@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x8f2e96ea */
+/* HASH CRC-32:0x2e289217 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -35,103 +35,56 @@
 #endif /* !__USE_KOS_ALTERATIONS */
 #endif /* !__PIO_OFFSET */
 __NAMESPACE_LOCAL_BEGIN
-/* Dependency: lseek from unistd */
 #ifndef __local___localdep_lseek_defined
 #define __local___localdep_lseek_defined 1
 #if defined(__CRT_HAVE_lseek64) && defined(__USE_FILE_OFFSET64)
-/* >> lseek(2)
- * Change the position of the file read/write pointer within a file referred to by `fd' */
 __CREDIRECT(,__FS_TYPE(off),__NOTHROW_NCX,__localdep_lseek,(__fd_t __fd, __FS_TYPE(off) __offset, __STDC_INT_AS_UINT_T __whence),lseek64,(__fd,__offset,__whence))
 #elif defined(__CRT_HAVE__lseeki64) && defined(__USE_FILE_OFFSET64)
-/* >> lseek(2)
- * Change the position of the file read/write pointer within a file referred to by `fd' */
 __CREDIRECT(,__FS_TYPE(off),__NOTHROW_NCX,__localdep_lseek,(__fd_t __fd, __FS_TYPE(off) __offset, __STDC_INT_AS_UINT_T __whence),_lseeki64,(__fd,__offset,__whence))
 #elif defined(__CRT_HAVE_lseek) && !defined(__USE_FILE_OFFSET64)
-/* >> lseek(2)
- * Change the position of the file read/write pointer within a file referred to by `fd' */
 __CREDIRECT(,__FS_TYPE(off),__NOTHROW_NCX,__localdep_lseek,(__fd_t __fd, __FS_TYPE(off) __offset, __STDC_INT_AS_UINT_T __whence),lseek,(__fd,__offset,__whence))
 #elif defined(__CRT_HAVE__lseek) && !defined(__USE_FILE_OFFSET64)
-/* >> lseek(2)
- * Change the position of the file read/write pointer within a file referred to by `fd' */
 __CREDIRECT(,__FS_TYPE(off),__NOTHROW_NCX,__localdep_lseek,(__fd_t __fd, __FS_TYPE(off) __offset, __STDC_INT_AS_UINT_T __whence),_lseek,(__fd,__offset,__whence))
 #elif defined(__CRT_HAVE___lseek) && !defined(__USE_FILE_OFFSET64)
-/* >> lseek(2)
- * Change the position of the file read/write pointer within a file referred to by `fd' */
 __CREDIRECT(,__FS_TYPE(off),__NOTHROW_NCX,__localdep_lseek,(__fd_t __fd, __FS_TYPE(off) __offset, __STDC_INT_AS_UINT_T __whence),__lseek,(__fd,__offset,__whence))
 #elif defined(__CRT_HAVE_lseek64) || defined(__CRT_HAVE__lseeki64) || defined(__CRT_HAVE_lseek) || defined(__CRT_HAVE__lseek) || defined(__CRT_HAVE___lseek)
 __NAMESPACE_LOCAL_END
 #include <libc/local/unistd/lseek.h>
 __NAMESPACE_LOCAL_BEGIN
-/* >> lseek(2)
- * Change the position of the file read/write pointer within a file referred to by `fd' */
 #define __localdep_lseek __LIBC_LOCAL_NAME(lseek)
 #else /* ... */
 #undef __local___localdep_lseek_defined
 #endif /* !... */
 #endif /* !__local___localdep_lseek_defined */
-/* Dependency: pread64 from unistd */
 #ifndef __local___localdep_pread64_defined
 #define __local___localdep_pread64_defined 1
 #ifdef __CRT_HAVE_pread64
-/* >> pread64(2)
- * Read data from a file at a specific offset */
 __CREDIRECT(__ATTR_NONNULL((2)),__SSIZE_TYPE__,__NOTHROW_RPC,__localdep_pread64,(__fd_t __fd, void *__buf, __SIZE_TYPE__ __bufsize, __PIO_OFFSET64 __offset),pread64,(__fd,__buf,__bufsize,__offset))
 #elif defined(__CRT_HAVE_pread) && __SIZEOF_OFF32_T__ == __SIZEOF_OFF64_T__
-/* >> pread64(2)
- * Read data from a file at a specific offset */
 __CREDIRECT(__ATTR_NONNULL((2)),__SSIZE_TYPE__,__NOTHROW_RPC,__localdep_pread64,(__fd_t __fd, void *__buf, __SIZE_TYPE__ __bufsize, __PIO_OFFSET64 __offset),pread,(__fd,__buf,__bufsize,__offset))
 #elif defined(__CRT_HAVE___pread64)
-/* >> pread64(2)
- * Read data from a file at a specific offset */
 __CREDIRECT(__ATTR_NONNULL((2)),__SSIZE_TYPE__,__NOTHROW_RPC,__localdep_pread64,(__fd_t __fd, void *__buf, __SIZE_TYPE__ __bufsize, __PIO_OFFSET64 __offset),__pread64,(__fd,__buf,__bufsize,__offset))
 #elif defined(__CRT_HAVE_pread) || ((defined(__CRT_HAVE_lseek64) || defined(__CRT_HAVE__lseeki64) || defined(__CRT_HAVE_lseek) || defined(__CRT_HAVE__lseek) || defined(__CRT_HAVE___lseek)) && (defined(__CRT_HAVE_read) || defined(__CRT_HAVE__read) || defined(__CRT_HAVE___read)) && defined(__SEEK_CUR) && defined(__SEEK_SET))
 __NAMESPACE_LOCAL_END
 #include <libc/local/unistd/pread64.h>
 __NAMESPACE_LOCAL_BEGIN
-/* >> pread64(2)
- * Read data from a file at a specific offset */
 #define __localdep_pread64 __LIBC_LOCAL_NAME(pread64)
 #else /* ... */
 #undef __local___localdep_pread64_defined
 #endif /* !... */
 #endif /* !__local___localdep_pread64_defined */
-/* Dependency: read from unistd */
 #ifndef __local___localdep_read_defined
 #define __local___localdep_read_defined 1
 #ifdef __CRT_HAVE_read
-/* >> read(2)
- * Read up to `bufsize' bytes from `fd' into `buf'
- * When `fd' has the `O_NONBLOCK' flag set, only read as much data as was
- * available at the time the call was made, and throw E_WOULDBLOCK if no data
- * was available at the time.
- * @return: <= bufsize: The actual amount of read bytes
- * @return: 0         : EOF */
 __CREDIRECT(__ATTR_NONNULL((2)),__SSIZE_TYPE__,__NOTHROW_RPC,__localdep_read,(__fd_t __fd, void *__buf, __SIZE_TYPE__ __bufsize),read,(__fd,__buf,__bufsize))
 #elif defined(__CRT_HAVE__read)
-/* >> read(2)
- * Read up to `bufsize' bytes from `fd' into `buf'
- * When `fd' has the `O_NONBLOCK' flag set, only read as much data as was
- * available at the time the call was made, and throw E_WOULDBLOCK if no data
- * was available at the time.
- * @return: <= bufsize: The actual amount of read bytes
- * @return: 0         : EOF */
 __CREDIRECT(__ATTR_NONNULL((2)),__SSIZE_TYPE__,__NOTHROW_RPC,__localdep_read,(__fd_t __fd, void *__buf, __SIZE_TYPE__ __bufsize),_read,(__fd,__buf,__bufsize))
 #elif defined(__CRT_HAVE___read)
-/* >> read(2)
- * Read up to `bufsize' bytes from `fd' into `buf'
- * When `fd' has the `O_NONBLOCK' flag set, only read as much data as was
- * available at the time the call was made, and throw E_WOULDBLOCK if no data
- * was available at the time.
- * @return: <= bufsize: The actual amount of read bytes
- * @return: 0         : EOF */
 __CREDIRECT(__ATTR_NONNULL((2)),__SSIZE_TYPE__,__NOTHROW_RPC,__localdep_read,(__fd_t __fd, void *__buf, __SIZE_TYPE__ __bufsize),__read,(__fd,__buf,__bufsize))
 #else /* ... */
 #undef __local___localdep_read_defined
 #endif /* !... */
 #endif /* !__local___localdep_read_defined */
-/* >> pread(2)
- * Read data from a file at a specific `offset', rather than the current R/W position
- * @return: <= bufsize: The actual amount of read bytes */
 __LOCAL_LIBC(pread) __ATTR_NONNULL((2)) __SSIZE_TYPE__
 __NOTHROW_RPC(__LIBCCALL __LIBC_LOCAL_NAME(pread))(__fd_t __fd, void *__buf, __SIZE_TYPE__ __bufsize, __PIO_OFFSET __offset) {
 

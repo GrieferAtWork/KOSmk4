@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x853fcbed */
+/* HASH CRC-32:0xcf44e18 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -25,7 +25,6 @@
 #if (defined(__CRT_HAVE_fcntl) || defined(__CRT_HAVE___fcntl)) && (defined(__F_SETFL_XCH) || (defined(__F_GETFL) && defined(__F_SETFL)))
 #include <bits/types.h>
 __NAMESPACE_LOCAL_BEGIN
-/* Dependency: fcntl from fcntl */
 #ifndef __local___localdep_fcntl_defined
 #define __local___localdep_fcntl_defined 1
 #ifdef __CRT_HAVE_fcntl

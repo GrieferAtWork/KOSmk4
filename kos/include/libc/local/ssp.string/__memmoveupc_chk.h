@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x967aeee0 */
+/* HASH CRC-32:0x8fa28e4e */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -23,19 +23,14 @@
 #include <__crt.h>
 #include <hybrid/typecore.h>
 __NAMESPACE_LOCAL_BEGIN
-/* Dependency: memmoveupc from string */
 #ifndef __local___localdep_memmoveupc_defined
 #define __local___localdep_memmoveupc_defined 1
 #ifdef __CRT_HAVE_memmoveupc
-/* Move memory between potentially overlapping memory blocks (assumes that `dst >= src || !ELEM_COUNT || !ELEM_SIZE')
- * @return: * : Always re-returns `dst' */
 __CREDIRECT(__ATTR_LEAF __ATTR_RETNONNULL __ATTR_NONNULL((1, 2)),void *,__NOTHROW_NCX,__localdep_memmoveupc,(void *__dst, void const *__src, __SIZE_TYPE__ __elem_count, __SIZE_TYPE__ __elem_size),memmoveupc,(__dst,__src,__elem_count,__elem_size))
 #else /* __CRT_HAVE_memmoveupc */
 __NAMESPACE_LOCAL_END
 #include <libc/local/string/memmoveupc.h>
 __NAMESPACE_LOCAL_BEGIN
-/* Move memory between potentially overlapping memory blocks (assumes that `dst >= src || !ELEM_COUNT || !ELEM_SIZE')
- * @return: * : Always re-returns `dst' */
 #define __localdep_memmoveupc __LIBC_LOCAL_NAME(memmoveupc)
 #endif /* !__CRT_HAVE_memmoveupc */
 #endif /* !__local___localdep_memmoveupc_defined */

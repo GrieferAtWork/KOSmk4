@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x1e70abb0 */
+/* HASH CRC-32:0xd103cfcb */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -24,19 +24,12 @@
 #ifdef __CRT_HAVE_pthread_mutex_trylock
 #include <bits/crt/threads.h>
 __NAMESPACE_LOCAL_BEGIN
-/* Dependency: pthread_mutex_trylock from pthread */
 #ifndef __local___localdep_pthread_mutex_trylock_defined
 #define __local___localdep_pthread_mutex_trylock_defined 1
 __NAMESPACE_LOCAL_END
 #include <bits/types.h>
 #include <bits/crt/pthreadtypes.h>
 __NAMESPACE_LOCAL_BEGIN
-/* >> pthread_mutex_trylock(3)
- * Try locking the given `mutex'
- * @return: EOK:   Success
- * @return: EBUSY: The mutex has already been locked
- *                 In case of a recursive mutex, another
- *                 thread was the one to acquire the lock. */
 __CREDIRECT(__ATTR_WUNUSED __ATTR_NONNULL((1)),__errno_t,__NOTHROW_NCX,__localdep_pthread_mutex_trylock,(__pthread_mutex_t *__mutex),pthread_mutex_trylock,(__mutex))
 #endif /* !__local___localdep_pthread_mutex_trylock_defined */
 __NAMESPACE_LOCAL_END
@@ -44,11 +37,6 @@ __NAMESPACE_LOCAL_END
 #include <bits/crt/pthreadtypes.h>
 #include <libc/errno.h>
 __NAMESPACE_LOCAL_BEGIN
-/* >> mtx_trylock(3)
- * Try to acquire a lock to a given mutex (s.a. `pthread_mutex_trylock(3)')
- * @return: thrd_success: Success
- * @return: thrd_busy:    Cannot lock without blocking right now
- * @return: thrd_error:   Error */
 __LOCAL_LIBC(mtx_trylock) __ATTR_NONNULL((1)) int
 __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(mtx_trylock))(__mtx_t *__restrict __mutex) {
 	__errno_t __error;

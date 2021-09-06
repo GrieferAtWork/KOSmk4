@@ -20,8 +20,8 @@
 #ifdef __INTELLISENSE__
 #include "signal.c"
 #define DEFINE_task_waitfor 1
-//#define DEFINE_task_waitfor_norpc 1
-//#define DEFINE_task_waitfor_nx 1
+//#define  DEFINE_task_waitfor_norpc   1
+//#define    DEFINE_task_waitfor_nx    1
 //#define DEFINE_task_waitfor_norpc_nx 1
 #endif /* __INTELLISENSE__ */
 

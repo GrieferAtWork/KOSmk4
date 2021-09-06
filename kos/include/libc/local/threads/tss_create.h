@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xe6f3de0 */
+/* HASH CRC-32:0x7a11d580 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -24,7 +24,6 @@
 #ifdef __CRT_HAVE_pthread_key_create
 #include <bits/crt/threads.h>
 __NAMESPACE_LOCAL_BEGIN
-/* Dependency: pthread_key_create from pthread */
 #ifndef __local___localdep_pthread_key_create_defined
 #define __local___localdep_pthread_key_create_defined 1
 __NAMESPACE_LOCAL_END
@@ -35,25 +34,12 @@ typedef void (__LIBKCALL *__pthread_destr_function_t)(void *);
 #include <bits/types.h>
 #include <bits/crt/pthreadtypes.h>
 __NAMESPACE_LOCAL_BEGIN
-/* >> pthread_key_create(3)
- * Create a key value identifying a location in the thread-specific
- * data area. Each thread maintains a distinct thread-specific data
- * area. `destr_function', if non-`NULL', is called with the value
- * associated to that key when the key is destroyed.
- * `destr_function' is not called if the value associated is `NULL'
- * when the key is destroyed
- * @return: EOK:    Success
- * @return: ENOMEM: Insufficient memory to create the key */
 __CREDIRECT(__ATTR_NONNULL((1)),__errno_t,__NOTHROW_NCX,__localdep_pthread_key_create,(__pthread_key_t *__key, __pthread_destr_function_t __destr_function),pthread_key_create,(__key,__destr_function))
 #endif /* !__local___localdep_pthread_key_create_defined */
 __NAMESPACE_LOCAL_END
 #include <asm/crt/threads.h>
 #include <bits/crt/pthreadtypes.h>
 __NAMESPACE_LOCAL_BEGIN
-/* >> tss_create(3)
- * Create a new TLS key (s.a. `pthread_key_create(3)')
- * @return: thrd_success: Success
- * @return: thrd_error:   Error */
 __LOCAL_LIBC(tss_create) int
 __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(tss_create))(__tss_t *__tss_id, __tss_dtor_t __destructor) {
 	__errno_t __error;

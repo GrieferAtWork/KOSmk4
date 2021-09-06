@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xa2405c7e */
+/* HASH CRC-32:0x6031c6d */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -23,13 +23,11 @@
 #include <__crt.h>
 #ifdef __CRT_HAVE_umount2
 __NAMESPACE_LOCAL_BEGIN
-/* Dependency: umount2 from sys.mount */
 #ifndef __local___localdep_umount2_defined
 #define __local___localdep_umount2_defined 1
 __NAMESPACE_LOCAL_END
 #include <features.h>
 __NAMESPACE_LOCAL_BEGIN
-/* @param: flags: Set of `MNT_FORCE | MNT_DETACH | MNT_EXPIRE | UMOUNT_NOFOLLOW' */
 __CREDIRECT(,int,__NOTHROW_RPC,__localdep_umount2,(char const *__special_file, __STDC_INT_AS_UINT_T __flags),umount2,(__special_file,__flags))
 #endif /* !__local___localdep_umount2_defined */
 __LOCAL_LIBC(umount) int

@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xe99c75e6 */
+/* HASH CRC-32:0xdf2cd281 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -49,7 +49,7 @@ NOTHROW_NCX(LIBCCALL libc_sl_init)(void) {
 	return result;
 }
 /* >> sl_add(3)
- * Append a given `name' to `sl'. `name' is considered
+ * Append a  given `name'  to  `sl'. `name'  is  considered
  * inherited if the StringList is destroyed with `freeit=1' */
 INTERN ATTR_SECTION(".text.crt.bsd.stringlist") NONNULL((1, 2)) int
 NOTHROW_NCX(LIBCCALL libc_sl_add)(struct _stringlist *sl,
@@ -88,9 +88,9 @@ NOTHROW_NCX(LIBCCALL libc_sl_free)(struct _stringlist *sl,
 	libc_free(sl);
 }
 /* >> sl_find(3)
- * Search for `name' within the given StringList. Upon success,
- * return a pointer to the equivalent string within `sl' (i.e. the
- * pointer originally passed to `sl_add()' to insert that string).
+ * Search  for  `name'  within  the  given  StringList.  Upon  success,
+ * return a  pointer to  the equivalent  string within  `sl' (i.e.  the
+ * pointer originally  passed to  `sl_add()'  to insert  that  string).
  * If `sl' doesn't contain an equivalent string, return `NULL' instead. */
 INTERN ATTR_SECTION(".text.crt.bsd.stringlist") ATTR_PURE NONNULL((1, 2)) char *
 NOTHROW_NCX(LIBCCALL libc_sl_find)(struct _stringlist __KOS_FIXED_CONST *sl,

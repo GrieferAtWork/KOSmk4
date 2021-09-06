@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x4c355baa */
+/* HASH CRC-32:0xde0ced64 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -34,31 +34,18 @@
 #endif /* !__USE_DOS_ALTERATIONS */
 #endif /* !__TARGV */
 __NAMESPACE_LOCAL_BEGIN
-/* Dependency: execve from unistd */
 #ifndef __local___localdep_execve_defined
 #define __local___localdep_execve_defined 1
 #if __has_builtin(__builtin_execve) && defined(__LIBC_BIND_CRTBUILTINS) && defined(__CRT_HAVE_execve)
-/* >> execve(2)
- * Replace the calling process with the application image referred to by `path' / `file'
- * and execute it's `main()' method, passing the given `argv', and setting `environ' to `envp' */
 __CEIREDIRECT(__ATTR_NONNULL((1, 2, 3)),int,__NOTHROW_RPC,__localdep_execve,(char const *__restrict __path, __TARGV, __TENVP),execve,{ return __builtin_execve(__path, (char *const *)___argv, (char *const *)___envp); })
 #elif defined(__CRT_HAVE_execve)
-/* >> execve(2)
- * Replace the calling process with the application image referred to by `path' / `file'
- * and execute it's `main()' method, passing the given `argv', and setting `environ' to `envp' */
 __CREDIRECT(__ATTR_NONNULL((1, 2, 3)),int,__NOTHROW_RPC,__localdep_execve,(char const *__restrict __path, __TARGV, __TENVP),execve,(__path,___argv,___envp))
 #elif defined(__CRT_HAVE__execve)
-/* >> execve(2)
- * Replace the calling process with the application image referred to by `path' / `file'
- * and execute it's `main()' method, passing the given `argv', and setting `environ' to `envp' */
 __CREDIRECT(__ATTR_NONNULL((1, 2, 3)),int,__NOTHROW_RPC,__localdep_execve,(char const *__restrict __path, __TARGV, __TENVP),_execve,(__path,___argv,___envp))
 #else /* ... */
 #undef __local___localdep_execve_defined
 #endif /* !... */
 #endif /* !__local___localdep_execve_defined */
-/* >> execv(3)
- * Replace the calling process with the application image referred to by `path' / `file'
- * and execute it's `main()' method, passing the given `argv', and setting `environ' to `envp' */
 __LOCAL_LIBC(execv) __ATTR_NONNULL((1, 2)) int
 __NOTHROW_RPC(__LIBCCALL __LIBC_LOCAL_NAME(execv))(char const *__restrict __path, __TARGV) {
 	return __localdep_execve(__path, ___argv, __LOCAL_environ);

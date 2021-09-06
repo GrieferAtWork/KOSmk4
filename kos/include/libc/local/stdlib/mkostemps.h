@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x90cc7ebe */
+/* HASH CRC-32:0x5a5fcdd4 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -26,25 +26,11 @@
 #include <features.h>
 #include <bits/types.h>
 __NAMESPACE_LOCAL_BEGIN
-/* Dependency: system_mktemp from stdlib */
 #ifndef __local___localdep_system_mktemp_defined
 #define __local___localdep_system_mktemp_defined 1
 __NAMESPACE_LOCAL_END
 #include <libc/local/stdlib/system_mktemp.h>
 __NAMESPACE_LOCAL_BEGIN
-/* Internal implementation for creating temporary files.
- * @param: what: Select what kind of temporary object to create.
- *                  `0': Create a temporary file. (The handle of that file will be returned)
- *                       Creating mode used is 0600
- *                       This mode is only recognized when `$has_function(open)'
- *                  `1': Create a temporary directory. (0 is returned on success)
- *                       Creating mode used is 0700
- *                       This mode is only recognized when `$has_function(mkdir)'
- *                       NOTE: `flags' is ignored in this mode
- *                  `2': Braindead `mktemp(3)'-mode: Like `0', but don't actually create the
- *                       file. Instead, return `0' on success
- *                       This mode is only recognized when `$has_function(open) || $has_function(stat)'
- *                       NOTE: `flags' is ignored in this mode */
 #define __localdep_system_mktemp __LIBC_LOCAL_NAME(system_mktemp)
 #endif /* !__local___localdep_system_mktemp_defined */
 __LOCAL_LIBC(mkostemps) __ATTR_WUNUSED __ATTR_NONNULL((1)) __fd_t

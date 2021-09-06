@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x50fccd59 */
+/* HASH CRC-32:0x15bb4913 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -24,29 +24,18 @@
 #ifdef __CRT_HAVE_pthread_setspecific
 #include <bits/crt/threads.h>
 __NAMESPACE_LOCAL_BEGIN
-/* Dependency: pthread_setspecific from pthread */
 #ifndef __local___localdep_pthread_setspecific_defined
 #define __local___localdep_pthread_setspecific_defined 1
 __NAMESPACE_LOCAL_END
 #include <bits/types.h>
 #include <bits/crt/pthreadtypes.h>
 __NAMESPACE_LOCAL_BEGIN
-/* >> pthread_setspecific(3)
- * Store POINTER in the thread-specific data slot identified by `key'
- * @return: EOK:    Success
- * @return: EINVAL: Invalid `key'
- * @return: ENOMEM: `pointer' is non-`NULL', `key' had yet to be allowed for the
- *                  calling thread, and an attempt to allocate it just now failed */
 __CREDIRECT(,__errno_t,__NOTHROW_NCX,__localdep_pthread_setspecific,(__pthread_key_t __key, void const *__pointer),pthread_setspecific,(__key,__pointer))
 #endif /* !__local___localdep_pthread_setspecific_defined */
 __NAMESPACE_LOCAL_END
 #include <asm/crt/threads.h>
 #include <bits/crt/pthreadtypes.h>
 __NAMESPACE_LOCAL_BEGIN
-/* >> tss_set(3)
- * Set the calling thread's value for the given TLS key (s.a. `pthread_setspecific(3)')
- * @return: thrd_success: Success
- * @return: thrd_error:   Error */
 __LOCAL_LIBC(tss_set) int
 __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(tss_set))(__tss_t __tss_id, void *__val) {
 	__errno_t __error;

@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xadbcf660 */
+/* HASH CRC-32:0xa22ba991 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -31,7 +31,6 @@ struct format_waprintf_data {
 };
 #endif /* !__format_waprintf_data_defined */
 __NAMESPACE_LOCAL_BEGIN
-/* Dependency: realloc from stdlib */
 #ifndef __local___localdep_realloc_defined
 #define __local___localdep_realloc_defined 1
 #if __has_builtin(__builtin_realloc) && defined(__LIBC_BIND_CRTBUILTINS)
@@ -49,12 +48,6 @@ __CREDIRECT(__ATTR_MALL_DEFAULT_ALIGNED __ATTR_WUNUSED __ATTR_ALLOC_SIZE((2)),vo
 __NAMESPACE_LOCAL_END
 #include <hybrid/__assert.h>
 __NAMESPACE_LOCAL_BEGIN
-/* >> format_waprintf_alloc(3)
- * Allocate a buffer of `num_wchars' wide-characters at the end of `self'
- * The returned pointer remains valid until the next time this function is called,
- * the format_aprintf buffer `self' is finalized, or some other function is used
- * to append additional data to the end of `self'
- * @return: NULL: Failed to allocate additional memory */
 __LOCAL_LIBC(format_c32aprintf_alloc) __ATTR_MALLOC __ATTR_MALL_DEFAULT_ALIGNED __ATTR_WUNUSED __ATTR_NONNULL((1)) __CHAR32_TYPE__ *
 __NOTHROW_NCX(__LIBKCALL __LIBC_LOCAL_NAME(format_c32aprintf_alloc))(struct format_c32aprintf_data *__restrict __self, __SIZE_TYPE__ __num_wchars) {
 	__CHAR32_TYPE__ *__result;

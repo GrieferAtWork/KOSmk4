@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x1962cc4e */
+/* HASH CRC-32:0xd6db77b8 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -50,27 +50,27 @@ typedef __pos64_t pos64_t; /* File/device position */
 #endif /* __USE_LARGEFILE64 */
 
 /* >> execv(3)
- * Replace the calling process with the application image referred to by `path' / `file'
+ * Replace the calling  process with  the application  image referred  to by  `path' /  `file'
  * and execute it's `main()' method, passing the given `argv', and setting `environ' to `envp' */
 __CDECLARE_VOID_OPT(__ATTR_NORETURN __ATTR_NONNULL((1, 2)),__THROWING,Execv,(char const *__restrict __path, __TARGV),(__path,___argv))
 /* >> execve(2)
- * Replace the calling process with the application image referred to by `path' / `file'
+ * Replace the calling  process with  the application  image referred  to by  `path' /  `file'
  * and execute it's `main()' method, passing the given `argv', and setting `environ' to `envp' */
 __CDECLARE_VOID_OPT(__ATTR_NORETURN __ATTR_NONNULL((1, 2, 3)),__THROWING,Execve,(char const *__restrict __path, __TARGV, __TENVP),(__path,___argv,___envp))
 /* >> execvp(3)
- * Replace the calling process with the application image referred to by `path' / `file'
+ * Replace the calling  process with  the application  image referred  to by  `path' /  `file'
  * and execute it's `main()' method, passing the given `argv', and setting `environ' to `envp' */
 __CDECLARE_VOID_OPT(__ATTR_NORETURN __ATTR_NONNULL((1, 2)),__THROWING,Execvp,(char const *__restrict __file, __TARGV),(__file,___argv))
 #ifdef __CRT_HAVE_Execl
 /* >> execl(3)
  * Replace the calling process with the application image referred to by `path' / `file'
- * and execute it's `main()' method, passing the list of NULL-terminated `args'-list */
+ * and execute it's  `main()' method,  passing the list  of NULL-terminated  `args'-list */
 __LIBC __ATTR_NORETURN __ATTR_SENTINEL __ATTR_NONNULL((1)) void (__VLIBCCALL Execl)(char const *__restrict __path, char const *__args, ...) __THROWS(...) __CASMNAME_SAME("Execl");
 #elif defined(__CRT_HAVE_Execv)
 #include <libc/local/kos.unistd/Execl.h>
 /* >> execl(3)
  * Replace the calling process with the application image referred to by `path' / `file'
- * and execute it's `main()' method, passing the list of NULL-terminated `args'-list */
+ * and execute it's  `main()' method,  passing the list  of NULL-terminated  `args'-list */
 #ifdef __cplusplus
 __NAMESPACE_LOCAL_USING_OR_IMPL(Execl, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_NORETURN __ATTR_SENTINEL __ATTR_NONNULL((1)) void (__VLIBCCALL Execl)(char const *__restrict __path, char const *__args, ...) __THROWS(...) { (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(Execl))(__path, __args, __builtin_va_arg_pack()); })
 #else /* __cplusplus */
@@ -80,14 +80,14 @@ __NAMESPACE_LOCAL_USING_OR_IMPL(Execl, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_NOR
 #ifdef __CRT_HAVE_Execle
 /* >> execle(3)
  * Replace the calling process with the application image referred to by `path' / `file'
- * and execute it's `main()' method, passing the list of NULL-terminated `args'-list,
+ * and  execute it's `main()'  method, passing the  list of NULL-terminated `args'-list,
  * and setting `environ' to a `char **' passed after the NULL sentinel */
 __LIBC __ATTR_NORETURN __ATTR_SENTINEL_O(1) __ATTR_NONNULL((1)) void (__VLIBCCALL Execle)(char const *__restrict __path, char const *__args, ...) __THROWS(...) __CASMNAME_SAME("Execle");
 #elif defined(__CRT_HAVE_Execve)
 #include <libc/local/kos.unistd/Execle.h>
 /* >> execle(3)
  * Replace the calling process with the application image referred to by `path' / `file'
- * and execute it's `main()' method, passing the list of NULL-terminated `args'-list,
+ * and  execute it's `main()'  method, passing the  list of NULL-terminated `args'-list,
  * and setting `environ' to a `char **' passed after the NULL sentinel */
 #ifdef __cplusplus
 __NAMESPACE_LOCAL_USING_OR_IMPL(Execle, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_NORETURN __ATTR_SENTINEL_O(1) __ATTR_NONNULL((1)) void (__VLIBCCALL Execle)(char const *__restrict __path, char const *__args, ...) __THROWS(...) { (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(Execle))(__path, __args, __builtin_va_arg_pack()); })
@@ -98,13 +98,13 @@ __NAMESPACE_LOCAL_USING_OR_IMPL(Execle, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_NO
 #ifdef __CRT_HAVE_Execpl
 /* >> execlp(3)
  * Replace the calling process with the application image referred to by `path' / `file'
- * and execute it's `main()' method, passing the list of NULL-terminated `args'-list */
+ * and execute it's  `main()' method,  passing the list  of NULL-terminated  `args'-list */
 __LIBC __ATTR_NORETURN __ATTR_SENTINEL __ATTR_NONNULL((1)) void (__VLIBCCALL Execpl)(char const *__restrict __file, char const *__args, ...) __THROWS(...) __CASMNAME_SAME("Execpl");
 #elif defined(__CRT_HAVE_Execvp)
 #include <libc/local/kos.unistd/Execpl.h>
 /* >> execlp(3)
  * Replace the calling process with the application image referred to by `path' / `file'
- * and execute it's `main()' method, passing the list of NULL-terminated `args'-list */
+ * and execute it's  `main()' method,  passing the list  of NULL-terminated  `args'-list */
 #ifdef __cplusplus
 __NAMESPACE_LOCAL_USING_OR_IMPL(Execpl, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_NORETURN __ATTR_SENTINEL __ATTR_NONNULL((1)) void (__VLIBCCALL Execpl)(char const *__restrict __file, char const *__args, ...) __THROWS(...) { (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(Execpl))(__file, __args, __builtin_va_arg_pack()); })
 #else /* __cplusplus */
@@ -114,14 +114,14 @@ __NAMESPACE_LOCAL_USING_OR_IMPL(Execpl, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_NO
 #ifdef __CRT_HAVE_Execlpe
 /* >> execle(3)
  * Replace the calling process with the application image referred to by `path' / `file'
- * and execute it's `main()' method, passing the list of NULL-terminated `args'-list,
+ * and  execute it's `main()'  method, passing the  list of NULL-terminated `args'-list,
  * and setting `environ' to a `char **' passed after the NULL sentinel */
 __LIBC __ATTR_NORETURN __ATTR_SENTINEL_O(1) __ATTR_NONNULL((1)) void (__VLIBCCALL Execlpe)(char const *__restrict __file, char const *__args, ...) __THROWS(...) __CASMNAME_SAME("Execlpe");
 #elif defined(__CRT_HAVE_Execvpe)
 #include <libc/local/kos.unistd/Execlpe.h>
 /* >> execle(3)
  * Replace the calling process with the application image referred to by `path' / `file'
- * and execute it's `main()' method, passing the list of NULL-terminated `args'-list,
+ * and  execute it's `main()'  method, passing the  list of NULL-terminated `args'-list,
  * and setting `environ' to a `char **' passed after the NULL sentinel */
 #ifdef __cplusplus
 __NAMESPACE_LOCAL_USING_OR_IMPL(Execlpe, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_NORETURN __ATTR_SENTINEL_O(1) __ATTR_NONNULL((1)) void (__VLIBCCALL Execlpe)(char const *__restrict __file, char const *__args, ...) __THROWS(...) { (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(Execlpe))(__file, __args, __builtin_va_arg_pack()); })
@@ -135,22 +135,22 @@ __CDECLARE_VOID_OPT(__ATTR_NONNULL((1)),__THROWING,Pipe,(__fd_t __pipedes[2]),(_
 #ifdef __CRT_HAVE_FSync
 /* >> fsync(2)
  * Synchronize a file (including its descriptor which contains timestamps, and its size),
- * meaning that changes to its data and/or descriptor are written to disk */
+ * meaning  that  changes   to  its   data  and/or   descriptor  are   written  to   disk */
 __CDECLARE_VOID(,__THROWING,FSync,(__fd_t __fd),(__fd))
 #elif defined(__CRT_HAVE_FDataSync)
 /* >> fsync(2)
  * Synchronize a file (including its descriptor which contains timestamps, and its size),
- * meaning that changes to its data and/or descriptor are written to disk */
+ * meaning  that  changes   to  its   data  and/or   descriptor  are   written  to   disk */
 __CREDIRECT_VOID(,__THROWING,FSync,(__fd_t __fd),FDataSync,(__fd))
 #else /* ... */
 #include <libc/local/kos.unistd/FSync.h>
 /* >> fsync(2)
  * Synchronize a file (including its descriptor which contains timestamps, and its size),
- * meaning that changes to its data and/or descriptor are written to disk */
+ * meaning  that  changes   to  its   data  and/or   descriptor  are   written  to   disk */
 __NAMESPACE_LOCAL_USING_OR_IMPL(FSync, __FORCELOCAL __ATTR_ARTIFICIAL void (__LIBCCALL FSync)(__fd_t __fd) __THROWS(...) { (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(FSync))(__fd); })
 #endif /* !... */
 /* >> setpgid(2)
- * Change the ID of the process group associated with `pid's process.
+ * Change  the ID of  the process group  associated with `pid's process.
  * (That is the TID of the leader of the process group of `pid's leader)
  * THREAD[PID]->LEADER->GROUP_LEADER = THREAD[PGID]
  * When `pid' is ZERO(0), use `gettid()' for it instead.
@@ -158,7 +158,7 @@ __NAMESPACE_LOCAL_USING_OR_IMPL(FSync, __FORCELOCAL __ATTR_ARTIFICIAL void (__LI
 __CDECLARE_VOID_OPT(,__THROWING,SetPGid,(__pid_t __pid, __pid_t __pgid),(__pid,__pgid))
 /* >> setsid(2)
  * Make the calling thread's process the leader of its associated
- * process group, before also making it its own session leader.
+ * process group, before also making  it its own session  leader.
  * Then return the TID of that new session leader, which is also the PID of the calling process.
  *  - THIS_THREAD->LEADER->GROUP_LEADER                 = THIS_THREAD->LEADER;
  *  - THIS_THREAD->LEADER->GROUP_LEADER->SESSION_LEADER = THIS_THREAD->LEADER->GROUP_LEADER;
@@ -178,11 +178,11 @@ __CDECLARE_VOID_OPT(,__THROWING,SetUid,(__uid_t __uid),(__uid))
 __CDECLARE_VOID_OPT(,__THROWING,SetGid,(__gid_t __gid),(__gid))
 /* >> fork(2)
  * Clone the calling thread into a second process and return twice, once
- * in the parent process where this function returns the (non-zero) PID
- * of the forked child process, and a second time in the child process
+ * in  the parent process where this function returns the (non-zero) PID
+ * of  the forked child process, and a  second time in the child process
  * itself, where ZERO(0) is returned.
  * The child then usually proceeds by calling `exec(2)' to replace its
- * application image with that of another program that the original
+ * application image with  that of another  program that the  original
  * parent can then `wait(2)' for. (s.a. `vfork(2)')
  * @return: 0 : You're the new process that was created
  * @return: * : The `return' value is the pid of your new child process */
@@ -215,7 +215,7 @@ __NAMESPACE_LOCAL_USING_OR_IMPL(Link, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_NONN
 #endif /* !__CRT_HAVE_Link */
 /* >> read(2)
  * Read up to `bufsize' bytes from `fd' into `buf'
- * When `fd' has the `O_NONBLOCK' flag set, only read as much data as was
+ * When `fd' has the  `O_NONBLOCK' flag set,  only read as  much data as  was
  * available at the time the call was made, and throw E_WOULDBLOCK if no data
  * was available at the time.
  * @return: <= bufsize: The actual amount of read bytes
@@ -223,7 +223,7 @@ __NAMESPACE_LOCAL_USING_OR_IMPL(Link, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_NONN
 __CDECLARE_OPT(__ATTR_NONNULL((2)),size_t,__THROWING,Read,(__fd_t __fd, void *__buf, size_t __bufsize),(__fd,__buf,__bufsize))
 /* >> write(2)
  * Write up to `bufsize' bytes from `buf' into `fd'
- * When `fd' has the `O_NONBLOCK' flag set, only write as much data
+ * When `fd' has the `O_NONBLOCK' flag set, only write as much  data
  * as possible at the time the call was made, and throw E_WOULDBLOCK
  * if no data could be written at the time.
  * @return: <= bufsize: The actual amount of written bytes
@@ -232,20 +232,20 @@ __CDECLARE_OPT(__ATTR_NONNULL((2)),size_t,__THROWING,Write,(__fd_t __fd, void co
 #ifdef __USE_KOS
 #ifdef __CRT_HAVE_ReadAll
 /* >> readall(3)
- * Same as `read(2)', however keep on reading until `read()' indicates EOF (causing
+ * Same  as `read(2)', however  keep on reading until  `read()' indicates EOF (causing
  * `readall()' to immediately return `0') or the entirety of the given buffer has been
  * filled (in which case `bufsize' is returned).
- * If an error occurs before all data could be read, try to use SEEK_CUR to rewind
+ * If  an error occurs before all data could be read, try to use SEEK_CUR to rewind
  * the file descriptor by the amount of data that had already been loaded. - Errors
  * during this phase are silently ignored and don't cause `errno' to change */
 __CDECLARE(__ATTR_NONNULL((2)),size_t,__THROWING,ReadAll,(__fd_t __fd, void *__buf, size_t __bufsize),(__fd,__buf,__bufsize))
 #elif defined(__CRT_HAVE_Read) && (defined(__CRT_HAVE_lseek64) || defined(__CRT_HAVE__lseeki64) || defined(__CRT_HAVE_lseek) || defined(__CRT_HAVE__lseek) || defined(__CRT_HAVE___lseek))
 #include <libc/local/kos.unistd/ReadAll.h>
 /* >> readall(3)
- * Same as `read(2)', however keep on reading until `read()' indicates EOF (causing
+ * Same  as `read(2)', however  keep on reading until  `read()' indicates EOF (causing
  * `readall()' to immediately return `0') or the entirety of the given buffer has been
  * filled (in which case `bufsize' is returned).
- * If an error occurs before all data could be read, try to use SEEK_CUR to rewind
+ * If  an error occurs before all data could be read, try to use SEEK_CUR to rewind
  * the file descriptor by the amount of data that had already been loaded. - Errors
  * during this phase are silently ignored and don't cause `errno' to change */
 __NAMESPACE_LOCAL_USING_OR_IMPL(ReadAll, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_NONNULL((2)) size_t (__LIBCCALL ReadAll)(__fd_t __fd, void *__buf, size_t __bufsize) __THROWS(...) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(ReadAll))(__fd, __buf, __bufsize); })
@@ -313,12 +313,12 @@ __CDECLARE_VOID_OPT(__ATTR_NONNULL((2)),__THROWING,FChownAt,(__fd_t __dfd, char 
  * Create a hard link from `fromfd:from', leading to `tofd:to' */
 __CDECLARE_VOID_OPT(__ATTR_NONNULL((2, 4)),__THROWING,LinkAt,(__fd_t __fromfd, char const *__from, __fd_t __tofd, char const *__to, __atflag_t __flags),(__fromfd,__from,__tofd,__to,__flags))
 /* >> symlinkat(3)
- * Create a new symbolic link loaded with `link_text' as link
+ * Create  a  new  symbolic  link  loaded  with  `link_text'  as link
  * text, at the filesystem location referred to by `tofd:target_path' */
 __CDECLARE_VOID_OPT(__ATTR_NONNULL((1, 3)),__THROWING,SymlinkAt,(char const *__link_text, __fd_t __tofd, char const *__target_path),(__link_text,__tofd,__target_path))
 /* >> readlinkat(2)
  * Read the text of a symbolic link under `dfd:path' into the provided buffer.
- * WARNING: This function is badly designed and will neither append a trailing
+ * WARNING: This  function is badly designed and will neither append a trailing
  *          NUL-character to the buffer, nor will it return the required buffer
  *          size. Instead, it will return the written size, and the caller must
  *          keep on over allocating until the function indicates that it didn't
@@ -479,29 +479,29 @@ __CDECLARE_VOID_OPT(,__THROWING,SetResGid,(__gid_t __rgid, __gid_t __egid, __gid
      defined(__USE_MISC)
 /* >> vfork(2)
  * Same as `fork(2)', but the child process may be executed within in the same VM
- * as the parent process, with the parent process remaining suspended until the
+ * as the parent process, with the  parent process remaining suspended until  the
  * child process invokes one of the following system calls:
  *   - `_exit(2)'  Terminate the child process. Be sure to use `_exit' (or `_Exit')
- *                 instead of the regular `exit(3)', since the later would include
- *                 the invocation of `atexit(3)' handlers, which would then run in
+ *                 instead of the regular `exit(3)', since the later would  include
+ *                 the invocation of `atexit(3)' handlers, which would then run  in
  *                 the context of a VM that isn't actually about to be destroyed.
  *   - `execve(2)' Create a new VM that is populated with the specified process
- *                 image. The parent process will only be resumed in case the
- *                 new program image could be loaded successfully. Otherwise,
- *                 the call to `execve(2)' returns normally in the child.
+ *                 image. The parent process will  only be resumed in case  the
+ *                 new  program image could  be loaded successfully. Otherwise,
+ *                 the call  to  `execve(2)'  returns normally  in  the  child.
  *                 Other functions from the exec()-family behave the same
  *
- * Care must be taken when using this system call, since you have to make sure that
- * the child process doesn't clobber any part of its (shared) stack that may be re-
- * used once execution resumes in the parent process. The same also goes for heap
- * functions, but generally speaking: you really shouldn't do anything that isn't
+ * Care  must be taken when using this system call, since you have to make sure that
+ * the  child process doesn't clobber any part of its (shared) stack that may be re-
+ * used once execution resumes in  the parent process. The  same also goes for  heap
+ * functions,  but generally speaking:  you really shouldn't  do anything that isn't
  * reentrant after calling any one of the fork() functions (since anything but would
- * rely on underlying implementations making proper use of pthread_atfork(3), which
- * is something that KOS intentionally doesn't do, since I feel like doing so only
+ * rely on underlying implementations making proper use of pthread_atfork(3),  which
+ * is something that KOS intentionally doesn't do,  since I feel like doing so  only
  * adds unnecessary bloat to code that doesn't rely on this)
  *
  * Additionally, this system call may be implemented as an alias for `fork(2)', in
- * which case the parent process will not actually get suspended until the child
+ * which  case the parent process will not  actually get suspended until the child
  * process performs any of the actions above. */
 __CDECLARE_OPT(__ATTR_RETURNS_TWICE __ATTR_WUNUSED,__pid_t,__THROWING,VFork,(void),())
 #endif
@@ -512,19 +512,19 @@ __CDECLARE_VOID_OPT(,__THROWING,FChown,(__fd_t __fd, __uid_t __owner, __gid_t __
  * Change the current working directory to `path' */
 __CDECLARE_VOID_OPT(,__THROWING,FChdir,(__fd_t __fd),(__fd))
 /* >> getpgid(2)
- * Return the ID of the process group associated with `pid's process.
+ * Return  the ID of  the process group  associated with `pid's process.
  * (That is the TID of the leader of the process group of `pid's leader)
  * THREAD[PID]->LEADER->GROUP_LEADER->PID
  * When `pid' is ZERO(0), use `gettid()' for it instead */
 __CDECLARE_OPT(__ATTR_WUNUSED,__pid_t,__THROWING,GetPGid,(__pid_t __pid),(__pid))
 /* >> getsid(2)
  * Return the ID of the session which a process `pid' is apart of.
- * return THREAD[PID]->LEADER->GROUP_LEADER->SESSION_LEADER->PID; */
+ * return  THREAD[PID]->LEADER->GROUP_LEADER->SESSION_LEADER->PID; */
 __CDECLARE_OPT(__ATTR_WUNUSED,__pid_t,__THROWING,GetSid,(__pid_t __pid),(__pid))
 #ifdef __CRT_HAVE_LChown
 /* >> lchown(2)
  * Change the ownership of a given `file' to `group:owner',
- * but don't reference it if that file is a symbolic link */
+ * but don't reference it if  that file is a symbolic  link */
 __CDECLARE_VOID(__ATTR_NONNULL((1)),__THROWING,LChown,(char const *__file, __uid_t __owner, __gid_t __group),(__file,__owner,__group))
 #else /* __CRT_HAVE_LChown */
 #include <asm/os/fcntl.h>
@@ -532,7 +532,7 @@ __CDECLARE_VOID(__ATTR_NONNULL((1)),__THROWING,LChown,(char const *__file, __uid
 #include <libc/local/kos.unistd/LChown.h>
 /* >> lchown(2)
  * Change the ownership of a given `file' to `group:owner',
- * but don't reference it if that file is a symbolic link */
+ * but don't reference it if  that file is a symbolic  link */
 __NAMESPACE_LOCAL_USING_OR_IMPL(LChown, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_NONNULL((1)) void (__LIBCCALL LChown)(char const *__file, __uid_t __owner, __gid_t __group) __THROWS(...) { (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(LChown))(__file, __owner, __group); })
 #endif /* __AT_FDCWD && __CRT_HAVE_FChownAt */
 #endif /* !__CRT_HAVE_LChown */
@@ -574,14 +574,14 @@ __NAMESPACE_LOCAL_USING_OR_IMPL(Truncate64, __FORCELOCAL __ATTR_ARTIFICIAL __ATT
 #if !defined(__FExecve_defined) && defined(__CRT_HAVE_FExecve)
 #define __FExecve_defined 1
 /* >> fexecve(2)
- * Replace the calling process with the application image referred to by `fd' and
+ * Replace the  calling  process  with the  application  image  referred to  by  `fd'  and
  * execute it's `main()' method, passing the given `argv', and setting `environ' to `envp' */
 __CDECLARE_VOID(__ATTR_NORETURN __ATTR_NONNULL((2, 3)),__THROWING,FExecve,(__fd_t __fd, __TARGV, __TENVP),(__fd,___argv,___envp))
 #endif /* !__FExecve_defined && __CRT_HAVE_FExecve */
 #endif /* __USE_XOPEN2K8 */
 #ifdef __USE_GNU
 /* >> execvpe(3)
- * Replace the calling process with the application image referred to by `file' and
+ * Replace the  calling process  with the  application  image referred  to by  `file'  and
  * execute it's `main()' method, passing the given `argv', and setting `environ' to `envp' */
 __CDECLARE_VOID_OPT(__ATTR_NORETURN __ATTR_NONNULL((1, 2, 3)),__THROWING,Execvpe,(char const *__restrict __file, __TARGV, __TENVP),(__file,___argv,___envp))
 #endif /* __USE_GNU */
@@ -630,7 +630,7 @@ __CDECLARE_VOID_OPT(,__THROWING,SetEGid,(__gid_t __egid),(__egid))
 #if defined(__USE_XOPEN_EXTENDED) || defined(__USE_XOPEN2K)
 #ifdef __CRT_HAVE_Symlink
 /* >> symlink(3)
- * Create a new symbolic link loaded with `link_text' as link
+ * Create  a new  symbolic link  loaded with  `link_text' as link
  * text, at the filesystem location referred to by `target_path'.
  * Same as `symlinkat(link_text, AT_FDCWD, target_path)' */
 __CDECLARE_VOID(__ATTR_NONNULL((1, 2)),__THROWING,Symlink,(char const *__link_text, char const *__target_path),(__link_text,__target_path))
@@ -639,7 +639,7 @@ __CDECLARE_VOID(__ATTR_NONNULL((1, 2)),__THROWING,Symlink,(char const *__link_te
 #if defined(__AT_FDCWD) && defined(__CRT_HAVE_SymlinkAt)
 #include <libc/local/kos.unistd/Symlink.h>
 /* >> symlink(3)
- * Create a new symbolic link loaded with `link_text' as link
+ * Create  a new  symbolic link  loaded with  `link_text' as link
  * text, at the filesystem location referred to by `target_path'.
  * Same as `symlinkat(link_text, AT_FDCWD, target_path)' */
 __NAMESPACE_LOCAL_USING_OR_IMPL(Symlink, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_NONNULL((1, 2)) void (__LIBCCALL Symlink)(char const *__link_text, char const *__target_path) __THROWS(...) { (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(Symlink))(__link_text, __target_path); })
@@ -649,7 +649,7 @@ __NAMESPACE_LOCAL_USING_OR_IMPL(Symlink, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_N
 /* >> readlink(3)
  * Read the text of a symbolic link under `path' into the provided buffer.
  * Same as `readlinkat(AT_FDCWD, path, buf, buflen)'
- * WARNING: This function is badly designed and will neither append a trailing
+ * WARNING: This  function is badly designed and will neither append a trailing
  *          NUL-character to the buffer, nor will it return the required buffer
  *          size. Instead, it will return the written size, and the caller must
  *          keep on over allocating until the function indicates that it didn't
@@ -663,7 +663,7 @@ __CDECLARE(__ATTR_NONNULL((1, 2)),size_t,__THROWING,Readlink,(char const *__rest
 /* >> readlink(3)
  * Read the text of a symbolic link under `path' into the provided buffer.
  * Same as `readlinkat(AT_FDCWD, path, buf, buflen)'
- * WARNING: This function is badly designed and will neither append a trailing
+ * WARNING: This  function is badly designed and will neither append a trailing
  *          NUL-character to the buffer, nor will it return the required buffer
  *          size. Instead, it will return the written size, and the caller must
  *          keep on over allocating until the function indicates that it didn't
@@ -705,7 +705,7 @@ __LIBC __LONG64_TYPE__ (__VLIBCCALL Syscall64)(__syscall_ulong_t __sysno, ...) _
 #if defined(__USE_MISC) || \
    (defined(__USE_XOPEN) && !defined(__USE_XOPEN2K))
 /* >> chroot(2)
- * Change the root directory of the calling `CLONE_FS' group of threads
+ * Change  the root directory of the calling `CLONE_FS' group of threads
  * (usually the process) to a path that was previously address by `path' */
 __CDECLARE_VOID_OPT(__ATTR_NONNULL((1)),__THROWING,ChRoot,(char const *__restrict __path),(__path))
 #endif /* ... */
@@ -747,18 +747,18 @@ __NAMESPACE_LOCAL_USING_OR_IMPL(FTruncate64, __FORCELOCAL __ATTR_ARTIFICIAL void
 #ifdef __CRT_HAVE_FDataSync
 /* >> fdatasync(2)
  * Synchronize only the data of a file (not its descriptor which contains
- * timestamps, and its size), meaning that changes are written to disk */
+ * timestamps,  and its size),  meaning that changes  are written to disk */
 __CDECLARE_VOID(,__THROWING,FDataSync,(__fd_t __fd),(__fd))
 #elif defined(__CRT_HAVE_FSync)
 /* >> fdatasync(2)
  * Synchronize only the data of a file (not its descriptor which contains
- * timestamps, and its size), meaning that changes are written to disk */
+ * timestamps,  and its size),  meaning that changes  are written to disk */
 __CREDIRECT_VOID(,__THROWING,FDataSync,(__fd_t __fd),FSync,(__fd))
 #else /* ... */
 #include <libc/local/kos.unistd/FDataSync.h>
 /* >> fdatasync(2)
  * Synchronize only the data of a file (not its descriptor which contains
- * timestamps, and its size), meaning that changes are written to disk */
+ * timestamps,  and its size),  meaning that changes  are written to disk */
 __NAMESPACE_LOCAL_USING_OR_IMPL(FDataSync, __FORCELOCAL __ATTR_ARTIFICIAL void (__LIBCCALL FDataSync)(__fd_t __fd) __THROWS(...) { (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(FDataSync))(__fd); })
 #endif /* !... */
 #endif /* __USE_POSIX199309 || __USE_UNIX98 */

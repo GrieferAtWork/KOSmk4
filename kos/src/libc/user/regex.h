@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x5c05b831 */
+/* HASH CRC-32:0x7caa7c1e */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -32,36 +32,36 @@ DECL_BEGIN
 
 #ifndef __KERNEL__
 /* Sets the current default syntax to `syntax', and return the old syntax.
- * You can also simply assign to the `re_syntax_options' variable */
+ * You  can  also  simply  assign  to  the  `re_syntax_options'   variable */
 INTDEF reg_syntax_t NOTHROW_NCX(LIBCCALL libc_re_set_syntax)(reg_syntax_t syntax);
-/* Compile the regular expression `pattern', with length `length'
- * and syntax given by the global `re_syntax_options', into the buffer
- * `buffer'. Return NULL if successful, and an error string if not.
- * To free the allocated storage, you must call `regfree' on `buffer'.
- * Note that the translate table must either have been initialized by
+/* Compile   the   regular  expression   `pattern',  with   length  `length'
+ * and  syntax  given by  the  global `re_syntax_options',  into  the buffer
+ * `buffer'.  Return  NULL  if  successful,  and  an  error  string  if not.
+ * To  free  the allocated  storage, you  must  call `regfree'  on `buffer'.
+ * Note  that  the  translate table  must  either have  been  initialized by
  * `regcomp', with a malloc'd value, or set to NULL before calling `regfree' */
 INTDEF char const *NOTHROW_NCX(LIBCCALL libc_re_compile_pattern)(char const *pattern, size_t length, struct re_pattern_buffer *buffer);
-/* Compile a fastmap for the compiled pattern in `buffer'; used to
+/* Compile  a  fastmap   for  the   compiled  pattern  in   `buffer';  used   to
  * accelerate searches. Return 0 if successful and `-2' if was an internal error */
 INTDEF int NOTHROW_NCX(LIBCCALL libc_re_compile_fastmap)(struct re_pattern_buffer *buffer);
-/* Search in the string `string' (with length `length') for the pattern
+/* Search in the  string `string'  (with length `length')  for the  pattern
  * compiled into `buffer'. Start searching at position `start', for `range'
- * characters. Return the starting position of the match, `-1' for no
- * match, or `-2' for an internal error. Also return register
- * information in `regs' (if `regs' and `buffer'->no_sub are nonzero) */
+ * characters.  Return  the starting  position of  the  match, `-1'  for no
+ * match,  or   `-2'  for   an  internal   error.  Also   return   register
+ * information in  `regs'  (if  `regs' and  `buffer'->no_sub  are  nonzero) */
 INTDEF int NOTHROW_NCX(LIBCCALL libc_re_search)(struct re_pattern_buffer *buffer, char const *string, int length, int start, int range, struct re_registers *regs);
 /* Like `re_search', but search in the concatenation of `string1'
- * and `string2'. Also, stop searching at index `start + stop' */
+ * and `string2'. Also,  stop searching  at index  `start + stop' */
 INTDEF int NOTHROW_NCX(LIBCCALL libc_re_search_2)(struct re_pattern_buffer *buffer, char const *string1, int length1, char const *string2, int length2, int start, int range, struct re_registers *regs, int stop);
 /* Like `re_search', but return how many characters in `string'
  * the regexp in `buffer' matched, starting at position `start' */
 INTDEF int NOTHROW_NCX(LIBCCALL libc_re_match)(struct re_pattern_buffer *buffer, char const *string, int length, int start, struct re_registers *regs);
 /* Relates to `re_match' as `re_search_2' relates to `re_search' */
 INTDEF int NOTHROW_NCX(LIBCCALL libc_re_match_2)(struct re_pattern_buffer *buffer, char const *string1, int length1, char const *string2, int length2, int start, struct re_registers *regs, int stop);
-/* Set `regs' to hold `num_regs' registers, storing them in `starts' and
- * `ends'. Subsequent matches using `buffer' and `regs' will use this memory
- * for recording register information. `starts' and `ends' must be allocated
- * with malloc, and must each be at least ``num_regs' * sizeof(regoff_t)' bytes long.
+/* Set  `regs'   to  hold   `num_regs'  registers,   storing  them   in  `starts'   and
+ * `ends'.   Subsequent  matches  using  `buffer'  and  `regs'  will  use  this  memory
+ * for  recording  register  information.  `starts'   and  `ends'  must  be   allocated
+ * with  malloc, and must each be at  least ``num_regs' * sizeof(regoff_t)' bytes long.
  * If `num_regs == 0', then subsequent matches should allocate their own register data.
  * Unless this function is called, the first search or match using
  * PATTERN_BUFFER will allocate its own register data, without freeing the old data */

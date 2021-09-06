@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xeb899cf6 */
+/* HASH CRC-32:0xad0251a1 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -25,30 +25,21 @@
 #include <kos/anno.h>
 #include <bits/types.h>
 __NAMESPACE_LOCAL_BEGIN
-/* Dependency: PRead64 from kos.unistd */
 #ifndef __local___localdep_PRead64_defined
 #define __local___localdep_PRead64_defined 1
 #ifdef __CRT_HAVE_PRead64
-/* >> pread64(2)
- * Read data from a file at a specific offset */
 __CREDIRECT(__ATTR_NONNULL((2)),__SIZE_TYPE__,__THROWING,__localdep_PRead64,(__fd_t __fd, void *__buf, __SIZE_TYPE__ __bufsize, __pos64_t __offset),PRead64,(__fd,__buf,__bufsize,__offset))
 #elif defined(__CRT_HAVE_PRead) && __SIZEOF_OFF32_T__ == __SIZEOF_OFF64_T__
-/* >> pread64(2)
- * Read data from a file at a specific offset */
 __CREDIRECT(__ATTR_NONNULL((2)),__SIZE_TYPE__,__THROWING,__localdep_PRead64,(__fd_t __fd, void *__buf, __SIZE_TYPE__ __bufsize, __pos64_t __offset),PRead,(__fd,__buf,__bufsize,__offset))
 #elif defined(__CRT_HAVE_PRead)
 __NAMESPACE_LOCAL_END
 #include <libc/local/kos.unistd/PRead64.h>
 __NAMESPACE_LOCAL_BEGIN
-/* >> pread64(2)
- * Read data from a file at a specific offset */
 #define __localdep_PRead64 __LIBC_LOCAL_NAME(PRead64)
 #else /* ... */
 #undef __local___localdep_PRead64_defined
 #endif /* !... */
 #endif /* !__local___localdep_PRead64_defined */
-/* >> preadall64(3)
- * Same as `readall(3)', but using `pread64(2)' instead of `read()' */
 __LOCAL_LIBC(PReadAll64) __ATTR_NONNULL((2)) __SIZE_TYPE__
 (__LIBCCALL __LIBC_LOCAL_NAME(PReadAll64))(__fd_t __fd, void *__buf, __SIZE_TYPE__ __bufsize, __pos64_t __offset) __THROWS(...) {
 	__SIZE_TYPE__ __result, __temp;

@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x6d9e729a */
+/* HASH CRC-32:0xdb353e8f */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -22,7 +22,6 @@
 #define __local__atol_l_defined 1
 #include <__crt.h>
 __NAMESPACE_LOCAL_BEGIN
-/* Dependency: strtol_l from stdlib */
 #ifndef __local___localdep_strtol_l_defined
 #define __local___localdep_strtol_l_defined 1
 #ifdef __CRT_HAVE_strtol_l

@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xdc96a6cf */
+/* HASH CRC-32:0x7322809c */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -31,7 +31,7 @@ DECL_BEGIN
 
 #ifndef __KERNEL__
 /* Match the given `name' against `pattern', returning
- * `0' if they match, and `FNM_NOMATCH' otherwise.
+ * `0'  if  they match,  and  `FNM_NOMATCH' otherwise.
  * @param: match_flags:   Set of `FNM_*'
  * @return: 0           : `name' is matched by `pattern'
  * @return: FNM_NOMATCH : `name' is not matched by `pattern' */

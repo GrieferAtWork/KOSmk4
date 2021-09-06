@@ -38,7 +38,7 @@ local copyright =
  *  /kos/include/crt-features/crt-kos-syscalls.h
  *  /kos/include/{name}/crt-features/crt-kos-syscalls{suffix}.h
  *       CRT feature definitions for syscall prototypes
- *       >> #define __CRT_HAVE_sys_exit 1
+ *       >> #define __CRT_HAVE_sys_exit
  *
  *  /kos/include/asm/syscalls.h
  *  /kos/include/asm/syscalls-proto.h
@@ -532,7 +532,7 @@ global xArchBinaryTypeCompatibilities:
 global xArchTypeSizes: {string: {string: int}} = Dict();
 
 @@Mapping for @{functionName: {functionNames...}}
-@@Maps any grouped function name to a set of all function names (including the
+@@Maps any  grouped function  name  to a  set of  all  function names  (including  the
 @@original group name) that do share functionality, and may share binary compatibility
 @@and should therefor be checked if binary compatibility is present as well.
 global possiblyCompatibleFunctionGroups: {string: HashSet with string} = Dict();
@@ -2790,7 +2790,7 @@ function generateLibcArchSyscallAssembly(
 	fp << "#endif /* " << guard << " */\n";
 }
 
-@@Enumerate the names of all functions that are allowed to be defined with binary
+@@Enumerate the names of all  functions that are allowed  to be defined with  binary
 @@compatibility for the given @name (so-long as they are actually binary-compatible)
 @@This function always at the very least re-yields @name itself
 function enumerateCompatibilityConsiderationFunctions(name: string): {string...} {
@@ -2950,8 +2950,8 @@ function main(archNames: {string...}) {
 	});
 
 	/* include/{}/crt-features/crt-kos-syscalls{}.h
-	 * >> #define __CRT_HAVE_sys_exit 1
-	 * >> #define __CRT_HAVE_sys_Xexit 1 */
+	 * >> #define __CRT_HAVE_sys_exit
+	 * >> #define __CRT_HAVE_sys_Xexit */
 	for (local name, a: ARCH) {
 		local c = archContexts[name];
 		writeHashedFile(a.formatPath(

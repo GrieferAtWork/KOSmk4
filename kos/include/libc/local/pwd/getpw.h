@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xe61132c6 */
+/* HASH CRC-32:0x92c85b9d */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -24,61 +24,40 @@
 #ifdef __CRT_HAVE_getpwuid
 #include <bits/types.h>
 __NAMESPACE_LOCAL_BEGIN
-/* Dependency: getpwuid from pwd */
 #ifndef __local___localdep_getpwuid_defined
 #define __local___localdep_getpwuid_defined 1
 __NAMESPACE_LOCAL_END
 #include <bits/crt/db/passwd.h>
 __NAMESPACE_LOCAL_BEGIN
-/* Search for an entry with a matching user ID
- * return: * :                         A pointer to the read password entry
- * return: NULL: (errno = <unchanged>) No entry for `uid' exists
- * return: NULL: (errno = <changed>)   Error (s.a. `errno') */
 __CREDIRECT(,struct passwd *,__NOTHROW_RPC,__localdep_getpwuid,(__uid_t __uid),getpwuid,(__uid))
 #endif /* !__local___localdep_getpwuid_defined */
-/* Dependency: sprintf from stdio */
 #ifndef __local___localdep_sprintf_defined
 #define __local___localdep_sprintf_defined 1
 #if __has_builtin(__builtin_sprintf) && defined(__LIBC_BIND_CRTBUILTINS) && defined(__CRT_HAVE_sprintf) && __has_builtin(__builtin_va_arg_pack)
 __NAMESPACE_LOCAL_END
 #include <features.h>
 __NAMESPACE_LOCAL_BEGIN
-/* >> sprintf(3), vsprintf(3)
- * Print a formatted string to a given in-member string buffer `buf'
- * Return the number of written characters, excluding a trailing NUL-character */
 __CEIREDIRECT(__ATTR_LIBC_PRINTF(2, 3) __ATTR_NONNULL((1, 2)),__STDC_INT_AS_SIZE_T,__NOTHROW_NCX,__localdep_sprintf,(char *__restrict __buf, char const *__restrict __format, ...),sprintf,{ return __builtin_sprintf(__buf, __format, __builtin_va_arg_pack()); })
 #elif defined(__CRT_HAVE_sprintf)
 __NAMESPACE_LOCAL_END
 #include <features.h>
 __NAMESPACE_LOCAL_BEGIN
-/* >> sprintf(3), vsprintf(3)
- * Print a formatted string to a given in-member string buffer `buf'
- * Return the number of written characters, excluding a trailing NUL-character */
 __LIBC __ATTR_LIBC_PRINTF(2, 3) __ATTR_NONNULL((1, 2)) __STDC_INT_AS_SIZE_T __NOTHROW_NCX(__VLIBCCALL __localdep_sprintf)(char *__restrict __buf, char const *__restrict __format, ...) __CASMNAME("sprintf");
 #elif defined(__CRT_HAVE__IO_sprintf)
 __NAMESPACE_LOCAL_END
 #include <features.h>
 __NAMESPACE_LOCAL_BEGIN
-/* >> sprintf(3), vsprintf(3)
- * Print a formatted string to a given in-member string buffer `buf'
- * Return the number of written characters, excluding a trailing NUL-character */
 __LIBC __ATTR_LIBC_PRINTF(2, 3) __ATTR_NONNULL((1, 2)) __STDC_INT_AS_SIZE_T __NOTHROW_NCX(__VLIBCCALL __localdep_sprintf)(char *__restrict __buf, char const *__restrict __format, ...) __CASMNAME("_IO_sprintf");
 #else /* ... */
 __NAMESPACE_LOCAL_END
 #include <libc/local/stdio/sprintf.h>
 __NAMESPACE_LOCAL_BEGIN
-/* >> sprintf(3), vsprintf(3)
- * Print a formatted string to a given in-member string buffer `buf'
- * Return the number of written characters, excluding a trailing NUL-character */
 #define __localdep_sprintf __LIBC_LOCAL_NAME(sprintf)
 #endif /* !... */
 #endif /* !__local___localdep_sprintf_defined */
 __NAMESPACE_LOCAL_END
 #include <bits/crt/inttypes.h>
 __NAMESPACE_LOCAL_BEGIN
-/* Re-construct the password-file line for the given uid in the
- * given buffer. This knows the format that the caller will
- * expect, but this need not be the format of the password file */
 __LOCAL_LIBC(getpw) int
 __NOTHROW_RPC(__LIBCCALL __LIBC_LOCAL_NAME(getpw))(__uid_t __uid, char *__buffer) {
 	struct passwd *__ent;

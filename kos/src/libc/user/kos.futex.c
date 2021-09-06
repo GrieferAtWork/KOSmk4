@@ -1184,14 +1184,14 @@ NOTHROW_RPC(LIBCCALL libc_futex_timedwaitwhile_allbits64)(lfutex_t *uaddr,
 #endif /* MAGIC:alias */
 /*[[[end:libc_futex_timedwaitwhile_allbits64]]]*/
 
-/*[[[head:libc_futex_getspin,hash:CRC-32=0x2bf8a4a8]]]*/
+/*[[[head:libc_futex_getspin,hash:CRC-32=0x22192ca8]]]*/
 /* Get/Set the number of times to spin the following futex operations without
- * entering kernel-space, setting waiter-bits, and entering sleep mode:
+ * entering  kernel-space,  setting  waiter-bits,  and  entering  sleep mode:
  *   - LFUTEX_WAIT_WHILE: SPIN({ if (*uaddr != val) DONE(); });
  *   - LFUTEX_WAIT_UNTIL: SPIN({ if (*uaddr == val) DONE(); });
  *   - ...
- * Futex spinning improves performance by bypassing expensive blocking operations
- * when associated locks are often only held for a couple of moments at a time.
+ * Futex  spinning  improves  performance  by  bypassing  expensive  blocking   operations
+ * when  associated  locks  are  often only  held  for  a  couple of  moments  at  a time.
  * Take for example `lfutex(LFUTEX_WAIT_WHILE)' (or preferably `futex_waitwhile()'), which
  * is wrapped like this:
  * >> unsigned int spins;
@@ -1217,14 +1217,14 @@ NOTHROW(LIBCCALL libc_futex_getspin)(void)
 }
 /*[[[end:libc_futex_getspin]]]*/
 
-/*[[[head:libc_futex_setspin,hash:CRC-32=0x5a639f7]]]*/
+/*[[[head:libc_futex_setspin,hash:CRC-32=0x7a05bf3]]]*/
 /* Get/Set the number of times to spin the following futex operations without
- * entering kernel-space, setting waiter-bits, and entering sleep mode:
+ * entering  kernel-space,  setting  waiter-bits,  and  entering  sleep mode:
  *   - LFUTEX_WAIT_WHILE: SPIN({ if (*uaddr != val) DONE(); });
  *   - LFUTEX_WAIT_UNTIL: SPIN({ if (*uaddr == val) DONE(); });
  *   - ...
- * Futex spinning improves performance by bypassing expensive blocking operations
- * when associated locks are often only held for a couple of moments at a time.
+ * Futex  spinning  improves  performance  by  bypassing  expensive  blocking   operations
+ * when  associated  locks  are  often only  held  for  a  couple of  moments  at  a time.
  * Take for example `lfutex(LFUTEX_WAIT_WHILE)' (or preferably `futex_waitwhile()'), which
  * is wrapped like this:
  * >> unsigned int spins;

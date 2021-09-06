@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xb4097297 */
+/* HASH CRC-32:0xe45119ae */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -25,23 +25,18 @@
 #if defined(__IEEE754_DOUBLE_TYPE_IS_FLOAT__) || defined(__IEEE754_FLOAT_TYPE_IS_FLOAT__) || defined(__IEEE854_LONG_DOUBLE_TYPE_IS_FLOAT__) || defined(__CRT_HAVE_exp) || defined(__CRT_HAVE___exp) || defined(__IEEE754_DOUBLE_TYPE_IS_DOUBLE__) || defined(__IEEE754_FLOAT_TYPE_IS_DOUBLE__) || defined(__IEEE854_LONG_DOUBLE_TYPE_IS_DOUBLE__)
 #include <bits/crt/math-vector.h>
 __NAMESPACE_LOCAL_BEGIN
-/* Dependency: exp from math */
 #ifndef __local___localdep_exp_defined
 #define __local___localdep_exp_defined 1
 #if __has_builtin(__builtin_exp) && defined(__LIBC_BIND_CRTBUILTINS) && defined(__CRT_HAVE_exp)
-/* Exponential function of `x' */
 __CEIREDIRECT(__ATTR_WUNUSED __DECL_SIMD_exp,double,__NOTHROW,__localdep_exp,(double __x),exp,{ return __builtin_exp(__x); })
 #elif defined(__CRT_HAVE_exp)
-/* Exponential function of `x' */
 __CREDIRECT(__ATTR_WUNUSED __DECL_SIMD_exp,double,__NOTHROW,__localdep_exp,(double __x),exp,(__x))
 #elif defined(__CRT_HAVE___exp)
-/* Exponential function of `x' */
 __CREDIRECT(__ATTR_WUNUSED __DECL_SIMD_exp,double,__NOTHROW,__localdep_exp,(double __x),__exp,(__x))
 #elif defined(__IEEE754_DOUBLE_TYPE_IS_DOUBLE__) || defined(__IEEE754_FLOAT_TYPE_IS_DOUBLE__) || defined(__IEEE854_LONG_DOUBLE_TYPE_IS_DOUBLE__)
 __NAMESPACE_LOCAL_END
 #include <libc/local/math/exp.h>
 __NAMESPACE_LOCAL_BEGIN
-/* Exponential function of `x' */
 #define __localdep_exp __LIBC_LOCAL_NAME(exp)
 #else /* ... */
 #undef __local___localdep_exp_defined
@@ -53,7 +48,6 @@ __NAMESPACE_LOCAL_END
 #include <libm/matherr.h>
 #include <libm/exp.h>
 __NAMESPACE_LOCAL_BEGIN
-/* Exponential function of `x' */
 __LOCAL_LIBC(expf) __ATTR_WUNUSED __DECL_SIMD_expf float
 __NOTHROW(__LIBCCALL __LIBC_LOCAL_NAME(expf))(float __x) {
 #if defined(__IEEE754_DOUBLE_TYPE_IS_FLOAT__) || defined(__IEEE754_FLOAT_TYPE_IS_FLOAT__) || defined(__IEEE854_LONG_DOUBLE_TYPE_IS_FLOAT__)

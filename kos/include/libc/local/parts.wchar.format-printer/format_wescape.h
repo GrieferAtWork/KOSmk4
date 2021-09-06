@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x1d07781 */
+/* HASH CRC-32:0xade57ac */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -25,52 +25,28 @@
 #include <bits/crt/wformat-printer.h>
 #include <hybrid/typecore.h>
 __NAMESPACE_LOCAL_BEGIN
-/* Dependency: unicode_readutf16_n from unicode */
 #ifndef __local___localdep_unicode_readutf16_n_defined
 #define __local___localdep_unicode_readutf16_n_defined 1
 #ifdef __CRT_HAVE_unicode_readutf16_n
-/* >> unicode_readutf16_n(3)
- * Same as `unicode_readutf16()', but don't read past `text_end' */
 __CREDIRECT(__ATTR_NONNULL((1, 2)),__CHAR32_TYPE__,__NOTHROW_NCX,__localdep_unicode_readutf16_n,(__CHAR16_TYPE__ const **__restrict __ptext, __CHAR16_TYPE__ const *__text_end),unicode_readutf16_n,(__ptext,__text_end))
 #else /* __CRT_HAVE_unicode_readutf16_n */
 __NAMESPACE_LOCAL_END
 #include <libc/local/unicode/unicode_readutf16_n.h>
 __NAMESPACE_LOCAL_BEGIN
-/* >> unicode_readutf16_n(3)
- * Same as `unicode_readutf16()', but don't read past `text_end' */
 #define __localdep_unicode_readutf16_n __LIBC_LOCAL_NAME(unicode_readutf16_n)
 #endif /* !__CRT_HAVE_unicode_readutf16_n */
 #endif /* !__local___localdep_unicode_readutf16_n_defined */
-/* Dependency: unicode_readutf8_n from unicode */
 #ifndef __local___localdep_unicode_readutf8_n_defined
 #define __local___localdep_unicode_readutf8_n_defined 1
 #ifdef __CRT_HAVE_unicode_readutf8_n
-/* >> unicode_readutf8_n(3)
- * Same as `unicode_readutf8()', but don't read past `text_end' */
 __CREDIRECT(__ATTR_NONNULL((1, 2)),__CHAR32_TYPE__,__NOTHROW_NCX,__localdep_unicode_readutf8_n,(char const **__restrict __ptext, char const *__text_end),unicode_readutf8_n,(__ptext,__text_end))
 #else /* __CRT_HAVE_unicode_readutf8_n */
 __NAMESPACE_LOCAL_END
 #include <libc/local/unicode/unicode_readutf8_n.h>
 __NAMESPACE_LOCAL_BEGIN
-/* >> unicode_readutf8_n(3)
- * Same as `unicode_readutf8()', but don't read past `text_end' */
 #define __localdep_unicode_readutf8_n __LIBC_LOCAL_NAME(unicode_readutf8_n)
 #endif /* !__CRT_HAVE_unicode_readutf8_n */
 #endif /* !__local___localdep_unicode_readutf8_n_defined */
-/* >> format_escape(3)
- * Do C-style escape on the given text, printing it to the given printer.
- * Input:
- * >> Hello "World" W
- * >> hat a great day.
- * Output #1: >> \"Hello \"World\" W\nhat a great day.\"
- * Output #2: >> Hello \"World\" W\nhat a great day
- * NOTE: Output #2 is generated if the `FORMAT_ESCAPE_FPRINTRAW' is set
- * This function escapes all control and non-ascii characters,
- * preferring octal encoding for control characters and hex-encoding
- * for other non-ascii characters, a behavior that may be modified
- * with the `FORMAT_ESCAPE_FFORCE*' flags
- * @param: printer: A function called for all quoted portions of the text
- * @param: textlen: The total number of bytes to escape, starting at `text' */
 __LOCAL_LIBC(format_wescape) __ATTR_NONNULL((1)) __SSIZE_TYPE__
 (__LIBCCALL __LIBC_LOCAL_NAME(format_wescape))(__pwformatprinter __printer, void *__arg, __WCHAR_TYPE__ const *__restrict __text, __SIZE_TYPE__ __textlen, unsigned int __flags) __THROWS(...) {
 #define __escape_tooct(__c) ('0' + (__WCHAR_TYPE__)(__WCHAR_TYPE__)(__c))

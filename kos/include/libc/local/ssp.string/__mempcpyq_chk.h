@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x91967566 */
+/* HASH CRC-32:0xb805b648 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -23,17 +23,14 @@
 #include <__crt.h>
 #include <hybrid/typecore.h>
 __NAMESPACE_LOCAL_BEGIN
-/* Dependency: mempcpyq from string */
 #ifndef __local___localdep_mempcpyq_defined
 #define __local___localdep_mempcpyq_defined 1
 #ifdef __CRT_HAVE_mempcpyq
-/* Same as `memcpyq', but return `dst + n_qwords', rather than `dst' */
 __CREDIRECT(__ATTR_LEAF __ATTR_RETNONNULL __ATTR_NONNULL((1, 2)),__UINT64_TYPE__ *,__NOTHROW_NCX,__localdep_mempcpyq,(void *__restrict __dst, void const *__restrict __src, __SIZE_TYPE__ __n_qwords),mempcpyq,(__dst,__src,__n_qwords))
 #else /* __CRT_HAVE_mempcpyq */
 __NAMESPACE_LOCAL_END
 #include <libc/local/string/mempcpyq.h>
 __NAMESPACE_LOCAL_BEGIN
-/* Same as `memcpyq', but return `dst + n_qwords', rather than `dst' */
 #define __localdep_mempcpyq __LIBC_LOCAL_NAME(mempcpyq)
 #endif /* !__CRT_HAVE_mempcpyq */
 #endif /* !__local___localdep_mempcpyq_defined */

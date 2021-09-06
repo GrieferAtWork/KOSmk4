@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xac53bf91 */
+/* HASH CRC-32:0xc5c9f7c5 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -22,8 +22,6 @@
 #define __local_unicode_readutf8_rev_n_defined 1
 #include <__crt.h>
 __NAMESPACE_LOCAL_BEGIN
-/* >> unicode_readutf8_rev_n(3)
- * Same as `unicode_readutf8_rev()', but don't read ahead of `text_start' */
 __LOCAL_LIBC(unicode_readutf8_rev_n) __ATTR_NONNULL((1, 2)) __CHAR32_TYPE__
 __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(unicode_readutf8_rev_n))(char const **__restrict __ptext, char const *__text_start) {
 	__CHAR32_TYPE__ __result;

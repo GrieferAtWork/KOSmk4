@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xa9eeaf72 */
+/* HASH CRC-32:0xa07150e5 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -23,30 +23,23 @@
 #include <__crt.h>
 #include <hybrid/typecore.h>
 __NAMESPACE_LOCAL_BEGIN
-/* Dependency: memmovedownl from string */
 #ifndef __local___localdep_memmovedownl_defined
 #define __local___localdep_memmovedownl_defined 1
 #ifdef __CRT_HAVE_memmovedownl
-/* Move memory between potentially overlapping memory blocks. (assumes that `dst <= src || !N_DWORDS') */
 __CREDIRECT(__ATTR_LEAF __ATTR_RETNONNULL __ATTR_NONNULL((1, 2)),__UINT32_TYPE__ *,__NOTHROW_NCX,__localdep_memmovedownl,(void *__dst, void const *__src, __SIZE_TYPE__ __n_dwords),memmovedownl,(__dst,__src,__n_dwords))
 #elif defined(__CRT_HAVE_memmovel)
-/* Move memory between potentially overlapping memory blocks. (assumes that `dst <= src || !N_DWORDS') */
 __CREDIRECT(__ATTR_LEAF __ATTR_RETNONNULL __ATTR_NONNULL((1, 2)),__UINT32_TYPE__ *,__NOTHROW_NCX,__localdep_memmovedownl,(void *__dst, void const *__src, __SIZE_TYPE__ __n_dwords),memmovel,(__dst,__src,__n_dwords))
 #elif defined(__CRT_HAVE_wmemmove) && __SIZEOF_WCHAR_T__ == 4
-/* Move memory between potentially overlapping memory blocks. (assumes that `dst <= src || !N_DWORDS') */
 __CREDIRECT(__ATTR_LEAF __ATTR_RETNONNULL __ATTR_NONNULL((1, 2)),__UINT32_TYPE__ *,__NOTHROW_NCX,__localdep_memmovedownl,(void *__dst, void const *__src, __SIZE_TYPE__ __n_dwords),wmemmove,(__dst,__src,__n_dwords))
 #elif defined(__CRT_HAVE_KOS$wmemmove) && defined(__LIBCCALL_IS_LIBKCALL)
-/* Move memory between potentially overlapping memory blocks. (assumes that `dst <= src || !N_DWORDS') */
 __COMPILER_REDIRECT(__LIBC,__ATTR_LEAF __ATTR_RETNONNULL __ATTR_NONNULL((1, 2)),__UINT32_TYPE__ *,__NOTHROW_NCX,__LIBCCALL,__localdep_memmovedownl,(void *__dst, void const *__src, __SIZE_TYPE__ __n_dwords),KOS$wmemmove,(__dst,__src,__n_dwords))
 #else /* ... */
 __NAMESPACE_LOCAL_END
 #include <libc/local/string/memmovedownl.h>
 __NAMESPACE_LOCAL_BEGIN
-/* Move memory between potentially overlapping memory blocks. (assumes that `dst <= src || !N_DWORDS') */
 #define __localdep_memmovedownl __LIBC_LOCAL_NAME(memmovedownl)
 #endif /* !... */
 #endif /* !__local___localdep_memmovedownl_defined */
-/* Same as `memmovew', but return `dst + N_DWORDS', rather than `dst' (assumes that `dst <= src || !N_DWORDS') */
 __LOCAL_LIBC(mempmovedownl) __ATTR_LEAF __ATTR_RETNONNULL __ATTR_NONNULL((1, 2)) __UINT32_TYPE__ *
 __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(mempmovedownl))(void *__dst, void const *__src, __SIZE_TYPE__ __n_dwords) {
 	return (__UINT32_TYPE__ *)__localdep_memmovedownl(__dst, __src, __n_dwords) + __n_dwords;

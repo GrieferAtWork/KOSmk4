@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x818be54c */
+/* HASH CRC-32:0xf4c1293f */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -23,52 +23,25 @@
 #include <__crt.h>
 #if defined(__CRT_HAVE_gai_suspend64) || defined(__CRT_HAVE_gai_suspend)
 __NAMESPACE_LOCAL_BEGIN
-/* Dependency: gai_suspend32 from netdb */
 #if !defined(__local___localdep_gai_suspend32_defined) && defined(__CRT_HAVE_gai_suspend)
 #define __local___localdep_gai_suspend32_defined 1
-/* Suspend execution of the thread until at least one of the `ent' requests
- * in `list' is handled. If `timeout' is not a null pointer it specifies the
- * longest time the function keeps waiting before returning with an error.
- * This function is not part of POSIX and therefore no official
- * cancellation point */
 __CREDIRECT(,int,__NOTHROW_RPC,__localdep_gai_suspend32,(struct gaicb const *const __list[], int __ent, struct __timespec32 const *__timeout),gai_suspend,(__list,__ent,__timeout))
 #endif /* !__local___localdep_gai_suspend32_defined && __CRT_HAVE_gai_suspend */
-/* Dependency: gai_suspend64 from netdb */
 #ifndef __local___localdep_gai_suspend64_defined
 #define __local___localdep_gai_suspend64_defined 1
 #ifdef __CRT_HAVE_gai_suspend64
-/* Suspend execution of the thread until at least one of the `ent' requests
- * in `list' is handled. If `timeout' is not a null pointer it specifies the
- * longest time the function keeps waiting before returning with an error.
- * This function is not part of POSIX and therefore no official
- * cancellation point */
 __CREDIRECT(,int,__NOTHROW_RPC,__localdep_gai_suspend64,(struct gaicb const *const __list[], int __ent, struct __timespec64 const *__timeout),gai_suspend64,(__list,__ent,__timeout))
 #elif defined(__CRT_HAVE_gai_suspend) && __SIZEOF_TIME32_T__ == __SIZEOF_TIME64_T__
-/* Suspend execution of the thread until at least one of the `ent' requests
- * in `list' is handled. If `timeout' is not a null pointer it specifies the
- * longest time the function keeps waiting before returning with an error.
- * This function is not part of POSIX and therefore no official
- * cancellation point */
 __CREDIRECT(,int,__NOTHROW_RPC,__localdep_gai_suspend64,(struct gaicb const *const __list[], int __ent, struct __timespec64 const *__timeout),gai_suspend,(__list,__ent,__timeout))
 #elif defined(__CRT_HAVE_gai_suspend)
 __NAMESPACE_LOCAL_END
 #include <libc/local/netdb/gai_suspend64.h>
 __NAMESPACE_LOCAL_BEGIN
-/* Suspend execution of the thread until at least one of the `ent' requests
- * in `list' is handled. If `timeout' is not a null pointer it specifies the
- * longest time the function keeps waiting before returning with an error.
- * This function is not part of POSIX and therefore no official
- * cancellation point */
 #define __localdep_gai_suspend64 __LIBC_LOCAL_NAME(gai_suspend64)
 #else /* ... */
 #undef __local___localdep_gai_suspend64_defined
 #endif /* !... */
 #endif /* !__local___localdep_gai_suspend64_defined */
-/* Suspend execution of the thread until at least one of the `ent' requests
- * in `list' is handled. If `timeout' is not a null pointer it specifies the
- * longest time the function keeps waiting before returning with an error.
- * This function is not part of POSIX and therefore no official
- * cancellation point */
 __LOCAL_LIBC(gai_suspend) int
 __NOTHROW_RPC(__LIBCCALL __LIBC_LOCAL_NAME(gai_suspend))(struct gaicb const *const __list[], int __ent, struct timespec const *__timeout) {
 #ifdef __CRT_HAVE_gai_suspend

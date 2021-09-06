@@ -175,7 +175,7 @@ void UTimensAt32($fd_t dirfd, [[nonnull]] char const *filename,
 void UTimensAt($fd_t dirfd, [[nonnull]] char const *filename,
                [[nullable]] struct timespec const times[2 /*or:3*/], $atflag_t flags) {
 @@pp_if $has_function(UTimensAt64)@@
-@@pp_ifdef __AT_CHANGE_CTIME@@
+@@pp_ifdef       __AT_CHANGE_CTIME@@
 	struct timespec64 tms[3];
 	if (!times) {
 		UTimensAt64(dirfd, filename, NULL, flags);

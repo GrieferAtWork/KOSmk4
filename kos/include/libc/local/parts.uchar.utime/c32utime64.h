@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x249ee456 */
+/* HASH CRC-32:0x79af92ba */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -23,7 +23,6 @@
 #include <__crt.h>
 #if (defined(__CRT_HAVE_wutime) && __SIZEOF_WCHAR_T__ == 4 && defined(__LIBCCALL_IS_LIBKCALL)) || defined(__CRT_HAVE_KOS$wutime) || (defined(__CRT_HAVE__wutime32) && __SIZEOF_WCHAR_T__ == 4 && defined(__LIBCCALL_IS_LIBKCALL)) || defined(__CRT_HAVE_KOS$_wutime32)
 __NAMESPACE_LOCAL_BEGIN
-/* Dependency: crt_c32utime32 from parts.uchar.utime */
 #ifndef __local___localdep_crt_c32utime32_defined
 #define __local___localdep_crt_c32utime32_defined 1
 #if defined(__CRT_HAVE_wutime) && __SIZEOF_WCHAR_T__ == 4 && defined(__LIBCCALL_IS_LIBKCALL)

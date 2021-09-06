@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x16aadb1b */
+/* HASH CRC-32:0x524b9706 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -24,35 +24,26 @@
 #include <ieee754.h>
 #if defined(__IEEE754_DOUBLE_TYPE_IS_LONG_DOUBLE__) || defined(__IEEE754_FLOAT_TYPE_IS_LONG_DOUBLE__) || defined(__IEEE854_LONG_DOUBLE_TYPE_IS_LONG_DOUBLE__) || defined(__CRT_HAVE_nextafter) || defined(__CRT_HAVE_nexttoward) || defined(__CRT_HAVE___nextafter) || defined(__CRT_HAVE__nextafter) || defined(__CRT_HAVE___nexttoward) || defined(__IEEE754_DOUBLE_TYPE_IS_DOUBLE__) || defined(__IEEE754_FLOAT_TYPE_IS_DOUBLE__) || defined(__IEEE854_LONG_DOUBLE_TYPE_IS_DOUBLE__)
 __NAMESPACE_LOCAL_BEGIN
-/* Dependency: nextafter from math */
 #ifndef __local___localdep_nextafter_defined
 #define __local___localdep_nextafter_defined 1
 #if __has_builtin(__builtin_nextafter) && defined(__LIBC_BIND_CRTBUILTINS) && defined(__CRT_HAVE_nextafter)
-/* Return `x + epsilon' if `x < y', and `x - epsilon' if `x > y' */
 __CEIREDIRECT(__ATTR_CONST __ATTR_WUNUSED,double,__NOTHROW,__localdep_nextafter,(double __x, double __y),nextafter,{ return __builtin_nextafter(__x, __y); })
 #elif __has_builtin(__builtin_nexttoward) && defined(__LIBC_BIND_CRTBUILTINS) && defined(__CRT_HAVE_nexttoward)
-/* Return `x + epsilon' if `x < y', and `x - epsilon' if `x > y' */
 __CEIREDIRECT(__ATTR_CONST __ATTR_WUNUSED,double,__NOTHROW,__localdep_nextafter,(double __x, double __y),nexttoward,{ return __builtin_nexttoward(__x); })
 #elif defined(__CRT_HAVE_nextafter)
-/* Return `x + epsilon' if `x < y', and `x - epsilon' if `x > y' */
 __CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,double,__NOTHROW,__localdep_nextafter,(double __x, double __y),nextafter,(__x,__y))
 #elif defined(__CRT_HAVE_nexttoward)
-/* Return `x + epsilon' if `x < y', and `x - epsilon' if `x > y' */
 __CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,double,__NOTHROW,__localdep_nextafter,(double __x, double __y),nexttoward,(__x,__y))
 #elif defined(__CRT_HAVE___nextafter)
-/* Return `x + epsilon' if `x < y', and `x - epsilon' if `x > y' */
 __CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,double,__NOTHROW,__localdep_nextafter,(double __x, double __y),__nextafter,(__x,__y))
 #elif defined(__CRT_HAVE__nextafter)
-/* Return `x + epsilon' if `x < y', and `x - epsilon' if `x > y' */
 __CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,double,__NOTHROW,__localdep_nextafter,(double __x, double __y),_nextafter,(__x,__y))
 #elif defined(__CRT_HAVE___nexttoward)
-/* Return `x + epsilon' if `x < y', and `x - epsilon' if `x > y' */
 __CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,double,__NOTHROW,__localdep_nextafter,(double __x, double __y),__nexttoward,(__x,__y))
 #elif defined(__IEEE754_DOUBLE_TYPE_IS_DOUBLE__) || defined(__IEEE754_FLOAT_TYPE_IS_DOUBLE__) || defined(__IEEE854_LONG_DOUBLE_TYPE_IS_DOUBLE__)
 __NAMESPACE_LOCAL_END
 #include <libc/local/math/nextafter.h>
 __NAMESPACE_LOCAL_BEGIN
-/* Return `x + epsilon' if `x < y', and `x - epsilon' if `x > y' */
 #define __localdep_nextafter __LIBC_LOCAL_NAME(nextafter)
 #else /* ... */
 #undef __local___localdep_nextafter_defined
@@ -61,7 +52,6 @@ __NAMESPACE_LOCAL_BEGIN
 __NAMESPACE_LOCAL_END
 #include <libm/nextafter.h>
 __NAMESPACE_LOCAL_BEGIN
-/* Return `x + epsilon' if `x < y', and `x - epsilon' if `x > y' */
 __LOCAL_LIBC(nextafterl) __ATTR_CONST __ATTR_WUNUSED __LONGDOUBLE
 __NOTHROW(__LIBCCALL __LIBC_LOCAL_NAME(nextafterl))(__LONGDOUBLE __x, __LONGDOUBLE __y) {
 #if defined(__IEEE754_DOUBLE_TYPE_IS_LONG_DOUBLE__) || defined(__IEEE754_FLOAT_TYPE_IS_LONG_DOUBLE__) || defined(__IEEE854_LONG_DOUBLE_TYPE_IS_LONG_DOUBLE__)

@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x8dfb18ba */
+/* HASH CRC-32:0x1541bd14 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -35,7 +35,7 @@ DECL_BEGIN
 #include <asm/os/stdio.h>
 /* >> login_tty(3)
  * Set the given `fd' as the controlling terminal, stdin,
- * stdout, and stderr. Afterwards, `fd' is closed.
+ * stdout,   and  stderr.  Afterwards,  `fd'  is  closed.
  * @return: 0 : Success
  * @return: * : Error */
 INTERN ATTR_SECTION(".text.crt.io.tty") int

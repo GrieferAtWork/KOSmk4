@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x6c66b8e8 */
+/* HASH CRC-32:0xa3e3177c */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -24,7 +24,6 @@
 #if defined(__CRT_HAVE_memalign) || defined(__CRT_HAVE_aligned_alloc) || defined(__CRT_HAVE_posix_memalign)
 #include <hybrid/typecore.h>
 __NAMESPACE_LOCAL_BEGIN
-/* Dependency: getpagesize from unistd */
 #ifndef __local___localdep_getpagesize_defined
 #define __local___localdep_getpagesize_defined 1
 __NAMESPACE_LOCAL_END
@@ -34,35 +33,26 @@ __NAMESPACE_LOCAL_BEGIN
 __NAMESPACE_LOCAL_END
 #include <features.h>
 __NAMESPACE_LOCAL_BEGIN
-/* >> getpagesize(3)
- * Return the size of a PAGE (in bytes) */
 __CEIREDIRECT(__ATTR_CONST __ATTR_WUNUSED,__STDC_INT_AS_SIZE_T,__NOTHROW,__localdep_getpagesize,(void),getpagesize,{ return __ARCH_PAGESIZE; })
 #elif defined(__CRT_HAVE_getpagesize)
 __NAMESPACE_LOCAL_END
 #include <features.h>
 __NAMESPACE_LOCAL_BEGIN
-/* >> getpagesize(3)
- * Return the size of a PAGE (in bytes) */
 __CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,__STDC_INT_AS_SIZE_T,__NOTHROW,__localdep_getpagesize,(void),getpagesize,())
 #elif defined(__CRT_HAVE___getpagesize)
 __NAMESPACE_LOCAL_END
 #include <features.h>
 __NAMESPACE_LOCAL_BEGIN
-/* >> getpagesize(3)
- * Return the size of a PAGE (in bytes) */
 __CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,__STDC_INT_AS_SIZE_T,__NOTHROW,__localdep_getpagesize,(void),__getpagesize,())
 #elif defined(__ARCH_PAGESIZE)
 __NAMESPACE_LOCAL_END
 #include <features.h>
 __NAMESPACE_LOCAL_BEGIN
-/* >> getpagesize(3)
- * Return the size of a PAGE (in bytes) */
 __FORCELOCAL __ATTR_CONST __ATTR_WUNUSED __STDC_INT_AS_SIZE_T __NOTHROW(__LIBCCALL __localdep_getpagesize)(void) { return __ARCH_PAGESIZE; }
 #else /* ... */
 #undef __local___localdep_getpagesize_defined
 #endif /* !... */
 #endif /* !__local___localdep_getpagesize_defined */
-/* Dependency: memalign from malloc */
 #ifndef __local___localdep_memalign_defined
 #define __local___localdep_memalign_defined 1
 #if __has_builtin(__builtin_aligned_alloc) && defined(__LIBC_BIND_CRTBUILTINS) && defined(__CRT_HAVE_aligned_alloc)

@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x35f96c84 */
+/* HASH CRC-32:0x35ccb7e4 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -23,7 +23,6 @@
 #include <__crt.h>
 struct format_aprintf_data;
 __NAMESPACE_LOCAL_BEGIN
-/* Dependency: malloc from stdlib */
 #ifndef __local___localdep_malloc_defined
 #define __local___localdep_malloc_defined 1
 #if __has_builtin(__builtin_malloc) && defined(__LIBC_BIND_CRTBUILTINS) && defined(__CRT_HAVE_malloc)
@@ -45,7 +44,6 @@ __NAMESPACE_LOCAL_BEGIN
 #undef __local___localdep_malloc_defined
 #endif /* !... */
 #endif /* !__local___localdep_malloc_defined */
-/* Dependency: realloc from stdlib */
 #ifndef __local___localdep_realloc_defined
 #define __local___localdep_realloc_defined 1
 #if __has_builtin(__builtin_realloc) && defined(__LIBC_BIND_CRTBUILTINS) && defined(__CRT_HAVE_realloc)
@@ -73,29 +71,6 @@ struct format_aprintf_data {
 };
 #endif /* !__format_aprintf_data_defined */
 __NAMESPACE_LOCAL_BEGIN
-/* >> format_aprintf_pack(3)
- * Pack and finalize a given aprintf format printer
- * Together with `format_aprintf_printer(3)', the aprintf
- * format printer sub-system should be used as follows:
- * >> char *result;
- * >> ssize_t error;
- * >> struct format_aprintf_data p = FORMAT_APRINTF_DATA_INIT;
- * >> error = format_printf(&format_aprintf_printer, &p, "%s %s", "Hello", "World");
- * >> if unlikely(error < 0) {
- * >>     format_aprintf_data_fini(&p);
- * >>     return NULL;
- * >> }
- * >> result = format_aprintf_pack(&p, NULL);
- * >> // `return' is an malloc()'d string "Hello World"
- * >> return result;
- * WARNING: Note that `format_aprintf_pack(3)' is able to return `NULL' as well,
- *          but will finalize the given aprintf printer an all cases.
- * NOTE:    The caller must destroy the returned string by passing it to `free(3)'
- * @param: pstrlen: When non-NULL, store the length of the constructed string here
- *                  Note that this is the actual length if the constructed string,
- *                  but may differ from `strlen(return)' when NUL characters were
- *                  printed to the aprintf-printer at one point.
- *                  (e.g. `format_aprintf_printer(&my_printer, "\0", 1)') */
 __LOCAL_LIBC(format_aprintf_pack) __ATTR_MALLOC __ATTR_MALL_DEFAULT_ALIGNED __ATTR_WUNUSED __ATTR_NONNULL((1)) char *
 __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(format_aprintf_pack))(struct format_aprintf_data *__restrict __self, __SIZE_TYPE__ *__pstrlen) {
 	/* Free unused buffer memory. */

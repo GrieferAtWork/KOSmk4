@@ -66,9 +66,9 @@ typedef __sem_t sem_t;
 @@>> sem_init(3)
 @@Initialize the given semaphore `sem' to start out with `value' tickets
 @@@param: sem:     The semaphore to initialize
-@@@param: pshared: When non-zero, `sem' may point to a memory region shared
+@@@param: pshared: When  non-zero, `sem'  may point  to a  memory region shared
 @@                 with another process, such that both caller, and any process
-@@                 the pointed-to memory is shared with can safely operate on
+@@                 the pointed-to memory is shared  with can safely operate  on
 @@                 the same semaphore.
 @@@param: value:   The initial # of tickets available.
 @@@return: 0:      Success
@@ -87,20 +87,20 @@ int sem_destroy([[nonnull]] sem_t *sem);
 
 @@>> sem_open(3)
 @@Open a named semaphore `name', which must be string that starts with `/'
-@@NOTE: When called multiple times with identical strings for `name',
+@@NOTE: When called multiple times with identical strings for  `name',
 @@      the behavior of this function differs between implementations:
 @@      #ifdef __ARCH_HAVE_NON_UNIQUE_SEM_OPEN
-@@         The returned pointer is allowed to be unique and different from
+@@         The  returned pointer is  allowed to be  unique and different from
 @@         any previously returned semaphore, but the backing physical memory
 @@         will be shared with other semaphores with the same name.
 @@      #else // __ARCH_HAVE_NON_UNIQUE_SEM_OPEN
-@@         The returned pointer may be identical to a pointer previously
+@@         The returned pointer  may be identical  to a pointer  previously
 @@         returned for the same semaphore. In this case, `sem_close()' may
-@@         only have to be called once to close all open handles for the
+@@         only have to be  called once to close  all open handles for  the
 @@         semaphore
 @@      #endif // !__ARCH_HAVE_NON_UNIQUE_SEM_OPEN
 @@@param: oflags:      Set of `0 | O_CREAT | O_EXCL' (When `O_CREAT' is given, this functions
-@@                     takes 2 additional arguments `..., mode_t mode, unsigned int value')
+@@                     takes 2  additional arguments  `..., mode_t mode, unsigned int value')
 @@@return: * :         A pointer to the opened semaphore, which must be closed by `sem_close(3)'
 @@@return: SEM_FAILED: [errno=EINVAL] The given `name' contains no characters after the initial `/'
 @@@return: SEM_FAILED: Error (s.a. `errno')
@@ -111,7 +111,7 @@ sem_t *sem_open([[nonnull]] char const *name, $oflag_t oflags,
 
 @@>> sem_close(3)
 @@Close a semaphore previously returned by `sem_open(3)'. But note the case
-@@of opening the same semaphore more than once within the same process, as
+@@of opening the same semaphore more than once within the same process,  as
 @@described by in `sem_open(3)' and by `__ARCH_HAVE_NON_UNIQUE_SEM_OPEN'->
 @@@return: 0: Success
 [[decl_include("<bits/crt/semaphore.h>")]]
@@ -119,7 +119,7 @@ int sem_close([[nonnull]] sem_t *sem);
 
 @@>> sem_unlink(3)
 @@Unlink (delete) a named semaphore `name' that was
-@@previously created by `sem_open(name, O_CREAT)'
+@@previously  created  by `sem_open(name, O_CREAT)'
 @@@return: 0:  Success
 @@@return: -1: [errno=EINVAL] The given `name' contains no characters after the initial `/'
 @@@return: -1: Error (s.a. `errno')
@@ -128,7 +128,7 @@ int sem_unlink([[nonnull]] const char *name);
 
 
 @@>> sem_wait(3)
-@@Wait for a ticket to become available to the given semaphore `sem'
+@@Wait  for a ticket  to become available to  the given semaphore `sem'
 @@Once a ticket has become available, consume it and return. Until that
 @@point in time, keep on blocking.
 @@@return: 0:  Success
@@ -145,9 +145,9 @@ int sem_timedwait32([[nonnull]] sem_t *__restrict sem,
 %
 %#ifdef __USE_XOPEN2K
 @@>> sem_timedwait(3)
-@@Wait for a ticket to become available to the given semaphore `sem'
+@@Wait for a  ticket to  become available  to the  given semaphore  `sem'
 @@Once a ticket has become available, consume it and return. If no ticket
-@@becomes available until `abstime' has passed, return `errno=ETIMEDOUT'
+@@becomes  available until `abstime' has passed, return `errno=ETIMEDOUT'
 @@@return: 0:  Success
 @@@return: -1: [errno=EINTR]     Interrupted.
 @@@return: -1: [errno=ETIMEDOUT] The given `abstime' expired before a ticket became available.
@@ -196,7 +196,7 @@ int sem_trywait([[nonnull]] sem_t *sem);
 
 @@>> sem_post(3)
 @@Post a ticket to the given semaphore `sem', waking up to 1 other thread
-@@that may be waiting for tickets to become available before returning.
+@@that may be waiting for  tickets to become available before  returning.
 @@@return: 0:  Success
 @@@return: -1: [errno=EOVERFLOW] The maximum number of tickets have already been posted.
 [[decl_include("<bits/crt/semaphore.h>")]]

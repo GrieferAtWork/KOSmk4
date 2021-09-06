@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x3c4f9a46 */
+/* HASH CRC-32:0x82b84744 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -23,27 +23,17 @@
 #include <__crt.h>
 #include <bits/crt/tm.h>
 __NAMESPACE_LOCAL_BEGIN
-/* Dependency: strptime from time */
 #ifndef __local___localdep_strptime_defined
 #define __local___localdep_strptime_defined 1
 #ifdef __CRT_HAVE_strptime
-/* >> strptime(3)
- * Parse `s' according to `format' and store binary time information in `tp'.
- * The return value is a pointer to the first unparsed character in `s' */
 __CREDIRECT(__ATTR_NONNULL((1, 2, 3)),char *,__NOTHROW_NCX,__localdep_strptime,(char const *__restrict __s, char const *__restrict __format, struct __NAMESPACE_STD_SYM tm *__restrict __tp),strptime,(__s,__format,__tp))
 #else /* __CRT_HAVE_strptime */
 __NAMESPACE_LOCAL_END
 #include <libc/local/time/strptime.h>
 __NAMESPACE_LOCAL_BEGIN
-/* >> strptime(3)
- * Parse `s' according to `format' and store binary time information in `tp'.
- * The return value is a pointer to the first unparsed character in `s' */
 #define __localdep_strptime __LIBC_LOCAL_NAME(strptime)
 #endif /* !__CRT_HAVE_strptime */
 #endif /* !__local___localdep_strptime_defined */
-/* >> strptime_l(3)
- * Similar to `strptime' but take the information from
- * the provided locale and not the global locale */
 __LOCAL_LIBC(strptime_l) __ATTR_NONNULL((1, 2, 3)) char *
 __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(strptime_l))(char const *__restrict __s, char const *__restrict __format, struct __NAMESPACE_STD_SYM tm *__restrict __tp, __locale_t __locale) {
 	(void)__locale;

@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x369d664 */
+/* HASH CRC-32:0x89c474b2 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -23,43 +23,21 @@
 #include <__crt.h>
 #if defined(__CRT_HAVE_free) || defined(__CRT_HAVE_cfree)
 __NAMESPACE_LOCAL_BEGIN
-/* Dependency: explicit_bzero from strings */
 #ifndef __local___localdep_explicit_bzero_defined
 #define __local___localdep_explicit_bzero_defined 1
 #ifdef __CRT_HAVE_bzero
-/* >> explicit_bzero(3)
- * Same as `bzero(dst, n_bytes)', however compilers will not optimize
- * away uses of this function when they (think) that clearing the memory
- * wouldn't have any visible side-effects (though those side-effects
- * may be a security-concious application trying to wipe sensitive data) */
 __CREDIRECT_VOID(,__NOTHROW_NCX,__localdep_explicit_bzero,(void *__dst, __SIZE_TYPE__ __n_bytes),bzero,(__dst,__n_bytes))
 #elif defined(__CRT_HAVE_explicit_bzero)
-/* >> explicit_bzero(3)
- * Same as `bzero(dst, n_bytes)', however compilers will not optimize
- * away uses of this function when they (think) that clearing the memory
- * wouldn't have any visible side-effects (though those side-effects
- * may be a security-concious application trying to wipe sensitive data) */
 __CREDIRECT_VOID(,__NOTHROW_NCX,__localdep_explicit_bzero,(void *__dst, __SIZE_TYPE__ __n_bytes),explicit_bzero,(__dst,__n_bytes))
 #elif defined(__CRT_HAVE___bzero)
-/* >> explicit_bzero(3)
- * Same as `bzero(dst, n_bytes)', however compilers will not optimize
- * away uses of this function when they (think) that clearing the memory
- * wouldn't have any visible side-effects (though those side-effects
- * may be a security-concious application trying to wipe sensitive data) */
 __CREDIRECT_VOID(,__NOTHROW_NCX,__localdep_explicit_bzero,(void *__dst, __SIZE_TYPE__ __n_bytes),__bzero,(__dst,__n_bytes))
 #else /* ... */
 __NAMESPACE_LOCAL_END
 #include <libc/local/strings/explicit_bzero.h>
 __NAMESPACE_LOCAL_BEGIN
-/* >> explicit_bzero(3)
- * Same as `bzero(dst, n_bytes)', however compilers will not optimize
- * away uses of this function when they (think) that clearing the memory
- * wouldn't have any visible side-effects (though those side-effects
- * may be a security-concious application trying to wipe sensitive data) */
 #define __localdep_explicit_bzero __LIBC_LOCAL_NAME(explicit_bzero)
 #endif /* !... */
 #endif /* !__local___localdep_explicit_bzero_defined */
-/* Dependency: free from stdlib */
 #ifndef __local___localdep_free_defined
 #define __local___localdep_free_defined 1
 #if __has_builtin(__builtin_free) && defined(__LIBC_BIND_CRTBUILTINS) && defined(__CRT_HAVE_free)
@@ -72,11 +50,6 @@ __CREDIRECT_VOID(,__NOTHROW_NCX,__localdep_free,(void *__mallptr),cfree,(__mallp
 #undef __local___localdep_free_defined
 #endif /* !... */
 #endif /* !__local___localdep_free_defined */
-/* >> freezero(3)
- * Same as `free(mallptr)', but also ensure that the memory region
- * described by `mallptr...+=num_bytes' is explicitly freed to zero, or
- * immediately returned to the OS, rather than being left in cache
- * while still containing its previous contents. */
 __LOCAL_LIBC(freezero) void
 __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(freezero))(void *__mallptr, __SIZE_TYPE__ __num_bytes) {
 	if __likely(__mallptr) {

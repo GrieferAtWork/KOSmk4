@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x8714efba */
+/* HASH CRC-32:0x391132e7 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -24,23 +24,18 @@
 #include <ieee754.h>
 #if defined(__IEEE754_DOUBLE_TYPE_IS_LONG_DOUBLE__) || defined(__IEEE754_FLOAT_TYPE_IS_LONG_DOUBLE__) || defined(__IEEE854_LONG_DOUBLE_TYPE_IS_LONG_DOUBLE__) || defined(__CRT_HAVE_fmod) || defined(__CRT_HAVE___fmod) || defined(__IEEE754_DOUBLE_TYPE_IS_DOUBLE__) || defined(__IEEE754_FLOAT_TYPE_IS_DOUBLE__) || defined(__IEEE854_LONG_DOUBLE_TYPE_IS_DOUBLE__)
 __NAMESPACE_LOCAL_BEGIN
-/* Dependency: fmod from math */
 #ifndef __local___localdep_fmod_defined
 #define __local___localdep_fmod_defined 1
 #if __has_builtin(__builtin_fmod) && defined(__LIBC_BIND_CRTBUILTINS) && defined(__CRT_HAVE_fmod)
-/* Floating-point modulo remainder of `x / y' */
 __CEIREDIRECT(__ATTR_WUNUSED,double,__NOTHROW,__localdep_fmod,(double __x, double __y),fmod,{ return __builtin_fmod(__x, __y); })
 #elif defined(__CRT_HAVE_fmod)
-/* Floating-point modulo remainder of `x / y' */
 __CREDIRECT(__ATTR_WUNUSED,double,__NOTHROW,__localdep_fmod,(double __x, double __y),fmod,(__x,__y))
 #elif defined(__CRT_HAVE___fmod)
-/* Floating-point modulo remainder of `x / y' */
 __CREDIRECT(__ATTR_WUNUSED,double,__NOTHROW,__localdep_fmod,(double __x, double __y),__fmod,(__x,__y))
 #elif defined(__IEEE754_DOUBLE_TYPE_IS_DOUBLE__) || defined(__IEEE754_FLOAT_TYPE_IS_DOUBLE__) || defined(__IEEE854_LONG_DOUBLE_TYPE_IS_DOUBLE__)
 __NAMESPACE_LOCAL_END
 #include <libc/local/math/fmod.h>
 __NAMESPACE_LOCAL_BEGIN
-/* Floating-point modulo remainder of `x / y' */
 #define __localdep_fmod __LIBC_LOCAL_NAME(fmod)
 #else /* ... */
 #undef __local___localdep_fmod_defined
@@ -52,7 +47,6 @@ __NAMESPACE_LOCAL_END
 #include <libm/matherr.h>
 #include <libm/fmod.h>
 __NAMESPACE_LOCAL_BEGIN
-/* Floating-point modulo remainder of `x / y' */
 __LOCAL_LIBC(fmodl) __ATTR_WUNUSED __LONGDOUBLE
 __NOTHROW(__LIBCCALL __LIBC_LOCAL_NAME(fmodl))(__LONGDOUBLE __x, __LONGDOUBLE __y) {
 #if defined(__IEEE754_DOUBLE_TYPE_IS_LONG_DOUBLE__) || defined(__IEEE754_FLOAT_TYPE_IS_LONG_DOUBLE__) || defined(__IEEE854_LONG_DOUBLE_TYPE_IS_LONG_DOUBLE__)

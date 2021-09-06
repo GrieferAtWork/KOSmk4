@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x87459764 */
+/* HASH CRC-32:0xa078e193 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -24,7 +24,6 @@
 #include <bits/types.h>
 #include <bits/crt/tm.h>
 __NAMESPACE_LOCAL_BEGIN
-/* Dependency: dos_gmtime64_s from time */
 #ifndef __local___localdep_dos_gmtime64_s_defined
 #define __local___localdep_dos_gmtime64_s_defined 1
 #ifdef __CRT_HAVE__gmtime64_s
@@ -62,8 +61,6 @@ __NAMESPACE_LOCAL_END
 #define __yearstodays(__n_years) (((146097*(__n_years))/400)/*-1*/) /* rounding error? */
 #endif /* !__yearstodays */
 __NAMESPACE_LOCAL_BEGIN
-/* >> gmtime_r(3), gmtime64_r(3)
- * Return the `struct tm' representation of `*timer' in UTC, using `*tp' to store the result */
 __LOCAL_LIBC(gmtime64_r) __ATTR_NONNULL((1, 2)) struct __NAMESPACE_STD_SYM tm *
 __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(gmtime64_r))(__time64_t const *__restrict __timer, struct __NAMESPACE_STD_SYM tm *__restrict __tp) {
 
@@ -144,7 +141,7 @@ __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(gmtime64_r))(__time64_t const *__rest
 			__tp->tm_isdst = __previousSunday >= 8;
 		} else {
 			//In November we must be before the first Sunday to be dst.
-			//That means the previous Sunday must be before the 1st.
+			//That means the  previous Sunday must  be before the  1st.
 			__tp->tm_isdst = __previousSunday <= 0;
 		}
 	}

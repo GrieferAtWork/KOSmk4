@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x1927b70b */
+/* HASH CRC-32:0x33f29ce */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -26,7 +26,6 @@
 #if defined(__CRT_HAVE_fgetpos64) || defined(__CRT_HAVE__IO_fgetpos64) || defined(__CRT_HAVE_fgetpos64_unlocked) || defined(__CRT_HAVE_fgetpos) || defined(__CRT_HAVE__IO_fgetpos) || defined(__CRT_HAVE_fgetpos_unlocked) || defined(__CRT_HAVE_ftello64) || defined(__CRT_HAVE_ftell64) || defined(__CRT_HAVE__ftelli64) || defined(__CRT_HAVE_ftello64_unlocked) || defined(__CRT_HAVE_ftell64_unlocked) || defined(__CRT_HAVE__ftelli64_nolock) || defined(__CRT_HAVE_ftello) || defined(__CRT_HAVE_ftello_unlocked) || defined(__CRT_HAVE_ftell) || defined(__CRT_HAVE__IO_ftell) || defined(__CRT_HAVE_ftell_unlocked) || defined(__CRT_HAVE__ftell_nolock)
 #include <kos/anno.h>
 __NAMESPACE_LOCAL_BEGIN
-/* Dependency: crt_fgetpos from stdio */
 #ifndef __local___localdep_crt_fgetpos_defined
 #define __local___localdep_crt_fgetpos_defined 1
 #if defined(__CRT_HAVE_fgetpos_unlocked) && defined(__USE_STDIO_UNLOCKED)
@@ -49,7 +48,6 @@ __CREDIRECT(__ATTR_NONNULL((1, 2)),int,__THROWING,__localdep_crt_fgetpos,(__FILE
 #undef __local___localdep_crt_fgetpos_defined
 #endif /* !... */
 #endif /* !__local___localdep_crt_fgetpos_defined */
-/* Dependency: crt_fgetpos64 from stdio */
 #ifndef __local___localdep_crt_fgetpos64_defined
 #define __local___localdep_crt_fgetpos64_defined 1
 #if defined(__CRT_HAVE_fgetpos_unlocked) && defined(__USE_STDIO_UNLOCKED) && __SIZEOF_OFF64_T__ == __SIZEOF_OFF32_T__
@@ -72,7 +70,6 @@ __CREDIRECT(__ATTR_NONNULL((1, 2)),int,__THROWING,__localdep_crt_fgetpos64,(__FI
 #undef __local___localdep_crt_fgetpos64_defined
 #endif /* !... */
 #endif /* !__local___localdep_crt_fgetpos64_defined */
-/* Dependency: crt_ftell from stdio */
 #ifndef __local___localdep_crt_ftell_defined
 #define __local___localdep_crt_ftell_defined 1
 #if defined(__CRT_HAVE_ftell_unlocked) && defined(__USE_STDIO_UNLOCKED)
@@ -115,7 +112,6 @@ __CREDIRECT(__ATTR_NONNULL((1)),long int,__THROWING,__localdep_crt_ftell,(__FILE
 #undef __local___localdep_crt_ftell_defined
 #endif /* !... */
 #endif /* !__local___localdep_crt_ftell_defined */
-/* Dependency: crt_ftello from stdio */
 #ifndef __local___localdep_crt_ftello_defined
 #define __local___localdep_crt_ftello_defined 1
 #if defined(__CRT_HAVE_ftell_unlocked) && defined(__USE_STDIO_UNLOCKED) && __SIZEOF_OFF32_T__ == __SIZEOF_LONG__
@@ -158,7 +154,6 @@ __CREDIRECT(__ATTR_NONNULL((1)),__off32_t,__THROWING,__localdep_crt_ftello,(__FI
 #undef __local___localdep_crt_ftello_defined
 #endif /* !... */
 #endif /* !__local___localdep_crt_ftello_defined */
-/* Dependency: crt_ftello64 from stdio */
 #ifndef __local___localdep_crt_ftello64_defined
 #define __local___localdep_crt_ftello64_defined 1
 #if defined(__CRT_HAVE_ftell_unlocked) && defined(__USE_STDIO_UNLOCKED) && __SIZEOF_OFF64_T__ == __SIZEOF_LONG__
@@ -201,8 +196,6 @@ __CREDIRECT(__ATTR_NONNULL((1)),__off64_t,__THROWING,__localdep_crt_ftello64,(__
 #undef __local___localdep_crt_ftello64_defined
 #endif /* !... */
 #endif /* !__local___localdep_crt_ftello64_defined */
-/* >> ftello(3), ftello64(3)
- * Return the current in-file position of `stream' */
 __LOCAL_LIBC(ftello) __ATTR_WUNUSED __ATTR_NONNULL((1)) __FS_TYPE(off)
 (__LIBCCALL __LIBC_LOCAL_NAME(ftello))(__FILE *__restrict __stream) __THROWS(...) {
 #if defined(__USE_FILE_OFFSET64) && ((defined(__CRT_HAVE_fgetpos) && __SIZEOF_OFF64_T__ == __SIZEOF_OFF32_T__) || (defined(__CRT_HAVE__IO_fgetpos) && __SIZEOF_OFF64_T__ == __SIZEOF_OFF32_T__) || defined(__CRT_HAVE_fgetpos64) || defined(__CRT_HAVE__IO_fgetpos64) || (defined(__CRT_HAVE_fgetpos_unlocked) && __SIZEOF_OFF64_T__ == __SIZEOF_OFF32_T__) || defined(__CRT_HAVE_fgetpos64_unlocked))

@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x4e52a2fc */
+/* HASH CRC-32:0xc218ec51 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -27,7 +27,6 @@
 #include <kos/anno.h>
 #include <bits/types.h>
 __NAMESPACE_LOCAL_BEGIN
-/* Dependency: exit from stdlib */
 #ifndef __local___localdep_exit_defined
 #define __local___localdep_exit_defined 1
 #if __has_builtin(__builtin_exit) && defined(__LIBC_BIND_CRTBUILTINS) && defined(__CRT_HAVE_exit)
@@ -44,152 +43,88 @@ __CREDIRECT_VOID(__ATTR_NORETURN,__THROWING,__localdep_exit,(int __status),_Exit
 #undef __local___localdep_exit_defined
 #endif /* !... */
 #endif /* !__local___localdep_exit_defined */
-/* Dependency: fflush from stdio */
 #ifndef __local___localdep_fflush_defined
 #define __local___localdep_fflush_defined 1
 #if defined(__CRT_HAVE_fflush_unlocked) && defined(__USE_STDIO_UNLOCKED)
-/* >> fflush(3)
- * Flush any unwritten data from `stream' to the underlying filesystem/TTY */
 __CREDIRECT(,int,__THROWING,__localdep_fflush,(__FILE *__stream),fflush_unlocked,(__stream))
 #elif defined(__CRT_HAVE__fflush_nolock) && defined(__USE_STDIO_UNLOCKED)
-/* >> fflush(3)
- * Flush any unwritten data from `stream' to the underlying filesystem/TTY */
 __CREDIRECT(,int,__THROWING,__localdep_fflush,(__FILE *__stream),_fflush_nolock,(__stream))
 #elif defined(__CRT_HAVE_fflush)
-/* >> fflush(3)
- * Flush any unwritten data from `stream' to the underlying filesystem/TTY */
 __CREDIRECT(,int,__THROWING,__localdep_fflush,(__FILE *__stream),fflush,(__stream))
 #elif defined(__CRT_HAVE__IO_fflush)
-/* >> fflush(3)
- * Flush any unwritten data from `stream' to the underlying filesystem/TTY */
 __CREDIRECT(,int,__THROWING,__localdep_fflush,(__FILE *__stream),_IO_fflush,(__stream))
 #elif defined(__CRT_HAVE_fflush_unlocked)
-/* >> fflush(3)
- * Flush any unwritten data from `stream' to the underlying filesystem/TTY */
 __CREDIRECT(,int,__THROWING,__localdep_fflush,(__FILE *__stream),fflush_unlocked,(__stream))
 #elif defined(__CRT_HAVE__fflush_nolock)
-/* >> fflush(3)
- * Flush any unwritten data from `stream' to the underlying filesystem/TTY */
 __CREDIRECT(,int,__THROWING,__localdep_fflush,(__FILE *__stream),_fflush_nolock,(__stream))
 #else /* ... */
 __NAMESPACE_LOCAL_END
 #include <libc/local/stdio/fflush.h>
 __NAMESPACE_LOCAL_BEGIN
-/* >> fflush(3)
- * Flush any unwritten data from `stream' to the underlying filesystem/TTY */
 #define __localdep_fflush __LIBC_LOCAL_NAME(fflush)
 #endif /* !... */
 #endif /* !__local___localdep_fflush_defined */
-/* Dependency: fprintf from stdio */
 #ifndef __local___localdep_fprintf_defined
 #define __local___localdep_fprintf_defined 1
 #if __has_builtin(__builtin_fprintf) && defined(__LIBC_BIND_CRTBUILTINS) && defined(__CRT_HAVE_fprintf) && __has_builtin(__builtin_va_arg_pack)
-/* >> fprintf(3), vfprintf(3)
- * Print data to `stream', following `format'
- * Return the number of successfully printed bytes */
 __CEIREDIRECT(__ATTR_LIBC_PRINTF(2, 3) __ATTR_NONNULL((1, 2)),__STDC_INT_AS_SSIZE_T,__THROWING,__localdep_fprintf,(__FILE *__restrict __stream, char const *__restrict __format, ...),fprintf,{ return __builtin_fprintf(__stream, __format, __builtin_va_arg_pack()); })
 #elif defined(__CRT_HAVE_fprintf_unlocked) && defined(__USE_STDIO_UNLOCKED)
-/* >> fprintf(3), vfprintf(3)
- * Print data to `stream', following `format'
- * Return the number of successfully printed bytes */
 __LIBC __ATTR_LIBC_PRINTF(2, 3) __ATTR_NONNULL((1, 2)) __STDC_INT_AS_SSIZE_T (__VLIBCCALL __localdep_fprintf)(__FILE *__restrict __stream, char const *__restrict __format, ...) __THROWS(...) __CASMNAME("fprintf_unlocked");
 #elif defined(__CRT_HAVE_fprintf)
-/* >> fprintf(3), vfprintf(3)
- * Print data to `stream', following `format'
- * Return the number of successfully printed bytes */
 __LIBC __ATTR_LIBC_PRINTF(2, 3) __ATTR_NONNULL((1, 2)) __STDC_INT_AS_SSIZE_T (__VLIBCCALL __localdep_fprintf)(__FILE *__restrict __stream, char const *__restrict __format, ...) __THROWS(...) __CASMNAME("fprintf");
 #elif defined(__CRT_HAVE__IO_fprintf)
-/* >> fprintf(3), vfprintf(3)
- * Print data to `stream', following `format'
- * Return the number of successfully printed bytes */
 __LIBC __ATTR_LIBC_PRINTF(2, 3) __ATTR_NONNULL((1, 2)) __STDC_INT_AS_SSIZE_T (__VLIBCCALL __localdep_fprintf)(__FILE *__restrict __stream, char const *__restrict __format, ...) __THROWS(...) __CASMNAME("_IO_fprintf");
 #elif defined(__CRT_HAVE_fprintf_s)
-/* >> fprintf(3), vfprintf(3)
- * Print data to `stream', following `format'
- * Return the number of successfully printed bytes */
 __LIBC __ATTR_LIBC_PRINTF(2, 3) __ATTR_NONNULL((1, 2)) __STDC_INT_AS_SSIZE_T (__VLIBCCALL __localdep_fprintf)(__FILE *__restrict __stream, char const *__restrict __format, ...) __THROWS(...) __CASMNAME("fprintf_s");
 #elif defined(__CRT_HAVE_fprintf_unlocked)
-/* >> fprintf(3), vfprintf(3)
- * Print data to `stream', following `format'
- * Return the number of successfully printed bytes */
 __LIBC __ATTR_LIBC_PRINTF(2, 3) __ATTR_NONNULL((1, 2)) __STDC_INT_AS_SSIZE_T (__VLIBCCALL __localdep_fprintf)(__FILE *__restrict __stream, char const *__restrict __format, ...) __THROWS(...) __CASMNAME("fprintf_unlocked");
 #else /* ... */
 __NAMESPACE_LOCAL_END
 #include <libc/local/stdio/fprintf.h>
 __NAMESPACE_LOCAL_BEGIN
-/* >> fprintf(3), vfprintf(3)
- * Print data to `stream', following `format'
- * Return the number of successfully printed bytes */
 #define __localdep_fprintf __LIBC_LOCAL_NAME(fprintf)
 #endif /* !... */
 #endif /* !__local___localdep_fprintf_defined */
-/* Dependency: fputc from stdio */
 #ifndef __local___localdep_fputc_defined
 #define __local___localdep_fputc_defined 1
 #if __has_builtin(__builtin_fputc) && defined(__LIBC_BIND_CRTBUILTINS) && defined(__CRT_HAVE_fputc)
-/* >> fputc(3)
- * Write a single character `ch' to `stream' */
 __CEIREDIRECT(__ATTR_NONNULL((2)),int,__THROWING,__localdep_fputc,(int __ch, __FILE *__restrict __stream),fputc,{ return __builtin_fputc(__ch, __stream); })
 #elif defined(__CRT_HAVE_fputc_unlocked) && defined(__USE_STDIO_UNLOCKED)
-/* >> fputc(3)
- * Write a single character `ch' to `stream' */
 __CREDIRECT(__ATTR_NONNULL((2)),int,__THROWING,__localdep_fputc,(int __ch, __FILE *__restrict __stream),fputc_unlocked,(__ch,__stream))
 #elif defined(__CRT_HAVE_putc_unlocked) && defined(__USE_STDIO_UNLOCKED)
-/* >> fputc(3)
- * Write a single character `ch' to `stream' */
 __CREDIRECT(__ATTR_NONNULL((2)),int,__THROWING,__localdep_fputc,(int __ch, __FILE *__restrict __stream),putc_unlocked,(__ch,__stream))
 #elif defined(__CRT_HAVE_fputc)
-/* >> fputc(3)
- * Write a single character `ch' to `stream' */
 __CREDIRECT(__ATTR_NONNULL((2)),int,__THROWING,__localdep_fputc,(int __ch, __FILE *__restrict __stream),fputc,(__ch,__stream))
 #elif defined(__CRT_HAVE_putc)
-/* >> fputc(3)
- * Write a single character `ch' to `stream' */
 __CREDIRECT(__ATTR_NONNULL((2)),int,__THROWING,__localdep_fputc,(int __ch, __FILE *__restrict __stream),putc,(__ch,__stream))
 #elif defined(__CRT_HAVE__IO_putc)
-/* >> fputc(3)
- * Write a single character `ch' to `stream' */
 __CREDIRECT(__ATTR_NONNULL((2)),int,__THROWING,__localdep_fputc,(int __ch, __FILE *__restrict __stream),_IO_putc,(__ch,__stream))
 #elif defined(__CRT_HAVE_fputc_unlocked)
-/* >> fputc(3)
- * Write a single character `ch' to `stream' */
 __CREDIRECT(__ATTR_NONNULL((2)),int,__THROWING,__localdep_fputc,(int __ch, __FILE *__restrict __stream),fputc_unlocked,(__ch,__stream))
 #elif defined(__CRT_HAVE_putc_unlocked)
-/* >> fputc(3)
- * Write a single character `ch' to `stream' */
 __CREDIRECT(__ATTR_NONNULL((2)),int,__THROWING,__localdep_fputc,(int __ch, __FILE *__restrict __stream),putc_unlocked,(__ch,__stream))
 #elif (defined(__CRT_DOS) && defined(__CRT_HAVE__flsbuf)) || defined(__CRT_HAVE_fwrite) || defined(__CRT_HAVE__IO_fwrite) || defined(__CRT_HAVE_fwrite_s) || defined(__CRT_HAVE_fwrite_unlocked) || defined(__CRT_HAVE__fwrite_nolock)
 __NAMESPACE_LOCAL_END
 #include <libc/local/stdio/fputc.h>
 __NAMESPACE_LOCAL_BEGIN
-/* >> fputc(3)
- * Write a single character `ch' to `stream' */
 #define __localdep_fputc __LIBC_LOCAL_NAME(fputc)
 #else /* ... */
 #undef __local___localdep_fputc_defined
 #endif /* !... */
 #endif /* !__local___localdep_fputc_defined */
-/* Dependency: strcmp from string */
 #ifndef __local___localdep_strcmp_defined
 #define __local___localdep_strcmp_defined 1
 #if __has_builtin(__builtin_strcmp) && defined(__LIBC_BIND_CRTBUILTINS) && defined(__CRT_HAVE_strcmp)
-/* >> strcmp(3)
- * Compare 2 strings and return the difference of the first non-matching character, or `0' if they are identical */
 __CEIREDIRECT(__ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1, 2)),int,__NOTHROW_NCX,__localdep_strcmp,(char const *__s1, char const *__s2),strcmp,{ return __builtin_strcmp(__s1, __s2); })
 #elif defined(__CRT_HAVE_strcmp)
-/* >> strcmp(3)
- * Compare 2 strings and return the difference of the first non-matching character, or `0' if they are identical */
 __CREDIRECT(__ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1, 2)),int,__NOTHROW_NCX,__localdep_strcmp,(char const *__s1, char const *__s2),strcmp,(__s1,__s2))
 #else /* ... */
 __NAMESPACE_LOCAL_END
 #include <libc/local/string/strcmp.h>
 __NAMESPACE_LOCAL_BEGIN
-/* >> strcmp(3)
- * Compare 2 strings and return the difference of the first non-matching character, or `0' if they are identical */
 #define __localdep_strcmp __LIBC_LOCAL_NAME(strcmp)
 #endif /* !... */
 #endif /* !__local___localdep_strcmp_defined */
-/* Dependency: strerror from string */
 #ifndef __local___localdep_strerror_defined
 #define __local___localdep_strerror_defined 1
 #ifdef __CRT_HAVE_strerror
@@ -201,46 +136,24 @@ __NAMESPACE_LOCAL_BEGIN
 #define __localdep_strerror __LIBC_LOCAL_NAME(strerror)
 #endif /* !__CRT_HAVE_strerror */
 #endif /* !__local___localdep_strerror_defined */
-/* Dependency: vfprintf from stdio */
 #ifndef __local___localdep_vfprintf_defined
 #define __local___localdep_vfprintf_defined 1
 #if __has_builtin(__builtin_vfprintf) && defined(__LIBC_BIND_CRTBUILTINS) && defined(__CRT_HAVE_vfprintf)
-/* >> fprintf(3), vfprintf(3)
- * Print data to `stream', following `format'
- * Return the number of successfully printed bytes */
 __CEIREDIRECT(__ATTR_LIBC_PRINTF(2, 0) __ATTR_NONNULL((1, 2)),__STDC_INT_AS_SSIZE_T,__THROWING,__localdep_vfprintf,(__FILE *__restrict __stream, char const *__restrict __format, __builtin_va_list __args),vfprintf,{ return __builtin_vfprintf(__stream, __format, __args); })
 #elif defined(__CRT_HAVE_vfprintf_unlocked) && defined(__USE_STDIO_UNLOCKED)
-/* >> fprintf(3), vfprintf(3)
- * Print data to `stream', following `format'
- * Return the number of successfully printed bytes */
 __CREDIRECT(__ATTR_LIBC_PRINTF(2, 0) __ATTR_NONNULL((1, 2)),__STDC_INT_AS_SSIZE_T,__THROWING,__localdep_vfprintf,(__FILE *__restrict __stream, char const *__restrict __format, __builtin_va_list __args),vfprintf_unlocked,(__stream,__format,__args))
 #elif defined(__CRT_HAVE_vfprintf)
-/* >> fprintf(3), vfprintf(3)
- * Print data to `stream', following `format'
- * Return the number of successfully printed bytes */
 __CREDIRECT(__ATTR_LIBC_PRINTF(2, 0) __ATTR_NONNULL((1, 2)),__STDC_INT_AS_SSIZE_T,__THROWING,__localdep_vfprintf,(__FILE *__restrict __stream, char const *__restrict __format, __builtin_va_list __args),vfprintf,(__stream,__format,__args))
 #elif defined(__CRT_HAVE_vfprintf_s)
-/* >> fprintf(3), vfprintf(3)
- * Print data to `stream', following `format'
- * Return the number of successfully printed bytes */
 __CREDIRECT(__ATTR_LIBC_PRINTF(2, 0) __ATTR_NONNULL((1, 2)),__STDC_INT_AS_SSIZE_T,__THROWING,__localdep_vfprintf,(__FILE *__restrict __stream, char const *__restrict __format, __builtin_va_list __args),vfprintf_s,(__stream,__format,__args))
 #elif defined(__CRT_HAVE__IO_vfprintf)
-/* >> fprintf(3), vfprintf(3)
- * Print data to `stream', following `format'
- * Return the number of successfully printed bytes */
 __CREDIRECT(__ATTR_LIBC_PRINTF(2, 0) __ATTR_NONNULL((1, 2)),__STDC_INT_AS_SSIZE_T,__THROWING,__localdep_vfprintf,(__FILE *__restrict __stream, char const *__restrict __format, __builtin_va_list __args),_IO_vfprintf,(__stream,__format,__args))
 #elif defined(__CRT_HAVE_vfprintf_unlocked)
-/* >> fprintf(3), vfprintf(3)
- * Print data to `stream', following `format'
- * Return the number of successfully printed bytes */
 __CREDIRECT(__ATTR_LIBC_PRINTF(2, 0) __ATTR_NONNULL((1, 2)),__STDC_INT_AS_SSIZE_T,__THROWING,__localdep_vfprintf,(__FILE *__restrict __stream, char const *__restrict __format, __builtin_va_list __args),vfprintf_unlocked,(__stream,__format,__args))
 #else /* ... */
 __NAMESPACE_LOCAL_END
 #include <libc/local/stdio/vfprintf.h>
 __NAMESPACE_LOCAL_BEGIN
-/* >> fprintf(3), vfprintf(3)
- * Print data to `stream', following `format'
- * Return the number of successfully printed bytes */
 #define __localdep_vfprintf __LIBC_LOCAL_NAME(vfprintf)
 #endif /* !... */
 #endif /* !__local___localdep_vfprintf_defined */
@@ -286,10 +199,6 @@ __LIBC unsigned int __error_message_count;
 #endif /* ... */
 #endif /* !__LOCAL_error_message_count */
 __NAMESPACE_LOCAL_BEGIN
-/* Same as `error()', but also include the given filename in the error message.
- * The message is printed as: `<program_invocation_short_name>:<filename>:<line>: <format...>[: <strerror(errnum)>]\n'
- * Additionally, when `error_one_per_line' is non-zero, consecutive calls to this function that
- * pass the same values for `filename' and `line' will not produce the error message. */
 __LOCAL_LIBC(error_at_line) __ATTR_LIBC_PRINTF(5, 6) void
 (__VLIBCCALL __LIBC_LOCAL_NAME(error_at_line))(int __status, __errno_t __errnum, char const *__filename, unsigned int __line, char const *__format, ...) __THROWS(...) {
 #ifdef __LOCAL_error_one_per_line

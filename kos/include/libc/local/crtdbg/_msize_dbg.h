@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x9488b0ca */
+/* HASH CRC-32:0x5a07eeea */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -24,7 +24,6 @@
 #if defined(__CRT_HAVE_malloc_usable_size) || defined(__CRT_HAVE__msize)
 #include <hybrid/typecore.h>
 __NAMESPACE_LOCAL_BEGIN
-/* Dependency: malloc_usable_size from malloc */
 #ifndef __local___localdep_malloc_usable_size_defined
 #define __local___localdep_malloc_usable_size_defined 1
 #ifdef __CRT_HAVE_malloc_usable_size

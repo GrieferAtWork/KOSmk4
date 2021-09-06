@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xd312cea */
+/* HASH CRC-32:0x4a9d9e8e */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -23,22 +23,17 @@
 #include <__crt.h>
 #include <hybrid/typecore.h>
 __NAMESPACE_LOCAL_BEGIN
-/* Dependency: wcsnend from wchar */
 #ifndef __local___localdep_wcsnend_defined
 #define __local___localdep_wcsnend_defined 1
 #ifdef __CRT_HAVE_wcsnend
-/* Same as `str+wcsnlen(str, max_chars)' */
 __CREDIRECT(__ATTR_PURE __ATTR_RETNONNULL __ATTR_WUNUSED __ATTR_NONNULL((1)),__WCHAR_TYPE__ *,__NOTHROW_NCX,__localdep_wcsnend,(__WCHAR_TYPE__ const *__restrict __str, __SIZE_TYPE__ __maxlen),wcsnend,(__str,__maxlen))
 #else /* __CRT_HAVE_wcsnend */
 __NAMESPACE_LOCAL_END
 #include <libc/local/wchar/wcsnend.h>
 __NAMESPACE_LOCAL_BEGIN
-/* Same as `str+wcsnlen(str, max_chars)' */
 #define __localdep_wcsnend __LIBC_LOCAL_NAME(wcsnend)
 #endif /* !__CRT_HAVE_wcsnend */
 #endif /* !__local___localdep_wcsnend_defined */
-/* >> strnlen(3)
- * Same as `strlen', but don't exceed `max_chars' characters (Same as `memlen[...](str, '\0', max_chars)´) */
 __LOCAL_LIBC(wcsnlen) __ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1)) __SIZE_TYPE__
 __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(wcsnlen))(__WCHAR_TYPE__ const *__restrict __str, __SIZE_TYPE__ __maxlen) {
 	return (__SIZE_TYPE__)(__localdep_wcsnend(__str, __maxlen) - __str);

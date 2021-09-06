@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x2720dc6c */
+/* HASH CRC-32:0xfba35d85 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -23,41 +23,21 @@
 #include <__crt.h>
 #include <bits/crt/tm.h>
 __NAMESPACE_LOCAL_BEGIN
-/* Dependency: strftime from time */
 #ifndef __local___localdep_strftime_defined
 #define __local___localdep_strftime_defined 1
 #if __has_builtin(__builtin_strftime) && defined(__LIBC_BIND_CRTBUILTINS) && defined(__CRT_HAVE_strftime)
-/* >> strftime(3)
- * Format `tp' into `s' according to `format'.
- * Write no more than `maxsize' characters and return the number
- * of characters written, or 0 if it would exceed `maxsize' */
 __CEIREDIRECT(__ATTR_NONNULL((1, 3, 4)),__SIZE_TYPE__,__NOTHROW_NCX,__localdep_strftime,(char *__restrict __buf, __SIZE_TYPE__ __bufsize, char const *__restrict __format, struct __NAMESPACE_STD_SYM tm const *__restrict __tp),strftime,{ return __builtin_strftime(__buf, __bufsize, __format, __tp); })
 #elif defined(__CRT_HAVE_strftime)
-/* >> strftime(3)
- * Format `tp' into `s' according to `format'.
- * Write no more than `maxsize' characters and return the number
- * of characters written, or 0 if it would exceed `maxsize' */
 __CREDIRECT(__ATTR_NONNULL((1, 3, 4)),__SIZE_TYPE__,__NOTHROW_NCX,__localdep_strftime,(char *__restrict __buf, __SIZE_TYPE__ __bufsize, char const *__restrict __format, struct __NAMESPACE_STD_SYM tm const *__restrict __tp),strftime,(__buf,__bufsize,__format,__tp))
 #elif defined(__CRT_HAVE__Strftime)
-/* >> strftime(3)
- * Format `tp' into `s' according to `format'.
- * Write no more than `maxsize' characters and return the number
- * of characters written, or 0 if it would exceed `maxsize' */
 __CREDIRECT(__ATTR_NONNULL((1, 3, 4)),__SIZE_TYPE__,__NOTHROW_NCX,__localdep_strftime,(char *__restrict __buf, __SIZE_TYPE__ __bufsize, char const *__restrict __format, struct __NAMESPACE_STD_SYM tm const *__restrict __tp),_Strftime,(__buf,__bufsize,__format,__tp))
 #else /* ... */
 __NAMESPACE_LOCAL_END
 #include <libc/local/time/strftime.h>
 __NAMESPACE_LOCAL_BEGIN
-/* >> strftime(3)
- * Format `tp' into `s' according to `format'.
- * Write no more than `maxsize' characters and return the number
- * of characters written, or 0 if it would exceed `maxsize' */
 #define __localdep_strftime __LIBC_LOCAL_NAME(strftime)
 #endif /* !... */
 #endif /* !__local___localdep_strftime_defined */
-/* >> strftime_l(3)
- * Similar to `strftime(3)' but take the information from
- * the provided locale and not the global locale */
 __LOCAL_LIBC(strftime_l) __ATTR_NONNULL((1, 3, 4)) __SIZE_TYPE__
 __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(strftime_l))(char *__restrict __buf, __SIZE_TYPE__ __bufsize, char const *__restrict __format, struct __NAMESPACE_STD_SYM tm const *__restrict __tp, __locale_t __locale) {
 	(void)__locale;

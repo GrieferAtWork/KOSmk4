@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xa5a8be2b */
+/* HASH CRC-32:0x82157bfb */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -24,32 +24,24 @@
 #include <ieee754.h>
 #if defined(__IEEE754_DOUBLE_TYPE_IS_LONG_DOUBLE__) || defined(__IEEE754_FLOAT_TYPE_IS_LONG_DOUBLE__) || defined(__IEEE854_LONG_DOUBLE_TYPE_IS_LONG_DOUBLE__) || defined(__CRT_HAVE_remainder) || defined(__CRT_HAVE_drem) || defined(__CRT_HAVE___remainder) || defined(__CRT_HAVE___drem) || defined(__IEEE754_DOUBLE_TYPE_IS_DOUBLE__) || defined(__IEEE754_FLOAT_TYPE_IS_DOUBLE__) || defined(__IEEE854_LONG_DOUBLE_TYPE_IS_DOUBLE__)
 __NAMESPACE_LOCAL_BEGIN
-/* Dependency: remainder from math */
 #ifndef __local___localdep_remainder_defined
 #define __local___localdep_remainder_defined 1
 #if __has_builtin(__builtin_remainder) && defined(__LIBC_BIND_CRTBUILTINS) && defined(__CRT_HAVE_remainder)
-/* Return the remainder of integer division `x / p' with infinite precision */
 __CEIREDIRECT(__ATTR_WUNUSED,double,__NOTHROW,__localdep_remainder,(double __x, double __p),remainder,{ return __builtin_remainder(__x, __p); })
 #elif __has_builtin(__builtin_drem) && defined(__LIBC_BIND_CRTBUILTINS) && defined(__CRT_HAVE_drem)
-/* Return the remainder of integer division `x / p' with infinite precision */
 __CEIREDIRECT(__ATTR_WUNUSED,double,__NOTHROW,__localdep_remainder,(double __x, double __p),drem,{ return __builtin_drem(__x, __p); })
 #elif defined(__CRT_HAVE_remainder)
-/* Return the remainder of integer division `x / p' with infinite precision */
 __CREDIRECT(__ATTR_WUNUSED,double,__NOTHROW,__localdep_remainder,(double __x, double __p),remainder,(__x,__p))
 #elif defined(__CRT_HAVE_drem)
-/* Return the remainder of integer division `x / p' with infinite precision */
 __CREDIRECT(__ATTR_WUNUSED,double,__NOTHROW,__localdep_remainder,(double __x, double __p),drem,(__x,__p))
 #elif defined(__CRT_HAVE___remainder)
-/* Return the remainder of integer division `x / p' with infinite precision */
 __CREDIRECT(__ATTR_WUNUSED,double,__NOTHROW,__localdep_remainder,(double __x, double __p),__remainder,(__x,__p))
 #elif defined(__CRT_HAVE___drem)
-/* Return the remainder of integer division `x / p' with infinite precision */
 __CREDIRECT(__ATTR_WUNUSED,double,__NOTHROW,__localdep_remainder,(double __x, double __p),__drem,(__x,__p))
 #elif defined(__IEEE754_DOUBLE_TYPE_IS_DOUBLE__) || defined(__IEEE754_FLOAT_TYPE_IS_DOUBLE__) || defined(__IEEE854_LONG_DOUBLE_TYPE_IS_DOUBLE__)
 __NAMESPACE_LOCAL_END
 #include <libc/local/math/remainder.h>
 __NAMESPACE_LOCAL_BEGIN
-/* Return the remainder of integer division `x / p' with infinite precision */
 #define __localdep_remainder __LIBC_LOCAL_NAME(remainder)
 #else /* ... */
 #undef __local___localdep_remainder_defined
@@ -61,7 +53,6 @@ __NAMESPACE_LOCAL_END
 #include <libm/isinf.h>
 #include <libm/remainder.h>
 __NAMESPACE_LOCAL_BEGIN
-/* Return the remainder of integer division `x / p' with infinite precision */
 __LOCAL_LIBC(remainderl) __ATTR_WUNUSED __LONGDOUBLE
 __NOTHROW(__LIBCCALL __LIBC_LOCAL_NAME(remainderl))(__LONGDOUBLE __x, __LONGDOUBLE __p) {
 #if defined(__IEEE754_DOUBLE_TYPE_IS_LONG_DOUBLE__) || defined(__IEEE754_FLOAT_TYPE_IS_LONG_DOUBLE__) || defined(__IEEE854_LONG_DOUBLE_TYPE_IS_LONG_DOUBLE__)

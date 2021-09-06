@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x89391da0 */
+/* HASH CRC-32:0xae012919 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -25,47 +25,28 @@
 #if !defined(__NO_STDSTREAMS) && (defined(__CRT_HAVE_fputc) || defined(__CRT_HAVE_putc) || defined(__CRT_HAVE__IO_putc) || defined(__CRT_HAVE_fputc_unlocked) || defined(__CRT_HAVE_putc_unlocked) || (defined(__CRT_DOS) && defined(__CRT_HAVE__flsbuf)) || defined(__CRT_HAVE_fwrite) || defined(__CRT_HAVE__IO_fwrite) || defined(__CRT_HAVE_fwrite_s) || defined(__CRT_HAVE_fwrite_unlocked) || defined(__CRT_HAVE__fwrite_nolock))
 #include <kos/anno.h>
 __NAMESPACE_LOCAL_BEGIN
-/* Dependency: fputc from stdio */
 #ifndef __local___localdep_fputc_defined
 #define __local___localdep_fputc_defined 1
 #if __has_builtin(__builtin_fputc) && defined(__LIBC_BIND_CRTBUILTINS) && defined(__CRT_HAVE_fputc)
-/* >> fputc(3)
- * Write a single character `ch' to `stream' */
 __CEIREDIRECT(__ATTR_NONNULL((2)),int,__THROWING,__localdep_fputc,(int __ch, __FILE *__restrict __stream),fputc,{ return __builtin_fputc(__ch, __stream); })
 #elif defined(__CRT_HAVE_fputc_unlocked) && defined(__USE_STDIO_UNLOCKED)
-/* >> fputc(3)
- * Write a single character `ch' to `stream' */
 __CREDIRECT(__ATTR_NONNULL((2)),int,__THROWING,__localdep_fputc,(int __ch, __FILE *__restrict __stream),fputc_unlocked,(__ch,__stream))
 #elif defined(__CRT_HAVE_putc_unlocked) && defined(__USE_STDIO_UNLOCKED)
-/* >> fputc(3)
- * Write a single character `ch' to `stream' */
 __CREDIRECT(__ATTR_NONNULL((2)),int,__THROWING,__localdep_fputc,(int __ch, __FILE *__restrict __stream),putc_unlocked,(__ch,__stream))
 #elif defined(__CRT_HAVE_fputc)
-/* >> fputc(3)
- * Write a single character `ch' to `stream' */
 __CREDIRECT(__ATTR_NONNULL((2)),int,__THROWING,__localdep_fputc,(int __ch, __FILE *__restrict __stream),fputc,(__ch,__stream))
 #elif defined(__CRT_HAVE_putc)
-/* >> fputc(3)
- * Write a single character `ch' to `stream' */
 __CREDIRECT(__ATTR_NONNULL((2)),int,__THROWING,__localdep_fputc,(int __ch, __FILE *__restrict __stream),putc,(__ch,__stream))
 #elif defined(__CRT_HAVE__IO_putc)
-/* >> fputc(3)
- * Write a single character `ch' to `stream' */
 __CREDIRECT(__ATTR_NONNULL((2)),int,__THROWING,__localdep_fputc,(int __ch, __FILE *__restrict __stream),_IO_putc,(__ch,__stream))
 #elif defined(__CRT_HAVE_fputc_unlocked)
-/* >> fputc(3)
- * Write a single character `ch' to `stream' */
 __CREDIRECT(__ATTR_NONNULL((2)),int,__THROWING,__localdep_fputc,(int __ch, __FILE *__restrict __stream),fputc_unlocked,(__ch,__stream))
 #elif defined(__CRT_HAVE_putc_unlocked)
-/* >> fputc(3)
- * Write a single character `ch' to `stream' */
 __CREDIRECT(__ATTR_NONNULL((2)),int,__THROWING,__localdep_fputc,(int __ch, __FILE *__restrict __stream),putc_unlocked,(__ch,__stream))
 #elif (defined(__CRT_DOS) && defined(__CRT_HAVE__flsbuf)) || defined(__CRT_HAVE_fwrite) || defined(__CRT_HAVE__IO_fwrite) || defined(__CRT_HAVE_fwrite_s) || defined(__CRT_HAVE_fwrite_unlocked) || defined(__CRT_HAVE__fwrite_nolock)
 __NAMESPACE_LOCAL_END
 #include <libc/local/stdio/fputc.h>
 __NAMESPACE_LOCAL_BEGIN
-/* >> fputc(3)
- * Write a single character `ch' to `stream' */
 #define __localdep_fputc __LIBC_LOCAL_NAME(fputc)
 #else /* ... */
 #undef __local___localdep_fputc_defined
@@ -74,8 +55,6 @@ __NAMESPACE_LOCAL_BEGIN
 __NAMESPACE_LOCAL_END
 #include <libc/local/stdstreams.h>
 __NAMESPACE_LOCAL_BEGIN
-/* >> putchar(3)
- * Alias for `fputc(ch, stdout)' */
 __LOCAL_LIBC(putchar) int
 (__LIBCCALL __LIBC_LOCAL_NAME(putchar))(int __ch) __THROWS(...) {
 	return __localdep_fputc(__ch, __LOCAL_stdout);

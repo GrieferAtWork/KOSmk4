@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x8b1196cf */
+/* HASH CRC-32:0x86d3f186 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -625,7 +625,7 @@ typedef __pthread_barrierattr_t pthread_barrierattr_t;
 
 
 /* >> pthread_create(3)
- * Create a new thread, starting with execution of `start_routine'
+ * Create a  new thread,  starting with  execution of  `start_routine'
  * getting passed `arg'. Creation attributed come from `attr'. The new
  * handle is stored in `*newthread'
  * @return: EOK:    Success
@@ -637,7 +637,7 @@ __CDECLARE_OPT(__ATTR_NONNULL((1, 3)),__errno_t,__NOTHROW_NCX,pthread_create,(pt
 __CDECLARE_VOID_OPT(__ATTR_NORETURN,__THROWING,pthread_exit,(void *__retval),(__retval))
 /* >> pthread_join(3)
  * Make calling thread wait for termination of the thread `pthread'.
- * The exit status of the thread is stored in `*thread_return', if
+ * The exit status of the  thread is stored in `*thread_return',  if
  * `thread_return' is not `NULL'.
  * @return: EOK: Success */
 __CDECLARE_OPT(,__errno_t,__NOTHROW_RPC,pthread_join,(pthread_t __pthread, void **__thread_return),(__pthread,__thread_return))
@@ -654,7 +654,7 @@ struct timespec;
 /* >> pthread_timedjoin_np(3), pthread_timedjoin64_np(3)
  * Make calling thread wait for termination of the thread `pthread',
  * but only until `timeout'. The exit status of the thread is stored
- * in `*thread_return', if `thread_return' is not `NULL'.
+ * in  `*thread_return',   if   `thread_return'   is   not   `NULL'.
  * @return: EOK:       Success
  * @return: EINVAL:    The given `abstime' is invalid
  * @return: ETIMEDOUT: The given `abstime' has expired */
@@ -663,7 +663,7 @@ __CREDIRECT(,__errno_t,__NOTHROW_RPC,pthread_timedjoin_np,(pthread_t __pthread, 
 /* >> pthread_timedjoin_np(3), pthread_timedjoin64_np(3)
  * Make calling thread wait for termination of the thread `pthread',
  * but only until `timeout'. The exit status of the thread is stored
- * in `*thread_return', if `thread_return' is not `NULL'.
+ * in  `*thread_return',   if   `thread_return'   is   not   `NULL'.
  * @return: EOK:       Success
  * @return: EINVAL:    The given `abstime' is invalid
  * @return: ETIMEDOUT: The given `abstime' has expired */
@@ -673,7 +673,7 @@ __CDECLARE(,__errno_t,__NOTHROW_RPC,pthread_timedjoin_np,(pthread_t __pthread, v
 /* >> pthread_timedjoin_np(3), pthread_timedjoin64_np(3)
  * Make calling thread wait for termination of the thread `pthread',
  * but only until `timeout'. The exit status of the thread is stored
- * in `*thread_return', if `thread_return' is not `NULL'.
+ * in  `*thread_return',   if   `thread_return'   is   not   `NULL'.
  * @return: EOK:       Success
  * @return: EINVAL:    The given `abstime' is invalid
  * @return: ETIMEDOUT: The given `abstime' has expired */
@@ -684,7 +684,7 @@ __NAMESPACE_LOCAL_USING_OR_IMPL(pthread_timedjoin_np, __FORCELOCAL __ATTR_ARTIFI
 /* >> pthread_timedjoin_np(3), pthread_timedjoin64_np(3)
  * Make calling thread wait for termination of the thread `pthread',
  * but only until `timeout'. The exit status of the thread is stored
- * in `*thread_return', if `thread_return' is not `NULL'.
+ * in  `*thread_return',   if   `thread_return'   is   not   `NULL'.
  * @return: EOK:       Success
  * @return: EINVAL:    The given `abstime' is invalid
  * @return: ETIMEDOUT: The given `abstime' has expired */
@@ -693,7 +693,7 @@ __CDECLARE(,__errno_t,__NOTHROW_RPC,pthread_timedjoin64_np,(pthread_t __pthread,
 /* >> pthread_timedjoin_np(3), pthread_timedjoin64_np(3)
  * Make calling thread wait for termination of the thread `pthread',
  * but only until `timeout'. The exit status of the thread is stored
- * in `*thread_return', if `thread_return' is not `NULL'.
+ * in  `*thread_return',   if   `thread_return'   is   not   `NULL'.
  * @return: EOK:       Success
  * @return: EINVAL:    The given `abstime' is invalid
  * @return: ETIMEDOUT: The given `abstime' has expired */
@@ -703,7 +703,7 @@ __CREDIRECT(,__errno_t,__NOTHROW_RPC,pthread_timedjoin64_np,(pthread_t __pthread
 /* >> pthread_timedjoin_np(3), pthread_timedjoin64_np(3)
  * Make calling thread wait for termination of the thread `pthread',
  * but only until `timeout'. The exit status of the thread is stored
- * in `*thread_return', if `thread_return' is not `NULL'.
+ * in  `*thread_return',   if   `thread_return'   is   not   `NULL'.
  * @return: EOK:       Success
  * @return: EINVAL:    The given `abstime' is invalid
  * @return: ETIMEDOUT: The given `abstime' has expired */
@@ -712,8 +712,8 @@ __NAMESPACE_LOCAL_USING_OR_IMPL(pthread_timedjoin64_np, __FORCELOCAL __ATTR_ARTI
 #endif /* __USE_TIME64 */
 #endif /* __USE_GNU */
 /* >> pthread_detach(3)
- * Indicate that the thread `pthread' is never to be joined with `pthread_join(3)'.
- * The resources of `pthread' will therefore be freed immediately when it
+ * Indicate  that the  thread `pthread' is  never to be  joined with `pthread_join(3)'.
+ * The  resources  of   `pthread'  will   therefore  be  freed   immediately  when   it
  * terminates, instead of waiting for another thread to perform `pthread_join(3)' on it
  * @return: EOK: Success */
 __CDECLARE_OPT(,__errno_t,__NOTHROW_NCX,pthread_detach,(pthread_t __pthread),(__pthread))
@@ -751,7 +751,7 @@ __LOCAL __ATTR_CONST int __NOTHROW(__LIBCCALL pthread_equal)(pthread_t __thr1, p
 /* Thread attribute handling. */
 
 /* >> pthread_attr_init(3)
- * Initialize thread attribute `*attr' with default attributes (detachstate is
+ * Initialize thread  attribute `*attr'  with default  attributes (detachstate  is
  * `PTHREAD_JOINABLE', scheduling policy is `SCHED_OTHER', no user-provided stack)
  * @return: EOK: Success */
 __CDECLARE_OPT(__ATTR_NONNULL((1)),__errno_t,__NOTHROW_NCX,pthread_attr_init,(pthread_attr_t *__attr),(__attr))
@@ -760,11 +760,11 @@ __CDECLARE_OPT(__ATTR_NONNULL((1)),__errno_t,__NOTHROW_NCX,pthread_attr_init,(pt
  * @return: EOK: Success */
 __CDECLARE_OPT(__ATTR_NONNULL((1)),__errno_t,__NOTHROW_NCX,pthread_attr_destroy,(pthread_attr_t *__attr),(__attr))
 /* >> pthread_attr_getdetachstate(3)
- * Get detach state attribute
+ * Get   detach   state    attribute
  * @return: EOK: Success */
 __CDECLARE_OPT(__ATTR_NONNULL((1, 2)),__errno_t,__NOTHROW_NCX,pthread_attr_getdetachstate,(pthread_attr_t const *__attr, int *__detachstate),(__attr,__detachstate))
 /* >> pthread_attr_setdetachstate(3)
- * Set detach state attribute
+ * Set   detach   state    attribute
  * @return: EOK:    Success
  * @return: EINVAL: Invalid/unsupported `detachstate' */
 __CDECLARE_OPT(__ATTR_NONNULL((1)),__errno_t,__NOTHROW_NCX,pthread_attr_setdetachstate,(pthread_attr_t *__attr, int __detachstate),(__attr,__detachstate))
@@ -826,9 +826,9 @@ __NAMESPACE_LOCAL_USING_OR_IMPL(pthread_attr_getstackaddr, __FORCELOCAL __ATTR_A
 #endif /* ... */
 #ifdef __CRT_HAVE_pthread_attr_setstackaddr
 /* >> pthread_attr_setstackaddr(3)
- * Set the starting address of the stack of the thread to be created.
+ * Set the starting address  of the stack of  the thread to be  created.
  * Depending on whether the stack grows up or down the value must either
- * be higher or lower than all the address in the memory block. The
+ * be higher or  lower than  all the address  in the  memory block.  The
  * minimal size of the block must be `PTHREAD_STACK_MIN'
  * @return: EOK:    Success
  * @return: EINVAL: The stack isn't suitably aligned */
@@ -836,9 +836,9 @@ __CDECLARE(__ATTR_DEPRECATED("Use pthread_attr_setstack()") __ATTR_NONNULL((1)),
 #elif (defined(__CRT_HAVE_pthread_attr_getstack) || (defined(__CRT_HAVE_pthread_attr_getstackaddr) && defined(__CRT_HAVE_pthread_attr_getstacksize))) && defined(__CRT_HAVE_pthread_attr_setstack)
 #include <libc/local/pthread/pthread_attr_setstackaddr.h>
 /* >> pthread_attr_setstackaddr(3)
- * Set the starting address of the stack of the thread to be created.
+ * Set the starting address  of the stack of  the thread to be  created.
  * Depending on whether the stack grows up or down the value must either
- * be higher or lower than all the address in the memory block. The
+ * be higher or  lower than  all the address  in the  memory block.  The
  * minimal size of the block must be `PTHREAD_STACK_MIN'
  * @return: EOK:    Success
  * @return: EINVAL: The stack isn't suitably aligned */
@@ -858,7 +858,7 @@ __NAMESPACE_LOCAL_USING_OR_IMPL(pthread_attr_getstacksize, __FORCELOCAL __ATTR_A
 #endif /* ... */
 #ifdef __CRT_HAVE_pthread_attr_setstacksize
 /* >> pthread_attr_setstacksize(3)
- * Add information about the minimum stack size needed for the thread
+ * Add information about the minimum  stack size needed for the  thread
  * to be started. This size must never be less than `PTHREAD_STACK_MIN'
  * and must also not exceed the system limits
  * @return: EOK:    Success
@@ -867,7 +867,7 @@ __CDECLARE(__ATTR_NONNULL((1)),__errno_t,__NOTHROW_NCX,pthread_attr_setstacksize
 #elif (defined(__CRT_HAVE_pthread_attr_getstack) || (defined(__CRT_HAVE_pthread_attr_getstackaddr) && defined(__CRT_HAVE_pthread_attr_getstacksize))) && defined(__CRT_HAVE_pthread_attr_setstack)
 #include <libc/local/pthread/pthread_attr_setstacksize.h>
 /* >> pthread_attr_setstacksize(3)
- * Add information about the minimum stack size needed for the thread
+ * Add information about the minimum  stack size needed for the  thread
  * to be started. This size must never be less than `PTHREAD_STACK_MIN'
  * and must also not exceed the system limits
  * @return: EOK:    Success
@@ -890,7 +890,7 @@ __NAMESPACE_LOCAL_USING_OR_IMPL(pthread_attr_getstack, __FORCELOCAL __ATTR_ARTIF
 #ifdef __CRT_HAVE_pthread_attr_setstack
 /* >> pthread_attr_setstack(3)
  * The following two interfaces are intended to replace the last two. They
- * require setting the address as well as the size since only setting the
+ * require setting the address as well as the size since only setting  the
  * address will make the implementation on some architectures impossible
  * @return: EOK:    Success
  * @return: EINVAL: `stacksize' is too small, or the stack isn't suitably aligned */
@@ -899,7 +899,7 @@ __CDECLARE(__ATTR_NONNULL((1)),__errno_t,__NOTHROW_NCX,pthread_attr_setstack,(pt
 #include <libc/local/pthread/pthread_attr_setstack.h>
 /* >> pthread_attr_setstack(3)
  * The following two interfaces are intended to replace the last two. They
- * require setting the address as well as the size since only setting the
+ * require setting the address as well as the size since only setting  the
  * address will make the implementation on some architectures impossible
  * @return: EOK:    Success
  * @return: EINVAL: `stacksize' is too small, or the stack isn't suitably aligned */
@@ -908,7 +908,7 @@ __NAMESPACE_LOCAL_USING_OR_IMPL(pthread_attr_setstack, __FORCELOCAL __ATTR_ARTIF
 #endif /* __USE_XOPEN2K */
 #ifdef __USE_GNU
 /* >> pthread_attr_setaffinity_np(3)
- * Thread created with attribute `attr' will be limited
+ * Thread  created with attribute `attr' will be limited
  * to run only on the processors represented in `cpuset'
  * @return: EOK:    Success
  * @return: EINVAL: The given set contains a non-existant CPU
@@ -931,7 +931,7 @@ __CDECLARE_OPT(__ATTR_NONNULL((1)),__errno_t,__NOTHROW_NCX,pthread_getattr_defau
  * @return: ENOMEM: Insufficient memory */
 __CDECLARE_OPT(__ATTR_NONNULL((1)),__errno_t,__NOTHROW_NCX,pthread_setattr_default_np,(pthread_attr_t const *__attr),(__attr))
 /* >> pthread_getattr_np(3)
- * Initialize thread attribute `*attr' with attributes corresponding to the
+ * Initialize thread  attribute `*attr'  with attributes  corresponding to  the
  * already running thread `pthread'. It shall be called on uninitialized `attr'
  * and destroyed with `pthread_attr_destroy(3)' when no longer needed
  * @return: EOK:    Success
@@ -1013,41 +1013,41 @@ __CDECLARE_OPT(,__errno_t,__NOTHROW_NCX,pthread_setconcurrency,(int __level),(__
 #ifdef __USE_GNU
 #ifdef __CRT_HAVE_sched_yield
 /* >> pthread_yield(3), thrd_yield(3), sched_yield(2)
- * Yield the processor to another thread or process.
+ * Yield  the processor to another thread or process.
  * This function is similar to the POSIX `sched_yield' function but
- * might be differently implemented in the case of a m-on-n thread
+ * might  be differently implemented in the case of a m-on-n thread
  * implementation
  * @return: EOK: Success */
 __CREDIRECT(,__errno_t,__NOTHROW_NCX,pthread_yield,(void),sched_yield,())
 #elif defined(__CRT_HAVE_thrd_yield)
 /* >> pthread_yield(3), thrd_yield(3), sched_yield(2)
- * Yield the processor to another thread or process.
+ * Yield  the processor to another thread or process.
  * This function is similar to the POSIX `sched_yield' function but
- * might be differently implemented in the case of a m-on-n thread
+ * might  be differently implemented in the case of a m-on-n thread
  * implementation
  * @return: EOK: Success */
 __CREDIRECT(,__errno_t,__NOTHROW_NCX,pthread_yield,(void),thrd_yield,())
 #elif defined(__CRT_HAVE_pthread_yield)
 /* >> pthread_yield(3), thrd_yield(3), sched_yield(2)
- * Yield the processor to another thread or process.
+ * Yield  the processor to another thread or process.
  * This function is similar to the POSIX `sched_yield' function but
- * might be differently implemented in the case of a m-on-n thread
+ * might  be differently implemented in the case of a m-on-n thread
  * implementation
  * @return: EOK: Success */
 __CDECLARE(,__errno_t,__NOTHROW_NCX,pthread_yield,(void),())
 #elif defined(__CRT_HAVE___sched_yield)
 /* >> pthread_yield(3), thrd_yield(3), sched_yield(2)
- * Yield the processor to another thread or process.
+ * Yield  the processor to another thread or process.
  * This function is similar to the POSIX `sched_yield' function but
- * might be differently implemented in the case of a m-on-n thread
+ * might  be differently implemented in the case of a m-on-n thread
  * implementation
  * @return: EOK: Success */
 __CREDIRECT(,__errno_t,__NOTHROW_NCX,pthread_yield,(void),__sched_yield,())
 #elif defined(__CRT_HAVE_yield)
 /* >> pthread_yield(3), thrd_yield(3), sched_yield(2)
- * Yield the processor to another thread or process.
+ * Yield  the processor to another thread or process.
  * This function is similar to the POSIX `sched_yield' function but
- * might be differently implemented in the case of a m-on-n thread
+ * might  be differently implemented in the case of a m-on-n thread
  * implementation
  * @return: EOK: Success */
 __CREDIRECT(,__errno_t,__NOTHROW_NCX,pthread_yield,(void),yield,())
@@ -1074,16 +1074,16 @@ typedef void (__LIBKCALL *__pthread_once_routine_t)(void);
 #ifdef __CRT_HAVE_pthread_once
 /* >> pthread_once(3)
  * Guarantee that the initialization function `init_routine' will be called
- * only once, even if pthread_once is executed several times with the
- * same `once_control' argument. `once_control' must point to a static or
+ * only  once,  even if  pthread_once is  executed  several times  with the
+ * same `once_control' argument. `once_control' must  point to a static  or
  * extern variable initialized to `PTHREAD_ONCE_INIT'.
  * @return: EOK: Success */
 __CDECLARE(__ATTR_NONNULL((1, 2)),__errno_t,__THROWING,pthread_once,(pthread_once_t *__once_control, __pthread_once_routine_t __init_routine),(__once_control,__init_routine))
 #elif defined(__CRT_HAVE_call_once)
 /* >> pthread_once(3)
  * Guarantee that the initialization function `init_routine' will be called
- * only once, even if pthread_once is executed several times with the
- * same `once_control' argument. `once_control' must point to a static or
+ * only  once,  even if  pthread_once is  executed  several times  with the
+ * same `once_control' argument. `once_control' must  point to a static  or
  * extern variable initialized to `PTHREAD_ONCE_INIT'.
  * @return: EOK: Success */
 __CREDIRECT(__ATTR_NONNULL((1, 2)),__errno_t,__THROWING,pthread_once,(pthread_once_t *__once_control, __pthread_once_routine_t __init_routine),call_once,(__once_control,__init_routine))
@@ -1091,8 +1091,8 @@ __CREDIRECT(__ATTR_NONNULL((1, 2)),__errno_t,__THROWING,pthread_once,(pthread_on
 #include <libc/local/pthread/pthread_once.h>
 /* >> pthread_once(3)
  * Guarantee that the initialization function `init_routine' will be called
- * only once, even if pthread_once is executed several times with the
- * same `once_control' argument. `once_control' must point to a static or
+ * only  once,  even if  pthread_once is  executed  several times  with the
+ * same `once_control' argument. `once_control' must  point to a static  or
  * extern variable initialized to `PTHREAD_ONCE_INIT'.
  * @return: EOK: Success */
 __NAMESPACE_LOCAL_USING_OR_IMPL(pthread_once, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_NONNULL((1, 2)) __errno_t (__LIBCCALL pthread_once)(pthread_once_t *__once_control, __pthread_once_routine_t __init_routine) __THROWS(...) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(pthread_once))(__once_control, __init_routine); })
@@ -1103,7 +1103,7 @@ __NAMESPACE_LOCAL_USING_OR_IMPL(pthread_once, __FORCELOCAL __ATTR_ARTIFICIAL __A
  * exception in C++ code. If cancellation is implemented by unwinding
  * this is necessary to have the compiler generate the unwind information. */
 /* >> pthread_setcancelstate(3)
- * Set cancelability state of current thread to `state',
+ * Set  cancelability  state   of  current   thread  to   `state',
  * returning old state in `*oldstate' if `oldstate' is not `NULL'.
  * @return: EOK:    Success
  * @return: EINVAL: Invalid/unsupported `state' */
@@ -1350,24 +1350,24 @@ __CREDIRECT(__ATTR_NONNULL((1)),int,__NOTHROW_NCX,__sigsetjmp,(struct __jmp_buf_
 __CDECLARE_OPT(__ATTR_NONNULL((1)),__errno_t,__NOTHROW_NCX,pthread_mutex_init,(pthread_mutex_t *__mutex, pthread_mutexattr_t const *__mutexattr),(__mutex,__mutexattr))
 #ifdef __CRT_HAVE_pthread_mutex_destroy
 /* >> pthread_mutex_destroy(3)
- * Destroy the given `mutex'
+ * Destroy  the  given `mutex'
  * @return: EOK: Success */
 __CDECLARE(__ATTR_NONNULL((1)),__errno_t,__NOTHROW_NCX,pthread_mutex_destroy,(pthread_mutex_t *__mutex),(__mutex))
 #elif defined(__CRT_HAVE_mtx_destroy)
 /* >> pthread_mutex_destroy(3)
- * Destroy the given `mutex'
+ * Destroy  the  given `mutex'
  * @return: EOK: Success */
 __CREDIRECT(__ATTR_NONNULL((1)),__errno_t,__NOTHROW_NCX,pthread_mutex_destroy,(pthread_mutex_t *__mutex),mtx_destroy,(__mutex))
 #endif /* ... */
 /* >> pthread_mutex_trylock(3)
  * Try locking the given `mutex'
  * @return: EOK:   Success
- * @return: EBUSY: The mutex has already been locked
- *                 In case of a recursive mutex, another
+ * @return: EBUSY: The  mutex  has  already  been   locked
+ *                 In case of  a recursive mutex,  another
  *                 thread was the one to acquire the lock. */
 __CDECLARE_OPT(__ATTR_WUNUSED __ATTR_NONNULL((1)),__errno_t,__NOTHROW_NCX,pthread_mutex_trylock,(pthread_mutex_t *__mutex),(__mutex))
 /* >> pthread_mutex_lock(3)
- * Lock the given `mutex'
+ * Lock  the  given `mutex'
  * @return: EOK: Success */
 __CDECLARE_OPT(__ATTR_NONNULL((1)),__errno_t,__NOTHROW_RPC,pthread_mutex_lock,(pthread_mutex_t *__mutex),(__mutex))
 #ifdef __USE_XOPEN2K
@@ -1471,7 +1471,7 @@ __NAMESPACE_LOCAL_USING_OR_IMPL(pthread_mutex_reltimedlock64_np, __FORCELOCAL __
 #endif /* __USE_TIME64 */
 #endif /* __USE_SOLARIS */
 /* >> pthread_mutex_unlock(3)
- * Unlock the given `mutex'
+ * Unlock  the  given `mutex'
  * @return: EOK: Success */
 __CDECLARE_OPT(__ATTR_NONNULL((1)),__errno_t,__NOTHROW_NCX,pthread_mutex_unlock,(pthread_mutex_t *__mutex),(__mutex))
 /* >> pthread_mutex_getprioceiling(3)
@@ -1480,7 +1480,7 @@ __CDECLARE_OPT(__ATTR_NONNULL((1)),__errno_t,__NOTHROW_NCX,pthread_mutex_unlock,
 __CDECLARE_OPT(__ATTR_NONNULL((1, 2)),__errno_t,__NOTHROW_NCX,pthread_mutex_getprioceiling,(pthread_mutex_t const *__restrict __mutex, int *__restrict __prioceiling),(__mutex,__prioceiling))
 /* >> pthread_mutex_setprioceiling(3)
  * Set the priority ceiling of `mutex' to `prioceiling',
- * return old priority ceiling value in `*old_ceiling'
+ * return old priority  ceiling value in  `*old_ceiling'
  * @return: EOK:    Success
  * @return: EINVAL: Invalid/unsupported `prioceiling' */
 __CDECLARE_OPT(__ATTR_NONNULL((1)),__errno_t,__NOTHROW_NCX,pthread_mutex_setprioceiling,(pthread_mutex_t *__restrict __mutex, int __prioceiling, int *__restrict __old_ceiling),(__mutex,__prioceiling,__old_ceiling))
@@ -1526,7 +1526,7 @@ __CDECLARE(__ATTR_NONNULL((1)),__errno_t,__NOTHROW_NCX,pthread_mutex_consistent_
 
 /* >> pthread_mutexattr_init(3)
  * Initialize mutex attribute object `attr' with default
- * attributes (kind is `PTHREAD_MUTEX_TIMED_NP')
+ * attributes    (kind    is   `PTHREAD_MUTEX_TIMED_NP')
  * @return: EOK: Success */
 __CDECLARE_OPT(__ATTR_NONNULL((1)),__errno_t,__NOTHROW_NCX,pthread_mutexattr_init,(pthread_mutexattr_t *__attr),(__attr))
 /* >> pthread_mutexattr_destroy(3)
@@ -1556,14 +1556,14 @@ __CREDIRECT(__ATTR_NONNULL((1, 2)),__errno_t,__NOTHROW_NCX,pthread_mutexattr_get
 #endif /* ... */
 #ifdef __CRT_HAVE_pthread_mutexattr_settype
 /* >> pthread_mutexattr_settype(3)
- * Set the mutex kind attribute in `*attr' to `kind' (either `PTHREAD_MUTEX_NORMAL',
+ * Set  the mutex kind attribute in `*attr' to `kind' (either `PTHREAD_MUTEX_NORMAL',
  * `PTHREAD_MUTEX_RECURSIVE', `PTHREAD_MUTEX_ERRORCHECK', or `PTHREAD_MUTEX_DEFAULT')
  * @return: EOK:    Success
  * @return: EINVAL: Invalid/unsupported `kind' */
 __CDECLARE(__ATTR_NONNULL((1)),__errno_t,__NOTHROW_NCX,pthread_mutexattr_settype,(pthread_mutexattr_t *__attr, int __kind),(__attr,__kind))
 #elif defined(__CRT_HAVE_pthread_mutexattr_setkind_np)
 /* >> pthread_mutexattr_settype(3)
- * Set the mutex kind attribute in `*attr' to `kind' (either `PTHREAD_MUTEX_NORMAL',
+ * Set  the mutex kind attribute in `*attr' to `kind' (either `PTHREAD_MUTEX_NORMAL',
  * `PTHREAD_MUTEX_RECURSIVE', `PTHREAD_MUTEX_ERRORCHECK', or `PTHREAD_MUTEX_DEFAULT')
  * @return: EOK:    Success
  * @return: EINVAL: Invalid/unsupported `kind' */
@@ -1575,7 +1575,7 @@ __CREDIRECT(__ATTR_NONNULL((1)),__errno_t,__NOTHROW_NCX,pthread_mutexattr_settyp
  * @return: EOK: Success */
 __CDECLARE_OPT(__ATTR_NONNULL((1, 2)),__errno_t,__NOTHROW_NCX,pthread_mutexattr_getprotocol,(pthread_mutexattr_t const *__restrict __attr, int *__restrict __protocol),(__attr,__protocol))
 /* >> pthread_mutexattr_setprotocol(3)
- * Set the mutex protocol attribute in `*attr' to `protocol' (either
+ * Set  the  mutex protocol  attribute  in `*attr'  to  `protocol' (either
  * `PTHREAD_PRIO_NONE', `PTHREAD_PRIO_INHERIT', or `PTHREAD_PRIO_PROTECT')
  * @return: EOK:    Success
  * @return: EINVAL: Invalid/unsupported `protocol' */
@@ -1666,7 +1666,7 @@ __CDECLARE_OPT(__ATTR_NONNULL((1)),__errno_t,__NOTHROW_RPC,pthread_rwlock_rdlock
  * Try to acquire read lock for `rwlock'
  * @return: EOK:   Success
  * @return: EBUSY: A read-lock cannot be acquired at the moment,
- *                 because a write-lock is already being held. */
+ *                 because a write-lock  is already being  held. */
 __CDECLARE_OPT(__ATTR_WUNUSED __ATTR_NONNULL((1)),__errno_t,__NOTHROW_NCX,pthread_rwlock_tryrdlock,(pthread_rwlock_t *__rwlock),(__rwlock))
 /* >> pthread_rwlock_wrlock(3)
  * Acquire write lock for `rwlock'
@@ -1676,7 +1676,7 @@ __CDECLARE_OPT(__ATTR_NONNULL((1)),__errno_t,__NOTHROW_RPC,pthread_rwlock_wrlock
  * Try to acquire write lock for `rwlock'
  * @return: EOK:   Success
  * @return: EBUSY: A write-lock cannot be acquired at the moment,
- *                 because read-locks are already being held. */
+ *                 because read-locks  are  already  being  held. */
 __CDECLARE_OPT(__ATTR_WUNUSED __ATTR_NONNULL((1)),__errno_t,__NOTHROW_NCX,pthread_rwlock_trywrlock,(pthread_rwlock_t *__rwlock),(__rwlock))
 #ifdef __USE_XOPEN2K
 #if defined(__CRT_HAVE_pthread_rwlock_timedrdlock64) && defined(__USE_TIME_BITS64)
@@ -1777,14 +1777,14 @@ __NAMESPACE_LOCAL_USING_OR_IMPL(pthread_rwlock_timedwrlock64, __FORCELOCAL __ATT
 #ifdef __USE_SOLARIS
 #if defined(__CRT_HAVE_pthread_rwlock_reltimedrdlock64_np) && defined(__USE_TIME_BITS64)
 /* >> pthread_rwlock_reltimedrdlock_np(3), pthread_rwlock_reltimedrdlock64_np(3)
- * Try to acquire read lock for `rwlock' or return after the specified time
+ * Try to acquire  read lock  for `rwlock' or  return after  the specified  time
  * @return: EOK:       Success
  * @return: EINVAL:    The given `reltime' is invalid
  * @return: ETIMEDOUT: The given `reltime' has expired */
 __CREDIRECT(__ATTR_WUNUSED __ATTR_NONNULL((1, 2)),__errno_t,__NOTHROW_RPC,pthread_rwlock_reltimedrdlock_np,(pthread_rwlock_t *__restrict __rwlock, struct timespec const *__restrict __reltime),pthread_rwlock_reltimedrdlock64_np,(__rwlock,__reltime))
 #elif defined(__CRT_HAVE_pthread_rwlock_reltimedrdlock_np) && !defined(__USE_TIME_BITS64)
 /* >> pthread_rwlock_reltimedrdlock_np(3), pthread_rwlock_reltimedrdlock64_np(3)
- * Try to acquire read lock for `rwlock' or return after the specified time
+ * Try to acquire  read lock  for `rwlock' or  return after  the specified  time
  * @return: EOK:       Success
  * @return: EINVAL:    The given `reltime' is invalid
  * @return: ETIMEDOUT: The given `reltime' has expired */
@@ -1792,7 +1792,7 @@ __CDECLARE(__ATTR_WUNUSED __ATTR_NONNULL((1, 2)),__errno_t,__NOTHROW_RPC,pthread
 #elif defined(__CRT_HAVE_pthread_rwlock_reltimedrdlock64_np) || defined(__CRT_HAVE_pthread_rwlock_reltimedrdlock_np)
 #include <libc/local/pthread/pthread_rwlock_reltimedrdlock_np.h>
 /* >> pthread_rwlock_reltimedrdlock_np(3), pthread_rwlock_reltimedrdlock64_np(3)
- * Try to acquire read lock for `rwlock' or return after the specified time
+ * Try to acquire  read lock  for `rwlock' or  return after  the specified  time
  * @return: EOK:       Success
  * @return: EINVAL:    The given `reltime' is invalid
  * @return: ETIMEDOUT: The given `reltime' has expired */
@@ -1800,14 +1800,14 @@ __NAMESPACE_LOCAL_USING_OR_IMPL(pthread_rwlock_reltimedrdlock_np, __FORCELOCAL _
 #endif /* ... */
 #if defined(__CRT_HAVE_pthread_rwlock_reltimedwrlock64_np) && defined(__USE_TIME_BITS64)
 /* >> pthread_rwlock_reltimedwrlock_np(3), pthread_rwlock_reltimedwrlock64_np(3)
- * Try to acquire write lock for `rwlock' or return after the specified time
+ * Try to acquire  write lock for  `rwlock' or return  after the specified  time
  * @return: EOK:       Success
  * @return: EINVAL:    The given `reltime' is invalid
  * @return: ETIMEDOUT: The given `reltime' has expired */
 __CREDIRECT(__ATTR_WUNUSED __ATTR_NONNULL((1, 2)),__errno_t,__NOTHROW_RPC,pthread_rwlock_reltimedwrlock_np,(pthread_rwlock_t *__restrict __rwlock, struct timespec const *__restrict __reltime),pthread_rwlock_reltimedwrlock64_np,(__rwlock,__reltime))
 #elif defined(__CRT_HAVE_pthread_rwlock_reltimedwrlock_np) && !defined(__USE_TIME_BITS64)
 /* >> pthread_rwlock_reltimedwrlock_np(3), pthread_rwlock_reltimedwrlock64_np(3)
- * Try to acquire write lock for `rwlock' or return after the specified time
+ * Try to acquire  write lock for  `rwlock' or return  after the specified  time
  * @return: EOK:       Success
  * @return: EINVAL:    The given `reltime' is invalid
  * @return: ETIMEDOUT: The given `reltime' has expired */
@@ -1815,7 +1815,7 @@ __CDECLARE(__ATTR_WUNUSED __ATTR_NONNULL((1, 2)),__errno_t,__NOTHROW_RPC,pthread
 #elif defined(__CRT_HAVE_pthread_rwlock_reltimedwrlock64_np) || defined(__CRT_HAVE_pthread_rwlock_reltimedwrlock_np)
 #include <libc/local/pthread/pthread_rwlock_reltimedwrlock_np.h>
 /* >> pthread_rwlock_reltimedwrlock_np(3), pthread_rwlock_reltimedwrlock64_np(3)
- * Try to acquire write lock for `rwlock' or return after the specified time
+ * Try to acquire  write lock for  `rwlock' or return  after the specified  time
  * @return: EOK:       Success
  * @return: EINVAL:    The given `reltime' is invalid
  * @return: ETIMEDOUT: The given `reltime' has expired */
@@ -1824,14 +1824,14 @@ __NAMESPACE_LOCAL_USING_OR_IMPL(pthread_rwlock_reltimedwrlock_np, __FORCELOCAL _
 #ifdef __USE_TIME64
 #ifdef __CRT_HAVE_pthread_rwlock_reltimedrdlock64_np
 /* >> pthread_rwlock_reltimedrdlock_np(3), pthread_rwlock_reltimedrdlock64_np(3)
- * Try to acquire read lock for `rwlock' or return after the specified time
+ * Try to acquire  read lock  for `rwlock' or  return after  the specified  time
  * @return: EOK:       Success
  * @return: EINVAL:    The given `reltime' is invalid
  * @return: ETIMEDOUT: The given `reltime' has expired */
 __CDECLARE(__ATTR_WUNUSED __ATTR_NONNULL((1, 2)),__errno_t,__NOTHROW_RPC,pthread_rwlock_reltimedrdlock64_np,(pthread_rwlock_t *__restrict __rwlock, struct timespec64 const *__restrict __reltime),(__rwlock,__reltime))
 #elif defined(__CRT_HAVE_pthread_rwlock_reltimedrdlock_np) && __SIZEOF_TIME32_T__ == __SIZEOF_TIME64_T__
 /* >> pthread_rwlock_reltimedrdlock_np(3), pthread_rwlock_reltimedrdlock64_np(3)
- * Try to acquire read lock for `rwlock' or return after the specified time
+ * Try to acquire  read lock  for `rwlock' or  return after  the specified  time
  * @return: EOK:       Success
  * @return: EINVAL:    The given `reltime' is invalid
  * @return: ETIMEDOUT: The given `reltime' has expired */
@@ -1839,7 +1839,7 @@ __CREDIRECT(__ATTR_WUNUSED __ATTR_NONNULL((1, 2)),__errno_t,__NOTHROW_RPC,pthrea
 #elif defined(__CRT_HAVE_pthread_rwlock_reltimedrdlock_np)
 #include <libc/local/pthread/pthread_rwlock_reltimedrdlock64_np.h>
 /* >> pthread_rwlock_reltimedrdlock_np(3), pthread_rwlock_reltimedrdlock64_np(3)
- * Try to acquire read lock for `rwlock' or return after the specified time
+ * Try to acquire  read lock  for `rwlock' or  return after  the specified  time
  * @return: EOK:       Success
  * @return: EINVAL:    The given `reltime' is invalid
  * @return: ETIMEDOUT: The given `reltime' has expired */
@@ -1847,14 +1847,14 @@ __NAMESPACE_LOCAL_USING_OR_IMPL(pthread_rwlock_reltimedrdlock64_np, __FORCELOCAL
 #endif /* ... */
 #ifdef __CRT_HAVE_pthread_rwlock_reltimedwrlock64_np
 /* >> pthread_rwlock_reltimedwrlock_np(3), pthread_rwlock_reltimedwrlock64_np(3)
- * Try to acquire write lock for `rwlock' or return after the specified time
+ * Try to acquire  write lock for  `rwlock' or return  after the specified  time
  * @return: EOK:       Success
  * @return: EINVAL:    The given `reltime' is invalid
  * @return: ETIMEDOUT: The given `reltime' has expired */
 __CDECLARE(__ATTR_WUNUSED __ATTR_NONNULL((1, 2)),__errno_t,__NOTHROW_RPC,pthread_rwlock_reltimedwrlock64_np,(pthread_rwlock_t *__restrict __rwlock, struct timespec64 const *__restrict __reltime),(__rwlock,__reltime))
 #elif defined(__CRT_HAVE_pthread_rwlock_reltimedwrlock_np) && __SIZEOF_TIME32_T__ == __SIZEOF_TIME64_T__
 /* >> pthread_rwlock_reltimedwrlock_np(3), pthread_rwlock_reltimedwrlock64_np(3)
- * Try to acquire write lock for `rwlock' or return after the specified time
+ * Try to acquire  write lock for  `rwlock' or return  after the specified  time
  * @return: EOK:       Success
  * @return: EINVAL:    The given `reltime' is invalid
  * @return: ETIMEDOUT: The given `reltime' has expired */
@@ -1862,7 +1862,7 @@ __CREDIRECT(__ATTR_WUNUSED __ATTR_NONNULL((1, 2)),__errno_t,__NOTHROW_RPC,pthrea
 #elif defined(__CRT_HAVE_pthread_rwlock_reltimedwrlock_np)
 #include <libc/local/pthread/pthread_rwlock_reltimedwrlock64_np.h>
 /* >> pthread_rwlock_reltimedwrlock_np(3), pthread_rwlock_reltimedwrlock64_np(3)
- * Try to acquire write lock for `rwlock' or return after the specified time
+ * Try to acquire  write lock for  `rwlock' or return  after the specified  time
  * @return: EOK:       Success
  * @return: EINVAL:    The given `reltime' is invalid
  * @return: ETIMEDOUT: The given `reltime' has expired */
@@ -1885,7 +1885,7 @@ __CDECLARE_OPT(__ATTR_NONNULL((1)),__errno_t,__NOTHROW_NCX,pthread_rwlock_unlock
  * @return: EOK: Success */
 __CDECLARE_OPT(__ATTR_NONNULL((1)),__errno_t,__NOTHROW_NCX,pthread_rwlockattr_init,(pthread_rwlockattr_t *__attr),(__attr))
 /* >> pthread_rwlockattr_destroy(3)
- * Destroy attribute object `attr'
+ * Destroy attribute object  `attr'
  * @return: EOK: Success */
 __CDECLARE_OPT(__ATTR_NONNULL((1)),__errno_t,__NOTHROW_NCX,pthread_rwlockattr_destroy,(pthread_rwlockattr_t *__attr),(__attr))
 /* >> pthread_rwlockattr_getpshared(3)
@@ -1902,7 +1902,7 @@ __CDECLARE_OPT(__ATTR_NONNULL((1)),__errno_t,__NOTHROW_NCX,pthread_rwlockattr_se
  * @return: EOK: Success */
 __CDECLARE_OPT(__ATTR_NONNULL((1, 2)),__errno_t,__NOTHROW_NCX,pthread_rwlockattr_getkind_np,(pthread_rwlockattr_t const *__restrict __attr, int *__restrict __pref),(__attr,__pref))
 /* >> pthread_rwlockattr_setkind_np(3)
- * Set reader/write preference
+ * Set     reader/write     preference
  * @return: EOK:    Success
  * @return: EINVAL: Invalid/unsupported `pref' */
 __CDECLARE_OPT(__ATTR_NONNULL((1)),__errno_t,__NOTHROW_NCX,pthread_rwlockattr_setkind_np,(pthread_rwlockattr_t *__attr, int __pref),(__attr,__pref))
@@ -1945,8 +1945,8 @@ __CDECLARE_OPT(__ATTR_NONNULL((1, 2)),__errno_t,__NOTHROW_RPC,pthread_cond_wait,
 #if defined(__CRT_HAVE_pthread_cond_timedwait64) && defined(__USE_TIME_BITS64)
 /* >> pthread_cond_timedwait(3), pthread_cond_timedwait64(3)
  * Wait for condition variable `cond' to be signaled or broadcast
- * until `abstime'. `mutex' is assumed to be locked before.
- * `abstime' is an absolute time specification; zero is the
+ * until `abstime'.  `mutex'  is  assumed to  be  locked  before.
+ * `abstime' is  an  absolute  time specification;  zero  is  the
  * beginning of the epoch (00:00:00 GMT, January 1, 1970).
  * @return: EOK:       Success
  * @return: EINVAL:    The given `abstime' is invalid
@@ -1955,8 +1955,8 @@ __CREDIRECT(__ATTR_WUNUSED __ATTR_NONNULL((1, 2, 3)),__errno_t,__NOTHROW_RPC,pth
 #elif defined(__CRT_HAVE_pthread_cond_timedwait) && !defined(__USE_TIME_BITS64)
 /* >> pthread_cond_timedwait(3), pthread_cond_timedwait64(3)
  * Wait for condition variable `cond' to be signaled or broadcast
- * until `abstime'. `mutex' is assumed to be locked before.
- * `abstime' is an absolute time specification; zero is the
+ * until `abstime'.  `mutex'  is  assumed to  be  locked  before.
+ * `abstime' is  an  absolute  time specification;  zero  is  the
  * beginning of the epoch (00:00:00 GMT, January 1, 1970).
  * @return: EOK:       Success
  * @return: EINVAL:    The given `abstime' is invalid
@@ -1966,8 +1966,8 @@ __CDECLARE(__ATTR_WUNUSED __ATTR_NONNULL((1, 2, 3)),__errno_t,__NOTHROW_RPC,pthr
 #include <libc/local/pthread/pthread_cond_timedwait.h>
 /* >> pthread_cond_timedwait(3), pthread_cond_timedwait64(3)
  * Wait for condition variable `cond' to be signaled or broadcast
- * until `abstime'. `mutex' is assumed to be locked before.
- * `abstime' is an absolute time specification; zero is the
+ * until `abstime'.  `mutex'  is  assumed to  be  locked  before.
+ * `abstime' is  an  absolute  time specification;  zero  is  the
  * beginning of the epoch (00:00:00 GMT, January 1, 1970).
  * @return: EOK:       Success
  * @return: EINVAL:    The given `abstime' is invalid
@@ -1978,8 +1978,8 @@ __NAMESPACE_LOCAL_USING_OR_IMPL(pthread_cond_timedwait, __FORCELOCAL __ATTR_ARTI
 #ifdef __CRT_HAVE_pthread_cond_timedwait64
 /* >> pthread_cond_timedwait(3), pthread_cond_timedwait64(3)
  * Wait for condition variable `cond' to be signaled or broadcast
- * until `abstime'. `mutex' is assumed to be locked before.
- * `abstime' is an absolute time specification; zero is the
+ * until `abstime'.  `mutex'  is  assumed to  be  locked  before.
+ * `abstime' is  an  absolute  time specification;  zero  is  the
  * beginning of the epoch (00:00:00 GMT, January 1, 1970).
  * @return: EOK:       Success
  * @return: EINVAL:    The given `abstime' is invalid
@@ -1988,8 +1988,8 @@ __CDECLARE(__ATTR_WUNUSED __ATTR_NONNULL((1, 2, 3)),__errno_t,__NOTHROW_RPC,pthr
 #elif defined(__CRT_HAVE_pthread_cond_timedwait) && __SIZEOF_TIME32_T__ == __SIZEOF_TIME64_T__
 /* >> pthread_cond_timedwait(3), pthread_cond_timedwait64(3)
  * Wait for condition variable `cond' to be signaled or broadcast
- * until `abstime'. `mutex' is assumed to be locked before.
- * `abstime' is an absolute time specification; zero is the
+ * until `abstime'.  `mutex'  is  assumed to  be  locked  before.
+ * `abstime' is  an  absolute  time specification;  zero  is  the
  * beginning of the epoch (00:00:00 GMT, January 1, 1970).
  * @return: EOK:       Success
  * @return: EINVAL:    The given `abstime' is invalid
@@ -1999,8 +1999,8 @@ __CREDIRECT(__ATTR_WUNUSED __ATTR_NONNULL((1, 2, 3)),__errno_t,__NOTHROW_RPC,pth
 #include <libc/local/pthread/pthread_cond_timedwait64.h>
 /* >> pthread_cond_timedwait(3), pthread_cond_timedwait64(3)
  * Wait for condition variable `cond' to be signaled or broadcast
- * until `abstime'. `mutex' is assumed to be locked before.
- * `abstime' is an absolute time specification; zero is the
+ * until `abstime'.  `mutex'  is  assumed to  be  locked  before.
+ * `abstime' is  an  absolute  time specification;  zero  is  the
  * beginning of the epoch (00:00:00 GMT, January 1, 1970).
  * @return: EOK:       Success
  * @return: EINVAL:    The given `abstime' is invalid
@@ -2011,7 +2011,7 @@ __NAMESPACE_LOCAL_USING_OR_IMPL(pthread_cond_timedwait64, __FORCELOCAL __ATTR_AR
 #ifdef __USE_SOLARIS
 #if defined(__CRT_HAVE_pthread_cond_reltimedwait64_np) && defined(__USE_TIME_BITS64)
 /* >> pthread_cond_reltimedwait_np(3), pthread_cond_reltimedwait64_np(3)
- * Wait for condition variable `cond' to be signaled or broadcast
+ * Wait for  condition  variable  `cond' to  be  signaled  or  broadcast
  * until `reltime'. `mutex' is assumed to be locked before.
  * @return: EOK:       Success
  * @return: EINVAL:    The given `reltime' is invalid
@@ -2019,7 +2019,7 @@ __NAMESPACE_LOCAL_USING_OR_IMPL(pthread_cond_timedwait64, __FORCELOCAL __ATTR_AR
 __CREDIRECT(__ATTR_WUNUSED __ATTR_NONNULL((1, 2, 3)),__errno_t,__NOTHROW_RPC,pthread_cond_reltimedwait_np,(pthread_cond_t *__restrict __cond, pthread_mutex_t *__restrict __mutex, struct timespec const *__restrict __reltime),pthread_cond_reltimedwait64_np,(__cond,__mutex,__reltime))
 #elif defined(__CRT_HAVE_pthread_cond_reltimedwait_np) && !defined(__USE_TIME_BITS64)
 /* >> pthread_cond_reltimedwait_np(3), pthread_cond_reltimedwait64_np(3)
- * Wait for condition variable `cond' to be signaled or broadcast
+ * Wait for  condition  variable  `cond' to  be  signaled  or  broadcast
  * until `reltime'. `mutex' is assumed to be locked before.
  * @return: EOK:       Success
  * @return: EINVAL:    The given `reltime' is invalid
@@ -2028,7 +2028,7 @@ __CDECLARE(__ATTR_WUNUSED __ATTR_NONNULL((1, 2, 3)),__errno_t,__NOTHROW_RPC,pthr
 #elif defined(__CRT_HAVE_pthread_cond_reltimedwait64_np) || defined(__CRT_HAVE_pthread_cond_reltimedwait_np)
 #include <libc/local/pthread/pthread_cond_reltimedwait_np.h>
 /* >> pthread_cond_reltimedwait_np(3), pthread_cond_reltimedwait64_np(3)
- * Wait for condition variable `cond' to be signaled or broadcast
+ * Wait for  condition  variable  `cond' to  be  signaled  or  broadcast
  * until `reltime'. `mutex' is assumed to be locked before.
  * @return: EOK:       Success
  * @return: EINVAL:    The given `reltime' is invalid
@@ -2038,7 +2038,7 @@ __NAMESPACE_LOCAL_USING_OR_IMPL(pthread_cond_reltimedwait_np, __FORCELOCAL __ATT
 #ifdef __USE_TIME64
 #ifdef __CRT_HAVE_pthread_cond_reltimedwait64_np
 /* >> pthread_cond_reltimedwait_np(3), pthread_cond_reltimedwait64_np(3)
- * Wait for condition variable `cond' to be signaled or broadcast
+ * Wait for  condition  variable  `cond' to  be  signaled  or  broadcast
  * until `reltime'. `mutex' is assumed to be locked before.
  * @return: EOK:       Success
  * @return: EINVAL:    The given `reltime' is invalid
@@ -2046,7 +2046,7 @@ __NAMESPACE_LOCAL_USING_OR_IMPL(pthread_cond_reltimedwait_np, __FORCELOCAL __ATT
 __CDECLARE(__ATTR_WUNUSED __ATTR_NONNULL((1, 2, 3)),__errno_t,__NOTHROW_RPC,pthread_cond_reltimedwait64_np,(pthread_cond_t *__restrict __cond, pthread_mutex_t *__restrict __mutex, struct timespec64 const *__restrict __reltime),(__cond,__mutex,__reltime))
 #elif defined(__CRT_HAVE_pthread_cond_reltimedwait_np) && __SIZEOF_TIME32_T__ == __SIZEOF_TIME64_T__
 /* >> pthread_cond_reltimedwait_np(3), pthread_cond_reltimedwait64_np(3)
- * Wait for condition variable `cond' to be signaled or broadcast
+ * Wait for  condition  variable  `cond' to  be  signaled  or  broadcast
  * until `reltime'. `mutex' is assumed to be locked before.
  * @return: EOK:       Success
  * @return: EINVAL:    The given `reltime' is invalid
@@ -2055,7 +2055,7 @@ __CREDIRECT(__ATTR_WUNUSED __ATTR_NONNULL((1, 2, 3)),__errno_t,__NOTHROW_RPC,pth
 #elif defined(__CRT_HAVE_pthread_cond_reltimedwait_np)
 #include <libc/local/pthread/pthread_cond_reltimedwait64_np.h>
 /* >> pthread_cond_reltimedwait_np(3), pthread_cond_reltimedwait64_np(3)
- * Wait for condition variable `cond' to be signaled or broadcast
+ * Wait for  condition  variable  `cond' to  be  signaled  or  broadcast
  * until `reltime'. `mutex' is assumed to be locked before.
  * @return: EOK:       Success
  * @return: EINVAL:    The given `reltime' is invalid
@@ -2108,14 +2108,14 @@ __CDECLARE_OPT(__ATTR_NONNULL((1)),__errno_t,__NOTHROW_NCX,pthread_condattr_setc
 #ifdef __CRT_HAVE_pthread_spin_init
 /* >> pthread_spin_init(3)
  * Initialize the spinlock `lock'. If `pshared' is nonzero
- * the spinlock can be shared between different processes
+ * the  spinlock can be shared between different processes
  * @return: EOK: Success */
 __CDECLARE(__ATTR_NONNULL((1)),__errno_t,__NOTHROW_NCX,pthread_spin_init,(pthread_spinlock_t *__lock, int __pshared),(__lock,__pshared))
 #else /* __CRT_HAVE_pthread_spin_init */
 #include <libc/local/pthread/pthread_spin_init.h>
 /* >> pthread_spin_init(3)
  * Initialize the spinlock `lock'. If `pshared' is nonzero
- * the spinlock can be shared between different processes
+ * the  spinlock can be shared between different processes
  * @return: EOK: Success */
 __NAMESPACE_LOCAL_USING_OR_IMPL(pthread_spin_init, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_NONNULL((1)) __errno_t __NOTHROW_NCX(__LIBCCALL pthread_spin_init)(pthread_spinlock_t *__lock, int __pshared) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(pthread_spin_init))(__lock, __pshared); })
 #endif /* !__CRT_HAVE_pthread_spin_init */
@@ -2159,13 +2159,13 @@ __NAMESPACE_LOCAL_USING_OR_IMPL(pthread_spin_trylock, __FORCELOCAL __ATTR_ARTIFI
 #endif /* !__CRT_HAVE_pthread_spin_trylock */
 #ifdef __CRT_HAVE_pthread_spin_unlock
 /* >> pthread_spin_unlock(3)
- * Release spinlock `lock'
+ * Release  spinlock  `lock'
  * @return: EOK: Success */
 __CDECLARE(__ATTR_NONNULL((1)),__errno_t,__NOTHROW_NCX,pthread_spin_unlock,(pthread_spinlock_t *__lock),(__lock))
 #else /* __CRT_HAVE_pthread_spin_unlock */
 #include <libc/local/pthread/pthread_spin_unlock.h>
 /* >> pthread_spin_unlock(3)
- * Release spinlock `lock'
+ * Release  spinlock  `lock'
  * @return: EOK: Success */
 __NAMESPACE_LOCAL_USING_OR_IMPL(pthread_spin_unlock, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_NONNULL((1)) __errno_t __NOTHROW_NCX(__LIBCCALL pthread_spin_unlock)(pthread_spinlock_t *__lock) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(pthread_spin_unlock))(__lock); })
 #endif /* !__CRT_HAVE_pthread_spin_unlock */
@@ -2177,7 +2177,7 @@ __NAMESPACE_LOCAL_USING_OR_IMPL(pthread_spin_unlock, __FORCELOCAL __ATTR_ARTIFIC
 
 /* >> pthread_barrier_init(3)
  * Initialize `barrier' with the attributes in `attr'.
- * The barrier is opened when `count' waiters arrived
+ * The  barrier is opened when `count' waiters arrived
  * @return: EOK:    Success
  * @return: EINVAL: The given `count' is ZERO(0) */
 __CDECLARE_OPT(__ATTR_NONNULL((1, 2)),__errno_t,__NOTHROW_NCX,pthread_barrier_init,(pthread_barrier_t *__restrict __barrier, pthread_barrierattr_t const *__restrict __attr, unsigned int __count),(__barrier,__attr,__count))
@@ -2226,7 +2226,7 @@ typedef void (__LIBKCALL *__pthread_destr_function_t)(void *);
 /* >> pthread_key_create(3)
  * Create a key value identifying a location in the thread-specific
  * data area. Each thread maintains a distinct thread-specific data
- * area. `destr_function', if non-`NULL', is called with the value
+ * area. `destr_function', if non-`NULL', is called with the  value
  * associated to that key when the key is destroyed.
  * `destr_function' is not called if the value associated is `NULL'
  * when the key is destroyed
@@ -2243,11 +2243,11 @@ __CDECLARE_OPT(__ATTR_NONNULL((1)),__errno_t,__NOTHROW_NCX,pthread_key_create,(p
 #endif /* !PTHREAD_ONCE_KEY_NP */
 #ifdef __CRT_HAVE_pthread_key_create_once_np
 /* >> pthread_key_create_once_np(3)
- * Same as `pthread_key_create()', but the given `key' must be pre-initialized
+ * Same as `pthread_key_create()', but the  given `key' must be  pre-initialized
  * using the static initializer `PTHREAD_ONCE_KEY_NP', whilst this function will
- * make sure that even in the event of multiple simultaneous threads calling
- * this function, only one will create the key, and all others will wait until
- * the key has been created. Once the key was created, further calls to this
+ * make  sure that  even in the  event of multiple  simultaneous threads calling
+ * this function, only one will create the  key, and all others will wait  until
+ * the key has been  created. Once the  key was created,  further calls to  this
  * function will no longer block, but simply return immediately.
  * @return: EOK:    Success
  * @return: ENOMEM: Insufficient memory to create the key */
@@ -2255,11 +2255,11 @@ __CDECLARE(__ATTR_NONNULL((1)),__errno_t,__NOTHROW_NCX,pthread_key_create_once_n
 #elif defined(__CRT_HAVE_pthread_key_create)
 #include <libc/local/pthread/pthread_key_create_once_np.h>
 /* >> pthread_key_create_once_np(3)
- * Same as `pthread_key_create()', but the given `key' must be pre-initialized
+ * Same as `pthread_key_create()', but the  given `key' must be  pre-initialized
  * using the static initializer `PTHREAD_ONCE_KEY_NP', whilst this function will
- * make sure that even in the event of multiple simultaneous threads calling
- * this function, only one will create the key, and all others will wait until
- * the key has been created. Once the key was created, further calls to this
+ * make  sure that  even in the  event of multiple  simultaneous threads calling
+ * this function, only one will create the  key, and all others will wait  until
+ * the key has been  created. Once the  key was created,  further calls to  this
  * function will no longer block, but simply return immediately.
  * @return: EOK:    Success
  * @return: ENOMEM: Insufficient memory to create the key */
@@ -2268,13 +2268,13 @@ __NAMESPACE_LOCAL_USING_OR_IMPL(pthread_key_create_once_np, __FORCELOCAL __ATTR_
 #endif /* __USE_SOLARIS */
 #ifdef __CRT_HAVE_pthread_key_delete
 /* >> pthread_key_delete(3)
- * Destroy the given `key'
+ * Destroy the given  `key'
  * @return: EOK:    Success
  * @return: EINVAL: Invalid `key' */
 __CDECLARE(,__errno_t,__NOTHROW_NCX,pthread_key_delete,(pthread_key_t __key),(__key))
 #elif defined(__CRT_HAVE_tss_delete)
 /* >> pthread_key_delete(3)
- * Destroy the given `key'
+ * Destroy the given  `key'
  * @return: EOK:    Success
  * @return: EINVAL: Invalid `key' */
 __CREDIRECT(,__errno_t,__NOTHROW_NCX,pthread_key_delete,(pthread_key_t __key),tss_delete,(__key))
@@ -2300,7 +2300,7 @@ __CREDIRECT(__ATTR_WUNUSED,void *,__NOTHROW_NCX,pthread_getspecific,(pthread_key
  * Store POINTER in the thread-specific data slot identified by `key'
  * @return: EOK:    Success
  * @return: EINVAL: Invalid `key'
- * @return: ENOMEM: `pointer' is non-`NULL', `key' had yet to be allowed for the
+ * @return: ENOMEM: `pointer'  is non-`NULL', `key' had yet to be allowed for the
  *                  calling thread, and an attempt to allocate it just now failed */
 __CDECLARE_OPT(,__errno_t,__NOTHROW_NCX,pthread_setspecific,(pthread_key_t __key, void const *__pointer),(__key,__pointer))
 #ifdef __USE_XOPEN2K
@@ -2317,15 +2317,15 @@ typedef void (__LIBKCALL *__pthread_atfork_func_t)(void);
 #if !defined(__pthread_atfork_defined) && defined(__CRT_HAVE_pthread_atfork)
 #define __pthread_atfork_defined 1
 /* >> pthread_atfork(3)
- * Install handlers to be called when a new process is created with `fork(2)'.
+ * Install handlers to be called when a new process is created with  `fork(2)'.
  * The `prepare' handler is called in the parent process just before performing
- * `fork(2)'. The `parent' handler is called in the parent process just after
- * `fork(2)'. The `child' handler is called in the child process. Each of the
- * three handlers can be `NULL', meaning that no handler needs to be called at
+ * `fork(2)'. The `parent' handler is called  in the parent process just  after
+ * `fork(2)'.  The `child' handler is called in  the child process. Each of the
+ * three  handlers can be `NULL', meaning that no handler needs to be called at
  * that point.
  * `pthread_atfork(3)' can be called several times, in which case the `prepare'
- * handlers are called in LIFO order (last added with `pthread_atfork(3)',
- * first called before `fork(2)'), and the `parent' and `child' handlers are
+ * handlers are  called in  LIFO order  (last added  with  `pthread_atfork(3)',
+ * first  called before `fork(2)'),  and the `parent'  and `child' handlers are
  * called in FIFO order (first added -> first called)
  * @return: EOK:    Success
  * @return: ENOMEM: Insufficient memory to register callbacks */
@@ -2365,27 +2365,27 @@ __NAMESPACE_LOCAL_USING_OR_IMPL(pthread_set_num_processors_np, __FORCELOCAL __AT
 #define __pthread_main_np_defined 1
 #ifdef __CRT_HAVE_pthread_main_np
 /* >> pthread_main_np(3)
- * Returns 1 if the calling thread is the main() thread (i.e. the
- * thread that was started by the kernel in order to execute the
- * calling program), and 0 otherwise. Additionally, -1 is returned
- * if the calling thread "hasn't been initialized", though this
+ * Returns  1 if the  calling thread is the  main() thread (i.e. the
+ * thread  that was  started by the  kernel in order  to execute the
+ * calling program), and 0  otherwise. Additionally, -1 is  returned
+ * if the  calling  thread  "hasn't been initialized",  though  this
  * isn't a case that can actually happen under KOS's implementation. */
 __CDECLARE(__ATTR_CONST,int,__NOTHROW,pthread_main_np,(void),())
 #elif defined(__CRT_HAVE_thr_main)
 /* >> pthread_main_np(3)
- * Returns 1 if the calling thread is the main() thread (i.e. the
- * thread that was started by the kernel in order to execute the
- * calling program), and 0 otherwise. Additionally, -1 is returned
- * if the calling thread "hasn't been initialized", though this
+ * Returns  1 if the  calling thread is the  main() thread (i.e. the
+ * thread  that was  started by the  kernel in order  to execute the
+ * calling program), and 0  otherwise. Additionally, -1 is  returned
+ * if the  calling  thread  "hasn't been initialized",  though  this
  * isn't a case that can actually happen under KOS's implementation. */
 __CREDIRECT(__ATTR_CONST,int,__NOTHROW,pthread_main_np,(void),thr_main,())
 #elif defined(__CRT_HAVE_gettid) && (defined(__CRT_HAVE_getpid) || defined(__CRT_HAVE__getpid) || defined(__CRT_HAVE___getpid))
 #include <libc/local/pthread/pthread_main_np.h>
 /* >> pthread_main_np(3)
- * Returns 1 if the calling thread is the main() thread (i.e. the
- * thread that was started by the kernel in order to execute the
- * calling program), and 0 otherwise. Additionally, -1 is returned
- * if the calling thread "hasn't been initialized", though this
+ * Returns  1 if the  calling thread is the  main() thread (i.e. the
+ * thread  that was  started by the  kernel in order  to execute the
+ * calling program), and 0  otherwise. Additionally, -1 is  returned
+ * if the  calling  thread  "hasn't been initialized",  though  this
  * isn't a case that can actually happen under KOS's implementation. */
 __NAMESPACE_LOCAL_USING_OR_IMPL(pthread_main_np, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_CONST int __NOTHROW(__LIBCCALL pthread_main_np)(void) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(pthread_main_np))(); })
 #else /* ... */

@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x9f80ce5c */
+/* HASH CRC-32:0x4007fe64 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -22,7 +22,6 @@
 #define __local_tolower_defined 1
 #include <__crt.h>
 __NAMESPACE_LOCAL_BEGIN
-/* Dependency: __ctype_tolower_loc from ctype */
 #if !defined(__local___localdep___ctype_tolower_loc_defined) && defined(__CRT_HAVE___ctype_tolower_loc)
 #define __local___localdep___ctype_tolower_loc_defined 1
 __NAMESPACE_LOCAL_END
@@ -30,7 +29,6 @@ __NAMESPACE_LOCAL_END
 __NAMESPACE_LOCAL_BEGIN
 __CREDIRECT(__ATTR_PURE __ATTR_WUNUSED,__INT32_TYPE__ const **,__NOTHROW,__localdep___ctype_tolower_loc,(void),__ctype_tolower_loc,())
 #endif /* !__local___localdep___ctype_tolower_loc_defined && __CRT_HAVE___ctype_tolower_loc */
-/* Dependency: isupper from ctype */
 #ifndef __local___localdep_isupper_defined
 #define __local___localdep_isupper_defined 1
 #if __has_builtin(__builtin_isupper) && defined(__LIBC_BIND_CRTBUILTINS) && defined(__CRT_HAVE_isupper)

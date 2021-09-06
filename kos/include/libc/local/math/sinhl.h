@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xda79767f */
+/* HASH CRC-32:0xed74c7f4 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -23,23 +23,18 @@
 #include <__crt.h>
 #if defined(__CRT_HAVE_sinh) || defined(__CRT_HAVE___sinh)
 __NAMESPACE_LOCAL_BEGIN
-/* Dependency: sinh from math */
 #ifndef __local___localdep_sinh_defined
 #define __local___localdep_sinh_defined 1
 #if __has_builtin(__builtin_sinh) && defined(__LIBC_BIND_CRTBUILTINS) && defined(__CRT_HAVE_sinh)
-/* Hyperbolic sine of `x' */
 __CEIREDIRECT(__ATTR_WUNUSED,double,__NOTHROW,__localdep_sinh,(double __x),sinh,{ return __builtin_sinh(__x); })
 #elif defined(__CRT_HAVE_sinh)
-/* Hyperbolic sine of `x' */
 __CREDIRECT(__ATTR_WUNUSED,double,__NOTHROW,__localdep_sinh,(double __x),sinh,(__x))
 #elif defined(__CRT_HAVE___sinh)
-/* Hyperbolic sine of `x' */
 __CREDIRECT(__ATTR_WUNUSED,double,__NOTHROW,__localdep_sinh,(double __x),__sinh,(__x))
 #else /* ... */
 #undef __local___localdep_sinh_defined
 #endif /* !... */
 #endif /* !__local___localdep_sinh_defined */
-/* Hyperbolic sine of `x' */
 __LOCAL_LIBC(sinhl) __ATTR_WUNUSED __LONGDOUBLE
 __NOTHROW(__LIBCCALL __LIBC_LOCAL_NAME(sinhl))(__LONGDOUBLE __x) {
 	return (__LONGDOUBLE)__localdep_sinh((double)__x);

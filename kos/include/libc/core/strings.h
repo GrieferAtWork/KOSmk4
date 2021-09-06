@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x89991f9d */
+/* HASH CRC-32:0xdd11bb1e */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -31,31 +31,31 @@ __SYSDECL_BEGIN
 
 #ifdef __CRT_HAVE_bzero
 /* >> explicit_bzero(3)
- * Same as `bzero(dst, n_bytes)', however compilers will not optimize
+ * Same as `bzero(dst, n_bytes)',  however compilers  will not  optimize
  * away uses of this function when they (think) that clearing the memory
- * wouldn't have any visible side-effects (though those side-effects
+ * wouldn't  have  any visible  side-effects (though  those side-effects
  * may be a security-concious application trying to wipe sensitive data) */
 __CREDIRECT_VOID(,__NOTHROW_NCX,__libc_core_explicit_bzero,(void *__dst, __SIZE_TYPE__ __n_bytes),bzero,(__dst,__n_bytes))
 #elif defined(__CRT_HAVE_explicit_bzero)
 /* >> explicit_bzero(3)
- * Same as `bzero(dst, n_bytes)', however compilers will not optimize
+ * Same as `bzero(dst, n_bytes)',  however compilers  will not  optimize
  * away uses of this function when they (think) that clearing the memory
- * wouldn't have any visible side-effects (though those side-effects
+ * wouldn't  have  any visible  side-effects (though  those side-effects
  * may be a security-concious application trying to wipe sensitive data) */
 __CREDIRECT_VOID(,__NOTHROW_NCX,__libc_core_explicit_bzero,(void *__dst, __SIZE_TYPE__ __n_bytes),explicit_bzero,(__dst,__n_bytes))
 #elif defined(__CRT_HAVE___bzero)
 /* >> explicit_bzero(3)
- * Same as `bzero(dst, n_bytes)', however compilers will not optimize
+ * Same as `bzero(dst, n_bytes)',  however compilers  will not  optimize
  * away uses of this function when they (think) that clearing the memory
- * wouldn't have any visible side-effects (though those side-effects
+ * wouldn't  have  any visible  side-effects (though  those side-effects
  * may be a security-concious application trying to wipe sensitive data) */
 __CREDIRECT_VOID(,__NOTHROW_NCX,__libc_core_explicit_bzero,(void *__dst, __SIZE_TYPE__ __n_bytes),__bzero,(__dst,__n_bytes))
 #else /* ... */
 #include <libc/local/strings/explicit_bzero.h>
 /* >> explicit_bzero(3)
- * Same as `bzero(dst, n_bytes)', however compilers will not optimize
+ * Same as `bzero(dst, n_bytes)',  however compilers  will not  optimize
  * away uses of this function when they (think) that clearing the memory
- * wouldn't have any visible side-effects (though those side-effects
+ * wouldn't  have  any visible  side-effects (though  those side-effects
  * may be a security-concious application trying to wipe sensitive data) */
 #define __libc_core_explicit_bzero (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(explicit_bzero))
 #endif /* !... */

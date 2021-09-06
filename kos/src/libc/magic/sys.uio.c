@@ -99,9 +99,9 @@ ssize_t process_vm_writev($pid_t pid,
 %
 @@>> readv(2)
 @@Same as `read(2)', but rather than specifying a single, continuous buffer,
-@@read data into `count' separate buffers, though still return the actual
+@@read  data into `count'  separate buffers, though  still return the actual
 @@number of read bytes.
-@@When `fd' has the `O_NONBLOCK' flag set, only read as much data as was
+@@When `fd' has the  `O_NONBLOCK' flag set,  only read as  much data as  was
 @@available at the time the call was made, and throw E_WOULDBLOCK if no data
 @@was available at the time.
 @@@return: <= SUM(iov[*].iov_len): The actual amount of read bytes
@@ -111,9 +111,9 @@ ssize_t readv($fd_t fd, [[inp(count)]] struct iovec const *iov, __STDC_INT_AS_SI
 
 @@>> writev(2)
 @@Same as `write(2)', but rather than specifying a single, continuous buffer,
-@@write data from `count' separate buffers, though still return the actual
+@@write  data from `count'  separate buffers, though  still return the actual
 @@number of written bytes.
-@@When `fd' has the `O_NONBLOCK' flag set, only write as much data
+@@When `fd' has the `O_NONBLOCK' flag set, only write as much  data
 @@as possible at the time the call was made, and throw E_WOULDBLOCK
 @@if no data could be written at the time.
 @@@return: <= SUM(iov[*].iov_len): The actual amount of written bytes
@@ -136,7 +136,7 @@ ssize_t pwritev32($fd_t fd, [[inp(count)]] struct iovec const *iov,
                   __STDC_INT_AS_SIZE_T count, $off32_t offset);
 
 @@>> preadv(2)
-@@Same as `readv(2)', but read data from a file at a
+@@Same as  `readv(2)', but  read data  from a  file at  a
 @@specific `offset', rather than the current R/W position
 @@@return: <= SUM(iov[*].iov_len): The actual amount of read bytes
 [[cp, wunused, no_crt_self_import]]
@@ -154,7 +154,7 @@ ssize_t preadv($fd_t fd, [[inp(count)]] struct iovec const *iov,
 }
 
 @@>> pwritev(2)
-@@Same as `writev(2)', but write data to a file at a
+@@Same as  `writev(2)', but  write data  to a  file at  a
 @@specific `offset', rather than the current R/W position
 @@@return: <= SUM(iov[*].iov_len): The actual amount of written bytes
 [[cp, no_crt_self_import]]

@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x3dc68edb */
+/* HASH CRC-32:0x398d5f64 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -23,9 +23,6 @@
 #include <__crt.h>
 #include <bits/crt/uformat-printer.h>
 __NAMESPACE_LOCAL_BEGIN
-/* >> format_wto32(3)
- * Format printer (compatible with `pc16formatprinter') for
- * converting wide-character unicode input data into a UTF-32 output */
 __LOCAL_LIBC(format_wto32) __SSIZE_TYPE__
 __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(format_wto32))(void *__arg, __WCHAR_TYPE__ const *__data, __SIZE_TYPE__ __datalen) {
 #if __SIZEOF_WCHAR_T__ == 2

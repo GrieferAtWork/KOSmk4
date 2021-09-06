@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x2dc29fc6 */
+/* HASH CRC-32:0xcf8e44ad */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -25,7 +25,6 @@
 #include <kos/anno.h>
 #include <hybrid/typecore.h>
 __NAMESPACE_LOCAL_BEGIN
-/* Dependency: fgetc16 from parts.uchar.stdio */
 #ifndef __local___localdep_fgetc16_defined
 #define __local___localdep_fgetc16_defined 1
 #if defined(__CRT_HAVE_fgetwc) && __SIZEOF_WCHAR_T__ == 2 && defined(__LIBCCALL_IS_LIBDCALL)

@@ -128,7 +128,7 @@ c32readlink(*) %{uchar32("wreadlink")}
 
 //%#if defined(__USE_REENTRANT) || defined(__USE_POSIX199506)
 //c16getlogin_r(*) %{uchar16("wgetlogin_r")}
-//c32getlogin_r(*) %{uchar32("wgetlogin_r")}
+//c32getlogin_r(*)         %{uchar32("wgetlogin_r")}
 //%#endif /* __USE_REENTRANT || __USE_POSIX199506 */
 
 %

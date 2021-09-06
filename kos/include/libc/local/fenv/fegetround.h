@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x795914c4 */
+/* HASH CRC-32:0xfa0e54f5 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -23,12 +23,6 @@
 #include <__crt.h>
 #include <bits/crt/fenv-inline.h>
 __NAMESPACE_LOCAL_BEGIN
-/* Get the current rounding direction
- * @return: One of...
- *             ... `FE_TONEAREST':  round()
- *             ... `FE_DOWNWARD':   floor()
- *             ... `FE_UPWARD':     ceil()
- *             ... `FE_TOWARDZERO': trunc() */
 __LOCAL_LIBC(fegetround) __ATTR_PURE __ATTR_WUNUSED int
 __NOTHROW(__LIBCCALL __LIBC_LOCAL_NAME(fegetround))(void) {
 	return __inline_fegetround();

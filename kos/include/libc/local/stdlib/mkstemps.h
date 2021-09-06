@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x2c39b589 */
+/* HASH CRC-32:0x3c34eab8 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -26,7 +26,6 @@
 #include <features.h>
 #include <bits/types.h>
 __NAMESPACE_LOCAL_BEGIN
-/* Dependency: mkostemps from stdlib */
 #ifndef __local___localdep_mkostemps_defined
 #define __local___localdep_mkostemps_defined 1
 #if defined(__CRT_HAVE_mkostemps64) && defined(__USE_FILE_OFFSET64)
@@ -44,15 +43,6 @@ __NAMESPACE_LOCAL_BEGIN
 #undef __local___localdep_mkostemps_defined
 #endif /* !... */
 #endif /* !__local___localdep_mkostemps_defined */
-/* >> mkstemps(3), mkstemps64(3)
- * Replace the last 6 characters of `template_' (which are followed by exactly
- * `suffixlen' more characters that are left alone), which must be filled with
- * all 'X'-characters before the call (else errno=EINVAL + return -1), with
- * random characters such that the filename described by `template_' will not
- * already exists. Then, create a new file with `O_RDWR' and return the file
- * descriptor of that file.
- * @param: suffixlen: The # of trailing characters to-be ignored
- *                    after the required 6 trailing 'X'-characters. */
 __LOCAL_LIBC(mkstemps) __ATTR_WUNUSED __ATTR_NONNULL((1)) __fd_t
 __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(mkstemps))(char *__template_, __STDC_INT_AS_SIZE_T __suffixlen) {
 	return __localdep_mkostemps(__template_, __suffixlen, 0);

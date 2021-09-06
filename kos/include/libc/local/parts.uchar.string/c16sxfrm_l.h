@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x74de1ab2 */
+/* HASH CRC-32:0xcdb6c255 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -23,7 +23,6 @@
 #include <__crt.h>
 #include <hybrid/typecore.h>
 __NAMESPACE_LOCAL_BEGIN
-/* Dependency: c16sxfrm from parts.uchar.string */
 #ifndef __local___localdep_c16sxfrm_defined
 #define __local___localdep_c16sxfrm_defined 1
 #if defined(__CRT_HAVE_wcsxfrm) && __SIZEOF_WCHAR_T__ == 2 && defined(__LIBCCALL_IS_LIBDCALL)

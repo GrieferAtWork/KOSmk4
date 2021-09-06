@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xc51d531f */
+/* HASH CRC-32:0x18f1d7e2 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -23,25 +23,19 @@
 #include <__crt.h>
 #include <bits/os/dirent.h>
 __NAMESPACE_LOCAL_BEGIN
-/* Dependency: strverscmp from string */
 #ifndef __local___localdep_strverscmp_defined
 #define __local___localdep_strverscmp_defined 1
 #ifdef __CRT_HAVE_strverscmp
-/* >> strverscmp(3) */
 __CREDIRECT(__ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1, 2)),int,__NOTHROW_NCX,__localdep_strverscmp,(char const *__s1, char const *__s2),strverscmp,(__s1,__s2))
 #elif defined(__CRT_HAVE___strverscmp)
-/* >> strverscmp(3) */
 __CREDIRECT(__ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1, 2)),int,__NOTHROW_NCX,__localdep_strverscmp,(char const *__s1, char const *__s2),__strverscmp,(__s1,__s2))
 #else /* ... */
 __NAMESPACE_LOCAL_END
 #include <libc/local/string/strverscmp.h>
 __NAMESPACE_LOCAL_BEGIN
-/* >> strverscmp(3) */
 #define __localdep_strverscmp __LIBC_LOCAL_NAME(strverscmp)
 #endif /* !... */
 #endif /* !__local___localdep_strverscmp_defined */
-/* >> versionsort(3), versionsort64(3)
- * Sort the 2 given directory entries `e1' and `e2' the same way `strvercmp(3)' would. */
 __LOCAL_LIBC(versionsort64) __ATTR_PURE __ATTR_NONNULL((1, 2)) int
 __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(versionsort64))(struct dirent64 const **__e1, struct dirent64 const **__e2) {
 	return __localdep_strverscmp((*__e1)->d_name, (*__e2)->d_name);

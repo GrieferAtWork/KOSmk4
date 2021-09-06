@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xb7dbd78b */
+/* HASH CRC-32:0x2b7c6618 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -86,16 +86,16 @@ typedef __rtm_status_t rtm_status_t;
 
 #if defined(__arch_rtm_begin) && defined(__CRT_HAVE_rtm_begin)
 /* >> rtm_begin(2)
- * Begin an RTM operation. Note that if the arch-specific RTM driver
+ * Begin  an  RTM operation.  Note that  if  the arch-specific  RTM driver
  * wasn't already loaded into the kernel, it will be loaded automatically,
  * though any error that may happen during this will result in `RTM_NOSYS'
  * begin returned.
- * Note that while an RTM operation is in progress, only a very small hand
- * full of system calls are allowed to be used. Attempting to use arbitrary
- * system calls will most likely result in an `RTM_ABORT_FAILED' error, and
+ * Note that while an RTM  operation is in progress,  only a very small  hand
+ * full  of system calls are allowed to  be used. Attempting to use arbitrary
+ * system calls will most likely  result in an `RTM_ABORT_FAILED' error,  and
  * attempting to access too much system memory in general will result in this
- * function returning with `RTM_ABORT_CAPACITY', rather than succeeding.
- * The following is a list of system calls which are whitelisted for use
+ * function returning  with  `RTM_ABORT_CAPACITY',  rather  than  succeeding.
+ * The following is  a list  of system calls  which are  whitelisted for  use
  * during a transaction:
  *   - rtm_begin(2):  Nested RTM operation
  *   - rtm_end(2):    End an RTM operation
@@ -108,16 +108,16 @@ typedef __rtm_status_t rtm_status_t;
 __CEIDECLARE(,rtm_status_t,__NOTHROW,rtm_begin,(void),{ return __arch_rtm_begin(); })
 #elif defined(__CRT_HAVE_rtm_begin)
 /* >> rtm_begin(2)
- * Begin an RTM operation. Note that if the arch-specific RTM driver
+ * Begin  an  RTM operation.  Note that  if  the arch-specific  RTM driver
  * wasn't already loaded into the kernel, it will be loaded automatically,
  * though any error that may happen during this will result in `RTM_NOSYS'
  * begin returned.
- * Note that while an RTM operation is in progress, only a very small hand
- * full of system calls are allowed to be used. Attempting to use arbitrary
- * system calls will most likely result in an `RTM_ABORT_FAILED' error, and
+ * Note that while an RTM  operation is in progress,  only a very small  hand
+ * full  of system calls are allowed to  be used. Attempting to use arbitrary
+ * system calls will most likely  result in an `RTM_ABORT_FAILED' error,  and
  * attempting to access too much system memory in general will result in this
- * function returning with `RTM_ABORT_CAPACITY', rather than succeeding.
- * The following is a list of system calls which are whitelisted for use
+ * function returning  with  `RTM_ABORT_CAPACITY',  rather  than  succeeding.
+ * The following is  a list  of system calls  which are  whitelisted for  use
  * during a transaction:
  *   - rtm_begin(2):  Nested RTM operation
  *   - rtm_end(2):    End an RTM operation
@@ -131,16 +131,16 @@ __CDECLARE(,rtm_status_t,__NOTHROW,rtm_begin,(void),())
 #elif defined(__arch_rtm_begin)
 #include <libc/local/kos.rtm/rtm_begin.h>
 /* >> rtm_begin(2)
- * Begin an RTM operation. Note that if the arch-specific RTM driver
+ * Begin  an  RTM operation.  Note that  if  the arch-specific  RTM driver
  * wasn't already loaded into the kernel, it will be loaded automatically,
  * though any error that may happen during this will result in `RTM_NOSYS'
  * begin returned.
- * Note that while an RTM operation is in progress, only a very small hand
- * full of system calls are allowed to be used. Attempting to use arbitrary
- * system calls will most likely result in an `RTM_ABORT_FAILED' error, and
+ * Note that while an RTM  operation is in progress,  only a very small  hand
+ * full  of system calls are allowed to  be used. Attempting to use arbitrary
+ * system calls will most likely  result in an `RTM_ABORT_FAILED' error,  and
  * attempting to access too much system memory in general will result in this
- * function returning with `RTM_ABORT_CAPACITY', rather than succeeding.
- * The following is a list of system calls which are whitelisted for use
+ * function returning  with  `RTM_ABORT_CAPACITY',  rather  than  succeeding.
+ * The following is  a list  of system calls  which are  whitelisted for  use
  * during a transaction:
  *   - rtm_begin(2):  Nested RTM operation
  *   - rtm_end(2):    End an RTM operation
@@ -157,14 +157,14 @@ __NAMESPACE_LOCAL_USING_OR_IMPL(rtm_begin, __FORCELOCAL __ATTR_ARTIFICIAL rtm_st
  * End a transaction
  * If the transaction was successful, return normally
  * If the transaction failed, `rtm_begin()' returns `RTM_ABORT_*'
- * If no transaction was in progress, the behavior is undefined */
+ * If no transaction was in  progress, the behavior is  undefined */
 __CEIDECLARE(,void,__NOTHROW,rtm_end,(void),{ __arch_rtm_end(); })
 #elif defined(__CRT_HAVE_rtm_end)
 /* >> rtm_end(2)
  * End a transaction
  * If the transaction was successful, return normally
  * If the transaction failed, `rtm_begin()' returns `RTM_ABORT_*'
- * If no transaction was in progress, the behavior is undefined */
+ * If no transaction was in  progress, the behavior is  undefined */
 __CDECLARE_VOID(,__NOTHROW,rtm_end,(void),())
 #elif defined(__arch_rtm_end)
 #include <libc/local/kos.rtm/rtm_end.h>
@@ -172,29 +172,29 @@ __CDECLARE_VOID(,__NOTHROW,rtm_end,(void),())
  * End a transaction
  * If the transaction was successful, return normally
  * If the transaction failed, `rtm_begin()' returns `RTM_ABORT_*'
- * If no transaction was in progress, the behavior is undefined */
+ * If no transaction was in  progress, the behavior is  undefined */
 __NAMESPACE_LOCAL_USING_OR_IMPL(rtm_end, __FORCELOCAL __ATTR_ARTIFICIAL void __NOTHROW(__LIBCCALL rtm_end)(void) { (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(rtm_end))(); })
 #endif /* ... */
 #if defined(__arch_rtm_abort) && defined(__CRT_HAVE_rtm_abort)
 /* >> rtm_abort(2)
- * Abort the current transaction by having `rtm_begin()' return with
+ * Abort  the   current  transaction   by   having  `rtm_begin()'   return   with
  * `RTM_ABORT_EXPLICIT | ((code << RTM_ABORT_CODE_S) & RTM_ABORT_CODE_M)'
- * If no transaction was in progress, behave as a no-op. Otherwise, this
+ * If no  transaction  was  in  progress, behave  as  a  no-op.  Otherwise,  this
  * function does not return normally, but returns from the original `rtm_begin()' */
 __COMPILER_EIDECLARE(,void,__NOTHROW,__FCALL,rtm_abort,(unsigned int __code),{ __arch_rtm_abort(__code); })
 #elif defined(__CRT_HAVE_rtm_abort)
 /* >> rtm_abort(2)
- * Abort the current transaction by having `rtm_begin()' return with
+ * Abort  the   current  transaction   by   having  `rtm_begin()'   return   with
  * `RTM_ABORT_EXPLICIT | ((code << RTM_ABORT_CODE_S) & RTM_ABORT_CODE_M)'
- * If no transaction was in progress, behave as a no-op. Otherwise, this
+ * If no  transaction  was  in  progress, behave  as  a  no-op.  Otherwise,  this
  * function does not return normally, but returns from the original `rtm_begin()' */
 __LIBC void __NOTHROW(__FCALL rtm_abort)(unsigned int __code) __CASMNAME_SAME("rtm_abort");
 #elif defined(__arch_rtm_abort)
 #include <libc/local/kos.rtm/rtm_abort.h>
 /* >> rtm_abort(2)
- * Abort the current transaction by having `rtm_begin()' return with
+ * Abort  the   current  transaction   by   having  `rtm_begin()'   return   with
  * `RTM_ABORT_EXPLICIT | ((code << RTM_ABORT_CODE_S) & RTM_ABORT_CODE_M)'
- * If no transaction was in progress, behave as a no-op. Otherwise, this
+ * If no  transaction  was  in  progress, behave  as  a  no-op.  Otherwise,  this
  * function does not return normally, but returns from the original `rtm_begin()' */
 __NAMESPACE_LOCAL_USING_OR_IMPL(rtm_abort, __FORCELOCAL __ATTR_ARTIFICIAL void __NOTHROW(__FCALL rtm_abort)(unsigned int __code) { (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(rtm_abort))(__code); })
 #endif /* ... */

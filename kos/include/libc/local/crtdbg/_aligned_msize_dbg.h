@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xc3d61a1c */
+/* HASH CRC-32:0x4429e905 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -23,7 +23,6 @@
 #include <__crt.h>
 #include <hybrid/typecore.h>
 __NAMESPACE_LOCAL_BEGIN
-/* Dependency: _aligned_msize from stdlib */
 #ifndef __local___localdep__aligned_msize_defined
 #define __local___localdep__aligned_msize_defined 1
 #ifdef __CRT_HAVE__aligned_msize

@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x80608ecb */
+/* HASH CRC-32:0xbbe5c98e */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -25,7 +25,6 @@
 #if defined(__CRT_HAVE_mkostemps) || defined(__CRT_HAVE_mkostemps64) || defined(__CRT_HAVE_open64) || defined(__CRT_HAVE___open64) || defined(__CRT_HAVE_open) || defined(__CRT_HAVE__open) || defined(__CRT_HAVE___open) || (defined(__AT_FDCWD) && (defined(__CRT_HAVE_openat64) || defined(__CRT_HAVE_openat)))
 #include <bits/types.h>
 __NAMESPACE_LOCAL_BEGIN
-/* Dependency: mkostemps64 from stdlib */
 #ifndef __local___localdep_mkostemps64_defined
 #define __local___localdep_mkostemps64_defined 1
 #ifdef __CRT_HAVE_mkostemps64

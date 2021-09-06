@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x7bd48db5 */
+/* HASH CRC-32:0xf0fac837 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -682,16 +682,16 @@ __NAMESPACE_LOCAL_USING_OR_IMPL(strcpy, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_LE
 #if __has_builtin(__builtin_strncpy) && defined(__LIBC_BIND_CRTBUILTINS) && defined(__CRT_HAVE_strncpy)
 /* >> strncpy(3)
  * Always write exactly `buflen' characters to `buf'. As far as
- * space for doing so is available, up to the `strlen(src)' of
- * the first characters are copied from `src'. All remaining
- * characters are always set to '\0'. Always re-returns `buf' */
+ * space  for doing so is available, up to the `strlen(src)' of
+ * the first characters  are copied from  `src'. All  remaining
+ * characters are always set  to '\0'. Always re-returns  `buf' */
 __CEIDECLARE_GCCNCX(__ATTR_LEAF __ATTR_RETNONNULL __ATTR_NONNULL((1, 2)),char *,__NOTHROW_NCX,strncpy,(char *__restrict __buf, char const *__restrict __src, size_t __buflen),{ return __builtin_strncpy(__buf, __src, __buflen); })
 #elif defined(__CRT_HAVE_strncpy)
 /* >> strncpy(3)
  * Always write exactly `buflen' characters to `buf'. As far as
- * space for doing so is available, up to the `strlen(src)' of
- * the first characters are copied from `src'. All remaining
- * characters are always set to '\0'. Always re-returns `buf' */
+ * space  for doing so is available, up to the `strlen(src)' of
+ * the first characters  are copied from  `src'. All  remaining
+ * characters are always set  to '\0'. Always re-returns  `buf' */
 __CDECLARE_GCCNCX(__ATTR_LEAF __ATTR_RETNONNULL __ATTR_NONNULL((1, 2)),char *,__NOTHROW_NCX,strncpy,(char *__restrict __buf, char const *__restrict __src, size_t __buflen),(__buf,__src,__buflen))
 #else /* ... */
 __NAMESPACE_STD_END
@@ -699,20 +699,20 @@ __NAMESPACE_STD_END
 __NAMESPACE_STD_BEGIN
 /* >> strncpy(3)
  * Always write exactly `buflen' characters to `buf'. As far as
- * space for doing so is available, up to the `strlen(src)' of
- * the first characters are copied from `src'. All remaining
- * characters are always set to '\0'. Always re-returns `buf' */
+ * space  for doing so is available, up to the `strlen(src)' of
+ * the first characters  are copied from  `src'. All  remaining
+ * characters are always set  to '\0'. Always re-returns  `buf' */
 __NAMESPACE_LOCAL_USING_OR_IMPL(strncpy, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_LEAF __ATTR_RETNONNULL __ATTR_NONNULL((1, 2)) char *__NOTHROW_NCX(__LIBCCALL strncpy)(char *__restrict __buf, char const *__restrict __src, size_t __buflen) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(strncpy))(__buf, __src, __buflen); })
 #endif /* !... */
 #if __has_builtin(__builtin_strcat) && defined(__LIBC_BIND_CRTBUILTINS) && defined(__CRT_HAVE_strcat)
 /* >> strcat(3)
- * Same as `strcpy(3)', but rather than copying `src' ontop of `dst',
+ * Same as `strcpy(3)',  but rather  than copying `src'  ontop of  `dst',
  * append it at the end of `dst', or more precisely copy to `strend(dst)'
  * Always re-returns `dst' */
 __CEIDECLARE_GCCNCX(__ATTR_LEAF __ATTR_RETNONNULL __ATTR_NONNULL((1, 2)),char *,__NOTHROW_NCX,strcat,(char *__restrict __dst, char const *__restrict __src),{ return __builtin_strcat(__dst, __src); })
 #elif defined(__CRT_HAVE_strcat)
 /* >> strcat(3)
- * Same as `strcpy(3)', but rather than copying `src' ontop of `dst',
+ * Same as `strcpy(3)',  but rather  than copying `src'  ontop of  `dst',
  * append it at the end of `dst', or more precisely copy to `strend(dst)'
  * Always re-returns `dst' */
 __CDECLARE_GCCNCX(__ATTR_LEAF __ATTR_RETNONNULL __ATTR_NONNULL((1, 2)),char *,__NOTHROW_NCX,strcat,(char *__restrict __dst, char const *__restrict __src),(__dst,__src))
@@ -721,7 +721,7 @@ __NAMESPACE_STD_END
 #include <libc/local/string/strcat.h>
 __NAMESPACE_STD_BEGIN
 /* >> strcat(3)
- * Same as `strcpy(3)', but rather than copying `src' ontop of `dst',
+ * Same as `strcpy(3)',  but rather  than copying `src'  ontop of  `dst',
  * append it at the end of `dst', or more precisely copy to `strend(dst)'
  * Always re-returns `dst' */
 __NAMESPACE_LOCAL_USING_OR_IMPL(strcat, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_LEAF __ATTR_RETNONNULL __ATTR_NONNULL((1, 2)) char *__NOTHROW_NCX(__LIBCCALL strcat)(char *__restrict __dst, char const *__restrict __src) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(strcat))(__dst, __src); })
@@ -729,12 +729,12 @@ __NAMESPACE_LOCAL_USING_OR_IMPL(strcat, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_LE
 #if __has_builtin(__builtin_strncat) && defined(__LIBC_BIND_CRTBUILTINS) && defined(__CRT_HAVE_strncat)
 /* >> strncat(3)
  * Copy at most max_srclen (or rather: exactly `strnlen(src, max_srclen)')
- * characters to `strend(buf)', and always re-return `buf'. */
+ * characters   to    `strend(buf)',   and    always   re-return    `buf'. */
 __CEIDECLARE_GCCNCX(__ATTR_LEAF __ATTR_RETNONNULL __ATTR_NONNULL((1, 2)),char *,__NOTHROW_NCX,strncat,(char *__restrict __buf, char const *__restrict __src, size_t __max_srclen),{ return __builtin_strncat(__buf, __src, __max_srclen); })
 #elif defined(__CRT_HAVE_strncat)
 /* >> strncat(3)
  * Copy at most max_srclen (or rather: exactly `strnlen(src, max_srclen)')
- * characters to `strend(buf)', and always re-return `buf'. */
+ * characters   to    `strend(buf)',   and    always   re-return    `buf'. */
 __CDECLARE_GCCNCX(__ATTR_LEAF __ATTR_RETNONNULL __ATTR_NONNULL((1, 2)),char *,__NOTHROW_NCX,strncat,(char *__restrict __buf, char const *__restrict __src, size_t __max_srclen),(__buf,__src,__max_srclen))
 #else /* ... */
 __NAMESPACE_STD_END
@@ -742,19 +742,19 @@ __NAMESPACE_STD_END
 __NAMESPACE_STD_BEGIN
 /* >> strncat(3)
  * Copy at most max_srclen (or rather: exactly `strnlen(src, max_srclen)')
- * characters to `strend(buf)', and always re-return `buf'. */
+ * characters   to    `strend(buf)',   and    always   re-return    `buf'. */
 __NAMESPACE_LOCAL_USING_OR_IMPL(strncat, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_LEAF __ATTR_RETNONNULL __ATTR_NONNULL((1, 2)) char *__NOTHROW_NCX(__LIBCCALL strncat)(char *__restrict __buf, char const *__restrict __src, size_t __max_srclen) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(strncat))(__buf, __src, __max_srclen); })
 #endif /* !... */
 #if __has_builtin(__builtin_strcspn) && defined(__LIBC_BIND_CRTBUILTINS) && defined(__CRT_HAVE_strcspn)
 /* >> strcspn(3)
- * Return the offset from `haystack' to the first
- * character for which `strchr(reject, ch) != NULL'.
+ * Return   the  offset  from  `haystack'  to  the  first
+ * character   for   which  `strchr(reject, ch) != NULL'.
  * If no such character exists, return `strlen(haystack)' */
 __CEIDECLARE_GCCNCX(__ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1, 2)),size_t,__NOTHROW_NCX,strcspn,(char const *__haystack, char const *__reject),{ return __builtin_strcspn(__haystack, __reject); })
 #elif defined(__CRT_HAVE_strcspn)
 /* >> strcspn(3)
- * Return the offset from `haystack' to the first
- * character for which `strchr(reject, ch) != NULL'.
+ * Return   the  offset  from  `haystack'  to  the  first
+ * character   for   which  `strchr(reject, ch) != NULL'.
  * If no such character exists, return `strlen(haystack)' */
 __CDECLARE_GCCNCX(__ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1, 2)),size_t,__NOTHROW_NCX,strcspn,(char const *__haystack, char const *__reject),(__haystack,__reject))
 #else /* ... */
@@ -762,21 +762,21 @@ __NAMESPACE_STD_END
 #include <libc/local/string/strcspn.h>
 __NAMESPACE_STD_BEGIN
 /* >> strcspn(3)
- * Return the offset from `haystack' to the first
- * character for which `strchr(reject, ch) != NULL'.
+ * Return   the  offset  from  `haystack'  to  the  first
+ * character   for   which  `strchr(reject, ch) != NULL'.
  * If no such character exists, return `strlen(haystack)' */
 __NAMESPACE_LOCAL_USING_OR_IMPL(strcspn, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1, 2)) size_t __NOTHROW_NCX(__LIBCCALL strcspn)(char const *__haystack, char const *__reject) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(strcspn))(__haystack, __reject); })
 #endif /* !... */
 #if __has_builtin(__builtin_strspn) && defined(__LIBC_BIND_CRTBUILTINS) && defined(__CRT_HAVE_strspn)
 /* >> strspn(3)
- * Return the offset from `haystack' to the first
- * character for which `strchr(reject, ch) == NULL'.
+ * Return   the  offset  from  `haystack'  to  the  first
+ * character   for   which  `strchr(reject, ch) == NULL'.
  * If no such character exists, return `strlen(haystack)' */
 __CEIDECLARE_GCCNCX(__ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1, 2)),size_t,__NOTHROW_NCX,strspn,(char const *__haystack, char const *__accept),{ return __builtin_strspn(__haystack, __accept); })
 #elif defined(__CRT_HAVE_strspn)
 /* >> strspn(3)
- * Return the offset from `haystack' to the first
- * character for which `strchr(reject, ch) == NULL'.
+ * Return   the  offset  from  `haystack'  to  the  first
+ * character   for   which  `strchr(reject, ch) == NULL'.
  * If no such character exists, return `strlen(haystack)' */
 __CDECLARE_GCCNCX(__ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1, 2)),size_t,__NOTHROW_NCX,strspn,(char const *__haystack, char const *__accept),(__haystack,__accept))
 #else /* ... */
@@ -784,8 +784,8 @@ __NAMESPACE_STD_END
 #include <libc/local/string/strspn.h>
 __NAMESPACE_STD_BEGIN
 /* >> strspn(3)
- * Return the offset from `haystack' to the first
- * character for which `strchr(reject, ch) == NULL'.
+ * Return   the  offset  from  `haystack'  to  the  first
+ * character   for   which  `strchr(reject, ch) == NULL'.
  * If no such character exists, return `strlen(haystack)' */
 __NAMESPACE_LOCAL_USING_OR_IMPL(strspn, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1, 2)) size_t __NOTHROW_NCX(__LIBCCALL strspn)(char const *__haystack, char const *__accept) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(strspn))(__haystack, __accept); })
 #endif /* !... */
@@ -1407,9 +1407,9 @@ extern "C++" {
  * Alternate `basename(3)' function that doesn't modify its `filename' argument
  * For a version that is allowed to modify its argument, but is also allowed to
  * strip trailing slashes, include <libgen.h> instead, which will override this
- * GNU-specific basename() function (you can explicitly make use of this GNU
- * version by doing `#undef basename', or writing `(basename)(filename)', as
- * opposed to `basename(filename)', when both version have been defined)
+ * GNU-specific  basename() function (you  can explicitly make  use of this GNU
+ * version by doing  `#undef basename', or  writing `(basename)(filename)',  as
+ * opposed to  `basename(filename)',  when  both  version  have  been  defined)
  * >> basename("/usr/include///"); // Returns ""
  * >> basename("/usr/include/");   // Returns ""
  * >> basename("/usr/include");    // Returns "include"
@@ -1430,9 +1430,9 @@ __CREDIRECT(__ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1)),char *,__NOTHROW_NCX,
  * Alternate `basename(3)' function that doesn't modify its `filename' argument
  * For a version that is allowed to modify its argument, but is also allowed to
  * strip trailing slashes, include <libgen.h> instead, which will override this
- * GNU-specific basename() function (you can explicitly make use of this GNU
- * version by doing `#undef basename', or writing `(basename)(filename)', as
- * opposed to `basename(filename)', when both version have been defined)
+ * GNU-specific  basename() function (you  can explicitly make  use of this GNU
+ * version by doing  `#undef basename', or  writing `(basename)(filename)',  as
+ * opposed to  `basename(filename)',  when  both  version  have  been  defined)
  * >> basename("/usr/include///"); // Returns ""
  * >> basename("/usr/include/");   // Returns ""
  * >> basename("/usr/include");    // Returns "include"
@@ -1455,9 +1455,9 @@ __CREDIRECT(__ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1)),char const *,__NOTHRO
  * Alternate `basename(3)' function that doesn't modify its `filename' argument
  * For a version that is allowed to modify its argument, but is also allowed to
  * strip trailing slashes, include <libgen.h> instead, which will override this
- * GNU-specific basename() function (you can explicitly make use of this GNU
- * version by doing `#undef basename', or writing `(basename)(filename)', as
- * opposed to `basename(filename)', when both version have been defined)
+ * GNU-specific  basename() function (you  can explicitly make  use of this GNU
+ * version by doing  `#undef basename', or  writing `(basename)(filename)',  as
+ * opposed to  `basename(filename)',  when  both  version  have  been  defined)
  * >> basename("/usr/include///"); // Returns ""
  * >> basename("/usr/include/");   // Returns ""
  * >> basename("/usr/include");    // Returns "include"
@@ -1483,9 +1483,9 @@ extern "C++" {
  * Alternate `basename(3)' function that doesn't modify its `filename' argument
  * For a version that is allowed to modify its argument, but is also allowed to
  * strip trailing slashes, include <libgen.h> instead, which will override this
- * GNU-specific basename() function (you can explicitly make use of this GNU
- * version by doing `#undef basename', or writing `(basename)(filename)', as
- * opposed to `basename(filename)', when both version have been defined)
+ * GNU-specific  basename() function (you  can explicitly make  use of this GNU
+ * version by doing  `#undef basename', or  writing `(basename)(filename)',  as
+ * opposed to  `basename(filename)',  when  both  version  have  been  defined)
  * >> basename("/usr/include///"); // Returns ""
  * >> basename("/usr/include/");   // Returns ""
  * >> basename("/usr/include");    // Returns "include"
@@ -1506,9 +1506,9 @@ __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1)) ch
  * Alternate `basename(3)' function that doesn't modify its `filename' argument
  * For a version that is allowed to modify its argument, but is also allowed to
  * strip trailing slashes, include <libgen.h> instead, which will override this
- * GNU-specific basename() function (you can explicitly make use of this GNU
- * version by doing `#undef basename', or writing `(basename)(filename)', as
- * opposed to `basename(filename)', when both version have been defined)
+ * GNU-specific  basename() function (you  can explicitly make  use of this GNU
+ * version by doing  `#undef basename', or  writing `(basename)(filename)',  as
+ * opposed to  `basename(filename)',  when  both  version  have  been  defined)
  * >> basename("/usr/include///"); // Returns ""
  * >> basename("/usr/include/");   // Returns ""
  * >> basename("/usr/include");    // Returns "include"
@@ -1531,9 +1531,9 @@ __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1)) ch
  * Alternate `basename(3)' function that doesn't modify its `filename' argument
  * For a version that is allowed to modify its argument, but is also allowed to
  * strip trailing slashes, include <libgen.h> instead, which will override this
- * GNU-specific basename() function (you can explicitly make use of this GNU
- * version by doing `#undef basename', or writing `(basename)(filename)', as
- * opposed to `basename(filename)', when both version have been defined)
+ * GNU-specific  basename() function (you  can explicitly make  use of this GNU
+ * version by doing  `#undef basename', or  writing `(basename)(filename)',  as
+ * opposed to  `basename(filename)',  when  both  version  have  been  defined)
  * >> basename("/usr/include///"); // Returns ""
  * >> basename("/usr/include/");   // Returns ""
  * >> basename("/usr/include");    // Returns "include"
@@ -1702,18 +1702,18 @@ __NAMESPACE_LOCAL_USING_OR_IMPL(strerrorname_np, __FORCELOCAL __ATTR_ARTIFICIAL 
 #ifdef __CRT_HAVE_sigabbrev_np
 /* >> sigabbrev_np(3)
  * Return the name of a given signal, without the leading `SIG*' prefix.
- * If the given `signum' isn't recognized, return `NULL' instead. */
+ * If the  given  `signum'  isn't  recognized,  return  `NULL'  instead. */
 __CDECLARE(__ATTR_CONST __ATTR_WUNUSED,char const *,__NOTHROW,sigabbrev_np,(__signo_t __signum),(__signum))
 #elif defined(__CRT_HAVE_signalname)
 /* >> sigabbrev_np(3)
  * Return the name of a given signal, without the leading `SIG*' prefix.
- * If the given `signum' isn't recognized, return `NULL' instead. */
+ * If the  given  `signum'  isn't  recognized,  return  `NULL'  instead. */
 __CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,char const *,__NOTHROW,sigabbrev_np,(__signo_t __signum),signalname,(__signum))
 #else /* ... */
 #include <libc/local/string/sigabbrev_np.h>
 /* >> sigabbrev_np(3)
  * Return the name of a given signal, without the leading `SIG*' prefix.
- * If the given `signum' isn't recognized, return `NULL' instead. */
+ * If the  given  `signum'  isn't  recognized,  return  `NULL'  instead. */
 __NAMESPACE_LOCAL_USING_OR_IMPL(sigabbrev_np, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_CONST __ATTR_WUNUSED char const *__NOTHROW(__LIBCCALL sigabbrev_np)(__signo_t __signum) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(sigabbrev_np))(__signum); })
 #endif /* !... */
 #ifdef __CRT_HAVE_sigdescr_np
@@ -3911,22 +3911,22 @@ __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1)) __
 #endif /* !... */
 #ifdef __CRT_HAVE_memlenw
 /* Same as `memendw', but return the offset from `haystack', rather than the actual address.
- * Returns `haystack + N_DWORDS * 2' if the given `needle' wasn't found */
+ * Returns    `haystack + N_DWORDS * 2'    if    the    given    `needle'    wasn't    found */
 __CDECLARE(__ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1)),__SIZE_TYPE__,__NOTHROW_NCX,memlenw,(void const *__restrict __haystack, __UINT16_TYPE__ __needle, __SIZE_TYPE__ __n_words),(__haystack,__needle,__n_words))
 #else /* __CRT_HAVE_memlenw */
 #include <libc/local/string/memlenw.h>
 /* Same as `memendw', but return the offset from `haystack', rather than the actual address.
- * Returns `haystack + N_DWORDS * 2' if the given `needle' wasn't found */
+ * Returns    `haystack + N_DWORDS * 2'    if    the    given    `needle'    wasn't    found */
 __NAMESPACE_LOCAL_USING_OR_IMPL(memlenw, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1)) __SIZE_TYPE__ __NOTHROW_NCX(__LIBCCALL memlenw)(void const *__restrict __haystack, __UINT16_TYPE__ __needle, __SIZE_TYPE__ __n_words) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(memlenw))(__haystack, __needle, __n_words); })
 #endif /* !__CRT_HAVE_memlenw */
 #ifdef __CRT_HAVE_memlenl
 /* Same as `memendl', but return the offset from `haystack', rather than the actual address.
- * Returns `haystack + N_DWORDS * 4' if the given `needle' wasn't found */
+ * Returns    `haystack + N_DWORDS * 4'    if    the    given    `needle'    wasn't    found */
 __CDECLARE(__ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1)),__SIZE_TYPE__,__NOTHROW_NCX,memlenl,(void const *__restrict __haystack, __UINT32_TYPE__ __needle, __SIZE_TYPE__ __n_dwords),(__haystack,__needle,__n_dwords))
 #else /* __CRT_HAVE_memlenl */
 #include <libc/local/string/memlenl.h>
 /* Same as `memendl', but return the offset from `haystack', rather than the actual address.
- * Returns `haystack + N_DWORDS * 4' if the given `needle' wasn't found */
+ * Returns    `haystack + N_DWORDS * 4'    if    the    given    `needle'    wasn't    found */
 __NAMESPACE_LOCAL_USING_OR_IMPL(memlenl, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1)) __SIZE_TYPE__ __NOTHROW_NCX(__LIBCCALL memlenl)(void const *__restrict __haystack, __UINT32_TYPE__ __needle, __SIZE_TYPE__ __n_dwords) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(memlenl))(__haystack, __needle, __n_dwords); })
 #endif /* !__CRT_HAVE_memlenl */
 #if defined(__fast_memrlen_defined) && defined(__CRT_HAVE_memrlen)
@@ -5603,20 +5603,20 @@ __CDECLARE(__ATTR_LEAF __ATTR_RETNONNULL __ATTR_NONNULL((1, 2)),void *,__NOTHROW
 __NAMESPACE_LOCAL_USING_OR_IMPL(memmoveupc, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_LEAF __ATTR_RETNONNULL __ATTR_NONNULL((1, 2)) void *__NOTHROW_NCX(__LIBCCALL memmoveupc)(void *__dst, void const *__src, __SIZE_TYPE__ __elem_count, __SIZE_TYPE__ __elem_size) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(memmoveupc))(__dst, __src, __elem_count, __elem_size); })
 #endif /* !... */
 #if defined(__fast_mempmoveupc_defined) && defined(__CRT_HAVE_mempmoveupc)
-/* Same as `memmoveupc', but return `dst + (ELEM_COUNT * ELEM_SIZE)',
+/* Same   as   `memmoveupc',  but   return  `dst + (ELEM_COUNT * ELEM_SIZE)',
  * rather than `dst' (assumes that `dst >= src || !ELEM_COUNT || !ELEM_SIZE') */
 __CEIDECLARE(__ATTR_LEAF __ATTR_RETNONNULL __ATTR_NONNULL((1, 2)),void *,__NOTHROW_NCX,mempmoveupc,(void *__dst, void const *__src, __SIZE_TYPE__ __elem_count, __SIZE_TYPE__ __elem_size),{ return (__NAMESPACE_FAST_SYM __LIBC_FAST_NAME(mempmoveupc))(__dst, __src, __elem_count, __elem_size); })
 #elif defined(__fast_mempmoveupc_defined)
-/* Same as `memmoveupc', but return `dst + (ELEM_COUNT * ELEM_SIZE)',
+/* Same   as   `memmoveupc',  but   return  `dst + (ELEM_COUNT * ELEM_SIZE)',
  * rather than `dst' (assumes that `dst >= src || !ELEM_COUNT || !ELEM_SIZE') */
 __FORCELOCAL __ATTR_LEAF __ATTR_RETNONNULL __ATTR_NONNULL((1, 2)) void *__NOTHROW_NCX(__LIBCCALL mempmoveupc)(void *__dst, void const *__src, __SIZE_TYPE__ __elem_count, __SIZE_TYPE__ __elem_size) { return (__NAMESPACE_FAST_SYM __LIBC_FAST_NAME(mempmoveupc))(__dst, __src, __elem_count, __elem_size); }
 #elif defined(__CRT_HAVE_mempmoveupc)
-/* Same as `memmoveupc', but return `dst + (ELEM_COUNT * ELEM_SIZE)',
+/* Same   as   `memmoveupc',  but   return  `dst + (ELEM_COUNT * ELEM_SIZE)',
  * rather than `dst' (assumes that `dst >= src || !ELEM_COUNT || !ELEM_SIZE') */
 __CDECLARE(__ATTR_LEAF __ATTR_RETNONNULL __ATTR_NONNULL((1, 2)),void *,__NOTHROW_NCX,mempmoveupc,(void *__dst, void const *__src, __SIZE_TYPE__ __elem_count, __SIZE_TYPE__ __elem_size),(__dst,__src,__elem_count,__elem_size))
 #else /* ... */
 #include <libc/local/string/mempmoveupc.h>
-/* Same as `memmoveupc', but return `dst + (ELEM_COUNT * ELEM_SIZE)',
+/* Same   as   `memmoveupc',  but   return  `dst + (ELEM_COUNT * ELEM_SIZE)',
  * rather than `dst' (assumes that `dst >= src || !ELEM_COUNT || !ELEM_SIZE') */
 __NAMESPACE_LOCAL_USING_OR_IMPL(mempmoveupc, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_LEAF __ATTR_RETNONNULL __ATTR_NONNULL((1, 2)) void *__NOTHROW_NCX(__LIBCCALL mempmoveupc)(void *__dst, void const *__src, __SIZE_TYPE__ __elem_count, __SIZE_TYPE__ __elem_size) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(mempmoveupc))(__dst, __src, __elem_count, __elem_size); })
 #endif /* !... */
@@ -5953,22 +5953,22 @@ extern "C++" {
 __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_LEAF __ATTR_RETNONNULL __ATTR_NONNULL((1, 2)) void *__NOTHROW_NCX(__LIBCCALL mempmove)(void *__dst, void const *__src, __SIZE_TYPE__ __elem_count, __SIZE_TYPE__ __elem_size) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(mempmovec))(__dst, __src, __elem_count, __elem_size); }
 #endif /* !... */
 #if defined(__fast_mempmoveupc_defined) && defined(__CRT_HAVE_mempmoveupc)
-/* Same as `memmoveupc', but return `dst + (ELEM_COUNT * ELEM_SIZE)',
+/* Same   as   `memmoveupc',  but   return  `dst + (ELEM_COUNT * ELEM_SIZE)',
  * rather than `dst' (assumes that `dst >= src || !ELEM_COUNT || !ELEM_SIZE') */
 __CEIREDIRECT(__ATTR_LEAF __ATTR_RETNONNULL __ATTR_NONNULL((1, 2)),void *,__NOTHROW_NCX,mempmoveup,(void *__dst, void const *__src, __SIZE_TYPE__ __elem_count, __SIZE_TYPE__ __elem_size),mempmoveupc,{ return (__NAMESPACE_FAST_SYM __LIBC_FAST_NAME(mempmoveupc))(__dst, __src, __elem_count, __elem_size); })
 #elif defined(__fast_mempmoveupc_defined)
-/* Same as `memmoveupc', but return `dst + (ELEM_COUNT * ELEM_SIZE)',
+/* Same   as   `memmoveupc',  but   return  `dst + (ELEM_COUNT * ELEM_SIZE)',
  * rather than `dst' (assumes that `dst >= src || !ELEM_COUNT || !ELEM_SIZE') */
 __FORCELOCAL __ATTR_LEAF __ATTR_RETNONNULL __ATTR_NONNULL((1, 2)) void *__NOTHROW_NCX(__LIBCCALL mempmoveup)(void *__dst, void const *__src, __SIZE_TYPE__ __elem_count, __SIZE_TYPE__ __elem_size) { return (__NAMESPACE_FAST_SYM __LIBC_FAST_NAME(mempmoveupc))(__dst, __src, __elem_count, __elem_size); }
 #elif defined(__CRT_HAVE_mempmoveupc)
-/* Same as `memmoveupc', but return `dst + (ELEM_COUNT * ELEM_SIZE)',
+/* Same   as   `memmoveupc',  but   return  `dst + (ELEM_COUNT * ELEM_SIZE)',
  * rather than `dst' (assumes that `dst >= src || !ELEM_COUNT || !ELEM_SIZE') */
 __CREDIRECT(__ATTR_LEAF __ATTR_RETNONNULL __ATTR_NONNULL((1, 2)),void *,__NOTHROW_NCX,mempmoveup,(void *__dst, void const *__src, __SIZE_TYPE__ __elem_count, __SIZE_TYPE__ __elem_size),mempmoveupc,(__dst,__src,__elem_count,__elem_size))
 #else /* ... */
 } /* extern "C++" */
 #include <libc/local/string/mempmoveupc.h>
 extern "C++" {
-/* Same as `memmoveupc', but return `dst + (ELEM_COUNT * ELEM_SIZE)',
+/* Same   as   `memmoveupc',  but   return  `dst + (ELEM_COUNT * ELEM_SIZE)',
  * rather than `dst' (assumes that `dst >= src || !ELEM_COUNT || !ELEM_SIZE') */
 __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_LEAF __ATTR_RETNONNULL __ATTR_NONNULL((1, 2)) void *__NOTHROW_NCX(__LIBCCALL mempmoveup)(void *__dst, void const *__src, __SIZE_TYPE__ __elem_count, __SIZE_TYPE__ __elem_size) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(mempmoveupc))(__dst, __src, __elem_count, __elem_size); }
 #endif /* !... */
@@ -6557,7 +6557,7 @@ __NAMESPACE_LOCAL_USING_OR_IMPL(memcasecmp_l, __FORCELOCAL __ATTR_ARTIFICIAL __A
 #if defined(__cplusplus) && defined(__CORRECT_ISO_CPP_STRING_H_PROTO)
 extern "C++" {
 /* Return the address of a sub-string `needle...+=needlelen' stored within `haystack...+=haystacklen'
- * During comparisons, casing of character is ignored using the given `locale' (s.a. `memmem()')
+ * During comparisons, casing  of character  is ignored using  the given  `locale' (s.a.  `memmem()')
  * If no such sub-string exists, return `NULL' instead.
  * #ifdef _MEMMEM_EMPTY_NEEDLE_NULL_SOURCE
  * When `needlelen' is ZERO(0), also return `NULL' unconditionally.
@@ -6566,7 +6566,7 @@ extern "C++" {
  * #endif // !_MEMMEM_EMPTY_NEEDLE_NULL_SOURCE */
 __CREDIRECT(__ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1, 3)),void *,__NOTHROW_NCX,memcasemem_l,(void *__haystack, __SIZE_TYPE__ __haystacklen, void const *__needle, __SIZE_TYPE__ __needlelen, __locale_t __locale),memcasemem0_l,(__haystack,__haystacklen,__needle,__needlelen,__locale))
 /* Return the address of a sub-string `needle...+=needlelen' stored within `haystack...+=haystacklen'
- * During comparisons, casing of character is ignored using the given `locale' (s.a. `memmem()')
+ * During comparisons, casing  of character  is ignored using  the given  `locale' (s.a.  `memmem()')
  * If no such sub-string exists, return `NULL' instead.
  * #ifdef _MEMMEM_EMPTY_NEEDLE_NULL_SOURCE
  * When `needlelen' is ZERO(0), also return `NULL' unconditionally.
@@ -6577,7 +6577,7 @@ __CREDIRECT(__ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1, 3)),void const *,__NOT
 } /* extern "C++" */
 #else /* __cplusplus && __CORRECT_ISO_CPP_STRING_H_PROTO */
 /* Return the address of a sub-string `needle...+=needlelen' stored within `haystack...+=haystacklen'
- * During comparisons, casing of character is ignored using the given `locale' (s.a. `memmem()')
+ * During comparisons, casing  of character  is ignored using  the given  `locale' (s.a.  `memmem()')
  * If no such sub-string exists, return `NULL' instead.
  * #ifdef _MEMMEM_EMPTY_NEEDLE_NULL_SOURCE
  * When `needlelen' is ZERO(0), also return `NULL' unconditionally.
@@ -6590,7 +6590,7 @@ __CREDIRECT(__ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1, 3)),void *,__NOTHROW_N
 #if defined(__cplusplus) && defined(__CORRECT_ISO_CPP_STRING_H_PROTO)
 extern "C++" {
 /* Return the address of a sub-string `needle...+=needlelen' stored within `haystack...+=haystacklen'
- * During comparisons, casing of character is ignored using the given `locale' (s.a. `memmem()')
+ * During comparisons, casing  of character  is ignored using  the given  `locale' (s.a.  `memmem()')
  * If no such sub-string exists, return `NULL' instead.
  * #ifdef _MEMMEM_EMPTY_NEEDLE_NULL_SOURCE
  * When `needlelen' is ZERO(0), also return `NULL' unconditionally.
@@ -6599,7 +6599,7 @@ extern "C++" {
  * #endif // !_MEMMEM_EMPTY_NEEDLE_NULL_SOURCE */
 __CREDIRECT(__ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1, 3)),void *,__NOTHROW_NCX,memcasemem_l,(void *__haystack, __SIZE_TYPE__ __haystacklen, void const *__needle, __SIZE_TYPE__ __needlelen, __locale_t __locale),memcasemem_l,(__haystack,__haystacklen,__needle,__needlelen,__locale))
 /* Return the address of a sub-string `needle...+=needlelen' stored within `haystack...+=haystacklen'
- * During comparisons, casing of character is ignored using the given `locale' (s.a. `memmem()')
+ * During comparisons, casing  of character  is ignored using  the given  `locale' (s.a.  `memmem()')
  * If no such sub-string exists, return `NULL' instead.
  * #ifdef _MEMMEM_EMPTY_NEEDLE_NULL_SOURCE
  * When `needlelen' is ZERO(0), also return `NULL' unconditionally.
@@ -6610,7 +6610,7 @@ __CREDIRECT(__ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1, 3)),void const *,__NOT
 } /* extern "C++" */
 #else /* __cplusplus && __CORRECT_ISO_CPP_STRING_H_PROTO */
 /* Return the address of a sub-string `needle...+=needlelen' stored within `haystack...+=haystacklen'
- * During comparisons, casing of character is ignored using the given `locale' (s.a. `memmem()')
+ * During comparisons, casing  of character  is ignored using  the given  `locale' (s.a.  `memmem()')
  * If no such sub-string exists, return `NULL' instead.
  * #ifdef _MEMMEM_EMPTY_NEEDLE_NULL_SOURCE
  * When `needlelen' is ZERO(0), also return `NULL' unconditionally.
@@ -6624,7 +6624,7 @@ __CDECLARE(__ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1, 3)),void *,__NOTHROW_NC
 #if defined(__cplusplus) && defined(__CORRECT_ISO_CPP_STRING_H_PROTO)
 extern "C++" {
 /* Return the address of a sub-string `needle...+=needlelen' stored within `haystack...+=haystacklen'
- * During comparisons, casing of character is ignored using the given `locale' (s.a. `memmem()')
+ * During comparisons, casing  of character  is ignored using  the given  `locale' (s.a.  `memmem()')
  * If no such sub-string exists, return `NULL' instead.
  * #ifdef _MEMMEM_EMPTY_NEEDLE_NULL_SOURCE
  * When `needlelen' is ZERO(0), also return `NULL' unconditionally.
@@ -6633,7 +6633,7 @@ extern "C++" {
  * #endif // !_MEMMEM_EMPTY_NEEDLE_NULL_SOURCE */
 __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1, 3)) void *__NOTHROW_NCX(__LIBCCALL memcasemem_l)(void *__haystack, __SIZE_TYPE__ __haystacklen, void const *__needle, __SIZE_TYPE__ __needlelen, __locale_t __locale) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(memcasemem_l))(__haystack, __haystacklen, __needle, __needlelen, __locale); }
 /* Return the address of a sub-string `needle...+=needlelen' stored within `haystack...+=haystacklen'
- * During comparisons, casing of character is ignored using the given `locale' (s.a. `memmem()')
+ * During comparisons, casing  of character  is ignored using  the given  `locale' (s.a.  `memmem()')
  * If no such sub-string exists, return `NULL' instead.
  * #ifdef _MEMMEM_EMPTY_NEEDLE_NULL_SOURCE
  * When `needlelen' is ZERO(0), also return `NULL' unconditionally.
@@ -6644,7 +6644,7 @@ __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1, 3))
 } /* extern "C++" */
 #else /* __cplusplus && __CORRECT_ISO_CPP_STRING_H_PROTO */
 /* Return the address of a sub-string `needle...+=needlelen' stored within `haystack...+=haystacklen'
- * During comparisons, casing of character is ignored using the given `locale' (s.a. `memmem()')
+ * During comparisons, casing  of character  is ignored using  the given  `locale' (s.a.  `memmem()')
  * If no such sub-string exists, return `NULL' instead.
  * #ifdef _MEMMEM_EMPTY_NEEDLE_NULL_SOURCE
  * When `needlelen' is ZERO(0), also return `NULL' unconditionally.
@@ -7078,7 +7078,7 @@ __NAMESPACE_LOCAL_USING_OR_IMPL(memrevq, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_L
 #ifdef __CRT_HAVE_strcmpz
 /* >> strcmpz(3)
  * Similar to `strcmp(3)', but the given `rhs' string mustn't necessarily be NUL-terminated.
- * Instead, that string's length is fixed at `rhs_len', and the compare is equivalent to:
+ * Instead, that string's length is  fixed at `rhs_len', and  the compare is equivalent  to:
  * > char *dup = (char *)malloc((rhs_len + 1) * sizeof(char));
  * > *(char *)mempcpy(dup, rhs, rhs_len, sizeof(char)) = '\0';
  * > return strcmp(lhs, dup); */
@@ -7087,7 +7087,7 @@ __CDECLARE(__ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1, 2)),int,__NOTHROW_NCX,s
 #include <libc/local/string/strcmpz.h>
 /* >> strcmpz(3)
  * Similar to `strcmp(3)', but the given `rhs' string mustn't necessarily be NUL-terminated.
- * Instead, that string's length is fixed at `rhs_len', and the compare is equivalent to:
+ * Instead, that string's length is  fixed at `rhs_len', and  the compare is equivalent  to:
  * > char *dup = (char *)malloc((rhs_len + 1) * sizeof(char));
  * > *(char *)mempcpy(dup, rhs, rhs_len, sizeof(char)) = '\0';
  * > return strcmp(lhs, dup); */
@@ -7096,25 +7096,25 @@ __NAMESPACE_LOCAL_USING_OR_IMPL(strcmpz, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_P
 #ifdef __CRT_HAVE_strstartcmp
 /* >> strstartcmp(3)
  * Compare the first `strnlen(str, strlen(startswith_str))' characters of
- * `str' with `startswith_str', returning the usual >0, <0, ==0. */
+ * `str'  with  `startswith_str',  returning  the  usual  >0,  <0,   ==0. */
 __CDECLARE(__ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1, 2)),int,__NOTHROW_NCX,strstartcmp,(char const *__str, char const *__startswith),(__str,__startswith))
 #else /* __CRT_HAVE_strstartcmp */
 #include <libc/local/string/strstartcmp.h>
 /* >> strstartcmp(3)
  * Compare the first `strnlen(str, strlen(startswith_str))' characters of
- * `str' with `startswith_str', returning the usual >0, <0, ==0. */
+ * `str'  with  `startswith_str',  returning  the  usual  >0,  <0,   ==0. */
 __NAMESPACE_LOCAL_USING_OR_IMPL(strstartcmp, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1, 2)) int __NOTHROW_NCX(__LIBCCALL strstartcmp)(char const *__str, char const *__startswith) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(strstartcmp))(__str, __startswith); })
 #endif /* !__CRT_HAVE_strstartcmp */
 #ifdef __CRT_HAVE_strstartcmpz
 /* >> strstartcmpz(3)
  * Compare the first `strnlen(str, startswith_len)' characters of
- * `str' with `startswith', returning the usual >0, <0, ==0. */
+ * `str' with  `startswith', returning  the  usual >0,  <0,  ==0. */
 __CDECLARE(__ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1, 2)),int,__NOTHROW_NCX,strstartcmpz,(char const *__str, char const *__startswith, size_t __startswith_len),(__str,__startswith,__startswith_len))
 #else /* __CRT_HAVE_strstartcmpz */
 #include <libc/local/string/strstartcmpz.h>
 /* >> strstartcmpz(3)
  * Compare the first `strnlen(str, startswith_len)' characters of
- * `str' with `startswith', returning the usual >0, <0, ==0. */
+ * `str' with  `startswith', returning  the  usual >0,  <0,  ==0. */
 __NAMESPACE_LOCAL_USING_OR_IMPL(strstartcmpz, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1, 2)) int __NOTHROW_NCX(__LIBCCALL strstartcmpz)(char const *__str, char const *__startswith, size_t __startswith_len) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(strstartcmpz))(__str, __startswith, __startswith_len); })
 #endif /* !__CRT_HAVE_strstartcmpz */
 #endif /* __USE_KOS */
@@ -7703,21 +7703,21 @@ __NAMESPACE_LOCAL_USING_OR_IMPL(wcscpy, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_RE
 #define __wcscspn_defined 1
 #ifdef __std_wcscspn_defined
 /* >> strcspn(3)
- * Return the offset from `haystack' to the first
- * character for which `strchr(reject, ch) != NULL'.
+ * Return   the  offset  from  `haystack'  to  the  first
+ * character   for   which  `strchr(reject, ch) != NULL'.
  * If no such character exists, return `strlen(haystack)' */
 __NAMESPACE_STD_USING(wcscspn)
 #elif defined(__CRT_HAVE_wcscspn)
 /* >> strcspn(3)
- * Return the offset from `haystack' to the first
- * character for which `strchr(reject, ch) != NULL'.
+ * Return   the  offset  from  `haystack'  to  the  first
+ * character   for   which  `strchr(reject, ch) != NULL'.
  * If no such character exists, return `strlen(haystack)' */
 __CDECLARE(__ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1, 2)),size_t,__NOTHROW_NCX,wcscspn,(wchar_t const *__haystack, wchar_t const *__reject),(__haystack,__reject))
 #else /* ... */
 #include <libc/local/wchar/wcscspn.h>
 /* >> strcspn(3)
- * Return the offset from `haystack' to the first
- * character for which `strchr(reject, ch) != NULL'.
+ * Return   the  offset  from  `haystack'  to  the  first
+ * character   for   which  `strchr(reject, ch) != NULL'.
  * If no such character exists, return `strlen(haystack)' */
 __NAMESPACE_LOCAL_USING_OR_IMPL(wcscspn, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1, 2)) size_t __NOTHROW_NCX(__LIBCCALL wcscspn)(wchar_t const *__haystack, wchar_t const *__reject) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(wcscspn))(__haystack, __reject); })
 #endif /* !... */
@@ -7880,21 +7880,21 @@ __NAMESPACE_LOCAL_USING_OR_IMPL(wcsrchr, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_P
 #define __wcsspn_defined 1
 #ifdef __std_wcsspn_defined
 /* >> strspn(3)
- * Return the offset from `haystack' to the first
- * character for which `strchr(reject, ch) == NULL'.
+ * Return   the  offset  from  `haystack'  to  the  first
+ * character   for   which  `strchr(reject, ch) == NULL'.
  * If no such character exists, return `strlen(haystack)' */
 __NAMESPACE_STD_USING(wcsspn)
 #elif defined(__CRT_HAVE_wcsspn)
 /* >> strspn(3)
- * Return the offset from `haystack' to the first
- * character for which `strchr(reject, ch) == NULL'.
+ * Return   the  offset  from  `haystack'  to  the  first
+ * character   for   which  `strchr(reject, ch) == NULL'.
  * If no such character exists, return `strlen(haystack)' */
 __CDECLARE(__ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1, 2)),size_t,__NOTHROW_NCX,wcsspn,(wchar_t const *__haystack, wchar_t const *__accept),(__haystack,__accept))
 #else /* ... */
 #include <libc/local/wchar/wcsspn.h>
 /* >> strspn(3)
- * Return the offset from `haystack' to the first
- * character for which `strchr(reject, ch) == NULL'.
+ * Return   the  offset  from  `haystack'  to  the  first
+ * character   for   which  `strchr(reject, ch) == NULL'.
  * If no such character exists, return `strlen(haystack)' */
 __NAMESPACE_LOCAL_USING_OR_IMPL(wcsspn, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1, 2)) size_t __NOTHROW_NCX(__LIBCCALL wcsspn)(wchar_t const *__haystack, wchar_t const *__accept) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(wcsspn))(__haystack, __accept); })
 #endif /* !... */
@@ -8816,19 +8816,19 @@ __SYSDECL_BEGIN
 extern "C++" {
 /* >> strnstr(3)
  * Search for `needle...+=strlen(needle)' within `haystack...+=strnlen(haystack, haystack_maxlen)'
- * If found, return a pointer to its location within `str', else return `NULL'
+ * If   found,   return  a   pointer   to  its   location   within  `str',   else   return  `NULL'
  * This function originates from BSD, but is also provided as a KOS extension */
 __CREDIRECT(__ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1, 2)),char *,__NOTHROW_NCX,strnstr,(char *__haystack, char *__needle, __SIZE_TYPE__ __haystack_maxlen),strnstr,(__haystack,__needle,__haystack_maxlen))
 /* >> strnstr(3)
  * Search for `needle...+=strlen(needle)' within `haystack...+=strnlen(haystack, haystack_maxlen)'
- * If found, return a pointer to its location within `str', else return `NULL'
+ * If   found,   return  a   pointer   to  its   location   within  `str',   else   return  `NULL'
  * This function originates from BSD, but is also provided as a KOS extension */
 __CREDIRECT(__ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1, 2)),char const *,__NOTHROW_NCX,strnstr,(char const *__haystack, char const *__needle, __SIZE_TYPE__ __haystack_maxlen),strnstr,(__haystack,__needle,__haystack_maxlen))
 } /* extern "C++" */
 #else /* __cplusplus && __CORRECT_ISO_CPP_STRING_H_PROTO */
 /* >> strnstr(3)
  * Search for `needle...+=strlen(needle)' within `haystack...+=strnlen(haystack, haystack_maxlen)'
- * If found, return a pointer to its location within `str', else return `NULL'
+ * If   found,   return  a   pointer   to  its   location   within  `str',   else   return  `NULL'
  * This function originates from BSD, but is also provided as a KOS extension */
 __CDECLARE(__ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1, 2)),char *,__NOTHROW_NCX,strnstr,(char const *__haystack, char const *__needle, __SIZE_TYPE__ __haystack_maxlen),(__haystack,__needle,__haystack_maxlen))
 #endif /* !__cplusplus || !__CORRECT_ISO_CPP_STRING_H_PROTO */
@@ -8838,19 +8838,19 @@ __CDECLARE(__ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1, 2)),char *,__NOTHROW_NC
 extern "C++" {
 /* >> strnstr(3)
  * Search for `needle...+=strlen(needle)' within `haystack...+=strnlen(haystack, haystack_maxlen)'
- * If found, return a pointer to its location within `str', else return `NULL'
+ * If   found,   return  a   pointer   to  its   location   within  `str',   else   return  `NULL'
  * This function originates from BSD, but is also provided as a KOS extension */
 __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1, 2)) char *__NOTHROW_NCX(__LIBCCALL strnstr)(char *__haystack, char *__needle, __SIZE_TYPE__ __haystack_maxlen) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(strnstr))(__haystack, __needle, __haystack_maxlen); }
 /* >> strnstr(3)
  * Search for `needle...+=strlen(needle)' within `haystack...+=strnlen(haystack, haystack_maxlen)'
- * If found, return a pointer to its location within `str', else return `NULL'
+ * If   found,   return  a   pointer   to  its   location   within  `str',   else   return  `NULL'
  * This function originates from BSD, but is also provided as a KOS extension */
 __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1, 2)) char const *__NOTHROW_NCX(__LIBCCALL strnstr)(char const *__haystack, char const *__needle, __SIZE_TYPE__ __haystack_maxlen) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(strnstr))(__haystack, __needle, __haystack_maxlen); }
 } /* extern "C++" */
 #else /* __cplusplus && __CORRECT_ISO_CPP_STRING_H_PROTO */
 /* >> strnstr(3)
  * Search for `needle...+=strlen(needle)' within `haystack...+=strnlen(haystack, haystack_maxlen)'
- * If found, return a pointer to its location within `str', else return `NULL'
+ * If   found,   return  a   pointer   to  its   location   within  `str',   else   return  `NULL'
  * This function originates from BSD, but is also provided as a KOS extension */
 __NAMESPACE_LOCAL_USING_OR_IMPL(strnstr, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1, 2)) char *__NOTHROW_NCX(__LIBCCALL strnstr)(char const *__haystack, char const *__needle, __SIZE_TYPE__ __haystack_maxlen) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(strnstr))(__haystack, __needle, __haystack_maxlen); })
 #endif /* !__cplusplus || !__CORRECT_ISO_CPP_STRING_H_PROTO */
@@ -8863,7 +8863,7 @@ __NAMESPACE_LOCAL_USING_OR_IMPL(strnstr, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_P
 #ifndef __strmode_defined
 #define __strmode_defined 1
 #ifdef __CRT_HAVE_strmode
-/* Generate a file mode representation similar to what's printed by `ls -l'
+/* Generate  a file mode representation similar to what's printed by `ls -l'
  * The representation is written to `p', and `mode' is the value as returned
  * by `stat(2)' in `struct stat::st_mode'
  * The format written is:
@@ -8874,12 +8874,12 @@ __NAMESPACE_LOCAL_USING_OR_IMPL(strnstr, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_P
  *    p[2]  = mode & S_IWUSR ? 'w' : '-';
  *    p[3]  = <mode & S_IXUSR | S_ISUID>: { 0: '-', S_IXUSR: 'x', S_ISUID: 'S',
  *                                          S_IXUSR | S_ISUID: 's' };
- *    p[4]  = mode & S_IRGRP ? 'r' : '-';
- *    p[5]  = mode & S_IWGRP ? 'w' : '-';
+ *    p[4] = mode & S_IRGRP ? 'r' : '-';
+ *    p[5] = mode & S_IWGRP ? 'w' : '-';
  *    p[6]  = <mode & S_IXGRP | S_ISGID>: { 0: '-', S_IXGRP: 'x', S_ISGID: 'S',
  *                                          S_IXGRP | S_ISGID: 's' };
- *    p[7]  = mode & S_IROTH ? 'r' : '-';
- *    p[8]  = mode & S_IWOTH ? 'w' : '-';
+ *    p[7] = mode & S_IROTH ? 'r' : '-';
+ *    p[8] = mode & S_IWOTH ? 'w' : '-';
  *    p[9]  = <mode & S_IXOTH | S_ISVTX>: { 0: '-', S_IXOTH: 'x', S_ISVTX: 'T',
  *                                          S_IXOTH | S_ISVTX: 't' };
  *    p[10] = ' '; // '+', if "alternate or additional access control
@@ -8888,7 +8888,7 @@ __NAMESPACE_LOCAL_USING_OR_IMPL(strnstr, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_P
 __CDECLARE_VOID(__ATTR_NONNULL((2)),__NOTHROW_NCX,strmode,(__mode_t __mode, char __p[12]),(__mode,__p))
 #else /* __CRT_HAVE_strmode */
 #include <libc/local/string/strmode.h>
-/* Generate a file mode representation similar to what's printed by `ls -l'
+/* Generate  a file mode representation similar to what's printed by `ls -l'
  * The representation is written to `p', and `mode' is the value as returned
  * by `stat(2)' in `struct stat::st_mode'
  * The format written is:
@@ -8899,12 +8899,12 @@ __CDECLARE_VOID(__ATTR_NONNULL((2)),__NOTHROW_NCX,strmode,(__mode_t __mode, char
  *    p[2]  = mode & S_IWUSR ? 'w' : '-';
  *    p[3]  = <mode & S_IXUSR | S_ISUID>: { 0: '-', S_IXUSR: 'x', S_ISUID: 'S',
  *                                          S_IXUSR | S_ISUID: 's' };
- *    p[4]  = mode & S_IRGRP ? 'r' : '-';
- *    p[5]  = mode & S_IWGRP ? 'w' : '-';
+ *    p[4] = mode & S_IRGRP ? 'r' : '-';
+ *    p[5] = mode & S_IWGRP ? 'w' : '-';
  *    p[6]  = <mode & S_IXGRP | S_ISGID>: { 0: '-', S_IXGRP: 'x', S_ISGID: 'S',
  *                                          S_IXGRP | S_ISGID: 's' };
- *    p[7]  = mode & S_IROTH ? 'r' : '-';
- *    p[8]  = mode & S_IWOTH ? 'w' : '-';
+ *    p[7] = mode & S_IROTH ? 'r' : '-';
+ *    p[8] = mode & S_IWOTH ? 'w' : '-';
  *    p[9]  = <mode & S_IXOTH | S_ISVTX>: { 0: '-', S_IXOTH: 'x', S_ISVTX: 'T',
  *                                          S_IXOTH | S_ISVTX: 't' };
  *    p[10] = ' '; // '+', if "alternate or additional access control
@@ -8955,14 +8955,14 @@ __NAMESPACE_LOCAL_USING_OR_IMPL(timingsafe_memcmp, __FORCELOCAL __ATTR_ARTIFICIA
 #ifdef __CRT_HAVE_strtosigno
 /* >> strtosigno(3)
  * Return the signal number for a given name.
- * e.g. `strtosigno("SIGINT") == SIGINT'
+ * e.g.      `strtosigno("SIGINT") == SIGINT'
  * When `name' isn't recognized, return `0' instead. */
 __CDECLARE(__ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1)),__signo_t,__NOTHROW_NCX,strtosigno,(const char *__name),(__name))
 #else /* __CRT_HAVE_strtosigno */
 #include <libc/local/string/strtosigno.h>
 /* >> strtosigno(3)
  * Return the signal number for a given name.
- * e.g. `strtosigno("SIGINT") == SIGINT'
+ * e.g.      `strtosigno("SIGINT") == SIGINT'
  * When `name' isn't recognized, return `0' instead. */
 __NAMESPACE_LOCAL_USING_OR_IMPL(strtosigno, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1)) __signo_t __NOTHROW_NCX(__LIBCCALL strtosigno)(const char *__name) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(strtosigno))(__name); })
 #endif /* !__CRT_HAVE_strtosigno */
@@ -8983,20 +8983,20 @@ __NAMESPACE_LOCAL_USING_OR_IMPL(explicit_memset, __FORCELOCAL __ATTR_ARTIFICIAL 
 #ifdef __CRT_HAVE_stresep
 /* >> stresep(3)
  * Same as `strsep(3)', but allow the specification of an additional `escape'
- * character that will cause the following character from `*stringp' to be
- * escaped, and not be considered as a separator, even if it is included
+ * character  that will cause  the following character  from `*stringp' to be
+ * escaped, and not  be considered  as a separator,  even if  it is  included
  * within `delim'. Note that `escape'-characters (if present) are not removed
- * from the input string, meaning that they will still appear in returned
+ * from  the input  string, meaning that  they will still  appear in returned
  * strings, should they have been present in the original input string. */
 __CDECLARE(__ATTR_LEAF __ATTR_NONNULL((1, 2)),char *,__NOTHROW_NCX,stresep,(char **__restrict __stringp, char const *__restrict __delim, int __escape),(__stringp,__delim,__escape))
 #else /* __CRT_HAVE_stresep */
 #include <libc/local/string/stresep.h>
 /* >> stresep(3)
  * Same as `strsep(3)', but allow the specification of an additional `escape'
- * character that will cause the following character from `*stringp' to be
- * escaped, and not be considered as a separator, even if it is included
+ * character  that will cause  the following character  from `*stringp' to be
+ * escaped, and not  be considered  as a separator,  even if  it is  included
  * within `delim'. Note that `escape'-characters (if present) are not removed
- * from the input string, meaning that they will still appear in returned
+ * from  the input  string, meaning that  they will still  appear in returned
  * strings, should they have been present in the original input string. */
 __NAMESPACE_LOCAL_USING_OR_IMPL(stresep, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_LEAF __ATTR_NONNULL((1, 2)) char *__NOTHROW_NCX(__LIBCCALL stresep)(char **__restrict __stringp, char const *__restrict __delim, int __escape) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(stresep))(__stringp, __delim, __escape); })
 #endif /* !__CRT_HAVE_stresep */

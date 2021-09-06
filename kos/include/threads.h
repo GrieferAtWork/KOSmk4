@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xc460783c */
+/* HASH CRC-32:0x17f3ddb1 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -473,7 +473,7 @@ __NAMESPACE_LOCAL_USING_OR_IMPL(cnd_init, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_
 #endif /* ... */
 #ifdef __CRT_HAVE_cnd_signal
 /* >> cnd_signal(3)
- * Wakeup one thread currently waiting on the given
+ * Wakeup  one thread currently  waiting on the given
  * condition variable (s.a. `pthread_cond_signal(3)')
  * @return: thrd_success: Success
  * @return: thrd_error:   Error */
@@ -481,7 +481,7 @@ __CDECLARE(__ATTR_NONNULL((1)),int,__NOTHROW_NCX,cnd_signal,(cnd_t *__restrict _
 #elif defined(__CRT_HAVE_pthread_cond_signal)
 #include <libc/local/threads/cnd_signal.h>
 /* >> cnd_signal(3)
- * Wakeup one thread currently waiting on the given
+ * Wakeup  one thread currently  waiting on the given
  * condition variable (s.a. `pthread_cond_signal(3)')
  * @return: thrd_success: Success
  * @return: thrd_error:   Error */
@@ -489,7 +489,7 @@ __NAMESPACE_LOCAL_USING_OR_IMPL(cnd_signal, __FORCELOCAL __ATTR_ARTIFICIAL __ATT
 #endif /* ... */
 #ifdef __CRT_HAVE_cnd_broadcast
 /* >> cnd_broadcast(3)
- * Wakeup all threads currently waiting on the given
+ * Wakeup  all  threads currently  waiting on  the given
  * condition variable (s.a. `pthread_cond_broadcast(3)')
  * @return: thrd_success: Success
  * @return: thrd_error:   Error */
@@ -497,7 +497,7 @@ __CDECLARE(__ATTR_NONNULL((1)),int,__NOTHROW_NCX,cnd_broadcast,(cnd_t *__restric
 #elif defined(__CRT_HAVE_pthread_cond_broadcast)
 #include <libc/local/threads/cnd_broadcast.h>
 /* >> cnd_broadcast(3)
- * Wakeup all threads currently waiting on the given
+ * Wakeup  all  threads currently  waiting on  the given
  * condition variable (s.a. `pthread_cond_broadcast(3)')
  * @return: thrd_success: Success
  * @return: thrd_error:   Error */
@@ -643,36 +643,36 @@ __NAMESPACE_LOCAL_USING_OR_IMPL(thr_min_stack, __FORCELOCAL __ATTR_ARTIFICIAL __
 #endif /* !__CRT_HAVE_thr_min_stack */
 #ifdef __CRT_HAVE_pthread_main_np
 /* >> thr_main(3)
- * Another one of these non-restricted, but solaris-specific functions:
- * This one returns 1 if the calling thread is the main() thread (i.e.
- * the thread that was started by the kernel in order to execute the
- * calling program), and 0 otherwise. Additionally, -1 is returned if
+ * Another  one of these non-restricted, but solaris-specific functions:
+ * This  one returns 1 if the calling  thread is the main() thread (i.e.
+ * the thread that  was started by  the kernel in  order to execute  the
+ * calling program), and  0 otherwise. Additionally,  -1 is returned  if
  * the calling thread "hasn't been initialized", or if the caller wasn't
- * created by one of the pthread- or threads-related init functions.
- * Internally, this is the return value if the caller doesn't have a
+ * created  by one  of the  pthread- or  threads-related init functions.
+ * Internally,  this is  the return value  if the caller  doesn't have a
  * proper pthread-controller attached. */
 __CREDIRECT(__ATTR_CONST,int,__NOTHROW,thr_main,(void),pthread_main_np,())
 #elif defined(__CRT_HAVE_thr_main)
 /* >> thr_main(3)
- * Another one of these non-restricted, but solaris-specific functions:
- * This one returns 1 if the calling thread is the main() thread (i.e.
- * the thread that was started by the kernel in order to execute the
- * calling program), and 0 otherwise. Additionally, -1 is returned if
+ * Another  one of these non-restricted, but solaris-specific functions:
+ * This  one returns 1 if the calling  thread is the main() thread (i.e.
+ * the thread that  was started by  the kernel in  order to execute  the
+ * calling program), and  0 otherwise. Additionally,  -1 is returned  if
  * the calling thread "hasn't been initialized", or if the caller wasn't
- * created by one of the pthread- or threads-related init functions.
- * Internally, this is the return value if the caller doesn't have a
+ * created  by one  of the  pthread- or  threads-related init functions.
+ * Internally,  this is  the return value  if the caller  doesn't have a
  * proper pthread-controller attached. */
 __CDECLARE(__ATTR_CONST,int,__NOTHROW,thr_main,(void),())
 #elif defined(__CRT_HAVE_gettid) && (defined(__CRT_HAVE_getpid) || defined(__CRT_HAVE__getpid) || defined(__CRT_HAVE___getpid))
 #include <libc/local/pthread/pthread_main_np.h>
 /* >> thr_main(3)
- * Another one of these non-restricted, but solaris-specific functions:
- * This one returns 1 if the calling thread is the main() thread (i.e.
- * the thread that was started by the kernel in order to execute the
- * calling program), and 0 otherwise. Additionally, -1 is returned if
+ * Another  one of these non-restricted, but solaris-specific functions:
+ * This  one returns 1 if the calling  thread is the main() thread (i.e.
+ * the thread that  was started by  the kernel in  order to execute  the
+ * calling program), and  0 otherwise. Additionally,  -1 is returned  if
  * the calling thread "hasn't been initialized", or if the caller wasn't
- * created by one of the pthread- or threads-related init functions.
- * Internally, this is the return value if the caller doesn't have a
+ * created  by one  of the  pthread- or  threads-related init functions.
+ * Internally,  this is  the return value  if the caller  doesn't have a
  * proper pthread-controller attached. */
 __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_CONST int __NOTHROW(__LIBCCALL thr_main)(void) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(pthread_main_np))(); }
 #endif /* ... */

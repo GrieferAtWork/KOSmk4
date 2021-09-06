@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x6e45fcdd */
+/* HASH CRC-32:0xf2a6d9f3 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -64,9 +64,9 @@ NOTHROW_NCX(LIBCCALL libc_inet_lnaof)(struct in_addr inaddr) {
 #include <netinet/in.h>
 #include <hybrid/__byteswap.h>
 /* >> inet_makeaddr(3)
- * Construct an Internet-host-address in network byte order from
+ * Construct  an  Internet-host-address in  network byte  order from
  * the combination of its network (`net'), and host (`host') number.
- * The `net' and `host' arguments can later be re-extracted by use
+ * The `net' and `host' arguments  can later be re-extracted by  use
  * of `inet_netof(3)' and `inet_lnaof(3)' */
 INTERN ATTR_SECTION(".text.crt.net.inet") ATTR_CONST WUNUSED struct in_addr
 NOTHROW_NCX(LIBCCALL libc_inet_makeaddr)(uint32_t net,
@@ -87,17 +87,17 @@ NOTHROW_NCX(LIBCCALL libc_inet_makeaddr)(uint32_t net,
 }
 #include <netinet/in.h>
 /* >> inet_addr(3)
- * Convert an Internet host address `CP' from its numbers-and-dots
+ * Convert an  Internet host  address  `CP' from  its  numbers-and-dots
  * notational form into its binary representation in network byte order
  * Accepted notations are:
- *     a.b.c.d  (1.2.3.4)
+ *     a.b.c.d (1.2.3.4)
  *     a.b.cd   (1.2.52)
- *     a.bcd    (1.564)
- *     abcd     (4660)
+ *     a.bcd     (1.564)
+ *     abcd (4660)
  * With each number allowed to be written in as one of:
  *     123      (decimal)
- *     0x123    (hex)
- *     0123     (oct) */
+ *     0x123 (hex)
+ *     0123  (oct) */
 INTERN ATTR_SECTION(".text.crt.net.inet") ATTR_PURE NONNULL((1)) in_addr_t
 NOTHROW_NCX(LIBCCALL libc_inet_addr)(char const *__restrict cp) {
 	struct in_addr addr;
@@ -106,9 +106,9 @@ NOTHROW_NCX(LIBCCALL libc_inet_addr)(char const *__restrict cp) {
 	return addr.s_addr;
 }
 /* >> inet_ntoa(3)
- * Return the conventional numbers-and-dots representation of a
- * given Internet host address `inaddr'. The returned pointer is
- * apart of a static buffer and may change in subsequence (or parallel)
+ * Return   the   conventional  numbers-and-dots   representation   of  a
+ * given  Internet  host  address  `inaddr'.  The  returned  pointer   is
+ * apart of a static buffer and  may change in subsequence (or  parallel)
  * calls. For a re-entrant version of this function, see `inet_ntoa_r(3)' */
 INTERN ATTR_SECTION(".text.crt.net.inet") ATTR_RETNONNULL WUNUSED char *
 NOTHROW_NCX(LIBCCALL libc_inet_ntoa)(struct in_addr inaddr) {
@@ -133,7 +133,7 @@ NOTHROW_NCX(LIBCCALL libc_inet_ntoa_r)(struct in_addr inaddr,
 #include <netinet/in.h>
 #include <hybrid/__byteswap.h>
 /* >> inet_network(3)
- * This function is the same as `inet_addr()', except that
+ * This function is  the same as  `inet_addr()', except  that
  * the return value is in host-endian, rather than net-endian */
 INTERN ATTR_SECTION(".text.crt.net.inet") ATTR_PURE NONNULL((1)) uint32_t
 NOTHROW_NCX(LIBCCALL libc_inet_network)(char const *__restrict cp) {
@@ -144,17 +144,17 @@ NOTHROW_NCX(LIBCCALL libc_inet_network)(char const *__restrict cp) {
 }
 /* >> inet_aton(3)
  * Convert an Internet host address `CP' from its numbers-and-dots
- * notational form into its binary representation in network byte
+ * notational form into its binary representation in network  byte
  * order. The result is then stored in `*INP'
  * Accepted notations are:
- *     a.b.c.d  (1.2.3.4)
+ *     a.b.c.d (1.2.3.4)
  *     a.b.cd   (1.2.52)
- *     a.bcd    (1.564)
- *     abcd     (4660)
+ *     a.bcd     (1.564)
+ *     abcd (4660)
  * With each number allowed to be written in as one of:
  *     123      (decimal)
- *     0x123    (hex)
- *     0123     (oct)
+ *     0x123 (hex)
+ *     0123  (oct)
  * @return: 0: Bad input format
  * @return: 1: Success */
 INTERN ATTR_SECTION(".text.crt.net.inet") NONNULL((1, 2)) int
@@ -166,14 +166,14 @@ NOTHROW_NCX(LIBCCALL libc_inet_aton)(char const *__restrict cp,
 /* >> inet_paton(3)
  * Same as `inet_aton()', but update `*pcp' to point past the address
  * Accepted notations are:
- *     a.b.c.d  (1.2.3.4)
+ *     a.b.c.d (1.2.3.4)
  *     a.b.cd   (1.2.52)
- *     a.bcd    (1.564)
- *     abcd     (4660)
+ *     a.bcd     (1.564)
+ *     abcd (4660)
  * With each number allowed to be written in as one of:
  *     123      (decimal)
- *     0x123    (hex)
- *     0123     (oct)
+ *     0x123 (hex)
+ *     0123  (oct)
  * @param: network_addr: When non-zero, `*pcp' is a network address
  * @return: 0: Bad input format
  * @return: 1: Success */

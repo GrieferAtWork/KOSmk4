@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x31d8bf0c */
+/* HASH CRC-32:0xdf453ab3 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -24,18 +24,13 @@
 #include <asm/os/fcntl.h>
 #if defined(__AT_FDCWD) && defined(__CRT_HAVE_linkat)
 __NAMESPACE_LOCAL_BEGIN
-/* Dependency: linkat from unistd */
 #ifndef __local___localdep_linkat_defined
 #define __local___localdep_linkat_defined 1
 __NAMESPACE_LOCAL_END
 #include <bits/types.h>
 __NAMESPACE_LOCAL_BEGIN
-/* >> linkat(2)
- * Create a hard link from `fromfd:from', leading to `tofd:to' */
 __CREDIRECT(__ATTR_NONNULL((2, 4)),int,__NOTHROW_RPC,__localdep_linkat,(__fd_t __fromfd, char const *__from, __fd_t __tofd, char const *__to, __atflag_t __flags),linkat,(__fromfd,__from,__tofd,__to,__flags))
 #endif /* !__local___localdep_linkat_defined */
-/* >> link(2)
- * Create a hard link from `from', leading to `to' */
 __LOCAL_LIBC(link) __ATTR_NONNULL((1, 2)) int
 __NOTHROW_RPC(__LIBCCALL __LIBC_LOCAL_NAME(link))(char const *__from, char const *__to) {
 	/* TODO: Header-implementation for `link()' on DOS (using the windows API) */

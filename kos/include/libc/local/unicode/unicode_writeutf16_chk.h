@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x5501ac51 */
+/* HASH CRC-32:0x363975e6 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -22,8 +22,6 @@
 #define __local_unicode_writeutf16_chk_defined 1
 #include <__crt.h>
 __NAMESPACE_LOCAL_BEGIN
-/* >> unicode_writeutf16_chk(3)
- * Same as `unicode_writeutf16()', but return `NULL' when `UNICODE_ISVALIDUTF16(ch)' is false */
 __LOCAL_LIBC(unicode_writeutf16_chk) __ATTR_WUNUSED __ATTR_NONNULL((1)) __CHAR16_TYPE__ *
 __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(unicode_writeutf16_chk))(__CHAR16_TYPE__ *__restrict __dst, __CHAR32_TYPE__ __ch) {
 	if __unlikely(__ch > 0x10ffff)

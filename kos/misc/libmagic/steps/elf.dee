@@ -82,7 +82,7 @@ global final OPT_ELF_FLATTEN_REQUIRE_NO_RELOCATIONS: string = "ELF_FLATTEN.requi
 @@@param allowedHeaders:       List of program headers indices that should be kept
 @@                             When @none, all headers are kept
 @@@param requireNoRelocations: When true, assert that no piece of code that is being
-@@                             kept would be affected by relocations.
+@@                             kept  would  be  affected  by   relocations.
 @@                             If this isn't the case, print+throw an error
 function flattenElfBinary(
 		inputFile: string, outputFile: string,

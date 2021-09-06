@@ -56,16 +56,16 @@ class Namespace {
 	@@> };
 	public member keyUsingOrImpl: Callable with string;
 
-	@@A key function that returns the transformed symbol name from
-	@@within the namespace for C. When compiling under c++, this is
-	@@always assumed to be equal to the symbol's actual name. Otherwise,
+	@@A  key  function  that  returns  the  transformed  symbol  name  from
+	@@within the  namespace  for  C.  When compiling  under  c++,  this  is
+	@@always  assumed to be  equal to the  symbol's actual name. Otherwise,
 	@@this assumption is only made on a per-symbol basis when this function
 	@@returns an equal string for some given symbol name.
 	@@e.g. @([](name) -> "__LIBC_FAST_NAME({})".format({ name }))
 	public member keyCSymbolName: Callable with string;
 
 	@@Returns the macro name for the default guard for the given symbol
-	@@e.g. @([](name) -> "__fast_{}_defined".format({ name }))
+	@@e.g.  @([](name)   ->   "__fast_{}_defined".format({   name   }))
 	public member keyDefaultGuard: Callable with string;
 
 	public operator hash(): int -> Object.id(this);

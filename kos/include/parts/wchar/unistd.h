@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x13de8e62 */
+/* HASH CRC-32:0x6e3a4d37 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -213,12 +213,12 @@ __CDECLARE_OPT(__ATTR_NONNULL((2)),int,__NOTHROW_RPC,wfchownat,(__fd_t __dfd, wc
  * Create a hard link from `fromfd:from', leading to `tofd:to' */
 __CDECLARE_OPT(__ATTR_NONNULL((2, 4)),int,__NOTHROW_RPC,wlinkat,(__fd_t __fromfd, wchar_t const *__from, __fd_t __tofd, wchar_t const *__to, __atflag_t __flags),(__fromfd,__from,__tofd,__to,__flags))
 /* >> symlinkat(3)
- * Create a new symbolic link loaded with `link_text' as link
+ * Create  a  new  symbolic  link  loaded  with  `link_text'  as link
  * text, at the filesystem location referred to by `tofd:target_path' */
 __CDECLARE_OPT(__ATTR_NONNULL((1, 3)),int,__NOTHROW_RPC,wsymlinkat,(wchar_t const *__link_text, __fd_t __tofd, wchar_t const *__target_path),(__link_text,__tofd,__target_path))
 /* >> readlinkat(2)
  * Read the text of a symbolic link under `dfd:path' into the provided buffer.
- * WARNING: This function is badly designed and will neither append a trailing
+ * WARNING: This  function is badly designed and will neither append a trailing
  *          NUL-character to the buffer, nor will it return the required buffer
  *          size. Instead, it will return the written size, and the caller must
  *          keep on over allocating until the function indicates that it didn't
@@ -238,7 +238,7 @@ __CDECLARE_OPT(__ATTR_NONNULL((2)),int,__NOTHROW_RPC,wunlinkat,(__fd_t __dfd, wc
 #ifdef __CRT_HAVE_wlchown
 /* >> lchown(2)
  * Change the ownership of a given `file' to `group:owner',
- * but don't reference it if that file is a symbolic link */
+ * but don't reference it if  that file is a symbolic  link */
 __CDECLARE(__ATTR_NONNULL((1)),int,__NOTHROW_RPC,wlchown,(wchar_t const *__file, __uid_t __owner, __gid_t __group),(__file,__owner,__group))
 #else /* __CRT_HAVE_wlchown */
 #include <asm/os/fcntl.h>
@@ -246,7 +246,7 @@ __CDECLARE(__ATTR_NONNULL((1)),int,__NOTHROW_RPC,wlchown,(wchar_t const *__file,
 #include <libc/local/parts.wchar.unistd/wlchown.h>
 /* >> lchown(2)
  * Change the ownership of a given `file' to `group:owner',
- * but don't reference it if that file is a symbolic link */
+ * but don't reference it if  that file is a symbolic  link */
 __NAMESPACE_LOCAL_USING_OR_IMPL(wlchown, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_NONNULL((1)) int __NOTHROW_RPC(__LIBCCALL wlchown)(wchar_t const *__file, __uid_t __owner, __gid_t __group) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(wlchown))(__file, __owner, __group); })
 #endif /* __AT_FDCWD && __AT_SYMLINK_NOFOLLOW && __CRT_HAVE_wfchownat */
 #endif /* !__CRT_HAVE_wlchown */
@@ -298,7 +298,7 @@ __NAMESPACE_LOCAL_USING_OR_IMPL(wtruncate64, __FORCELOCAL __ATTR_ARTIFICIAL __AT
 #if defined(__USE_XOPEN_EXTENDED) || defined(__USE_XOPEN2K)
 #ifdef __CRT_HAVE_wsymlink
 /* >> symlink(3)
- * Create a new symbolic link loaded with `link_text' as link
+ * Create  a new  symbolic link  loaded with  `link_text' as link
  * text, at the filesystem location referred to by `target_path'.
  * Same as `symlinkat(link_text, AT_FDCWD, target_path)' */
 __CDECLARE(__ATTR_NONNULL((1, 2)),int,__NOTHROW_RPC,wsymlink,(wchar_t const *__link_text, wchar_t const *__target_path),(__link_text,__target_path))
@@ -307,7 +307,7 @@ __CDECLARE(__ATTR_NONNULL((1, 2)),int,__NOTHROW_RPC,wsymlink,(wchar_t const *__l
 #if defined(__AT_FDCWD) && defined(__CRT_HAVE_wsymlinkat)
 #include <libc/local/parts.wchar.unistd/wsymlink.h>
 /* >> symlink(3)
- * Create a new symbolic link loaded with `link_text' as link
+ * Create  a new  symbolic link  loaded with  `link_text' as link
  * text, at the filesystem location referred to by `target_path'.
  * Same as `symlinkat(link_text, AT_FDCWD, target_path)' */
 __NAMESPACE_LOCAL_USING_OR_IMPL(wsymlink, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_NONNULL((1, 2)) int __NOTHROW_RPC(__LIBCCALL wsymlink)(wchar_t const *__link_text, wchar_t const *__target_path) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(wsymlink))(__link_text, __target_path); })
@@ -317,7 +317,7 @@ __NAMESPACE_LOCAL_USING_OR_IMPL(wsymlink, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_
 /* >> readlink(3)
  * Read the text of a symbolic link under `path' into the provided buffer.
  * Same as `readlinkat(AT_FDCWD, path, buf, buflen)'
- * WARNING: This function is badly designed and will neither append a trailing
+ * WARNING: This  function is badly designed and will neither append a trailing
  *          NUL-character to the buffer, nor will it return the required buffer
  *          size. Instead, it will return the written size, and the caller must
  *          keep on over allocating until the function indicates that it didn't
@@ -331,7 +331,7 @@ __CDECLARE(__ATTR_NONNULL((1, 2)),ssize_t,__NOTHROW_RPC,wreadlink,(wchar_t const
 /* >> readlink(3)
  * Read the text of a symbolic link under `path' into the provided buffer.
  * Same as `readlinkat(AT_FDCWD, path, buf, buflen)'
- * WARNING: This function is badly designed and will neither append a trailing
+ * WARNING: This  function is badly designed and will neither append a trailing
  *          NUL-character to the buffer, nor will it return the required buffer
  *          size. Instead, it will return the written size, and the caller must
  *          keep on over allocating until the function indicates that it didn't
@@ -365,7 +365,7 @@ __CDECLARE_OPT(__ATTR_NONNULL((1)),int,__NOTHROW_NCX,wsetdomainname,(wchar_t con
 #if (defined(__USE_MISC) || \
      (defined(__USE_XOPEN) && !defined(__USE_XOPEN2K)))
 /* >> chroot(2)
- * Change the root directory of the calling `CLONE_FS' group of threads
+ * Change  the root directory of the calling `CLONE_FS' group of threads
  * (usually the process) to a path that was previously address by `path' */
 __CDECLARE_OPT(__ATTR_NONNULL((1)),int,__NOTHROW_RPC,wchroot,(wchar_t const *__restrict __path),(__path))
 #endif /* ... */

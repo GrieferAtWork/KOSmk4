@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xbb3546bc */
+/* HASH CRC-32:0x903d72eb */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -26,30 +26,20 @@
 #include <kos/anno.h>
 #include <hybrid/typecore.h>
 __NAMESPACE_LOCAL_BEGIN
-/* Dependency: ferror from stdio */
 #ifndef __local___localdep_ferror_defined
 #define __local___localdep_ferror_defined 1
 #if defined(__CRT_HAVE_ferror_unlocked) && defined(__USE_STDIO_UNLOCKED)
-/* >> ferror(3)
- * Check if an I/O error occurred in `stream' */
 __CREDIRECT(__ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1)),int,__NOTHROW_NCX,__localdep_ferror,(__FILE __KOS_FIXED_CONST *__restrict __stream),ferror_unlocked,(__stream))
 #elif defined(__CRT_HAVE_ferror)
-/* >> ferror(3)
- * Check if an I/O error occurred in `stream' */
 __CREDIRECT(__ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1)),int,__NOTHROW_NCX,__localdep_ferror,(__FILE __KOS_FIXED_CONST *__restrict __stream),ferror,(__stream))
 #elif defined(__CRT_HAVE__IO_ferror)
-/* >> ferror(3)
- * Check if an I/O error occurred in `stream' */
 __CREDIRECT(__ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1)),int,__NOTHROW_NCX,__localdep_ferror,(__FILE __KOS_FIXED_CONST *__restrict __stream),_IO_ferror,(__stream))
 #elif defined(__CRT_HAVE_ferror_unlocked)
-/* >> ferror(3)
- * Check if an I/O error occurred in `stream' */
 __CREDIRECT(__ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1)),int,__NOTHROW_NCX,__localdep_ferror,(__FILE __KOS_FIXED_CONST *__restrict __stream),ferror_unlocked,(__stream))
 #else /* ... */
 #undef __local___localdep_ferror_defined
 #endif /* !... */
 #endif /* !__local___localdep_ferror_defined */
-/* Dependency: fgetc16 from parts.uchar.stdio */
 #ifndef __local___localdep_fgetc16_defined
 #define __local___localdep_fgetc16_defined 1
 #if defined(__CRT_HAVE_fgetwc) && __SIZEOF_WCHAR_T__ == 2 && defined(__LIBCCALL_IS_LIBDCALL)
@@ -64,7 +54,6 @@ __CREDIRECT_DOS(__ATTR_NONNULL((1)),__WINT_TYPE__,__THROWING,__localdep_fgetc16,
 #undef __local___localdep_fgetc16_defined
 #endif /* !... */
 #endif /* !__local___localdep_fgetc16_defined */
-/* Dependency: ungetc16 from parts.uchar.stdio */
 #ifndef __local___localdep_ungetc16_defined
 #define __local___localdep_ungetc16_defined 1
 #if defined(__CRT_HAVE_ungetwc_unlocked) && defined(__USE_STDIO_UNLOCKED) && __SIZEOF_WCHAR_T__ == 2 && defined(__LIBCCALL_IS_LIBDCALL)

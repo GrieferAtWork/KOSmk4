@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x37a1a528 */
+/* HASH CRC-32:0x6c9b56ad */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -24,7 +24,6 @@
 #ifdef __CRT_HAVE_setitimer
 #include <bits/os/itimerval.h>
 __NAMESPACE_LOCAL_BEGIN
-/* Dependency: setitimer32 from sys.time */
 #ifndef __local___localdep_setitimer32_defined
 #define __local___localdep_setitimer32_defined 1
 __CREDIRECT(__ATTR_NONNULL((2)),int,__NOTHROW_NCX,__localdep_setitimer32,(int __which, struct __itimerval32 const *__restrict __newval, struct __itimerval32 *__restrict __oldval),setitimer,(__which,__newval,__oldval))

@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x357a3caf */
+/* HASH CRC-32:0x5986bff0 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -23,7 +23,6 @@
 #include <__crt.h>
 #include <hybrid/typecore.h>
 __NAMESPACE_LOCAL_BEGIN
-/* Dependency: memcasecmp from string */
 #ifndef __local___localdep_memcasecmp_defined
 #define __local___localdep_memcasecmp_defined 1
 #ifdef __CRT_HAVE_memcasecmp
@@ -39,7 +38,6 @@ __NAMESPACE_LOCAL_BEGIN
 #define __localdep_memcasecmp __LIBC_LOCAL_NAME(memcasecmp)
 #endif /* !... */
 #endif /* !__local___localdep_memcasecmp_defined */
-/* Dependency: tolower from ctype */
 #ifndef __local___localdep_tolower_defined
 #define __local___localdep_tolower_defined 1
 #if __has_builtin(__builtin_tolower) && defined(__LIBC_BIND_CRTBUILTINS) && defined(__CRT_HAVE_tolower)
@@ -58,14 +56,6 @@ __NAMESPACE_LOCAL_BEGIN
 __NAMESPACE_LOCAL_END
 #include <features.h>
 __NAMESPACE_LOCAL_BEGIN
-/* Return the address of a sub-string `needle...+=needlelen' stored within `haystack...+=haystacklen'
- * During comparisons, casing of character is ignored (s.a. `memmem()')
- * If no such sub-string exists, return `NULL' instead.
- * #ifdef _MEMMEM_EMPTY_NEEDLE_NULL_SOURCE
- * When `needlelen' is ZERO(0), also return `NULL' unconditionally.
- * #else // _MEMMEM_EMPTY_NEEDLE_NULL_SOURCE
- * When `needlelen' is ZERO(0), re-return `haystack + haystacklen' unconditionally.
- * #endif // !_MEMMEM_EMPTY_NEEDLE_NULL_SOURCE */
 __LOCAL_LIBC(memcasemem) __ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1, 3)) void *
 __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(memcasemem))(void const *__haystack, __SIZE_TYPE__ __haystacklen, void const *__needle, __SIZE_TYPE__ __needlelen) {
 	__BYTE_TYPE__ *__candidate, __marker;

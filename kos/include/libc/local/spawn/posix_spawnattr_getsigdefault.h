@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xf897b7b1 */
+/* HASH CRC-32:0x473db7c8 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -26,31 +26,20 @@
 #include <bits/crt/posix_spawn.h>
 #include <bits/os/sigset.h>
 __NAMESPACE_LOCAL_BEGIN
-/* Dependency: memcpy from string */
 #ifndef __local___localdep_memcpy_defined
 #define __local___localdep_memcpy_defined 1
 #ifdef __CRT_HAVE_memcpy
 __NAMESPACE_LOCAL_END
 #include <hybrid/typecore.h>
 __NAMESPACE_LOCAL_BEGIN
-/* >> memcpy(3)
- * Copy memory between non-overlapping memory blocks.
- * @return: * : Always re-returns `dst' */
 __CREDIRECT(__ATTR_LEAF __ATTR_RETNONNULL __ATTR_NONNULL((1, 2)),void *,__NOTHROW_NCX,__localdep_memcpy,(void *__restrict __dst, void const *__restrict __src, __SIZE_TYPE__ __n_bytes),memcpy,(__dst,__src,__n_bytes))
 #else /* __CRT_HAVE_memcpy */
 __NAMESPACE_LOCAL_END
 #include <libc/local/string/memcpy.h>
 __NAMESPACE_LOCAL_BEGIN
-/* >> memcpy(3)
- * Copy memory between non-overlapping memory blocks.
- * @return: * : Always re-returns `dst' */
 #define __localdep_memcpy __LIBC_LOCAL_NAME(memcpy)
 #endif /* !__CRT_HAVE_memcpy */
 #endif /* !__local___localdep_memcpy_defined */
-/* >> posix_spawnattr_getsigdefault(3)
- * Get the set of signal handler that are reset of `SIG_DFL' by
- * the child process when `POSIX_SPAWN_SETSIGDEF' is set.
- * @return: 0 : Success */
 __LOCAL_LIBC(posix_spawnattr_getsigdefault) __ATTR_NONNULL((1, 2)) __errno_t
 __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(posix_spawnattr_getsigdefault))(struct __posix_spawnattr const *__restrict __attr, struct __sigset_struct *__restrict __sigdefault) {
 	__localdep_memcpy(__sigdefault, &__attr->__sd, sizeof(struct __sigset_struct));

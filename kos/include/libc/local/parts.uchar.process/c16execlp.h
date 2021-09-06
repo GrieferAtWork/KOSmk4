@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xc2903a91 */
+/* HASH CRC-32:0x1f9abc99 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -23,7 +23,6 @@
 #include <__crt.h>
 #if (defined(__CRT_HAVE_wexecvp) && __SIZEOF_WCHAR_T__ == 2 && defined(__LIBCCALL_IS_LIBDCALL)) || defined(__CRT_HAVE_DOS$wexecvp) || (defined(__CRT_HAVE__wexecvp) && __SIZEOF_WCHAR_T__ == 2 && defined(__LIBCCALL_IS_LIBDCALL)) || defined(__CRT_HAVE_DOS$_wexecvp)
 __NAMESPACE_LOCAL_BEGIN
-/* Dependency: c16execvp from parts.uchar.process */
 #ifndef __local___localdep_c16execvp_defined
 #define __local___localdep_c16execvp_defined 1
 #if defined(__CRT_HAVE_wexecvp) && __SIZEOF_WCHAR_T__ == 2 && defined(__LIBCCALL_IS_LIBDCALL)

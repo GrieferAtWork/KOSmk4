@@ -71,14 +71,14 @@ typedef __SSIZE_TYPE__ ssize_t;
 
 @@>> getrandom(2)
 @@Ask the kernel for up to `num_bytes' bytes of random
-@@data, which should then be written to `buf'.
+@@data,   which  should  then  be  written  to  `buf'.
 @@@param: flags: Set of `GRND_NONBLOCK | GRND_RANDOM'
 @@@return: * :   The actual number of returned random bytes.
 @@               If `GRND_NONBLOCK' was passed, or if the calling thread
-@@               was interrupted, this may be less than `num_bytes'
-@@@return: -1:   Error (s.a. `errno') Note that in the event of the
+@@               was  interrupted,  this  may be  less  than `num_bytes'
+@@@return: -1:   Error (s.a. `errno')  Note that in  the event of  the
 @@               calling thread being interrupted, `EINTR' is only set
-@@               if no random data had already been retrieved from
+@@               if no  random data  had already  been retrieved  from
 @@               the kernel's random data sink.
 [[wunused, decl_include("<hybrid/typecore.h>")]]
 ssize_t getrandom([[outp(num_bytes)]] void *buf,
@@ -86,15 +86,15 @@ ssize_t getrandom([[outp(num_bytes)]] void *buf,
 
 
 @@>> getentropy(3)
-@@Similar to `getrandom(buf, num_bytes, GRND_RANDOM)', however
-@@the case where the calling thread is interrupted, causing
-@@less than `num_bytes' of data to be read is handled by reading
-@@more random data until all of `num_bytes' have been read.
-@@Note that portable applications should be aware that certain
+@@Similar   to   `getrandom(buf, num_bytes, GRND_RANDOM)',  however
+@@the  case  where  the  calling  thread  is  interrupted,  causing
+@@less  than `num_bytes' of  data to be read  is handled by reading
+@@more  random  data  until  all  of  `num_bytes'  have  been read.
+@@Note that  portable applications  should  be aware  that  certain
 @@implementations of this function disallow calls where `num_bytes'
 @@is larger than `256'
 @@Also note that any error other than `EFAULT'
-@@and `ENOSYS' may be translated into `EIO'
+@@and `ENOSYS'  may be  translated into  `EIO'
 @@@return:  0: Success
 @@@return: -1: Error (see `errno')
 [[decl_include("<hybrid/typecore.h>")]]

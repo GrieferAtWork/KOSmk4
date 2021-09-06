@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x3252bc80 */
+/* HASH CRC-32:0x54811d31 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -24,89 +24,63 @@
 #include <asm/os/fcntl.h>
 #if defined(__CRT_HAVE_unlink) || defined(__CRT_HAVE__unlink) || (defined(__AT_FDCWD) && defined(__CRT_HAVE_unlinkat))
 __NAMESPACE_LOCAL_BEGIN
-/* Dependency: memcpy from string */
 #ifndef __local___localdep_memcpy_defined
 #define __local___localdep_memcpy_defined 1
 #ifdef __CRT_HAVE_memcpy
 __NAMESPACE_LOCAL_END
 #include <hybrid/typecore.h>
 __NAMESPACE_LOCAL_BEGIN
-/* >> memcpy(3)
- * Copy memory between non-overlapping memory blocks.
- * @return: * : Always re-returns `dst' */
 __CREDIRECT(__ATTR_LEAF __ATTR_RETNONNULL __ATTR_NONNULL((1, 2)),void *,__NOTHROW_NCX,__localdep_memcpy,(void *__restrict __dst, void const *__restrict __src, __SIZE_TYPE__ __n_bytes),memcpy,(__dst,__src,__n_bytes))
 #else /* __CRT_HAVE_memcpy */
 __NAMESPACE_LOCAL_END
 #include <libc/local/string/memcpy.h>
 __NAMESPACE_LOCAL_BEGIN
-/* >> memcpy(3)
- * Copy memory between non-overlapping memory blocks.
- * @return: * : Always re-returns `dst' */
 #define __localdep_memcpy __LIBC_LOCAL_NAME(memcpy)
 #endif /* !__CRT_HAVE_memcpy */
 #endif /* !__local___localdep_memcpy_defined */
-/* Dependency: mempcpy from string */
 #ifndef __local___localdep_mempcpy_defined
 #define __local___localdep_mempcpy_defined 1
 #ifdef __CRT_HAVE_mempcpy
 __NAMESPACE_LOCAL_END
 #include <hybrid/typecore.h>
 __NAMESPACE_LOCAL_BEGIN
-/* >> mempcpy(3)
- * Same as `memcpy', but return `dst + n_bytes', rather than `dst' */
 __CREDIRECT(__ATTR_LEAF __ATTR_RETNONNULL __ATTR_NONNULL((1, 2)),void *,__NOTHROW_NCX,__localdep_mempcpy,(void *__restrict __dst, void const *__restrict __src, __SIZE_TYPE__ __n_bytes),mempcpy,(__dst,__src,__n_bytes))
 #elif defined(__CRT_HAVE___mempcpy)
 __NAMESPACE_LOCAL_END
 #include <hybrid/typecore.h>
 __NAMESPACE_LOCAL_BEGIN
-/* >> mempcpy(3)
- * Same as `memcpy', but return `dst + n_bytes', rather than `dst' */
 __CREDIRECT(__ATTR_LEAF __ATTR_RETNONNULL __ATTR_NONNULL((1, 2)),void *,__NOTHROW_NCX,__localdep_mempcpy,(void *__restrict __dst, void const *__restrict __src, __SIZE_TYPE__ __n_bytes),__mempcpy,(__dst,__src,__n_bytes))
 #else /* ... */
 __NAMESPACE_LOCAL_END
 #include <libc/local/string/mempcpy.h>
 __NAMESPACE_LOCAL_BEGIN
-/* >> mempcpy(3)
- * Same as `memcpy', but return `dst + n_bytes', rather than `dst' */
 #define __localdep_mempcpy __LIBC_LOCAL_NAME(mempcpy)
 #endif /* !... */
 #endif /* !__local___localdep_mempcpy_defined */
-/* Dependency: strlen from string */
 #ifndef __local___localdep_strlen_defined
 #define __local___localdep_strlen_defined 1
 #ifdef __CRT_HAVE_strlen
 __NAMESPACE_LOCAL_END
 #include <hybrid/typecore.h>
 __NAMESPACE_LOCAL_BEGIN
-/* >> strlen(3)
- * Return the length of the string in characters (Same as `rawmemlen[...](str, '\0')') */
 __CREDIRECT(__ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1)),__SIZE_TYPE__,__NOTHROW_NCX,__localdep_strlen,(char const *__restrict __str),strlen,(__str))
 #else /* __CRT_HAVE_strlen */
 __NAMESPACE_LOCAL_END
 #include <libc/local/string/strlen.h>
 __NAMESPACE_LOCAL_BEGIN
-/* >> strlen(3)
- * Return the length of the string in characters (Same as `rawmemlen[...](str, '\0')') */
 #define __localdep_strlen __LIBC_LOCAL_NAME(strlen)
 #endif /* !__CRT_HAVE_strlen */
 #endif /* !__local___localdep_strlen_defined */
-/* Dependency: unlink from unistd */
 #ifndef __local___localdep_unlink_defined
 #define __local___localdep_unlink_defined 1
 #ifdef __CRT_HAVE_unlink
-/* >> unlink(2)
- * Remove a file, symbolic link, device or FIFO referred to by `file' */
 __CREDIRECT(__ATTR_NONNULL((1)),int,__NOTHROW_RPC,__localdep_unlink,(char const *__file),unlink,(__file))
 #elif defined(__CRT_HAVE__unlink)
-/* >> unlink(2)
- * Remove a file, symbolic link, device or FIFO referred to by `file' */
 __CREDIRECT(__ATTR_NONNULL((1)),int,__NOTHROW_RPC,__localdep_unlink,(char const *__file),_unlink,(__file))
 #elif defined(__AT_FDCWD) && defined(__CRT_HAVE_unlinkat)
 __NAMESPACE_LOCAL_END
 #include <libc/local/unistd/unlink.h>
 __NAMESPACE_LOCAL_BEGIN
-/* >> unlink(2)
- * Remove a file, symbolic link, device or FIFO referred to by `file' */
 #define __localdep_unlink __LIBC_LOCAL_NAME(unlink)
 #else /* ... */
 #undef __local___localdep_unlink_defined

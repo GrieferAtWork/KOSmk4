@@ -154,8 +154,8 @@ typedef size_t mpart_reladdr_t;
 //	MNODE_INIT_mn_minaddr(FILL_ME),
 //	MNODE_INIT_mn_maxaddr(FILL_ME - 1),
 //	MNODE_INIT_mn_flags(MNODE_F_PWRITE | MNODE_F_PREAD |
-//	                    MNODE_F_SHARED | MNODE_F_NOSPLIT |
-//	                    MNODE_F_NOMERGE | MNODE_F_KERNPART |
+//	                    MNODE_F_SHARED    |    MNODE_F_NOSPLIT    |
+//	                    MNODE_F_NOMERGE   |   MNODE_F_KERNPART    |
 //	                    _MNODE_F_MPREPARED_KERNEL | MNODE_F_MLOCK),
 //	MNODE_INIT_mn_part(FILL_ME),
 //	MNODE_INIT_mn_fspath(NULL),

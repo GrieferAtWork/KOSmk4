@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x11d9d86e */
+/* HASH CRC-32:0x894d397d */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -24,7 +24,6 @@
 #if defined(__CRT_HAVE_umask) || defined(__CRT_HAVE__umask)
 #include <bits/types.h>
 __NAMESPACE_LOCAL_BEGIN
-/* Dependency: umask from sys.stat */
 #ifndef __local___localdep_umask_defined
 #define __local___localdep_umask_defined 1
 #ifdef __CRT_HAVE_umask
@@ -35,8 +34,6 @@ __CREDIRECT(,__mode_t,__NOTHROW_NCX,__localdep_umask,(__mode_t __mode),_umask,(_
 #undef __local___localdep_umask_defined
 #endif /* !... */
 #endif /* !__local___localdep_umask_defined */
-/* Return the current umask.
- * WARNING: This function isn't thread-safe */
 __LOCAL_LIBC(getumask) __mode_t
 __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(getumask))(void) {
 	__mode_t __result;

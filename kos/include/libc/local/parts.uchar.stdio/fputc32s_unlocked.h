@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x92c63f39 */
+/* HASH CRC-32:0xaa6db5cc */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -26,65 +26,43 @@
 #include <hybrid/typecore.h>
 #include <kos/anno.h>
 __NAMESPACE_LOCAL_BEGIN
-/* Dependency: c32slen from parts.uchar.string */
 #ifndef __local___localdep_c32slen_defined
 #define __local___localdep_c32slen_defined 1
 #if defined(__CRT_HAVE_wcslen) && __SIZEOF_WCHAR_T__ == 4 && defined(__LIBCCALL_IS_LIBKCALL)
-/* >> strlen(3)
- * Return the length of the string in characters (Same as `rawmemlen[...](str, '\0')') */
 __CREDIRECT(__ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1)),__SIZE_TYPE__,__NOTHROW_NCX,__localdep_c32slen,(__CHAR32_TYPE__ const *__restrict __str),wcslen,(__str))
 #elif defined(__CRT_HAVE_KOS$wcslen)
-/* >> strlen(3)
- * Return the length of the string in characters (Same as `rawmemlen[...](str, '\0')') */
 __CREDIRECT_KOS(__ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1)),__SIZE_TYPE__,__NOTHROW_NCX,__localdep_c32slen,(__CHAR32_TYPE__ const *__restrict __str),wcslen,(__str))
 #elif __SIZEOF_WCHAR_T__ == 4
 __NAMESPACE_LOCAL_END
 #include <libc/local/wchar/wcslen.h>
 __NAMESPACE_LOCAL_BEGIN
-/* >> strlen(3)
- * Return the length of the string in characters (Same as `rawmemlen[...](str, '\0')') */
 #define __localdep_c32slen (*(__SIZE_TYPE__(__LIBKCALL *)(__CHAR32_TYPE__ const *__restrict))&__LIBC_LOCAL_NAME(wcslen))
 #else /* ... */
 __NAMESPACE_LOCAL_END
 #include <libc/local/parts.uchar.string/c32slen.h>
 __NAMESPACE_LOCAL_BEGIN
-/* >> strlen(3)
- * Return the length of the string in characters (Same as `rawmemlen[...](str, '\0')') */
 #define __localdep_c32slen __LIBC_LOCAL_NAME(c32slen)
 #endif /* !... */
 #endif /* !__local___localdep_c32slen_defined */
-/* Dependency: file_c32printer_unlocked from parts.uchar.stdio */
 #ifndef __local___localdep_file_c32printer_unlocked_defined
 #define __local___localdep_file_c32printer_unlocked_defined 1
 #if defined(__CRT_HAVE_file_wprinter_unlocked) && __SIZEOF_WCHAR_T__ == 4 && defined(__LIBCCALL_IS_LIBKCALL)
-/* >> file_wprinter_unlocked(3)
- * Same as `file_wprinter()', but performs I/O without acquiring a lock to `(FILE *)arg' */
 __CREDIRECT(__ATTR_NONNULL((1, 2)),__SSIZE_TYPE__,__THROWING,__localdep_file_c32printer_unlocked,(void *__arg, __CHAR32_TYPE__ const *__restrict __data, __SIZE_TYPE__ __datalen),file_wprinter_unlocked,(__arg,__data,__datalen))
 #elif defined(__CRT_HAVE_KOS$file_wprinter_unlocked)
-/* >> file_wprinter_unlocked(3)
- * Same as `file_wprinter()', but performs I/O without acquiring a lock to `(FILE *)arg' */
 __CREDIRECT_KOS(__ATTR_NONNULL((1, 2)),__SSIZE_TYPE__,__THROWING,__localdep_file_c32printer_unlocked,(void *__arg, __CHAR32_TYPE__ const *__restrict __data, __SIZE_TYPE__ __datalen),file_wprinter_unlocked,(__arg,__data,__datalen))
 #elif defined(__CRT_HAVE_file_wprinter) && __SIZEOF_WCHAR_T__ == 4 && defined(__LIBCCALL_IS_LIBKCALL)
-/* >> file_wprinter_unlocked(3)
- * Same as `file_wprinter()', but performs I/O without acquiring a lock to `(FILE *)arg' */
 __CREDIRECT(__ATTR_NONNULL((1, 2)),__SSIZE_TYPE__,__THROWING,__localdep_file_c32printer_unlocked,(void *__arg, __CHAR32_TYPE__ const *__restrict __data, __SIZE_TYPE__ __datalen),file_wprinter,(__arg,__data,__datalen))
 #elif defined(__CRT_HAVE_KOS$file_wprinter)
-/* >> file_wprinter_unlocked(3)
- * Same as `file_wprinter()', but performs I/O without acquiring a lock to `(FILE *)arg' */
 __CREDIRECT_KOS(__ATTR_NONNULL((1, 2)),__SSIZE_TYPE__,__THROWING,__localdep_file_c32printer_unlocked,(void *__arg, __CHAR32_TYPE__ const *__restrict __data, __SIZE_TYPE__ __datalen),file_wprinter,(__arg,__data,__datalen))
 #elif (defined(__CRT_HAVE_fputwc_unlocked) || defined(__CRT_HAVE__fputwc_nolock)) && __SIZEOF_WCHAR_T__ == 4
 __NAMESPACE_LOCAL_END
 #include <libc/local/wchar/file_wprinter_unlocked.h>
 __NAMESPACE_LOCAL_BEGIN
-/* >> file_wprinter_unlocked(3)
- * Same as `file_wprinter()', but performs I/O without acquiring a lock to `(FILE *)arg' */
 #define __localdep_file_c32printer_unlocked (*(__SSIZE_TYPE__(__LIBKCALL *)(void *, __CHAR32_TYPE__ const *__restrict, __SIZE_TYPE__))&__LIBC_LOCAL_NAME(file_wprinter_unlocked))
 #elif (defined(__CRT_HAVE_fputwc_unlocked) && __SIZEOF_WCHAR_T__ == 4 && defined(__LIBCCALL_IS_LIBKCALL)) || defined(__CRT_HAVE_KOS$fputwc_unlocked) || (defined(__CRT_HAVE__fputwc_nolock) && __SIZEOF_WCHAR_T__ == 4 && defined(__LIBCCALL_IS_LIBKCALL)) || defined(__CRT_HAVE_KOS$_fputwc_nolock)
 __NAMESPACE_LOCAL_END
 #include <libc/local/parts.uchar.stdio/file_c32printer_unlocked.h>
 __NAMESPACE_LOCAL_BEGIN
-/* >> file_wprinter_unlocked(3)
- * Same as `file_wprinter()', but performs I/O without acquiring a lock to `(FILE *)arg' */
 #define __localdep_file_c32printer_unlocked __LIBC_LOCAL_NAME(file_c32printer_unlocked)
 #else /* ... */
 #undef __local___localdep_file_c32printer_unlocked_defined

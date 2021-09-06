@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x243be93a */
+/* HASH CRC-32:0xa32c5d3f */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -24,27 +24,18 @@
 #ifdef __CRT_HAVE_pthread_cond_signal
 #include <bits/crt/threads.h>
 __NAMESPACE_LOCAL_BEGIN
-/* Dependency: pthread_cond_signal from pthread */
 #ifndef __local___localdep_pthread_cond_signal_defined
 #define __local___localdep_pthread_cond_signal_defined 1
 __NAMESPACE_LOCAL_END
 #include <bits/types.h>
 #include <bits/crt/pthreadtypes.h>
 __NAMESPACE_LOCAL_BEGIN
-/* >> pthread_cond_signal(3)
- * Wake up one thread waiting for condition variable `cond'
- * @return: EOK: Success */
 __CREDIRECT(__ATTR_NONNULL((1)),__errno_t,__NOTHROW_NCX,__localdep_pthread_cond_signal,(__pthread_cond_t *__cond),pthread_cond_signal,(__cond))
 #endif /* !__local___localdep_pthread_cond_signal_defined */
 __NAMESPACE_LOCAL_END
 #include <asm/crt/threads.h>
 #include <bits/crt/pthreadtypes.h>
 __NAMESPACE_LOCAL_BEGIN
-/* >> cnd_signal(3)
- * Wakeup one thread currently waiting on the given
- * condition variable (s.a. `pthread_cond_signal(3)')
- * @return: thrd_success: Success
- * @return: thrd_error:   Error */
 __LOCAL_LIBC(cnd_signal) __ATTR_NONNULL((1)) int
 __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(cnd_signal))(__cnd_t *__restrict __cond) {
 	__errno_t __error;

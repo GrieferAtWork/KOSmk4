@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xeb464dd */
+/* HASH CRC-32:0x920572f1 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -32,26 +32,26 @@ DECL_BEGIN
 #if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
 /* >> getrandom(2)
  * Ask the kernel for up to `num_bytes' bytes of random
- * data, which should then be written to `buf'.
+ * data,   which  should  then  be  written  to  `buf'.
  * @param: flags: Set of `GRND_NONBLOCK | GRND_RANDOM'
  * @return: * :   The actual number of returned random bytes.
  *                If `GRND_NONBLOCK' was passed, or if the calling thread
- *                was interrupted, this may be less than `num_bytes'
- * @return: -1:   Error (s.a. `errno') Note that in the event of the
+ *                was  interrupted,  this  may be  less  than `num_bytes'
+ * @return: -1:   Error (s.a. `errno')  Note that in  the event of  the
  *                calling thread being interrupted, `EINTR' is only set
- *                if no random data had already been retrieved from
+ *                if no  random data  had already  been retrieved  from
  *                the kernel's random data sink. */
 INTDEF WUNUSED NONNULL((1)) ssize_t NOTHROW_NCX(LIBDCALL libd_getrandom)(void *buf, size_t num_bytes, unsigned int flags);
 /* >> getentropy(3)
- * Similar to `getrandom(buf, num_bytes, GRND_RANDOM)', however
- * the case where the calling thread is interrupted, causing
- * less than `num_bytes' of data to be read is handled by reading
- * more random data until all of `num_bytes' have been read.
- * Note that portable applications should be aware that certain
+ * Similar   to   `getrandom(buf, num_bytes, GRND_RANDOM)',  however
+ * the  case  where  the  calling  thread  is  interrupted,  causing
+ * less  than `num_bytes' of  data to be read  is handled by reading
+ * more  random  data  until  all  of  `num_bytes'  have  been read.
+ * Note that  portable applications  should  be aware  that  certain
  * implementations of this function disallow calls where `num_bytes'
  * is larger than `256'
  * Also note that any error other than `EFAULT'
- * and `ENOSYS' may be translated into `EIO'
+ * and `ENOSYS'  may be  translated into  `EIO'
  * @return:  0: Success
  * @return: -1: Error (see `errno') */
 INTDEF WUNUSED NONNULL((1)) int NOTHROW_NCX(LIBDCALL libd_getentropy)(void *buf, size_t num_bytes);

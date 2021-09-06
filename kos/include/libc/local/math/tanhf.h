@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x17f97a6a */
+/* HASH CRC-32:0x9b47a7cd */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -23,23 +23,18 @@
 #include <__crt.h>
 #if defined(__CRT_HAVE_tanh) || defined(__CRT_HAVE___tanh)
 __NAMESPACE_LOCAL_BEGIN
-/* Dependency: tanh from math */
 #ifndef __local___localdep_tanh_defined
 #define __local___localdep_tanh_defined 1
 #if __has_builtin(__builtin_tanh) && defined(__LIBC_BIND_CRTBUILTINS) && defined(__CRT_HAVE_tanh)
-/* Hyperbolic tangent of `x' */
 __CEIREDIRECT(__ATTR_WUNUSED,double,__NOTHROW,__localdep_tanh,(double __x),tanh,{ return __builtin_tanh(__x); })
 #elif defined(__CRT_HAVE_tanh)
-/* Hyperbolic tangent of `x' */
 __CREDIRECT(__ATTR_WUNUSED,double,__NOTHROW,__localdep_tanh,(double __x),tanh,(__x))
 #elif defined(__CRT_HAVE___tanh)
-/* Hyperbolic tangent of `x' */
 __CREDIRECT(__ATTR_WUNUSED,double,__NOTHROW,__localdep_tanh,(double __x),__tanh,(__x))
 #else /* ... */
 #undef __local___localdep_tanh_defined
 #endif /* !... */
 #endif /* !__local___localdep_tanh_defined */
-/* Hyperbolic tangent of `x' */
 __LOCAL_LIBC(tanhf) __ATTR_WUNUSED float
 __NOTHROW(__LIBCCALL __LIBC_LOCAL_NAME(tanhf))(float __x) {
 	return (float)__localdep_tanh((double)__x);

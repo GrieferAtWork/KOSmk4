@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x93e790fe */
+/* HASH CRC-32:0xba3925e8 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -25,12 +25,10 @@
 #include <bits/types.h>
 #include <kos/anno.h>
 __NAMESPACE_LOCAL_BEGIN
-/* Dependency: OpenAt32 from kos.fcntl */
 #if !defined(__local___localdep_OpenAt32_defined) && defined(__CRT_HAVE_OpenAt)
 #define __local___localdep_OpenAt32_defined 1
 __CVREDIRECT(__ATTR_WUNUSED __ATTR_NONNULL((2)),__fd_t,__THROWING,__localdep_OpenAt32,(__fd_t __dirfd, char const *__filename, __oflag_t __oflags),OpenAt,(__dirfd,__filename,__oflags),__oflags,1,(__mode_t))
 #endif /* !__local___localdep_OpenAt32_defined && __CRT_HAVE_OpenAt */
-/* Dependency: OpenAt64 from kos.fcntl */
 #ifndef __local___localdep_OpenAt64_defined
 #define __local___localdep_OpenAt64_defined 1
 #ifdef __CRT_HAVE_OpenAt64

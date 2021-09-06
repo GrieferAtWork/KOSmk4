@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xb7457b8d */
+/* HASH CRC-32:0x961de74e */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -24,11 +24,6 @@
 #include <kos/bits/rtm.h>
 #ifdef __arch_rtm_abort
 __NAMESPACE_LOCAL_BEGIN
-/* >> rtm_abort(2)
- * Abort the current transaction by having `rtm_begin()' return with
- * `RTM_ABORT_EXPLICIT | ((code << RTM_ABORT_CODE_S) & RTM_ABORT_CODE_M)'
- * If no transaction was in progress, behave as a no-op. Otherwise, this
- * function does not return normally, but returns from the original `rtm_begin()' */
 __LOCAL_LIBC(rtm_abort) void
 __NOTHROW(__FCALL __LIBC_LOCAL_NAME(rtm_abort))(unsigned int __code) {
 	__arch_rtm_abort(__code);

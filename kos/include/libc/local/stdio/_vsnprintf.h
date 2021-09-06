@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xe43946d0 */
+/* HASH CRC-32:0xaec1a1ec */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -24,39 +24,21 @@
 #include <features.h>
 #include <hybrid/typecore.h>
 __NAMESPACE_LOCAL_BEGIN
-/* Dependency: vsnprintf from stdio */
 #ifndef __local___localdep_vsnprintf_defined
 #define __local___localdep_vsnprintf_defined 1
 #if __has_builtin(__builtin_vsnprintf) && defined(__LIBC_BIND_CRTBUILTINS) && defined(__CRT_HAVE_vsnprintf)
-/* >> snprintf(3), vsnprintf(3)
- * Print a formatted string to a given in-member string buffer `buf'
- * Always return the REQUIRED buffer size (excluding a trailing NUL-
- * character), and never write more than `buflen' characters to `buf' */
 __CEIREDIRECT(__ATTR_LIBC_PRINTF(3, 0) __ATTR_NONNULL((3)),__STDC_INT_AS_SIZE_T,__NOTHROW_NCX,__localdep_vsnprintf,(char *__restrict __buf, __SIZE_TYPE__ __buflen, char const *__restrict __format, __builtin_va_list __args),vsnprintf,{ return __builtin_vsnprintf(__buf, __buflen, __format, __args); })
 #elif defined(__CRT_HAVE_vsnprintf)
-/* >> snprintf(3), vsnprintf(3)
- * Print a formatted string to a given in-member string buffer `buf'
- * Always return the REQUIRED buffer size (excluding a trailing NUL-
- * character), and never write more than `buflen' characters to `buf' */
 __CREDIRECT(__ATTR_LIBC_PRINTF(3, 0) __ATTR_NONNULL((3)),__STDC_INT_AS_SIZE_T,__NOTHROW_NCX,__localdep_vsnprintf,(char *__restrict __buf, __SIZE_TYPE__ __buflen, char const *__restrict __format, __builtin_va_list __args),vsnprintf,(__buf,__buflen,__format,__args))
 #elif defined(__CRT_HAVE___vsnprintf)
-/* >> snprintf(3), vsnprintf(3)
- * Print a formatted string to a given in-member string buffer `buf'
- * Always return the REQUIRED buffer size (excluding a trailing NUL-
- * character), and never write more than `buflen' characters to `buf' */
 __CREDIRECT(__ATTR_LIBC_PRINTF(3, 0) __ATTR_NONNULL((3)),__STDC_INT_AS_SIZE_T,__NOTHROW_NCX,__localdep_vsnprintf,(char *__restrict __buf, __SIZE_TYPE__ __buflen, char const *__restrict __format, __builtin_va_list __args),__vsnprintf,(__buf,__buflen,__format,__args))
 #else /* ... */
 __NAMESPACE_LOCAL_END
 #include <libc/local/stdio/vsnprintf.h>
 __NAMESPACE_LOCAL_BEGIN
-/* >> snprintf(3), vsnprintf(3)
- * Print a formatted string to a given in-member string buffer `buf'
- * Always return the REQUIRED buffer size (excluding a trailing NUL-
- * character), and never write more than `buflen' characters to `buf' */
 #define __localdep_vsnprintf __LIBC_LOCAL_NAME(vsnprintf)
 #endif /* !... */
 #endif /* !__local___localdep_vsnprintf_defined */
-/* WARNING: This function returns the number of written character. - Not the required buffer size! */
 __LOCAL_LIBC(_vsnprintf) __ATTR_LIBC_PRINTF(3, 0) __ATTR_NONNULL((3)) __STDC_INT_AS_SIZE_T
 __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(_vsnprintf))(char *__restrict __buf, __SIZE_TYPE__ __bufsize, char const *__restrict __format, __builtin_va_list __args) {
 	__STDC_INT_AS_SIZE_T __result;

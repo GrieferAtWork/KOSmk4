@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xf86fb279 */
+/* HASH CRC-32:0xdd74ae7e */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -23,47 +23,25 @@
 #include <__crt.h>
 #include <features.h>
 __NAMESPACE_LOCAL_BEGIN
-/* Dependency: vsscanf from stdio */
 #ifndef __local___localdep_vsscanf_defined
 #define __local___localdep_vsscanf_defined 1
 #if __has_builtin(__builtin_vsscanf) && defined(__LIBC_BIND_CRTBUILTINS) && defined(__CRT_HAVE_vsscanf)
-/* >> sscanf(3), vsscanf(3)
- * Scan data from a given `input' string, following `format'
- * Return the number of successfully scanned data items */
 __CEIREDIRECT(__ATTR_WUNUSED __ATTR_LIBC_SCANF(2, 0) __ATTR_NONNULL((1, 2)),__STDC_INT_AS_SIZE_T,__NOTHROW_NCX,__localdep_vsscanf,(char const *__restrict __input, char const *__restrict __format, __builtin_va_list __args),vsscanf,{ return __builtin_vsscanf(__input, __format, __args); })
 #elif defined(__CRT_HAVE_vsscanf)
-/* >> sscanf(3), vsscanf(3)
- * Scan data from a given `input' string, following `format'
- * Return the number of successfully scanned data items */
 __CREDIRECT(__ATTR_WUNUSED __ATTR_LIBC_SCANF(2, 0) __ATTR_NONNULL((1, 2)),__STDC_INT_AS_SIZE_T,__NOTHROW_NCX,__localdep_vsscanf,(char const *__restrict __input, char const *__restrict __format, __builtin_va_list __args),vsscanf,(__input,__format,__args))
 #elif defined(__CRT_HAVE__vsscanf)
-/* >> sscanf(3), vsscanf(3)
- * Scan data from a given `input' string, following `format'
- * Return the number of successfully scanned data items */
 __CREDIRECT(__ATTR_WUNUSED __ATTR_LIBC_SCANF(2, 0) __ATTR_NONNULL((1, 2)),__STDC_INT_AS_SIZE_T,__NOTHROW_NCX,__localdep_vsscanf,(char const *__restrict __input, char const *__restrict __format, __builtin_va_list __args),_vsscanf,(__input,__format,__args))
 #elif defined(__CRT_HAVE__vsscanf_s)
-/* >> sscanf(3), vsscanf(3)
- * Scan data from a given `input' string, following `format'
- * Return the number of successfully scanned data items */
 __CREDIRECT(__ATTR_WUNUSED __ATTR_LIBC_SCANF(2, 0) __ATTR_NONNULL((1, 2)),__STDC_INT_AS_SIZE_T,__NOTHROW_NCX,__localdep_vsscanf,(char const *__restrict __input, char const *__restrict __format, __builtin_va_list __args),_vsscanf_s,(__input,__format,__args))
 #elif defined(__CRT_HAVE___vsscanf)
-/* >> sscanf(3), vsscanf(3)
- * Scan data from a given `input' string, following `format'
- * Return the number of successfully scanned data items */
 __CREDIRECT(__ATTR_WUNUSED __ATTR_LIBC_SCANF(2, 0) __ATTR_NONNULL((1, 2)),__STDC_INT_AS_SIZE_T,__NOTHROW_NCX,__localdep_vsscanf,(char const *__restrict __input, char const *__restrict __format, __builtin_va_list __args),__vsscanf,(__input,__format,__args))
 #else /* ... */
 __NAMESPACE_LOCAL_END
 #include <libc/local/stdio/vsscanf.h>
 __NAMESPACE_LOCAL_BEGIN
-/* >> sscanf(3), vsscanf(3)
- * Scan data from a given `input' string, following `format'
- * Return the number of successfully scanned data items */
 #define __localdep_vsscanf __LIBC_LOCAL_NAME(vsscanf)
 #endif /* !... */
 #endif /* !__local___localdep_vsscanf_defined */
-/* >> sscanf(3), vsscanf(3)
- * Scan data from a given `input' string, following `format'
- * Return the number of successfully scanned data items */
 __LOCAL_LIBC(sscanf) __ATTR_LIBC_SCANF(2, 3) __ATTR_NONNULL((1, 2)) __STDC_INT_AS_SIZE_T
 __NOTHROW_NCX(__VLIBCCALL __LIBC_LOCAL_NAME(sscanf))(char const *__restrict __input, char const *__restrict __format, ...) {
 	__STDC_INT_AS_SIZE_T __result;

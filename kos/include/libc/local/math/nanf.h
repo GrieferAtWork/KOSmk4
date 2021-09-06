@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xd53308f1 */
+/* HASH CRC-32:0x3008453c */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -24,23 +24,18 @@
 #include <ieee754.h>
 #if defined(__IEEE754_DOUBLE_TYPE_IS_FLOAT__) || defined(__IEEE754_FLOAT_TYPE_IS_FLOAT__) || defined(__IEEE854_LONG_DOUBLE_TYPE_IS_FLOAT__) || defined(__CRT_HAVE_nan) || defined(__CRT_HAVE___nan) || defined(__IEEE754_DOUBLE_TYPE_IS_DOUBLE__) || defined(__IEEE754_FLOAT_TYPE_IS_DOUBLE__) || defined(__IEEE854_LONG_DOUBLE_TYPE_IS_DOUBLE__)
 __NAMESPACE_LOCAL_BEGIN
-/* Dependency: nan from math */
 #ifndef __local___localdep_nan_defined
 #define __local___localdep_nan_defined 1
 #if __has_builtin(__builtin_nan) && defined(__LIBC_BIND_CRTBUILTINS) && defined(__CRT_HAVE_nan)
-/* Return representation of qNaN for double type */
 __CEIREDIRECT(__ATTR_CONST __ATTR_WUNUSED,double,__NOTHROW,__localdep_nan,(char const *__tagb),nan,{ return __builtin_nan(__tagb); })
 #elif defined(__CRT_HAVE_nan)
-/* Return representation of qNaN for double type */
 __CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,double,__NOTHROW,__localdep_nan,(char const *__tagb),nan,(__tagb))
 #elif defined(__CRT_HAVE___nan)
-/* Return representation of qNaN for double type */
 __CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,double,__NOTHROW,__localdep_nan,(char const *__tagb),__nan,(__tagb))
 #elif defined(__IEEE754_DOUBLE_TYPE_IS_DOUBLE__) || defined(__IEEE754_FLOAT_TYPE_IS_DOUBLE__) || defined(__IEEE854_LONG_DOUBLE_TYPE_IS_DOUBLE__)
 __NAMESPACE_LOCAL_END
 #include <libc/local/math/nan.h>
 __NAMESPACE_LOCAL_BEGIN
-/* Return representation of qNaN for double type */
 #define __localdep_nan __LIBC_LOCAL_NAME(nan)
 #else /* ... */
 #undef __local___localdep_nan_defined
@@ -49,7 +44,6 @@ __NAMESPACE_LOCAL_BEGIN
 __NAMESPACE_LOCAL_END
 #include <libm/nan.h>
 __NAMESPACE_LOCAL_BEGIN
-/* Return representation of qNaN for double type */
 __LOCAL_LIBC(nanf) __ATTR_CONST __ATTR_WUNUSED float
 __NOTHROW(__LIBCCALL __LIBC_LOCAL_NAME(nanf))(char const *__tagb) {
 #if defined(__IEEE754_DOUBLE_TYPE_IS_FLOAT__) || defined(__IEEE754_FLOAT_TYPE_IS_FLOAT__) || defined(__IEEE854_LONG_DOUBLE_TYPE_IS_FLOAT__)

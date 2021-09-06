@@ -84,26 +84,26 @@ typedef __uintptr_t lfutex_t;
 //extern "C++" {
 //class futex_t;
 //__NAMESPACE_INT_BEGIN
-//class __LFutexOpEquals;
+//class    __LFutexOpEquals;
 //class __LFutexOpNotEquals;
-//class __LFutexOpAbove;
-//class __LFutexOpBelow;
+//class     __LFutexOpAbove;
+//class     __LFutexOpBelow;
 //class __LFutexOpAboveEqual;
 //class __LFutexOpBelowEqual;
-//class __LFutexOpBitmask;
+//class    __LFutexOpBitmask;
 //class __LFutexOpNotBitmask;
 //class __LFutexOpAnd;
 //__NAMESPACE_INT_END
 //
 //struct timespec;
 //
-//__FORCELOCAL int __NOTHROW_NCX(__LIBCCALL waitif)(__NAMESPACE_INT_SYM __LFutexOpEquals const &__expr, struct timespec const *timeout __DFL(__NULLPTR));
-//__FORCELOCAL int __NOTHROW_NCX(__LIBCCALL waitif)(__NAMESPACE_INT_SYM __LFutexOpNotEquals const &__expr, struct timespec const *timeout __DFL(__NULLPTR));
-//__FORCELOCAL int __NOTHROW_NCX(__LIBCCALL waitif)(__NAMESPACE_INT_SYM __LFutexOpAbove const &__expr, struct timespec const *timeout __DFL(__NULLPTR));
-//__FORCELOCAL int __NOTHROW_NCX(__LIBCCALL waitif)(__NAMESPACE_INT_SYM __LFutexOpBelow const &__expr, struct timespec const *timeout __DFL(__NULLPTR));
+//__FORCELOCAL  int __NOTHROW_NCX(__LIBCCALL  waitif)(__NAMESPACE_INT_SYM __LFutexOpEquals const  &__expr, struct timespec  const *timeout __DFL(__NULLPTR));
+//__FORCELOCAL int __NOTHROW_NCX(__LIBCCALL waitif)(__NAMESPACE_INT_SYM __LFutexOpNotEquals const &__expr, struct timespec const *timeout  __DFL(__NULLPTR));
+//__FORCELOCAL int __NOTHROW_NCX(__LIBCCALL  waitif)(__NAMESPACE_INT_SYM __LFutexOpAbove  const &__expr,  struct timespec  const *timeout  __DFL(__NULLPTR));
+//__FORCELOCAL int __NOTHROW_NCX(__LIBCCALL  waitif)(__NAMESPACE_INT_SYM __LFutexOpBelow  const &__expr,  struct timespec  const *timeout  __DFL(__NULLPTR));
 //__FORCELOCAL int __NOTHROW_NCX(__LIBCCALL waitif)(__NAMESPACE_INT_SYM __LFutexOpAboveEqual const &__expr, struct timespec const *timeout __DFL(__NULLPTR));
 //__FORCELOCAL int __NOTHROW_NCX(__LIBCCALL waitif)(__NAMESPACE_INT_SYM __LFutexOpBelowEqual const &__expr, struct timespec const *timeout __DFL(__NULLPTR));
-//__FORCELOCAL int __NOTHROW_NCX(__LIBCCALL waitif)(__NAMESPACE_INT_SYM __LFutexOpBitmask const &__expr, struct timespec const *timeout __DFL(__NULLPTR));
+//__FORCELOCAL  int __NOTHROW_NCX(__LIBCCALL waitif)(__NAMESPACE_INT_SYM  __LFutexOpBitmask const &__expr, struct  timespec const *timeout __DFL(__NULLPTR));
 //__FORCELOCAL int __NOTHROW_NCX(__LIBCCALL waitif)(__NAMESPACE_INT_SYM __LFutexOpNotBitmask const &__expr, struct timespec const *timeout __DFL(__NULLPTR));
 //__FORCELOCAL int __NOTHROW_NCX(__LIBCCALL waitif)(__NAMESPACE_INT_SYM __LFutexOpAnd const &__expr, struct timespec const *timeout __DFL(__NULLPTR));
 //
@@ -147,13 +147,13 @@ typedef __uintptr_t lfutex_t;
 //			return !((__m_futex op1 __m_val)op2 __m_val2);                         \
 //		}                                                                          \
 //	}
-//__DEFINE_BINARY_WRAPPER(__LFutexOpEquals, ==);
-//__DEFINE_BINARY_WRAPPER(__LFutexOpNotEquals, !=);
-//__DEFINE_BINARY_WRAPPER(__LFutexOpAbove, >);
-//__DEFINE_BINARY_WRAPPER(__LFutexOpBelow, <);
-//__DEFINE_BINARY_WRAPPER(__LFutexOpAboveEqual, >=);
-//__DEFINE_BINARY_WRAPPER(__LFutexOpBelowEqual, <=);
-//__DEFINE_TRINARY_WRAPPER(__LFutexOpBitmask, &, ==);
+//__DEFINE_BINARY_WRAPPER(__LFutexOpEquals,         ==);
+//__DEFINE_BINARY_WRAPPER(__LFutexOpNotEquals,      !=);
+//__DEFINE_BINARY_WRAPPER(__LFutexOpAbove,           >);
+//__DEFINE_BINARY_WRAPPER(__LFutexOpBelow,           <);
+//__DEFINE_BINARY_WRAPPER(__LFutexOpAboveEqual,     >=);
+//__DEFINE_BINARY_WRAPPER(__LFutexOpBelowEqual,     <=);
+//__DEFINE_TRINARY_WRAPPER(__LFutexOpBitmask,  &,   ==);
 //__DEFINE_TRINARY_WRAPPER(__LFutexOpNotBitmask, &, !=);
 //#undef __DEFINE_TRINARY_WRAPPER
 //#undef __DEFINE_BINARY_WRAPPER
@@ -182,7 +182,7 @@ typedef __uintptr_t lfutex_t;
 //};
 //
 //__NAMESPACE_INT_END
-//class futex_t {
+//class   futex_t   {
 //private:
 //	lfutex_t __m_futex; /* The underlying futex. */
 //public:
@@ -974,12 +974,12 @@ __NOTHROW_NCX(__LIBCCALL futex_trywaitwhile_allbits)(lfutex_t *__uaddr, lfutex_t
 
 
 @@Get/Set the number of times to spin the following futex operations without
-@@entering kernel-space, setting waiter-bits, and entering sleep mode:
+@@entering  kernel-space,  setting  waiter-bits,  and  entering  sleep mode:
 @@  - LFUTEX_WAIT_WHILE: SPIN({ if (*uaddr != val) DONE(); });
 @@  - LFUTEX_WAIT_UNTIL: SPIN({ if (*uaddr == val) DONE(); });
 @@  - ...
-@@Futex spinning improves performance by bypassing expensive blocking operations
-@@when associated locks are often only held for a couple of moments at a time.
+@@Futex  spinning  improves  performance  by  bypassing  expensive  blocking   operations
+@@when  associated  locks  are  often only  held  for  a  couple of  moments  at  a time.
 @@Take for example `lfutex(LFUTEX_WAIT_WHILE)' (or preferably `futex_waitwhile()'), which
 @@is wrapped like this:
 @@>> unsigned int spins;

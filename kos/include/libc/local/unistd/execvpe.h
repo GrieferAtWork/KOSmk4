@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xb4d82fa7 */
+/* HASH CRC-32:0xafaef8d9 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -35,29 +35,18 @@
 #endif /* !__USE_DOS_ALTERATIONS */
 #endif /* !__TARGV */
 __NAMESPACE_LOCAL_BEGIN
-/* Dependency: execve from unistd */
 #ifndef __local___localdep_execve_defined
 #define __local___localdep_execve_defined 1
 #if __has_builtin(__builtin_execve) && defined(__LIBC_BIND_CRTBUILTINS) && defined(__CRT_HAVE_execve)
-/* >> execve(2)
- * Replace the calling process with the application image referred to by `path' / `file'
- * and execute it's `main()' method, passing the given `argv', and setting `environ' to `envp' */
 __CEIREDIRECT(__ATTR_NONNULL((1, 2, 3)),int,__NOTHROW_RPC,__localdep_execve,(char const *__restrict __path, __TARGV, __TENVP),execve,{ return __builtin_execve(__path, (char *const *)___argv, (char *const *)___envp); })
 #elif defined(__CRT_HAVE_execve)
-/* >> execve(2)
- * Replace the calling process with the application image referred to by `path' / `file'
- * and execute it's `main()' method, passing the given `argv', and setting `environ' to `envp' */
 __CREDIRECT(__ATTR_NONNULL((1, 2, 3)),int,__NOTHROW_RPC,__localdep_execve,(char const *__restrict __path, __TARGV, __TENVP),execve,(__path,___argv,___envp))
 #elif defined(__CRT_HAVE__execve)
-/* >> execve(2)
- * Replace the calling process with the application image referred to by `path' / `file'
- * and execute it's `main()' method, passing the given `argv', and setting `environ' to `envp' */
 __CREDIRECT(__ATTR_NONNULL((1, 2, 3)),int,__NOTHROW_RPC,__localdep_execve,(char const *__restrict __path, __TARGV, __TENVP),_execve,(__path,___argv,___envp))
 #else /* ... */
 #undef __local___localdep_execve_defined
 #endif /* !... */
 #endif /* !__local___localdep_execve_defined */
-/* Dependency: getenv from stdlib */
 #ifndef __local___localdep_getenv_defined
 #define __local___localdep_getenv_defined 1
 #ifdef __CRT_HAVE_getenv
@@ -71,83 +60,59 @@ __NAMESPACE_LOCAL_BEGIN
 #undef __local___localdep_getenv_defined
 #endif /* !... */
 #endif /* !__local___localdep_getenv_defined */
-/* Dependency: mempcpyc from string */
 #ifndef __local___localdep_mempcpyc_defined
 #define __local___localdep_mempcpyc_defined 1
 #ifdef __CRT_HAVE_mempcpyc
 __NAMESPACE_LOCAL_END
 #include <hybrid/typecore.h>
 __NAMESPACE_LOCAL_BEGIN
-/* Same as `memcpyc', but return `dst + (ELEM_COUNT * ELEM_SIZE)', rather than `dst' */
 __CREDIRECT(__ATTR_LEAF __ATTR_RETNONNULL __ATTR_NONNULL((1, 2)),void *,__NOTHROW_NCX,__localdep_mempcpyc,(void *__restrict __dst, void const *__restrict __src, __SIZE_TYPE__ __elem_count, __SIZE_TYPE__ __elem_size),mempcpyc,(__dst,__src,__elem_count,__elem_size))
 #else /* __CRT_HAVE_mempcpyc */
 __NAMESPACE_LOCAL_END
 #include <libc/local/string/mempcpyc.h>
 __NAMESPACE_LOCAL_BEGIN
-/* Same as `memcpyc', but return `dst + (ELEM_COUNT * ELEM_SIZE)', rather than `dst' */
 #define __localdep_mempcpyc __LIBC_LOCAL_NAME(mempcpyc)
 #endif /* !__CRT_HAVE_mempcpyc */
 #endif /* !__local___localdep_mempcpyc_defined */
-/* Dependency: strchr from string */
 #ifndef __local___localdep_strchr_defined
 #define __local___localdep_strchr_defined 1
 #if __has_builtin(__builtin_strchr) && defined(__LIBC_BIND_CRTBUILTINS) && defined(__CRT_HAVE_strchr)
-/* >> strchr(3)
- * Return the pointer of the first instance of `needle', or `NULL' if `needle' wasn't found. */
 __CEIREDIRECT(__ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1)),char *,__NOTHROW_NCX,__localdep_strchr,(char const *__restrict __haystack, int __needle),strchr,{ return __builtin_strchr(__haystack, __needle); })
 #elif __has_builtin(__builtin_index) && defined(__LIBC_BIND_CRTBUILTINS) && defined(__CRT_HAVE_index)
-/* >> strchr(3)
- * Return the pointer of the first instance of `needle', or `NULL' if `needle' wasn't found. */
 __CEIREDIRECT(__ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1)),char *,__NOTHROW_NCX,__localdep_strchr,(char const *__restrict __haystack, int __needle),index,{ return __builtin_index(__haystack, __needle); })
 #elif defined(__CRT_HAVE_strchr)
-/* >> strchr(3)
- * Return the pointer of the first instance of `needle', or `NULL' if `needle' wasn't found. */
 __CREDIRECT(__ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1)),char *,__NOTHROW_NCX,__localdep_strchr,(char const *__restrict __haystack, int __needle),strchr,(__haystack,__needle))
 #elif defined(__CRT_HAVE_index)
-/* >> strchr(3)
- * Return the pointer of the first instance of `needle', or `NULL' if `needle' wasn't found. */
 __CREDIRECT(__ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1)),char *,__NOTHROW_NCX,__localdep_strchr,(char const *__restrict __haystack, int __needle),index,(__haystack,__needle))
 #else /* ... */
 __NAMESPACE_LOCAL_END
 #include <libc/local/string/strchr.h>
 __NAMESPACE_LOCAL_BEGIN
-/* >> strchr(3)
- * Return the pointer of the first instance of `needle', or `NULL' if `needle' wasn't found. */
 #define __localdep_strchr __LIBC_LOCAL_NAME(strchr)
 #endif /* !... */
 #endif /* !__local___localdep_strchr_defined */
-/* Dependency: strchrnul from string */
 #ifndef __local___localdep_strchrnul_defined
 #define __local___localdep_strchrnul_defined 1
 #ifdef __CRT_HAVE_strchrnul
-/* >> strchrnul(3)
- * Same as `strchr', but return `strend(str)', rather than `NULL' if `needle' wasn't found. */
 __CREDIRECT(__ATTR_PURE __ATTR_RETNONNULL __ATTR_WUNUSED __ATTR_NONNULL((1)),char *,__NOTHROW_NCX,__localdep_strchrnul,(char const *__restrict __haystack, int __needle),strchrnul,(__haystack,__needle))
 #else /* __CRT_HAVE_strchrnul */
 __NAMESPACE_LOCAL_END
 #include <libc/local/string/strchrnul.h>
 __NAMESPACE_LOCAL_BEGIN
-/* >> strchrnul(3)
- * Same as `strchr', but return `strend(str)', rather than `NULL' if `needle' wasn't found. */
 #define __localdep_strchrnul __LIBC_LOCAL_NAME(strchrnul)
 #endif /* !__CRT_HAVE_strchrnul */
 #endif /* !__local___localdep_strchrnul_defined */
-/* Dependency: strlen from string */
 #ifndef __local___localdep_strlen_defined
 #define __local___localdep_strlen_defined 1
 #ifdef __CRT_HAVE_strlen
 __NAMESPACE_LOCAL_END
 #include <hybrid/typecore.h>
 __NAMESPACE_LOCAL_BEGIN
-/* >> strlen(3)
- * Return the length of the string in characters (Same as `rawmemlen[...](str, '\0')') */
 __CREDIRECT(__ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1)),__SIZE_TYPE__,__NOTHROW_NCX,__localdep_strlen,(char const *__restrict __str),strlen,(__str))
 #else /* __CRT_HAVE_strlen */
 __NAMESPACE_LOCAL_END
 #include <libc/local/string/strlen.h>
 __NAMESPACE_LOCAL_BEGIN
-/* >> strlen(3)
- * Return the length of the string in characters (Same as `rawmemlen[...](str, '\0')') */
 #define __localdep_strlen __LIBC_LOCAL_NAME(strlen)
 #endif /* !__CRT_HAVE_strlen */
 #endif /* !__local___localdep_strlen_defined */
@@ -178,9 +143,6 @@ __LOCAL_LIBC(__execvpe_impl) __ATTR_NOINLINE __ATTR_NONNULL((1, 3, 5, 6)) int
 }
 __NAMESPACE_LOCAL_END
 __NAMESPACE_LOCAL_BEGIN
-/* >> execvpe(3)
- * Replace the calling process with the application image referred to by `file' and
- * execute it's `main()' method, passing the given `argv', and setting `environ' to `envp' */
 __LOCAL_LIBC(execvpe) __ATTR_NONNULL((1, 2, 3)) int
 __NOTHROW_RPC(__LIBCCALL __LIBC_LOCAL_NAME(execvpe))(char const *__restrict __file, __TARGV, __TENVP) {
 	char *__env_path;

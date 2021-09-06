@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x9e067341 */
+/* HASH CRC-32:0x91960cb5 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -24,37 +24,25 @@
 #if defined(__CRT_HAVE_stime64) || defined(__CRT_HAVE_stime)
 #include <bits/types.h>
 __NAMESPACE_LOCAL_BEGIN
-/* Dependency: stime32 from time */
 #if !defined(__local___localdep_stime32_defined) && defined(__CRT_HAVE_stime)
 #define __local___localdep_stime32_defined 1
-/* >> stime(3), stime64(3)
- * Set the system time to `*when'. This call is restricted to the superuser */
 __CREDIRECT(__ATTR_NONNULL((1)),int,__NOTHROW_NCX,__localdep_stime32,(__time32_t const *__when),stime,(__when))
 #endif /* !__local___localdep_stime32_defined && __CRT_HAVE_stime */
-/* Dependency: stime64 from time */
 #ifndef __local___localdep_stime64_defined
 #define __local___localdep_stime64_defined 1
 #ifdef __CRT_HAVE_stime64
-/* >> stime(3), stime64(3)
- * Set the system time to `*when'. This call is restricted to the superuser */
 __CREDIRECT(__ATTR_NONNULL((1)),int,__NOTHROW_NCX,__localdep_stime64,(__time64_t const *__when),stime64,(__when))
 #elif defined(__CRT_HAVE_stime) && __SIZEOF_TIME32_T__ == __SIZEOF_TIME64_T__
-/* >> stime(3), stime64(3)
- * Set the system time to `*when'. This call is restricted to the superuser */
 __CREDIRECT(__ATTR_NONNULL((1)),int,__NOTHROW_NCX,__localdep_stime64,(__time64_t const *__when),stime,(__when))
 #elif defined(__CRT_HAVE_stime)
 __NAMESPACE_LOCAL_END
 #include <libc/local/time/stime64.h>
 __NAMESPACE_LOCAL_BEGIN
-/* >> stime(3), stime64(3)
- * Set the system time to `*when'. This call is restricted to the superuser */
 #define __localdep_stime64 __LIBC_LOCAL_NAME(stime64)
 #else /* ... */
 #undef __local___localdep_stime64_defined
 #endif /* !... */
 #endif /* !__local___localdep_stime64_defined */
-/* >> stime(3), stime64(3)
- * Set the system time to `*when'. This call is restricted to the superuser */
 __LOCAL_LIBC(stime) __ATTR_NONNULL((1)) int
 __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(stime))(__TM_TYPE(time) const *__when) {
 #ifdef __CRT_HAVE_stime

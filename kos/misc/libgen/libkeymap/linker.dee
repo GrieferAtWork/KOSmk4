@@ -47,7 +47,7 @@ final global KMP_ENCODING_LATIN1  = 0x00;
 @@All characters are encoded as UTF-8 sequences.
 final global KMP_ENCODING_UTF8    = 0x01;
 
-@@All characters are encoded as UTF-16 sequences (Little endian) with a length
+@@All  characters are  encoded as UTF-16  sequences (Little endian)  with a length
 @@of a single character each (max. 2 UTF-16 characters; 1 if it isn't a surrogate)
 final global KMP_ENCODING_UTF16LE = 0x02;
 
@@ -61,7 +61,7 @@ final global KMP_ENCODING_UTF32LE = 0x04;
 final global KMP_ENCODING_UTF32BE = 0x05;
 
 @@Multi-character-string (each character is encoded as UTF-8,
-@@and the sequence is terminated by a NUL-character)
+@@and   the  sequence  is   terminated  by  a  NUL-character)
 final global KMP_ENCODING_MCS     = 0x06;
 
 @@Max recognized encoding.
@@ -103,13 +103,13 @@ final global KMP_OP_DEFENC     = 0x05;
 final global KMP_OP_SETKEY2    = 0x06;
 
 @@OPCODE: mask = *(u16 const *)%pc; %pc += 2;
-@@        kchr = READ_CHARACTER(%pc, %enc);
+@@        kchr  =  READ_CHARACTER(%pc, %enc);
 @@        if (CURRENT_KEYMOD == mask)
 @@            return kchr;
 final global KMP_OP_SETKEYMOD2 = 0x1a;
 
 @@OPCODE: mask = *(u8 const *)%pc; %pc += 1;
-@@        kchr = READ_CHARACTER(%pc, %enc);
+@@        kchr = READ_CHARACTER(%pc,  %enc);
 @@        if (CURRENT_KEYMOD == mask)
 @@            return kchr;
 final global KMP_OP_SETKEYMOD  = 0x1b;
@@ -139,7 +139,7 @@ final global KMP_OP_NOP        = 0x1f;
 @@Mask for merged operand instructions.
 @@ if ((op & KMP_OP_MEXTENDED) == KMP_OP_FDEFLATIN) ...;
 @@ if ((op & KMP_OP_MEXTENDED) == KMP_OP_FDEFDIGIT) ...;
-@@ if ((op & KMP_OP_MEXTENDED) == KMP_OP_FSETROW) ...;
+@@ if ((op &  KMP_OP_MEXTENDED) == KMP_OP_FSETROW)  ...;
 @@ if ((op & KMP_OP_MEXTENDED) == KMP_OP_FSETCOL) ...;
 final global KMP_OP_MEXTENDED = 0xe0;
 

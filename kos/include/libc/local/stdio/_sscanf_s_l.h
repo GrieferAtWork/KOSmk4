@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xeb5919c9 */
+/* HASH CRC-32:0x516923d1 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -24,7 +24,6 @@
 #include <features.h>
 #include <kos/anno.h>
 __NAMESPACE_LOCAL_BEGIN
-/* Dependency: _vsscanf_s_l from stdio */
 #ifndef __local___localdep__vsscanf_s_l_defined
 #define __local___localdep__vsscanf_s_l_defined 1
 #ifdef __CRT_HAVE__vsscanf_l

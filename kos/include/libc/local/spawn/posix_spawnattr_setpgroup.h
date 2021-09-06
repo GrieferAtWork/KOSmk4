@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x6f86d379 */
+/* HASH CRC-32:0x397e44b2 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -26,11 +26,6 @@
 #include <bits/crt/posix_spawn.h>
 #include <bits/types.h>
 __NAMESPACE_LOCAL_BEGIN
-/* >> posix_spawnattr_getschedparam(3)
- * Set the `pgid' argument of a call `setpgid(getpid(), pgid)' that
- * the child process will perform when `POSIX_SPAWN_SETPGROUP' is set.
- * HINT: A call `setpgid(getpid(), 0)' is the same as `setpgid(getpid(), getpid())'!
- * @return: 0 : Success */
 __LOCAL_LIBC(posix_spawnattr_setpgroup) __ATTR_NONNULL((1)) __errno_t
 __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(posix_spawnattr_setpgroup))(struct __posix_spawnattr *__restrict __attr, __pid_t __pgroup) {
 	__attr->__pgrp = __pgroup;

@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xe0bc9a6d */
+/* HASH CRC-32:0xf256ebf */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -33,7 +33,6 @@
 #endif /* !__USE_KOS_ALTERATIONS */
 #endif /* !__PIO_OFFSET */
 __NAMESPACE_LOCAL_BEGIN
-/* Dependency: fallocate32 from fcntl */
 #if !defined(__local___localdep_fallocate32_defined) && defined(__CRT_HAVE_fallocate)
 #define __local___localdep_fallocate32_defined 1
 __CREDIRECT(,int,__NOTHROW_NCX,__localdep_fallocate32,(__fd_t __fd, __STDC_INT_AS_UINT_T __mode, __pos32_t __offset, __pos32_t __length),fallocate,(__fd,__mode,__offset,__length))

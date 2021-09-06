@@ -61,7 +61,7 @@ __SYSDECL_BEGIN
 @@>> dirname("..");              // Returns "."
 @@>> dirname("");                // Returns "."
 @@>> dirname(NULL);              // Returns "."
-@@Note that for this purpose, `path' may be modified in-place, meaning
+@@Note  that for this purpose, `path' may be modified in-place, meaning
 @@that you should really always pass an strdup()'d, or writable string.
 [[nonnull]] char *dirname([[nullable]] char *path) {
 	char *iter;
@@ -122,11 +122,11 @@ fallback:
 @@>> basename("");                // Returns "."
 @@>> basename(NULL);              // Returns "."
 @@Note that for this purpose, `filename' may be modified in-place, meaning
-@@that you should really always pass an strdup()'d, or writable string.
+@@that  you should really  always pass an  strdup()'d, or writable string.
 @@
 @@Also note that a different version of this function exists in <string.h>,
-@@where if you include both <libgen.h> and <string.h>, you can use the
-@@alternate function from <string.h> by `#undef basename', or calling the
+@@where if you  include both  <libgen.h> and  <string.h>, you  can use  the
+@@alternate function from <string.h>  by `#undef basename', or calling  the
 @@function as `(basename)(...)' (as opposed to `basename(...)')
 [[nonnull, export_alias("__gnu_basename")]]
 char *__xpg_basename(char *filename) {

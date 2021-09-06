@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x73c4099e */
+/* HASH CRC-32:0x50ff1c91 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -24,23 +24,16 @@
 #if defined(__CRT_HAVE_pipe) || defined(__CRT_HAVE___pipe) || defined(__CRT_HAVE__pipe)
 #include <bits/types.h>
 __NAMESPACE_LOCAL_BEGIN
-/* Dependency: pipe from unistd */
 #ifndef __local___localdep_pipe_defined
 #define __local___localdep_pipe_defined 1
 #ifdef __CRT_HAVE_pipe
-/* >> pipe(2)
- * Create a new pair of connected pipes ([0] = reader, [1] = writer) */
 __CREDIRECT(__ATTR_NONNULL((1)),int,__NOTHROW_NCX,__localdep_pipe,(__fd_t __pipedes[2]),pipe,(__pipedes))
 #elif defined(__CRT_HAVE___pipe)
-/* >> pipe(2)
- * Create a new pair of connected pipes ([0] = reader, [1] = writer) */
 __CREDIRECT(__ATTR_NONNULL((1)),int,__NOTHROW_NCX,__localdep_pipe,(__fd_t __pipedes[2]),__pipe,(__pipedes))
 #elif defined(__CRT_HAVE__pipe)
 __NAMESPACE_LOCAL_END
 #include <libc/local/unistd/pipe.h>
 __NAMESPACE_LOCAL_BEGIN
-/* >> pipe(2)
- * Create a new pair of connected pipes ([0] = reader, [1] = writer) */
 #define __localdep_pipe __LIBC_LOCAL_NAME(pipe)
 #else /* ... */
 #undef __local___localdep_pipe_defined

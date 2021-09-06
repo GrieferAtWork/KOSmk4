@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x5d3aea48 */
+/* HASH CRC-32:0x65ad78c8 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -23,9 +23,6 @@
 #include <__crt.h>
 #include <bits/os/sigset.h>
 __NAMESPACE_LOCAL_BEGIN
-/* >> signandset(3)
- * Set-up every signal `S' from `set' as the result of `set[S] = left[S] & ~right[S]'
- * @return: 0: Always returns `0' */
 __LOCAL_LIBC(signandset) __ATTR_NONNULL((1, 2, 3)) int
 __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(signandset))(struct __sigset_struct *__set, struct __sigset_struct const *__left, struct __sigset_struct const *__right) {
 	__SIZE_TYPE__ __i;

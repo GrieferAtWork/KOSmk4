@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x7d8e827e */
+/* HASH CRC-32:0xee59d686 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -24,20 +24,16 @@
 #if defined(__CRT_HAVE___crtSleep) || defined(__CRT_HAVE_delay)
 #include <bits/types.h>
 __NAMESPACE_LOCAL_BEGIN
-/* Dependency: __crtSleep from unistd */
 #ifndef __local___localdep___crtSleep_defined
 #define __local___localdep___crtSleep_defined 1
 #ifdef __CRT_HAVE___crtSleep
-/* Hidden function exported by DOS that allows for millisecond precision */
 __CREDIRECT_VOID(,__NOTHROW_RPC,__localdep___crtSleep,(__UINT32_TYPE__ __msecs),__crtSleep,(__msecs))
 #elif defined(__CRT_HAVE_delay)
-/* Hidden function exported by DOS that allows for millisecond precision */
 __CREDIRECT_VOID(,__NOTHROW_RPC,__localdep___crtSleep,(__UINT32_TYPE__ __msecs),delay,(__msecs))
 #else /* ... */
 #undef __local___localdep___crtSleep_defined
 #endif /* !... */
 #endif /* !__local___localdep___crtSleep_defined */
-/* Sleep for `useconds' microseconds (1/1.000.000 seconds) */
 __LOCAL_LIBC(usleep) int
 __NOTHROW_RPC(__LIBCCALL __LIBC_LOCAL_NAME(usleep))(__useconds_t __useconds) {
 	__localdep___crtSleep(__useconds / 1000l); /*USEC_PER_MSEC*/

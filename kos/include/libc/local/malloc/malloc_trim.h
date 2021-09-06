@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xa8b6748d */
+/* HASH CRC-32:0xf9fc5960 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -23,7 +23,6 @@
 #include <__crt.h>
 #include <hybrid/typecore.h>
 __NAMESPACE_LOCAL_BEGIN
-/* Dependency: _heapmin from malloc */
 #if !defined(__local___localdep__heapmin_defined) && defined(__CRT_HAVE__heapmin)
 #define __local___localdep__heapmin_defined 1
 __CREDIRECT(,int,__NOTHROW_NCX,__localdep__heapmin,(void),_heapmin,())

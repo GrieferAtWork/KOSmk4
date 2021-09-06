@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xe1d70e0e */
+/* HASH CRC-32:0x16a0374b */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -23,7 +23,6 @@
 #include <__crt.h>
 #include <hybrid/typecore.h>
 __NAMESPACE_LOCAL_BEGIN
-/* Dependency: strncasecmp from string */
 #ifndef __local___localdep_strncasecmp_defined
 #define __local___localdep_strncasecmp_defined 1
 #if __has_builtin(__builtin_strncasecmp) && defined(__LIBC_BIND_CRTBUILTINS) && defined(__CRT_HAVE_strncasecmp)

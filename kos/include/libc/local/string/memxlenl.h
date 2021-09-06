@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x68d84d1d */
+/* HASH CRC-32:0xa0da394a */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -23,21 +23,17 @@
 #include <__crt.h>
 #include <hybrid/typecore.h>
 __NAMESPACE_LOCAL_BEGIN
-/* Dependency: memxendl from string */
 #ifndef __local___localdep_memxendl_defined
 #define __local___localdep_memxendl_defined 1
 #ifdef __CRT_HAVE_memxendl
-/* Same as `memendl', but search for non-matching locations. */
 __CREDIRECT(__ATTR_PURE __ATTR_RETNONNULL __ATTR_WUNUSED __ATTR_NONNULL((1)),__UINT32_TYPE__ *,__NOTHROW_NCX,__localdep_memxendl,(void const *__restrict __haystack, __UINT32_TYPE__ __needle, __SIZE_TYPE__ __n_bytes),memxendl,(__haystack,__needle,__n_bytes))
 #else /* __CRT_HAVE_memxendl */
 __NAMESPACE_LOCAL_END
 #include <libc/local/string/memxendl.h>
 __NAMESPACE_LOCAL_BEGIN
-/* Same as `memendl', but search for non-matching locations. */
 #define __localdep_memxendl __LIBC_LOCAL_NAME(memxendl)
 #endif /* !__CRT_HAVE_memxendl */
 #endif /* !__local___localdep_memxendl_defined */
-/* Same as `memlenl', but search for non-matching locations. */
 __LOCAL_LIBC(memxlenl) __ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1)) __SIZE_TYPE__
 __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(memxlenl))(void const *__restrict __haystack, __UINT32_TYPE__ __needle, __SIZE_TYPE__ __n_dwords) {
 	return (__SIZE_TYPE__)(__localdep_memxendl(__haystack, __needle, __n_dwords) - (__UINT32_TYPE__ *)__haystack);

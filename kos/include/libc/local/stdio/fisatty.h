@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x96850eea */
+/* HASH CRC-32:0xa0782d63 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -25,58 +25,36 @@
 #include <features.h>
 #if (defined(__CRT_HAVE_isatty) || defined(__CRT_HAVE__isatty) || defined(__CRT_HAVE_tcgetattr) || (defined(__CRT_HAVE_ioctl) && defined(__TCGETA))) && (defined(__CRT_HAVE_fileno) || defined(__CRT_HAVE__fileno) || defined(__CRT_HAVE_fileno_unlocked))
 __NAMESPACE_LOCAL_BEGIN
-/* Dependency: fileno from stdio */
 #ifndef __local___localdep_fileno_defined
 #define __local___localdep_fileno_defined 1
 #if defined(__CRT_HAVE_fileno_unlocked) && defined(__USE_STDIO_UNLOCKED)
-/* >> fileno(3)
- * Return the underlying file descriptor number used by `stream' */
 __CREDIRECT(__ATTR_WUNUSED __ATTR_NONNULL((1)),__fd_t,__NOTHROW_NCX,__localdep_fileno,(__FILE *__restrict __stream),fileno_unlocked,(__stream))
 #elif defined(__CRT_HAVE_fileno)
-/* >> fileno(3)
- * Return the underlying file descriptor number used by `stream' */
 __CREDIRECT(__ATTR_WUNUSED __ATTR_NONNULL((1)),__fd_t,__NOTHROW_NCX,__localdep_fileno,(__FILE *__restrict __stream),fileno,(__stream))
 #elif defined(__CRT_HAVE__fileno)
-/* >> fileno(3)
- * Return the underlying file descriptor number used by `stream' */
 __CREDIRECT(__ATTR_WUNUSED __ATTR_NONNULL((1)),__fd_t,__NOTHROW_NCX,__localdep_fileno,(__FILE *__restrict __stream),_fileno,(__stream))
 #elif defined(__CRT_HAVE_fileno_unlocked)
-/* >> fileno(3)
- * Return the underlying file descriptor number used by `stream' */
 __CREDIRECT(__ATTR_WUNUSED __ATTR_NONNULL((1)),__fd_t,__NOTHROW_NCX,__localdep_fileno,(__FILE *__restrict __stream),fileno_unlocked,(__stream))
 #else /* ... */
 #undef __local___localdep_fileno_defined
 #endif /* !... */
 #endif /* !__local___localdep_fileno_defined */
-/* Dependency: isatty from unistd */
 #ifndef __local___localdep_isatty_defined
 #define __local___localdep_isatty_defined 1
 #ifdef __CRT_HAVE_isatty
 __NAMESPACE_LOCAL_END
 #include <bits/types.h>
 __NAMESPACE_LOCAL_BEGIN
-/* >> isatty(2)
- * Check if the given file handle `fd' refers to a TTY
- * @return: 1: Is a tty
- * @return: 0: Not a tty (`errno' was modified, and is usually set to `ENOTTY') */
 __CREDIRECT(__ATTR_WUNUSED,int,__NOTHROW_NCX,__localdep_isatty,(__fd_t __fd),isatty,(__fd))
 #elif defined(__CRT_HAVE__isatty)
 __NAMESPACE_LOCAL_END
 #include <bits/types.h>
 __NAMESPACE_LOCAL_BEGIN
-/* >> isatty(2)
- * Check if the given file handle `fd' refers to a TTY
- * @return: 1: Is a tty
- * @return: 0: Not a tty (`errno' was modified, and is usually set to `ENOTTY') */
 __CREDIRECT(__ATTR_WUNUSED,int,__NOTHROW_NCX,__localdep_isatty,(__fd_t __fd),_isatty,(__fd))
 #elif defined(__CRT_HAVE_tcgetattr) || (defined(__CRT_HAVE_ioctl) && defined(__TCGETA))
 __NAMESPACE_LOCAL_END
 #include <libc/local/unistd/isatty.h>
 __NAMESPACE_LOCAL_BEGIN
-/* >> isatty(2)
- * Check if the given file handle `fd' refers to a TTY
- * @return: 1: Is a tty
- * @return: 0: Not a tty (`errno' was modified, and is usually set to `ENOTTY') */
 #define __localdep_isatty __LIBC_LOCAL_NAME(isatty)
 #else /* ... */
 #undef __local___localdep_isatty_defined

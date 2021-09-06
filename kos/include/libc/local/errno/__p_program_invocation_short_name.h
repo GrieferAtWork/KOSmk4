@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xbbd6d599 */
+/* HASH CRC-32:0x402f8046 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -24,7 +24,6 @@
 #include <libc/local/program_invocation_name.h>
 #ifdef __LOCAL_program_invocation_short_name_p
 __NAMESPACE_LOCAL_BEGIN
-/* Alias for `strchr(argv[0], '/') ? strchr(argv[0], '/') + 1 : argv[0]', as passed to main() */
 __LOCAL_LIBC(__p_program_invocation_short_name) __ATTR_CONST __ATTR_RETNONNULL __ATTR_WUNUSED char **
 __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(__p_program_invocation_short_name))(void) {
 	return &__LOCAL_program_invocation_short_name_p;

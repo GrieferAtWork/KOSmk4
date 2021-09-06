@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x3f91d1ed */
+/* HASH CRC-32:0x396a13fb */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -23,10 +23,6 @@
 #include <__crt.h>
 #include <bits/os/sigset.h>
 __NAMESPACE_LOCAL_BEGIN
-/* >> sigisemptyset(3)
- * Check if the given signal set is empty
- * @return: != 0: The given `set' is non-empty
- * @return: == 0: The given `set' is empty */
 __LOCAL_LIBC(sigisemptyset) __ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1)) int
 __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(sigisemptyset))(struct __sigset_struct const *__restrict __set) {
 	__SIZE_TYPE__ __i;

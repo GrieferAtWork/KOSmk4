@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x1cf9d765 */
+/* HASH CRC-32:0x3fb9c3d2 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -22,22 +22,17 @@
 #define __local_wcssep_defined 1
 #include <__crt.h>
 __NAMESPACE_LOCAL_BEGIN
-/* Dependency: wcschr from wchar */
 #ifndef __local___localdep_wcschr_defined
 #define __local___localdep_wcschr_defined 1
 #ifdef __CRT_HAVE_wcschr
 __NAMESPACE_LOCAL_END
 #include <hybrid/typecore.h>
 __NAMESPACE_LOCAL_BEGIN
-/* >> strchr(3)
- * Return the pointer of the first instance of `needle', or `NULL' if `needle' wasn't found. */
 __CREDIRECT(__ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1)),__WCHAR_TYPE__ *,__NOTHROW_NCX,__localdep_wcschr,(__WCHAR_TYPE__ const *__restrict __haystack, __WCHAR_TYPE__ __needle),wcschr,(__haystack,__needle))
 #else /* __CRT_HAVE_wcschr */
 __NAMESPACE_LOCAL_END
 #include <libc/local/wchar/wcschr.h>
 __NAMESPACE_LOCAL_BEGIN
-/* >> strchr(3)
- * Return the pointer of the first instance of `needle', or `NULL' if `needle' wasn't found. */
 #define __localdep_wcschr __LIBC_LOCAL_NAME(wcschr)
 #endif /* !__CRT_HAVE_wcschr */
 #endif /* !__local___localdep_wcschr_defined */

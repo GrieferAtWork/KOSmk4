@@ -320,8 +320,8 @@ x86_handle_device_not_available(struct icpustate *__restrict state) {
 
 /* TODO: FPU Exception handlers. */
 //INTDEF struct icpustate *FCALL x86_handle_coprocessor_fault(struct icpustate *__restrict state);
-//INTDEF struct icpustate *FCALL x86_handle_fpu_x87(struct icpustate *__restrict state);
-//INTDEF struct icpustate *FCALL x86_handle_fpu_simd(struct icpustate *__restrict state);
+//INTDEF  struct  icpustate   *FCALL  x86_handle_fpu_x87(struct   icpustate  *__restrict   state);
+//INTDEF   struct  icpustate  *FCALL   x86_handle_fpu_simd(struct  icpustate  *__restrict  state);
 
 
 

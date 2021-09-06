@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x15f86742 */
+/* HASH CRC-32:0xe2db44a8 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -23,22 +23,17 @@
 #include <__crt.h>
 #include <hybrid/typecore.h>
 __NAMESPACE_LOCAL_BEGIN
-/* Dependency: strnend from string */
 #ifndef __local___localdep_strnend_defined
 #define __local___localdep_strnend_defined 1
 #ifdef __CRT_HAVE_strnend
-/* Same as `str + strnlen(str, max_chars)' */
 __CREDIRECT(__ATTR_PURE __ATTR_RETNONNULL __ATTR_WUNUSED __ATTR_NONNULL((1)),char *,__NOTHROW_NCX,__localdep_strnend,(char const *__restrict __str, __SIZE_TYPE__ __maxlen),strnend,(__str,__maxlen))
 #else /* __CRT_HAVE_strnend */
 __NAMESPACE_LOCAL_END
 #include <libc/local/string/strnend.h>
 __NAMESPACE_LOCAL_BEGIN
-/* Same as `str + strnlen(str, max_chars)' */
 #define __localdep_strnend __LIBC_LOCAL_NAME(strnend)
 #endif /* !__CRT_HAVE_strnend */
 #endif /* !__local___localdep_strnend_defined */
-/* >> strnlen(3)
- * Same as `strlen', but don't exceed `max_chars' characters (Same as `memlen[...](str, '\0', max_chars)´) */
 __LOCAL_LIBC(strnlen) __ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1)) __SIZE_TYPE__
 __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(strnlen))(char const *__restrict __str, __SIZE_TYPE__ __maxlen) {
 	return (__SIZE_TYPE__)(__localdep_strnend(__str, __maxlen) - __str);

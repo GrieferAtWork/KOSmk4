@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xdefddb54 */
+/* HASH CRC-32:0xa8868bac */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -26,30 +26,20 @@
 #include <hybrid/typecore.h>
 #include <kos/anno.h>
 __NAMESPACE_LOCAL_BEGIN
-/* Dependency: ferror_unlocked from stdio */
 #ifndef __local___localdep_ferror_unlocked_defined
 #define __local___localdep_ferror_unlocked_defined 1
 #if defined(__CRT_HAVE_ferror_unlocked) && defined(__USE_STDIO_UNLOCKED)
-/* >> ferror_unlocked(3)
- * Same as `ferror()', but performs I/O without acquiring a lock to `stream' */
 __CREDIRECT(__ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1)),int,__NOTHROW_NCX,__localdep_ferror_unlocked,(__FILE __KOS_FIXED_CONST *__restrict __stream),ferror_unlocked,(__stream))
 #elif defined(__CRT_HAVE_ferror)
-/* >> ferror_unlocked(3)
- * Same as `ferror()', but performs I/O without acquiring a lock to `stream' */
 __CREDIRECT(__ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1)),int,__NOTHROW_NCX,__localdep_ferror_unlocked,(__FILE __KOS_FIXED_CONST *__restrict __stream),ferror,(__stream))
 #elif defined(__CRT_HAVE__IO_ferror)
-/* >> ferror_unlocked(3)
- * Same as `ferror()', but performs I/O without acquiring a lock to `stream' */
 __CREDIRECT(__ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1)),int,__NOTHROW_NCX,__localdep_ferror_unlocked,(__FILE __KOS_FIXED_CONST *__restrict __stream),_IO_ferror,(__stream))
 #elif defined(__CRT_HAVE_ferror_unlocked)
-/* >> ferror_unlocked(3)
- * Same as `ferror()', but performs I/O without acquiring a lock to `stream' */
 __CREDIRECT(__ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1)),int,__NOTHROW_NCX,__localdep_ferror_unlocked,(__FILE __KOS_FIXED_CONST *__restrict __stream),ferror_unlocked,(__stream))
 #else /* ... */
 #undef __local___localdep_ferror_unlocked_defined
 #endif /* !... */
 #endif /* !__local___localdep_ferror_unlocked_defined */
-/* Dependency: fgetwc_unlocked from wchar */
 #ifndef __local___localdep_fgetwc_unlocked_defined
 #define __local___localdep_fgetwc_unlocked_defined 1
 #ifdef __CRT_HAVE_fgetwc_unlocked
@@ -60,7 +50,6 @@ __CREDIRECT(__ATTR_NONNULL((1)),__WINT_TYPE__,__THROWING,__localdep_fgetwc_unloc
 #undef __local___localdep_fgetwc_unlocked_defined
 #endif /* !... */
 #endif /* !__local___localdep_fgetwc_unlocked_defined */
-/* Dependency: ungetwc_unlocked from wchar */
 #ifndef __local___localdep_ungetwc_unlocked_defined
 #define __local___localdep_ungetwc_unlocked_defined 1
 #ifdef __CRT_HAVE_ungetwc_unlocked

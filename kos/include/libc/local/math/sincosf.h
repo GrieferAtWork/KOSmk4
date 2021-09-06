@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x4aaba7b9 */
+/* HASH CRC-32:0x51d4f5eb */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -24,23 +24,18 @@
 #if defined(__CRT_HAVE_sincos) || defined(__CRT_HAVE___sincos)
 #include <bits/crt/math-vector.h>
 __NAMESPACE_LOCAL_BEGIN
-/* Dependency: sincos from math */
 #ifndef __local___localdep_sincos_defined
 #define __local___localdep_sincos_defined 1
 #if __has_builtin(__builtin_sincos) && defined(__LIBC_BIND_CRTBUILTINS) && defined(__CRT_HAVE_sincos)
-/* Cosine and sine of `x' */
 __CEIREDIRECT(__DECL_SIMD_sincos __ATTR_NONNULL((2, 3)),void,__NOTHROW,__localdep_sincos,(double __x, double *__psinx, double *__pcosx),sincos,{ __builtin_sincos(__x, __psinx, __pcosx); })
 #elif defined(__CRT_HAVE_sincos)
-/* Cosine and sine of `x' */
 __CREDIRECT_VOID(__DECL_SIMD_sincos __ATTR_NONNULL((2, 3)),__NOTHROW,__localdep_sincos,(double __x, double *__psinx, double *__pcosx),sincos,(__x,__psinx,__pcosx))
 #elif defined(__CRT_HAVE___sincos)
-/* Cosine and sine of `x' */
 __CREDIRECT_VOID(__DECL_SIMD_sincos __ATTR_NONNULL((2, 3)),__NOTHROW,__localdep_sincos,(double __x, double *__psinx, double *__pcosx),__sincos,(__x,__psinx,__pcosx))
 #else /* ... */
 #undef __local___localdep_sincos_defined
 #endif /* !... */
 #endif /* !__local___localdep_sincos_defined */
-/* Cosine and sine of `x' */
 __LOCAL_LIBC(sincosf) __DECL_SIMD_sincosf __ATTR_NONNULL((2, 3)) void
 __NOTHROW(__LIBCCALL __LIBC_LOCAL_NAME(sincosf))(float __x, float *__psinx, float *__pcosx) {
 	double __sinx, __cosx;

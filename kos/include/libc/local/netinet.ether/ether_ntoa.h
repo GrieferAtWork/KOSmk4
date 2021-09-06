@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x8b3e70d9 */
+/* HASH CRC-32:0x26161baf */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -23,27 +23,20 @@
 #include <__crt.h>
 struct ether_addr;
 __NAMESPACE_LOCAL_BEGIN
-/* Dependency: ether_ntoa_r from netinet.ether */
 #ifndef __local___localdep_ether_ntoa_r_defined
 #define __local___localdep_ether_ntoa_r_defined 1
 #ifdef __CRT_HAVE_ether_ntoa_r
-/* Convert `addr' into a 20-character-long string that
- * uses the the standard `AA:BB:CC:DD:EE:FF' notation. */
 __CREDIRECT(__ATTR_RETNONNULL __ATTR_NONNULL((1, 2)),char *,__NOTHROW_NCX,__localdep_ether_ntoa_r,(struct ether_addr const *__restrict __addr, char *__restrict __buf),ether_ntoa_r,(__addr,__buf))
 #else /* __CRT_HAVE_ether_ntoa_r */
 __NAMESPACE_LOCAL_END
 #include <libc/local/netinet.ether/ether_ntoa_r.h>
 __NAMESPACE_LOCAL_BEGIN
-/* Convert `addr' into a 20-character-long string that
- * uses the the standard `AA:BB:CC:DD:EE:FF' notation. */
 #define __localdep_ether_ntoa_r __LIBC_LOCAL_NAME(ether_ntoa_r)
 #endif /* !__CRT_HAVE_ether_ntoa_r */
 #endif /* !__local___localdep_ether_ntoa_r_defined */
 __NAMESPACE_LOCAL_END
 #include <net/ethernet.h>
 __NAMESPACE_LOCAL_BEGIN
-/* Convert `addr' into a 20-character-long string that
- * uses the the standard `AA:BB:CC:DD:EE:FF' notation. */
 __LOCAL_LIBC(ether_ntoa) __ATTR_RETNONNULL __ATTR_WUNUSED __ATTR_NONNULL((1)) char *
 __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(ether_ntoa))(struct ether_addr const *__restrict __addr) {
 	static char __buf[21];

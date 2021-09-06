@@ -72,11 +72,11 @@ NOTHROW(LIBCCALL oflag_dos2kos)(oflag_t dos_oflags) {
 
 
 
-/*[[[head:libd_open,hash:CRC-32=0xc673d3a2]]]*/
+/*[[[head:libd_open,hash:CRC-32=0x9cc4ec68]]]*/
 /* >> open(2), open64(2), openat(2), openat64(2)
- * Open a new file handle to the file specified by `filename'
- * When `oflags & O_CREAT', then `mode' specifies the initial
- * file access permissions with which the file should be opened.
+ * Open  a  new  file  handle  to  the  file  specified  by `filename'
+ * When  `oflags & O_CREAT',   then  `mode'   specifies  the   initial
+ * file  access  permissions with  which  the file  should  be opened.
  * On KOS, the returned handle can be anything, but is usually one of:
  *   - HANDLE_TYPE_PATH:                   When `O_PATH' was given
  *   - HANDLE_TYPE_BLOCKDEVICE:            For `S_IFBLK' files
@@ -86,7 +86,7 @@ NOTHROW(LIBCCALL oflag_dos2kos)(oflag_t dos_oflags) {
  *   - HANDLE_TYPE_ONESHOT_DIRECTORY_FILE: For `S_IFDIR' files from special one-shot directories
  *   - HANDLE_TYPE_FILE:                   For `S_IFREG' and `S_IFDIR' (~normal~) files
  *   - *:                                  Certain filesystem names can literally return anything, such
- *                                         as `/proc/self/fd/1234', which is more like `dup(1234)' */
+ *                                         as `/proc/self/fd/1234',  which  is  more  like  `dup(1234)' */
 INTERN ATTR_SECTION(".text.crt.dos.io.access") WUNUSED NONNULL((1)) fd_t
 NOTHROW_RPC(VLIBDCALL libd_open)(char const *filename,
                                  oflag_t oflags,
@@ -126,11 +126,11 @@ NOTHROW_RPC(VLIBDCALL libd_open)(char const *filename,
 }
 /*[[[end:libd_open]]]*/
 
-/*[[[head:libc_open,hash:CRC-32=0x4f3d3c40]]]*/
+/*[[[head:libc_open,hash:CRC-32=0x3f8deef9]]]*/
 /* >> open(2), open64(2), openat(2), openat64(2)
- * Open a new file handle to the file specified by `filename'
- * When `oflags & O_CREAT', then `mode' specifies the initial
- * file access permissions with which the file should be opened.
+ * Open  a  new  file  handle  to  the  file  specified  by `filename'
+ * When  `oflags & O_CREAT',   then  `mode'   specifies  the   initial
+ * file  access  permissions with  which  the file  should  be opened.
  * On KOS, the returned handle can be anything, but is usually one of:
  *   - HANDLE_TYPE_PATH:                   When `O_PATH' was given
  *   - HANDLE_TYPE_BLOCKDEVICE:            For `S_IFBLK' files
@@ -140,7 +140,7 @@ NOTHROW_RPC(VLIBDCALL libd_open)(char const *filename,
  *   - HANDLE_TYPE_ONESHOT_DIRECTORY_FILE: For `S_IFDIR' files from special one-shot directories
  *   - HANDLE_TYPE_FILE:                   For `S_IFREG' and `S_IFDIR' (~normal~) files
  *   - *:                                  Certain filesystem names can literally return anything, such
- *                                         as `/proc/self/fd/1234', which is more like `dup(1234)' */
+ *                                         as `/proc/self/fd/1234',  which  is  more  like  `dup(1234)' */
 INTERN ATTR_SECTION(".text.crt.io.access") WUNUSED NONNULL((1)) fd_t
 NOTHROW_RPC(VLIBCCALL libc_open)(char const *filename,
                                  oflag_t oflags,
@@ -197,11 +197,11 @@ NOTHROW_RPC(LIBCCALL libc_creat)(char const *filename,
 }
 /*[[[end:libc_creat]]]*/
 
-/*[[[head:libd_openat,hash:CRC-32=0x947bd88d]]]*/
+/*[[[head:libd_openat,hash:CRC-32=0xe9b5826c]]]*/
 /* >> open(2), open64(2), openat(2), openat64(2)
- * Open a new file handle to the file specified by `filename'
- * When `oflags & O_CREAT', then `mode' specifies the initial
- * file access permissions with which the file should be opened.
+ * Open  a  new  file  handle  to  the  file  specified  by `filename'
+ * When  `oflags & O_CREAT',   then  `mode'   specifies  the   initial
+ * file  access  permissions with  which  the file  should  be opened.
  * On KOS, the returned handle can be anything, but is usually one of:
  *   - HANDLE_TYPE_PATH:                   When `O_PATH' was given
  *   - HANDLE_TYPE_BLOCKDEVICE:            For `S_IFBLK' files
@@ -211,7 +211,7 @@ NOTHROW_RPC(LIBCCALL libc_creat)(char const *filename,
  *   - HANDLE_TYPE_ONESHOT_DIRECTORY_FILE: For `S_IFDIR' files from special one-shot directories
  *   - HANDLE_TYPE_FILE:                   For `S_IFREG' and `S_IFDIR' (~normal~) files
  *   - *:                                  Certain filesystem names can literally return anything, such
- *                                         as `/proc/self/fd/1234', which is more like `dup(1234)' */
+ *                                         as `/proc/self/fd/1234',  which  is  more  like  `dup(1234)' */
 INTERN ATTR_SECTION(".text.crt.dos.io.access") WUNUSED NONNULL((2)) fd_t
 NOTHROW_RPC(VLIBDCALL libd_openat)(fd_t dirfd,
                                    char const *filename,
@@ -242,11 +242,11 @@ NOTHROW_RPC(VLIBDCALL libd_openat)(fd_t dirfd,
 }
 /*[[[end:libd_openat]]]*/
 
-/*[[[head:libc_openat,hash:CRC-32=0xf9f3d202]]]*/
+/*[[[head:libc_openat,hash:CRC-32=0xc62681e6]]]*/
 /* >> open(2), open64(2), openat(2), openat64(2)
- * Open a new file handle to the file specified by `filename'
- * When `oflags & O_CREAT', then `mode' specifies the initial
- * file access permissions with which the file should be opened.
+ * Open  a  new  file  handle  to  the  file  specified  by `filename'
+ * When  `oflags & O_CREAT',   then  `mode'   specifies  the   initial
+ * file  access  permissions with  which  the file  should  be opened.
  * On KOS, the returned handle can be anything, but is usually one of:
  *   - HANDLE_TYPE_PATH:                   When `O_PATH' was given
  *   - HANDLE_TYPE_BLOCKDEVICE:            For `S_IFBLK' files
@@ -256,7 +256,7 @@ NOTHROW_RPC(VLIBDCALL libd_openat)(fd_t dirfd,
  *   - HANDLE_TYPE_ONESHOT_DIRECTORY_FILE: For `S_IFDIR' files from special one-shot directories
  *   - HANDLE_TYPE_FILE:                   For `S_IFREG' and `S_IFDIR' (~normal~) files
  *   - *:                                  Certain filesystem names can literally return anything, such
- *                                         as `/proc/self/fd/1234', which is more like `dup(1234)' */
+ *                                         as `/proc/self/fd/1234',  which  is  more  like  `dup(1234)' */
 INTERN ATTR_SECTION(".text.crt.io.access") WUNUSED NONNULL((2)) fd_t
 NOTHROW_RPC(VLIBCCALL libc_openat)(fd_t dirfd,
                                    char const *filename,

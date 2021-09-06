@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x77a288c0 */
+/* HASH CRC-32:0xa7651653 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -25,13 +25,10 @@
 #include <kos/anno.h>
 #include <bits/types.h>
 __NAMESPACE_LOCAL_BEGIN
-/* Dependency: PWrite32 from kos.unistd */
 #ifndef __local___localdep_PWrite32_defined
 #define __local___localdep_PWrite32_defined 1
 __CREDIRECT(__ATTR_NONNULL((2)),__SIZE_TYPE__,__THROWING,__localdep_PWrite32,(__fd_t __fd, void const *__buf, __SIZE_TYPE__ __bufsize, __pos32_t __offset),PWrite,(__fd,__buf,__bufsize,__offset))
 #endif /* !__local___localdep_PWrite32_defined */
-/* >> pwrite64(2)
- * Write data to a file at a specific offset */
 __LOCAL_LIBC(PWrite64) __ATTR_NONNULL((2)) __SIZE_TYPE__
 (__LIBCCALL __LIBC_LOCAL_NAME(PWrite64))(__fd_t __fd, void *__buf, __SIZE_TYPE__ __bufsize, __pos64_t __offset) __THROWS(...) {
 	return __localdep_PWrite32(__fd, __buf, __bufsize, (__pos32_t)__offset);

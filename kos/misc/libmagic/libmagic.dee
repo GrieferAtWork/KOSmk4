@@ -107,7 +107,7 @@ import * from errors;
 
 
 @@Option: bool
-@@An option that may be used for any group to
+@@An  option that  may be  used for  any group to
 @@cause it to ignore the effects of @Config.FORCE
 global final OPT_NOFORCE = "noforce";
 
@@ -227,7 +227,7 @@ local final libwin32 = try import("win32") catch (...) none;
 
 @@Get the last-modified timestamp for the given @filename
 @@NOTE: This function keeps an internal cache that is volatime
-@@      to changes to the current working directory.
+@@      to   changes   to  the   current   working  directory.
 function getLastModfiedTime(filename: string): time.Time | none {
 	local result = _lastModfiedTimeCache.get(filename);
 	if (result is none) {
@@ -291,7 +291,7 @@ function setForceChanged(filename: string, now: Object = none): Object {
 
 
 @@Remove a given @filename from the cache of
-@@known last-modified timestamps of files.
+@@known last-modified  timestamps of  files.
 function fileMayHaveChanged(filename: string) {
 	_lastModfiedTimeCache.pop(filename, none);
 }
@@ -341,20 +341,20 @@ class Step {
 	final member getProducedFiles: Callable = none; /* out */
 
 	@@> getProducedOutputFiles(step: BoundStep): {string...}
-	@@Returns the filenames of the primary output files, that is
-	@@the files who's timestamps should be considered as the ones
-	@@used to determine if changes in input files have occurred.
-	@@When this callback is defined, all other files which may
+	@@Returns the filenames of the  primary output files, that  is
+	@@the files who's timestamps should be considered as the  ones
+	@@used to determine if changes  in input files have  occurred.
+	@@When  this callback  is defined,  all other  files which may
 	@@also be produced by this build step are considered secondary
 	@@build artifacts who's timestamp will be ignored, except when
 	@@explicitly used as dependencies of other steps.
 	final member getProducedOutputFiles: Callable = none; /* out */
 
 	@@> getModifiedOutputFiles(step: BoundStep): {string...}
-	@@Returns the names of output files that (may) be modified or
-	@@created by this step. - This differs from @getProducedFiles,
-	@@in that modified output files may overlap with build steps,
-	@@however, during execution, care will be taken that no 2 steps
+	@@Returns  the names of  output files that  (may) be modified or
+	@@created by this step.  - This differs from  @getProducedFiles,
+	@@in that modified  output files may  overlap with build  steps,
+	@@however,  during execution, care will be taken that no 2 steps
 	@@that may modify the same output file are executed in parallel.
 	@@Also: In case another build step exists that may create such an
 	@@      output file, that step is always executed first, allowing
@@ -363,10 +363,10 @@ class Step {
 	final member getModifiedOutputFiles: Callable = none; /* in|out */
 
 	@@> getMaybeModifiedOutputFiles(step: BoundStep): {string...}
-	@@Same as `getModifiedOutputFiles()', but the enumerated files may
-	@@not necessarily get modified when the step is run. - Instead of using
+	@@Same  as  `getModifiedOutputFiles()',  but  the  enumerated  files  may
+	@@not  necessarily get modified when the step  is run. - Instead of using
 	@@the timestamp of the file itself, use a different file `.<name>.latest'
-	@@to keep track of the timestamp when such a file was last updated.
+	@@to keep  track of  the timestamp  when such  a file  was last  updated.
 	final member getMaybeModifiedOutputFiles: Callable = none; /* in|out */
 
 
@@ -393,10 +393,10 @@ class Group {
 	@@The name of this group (Only for logs; no syntactical meaning)
 	public final member name: string;
 
-	@@List of compilation steps, which are functions invoked
-	@@as Callable(group: Group, changed: bool): {Waitable...}
+	@@List  of  compilation steps,  which are  functions invoked
+	@@as  Callable(group:  Group, changed:  bool): {Waitable...}
 	@@The given parameter `changed' is set to true for the first
-	@@step, as well as any step performed after a previous step
+	@@step,  as well as any step performed after a previous step
 	@@returned at least 1 Waitable Object
 	public final member steps: {Step...} = [];
 
@@ -472,7 +472,7 @@ class Group {
 class Config {
 	this = default;
 
-	@@The prefix that should be used by a cross-compiler (needs
+	@@The prefix that should be used by a cross-compiler  (needs
 	@@to be used in conjunction with the implementing toolchain)
 	public final member CROSS_PREFIX: string = "";
 
@@ -490,7 +490,7 @@ class Config {
 	public final member FORCE: bool = false;
 
 	@@Set to true if error messages printed by build-tools
-	@@should be formatted into a singular, common format.
+	@@should  be formatted into a singular, common format.
 	public final member FORMAT_ERRORS: bool = false;
 
 	@@Enable verbose mode (print executed commands)
@@ -512,7 +512,7 @@ class Config {
 
 class Waitable {
 	this = default;
-	//function waitfor();
+	//function    waitfor();
 	//function trywaitfor();
 }
 
@@ -694,9 +694,9 @@ class BoundStep {
 
 	@@List of files that may be modified by this step
 	@@NOTE: The second tuple element is the original last-modified
-	@@      timestamp of the file (or @none if it didn't exist)
-	@@      This is needed to ensure that timestamps of outputs
-	@@      created by other steps are properly compared against
+	@@      timestamp of the  file (or @none  if it didn't  exist)
+	@@      This is needed  to ensure that  timestamps of  outputs
+	@@      created  by other steps  are properly compared against
 	@@      that timestamp at last point in time when the modified
 	@@      output file was last known to be ~whole~
 	@@Consider these 4 steps:
@@ -704,7 +704,7 @@ class BoundStep {
 	@@       - IN: a.txt; MODIFY: log.txt
 	@@       - IN: ...; OUT: b.txt
 	@@       - IN: b.txt; MODIFY: log.txt
-	@@These steps can be executed in the same order, and nothing
+	@@These steps can  be executed  in the same  order, and  nothing
 	@@would go wrong, however, the system is also allowed to execute
 	@@them like this:
 	@@       - IN: ...; OUT: a.txt
@@ -851,7 +851,7 @@ class BoundStep {
 		_stepWaitables = List(step.run(this));
 	}
 
-	@@Wait for all waitables of this step to complete
+	@@Wait for  all waitables  of this  step to  complete
 	@@If this step had already been finished in the past,
 	@@return immediately.
 	@@If the step hadn't been started yet, start it now
@@ -926,7 +926,7 @@ class BoundStep {
 		return false;
 	}
 
-	@@Enumerate the full path of dependencies
+	@@Enumerate the full path of  dependencies
 	@@to reach a given recursive dependency @s
 	function walkRecursiveDependencies(s: BoundStep): {BoundStep...} {
 		yield this;
@@ -975,7 +975,7 @@ function combineSteps(steps...: Step): Step {
 
 
 @@Order build steps and return all steps that need to be performed to build all of the given groups.
-@@The second set of steps are steps that depend on MaybeModified steps forming a dependency loop.
+@@The second set of steps  are steps that depend on  MaybeModified steps forming a dependency  loop.
 @@When non-empty, the input files of these steps must be re-checked for changes.
 function orderGroups(toolchainsAndGroups: {(Toolchain, {Group...})...}): ({BoundStep...}, {BoundStep...}) {
 	local loop_recheck: {BoundStep...} = HashSet();
@@ -1457,7 +1457,7 @@ class Timed {
 #endif
 
 
-@@Helper function for combining @orderGroups and @executeBuildSteps
+@@Helper function for  combining @orderGroups and  @executeBuildSteps
 @@in order to perform a parallel build of all of the specified groups
 function buildGroups(toolchainsAndGroups: {(Toolchain, {Group...})...}, maxParallelSteps: int = 8) {
 #if 1
@@ -1510,7 +1510,7 @@ again_recheck_deps:
 
 
 @@Same as @buildGroups(), however only perform steps
-@@for which the given @filterStep() returns true
+@@for  which  the given  @filterStep()  returns true
 function buildGroupsWithStepFilter(
 		toolchainsAndGroups: {(Toolchain, {Group...})...},
 		filterStep: {(bool,string)...} = none, maxParallelSteps: int = 8) {
@@ -1533,7 +1533,7 @@ function enumerateBoundStepOutputFilesForWhitelistChecking(step: BoundStep): {st
 }
 
 @@Same as @buildGroups(), however only perform steps that are required by other steps,
-@@as well as steps that produce output files that are apart of @outputWhiteList
+@@as well  as steps  that produce  output  files that  are apart  of  @outputWhiteList
 @@@param outputWhiteList: Set of (is_regex, pattern_or_filename)
 function buildGroupsWithOutputWhitelist(
 		toolchainsAndGroups: {(Toolchain, {Group...})...},
@@ -1573,9 +1573,9 @@ function buildGroupsWithGroupWhitelist(
 
 
 @@Same as @buildGroups(), however only perform steps that are required by other steps,
-@@as well as steps that are apart of identically-named groups containing at least a
-@@single step that requires one of the given @inputFileWhitelist as input
-@@Using this, you can implement something like BUILD_PROJECT_OF(SOURCE_FILE)
+@@as well as steps that  are apart of identically-named  groups containing at least  a
+@@single   step  that  requires   one  of  the   given  @inputFileWhitelist  as  input
+@@Using  this,  you   can  implement   something  like   BUILD_PROJECT_OF(SOURCE_FILE)
 @@@param inputFileWhitelist: Set of filenames normalized using `normalizePath(NAME, false)'
 function buildGroupsWithGroupOfInputFileWhitelist(
 		toolchainsAndGroups: {(Toolchain, {Group...})...},

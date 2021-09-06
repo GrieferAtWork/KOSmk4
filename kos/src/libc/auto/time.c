@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x82e31129 */
+/* HASH CRC-32:0xd230d5fa */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -109,7 +109,7 @@ __NAMESPACE_LOCAL_END
 #endif /* !__LIBC_GMTIME_BUFFER_DEFINED */
 #endif /* __BUILDING_LIBC */
 /* >> gmtime(3), gmtime64(3)
- * Return the `struct tm' representation of `*timer'
+ * Return  the  `struct tm'  representation  of   `*timer'
  * in Universal Coordinated Time (aka Greenwich Mean Time) */
 INTERN ATTR_SECTION(".text.crt.time") ATTR_RETNONNULL WUNUSED NONNULL((1)) struct tm *
 NOTHROW_NCX(LIBCCALL libc_gmtime)(time_t const *timer) {
@@ -152,7 +152,7 @@ NOTHROW_NCX(LIBCCALL libc_localtime)(time_t const *timer) {
 /* >> strftime(3)
  * Format `tp' into `s' according to `format'.
  * Write no more than `maxsize' characters and return the number
- * of characters written, or 0 if it would exceed `maxsize' */
+ * of characters  written, or  0 if  it would  exceed  `maxsize' */
 INTERN ATTR_SECTION(".text.crt.time") NONNULL((1, 3, 4)) size_t
 NOTHROW_NCX(LIBCCALL libc_strftime)(char *__restrict buf,
                                     size_t bufsize,
@@ -186,7 +186,7 @@ __NAMESPACE_LOCAL_END
 #endif /* !__LIBC_CTIME_BUFFER_DEFINED */
 /* >> asctime(3)
  * Return a string of the form "Day Mon dd hh:mm:ss yyyy\n"
- * that is the representation of `tp' in this format */
+ * that is  the  representation  of  `tp'  in  this  format */
 INTERN ATTR_SECTION(".text.crt.time") ATTR_RETNONNULL WUNUSED NONNULL((1)) char *
 NOTHROW_NCX(LIBCCALL libc_asctime)(struct tm const *tp) {
 	return libc_asctime_r(tp, __NAMESPACE_LOCAL_SYM __ctime_buf);
@@ -288,7 +288,7 @@ __NAMESPACE_LOCAL_END
 #endif /* !__LIBC_GMTIME_BUFFER_DEFINED */
 #endif /* __BUILDING_LIBC || (!__CRT_HAVE_gmtime && !__CRT_HAVE__gmtime32) */
 /* >> gmtime(3), gmtime64(3)
- * Return the `struct tm' representation of `*timer'
+ * Return  the  `struct tm'  representation  of   `*timer'
  * in Universal Coordinated Time (aka Greenwich Mean Time) */
 INTERN ATTR_SECTION(".text.crt.time") ATTR_RETNONNULL WUNUSED NONNULL((1)) struct tm *
 NOTHROW_NCX(LIBCCALL libc_gmtime64)(time64_t const *timer) {
@@ -399,7 +399,7 @@ NOTHROW_NCX(LIBCCALL libc_timespec_get64)(struct timespec64 *ts,
 #endif /* __SIZEOF_TIME32_T__ != __SIZEOF_TIME64_T__ */
 /* >> strftime_l(3)
  * Similar to `strftime(3)' but take the information from
- * the provided locale and not the global locale */
+ * the   provided  locale  and   not  the  global  locale */
 INTERN ATTR_SECTION(".text.crt.time") NONNULL((1, 3, 4)) size_t
 NOTHROW_NCX(LIBCCALL libc_strftime_l)(char *__restrict buf,
                                       size_t bufsize,
@@ -411,7 +411,7 @@ NOTHROW_NCX(LIBCCALL libc_strftime_l)(char *__restrict buf,
 }
 /* >> strptime(3)
  * Parse `s' according to `format' and store binary time information in `tp'.
- * The return value is a pointer to the first unparsed character in `s' */
+ * The return  value is  a pointer  to the  first unparsed  character in  `s' */
 INTERN ATTR_SECTION(".text.crt.time") NONNULL((1, 2, 3)) char *
 NOTHROW_NCX(LIBCCALL libc_strptime)(char const *__restrict s,
                                     char const *__restrict format,
@@ -436,7 +436,7 @@ NOTHROW_NCX(LIBCCALL libc_strptime)(char const *__restrict s,
 }
 /* >> strptime_l(3)
  * Similar to `strptime' but take the information from
- * the provided locale and not the global locale */
+ * the  provided  locale  and  not  the  global locale */
 INTERN ATTR_SECTION(".text.crt.time") NONNULL((1, 2, 3)) char *
 NOTHROW_NCX(LIBCCALL libc_strptime_l)(char const *__restrict s,
                                       char const *__restrict format,
@@ -446,11 +446,11 @@ NOTHROW_NCX(LIBCCALL libc_strptime_l)(char const *__restrict s,
 	return libc_strptime(s, format, tp);
 }
 /* >> getdate_r(3)
- * Since `getdate' is not reentrant because of the use of `getdate_err'
+ * Since  `getdate' is not  reentrant because of  the use of `getdate_err'
  * and the static buffer to return the result in, we provide a thread-safe
- * variant.  The functionality is the same.  The result is returned in
- * the buffer pointed to by `resbufp' and in case of an error the return
- * value is != 0 with the same values as given above for `getdate_err'. */
+ * variant.  The  functionality is  the same.  The  result is  returned in
+ * the buffer pointed to by `resbufp' and  in case of an error the  return
+ * value is != 0  with the same values  as given above for  `getdate_err'. */
 INTERN ATTR_SECTION(".text.crt.time") NONNULL((1, 2)) int
 NOTHROW_NCX(LIBCCALL libc_getdate_r)(char const *__restrict string,
                                      struct tm *__restrict resbufp) {
@@ -522,7 +522,7 @@ NOTHROW_NCX(LIBCCALL libc_gmtime_r)(time_t const *__restrict timer,
 			tp->tm_isdst = previousSunday >= 8;
 		} else {
 			//In November we must be before the first Sunday to be dst.
-			//That means the previous Sunday must be before the 1st.
+			//That means the  previous Sunday must  be before the  1st.
 			tp->tm_isdst = previousSunday <= 0;
 		}
 	}
@@ -634,7 +634,7 @@ NOTHROW_NCX(LIBCCALL libc_gmtime64_r)(time64_t const *__restrict timer,
 			tp->tm_isdst = previousSunday >= 8;
 		} else {
 			//In November we must be before the first Sunday to be dst.
-			//That means the previous Sunday must be before the 1st.
+			//That means the  previous Sunday must  be before the  1st.
 			tp->tm_isdst = previousSunday <= 0;
 		}
 	}
@@ -742,7 +742,7 @@ __NAMESPACE_LOCAL_END
 #endif /* __BUILDING_LIBC || !__CRT_HAVE_asctime_s */
 /* >> asctime_r(3)
  * Return in `buf' a string of the form "Day Mon dd hh:mm:ss yyyy\n"
- * that is the representation of `tp' in this format */
+ * that   is   the   representation   of   `tp'   in   this   format */
 INTERN ATTR_SECTION(".text.crt.time") NONNULL((1, 2)) char *
 NOTHROW_NCX(LIBCCALL libc_asctime_r)(struct tm const *__restrict tp,
                                      char buf[26]) {

@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xe362ec99 */
+/* HASH CRC-32:0xbc143349 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -24,29 +24,22 @@
 #if defined(__CRT_HAVE_fopendirat) || (defined(__CRT_HAVE_fdopendir) && (defined(__CRT_HAVE_openat64) || defined(__CRT_HAVE_openat)))
 struct __dirstream;
 __NAMESPACE_LOCAL_BEGIN
-/* Dependency: fopendirat from dirent */
 #ifndef __local___localdep_fopendirat_defined
 #define __local___localdep_fopendirat_defined 1
 #ifdef __CRT_HAVE_fopendirat
 __NAMESPACE_LOCAL_END
 #include <bits/types.h>
 __NAMESPACE_LOCAL_BEGIN
-/* >> fopendirat(3)
- * Directory-handle-relative, and flags-enabled versions of `opendir(3)' */
 __CREDIRECT(__ATTR_WUNUSED __ATTR_NONNULL((2)),struct __dirstream *,__NOTHROW_RPC,__localdep_fopendirat,(__fd_t __dirfd, char const *__name, __oflag_t __oflags),fopendirat,(__dirfd,__name,__oflags))
 #elif defined(__CRT_HAVE_fdopendir) && (defined(__CRT_HAVE_openat64) || defined(__CRT_HAVE_openat))
 __NAMESPACE_LOCAL_END
 #include <libc/local/dirent/fopendirat.h>
 __NAMESPACE_LOCAL_BEGIN
-/* >> fopendirat(3)
- * Directory-handle-relative, and flags-enabled versions of `opendir(3)' */
 #define __localdep_fopendirat __LIBC_LOCAL_NAME(fopendirat)
 #else /* ... */
 #undef __local___localdep_fopendirat_defined
 #endif /* !... */
 #endif /* !__local___localdep_fopendirat_defined */
-/* >> opendirat(3)
- * Directory-handle-relative, and flags-enabled versions of `opendir(3)' */
 __LOCAL_LIBC(opendirat) __ATTR_WUNUSED __ATTR_NONNULL((2)) struct __dirstream *
 __NOTHROW_RPC(__LIBCCALL __LIBC_LOCAL_NAME(opendirat))(__fd_t __dirfd, char const *__name) {
 	return __localdep_fopendirat(__dirfd, __name, 0);

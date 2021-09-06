@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x97c04ce3 */
+/* HASH CRC-32:0x6111ee9d */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -23,7 +23,6 @@
 #include <__crt.h>
 #if (defined(__CRT_HAVE_wspawnvpe) && __SIZEOF_WCHAR_T__ == 2 && defined(__LIBCCALL_IS_LIBDCALL)) || defined(__CRT_HAVE_DOS$wspawnvpe) || (defined(__CRT_HAVE__wspawnvpe) && __SIZEOF_WCHAR_T__ == 2 && defined(__LIBCCALL_IS_LIBDCALL)) || defined(__CRT_HAVE_DOS$_wspawnvpe)
 __NAMESPACE_LOCAL_BEGIN
-/* Dependency: c16spawnvpe from parts.uchar.process */
 #ifndef __local___localdep_c16spawnvpe_defined
 #define __local___localdep_c16spawnvpe_defined 1
 #if defined(__CRT_HAVE_wspawnvpe) && __SIZEOF_WCHAR_T__ == 2 && defined(__LIBCCALL_IS_LIBDCALL)

@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x1c9b34c5 */
+/* HASH CRC-32:0x14021720 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -22,12 +22,10 @@
 #define __local_isblank_l_defined 1
 #include <__crt.h>
 __NAMESPACE_LOCAL_BEGIN
-/* Dependency: __locale_ctype_ptr_l from ctype */
 #if !defined(__local___localdep___locale_ctype_ptr_l_defined) && defined(__CRT_HAVE___locale_ctype_ptr_l)
 #define __local___localdep___locale_ctype_ptr_l_defined 1
 __CREDIRECT(__ATTR_PURE __ATTR_WUNUSED,char const *,__NOTHROW_NCX,__localdep___locale_ctype_ptr_l,(__locale_t __locale),__locale_ctype_ptr_l,(__locale))
 #endif /* !__local___localdep___locale_ctype_ptr_l_defined && __CRT_HAVE___locale_ctype_ptr_l */
-/* Dependency: isblank from ctype */
 #ifndef __local___localdep_isblank_defined
 #define __local___localdep_isblank_defined 1
 #if __has_builtin(__builtin_isblank) && defined(__LIBC_BIND_CRTBUILTINS) && defined(__CRT_HAVE_isblank)

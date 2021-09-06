@@ -37,7 +37,7 @@ __SYSDECL_BEGIN
 }
 
 @@>> getauxval(3)
-@@Return the value associated with a named `type' from the
+@@Return the value associated with  a named `type' from  the
 @@auxiliary information vector passed to the calling program
 @@by the kernel.
 @@@param: type: One of `AT_*' from <elf.h>

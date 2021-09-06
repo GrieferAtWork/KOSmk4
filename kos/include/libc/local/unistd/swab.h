@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x636cb3e5 */
+/* HASH CRC-32:0xd3fcefff */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -23,10 +23,6 @@
 #include <__crt.h>
 #include <features.h>
 __NAMESPACE_LOCAL_BEGIN
-/* >> swab(3)
- * Copy `n_bytes & ~1' (FLOOR_ALIGN(n_bytes, 2)) from `from' to `to',
- * exchanging the order of even and odd bytes ("123456" --> "214365")
- * When `n_bytes <= 1', don't do anything and return immediately */
 __LOCAL_LIBC(swab) __ATTR_NONNULL((1, 2)) void
 __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(swab))(void const *__restrict __from, void *__restrict __to, __STDC_INT_AS_SSIZE_T __n_bytes) {
 	__n_bytes &= ~1;

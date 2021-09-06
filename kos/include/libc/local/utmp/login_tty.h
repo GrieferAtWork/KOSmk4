@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xf0bdcdb3 */
+/* HASH CRC-32:0xaa7bd1fe */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -24,106 +24,66 @@
 #include <asm/os/tty.h>
 #if defined(__TIOCSCTTY) && defined(__CRT_HAVE_ioctl) && defined(__CRT_HAVE_setsid) && (defined(__CRT_HAVE_dup2) || defined(__CRT_HAVE__dup2) || defined(__CRT_HAVE___dup2)) && (defined(__CRT_HAVE_close) || defined(__CRT_HAVE__close) || defined(__CRT_HAVE___close))
 __NAMESPACE_LOCAL_BEGIN
-/* Dependency: close from unistd */
 #ifndef __local___localdep_close_defined
 #define __local___localdep_close_defined 1
 #ifdef __CRT_HAVE_close
 __NAMESPACE_LOCAL_END
 #include <bits/types.h>
 __NAMESPACE_LOCAL_BEGIN
-/* >> close(2)
- * Close a given file descriptor/handle `fd' */
 __CREDIRECT(,int,__NOTHROW_NCX,__localdep_close,(__fd_t __fd),close,(__fd))
 #elif defined(__CRT_HAVE__close)
 __NAMESPACE_LOCAL_END
 #include <bits/types.h>
 __NAMESPACE_LOCAL_BEGIN
-/* >> close(2)
- * Close a given file descriptor/handle `fd' */
 __CREDIRECT(,int,__NOTHROW_NCX,__localdep_close,(__fd_t __fd),_close,(__fd))
 #elif defined(__CRT_HAVE___close)
 __NAMESPACE_LOCAL_END
 #include <bits/types.h>
 __NAMESPACE_LOCAL_BEGIN
-/* >> close(2)
- * Close a given file descriptor/handle `fd' */
 __CREDIRECT(,int,__NOTHROW_NCX,__localdep_close,(__fd_t __fd),__close,(__fd))
 #else /* ... */
 #undef __local___localdep_close_defined
 #endif /* !... */
 #endif /* !__local___localdep_close_defined */
-/* Dependency: dup2 from unistd */
 #ifndef __local___localdep_dup2_defined
 #define __local___localdep_dup2_defined 1
 #ifdef __CRT_HAVE_dup2
 __NAMESPACE_LOCAL_END
 #include <bits/types.h>
 __NAMESPACE_LOCAL_BEGIN
-/* >> dup2(2)
- * @return: newfd: Returns the new handle upon success.
- * Duplicate a file referred to by `oldfd' into `newfd' */
 __CREDIRECT(,__fd_t,__NOTHROW_NCX,__localdep_dup2,(__fd_t __oldfd, __fd_t __newfd),dup2,(__oldfd,__newfd))
 #elif defined(__CRT_HAVE__dup2)
 __NAMESPACE_LOCAL_END
 #include <bits/types.h>
 __NAMESPACE_LOCAL_BEGIN
-/* >> dup2(2)
- * @return: newfd: Returns the new handle upon success.
- * Duplicate a file referred to by `oldfd' into `newfd' */
 __CREDIRECT(,__fd_t,__NOTHROW_NCX,__localdep_dup2,(__fd_t __oldfd, __fd_t __newfd),_dup2,(__oldfd,__newfd))
 #elif defined(__CRT_HAVE___dup2)
 __NAMESPACE_LOCAL_END
 #include <bits/types.h>
 __NAMESPACE_LOCAL_BEGIN
-/* >> dup2(2)
- * @return: newfd: Returns the new handle upon success.
- * Duplicate a file referred to by `oldfd' into `newfd' */
 __CREDIRECT(,__fd_t,__NOTHROW_NCX,__localdep_dup2,(__fd_t __oldfd, __fd_t __newfd),__dup2,(__oldfd,__newfd))
 #else /* ... */
 #undef __local___localdep_dup2_defined
 #endif /* !... */
 #endif /* !__local___localdep_dup2_defined */
-/* Dependency: ioctl from sys.ioctl */
 #ifndef __local___localdep_ioctl_defined
 #define __local___localdep_ioctl_defined 1
 __NAMESPACE_LOCAL_END
 #include <features.h>
 #include <bits/types.h>
 __NAMESPACE_LOCAL_BEGIN
-/* >> ioctl(2)
- * Perform the I/O control operation specified by `request' on `fd'.
- * Many I/O control operations except an additional argument, though
- * this argument's type and meaning depends on `REQUEST'. If used, it's
- * usually either a pointer to a larger argument structure, or an integer
- * that fits into a single register.
- * @return: * : The return value depends on the given `request'.
- * @return: 0 : A zero return-value usually indicates success.
- * @return: -1: All ioctl operations use this to indicate error (s.a. `errno') */
 __CVREDIRECT(,__STDC_INT_AS_SSIZE_T,__NOTHROW_RPC,__localdep_ioctl,(__fd_t __fd, __ULONGPTR_TYPE__ __request),ioctl,(__fd,__request),__request,1,(void *))
 #endif /* !__local___localdep_ioctl_defined */
-/* Dependency: setsid from unistd */
 #ifndef __local___localdep_setsid_defined
 #define __local___localdep_setsid_defined 1
 __NAMESPACE_LOCAL_END
 #include <bits/types.h>
 __NAMESPACE_LOCAL_BEGIN
-/* >> setsid(2)
- * Make the calling thread's process the leader of its associated
- * process group, before also making it its own session leader.
- * Then return the TID of that new session leader, which is also the PID of the calling process.
- *  - THIS_THREAD->LEADER->GROUP_LEADER                 = THIS_THREAD->LEADER;
- *  - THIS_THREAD->LEADER->GROUP_LEADER->SESSION_LEADER = THIS_THREAD->LEADER->GROUP_LEADER;
- *  - return THIS_THREAD->LEADER->PID; */
 __CREDIRECT(,__pid_t,__NOTHROW_NCX,__localdep_setsid,(void),setsid,())
 #endif /* !__local___localdep_setsid_defined */
 __NAMESPACE_LOCAL_END
 #include <asm/os/stdio.h>
 __NAMESPACE_LOCAL_BEGIN
-/* >> login_tty(3)
- * Set the given `fd' as the controlling terminal, stdin,
- * stdout, and stderr. Afterwards, `fd' is closed.
- * @return: 0 : Success
- * @return: * : Error */
 __LOCAL_LIBC(login_tty) int
 __NOTHROW_RPC_KOS(__LIBCCALL __LIBC_LOCAL_NAME(login_tty))(__fd_t __fd) {
 	if __unlikely(__localdep_setsid() < 0)

@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x13cca25f */
+/* HASH CRC-32:0x6aefdb12 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -199,7 +199,7 @@ INTDEF NONNULL((1)) int NOTHROW_NCX(LIBCCALL libc_cnd_init)(cnd_t *__restrict co
 #endif /* !__KERNEL__ */
 #if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
 /* >> cnd_signal(3)
- * Wakeup one thread currently waiting on the given
+ * Wakeup  one thread currently  waiting on the given
  * condition variable (s.a. `pthread_cond_signal(3)')
  * @return: thrd_success: Success
  * @return: thrd_error:   Error */
@@ -207,7 +207,7 @@ INTDEF NONNULL((1)) int NOTHROW_NCX(LIBDCALL libd_cnd_signal)(cnd_t *__restrict 
 #endif /* !__LIBCCALL_IS_LIBDCALL && !__KERNEL__ */
 #ifndef __KERNEL__
 /* >> cnd_signal(3)
- * Wakeup one thread currently waiting on the given
+ * Wakeup  one thread currently  waiting on the given
  * condition variable (s.a. `pthread_cond_signal(3)')
  * @return: thrd_success: Success
  * @return: thrd_error:   Error */
@@ -215,7 +215,7 @@ INTDEF NONNULL((1)) int NOTHROW_NCX(LIBCCALL libc_cnd_signal)(cnd_t *__restrict 
 #endif /* !__KERNEL__ */
 #if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
 /* >> cnd_broadcast(3)
- * Wakeup all threads currently waiting on the given
+ * Wakeup  all  threads currently  waiting on  the given
  * condition variable (s.a. `pthread_cond_broadcast(3)')
  * @return: thrd_success: Success
  * @return: thrd_error:   Error */
@@ -223,7 +223,7 @@ INTDEF NONNULL((1)) int NOTHROW_NCX(LIBDCALL libd_cnd_broadcast)(cnd_t *__restri
 #endif /* !__LIBCCALL_IS_LIBDCALL && !__KERNEL__ */
 #ifndef __KERNEL__
 /* >> cnd_broadcast(3)
- * Wakeup all threads currently waiting on the given
+ * Wakeup  all  threads currently  waiting on  the given
  * condition variable (s.a. `pthread_cond_broadcast(3)')
  * @return: thrd_success: Success
  * @return: thrd_error:   Error */

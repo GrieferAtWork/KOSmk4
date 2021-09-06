@@ -55,11 +55,11 @@ NOTHROW_NCX(LIBCCALL libc_endaliasent)(void)
 }
 /*[[[end:libc_endaliasent]]]*/
 
-/*[[[head:libc_getaliasent,hash:CRC-32=0x2d0eb7a7]]]*/
+/*[[[head:libc_getaliasent,hash:CRC-32=0x2915d42d]]]*/
 /* >> getaliasent(3)
- * Read the entry entry from the mail alias alias database.
+ * Read  the  entry entry  from  the mail  alias  alias database.
  * If the database hadn't already been opened, this function will
- * open it the same way that a call to `setaliasent(3)' would.
+ * open  it the same  way that a  call to `setaliasent(3)' would.
  * @return: * :   A pointer to an internal, statically allocated structure
  * @return: NULL: [errno=<unchanged>] Database end has been reached
  * @return: NULL: [errno=ENOENT]      Database end has been reached

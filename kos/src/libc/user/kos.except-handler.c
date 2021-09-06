@@ -28,7 +28,7 @@ DECL_BEGIN
 
 
 
-/*[[[head:libc_set_exception_handler,hash:CRC-32=0xa6e70c38]]]*/
+/*[[[head:libc_set_exception_handler,hash:CRC-32=0xfd0dc29b]]]*/
 /* >> set_exception_handler(2)
  * Set the exception handler mode for the calling thread.
  * Examples:
@@ -37,7 +37,7 @@ DECL_BEGIN
  *     Set mode #3: set_exception_handler(EXCEPT_HANDLER_MODE_SIGHAND | EXCEPT_HANDLER_FLAG_SETHANDLER, &except_handler3, NULL)
  *     Set mode #4: set_exception_handler(EXCEPT_HANDLER_MODE_SIGHAND | EXCEPT_HANDLER_FLAG_SETHANDLER, &except_handler4, NULL)
  * WARNING: Many system libraries assume that either mode #3 or #4 is enabled,
- *          as other modes may not allow for exceptions such as E_SEGFAULT to
+ *          as other modes may not allow for exceptions such as E_SEGFAULT  to
  *          be handled using the TRY-EXCEPT model.
  *          Examples for these include: `libinstrlen:instruction_trysucc()'
  * @param: mode:       One of `EXCEPT_HANDLER_MODE_*', optionally or'd with `EXCEPT_HANDLER_FLAG_*'

@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xf4c1051b */
+/* HASH CRC-32:0x89e1244f */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -25,37 +25,25 @@
 #include <kos/anno.h>
 #include <bits/types.h>
 __NAMESPACE_LOCAL_BEGIN
-/* Dependency: Truncate32 from kos.unistd */
 #if !defined(__local___localdep_Truncate32_defined) && defined(__CRT_HAVE_Truncate)
 #define __local___localdep_Truncate32_defined 1
-/* >> truncate(2)
- * Truncate the given file `file' to a length of `length' */
 __CREDIRECT(__ATTR_NONNULL((1)),__vodi,__THROWING,__localdep_Truncate32,(char const *__file, __pos32_t __length),Truncate,(__file,__length))
 #endif /* !__local___localdep_Truncate32_defined && __CRT_HAVE_Truncate */
-/* Dependency: Truncate64 from kos.unistd */
 #ifndef __local___localdep_Truncate64_defined
 #define __local___localdep_Truncate64_defined 1
 #ifdef __CRT_HAVE_Truncate64
-/* >> truncate64(2)
- * Truncate the given file `file' to a length of `length' */
 __CREDIRECT_VOID(__ATTR_NONNULL((1)),__THROWING,__localdep_Truncate64,(char const *__file, __pos64_t __length),Truncate64,(__file,__length))
 #elif defined(__CRT_HAVE_Truncate) && __SIZEOF_OFF32_T__ == __SIZEOF_OFF64_T__
-/* >> truncate64(2)
- * Truncate the given file `file' to a length of `length' */
 __CREDIRECT_VOID(__ATTR_NONNULL((1)),__THROWING,__localdep_Truncate64,(char const *__file, __pos64_t __length),Truncate,(__file,__length))
 #elif defined(__CRT_HAVE_Truncate)
 __NAMESPACE_LOCAL_END
 #include <libc/local/kos.unistd/Truncate64.h>
 __NAMESPACE_LOCAL_BEGIN
-/* >> truncate64(2)
- * Truncate the given file `file' to a length of `length' */
 #define __localdep_Truncate64 __LIBC_LOCAL_NAME(Truncate64)
 #else /* ... */
 #undef __local___localdep_Truncate64_defined
 #endif /* !... */
 #endif /* !__local___localdep_Truncate64_defined */
-/* >> truncate(2)
- * Truncate the given file `file' to a length of `length' */
 __LOCAL_LIBC(Truncate) __ATTR_NONNULL((1)) void
 (__LIBCCALL __LIBC_LOCAL_NAME(Truncate))(char const *__file, __FS_TYPE(pos) __length) __THROWS(...) {
 #ifdef __CRT_HAVE_Truncate

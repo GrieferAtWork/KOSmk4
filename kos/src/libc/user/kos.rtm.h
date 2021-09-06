@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x6088a0a0 */
+/* HASH CRC-32:0x52e1a6b1 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -31,16 +31,16 @@ DECL_BEGIN
 
 #ifndef __KERNEL__
 /* >> rtm_begin(2)
- * Begin an RTM operation. Note that if the arch-specific RTM driver
+ * Begin  an  RTM operation.  Note that  if  the arch-specific  RTM driver
  * wasn't already loaded into the kernel, it will be loaded automatically,
  * though any error that may happen during this will result in `RTM_NOSYS'
  * begin returned.
- * Note that while an RTM operation is in progress, only a very small hand
- * full of system calls are allowed to be used. Attempting to use arbitrary
- * system calls will most likely result in an `RTM_ABORT_FAILED' error, and
+ * Note that while an RTM  operation is in progress,  only a very small  hand
+ * full  of system calls are allowed to  be used. Attempting to use arbitrary
+ * system calls will most likely  result in an `RTM_ABORT_FAILED' error,  and
  * attempting to access too much system memory in general will result in this
- * function returning with `RTM_ABORT_CAPACITY', rather than succeeding.
- * The following is a list of system calls which are whitelisted for use
+ * function returning  with  `RTM_ABORT_CAPACITY',  rather  than  succeeding.
+ * The following is  a list  of system calls  which are  whitelisted for  use
  * during a transaction:
  *   - rtm_begin(2):  Nested RTM operation
  *   - rtm_end(2):    End an RTM operation
@@ -55,12 +55,12 @@ INTDEF rtm_status_t NOTHROW(LIBCCALL libc_rtm_begin)(void);
  * End a transaction
  * If the transaction was successful, return normally
  * If the transaction failed, `rtm_begin()' returns `RTM_ABORT_*'
- * If no transaction was in progress, the behavior is undefined */
+ * If no transaction was in  progress, the behavior is  undefined */
 INTDEF void NOTHROW(LIBCCALL libc_rtm_end)(void);
 /* >> rtm_abort(2)
- * Abort the current transaction by having `rtm_begin()' return with
+ * Abort  the   current  transaction   by   having  `rtm_begin()'   return   with
  * `RTM_ABORT_EXPLICIT | ((code << RTM_ABORT_CODE_S) & RTM_ABORT_CODE_M)'
- * If no transaction was in progress, behave as a no-op. Otherwise, this
+ * If no  transaction  was  in  progress, behave  as  a  no-op.  Otherwise,  this
  * function does not return normally, but returns from the original `rtm_begin()' */
 INTDEF void NOTHROW(__FCALL libc_rtm_abort)(unsigned int code);
 /* >> rtm_test(2)

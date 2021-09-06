@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xb96bc535 */
+/* HASH CRC-32:0x7e3fb687 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -23,9 +23,6 @@
 #include <__crt.h>
 #include <hybrid/typecore.h>
 __NAMESPACE_LOCAL_BEGIN
-/* >> memfrob(3)
- * Xor every byte in `buf...+=num_bytes' with decimal `42' (yeah...)
- * Always re-return the given `buf' */
 __LOCAL_LIBC(memfrob) __ATTR_LEAF __ATTR_RETNONNULL __ATTR_NONNULL((1)) void *
 __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(memfrob))(void *__buf, __SIZE_TYPE__ __num_bytes) {
 	__BYTE_TYPE__ *__iter = (__BYTE_TYPE__ *)__buf;

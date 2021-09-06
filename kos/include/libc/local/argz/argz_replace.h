@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xaabd8115 */
+/* HASH CRC-32:0xbef2e3a5 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -24,109 +24,67 @@
 #if defined(__CRT_HAVE_realloc) && (defined(__CRT_HAVE_free) || defined(__CRT_HAVE_cfree))
 #include <bits/types.h>
 __NAMESPACE_LOCAL_BEGIN
-/* Dependency: memmem from string */
 #ifndef __local___localdep_memmem_defined
 #define __local___localdep_memmem_defined 1
 #if defined(__CRT_HAVE_memmem0) && defined(__USE_MEMMEM_EMPTY_NEEDLE_NULL)
 __NAMESPACE_LOCAL_END
 #include <hybrid/typecore.h>
 __NAMESPACE_LOCAL_BEGIN
-/* >> memmem(3)
- * Return the first address of a sub-string `needle...+=needlelen'
- * stored within `haystack...+=haystacklen'
- * If no such sub-string exists, return `NULL' instead.
- * #ifdef _MEMMEM_EMPTY_NEEDLE_NULL_SOURCE
- * When `needlelen' is ZERO(0), also return `NULL' unconditionally.
- * #else // _MEMMEM_EMPTY_NEEDLE_NULL_SOURCE
- * When `needlelen' is ZERO(0), re-return `haystack' unconditionally.
- * #endif // !_MEMMEM_EMPTY_NEEDLE_NULL_SOURCE */
 __CREDIRECT(__ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1, 3)),void *,__NOTHROW_NCX,__localdep_memmem,(void const *__haystack, __SIZE_TYPE__ __haystacklen, void const *__needle, __SIZE_TYPE__ __needlelen),memmem0,(__haystack,__haystacklen,__needle,__needlelen))
 #elif defined(__CRT_HAVE_memmem) && !defined(__USE_MEMMEM_EMPTY_NEEDLE_NULL)
 __NAMESPACE_LOCAL_END
 #include <hybrid/typecore.h>
 __NAMESPACE_LOCAL_BEGIN
-/* >> memmem(3)
- * Return the first address of a sub-string `needle...+=needlelen'
- * stored within `haystack...+=haystacklen'
- * If no such sub-string exists, return `NULL' instead.
- * #ifdef _MEMMEM_EMPTY_NEEDLE_NULL_SOURCE
- * When `needlelen' is ZERO(0), also return `NULL' unconditionally.
- * #else // _MEMMEM_EMPTY_NEEDLE_NULL_SOURCE
- * When `needlelen' is ZERO(0), re-return `haystack' unconditionally.
- * #endif // !_MEMMEM_EMPTY_NEEDLE_NULL_SOURCE */
 __CREDIRECT(__ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1, 3)),void *,__NOTHROW_NCX,__localdep_memmem,(void const *__haystack, __SIZE_TYPE__ __haystacklen, void const *__needle, __SIZE_TYPE__ __needlelen),memmem,(__haystack,__haystacklen,__needle,__needlelen))
 #else /* ... */
 __NAMESPACE_LOCAL_END
 #include <libc/local/string/memmem.h>
 __NAMESPACE_LOCAL_BEGIN
-/* >> memmem(3)
- * Return the first address of a sub-string `needle...+=needlelen'
- * stored within `haystack...+=haystacklen'
- * If no such sub-string exists, return `NULL' instead.
- * #ifdef _MEMMEM_EMPTY_NEEDLE_NULL_SOURCE
- * When `needlelen' is ZERO(0), also return `NULL' unconditionally.
- * #else // _MEMMEM_EMPTY_NEEDLE_NULL_SOURCE
- * When `needlelen' is ZERO(0), re-return `haystack' unconditionally.
- * #endif // !_MEMMEM_EMPTY_NEEDLE_NULL_SOURCE */
 #define __localdep_memmem __LIBC_LOCAL_NAME(memmem)
 #endif /* !... */
 #endif /* !__local___localdep_memmem_defined */
-/* Dependency: memmovedownc from string */
 #ifndef __local___localdep_memmovedownc_defined
 #define __local___localdep_memmovedownc_defined 1
 #ifdef __CRT_HAVE_memmovedownc
 __NAMESPACE_LOCAL_END
 #include <hybrid/typecore.h>
 __NAMESPACE_LOCAL_BEGIN
-/* Move memory between potentially overlapping memory blocks (assumes that `dst <= src || !ELEM_COUNT || !ELEM_SIZE')
- * @return: * : Always re-returns `dst' */
 __CREDIRECT(__ATTR_LEAF __ATTR_RETNONNULL __ATTR_NONNULL((1, 2)),void *,__NOTHROW_NCX,__localdep_memmovedownc,(void *__dst, void const *__src, __SIZE_TYPE__ __elem_count, __SIZE_TYPE__ __elem_size),memmovedownc,(__dst,__src,__elem_count,__elem_size))
 #else /* __CRT_HAVE_memmovedownc */
 __NAMESPACE_LOCAL_END
 #include <libc/local/string/memmovedownc.h>
 __NAMESPACE_LOCAL_BEGIN
-/* Move memory between potentially overlapping memory blocks (assumes that `dst <= src || !ELEM_COUNT || !ELEM_SIZE')
- * @return: * : Always re-returns `dst' */
 #define __localdep_memmovedownc __LIBC_LOCAL_NAME(memmovedownc)
 #endif /* !__CRT_HAVE_memmovedownc */
 #endif /* !__local___localdep_memmovedownc_defined */
-/* Dependency: memmoveupc from string */
 #ifndef __local___localdep_memmoveupc_defined
 #define __local___localdep_memmoveupc_defined 1
 #ifdef __CRT_HAVE_memmoveupc
 __NAMESPACE_LOCAL_END
 #include <hybrid/typecore.h>
 __NAMESPACE_LOCAL_BEGIN
-/* Move memory between potentially overlapping memory blocks (assumes that `dst >= src || !ELEM_COUNT || !ELEM_SIZE')
- * @return: * : Always re-returns `dst' */
 __CREDIRECT(__ATTR_LEAF __ATTR_RETNONNULL __ATTR_NONNULL((1, 2)),void *,__NOTHROW_NCX,__localdep_memmoveupc,(void *__dst, void const *__src, __SIZE_TYPE__ __elem_count, __SIZE_TYPE__ __elem_size),memmoveupc,(__dst,__src,__elem_count,__elem_size))
 #else /* __CRT_HAVE_memmoveupc */
 __NAMESPACE_LOCAL_END
 #include <libc/local/string/memmoveupc.h>
 __NAMESPACE_LOCAL_BEGIN
-/* Move memory between potentially overlapping memory blocks (assumes that `dst >= src || !ELEM_COUNT || !ELEM_SIZE')
- * @return: * : Always re-returns `dst' */
 #define __localdep_memmoveupc __LIBC_LOCAL_NAME(memmoveupc)
 #endif /* !__CRT_HAVE_memmoveupc */
 #endif /* !__local___localdep_memmoveupc_defined */
-/* Dependency: mempcpyc from string */
 #ifndef __local___localdep_mempcpyc_defined
 #define __local___localdep_mempcpyc_defined 1
 #ifdef __CRT_HAVE_mempcpyc
 __NAMESPACE_LOCAL_END
 #include <hybrid/typecore.h>
 __NAMESPACE_LOCAL_BEGIN
-/* Same as `memcpyc', but return `dst + (ELEM_COUNT * ELEM_SIZE)', rather than `dst' */
 __CREDIRECT(__ATTR_LEAF __ATTR_RETNONNULL __ATTR_NONNULL((1, 2)),void *,__NOTHROW_NCX,__localdep_mempcpyc,(void *__restrict __dst, void const *__restrict __src, __SIZE_TYPE__ __elem_count, __SIZE_TYPE__ __elem_size),mempcpyc,(__dst,__src,__elem_count,__elem_size))
 #else /* __CRT_HAVE_mempcpyc */
 __NAMESPACE_LOCAL_END
 #include <libc/local/string/mempcpyc.h>
 __NAMESPACE_LOCAL_BEGIN
-/* Same as `memcpyc', but return `dst + (ELEM_COUNT * ELEM_SIZE)', rather than `dst' */
 #define __localdep_mempcpyc __LIBC_LOCAL_NAME(mempcpyc)
 #endif /* !__CRT_HAVE_mempcpyc */
 #endif /* !__local___localdep_mempcpyc_defined */
-/* Dependency: realloc from stdlib */
 #ifndef __local___localdep_realloc_defined
 #define __local___localdep_realloc_defined 1
 #if __has_builtin(__builtin_realloc) && defined(__LIBC_BIND_CRTBUILTINS)
@@ -141,36 +99,23 @@ __NAMESPACE_LOCAL_BEGIN
 __CREDIRECT(__ATTR_MALL_DEFAULT_ALIGNED __ATTR_WUNUSED __ATTR_ALLOC_SIZE((2)),void *,__NOTHROW_NCX,__localdep_realloc,(void *__mallptr, __SIZE_TYPE__ __num_bytes),realloc,(__mallptr,__num_bytes))
 #endif /* !__has_builtin(__builtin_realloc) || !__LIBC_BIND_CRTBUILTINS */
 #endif /* !__local___localdep_realloc_defined */
-/* Dependency: strlen from string */
 #ifndef __local___localdep_strlen_defined
 #define __local___localdep_strlen_defined 1
 #ifdef __CRT_HAVE_strlen
 __NAMESPACE_LOCAL_END
 #include <hybrid/typecore.h>
 __NAMESPACE_LOCAL_BEGIN
-/* >> strlen(3)
- * Return the length of the string in characters (Same as `rawmemlen[...](str, '\0')') */
 __CREDIRECT(__ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1)),__SIZE_TYPE__,__NOTHROW_NCX,__localdep_strlen,(char const *__restrict __str),strlen,(__str))
 #else /* __CRT_HAVE_strlen */
 __NAMESPACE_LOCAL_END
 #include <libc/local/string/strlen.h>
 __NAMESPACE_LOCAL_BEGIN
-/* >> strlen(3)
- * Return the length of the string in characters (Same as `rawmemlen[...](str, '\0')') */
 #define __localdep_strlen __LIBC_LOCAL_NAME(strlen)
 #endif /* !__CRT_HAVE_strlen */
 #endif /* !__local___localdep_strlen_defined */
 __NAMESPACE_LOCAL_END
 #include <libc/errno.h>
 __NAMESPACE_LOCAL_BEGIN
-/* >> argz_replace(3)
- * Replace all matches of `str' inside of every string or sub-string from `pargz...+=pargz_len'
- * with `with', and resize the argz-string if necessary. For every replacement that is done,
- * the given `replace_count' is incremented by one (if `replace_count' is non-NULL)
- * @return: 0:      Success
- * @return: ENOMEM: Insufficient heap memory (can only happen when `strlen(with) > strlen(str)',
- *                  but note that the GLibc implementation of this function is completely
- *                  unreadable and may be able to return this for other cases as well...) */
 __LOCAL_LIBC(argz_replace) __ATTR_NONNULL((1, 2, 4)) __errno_t
 __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(argz_replace))(char **__restrict __pargz, __SIZE_TYPE__ *__restrict __pargz_len, char const *__restrict __str, char const *__restrict __with, unsigned int *__restrict __replace_count) {
 	__SIZE_TYPE__ __findlen, __repllen;
@@ -184,7 +129,7 @@ __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(argz_replace))(char **__restrict __pa
 	__find_offset = 0;
 	/* I have no  idea what the  GLibc implementation does  here, and I'm  not
 	 * quite sure it  knows either.  - At first  I though  that this  function
-	 * was supposed to  only replace  entries of an  argz-string  as a  whole,
+	 * was supposed to  only replace  entries of  an argz-string  as a  whole,
 	 * but now I  believe it's just  supposed to do  replacement of any  match
 	 * found.  However, GLibc appears to be utterly afraid of using `memmem()'
 	 * for  this,  and instead  opt's to  using  `argz_next()' to  iterate the

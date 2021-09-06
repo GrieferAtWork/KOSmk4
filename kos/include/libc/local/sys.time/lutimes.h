@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x23f7efbb */
+/* HASH CRC-32:0x697c34b0 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -24,12 +24,10 @@
 #if defined(__CRT_HAVE_lutimes64) || defined(__CRT_HAVE_lutimes)
 #include <bits/os/timeval.h>
 __NAMESPACE_LOCAL_BEGIN
-/* Dependency: lutimes32 from sys.time */
 #if !defined(__local___localdep_lutimes32_defined) && defined(__CRT_HAVE_lutimes)
 #define __local___localdep_lutimes32_defined 1
 __CREDIRECT(__ATTR_NONNULL((1)),int,__NOTHROW_NCX,__localdep_lutimes32,(char const *__file, struct __timeval32 const __tvp[2]),lutimes,(__file,__tvp))
 #endif /* !__local___localdep_lutimes32_defined && __CRT_HAVE_lutimes */
-/* Dependency: lutimes64 from sys.time */
 #ifndef __local___localdep_lutimes64_defined
 #define __local___localdep_lutimes64_defined 1
 #ifdef __CRT_HAVE_lutimes64

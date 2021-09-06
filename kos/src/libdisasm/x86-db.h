@@ -2915,8 +2915,8 @@ PRIVATE struct instruction const ops_0f[] = {
 	I(0x77, IF_VEX, OP_VEX_B0(0, 1, 0, 1) "vzeroall"),
 	I(0x77, 0,                      "emms"),
 
-//	I(0x78, IF_MODRM|IF_RMM,  "svdc\t" OP_RSEG OP_MEM/*80*/), /* http://www.geoffchappell.com/notes/windows/archive/linkcpu.htm */
-//	I(0x79, IF_MODRM|IF_RMM,  "rsdc\t" OP_MEM/*80*/ OP_RSEG), /* http://www.geoffchappell.com/notes/windows/archive/linkcpu.htm */
+//	I(0x78, IF_MODRM|IF_RMM, "svdc\t" OP_RSEG OP_MEM/*80*/), /* http://www.geoffchappell.com/notes/windows/archive/linkcpu.htm */
+//	I(0x79, IF_MODRM|IF_RMM, "rsdc\t" OP_MEM/*80*/ OP_RSEG), /* http://www.geoffchappell.com/notes/windows/archive/linkcpu.htm */
 
 	I(0x78, IF_VEX|IF_MODRM, LONGREPR_B(B_OP_VEX_B0(0, 0, 1, 0), LO_VCVTTPD2UDQ)),     /* EVEX.128.0f.W1 78 /r vcvttpd2udq xmm1{k1}{z}, xmm2/m128/m64bcst */
 	I(0x78, IF_VEX|IF_MODRM, LONGREPR_B(B_OP_VEX_B0(0, 0, 1, 1), LO_VCVTTPD2UDQ)),     /* EVEX.256.0f.W1 78 /r vcvttpd2udq xmm1{k1}{z}, ymm2/m256/m64bcst */

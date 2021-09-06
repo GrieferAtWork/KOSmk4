@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x5e8123d7 */
+/* HASH CRC-32:0x2334876a */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -25,18 +25,13 @@
 #if defined(__AT_FDCWD) && defined(__CRT_HAVE_UnlinkAt)
 #include <kos/anno.h>
 __NAMESPACE_LOCAL_BEGIN
-/* Dependency: UnlinkAt from kos.unistd */
 #ifndef __local___localdep_UnlinkAt_defined
 #define __local___localdep_UnlinkAt_defined 1
 __NAMESPACE_LOCAL_END
 #include <bits/types.h>
 __NAMESPACE_LOCAL_BEGIN
-/* >> unlinkat(2)
- * Remove a file, symbolic link, device or FIFO referred to by `dfd:name' */
 __CREDIRECT_VOID(__ATTR_NONNULL((2)),__THROWING,__localdep_UnlinkAt,(__fd_t __dfd, char const *__name, __atflag_t __flags),UnlinkAt,(__dfd,__name,__flags))
 #endif /* !__local___localdep_UnlinkAt_defined */
-/* >> rmdir(2)
- * Remove a directory referred to by `path' */
 __LOCAL_LIBC(Rmdir) __ATTR_NONNULL((1)) void
 (__LIBCCALL __LIBC_LOCAL_NAME(Rmdir))(char const *__path) __THROWS(...) {
 	__localdep_UnlinkAt(__AT_FDCWD, __path, 0x0200); /* AT_REMOVEDIR */

@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x1b50e085 */
+/* HASH CRC-32:0xd7cf8d11 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -24,7 +24,6 @@
 #include <features.h>
 #include <hybrid/typecore.h>
 __NAMESPACE_LOCAL_BEGIN
-/* Dependency: _vsnwprintf_s_l from wchar */
 #ifndef __local___localdep__vsnwprintf_s_l_defined
 #define __local___localdep__vsnwprintf_s_l_defined 1
 #ifdef __CRT_HAVE__vsnwprintf_s_l

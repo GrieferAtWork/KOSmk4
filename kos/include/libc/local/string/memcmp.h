@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xf3b7d6e6 */
+/* HASH CRC-32:0x53e4ecab */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -23,11 +23,6 @@
 #include <__crt.h>
 #include <hybrid/typecore.h>
 __NAMESPACE_LOCAL_BEGIN
-/* >> memcmp(3)
- * Compare memory buffers and return the difference of the first non-matching byte
- * @return:  < 0: `s1...+=n_bytes'  < `s2...+=n_bytes'
- * @return: == 0: `s1...+=n_bytes' == `s2...+=n_bytes'
- * @return:  > 0: `s1...+=n_bytes'  > `s2...+=n_bytes' */
 __LOCAL_LIBC(memcmp) __ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1, 2)) int
 __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(memcmp))(void const *__s1, void const *__s2, __SIZE_TYPE__ __n_bytes) {
 	__BYTE_TYPE__ *__p1 = (__BYTE_TYPE__ *)__s1;

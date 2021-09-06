@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x2532b4e8 */
+/* HASH CRC-32:0xa95a531f */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -64,13 +64,13 @@ INTDEF ATTR_RETNONNULL WUNUSED NONNULL((1)) char *NOTHROW_NCX(LIBCCALL libc_ctim
 #endif /* !__KERNEL__ */
 #if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
 /* >> gmtime(3), gmtime64(3)
- * Return the `struct tm' representation of `*timer'
+ * Return  the  `struct tm'  representation  of   `*timer'
  * in Universal Coordinated Time (aka Greenwich Mean Time) */
 INTDEF ATTR_RETNONNULL WUNUSED NONNULL((1)) struct tm *NOTHROW_NCX(LIBDCALL libd_gmtime)(time_t const *timer);
 #endif /* !__LIBCCALL_IS_LIBDCALL && !__KERNEL__ */
 #ifndef __KERNEL__
 /* >> gmtime(3), gmtime64(3)
- * Return the `struct tm' representation of `*timer'
+ * Return  the  `struct tm'  representation  of   `*timer'
  * in Universal Coordinated Time (aka Greenwich Mean Time) */
 INTDEF ATTR_RETNONNULL WUNUSED NONNULL((1)) struct tm *NOTHROW_NCX(LIBCCALL libc_gmtime)(time_t const *timer);
 #endif /* !__KERNEL__ */
@@ -88,26 +88,26 @@ INTDEF ATTR_RETNONNULL WUNUSED NONNULL((1)) struct tm *NOTHROW_NCX(LIBCCALL libc
 /* >> strftime(3)
  * Format `tp' into `s' according to `format'.
  * Write no more than `maxsize' characters and return the number
- * of characters written, or 0 if it would exceed `maxsize' */
+ * of characters  written, or  0 if  it would  exceed  `maxsize' */
 INTDEF NONNULL((1, 3, 4)) size_t NOTHROW_NCX(LIBDCALL libd_strftime)(char *__restrict buf, size_t bufsize, char const *__restrict format, struct tm const *__restrict tp);
 #endif /* !__LIBCCALL_IS_LIBDCALL && !__KERNEL__ */
 #ifndef __KERNEL__
 /* >> strftime(3)
  * Format `tp' into `s' according to `format'.
  * Write no more than `maxsize' characters and return the number
- * of characters written, or 0 if it would exceed `maxsize' */
+ * of characters  written, or  0 if  it would  exceed  `maxsize' */
 INTDEF NONNULL((1, 3, 4)) size_t NOTHROW_NCX(LIBCCALL libc_strftime)(char *__restrict buf, size_t bufsize, char const *__restrict format, struct tm const *__restrict tp);
 #endif /* !__KERNEL__ */
 #if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
 /* >> asctime(3)
  * Return a string of the form "Day Mon dd hh:mm:ss yyyy\n"
- * that is the representation of `tp' in this format */
+ * that is  the  representation  of  `tp'  in  this  format */
 INTDEF ATTR_RETNONNULL WUNUSED NONNULL((1)) char *NOTHROW_NCX(LIBDCALL libd_asctime)(struct tm const *tp);
 #endif /* !__LIBCCALL_IS_LIBDCALL && !__KERNEL__ */
 #ifndef __KERNEL__
 /* >> asctime(3)
  * Return a string of the form "Day Mon dd hh:mm:ss yyyy\n"
- * that is the representation of `tp' in this format */
+ * that is  the  representation  of  `tp'  in  this  format */
 INTDEF ATTR_RETNONNULL WUNUSED NONNULL((1)) char *NOTHROW_NCX(LIBCCALL libc_asctime)(struct tm const *tp);
 #endif /* !__KERNEL__ */
 #if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
@@ -151,13 +151,13 @@ INTDEF ATTR_RETNONNULL WUNUSED NONNULL((1)) char *NOTHROW_NCX(LIBCCALL libc_ctim
 #endif /* !__KERNEL__ */
 #if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
 /* >> gmtime(3), gmtime64(3)
- * Return the `struct tm' representation of `*timer'
+ * Return  the  `struct tm'  representation  of   `*timer'
  * in Universal Coordinated Time (aka Greenwich Mean Time) */
 INTDEF ATTR_RETNONNULL WUNUSED NONNULL((1)) struct tm *NOTHROW_NCX(LIBDCALL libd_gmtime64)(time64_t const *timer);
 #endif /* !__LIBCCALL_IS_LIBDCALL && !__KERNEL__ */
 #ifndef __KERNEL__
 /* >> gmtime(3), gmtime64(3)
- * Return the `struct tm' representation of `*timer'
+ * Return  the  `struct tm'  representation  of   `*timer'
  * in Universal Coordinated Time (aka Greenwich Mean Time) */
 INTDEF ATTR_RETNONNULL WUNUSED NONNULL((1)) struct tm *NOTHROW_NCX(LIBCCALL libc_gmtime64)(time64_t const *timer);
 #endif /* !__KERNEL__ */
@@ -288,55 +288,55 @@ INTDEF NONNULL((1)) int NOTHROW_NCX(LIBCCALL libc_timespec_get64)(struct timespe
 INTDEF NONNULL((1)) struct tm *NOTHROW_NCX(LIBDCALL libd_getdate)(const char *string);
 /* >> strftime_l(3)
  * Similar to `strftime(3)' but take the information from
- * the provided locale and not the global locale */
+ * the   provided  locale  and   not  the  global  locale */
 INTDEF NONNULL((1, 3, 4)) size_t NOTHROW_NCX(LIBDCALL libd_strftime_l)(char *__restrict buf, size_t bufsize, char const *__restrict format, struct tm const *__restrict tp, locale_t locale);
 #endif /* !__LIBCCALL_IS_LIBDCALL && !__KERNEL__ */
 #ifndef __KERNEL__
 /* >> strftime_l(3)
  * Similar to `strftime(3)' but take the information from
- * the provided locale and not the global locale */
+ * the   provided  locale  and   not  the  global  locale */
 INTDEF NONNULL((1, 3, 4)) size_t NOTHROW_NCX(LIBCCALL libc_strftime_l)(char *__restrict buf, size_t bufsize, char const *__restrict format, struct tm const *__restrict tp, locale_t locale);
 #endif /* !__KERNEL__ */
 #if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
 /* >> strptime(3)
  * Parse `s' according to `format' and store binary time information in `tp'.
- * The return value is a pointer to the first unparsed character in `s' */
+ * The return  value is  a pointer  to the  first unparsed  character in  `s' */
 INTDEF NONNULL((1, 2, 3)) char *NOTHROW_NCX(LIBDCALL libd_strptime)(char const *__restrict s, char const *__restrict format, struct tm *__restrict tp);
 #endif /* !__LIBCCALL_IS_LIBDCALL && !__KERNEL__ */
 #ifndef __KERNEL__
 /* >> strptime(3)
  * Parse `s' according to `format' and store binary time information in `tp'.
- * The return value is a pointer to the first unparsed character in `s' */
+ * The return  value is  a pointer  to the  first unparsed  character in  `s' */
 INTDEF NONNULL((1, 2, 3)) char *NOTHROW_NCX(LIBCCALL libc_strptime)(char const *__restrict s, char const *__restrict format, struct tm *__restrict tp);
 #endif /* !__KERNEL__ */
 #if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
 /* >> strptime_l(3)
  * Similar to `strptime' but take the information from
- * the provided locale and not the global locale */
+ * the  provided  locale  and  not  the  global locale */
 INTDEF NONNULL((1, 2, 3)) char *NOTHROW_NCX(LIBDCALL libd_strptime_l)(char const *__restrict s, char const *__restrict format, struct tm *__restrict tp, locale_t locale);
 #endif /* !__LIBCCALL_IS_LIBDCALL && !__KERNEL__ */
 #ifndef __KERNEL__
 /* >> strptime_l(3)
  * Similar to `strptime' but take the information from
- * the provided locale and not the global locale */
+ * the  provided  locale  and  not  the  global locale */
 INTDEF NONNULL((1, 2, 3)) char *NOTHROW_NCX(LIBCCALL libc_strptime_l)(char const *__restrict s, char const *__restrict format, struct tm *__restrict tp, locale_t locale);
 #endif /* !__KERNEL__ */
 #if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
 /* >> getdate_r(3)
- * Since `getdate' is not reentrant because of the use of `getdate_err'
+ * Since  `getdate' is not  reentrant because of  the use of `getdate_err'
  * and the static buffer to return the result in, we provide a thread-safe
- * variant.  The functionality is the same.  The result is returned in
- * the buffer pointed to by `resbufp' and in case of an error the return
- * value is != 0 with the same values as given above for `getdate_err'. */
+ * variant.  The  functionality is  the same.  The  result is  returned in
+ * the buffer pointed to by `resbufp' and  in case of an error the  return
+ * value is != 0  with the same values  as given above for  `getdate_err'. */
 INTDEF NONNULL((1, 2)) int NOTHROW_NCX(LIBDCALL libd_getdate_r)(char const *__restrict string, struct tm *__restrict resbufp);
 #endif /* !__LIBCCALL_IS_LIBDCALL && !__KERNEL__ */
 #ifndef __KERNEL__
 /* >> getdate_r(3)
- * Since `getdate' is not reentrant because of the use of `getdate_err'
+ * Since  `getdate' is not  reentrant because of  the use of `getdate_err'
  * and the static buffer to return the result in, we provide a thread-safe
- * variant.  The functionality is the same.  The result is returned in
- * the buffer pointed to by `resbufp' and in case of an error the return
- * value is != 0 with the same values as given above for `getdate_err'. */
+ * variant.  The  functionality is  the same.  The  result is  returned in
+ * the buffer pointed to by `resbufp' and  in case of an error the  return
+ * value is != 0  with the same values  as given above for  `getdate_err'. */
 INTDEF NONNULL((1, 2)) int NOTHROW_NCX(LIBCCALL libc_getdate_r)(char const *__restrict string, struct tm *__restrict resbufp);
 #endif /* !__KERNEL__ */
 #if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
@@ -406,13 +406,13 @@ INTDEF NONNULL((1, 2)) char *NOTHROW_NCX(LIBCCALL libc_ctime64_r)(time64_t const
 #if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
 /* >> asctime_r(3)
  * Return in `buf' a string of the form "Day Mon dd hh:mm:ss yyyy\n"
- * that is the representation of `tp' in this format */
+ * that   is   the   representation   of   `tp'   in   this   format */
 INTDEF NONNULL((1, 2)) char *NOTHROW_NCX(LIBDCALL libd_asctime_r)(struct tm const *__restrict tp, char buf[26]);
 #endif /* !__LIBCCALL_IS_LIBDCALL && !__KERNEL__ */
 #ifndef __KERNEL__
 /* >> asctime_r(3)
  * Return in `buf' a string of the form "Day Mon dd hh:mm:ss yyyy\n"
- * that is the representation of `tp' in this format */
+ * that   is   the   representation   of   `tp'   in   this   format */
 INTDEF NONNULL((1, 2)) char *NOTHROW_NCX(LIBCCALL libc_asctime_r)(struct tm const *__restrict tp, char buf[26]);
 #endif /* !__KERNEL__ */
 

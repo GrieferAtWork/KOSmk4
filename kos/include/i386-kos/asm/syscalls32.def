@@ -48,11 +48,11 @@
 
 
 @@Restore the specified register state when returning from a signal handler
-@@Note that the order and locations of arguments taken by this system call
+@@Note that the order and locations of arguments taken by this system  call
 @@are of great importance, as they must match what is encoded by the kernel
 @@within `sighand_raise_signal()'
 @@The order chosen is also important, as it is selected such that arguments
-@@are only passed through registers that are preserved by CDECL
+@@are  only  passed   through  registers  that   are  preserved  by   CDECL
 [restart(must)][noexcept]
 sigreturn:([tostr(STRUCT_FPUSTATE32)] struct fpustate32 const *restore_fpu, syscall_ulong_t unused1,
            syscall_ulong_t unused2, [tostr(STRUCT_SIGSET)] struct __sigset_struct const *restore_sigmask,

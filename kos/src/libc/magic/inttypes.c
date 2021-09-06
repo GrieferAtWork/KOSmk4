@@ -774,13 +774,13 @@ $uintmax_t wcstoumax_l([[nonnull]] $wchar_t const *__restrict nptr,
 %#ifdef __USE_NETBSD
 
 @@>> strtoi(3), strtou(3), strtoi_l(3), strtou_l(3)
-@@Safely convert `nptr' to an integer which is then returned.
-@@If no integer could be read, set `*rstatus' (if non-`NULL')
-@@to `ECANCELED'. If non-`NULL', `*endptr' is made to point
-@@past the read integer, and if it points to a non-'\0'-
-@@character, `*rstatus' (if non-`NULL') is set to `ENOTSUP'.
-@@Also make sure that the returned integer lies within the
-@@bounds of `[lo,hi]' (inclusively). If it does not, clamp it
+@@Safely convert `nptr'  to an integer  which is then  returned.
+@@If no integer  could be read,  set `*rstatus' (if  non-`NULL')
+@@to `ECANCELED'.  If non-`NULL',  `*endptr'  is made  to  point
+@@past the  read  integer,  and  if it  points  to  a  non-'\0'-
+@@character,  `*rstatus'  (if non-`NULL')  is set  to `ENOTSUP'.
+@@Also  make  sure that  the  returned integer  lies  within the
+@@bounds of `[lo,hi]'  (inclusively). If it  does not, clamp  it
 @@to those bounds and set `*rstatus' (if non-`NULL') to `ERANGE'
 @@@param: lo, hi:  Lo/Hi-bounds for the to-be returned integer.
 @@@param: rstatus: When non-`NULL', set to a conversion error (if any)

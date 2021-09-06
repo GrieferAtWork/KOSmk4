@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xa3a22b10 */
+/* HASH CRC-32:0xeb484fa0 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -35,23 +35,16 @@
 #endif /* !__USE_KOS_ALTERATIONS */
 #endif /* !__PIO_OFFSET */
 __NAMESPACE_LOCAL_BEGIN
-/* Dependency: pwriteall64 from unistd */
 #ifndef __local___localdep_pwriteall64_defined
 #define __local___localdep_pwriteall64_defined 1
 #ifdef __CRT_HAVE_pwriteall64
-/* >> pwriteall64(3)
- * Same as `writeall(3)', but using `pwrite64(2)' instead of `write()' */
 __CREDIRECT(__ATTR_NONNULL((2)),__SSIZE_TYPE__,__NOTHROW_RPC,__localdep_pwriteall64,(__fd_t __fd, void *__buf, __SIZE_TYPE__ __bufsize, __PIO_OFFSET64 __offset),pwriteall64,(__fd,__buf,__bufsize,__offset))
 #elif defined(__CRT_HAVE_pwriteall) && __SIZEOF_OFF32_T__ == __SIZEOF_OFF64_T__
-/* >> pwriteall64(3)
- * Same as `writeall(3)', but using `pwrite64(2)' instead of `write()' */
 __CREDIRECT(__ATTR_NONNULL((2)),__SSIZE_TYPE__,__NOTHROW_RPC,__localdep_pwriteall64,(__fd_t __fd, void *__buf, __SIZE_TYPE__ __bufsize, __PIO_OFFSET64 __offset),pwriteall,(__fd,__buf,__bufsize,__offset))
 #elif defined(__CRT_HAVE_pwrite64) || defined(__CRT_HAVE___pwrite64) || defined(__CRT_HAVE_pwrite) || ((defined(__CRT_HAVE_lseek64) || defined(__CRT_HAVE__lseeki64) || defined(__CRT_HAVE_lseek) || defined(__CRT_HAVE__lseek) || defined(__CRT_HAVE___lseek)) && (defined(__CRT_HAVE_write) || defined(__CRT_HAVE__write) || defined(__CRT_HAVE___write)) && defined(__SEEK_CUR) && defined(__SEEK_SET))
 __NAMESPACE_LOCAL_END
 #include <libc/local/unistd/pwriteall64.h>
 __NAMESPACE_LOCAL_BEGIN
-/* >> pwriteall64(3)
- * Same as `writeall(3)', but using `pwrite64(2)' instead of `write()' */
 #define __localdep_pwriteall64 __LIBC_LOCAL_NAME(pwriteall64)
 #else /* ... */
 #undef __local___localdep_pwriteall64_defined
@@ -60,8 +53,6 @@ __NAMESPACE_LOCAL_BEGIN
 __NAMESPACE_LOCAL_END
 #include <libc/errno.h>
 __NAMESPACE_LOCAL_BEGIN
-/* >> pwriteall(3)
- * Same as `writeall(3)', but using `pwrite(2)' instead of `write()' */
 __LOCAL_LIBC(pwriteall) __ATTR_NONNULL((2)) __SSIZE_TYPE__
 __NOTHROW_RPC(__LIBCCALL __LIBC_LOCAL_NAME(pwriteall))(__fd_t __fd, void const *__buf, __SIZE_TYPE__ __bufsize, __PIO_OFFSET __offset) {
 	return __localdep_pwriteall64(__fd, __buf, __bufsize, (__PIO_OFFSET64)__offset);

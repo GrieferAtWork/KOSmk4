@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xf929e522 */
+/* HASH CRC-32:0x62c33d6c */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -35,103 +35,56 @@
 #endif /* !__USE_KOS_ALTERATIONS */
 #endif /* !__PIO_OFFSET */
 __NAMESPACE_LOCAL_BEGIN
-/* Dependency: lseek from unistd */
 #ifndef __local___localdep_lseek_defined
 #define __local___localdep_lseek_defined 1
 #if defined(__CRT_HAVE_lseek64) && defined(__USE_FILE_OFFSET64)
-/* >> lseek(2)
- * Change the position of the file read/write pointer within a file referred to by `fd' */
 __CREDIRECT(,__FS_TYPE(off),__NOTHROW_NCX,__localdep_lseek,(__fd_t __fd, __FS_TYPE(off) __offset, __STDC_INT_AS_UINT_T __whence),lseek64,(__fd,__offset,__whence))
 #elif defined(__CRT_HAVE__lseeki64) && defined(__USE_FILE_OFFSET64)
-/* >> lseek(2)
- * Change the position of the file read/write pointer within a file referred to by `fd' */
 __CREDIRECT(,__FS_TYPE(off),__NOTHROW_NCX,__localdep_lseek,(__fd_t __fd, __FS_TYPE(off) __offset, __STDC_INT_AS_UINT_T __whence),_lseeki64,(__fd,__offset,__whence))
 #elif defined(__CRT_HAVE_lseek) && !defined(__USE_FILE_OFFSET64)
-/* >> lseek(2)
- * Change the position of the file read/write pointer within a file referred to by `fd' */
 __CREDIRECT(,__FS_TYPE(off),__NOTHROW_NCX,__localdep_lseek,(__fd_t __fd, __FS_TYPE(off) __offset, __STDC_INT_AS_UINT_T __whence),lseek,(__fd,__offset,__whence))
 #elif defined(__CRT_HAVE__lseek) && !defined(__USE_FILE_OFFSET64)
-/* >> lseek(2)
- * Change the position of the file read/write pointer within a file referred to by `fd' */
 __CREDIRECT(,__FS_TYPE(off),__NOTHROW_NCX,__localdep_lseek,(__fd_t __fd, __FS_TYPE(off) __offset, __STDC_INT_AS_UINT_T __whence),_lseek,(__fd,__offset,__whence))
 #elif defined(__CRT_HAVE___lseek) && !defined(__USE_FILE_OFFSET64)
-/* >> lseek(2)
- * Change the position of the file read/write pointer within a file referred to by `fd' */
 __CREDIRECT(,__FS_TYPE(off),__NOTHROW_NCX,__localdep_lseek,(__fd_t __fd, __FS_TYPE(off) __offset, __STDC_INT_AS_UINT_T __whence),__lseek,(__fd,__offset,__whence))
 #elif defined(__CRT_HAVE_lseek64) || defined(__CRT_HAVE__lseeki64) || defined(__CRT_HAVE_lseek) || defined(__CRT_HAVE__lseek) || defined(__CRT_HAVE___lseek)
 __NAMESPACE_LOCAL_END
 #include <libc/local/unistd/lseek.h>
 __NAMESPACE_LOCAL_BEGIN
-/* >> lseek(2)
- * Change the position of the file read/write pointer within a file referred to by `fd' */
 #define __localdep_lseek __LIBC_LOCAL_NAME(lseek)
 #else /* ... */
 #undef __local___localdep_lseek_defined
 #endif /* !... */
 #endif /* !__local___localdep_lseek_defined */
-/* Dependency: pwrite64 from unistd */
 #ifndef __local___localdep_pwrite64_defined
 #define __local___localdep_pwrite64_defined 1
 #ifdef __CRT_HAVE_pwrite64
-/* >> pwrite64(2)
- * Write data to a file at a specific offset */
 __CREDIRECT(__ATTR_NONNULL((2)),__SSIZE_TYPE__,__NOTHROW_RPC,__localdep_pwrite64,(__fd_t __fd, void const *__buf, __SIZE_TYPE__ __bufsize, __PIO_OFFSET64 __offset),pwrite64,(__fd,__buf,__bufsize,__offset))
 #elif defined(__CRT_HAVE_pwrite) && __SIZEOF_OFF32_T__ == __SIZEOF_OFF64_T__
-/* >> pwrite64(2)
- * Write data to a file at a specific offset */
 __CREDIRECT(__ATTR_NONNULL((2)),__SSIZE_TYPE__,__NOTHROW_RPC,__localdep_pwrite64,(__fd_t __fd, void const *__buf, __SIZE_TYPE__ __bufsize, __PIO_OFFSET64 __offset),pwrite,(__fd,__buf,__bufsize,__offset))
 #elif defined(__CRT_HAVE___pwrite64)
-/* >> pwrite64(2)
- * Write data to a file at a specific offset */
 __CREDIRECT(__ATTR_NONNULL((2)),__SSIZE_TYPE__,__NOTHROW_RPC,__localdep_pwrite64,(__fd_t __fd, void const *__buf, __SIZE_TYPE__ __bufsize, __PIO_OFFSET64 __offset),__pwrite64,(__fd,__buf,__bufsize,__offset))
 #elif defined(__CRT_HAVE_pwrite) || ((defined(__CRT_HAVE_lseek64) || defined(__CRT_HAVE__lseeki64) || defined(__CRT_HAVE_lseek) || defined(__CRT_HAVE__lseek) || defined(__CRT_HAVE___lseek)) && (defined(__CRT_HAVE_write) || defined(__CRT_HAVE__write) || defined(__CRT_HAVE___write)) && defined(__SEEK_CUR) && defined(__SEEK_SET))
 __NAMESPACE_LOCAL_END
 #include <libc/local/unistd/pwrite64.h>
 __NAMESPACE_LOCAL_BEGIN
-/* >> pwrite64(2)
- * Write data to a file at a specific offset */
 #define __localdep_pwrite64 __LIBC_LOCAL_NAME(pwrite64)
 #else /* ... */
 #undef __local___localdep_pwrite64_defined
 #endif /* !... */
 #endif /* !__local___localdep_pwrite64_defined */
-/* Dependency: write from unistd */
 #ifndef __local___localdep_write_defined
 #define __local___localdep_write_defined 1
 #ifdef __CRT_HAVE_write
-/* >> write(2)
- * Write up to `bufsize' bytes from `buf' into `fd'
- * When `fd' has the `O_NONBLOCK' flag set, only write as much data
- * as possible at the time the call was made, and throw E_WOULDBLOCK
- * if no data could be written at the time.
- * @return: <= bufsize: The actual amount of written bytes
- * @return: 0         : No more data can be written */
 __CREDIRECT(__ATTR_NONNULL((2)),__SSIZE_TYPE__,__NOTHROW_RPC,__localdep_write,(__fd_t __fd, void const *__buf, __SIZE_TYPE__ __bufsize),write,(__fd,__buf,__bufsize))
 #elif defined(__CRT_HAVE__write)
-/* >> write(2)
- * Write up to `bufsize' bytes from `buf' into `fd'
- * When `fd' has the `O_NONBLOCK' flag set, only write as much data
- * as possible at the time the call was made, and throw E_WOULDBLOCK
- * if no data could be written at the time.
- * @return: <= bufsize: The actual amount of written bytes
- * @return: 0         : No more data can be written */
 __CREDIRECT(__ATTR_NONNULL((2)),__SSIZE_TYPE__,__NOTHROW_RPC,__localdep_write,(__fd_t __fd, void const *__buf, __SIZE_TYPE__ __bufsize),_write,(__fd,__buf,__bufsize))
 #elif defined(__CRT_HAVE___write)
-/* >> write(2)
- * Write up to `bufsize' bytes from `buf' into `fd'
- * When `fd' has the `O_NONBLOCK' flag set, only write as much data
- * as possible at the time the call was made, and throw E_WOULDBLOCK
- * if no data could be written at the time.
- * @return: <= bufsize: The actual amount of written bytes
- * @return: 0         : No more data can be written */
 __CREDIRECT(__ATTR_NONNULL((2)),__SSIZE_TYPE__,__NOTHROW_RPC,__localdep_write,(__fd_t __fd, void const *__buf, __SIZE_TYPE__ __bufsize),__write,(__fd,__buf,__bufsize))
 #else /* ... */
 #undef __local___localdep_write_defined
 #endif /* !... */
 #endif /* !__local___localdep_write_defined */
-/* >> pwrite(2)
- * Write data to a file at a specific `offset', rather than the current R/W position
- * @return: <= bufsize: The actual amount of written bytes */
 __LOCAL_LIBC(pwrite) __ATTR_NONNULL((2)) __SSIZE_TYPE__
 __NOTHROW_RPC(__LIBCCALL __LIBC_LOCAL_NAME(pwrite))(__fd_t __fd, void const *__buf, __SIZE_TYPE__ __bufsize, __PIO_OFFSET __offset) {
 

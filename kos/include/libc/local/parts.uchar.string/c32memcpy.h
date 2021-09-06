@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xdd96eb4 */
+/* HASH CRC-32:0x4a11ad5 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -23,59 +23,44 @@
 #include <__crt.h>
 #include <hybrid/typecore.h>
 __NAMESPACE_LOCAL_BEGIN
-/* Dependency: memcpyc from string */
 #ifndef __local___localdep_memcpyc_defined
 #define __local___localdep_memcpyc_defined 1
 #ifdef __CRT_HAVE_memcpyc
-/* Copy memory between non-overlapping memory blocks.
- * @return: * : Always re-returns `dst' */
 __CREDIRECT(__ATTR_LEAF __ATTR_RETNONNULL __ATTR_NONNULL((1, 2)),void *,__NOTHROW_NCX,__localdep_memcpyc,(void *__restrict __dst, void const *__restrict __src, __SIZE_TYPE__ __elem_count, __SIZE_TYPE__ __elem_size),memcpyc,(__dst,__src,__elem_count,__elem_size))
 #else /* __CRT_HAVE_memcpyc */
 __NAMESPACE_LOCAL_END
 #include <libc/local/string/memcpyc.h>
 __NAMESPACE_LOCAL_BEGIN
-/* Copy memory between non-overlapping memory blocks.
- * @return: * : Always re-returns `dst' */
 #define __localdep_memcpyc __LIBC_LOCAL_NAME(memcpyc)
 #endif /* !__CRT_HAVE_memcpyc */
 #endif /* !__local___localdep_memcpyc_defined */
-/* Dependency: memcpyl from string */
 #ifndef __local___localdep_memcpyl_defined
 #define __local___localdep_memcpyl_defined 1
 #ifdef __CRT_HAVE_memcpyl
-/* Copy memory between non-overlapping memory blocks. */
 __CREDIRECT(__ATTR_LEAF __ATTR_RETNONNULL __ATTR_NONNULL((1, 2)),__UINT32_TYPE__ *,__NOTHROW_NCX,__localdep_memcpyl,(void *__restrict __dst, void const *__restrict __src, __SIZE_TYPE__ __n_dwords),memcpyl,(__dst,__src,__n_dwords))
 #elif defined(__CRT_HAVE_wmemcpy) && __SIZEOF_WCHAR_T__ == 4
-/* Copy memory between non-overlapping memory blocks. */
 __CREDIRECT(__ATTR_LEAF __ATTR_RETNONNULL __ATTR_NONNULL((1, 2)),__UINT32_TYPE__ *,__NOTHROW_NCX,__localdep_memcpyl,(void *__restrict __dst, void const *__restrict __src, __SIZE_TYPE__ __n_dwords),wmemcpy,(__dst,__src,__n_dwords))
 #elif defined(__CRT_HAVE_KOS$wmemcpy) && defined(__LIBCCALL_IS_LIBKCALL)
-/* Copy memory between non-overlapping memory blocks. */
 __COMPILER_REDIRECT(__LIBC,__ATTR_LEAF __ATTR_RETNONNULL __ATTR_NONNULL((1, 2)),__UINT32_TYPE__ *,__NOTHROW_NCX,__LIBCCALL,__localdep_memcpyl,(void *__restrict __dst, void const *__restrict __src, __SIZE_TYPE__ __n_dwords),KOS$wmemcpy,(__dst,__src,__n_dwords))
 #else /* ... */
 __NAMESPACE_LOCAL_END
 #include <libc/local/string/memcpyl.h>
 __NAMESPACE_LOCAL_BEGIN
-/* Copy memory between non-overlapping memory blocks. */
 #define __localdep_memcpyl __LIBC_LOCAL_NAME(memcpyl)
 #endif /* !... */
 #endif /* !__local___localdep_memcpyl_defined */
-/* Dependency: memcpyw from string */
 #ifndef __local___localdep_memcpyw_defined
 #define __local___localdep_memcpyw_defined 1
 #ifdef __CRT_HAVE_memcpyw
-/* Copy memory between non-overlapping memory blocks. */
 __CREDIRECT(__ATTR_LEAF __ATTR_RETNONNULL __ATTR_NONNULL((1, 2)),__UINT16_TYPE__ *,__NOTHROW_NCX,__localdep_memcpyw,(void *__restrict __dst, void const *__restrict __src, __SIZE_TYPE__ __n_words),memcpyw,(__dst,__src,__n_words))
 #elif defined(__CRT_HAVE_wmemcpy) && __SIZEOF_WCHAR_T__ == 2
-/* Copy memory between non-overlapping memory blocks. */
 __CREDIRECT(__ATTR_LEAF __ATTR_RETNONNULL __ATTR_NONNULL((1, 2)),__UINT16_TYPE__ *,__NOTHROW_NCX,__localdep_memcpyw,(void *__restrict __dst, void const *__restrict __src, __SIZE_TYPE__ __n_words),wmemcpy,(__dst,__src,__n_words))
 #elif defined(__CRT_HAVE_DOS$wmemcpy) && defined(__LIBCCALL_IS_LIBDCALL)
-/* Copy memory between non-overlapping memory blocks. */
 __COMPILER_REDIRECT(__LIBC,__ATTR_LEAF __ATTR_RETNONNULL __ATTR_NONNULL((1, 2)),__UINT16_TYPE__ *,__NOTHROW_NCX,__LIBCCALL,__localdep_memcpyw,(void *__restrict __dst, void const *__restrict __src, __SIZE_TYPE__ __n_words),DOS$wmemcpy,(__dst,__src,__n_words))
 #else /* ... */
 __NAMESPACE_LOCAL_END
 #include <libc/local/string/memcpyw.h>
 __NAMESPACE_LOCAL_BEGIN
-/* Copy memory between non-overlapping memory blocks. */
 #define __localdep_memcpyw __LIBC_LOCAL_NAME(memcpyw)
 #endif /* !... */
 #endif /* !__local___localdep_memcpyw_defined */

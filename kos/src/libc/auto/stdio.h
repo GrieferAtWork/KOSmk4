@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x69db1a2a */
+/* HASH CRC-32:0x107a6446 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -34,7 +34,7 @@ DECL_BEGIN
  * Remove a file or directory `filename' */
 INTDEF NONNULL((1)) int NOTHROW_RPC(LIBDCALL libd_remove)(char const *filename);
 /* >> rename(3)
- * Rename a given file `oldname' to `newname_or_path', or in the event
+ * Rename  a given file `oldname' to `newname_or_path', or in the event
  * that `newname_or_path' refers to a directory, place the file within. */
 INTDEF NONNULL((1, 2)) int NOTHROW_RPC(LIBDCALL libd_rename)(char const *oldname, char const *newname_or_path);
 INTDEF WUNUSED NONNULL((1)) char *NOTHROW_NCX(LIBDCALL libd_tmpnam)(char *buf);
@@ -60,7 +60,7 @@ INTDEF NONNULL((1)) void NOTHROW_NCX(LIBCCALL libc_setbuf)(FILE *__restrict stre
 INTDEF NONNULL((1)) int NOTHROW_NCX(LIBDCALL libd_setvbuf)(FILE *__restrict stream, char *__restrict buf, __STDC_INT_AS_UINT_T modes, size_t bufsize);
 /* >> fgetc(3)
  * Read and return a single character from `stream'
- * If the given `stream' has been exhausted or if an error occurred, `EOF' is
+ * If  the given `stream' has been exhausted or if an error occurred, `EOF' is
  * returned and the exact cause can be determined by using `ferror' and `feof' */
 INTDEF NONNULL((1)) int (LIBDCALL libd_fgetc)(FILE *__restrict stream) THROWS(...);
 #endif /* !__LIBCCALL_IS_LIBDCALL && !__KERNEL__ */
@@ -84,15 +84,15 @@ INTDEF int (LIBCCALL libc_putchar)(int ch) THROWS(...);
 #endif /* !__KERNEL__ */
 #if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
 /* >> fgets(3)
- * Read up to `bufsize - 1' bytes of data from `stream', storing them into `buf' stopped when
- * the buffer is full or a line-feed was read (in this case, the line-feed is also written to `buf')
+ * Read up  to  `bufsize - 1'  bytes  of  data  from  `stream',  storing  them  into  `buf'  stopped  when
+ * the buffer is  full or a  line-feed was read  (in this case,  the line-feed is  also written to  `buf')
  * Afterwards, append a trailing NUL-character and re-return `buf', or return `NULL' if an error occurred. */
 INTDEF WUNUSED NONNULL((1, 3)) char *(LIBDCALL libd_fgets)(char *__restrict buf, __STDC_INT_AS_SIZE_T bufsize, FILE *__restrict stream) THROWS(...);
 #endif /* !__LIBCCALL_IS_LIBDCALL && !__KERNEL__ */
 #ifndef __KERNEL__
 /* >> fgets(3)
- * Read up to `bufsize - 1' bytes of data from `stream', storing them into `buf' stopped when
- * the buffer is full or a line-feed was read (in this case, the line-feed is also written to `buf')
+ * Read up  to  `bufsize - 1'  bytes  of  data  from  `stream',  storing  them  into  `buf'  stopped  when
+ * the buffer is  full or a  line-feed was read  (in this case,  the line-feed is  also written to  `buf')
  * Afterwards, append a trailing NUL-character and re-return `buf', or return `NULL' if an error occurred. */
 INTDEF WUNUSED NONNULL((1, 3)) char *(LIBCCALL libc_fgets)(char *__restrict buf, __STDC_INT_AS_SIZE_T bufsize, FILE *__restrict stream) THROWS(...);
 #endif /* !__KERNEL__ */
@@ -173,68 +173,68 @@ INTDEF WUNUSED NONNULL((1, 2)) FILE *NOTHROW_RPC(LIBDCALL libd_fopen)(char const
  * Re-open the given `stream' as a file-stream for accessing `filename' */
 INTDEF NONNULL((1, 2, 3)) FILE *NOTHROW_RPC(LIBDCALL libd_freopen)(char const *__restrict filename, char const *__restrict modes, FILE *__restrict stream);
 /* >> fgetpos(3), fgetpos64(3)
- * Initialize an opaque descriptor `pos' for the current in-file position of `stream'
+ * Initialize   an   opaque  descriptor   `pos'   for  the   current   in-file  position   of  `stream'
  * Upon success (return == 0), `pos' can be used to restore the current position by calling `fsetpos()' */
 INTDEF NONNULL((1, 2)) int (LIBDCALL libd_fgetpos)(FILE *__restrict stream, fpos_t *__restrict pos) THROWS(...);
 /* >> fsetpos(3), fsetpos64(3)
  * Set the file position of `stream' to `pos', as previously initialized with a call to `fgetpos()' */
 INTDEF NONNULL((1, 2)) int (LIBDCALL libd_fsetpos)(FILE *__restrict stream, fpos_t const *__restrict pos) THROWS(...);
 /* >> fprintf(3), vfprintf(3)
- * Print data to `stream', following `format'
+ * Print  data  to  `stream',  following  `format'
  * Return the number of successfully printed bytes */
 INTDEF ATTR_LIBC_PRINTF(2, 0) NONNULL((1, 2)) __STDC_INT_AS_SSIZE_T (LIBDCALL libd_vfprintf)(FILE *__restrict stream, char const *__restrict format, va_list args) THROWS(...);
 #endif /* !__LIBCCALL_IS_LIBDCALL && !__KERNEL__ */
 #ifndef __KERNEL__
 /* >> fprintf(3), vfprintf(3)
- * Print data to `stream', following `format'
+ * Print  data  to  `stream',  following  `format'
  * Return the number of successfully printed bytes */
 INTDEF ATTR_LIBC_PRINTF(2, 0) NONNULL((1, 2)) __STDC_INT_AS_SSIZE_T (LIBCCALL libc_vfprintf)(FILE *__restrict stream, char const *__restrict format, va_list args) THROWS(...);
 #endif /* !__KERNEL__ */
 #if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
 /* >> fprintf(3), vfprintf(3)
- * Print data to `stream', following `format'
+ * Print  data  to  `stream',  following  `format'
  * Return the number of successfully printed bytes */
 INTDEF ATTR_LIBC_PRINTF(2, 3) NONNULL((1, 2)) __STDC_INT_AS_SSIZE_T (VLIBDCALL libd_fprintf)(FILE *__restrict stream, char const *__restrict format, ...) THROWS(...);
 #endif /* !__LIBCCALL_IS_LIBDCALL && !__KERNEL__ */
 #ifndef __KERNEL__
 /* >> fprintf(3), vfprintf(3)
- * Print data to `stream', following `format'
+ * Print  data  to  `stream',  following  `format'
  * Return the number of successfully printed bytes */
 INTDEF ATTR_LIBC_PRINTF(2, 3) NONNULL((1, 2)) __STDC_INT_AS_SSIZE_T (VLIBCCALL libc_fprintf)(FILE *__restrict stream, char const *__restrict format, ...) THROWS(...);
 #endif /* !__KERNEL__ */
 #if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
 /* >> printf(3), vprintf(3)
- * Print data to `stdout', following `format'
+ * Print  data  to  `stdout',  following  `format'
  * Return the number of successfully printed bytes */
 INTDEF ATTR_LIBC_PRINTF(1, 0) NONNULL((1)) __STDC_INT_AS_SSIZE_T (LIBDCALL libd_vprintf)(char const *__restrict format, va_list args) THROWS(...);
 #endif /* !__LIBCCALL_IS_LIBDCALL && !__KERNEL__ */
 #ifndef __KERNEL__
 /* >> printf(3), vprintf(3)
- * Print data to `stdout', following `format'
+ * Print  data  to  `stdout',  following  `format'
  * Return the number of successfully printed bytes */
 INTDEF ATTR_LIBC_PRINTF(1, 0) NONNULL((1)) __STDC_INT_AS_SSIZE_T (LIBCCALL libc_vprintf)(char const *__restrict format, va_list args) THROWS(...);
 #endif /* !__KERNEL__ */
 #if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
 /* >> printf(3), vprintf(3)
- * Print data to `stdout', following `format'
+ * Print  data  to  `stdout',  following  `format'
  * Return the number of successfully printed bytes */
 INTDEF ATTR_LIBC_PRINTF(1, 2) NONNULL((1)) __STDC_INT_AS_SSIZE_T (VLIBDCALL libd_printf)(char const *__restrict format, ...) THROWS(...);
 #endif /* !__LIBCCALL_IS_LIBDCALL && !__KERNEL__ */
 #ifndef __KERNEL__
 /* >> printf(3), vprintf(3)
- * Print data to `stdout', following `format'
+ * Print  data  to  `stdout',  following  `format'
  * Return the number of successfully printed bytes */
 INTDEF ATTR_LIBC_PRINTF(1, 2) NONNULL((1)) __STDC_INT_AS_SSIZE_T (VLIBCCALL libc_printf)(char const *__restrict format, ...) THROWS(...);
 #endif /* !__KERNEL__ */
 #if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
 /* >> fscanf(3), vfscanf(3)
- * Scan data from `stream', following `format'
+ * Scan  data   from   `stream',   following   `format'
  * Return the number of successfully scanned data items */
 INTDEF WUNUSED ATTR_LIBC_SCANF(2, 0) NONNULL((1, 2)) __STDC_INT_AS_SIZE_T (LIBDCALL libd_vfscanf)(FILE *__restrict stream, char const *__restrict format, va_list args) THROWS(...);
 #endif /* !__LIBCCALL_IS_LIBDCALL && !__KERNEL__ */
 #ifndef __KERNEL__
 /* >> fscanf(3), vfscanf(3)
- * Scan data from `stream', following `format'
+ * Scan  data   from   `stream',   following   `format'
  * Return the number of successfully scanned data items */
 INTDEF WUNUSED ATTR_LIBC_SCANF(2, 0) NONNULL((1, 2)) __STDC_INT_AS_SIZE_T (LIBCCALL libc_vfscanf)(FILE *__restrict stream, char const *__restrict format, va_list args) THROWS(...);
 #endif /* !__KERNEL__ */
@@ -252,13 +252,13 @@ INTDEF WUNUSED ATTR_LIBC_SCANF(1, 0) NONNULL((1)) __STDC_INT_AS_SIZE_T (LIBCCALL
 #endif /* !__KERNEL__ */
 #if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
 /* >> fscanf(3), vfscanf(3)
- * Scan data from `stream', following `format'
+ * Scan  data   from   `stream',   following   `format'
  * Return the number of successfully scanned data items */
 INTDEF WUNUSED ATTR_LIBC_SCANF(2, 3) NONNULL((1, 2)) __STDC_INT_AS_SIZE_T (VLIBDCALL libd_fscanf)(FILE *__restrict stream, char const *__restrict format, ...) THROWS(...);
 #endif /* !__LIBCCALL_IS_LIBDCALL && !__KERNEL__ */
 #ifndef __KERNEL__
 /* >> fscanf(3), vfscanf(3)
- * Scan data from `stream', following `format'
+ * Scan  data   from   `stream',   following   `format'
  * Return the number of successfully scanned data items */
 INTDEF WUNUSED ATTR_LIBC_SCANF(2, 3) NONNULL((1, 2)) __STDC_INT_AS_SIZE_T (VLIBCCALL libc_fscanf)(FILE *__restrict stream, char const *__restrict format, ...) THROWS(...);
 #endif /* !__KERNEL__ */
@@ -283,69 +283,69 @@ INTDEF WUNUSED ATTR_DEPRECATED("No buffer size checks (use `fgets\' instead)") N
 #if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
 /* >> sscanf(3), vsscanf(3)
  * Scan data from a given `input' string, following `format'
- * Return the number of successfully scanned data items */
+ * Return  the  number  of successfully  scanned  data items */
 INTDEF WUNUSED ATTR_LIBC_SCANF(2, 0) NONNULL((1, 2)) __STDC_INT_AS_SIZE_T NOTHROW_NCX(LIBDCALL libd_vsscanf)(char const *__restrict input, char const *__restrict format, va_list args);
 #endif /* !__LIBCCALL_IS_LIBDCALL && !__KERNEL__ */
 #ifndef __KERNEL__
 /* >> sscanf(3), vsscanf(3)
  * Scan data from a given `input' string, following `format'
- * Return the number of successfully scanned data items */
+ * Return  the  number  of successfully  scanned  data items */
 INTDEF WUNUSED ATTR_LIBC_SCANF(2, 0) NONNULL((1, 2)) __STDC_INT_AS_SIZE_T NOTHROW_NCX(LIBCCALL libc_vsscanf)(char const *__restrict input, char const *__restrict format, va_list args);
 #endif /* !__KERNEL__ */
 #if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
 /* >> sscanf(3), vsscanf(3)
  * Scan data from a given `input' string, following `format'
- * Return the number of successfully scanned data items */
+ * Return  the  number  of successfully  scanned  data items */
 INTDEF ATTR_LIBC_SCANF(2, 3) NONNULL((1, 2)) __STDC_INT_AS_SIZE_T NOTHROW_NCX(VLIBDCALL libd_sscanf)(char const *__restrict input, char const *__restrict format, ...);
 #endif /* !__LIBCCALL_IS_LIBDCALL && !__KERNEL__ */
 #ifndef __KERNEL__
 /* >> sscanf(3), vsscanf(3)
  * Scan data from a given `input' string, following `format'
- * Return the number of successfully scanned data items */
+ * Return  the  number  of successfully  scanned  data items */
 INTDEF ATTR_LIBC_SCANF(2, 3) NONNULL((1, 2)) __STDC_INT_AS_SIZE_T NOTHROW_NCX(VLIBCCALL libc_sscanf)(char const *__restrict input, char const *__restrict format, ...);
 #endif /* !__KERNEL__ */
 #if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
 /* >> sprintf(3), vsprintf(3)
- * Print a formatted string to a given in-member string buffer `buf'
+ * Print  a  formatted  string  to  a  given  in-member  string  buffer  `buf'
  * Return the number of written characters, excluding a trailing NUL-character */
 INTDEF ATTR_LIBC_PRINTF(2, 0) NONNULL((1, 2)) __STDC_INT_AS_SSIZE_T NOTHROW_NCX(LIBDCALL libd_vsprintf)(char *__restrict dest, char const *__restrict format, va_list args);
 #endif /* !__LIBCCALL_IS_LIBDCALL && !__KERNEL__ */
 /* >> sprintf(3), vsprintf(3)
- * Print a formatted string to a given in-member string buffer `buf'
+ * Print  a  formatted  string  to  a  given  in-member  string  buffer  `buf'
  * Return the number of written characters, excluding a trailing NUL-character */
 INTDEF ATTR_LIBC_PRINTF(2, 0) NONNULL((1, 2)) __STDC_INT_AS_SSIZE_T NOTHROW_NCX(LIBCCALL libc_vsprintf)(char *__restrict dest, char const *__restrict format, va_list args);
 #if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
 /* >> sprintf(3), vsprintf(3)
- * Print a formatted string to a given in-member string buffer `buf'
+ * Print  a  formatted  string  to  a  given  in-member  string  buffer  `buf'
  * Return the number of written characters, excluding a trailing NUL-character */
 INTDEF ATTR_LIBC_PRINTF(2, 3) NONNULL((1, 2)) __STDC_INT_AS_SIZE_T NOTHROW_NCX(VLIBDCALL libd_sprintf)(char *__restrict buf, char const *__restrict format, ...);
 #endif /* !__LIBCCALL_IS_LIBDCALL && !__KERNEL__ */
 /* >> sprintf(3), vsprintf(3)
- * Print a formatted string to a given in-member string buffer `buf'
+ * Print  a  formatted  string  to  a  given  in-member  string  buffer  `buf'
  * Return the number of written characters, excluding a trailing NUL-character */
 INTDEF ATTR_LIBC_PRINTF(2, 3) NONNULL((1, 2)) __STDC_INT_AS_SIZE_T NOTHROW_NCX(VLIBCCALL libc_sprintf)(char *__restrict buf, char const *__restrict format, ...);
 #if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
 /* >> snprintf(3), vsnprintf(3)
- * Print a formatted string to a given in-member string buffer `buf'
- * Always return the REQUIRED buffer size (excluding a trailing NUL-
+ * Print  a formatted string to a given in-member string buffer `buf'
+ * Always return the REQUIRED buffer size (excluding a trailing  NUL-
  * character), and never write more than `buflen' characters to `buf' */
 INTDEF ATTR_LIBC_PRINTF(3, 0) NONNULL((3)) __STDC_INT_AS_SIZE_T NOTHROW_NCX(LIBDCALL libd_vsnprintf)(char *__restrict buf, size_t buflen, char const *__restrict format, va_list args);
 #endif /* !__LIBCCALL_IS_LIBDCALL && !__KERNEL__ */
 /* >> snprintf(3), vsnprintf(3)
- * Print a formatted string to a given in-member string buffer `buf'
- * Always return the REQUIRED buffer size (excluding a trailing NUL-
+ * Print  a formatted string to a given in-member string buffer `buf'
+ * Always return the REQUIRED buffer size (excluding a trailing  NUL-
  * character), and never write more than `buflen' characters to `buf' */
 INTDEF ATTR_LIBC_PRINTF(3, 0) NONNULL((3)) __STDC_INT_AS_SIZE_T NOTHROW_NCX(LIBCCALL libc_vsnprintf)(char *__restrict buf, size_t buflen, char const *__restrict format, va_list args);
 #if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
 /* >> snprintf(3), vsnprintf(3)
- * Print a formatted string to a given in-member string buffer `buf'
- * Always return the REQUIRED buffer size (excluding a trailing NUL-
+ * Print  a formatted string to a given in-member string buffer `buf'
+ * Always return the REQUIRED buffer size (excluding a trailing  NUL-
  * character), and never write more than `buflen' characters to `buf' */
 INTDEF ATTR_LIBC_PRINTF(3, 4) NONNULL((3)) __STDC_INT_AS_SIZE_T NOTHROW_NCX(VLIBDCALL libd_snprintf)(char *__restrict buf, size_t buflen, char const *__restrict format, ...);
 #endif /* !__LIBCCALL_IS_LIBDCALL && !__KERNEL__ */
 /* >> snprintf(3), vsnprintf(3)
- * Print a formatted string to a given in-member string buffer `buf'
- * Always return the REQUIRED buffer size (excluding a trailing NUL-
+ * Print  a formatted string to a given in-member string buffer `buf'
+ * Always return the REQUIRED buffer size (excluding a trailing  NUL-
  * character), and never write more than `buflen' characters to `buf' */
 INTDEF ATTR_LIBC_PRINTF(3, 4) NONNULL((3)) __STDC_INT_AS_SIZE_T NOTHROW_NCX(VLIBCCALL libc_snprintf)(char *__restrict buf, size_t buflen, char const *__restrict format, ...);
 #if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
@@ -414,7 +414,7 @@ INTDEF NONNULL((2)) int (LIBDCALL libd_fputc_unlocked)(int ch, FILE *__restrict 
 INTDEF ATTR_MALLOC WUNUSED char *NOTHROW_NCX(LIBDCALL libd_tempnam)(char const *dir, char const *pfx);
 /* >> fdopen(3)
  * Open a new file stream by inheriting a given file descriptor `fd'
- * Note that upon success (`return != NULL'), the given `fd'
+ * Note   that  upon  success  (`return != NULL'),  the  given  `fd'
  * will be `close()'d once `fclose(return)' is called */
 INTDEF WUNUSED NONNULL((2)) FILE *NOTHROW_NCX(LIBDCALL libd_fdopen)(fd_t fd, char const *__restrict modes);
 /* >> fileno(3)
@@ -470,7 +470,7 @@ INTDEF WUNUSED NONNULL((1, 2)) FILE *NOTHROW_RPC(LIBDCALL libd_popen)(char const
 INTDEF NONNULL((1)) int NOTHROW_NCX(LIBDCALL libd_pclose)(FILE *stream);
 /* >> popenve(3)
  * Similar to `popen(3)', but rather than running `execl("/bin/sh", "-c", command)',
- * this function will `execve(path, argv, envp)'. The returned FILE must still be
+ * this function will  `execve(path, argv, envp)'. The returned  FILE must still  be
  * closed using `pclose(3)', rather than `fclose(3)' */
 INTDEF WUNUSED NONNULL((1, 2, 3, 4)) FILE *NOTHROW_RPC(LIBDCALL libd_popenve)(char const *path, __TARGV, __TENVP, char const *modes);
 /* >> getw(3)
@@ -547,7 +547,7 @@ INTDEF WUNUSED NONNULL((1, 2)) FILE *NOTHROW_RPC(LIBDCALL libd_fopen64)(char con
  * Re-open the given `stream' as a file-stream for accessing `filename' */
 INTDEF NONNULL((1, 2, 3)) FILE *NOTHROW_RPC(LIBDCALL libd_freopen64)(char const *__restrict filename, char const *__restrict modes, FILE *__restrict stream);
 /* >> fgetpos(3), fgetpos64(3)
- * Initialize an opaque descriptor `pos' for the current in-file position of `stream'
+ * Initialize   an   opaque  descriptor   `pos'   for  the   current   in-file  position   of  `stream'
  * Upon success (return == 0), `pos' can be used to restore the current position by calling `fsetpos()' */
 INTDEF NONNULL((1, 2)) int (LIBDCALL libd_fgetpos64)(FILE *__restrict stream, fpos64_t *__restrict pos) THROWS(...);
 /* >> fsetpos(3), fsetpos64(3)
@@ -712,12 +712,12 @@ INTDEF WUNUSED NONNULL((1, 2)) char *NOTHROW_NCX(LIBDCALL libd_fgetln)(FILE *__r
 /* >> fmtcheck(3)
  * Check if `user_format' may be used as a drop-in replacement for `good_format'
  * in the context of a call to `printf(3)' (or `format_printf()'), such that all
- * contained format qualifiers reference the same (or compatible) underlying C
+ * contained format qualifiers reference the  same (or compatible) underlying  C
  * types, and in the same order.
- * If all of this is the case, simply re-return `user_format'. Otherwise (i.e.
+ * If all of this is the  case, simply re-return `user_format'. Otherwise  (i.e.
  * when `user_format' isn't compatible with `good_format'), return `good_format'
- * instead. This function is meant to be used to validate user-provided printf
- * format strings before actually using them, after they've been read from lang
+ * instead. This function is meant to  be used to validate user-provided  printf
+ * format strings before actually using them, after they've been read from  lang
  * config files: `printf(fmtcheck(get_user_fmt(), "%s %s"), "Foo", "Bar");' */
 INTDEF ATTR_RETNONNULL WUNUSED NONNULL((2)) __ATTR_FORMAT_ARG(2) char const *NOTHROW_NCX(LIBDCALL libd_fmtcheck)(char const *user_format, char const *good_format);
 /* >> funopen(3), funopen64(3) */

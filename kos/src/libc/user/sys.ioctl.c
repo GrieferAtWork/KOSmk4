@@ -34,11 +34,11 @@ DECL_BEGIN
 
 
 
-/*[[[head:libc_ioctl,hash:CRC-32=0x8ef74f26]]]*/
+/*[[[head:libc_ioctl,hash:CRC-32=0x47187e9e]]]*/
 /* >> ioctl(2)
- * Perform the I/O control operation specified by `request' on `fd'.
- * Many I/O control operations except an additional argument, though
- * this argument's type and meaning depends on `REQUEST'. If used, it's
+ * Perform the  I/O control  operation specified  by `request'  on  `fd'.
+ * Many I/O  control operations  except  an additional  argument,  though
+ * this argument's type and meaning  depends on `REQUEST'. If used,  it's
  * usually either a pointer to a larger argument structure, or an integer
  * that fits into a single register.
  * @return: * : The return value depends on the given `request'.

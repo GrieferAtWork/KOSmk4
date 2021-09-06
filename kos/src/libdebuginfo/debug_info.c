@@ -2804,14 +2804,14 @@ generic_print_address:
 			}
 		}	break;
 
-		//case DW_ATE_complex_float: break;
+		//case  DW_ATE_complex_float:  break;
 		//case DW_ATE_imaginary_float: break;
-		//case DW_ATE_packed_decimal: break;
-		//case DW_ATE_numeric_string: break;
+		//case DW_ATE_packed_decimal:  break;
+		//case DW_ATE_numeric_string:  break;
 		//case DW_ATE_edited: break;
-		//case DW_ATE_signed_fixed: break;
+		//case  DW_ATE_signed_fixed:  break;
 		//case DW_ATE_unsigned_fixed: break;
-		//case DW_ATE_decimal_float: break;
+		//case DW_ATE_decimal_float:  break;
 
 		default: goto print_generic;
 		}

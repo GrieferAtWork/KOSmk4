@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x3d4065a5 */
+/* HASH CRC-32:0xf444f8f7 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -23,7 +23,6 @@
 #include <__crt.h>
 #include <hybrid/typecore.h>
 __NAMESPACE_LOCAL_BEGIN
-/* Same as `str+wcsnlen(str, max_chars)' */
 __LOCAL_LIBC(c32snend) __ATTR_PURE __ATTR_RETNONNULL __ATTR_WUNUSED __ATTR_NONNULL((1)) __CHAR32_TYPE__ *
 __NOTHROW_NCX(__LIBKCALL __LIBC_LOCAL_NAME(c32snend))(__CHAR32_TYPE__ const *__restrict __str, __SIZE_TYPE__ __maxlen) {
 	for (; __maxlen && *__str; ++__str, --__maxlen)

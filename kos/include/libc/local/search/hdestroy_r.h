@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xc8ded37c */
+/* HASH CRC-32:0x7870e7c1 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -23,7 +23,6 @@
 #include <__crt.h>
 struct hsearch_data;
 __NAMESPACE_LOCAL_BEGIN
-/* Dependency: free from stdlib */
 #ifndef __local___localdep_free_defined
 #define __local___localdep_free_defined 1
 #if __has_builtin(__builtin_free) && defined(__LIBC_BIND_CRTBUILTINS) && defined(__CRT_HAVE_free)
@@ -48,7 +47,6 @@ struct hsearch_data {
 #endif /* !__hsearch_data_defined */
 #include <libc/errno.h>
 __NAMESPACE_LOCAL_BEGIN
-/* >> hdestroy_r(3) */
 __LOCAL_LIBC(hdestroy_r) void
 __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(hdestroy_r))(struct hsearch_data *__htab) {
 	if (__htab == __NULLPTR) {

@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xfbf62e7f */
+/* HASH CRC-32:0x5d954ee1 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -24,26 +24,6 @@
 #include <kos/bits/rtm.h>
 #ifdef __arch_rtm_begin
 __NAMESPACE_LOCAL_BEGIN
-/* >> rtm_begin(2)
- * Begin an RTM operation. Note that if the arch-specific RTM driver
- * wasn't already loaded into the kernel, it will be loaded automatically,
- * though any error that may happen during this will result in `RTM_NOSYS'
- * begin returned.
- * Note that while an RTM operation is in progress, only a very small hand
- * full of system calls are allowed to be used. Attempting to use arbitrary
- * system calls will most likely result in an `RTM_ABORT_FAILED' error, and
- * attempting to access too much system memory in general will result in this
- * function returning with `RTM_ABORT_CAPACITY', rather than succeeding.
- * The following is a list of system calls which are whitelisted for use
- * during a transaction:
- *   - rtm_begin(2):  Nested RTM operation
- *   - rtm_end(2):    End an RTM operation
- *   - rtm_abort(2):  Abort an RTM operation
- *   - rtm_test(2):   Check if an RTM operation is in progress (always returns `1')
- * Anything else will most likely result in this system call returning `RTM_ABORT_FAILED'
- * @return: RTM_STARTED : RTM operation was started.
- * @return: RTM_NOSYS   : RTM isn't supposed because the RTM driver is missing, or cannot be loaded.
- * @return: RTM_ABORT_* : RTM operation failed (s.a. code from `<kos/rtm.h>') */
 __LOCAL_LIBC(rtm_begin) __rtm_status_t
 __NOTHROW(__LIBCCALL __LIBC_LOCAL_NAME(rtm_begin))(void) {
 	return __arch_rtm_begin();

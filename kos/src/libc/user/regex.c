@@ -118,9 +118,9 @@ err:
 
 
 
-/*[[[head:libc_re_set_syntax,hash:CRC-32=0x3d6e06ae]]]*/
+/*[[[head:libc_re_set_syntax,hash:CRC-32=0x17dca2c5]]]*/
 /* Sets the current default syntax to `syntax', and return the old syntax.
- * You can also simply assign to the `re_syntax_options' variable */
+ * You  can  also  simply  assign  to  the  `re_syntax_options'   variable */
 INTERN ATTR_SECTION(".text.crt.utility.regex") reg_syntax_t
 NOTHROW_NCX(LIBCCALL libc_re_set_syntax)(reg_syntax_t syntax)
 /*[[[body:libc_re_set_syntax]]]*/
@@ -129,12 +129,12 @@ NOTHROW_NCX(LIBCCALL libc_re_set_syntax)(reg_syntax_t syntax)
 }
 /*[[[end:libc_re_set_syntax]]]*/
 
-/*[[[head:libc_re_compile_pattern,hash:CRC-32=0xae41217f]]]*/
-/* Compile the regular expression `pattern', with length `length'
- * and syntax given by the global `re_syntax_options', into the buffer
- * `buffer'. Return NULL if successful, and an error string if not.
- * To free the allocated storage, you must call `regfree' on `buffer'.
- * Note that the translate table must either have been initialized by
+/*[[[head:libc_re_compile_pattern,hash:CRC-32=0x79f5d025]]]*/
+/* Compile   the   regular  expression   `pattern',  with   length  `length'
+ * and  syntax  given by  the  global `re_syntax_options',  into  the buffer
+ * `buffer'.  Return  NULL  if  successful,  and  an  error  string  if not.
+ * To  free  the allocated  storage, you  must  call `regfree'  on `buffer'.
+ * Note  that  the  translate table  must  either have  been  initialized by
  * `regcomp', with a malloc'd value, or set to NULL before calling `regfree' */
 INTERN ATTR_SECTION(".text.crt.utility.regex") char const *
 NOTHROW_NCX(LIBCCALL libc_re_compile_pattern)(char const *pattern,
@@ -151,8 +151,8 @@ NOTHROW_NCX(LIBCCALL libc_re_compile_pattern)(char const *pattern,
 }
 /*[[[end:libc_re_compile_pattern]]]*/
 
-/*[[[head:libc_re_compile_fastmap,hash:CRC-32=0x3664b3ec]]]*/
-/* Compile a fastmap for the compiled pattern in `buffer'; used to
+/*[[[head:libc_re_compile_fastmap,hash:CRC-32=0xcd4ace1]]]*/
+/* Compile  a  fastmap   for  the   compiled  pattern  in   `buffer';  used   to
  * accelerate searches. Return 0 if successful and `-2' if was an internal error */
 INTERN ATTR_SECTION(".text.crt.utility.regex") int
 NOTHROW_NCX(LIBCCALL libc_re_compile_fastmap)(struct re_pattern_buffer *buffer)
@@ -164,12 +164,12 @@ NOTHROW_NCX(LIBCCALL libc_re_compile_fastmap)(struct re_pattern_buffer *buffer)
 }
 /*[[[end:libc_re_compile_fastmap]]]*/
 
-/*[[[head:libc_re_search,hash:CRC-32=0xb15bd4a7]]]*/
-/* Search in the string `string' (with length `length') for the pattern
+/*[[[head:libc_re_search,hash:CRC-32=0x8d5f631c]]]*/
+/* Search in the  string `string'  (with length `length')  for the  pattern
  * compiled into `buffer'. Start searching at position `start', for `range'
- * characters. Return the starting position of the match, `-1' for no
- * match, or `-2' for an internal error. Also return register
- * information in `regs' (if `regs' and `buffer'->no_sub are nonzero) */
+ * characters.  Return  the starting  position of  the  match, `-1'  for no
+ * match,  or   `-2'  for   an  internal   error.  Also   return   register
+ * information in  `regs'  (if  `regs' and  `buffer'->no_sub  are  nonzero) */
 INTERN ATTR_SECTION(".text.crt.utility.regex") int
 NOTHROW_NCX(LIBCCALL libc_re_search)(struct re_pattern_buffer *buffer,
                                      char const *string,
@@ -191,9 +191,9 @@ NOTHROW_NCX(LIBCCALL libc_re_search)(struct re_pattern_buffer *buffer,
 }
 /*[[[end:libc_re_search]]]*/
 
-/*[[[head:libc_re_search_2,hash:CRC-32=0xbcc7af02]]]*/
+/*[[[head:libc_re_search_2,hash:CRC-32=0xafae72f0]]]*/
 /* Like `re_search', but search in the concatenation of `string1'
- * and `string2'. Also, stop searching at index `start + stop' */
+ * and `string2'. Also,  stop searching  at index  `start + stop' */
 INTERN ATTR_SECTION(".text.crt.utility.regex") int
 NOTHROW_NCX(LIBCCALL libc_re_search_2)(struct re_pattern_buffer *buffer,
                                        char const *string1,
@@ -273,11 +273,11 @@ NOTHROW_NCX(LIBCCALL libc_re_match_2)(struct re_pattern_buffer *buffer,
 }
 /*[[[end:libc_re_match_2]]]*/
 
-/*[[[head:libc_re_set_registers,hash:CRC-32=0xff183892]]]*/
-/* Set `regs' to hold `num_regs' registers, storing them in `starts' and
- * `ends'. Subsequent matches using `buffer' and `regs' will use this memory
- * for recording register information. `starts' and `ends' must be allocated
- * with malloc, and must each be at least ``num_regs' * sizeof(regoff_t)' bytes long.
+/*[[[head:libc_re_set_registers,hash:CRC-32=0x3540e920]]]*/
+/* Set  `regs'   to  hold   `num_regs'  registers,   storing  them   in  `starts'   and
+ * `ends'.   Subsequent  matches  using  `buffer'  and  `regs'  will  use  this  memory
+ * for  recording  register  information.  `starts'   and  `ends'  must  be   allocated
+ * with  malloc, and must each be at  least ``num_regs' * sizeof(regoff_t)' bytes long.
  * If `num_regs == 0', then subsequent matches should allocate their own register data.
  * Unless this function is called, the first search or match using
  * PATTERN_BUFFER will allocate its own register data, without freeing the old data */

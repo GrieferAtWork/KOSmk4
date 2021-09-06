@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x3d8e4827 */
+/* HASH CRC-32:0xa49b451a */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -24,7 +24,6 @@
 #if defined(__CRT_HAVE_malloc) || defined(__CRT_HAVE_calloc) || defined(__CRT_HAVE_realloc) || defined(__CRT_HAVE_memalign) || defined(__CRT_HAVE_aligned_alloc) || defined(__CRT_HAVE_posix_memalign)
 #include <hybrid/typecore.h>
 __NAMESPACE_LOCAL_BEGIN
-/* Dependency: malloc from stdlib */
 #ifndef __local___localdep_malloc_defined
 #define __local___localdep_malloc_defined 1
 #if __has_builtin(__builtin_malloc) && defined(__LIBC_BIND_CRTBUILTINS) && defined(__CRT_HAVE_malloc)
@@ -40,21 +39,14 @@ __NAMESPACE_LOCAL_BEGIN
 #undef __local___localdep_malloc_defined
 #endif /* !... */
 #endif /* !__local___localdep_malloc_defined */
-/* Dependency: memset from string */
 #ifndef __local___localdep_memset_defined
 #define __local___localdep_memset_defined 1
 #ifdef __CRT_HAVE_memset
-/* >> memset(3)
- * Fill memory with a given byte
- * @return: * : Always re-returns `dst' */
 __CREDIRECT(__ATTR_LEAF __ATTR_RETNONNULL __ATTR_NONNULL((1)),void *,__NOTHROW_NCX,__localdep_memset,(void *__restrict __dst, int __byte, __SIZE_TYPE__ __n_bytes),memset,(__dst,__byte,__n_bytes))
 #else /* __CRT_HAVE_memset */
 __NAMESPACE_LOCAL_END
 #include <libc/local/string/memset.h>
 __NAMESPACE_LOCAL_BEGIN
-/* >> memset(3)
- * Fill memory with a given byte
- * @return: * : Always re-returns `dst' */
 #define __localdep_memset __LIBC_LOCAL_NAME(memset)
 #endif /* !__CRT_HAVE_memset */
 #endif /* !__local___localdep_memset_defined */

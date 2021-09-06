@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x5ebb71b2 */
+/* HASH CRC-32:0xafd4c19 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -26,7 +26,6 @@
 #include <bits/crt/posix_spawn.h>
 #include <bits/types.h>
 __NAMESPACE_LOCAL_BEGIN
-/* Dependency: free from stdlib */
 #ifndef __local___localdep_free_defined
 #define __local___localdep_free_defined 1
 #if __has_builtin(__builtin_free) && defined(__LIBC_BIND_CRTBUILTINS) && defined(__CRT_HAVE_free)
@@ -39,16 +38,13 @@ __CREDIRECT_VOID(,__NOTHROW_NCX,__localdep_free,(void *__mallptr),cfree,(__mallp
 #undef __local___localdep_free_defined
 #endif /* !... */
 #endif /* !__local___localdep_free_defined */
-/* Dependency: posix_spawn_file_actions_alloc from spawn */
 #ifndef __local___localdep_posix_spawn_file_actions_alloc_defined
 #define __local___localdep_posix_spawn_file_actions_alloc_defined 1
 __NAMESPACE_LOCAL_END
 #include <libc/local/spawn/posix_spawn_file_actions_alloc.h>
 __NAMESPACE_LOCAL_BEGIN
-/* Helper functions for allocating an a new file-spawn action entry */
 #define __localdep_posix_spawn_file_actions_alloc __LIBC_LOCAL_NAME(posix_spawn_file_actions_alloc)
 #endif /* !__local___localdep_posix_spawn_file_actions_alloc_defined */
-/* Dependency: strdup from string */
 #ifndef __local___localdep_strdup_defined
 #define __local___localdep_strdup_defined 1
 #if __has_builtin(__builtin_strdup) && defined(__LIBC_BIND_CRTBUILTINS) && defined(__CRT_HAVE_strdup)
@@ -66,10 +62,6 @@ __NAMESPACE_LOCAL_BEGIN
 #define __localdep_strdup __LIBC_LOCAL_NAME(strdup)
 #endif /* !... */
 #endif /* !__local___localdep_strdup_defined */
-/* >> posix_spawn_file_actions_addchdir_np(3)
- * Enqueue a call `chdir(path)' to be performed by the child process
- * @return: 0     : Success
- * @return: ENOMEM: Insufficient memory to enqueue the action */
 __LOCAL_LIBC(posix_spawn_file_actions_addchdir_np) __ATTR_NONNULL((1, 2)) __errno_t
 __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(posix_spawn_file_actions_addchdir_np))(struct __posix_spawn_file_actions *__restrict __file_actions, const char *__restrict __path) {
 	struct __spawn_action *__action;

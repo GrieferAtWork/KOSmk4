@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xabe5105a */
+/* HASH CRC-32:0x7e95c7e2 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -24,7 +24,6 @@
 struct exception_data;
 struct __siginfo_struct;
 __NAMESPACE_LOCAL_BEGIN
-/* Dependency: bzero from string */
 #ifndef __local___localdep_bzero_defined
 #define __local___localdep_bzero_defined 1
 #ifdef __CRT_HAVE_bzero
@@ -49,20 +48,17 @@ __NAMESPACE_LOCAL_BEGIN
 #define __localdep_bzero __LIBC_LOCAL_NAME(bzero)
 #endif /* !... */
 #endif /* !__local___localdep_bzero_defined */
-/* Dependency: error_as_errno from kos.except */
 #ifndef __local___localdep_error_as_errno_defined
 #define __local___localdep_error_as_errno_defined 1
 #ifdef __CRT_HAVE_error_as_errno
 __NAMESPACE_LOCAL_END
 #include <bits/types.h>
 __NAMESPACE_LOCAL_BEGIN
-/* Transform the given exception into a posix errno value */
 __COMPILER_REDIRECT(__LIBC,__ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1)),__errno_t,__NOTHROW_NCX,__LIBKCALL,__localdep_error_as_errno,(struct exception_data const *__restrict __self),error_as_errno,(__self))
 #else /* __CRT_HAVE_error_as_errno */
 __NAMESPACE_LOCAL_END
 #include <libc/local/kos.except/error_as_errno.h>
 __NAMESPACE_LOCAL_BEGIN
-/* Transform the given exception into a posix errno value */
 #define __localdep_error_as_errno __LIBC_LOCAL_NAME(error_as_errno)
 #endif /* !__CRT_HAVE_error_as_errno */
 #endif /* !__local___localdep_error_as_errno_defined */
@@ -75,9 +71,6 @@ __NAMESPACE_LOCAL_END
 #include <kos/except/codes.h>
 #include <kos/kernel/handle.h>
 __NAMESPACE_LOCAL_BEGIN
-/* Transform the given exception into a posix signal.
- * If doing this is possible, fill in `*result' and return `true'.
- * Otherwise, `*result' is left in an undefined state, and `false' is returned. */
 __LOCAL_LIBC(error_as_signal) __ATTR_WUNUSED __ATTR_NONNULL((1, 2)) __BOOL
 __NOTHROW_NCX(__LIBKCALL __LIBC_LOCAL_NAME(error_as_signal))(struct exception_data const *__restrict __self, struct __siginfo_struct *__restrict __result) {
 	__error_code_t __code = __self->e_code;

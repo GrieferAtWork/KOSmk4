@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x9d994335 */
+/* HASH CRC-32:0x7d9d9315 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -24,61 +24,35 @@
 #if defined(__CRT_HAVE_thrd_sleep) || defined(__CRT_HAVE_thrd_sleep64) || defined(__CRT_HAVE_nanosleep64) || defined(__CRT_HAVE_nanosleep) || defined(__CRT_HAVE___nanosleep)
 #include <bits/os/timespec.h>
 __NAMESPACE_LOCAL_BEGIN
-/* Dependency: crt_thrd_sleep64 from threads */
 #if !defined(__local___localdep_crt_thrd_sleep64_defined) && defined(__CRT_HAVE_thrd_sleep64)
 #define __local___localdep_crt_thrd_sleep64_defined 1
-/* >> thrd_sleep(3), thrd_sleep64(3)
- * Sleep until a signal is received, or `time_point' has elapsed (s.a. `nanosleep(2)')
- * @return:     0: The (relative) time specified by `time_point' has elapsed
- * @return:    -1: A signal was received while waiting, and `remaining' was filled in (if given)
- * @return: <= -2: Some other error occurred */
 __CREDIRECT(__ATTR_NONNULL((1)),int,__NOTHROW_RPC,__localdep_crt_thrd_sleep64,(struct __timespec64 const *__time_point, struct __timespec64 *__remaining),thrd_sleep64,(__time_point,__remaining))
 #endif /* !__local___localdep_crt_thrd_sleep64_defined && __CRT_HAVE_thrd_sleep64 */
-/* Dependency: nanosleep from time */
 #ifndef __local___localdep_nanosleep_defined
 #define __local___localdep_nanosleep_defined 1
 #if defined(__CRT_HAVE_nanosleep64) && defined(__USE_TIME_BITS64)
-/* >> nanosleep(2), nanosleep64(2)
- * Pause execution for a number of nanoseconds */
 __CREDIRECT(__ATTR_NONNULL((1)),int,__NOTHROW_RPC,__localdep_nanosleep,(struct timespec const *__requested_time, struct timespec *__remaining),nanosleep64,(__requested_time,__remaining))
 #elif defined(__CRT_HAVE_nanosleep) && !defined(__USE_TIME_BITS64)
-/* >> nanosleep(2), nanosleep64(2)
- * Pause execution for a number of nanoseconds */
 __CREDIRECT(__ATTR_NONNULL((1)),int,__NOTHROW_RPC,__localdep_nanosleep,(struct timespec const *__requested_time, struct timespec *__remaining),nanosleep,(__requested_time,__remaining))
 #elif defined(__CRT_HAVE___nanosleep)
-/* >> nanosleep(2), nanosleep64(2)
- * Pause execution for a number of nanoseconds */
 __CREDIRECT(__ATTR_NONNULL((1)),int,__NOTHROW_RPC,__localdep_nanosleep,(struct timespec const *__requested_time, struct timespec *__remaining),__nanosleep,(__requested_time,__remaining))
 #elif defined(__CRT_HAVE_nanosleep64) || defined(__CRT_HAVE_nanosleep)
 __NAMESPACE_LOCAL_END
 #include <libc/local/time/nanosleep.h>
 __NAMESPACE_LOCAL_BEGIN
-/* >> nanosleep(2), nanosleep64(2)
- * Pause execution for a number of nanoseconds */
 #define __localdep_nanosleep __LIBC_LOCAL_NAME(nanosleep)
 #else /* ... */
 #undef __local___localdep_nanosleep_defined
 #endif /* !... */
 #endif /* !__local___localdep_nanosleep_defined */
-/* Dependency: thrd_sleep32 from threads */
 #if !defined(__local___localdep_thrd_sleep32_defined) && defined(__CRT_HAVE_thrd_sleep)
 #define __local___localdep_thrd_sleep32_defined 1
-/* >> thrd_sleep(3), thrd_sleep64(3)
- * Sleep until a signal is received, or `time_point' has elapsed (s.a. `nanosleep(2)')
- * @return:     0: The (relative) time specified by `time_point' has elapsed
- * @return:    -1: A signal was received while waiting, and `remaining' was filled in (if given)
- * @return: <= -2: Some other error occurred */
 __CREDIRECT(__ATTR_NONNULL((1)),int,__NOTHROW_RPC,__localdep_thrd_sleep32,(struct __timespec32 const *__time_point, struct __timespec32 *__remaining),thrd_sleep,(__time_point,__remaining))
 #endif /* !__local___localdep_thrd_sleep32_defined && __CRT_HAVE_thrd_sleep */
 __NAMESPACE_LOCAL_END
 #include <asm/crt/threads.h>
 #include <libc/errno.h>
 __NAMESPACE_LOCAL_BEGIN
-/* >> thrd_sleep(3), thrd_sleep64(3)
- * Sleep until a signal is received, or `time_point' has elapsed (s.a. `nanosleep(2)')
- * @return:     0: The (relative) time specified by `time_point' has elapsed
- * @return:    -1: A signal was received while waiting, and `remaining' was filled in (if given)
- * @return: <= -2: Some other error occurred */
 __LOCAL_LIBC(thrd_sleep) __ATTR_NONNULL((1)) int
 __NOTHROW_RPC(__LIBCCALL __LIBC_LOCAL_NAME(thrd_sleep))(struct timespec const *__time_point, struct timespec *__remaining) {
 #ifdef __CRT_HAVE_thrd_sleep

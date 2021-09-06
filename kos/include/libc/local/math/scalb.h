@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x4c54c217 */
+/* HASH CRC-32:0x2b982dd5 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -30,7 +30,6 @@
 #include <libc/errno.h>
 #include <libm/scalb.h>
 __NAMESPACE_LOCAL_BEGIN
-/* Return `x' times (2 to the Nth power) */
 __LOCAL_LIBC(scalb) __ATTR_WUNUSED double
 __NOTHROW(__LIBCCALL __LIBC_LOCAL_NAME(scalb))(double __x, double __fn) {
 	/*

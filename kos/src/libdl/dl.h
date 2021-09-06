@@ -236,7 +236,7 @@ DlModule_ElfGetShstrtab(DlModule *__restrict self);
 
 /* Return the section header associated with a given `name'
  * @return: NULL:             Error (w/ dlerror() set)
- * @return: (ElfW(Shdr) *)-1: Not found (w/o dlerror() set)  */
+ * @return: (ElfW(Shdr) *)-1: Not found (w/o dlerror() set) */
 INTDEF WUNUSED NONNULL((1, 2)) ElfW(Shdr) *CC
 DlModule_ElfGetSection(DlModule *__restrict self,
                        char const *__restrict name);

@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xcfe925aa */
+/* HASH CRC-32:0xff0f717f */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -24,26 +24,20 @@
 #ifdef __CRT_HAVE_realloc
 #include <bits/types.h>
 __NAMESPACE_LOCAL_BEGIN
-/* Dependency: memcpyc from string */
 #ifndef __local___localdep_memcpyc_defined
 #define __local___localdep_memcpyc_defined 1
 #ifdef __CRT_HAVE_memcpyc
 __NAMESPACE_LOCAL_END
 #include <hybrid/typecore.h>
 __NAMESPACE_LOCAL_BEGIN
-/* Copy memory between non-overlapping memory blocks.
- * @return: * : Always re-returns `dst' */
 __CREDIRECT(__ATTR_LEAF __ATTR_RETNONNULL __ATTR_NONNULL((1, 2)),void *,__NOTHROW_NCX,__localdep_memcpyc,(void *__restrict __dst, void const *__restrict __src, __SIZE_TYPE__ __elem_count, __SIZE_TYPE__ __elem_size),memcpyc,(__dst,__src,__elem_count,__elem_size))
 #else /* __CRT_HAVE_memcpyc */
 __NAMESPACE_LOCAL_END
 #include <libc/local/string/memcpyc.h>
 __NAMESPACE_LOCAL_BEGIN
-/* Copy memory between non-overlapping memory blocks.
- * @return: * : Always re-returns `dst' */
 #define __localdep_memcpyc __LIBC_LOCAL_NAME(memcpyc)
 #endif /* !__CRT_HAVE_memcpyc */
 #endif /* !__local___localdep_memcpyc_defined */
-/* Dependency: realloc from stdlib */
 #ifndef __local___localdep_realloc_defined
 #define __local___localdep_realloc_defined 1
 #if __has_builtin(__builtin_realloc) && defined(__LIBC_BIND_CRTBUILTINS)
@@ -61,10 +55,6 @@ __CREDIRECT(__ATTR_MALL_DEFAULT_ALIGNED __ATTR_WUNUSED __ATTR_ALLOC_SIZE((2)),vo
 __NAMESPACE_LOCAL_END
 #include <libc/errno.h>
 __NAMESPACE_LOCAL_BEGIN
-/* >> argz_append(3)
- * Increase allocated memory of `*pargz' and append `buf...+=buf_len'
- * @return: 0 :     Success
- * @return: ENOMEM: Insufficient heap memory */
 __LOCAL_LIBC(argz_append) __ATTR_NONNULL((1, 2)) __errno_t
 __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(argz_append))(char **__restrict __pargz, __SIZE_TYPE__ *__restrict __pargz_len, char const *__restrict __buf, __SIZE_TYPE__ __buf_len) {
 	__SIZE_TYPE__ __oldlen = *__pargz_len;

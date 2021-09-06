@@ -86,9 +86,9 @@ NOTHROW(LIBCCALL libc_p_environ)(void) {
 
 
 
-/*[[[head:libc_execve,hash:CRC-32=0xae5637c3]]]*/
+/*[[[head:libc_execve,hash:CRC-32=0x8b7788fe]]]*/
 /* >> execve(2)
- * Replace the calling process with the application image referred to by `path' / `file'
+ * Replace the calling  process with  the application  image referred  to by  `path' /  `file'
  * and execute it's `main()' method, passing the given `argv', and setting `environ' to `envp' */
 INTERN ATTR_SECTION(".text.crt.fs.exec.exec") NONNULL((1, 2, 3)) int
 NOTHROW_RPC(LIBCCALL libc_execve)(char const *__restrict path,
@@ -174,9 +174,9 @@ NOTHROW_NCX(LIBCCALL libc_getpgrp)(void)
 }
 /*[[[end:libc_getpgrp]]]*/
 
-/*[[[head:libc_setpgid,hash:CRC-32=0x5c9bcdc1]]]*/
+/*[[[head:libc_setpgid,hash:CRC-32=0x7634a5a6]]]*/
 /* >> setpgid(2)
- * Change the ID of the process group associated with `pid's process.
+ * Change  the ID of  the process group  associated with `pid's process.
  * (That is the TID of the leader of the process group of `pid's leader)
  * THREAD[PID]->LEADER->GROUP_LEADER = THREAD[PGID]
  * When `pid' is ZERO(0), use `gettid()' for it instead.
@@ -191,10 +191,10 @@ NOTHROW_NCX(LIBCCALL libc_setpgid)(pid_t pid,
 }
 /*[[[end:libc_setpgid]]]*/
 
-/*[[[head:libc_setsid,hash:CRC-32=0x23cae8a2]]]*/
+/*[[[head:libc_setsid,hash:CRC-32=0x4b32f42e]]]*/
 /* >> setsid(2)
  * Make the calling thread's process the leader of its associated
- * process group, before also making it its own session leader.
+ * process group, before also making  it its own session  leader.
  * Then return the TID of that new session leader, which is also the PID of the calling process.
  *  - THIS_THREAD->LEADER->GROUP_LEADER                 = THIS_THREAD->LEADER;
  *  - THIS_THREAD->LEADER->GROUP_LEADER->SESSION_LEADER = THIS_THREAD->LEADER->GROUP_LEADER;
@@ -332,14 +332,14 @@ NOTHROW_NCX(LIBCCALL libc_setgid)(gid_t gid)
 }
 /*[[[end:libc_setgid]]]*/
 
-/*[[[head:libc_fork,hash:CRC-32=0x2f1aa539]]]*/
+/*[[[head:libc_fork,hash:CRC-32=0x8a8f497a]]]*/
 /* >> fork(2)
  * Clone the calling thread into a second process and return twice, once
- * in the parent process where this function returns the (non-zero) PID
- * of the forked child process, and a second time in the child process
+ * in  the parent process where this function returns the (non-zero) PID
+ * of  the forked child process, and a  second time in the child process
  * itself, where ZERO(0) is returned.
  * The child then usually proceeds by calling `exec(2)' to replace its
- * application image with that of another program that the original
+ * application image with  that of another  program that the  original
  * parent can then `wait(2)' for. (s.a. `vfork(2)')
  * @return: 0 : You're the new process that was created
  * @return: * : The `return' value is the pid of your new child process */
@@ -574,10 +574,10 @@ NOTHROW_RPC(LIBCCALL libc_link)(char const *from,
 }
 /*[[[end:libc_link]]]*/
 
-/*[[[head:libc_read,hash:CRC-32=0x760af5fb]]]*/
+/*[[[head:libc_read,hash:CRC-32=0x624f5168]]]*/
 /* >> read(2)
  * Read up to `bufsize' bytes from `fd' into `buf'
- * When `fd' has the `O_NONBLOCK' flag set, only read as much data as was
+ * When `fd' has the  `O_NONBLOCK' flag set,  only read as  much data as  was
  * available at the time the call was made, and throw E_WOULDBLOCK if no data
  * was available at the time.
  * @return: <= bufsize: The actual amount of read bytes
@@ -594,10 +594,10 @@ NOTHROW_RPC(LIBCCALL libc_read)(fd_t fd,
 }
 /*[[[end:libc_read]]]*/
 
-/*[[[head:libc_write,hash:CRC-32=0x77a5c27]]]*/
+/*[[[head:libc_write,hash:CRC-32=0x26b3e384]]]*/
 /* >> write(2)
  * Write up to `bufsize' bytes from `buf' into `fd'
- * When `fd' has the `O_NONBLOCK' flag set, only write as much data
+ * When `fd' has the `O_NONBLOCK' flag set, only write as much  data
  * as possible at the time the call was made, and throw E_WOULDBLOCK
  * if no data could be written at the time.
  * @return: <= bufsize: The actual amount of written bytes
@@ -878,9 +878,9 @@ NOTHROW_RPC(LIBCCALL libc_linkat)(fd_t fromfd,
 }
 /*[[[end:libc_linkat]]]*/
 
-/*[[[head:libc_symlinkat,hash:CRC-32=0x5689b9b5]]]*/
+/*[[[head:libc_symlinkat,hash:CRC-32=0x7633b480]]]*/
 /* >> symlinkat(3)
- * Create a new symbolic link loaded with `link_text' as link
+ * Create  a  new  symbolic  link  loaded  with  `link_text'  as link
  * text, at the filesystem location referred to by `tofd:target_path' */
 INTERN ATTR_SECTION(".text.crt.fs.modify") NONNULL((1, 3)) int
 NOTHROW_RPC(LIBCCALL libc_symlinkat)(char const *link_text,
@@ -896,10 +896,10 @@ NOTHROW_RPC(LIBCCALL libc_symlinkat)(char const *link_text,
 }
 /*[[[end:libc_symlinkat]]]*/
 
-/*[[[head:libc_readlinkat,hash:CRC-32=0x3ba8f438]]]*/
+/*[[[head:libc_readlinkat,hash:CRC-32=0x2df2a224]]]*/
 /* >> readlinkat(2)
  * Read the text of a symbolic link under `dfd:path' into the provided buffer.
- * WARNING: This function is badly designed and will neither append a trailing
+ * WARNING: This  function is badly designed and will neither append a trailing
  *          NUL-character to the buffer, nor will it return the required buffer
  *          size. Instead, it will return the written size, and the caller must
  *          keep on over allocating until the function indicates that it didn't
@@ -1277,9 +1277,9 @@ NOTHROW_RPC(LIBCCALL libc_fchdir)(fd_t fd)
 }
 /*[[[end:libc_fchdir]]]*/
 
-/*[[[head:libc_getpgid,hash:CRC-32=0x5ffda70]]]*/
+/*[[[head:libc_getpgid,hash:CRC-32=0x73a5d73]]]*/
 /* >> getpgid(2)
- * Return the ID of the process group associated with `pid's process.
+ * Return  the ID of  the process group  associated with `pid's process.
  * (That is the TID of the leader of the process group of `pid's leader)
  * THREAD[PID]->LEADER->GROUP_LEADER->PID
  * When `pid' is ZERO(0), use `gettid()' for it instead */
@@ -1293,10 +1293,10 @@ NOTHROW_NCX(LIBCCALL libc_getpgid)(pid_t pid)
 }
 /*[[[end:libc_getpgid]]]*/
 
-/*[[[head:libc_getsid,hash:CRC-32=0xe542b6c7]]]*/
+/*[[[head:libc_getsid,hash:CRC-32=0x643d1819]]]*/
 /* >> getsid(2)
  * Return the ID of the session which a process `pid' is apart of.
- * return THREAD[PID]->LEADER->GROUP_LEADER->SESSION_LEADER->PID; */
+ * return  THREAD[PID]->LEADER->GROUP_LEADER->SESSION_LEADER->PID; */
 INTERN ATTR_SECTION(".text.crt.sched.process") WUNUSED pid_t
 NOTHROW_NCX(LIBCCALL libc_getsid)(pid_t pid)
 /*[[[body:libc_getsid]]]*/
@@ -1307,10 +1307,10 @@ NOTHROW_NCX(LIBCCALL libc_getsid)(pid_t pid)
 }
 /*[[[end:libc_getsid]]]*/
 
-/*[[[head:libc_lchown,hash:CRC-32=0x65b469a0]]]*/
+/*[[[head:libc_lchown,hash:CRC-32=0x97634942]]]*/
 /* >> lchown(2)
  * Change the ownership of a given `file' to `group:owner',
- * but don't reference it if that file is a symbolic link */
+ * but don't reference it if  that file is a symbolic  link */
 INTERN ATTR_SECTION(".text.crt.fs.modify") NONNULL((1)) int
 NOTHROW_RPC(LIBCCALL libc_lchown)(char const *file,
                                   uid_t owner,
@@ -1365,9 +1365,9 @@ NOTHROW_NCX(LIBCCALL libc_truncate64)(char const *file,
 #endif /* MAGIC:alias */
 /*[[[end:libc_truncate64]]]*/
 
-/*[[[head:libc_fexecve,hash:CRC-32=0xac08f77f]]]*/
+/*[[[head:libc_fexecve,hash:CRC-32=0x318f1a9a]]]*/
 /* >> fexecve(2)
- * Replace the calling process with the application image referred to by `fd' and
+ * Replace the  calling  process  with the  application  image  referred to  by  `fd'  and
  * execute it's `main()' method, passing the given `argv', and setting `environ' to `envp' */
 INTERN ATTR_SECTION(".text.crt.fs.exec.exec") NONNULL((2, 3)) int
 NOTHROW_RPC(LIBCCALL libc_fexecve)(fd_t fd,
@@ -1574,9 +1574,9 @@ NOTHROW_NCX(LIBCCALL libc_ttyslot)(void)
 }
 /*[[[end:libc_ttyslot]]]*/
 
-/*[[[head:libc_symlink,hash:CRC-32=0x386d6ca5]]]*/
+/*[[[head:libc_symlink,hash:CRC-32=0xfcf1d157]]]*/
 /* >> symlink(3)
- * Create a new symbolic link loaded with `link_text' as link
+ * Create  a new  symbolic link  loaded with  `link_text' as link
  * text, at the filesystem location referred to by `target_path'.
  * Same as `symlinkat(link_text, AT_FDCWD, target_path)' */
 INTERN ATTR_SECTION(".text.crt.fs.modify") NONNULL((1, 2)) int
@@ -1590,11 +1590,11 @@ NOTHROW_RPC(LIBCCALL libc_symlink)(char const *link_text,
 }
 /*[[[end:libc_symlink]]]*/
 
-/*[[[head:libc_readlink,hash:CRC-32=0xb933789e]]]*/
+/*[[[head:libc_readlink,hash:CRC-32=0x5d2f535b]]]*/
 /* >> readlink(3)
  * Read the text of a symbolic link under `path' into the provided buffer.
  * Same as `readlinkat(AT_FDCWD, path, buf, buflen)'
- * WARNING: This function is badly designed and will neither append a trailing
+ * WARNING: This  function is badly designed and will neither append a trailing
  *          NUL-character to the buffer, nor will it return the required buffer
  *          size. Instead, it will return the written size, and the caller must
  *          keep on over allocating until the function indicates that it didn't
@@ -1818,9 +1818,9 @@ NOTHROW_RPC(LIBCCALL libc_revoke)(char const *file)
 /*[[[skip:libc_syscall]]]*/
 /*[[[skip:libc_syscall64]]]*/
 
-/*[[[head:libc_chroot,hash:CRC-32=0xc5ab98aa]]]*/
+/*[[[head:libc_chroot,hash:CRC-32=0xe546b55e]]]*/
 /* >> chroot(2)
- * Change the root directory of the calling `CLONE_FS' group of threads
+ * Change  the root directory of the calling `CLONE_FS' group of threads
  * (usually the process) to a path that was previously address by `path' */
 INTERN ATTR_SECTION(".text.crt.fs.utility") NONNULL((1)) int
 NOTHROW_RPC(LIBCCALL libc_chroot)(char const *__restrict path)
@@ -1911,9 +1911,9 @@ err:
 }
 
 
-/*[[[head:libc_brk,hash:CRC-32=0xcf35a87e]]]*/
+/*[[[head:libc_brk,hash:CRC-32=0x7ed249a9]]]*/
 /* >> brk(2), sbrk(2)
- * Change the program break, allowing for a rudimentary implementation of a heap.
+ * Change the  program  break,  allowing  for a  rudimentary  implementation  of  a  heap.
  * It is recommended to use the much more advanced functions found in <sys/mman.h> instead */
 INTERN ATTR_SECTION(".text.crt.heap.utility") int
 NOTHROW_NCX(LIBCCALL libc_brk)(void *addr)
@@ -1927,9 +1927,9 @@ NOTHROW_NCX(LIBCCALL libc_brk)(void *addr)
 }
 /*[[[end:libc_brk]]]*/
 
-/*[[[head:libc_sbrk,hash:CRC-32=0x89be8296]]]*/
+/*[[[head:libc_sbrk,hash:CRC-32=0x6575aae]]]*/
 /* >> brk(2), sbrk(2)
- * Change the program break, allowing for a rudimentary implementation of a heap.
+ * Change the  program  break,  allowing  for a  rudimentary  implementation  of  a  heap.
  * It is recommended to use the much more advanced functions found in <sys/mman.h> instead */
 INTERN ATTR_SECTION(".text.crt.heap.utility") void *
 NOTHROW_NCX(LIBCCALL libc_sbrk)(intptr_t delta)
@@ -2042,9 +2042,9 @@ PRIVATE ATTR_SECTION(".rodata.crt.fs.property") u8 const pc_superblock_features_
 	[_PC_2_SYMLINKS]         = FIELD_UNDEFINED, /* Custom! */
 };
 
-/*[[[head:libc_fpathconf,hash:CRC-32=0x53714ecc]]]*/
+/*[[[head:libc_fpathconf,hash:CRC-32=0xb1c5ff53]]]*/
 /* >> fpathconf(2)
- * @param: name: One of `_PC_*' from <asm/crt/confname.h>
+ * @param: name: One   of    `_PC_*'    from    <asm/crt/confname.h>
  * Return a path configuration value associated with `name' for `fd'
  * return: * : The configuration limit associated with `name' for `fd'
  * return: -1: [errno=<unchanged>] The configuration specified by `name' is unlimited for `fd'
@@ -3069,12 +3069,12 @@ STATIC_ASSERT(COMPILER_LENOF(sysconf_table) <= _SC_COUNT);
 
 
 
-/*[[[head:libc_sysconf,hash:CRC-32=0x4e89c8f0]]]*/
+/*[[[head:libc_sysconf,hash:CRC-32=0x66d53c48]]]*/
 /* >> sysconf(2)
  * @param: name: One of `_SC_*' from <asm/crt/confname.h>
- * Return a system configuration value `name'
+ * Return   a   system    configuration   value    `name'
  * return: * : The configuration limit associated with `name' for `path'
- * return: -1: [errno=<unchanged>] `name' refers to a maximum or minimum
+ * return: -1: [errno=<unchanged>] `name'  refers to a maximum or minimum
  *                                 limit, and that limit is indeterminate
  * return: -1: [errno=EINVAL]      The given `name' isn't a recognized config option */
 INTERN ATTR_SECTION(".text.crt.system.configuration") WUNUSED longptr_t
@@ -3261,12 +3261,12 @@ NOTHROW_RPC(LIBCCALL libc_freadlinkat)(fd_t dfd,
 }
 /*[[[end:libc_freadlinkat]]]*/
 
-/*[[[head:libc_readall,hash:CRC-32=0x1811c1fc]]]*/
+/*[[[head:libc_readall,hash:CRC-32=0x589a58b0]]]*/
 /* >> readall(3)
- * Same as `read(2)', however keep on reading until `read()' indicates EOF (causing
+ * Same  as `read(2)', however  keep on reading until  `read()' indicates EOF (causing
  * `readall()' to immediately return `0') or the entirety of the given buffer has been
  * filled (in which case `bufsize' is returned).
- * If an error occurs before all data could be read, try to use SEEK_CUR to rewind
+ * If  an error occurs before all data could be read, try to use SEEK_CUR to rewind
  * the file descriptor by the amount of data that had already been loaded. - Errors
  * during this phase are silently ignored and don't cause `errno' to change */
 INTERN ATTR_SECTION(".text.crt.io.read") NONNULL((2)) ssize_t
@@ -3300,9 +3300,9 @@ NOTHROW_RPC(LIBCCALL libc_readall)(fd_t fd,
 }
 /*[[[end:libc_readall]]]*/
 
-/*[[[head:libc_writeall,hash:CRC-32=0xa9ae1bd1]]]*/
+/*[[[head:libc_writeall,hash:CRC-32=0xc1757880]]]*/
 /* >> writeall(3)
- * Same as `write(2)', however keep on writing until `write()' indicates EOF (causing
+ * Same as `write(2)', however keep on  writing until `write()' indicates EOF  (causing
  * `writeall()' to immediately return `0') or the entirety of the given buffer has been
  * written (in which case `bufsize' is returned). */
 INTERN ATTR_SECTION(".text.crt.io.write") NONNULL((2)) ssize_t
@@ -3484,9 +3484,9 @@ NOTHROW(LIBCCALL libc_gettid)(void)
 }
 /*[[[end:libc_gettid]]]*/
 
-/*[[[head:libc_sync,hash:CRC-32=0x1431d596]]]*/
+/*[[[head:libc_sync,hash:CRC-32=0x89d09d29]]]*/
 /* >> sync(2)
- * Synchronize all disk operations of all mounted file systems and flush
+ * Synchronize all disk  operations of  all mounted file  systems and  flush
  * unwritten buffers down to the hardware layer, ensuring that modifications
  * made become visible on the underlying, persistent media */
 INTERN ATTR_SECTION(".text.crt.fs.modify") void
@@ -3537,10 +3537,10 @@ err:
 }
 /*[[[end:libc_nice]]]*/
 
-/*[[[head:libc_fsync,hash:CRC-32=0x9bcfb5e6]]]*/
+/*[[[head:libc_fsync,hash:CRC-32=0x293e6766]]]*/
 /* >> fsync(2)
  * Synchronize a file (including its descriptor which contains timestamps, and its size),
- * meaning that changes to its data and/or descriptor are written to disk */
+ * meaning  that  changes   to  its   data  and/or   descriptor  are   written  to   disk */
 INTERN ATTR_SECTION(".text.crt.io.sync") int
 NOTHROW_RPC(LIBCCALL libc_fsync)(fd_t fd)
 /*[[[body:libc_fsync]]]*/
@@ -3551,10 +3551,10 @@ NOTHROW_RPC(LIBCCALL libc_fsync)(fd_t fd)
 }
 /*[[[end:libc_fsync]]]*/
 
-/*[[[head:libc_fdatasync,hash:CRC-32=0xcadd0612]]]*/
+/*[[[head:libc_fdatasync,hash:CRC-32=0x9bc7c550]]]*/
 /* >> fdatasync(2)
  * Synchronize only the data of a file (not its descriptor which contains
- * timestamps, and its size), meaning that changes are written to disk */
+ * timestamps,  and its size),  meaning that changes  are written to disk */
 INTERN ATTR_SECTION(".text.crt.io.sync") int
 NOTHROW_RPC(LIBCCALL libc_fdatasync)(fd_t fd)
 /*[[[body:libc_fdatasync]]]*/

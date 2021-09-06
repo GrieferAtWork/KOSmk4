@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x3c563209 */
+/* HASH CRC-32:0x5a4e2b68 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -24,23 +24,18 @@
 #include <ieee754.h>
 #if defined(__IEEE754_DOUBLE_TYPE_IS_FLOAT__) || defined(__IEEE754_FLOAT_TYPE_IS_FLOAT__) || defined(__IEEE854_LONG_DOUBLE_TYPE_IS_FLOAT__) || defined(__CRT_HAVE_atan) || defined(__CRT_HAVE___atan) || defined(__IEEE754_DOUBLE_TYPE_IS_DOUBLE__) || defined(__IEEE754_FLOAT_TYPE_IS_DOUBLE__) || defined(__IEEE854_LONG_DOUBLE_TYPE_IS_DOUBLE__)
 __NAMESPACE_LOCAL_BEGIN
-/* Dependency: atan from math */
 #ifndef __local___localdep_atan_defined
 #define __local___localdep_atan_defined 1
 #if __has_builtin(__builtin_atan) && defined(__LIBC_BIND_CRTBUILTINS) && defined(__CRT_HAVE_atan)
-/* Arc tangent of `x' */
 __CEIREDIRECT(__ATTR_WUNUSED,double,__NOTHROW,__localdep_atan,(double __x),atan,{ return __builtin_atan(__x); })
 #elif defined(__CRT_HAVE_atan)
-/* Arc tangent of `x' */
 __CREDIRECT(__ATTR_WUNUSED,double,__NOTHROW,__localdep_atan,(double __x),atan,(__x))
 #elif defined(__CRT_HAVE___atan)
-/* Arc tangent of `x' */
 __CREDIRECT(__ATTR_WUNUSED,double,__NOTHROW,__localdep_atan,(double __x),__atan,(__x))
 #elif defined(__IEEE754_DOUBLE_TYPE_IS_DOUBLE__) || defined(__IEEE754_FLOAT_TYPE_IS_DOUBLE__) || defined(__IEEE854_LONG_DOUBLE_TYPE_IS_DOUBLE__)
 __NAMESPACE_LOCAL_END
 #include <libc/local/math/atan.h>
 __NAMESPACE_LOCAL_BEGIN
-/* Arc tangent of `x' */
 #define __localdep_atan __LIBC_LOCAL_NAME(atan)
 #else /* ... */
 #undef __local___localdep_atan_defined
@@ -53,7 +48,6 @@ __NAMESPACE_LOCAL_END
 #include <libm/inf.h>
 #include <libm/atan.h>
 __NAMESPACE_LOCAL_BEGIN
-/* Arc tangent of `x' */
 __LOCAL_LIBC(atanf) __ATTR_WUNUSED float
 __NOTHROW(__LIBCCALL __LIBC_LOCAL_NAME(atanf))(float __x) {
 #if defined(__IEEE754_DOUBLE_TYPE_IS_FLOAT__) || defined(__IEEE754_FLOAT_TYPE_IS_FLOAT__) || defined(__IEEE854_LONG_DOUBLE_TYPE_IS_FLOAT__)

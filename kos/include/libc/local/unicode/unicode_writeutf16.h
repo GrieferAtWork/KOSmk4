@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xc3ec239 */
+/* HASH CRC-32:0x56315e99 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -22,9 +22,6 @@
 #define __local_unicode_writeutf16_defined 1
 #include <__crt.h>
 __NAMESPACE_LOCAL_BEGIN
-/* >> unicode_writeutf16(3)
- * Write a given Unicode character `ch' to `dst' and return a pointer to its end location.
- * This function will write at most `UNICODE_UTF16_CURLEN' words to `dst' */
 __LOCAL_LIBC(unicode_writeutf16) __ATTR_RETNONNULL __ATTR_NONNULL((1)) __CHAR16_TYPE__ *
 __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(unicode_writeutf16))(__CHAR16_TYPE__ *__restrict __dst, __CHAR32_TYPE__ __ch) {
 	if __likely(__ch <= 0xffff && (__ch < 0xd800 || __ch > 0xdfff)) {

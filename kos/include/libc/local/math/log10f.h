@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xea25b5b0 */
+/* HASH CRC-32:0x17136e6a */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -23,23 +23,18 @@
 #include <__crt.h>
 #if defined(__CRT_HAVE_log10) || defined(__CRT_HAVE___log10)
 __NAMESPACE_LOCAL_BEGIN
-/* Dependency: log10 from math */
 #ifndef __local___localdep_log10_defined
 #define __local___localdep_log10_defined 1
 #if __has_builtin(__builtin_log10) && defined(__LIBC_BIND_CRTBUILTINS) && defined(__CRT_HAVE_log10)
-/* Base-ten logarithm of `x' */
 __CEIREDIRECT(__ATTR_WUNUSED,double,__NOTHROW,__localdep_log10,(double __x),log10,{ return __builtin_log10(__x); })
 #elif defined(__CRT_HAVE_log10)
-/* Base-ten logarithm of `x' */
 __CREDIRECT(__ATTR_WUNUSED,double,__NOTHROW,__localdep_log10,(double __x),log10,(__x))
 #elif defined(__CRT_HAVE___log10)
-/* Base-ten logarithm of `x' */
 __CREDIRECT(__ATTR_WUNUSED,double,__NOTHROW,__localdep_log10,(double __x),__log10,(__x))
 #else /* ... */
 #undef __local___localdep_log10_defined
 #endif /* !... */
 #endif /* !__local___localdep_log10_defined */
-/* Base-ten logarithm of `x' */
 __LOCAL_LIBC(log10f) __ATTR_WUNUSED float
 __NOTHROW(__LIBCCALL __LIBC_LOCAL_NAME(log10f))(float __x) {
 	return (float)__localdep_log10((double)__x);

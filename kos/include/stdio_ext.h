@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x29d1a3d9 */
+/* HASH CRC-32:0x6036f8cf */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -111,14 +111,14 @@ enum {
 
 /* >> __fbufsize(3)
  * Return the size of the buffer of `stream' in
- * bytes currently in use by the given stream */
+ * bytes  currently in use  by the given stream */
 __CDECLARE_OPT(__ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1)),__SIZE_TYPE__,__NOTHROW_NCX,__fbufsize,(__FILE *__stream),(__stream))
 /* >> __freading(3)
- * Return non-zero value when `stream' is opened readonly,
+ * Return  non-zero value when  `stream' is opened readonly,
  * or if the last operation on `stream' was a read operation */
 __CDECLARE_OPT(__ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1)),int,__NOTHROW_NCX,__freading,(__FILE *__stream),(__stream))
 /* >> __fwriting(3)
- * Return non-zero value when `stream' is opened write-only or
+ * Return non-zero value when  `stream' is opened write-only  or
  * append-only, or if the last operation on `stream' was a write
  * operation */
 __CDECLARE_OPT(__ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1)),int,__NOTHROW_NCX,__fwriting,(__FILE *__stream),(__stream))

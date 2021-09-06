@@ -52,7 +52,7 @@ __SYSDECL_BEGIN
 
 %[define(DEFINE_LOCAL_error_print_progname =
 @@pp_ifndef __LOCAL_error_print_progname@@
-@@pp_ifdef error_print_progname@@
+@@pp_ifdef          error_print_progname@@
 #define __LOCAL_error_print_progname error_print_progname
 @@pp_elif defined(__CRT_HAVE_error_print_progname)@@
 @@pp_ifdef __NO_ASMNAME@@
@@ -68,7 +68,7 @@ __LIBC void (__LIBKCALL *error_print_progname)(void);
 
 %[define(DEFINE_LOCAL_error_message_count =
 @@pp_ifndef __LOCAL_error_message_count@@
-@@pp_ifdef error_message_count@@
+@@pp_ifdef          error_message_count@@
 #define __LOCAL_error_message_count error_message_count
 @@pp_elif defined(__CRT_HAVE_error_message_count)@@
 @@pp_ifdef __NO_ASMNAME@@
@@ -84,7 +84,7 @@ __LIBC unsigned int error_message_count;
 
 %[define(DEFINE_LOCAL_error_one_per_line =
 @@pp_ifndef __LOCAL_error_one_per_line@@
-@@pp_ifdef error_one_per_line@@
+@@pp_ifdef          error_one_per_line@@
 #define __LOCAL_error_one_per_line error_one_per_line
 @@pp_elif defined(__CRT_HAVE_error_one_per_line)@@
 @@pp_ifdef __NO_ASMNAME@@
@@ -99,7 +99,7 @@ __LIBC int error_one_per_line;
 )]
 
 
-@@Helper function for printing an error message to `stderr' and possibly exiting the program
+@@Helper  function  for printing  an error  message to  `stderr' and  possibly exiting  the program
 @@The message is printed as: `<program_invocation_short_name>: <format...>[: <strerror(errnum)>]\n'
 @@Also note that `stdout' is flushed before the message is printed.
 @@If `STATUS' is non-zero, follow up with a call to `exit(status)'
@@ -143,7 +143,7 @@ void error(int status, $errno_t errnum, const char *format, ...) {
 
 @@Same as `error()', but also include the given filename in the error message.
 @@The message is printed as: `<program_invocation_short_name>:<filename>:<line>: <format...>[: <strerror(errnum)>]\n'
-@@Additionally, when `error_one_per_line' is non-zero, consecutive calls to this function that
+@@Additionally,    when   `error_one_per_line'   is    non-zero,   consecutive   calls    to   this   function   that
 @@pass the same values for `filename' and `line' will not produce the error message.
 [[fast, libc, throws, ATTR_LIBC_PRINTF(5, 6)]]
 [[decl_include("<bits/types.h>")]]

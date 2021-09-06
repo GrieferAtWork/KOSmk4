@@ -141,22 +141,22 @@ $errno_t crt_posix_spawn([[nonnull]] pid_t *__restrict pid,
 %#ifdef __USE_KOS
 
 @@>> posix_fspawn_np(3)
-@@Implementation for the fastest possible method of (safely) doing fork(2)+fexecve(2)
-@@in order to spawn a new process from the given `execfd' file descriptor.
+@@Implementation for the fastest possible  method of (safely) doing  fork(2)+fexecve(2)
+@@in  order  to  spawn  a  new  process  from  the  given  `execfd'  file   descriptor.
 @@For this purpose, any error that may happen during either the fork(3), the fexecve(2)
-@@or any of the numerous additional system calls that may be performed in-between will
-@@be returned by this function to the parent process, while the function itself never
+@@or  any of the numerous additional system calls that may be performed in-between will
+@@be returned by this function to the  parent process, while the function itself  never
 @@actually returns in the child process.
-@@For this purpose, this function tries to make use of `vfork(2)' in combination
-@@with `__ARCH_HAVE_SHARED_VM_VFORK', and if that isn't available, a temporary pipe
-@@is used to communicate process initialization errors, as well as to await a successful
-@@exec call by using the fact that a successful exec will close all `O_CLOEXEC' files,
+@@For this  purpose,  this  function tries  to  make  use of  `vfork(2)'  in  combination
+@@with  `__ARCH_HAVE_SHARED_VM_VFORK',  and if  that  isn't available,  a  temporary pipe
+@@is  used to communicate process initialization errors, as well as to await a successful
+@@exec call by using the  fact that a successful exec  will close all `O_CLOEXEC'  files,
 @@with the pipe having been given that flag, and that a pipe without both ends still open
-@@will always have its read immediately return (which is used to indicate success)
+@@will always  have its  read immediately  return  (which is  used to  indicate  success)
 @@@param: pid:          Store the PID of the newly spawned child process here
 @@@param: execfd:       The file descriptor pointing to the file that should be executed
 @@@param: file_actions: [0..1] A set of additional actions to perform in regards to file-
-@@                             handle operations. Can be used to (e.g.) re-direct stdout
+@@                             handle operations. Can be used to (e.g.) re-direct  stdout
 @@                             for the new process
 @@@param: attrp:        [0..1] Additional process attributes to set for the child process
 @@@param: argv:         Same as the `argv' accepted by `fexecve(2)'
@@ -341,7 +341,7 @@ do_exec:
 
 
 @@pp_ifdef __POSIX_SPAWN_ACTION_TCSETPGRP@@
-@@pp_if !$has_function(tcsetpgrp)@@
+@@pp_if         !$has_function(tcsetpgrp)@@
 #define __POSIX_SPAWN_HAVE_UNSUPPORTED_FILE_ACTION 1
 @@pp_else@@
 			case __POSIX_SPAWN_ACTION_TCSETPGRP:
@@ -354,7 +354,7 @@ do_exec:
 
 
 @@pp_ifdef __POSIX_SPAWN_ACTION_CLOSEFROM@@
-@@pp_if !$has_function(closefrom)@@
+@@pp_if         !$has_function(closefrom)@@
 #define __POSIX_SPAWN_HAVE_UNSUPPORTED_FILE_ACTION 1
 @@pp_else@@
 			case __POSIX_SPAWN_ACTION_CLOSEFROM:
@@ -535,21 +535,21 @@ child_error:
 
 @@>> posix_spawn(3)
 @@Implementation for the fastest possible method of (safely) doing fork(2)+execve(2)
-@@in order to spawn a new process from the given `path' program.
+@@in  order   to   spawn   a   new  process   from   the   given   `path'   program.
 @@For this purpose, any error that may happen during either the fork(3), the execve(2)
 @@or any of the numerous additional system calls that may be performed in-between will
-@@be returned by this function to the parent process, while the function itself never
+@@be  returned by this function to the parent process, while the function itself never
 @@actually returns in the child process.
-@@For this purpose, this function tries to make use of `vfork(2)' in combination
-@@with `__ARCH_HAVE_SHARED_VM_VFORK', and if that isn't available, a temporary pipe
-@@is used to communicate process initialization errors, as well as to await a successful
-@@exec call by using the fact that a successful exec will close all `O_CLOEXEC' files,
+@@For this  purpose,  this  function tries  to  make  use of  `vfork(2)'  in  combination
+@@with  `__ARCH_HAVE_SHARED_VM_VFORK',  and if  that  isn't available,  a  temporary pipe
+@@is  used to communicate process initialization errors, as well as to await a successful
+@@exec call by using the  fact that a successful exec  will close all `O_CLOEXEC'  files,
 @@with the pipe having been given that flag, and that a pipe without both ends still open
-@@will always have its read immediately return (which is used to indicate success)
+@@will always  have its  read immediately  return  (which is  used to  indicate  success)
 @@@param: pid:          Store the PID of the newly spawned child process here
 @@@param: path:         The pathname of the program that should be executed
 @@@param: file_actions: [0..1] A set of additional actions to perform in regards to file-
-@@                             handle operations. Can be used to (e.g.) re-direct stdout
+@@                             handle operations. Can be used to (e.g.) re-direct  stdout
 @@                             for the new process
 @@@param: attrp:        [0..1] Additional process attributes to set for the child process
 @@@param: argv:         Same as the `argv' accepted by `execve(2)'
@@ -585,9 +585,9 @@ $errno_t posix_spawn([[nonnull]] pid_t *__restrict pid,
 
 
 @@>> posix_spawnp(3)
-@@Same as `posix_spawn(3)', but search `getenv("PATH")' for `file', rather than
-@@directly making use of `file' as the absolute filename of the file to execute.
-@@Note however that when `file' contains any slashes, `$PATH' won't be searched
+@@Same  as  `posix_spawn(3)',  but  search  `getenv("PATH")'  for  `file',  rather  than
+@@directly making  use of  `file'  as the  absolute filename  of  the file  to  execute.
+@@Note however  that  when  `file'  contains any  slashes,  `$PATH'  won't  be  searched
 @@either, but instead, `file' is used as-is. (same as with `execve(2)' vs. `execvpe(3)')
 [[requires_include("<hybrid/__alloca.h>")]]
 [[requires($has_function(getenv) && $has_function(posix_spawn) && defined(__hybrid_alloca))]]
@@ -707,7 +707,7 @@ $errno_t posix_spawnattr_getflags([[nonnull]] posix_spawnattr_t const *__restric
 }
 
 @@>> posix_spawnattr_setflags(3)
-@@Specify the set of additional operations to-be performed by the
+@@Specify the  set of  additional operations  to-be performed  by  the
 @@child process prior to being started. The given `flags' is a set of:
 @@  - POSIX_SPAWN_RESETIDS:      Perform 2 calls `seteuid(getuid())' and `setegid(getgid())'
 @@  - POSIX_SPAWN_SETSIGDEF:     s.a. posix_spawnattr_setsigdefault(3)
@@ -728,7 +728,7 @@ $errno_t posix_spawnattr_setflags([[nonnull]] posix_spawnattr_t *__restrict attr
 
 @@>> posix_spawnattr_getsigdefault(3)
 @@Get the set of signal handler that are reset of `SIG_DFL' by
-@@the child process when `POSIX_SPAWN_SETSIGDEF' is set.
+@@the  child  process  when  `POSIX_SPAWN_SETSIGDEF'  is  set.
 @@@return: 0 : Success
 [[decl_include("<bits/crt/posix_spawn.h>", "<bits/os/sigset.h>")]]
 [[requires_include("<asm/crt/posix_spawn.h>")]]
@@ -741,7 +741,7 @@ $errno_t posix_spawnattr_getsigdefault([[nonnull]] posix_spawnattr_t const *__re
 
 @@>> posix_spawnattr_setsigdefault(3)
 @@Set the set of signal handler that are reset of `SIG_DFL' by
-@@the child process when `POSIX_SPAWN_SETSIGDEF' is set.
+@@the  child  process  when  `POSIX_SPAWN_SETSIGDEF'  is  set.
 @@@return: 0 : Success
 [[decl_include("<bits/crt/posix_spawn.h>", "<bits/os/sigset.h>")]]
 [[requires_include("<asm/crt/posix_spawn.h>")]]
@@ -754,7 +754,7 @@ $errno_t posix_spawnattr_setsigdefault([[nonnull]] posix_spawnattr_t *__restrict
 
 @@>> posix_spawnattr_getsigmask(3)
 @@Get the `sigmask' argument of a call `sigprocmask(SIG_SETMASK, sigmask, NULL)'
-@@that the child process will perform when `POSIX_SPAWN_SETSIGMASK' is set.
+@@that the  child process  will perform  when `POSIX_SPAWN_SETSIGMASK'  is  set.
 @@@return: 0 : Success
 [[decl_include("<bits/crt/posix_spawn.h>", "<bits/os/sigset.h>")]]
 [[requires_include("<asm/crt/posix_spawn.h>")]]
@@ -767,7 +767,7 @@ $errno_t posix_spawnattr_getsigmask([[nonnull]] posix_spawnattr_t const *__restr
 
 @@>> posix_spawnattr_getsigmask(3)
 @@Set the `sigmask' argument of a call `sigprocmask(SIG_SETMASK, sigmask, NULL)'
-@@that the child process will perform when `POSIX_SPAWN_SETSIGMASK' is set.
+@@that the  child process  will perform  when `POSIX_SPAWN_SETSIGMASK'  is  set.
 @@@return: 0 : Success
 [[decl_include("<bits/crt/posix_spawn.h>", "<bits/os/sigset.h>")]]
 [[requires_include("<asm/crt/posix_spawn.h>")]]
@@ -779,7 +779,7 @@ $errno_t posix_spawnattr_setsigmask([[nonnull]] posix_spawnattr_t *__restrict at
 }
 
 @@>> posix_spawnattr_getpgroup(3)
-@@Get the `pgid' argument of a call `setpgid(getpid(), pgid)' that
+@@Get the `pgid'  argument of a  call `setpgid(getpid(), pgid)'  that
 @@the child process will perform when `POSIX_SPAWN_SETPGROUP' is set.
 @@@return: 0 : Success
 [[decl_include("<bits/crt/posix_spawn.h>", "<bits/types.h>")]]
@@ -792,7 +792,7 @@ $errno_t posix_spawnattr_getpgroup([[nonnull]] posix_spawnattr_t const *__restri
 }
 
 @@>> posix_spawnattr_getschedparam(3)
-@@Set the `pgid' argument of a call `setpgid(getpid(), pgid)' that
+@@Set the `pgid'  argument of a  call `setpgid(getpid(), pgid)'  that
 @@the child process will perform when `POSIX_SPAWN_SETPGROUP' is set.
 @@HINT: A call `setpgid(getpid(), 0)' is the same as `setpgid(getpid(), getpid())'!
 @@@return: 0 : Success
@@ -806,7 +806,7 @@ $errno_t posix_spawnattr_setpgroup([[nonnull]] posix_spawnattr_t *__restrict att
 
 @@>> posix_spawnattr_getschedparam(3)
 @@Get the `policy' argument of a call `sched_setscheduler(getpid(), policy, param)'
-@@that the child process will perform when `POSIX_SPAWN_SETSCHEDULER' is set.
+@@that  the  child process  will  perform when  `POSIX_SPAWN_SETSCHEDULER'  is set.
 @@@return: 0 : Success
 [[decl_include("<bits/crt/posix_spawn.h>")]]
 [[requires_include("<asm/crt/posix_spawn.h>")]]
@@ -819,7 +819,7 @@ $errno_t posix_spawnattr_getschedpolicy([[nonnull]] posix_spawnattr_t const *__r
 
 @@>> posix_spawnattr_getschedparam(3)
 @@Set the `policy' argument of a call `sched_setscheduler(getpid(), policy, param)'
-@@that the child process will perform when `POSIX_SPAWN_SETSCHEDULER' is set.
+@@that  the  child process  will  perform when  `POSIX_SPAWN_SETSCHEDULER'  is set.
 @@@return: 0 : Success
 [[decl_include("<bits/crt/posix_spawn.h>")]]
 [[requires_include("<asm/crt/posix_spawn.h>")]]
@@ -832,7 +832,7 @@ $errno_t posix_spawnattr_setschedpolicy([[nonnull]] posix_spawnattr_t *__restric
 
 @@>> posix_spawnattr_getschedparam(3)
 @@Get the `param' argument of a call `sched_setscheduler(getpid(), policy, param)'
-@@that the child process will perform when `POSIX_SPAWN_SETSCHEDPARAM' is set.
+@@that  the child  process will  perform when  `POSIX_SPAWN_SETSCHEDPARAM' is set.
 @@@return: 0 : Success
 [[decl_include("<bits/crt/posix_spawn.h>", "<bits/os/sched.h>")]]
 [[requires_include("<asm/crt/posix_spawn.h>")]]
@@ -845,7 +845,7 @@ $errno_t posix_spawnattr_getschedparam([[nonnull]] posix_spawnattr_t const *__re
 
 @@>> posix_spawnattr_setschedparam(3)
 @@Set the `param' argument of a call `sched_setscheduler(getpid(), policy, param)'
-@@that the child process will perform when `POSIX_SPAWN_SETSCHEDPARAM' is set.
+@@that  the child  process will  perform when  `POSIX_SPAWN_SETSCHEDPARAM' is set.
 @@@return: 0 : Success
 [[decl_include("<bits/crt/posix_spawn.h>", "<bits/os/sched.h>")]]
 [[requires_include("<asm/crt/posix_spawn.h>")]]
@@ -952,7 +952,7 @@ struct __spawn_action *posix_spawn_file_actions_alloc([[nonnull]] posix_spawn_fi
 
 @@>> posix_spawn_file_actions_addopen(3)
 @@Enqueue a call `dup2(open(path, oflags, mode), fd)' to be performed by the child process
-@@Note though that the intermediate file returned by `open()' will not remain open!
+@@Note though  that the  intermediate file  returned  by `open()'  will not  remain  open!
 @@@return: 0     : Success
 @@@return: ENOMEM: Insufficient memory to enqueue the action
 [[decl_include("<bits/crt/posix_spawn.h>", "<bits/types.h>", "<libc/errno.h>")]]

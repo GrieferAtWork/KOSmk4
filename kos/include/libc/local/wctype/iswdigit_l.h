@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x843a48e4 */
+/* HASH CRC-32:0x2f99aeeb */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -23,7 +23,6 @@
 #include <__crt.h>
 #include <hybrid/typecore.h>
 __NAMESPACE_LOCAL_BEGIN
-/* Dependency: iswdigit from wctype */
 #ifndef __local___localdep_iswdigit_defined
 #define __local___localdep_iswdigit_defined 1
 #if __has_builtin(__builtin_iswdigit) && defined(__LIBC_BIND_CRTBUILTINS) && defined(__CRT_HAVE_iswdigit)

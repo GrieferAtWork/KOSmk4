@@ -61,7 +61,7 @@ __SYSDECL_BEGIN
 
 @@>> login_tty(3)
 @@Set the given `fd' as the controlling terminal, stdin,
-@@stdout, and stderr. Afterwards, `fd' is closed.
+@@stdout,   and  stderr.  Afterwards,  `fd'  is  closed.
 @@@return: 0 : Success
 @@@return: * : Error
 [[guard, cp_kos, section(".text.crt{|.dos}.io.tty")]]

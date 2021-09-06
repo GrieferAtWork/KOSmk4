@@ -167,20 +167,20 @@ struct option {
 
 }
 
-@@Return the option character from OPTS just read.  Return -1 when
-@@there are no more options.  For unrecognized options, or options
+@@Return the option  character from  OPTS just read.  Return -1  when
+@@there  are no  more options.  For unrecognized  options, or options
 @@missing arguments, `optopt' is set to the option letter, and '?' is
 @@returned.
 @@- The OPTS string is a list of characters which are recognized option
 @@  letters, optionally followed by colons, specifying that that letter
 @@  takes an argument, to be placed in `optarg'.
 @@- If a letter in OPTS is followed by two colons, its argument is
-@@  optional.  This behavior is specific to the GNU `getopt'.
-@@- The argument `--' causes premature termination of argument
+@@  optional. This  behavior  is  specific to  the  GNU  `getopt'.
+@@- The  argument `--' causes  premature termination of argument
 @@  scanning, explicitly telling `getopt' that there are no more
 @@  options.
 @@- If OPTS begins with `--', then non-option arguments are treated as
-@@  arguments to the option '\0'.  This behavior is specific to the GNU
+@@  arguments to the option '\0'. This behavior is specific to the GNU
 @@  `getopt'
 [[guard, wunused]]
 int getopt(int argc, char *const argv[], char const *shortopts);

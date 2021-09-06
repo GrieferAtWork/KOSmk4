@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xd8e5ed44 */
+/* HASH CRC-32:0xf4cf16d8 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -23,23 +23,18 @@
 #include <__crt.h>
 #if defined(__CRT_HAVE_exp10) || defined(__CRT_HAVE___exp10)
 __NAMESPACE_LOCAL_BEGIN
-/* Dependency: exp10 from math */
 #ifndef __local___localdep_exp10_defined
 #define __local___localdep_exp10_defined 1
 #if __has_builtin(__builtin_exp10) && defined(__LIBC_BIND_CRTBUILTINS) && defined(__CRT_HAVE_exp10)
-/* A function missing in all standards: compute exponent to base ten */
 __CEIREDIRECT(__ATTR_WUNUSED,double,__NOTHROW,__localdep_exp10,(double __x),exp10,{ return __builtin_exp10(__x); })
 #elif defined(__CRT_HAVE_exp10)
-/* A function missing in all standards: compute exponent to base ten */
 __CREDIRECT(__ATTR_WUNUSED,double,__NOTHROW,__localdep_exp10,(double __x),exp10,(__x))
 #elif defined(__CRT_HAVE___exp10)
-/* A function missing in all standards: compute exponent to base ten */
 __CREDIRECT(__ATTR_WUNUSED,double,__NOTHROW,__localdep_exp10,(double __x),__exp10,(__x))
 #else /* ... */
 #undef __local___localdep_exp10_defined
 #endif /* !... */
 #endif /* !__local___localdep_exp10_defined */
-/* A function missing in all standards: compute exponent to base ten */
 __LOCAL_LIBC(exp10l) __ATTR_WUNUSED __LONGDOUBLE
 __NOTHROW(__LIBCCALL __LIBC_LOCAL_NAME(exp10l))(__LONGDOUBLE __x) {
 	return (__LONGDOUBLE)__localdep_exp10((double)__x);

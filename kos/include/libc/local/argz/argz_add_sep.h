@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x93548b80 */
+/* HASH CRC-32:0xc786e783 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -24,7 +24,6 @@
 #ifdef __CRT_HAVE_realloc
 #include <bits/types.h>
 __NAMESPACE_LOCAL_BEGIN
-/* Dependency: free from stdlib */
 #ifndef __local___localdep_free_defined
 #define __local___localdep_free_defined 1
 #if __has_builtin(__builtin_free) && defined(__LIBC_BIND_CRTBUILTINS) && defined(__CRT_HAVE_free)
@@ -37,7 +36,6 @@ __CREDIRECT_VOID(,__NOTHROW_NCX,__localdep_free,(void *__mallptr),cfree,(__mallp
 #undef __local___localdep_free_defined
 #endif /* !... */
 #endif /* !__local___localdep_free_defined */
-/* Dependency: realloc from stdlib */
 #ifndef __local___localdep_realloc_defined
 #define __local___localdep_realloc_defined 1
 #if __has_builtin(__builtin_realloc) && defined(__LIBC_BIND_CRTBUILTINS)
@@ -52,37 +50,23 @@ __NAMESPACE_LOCAL_BEGIN
 __CREDIRECT(__ATTR_MALL_DEFAULT_ALIGNED __ATTR_WUNUSED __ATTR_ALLOC_SIZE((2)),void *,__NOTHROW_NCX,__localdep_realloc,(void *__mallptr, __SIZE_TYPE__ __num_bytes),realloc,(__mallptr,__num_bytes))
 #endif /* !__has_builtin(__builtin_realloc) || !__LIBC_BIND_CRTBUILTINS */
 #endif /* !__local___localdep_realloc_defined */
-/* Dependency: strlen from string */
 #ifndef __local___localdep_strlen_defined
 #define __local___localdep_strlen_defined 1
 #ifdef __CRT_HAVE_strlen
 __NAMESPACE_LOCAL_END
 #include <hybrid/typecore.h>
 __NAMESPACE_LOCAL_BEGIN
-/* >> strlen(3)
- * Return the length of the string in characters (Same as `rawmemlen[...](str, '\0')') */
 __CREDIRECT(__ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1)),__SIZE_TYPE__,__NOTHROW_NCX,__localdep_strlen,(char const *__restrict __str),strlen,(__str))
 #else /* __CRT_HAVE_strlen */
 __NAMESPACE_LOCAL_END
 #include <libc/local/string/strlen.h>
 __NAMESPACE_LOCAL_BEGIN
-/* >> strlen(3)
- * Return the length of the string in characters (Same as `rawmemlen[...](str, '\0')') */
 #define __localdep_strlen __LIBC_LOCAL_NAME(strlen)
 #endif /* !__CRT_HAVE_strlen */
 #endif /* !__local___localdep_strlen_defined */
 __NAMESPACE_LOCAL_END
 #include <libc/errno.h>
 __NAMESPACE_LOCAL_BEGIN
-/* >> argz_add_sep(3)
- * A combination of `argz_create_sep()' and `argz_append()' that will
- * append a duplication of `string' onto `*pargz', whilst replacing all
- * instances of `sep' with NUL-characters, thus turning them into the
- * markers between separate strings. Note however that duplicate,
- * successive instance of `sep' are merged, such that no empty sub-
- * strings will be present in the resulting argz-string.
- * @return: 0 :     Success
- * @return: ENOMEM: Insufficient heap memory */
 __LOCAL_LIBC(argz_add_sep) __ATTR_NONNULL((1, 2, 3)) __errno_t
 __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(argz_add_sep))(char **__restrict __pargz, __SIZE_TYPE__ *__restrict __pargz_len, char const *__restrict __string, int __sep) {
 	char *__result_string, *__dst;
@@ -94,7 +78,7 @@ __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(argz_add_sep))(char **__restrict __pa
 	/* Note that GLibc actually has a bug here that causes it to write `NULL'
 	 * into  the given  `*pargz' pointer  when the  allocation fails, instead
 	 * of leaving that  pointer in  its original state  (allowing the  caller
-	 * to cleanup the  argz-array,  instead of  forcing the  array to  become
+	 * to cleanup  the argz-array,  instead of  forcing the  array to  become
 	 * a memory leak)
 	 * -> That bug is fixed here!
 	 * Glibc's  version  of this:

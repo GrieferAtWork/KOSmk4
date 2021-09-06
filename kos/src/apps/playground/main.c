@@ -967,7 +967,7 @@ int main_dumpdebug(int argc, char *argv[], char *envp[]) {
 		 * >> }
 		 *
 		 * Because of the `using namespace std;', there are now 2 symbols `exit' within
-		 * the global namespace. *sigh* (all of this just because of GCC's debug info
+		 * the  global namespace. *sigh* (all of this  just because of GCC's debug info
 		 * bloat; s.a. https://gcc.gnu.org/bugzilla/show_bug.cgi?id=96417) */
 		/*exit(1);*/
 		return 1;

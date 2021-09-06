@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xa181f594 */
+/* HASH CRC-32:0xc00d6d4a */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -22,7 +22,6 @@
 #define __local_toascii_defined 1
 #include <__crt.h>
 __NAMESPACE_LOCAL_BEGIN
-/* Re-returns `C & 0x7f' */
 __LOCAL_LIBC(toascii) __ATTR_CONST int
 __NOTHROW(__LIBCCALL __LIBC_LOCAL_NAME(toascii))(int __c) {
 	return __c & 0x7f;

@@ -134,7 +134,7 @@ got_bios:
 			}
 		}
 
-//		rc << "load32bitOSImage: os=nullkernel, path=" << repr(kernelShadowFilename) << ", iolog=, initrd=\n";
+//		rc  << "load32bitOSImage: os=nullkernel, path=" << repr(kernelShadowFilename) << ", iolog=, initrd=\n";
 //		rc << "plugin_ctrl: unmapped=1, biosdev=1, speaker=1, extfpuirq=1, parallel=1, serial=1, gameport=1\n";
 //		rc << "config_interface: win32config\n";
 //		rc << "display_library: win32, options=\"gui_debug\"\n";
@@ -146,18 +146,18 @@ got_bios:
 //		rc << "ata1: enabled=1, ioaddr1=0x170, ioaddr2=0x370, irq=15\n";
 //		rc << "ata1-master: type=none\n";
 //		rc << "ata1-slave: type=none\n";
-//		rc << "ata2: enabled=0\n";
+//		rc    <<    "ata2: enabled=0\n";
 //		rc << "ata3: enabled=0\n";
 //		rc << "pci: enabled=1, chipset=i440fx\n";
 //		rc << "vga: extension=vbe, update_freq=5, realtime=1\n";
-//		rc << "#cpuid: smep=0, smap=0, mwait=1, vmx=1\n";
-//		rc << "print_timestamps: enabled=0\n";
+//		rc    <<     "#cpuid: smep=0, smap=0, mwait=1, vmx=1\n";
+//		rc          <<          "print_timestamps: enabled=0\n";
 //		rc << "private_colormap: enabled=1\n";
 //		rc << "clock: sync=none, time0=local, rtc_sync=0\n";
 //		rc << "log: -\n";
-//		rc << "logprefix: %t%e%d\n";
+//		rc  <<   "logprefix: %t%e%d\n";
 //		rc << "debug: action=ignore\n";
-//		rc << "info: action=report\n";
+//		rc <<  "info: action=report\n";
 //		rc << "error: action=report\n";
 //		rc << "panic: action=ask\n";
 //		rc << "keyboard: type=mf, serial_delay=250, paste_delay=100000, user_shortcut=none\n";

@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xb6c274d4 */
+/* HASH CRC-32:0x63419327 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -770,13 +770,13 @@ __NAMESPACE_LOCAL_USING_OR_IMPL(cfmakeraw, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR
 #ifdef __CRT_HAVE_cfmakesane
 /* >> cfmakesane(3)
  * Set ~sane~ mode for the given `termios_p' (out-only; meaning that `termios_p' gets initialized by this function)
- * Sane here refers to setting all values to their defaults, as they are defined in <sys/ttydefaults.h> */
+ * Sane here  refers  to  setting  all values  to  their  defaults,  as they  are  defined  in  <sys/ttydefaults.h> */
 __CDECLARE_VOID(__ATTR_NONNULL((1)),__NOTHROW_NCX,cfmakesane,(struct termios *__restrict __termios_p),(__termios_p))
 #else /* __CRT_HAVE_cfmakesane */
 #include <libc/local/termios/cfmakesane.h>
 /* >> cfmakesane(3)
  * Set ~sane~ mode for the given `termios_p' (out-only; meaning that `termios_p' gets initialized by this function)
- * Sane here refers to setting all values to their defaults, as they are defined in <sys/ttydefaults.h> */
+ * Sane here  refers  to  setting  all values  to  their  defaults,  as they  are  defined  in  <sys/ttydefaults.h> */
 __NAMESPACE_LOCAL_USING_OR_IMPL(cfmakesane, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_NONNULL((1)) void __NOTHROW_NCX(__LIBCCALL cfmakesane)(struct termios *__restrict __termios_p) { (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(cfmakesane))(__termios_p); })
 #endif /* !__CRT_HAVE_cfmakesane */
 #endif /* __USE_KOS || __USE_BSD */

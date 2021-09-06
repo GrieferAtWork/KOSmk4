@@ -33,19 +33,19 @@
 
 DECL_BEGIN
 
-/*[[[head:libc_openpty,hash:CRC-32=0xb4fc0307]]]*/
+/*[[[head:libc_openpty,hash:CRC-32=0xccffbca8]]]*/
 /* >> openpty(2)
- * Create a new ptty (psuedo tty), storing the handles for the
- * master/slave adapters in `*amaster' and `*aslave'. Additionally,
- * the caller may specific the initial terminal settings `termp'
- * and window size `winp', as well as a location where the kernel
- * should store the filename of the PTY master socket (as already
+ * Create  a  new  ptty (psuedo  tty),  storing the  handles  for the
+ * master/slave adapters in  `*amaster' and `*aslave'.  Additionally,
+ * the caller  may specific  the  initial terminal  settings  `termp'
+ * and  window size  `winp', as well  as a location  where the kernel
+ * should store the  filename of  the PTY master  socket (as  already
  * returned in `*amaster'). Note that the max length of this filename
- * is implementation defined, with no way for the use to specify how
- * much space is is available in the passed buffer. As such, a
- * portable application can only ever pass `NULL' for this value.
- * On KOS, the value written to `name' is the absolute filename of
- * the master-device in the `/dev' filesystem, which usually means
+ * is implementation defined, with no way for the use to specify  how
+ * much  space  is is  available  in the  passed  buffer. As  such, a
+ * portable  application can  only ever  pass `NULL'  for this value.
+ * On  KOS, the value  written to `name' is  the absolute filename of
+ * the master-device in  the `/dev' filesystem,  which usually  means
  * that the written filename is something like `/dev/ptyp0'.
  * NOTE: On KOS, this function is a system call, though in other
  *       operating system it is often implemented via `open(2)',

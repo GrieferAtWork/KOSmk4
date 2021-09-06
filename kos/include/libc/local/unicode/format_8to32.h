@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xafc9eb8e */
+/* HASH CRC-32:0x765e7318 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -22,26 +22,17 @@
 #define __local_format_8to32_defined 1
 #include <__crt.h>
 __NAMESPACE_LOCAL_BEGIN
-/* Dependency: unicode_c8toc32 from unicode */
 #ifndef __local___localdep_unicode_c8toc32_defined
 #define __local___localdep_unicode_c8toc32_defined 1
 #ifdef __CRT_HAVE_unicode_c8toc32
 __NAMESPACE_LOCAL_END
 #include <bits/crt/mbstate.h>
 __NAMESPACE_LOCAL_BEGIN
-/* >> unicode_c8toc32(3)
- * @return: *:          Success (*pc32 was filled; the return value is the number of bytes taken from `s')
- * @return: (size_t)-1: Unicode error (the given input string isn't a valid unicode sequence)
- * @return: (size_t)-2: Success, but no character was generated (s...+=n, together with `mbs' doesn't for a full character, but `mbs' was updated) */
 __CREDIRECT(__ATTR_NONNULL((1, 2, 4)),__SIZE_TYPE__,__NOTHROW_NCX,__localdep_unicode_c8toc32,(__CHAR32_TYPE__ *__restrict __pc32, char const *__restrict __s, __SIZE_TYPE__ __n, struct __mbstate *__restrict __mbs),unicode_c8toc32,(__pc32,__s,__n,__mbs))
 #else /* __CRT_HAVE_unicode_c8toc32 */
 __NAMESPACE_LOCAL_END
 #include <libc/local/unicode/unicode_c8toc32.h>
 __NAMESPACE_LOCAL_BEGIN
-/* >> unicode_c8toc32(3)
- * @return: *:          Success (*pc32 was filled; the return value is the number of bytes taken from `s')
- * @return: (size_t)-1: Unicode error (the given input string isn't a valid unicode sequence)
- * @return: (size_t)-2: Success, but no character was generated (s...+=n, together with `mbs' doesn't for a full character, but `mbs' was updated) */
 #define __localdep_unicode_c8toc32 __LIBC_LOCAL_NAME(unicode_c8toc32)
 #endif /* !__CRT_HAVE_unicode_c8toc32 */
 #endif /* !__local___localdep_unicode_c8toc32_defined */
@@ -50,9 +41,6 @@ __NAMESPACE_LOCAL_END
 #include <bits/crt/format-printer.h>
 #include <bits/crt/uformat-printer.h>
 __NAMESPACE_LOCAL_BEGIN
-/* >> format_8to32(3)
- * Format printer (compatible with `__pformatprinter') for
- * converting UTF-8 unicode input data into a UTF-32 output */
 __LOCAL_LIBC(format_8to32) __SSIZE_TYPE__
 __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(format_8to32))(void *__arg, char const *__data, __SIZE_TYPE__ __datalen) {
 	struct __local_format_8to32_data {

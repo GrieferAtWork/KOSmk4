@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x7397b7e */
+/* HASH CRC-32:0xdbe71108 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -34,17 +34,17 @@ __SYSDECL_BEGIN
 #ifdef __CRT_HAVE_realloc_in_place
 #include <hybrid/typecore.h>
 /* @EXCEPT: `realloc_in_place()' will return `NULL' if the reallocation isn't
- *           possible due to the requested memory above `MALLPTR' already being
+ *           possible due to the requested  memory above `MALLPTR' already  being
  *           in use. However, an `E_BADALLOC' exception is thrown if insufficient
- *           memory (for internal control structures) is available to complete
+ *           memory (for internal  control structures) is  available to  complete
  *           the operation */
 __CREDIRECT(__ATTR_MALL_DEFAULT_ALIGNED __ATTR_ALLOC_SIZE((2)),void *,__NOTHROW_NCX,__libc_core_realloc_in_place,(void *__restrict __mallptr, __SIZE_TYPE__ __n_bytes),realloc_in_place,(__mallptr,__n_bytes))
 #elif defined(__CRT_HAVE__expand)
 #include <hybrid/typecore.h>
 /* @EXCEPT: `realloc_in_place()' will return `NULL' if the reallocation isn't
- *           possible due to the requested memory above `MALLPTR' already being
+ *           possible due to the requested  memory above `MALLPTR' already  being
  *           in use. However, an `E_BADALLOC' exception is thrown if insufficient
- *           memory (for internal control structures) is available to complete
+ *           memory (for internal  control structures) is  available to  complete
  *           the operation */
 __CREDIRECT(__ATTR_MALL_DEFAULT_ALIGNED __ATTR_ALLOC_SIZE((2)),void *,__NOTHROW_NCX,__libc_core_realloc_in_place,(void *__restrict __mallptr, __SIZE_TYPE__ __n_bytes),_expand,(__mallptr,__n_bytes))
 #else /* ... */

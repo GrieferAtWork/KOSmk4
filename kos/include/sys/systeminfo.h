@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x1986cc7a */
+/* HASH CRC-32:0xa71369c1 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -53,7 +53,7 @@
 
 //???#ifndef HW_INVALID_HOSTID
 //???#define HW_INVALID_HOSTID 0xffffffff
-//???#endif /* !HW_INVALID_HOSTID */
+//???#endif   /*   !HW_INVALID_HOSTID  */
 //???#ifndef HW_HOSTID_LEN
 //???#define HW_HOSTID_LEN 11 /* == strlen(sprintf("%d", HW_INVALID_HOSTID)) + 1 */
 //???#endif /* !HW_HOSTID_LEN */

@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x2377a7fd */
+/* HASH CRC-32:0xaa65a51d */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -31,7 +31,6 @@ struct format_waprintf_data {
 };
 #endif /* !__format_waprintf_data_defined */
 __NAMESPACE_LOCAL_BEGIN
-/* Dependency: malloc from stdlib */
 #ifndef __local___localdep_malloc_defined
 #define __local___localdep_malloc_defined 1
 #if __has_builtin(__builtin_malloc) && defined(__LIBC_BIND_CRTBUILTINS) && defined(__CRT_HAVE_malloc)
@@ -51,7 +50,6 @@ __NAMESPACE_LOCAL_BEGIN
 #define __localdep_malloc __LIBC_LOCAL_NAME(malloc)
 #endif /* !... */
 #endif /* !__local___localdep_malloc_defined */
-/* Dependency: realloc from stdlib */
 #ifndef __local___localdep_realloc_defined
 #define __local___localdep_realloc_defined 1
 #if __has_builtin(__builtin_realloc) && defined(__LIBC_BIND_CRTBUILTINS)
@@ -69,27 +67,6 @@ __CREDIRECT(__ATTR_MALL_DEFAULT_ALIGNED __ATTR_WUNUSED __ATTR_ALLOC_SIZE((2)),vo
 __NAMESPACE_LOCAL_END
 #include <hybrid/__assert.h>
 __NAMESPACE_LOCAL_BEGIN
-/* Pack and finalize a given aprintf format printer
- * Together with `format_waprintf_printer()', the aprintf
- * format printer sub-system should be used as follows:
- * >> char *result;
- * >> ssize_t error;
- * >> struct format_waprintf_data p = FORMAT_WAPRINTF_DATA_INIT;
- * >> error = format_wprintf(&format_waprintf_printer, &p, L"%s %s", "Hello", "World");
- * >> if unlikely(error < 0) {
- * >>     format_waprintf_data_fini(&p);
- * >>     return NULL;
- * >> }
- * >> result = format_waprintf_pack(&p, NULL);
- * >> return result;
- * WARNING: Note that `format_waprintf_pack()' is able to return `NULL' as well,
- *          but will finalize the given aprintf printer an all cases.
- * NOTE:    The caller must destroy the returned string by passing it to `free()'
- * @param: pstrlen: When non-NULL, store the length of the constructed string here
- *                  Note that this is the actual length if the constructed string,
- *                  but may differ from `wcslen(return)' when NUL characters were
- *                  printed to the waprintf-printer at one point.
- *                  (e.g. `format_waprintf_printer(&my_printer, L"\0", 1)') */
 __LOCAL_LIBC(format_c32aprintf_pack) __ATTR_MALLOC __ATTR_MALL_DEFAULT_ALIGNED __ATTR_WUNUSED __ATTR_NONNULL((1)) __CHAR32_TYPE__ *
 __NOTHROW_NCX(__LIBKCALL __LIBC_LOCAL_NAME(format_c32aprintf_pack))(struct format_c32aprintf_data *__restrict __self, __SIZE_TYPE__ *__pstrlen) {
 	/* Free unused buffer memory. */

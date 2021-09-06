@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x6187f08 */
+/* HASH CRC-32:0x6ad9eea5 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -61,19 +61,19 @@ __NAMESPACE_LOCAL_USING_OR_IMPL(strlcat, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_L
 extern "C++" {
 /* >> strnstr(3)
  * Search for `needle...+=strlen(needle)' within `haystack...+=strnlen(haystack, haystack_maxlen)'
- * If found, return a pointer to its location within `str', else return `NULL'
+ * If   found,   return  a   pointer   to  its   location   within  `str',   else   return  `NULL'
  * This function originates from BSD, but is also provided as a KOS extension */
 __CREDIRECT(__ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1, 2)),char *,__NOTHROW_NCX,strnstr,(char *__haystack, char *__needle, __SIZE_TYPE__ __haystack_maxlen),strnstr,(__haystack,__needle,__haystack_maxlen))
 /* >> strnstr(3)
  * Search for `needle...+=strlen(needle)' within `haystack...+=strnlen(haystack, haystack_maxlen)'
- * If found, return a pointer to its location within `str', else return `NULL'
+ * If   found,   return  a   pointer   to  its   location   within  `str',   else   return  `NULL'
  * This function originates from BSD, but is also provided as a KOS extension */
 __CREDIRECT(__ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1, 2)),char const *,__NOTHROW_NCX,strnstr,(char const *__haystack, char const *__needle, __SIZE_TYPE__ __haystack_maxlen),strnstr,(__haystack,__needle,__haystack_maxlen))
 } /* extern "C++" */
 #else /* __cplusplus && __CORRECT_ISO_CPP_STRING_H_PROTO */
 /* >> strnstr(3)
  * Search for `needle...+=strlen(needle)' within `haystack...+=strnlen(haystack, haystack_maxlen)'
- * If found, return a pointer to its location within `str', else return `NULL'
+ * If   found,   return  a   pointer   to  its   location   within  `str',   else   return  `NULL'
  * This function originates from BSD, but is also provided as a KOS extension */
 __CDECLARE(__ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1, 2)),char *,__NOTHROW_NCX,strnstr,(char const *__haystack, char const *__needle, __SIZE_TYPE__ __haystack_maxlen),(__haystack,__needle,__haystack_maxlen))
 #endif /* !__cplusplus || !__CORRECT_ISO_CPP_STRING_H_PROTO */
@@ -83,19 +83,19 @@ __CDECLARE(__ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1, 2)),char *,__NOTHROW_NC
 extern "C++" {
 /* >> strnstr(3)
  * Search for `needle...+=strlen(needle)' within `haystack...+=strnlen(haystack, haystack_maxlen)'
- * If found, return a pointer to its location within `str', else return `NULL'
+ * If   found,   return  a   pointer   to  its   location   within  `str',   else   return  `NULL'
  * This function originates from BSD, but is also provided as a KOS extension */
 __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1, 2)) char *__NOTHROW_NCX(__LIBCCALL strnstr)(char *__haystack, char *__needle, __SIZE_TYPE__ __haystack_maxlen) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(strnstr))(__haystack, __needle, __haystack_maxlen); }
 /* >> strnstr(3)
  * Search for `needle...+=strlen(needle)' within `haystack...+=strnlen(haystack, haystack_maxlen)'
- * If found, return a pointer to its location within `str', else return `NULL'
+ * If   found,   return  a   pointer   to  its   location   within  `str',   else   return  `NULL'
  * This function originates from BSD, but is also provided as a KOS extension */
 __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1, 2)) char const *__NOTHROW_NCX(__LIBCCALL strnstr)(char const *__haystack, char const *__needle, __SIZE_TYPE__ __haystack_maxlen) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(strnstr))(__haystack, __needle, __haystack_maxlen); }
 } /* extern "C++" */
 #else /* __cplusplus && __CORRECT_ISO_CPP_STRING_H_PROTO */
 /* >> strnstr(3)
  * Search for `needle...+=strlen(needle)' within `haystack...+=strnlen(haystack, haystack_maxlen)'
- * If found, return a pointer to its location within `str', else return `NULL'
+ * If   found,   return  a   pointer   to  its   location   within  `str',   else   return  `NULL'
  * This function originates from BSD, but is also provided as a KOS extension */
 __NAMESPACE_LOCAL_USING_OR_IMPL(strnstr, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1, 2)) char *__NOTHROW_NCX(__LIBCCALL strnstr)(char const *__haystack, char const *__needle, __SIZE_TYPE__ __haystack_maxlen) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(strnstr))(__haystack, __needle, __haystack_maxlen); })
 #endif /* !__cplusplus || !__CORRECT_ISO_CPP_STRING_H_PROTO */
@@ -104,7 +104,7 @@ __NAMESPACE_LOCAL_USING_OR_IMPL(strnstr, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_P
 #ifndef __strmode_defined
 #define __strmode_defined 1
 #ifdef __CRT_HAVE_strmode
-/* Generate a file mode representation similar to what's printed by `ls -l'
+/* Generate  a file mode representation similar to what's printed by `ls -l'
  * The representation is written to `p', and `mode' is the value as returned
  * by `stat(2)' in `struct stat::st_mode'
  * The format written is:
@@ -115,12 +115,12 @@ __NAMESPACE_LOCAL_USING_OR_IMPL(strnstr, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_P
  *    p[2]  = mode & S_IWUSR ? 'w' : '-';
  *    p[3]  = <mode & S_IXUSR | S_ISUID>: { 0: '-', S_IXUSR: 'x', S_ISUID: 'S',
  *                                          S_IXUSR | S_ISUID: 's' };
- *    p[4]  = mode & S_IRGRP ? 'r' : '-';
- *    p[5]  = mode & S_IWGRP ? 'w' : '-';
+ *    p[4] = mode & S_IRGRP ? 'r' : '-';
+ *    p[5] = mode & S_IWGRP ? 'w' : '-';
  *    p[6]  = <mode & S_IXGRP | S_ISGID>: { 0: '-', S_IXGRP: 'x', S_ISGID: 'S',
  *                                          S_IXGRP | S_ISGID: 's' };
- *    p[7]  = mode & S_IROTH ? 'r' : '-';
- *    p[8]  = mode & S_IWOTH ? 'w' : '-';
+ *    p[7] = mode & S_IROTH ? 'r' : '-';
+ *    p[8] = mode & S_IWOTH ? 'w' : '-';
  *    p[9]  = <mode & S_IXOTH | S_ISVTX>: { 0: '-', S_IXOTH: 'x', S_ISVTX: 'T',
  *                                          S_IXOTH | S_ISVTX: 't' };
  *    p[10] = ' '; // '+', if "alternate or additional access control
@@ -129,7 +129,7 @@ __NAMESPACE_LOCAL_USING_OR_IMPL(strnstr, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_P
 __CDECLARE_VOID(__ATTR_NONNULL((2)),__NOTHROW_NCX,strmode,(__mode_t __mode, char __p[12]),(__mode,__p))
 #else /* __CRT_HAVE_strmode */
 #include <libc/local/string/strmode.h>
-/* Generate a file mode representation similar to what's printed by `ls -l'
+/* Generate  a file mode representation similar to what's printed by `ls -l'
  * The representation is written to `p', and `mode' is the value as returned
  * by `stat(2)' in `struct stat::st_mode'
  * The format written is:
@@ -140,12 +140,12 @@ __CDECLARE_VOID(__ATTR_NONNULL((2)),__NOTHROW_NCX,strmode,(__mode_t __mode, char
  *    p[2]  = mode & S_IWUSR ? 'w' : '-';
  *    p[3]  = <mode & S_IXUSR | S_ISUID>: { 0: '-', S_IXUSR: 'x', S_ISUID: 'S',
  *                                          S_IXUSR | S_ISUID: 's' };
- *    p[4]  = mode & S_IRGRP ? 'r' : '-';
- *    p[5]  = mode & S_IWGRP ? 'w' : '-';
+ *    p[4] = mode & S_IRGRP ? 'r' : '-';
+ *    p[5] = mode & S_IWGRP ? 'w' : '-';
  *    p[6]  = <mode & S_IXGRP | S_ISGID>: { 0: '-', S_IXGRP: 'x', S_ISGID: 'S',
  *                                          S_IXGRP | S_ISGID: 's' };
- *    p[7]  = mode & S_IROTH ? 'r' : '-';
- *    p[8]  = mode & S_IWOTH ? 'w' : '-';
+ *    p[7] = mode & S_IROTH ? 'r' : '-';
+ *    p[8] = mode & S_IWOTH ? 'w' : '-';
  *    p[9]  = <mode & S_IXOTH | S_ISVTX>: { 0: '-', S_IXOTH: 'x', S_ISVTX: 'T',
  *                                          S_IXOTH | S_ISVTX: 't' };
  *    p[10] = ' '; // '+', if "alternate or additional access control
@@ -158,31 +158,31 @@ __NAMESPACE_LOCAL_USING_OR_IMPL(strmode, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_N
 #define __explicit_bzero_defined 1
 #ifdef __CRT_HAVE_bzero
 /* >> explicit_bzero(3)
- * Same as `bzero(dst, n_bytes)', however compilers will not optimize
+ * Same as `bzero(dst, n_bytes)',  however compilers  will not  optimize
  * away uses of this function when they (think) that clearing the memory
- * wouldn't have any visible side-effects (though those side-effects
+ * wouldn't  have  any visible  side-effects (though  those side-effects
  * may be a security-concious application trying to wipe sensitive data) */
 __CREDIRECT_VOID(,__NOTHROW_NCX,explicit_bzero,(void *__dst, size_t __n_bytes),bzero,(__dst,__n_bytes))
 #elif defined(__CRT_HAVE_explicit_bzero)
 /* >> explicit_bzero(3)
- * Same as `bzero(dst, n_bytes)', however compilers will not optimize
+ * Same as `bzero(dst, n_bytes)',  however compilers  will not  optimize
  * away uses of this function when they (think) that clearing the memory
- * wouldn't have any visible side-effects (though those side-effects
+ * wouldn't  have  any visible  side-effects (though  those side-effects
  * may be a security-concious application trying to wipe sensitive data) */
 __CDECLARE_VOID(,__NOTHROW_NCX,explicit_bzero,(void *__dst, size_t __n_bytes),(__dst,__n_bytes))
 #elif defined(__CRT_HAVE___bzero)
 /* >> explicit_bzero(3)
- * Same as `bzero(dst, n_bytes)', however compilers will not optimize
+ * Same as `bzero(dst, n_bytes)',  however compilers  will not  optimize
  * away uses of this function when they (think) that clearing the memory
- * wouldn't have any visible side-effects (though those side-effects
+ * wouldn't  have  any visible  side-effects (though  those side-effects
  * may be a security-concious application trying to wipe sensitive data) */
 __CREDIRECT_VOID(,__NOTHROW_NCX,explicit_bzero,(void *__dst, size_t __n_bytes),__bzero,(__dst,__n_bytes))
 #else /* ... */
 #include <libc/local/strings/explicit_bzero.h>
 /* >> explicit_bzero(3)
- * Same as `bzero(dst, n_bytes)', however compilers will not optimize
+ * Same as `bzero(dst, n_bytes)',  however compilers  will not  optimize
  * away uses of this function when they (think) that clearing the memory
- * wouldn't have any visible side-effects (though those side-effects
+ * wouldn't  have  any visible  side-effects (though  those side-effects
  * may be a security-concious application trying to wipe sensitive data) */
 __NAMESPACE_LOCAL_USING_OR_IMPL(explicit_bzero, __FORCELOCAL __ATTR_ARTIFICIAL void __NOTHROW_NCX(__LIBCCALL explicit_bzero)(void *__dst, size_t __n_bytes) { (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(explicit_bzero))(__dst, __n_bytes); })
 #endif /* !... */

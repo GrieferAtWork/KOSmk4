@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xa6d36c04 */
+/* HASH CRC-32:0x51582b27 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -22,40 +22,17 @@
 #define __local_dirname_defined 1
 #include <__crt.h>
 __NAMESPACE_LOCAL_BEGIN
-/* Dependency: strend from string */
 #ifndef __local___localdep_strend_defined
 #define __local___localdep_strend_defined 1
 #ifdef __CRT_HAVE_strend
-/* Same as `str + strlen(str)' */
 __CREDIRECT(__ATTR_PURE __ATTR_RETNONNULL __ATTR_WUNUSED __ATTR_NONNULL((1)),char *,__NOTHROW_NCX,__localdep_strend,(char const *__restrict __str),strend,(__str))
 #else /* __CRT_HAVE_strend */
 __NAMESPACE_LOCAL_END
 #include <libc/local/string/strend.h>
 __NAMESPACE_LOCAL_BEGIN
-/* Same as `str + strlen(str)' */
 #define __localdep_strend __LIBC_LOCAL_NAME(strend)
 #endif /* !__CRT_HAVE_strend */
 #endif /* !__local___localdep_strend_defined */
-/* Return the directory, that is everything leading up to, but not
- * including the last slash of `path'. If no such path exists, "."
- * is returned instead. Trailing slashes are ignored
- * >> dirname("/usr/include///"); // Returns "/usr"
- * >> dirname("/usr/include/");   // Returns "/usr"
- * >> dirname("/usr/include");    // Returns "/usr"
- * >> dirname("/usr/");           // Returns "/"
- * >> dirname("/usr");            // Returns "/"
- * >> dirname("/");               // Returns "/"
- * >> dirname("///");             // Returns "/"
- * >> dirname("foo/bar/");        // Returns "foo"
- * >> dirname("foo/bar");         // Returns "foo"
- * >> dirname("foo/");            // Returns "."
- * >> dirname("foo");             // Returns "."
- * >> dirname(".");               // Returns "."
- * >> dirname("..");              // Returns "."
- * >> dirname("");                // Returns "."
- * >> dirname(NULL);              // Returns "."
- * Note that for this purpose, `path' may be modified in-place, meaning
- * that you should really always pass an strdup()'d, or writable string. */
 __LOCAL_LIBC(dirname) __ATTR_RETNONNULL char *
 __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(dirname))(char *__path) {
 	char *__iter;

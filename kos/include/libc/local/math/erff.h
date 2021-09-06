@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x835f6bcc */
+/* HASH CRC-32:0x8e3b7a79 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -23,7 +23,6 @@
 #include <__crt.h>
 #if defined(__CRT_HAVE_erf) || defined(__CRT_HAVE___erf)
 __NAMESPACE_LOCAL_BEGIN
-/* Dependency: erf from math */
 #ifndef __local___localdep_erf_defined
 #define __local___localdep_erf_defined 1
 #if __has_builtin(__builtin_erf) && defined(__LIBC_BIND_CRTBUILTINS) && defined(__CRT_HAVE_erf)

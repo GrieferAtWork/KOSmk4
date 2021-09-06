@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xebdbb506 */
+/* HASH CRC-32:0x1179bdcd */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -24,26 +24,18 @@
 #if defined(__CRT_HAVE_wtruncate) || ((defined(__CRT_HAVE_open64) || defined(__CRT_HAVE___open64) || defined(__CRT_HAVE_open) || defined(__CRT_HAVE__open) || defined(__CRT_HAVE___open)) && (defined(__CRT_HAVE_ftruncate64) || defined(__CRT_HAVE__chsize_s) || defined(__CRT_HAVE_ftruncate)))
 #include <bits/types.h>
 __NAMESPACE_LOCAL_BEGIN
-/* Dependency: close from unistd */
 #ifndef __local___localdep_close_defined
 #define __local___localdep_close_defined 1
 #ifdef __CRT_HAVE_close
-/* >> close(2)
- * Close a given file descriptor/handle `fd' */
 __CREDIRECT(,int,__NOTHROW_NCX,__localdep_close,(__fd_t __fd),close,(__fd))
 #elif defined(__CRT_HAVE__close)
-/* >> close(2)
- * Close a given file descriptor/handle `fd' */
 __CREDIRECT(,int,__NOTHROW_NCX,__localdep_close,(__fd_t __fd),_close,(__fd))
 #elif defined(__CRT_HAVE___close)
-/* >> close(2)
- * Close a given file descriptor/handle `fd' */
 __CREDIRECT(,int,__NOTHROW_NCX,__localdep_close,(__fd_t __fd),__close,(__fd))
 #else /* ... */
 #undef __local___localdep_close_defined
 #endif /* !... */
 #endif /* !__local___localdep_close_defined */
-/* Dependency: ftruncate64 from unistd */
 #ifndef __local___localdep_ftruncate64_defined
 #define __local___localdep_ftruncate64_defined 1
 #ifdef __CRT_HAVE_ftruncate64
@@ -59,8 +51,6 @@ __NAMESPACE_LOCAL_END
 #endif /* !__USE_KOS_ALTERATIONS */
 #endif /* !__PIO_OFFSET */
 __NAMESPACE_LOCAL_BEGIN
-/* >> ftruncate(2), ftruncate64(2)
- * Truncate the given file `fd' to a length of `length' */
 __CREDIRECT(,int,__NOTHROW_NCX,__localdep_ftruncate64,(__fd_t __fd, __PIO_OFFSET64 __length),ftruncate64,(__fd,__length))
 #elif defined(__CRT_HAVE_ftruncate) && __SIZEOF_OFF32_T__ == __SIZEOF_OFF64_T__
 __NAMESPACE_LOCAL_END
@@ -75,8 +65,6 @@ __NAMESPACE_LOCAL_END
 #endif /* !__USE_KOS_ALTERATIONS */
 #endif /* !__PIO_OFFSET */
 __NAMESPACE_LOCAL_BEGIN
-/* >> ftruncate(2), ftruncate64(2)
- * Truncate the given file `fd' to a length of `length' */
 __CREDIRECT(,int,__NOTHROW_NCX,__localdep_ftruncate64,(__fd_t __fd, __PIO_OFFSET64 __length),ftruncate,(__fd,__length))
 #elif defined(__CRT_HAVE__chsize_s)
 __NAMESPACE_LOCAL_END
@@ -91,115 +79,37 @@ __NAMESPACE_LOCAL_END
 #endif /* !__USE_KOS_ALTERATIONS */
 #endif /* !__PIO_OFFSET */
 __NAMESPACE_LOCAL_BEGIN
-/* >> ftruncate(2), ftruncate64(2)
- * Truncate the given file `fd' to a length of `length' */
 __CREDIRECT(,int,__NOTHROW_NCX,__localdep_ftruncate64,(__fd_t __fd, __PIO_OFFSET64 __length),_chsize_s,(__fd,__length))
 #elif defined(__CRT_HAVE_ftruncate)
 __NAMESPACE_LOCAL_END
 #include <libc/local/unistd/ftruncate64.h>
 __NAMESPACE_LOCAL_BEGIN
-/* >> ftruncate(2), ftruncate64(2)
- * Truncate the given file `fd' to a length of `length' */
 #define __localdep_ftruncate64 __LIBC_LOCAL_NAME(ftruncate64)
 #else /* ... */
 #undef __local___localdep_ftruncate64_defined
 #endif /* !... */
 #endif /* !__local___localdep_ftruncate64_defined */
-/* Dependency: open64 from fcntl */
 #ifndef __local___localdep_open64_defined
 #define __local___localdep_open64_defined 1
 #ifdef __CRT_HAVE_open64
-/* >> open(2), open64(2), openat(2), openat64(2)
- * Open a new file handle to the file specified by `filename'
- * When `oflags & O_CREAT', then `mode' specifies the initial
- * file access permissions with which the file should be opened.
- * On KOS, the returned handle can be anything, but is usually one of:
- *   - HANDLE_TYPE_PATH:                   When `O_PATH' was given
- *   - HANDLE_TYPE_BLOCKDEVICE:            For `S_IFBLK' files
- *   - HANDLE_TYPE_CHARACTERDEVICE:        For `S_IFCHR' files (in this case, `O_NOCTTY' gains meaning)
- *   - HANDLE_TYPE_FIFO_USER:              For `S_IFIFO' files
- *   - HANDLE_TYPE_MFILE:                  For `S_IFLNK' files (only when `O_SYMLINK' was given)
- *   - HANDLE_TYPE_ONESHOT_DIRECTORY_FILE: For `S_IFDIR' files from special one-shot directories
- *   - HANDLE_TYPE_FILE:                   For `S_IFREG' and `S_IFDIR' (~normal~) files
- *   - *:                                  Certain filesystem names can literally return anything, such
- *                                         as `/proc/self/fd/1234', which is more like `dup(1234)' */
 __CVREDIRECT(__ATTR_WUNUSED __ATTR_NONNULL((1)),__fd_t,__NOTHROW_RPC,__localdep_open64,(char const *__filename, __oflag_t __oflags),open64,(__filename,__oflags),__oflags,1,(__mode_t))
 #elif defined(__CRT_HAVE___open64)
-/* >> open(2), open64(2), openat(2), openat64(2)
- * Open a new file handle to the file specified by `filename'
- * When `oflags & O_CREAT', then `mode' specifies the initial
- * file access permissions with which the file should be opened.
- * On KOS, the returned handle can be anything, but is usually one of:
- *   - HANDLE_TYPE_PATH:                   When `O_PATH' was given
- *   - HANDLE_TYPE_BLOCKDEVICE:            For `S_IFBLK' files
- *   - HANDLE_TYPE_CHARACTERDEVICE:        For `S_IFCHR' files (in this case, `O_NOCTTY' gains meaning)
- *   - HANDLE_TYPE_FIFO_USER:              For `S_IFIFO' files
- *   - HANDLE_TYPE_MFILE:                  For `S_IFLNK' files (only when `O_SYMLINK' was given)
- *   - HANDLE_TYPE_ONESHOT_DIRECTORY_FILE: For `S_IFDIR' files from special one-shot directories
- *   - HANDLE_TYPE_FILE:                   For `S_IFREG' and `S_IFDIR' (~normal~) files
- *   - *:                                  Certain filesystem names can literally return anything, such
- *                                         as `/proc/self/fd/1234', which is more like `dup(1234)' */
 __CVREDIRECT(__ATTR_WUNUSED __ATTR_NONNULL((1)),__fd_t,__NOTHROW_RPC,__localdep_open64,(char const *__filename, __oflag_t __oflags),__open64,(__filename,__oflags),__oflags,1,(__mode_t))
 #elif defined(__CRT_HAVE_open) && (!defined(__O_LARGEFILE) || !__O_LARGEFILE)
-/* >> open(2), open64(2), openat(2), openat64(2)
- * Open a new file handle to the file specified by `filename'
- * When `oflags & O_CREAT', then `mode' specifies the initial
- * file access permissions with which the file should be opened.
- * On KOS, the returned handle can be anything, but is usually one of:
- *   - HANDLE_TYPE_PATH:                   When `O_PATH' was given
- *   - HANDLE_TYPE_BLOCKDEVICE:            For `S_IFBLK' files
- *   - HANDLE_TYPE_CHARACTERDEVICE:        For `S_IFCHR' files (in this case, `O_NOCTTY' gains meaning)
- *   - HANDLE_TYPE_FIFO_USER:              For `S_IFIFO' files
- *   - HANDLE_TYPE_MFILE:                  For `S_IFLNK' files (only when `O_SYMLINK' was given)
- *   - HANDLE_TYPE_ONESHOT_DIRECTORY_FILE: For `S_IFDIR' files from special one-shot directories
- *   - HANDLE_TYPE_FILE:                   For `S_IFREG' and `S_IFDIR' (~normal~) files
- *   - *:                                  Certain filesystem names can literally return anything, such
- *                                         as `/proc/self/fd/1234', which is more like `dup(1234)' */
 __CVREDIRECT(__ATTR_WUNUSED __ATTR_NONNULL((1)),__fd_t,__NOTHROW_RPC,__localdep_open64,(char const *__filename, __oflag_t __oflags),open,(__filename,__oflags),__oflags,1,(__mode_t))
 #elif defined(__CRT_HAVE__open) && (!defined(__O_LARGEFILE) || !__O_LARGEFILE)
-/* >> open(2), open64(2), openat(2), openat64(2)
- * Open a new file handle to the file specified by `filename'
- * When `oflags & O_CREAT', then `mode' specifies the initial
- * file access permissions with which the file should be opened.
- * On KOS, the returned handle can be anything, but is usually one of:
- *   - HANDLE_TYPE_PATH:                   When `O_PATH' was given
- *   - HANDLE_TYPE_BLOCKDEVICE:            For `S_IFBLK' files
- *   - HANDLE_TYPE_CHARACTERDEVICE:        For `S_IFCHR' files (in this case, `O_NOCTTY' gains meaning)
- *   - HANDLE_TYPE_FIFO_USER:              For `S_IFIFO' files
- *   - HANDLE_TYPE_MFILE:                  For `S_IFLNK' files (only when `O_SYMLINK' was given)
- *   - HANDLE_TYPE_ONESHOT_DIRECTORY_FILE: For `S_IFDIR' files from special one-shot directories
- *   - HANDLE_TYPE_FILE:                   For `S_IFREG' and `S_IFDIR' (~normal~) files
- *   - *:                                  Certain filesystem names can literally return anything, such
- *                                         as `/proc/self/fd/1234', which is more like `dup(1234)' */
 __CVREDIRECT(__ATTR_WUNUSED __ATTR_NONNULL((1)),__fd_t,__NOTHROW_RPC,__localdep_open64,(char const *__filename, __oflag_t __oflags),_open,(__filename,__oflags),__oflags,1,(__mode_t))
 #elif defined(__CRT_HAVE_open) || defined(__CRT_HAVE__open) || defined(__CRT_HAVE___open)
 __NAMESPACE_LOCAL_END
 #include <libc/local/fcntl/open64.h>
 __NAMESPACE_LOCAL_BEGIN
-/* >> open(2), open64(2), openat(2), openat64(2)
- * Open a new file handle to the file specified by `filename'
- * When `oflags & O_CREAT', then `mode' specifies the initial
- * file access permissions with which the file should be opened.
- * On KOS, the returned handle can be anything, but is usually one of:
- *   - HANDLE_TYPE_PATH:                   When `O_PATH' was given
- *   - HANDLE_TYPE_BLOCKDEVICE:            For `S_IFBLK' files
- *   - HANDLE_TYPE_CHARACTERDEVICE:        For `S_IFCHR' files (in this case, `O_NOCTTY' gains meaning)
- *   - HANDLE_TYPE_FIFO_USER:              For `S_IFIFO' files
- *   - HANDLE_TYPE_MFILE:                  For `S_IFLNK' files (only when `O_SYMLINK' was given)
- *   - HANDLE_TYPE_ONESHOT_DIRECTORY_FILE: For `S_IFDIR' files from special one-shot directories
- *   - HANDLE_TYPE_FILE:                   For `S_IFREG' and `S_IFDIR' (~normal~) files
- *   - *:                                  Certain filesystem names can literally return anything, such
- *                                         as `/proc/self/fd/1234', which is more like `dup(1234)' */
 #define __localdep_open64 __LIBC_LOCAL_NAME(open64)
 #else /* ... */
 #undef __local___localdep_open64_defined
 #endif /* !... */
 #endif /* !__local___localdep_open64_defined */
-/* Dependency: wtruncate32 from parts.wchar.unistd */
 #if !defined(__local___localdep_wtruncate32_defined) && defined(__CRT_HAVE_wtruncate)
 #define __local___localdep_wtruncate32_defined 1
-/* >> truncate(2)
- * Truncate the given file `file' to a length of `length' */
 __CREDIRECT(__ATTR_NONNULL((1)),int,__NOTHROW_NCX,__localdep_wtruncate32,(__WCHAR_TYPE__ const *__file, __pos32_t __length),wtruncate,(__file,__length))
 #endif /* !__local___localdep_wtruncate32_defined && __CRT_HAVE_wtruncate */
 __NAMESPACE_LOCAL_END
@@ -214,8 +124,6 @@ __NAMESPACE_LOCAL_END
 #endif /* !__USE_KOS_ALTERATIONS */
 #endif /* !__PIO_OFFSET */
 __NAMESPACE_LOCAL_BEGIN
-/* >> truncate64(2)
- * Truncate the given file `file' to a length of `length' */
 __LOCAL_LIBC(wtruncate64) __ATTR_NONNULL((1)) int
 __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(wtruncate64))(__WCHAR_TYPE__ const *__file, __PIO_OFFSET64 __length) {
 #ifdef __CRT_HAVE_wtruncate

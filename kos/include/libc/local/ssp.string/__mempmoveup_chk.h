@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xf95727f7 */
+/* HASH CRC-32:0xaa8ff006 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -23,20 +23,16 @@
 #include <__crt.h>
 #include <hybrid/typecore.h>
 __NAMESPACE_LOCAL_BEGIN
-/* Dependency: mempmoveup from string */
 #ifndef __local___localdep_mempmoveup_defined
 #define __local___localdep_mempmoveup_defined 1
 #ifdef __CRT_HAVE_mempmoveup
-/* Same as `memmoveup', but return `dst + n_bytes', rather than `dst' (assumes that `dst >= src || !n_bytes') */
 __CREDIRECT(__ATTR_LEAF __ATTR_RETNONNULL __ATTR_NONNULL((1, 2)),void *,__NOTHROW_NCX,__localdep_mempmoveup,(void *__dst, void const *__src, __SIZE_TYPE__ __n_bytes),mempmoveup,(__dst,__src,__n_bytes))
 #elif defined(__CRT_HAVE_mempmove)
-/* Same as `memmoveup', but return `dst + n_bytes', rather than `dst' (assumes that `dst >= src || !n_bytes') */
 __CREDIRECT(__ATTR_LEAF __ATTR_RETNONNULL __ATTR_NONNULL((1, 2)),void *,__NOTHROW_NCX,__localdep_mempmoveup,(void *__dst, void const *__src, __SIZE_TYPE__ __n_bytes),mempmove,(__dst,__src,__n_bytes))
 #else /* ... */
 __NAMESPACE_LOCAL_END
 #include <libc/local/string/mempmoveup.h>
 __NAMESPACE_LOCAL_BEGIN
-/* Same as `memmoveup', but return `dst + n_bytes', rather than `dst' (assumes that `dst >= src || !n_bytes') */
 #define __localdep_mempmoveup __LIBC_LOCAL_NAME(mempmoveup)
 #endif /* !... */
 #endif /* !__local___localdep_mempmoveup_defined */

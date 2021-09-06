@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x7cd2a335 */
+/* HASH CRC-32:0x98c22d75 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -32,7 +32,6 @@ typedef struct _stringlist {
 } StringList;
 #endif /* !___stringlist_defined */
 __NAMESPACE_LOCAL_BEGIN
-/* Dependency: free from stdlib */
 #ifndef __local___localdep_free_defined
 #define __local___localdep_free_defined 1
 #if __has_builtin(__builtin_free) && defined(__LIBC_BIND_CRTBUILTINS) && defined(__CRT_HAVE_free)
@@ -45,7 +44,6 @@ __CREDIRECT_VOID(,__NOTHROW_NCX,__localdep_free,(void *__mallptr),cfree,(__mallp
 #undef __local___localdep_free_defined
 #endif /* !... */
 #endif /* !__local___localdep_free_defined */
-/* Dependency: malloc from stdlib */
 #ifndef __local___localdep_malloc_defined
 #define __local___localdep_malloc_defined 1
 #if __has_builtin(__builtin_malloc) && defined(__LIBC_BIND_CRTBUILTINS) && defined(__CRT_HAVE_malloc)
@@ -61,8 +59,6 @@ __NAMESPACE_LOCAL_BEGIN
 #undef __local___localdep_malloc_defined
 #endif /* !... */
 #endif /* !__local___localdep_malloc_defined */
-/* >> sl_init(3)
- * Allocates and returns a new StringList object. Upon error, `NULL' is returned */
 __LOCAL_LIBC(sl_init) __ATTR_WUNUSED struct _stringlist *
 __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(sl_init))(void) {
 	struct _stringlist *__result;

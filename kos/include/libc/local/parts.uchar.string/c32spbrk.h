@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x814675b8 */
+/* HASH CRC-32:0x39df57a7 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -23,9 +23,6 @@
 #include <__crt.h>
 #include <hybrid/typecore.h>
 __NAMESPACE_LOCAL_BEGIN
-/* >> strpbrk(3)
- * Return a pointer to the first character from `haystack' with `strchr(*return, accept) != NULL'
- * If no such character exists, return `NULL' instead. */
 __LOCAL_LIBC(c32spbrk) __ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1, 2)) __CHAR32_TYPE__ *
 __NOTHROW_NCX(__LIBKCALL __LIBC_LOCAL_NAME(c32spbrk))(__CHAR32_TYPE__ const *__haystack, __CHAR32_TYPE__ const *__accept) {
 	__CHAR32_TYPE__ __haych, __ch;

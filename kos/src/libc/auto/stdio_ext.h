@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x8146ea8d */
+/* HASH CRC-32:0xa2a2cfa */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -32,14 +32,14 @@ DECL_BEGIN
 #if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
 /* >> __fbufsize(3)
  * Return the size of the buffer of `stream' in
- * bytes currently in use by the given stream */
+ * bytes  currently in use  by the given stream */
 INTDEF ATTR_PURE WUNUSED NONNULL((1)) size_t NOTHROW_NCX(LIBDCALL libd___fbufsize)(FILE *stream);
 /* >> __freading(3)
- * Return non-zero value when `stream' is opened readonly,
+ * Return  non-zero value when  `stream' is opened readonly,
  * or if the last operation on `stream' was a read operation */
 INTDEF ATTR_PURE WUNUSED NONNULL((1)) int NOTHROW_NCX(LIBDCALL libd___freading)(FILE *stream);
 /* >> __fwriting(3)
- * Return non-zero value when `stream' is opened write-only or
+ * Return non-zero value when  `stream' is opened write-only  or
  * append-only, or if the last operation on `stream' was a write
  * operation */
 INTDEF ATTR_PURE WUNUSED NONNULL((1)) int NOTHROW_NCX(LIBDCALL libd___fwriting)(FILE *stream);

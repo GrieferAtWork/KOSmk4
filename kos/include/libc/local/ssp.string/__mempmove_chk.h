@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x8367a0a6 */
+/* HASH CRC-32:0x8c7e542b */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -23,17 +23,14 @@
 #include <__crt.h>
 #include <hybrid/typecore.h>
 __NAMESPACE_LOCAL_BEGIN
-/* Dependency: mempmove from string */
 #ifndef __local___localdep_mempmove_defined
 #define __local___localdep_mempmove_defined 1
 #ifdef __CRT_HAVE_mempmove
-/* Same as `memmove', but return `dst + n_bytes', rather than `dst' */
 __CREDIRECT(__ATTR_LEAF __ATTR_RETNONNULL __ATTR_NONNULL((1, 2)),void *,__NOTHROW_NCX,__localdep_mempmove,(void *__dst, void const *__src, __SIZE_TYPE__ __n_bytes),mempmove,(__dst,__src,__n_bytes))
 #else /* __CRT_HAVE_mempmove */
 __NAMESPACE_LOCAL_END
 #include <libc/local/string/mempmove.h>
 __NAMESPACE_LOCAL_BEGIN
-/* Same as `memmove', but return `dst + n_bytes', rather than `dst' */
 #define __localdep_mempmove __LIBC_LOCAL_NAME(mempmove)
 #endif /* !__CRT_HAVE_mempmove */
 #endif /* !__local___localdep_mempmove_defined */

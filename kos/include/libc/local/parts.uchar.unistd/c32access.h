@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x15dc35c2 */
+/* HASH CRC-32:0x438e9d8c */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -25,26 +25,16 @@
 #if defined(__AT_FDCWD) && ((defined(__CRT_HAVE_wfaccessat) && __SIZEOF_WCHAR_T__ == 4 && defined(__LIBCCALL_IS_LIBKCALL)) || defined(__CRT_HAVE_KOS$wfaccessat))
 #include <features.h>
 __NAMESPACE_LOCAL_BEGIN
-/* Dependency: c32faccessat from parts.uchar.unistd */
 #ifndef __local___localdep_c32faccessat_defined
 #define __local___localdep_c32faccessat_defined 1
 #if defined(__CRT_HAVE_wfaccessat) && __SIZEOF_WCHAR_T__ == 4 && defined(__LIBCCALL_IS_LIBKCALL)
-/* >> faccessat(2)
- * @param: type: Set of `X_OK | W_OK | R_OK'
- * Test for access to the specified file `dfd:file', testing for `type' */
 __CREDIRECT(__ATTR_NONNULL((2)),int,__NOTHROW_RPC,__localdep_c32faccessat,(__fd_t __dfd, __CHAR32_TYPE__ const *__file, __STDC_INT_AS_UINT_T __type, __atflag_t __flags),wfaccessat,(__dfd,__file,__type,__flags))
 #elif defined(__CRT_HAVE_KOS$wfaccessat)
-/* >> faccessat(2)
- * @param: type: Set of `X_OK | W_OK | R_OK'
- * Test for access to the specified file `dfd:file', testing for `type' */
 __CREDIRECT_KOS(__ATTR_NONNULL((2)),int,__NOTHROW_RPC,__localdep_c32faccessat,(__fd_t __dfd, __CHAR32_TYPE__ const *__file, __STDC_INT_AS_UINT_T __type, __atflag_t __flags),wfaccessat,(__dfd,__file,__type,__flags))
 #else /* ... */
 #undef __local___localdep_c32faccessat_defined
 #endif /* !... */
 #endif /* !__local___localdep_c32faccessat_defined */
-/* >> access(2)
- * @param: type: Set of `X_OK | W_OK | R_OK'
- * Test for access to the specified file `file', testing for `type' */
 __LOCAL_LIBC(c32access) __ATTR_WUNUSED __ATTR_NONNULL((1)) int
 __NOTHROW_RPC(__LIBKCALL __LIBC_LOCAL_NAME(c32access))(__CHAR32_TYPE__ const *__file, __STDC_INT_AS_UINT_T __type) {
 	return __localdep_c32faccessat(__AT_FDCWD, __file, __type, 0);

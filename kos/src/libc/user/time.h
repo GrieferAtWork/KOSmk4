@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xc68a95ca */
+/* HASH CRC-32:0xed79aaa */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -32,7 +32,7 @@ DECL_BEGIN
 
 #ifndef __KERNEL__
 /* >> clock(3)
- * Time used by the program so far (user time + system time)
+ * Time used by the program so  far (user time + system  time)
  * The `result / CLOCKS_PER_SECOND' is program time in seconds */
 INTDEF WUNUSED clock_t NOTHROW_NCX(LIBCCALL libc_clock)(void);
 /* >> time(2), time64(2)
@@ -43,7 +43,7 @@ INTDEF time_t NOTHROW_NCX(LIBCCALL libc_time)(time_t *timer);
 INTDEF time64_t NOTHROW_NCX(LIBCCALL libc_time64)(time64_t *timer);
 /* >> tzset(3)
  * Set time conversion information from the `$TZ' environment variable.
- * If `$TZ' is not defined, a locale-dependent default is used */
+ * If  `$TZ'  is  not  defined,  a  locale-dependent  default  is  used */
 INTDEF void NOTHROW_NCX(LIBCCALL libc_tzset)(void);
 /* >> stime(3), stime64(3)
  * Set the system time to `*when'. This call is restricted to the superuser */

@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x8814389d */
+/* HASH CRC-32:0x13718574 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -23,29 +23,16 @@
 #include <__crt.h>
 #include <hybrid/typecore.h>
 __NAMESPACE_LOCAL_BEGIN
-/* Dependency: strcpy from string */
 #ifndef __local___localdep_strcpy_defined
 #define __local___localdep_strcpy_defined 1
 #if __has_builtin(__builtin_strcpy) && defined(__LIBC_BIND_CRTBUILTINS) && defined(__CRT_HAVE_strcpy)
-/* >> strcpy(3)
- * Copy a NUL-terminated string `str' to `dst', and re-return `dst'.
- * The exact # of characters copied is `strlen(src) + 1' (+1 because
- * the trailing NUL-character is also copied) */
 __CEIREDIRECT(__ATTR_LEAF __ATTR_RETNONNULL __ATTR_NONNULL((1, 2)),char *,__NOTHROW_NCX,__localdep_strcpy,(char *__restrict __dst, char const *__restrict __src),strcpy,{ return __builtin_strcpy(__dst, __src); })
 #elif defined(__CRT_HAVE_strcpy)
-/* >> strcpy(3)
- * Copy a NUL-terminated string `str' to `dst', and re-return `dst'.
- * The exact # of characters copied is `strlen(src) + 1' (+1 because
- * the trailing NUL-character is also copied) */
 __CREDIRECT(__ATTR_LEAF __ATTR_RETNONNULL __ATTR_NONNULL((1, 2)),char *,__NOTHROW_NCX,__localdep_strcpy,(char *__restrict __dst, char const *__restrict __src),strcpy,(__dst,__src))
 #else /* ... */
 __NAMESPACE_LOCAL_END
 #include <libc/local/string/strcpy.h>
 __NAMESPACE_LOCAL_BEGIN
-/* >> strcpy(3)
- * Copy a NUL-terminated string `str' to `dst', and re-return `dst'.
- * The exact # of characters copied is `strlen(src) + 1' (+1 because
- * the trailing NUL-character is also copied) */
 #define __localdep_strcpy __LIBC_LOCAL_NAME(strcpy)
 #endif /* !... */
 #endif /* !__local___localdep_strcpy_defined */

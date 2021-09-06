@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xfeae3411 */
+/* HASH CRC-32:0xa059eab3 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -25,46 +25,36 @@
 #include <features.h>
 #if defined(__CRT_HAVE_errx) || defined(__CRT_HAVE_verrx) || ((defined(__CRT_HAVE_vwarnx) || (!defined(__NO_STDSTREAMS) && defined(__LOCAL_program_invocation_short_name) && (defined(__CRT_HAVE_fputc) || defined(__CRT_HAVE_putc) || defined(__CRT_HAVE__IO_putc) || defined(__CRT_HAVE_fputc_unlocked) || defined(__CRT_HAVE_putc_unlocked) || (defined(__CRT_DOS) && defined(__CRT_HAVE__flsbuf)) || defined(__CRT_HAVE_fwrite) || defined(__CRT_HAVE__IO_fwrite) || defined(__CRT_HAVE_fwrite_s) || defined(__CRT_HAVE_fwrite_unlocked) || defined(__CRT_HAVE__fwrite_nolock)))) && (defined(__CRT_HAVE_exit) || defined(__CRT_HAVE_quick_exit) || defined(__CRT_HAVE__exit) || defined(__CRT_HAVE__Exit)))
 __NAMESPACE_LOCAL_BEGIN
-/* Dependency: errx from err */
 #ifndef __local___localdep_errx_defined
 #define __local___localdep_errx_defined 1
 #ifdef __CRT_HAVE_errx
 __NAMESPACE_LOCAL_END
 #include <kos/anno.h>
 __NAMESPACE_LOCAL_BEGIN
-/* Same as `warnx()', but follow up by calling `exit(status)' */
 __LIBC __ATTR_NORETURN __ATTR_LIBC_PRINTF(2, 3) void (__VLIBCCALL __localdep_errx)(int __status, char const *__format, ...) __THROWS(...) __CASMNAME("errx");
 #elif defined(__CRT_HAVE_verrx) || ((defined(__CRT_HAVE_vwarnx) || (!defined(__NO_STDSTREAMS) && defined(__LOCAL_program_invocation_short_name) && (defined(__CRT_HAVE_fputc) || defined(__CRT_HAVE_putc) || defined(__CRT_HAVE__IO_putc) || defined(__CRT_HAVE_fputc_unlocked) || defined(__CRT_HAVE_putc_unlocked) || (defined(__CRT_DOS) && defined(__CRT_HAVE__flsbuf)) || defined(__CRT_HAVE_fwrite) || defined(__CRT_HAVE__IO_fwrite) || defined(__CRT_HAVE_fwrite_s) || defined(__CRT_HAVE_fwrite_unlocked) || defined(__CRT_HAVE__fwrite_nolock)))) && (defined(__CRT_HAVE_exit) || defined(__CRT_HAVE_quick_exit) || defined(__CRT_HAVE__exit) || defined(__CRT_HAVE__Exit)))
 __NAMESPACE_LOCAL_END
 #include <libc/local/err/errx.h>
 __NAMESPACE_LOCAL_BEGIN
-/* Same as `warnx()', but follow up by calling `exit(status)' */
 #define __localdep_errx __LIBC_LOCAL_NAME(errx)
 #else /* ... */
 #undef __local___localdep_errx_defined
 #endif /* !... */
 #endif /* !__local___localdep_errx_defined */
-/* Dependency: strsuftollx from stdlib */
 #ifndef __local___localdep_strsuftollx_defined
 #define __local___localdep_strsuftollx_defined 1
 #ifdef __CRT_HAVE_strsuftollx
-/* >> strsuftollx(3) */
 __CREDIRECT(__ATTR_WUNUSED __ATTR_NONNULL((1, 2)),__LONGLONG,__NOTHROW_NCX,__localdep_strsuftollx,(char const *__desc, char const *__val, __LONGLONG __lo, __LONGLONG __hi, char *__errbuf, __SIZE_TYPE__ __errbuflen),strsuftollx,(__desc,__val,__lo,__hi,__errbuf,__errbuflen))
 #else /* __CRT_HAVE_strsuftollx */
 __NAMESPACE_LOCAL_END
 #include <libc/local/stdlib/strsuftollx.h>
 __NAMESPACE_LOCAL_BEGIN
-/* >> strsuftollx(3) */
 #define __localdep_strsuftollx __LIBC_LOCAL_NAME(strsuftollx)
 #endif /* !__CRT_HAVE_strsuftollx */
 #endif /* !__local___localdep_strsuftollx_defined */
 __NAMESPACE_LOCAL_END
 #include <asm/os/stdlib.h>
 __NAMESPACE_LOCAL_BEGIN
-/* >> strsuftoll(3)
- * Same as `strsuftollx(3)', but if an error happens, make
- * use of `errx(3)' to terminate the program, rather than
- * return to the caller. */
 __LOCAL_LIBC(strsuftoll) __ATTR_WUNUSED __ATTR_NONNULL((1, 2)) __LONGLONG
 __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(strsuftoll))(char const *__desc, char const *__val, __LONGLONG __lo, __LONGLONG __hi) {
 	__LONGLONG __result;

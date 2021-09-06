@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x3c260e27 */
+/* HASH CRC-32:0x6a739217 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -33,16 +33,13 @@ typedef __FS_TYPE(off) (__LIBKCALL *__funopen_seekfn_t)(void *__cookie, __FS_TYP
 typedef int (__LIBKCALL *__funopen_closefn_t)(void *__cookie);
 #endif /* !____funopen_types_defined */
 __NAMESPACE_LOCAL_BEGIN
-/* Dependency: crt_fopencookie from stdio */
 #if !defined(__local___localdep_crt_fopencookie_defined) && defined(__CRT_HAVE_fopencookie)
 #define __local___localdep_crt_fopencookie_defined 1
 __NAMESPACE_LOCAL_END
 #include <libio.h>
 __NAMESPACE_LOCAL_BEGIN
-/* >> fopencookie(3) */
 __CREDIRECT(__ATTR_WUNUSED __ATTR_NONNULL((2)),__FILE *,__NOTHROW_NCX,__localdep_crt_fopencookie,(void *__restrict __magic_cookie, char const *__restrict __modes, _IO_cookie_io_functions_t __io_funcs),fopencookie,(__magic_cookie,__modes,__io_funcs))
 #endif /* !__local___localdep_crt_fopencookie_defined && __CRT_HAVE_fopencookie */
-/* Dependency: free from stdlib */
 #ifndef __local___localdep_free_defined
 #define __local___localdep_free_defined 1
 #if __has_builtin(__builtin_free) && defined(__LIBC_BIND_CRTBUILTINS) && defined(__CRT_HAVE_free)
@@ -55,7 +52,6 @@ __CREDIRECT_VOID(,__NOTHROW_NCX,__localdep_free,(void *__mallptr),cfree,(__mallp
 #undef __local___localdep_free_defined
 #endif /* !... */
 #endif /* !__local___localdep_free_defined */
-/* Dependency: funopen2 from stdio */
 #ifndef __local___localdep_funopen2_defined
 #define __local___localdep_funopen2_defined 1
 #if defined(__CRT_HAVE_funopen2) && __FS_SIZEOF(OFF) == __SIZEOF_OFF32_T__
@@ -69,7 +65,6 @@ typedef int (__LIBKCALL *__funopen2_flushfn_t)(void *__cookie);
 typedef int (__LIBKCALL *__funopen2_closefn_t)(void *__cookie);
 #endif /* !____funopen2_types_defined */
 __NAMESPACE_LOCAL_BEGIN
-/* >> funopen2(3), funopen2_64(3) */
 __CREDIRECT(__ATTR_WUNUSED,__FILE *,__NOTHROW_NCX,__localdep_funopen2,(void const *__cookie, __funopen2_readfn_t __readfn, __funopen2_writefn_t __writefn, __funopen2_seekfn_t __seekfn, __funopen2_flushfn_t __flushfn, __funopen2_closefn_t __closefn),funopen2,(__cookie,__readfn,__writefn,__seekfn,__flushfn,__closefn))
 #elif defined(__CRT_HAVE_funopen2_64) && __FS_SIZEOF(OFF) == __SIZEOF_OFF64_T__
 __NAMESPACE_LOCAL_END
@@ -82,19 +77,16 @@ typedef int (__LIBKCALL *__funopen2_flushfn_t)(void *__cookie);
 typedef int (__LIBKCALL *__funopen2_closefn_t)(void *__cookie);
 #endif /* !____funopen2_types_defined */
 __NAMESPACE_LOCAL_BEGIN
-/* >> funopen2(3), funopen2_64(3) */
 __CREDIRECT(__ATTR_WUNUSED,__FILE *,__NOTHROW_NCX,__localdep_funopen2,(void const *__cookie, __funopen2_readfn_t __readfn, __funopen2_writefn_t __writefn, __funopen2_seekfn_t __seekfn, __funopen2_flushfn_t __flushfn, __funopen2_closefn_t __closefn),funopen2_64,(__cookie,__readfn,__writefn,__seekfn,__flushfn,__closefn))
 #elif (defined(__CRT_HAVE_malloc) || defined(__CRT_HAVE_calloc) || defined(__CRT_HAVE_realloc) || defined(__CRT_HAVE_memalign) || defined(__CRT_HAVE_aligned_alloc) || defined(__CRT_HAVE_posix_memalign)) && ((defined(__CRT_HAVE_funopen2) && __SIZEOF_OFF64_T__ == __SIZEOF_OFF32_T__) || defined(__CRT_HAVE_funopen2_64) || defined(__CRT_HAVE_funopen2))
 __NAMESPACE_LOCAL_END
 #include <libc/local/stdio/funopen2.h>
 __NAMESPACE_LOCAL_BEGIN
-/* >> funopen2(3), funopen2_64(3) */
 #define __localdep_funopen2 __LIBC_LOCAL_NAME(funopen2)
 #else /* ... */
 #undef __local___localdep_funopen2_defined
 #endif /* !... */
 #endif /* !__local___localdep_funopen2_defined */
-/* Dependency: funopen64 from stdio */
 #ifndef __local___localdep_funopen64_defined
 #define __local___localdep_funopen64_defined 1
 #if defined(__CRT_HAVE_funopen) && __SIZEOF_OFF64_T__ == __SIZEOF_OFF32_T__
@@ -104,7 +96,6 @@ __NAMESPACE_LOCAL_END
 typedef __off64_t (__LIBKCALL *__funopen64_seekfn_t)(void *__cookie, __off64_t __off, int __whence);
 #endif /* !____funopen64_types_defined */
 __NAMESPACE_LOCAL_BEGIN
-/* >> funopen(3), funopen64(3) */
 __CREDIRECT(__ATTR_WUNUSED,__FILE *,__NOTHROW_NCX,__localdep_funopen64,(void const *__cookie, __funopen_readfn_t __readfn, __funopen_writefn_t __writefn, __funopen64_seekfn_t __seekfn, __funopen_closefn_t __closefn),funopen,(__cookie,__readfn,__writefn,__seekfn,__closefn))
 #elif defined(__CRT_HAVE_funopen64)
 __NAMESPACE_LOCAL_END
@@ -113,19 +104,16 @@ __NAMESPACE_LOCAL_END
 typedef __off64_t (__LIBKCALL *__funopen64_seekfn_t)(void *__cookie, __off64_t __off, int __whence);
 #endif /* !____funopen64_types_defined */
 __NAMESPACE_LOCAL_BEGIN
-/* >> funopen(3), funopen64(3) */
 __CREDIRECT(__ATTR_WUNUSED,__FILE *,__NOTHROW_NCX,__localdep_funopen64,(void const *__cookie, __funopen_readfn_t __readfn, __funopen_writefn_t __writefn, __funopen64_seekfn_t __seekfn, __funopen_closefn_t __closefn),funopen64,(__cookie,__readfn,__writefn,__seekfn,__closefn))
 #elif (__SIZEOF_INT__ == __SIZEOF_SIZE_T__ && ((defined(__CRT_HAVE_funopen2) && __SIZEOF_OFF64_T__ == __SIZEOF_OFF32_T__) || defined(__CRT_HAVE_funopen2_64) || ((defined(__CRT_HAVE_malloc) || defined(__CRT_HAVE_calloc) || defined(__CRT_HAVE_realloc) || defined(__CRT_HAVE_memalign) || defined(__CRT_HAVE_aligned_alloc) || defined(__CRT_HAVE_posix_memalign)) && defined(__CRT_HAVE_funopen2)))) || ((defined(__CRT_HAVE_malloc) || defined(__CRT_HAVE_calloc) || defined(__CRT_HAVE_realloc) || defined(__CRT_HAVE_memalign) || defined(__CRT_HAVE_aligned_alloc) || defined(__CRT_HAVE_posix_memalign)) && (defined(__CRT_HAVE_funopen2_64) || defined(__CRT_HAVE_funopen2) || defined(__CRT_HAVE_fopencookie) || defined(__CRT_HAVE_funopen)))
 __NAMESPACE_LOCAL_END
 #include <libc/local/stdio/funopen64.h>
 __NAMESPACE_LOCAL_BEGIN
-/* >> funopen(3), funopen64(3) */
 #define __localdep_funopen64 __LIBC_LOCAL_NAME(funopen64)
 #else /* ... */
 #undef __local___localdep_funopen64_defined
 #endif /* !... */
 #endif /* !__local___localdep_funopen64_defined */
-/* Dependency: malloc from stdlib */
 #ifndef __local___localdep_malloc_defined
 #define __local___localdep_malloc_defined 1
 #if __has_builtin(__builtin_malloc) && defined(__LIBC_BIND_CRTBUILTINS) && defined(__CRT_HAVE_malloc)
@@ -369,7 +357,6 @@ __NAMESPACE_LOCAL_END
 #endif /* !... */
 #endif /* __SIZEOF_INT__ != __SIZEOF_SIZE_T__ || ((!__CRT_HAVE_funopen2 || __FS_SIZEOF(OFF) != __SIZEOF_OFF32_T__) && (!__CRT_HAVE_funopen2_64 || __FS_SIZEOF(OFF) != __SIZEOF_OFF64_T__) && ((!__CRT_HAVE_malloc && !__CRT_HAVE_calloc && !__CRT_HAVE_realloc && !__CRT_HAVE_memalign && !__CRT_HAVE_aligned_alloc && !__CRT_HAVE_posix_memalign) || (!__CRT_HAVE_funopen2_64 && !__CRT_HAVE_funopen2))) */
 __NAMESPACE_LOCAL_BEGIN
-/* >> funopen(3), funopen64(3) */
 __LOCAL_LIBC(funopen) __ATTR_WUNUSED __FILE *
 __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(funopen))(void const *__cookie, __funopen_readfn_t __readfn, __funopen_writefn_t __writefn, __funopen_seekfn_t __seekfn, __funopen_closefn_t __closefn) {
 #if __SIZEOF_INT__ == __SIZEOF_SIZE_T__ && ((defined(__CRT_HAVE_funopen2) && __FS_SIZEOF(OFF) == __SIZEOF_OFF32_T__) || (defined(__CRT_HAVE_funopen2_64) && __FS_SIZEOF(OFF) == __SIZEOF_OFF64_T__) || ((defined(__CRT_HAVE_malloc) || defined(__CRT_HAVE_calloc) || defined(__CRT_HAVE_realloc) || defined(__CRT_HAVE_memalign) || defined(__CRT_HAVE_aligned_alloc) || defined(__CRT_HAVE_posix_memalign)) && ((defined(__CRT_HAVE_funopen2) && __SIZEOF_OFF64_T__ == __SIZEOF_OFF32_T__) || defined(__CRT_HAVE_funopen2_64) || defined(__CRT_HAVE_funopen2))))

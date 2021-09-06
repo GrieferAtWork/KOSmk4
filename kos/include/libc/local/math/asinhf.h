@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xd69145cc */
+/* HASH CRC-32:0x17cc5b97 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -23,23 +23,18 @@
 #include <__crt.h>
 #if defined(__CRT_HAVE_asinh) || defined(__CRT_HAVE___asinh)
 __NAMESPACE_LOCAL_BEGIN
-/* Dependency: asinh from math */
 #ifndef __local___localdep_asinh_defined
 #define __local___localdep_asinh_defined 1
 #if __has_builtin(__builtin_asinh) && defined(__LIBC_BIND_CRTBUILTINS) && defined(__CRT_HAVE_asinh)
-/* Hyperbolic arc sine of `x' */
 __CEIREDIRECT(__ATTR_WUNUSED,double,__NOTHROW,__localdep_asinh,(double __x),asinh,{ return __builtin_asinh(__x); })
 #elif defined(__CRT_HAVE_asinh)
-/* Hyperbolic arc sine of `x' */
 __CREDIRECT(__ATTR_WUNUSED,double,__NOTHROW,__localdep_asinh,(double __x),asinh,(__x))
 #elif defined(__CRT_HAVE___asinh)
-/* Hyperbolic arc sine of `x' */
 __CREDIRECT(__ATTR_WUNUSED,double,__NOTHROW,__localdep_asinh,(double __x),__asinh,(__x))
 #else /* ... */
 #undef __local___localdep_asinh_defined
 #endif /* !... */
 #endif /* !__local___localdep_asinh_defined */
-/* Hyperbolic arc sine of `x' */
 __LOCAL_LIBC(asinhf) __ATTR_WUNUSED float
 __NOTHROW(__LIBCCALL __LIBC_LOCAL_NAME(asinhf))(float __x) {
 	return (float)__localdep_asinh((double)__x);

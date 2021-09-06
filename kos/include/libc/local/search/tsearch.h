@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x8a901a99 */
+/* HASH CRC-32:0x959459f8 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -27,7 +27,6 @@
 typedef int (__LIBCCALL *__compar_fn_t)(void const *__a, void const *__b);
 #endif /* !____compar_fn_t_defined */
 __NAMESPACE_LOCAL_BEGIN
-/* Dependency: malloc from stdlib */
 #ifndef __local___localdep_malloc_defined
 #define __local___localdep_malloc_defined 1
 #if __has_builtin(__builtin_malloc) && defined(__LIBC_BIND_CRTBUILTINS) && defined(__CRT_HAVE_malloc)
@@ -115,9 +114,6 @@ __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(__maybe_split_for_insert))(void **__r
 }
 __NAMESPACE_LOCAL_END
 __NAMESPACE_LOCAL_BEGIN
-/* >> tsearch(3)
- * Search for an entry matching the given `key' in the tree
- * pointed to by `*rootp' and insert a new element if not found */
 __LOCAL_LIBC(tsearch) __ATTR_NONNULL((3)) void *
 __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(tsearch))(void const *__key, void **__vrootp, __compar_fn_t __compar) {
 	typedef struct __node_struct {

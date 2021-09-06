@@ -293,7 +293,7 @@ struct dirent *readdir([[nonnull]] DIR *__restrict dirp);
 %
 @@>> rewinddir(3)
 @@Rewind the given directory stream in such a way that the next call
-@@to `readdir(3)' will once again return the first directory entry
+@@to `readdir(3)' will once again  return the first directory  entry
 [[decl_prefix(DEFINE_STRUCT_DIRSTREAM)]]
 void rewinddir([[nonnull]] DIR *__restrict dirp);
 
@@ -316,10 +316,10 @@ struct dirent64 *readdir64([[nonnull]] DIR *__restrict dirp);
 %#ifdef __USE_POSIX
 @@>> readdir_r(3), readdir64_r(3)
 @@Reentrant version of `readdir(3)'
-@@NOTE: This ~reentrant~ version of readdir() is strongly discouraged from being used in KOS, as the
+@@NOTE: This ~reentrant~ version of readdir()  is strongly discouraged from being  used in KOS, as  the
 @@      kernel does not impose a limit on the length of a single directory entry name (s.a. 'kreaddir')
 @@>> Instead, simply use `readdir()' / `readdir64()', which will automatically (re-)allocate an internal,
-@@   per-directory buffer of sufficient size to house any directory entry (s.a.: `READDIR_DEFAULT')
+@@   per-directory  buffer  of sufficient  size to  house any  directory entry  (s.a.: `READDIR_DEFAULT')
 [[cp, decl_prefix(DEFINE_STRUCT_DIRSTREAM), no_crt_self_import]]
 [[if(!defined(__USE_FILE_OFFSET64) || defined(_DIRENT_MATCHES_DIRENT64)), preferred_alias("readdir_r")]]
 [[if(defined(__USE_FILE_OFFSET64) || defined(_DIRENT_MATCHES_DIRENT64)), preferred_alias("readdir64_r")]]
@@ -512,10 +512,10 @@ int versionsort64([[nonnull]] struct dirent64 const **e1,
 %#if defined(__USE_KOS) && defined(__KOS__)
 @@>> kreaddir(2), kreaddirf(2), kreaddir64(2), kreaddirf64(2)
 @@The KOS-specific system call for reading a single directory entry
-@@from a file descriptor referring to an open directory stream.
+@@from  a file  descriptor referring  to an  open directory stream.
 @@@param: mode: One of `READDIR_*' (See below)
 @@@return: * : The actually required buffer size for the directory entry (in bytes)
-@@             NOTE: When `READDIR_DEFAULT' was passed for `mode', the directory
+@@             NOTE: When  `READDIR_DEFAULT' was passed for `mode', the directory
 @@                   stream will only be advanced when this value is >= 'bufsize'
 @@@return: 0 : The end of the directory has been reached.
 @@@return: -1: Failed to read a directory entry for some reason (s.a.: `errno')

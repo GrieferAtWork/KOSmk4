@@ -425,9 +425,9 @@ function parsePrototypeAnnotation(
 }
 
 
-@@Parse the contents of an argument list, starting after the leading @"(",
+@@Parse the contents of an argument list, starting after the leading  @"(",
 @@such that @self.next() will return the first token _after_ that @"(", and
-@@stopping such that @self.tok will point at the first character after the
+@@stopping such that @self.tok will point at the first character after  the
 @@trailing @")"
 @@NOTE: Optionally, the current token may be a @"[" upon entry, in which case
 @@      @defaultAttributes will not be used, but attributes will rather be
@@ -585,7 +585,7 @@ again_skip_arg_annotation_rbracket:
 }
 
 @@Same as @parseArgumentList, but also parse an optional trailing @"-> TYPE"
-@@or @": TYPE" suffix, and throw an error if such a suffix is present, but
+@@or @": TYPE" suffix, and throw an error  if such a suffix is present,  but
 @@some other return type had already been defined.
 @@Upon return, @self will point at the first character after the return type
 function parseArgumentListAndOptionalTrailingReturnType(
@@ -918,7 +918,7 @@ class FunctionFeatures {
 	}
 
 	@@Set the name of a guard (to-be used when @guard
-	@@is true) for a given namespace @namespaceName
+	@@is true) for  a given namespace  @namespaceName
 	public function setNamespaceGuardName(
 			namespaceName: string, guardName: string | UserString | none) {
 		if (guardName is none) {
@@ -939,7 +939,7 @@ class FunctionFeatures {
 			self: CParser, ppCond: string | UserString | none = none): bool {
 		local tok = self.tok;
 		@@Simple annotations that only entail setting the value of some field.
-		@@This is a mapping of: @(tagName: (fieldName, toBeAssignedValue))
+		@@This  is  a mapping  of: @(tagName:  (fieldName, toBeAssignedValue))
 		final local SIMPLE_SETFIELD_ANNOTATIONS: {string: (string, Object)} = {
 			"nodecl"                      : ("decl", "__LIBC" /*DEFAULT_DECL*/),
 			"no_decl"                     : ("decl", "__LIBC" /*DEFAULT_DECL*/),
@@ -1332,7 +1332,7 @@ err_unexpected_if:
 		return true;
 	}
 
-	@@Assert that all annotations that are only valid when a
+	@@Assert  that  all   annotations  that  are   only  valid  when   a
 	@@function body is present match the annotations of @defaultFeatures
 	public function assertDefaultAttributesWithoutImplementation(
 			defaultFeatures: FunctionFeatures): string {
@@ -1395,7 +1395,7 @@ err_unexpected_if:
 		return none;
 	}
 
-	@@Assert that no annotations are given that wouldn't make sense for
+	@@Assert  that no annotations  are given that  wouldn't make sense for
 	@@symbolic aliasing functions, such that %{uchar} or '= other' aliases
 	public function assertAllSymbolicAliasOnly(
 			self: CParser, defaultFeatures: FunctionFeatures, functionName: string) {
@@ -1406,7 +1406,7 @@ err_unexpected_if:
 		}
 	}
 
-	@@Assert that no annotations are given that wouldn't make sense for
+	@@Assert  that no annotations  are given that  wouldn't make sense for
 	@@symbolic aliasing functions, such that %{uchar} or '= other' aliases
 	public function assertAllGeneratedFunctionBody(
 			self: CParser, functionName: string) {
@@ -1436,11 +1436,11 @@ function truncateInlineFunctionImplementation(text: string): string {
 	return result;
 }
 
-@@Add @func to @mapping under @mapping[func.name]
-@@If another object was already bound to under that key,
+@@Add   @func   to   @mapping   under    @mapping[func.name]
+@@If  another object  was already  bound to  under that key,
 @@replace the existing object with @DuplicateFunctionMarker.
 @@NOTE: This function operates atomically between multiple threads,
-@@      which is required when multiple system header definition
+@@      which is required  when multiple  system header  definition
 @@      source files are loaded by separate threads.
 function defineFunctionInMapping(
 		mapping: {string: Function} | {string: LocalFunction},
@@ -1610,7 +1610,7 @@ function getVargargsPlaceholderArgumentName(i: int, ctype: CType): string {
 }
 
 
-@@Generate the implementation of a call-to-wrapper for dosabi functions
+@@Generate the implementation of  a call-to-wrapper for dosabi  functions
 @@The caller must ensure that @dosPrototype doesn't have any var-args, or
 @@has a non-@none @FunctionPrototype.ellipsisArgumentTypes field.
 function generateDosWrapperFunctionImplementationForPrototype(
@@ -1728,7 +1728,7 @@ class LoaderContext {
 
 	@@A custom callback that is invoked to parse otherwise
 	@@unrecognized directives. Upon entry, the parser will
-	@@point at the directive's name, and upon exit, the
+	@@point at the  directive's name, and  upon exit,  the
 	@@parser should point at the trailing @"," or @"]"
 	public member customDirectivesParser: Callable with LoaderContext;
 
@@ -1739,7 +1739,7 @@ class LoaderContext {
 	public member pushedDefaultFeatures: {FunctionFeatures...} = none;
 
 	@@Elements to be inserted at the start of the system header (e.g. <string.h>)
-	@@These elements will be inserted after the copyright notice, but before the
+	@@These elements will be inserted after the copyright notice, but before  the
 	@@include guard macro. This section is intended to be filled with portability
 	@@notes, and standard references.
 	public member result_order_headerCPrefix: {(Function | ExposedFunction | string | UserString | Callable)...} = none;
@@ -2092,7 +2092,7 @@ again:
 	@@Where ATTRIB is:
 	@@    ',' ~~ (ATTR_NAME ':' ATTR_VALEXPR)...
 	@@
-	@@Where ATTR_NAME is the name of one of the members of @ExposedFunction
+	@@Where ATTR_NAME  is  the  name  of  one  of  the  members  of  @ExposedFunction
 	@@Where ATTR_VALEXPR is a deemon expression, as executable by @(exec from deemon)
 	@@
 	@@HINT: %[insert:guarded_*_function(...)] is the same as %[insert:_function(guardName: true)]
@@ -2373,12 +2373,12 @@ again:
 
 	@@Define simple textual replacement macros
 	@@>%[define(MACRO_NAME = TEXT INSERTED AS REPLACEMENT)]
-	@@This differs from @"%[define_replacement(...)]", in that the keyword
-	@@is replaced in all situations, regardless of escape mode, as well as
+	@@This  differs  from @"%[define_replacement(...)]",  in that  the keyword
+	@@is  replaced in  all situations, regardless  of escape mode,  as well as
 	@@the fact that the replacement text will be re-parsed for further macros,
 	@@as well as replacements.
 	@@Note that macros defined using this directive are expanded at the same
-	@@time as special builtin macros such as @"$has_function"
+	@@time    as   special   builtin   macros   such   as   @"$has_function"
 	public function parseDirective_define() {
 		parseDirective_define_replacement(keywordMacros);
 	}
@@ -2404,7 +2404,7 @@ again:
 
 	@@Define a list of CRT symbol names for use in alias() and similar attributes
 	@@>%[define_crt_name_list(NAME = [FIRST_NAME, SECOND_NAME, ...])]
-	@@The list of names can then be used in declarations:
+	@@The    list    of   names    can    then   be    used    in   declarations:
 	@@>[[alias(NAME...)]]
 	@@>foo();
 	@@Which behaves the same as:
@@ -2433,9 +2433,9 @@ again:
 		self.skip(")");
 	}
 
-	@@Parse a directive. Upon entry, the parser will
+	@@Parse a directive.  Upon entry,  the parser  will
 	@@point at the directive's name, and upon exit, the
-	@@parser should point at the trailing @"," or @"]"
+	@@parser should point at the trailing @"," or  @"]"
 	public function parseDirective() {
 		/* %[directive...] */
 		local self = this.self;
@@ -2556,7 +2556,7 @@ function replaceFunctionPrototypeDefaultCCWithDefaultDosCC(
 @@Load system header definitions
 @@@param: customDirectivesParser: A custom callback that is invoked to parse otherwise
 @@                                unrecognized directives. Upon entry, the parser will
-@@                                point at the directive's name, and upon exit, the
+@@                                point at the  directive's name, and  upon exit,  the
 @@                                parser should point at the trailing @"," or @"]"
 function loadSystemHeaderDefinitions(
 		self: CParser, headerName: string,

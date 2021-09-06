@@ -650,7 +650,7 @@ typedef void *(__LIBKCALL *__pthread_start_routine_t)(void *);
 )]
 
 @@>> pthread_create(3)
-@@Create a new thread, starting with execution of `start_routine'
+@@Create a  new thread,  starting with  execution of  `start_routine'
 @@getting passed `arg'. Creation attributed come from `attr'. The new
 @@handle is stored in `*newthread'
 @@@return: EOK:    Success
@@ -668,7 +668,7 @@ void pthread_exit(void *retval);
 
 @@>> pthread_join(3)
 @@Make calling thread wait for termination of the thread `pthread'.
-@@The exit status of the thread is stored in `*thread_return', if
+@@The exit status of the  thread is stored in `*thread_return',  if
 @@`thread_return' is not `NULL'.
 @@@return: EOK: Success
 [[cp, decl_include("<bits/types.h>", "<bits/crt/pthreadtypes.h>")]]
@@ -688,7 +688,7 @@ $errno_t pthread_tryjoin_np(pthread_t pthread, void **thread_return);
 @@>> pthread_timedjoin_np(3), pthread_timedjoin64_np(3)
 @@Make calling thread wait for termination of the thread `pthread',
 @@but only until `timeout'. The exit status of the thread is stored
-@@in `*thread_return', if `thread_return' is not `NULL'.
+@@in  `*thread_return',   if   `thread_return'   is   not   `NULL'.
 @@@return: EOK:       Success
 @@@return: EINVAL:    The given `abstime' is invalid
 @@@return: ETIMEDOUT: The given `abstime' has expired
@@ -739,8 +739,8 @@ $errno_t pthread_timedjoin64_np(pthread_t pthread, void **thread_return,
 %#endif /* __USE_GNU */
 
 @@>> pthread_detach(3)
-@@Indicate that the thread `pthread' is never to be joined with `pthread_join(3)'.
-@@The resources of `pthread' will therefore be freed immediately when it
+@@Indicate  that the  thread `pthread' is  never to be  joined with `pthread_join(3)'.
+@@The  resources  of   `pthread'  will   therefore  be  freed   immediately  when   it
 @@terminates, instead of waiting for another thread to perform `pthread_join(3)' on it
 @@@return: EOK: Success
 [[decl_include("<bits/types.h>", "<bits/crt/pthreadtypes.h>")]]
@@ -766,7 +766,7 @@ int pthread_equal(pthread_t thr1, pthread_t thr2) {
 %/* Thread attribute handling. */
 %
 @@>> pthread_attr_init(3)
-@@Initialize thread attribute `*attr' with default attributes (detachstate is
+@@Initialize thread  attribute `*attr'  with default  attributes (detachstate  is
 @@`PTHREAD_JOINABLE', scheduling policy is `SCHED_OTHER', no user-provided stack)
 @@@return: EOK: Success
 [[decl_include("<bits/types.h>", "<bits/crt/pthreadtypes.h>")]]
@@ -779,14 +779,14 @@ $errno_t pthread_attr_init([[nonnull]] pthread_attr_t *attr);
 $errno_t pthread_attr_destroy([[nonnull]] pthread_attr_t *attr);
 
 @@>> pthread_attr_getdetachstate(3)
-@@Get detach state attribute
+@@Get   detach   state    attribute
 @@@return: EOK: Success
 [[decl_include("<bits/types.h>", "<bits/crt/pthreadtypes.h>")]]
 $errno_t pthread_attr_getdetachstate([[nonnull]] pthread_attr_t const *attr,
                                      [[nonnull]] int *detachstate);
 
 @@>> pthread_attr_setdetachstate(3)
-@@Set detach state attribute
+@@Set   detach   state    attribute
 @@@return: EOK:    Success
 @@@return: EINVAL: Invalid/unsupported `detachstate'
 [[decl_include("<bits/types.h>", "<bits/crt/pthreadtypes.h>")]]
@@ -905,9 +905,9 @@ $errno_t pthread_attr_getstackaddr([[nonnull]] pthread_attr_t const *__restrict 
 
 
 @@>> pthread_attr_setstackaddr(3)
-@@Set the starting address of the stack of the thread to be created.
+@@Set the starting address  of the stack of  the thread to be  created.
 @@Depending on whether the stack grows up or down the value must either
-@@be higher or lower than all the address in the memory block. The
+@@be higher or  lower than  all the address  in the  memory block.  The
 @@minimal size of the block must be `PTHREAD_STACK_MIN'
 @@@return: EOK:    Success
 @@@return: EINVAL: The stack isn't suitably aligned
@@ -940,7 +940,7 @@ $errno_t pthread_attr_getstacksize([[nonnull]] pthread_attr_t const *__restrict 
 }
 
 @@>> pthread_attr_setstacksize(3)
-@@Add information about the minimum stack size needed for the thread
+@@Add information about the minimum  stack size needed for the  thread
 @@to be started. This size must never be less than `PTHREAD_STACK_MIN'
 @@and must also not exceed the system limits
 @@@return: EOK:    Success
@@ -980,7 +980,7 @@ $errno_t pthread_attr_getstack([[nonnull]] pthread_attr_t const *__restrict attr
 
 @@>> pthread_attr_setstack(3)
 @@The following two interfaces are intended to replace the last two. They
-@@require setting the address as well as the size since only setting the
+@@require setting the address as well as the size since only setting  the
 @@address will make the implementation on some architectures impossible
 @@@return: EOK:    Success
 @@@return: EINVAL: `stacksize' is too small, or the stack isn't suitably aligned
@@ -998,7 +998,7 @@ $errno_t pthread_attr_setstack([[nonnull]] pthread_attr_t *attr,
 
 %#ifdef __USE_GNU
 @@>> pthread_attr_setaffinity_np(3)
-@@Thread created with attribute `attr' will be limited
+@@Thread  created with attribute `attr' will be limited
 @@to run only on the processors represented in `cpuset'
 @@@return: EOK:    Success
 @@@return: EINVAL: The given set contains a non-existant CPU
@@ -1031,7 +1031,7 @@ $errno_t pthread_getattr_default_np([[nonnull]] pthread_attr_t *attr);
 $errno_t pthread_setattr_default_np([[nonnull]] pthread_attr_t const *attr);
 
 @@>> pthread_getattr_np(3)
-@@Initialize thread attribute `*attr' with attributes corresponding to the
+@@Initialize thread  attribute `*attr'  with attributes  corresponding to  the
 @@already running thread `pthread'. It shall be called on uninitialized `attr'
 @@and destroyed with `pthread_attr_destroy(3)' when no longer needed
 @@@return: EOK:    Success
@@ -1122,9 +1122,9 @@ $errno_t pthread_setconcurrency(int level);
 
 %#ifdef __USE_GNU
 @@>> pthread_yield(3), thrd_yield(3), sched_yield(2)
-@@Yield the processor to another thread or process.
+@@Yield  the processor to another thread or process.
 @@This function is similar to the POSIX `sched_yield' function but
-@@might be differently implemented in the case of a m-on-n thread
+@@might  be differently implemented in the case of a m-on-n thread
 @@implementation
 @@@return: EOK: Success
 [[decl_include("<bits/types.h>")]]
@@ -1169,8 +1169,8 @@ typedef void (__LIBKCALL *__pthread_once_routine_t)(void);
 
 @@>> pthread_once(3)
 @@Guarantee that the initialization function `init_routine' will be called
-@@only once, even if pthread_once is executed several times with the
-@@same `once_control' argument. `once_control' must point to a static or
+@@only  once,  even if  pthread_once is  executed  several times  with the
+@@same `once_control' argument. `once_control' must  point to a static  or
 @@extern variable initialized to `PTHREAD_ONCE_INIT'.
 @@@return: EOK: Success
 [[throws, export_alias("call_once")]]
@@ -1250,7 +1250,7 @@ again:
 
 
 @@>> pthread_setcancelstate(3)
-@@Set cancelability state of current thread to `state',
+@@Set  cancelability  state   of  current   thread  to   `state',
 @@returning old state in `*oldstate' if `oldstate' is not `NULL'.
 @@@return: EOK:    Success
 @@@return: EINVAL: Invalid/unsupported `state'
@@ -1550,7 +1550,7 @@ $errno_t pthread_mutex_init([[nonnull]] pthread_mutex_t *mutex,
                             pthread_mutexattr_t const *mutexattr);
 
 @@>> pthread_mutex_destroy(3)
-@@Destroy the given `mutex'
+@@Destroy  the  given `mutex'
 @@@return: EOK: Success
 [[export_alias("mtx_destroy")]]
 [[decl_include("<bits/types.h>", "<bits/crt/pthreadtypes.h>")]]
@@ -1559,14 +1559,14 @@ $errno_t pthread_mutex_destroy([[nonnull]] pthread_mutex_t *mutex);
 @@>> pthread_mutex_trylock(3)
 @@Try locking the given `mutex'
 @@@return: EOK:   Success
-@@@return: EBUSY: The mutex has already been locked
-@@                In case of a recursive mutex, another
+@@@return: EBUSY: The  mutex  has  already  been   locked
+@@                In case of  a recursive mutex,  another
 @@                thread was the one to acquire the lock.
 [[wunused, decl_include("<bits/types.h>", "<bits/crt/pthreadtypes.h>")]]
 $errno_t pthread_mutex_trylock([[nonnull]] pthread_mutex_t *mutex);
 
 @@>> pthread_mutex_lock(3)
-@@Lock the given `mutex'
+@@Lock  the  given `mutex'
 @@@return: EOK: Success
 [[cp, decl_include("<bits/types.h>", "<bits/crt/pthreadtypes.h>")]]
 $errno_t pthread_mutex_lock([[nonnull]] pthread_mutex_t *mutex);
@@ -1679,7 +1679,7 @@ $errno_t pthread_mutex_reltimedlock64_np([[nonnull]] pthread_mutex_t *__restrict
 
 
 @@>> pthread_mutex_unlock(3)
-@@Unlock the given `mutex'
+@@Unlock  the  given `mutex'
 @@@return: EOK: Success
 [[decl_include("<bits/types.h>", "<bits/crt/pthreadtypes.h>")]]
 $errno_t pthread_mutex_unlock([[nonnull]] pthread_mutex_t *mutex);
@@ -1693,7 +1693,7 @@ $errno_t pthread_mutex_getprioceiling([[nonnull]] pthread_mutex_t const *__restr
 
 @@>> pthread_mutex_setprioceiling(3)
 @@Set the priority ceiling of `mutex' to `prioceiling',
-@@return old priority ceiling value in `*old_ceiling'
+@@return old priority  ceiling value in  `*old_ceiling'
 @@@return: EOK:    Success
 @@@return: EINVAL: Invalid/unsupported `prioceiling'
 [[decl_include("<bits/types.h>", "<bits/crt/pthreadtypes.h>")]]
@@ -1724,7 +1724,7 @@ $errno_t pthread_mutex_consistent([[nonnull]] pthread_mutex_t *mutex);
 
 @@>> pthread_mutexattr_init(3)
 @@Initialize mutex attribute object `attr' with default
-@@attributes (kind is `PTHREAD_MUTEX_TIMED_NP')
+@@attributes    (kind    is   `PTHREAD_MUTEX_TIMED_NP')
 @@@return: EOK: Success
 [[decl_include("<bits/types.h>", "<bits/crt/pthreadtypes.h>")]]
 $errno_t pthread_mutexattr_init([[nonnull]] pthread_mutexattr_t *attr);
@@ -1761,7 +1761,7 @@ $errno_t pthread_mutexattr_gettype([[nonnull]] pthread_mutexattr_t const *__rest
                                    [[nonnull]] int *__restrict kind);
 
 @@>> pthread_mutexattr_settype(3)
-@@Set the mutex kind attribute in `*attr' to `kind' (either `PTHREAD_MUTEX_NORMAL',
+@@Set  the mutex kind attribute in `*attr' to `kind' (either `PTHREAD_MUTEX_NORMAL',
 @@`PTHREAD_MUTEX_RECURSIVE', `PTHREAD_MUTEX_ERRORCHECK', or `PTHREAD_MUTEX_DEFAULT')
 @@@return: EOK:    Success
 @@@return: EINVAL: Invalid/unsupported `kind'
@@ -1778,7 +1778,7 @@ $errno_t pthread_mutexattr_getprotocol([[nonnull]] pthread_mutexattr_t const *__
                                        [[nonnull]] int *__restrict protocol);
 
 @@>> pthread_mutexattr_setprotocol(3)
-@@Set the mutex protocol attribute in `*attr' to `protocol' (either
+@@Set  the  mutex protocol  attribute  in `*attr'  to  `protocol' (either
 @@`PTHREAD_PRIO_NONE', `PTHREAD_PRIO_INHERIT', or `PTHREAD_PRIO_PROTECT')
 @@@return: EOK:    Success
 @@@return: EINVAL: Invalid/unsupported `protocol'
@@ -1857,7 +1857,7 @@ $errno_t pthread_rwlock_rdlock([[nonnull]] pthread_rwlock_t *rwlock);
 @@Try to acquire read lock for `rwlock'
 @@@return: EOK:   Success
 @@@return: EBUSY: A read-lock cannot be acquired at the moment,
-@@                because a write-lock is already being held.
+@@                because a write-lock  is already being  held.
 [[wunused, decl_include("<bits/types.h>", "<bits/crt/pthreadtypes.h>")]]
 $errno_t pthread_rwlock_tryrdlock([[nonnull]] pthread_rwlock_t *rwlock);
 
@@ -1871,7 +1871,7 @@ $errno_t pthread_rwlock_wrlock([[nonnull]] pthread_rwlock_t *rwlock);
 @@Try to acquire write lock for `rwlock'
 @@@return: EOK:   Success
 @@@return: EBUSY: A write-lock cannot be acquired at the moment,
-@@                because read-locks are already being held.
+@@                because read-locks  are  already  being  held.
 [[wunused, decl_include("<bits/types.h>", "<bits/crt/pthreadtypes.h>")]]
 $errno_t pthread_rwlock_trywrlock([[nonnull]] pthread_rwlock_t *rwlock);
 
@@ -1976,7 +1976,7 @@ $errno_t pthread_rwlock_timedwrlock64([[nonnull]] pthread_rwlock_t *__restrict r
 
 %#ifdef __USE_SOLARIS
 @@>> pthread_rwlock_reltimedrdlock_np(3), pthread_rwlock_reltimedrdlock64_np(3)
-@@Try to acquire read lock for `rwlock' or return after the specified time
+@@Try to acquire  read lock  for `rwlock' or  return after  the specified  time
 @@@return: EOK:       Success
 @@@return: EINVAL:    The given `reltime' is invalid
 @@@return: ETIMEDOUT: The given `reltime' has expired
@@ -2006,7 +2006,7 @@ $errno_t pthread_rwlock_reltimedrdlock_np([[nonnull]] pthread_rwlock_t *__restri
 }
 
 @@>> pthread_rwlock_reltimedwrlock_np(3), pthread_rwlock_reltimedwrlock64_np(3)
-@@Try to acquire write lock for `rwlock' or return after the specified time
+@@Try to acquire  write lock for  `rwlock' or return  after the specified  time
 @@@return: EOK:       Success
 @@@return: EINVAL:    The given `reltime' is invalid
 @@@return: ETIMEDOUT: The given `reltime' has expired
@@ -2093,7 +2093,7 @@ $errno_t pthread_rwlock_unlock([[nonnull]] pthread_rwlock_t *rwlock);
 $errno_t pthread_rwlockattr_init([[nonnull]] pthread_rwlockattr_t *attr);
 
 @@>> pthread_rwlockattr_destroy(3)
-@@Destroy attribute object `attr'
+@@Destroy attribute object  `attr'
 @@@return: EOK: Success
 [[decl_include("<bits/types.h>", "<bits/crt/pthreadtypes.h>")]]
 $errno_t pthread_rwlockattr_destroy([[nonnull]] pthread_rwlockattr_t *attr);
@@ -2120,7 +2120,7 @@ $errno_t pthread_rwlockattr_getkind_np([[nonnull]] pthread_rwlockattr_t const *_
                                        [[nonnull]] int *__restrict pref);
 
 @@>> pthread_rwlockattr_setkind_np(3)
-@@Set reader/write preference
+@@Set     reader/write     preference
 @@@return: EOK:    Success
 @@@return: EINVAL: Invalid/unsupported `pref'
 [[decl_include("<bits/types.h>", "<bits/crt/pthreadtypes.h>")]]
@@ -2171,8 +2171,8 @@ $errno_t pthread_cond_wait([[nonnull]] pthread_cond_t *__restrict cond,
 
 @@>> pthread_cond_timedwait(3), pthread_cond_timedwait64(3)
 @@Wait for condition variable `cond' to be signaled or broadcast
-@@until `abstime'. `mutex' is assumed to be locked before.
-@@`abstime' is an absolute time specification; zero is the
+@@until `abstime'.  `mutex'  is  assumed to  be  locked  before.
+@@`abstime' is  an  absolute  time specification;  zero  is  the
 @@beginning of the epoch (00:00:00 GMT, January 1, 1970).
 @@@return: EOK:       Success
 @@@return: EINVAL:    The given `abstime' is invalid
@@ -2229,7 +2229,7 @@ $errno_t pthread_cond_timedwait64([[nonnull]] pthread_cond_t *__restrict cond,
 
 %#ifdef __USE_SOLARIS
 @@>> pthread_cond_reltimedwait_np(3), pthread_cond_reltimedwait64_np(3)
-@@Wait for condition variable `cond' to be signaled or broadcast
+@@Wait for  condition  variable  `cond' to  be  signaled  or  broadcast
 @@until `reltime'. `mutex' is assumed to be locked before.
 @@@return: EOK:       Success
 @@@return: EINVAL:    The given `reltime' is invalid
@@ -2347,7 +2347,7 @@ $errno_t pthread_condattr_setclock([[nonnull]] pthread_condattr_t *attr, $clocki
 
 @@>> pthread_spin_init(3)
 @@Initialize the spinlock `lock'. If `pshared' is nonzero
-@@the spinlock can be shared between different processes
+@@the  spinlock can be shared between different processes
 @@@return: EOK: Success
 [[impl_include("<hybrid/__atomic.h>")]]
 [[decl_include("<bits/types.h>", "<bits/crt/pthreadtypes.h>")]]
@@ -2399,7 +2399,7 @@ $errno_t pthread_spin_trylock([[nonnull]] pthread_spinlock_t *lock) {
 }
 
 @@>> pthread_spin_unlock(3)
-@@Release spinlock `lock'
+@@Release  spinlock  `lock'
 @@@return: EOK: Success
 [[impl_include("<hybrid/__atomic.h>")]]
 [[decl_include("<bits/types.h>", "<bits/crt/pthreadtypes.h>")]]
@@ -2419,7 +2419,7 @@ $errno_t pthread_spin_unlock([[nonnull]] pthread_spinlock_t *lock) {
 
 @@>> pthread_barrier_init(3)
 @@Initialize `barrier' with the attributes in `attr'.
-@@The barrier is opened when `count' waiters arrived
+@@The  barrier is opened when `count' waiters arrived
 @@@return: EOK:    Success
 @@@return: EINVAL: The given `count' is ZERO(0)
 [[decl_include("<bits/types.h>", "<bits/crt/pthreadtypes.h>")]]
@@ -2494,7 +2494,7 @@ typedef void (__LIBKCALL *__pthread_destr_function_t)(void *);
 @@>> pthread_key_create(3)
 @@Create a key value identifying a location in the thread-specific
 @@data area. Each thread maintains a distinct thread-specific data
-@@area. `destr_function', if non-`NULL', is called with the value
+@@area. `destr_function', if non-`NULL', is called with the  value
 @@associated to that key when the key is destroyed.
 @@`destr_function' is not called if the value associated is `NULL'
 @@when the key is destroyed
@@ -2523,11 +2523,11 @@ $errno_t pthread_key_create([[nonnull]] pthread_key_t *key,
 }
 
 @@>> pthread_key_create_once_np(3)
-@@Same as `pthread_key_create()', but the given `key' must be pre-initialized
+@@Same as `pthread_key_create()', but the  given `key' must be  pre-initialized
 @@using the static initializer `PTHREAD_ONCE_KEY_NP', whilst this function will
-@@make sure that even in the event of multiple simultaneous threads calling
-@@this function, only one will create the key, and all others will wait until
-@@the key has been created. Once the key was created, further calls to this
+@@make  sure that  even in the  event of multiple  simultaneous threads calling
+@@this function, only one will create the  key, and all others will wait  until
+@@the key has been  created. Once the  key was created,  further calls to  this
 @@function will no longer block, but simply return immediately.
 @@@return: EOK:    Success
 @@@return: ENOMEM: Insufficient memory to create the key
@@ -2582,7 +2582,7 @@ again:
 %#endif /* __USE_SOLARIS */
 
 @@>> pthread_key_delete(3)
-@@Destroy the given `key'
+@@Destroy the given  `key'
 @@@return: EOK:    Success
 @@@return: EINVAL: Invalid `key'
 [[export_alias("tss_delete")]]
@@ -2603,7 +2603,7 @@ void *pthread_getspecific(pthread_key_t key);
 @@Store POINTER in the thread-specific data slot identified by `key'
 @@@return: EOK:    Success
 @@@return: EINVAL: Invalid `key'
-@@@return: ENOMEM: `pointer' is non-`NULL', `key' had yet to be allowed for the
+@@@return: ENOMEM: `pointer'  is non-`NULL', `key' had yet to be allowed for the
 @@                 calling thread, and an attempt to allocate it just now failed
 [[decl_include("<bits/types.h>", "<bits/crt/pthreadtypes.h>")]]
 $errno_t pthread_setspecific(pthread_key_t key, void const *pointer);
@@ -2632,15 +2632,15 @@ typedef void (__LIBKCALL *__pthread_atfork_func_t)(void);
 
 
 @@>> pthread_atfork(3)
-@@Install handlers to be called when a new process is created with `fork(2)'.
+@@Install handlers to be called when a new process is created with  `fork(2)'.
 @@The `prepare' handler is called in the parent process just before performing
-@@`fork(2)'. The `parent' handler is called in the parent process just after
-@@`fork(2)'. The `child' handler is called in the child process. Each of the
-@@three handlers can be `NULL', meaning that no handler needs to be called at
+@@`fork(2)'. The `parent' handler is called  in the parent process just  after
+@@`fork(2)'.  The `child' handler is called in  the child process. Each of the
+@@three  handlers can be `NULL', meaning that no handler needs to be called at
 @@that point.
 @@`pthread_atfork(3)' can be called several times, in which case the `prepare'
-@@handlers are called in LIFO order (last added with `pthread_atfork(3)',
-@@first called before `fork(2)'), and the `parent' and `child' handlers are
+@@handlers are  called in  LIFO order  (last added  with  `pthread_atfork(3)',
+@@first  called before `fork(2)'),  and the `parent'  and `child' handlers are
 @@called in FIFO order (first added -> first called)
 @@@return: EOK:    Success
 @@@return: ENOMEM: Insufficient memory to register callbacks
@@ -2700,10 +2700,10 @@ $errno_t pthread_set_num_processors_np(int n) {
 
 %#ifdef __USE_BSD
 @@>> pthread_main_np(3)
-@@Returns 1 if the calling thread is the main() thread (i.e. the
-@@thread that was started by the kernel in order to execute the
-@@calling program), and 0 otherwise. Additionally, -1 is returned
-@@if the calling thread "hasn't been initialized", though this
+@@Returns  1 if the  calling thread is the  main() thread (i.e. the
+@@thread  that was  started by the  kernel in order  to execute the
+@@calling program), and 0  otherwise. Additionally, -1 is  returned
+@@if the  calling  thread  "hasn't been initialized",  though  this
 @@isn't a case that can actually happen under KOS's implementation.
 [[const, nothrow, guard, export_alias("thr_main")]]
 [[requires_function(gettid, getpid)]]

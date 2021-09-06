@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xb524d67 */
+/* HASH CRC-32:0x4d0a9c7c */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -213,14 +213,14 @@ struct _ENTRY;
 /* >> hsearch(3)
  * Search for entry matching `item.key' in internal hash table.
  * If `action' is `FIND' return found entry or signal error by returning `NULL'.
- * If `action' is `ENTER' replace existing data (if any) with `item.data' */
+ * If  `action'  is  `ENTER' replace  existing  data (if  any)  with `item.data' */
 __CDECLARE(,ENTRY *,__NOTHROW_NCX,hsearch,(ENTRY __item, ACTION __action),(__item,__action))
 #else /* __CRT_HAVE_hsearch */
 #include <libc/local/search/hsearch.h>
 /* >> hsearch(3)
  * Search for entry matching `item.key' in internal hash table.
  * If `action' is `FIND' return found entry or signal error by returning `NULL'.
- * If `action' is `ENTER' replace existing data (if any) with `item.data' */
+ * If  `action'  is  `ENTER' replace  existing  data (if  any)  with `item.data' */
 __NAMESPACE_LOCAL_USING_OR_IMPL(hsearch, __FORCELOCAL __ATTR_ARTIFICIAL ENTRY *__NOTHROW_NCX(__LIBCCALL hsearch)(ENTRY __item, ACTION __action) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(hsearch))(__item, __action); })
 #endif /* !__CRT_HAVE_hsearch */
 #ifdef __CRT_HAVE_hcreate
@@ -286,36 +286,36 @@ __NAMESPACE_LOCAL_USING_OR_IMPL(hdestroy_r, __FORCELOCAL __ATTR_ARTIFICIAL void 
  * datum. Everything depends on that. */
 #ifdef __CRT_HAVE_tsearch
 /* >> tsearch(3)
- * Search for an entry matching the given `key' in the tree
+ * Search for an  entry matching  the given `key'  in the  tree
  * pointed to by `*rootp' and insert a new element if not found */
 __CDECLARE(__ATTR_NONNULL((3)),void *,__NOTHROW_NCX,tsearch,(void const *__key, void **__vrootp, __compar_fn_t __compar),(__key,__vrootp,__compar))
 #elif defined(__CRT_HAVE___tsearch)
 /* >> tsearch(3)
- * Search for an entry matching the given `key' in the tree
+ * Search for an  entry matching  the given `key'  in the  tree
  * pointed to by `*rootp' and insert a new element if not found */
 __CREDIRECT(__ATTR_NONNULL((3)),void *,__NOTHROW_NCX,tsearch,(void const *__key, void **__vrootp, __compar_fn_t __compar),__tsearch,(__key,__vrootp,__compar))
 #elif defined(__CRT_HAVE_malloc) || defined(__CRT_HAVE_calloc) || defined(__CRT_HAVE_realloc) || defined(__CRT_HAVE_memalign) || defined(__CRT_HAVE_aligned_alloc) || defined(__CRT_HAVE_posix_memalign)
 #include <libc/local/search/tsearch.h>
 /* >> tsearch(3)
- * Search for an entry matching the given `key' in the tree
+ * Search for an  entry matching  the given `key'  in the  tree
  * pointed to by `*rootp' and insert a new element if not found */
 __NAMESPACE_LOCAL_USING_OR_IMPL(tsearch, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_NONNULL((3)) void *__NOTHROW_NCX(__LIBCCALL tsearch)(void const *__key, void **__vrootp, __compar_fn_t __compar) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(tsearch))(__key, __vrootp, __compar); })
 #endif /* ... */
 #ifdef __CRT_HAVE_tfind
 /* >> tfind(3)
  * Search for an entry matching the given `key' in the tree pointed
- * to by `*rootp'. If no matching entry is available return `NULL' */
+ * to  by `*rootp'. If no matching entry is available return `NULL' */
 __CDECLARE(__ATTR_NONNULL((3)),void *,__NOTHROW_NCX,tfind,(void const *__key, void *const *__vrootp, __compar_fn_t __compar),(__key,__vrootp,__compar))
 #elif defined(__CRT_HAVE___tfind)
 /* >> tfind(3)
  * Search for an entry matching the given `key' in the tree pointed
- * to by `*rootp'. If no matching entry is available return `NULL' */
+ * to  by `*rootp'. If no matching entry is available return `NULL' */
 __CREDIRECT(__ATTR_NONNULL((3)),void *,__NOTHROW_NCX,tfind,(void const *__key, void *const *__vrootp, __compar_fn_t __compar),__tfind,(__key,__vrootp,__compar))
 #else /* ... */
 #include <libc/local/search/tfind.h>
 /* >> tfind(3)
  * Search for an entry matching the given `key' in the tree pointed
- * to by `*rootp'. If no matching entry is available return `NULL' */
+ * to  by `*rootp'. If no matching entry is available return `NULL' */
 __NAMESPACE_LOCAL_USING_OR_IMPL(tfind, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_NONNULL((3)) void *__NOTHROW_NCX(__LIBCCALL tfind)(void const *__key, void *const *__vrootp, __compar_fn_t __compar) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(tfind))(__key, __vrootp, __compar); })
 #endif /* !... */
 #ifdef __CRT_HAVE_tdelete
@@ -403,13 +403,13 @@ __NAMESPACE_LOCAL_USING_OR_IMPL(lfind, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_NON
 #ifdef __CRT_HAVE_lsearch
 /* >> lsearch(3)
  * Perform linear search for `key' by comparing by `compar' function
- * in array [base, base+nmemb*size) and insert entry if not found */
+ * in array [base,  base+nmemb*size) and insert  entry if not  found */
 __CDECLARE(__ATTR_NONNULL((2, 3, 5)),void *,__NOTHROW_NCX,lsearch,(void const *__key, void *__base, size_t *__nmemb, size_t __size, __compar_fn_t __compar),(__key,__base,__nmemb,__size,__compar))
 #else /* __CRT_HAVE_lsearch */
 #include <libc/local/search/lsearch.h>
 /* >> lsearch(3)
  * Perform linear search for `key' by comparing by `compar' function
- * in array [base, base+nmemb*size) and insert entry if not found */
+ * in array [base,  base+nmemb*size) and insert  entry if not  found */
 __NAMESPACE_LOCAL_USING_OR_IMPL(lsearch, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_NONNULL((2, 3, 5)) void *__NOTHROW_NCX(__LIBCCALL lsearch)(void const *__key, void *__base, size_t *__nmemb, size_t __size, __compar_fn_t __compar) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(lsearch))(__key, __base, __nmemb, __size, __compar); })
 #endif /* !__CRT_HAVE_lsearch */
 

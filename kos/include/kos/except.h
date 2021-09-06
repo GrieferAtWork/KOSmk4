@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xd2a146d7 */
+/* HASH CRC-32:0xf2258592 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -142,39 +142,39 @@ __NAMESPACE_LOCAL_USING_OR_IMPL(error_as_errno, __FORCELOCAL __ATTR_ARTIFICIAL _
 struct __siginfo_struct;
 #ifdef __CRT_HAVE_error_as_signal
 /* Transform the given exception into a posix signal.
- * If doing this is possible, fill in `*result' and return `true'.
+ * If   doing  this  is   possible,  fill  in   `*result'  and  return  `true'.
  * Otherwise, `*result' is left in an undefined state, and `false' is returned. */
 __LIBC __ATTR_WUNUSED __ATTR_NONNULL((1, 2)) __BOOL __NOTHROW_NCX(__LIBKCALL error_as_signal)(struct exception_data const *__restrict __self, struct __siginfo_struct *__restrict __result) __CASMNAME_SAME("error_as_signal");
 #else /* __CRT_HAVE_error_as_signal */
 #include <libc/local/kos.except/error_as_signal.h>
 /* Transform the given exception into a posix signal.
- * If doing this is possible, fill in `*result' and return `true'.
+ * If   doing  this  is   possible,  fill  in   `*result'  and  return  `true'.
  * Otherwise, `*result' is left in an undefined state, and `false' is returned. */
 __NAMESPACE_LOCAL_USING_OR_IMPL(error_as_signal, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_WUNUSED __ATTR_NONNULL((1, 2)) __BOOL __NOTHROW_NCX(__LIBKCALL error_as_signal)(struct exception_data const *__restrict __self, struct __siginfo_struct *__restrict __result) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(error_as_signal))(__self, __result); })
 #endif /* !__CRT_HAVE_error_as_signal */
 #ifdef __CRT_HAVE_error_name
 /* Return the name of the given error, or `NULL' if unknown.
- * This name is the same as the `E_*' identifier.
+ * This  name  is   the  same  as   the  `E_*'   identifier.
  * E.g.: `error_name(ERROR_CODEOF(E_BADALLOC))' -> "E_BADALLOC" */
 __LIBC __ATTR_CONST __ATTR_WUNUSED char const *__NOTHROW(__LIBKCALL error_name)(error_code_t __code) __CASMNAME_SAME("error_name");
 #else /* __CRT_HAVE_error_name */
 #include <libc/local/kos.except/error_name.h>
 /* Return the name of the given error, or `NULL' if unknown.
- * This name is the same as the `E_*' identifier.
+ * This  name  is   the  same  as   the  `E_*'   identifier.
  * E.g.: `error_name(ERROR_CODEOF(E_BADALLOC))' -> "E_BADALLOC" */
 __NAMESPACE_LOCAL_USING_OR_IMPL(error_name, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_CONST __ATTR_WUNUSED char const *__NOTHROW(__LIBKCALL error_name)(error_code_t __code) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(error_name))(__code); })
 #endif /* !__CRT_HAVE_error_name */
 #ifdef __CRT_HAVE_error_priority
 /* Return the priority for a given error code, where exceptions
- * with greater priorities should take the place of ones with
- * lower priorities in situations where multiple simultaneous
+ * with greater priorities should take  the place of ones  with
+ * lower priorities in  situations where multiple  simultaneous
  * errors can't be prevented. */
 __LIBC __ATTR_CONST __ATTR_WUNUSED unsigned int __NOTHROW(__LIBKCALL error_priority)(error_code_t __code) __CASMNAME_SAME("error_priority");
 #else /* __CRT_HAVE_error_priority */
 #include <libc/local/kos.except/error_priority.h>
 /* Return the priority for a given error code, where exceptions
- * with greater priorities should take the place of ones with
- * lower priorities in situations where multiple simultaneous
+ * with greater priorities should take  the place of ones  with
+ * lower priorities in  situations where multiple  simultaneous
  * errors can't be prevented. */
 __NAMESPACE_LOCAL_USING_OR_IMPL(error_priority, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_CONST __ATTR_WUNUSED unsigned int __NOTHROW(__LIBKCALL error_priority)(error_code_t __code) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(error_priority))(__code); })
 #endif /* !__CRT_HAVE_error_priority */
@@ -189,7 +189,7 @@ __NAMESPACE_LOCAL_USING_OR_IMPL(error_info, __FORCELOCAL __ATTR_ARTIFICIAL __ATT
 #endif /* ... */
 #ifdef __CRT_HAVE_error_unwind
 /* Unwind the given register state to propagate the currently set error.
- * Following this, the returned register state should then be loaded. */
+ * Following this, the  returned register state  should then be  loaded. */
 __LIBC __ATTR_RETNONNULL __ATTR_WUNUSED __ATTR_NONNULL((1)) error_register_state_t *__NOTHROW_NCX(__ERROR_UNWIND_CC error_unwind)(error_register_state_t *__restrict __state) __CASMNAME_SAME("error_unwind");
 #endif /* __CRT_HAVE_error_unwind */
 #endif /* __USE_KOS_KERNEL */

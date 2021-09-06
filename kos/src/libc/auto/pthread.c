@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xdf4e37c */
+/* HASH CRC-32:0x8370b161 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -47,8 +47,8 @@ NOTHROW(LIBCCALL libc_pthread_equal)(pthread_t thr1,
 #include <asm/os/errno.h>
 /* >> pthread_once(3)
  * Guarantee that the initialization function `init_routine' will be called
- * only once, even if pthread_once is executed several times with the
- * same `once_control' argument. `once_control' must point to a static or
+ * only  once,  even if  pthread_once is  executed  several times  with the
+ * same `once_control' argument. `once_control' must  point to a static  or
  * extern variable initialized to `PTHREAD_ONCE_INIT'.
  * @return: EOK: Success */
 INTERN ATTR_SECTION(".text.crt.sched.pthread") NONNULL((1, 2)) errno_t
@@ -126,7 +126,7 @@ NOTHROW_NCX(LIBCCALL libc___pthread_cleanup_routine)(struct __pthread_cleanup_fr
 #include <hybrid/__atomic.h>
 /* >> pthread_spin_init(3)
  * Initialize the spinlock `lock'. If `pshared' is nonzero
- * the spinlock can be shared between different processes
+ * the  spinlock can be shared between different processes
  * @return: EOK: Success */
 INTERN ATTR_SECTION(".text.crt.sched.pthread") NONNULL((1)) errno_t
 NOTHROW_NCX(LIBCCALL libc_pthread_spin_init)(pthread_spinlock_t *lock,
@@ -177,7 +177,7 @@ NOTHROW_NCX(LIBCCALL libc_pthread_spin_trylock)(pthread_spinlock_t *lock) {
 }
 #include <hybrid/__atomic.h>
 /* >> pthread_spin_unlock(3)
- * Release spinlock `lock'
+ * Release  spinlock  `lock'
  * @return: EOK: Success */
 INTERN ATTR_SECTION(".text.crt.sched.pthread") NONNULL((1)) errno_t
 NOTHROW_NCX(LIBCCALL libc_pthread_spin_unlock)(pthread_spinlock_t *lock) {
@@ -186,11 +186,11 @@ NOTHROW_NCX(LIBCCALL libc_pthread_spin_unlock)(pthread_spinlock_t *lock) {
 }
 #include <hybrid/__atomic.h>
 /* >> pthread_key_create_once_np(3)
- * Same as `pthread_key_create()', but the given `key' must be pre-initialized
+ * Same as `pthread_key_create()', but the  given `key' must be  pre-initialized
  * using the static initializer `PTHREAD_ONCE_KEY_NP', whilst this function will
- * make sure that even in the event of multiple simultaneous threads calling
- * this function, only one will create the key, and all others will wait until
- * the key has been created. Once the key was created, further calls to this
+ * make  sure that  even in the  event of multiple  simultaneous threads calling
+ * this function, only one will create the  key, and all others will wait  until
+ * the key has been  created. Once the  key was created,  further calls to  this
  * function will no longer block, but simply return immediately.
  * @return: EOK:    Success
  * @return: ENOMEM: Insufficient memory to create the key */
@@ -273,10 +273,10 @@ NOTHROW_NCX(LIBCCALL libc_pthread_set_num_processors_np)(int n) {
 	return result;
 }
 /* >> pthread_main_np(3)
- * Returns 1 if the calling thread is the main() thread (i.e. the
- * thread that was started by the kernel in order to execute the
- * calling program), and 0 otherwise. Additionally, -1 is returned
- * if the calling thread "hasn't been initialized", though this
+ * Returns  1 if the  calling thread is the  main() thread (i.e. the
+ * thread  that was  started by the  kernel in order  to execute the
+ * calling program), and 0  otherwise. Additionally, -1 is  returned
+ * if the  calling  thread  "hasn't been initialized",  though  this
  * isn't a case that can actually happen under KOS's implementation. */
 INTERN ATTR_SECTION(".text.crt.sched.pthread_ext") ATTR_CONST int
 NOTHROW(LIBCCALL libc_pthread_main_np)(void) {

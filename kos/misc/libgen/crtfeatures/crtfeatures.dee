@@ -817,15 +817,15 @@ final class CParser {
 	public member ignoredMacros: {string...} = HashSet();
 	public member ignoredMacrosPred: {Callable with string...} = List();
 
-	@@All known preprocessor macros, as well as the c-preprocessor
+	@@All known preprocessor macros, as well as the  c-preprocessor
 	@@expression that need to be met in order to have them defined.
 	@@Mapping is: @{macroName: {ppExpr: macroDef}}
 	public member allMacroDefinitions: {string: {string: CMacro}} = Dict();
 
 	@@Same as @allMacroDefinitions, but filter out ignored macro conditionals,
-	@@as well as thereform resulting duplicate macro definitions.
-	@@If the process or removing ignored macros results in ambiguity, emit
-	@@a warning and don't discard ignored macros for that specific macro.
+	@@as   well   as   thereform   resulting   duplicate   macro  definitions.
+	@@If the process  or removing  ignored macros results  in ambiguity,  emit
+	@@a warning  and don't  discard ignored  macros for  that specific  macro.
 	@@s.a. @ignoredMacros
 	@@     @ignoredMacrosPred
 	public property allMacroDefinitionsFiltered: {string: {string: CMacro}} = {
@@ -889,7 +889,7 @@ final class CParser {
 	}
 	private member _allMacroDefinitionsFiltered = none;
 
-	@@Check if a given macro should be ignored when it appears in expression
+	@@Check  if  a given  macro  should be  ignored  when it  appears  in expression
 	@@This causes the macro to be omitted from macro definition condition expression
 	function shouldIgnoreMacro(name: string): bool {
 		if (name in ignoredMacros)
@@ -1129,10 +1129,10 @@ do_ignore_once:
 		}
 	}
 
-	@@Evaluate the current preprocessor expression (@tok[1][1])
+	@@Evaluate  the  current  preprocessor  expression   (@tok[1][1])
 	@@If the expression can be determined under the given assumptions
-	@@and known / known-deleted macros, return @true or @false.
-	@@Otherwise, return a pp-expresion who's evaluation must be
+	@@and known  /  known-deleted  macros, return  @true  or  @false.
+	@@Otherwise,  return  a  pp-expresion  who's  evaluation  must be
 	@@deferred until a later point in time.
 	public function evalutePreprocessorExpression(
 			preprocessorAssumptions: string,

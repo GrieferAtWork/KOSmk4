@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x5746eb7d */
+/* HASH CRC-32:0x9d3753bf */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -25,16 +25,6 @@
 #ifdef __POSIX_SPAWN_USE_KOS
 #include <bits/crt/posix_spawn.h>
 __NAMESPACE_LOCAL_BEGIN
-/* >> posix_spawnattr_setflags(3)
- * Specify the set of additional operations to-be performed by the
- * child process prior to being started. The given `flags' is a set of:
- *   - POSIX_SPAWN_RESETIDS:      Perform 2 calls `seteuid(getuid())' and `setegid(getgid())'
- *   - POSIX_SPAWN_SETSIGDEF:     s.a. posix_spawnattr_setsigdefault(3)
- *   - POSIX_SPAWN_SETSIGMASK:    s.a. posix_spawnattr_setsigmask(3)
- *   - POSIX_SPAWN_SETPGROUP:     s.a. posix_spawnattr_setpgroup(3)
- *   - POSIX_SPAWN_SETSCHEDULER:  s.a. posix_spawnattr_setschedpolicy(3)
- *   - POSIX_SPAWN_SETSCHEDPARAM: s.a. posix_spawnattr_setschedparam(3)
- * @return: 0 : Success */
 __LOCAL_LIBC(posix_spawnattr_setflags) __ATTR_NONNULL((1)) __errno_t
 __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(posix_spawnattr_setflags))(struct __posix_spawnattr *__restrict __attr, short int __flags) {
 	__attr->__flags = (__UINT16_TYPE__)(unsigned short int)__flags;

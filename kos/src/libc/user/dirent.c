@@ -167,10 +167,10 @@ err_null:
 }
 /*[[[end:libc_fdclosedir]]]*/
 
-/*[[[head:libc_rewinddir,hash:CRC-32=0x6779ce77]]]*/
+/*[[[head:libc_rewinddir,hash:CRC-32=0x58c68174]]]*/
 /* >> rewinddir(3)
  * Rewind the given directory stream in such a way that the next call
- * to `readdir(3)' will once again return the first directory entry */
+ * to `readdir(3)' will once again  return the first directory  entry */
 INTERN ATTR_SECTION(".text.crt.fs.dir") NONNULL((1)) void
 NOTHROW_NCX(LIBCCALL libc_rewinddir)(DIR *__restrict dirp)
 /*[[[body:libc_rewinddir]]]*/
@@ -335,13 +335,13 @@ err_null:
 /*[[[impl:libc_readdir64]]]*/
 DEFINE_INTERN_WEAK_ALIAS(libc_readdir64, libc_readdir);
 
-/*[[[head:libc_readdir_r,hash:CRC-32=0xf47e0906]]]*/
+/*[[[head:libc_readdir_r,hash:CRC-32=0xf1a0a0ec]]]*/
 /* >> readdir_r(3), readdir64_r(3)
  * Reentrant version of `readdir(3)'
- * NOTE: This ~reentrant~ version of readdir() is strongly discouraged from being used in KOS, as the
+ * NOTE: This ~reentrant~ version of readdir()  is strongly discouraged from being  used in KOS, as  the
  *       kernel does not impose a limit on the length of a single directory entry name (s.a. 'kreaddir')
  * >> Instead, simply use `readdir()' / `readdir64()', which will automatically (re-)allocate an internal,
- *    per-directory buffer of sufficient size to house any directory entry (s.a.: `READDIR_DEFAULT') */
+ *    per-directory  buffer  of sufficient  size to  house any  directory entry  (s.a.: `READDIR_DEFAULT') */
 INTERN ATTR_SECTION(".text.crt.fs.dir") NONNULL((1, 2, 3)) int
 NOTHROW_RPC(LIBCCALL libc_readdir_r)(DIR *__restrict dirp,
                                      struct dirent *__restrict entry,
@@ -571,13 +571,13 @@ err:
 DEFINE_INTERN_WEAK_ALIAS(libc_kreaddirf64, libc_kreaddirf);
 DEFINE_INTERN_WEAK_ALIAS(libc_kreaddir64, libc_kreaddir);
 
-/*[[[head:libc_kreaddirf,hash:CRC-32=0x4c4aa380]]]*/
+/*[[[head:libc_kreaddirf,hash:CRC-32=0x32514912]]]*/
 /* >> kreaddir(2), kreaddirf(2), kreaddir64(2), kreaddirf64(2)
  * The KOS-specific system call for reading a single directory entry
- * from a file descriptor referring to an open directory stream.
+ * from  a file  descriptor referring  to an  open directory stream.
  * @param: mode: One of `READDIR_*' (See below)
  * @return: * : The actually required buffer size for the directory entry (in bytes)
- *              NOTE: When `READDIR_DEFAULT' was passed for `mode', the directory
+ *              NOTE: When  `READDIR_DEFAULT' was passed for `mode', the directory
  *                    stream will only be advanced when this value is >= 'bufsize'
  * @return: 0 : The end of the directory has been reached.
  * @return: -1: Failed to read a directory entry for some reason (s.a.: `errno') */
@@ -595,13 +595,13 @@ NOTHROW_RPC(LIBCCALL libc_kreaddirf)(fd_t fd,
 }
 /*[[[end:libc_kreaddirf]]]*/
 
-/*[[[head:libc_kreaddir,hash:CRC-32=0x104ab5c4]]]*/
+/*[[[head:libc_kreaddir,hash:CRC-32=0xfc1b6ac9]]]*/
 /* >> kreaddir(2), kreaddirf(2), kreaddir64(2), kreaddirf64(2)
  * The KOS-specific system call for reading a single directory entry
- * from a file descriptor referring to an open directory stream.
+ * from  a file  descriptor referring  to an  open directory stream.
  * @param: mode: One of `READDIR_*' (See below)
  * @return: * : The actually required buffer size for the directory entry (in bytes)
- *              NOTE: When `READDIR_DEFAULT' was passed for `mode', the directory
+ *              NOTE: When  `READDIR_DEFAULT' was passed for `mode', the directory
  *                    stream will only be advanced when this value is >= 'bufsize'
  * @return: 0 : The end of the directory has been reached.
  * @return: -1: Failed to read a directory entry for some reason (s.a.: `errno') */

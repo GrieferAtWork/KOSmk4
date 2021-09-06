@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x18a0f20f */
+/* HASH CRC-32:0x148e42bc */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -24,29 +24,19 @@
 #if defined(__CRT_HAVE_futex_wake) || defined(__CRT_HAVE_lfutex64) || defined(__CRT_HAVE_lfutex)
 #include <bits/types.h>
 __NAMESPACE_LOCAL_BEGIN
-/* Dependency: futex_wake from kos.futex */
 #ifndef __local___localdep_futex_wake_defined
 #define __local___localdep_futex_wake_defined 1
 #ifdef __CRT_HAVE_futex_wake
-/* Wake up to `MAX_WAKE' threads waiting for `*UADDR'
- * @return: * : The number of woken threads
- * @return: -1:EFAULT: A faulty pointer was given */
 __CREDIRECT(__ATTR_NONNULL((1)),__SSIZE_TYPE__,__NOTHROW_NCX,__localdep_futex_wake,(__uintptr_t *__uaddr, __SIZE_TYPE__ __max_wake),futex_wake,(__uaddr,__max_wake))
 #elif defined(__CRT_HAVE_lfutex64) || defined(__CRT_HAVE_lfutex)
 __NAMESPACE_LOCAL_END
 #include <libc/local/kos.futex/futex_wake.h>
 __NAMESPACE_LOCAL_BEGIN
-/* Wake up to `MAX_WAKE' threads waiting for `*UADDR'
- * @return: * : The number of woken threads
- * @return: -1:EFAULT: A faulty pointer was given */
 #define __localdep_futex_wake __LIBC_LOCAL_NAME(futex_wake)
 #else /* ... */
 #undef __local___localdep_futex_wake_defined
 #endif /* !... */
 #endif /* !__local___localdep_futex_wake_defined */
-/* Wake all threads waiting for `*UADDR' (same as `futex_wake(uaddr, (size_t)-1)')
- * @return: * : The number of woken threads
- * @return: -1:EFAULT: A faulty pointer was given */
 __LOCAL_LIBC(futex_wakeall) __ATTR_NONNULL((1)) __SSIZE_TYPE__
 __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(futex_wakeall))(__uintptr_t *__uaddr) {
 	return __localdep_futex_wake(__uaddr, (__SIZE_TYPE__)-1);

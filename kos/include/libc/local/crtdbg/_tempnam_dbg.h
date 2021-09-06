@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xde78b17a */
+/* HASH CRC-32:0x3462736d */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -23,14 +23,11 @@
 #include <__crt.h>
 #if defined(__CRT_HAVE_tempnam) || defined(__CRT_HAVE__tempnam)
 __NAMESPACE_LOCAL_BEGIN
-/* Dependency: tempnam from stdio */
 #ifndef __local___localdep_tempnam_defined
 #define __local___localdep_tempnam_defined 1
 #ifdef __CRT_HAVE_tempnam
-/* >> tempnam(3) */
 __CREDIRECT(__ATTR_MALLOC __ATTR_WUNUSED,char *,__NOTHROW_NCX,__localdep_tempnam,(char const *__dir, char const *__pfx),tempnam,(__dir,__pfx))
 #elif defined(__CRT_HAVE__tempnam)
-/* >> tempnam(3) */
 __CREDIRECT(__ATTR_MALLOC __ATTR_WUNUSED,char *,__NOTHROW_NCX,__localdep_tempnam,(char const *__dir, char const *__pfx),_tempnam,(__dir,__pfx))
 #else /* ... */
 #undef __local___localdep_tempnam_defined

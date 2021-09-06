@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x9d780709 */
+/* HASH CRC-32:0x746f4d53 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -22,28 +22,6 @@
 #define __local_basename_defined 1
 #include <__crt.h>
 __NAMESPACE_LOCAL_BEGIN
-/* >> basename(3)
- * Alternate `basename(3)' function that doesn't modify its `filename' argument
- * For a version that is allowed to modify its argument, but is also allowed to
- * strip trailing slashes, include <libgen.h> instead, which will override this
- * GNU-specific basename() function (you can explicitly make use of this GNU
- * version by doing `#undef basename', or writing `(basename)(filename)', as
- * opposed to `basename(filename)', when both version have been defined)
- * >> basename("/usr/include///"); // Returns ""
- * >> basename("/usr/include/");   // Returns ""
- * >> basename("/usr/include");    // Returns "include"
- * >> basename("/usr/");           // Returns ""
- * >> basename("/usr");            // Returns "usr"
- * >> basename("/");               // Returns ""
- * >> basename("///");             // Returns ""
- * >> basename("foo/bar/");        // Returns ""
- * >> basename("foo/bar");         // Returns "bar"
- * >> basename("foo/");            // Returns ""
- * >> basename("foo");             // Returns "foo"
- * >> basename(".");               // Returns "."
- * >> basename("..");              // Returns ".."
- * >> basename("");                // Returns ""
- * >> basename(NULL);              // <Undefined behavior> */
 __LOCAL_LIBC(basename) __ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1)) char *
 __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(basename))(char const *__filename) {
 	/* char  *slash   =   strrchr(filename,   '/');

@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xc5c224e3 */
+/* HASH CRC-32:0xba87fdc2 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -23,21 +23,17 @@
 #include <__crt.h>
 #include <hybrid/typecore.h>
 __NAMESPACE_LOCAL_BEGIN
-/* Dependency: wcschrnul from wchar */
 #ifndef __local___localdep_wcschrnul_defined
 #define __local___localdep_wcschrnul_defined 1
 #ifdef __CRT_HAVE_wcschrnul
-/* Same as `wcschr', but return `wcsend(str)', rather than `NULL' if `needle' wasn't found. */
 __CREDIRECT(__ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1)),__WCHAR_TYPE__ *,__NOTHROW_NCX,__localdep_wcschrnul,(__WCHAR_TYPE__ const *__haystack, __WCHAR_TYPE__ __needle),wcschrnul,(__haystack,__needle))
 #else /* __CRT_HAVE_wcschrnul */
 __NAMESPACE_LOCAL_END
 #include <libc/local/wchar/wcschrnul.h>
 __NAMESPACE_LOCAL_BEGIN
-/* Same as `wcschr', but return `wcsend(str)', rather than `NULL' if `needle' wasn't found. */
 #define __localdep_wcschrnul __LIBC_LOCAL_NAME(wcschrnul)
 #endif /* !__CRT_HAVE_wcschrnul */
 #endif /* !__local___localdep_wcschrnul_defined */
-/* Same as `wcschrnul', but return the offset from `str', rather than the actual address */
 __LOCAL_LIBC(wcsoff) __ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1)) __SIZE_TYPE__
 __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(wcsoff))(__WCHAR_TYPE__ const *__restrict __haystack, __WCHAR_TYPE__ __needle) {
 	return (__SIZE_TYPE__)(__localdep_wcschrnul(__haystack, __needle) - __haystack);

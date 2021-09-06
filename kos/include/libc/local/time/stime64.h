@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xe2adfb87 */
+/* HASH CRC-32:0x722e664e */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -24,15 +24,10 @@
 #ifdef __CRT_HAVE_stime
 #include <bits/types.h>
 __NAMESPACE_LOCAL_BEGIN
-/* Dependency: stime32 from time */
 #ifndef __local___localdep_stime32_defined
 #define __local___localdep_stime32_defined 1
-/* >> stime(3), stime64(3)
- * Set the system time to `*when'. This call is restricted to the superuser */
 __CREDIRECT(__ATTR_NONNULL((1)),int,__NOTHROW_NCX,__localdep_stime32,(__time32_t const *__when),stime,(__when))
 #endif /* !__local___localdep_stime32_defined */
-/* >> stime(3), stime64(3)
- * Set the system time to `*when'. This call is restricted to the superuser */
 __LOCAL_LIBC(stime64) __ATTR_NONNULL((1)) int
 __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(stime64))(__time64_t const *__when) {
 	__time32_t __tms = (__time32_t)*__when;

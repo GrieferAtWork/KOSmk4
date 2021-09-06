@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xfd1f8843 */
+/* HASH CRC-32:0xbf37f50c */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -25,24 +25,13 @@
 #if defined(__CRT_HAVE_ioctl) && defined(__TCXONC)
 #include <features.h>
 __NAMESPACE_LOCAL_BEGIN
-/* Dependency: ioctl from sys.ioctl */
 #ifndef __local___localdep_ioctl_defined
 #define __local___localdep_ioctl_defined 1
 __NAMESPACE_LOCAL_END
 #include <bits/types.h>
 __NAMESPACE_LOCAL_BEGIN
-/* >> ioctl(2)
- * Perform the I/O control operation specified by `request' on `fd'.
- * Many I/O control operations except an additional argument, though
- * this argument's type and meaning depends on `REQUEST'. If used, it's
- * usually either a pointer to a larger argument structure, or an integer
- * that fits into a single register.
- * @return: * : The return value depends on the given `request'.
- * @return: 0 : A zero return-value usually indicates success.
- * @return: -1: All ioctl operations use this to indicate error (s.a. `errno') */
 __CVREDIRECT(,__STDC_INT_AS_SSIZE_T,__NOTHROW_RPC,__localdep_ioctl,(__fd_t __fd, __ULONGPTR_TYPE__ __request),ioctl,(__fd,__request),__request,1,(void *))
 #endif /* !__local___localdep_ioctl_defined */
-/* @param: action: One of `TCOOFF', `TCOON', `TCIOFF', `TCION' */
 __LOCAL_LIBC(tcflow) int
 __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(tcflow))(__fd_t __fd, __STDC_INT_AS_UINT_T __action) {
 	return (int)__localdep_ioctl(__fd, __TCXONC, __action);

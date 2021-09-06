@@ -124,10 +124,10 @@ $fd_t opendev([[nonnull]] char const *path, $oflag_t oflags,
 @@                    delim[2]: The line-comment character (defaults to '#')
 @@@param: flags:   Set of `FPARSELN_UNESC*'
 @@@return: * :     Pointer to a heap-allocated, and pre-escaped (according to `flags')
-@@                 line, that must be `free(3)'ed by the caller once they are done
+@@                 line,  that must  be `free(3)'ed by  the caller once  they are done
 @@                 using it.
-@@                 If the result would be empty as the result of `feof(stream)' upon
-@@                 return of this function, `strdup("")' will be returned. (i.e. NULL
+@@                 If the result would be empty  as the result of `feof(stream)'  upon
+@@                 return of this function, `strdup("")' will be returned. (i.e.  NULL
 @@                 is only returned in case of an error; _NOT_ in case of end-of-file)
 @@@return: NULL:   Error (s.a. `errno' and `ferror(stream)')
 [[cp, wunused, decl_include("<features.h>", "<hybrid/typecore.h>")]]

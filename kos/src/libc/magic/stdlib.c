@@ -328,7 +328,7 @@ typedef int (__LIBCCALL *__compar_fn_t)(void const *__a, void const *__b);
 
 
 %[define(DEFINE_INVOKE_COMPARE_HELPER =
-@@pp_ifndef __LIBCCALL_CALLER_CLEANUP@@
+@@pp_ifndef         __LIBCCALL_CALLER_CLEANUP@@
 @@pp_ifndef ____invoke_compare_helper_defined@@
 @@push_namespace(local)@@
 #define ____invoke_compare_helper_defined 1
@@ -589,9 +589,9 @@ size_t wcstombs([[nonnull]] char *__restrict dst,
 
 @@>> system(3)
 @@Execute a given `command' on the system interpreter (as in `sh -c $command')
-@@The return value is the exit status after running `command'
+@@The   return   value   is   the   exit   status   after   running  `command'
 @@When `command' is `NULL' only check if a system interpreter is available.
-@@When no system interpreter is available, `127' is returned.
+@@When  no   system   interpreter   is  available,   `127'   is   returned.
 [[cp, std, guard, section(".text.crt{|.dos}.fs.exec.system")]]
 [[impl_include("<asm/os/wait.h>")]]
 [[requires($has_function(shexec) && $has_function(_Exit) &&
@@ -1006,19 +1006,19 @@ __LONGDOUBLE strtold([[nonnull]] char const *__restrict nptr,
 
 @@>> strto32_r(3), strtou32_r(3), strto64_r(3), strtou64_r(3)
 @@Safely parse & return an integer from `nptr', and store any potential
-@@errors in `*error' (if non-NULL). The following errors are defined:
+@@errors in `*error' (if non-NULL).  The following errors are  defined:
 @@ - 0:         Success
 @@ - ECANCELED: Nothing was parsed.
 @@              In this case, `*endptr' is set to the original `nptr'
 @@              (iow: leading spaces are _not_ skipped in `*endptr'),
 @@              and the returned integer is `0'
 @@ - ERANGE:    Integer over- or under-flow while parsing.
-@@              In this case, `*endptr' is still updated correctly, and
-@@              the returned integer is the closest representable value
+@@              In this case, `*endptr' is still updated correctly,  and
+@@              the  returned integer is the closest representable value
 @@              to the integer given in `nptr' (i.e. `U?INTn_(MIN|MAX)')
 @@              This error supercedes `EINVAL' if both conditions apply.
 @@ - EINVAL:    Only when `endptr == NULL': The parsed number is followed
-@@              by at least 1 additional non-whitespace character.
+@@              by   at  least  1  additional  non-whitespace  character.
 @@              The returned integer value is not affected by this error.
 [[kernel, ATTR_LEAF]]
 [[section(".text.crt{|.dos}.unicode.static.convert")]]
@@ -1661,15 +1661,15 @@ __ULONGLONG strtoull_r([[nonnull]] char const *__restrict nptr,
 
 
 @@>> strto32(3), strto64(3), strtou32(3), strtou64(3)
-@@Convert a string (radix=`base') from `nptr' into an integer,
-@@and store a pointer to the end of the number in `*endptr'.
+@@Convert a string  (radix=`base') from `nptr'  into an  integer,
+@@and store a  pointer to  the end  of the  number in  `*endptr'.
 @@If `errno(3)' support is available, integer overflow is handled
 @@by setting `errno=ERANGE', and returning the greatest or lowest
-@@valid integer (`U?INTn_(MIN|MAX))'. (though note that
-@@`endptr' (if non-NULL) is still updated in this case!)
-@@Upon success, `errno' is left unchanged, and the integer repr
-@@of the parsed number is returned. When no integer was parsed,
-@@then `0' is returned, `*endptr' is set to `nptr', but `errno'
+@@valid   integer   (`U?INTn_(MIN|MAX))'.   (though   note   that
+@@`endptr'  (if  non-NULL)  is  still  updated  in  this   case!)
+@@Upon success, `errno' is left  unchanged, and the integer  repr
+@@of the parsed number is  returned. When no integer was  parsed,
+@@then `0' is returned, `*endptr'  is set to `nptr', but  `errno'
 @@will not have been modified.
 @@@return: * :         Success: The parsed integer
 @@@return: 0 :         [*endptr=nptr] error: Nothing was parsed
@@ -1824,7 +1824,7 @@ $int64_t strto64_l([[nonnull]] char const *__restrict nptr,
 [[wunused, dos_only_export_alias("_gcvt")]]
 [[impl_include("<hybrid/floatcore.h>")]]
 char *gcvt(double val, int ndigit, [[nonnull]] char *buf) {
-@@pp_ifndef DBL_NDIGIT_MAX@@
+@@pp_ifndef     DBL_NDIGIT_MAX@@
 @@pp_if __DBL_MANT_DIG__ == 53@@
 #define DBL_NDIGIT_MAX 17
 @@pp_elif __DBL_MANT_DIG__ == 24@@
@@ -1927,7 +1927,7 @@ int fcvt_r(double val, int ndigit,
 [[section(".text.crt{|.dos}.unicode.static.convert")]]
 [[if($extended_include_prefix("<hybrid/typecore.h>")__SIZEOF_LONG_DOUBLE__ == __SIZEOF_DOUBLE__), alias("gcvt", "_gcvt")]]
 char *qgcvt(__LONGDOUBLE val, int ndigit, [[nonnull]] char *buf) {
-@@pp_ifndef LDBG_NDIGIT_MAX@@
+@@pp_ifndef     LDBG_NDIGIT_MAX@@
 @@pp_if __LDBL_MANT_DIG__ == 53@@
 #define LDBG_NDIGIT_MAX 17
 @@pp_elif __LDBL_MANT_DIG__ == 24@@
@@ -2098,11 +2098,11 @@ int clearenv();
 @@>> mkstemps(3), mkstemps64(3)
 @@Replace the last 6 characters of `template_' (which are followed by exactly
 @@`suffixlen' more characters that are left alone), which must be filled with
-@@all 'X'-characters before the call (else errno=EINVAL + return -1), with
-@@random characters such that the filename described by `template_' will not
-@@already exists. Then, create a new file with `O_RDWR' and return the file
+@@all  'X'-characters before the  call (else errno=EINVAL  + return -1), with
+@@random  characters such that the filename described by `template_' will not
+@@already  exists. Then, create a new file  with `O_RDWR' and return the file
 @@descriptor of that file.
-@@@param: suffixlen: The # of trailing characters to-be ignored
+@@@param: suffixlen: The #  of trailing  characters to-be  ignored
 @@                   after the required 6 trailing 'X'-characters.
 [[section(".text.crt{|.dos}.fs.utility")]]
 [[wunused, guard, decl_include("<features.h>", "<bits/types.h>")]]
@@ -2314,10 +2314,10 @@ long a64l([[nonnull]] char const *s) {
 }
 
 @@Load the filesystem location of a given file handle.
-@@This function behaves similar to `readlink()', but will also function for
+@@This  function behaves similar to `readlink()', but will also function for
 @@non-symlink paths, as well as always return an absolute (unambiguous) path
 @@@param: resolved: A buffer of `PATH_MAX' bytes to-be filled with the resulting
-@@                  path, or NULL to automatically `malloc()'ate and return a
+@@                  path, or NULL  to automatically `malloc()'ate  and return  a
 @@                  buffer of sufficient size.
 [[cp, wunused, section(".text.crt{|.dos}.fs.property")]]
 char *realpath([[nonnull]] char const *filename, char *resolved);
@@ -2331,8 +2331,8 @@ char *realpath([[nonnull]] char const *filename, char *resolved);
 % *       same _SOURCE-block as its `realpath()' companion. */
 @@Load the filesystem location of a given file handle.
 @@This function behaves similar to `readlink("/proc/self/fd/%d" % fd)'
-@@NOTE: You may also pass `NULL' for `resolved' to have a buffer of `buflen'
-@@      bytes automatically allocated in the heap, ontop of which you may also
+@@NOTE: You may  also pass  `NULL' for  `resolved' to  have a  buffer of  `buflen'
+@@      bytes  automatically allocated  in the heap,  ontop of which  you may also
 @@      pass `0' for `buflen' to automatically determine the required buffer size.
 [[cp, wunused, section(".text.crt{|.dos}.fs.property")]]
 [[decl_include("<bits/types.h>")]]
@@ -2344,12 +2344,12 @@ char *frealpath($fd_t fd, char *resolved, $size_t buflen);
 @@Load the filesystem location of a given file handle.
 @@This function behaves similar to `readlink("/proc/self/fd/%d" % fd)'
 @@@param flags: Set of `0 | AT_ALTPATH | AT_DOSPATH'
-@@NOTE: You may use `AT_ALTPATH' to cause the path to be printed in alternate
-@@      representation mode. This means that if the path would have normally
+@@NOTE: You  may use `AT_ALTPATH' to cause the  path to be printed in alternate
+@@      representation  mode. This means  that if the  path would have normally
 @@      been printed as a unix path, it would instead be printed as a DOS path.
 @@      Similarly, the reverse also applies.
-@@NOTE: You may also pass `NULL' for `resolved' to have a buffer of `buflen'
-@@      bytes automatically allocated in the heap, ontop of which you may also
+@@NOTE: You may  also pass  `NULL' for  `resolved' to  have a  buffer of  `buflen'
+@@      bytes  automatically allocated  in the heap,  ontop of which  you may also
 @@      pass `0' for `buflen' to automatically determine the required buffer size.
 [[cp, wunused, section(".text.crt{|.dos}.fs.property")]]
 [[decl_include("<bits/types.h>")]]
@@ -2357,14 +2357,14 @@ char *frealpath4($fd_t fd, char *resolved, $size_t buflen, $atflag_t flags);
 
 @@Returns the absolute filesystem path for the specified file
 @@When `AT_SYMLINK_NOFOLLOW' is given, a final symlink is not dereferenced,
-@@causing the path to the symlink itself to be printed. - Otherwise, the
+@@causing the path to  the symlink itself to  be printed. - Otherwise,  the
 @@file pointed to by the symblic link is printed.
-@@NOTE: You may use `AT_ALTPATH' to cause the path to be printed in alternate
-@@      representation mode. This means that if the path would have normally
+@@NOTE: You  may use `AT_ALTPATH' to cause the  path to be printed in alternate
+@@      representation  mode. This means  that if the  path would have normally
 @@      been printed as a unix path, it would instead be printed as a DOS path.
 @@      Similarly, the reverse also applies.
-@@NOTE: You may also pass `NULL' for `resolved' to have a buffer of `buflen'
-@@      bytes automatically allocated in the heap, ontop of which you may also
+@@NOTE: You may  also pass  `NULL' for  `resolved' to  have a  buffer of  `buflen'
+@@      bytes  automatically allocated  in the heap,  ontop of which  you may also
 @@      pass `0' for `buflen' to automatically determine the required buffer size.
 @@@param flags: Set of `0 | AT_ALTPATH | AT_SYMLINK_NOFOLLOW | AT_DOSPATH'
 @@@return: NULL: [errno=ERANGE]: `buflen' is too small to fit the entire path
@@ -2380,12 +2380,12 @@ char *frealpathat($fd_t dirfd, [[nonnull]] char const *filename,
 %     (defined(__USE_XOPEN_EXTENDED) && !defined(__USE_XOPEN2K8)))
 
 @@>> mktemp(3)
-@@Badly designed version of `mkstemp' that won't actually create
+@@Badly designed version of  `mkstemp' that won't actually  create
 @@the temporary file, meaning that by the time the caller tries to
-@@create the file themselves, another process may have already
+@@create the  file themselves,  another process  may have  already
 @@created it.
-@@Also: when no temporary filename can be created, rather than
-@@      returning something sensible like `NULL', this function
+@@Also: when no  temporary filename  can be  created, rather  than
+@@      returning something  sensible like  `NULL', this  function
 @@      will instead set `template_' to an empty string, and still
 @@      re-return it like it would if everything had worked!
 [[section(".text.crt{|.dos}.fs.utility")]]
@@ -2478,9 +2478,9 @@ int getsubopt([[nonnull]] char **__restrict optionp,
 
 
 @@>> mkstemp(3), mkstemp64(3)
-@@Replace the last 6 characters of `template_', which must be filled with
-@@all 'X'-characters before the call (else errno=EINVAL + return -1),
-@@with random characters such that the filename described by `template_'
+@@Replace the last 6 characters of  `template_', which must be filled  with
+@@all  'X'-characters  before the  call  (else errno=EINVAL  +  return -1),
+@@with random characters  such that the  filename described by  `template_'
 @@will not already exists. Then, create a new file with `O_RDWR' and return
 @@the file descriptor of that file.
 [[section(".text.crt{|.dos}.fs.utility")]]
@@ -2505,8 +2505,8 @@ $fd_t mkstemp64([[nonnull]] char *template_) {
 %#ifdef __USE_XOPEN2K8
 @@>> mkdtemp(3)
 @@Replace the last 6 characters of `template_', which must be filled with
-@@all 'X'-characters before the call (else errno=EINVAL + return -1),
-@@with random characters such that the pathname described by `template_'
+@@all  'X'-characters before  the call  (else errno=EINVAL  + return -1),
+@@with random characters such that the pathname described by  `template_'
 @@will not already exists. Then, create a new directory with `mode=0700',
 @@and re-return `template_' to indicate success.
 @@On error, `NULL' will be returned, and the contents of `template_' are undefined.
@@ -2539,7 +2539,7 @@ int unlockpt($fd_t fd) {
 }
 
 @@Returns the name of the PTY slave (Pseudo TTY slave)
-@@associated with the master descriptor `fd'
+@@associated   with   the   master   descriptor   `fd'
 [[section(".text.crt{|.dos}.io.tty")]]
 [[wunused, requires_function(ptsname_r)]]
 [[decl_include("<bits/types.h>")]]
@@ -2561,7 +2561,7 @@ $fd_t posix_openpt($oflag_t oflags);
 
 %#if defined(__USE_GNU) || defined(__USE_NETBSD)
 @@Returns the name of the PTY slave (Pseudo TTY slave)
-@@associated with the master descriptor `fd'
+@@associated   with   the   master   descriptor   `fd'
 [[section(".text.crt{|.dos}.io.tty"), decl_include("<bits/types.h>")]]
 int ptsname_r($fd_t fd, [[nonnull]] char *buf, $size_t buflen);
 %#endif /* __USE_GNU || __USE_NETBSD */
@@ -2800,7 +2800,7 @@ again:
 
 @@pp_if $has_function(open)@@
 	case 0: {
-@@pp_ifdef O_RDWR@@
+@@pp_ifdef    O_RDWR@@
 @@pp_ifdef O_ACCMODE@@
 		flags &= ~O_ACCMODE;
 @@pp_endif@@
@@ -2981,10 +2981,10 @@ void *__NOTHROW_NCX(__LIBCCALL calloc)(__SIZE_TYPE__ __num_bytes) { return (call
 
 @@>> shexec(3)
 @@Execute command with the system interpreter (such as: `/bin/sh -c $command')
-@@This function is used to implement `system(3)' and `popen(3)', and may be
+@@This  function is used  to implement `system(3)' and  `popen(3)', and may be
 @@used to invoke the system interpreter.
 @@This function only returns on failure (similar to exec(2)), and will never
-@@return on success (since in that case, the calling program will have been
+@@return on success (since in that case, the calling program will have  been
 @@replaced by the system shell)
 @@The shell paths attempted by this function are system-dependent, but before
 @@any of them are tested, this function will try to use `getenv("SHELL")', if
@@ -3066,8 +3066,8 @@ typedef int (__LIBKCALL *__fdwalk_func_t)(void *__cookie, __fd_t __fd);
 
 
 @@Enumerate all open file descriptors by invoking `(*func)(cookie, <fd>)' for each of them
-@@If during any of these invocations, `(*func)(...)' returns non-zero, enumeration stops,
-@@and `fdwalk()' returns with that same value. If `(*func)(...)' is never called, or all
+@@If  during any of these invocations, `(*func)(...)' returns non-zero, enumeration stops,
+@@and `fdwalk()' returns with that same value.  If `(*func)(...)' is never called, or  all
 @@invocations return 0, `fdwalk()' will also return 0.
 [[decl_prefix(DEFINE_FDWALK_FUNC_T)]]
 [[requires_include("<asm/os/fcntl.h>")]]
@@ -3159,8 +3159,8 @@ void *reallocf(void *mallptr, $size_t num_bytes) {
 }
 
 @@>> recallocarray(3)
-@@Same as `recallocv(mallptr, new_elem_count, elem_size)', but also ensure that
-@@when `mallptr != NULL', memory pointed to by the old `mallptr...+=old_elem_count*elem_size'
+@@Same   as    `recallocv(mallptr, new_elem_count, elem_size)',   but    also   ensure    that
+@@when `mallptr != NULL', memory pointed to by the old  `mallptr...+=old_elem_count*elem_size'
 @@is explicitly freed to zero (s.a. `freezero()') when reallocation must move the memory block
 [[guard, section(".text.crt{|.dos}.heap.rare_helpers")]]
 [[wunused, ATTR_MALL_DEFAULT_ALIGNED, ATTR_ALLOC_SIZE((3, 4))]]
@@ -3195,9 +3195,9 @@ void *recallocarray(void *mallptr, $size_t old_elem_count,
 }
 
 @@>> freezero(3)
-@@Same as `free(mallptr)', but also ensure that the memory region
+@@Same as  `free(mallptr)', but  also ensure  that the  memory  region
 @@described by `mallptr...+=num_bytes' is explicitly freed to zero, or
-@@immediately returned to the OS, rather than being left in cache
+@@immediately returned  to the  OS, rather  than being  left in  cache
 @@while still containing its previous contents.
 [[section(".text.crt{|.dos}.heap.rare_helpers")]]
 [[userimpl, requires_function(free), guard]]
@@ -3334,7 +3334,7 @@ int sradixsort([[nonnull]] unsigned char const **base, int item_count,
 %#ifdef __LONGLONG
 
 @@>> strtonum(3)
-@@Similar to `strtoi()' with `base=10', but return human-
+@@Similar to `strtoi()'  with `base=10',  but return  human-
 @@readable error messages in `*p_errstr' on error (alongside
 @@`return==0') (or `NULL' on success).
 @@The following messages are defined:
@@ -3448,13 +3448,13 @@ void qsort_r([[nonnull]] void *pbase, $size_t item_count, $size_t item_size,
 
 
 @@>> mkostemp(3), mkostemp64(3)
-@@Replace the last 6 characters of `template_' (which are followed by exactly
-@@`suffixlen' more characters that are left alone), which must be filled with
-@@all 'X'-characters before the call (else errno=EINVAL + return -1), with
-@@random characters such that the filename described by `template_' will not
+@@Replace  the  last 6  characters of  `template_' (which  are followed  by exactly
+@@`suffixlen'  more  characters that  are left  alone), which  must be  filled with
+@@all  'X'-characters  before  the  call  (else  errno=EINVAL  +  return  -1), with
+@@random  characters  such  that the  filename  described by  `template_'  will not
 @@already exists. Then, create a new file with `O_RDWR | flags' and return the file
 @@descriptor of that file.
-@@@param: flags: Additional flags to pass to `open(2)',
+@@@param: flags: Additional  flags  to pass  to `open(2)',
 @@               but `O_ACCMODE' is always set to `O_RDWR'
 [[section(".text.crt{|.dos}.fs.utility")]]
 [[if(defined(__USE_FILE_OFFSET64)), preferred_alias("mkostemp64")]]
@@ -3582,7 +3582,7 @@ void setproctitle(char const *format, ...);
 %#ifdef __LONGLONG
 @@>> strsuftoll(3)
 @@Same as `strsuftollx(3)', but if an error happens, make
-@@use of `errx(3)' to terminate the program, rather than
+@@use of `errx(3)' to terminate the program, rather  than
 @@return to the caller.
 [[wunused, requires_function(errx)]]
 [[impl_include("<asm/os/stdlib.h>")]]

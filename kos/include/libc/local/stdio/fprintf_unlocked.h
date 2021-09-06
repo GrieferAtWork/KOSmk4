@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x2c0bf5a5 */
+/* HASH CRC-32:0x7ae118d2 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -25,32 +25,25 @@
 #include <features.h>
 #include <kos/anno.h>
 __NAMESPACE_LOCAL_BEGIN
-/* Dependency: vfprintf_unlocked from stdio */
 #ifndef __local___localdep_vfprintf_unlocked_defined
 #define __local___localdep_vfprintf_unlocked_defined 1
 #ifdef __CRT_HAVE_vfprintf_unlocked
-/* >> fprintf_unlocked(3), vfprintf_unlocked(3) */
 __CREDIRECT(__ATTR_LIBC_PRINTF(2, 0) __ATTR_NONNULL((1, 2)),__STDC_INT_AS_SSIZE_T,__THROWING,__localdep_vfprintf_unlocked,(__FILE *__restrict __stream, char const *__restrict __format, __builtin_va_list __args),vfprintf_unlocked,(__stream,__format,__args))
 #elif defined(__CRT_HAVE_vfprintf)
-/* >> fprintf_unlocked(3), vfprintf_unlocked(3) */
 __CREDIRECT(__ATTR_LIBC_PRINTF(2, 0) __ATTR_NONNULL((1, 2)),__STDC_INT_AS_SSIZE_T,__THROWING,__localdep_vfprintf_unlocked,(__FILE *__restrict __stream, char const *__restrict __format, __builtin_va_list __args),vfprintf,(__stream,__format,__args))
 #elif defined(__CRT_HAVE_vfprintf_s)
-/* >> fprintf_unlocked(3), vfprintf_unlocked(3) */
 __CREDIRECT(__ATTR_LIBC_PRINTF(2, 0) __ATTR_NONNULL((1, 2)),__STDC_INT_AS_SSIZE_T,__THROWING,__localdep_vfprintf_unlocked,(__FILE *__restrict __stream, char const *__restrict __format, __builtin_va_list __args),vfprintf_s,(__stream,__format,__args))
 #elif defined(__CRT_HAVE__IO_vfprintf)
-/* >> fprintf_unlocked(3), vfprintf_unlocked(3) */
 __CREDIRECT(__ATTR_LIBC_PRINTF(2, 0) __ATTR_NONNULL((1, 2)),__STDC_INT_AS_SSIZE_T,__THROWING,__localdep_vfprintf_unlocked,(__FILE *__restrict __stream, char const *__restrict __format, __builtin_va_list __args),_IO_vfprintf,(__stream,__format,__args))
 #elif defined(__CRT_HAVE_file_printer_unlocked) || defined(__CRT_HAVE_file_printer) || defined(__CRT_HAVE_fwrite_unlocked) || defined(__CRT_HAVE__fwrite_nolock) || defined(__CRT_HAVE_fwrite) || defined(__CRT_HAVE__IO_fwrite) || defined(__CRT_HAVE_fwrite_s) || defined(__CRT_HAVE_fgetc_unlocked) || defined(__CRT_HAVE_getc_unlocked) || (defined(__CRT_HAVE_fgetc) && (!defined(__CRT_DOS) || !defined(__CRT_HAVE__filbuf))) || (defined(__CRT_HAVE_getc) && (!defined(__CRT_DOS) || !defined(__CRT_HAVE__filbuf))) || (defined(__CRT_HAVE__IO_getc) && (!defined(__CRT_DOS) || !defined(__CRT_HAVE__filbuf))) || (defined(__CRT_DOS) && defined(__CRT_HAVE__filbuf)) || defined(__CRT_HAVE_fread) || defined(__CRT_HAVE__IO_fread) || defined(__CRT_HAVE_fread_unlocked) || defined(__CRT_HAVE__fread_nolock)
 __NAMESPACE_LOCAL_END
 #include <libc/local/stdio/vfprintf_unlocked.h>
 __NAMESPACE_LOCAL_BEGIN
-/* >> fprintf_unlocked(3), vfprintf_unlocked(3) */
 #define __localdep_vfprintf_unlocked __LIBC_LOCAL_NAME(vfprintf_unlocked)
 #else /* ... */
 #undef __local___localdep_vfprintf_unlocked_defined
 #endif /* !... */
 #endif /* !__local___localdep_vfprintf_unlocked_defined */
-/* >> fprintf_unlocked(3), vfprintf_unlocked(3) */
 __LOCAL_LIBC(fprintf_unlocked) __ATTR_LIBC_PRINTF(2, 3) __ATTR_NONNULL((1, 2)) __STDC_INT_AS_SSIZE_T
 (__VLIBCCALL __LIBC_LOCAL_NAME(fprintf_unlocked))(__FILE *__restrict __stream, char const *__restrict __format, ...) __THROWS(...) {
 	__STDC_INT_AS_SSIZE_T __result;

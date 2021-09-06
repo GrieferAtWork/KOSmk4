@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x9d757931 */
+/* HASH CRC-32:0x9b1bf549 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -23,37 +23,27 @@
 #include <__crt.h>
 #include <kos/bits/exception_data.h>
 __NAMESPACE_LOCAL_BEGIN
-/* Dependency: rawmemchr from string */
 #ifndef __local___localdep_rawmemchr_defined
 #define __local___localdep_rawmemchr_defined 1
 #ifdef __CRT_HAVE_rawmemchr
-/* >> rawmemchr(3)
- * Same as `memchr' with a search limit of `(size_t)-1' */
 __CREDIRECT(__ATTR_PURE __ATTR_RETNONNULL __ATTR_WUNUSED __ATTR_NONNULL((1)),void *,__NOTHROW_NCX,__localdep_rawmemchr,(void const *__restrict __haystack, int __needle),rawmemchr,(__haystack,__needle))
 #elif defined(__CRT_HAVE___rawmemchr)
-/* >> rawmemchr(3)
- * Same as `memchr' with a search limit of `(size_t)-1' */
 __CREDIRECT(__ATTR_PURE __ATTR_RETNONNULL __ATTR_WUNUSED __ATTR_NONNULL((1)),void *,__NOTHROW_NCX,__localdep_rawmemchr,(void const *__restrict __haystack, int __needle),__rawmemchr,(__haystack,__needle))
 #else /* ... */
 __NAMESPACE_LOCAL_END
 #include <libc/local/string/rawmemchr.h>
 __NAMESPACE_LOCAL_BEGIN
-/* >> rawmemchr(3)
- * Same as `memchr' with a search limit of `(size_t)-1' */
 #define __localdep_rawmemchr __LIBC_LOCAL_NAME(rawmemchr)
 #endif /* !... */
 #endif /* !__local___localdep_rawmemchr_defined */
-/* Dependency: strend from string */
 #ifndef __local___localdep_strend_defined
 #define __local___localdep_strend_defined 1
 #ifdef __CRT_HAVE_strend
-/* Same as `str + strlen(str)' */
 __CREDIRECT(__ATTR_PURE __ATTR_RETNONNULL __ATTR_WUNUSED __ATTR_NONNULL((1)),char *,__NOTHROW_NCX,__localdep_strend,(char const *__restrict __str),strend,(__str))
 #else /* __CRT_HAVE_strend */
 __NAMESPACE_LOCAL_END
 #include <libc/local/string/strend.h>
 __NAMESPACE_LOCAL_BEGIN
-/* Same as `str + strlen(str)' */
 #define __localdep_strend __LIBC_LOCAL_NAME(strend)
 #endif /* !__CRT_HAVE_strend */
 #endif /* !__local___localdep_strend_defined */
@@ -61,9 +51,6 @@ __NAMESPACE_LOCAL_END
 #include <hybrid/host.h>
 #include <kos/except/codes.h>
 __NAMESPACE_LOCAL_BEGIN
-/* Return the name of the given error, or `NULL' if unknown.
- * This name is the same as the `E_*' identifier.
- * E.g.: `error_name(ERROR_CODEOF(E_BADALLOC))' -> "E_BADALLOC" */
 __LOCAL_LIBC(error_name) __ATTR_CONST __ATTR_WUNUSED char const *
 __NOTHROW(__LIBKCALL __LIBC_LOCAL_NAME(error_name))(__error_code_t __code) {
 	__error_class_t __err_class       = ERROR_CLASS(__code);

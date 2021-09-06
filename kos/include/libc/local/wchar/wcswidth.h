@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xab5e67b9 */
+/* HASH CRC-32:0x5f06fd08 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -23,7 +23,6 @@
 #include <__crt.h>
 #include <hybrid/typecore.h>
 __NAMESPACE_LOCAL_BEGIN
-/* Dependency: wcwidth from wchar */
 #ifndef __local___localdep_wcwidth_defined
 #define __local___localdep_wcwidth_defined 1
 #ifdef __CRT_HAVE_wcwidth

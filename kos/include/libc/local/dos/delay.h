@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xe8be8d3f */
+/* HASH CRC-32:0x703ab497 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -23,20 +23,17 @@
 #include <__crt.h>
 #if defined(__CRT_HAVE_usleep) || defined(__CRT_HAVE___crtSleep) || defined(__CRT_HAVE_delay)
 __NAMESPACE_LOCAL_BEGIN
-/* Dependency: usleep from unistd */
 #ifndef __local___localdep_usleep_defined
 #define __local___localdep_usleep_defined 1
 #ifdef __CRT_HAVE_usleep
 __NAMESPACE_LOCAL_END
 #include <bits/types.h>
 __NAMESPACE_LOCAL_BEGIN
-/* Sleep for `useconds' microseconds (1/1.000.000 seconds) */
 __CREDIRECT(,int,__NOTHROW_RPC,__localdep_usleep,(__useconds_t __useconds),usleep,(__useconds))
 #elif defined(__CRT_HAVE___crtSleep) || defined(__CRT_HAVE_delay)
 __NAMESPACE_LOCAL_END
 #include <libc/local/unistd/usleep.h>
 __NAMESPACE_LOCAL_BEGIN
-/* Sleep for `useconds' microseconds (1/1.000.000 seconds) */
 #define __localdep_usleep __LIBC_LOCAL_NAME(usleep)
 #else /* ... */
 #undef __local___localdep_usleep_defined
@@ -45,7 +42,6 @@ __NAMESPACE_LOCAL_BEGIN
 __NAMESPACE_LOCAL_END
 #include <bits/types.h>
 __NAMESPACE_LOCAL_BEGIN
-/* Sleep for `mill' milliseconds (1/1.000 seconds) */
 __LOCAL_LIBC(delay) void
 __NOTHROW_RPC(__LIBCCALL __LIBC_LOCAL_NAME(delay))(unsigned int __mill) {
 	__localdep_usleep((__useconds_t)__mill * 1000);

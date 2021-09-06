@@ -236,7 +236,7 @@ typedef struct di_debuginfo_location_struct {
 		else
 
 /* Helper to break out of a `DI_DEBUGINFO_CU_PARSER_EACHATTR()'
- * loop, whilst keep the parser state consistent and valid. */
+ * loop, whilst  keep the  parser state  consistent and  valid. */
 #define DI_DEBUGINFO_CU_PARSER_EACHATTR_BREAK(attr, self)                              \
 	do {                                                                               \
 		for (;;) {                                                                     \

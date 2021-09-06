@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x704bce64 */
+/* HASH CRC-32:0xe264fd1a */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -23,23 +23,18 @@
 #include <__crt.h>
 #include <hybrid/typecore.h>
 __NAMESPACE_LOCAL_BEGIN
-/* Dependency: mempcpyw from string */
 #ifndef __local___localdep_mempcpyw_defined
 #define __local___localdep_mempcpyw_defined 1
 #ifdef __CRT_HAVE_mempcpyw
-/* Same as `memcpyw', but return `dst + N_WORDS', rather than `dst' */
 __CREDIRECT(__ATTR_LEAF __ATTR_RETNONNULL __ATTR_NONNULL((1, 2)),__UINT16_TYPE__ *,__NOTHROW_NCX,__localdep_mempcpyw,(void *__restrict __dst, void const *__restrict __src, __SIZE_TYPE__ __n_words),mempcpyw,(__dst,__src,__n_words))
 #elif defined(__CRT_HAVE_wmempcpy) && __SIZEOF_WCHAR_T__ == 2
-/* Same as `memcpyw', but return `dst + N_WORDS', rather than `dst' */
 __CREDIRECT(__ATTR_LEAF __ATTR_RETNONNULL __ATTR_NONNULL((1, 2)),__UINT16_TYPE__ *,__NOTHROW_NCX,__localdep_mempcpyw,(void *__restrict __dst, void const *__restrict __src, __SIZE_TYPE__ __n_words),wmempcpy,(__dst,__src,__n_words))
 #elif defined(__CRT_HAVE_DOS$wmempcpy) && defined(__LIBCCALL_IS_LIBDCALL)
-/* Same as `memcpyw', but return `dst + N_WORDS', rather than `dst' */
 __COMPILER_REDIRECT(__LIBC,__ATTR_LEAF __ATTR_RETNONNULL __ATTR_NONNULL((1, 2)),__UINT16_TYPE__ *,__NOTHROW_NCX,__LIBCCALL,__localdep_mempcpyw,(void *__restrict __dst, void const *__restrict __src, __SIZE_TYPE__ __n_words),DOS$wmempcpy,(__dst,__src,__n_words))
 #else /* ... */
 __NAMESPACE_LOCAL_END
 #include <libc/local/string/mempcpyw.h>
 __NAMESPACE_LOCAL_BEGIN
-/* Same as `memcpyw', but return `dst + N_WORDS', rather than `dst' */
 #define __localdep_mempcpyw __LIBC_LOCAL_NAME(mempcpyw)
 #endif /* !... */
 #endif /* !__local___localdep_mempcpyw_defined */

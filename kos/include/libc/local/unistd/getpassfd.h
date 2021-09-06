@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xefbd328d */
+/* HASH CRC-32:0x69c19407 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -25,26 +25,18 @@
 #include <features.h>
 #include <bits/types.h>
 __NAMESPACE_LOCAL_BEGIN
-/* Dependency: close from unistd */
 #ifndef __local___localdep_close_defined
 #define __local___localdep_close_defined 1
 #ifdef __CRT_HAVE_close
-/* >> close(2)
- * Close a given file descriptor/handle `fd' */
 __CREDIRECT(,int,__NOTHROW_NCX,__localdep_close,(__fd_t __fd),close,(__fd))
 #elif defined(__CRT_HAVE__close)
-/* >> close(2)
- * Close a given file descriptor/handle `fd' */
 __CREDIRECT(,int,__NOTHROW_NCX,__localdep_close,(__fd_t __fd),_close,(__fd))
 #elif defined(__CRT_HAVE___close)
-/* >> close(2)
- * Close a given file descriptor/handle `fd' */
 __CREDIRECT(,int,__NOTHROW_NCX,__localdep_close,(__fd_t __fd),__close,(__fd))
 #else /* ... */
 #undef __local___localdep_close_defined
 #endif /* !... */
 #endif /* !__local___localdep_close_defined */
-/* Dependency: free from stdlib */
 #ifndef __local___localdep_free_defined
 #define __local___localdep_free_defined 1
 #if __has_builtin(__builtin_free) && defined(__LIBC_BIND_CRTBUILTINS) && defined(__CRT_HAVE_free)
@@ -57,20 +49,11 @@ __CREDIRECT_VOID(,__NOTHROW_NCX,__localdep_free,(void *__mallptr),cfree,(__mallp
 #undef __local___localdep_free_defined
 #endif /* !... */
 #endif /* !__local___localdep_free_defined */
-/* Dependency: isatty from unistd */
 #ifndef __local___localdep_isatty_defined
 #define __local___localdep_isatty_defined 1
 #ifdef __CRT_HAVE_isatty
-/* >> isatty(2)
- * Check if the given file handle `fd' refers to a TTY
- * @return: 1: Is a tty
- * @return: 0: Not a tty (`errno' was modified, and is usually set to `ENOTTY') */
 __CREDIRECT(__ATTR_WUNUSED,int,__NOTHROW_NCX,__localdep_isatty,(__fd_t __fd),isatty,(__fd))
 #elif defined(__CRT_HAVE__isatty)
-/* >> isatty(2)
- * Check if the given file handle `fd' refers to a TTY
- * @return: 1: Is a tty
- * @return: 0: Not a tty (`errno' was modified, and is usually set to `ENOTTY') */
 __CREDIRECT(__ATTR_WUNUSED,int,__NOTHROW_NCX,__localdep_isatty,(__fd_t __fd),_isatty,(__fd))
 #else /* ... */
 __NAMESPACE_LOCAL_END
@@ -80,17 +63,12 @@ __NAMESPACE_LOCAL_BEGIN
 __NAMESPACE_LOCAL_END
 #include <libc/local/unistd/isatty.h>
 __NAMESPACE_LOCAL_BEGIN
-/* >> isatty(2)
- * Check if the given file handle `fd' refers to a TTY
- * @return: 1: Is a tty
- * @return: 0: Not a tty (`errno' was modified, and is usually set to `ENOTTY') */
 #define __localdep_isatty __LIBC_LOCAL_NAME(isatty)
 #else /* __CRT_HAVE_tcgetattr || (__CRT_HAVE_ioctl && __TCGETA) */
 #undef __local___localdep_isatty_defined
 #endif /* !__CRT_HAVE_tcgetattr && (!__CRT_HAVE_ioctl || !__TCGETA) */
 #endif /* !... */
 #endif /* !__local___localdep_isatty_defined */
-/* Dependency: isprint from ctype */
 #ifndef __local___localdep_isprint_defined
 #define __local___localdep_isprint_defined 1
 #if __has_builtin(__builtin_isprint) && defined(__LIBC_BIND_CRTBUILTINS) && defined(__CRT_HAVE_isprint)
@@ -104,7 +82,6 @@ __NAMESPACE_LOCAL_BEGIN
 #define __localdep_isprint __LIBC_LOCAL_NAME(isprint)
 #endif /* !... */
 #endif /* !__local___localdep_isprint_defined */
-/* Dependency: malloc from stdlib */
 #ifndef __local___localdep_malloc_defined
 #define __local___localdep_malloc_defined 1
 #if __has_builtin(__builtin_malloc) && defined(__LIBC_BIND_CRTBUILTINS) && defined(__CRT_HAVE_malloc)
@@ -126,168 +103,76 @@ __NAMESPACE_LOCAL_BEGIN
 #undef __local___localdep_malloc_defined
 #endif /* !... */
 #endif /* !__local___localdep_malloc_defined */
-/* Dependency: memcmp from string */
 #ifndef __local___localdep_memcmp_defined
 #define __local___localdep_memcmp_defined 1
 #ifdef __CRT_HAVE_memcmp
 __NAMESPACE_LOCAL_END
 #include <hybrid/typecore.h>
 __NAMESPACE_LOCAL_BEGIN
-/* >> memcmp(3)
- * Compare memory buffers and return the difference of the first non-matching byte
- * @return:  < 0: `s1...+=n_bytes'  < `s2...+=n_bytes'
- * @return: == 0: `s1...+=n_bytes' == `s2...+=n_bytes'
- * @return:  > 0: `s1...+=n_bytes'  > `s2...+=n_bytes' */
 __CREDIRECT(__ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1, 2)),int,__NOTHROW_NCX,__localdep_memcmp,(void const *__s1, void const *__s2, __SIZE_TYPE__ __n_bytes),memcmp,(__s1,__s2,__n_bytes))
 #elif defined(__CRT_HAVE_bcmp)
 __NAMESPACE_LOCAL_END
 #include <hybrid/typecore.h>
 __NAMESPACE_LOCAL_BEGIN
-/* >> memcmp(3)
- * Compare memory buffers and return the difference of the first non-matching byte
- * @return:  < 0: `s1...+=n_bytes'  < `s2...+=n_bytes'
- * @return: == 0: `s1...+=n_bytes' == `s2...+=n_bytes'
- * @return:  > 0: `s1...+=n_bytes'  > `s2...+=n_bytes' */
 __CREDIRECT(__ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1, 2)),int,__NOTHROW_NCX,__localdep_memcmp,(void const *__s1, void const *__s2, __SIZE_TYPE__ __n_bytes),bcmp,(__s1,__s2,__n_bytes))
 #else /* ... */
 __NAMESPACE_LOCAL_END
 #include <libc/local/string/memcmp.h>
 __NAMESPACE_LOCAL_BEGIN
-/* >> memcmp(3)
- * Compare memory buffers and return the difference of the first non-matching byte
- * @return:  < 0: `s1...+=n_bytes'  < `s2...+=n_bytes'
- * @return: == 0: `s1...+=n_bytes' == `s2...+=n_bytes'
- * @return:  > 0: `s1...+=n_bytes'  > `s2...+=n_bytes' */
 #define __localdep_memcmp __LIBC_LOCAL_NAME(memcmp)
 #endif /* !... */
 #endif /* !__local___localdep_memcmp_defined */
-/* Dependency: memcpy from string */
 #ifndef __local___localdep_memcpy_defined
 #define __local___localdep_memcpy_defined 1
 #ifdef __CRT_HAVE_memcpy
 __NAMESPACE_LOCAL_END
 #include <hybrid/typecore.h>
 __NAMESPACE_LOCAL_BEGIN
-/* >> memcpy(3)
- * Copy memory between non-overlapping memory blocks.
- * @return: * : Always re-returns `dst' */
 __CREDIRECT(__ATTR_LEAF __ATTR_RETNONNULL __ATTR_NONNULL((1, 2)),void *,__NOTHROW_NCX,__localdep_memcpy,(void *__restrict __dst, void const *__restrict __src, __SIZE_TYPE__ __n_bytes),memcpy,(__dst,__src,__n_bytes))
 #else /* __CRT_HAVE_memcpy */
 __NAMESPACE_LOCAL_END
 #include <libc/local/string/memcpy.h>
 __NAMESPACE_LOCAL_BEGIN
-/* >> memcpy(3)
- * Copy memory between non-overlapping memory blocks.
- * @return: * : Always re-returns `dst' */
 #define __localdep_memcpy __LIBC_LOCAL_NAME(memcpy)
 #endif /* !__CRT_HAVE_memcpy */
 #endif /* !__local___localdep_memcpy_defined */
-/* Dependency: memcpyc from string */
 #ifndef __local___localdep_memcpyc_defined
 #define __local___localdep_memcpyc_defined 1
 #ifdef __CRT_HAVE_memcpyc
 __NAMESPACE_LOCAL_END
 #include <hybrid/typecore.h>
 __NAMESPACE_LOCAL_BEGIN
-/* Copy memory between non-overlapping memory blocks.
- * @return: * : Always re-returns `dst' */
 __CREDIRECT(__ATTR_LEAF __ATTR_RETNONNULL __ATTR_NONNULL((1, 2)),void *,__NOTHROW_NCX,__localdep_memcpyc,(void *__restrict __dst, void const *__restrict __src, __SIZE_TYPE__ __elem_count, __SIZE_TYPE__ __elem_size),memcpyc,(__dst,__src,__elem_count,__elem_size))
 #else /* __CRT_HAVE_memcpyc */
 __NAMESPACE_LOCAL_END
 #include <libc/local/string/memcpyc.h>
 __NAMESPACE_LOCAL_BEGIN
-/* Copy memory between non-overlapping memory blocks.
- * @return: * : Always re-returns `dst' */
 #define __localdep_memcpyc __LIBC_LOCAL_NAME(memcpyc)
 #endif /* !__CRT_HAVE_memcpyc */
 #endif /* !__local___localdep_memcpyc_defined */
-/* Dependency: memset from string */
 #ifndef __local___localdep_memset_defined
 #define __local___localdep_memset_defined 1
 #ifdef __CRT_HAVE_memset
 __NAMESPACE_LOCAL_END
 #include <hybrid/typecore.h>
 __NAMESPACE_LOCAL_BEGIN
-/* >> memset(3)
- * Fill memory with a given byte
- * @return: * : Always re-returns `dst' */
 __CREDIRECT(__ATTR_LEAF __ATTR_RETNONNULL __ATTR_NONNULL((1)),void *,__NOTHROW_NCX,__localdep_memset,(void *__restrict __dst, int __byte, __SIZE_TYPE__ __n_bytes),memset,(__dst,__byte,__n_bytes))
 #else /* __CRT_HAVE_memset */
 __NAMESPACE_LOCAL_END
 #include <libc/local/string/memset.h>
 __NAMESPACE_LOCAL_BEGIN
-/* >> memset(3)
- * Fill memory with a given byte
- * @return: * : Always re-returns `dst' */
 #define __localdep_memset __LIBC_LOCAL_NAME(memset)
 #endif /* !__CRT_HAVE_memset */
 #endif /* !__local___localdep_memset_defined */
-/* Dependency: open from fcntl */
 #ifndef __local___localdep_open_defined
 #define __local___localdep_open_defined 1
 #if defined(__CRT_HAVE_open64) && defined(__USE_FILE_OFFSET64)
-/* >> open(2), open64(2), openat(2), openat64(2)
- * Open a new file handle to the file specified by `filename'
- * When `oflags & O_CREAT', then `mode' specifies the initial
- * file access permissions with which the file should be opened.
- * On KOS, the returned handle can be anything, but is usually one of:
- *   - HANDLE_TYPE_PATH:                   When `O_PATH' was given
- *   - HANDLE_TYPE_BLOCKDEVICE:            For `S_IFBLK' files
- *   - HANDLE_TYPE_CHARACTERDEVICE:        For `S_IFCHR' files (in this case, `O_NOCTTY' gains meaning)
- *   - HANDLE_TYPE_FIFO_USER:              For `S_IFIFO' files
- *   - HANDLE_TYPE_MFILE:                  For `S_IFLNK' files (only when `O_SYMLINK' was given)
- *   - HANDLE_TYPE_ONESHOT_DIRECTORY_FILE: For `S_IFDIR' files from special one-shot directories
- *   - HANDLE_TYPE_FILE:                   For `S_IFREG' and `S_IFDIR' (~normal~) files
- *   - *:                                  Certain filesystem names can literally return anything, such
- *                                         as `/proc/self/fd/1234', which is more like `dup(1234)' */
 __CVREDIRECT(__ATTR_WUNUSED __ATTR_NONNULL((1)),__fd_t,__NOTHROW_RPC,__localdep_open,(char const *__filename, __oflag_t __oflags),open64,(__filename,__oflags),__oflags,1,(__mode_t))
 #elif defined(__CRT_HAVE_open) && !defined(__USE_FILE_OFFSET64)
-/* >> open(2), open64(2), openat(2), openat64(2)
- * Open a new file handle to the file specified by `filename'
- * When `oflags & O_CREAT', then `mode' specifies the initial
- * file access permissions with which the file should be opened.
- * On KOS, the returned handle can be anything, but is usually one of:
- *   - HANDLE_TYPE_PATH:                   When `O_PATH' was given
- *   - HANDLE_TYPE_BLOCKDEVICE:            For `S_IFBLK' files
- *   - HANDLE_TYPE_CHARACTERDEVICE:        For `S_IFCHR' files (in this case, `O_NOCTTY' gains meaning)
- *   - HANDLE_TYPE_FIFO_USER:              For `S_IFIFO' files
- *   - HANDLE_TYPE_MFILE:                  For `S_IFLNK' files (only when `O_SYMLINK' was given)
- *   - HANDLE_TYPE_ONESHOT_DIRECTORY_FILE: For `S_IFDIR' files from special one-shot directories
- *   - HANDLE_TYPE_FILE:                   For `S_IFREG' and `S_IFDIR' (~normal~) files
- *   - *:                                  Certain filesystem names can literally return anything, such
- *                                         as `/proc/self/fd/1234', which is more like `dup(1234)' */
 __CVREDIRECT(__ATTR_WUNUSED __ATTR_NONNULL((1)),__fd_t,__NOTHROW_RPC,__localdep_open,(char const *__filename, __oflag_t __oflags),open,(__filename,__oflags),__oflags,1,(__mode_t))
 #elif defined(__CRT_HAVE__open) && !defined(__USE_FILE_OFFSET64)
-/* >> open(2), open64(2), openat(2), openat64(2)
- * Open a new file handle to the file specified by `filename'
- * When `oflags & O_CREAT', then `mode' specifies the initial
- * file access permissions with which the file should be opened.
- * On KOS, the returned handle can be anything, but is usually one of:
- *   - HANDLE_TYPE_PATH:                   When `O_PATH' was given
- *   - HANDLE_TYPE_BLOCKDEVICE:            For `S_IFBLK' files
- *   - HANDLE_TYPE_CHARACTERDEVICE:        For `S_IFCHR' files (in this case, `O_NOCTTY' gains meaning)
- *   - HANDLE_TYPE_FIFO_USER:              For `S_IFIFO' files
- *   - HANDLE_TYPE_MFILE:                  For `S_IFLNK' files (only when `O_SYMLINK' was given)
- *   - HANDLE_TYPE_ONESHOT_DIRECTORY_FILE: For `S_IFDIR' files from special one-shot directories
- *   - HANDLE_TYPE_FILE:                   For `S_IFREG' and `S_IFDIR' (~normal~) files
- *   - *:                                  Certain filesystem names can literally return anything, such
- *                                         as `/proc/self/fd/1234', which is more like `dup(1234)' */
 __CVREDIRECT(__ATTR_WUNUSED __ATTR_NONNULL((1)),__fd_t,__NOTHROW_RPC,__localdep_open,(char const *__filename, __oflag_t __oflags),_open,(__filename,__oflags),__oflags,1,(__mode_t))
 #elif defined(__CRT_HAVE___open) && !defined(__USE_FILE_OFFSET64)
-/* >> open(2), open64(2), openat(2), openat64(2)
- * Open a new file handle to the file specified by `filename'
- * When `oflags & O_CREAT', then `mode' specifies the initial
- * file access permissions with which the file should be opened.
- * On KOS, the returned handle can be anything, but is usually one of:
- *   - HANDLE_TYPE_PATH:                   When `O_PATH' was given
- *   - HANDLE_TYPE_BLOCKDEVICE:            For `S_IFBLK' files
- *   - HANDLE_TYPE_CHARACTERDEVICE:        For `S_IFCHR' files (in this case, `O_NOCTTY' gains meaning)
- *   - HANDLE_TYPE_FIFO_USER:              For `S_IFIFO' files
- *   - HANDLE_TYPE_MFILE:                  For `S_IFLNK' files (only when `O_SYMLINK' was given)
- *   - HANDLE_TYPE_ONESHOT_DIRECTORY_FILE: For `S_IFDIR' files from special one-shot directories
- *   - HANDLE_TYPE_FILE:                   For `S_IFREG' and `S_IFDIR' (~normal~) files
- *   - *:                                  Certain filesystem names can literally return anything, such
- *                                         as `/proc/self/fd/1234', which is more like `dup(1234)' */
 __CVREDIRECT(__ATTR_WUNUSED __ATTR_NONNULL((1)),__fd_t,__NOTHROW_RPC,__localdep_open,(char const *__filename, __oflag_t __oflags),__open,(__filename,__oflags),__oflags,1,(__mode_t))
 #else /* ... */
 __NAMESPACE_LOCAL_END
@@ -297,135 +182,73 @@ __NAMESPACE_LOCAL_BEGIN
 __NAMESPACE_LOCAL_END
 #include <libc/local/fcntl/open.h>
 __NAMESPACE_LOCAL_BEGIN
-/* >> open(2), open64(2), openat(2), openat64(2)
- * Open a new file handle to the file specified by `filename'
- * When `oflags & O_CREAT', then `mode' specifies the initial
- * file access permissions with which the file should be opened.
- * On KOS, the returned handle can be anything, but is usually one of:
- *   - HANDLE_TYPE_PATH:                   When `O_PATH' was given
- *   - HANDLE_TYPE_BLOCKDEVICE:            For `S_IFBLK' files
- *   - HANDLE_TYPE_CHARACTERDEVICE:        For `S_IFCHR' files (in this case, `O_NOCTTY' gains meaning)
- *   - HANDLE_TYPE_FIFO_USER:              For `S_IFIFO' files
- *   - HANDLE_TYPE_MFILE:                  For `S_IFLNK' files (only when `O_SYMLINK' was given)
- *   - HANDLE_TYPE_ONESHOT_DIRECTORY_FILE: For `S_IFDIR' files from special one-shot directories
- *   - HANDLE_TYPE_FILE:                   For `S_IFREG' and `S_IFDIR' (~normal~) files
- *   - *:                                  Certain filesystem names can literally return anything, such
- *                                         as `/proc/self/fd/1234', which is more like `dup(1234)' */
 #define __localdep_open __LIBC_LOCAL_NAME(open)
 #else /* __CRT_HAVE_open64 || __CRT_HAVE___open64 || __CRT_HAVE_open || __CRT_HAVE__open || __CRT_HAVE___open || (__AT_FDCWD && (__CRT_HAVE_openat64 || __CRT_HAVE_openat)) */
 #undef __local___localdep_open_defined
 #endif /* !__CRT_HAVE_open64 && !__CRT_HAVE___open64 && !__CRT_HAVE_open && !__CRT_HAVE__open && !__CRT_HAVE___open && (!__AT_FDCWD || (!__CRT_HAVE_openat64 && !__CRT_HAVE_openat)) */
 #endif /* !... */
 #endif /* !__local___localdep_open_defined */
-/* Dependency: poll from sys.poll */
 #ifndef __local___localdep_poll_defined
 #define __local___localdep_poll_defined 1
 #ifdef __CRT_HAVE_poll
 __NAMESPACE_LOCAL_END
 #include <bits/os/pollfd.h>
 __NAMESPACE_LOCAL_BEGIN
-/* @param timeout: Timeout in milliseconds (or negative for infinity) */
 __CREDIRECT(__ATTR_NONNULL((1)),int,__NOTHROW_RPC,__localdep_poll,(struct pollfd *__fds, __UINTPTR_TYPE__ __nfds, int __timeout),poll,(__fds,__nfds,__timeout))
 #elif defined(__CRT_HAVE___poll)
 __NAMESPACE_LOCAL_END
 #include <bits/os/pollfd.h>
 __NAMESPACE_LOCAL_BEGIN
-/* @param timeout: Timeout in milliseconds (or negative for infinity) */
 __CREDIRECT(__ATTR_NONNULL((1)),int,__NOTHROW_RPC,__localdep_poll,(struct pollfd *__fds, __UINTPTR_TYPE__ __nfds, int __timeout),__poll,(__fds,__nfds,__timeout))
 #else /* ... */
 #undef __local___localdep_poll_defined
 #endif /* !... */
 #endif /* !__local___localdep_poll_defined */
-/* Dependency: raise from signal */
 #ifndef __local___localdep_raise_defined
 #define __local___localdep_raise_defined 1
 #ifdef __CRT_HAVE_raise
-/* >> raise(3)
- * Raise a signal within the current thread.
- * In a *-theaded process this is same as:
- *   *=multi:  `pthread_kill(pthread_self(), signo)'
- *   *=single: `kill(getpid(), signo)'
- * @return: 0:  Success
- * @return: -1: [errno=EINVAL] The given `signo' is invalid */
 __CREDIRECT(,int,__NOTHROW_NCX,__localdep_raise,(__signo_t __signo),raise,(__signo))
 #elif (defined(__CRT_HAVE_pthread_kill) && (defined(__CRT_HAVE_pthread_self) || defined(__CRT_HAVE_thrd_current))) || (defined(__CRT_HAVE_kill) && (defined(__CRT_HAVE_getpid) || defined(__CRT_HAVE__getpid) || defined(__CRT_HAVE___getpid)))
 __NAMESPACE_LOCAL_END
 #include <libc/local/signal/raise.h>
 __NAMESPACE_LOCAL_BEGIN
-/* >> raise(3)
- * Raise a signal within the current thread.
- * In a *-theaded process this is same as:
- *   *=multi:  `pthread_kill(pthread_self(), signo)'
- *   *=single: `kill(getpid(), signo)'
- * @return: 0:  Success
- * @return: -1: [errno=EINVAL] The given `signo' is invalid */
 #define __localdep_raise __LIBC_LOCAL_NAME(raise)
 #else /* ... */
 #undef __local___localdep_raise_defined
 #endif /* !... */
 #endif /* !__local___localdep_raise_defined */
-/* Dependency: read from unistd */
 #ifndef __local___localdep_read_defined
 #define __local___localdep_read_defined 1
 #ifdef __CRT_HAVE_read
-/* >> read(2)
- * Read up to `bufsize' bytes from `fd' into `buf'
- * When `fd' has the `O_NONBLOCK' flag set, only read as much data as was
- * available at the time the call was made, and throw E_WOULDBLOCK if no data
- * was available at the time.
- * @return: <= bufsize: The actual amount of read bytes
- * @return: 0         : EOF */
 __CREDIRECT(__ATTR_NONNULL((2)),__SSIZE_TYPE__,__NOTHROW_RPC,__localdep_read,(__fd_t __fd, void *__buf, __SIZE_TYPE__ __bufsize),read,(__fd,__buf,__bufsize))
 #elif defined(__CRT_HAVE__read)
-/* >> read(2)
- * Read up to `bufsize' bytes from `fd' into `buf'
- * When `fd' has the `O_NONBLOCK' flag set, only read as much data as was
- * available at the time the call was made, and throw E_WOULDBLOCK if no data
- * was available at the time.
- * @return: <= bufsize: The actual amount of read bytes
- * @return: 0         : EOF */
 __CREDIRECT(__ATTR_NONNULL((2)),__SSIZE_TYPE__,__NOTHROW_RPC,__localdep_read,(__fd_t __fd, void *__buf, __SIZE_TYPE__ __bufsize),_read,(__fd,__buf,__bufsize))
 #elif defined(__CRT_HAVE___read)
-/* >> read(2)
- * Read up to `bufsize' bytes from `fd' into `buf'
- * When `fd' has the `O_NONBLOCK' flag set, only read as much data as was
- * available at the time the call was made, and throw E_WOULDBLOCK if no data
- * was available at the time.
- * @return: <= bufsize: The actual amount of read bytes
- * @return: 0         : EOF */
 __CREDIRECT(__ATTR_NONNULL((2)),__SSIZE_TYPE__,__NOTHROW_RPC,__localdep_read,(__fd_t __fd, void *__buf, __SIZE_TYPE__ __bufsize),__read,(__fd,__buf,__bufsize))
 #else /* ... */
 #undef __local___localdep_read_defined
 #endif /* !... */
 #endif /* !__local___localdep_read_defined */
-/* Dependency: strlen from string */
 #ifndef __local___localdep_strlen_defined
 #define __local___localdep_strlen_defined 1
 #ifdef __CRT_HAVE_strlen
 __NAMESPACE_LOCAL_END
 #include <hybrid/typecore.h>
 __NAMESPACE_LOCAL_BEGIN
-/* >> strlen(3)
- * Return the length of the string in characters (Same as `rawmemlen[...](str, '\0')') */
 __CREDIRECT(__ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1)),__SIZE_TYPE__,__NOTHROW_NCX,__localdep_strlen,(char const *__restrict __str),strlen,(__str))
 #else /* __CRT_HAVE_strlen */
 __NAMESPACE_LOCAL_END
 #include <libc/local/string/strlen.h>
 __NAMESPACE_LOCAL_BEGIN
-/* >> strlen(3)
- * Return the length of the string in characters (Same as `rawmemlen[...](str, '\0')') */
 #define __localdep_strlen __LIBC_LOCAL_NAME(strlen)
 #endif /* !__CRT_HAVE_strlen */
 #endif /* !__local___localdep_strlen_defined */
-/* Dependency: tcgetattr from termios */
 #ifndef __local___localdep_tcgetattr_defined
 #define __local___localdep_tcgetattr_defined 1
 #ifdef __CRT_HAVE_tcgetattr
 __NAMESPACE_LOCAL_END
 #include <bits/os/termios.h>
 __NAMESPACE_LOCAL_BEGIN
-/* >> tcgetattr(3)
- * Get terminal attributes */
 __CREDIRECT(__ATTR_NONNULL((2)),int,__NOTHROW_NCX,__localdep_tcgetattr,(__fd_t __fd, struct termios *__restrict __termios_p),tcgetattr,(__fd,__termios_p))
 #else /* __CRT_HAVE_tcgetattr */
 __NAMESPACE_LOCAL_END
@@ -435,38 +258,28 @@ __NAMESPACE_LOCAL_BEGIN
 __NAMESPACE_LOCAL_END
 #include <libc/local/termios/tcgetattr.h>
 __NAMESPACE_LOCAL_BEGIN
-/* >> tcgetattr(3)
- * Get terminal attributes */
 #define __localdep_tcgetattr __LIBC_LOCAL_NAME(tcgetattr)
 #else /* __CRT_HAVE_ioctl && __TCGETA */
 #undef __local___localdep_tcgetattr_defined
 #endif /* !__CRT_HAVE_ioctl || !__TCGETA */
 #endif /* !__CRT_HAVE_tcgetattr */
 #endif /* !__local___localdep_tcgetattr_defined */
-/* Dependency: tcsetattr from termios */
 #ifndef __local___localdep_tcsetattr_defined
 #define __local___localdep_tcsetattr_defined 1
 #ifdef __CRT_HAVE_tcsetattr
 __NAMESPACE_LOCAL_END
 #include <bits/os/termios.h>
 __NAMESPACE_LOCAL_BEGIN
-/* >> tcsetattr(3)
- * Set terminal attributes
- * @param: optional_actions: One of `TCSANOW', `TCSADRAIN' or `TCSAFLUSH' */
 __CREDIRECT(__ATTR_NONNULL((3)),int,__NOTHROW_NCX,__localdep_tcsetattr,(__fd_t __fd, __STDC_INT_AS_UINT_T __optional_actions, struct termios const *__restrict __termios_p),tcsetattr,(__fd,__optional_actions,__termios_p))
 #elif defined(__CRT_HAVE_ioctl)
 __NAMESPACE_LOCAL_END
 #include <libc/local/termios/tcsetattr.h>
 __NAMESPACE_LOCAL_BEGIN
-/* >> tcsetattr(3)
- * Set terminal attributes
- * @param: optional_actions: One of `TCSANOW', `TCSADRAIN' or `TCSAFLUSH' */
 #define __localdep_tcsetattr __LIBC_LOCAL_NAME(tcsetattr)
 #else /* ... */
 #undef __local___localdep_tcsetattr_defined
 #endif /* !... */
 #endif /* !__local___localdep_tcsetattr_defined */
-/* Dependency: tolower from ctype */
 #ifndef __local___localdep_tolower_defined
 #define __local___localdep_tolower_defined 1
 #if __has_builtin(__builtin_tolower) && defined(__LIBC_BIND_CRTBUILTINS) && defined(__CRT_HAVE_tolower)
@@ -482,7 +295,6 @@ __NAMESPACE_LOCAL_BEGIN
 #define __localdep_tolower __LIBC_LOCAL_NAME(tolower)
 #endif /* !... */
 #endif /* !__local___localdep_tolower_defined */
-/* Dependency: toupper from ctype */
 #ifndef __local___localdep_toupper_defined
 #define __local___localdep_toupper_defined 1
 #if __has_builtin(__builtin_toupper) && defined(__LIBC_BIND_CRTBUILTINS) && defined(__CRT_HAVE_toupper)
@@ -498,35 +310,13 @@ __NAMESPACE_LOCAL_BEGIN
 #define __localdep_toupper __LIBC_LOCAL_NAME(toupper)
 #endif /* !... */
 #endif /* !__local___localdep_toupper_defined */
-/* Dependency: write from unistd */
 #ifndef __local___localdep_write_defined
 #define __local___localdep_write_defined 1
 #ifdef __CRT_HAVE_write
-/* >> write(2)
- * Write up to `bufsize' bytes from `buf' into `fd'
- * When `fd' has the `O_NONBLOCK' flag set, only write as much data
- * as possible at the time the call was made, and throw E_WOULDBLOCK
- * if no data could be written at the time.
- * @return: <= bufsize: The actual amount of written bytes
- * @return: 0         : No more data can be written */
 __CREDIRECT(__ATTR_NONNULL((2)),__SSIZE_TYPE__,__NOTHROW_RPC,__localdep_write,(__fd_t __fd, void const *__buf, __SIZE_TYPE__ __bufsize),write,(__fd,__buf,__bufsize))
 #elif defined(__CRT_HAVE__write)
-/* >> write(2)
- * Write up to `bufsize' bytes from `buf' into `fd'
- * When `fd' has the `O_NONBLOCK' flag set, only write as much data
- * as possible at the time the call was made, and throw E_WOULDBLOCK
- * if no data could be written at the time.
- * @return: <= bufsize: The actual amount of written bytes
- * @return: 0         : No more data can be written */
 __CREDIRECT(__ATTR_NONNULL((2)),__SSIZE_TYPE__,__NOTHROW_RPC,__localdep_write,(__fd_t __fd, void const *__buf, __SIZE_TYPE__ __bufsize),_write,(__fd,__buf,__bufsize))
 #elif defined(__CRT_HAVE___write)
-/* >> write(2)
- * Write up to `bufsize' bytes from `buf' into `fd'
- * When `fd' has the `O_NONBLOCK' flag set, only write as much data
- * as possible at the time the call was made, and throw E_WOULDBLOCK
- * if no data could be written at the time.
- * @return: <= bufsize: The actual amount of written bytes
- * @return: 0         : No more data can be written */
 __CREDIRECT(__ATTR_NONNULL((2)),__SSIZE_TYPE__,__NOTHROW_RPC,__localdep_write,(__fd_t __fd, void const *__buf, __SIZE_TYPE__ __bufsize),__write,(__fd,__buf,__bufsize))
 #else /* ... */
 #undef __local___localdep_write_defined
@@ -545,46 +335,6 @@ __NAMESPACE_LOCAL_END
 #include <asm/os/poll.h>
 #include <libc/strings.h>
 __NAMESPACE_LOCAL_BEGIN
-/* >> getpassfd(3)
- * This function behaves similar to `readpassphrase(3)', but is still
- * quite distinct from that function in how this one behaves, vs. how
- * that other function behaves. In general, this function is a bit more
- * user-friendly, in that it offers more (but different) `flags' to
- * control how the password prompt is generated, with the main advantage
- * of this function being that it implements some "advanced" readline
- * functionality, such as deleting typed characters without relying on
- * the system TTY canonical buffer (which `readpassphrase(3)' needs,
- * since it doesn't include support for _any_ control characters other
- * that CR/LF as indicators to stop reading text)
- * Which of the 2 functions should be used is a matter of taste, but
- * personally, I prefer this one over `readpassphrase(3)'.
- * @param: prompt:  [0..1]      Text-prompt to display to the user, or `NULL'
- * @param: buf:     [0..buflen] Buffer that will receive the user's password.
- *                              When set to `NULL', a dynamically allocated
- *                              buffer will be used and returned.
- * @param: buflen:              Size of `buf' (in characters) (ignored when `buf == NULL')
- * @param: fds:     [0..1]      When non-NULL, an [stdin,stdout,stderr] triple
- *                              of files, used for [read,write,beep] operations.
- *                              When `NULL', try to use `/dev/tty' instead, and
- *                              if that fails, use `STDIN_FILENO,STDERR_FILENO,
- *                              STDERR_FILENO' as final fallback.
- *                              When `GETPASS_NEED_TTY' is set, the function
- *                              will fail with `errno=ENOTTY' if the actually
- *                              used `fds[0]' (iow: stdin) isn't a TTY device
- *                              s.a. `isatty(3)'
- * @param: flags:               Set of `GETPASS_*' flags (from <unistd.h>)
- * @param: timeout_in_seconds:  When non-0, timeout (in seconds) to wait for the
- *                              user to type each character of their password. If
- *                              this timeout expires, fail with `errno=ETIMEDOUT'
- *                              Negative values result in weak undefined behavior.
- * @return: * :   [buf == NULL] Success (dynamically allocated buffer; must be `free(3)'d)
- * @return: buf:                Success
- * @return: NULL: [ETIMEDOUT]   The given `timeout_in_seconds' has expired.
- * @return: NULL: [EINVAL]      `buf' is non-`NULL', but `buflen' is `0'
- * @return: NULL: [ENOTTY]      `GETPASS_NEED_TTY' was given, but not a tty
- * @return: NULL: [ENOMEM]      Insufficient memory
- * @return: NULL: [ENODATA]     End-of-file while reading, and `GETPASS_FAIL_EOF' was set.
- * @return: NULL: [*]           Error */
 __LOCAL_LIBC(getpassfd) __ATTR_WUNUSED char *
 __NOTHROW_RPC(__LIBCCALL __LIBC_LOCAL_NAME(getpassfd))(char const *__prompt, char *__buf, __SIZE_TYPE__ __buflen, __fd_t __fds[3], __STDC_INT_AS_UINT_T __flags, int __timeout_in_seconds) {
 #ifndef __STDIN_FILENO

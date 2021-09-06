@@ -73,7 +73,7 @@ function replaceKeywordsWithMacros(
 @@Enumerate the C-macro definitions from a given @filename
 @@Macros are enumerated as @(macroName: string, macroDecl: string) pairs.
 @@Note that function-like macros are not enumerated
-@@Also note that keyword-style macros already enumerated are
+@@Also  note that keyword-style  macros already enumerated are
 @@automatically replaced with their values, should they appear
 @@in later macros:
 @@> #define FOO 42
@@ -103,7 +103,7 @@ function enumerateMacrosFromFile(filename: string): {(string, string)...} {
 }
 
 @@Same as @enumerateMacrosFromFile, but enumerate multiple files
-@@Note that function also accepts wildcards in filenames!
+@@Note  that  function  also  accepts  wildcards  in  filenames!
 function enumerateMacrosFromFiles(filenames: {string...}): {(string, string)...} {
 	for (local filename: filenames) {
 		if ("*" !in filename && "?" !in filename) {
@@ -122,7 +122,7 @@ function enumerateMacrosFromFiles(filenames: {string...}): {(string, string)...}
 }
 
 @@Convert a macro's expansion value to an integer
-@@If this is impossible, return @none instead
+@@If  this  is impossible,  return  @none instead
 function getMacroIntValue(macroValue: string): int | none {
 again:
 	if (macroValue.endswith(")")) {
@@ -172,7 +172,7 @@ global final REPR_SPLIT_THRESHOLD = 24;
 
 
 @@Parition a given set of @ids into continous segments that
-@@cover all given @ids, and possibly a little bit more.
+@@cover  all given  @ids, and  possibly a  little bit more.
 function parititionIds(ids: {int...}): {(int, int)...} {
 	ids = ids.sorted();
 	local result = [];

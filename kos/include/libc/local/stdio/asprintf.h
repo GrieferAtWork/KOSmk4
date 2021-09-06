@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x2fa70054 */
+/* HASH CRC-32:0x456dc631 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -24,26 +24,19 @@
 #if defined(__CRT_HAVE_vasprintf) || ((defined(__CRT_HAVE_format_aprintf_printer) || defined(__CRT_HAVE_format_aprintf_alloc) || defined(__CRT_HAVE_realloc)) && (defined(__CRT_HAVE_free) || defined(__CRT_HAVE_cfree)))
 #include <features.h>
 __NAMESPACE_LOCAL_BEGIN
-/* Dependency: vasprintf from stdio */
 #ifndef __local___localdep_vasprintf_defined
 #define __local___localdep_vasprintf_defined 1
 #ifdef __CRT_HAVE_vasprintf
-/* >> asprintf(3), vasprintf(3)
- * Print the given `format' into a newly allocated, heap-allocated string which is then stored in `*pstr' */
 __CREDIRECT(__ATTR_LIBC_PRINTF(2, 3) __ATTR_NONNULL((1, 2)),__STDC_INT_AS_SSIZE_T,__NOTHROW_NCX,__localdep_vasprintf,(char **__restrict __pstr, char const *__restrict __format, __builtin_va_list __args),vasprintf,(__pstr,__format,__args))
 #elif (defined(__CRT_HAVE_format_aprintf_printer) || defined(__CRT_HAVE_format_aprintf_alloc) || defined(__CRT_HAVE_realloc)) && (defined(__CRT_HAVE_free) || defined(__CRT_HAVE_cfree))
 __NAMESPACE_LOCAL_END
 #include <libc/local/stdio/vasprintf.h>
 __NAMESPACE_LOCAL_BEGIN
-/* >> asprintf(3), vasprintf(3)
- * Print the given `format' into a newly allocated, heap-allocated string which is then stored in `*pstr' */
 #define __localdep_vasprintf __LIBC_LOCAL_NAME(vasprintf)
 #else /* ... */
 #undef __local___localdep_vasprintf_defined
 #endif /* !... */
 #endif /* !__local___localdep_vasprintf_defined */
-/* >> asprintf(3), vasprintf(3)
- * Print the given `format' into a newly allocated, heap-allocated string which is then stored in `*pstr' */
 __LOCAL_LIBC(asprintf) __ATTR_LIBC_PRINTF(2, 3) __ATTR_NONNULL((1, 2)) __STDC_INT_AS_SSIZE_T
 __NOTHROW_NCX(__VLIBCCALL __LIBC_LOCAL_NAME(asprintf))(char **__restrict __pstr, char const *__restrict __format, ...) {
 	__STDC_INT_AS_SSIZE_T __result;

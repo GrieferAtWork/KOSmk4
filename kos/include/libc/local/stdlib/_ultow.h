@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xde8a9d61 */
+/* HASH CRC-32:0x8b14dea0 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -22,7 +22,6 @@
 #define __local__ultow_defined 1
 #include <__crt.h>
 __NAMESPACE_LOCAL_BEGIN
-/* Dependency: _ultow_s from stdlib */
 #ifndef __local___localdep__ultow_s_defined
 #define __local___localdep__ultow_s_defined 1
 #ifdef __CRT_HAVE__ultow_s

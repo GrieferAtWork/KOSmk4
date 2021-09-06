@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xae5dd798 */
+/* HASH CRC-32:0x57237f3e */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -23,7 +23,6 @@
 #include <__crt.h>
 #include <hybrid/typecore.h>
 __NAMESPACE_LOCAL_BEGIN
-/* Dependency: c32sncasecmp from parts.uchar.string */
 #ifndef __local___localdep_c32sncasecmp_defined
 #define __local___localdep_c32sncasecmp_defined 1
 #if defined(__CRT_HAVE_wcsncasecmp) && __SIZEOF_WCHAR_T__ == 4 && defined(__LIBCCALL_IS_LIBKCALL)

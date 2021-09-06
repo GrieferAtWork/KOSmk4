@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x1c995207 */
+/* HASH CRC-32:0xa9ff62e6 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -23,7 +23,6 @@
 #include <__crt.h>
 #include <hybrid/typecore.h>
 __NAMESPACE_LOCAL_BEGIN
-/* Same as `strnrchr', but return `str - 1', rather than `NULL' if `needle' wasn't found. */
 __LOCAL_LIBC(strnrchrnul) __ATTR_PURE __ATTR_RETNONNULL __ATTR_WUNUSED __ATTR_NONNULL((1)) char *
 __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(strnrchrnul))(char const *__restrict __haystack, int __needle, __SIZE_TYPE__ __maxlen) {
 	char const *__result = __haystack - 1;

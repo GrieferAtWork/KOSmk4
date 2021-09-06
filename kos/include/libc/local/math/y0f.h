@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x12caa653 */
+/* HASH CRC-32:0x9f463f31 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -23,7 +23,6 @@
 #include <__crt.h>
 #if defined(__CRT_HAVE_y0) || defined(__CRT_HAVE___y0)
 __NAMESPACE_LOCAL_BEGIN
-/* Dependency: y0 from math */
 #ifndef __local___localdep_y0_defined
 #define __local___localdep_y0_defined 1
 #if __has_builtin(__builtin_y0) && defined(__LIBC_BIND_CRTBUILTINS) && defined(__CRT_HAVE_y0)

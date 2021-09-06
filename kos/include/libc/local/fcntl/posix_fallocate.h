@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xa24986d0 */
+/* HASH CRC-32:0xa13e8305 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -33,12 +33,10 @@
 #endif /* !__USE_KOS_ALTERATIONS */
 #endif /* !__PIO_OFFSET */
 __NAMESPACE_LOCAL_BEGIN
-/* Dependency: posix_fallocate32 from fcntl */
 #if !defined(__local___localdep_posix_fallocate32_defined) && defined(__CRT_HAVE_posix_fallocate)
 #define __local___localdep_posix_fallocate32_defined 1
 __CREDIRECT(,int,__NOTHROW_NCX,__localdep_posix_fallocate32,(__fd_t __fd, __pos32_t __offset, __pos32_t __length),posix_fallocate,(__fd,__offset,__length))
 #endif /* !__local___localdep_posix_fallocate32_defined && __CRT_HAVE_posix_fallocate */
-/* Dependency: posix_fallocate64 from fcntl */
 #ifndef __local___localdep_posix_fallocate64_defined
 #define __local___localdep_posix_fallocate64_defined 1
 #ifdef __CRT_HAVE_posix_fallocate64

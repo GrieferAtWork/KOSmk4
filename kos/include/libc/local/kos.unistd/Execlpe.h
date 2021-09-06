@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x29a1ac67 */
+/* HASH CRC-32:0x6e3fa15f */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -24,7 +24,6 @@
 #ifdef __CRT_HAVE_Execvpe
 #include <kos/anno.h>
 __NAMESPACE_LOCAL_BEGIN
-/* Dependency: Execvpe from kos.unistd */
 #ifndef __local___localdep_Execvpe_defined
 #define __local___localdep_Execvpe_defined 1
 __NAMESPACE_LOCAL_END
@@ -39,18 +38,11 @@ __NAMESPACE_LOCAL_END
 #endif /* !__USE_DOS_ALTERATIONS */
 #endif /* !__TARGV */
 __NAMESPACE_LOCAL_BEGIN
-/* >> execvpe(3)
- * Replace the calling process with the application image referred to by `file' and
- * execute it's `main()' method, passing the given `argv', and setting `environ' to `envp' */
 __CREDIRECT_VOID(__ATTR_NORETURN __ATTR_NONNULL((1, 2, 3)),__THROWING,__localdep_Execvpe,(char const *__restrict __file, __TARGV, __TENVP),Execvpe,(__file,___argv,___envp))
 #endif /* !__local___localdep_Execvpe_defined */
 __NAMESPACE_LOCAL_END
 #include <parts/redirect-exec.h>
 __NAMESPACE_LOCAL_BEGIN
-/* >> execle(3)
- * Replace the calling process with the application image referred to by `path' / `file'
- * and execute it's `main()' method, passing the list of NULL-terminated `args'-list,
- * and setting `environ' to a `char **' passed after the NULL sentinel */
 __LOCAL_LIBC(Execlpe) __ATTR_NORETURN __ATTR_SENTINEL_O(1) __ATTR_NONNULL((1)) void
 (__VLIBCCALL __LIBC_LOCAL_NAME(Execlpe))(char const *__restrict __file, char const *__args, ...) __THROWS(...) {
 	__REDIRECT_XEXECLE(char, __localdep_Execvpe, __file, __args)

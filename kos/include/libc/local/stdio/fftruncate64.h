@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x3c5ef9f0 */
+/* HASH CRC-32:0x7354b910 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -35,57 +35,37 @@
 #endif /* !__USE_KOS_ALTERATIONS */
 #endif /* !__PIO_OFFSET */
 __NAMESPACE_LOCAL_BEGIN
-/* Dependency: fileno from stdio */
 #ifndef __local___localdep_fileno_defined
 #define __local___localdep_fileno_defined 1
 #if defined(__CRT_HAVE_fileno_unlocked) && defined(__USE_STDIO_UNLOCKED)
-/* >> fileno(3)
- * Return the underlying file descriptor number used by `stream' */
 __CREDIRECT(__ATTR_WUNUSED __ATTR_NONNULL((1)),__fd_t,__NOTHROW_NCX,__localdep_fileno,(__FILE *__restrict __stream),fileno_unlocked,(__stream))
 #elif defined(__CRT_HAVE_fileno)
-/* >> fileno(3)
- * Return the underlying file descriptor number used by `stream' */
 __CREDIRECT(__ATTR_WUNUSED __ATTR_NONNULL((1)),__fd_t,__NOTHROW_NCX,__localdep_fileno,(__FILE *__restrict __stream),fileno,(__stream))
 #elif defined(__CRT_HAVE__fileno)
-/* >> fileno(3)
- * Return the underlying file descriptor number used by `stream' */
 __CREDIRECT(__ATTR_WUNUSED __ATTR_NONNULL((1)),__fd_t,__NOTHROW_NCX,__localdep_fileno,(__FILE *__restrict __stream),_fileno,(__stream))
 #elif defined(__CRT_HAVE_fileno_unlocked)
-/* >> fileno(3)
- * Return the underlying file descriptor number used by `stream' */
 __CREDIRECT(__ATTR_WUNUSED __ATTR_NONNULL((1)),__fd_t,__NOTHROW_NCX,__localdep_fileno,(__FILE *__restrict __stream),fileno_unlocked,(__stream))
 #else /* ... */
 #undef __local___localdep_fileno_defined
 #endif /* !... */
 #endif /* !__local___localdep_fileno_defined */
-/* Dependency: ftruncate64 from unistd */
 #ifndef __local___localdep_ftruncate64_defined
 #define __local___localdep_ftruncate64_defined 1
 #ifdef __CRT_HAVE_ftruncate64
-/* >> ftruncate(2), ftruncate64(2)
- * Truncate the given file `fd' to a length of `length' */
 __CREDIRECT(,int,__NOTHROW_NCX,__localdep_ftruncate64,(__fd_t __fd, __PIO_OFFSET64 __length),ftruncate64,(__fd,__length))
 #elif defined(__CRT_HAVE_ftruncate) && __SIZEOF_OFF32_T__ == __SIZEOF_OFF64_T__
-/* >> ftruncate(2), ftruncate64(2)
- * Truncate the given file `fd' to a length of `length' */
 __CREDIRECT(,int,__NOTHROW_NCX,__localdep_ftruncate64,(__fd_t __fd, __PIO_OFFSET64 __length),ftruncate,(__fd,__length))
 #elif defined(__CRT_HAVE__chsize_s)
-/* >> ftruncate(2), ftruncate64(2)
- * Truncate the given file `fd' to a length of `length' */
 __CREDIRECT(,int,__NOTHROW_NCX,__localdep_ftruncate64,(__fd_t __fd, __PIO_OFFSET64 __length),_chsize_s,(__fd,__length))
 #elif defined(__CRT_HAVE_ftruncate)
 __NAMESPACE_LOCAL_END
 #include <libc/local/unistd/ftruncate64.h>
 __NAMESPACE_LOCAL_BEGIN
-/* >> ftruncate(2), ftruncate64(2)
- * Truncate the given file `fd' to a length of `length' */
 #define __localdep_ftruncate64 __LIBC_LOCAL_NAME(ftruncate64)
 #else /* ... */
 #undef __local___localdep_ftruncate64_defined
 #endif /* !... */
 #endif /* !__local___localdep_ftruncate64_defined */
-/* >> fftruncate64(3)
- * Truncate the given file `stream' to a length of `length' */
 __LOCAL_LIBC(fftruncate64) __ATTR_NONNULL((1)) int
 (__LIBCCALL __LIBC_LOCAL_NAME(fftruncate64))(__FILE *__restrict __stream, __PIO_OFFSET64 __length) __THROWS(...) {
 	int __result = -1;

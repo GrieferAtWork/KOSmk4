@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x4e21b5ed */
+/* HASH CRC-32:0x22e2d6b4 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -26,21 +26,10 @@
 #include <bits/crt/pthreadtypes.h>
 #include <bits/os/timespec.h>
 __NAMESPACE_LOCAL_BEGIN
-/* Dependency: pthread_mutex_reltimedlock32_np from pthread */
 #ifndef __local___localdep_pthread_mutex_reltimedlock32_np_defined
 #define __local___localdep_pthread_mutex_reltimedlock32_np_defined 1
-/* >> pthread_mutex_reltimedlock_np(3), pthread_mutex_reltimedlock64_np(3)
- * Wait until lock becomes available, or specified amount of time has passed
- * @return: EOK:       Success
- * @return: EINVAL:    The given `reltime' is invalid
- * @return: ETIMEDOUT: The given `reltime' has expired */
 __CREDIRECT(__ATTR_WUNUSED __ATTR_NONNULL((1, 2)),__errno_t,__NOTHROW_RPC,__localdep_pthread_mutex_reltimedlock32_np,(__pthread_mutex_t *__restrict __mutex, struct timespec const *__restrict __reltime),pthread_mutex_reltimedlock_np,(__mutex,__reltime))
 #endif /* !__local___localdep_pthread_mutex_reltimedlock32_np_defined */
-/* >> pthread_mutex_reltimedlock_np(3), pthread_mutex_reltimedlock64_np(3)
- * Wait until lock becomes available, or specified amount of time has passed
- * @return: EOK:       Success
- * @return: EINVAL:    The given `reltime' is invalid
- * @return: ETIMEDOUT: The given `reltime' has expired */
 __LOCAL_LIBC(pthread_mutex_reltimedlock64_np) __ATTR_WUNUSED __ATTR_NONNULL((1, 2)) __errno_t
 __NOTHROW_RPC(__LIBCCALL __LIBC_LOCAL_NAME(pthread_mutex_reltimedlock64_np))(__pthread_mutex_t *__restrict __mutex, struct __timespec64 const *__restrict __reltime) {
 	__errno_t __result;

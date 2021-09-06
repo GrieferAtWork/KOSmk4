@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xb68d1023 */
+/* HASH CRC-32:0xaff389fa */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -24,7 +24,6 @@
 #ifdef __CRT_HAVE__fullpath
 #include <hybrid/typecore.h>
 __NAMESPACE_LOCAL_BEGIN
-/* Dependency: _fullpath from stdlib */
 #ifndef __local___localdep__fullpath_defined
 #define __local___localdep__fullpath_defined 1
 __CREDIRECT(,char *,__NOTHROW_RPC,__localdep__fullpath,(char *__buf, char const *__path, __SIZE_TYPE__ __buflen),_fullpath,(__buf,__path,__buflen))

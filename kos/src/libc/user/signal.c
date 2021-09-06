@@ -73,10 +73,10 @@ INTDEF void /*ASMCALL*/ libc_sig_restore(void);
 
 
 
-/*[[[head:libd_raise,hash:CRC-32=0xc08b88d9]]]*/
+/*[[[head:libd_raise,hash:CRC-32=0x2247937f]]]*/
 /* >> raise(3)
  * Raise a signal within the current thread.
- * In a *-theaded process this is same as:
+ * In  a *-theaded process  this is same as:
  *   *=multi:  `pthread_kill(pthread_self(), signo)'
  *   *=single: `kill(getpid(), signo)'
  * @return: 0:  Success
@@ -89,10 +89,10 @@ NOTHROW_NCX(LIBDCALL libd_raise)(signo_t signo)
 }
 /*[[[end:libd_raise]]]*/
 
-/*[[[head:libc_raise,hash:CRC-32=0x4ecd8fe5]]]*/
+/*[[[head:libc_raise,hash:CRC-32=0xbb96ae5]]]*/
 /* >> raise(3)
  * Raise a signal within the current thread.
- * In a *-theaded process this is same as:
+ * In  a *-theaded process  this is same as:
  *   *=multi:  `pthread_kill(pthread_self(), signo)'
  *   *=single: `kill(getpid(), signo)'
  * @return: 0:  Success
@@ -197,8 +197,8 @@ NOTHROW(LIBCCALL libc___p_sys_siglist)(void)
 }
 /*[[[end:libc___p_sys_siglist]]]*/
 
-/*[[[head:libc_sigreturn,hash:CRC-32=0xfebcf9f0]]]*/
-/* Don't call directly. Used internally to resume
+/*[[[head:libc_sigreturn,hash:CRC-32=0x5194db98]]]*/
+/* Don't  call directly. Used internally to resume
  * execution when returning from a signal handler. */
 INTERN ATTR_SECTION(".text.crt.sched.signal") ATTR_NORETURN void
 NOTHROW_NCX(LIBCCALL libc_sigreturn)(struct sigcontext const *scp)
@@ -215,7 +215,7 @@ NOTHROW_NCX(LIBCCALL libc_sigreturn)(struct sigcontext const *scp)
 
 PRIVATE ATTR_SECTION(".bss.crt.sched.signal") sigset_t __sigintr;
 
-/*[[[head:libc_bsd_signal,hash:CRC-32=0xde37059e]]]*/
+/*[[[head:libc_bsd_signal,hash:CRC-32=0x8c366111]]]*/
 /* >> bsd_signal(3)
  * Wrapper for `sigaction(2)' to establish a signal handler as:
  *     >> struct sigaction act, oact
@@ -227,7 +227,7 @@ PRIVATE ATTR_SECTION(".bss.crt.sched.signal") sigset_t __sigintr;
  *     >> if (sigaction(signo, &act, &oact) != 0)
  *     >>     oact.sa_handler = SIG_ERR;
  *     >> return oact.sa_handler;
- *     Where `SIGNALS_WITH_SIGINTERRUPT' is the set of signals for which
+ *     Where `SIGNALS_WITH_SIGINTERRUPT' is the set of signals for  which
  *     `siginterrupt(3)' had last been called with a non-zero `interrupt'
  *     argument
  * @return: * :      The previous signal handler function.
@@ -258,7 +258,7 @@ NOTHROW_NCX(LIBCCALL libc_bsd_signal)(signo_t signo,
 }
 /*[[[end:libc_bsd_signal]]]*/
 
-/*[[[head:libd_bsd_signal,hash:CRC-32=0x7ce60dfa]]]*/
+/*[[[head:libd_bsd_signal,hash:CRC-32=0x1a7cc9f2]]]*/
 /* >> bsd_signal(3)
  * Wrapper for `sigaction(2)' to establish a signal handler as:
  *     >> struct sigaction act, oact
@@ -270,7 +270,7 @@ NOTHROW_NCX(LIBCCALL libc_bsd_signal)(signo_t signo,
  *     >> if (sigaction(signo, &act, &oact) != 0)
  *     >>     oact.sa_handler = SIG_ERR;
  *     >> return oact.sa_handler;
- *     Where `SIGNALS_WITH_SIGINTERRUPT' is the set of signals for which
+ *     Where `SIGNALS_WITH_SIGINTERRUPT' is the set of signals for  which
  *     `siginterrupt(3)' had last been called with a non-zero `interrupt'
  *     argument
  * @return: * :      The previous signal handler function.
@@ -286,15 +286,15 @@ NOTHROW_NCX(LIBDCALL libd_bsd_signal)(signo_t signo,
 
 
 
-/*[[[head:libc_kill,hash:CRC-32=0xdf836e2b]]]*/
+/*[[[head:libc_kill,hash:CRC-32=0x1a67950e]]]*/
 /* >> kill(2)
  * Raise a signal `signo' within the process(es) specified by `pid':
  *   - pid > 0:   Deliver `signo' to a process who's PID matches `pid'.
  *   - pid == 0:  Deliver `signo' to every process within the caller's process group.
- *   - pid == -1: Deliver `signo' to every process the caller has permission to send
+ *   - pid == -1: Deliver  `signo'  to  every process  the  caller has  permission  to send
  *                signals to, with the exception of a process with pid=1 (i.e. `/bin/init')
  *   - pid < -1:  Deliver `signo' to every process within the process group `-pid'
- * @param: signo: The signal number to deliver. When set to `0', no signal is delivered,
+ * @param: signo: The signal number to deliver. When set to `0', no signal is  delivered,
  *                and this function can be used to test if the caller would be allowed to
  *                send signals to the process(es) specified by `pid'
  * @return: 0:    Success
@@ -319,15 +319,15 @@ NOTHROW_NCX(LIBCCALL libc_kill)(pid_t pid,
 #endif /* !__NR_sigprocmask */
 
 
-/*[[[head:libc_sigprocmask,hash:CRC-32=0x4fb0ffa0]]]*/
-/* Change the signal mask for the calling thread. Note that portable
+/*[[[head:libc_sigprocmask,hash:CRC-32=0x45302536]]]*/
+/* Change  the signal mask for the calling thread. Note that portable
  * programs that also make use of multithreading must instead use the
- * pthread-specific `pthread_sigmask()' function instead, as POSIX
- * states that this function behaves undefined in such scenarios.
- * However, on KOS, `pthread_sigmask()' is simply an alias for this
- * function, and `sigprocmask()' always operates thread-local.
- * Note also that on KOS 2 additional functions `getsigmaskptr()'
- * and `setsigmaskptr()' exist, which can be used to get/set the
+ * pthread-specific  `pthread_sigmask()'  function instead,  as POSIX
+ * states that  this function  behaves undefined  in such  scenarios.
+ * However, on KOS, `pthread_sigmask()' is  simply an alias for  this
+ * function,  and  `sigprocmask()'   always  operates   thread-local.
+ * Note also  that on  KOS 2  additional functions  `getsigmaskptr()'
+ * and `setsigmaskptr()'  exist, which  can be  used to  get/set  the
  * address of the signal mask used by the kernel.
  * @param how: One of `SIG_BLOCK', `SIG_UNBLOCK' or `SIG_SETMASK'
  * @return: 0:  Success
@@ -460,9 +460,9 @@ STATIC_ASSERT(sizeof(sigset_t) >= sizeof(void *));
 #define INITIAL_SIGMASKBUF(me)  (me)->pt_emumask
 #endif /* !__LIBC_CONFIG_HAVE_USERPROCMASK */
 
-/*[[[head:libc_getsigmaskptr,hash:CRC-32=0xf709aa6c]]]*/
+/*[[[head:libc_getsigmaskptr,hash:CRC-32=0x46aed0ec]]]*/
 /* >> getsigmaskptr(3)
- * Return the current signal mask pointer.
+ * Return   the   current  signal   mask  pointer.
  * See the documentation of `setsigmaskptr(3)' for
  * what this function is all about.
  * @return: * : A pointer to the calling thread's current signal mask */
@@ -496,13 +496,13 @@ do_legacy_sigprocmask:
 }
 /*[[[end:libc_getsigmaskptr]]]*/
 
-/*[[[head:libc_setsigmaskptr,hash:CRC-32=0x6d635ab4]]]*/
+/*[[[head:libc_setsigmaskptr,hash:CRC-32=0xa9c00d13]]]*/
 /* >> setsigmaskptr(3)
- * Set the current signal mask pointer to `sigmaskptr'
- * This is a kos-specific function that can be used to
- * speed up/replace calls to `sigprocmask()'. But using
+ * Set  the  current  signal  mask  pointer  to `sigmaskptr'
+ * This  is  a kos-specific  function  that can  be  used to
+ * speed up/replace  calls  to  `sigprocmask()'.  But  using
  * this function safely requires knowledge of its underlying
- * semantics. If you're unsure on those, you should instead
+ * semantics. If you're unsure on those, you should  instead
  * just use the portable `sigprocmask()' and forget you ever
  * read this comment :)
  * Example usage:
@@ -574,13 +574,13 @@ do_legacy_sigprocmask:
 }
 /*[[[end:libc_setsigmaskptr]]]*/
 
-/*[[[head:libc_setsigmaskfullptr,hash:CRC-32=0xc730b1a]]]*/
+/*[[[head:libc_setsigmaskfullptr,hash:CRC-32=0x305821b0]]]*/
 /* >> setsigmaskfullptr(3)
- * Same as `setsigmaskptr()', but set a statically allocated, fully
- * filled signal mask as the calling thread's current signal mask.
- * This essentially means that this function can be used to temporarily
- * disable the reception of all signals within the calling thread, thus
- * allowing the thread to run without being interrupted (by another but
+ * Same as  `setsigmaskptr()',  but  set a  statically  allocated,  fully
+ * filled signal  mask  as  the calling  thread's  current  signal  mask.
+ * This essentially means that this  function can be used to  temporarily
+ * disable the reception of all  signals within the calling thread,  thus
+ * allowing the thread to run  without being interrupted (by another  but
  * SIGKILL and SIGSTOP, which can't be masked), until the returned signal
  * mask is restored.
  * >> sigset_t *os;
@@ -622,9 +622,9 @@ do_legacy_sigprocmask:
 /*[[[end:libc_setsigmaskfullptr]]]*/
 
 
-/*[[[head:libc_sigsuspend,hash:CRC-32=0xc9c070c8]]]*/
+/*[[[head:libc_sigsuspend,hash:CRC-32=0x7d1515b8]]]*/
 /* >> sigsuspend(2)
- * Atomically save and set the caller's signal mask to `set', then wait for
+ * Atomically save and  set the caller's  signal mask to  `set', then wait  for
  * one of the contained signals to arrive before restoring the old signal mask.
  * @param: set: The set of signals on which to wait
  * @return: -1: [errno=EINTR] The signal handler for `signo' was executed. */
@@ -642,9 +642,9 @@ NOTHROW_RPC(LIBCCALL libc_sigsuspend)(sigset_t const *set)
 }
 /*[[[end:libc_sigsuspend]]]*/
 
-/*[[[head:libc_sigaction,hash:CRC-32=0x134e7c78]]]*/
+/*[[[head:libc_sigaction,hash:CRC-32=0x42476a3b]]]*/
 /* >> sigaction(2)
- * Get/Set the action that shall be performed when a
+ * Get/Set the  action that  shall  be performed  when  a
  * signal `signo' must be handled by the calling process.
  * This function will modifiy the caller's kernel-space signal handler descriptor,
  * who's shared/unshared behavior between threads is controlled by `CLONE_SIGHAND'
@@ -674,10 +674,10 @@ NOTHROW_NCX(LIBCCALL libc_sigaction)(signo_t signo,
 }
 /*[[[end:libc_sigaction]]]*/
 
-/*[[[head:libc_sigpending,hash:CRC-32=0x1c91f480]]]*/
+/*[[[head:libc_sigpending,hash:CRC-32=0x1ea4539]]]*/
 /* >> sigpending(2)
  * Retrieve the set of signals that are pending
- * in either the calling thread and process
+ * in  either  the calling  thread  and process
  * @return: 0: Success */
 INTERN ATTR_SECTION(".text.crt.sched.signal") NONNULL((1)) int
 NOTHROW_NCX(LIBCCALL libc_sigpending)(sigset_t *__restrict set)
@@ -723,9 +723,9 @@ NOTHROW_RPC(LIBCCALL libc_sigwait)(sigset_t const *__restrict set,
 }
 /*[[[end:libc_sigwait]]]*/
 
-/*[[[head:libc_sigwaitinfo,hash:CRC-32=0xc8432a78]]]*/
+/*[[[head:libc_sigwaitinfo,hash:CRC-32=0x5ddcefd2]]]*/
 /* >> sigwaitinfo(2)
- * Same as `sigsuspend(2)', but write-back extended information in the signal,
+ * Same as `sigsuspend(2)',  but write-back extended  information in the  signal,
  * as it would/has also been passed to a signal handler's second (info) argument.
  * @param: set:  The set of signals on which to wait
  * @param: info: Information about the signal on which to wait.
@@ -810,17 +810,17 @@ NOTHROW_RPC(LIBCCALL libc_sigtimedwait64)(sigset_t const *__restrict set,
 #endif /* MAGIC:alias */
 /*[[[end:libc_sigtimedwait64]]]*/
 
-/*[[[head:libc_sigqueue,hash:CRC-32=0x26e533e8]]]*/
+/*[[[head:libc_sigqueue,hash:CRC-32=0x60844282]]]*/
 /* >> sigqueue(2)
- * Similar to `kill(2)', but `pid' must be positive and reference a process's PID,
+ * Similar to  `kill(2)',  but  `pid'  must  be positive  and  reference  a  process's  PID,
  * meaning that this function can only be uesd to send a signal to single, specific process.
  * @param: pid:   The PID of the process that shall receive the signal.
- * @param: signo: The signal number to deliver. When set to `0', no signal is delivered,
+ * @param: signo: The signal number to deliver. When set to `0', no signal is  delivered,
  *                and this function can be used to test if the caller would be allowed to
  *                send signals to the process(es) specified by `pid'
  * @param: val:   An additional value to pass alongside the signal itself. This value can
  *                read as `info->si_value' from within a 3-arg signal handler established
- *                by `pid', or may also be returned by a call to `sigwaitinfo(2)' and
+ *                by `pid', or  may also be  returned by a  call to `sigwaitinfo(2)'  and
  *                friends made by `pid'.
  * @return: 0:    Success
  * @return: -1:   [errno=EINVAL] The given `signo' is invalid
@@ -840,15 +840,15 @@ NOTHROW_NCX(LIBCCALL libc_sigqueue)(pid_t pid,
 }
 /*[[[end:libc_sigqueue]]]*/
 
-/*[[[head:libc_sigqueueinfo,hash:CRC-32=0x7b4d788f]]]*/
+/*[[[head:libc_sigqueueinfo,hash:CRC-32=0xbbf4d0ea]]]*/
 /* >> sigqueueinfo(2)
- * Similar to `sigqueue(2)', but instead of only being able to specify a custom
- * signal value, everything about signal meta-data can be specified by this function.
- * Note however that various privileges are required to provide custom values for
+ * Similar to  `sigqueue(2)',  but  instead  of  only being  able  to  specify  a  custom
+ * signal  value, everything  about signal meta-data  can be specified  by this function.
+ * Note however  that  various privileges  are  required  to provide  custom  values  for
  * different values of `uinfo' that don't match what the equivalent call to `sigqueue(2)'
  * would have used.
  * @param: pid:   The PID of the process that shall receive the signal.
- * @param: signo: The signal number to deliver. When set to `0', no signal is delivered,
+ * @param: signo: The signal number to deliver. When set to `0', no signal is  delivered,
  *                and this function can be used to test if the caller would be allowed to
  *                send signals to the process(es) specified by `pid'
  * @param: uinfo: Signal information to pass alongside the signal itself.
@@ -872,12 +872,12 @@ NOTHROW_NCX(LIBCCALL libc_sigqueueinfo)(pid_t pid,
 }
 /*[[[end:libc_sigqueueinfo]]]*/
 
-/*[[[head:libc_tgsigqueueinfo,hash:CRC-32=0x464eb3cd]]]*/
+/*[[[head:libc_tgsigqueueinfo,hash:CRC-32=0x3077d25e]]]*/
 /* >> tgsigqueueinfo(2)
- * Similar to `sigqueueinfo(2)', rather than sending a signal to a process
+ * Similar  to `sigqueueinfo(2)', rather than sending a signal to a process
  * as a whole, only send the signal to a single thread within that process.
  * @param: pid:   The PID of the process that shall receive the signal.
- * @param: signo: The signal number to deliver. When set to `0', no signal is delivered,
+ * @param: signo: The signal number to deliver. When set to `0', no signal is  delivered,
  *                and this function can be used to test if the caller would be allowed to
  *                send signals to the process(es) specified by `pid'
  * @param: uinfo: Signal information to pass alongside the signal itself.
@@ -903,13 +903,13 @@ NOTHROW_NCX(LIBCCALL libc_tgsigqueueinfo)(pid_t pid,
 }
 /*[[[end:libc_tgsigqueueinfo]]]*/
 
-/*[[[head:libc_siginterrupt,hash:CRC-32=0x235b7f05]]]*/
+/*[[[head:libc_siginterrupt,hash:CRC-32=0x18f58b8f]]]*/
 /* >> siginterrupt(3)
  * Set the `SA_RESTART' of the already-established signal handler for `signo',
  * as well as cause any future handler established by `bsd_signal()' or one of
  * its aliases to immediately be established with `SA_RESTART' set/cleared
  * @param: interrupt: When == 0: clear `SA_RESTART' for the signal handler of `signo'
- *                    When != 0: set `SA_RESTART' for the signal handler of `signo'
+ *                    When != 0: set `SA_RESTART'  for the signal handler of  `signo'
  * @return: 0:  Success
  * @return: -1: [errno=EINVAL] The given `signo' is invalid */
 INTERN ATTR_SECTION(".text.crt.sched.signal") int
@@ -935,10 +935,10 @@ err:
 }
 /*[[[end:libc_siginterrupt]]]*/
 
-/*[[[head:libc_sigaltstack,hash:CRC-32=0x46a3cdb5]]]*/
+/*[[[head:libc_sigaltstack,hash:CRC-32=0x732220e5]]]*/
 /* >> sigaltstack(2)
  * Get/Set the alternate signal stack for the calling thread. When set,
- * the alternate signal stack can be used to host signal handlers that
+ * the alternate signal stack can be used to host signal handlers  that
  * have been established with the `SA_ONSTACK' flag in `sa_flags'.
  * @return: 0:  Success
  * @return: -1: Error (s.a. `errno') */
@@ -975,16 +975,16 @@ NOTHROW_NCX(LIBCCALL libc_pthread_kill)(pthread_t pthread,
 }
 /*[[[end:libc_pthread_kill]]]*/
 
-/*[[[head:libc_pthread_sigqueue,hash:CRC-32=0x7bae824f]]]*/
+/*[[[head:libc_pthread_sigqueue,hash:CRC-32=0x9c00ca3b]]]*/
 /* >> pthread_sigqueue(3)
- * This function is for `pthread_kill(3)', what `sigqueue(2)' is for `kill(2)',
+ * This function is for `pthread_kill(3)', what `sigqueue(2)' is for  `kill(2)',
  * in that it sends a signal to `pthread', alongside a custom signal value `val'
- * @param: signo: The signal number to deliver. When set to `0', no signal is delivered,
+ * @param: signo: The signal number to deliver. When set to `0', no signal is  delivered,
  *                and this function can be used to test if the caller would be allowed to
  *                send signals to the process(es) specified by `pid'
  * @param: val:   An additional value to pass alongside the signal itself. This value can
  *                read as `info->si_value' from within a 3-arg signal handler established
- *                by `pid', or may also be returned by a call to `sigwaitinfo(2)' and
+ *                by `pid', or  may also be  returned by a  call to `sigwaitinfo(2)'  and
  *                friends made by `pid'.
  * @return: EOK:    Success
  * @return: EINVAL: The given `signo' is invalid

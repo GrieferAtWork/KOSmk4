@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xc2fdec1b */
+/* HASH CRC-32:0x927a9257 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -27,46 +27,31 @@ typedef int (__LIBCCALL *__compar_fn_t)(void const *__a, void const *__b);
 #endif /* !____compar_fn_t_defined */
 #include <hybrid/typecore.h>
 __NAMESPACE_LOCAL_BEGIN
-/* Dependency: lfind from search */
 #ifndef __local___localdep_lfind_defined
 #define __local___localdep_lfind_defined 1
 #ifdef __CRT_HAVE_lfind
 __NAMESPACE_LOCAL_END
 #include <features.h>
 __NAMESPACE_LOCAL_BEGIN
-/* >> lfind(3)
- * Perform linear search for `key' by comparing by `compar' in an array [base, base+nmemb*size) */
 __CREDIRECT(__ATTR_NONNULL((2, 3, 5)),void *,__NOTHROW_NCX,__localdep_lfind,(void const *__key, void const *__base, __SIZE_TYPE__ __KOS_FIXED_CONST *__nmemb, __SIZE_TYPE__ __size, __compar_fn_t __compar),lfind,(__key,__base,__nmemb,__size,__compar))
 #else /* __CRT_HAVE_lfind */
 __NAMESPACE_LOCAL_END
 #include <libc/local/search/lfind.h>
 __NAMESPACE_LOCAL_BEGIN
-/* >> lfind(3)
- * Perform linear search for `key' by comparing by `compar' in an array [base, base+nmemb*size) */
 #define __localdep_lfind __LIBC_LOCAL_NAME(lfind)
 #endif /* !__CRT_HAVE_lfind */
 #endif /* !__local___localdep_lfind_defined */
-/* Dependency: memcpy from string */
 #ifndef __local___localdep_memcpy_defined
 #define __local___localdep_memcpy_defined 1
 #ifdef __CRT_HAVE_memcpy
-/* >> memcpy(3)
- * Copy memory between non-overlapping memory blocks.
- * @return: * : Always re-returns `dst' */
 __CREDIRECT(__ATTR_LEAF __ATTR_RETNONNULL __ATTR_NONNULL((1, 2)),void *,__NOTHROW_NCX,__localdep_memcpy,(void *__restrict __dst, void const *__restrict __src, __SIZE_TYPE__ __n_bytes),memcpy,(__dst,__src,__n_bytes))
 #else /* __CRT_HAVE_memcpy */
 __NAMESPACE_LOCAL_END
 #include <libc/local/string/memcpy.h>
 __NAMESPACE_LOCAL_BEGIN
-/* >> memcpy(3)
- * Copy memory between non-overlapping memory blocks.
- * @return: * : Always re-returns `dst' */
 #define __localdep_memcpy __LIBC_LOCAL_NAME(memcpy)
 #endif /* !__CRT_HAVE_memcpy */
 #endif /* !__local___localdep_memcpy_defined */
-/* >> lsearch(3)
- * Perform linear search for `key' by comparing by `compar' function
- * in array [base, base+nmemb*size) and insert entry if not found */
 __LOCAL_LIBC(lsearch) __ATTR_NONNULL((2, 3, 5)) void *
 __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(lsearch))(void const *__key, void *__base, __SIZE_TYPE__ *__nmemb, __SIZE_TYPE__ __size, __compar_fn_t __compar) {
 	void *__result;

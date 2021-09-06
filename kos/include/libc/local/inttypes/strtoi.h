@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x1ff2f0b5 */
+/* HASH CRC-32:0xf4af706c */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -24,7 +24,6 @@
 #include <features.h>
 #include <bits/types.h>
 __NAMESPACE_LOCAL_BEGIN
-/* Dependency: strtoimax_r from inttypes */
 #ifndef __local___localdep_strtoimax_r_defined
 #define __local___localdep_strtoimax_r_defined 1
 __NAMESPACE_LOCAL_END
@@ -54,17 +53,6 @@ __NAMESPACE_LOCAL_BEGIN
 __NAMESPACE_LOCAL_END
 #include <libc/errno.h>
 __NAMESPACE_LOCAL_BEGIN
-/* >> strtoi(3), strtou(3), strtoi_l(3), strtou_l(3)
- * Safely convert `nptr' to an integer which is then returned.
- * If no integer could be read, set `*rstatus' (if non-`NULL')
- * to `ECANCELED'. If non-`NULL', `*endptr' is made to point
- * past the read integer, and if it points to a non-'\0'-
- * character, `*rstatus' (if non-`NULL') is set to `ENOTSUP'.
- * Also make sure that the returned integer lies within the
- * bounds of `[lo,hi]' (inclusively). If it does not, clamp it
- * to those bounds and set `*rstatus' (if non-`NULL') to `ERANGE'
- * @param: lo, hi:  Lo/Hi-bounds for the to-be returned integer.
- * @param: rstatus: When non-`NULL', set to a conversion error (if any) */
 __LOCAL_LIBC(strtoi) __ATTR_LEAF __ATTR_NONNULL((1)) __INTMAX_TYPE__
 __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(strtoi))(char const *__restrict __nptr, char **__restrict __endptr, __STDC_INT_AS_UINT_T __base, __INTMAX_TYPE__ __lo, __INTMAX_TYPE__ __hi, __errno_t *__rstatus) {
 	char *__used_endptr;

@@ -808,7 +808,7 @@ for (local name: classes.keys.sorted()) {
 
 %struct __siginfo_struct;
 @@Transform the given exception into a posix signal.
-@@If doing this is possible, fill in `*result' and return `true'.
+@@If   doing  this  is   possible,  fill  in   `*result'  and  return  `true'.
 @@Otherwise, `*result' is left in an undefined state, and `false' is returned.
 [[wunused, kernel, no_crt_dos_wrapper, cc(LIBKCALL)]]
 [[decl_prefix(struct exception_data;)]]
@@ -1008,7 +1008,7 @@ $bool error_as_signal([[nonnull]] struct exception_data const *__restrict self,
 
 
 @@Return the name of the given error, or `NULL' if unknown.
-@@This name is the same as the `E_*' identifier.
+@@This  name  is   the  same  as   the  `E_*'   identifier.
 @@E.g.: `error_name(ERROR_CODEOF(E_BADALLOC))' -> "E_BADALLOC"
 [[kernel, no_crt_dos_wrapper, cc(LIBKCALL)]]
 [[wunused, const, nothrow, decl_include("<kos/bits/exception_data.h>")]]
@@ -1293,8 +1293,8 @@ non_linear_prefix:
 
 
 @@Return the priority for a given error code, where exceptions
-@@with greater priorities should take the place of ones with
-@@lower priorities in situations where multiple simultaneous
+@@with greater priorities should take  the place of ones  with
+@@lower priorities in  situations where multiple  simultaneous
 @@errors can't be prevented.
 [[kernel, no_crt_dos_wrapper, cc(LIBKCALL)]]
 [[wunused, const, nothrow]]
@@ -1329,7 +1329,7 @@ struct exception_info *error_info(void) {
 }
 
 @@Unwind the given register state to propagate the currently set error.
-@@Following this, the returned register state should then be loaded.
+@@Following this, the  returned register state  should then be  loaded.
 [[kernel, no_crt_dos_wrapper, cc(__ERROR_UNWIND_CC)]]
 [[wunused, nonnull, decl_include("<kos/bits/except.h>")]]
 [[decl_prefix(

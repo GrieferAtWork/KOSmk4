@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x402841d6 */
+/* HASH CRC-32:0xdb9a93 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -24,12 +24,10 @@
 #include <libc/local/environ.h>
 #if (defined(__CRT_HAVE_getenv) || defined(__LOCAL_environ)) && defined(__CRT_HAVE__putenv_s)
 __NAMESPACE_LOCAL_BEGIN
-/* Dependency: dos_putenv_s from stdlib */
 #ifndef __local___localdep_dos_putenv_s_defined
 #define __local___localdep_dos_putenv_s_defined 1
 __CREDIRECT(__ATTR_NONNULL((1, 2)),int,__NOTHROW_NCX,__localdep_dos_putenv_s,(char const *__varname, char const *__val),_putenv_s,(__varname,__val))
 #endif /* !__local___localdep_dos_putenv_s_defined */
-/* Dependency: getenv from stdlib */
 #ifndef __local___localdep_getenv_defined
 #define __local___localdep_getenv_defined 1
 #ifdef __CRT_HAVE_getenv

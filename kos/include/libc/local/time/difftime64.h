@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xed9ed752 */
+/* HASH CRC-32:0x1b6c2985 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -23,23 +23,16 @@
 #include <__crt.h>
 #include <bits/types.h>
 __NAMESPACE_LOCAL_BEGIN
-/* Dependency: difftime32 from time */
 #ifndef __local___localdep_difftime32_defined
 #define __local___localdep_difftime32_defined 1
 #ifdef __CRT_HAVE_difftime
-/* >> difftime(3), difftime64(3)
- * Return the difference between `time1' and `time0' */
 __CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,double,__NOTHROW,__localdep_difftime32,(__time32_t __time1, __time32_t __time0),difftime,(__time1,__time0))
 #elif defined(__CRT_HAVE__difftime32)
-/* >> difftime(3), difftime64(3)
- * Return the difference between `time1' and `time0' */
 __CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,double,__NOTHROW,__localdep_difftime32,(__time32_t __time1, __time32_t __time0),_difftime32,(__time1,__time0))
 #else /* ... */
 #undef __local___localdep_difftime32_defined
 #endif /* !... */
 #endif /* !__local___localdep_difftime32_defined */
-/* >> difftime(3), difftime64(3)
- * Return the difference between `time1' and `time0' */
 __LOCAL_LIBC(difftime64) __ATTR_CONST __ATTR_WUNUSED double
 __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(difftime64))(__time64_t __time1, __time64_t __time0) {
 

@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x9fae5b26 */
+/* HASH CRC-32:0xfd8e02d */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -23,7 +23,6 @@
 #include <__crt.h>
 #if defined(__CRT_HAVE_lgamma) || defined(__CRT_HAVE_gamma) || defined(__CRT_HAVE___lgamma) || defined(__CRT_HAVE___gamma)
 __NAMESPACE_LOCAL_BEGIN
-/* Dependency: lgamma from math */
 #ifndef __local___localdep_lgamma_defined
 #define __local___localdep_lgamma_defined 1
 #if __has_builtin(__builtin_lgamma) && defined(__LIBC_BIND_CRTBUILTINS) && defined(__CRT_HAVE_lgamma)

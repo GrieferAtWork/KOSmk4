@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x76a059e0 */
+/* HASH CRC-32:0xf5fc1347 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -36,7 +36,7 @@ DECL_BEGIN
 #include <bits/os/sigset.h>
 /* >> sigblock(3)
  * Deprecated method of SIG_BLOCK-ing a given set of signals.
- * Modern code should use `sigprocmask()' instead.
+ * Modern   code   should   use   `sigprocmask()'    instead.
  * @return: 0: Success */
 INTERN ATTR_SECTION(".text.crt.sched.signal") ATTR_DEPRECATED("Using `sigprocmask(SIG_BLOCK)\' instead") int
 NOTHROW_NCX(LIBCCALL libc_sigblock)(int mask) {
@@ -49,7 +49,7 @@ NOTHROW_NCX(LIBCCALL libc_sigblock)(int mask) {
 #include <bits/os/sigset.h>
 /* >> sigsetmask(3)
  * Deprecated method of SIG_SETMASK-ing a given set of signals.
- * Modern code should use `sigprocmask(SIG_SETMASK)' instead.
+ * Modern code should  use `sigprocmask(SIG_SETMASK)'  instead.
  * @return: 0: Success */
 INTERN ATTR_SECTION(".text.crt.sched.signal") ATTR_DEPRECATED("Using `sigprocmask()\' instead") int
 NOTHROW_NCX(LIBCCALL libc_sigsetmask)(int mask) {
@@ -62,10 +62,10 @@ NOTHROW_NCX(LIBCCALL libc_sigsetmask)(int mask) {
 #include <bits/os/sigset.h>
 #include <hybrid/typecore.h>
 /* >> sigsetmask(3)
- * Deprecated method of retrieving the masking-state of
+ * Deprecated method of  retrieving the masking-state  of
  * the lowest-numberred `sizeof(int) * NBBY - 1' signals.
  * @return: <= INT_MAX: An incomplete signal mask bitset for a couple
- *                      of the lowest-numbered couple of signal.
+ *                      of  the  lowest-numbered  couple  of  signal.
  * @return: -1:         Error */
 INTERN ATTR_SECTION(".text.crt.sched.signal") ATTR_DEPRECATED("Using `sigprocmask()\' instead") int
 NOTHROW_NCX(LIBCCALL libc_siggetmask)(void) {
@@ -81,7 +81,7 @@ NOTHROW_NCX(LIBCCALL libc_siggetmask)(void) {
 }
 /* >> sigpause(3)
  * Atomically save and set the caller's signal mask to consist solely
- * of the signal signal `signo', then wait for that signal to arrive
+ * of the signal signal `signo', then wait for that signal to  arrive
  * before restoring the old signal mask.
  * @return: -1: [errno=EINTR] The signal handler for `signo' was executed. */
 INTERN ATTR_SECTION(".text.crt.sched.signal") int
@@ -248,7 +248,7 @@ NOTHROW_NCX(LIBCCALL libc_signandset)(sigset_t *set,
 #ifndef __KERNEL__
 /* >> killpg(3)
  * Alias for `kill(-pgrp, signo)'
- * @param: signo: The signal number to deliver. When set to `0', no signal is delivered,
+ * @param: signo: The signal number to deliver. When set to `0', no signal is  delivered,
  *                and this function can be used to test if the caller would be allowed to
  *                send signals to the process(es) specified by `pid'
  * @return: 0:    Success
@@ -832,7 +832,7 @@ NOTHROW_NCX(LIBCCALL libc_set_single_signal_action)(int sig,
 	return libc_sigprocmask(how, &set, NULL);
 }
 /* >> sighold(3)
- * Mask a single signal `signo', which is the same
+ * Mask a single signal  `signo', which is the  same
  * as `sigprocmask(SIG_BLOCK, MASKFOR(signo), NULL)'
  * @return: 0:  Success
  * @return: -1: Error (s.a. `errno') */
@@ -841,7 +841,7 @@ NOTHROW_NCX(LIBCCALL libc_sighold)(signo_t signo) {
 	return libc_set_single_signal_action(signo, __SIG_BLOCK);
 }
 /* >> sighold(3)
- * Unmask a single signal `signo', which is the same
+ * Unmask a single signal  `signo', which is the  same
  * as `sigprocmask(SIG_UNBLOCK, MASKFOR(signo), NULL)'
  * @return: 0:  Success
  * @return: -1: Error (s.a. `errno') */
@@ -859,7 +859,7 @@ NOTHROW_NCX(LIBCCALL libc_sigignore)(signo_t signo) {
 }
 #include <bits/os/sigaction.h>
 /* >> sigset(3)
- * Set the handler of `signo' to `disp', or add `signo' to
+ * Set the handler of `signo'  to `disp', or add `signo'  to
  * the calling threads's signal mask when `disp == SIG_HOLD'
  * @return: 0:  Success
  * @return: -1: Error (s.a. `errno') */
@@ -910,9 +910,9 @@ NOTHROW_NCX(LIBCCALL libc___libc_current_sigrtmax)(void) {
 }
 /* >> signalnumber(3)
  * Similar to `strtosigno(3)', however ignore any leading `SIG*'
- * prefix of `name', and do a case-insensitive compare between
- * the given `name', and the signal's actual name.
- * When `name' isn't recognized, return `0' instead. */
+ * prefix of `name', and  do a case-insensitive compare  between
+ * the   given   `name',   and   the   signal's   actual   name.
+ * When   `name'   isn't   recognized,   return   `0'   instead. */
 INTERN ATTR_SECTION(".text.crt.sched.signal") ATTR_PURE WUNUSED NONNULL((1)) signo_t
 NOTHROW_NCX(LIBCCALL libc_signalnumber)(const char *name) {
 	signo_t i, result = 0;
@@ -931,7 +931,7 @@ NOTHROW_NCX(LIBCCALL libc_signalnumber)(const char *name) {
 }
 /* >> signalnext(3)
  * Return the next-greater signal number that comes after `signo'
- * When no such signal number exists, return `0'. When the given
+ * When  no such signal number exists, return `0'. When the given
  * `signo' is `0', return the lowest valid signal number. */
 INTERN ATTR_SECTION(".text.crt.sched.signal") ATTR_CONST WUNUSED signo_t
 NOTHROW_NCX(LIBCCALL libc_signalnext)(signo_t signo) {

@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x86527bd0 */
+/* HASH CRC-32:0x4e9b6e02 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -24,13 +24,10 @@
 #ifdef __CRT_HAVE__pipe
 #include <bits/types.h>
 __NAMESPACE_LOCAL_BEGIN
-/* Dependency: dos_pipe from unistd */
 #ifndef __local___localdep_dos_pipe_defined
 #define __local___localdep_dos_pipe_defined 1
 __CREDIRECT(__ATTR_NONNULL((1)),int,__NOTHROW_NCX,__localdep_dos_pipe,(__fd_t __pipedes[2], __UINT32_TYPE__ __pipesize, __oflag_t __textmode),_pipe,(__pipedes,__pipesize,__textmode))
 #endif /* !__local___localdep_dos_pipe_defined */
-/* >> pipe(2)
- * Create a new pair of connected pipes ([0] = reader, [1] = writer) */
 __LOCAL_LIBC(pipe) __ATTR_NONNULL((1)) int
 __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(pipe))(__fd_t __pipedes[2]) {
 	return __localdep_dos_pipe(__pipedes, 4096, 0x8000); /* O_BINARY */

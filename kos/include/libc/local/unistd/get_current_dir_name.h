@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x2a59be61 */
+/* HASH CRC-32:0xac22371b */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -23,28 +23,22 @@
 #include <__crt.h>
 #if defined(__CRT_HAVE_getcwd) || defined(__CRT_HAVE__getcwd)
 __NAMESPACE_LOCAL_BEGIN
-/* Dependency: getcwd from unistd */
 #ifndef __local___localdep_getcwd_defined
 #define __local___localdep_getcwd_defined 1
 #ifdef __CRT_HAVE_getcwd
 __NAMESPACE_LOCAL_END
 #include <hybrid/typecore.h>
 __NAMESPACE_LOCAL_BEGIN
-/* >> getcwd(2)
- * Return the path of the current working directory, relative to the filesystem root set by `chdir(2)' */
 __CREDIRECT(,char *,__NOTHROW_RPC,__localdep_getcwd,(char *__buf, __SIZE_TYPE__ __bufsize),getcwd,(__buf,__bufsize))
 #elif defined(__CRT_HAVE__getcwd)
 __NAMESPACE_LOCAL_END
 #include <hybrid/typecore.h>
 __NAMESPACE_LOCAL_BEGIN
-/* >> getcwd(2)
- * Return the path of the current working directory, relative to the filesystem root set by `chdir(2)' */
 __CREDIRECT(,char *,__NOTHROW_RPC,__localdep_getcwd,(char *__buf, __SIZE_TYPE__ __bufsize),_getcwd,(__buf,__bufsize))
 #else /* ... */
 #undef __local___localdep_getcwd_defined
 #endif /* !... */
 #endif /* !__local___localdep_getcwd_defined */
-/* Dependency: getenv from stdlib */
 #ifndef __local___localdep_getenv_defined
 #define __local___localdep_getenv_defined 1
 #ifdef __CRT_HAVE_getenv
@@ -63,7 +57,6 @@ __NAMESPACE_LOCAL_BEGIN
 #endif /* !__LOCAL_environ */
 #endif /* !__CRT_HAVE_getenv */
 #endif /* !__local___localdep_getenv_defined */
-/* Dependency: stat from sys.stat */
 #ifndef __local___localdep_stat_defined
 #define __local___localdep_stat_defined 1
 #if defined(__CRT_HAVE_kstat) && defined(__CRT_KOS_PRIMARY)
@@ -120,7 +113,6 @@ __CREDIRECT(__ATTR_NONNULL((1, 2)),int,__NOTHROW_NCX,__localdep_stat,(char const
 #undef __local___localdep_stat_defined
 #endif /* !... */
 #endif /* !__local___localdep_stat_defined */
-/* Dependency: strdup from string */
 #ifndef __local___localdep_strdup_defined
 #define __local___localdep_strdup_defined 1
 #if __has_builtin(__builtin_strdup) && defined(__LIBC_BIND_CRTBUILTINS) && defined(__CRT_HAVE_strdup)

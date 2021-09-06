@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xfb004e1c */
+/* HASH CRC-32:0x62569ea1 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -37,7 +37,7 @@ DECL_BEGIN
  * @return: -1: Error (s.a. `errno') */
 INTDEF WUNUSED fd_t NOTHROW_NCX(LIBCCALL libc_epoll_create)(__STDC_INT_AS_SIZE_T size);
 /* >> epoll_create1(2)
- * Create a new epoll control descriptor which can be used for
+ * Create  a new epoll control descriptor which can be used for
  * monitoring of pollable events happening in registered files.
  * @param: flags: Set of `EPOLL_CLOEXEC | EPOLL_CLOFORK'
  * @return: * :   The newly created epoll control descriptor.
@@ -45,7 +45,7 @@ INTDEF WUNUSED fd_t NOTHROW_NCX(LIBCCALL libc_epoll_create)(__STDC_INT_AS_SIZE_T
  * @throw: E_INVALID_ARGUMENT_UNKNOWN_FLAG:E_INVALID_ARGUMENT_CONTEXT_EPOLL_CREATE1_FLAGS: [...] */
 INTDEF WUNUSED fd_t NOTHROW_NCX(LIBCCALL libc_epoll_create1)(__STDC_INT_AS_UINT_T flags);
 /* >> epoll_ctl(2)
- * Manipulate a given epoll controller `epfd', as previously returned by `epoll_create1(2)'
+ * Manipulate a given  epoll controller  `epfd', as previously  returned by  `epoll_create1(2)'
  * in order to register (`EPOLL_CTL_ADD'), remove (`EPOLL_CTL_DEL') or modify (`EPOLL_CTL_MOD')
  * the file descriptors being monitored
  * @param: op:    One of `EPOLL_CTL_ADD', `EPOLL_CTL_DEL' or `EPOLL_CTL_MOD'
@@ -55,7 +55,7 @@ INTDEF WUNUSED fd_t NOTHROW_NCX(LIBCCALL libc_epoll_create1)(__STDC_INT_AS_UINT_
  * @return: -1:   [errno=EEXIST][op=EPOLL_CTL_ADD] The given `fd' (and its kernel object) has already been registered
  * @return: -1:   [errno=ENOENT][op=EPOLL_CTL_MOD|EPOLL_CTL_DEL] The given `fd' (and its kernel object) aren't registered
  * @return: -1:   Error (s.a. `errno')
- * @throw: E_ILLEGAL_REFERENCE_LOOP: The given `fd' is another epoll that either
+ * @throw: E_ILLEGAL_REFERENCE_LOOP: The  given  `fd'  is  another  epoll  that either
  *                                   forms a loop with `epfd', or has too many nested.
  * @throw: E_INVALID_ARGUMENT_UNKNOWN_COMMAND:E_INVALID_ARGUMENT_CONTEXT_EPOLL_CTL_OP: [...] */
 INTDEF int NOTHROW_NCX(LIBCCALL libc_epoll_ctl)(fd_t epfd, __epoll_ctl_t op, fd_t fd, struct epoll_event *event);
@@ -65,7 +65,7 @@ INTDEF int NOTHROW_NCX(LIBCCALL libc_epoll_ctl)(fd_t epfd, __epoll_ctl_t op, fd_
  * @param: events:    A buffer where the kernel can store information on the
  *                    events that actually took place.
  * @param: maxevents: The # of events that can be stored in `events' (must be >= 1)
- * @param: timeout:   The max amount of time (in milliseconds) before returning
+ * @param: timeout:   The max amount of time (in milliseconds) before  returning
  *                    in the case where no event occurred in the mean time. When
  *                    set to `-1', wait indefinitely
  * @return: >= 1:     The # of events that happened (written to the first `return'
@@ -75,12 +75,12 @@ INTDEF int NOTHROW_NCX(LIBCCALL libc_epoll_ctl)(fd_t epfd, __epoll_ctl_t op, fd_
 INTDEF NONNULL((2)) __STDC_INT_AS_SSIZE_T NOTHROW_RPC(LIBCCALL libc_epoll_wait)(fd_t epfd, struct epoll_event *events, __STDC_INT_AS_SIZE_T maxevents, int timeout);
 /* >> epoll_pwait(2)
  * Same as `epoll_wait(2)', but change the calling thread's signal mask to `ss' while
- * waiting. Wait until at least one of the conditions monitored by `epfd' to be met.
+ * waiting.  Wait until at least one of the conditions monitored by `epfd' to be met.
  * @param: epfd:      The epoll controller on which to wait.
  * @param: events:    A buffer where the kernel can store information on the
  *                    events that actually took place.
  * @param: maxevents: The # of events that can be stored in `events' (must be >= 1)
- * @param: timeout:   The max amount of time (in milliseconds) before returning
+ * @param: timeout:   The max amount of time (in milliseconds) before  returning
  *                    in the case where no event occurred in the mean time. When
  *                    set to `-1', wait indefinitely
  * @param: ss:        The signal mask to apply while waiting for an event to happen.

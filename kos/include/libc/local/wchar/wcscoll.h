@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x437bfb73 */
+/* HASH CRC-32:0x3643f658 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -22,19 +22,14 @@
 #define __local_wcscoll_defined 1
 #include <__crt.h>
 __NAMESPACE_LOCAL_BEGIN
-/* Dependency: wcscmp from wchar */
 #ifndef __local___localdep_wcscmp_defined
 #define __local___localdep_wcscmp_defined 1
 #ifdef __CRT_HAVE_wcscmp
-/* >> strcmp(3)
- * Compare 2 strings and return the difference of the first non-matching character, or `0' if they are identical */
 __CREDIRECT(__ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1, 2)),int,__NOTHROW_NCX,__localdep_wcscmp,(__WCHAR_TYPE__ const *__s1, __WCHAR_TYPE__ const *__s2),wcscmp,(__s1,__s2))
 #else /* __CRT_HAVE_wcscmp */
 __NAMESPACE_LOCAL_END
 #include <libc/local/wchar/wcscmp.h>
 __NAMESPACE_LOCAL_BEGIN
-/* >> strcmp(3)
- * Compare 2 strings and return the difference of the first non-matching character, or `0' if they are identical */
 #define __localdep_wcscmp __LIBC_LOCAL_NAME(wcscmp)
 #endif /* !__CRT_HAVE_wcscmp */
 #endif /* !__local___localdep_wcscmp_defined */

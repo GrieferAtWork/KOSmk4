@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x8d16c26c */
+/* HASH CRC-32:0xef5b6ab9 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -27,7 +27,6 @@
 #include <libm/matherr.h>
 #include <libm/atan2.h>
 __NAMESPACE_LOCAL_BEGIN
-/* Arc tangent of `y / x' */
 __LOCAL_LIBC(atan2) __ATTR_WUNUSED double
 __NOTHROW(__LIBCCALL __LIBC_LOCAL_NAME(atan2))(double __y, double __x) {
 	if (__LIBM_LIB_VERSION == __LIBM_SVID && __x == 0.0 && __y == 0.0)

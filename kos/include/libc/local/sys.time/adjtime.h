@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xe8cd583a */
+/* HASH CRC-32:0xfbcc3390 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -24,12 +24,10 @@
 #if defined(__CRT_HAVE_adjtime64) || defined(__CRT_HAVE_adjtime)
 #include <bits/os/timeval.h>
 __NAMESPACE_LOCAL_BEGIN
-/* Dependency: adjtime32 from sys.time */
 #if !defined(__local___localdep_adjtime32_defined) && defined(__CRT_HAVE_adjtime)
 #define __local___localdep_adjtime32_defined 1
 __CREDIRECT(,int,__NOTHROW_NCX,__localdep_adjtime32,(struct __timeval32 const *__delta, struct __timeval32 *__olddelta),adjtime,(__delta,__olddelta))
 #endif /* !__local___localdep_adjtime32_defined && __CRT_HAVE_adjtime */
-/* Dependency: adjtime64 from sys.time */
 #ifndef __local___localdep_adjtime64_defined
 #define __local___localdep_adjtime64_defined 1
 #ifdef __CRT_HAVE_adjtime64

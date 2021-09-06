@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x460b7dd6 */
+/* HASH CRC-32:0x87d5b37e */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -24,7 +24,6 @@
 #if defined(__CRT_HAVE_recallocv) || defined(__CRT_HAVE__recalloc) || (defined(__CRT_HAVE_realloc) && (defined(__CRT_HAVE_malloc_usable_size) || defined(__CRT_HAVE__msize)))
 #include <hybrid/typecore.h>
 __NAMESPACE_LOCAL_BEGIN
-/* Dependency: recallocv from malloc */
 #ifndef __local___localdep_recallocv_defined
 #define __local___localdep_recallocv_defined 1
 #ifdef __CRT_HAVE_recallocv

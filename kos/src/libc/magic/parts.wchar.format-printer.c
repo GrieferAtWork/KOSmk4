@@ -224,7 +224,7 @@ struct format_wsnprintf_data {
 @@Format-printer implementation for printing to a string buffer like `wsnprintf' would
 @@WARNING: No trailing NUL-character is implicitly appended
 @@NOTE: The number of written characters is `<orig_bufsize> - arg->sd_bufsiz'
-@@NOTE: The number of required characters is `arg->sd_buffer - <orig_buf>', or
+@@NOTE: The   number   of   required   characters   is   `arg->sd_buffer - <orig_buf>',   or
 @@      alternatively the sum of return values of all calls to `format_wsnprintf_printer(3)'
 [[wchar]]
 $ssize_t format_wsnprintf_printer([[nonnull]] /*struct format_wsnprintf_data**/ void *arg,
@@ -328,9 +328,9 @@ struct format_waprintf_data {
 )]
 
 
-@@Pack and finalize a given aprintf format printer
+@@Pack  and  finalize  a  given  aprintf  format printer
 @@Together with `format_waprintf_printer()', the aprintf
-@@format printer sub-system should be used as follows:
+@@format  printer sub-system should  be used as follows:
 @@>> char *result;
 @@>> ssize_t error;
 @@>> struct format_waprintf_data p = FORMAT_WAPRINTF_DATA_INIT;
@@ -342,11 +342,11 @@ struct format_waprintf_data {
 @@>> result = format_waprintf_pack(&p, NULL);
 @@>> return result;
 @@WARNING: Note that `format_waprintf_pack()' is able to return `NULL' as well,
-@@         but will finalize the given aprintf printer an all cases.
+@@         but  will  finalize  the  given   aprintf  printer  an  all   cases.
 @@NOTE:    The caller must destroy the returned string by passing it to `free()'
 @@@param: pstrlen: When non-NULL, store the length of the constructed string here
 @@                 Note that this is the actual length if the constructed string,
-@@                 but may differ from `wcslen(return)' when NUL characters were
+@@                 but may differ from `wcslen(return)' when NUL characters  were
 @@                 printed to the waprintf-printer at one point.
 @@                 (e.g. `format_waprintf_printer(&my_printer, L"\0", 1)')
 [[wchar, impl_include("<hybrid/__assert.h>")]]
@@ -397,9 +397,9 @@ wchar_t *format_waprintf_pack([[nonnull]] struct format_waprintf_data *__restric
 
 
 @@>> format_waprintf_alloc(3)
-@@Allocate a buffer of `num_wchars' wide-characters at the end of `self'
+@@Allocate  a  buffer  of  `num_wchars'  wide-characters  at  the  end  of `self'
 @@The returned pointer remains valid until the next time this function is called,
-@@the format_aprintf buffer `self' is finalized, or some other function is used
+@@the format_aprintf buffer `self' is finalized,  or some other function is  used
 @@to append additional data to the end of `self'
 @@@return: NULL: Failed to allocate additional memory
 [[wchar, wunused, impl_include("<hybrid/__assert.h>")]]

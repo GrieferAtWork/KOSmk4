@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x37c072db */
+/* HASH CRC-32:0x75d21c8c */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -26,7 +26,6 @@
 typedef void (__LIBKCALL *__free_fn_t)(void *__nodep);
 #endif /* !____free_fn_t_defined */
 __NAMESPACE_LOCAL_BEGIN
-/* Dependency: free from stdlib */
 #ifndef __local___localdep_free_defined
 #define __local___localdep_free_defined 1
 #if __has_builtin(__builtin_free) && defined(__LIBC_BIND_CRTBUILTINS) && defined(__CRT_HAVE_free)
@@ -39,8 +38,6 @@ __CREDIRECT_VOID(,__NOTHROW_NCX,__localdep_free,(void *__mallptr),cfree,(__mallp
 #undef __local___localdep_free_defined
 #endif /* !... */
 #endif /* !__local___localdep_free_defined */
-/* >> tdestroy(3)
- * Destroy the whole tree, call `freefct' for each node or leaf */
 __LOCAL_LIBC(tdestroy) __ATTR_NONNULL((2)) void
 __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(tdestroy))(void *__root, __free_fn_t __freefct) {
 __again:

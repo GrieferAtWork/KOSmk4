@@ -21,7 +21,7 @@
 #include "mman-map.c"
 #define DEFINE_mman_map
 //#define DEFINE_mman_map_subrange
-//#define DEFINE_mman_map_res
+//#define      DEFINE_mman_map_res
 #endif /* __INTELLISENSE__ */
 
 #include <fs/node.h>

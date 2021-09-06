@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x547d3848 */
+/* HASH CRC-32:0x166b118d */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -22,20 +22,17 @@
 #define __local_hdestroy_defined 1
 #include <__crt.h>
 __NAMESPACE_LOCAL_BEGIN
-/* Dependency: hdestroy_r from search */
 #ifndef __local___localdep_hdestroy_r_defined
 #define __local___localdep_hdestroy_r_defined 1
 #ifdef __CRT_HAVE_hdestroy_r
 __NAMESPACE_LOCAL_END
 struct hsearch_data;
 __NAMESPACE_LOCAL_BEGIN
-/* >> hdestroy_r(3) */
 __CREDIRECT_VOID(,__NOTHROW_NCX,__localdep_hdestroy_r,(struct hsearch_data *__htab),hdestroy_r,(__htab))
 #else /* __CRT_HAVE_hdestroy_r */
 __NAMESPACE_LOCAL_END
 #include <libc/local/search/hdestroy_r.h>
 __NAMESPACE_LOCAL_BEGIN
-/* >> hdestroy_r(3) */
 #define __localdep_hdestroy_r __LIBC_LOCAL_NAME(hdestroy_r)
 #endif /* !__CRT_HAVE_hdestroy_r */
 #endif /* !__local___localdep_hdestroy_r_defined */
@@ -56,8 +53,6 @@ __LOCAL_LIBC_DATA(__htab) struct hsearch_data __htab = { __NULLPTR, 0, 0 };
 __NAMESPACE_LOCAL_END
 #endif /* !__local_htab_defined */
 __NAMESPACE_LOCAL_BEGIN
-/* >> hdestroy(3)
- * Destroy current internal hashing table */
 __LOCAL_LIBC(hdestroy) void
 __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(hdestroy))(void) {
 	__localdep_hdestroy_r(&__NAMESPACE_LOCAL_SYM __htab);

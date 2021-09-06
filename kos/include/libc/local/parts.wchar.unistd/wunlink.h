@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x167b33c3 */
+/* HASH CRC-32:0xc4b0cc0b */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -24,18 +24,13 @@
 #include <asm/os/fcntl.h>
 #if defined(__AT_FDCWD) && defined(__CRT_HAVE_wunlinkat)
 __NAMESPACE_LOCAL_BEGIN
-/* Dependency: wunlinkat from parts.wchar.unistd */
 #ifndef __local___localdep_wunlinkat_defined
 #define __local___localdep_wunlinkat_defined 1
 __NAMESPACE_LOCAL_END
 #include <bits/types.h>
 __NAMESPACE_LOCAL_BEGIN
-/* >> unlinkat(2)
- * Remove a file, symbolic link, device or FIFO referred to by `dfd:name' */
 __CREDIRECT(__ATTR_NONNULL((2)),int,__NOTHROW_RPC,__localdep_wunlinkat,(__fd_t __dfd, __WCHAR_TYPE__ const *__name, __atflag_t __flags),wunlinkat,(__dfd,__name,__flags))
 #endif /* !__local___localdep_wunlinkat_defined */
-/* >> unlink(2)
- * Remove a file, symbolic link, device or FIFO referred to by `file' */
 __LOCAL_LIBC(wunlink) __ATTR_NONNULL((1)) int
 __NOTHROW_RPC(__LIBCCALL __LIBC_LOCAL_NAME(wunlink))(__WCHAR_TYPE__ const *__file) {
 	return __localdep_wunlinkat(__AT_FDCWD, __file, 0);

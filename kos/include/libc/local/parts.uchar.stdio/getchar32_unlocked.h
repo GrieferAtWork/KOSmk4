@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xb0c92a52 */
+/* HASH CRC-32:0x8acbf1e6 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -25,7 +25,6 @@
 #include <hybrid/typecore.h>
 #include <kos/anno.h>
 __NAMESPACE_LOCAL_BEGIN
-/* Dependency: fgetc32_unlocked from parts.uchar.stdio */
 #ifndef __local___localdep_fgetc32_unlocked_defined
 #define __local___localdep_fgetc32_unlocked_defined 1
 #if defined(__CRT_HAVE_fgetwc_unlocked) && __SIZEOF_WCHAR_T__ == 4 && defined(__LIBCCALL_IS_LIBKCALL)

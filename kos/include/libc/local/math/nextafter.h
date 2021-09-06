@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xa87c8593 */
+/* HASH CRC-32:0x4f7bf620 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -25,7 +25,6 @@
 #if defined(__IEEE754_DOUBLE_TYPE_IS_DOUBLE__) || defined(__IEEE754_FLOAT_TYPE_IS_DOUBLE__) || defined(__IEEE854_LONG_DOUBLE_TYPE_IS_DOUBLE__)
 #include <libm/nextafter.h>
 __NAMESPACE_LOCAL_BEGIN
-/* Return `x + epsilon' if `x < y', and `x - epsilon' if `x > y' */
 __LOCAL_LIBC(nextafter) __ATTR_CONST __ATTR_WUNUSED double
 __NOTHROW(__LIBCCALL __LIBC_LOCAL_NAME(nextafter))(double __x, double __y) {
 	return __LIBM_MATHFUN2(nextafter, __x, __y);

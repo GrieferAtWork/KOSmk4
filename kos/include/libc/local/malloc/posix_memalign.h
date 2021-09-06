@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x32270313 */
+/* HASH CRC-32:0x74a1c8ec */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -24,7 +24,6 @@
 #if defined(__CRT_HAVE_memalign) || defined(__CRT_HAVE_aligned_alloc) || defined(__CRT_HAVE_posix_memalign)
 #include <bits/types.h>
 __NAMESPACE_LOCAL_BEGIN
-/* Dependency: memalign from malloc */
 #ifndef __local___localdep_memalign_defined
 #define __local___localdep_memalign_defined 1
 #if __has_builtin(__builtin_aligned_alloc) && defined(__LIBC_BIND_CRTBUILTINS) && defined(__CRT_HAVE_aligned_alloc)

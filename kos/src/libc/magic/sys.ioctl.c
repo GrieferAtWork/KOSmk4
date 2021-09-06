@@ -662,9 +662,9 @@ __SYSDECL_BEGIN
 }
 
 @@>> ioctl(2)
-@@Perform the I/O control operation specified by `request' on `fd'.
-@@Many I/O control operations except an additional argument, though
-@@this argument's type and meaning depends on `REQUEST'. If used, it's
+@@Perform the  I/O control  operation specified  by `request'  on  `fd'.
+@@Many I/O  control operations  except  an additional  argument,  though
+@@this argument's type and meaning  depends on `REQUEST'. If used,  it's
 @@usually either a pointer to a larger argument structure, or an integer
 @@that fits into a single register.
 @@@return: * : The return value depends on the given `request'.

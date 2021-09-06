@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x1ca934f0 */
+/* HASH CRC-32:0x2d055381 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -24,7 +24,6 @@
 #include <libc/local/program_invocation_name.h>
 #ifdef __LOCAL_program_invocation_short_name
 __NAMESPACE_LOCAL_BEGIN
-/* >> getprogname(3), setprogname(3) */
 __LOCAL_LIBC(getprogname) __ATTR_CONST __ATTR_WUNUSED char const *
 __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(getprogname))(void) {
 	return __LOCAL_program_invocation_short_name;

@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xf13345f1 */
+/* HASH CRC-32:0x96b37976 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -31,22 +31,22 @@ DECL_BEGIN
 
 #if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
 /* >> posix_fspawn_np(3)
- * Implementation for the fastest possible method of (safely) doing fork(2)+fexecve(2)
- * in order to spawn a new process from the given `execfd' file descriptor.
+ * Implementation for the fastest possible  method of (safely) doing  fork(2)+fexecve(2)
+ * in  order  to  spawn  a  new  process  from  the  given  `execfd'  file   descriptor.
  * For this purpose, any error that may happen during either the fork(3), the fexecve(2)
- * or any of the numerous additional system calls that may be performed in-between will
- * be returned by this function to the parent process, while the function itself never
+ * or  any of the numerous additional system calls that may be performed in-between will
+ * be returned by this function to the  parent process, while the function itself  never
  * actually returns in the child process.
- * For this purpose, this function tries to make use of `vfork(2)' in combination
- * with `__ARCH_HAVE_SHARED_VM_VFORK', and if that isn't available, a temporary pipe
- * is used to communicate process initialization errors, as well as to await a successful
- * exec call by using the fact that a successful exec will close all `O_CLOEXEC' files,
+ * For this  purpose,  this  function tries  to  make  use of  `vfork(2)'  in  combination
+ * with  `__ARCH_HAVE_SHARED_VM_VFORK',  and if  that  isn't available,  a  temporary pipe
+ * is  used to communicate process initialization errors, as well as to await a successful
+ * exec call by using the  fact that a successful exec  will close all `O_CLOEXEC'  files,
  * with the pipe having been given that flag, and that a pipe without both ends still open
- * will always have its read immediately return (which is used to indicate success)
+ * will always  have its  read immediately  return  (which is  used to  indicate  success)
  * @param: pid:          Store the PID of the newly spawned child process here
  * @param: execfd:       The file descriptor pointing to the file that should be executed
  * @param: file_actions: [0..1] A set of additional actions to perform in regards to file-
- *                              handle operations. Can be used to (e.g.) re-direct stdout
+ *                              handle operations. Can be used to (e.g.) re-direct  stdout
  *                              for the new process
  * @param: attrp:        [0..1] Additional process attributes to set for the child process
  * @param: argv:         Same as the `argv' accepted by `fexecve(2)'
@@ -57,22 +57,22 @@ INTDEF NONNULL((1, 5, 6)) errno_t NOTHROW_RPC(LIBDCALL libd_posix_fspawn_np)(pid
 #endif /* !__LIBCCALL_IS_LIBDCALL && !__KERNEL__ */
 #ifndef __KERNEL__
 /* >> posix_fspawn_np(3)
- * Implementation for the fastest possible method of (safely) doing fork(2)+fexecve(2)
- * in order to spawn a new process from the given `execfd' file descriptor.
+ * Implementation for the fastest possible  method of (safely) doing  fork(2)+fexecve(2)
+ * in  order  to  spawn  a  new  process  from  the  given  `execfd'  file   descriptor.
  * For this purpose, any error that may happen during either the fork(3), the fexecve(2)
- * or any of the numerous additional system calls that may be performed in-between will
- * be returned by this function to the parent process, while the function itself never
+ * or  any of the numerous additional system calls that may be performed in-between will
+ * be returned by this function to the  parent process, while the function itself  never
  * actually returns in the child process.
- * For this purpose, this function tries to make use of `vfork(2)' in combination
- * with `__ARCH_HAVE_SHARED_VM_VFORK', and if that isn't available, a temporary pipe
- * is used to communicate process initialization errors, as well as to await a successful
- * exec call by using the fact that a successful exec will close all `O_CLOEXEC' files,
+ * For this  purpose,  this  function tries  to  make  use of  `vfork(2)'  in  combination
+ * with  `__ARCH_HAVE_SHARED_VM_VFORK',  and if  that  isn't available,  a  temporary pipe
+ * is  used to communicate process initialization errors, as well as to await a successful
+ * exec call by using the  fact that a successful exec  will close all `O_CLOEXEC'  files,
  * with the pipe having been given that flag, and that a pipe without both ends still open
- * will always have its read immediately return (which is used to indicate success)
+ * will always  have its  read immediately  return  (which is  used to  indicate  success)
  * @param: pid:          Store the PID of the newly spawned child process here
  * @param: execfd:       The file descriptor pointing to the file that should be executed
  * @param: file_actions: [0..1] A set of additional actions to perform in regards to file-
- *                              handle operations. Can be used to (e.g.) re-direct stdout
+ *                              handle operations. Can be used to (e.g.) re-direct  stdout
  *                              for the new process
  * @param: attrp:        [0..1] Additional process attributes to set for the child process
  * @param: argv:         Same as the `argv' accepted by `fexecve(2)'
@@ -84,21 +84,21 @@ INTDEF NONNULL((1, 5, 6)) errno_t NOTHROW_RPC(LIBCCALL libc_posix_fspawn_np)(pid
 #if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
 /* >> posix_spawn(3)
  * Implementation for the fastest possible method of (safely) doing fork(2)+execve(2)
- * in order to spawn a new process from the given `path' program.
+ * in  order   to   spawn   a   new  process   from   the   given   `path'   program.
  * For this purpose, any error that may happen during either the fork(3), the execve(2)
  * or any of the numerous additional system calls that may be performed in-between will
- * be returned by this function to the parent process, while the function itself never
+ * be  returned by this function to the parent process, while the function itself never
  * actually returns in the child process.
- * For this purpose, this function tries to make use of `vfork(2)' in combination
- * with `__ARCH_HAVE_SHARED_VM_VFORK', and if that isn't available, a temporary pipe
- * is used to communicate process initialization errors, as well as to await a successful
- * exec call by using the fact that a successful exec will close all `O_CLOEXEC' files,
+ * For this  purpose,  this  function tries  to  make  use of  `vfork(2)'  in  combination
+ * with  `__ARCH_HAVE_SHARED_VM_VFORK',  and if  that  isn't available,  a  temporary pipe
+ * is  used to communicate process initialization errors, as well as to await a successful
+ * exec call by using the  fact that a successful exec  will close all `O_CLOEXEC'  files,
  * with the pipe having been given that flag, and that a pipe without both ends still open
- * will always have its read immediately return (which is used to indicate success)
+ * will always  have its  read immediately  return  (which is  used to  indicate  success)
  * @param: pid:          Store the PID of the newly spawned child process here
  * @param: path:         The pathname of the program that should be executed
  * @param: file_actions: [0..1] A set of additional actions to perform in regards to file-
- *                              handle operations. Can be used to (e.g.) re-direct stdout
+ *                              handle operations. Can be used to (e.g.) re-direct  stdout
  *                              for the new process
  * @param: attrp:        [0..1] Additional process attributes to set for the child process
  * @param: argv:         Same as the `argv' accepted by `execve(2)'
@@ -110,21 +110,21 @@ INTDEF NONNULL((1, 2, 5, 6)) errno_t NOTHROW_RPC(LIBDCALL libd_posix_spawn)(pid_
 #ifndef __KERNEL__
 /* >> posix_spawn(3)
  * Implementation for the fastest possible method of (safely) doing fork(2)+execve(2)
- * in order to spawn a new process from the given `path' program.
+ * in  order   to   spawn   a   new  process   from   the   given   `path'   program.
  * For this purpose, any error that may happen during either the fork(3), the execve(2)
  * or any of the numerous additional system calls that may be performed in-between will
- * be returned by this function to the parent process, while the function itself never
+ * be  returned by this function to the parent process, while the function itself never
  * actually returns in the child process.
- * For this purpose, this function tries to make use of `vfork(2)' in combination
- * with `__ARCH_HAVE_SHARED_VM_VFORK', and if that isn't available, a temporary pipe
- * is used to communicate process initialization errors, as well as to await a successful
- * exec call by using the fact that a successful exec will close all `O_CLOEXEC' files,
+ * For this  purpose,  this  function tries  to  make  use of  `vfork(2)'  in  combination
+ * with  `__ARCH_HAVE_SHARED_VM_VFORK',  and if  that  isn't available,  a  temporary pipe
+ * is  used to communicate process initialization errors, as well as to await a successful
+ * exec call by using the  fact that a successful exec  will close all `O_CLOEXEC'  files,
  * with the pipe having been given that flag, and that a pipe without both ends still open
- * will always have its read immediately return (which is used to indicate success)
+ * will always  have its  read immediately  return  (which is  used to  indicate  success)
  * @param: pid:          Store the PID of the newly spawned child process here
  * @param: path:         The pathname of the program that should be executed
  * @param: file_actions: [0..1] A set of additional actions to perform in regards to file-
- *                              handle operations. Can be used to (e.g.) re-direct stdout
+ *                              handle operations. Can be used to (e.g.) re-direct  stdout
  *                              for the new process
  * @param: attrp:        [0..1] Additional process attributes to set for the child process
  * @param: argv:         Same as the `argv' accepted by `execve(2)'
@@ -135,17 +135,17 @@ INTDEF NONNULL((1, 2, 5, 6)) errno_t NOTHROW_RPC(LIBCCALL libc_posix_spawn)(pid_
 #endif /* !__KERNEL__ */
 #if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
 /* >> posix_spawnp(3)
- * Same as `posix_spawn(3)', but search `getenv("PATH")' for `file', rather than
- * directly making use of `file' as the absolute filename of the file to execute.
- * Note however that when `file' contains any slashes, `$PATH' won't be searched
+ * Same  as  `posix_spawn(3)',  but  search  `getenv("PATH")'  for  `file',  rather  than
+ * directly making  use of  `file'  as the  absolute filename  of  the file  to  execute.
+ * Note however  that  when  `file'  contains any  slashes,  `$PATH'  won't  be  searched
  * either, but instead, `file' is used as-is. (same as with `execve(2)' vs. `execvpe(3)') */
 INTDEF NONNULL((1, 2, 5, 6)) errno_t NOTHROW_RPC(LIBDCALL libd_posix_spawnp)(pid_t *__restrict pid, const char *__restrict file, posix_spawn_file_actions_t const *file_actions, posix_spawnattr_t const *attrp, __TARGV, __TENVP);
 #endif /* !__LIBCCALL_IS_LIBDCALL && !__KERNEL__ */
 #ifndef __KERNEL__
 /* >> posix_spawnp(3)
- * Same as `posix_spawn(3)', but search `getenv("PATH")' for `file', rather than
- * directly making use of `file' as the absolute filename of the file to execute.
- * Note however that when `file' contains any slashes, `$PATH' won't be searched
+ * Same  as  `posix_spawn(3)',  but  search  `getenv("PATH")'  for  `file',  rather  than
+ * directly making  use of  `file'  as the  absolute filename  of  the file  to  execute.
+ * Note however  that  when  `file'  contains any  slashes,  `$PATH'  won't  be  searched
  * either, but instead, `file' is used as-is. (same as with `execve(2)' vs. `execvpe(3)') */
 INTDEF NONNULL((1, 2, 5, 6)) errno_t NOTHROW_RPC(LIBCCALL libc_posix_spawnp)(pid_t *__restrict pid, const char *__restrict file, posix_spawn_file_actions_t const *file_actions, posix_spawnattr_t const *attrp, __TARGV, __TENVP);
 #endif /* !__KERNEL__ */
@@ -187,7 +187,7 @@ INTDEF NONNULL((1, 2)) errno_t NOTHROW_NCX(LIBCCALL libc_posix_spawnattr_getflag
 #endif /* !__KERNEL__ */
 #if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
 /* >> posix_spawnattr_setflags(3)
- * Specify the set of additional operations to-be performed by the
+ * Specify the  set of  additional operations  to-be performed  by  the
  * child process prior to being started. The given `flags' is a set of:
  *   - POSIX_SPAWN_RESETIDS:      Perform 2 calls `seteuid(getuid())' and `setegid(getgid())'
  *   - POSIX_SPAWN_SETSIGDEF:     s.a. posix_spawnattr_setsigdefault(3)
@@ -200,7 +200,7 @@ INTDEF NONNULL((1)) errno_t NOTHROW_NCX(LIBDCALL libd_posix_spawnattr_setflags)(
 #endif /* !__LIBCCALL_IS_LIBDCALL && !__KERNEL__ */
 #ifndef __KERNEL__
 /* >> posix_spawnattr_setflags(3)
- * Specify the set of additional operations to-be performed by the
+ * Specify the  set of  additional operations  to-be performed  by  the
  * child process prior to being started. The given `flags' is a set of:
  *   - POSIX_SPAWN_RESETIDS:      Perform 2 calls `seteuid(getuid())' and `setegid(getgid())'
  *   - POSIX_SPAWN_SETSIGDEF:     s.a. posix_spawnattr_setsigdefault(3)
@@ -214,76 +214,76 @@ INTDEF NONNULL((1)) errno_t NOTHROW_NCX(LIBCCALL libc_posix_spawnattr_setflags)(
 #if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
 /* >> posix_spawnattr_getsigdefault(3)
  * Get the set of signal handler that are reset of `SIG_DFL' by
- * the child process when `POSIX_SPAWN_SETSIGDEF' is set.
+ * the  child  process  when  `POSIX_SPAWN_SETSIGDEF'  is  set.
  * @return: 0 : Success */
 INTDEF NONNULL((1, 2)) errno_t NOTHROW_NCX(LIBDCALL libd_posix_spawnattr_getsigdefault)(posix_spawnattr_t const *__restrict attr, sigset_t *__restrict sigdefault);
 #endif /* !__LIBCCALL_IS_LIBDCALL && !__KERNEL__ */
 #ifndef __KERNEL__
 /* >> posix_spawnattr_getsigdefault(3)
  * Get the set of signal handler that are reset of `SIG_DFL' by
- * the child process when `POSIX_SPAWN_SETSIGDEF' is set.
+ * the  child  process  when  `POSIX_SPAWN_SETSIGDEF'  is  set.
  * @return: 0 : Success */
 INTDEF NONNULL((1, 2)) errno_t NOTHROW_NCX(LIBCCALL libc_posix_spawnattr_getsigdefault)(posix_spawnattr_t const *__restrict attr, sigset_t *__restrict sigdefault);
 #endif /* !__KERNEL__ */
 #if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
 /* >> posix_spawnattr_setsigdefault(3)
  * Set the set of signal handler that are reset of `SIG_DFL' by
- * the child process when `POSIX_SPAWN_SETSIGDEF' is set.
+ * the  child  process  when  `POSIX_SPAWN_SETSIGDEF'  is  set.
  * @return: 0 : Success */
 INTDEF NONNULL((1, 2)) errno_t NOTHROW_NCX(LIBDCALL libd_posix_spawnattr_setsigdefault)(posix_spawnattr_t *__restrict attr, sigset_t const *__restrict sigdefault);
 #endif /* !__LIBCCALL_IS_LIBDCALL && !__KERNEL__ */
 #ifndef __KERNEL__
 /* >> posix_spawnattr_setsigdefault(3)
  * Set the set of signal handler that are reset of `SIG_DFL' by
- * the child process when `POSIX_SPAWN_SETSIGDEF' is set.
+ * the  child  process  when  `POSIX_SPAWN_SETSIGDEF'  is  set.
  * @return: 0 : Success */
 INTDEF NONNULL((1, 2)) errno_t NOTHROW_NCX(LIBCCALL libc_posix_spawnattr_setsigdefault)(posix_spawnattr_t *__restrict attr, sigset_t const *__restrict sigdefault);
 #endif /* !__KERNEL__ */
 #if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
 /* >> posix_spawnattr_getsigmask(3)
  * Get the `sigmask' argument of a call `sigprocmask(SIG_SETMASK, sigmask, NULL)'
- * that the child process will perform when `POSIX_SPAWN_SETSIGMASK' is set.
+ * that the  child process  will perform  when `POSIX_SPAWN_SETSIGMASK'  is  set.
  * @return: 0 : Success */
 INTDEF NONNULL((1, 2)) errno_t NOTHROW_NCX(LIBDCALL libd_posix_spawnattr_getsigmask)(posix_spawnattr_t const *__restrict attr, sigset_t *__restrict sigmask);
 #endif /* !__LIBCCALL_IS_LIBDCALL && !__KERNEL__ */
 #ifndef __KERNEL__
 /* >> posix_spawnattr_getsigmask(3)
  * Get the `sigmask' argument of a call `sigprocmask(SIG_SETMASK, sigmask, NULL)'
- * that the child process will perform when `POSIX_SPAWN_SETSIGMASK' is set.
+ * that the  child process  will perform  when `POSIX_SPAWN_SETSIGMASK'  is  set.
  * @return: 0 : Success */
 INTDEF NONNULL((1, 2)) errno_t NOTHROW_NCX(LIBCCALL libc_posix_spawnattr_getsigmask)(posix_spawnattr_t const *__restrict attr, sigset_t *__restrict sigmask);
 #endif /* !__KERNEL__ */
 #if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
 /* >> posix_spawnattr_getsigmask(3)
  * Set the `sigmask' argument of a call `sigprocmask(SIG_SETMASK, sigmask, NULL)'
- * that the child process will perform when `POSIX_SPAWN_SETSIGMASK' is set.
+ * that the  child process  will perform  when `POSIX_SPAWN_SETSIGMASK'  is  set.
  * @return: 0 : Success */
 INTDEF NONNULL((1, 2)) errno_t NOTHROW_NCX(LIBDCALL libd_posix_spawnattr_setsigmask)(posix_spawnattr_t *__restrict attr, sigset_t const *__restrict sigmask);
 #endif /* !__LIBCCALL_IS_LIBDCALL && !__KERNEL__ */
 #ifndef __KERNEL__
 /* >> posix_spawnattr_getsigmask(3)
  * Set the `sigmask' argument of a call `sigprocmask(SIG_SETMASK, sigmask, NULL)'
- * that the child process will perform when `POSIX_SPAWN_SETSIGMASK' is set.
+ * that the  child process  will perform  when `POSIX_SPAWN_SETSIGMASK'  is  set.
  * @return: 0 : Success */
 INTDEF NONNULL((1, 2)) errno_t NOTHROW_NCX(LIBCCALL libc_posix_spawnattr_setsigmask)(posix_spawnattr_t *__restrict attr, sigset_t const *__restrict sigmask);
 #endif /* !__KERNEL__ */
 #if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
 /* >> posix_spawnattr_getpgroup(3)
- * Get the `pgid' argument of a call `setpgid(getpid(), pgid)' that
+ * Get the `pgid'  argument of a  call `setpgid(getpid(), pgid)'  that
  * the child process will perform when `POSIX_SPAWN_SETPGROUP' is set.
  * @return: 0 : Success */
 INTDEF NONNULL((1, 2)) errno_t NOTHROW_NCX(LIBDCALL libd_posix_spawnattr_getpgroup)(posix_spawnattr_t const *__restrict attr, pid_t *__restrict pgroup);
 #endif /* !__LIBCCALL_IS_LIBDCALL && !__KERNEL__ */
 #ifndef __KERNEL__
 /* >> posix_spawnattr_getpgroup(3)
- * Get the `pgid' argument of a call `setpgid(getpid(), pgid)' that
+ * Get the `pgid'  argument of a  call `setpgid(getpid(), pgid)'  that
  * the child process will perform when `POSIX_SPAWN_SETPGROUP' is set.
  * @return: 0 : Success */
 INTDEF NONNULL((1, 2)) errno_t NOTHROW_NCX(LIBCCALL libc_posix_spawnattr_getpgroup)(posix_spawnattr_t const *__restrict attr, pid_t *__restrict pgroup);
 #endif /* !__KERNEL__ */
 #if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
 /* >> posix_spawnattr_getschedparam(3)
- * Set the `pgid' argument of a call `setpgid(getpid(), pgid)' that
+ * Set the `pgid'  argument of a  call `setpgid(getpid(), pgid)'  that
  * the child process will perform when `POSIX_SPAWN_SETPGROUP' is set.
  * HINT: A call `setpgid(getpid(), 0)' is the same as `setpgid(getpid(), getpid())'!
  * @return: 0 : Success */
@@ -291,7 +291,7 @@ INTDEF NONNULL((1)) errno_t NOTHROW_NCX(LIBDCALL libd_posix_spawnattr_setpgroup)
 #endif /* !__LIBCCALL_IS_LIBDCALL && !__KERNEL__ */
 #ifndef __KERNEL__
 /* >> posix_spawnattr_getschedparam(3)
- * Set the `pgid' argument of a call `setpgid(getpid(), pgid)' that
+ * Set the `pgid'  argument of a  call `setpgid(getpid(), pgid)'  that
  * the child process will perform when `POSIX_SPAWN_SETPGROUP' is set.
  * HINT: A call `setpgid(getpid(), 0)' is the same as `setpgid(getpid(), getpid())'!
  * @return: 0 : Success */
@@ -300,56 +300,56 @@ INTDEF NONNULL((1)) errno_t NOTHROW_NCX(LIBCCALL libc_posix_spawnattr_setpgroup)
 #if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
 /* >> posix_spawnattr_getschedparam(3)
  * Get the `policy' argument of a call `sched_setscheduler(getpid(), policy, param)'
- * that the child process will perform when `POSIX_SPAWN_SETSCHEDULER' is set.
+ * that  the  child process  will  perform when  `POSIX_SPAWN_SETSCHEDULER'  is set.
  * @return: 0 : Success */
 INTDEF NONNULL((1, 2)) errno_t NOTHROW_NCX(LIBDCALL libd_posix_spawnattr_getschedpolicy)(posix_spawnattr_t const *__restrict attr, int *__restrict schedpolicy);
 #endif /* !__LIBCCALL_IS_LIBDCALL && !__KERNEL__ */
 #ifndef __KERNEL__
 /* >> posix_spawnattr_getschedparam(3)
  * Get the `policy' argument of a call `sched_setscheduler(getpid(), policy, param)'
- * that the child process will perform when `POSIX_SPAWN_SETSCHEDULER' is set.
+ * that  the  child process  will  perform when  `POSIX_SPAWN_SETSCHEDULER'  is set.
  * @return: 0 : Success */
 INTDEF NONNULL((1, 2)) errno_t NOTHROW_NCX(LIBCCALL libc_posix_spawnattr_getschedpolicy)(posix_spawnattr_t const *__restrict attr, int *__restrict schedpolicy);
 #endif /* !__KERNEL__ */
 #if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
 /* >> posix_spawnattr_getschedparam(3)
  * Set the `policy' argument of a call `sched_setscheduler(getpid(), policy, param)'
- * that the child process will perform when `POSIX_SPAWN_SETSCHEDULER' is set.
+ * that  the  child process  will  perform when  `POSIX_SPAWN_SETSCHEDULER'  is set.
  * @return: 0 : Success */
 INTDEF NONNULL((1)) errno_t NOTHROW_NCX(LIBDCALL libd_posix_spawnattr_setschedpolicy)(posix_spawnattr_t *__restrict attr, int schedpolicy);
 #endif /* !__LIBCCALL_IS_LIBDCALL && !__KERNEL__ */
 #ifndef __KERNEL__
 /* >> posix_spawnattr_getschedparam(3)
  * Set the `policy' argument of a call `sched_setscheduler(getpid(), policy, param)'
- * that the child process will perform when `POSIX_SPAWN_SETSCHEDULER' is set.
+ * that  the  child process  will  perform when  `POSIX_SPAWN_SETSCHEDULER'  is set.
  * @return: 0 : Success */
 INTDEF NONNULL((1)) errno_t NOTHROW_NCX(LIBCCALL libc_posix_spawnattr_setschedpolicy)(posix_spawnattr_t *__restrict attr, int schedpolicy);
 #endif /* !__KERNEL__ */
 #if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
 /* >> posix_spawnattr_getschedparam(3)
  * Get the `param' argument of a call `sched_setscheduler(getpid(), policy, param)'
- * that the child process will perform when `POSIX_SPAWN_SETSCHEDPARAM' is set.
+ * that  the child  process will  perform when  `POSIX_SPAWN_SETSCHEDPARAM' is set.
  * @return: 0 : Success */
 INTDEF NONNULL((1, 2)) errno_t NOTHROW_NCX(LIBDCALL libd_posix_spawnattr_getschedparam)(posix_spawnattr_t const *__restrict attr, struct sched_param *__restrict schedparam);
 #endif /* !__LIBCCALL_IS_LIBDCALL && !__KERNEL__ */
 #ifndef __KERNEL__
 /* >> posix_spawnattr_getschedparam(3)
  * Get the `param' argument of a call `sched_setscheduler(getpid(), policy, param)'
- * that the child process will perform when `POSIX_SPAWN_SETSCHEDPARAM' is set.
+ * that  the child  process will  perform when  `POSIX_SPAWN_SETSCHEDPARAM' is set.
  * @return: 0 : Success */
 INTDEF NONNULL((1, 2)) errno_t NOTHROW_NCX(LIBCCALL libc_posix_spawnattr_getschedparam)(posix_spawnattr_t const *__restrict attr, struct sched_param *__restrict schedparam);
 #endif /* !__KERNEL__ */
 #if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
 /* >> posix_spawnattr_setschedparam(3)
  * Set the `param' argument of a call `sched_setscheduler(getpid(), policy, param)'
- * that the child process will perform when `POSIX_SPAWN_SETSCHEDPARAM' is set.
+ * that  the child  process will  perform when  `POSIX_SPAWN_SETSCHEDPARAM' is set.
  * @return: 0 : Success */
 INTDEF NONNULL((1, 2)) errno_t NOTHROW_NCX(LIBDCALL libd_posix_spawnattr_setschedparam)(posix_spawnattr_t *__restrict attr, struct sched_param const *__restrict schedparam);
 #endif /* !__LIBCCALL_IS_LIBDCALL && !__KERNEL__ */
 #ifndef __KERNEL__
 /* >> posix_spawnattr_setschedparam(3)
  * Set the `param' argument of a call `sched_setscheduler(getpid(), policy, param)'
- * that the child process will perform when `POSIX_SPAWN_SETSCHEDPARAM' is set.
+ * that  the child  process will  perform when  `POSIX_SPAWN_SETSCHEDPARAM' is set.
  * @return: 0 : Success */
 INTDEF NONNULL((1, 2)) errno_t NOTHROW_NCX(LIBCCALL libc_posix_spawnattr_setschedparam)(posix_spawnattr_t *__restrict attr, struct sched_param const *__restrict schedparam);
 #endif /* !__KERNEL__ */
@@ -382,7 +382,7 @@ INTDEF WUNUSED NONNULL((1)) struct __spawn_action *NOTHROW_NCX(LIBCCALL libc_pos
 #if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
 /* >> posix_spawn_file_actions_addopen(3)
  * Enqueue a call `dup2(open(path, oflags, mode), fd)' to be performed by the child process
- * Note though that the intermediate file returned by `open()' will not remain open!
+ * Note though  that the  intermediate file  returned  by `open()'  will not  remain  open!
  * @return: 0     : Success
  * @return: ENOMEM: Insufficient memory to enqueue the action */
 INTDEF NONNULL((1, 3)) errno_t NOTHROW_NCX(LIBDCALL libd_posix_spawn_file_actions_addopen)(posix_spawn_file_actions_t *__restrict file_actions, fd_t fd, char const *__restrict path, oflag_t oflags, mode_t mode);
@@ -390,7 +390,7 @@ INTDEF NONNULL((1, 3)) errno_t NOTHROW_NCX(LIBDCALL libd_posix_spawn_file_action
 #ifndef __KERNEL__
 /* >> posix_spawn_file_actions_addopen(3)
  * Enqueue a call `dup2(open(path, oflags, mode), fd)' to be performed by the child process
- * Note though that the intermediate file returned by `open()' will not remain open!
+ * Note though  that the  intermediate file  returned  by `open()'  will not  remain  open!
  * @return: 0     : Success
  * @return: ENOMEM: Insufficient memory to enqueue the action */
 INTDEF NONNULL((1, 3)) errno_t NOTHROW_NCX(LIBCCALL libc_posix_spawn_file_actions_addopen)(posix_spawn_file_actions_t *__restrict file_actions, fd_t fd, char const *__restrict path, oflag_t oflags, mode_t mode);

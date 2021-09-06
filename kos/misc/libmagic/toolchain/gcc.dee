@@ -560,7 +560,7 @@ again_handle_col:
 		return createWaitableProcess(step, options, "gcc", ipc.Process(cc, arguments));
 	}
 
-	@@Create a compiler process for the purpose of testing compiler features.
+	@@Create  a compiler process for the purpose of testing compiler features.
 	@@The process has yet to be started, and will read source code from stdin,
 	@@which the caller can then provide using a pipe
 	function createFeatureTestCompilerProcess(language: string,

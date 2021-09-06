@@ -57,16 +57,16 @@ class SimpConfig {
 	public member truncateOutput: bool = true;
 
 	@@Macros that are always/never defined or defined as something specific:
-	@@ - @true:   Always defined, but actual value is unknown. This option
+	@@ - @true:   Always  defined,  but  actual  value  is  unknown.  This  option
 	@@            will allow the macro to replaced in `#ifdef x` and `defined(x)`,
-	@@            but will cause it to be left alone when encountered outside of
+	@@            but will cause it to be  left alone when encountered outside  of
 	@@            such a context.
 	@@ - @false:  Similar to @true, but the macro is assumed to never be defined.
-	@@            This results in `defined(x)` to always be replaced with `0`,
+	@@            This results in  `defined(x)` to always  be replaced with  `0`,
 	@@            and `#ifdef x` to be the same as `#if 0`
-	@@ - @string: The replacement text of the macro. The macro is assumed to be
+	@@ - @string: The  replacement text  of the macro.  The macro is  assumed to be
 	@@            defined, similar to when @true is used, but will also be replaced
-	@@            with this string, before being re-interpreted once again when
+	@@            with this  string, before  being re-interpreted  once again  when
 	@@            encountered elsewhere.
 	@@ - @SimpFunctionMacro: Similar to @string, but describe a function-like macro
 	public member macros: {string: SimpFunctionMacro | string | bool} = Dict();
@@ -75,12 +75,12 @@ class SimpConfig {
 	@@This list is only used when a macro name could not be found in @macros
 	public member undefMacrosStartsWith: {string...} = [];
 
-	@@Set of keywords (stripped of leading/trailing '_')
+	@@Set of  keywords  (stripped  of  leading/trailing  '_')
 	@@for which __has_builtin() evaluates to a given constant
 	public member known___has_builtin: {string: int} = Dict();
 
 	@@Return the definition of a macro, given its name
-	@@If no definition exists, return @none instead.
+	@@If no definition  exists, return @none  instead.
 	function getMacroDefinition(name: string)
 			: SimpFunctionMacro | string | bool | none {
 		local result = macros.get(name);
@@ -535,7 +535,7 @@ function simpPpParse(
 
 
 @@Skip ahead until the next the "#" of the next "#else", "#elif" or "#endif"
-@@directive, returning with the parser set to select the "#" token.
+@@directive,  returning  with  the  parser  set  to  select  the  "#" token.
 @@@param: startPos: The starting index from where to start searching for directive.
 function CParser_SkipPPBlock(self: CParser, startPos: int): string {
 	local recursion = 0;

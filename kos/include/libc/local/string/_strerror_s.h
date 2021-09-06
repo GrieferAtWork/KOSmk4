@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x4a50201d */
+/* HASH CRC-32:0xde65fc6d */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -25,7 +25,6 @@
 #ifdef __libc_geterrno
 #include <bits/types.h>
 __NAMESPACE_LOCAL_BEGIN
-/* Dependency: snprintf from stdio */
 #ifndef __local___localdep_snprintf_defined
 #define __local___localdep_snprintf_defined 1
 #if __has_builtin(__builtin_snprintf) && defined(__LIBC_BIND_CRTBUILTINS) && defined(__CRT_HAVE_snprintf) && __has_builtin(__builtin_va_arg_pack)
@@ -33,33 +32,20 @@ __NAMESPACE_LOCAL_END
 #include <features.h>
 #include <hybrid/typecore.h>
 __NAMESPACE_LOCAL_BEGIN
-/* >> snprintf(3), vsnprintf(3)
- * Print a formatted string to a given in-member string buffer `buf'
- * Always return the REQUIRED buffer size (excluding a trailing NUL-
- * character), and never write more than `buflen' characters to `buf' */
 __CEIREDIRECT(__ATTR_LIBC_PRINTF(3, 4) __ATTR_NONNULL((3)),__STDC_INT_AS_SIZE_T,__NOTHROW_NCX,__localdep_snprintf,(char *__restrict __buf, __SIZE_TYPE__ __buflen, char const *__restrict __format, ...),snprintf,{ return __builtin_snprintf(__buf, __buflen, __format, __builtin_va_arg_pack()); })
 #elif defined(__CRT_HAVE_snprintf)
 __NAMESPACE_LOCAL_END
 #include <features.h>
 #include <hybrid/typecore.h>
 __NAMESPACE_LOCAL_BEGIN
-/* >> snprintf(3), vsnprintf(3)
- * Print a formatted string to a given in-member string buffer `buf'
- * Always return the REQUIRED buffer size (excluding a trailing NUL-
- * character), and never write more than `buflen' characters to `buf' */
 __LIBC __ATTR_LIBC_PRINTF(3, 4) __ATTR_NONNULL((3)) __STDC_INT_AS_SIZE_T __NOTHROW_NCX(__VLIBCCALL __localdep_snprintf)(char *__restrict __buf, __SIZE_TYPE__ __buflen, char const *__restrict __format, ...) __CASMNAME("snprintf");
 #else /* ... */
 __NAMESPACE_LOCAL_END
 #include <libc/local/stdio/snprintf.h>
 __NAMESPACE_LOCAL_BEGIN
-/* >> snprintf(3), vsnprintf(3)
- * Print a formatted string to a given in-member string buffer `buf'
- * Always return the REQUIRED buffer size (excluding a trailing NUL-
- * character), and never write more than `buflen' characters to `buf' */
 #define __localdep_snprintf __LIBC_LOCAL_NAME(snprintf)
 #endif /* !... */
 #endif /* !__local___localdep_snprintf_defined */
-/* Dependency: strerrordesc_np from string */
 #ifndef __local___localdep_strerrordesc_np_defined
 #define __local___localdep_strerrordesc_np_defined 1
 #ifdef __CRT_HAVE_strerrordesc_np

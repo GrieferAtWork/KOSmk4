@@ -31,11 +31,11 @@ DECL_BEGIN
 
 
 
-/*[[[head:libc_glob,hash:CRC-32=0xe1f0c0eb]]]*/
+/*[[[head:libc_glob,hash:CRC-32=0x8b00b56e]]]*/
 /* @param: flags: Set of `GLOB_ERR | GLOB_MARK | GLOB_NOSORT | GLOB_DOOFFS |
- *                        GLOB_NOCHECK | GLOB_APPEND | GLOB_NOESCAPE |
+ *                        GLOB_NOCHECK | GLOB_APPEND  | GLOB_NOESCAPE  |
  *                        GLOB_PERIOD | GLOB_MAGCHAR | GLOB_ALTDIRFUNC |
- *                        GLOB_BRACE | GLOB_NOMAGIC | GLOB_TILDE |
+ *                        GLOB_BRACE  |  GLOB_NOMAGIC  |  GLOB_TILDE   |
  *                        GLOB_ONLYDIR | GLOB_TILDE_CHECK'
  * @return: GLOB_NOSPACE : ...
  * @return: GLOB_ABORTED : ...
@@ -69,11 +69,11 @@ NOTHROW_NCX(LIBCCALL libc_globfree)(glob_t *pglob)
 }
 /*[[[end:libc_globfree]]]*/
 
-/*[[[head:libc_glob64,hash:CRC-32=0xe4413fa7]]]*/
+/*[[[head:libc_glob64,hash:CRC-32=0xda7d33be]]]*/
 /* @param: flags: Set of `GLOB_ERR | GLOB_MARK | GLOB_NOSORT | GLOB_DOOFFS |
- *                        GLOB_NOCHECK | GLOB_APPEND | GLOB_NOESCAPE |
+ *                        GLOB_NOCHECK | GLOB_APPEND  | GLOB_NOESCAPE  |
  *                        GLOB_PERIOD | GLOB_MAGCHAR | GLOB_ALTDIRFUNC |
- *                        GLOB_BRACE | GLOB_NOMAGIC | GLOB_TILDE |
+ *                        GLOB_BRACE  |  GLOB_NOMAGIC  |  GLOB_TILDE   |
  *                        GLOB_ONLYDIR | GLOB_TILDE_CHECK'
  * @return: GLOB_NOSPACE : ...
  * @return: GLOB_ABORTED : ...

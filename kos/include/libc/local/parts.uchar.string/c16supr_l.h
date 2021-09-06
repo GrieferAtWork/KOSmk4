@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x79e86efc */
+/* HASH CRC-32:0x200a888e */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -22,7 +22,6 @@
 #define __local_c16supr_l_defined 1
 #include <__crt.h>
 __NAMESPACE_LOCAL_BEGIN
-/* Dependency: towupper_l from wctype */
 #ifndef __local___localdep_towupper_l_defined
 #define __local___localdep_towupper_l_defined 1
 #ifdef __CRT_HAVE_towupper_l

@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x411e5d56 */
+/* HASH CRC-32:0x50be8cbc */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -23,7 +23,6 @@
 #include <__crt.h>
 struct __glob64_struct;
 __NAMESPACE_LOCAL_BEGIN
-/* Dependency: globfree32 from glob */
 #if !defined(__local___localdep_globfree32_defined) && defined(__CRT_HAVE_globfree)
 #define __local___localdep_globfree32_defined 1
 __CREDIRECT_VOID(,__NOTHROW_NCX,__localdep_globfree32,(void *__pglob),globfree,(__pglob))

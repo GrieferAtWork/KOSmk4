@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xb82c13ae */
+/* HASH CRC-32:0xadbffafa */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -26,35 +26,24 @@
 #include <features.h>
 #include <bits/os/timespec.h>
 __NAMESPACE_LOCAL_BEGIN
-/* Dependency: clock_gettime from time */
 #ifndef __local___localdep_clock_gettime_defined
 #define __local___localdep_clock_gettime_defined 1
 #if defined(__CRT_HAVE_clock_gettime64) && defined(__USE_TIME_BITS64)
-/* >> clock_gettime(2), clock_gettime64(2)
- * Get current value of clock `clock_id' and store it in `tp' */
 __CREDIRECT(__ATTR_NONNULL((2)),int,__NOTHROW_NCX,__localdep_clock_gettime,(__clockid_t __clock_id, struct timespec *__tp),clock_gettime64,(__clock_id,__tp))
 #elif defined(__CRT_HAVE_clock_gettime) && !defined(__USE_TIME_BITS64)
-/* >> clock_gettime(2), clock_gettime64(2)
- * Get current value of clock `clock_id' and store it in `tp' */
 __CREDIRECT(__ATTR_NONNULL((2)),int,__NOTHROW_NCX,__localdep_clock_gettime,(__clockid_t __clock_id, struct timespec *__tp),clock_gettime,(__clock_id,__tp))
 #elif defined(__CRT_HAVE___clock_gettime) && !defined(__USE_TIME_BITS64)
-/* >> clock_gettime(2), clock_gettime64(2)
- * Get current value of clock `clock_id' and store it in `tp' */
 __CREDIRECT(__ATTR_NONNULL((2)),int,__NOTHROW_NCX,__localdep_clock_gettime,(__clockid_t __clock_id, struct timespec *__tp),__clock_gettime,(__clock_id,__tp))
 #else /* ... */
 __NAMESPACE_LOCAL_END
 #include <libc/local/time/clock_gettime.h>
 __NAMESPACE_LOCAL_BEGIN
-/* >> clock_gettime(2), clock_gettime64(2)
- * Get current value of clock `clock_id' and store it in `tp' */
 #define __localdep_clock_gettime __LIBC_LOCAL_NAME(clock_gettime)
 #endif /* !... */
 #endif /* !__local___localdep_clock_gettime_defined */
 __NAMESPACE_LOCAL_END
 #include <asm/crt/time.h>
 __NAMESPACE_LOCAL_BEGIN
-/* >> timespec_get(3), timespec_get64(3)
- * Set `ts' to calendar time based in time base `base' */
 __LOCAL_LIBC(timespec_get) __ATTR_NONNULL((1)) int
 __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(timespec_get))(struct timespec *__ts, __STDC_INT_AS_UINT_T __base) {
 	if (__base == __TIME_UTC) {

@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xec6ce842 */
+/* HASH CRC-32:0x32d0015d */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -22,7 +22,6 @@
 #define __local_fcvt_defined 1
 #include <__crt.h>
 __NAMESPACE_LOCAL_BEGIN
-/* Dependency: fcvt_r from stdlib */
 #ifndef __local___localdep_fcvt_r_defined
 #define __local___localdep_fcvt_r_defined 1
 #ifdef __CRT_HAVE_fcvt_r

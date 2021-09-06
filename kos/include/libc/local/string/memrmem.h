@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x88b65799 */
+/* HASH CRC-32:0x38c9328a */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -23,63 +23,33 @@
 #include <__crt.h>
 #include <hybrid/typecore.h>
 __NAMESPACE_LOCAL_BEGIN
-/* Dependency: memcmp from string */
 #ifndef __local___localdep_memcmp_defined
 #define __local___localdep_memcmp_defined 1
 #ifdef __CRT_HAVE_memcmp
-/* >> memcmp(3)
- * Compare memory buffers and return the difference of the first non-matching byte
- * @return:  < 0: `s1...+=n_bytes'  < `s2...+=n_bytes'
- * @return: == 0: `s1...+=n_bytes' == `s2...+=n_bytes'
- * @return:  > 0: `s1...+=n_bytes'  > `s2...+=n_bytes' */
 __CREDIRECT(__ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1, 2)),int,__NOTHROW_NCX,__localdep_memcmp,(void const *__s1, void const *__s2, __SIZE_TYPE__ __n_bytes),memcmp,(__s1,__s2,__n_bytes))
 #elif defined(__CRT_HAVE_bcmp)
-/* >> memcmp(3)
- * Compare memory buffers and return the difference of the first non-matching byte
- * @return:  < 0: `s1...+=n_bytes'  < `s2...+=n_bytes'
- * @return: == 0: `s1...+=n_bytes' == `s2...+=n_bytes'
- * @return:  > 0: `s1...+=n_bytes'  > `s2...+=n_bytes' */
 __CREDIRECT(__ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1, 2)),int,__NOTHROW_NCX,__localdep_memcmp,(void const *__s1, void const *__s2, __SIZE_TYPE__ __n_bytes),bcmp,(__s1,__s2,__n_bytes))
 #else /* ... */
 __NAMESPACE_LOCAL_END
 #include <libc/local/string/memcmp.h>
 __NAMESPACE_LOCAL_BEGIN
-/* >> memcmp(3)
- * Compare memory buffers and return the difference of the first non-matching byte
- * @return:  < 0: `s1...+=n_bytes'  < `s2...+=n_bytes'
- * @return: == 0: `s1...+=n_bytes' == `s2...+=n_bytes'
- * @return:  > 0: `s1...+=n_bytes'  > `s2...+=n_bytes' */
 #define __localdep_memcmp __LIBC_LOCAL_NAME(memcmp)
 #endif /* !... */
 #endif /* !__local___localdep_memcmp_defined */
-/* Dependency: memrchr from string */
 #ifndef __local___localdep_memrchr_defined
 #define __local___localdep_memrchr_defined 1
 #ifdef __CRT_HAVE_memrchr
-/* >> memrchr(3)
- * Descendingly search for `needle', starting at `haystack + n_bytes'.
- * Return `NULL' if `needle' wasn't found. */
 __CREDIRECT(__ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1)),void *,__NOTHROW_NCX,__localdep_memrchr,(void const *__restrict __haystack, int __needle, __SIZE_TYPE__ __n_bytes),memrchr,(__haystack,__needle,__n_bytes))
 #else /* __CRT_HAVE_memrchr */
 __NAMESPACE_LOCAL_END
 #include <libc/local/string/memrchr.h>
 __NAMESPACE_LOCAL_BEGIN
-/* >> memrchr(3)
- * Descendingly search for `needle', starting at `haystack + n_bytes'.
- * Return `NULL' if `needle' wasn't found. */
 #define __localdep_memrchr __LIBC_LOCAL_NAME(memrchr)
 #endif /* !__CRT_HAVE_memrchr */
 #endif /* !__local___localdep_memrchr_defined */
 __NAMESPACE_LOCAL_END
 #include <features.h>
 __NAMESPACE_LOCAL_BEGIN
-/* Return the last address of a sub-string `needle...+=needlelen' stored within `haystack...+=haystacklen'
- * If no such sub-string exists, return `NULL' instead.
- * #ifdef _MEMMEM_EMPTY_NEEDLE_NULL_SOURCE
- * When `needlelen' is ZERO(0), also return `NULL' unconditionally.
- * #else // _MEMMEM_EMPTY_NEEDLE_NULL_SOURCE
- * When `needlelen' is ZERO(0), re-return `haystack + haystacklen' unconditionally.
- * #endif // !_MEMMEM_EMPTY_NEEDLE_NULL_SOURCE */
 __LOCAL_LIBC(memrmem) __ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1, 3)) void *
 __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(memrmem))(void const *__haystack, __SIZE_TYPE__ __haystacklen, void const *__needle, __SIZE_TYPE__ __needlelen) {
 	__BYTE_TYPE__ *__candidate, __marker;

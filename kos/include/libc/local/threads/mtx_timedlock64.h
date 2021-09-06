@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xb2edf5f3 */
+/* HASH CRC-32:0x63d6e9d */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -24,7 +24,6 @@
 #if defined(__CRT_HAVE_pthread_mutex_timedlock64) || defined(__CRT_HAVE_pthread_mutex_timedlock)
 #include <bits/crt/threads.h>
 __NAMESPACE_LOCAL_BEGIN
-/* Dependency: pthread_mutex_timedlock64 from pthread */
 #ifndef __local___localdep_pthread_mutex_timedlock64_defined
 #define __local___localdep_pthread_mutex_timedlock64_defined 1
 #ifdef __CRT_HAVE_pthread_mutex_timedlock64
@@ -33,11 +32,6 @@ __NAMESPACE_LOCAL_END
 #include <bits/crt/pthreadtypes.h>
 #include <bits/os/timespec.h>
 __NAMESPACE_LOCAL_BEGIN
-/* >> pthread_mutex_timedlock(3), pthread_mutex_timedlock64(3)
- * Wait until lock becomes available, or specified time passes
- * @return: EOK:       Success
- * @return: EINVAL:    The given `abstime' is invalid
- * @return: ETIMEDOUT: The given `abstime' has expired */
 __CREDIRECT(__ATTR_WUNUSED __ATTR_NONNULL((1, 2)),__errno_t,__NOTHROW_RPC,__localdep_pthread_mutex_timedlock64,(__pthread_mutex_t *__restrict __mutex, struct __timespec64 const *__restrict __abstime),pthread_mutex_timedlock64,(__mutex,__abstime))
 #elif defined(__CRT_HAVE_pthread_mutex_timedlock) && __SIZEOF_TIME32_T__ == __SIZEOF_TIME64_T__
 __NAMESPACE_LOCAL_END
@@ -45,21 +39,11 @@ __NAMESPACE_LOCAL_END
 #include <bits/crt/pthreadtypes.h>
 #include <bits/os/timespec.h>
 __NAMESPACE_LOCAL_BEGIN
-/* >> pthread_mutex_timedlock(3), pthread_mutex_timedlock64(3)
- * Wait until lock becomes available, or specified time passes
- * @return: EOK:       Success
- * @return: EINVAL:    The given `abstime' is invalid
- * @return: ETIMEDOUT: The given `abstime' has expired */
 __CREDIRECT(__ATTR_WUNUSED __ATTR_NONNULL((1, 2)),__errno_t,__NOTHROW_RPC,__localdep_pthread_mutex_timedlock64,(__pthread_mutex_t *__restrict __mutex, struct __timespec64 const *__restrict __abstime),pthread_mutex_timedlock,(__mutex,__abstime))
 #elif defined(__CRT_HAVE_pthread_mutex_timedlock)
 __NAMESPACE_LOCAL_END
 #include <libc/local/pthread/pthread_mutex_timedlock64.h>
 __NAMESPACE_LOCAL_BEGIN
-/* >> pthread_mutex_timedlock(3), pthread_mutex_timedlock64(3)
- * Wait until lock becomes available, or specified time passes
- * @return: EOK:       Success
- * @return: EINVAL:    The given `abstime' is invalid
- * @return: ETIMEDOUT: The given `abstime' has expired */
 #define __localdep_pthread_mutex_timedlock64 __LIBC_LOCAL_NAME(pthread_mutex_timedlock64)
 #else /* ... */
 #undef __local___localdep_pthread_mutex_timedlock64_defined
@@ -70,11 +54,6 @@ __NAMESPACE_LOCAL_END
 #include <bits/crt/pthreadtypes.h>
 #include <asm/os/errno.h>
 __NAMESPACE_LOCAL_BEGIN
-/* >> mtx_timedlock(3), mtx_timedlock64(3)
- * Acquire a lock to a given mutex (s.a. `pthread_mutex_timedlock(3)')
- * @return: thrd_success:  Success
- * @return: thrd_timedout: Timeout
- * @return: thrd_error:    Error */
 __LOCAL_LIBC(mtx_timedlock64) __ATTR_NONNULL((1, 2)) int
 __NOTHROW_RPC(__LIBCCALL __LIBC_LOCAL_NAME(mtx_timedlock64))(__mtx_t *__restrict __mutex, struct __timespec64 const *__restrict __time_point) {
 	__errno_t __error;

@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x41ad7ee6 */
+/* HASH CRC-32:0x3f208a5a */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -23,7 +23,6 @@
 #include <__crt.h>
 #if defined(__CRT_HAVE_wgetcwd) || defined(__CRT_HAVE__wgetcwd)
 __NAMESPACE_LOCAL_BEGIN
-/* Dependency: getenv from stdlib */
 #ifndef __local___localdep_getenv_defined
 #define __local___localdep_getenv_defined 1
 #ifdef __CRT_HAVE_getenv
@@ -42,7 +41,6 @@ __NAMESPACE_LOCAL_BEGIN
 #endif /* !__LOCAL_environ */
 #endif /* !__CRT_HAVE_getenv */
 #endif /* !__local___localdep_getenv_defined */
-/* Dependency: stat from sys.stat */
 #ifndef __local___localdep_stat_defined
 #define __local___localdep_stat_defined 1
 #if defined(__CRT_HAVE_kstat) && defined(__CRT_KOS_PRIMARY)
@@ -99,7 +97,6 @@ __CREDIRECT(__ATTR_NONNULL((1, 2)),int,__NOTHROW_NCX,__localdep_stat,(char const
 #undef __local___localdep_stat_defined
 #endif /* !... */
 #endif /* !__local___localdep_stat_defined */
-/* Dependency: wcsdup from wchar */
 #ifndef __local___localdep_wcsdup_defined
 #define __local___localdep_wcsdup_defined 1
 #ifdef __CRT_HAVE_wcsdup
@@ -115,22 +112,17 @@ __NAMESPACE_LOCAL_BEGIN
 #undef __local___localdep_wcsdup_defined
 #endif /* !... */
 #endif /* !__local___localdep_wcsdup_defined */
-/* Dependency: wgetcwd from parts.wchar.unistd */
 #ifndef __local___localdep_wgetcwd_defined
 #define __local___localdep_wgetcwd_defined 1
 #ifdef __CRT_HAVE_wgetcwd
 __NAMESPACE_LOCAL_END
 #include <hybrid/typecore.h>
 __NAMESPACE_LOCAL_BEGIN
-/* >> getcwd(2)
- * Return the path of the current working directory, relative to the filesystem root set by `chdir(2)' */
 __CREDIRECT(,__WCHAR_TYPE__ *,__NOTHROW_RPC,__localdep_wgetcwd,(__WCHAR_TYPE__ *__buf, __SIZE_TYPE__ __bufsize),wgetcwd,(__buf,__bufsize))
 #elif defined(__CRT_HAVE__wgetcwd)
 __NAMESPACE_LOCAL_END
 #include <hybrid/typecore.h>
 __NAMESPACE_LOCAL_BEGIN
-/* >> getcwd(2)
- * Return the path of the current working directory, relative to the filesystem root set by `chdir(2)' */
 __CREDIRECT(,__WCHAR_TYPE__ *,__NOTHROW_RPC,__localdep_wgetcwd,(__WCHAR_TYPE__ *__buf, __SIZE_TYPE__ __bufsize),_wgetcwd,(__buf,__bufsize))
 #else /* ... */
 #undef __local___localdep_wgetcwd_defined

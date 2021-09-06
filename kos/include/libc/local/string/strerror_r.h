@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x3590a0ac */
+/* HASH CRC-32:0x91245135 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -23,26 +23,20 @@
 #include <__crt.h>
 #include <bits/types.h>
 __NAMESPACE_LOCAL_BEGIN
-/* Dependency: memcpyc from string */
 #ifndef __local___localdep_memcpyc_defined
 #define __local___localdep_memcpyc_defined 1
 #ifdef __CRT_HAVE_memcpyc
 __NAMESPACE_LOCAL_END
 #include <hybrid/typecore.h>
 __NAMESPACE_LOCAL_BEGIN
-/* Copy memory between non-overlapping memory blocks.
- * @return: * : Always re-returns `dst' */
 __CREDIRECT(__ATTR_LEAF __ATTR_RETNONNULL __ATTR_NONNULL((1, 2)),void *,__NOTHROW_NCX,__localdep_memcpyc,(void *__restrict __dst, void const *__restrict __src, __SIZE_TYPE__ __elem_count, __SIZE_TYPE__ __elem_size),memcpyc,(__dst,__src,__elem_count,__elem_size))
 #else /* __CRT_HAVE_memcpyc */
 __NAMESPACE_LOCAL_END
 #include <libc/local/string/memcpyc.h>
 __NAMESPACE_LOCAL_BEGIN
-/* Copy memory between non-overlapping memory blocks.
- * @return: * : Always re-returns `dst' */
 #define __localdep_memcpyc __LIBC_LOCAL_NAME(memcpyc)
 #endif /* !__CRT_HAVE_memcpyc */
 #endif /* !__local___localdep_memcpyc_defined */
-/* Dependency: snprintf from stdio */
 #ifndef __local___localdep_snprintf_defined
 #define __local___localdep_snprintf_defined 1
 #if __has_builtin(__builtin_snprintf) && defined(__LIBC_BIND_CRTBUILTINS) && defined(__CRT_HAVE_snprintf) && __has_builtin(__builtin_va_arg_pack)
@@ -50,33 +44,20 @@ __NAMESPACE_LOCAL_END
 #include <features.h>
 #include <hybrid/typecore.h>
 __NAMESPACE_LOCAL_BEGIN
-/* >> snprintf(3), vsnprintf(3)
- * Print a formatted string to a given in-member string buffer `buf'
- * Always return the REQUIRED buffer size (excluding a trailing NUL-
- * character), and never write more than `buflen' characters to `buf' */
 __CEIREDIRECT(__ATTR_LIBC_PRINTF(3, 4) __ATTR_NONNULL((3)),__STDC_INT_AS_SIZE_T,__NOTHROW_NCX,__localdep_snprintf,(char *__restrict __buf, __SIZE_TYPE__ __buflen, char const *__restrict __format, ...),snprintf,{ return __builtin_snprintf(__buf, __buflen, __format, __builtin_va_arg_pack()); })
 #elif defined(__CRT_HAVE_snprintf)
 __NAMESPACE_LOCAL_END
 #include <features.h>
 #include <hybrid/typecore.h>
 __NAMESPACE_LOCAL_BEGIN
-/* >> snprintf(3), vsnprintf(3)
- * Print a formatted string to a given in-member string buffer `buf'
- * Always return the REQUIRED buffer size (excluding a trailing NUL-
- * character), and never write more than `buflen' characters to `buf' */
 __LIBC __ATTR_LIBC_PRINTF(3, 4) __ATTR_NONNULL((3)) __STDC_INT_AS_SIZE_T __NOTHROW_NCX(__VLIBCCALL __localdep_snprintf)(char *__restrict __buf, __SIZE_TYPE__ __buflen, char const *__restrict __format, ...) __CASMNAME("snprintf");
 #else /* ... */
 __NAMESPACE_LOCAL_END
 #include <libc/local/stdio/snprintf.h>
 __NAMESPACE_LOCAL_BEGIN
-/* >> snprintf(3), vsnprintf(3)
- * Print a formatted string to a given in-member string buffer `buf'
- * Always return the REQUIRED buffer size (excluding a trailing NUL-
- * character), and never write more than `buflen' characters to `buf' */
 #define __localdep_snprintf __LIBC_LOCAL_NAME(snprintf)
 #endif /* !... */
 #endif /* !__local___localdep_snprintf_defined */
-/* Dependency: strerror from string */
 #ifndef __local___localdep_strerror_defined
 #define __local___localdep_strerror_defined 1
 #ifdef __CRT_HAVE_strerror
@@ -88,7 +69,6 @@ __NAMESPACE_LOCAL_BEGIN
 #define __localdep_strerror __LIBC_LOCAL_NAME(strerror)
 #endif /* !__CRT_HAVE_strerror */
 #endif /* !__local___localdep_strerror_defined */
-/* Dependency: strerrordesc_np from string */
 #ifndef __local___localdep_strerrordesc_np_defined
 #define __local___localdep_strerrordesc_np_defined 1
 #ifdef __CRT_HAVE_strerrordesc_np
@@ -100,22 +80,17 @@ __NAMESPACE_LOCAL_BEGIN
 #define __localdep_strerrordesc_np __LIBC_LOCAL_NAME(strerrordesc_np)
 #endif /* !__CRT_HAVE_strerrordesc_np */
 #endif /* !__local___localdep_strerrordesc_np_defined */
-/* Dependency: strlen from string */
 #ifndef __local___localdep_strlen_defined
 #define __local___localdep_strlen_defined 1
 #ifdef __CRT_HAVE_strlen
 __NAMESPACE_LOCAL_END
 #include <hybrid/typecore.h>
 __NAMESPACE_LOCAL_BEGIN
-/* >> strlen(3)
- * Return the length of the string in characters (Same as `rawmemlen[...](str, '\0')') */
 __CREDIRECT(__ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1)),__SIZE_TYPE__,__NOTHROW_NCX,__localdep_strlen,(char const *__restrict __str),strlen,(__str))
 #else /* __CRT_HAVE_strlen */
 __NAMESPACE_LOCAL_END
 #include <libc/local/string/strlen.h>
 __NAMESPACE_LOCAL_BEGIN
-/* >> strlen(3)
- * Return the length of the string in characters (Same as `rawmemlen[...](str, '\0')') */
 #define __localdep_strlen __LIBC_LOCAL_NAME(strlen)
 #endif /* !__CRT_HAVE_strlen */
 #endif /* !__local___localdep_strlen_defined */

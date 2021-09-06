@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x49e150b7 */
+/* HASH CRC-32:0x4e0f9535 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -23,48 +23,31 @@
 #include <__crt.h>
 #include <bits/crt/tm.h>
 __NAMESPACE_LOCAL_BEGIN
-/* Dependency: crt_asctime_s from time */
 #if !defined(__local___localdep_crt_asctime_s_defined) && defined(__CRT_HAVE_asctime_s)
 #define __local___localdep_crt_asctime_s_defined 1
-/* >> asctime_r(3)
- * Return in `buf' a string of the form "Day Mon dd hh:mm:ss yyyy\n"
- * that is the representation of `tp' in this format */
 __CREDIRECT(__ATTR_NONNULL((1, 3)),__errno_t,__NOTHROW_NCX,__localdep_crt_asctime_s,(char *__restrict __buf, __SIZE_TYPE__ __buflen, struct __NAMESPACE_STD_SYM tm const *__restrict __tp),asctime_s,(__buf,__buflen,__tp))
 #endif /* !__local___localdep_crt_asctime_s_defined && __CRT_HAVE_asctime_s */
-/* Dependency: sprintf from stdio */
 #ifndef __local___localdep_sprintf_defined
 #define __local___localdep_sprintf_defined 1
 #if __has_builtin(__builtin_sprintf) && defined(__LIBC_BIND_CRTBUILTINS) && defined(__CRT_HAVE_sprintf) && __has_builtin(__builtin_va_arg_pack)
 __NAMESPACE_LOCAL_END
 #include <features.h>
 __NAMESPACE_LOCAL_BEGIN
-/* >> sprintf(3), vsprintf(3)
- * Print a formatted string to a given in-member string buffer `buf'
- * Return the number of written characters, excluding a trailing NUL-character */
 __CEIREDIRECT(__ATTR_LIBC_PRINTF(2, 3) __ATTR_NONNULL((1, 2)),__STDC_INT_AS_SIZE_T,__NOTHROW_NCX,__localdep_sprintf,(char *__restrict __buf, char const *__restrict __format, ...),sprintf,{ return __builtin_sprintf(__buf, __format, __builtin_va_arg_pack()); })
 #elif defined(__CRT_HAVE_sprintf)
 __NAMESPACE_LOCAL_END
 #include <features.h>
 __NAMESPACE_LOCAL_BEGIN
-/* >> sprintf(3), vsprintf(3)
- * Print a formatted string to a given in-member string buffer `buf'
- * Return the number of written characters, excluding a trailing NUL-character */
 __LIBC __ATTR_LIBC_PRINTF(2, 3) __ATTR_NONNULL((1, 2)) __STDC_INT_AS_SIZE_T __NOTHROW_NCX(__VLIBCCALL __localdep_sprintf)(char *__restrict __buf, char const *__restrict __format, ...) __CASMNAME("sprintf");
 #elif defined(__CRT_HAVE__IO_sprintf)
 __NAMESPACE_LOCAL_END
 #include <features.h>
 __NAMESPACE_LOCAL_BEGIN
-/* >> sprintf(3), vsprintf(3)
- * Print a formatted string to a given in-member string buffer `buf'
- * Return the number of written characters, excluding a trailing NUL-character */
 __LIBC __ATTR_LIBC_PRINTF(2, 3) __ATTR_NONNULL((1, 2)) __STDC_INT_AS_SIZE_T __NOTHROW_NCX(__VLIBCCALL __localdep_sprintf)(char *__restrict __buf, char const *__restrict __format, ...) __CASMNAME("_IO_sprintf");
 #else /* ... */
 __NAMESPACE_LOCAL_END
 #include <libc/local/stdio/sprintf.h>
 __NAMESPACE_LOCAL_BEGIN
-/* >> sprintf(3), vsprintf(3)
- * Print a formatted string to a given in-member string buffer `buf'
- * Return the number of written characters, excluding a trailing NUL-character */
 #define __localdep_sprintf __LIBC_LOCAL_NAME(sprintf)
 #endif /* !... */
 #endif /* !__local___localdep_sprintf_defined */
@@ -86,9 +69,6 @@ __NAMESPACE_LOCAL_END
 #endif /* !__LIBC_TIME_ABBR_MONTH_NAMES_DEFINED */
 #endif /* __BUILDING_LIBC || !__CRT_HAVE_asctime_s */
 __NAMESPACE_LOCAL_BEGIN
-/* >> asctime_r(3)
- * Return in `buf' a string of the form "Day Mon dd hh:mm:ss yyyy\n"
- * that is the representation of `tp' in this format */
 __LOCAL_LIBC(asctime_r) __ATTR_NONNULL((1, 2)) char *
 __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(asctime_r))(struct __NAMESPACE_STD_SYM tm const *__restrict __tp, char __buf[26]) {
 

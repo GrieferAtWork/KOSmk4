@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x5fb37396 */
+/* HASH CRC-32:0xa75396fa */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -25,12 +25,10 @@
 #include <bits/os/timeval.h>
 struct timezone;
 __NAMESPACE_LOCAL_BEGIN
-/* Dependency: settimeofday32 from sys.time */
 #if !defined(__local___localdep_settimeofday32_defined) && defined(__CRT_HAVE_settimeofday)
 #define __local___localdep_settimeofday32_defined 1
 __CREDIRECT(,int,__NOTHROW_NCX,__localdep_settimeofday32,(struct __timeval32 const *__tv, struct timezone const *__tz),settimeofday,(__tv,__tz))
 #endif /* !__local___localdep_settimeofday32_defined && __CRT_HAVE_settimeofday */
-/* Dependency: settimeofday64 from sys.time */
 #ifndef __local___localdep_settimeofday64_defined
 #define __local___localdep_settimeofday64_defined 1
 #ifdef __CRT_HAVE_settimeofday64

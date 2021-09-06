@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x6d1d7465 */
+/* HASH CRC-32:0x97948521 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -24,64 +24,46 @@
 #if defined(__CRT_HAVE__ftime64_s) || defined(__CRT_HAVE_ftime64) || defined(__CRT_HAVE__ftime32) || defined(__CRT_HAVE__ftime32_s) || defined(__CRT_HAVE_ftime)
 #include <bits/os/timeb.h>
 __NAMESPACE_LOCAL_BEGIN
-/* Dependency: crt_dos_ftime32 from sys.timeb */
 #if !defined(__local___localdep_crt_dos_ftime32_defined) && defined(__CRT_HAVE__ftime32)
 #define __local___localdep_crt_dos_ftime32_defined 1
-/* Fill in TIMEBUF with information about the current time */
 __CREDIRECT_VOID(__ATTR_NONNULL((1)),__NOTHROW_NCX,__localdep_crt_dos_ftime32,(struct __timeb32 *__timebuf),_ftime32,(__timebuf))
 #endif /* !__local___localdep_crt_dos_ftime32_defined && __CRT_HAVE__ftime32 */
-/* Dependency: crt_ftime32 from sys.timeb */
 #if !defined(__local___localdep_crt_ftime32_defined) && defined(__CRT_HAVE_ftime)
 #define __local___localdep_crt_ftime32_defined 1
-/* Fill in TIMEBUF with information about the current time */
 __CREDIRECT(__ATTR_NONNULL((1)),int,__NOTHROW_NCX,__localdep_crt_ftime32,(struct __timeb32 *__timebuf),ftime,(__timebuf))
 #endif /* !__local___localdep_crt_ftime32_defined && __CRT_HAVE_ftime */
-/* Dependency: crt_ftime32_s from sys.timeb */
 #if !defined(__local___localdep_crt_ftime32_s_defined) && defined(__CRT_HAVE__ftime32_s)
 #define __local___localdep_crt_ftime32_s_defined 1
 __NAMESPACE_LOCAL_END
 #include <bits/types.h>
 __NAMESPACE_LOCAL_BEGIN
-/* Fill in TIMEBUF with information about the current time */
 __CREDIRECT(__ATTR_NONNULL((1)),__errno_t,__NOTHROW_NCX,__localdep_crt_ftime32_s,(struct __timeb32 *__timebuf),_ftime32_s,(__timebuf))
 #endif /* !__local___localdep_crt_ftime32_s_defined && __CRT_HAVE__ftime32_s */
-/* Dependency: crt_ftime64 from sys.timeb */
 #if !defined(__local___localdep_crt_ftime64_defined) && defined(__CRT_HAVE_ftime64)
 #define __local___localdep_crt_ftime64_defined 1
-/* Fill in TIMEBUF with information about the current time */
 __CREDIRECT(__ATTR_NONNULL((1)),int,__NOTHROW_NCX,__localdep_crt_ftime64,(struct __timeb64 *__timebuf),ftime64,(__timebuf))
 #endif /* !__local___localdep_crt_ftime64_defined && __CRT_HAVE_ftime64 */
-/* Dependency: crt_ftime64_s from sys.timeb */
 #if !defined(__local___localdep_crt_ftime64_s_defined) && defined(__CRT_HAVE__ftime64_s)
 #define __local___localdep_crt_ftime64_s_defined 1
 __NAMESPACE_LOCAL_END
 #include <bits/types.h>
 __NAMESPACE_LOCAL_BEGIN
-/* Fill in TIMEBUF with information about the current time */
 __CREDIRECT(__ATTR_NONNULL((1)),__errno_t,__NOTHROW_NCX,__localdep_crt_ftime64_s,(struct __timeb64 *__timebuf),_ftime64_s,(__timebuf))
 #endif /* !__local___localdep_crt_ftime64_s_defined && __CRT_HAVE__ftime64_s */
-/* Dependency: memset from string */
 #ifndef __local___localdep_memset_defined
 #define __local___localdep_memset_defined 1
 #ifdef __CRT_HAVE_memset
 __NAMESPACE_LOCAL_END
 #include <hybrid/typecore.h>
 __NAMESPACE_LOCAL_BEGIN
-/* >> memset(3)
- * Fill memory with a given byte
- * @return: * : Always re-returns `dst' */
 __CREDIRECT(__ATTR_LEAF __ATTR_RETNONNULL __ATTR_NONNULL((1)),void *,__NOTHROW_NCX,__localdep_memset,(void *__restrict __dst, int __byte, __SIZE_TYPE__ __n_bytes),memset,(__dst,__byte,__n_bytes))
 #else /* __CRT_HAVE_memset */
 __NAMESPACE_LOCAL_END
 #include <libc/local/string/memset.h>
 __NAMESPACE_LOCAL_BEGIN
-/* >> memset(3)
- * Fill memory with a given byte
- * @return: * : Always re-returns `dst' */
 #define __localdep_memset __LIBC_LOCAL_NAME(memset)
 #endif /* !__CRT_HAVE_memset */
 #endif /* !__local___localdep_memset_defined */
-/* Fill in TIMEBUF with information about the current time */
 __LOCAL_LIBC(_ftime64) __ATTR_NONNULL((1)) void
 __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(_ftime64))(struct __timeb64 *__timebuf) {
 #ifdef __CRT_HAVE__ftime64_s

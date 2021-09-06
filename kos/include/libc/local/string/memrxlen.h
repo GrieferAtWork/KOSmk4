@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x5ba80d98 */
+/* HASH CRC-32:0xab1388f2 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -23,21 +23,17 @@
 #include <__crt.h>
 #include <hybrid/typecore.h>
 __NAMESPACE_LOCAL_BEGIN
-/* Dependency: memrxend from string */
 #ifndef __local___localdep_memrxend_defined
 #define __local___localdep_memrxend_defined 1
 #ifdef __CRT_HAVE_memrxend
-/* Same as `memrend', but search for non-matching locations. */
 __CREDIRECT(__ATTR_PURE __ATTR_RETNONNULL __ATTR_WUNUSED __ATTR_NONNULL((1)),void *,__NOTHROW_NCX,__localdep_memrxend,(void const *__restrict __haystack, int __needle, __SIZE_TYPE__ __n_bytes),memrxend,(__haystack,__needle,__n_bytes))
 #else /* __CRT_HAVE_memrxend */
 __NAMESPACE_LOCAL_END
 #include <libc/local/string/memrxend.h>
 __NAMESPACE_LOCAL_BEGIN
-/* Same as `memrend', but search for non-matching locations. */
 #define __localdep_memrxend __LIBC_LOCAL_NAME(memrxend)
 #endif /* !__CRT_HAVE_memrxend */
 #endif /* !__local___localdep_memrxend_defined */
-/* Same as `memrlen', but search for non-matching locations. */
 __LOCAL_LIBC(memrxlen) __ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1)) __SIZE_TYPE__
 __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(memrxlen))(void const *__restrict __haystack, int __needle, __SIZE_TYPE__ __n_bytes) {
 	return (__SIZE_TYPE__)((__BYTE_TYPE__ *)__localdep_memrxend(__haystack, __needle, __n_bytes) - (__BYTE_TYPE__ *)__haystack);

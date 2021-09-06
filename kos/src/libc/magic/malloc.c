@@ -86,9 +86,9 @@ typedef __SIZE_TYPE__ size_t;
 
 
 @@@EXCEPT: `realloc_in_place()' will return `NULL' if the reallocation isn't
-@@          possible due to the requested memory above `MALLPTR' already being
+@@          possible due to the requested  memory above `MALLPTR' already  being
 @@          in use. However, an `E_BADALLOC' exception is thrown if insufficient
-@@          memory (for internal control structures) is available to complete
+@@          memory (for internal  control structures) is  available to  complete
 @@          the operation
 [[libc, dos_only_export_alias("_expand")]]
 [[ATTR_MALL_DEFAULT_ALIGNED, ATTR_ALLOC_SIZE((2))]]

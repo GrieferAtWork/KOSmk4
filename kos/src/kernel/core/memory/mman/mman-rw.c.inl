@@ -20,11 +20,11 @@
 #ifdef __INTELLISENSE__
 #include "mman-rw.c"
 #define DEFINE_mman_read_nopf
-//#define DEFINE_mman_write_nopf
+//#define  DEFINE_mman_write_nopf
 //#define DEFINE_mman_memset_nopf
-//#define DEFINE_mman_read
-//#define DEFINE_mman_write
-//#define DEFINE_mman_memset
+//#define        DEFINE_mman_read
+//#define       DEFINE_mman_write
+//#define      DEFINE_mman_memset
 #endif /* __INTELLISENSE__ */
 
 #include <kernel/mman.h>

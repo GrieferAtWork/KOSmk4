@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x37f8dec8 */
+/* HASH CRC-32:0xda264b07 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -43,7 +43,7 @@ DECL_BEGIN
 #ifndef __KERNEL__
 #include <libc/local/environ.h>
 /* >> execv(3)
- * Replace the calling process with the application image referred to by `path' / `file'
+ * Replace the calling  process with  the application  image referred  to by  `path' /  `file'
  * and execute it's `main()' method, passing the given `argv', and setting `environ' to `envp' */
 INTERN ATTR_SECTION(".text.crt.fs.exec.exec") NONNULL((1, 2)) int
 NOTHROW_RPC(LIBCCALL libc_execv)(char const *__restrict path,
@@ -52,7 +52,7 @@ NOTHROW_RPC(LIBCCALL libc_execv)(char const *__restrict path,
 }
 #include <libc/local/environ.h>
 /* >> execvp(3)
- * Replace the calling process with the application image referred to by `path' / `file'
+ * Replace the calling  process with  the application  image referred  to by  `path' /  `file'
  * and execute it's `main()' method, passing the given `argv', and setting `environ' to `envp' */
 INTERN ATTR_SECTION(".text.crt.fs.exec.exec") NONNULL((1, 2)) int
 NOTHROW_RPC(LIBCCALL libc_execvp)(char const *__restrict file,
@@ -64,7 +64,7 @@ NOTHROW_RPC(LIBCCALL libc_execvp)(char const *__restrict file,
 #include <parts/redirect-exec.h>
 /* >> execl(3)
  * Replace the calling process with the application image referred to by `path' / `file'
- * and execute it's `main()' method, passing the list of NULL-terminated `args'-list */
+ * and execute it's  `main()' method,  passing the list  of NULL-terminated  `args'-list */
 INTERN ATTR_SECTION(".text.crt.dos.fs.exec.exec") ATTR_SENTINEL NONNULL((1)) int
 NOTHROW_RPC(VLIBDCALL libd_execl)(char const *__restrict path,
                                   char const *args,
@@ -76,7 +76,7 @@ NOTHROW_RPC(VLIBDCALL libd_execl)(char const *__restrict path,
 #include <parts/redirect-exec.h>
 /* >> execl(3)
  * Replace the calling process with the application image referred to by `path' / `file'
- * and execute it's `main()' method, passing the list of NULL-terminated `args'-list */
+ * and execute it's  `main()' method,  passing the list  of NULL-terminated  `args'-list */
 INTERN ATTR_SECTION(".text.crt.fs.exec.exec") ATTR_SENTINEL NONNULL((1)) int
 NOTHROW_RPC(VLIBCCALL libc_execl)(char const *__restrict path,
                                   char const *args,
@@ -88,7 +88,7 @@ NOTHROW_RPC(VLIBCCALL libc_execl)(char const *__restrict path,
 #include <parts/redirect-exec.h>
 /* >> execle(3)
  * Replace the calling process with the application image referred to by `path' / `file'
- * and execute it's `main()' method, passing the list of NULL-terminated `args'-list,
+ * and  execute it's `main()'  method, passing the  list of NULL-terminated `args'-list,
  * and setting `environ' to a `char **' passed after the NULL sentinel */
 INTERN ATTR_SECTION(".text.crt.dos.fs.exec.exec") ATTR_SENTINEL_O(1) NONNULL((1)) int
 NOTHROW_RPC(VLIBDCALL libd_execle)(char const *__restrict path,
@@ -101,7 +101,7 @@ NOTHROW_RPC(VLIBDCALL libd_execle)(char const *__restrict path,
 #include <parts/redirect-exec.h>
 /* >> execle(3)
  * Replace the calling process with the application image referred to by `path' / `file'
- * and execute it's `main()' method, passing the list of NULL-terminated `args'-list,
+ * and  execute it's `main()'  method, passing the  list of NULL-terminated `args'-list,
  * and setting `environ' to a `char **' passed after the NULL sentinel */
 INTERN ATTR_SECTION(".text.crt.fs.exec.exec") ATTR_SENTINEL_O(1) NONNULL((1)) int
 NOTHROW_RPC(VLIBCCALL libc_execle)(char const *__restrict path,
@@ -114,7 +114,7 @@ NOTHROW_RPC(VLIBCCALL libc_execle)(char const *__restrict path,
 #include <parts/redirect-exec.h>
 /* >> execlp(3)
  * Replace the calling process with the application image referred to by `path' / `file'
- * and execute it's `main()' method, passing the list of NULL-terminated `args'-list */
+ * and execute it's  `main()' method,  passing the list  of NULL-terminated  `args'-list */
 INTERN ATTR_SECTION(".text.crt.dos.fs.exec.exec") ATTR_SENTINEL NONNULL((1)) int
 NOTHROW_RPC(VLIBDCALL libd_execlp)(char const *__restrict file,
                                    char const *args,
@@ -126,7 +126,7 @@ NOTHROW_RPC(VLIBDCALL libd_execlp)(char const *__restrict file,
 #include <parts/redirect-exec.h>
 /* >> execlp(3)
  * Replace the calling process with the application image referred to by `path' / `file'
- * and execute it's `main()' method, passing the list of NULL-terminated `args'-list */
+ * and execute it's  `main()' method,  passing the list  of NULL-terminated  `args'-list */
 INTERN ATTR_SECTION(".text.crt.fs.exec.exec") ATTR_SENTINEL NONNULL((1)) int
 NOTHROW_RPC(VLIBCCALL libc_execlp)(char const *__restrict file,
                                    char const *args,
@@ -159,7 +159,7 @@ __LOCAL_LIBC(__execvpe_impl) __ATTR_NOINLINE __ATTR_NONNULL((1, 3, 5, 6)) int
 }
 __NAMESPACE_LOCAL_END
 /* >> execvpe(3)
- * Replace the calling process with the application image referred to by `file' and
+ * Replace the  calling process  with the  application  image referred  to by  `file'  and
  * execute it's `main()' method, passing the given `argv', and setting `environ' to `envp' */
 INTERN ATTR_SECTION(".text.crt.fs.exec.exec") NONNULL((1, 2, 3)) int
 NOTHROW_RPC(LIBCCALL libc_execvpe)(char const *__restrict file,
@@ -207,7 +207,7 @@ NOTHROW_RPC(LIBCCALL libc_execvpe)(char const *__restrict file,
 #include <parts/redirect-exec.h>
 /* >> execlpe(3)
  * Replace the calling process with the application image referred to by `path' / `file'
- * and execute it's `main()' method, passing the list of NULL-terminated `args'-list,
+ * and  execute it's `main()'  method, passing the  list of NULL-terminated `args'-list,
  * and setting `environ' to a `char **' passed after the NULL sentinel */
 INTERN ATTR_SECTION(".text.crt.dos.fs.exec.exec") ATTR_SENTINEL_O(1) NONNULL((1)) int
 NOTHROW_RPC(VLIBDCALL libd_execlpe)(char const *__restrict file,
@@ -220,7 +220,7 @@ NOTHROW_RPC(VLIBDCALL libd_execlpe)(char const *__restrict file,
 #include <parts/redirect-exec.h>
 /* >> execlpe(3)
  * Replace the calling process with the application image referred to by `path' / `file'
- * and execute it's `main()' method, passing the list of NULL-terminated `args'-list,
+ * and  execute it's `main()'  method, passing the  list of NULL-terminated `args'-list,
  * and setting `environ' to a `char **' passed after the NULL sentinel */
 INTERN ATTR_SECTION(".text.crt.fs.exec.exec") ATTR_SENTINEL_O(1) NONNULL((1)) int
 NOTHROW_RPC(VLIBCCALL libc_execlpe)(char const *__restrict file,
@@ -358,7 +358,7 @@ NOTHROW_NCX(LIBCCALL libc_swab)(void const *__restrict from,
 }
 /* >> ctermid(3)
  * Writes the string "/dev/tty" to `s', or returns a pointer to
- * a writable data location that contains that same string. */
+ * a writable  data location  that contains  that same  string. */
 INTERN ATTR_SECTION(".text.crt.io.tty") ATTR_RETNONNULL char *
 NOTHROW_NCX(LIBCCALL libc_ctermid)(char *s) {
 	static char buf[9];
@@ -369,10 +369,10 @@ NOTHROW_NCX(LIBCCALL libc_ctermid)(char *s) {
 #include <asm/crt/stdio.h>
 /* >> cuserid(3)
  * Return the name of the current user (`$LOGNAME' or `getpwuid(geteuid())'), storing
- * that name in `s'. When `s' is NULL, a static buffer is used instead
- * When given, `s' must be a buffer of at least `L_cuserid' bytes.
- * If the actual username is longer than this, it may be truncated, and programs
- * that wish to support longer usernames should make use of `getlogin_r()' instead.
+ * that  name  in  `s'.  When  `s'  is   NULL,  a  static  buffer  is  used   instead
+ * When  given,   `s'   must  be   a   buffer   of  at   least   `L_cuserid'   bytes.
+ * If the actual  username is longer  than this,  it may be  truncated, and  programs
+ * that wish to support longer usernames  should make use of `getlogin_r()'  instead.
  * s.a. `getlogin()' and `getlogin_r()' */
 INTERN ATTR_SECTION(".text.crt.io.tty") char *
 NOTHROW_NCX(LIBCCALL libc_cuserid)(char *s) {
@@ -401,36 +401,36 @@ NOTHROW_NCX(LIBCCALL libc_cuserid)(char *s) {
 #include <asm/os/poll.h>
 #include <libc/strings.h>
 /* >> getpassfd(3)
- * This function behaves similar to `readpassphrase(3)', but is still
- * quite distinct from that function in how this one behaves, vs. how
- * that other function behaves. In general, this function is a bit more
- * user-friendly, in that it offers more (but different) `flags' to
+ * This function behaves  similar to `readpassphrase(3)',  but is  still
+ * quite  distinct from that  function in how this  one behaves, vs. how
+ * that other function behaves. In general, this function is a bit  more
+ * user-friendly, in  that it  offers more  (but different)  `flags'  to
  * control how the password prompt is generated, with the main advantage
- * of this function being that it implements some "advanced" readline
- * functionality, such as deleting typed characters without relying on
- * the system TTY canonical buffer (which `readpassphrase(3)' needs,
- * since it doesn't include support for _any_ control characters other
+ * of this function  being that it  implements some "advanced"  readline
+ * functionality, such as deleting  typed characters without relying  on
+ * the  system  TTY canonical  buffer (which  `readpassphrase(3)' needs,
+ * since it doesn't include support  for _any_ control characters  other
  * that CR/LF as indicators to stop reading text)
  * Which of the 2 functions should be used is a matter of taste, but
- * personally, I prefer this one over `readpassphrase(3)'.
+ * personally,   I   prefer  this   one   over  `readpassphrase(3)'.
  * @param: prompt:  [0..1]      Text-prompt to display to the user, or `NULL'
  * @param: buf:     [0..buflen] Buffer that will receive the user's password.
- *                              When set to `NULL', a dynamically allocated
+ *                              When set to  `NULL', a dynamically  allocated
  *                              buffer will be used and returned.
  * @param: buflen:              Size of `buf' (in characters) (ignored when `buf == NULL')
- * @param: fds:     [0..1]      When non-NULL, an [stdin,stdout,stderr] triple
+ * @param: fds:     [0..1]      When non-NULL,  an [stdin,stdout,stderr]  triple
  *                              of files, used for [read,write,beep] operations.
- *                              When `NULL', try to use `/dev/tty' instead, and
- *                              if that fails, use `STDIN_FILENO,STDERR_FILENO,
+ *                              When  `NULL', try to use `/dev/tty' instead, and
+ *                              if that fails, use  `STDIN_FILENO,STDERR_FILENO,
  *                              STDERR_FILENO' as final fallback.
- *                              When `GETPASS_NEED_TTY' is set, the function
+ *                              When `GETPASS_NEED_TTY' is set, the  function
  *                              will fail with `errno=ENOTTY' if the actually
  *                              used `fds[0]' (iow: stdin) isn't a TTY device
  *                              s.a. `isatty(3)'
  * @param: flags:               Set of `GETPASS_*' flags (from <unistd.h>)
- * @param: timeout_in_seconds:  When non-0, timeout (in seconds) to wait for the
- *                              user to type each character of their password. If
- *                              this timeout expires, fail with `errno=ETIMEDOUT'
+ * @param: timeout_in_seconds:  When non-0, timeout (in  seconds) to wait for  the
+ *                              user to type each character of their password.  If
+ *                              this timeout expires, fail with  `errno=ETIMEDOUT'
  *                              Negative values result in weak undefined behavior.
  * @return: * :   [buf == NULL] Success (dynamically allocated buffer; must be `free(3)'d)
  * @return: buf:                Success
@@ -1043,9 +1043,9 @@ NOTHROW_NCX(LIBCCALL libc_closefrom)(fd_t lowfd) {
 }
 #include <asm/os/fcntl.h>
 /* >> fchroot(2)
- * Change the root directory to `fd'. If `fd' was opened before a prior call to `chroot()',
- * and referrs to a directory, then this function can be used to escape a chroot() jail.
- * No special permissions are required to use this function, since a malicious application
+ * Change the root directory to  `fd'. If `fd' was opened  before a prior call to  `chroot()',
+ * and referrs to  a directory,  then this function  can be  used to escape  a chroot()  jail.
+ * No special permissions  are required to  use this function,  since a malicious  application
  * could achieve the same behavior by use of `*at' system calls, using `fd' as `dfd' argument. */
 INTERN ATTR_SECTION(".text.crt.sched.user") int
 NOTHROW_NCX(LIBCCALL libc_fchroot)(fd_t fd) {
@@ -1057,12 +1057,12 @@ NOTHROW_NCX(LIBCCALL libc_fchroot)(fd_t fd) {
 }
 #include <libc/errno.h>
 /* >> resolvepath(3)
- * Similar to `frealpathat(2)' (though use the later for more options)
- * Also note that this function appears to have a weird rule (which KOS simply
- * ignores) that is related to this function not writing more than `PATH_MAX'
+ * Similar  to  `frealpathat(2)'  (though  use  the  later  for  more   options)
+ * Also note that this function appears to  have a weird rule (which KOS  simply
+ * ignores)  that is related  to this function not  writing more than `PATH_MAX'
  * bytes to `buf'. (Why??? I mean: The whole point of having a `buflen' argument
  * is to be able to handle names of arbitrary lengths)
- * Additionally, the online docs don't mention what happens when `buflen' is too
+ * Additionally, the online docs don't mention what happens when `buflen' is  too
  * small, so I guess I can just make up what's supposed to happen, and I say that
  * the function will set errno=ERANGE and return -1
  * @return: * : Used buffer size (possibly including a NUL-byte, but maybe not)

@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xab749ca4 */
+/* HASH CRC-32:0xd8e4d3b6 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -23,7 +23,6 @@
 #include <__crt.h>
 #include <hybrid/typecore.h>
 __NAMESPACE_LOCAL_BEGIN
-/* Same as `memrchrq', but return `haystack - 8', rather than `NULL' if `needle' wasn't found. */
 __LOCAL_LIBC(memrendq) __ATTR_PURE __ATTR_RETNONNULL __ATTR_WUNUSED __ATTR_NONNULL((1)) __UINT64_TYPE__ *
 __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(memrendq))(void const *__restrict __haystack, __UINT64_TYPE__ __needle, __SIZE_TYPE__ __n_qwords) {
 	__UINT64_TYPE__ *__result = (__UINT64_TYPE__ *)__haystack + __n_qwords;

@@ -35,24 +35,24 @@ global CONFIG_VERBOSE;
 global final DEFAULT_CONFIG_VERBOSE = false;
 
 @@Timeout for the next byte in an on-going command (in microseconds)
-@@When this timeout is exceeded, the current command is discarded
+@@When this timeout  is exceeded, the  current command is  discarded
 global CONFIG_GDB_COMMAND_NEXTBYTE_TIMEOUT;
 
 @@Timeout for waiting for GDB to ACK a command (in microseconds)
-@@When this timeout is exceeded, try to send the packet again
+@@When  this timeout is  exceeded, try to  send the packet again
 global CONFIG_GDB_COMMAND_ACK_TIMEOUT;
 
-@@Max # of times to re-attempt sending a response to GDB
+@@Max   #  of  times  to  re-attempt  sending  a  response  to  GDB
 @@the total # of attempts is @(CONFIG_GDB_SEND_MAX_RETRY_COUNT + 1)
 global CONFIG_GDB_SEND_MAX_RETRY_COUNT;
 
 @@Timeout (in microseconds) before re-attempting a telnet command,
-@@or assuming that the command completed successfully.
+@@or   assuming   that   the   command   completed   successfully.
 global CONFIG_TELNET_RESPONSE_TIMEOUT;
 global CONFIG_VBOXMANAGE_COMPLETE_TIMEOUT;
 
 @@Use VirtualBox's builtin (and broken) single-step
-@@function, rather than using code injection.
+@@function,  rather  than  using  code   injection.
 global final CONFIG_USE_NATIVE_STEP = false;
 
 @@Keep the VM running during memory reads
@@ -122,7 +122,7 @@ global gdbServerSocket: net.socket;
 global CONFIG_GDB_REMOTE_SUPPORTS_SWBREAK: bool = false;
 global CONFIG_GDB_REMOTE_SUPPORTS_HWBREAK: bool = false;
 
-@@Read in response data until a line is read that doesn't contain a
+@@Read in response  data until a  line is read  that doesn't contain  a
 @@trailing line-feed and starts with @"VBoxDbg>". At that point, return
 @@all previously read lines.
 function vBoxTelnetGetResponse(timeout_microseconds: int = -1): Bytes {
@@ -428,7 +428,7 @@ function vmWriteMemory(addr: int, data: Bytes) {
 	}
 }
 
-@@Set of currently defined breakpoints
+@@Set   of   currently   defined   breakpoints
 @@Mapping is @(breakpointId: (typ, addr, len))
 global vmDefinedBreakpoints: {int: (int, int, int)} = Dict();
 
@@ -440,7 +440,7 @@ function vmClearAllBreakpoints() {
 	vmDefinedBreakpoints.clear();
 }
 
-@@Search for a defined breakpoint and returns
+@@Search for a  defined breakpoint and  returns
 @@its ID, or @none if no such breakpoint exists
 function vmFindDefinedBreakpoint(typ: int, addr: int, len: int): int | none {
 	local packedData = (typ, addr, len);
@@ -558,7 +558,7 @@ function _vmSetRegister(name: string, value: string | int) {
 }
 
 @@When @_vmIsStepLoopPaused is @none, determine its
-@@proper value and assign @true or @false to it.
+@@proper value and  assign @true or  @false to  it.
 function vmGetStepLoopPaused(rip: int = none): bool {
 	if (_vmIsStepLoopPaused is none) {
 		if (rip is none)
@@ -865,10 +865,10 @@ function _vmGetRegisters(): {string: int} {
 @@Return a set of @(register, value) for the following registers:
 @@   @"ax", @"bx", @"cx", @"dx", @"si", @"di", @"sp", @"bp", @"ip", @"flags"
 @@   @"cs", @"ds", @"es", @"fs", @"gs"
-@@On x86_64, the following registers are also contained:
+@@On x86_64,  the   following  registers   are  also   contained:
 @@   @"r8", @"r9", @"r10", @"r11", @"r12", @"r13", @"r14", @"r15"
 @@The register names of the first line always have those names in the returned
-@@mapping, however will have had the one of @"foo", @"efoo" or @"rfoo" in the
+@@mapping,  however will have had the one of @"foo", @"efoo" or @"rfoo" in the
 @@original register list.
 function vmGetRegisters(): {string: int} {
 	local result = _vmGetRegisters();
@@ -998,7 +998,7 @@ again:
 global GDBHandleVirtualBoxEvent;
 global gdbStopReason;
 
-@@Resume VM execution. When @singleStep is @true, only execute a
+@@Resume VM execution.  When @singleStep is  @true, only execute  a
 @@single instruction and return once that instruction has finished,
 @@alongside setting @gdbStopReason as appropriate
 function vmResume(singleStep: bool = false) {

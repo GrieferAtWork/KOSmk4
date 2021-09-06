@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xe9ae519c */
+/* HASH CRC-32:0x578030b1 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -22,7 +22,6 @@
 #define __local_strcasestr_defined 1
 #include <__crt.h>
 __NAMESPACE_LOCAL_BEGIN
-/* Dependency: strcasecmp from string */
 #ifndef __local___localdep_strcasecmp_defined
 #define __local___localdep_strcasecmp_defined 1
 #if __has_builtin(__builtin_strcasecmp) && defined(__LIBC_BIND_CRTBUILTINS) && defined(__CRT_HAVE_strcasecmp)
@@ -46,8 +45,6 @@ __NAMESPACE_LOCAL_BEGIN
 #define __localdep_strcasecmp __LIBC_LOCAL_NAME(strcasecmp)
 #endif /* !... */
 #endif /* !__local___localdep_strcasecmp_defined */
-/* >> strcasestr(3)
- * Same as `strstr', but ignore casing */
 __LOCAL_LIBC(strcasestr) __ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1, 2)) char *
 __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(strcasestr))(char const *__haystack, char const *__needle) {
 	for (; *__haystack; ++__haystack) {

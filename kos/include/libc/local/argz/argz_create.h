@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x5237d287 */
+/* HASH CRC-32:0xe8246df8 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -24,7 +24,6 @@
 #if defined(__CRT_HAVE_malloc) || defined(__CRT_HAVE_calloc) || defined(__CRT_HAVE_realloc) || defined(__CRT_HAVE_memalign) || defined(__CRT_HAVE_aligned_alloc) || defined(__CRT_HAVE_posix_memalign)
 #include <bits/types.h>
 __NAMESPACE_LOCAL_BEGIN
-/* Dependency: malloc from stdlib */
 #ifndef __local___localdep_malloc_defined
 #define __local___localdep_malloc_defined 1
 #if __has_builtin(__builtin_malloc) && defined(__LIBC_BIND_CRTBUILTINS) && defined(__CRT_HAVE_malloc)
@@ -46,46 +45,32 @@ __NAMESPACE_LOCAL_BEGIN
 #undef __local___localdep_malloc_defined
 #endif /* !... */
 #endif /* !__local___localdep_malloc_defined */
-/* Dependency: stpcpy from string */
 #ifndef __local___localdep_stpcpy_defined
 #define __local___localdep_stpcpy_defined 1
 #if __has_builtin(__builtin_stpcpy) && defined(__LIBC_BIND_CRTBUILTINS) && defined(__CRT_HAVE_stpcpy)
-/* >> stpcpy(3)
- * Same as `mempcpy(dst, src, (strlen(src) + 1) * sizeof(char)) - 1´ */
 __CEIREDIRECT(__ATTR_LEAF __ATTR_RETNONNULL __ATTR_NONNULL((1, 2)),char *,__NOTHROW_NCX,__localdep_stpcpy,(char *__restrict __buf, char const *__restrict __src),stpcpy,{ return __builtin_stpcpy(__buf, __src); })
 #elif defined(__CRT_HAVE_stpcpy)
-/* >> stpcpy(3)
- * Same as `mempcpy(dst, src, (strlen(src) + 1) * sizeof(char)) - 1´ */
 __CREDIRECT(__ATTR_LEAF __ATTR_RETNONNULL __ATTR_NONNULL((1, 2)),char *,__NOTHROW_NCX,__localdep_stpcpy,(char *__restrict __buf, char const *__restrict __src),stpcpy,(__buf,__src))
 #elif defined(__CRT_HAVE___stpcpy)
-/* >> stpcpy(3)
- * Same as `mempcpy(dst, src, (strlen(src) + 1) * sizeof(char)) - 1´ */
 __CREDIRECT(__ATTR_LEAF __ATTR_RETNONNULL __ATTR_NONNULL((1, 2)),char *,__NOTHROW_NCX,__localdep_stpcpy,(char *__restrict __buf, char const *__restrict __src),__stpcpy,(__buf,__src))
 #else /* ... */
 __NAMESPACE_LOCAL_END
 #include <libc/local/string/stpcpy.h>
 __NAMESPACE_LOCAL_BEGIN
-/* >> stpcpy(3)
- * Same as `mempcpy(dst, src, (strlen(src) + 1) * sizeof(char)) - 1´ */
 #define __localdep_stpcpy __LIBC_LOCAL_NAME(stpcpy)
 #endif /* !... */
 #endif /* !__local___localdep_stpcpy_defined */
-/* Dependency: strlen from string */
 #ifndef __local___localdep_strlen_defined
 #define __local___localdep_strlen_defined 1
 #ifdef __CRT_HAVE_strlen
 __NAMESPACE_LOCAL_END
 #include <hybrid/typecore.h>
 __NAMESPACE_LOCAL_BEGIN
-/* >> strlen(3)
- * Return the length of the string in characters (Same as `rawmemlen[...](str, '\0')') */
 __CREDIRECT(__ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1)),__SIZE_TYPE__,__NOTHROW_NCX,__localdep_strlen,(char const *__restrict __str),strlen,(__str))
 #else /* __CRT_HAVE_strlen */
 __NAMESPACE_LOCAL_END
 #include <libc/local/string/strlen.h>
 __NAMESPACE_LOCAL_BEGIN
-/* >> strlen(3)
- * Return the length of the string in characters (Same as `rawmemlen[...](str, '\0')') */
 #define __localdep_strlen __LIBC_LOCAL_NAME(strlen)
 #endif /* !__CRT_HAVE_strlen */
 #endif /* !__local___localdep_strlen_defined */
@@ -93,25 +78,6 @@ __NAMESPACE_LOCAL_END
 #include <libc/errno.h>
 #include <hybrid/__assert.h>
 __NAMESPACE_LOCAL_BEGIN
-/* >> argz_create(3)
- * Construct an argz-string from a given NULL-terminated `argv'-vector,
- * as is also passed to main(), and accepted by the exec() family of functions
- * An argz-string is imply a string of '\0'-seperated sub-strings, where each
- * sub-string represents one of the original strings from `argv'
- * The base-pointer to this string is stored in `*pargz'
- * The overall length of the argz-string is tracked at the offset from its base
- * pointer, to the first byte after a trailing '\0' character that follows the
- * last of the many sub-strings. An empty argz-string is thus represented as any
- * base-pointer in conjunction with `*pargz_len=0'. (But note that GLibc seems to
- * suggest that certain APIs should be used under the assumption that an empty
- * argz-string can also be represented with the base pointer `*pargz=NULL'. This
- * kind of behavior is _NOT_ actually supported by the API, and only implied by
- * some (apparently) badly worded documentation of `argz_next(3)')
- * When an argz-string is no longer needed, it can be destroyed by passing its
- * base pointer (as filled in at `*pargz' by this function, and updated by the
- * many other functions in this header) to `free(3)'
- * @return: 0 :     Success
- * @return: ENOMEM: Insufficient heap memory */
 __LOCAL_LIBC(argz_create) __ATTR_NONNULL((1, 2, 3)) __errno_t
 __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(argz_create))(char *const ___argv[], char **__restrict __pargz, __SIZE_TYPE__ *__restrict __pargz_len) {
 	__SIZE_TYPE__ __i, ___argc, __total_len = 0;

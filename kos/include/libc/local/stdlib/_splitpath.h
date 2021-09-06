@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x898dad1e */
+/* HASH CRC-32:0x97a15048 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -22,7 +22,6 @@
 #define __local__splitpath_defined 1
 #include <__crt.h>
 __NAMESPACE_LOCAL_BEGIN
-/* Dependency: _splitpath_s from stdlib */
 #ifndef __local___localdep__splitpath_s_defined
 #define __local___localdep__splitpath_s_defined 1
 #ifdef __CRT_HAVE__splitpath_s

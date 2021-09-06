@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x175c2a47 */
+/* HASH CRC-32:0xf1c3a40e */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -26,10 +26,6 @@
 #include <hybrid/__alloca.h>
 #include <libc/string.h>
 __NAMESPACE_LOCAL_BEGIN
-/* >> format_repeat(3)
- * Repeat `ch' a number of `num_repetitions' times
- * The usual format-printer rules apply, and this function
- * is allowed to call `printer' as often as it chooses */
 __LOCAL_LIBC(format_wrepeat) __ATTR_NONNULL((1)) __SSIZE_TYPE__
 (__LIBCCALL __LIBC_LOCAL_NAME(format_wrepeat))(__pwformatprinter __printer, void *__arg, __WCHAR_TYPE__ __ch, __SIZE_TYPE__ __num_repetitions) __THROWS(...) {
 	__SSIZE_TYPE__ __result, __temp;

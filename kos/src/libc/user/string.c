@@ -266,10 +266,10 @@ strsignal_offset_t const strsignal_offsets_db[NSIG] = {
 };
 
 
-/*[[[head:libd_sigabbrev_np,hash:CRC-32=0x49fe93d5]]]*/
+/*[[[head:libd_sigabbrev_np,hash:CRC-32=0xfa615854]]]*/
 /* >> sigabbrev_np(3)
  * Return the name of a given signal, without the leading `SIG*' prefix.
- * If the given `signum' isn't recognized, return `NULL' instead. */
+ * If the  given  `signum'  isn't  recognized,  return  `NULL'  instead. */
 INTERN ATTR_SECTION(".text.crt.dos.errno") ATTR_CONST WUNUSED char const *
 NOTHROW(LIBDCALL libd_sigabbrev_np)(signo_t signum)
 /*[[[body:libd_sigabbrev_np]]]*/
@@ -279,10 +279,10 @@ NOTHROW(LIBDCALL libd_sigabbrev_np)(signo_t signum)
 }
 /*[[[end:libd_sigabbrev_np]]]*/
 
-/*[[[head:libc_sigabbrev_np,hash:CRC-32=0x89bdbb00]]]*/
+/*[[[head:libc_sigabbrev_np,hash:CRC-32=0x941c9210]]]*/
 /* >> sigabbrev_np(3)
  * Return the name of a given signal, without the leading `SIG*' prefix.
- * If the given `signum' isn't recognized, return `NULL' instead. */
+ * If the  given  `signum'  isn't  recognized,  return  `NULL'  instead. */
 INTERN ATTR_SECTION(".text.crt.errno") ATTR_CONST WUNUSED char const *
 NOTHROW(LIBCCALL libc_sigabbrev_np)(signo_t signum)
 /*[[[body:libc_sigabbrev_np]]]*/

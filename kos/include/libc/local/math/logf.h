@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xf357dc7e */
+/* HASH CRC-32:0xd69e8a44 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -24,23 +24,18 @@
 #if defined(__CRT_HAVE_log) || defined(__CRT_HAVE___log)
 #include <bits/crt/math-vector.h>
 __NAMESPACE_LOCAL_BEGIN
-/* Dependency: log from math */
 #ifndef __local___localdep_log_defined
 #define __local___localdep_log_defined 1
 #if __has_builtin(__builtin_log) && defined(__LIBC_BIND_CRTBUILTINS) && defined(__CRT_HAVE_log)
-/* Natural logarithm of `x' */
 __CEIREDIRECT(__ATTR_WUNUSED __DECL_SIMD_log,double,__NOTHROW,__localdep_log,(double __x),log,{ return __builtin_log(__x); })
 #elif defined(__CRT_HAVE_log)
-/* Natural logarithm of `x' */
 __CREDIRECT(__ATTR_WUNUSED __DECL_SIMD_log,double,__NOTHROW,__localdep_log,(double __x),log,(__x))
 #elif defined(__CRT_HAVE___log)
-/* Natural logarithm of `x' */
 __CREDIRECT(__ATTR_WUNUSED __DECL_SIMD_log,double,__NOTHROW,__localdep_log,(double __x),__log,(__x))
 #else /* ... */
 #undef __local___localdep_log_defined
 #endif /* !... */
 #endif /* !__local___localdep_log_defined */
-/* Natural logarithm of `x' */
 __LOCAL_LIBC(logf) __ATTR_WUNUSED __DECL_SIMD_logf float
 __NOTHROW(__LIBCCALL __LIBC_LOCAL_NAME(logf))(float __x) {
 	return (float)__localdep_log((double)__x);

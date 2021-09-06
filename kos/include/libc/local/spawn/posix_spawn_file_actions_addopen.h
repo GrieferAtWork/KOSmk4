@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xf49bc321 */
+/* HASH CRC-32:0x6ce6e54a */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -27,7 +27,6 @@
 #include <bits/types.h>
 #include <libc/errno.h>
 __NAMESPACE_LOCAL_BEGIN
-/* Dependency: free from stdlib */
 #ifndef __local___localdep_free_defined
 #define __local___localdep_free_defined 1
 #if __has_builtin(__builtin_free) && defined(__LIBC_BIND_CRTBUILTINS) && defined(__CRT_HAVE_free)
@@ -40,16 +39,13 @@ __CREDIRECT_VOID(,__NOTHROW_NCX,__localdep_free,(void *__mallptr),cfree,(__mallp
 #undef __local___localdep_free_defined
 #endif /* !... */
 #endif /* !__local___localdep_free_defined */
-/* Dependency: posix_spawn_file_actions_alloc from spawn */
 #ifndef __local___localdep_posix_spawn_file_actions_alloc_defined
 #define __local___localdep_posix_spawn_file_actions_alloc_defined 1
 __NAMESPACE_LOCAL_END
 #include <libc/local/spawn/posix_spawn_file_actions_alloc.h>
 __NAMESPACE_LOCAL_BEGIN
-/* Helper functions for allocating an a new file-spawn action entry */
 #define __localdep_posix_spawn_file_actions_alloc __LIBC_LOCAL_NAME(posix_spawn_file_actions_alloc)
 #endif /* !__local___localdep_posix_spawn_file_actions_alloc_defined */
-/* Dependency: strdup from string */
 #ifndef __local___localdep_strdup_defined
 #define __local___localdep_strdup_defined 1
 #if __has_builtin(__builtin_strdup) && defined(__LIBC_BIND_CRTBUILTINS) && defined(__CRT_HAVE_strdup)
@@ -67,11 +63,6 @@ __NAMESPACE_LOCAL_BEGIN
 #define __localdep_strdup __LIBC_LOCAL_NAME(strdup)
 #endif /* !... */
 #endif /* !__local___localdep_strdup_defined */
-/* >> posix_spawn_file_actions_addopen(3)
- * Enqueue a call `dup2(open(path, oflags, mode), fd)' to be performed by the child process
- * Note though that the intermediate file returned by `open()' will not remain open!
- * @return: 0     : Success
- * @return: ENOMEM: Insufficient memory to enqueue the action */
 __LOCAL_LIBC(posix_spawn_file_actions_addopen) __ATTR_NONNULL((1, 3)) __errno_t
 __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(posix_spawn_file_actions_addopen))(struct __posix_spawn_file_actions *__restrict __file_actions, __fd_t __fd, char const *__restrict __path, __oflag_t __oflags, __mode_t __mode) {
 	struct __spawn_action *__action;

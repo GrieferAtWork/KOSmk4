@@ -585,7 +585,7 @@ void *mmap32(void *addr, size_t len, __STDC_INT_AS_UINT_T prot,
 @@@param prot:  Either `PROT_NONE', or set of `PROT_EXEC | PROT_WRITE | PROT_READ | PROT_SEM | PROT_LOOSE | PROT_SHARED'
 @@@param flags: One of `MAP_SHARED`, 'MAP_SHARED_VALIDATE' or `MAP_PRIVATE', optionally or'd
 @@              with a set of `MAP_ANONYMOUS | MAP_FIXED | MAP_GROWSDOWN | MAP_LOCKED|
-@@              MAP_NONBLOCK | MAP_NORESERVE | MAP_POPULATE | MAP_STACK | MAP_SYNC |
+@@              MAP_NONBLOCK | MAP_NORESERVE | MAP_POPULATE  | MAP_STACK | MAP_SYNC  |
 @@              MAP_UNINITIALIZED | MAP_DONT_MAP | MAP_FIXED_NOREPLACE'
 [[decl_include("<features.h>")]]
 [[wunused, section(".text.crt{|.dos}.heap.mman"), no_crt_self_import]]

@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x330046a1 */
+/* HASH CRC-32:0x80257953 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -25,23 +25,18 @@
 #if defined(__IEEE754_DOUBLE_TYPE_IS_FLOAT__) || defined(__IEEE754_FLOAT_TYPE_IS_FLOAT__) || defined(__IEEE854_LONG_DOUBLE_TYPE_IS_FLOAT__) || defined(__CRT_HAVE_pow) || defined(__CRT_HAVE___pow) || defined(__IEEE754_DOUBLE_TYPE_IS_DOUBLE__) || defined(__IEEE754_FLOAT_TYPE_IS_DOUBLE__) || defined(__IEEE854_LONG_DOUBLE_TYPE_IS_DOUBLE__)
 #include <bits/crt/math-vector.h>
 __NAMESPACE_LOCAL_BEGIN
-/* Dependency: pow from math */
 #ifndef __local___localdep_pow_defined
 #define __local___localdep_pow_defined 1
 #if __has_builtin(__builtin_pow) && defined(__LIBC_BIND_CRTBUILTINS) && defined(__CRT_HAVE_pow)
-/* Return `x' to the `y' power */
 __CEIREDIRECT(__ATTR_WUNUSED __DECL_SIMD_pow,double,__NOTHROW,__localdep_pow,(double __x, double __y),pow,{ return __builtin_pow(__x, __y); })
 #elif defined(__CRT_HAVE_pow)
-/* Return `x' to the `y' power */
 __CREDIRECT(__ATTR_WUNUSED __DECL_SIMD_pow,double,__NOTHROW,__localdep_pow,(double __x, double __y),pow,(__x,__y))
 #elif defined(__CRT_HAVE___pow)
-/* Return `x' to the `y' power */
 __CREDIRECT(__ATTR_WUNUSED __DECL_SIMD_pow,double,__NOTHROW,__localdep_pow,(double __x, double __y),__pow,(__x,__y))
 #elif defined(__IEEE754_DOUBLE_TYPE_IS_DOUBLE__) || defined(__IEEE754_FLOAT_TYPE_IS_DOUBLE__) || defined(__IEEE854_LONG_DOUBLE_TYPE_IS_DOUBLE__)
 __NAMESPACE_LOCAL_END
 #include <libc/local/math/pow.h>
 __NAMESPACE_LOCAL_BEGIN
-/* Return `x' to the `y' power */
 #define __localdep_pow __LIBC_LOCAL_NAME(pow)
 #else /* ... */
 #undef __local___localdep_pow_defined
@@ -53,7 +48,6 @@ __NAMESPACE_LOCAL_END
 #include <libm/matherr.h>
 #include <libm/pow.h>
 __NAMESPACE_LOCAL_BEGIN
-/* Return `x' to the `y' power */
 __LOCAL_LIBC(powf) __ATTR_WUNUSED __DECL_SIMD_powf float
 __NOTHROW(__LIBCCALL __LIBC_LOCAL_NAME(powf))(float __x, float __y) {
 #if defined(__IEEE754_DOUBLE_TYPE_IS_FLOAT__) || defined(__IEEE754_FLOAT_TYPE_IS_FLOAT__) || defined(__IEEE854_LONG_DOUBLE_TYPE_IS_FLOAT__)

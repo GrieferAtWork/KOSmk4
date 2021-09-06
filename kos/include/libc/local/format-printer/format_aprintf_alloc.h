@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xd5211823 */
+/* HASH CRC-32:0xea2c1b6a */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -24,7 +24,6 @@
 #ifdef __CRT_HAVE_realloc
 struct format_aprintf_data;
 __NAMESPACE_LOCAL_BEGIN
-/* Dependency: realloc from stdlib */
 #ifndef __local___localdep_realloc_defined
 #define __local___localdep_realloc_defined 1
 #if __has_builtin(__builtin_realloc) && defined(__LIBC_BIND_CRTBUILTINS)
@@ -50,12 +49,6 @@ struct format_aprintf_data {
 };
 #endif /* !__format_aprintf_data_defined */
 __NAMESPACE_LOCAL_BEGIN
-/* >> format_aprintf_alloc(3)
- * Allocate a buffer of `num_chars' characters at the end of `self'
- * The returned pointer remains valid until the next time this function is called,
- * the format_aprintf buffer `self' is finalized, or some other function is used
- * to append additional data to the end of `self'
- * @return: NULL: Failed to allocate additional memory */
 __LOCAL_LIBC(format_aprintf_alloc) __ATTR_MALLOC __ATTR_MALL_DEFAULT_ALIGNED __ATTR_WUNUSED __ATTR_ALLOC_SIZE((2)) __ATTR_NONNULL((1)) char *
 __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(format_aprintf_alloc))(struct format_aprintf_data *__restrict __self, __SIZE_TYPE__ __num_chars) {
 	char *__result;

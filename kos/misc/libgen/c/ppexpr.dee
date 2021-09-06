@@ -79,7 +79,7 @@ global final BRT_ANY     = 20; /* @"{data[0]} || {data[1]} || ..."     data: {PP
 #define OPERATOR_PRIORITY_BRT_ANY     10
 
 
-@@Mapping between `BRT_*` and their operator priority, where
+@@Mapping  between  `BRT_*`  and  their  operator  priority,  where
 @@operators with a greater priority must be wrapped in parenthesis,
 @@when wrapped by operators of lower priority.
 global final OPERATOR_PRIORITY: {int: int} = {
@@ -133,7 +133,7 @@ class PPAssume {
 		return result;
 	}
 
-	@@Return all assumptions for typ-type
+	@@Return  all  assumptions  for   typ-type
 	@@collections, where data contains @branch
 	@@Only collections with at most @maxlen items are returned
 	public function getAssumptionsForTypedCollectionContaining(
@@ -297,7 +297,7 @@ function eliminateKnownSubExpressionsWithIndices(
 @@Search for element pairs of at least 2 elements in @data,
 @@and check if @assume can make assumptions when looking at
 @@these pairs.
-@@If assumptions can be made, then do make them and return a
+@@If assumptions can be made, then do make them and return  a
 @@new set of branches that are equivalent to those from @data
 @@The caller must ensure that @(#data >= 2)
 function eliminateKnownSubExpressions(
@@ -564,9 +564,9 @@ done:
 
 
 	@@Optimize @this @PPBranch, and return it in its optimized form
-	@@Note that this function may also modify the original branch,
+	@@Note that this function may also modify the original  branch,
 	@@though mustn't necessarily re-return @this PPBranch!
-	@@@param: asBool: When true, the caller will use the resulting branch after
+	@@@param: asBool: When true,  the caller  will use  the resulting  branch  after
 	@@                casting its value to a boolean. - e.g. within a `a && b && c',
 	@@                `a || b || c', or a `a ? ... : ...' expression
 	public function optimize(asBool: bool = true, assume: PPAssume = none): PPBranch {
@@ -1541,7 +1541,7 @@ function ppParse(self: string | UserString | CParser | File): PPBranch {
 }
 
 
-@@A simple wrapper function that may be used
+@@A  simple wrapper function  that may be used
 @@for optimization of preprocessor expressions
 function optimize(expr: string, assumedExpr: string = none): string {
 	return ppParse(expr)
@@ -1553,7 +1553,7 @@ function optimize(expr: string, assumedExpr: string = none): string {
 
 
 @@Same as @optimize, but automatically wrap for a `#if`, `#ifdef` or `#ifndef` expression
-@@The returned string is semantically equivalent to `"#if " + optimize(expr) + "\n"`
+@@The returned string  is semantically  equivalent to  `"#if " +  optimize(expr) +  "\n"`
 function optimizeForIfdef(expr: string): string {
 	local result = optimize(expr);
 	if (result.startswith("defined(") && result.endswith(")") &&

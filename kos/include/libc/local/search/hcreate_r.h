@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x9bae8204 */
+/* HASH CRC-32:0x484053a4 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -25,7 +25,6 @@
 struct hsearch_data;
 #include <hybrid/typecore.h>
 __NAMESPACE_LOCAL_BEGIN
-/* Dependency: calloc from stdlib */
 #ifndef __local___localdep_calloc_defined
 #define __local___localdep_calloc_defined 1
 #if __has_builtin(__builtin_calloc) && defined(__LIBC_BIND_CRTBUILTINS) && defined(__CRT_HAVE_calloc)
@@ -77,7 +76,6 @@ __NOTHROW(__LIBCCALL __LIBC_LOCAL_NAME(__isprime))(unsigned int __number) {
 }
 __NAMESPACE_LOCAL_END
 __NAMESPACE_LOCAL_BEGIN
-/* >> hcreate_r(3) */
 __LOCAL_LIBC(hcreate_r) int
 __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(hcreate_r))(__SIZE_TYPE__ __nel, struct hsearch_data *__htab) {
 	typedef struct {

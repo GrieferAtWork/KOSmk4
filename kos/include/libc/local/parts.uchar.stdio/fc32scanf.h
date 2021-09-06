@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xe7aec13d */
+/* HASH CRC-32:0xe2c310fa */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -26,7 +26,6 @@
 #include <features.h>
 #include <hybrid/typecore.h>
 __NAMESPACE_LOCAL_BEGIN
-/* Dependency: vfc32scanf from parts.uchar.stdio */
 #ifndef __local___localdep_vfc32scanf_defined
 #define __local___localdep_vfc32scanf_defined 1
 #if defined(__CRT_HAVE_vfwscanf) && __SIZEOF_WCHAR_T__ == 4 && defined(__LIBCCALL_IS_LIBKCALL)

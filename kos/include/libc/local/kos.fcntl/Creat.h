@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xf616b6ea */
+/* HASH CRC-32:0x8a6baa5a */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -26,7 +26,6 @@
 #include <bits/types.h>
 #include <kos/anno.h>
 __NAMESPACE_LOCAL_BEGIN
-/* Dependency: Open from kos.fcntl */
 #ifndef __local___localdep_Open_defined
 #define __local___localdep_Open_defined 1
 #if defined(__CRT_HAVE_Open64) && defined(__USE_FILE_OFFSET64)

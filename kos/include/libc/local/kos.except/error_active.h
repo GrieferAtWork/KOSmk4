@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x87900aed */
+/* HASH CRC-32:0xbdf9d79c */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -24,7 +24,6 @@
 #include <kos/bits/fastexcept.h>
 #if defined(__CRT_HAVE_error_code) || defined(__arch_error_code) || defined(__CRT_HAVE_error_data) || defined(__arch_error_data)
 __NAMESPACE_LOCAL_BEGIN
-/* Dependency: error_code from kos.except */
 #ifndef __local___localdep_error_code_defined
 #define __local___localdep_error_code_defined 1
 #ifdef __CRT_HAVE_error_code

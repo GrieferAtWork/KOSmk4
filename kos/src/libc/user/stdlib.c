@@ -1212,12 +1212,12 @@ NOTHROW_NCX(LIBCCALL libc_setstate)(char *statebuf)
 
 
 
-/*[[[head:libc_realpath,hash:CRC-32=0x6c88b30c]]]*/
+/*[[[head:libc_realpath,hash:CRC-32=0x124eed81]]]*/
 /* Load the filesystem location of a given file handle.
- * This function behaves similar to `readlink()', but will also function for
+ * This  function behaves similar to `readlink()', but will also function for
  * non-symlink paths, as well as always return an absolute (unambiguous) path
  * @param: resolved: A buffer of `PATH_MAX' bytes to-be filled with the resulting
- *                   path, or NULL to automatically `malloc()'ate and return a
+ *                   path, or NULL  to automatically `malloc()'ate  and return  a
  *                   buffer of sufficient size. */
 INTERN ATTR_SECTION(".text.crt.fs.property") WUNUSED NONNULL((1)) char *
 NOTHROW_RPC(LIBCCALL libc_realpath)(char const *filename,
@@ -1229,11 +1229,11 @@ NOTHROW_RPC(LIBCCALL libc_realpath)(char const *filename,
 }
 /*[[[end:libc_realpath]]]*/
 
-/*[[[head:libc_frealpath,hash:CRC-32=0xaabc516]]]*/
+/*[[[head:libc_frealpath,hash:CRC-32=0x56ec606d]]]*/
 /* Load the filesystem location of a given file handle.
  * This function behaves similar to `readlink("/proc/self/fd/%d" % fd)'
- * NOTE: You may also pass `NULL' for `resolved' to have a buffer of `buflen'
- *       bytes automatically allocated in the heap, ontop of which you may also
+ * NOTE: You may  also pass  `NULL' for  `resolved' to  have a  buffer of  `buflen'
+ *       bytes  automatically allocated  in the heap,  ontop of which  you may also
  *       pass `0' for `buflen' to automatically determine the required buffer size. */
 INTERN ATTR_SECTION(".text.crt.fs.property") WUNUSED char *
 NOTHROW_RPC(LIBCCALL libc_frealpath)(fd_t fd,
@@ -1245,16 +1245,16 @@ NOTHROW_RPC(LIBCCALL libc_frealpath)(fd_t fd,
 }
 /*[[[end:libc_frealpath]]]*/
 
-/*[[[head:libc_frealpath4,hash:CRC-32=0xa3934ba2]]]*/
+/*[[[head:libc_frealpath4,hash:CRC-32=0x6655b46f]]]*/
 /* Load the filesystem location of a given file handle.
  * This function behaves similar to `readlink("/proc/self/fd/%d" % fd)'
  * @param flags: Set of `0 | AT_ALTPATH | AT_DOSPATH'
- * NOTE: You may use `AT_ALTPATH' to cause the path to be printed in alternate
- *       representation mode. This means that if the path would have normally
+ * NOTE: You  may use `AT_ALTPATH' to cause the  path to be printed in alternate
+ *       representation  mode. This means  that if the  path would have normally
  *       been printed as a unix path, it would instead be printed as a DOS path.
  *       Similarly, the reverse also applies.
- * NOTE: You may also pass `NULL' for `resolved' to have a buffer of `buflen'
- *       bytes automatically allocated in the heap, ontop of which you may also
+ * NOTE: You may  also pass  `NULL' for  `resolved' to  have a  buffer of  `buflen'
+ *       bytes  automatically allocated  in the heap,  ontop of which  you may also
  *       pass `0' for `buflen' to automatically determine the required buffer size. */
 INTERN ATTR_SECTION(".text.crt.fs.property") WUNUSED char *
 NOTHROW_RPC(LIBCCALL libc_frealpath4)(fd_t fd,
@@ -1326,17 +1326,17 @@ done:
 }
 /*[[[end:libc_frealpath4]]]*/
 
-/*[[[head:libc_frealpathat,hash:CRC-32=0x2088ea70]]]*/
+/*[[[head:libc_frealpathat,hash:CRC-32=0xe792b5bd]]]*/
 /* Returns the absolute filesystem path for the specified file
  * When `AT_SYMLINK_NOFOLLOW' is given, a final symlink is not dereferenced,
- * causing the path to the symlink itself to be printed. - Otherwise, the
+ * causing the path to  the symlink itself to  be printed. - Otherwise,  the
  * file pointed to by the symblic link is printed.
- * NOTE: You may use `AT_ALTPATH' to cause the path to be printed in alternate
- *       representation mode. This means that if the path would have normally
+ * NOTE: You  may use `AT_ALTPATH' to cause the  path to be printed in alternate
+ *       representation  mode. This means  that if the  path would have normally
  *       been printed as a unix path, it would instead be printed as a DOS path.
  *       Similarly, the reverse also applies.
- * NOTE: You may also pass `NULL' for `resolved' to have a buffer of `buflen'
- *       bytes automatically allocated in the heap, ontop of which you may also
+ * NOTE: You may  also pass  `NULL' for  `resolved' to  have a  buffer of  `buflen'
+ *       bytes  automatically allocated  in the heap,  ontop of which  you may also
  *       pass `0' for `buflen' to automatically determine the required buffer size.
  * @param flags: Set of `0 | AT_ALTPATH | AT_SYMLINK_NOFOLLOW | AT_DOSPATH'
  * @return: NULL: [errno=ERANGE]: `buflen' is too small to fit the entire path */
@@ -1450,9 +1450,9 @@ NOTHROW_RPC(LIBCCALL libc_getpt)(void)
 }
 /*[[[end:libc_getpt]]]*/
 
-/*[[[head:libc_ptsname_r,hash:CRC-32=0xb81b248a]]]*/
+/*[[[head:libc_ptsname_r,hash:CRC-32=0xfab75b90]]]*/
 /* Returns the name of the PTY slave (Pseudo TTY slave)
- * associated with the master descriptor `fd' */
+ * associated   with   the   master   descriptor   `fd' */
 INTERN ATTR_SECTION(".text.crt.io.tty") NONNULL((2)) int
 NOTHROW_NCX(LIBCCALL libc_ptsname_r)(fd_t fd,
                                      char *buf,
@@ -2055,10 +2055,10 @@ NOTHROW_NCX(LIBDCALL libd__wdupenv_s)(char16_t **pbuf,
 /*[[[end:libd__wdupenv_s]]]*/
 
 
-/*[[[head:libc_recallocarray,hash:CRC-32=0x7b1f23e9]]]*/
+/*[[[head:libc_recallocarray,hash:CRC-32=0x5547ea7b]]]*/
 /* >> recallocarray(3)
- * Same as `recallocv(mallptr, new_elem_count, elem_size)', but also ensure that
- * when `mallptr != NULL', memory pointed to by the old `mallptr...+=old_elem_count*elem_size'
+ * Same   as    `recallocv(mallptr, new_elem_count, elem_size)',   but    also   ensure    that
+ * when `mallptr != NULL', memory pointed to by the old  `mallptr...+=old_elem_count*elem_size'
  * is explicitly freed to zero (s.a. `freezero()') when reallocation must move the memory block */
 INTERN ATTR_SECTION(".text.crt.heap.rare_helpers") ATTR_MALL_DEFAULT_ALIGNED WUNUSED ATTR_ALLOC_SIZE((3, 4)) void *
 NOTHROW_NCX(LIBCCALL libc_recallocarray)(void *mallptr,
@@ -2095,11 +2095,11 @@ NOTHROW_NCX(LIBCCALL libc_recallocarray)(void *mallptr,
 }
 /*[[[end:libc_recallocarray]]]*/
 
-/*[[[head:libc_freezero,hash:CRC-32=0x9a62d36d]]]*/
+/*[[[head:libc_freezero,hash:CRC-32=0xe71abd64]]]*/
 /* >> freezero(3)
- * Same as `free(mallptr)', but also ensure that the memory region
+ * Same as  `free(mallptr)', but  also ensure  that the  memory  region
  * described by `mallptr...+=num_bytes' is explicitly freed to zero, or
- * immediately returned to the OS, rather than being left in cache
+ * immediately returned  to the  OS, rather  than being  left in  cache
  * while still containing its previous contents. */
 INTERN ATTR_SECTION(".text.crt.heap.rare_helpers") void
 NOTHROW_NCX(LIBCCALL libc_freezero)(void *mallptr,

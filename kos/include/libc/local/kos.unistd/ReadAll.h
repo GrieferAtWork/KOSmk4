@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xab213fcd */
+/* HASH CRC-32:0xeaba55fc */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -25,62 +25,41 @@
 #include <kos/anno.h>
 #include <bits/types.h>
 __NAMESPACE_LOCAL_BEGIN
-/* Dependency: Read from kos.unistd */
 #ifndef __local___localdep_Read_defined
 #define __local___localdep_Read_defined 1
-/* >> read(2)
- * Read up to `bufsize' bytes from `fd' into `buf'
- * When `fd' has the `O_NONBLOCK' flag set, only read as much data as was
- * available at the time the call was made, and throw E_WOULDBLOCK if no data
- * was available at the time.
- * @return: <= bufsize: The actual amount of read bytes
- * @return: 0         : EOF */
 __CREDIRECT(__ATTR_NONNULL((2)),__SIZE_TYPE__,__THROWING,__localdep_Read,(__fd_t __fd, void *__buf, __SIZE_TYPE__ __bufsize),Read,(__fd,__buf,__bufsize))
 #endif /* !__local___localdep_Read_defined */
-/* Dependency: lseek from unistd */
 #ifndef __local___localdep_lseek_defined
 #define __local___localdep_lseek_defined 1
 #if defined(__CRT_HAVE_lseek64) && defined(__USE_FILE_OFFSET64)
 __NAMESPACE_LOCAL_END
 #include <features.h>
 __NAMESPACE_LOCAL_BEGIN
-/* >> lseek(2)
- * Change the position of the file read/write pointer within a file referred to by `fd' */
 __CREDIRECT(,__FS_TYPE(off),__NOTHROW_NCX,__localdep_lseek,(__fd_t __fd, __FS_TYPE(off) __offset, __STDC_INT_AS_UINT_T __whence),lseek64,(__fd,__offset,__whence))
 #elif defined(__CRT_HAVE__lseeki64) && defined(__USE_FILE_OFFSET64)
 __NAMESPACE_LOCAL_END
 #include <features.h>
 __NAMESPACE_LOCAL_BEGIN
-/* >> lseek(2)
- * Change the position of the file read/write pointer within a file referred to by `fd' */
 __CREDIRECT(,__FS_TYPE(off),__NOTHROW_NCX,__localdep_lseek,(__fd_t __fd, __FS_TYPE(off) __offset, __STDC_INT_AS_UINT_T __whence),_lseeki64,(__fd,__offset,__whence))
 #elif defined(__CRT_HAVE_lseek) && !defined(__USE_FILE_OFFSET64)
 __NAMESPACE_LOCAL_END
 #include <features.h>
 __NAMESPACE_LOCAL_BEGIN
-/* >> lseek(2)
- * Change the position of the file read/write pointer within a file referred to by `fd' */
 __CREDIRECT(,__FS_TYPE(off),__NOTHROW_NCX,__localdep_lseek,(__fd_t __fd, __FS_TYPE(off) __offset, __STDC_INT_AS_UINT_T __whence),lseek,(__fd,__offset,__whence))
 #elif defined(__CRT_HAVE__lseek) && !defined(__USE_FILE_OFFSET64)
 __NAMESPACE_LOCAL_END
 #include <features.h>
 __NAMESPACE_LOCAL_BEGIN
-/* >> lseek(2)
- * Change the position of the file read/write pointer within a file referred to by `fd' */
 __CREDIRECT(,__FS_TYPE(off),__NOTHROW_NCX,__localdep_lseek,(__fd_t __fd, __FS_TYPE(off) __offset, __STDC_INT_AS_UINT_T __whence),_lseek,(__fd,__offset,__whence))
 #elif defined(__CRT_HAVE___lseek) && !defined(__USE_FILE_OFFSET64)
 __NAMESPACE_LOCAL_END
 #include <features.h>
 __NAMESPACE_LOCAL_BEGIN
-/* >> lseek(2)
- * Change the position of the file read/write pointer within a file referred to by `fd' */
 __CREDIRECT(,__FS_TYPE(off),__NOTHROW_NCX,__localdep_lseek,(__fd_t __fd, __FS_TYPE(off) __offset, __STDC_INT_AS_UINT_T __whence),__lseek,(__fd,__offset,__whence))
 #else /* ... */
 __NAMESPACE_LOCAL_END
 #include <libc/local/unistd/lseek.h>
 __NAMESPACE_LOCAL_BEGIN
-/* >> lseek(2)
- * Change the position of the file read/write pointer within a file referred to by `fd' */
 #define __localdep_lseek __LIBC_LOCAL_NAME(lseek)
 #endif /* !... */
 #endif /* !__local___localdep_lseek_defined */
@@ -88,13 +67,6 @@ __NAMESPACE_LOCAL_END
 #include <libc/errno.h>
 #include <kos/except.h>
 __NAMESPACE_LOCAL_BEGIN
-/* >> readall(3)
- * Same as `read(2)', however keep on reading until `read()' indicates EOF (causing
- * `readall()' to immediately return `0') or the entirety of the given buffer has been
- * filled (in which case `bufsize' is returned).
- * If an error occurs before all data could be read, try to use SEEK_CUR to rewind
- * the file descriptor by the amount of data that had already been loaded. - Errors
- * during this phase are silently ignored and don't cause `errno' to change */
 __LOCAL_LIBC(ReadAll) __ATTR_NONNULL((2)) __SIZE_TYPE__
 (__LIBCCALL __LIBC_LOCAL_NAME(ReadAll))(__fd_t __fd, void *__buf, __SIZE_TYPE__ __bufsize) __THROWS(...) {
 	__SIZE_TYPE__ __result, __temp;

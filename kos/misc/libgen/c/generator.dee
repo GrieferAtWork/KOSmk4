@@ -29,14 +29,14 @@ import Function from .cheaders;
 global Generator;
 global generators;
 
-@@Generators can be used to convert implementations
+@@Generators can  be used  to convert  implementations
 @@and prototypes of one function into those of another
-@@function. Examples include str2wcs or double2float
+@@function. Examples include  str2wcs or  double2float
 class Generator {
 	this = default;
 
-	@@Returns the default name of the base function, given the
-	@@name of the function who's implementation is being generated.
+	@@Returns   the   default   name   of   the   base   function,   given   the
+	@@name  of   the  function   who's   implementation  is   being   generated.
 	@@> function getDefaultBaseFunctionName(name: string): string | none;
 	@@If the name could not be deduced, the function should return @none instead
 	public member getDefaultBaseFunctionName: Callable with string;
@@ -46,11 +46,11 @@ class Generator {
 	@@> function registerFunctionPairing(generatedFunctionName: string, baseFunctionName: string);
 	public member registerFunctionPairing: Callable with (string, string) = none;
 
-	@@Replace text, as in prototype typenames, or the body of a function
+	@@Replace   text,  as   in  prototype  typenames,   or  the  body   of  a  function
 	@@> function replaceText(text: string | CParser | UserString): string | UserString;
 	public member replaceText: Callable with (string | CParser | UserString);
 
-	@@Same as @replaceText, but is optional and used to convert documentation strings
+	@@Same  as  @replaceText,  but  is  optional  and  used  to  convert  documentation  strings
 	@@> function replaceDocumentation(text: string | CParser | UserString): string | UserString;
 	public member replaceDocumentation: Callable with (string | CParser | UserString) = none;
 
@@ -218,7 +218,7 @@ global str2wcsReplacementEscapes: {string: string} = Dict({
 global str2wcsHeaderReplacementEscapes: {string: string} = Dict();
 
 @@str2wcs will convert all keywords starting with @"str" with @"wcs"
-@@This is a list of keywords that aren't replaced like that.
+@@This is  a  list  of  keywords that  aren't  replaced  like  that.
 global str2wcsNotFunctionNameKeywords: {string...} = {
 	"string", "stringp", "stretch", "str", "struct"
 };

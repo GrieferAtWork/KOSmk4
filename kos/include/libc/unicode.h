@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x206e0e58 */
+/* HASH CRC-32:0x31b0ba05 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -31,8 +31,8 @@
  * Read a single Unicode character from a given UTF-8 string */
 #define __libc_unicode_readutf8 __libc_core_unicode_readutf8
 /* >> unicode_readutf8_rev(3)
- * Same as `unicode_readutf8', but read backwards, with `*ptext'
- * starting out as a pointer after the character to be read, before
+ * Same  as  `unicode_readutf8',  but read  backwards,  with `*ptext'
+ * starting out as a pointer after  the character to be read,  before
  * being updated to point to the start of the character that was read */
 #define __libc_unicode_readutf8_rev __libc_core_unicode_readutf8_rev
 /* >> unicode_readutf8_n(3)
@@ -43,11 +43,11 @@
 #define __libc_unicode_readutf8_rev_n __libc_core_unicode_readutf8_rev_n
 /* >> unicode_writeutf8(3)
  * Write a given Unicode character `ch' to `dst' and return a pointer to its end location.
- * This function will write at most `UNICODE_UTF8_CURLEN' bytes to `dst' */
+ * This   function   will   write   at   most   `UNICODE_UTF8_CURLEN'   bytes   to   `dst' */
 #define __libc_unicode_writeutf8 __libc_core_unicode_writeutf8
 /* >> unicode_writeutf16(3)
  * Write a given Unicode character `ch' to `dst' and return a pointer to its end location.
- * This function will write at most `UNICODE_UTF16_CURLEN' words to `dst' */
+ * This   function   will   write   at   most   `UNICODE_UTF16_CURLEN'   words   to  `dst' */
 #define __libc_unicode_writeutf16 __libc_core_unicode_writeutf16
 #define __LIBC_UNICODE_UTF8_MAXLEN              8
 #define __LIBC_UNICODE_UTF8_CURLEN              7

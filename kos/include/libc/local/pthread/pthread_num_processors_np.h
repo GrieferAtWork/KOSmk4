@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x847e0093 */
+/* HASH CRC-32:0x69e70a90 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -24,7 +24,6 @@
 #ifdef __CRT_HAVE_sched_getaffinity
 #include <features.h>
 __NAMESPACE_LOCAL_BEGIN
-/* Dependency: sched_getaffinity from sched */
 #ifndef __local___localdep_sched_getaffinity_defined
 #define __local___localdep_sched_getaffinity_defined 1
 __NAMESPACE_LOCAL_END
@@ -36,8 +35,6 @@ __CREDIRECT(,int,__NOTHROW_NCX,__localdep_sched_getaffinity,(__pid_t __pid, __SI
 __NAMESPACE_LOCAL_END
 #include <bits/os/cpu_set.h>
 __NAMESPACE_LOCAL_BEGIN
-/* >> pthread_num_processors_np(3)
- * @return: * : The number of cpus that the calling thread is able to run on */
 __LOCAL_LIBC(pthread_num_processors_np) __STDC_INT_AS_SIZE_T
 __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(pthread_num_processors_np))(void) {
 	struct __cpu_set_struct __cset;

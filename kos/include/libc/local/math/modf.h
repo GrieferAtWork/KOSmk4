@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x1329524c */
+/* HASH CRC-32:0xaedb70e3 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -25,7 +25,6 @@
 #if defined(__IEEE754_DOUBLE_TYPE_IS_DOUBLE__) || defined(__IEEE754_FLOAT_TYPE_IS_DOUBLE__) || defined(__IEEE854_LONG_DOUBLE_TYPE_IS_DOUBLE__)
 #include <libm/modf.h>
 __NAMESPACE_LOCAL_BEGIN
-/* Break `value' into integral and fractional parts */
 __LOCAL_LIBC(modf) __ATTR_WUNUSED __ATTR_NONNULL((2)) double
 __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(modf))(double __x, double *__iptr) {
 #ifdef __IEEE754_DOUBLE_TYPE_IS_DOUBLE__

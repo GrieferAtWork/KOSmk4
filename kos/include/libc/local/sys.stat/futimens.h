@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x1483296d */
+/* HASH CRC-32:0x9a642be */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -25,12 +25,10 @@
 #include <bits/os/timespec.h>
 #include <bits/types.h>
 __NAMESPACE_LOCAL_BEGIN
-/* Dependency: futimens32 from sys.stat */
 #if !defined(__local___localdep_futimens32_defined) && defined(__CRT_HAVE_futimens)
 #define __local___localdep_futimens32_defined 1
 __CREDIRECT(,int,__NOTHROW_RPC,__localdep_futimens32,(__fd_t __fd, struct timespec const __times[2 /*or:3*/]),futimens,(__fd,__times))
 #endif /* !__local___localdep_futimens32_defined && __CRT_HAVE_futimens */
-/* Dependency: futimens64 from sys.stat */
 #ifndef __local___localdep_futimens64_defined
 #define __local___localdep_futimens64_defined 1
 #ifdef __CRT_HAVE_futimens64

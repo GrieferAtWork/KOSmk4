@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x8e85abef */
+/* HASH CRC-32:0xcd3622d4 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -28,138 +28,74 @@
 #include <kos/anno.h>
 #include <bits/crt/db/mntent.h>
 __NAMESPACE_LOCAL_BEGIN
-/* Dependency: fprintf from stdio */
 #ifndef __local___localdep_fprintf_defined
 #define __local___localdep_fprintf_defined 1
 #if __has_builtin(__builtin_fprintf) && defined(__LIBC_BIND_CRTBUILTINS) && defined(__CRT_HAVE_fprintf) && __has_builtin(__builtin_va_arg_pack)
-/* >> fprintf(3), vfprintf(3)
- * Print data to `stream', following `format'
- * Return the number of successfully printed bytes */
 __CEIREDIRECT(__ATTR_LIBC_PRINTF(2, 3) __ATTR_NONNULL((1, 2)),__STDC_INT_AS_SSIZE_T,__THROWING,__localdep_fprintf,(__FILE *__restrict __stream, char const *__restrict __format, ...),fprintf,{ return __builtin_fprintf(__stream, __format, __builtin_va_arg_pack()); })
 #elif defined(__CRT_HAVE_fprintf_unlocked) && defined(__USE_STDIO_UNLOCKED)
-/* >> fprintf(3), vfprintf(3)
- * Print data to `stream', following `format'
- * Return the number of successfully printed bytes */
 __LIBC __ATTR_LIBC_PRINTF(2, 3) __ATTR_NONNULL((1, 2)) __STDC_INT_AS_SSIZE_T (__VLIBCCALL __localdep_fprintf)(__FILE *__restrict __stream, char const *__restrict __format, ...) __THROWS(...) __CASMNAME("fprintf_unlocked");
 #elif defined(__CRT_HAVE_fprintf)
-/* >> fprintf(3), vfprintf(3)
- * Print data to `stream', following `format'
- * Return the number of successfully printed bytes */
 __LIBC __ATTR_LIBC_PRINTF(2, 3) __ATTR_NONNULL((1, 2)) __STDC_INT_AS_SSIZE_T (__VLIBCCALL __localdep_fprintf)(__FILE *__restrict __stream, char const *__restrict __format, ...) __THROWS(...) __CASMNAME("fprintf");
 #elif defined(__CRT_HAVE__IO_fprintf)
-/* >> fprintf(3), vfprintf(3)
- * Print data to `stream', following `format'
- * Return the number of successfully printed bytes */
 __LIBC __ATTR_LIBC_PRINTF(2, 3) __ATTR_NONNULL((1, 2)) __STDC_INT_AS_SSIZE_T (__VLIBCCALL __localdep_fprintf)(__FILE *__restrict __stream, char const *__restrict __format, ...) __THROWS(...) __CASMNAME("_IO_fprintf");
 #elif defined(__CRT_HAVE_fprintf_s)
-/* >> fprintf(3), vfprintf(3)
- * Print data to `stream', following `format'
- * Return the number of successfully printed bytes */
 __LIBC __ATTR_LIBC_PRINTF(2, 3) __ATTR_NONNULL((1, 2)) __STDC_INT_AS_SSIZE_T (__VLIBCCALL __localdep_fprintf)(__FILE *__restrict __stream, char const *__restrict __format, ...) __THROWS(...) __CASMNAME("fprintf_s");
 #elif defined(__CRT_HAVE_fprintf_unlocked)
-/* >> fprintf(3), vfprintf(3)
- * Print data to `stream', following `format'
- * Return the number of successfully printed bytes */
 __LIBC __ATTR_LIBC_PRINTF(2, 3) __ATTR_NONNULL((1, 2)) __STDC_INT_AS_SSIZE_T (__VLIBCCALL __localdep_fprintf)(__FILE *__restrict __stream, char const *__restrict __format, ...) __THROWS(...) __CASMNAME("fprintf_unlocked");
 #elif defined(__CRT_HAVE_vfprintf) || defined(__CRT_HAVE_vfprintf_s) || defined(__CRT_HAVE__IO_vfprintf) || defined(__CRT_HAVE_vfprintf_unlocked) || defined(__CRT_HAVE_file_printer) || defined(__CRT_HAVE_file_printer_unlocked) || defined(__CRT_HAVE_fputc) || defined(__CRT_HAVE_putc) || defined(__CRT_HAVE__IO_putc) || defined(__CRT_HAVE_fputc_unlocked) || defined(__CRT_HAVE_putc_unlocked) || (defined(__CRT_DOS) && defined(__CRT_HAVE__flsbuf)) || defined(__CRT_HAVE_fwrite) || defined(__CRT_HAVE__IO_fwrite) || defined(__CRT_HAVE_fwrite_s) || defined(__CRT_HAVE_fwrite_unlocked) || defined(__CRT_HAVE__fwrite_nolock)
 __NAMESPACE_LOCAL_END
 #include <libc/local/stdio/fprintf.h>
 __NAMESPACE_LOCAL_BEGIN
-/* >> fprintf(3), vfprintf(3)
- * Print data to `stream', following `format'
- * Return the number of successfully printed bytes */
 #define __localdep_fprintf __LIBC_LOCAL_NAME(fprintf)
 #else /* ... */
 #undef __local___localdep_fprintf_defined
 #endif /* !... */
 #endif /* !__local___localdep_fprintf_defined */
-/* Dependency: fseek from stdio */
 #ifndef __local___localdep_fseek_defined
 #define __local___localdep_fseek_defined 1
 #if defined(__CRT_HAVE_fseek_unlocked) && defined(__USE_STDIO_UNLOCKED)
-/* >> fseek(3)
- * Change the current in-file position of `stream' as a byte-offet from the start of the file */
 __CREDIRECT(__ATTR_NONNULL((1)),int,__THROWING,__localdep_fseek,(__FILE *__restrict __stream, long int __off, int __whence),fseek_unlocked,(__stream,__off,__whence))
 #elif defined(__CRT_HAVE__fseek_nolock) && defined(__USE_STDIO_UNLOCKED)
-/* >> fseek(3)
- * Change the current in-file position of `stream' as a byte-offet from the start of the file */
 __CREDIRECT(__ATTR_NONNULL((1)),int,__THROWING,__localdep_fseek,(__FILE *__restrict __stream, long int __off, int __whence),_fseek_nolock,(__stream,__off,__whence))
 #elif defined(__CRT_HAVE_fseeko_unlocked) && defined(__USE_STDIO_UNLOCKED) && __SIZEOF_LONG__ == __SIZEOF_OFF32_T__
-/* >> fseek(3)
- * Change the current in-file position of `stream' as a byte-offet from the start of the file */
 __CREDIRECT(__ATTR_NONNULL((1)),int,__THROWING,__localdep_fseek,(__FILE *__restrict __stream, long int __off, int __whence),fseeko_unlocked,(__stream,__off,__whence))
 #elif defined(__CRT_HAVE_fseeko64_unlocked) && defined(__USE_STDIO_UNLOCKED) && __SIZEOF_LONG__ == __SIZEOF_OFF64_T__
-/* >> fseek(3)
- * Change the current in-file position of `stream' as a byte-offet from the start of the file */
 __CREDIRECT(__ATTR_NONNULL((1)),int,__THROWING,__localdep_fseek,(__FILE *__restrict __stream, long int __off, int __whence),fseeko64_unlocked,(__stream,__off,__whence))
 #elif defined(__CRT_HAVE_fseek64_unlocked) && defined(__USE_STDIO_UNLOCKED) && __SIZEOF_LONG__ == __SIZEOF_OFF64_T__
-/* >> fseek(3)
- * Change the current in-file position of `stream' as a byte-offet from the start of the file */
 __CREDIRECT(__ATTR_NONNULL((1)),int,__THROWING,__localdep_fseek,(__FILE *__restrict __stream, long int __off, int __whence),fseek64_unlocked,(__stream,__off,__whence))
 #elif defined(__CRT_HAVE__fseeki64_nolock) && defined(__USE_STDIO_UNLOCKED) && __SIZEOF_LONG__ == __SIZEOF_OFF64_T__
-/* >> fseek(3)
- * Change the current in-file position of `stream' as a byte-offet from the start of the file */
 __CREDIRECT(__ATTR_NONNULL((1)),int,__THROWING,__localdep_fseek,(__FILE *__restrict __stream, long int __off, int __whence),_fseeki64_nolock,(__stream,__off,__whence))
 #elif defined(__CRT_HAVE_fseek)
-/* >> fseek(3)
- * Change the current in-file position of `stream' as a byte-offet from the start of the file */
 __CREDIRECT(__ATTR_NONNULL((1)),int,__THROWING,__localdep_fseek,(__FILE *__restrict __stream, long int __off, int __whence),fseek,(__stream,__off,__whence))
 #elif defined(__CRT_HAVE_fseeko) && __SIZEOF_LONG__ == __SIZEOF_OFF32_T__
-/* >> fseek(3)
- * Change the current in-file position of `stream' as a byte-offet from the start of the file */
 __CREDIRECT(__ATTR_NONNULL((1)),int,__THROWING,__localdep_fseek,(__FILE *__restrict __stream, long int __off, int __whence),fseeko,(__stream,__off,__whence))
 #elif defined(__CRT_HAVE_fseeko64) && __SIZEOF_LONG__ == __SIZEOF_OFF64_T__
-/* >> fseek(3)
- * Change the current in-file position of `stream' as a byte-offet from the start of the file */
 __CREDIRECT(__ATTR_NONNULL((1)),int,__THROWING,__localdep_fseek,(__FILE *__restrict __stream, long int __off, int __whence),fseeko64,(__stream,__off,__whence))
 #elif defined(__CRT_HAVE_fseek64) && __SIZEOF_LONG__ == __SIZEOF_OFF64_T__
-/* >> fseek(3)
- * Change the current in-file position of `stream' as a byte-offet from the start of the file */
 __CREDIRECT(__ATTR_NONNULL((1)),int,__THROWING,__localdep_fseek,(__FILE *__restrict __stream, long int __off, int __whence),fseek64,(__stream,__off,__whence))
 #elif defined(__CRT_HAVE__fseeki64) && __SIZEOF_LONG__ == __SIZEOF_OFF64_T__
-/* >> fseek(3)
- * Change the current in-file position of `stream' as a byte-offet from the start of the file */
 __CREDIRECT(__ATTR_NONNULL((1)),int,__THROWING,__localdep_fseek,(__FILE *__restrict __stream, long int __off, int __whence),_fseeki64,(__stream,__off,__whence))
 #elif defined(__CRT_HAVE_fseek_unlocked)
-/* >> fseek(3)
- * Change the current in-file position of `stream' as a byte-offet from the start of the file */
 __CREDIRECT(__ATTR_NONNULL((1)),int,__THROWING,__localdep_fseek,(__FILE *__restrict __stream, long int __off, int __whence),fseek_unlocked,(__stream,__off,__whence))
 #elif defined(__CRT_HAVE__fseek_nolock)
-/* >> fseek(3)
- * Change the current in-file position of `stream' as a byte-offet from the start of the file */
 __CREDIRECT(__ATTR_NONNULL((1)),int,__THROWING,__localdep_fseek,(__FILE *__restrict __stream, long int __off, int __whence),_fseek_nolock,(__stream,__off,__whence))
 #elif defined(__CRT_HAVE_fseeko_unlocked) && __SIZEOF_LONG__ == __SIZEOF_OFF32_T__
-/* >> fseek(3)
- * Change the current in-file position of `stream' as a byte-offet from the start of the file */
 __CREDIRECT(__ATTR_NONNULL((1)),int,__THROWING,__localdep_fseek,(__FILE *__restrict __stream, long int __off, int __whence),fseeko_unlocked,(__stream,__off,__whence))
 #elif defined(__CRT_HAVE_fseeko64_unlocked) && __SIZEOF_LONG__ == __SIZEOF_OFF64_T__
-/* >> fseek(3)
- * Change the current in-file position of `stream' as a byte-offet from the start of the file */
 __CREDIRECT(__ATTR_NONNULL((1)),int,__THROWING,__localdep_fseek,(__FILE *__restrict __stream, long int __off, int __whence),fseeko64_unlocked,(__stream,__off,__whence))
 #elif defined(__CRT_HAVE_fseek64_unlocked) && __SIZEOF_LONG__ == __SIZEOF_OFF64_T__
-/* >> fseek(3)
- * Change the current in-file position of `stream' as a byte-offet from the start of the file */
 __CREDIRECT(__ATTR_NONNULL((1)),int,__THROWING,__localdep_fseek,(__FILE *__restrict __stream, long int __off, int __whence),fseek64_unlocked,(__stream,__off,__whence))
 #elif defined(__CRT_HAVE__fseeki64_nolock) && __SIZEOF_LONG__ == __SIZEOF_OFF64_T__
-/* >> fseek(3)
- * Change the current in-file position of `stream' as a byte-offet from the start of the file */
 __CREDIRECT(__ATTR_NONNULL((1)),int,__THROWING,__localdep_fseek,(__FILE *__restrict __stream, long int __off, int __whence),_fseeki64_nolock,(__stream,__off,__whence))
 #elif defined(__CRT_HAVE_fseeko) || defined(__CRT_HAVE_fseeko_unlocked) || defined(__CRT_HAVE_fseeko64) || defined(__CRT_HAVE_fseek64) || defined(__CRT_HAVE__fseeki64) || defined(__CRT_HAVE_fseeko64_unlocked) || defined(__CRT_HAVE_fseek64_unlocked) || defined(__CRT_HAVE__fseeki64_nolock)
 __NAMESPACE_LOCAL_END
 #include <libc/local/stdio/fseek.h>
 __NAMESPACE_LOCAL_BEGIN
-/* >> fseek(3)
- * Change the current in-file position of `stream' as a byte-offet from the start of the file */
 #define __localdep_fseek __LIBC_LOCAL_NAME(fseek)
 #else /* ... */
 #undef __local___localdep_fseek_defined
 #endif /* !... */
 #endif /* !__local___localdep_fseek_defined */
-/* >> addmntent(3)
- * Append a line `"%s %s %s %s %d %d\n" % (mnt_fsname, mnt_dir,
- * mnt_type, mnt_opts, mnt_freq, mnt_passno)' to the end of `stream'
- * @return: 0: Success
- * @return: 1: Error (WARNING: `errno' is left undefined) */
 __LOCAL_LIBC(addmntent) __ATTR_NONNULL((1, 2)) int
 (__LIBCCALL __LIBC_LOCAL_NAME(addmntent))(__FILE *__restrict __stream, struct mntent const *__restrict __mnt) __THROWS(...) {
 	if __unlikely(!__mnt ||

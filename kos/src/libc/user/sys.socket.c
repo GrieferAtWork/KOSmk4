@@ -39,7 +39,7 @@ DECL_BEGIN
 
 
 
-/*[[[head:libc_socket,hash:CRC-32=0xaf9876dc]]]*/
+/*[[[head:libc_socket,hash:CRC-32=0x24108e4]]]*/
 /* >> socket(2)
  * Create a new socket for the given domain/type/protocol triple.
  * @param: domain:   Socket address domain/family (one of `AF_*' from `<sys/socket.h>')
@@ -47,7 +47,7 @@ DECL_BEGIN
  *                   May optionally be or'd with `SOCK_CLOEXEC | SOCK_CLOFORK | SOCK_NONBLOCK'
  * @param: protocol: Socket protocol (`0' for automatic). Available socket protocols mainly
  *                   depend on the selected `domain', and may be further specialized by the
- *                   `type' argument. for example, `AF_INET' takes one of `IPPROTO_*'
+ *                   `type' argument.  for  example,  `AF_INET' takes  one  of  `IPPROTO_*'
  *                   >> socket(AF_INET, SOCK_STREAM, IPPROTO_TCP);
  *                   Also note that protocol IDs can be enumerated by `getprotoent(3)' from `<netdb.h>'
  * @return: * : A file descriptor for the newly created socket.
@@ -66,9 +66,9 @@ NOTHROW_NCX(LIBCCALL libc_socket)(__STDC_INT_AS_UINT_T domain,
 }
 /*[[[end:libc_socket]]]*/
 
-/*[[[head:libc_socketpair,hash:CRC-32=0x14f7a08a]]]*/
+/*[[[head:libc_socketpair,hash:CRC-32=0xf094b4f]]]*/
 /* >> socketpair(2)
- * Create pair of connected sockets with the given domain/type/protocol triple
+ * Create  pair of  connected sockets  with the  given domain/type/protocol triple
  * The sockets handles are stroed in `fds[0]' and `fds[1]', are already connected,
  * and are indistinguishable from each other.
  * @param: domain:   Socket address domain (one of `AF_*' from `<sys/socket.h>')
@@ -76,7 +76,7 @@ NOTHROW_NCX(LIBCCALL libc_socket)(__STDC_INT_AS_UINT_T domain,
  *                   May optionally be or'd with `SOCK_CLOEXEC | SOCK_CLOFORK | SOCK_NONBLOCK'
  * @param: protocol: Socket protocol (`0' for automatic). Available socket protocols mainly
  *                   depend on the selected `domain', and may be further specialized by the
- *                   `type' argument. for example, `AF_INET' takes one of `IPPROTO_*'
+ *                   `type' argument.  for  example,  `AF_INET' takes  one  of  `IPPROTO_*'
  *                   >> socket(AF_INET, SOCK_STREAM, IPPROTO_TCP);
  *                   Also note that protocol IDs can be enumerated by `getprotoent(3)' from `<netdb.h>'
  * @return: 0 : Success (the sockets are stored in `fds[0]' and `fds[1]')
@@ -120,18 +120,18 @@ NOTHROW_NCX(LIBCCALL libc_bind)(fd_t sockfd,
 }
 /*[[[end:libc_bind]]]*/
 
-/*[[[head:libc_getsockname,hash:CRC-32=0x9dddd1ec]]]*/
+/*[[[head:libc_getsockname,hash:CRC-32=0xcba55e86]]]*/
 /* >> getsockname(2)
  * Determine the local address (aka. name) for the given socket `sockfd'.
- * This is usually the same address as was previously set by `bind(2)'
+ * This  is usually the  same address as was  previously set by `bind(2)'
  * NOTE: Before the socket has actually be bound or connected, the exact
- *       address that is returned by this function is weakly undefined.
+ *       address that is returned by this function is weakly  undefined.
  *       e.g.: For AF_INET, sin_addr=0.0.0.0, sin_port=0 is returned.
  * @param: addr:     [out] Buffer where to store the sock address.
  * @param: addr_len: [in]  The amount of available memory starting at `addr'
  *                   [out] The amount of required memory for the address.
  *                         This may be more than was given, in which case
- *                         the address was truncated and may be invalid.
+ *                         the  address was truncated and may be invalid.
  * return: 0 : Success
  * return: -1: Error (s.a. `errno') */
 INTERN ATTR_SECTION(".text.crt.net.socket") NONNULL((2, 3)) int
@@ -148,14 +148,14 @@ NOTHROW_NCX(LIBCCALL libc_getsockname)(fd_t sockfd,
 }
 /*[[[end:libc_getsockname]]]*/
 
-/*[[[head:libc_getpeername,hash:CRC-32=0x8e51e817]]]*/
+/*[[[head:libc_getpeername,hash:CRC-32=0x5a73cea1]]]*/
 /* >> getpeername(2)
  * Lookup the peer (remote) address of `sockfd' and store it in `*addr...+=*addr_len'
  * @param: addr:     [out] Buffer where to store the sock address.
  * @param: addr_len: [in]  The amount of available memory starting at `addr'
  *                   [out] The amount of required memory for the address.
  *                         This may be more than was given, in which case
- *                         the address was truncated and may be invalid.
+ *                         the  address was truncated and may be invalid.
  * @return: 0 : Success
  * @return: -1: [errno=ENOTCONN]  E_INVALID_ARGUMENT_BAD_STATE:E_INVALID_ARGUMENT_CONTEXT_GETPEERNAME_NOT_CONNECTED
  * @return: -1: Error (s.a. `errno') */
@@ -173,11 +173,11 @@ NOTHROW_NCX(LIBCCALL libc_getpeername)(fd_t sockfd,
 }
 /*[[[end:libc_getpeername]]]*/
 
-/*[[[head:libc_connect,hash:CRC-32=0xd44f62db]]]*/
+/*[[[head:libc_connect,hash:CRC-32=0x5fe0c537]]]*/
 /* >> connect(2)
  * Connect to the specified address.
  * If the given `sockfd' isn't connection-oriented, this will set the address
- * that will implicitly be used as destination by `send(2)' and `write(2)'
+ * that  will implicitly be  used as destination  by `send(2)' and `write(2)'
  * @return: 0 : Success
  * @return: -1: [errno=EADDRINUSE]    E_NET_ADDRESS_IN_USE:E_NET_ADDRESS_IN_USE_CONTEXT_CONNECT
  * @return: -1: [errno=EINVAL]        E_INVALID_ARGUMENT_UNEXPECTED_COMMAND:E_INVALID_ARGUMENT_CONTEXT_BIND_WRONG_ADDRESS_FAMILY
@@ -320,13 +320,13 @@ NOTHROW_RPC(LIBCCALL libc_recvfrom)(fd_t sockfd,
 }
 /*[[[end:libc_recvfrom]]]*/
 
-/*[[[head:libc_recvmsg,hash:CRC-32=0xc3a842bc]]]*/
+/*[[[head:libc_recvmsg,hash:CRC-32=0xff7c52d9]]]*/
 /* >> recvmsg(2)
  * Same as `recv(2)' and `recvfrom(2)', but also allows for receiving ancillary
- * data as well as for data buffers to be represented by an IOV vector.
+ * data as  well as  for  data buffers  to be  represented  by an  IOV  vector.
  * @param: msg_flags: Set of `MSG_CMSG_CLOEXEC | MSG_CMSG_CLOFORK |
  *                            MSG_DONTWAIT | MSG_ERRQUEUE | MSG_OOB |
- *                            MSG_PEEK | MSG_TRUNC | MSG_WAITALL'
+ *                            MSG_PEEK  |  MSG_TRUNC  |  MSG_WAITALL'
  * @return: * : [<= bufsize] The actual # of received payload bytes
  * @return: -1: ... Same as for `recv(2)' and `recvfrom(2)' */
 INTERN ATTR_SECTION(".text.crt.net.socket") WUNUSED NONNULL((2)) ssize_t
@@ -343,13 +343,13 @@ NOTHROW_RPC(LIBCCALL libc_recvmsg)(fd_t sockfd,
 }
 /*[[[end:libc_recvmsg]]]*/
 
-/*[[[head:libc_recvmmsg,hash:CRC-32=0x33a262b0]]]*/
+/*[[[head:libc_recvmmsg,hash:CRC-32=0xe117cf4f]]]*/
 /* >> recvmmsg(2)
  * Same as `recvmsg(2)', but may be used to receive many
- * messages (datagrams) with a single system call.
+ * messages  (datagrams)  with  a  single  system  call.
  * @param: msg_flags: Set of `MSG_CMSG_CLOEXEC | MSG_CMSG_CLOFORK |
  *                            MSG_DONTWAIT | MSG_ERRQUEUE | MSG_OOB |
- *                            MSG_PEEK | MSG_TRUNC | MSG_WAITALL |
+ *                            MSG_PEEK  |  MSG_TRUNC |  MSG_WAITALL |
  *                            MSG_WAITFORONE'
  * @return: * : The # of datagrams successfully received.
  * @return: -1: Error (s.a. `recvmsg(2)') */
@@ -371,16 +371,16 @@ NOTHROW_RPC(LIBCCALL libc_recvmmsg)(fd_t sockfd,
 }
 /*[[[end:libc_recvmmsg]]]*/
 
-/*[[[head:libc_recvmmsg64,hash:CRC-32=0x7a99ba1f]]]*/
+/*[[[head:libc_recvmmsg64,hash:CRC-32=0x38962cb1]]]*/
 #if __SIZEOF_TIME32_T__ == __SIZEOF_TIME64_T__
 DEFINE_INTERN_ALIAS(libc_recvmmsg64, libc_recvmmsg);
 #else /* MAGIC:alias */
 /* >> recvmmsg(2)
  * Same as `recvmsg(2)', but may be used to receive many
- * messages (datagrams) with a single system call.
+ * messages  (datagrams)  with  a  single  system  call.
  * @param: msg_flags: Set of `MSG_CMSG_CLOEXEC | MSG_CMSG_CLOFORK |
  *                            MSG_DONTWAIT | MSG_ERRQUEUE | MSG_OOB |
- *                            MSG_PEEK | MSG_TRUNC | MSG_WAITALL |
+ *                            MSG_PEEK  |  MSG_TRUNC |  MSG_WAITALL |
  *                            MSG_WAITFORONE'
  * @return: * : The # of datagrams successfully received.
  * @return: -1: Error (s.a. `recvmsg(2)') */
@@ -468,7 +468,7 @@ NOTHROW_RPC(LIBCCALL libc_send)(fd_t sockfd,
 }
 /*[[[end:libc_send]]]*/
 
-/*[[[head:libc_sendto,hash:CRC-32=0xfc977d7f]]]*/
+/*[[[head:libc_sendto,hash:CRC-32=0x687f638b]]]*/
 /* >> sendto(2)
  * Send the contents of a given buffer over this socket to the specified address
  * @param: buf:       Buffer of data to send (with a length of `bufsize' bytes)
@@ -477,7 +477,7 @@ NOTHROW_RPC(LIBCCALL libc_send)(fd_t sockfd,
  *                            MSG_EOR | MSG_MORE | MSG_NOSIGNAL | MSG_OOB'
  * @param: addr:      Address where to send data (or NULL when `addr_len' is 0)
  * @param: addr_len:  Size of `addr', or `0' to have this behave as an alias
- *                    for `send(sockfd, buf, bufsize, msg_flags)'
+ *                    for            `send(sockfd, buf, bufsize, msg_flags)'
  * @return: * : [<= bufsize] The actual # of send bytes
  * @return: -1: [errno=EINVAL]       E_INVALID_ARGUMENT_UNEXPECTED_COMMAND:E_INVALID_ARGUMENT_CONTEXT_SENDTO_WRONG_ADDRESS_FAMILY
  * @return: -1: [errno=EDESTADDRREQ] E_INVALID_ARGUMENT_BAD_STATE:E_INVALID_ARGUMENT_CONTEXT_SEND_NOT_CONNECTED
@@ -531,10 +531,10 @@ NOTHROW_RPC(LIBCCALL libc_sendto)(fd_t sockfd,
 }
 /*[[[end:libc_sendto]]]*/
 
-/*[[[head:libc_sendmsg,hash:CRC-32=0x4f6beed4]]]*/
+/*[[[head:libc_sendmsg,hash:CRC-32=0xd9d85e30]]]*/
 /* >> sendmsg(2)
  * Same as `send(2)' and `sendto(2)', but also allows for sending ancillary
- * data as well as for data buffers to be represented by an IOV vector.
+ * data as well as  for data buffers  to be represented  by an IOV  vector.
  * @param: msg_flags: Set of `MSG_CONFIRM | MSG_DONTROUTE | MSG_DONTWAIT |
  *                            MSG_EOR | MSG_MORE | MSG_NOSIGNAL | MSG_OOB'
  * @return: * : [<= bufsize] The actual # of send payload bytes
@@ -553,10 +553,10 @@ NOTHROW_RPC(LIBCCALL libc_sendmsg)(fd_t sockfd,
 }
 /*[[[end:libc_sendmsg]]]*/
 
-/*[[[head:libc_sendmmsg,hash:CRC-32=0x30e263b6]]]*/
+/*[[[head:libc_sendmmsg,hash:CRC-32=0x85bdb5a1]]]*/
 /* >> sendmmsg(2)
  * Same as `sendmsg(2)', but may be used to send many
- * messages (datagrams) with a single system call.
+ * messages (datagrams)  with a  single system  call.
  * @param: msg_flags: Set of `MSG_CONFIRM | MSG_DONTROUTE | MSG_DONTWAIT |
  *                            MSG_EOR | MSG_MORE | MSG_NOSIGNAL | MSG_OOB'
  * @return: * : The # of datagrams successfully sent.
@@ -577,7 +577,7 @@ NOTHROW_RPC(LIBCCALL libc_sendmmsg)(fd_t sockfd,
 }
 /*[[[end:libc_sendmmsg]]]*/
 
-/*[[[head:libc_getsockopt,hash:CRC-32=0xe57f5670]]]*/
+/*[[[head:libc_getsockopt,hash:CRC-32=0x8c86e1b5]]]*/
 /* >> getsockopt(2)
  * Get the value of the named socket option `level:optname' and store it in `optval'
  * @param: level:   One of `SOL_*' (e.g.: `SOL_SOCKET')
@@ -586,7 +586,7 @@ NOTHROW_RPC(LIBCCALL libc_sendmmsg)(fd_t sockfd,
  * @param: optlen:  [in]  The amount of available memory starting at `optval'
  *                  [out] The amount of required memory for the option value.
  *                        This may be more than was given, in which case
- *                        the contents of `optval' are undefined.
+ *                        the  contents  of   `optval'  are   undefined.
  * @return: 0 : Success
  * @return: -1: [errno=ENOPROTOOPT] E_INVALID_ARGUMENT_SOCKET_OPT:E_INVALID_ARGUMENT_CONTEXT_GETSOCKOPT */
 INTERN ATTR_SECTION(".text.crt.net.socket") NONNULL((4, 5)) int
@@ -635,12 +635,12 @@ NOTHROW_NCX(LIBCCALL libc_setsockopt)(fd_t sockfd,
 }
 /*[[[end:libc_setsockopt]]]*/
 
-/*[[[head:libc_listen,hash:CRC-32=0xd87c68de]]]*/
+/*[[[head:libc_listen,hash:CRC-32=0xa8d5894c]]]*/
 /* >> listen(2)
  * Begin to listen for incoming client (aka. peer) connection requests.
- * @param: max_backlog: The max number of clients pending to be accept(2)-ed, before
+ * @param: max_backlog: The max number of clients  pending to be accept(2)-ed,  before
  *                      the kernel will refuse to enqueue additional clients, and will
- *                      instead automatically refuse any further requests until the
+ *                      instead automatically refuse  any further  requests until  the
  *                      less than `max_backlog' clients are still pending.
  * @return: 0 : Success
  * @return: -1: [errno=EADDRINUSE]  E_NET_ADDRESS_IN_USE:E_NET_ADDRESS_IN_USE_CONTEXT_LISTEN
@@ -657,16 +657,16 @@ NOTHROW_NCX(LIBCCALL libc_listen)(fd_t sockfd,
 }
 /*[[[end:libc_listen]]]*/
 
-/*[[[head:libc_accept,hash:CRC-32=0xbc202b11]]]*/
+/*[[[head:libc_accept,hash:CRC-32=0x19d70fe0]]]*/
 /* >> accept(2)
  * Accept incoming client (aka. peer) connection requests.
  * @param: addr:      Peer address of the sender (or `NULL' when `addr_len' is `NULL')
  * @param: addr_len:  [NULL] Don't fill in the client's peer address
  *                    [in]   The amount of available memory starting at `addr'
- *                    [out]  The amount of required memory for the address.
- *                           This may be more than was given, in which case
- *                           the address was truncated and may be invalid.
- *                           If this happens, the caller can still determine
+ *                    [out]  The  amount  of required  memory for  the address.
+ *                           This  may be  more than  was given,  in which case
+ *                           the  address  was  truncated and  may  be invalid.
+ *                           If this happens,  the caller  can still  determine
  *                           the correct address through use of `getpeername()'
  * @return: * : A file descriptor for the newly accept(2)-ed connection
  * @return: -1: [errno=EINVAL]       E_INVALID_ARGUMENT_BAD_STATE:E_INVALID_ARGUMENT_CONTEXT_SOCKET_NOT_LISTENING
@@ -687,10 +687,10 @@ NOTHROW_RPC(LIBCCALL libc_accept)(fd_t sockfd,
 }
 /*[[[end:libc_accept]]]*/
 
-/*[[[head:libc_shutdown,hash:CRC-32=0xa82eac2b]]]*/
+/*[[[head:libc_shutdown,hash:CRC-32=0x37298782]]]*/
 /* >> shutdown(2)
  * Disallow further reception of data (causing `recv(2)' to return `0' as soon
- * as all currently queued data has been read), and/or further transmission
+ * as  all currently queued  data has been  read), and/or further transmission
  * of data (causing `send(2)' to throw an `E_NET_SHUTDOWN' exception)
  * @param: how: One of `SHUT_RD', `SHUT_WR' or `SHUT_RDWR'
  * @return: 0 : Success
@@ -707,16 +707,16 @@ NOTHROW_NCX(LIBCCALL libc_shutdown)(fd_t sockfd,
 }
 /*[[[end:libc_shutdown]]]*/
 
-/*[[[head:libc_accept4,hash:CRC-32=0x98e75da5]]]*/
+/*[[[head:libc_accept4,hash:CRC-32=0xbe1ac692]]]*/
 /* >> accept4(2)
  * Accept incoming client (aka. peer) connection requests.
  * @param: addr:       Peer address of the sender (or `NULL' when `addr_len' is `NULL')
  * @param: addr_len:   [NULL] Don't fill in the client's peer address
  *                     [in]   The amount of available memory starting at `addr'
- *                     [out]  The amount of required memory for the address.
- *                            This may be more than was given, in which case
- *                            the address was truncated and may be invalid.
- *                            If this happens, the caller can still determine
+ *                     [out]  The  amount  of required  memory for  the address.
+ *                            This  may be  more than  was given,  in which case
+ *                            the  address  was  truncated and  may  be invalid.
+ *                            If this happens,  the caller  can still  determine
  *                            the correct address through use of `getpeername()'
  * @param: sock_flags: Set of `SOCK_NONBLOCK | SOCK_CLOEXEC | SOCK_CLOFORK'
  * @return: * : A file descriptor for the newly accept(2)-ed connection

@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xe9d81611 */
+/* HASH CRC-32:0x5a8d8553 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -25,36 +25,25 @@
 #include <kos/anno.h>
 #include <bits/types.h>
 __NAMESPACE_LOCAL_BEGIN
-/* Dependency: PWrite32 from kos.unistd */
 #if !defined(__local___localdep_PWrite32_defined) && defined(__CRT_HAVE_PWrite)
 #define __local___localdep_PWrite32_defined 1
 __CREDIRECT(__ATTR_NONNULL((2)),__SIZE_TYPE__,__THROWING,__localdep_PWrite32,(__fd_t __fd, void const *__buf, __SIZE_TYPE__ __bufsize, __pos32_t __offset),PWrite,(__fd,__buf,__bufsize,__offset))
 #endif /* !__local___localdep_PWrite32_defined && __CRT_HAVE_PWrite */
-/* Dependency: PWrite64 from kos.unistd */
 #ifndef __local___localdep_PWrite64_defined
 #define __local___localdep_PWrite64_defined 1
 #ifdef __CRT_HAVE_PWrite64
-/* >> pwrite64(2)
- * Write data to a file at a specific offset */
 __CREDIRECT(__ATTR_NONNULL((2)),__SIZE_TYPE__,__THROWING,__localdep_PWrite64,(__fd_t __fd, void *__buf, __SIZE_TYPE__ __bufsize, __pos64_t __offset),PWrite64,(__fd,__buf,__bufsize,__offset))
 #elif defined(__CRT_HAVE_PWrite) && __SIZEOF_OFF32_T__ == __SIZEOF_OFF64_T__
-/* >> pwrite64(2)
- * Write data to a file at a specific offset */
 __CREDIRECT(__ATTR_NONNULL((2)),__SIZE_TYPE__,__THROWING,__localdep_PWrite64,(__fd_t __fd, void *__buf, __SIZE_TYPE__ __bufsize, __pos64_t __offset),PWrite,(__fd,__buf,__bufsize,__offset))
 #elif defined(__CRT_HAVE_PWrite)
 __NAMESPACE_LOCAL_END
 #include <libc/local/kos.unistd/PWrite64.h>
 __NAMESPACE_LOCAL_BEGIN
-/* >> pwrite64(2)
- * Write data to a file at a specific offset */
 #define __localdep_PWrite64 __LIBC_LOCAL_NAME(PWrite64)
 #else /* ... */
 #undef __local___localdep_PWrite64_defined
 #endif /* !... */
 #endif /* !__local___localdep_PWrite64_defined */
-/* >> pwrite(2)
- * Write data to a file at a specific `offset', rather than the current R/W position
- * @return: <= bufsize: The actual amount of written bytes */
 __LOCAL_LIBC(PWrite) __ATTR_NONNULL((2)) __SIZE_TYPE__
 (__LIBCCALL __LIBC_LOCAL_NAME(PWrite))(__fd_t __fd, void const *__buf, __SIZE_TYPE__ __bufsize, __FS_TYPE(pos) __offset) __THROWS(...) {
 #ifdef __CRT_HAVE_PWrite

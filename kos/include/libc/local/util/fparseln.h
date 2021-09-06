@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xdc7edb9 */
+/* HASH CRC-32:0x105cb7df */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -25,86 +25,52 @@
 #if (defined(__CRT_HAVE_fgetc) || defined(__CRT_HAVE_getc) || defined(__CRT_HAVE__IO_getc) || defined(__CRT_HAVE_fgetc_unlocked) || defined(__CRT_HAVE_getc_unlocked) || (defined(__CRT_DOS) && defined(__CRT_HAVE__filbuf)) || defined(__CRT_HAVE_fread) || defined(__CRT_HAVE__IO_fread) || defined(__CRT_HAVE_fread_unlocked) || defined(__CRT_HAVE__fread_nolock)) && (defined(__CRT_HAVE_ungetc) || defined(__CRT_HAVE__IO_ungetc) || defined(__CRT_HAVE_ungetc_unlocked) || defined(__CRT_HAVE__ungetc_nolock)) && defined(__CRT_HAVE_realloc)
 #include <hybrid/typecore.h>
 __NAMESPACE_LOCAL_BEGIN
-/* Dependency: fgetc from stdio */
 #ifndef __local___localdep_fgetc_defined
 #define __local___localdep_fgetc_defined 1
 #if defined(__CRT_HAVE_fgetc_unlocked) && defined(__USE_STDIO_UNLOCKED)
 __NAMESPACE_LOCAL_END
 #include <kos/anno.h>
 __NAMESPACE_LOCAL_BEGIN
-/* >> fgetc(3)
- * Read and return a single character from `stream'
- * If the given `stream' has been exhausted or if an error occurred, `EOF' is
- * returned and the exact cause can be determined by using `ferror' and `feof' */
 __CREDIRECT(__ATTR_NONNULL((1)),int,__THROWING,__localdep_fgetc,(__FILE *__restrict __stream),fgetc_unlocked,(__stream))
 #elif defined(__CRT_HAVE_getc_unlocked) && defined(__USE_STDIO_UNLOCKED)
 __NAMESPACE_LOCAL_END
 #include <kos/anno.h>
 __NAMESPACE_LOCAL_BEGIN
-/* >> fgetc(3)
- * Read and return a single character from `stream'
- * If the given `stream' has been exhausted or if an error occurred, `EOF' is
- * returned and the exact cause can be determined by using `ferror' and `feof' */
 __CREDIRECT(__ATTR_NONNULL((1)),int,__THROWING,__localdep_fgetc,(__FILE *__restrict __stream),getc_unlocked,(__stream))
 #elif defined(__CRT_HAVE_fgetc)
 __NAMESPACE_LOCAL_END
 #include <kos/anno.h>
 __NAMESPACE_LOCAL_BEGIN
-/* >> fgetc(3)
- * Read and return a single character from `stream'
- * If the given `stream' has been exhausted or if an error occurred, `EOF' is
- * returned and the exact cause can be determined by using `ferror' and `feof' */
 __CREDIRECT(__ATTR_NONNULL((1)),int,__THROWING,__localdep_fgetc,(__FILE *__restrict __stream),fgetc,(__stream))
 #elif defined(__CRT_HAVE_getc)
 __NAMESPACE_LOCAL_END
 #include <kos/anno.h>
 __NAMESPACE_LOCAL_BEGIN
-/* >> fgetc(3)
- * Read and return a single character from `stream'
- * If the given `stream' has been exhausted or if an error occurred, `EOF' is
- * returned and the exact cause can be determined by using `ferror' and `feof' */
 __CREDIRECT(__ATTR_NONNULL((1)),int,__THROWING,__localdep_fgetc,(__FILE *__restrict __stream),getc,(__stream))
 #elif defined(__CRT_HAVE__IO_getc)
 __NAMESPACE_LOCAL_END
 #include <kos/anno.h>
 __NAMESPACE_LOCAL_BEGIN
-/* >> fgetc(3)
- * Read and return a single character from `stream'
- * If the given `stream' has been exhausted or if an error occurred, `EOF' is
- * returned and the exact cause can be determined by using `ferror' and `feof' */
 __CREDIRECT(__ATTR_NONNULL((1)),int,__THROWING,__localdep_fgetc,(__FILE *__restrict __stream),_IO_getc,(__stream))
 #elif defined(__CRT_HAVE_fgetc_unlocked)
 __NAMESPACE_LOCAL_END
 #include <kos/anno.h>
 __NAMESPACE_LOCAL_BEGIN
-/* >> fgetc(3)
- * Read and return a single character from `stream'
- * If the given `stream' has been exhausted or if an error occurred, `EOF' is
- * returned and the exact cause can be determined by using `ferror' and `feof' */
 __CREDIRECT(__ATTR_NONNULL((1)),int,__THROWING,__localdep_fgetc,(__FILE *__restrict __stream),fgetc_unlocked,(__stream))
 #elif defined(__CRT_HAVE_getc_unlocked)
 __NAMESPACE_LOCAL_END
 #include <kos/anno.h>
 __NAMESPACE_LOCAL_BEGIN
-/* >> fgetc(3)
- * Read and return a single character from `stream'
- * If the given `stream' has been exhausted or if an error occurred, `EOF' is
- * returned and the exact cause can be determined by using `ferror' and `feof' */
 __CREDIRECT(__ATTR_NONNULL((1)),int,__THROWING,__localdep_fgetc,(__FILE *__restrict __stream),getc_unlocked,(__stream))
 #elif (defined(__CRT_DOS) && defined(__CRT_HAVE__filbuf)) || defined(__CRT_HAVE_fread) || defined(__CRT_HAVE__IO_fread) || defined(__CRT_HAVE_fread_unlocked) || defined(__CRT_HAVE__fread_nolock)
 __NAMESPACE_LOCAL_END
 #include <libc/local/stdio/fgetc.h>
 __NAMESPACE_LOCAL_BEGIN
-/* >> fgetc(3)
- * Read and return a single character from `stream'
- * If the given `stream' has been exhausted or if an error occurred, `EOF' is
- * returned and the exact cause can be determined by using `ferror' and `feof' */
 #define __localdep_fgetc __LIBC_LOCAL_NAME(fgetc)
 #else /* ... */
 #undef __local___localdep_fgetc_defined
 #endif /* !... */
 #endif /* !__local___localdep_fgetc_defined */
-/* Dependency: free from stdlib */
 #ifndef __local___localdep_free_defined
 #define __local___localdep_free_defined 1
 #if __has_builtin(__builtin_free) && defined(__LIBC_BIND_CRTBUILTINS) && defined(__CRT_HAVE_free)
@@ -117,36 +83,30 @@ __CREDIRECT_VOID(,__NOTHROW_NCX,__localdep_free,(void *__mallptr),cfree,(__mallp
 #undef __local___localdep_free_defined
 #endif /* !... */
 #endif /* !__local___localdep_free_defined */
-/* Dependency: getline from stdio */
 #ifndef __local___localdep_getline_defined
 #define __local___localdep_getline_defined 1
 #if defined(__CRT_HAVE_getline_unlocked) && defined(__USE_STDIO_UNLOCKED)
 __NAMESPACE_LOCAL_END
 #include <kos/anno.h>
 __NAMESPACE_LOCAL_BEGIN
-/* >> getline(3) */
 __CREDIRECT(__ATTR_WUNUSED __ATTR_NONNULL((1, 2, 3)),__SSIZE_TYPE__,__THROWING,__localdep_getline,(char **__restrict __lineptr, __SIZE_TYPE__ *__restrict __pcount, __FILE *__restrict __stream),getline_unlocked,(__lineptr,__pcount,__stream))
 #elif defined(__CRT_HAVE_getline)
 __NAMESPACE_LOCAL_END
 #include <kos/anno.h>
 __NAMESPACE_LOCAL_BEGIN
-/* >> getline(3) */
 __CREDIRECT(__ATTR_WUNUSED __ATTR_NONNULL((1, 2, 3)),__SSIZE_TYPE__,__THROWING,__localdep_getline,(char **__restrict __lineptr, __SIZE_TYPE__ *__restrict __pcount, __FILE *__restrict __stream),getline,(__lineptr,__pcount,__stream))
 #elif defined(__CRT_HAVE_getline_unlocked)
 __NAMESPACE_LOCAL_END
 #include <kos/anno.h>
 __NAMESPACE_LOCAL_BEGIN
-/* >> getline(3) */
 __CREDIRECT(__ATTR_WUNUSED __ATTR_NONNULL((1, 2, 3)),__SSIZE_TYPE__,__THROWING,__localdep_getline,(char **__restrict __lineptr, __SIZE_TYPE__ *__restrict __pcount, __FILE *__restrict __stream),getline_unlocked,(__lineptr,__pcount,__stream))
 #else /* ... */
 __NAMESPACE_LOCAL_END
 #include <libc/local/stdio/getline.h>
 __NAMESPACE_LOCAL_BEGIN
-/* >> getline(3) */
 #define __localdep_getline __LIBC_LOCAL_NAME(getline)
 #endif /* !... */
 #endif /* !__local___localdep_getline_defined */
-/* Dependency: malloc from stdlib */
 #ifndef __local___localdep_malloc_defined
 #define __local___localdep_malloc_defined 1
 #if __has_builtin(__builtin_malloc) && defined(__LIBC_BIND_CRTBUILTINS) && defined(__CRT_HAVE_malloc)
@@ -160,39 +120,28 @@ __NAMESPACE_LOCAL_BEGIN
 #define __localdep_malloc __LIBC_LOCAL_NAME(malloc)
 #endif /* !... */
 #endif /* !__local___localdep_malloc_defined */
-/* Dependency: memcpyc from string */
 #ifndef __local___localdep_memcpyc_defined
 #define __local___localdep_memcpyc_defined 1
 #ifdef __CRT_HAVE_memcpyc
-/* Copy memory between non-overlapping memory blocks.
- * @return: * : Always re-returns `dst' */
 __CREDIRECT(__ATTR_LEAF __ATTR_RETNONNULL __ATTR_NONNULL((1, 2)),void *,__NOTHROW_NCX,__localdep_memcpyc,(void *__restrict __dst, void const *__restrict __src, __SIZE_TYPE__ __elem_count, __SIZE_TYPE__ __elem_size),memcpyc,(__dst,__src,__elem_count,__elem_size))
 #else /* __CRT_HAVE_memcpyc */
 __NAMESPACE_LOCAL_END
 #include <libc/local/string/memcpyc.h>
 __NAMESPACE_LOCAL_BEGIN
-/* Copy memory between non-overlapping memory blocks.
- * @return: * : Always re-returns `dst' */
 #define __localdep_memcpyc __LIBC_LOCAL_NAME(memcpyc)
 #endif /* !__CRT_HAVE_memcpyc */
 #endif /* !__local___localdep_memcpyc_defined */
-/* Dependency: memmovedownc from string */
 #ifndef __local___localdep_memmovedownc_defined
 #define __local___localdep_memmovedownc_defined 1
 #ifdef __CRT_HAVE_memmovedownc
-/* Move memory between potentially overlapping memory blocks (assumes that `dst <= src || !ELEM_COUNT || !ELEM_SIZE')
- * @return: * : Always re-returns `dst' */
 __CREDIRECT(__ATTR_LEAF __ATTR_RETNONNULL __ATTR_NONNULL((1, 2)),void *,__NOTHROW_NCX,__localdep_memmovedownc,(void *__dst, void const *__src, __SIZE_TYPE__ __elem_count, __SIZE_TYPE__ __elem_size),memmovedownc,(__dst,__src,__elem_count,__elem_size))
 #else /* __CRT_HAVE_memmovedownc */
 __NAMESPACE_LOCAL_END
 #include <libc/local/string/memmovedownc.h>
 __NAMESPACE_LOCAL_BEGIN
-/* Move memory between potentially overlapping memory blocks (assumes that `dst <= src || !ELEM_COUNT || !ELEM_SIZE')
- * @return: * : Always re-returns `dst' */
 #define __localdep_memmovedownc __LIBC_LOCAL_NAME(memmovedownc)
 #endif /* !__CRT_HAVE_memmovedownc */
 #endif /* !__local___localdep_memmovedownc_defined */
-/* Dependency: realloc from stdlib */
 #ifndef __local___localdep_realloc_defined
 #define __local___localdep_realloc_defined 1
 #if __has_builtin(__builtin_realloc) && defined(__LIBC_BIND_CRTBUILTINS)
@@ -201,32 +150,19 @@ __CEIREDIRECT(__ATTR_MALL_DEFAULT_ALIGNED __ATTR_WUNUSED __ATTR_ALLOC_SIZE((2)),
 __CREDIRECT(__ATTR_MALL_DEFAULT_ALIGNED __ATTR_WUNUSED __ATTR_ALLOC_SIZE((2)),void *,__NOTHROW_NCX,__localdep_realloc,(void *__mallptr, __SIZE_TYPE__ __num_bytes),realloc,(__mallptr,__num_bytes))
 #endif /* !__has_builtin(__builtin_realloc) || !__LIBC_BIND_CRTBUILTINS */
 #endif /* !__local___localdep_realloc_defined */
-/* Dependency: ungetc from stdio */
 #ifndef __local___localdep_ungetc_defined
 #define __local___localdep_ungetc_defined 1
 #if defined(__CRT_HAVE_ungetc_unlocked) && defined(__USE_STDIO_UNLOCKED)
-/* >> ungetc(3)
- * Unget a single character byte of data previously returned by `getc()' */
 __CREDIRECT(__ATTR_NONNULL((2)),int,__NOTHROW_NCX,__localdep_ungetc,(int __ch, __FILE *__restrict __stream),ungetc_unlocked,(__ch,__stream))
 #elif defined(__CRT_HAVE__ungetc_nolock) && defined(__USE_STDIO_UNLOCKED)
-/* >> ungetc(3)
- * Unget a single character byte of data previously returned by `getc()' */
 __CREDIRECT(__ATTR_NONNULL((2)),int,__NOTHROW_NCX,__localdep_ungetc,(int __ch, __FILE *__restrict __stream),_ungetc_nolock,(__ch,__stream))
 #elif defined(__CRT_HAVE_ungetc)
-/* >> ungetc(3)
- * Unget a single character byte of data previously returned by `getc()' */
 __CREDIRECT(__ATTR_NONNULL((2)),int,__NOTHROW_NCX,__localdep_ungetc,(int __ch, __FILE *__restrict __stream),ungetc,(__ch,__stream))
 #elif defined(__CRT_HAVE__IO_ungetc)
-/* >> ungetc(3)
- * Unget a single character byte of data previously returned by `getc()' */
 __CREDIRECT(__ATTR_NONNULL((2)),int,__NOTHROW_NCX,__localdep_ungetc,(int __ch, __FILE *__restrict __stream),_IO_ungetc,(__ch,__stream))
 #elif defined(__CRT_HAVE_ungetc_unlocked)
-/* >> ungetc(3)
- * Unget a single character byte of data previously returned by `getc()' */
 __CREDIRECT(__ATTR_NONNULL((2)),int,__NOTHROW_NCX,__localdep_ungetc,(int __ch, __FILE *__restrict __stream),ungetc_unlocked,(__ch,__stream))
 #elif defined(__CRT_HAVE__ungetc_nolock)
-/* >> ungetc(3)
- * Unget a single character byte of data previously returned by `getc()' */
 __CREDIRECT(__ATTR_NONNULL((2)),int,__NOTHROW_NCX,__localdep_ungetc,(int __ch, __FILE *__restrict __stream),_ungetc_nolock,(__ch,__stream))
 #else /* ... */
 #undef __local___localdep_ungetc_defined
@@ -237,23 +173,6 @@ __NAMESPACE_LOCAL_END
 #include <asm/os/stdio.h>
 #include <asm/crt/util.h>
 __NAMESPACE_LOCAL_BEGIN
-/* >> fparseln(3)
- * Parse one line of text from `stream', whilst accounting for
- * special character escapes, as well as custom line-comments.
- * @param: plen:    When non-NULL, store `strlen(return)' here
- * @param: plineno: When non-NULL, incremented for every line-feed read from `stream'
- * @param: delim:   Special characters (use NUL to disable, and NULL to use defaults)
- *                     delim[0]: The escape character (defaults to '\\')
- *                     delim[1]: The line-continuation character (defaults to '\\')
- *                     delim[2]: The line-comment character (defaults to '#')
- * @param: flags:   Set of `FPARSELN_UNESC*'
- * @return: * :     Pointer to a heap-allocated, and pre-escaped (according to `flags')
- *                  line, that must be `free(3)'ed by the caller once they are done
- *                  using it.
- *                  If the result would be empty as the result of `feof(stream)' upon
- *                  return of this function, `strdup("")' will be returned. (i.e. NULL
- *                  is only returned in case of an error; _NOT_ in case of end-of-file)
- * @return: NULL:   Error (s.a. `errno' and `ferror(stream)') */
 __LOCAL_LIBC(fparseln) __ATTR_WUNUSED __ATTR_NONNULL((1)) char *
 __NOTHROW_RPC(__LIBCCALL __LIBC_LOCAL_NAME(fparseln))(__FILE *__stream, __SIZE_TYPE__ *__plen, __SIZE_TYPE__ *__plineno, char const __delim[3], __STDC_INT_AS_UINT_T __flags) {
 	char *__result;

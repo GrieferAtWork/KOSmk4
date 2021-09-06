@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x3bf169b7 */
+/* HASH CRC-32:0xa6b5e347 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -23,37 +23,28 @@
 #include <__crt.h>
 #include <hybrid/typecore.h>
 __NAMESPACE_LOCAL_BEGIN
-/* Dependency: wcsend from wchar */
 #ifndef __local___localdep_wcsend_defined
 #define __local___localdep_wcsend_defined 1
 #ifdef __CRT_HAVE_wcsend
-/* Same as `str+wcslen(str)' */
 __CREDIRECT(__ATTR_PURE __ATTR_RETNONNULL __ATTR_WUNUSED __ATTR_NONNULL((1)),__WCHAR_TYPE__ *,__NOTHROW_NCX,__localdep_wcsend,(__WCHAR_TYPE__ const *__restrict __str),wcsend,(__str))
 #else /* __CRT_HAVE_wcsend */
 __NAMESPACE_LOCAL_END
 #include <libc/local/wchar/wcsend.h>
 __NAMESPACE_LOCAL_BEGIN
-/* Same as `str+wcslen(str)' */
 #define __localdep_wcsend __LIBC_LOCAL_NAME(wcsend)
 #endif /* !__CRT_HAVE_wcsend */
 #endif /* !__local___localdep_wcsend_defined */
-/* Dependency: wcslen from wchar */
 #ifndef __local___localdep_wcslen_defined
 #define __local___localdep_wcslen_defined 1
 #ifdef __CRT_HAVE_wcslen
-/* >> strlen(3)
- * Return the length of the string in characters (Same as `rawmemlen[...](str, '\0')') */
 __CREDIRECT(__ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1)),__SIZE_TYPE__,__NOTHROW_NCX,__localdep_wcslen,(__WCHAR_TYPE__ const *__restrict __str),wcslen,(__str))
 #else /* __CRT_HAVE_wcslen */
 __NAMESPACE_LOCAL_END
 #include <libc/local/wchar/wcslen.h>
 __NAMESPACE_LOCAL_BEGIN
-/* >> strlen(3)
- * Return the length of the string in characters (Same as `rawmemlen[...](str, '\0')') */
 #define __localdep_wcslen __LIBC_LOCAL_NAME(wcslen)
 #endif /* !__CRT_HAVE_wcslen */
 #endif /* !__local___localdep_wcslen_defined */
-/* Dependency: wmemcpy from wchar */
 #ifndef __local___localdep_wmemcpy_defined
 #define __local___localdep_wmemcpy_defined 1
 #ifdef __CRT_HAVE_wmemcpy

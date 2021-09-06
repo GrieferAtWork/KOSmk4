@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x91068d0e */
+/* HASH CRC-32:0x8dbd3a67 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -61,9 +61,6 @@ __LIBC char const *const _sys_siglist[__NSIG];
 #endif /* sys_siglist... */
 #endif /* !___local_sys_siglist_defined */
 __NAMESPACE_LOCAL_BEGIN
-/* >> sigabbrev_np(3)
- * Return the name of a given signal, without the leading `SIG*' prefix.
- * If the given `signum' isn't recognized, return `NULL' instead. */
 __LOCAL_LIBC(sigabbrev_np) __ATTR_CONST __ATTR_WUNUSED char const *
 __NOTHROW(__LIBCCALL __LIBC_LOCAL_NAME(sigabbrev_np))(__signo_t __signum) {
 #if defined(__CRT_HAVE___p_sys_siglist) || defined(__CRT_HAVE_sys_siglist) || defined(__CRT_HAVE__sys_siglist)

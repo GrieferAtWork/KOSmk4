@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xafefb08 */
+/* HASH CRC-32:0xb9ade41a */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -319,7 +319,7 @@ typedef struct __sigset_struct sigset_t;
  * @return: -1: Error (s.a. `errno') */
 __CDECLARE_OPT(__ATTR_WUNUSED,__fd_t,__NOTHROW_NCX,epoll_create,(__STDC_INT_AS_SIZE_T __size),(__size))
 /* >> epoll_create1(2)
- * Create a new epoll control descriptor which can be used for
+ * Create  a new epoll control descriptor which can be used for
  * monitoring of pollable events happening in registered files.
  * @param: flags: Set of `EPOLL_CLOEXEC | EPOLL_CLOFORK'
  * @return: * :   The newly created epoll control descriptor.
@@ -327,7 +327,7 @@ __CDECLARE_OPT(__ATTR_WUNUSED,__fd_t,__NOTHROW_NCX,epoll_create,(__STDC_INT_AS_S
  * @throw: E_INVALID_ARGUMENT_UNKNOWN_FLAG:E_INVALID_ARGUMENT_CONTEXT_EPOLL_CREATE1_FLAGS: [...] */
 __CDECLARE_OPT(__ATTR_WUNUSED,__fd_t,__NOTHROW_NCX,epoll_create1,(__STDC_INT_AS_UINT_T __flags),(__flags))
 /* >> epoll_ctl(2)
- * Manipulate a given epoll controller `epfd', as previously returned by `epoll_create1(2)'
+ * Manipulate a given  epoll controller  `epfd', as previously  returned by  `epoll_create1(2)'
  * in order to register (`EPOLL_CTL_ADD'), remove (`EPOLL_CTL_DEL') or modify (`EPOLL_CTL_MOD')
  * the file descriptors being monitored
  * @param: op:    One of `EPOLL_CTL_ADD', `EPOLL_CTL_DEL' or `EPOLL_CTL_MOD'
@@ -337,7 +337,7 @@ __CDECLARE_OPT(__ATTR_WUNUSED,__fd_t,__NOTHROW_NCX,epoll_create1,(__STDC_INT_AS_
  * @return: -1:   [errno=EEXIST][op=EPOLL_CTL_ADD] The given `fd' (and its kernel object) has already been registered
  * @return: -1:   [errno=ENOENT][op=EPOLL_CTL_MOD|EPOLL_CTL_DEL] The given `fd' (and its kernel object) aren't registered
  * @return: -1:   Error (s.a. `errno')
- * @throw: E_ILLEGAL_REFERENCE_LOOP: The given `fd' is another epoll that either
+ * @throw: E_ILLEGAL_REFERENCE_LOOP: The  given  `fd'  is  another  epoll  that either
  *                                   forms a loop with `epfd', or has too many nested.
  * @throw: E_INVALID_ARGUMENT_UNKNOWN_COMMAND:E_INVALID_ARGUMENT_CONTEXT_EPOLL_CTL_OP: [...] */
 __CDECLARE_OPT(,int,__NOTHROW_NCX,epoll_ctl,(__fd_t __epfd, __epoll_ctl_t __op, __fd_t __fd, struct epoll_event *__event),(__epfd,__op,__fd,__event))
@@ -347,7 +347,7 @@ __CDECLARE_OPT(,int,__NOTHROW_NCX,epoll_ctl,(__fd_t __epfd, __epoll_ctl_t __op, 
  * @param: events:    A buffer where the kernel can store information on the
  *                    events that actually took place.
  * @param: maxevents: The # of events that can be stored in `events' (must be >= 1)
- * @param: timeout:   The max amount of time (in milliseconds) before returning
+ * @param: timeout:   The max amount of time (in milliseconds) before  returning
  *                    in the case where no event occurred in the mean time. When
  *                    set to `-1', wait indefinitely
  * @return: >= 1:     The # of events that happened (written to the first `return'
@@ -357,12 +357,12 @@ __CDECLARE_OPT(,int,__NOTHROW_NCX,epoll_ctl,(__fd_t __epfd, __epoll_ctl_t __op, 
 __CDECLARE_OPT(__ATTR_NONNULL((2)),__STDC_INT_AS_SSIZE_T,__NOTHROW_RPC,epoll_wait,(__fd_t __epfd, struct epoll_event *__events, __STDC_INT_AS_SIZE_T __maxevents, int __timeout),(__epfd,__events,__maxevents,__timeout))
 /* >> epoll_pwait(2)
  * Same as `epoll_wait(2)', but change the calling thread's signal mask to `ss' while
- * waiting. Wait until at least one of the conditions monitored by `epfd' to be met.
+ * waiting.  Wait until at least one of the conditions monitored by `epfd' to be met.
  * @param: epfd:      The epoll controller on which to wait.
  * @param: events:    A buffer where the kernel can store information on the
  *                    events that actually took place.
  * @param: maxevents: The # of events that can be stored in `events' (must be >= 1)
- * @param: timeout:   The max amount of time (in milliseconds) before returning
+ * @param: timeout:   The max amount of time (in milliseconds) before  returning
  *                    in the case where no event occurred in the mean time. When
  *                    set to `-1', wait indefinitely
  * @param: ss:        The signal mask to apply while waiting for an event to happen.

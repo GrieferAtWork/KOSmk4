@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xf3e9047d */
+/* HASH CRC-32:0x203ffe0b */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -657,9 +657,9 @@ __SYSDECL_BEGIN
 #if !defined(__ioctl_defined) && defined(__CRT_HAVE_ioctl)
 #define __ioctl_defined 1
 /* >> ioctl(2)
- * Perform the I/O control operation specified by `request' on `fd'.
- * Many I/O control operations except an additional argument, though
- * this argument's type and meaning depends on `REQUEST'. If used, it's
+ * Perform the  I/O control  operation specified  by `request'  on  `fd'.
+ * Many I/O  control operations  except  an additional  argument,  though
+ * this argument's type and meaning  depends on `REQUEST'. If used,  it's
  * usually either a pointer to a larger argument structure, or an integer
  * that fits into a single register.
  * @return: * : The return value depends on the given `request'.

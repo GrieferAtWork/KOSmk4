@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x2b46bba7 */
+/* HASH CRC-32:0xd8db7b1e */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -25,16 +25,10 @@
 #if defined(__AT_FDCWD) && defined(__AT_SYMLINK_NOFOLLOW) && defined(__CRT_HAVE_fchownat)
 #include <bits/types.h>
 __NAMESPACE_LOCAL_BEGIN
-/* Dependency: fchownat from unistd */
 #ifndef __local___localdep_fchownat_defined
 #define __local___localdep_fchownat_defined 1
-/* >> fchownat(2)
- * Change the ownership of a given `dfd:file' to `group:owner' */
 __CREDIRECT(__ATTR_NONNULL((2)),int,__NOTHROW_RPC,__localdep_fchownat,(__fd_t __dfd, char const *__file, __uid_t __owner, __gid_t __group, __atflag_t __flags),fchownat,(__dfd,__file,__owner,__group,__flags))
 #endif /* !__local___localdep_fchownat_defined */
-/* >> lchown(2)
- * Change the ownership of a given `file' to `group:owner',
- * but don't reference it if that file is a symbolic link */
 __LOCAL_LIBC(lchown) __ATTR_NONNULL((1)) int
 __NOTHROW_RPC(__LIBCCALL __LIBC_LOCAL_NAME(lchown))(char const *__file, __uid_t __owner, __gid_t __group) {
 	return __localdep_fchownat(__AT_FDCWD, __file, __owner, __group, __AT_SYMLINK_NOFOLLOW);

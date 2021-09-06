@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x81a6926e */
+/* HASH CRC-32:0x5771fc81 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -25,12 +25,10 @@
 #include <kos/anno.h>
 #include <hybrid/typecore.h>
 __NAMESPACE_LOCAL_BEGIN
-/* Dependency: Memalign from kos.malloc */
 #ifndef __local___localdep_Memalign_defined
 #define __local___localdep_Memalign_defined 1
 __CREDIRECT(__ATTR_MALLOC __ATTR_RETNONNULL __ATTR_WUNUSED __ATTR_ALLOC_ALIGN(1) __ATTR_ALLOC_SIZE((2)),void *,__THROWING,__localdep_Memalign,(__SIZE_TYPE__ __alignment, __SIZE_TYPE__ __num_bytes),Memalign,(__alignment,__num_bytes))
 #endif /* !__local___localdep_Memalign_defined */
-/* Dependency: getpagesize from unistd */
 #ifndef __local___localdep_getpagesize_defined
 #define __local___localdep_getpagesize_defined 1
 __NAMESPACE_LOCAL_END
@@ -40,29 +38,21 @@ __NAMESPACE_LOCAL_BEGIN
 __NAMESPACE_LOCAL_END
 #include <features.h>
 __NAMESPACE_LOCAL_BEGIN
-/* >> getpagesize(3)
- * Return the size of a PAGE (in bytes) */
 __CEIREDIRECT(__ATTR_CONST __ATTR_WUNUSED,__STDC_INT_AS_SIZE_T,__NOTHROW,__localdep_getpagesize,(void),getpagesize,{ return __ARCH_PAGESIZE; })
 #elif defined(__CRT_HAVE_getpagesize)
 __NAMESPACE_LOCAL_END
 #include <features.h>
 __NAMESPACE_LOCAL_BEGIN
-/* >> getpagesize(3)
- * Return the size of a PAGE (in bytes) */
 __CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,__STDC_INT_AS_SIZE_T,__NOTHROW,__localdep_getpagesize,(void),getpagesize,())
 #elif defined(__CRT_HAVE___getpagesize)
 __NAMESPACE_LOCAL_END
 #include <features.h>
 __NAMESPACE_LOCAL_BEGIN
-/* >> getpagesize(3)
- * Return the size of a PAGE (in bytes) */
 __CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,__STDC_INT_AS_SIZE_T,__NOTHROW,__localdep_getpagesize,(void),__getpagesize,())
 #elif defined(__ARCH_PAGESIZE)
 __NAMESPACE_LOCAL_END
 #include <features.h>
 __NAMESPACE_LOCAL_BEGIN
-/* >> getpagesize(3)
- * Return the size of a PAGE (in bytes) */
 __FORCELOCAL __ATTR_CONST __ATTR_WUNUSED __STDC_INT_AS_SIZE_T __NOTHROW(__LIBCCALL __localdep_getpagesize)(void) { return __ARCH_PAGESIZE; }
 #else /* ... */
 #undef __local___localdep_getpagesize_defined

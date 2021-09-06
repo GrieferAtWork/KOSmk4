@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x683b1c43 */
+/* HASH CRC-32:0xc5581b7a */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -23,61 +23,42 @@
 #include <__crt.h>
 #include <bits/types.h>
 __NAMESPACE_LOCAL_BEGIN
-/* Dependency: ctime32 from time */
 #ifndef __local___localdep_ctime32_defined
 #define __local___localdep_ctime32_defined 1
 #ifdef __CRT_HAVE_ctime
-/* >> ctime(3), ctime64(3)
- * Equivalent to `asctime(localtime(timer))' */
 __CREDIRECT(__ATTR_RETNONNULL __ATTR_WUNUSED __ATTR_NONNULL((1)),char *,__NOTHROW_NCX,__localdep_ctime32,(__time32_t const *__timer),ctime,(__timer))
 #elif defined(__CRT_HAVE__ctime32)
-/* >> ctime(3), ctime64(3)
- * Equivalent to `asctime(localtime(timer))' */
 __CREDIRECT(__ATTR_RETNONNULL __ATTR_WUNUSED __ATTR_NONNULL((1)),char *,__NOTHROW_NCX,__localdep_ctime32,(__time32_t const *__timer),_ctime32,(__timer))
 #else /* ... */
 #undef __local___localdep_ctime32_defined
 #endif /* !... */
 #endif /* !__local___localdep_ctime32_defined */
-/* Dependency: ctime64 from time */
 #ifndef __local___localdep_ctime64_defined
 #define __local___localdep_ctime64_defined 1
 #ifdef __CRT_HAVE_ctime64
-/* >> ctime(3), ctime64(3)
- * Equivalent to `asctime(localtime(timer))' */
 __CREDIRECT(__ATTR_RETNONNULL __ATTR_WUNUSED __ATTR_NONNULL((1)),char *,__NOTHROW_NCX,__localdep_ctime64,(__time64_t const *__timer),ctime64,(__timer))
 #elif defined(__CRT_HAVE_ctime) && __SIZEOF_TIME32_T__ == __SIZEOF_TIME64_T__
-/* >> ctime(3), ctime64(3)
- * Equivalent to `asctime(localtime(timer))' */
 __CREDIRECT(__ATTR_RETNONNULL __ATTR_WUNUSED __ATTR_NONNULL((1)),char *,__NOTHROW_NCX,__localdep_ctime64,(__time64_t const *__timer),ctime,(__timer))
 #elif defined(__CRT_HAVE__ctime64)
-/* >> ctime(3), ctime64(3)
- * Equivalent to `asctime(localtime(timer))' */
 __CREDIRECT(__ATTR_RETNONNULL __ATTR_WUNUSED __ATTR_NONNULL((1)),char *,__NOTHROW_NCX,__localdep_ctime64,(__time64_t const *__timer),_ctime64,(__timer))
 #else /* ... */
 __NAMESPACE_LOCAL_END
 #include <libc/local/time/ctime64.h>
 __NAMESPACE_LOCAL_BEGIN
-/* >> ctime(3), ctime64(3)
- * Equivalent to `asctime(localtime(timer))' */
 #define __localdep_ctime64 __LIBC_LOCAL_NAME(ctime64)
 #endif /* !... */
 #endif /* !__local___localdep_ctime64_defined */
-/* Dependency: ctime_r from time */
 #ifndef __local___localdep_ctime_r_defined
 #define __local___localdep_ctime_r_defined 1
 #ifdef __CRT_HAVE_ctime_r
 __NAMESPACE_LOCAL_END
 #include <bits/crt/tm.h>
 __NAMESPACE_LOCAL_BEGIN
-/* >> ctime_r(3), ctime64_r(3)
- * Equivalent to `asctime_r(localtime_r(timer, <tmp>), buf)' */
 __CREDIRECT(__ATTR_NONNULL((1, 2)),char *,__NOTHROW_NCX,__localdep_ctime_r,(__TM_TYPE(time) const *__restrict __timer, char __buf[26]),ctime_r,(__timer,__buf))
 #else /* __CRT_HAVE_ctime_r */
 __NAMESPACE_LOCAL_END
 #include <libc/local/time/ctime_r.h>
 __NAMESPACE_LOCAL_BEGIN
-/* >> ctime_r(3), ctime64_r(3)
- * Equivalent to `asctime_r(localtime_r(timer, <tmp>), buf)' */
 #define __localdep_ctime_r __LIBC_LOCAL_NAME(ctime_r)
 #endif /* !__CRT_HAVE_ctime_r */
 #endif /* !__local___localdep_ctime_r_defined */
@@ -91,8 +72,6 @@ __NAMESPACE_LOCAL_END
 #endif /* !__LIBC_CTIME_BUFFER_DEFINED */
 #endif /* __BUILDING_LIBC || (!__CRT_HAVE_ctime && !__CRT_HAVE__ctime32) */
 __NAMESPACE_LOCAL_BEGIN
-/* >> ctime(3), ctime64(3)
- * Equivalent to `asctime(localtime(timer))' */
 __LOCAL_LIBC(ctime) __ATTR_RETNONNULL __ATTR_WUNUSED __ATTR_NONNULL((1)) char *
 __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(ctime))(__TM_TYPE(time) const *__timer) {
 

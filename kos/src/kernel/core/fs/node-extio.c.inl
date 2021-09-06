@@ -19,9 +19,9 @@
  */
 #ifdef __INTELLISENSE__
 #include "node.c"
-//#define DEFINE_IO_PHYS 1
+//#define  DEFINE_IO_PHYS  1
 //#define DEFINE_IO_VECTOR 1
-//#define DEFINE_IO_ASYNC 1
+//#define DEFINE_IO_ASYNC  1
 //#define DEFINE_IO_KERNEL 1
 #endif /* __INTELLISENSE__ */
 

@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xc60246d3 */
+/* HASH CRC-32:0x259af465 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -298,7 +298,7 @@ for (local field, add, flags: ops) {
 #include <asm/os/termios.h>
 /* >> cfmakesane(3)
  * Set ~sane~ mode for the given `termios_p' (out-only; meaning that `termios_p' gets initialized by this function)
- * Sane here refers to setting all values to their defaults, as they are defined in <sys/ttydefaults.h> */
+ * Sane here  refers  to  setting  all values  to  their  defaults,  as they  are  defined  in  <sys/ttydefaults.h> */
 INTERN ATTR_SECTION(".text.crt.io.tty") NONNULL((1)) void
 NOTHROW_NCX(LIBCCALL libc_cfmakesane)(struct termios *__restrict termios_p) {
 	/* Default everything to ZERO */

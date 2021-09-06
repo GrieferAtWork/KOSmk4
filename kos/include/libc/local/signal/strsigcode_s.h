@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xbf93b2f3 */
+/* HASH CRC-32:0xcf1df7e5 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -22,17 +22,14 @@
 #define __local_strsigcode_s_defined 1
 #include <__crt.h>
 __NAMESPACE_LOCAL_BEGIN
-/* Dependency: strend from string */
 #ifndef __local___localdep_strend_defined
 #define __local___localdep_strend_defined 1
 #ifdef __CRT_HAVE_strend
-/* Same as `str + strlen(str)' */
 __CREDIRECT(__ATTR_PURE __ATTR_RETNONNULL __ATTR_WUNUSED __ATTR_NONNULL((1)),char *,__NOTHROW_NCX,__localdep_strend,(char const *__restrict __str),strend,(__str))
 #else /* __CRT_HAVE_strend */
 __NAMESPACE_LOCAL_END
 #include <libc/local/string/strend.h>
 __NAMESPACE_LOCAL_BEGIN
-/* Same as `str + strlen(str)' */
 #define __localdep_strend __LIBC_LOCAL_NAME(strend)
 #endif /* !__CRT_HAVE_strend */
 #endif /* !__local___localdep_strend_defined */
@@ -40,10 +37,6 @@ __NAMESPACE_LOCAL_END
 #include <asm/os/signal.h>
 #include <asm/os/siginfo.h>
 __NAMESPACE_LOCAL_BEGIN
-/* >> strsigcode_s(3)
- * Return a textual description of `code', as read from `siginfo_t::si_code',
- * and used in conjunction with a given signal `signo'. This function is used
- * for the implementation of `psiginfo(3)' */
 __LOCAL_LIBC(strsigcode_s) __ATTR_CONST __ATTR_WUNUSED char const *
 __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(strsigcode_s))(__signo_t __signo, int __code) {
 	char const *__result = __NULLPTR;

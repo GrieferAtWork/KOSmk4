@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xc9398bdb */
+/* HASH CRC-32:0xea045373 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -22,7 +22,6 @@
 #define __local_strsuftollx_defined 1
 #include <__crt.h>
 __NAMESPACE_LOCAL_BEGIN
-/* Dependency: strtoll from stdlib */
 #ifndef __local___localdep_strtoll_defined
 #define __local___localdep_strtoll_defined 1
 #ifdef __CRT_HAVE_strtoll
@@ -86,7 +85,6 @@ __NAMESPACE_LOCAL_BEGIN
 #define __localdep_strtoll __LIBC_LOCAL_NAME(strtoll)
 #endif /* !... */
 #endif /* !__local___localdep_strtoll_defined */
-/* >> strsuftollx(3) */
 __LOCAL_LIBC(strsuftollx) __ATTR_WUNUSED __ATTR_NONNULL((1, 2)) __LONGLONG
 __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(strsuftollx))(char const *__desc, char const *__val, __LONGLONG __lo, __LONGLONG __hi, char *__errbuf, __SIZE_TYPE__ __errbuflen) {
 	/* TODO */

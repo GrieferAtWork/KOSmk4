@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xcc09fdcf */
+/* HASH CRC-32:0x49d38628 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -23,7 +23,6 @@
 #include <__crt.h>
 #include <bits/types.h>
 __NAMESPACE_LOCAL_BEGIN
-/* Dependency: mbstowcs from stdlib */
 #ifndef __local___localdep_mbstowcs_defined
 #define __local___localdep_mbstowcs_defined 1
 #ifdef __CRT_HAVE_mbstowcs

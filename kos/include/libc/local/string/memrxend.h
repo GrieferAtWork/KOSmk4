@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x29b3a81c */
+/* HASH CRC-32:0x9edd9e4f */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -23,7 +23,6 @@
 #include <__crt.h>
 #include <hybrid/typecore.h>
 __NAMESPACE_LOCAL_BEGIN
-/* Same as `memrend', but search for non-matching locations. */
 __LOCAL_LIBC(memrxend) __ATTR_PURE __ATTR_RETNONNULL __ATTR_WUNUSED __ATTR_NONNULL((1)) void *
 __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(memrxend))(void const *__restrict __haystack, int __needle, __SIZE_TYPE__ __n_bytes) {
 	__BYTE_TYPE__ *__result = (__BYTE_TYPE__ *)__haystack + __n_bytes;

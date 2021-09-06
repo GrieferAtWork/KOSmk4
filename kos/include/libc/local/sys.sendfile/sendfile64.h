@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x60d7d25f */
+/* HASH CRC-32:0x1529ddde */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -24,7 +24,6 @@
 #ifdef __CRT_HAVE_sendfile
 #include <bits/types.h>
 __NAMESPACE_LOCAL_BEGIN
-/* Dependency: sendfile32 from sys.sendfile */
 #ifndef __local___localdep_sendfile32_defined
 #define __local___localdep_sendfile32_defined 1
 __CREDIRECT(,__SSIZE_TYPE__,__NOTHROW_NCX,__localdep_sendfile32,(__fd_t __out_fd, __fd_t __in_fd, __off32_t *__offset, __SIZE_TYPE__ __count),sendfile,(__out_fd,__in_fd,__offset,__count))

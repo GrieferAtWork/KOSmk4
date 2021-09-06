@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xa08065e4 */
+/* HASH CRC-32:0xcd8344f6 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -24,10 +24,6 @@
 #include <kos/bits/exception_data.h>
 #include <kos/except/codes.h>
 __NAMESPACE_LOCAL_BEGIN
-/* Return the priority for a given error code, where exceptions
- * with greater priorities should take the place of ones with
- * lower priorities in situations where multiple simultaneous
- * errors can't be prevented. */
 __LOCAL_LIBC(error_priority) __ATTR_CONST __ATTR_WUNUSED unsigned int
 __NOTHROW(__LIBKCALL __LIBC_LOCAL_NAME(error_priority))(__error_code_t __code) {
 	__error_class_t __code_class = ERROR_CLASS(__code);

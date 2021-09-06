@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x4283f0e4 */
+/* HASH CRC-32:0x307b4951 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -22,7 +22,6 @@
 #define __local_c32scasecoll_defined 1
 #include <__crt.h>
 __NAMESPACE_LOCAL_BEGIN
-/* Dependency: c32scasecmp from parts.uchar.string */
 #ifndef __local___localdep_c32scasecmp_defined
 #define __local___localdep_c32scasecmp_defined 1
 #if defined(__CRT_HAVE_wcscasecmp) && __SIZEOF_WCHAR_T__ == 4 && defined(__LIBCCALL_IS_LIBKCALL)

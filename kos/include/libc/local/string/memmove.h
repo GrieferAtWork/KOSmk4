@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x5ace1260 */
+/* HASH CRC-32:0xf35a8f03 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -23,9 +23,6 @@
 #include <__crt.h>
 #include <hybrid/typecore.h>
 __NAMESPACE_LOCAL_BEGIN
-/* >> memmove(3)
- * Move memory between potentially overlapping memory blocks.
- * @return: * : Always re-returns `dst' */
 __LOCAL_LIBC(memmove) __ATTR_LEAF __ATTR_RETNONNULL __ATTR_NONNULL((1, 2)) void *
 __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(memmove))(void *__dst, void const *__src, __SIZE_TYPE__ __n_bytes) {
 	__BYTE_TYPE__ *__pdst;

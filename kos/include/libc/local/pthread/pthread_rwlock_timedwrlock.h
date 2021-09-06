@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x110aa79a */
+/* HASH CRC-32:0xda6ec8d1 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -26,52 +26,25 @@
 #include <bits/crt/pthreadtypes.h>
 #include <bits/os/timespec.h>
 __NAMESPACE_LOCAL_BEGIN
-/* Dependency: pthread_rwlock_timedwrlock32 from pthread */
 #if !defined(__local___localdep_pthread_rwlock_timedwrlock32_defined) && defined(__CRT_HAVE_pthread_rwlock_timedwrlock)
 #define __local___localdep_pthread_rwlock_timedwrlock32_defined 1
-/* >> pthread_rwlock_timedwrlock(3), pthread_rwlock_timedwrlock64(3)
- * Try to acquire write lock for `rwlock' or return after the specified time
- * @return: EOK:       Success
- * @return: EINVAL:    The given `abstime' is invalid
- * @return: ETIMEDOUT: The given `abstime' has expired */
 __CREDIRECT(__ATTR_WUNUSED __ATTR_NONNULL((1, 2)),__errno_t,__NOTHROW_RPC,__localdep_pthread_rwlock_timedwrlock32,(__pthread_rwlock_t *__restrict __rwlock, struct __timespec32 const *__restrict __abstime),pthread_rwlock_timedwrlock,(__rwlock,__abstime))
 #endif /* !__local___localdep_pthread_rwlock_timedwrlock32_defined && __CRT_HAVE_pthread_rwlock_timedwrlock */
-/* Dependency: pthread_rwlock_timedwrlock64 from pthread */
 #ifndef __local___localdep_pthread_rwlock_timedwrlock64_defined
 #define __local___localdep_pthread_rwlock_timedwrlock64_defined 1
 #ifdef __CRT_HAVE_pthread_rwlock_timedwrlock64
-/* >> pthread_rwlock_timedwrlock(3), pthread_rwlock_timedwrlock64(3)
- * Try to acquire write lock for `rwlock' or return after the specified time
- * @return: EOK:       Success
- * @return: EINVAL:    The given `abstime' is invalid
- * @return: ETIMEDOUT: The given `abstime' has expired */
 __CREDIRECT(__ATTR_WUNUSED __ATTR_NONNULL((1, 2)),__errno_t,__NOTHROW_RPC,__localdep_pthread_rwlock_timedwrlock64,(__pthread_rwlock_t *__restrict __rwlock, struct __timespec64 const *__restrict __abstime),pthread_rwlock_timedwrlock64,(__rwlock,__abstime))
 #elif defined(__CRT_HAVE_pthread_rwlock_timedwrlock) && __SIZEOF_TIME32_T__ == __SIZEOF_TIME64_T__
-/* >> pthread_rwlock_timedwrlock(3), pthread_rwlock_timedwrlock64(3)
- * Try to acquire write lock for `rwlock' or return after the specified time
- * @return: EOK:       Success
- * @return: EINVAL:    The given `abstime' is invalid
- * @return: ETIMEDOUT: The given `abstime' has expired */
 __CREDIRECT(__ATTR_WUNUSED __ATTR_NONNULL((1, 2)),__errno_t,__NOTHROW_RPC,__localdep_pthread_rwlock_timedwrlock64,(__pthread_rwlock_t *__restrict __rwlock, struct __timespec64 const *__restrict __abstime),pthread_rwlock_timedwrlock,(__rwlock,__abstime))
 #elif defined(__CRT_HAVE_pthread_rwlock_timedwrlock)
 __NAMESPACE_LOCAL_END
 #include <libc/local/pthread/pthread_rwlock_timedwrlock64.h>
 __NAMESPACE_LOCAL_BEGIN
-/* >> pthread_rwlock_timedwrlock(3), pthread_rwlock_timedwrlock64(3)
- * Try to acquire write lock for `rwlock' or return after the specified time
- * @return: EOK:       Success
- * @return: EINVAL:    The given `abstime' is invalid
- * @return: ETIMEDOUT: The given `abstime' has expired */
 #define __localdep_pthread_rwlock_timedwrlock64 __LIBC_LOCAL_NAME(pthread_rwlock_timedwrlock64)
 #else /* ... */
 #undef __local___localdep_pthread_rwlock_timedwrlock64_defined
 #endif /* !... */
 #endif /* !__local___localdep_pthread_rwlock_timedwrlock64_defined */
-/* >> pthread_rwlock_timedwrlock(3), pthread_rwlock_timedwrlock64(3)
- * Try to acquire write lock for `rwlock' or return after the specified time
- * @return: EOK:       Success
- * @return: EINVAL:    The given `abstime' is invalid
- * @return: ETIMEDOUT: The given `abstime' has expired */
 __LOCAL_LIBC(pthread_rwlock_timedwrlock) __ATTR_WUNUSED __ATTR_NONNULL((1, 2)) __errno_t
 __NOTHROW_RPC(__LIBCCALL __LIBC_LOCAL_NAME(pthread_rwlock_timedwrlock))(__pthread_rwlock_t *__restrict __rwlock, struct timespec const *__restrict __abstime) {
 #ifdef __CRT_HAVE_pthread_rwlock_timedwrlock

@@ -32,9 +32,9 @@ DECL_BEGIN
 
 
 
-/*[[[head:libc_setfsuid,hash:CRC-32=0xa159ce79]]]*/
+/*[[[head:libc_setfsuid,hash:CRC-32=0xddd3be13]]]*/
 /* >> setfsuid(2)
- * Set the user ID for the cred-context (s.a. `CLONE_CRED') of the
+ * Set the  user ID  for the  cred-context (s.a.  `CLONE_CRED') of  the
  * calling thread. The calling thread needs the `CAP_SETUID' privilege.
  * @return: 0:  Success.
  * @return: -1: Error (s.a. `errno') */
@@ -52,9 +52,9 @@ NOTHROW_NCX(LIBCCALL libc_setfsuid)(uid_t uid)
 }
 /*[[[end:libc_setfsuid]]]*/
 
-/*[[[head:libc_setfsgid,hash:CRC-32=0x7fa8c2a3]]]*/
+/*[[[head:libc_setfsgid,hash:CRC-32=0xef55724b]]]*/
 /* >> setfsgid(2)
- * Set the group ID for the cred-context (s.a. `CLONE_CRED') of the
+ * Set the group  ID for  the cred-context (s.a.  `CLONE_CRED') of  the
  * calling thread. The calling thread needs the `CAP_SETGID' privilege.
  * @return: 0:  Success.
  * @return: -1: Error (s.a. `errno') */

@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xbce5343d */
+/* HASH CRC-32:0x61a33c8f */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -25,62 +25,25 @@
 #include <bits/crt/semaphore.h>
 #include <bits/os/timespec.h>
 __NAMESPACE_LOCAL_BEGIN
-/* Dependency: sem_timedwait32 from semaphore */
 #if !defined(__local___localdep_sem_timedwait32_defined) && defined(__CRT_HAVE_sem_timedwait)
 #define __local___localdep_sem_timedwait32_defined 1
-/* >> sem_timedwait(3)
- * Wait for a ticket to become available to the given semaphore `sem'
- * Once a ticket has become available, consume it and return. If no ticket
- * becomes available until `abstime' has passed, return `errno=ETIMEDOUT'
- * @return: 0:  Success
- * @return: -1: [errno=EINTR]     Interrupted.
- * @return: -1: [errno=ETIMEDOUT] The given `abstime' expired before a ticket became available. */
 __CREDIRECT(__ATTR_NONNULL((1, 2)),int,__NOTHROW_RPC,__localdep_sem_timedwait32,(__sem_t *__restrict __sem, struct __timespec32 const *__restrict __abstime),sem_timedwait,(__sem,__abstime))
 #endif /* !__local___localdep_sem_timedwait32_defined && __CRT_HAVE_sem_timedwait */
-/* Dependency: sem_timedwait64 from semaphore */
 #ifndef __local___localdep_sem_timedwait64_defined
 #define __local___localdep_sem_timedwait64_defined 1
 #ifdef __CRT_HAVE_sem_timedwait64
-/* >> sem_timedwait(3)
- * Wait for a ticket to become available to the given semaphore `sem'
- * Once a ticket has become available, consume it and return. If no ticket
- * becomes available until `abstime' has passed, return `errno=ETIMEDOUT'
- * @return: 0:  Success
- * @return: -1: [errno=EINTR]     Interrupted.
- * @return: -1: [errno=ETIMEDOUT] The given `abstime' expired before a ticket became available. */
 __CREDIRECT(__ATTR_NONNULL((1, 2)),int,__NOTHROW_RPC,__localdep_sem_timedwait64,(__sem_t *__restrict __sem, struct __timespec64 const *__restrict __abstime),sem_timedwait64,(__sem,__abstime))
 #elif defined(__CRT_HAVE_sem_timedwait) && __SIZEOF_TIME32_T__ == __SIZEOF_TIME64_T__
-/* >> sem_timedwait(3)
- * Wait for a ticket to become available to the given semaphore `sem'
- * Once a ticket has become available, consume it and return. If no ticket
- * becomes available until `abstime' has passed, return `errno=ETIMEDOUT'
- * @return: 0:  Success
- * @return: -1: [errno=EINTR]     Interrupted.
- * @return: -1: [errno=ETIMEDOUT] The given `abstime' expired before a ticket became available. */
 __CREDIRECT(__ATTR_NONNULL((1, 2)),int,__NOTHROW_RPC,__localdep_sem_timedwait64,(__sem_t *__restrict __sem, struct __timespec64 const *__restrict __abstime),sem_timedwait,(__sem,__abstime))
 #elif defined(__CRT_HAVE_sem_timedwait)
 __NAMESPACE_LOCAL_END
 #include <libc/local/semaphore/sem_timedwait64.h>
 __NAMESPACE_LOCAL_BEGIN
-/* >> sem_timedwait(3)
- * Wait for a ticket to become available to the given semaphore `sem'
- * Once a ticket has become available, consume it and return. If no ticket
- * becomes available until `abstime' has passed, return `errno=ETIMEDOUT'
- * @return: 0:  Success
- * @return: -1: [errno=EINTR]     Interrupted.
- * @return: -1: [errno=ETIMEDOUT] The given `abstime' expired before a ticket became available. */
 #define __localdep_sem_timedwait64 __LIBC_LOCAL_NAME(sem_timedwait64)
 #else /* ... */
 #undef __local___localdep_sem_timedwait64_defined
 #endif /* !... */
 #endif /* !__local___localdep_sem_timedwait64_defined */
-/* >> sem_timedwait(3)
- * Wait for a ticket to become available to the given semaphore `sem'
- * Once a ticket has become available, consume it and return. If no ticket
- * becomes available until `abstime' has passed, return `errno=ETIMEDOUT'
- * @return: 0:  Success
- * @return: -1: [errno=EINTR]     Interrupted.
- * @return: -1: [errno=ETIMEDOUT] The given `abstime' expired before a ticket became available. */
 __LOCAL_LIBC(sem_timedwait) __ATTR_NONNULL((1, 2)) int
 __NOTHROW_RPC(__LIBCCALL __LIBC_LOCAL_NAME(sem_timedwait))(__sem_t *__restrict __sem, struct timespec const *__restrict __abstime) {
 #ifdef __CRT_HAVE_sem_timedwait

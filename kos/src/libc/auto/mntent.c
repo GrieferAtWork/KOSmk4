@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xc46332 */
+/* HASH CRC-32:0x2cc32493 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -123,7 +123,7 @@ err:
 	return NULL;
 }
 /* >> addmntent(3)
- * Append a line `"%s %s %s %s %d %d\n" % (mnt_fsname, mnt_dir,
+ * Append a  line  `"%s %s %s %s %d %d\n"  %  (mnt_fsname,  mnt_dir,
  * mnt_type, mnt_opts, mnt_freq, mnt_passno)' to the end of `stream'
  * @return: 0: Success
  * @return: 1: Error (WARNING: `errno' is left undefined) */

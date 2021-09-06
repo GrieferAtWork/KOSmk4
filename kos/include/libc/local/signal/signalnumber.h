@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xa1bf00ca */
+/* HASH CRC-32:0x4de34d21 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -22,36 +22,25 @@
 #define __local_signalnumber_defined 1
 #include <__crt.h>
 __NAMESPACE_LOCAL_BEGIN
-/* Dependency: sigabbrev_np from string */
 #ifndef __local___localdep_sigabbrev_np_defined
 #define __local___localdep_sigabbrev_np_defined 1
 #ifdef __CRT_HAVE_sigabbrev_np
 __NAMESPACE_LOCAL_END
 #include <bits/types.h>
 __NAMESPACE_LOCAL_BEGIN
-/* >> sigabbrev_np(3)
- * Return the name of a given signal, without the leading `SIG*' prefix.
- * If the given `signum' isn't recognized, return `NULL' instead. */
 __CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,char const *,__NOTHROW,__localdep_sigabbrev_np,(__signo_t __signum),sigabbrev_np,(__signum))
 #elif defined(__CRT_HAVE_signalname)
 __NAMESPACE_LOCAL_END
 #include <bits/types.h>
 __NAMESPACE_LOCAL_BEGIN
-/* >> sigabbrev_np(3)
- * Return the name of a given signal, without the leading `SIG*' prefix.
- * If the given `signum' isn't recognized, return `NULL' instead. */
 __CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,char const *,__NOTHROW,__localdep_sigabbrev_np,(__signo_t __signum),signalname,(__signum))
 #else /* ... */
 __NAMESPACE_LOCAL_END
 #include <libc/local/string/sigabbrev_np.h>
 __NAMESPACE_LOCAL_BEGIN
-/* >> sigabbrev_np(3)
- * Return the name of a given signal, without the leading `SIG*' prefix.
- * If the given `signum' isn't recognized, return `NULL' instead. */
 #define __localdep_sigabbrev_np __LIBC_LOCAL_NAME(sigabbrev_np)
 #endif /* !... */
 #endif /* !__local___localdep_sigabbrev_np_defined */
-/* Dependency: strcasecmp from string */
 #ifndef __local___localdep_strcasecmp_defined
 #define __local___localdep_strcasecmp_defined 1
 #if __has_builtin(__builtin_strcasecmp) && defined(__LIBC_BIND_CRTBUILTINS) && defined(__CRT_HAVE_strcasecmp)
@@ -78,11 +67,6 @@ __NAMESPACE_LOCAL_BEGIN
 __NAMESPACE_LOCAL_END
 #include <asm/os/signal.h>
 __NAMESPACE_LOCAL_BEGIN
-/* >> signalnumber(3)
- * Similar to `strtosigno(3)', however ignore any leading `SIG*'
- * prefix of `name', and do a case-insensitive compare between
- * the given `name', and the signal's actual name.
- * When `name' isn't recognized, return `0' instead. */
 __LOCAL_LIBC(signalnumber) __ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1)) __signo_t
 __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(signalnumber))(const char *__name) {
 	__signo_t __i, __result = 0;

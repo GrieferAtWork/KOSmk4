@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x3f450682 */
+/* HASH CRC-32:0xbfdc4033 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -23,10 +23,6 @@
 #include <__crt.h>
 #include <hybrid/typecore.h>
 __NAMESPACE_LOCAL_BEGIN
-/* >> strnstr(3)
- * Search for `needle...+=strlen(needle)' within `haystack...+=strnlen(haystack, haystack_maxlen)'
- * If found, return a pointer to its location within `str', else return `NULL'
- * This function originates from BSD, but is also provided as a KOS extension */
 __LOCAL_LIBC(strnstr) __ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1, 2)) char *
 __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(strnstr))(char const *__haystack, char const *__needle, __SIZE_TYPE__ __haystack_maxlen) {
 	char __ch, __needle_start = *__needle++;

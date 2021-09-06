@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x29ebda82 */
+/* HASH CRC-32:0x338f63aa */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -23,26 +23,20 @@
 #include <__crt.h>
 #if defined(__CRT_HAVE_logb) || defined(__CRT_HAVE___logb) || defined(__CRT_HAVE__logb)
 __NAMESPACE_LOCAL_BEGIN
-/* Dependency: logb from math */
 #ifndef __local___localdep_logb_defined
 #define __local___localdep_logb_defined 1
 #if __has_builtin(__builtin_logb) && defined(__LIBC_BIND_CRTBUILTINS) && defined(__CRT_HAVE_logb)
-/* Return the base 2 signed integral exponent of `x' */
 __CEIREDIRECT(__ATTR_WUNUSED,double,__NOTHROW,__localdep_logb,(double __x),logb,{ return __builtin_logb(__x); })
 #elif defined(__CRT_HAVE_logb)
-/* Return the base 2 signed integral exponent of `x' */
 __CREDIRECT(__ATTR_WUNUSED,double,__NOTHROW,__localdep_logb,(double __x),logb,(__x))
 #elif defined(__CRT_HAVE___logb)
-/* Return the base 2 signed integral exponent of `x' */
 __CREDIRECT(__ATTR_WUNUSED,double,__NOTHROW,__localdep_logb,(double __x),__logb,(__x))
 #elif defined(__CRT_HAVE__logb)
-/* Return the base 2 signed integral exponent of `x' */
 __CREDIRECT(__ATTR_WUNUSED,double,__NOTHROW,__localdep_logb,(double __x),_logb,(__x))
 #else /* ... */
 #undef __local___localdep_logb_defined
 #endif /* !... */
 #endif /* !__local___localdep_logb_defined */
-/* Return the base 2 signed integral exponent of `x' */
 __LOCAL_LIBC(logbf) __ATTR_WUNUSED float
 __NOTHROW(__LIBCCALL __LIBC_LOCAL_NAME(logbf))(float __x) {
 	return (float)__localdep_logb((double)__x);

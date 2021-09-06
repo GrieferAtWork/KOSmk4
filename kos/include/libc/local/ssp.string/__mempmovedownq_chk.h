@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x16271d70 */
+/* HASH CRC-32:0xac2a380a */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -23,20 +23,16 @@
 #include <__crt.h>
 #include <hybrid/typecore.h>
 __NAMESPACE_LOCAL_BEGIN
-/* Dependency: mempmovedownq from string */
 #ifndef __local___localdep_mempmovedownq_defined
 #define __local___localdep_mempmovedownq_defined 1
 #ifdef __CRT_HAVE_mempmovedownq
-/* Same as `memmovew', but return `dst + n_qwords', rather than `dst' (assumes that `dst <= src || !n_qwords') */
 __CREDIRECT(__ATTR_LEAF __ATTR_RETNONNULL __ATTR_NONNULL((1, 2)),__UINT64_TYPE__ *,__NOTHROW_NCX,__localdep_mempmovedownq,(void *__restrict __dst, void const *__restrict __src, __SIZE_TYPE__ __n_qwords),mempmovedownq,(__dst,__src,__n_qwords))
 #elif defined(__CRT_HAVE_mempmoveq)
-/* Same as `memmovew', but return `dst + n_qwords', rather than `dst' (assumes that `dst <= src || !n_qwords') */
 __CREDIRECT(__ATTR_LEAF __ATTR_RETNONNULL __ATTR_NONNULL((1, 2)),__UINT64_TYPE__ *,__NOTHROW_NCX,__localdep_mempmovedownq,(void *__restrict __dst, void const *__restrict __src, __SIZE_TYPE__ __n_qwords),mempmoveq,(__dst,__src,__n_qwords))
 #else /* ... */
 __NAMESPACE_LOCAL_END
 #include <libc/local/string/mempmovedownq.h>
 __NAMESPACE_LOCAL_BEGIN
-/* Same as `memmovew', but return `dst + n_qwords', rather than `dst' (assumes that `dst <= src || !n_qwords') */
 #define __localdep_mempmovedownq __LIBC_LOCAL_NAME(mempmovedownq)
 #endif /* !... */
 #endif /* !__local___localdep_mempmovedownq_defined */

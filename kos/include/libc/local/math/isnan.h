@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x161aab42 */
+/* HASH CRC-32:0xc3c11384 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -25,7 +25,6 @@
 #if defined(__IEEE754_DOUBLE_TYPE_IS_DOUBLE__) || defined(__IEEE754_FLOAT_TYPE_IS_DOUBLE__) || defined(__IEEE854_LONG_DOUBLE_TYPE_IS_DOUBLE__)
 #include <libm/isnan.h>
 __NAMESPACE_LOCAL_BEGIN
-/* Return nonzero if `value' is not a number */
 __LOCAL_LIBC(isnan) __ATTR_CONST __ATTR_WUNUSED int
 __NOTHROW(__LIBCCALL __LIBC_LOCAL_NAME(isnan))(double __x) {
 	return __LIBM_MATHFUNI(isnan, __x);

@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x89b435c4 */
+/* HASH CRC-32:0xc61ed88 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -23,23 +23,18 @@
 #include <__crt.h>
 #if defined(__CRT_HAVE_tgamma) || defined(__CRT_HAVE___tgamma)
 __NAMESPACE_LOCAL_BEGIN
-/* Dependency: tgamma from math */
 #ifndef __local___localdep_tgamma_defined
 #define __local___localdep_tgamma_defined 1
 #if __has_builtin(__builtin_tgamma) && defined(__LIBC_BIND_CRTBUILTINS) && defined(__CRT_HAVE_tgamma)
-/* True gamma function */
 __CEIREDIRECT(__ATTR_WUNUSED,double,__NOTHROW,__localdep_tgamma,(double __x),tgamma,{ return __builtin_tgamma(__x); })
 #elif defined(__CRT_HAVE_tgamma)
-/* True gamma function */
 __CREDIRECT(__ATTR_WUNUSED,double,__NOTHROW,__localdep_tgamma,(double __x),tgamma,(__x))
 #elif defined(__CRT_HAVE___tgamma)
-/* True gamma function */
 __CREDIRECT(__ATTR_WUNUSED,double,__NOTHROW,__localdep_tgamma,(double __x),__tgamma,(__x))
 #else /* ... */
 #undef __local___localdep_tgamma_defined
 #endif /* !... */
 #endif /* !__local___localdep_tgamma_defined */
-/* True gamma function */
 __LOCAL_LIBC(tgammal) __ATTR_WUNUSED __LONGDOUBLE
 __NOTHROW(__LIBCCALL __LIBC_LOCAL_NAME(tgammal))(__LONGDOUBLE __x) {
 	return (__LONGDOUBLE)__localdep_tgamma((double)__x);

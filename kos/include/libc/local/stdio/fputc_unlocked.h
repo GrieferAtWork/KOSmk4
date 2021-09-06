@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x6adc29a6 */
+/* HASH CRC-32:0x9512fa97 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -24,12 +24,10 @@
 #if (defined(__CRT_DOS) && defined(__CRT_HAVE__flsbuf)) || defined(__CRT_HAVE_fwrite) || defined(__CRT_HAVE__IO_fwrite) || defined(__CRT_HAVE_fwrite_s) || defined(__CRT_HAVE_fwrite_unlocked) || defined(__CRT_HAVE__fwrite_nolock)
 #include <kos/anno.h>
 __NAMESPACE_LOCAL_BEGIN
-/* Dependency: _flsbuf from stdio */
 #if !defined(__local___localdep__flsbuf_defined) && defined(__CRT_HAVE__flsbuf)
 #define __local___localdep__flsbuf_defined 1
 __CREDIRECT(__ATTR_NONNULL((2)),int,__THROWING,__localdep__flsbuf,(int __ch, __FILE *__restrict __stream),_flsbuf,(__ch,__stream))
 #endif /* !__local___localdep__flsbuf_defined && __CRT_HAVE__flsbuf */
-/* Dependency: crt_fwrite_unlocked from stdio */
 #ifndef __local___localdep_crt_fwrite_unlocked_defined
 #define __local___localdep_crt_fwrite_unlocked_defined 1
 #ifdef __CRT_HAVE_fwrite
@@ -61,8 +59,6 @@ __CREDIRECT(__ATTR_NONNULL((1, 4)),__SIZE_TYPE__,__THROWING,__localdep_crt_fwrit
 #undef __local___localdep_crt_fwrite_unlocked_defined
 #endif /* !... */
 #endif /* !__local___localdep_crt_fwrite_unlocked_defined */
-/* >> fputc_unlocked(3)
- * Same as `fputc()', but performs I/O without acquiring a lock to `stream' */
 __LOCAL_LIBC(fputc_unlocked) __ATTR_NONNULL((2)) int
 (__LIBCCALL __LIBC_LOCAL_NAME(fputc_unlocked))(int __ch, __FILE *__restrict __stream) __THROWS(...) {
 #if defined(__CRT_DOS) && defined(__CRT_HAVE__flsbuf)

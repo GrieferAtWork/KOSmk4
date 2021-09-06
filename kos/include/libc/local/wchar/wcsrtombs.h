@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x9c337503 */
+/* HASH CRC-32:0x45ea50e7 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -24,27 +24,19 @@
 #include <bits/crt/mbstate.h>
 #include <hybrid/typecore.h>
 __NAMESPACE_LOCAL_BEGIN
-/* Dependency: mempcpy from string */
 #ifndef __local___localdep_mempcpy_defined
 #define __local___localdep_mempcpy_defined 1
 #ifdef __CRT_HAVE_mempcpy
-/* >> mempcpy(3)
- * Same as `memcpy', but return `dst + n_bytes', rather than `dst' */
 __CREDIRECT(__ATTR_LEAF __ATTR_RETNONNULL __ATTR_NONNULL((1, 2)),void *,__NOTHROW_NCX,__localdep_mempcpy,(void *__restrict __dst, void const *__restrict __src, __SIZE_TYPE__ __n_bytes),mempcpy,(__dst,__src,__n_bytes))
 #elif defined(__CRT_HAVE___mempcpy)
-/* >> mempcpy(3)
- * Same as `memcpy', but return `dst + n_bytes', rather than `dst' */
 __CREDIRECT(__ATTR_LEAF __ATTR_RETNONNULL __ATTR_NONNULL((1, 2)),void *,__NOTHROW_NCX,__localdep_mempcpy,(void *__restrict __dst, void const *__restrict __src, __SIZE_TYPE__ __n_bytes),__mempcpy,(__dst,__src,__n_bytes))
 #else /* ... */
 __NAMESPACE_LOCAL_END
 #include <libc/local/string/mempcpy.h>
 __NAMESPACE_LOCAL_BEGIN
-/* >> mempcpy(3)
- * Same as `memcpy', but return `dst + n_bytes', rather than `dst' */
 #define __localdep_mempcpy __LIBC_LOCAL_NAME(mempcpy)
 #endif /* !... */
 #endif /* !__local___localdep_mempcpy_defined */
-/* Dependency: wcrtomb from wchar */
 #ifndef __local___localdep_wcrtomb_defined
 #define __local___localdep_wcrtomb_defined 1
 #ifdef __CRT_HAVE_wcrtomb

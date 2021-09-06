@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xa3eec288 */
+/* HASH CRC-32:0xa657823e */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -239,7 +239,7 @@ NOTHROW_NCX(LIBCCALL libc_cnd_init)(cnd_t *__restrict cond) {
 #include <asm/crt/threads.h>
 #include <bits/crt/pthreadtypes.h>
 /* >> cnd_signal(3)
- * Wakeup one thread currently waiting on the given
+ * Wakeup  one thread currently  waiting on the given
  * condition variable (s.a. `pthread_cond_signal(3)')
  * @return: thrd_success: Success
  * @return: thrd_error:   Error */
@@ -254,7 +254,7 @@ NOTHROW_NCX(LIBCCALL libc_cnd_signal)(cnd_t *__restrict cond) {
 #include <asm/crt/threads.h>
 #include <bits/crt/pthreadtypes.h>
 /* >> cnd_broadcast(3)
- * Wakeup all threads currently waiting on the given
+ * Wakeup  all  threads currently  waiting on  the given
  * condition variable (s.a. `pthread_cond_broadcast(3)')
  * @return: thrd_success: Success
  * @return: thrd_error:   Error */

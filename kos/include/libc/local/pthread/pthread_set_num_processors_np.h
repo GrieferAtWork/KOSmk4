@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xad3728de */
+/* HASH CRC-32:0x377af91e */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -24,7 +24,6 @@
 #ifdef __CRT_HAVE_sched_setaffinity
 #include <bits/types.h>
 __NAMESPACE_LOCAL_BEGIN
-/* Dependency: sched_setaffinity from sched */
 #ifndef __local___localdep_sched_setaffinity_defined
 #define __local___localdep_sched_setaffinity_defined 1
 __NAMESPACE_LOCAL_END
@@ -36,11 +35,6 @@ __NAMESPACE_LOCAL_END
 #include <bits/os/cpu_set.h>
 #include <libc/errno.h>
 __NAMESPACE_LOCAL_BEGIN
-/* >> pthread_set_num_processors_np(3)
- * Restrict the calling thread to only run on the first `n' cpus
- * @return: EOK:    Success
- * @return: EINVAL: `n' was specified as less than `1'
- * @return: * :     Same as `errno' after a call to `sched_setaffinity(2)' */
 __LOCAL_LIBC(pthread_set_num_processors_np) __errno_t
 __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(pthread_set_num_processors_np))(int __n) {
 	int __i, __result;

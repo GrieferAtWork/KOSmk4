@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xa19bc867 */
+/* HASH CRC-32:0xc504450 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -24,35 +24,19 @@
 #include <libc/local/environ.h>
 #if defined(__CRT_HAVE_cuserid) || defined(__CRT_HAVE_getlogin_r) || defined(__CRT_HAVE_getenv) || defined(__LOCAL_environ) || (defined(__CRT_HAVE_getpwuid_r) && defined(__CRT_HAVE_geteuid))
 __NAMESPACE_LOCAL_BEGIN
-/* Dependency: cuserid from unistd */
 #ifndef __local___localdep_cuserid_defined
 #define __local___localdep_cuserid_defined 1
 #ifdef __CRT_HAVE_cuserid
-/* >> cuserid(3)
- * Return the name of the current user (`$LOGNAME' or `getpwuid(geteuid())'), storing
- * that name in `s'. When `s' is NULL, a static buffer is used instead
- * When given, `s' must be a buffer of at least `L_cuserid' bytes.
- * If the actual username is longer than this, it may be truncated, and programs
- * that wish to support longer usernames should make use of `getlogin_r()' instead.
- * s.a. `getlogin()' and `getlogin_r()' */
 __CREDIRECT(,char *,__NOTHROW_NCX,__localdep_cuserid,(char *__s),cuserid,(__s))
 #elif defined(__CRT_HAVE_getlogin_r) || defined(__CRT_HAVE_getenv) || defined(__LOCAL_environ) || (defined(__CRT_HAVE_getpwuid_r) && defined(__CRT_HAVE_geteuid))
 __NAMESPACE_LOCAL_END
 #include <libc/local/unistd/cuserid.h>
 __NAMESPACE_LOCAL_BEGIN
-/* >> cuserid(3)
- * Return the name of the current user (`$LOGNAME' or `getpwuid(geteuid())'), storing
- * that name in `s'. When `s' is NULL, a static buffer is used instead
- * When given, `s' must be a buffer of at least `L_cuserid' bytes.
- * If the actual username is longer than this, it may be truncated, and programs
- * that wish to support longer usernames should make use of `getlogin_r()' instead.
- * s.a. `getlogin()' and `getlogin_r()' */
 #define __localdep_cuserid __LIBC_LOCAL_NAME(cuserid)
 #else /* ... */
 #undef __local___localdep_cuserid_defined
 #endif /* !... */
 #endif /* !__local___localdep_cuserid_defined */
-/* Dependency: getenv from stdlib */
 #ifndef __local___localdep_getenv_defined
 #define __local___localdep_getenv_defined 1
 #ifdef __CRT_HAVE_getenv
@@ -66,9 +50,6 @@ __NAMESPACE_LOCAL_BEGIN
 #undef __local___localdep_getenv_defined
 #endif /* !... */
 #endif /* !__local___localdep_getenv_defined */
-/* >> getlogin(3)
- * Return the login name for the current user, or `NULL' on error.
- * s.a. `getlogin_r()' and `cuserid()' */
 __LOCAL_LIBC(getlogin) __ATTR_WUNUSED char *
 __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(getlogin))(void) {
 #if defined(__CRT_HAVE_getenv) || defined(__LOCAL_environ)

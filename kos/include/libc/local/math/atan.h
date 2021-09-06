@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xa3927a1d */
+/* HASH CRC-32:0x26b518d9 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -29,7 +29,6 @@
 #include <libm/inf.h>
 #include <libm/atan.h>
 __NAMESPACE_LOCAL_BEGIN
-/* Arc tangent of `x' */
 __LOCAL_LIBC(atan) __ATTR_WUNUSED double
 __NOTHROW(__LIBCCALL __LIBC_LOCAL_NAME(atan))(double __x) {
 	if (__LIBM_LIB_VERSION != __LIBM_IEEE &&

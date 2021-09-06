@@ -40,14 +40,14 @@ global final DILINK_PHYS2VIRT = "DILINK.phys2virt";
 global final DILINK_START = "DILINK.start";
 
 @@Name of the symbol that should be defined by @DILINK to
-@@hold the total size needed to hold debug section data.
+@@hold the total size needed to hold debug section  data.
 global final DILINK_SIZE = "DILINK.size";
 
 @@List of (sectionName, sectionStartSymbol, sectionSizeSymbol)
 global final DILINK_BINDINGS = "DILINK.bindings";
 
 @@Determine the index of the program header who's starting
-@@physical address is equal to VADDR(symbolName) - offset
+@@physical  address is equal to VADDR(symbolName) - offset
 function findProgramHeaderIndexWithPhysAddressEqualToSymbolPlusOffset(
 		elfBinaryFilename: string, symbolName: string, offset: int): int {
 	throw Error("TODO");
@@ -68,7 +68,7 @@ final local function DILINK_run(self: BoundStep): string {
 	local th = Thread([]{
 		@@Our current guess on section offsets and sizes
 		local guessedSectionOffsetsAndSizes: {string: (int, int)} = Dict();
-		@@This is a cache file containing the last-correct sizes of sections in the
+		@@This  is  a   cache  file  containing   the  last-correct  sizes   of  sections  in   the
 		@@form of 1 entry per line, written as "<section_name>\t<section_offset>\t<section_size>\n"
 		local savedDebugSectionSizeCacheFilename = config
 			.getBuildArtifact(group, script, ".di_sectsiz");
@@ -151,7 +151,7 @@ link_again_with_new_guesses:
 			 * >> }
 			 */
 			@@The index of the program header that should be modified.
-			@@Set to @none if unknown, and @false if ambiguous
+			@@Set  to  @none  if  unknown,  and  @false  if  ambiguous
 			local programHeaderIndexToModify: int = none;
 			@@The correct section offsets and sizes
 			local correctSectionOffsetsAndSizes: {string: (int, int)} = Dict();
@@ -323,10 +323,10 @@ final local function DILINK_tostr(self: BoundStep): string {
 }
 
 @@DILINK
-@@Same as @(LINK from .c), but make .debug_* sections available by linking
-@@with special options to guess the final size of debug sections, and re-trying
+@@Same as  @(LINK  from .c),  but  make  .debug_* sections  available  by  linking
+@@with special options to  guess the final size  of debug sections, and  re-trying
 @@if the guess was incorrect, whilst repeating this until we've guessed correctly.
-@@For this purpose, this step must be used with @OPT_LINK_SCRIPT to assign the
+@@For this purpose,  this step must  be used with  @OPT_LINK_SCRIPT to assign  the
 @@needed static virtual buffer area.
 global DILINK: Step = Step(
 	name: "DILINK",

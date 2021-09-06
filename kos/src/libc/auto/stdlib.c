@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xa7525dec */
+/* HASH CRC-32:0x3d24747c */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -240,9 +240,9 @@ NOTHROW_NCX(LIBKCALL libc_wcstombs)(char *__restrict dst,
 #include <asm/os/wait.h>
 /* >> system(3)
  * Execute a given `command' on the system interpreter (as in `sh -c $command')
- * The return value is the exit status after running `command'
+ * The   return   value   is   the   exit   status   after   running  `command'
  * When `command' is `NULL' only check if a system interpreter is available.
- * When no system interpreter is available, `127' is returned. */
+ * When  no   system   interpreter   is  available,   `127'   is   returned. */
 INTERN ATTR_SECTION(".text.crt.fs.exec.system") int
 NOTHROW_RPC(LIBCCALL libc_system)(char const *command) {
 	int status;
@@ -674,19 +674,19 @@ NOTHROW_NCX(LIBCCALL libc_strtold)(char const *__restrict nptr,
 #include <hybrid/__overflow.h>
 /* >> strto32_r(3), strtou32_r(3), strto64_r(3), strtou64_r(3)
  * Safely parse & return an integer from `nptr', and store any potential
- * errors in `*error' (if non-NULL). The following errors are defined:
+ * errors in `*error' (if non-NULL).  The following errors are  defined:
  *  - 0:         Success
  *  - ECANCELED: Nothing was parsed.
  *               In this case, `*endptr' is set to the original `nptr'
  *               (iow: leading spaces are _not_ skipped in `*endptr'),
  *               and the returned integer is `0'
  *  - ERANGE:    Integer over- or under-flow while parsing.
- *               In this case, `*endptr' is still updated correctly, and
- *               the returned integer is the closest representable value
+ *               In this case, `*endptr' is still updated correctly,  and
+ *               the  returned integer is the closest representable value
  *               to the integer given in `nptr' (i.e. `U?INTn_(MIN|MAX)')
  *               This error supercedes `EINVAL' if both conditions apply.
  *  - EINVAL:    Only when `endptr == NULL': The parsed number is followed
- *               by at least 1 additional non-whitespace character.
+ *               by   at  least  1  additional  non-whitespace  character.
  *               The returned integer value is not affected by this error. */
 INTERN ATTR_SECTION(".text.crt.unicode.static.convert") ATTR_LEAF NONNULL((1)) uint32_t
 NOTHROW_NCX(LIBCCALL libc_strtou32_r)(char const *__restrict nptr,
@@ -804,19 +804,19 @@ NOTHROW_NCX(LIBCCALL libc_strtou32_r)(char const *__restrict nptr,
 #include <hybrid/limitcore.h>
 /* >> strto32_r(3), strtou32_r(3), strto64_r(3), strtou64_r(3)
  * Safely parse & return an integer from `nptr', and store any potential
- * errors in `*error' (if non-NULL). The following errors are defined:
+ * errors in `*error' (if non-NULL).  The following errors are  defined:
  *  - 0:         Success
  *  - ECANCELED: Nothing was parsed.
  *               In this case, `*endptr' is set to the original `nptr'
  *               (iow: leading spaces are _not_ skipped in `*endptr'),
  *               and the returned integer is `0'
  *  - ERANGE:    Integer over- or under-flow while parsing.
- *               In this case, `*endptr' is still updated correctly, and
- *               the returned integer is the closest representable value
+ *               In this case, `*endptr' is still updated correctly,  and
+ *               the  returned integer is the closest representable value
  *               to the integer given in `nptr' (i.e. `U?INTn_(MIN|MAX)')
  *               This error supercedes `EINVAL' if both conditions apply.
  *  - EINVAL:    Only when `endptr == NULL': The parsed number is followed
- *               by at least 1 additional non-whitespace character.
+ *               by   at  least  1  additional  non-whitespace  character.
  *               The returned integer value is not affected by this error. */
 INTERN ATTR_SECTION(".text.crt.unicode.static.convert") ATTR_LEAF NONNULL((1)) int32_t
 NOTHROW_NCX(LIBCCALL libc_strto32_r)(char const *__restrict nptr,
@@ -946,19 +946,19 @@ handle_overflow:
 }
 /* >> strto32_r(3), strtou32_r(3), strto64_r(3), strtou64_r(3)
  * Safely parse & return an integer from `nptr', and store any potential
- * errors in `*error' (if non-NULL). The following errors are defined:
+ * errors in `*error' (if non-NULL).  The following errors are  defined:
  *  - 0:         Success
  *  - ECANCELED: Nothing was parsed.
  *               In this case, `*endptr' is set to the original `nptr'
  *               (iow: leading spaces are _not_ skipped in `*endptr'),
  *               and the returned integer is `0'
  *  - ERANGE:    Integer over- or under-flow while parsing.
- *               In this case, `*endptr' is still updated correctly, and
- *               the returned integer is the closest representable value
+ *               In this case, `*endptr' is still updated correctly,  and
+ *               the  returned integer is the closest representable value
  *               to the integer given in `nptr' (i.e. `U?INTn_(MIN|MAX)')
  *               This error supercedes `EINVAL' if both conditions apply.
  *  - EINVAL:    Only when `endptr == NULL': The parsed number is followed
- *               by at least 1 additional non-whitespace character.
+ *               by   at  least  1  additional  non-whitespace  character.
  *               The returned integer value is not affected by this error. */
 INTERN ATTR_SECTION(".text.crt.unicode.static.convert") ATTR_LEAF NONNULL((1)) uint64_t
 NOTHROW_NCX(LIBCCALL libc_strtou64_r)(char const *__restrict nptr,
@@ -1075,19 +1075,19 @@ NOTHROW_NCX(LIBCCALL libc_strtou64_r)(char const *__restrict nptr,
 }
 /* >> strto32_r(3), strtou32_r(3), strto64_r(3), strtou64_r(3)
  * Safely parse & return an integer from `nptr', and store any potential
- * errors in `*error' (if non-NULL). The following errors are defined:
+ * errors in `*error' (if non-NULL).  The following errors are  defined:
  *  - 0:         Success
  *  - ECANCELED: Nothing was parsed.
  *               In this case, `*endptr' is set to the original `nptr'
  *               (iow: leading spaces are _not_ skipped in `*endptr'),
  *               and the returned integer is `0'
  *  - ERANGE:    Integer over- or under-flow while parsing.
- *               In this case, `*endptr' is still updated correctly, and
- *               the returned integer is the closest representable value
+ *               In this case, `*endptr' is still updated correctly,  and
+ *               the  returned integer is the closest representable value
  *               to the integer given in `nptr' (i.e. `U?INTn_(MIN|MAX)')
  *               This error supercedes `EINVAL' if both conditions apply.
  *  - EINVAL:    Only when `endptr == NULL': The parsed number is followed
- *               by at least 1 additional non-whitespace character.
+ *               by   at  least  1  additional  non-whitespace  character.
  *               The returned integer value is not affected by this error. */
 INTERN ATTR_SECTION(".text.crt.unicode.static.convert") ATTR_LEAF NONNULL((1)) int64_t
 NOTHROW_NCX(LIBCCALL libc_strto64_r)(char const *__restrict nptr,
@@ -1217,15 +1217,15 @@ handle_overflow:
 }
 #include <libc/errno.h>
 /* >> strto32(3), strto64(3), strtou32(3), strtou64(3)
- * Convert a string (radix=`base') from `nptr' into an integer,
- * and store a pointer to the end of the number in `*endptr'.
+ * Convert a string  (radix=`base') from `nptr'  into an  integer,
+ * and store a  pointer to  the end  of the  number in  `*endptr'.
  * If `errno(3)' support is available, integer overflow is handled
  * by setting `errno=ERANGE', and returning the greatest or lowest
- * valid integer (`U?INTn_(MIN|MAX))'. (though note that
- * `endptr' (if non-NULL) is still updated in this case!)
- * Upon success, `errno' is left unchanged, and the integer repr
- * of the parsed number is returned. When no integer was parsed,
- * then `0' is returned, `*endptr' is set to `nptr', but `errno'
+ * valid   integer   (`U?INTn_(MIN|MAX))'.   (though   note   that
+ * `endptr'  (if  non-NULL)  is  still  updated  in  this   case!)
+ * Upon success, `errno' is left  unchanged, and the integer  repr
+ * of the parsed number is  returned. When no integer was  parsed,
+ * then `0' is returned, `*endptr'  is set to `nptr', but  `errno'
  * will not have been modified.
  * @return: * :         Success: The parsed integer
  * @return: 0 :         [*endptr=nptr] error: Nothing was parsed
@@ -1247,15 +1247,15 @@ NOTHROW_NCX(LIBCCALL libc_strtou32)(char const *__restrict nptr,
 #endif /* !__libc_geterrno || !ERANGE */
 }
 /* >> strto32(3), strto64(3), strtou32(3), strtou64(3)
- * Convert a string (radix=`base') from `nptr' into an integer,
- * and store a pointer to the end of the number in `*endptr'.
+ * Convert a string  (radix=`base') from `nptr'  into an  integer,
+ * and store a  pointer to  the end  of the  number in  `*endptr'.
  * If `errno(3)' support is available, integer overflow is handled
  * by setting `errno=ERANGE', and returning the greatest or lowest
- * valid integer (`U?INTn_(MIN|MAX))'. (though note that
- * `endptr' (if non-NULL) is still updated in this case!)
- * Upon success, `errno' is left unchanged, and the integer repr
- * of the parsed number is returned. When no integer was parsed,
- * then `0' is returned, `*endptr' is set to `nptr', but `errno'
+ * valid   integer   (`U?INTn_(MIN|MAX))'.   (though   note   that
+ * `endptr'  (if  non-NULL)  is  still  updated  in  this   case!)
+ * Upon success, `errno' is left  unchanged, and the integer  repr
+ * of the parsed number is  returned. When no integer was  parsed,
+ * then `0' is returned, `*endptr'  is set to `nptr', but  `errno'
  * will not have been modified.
  * @return: * :         Success: The parsed integer
  * @return: 0 :         [*endptr=nptr] error: Nothing was parsed
@@ -1277,15 +1277,15 @@ NOTHROW_NCX(LIBCCALL libc_strto32)(char const *__restrict nptr,
 #endif /* !__libc_geterrno || !ERANGE */
 }
 /* >> strto32(3), strto64(3), strtou32(3), strtou64(3)
- * Convert a string (radix=`base') from `nptr' into an integer,
- * and store a pointer to the end of the number in `*endptr'.
+ * Convert a string  (radix=`base') from `nptr'  into an  integer,
+ * and store a  pointer to  the end  of the  number in  `*endptr'.
  * If `errno(3)' support is available, integer overflow is handled
  * by setting `errno=ERANGE', and returning the greatest or lowest
- * valid integer (`U?INTn_(MIN|MAX))'. (though note that
- * `endptr' (if non-NULL) is still updated in this case!)
- * Upon success, `errno' is left unchanged, and the integer repr
- * of the parsed number is returned. When no integer was parsed,
- * then `0' is returned, `*endptr' is set to `nptr', but `errno'
+ * valid   integer   (`U?INTn_(MIN|MAX))'.   (though   note   that
+ * `endptr'  (if  non-NULL)  is  still  updated  in  this   case!)
+ * Upon success, `errno' is left  unchanged, and the integer  repr
+ * of the parsed number is  returned. When no integer was  parsed,
+ * then `0' is returned, `*endptr'  is set to `nptr', but  `errno'
  * will not have been modified.
  * @return: * :         Success: The parsed integer
  * @return: 0 :         [*endptr=nptr] error: Nothing was parsed
@@ -1307,15 +1307,15 @@ NOTHROW_NCX(LIBCCALL libc_strtou64)(char const *__restrict nptr,
 #endif /* !__libc_geterrno || !ERANGE */
 }
 /* >> strto32(3), strto64(3), strtou32(3), strtou64(3)
- * Convert a string (radix=`base') from `nptr' into an integer,
- * and store a pointer to the end of the number in `*endptr'.
+ * Convert a string  (radix=`base') from `nptr'  into an  integer,
+ * and store a  pointer to  the end  of the  number in  `*endptr'.
  * If `errno(3)' support is available, integer overflow is handled
  * by setting `errno=ERANGE', and returning the greatest or lowest
- * valid integer (`U?INTn_(MIN|MAX))'. (though note that
- * `endptr' (if non-NULL) is still updated in this case!)
- * Upon success, `errno' is left unchanged, and the integer repr
- * of the parsed number is returned. When no integer was parsed,
- * then `0' is returned, `*endptr' is set to `nptr', but `errno'
+ * valid   integer   (`U?INTn_(MIN|MAX))'.   (though   note   that
+ * `endptr'  (if  non-NULL)  is  still  updated  in  this   case!)
+ * Upon success, `errno' is left  unchanged, and the integer  repr
+ * of the parsed number is  returned. When no integer was  parsed,
+ * then `0' is returned, `*endptr'  is set to `nptr', but  `errno'
  * will not have been modified.
  * @return: * :         Success: The parsed integer
  * @return: 0 :         [*endptr=nptr] error: Nothing was parsed
@@ -1529,11 +1529,11 @@ NOTHROW_NCX(LIBCCALL libc_qfcvt)(__LONGDOUBLE val,
 /* >> mkstemps(3), mkstemps64(3)
  * Replace the last 6 characters of `template_' (which are followed by exactly
  * `suffixlen' more characters that are left alone), which must be filled with
- * all 'X'-characters before the call (else errno=EINVAL + return -1), with
- * random characters such that the filename described by `template_' will not
- * already exists. Then, create a new file with `O_RDWR' and return the file
+ * all  'X'-characters before the  call (else errno=EINVAL  + return -1), with
+ * random  characters such that the filename described by `template_' will not
+ * already  exists. Then, create a new file  with `O_RDWR' and return the file
  * descriptor of that file.
- * @param: suffixlen: The # of trailing characters to-be ignored
+ * @param: suffixlen: The #  of trailing  characters to-be  ignored
  *                    after the required 6 trailing 'X'-characters. */
 INTERN ATTR_SECTION(".text.crt.fs.utility") WUNUSED NONNULL((1)) fd_t
 NOTHROW_NCX(LIBCCALL libc_mkstemps)(char *template_,
@@ -1587,12 +1587,12 @@ NOTHROW_NCX(LIBCCALL libc_a64l)(char const *s) {
 	return result;
 }
 /* >> mktemp(3)
- * Badly designed version of `mkstemp' that won't actually create
+ * Badly designed version of  `mkstemp' that won't actually  create
  * the temporary file, meaning that by the time the caller tries to
- * create the file themselves, another process may have already
+ * create the  file themselves,  another process  may have  already
  * created it.
- * Also: when no temporary filename can be created, rather than
- *       returning something sensible like `NULL', this function
+ * Also: when no  temporary filename  can be  created, rather  than
+ *       returning something  sensible like  `NULL', this  function
  *       will instead set `template_' to an empty string, and still
  *       re-return it like it would if everything had worked! */
 INTERN ATTR_SECTION(".text.crt.fs.utility") ATTR_RETNONNULL NONNULL((1)) char *
@@ -1664,9 +1664,9 @@ NOTHROW_NCX(LIBCCALL libc_getsubopt)(char **__restrict optionp,
 	return -1;
 }
 /* >> mkstemp(3), mkstemp64(3)
- * Replace the last 6 characters of `template_', which must be filled with
- * all 'X'-characters before the call (else errno=EINVAL + return -1),
- * with random characters such that the filename described by `template_'
+ * Replace the last 6 characters of  `template_', which must be filled  with
+ * all  'X'-characters  before the  call  (else errno=EINVAL  +  return -1),
+ * with random characters  such that the  filename described by  `template_'
  * will not already exists. Then, create a new file with `O_RDWR' and return
  * the file descriptor of that file. */
 INTERN ATTR_SECTION(".text.crt.fs.utility") WUNUSED NONNULL((1)) fd_t
@@ -1675,8 +1675,8 @@ NOTHROW_RPC(LIBCCALL libc_mkstemp)(char *template_) {
 }
 /* >> mkdtemp(3)
  * Replace the last 6 characters of `template_', which must be filled with
- * all 'X'-characters before the call (else errno=EINVAL + return -1),
- * with random characters such that the pathname described by `template_'
+ * all  'X'-characters before  the call  (else errno=EINVAL  + return -1),
+ * with random characters such that the pathname described by  `template_'
  * will not already exists. Then, create a new directory with `mode=0700',
  * and re-return `template_' to indicate success.
  * On error, `NULL' will be returned, and the contents of `template_' are undefined. */
@@ -1694,7 +1694,7 @@ NOTHROW_NCX(LIBCCALL libc_unlockpt)(fd_t fd) {
 	return 0;
 }
 /* Returns the name of the PTY slave (Pseudo TTY slave)
- * associated with the master descriptor `fd' */
+ * associated   with   the   master   descriptor   `fd' */
 INTERN ATTR_SECTION(".text.crt.io.tty") WUNUSED char *
 NOTHROW_NCX(LIBCCALL libc_ptsname)(fd_t fd) {
 	static char buf[64];
@@ -1993,10 +1993,10 @@ do_try_again:
 }
 /* >> shexec(3)
  * Execute command with the system interpreter (such as: `/bin/sh -c $command')
- * This function is used to implement `system(3)' and `popen(3)', and may be
+ * This  function is used  to implement `system(3)' and  `popen(3)', and may be
  * used to invoke the system interpreter.
  * This function only returns on failure (similar to exec(2)), and will never
- * return on success (since in that case, the calling program will have been
+ * return on success (since in that case, the calling program will have  been
  * replaced by the system shell)
  * The shell paths attempted by this function are system-dependent, but before
  * any of them are tested, this function will try to use `getenv("SHELL")', if
@@ -2037,8 +2037,8 @@ NOTHROW_NCX(LIBCCALL libc_getexecname)(void) {
 }
 #include <asm/os/fcntl.h>
 /* Enumerate all open file descriptors by invoking `(*func)(cookie, <fd>)' for each of them
- * If during any of these invocations, `(*func)(...)' returns non-zero, enumeration stops,
- * and `fdwalk()' returns with that same value. If `(*func)(...)' is never called, or all
+ * If  during any of these invocations, `(*func)(...)' returns non-zero, enumeration stops,
+ * and `fdwalk()' returns with that same value.  If `(*func)(...)' is never called, or  all
  * invocations return 0, `fdwalk()' will also return 0. */
 INTERN ATTR_SECTION(".text.crt.solaris") NONNULL((1)) int
 NOTHROW_NCX(LIBCCALL libc_fdwalk)(__fdwalk_func_t func,
@@ -2183,7 +2183,7 @@ INTERN ATTR_SECTION(".text.crt.bsd") NONNULL((1, 4)) int
 }
 #include <bits/types.h>
 /* >> strtonum(3)
- * Similar to `strtoi()' with `base=10', but return human-
+ * Similar to `strtoi()'  with `base=10',  but return  human-
  * readable error messages in `*p_errstr' on error (alongside
  * `return==0') (or `NULL' on success).
  * The following messages are defined:
@@ -2278,13 +2278,13 @@ INTERN ATTR_SECTION(".text.crt.utility.stdlib") NONNULL((1, 4)) void
 }
 #ifndef __KERNEL__
 /* >> mkostemp(3), mkostemp64(3)
- * Replace the last 6 characters of `template_' (which are followed by exactly
- * `suffixlen' more characters that are left alone), which must be filled with
- * all 'X'-characters before the call (else errno=EINVAL + return -1), with
- * random characters such that the filename described by `template_' will not
+ * Replace  the  last 6  characters of  `template_' (which  are followed  by exactly
+ * `suffixlen'  more  characters that  are left  alone), which  must be  filled with
+ * all  'X'-characters  before  the  call  (else  errno=EINVAL  +  return  -1), with
+ * random  characters  such  that the  filename  described by  `template_'  will not
  * already exists. Then, create a new file with `O_RDWR | flags' and return the file
  * descriptor of that file.
- * @param: flags: Additional flags to pass to `open(2)',
+ * @param: flags: Additional  flags  to pass  to `open(2)',
  *                but `O_ACCMODE' is always set to `O_RDWR' */
 INTERN ATTR_SECTION(".text.crt.fs.utility") WUNUSED NONNULL((1)) fd_t
 NOTHROW_NCX(LIBCCALL libc_mkostemp)(char *template_,
@@ -2307,7 +2307,7 @@ NOTHROW_NCX(LIBCCALL libc_devname)(dev_t dev,
 #include <asm/os/stdlib.h>
 /* >> strsuftoll(3)
  * Same as `strsuftollx(3)', but if an error happens, make
- * use of `errx(3)' to terminate the program, rather than
+ * use of `errx(3)' to terminate the program, rather  than
  * return to the caller. */
 INTERN ATTR_SECTION(".text.crt.bsd") WUNUSED NONNULL((1, 2)) __LONGLONG
 NOTHROW_NCX(LIBCCALL libc_strsuftoll)(char const *desc,

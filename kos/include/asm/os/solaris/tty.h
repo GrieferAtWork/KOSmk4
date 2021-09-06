@@ -129,7 +129,7 @@ struct lx_cc {
 
 //struct ppsclockev {
 //	struct timeval tv;
-//	uint_t serial;
+//	uint_t     serial;
 //};
 
 __DECL_END

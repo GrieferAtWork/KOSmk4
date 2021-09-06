@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xde0dcc25 */
+/* HASH CRC-32:0xca0c38b6 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -23,7 +23,6 @@
 #include <__crt.h>
 struct ether_addr;
 __NAMESPACE_LOCAL_BEGIN
-/* Dependency: isspace from ctype */
 #ifndef __local___localdep_isspace_defined
 #define __local___localdep_isspace_defined 1
 #if __has_builtin(__builtin_isspace) && defined(__LIBC_BIND_CRTBUILTINS) && defined(__CRT_HAVE_isspace)
@@ -40,8 +39,6 @@ __NAMESPACE_LOCAL_BEGIN
 __NAMESPACE_LOCAL_END
 #include <net/ethernet.h>
 __NAMESPACE_LOCAL_BEGIN
-/* To the reverse of `ether_ntoa()' and convert
- * a `AA:BB:CC:DD:EE:FF'-string into an ethernet address. */
 __LOCAL_LIBC(ether_paton_r) __ATTR_WUNUSED __ATTR_NONNULL((1, 2)) struct ether_addr *
 __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(ether_paton_r))(char const **__restrict __pasc, struct ether_addr *__restrict __addr) {
 	unsigned int __i;
