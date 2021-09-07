@@ -29,8 +29,8 @@ DECL_BEGIN
  * In the case of dynamic TLS, allocate missing segments lazily,
  * logging a system error and exiting the calling application if
  * doing so fails. */
-INTERN ATTR_RETNONNULL WUNUSED NONNULL((1)) void *ATTR_FASTCALL
-libdl_dltlsbase(DlModule *__restrict self)
+INTERN ATTR_RETNONNULL WUNUSED NONNULL((1)) void *FCALL
+libdl_dltlsbase(DlModule *__restrict self) THROWS(...)
 #else /* FAIL_ON_ERROR */
 /* Return the calling thread's base address of the TLS segment associated with `tls_handle'
  * NOTE: TLS Segments are allocated and initialized lazily, meaning that the initializer
@@ -43,8 +43,8 @@ libdl_dltlsbase(DlModule *__restrict self)
  *       the calling thread (e.g.: Such a pointer is needed by `unwind_emulator_t::sm_tlsbase')
  * @return: * :   Pointer to the base of the TLS segment associated with `tls_handle' within the calling thread.
  * @return: NULL: Invalid `tls_handle', or allocation/initialization failed. (s.a. `dlerror()') */
-INTERN WUNUSED NONNULL((1, 2)) void *__DLFCN_DLTLSADDR2_CC
-libdl_dltlsaddr2(DlModule *self, struct tls_segment *seg)
+INTERN WUNUSED void *__DLFCN_DLTLSADDR2_CC
+libdl_dltlsaddr2(USER DlModule *self, USER struct tls_segment *seg) THROWS(E_SEGFAULT, ...)
 #endif /* !FAIL_ON_ERROR */
 {
 #ifdef FAIL_ON_ERROR
@@ -122,7 +122,7 @@ libdl_dltlsaddr2(DlModule *self, struct tls_segment *seg)
 	 *      within the following atomic  lock? (In other words:  This lock needs to  allow
 	 *      for recursion within the same thread)
 	 * ->:  What about the fact that we're also using malloc() here? malloc() most definitely
-	 *      isn't   (any   probably  couldn't)   be   re-entrant  in   the   general  case...
+	 *      isn't   (and   probably  couldn't)   be   re-entrant  in   the   general  case...
 	 *      What do the  specs say  about a  signal handler being  the first  to access  some
 	 *      thread-local variable? */
 	atomic_rwlock_write(&seg->ts_exlock);

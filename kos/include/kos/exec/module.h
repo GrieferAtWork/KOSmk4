@@ -151,8 +151,8 @@ typedef void module_t;
 #if !defined(__dlgethandle_defined) && defined(__CRT_HAVE_dlgethandle)
 #define __dlgethandle_defined 1
 __IMPDEF __ATTR_WUNUSED void *
-__NOTHROW_NCX(__DLFCN_CC dlgethandle)(void const *__static_pointer,
-                                      unsigned int __flags __DFL(DLGETHANDLE_FNORMAL));
+__NOTHROW(__DLFCN_CC dlgethandle)(void const *__static_pointer,
+                                  unsigned int __flags __DFL(DLGETHANDLE_FNORMAL));
 #endif /* !__dlgethandle_defined && __CRT_HAVE_dlgethandle */
 #ifdef __dlgethandle_defined
 #define module_fromaddr(addr)    dlgethandle(addr, DLGETHANDLE_FNORMAL)

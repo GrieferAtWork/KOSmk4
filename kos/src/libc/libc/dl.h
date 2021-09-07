@@ -49,6 +49,7 @@ DECL_BEGIN
  * use a custom, lazily initialized function table against functions
  * from libdl (though excluding the function we need to fill in that
  * table, which is `dlsym()')
+ *
  * The  reason we do  this because on  most architectures, each jump
  * relocation will require  some form of  initialization to be  done
  * by libdl during _every_ _single_ _initialization_ of the  library
@@ -57,6 +58,7 @@ DECL_BEGIN
  * time of practically any application  on the system (since  pretty
  * much all applications are linked against libc), I personally _do_
  * care.
+ *
  * So any lazy relocation against  functions from libdl is  replaced
  * by a lazily initialized indirection call that truly doesn't cause
  * any additional relocations.
@@ -65,6 +67,7 @@ DECL_BEGIN
  * do the symbol lookups themself, meaning we'd had to do
  * `dlsym(RTLD_DEFAULT, "dlsym")' to get dlsym itself, which obviously
  * wouldn't work)
+ *
  * However, in practice these are still some other relocations that we
  * can't easily get rid of, since those are made by compiler-generated
  * function calls:
@@ -93,26 +96,26 @@ DECL_BEGIN
 #define LIBC_DLTLSALLOC_SECTION    ".crt.sched.pthread" /* Used by pthread */
 #define LIBC_DLTLSFREE_SECTION     ".crt.sched.pthread" /* Used by pthread */
 
-typedef WUNUSED void * /*NOTHROW_NCX*/ (__DLFCN_CC *PDLOPEN)(char const *filename, int mode);
-typedef NONNULL((1)) int /*NOTHROW_NCX*/ (__DLFCN_CC *PDLCLOSE)(void *handle);
+typedef WUNUSED void *(__DLFCN_CC *PDLOPEN)(char const *filename, int mode) /*THROWS(...)*/;
+typedef NONNULL((1)) int (__DLFCN_CC *PDLCLOSE)(void *handle) /*THROWS(...)*/;
 typedef WUNUSED void * /*NOTHROW_NCX*/ (__DLFCN_CC *PDLTLSALLOCSEG)(void);
 typedef NONNULL((1)) int /*NOTHROW_NCX*/ (__DLFCN_CC *PDLTLSFREESEG)(void *ptr);
 typedef WUNUSED void * /*NOTHROW_NCX*/ (__DLFCN_CC *PDLGETHANDLE)(void const *static_pointer, unsigned int flags);
 typedef WUNUSED void * /*NOTHROW_NCX*/ (__DLFCN_CC *PDLGETMODULE)(char const *name, unsigned int flags);
 typedef WUNUSED NONNULL((1)) fd_t /*NOTHROW_NCX*/ (__DLFCN_CC *PDLMODULEFD)(void *handle);
 typedef WUNUSED NONNULL((1)) char const * /*NOTHROW_NCX*/ (__DLFCN_CC *PDLMODULENAME)(void *handle);
-typedef void * /*NOTHROW_NCX*/ (__DLFCN_VCC *PDLAUXCTRL)(void *handle, unsigned int cmd, ...);
+typedef void * (__DLFCN_VCC *PDLAUXCTRL)(void *handle, unsigned int cmd, ...) /*THROWS(...)*/;
 typedef WUNUSED char * /*NOTHROW_NCX*/ (__DLFCN_CC *PDLERROR)(void);
 typedef WUNUSED NONNULL((1)) void * /*NOTHROW_NCX*/ (__DLFCN_CC *PDLMODULEBASE)(void *handle);
 typedef WUNUSED NONNULL((1)) int /*NOTHROW_NCX*/ (__DLFCN_CC *PDLEXCEPTAWARE)(void *handle);
-typedef WUNUSED NONNULL((1)) void * /*NOTHROW_NCX*/ (__DLFCN_DLTLSADDR_CC *PDLTLSADDR)(void *tls_handle);
-typedef WUNUSED NONNULL((1, 2)) void * /*NOTHROW_NCX*/ (__DLFCN_DLTLSADDR2_CC *PDLTLSADDR2)(void *tls_handle, void *tls_segment);
-typedef WUNUSED void * /*NOTHROW_NCX*/ (__DLFCN_CC *PDLTLSALLOC)(size_t num_bytes, size_t min_alignment,
-                                                                 void const *template_data, size_t template_size,
-                                                                 void (LIBCCALL *perthread_init)(void *arg, void *base),
-                                                                 void (LIBCCALL *perthread_fini)(void *arg, void *base),
-                                                                 void *perthread_callback_arg);
-typedef NONNULL((1)) int /*__NOTHROW_NCX*/ (__DLFCN_CC *PDLTLSFREE)(void *__tls_handle);
+typedef WUNUSED NONNULL((1)) void *(__DLFCN_DLTLSADDR_CC *PDLTLSADDR)(void *tls_handle) /*THROWS(...)*/;
+typedef WUNUSED NONNULL((1, 2)) void *(__DLFCN_DLTLSADDR2_CC *PDLTLSADDR2)(void *tls_handle, void *tls_segment) /*THROWS(...)*/;
+typedef WUNUSED void * /*NOTHROW*/ (__DLFCN_CC *PDLTLSALLOC)(size_t num_bytes, size_t min_alignment,
+                                                             void const *template_data, size_t template_size,
+                                                             void (LIBCCALL *perthread_init)(void *arg, void *base),
+                                                             void (LIBCCALL *perthread_fini)(void *arg, void *base),
+                                                             void *perthread_callback_arg);
+typedef NONNULL((1)) int (__DLFCN_CC *PDLTLSFREE)(void *tls_handle) /*THROWS(...)*/;
 
 
 

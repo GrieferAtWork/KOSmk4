@@ -32,15 +32,15 @@ DECL_BEGIN
 INTERN WUNUSED NONNULL((1)) int CC
 DlModule_ApplyRelocationsWithAddend(DlModule *__restrict self,
                                     ElfW(Rela) const *__restrict vector,
-                                    size_t count,
-                                    unsigned int flags)
+                                    size_t count, unsigned int flags)
+		THROWS(...)
 #define LOCAL_HAVE_ADDENDS 1
 #elif defined(DEFINE_DlModule_ApplyRelocations)
 INTERN WUNUSED NONNULL((1)) int CC
 DlModule_ApplyRelocations(DlModule *__restrict self,
                           ElfW(Rel) const *__restrict vector,
-                          size_t count,
-                          unsigned int flags)
+                          size_t count, unsigned int flags)
+		THROWS(...)
 #undef LOCAL_HAVE_ADDENDS
 #else /* ... */
 #error "Invalid configuration"

@@ -145,8 +145,10 @@
 
 #include <libdl/api.h>
 
-#define CC  LIBDL_CC
-#define VCC LIBDL_VCC
+#define CC        LIBDL_CC    /* Internal and hidden API calling convention */
+#define VCC       LIBDL_VCC   /* *ditto* */
+#define DLFCN_CC  __DLFCN_CC  /* Public (aka. <dlfcn.h>) calling convention */
+#define DLFCN_VCC __DLFCN_VCC /* *ditto* */
 
 #ifndef FCALL
 #define FCALL __FCALL
@@ -172,11 +174,5 @@
 #ifndef VLIBDCALL
 #define VLIBDCALL __VLIBDCALL
 #endif /* !VLIBDCALL */
-#ifndef DLFCN_CC
-#define DLFCN_CC __DLFCN_CC
-#endif /* !DLFCN_CC */
-#ifndef DLFCN_VCC
-#define DLFCN_VCC __DLFCN_VCC
-#endif /* !DLFCN_VCC */
 
 #endif /* !GUARD_LIBDL_API_H */

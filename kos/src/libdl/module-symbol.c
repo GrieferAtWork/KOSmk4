@@ -36,8 +36,9 @@
 
 DECL_BEGIN
 
-LOCAL ATTR_PURE WUNUSED NONNULL((1)) u32 CC
-gnu_symhash(char const *__restrict name) {
+LOCAL ATTR_PURE WUNUSED NONNULL((1)) u32
+NOTHROW_NCX(CC gnu_symhash)(USER char const *name)
+		THROWS(E_SEGFAULT) {
 	u32 h = 5381;
 	for (; *name; ++name) {
 		h = h * 33 + (u8)*name;
@@ -45,8 +46,9 @@ gnu_symhash(char const *__restrict name) {
 	return h;
 }
 
-LOCAL ATTR_PURE WUNUSED NONNULL((1)) u32 CC
-elf_symhash(char const *__restrict name) {
+LOCAL ATTR_PURE WUNUSED NONNULL((1)) u32
+NOTHROW_NCX(CC elf_symhash)(USER char const *name)
+		THROWS(E_SEGFAULT) {
 	u32 h = 0;
 	for (; *name; ++name) {
 		u32 g;
@@ -74,11 +76,12 @@ elf_symhash(char const *__restrict name) {
  *          This function merely returns the associated entry from `.dynsym'
  * NOTE: This function ~may~ set `dlerror()' when returning `NULL' in
  *       case of the error is the  result of a corrupted hash  table. */
-INTERN WUNUSED NONNULL((1, 2, 3, 4)) ElfW(Sym) const *CC
-DlModule_ElfGetLocalSymbol(DlModule *__restrict self,
-                           char const *__restrict name,
-                           uintptr_t *__restrict phash_elf,
-                           uintptr_t *__restrict phash_gnu) {
+INTERN WUNUSED NONNULL((1, 2, 3, 4)) ElfW(Sym) const *
+NOTHROW_NCX(CC DlModule_ElfGetLocalSymbol)(USER DlModule *self,
+                                           USER char const *name,
+                                           uintptr_t *__restrict phash_elf,
+                                           uintptr_t *__restrict phash_gnu)
+		THROWS(E_SEGFAULT) {
 	ElfW(Sym) const *result;
 	/************************************************************************/
 	/* GNU hash table support                                               */

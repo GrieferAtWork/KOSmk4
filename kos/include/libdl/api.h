@@ -24,7 +24,7 @@
 #include <__stdinc.h>
 
 #if defined(__i386__) && !defined(__x86_64__)
-#define LIBDL_CC  __ATTR_STDCALL
+#define LIBDL_CC  __ATTR_FASTCALL
 #define LIBDL_VCC __ATTR_CDECL
 #else /* __i386__ && !__x86_64__ */
 #define LIBDL_CC  __LIBKCALL

@@ -68,7 +68,7 @@ struct dtls_extension {
 DECL_END
 
 #define RBTREE_LEFT_LEANING   /* Use left-leaning trees */
-#define RBTREE_NOTHROW        /* nothing */
+#define RBTREE_NOTHROW        NOTHROW
 #define RBTREE(name)          dtls_extension_tree_##name
 #define RBTREE_T              struct dtls_extension
 #define RBTREE_Tkey           DlModule *
@@ -115,8 +115,8 @@ PRIVATE void const *static_tls_init = NULL;
 
 
 
-INTERN NONNULL((1)) void CC
-DlModule_RemoveTLSExtension(DlModule *__restrict self) {
+INTERN NONNULL((1)) void
+NOTHROW(CC DlModule_RemoveTLSExtension)(DlModule *__restrict self) {
 	struct tls_segment *iter;
 	struct dtls_extension *chain, *next;
 	chain = NULL;
@@ -146,8 +146,8 @@ again:
 
 
 /* Initialize the static TLS bindings table from the set of currently loaded modules. */
-INTERN WUNUSED int CC
-DlModule_InitStaticTLSBindings(void) {
+INTERN WUNUSED int
+NOTHROW_RPC(CC DlModule_InitStaticTLSBindings)(void) {
 	DlModule *iter;
 	ptrdiff_t endptr = 0;
 
@@ -202,8 +202,8 @@ err:
 	return -1;
 }
 
-PRIVATE NONNULL((1)) void CC
-try_incref_extension_table_modules(struct dtls_extension *__restrict self) {
+PRIVATE NONNULL((1)) void
+NOTHROW(CC try_incref_extension_table_modules)(struct dtls_extension *__restrict self) {
 	DlModule *mod;
 again:
 	mod = dtls_extension_getmodule(self);
@@ -222,7 +222,8 @@ again:
 }
 
 PRIVATE NONNULL((1)) void CC
-decref_tls_extension_modules(struct dtls_extension *__restrict self) {
+decref_tls_extension_modules(struct dtls_extension *__restrict self)
+		THROWS(...) {
 	DlModule *mod;
 	struct dtls_extension *minptr, *maxptr;
 again:
@@ -245,7 +246,8 @@ again:
 }
 
 PRIVATE NONNULL((1)) void CC
-fini_tls_extension_tables(struct dtls_extension *__restrict self) {
+fini_tls_extension_tables(struct dtls_extension *__restrict self)
+		THROWS(...) {
 	DlModule *mod;
 	struct dtls_extension *minptr, *maxptr;
 again:
@@ -280,7 +282,7 @@ again:
 }
 
 /* Run finalizers for all TLS segments allocated within the calling thread. */
-INTERN void CC DlModule_RunAllTlsFinalizers(void) {
+INTERN void CC DlModule_RunAllTlsFinalizers(void) THROWS(...) {
 	struct tls_segment *self;
 	struct dtls_extension *ext_free;
 	self = (struct tls_segment *)RD_TLS_BASE_REGISTER();
@@ -305,8 +307,8 @@ INTERN void CC DlModule_RunAllTlsFinalizers(void) {
  * NOTE: The caller is responsible to store the returned segment to the appropriate TLS register.
  * @return: * :   Pointer to the newly allocated TLS segment.
  * @return: NULL: Error (s.a. dlerror()) */
-INTERN ATTR_MALLOC WUNUSED struct tls_segment *DLFCN_CC
-libdl_dltlsallocseg(void) {
+INTERN ATTR_MALLOC WUNUSED struct tls_segment *
+NOTHROW(DLFCN_CC libdl_dltlsallocseg)(void) {
 	struct tls_segment *result;
 	result = (struct tls_segment *)memalign(static_tls_align,
 	                                        static_tls_size);
@@ -328,7 +330,8 @@ err_nomem:
 }
 
 PRIVATE NONNULL((1)) void CC
-delete_extension_tables(struct dtls_extension *__restrict self) {
+delete_extension_tables(struct dtls_extension *__restrict self)
+		THROWS(...) {
 	DlModule *mod;
 	struct dtls_extension *minptr, *maxptr;
 again:
@@ -362,7 +365,8 @@ again:
 }
 
 LOCAL NONNULL((1)) void CC
-clear_extension_table(struct tls_segment *__restrict self) {
+clear_extension_table(struct tls_segment *__restrict self)
+		THROWS(...) {
 	struct dtls_extension *ext_free;
 	atomic_rwlock_write(&self->ts_exlock);
 	ext_free = self->ts_extree;
@@ -379,7 +383,8 @@ clear_extension_table(struct tls_segment *__restrict self) {
 
 /* Free a previously allocated static TLS segment (usually called by `pthread_exit()' and friends). */
 INTERN NONNULL((1)) int DLFCN_CC
-libdl_dltlsfreeseg(struct tls_segment *seg) {
+libdl_dltlsfreeseg(USER struct tls_segment *seg)
+		THROWS(E_SEGFAULT, ...) {
 	if unlikely(!DL_VERIFY_TLS_SEGMENT(seg))
 		goto err_badptr;
 	atomic_rwlock_write(&static_tls_lock);
@@ -467,12 +472,12 @@ err_badptr:
  *                         segment to delete it and  optionally invoke finalizer callbacks)  by
  *                         passing it to `dltlsfree()'
  * @return: NULL:          Failed to allocate the TLS segment (s.a. `dlerror()') */
-INTERN WUNUSED DlModule *DLFCN_CC
-libdl_dltlsalloc(size_t num_bytes, size_t min_alignment,
-                 void const *template_data, size_t template_size,
-                 void (DLFCN_CC *perthread_init)(void *arg, void *base),
-                 void (DLFCN_CC *perthread_fini)(void *arg, void *base),
-                 void *perthread_callback_arg) {
+INTERN WUNUSED DlModule *
+NOTHROW(DLFCN_CC libdl_dltlsalloc)(size_t num_bytes, size_t min_alignment,
+                                   USER void const *template_data, size_t template_size,
+                                   void (DLFCN_CC USER *perthread_init)(void *arg, void *base),
+                                   void (DLFCN_CC USER *perthread_fini)(void *arg, void *base),
+                                   USER void *perthread_callback_arg) {
 	DlModule *result;
 	if unlikely(template_size > num_bytes) {
 		dl_seterrorf("TLS template size (%" PRIuSIZ ") is greater than TLS memory size (%" PRIuSIZ ")",
@@ -523,8 +528,9 @@ err:
 
 
 /* Free a TLS segment previously allocated with `dltlsalloc()' */
-INTERN NONNULL((1)) int DLFCN_CC
-libdl_dltlsfree(DlModule *self) {
+INTERN int
+NOTHROW_NCX(DLFCN_CC libdl_dltlsfree)(USER DlModule *self)
+		THROWS(E_SEGFAULT) {
 	if unlikely(!DL_VERIFY_MODULE_HANDLE(self))
 		goto err_nullmodule;
 	DlModule_RemoveTLSExtension(self);
@@ -552,8 +558,8 @@ DEFINE_PUBLIC_ALIAS(dltlsaddr2, libdl_dltlsaddr2);
 
 /* Similar to `libdl_dltlsaddr()', but do no lazy allocation
  * and return NULL if the module doesn't have a TLS segment. */
-INTERN WUNUSED NONNULL((1)) void *CC
-DlModule_TryGetTLSAddr(DlModule *__restrict self) {
+INTERN WUNUSED NONNULL((1)) void *
+NOTHROW(CC DlModule_TryGetTLSAddr)(DlModule *__restrict self) {
 	byte_t *result;
 	struct tls_segment *tls;
 	struct dtls_extension *extab;
@@ -572,8 +578,8 @@ DlModule_TryGetTLSAddr(DlModule *__restrict self) {
 
 
 
-INTERN WUNUSED NONNULL((1)) void *__DLFCN_DLTLSADDR_CC
-libdl_dltlsaddr(DlModule *self) {
+INTERN WUNUSED void *__DLFCN_DLTLSADDR_CC
+libdl_dltlsaddr(USER DlModule *self) THROWS(E_SEGFAULT, ...) {
 	void *result;
 	struct tls_segment *seg;
 	seg    = (struct tls_segment *)RD_TLS_BASE_REGISTER();

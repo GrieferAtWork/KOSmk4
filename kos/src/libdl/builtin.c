@@ -54,12 +54,11 @@
 DECL_BEGIN
 
 INTERN NONNULL((2)) ssize_t
-NOTHROW_RPC(FORMATPRINTER_CC syslog_printer)(void *arg,
-                                             char const *__restrict data,
-                                             size_t datalen) {
-	return sys_syslog((syscall_ulong_t)arg,
-	                  data,
-	                  datalen);
+NOTHROW_NCX(FORMATPRINTER_CC syslog_printer)(void *arg,
+                                             USER char const *data,
+                                             size_t datalen)
+		THROWS(E_SEGFAULT) {
+	return sys_Xsyslog((syscall_ulong_t)arg, data, datalen);
 }
 
 #ifndef NDEBUG
@@ -85,8 +84,8 @@ struct assert_args {
 	void        *pc;
 };
 
-PRIVATE ATTR_NOINLINE ATTR_NORETURN NONNULL((1)) void LIBCCALL
-assertion_failure_core(struct assert_args *__restrict args) {
+PRIVATE ATTR_NOINLINE ATTR_NORETURN NONNULL((1)) void
+/*NOTHROW*/ (LIBCCALL assertion_failure_core)(struct assert_args *__restrict args) {
 	syslog(LOG_ERR, "[rtld] Assertion Failure [pc=%p]\n", args->pc);
 	syslog(LOG_ERR, "%s(%d) : %s%s%s\n",
 	       args->file, args->line,
@@ -112,9 +111,9 @@ assertion_failure_core(struct assert_args *__restrict args) {
 }
 
 
-INTERN ATTR_COLD ATTR_NORETURN void LIBCCALL
-__afail(char const *expr, char const *file,
-        unsigned int line, char const *func) {
+INTERN ATTR_COLD ATTR_NORETURN void
+/*NOTHROW*/ (LIBCCALL __afail)(char const *expr, char const *file,
+                               unsigned int line, char const *func) {
 	struct assert_args aargs;
 	memset(&aargs, 0, sizeof(aargs));
 	aargs.expr = expr;
@@ -125,10 +124,10 @@ __afail(char const *expr, char const *file,
 	assertion_failure_core(&aargs);
 }
 
-INTERN ATTR_COLD ATTR_NORETURN void VLIBCCALL
-__afailf(char const *expr, char const *file,
-         unsigned int line, char const *func,
-         char const *format, ...) {
+INTERN ATTR_COLD ATTR_NORETURN void
+/*NOTHROW*/ (VLIBCCALL __afailf)(char const *expr, char const *file,
+                                 unsigned int line, char const *func,
+                                 char const *format, ...) {
 	struct assert_args aargs;
 	va_start(aargs.args, format);
 	aargs.expr   = expr;
@@ -165,36 +164,117 @@ INTERN char *dl_error_message = NULL;
  *                error that  happened during  execution of  any of  the  functions
  *                exported from libdl.
  * @return: NULL: No error happened, or the last error has already been consumed. */
-INTERN char *DLFCN_CC libdl_dlerror(void) {
+INTERN char *NOTHROW(DLFCN_CC libdl_dlerror)(void) {
 	return ATOMIC_XCH(dl_error_message, NULL);
 }
 
 
-INTERN ATTR_COLD int CC
-dl_seterror_badptr(void *ptr) {
+INTERN ATTR_COLD int NOTHROW(CC dl_seterror_badptr)(void *ptr) {
 	return dl_seterrorf("Bad pointer: %p", ptr);
 }
 
-INTERN ATTR_COLD int CC
-dl_seterror_badmodule(void *modptr) {
+INTERN ATTR_COLD int NOTHROW(CC dl_seterror_badmodule)(void *modptr) {
 	return dl_seterrorf("Bad module handle: %p", modptr);
 }
 
-INTERN ATTR_COLD int CC
-dl_seterror_badsection(void *sectptr) {
+INTERN ATTR_COLD int NOTHROW(CC dl_seterror_badsection)(void *sectptr) {
 	return dl_seterrorf("Bad section handle: %p", sectptr);
 }
 
+INTERN ATTR_COLD NONNULL((1)) int
+NOTHROW(CC dl_seterror_header_read_error)(char const *__restrict filename) {
+	return dl_seterrorf("%q: Failed to read headers", filename);
+}
+
+INTERN ATTR_COLD NONNULL((1)) int
+NOTHROW(CC dl_seterror_notelf)(char const *__restrict filename) {
+	return dl_seterrorf("%q: Not an ELF object", filename);
+}
+
+INTERN ATTR_COLD NONNULL((1, 2)) int
+NOTHROW_NCX(CC dl_seterror_nosect)(USER DlModule const *self,
+                                   USER char const *name)
+		THROWS(E_SEGFAULT) {
+	return dl_seterrorf("%q: No such section %q",
+	                    self->dm_filename, name);
+}
+
+INTERN ATTR_COLD int
+NOTHROW(CC dl_seterror_no_mod_at_addr)(USER void const *static_pointer) {
+	return dl_seterrorf("Address %p does not map to any module",
+	                    static_pointer);
+}
+
+INTERN ATTR_COLD NONNULL((1)) int
+NOTHROW_NCX(CC dl_seterror_nosect_index)(USER DlModule const *self, size_t index)
+		THROWS(E_SEGFAULT) {
+	return dl_seterrorf("%q: Section index %" PRIuSIZ " is greater than %" PRIuSIZ,
+	                    self->dm_filename, index, self->dm_shnum);
+}
+
+INTERN ATTR_COLD NONNULL((1)) int
+NOTHROW_NCX(CC dl_seterror_nosym_global)(USER char const *symname)
+		THROWS(E_SEGFAULT) {
+	return dl_seterrorf("No global module contains a symbol %q", symname);
+}
+
+INTERN ATTR_COLD NONNULL((1, 2)) int
+NOTHROW_NCX(CC dl_seterror_nosym_next)(DlModule const *__restrict after,
+                                       USER char const *symname)
+		THROWS(E_SEGFAULT) {
+	return dl_seterrorf("No module loaded after %q contains a symbol %q",
+	                    after->dm_filename, symname);
+}
+
+INTERN ATTR_COLD NONNULL((1, 2)) int
+NOTHROW_NCX(CC dl_seterror_nosym_in)(USER DlModule const *mod,
+                                     USER char const *symname)
+		THROWS(E_SEGFAULT) {
+	return dl_seterrorf("%q: Unknown symbol %q",
+	                    mod->dm_filename, symname);
+}
+
+INTERN ATTR_COLD NONNULL((1)) int
+NOTHROW_NCX(CC dl_seterror_nosym_next_badcaller)(USER char const *symname)
+		THROWS(E_SEGFAULT) {
+	(void)symname;
+	return dl_seterrorf("`RTLD_NEXT' used from externally loaded code");
+}
+
+INTERN ATTR_COLD NONNULL((1)) int
+NOTHROW_NCX(CC dl_seterror_dlopen_failed)(USER char const *libname)
+		THROWS(E_SEGFAULT) {
+	return dl_seterrorf("Failed to open library %q", libname);
+}
+
+INTERN ATTR_COLD NONNULL((1, 2)) int
+NOTHROW_NCX(CC dl_seterr_section_mmap_failed)(USER DlModule const *self,
+                                              USER char const *section_filename)
+		THROWS(E_SEGFAULT) {
+	return dl_seterrorf("%q: Failed to map section %q into memory",
+	                    self->dm_filename, section_filename);
+}
+
+INTERN ATTR_COLD NONNULL((1)) int
+NOTHROW_NCX(CC dl_seterr_section_index_mmap_failed)(USER DlModule const *self,
+                                                    size_t section_index)
+		THROWS(E_SEGFAULT) {
+	return dl_seterrorf("%q: Failed to map section #%" PRIuSIZ " into memory",
+	                    self->dm_filename, section_index);
+}
+
+
+
 PRIVATE char const message_nomem[] = "Insufficient memory";
-INTERN ATTR_COLD int CC
-dl_seterror_nomem(void) {
+INTERN ATTR_COLD int NOTHROW(CC dl_seterror_nomem)(void) {
 	memcpy(dl_error_buffer, message_nomem, sizeof(message_nomem));
 	ATOMIC_WRITE(dl_error_message, (char *)dl_error_buffer);
 	return -1;
 }
 
-INTERN ATTR_COLD NONNULL((1)) int VCC
-dl_seterrorf(char const *__restrict format, ...) {
+INTERN ATTR_COLD NONNULL((1)) int
+NOTHROW_NCX(VCC dl_seterrorf)(char const *__restrict format, ...)
+		THROWS(E_SEGFAULT) {
 	int result;
 	va_list args;
 	va_start(args, format);
@@ -203,8 +283,9 @@ dl_seterrorf(char const *__restrict format, ...) {
 	return result;
 }
 
-INTERN ATTR_COLD NONNULL((1)) int CC
-dl_vseterrorf(char const *__restrict format, va_list args) {
+INTERN ATTR_COLD NONNULL((1)) int
+NOTHROW_NCX(CC dl_vseterrorf)(char const *__restrict format, va_list args)
+		THROWS(E_SEGFAULT) {
 	vsnprintf(dl_error_buffer,
 	          sizeof(dl_error_buffer),
 	          format,
@@ -221,8 +302,8 @@ dl_vseterrorf(char const *__restrict format, va_list args) {
  * from the fact that various components must be accessed globally). */
 INTERN struct atomic_owner_rwlock DlModule_LoadLock = ATOMIC_OWNER_RWLOCK_INIT;
 
-LOCAL NONNULL((1)) void CC
-update_module_flags(DlModule *__restrict self, int mode) {
+INTERN NONNULL((1)) void
+NOTHROW(CC DlModule_UpdateFlags)(DlModule *__restrict self, int mode) {
 	uintptr_t old_flags;
 again_old_flags:
 	old_flags = ATOMIC_READ(self->dm_flags);
@@ -266,7 +347,8 @@ again_old_flags:
  * @return: * :   A handle to the library that got loaded.
  * @return: NULL: Failed to load the library. - Call `dlerror()' to get an error message. */
 INTERN WUNUSED REF_IF(!(return->dm_flags & RTLD_NODELETE)) DlModule *DLFCN_CC
-libdl_dlopen(char const *filename, int mode) {
+libdl_dlopen(USER char const *filename, int mode)
+		THROWS(E_SEGFAULT, ...) {
 	REF_IF(!(return->dm_flags & RTLD_NODELETE)) DlModule *result;
 	if unlikely(!filename) {
 		/* ... If filename is NULL, then the returned handle is for the main program... */
@@ -290,7 +372,7 @@ again:
 			result = DlModule_FindFilenameInPathListFromAll(filename);
 		}
 		if likely(result)
-			update_module_flags(result, mode);
+			DlModule_UpdateFlags(result, mode);
 	} else {
 		if (strchr(filename, '/')) {
 			/* Load a module from an absolute filesystem location. */
@@ -305,7 +387,7 @@ again:
 	}
 	if unlikely(!result) {
 		if (!ATOMIC_READ(dl_error_message))
-			dl_seterrorf("Failed to open module %q", filename);
+			dl_seterror_dlopen_failed(filename);
 	} else {
 		while unlikely(result->dm_flags & RTLD_LOADING) {
 			/* The library is still being initialized by another thread. */
@@ -345,7 +427,8 @@ again:
  *              performed.  The  only guaranty  made is  that NULL-handles
  *              are always handled as fail-safe! */
 INTERN NONNULL((1)) int DLFCN_CC
-libdl_dlclose(REF DlModule *self) {
+libdl_dlclose(USER REF_IF(!(self->dm_flags & RTLD_NODELETE)) DlModule *self)
+		THROWS(E_SEGFAULT, ...) {
 	if unlikely(!DL_VERIFY_MODULE_HANDLE(self))
 		goto err_bad_module;
 	/* Don't decref NODELETE modules! */
@@ -363,8 +446,8 @@ err_bad_module:
  * @return: 1 : The given module is exception aware
  * @return: 0 : The given module isn't exception aware
  * @return: * : The given module handler is invalid (s.a. `dlerror()') */
-INTERN NONNULL((1)) int DLFCN_CC
-libdl_dlexceptaware(DlModule *self) {
+INTERN WUNUSED NONNULL((1)) int
+NOTHROW_NCX(DLFCN_CC libdl_dlexceptaware)(USER DlModule *self) THROWS(E_SEGFAULT) {
 	if unlikely(!DL_VERIFY_MODULE_HANDLE(self))
 		goto err_bad_module;
 	/* TODO */
@@ -384,14 +467,15 @@ struct dl_symbol {
 #define DLMODULE_SEARCH_SYMBOL_IN_DEPENDENCIES_FOUND     1
 #define DLMODULE_SEARCH_SYMBOL_IN_DEPENDENCIES_NO_MODULE 2
 #define DLMODULE_SEARCH_SYMBOL_IN_DEPENDENCIES_ERROR     3
-PRIVATE NONNULL((2)) unsigned int CC
+PRIVATE NONNULL((1, 2, 3, 4, 5, 6)) unsigned int CC
 dlmodule_search_symbol_in_dependencies(DlModule *__restrict self,
-                                       char const *__restrict name,
+                                       USER char const *name,
                                        uintptr_t *__restrict phash_elf,
                                        uintptr_t *__restrict phash_gnu,
                                        ElfW(Addr) *__restrict presult,
                                        struct dl_symbol *__restrict pweak_symbol,
-                                       size_t depth) {
+                                       size_t depth)
+		THROWS(E_SEGFAULT, ...) {
 	struct dl_symbol symbol;
 	size_t i;
 	if (!self->dm_depcnt)
@@ -520,8 +604,9 @@ dlmodule_search_symbol_in_dependencies(DlModule *__restrict self,
  * @return: * :    The address of the symbol in question.
  * @return: NULL:  No  such symbol (dlerror()  != NULL), or  the symbol has been
  *                 linked to be loaded at the address `NULL' (dlerror() == NULL) */
-INTERN NONNULL((2)) void *DLFCN_CC
-libdl_dlsym(DlModule *self, char const *__restrict name) {
+INTERN WUNUSED NONNULL((2)) void *DLFCN_CC
+libdl_dlsym(USER DlModule *self, USER char const *name)
+		THROWS(E_SEGFAULT, ...) {
 	ElfW(Addr) result;
 	uintptr_t hash_elf, hash_gnu;
 	struct dl_symbol symbol;
@@ -661,10 +746,9 @@ again_search_globals_module:
 			symbol.ds_mod = libdl_dlgethandle(__builtin_return_address(0), DLGETHANDLE_FNORMAL);
 			if unlikely(!symbol.ds_mod)
 				goto err_rtld_next_no_base;
-			dl_seterrorf("No module loaded after %q contains a symbol %q",
-			             symbol.ds_mod->dm_filename, name);
+			dl_seterror_nosym_next(symbol.ds_mod, name);
 		} else {
-			dl_seterrorf("No loaded module contains a symbol %q", name);
+			dl_seterror_nosym_global(name);
 		}
 	} else if (self == RTLD_NEXT) {
 		symbol.ds_mod = libdl_dlgethandle(__builtin_return_address(0), DLGETHANDLE_FNORMAL);
@@ -790,8 +874,7 @@ done:
 			}
 		}
 		/* Missing symbol... */
-		dl_seterrorf("Failed to find symbol %q in %q",
-		             name, self->dm_filename);
+		dl_seterror_nosym_in(self, name);
 	}
 err:
 	return NULL;
@@ -802,7 +885,7 @@ err_weak_symbol_mod:
 	decref(weak_symbol.ds_mod);
 	goto err;
 err_rtld_next_no_base:
-	dl_seterrorf("Can only use `RTLD_NEXT' from dynamically loaded code");
+	dl_seterror_nosym_next_badcaller(name);
 	goto err;
 err_bad_module:
 	dl_seterror_badmodule(self);
@@ -814,8 +897,8 @@ err_bad_module:
 
 /* Return the handle of an already loaded library, given a static data/text pointer
  * @param: flags: Set of `DLGETHANDLE_F*' */
-INTERN WUNUSED REF_IF(!(return->dm_flags & RTLD_NODELETE) && (flags & DLGETHANDLE_FINCREF)) DlModule *DLFCN_CC
-libdl_dlgethandle(void const *static_pointer, unsigned int flags) {
+INTERN WUNUSED REF_IF(!(return->dm_flags & RTLD_NODELETE) && (flags & DLGETHANDLE_FINCREF)) DlModule *
+NOTHROW(DLFCN_CC libdl_dlgethandle)(void const *static_pointer, unsigned int flags) {
 	DlModule *result;
 	if unlikely(flags & ~(DLGETHANDLE_FINCREF)) {
 		dl_seterrorf("Invalid flags %#x passed to `dlgethandle()'", flags);
@@ -875,8 +958,8 @@ got_result:
  *                 - "C"             (requires `DLGETHANDLE_FNOCASE')
  *                Alternatively, `NULL' can be passed to return a handle for the caller's module.
  * @param: flags: Set of `DLGETHANDLE_F*' */
-INTERN WUNUSED REF_IF(!(return->dm_flags & RTLD_NODELETE) && (flags & DLGETHANDLE_FINCREF)) DlModule *DLFCN_CC
-libdl_dlgetmodule(char const *name, unsigned int flags) {
+INTERN WUNUSED REF_IF(!(return->dm_flags & RTLD_NODELETE) && (flags & DLGETHANDLE_FINCREF)) DlModule *
+NOTHROW_NCX(DLFCN_CC libdl_dlgetmodule)(USER char const *name, unsigned int flags) THROWS(E_SEGFAULT) {
 	DlModule *result;
 	if (!name) {
 		result = libdl_dlgethandle(__builtin_return_address(0), flags);
@@ -990,8 +1073,10 @@ got_result:
 }
 
 
-INTERN NONNULL((2)) int DLFCN_CC
-libdl_dladdr(void const *address, Dl_info *info) {
+INTERN NONNULL((2)) int
+NOTHROW_NCX(DLFCN_CC libdl_dladdr)(void const *address,
+                                   USER Dl_info *info)
+		THROWS(E_SEGFAULT) {
 	REF DlModule *mod;
 	mod = libdl_dlgethandle(address, DLGETHANDLE_FINCREF);
 	if unlikely(!mod)
@@ -1056,8 +1141,9 @@ err:
  *                       that same fd, possibly closing  some other handle if  the
  *                       same slot was re-used in the mean time.
  * @return: * : Error (s.a. `dlerror()') */
-INTERN WUNUSED NONNULL((1)) fd_t DLFCN_CC
-libdl_dlmodulefd(DlModule *self) {
+INTERN WUNUSED NONNULL((1)) fd_t
+NOTHROW_NCX(DLFCN_CC libdl_dlmodulefd)(USER DlModule *self)
+		THROWS(E_SEGFAULT) {
 	if unlikely(!DL_VERIFY_MODULE_HANDLE(self))
 		goto err_bad_module;
 	return DlModule_GetFd(self);
@@ -1070,8 +1156,9 @@ err_bad_module:
  * @param: handle: A handle returned by `dlopen()'.
  * @return: * :    The absolute, unambiguous filename for the given module `handle'
  * @return: NULL:  Error (s.a. `dlerror()') */
-INTERN WUNUSED NONNULL((1)) char const *DLFCN_CC
-libdl_dlmodulename(DlModule *self) {
+INTERN WUNUSED NONNULL((1)) char const *
+NOTHROW_NCX(DLFCN_CC libdl_dlmodulename)(USER DlModule *self)
+		THROWS(E_SEGFAULT) {
 	if unlikely(!DL_VERIFY_MODULE_HANDLE(self))
 		goto err_bad_module;
 	return self->dm_filename;
@@ -1091,8 +1178,9 @@ err_bad_module:
  * @param: handle: A handle returned by `dlopen()'.
  * @return: * : The load address / module base for the given `handle'.
  * @return: 0 : Error (s.a. `dlerror()'), or load-address of ZERO */
-INTERN WUNUSED NONNULL((1)) uintptr_t DLFCN_CC
-libdl_dlmodulebase(DlModule *self) {
+INTERN WUNUSED NONNULL((1)) uintptr_t
+NOTHROW_NCX(DLFCN_CC libdl_dlmodulebase)(USER DlModule *self)
+		THROWS(E_SEGFAULT) {
 	if unlikely(!DL_VERIFY_MODULE_HANDLE(self))
 		goto err_bad_module;
 	return self->dm_loadaddr;
@@ -1102,8 +1190,9 @@ err_bad_module:
 }
 
 
-INTERN NONNULL((1)) void CC
-DlSection_Destroy(DlSection *__restrict self) {
+INTERN NONNULL((1)) void
+NOTHROW_NCX(CC DlSection_Destroy)(USER DlSection *self)
+		THROWS(E_SEGFAULT) {
 	DlModule *mod;
 	/* Unmap section data. */
 	if ((self->ds_flags & DLSECTION_FLAG_OWNED) && (self->ds_data != (void *)-1))
@@ -1141,21 +1230,15 @@ again:
 }
 
 
-PRIVATE ATTR_COLD NONNULL((1, 2)) int
-NOTHROW(CC dl_seterr_section_mmap_failed)(char const *module_filename,
-                                          char const *section_filename) {
-	return dl_seterrorf("%q: Failed to map section %q into memory",
-	                    module_filename, section_filename);
-}
-
 
 
 
 PRIVATE ATTR_PURE WUNUSED NONNULL((1)) bool
-NOTHROW(CC aux_section_ismapped_file)(DlModule const *__restrict self,
-                                      syscall_ulong_t file_offset,
-                                      uintptr_t module_rel_addr,
-                                      size_t num_bytes) {
+NOTHROW_NCX(CC aux_section_ismapped_file)(USER DlModule const *self,
+                                          syscall_ulong_t file_offset,
+                                          uintptr_t module_rel_addr,
+                                          size_t num_bytes)
+		THROWS(E_SEGFAULT) {
 	ElfW(Word) i;
 again:
 	for (i = 0; i < self->dm_elf.de_phnum; ++i) {
@@ -1192,9 +1275,10 @@ again:
  * return  the module-relative offset  to it. If no
  * such mapping exists, return (uintptr_t)-1 */
 PRIVATE ATTR_PURE WUNUSED NONNULL((1)) uintptr_t
-NOTHROW(CC find_file_mapping)(DlModule const *__restrict self,
-                              syscall_ulong_t file_offset,
-                              size_t num_bytes) {
+NOTHROW_NCX(CC find_file_mapping)(USER DlModule const *self,
+                                  syscall_ulong_t file_offset,
+                                  size_t num_bytes)
+		THROWS(E_SEGFAULT) {
 	ElfW(Word) i;
 	for (i = 0; i < self->dm_elf.de_phnum; ++i) {
 		size_t num_loaded;
@@ -1226,8 +1310,9 @@ NOTHROW(CC find_file_mapping)(DlModule const *__restrict self,
 
 /* Return the # of bytes consecutively mapped starting at `module_rel_addr' */
 PRIVATE ATTR_PURE WUNUSED NONNULL((1)) size_t
-NOTHROW(CC sizeof_addr_mapping)(DlModule const *__restrict self,
-                                uintptr_t module_rel_addr) {
+NOTHROW_NCX(CC sizeof_addr_mapping)(USER DlModule const *self,
+                                    uintptr_t module_rel_addr)
+		THROWS(E_SEGFAULT) {
 	size_t result;
 	ElfW(Word) i;
 	result = 0;
@@ -1252,9 +1337,10 @@ again:
 }
 
 PRIVATE ATTR_PURE WUNUSED NONNULL((1)) bool
-NOTHROW(CC aux_section_ismapped)(DlModule const *__restrict self,
-                                 uintptr_t module_rel_addr,
-                                 size_t num_bytes) {
+NOTHROW_NCX(CC aux_section_ismapped)(USER DlModule const *self,
+                                     uintptr_t module_rel_addr,
+                                     size_t num_bytes)
+		THROWS(E_SEGFAULT) {
 	ElfW(Word) i;
 again:
 	for (i = 0; i < self->dm_elf.de_phnum; ++i) {
@@ -1280,7 +1366,8 @@ again:
 }
 
 PRIVATE ATTR_PURE WUNUSED NONNULL((1)) ElfW(Dyn) const *
-NOTHROW(CC get_dynamic_tag)(DlModule const *__restrict self, ElfW(Sword) tag) {
+NOTHROW_NCX(CC get_dynamic_tag)(USER DlModule const *self, ElfW(Sword) tag)
+		THROWS(E_SEGFAULT) {
 	size_t i;
 	for (i = 0; i < self->dm_elf.de_dyncnt; ++i) {
 		if (self->dm_dynhdr[i].d_tag == DT_NULL)
@@ -1355,7 +1442,10 @@ PRIVATE struct aux_section_def const aux_sections[] = {
  * @return: NULL:            Error (dlerror was set)
  * @return: (DlSection *)-1: The indexed section doesn't exist. */
 PRIVATE WUNUSED NONNULL((1)) REF DlSection *
-NOTHROW(CC create_aux_section)(DlModule *__restrict self, unsigned int index) {
+NOTHROW_NCX(CC create_aux_section)(USER DlModule *self,
+                                   unsigned int index,
+                                   unsigned int flags)
+		THROWS(E_SEGFAULT) {
 	REF DlSection *result;
 	ElfW(Word) phdr;
 	struct aux_section_def const *rules;
@@ -1534,8 +1624,11 @@ create_section_from_addr:
 		                MAP_PRIVATE | MAP_FILE,
 		                modfd, section_offset);
 		if unlikely(E_ISERR(base)) {
-			dl_seterr_section_mmap_failed(self->dm_filename,
-			                              rules->asd_name);
+			if (flags & DLLOCKSECTION_FINDEX) {
+				dl_seterr_section_index_mmap_failed(self, (size_t)self->dm_elf.de_shnum + index);
+			} else {
+				dl_seterr_section_mmap_failed(self, rules->asd_name);
+			}
 			goto err_r;
 		}
 		result->ds_data  = base;
@@ -1561,7 +1654,9 @@ NOTHROW(CC destroy_aux_section)(DlSection *__restrict self) {
 
 
 PRIVATE ATTR_PURE WUNUSED NONNULL((1)) unsigned int
-NOTHROW(CC get_aux_section_def)(char const *__restrict name, unsigned int flags) {
+NOTHROW_NCX(CC get_aux_section_def)(USER char const *name,
+                                    unsigned int flags)
+		THROWS(E_SEGFAULT) {
 	unsigned int i;
 	if (flags & DLLOCKSECTION_FINDEX) {
 		/* Special case: section index. */
@@ -1580,9 +1675,10 @@ NOTHROW(CC get_aux_section_def)(char const *__restrict name, unsigned int flags)
 /* Returns `NULL'            on error     (w/ dlerror() set)
  * Returns `(DlSection *)-1' if not found (w/o dlerror() set) */
 PRIVATE WUNUSED NONNULL((1)) REF DlSection *
-NOTHROW(CC libdl_dllocksection_aux)(DlModule *__restrict self,
-                        char const *__restrict name,
-                        unsigned int flags) {
+NOTHROW_NCX(CC libdl_dllocksection_aux)(DlModule *__restrict self,
+                                        USER char const *name,
+                                        unsigned int flags)
+		THROWS(E_SEGFAULT) {
 	REF DlSection *result;
 	unsigned int index;
 	size_t real_index;
@@ -1602,7 +1698,7 @@ NOTHROW(CC libdl_dllocksection_aux)(DlModule *__restrict self,
 	atomic_rwlock_endread(&self->dm_sections_lock);
 
 	/* Must create the section from scratch (or at least try to) */
-	result = create_aux_section(self, index);
+	result = create_aux_section(self, index, flags);
 	if (!result || result == (REF DlSection *)-1)
 		return result;
 
@@ -1665,8 +1761,8 @@ again_save_results:
 }
 
 PRIVATE ATTR_CONST WUNUSED NONNULL((1, 2)) char const *
-NOTHROW(CC libdl_dlsectionname_aux)(DlSection *__restrict UNUSED(self),
-                                    DlModule *__restrict UNUSED(mod),
+NOTHROW(CC libdl_dlsectionname_aux)(USER DlSection *UNUSED(self),
+                                    USER DlModule *UNUSED(mod),
                                     size_t index) {
 	assert(index < COMPILER_LENOF(aux_sections));
 	return aux_sections[index].asd_name;
@@ -1681,10 +1777,11 @@ NOTHROW(CC libdl_dlsectionname_aux)(DlSection *__restrict UNUSED(self),
  *                 Note however that the actual  section data is usually mapped  as read-only, or at  the
  *                 very least `MAP_PRIVATE', meaning that writes aren't written back to the library file!
  * @return: NULL:  Error (s.a. `dlerror()'; usually: unknown section) */
-INTERN WUNUSED REF DlSection *DLFCN_CC
-libdl_dllocksection(DlModule *self,
-                    char const *__restrict name,
-                    unsigned int flags) {
+INTERN WUNUSED NONNULL((2)) REF DlSection *
+NOTHROW_NCX(DLFCN_CC libdl_dllocksection)(USER DlModule *self,
+                                          USER char const *name,
+                                          unsigned int flags)
+		THROWS(E_SEGFAULT) {
 	REF DlSection *result;
 	if unlikely(!DL_VERIFY_MODULE_HANDLE(self))
 		goto err_bad_module;
@@ -1815,10 +1912,9 @@ again_read_section:
 			if (E_ISERR(base)) {
 				DlSection_Decref(result);
 				if (flags & DLLOCKSECTION_FINDEX) {
-					dl_seterrorf("%q: Failed to map section #%" PRIuSIZ " into memory",
-					             self->dm_filename, (uintptr_t)name);
+					dl_seterr_section_index_mmap_failed(self, (size_t)(uintptr_t)name);
 				} else {
-					dl_seterr_section_mmap_failed(self->dm_filename, name);
+					dl_seterr_section_mmap_failed(self, name);
 				}
 				goto err;
 			}
@@ -1948,10 +2044,9 @@ again_read_elf_section:
 			if (E_ISERR(base)) {
 				DlSection_Decref(result);
 				if (flags & DLLOCKSECTION_FINDEX) {
-					dl_seterrorf("%q: Failed to map section #%" PRIuSIZ " into memory",
-					                self->dm_filename, (uintptr_t)name);
+					dl_seterr_section_index_mmap_failed(self, (size_t)(uintptr_t)name);
 				} else {
-					dl_seterr_section_mmap_failed(self->dm_filename, name);
+					dl_seterr_section_mmap_failed(self, name);
 				}
 				goto err;
 			}
@@ -1978,8 +2073,9 @@ err_bad_flags:
  *       returns a reference you inherit as the caller
  * @return: 0 : Successfully unlocked the given section `sect'
  * @return: * : Error (s.a. `dlerror()') */
-INTERN NONNULL((1)) int DLFCN_CC
-libdl_dlunlocksection(REF DlSection *sect) {
+INTERN NONNULL((1)) int
+NOTHROW_NCX(DLFCN_CC libdl_dlunlocksection)(USER REF DlSection *sect)
+		THROWS(E_SEGFAULT) {
 	if unlikely(!DL_VERIFY_SECTION_HANDLE(sect))
 		goto err_bad_section;
 	{
@@ -2034,8 +2130,9 @@ err_bad_section:
  *          >> // will probably also be NULL if the module had already been unloaded)
  *          >> ...
  *          >> dlclose(mod); */
-INTERN NONNULL((1)) char const *DLFCN_CC
-libdl_dlsectionname(DlSection *sect) {
+INTERN WUNUSED NONNULL((1)) char const *
+NOTHROW_NCX(DLFCN_CC libdl_dlsectionname)(USER DlSection *sect)
+		THROWS(E_SEGFAULT) {
 	char const *result;
 	REF DlModule *mod;
 	if unlikely(!DL_VERIFY_SECTION_HANDLE(sect))
@@ -2090,8 +2187,9 @@ err:
 }
 
 /* Returns  the index of a given section, or `(size_t)-1' on error. */
-INTERN NONNULL((1)) size_t DLFCN_CC
-libdl_dlsectionindex(DlSection *sect) {
+INTERN WUNUSED NONNULL((1)) size_t
+NOTHROW_NCX(DLFCN_CC libdl_dlsectionindex)(USER DlSection *sect)
+		THROWS(E_SEGFAULT) {
 	size_t result;
 	if unlikely(!DL_VERIFY_SECTION_HANDLE(sect))
 		goto err_bad_section;
@@ -2107,8 +2205,9 @@ err_bad_section:
  * @param: flags: Set of `DLGETHANDLE_F*'
  * @return: * :   A pointer, or reference to the module handle (when `DLGETHANDLE_FINCREF' was given)
  * @return: NULL: Error (s.a. `dlerror()'; usually, the module was already unloaded) */
-INTERN NONNULL((1)) DlModule *DLFCN_CC
-libdl_dlsectionmodule(DlSection *sect, unsigned int flags) {
+INTERN WUNUSED NONNULL((1)) DlModule *
+NOTHROW_NCX(DLFCN_CC libdl_dlsectionmodule)(USER DlSection *sect, unsigned int flags)
+		THROWS(E_SEGFAULT) {
 	DlModule *mod;
 	if unlikely(!DL_VERIFY_SECTION_HANDLE(sect))
 		goto err_bad_section;
@@ -2147,11 +2246,10 @@ PRIVATE PZLIB_READER_FINI pdyn_zlib_reader_fini = NULL;
 #define zlib_reader_fini (*pdyn_zlib_reader_fini)
 
 
-LOCAL bool CC init_zlib(void) {
+PRIVATE WUNUSED bool NOTHROW(CC init_zlib)(void) {
 	if (!pdyn_zlib_reader_init) {
 		REF DlModule *libzlib;
-		libzlib = libdl_dlopen(LIBZLIB_LIBRARY_NAME,
-		                       RTLD_LOCAL);
+		libzlib = libdl_dlopen(LIBZLIB_LIBRARY_NAME, RTLD_LOCAL);
 		if unlikely(!libzlib)
 			goto err;
 		if ((*(void **)&pdyn_zlib_reader_fini = libdl_dlsym(libzlib, "zlib_reader_fini")) == NULL)
@@ -2191,11 +2289,12 @@ NOTHROW(CC decompress_section_data)(void *dst, size_t dst_size,
 }
 
 
-LOCAL WUNUSED NONNULL((1, 2, 4)) void *CC
-inflate_compressed_section(DlSection *sect,
-                           void const *section_data,
-                           size_t section_size,
-                           size_t *psection_csize) {
+PRIVATE WUNUSED NONNULL((1, 2, 4)) void *
+NOTHROW_NCX(CC inflate_compressed_section)(USER DlSection *sect,
+                                           void const *section_data,
+                                           size_t section_size,
+                                           size_t *__restrict psection_csize)
+		THROWS(E_SEGFAULT) {
 	ElfW(Chdr) *chdr;
 	void *result;
 	chdr = (ElfW(Chdr) *)section_data;
@@ -2231,18 +2330,18 @@ inflate_compressed_section(DlSection *sect,
 	/* Success! */
 	return result;
 err_mmap_failed:
-	dl_seterrorf("Failed to allocate decompressed buffer for compressed section %s:%s",
+	dl_seterrorf("%q: Failed to allocate decompressed buffer for compressed section %q",
 	             libdl_dlmodulename(libdl_dlsectionmodule(sect, 0)),
 	             libdl_dlsectionname(sect));
 	goto err;
 err_wrong_chdr_type:
-	dl_seterrorf("Compressed section %s:%s uses an unknown compression scheme %u",
+	dl_seterrorf("%q: Compressed section %q uses an unknown compression scheme %u",
 	             libdl_dlmodulename(libdl_dlsectionmodule(sect, 0)),
 	             libdl_dlsectionname(sect),
 	             (unsigned int)chdr->ch_type);
 	goto err;
 err_bad_section_size:
-	dl_seterrorf("Compressed section %s:%s is too small to be compressed",
+	dl_seterrorf("%q: Compressed section %q is too small to be compressed",
 	             libdl_dlmodulename(libdl_dlsectionmodule(sect, 0)),
 	             libdl_dlsectionname(sect));
 	goto err;
@@ -2276,8 +2375,10 @@ err:
  *                `sect'  isn't compressed, this  function will simply return
  *                the section's normal data blob, that is `sect->ds_data'
  * @return: NULL: Error (s.a. `dlerror()') */
-INTERN WUNUSED NONNULL((1)) void *DLFCN_CC
-libdl_dlinflatesection(DlSection *sect, size_t *psize) {
+INTERN WUNUSED NONNULL((1)) void *
+NOTHROW_NCX(DLFCN_CC libdl_dlinflatesection)(USER DlSection *sect,
+                                             USER size_t *psize)
+		THROWS(E_SEGFAULT) {
 	if unlikely(!DL_VERIFY_SECTION_HANDLE(sect))
 		goto err_bad_section;
 	/* Check for simple case: Was inflated data already loaded? */
@@ -2316,7 +2417,7 @@ libdl_dlinflatesection(DlSection *sect, size_t *psize) {
 		*psize = sect->ds_csize;
 	return sect->ds_cdata;
 err_no_section_data:
-	dl_seterrorf("Section data not loaded for %s:%s",
+	dl_seterrorf("%q: Section data not loaded for %q",
 	             libdl_dlmodulename(libdl_dlsectionmodule(sect, 0)),
 	             libdl_dlsectionname(sect));
 	goto err;
@@ -2330,7 +2431,8 @@ err:
 
 
 PRIVATE NONNULL((1)) int CC
-DlModule_InvokeDlCacheFunctions(DlModule *__restrict self) {
+DlModule_InvokeDlCacheFunctions(DlModule *__restrict self)
+		THROWS(...) {
 	int result = 0;
 	DlSection *sect;
 	sect = libdl_dllocksection(self, ".dl_caches",
@@ -2360,7 +2462,7 @@ done:
  * memory. For more information, see `DL_REGISTER_CACHE()'
  * @return: 0: No optional memory could be released.
  * @return: 1: Some optional memory was released. */
-INTERN int DLFCN_CC libdl_dlclearcaches(void) {
+INTERN int DLFCN_CC libdl_dlclearcaches(void) THROWS(...) {
 	int result = 0;
 	/* TODO: Guard against recursive calls:
 	 *  - Within the same thread:
@@ -2440,8 +2542,9 @@ again_lock_global:
 }
 
 
-PRIVATE void DLFCN_CC
-DlModule_RunAllModuleFinalizers(void) {
+PRIVATE void CC
+DlModule_RunAllModuleFinalizers(void)
+		THROWS(...) {
 	DlModule *mod;
 again:
 	atomic_rwlock_read(&DlModule_AllLock);
@@ -2529,7 +2632,8 @@ decref_module_and_continue:
  * @return: NULL: Error: Unknown `cmd' (s.a. dlerror())
  * @return: NULL: Error: Invalid `handle' (s.a. dlerror()) */
 INTERN void *DLFCN_CC
-libdl_dlauxctrl(DlModule *self, unsigned int cmd, ...) {
+libdl_dlauxctrl(USER DlModule *self, unsigned int cmd, ...)
+		THROWS(E_SEGFAULT, ...) {
 	void *result;
 	va_list args;
 	va_start(args, cmd);
@@ -2815,7 +2919,7 @@ done:
 	va_end(args);
 	return result;
 err_notelf:
-	dl_seterror_notelf(self);
+	dl_seterror_notelf(self->dm_filename);
 	goto err;
 err_nomem:
 	dl_seterror_nomem();
@@ -2824,9 +2928,11 @@ err:
 	goto done;
 }
 
-PRIVATE int CC
+PRIVATE NONNULL((1, 2)) int CC
 DlModule_IteratePhdr(DlModule *__restrict self,
-                     __dl_iterator_callback callback, void *arg) {
+                     USER __dl_iterator_callback callback,
+                     USER void *arg)
+		THROWS(...) {
 	int result;
 	struct dl_phdr_info info;
 	info.dlpi_addr      = self->dm_loadaddr;
@@ -2864,8 +2970,9 @@ DlModule_IteratePhdr(DlModule *__restrict self,
  * Enumeration stops when `*callback' returns a non-zero value, which
  * will then also be returned  by this function. Otherwise, `0'  will
  * be returned after all modules have been enumerated. */
-INTERN int DLFCN_CC
-libdl_iterate_phdr(__dl_iterator_callback callback, void *arg) {
+INTERN NONNULL((1)) int DLFCN_CC
+libdl_iterate_phdr(USER __dl_iterator_callback callback, USER void *arg)
+		THROWS(E_SEGFAULT, ...) {
 	int result = 0;
 	REF DlModule *current, *next;
 	atomic_rwlock_read(&DlModule_AllLock);
@@ -3125,7 +3232,8 @@ INTDEF struct dlsym_builtin_symbol const dlsym_builtin_table[DLSYM_BUILTIN_COUNT
  *          in moddbx's `cexpr_load_special_libdl_symbol()' function, which
  *          contains special handling for binding against this symbol! */
 PRIVATE char *dl_program_invocation_short_name = NULL;
-PRIVATE WUNUSED char **FCALL dlget_p_program_invocation_short_name(void) {
+PRIVATE WUNUSED char **
+NOTHROW_NCX(FCALL dlget_p_program_invocation_short_name)(void) THROWS(E_SEGFAULT) {
 	if (!dl_program_invocation_short_name) {
 		char *progname = root_peb->pp_argv
 		                 ? root_peb->pp_argv[0]
@@ -3145,8 +3253,8 @@ PRIVATE WUNUSED char **FCALL dlget_p_program_invocation_short_name(void) {
 
 
 /* Return the address of a builtin function (e.g. `dlopen()') */
-INTERN ATTR_PURE WUNUSED NONNULL((1)) void *FCALL
-dlsym_builtin(char const *__restrict name) {
+INTERN ATTR_PURE WUNUSED NONNULL((1)) void *
+NOTHROW_NCX(CC dlsym_builtin)(USER char const *name) THROWS(E_SEGFAULT) {
 	size_t lo, hi;
 	/* Do a binary search across `dlsym_builtin_table' */
 	lo = 0;
@@ -3262,8 +3370,8 @@ return_program_invocation_short_name:
 
 
 /* Used internally for some relocations: the "size" of libdl builtin symbols. */
-INTERN ATTR_PURE WUNUSED NONNULL((1)) size_t FCALL
-dlsym_builtin_size(char const *__restrict name) {
+INTERN ATTR_PURE WUNUSED NONNULL((1)) size_t
+NOTHROW_NCX(CC dlsym_builtin_size)(USER char const *name) THROWS(E_SEGFAULT) {
 	/* Only a couple of symbols should actually have a non-zero size value. */
 	switch (*name++) {
 
@@ -3368,8 +3476,8 @@ return_pointer:
 
 
 
-INTERN WUNUSED ATTR_CONST DlSection *FCALL
-dlsec_builtin_index(size_t sect_index) {
+INTERN WUNUSED ATTR_CONST DlSection *
+NOTHROW(CC dlsec_builtin_index)(size_t sect_index) {
 	DlSection *result;
 	switch (sect_index) {
 #define DEFINE_BUILTIN_SECTION(index, sect_name, link_name, elf_type, elf_flags)                            \
@@ -3394,8 +3502,8 @@ dlsec_builtin_index(size_t sect_index) {
 	return result;
 }
 
-INTERN WUNUSED ATTR_CONST char const *FCALL
-dlsec_builtin_name(size_t sect_index) {
+INTERN WUNUSED ATTR_CONST char const *
+NOTHROW(CC dlsec_builtin_name)(size_t sect_index) {
 	char const *result;
 	switch (sect_index) {
 #define DEFINE_BUILTIN_SECTION(index, sect_name, link_name, elf_type, elf_flags) \
@@ -3412,8 +3520,8 @@ dlsec_builtin_name(size_t sect_index) {
 }
 
 
-INTERN ATTR_PURE WUNUSED NONNULL((1)) DlSection *FCALL
-dlsec_builtin(char const *__restrict name) {
+INTERN ATTR_PURE WUNUSED NONNULL((1)) DlSection *
+NOTHROW_NCX(CC dlsec_builtin)(USER char const *name) THROWS(E_SEGFAULT) {
 	size_t sect_index;
 	char const *sect_name;
 	for (sect_index = 0;; ++sect_index) {
@@ -3431,8 +3539,8 @@ dlsec_builtin(char const *__restrict name) {
  * and  must be defined by one of the  loaded libraries. - If no such function
  * is defined, log an error message to the system log and terminate the hosted
  * application ungracefully. */
-INTERN ATTR_RETNONNULL WUNUSED NONNULL((1)) void *FCALL
-dl_require_global(char const *__restrict name) {
+INTERN ATTR_RETNONNULL WUNUSED NONNULL((1)) void *
+NOTHROW(FCALL dl_require_global)(char const *__restrict name) {
 	void *result;
 	/* Search all globally loaded modules for the symbol. */
 	result = libdl_dlsym((DlModule *)RTLD_DEFAULT, name);

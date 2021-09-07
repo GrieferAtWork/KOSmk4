@@ -62,7 +62,8 @@ INTERN ElfW(Shdr) empty_shdr[1] = { 0 };
 
 /* Module finalizer functions. */
 INTDEF NONNULL((1)) void CC
-dlmodule_finalizers_run(struct dlmodule_finalizers *__restrict self) {
+dlmodule_finalizers_run(struct dlmodule_finalizers *__restrict self)
+		THROWS(...) {
 	size_t count;
 	atomic_rwlock_read(&self->df_lock);
 	count = ATOMIC_XCH(self->df_size, 0);
@@ -87,7 +88,8 @@ dlmodule_finalizers_run(struct dlmodule_finalizers *__restrict self) {
 
 /* DlModule functions */
 INTERN NONNULL((1)) void CC
-DlModule_Destroy(DlModule *__restrict self) {
+DlModule_Destroy(USER DlModule *self)
+		THROWS(E_SEGFAULT, ...) {
 
 	/* Unbind the module from the list of all modules. */
 	atomic_rwlock_write(&DlModule_AllLock);
@@ -244,17 +246,19 @@ again_free_sections:
 }
 
 /* DlModule functions */
-INTERN NONNULL((1)) void CC
-DlModule_Free(DlModule *__restrict self) {
+INTERN NONNULL((1)) void
+NOTHROW_NCX(CC DlModule_Free)(USER DlModule *self)
+		THROWS(E_SEGFAULT) {
 	free(self);
 }
 
 
-INTDEF WUNUSED fd_t CC reopen_bigfd(fd_t fd);
+INTDEF WUNUSED fd_t NOTHROW_RPC(CC reopen_bigfd)(fd_t fd);
 
 /* Lazily allocate if necessary, and return the file descriptor for `self' */
-INTERN WUNUSED NONNULL((1)) fd_t CC
-DlModule_GetFd(DlModule *__restrict self) {
+INTERN WUNUSED NONNULL((1)) fd_t
+NOTHROW_NCX(CC DlModule_GetFd)(USER DlModule *self)
+		THROWS(E_SEGFAULT) {
 	fd_t result = self->dm_file;
 	if (result < 0) {
 		fd_t newresult;
@@ -285,8 +289,9 @@ err:
  *  - self->dm_elf.de_shstrndx
  *  - self->dm_elf.de_shdr
  * @return: NULL: Error */
-INTERN WUNUSED NONNULL((1)) ElfW(Shdr) *CC
-DlModule_ElfGetShdrs(DlModule *__restrict self) {
+INTERN WUNUSED NONNULL((1)) ElfW(Shdr) *
+NOTHROW_NCX(CC DlModule_ElfGetShdrs)(USER DlModule *self)
+		THROWS(E_SEGFAULT) {
 	fd_t fd;
 	ElfW(Shdr) *result;
 	assert(!self->dm_ops);
@@ -357,8 +362,9 @@ err:
 
 /* Lazily allocate if necessary, and return the section header string table for `self'
  * @return: NULL: Error (s.a. dl_error_message) */
-INTERN WUNUSED NONNULL((1)) char *CC
-DlModule_ElfGetShstrtab(DlModule *__restrict self) {
+INTERN WUNUSED NONNULL((1)) char *
+NOTHROW_NCX(CC DlModule_ElfGetShstrtab)(DlModule *self)
+		THROWS(E_SEGFAULT) {
 	char *result;
 	ElfW(Shdr) *shdrs;
 	assert(!self->dm_ops);
@@ -413,8 +419,9 @@ err:
  * NOTE: This function may only be called with `de_dynsym_tab' is non-NULL!
  * @return: * : The # of symbols in `de_dynsym_tab'
  * @return: 0 : Error (dlerror() was modified) */
-INTERN WUNUSED NONNULL((1)) size_t CC
-DlModule_ElfGetDynSymCnt(DlModule *__restrict self) {
+INTERN WUNUSED NONNULL((1)) size_t
+NOTHROW_NCX(CC DlModule_ElfGetDynSymCnt)(USER DlModule *self)
+		THROWS(E_SEGFAULT) {
 	size_t result;
 	assert(!self->dm_ops);
 	assert(self->dm_elf.de_dynsym_tab);
@@ -483,25 +490,13 @@ DlModule_ElfGetDynSymCnt(DlModule *__restrict self) {
 
 
 
-INTERN NONNULL((1, 2)) __attribute__((__cold__)) int CC
-dl_seterror_nosect(DlModule *__restrict self,
-                   char const *__restrict name) {
-	return dl_seterrorf("%q: No such section %q",
-	                    self->dm_filename, name);
-}
-
-INTERN ATTR_COLD NONNULL((1)) int CC
-dl_seterror_nosect_index(DlModule *__restrict self, size_t index) {
-	return dl_seterrorf("%q: Section index %" PRIuSIZ " is greater than %" PRIuSIZ,
-	                    self->dm_filename, index, self->dm_shnum);
-}
-
 /* Return the section header associated with a given `name'
  * @return: NULL:             Error (w/ dlerror() set)
  * @return: (ElfW(Shdr) *)-1: Not found (w/o dlerror() set) */
-INTERN WUNUSED NONNULL((1, 2)) ElfW(Shdr) *CC
-DlModule_ElfGetSection(DlModule *__restrict self,
-                       char const *__restrict name) {
+INTERN WUNUSED NONNULL((1, 2)) ElfW(Shdr) *
+NOTHROW_NCX(CC DlModule_ElfGetSection)(USER DlModule *self,
+                                       USER char const *name)
+		THROWS(E_SEGFAULT) {
 	ElfW(Shdr) *result;
 	uint16_t i;
 	char *strtab;

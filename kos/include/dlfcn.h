@@ -237,7 +237,7 @@ typedef __Lmid_t Lmid_t;
  * @return: * :   A handle to the library that got loaded.
  * @return: NULL: Failed to load the library. - Call `dlerror()' to get an error message. */
 #ifdef __CRT_HAVE_dlopen
-__IMPDEF __ATTR_WUNUSED void *__NOTHROW_NCX(__DLFCN_CC dlopen)(char const *__filename, int __mode);
+__IMPDEF __ATTR_WUNUSED void *(__DLFCN_CC dlopen)(char const *__filename, int __mode) /*__THROWS(...)*/;
 #endif /* __CRT_HAVE_dlopen */
 
 /* Close a  previously  opened  dynamic module  handle,  as  returned  by
@@ -262,7 +262,7 @@ __IMPDEF __ATTR_WUNUSED void *__NOTHROW_NCX(__DLFCN_CC dlopen)(char const *__fil
  *              are always handled as fail-safe! */
 #ifdef __CRT_HAVE_dlclose
 __IMPDEF __ATTR_NONNULL((1)) int
-__NOTHROW_NCX(__DLFCN_CC dlclose)(void *__handle);
+(__DLFCN_CC dlclose)(void *__handle) /*__THROWS(...)*/;
 #endif /* __CRT_HAVE_dlclose */
 
 /* Lookup the load address of a symbol within a shared library  `handle',
@@ -303,10 +303,10 @@ __NOTHROW_NCX(__DLFCN_CC dlclose)(void *__handle);
  *                 linked to be loaded at the address `NULL' (dlerror() == NULL) */
 #ifdef __CRT_HAVE_dlsym
 __IMPDEF __ATTR_WUNUSED __ATTR_NONNULL((2)) void *
-__NOTHROW_NCX(__DLFCN_CC dlsym)(void *__handle, char const *__restrict __symbol_name);
+(__DLFCN_CC dlsym)(void *__handle, char const *__restrict __symbol_name) /*__THROWS(...)*/;
 #elif defined(__CRT_HAVE_dlfunc)
-__COMPILER_REDIRECT(__IMPDEF,__ATTR_WUNUSED __ATTR_NONNULL((2)),void *,__NOTHROW_NCX,__DLFCN_CC,
-                    dlsym,(void *__handle, char const *__restrict __symbol_name),dlfunc,(__handle,__symbol_name))
+__COMPILER_REDIRECT(__IMPDEF,__ATTR_WUNUSED __ATTR_NONNULL((2)),void *,,__DLFCN_CC,
+                    dlsym,(void *__handle, char const *__restrict __symbol_name),dlfunc,(__handle,__symbol_name)) /*__THROWS(...)*/
 #endif /* ... */
 
 /* Return  and clear the  current libdl error message  string, such that for
@@ -326,7 +326,7 @@ __COMPILER_REDIRECT(__IMPDEF,__ATTR_WUNUSED __ATTR_NONNULL((2)),void *,__NOTHROW
  *                exported from libdl.
  * @return: NULL: No error happened, or the last error has already been consumed. */
 #ifdef __CRT_HAVE_dlerror
-__IMPDEF __ATTR_WUNUSED char *__NOTHROW_NCX(__DLFCN_CC dlerror)(void);
+__IMPDEF __ATTR_WUNUSED char *__NOTHROW(__DLFCN_CC dlerror)(void);
 #endif /* __CRT_HAVE_dlerror */
 
 
@@ -342,11 +342,11 @@ typedef void (*dlfunc_t)(struct __dlfunc_arg);
  * extends  upon this by  specifying that no data  is lost when  such a cast is
  * performed) */
 #ifdef __CRT_HAVE_dlsym
-__COMPILER_REDIRECT(__IMPDEF,__ATTR_WUNUSED __ATTR_NONNULL((2)),dlfunc_t,__NOTHROW_NCX,__DLFCN_CC,
-                    dlfunc,(void *__handle, char const *__restrict __symbol_name),dlsym,(__handle,__symbol_name))
+__COMPILER_REDIRECT(__IMPDEF,__ATTR_WUNUSED __ATTR_NONNULL((2)),dlfunc_t,,__DLFCN_CC,
+                    dlfunc,(void *__handle, char const *__restrict __symbol_name),dlsym,(__handle,__symbol_name)) /*__THROWS(...)*/
 #elif defined(__CRT_HAVE_dlfunc)
 __IMPDEF __ATTR_WUNUSED __ATTR_NONNULL((2)) dlfunc_t
-__NOTHROW_NCX(__DLFCN_CC dlfunc)(void *__handle, char const *__restrict __symbol_name);
+(__DLFCN_CC dlfunc)(void *__handle, char const *__restrict __symbol_name) /*__THROWS(...)*/;
 #endif /* ... */
 #endif /* __USE_BSD */
 
@@ -359,10 +359,10 @@ __NOTHROW_NCX(__DLFCN_CC dlfunc)(void *__handle, char const *__restrict __symbol
  *               exactly one of [RTLD_GLOBAL, RTLD_LOCAL], optionally
  *               or'd with any of the other `RTLD_*' flags. */
 #ifdef __CRT_HAVE_dlfopen
-__COMPILER_REDIRECT(__IMPDEF,__ATTR_WUNUSED,void *,__NOTHROW_NCX,__DLFCN_CC,
-                    fdlopen,(/*inherit(on_success)*/ __fd_t __fd, int __mode),dlfopen,(__fd,__mode))
+__COMPILER_REDIRECT(__IMPDEF,__ATTR_WUNUSED,void *,,__DLFCN_CC,
+                    fdlopen,(/*inherit(on_success)*/ __fd_t __fd, int __mode),dlfopen,(__fd,__mode)) /*__THROWS(...)*/
 #elif defined(__CRT_HAVE_fdlopen)
-__IMPDEF __ATTR_WUNUSED void *__NOTHROW_NCX(__DLFCN_CC fdlopen)(/*inherit(on_success)*/ __fd_t __fd, int __mode);
+__IMPDEF __ATTR_WUNUSED void *(__DLFCN_CC fdlopen)(/*inherit(on_success)*/ __fd_t __fd, int __mode) /*__THROWS(...)*/;
 #endif /* ... */
 #endif /* __USE_KOS || __USE_BSD */
 
@@ -401,8 +401,8 @@ __NOTHROW_NCX(__DLFCN_CC dlexceptaware)(void *__handle);
 #ifndef __dlgethandle_defined
 #define __dlgethandle_defined 1
 __IMPDEF __ATTR_WUNUSED void *
-__NOTHROW_NCX(__DLFCN_CC dlgethandle)(void const *__static_pointer,
-                                      unsigned int __flags __DFL(DLGETHANDLE_FNORMAL));
+__NOTHROW(__DLFCN_CC dlgethandle)(void const *__static_pointer,
+                                  unsigned int __flags __DFL(DLGETHANDLE_FNORMAL));
 #endif /* !__dlgethandle_defined */
 #endif /* __CRT_HAVE_dlgethandle */
 
@@ -601,7 +601,7 @@ __NOTHROW_NCX(__DLFCN_CC dlinflatesection)(struct dl_section *__sect,
  * @return: 0: No optional memory could be released.
  * @return: 1: Some optional memory was released. */
 #ifdef __CRT_HAVE_dlclearcaches
-__IMPDEF int __NOTHROW_NCX(__DLFCN_CC dlclearcaches)(void);
+__IMPDEF int (__DLFCN_CC dlclearcaches)(void) /*__THROWS(...)*/;
 #endif /* __CRT_HAVE_dlclearcaches */
 
 /* Allocate/Free a static TLS segment
@@ -611,13 +611,14 @@ __IMPDEF int __NOTHROW_NCX(__DLFCN_CC dlclearcaches)(void);
  * @return: * :   Pointer to the newly allocated TLS segment.
  * @return: NULL: Error (s.a. dlerror()) */
 #ifdef __CRT_HAVE_dltlsallocseg
-__IMPDEF void *__NOTHROW_NCX(__DLFCN_CC dltlsallocseg)(void);
+__IMPDEF __ATTR_WUNUSED void *
+__NOTHROW_NCX(__DLFCN_CC dltlsallocseg)(void);
 #endif /* __CRT_HAVE_dltlsallocseg */
 
 /* Free a previously allocated static TLS segment (usually called by `pthread_exit()' and friends). */
 #ifdef __CRT_HAVE_dltlsfreeseg
 __IMPDEF __ATTR_NONNULL((1)) int
-__NOTHROW_NCX(__DLFCN_CC dltlsfreeseg)(void *__ptr);
+(__DLFCN_CC dltlsfreeseg)(void *__ptr) /*__THROWS(...)*/;
 #endif /* __CRT_HAVE_dltlsfreeseg */
 
 /* DL-based TLS memory management API.
@@ -669,11 +670,11 @@ __NOTHROW_NCX(__DLFCN_CC dltlsfreeseg)(void *__ptr);
  * @return: NULL:          Failed to allocate the TLS segment (s.a. `dlerror()') */
 #ifdef __CRT_HAVE_dltlsalloc
 __IMPDEF __ATTR_WUNUSED void *
-__NOTHROW_NCX(__DLFCN_CC dltlsalloc)(__size_t __num_bytes, __size_t __min_alignment,
-                                     void const *__template_data, __size_t __template_size,
-                                     void (__LIBCCALL *__perthread_init)(void *__arg, void *__base),
-                                     void (__LIBCCALL *__perthread_fini)(void *__arg, void *__base),
-                                     void *__perthread_callback_arg);
+__NOTHROW(__DLFCN_CC dltlsalloc)(__size_t __num_bytes, __size_t __min_alignment,
+                                 void const *__template_data, __size_t __template_size,
+                                 void (__LIBCCALL *__perthread_init)(void *__arg, void *__base),
+                                 void (__LIBCCALL *__perthread_fini)(void *__arg, void *__base),
+                                 void *__perthread_callback_arg);
 #endif /* __CRT_HAVE_dltlsalloc */
 
 /* Free a TLS segment previously allocated with `dltlsalloc()' */
@@ -703,7 +704,8 @@ __NOTHROW_NCX(__DLFCN_CC dltlsfree)(void *__tls_handle);
  * @return: NULL: Invalid `tls_handle', or allocation/initialization failed. (s.a. `dlerror()') */
 #ifdef __CRT_HAVE_dltlsaddr
 __IMPDEF __ATTR_WUNUSED __ATTR_NONNULL((1)) void *
-__NOTHROW_NCX(__DLFCN_DLTLSADDR_CC dltlsaddr)(void *__tls_handle);
+(__DLFCN_DLTLSADDR_CC dltlsaddr)(void *__tls_handle)
+		/*__THROWS(...)*/;
 #endif /* __CRT_HAVE_dltlsaddr */
 
 /* Same as `dltlsaddr()', but used to lookup a TLS block relative to a given `tls_segment',
@@ -716,8 +718,9 @@ __NOTHROW_NCX(__DLFCN_DLTLSADDR_CC dltlsaddr)(void *__tls_handle);
  *                allocation/initialization failed. (s.a. `dlerror()') */
 #ifdef __CRT_HAVE_dltlsaddr2
 __IMPDEF __ATTR_WUNUSED __ATTR_NONNULL((1, 2)) void *
-__NOTHROW_NCX(__DLFCN_DLTLSADDR2_CC dltlsaddr2)(void *__tls_handle,
-                                                void *__tls_segment);
+(__DLFCN_DLTLSADDR2_CC dltlsaddr2)(void *__tls_handle,
+                                   void *__tls_segment)
+		/*__THROWS(...)*/;
 #endif /* __CRT_HAVE_dltlsaddr2 */
 
 
@@ -733,10 +736,9 @@ __NOTHROW_NCX(__DLFCN_DLTLSADDR2_CC dltlsaddr2)(void *__tls_handle,
  * @return: NULL: Error: Unknown `cmd' (s.a. dlerror())
  * @return: NULL: Error: Invalid `handle' (s.a. dlerror()) */
 #ifdef __CRT_HAVE_dlauxctrl
-__IMPDEF void *
-__NOTHROW_NCX(__DLFCN_VCC dlauxctrl)(void *__handle,
-                                     unsigned int __cmd,
-                                     ...);
+__IMPDEF void *(__DLFCN_VCC dlauxctrl)(void *__handle,
+                                       unsigned int __cmd,
+                                       ...) /*__THROWS(...)*/;
 
 #define DLAUXCTRL_MOD_INCREF         0xa001 /* incref() the module handle (always re-returns `handle') */
 #define DLAUXCTRL_MOD_DECREF         0xa002 /* decref() the module handle (always re-returns `handle') */
@@ -852,14 +854,14 @@ __NOTHROW_NCX(__DLFCN_CC dlinfo)(void *__restrict __handle,
 
 #ifdef __USE_GNU
 #if defined(__CRT_HAVE_dlmopen) && defined(__Lmid_t)
-__IMPDEF void *(__DLFCN_CC dlmopen)(__Lmid_t __nsid, char const *__file, int __mode);
+__IMPDEF void *(__DLFCN_CC dlmopen)(__Lmid_t __nsid, char const *__file, int __mode) /*__THROWS(...)*/;
 #endif /* __CRT_HAVE_dlmopen && __Lmid_t */
 
 #ifdef __CRT_HAVE_dlvsym
 __IMPDEF __ATTR_NONNULL((2, 3)) void *
-__NOTHROW_NCX(__DLFCN_CC dlvsym)(void *__restrict __handle,
-                                 char const *__name,
-                                 char const *__version);
+(__DLFCN_CC dlvsym)(void *__restrict __handle,
+                    char const *__name,
+                    char const *__version) /*__THROWS(...)*/;
 #endif /* __CRT_HAVE_dlvsym */
 
 #ifdef __CRT_HAVE_dladdr1

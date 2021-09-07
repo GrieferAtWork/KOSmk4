@@ -40,7 +40,8 @@
 
 DECL_BEGIN
 
-LOCAL NONNULL((1)) void CC try_add2global(DlModule *__restrict self) {
+LOCAL NONNULL((1)) void
+NOTHROW(CC try_add2global)(DlModule *__restrict self) {
 	uintptr_t old_flags;
 again_old_flags:
 	old_flags = ATOMIC_READ(self->dm_flags);
@@ -67,7 +68,7 @@ INTERN char *dl_library_path = NULL;
  * For this purpose, calling them is essentially the same as calling the
  * primary program's main()  function, only that  these are expected  to
  * return without doing the program's main task! */
-typedef void (*elf_init_t)(int argc, char *argv[], char *envp[]);
+typedef void (*elf_init_t)(int argc, char *argv[], char *envp[]) THROWS(...);
 #define CALLINIT(funptr)                        \
 	((*(elf_init_t)(funptr))(root_peb->pp_argc, \
 	                         root_peb->pp_argv, \
@@ -76,7 +77,7 @@ typedef void (*elf_init_t)(int argc, char *argv[], char *envp[]);
 
 /* Run library initializers for `self' */
 PRIVATE NONNULL((1)) void CC
-DlModule_ElfRunInitializers(DlModule *__restrict self) {
+DlModule_ElfRunInitializers(DlModule *__restrict self) THROWS(...) {
 	size_t i, dyni;
 	uintptr_t init_func           = 0;
 	uintptr_t *preinit_array_base = NULL;
@@ -142,7 +143,7 @@ done_dyntag:
  * appearing   within  `DlModule_AllList',  meaning  that  the  primary
  * application's  __attribute__((constructor))  functions  are  invoked
  * _AFTER_ those from (e.g.) libc. */
-INTERN void CC DlModule_RunAllStaticInitializers(void) {
+INTERN void CC DlModule_RunAllStaticInitializers(void) THROWS(...) {
 	REF DlModule *primary;
 	DlModule *last;
 	primary = LIST_FIRST(&DlModule_GlobalList);
@@ -205,8 +206,8 @@ done:
 #endif /* !ELF_PF_FLAGS_TO_PROT_FLAGS_PLUS_WRITE */
 
 
-PRIVATE NONNULL((1)) int CC
-DlModule_ElfMakeTextWritable(DlModule *__restrict self) {
+PRIVATE NONNULL((1)) int
+NOTHROW(CC DlModule_ElfMakeTextWritable)(DlModule *__restrict self) {
 	ElfW(Half) i;
 	errno_t error;
 	for (i = 0; i < self->dm_elf.de_phnum; ++i) {
@@ -226,8 +227,8 @@ err_mprotect_failed:
 	                    self->dm_filename, (unsigned int)-error);
 }
 
-PRIVATE NONNULL((1)) void CC
-DlModule_ElfMakeTextReadonly(DlModule *__restrict self) {
+PRIVATE NONNULL((1)) void
+NOTHROW(CC DlModule_ElfMakeTextReadonly)(DlModule *__restrict self) {
 	ElfW(Half) i;
 	for (i = 0; i < self->dm_elf.de_phnum; ++i) {
 		if (self->dm_elf.de_phdr[i].p_type != PT_LOAD)
@@ -243,7 +244,8 @@ DlModule_ElfMakeTextReadonly(DlModule *__restrict self) {
 /* Apply relocations & execute library initialized within `self'
  * @param: flags: Set of `DL_MODULE_INITIALIZE_F*' */
 INTERN NONNULL((1)) int CC
-DlModule_ElfInitialize(DlModule *__restrict self, unsigned int flags) {
+DlModule_ElfInitialize(DlModule *__restrict self, unsigned int flags)
+		THROWS(...) {
 #if ELF_ARCH_USESRELA
 	ElfW(Rela) *rela_base     = NULL;
 	size_t rela_count         = 0;

@@ -44,9 +44,13 @@
 #define DL_API_SYMBOL(name) name
 #endif /* __BUILDING_LIBDL */
 
+#ifdef __CC__
 DECL_BEGIN
 
-#ifdef __CC__
+#ifndef __DLFCN_CC
+#define __DLFCN_CC  __LIBCCALL
+#define __DLFCN_VCC __VLIBCCALL
+#endif /* !__DLFCN_CC */
 
 #ifndef __DlSection_defined
 #define __DlSection_defined 1
@@ -88,8 +92,8 @@ struct dlsection {
 };
 
 #ifdef __INTELLISENSE__
-INTDEF NONNULL((1)) void LIBDL_CC DlSection_Incref(DlSection *__restrict self);
-INTDEF NONNULL((1)) void LIBDL_CC DlSection_Decref(DlSection *__restrict self);
+INTDEF NONNULL((1)) void NOTHROW_NCX(DlSection_Incref)(__USER DlSection *self) __THROWS(E_SEGFAULT);
+INTDEF NONNULL((1)) void NOTHROW_NCX(DlSection_Decref)(__USER DlSection *self) __THROWS(E_SEGFAULT);
 #else /* __INTELLISENSE__ */
 #define DlSection_Incref(self) \
 	__hybrid_atomic_inc((self)->ds_refcnt, __ATOMIC_SEQ_CST)
@@ -98,8 +102,8 @@ INTDEF NONNULL((1)) void LIBDL_CC DlSection_Decref(DlSection *__restrict self);
 	       (DL_API_SYMBOL(DlSection_Destroy)(self), 0))
 #endif /* !__INTELLISENSE__ */
 
-FORCELOCAL ATTR_ARTIFICIAL NONNULL((1)) __BOOL LIBDL_CC
-DlSection_TryIncref(DlSection *__restrict self) {
+LOCAL ATTR_ARTIFICIAL NONNULL((1)) __BOOL
+NOTHROW_NCX(LIBDL_CC DlSection_TryIncref)(__USER DlSection *self) __THROWS(E_SEGFAULT) {
 	refcnt_t refcnt;
 	do {
 		refcnt = __hybrid_atomic_load(self->ds_refcnt, __ATOMIC_ACQUIRE);
@@ -111,8 +115,8 @@ DlSection_TryIncref(DlSection *__restrict self) {
 }
 
 #ifdef __BUILDING_LIBDL
-INTDEF NONNULL((1)) void LIBDL_CC
-DlSection_Destroy(DlSection *__restrict self);
+INTDEF NONNULL((1)) void
+NOTHROW_NCX(LIBDL_CC DlSection_Destroy)(__USER DlSection *self) __THROWS(E_SEGFAULT);
 #endif /* __BUILDING_LIBDL */
 
 struct dlmodule_finalizer {
@@ -229,8 +233,8 @@ struct dlmodule {
 	                                          * NOTE:  Only modules loaded  by the initial application  are part of  the static TLS segment.
 	                                          *    -> All other modules loaded thereafter have their TLS segments lazily loaded on first access. */
 	/* WARNING: TLS Initializers/Finalizers are _NOT_ invoked for modules apart of the static TLS image! */
-	void                    (*dm_tls_init)(void *arg, void *base); /* [valid_if(!dm_tlsstoff)][0..1] Optional callback for a TLS initializer. */
-	void                    (*dm_tls_fini)(void *arg, void *base); /* [valid_if(!dm_tlsstoff)][0..1] Optional callback for a TLS finalizer. */
+	void         (__DLFCN_CC *dm_tls_init)(void *arg, void *base); /* [valid_if(!dm_tlsstoff)][0..1] Optional callback for a TLS initializer. */
+	void         (__DLFCN_CC *dm_tls_fini)(void *arg, void *base); /* [valid_if(!dm_tlsstoff)][0..1] Optional callback for a TLS finalizer. */
 	void                     *dm_tls_arg;    /* [?..?][const] Argument passed to `dm_tls_init' / `dm_tls_fini' */
 
 	/* All  of  the  above  was  just  so  that  `dltlsalloc()' doesn't
@@ -276,17 +280,29 @@ struct dlmodule {
 };
 
 #ifdef __BUILDING_LIBDL
-INTDEF NONNULL((1)) void LIBDL_CC DlModule_Destroy(DlModule *__restrict self);
-INTDEF NONNULL((1)) void LIBDL_CC DlModule_Free(DlModule *__restrict self);
+INTDEF NONNULL((1)) void LIBDL_CC DlModule_Destroy(__USER DlModule *self) __THROWS(E_SEGFAULT, ...);
+INTDEF NONNULL((1)) void NOTHROW_NCX(LIBDL_CC DlModule_Free)(__USER DlModule *self) __THROWS(E_SEGFAULT);
 #else /* __BUILDING_LIBDL */
 #define DlModule_Destroy(self) (DL_API_SYMBOL(DlModule_Destroy)(self))
 #define DlModule_Free(self)    (DL_API_SYMBOL(DlModule_Free)(self))
 #endif /* !__BUILDING_LIBDL */
+
+/* Make sure to define the DlModule decref() function such that it can throw exceptions.
+ * This  is required  since `DlModule_Destroy()'  invokes module  finalizers which might
+ * throw exceptions. (Whether or not they should do that is another story, though) */
+#undef __REFCNT_NOTHROW
+#define __REFCNT_NOTHROW /* nothing */
 __DEFINE_REFCOUNT_FUNCTIONS(DlModule, dm_refcnt, DlModule_Destroy)
+#undef __REFCNT_NOTHROW
+#ifdef __KERNEL__
+#define __REFCNT_NOTHROW __NOTHROW
+#else /* __KERNEL__ */
+#define __REFCNT_NOTHROW __NOTHROW_NCX
+#endif /* !__KERNEL__ */
+
 __DEFINE_WEAKREFCOUNT_FUNCTIONS(DlModule, dm_weakrefcnt, DlModule_Free)
 
-#endif /* __CC__ */
-
 DECL_END
+#endif /* __CC__ */
 
 #endif /* !_LIBDL_MODULE_H */

@@ -60,7 +60,8 @@ dlmodule_find_symbol_in_dependencies(DlModule *__restrict self,
                                      size_t *psize,
                                      DlModule **pmodule,
                                      struct dl_symbol *__restrict pweak_symbol,
-                                     size_t depth) {
+                                     size_t depth)
+		THROWS(...) {
 	struct dl_symbol symbol;
 	size_t i;
 	if (!self->dm_depcnt)
@@ -178,7 +179,8 @@ dlmodule_find_symbol_in_dependencies(DlModule *__restrict self,
 PRIVATE ATTR_NOINLINE WUNUSED NONNULL((1, 3)) bool CC
 DlModule_ElfFindSymbol(DlModule *__restrict self, uintptr_t symid,
                        ElfW(Addr) *__restrict paddr,
-                       size_t *psize, DlModule **pmodule) {
+                       size_t *psize, DlModule **pmodule)
+		THROWS(...) {
 	struct dl_symbol weak_symbol;
 	ElfW(Sym) const *symbol;
 	ElfW(Addr) addr;
@@ -427,14 +429,15 @@ STATIC_ASSERT(offsetof(Elf64_Rel, r_info) == offsetof(Elf64_Rela, r_info));
 #endif /* !ELF_ARCH_R_JMP_SLOT */
 #endif /* !ELF_ARCH_NAME_R_JMP_SLOT */
 
-INTERN WUNUSED NONNULL((1)) ElfW(Addr) ATTR_FASTCALL
+INTERN WUNUSED NONNULL((1)) ElfW(Addr) FCALL
 dl_bind_lazy_relocation(DlModule *__restrict self,
 #if ELF_ARCH_LAZYINDX
                         uintptr_t jmp_rel_index
 #else /* ELF_ARCH_LAZYINDX */
                         uintptr_t jmp_rel_offset
 #endif /* !ELF_ARCH_LAZYINDX */
-                        ) {
+                        )
+		THROWS(...) {
 	ElfW(Rel) *rel;
 	byte_t *reladdr;
 	ElfW(Addr) addr;

@@ -59,7 +59,7 @@ INTERN struct dlmodule_dlist DlModule_AllList = DLIST_HEAD_INITIALIZER(DlModule_
 INTERN struct atomic_rwlock DlModule_AllLock  = ATOMIC_RWLOCK_INIT;
 
 
-INTERN WUNUSED fd_t CC reopen_bigfd(fd_t fd) {
+INTERN WUNUSED fd_t NOTHROW_RPC(CC reopen_bigfd)(fd_t fd) {
 	enum {
 		MAX_RESERVED_FD_2 = STDIN_FILENO > STDOUT_FILENO
 		                    ? STDIN_FILENO
@@ -84,8 +84,8 @@ INTERN WUNUSED fd_t CC reopen_bigfd(fd_t fd) {
 }
 
 
-PRIVATE ATTR_MALLOC WUNUSED char *CC
-realpath_malloc(fd_t fd) {
+PRIVATE ATTR_MALLOC WUNUSED char *
+NOTHROW_RPC(CC realpath_malloc)(fd_t fd) {
 	char *resolved, *buffer;
 	ssize_t result;
 	size_t bufsize;
@@ -122,8 +122,8 @@ err_buffer:
 	return NULL;
 }
 
-INTERN NONNULL((2)) ssize_t CC
-preadall(fd_t fd, void *buf, size_t bufsize, ElfW(Off) offset) {
+INTERN NONNULL((2)) ssize_t
+NOTHROW_RPC(CC preadall)(fd_t fd, void *buf, size_t bufsize, ElfW(Off) offset) {
 	ssize_t result, temp;
 	result = sys_pread64(fd, buf, bufsize, offset);
 	if unlikely(E_ISERR(result))
@@ -149,26 +149,6 @@ err:
 	return 0;
 }
 
-LOCAL NONNULL((1)) void CC
-update_module_flags(DlModule *__restrict self, int mode) {
-	uintptr_t old_flags;
-again_old_flags:
-	old_flags = ATOMIC_READ(self->dm_flags);
-	if ((mode & RTLD_GLOBAL) && !(old_flags & RTLD_GLOBAL)) {
-		/* Make the module global. */
-		atomic_rwlock_write(&DlModule_GlobalLock);
-		if (!ATOMIC_CMPXCH_WEAK(self->dm_flags, old_flags,
-		                        old_flags | RTLD_GLOBAL)) {
-			atomic_rwlock_endwrite(&DlModule_GlobalLock);
-			goto again_old_flags;
-		}
-		assert(!LIST_ISBOUND(self, dm_globals));
-		DlModule_AddToGlobals(self);
-		assert(LIST_ISBOUND(self, dm_globals));
-		atomic_rwlock_endwrite(&DlModule_GlobalLock);
-	}
-}
-
 
 
 
@@ -183,7 +163,8 @@ again_old_flags:
 DEFINE_INTERN_ALIAS(libdl_dlfopen, DlModule_OpenFd);
 DEFINE_PUBLIC_ALIAS(dlfopen, libdl_dlfopen);
 INTERN WUNUSED REF_IF(!(return->dm_flags & RTLD_NODELETE)) DlModule *DLFCN_CC
-DlModule_OpenFd(/*inherit(on_success)*/ fd_t fd, unsigned int mode) {
+DlModule_OpenFd(/*inherit(on_success)*/ fd_t fd, unsigned int mode)
+		THROWS(...) {
 	REF DlModule *result;
 	char *rp = realpath_malloc(fd);
 	if unlikely(!rp)
@@ -201,8 +182,9 @@ err:
 }
 
 INTERN WUNUSED NONNULL((1)) REF_IF(!(return->dm_flags & RTLD_NODELETE)) DlModule *CC
-DlModule_OpenFilename(char const *__restrict filename,
-                      unsigned int mode) {
+DlModule_OpenFilename(USER char const *filename,
+                      unsigned int mode)
+		THROWS(E_SEGFAULT, ...) {
 	fd_t fd;
 	REF DlModule *result;
 	result = DlModule_FindFromFilename(filename);
@@ -221,19 +203,17 @@ DlModule_OpenFilename(char const *__restrict filename,
 done:
 	return result;
 done_existing:
-	update_module_flags(result, mode);
+	DlModule_UpdateFlags(result, mode);
 	goto done;
 err:
 	return NULL;
 }
 
-INTERN WUNUSED ATTR_NOINLINE NONNULL((1, 3))
-REF_IF(!(return->dm_flags & RTLD_NODELETE)) DlModule *CC
-DlModule_OpenFilenameInPath(char const *__restrict path,
-                            size_t pathlen,
-                            char const *__restrict filename,
-                            size_t filenamelen,
-                            unsigned int mode) {
+INTERN WUNUSED ATTR_NOINLINE NONNULL((1, 3)) REF_IF(!(return->dm_flags & RTLD_NODELETE)) DlModule *CC
+DlModule_OpenFilenameInPath(char const *__restrict path, size_t pathlen,
+                            USER char const *filename, size_t filenamelen,
+                            unsigned int mode)
+		THROWS(E_SEGFAULT, ...) {
 	char *buf;
 	REF DlModule *result;
 	while (pathlen && path[pathlen - 1] == '/')
@@ -258,12 +238,10 @@ DlModule_OpenFilenameInPath(char const *__restrict path,
 	return result;
 }
 
-INTERN WUNUSED ATTR_NOINLINE NONNULL((1, 3))
-REF_IF(!(return->dm_flags & RTLD_NODELETE)) DlModule *CC
-DlModule_FindFilenameInPathFromAll(char const *__restrict path,
-                                   size_t pathlen,
-                                   char const *__restrict filename,
-                                   size_t filenamelen) {
+INTERN WUNUSED ATTR_NOINLINE NONNULL((1, 3)) REF_IF(!(return->dm_flags & RTLD_NODELETE)) DlModule *
+NOTHROW_NCX(CC DlModule_FindFilenameInPathFromAll)(char const *__restrict path, size_t pathlen,
+                                                   USER char const *filename, size_t filenamelen)
+		THROWS(E_SEGFAULT) {
 	char *buf;
 	REF DlModule *result;
 	while (pathlen && path[pathlen - 1] == '/')
@@ -283,8 +261,9 @@ DlModule_FindFilenameInPathFromAll(char const *__restrict path,
 	return result;
 }
 
-INTERN WUNUSED NONNULL((1)) REF_IF(!(return->dm_flags & RTLD_NODELETE)) DlModule *CC
-DlModule_FindFilenameInPathListFromAll(char const *__restrict filename) {
+INTERN WUNUSED NONNULL((1)) REF_IF(!(return->dm_flags & RTLD_NODELETE)) DlModule *
+NOTHROW_NCX(CC DlModule_FindFilenameInPathListFromAll)(USER char const *filename)
+		THROWS(E_SEGFAULT) {
 	REF DlModule *result;
 	char const *sep;
 	char const *path   = dl_library_path;
@@ -311,8 +290,9 @@ DlModule_FindFilenameInPathListFromAll(char const *__restrict filename) {
 
 INTERN WUNUSED NONNULL((1, 2)) REF_IF(!(return->dm_flags & RTLD_NODELETE)) DlModule *CC
 DlModule_OpenFilenameInPathList(char const *__restrict path,
-                                char const *__restrict filename,
-                                unsigned int mode) {
+                                USER char const *filename,
+                                unsigned int mode)
+		THROWS(E_SEGFAULT, ...) {
 	REF DlModule *result;
 	char const *sep;
 	size_t filenamelen;
@@ -365,7 +345,8 @@ done:
 
 
 PRIVATE NONNULL((1)) int CC
-DlModule_ElfLoadLoadedProgramHeaders(DlModule *__restrict self) {
+DlModule_ElfLoadLoadedProgramHeaders(DlModule *__restrict self)
+		THROWS(...) {
 	uint16_t pidx;
 	for (pidx = 0; pidx < self->dm_elf.de_phnum; ++pidx) {
 		uintptr_t base = self->dm_loadaddr + self->dm_elf.de_phdr[pidx].p_vaddr;
@@ -494,6 +475,7 @@ DlModule_ElfLoadLoadedProgramHeaders(DlModule *__restrict self) {
 	                                   ? DL_MODULE_ELF_INITIALIZE_FBINDNOW
 	                                   : DL_MODULE_ELF_INITIALIZE_FNORMAL))
 		goto err;
+
 	/* And with that, we've successfully initialize the module! */
 	ATOMIC_AND(self->dm_flags, ~RTLD_LOADING);
 	return 0;
@@ -504,7 +486,8 @@ err:
 
 INTERN WUNUSED NONNULL((1, 2)) REF DlModule *CC
 DlModule_ElfOpenLoadedProgramHeaders(/*inherit(on_success,HEAP)*/ char *__restrict filename,
-                                     struct elfexec_info *__restrict info, uintptr_t loadaddr) {
+                                     struct elfexec_info *__restrict info, uintptr_t loadaddr)
+		THROWS(...) {
 	REF DlModule *result;
 	uint16_t pidx;
 	result = (REF DlModule *)calloc(offsetof(DlModule, dm_elf.de_phdr) +
@@ -550,10 +533,10 @@ err_r:
 }
 
 
-INTERN WUNUSED NONNULL((1, 2)) int CC
-DlModule_ElfVerifyEhdr(ElfW(Ehdr) const *__restrict ehdr,
-                       char const *__restrict filename,
-                       bool requires_ET_DYN) {
+INTERN WUNUSED NONNULL((1, 2)) int
+NOTHROW(CC DlModule_ElfVerifyEhdr)(ElfW(Ehdr) const *__restrict ehdr,
+                                   char const *__restrict filename,
+                                   bool requires_ET_DYN) {
 	char const *reason;
 	reason = "ehdr.e_ident[EI_MAG*] != " PP_STR(ELFMAG);
 	if unlikely(ehdr->e_ident[EI_MAG0] != ELFMAG0 ||
@@ -596,10 +579,10 @@ err:
 }
 
 
-PRIVATE WUNUSED NONNULL((1, 2)) REF DlModule *CC
-DlModule_ElfMapProgramHeaders(ElfW(Ehdr) const *__restrict ehdr,
-                              /*inherit(on_success,HEAP)*/ char *__restrict filename,
-                              /*inherit(on_success)*/ fd_t fd) {
+PRIVATE WUNUSED NONNULL((1, 2)) REF DlModule *
+NOTHROW(CC DlModule_ElfMapProgramHeaders)(ElfW(Ehdr) const *__restrict ehdr,
+                                          /*inherit(on_success,HEAP)*/ char *__restrict filename,
+                                          /*inherit(on_success)*/ fd_t fd) {
 	uint16_t pidx;
 	REF DlModule *result;
 	if unlikely(DlModule_ElfVerifyEhdr(ehdr, filename, true))
@@ -672,27 +655,18 @@ err:
 	return NULL;
 }
 
-INTERN ATTR_COLD int CC
-dl_seterror_header_read_error(char const *__restrict filename) {
-	return dl_seterrorf("%q: Failed to read headers", filename);
-}
-
-INTERN ATTR_COLD int CC
-dl_seterror_notelf(DlModule *__restrict self) {
-	return dl_seterrorf("%q: Not an ELF object", self->dm_filename);
-}
-
 
 INTERN WUNUSED NONNULL((1)) REF_IF(!(return->dm_flags & RTLD_NODELETE)) DlModule *CC
 DlModule_OpenFilenameAndFd(/*inherit(on_success,HEAP)*/ char *__restrict filename,
-                           /*inherit(on_success)*/ fd_t fd, unsigned int mode) {
+                           /*inherit(on_success)*/ fd_t fd, unsigned int mode)
+		THROWS(...) {
 	ElfW(Ehdr) ehdr;
 	REF DlModule *result;
 	result = DlModule_FindFromFilename(filename);
 	if (result) {
 		sys_close(fd);
 		free(filename);
-		update_module_flags(result, mode);
+		DlModule_UpdateFlags(result, mode);
 		goto done;
 	}
 	if unlikely(preadall(fd, &ehdr, sizeof(ehdr), 0) <= 0)
@@ -747,9 +721,9 @@ err:
 
 /* Find  the  DL   module  mapping   the  specified   file.
  * If no such module is loaded, `NULL' is returned instead. */
-INTERN WUNUSED NONNULL((1))
-REF_IF(!(return->dm_flags & RTLD_NODELETE)) DlModule *CC
-DlModule_FindFromFilename(char const *__restrict filename) {
+INTERN WUNUSED NONNULL((1)) REF_IF(!(return->dm_flags & RTLD_NODELETE)) DlModule *
+NOTHROW_NCX(CC DlModule_FindFromFilename)(USER char const *filename)
+		THROWS(E_SEGFAULT) {
 	REF DlModule *result;
 	atomic_rwlock_read(&DlModule_AllLock);
 	DlModule_AllList_FOREACH(result) {
@@ -762,59 +736,6 @@ DlModule_FindFromFilename(char const *__restrict filename) {
 	atomic_rwlock_endread(&DlModule_AllLock);
 	return result;
 }
-
-INTERN ATTR_COLD int CC
-dl_seterror_no_mod_at_addr(void const *static_pointer) {
-	return dl_seterrorf("Address %p does not map to any module",
-	                    static_pointer);
-}
-
-
-/* Find the DL module containing a given static pointer. */
-INTERN WUNUSED DlModule *CC
-DlModule_FindFromStaticPointer(void const *static_pointer) {
-	REF DlModule *result;
-	atomic_rwlock_read(&DlModule_AllLock);
-	DlModule_AllList_FOREACH(result) {
-		uint16_t i;
-		if ((uintptr_t)static_pointer < result->dm_loadstart)
-			continue;
-		if ((uintptr_t)static_pointer >= result->dm_loadend)
-			continue;
-
-		/* Support for formats other than ELF. */
-		if (result->dm_ops) {
-			if (!(*result->dm_ops->df_ismapped)(result,
-			                                    (uintptr_t)static_pointer -
-			                                    result->dm_loadaddr))
-				continue;
-			goto got_result;
-		}
-
-		/* Make sure that `static_pointer' maps to some program segment. */
-		for (i = 0; i < result->dm_elf.de_phnum; ++i) {
-			uintptr_t segment_base;
-			if (result->dm_elf.de_phdr[i].p_type != PT_LOAD)
-				continue;
-			segment_base = result->dm_loadaddr + result->dm_elf.de_phdr[i].p_vaddr;
-			if ((uintptr_t)static_pointer < segment_base)
-				continue;
-			if ((uintptr_t)static_pointer >= segment_base + result->dm_elf.de_phdr[i].p_memsz)
-				continue;
-			/* Found the segment! */
-			goto got_result;
-		}
-	}
-	atomic_rwlock_endread(&DlModule_AllLock);
-	dl_seterror_no_mod_at_addr(static_pointer);
-	return NULL;
-got_result:
-	/*incref(result);*/ /* This function doesn't return a reference! */
-	atomic_rwlock_endread(&DlModule_GlobalLock);
-	return result;
-}
-
-
 
 DECL_END
 
