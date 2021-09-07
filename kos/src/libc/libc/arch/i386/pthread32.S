@@ -34,7 +34,7 @@
 #include <sched.h>
 
 
-.section .text.crt.sched.pthread.libc_handle
+.section .text.crt.sched.pthread
 INTERN_FUNCTION(libc_handle)
 	.cfi_startproc
 	/* Hacky code to quickly get a DL handle for libc itself. */
@@ -65,7 +65,7 @@ END(libc_handle)
  * NOTE: This function also fills in `thread->pt_tid' */
 /* INTDEF errno_t NOTHROW(__FCALL libc_pthread_clone)(struct pthread *__restrict thread,
  *                                                    __pthread_start_routine_t start); */
-.section .text.crt.sched.pthread.pthread_clone
+.section .text.crt.sched.pthread
 INTERN_FUNCTION(libc_pthread_clone)
 	.cfi_startproc
 
@@ -110,7 +110,7 @@ END(libc_pthread_clone)
  * libc_pthread_unmap_stack_and_exit(void *stackaddr,
  *                                   size_t stacksize,
  *                                   int    exitcode); */
-.section .text.crt.sched.pthread.pthread_unmap_stack_and_exit
+.section .text.crt.sched.pthread
 INTERN_FUNCTION(libc_pthread_unmap_stack_and_exit)
 	/* NOTE: We  must use `int 80h' for syscalls here, since the (more efficient)
 	 *       method of using `__i386_syscall()' would require use of stack memory

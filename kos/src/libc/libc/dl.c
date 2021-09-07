@@ -34,19 +34,19 @@
 DECL_BEGIN
 
 #ifdef HAVE_LAZY_LIBDL_RELOCATIONS
-#define DEFINE_LAZY_LIBDL_RELOCATION(section, Ptype, name)                                   \
-	PRIVATE ATTR_SECTION(".bss" section ".pdyn_" #name) Ptype pdyn_##name           = NULL;  \
-	PRIVATE ATTR_SECTION(".rodata" section ".name_" #name) char const name_##name[] = #name; \
-	INTERN ATTR_SECTION(".text" section ".libc_get_" #name)                                  \
-	ATTR_RETNONNULL WUNUSED Ptype NOTHROW_NCX(LIBCCALL libc_get_##name)(void) {              \
-		if (!pdyn_##name) {                                                                  \
-			Ptype pfun;                                                                      \
-			*(void **)&pfun = dlsym(RTLD_DEFAULT, name_##name);                              \
-			if unlikely(!pfun)                                                               \
-				abort();                                                                     \
-			ATOMIC_WRITE(pdyn_##name, pfun);                                                 \
-		}                                                                                    \
-		return pdyn_##name;                                                                  \
+#define DEFINE_LAZY_LIBDL_RELOCATION(section, Ptype, name)                      \
+	PRIVATE ATTR_SECTION(".bss" section) Ptype pdyn_##name           = NULL;    \
+	PRIVATE ATTR_SECTION(".rodata" section) char const name_##name[] = #name;   \
+	INTERN ATTR_SECTION(".text" section)                                        \
+	ATTR_RETNONNULL WUNUSED Ptype NOTHROW_NCX(LIBCCALL libc_get_##name)(void) { \
+		if (!pdyn_##name) {                                                     \
+			Ptype pfun;                                                         \
+			*(void **)&pfun = dlsym(RTLD_DEFAULT, name_##name);                 \
+			if unlikely(!pfun)                                                  \
+				abort();                                                        \
+			ATOMIC_WRITE(pdyn_##name, pfun);                                    \
+		}                                                                       \
+		return pdyn_##name;                                                     \
 	}
 DEFINE_LAZY_LIBDL_RELOCATION(LIBC_DLOPEN_SECTION, PDLOPEN, dlopen)
 DEFINE_LAZY_LIBDL_RELOCATION(LIBC_DLCLOSE_SECTION, PDLCLOSE, dlclose)

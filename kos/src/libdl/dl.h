@@ -304,7 +304,7 @@ NOTHROW_NCX(CC DlModule_ElfGetLocalSymbol)(USER DlModule *self,
 /* Find  the  DL   module  mapping   the  specified   file.
  * If no such module is loaded, `NULL' is returned instead.
  * @return: NULL: No such module exists (NOTE: No error was set in this case!) */
-INTDEF REF_IF(!(return->dm_flags & RTLD_NODELETE)) DlModule *
+INTERN REF_IF(!(return->dm_flags & RTLD_NODELETE)) DlModule *
 NOTHROW_NCX(CC DlModule_FindFromFilename)(USER char const *filename)
 		THROWS(E_SEGFAULT);
 

@@ -54,16 +54,6 @@
 
 %[define_ccompat_header("cstdio")]
 
-/* Declare stdio data sections as known, so they are guarantied to get linked properly */
-%[declare_known_section(".data.crt.FILE.core.read")]
-%[declare_known_section(".data.crt.FILE.core.write")]
-%[declare_known_section(".data.crt.FILE.core.seek")]
-%[declare_known_section(".data.crt.FILE.core.utility")]
-%[declare_known_section(".data.crt.FILE.locked.utility")]
-%[declare_known_section(".data.crt.FILE.locked.read.read")]
-%[declare_known_section(".data.crt.FILE.locked.write.write")]
-
-
 %[define_replacement(FILE     = __FILE)]
 %[define_replacement(fd_t     = __fd_t)]
 %[define_replacement(atflag_t = __atflag_t)]

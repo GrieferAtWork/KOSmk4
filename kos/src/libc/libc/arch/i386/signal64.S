@@ -30,7 +30,7 @@
 
 #include <syscall.h>
 
-.section .text.crt.sched.signal.sig_restore
+.section .text.crt.sched.signal
 INTERN_FUNCTION(libc_sig_restore)
 	.cfi_startproc simple
 	.cfi_signal_frame

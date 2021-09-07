@@ -402,7 +402,7 @@ function customDirectivesParser(context: LoaderContext): bool {
 	case "declare_user_export":
 	case "declare_kernel_export":
 	case "declare_kernel_only_export":
-	case "declare_known_section": {
+	case "declare_known_section_class": {
 		local s = tok == "declare_user_export"
 			? knownUserExports
 			: tok == "declare_kernel_export"
@@ -571,7 +571,166 @@ function doPrint_include_crtFeatures_crtKosKernel(fp: File) {
 	wrt.flush();
 }
 
+class WildcardRule {
+	this = default;
+	public member pattern: string;
+	public member sections: {string...};
+}
 
+function resolveLine(line: {string | WildcardRule...}): {string...} {
+	for (local e: line) {
+		if (e is WildcardRule) {
+			yield e.sections...;
+		} else {
+			yield e;
+		}
+	}
+}
+
+
+@@Update the file "/src/libc/crt-order.h"
+function doPrint_src_libc_crtOrder() {
+	final local ORDER_FILENAME = "src/libc/crt-order.h";
+	printMessage("Parsing crt-order: {!r} (begin)".format({ ORDER_FILENAME }));
+	local usedSectionNames: HashSet with string = copy knownLibcSections;
+	for (local header: allSystemHeaders.values) {
+		for (local field: { "order_libcAutoSource", "order_libcDosabiSource", "order_libcUserSource" }) {
+			for (local item: header.operator . (field)) {
+				if (item !is LibraryFunction)
+					continue;
+				for (local binding/*: LibraryFunctionBinding*/ : item.functionBindings) {
+					local sect = binding.implSection;
+					if (sect !is none) {
+						sect = str(sect);
+						if (sect.startswith(".text"))
+							usedSectionNames.insert(sect[5:]);
+					}
+				}
+			}
+		}
+	}
+
+	/* Remove a couple of special section names we may have picked up on. */
+	for (local x: { "", ".unlikely", ".likely", ".hot", ".cold" })
+		usedSectionNames.remove(x);
+
+	/* Parse rules */
+	local repeatRules: {string...} = [];     /* @REPEAT rules */
+	local orderRules: {{string...}...} = []; /* Output order rules (one per line) */
+	local oldData = File.open(ORDER_FILENAME, "rb").read();
+	local data = oldData.decode("utf-8").unifylines();
+	/* Find markers. */
+	local dataRulesStart   = data.index("/*[[[order") + 10;
+	local dataRulesEnd     = data.index("]]]*/", dataRulesStart);
+	local orderOutputStart = dataRulesEnd + 5;
+	local orderOutputEnd   = data.index("/*[[[end]]]*/", orderOutputStart);
+	local i = dataRulesStart;
+	while (i < dataRulesEnd) {
+		if (data.isspace(i)) {
+			++i;
+			continue;
+		}
+		local eol = data.find("\n", i, dataRulesEnd);
+		if (eol < 0)
+			eol = dataRulesEnd;
+		local com = data.find("#", i, eol);
+		if (com < 0)
+			com = eol;
+		local line = data[i:com].rstrip();
+		i = eol + 1;
+		if (!line)
+			continue;
+		if (line.startswith("@REPEAT")) {
+			line = line[7:].lstrip();
+			repeatRules.append(line);
+			continue;
+		}
+		local items = [];
+		for (local el: line.split(" ")) {
+			el = el.strip();
+			if (el.startswith("!")) {
+				usedSectionNames.append(el);
+				el = el[1:];
+			}
+			items.append(el);
+		}
+		orderRules.append(items);
+	}
+
+	/* Apply repeat rules. */
+	local order: {{string...}...} = copy orderRules;
+	for (local prefix: repeatRules) {
+		for (local block: orderRules) {
+			order.append(Tuple(for (local r: block) prefix + r));
+		}
+	}
+
+	@@Final output order of sections
+	local sectionsOutputOrder: {{string...}...} = [];
+	local wildcardRules: {WildcardRule...} = [];
+	for (local block: order) {
+		local blockSections = [];
+		for (local rule: block) {
+			if ("*" in rule || "?" in rule) {
+				rule = WildcardRule(pattern: rule);
+				blockSections.append(rule);
+				wildcardRules.append(rule);
+			} else {
+				if (usedSectionNames.remove(rule))
+					blockSections.append(rule);
+			}
+		}
+		sectionsOutputOrder.append(blockSections);
+	}
+	/* Resolve wildcard rules. */
+	wildcardRules.sort([](x) -> x.pattern);
+	wildcardRules.sort([](x) -> x.pattern.length);
+	for (local rule: wildcardRules) {
+		local sections: {string...} = [];
+		local pattern = rule.pattern;
+again_search_wildcard:
+		for (local name: usedSectionNames) {
+			if (name.wmatch(pattern)) {
+				usedSectionNames.remove(name);
+				sections.append(name);
+				goto again_search_wildcard;
+			}
+		}
+		sections.sort();
+		rule.sections = sections;
+	}
+
+	/* Check if there are any sections that don't appear int the output order */
+	if (usedSectionNames) {
+		for (local n: usedSectionNames.sorted())
+			print File.stderr: "Unmapped section:", repr n;
+		throw Error("Unmapped sections are present");
+	}
+
+	/* Print the section-order macro. */
+	local newMacroText = File.Writer();
+	newMacroText << "\n#define CRT_SECTIONS_LINKORDER(CB, PREFIX) \\\n";
+	for (local line: sectionsOutputOrder) {
+		line = Tuple(resolveLine(line));
+		if (!line)
+			continue;
+		newMacroText << "\tCB("
+			<< " ".join(for (local name: line) "PREFIX" + name)
+			<< ") \\\n";
+	}
+	newMacroText = newMacroText.string[:-2] + "\n";
+	local newData = "{}{}{}".format({
+		data[:orderOutputStart],
+		newMacroText,
+		data[orderOutputEnd:],
+	}).encode("utf-8");
+	if (newData != oldData) {
+		printMessage("Updating crt-order: {!r}".format({ ORDER_FILENAME }));
+		with (local fp = File.open(ORDER_FILENAME, "w"))
+			fp.write(newData);
+	}
+	printMessage("Parsing crt-order: {!r} (end)".format({ ORDER_FILENAME }));
+}
 
 @@Print the file "/kos/src/libc/libc/dosabi-functions.h"
 function doPrint_src_libc_libc_dosabiFunctions(fp: File) {
@@ -771,6 +930,183 @@ function doPrint_include_gnu_stubs(fp: File) {
 	cWriter.flush();
 }
 
+function handleSectionName(name: string) {
+	if (name.startswith("\"") && name.endswith("\""))
+		name = name[1:-1];
+	for (local prefix: { ".text", ".data", ".rodata", ".bss" }) {
+		if (name.startswith(prefix)) {
+			name = str(name[#prefix:]);
+			if (name)
+				knownLibcSections.insert(name);
+			return true;
+		}
+	}
+	return false;
+}
+
+function scanFileForSectionNames(filename: string) {
+	printMessage("Scanning for section names: {!r} (begin)".format({ filename }));
+	local data = File.open(filename, "rb").read();
+	local i = 0, len = #data;
+	while (i < len) {
+		if (data.isspace(i)) {
+			++i;
+			continue;
+		}
+		local ch = data[i];
+		++i;
+		switch (ch) {
+
+		case "A".ord(): {
+			if (data.startswith("TTR_SECTION", i)) {
+				i += 11;
+				while (i < len && data.isspace(i))
+					++i;
+				if (i >= len)
+					break;
+				if (data[i] != "(".ord())
+					break;
+				do {
+					++i;
+				} while (i < len && data.isspace(i));
+				if (data[i] != "\"".ord())
+					break;
+				++i;
+				local sectionNameStart = i;
+				i = data.find("\"", i);
+				if (i < 0)
+					goto done;
+				handleSectionName(data[sectionNameStart:i]);
+				++i;
+			}
+		}	break;
+
+		case "D".ord(): {
+			if (data.startswith("EFINE_NOREL_GLOBAL_META", i)) {
+				i += 23;
+				while (i < len && data.isspace(i))
+					++i;
+				if (i >= len)
+					break;
+				if (data[i] != "(".ord())
+					break;
+				local s = data.find("\"", i);
+				if (s < 0)
+					break;
+				i = s + 1;
+				local sectionNameStart = i;
+				i = data.find("\"", i);
+				if (i < 0)
+					goto done;
+				handleSectionName(".text" + data[sectionNameStart:i]);
+				++i;
+			}
+		}	break;
+
+		case ".".ord(): {
+			while (i < len && data.isspace(i))
+				++i;
+			if (data.startswith("section", i)) {
+				i += 7;
+handle_asm_section_directive:
+				if (i >= len)
+					goto done;
+				if (!data.isspace(i))
+					break;
+				do {
+					++i;
+				} while (i < len && data.isspace(i));
+				if (i >= len)
+					goto done;
+				if (data[i] == "\"".ord()) {
+					++i;
+					local sectionNameStart = i;
+					i = data.find("\"", i);
+					if (i < 0)
+						goto done;
+					handleSectionName(data[sectionNameStart:i]);
+					++i;
+				} else {
+					local sectionNameStart = i;
+					while (i < len && (data.issymcont(i) || data[i] in ".$".ordinals))
+						++i;
+					if (i > sectionNameStart)
+						handleSectionName(data[sectionNameStart:i]);
+				}
+			} else if (data.startswith("pushsection", i)) {
+				i += 11;
+				goto handle_asm_section_directive;
+			}
+		}	break;
+
+		case "\"".ord():
+		case "\'".ord(): {
+			while (i < len) {
+				local ch2 = data[i];
+				++i;
+				if (ch2 == ch)
+					break;
+				if (ch2 == "\\".ord())
+					++i;
+			}
+		}	break;
+
+		case "/".ord(): {
+			if (i >= len)
+				goto done;
+			ch = data[i];
+			if (ch == "/".ord()) {
+				i = data.find("\n", i);
+				if (i < 0)
+					goto done;
+			} else if (ch == "*".ord()) {
+				i = data.find("*/", i+1);
+				if (i < 0)
+					goto done;
+				i += 2;
+			}
+		}	break;
+
+		case "#".ord(): {
+			local eol = data.find("\n", i);
+			if (eol < 0)
+				eol = len;
+			local com = data.find("/*", i, eol);
+			if (com >= 0)
+				eol = com;
+			local line = data[i:eol].lstrip();
+			if (line.startswith("define ")) {
+				local name;
+				line = line[7:].lstrip();
+				name, none, line = line.partition(" ")...;
+				name = name.strip();
+				line = line.strip();
+				if ("SECTION" in name && line) {
+					local com = line.find("//");
+					if (com >= 0)
+						line = line[:com].rstrip();
+					handleSectionName(line);
+				}
+			}
+			i = eol;
+		}	break;
+
+		default:
+			break;
+		}
+	}
+done:
+	printMessage("Scanning for section names: {!r} (end)".format({ filename }));
+}
+
+
+function startScanSectionJobs(filenamePattern: string) {
+	local head = fs.abspath(fs.headof(filenamePattern));
+	for (local filename: fs.query(filenamePattern)) {
+		startTask(scanFileForSectionNames, (head + "/" + filename,));
+	}
+}
+
 
 
 try {
@@ -795,7 +1131,21 @@ try {
 			fullPath, fs.fileof(filename)));
 	}
 
+	/* Scan libc source files for additional section names. */
+	startTask(scanFileForSectionNames, ("src/libc/api.h",));
+	startScanSectionJobs("src/libc/hybrid/arch/i386/*.h");
+	startScanSectionJobs("src/libc/hybrid/arch/i386/*.c");
+	startScanSectionJobs("src/libc/hybrid/arch/i386/*.S");
+	startScanSectionJobs("src/libc/hybrid/*.c");
+	startScanSectionJobs("src/libc/hybrid/*.h");
+	startScanSectionJobs("src/libc/libc/arch/i386/*.h");
+	startScanSectionJobs("src/libc/libc/arch/i386/*.c");
+	startScanSectionJobs("src/libc/libc/arch/i386/*.S");
+	startScanSectionJobs("src/libc/libc/*.c");
+	startScanSectionJobs("src/libc/libc/*.h");
+	startScanSectionJobs("src/libc/user/*.c");
 	waitTasks();
+
 	messagePrefix = "2/3";
 
 	/* Define some special files */
@@ -803,6 +1153,7 @@ try {
 	startTask(updateHashedFile, ("src/libc/crt-features.h", doPrint_src_libc_crtFeatures));
 	startTask(updateHashedFile, ("src/libc/libc/dosabi-functions.h", doPrint_src_libc_libc_dosabiFunctions));
 	startTask(updateHashedFile, ("src/libc/libc/dosabi-exports.h", doPrint_src_libc_libc_dosabiExports));
+	startTask(doPrint_src_libc_crtOrder);
 
 	/* Generate the actual system headers (i.e. <string.h>) */
 	for (local name /*: string*/, header /*: SystemHeader*/: allSystemHeaders) {

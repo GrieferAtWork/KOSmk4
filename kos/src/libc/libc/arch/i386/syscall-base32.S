@@ -116,7 +116,7 @@
  * register unwind / sp-offset behavior.
  */
 
-.section .text.crt.syscall.selector
+.section .text.crt.syscalls.selector
 INTERN_FUNCTION(libc_x86_syscall_init)
 	.cfi_startproc
 	/* Right now, our stack looks like this:
@@ -221,7 +221,7 @@ INTERN_FUNCTION(libc_x86_syscall_init)
 END(libc_x86_syscall_init)
 
 
-.section .text.crt.syscall.x86_sysenter_common
+.section .text.crt.syscalls.x86_sysenter_common
 INTERN_FUNCTION(libc_x86_sysenter_common)
 	.cfi_startproc
 	popl_cfi %edi     /* EDI = RETURN_PC */
@@ -271,7 +271,7 @@ END(libc_x86_sysenter_common)
 	.cfi_escape DW_OP_deref                               /* CFI: [*(u32 *)%esp] */
 
 
-.section .xdata.crt.syscall.__i386_syscall, "awx"
+.section .xdata, "awx"
 	.align 16                /* Align by a whole cacheline */
 	/* NOTE: Technically, this `0x90' only has to be something that isn't `0xfd'! */
 	.byte  0x90              /* nop                             nop           */
@@ -321,7 +321,7 @@ INTERN_FUNCTION(libc___i386_syscall)
 #undef _CFI_FUNBASE_OFFSET
 END(libc___i386_syscall)
 
-.section .xdata.crt.syscall.__i386_Xsyscall, "awx"
+.section .xdata, "awx"
 	.align 16                /* Align by a whole cacheline */
 INTERN_FUNCTION(libc___i386_Xsyscall)
 #define _CFI_FUNBASE_OFFSET 1 /* Offset from `.cfi_startproc' to 0x55 (`pushl %ebp') or 0xcd (`int $0x80') */
@@ -381,7 +381,7 @@ END(libc___i386_Xsyscall)
 
 
 
-.section .text.crt.system.utility.syscall
+.section .text.crt.system.utility
 INTERN_FUNCTION(libc_syscall)
 	.cfi_startproc
 	pushl_cfi_r %ebx
@@ -423,7 +423,7 @@ DEFINE_PUBLIC_ALIAS(syscall64, libc_syscall64)
 DEFINE_PUBLIC_ALIAS(__syscall, libc_syscall64)
 
 
-.section .text.crt.except.system.utility.Syscall
+.section .text.crt.except.system.utility
 INTERN_FUNCTION(libc_Syscall)
 	.cfi_startproc
 	pushl_cfi_r %ebx

@@ -1171,20 +1171,20 @@ typedef NONNULL((1, 2)) void (LIBCCALL *P__REGISTER_FRAME_INFO_TABLE_BASES)(void
 typedef NONNULL((1)) struct rf_object * /*NOTHROW*/ (LIBCCALL *P__DEREGISTER_FRAME_INFO)(void const *begin);
 typedef NONNULL((2)) void const * /*NOTHROW_NCX*/ (LIBCCALL *P_UNWIND_FIND_FDE)(void const *pc, struct dwarf_eh_bases *__restrict bases);
 
-PRIVATE ATTR_SECTION(".bss.compat.linux") P__REGISTER_FRAME_INFO_BASES /*      */ pdyn___register_frame_info_bases       = NULL;
-PRIVATE ATTR_SECTION(".bss.compat.linux") P__REGISTER_FRAME_INFO_TABLE_BASES /**/ pdyn___register_frame_info_table_bases = NULL;
-PRIVATE ATTR_SECTION(".bss.compat.linux") P__DEREGISTER_FRAME_INFO /*          */ pdyn___deregister_frame_info           = NULL;
-PRIVATE ATTR_SECTION(".bss.compat.linux") P_UNWIND_FIND_FDE /*                 */ pdyn__Unwind_Find_FDE                  = NULL;
+PRIVATE ATTR_SECTION(".bss.crt.compat.linux.__register_frame") P__REGISTER_FRAME_INFO_BASES /*      */ pdyn___register_frame_info_bases       = NULL;
+PRIVATE ATTR_SECTION(".bss.crt.compat.linux.__register_frame") P__REGISTER_FRAME_INFO_TABLE_BASES /**/ pdyn___register_frame_info_table_bases = NULL;
+PRIVATE ATTR_SECTION(".bss.crt.compat.linux.__register_frame") P__DEREGISTER_FRAME_INFO /*          */ pdyn___deregister_frame_info           = NULL;
+PRIVATE ATTR_SECTION(".bss.crt.compat.linux.__register_frame") P_UNWIND_FIND_FDE /*                 */ pdyn__Unwind_Find_FDE                  = NULL;
 
-PRIVATE ATTR_SECTION(".rodata.compat.linux") char const name___register_frame_info_bases[]       = "__register_frame_info_bases";
-PRIVATE ATTR_SECTION(".rodata.compat.linux") char const name___register_frame_info_table_bases[] = "__register_frame_info_table_bases";
-PRIVATE ATTR_SECTION(".rodata.compat.linux") char const name___deregister_frame_info[]           = "__deregister_frame_info";
-PRIVATE ATTR_SECTION(".rodata.compat.linux") char const name__Unwind_Find_FDE[]                  = "_Unwind_Find_FDE";
+PRIVATE ATTR_SECTION(".rodata.crt.compat.linux.__register_frame") char const name___register_frame_info_bases[]       = "__register_frame_info_bases";
+PRIVATE ATTR_SECTION(".rodata.crt.compat.linux.__register_frame") char const name___register_frame_info_table_bases[] = "__register_frame_info_table_bases";
+PRIVATE ATTR_SECTION(".rodata.crt.compat.linux.__register_frame") char const name___deregister_frame_info[]           = "__deregister_frame_info";
+PRIVATE ATTR_SECTION(".rodata.crt.compat.linux.__register_frame") char const name__Unwind_Find_FDE[]                  = "_Unwind_Find_FDE";
 
 /* Initialize RegisterFrame-bindings implemented in libunwind. */
 #define ENSURE_LIBUNWIND_LOADED_RF() \
 	(ATOMIC_READ(pdyn__Unwind_Find_FDE) != NULL || (initialize_libunwind_rf(), 0))
-INTERN SECTION_EXCEPT_TEXT ATTR_NOINLINE
+INTERN ATTR_NOINLINE ATTR_SECTION(".text.crt.compat.linux.__register_frame")
 void LIBCCALL initialize_libunwind_rf(void) {
 	ENSURE_LIBUNWIND_LOADED();
 	/* Dynamically bind functions. */
@@ -1216,54 +1216,54 @@ INTDEF struct rf_object *NOTHROW(LIBCCALL libc___deregister_frame_info)(/*nullab
 INTDEF NONNULL((1)) void NOTHROW(LIBCCALL libc___deregister_frame)(void const *begin);
 INTDEF NONNULL((2)) void const *NOTHROW_NCX(LIBCCALL libc__Unwind_Find_FDE)(void const *pc, struct dwarf_eh_bases *__restrict bases);
 
-INTERN NONNULL((2)) void LIBCCALL
+INTERN ATTR_SECTION(".text.crt.compat.linux.__register_frame") NONNULL((2)) void LIBCCALL
 libc___register_frame_info_bases(/*nullable*/ void const *begin, struct rf_object *__restrict ob,
                                  void const *tbase, void const *dbase) {
 	ENSURE_LIBUNWIND_LOADED_RF();
 	(*pdyn___register_frame_info_bases)(begin, ob, tbase, dbase);
 }
 
-INTERN NONNULL((1, 2)) void LIBCCALL
+INTERN ATTR_SECTION(".text.crt.compat.linux.__register_frame") NONNULL((1, 2)) void LIBCCALL
 libc___register_frame_info_table_bases(void const *const *begin, struct rf_object *__restrict ob,
                                        void const *tbase, void const *dbase) {
 	ENSURE_LIBUNWIND_LOADED_RF();
 	(*pdyn___register_frame_info_table_bases)(begin, ob, tbase, dbase);
 }
 
-INTERN struct rf_object *
+INTERN ATTR_SECTION(".text.crt.compat.linux.__register_frame") struct rf_object *
 NOTHROW(LIBCCALL libc___deregister_frame_info)(/*nullable*/ void const *begin) {
 	ENSURE_LIBUNWIND_LOADED_RF();
 	return (*pdyn___deregister_frame_info)(begin);
 }
 
-INTERN NONNULL((2)) void const *
+INTERN ATTR_SECTION(".text.crt.compat.linux.__register_frame") NONNULL((2)) void const *
 NOTHROW_NCX(LIBCCALL libc__Unwind_Find_FDE)(void const *pc, struct dwarf_eh_bases *__restrict bases) {
 	ENSURE_LIBUNWIND_LOADED_RF();
 	return (*pdyn__Unwind_Find_FDE)(pc, bases);
 }
 
-INTERN NONNULL((2)) void LIBCCALL
+INTERN ATTR_SECTION(".text.crt.compat.linux.__register_frame") NONNULL((2)) void LIBCCALL
 libc___register_frame_info(/*nullable*/ void const *begin, struct rf_object *__restrict ob) {
 	libc___register_frame_info_bases(begin, ob, NULL, NULL);
 }
 
-INTERN NONNULL((1)) void LIBCCALL
+INTERN ATTR_SECTION(".text.crt.compat.linux.__register_frame") NONNULL((1)) void LIBCCALL
 libc___register_frame(void const *begin) {
 	if (*(uint32_t const *)begin != 0)
 		libc___register_frame_info(begin, rf_object_malloc());
 }
 
-INTERN NONNULL((1, 2)) void LIBCCALL
+INTERN ATTR_SECTION(".text.crt.compat.linux.__register_frame") NONNULL((1, 2)) void LIBCCALL
 libc___register_frame_info_table(void const *const *begin, struct rf_object *__restrict ob) {
 	libc___register_frame_info_table_bases(begin, ob, NULL, NULL);
 }
 
-INTERN NONNULL((1)) void LIBCCALL
+INTERN ATTR_SECTION(".text.crt.compat.linux.__register_frame") NONNULL((1)) void LIBCCALL
 libc___register_frame_table(void const *const *begin) {
 	libc___register_frame_info_table(begin, rf_object_malloc());
 }
 
-INTERN NONNULL((1)) void
+INTERN ATTR_SECTION(".text.crt.compat.linux.__register_frame") NONNULL((1)) void
 NOTHROW(LIBCCALL libc___deregister_frame)(void const *begin) {
 	if (*(uint32_t const *)begin != 0)
 		free(libc___deregister_frame_info(begin));

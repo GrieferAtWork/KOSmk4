@@ -60,7 +60,7 @@ DEFINE_INTERN_ALIAS(libc_kfstatat, libc_kos_fstatat);
 DEFINE_INTERN_ALIAS(libc_kfstatat64, libc_kos_fstatat);
 
 /* KOS Native stat() */
-INTERN ATTR_SECTION(".text.crt.fs.stat.kos_fstat") NONNULL((2)) int
+INTERN ATTR_SECTION(".text.crt.fs.stat") NONNULL((2)) int
 NOTHROW_RPC(LIBCCALL libc_kos_fstat)(fd_t fd,
                                      struct __kos_stat *__restrict buf) {
 	errno_t error;
@@ -69,7 +69,7 @@ NOTHROW_RPC(LIBCCALL libc_kos_fstat)(fd_t fd,
 	return libc_seterrno_syserr(error);
 }
 
-INTERN ATTR_SECTION(".text.crt.fs.stat.kos_stat") NONNULL((2)) int
+INTERN ATTR_SECTION(".text.crt.fs.stat") NONNULL((2)) int
 NOTHROW_RPC(LIBCCALL libc_kos_stat)(char const *__restrict filename,
                                     struct __kos_stat *__restrict buf) {
 	errno_t error;
@@ -80,7 +80,7 @@ NOTHROW_RPC(LIBCCALL libc_kos_stat)(char const *__restrict filename,
 	return libc_seterrno_syserr(error);
 }
 
-INTERN ATTR_SECTION(".text.crt.fs.stat.kos_lstat") NONNULL((2)) int
+INTERN ATTR_SECTION(".text.crt.fs.stat") NONNULL((2)) int
 NOTHROW_RPC(LIBCCALL libc_kos_lstat)(char const *__restrict filename,
                                      struct __kos_stat *__restrict buf) {
 	errno_t error;
@@ -91,7 +91,7 @@ NOTHROW_RPC(LIBCCALL libc_kos_lstat)(char const *__restrict filename,
 	return libc_seterrno_syserr(error);
 }
 
-INTERN ATTR_SECTION(".text.crt.fs.stat.kos_fstatat") NONNULL((2)) int
+INTERN ATTR_SECTION(".text.crt.fs.stat") NONNULL((2)) int
 NOTHROW_RPC(LIBCCALL libc_kos_fstatat)(fd_t dirfd,
                                        char const *__restrict filename,
                                        struct __kos_stat *__restrict buf,
@@ -115,7 +115,7 @@ DEFINE_PUBLIC_ALIAS(DOS$fstat, libc_cyg_fstat);
 DEFINE_PUBLIC_ALIAS(DOS$fstat64, libc_cyg_fstat);
 DEFINE_PUBLIC_ALIAS(DOS$fstatat, libc_cyg_fstatat);
 DEFINE_PUBLIC_ALIAS(DOS$fstatat64, libc_cyg_fstatat);
-LOCAL NONNULL((1, 2)) void LIBCCALL
+LOCAL ATTR_SECTION(".text.crt.dos.compat.cyg.fs.stat") NONNULL((1, 2)) void LIBCCALL
 convstat_kos2cyg(struct __cyg_stat *__restrict dst,
                  struct __kos_stat const *__restrict src) {
 	dst->st_dev      = (u32)src->st_dev;
@@ -134,7 +134,7 @@ convstat_kos2cyg(struct __cyg_stat *__restrict dst,
 	dst->st_birthtim = src->st_ctim64;
 }
 
-INTERN ATTR_SECTION(".text.crt.dos.fs.stat.cyg_fstat") NONNULL((2)) int
+INTERN ATTR_SECTION(".text.crt.dos.compat.cyg.fs.stat") NONNULL((2)) int
 NOTHROW_RPC(LIBCCALL libc_cyg_fstat)(fd_t fd,
                                      struct __cyg_stat *__restrict buf) {
 	struct __kos_stat st;
@@ -144,7 +144,7 @@ NOTHROW_RPC(LIBCCALL libc_cyg_fstat)(fd_t fd,
 	return result;
 }
 
-INTERN ATTR_SECTION(".text.crt.dos.fs.stat.cyg_stat") NONNULL((1, 2)) int
+INTERN ATTR_SECTION(".text.crt.dos.compat.cyg.fs.stat") NONNULL((1, 2)) int
 NOTHROW_RPC(LIBCCALL libc_cyg_stat)(char const *__restrict filename,
                                     struct __cyg_stat *__restrict buf) {
 	struct __kos_stat st;
@@ -154,7 +154,7 @@ NOTHROW_RPC(LIBCCALL libc_cyg_stat)(char const *__restrict filename,
 	return result;
 }
 
-INTERN ATTR_SECTION(".text.crt.dos.fs.stat.cyg_lstat") NONNULL((1, 2)) int
+INTERN ATTR_SECTION(".text.crt.dos.compat.cyg.fs.stat") NONNULL((1, 2)) int
 NOTHROW_RPC(LIBCCALL libc_cyg_lstat)(char const *__restrict filename,
                                      struct __cyg_stat *__restrict buf) {
 	struct __kos_stat st;
@@ -164,7 +164,7 @@ NOTHROW_RPC(LIBCCALL libc_cyg_lstat)(char const *__restrict filename,
 	return result;
 }
 
-INTERN ATTR_SECTION(".text.crt.dos.fs.stat.cyg_fstatat") NONNULL((2, 3)) int
+INTERN ATTR_SECTION(".text.crt.dos.compat.cyg.fs.stat") NONNULL((2, 3)) int
 NOTHROW_RPC(LIBCCALL libc_cyg_fstatat)(fd_t dirfd,
                                        char const *__restrict filename,
                                        struct __cyg_stat *__restrict buf,
@@ -196,7 +196,7 @@ DEFINE_INTERN_ALIAS(libc_fstat, libc_glc_fstat);
 DEFINE_INTERN_ALIAS(libc_fstat64, libc_glc_fstat64);
 DEFINE_INTERN_ALIAS(libc_fstatat, libc_glc_fstatat);
 DEFINE_INTERN_ALIAS(libc_fstatat64, libc_glc_fstatat64);
-LOCAL NONNULL((1, 2)) void LIBCCALL
+LOCAL ATTR_SECTION(".text.crt.glibc.fs.stat") NONNULL((1, 2)) void LIBCCALL
 convstat_kos2glc(struct __glc_stat *__restrict dst,
                  struct __kos_stat const *__restrict src) {
 	dst->st_dev     = (u64)src->st_dev;
@@ -214,7 +214,7 @@ convstat_kos2glc(struct __glc_stat *__restrict dst,
 	dst->st_ctim    = src->st_ctim32;
 }
 
-LOCAL NONNULL((1, 2)) void LIBCCALL
+LOCAL ATTR_SECTION(".text.crt.glibc.fs.stat") NONNULL((1, 2)) void LIBCCALL
 convstat_kos2glc64(struct __glc_stat64 *__restrict dst,
                    struct __kos_stat const *__restrict src) {
 	dst->st_dev     = (u64)src->st_dev;
@@ -233,7 +233,7 @@ convstat_kos2glc64(struct __glc_stat64 *__restrict dst,
 	dst->st_ino64   = (u64)src->st_ino64;
 }
 
-INTERN ATTR_SECTION(".text.crt.fs.stat_glc.glc_fstat") NONNULL((2)) int
+INTERN ATTR_SECTION(".text.crt.glibc.fs.stat") NONNULL((2)) int
 NOTHROW_RPC(LIBCCALL libc_glc_fstat)(fd_t fd,
                                      struct __glc_stat *__restrict buf) {
 	struct __kos_stat st;
@@ -243,7 +243,7 @@ NOTHROW_RPC(LIBCCALL libc_glc_fstat)(fd_t fd,
 	return result;
 }
 
-INTERN ATTR_SECTION(".text.crt.fs.stat_glc.glc_fstat64") NONNULL((2)) int
+INTERN ATTR_SECTION(".text.crt.glibc.fs.stat") NONNULL((2)) int
 NOTHROW_RPC(LIBCCALL libc_glc_fstat64)(fd_t fd,
                                        struct __glc_stat64 *__restrict buf) {
 	struct __kos_stat st;
@@ -253,7 +253,7 @@ NOTHROW_RPC(LIBCCALL libc_glc_fstat64)(fd_t fd,
 	return result;
 }
 
-INTERN ATTR_SECTION(".text.crt.fs.stat_glc.glc_stat") NONNULL((1, 2)) int
+INTERN ATTR_SECTION(".text.crt.glibc.fs.stat") NONNULL((1, 2)) int
 NOTHROW_RPC(LIBCCALL libc_glc_stat)(char const *__restrict filename,
                                     struct __glc_stat *__restrict buf) {
 	struct __kos_stat st;
@@ -263,7 +263,7 @@ NOTHROW_RPC(LIBCCALL libc_glc_stat)(char const *__restrict filename,
 	return result;
 }
 
-INTERN ATTR_SECTION(".text.crt.fs.stat_glc.glc_stat64") NONNULL((1, 2)) int
+INTERN ATTR_SECTION(".text.crt.glibc.fs.stat") NONNULL((1, 2)) int
 NOTHROW_RPC(LIBCCALL libc_glc_stat64)(char const *__restrict filename,
                                       struct __glc_stat64 *__restrict buf) {
 	struct __kos_stat st;
@@ -273,7 +273,7 @@ NOTHROW_RPC(LIBCCALL libc_glc_stat64)(char const *__restrict filename,
 	return result;
 }
 
-INTERN ATTR_SECTION(".text.crt.fs.stat_glc.glc_lstat") NONNULL((1, 2)) int
+INTERN ATTR_SECTION(".text.crt.glibc.fs.stat") NONNULL((1, 2)) int
 NOTHROW_RPC(LIBCCALL libc_glc_lstat)(char const *__restrict filename,
                                      struct __glc_stat *__restrict buf) {
 	struct __kos_stat st;
@@ -283,7 +283,7 @@ NOTHROW_RPC(LIBCCALL libc_glc_lstat)(char const *__restrict filename,
 	return result;
 }
 
-INTERN ATTR_SECTION(".text.crt.fs.stat_glc.glc_lstat64") NONNULL((1, 2)) int
+INTERN ATTR_SECTION(".text.crt.glibc.fs.stat") NONNULL((1, 2)) int
 NOTHROW_RPC(LIBCCALL libc_glc_lstat64)(char const *__restrict filename,
                                        struct __glc_stat64 *__restrict buf) {
 	struct __kos_stat st;
@@ -293,7 +293,7 @@ NOTHROW_RPC(LIBCCALL libc_glc_lstat64)(char const *__restrict filename,
 	return result;
 }
 
-INTERN ATTR_SECTION(".text.crt.fs.stat_glc.glc_fstatat") NONNULL((2, 3)) int
+INTERN ATTR_SECTION(".text.crt.glibc.fs.stat") NONNULL((2, 3)) int
 NOTHROW_RPC(LIBCCALL libc_glc_fstatat)(fd_t dirfd,
                                        char const *__restrict filename,
                                        struct __glc_stat *__restrict buf,
@@ -308,7 +308,7 @@ NOTHROW_RPC(LIBCCALL libc_glc_fstatat)(fd_t dirfd,
 	return result;
 }
 
-INTERN ATTR_SECTION(".text.crt.fs.stat_glc.glc_fstatat64") NONNULL((2, 3)) int
+INTERN ATTR_SECTION(".text.crt.glibc.fs.stat") NONNULL((2, 3)) int
 NOTHROW_RPC(LIBCCALL libc_glc_fstatat64)(fd_t dirfd,
                                          char const *__restrict filename,
                                          struct __glc_stat64 *__restrict buf,
@@ -352,7 +352,7 @@ DEFINE_INTERN_ALIAS(libc__stat32i64, libc_dos_stat32i64);
 DEFINE_INTERN_ALIAS(libc__stat64, libc_dos_stat64);
 DEFINE_INTERN_ALIAS(libc__stat64i32, libc_dos_stat64);
 
-LOCAL NONNULL((1, 2)) void LIBCCALL
+LOCAL ATTR_SECTION(".text.crt.dos.compat.dos.fs.stat") NONNULL((1, 2)) void LIBCCALL
 convstat_kos2dos32(struct __dos_stat32 *__restrict dst,
                    struct __kos_stat const *__restrict src) {
 	dst->st_dev     = (u32)src->st_dev;
@@ -367,7 +367,7 @@ convstat_kos2dos32(struct __dos_stat32 *__restrict dst,
 	dst->st_mtime32 = (time32_t)src->st_mtim32.tv_sec;
 	dst->st_ctime32 = (time32_t)src->st_ctim32.tv_sec;
 }
-LOCAL NONNULL((1, 2)) void LIBCCALL
+LOCAL ATTR_SECTION(".text.crt.dos.compat.dos.fs.stat") NONNULL((1, 2)) void LIBCCALL
 convstat_kos2dos32i64(struct __dos_stat32i64 *__restrict dst,
                       struct __kos_stat const *__restrict src) {
 	dst->st_dev     = (u32)src->st_dev;
@@ -383,7 +383,7 @@ convstat_kos2dos32i64(struct __dos_stat32i64 *__restrict dst,
 	dst->st_ctime32 = (time32_t)src->st_ctim32.tv_sec;
 }
 
-LOCAL NONNULL((1, 2)) void LIBCCALL
+LOCAL ATTR_SECTION(".text.crt.dos.compat.dos.fs.stat") NONNULL((1, 2)) void LIBCCALL
 convstat_kos2dos64(struct __dos_stat64 *__restrict dst,
                    struct __kos_stat const *__restrict src) {
 	dst->st_dev     = (u32)src->st_dev;
@@ -399,7 +399,7 @@ convstat_kos2dos64(struct __dos_stat64 *__restrict dst,
 	dst->st_ctime64 = (time64_t)src->st_ctim64.tv_sec;
 }
 
-INTERN ATTR_SECTION(".text.crt.dos.fs.stat.dos_fstat32") NONNULL((2)) int
+INTERN ATTR_SECTION(".text.crt.dos.compat.dos.fs.stat") NONNULL((2)) int
 NOTHROW_RPC(LIBCCALL libc_dos_fstat32)(fd_t fd,
                                        struct __dos_stat32 *__restrict buf) {
 	struct __kos_stat st;
@@ -409,7 +409,7 @@ NOTHROW_RPC(LIBCCALL libc_dos_fstat32)(fd_t fd,
 	return result;
 }
 
-INTERN ATTR_SECTION(".text.crt.dos.fs.stat.dos_fstat32i64") NONNULL((2)) int
+INTERN ATTR_SECTION(".text.crt.dos.compat.dos.fs.stat") NONNULL((2)) int
 NOTHROW_RPC(LIBCCALL libc_dos_fstat32i64)(fd_t fd,
                                           struct __dos_stat32i64 *__restrict buf) {
 	struct __kos_stat st;
@@ -419,7 +419,7 @@ NOTHROW_RPC(LIBCCALL libc_dos_fstat32i64)(fd_t fd,
 	return result;
 }
 
-INTERN ATTR_SECTION(".text.crt.dos.fs.stat.dos_fstat64") NONNULL((2)) int
+INTERN ATTR_SECTION(".text.crt.dos.compat.dos.fs.stat") NONNULL((2)) int
 NOTHROW_RPC(LIBCCALL libc_dos_fstat64)(fd_t fd,
                                        struct __dos_stat64 *__restrict buf) {
 	struct __kos_stat st;
@@ -429,7 +429,7 @@ NOTHROW_RPC(LIBCCALL libc_dos_fstat64)(fd_t fd,
 	return result;
 }
 
-INTERN ATTR_SECTION(".text.crt.dos.fs.stat.dos_stat32") NONNULL((1, 2)) int
+INTERN ATTR_SECTION(".text.crt.dos.compat.dos.fs.stat") NONNULL((1, 2)) int
 NOTHROW_RPC(LIBCCALL libc_dos_stat32)(char const *__restrict filename,
                                       struct __dos_stat32 *__restrict buf) {
 	struct __kos_stat st;
@@ -439,7 +439,7 @@ NOTHROW_RPC(LIBCCALL libc_dos_stat32)(char const *__restrict filename,
 	return result;
 }
 
-INTERN ATTR_SECTION(".text.crt.dos.fs.stat.dos_stat32i64") NONNULL((1, 2)) int
+INTERN ATTR_SECTION(".text.crt.dos.compat.dos.fs.stat") NONNULL((1, 2)) int
 NOTHROW_RPC(LIBCCALL libc_dos_stat32i64)(char const *__restrict filename,
                                          struct __dos_stat32i64 *__restrict buf) {
 	struct __kos_stat st;
@@ -449,7 +449,7 @@ NOTHROW_RPC(LIBCCALL libc_dos_stat32i64)(char const *__restrict filename,
 	return result;
 }
 
-INTERN ATTR_SECTION(".text.crt.dos.fs.stat.dos_stat64") NONNULL((1, 2)) int
+INTERN ATTR_SECTION(".text.crt.dos.compat.dos.fs.stat") NONNULL((1, 2)) int
 NOTHROW_RPC(LIBCCALL libc_dos_stat64)(char const *__restrict filename,
                                       struct __dos_stat64 *__restrict buf) {
 	struct __kos_stat st;

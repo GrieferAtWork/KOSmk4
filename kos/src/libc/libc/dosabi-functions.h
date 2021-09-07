@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x5d5f41a0 */
+/* HASH CRC-32:0x59d3041c */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -513,10 +513,10 @@ DFUN(".text.crt.dos.sched.futexlock", libd_futexlock_timedwaitwhile_anybit64, li
 DFUN(".text.crt.dos.sched.futexlock", libd_futexlock_timedwaitwhile_allbits64, libc_futexlock_timedwaitwhile_allbits64, TD, 4, TP, TP, TP, TP)
 
 /* kos.hop.api */
-DFUN(".text.crt.dos.syscall.hop", libd_hop, libc_hop, TIn(__SIZEOF_SYSCALL_LONG_T__), 3, TIn(__SIZEOF_FD_T__), TIn(__SIZEOF_SYSCALL_LONG_T__), TP)
-DFUN(".text.crt.dos.syscall.hop", libd_hopf, libc_hopf, TIn(__SIZEOF_SYSCALL_LONG_T__), 4, TIn(__SIZEOF_FD_T__), TIn(__SIZEOF_SYSCALL_LONG_T__), TIn(__SIZEOF_IOMODE_T__), TP)
-DFUN(".text.crt.dos.syscall.hop", libd_Hop, libc_Hop, TIn(__SIZEOF_SYSCALL_LONG_T__), 3, TIn(__SIZEOF_FD_T__), TIn(__SIZEOF_SYSCALL_LONG_T__), TP)
-DFUN(".text.crt.dos.syscall.hop", libd_Hopf, libc_Hopf, TIn(__SIZEOF_SYSCALL_LONG_T__), 4, TIn(__SIZEOF_FD_T__), TIn(__SIZEOF_SYSCALL_LONG_T__), TIn(__SIZEOF_IOMODE_T__), TP)
+DFUN(".text.crt.dos.kos.syscalls", libd_hop, libc_hop, TIn(__SIZEOF_SYSCALL_LONG_T__), 3, TIn(__SIZEOF_FD_T__), TIn(__SIZEOF_SYSCALL_LONG_T__), TP)
+DFUN(".text.crt.dos.kos.syscalls", libd_hopf, libc_hopf, TIn(__SIZEOF_SYSCALL_LONG_T__), 4, TIn(__SIZEOF_FD_T__), TIn(__SIZEOF_SYSCALL_LONG_T__), TIn(__SIZEOF_IOMODE_T__), TP)
+DFUN(".text.crt.dos.kos.syscalls", libd_Hop, libc_Hop, TIn(__SIZEOF_SYSCALL_LONG_T__), 3, TIn(__SIZEOF_FD_T__), TIn(__SIZEOF_SYSCALL_LONG_T__), TP)
+DFUN(".text.crt.dos.kos.syscalls", libd_Hopf, libc_Hopf, TIn(__SIZEOF_SYSCALL_LONG_T__), 4, TIn(__SIZEOF_FD_T__), TIn(__SIZEOF_SYSCALL_LONG_T__), TIn(__SIZEOF_IOMODE_T__), TP)
 
 /* kos.malloc */
 DFUN(".text.crt.dos.except.heap.malloc", libd_Malloc, libc_Malloc, TP, 1, TI)

@@ -43,19 +43,20 @@
 
 DECL_BEGIN
 
-#define SECTION_DEBUG_TEXT(x)   ATTR_SECTION(".text.crt.debug" x)
-#define SECTION_DEBUG_BSS(x)    ATTR_SECTION(".bss.crt.debug" x)
-#define SECTION_DEBUG_STRING(x) ATTR_SECTION(".rodata.crt.debug" x)
+#define SECTION_DEBUG_TEXT   ".text.crt.debug"
+#define SECTION_DEBUG_BSS    ".bss.crt.debug"
+#define SECTION_DEBUG_STRING ".rodata.crt.debug"
 
 INTDEF void *pdyn_libunwind; /* From `../libc/except.c' */
 INTDEF void LIBCCALL initialize_libunwind(void); /* From `../libc/except.c' */
 
-PRIVATE SECTION_DEBUG_BSS("pdyn_unwind_getreg_lcpustate") PUNWIND_GETREG_LCPUSTATE pdyn_unwind_getreg_lcpustate = NULL;
-PRIVATE SECTION_DEBUG_BSS("pdyn_unwind_setreg_lcpustate") PUNWIND_SETREG_LCPUSTATE pdyn_unwind_setreg_lcpustate = NULL;
-PRIVATE SECTION_DEBUG_STRING("name_unwind_getreg_lcpustate") char const name_unwind_getreg_lcpustate[] = "unwind_getreg_lcpustate";
-PRIVATE SECTION_DEBUG_STRING("name_unwind_setreg_lcpustate") char const name_unwind_setreg_lcpustate[] = "unwind_setreg_lcpustate";
+PRIVATE ATTR_SECTION(SECTION_DEBUG_BSS) PUNWIND_GETREG_LCPUSTATE pdyn_unwind_getreg_lcpustate = NULL;
+PRIVATE ATTR_SECTION(SECTION_DEBUG_BSS) PUNWIND_SETREG_LCPUSTATE pdyn_unwind_setreg_lcpustate = NULL;
+PRIVATE ATTR_SECTION(SECTION_DEBUG_STRING) char const name_unwind_getreg_lcpustate[] = "unwind_getreg_lcpustate";
+PRIVATE ATTR_SECTION(SECTION_DEBUG_STRING) char const name_unwind_setreg_lcpustate[] = "unwind_setreg_lcpustate";
 
-PRIVATE bool LIBCCALL initialize_libunwind_debug(void) {
+PRIVATE ATTR_SECTION(SECTION_DEBUG_TEXT) bool
+NOTHROW(LIBCCALL initialize_libunwind_debug)(void) {
 	initialize_libunwind();
 #define BIND(func, name)                                                 \
 	if unlikely((*(void **)&func = dlsym(pdyn_libunwind, name)) == NULL) \
@@ -75,19 +76,18 @@ err_init_failed:
 	(ATOMIC_READ(pdyn_unwind_setreg_lcpustate) != NULL || initialize_libunwind_debug())
 
 
-PRIVATE SECTION_DEBUG_BSS("pdyn_libdebuginfo") void *pdyn_libdebuginfo = NULL;
-PRIVATE SECTION_DEBUG_BSS("pdyn_unwind_for_debug")         PUNWIND_FOR_DEBUG         pdyn_unwind_for_debug         = NULL;
-PRIVATE SECTION_DEBUG_BSS("pdyn_debug_addr2line_sections_lock")     PDEBUG_ADDR2LINE_SECTIONS_LOCK     pdyn_debug_addr2line_sections_lock     = NULL;
-PRIVATE SECTION_DEBUG_BSS("pdyn_debug_addr2line_sections_unlock")   PDEBUG_ADDR2LINE_SECTIONS_UNLOCK   pdyn_debug_addr2line_sections_unlock   = NULL;
-PRIVATE SECTION_DEBUG_BSS("pdyn_debug_addr2line") PDEBUG_ADDR2LINE pdyn_debug_addr2line = NULL;
+PRIVATE ATTR_SECTION(SECTION_DEBUG_BSS) void *pdyn_libdebuginfo                                               = NULL;
+PRIVATE ATTR_SECTION(SECTION_DEBUG_BSS) PUNWIND_FOR_DEBUG pdyn_unwind_for_debug                               = NULL;
+PRIVATE ATTR_SECTION(SECTION_DEBUG_BSS) PDEBUG_ADDR2LINE_SECTIONS_LOCK pdyn_debug_addr2line_sections_lock     = NULL;
+PRIVATE ATTR_SECTION(SECTION_DEBUG_BSS) PDEBUG_ADDR2LINE_SECTIONS_UNLOCK pdyn_debug_addr2line_sections_unlock = NULL;
+PRIVATE ATTR_SECTION(SECTION_DEBUG_BSS) PDEBUG_ADDR2LINE pdyn_debug_addr2line                                 = NULL;
+#define unwind_for_debug                (*pdyn_unwind_for_debug)
+#define debug_addr2line_sections_lock   (*pdyn_debug_addr2line_sections_lock)
+#define debug_addr2line_sections_unlock (*pdyn_debug_addr2line_sections_unlock)
+#define debug_addr2line                 (*pdyn_debug_addr2line)
 
-#define unwind_for_debug         (*pdyn_unwind_for_debug)
-#define debug_addr2line_sections_lock     (*pdyn_debug_addr2line_sections_lock)
-#define debug_addr2line_sections_unlock   (*pdyn_debug_addr2line_sections_unlock)
-#define debug_addr2line (*pdyn_debug_addr2line)
-
-PRIVATE ATTR_NOINLINE WUNUSED SECTION_DEBUG_TEXT("get_libdebuginfo")
-void *LIBCCALL get_libdebuginfo(void) {
+PRIVATE ATTR_NOINLINE WUNUSED ATTR_SECTION(SECTION_DEBUG_TEXT) void *
+NOTHROW(LIBCCALL get_libdebuginfo)(void) {
 	void *result;
 again:
 	result = ATOMIC_READ(pdyn_libdebuginfo);
@@ -106,8 +106,8 @@ again:
 	return result;
 }
 
-PRIVATE ATTR_NOINLINE WUNUSED SECTION_DEBUG_TEXT("init_libdebuginfo")
-bool LIBCCALL init_libdebuginfo(void) {
+PRIVATE ATTR_NOINLINE WUNUSED ATTR_SECTION(SECTION_DEBUG_TEXT) bool
+NOTHROW(LIBCCALL init_libdebuginfo)(void) {
 	void *lib;
 	if (pdyn_debug_addr2line_sections_lock)
 		return true;
@@ -178,7 +178,7 @@ NOTHROW_NCX(LIBCCALL libc_backtrace)(void **array,
 }
 /*[[[end:libc_backtrace]]]*/
 
-PRIVATE ATTR_SECTION(".text.crt.debug.print_function_name") ssize_t
+PRIVATE ATTR_SECTION(".text.crt.debug") ssize_t
 NOTHROW_NCX(LIBCCALL print_function_name)(void *pc,
                                           pformatprinter printer,
                                           void *arg) {
@@ -256,7 +256,7 @@ NOTHROW_NCX(LIBCCALL libc_backtrace_symbols)(void *const *array,
 	if unlikely(!format_aprintf_alloc(&data, CEILDIV((size + 1) * sizeof(char *), sizeof(char))))
 		goto err;
 	for (i = 0; i < size; ++i) {
-		PRIVATE SECTION_DEBUG_STRING("debug_empty_string") char const debug_empty_string[1] = { 0 };
+		PRIVATE ATTR_SECTION(SECTION_DEBUG_STRING) char const debug_empty_string[1] = { 0 };
 		if unlikely(print_function_name(array[i], &format_aprintf_printer, &data) < 0)
 			goto err;
 		if unlikely(format_aprintf_printer(array[i], debug_empty_string, 1) < 0)
@@ -298,12 +298,13 @@ NOTHROW_NCX(LIBCCALL libc_backtrace_symbols_fd)(void *const *array,
 	if (!init_libdebuginfo())
 		return;
 	for (i = 0; i < size; ++i) {
-		PRIVATE SECTION_DEBUG_STRING("debug_lf") char const debug_lf[1] = { '\n' };
-		PRIVATE SECTION_DEBUG_STRING("debug_unknown_name") char const debug_unknown_name[1] = { '?' };
+		PRIVATE ATTR_SECTION(SECTION_DEBUG_STRING) char const debug_lf[1] = { '\n' };
+		PRIVATE ATTR_SECTION(SECTION_DEBUG_STRING) char const debug_unknown_name[1] = { '?' };
 #ifndef __LIBCCALL_IS_FORMATPRINTER_CC
 #error "Shouldn't happen?"
 #endif /* !__LIBCCALL_IS_FORMATPRINTER_CC */
 		error = print_function_name(array[i],
+		                            /* TODO: Dedicated function: `write_printer' */
 		                            (pformatprinter)(void *)&write,
 		                            (void *)(uintptr_t)(unsigned int)fd);
 		if unlikely(error < 0)

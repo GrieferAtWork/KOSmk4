@@ -35,10 +35,6 @@
 %[define_replacement(mbstate_t = "struct __mbstate")]
 %[default:section(".text.crt{|.dos}.unicode.mbr")]
 
-%[declare_known_section(".text.crt{|.dos}.wchar.unicode.convert")]
-%[declare_known_section(".text.crt.dos.wchar.unicode.convert")]
-
-
 %[insert:prefix(
 #include <features.h>
 )]%[insert:prefix(

@@ -43,7 +43,7 @@
 #define OFFSET_JMPBUF_PA1 28
 #define OFFSET_JMPBUF_SIG 32
 
-.section .text.crt.utility.setjmp.setjmp
+.section .text.crt.utility.setjmp
 INTERN_FUNCTION(libc_setjmp)
 	.cfi_startproc
 	movl   4(%esp), %eax /* jmp_buf */
@@ -67,7 +67,7 @@ DEFINE_PUBLIC_ALIAS(_setjmp, libc_setjmp)
 DEFINE_PUBLIC_ALIAS(__setjmp, libc_setjmp)
 
 
-.section .text.crt.utility.setjmp.longjmp
+.section .text.crt.utility.setjmp
 INTERN_FUNCTION(libc_longjmp)
 	.cfi_startproc
 	.cfi_signal_frame
@@ -100,7 +100,7 @@ DEFINE_PUBLIC_ALIAS(__fast_longjmp, libc___fast_longjmp)
 
 
 
-.section .text.crt.utility.setjmp.sigsetjmp
+.section .text.crt.utility.setjmp
 INTERN_FUNCTION(libc__setjmpex)
 	.cfi_startproc
 	movl   $(1), %edx
@@ -139,7 +139,7 @@ DEFINE_PUBLIC_ALIAS(_setjmpex, libc__setjmpex)
 DEFINE_PUBLIC_ALIAS(sigsetjmp, libc_sigsetjmp)
 DEFINE_PUBLIC_ALIAS(__sigsetjmp, libc_sigsetjmp)
 
-.section .text.crt.utility.setjmp.siglongjmp
+.section .text.crt.utility.setjmp
 INTERN_FUNCTION(libc_siglongjmp)
 	.cfi_startproc
 	.cfi_signal_frame

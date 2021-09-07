@@ -26,7 +26,7 @@
 #include <asm/cfi.h>
 #include <sys/syscall.h>
 
-.section .text.crt.system.utility.syscall
+.section .text.crt.system.utility
 INTERN_FUNCTION(libc_syscall)
 	.cfi_startproc
 	movq   %rdi,    %rax /* sysno */
@@ -52,7 +52,7 @@ DEFINE_PUBLIC_ALIAS(syscall, libc_syscall)
 DEFINE_PUBLIC_ALIAS(syscall64, libc_syscall64)
 DEFINE_PUBLIC_ALIAS(__syscall, libc_syscall64)
 
-.section .text.crt.except.system.utility.Syscall
+.section .text.crt.except.system.utility
 INTERN_FUNCTION(libc_Syscall)
 	.cfi_startproc
 	.cfi_escape 0x16, 0x31, 0x07, 0x90, 0x31, 0x0a, 0x00, 0x04, 0x20, 0x1a /* Clear EFLAGS.DF on exit */

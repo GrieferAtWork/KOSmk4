@@ -17,7 +17,7 @@
  *    misrepresented as being the original software.                          *
  * 3. This notice may not be removed or altered from any source distribution. *
  */
-%[default:section(".text.crt{|.dos}.syscall.hop")]
+%[default:section(".text.crt{|.dos}.kos.syscalls")]
 
 %[insert:prefix(
 #include <hybrid/typecore.h>

@@ -38,8 +38,6 @@
 }
 
 %[define_ccompat_header("cstdlib")]
-%[declare_known_section(".text.crt{|.dos}.application.init")]
-%[declare_known_section(".text.crt{|.dos}.glibc")]
 
 %[define_replacement(fd_t = __fd_t)]
 %[define_replacement(oflag_t = __oflag_t)]

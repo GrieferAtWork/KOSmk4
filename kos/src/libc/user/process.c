@@ -49,8 +49,8 @@ struct simple_thread_data {
 	void           *std_arg;               /* Entry argument. */
 };
 
-PRIVATE ATTR_SECTION(".text.crt.dos.sched.thread.simple_thread_entry") u32
-_BEGINTHREADEX_CC simple_thread_entry(void *arg) {
+PRIVATE ATTR_SECTION(".text.crt.dos.sched.thread")
+u32 _BEGINTHREADEX_CC simple_thread_entry(void *arg) {
 	struct simple_thread_data data;
 	memcpy(&data, arg, sizeof(struct simple_thread_data));
 	free(arg);
@@ -91,7 +91,8 @@ struct dos_thread_data {
 	u32 (_BEGINTHREADEX_CC *dtd_entry)(void *arg); /* [1..1] Entry callback. */
 	void                   *dtd_arg;               /* Entry argument. */
 };
-PRIVATE ATTR_SECTION(".text.crt.dos.sched.thread.dos_thread_entry")
+
+PRIVATE ATTR_SECTION(".text.crt.dos.sched.thread")
 int LIBCCALL dos_thread_entry(void *arg) {
 	int result;
 	struct dos_thread_data data;

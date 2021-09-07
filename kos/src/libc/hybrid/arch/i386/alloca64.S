@@ -28,7 +28,7 @@
 #undef alloca
 #undef _alloca
 
-.section .text.crt.utility.alloca
+.section .text.crt.utility
 INTERN_FUNCTION(libc_alloca)
 	.cfi_startproc
 	popq_cfi %rcx            /* return address */
@@ -48,7 +48,7 @@ DEFINE_PUBLIC_ALIAS(_alloca, libc_alloca)
 #endif /* !__KERNEL__ */
 
 #ifndef __KERNEL__
-.section .text.crt.dos.utility.alloca
+.section .text.crt.dos.utility
 INTERN_FUNCTION(libd_alloca)
 	.cfi_startproc
 	popq_cfi %rdx            /* return address */

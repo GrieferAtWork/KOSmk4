@@ -37,7 +37,7 @@
  * >>                                   %r8:     pid_t *ptid,
  * >>                                   %r9:     void *newtls,
  * >>                                   8(%rsp): pid_t *ctid) */
-.section .text.crt.sched.access.clone
+.section .text.crt.sched.access
 INTERN_FUNCTION(libc_clone)
 	.cfi_startproc
 	/* We use %r14 and %r15 to pass arguments to the new thread,

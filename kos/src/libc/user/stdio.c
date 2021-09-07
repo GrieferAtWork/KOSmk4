@@ -62,10 +62,10 @@ DECL_BEGIN
 #define libc_ferror_unlocked libc_ferror
 #define libc_feof_unlocked   libc_feof
 
-#define DEFINE_DEFAULT_STD_FILE(name, io_flags, fd)                                                     \
-	PRIVATE ATTR_SECTION(".data.crt.FILE.locked.utility.std_files_io.default_" #name)                   \
-	struct iofile_data_novtab default_##name##_io = IOFILE_DATA_NOVTAB_INIT();                          \
-	INTERN ATTR_SECTION(".data.crt.FILE.locked.utility.std_files.default_" #name) FILE default_##name = \
+#define DEFINE_DEFAULT_STD_FILE(name, io_flags, fd)                            \
+	PRIVATE ATTR_SECTION(".data.crt.FILE.std_files")                           \
+	struct iofile_data_novtab default_##name##_io = IOFILE_DATA_NOVTAB_INIT(); \
+	INTERN ATTR_SECTION(".data.crt.FILE.std_files") FILE default_##name =      \
 	__IO_FILE_INIT(NULL, 0, NULL, io_flags, fd, { 0 }, 0, (struct iofile_data *)&default_##name##_io)
 DEFINE_DEFAULT_STD_FILE(stdin, IO_LNBUF, STDIN_FILENO);
 DEFINE_DEFAULT_STD_FILE(stdout, IO_RW | IO_LNIFTYY, STDOUT_FILENO);
@@ -80,22 +80,22 @@ DEFINE_PUBLIC_ALIAS(_IO_2_1_stderr_, default_stderr);
 DATDEF FILE *g_stdin ASMNAME("stdin");
 DATDEF FILE *g_stdout ASMNAME("stdout");
 DATDEF FILE *g_stderr ASMNAME("stderr");
-PUBLIC ATTR_SECTION(".data.crt.FILE.locked.read.read.stdin")    FILE *g_stdin  = &default_stdin;  /* !Relocation */
-PUBLIC ATTR_SECTION(".data.crt.FILE.locked.write.write.stdout") FILE *g_stdout = &default_stdout; /* !Relocation */
-PUBLIC ATTR_SECTION(".data.crt.FILE.locked.write.write.stderr") FILE *g_stderr = &default_stderr; /* !Relocation */
+PUBLIC ATTR_SECTION(".data.crt.FILE.locked.read.read") FILE *g_stdin    = &default_stdin;  /* !Relocation */
+PUBLIC ATTR_SECTION(".data.crt.FILE.locked.write.write") FILE *g_stdout = &default_stdout; /* !Relocation */
+PUBLIC ATTR_SECTION(".data.crt.FILE.locked.write.write") FILE *g_stderr = &default_stderr; /* !Relocation */
 
 
 typedef LIST_HEAD_P(FILE) FileList;
 
 /* [0..1][lock(all_files_lock)] Chain of all files.
  * NOTE: This chain excludes the initial stdin, stdout and stderr streams! */
-PRIVATE ATTR_SECTION(".bss.crt.application.exit.all_files")
+PRIVATE ATTR_SECTION(".bss.crt.application.exit")
 FileList all_files = LIST_HEAD_INITIALIZER(all_files);
-PRIVATE ATTR_SECTION(".bss.crt.application.exit.all_files_lock")
+PRIVATE ATTR_SECTION(".bss.crt.application.exit")
 struct atomic_rwlock all_files_lock = ATOMIC_RWLOCK_INIT;
 
 /* Add the given file to the set of all files */
-PRIVATE ATTR_SECTION(".text.crt.FILE.core.utility.allfiles_insert")
+PRIVATE ATTR_SECTION(".text.crt.FILE.core.utility")
 NONNULL((1)) void LIBCCALL allfiles_insert(FILE *__restrict self) {
 	atomic_rwlock_write(&all_files_lock);
 	assert(!LIST_ISBOUND(self, if_exdata->io_link));
@@ -105,7 +105,7 @@ NONNULL((1)) void LIBCCALL allfiles_insert(FILE *__restrict self) {
 }
 
 /* Remove the given file from the set of all files */
-PRIVATE ATTR_SECTION(".text.crt.FILE.core.utility.allfiles_remove")
+PRIVATE ATTR_SECTION(".text.crt.FILE.core.utility")
 NONNULL((1)) void LIBCCALL allfiles_remove(FILE *__restrict self) {
 	atomic_rwlock_write(&all_files_lock);
 	assert(LIST_ISBOUND(self, if_exdata->io_link));
@@ -115,13 +115,13 @@ NONNULL((1)) void LIBCCALL allfiles_remove(FILE *__restrict self) {
 
 
 /* [0..1][lock(changed_linebuffered_files_lock)] Chain of tty-buffers. */
-PRIVATE ATTR_SECTION(".bss.crt.FILE.core.write.changed_linebuffered_files")
+PRIVATE ATTR_SECTION(".bss.crt.FILE.core.write")
 FileList changed_linebuffered_files = LIST_HEAD_INITIALIZER(changed_linebuffered_files);
-PRIVATE ATTR_SECTION(".bss.crt.FILE.core.write.changed_linebuffered_files_lock")
+PRIVATE ATTR_SECTION(".bss.crt.FILE.core.write")
 struct atomic_lock changed_linebuffered_files_lock = ATOMIC_LOCK_INIT;
 
 /* Add the given file to the set of changed line-buffered files */
-PRIVATE ATTR_SECTION(".text.crt.FILE.core.write.changed_linebuffered_insert")
+PRIVATE ATTR_SECTION(".text.crt.FILE.core.write")
 NONNULL((1)) void LIBCCALL changed_linebuffered_insert(FILE *__restrict self) {
 	atomic_lock_acquire(&changed_linebuffered_files_lock);
 	if (!LIST_ISBOUND(self, if_exdata->io_lnch))
@@ -131,7 +131,7 @@ NONNULL((1)) void LIBCCALL changed_linebuffered_insert(FILE *__restrict self) {
 }
 
 /* Remove the given file from the set of changed line-buffered files */
-PRIVATE ATTR_SECTION(".text.crt.FILE.core.write.changed_linebuffered_remove")
+PRIVATE ATTR_SECTION(".text.crt.FILE.core.write")
 NONNULL((1)) void LIBCCALL changed_linebuffered_remove(FILE *__restrict self) {
 	atomic_lock_acquire(&changed_linebuffered_files_lock);
 	if (LIST_ISBOUND(self, if_exdata->io_lnch))
@@ -140,7 +140,7 @@ NONNULL((1)) void LIBCCALL changed_linebuffered_remove(FILE *__restrict self) {
 }
 
 /* Low-level file read operation. */
-ATTR_SECTION(".text.crt.FILE.core.read.file_system_read")
+ATTR_SECTION(".text.crt.FILE.core.read")
 PRIVATE NONNULL((1)) ssize_t LIBCCALL
 file_system_read(FILE *__restrict self,
                  void *buf, size_t num_bytes) {
@@ -158,7 +158,7 @@ file_system_read(FILE *__restrict self,
 }
 
 /* Low-level file write operation. */
-ATTR_SECTION(".text.crt.FILE.core.write.file_system_write")
+ATTR_SECTION(".text.crt.FILE.core.write")
 PRIVATE NONNULL((1)) ssize_t LIBCCALL
 file_system_write(FILE *__restrict self,
                   void const *buf, size_t num_bytes) {
@@ -175,7 +175,7 @@ file_system_write(FILE *__restrict self,
 	return result;
 }
 
-ATTR_SECTION(".text.crt.FILE.core.write.file_system_writeall")
+ATTR_SECTION(".text.crt.FILE.core.write")
 PRIVATE NONNULL((1)) ssize_t LIBCCALL
 file_system_writeall(FILE *__restrict self,
                      void const *buf, size_t num_bytes) {
@@ -209,7 +209,7 @@ file_system_writeall(FILE *__restrict self,
 }
 
 /* Low-level file seek operation. */
-ATTR_SECTION(".text.crt.FILE.core.seek.file_system_seek")
+ATTR_SECTION(".text.crt.FILE.core.seek")
 PRIVATE NONNULL((1)) off64_t LIBCCALL
 file_system_seek(FILE *__restrict self,
                  off64_t offset, int whence) {
@@ -227,7 +227,7 @@ file_system_seek(FILE *__restrict self,
 }
 
 /* Low-level file close operation. */
-ATTR_SECTION(".text.crt.FILE.core.utility.file_system_close")
+ATTR_SECTION(".text.crt.FILE.core.utility")
 PRIVATE NONNULL((1)) int LIBCCALL
 file_system_close(FILE *__restrict self) {
 	int result;
@@ -244,7 +244,7 @@ file_system_close(FILE *__restrict self) {
 }
 
 /* Low-level file sync operation. */
-ATTR_SECTION(".text.crt.FILE.core.write.file_system_sync")
+ATTR_SECTION(".text.crt.FILE.core.write")
 PRIVATE NONNULL((1)) int LIBCCALL
 file_system_sync(FILE *__restrict self) {
 	int result;
@@ -261,7 +261,7 @@ file_system_sync(FILE *__restrict self) {
 }
 
 /* Low-level file truncate operation. */
-ATTR_SECTION(".text.crt.FILE.core.write.file_system_sync")
+ATTR_SECTION(".text.crt.FILE.core.write")
 PRIVATE NONNULL((1)) int LIBCCALL
 file_system_trunc(FILE *__restrict self, pos64_t new_size) {
 	int result;
@@ -276,7 +276,7 @@ file_system_trunc(FILE *__restrict self, pos64_t new_size) {
 }
 
 /* Determine if `self' is a TTY */
-ATTR_SECTION(".text.crt.FILE.core.utility.file_determine_isatty")
+ATTR_SECTION(".text.crt.FILE.core.utility")
 INTERN NONNULL((1)) void LIBCCALL
 file_determine_isatty(FILE *__restrict self) {
 	uint32_t flags = self->if_flag;
@@ -299,7 +299,7 @@ file_determine_isatty(FILE *__restrict self) {
 }
 
 
-PRIVATE ATTR_SECTION(".text.crt.FILE.core.utility.file_buffer_realloc") byte_t *LIBCCALL
+PRIVATE ATTR_SECTION(".text.crt.FILE.core.utility") byte_t *LIBCCALL
 file_buffer_realloc(FILE *__restrict self, size_t new_size) {
 	if (!(self->if_flag & IO_MALLBUF))
 		return (byte_t *)malloc(new_size);
@@ -307,7 +307,7 @@ file_buffer_realloc(FILE *__restrict self, size_t new_size) {
 	return (byte_t *)realloc(self->if_base, new_size);
 }
 
-PRIVATE ATTR_SECTION(".text.crt.FILE.core.utility.file_buffer_realloc_dynscale") byte_t *LIBCCALL
+PRIVATE ATTR_SECTION(".text.crt.FILE.core.utility") byte_t *LIBCCALL
 file_buffer_realloc_dynscale(FILE *__restrict self,
                              size_t *__restrict pnew_size,
                              pos64_t fpos) {
@@ -325,7 +325,7 @@ file_buffer_realloc_dynscale(FILE *__restrict self,
 
 
 /* Change the operations mode of a given buffer. */
-ATTR_SECTION(".text.crt.FILE.core.utility.file_setmode")
+ATTR_SECTION(".text.crt.FILE.core.utility")
 PRIVATE WUNUSED NONNULL((1)) int LIBCCALL
 file_setmode(FILE *__restrict self,
              void *buf, int mode, size_t size) {
@@ -424,7 +424,7 @@ err:
 	return -1;
 }
 
-ATTR_SECTION(".text.crt.FILE.core.write.file_sync")
+ATTR_SECTION(".text.crt.FILE.core.write")
 INTERN NONNULL((1)) int LIBCCALL
 file_sync(FILE *__restrict self) {
 	pos64_t abs_chngpos;
@@ -488,7 +488,7 @@ err:
 	return -1;
 }
 
-PRIVATE NONNULL((1)) ATTR_SECTION(".text.crt.application.exit.file_sync_locked") int LIBCCALL
+PRIVATE NONNULL((1)) ATTR_SECTION(".text.crt.application.exit") int LIBCCALL
 file_sync_locked(FILE *__restrict self) {
 	int result;
 	if (FMUSTLOCK(self)) {
@@ -501,7 +501,7 @@ file_sync_locked(FILE *__restrict self) {
 	return result;
 }
 
-INTERN NONNULL((1)) ATTR_SECTION(".text.crt.FILE.core.utility.file_destroy") void LIBCCALL
+INTERN NONNULL((1)) ATTR_SECTION(".text.crt.FILE.core.utility") void LIBCCALL
 file_destroy(FILE *__restrict self) {
 	refcnt_t refcnt;
 	struct iofile_data *ex;
@@ -571,7 +571,7 @@ file_destroy(FILE *__restrict self) {
 
 
 /* Synchronize unwritten data of all line-buffered files. */
-INTERN ATTR_SECTION(".text.crt.FILE.core.write.file_sync_lnfiles")
+INTERN ATTR_SECTION(".text.crt.FILE.core.write")
 void LIBCCALL file_sync_lnfiles(void) {
 	FILE *fp;
 again:
@@ -599,7 +599,7 @@ again:
 	atomic_lock_release(&changed_linebuffered_files_lock);
 }
 
-PRIVATE ATTR_SECTION(".text.crt.application.exit.file_do_syncall_locked")
+PRIVATE ATTR_SECTION(".text.crt.application.exit")
 void LIBCCALL file_do_syncall_locked(uintptr_t version) {
 	for (;;) {
 		FILE *fp, *next_fp;
@@ -638,7 +638,7 @@ do_flush_fp:
 	}
 }
 
-PRIVATE ATTR_SECTION(".text.crt.FILE.unlocked.write.utility.file_do_syncall_unlocked")
+PRIVATE ATTR_SECTION(".text.crt.FILE.unlocked.write.utility")
 void LIBCCALL file_do_syncall_unlocked(uintptr_t version) {
 	for (;;) {
 		FILE *fp, *next_fp;
@@ -671,14 +671,11 @@ do_flush_fp:
 }
 
 
-PRIVATE ATTR_SECTION(".bss.crt.application.exit.flushall_lock")
-struct atomic_owner_rwlock flushall_lock = ATOMIC_OWNER_RWLOCK_INIT;
-PRIVATE ATTR_SECTION(".bss.crt.application.exit.flushall_version")
-uintptr_t flushall_version = 0;
-PRIVATE ATTR_SECTION(".bss.crt.application.exit.flushall_must_restart")
-bool flushall_must_restart = false;
+PRIVATE ATTR_SECTION(".bss.crt.application.exit") struct atomic_owner_rwlock flushall_lock = ATOMIC_OWNER_RWLOCK_INIT;
+PRIVATE ATTR_SECTION(".bss.crt.application.exit") uintptr_t flushall_version = 0;
+PRIVATE ATTR_SECTION(".bss.crt.application.exit") bool flushall_must_restart = false;
 
-PRIVATE ATTR_SECTION(".text.crt.application.exit.file_syncall_locked")
+PRIVATE ATTR_SECTION(".text.crt.application.exit")
 void LIBCCALL file_syncall_locked(void) {
 	/* Check for recursion (as is possible due to file cookies) */
 	if (atomic_owner_rwlock_writing(&flushall_lock)) {
@@ -694,7 +691,7 @@ void LIBCCALL file_syncall_locked(void) {
 	atomic_owner_rwlock_endwrite(&flushall_lock);
 }
 
-PRIVATE ATTR_SECTION(".text.crt.FILE.unlocked.write.utility.file_syncall_unlocked")
+PRIVATE ATTR_SECTION(".text.crt.FILE.unlocked.write.utility")
 void LIBCCALL file_syncall_unlocked(void) {
 	/* Check for recursion (as is possible due to file cookies) */
 	if (atomic_owner_rwlock_writing(&flushall_lock)) {
@@ -712,7 +709,7 @@ void LIBCCALL file_syncall_unlocked(void) {
 
 
 /* High-level, common read-from-file function. */
-INTERN ATTR_SECTION(".text.crt.FILE.core.read.file_readdata")
+INTERN ATTR_SECTION(".text.crt.FILE.core.read")
 NONNULL((1)) size_t LIBCCALL file_readdata(FILE *__restrict self,
                                            void *buf, size_t num_bytes) {
 	ssize_t read_size;
@@ -914,7 +911,7 @@ err:
 
 
 /* High-level, common write-to-file function. */
-INTERN ATTR_SECTION(".text.crt.FILE.core.write.file_writedata")
+INTERN ATTR_SECTION(".text.crt.FILE.core.write")
 NONNULL((1)) size_t LIBCCALL file_writedata(FILE *__restrict self,
                                             void const *buf, size_t num_bytes) {
 	size_t result = 0;
@@ -1062,7 +1059,7 @@ err0:
 	return 0;
 }
 
-INTERN ATTR_SECTION(".text.crt.FILE.core.write.file_writedata")
+INTERN ATTR_SECTION(".text.crt.FILE.core.seek")
 NONNULL((1)) pos64_t LIBCCALL file_seek(FILE *__restrict self,
                                         off64_t off, int whence) {
 	pos64_t result;
@@ -1155,7 +1152,7 @@ err0:
 }
 
 
-INTERN ATTR_SECTION(".text.crt.FILE.core.read.file_getc")
+INTERN ATTR_SECTION(".text.crt.FILE.core.read")
 WUNUSED NONNULL((1)) int LIBCCALL file_getc(FILE *__restrict self) {
 	uint8_t *new_buffer;
 	size_t new_bufsize;
@@ -1322,7 +1319,7 @@ err0:
 	goto done;
 }
 
-INTERN ATTR_SECTION(".text.crt.FILE.core.read.file_ungetc")
+INTERN ATTR_SECTION(".text.crt.FILE.core.read")
 WUNUSED NONNULL((1)) int LIBCCALL file_ungetc(FILE *__restrict self, unsigned char ch) {
 	uint8_t *new_buffer;
 	size_t new_bufsize, inc_size;
@@ -1383,7 +1380,7 @@ err:
 	return EOF;
 }
 
-INTERN ATTR_SECTION(".text.crt.dos.wchar.FILE.core.read.file_getc16")
+INTERN ATTR_SECTION(".text.crt.dos.wchar.FILE.core.read")
 WUNUSED NONNULL((1)) char16_t LIBCCALL file_getc16(FILE *__restrict self) {
 	char16_t result;
 	struct iofile_data *ex;
@@ -1429,7 +1426,7 @@ done:
 	return result;
 }
 
-INTERN ATTR_SECTION(".text.crt.wchar.FILE.core.read.file_getc32")
+INTERN ATTR_SECTION(".text.crt.wchar.FILE.core.read")
 WUNUSED NONNULL((1)) char32_t LIBCCALL file_getc32(FILE *__restrict self) {
 	char32_t result;
 	struct iofile_data *ex;
@@ -1464,7 +1461,7 @@ done:
 }
 
 
-INTERN ATTR_SECTION(".text.crt.dos.wchar.FILE.core.read.file_ungetc16")
+INTERN ATTR_SECTION(".text.crt.dos.wchar.FILE.core.read")
 WUNUSED NONNULL((1)) char16_t LIBCCALL file_ungetc16(FILE *__restrict self, char16_t ch) {
 	char32_t unget_char;
 	char16_t result = ch;
@@ -1501,7 +1498,7 @@ done:
 	return result;
 }
 
-INTERN ATTR_SECTION(".text.crt.wchar.FILE.core.read.file_ungetc32")
+INTERN ATTR_SECTION(".text.crt.wchar.FILE.core.read")
 WUNUSED NONNULL((1)) char32_t LIBCCALL file_ungetc32(FILE *__restrict self, char32_t ch) {
 	char32_t result = ch;
 	char buf[UNICODE_UTF8_CURLEN], *end;
@@ -1517,7 +1514,7 @@ WUNUSED NONNULL((1)) char32_t LIBCCALL file_ungetc32(FILE *__restrict self, char
 	return result;
 }
 
-INTERN ATTR_SECTION(".text.crt.dos.wchar.FILE.core.write.file_print16")
+INTERN ATTR_SECTION(".text.crt.dos.wchar.FILE.core.write")
 WUNUSED NONNULL((1)) ssize_t LIBCCALL
 file_print16(void *self, char16_t const *__restrict data, size_t datalen) {
 	ssize_t result;
@@ -1542,7 +1539,7 @@ file_print16(void *self, char16_t const *__restrict data, size_t datalen) {
 	return result;
 }
 
-INTERN ATTR_SECTION(".text.crt.wchar.FILE.core.write.file_print32")
+INTERN ATTR_SECTION(".text.crt.wchar.FILE.core.write")
 WUNUSED NONNULL((1)) ssize_t LIBCCALL
 file_print32(void *self, char32_t const *__restrict data, size_t datalen) {
 	ssize_t result;
@@ -1555,7 +1552,7 @@ file_print32(void *self, char32_t const *__restrict data, size_t datalen) {
 
 
 
-INTERN ATTR_SECTION(".text.crt.FILE.core.write.file_truncate")
+INTERN ATTR_SECTION(".text.crt.FILE.core.write")
 WUNUSED NONNULL((1)) int LIBCCALL file_truncate(FILE *__restrict self,
                                                 pos64_t new_size) {
 	pos64_t abs_pos, abs_end;
@@ -1620,7 +1617,7 @@ struct open_option {
  * >> fopen("foo.txt", "text,RW,T,C");           // Extended form.
  * >> fopen("foo.txt", "text,rdwr,trunc,creat"); // Long form. */
 #define BASEMODE_MASK (O_ACCMODE | O_CREAT | O_EXCL | O_TRUNC | O_APPEND)
-PRIVATE ATTR_SECTION(".rodata.crt.FILE.core.utility.open_options")
+PRIVATE ATTR_SECTION(".rodata.crt.FILE.core.utility")
 struct open_option const open_options[] = {
 	/* Short flag names. */
 	{ "R", OPEN_EXFLAG_FNORMAL, O_ACCMODE, O_RDONLY },
@@ -1676,7 +1673,7 @@ struct open_option const open_options[] = {
 
 /* @param: poflags: When non-NULL, filled with `O_*'
  * @return: * :     Set of `IO_*' */
-INTERN ATTR_SECTION(".text.crt.FILE.core.utility.file_evalmodes")
+INTERN ATTR_SECTION(".text.crt.FILE.core.utility")
 WUNUSED uint32_t LIBCCALL file_evalmodes(char const *modes,
                                          oflag_t *poflags) {
 	/* IO_LNIFTYY: Check if the stream handle is a tty
@@ -1770,7 +1767,7 @@ found_option:
 
 
 /* @param: flags: Set of `IO_*' */
-INTERN ATTR_SECTION(".text.crt.FILE.core.utility.file_openfd")
+INTERN ATTR_SECTION(".text.crt.FILE.core.utility")
 WUNUSED FILE *LIBCCALL file_openfd(/*inherit(on_success)*/ fd_t fd, uint32_t flags) {
 	FILE *result;
 	struct iofile_data *ex;
@@ -1792,7 +1789,7 @@ done:
 }
 
 
-INTERN NONNULL((1)) ATTR_SECTION(".text.crt.FILE.core.utility.file_openfd")
+INTERN NONNULL((1)) ATTR_SECTION(".text.crt.FILE.core.utility")
 WUNUSED FILE *LIBCCALL file_reopenfd(FILE *__restrict self,
                                      fd_t fd, uint32_t flags) {
 	struct iofile_data *ex;
@@ -2731,8 +2728,7 @@ NOTHROW_NCX(LIBCCALL libc_fmtcheck)(char const *user_format,
 
 
 
-ATTR_SECTION(".text.crt.FILE.core.utility.file_funopen")
-LOCAL WUNUSED NONNULL((1)) FILE *LIBCCALL
+PRIVATE WUNUSED ATTR_SECTION(".text.crt.FILE.core.utility") NONNULL((1)) FILE *LIBCCALL
 file_funopen(void const *cookie,
              __funopen2_readfn_t readfn, __funopen2_writefn_t writefn,
              __funopen2_64_seekfn_t seekfn, __funopen2_flushfn_t flushfn,
@@ -3224,7 +3220,7 @@ struct memopen_cookie {
 	byte_t *moc_end;  /* [1..1] End-pointer */
 };
 
-PRIVATE ATTR_SECTION(".text.crt.FILE.utility.memopen.read")
+PRIVATE ATTR_SECTION(".text.crt.FILE.utility.memopen")
 ssize_t LIBCCALL memopen_read(void *cookie, void *buf, size_t num_bytes) {
 	size_t maxlen;
 	struct memopen_cookie *me;
@@ -3237,7 +3233,7 @@ ssize_t LIBCCALL memopen_read(void *cookie, void *buf, size_t num_bytes) {
 	return (size_t)maxlen;
 }
 
-PRIVATE ATTR_SECTION(".text.crt.FILE.utility.memopen.write")
+PRIVATE ATTR_SECTION(".text.crt.FILE.utility.memopen")
 ssize_t LIBCCALL memopen_write(void *cookie, void const *buf, size_t num_bytes) {
 	size_t maxlen;
 	struct memopen_cookie *me;
@@ -3250,7 +3246,7 @@ ssize_t LIBCCALL memopen_write(void *cookie, void const *buf, size_t num_bytes) 
 	return (size_t)maxlen;
 }
 
-PRIVATE ATTR_SECTION(".text.crt.FILE.utility.memopen.seek")
+PRIVATE ATTR_SECTION(".text.crt.FILE.utility.memopen")
 off64_t LIBCCALL memopen_seek(void *cookie, off64_t off, int whence) {
 	pos64_t newpos;
 	struct memopen_cookie *me;
@@ -3288,7 +3284,7 @@ err_EOVERFLOW:
 	return -1;
 }
 
-PRIVATE ATTR_SECTION(".text.crt.FILE.utility.memopen.close")
+PRIVATE ATTR_SECTION(".text.crt.FILE.utility.memopen")
 int LIBCCALL memopen_close(void *cookie) {
 	free(cookie);
 	return 0;
@@ -3339,7 +3335,7 @@ struct memstream_file {
 	byte_t  *mf_end;   /* [0..1] Allocated buffer end pointer. */
 };
 
-PRIVATE ATTR_SECTION(".text.crt.FILE.utility.memstream.read")
+PRIVATE ATTR_SECTION(".text.crt.FILE.utility.memstream")
 ssize_t LIBCCALL memstream_read(void *cookie, void *buf, size_t num_bytes) {
 	struct memstream_file *me;
 	me = (struct memstream_file *)cookie;
@@ -3351,7 +3347,7 @@ ssize_t LIBCCALL memstream_read(void *cookie, void *buf, size_t num_bytes) {
 	return (ssize_t)maxread;
 }
 
-PRIVATE ATTR_SECTION(".text.crt.FILE.utility.memstream.write")
+PRIVATE ATTR_SECTION(".text.crt.FILE.utility.memstream")
 ssize_t LIBCCALL memstream_write(void *cookie, void const *buf, size_t num_bytes) {
 	struct memstream_file *me;
 	size_t new_alloc, result = 0;
@@ -3394,7 +3390,7 @@ err:
 	return -1;
 }
 
-PRIVATE ATTR_SECTION(".text.crt.FILE.utility.memstream.seek")
+PRIVATE ATTR_SECTION(".text.crt.FILE.utility.memstream")
 off64_t LIBCCALL memstream_seek(void *cookie, off64_t off, int whence) {
 	struct memstream_file *me;
 	pos64_t new_pos;
@@ -3425,7 +3421,7 @@ err_EOVERFLOW:
 	return libc_seterrno(EOVERFLOW);
 }
 
-PRIVATE ATTR_SECTION(".text.crt.FILE.utility.memstream.close")
+PRIVATE ATTR_SECTION(".text.crt.FILE.utility.memstream")
 int LIBCCALL memstream_close(void *cookie) {
 	free(cookie);
 	return 0;

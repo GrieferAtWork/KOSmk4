@@ -36,14 +36,14 @@ DECL_BEGIN
 
 #ifdef __CC__
 
-#define UCHAR16_TEXT(name) ATTR_SECTION(".text.crt.dos.wchar.unicode.convert." name)
-#define UCHAR32_TEXT(name) ATTR_SECTION(".text.crt.wchar.unicode.convert." name)
-#define UCHAR_TEXT UCHAR32_TEXT
+#define SECTION_TEXT_UCHAR16 ".text.crt.dos.wchar.unicode.convert"
+#define SECTION_TEXT_UCHAR32 ".text.crt.wchar.unicode.convert"
+#define SECTION_TEXT_UCHAR   SECTION_TEXT_UCHAR32
 
 
 /* Helper functions for converting wide-character strings
  * into  UTF-8,  so  they  may  be  used  by  the kernel. */
-INTERN UCHAR_TEXT("uchar_freev") void LIBCCALL
+INTERN ATTR_SECTION(SECTION_TEXT_UCHAR) void LIBCCALL
 libc_uchar_freev(/*utf-8*/ char **ptr) {
 	char **iter, *temp;
 	if unlikely(!ptr)
@@ -53,7 +53,7 @@ libc_uchar_freev(/*utf-8*/ char **ptr) {
 	free(ptr);
 }
 
-INTERN UCHAR_TEXT("uchar_freevn") void LIBCCALL
+INTERN ATTR_SECTION(SECTION_TEXT_UCHAR) void LIBCCALL
 libc_uchar_freevn(/*utf-8*/ char **ptr, size_t count) {
 	size_t i;
 	if unlikely(!ptr)
@@ -64,8 +64,7 @@ libc_uchar_freevn(/*utf-8*/ char **ptr, size_t count) {
 	free(ptr);
 }
 
-INTERN ATTR_MALLOC WUNUSED NONNULL((1))
-UCHAR16_TEXT("uchar_c16tombs") /*utf-8*/ char *LIBDCALL
+INTERN ATTR_SECTION(SECTION_TEXT_UCHAR16) ATTR_MALLOC WUNUSED NONNULL((1)) /*utf-8*/ char *LIBDCALL
 libc_uchar_c16tombs(char16_t const *__restrict str) {
 	size_t len;
 	if unlikely(!str) {
@@ -76,8 +75,7 @@ libc_uchar_c16tombs(char16_t const *__restrict str) {
 	return libc_uchar_c16tombsn(str, len, NULL);
 }
 
-INTERN ATTR_MALLOC WUNUSED NONNULL((1))
-UCHAR32_TEXT("uchar_c32tombs") /*utf-8*/ char *LIBCCALL
+INTERN ATTR_SECTION(SECTION_TEXT_UCHAR32) ATTR_MALLOC WUNUSED NONNULL((1)) /*utf-8*/ char *LIBCCALL
 libc_uchar_c32tombs(char32_t const *__restrict str) {
 	size_t len;
 	if unlikely(!str) {
@@ -88,8 +86,7 @@ libc_uchar_c32tombs(char32_t const *__restrict str) {
 	return libc_uchar_c32tombsn(str, len, NULL);
 }
 
-INTERN ATTR_MALLOC WUNUSED NONNULL((1))
-UCHAR16_TEXT("uchar_c16tombsn") /*utf-8*/ char *LIBDCALL
+INTERN ATTR_SECTION(SECTION_TEXT_UCHAR16) ATTR_MALLOC WUNUSED NONNULL((1)) /*utf-8*/ char *LIBDCALL
 libc_uchar_c16tombsn(char16_t const *__restrict str, size_t len, size_t *preslen) {
 	struct format_aprintf_data printer_data = FORMAT_APRINTF_DATA_INIT;
 	struct format_16to8_data convert_data;
@@ -103,8 +100,7 @@ libc_uchar_c16tombsn(char16_t const *__restrict str, size_t len, size_t *preslen
 	return format_aprintf_pack(&printer_data, preslen);
 }
 
-INTERN ATTR_MALLOC WUNUSED NONNULL((1))
-UCHAR32_TEXT("uchar_c32tombsn") /*utf-8*/ char *LIBCCALL
+INTERN ATTR_SECTION(SECTION_TEXT_UCHAR32) ATTR_MALLOC WUNUSED NONNULL((1)) /*utf-8*/ char *LIBCCALL
 libc_uchar_c32tombsn(char32_t const *__restrict str, size_t len, size_t *preslen) {
 	struct format_aprintf_data printer_data = FORMAT_APRINTF_DATA_INIT;
 	struct format_32to8_data convert_data;
@@ -117,8 +113,7 @@ libc_uchar_c32tombsn(char32_t const *__restrict str, size_t len, size_t *preslen
 	return format_aprintf_pack(&printer_data, preslen);
 }
 
-INTERN ATTR_MALLOC WUNUSED NONNULL((1))
-UCHAR16_TEXT("uchar_c16tombsv") /*utf-8*/ char **LIBDCALL
+INTERN ATTR_SECTION(SECTION_TEXT_UCHAR16) ATTR_MALLOC WUNUSED NONNULL((1)) /*utf-8*/ char **LIBDCALL
 libc_uchar_c16tombsv(char16_t const *const *__restrict vector) {
 	size_t i, count = 0;
 	char **result;
@@ -146,8 +141,7 @@ err:
 	return NULL;
 }
 
-INTERN ATTR_MALLOC WUNUSED NONNULL((1))
-UCHAR32_TEXT("uchar_c32tombsv") /*utf-8*/ char **LIBCCALL
+INTERN ATTR_SECTION(SECTION_TEXT_UCHAR32) ATTR_MALLOC WUNUSED NONNULL((1)) /*utf-8*/ char **LIBCCALL
 libc_uchar_c32tombsv(char32_t const *const *__restrict vector) {
 	size_t i, count = 0;
 	char **result;
@@ -176,8 +170,7 @@ err:
 }
 
 
-INTERN ATTR_MALLOC WUNUSED NONNULL((1))
-UCHAR16_TEXT("uchar_c16tombsvn") /*utf-8*/ char **LIBDCALL
+INTERN ATTR_SECTION(SECTION_TEXT_UCHAR16) ATTR_MALLOC WUNUSED NONNULL((1)) /*utf-8*/ char **LIBDCALL
 libc_uchar_c16tombsvn(char16_t const *const *__restrict vector, size_t count) {
 	size_t i;
 	char **result;
@@ -205,8 +198,7 @@ err:
 	return NULL;
 }
 
-INTERN ATTR_MALLOC WUNUSED NONNULL((1))
-UCHAR32_TEXT("uchar_c32tombsvn") /*utf-8*/ char **LIBCCALL
+INTERN ATTR_SECTION(SECTION_TEXT_UCHAR32) ATTR_MALLOC WUNUSED NONNULL((1)) /*utf-8*/ char **LIBCCALL
 libc_uchar_c32tombsvn(char32_t const *const *__restrict vector, size_t count) {
 	size_t i;
 	char **result;
@@ -236,22 +228,19 @@ err:
 
 
 
-INTERN ATTR_MALLOC WUNUSED NONNULL((1))
-UCHAR16_TEXT("uchar_mbstoc16") char16_t *LIBDCALL
+INTERN ATTR_SECTION(SECTION_TEXT_UCHAR16) ATTR_MALLOC WUNUSED NONNULL((1)) char16_t *LIBDCALL
 libc_uchar_mbstoc16(/*utf-8*/ char const *__restrict str) {
 	size_t len = strlen(str);
 	return libc_uchar_mbstoc16n(str, len, NULL);
 }
 
-INTERN ATTR_MALLOC WUNUSED NONNULL((1))
-UCHAR32_TEXT("uchar_mbstoc32") char32_t *LIBCCALL
+INTERN ATTR_SECTION(SECTION_TEXT_UCHAR32) ATTR_MALLOC WUNUSED NONNULL((1)) char32_t *LIBCCALL
 libc_uchar_mbstoc32(/*utf-8*/ char const *__restrict str) {
 	size_t len = strlen(str);
 	return libc_uchar_mbstoc32n(str, len, NULL);
 }
 
-INTERN ATTR_MALLOC WUNUSED NONNULL((1))
-UCHAR16_TEXT("uchar_mbstoc16n") char16_t *LIBDCALL
+INTERN ATTR_SECTION(SECTION_TEXT_UCHAR16) ATTR_MALLOC WUNUSED NONNULL((1)) char16_t *LIBDCALL
 libc_uchar_mbstoc16n(/*utf-8*/ char const *__restrict str,
                      size_t len, size_t *preslen) {
 	struct format_c16aprintf_data printer_data = FORMAT_C16APRINTF_DATA_INIT;
@@ -267,8 +256,7 @@ libc_uchar_mbstoc16n(/*utf-8*/ char const *__restrict str,
 }
 
 
-INTERN ATTR_MALLOC WUNUSED NONNULL((1))
-UCHAR32_TEXT("uchar_mbstoc32n") char32_t *LIBCCALL
+INTERN ATTR_SECTION(SECTION_TEXT_UCHAR32) ATTR_MALLOC WUNUSED NONNULL((1)) char32_t *LIBCCALL
 libc_uchar_mbstoc32n(/*utf-8*/ char const *__restrict str,
                      size_t len, size_t *preslen) {
 	struct format_c32aprintf_data printer_data = FORMAT_C32APRINTF_DATA_INIT;

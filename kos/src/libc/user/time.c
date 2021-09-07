@@ -36,19 +36,19 @@ DECL_BEGIN
 
 
 DEFINE_PUBLIC_ALIAS(DOS$__tzname, libd___tzname);
-INTERN ATTR_CONST ATTR_SECTION(".text.crt.dos.time.timezone.__tzname") char **
+INTERN ATTR_CONST ATTR_SECTION(".text.crt.dos.time.timezone") char **
 NOTHROW_NCX(libd___tzname)(void) {
 	return &tzname;
 }
 
 DEFINE_PUBLIC_ALIAS(DOS$__daylight, libd___daylight);
-INTERN ATTR_CONST ATTR_SECTION(".text.crt.dos.time.timezone.__daylight") int *
+INTERN ATTR_CONST ATTR_SECTION(".text.crt.dos.time.timezone") int *
 NOTHROW_NCX(libd___daylight)(void) {
 	return &daylight;
 }
 
 DEFINE_PUBLIC_ALIAS(DOS$__timezone, libd___timezone);
-INTERN ATTR_CONST ATTR_SECTION(".text.crt.dos.time.timezone.__daylight") longptr_t *
+INTERN ATTR_CONST ATTR_SECTION(".text.crt.dos.time.timezone") longptr_t *
 NOTHROW_NCX(libd___timezone)(void) {
 	return &timezone;
 }

@@ -38,8 +38,7 @@
 DECL_BEGIN
 
 
-INTERN NONNULL((1, 2))
-ATTR_WEAK ATTR_SECTION(".text.crt.dos.wchar.fs.exec.exec.do_c16exec") int
+INTERN ATTR_SECTION(".text.crt.dos.wchar.fs.exec.exec") NONNULL((1, 2)) int
 NOTHROW_RPC(LIBCCALL libc_do_c16exec)(char16_t const *__restrict file_or_path,
                                       char16_t const *const *__restrict argv,
                                       char16_t const *const *envp,
@@ -73,8 +72,7 @@ done:
 	return result;
 }
 
-INTERN NONNULL((1, 2))
-ATTR_WEAK ATTR_SECTION(".text.crt.wchar.fs.exec.exec.do_c32exec") int
+INTERN ATTR_SECTION(".text.crt.wchar.fs.exec.exec") NONNULL((1, 2)) int
 NOTHROW_RPC(LIBCCALL libc_do_c32exec)(char32_t const *__restrict file_or_path,
                                       char32_t const *const *__restrict argv,
                                       char32_t const *const *envp,
@@ -108,8 +106,7 @@ done:
 	return result;
 }
 
-INTERN NONNULL((2, 3))
-ATTR_WEAK ATTR_SECTION(".text.crt.dos.wchar.fs.exec.exec.do_c16spawn") pid_t
+INTERN ATTR_SECTION(".text.crt.dos.wchar.fs.exec.exec") NONNULL((2, 3)) pid_t
 NOTHROW_RPC(LIBCCALL libc_do_c16spawn)(int mode,
                                        char16_t const *__restrict file_or_path,
                                        char16_t const *const *__restrict argv,
@@ -144,8 +141,7 @@ done:
 	return result;
 }
 
-INTERN NONNULL((2, 3))
-ATTR_WEAK ATTR_SECTION(".text.crt.wchar.fs.exec.exec.do_c32spawn") pid_t
+INTERN ATTR_SECTION(".text.crt.wchar.fs.exec.exec") NONNULL((2, 3)) pid_t
 NOTHROW_RPC(LIBCCALL libc_do_c32spawn)(int mode,
                                        char32_t const *__restrict file_or_path,
                                        char32_t const *const *__restrict argv,

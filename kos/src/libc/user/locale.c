@@ -32,10 +32,10 @@ DECL_BEGIN
  *       should become some string that contains ".UTF-8".
  *       The later is checked for by libncursesw and  must
  *       be present for full unicode support. */
-PRIVATE ATTR_SECTION(".data.crt.unsorted.current_locale")
+PRIVATE ATTR_SECTION(".data.crt.i18n")
 char current_locale[] = "C.UTF-8";
 
-PRIVATE ATTR_SECTION(".data.crt.unsorted.current_lconv")
+PRIVATE ATTR_SECTION(".data.crt.i18n")
 struct lconv current_lconv = {
 	/* .decimal_point      = */ NULL,
 	/* .thousands_sep      = */ NULL,

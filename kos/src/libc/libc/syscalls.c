@@ -34,7 +34,7 @@
 
 DECL_BEGIN
 
-INTERN ATTR_SECTION(".text.crt.syscall.ksysctl") syscall_slong_t
+INTERN ATTR_SECTION(".text.crt.kos.syscalls") syscall_slong_t
 NOTHROW_NCX(VLIBCCALL libc_ksysctl)(syscall_ulong_t cmd, ... /*, void *arg*/) {
 	syscall_slong_t result;
 	va_list args;

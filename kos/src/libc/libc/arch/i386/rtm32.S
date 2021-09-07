@@ -41,7 +41,7 @@
 
 
 #ifdef CONFIG_SUPPORT_HARDWARE_RTM
-.section .xdata.crt.system.rtm, "awx"
+.section .xdata, "awx"
 #else /* CONFIG_SUPPORT_HARDWARE_RTM */
 .section .text.crt.system.rtm
 #endif /* !CONFIG_SUPPORT_HARDWARE_RTM */

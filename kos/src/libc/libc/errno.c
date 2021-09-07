@@ -44,7 +44,7 @@ DEFINE_PUBLIC_ALIAS(__errno_location, libc_errno_p);
 DEFINE_INTERN_ALIAS(libc__errno, libc_errno_p);
 DEFINE_INTERN_ALIAS(libc___errno, libc_errno_p);
 DEFINE_INTERN_ALIAS(libc___errno_location, libc_errno_p);
-INTERN ATTR_CONST ATTR_SECTION(".text.crt.errno_access.__errno_location")
+INTERN ATTR_CONST ATTR_SECTION(".text.crt.errno_access")
 NOBLOCK errno_t *NOTHROW(LIBCCALL libc_errno_p)(void) {
 	struct pthread *me = &current;
 	if unlikely(me->pt_errno_kind != LIBC_ERRNO_KIND_KOS) {
@@ -62,21 +62,21 @@ NOBLOCK errno_t *NOTHROW(LIBCCALL libc_errno_p)(void) {
 
 DEFINE_PUBLIC_ALIAS(__get_errno_fast, libc_geterrno);
 DEFINE_INTERN_ALIAS(libc___get_errno_fast, libc_geterrno);
-INTERN ATTR_SECTION(".text.crt.errno_access.geterrno")
+INTERN ATTR_SECTION(".text.crt.errno_access")
 NOBLOCK ATTR_PURE errno_t NOTHROW(LIBCCALL libc_geterrno)(void) {
 	return current.pt_errno_value;
 }
 
 DEFINE_PUBLIC_ALIAS(__get_errno, libc_geterrno_safe);
 DEFINE_INTERN_ALIAS(libc___get_errno, libc_geterrno);
-INTERN ATTR_SECTION(".text.crt.dos.errno_access.geterrno_safe")
+INTERN ATTR_SECTION(".text.crt.dos.errno_access")
 NOBLOCK ATTR_PURE errno_t NOTHROW(LIBCCALL libc_geterrno_safe)(void) {
 	return *libc_errno_p();
 }
 
 #ifndef __NO_ATTR_FASTCALL
 DEFINE_PUBLIC_ALIAS(__set_errno, libc_seterrno_compat);
-INTERN ATTR_SECTION(".text.crt.errno_access.seterrno_compat")
+INTERN ATTR_SECTION(".text.crt.errno_access")
 NOBLOCK syscall_slong_t NOTHROW(LIBCCALL libc_seterrno_compat)(errno_t value) {
 	return libc_seterrno(value);
 }
@@ -84,7 +84,7 @@ DEFINE_PUBLIC_ALIAS(__set_errno_f, libc_seterrno);
 #else /* !__NO_ATTR_FASTCALL */
 DEFINE_PUBLIC_ALIAS(__set_errno, libc_seterrno);
 #endif /* __NO_ATTR_FASTCALL */
-INTERN ATTR_SECTION(".text.crt.errno_access.seterrno")
+INTERN ATTR_SECTION(".text.crt.errno_access")
 NOBLOCK syscall_slong_t NOTHROW(__FCALL libc_seterrno)(errno_t value) {
 	struct pthread *me = &current;
 	me->pt_errno_value = value;
@@ -99,7 +99,7 @@ NOBLOCK syscall_slong_t NOTHROW(__FCALL libc_seterrno)(errno_t value) {
 
 DEFINE_PUBLIC_ALIAS(DOS$_errno, libd_errno_p);
 DEFINE_INTERN_ALIAS(libd__errno, libd_errno_p);
-INTERN ATTR_SECTION(".text.crt.dos.errno_access._errno")
+INTERN ATTR_SECTION(".text.crt.dos.errno_access")
 NOBLOCK ATTR_CONST /*dos*/ errno_t *NOTHROW(LIBDCALL libd_errno_p)(void) {
 	struct pthread *me = &current;
 	if (me->pt_errno_kind != LIBC_ERRNO_KIND_DOS) {
@@ -117,7 +117,7 @@ NOBLOCK ATTR_CONST /*dos*/ errno_t *NOTHROW(LIBDCALL libd_errno_p)(void) {
 
 DEFINE_PUBLIC_ALIAS(__get_doserrno, libd_geterrno);
 DEFINE_INTERN_ALIAS(libc___get_doserrno, libd_geterrno);
-INTERN ATTR_SECTION(".text.crt.dos.errno_access.__get_doserrno")
+INTERN ATTR_SECTION(".text.crt.dos.errno_access")
 NOBLOCK ATTR_PURE /*dos*/ errno_t NOTHROW(LIBDCALL libd_geterrno)(void) {
 	return *libd_errno_p();
 }
@@ -126,7 +126,7 @@ DEFINE_PUBLIC_ALIAS(_dosmaperr, libd_seterrno);
 DEFINE_PUBLIC_ALIAS(__set_doserrno, libd_seterrno);
 DEFINE_INTERN_ALIAS(libc__dosmaperr, libd_seterrno);
 DEFINE_INTERN_ALIAS(libc___set_doserrno, libd_seterrno);
-INTERN ATTR_SECTION(".text.crt.dos.errno_access.__set_doserrno")
+INTERN ATTR_SECTION(".text.crt.dos.errno_access")
 NOBLOCK syscall_slong_t NOTHROW(LIBDCALL libd_seterrno)(/*dos*/ errno_t value) {
 	struct pthread *me = &current;
 	me->pt_errno_value = value;
@@ -136,7 +136,7 @@ NOBLOCK syscall_slong_t NOTHROW(LIBDCALL libd_seterrno)(/*dos*/ errno_t value) {
 
 DEFINE_PUBLIC_ALIAS(__doserrno, libd_nterrno_p);
 DEFINE_INTERN_ALIAS(libc___doserrno, libd_nterrno_p);
-INTERN ATTR_CONST ATTR_SECTION(".text.crt.dos.errno_access.__doserrno")
+INTERN ATTR_CONST ATTR_SECTION(".text.crt.dos.errno_access")
 NOBLOCK /*nt*/ errno_t *NOTHROW(LIBDCALL libd_nterrno_p)(void) {
 	struct pthread *me = &current;
 	if (me->pt_errno_kind != LIBC_ERRNO_KIND_NT) {
@@ -154,14 +154,14 @@ NOBLOCK /*nt*/ errno_t *NOTHROW(LIBDCALL libd_nterrno_p)(void) {
 
 DEFINE_PUBLIC_ALIAS(__get_nterrno, libd_getnterrno);
 DEFINE_INTERN_ALIAS(libc___get_nterrno, libd_setnterrno);
-INTERN ATTR_SECTION(".text.crt.dos.errno_access.__get_nterrno")
+INTERN ATTR_SECTION(".text.crt.dos.errno_access")
 NOBLOCK ATTR_PURE /*nt*/ errno_t NOTHROW(LIBDCALL libd_getnterrno)(void) {
 	return *libd_nterrno_p();
 }
 
 DEFINE_PUBLIC_ALIAS(__set_nterrno, libd_setnterrno);
 DEFINE_INTERN_ALIAS(libc___set_nterrno, libd_setnterrno);
-INTERN ATTR_SECTION(".text.crt.dos.errno_access.__set_nterrno")
+INTERN ATTR_SECTION(".text.crt.dos.errno_access")
 NOBLOCK syscall_slong_t NOTHROW(LIBDCALL libd_setnterrno)(/*nt*/ errno_t value) {
 	struct pthread *me = &current;
 	me->pt_errno_value = value;
@@ -177,7 +177,7 @@ NOBLOCK syscall_slong_t NOTHROW(LIBDCALL libd_setnterrno)(/*nt*/ errno_t value) 
 
 DEFINE_PUBLIC_ALIAS(DOS$__errno, libd_cygerrno_p);
 DEFINE_INTERN_ALIAS(libd___errno, libd_cygerrno_p);
-INTERN ATTR_SECTION(".text.crt.dos.errno_access.__errno")
+INTERN ATTR_SECTION(".text.crt.dos.errno_access")
 NOBLOCK ATTR_CONST /*cyg*/ errno_t *NOTHROW(LIBDCALL libd_cygerrno_p)(void) {
 	struct pthread *me = &current;
 	if (me->pt_errno_kind != LIBC_ERRNO_KIND_CYG) {
@@ -195,14 +195,14 @@ NOBLOCK ATTR_CONST /*cyg*/ errno_t *NOTHROW(LIBDCALL libd_cygerrno_p)(void) {
 
 DEFINE_PUBLIC_ALIAS(__get_cygerrno, libd_getcygerrno);
 DEFINE_INTERN_ALIAS(libc___get_cygerrno, libd_getcygerrno);
-INTERN ATTR_SECTION(".text.crt.dos.errno_access.__get_cygerrno")
+INTERN ATTR_SECTION(".text.crt.dos.errno_access")
 NOBLOCK ATTR_PURE /*cyg*/ errno_t NOTHROW(LIBDCALL libd_getcygerrno)(void) {
 	return *libd_cygerrno_p();
 }
 
 DEFINE_PUBLIC_ALIAS(__set_cygerrno, libd_setcygerrno);
 DEFINE_INTERN_ALIAS(libc___set_cygerrno, libd_setcygerrno);
-INTERN ATTR_SECTION(".text.crt.dos.errno_access.__set_cygerrno")
+INTERN ATTR_SECTION(".text.crt.dos.errno_access")
 NOBLOCK syscall_slong_t NOTHROW(LIBDCALL libd_setcygerrno)(/*cyg*/ errno_t value) {
 	struct pthread *me = &current;
 	me->pt_errno_value = value;

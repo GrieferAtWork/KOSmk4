@@ -64,34 +64,33 @@ DECL_BEGIN
 #define RETURN_IN_ORDER 1
 #define REQUIRE_ORDER   2
 
-#define GETOPT_DATA(name)   ATTR_SECTION(".data.crt.application.options." name)
 /* NOTE: We put everything into .data, even though some of it could go into .bss
  *       This is done  so that we  keep related data  more closely together  and
  *       possibly  reduce the number  of required #PFs  to load this sub-system. */
-#define GETOPT_BSS(name)    ATTR_SECTION(".data.crt.application.options." name)
-#define GETOPT_TEXT(name)   ATTR_SECTION(".text.crt.application.options." name)
-#define GETOPT_RODATA(name) ATTR_SECTION(".rodata.crt.application.options." name)
+#define GETOPT_SECTION_DATA   ".data.crt.application.options"
+#define GETOPT_SECTION_BSS    ".data.crt.application.options"
+#define GETOPT_SECTION_TEXT   ".text.crt.application.options"
+#define GETOPT_SECTION_RODATA ".rodata.crt.application.options"
 
 DATDEF /**/ char *g_optarg ASMNAME("optarg");
 DATDEF /*  */ int g_optind ASMNAME("optind");
 DATDEF /*  */ int g_opterr ASMNAME("opterr");
 DATDEF /*  */ int g_optopt ASMNAME("optopt");
-PUBLIC GETOPT_BSS("optarg") char *g_optarg = NULL;
-PUBLIC GETOPT_DATA("optind") int g_optind  = 1;
-PUBLIC GETOPT_DATA("opterr") int g_opterr  = 1;
-PUBLIC GETOPT_DATA("optopt") int g_optopt  = '?';
+PUBLIC ATTR_SECTION(GETOPT_SECTION_BSS) char *g_optarg = NULL;
+PUBLIC ATTR_SECTION(GETOPT_SECTION_DATA) int g_optind  = 1;
+PUBLIC ATTR_SECTION(GETOPT_SECTION_DATA) int g_opterr  = 1;
+PUBLIC ATTR_SECTION(GETOPT_SECTION_DATA) int g_optopt  = '?';
 
-
-PRIVATE GETOPT_BSS("__nextchar")     char *__nextchar;
-PRIVATE GETOPT_BSS("__first_nonopt") int   __first_nonopt;
-PRIVATE GETOPT_BSS("__last_nonopt")  int   __last_nonopt;
-PRIVATE GETOPT_BSS("__ordering")     int   __ordering;
-PRIVATE GETOPT_BSS("__initialized")  int   __initialized;
+PRIVATE ATTR_SECTION(GETOPT_SECTION_BSS) char *__nextchar   = NULL;
+PRIVATE ATTR_SECTION(GETOPT_SECTION_BSS) int __first_nonopt = 0;
+PRIVATE ATTR_SECTION(GETOPT_SECTION_BSS) int __last_nonopt  = 0;
+PRIVATE ATTR_SECTION(GETOPT_SECTION_BSS) int __ordering     = 0;
+PRIVATE ATTR_SECTION(GETOPT_SECTION_BSS) int __initialized  = 0;
 
 
 
 #define DEFINE_STRING(name, str) \
-	PRIVATE GETOPT_RODATA(#name) ATTR_ALIGNED(1) char const name[] = str
+	PRIVATE ATTR_SECTION(GETOPT_SECTION_RODATA) ATTR_ALIGNED(1) char const name[] = str
 DEFINE_STRING(message_ambiguous_option, "%s: option `%s%s' is ambiguous\n");
 DEFINE_STRING(message_ambiguous_option2, "%s: option `%s%s' is ambiguous; possibilities:");
 DEFINE_STRING(message_ambiguous_option_variant, " `%s%s'");
@@ -107,7 +106,7 @@ DEFINE_STRING(message_POSIXLY_CORRECT, "POSIXLY_CORRECT");
 #undef DEFINE_STRING
 
 
-PRIVATE GETOPT_TEXT("exchange")
+PRIVATE ATTR_SECTION(GETOPT_SECTION_TEXT)
 void LIBCCALL exchange(char **argv) {
 	int bottom = __first_nonopt;
 	int middle = __last_nonopt;
@@ -136,7 +135,7 @@ void LIBCCALL exchange(char **argv) {
 	__last_nonopt = optind;
 }
 
-PRIVATE GETOPT_TEXT("process_long_option") int LIBCCALL
+PRIVATE ATTR_SECTION(GETOPT_SECTION_TEXT) int LIBCCALL
 process_long_option(int argc, char **argv, char const *optstring,
                     struct option const *longopts, int *longind,
                     int long_only, int print_errors, char const *prefix) {
@@ -260,7 +259,7 @@ process_long_option(int argc, char **argv, char const *optstring,
 }
 
 
-PRIVATE GETOPT_TEXT("_getopt_initialize") char const *LIBCCALL
+PRIVATE ATTR_SECTION(GETOPT_SECTION_TEXT) char const *LIBCCALL
 _getopt_initialize(int UNUSED(argc), char **UNUSED(argv),
                    char const *optstring, int posixly_correct) {
 	if (optind == 0)
@@ -283,7 +282,7 @@ _getopt_initialize(int UNUSED(argc), char **UNUSED(argv),
 }
 
 
-PRIVATE GETOPT_TEXT("_getopt_internal_r") int LIBCCALL
+PRIVATE ATTR_SECTION(GETOPT_SECTION_TEXT) int LIBCCALL
 _getopt_internal_r(int argc, char **argv, char const *optstring,
                    struct option const *longopts, int *longind,
                    int long_only, int posixly_correct) {
@@ -422,18 +421,12 @@ _getopt_internal_r(int argc, char **argv, char const *optstring,
 
 
 DEFINE_PUBLIC_ALIAS(__posix_getopt,libc___posix_getopt);
-INTERN WUNUSED
-ATTR_WEAK ATTR_SECTION(".text.crt.application.options.__posix_getopt") int
+INTERN WUNUSED ATTR_SECTION(".text.crt.application.options") int
 NOTHROW_NCX(LIBCCALL libc___posix_getopt)(int argc,
                                           char *const argv[],
                                           char const *shortopts) {
-	return _getopt_internal_r(argc,
-	                          (char **)argv,
-	                          shortopts,
-	                          NULL,
-	                          NULL,
-	                          0,
-	                          1);
+	return _getopt_internal_r(argc, (char **)argv, shortopts,
+	                          NULL, NULL, 0, 1);
 }
 
 

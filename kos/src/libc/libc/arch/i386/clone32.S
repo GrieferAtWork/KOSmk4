@@ -33,7 +33,7 @@
  * >> NOTHROW_NCX(VLIBCCALL libc_clone)(__clone_func_t fn, void *child_stack,
  * >>                                   int flags, void *arg, pid_t *ptid,
  * >>                                   void *newtls, pid_t *ctid) */
-.section .text.crt.sched.access.clone
+.section .text.crt.sched.access
 INTERN_FUNCTION(libc_clone)
 	.cfi_startproc
 

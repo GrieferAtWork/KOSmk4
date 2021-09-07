@@ -54,10 +54,7 @@ EXTERN(this_exception_state)
 #define FIELD_ERROR_POINTERS(off)  %fs:this_exception_args + (off)
 #define FIELD_ERROR_FAULTADDR      %fs:this_exception_faultaddr
 #define FIELD_ERROR_REGISTERS(off) %fs:this_exception_state + (off)
-#define S_EXCEPT_TEXT(name)        .text
-#define S_EXCEPT_DATA(name)        .data
-#define S_EXCEPT_RODATA(name)      .rodata
-#define S_EXCEPT_STRING(name)      .rodata
+#define SECTION_EXCEPT_TEXT        .text
 #else /* __KERNEL__ */
 #define FIELD_ERROR_CODE            OFFSET_EXCEPTION_INFO_CODE(%eax)
 #define FIELD_ERROR_FLAGS           OFFSET_EXCEPTION_INFO_FLAGS(%eax)
@@ -65,10 +62,7 @@ EXTERN(this_exception_state)
 #define FIELD_ERROR_FAULTADDR      (OFFSET_EXCEPTION_INFO_DATA + __OFFSET_EXCEPTION_DATA_FAULTADDR)(%eax)
 #define FIELD_ERROR_TRACE(off)     (OFFSET_EXCEPTION_INFO_TRACE + (off))(%eax)
 #define FIELD_ERROR_REGISTERS(off) (OFFSET_EXCEPTION_INFO_STATE + (off))(%eax)
-#define S_EXCEPT_TEXT(name)        .text.crt.except.name
-#define S_EXCEPT_DATA(name)        .data.crt.except.name
-#define S_EXCEPT_RODATA(name)      .rodata.crt.except.name
-#define S_EXCEPT_STRING(name)      .rodata.crt.except.name
+#define SECTION_EXCEPT_TEXT        .text.crt.except
 #endif /* !__KERNEL__ */
 
 #ifdef __KERNEL__
@@ -94,7 +88,7 @@ EXTERN(this_exception_state)
 
 
 
-.section S_EXCEPT_TEXT(error_rethrow)
+.section SECTION_EXCEPT_TEXT
 DEFINE_PUBLIC_ALIAS(error_rethrow, libc_error_rethrow)
 INTERN_FUNCTION(libc_error_rethrow)
 	/* ATTR_NORETURN void error_rethrow(void) */
@@ -191,7 +185,7 @@ DEFINE_PUBLIC_ALIAS(_Unwind_Resume, error_rethrow)
 
 #else /* __KERNEL__ */
 
-.section S_EXCEPT_TEXT(_Unwind_RaiseException)
+.section SECTION_EXCEPT_TEXT
 INTERN_FUNCTION(libc_Unwind_RaiseException)
 	.cfi_startproc
 	.cfi_signal_frame
@@ -206,7 +200,7 @@ END(libc_Unwind_RaiseException)
 DEFINE_PUBLIC_ALIAS(_Unwind_RaiseException, libc_Unwind_RaiseException)
 
 
-.section S_EXCEPT_TEXT(_Unwind_Resume)
+.section SECTION_EXCEPT_TEXT
 INTERN_FUNCTION(libc_Unwind_Resume)
 	.cfi_startproc
 	.cfi_signal_frame
@@ -221,7 +215,7 @@ END(libc_Unwind_Resume)
 DEFINE_PUBLIC_ALIAS(_Unwind_Resume, libc_Unwind_Resume)
 
 
-.section S_EXCEPT_TEXT(_Unwind_Resume_or_Rethrow)
+.section SECTION_EXCEPT_TEXT
 INTERN_FUNCTION(libc_Unwind_Resume_or_Rethrow)
 	.cfi_startproc
 	.cfi_signal_frame
@@ -236,7 +230,7 @@ END(libc_Unwind_Resume_or_Rethrow)
 DEFINE_PUBLIC_ALIAS(_Unwind_Resume_or_Rethrow, libc_Unwind_Resume_or_Rethrow)
 
 
-.section S_EXCEPT_TEXT(_Unwind_ForcedUnwind)
+.section SECTION_EXCEPT_TEXT
 INTERN_FUNCTION(libc_Unwind_ForcedUnwind)
 	.cfi_startproc
 	.cfi_signal_frame
@@ -254,7 +248,7 @@ END(libc_Unwind_ForcedUnwind)
 DEFINE_PUBLIC_ALIAS(_Unwind_ForcedUnwind, libc_Unwind_ForcedUnwind)
 
 
-.section S_EXCEPT_TEXT(_Unwind_Backtrace)
+.section SECTION_EXCEPT_TEXT
 INTERN_FUNCTION(libc_Unwind_Backtrace)
 	.cfi_startproc
 	.cfi_signal_frame
@@ -286,7 +280,7 @@ DEFINE_PUBLIC_ALIAS(_Unwind_Backtrace, libc_Unwind_Backtrace)
 	.cfi_rel_offset %eip, ((offset) + OFFSET_KCPUSTATE_EIP);
 
 
-.section S_EXCEPT_TEXT(except_handler3)
+.section SECTION_EXCEPT_TEXT
 INTERN_FUNCTION(libc_except_handler3)
 	.cfi_startproc simple
 	.cfi_signal_frame
@@ -301,7 +295,7 @@ INTERN_FUNCTION(libc_except_handler3)
 END(libc_except_handler3)
 DEFINE_PUBLIC_ALIAS(except_handler3, libc_except_handler3)
 
-.section S_EXCEPT_TEXT(except_handler4)
+.section SECTION_EXCEPT_TEXT
 INTERN_FUNCTION(libc_except_handler4)
 	.cfi_startproc simple
 	.cfi_signal_frame
@@ -328,7 +322,7 @@ DEFINE_PUBLIC_ALIAS(except_handler4, libc_except_handler4)
 
 
 
-.section S_EXCEPT_TEXT(error_thrown)
+.section SECTION_EXCEPT_TEXT
 DEFINE_PUBLIC_ALIAS(error_thrown, libc_error_thrown)
 INTERN_FUNCTION(libc_error_thrown)
 	/* ATTR_NORETURN void error_thrown(error_code_t code, unsigned int argc, ...) */
@@ -421,7 +415,7 @@ END(libc_error_thrown)
 
 
 
-.section S_EXCEPT_TEXT(error_throw)
+.section SECTION_EXCEPT_TEXT
 DEFINE_PUBLIC_ALIAS(error_throw, libc_error_throw)
 INTERN_FUNCTION(libc_error_throw)
 	.cfi_startproc

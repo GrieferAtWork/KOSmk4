@@ -117,7 +117,7 @@ else {
 print("typedef ", dos_errno_t, " dos_errno_t;");
 local longestDosErrnoName = dosErrnoNames.keys.each.length > ...;
 local longestKosErrnoName = kosErrnoNames.keys.each.length > ...;
-print("PRIVATE ATTR_SECTION(\".rodata.crt.dos.errno_access.dos2kos_db\")");
+print("PRIVATE ATTR_SECTION(\".rodata.crt.dos.compat.dos.errno\")");
 print("kos_errno_t const dos2kos_db[", dos_emax + 1, "] = {");
 for (local i: [:dos_emax + 1]) {
 	print("\t"),;
@@ -134,7 +134,7 @@ for (local i: [:dos_emax + 1]) {
 print("};");
 print();
 
-print("PRIVATE ATTR_SECTION(\".rodata.crt.dos.errno_access.dos2kos_db\")");
+print("PRIVATE ATTR_SECTION(\".rodata.crt.dos.compat.dos.errno\")");
 print("kos_errno_t const kos2dos_db[", kos_emax + 1, "] = {");
 for (local i: [:kos_emax + 1]) {
 	print("\t"),;
@@ -157,7 +157,7 @@ for (local i: [:kos_emax + 1]) {
 print("};");
 ]]]*/
 typedef uint8_t dos_errno_t;
-PRIVATE ATTR_SECTION(".rodata.crt.dos.errno_access.dos2kos_db")
+PRIVATE ATTR_SECTION(".rodata.crt.dos.compat.dos.errno")
 kos_errno_t const dos2kos_db[141] = {
 	KOS_EDOS(0),
 	EPERM,           /*  DOS_EPERM:           Operation not permitted */
@@ -302,7 +302,7 @@ kos_errno_t const dos2kos_db[141] = {
 	EWOULDBLOCK,     /*  DOS_EWOULDBLOCK:     Operation would block */
 };
 
-PRIVATE ATTR_SECTION(".rodata.crt.dos.errno_access.dos2kos_db")
+PRIVATE ATTR_SECTION(".rodata.crt.dos.compat.dos.errno")
 kos_errno_t const kos2dos_db[134] = {
 	DOS_EKOS(0),
 	1,                /*  EPERM           -> DOS_EPERM:           Operation not permitted */
@@ -443,27 +443,27 @@ kos_errno_t const kos2dos_db[134] = {
 /* clang-format on */
 
 DEFINE_PUBLIC_ALIAS(errno_nt2kos, libd_errno_nt2kos);
-INTERN ATTR_SECTION(".text.crt.dos.errno_access.errno_nt2kos")
+INTERN ATTR_SECTION(".text.crt.dos.compat.dos.errno")
 NOBLOCK ATTR_CONST /*kos*/ errno_t NOTHROW(LIBDCALL libd_errno_nt2kos)(/*nt*/ errno_t value) {
 	return libd_errno_dos2kos(libd_errno_nt2dos(value));
 }
 
 DEFINE_PUBLIC_ALIAS(errno_kos2nt, libd_errno_kos2nt);
-INTERN ATTR_SECTION(".text.crt.dos.errno_access.errno_kos2nt")
+INTERN ATTR_SECTION(".text.crt.dos.compat.dos.errno")
 NOBLOCK ATTR_CONST /*nt*/ errno_t NOTHROW(LIBDCALL libd_errno_kos2nt)(/*kos*/ errno_t value) {
 	return libd_errno_dos2nt(libd_errno_kos2dos(value));
 }
 
 DEFINE_PUBLIC_ALIAS(errno_nt2dos, libd_errno_nt2dos);
 DEFINE_INTERN_ALIAS(libd__dosmaperr, libd_errno_nt2dos);
-INTERN ATTR_SECTION(".text.crt.dos.errno_access.errno_nt2dos")
+INTERN ATTR_SECTION(".text.crt.dos.compat.dos.errno")
 NOBLOCK ATTR_CONST /*dos*/ errno_t NOTHROW(LIBDCALL libd_errno_nt2dos)(/*nt*/ errno_t value) {
 	/* TODO */
 	return value;
 }
 
 DEFINE_PUBLIC_ALIAS(errno_dos2nt, libd_errno_dos2nt);
-INTERN ATTR_SECTION(".text.crt.dos.errno_access.errno_dos2nt")
+INTERN ATTR_SECTION(".text.crt.dos.compat.dos.errno")
 NOBLOCK ATTR_CONST /*nt*/ errno_t NOTHROW(LIBDCALL libd_errno_dos2nt)(/*kos*/ errno_t value) {
 	/* TODO */
 	return value;
@@ -471,7 +471,7 @@ NOBLOCK ATTR_CONST /*nt*/ errno_t NOTHROW(LIBDCALL libd_errno_dos2nt)(/*kos*/ er
 
 
 DEFINE_PUBLIC_ALIAS(errno_kos2dos, libd_errno_dos2kos);
-INTERN ATTR_SECTION(".text.crt.dos.errno_access.errno_kos2dos")
+INTERN ATTR_SECTION(".text.crt.dos.compat.dos.errno")
 NOBLOCK ATTR_CONST /*dos*/ errno_t NOTHROW(LIBDCALL libd_errno_kos2dos)(/*kos*/ errno_t value) {
 	errno_t result;
 	if ((unsigned int)value > EMAX)
@@ -483,7 +483,7 @@ NOBLOCK ATTR_CONST /*dos*/ errno_t NOTHROW(LIBDCALL libd_errno_kos2dos)(/*kos*/ 
 }
 
 DEFINE_PUBLIC_ALIAS(errno_dos2kos, libd_errno_dos2kos);
-INTERN ATTR_SECTION(".text.crt.dos.errno_access.errno_dos2kos")
+INTERN ATTR_SECTION(".text.crt.dos.compat.dos.errno")
 NOBLOCK ATTR_CONST /*kos*/ errno_t NOTHROW(LIBDCALL libd_errno_dos2kos)(/*dos*/ errno_t value) {
 	errno_t result;
 	if ((unsigned int)value > DOS_EMAX)

@@ -40,7 +40,7 @@
  * NOTE: This function also fills in `thread->pt_tid' */
 /* INTDEF errno_t NOTHROW(__FCALL libc_pthread_clone)(struct pthread *__restrict thread,
  *                                                    __pthread_start_routine_t start); */
-.section .text.crt.sched.pthread.pthread_clone
+.section .text.crt.sched.pthread
 INTERN_FUNCTION(libc_pthread_clone)
 	.cfi_startproc
 
@@ -90,7 +90,7 @@ END(libc_pthread_clone)
  * libc_pthread_unmap_stack_and_exit(%rdi: void *stackaddr,
  *                                   %rsi: size_t stacksize,
  *                                   %rdx: int exitcode); */
-.section .text.crt.sched.pthread.pthread_unmap_stack_and_exit
+.section .text.crt.sched.pthread
 INTERN_FUNCTION(libc_pthread_unmap_stack_and_exit)
 	movq   %rdx, %rbp          /* int exitcode */
 	movq   $(SYS_munmap), %rax

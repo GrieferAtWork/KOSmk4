@@ -73,13 +73,12 @@
 
 DECL_BEGIN
 
-INTERN ATTR_SECTION(".bss.crt.fs.environ.lock")
+INTERN ATTR_SECTION(".bss.crt.fs.environ")
 struct atomic_rwlock libc_environ_lock = ATOMIC_RWLOCK_INIT;
 
 DEFINE_PUBLIC_ALIAS(__p__environ, libc_p_environ);
-INTERN WUNUSED ATTR_CONST ATTR_RETNONNULL
-ATTR_SECTION(".text.crt.dos.fs.environ.__p__environ") char ***
-NOTHROW(LIBCCALL libc_p_environ)(void) {
+INTERN WUNUSED ATTR_CONST ATTR_RETNONNULL ATTR_SECTION(".text.crt.dos.fs.environ")
+char ***NOTHROW(LIBCCALL libc_p_environ)(void) {
 	return &environ;
 }
 
@@ -1441,8 +1440,8 @@ NOTHROW_NCX(LIBCCALL libc_setregid)(gid_t rgid,
 }
 /*[[[end:libc_setregid]]]*/
 
-PRIVATE ATTR_SECTION(".rodata.crt.system.configuration.hostid_pathname") char const hostid_pathname[] = "/etc";
-PRIVATE ATTR_SECTION(".rodata.crt.system.configuration.hostid_filename") char const hostid_filename[] = "/etc/hostid";
+PRIVATE ATTR_SECTION(".rodata.crt.system.configuration") char const hostid_pathname[] = "/etc";
+PRIVATE ATTR_SECTION(".rodata.crt.system.configuration") char const hostid_filename[] = "/etc/hostid";
 
 /*[[[head:libc_gethostid,hash:CRC-32=0xd6c89d9b]]]*/
 /* >> gethostid(3) */
@@ -2166,7 +2165,7 @@ NOTHROW_NCX(LIBCCALL libc_confstr)(__STDC_INT_AS_UINT_T name,
 /*[[[body:libc_confstr]]]*/
 {
 #define DEFINE_STRING(name, text) \
-	PRIVATE ATTR_SECTION(".rodata.crt.system.configuration.confstr_" #name) char const name[] = text
+	PRIVATE ATTR_SECTION(".rodata.crt.system.configuration") char const name[] = text
 	size_t result;
 	DEFINE_STRING(empty_string, "");
 	char const *result_string = empty_string;

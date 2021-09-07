@@ -42,16 +42,16 @@ DEFINE_NOREL_GLOBAL_META(int, __argc, ".crt.dos.application.init");
 DEFINE_NOREL_GLOBAL_META(char **, __argv, ".crt.dos.application.init");
 DEFINE_NOREL_GLOBAL_META(char *, _pgmptr, ".crt.dos.application.init");
 DEFINE_NOREL_GLOBAL_META(char *, __progname, ".crt.errno.utility");
-DEFINE_NOREL_GLOBAL_META(char **, environ, ".crt.fs.environ.environ");
+DEFINE_NOREL_GLOBAL_META(char **, environ, ".crt.fs.environ");
 
 
 /* <stdio.h> */
 #undef stdin
 #undef stdout
 #undef stderr
-DEFINE_NOREL_GLOBAL_META(FILE *, stdin, ".crt.FILE.locked.read.read.stdin");
-DEFINE_NOREL_GLOBAL_META(FILE *, stdout, ".crt.FILE.locked.write.write.stdout");
-DEFINE_NOREL_GLOBAL_META(FILE *, stderr, ".crt.FILE.locked.write.write.stderr");
+DEFINE_NOREL_GLOBAL_META(FILE *, stdin, ".crt.FILE.locked.read.read");
+DEFINE_NOREL_GLOBAL_META(FILE *, stdout, ".crt.FILE.locked.write.write");
+DEFINE_NOREL_GLOBAL_META(FILE *, stderr, ".crt.FILE.locked.write.write");
 /* HINT: The actual std* symbols are  exported from "user/stdio.c", since  they
  *       require special initialization based on symbols that only exist within
  *       that specific source file */
@@ -64,9 +64,9 @@ DEFINE_NOREL_GLOBAL_META(FILE *, stderr, ".crt.FILE.locked.write.write.stderr");
 DEFINE_NOREL_GLOBAL_META(PERROR_PRINT_PROGNAME, error_print_progname, ".crt.error");
 DEFINE_NOREL_GLOBAL_META(unsigned int, error_message_count, ".crt.error");
 DEFINE_NOREL_GLOBAL_META(int, error_one_per_line, ".crt.error");
-PUBLIC ATTR_SECTION(".bss.crt.error.error_print_progname") PERROR_PRINT_PROGNAME error_print_progname = NULL;
-PUBLIC ATTR_SECTION(".bss.crt.error.error_message_count") unsigned int error_message_count = 0;
-PUBLIC ATTR_SECTION(".bss.crt.error.error_one_per_line") int error_one_per_line = 0;
+PUBLIC ATTR_SECTION(".bss.crt.error") PERROR_PRINT_PROGNAME error_print_progname = NULL;
+PUBLIC ATTR_SECTION(".bss.crt.error") unsigned int error_message_count = 0;
+PUBLIC ATTR_SECTION(".bss.crt.error") int error_one_per_line = 0;
 
 
 /* <regex.h> */
@@ -82,12 +82,12 @@ PUBLIC ATTR_SECTION(".bss.crt.utility.regex") reg_syntax_t re_syntax_options = 0
 #undef __tzname
 #undef __timezone
 #undef __daylight
-DEFINE_NOREL_GLOBAL_META(char *, tzname, ".crt.time.timezone.tzname");
-DEFINE_NOREL_GLOBAL_META(longptr_t, timezone, ".crt.time.timezone.timezone");
-DEFINE_NOREL_GLOBAL_META(int, daylight, ".crt.time.timezone.daylight");
-PUBLIC ATTR_SECTION(".bss.crt.time.timezone.tzname") /* */ char *tzname[2] = { NULL, NULL };
-PUBLIC ATTR_SECTION(".bss.crt.time.timezone.timezone") longptr_t timezone  = 0;
-PUBLIC ATTR_SECTION(".bss.crt.time.timezone.daylight") int /* */ daylight  = 0;
+DEFINE_NOREL_GLOBAL_META(char *, tzname, ".crt.time.timezone");
+DEFINE_NOREL_GLOBAL_META(longptr_t, timezone, ".crt.time.timezone");
+DEFINE_NOREL_GLOBAL_META(int, daylight, ".crt.time.timezone");
+PUBLIC ATTR_SECTION(".bss.crt.time.timezone") char *tzname[2]    = { NULL, NULL };
+PUBLIC ATTR_SECTION(".bss.crt.time.timezone") longptr_t timezone = 0;
+PUBLIC ATTR_SECTION(".bss.crt.time.timezone") int daylight       = 0;
 DEFINE_PUBLIC_ALIAS(__tzname, tzname);
 DEFINE_PUBLIC_ALIAS(__timezone, timezone);
 DEFINE_PUBLIC_ALIAS(__daylight, daylight);

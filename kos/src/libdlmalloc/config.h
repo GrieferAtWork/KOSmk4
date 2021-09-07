@@ -167,26 +167,26 @@ DECL_BEGIN
 
 /* Declare exported functions within individual sections. */
 
-DLMALLOC_EXPORT ATTR_SECTION(".text.crt.dlmalloc") void *dlmalloc(size_t bytes);
-DLMALLOC_EXPORT ATTR_SECTION(".text.crt.dlfree") void dlfree(void *mem);
-DLMALLOC_EXPORT ATTR_SECTION(".text.crt.dlcalloc") void *dlcalloc(size_t n_elements, size_t elem_size);
-DLMALLOC_EXPORT ATTR_SECTION(".text.crt.dlrealloc") void *dlrealloc(void *oldmem, size_t bytes);
-DLMALLOC_EXPORT ATTR_SECTION(".text.crt.dlrealloc_in_place") void *dlrealloc_in_place(void *oldmem, size_t bytes);
-DLMALLOC_EXPORT ATTR_SECTION(".text.crt.dlmemalign") void *dlmemalign(size_t alignment, size_t bytes);
-DLMALLOC_EXPORT ATTR_SECTION(".text.crt.dlposix_memalign") int dlposix_memalign(void **pp, size_t alignment, size_t bytes);
-DLMALLOC_EXPORT ATTR_SECTION(".text.crt.dlvalloc") void *dlvalloc(size_t bytes);
-DLMALLOC_EXPORT ATTR_SECTION(".text.crt.dlmallopt") int dlmallopt(int param_number, int value);
-DLMALLOC_EXPORT ATTR_SECTION(".text.crt.dlmalloc_footprint") size_t dlmalloc_footprint(void);
-DLMALLOC_EXPORT ATTR_SECTION(".text.crt.dlmalloc_max_footprint") size_t dlmalloc_max_footprint(void);
-DLMALLOC_EXPORT ATTR_SECTION(".text.crt.dlmalloc_footprint_limit") size_t dlmalloc_footprint_limit(void);
-DLMALLOC_EXPORT ATTR_SECTION(".text.crt.dlmalloc_set_footprint_limit") size_t dlmalloc_set_footprint_limit(size_t bytes);
-DLMALLOC_EXPORT ATTR_SECTION(".text.crt.dlmallinfo") struct mallinfo dlmallinfo(void);
-DLMALLOC_EXPORT ATTR_SECTION(".text.crt.dlindependent_calloc") void **dlindependent_calloc(size_t n_elements, size_t elem_size, void *chunks[]);
-DLMALLOC_EXPORT ATTR_SECTION(".text.crt.dlindependent_comalloc") void **dlindependent_comalloc(size_t n_elements, size_t sizes[], void *chunks[]);
-DLMALLOC_EXPORT ATTR_SECTION(".text.crt.dlbulk_free") size_t dlbulk_free(void *array[], size_t nelem);
-DLMALLOC_EXPORT ATTR_SECTION(".text.crt.dlpvalloc") void *dlpvalloc(size_t bytes);
-DLMALLOC_EXPORT ATTR_SECTION(".text.crt.dlmalloc_trim") int dlmalloc_trim(size_t pad);
-DLMALLOC_EXPORT ATTR_SECTION(".text.crt.dlmalloc_usable_size") size_t dlmalloc_usable_size(void *mem);
+DLMALLOC_EXPORT ATTR_SECTION(".text.crt.heap.malloc") void *dlmalloc(size_t bytes);
+DLMALLOC_EXPORT ATTR_SECTION(".text.crt.heap.malloc") void dlfree(void *mem);
+DLMALLOC_EXPORT ATTR_SECTION(".text.crt.heap.malloc") void *dlcalloc(size_t n_elements, size_t elem_size);
+DLMALLOC_EXPORT ATTR_SECTION(".text.crt.heap.malloc") void *dlrealloc(void *oldmem, size_t bytes);
+DLMALLOC_EXPORT ATTR_SECTION(".text.crt.heap.malloc") void *dlrealloc_in_place(void *oldmem, size_t bytes);
+DLMALLOC_EXPORT ATTR_SECTION(".text.crt.heap.malloc") void *dlmemalign(size_t alignment, size_t bytes);
+DLMALLOC_EXPORT ATTR_SECTION(".text.crt.heap.malloc") int dlposix_memalign(void **pp, size_t alignment, size_t bytes);
+DLMALLOC_EXPORT ATTR_SECTION(".text.crt.heap.malloc") void *dlvalloc(size_t bytes);
+DLMALLOC_EXPORT ATTR_SECTION(".text.crt.heap.malloc") int dlmallopt(int param_number, int value);
+DLMALLOC_EXPORT ATTR_SECTION(".text.crt.heap.malloc") size_t dlmalloc_footprint(void);
+DLMALLOC_EXPORT ATTR_SECTION(".text.crt.heap.malloc") size_t dlmalloc_max_footprint(void);
+DLMALLOC_EXPORT ATTR_SECTION(".text.crt.heap.malloc") size_t dlmalloc_footprint_limit(void);
+DLMALLOC_EXPORT ATTR_SECTION(".text.crt.heap.malloc") size_t dlmalloc_set_footprint_limit(size_t bytes);
+DLMALLOC_EXPORT ATTR_SECTION(".text.crt.heap.malloc") struct mallinfo dlmallinfo(void);
+DLMALLOC_EXPORT ATTR_SECTION(".text.crt.heap.malloc") void **dlindependent_calloc(size_t n_elements, size_t elem_size, void *chunks[]);
+DLMALLOC_EXPORT ATTR_SECTION(".text.crt.heap.malloc") void **dlindependent_comalloc(size_t n_elements, size_t sizes[], void *chunks[]);
+DLMALLOC_EXPORT ATTR_SECTION(".text.crt.heap.malloc") size_t dlbulk_free(void *array[], size_t nelem);
+DLMALLOC_EXPORT ATTR_SECTION(".text.crt.heap.malloc") void *dlpvalloc(size_t bytes);
+DLMALLOC_EXPORT ATTR_SECTION(".text.crt.heap.malloc") int dlmalloc_trim(size_t pad);
+DLMALLOC_EXPORT ATTR_SECTION(".text.crt.heap.malloc") size_t dlmalloc_usable_size(void *mem);
 
 #ifdef DL_REGISTER_CACHE
 DL_REGISTER_CACHE(dl_clear_caches) {

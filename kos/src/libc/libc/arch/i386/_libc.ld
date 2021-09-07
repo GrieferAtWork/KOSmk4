@@ -17,30 +17,29 @@
  *    misrepresented as being the original software.                          *
  * 3. This notice may not be removed or altered from any source distribution. *
  */
-#ifndef GUARD_LIBC_LIBC_ARCH_I386__LIBC64_LD
-#define GUARD_LIBC_LIBC_ARCH_I386__LIBC64_LD 1
+#ifndef GUARD_LIBC_LIBC_ARCH_I386__LIBC_LD
+#define GUARD_LIBC_LIBC_ARCH_I386__LIBC_LD 1
 
 #include <hybrid/compiler.h>
 
+#include <hybrid/host.h>
+
 #include <asm/pagesize.h>
 
-/* #include <crt-features/crt-kos-sections-order.h> */
-/* Include as relative so we get a dependency on that header.
- * Since  that header is automatically generated, it updating
- * will also force our file to be re-preprocessed, automating
- * the process a little bit better. */
-#include "../../../../../include/crt-features/crt-kos-sections-order.h"
+#include "../../../crt-order.h"
 
 #if 0
 #define PHDR(x) /* nothing */
 #else
 PHDRS {
-	text PT_LOAD;
-//	xdata PT_LOAD;
-	rodata PT_LOAD;
-	data PT_LOAD;
+	text    PT_LOAD;
+#ifndef __x86_64__
+	xdata   PT_LOAD;
+#endif /* !__x86_64__ */
+	rodata  PT_LOAD;
+	data    PT_LOAD;
 	dynamic PT_DYNAMIC;
-	tls PT_TLS;
+	tls     PT_TLS;
 }
 #define PHDR(x) :x
 #endif
@@ -53,14 +52,12 @@ PHDRS {
 
 
 #define ENUMERATE_CRT_SECTIONS(PREFIX) \
-	__CRT_LINKORDER_SECTIONS(*,PREFIX.crt)
+	CRT_SECTIONS_LINKORDER(*,PREFIX)
 #define ENUMERATE_SECTIONS(PREFIX)                                 \
 	*(PREFIX.hot PREFIX.likely PREFIX.hot.* PREFIX.likely.*)       \
 	*(PREFIX)                                                      \
-	ENUMERATE_CRT_SECTIONS(PREFIX.crt)                             \
-	*(PREFIX.cold PREFIX.unlikely PREFIX.cold.* PREFIX.unlikely.*) \
-	*(PREFIX.*)                                                    \
-/**/
+	ENUMERATE_CRT_SECTIONS(PREFIX)                                 \
+	*(PREFIX.cold PREFIX.unlikely PREFIX.cold.* PREFIX.unlikely.*)
 
 
 SECTIONS {
@@ -74,20 +71,21 @@ SECTIONS {
 	.text : {
 		*(.text.__x86.*)
 		ENUMERATE_SECTIONS(.text)
+		*(.text.local.*)
 	} PHDR(text)
 
-//	. = ALIGN(__ARCH_PAGESIZE);
-//	.xdata : {
-//		ENUMERATE_SECTIONS(.xdata)
-//	} PHDR(xdata)
+#ifndef __x86_64__
+	. = ALIGN(__ARCH_PAGESIZE);
+	.xdata : {
+		*(.xdata)
+	} PHDR(xdata)
+#endif /* !__x86_64__ */
 
 	. = ALIGN(__ARCH_PAGESIZE);
 	.rodata : {
-		*(.rodata.hot .rodata.likely .rodata.hot.* .rodata.likely.*)
-		*(.rodata .rodata.str* .rodata.*.str* .rodata.cst* .rodata.*.cst*)
-		ENUMERATE_CRT_SECTIONS(.rodata)
-		*(.rodata.cold .rodata.cold.* .rodata.unlikely .rodata.unlikely.*)
-		*(.rodata.*)
+		*(.rodata.str* .rodata.*.str* .rodata.cst* .rodata.*.cst*)
+		ENUMERATE_SECTIONS(.rodata)
+		*(.rodata.local.*)
 	} PHDR(rodata)
 
 	.gcc_except_table : {
@@ -102,6 +100,7 @@ SECTIONS {
 		KEEP(*(.eh_frame))
 	} PHDR(rodata)
 
+#ifdef __x86_64__
 	.rela.dyn : {
 		*(.rela.init)
 		*(.rela.text .rela.text.* .rela.gnu.linkonce.t.*)
@@ -123,6 +122,27 @@ SECTIONS {
 	.rela.plt : {
 		*(.rela.plt)
 	} PHDR(rodata)
+#else /* __x86_64__ */
+	.rel.dyn : {
+		*(.rel.init)
+		*(.rel.text .rel.text.*)
+		*(.rel.fini)
+		*(.rel.rodata .rel.rodata.*)
+		*(.rel.data.rel.ro .rel.data.rel.ro.*)
+		*(.rel.data .rel.data.*)
+		*(.rel.tdata .rel.tdata.*)
+		*(.rel.tbss .rel.tbss.*)
+		*(.rel.ctors)
+		*(.rel.dtors)
+		*(.rel.got)
+		*(.rel.bss .rel.bss.*)
+		*(.rel.ifunc)
+	} PHDR(rodata)
+
+	.rel.plt : {
+		*(.rel.plt)
+	} PHDR(rodata)
+#endif /* !__x86_64__ */
 
 	.tdata : {
 		*(.tdata .tdata.* .gnu.linkonce.td.*)
@@ -147,12 +167,9 @@ SECTIONS {
 	} PHDR(data)
 
 	.data : {
-		*(.data.read_mostly .data.hot .data.likely .data.hot.* .data.likely.*)
-		*(.data)
-		ENUMERATE_CRT_SECTIONS(.data)
-		*(.data.local.*) /* Load data objects, as defined by `__LOCAL_LIBC_DATA()' within automatic source files. */
-		*(.data.cold .data.unlikely .data.cold.* .data.unlikely.*)
-//		*(.data.*) /* We need to be able to discard *(.data.DW.ref.*)! */
+		*(.data.read_mostly)
+		ENUMERATE_SECTIONS(.data)
+		*(.data.local.*)
 	} PHDR(data)
 
 	.preinit_array : {
@@ -170,6 +187,7 @@ SECTIONS {
 	. = ALIGN(__ARCH_PAGESIZE);
 	.bss : {
 		ENUMERATE_SECTIONS(.bss)
+		*(.bss.local.*)
 	} PHDR(data)
 
 	/DISCARD/ : {
@@ -185,4 +203,4 @@ SECTIONS {
 
 }
 
-#endif /* !GUARD_LIBC_LIBC_ARCH_I386__LIBC64_LD */
+#endif /* !GUARD_LIBC_LIBC_ARCH_I386__LIBC_LD */

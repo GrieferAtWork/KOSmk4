@@ -30,16 +30,16 @@
 
 
 #ifdef __KERNEL__
-#define ASSERTION_SECTION(n)   .text.cold
+#define ASSERTION_SECTION   .text.cold
 #else /* __KERNEL__ */
-#define ASSERTION_SECTION(n)   .text.crt.assert.n
+#define ASSERTION_SECTION   .text.crt.assert
 #endif /* !__KERNEL__ */
 
 #define ADJUST_ESP(additional_offset, argument_size) \
 	addl   $(((SIZEOF_KCPUSTATE - OFFSET_KCPUSTATE_GPREGS) - OFFSET_KCPUSTATE_EFLAGS) + (additional_offset)), \
 	          OFFSET_KCPUSTATE_GPREGS + OFFSET_GPREGS_ESP(%esp)
 
-.section ASSERTION_SECTION(__stack_chk_fail)
+.section ASSERTION_SECTION
 PUBLIC_FUNCTION(__stack_chk_fail)
 	.cfi_startproc
 	/* Generate a full `struct kcpustate' */
@@ -53,7 +53,7 @@ PUBLIC_FUNCTION(__stack_chk_fail)
 END(__stack_chk_fail)
 DEFINE_INTERN_ALIAS(__stack_chk_fail_local, __stack_chk_fail)
 
-.section ASSERTION_SECTION(abort)
+.section ASSERTION_SECTION
 INTERN_FUNCTION(libc_abort)
 	.cfi_startproc
 	/* Generate a full `struct kcpustate' */
@@ -76,7 +76,7 @@ DEFINE_PUBLIC_ALIAS("?terminate@@YAXXZ", libc_abort) /* std::terminate(void) */
 #endif /* !__KERNEL__ */
 
 
-.section ASSERTION_SECTION(__afail)
+.section ASSERTION_SECTION
 INTERN_FUNCTION(libc___afail)
 	.cfi_startproc
 	/* char const *expr, char const *file, unsigned int line, char const *func */
@@ -103,7 +103,7 @@ INTERN_FUNCTION(libc___afail)
 END(libc___afail)
 DEFINE_PUBLIC_ALIAS(__afail, libc___afail)
 
-.section ASSERTION_SECTION(__afailf)
+.section ASSERTION_SECTION
 INTERN_FUNCTION(libc___afailf)
 	.cfi_startproc
 	/* char const *expr, char const *file, unsigned int line, char const *func, char const *format */
@@ -125,7 +125,7 @@ DEFINE_PUBLIC_ALIAS(__afailf, libc___afailf)
 #if defined(__KERNEL__) || defined(__INTELLISENSE__)
 /* Support for __acheck[f]() */
 
-.section ASSERTION_SECTION(__acheck)
+.section ASSERTION_SECTION
 INTERN_FUNCTION(libc___acheck)
 	.cfi_startproc
 	/* char const *expr, char const *file, unsigned int line, char const *func */
@@ -194,7 +194,7 @@ INTERN_FUNCTION(libc___acheck)
 END(libc___acheck)
 DEFINE_PUBLIC_ALIAS(__acheck, libc___acheck)
 
-.section ASSERTION_SECTION(__acheckf)
+.section ASSERTION_SECTION
 INTERN_FUNCTION(libc___acheckf)
 	.cfi_startproc
 	/* char const *expr, char const *file, unsigned int line, char const *func, char const *format */
@@ -218,7 +218,7 @@ DEFINE_PUBLIC_ALIAS(__acheckf, libc___acheckf)
 DEFINE_INTERN_ALIAS(libc___assert_fail, libc___afail)
 DEFINE_PUBLIC_ALIAS(__assert_fail, libc___assert_fail)
 
-.section ASSERTION_SECTION(__assert_func)
+.section ASSERTION_SECTION
 INTERN_FUNCTION(libc___assert_func)
 	.cfi_startproc
 	/* char const *file, unsigned int line, char const *func, char const *expr */
@@ -240,7 +240,7 @@ END(libc___assert_func)
 DEFINE_PUBLIC_ALIAS(__assert_func, libc___assert_func)
 
 
-.section ASSERTION_SECTION(__assertfail)
+.section ASSERTION_SECTION
 INTERN_FUNCTION(libc___assertfail)
 	.cfi_startproc
 	/* char const *expr, char const *file, unsigned int line, char const *func, size_t charsize */
@@ -258,7 +258,7 @@ DEFINE_PUBLIC_ALIAS(__assertfail, libc___assertfail)
 
 
 
-.section ASSERTION_SECTION(__assert)
+.section ASSERTION_SECTION
 INTERN_FUNCTION(libc___assert)
 	.cfi_startproc
 	/* char const *file, unsigned int line, char const *expr */
@@ -290,7 +290,7 @@ DEFINE_PUBLIC_ALIAS(__assert, libc___assert)
 
 
 
-.section ASSERTION_SECTION(_assert)
+.section ASSERTION_SECTION
 INTERN_FUNCTION(libc__assert)
 	.cfi_startproc
 	/* char const *expr, char const *file, unsigned int line */

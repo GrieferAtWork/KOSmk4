@@ -46,11 +46,11 @@ DECL_BEGIN
  * Define this special variant manually, since magic wouldn't  understand
  * some weird function that only exists in DOS-mode, but uses a name that
  * is bound to a different function in KOS-mode... */
-PRIVATE ATTR_SECTION(".bss.crt.dos.wchar.string.memory.wcstok_safe_ptr")
+PRIVATE ATTR_SECTION(".bss.crt.dos.wchar.string.memory")
 char16_t *wcstok_safe_ptr = NULL;
 
 DEFINE_PUBLIC_ALIAS(DOS$wcstok, libd_wcstok_nosafe);
-INTERN ATTR_SECTION(".text.crt.dos.wchar.string.memory.wcstok") NONNULL((2)) char16_t *
+INTERN ATTR_SECTION(".text.crt.dos.wchar.string.memory") NONNULL((2)) char16_t *
 NOTHROW_NCX(LIBDCALL libd_wcstok_nosafe)(char16_t *string,
                                          char16_t const *__restrict delim) {
 	return libd_wcstok(string, delim, &wcstok_safe_ptr);

@@ -112,7 +112,7 @@ got_candidate:
 
 DEFINE_PUBLIC_ALIAS(memmem0, libc_memmem0);
 INTERN ATTR_PURE WUNUSED NONNULL((1, 3))
-ATTR_WEAK ATTR_SECTION(".text.crt.string.memory.memmem0") void *
+ATTR_WEAK ATTR_SECTION(".text.crt.string.memory") void *
 NOTHROW_NCX(LIBCCALL libc_memmem0)(void const *haystack, size_t haystacklen,
                                    void const *needle, size_t needlelen) {
 	byte_t *candidate, marker;
@@ -132,7 +132,7 @@ NOTHROW_NCX(LIBCCALL libc_memmem0)(void const *haystack, size_t haystacklen,
 
 DEFINE_PUBLIC_ALIAS(memrmem0, libc_memrmem0);
 INTERN ATTR_PURE WUNUSED NONNULL((1, 3))
-ATTR_WEAK ATTR_SECTION(".text.crt.string.memory.memrmem0") void *
+ATTR_WEAK ATTR_SECTION(".text.crt.string.memory") void *
 NOTHROW_NCX(LIBCCALL libc_memrmem0)(void const *haystack, size_t haystacklen,
                                     void const *needle, size_t needlelen) {
 	byte_t *candidate, marker;

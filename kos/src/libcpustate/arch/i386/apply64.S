@@ -39,18 +39,18 @@
 #endif /* __KERNEL__ */
 
 #ifdef __KERNEL__
-#define TEXT_SECTION     .section .xdata
+#define TEXT_SECTION     .xdata
 #define BEGIN_TRAP(name) PUBLIC_FUNCTION(name); .byte 0xe9; .long 0x00000000
 #define END_TRAP(name)   END(name)
 #else /* __KERNEL__ */
-#define TEXT_SECTION     .section .text
+#define TEXT_SECTION     .text
 #define BEGIN_TRAP(name) /* nothing */
 #define END_TRAP(name)   /* nothing */
 #endif /* !__KERNEL__ */
 
 
 #ifdef __KERNEL__
-TEXT_SECTION
+.section TEXT_SECTION
 	.cfi_startproc simple
 	.cfi_signal_frame
 	.cfi_def_cfa %rdi, 0
@@ -71,7 +71,7 @@ DEFINE_PUBLIC_ALIAS(cpu_apply_icpustate_rsp, libcpu_apply_icpustate_rsp)
 
 
 
-TEXT_SECTION
+.section TEXT_SECTION
 	.cfi_startproc simple
 	.cfi_signal_frame
 	.cfi_def_cfa %rdi, OFFSET_SCPUSTATE_IRREGS
@@ -115,7 +115,7 @@ DEFINE_PUBLIC_ALIAS(cpu_apply_scpustate_rsp, libcpu_apply_scpustate_rsp)
 
 
 
-TEXT_SECTION
+.section TEXT_SECTION
 	.cfi_startproc simple
 	.cfi_signal_frame
 	.cfi_def_cfa %rdi, 0
@@ -203,7 +203,7 @@ END_TRAP(kernel_debugtrap_ucpustate)
 DEFINE_PUBLIC_ALIAS(cpu_apply_ucpustate, libcpu_apply_ucpustate)
 
 
-TEXT_SECTION
+.section TEXT_SECTION
 	.cfi_startproc simple
 	.cfi_signal_frame
 	.cfi_def_cfa %rdi, 0
@@ -292,7 +292,7 @@ END_TRAP(kernel_debugtrap_lcpustate)
 DEFINE_PUBLIC_ALIAS(cpu_apply_lcpustate, libcpu_apply_lcpustate)
 
 
-TEXT_SECTION
+.section TEXT_SECTION
 	.cfi_startproc simple
 	.cfi_signal_frame
 	.cfi_def_cfa %rdi, 0

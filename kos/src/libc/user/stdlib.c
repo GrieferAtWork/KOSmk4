@@ -82,7 +82,7 @@ PRIVATE ATTR_SECTION(".bss.crt.fs.environ.heap") char **libc_environ_heap = NULL
 /* [lock(libc_environ_lock)][0..1] Linked list of heap-allocated environ strings. */
 PRIVATE ATTR_SECTION(".bss.crt.fs.environ.heap") struct environ_heapstr *libc_environ_strings = NULL;
 
-LOCAL ATTR_SECTION(".text.crt.fs.environ.heap.environ_remove_heapstring_locked")
+LOCAL ATTR_SECTION(".text.crt.fs.environ.heap")
 bool LIBCCALL environ_remove_heapstring_locked(struct environ_heapstr *ptr) {
 	struct environ_heapstr **piter, *iter;
 	assert(atomic_rwlock_reading(&libc_environ_lock));
@@ -108,7 +108,7 @@ bool LIBCCALL environ_remove_heapstring_locked(struct environ_heapstr *ptr) {
 typedef void (__LIBDCALL *__dos_atexit_func_t)(void);
 typedef int (__LIBDCALL *__dos_compar_fn_t)(void const *__a, void const *__b);
 
-PRIVATE ATTR_SECTION(".text.crt.dos.sched.process.libd_atexit_wrapper") void
+PRIVATE ATTR_SECTION(".text.crt.dos.sched.process") void
 NOTHROW_NCX(LIBCCALL libd_atexit_wrapper)(int status, void *arg) {
 	(void)status;
 	(*(__dos_atexit_func_t)arg)();
@@ -157,7 +157,7 @@ INTERN ATTR_SECTION(".text.crt.dos.utility.stdlib") WUNUSED NONNULL((1, 2, 5)) v
 /* TODO: Add support for: __cxa_thread_atexit_impl  */
 DEFINE_PUBLIC_ALIAS(__cxa_atexit, libc___cxa_atexit);
 
-INTERN ATTR_SECTION(".text.crt.sched.process.__cxa_atexit") int
+INTERN ATTR_SECTION(".text.crt.sched.process") int
 NOTHROW_NCX(LIBCCALL libc___cxa_atexit)(void (LIBCCALL *func)(void *arg),
                                         void *arg, void *dso_handle) {
 	void *dl_handle, *error;
@@ -195,14 +195,14 @@ NOTHROW_NCX(LIBCCALL libc___cxa_atexit)(void (LIBCCALL *func)(void *arg),
 
 
 
-PRIVATE ATTR_SECTION(".rodata.crt.random.rand_map") u32 const rand_map[] = {
+PRIVATE ATTR_SECTION(".rodata.crt.random") u32 const rand_map[] = {
 	0x11e0ebcc, 0xa914eba6, 0xe400e438, 0xa6c4a4df,
 	0x0da46171, 0x4b9a27d1, 0x201910ae, 0x95e213cb,
 	0xd5ce0943, 0x00005fdc, 0x0319257d, 0x09280b06,
 	0x1148c0a6, 0x07a24139, 0x021214a6, 0x03221af8
 };
-PRIVATE ATTR_SECTION(".bss.crt.random.seed") u32 libc_seed = 0;
-PRIVATE ATTR_SECTION(".text.crt.random.seed") unsigned int
+PRIVATE ATTR_SECTION(".bss.crt.random") u32 libc_seed = 0;
+PRIVATE ATTR_SECTION(".text.crt.random") unsigned int
 NOTHROW(LIBCCALL libc_do_random)(unsigned int *pseed) {
 	unsigned int old_seed, new_seed;
 	do {
@@ -1503,8 +1503,7 @@ NOTHROW_NCX(LIBCCALL libc___p___argv)(void)
 /*[[[end:libc___p___argv]]]*/
 
 
-PRIVATE ATTR_CONST WUNUSED
-ATTR_SECTION(".text.crt.dos.application.init.__p___initenv.get_initenv")
+PRIVATE ATTR_CONST WUNUSED ATTR_SECTION(".text.crt.dos.application.init")
 char **NOTHROW(libc_get_initenv)(void) {
 	struct process_peb *peb;
 	char **result;
@@ -1517,10 +1516,8 @@ char **NOTHROW(libc_get_initenv)(void) {
 	return result;
 }
 
-PRIVATE ATTR_SECTION(".bss.crt.dos.application.init.__p___initenv.pointer")
-char **libc___p___initenv_pointer = NULL;
-PRIVATE ATTR_SECTION(".bss.crt.dos.application.init.__p___initenv.initialized")
-struct atomic_once libc___p___initenv_initialized = ATOMIC_ONCE_INIT;
+PRIVATE ATTR_SECTION(".bss.crt.dos.application.init") char **libc___p___initenv_pointer = NULL;
+PRIVATE ATTR_SECTION(".bss.crt.dos.application.init") struct atomic_once libc___p___initenv_initialized = ATOMIC_ONCE_INIT;
 
 /*[[[head:libc___p___initenv,hash:CRC-32=0x2f3a191d]]]*/
 /* Access to the initial environment block */

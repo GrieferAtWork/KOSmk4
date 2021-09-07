@@ -104,7 +104,7 @@
 	addq   %r11, %rax /* calculate absolute address */
 
 
-.section ".text.crt.dos.msabi64"
+.section ".text.crt.dos.compat.dos.msabi64"
 #define DFUN(sectionName, libd_name, libc_name, returnType, argc, ...)              \
 	INTERN_FUNCTION(libd_name);                                                     \
 		INTERN(libc_name);                                                          \
@@ -208,7 +208,7 @@
 	popq_cfi_r %rsi;               \
 	popq_cfi_r %rdi
 
-.section ".text.crt.dos.msabi64.msabi64_RRRR"
+.section ".text.crt.compat.dos.msabi64.msabi64_RRRR"
 INTERN_FUNCTION(libd_msabi64_RRRR)
 	.cfi_startproc
 	MSABI_LOAD_RETURN_ADDRESS()
@@ -233,7 +233,7 @@ INTERN_FUNCTION(libd_msabi64_RRRR)
 END(libd_msabi64_RRRR)
 
 
-.section ".text.crt.dos.msabi64.msabi64_RRRRR"
+.section ".text.crt.compat.dos.msabi64.msabi64_RRRRR"
 INTERN_FUNCTION(libd_msabi64_RRRRR)
 	.cfi_startproc
 	MSABI_LOAD_RETURN_ADDRESS()
@@ -259,7 +259,7 @@ INTERN_FUNCTION(libd_msabi64_RRRRR)
 END(libd_msabi64_RRRRR)
 
 
-.section ".text.crt.dos.msabi64.msabi64_RRRRRRn"
+.section ".text.crt.compat.dos.msabi64.msabi64_RRRRRRn"
 .cfi_startproc
 /* If necessary, add wrappers for more arguments here! */
 INTERN_FUNCTION(libd_msabi64_RRRRRRRRR)

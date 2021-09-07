@@ -52,19 +52,19 @@ DECL_BEGIN
  *          init.c file, thus preventing the need of unnecessary relocations,
  *          as well as  making it plain  and simple to  control the order  of
  *          initialization/finalization */
-INTERN ATTR_SECTION(".text.crt.application.init.libc_init")
+INTERN ATTR_SECTION(".text.crt.application.init")
 void LIBCCALL libc_init(void) {
 	/* sys_set_exception_handler(...) */
 	EXCEPT_INITIALIZER_KERNEL_EXCEPTION_HANDLER();
 }
 
-INTERN ATTR_SECTION(".text.crt.application.exit.libc_fini")
+INTERN ATTR_SECTION(".text.crt.application.exit")
 void LIBCCALL libc_fini(void) {
 	/* Flush all file buffers to disk. */
 	flushall();
 }
 
-INTERN ATTR_SECTION(".text.crt.glibc.application.init.libc_start_main")
+INTERN ATTR_SECTION(".text.crt.glibc.application.init")
 NONNULL((1)) int LIBCCALL
 libc_start_main(int (*main)(int, char **, char **),
                 int argc, char **ubp_av,

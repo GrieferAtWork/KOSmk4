@@ -40,7 +40,6 @@
 %[declare_user_export("__assert", "__assert_fail", "__assert_func")]
 %[declare_user_export("__assertfail", "_assert")]
 
-
 %[define_replacement(sigset_t = "struct __sigset_struct")]
 %[default:section(".text.crt{|.dos}.database.aliases")]
 

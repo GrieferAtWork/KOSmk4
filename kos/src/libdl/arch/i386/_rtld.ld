@@ -50,7 +50,7 @@ SECTIONS {
 		PROVIDE_HIDDEN(__rtld_text_start = .);
 		*(.text.linker_entry)
 		*(.text.hot .text.hot.* .text.likely .text.likely.*)
-		*(.text.__x86.* .text .text.crt.* .text.local.*)
+		*(.text.__x86.* .text .text.local.*)
 		*(.text.cold .text.cold.* .text.unlikely .text.unlikely.*)
 		*(.text.*)
 		PROVIDE_HIDDEN(__rtld_text_end = .);
@@ -59,7 +59,7 @@ SECTIONS {
 	.rodata BLOCK(1) : {
 		PROVIDE_HIDDEN(__rtld_rodata_start = .);
 		*(.rodata.hot .rodata.hot.* .rodata.likely .rodata.likely.*)
-		*(.rodata .rodata.str* .rodata.cst* .rodata.*.str* .rodata.*.cst* .rodata.crt.* .rodata.local.*)
+		*(.rodata .rodata.str* .rodata.cst* .rodata.*.str* .rodata.*.cst* .rodata.local.*)
 		*(.rodata.cold .rodata.cold.* .rodata.unlikely .rodata.unlikely.*)
 		*(.rodata.*)
 		PROVIDE_HIDDEN(__rtld_rodata_end = .);
@@ -82,7 +82,7 @@ SECTIONS {
 	.data BLOCK(1) : {
 		PROVIDE_HIDDEN(__rtld_data_start = .);
 		*(.data.hot .data.hot.* .data.likely .data.likely.*)
-		*(.data .data.crt.* .data.local.*)
+		*(.data .data.local.*)
 		*(.data.cold .data.cold.* .data.unlikely .data.unlikely.*)
 		*(.data.*)
 		PROVIDE_HIDDEN(__rtld_data_end = .);
@@ -91,7 +91,7 @@ SECTIONS {
 	.bss BLOCK(1) : {
 		PROVIDE_HIDDEN(__rtld_bss_start = .);
 		*(.bss.hot .bss.hot.* .bss.likely .bss.likely.*)
-		*(.bss .bss.crt.* .bss.local.*)
+		*(.bss .bss.local.*)
 		*(.bss.cold .bss.cold.* .bss.unlikely .bss.unlikely.*)
 		*(.bss.*)
 		PROVIDE_HIDDEN(__rtld_bss_end = .);

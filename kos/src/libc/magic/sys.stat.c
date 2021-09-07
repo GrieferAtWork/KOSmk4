@@ -72,9 +72,6 @@
 %[define_replacement(UTIME_NOW   = __UTIME_NOW)]
 %[define_replacement(UTIME_OMIT  = __UTIME_OMIT)]
 
-%[declare_known_section(".text.crt{|.dos}.fs.stat")]
-%[declare_known_section(".text.crt{|.dos}.fs.stat_glc")]
-
 /* KOS's stat function family */
 %[declare_user_export("kstat", "kstat64")]
 %[declare_user_export("klstat", "klstat64")]

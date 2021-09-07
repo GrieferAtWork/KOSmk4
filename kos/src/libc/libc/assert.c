@@ -53,15 +53,15 @@ DECL_BEGIN
 PUBLIC uintptr_t __stack_chk_guard = 0x123baf37;
 
 /* 0: Unknown, 1: Yes, 2: No */
-PRIVATE ATTR_SECTION(".bss.crt.assert.stderr_isatty") int stderr_isatty = 0;
+PRIVATE ATTR_SECTION(".bss.crt.assert") int stderr_isatty = 0;
 
-INTERN ATTR_NOINLINE ATTR_COLD ATTR_SECTION(".text.crt.assert.determine_stderr_isatty") void
+INTERN ATTR_NOINLINE ATTR_COLD ATTR_SECTION(".text.crt.assert") void
 NOTHROW(LIBCCALL determine_stderr_isatty)(void) {
 	struct termios ios;
 	stderr_isatty = sys_ioctl(STDERR_FILENO, TCGETA, &ios) < 0 ? 2 : 1;
 }
 
-INTERN ATTR_COLD ATTR_SECTION(".text.crt.assert.printer") ssize_t LIBCCALL
+INTERN ATTR_COLD ATTR_SECTION(".text.crt.assert") ssize_t LIBCCALL
 assert_printer(void *UNUSED(ignored), char const *__restrict data, size_t datalen) {
 	/* Also write assertion error text to stderr, but only if it's a TTY. */
 	if (stderr_isatty != 2) {
@@ -75,7 +75,7 @@ assert_printer(void *UNUSED(ignored), char const *__restrict data, size_t datale
 }
 
 
-PRIVATE ATTR_NORETURN ATTR_COLD void LIBCCALL
+PRIVATE ATTR_NORETURN ATTR_COLD ATTR_SECTION(".text.crt.assert") void LIBCCALL
 trap_application(struct kcpustate *__restrict state,
                  union coredump_info *info,
                  unsigned int unwind_error) {
@@ -92,7 +92,7 @@ trap_application(struct kcpustate *__restrict state,
 }
 
 
-INTERN ATTR_NORETURN ATTR_COLD ATTR_SECTION(".text.crt.assert.__stack_chk_fail") void __FCALL
+INTERN ATTR_NORETURN ATTR_COLD ATTR_SECTION(".text.crt.assert") void __FCALL
 libc_stack_failure_core(struct kcpustate *__restrict state) {
 	format_printf(&assert_printer, NULL,
 	              "User-space stack check failure [pc=%p]\n",
@@ -100,7 +100,7 @@ libc_stack_failure_core(struct kcpustate *__restrict state) {
 	trap_application(state, NULL, UNWIND_USER_SSP);
 }
 
-INTERN ATTR_NORETURN ATTR_COLD ATTR_SECTION(".text.crt.assert.abort") void __FCALL
+INTERN ATTR_NORETURN ATTR_COLD ATTR_SECTION(".text.crt.assert") void __FCALL
 libc_abort_failure_core(struct kcpustate *__restrict state) {
 	format_printf(&assert_printer, NULL,
 	              "abort() called [pc=%p]\n",
@@ -109,8 +109,7 @@ libc_abort_failure_core(struct kcpustate *__restrict state) {
 }
 
 
-INTERN ATTR_SECTION(".text.crt.assert.assert")
-ATTR_NOINLINE ATTR_NORETURN ATTR_COLD void LIBCCALL
+INTERN ATTR_NOINLINE ATTR_NORETURN ATTR_COLD ATTR_SECTION(".text.crt.assert") void LIBCCALL
 libc_assertion_failure_core(struct assert_args *__restrict args) {
 	struct coredump_assert cdinfo;
 	char message_buf[COREDUMP_ASSERT_MESG_MAXLEN];
@@ -156,12 +155,12 @@ libc_assertion_failure_core(struct assert_args *__restrict args) {
 }
 
 #ifdef CONFIG_LOG_LIBC_UNIMPLEMENTED
-INTERN void LIBCCALL
+INTERN ATTR_SECTION(".text.crt.assert") void LIBCCALL
 libc_unimplemented(char const *__restrict name) {
 	syslog(LOG_WARN, "[libc] Unimplemented function called: `%#q()'\n", name);
 }
 
-INTERN void VLIBCCALL
+INTERN ATTR_SECTION(".text.crt.assert") void VLIBCCALL
 libc_unimplementedf(char const *__restrict format, ...) {
 	va_list args;
 	syslog(LOG_WARN, "[libc] Unimplemented function called: `");

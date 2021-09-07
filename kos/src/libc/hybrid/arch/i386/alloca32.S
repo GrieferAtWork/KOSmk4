@@ -28,7 +28,7 @@
 #undef alloca
 #undef _alloca
 
-.section .text.crt.utility.alloca
+.section .text.crt.utility
 INTERN_FUNCTION(libc_alloca)
 	.cfi_startproc
 	popl_cfi %ecx            /* return address */
