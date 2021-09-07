@@ -1198,7 +1198,7 @@ function printExceptNameFunctionBodyForMappings(
 		return v.hex()[2:].zfill(4);
 	}
 
-	@@Min/max bounds for continous error sub-class ranges
+	@@Min/max bounds for continuous error sub-class ranges
 	local subClassPartitions: {int: {(int, int)...}} = Dict();
 
 	@@Mappings for @ERROR_CLASS(...) where @(#subClassPartitions[ERROR_CLASS(...)] >= 2)

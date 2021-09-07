@@ -57,6 +57,13 @@ PUBLIC_FUNCTION(x86_syscall32_lcall7)
 	cli /* Disable preemption (NOTE: user-space RPC redirection contains a special case
 	     * to detect us not having a proper IRET  tail and fixes this for us if we  get
 	     * interrupted before we're able to disable interrupts with this  instruction!) */
+/*[[[cfi{arch="i386",register="%eflags"}
+	push   %eflags      # Custom unwind rule for %eflags
+	or     $EFLAGS_IF
+]]]*/
+	.cfi_escape 22,9,6,121,0,11,0,2,33
+/*[[[end]]]*/
+
 	/* Must transform to { IP, CS, EFLAGS, SP, SS } */
 	pushfl_cfi
 	xchgl  %ss:0(%esp), %eax  /* { EAX, IP, CS, SP, SS }      (EAX == EFLAGS) */
@@ -119,11 +126,9 @@ PUBLIC_FUNCTION(x86_syscall32_lcall7_iret)
 	/* + 12: %fs, %es, %ds */
 	movl   (12 + 12 + OFFSET_IRREGS_EIP)(%esp), %ecx /* USER_EIP */
 	/* lcall $7, $? -- { 0x9a, ?, ?, ?, ?, 0x07, 0x00 } */
-	movb   -7(%ecx), %al
-	cmpb   $(0x9a), %al
+	cmpb   $(0x9a), -7(%ecx)
 	jne    2f             /* Not invoked as `lcall $7, $?' */
-	movw   -2(%ecx), %ax
-	cmpw   $(0x0007), %ax
+	cmpw   $(0x0007), -2(%ecx)
 	jne    2f             /* Not invoked as `lcall $7, $?' */
 	movl   -6(%ecx), %eax /* EAX = ? (from `lcall $7, $?') */
 	testl  %eax, %eax

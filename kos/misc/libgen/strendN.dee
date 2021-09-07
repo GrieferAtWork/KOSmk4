@@ -171,8 +171,8 @@ function enumerateIntegerMacrosFromFile(filename: string): {(string, int)...} {
 global final REPR_SPLIT_THRESHOLD = 24;
 
 
-@@Parition a given set of @ids into continous segments that
-@@cover  all given  @ids, and  possibly a  little bit more.
+@@Parition a given set of @ids into continuous segments that
+@@cover all  given @ids,  and possibly  a little  bit  more.
 function parititionIds(ids: {int...}): {(int, int)...} {
 	ids = ids.sorted();
 	local result = [];

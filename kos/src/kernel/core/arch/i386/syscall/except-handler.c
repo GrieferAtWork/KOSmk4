@@ -557,14 +557,20 @@ NOTHROW(FCALL x86_userexcept_seterrno)(struct icpustate *__restrict state,
 #endif /* !__x86_64__ */
 {
 	errno_t errval;
-	(void)sc_info;
 	errval = -error_as_errno(data);
 	log_userexcept_errno_propagate(state, sc_info, data, errval);
+
+	/* All system call  methods return error  values through  EAX.
+	 * If  this were ever to change (such that certain methods use
+	 * different registers/locations), that special behavior would
+	 * have to be implemented right here. */
 	gpregs_setpax(&state->ics_gpregs, errval);
+
 	/* Check if the system call is double-wide so we
 	 * can  sign-extend the error code if necessary. */
 	if (kernel_syscall32_doublewide(sc_info->rsi_sysno))
 		gpregs_setpdx(&state->ics_gpregs, (uintptr_t)-1); /* sign-extend */
+
 	/* Set an error flag (if any) */
 	state = x86_userexcept_set_error_flag(state, sc_info, data);
 	return state;
@@ -574,7 +580,7 @@ NOTHROW(FCALL x86_userexcept_seterrno)(struct icpustate *__restrict state,
 /* Propagate the currently  thrown exception  into user-space, using  either the  user-space
  * exception handler, by raising  a POSIX signal,  or by translating  the exception into  an
  * E* error code in  the event of a  system call with exceptions  disabled (on x86,  except-
- * enabled is usually controlled by the CF bit, however this function takes that information
+ * enabled is usually controlled by the DF bit, however this function takes that information
  * from the `RPC_SYSCALL_INFO_FEXCEPT' bit in `sc_info->rsi_flags'). */
 PUBLIC ATTR_RETNONNULL WUNUSED NONNULL((1)) struct icpustate *
 NOTHROW(FCALL x86_userexcept_propagate)(struct icpustate *__restrict state,

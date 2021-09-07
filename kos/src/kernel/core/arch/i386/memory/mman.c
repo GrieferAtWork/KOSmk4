@@ -355,7 +355,7 @@ INTDEF byte_t __kernel_asyncwork_stack_guard[];
 INTDEF byte_t __kernel_bootidle_stack_guard[];
 #endif /* CONFIG_HAVE_KERNEL_STACK_GUARD */
 
-PRIVATE ATTR_FREETEXT void
+PRIVATE ATTR_FREETEXT NONNULL((1)) void
 NOTHROW(KCALL simple_insert_and_activate)(struct mnode *__restrict node,
                                           u16 prot) {
 	struct mpart *part;

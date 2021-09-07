@@ -154,7 +154,7 @@ STATIC_ASSERT(PAE_PDIR_E1_IDENTITY_BASE == PAE_MMAN_KERNEL_PDIR_IDENTITY_BASE);
  * The caller is required to allocate the page directory
  * controller itself, which  must be  aligned and  sized
  * according to `PAGEDIR_ALIGN' and `PAGEDIR_SIZE'. */
-INTERN NOBLOCK NONNULL((1)) bool
+PRIVATE NOBLOCK WUNUSED NONNULL((1)) bool
 NOTHROW(FCALL pae_pagedir_tryinit)(VIRT struct pae_pdir *__restrict self) {
 	u64 e3[4];
 	/* Assert constants that are used below. */
@@ -277,7 +277,7 @@ NOTHROW(FCALL pae_pagedir_fini)(VIRT struct pae_pdir *__restrict self,
 
 
 
-LOCAL NOBLOCK void
+LOCAL NOBLOCK NONNULL((1)) void
 NOTHROW(FCALL pae_pagedir_set_prepared)(union pae_pdir_e1 *__restrict e1_p) {
 	u64 word;
 	for (;;) {
@@ -460,7 +460,7 @@ NOTHROW(FCALL pae_pagedir_sync_flattened_e1_vector)(unsigned int vec3,
 
 
 
-LOCAL NOBLOCK WUNUSED bool
+LOCAL NOBLOCK WUNUSED NONNULL((1, 2)) bool
 NOTHROW(KCALL pae_pagedir_can_flatten_e1_vector)(union pae_pdir_e1 const e1_p[512],
                                                  u64 *__restrict new_e2_word,
                                                  unsigned int still_prepared_vec2) {
@@ -527,7 +527,7 @@ NOTHROW(KCALL pae_pagedir_can_flatten_e1_vector)(union pae_pdir_e1 const e1_p[51
 	pae_pagedir_unset_prepared(e1_p)
 #endif /* NDEBUG */
 
-LOCAL NOBLOCK void
+LOCAL NOBLOCK NONNULL((1)) void
 NOTHROW(FCALL pae_pagedir_unset_prepared)(union pae_pdir_e1 *__restrict e1_p
 #ifndef NDEBUG
                                           ,
@@ -662,7 +662,7 @@ again_try_exchange_e2_word:
 
 
 #if defined(NDEBUG) || 0
-#define assert_prepared(addr, num_bytes) (void)0
+#define assert_prepared(addr, num_bytes)          (void)0
 #define assert_prepared_if(cond, addr, num_bytes) (void)0
 #else /* NDEBUG */
 PRIVATE NOBLOCK WUNUSED bool
@@ -1084,7 +1084,7 @@ INTERN ATTR_PAGING_READMOSTLY u64 pae_pageperm_matrix[0x40] = {
 };
 
 
-LOCAL NOBLOCK u64
+LOCAL NOBLOCK WUNUSED u64
 NOTHROW(FCALL pae_pagedir_encode_4kib)(PAGEDIR_PAGEALIGNED VIRT void *addr,
                                        PAGEDIR_PAGEALIGNED PHYS physaddr_t phys,
                                        u16 perm) {
@@ -1525,7 +1525,7 @@ NOTHROW(FCALL pae_pagedir_unsetchanged)(VIRT void *addr) {
 
 /* NOTE: This function must do its own tracing of continuous page ranges.
  *       The caller is may not necessary ensure that the function is only
- *       called once for a single, continous range.
+ *       called once for a single, continuous range.
  * @param: word: The page directory starting control word.
  *               When `PAE_PAGE_FPRESENT' is set, refers to a mapped page range
  *               When `PAE_PAGE_FISAHINT' is set, refers to a mapped page range */
@@ -1536,8 +1536,8 @@ typedef void (KCALL *pae_enumfun_t)(void *arg, void *start, size_t num_bytes, u6
 
 #define PAE_PAGE_FPAT PAE_PAGE_FPAT_4KIB
 /* Convert an En | n >= 2 word into an E1 word */
-PRIVATE ATTR_DBGTEXT ATTR_CONST u64 KCALL
-pae_convert_en_to_e1(u64 word) {
+PRIVATE ATTR_DBGTEXT ATTR_CONST WUNUSED u64
+NOTHROW(KCALL pae_convert_en_to_e1)(u64 word) {
 	assert(word & PAE_PAGE_FPRESENT);
 	assert(word & PAE_PAGE_F2MIB);
 	word &= ~PAE_PAGE_F2MIB;
@@ -1551,7 +1551,7 @@ pae_convert_en_to_e1(u64 word) {
 }
 
 #define PAE_PDIR_E1_ISUSED(e1_word) (((e1_word) & (PAE_PAGE_FPRESENT | PAE_PAGE_FISAHINT | PAE_PAGE_FPREPARED)) != 0)
-PRIVATE ATTR_DBGTEXT void KCALL
+PRIVATE ATTR_DBGTEXT NONNULL((1)) void KCALL
 pae_enum_e1(pae_enumfun_t func, void *arg,
             unsigned int vec3,
             unsigned int vec2, u64 mask) {
@@ -1596,7 +1596,7 @@ docall:
 	}
 }
 
-PRIVATE ATTR_DBGTEXT void KCALL
+PRIVATE ATTR_DBGTEXT NONNULL((1)) void KCALL
 pae_enum_e2(pae_enumfun_t func, void *arg,
             unsigned int vec3, u64 mask) {
 	unsigned int vec2 = 1, laststart = 0;
@@ -1653,7 +1653,7 @@ docall:
 	}
 }
 
-PRIVATE ATTR_DBGTEXT void KCALL
+PRIVATE ATTR_DBGTEXT NONNULL((1)) void KCALL
 pae_enum_e3(pae_enumfun_t func, void *arg, unsigned int vec3_end) {
 	unsigned int vec3;
 	union pae_pdir_e3 *e3 = PAE_PDIR_E3_IDENTITY;
@@ -1675,7 +1675,7 @@ struct pae_enumdat {
 	bool   ed_skipident;
 };
 
-PRIVATE ATTR_DBGTEXT void KCALL
+PRIVATE ATTR_DBGTEXT NONNULL((1)) void KCALL
 pae_printident(struct pae_enumdat *__restrict data) {
 	dbg_printf(DBGSTR(AC_WHITE("%p") "-" AC_WHITE("%p") ": " AC_WHITE("%" PRIuSIZ) " identity mappings\n"),
 	           (byte_t *)PAE_MMAN_KERNEL_PDIR_IDENTITY_BASE,
@@ -1684,7 +1684,7 @@ pae_printident(struct pae_enumdat *__restrict data) {
 	data->ed_identcnt = 0;
 }
 
-PRIVATE ATTR_DBGTEXT void KCALL
+PRIVATE ATTR_DBGTEXT NONNULL((1)) void KCALL
 pae_doenum(struct pae_enumdat *__restrict data,
            void *start, size_t num_bytes, u64 word, u64 mask) {
 	assert((word & PAE_PAGE_FPRESENT) || (word & PAE_PAGE_FISAHINT));
@@ -1768,7 +1768,7 @@ pae_doenum(struct pae_enumdat *__restrict data,
 	}
 }
 
-PRIVATE ATTR_DBGTEXT void KCALL
+PRIVATE ATTR_DBGTEXT NONNULL((1)) void KCALL
 pae_enumfun(void *arg, void *start, size_t num_bytes, u64 word) {
 	struct pae_enumdat *data;
 	data = (struct pae_enumdat *)arg;
@@ -1803,7 +1803,8 @@ done_print:
 	data->ed_prevword    = word;
 }
 
-PRIVATE ATTR_DBGTEXT void KCALL pae_do_ldpd(unsigned int vec3_max) {
+PRIVATE ATTR_DBGTEXT void KCALL
+pae_do_ldsd(unsigned int vec3_max) {
 	struct pae_enumdat data;
 	data.ed_prevstart = 0;
 	data.ed_prevsize  = 0;
@@ -1818,13 +1819,14 @@ PRIVATE ATTR_DBGTEXT void KCALL pae_do_ldpd(unsigned int vec3_max) {
 		pae_doenum(&data, data.ed_prevstart, data.ed_prevsize, data.ed_prevword, data.ed_mask);
 }
 
-INTERN ATTR_DBGTEXT void FCALL pae_dbg_lspd(pagedir_phys_t pdir) {
+INTERN ATTR_DBGTEXT void FCALL
+pae_dbg_lspd(pagedir_phys_t pdir) {
 	if (pdir == pagedir_kernel_phys) {
-		pae_do_ldpd(4);
+		pae_do_ldsd(4);
 		return;
 	}
 	PAGEDIR_P_BEGINUSE(pdir) {
-		pae_do_ldpd(3);
+		pae_do_ldsd(3);
 	}
 	PAGEDIR_P_ENDUSE(pdir);
 }

@@ -56,7 +56,7 @@ NOTHROW(KCALL mman_delhwbreak)(struct mman *__restrict self, void *addr,
                                unsigned int br_size DFL(DR_S1));
 
 /* Clear all hardware breakpoints from `self' */
-FUNDEF NOBLOCK void
+FUNDEF NOBLOCK NONNULL((1)) void
 NOTHROW(KCALL mman_clrhwbreak)(struct mman *__restrict self);
 
 DECL_END

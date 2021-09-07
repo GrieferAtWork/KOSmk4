@@ -122,8 +122,12 @@
 /* These are defined explicitly */
 #define __CRT_HAVE_syslog_printer /* Required for using `syslog()' */
 #ifndef NDEBUG
+#ifndef __CRT_HAVE___afail
 #define __CRT_HAVE___afail
+#endif /* !__CRT_HAVE___afail */
+#ifndef __CRT_HAVE___afailf
 #define __CRT_HAVE___afailf
+#endif /* !__CRT_HAVE___afailf */
 #define __CRT_HAVE___stack_chk_guard
 #define __CRT_HAVE___stack_chk_fail
 #define __CRT_HAVE___stack_chk_fail_local

@@ -251,14 +251,17 @@ INTDEF byte_t __x86_cpu_part1_bytes[];
 INTDEF byte_t __x86_cpu_part1_pages[];
 
 #ifdef __x86_64__
-INTDEF FREE union p64_pdir_e1 *NOTHROW(FCALL x86_get_cpu_iob_pointer_p64)(struct cpu *__restrict self);
+INTDEF FREE ATTR_CONST WUNUSED NONNULL((1)) union p64_pdir_e1 *
+NOTHROW(FCALL x86_get_cpu_iob_pointer_p64)(struct cpu const *__restrict self);
 #define x86_get_cpu_iob_pointer  x86_get_cpu_iob_pointer_p64
 #else /* __x86_64__ */
 #ifndef CONFIG_NO_PAGING_P32
-INTDEF FREE union p32_pdir_e1 *NOTHROW(FCALL x86_get_cpu_iob_pointer_p32)(struct cpu *__restrict self);
+INTDEF FREE ATTR_CONST WUNUSED NONNULL((1)) union p32_pdir_e1 *
+NOTHROW(FCALL x86_get_cpu_iob_pointer_p32)(struct cpu const *__restrict self);
 #endif /* !CONFIG_NO_PAGING_P32 */
 #ifndef CONFIG_NO_PAGING_PAE
-INTDEF FREE union pae_pdir_e1 *NOTHROW(FCALL x86_get_cpu_iob_pointer_pae)(struct cpu *__restrict self);
+INTDEF FREE ATTR_CONST WUNUSED NONNULL((1)) union pae_pdir_e1 *
+NOTHROW(FCALL x86_get_cpu_iob_pointer_pae)(struct cpu const *__restrict self);
 #endif /* !CONFIG_NO_PAGING_PAE */
 
 #ifdef CONFIG_NO_PAGING_P32

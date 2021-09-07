@@ -158,16 +158,16 @@ NOTHROW(FCALL pagedir_install_jmp)(void *redirection_addr,
 
 
 
-#if !defined(CONFIG_BOOTUP_OPTIMIZE_FOR_P32) && \
-    !defined(CONFIG_BOOTUP_OPTIMIZE_FOR_PAE)
+#if (!defined(CONFIG_BOOTUP_OPTIMIZE_FOR_P32) && \
+     !defined(CONFIG_BOOTUP_OPTIMIZE_FOR_PAE))
 #if defined(CONFIG_NO_PAGING_P32)
 #define CONFIG_BOOTUP_OPTIMIZE_FOR_PAE 1
 #elif defined(CONFIG_NO_PAGING_PAE)
 #define CONFIG_BOOTUP_OPTIMIZE_FOR_P32 1
-#else
+#else /* ... */
 #define CONFIG_BOOTUP_OPTIMIZE_FOR_PAE 1
-#endif
-#endif
+#endif /* !... */
+#endif /* !CONFIG_BOOTUP_OPTIMIZE_FOR_* */
 
 #ifdef CONFIG_BOOTUP_OPTIMIZE_FOR_PAE
 #define DEFINE_PUBLIC_ALIAS_PAGING_PAE(name) \
@@ -179,7 +179,7 @@ FOREACH_PAGING_FUNCTION(DEFINE_PUBLIC_ALIAS_PAGING_PAE)
 	DEFINE_PUBLIC_ALIAS(name, p32_##name);
 FOREACH_PAGING_FUNCTION(DEFINE_PUBLIC_ALIAS_PAGING_P32)
 #undef DEFINE_PUBLIC_ALIAS_PAGING_P32
-#endif
+#endif /* ... */
 
 
 #ifndef CONFIG_NO_PAGING_P32
@@ -243,7 +243,7 @@ INTDEF byte_t x86_pagedir_syncall_cr4_size[];
 
 
 #ifndef CONFIG_NO_PAGING_P32
-INTERN ATTR_FREETEXT ATTR_CONST union p32_pdir_e1 *
+INTERN ATTR_FREETEXT ATTR_CONST WUNUSED NONNULL((1)) union p32_pdir_e1 *
 NOTHROW(FCALL x86_get_cpu_iob_pointer_p32)(struct cpu *__restrict self) {
 	union p32_pdir_e1 *e1_pointer;
 	uintptr_t iobp;
@@ -252,6 +252,7 @@ NOTHROW(FCALL x86_get_cpu_iob_pointer_p32)(struct cpu *__restrict self) {
 	                                  [P32_PDIR_VEC1INDEX(iobp)];
 	return e1_pointer;
 }
+
 LOCAL ATTR_FREETEXT void
 NOTHROW(KCALL ioperm_preemption_set_p32_unmap)(void) {
 	/* Initialize the `bootcpu.thiscpu_x86_iobnode_pagedir_identity' pointer. */
@@ -275,7 +276,7 @@ NOTHROW(KCALL ioperm_preemption_set_p32_unmap)(void) {
 #endif /* !CONFIG_NO_PAGING_P32 */
 
 #ifndef CONFIG_NO_PAGING_PAE
-INTERN ATTR_FREETEXT ATTR_CONST union pae_pdir_e1 *
+INTERN ATTR_FREETEXT ATTR_CONST WUNUSED NONNULL((1)) union pae_pdir_e1 *
 NOTHROW(FCALL x86_get_cpu_iob_pointer_pae)(struct cpu *__restrict self) {
 	union pae_pdir_e1 *e1_pointer;
 	uintptr_t iobp;
@@ -285,6 +286,7 @@ NOTHROW(FCALL x86_get_cpu_iob_pointer_pae)(struct cpu *__restrict self) {
 	                                  [PAE_PDIR_VEC1INDEX(iobp)];
 	return e1_pointer;
 }
+
 LOCAL ATTR_FREETEXT void
 NOTHROW(KCALL ioperm_preemption_set_pae_unmap)(void) {
 	/* Initialize the `bootcpu.thiscpu_x86_iobnode_pagedir_identity' pointer. */
@@ -344,9 +346,9 @@ NOTHROW(KCALL x86_initialize_paging)(void) {
 		memcpy((void *)&x86_pagedir_syncall_maybe_global, x86_pagedir_syncall_cr3, (size_t)x86_pagedir_syncall_cr3_size);
 	} else if (!HAVE_INSTR_INVPCID) {
 		/* From `4.10.4.1     Operations that Invalidate TLBs and Paging-Structure Caches'
-		 *  `MOV to CR4. The behavior of the instruction depends on the bits being modified:'
-		 *   `The instruction invalidates all TLB entries (including global entries) and all entries
-		 *    in all paging-structure caches (for all PCIDs) if ... it changes the value of CR4.PGE ...' */
+		 *    `MOV to CR4. The behavior of the instruction depends on the bits being modified:'
+		 *       `The instruction invalidates all TLB entries (including global entries) and all entries
+		 *       in  all paging-structure caches (for all PCIDs) if ... it changes the value of CR4.PGE' */
 		/* In other words: Toggling the PGE bit twice will get rid of all global TLBs */
 		memcpy((void *)&pagedir_syncall, x86_pagedir_syncall_cr4, (size_t)x86_pagedir_syncall_cr4_size);
 	}
@@ -364,12 +366,8 @@ NOTHROW(KCALL x86_initialize_paging)(void) {
 		}
 	}
 
-	/* TODO: Make  use   of   `HAVE_PAGE_ATTRIBUTE_TABLE'   to   control
-	 *       availability of `P32_PAGE_FPAT_4KIB' / `P32_PAGE_FPAT_4MIB' */
-
 	/* TODO: Make  use of `CPUID.80000008H:EAX[7:0]'  to figure out the
 	 *       physical address width supported by the hosting processor. */
-
 }
 
 

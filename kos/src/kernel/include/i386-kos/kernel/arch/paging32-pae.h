@@ -318,9 +318,6 @@ INTDEF NONNULL((1)) void FCALL
 pae_pagedir_init(VIRT struct pae_pdir *__restrict self)
 		THROWS(E_BADALLOC);
 
-INTDEF NOBLOCK NONNULL((1)) bool
-NOTHROW(FCALL pae_pagedir_tryinit)(VIRT struct pae_pdir *__restrict self);
-
 /* Finalize a given page directory. */
 INTDEF NOBLOCK NONNULL((1)) void
 NOTHROW(FCALL pae_pagedir_fini)(VIRT struct pae_pdir *__restrict self,

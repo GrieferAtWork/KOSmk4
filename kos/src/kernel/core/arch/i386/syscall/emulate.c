@@ -68,7 +68,8 @@ PUBLIC ATTR_WEAK
 IFELSEX3264(ATTR_SECTION(".text.x86.x86_syscall_emulate_int80h"),
             ATTR_SECTION(".text.x86.x86_syscall_emulate32_int80h"))
 WUNUSED NONNULL((1)) struct icpustate *FCALL
-IFELSEX3264(x86_syscall_emulate_int80h, x86_syscall_emulate32_int80h)(struct icpustate *__restrict state) {
+IFELSEX3264(x86_syscall_emulate_int80h,
+            x86_syscall_emulate32_int80h)(struct icpustate *__restrict state) {
 	struct rpc_syscall_info sc;
 	rpc_syscall_info_get32_int80h(&sc, state);
 	return syscall_emulate32(state, &sc);
@@ -91,7 +92,8 @@ PUBLIC ATTR_WEAK
 IFELSEX3264(ATTR_SECTION(".text.x86.x86_syscall_emulate_sysenter"),
             ATTR_SECTION(".text.x86.x86_syscall_emulate32_sysenter"))
 WUNUSED NONNULL((1)) struct icpustate *FCALL
-IFELSEX3264(x86_syscall_emulate_sysenter, x86_syscall_emulate32_sysenter)(struct icpustate *__restrict state) {
+IFELSEX3264(x86_syscall_emulate_sysenter,
+            x86_syscall_emulate32_sysenter)(struct icpustate *__restrict state) {
 	struct rpc_syscall_info sc;
 	rpc_syscall_info_get32_sysenter(&sc, state);
 	return syscall_emulate32(state, &sc);
@@ -307,8 +309,8 @@ done:
 	return state;
 }
 
-typedef u32 (__ARCH_SYSCALLCC *syscall_run32_32_t)(u64 const *regv);
-typedef u64 (__ARCH_SYSCALLCC *syscall_run32_64_t)(u64 const *regv);
+typedef NONNULL((1)) u32 (__ARCH_SYSCALLCC *syscall_run32_32_t)(u64 const *regv);
+typedef NONNULL((1)) u64 (__ARCH_SYSCALLCC *syscall_run32_64_t)(u64 const *regv);
 
 PUBLIC ATTR_RETNONNULL WUNUSED NONNULL((1, 2)) struct icpustate *FCALL
 syscall_emulate32(struct icpustate *__restrict state,

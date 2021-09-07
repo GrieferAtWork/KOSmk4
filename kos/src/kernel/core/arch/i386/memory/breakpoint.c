@@ -51,7 +51,8 @@ PUBLIC ATTR_PERMMAN uintptr_t thismman_x86_dr7 = 0;
 
 
 #define thismman_x86_drN(n) (*thismman_x86_drN_impl(n))
-LOCAL ATTR_CONST void **KCALL thismman_x86_drN_impl(unsigned int n) {
+LOCAL ATTR_CONST WUNUSED void **
+NOTHROW(KCALL thismman_x86_drN_impl)(unsigned int n) {
 	void **result;
 	switch (n) {
 
@@ -204,7 +205,7 @@ NOTHROW(KCALL mman_delhwbreak)(struct mman *__restrict self,
 }
 
 /* Clear all hardware breakpoints from `self' */
-PUBLIC NOBLOCK void
+PUBLIC NOBLOCK NONNULL((1)) void
 NOTHROW(KCALL mman_clrhwbreak)(struct mman *__restrict self) {
 	uintptr_t dr7;
 	dr7 = FORMMAN(self, thismman_x86_dr7);

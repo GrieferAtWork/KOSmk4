@@ -183,8 +183,9 @@ PRIVATE ATTR_FREETEXT bool NOTHROW(KCALL detect_e820)(void) {
 		state.vr_regs.vr_edx = 0x534d4150;
 		state.vr_regs.vr_edi = VM86_BUFFER_OFFSET;
 		state.vr_regs.vr_es  = VM86_BUFFER_SEG;
+		/* Execute realmode interrupt. */
 		if (!interrupt(&state, 0x15))
-			break; /* Execute realmode interrupt. */
+			break;
 		if (state.vr_regs.vr_eflags & EFLAGS_CF)
 			break; /* Unsupported. */
 		if (state.vr_regs.vr_eax != 0x534d4150)
@@ -207,8 +208,9 @@ PRIVATE ATTR_FREETEXT bool NOTHROW(KCALL detect_e801)(void) {
 	vm86_state_t state;
 	memset(&state.vr_regs, 0, sizeof(state.vr_regs));
 	state.vr_regs.vr_eax = 0xe801;
+	/* Execute realmode interrupt. */
 	if (!interrupt(&state, 0x15))
-		return false; /* Execute realmode interrupt. */
+		return false;
 	if (state.vr_regs.vr_eflags & EFLAGS_CF)
 		return false; /* Check for errors. */
 	state.vr_regs.vr_eax &= 0xffff;
@@ -232,8 +234,9 @@ PRIVATE ATTR_FREETEXT bool NOTHROW(KCALL detect_da88)(void) {
 	u32 count;
 	memset(&state.vr_regs, 0, sizeof(state.vr_regs));
 	state.vr_regs.vr_eax = 0xda88;
+	/* Execute realmode interrupt. */
 	if (!interrupt(&state, 0x15))
-		return false; /* Execute realmode interrupt. */
+		return false;
 	if (state.vr_regs.vr_eflags & EFLAGS_CF)
 		return false;
 	count = ((u32)(state.vr_regs.vr_ebx & 0xffff) << 8 | (u32)(state.vr_regs.vr_ecx & 0xff)) * 1024;
@@ -248,8 +251,9 @@ PRIVATE ATTR_FREETEXT bool NOTHROW(KCALL detect_88)(void) {
 	u32 count;
 	memset(&state.vr_regs, 0, sizeof(state.vr_regs));
 	state.vr_regs.vr_eax = 0x88;
+	/* Execute realmode interrupt. */
 	if (!interrupt(&state, 0x15))
-		return false; /* Execute realmode interrupt. */
+		return false;
 	if (state.vr_regs.vr_eflags & EFLAGS_CF)
 		return false;
 	count = (u32)(state.vr_regs.vr_eax & 0xffff) * 1024;
@@ -264,8 +268,9 @@ PRIVATE ATTR_FREETEXT bool NOTHROW(KCALL detect_8a)(void) {
 	u32 count;
 	memset(&state.vr_regs, 0, sizeof(state.vr_regs));
 	state.vr_regs.vr_eax = 0x8a;
+	/* Execute realmode interrupt. */
 	if (!interrupt(&state, 0x15))
-		return false; /* Execute realmode interrupt. */
+		return false;
 	if (state.vr_regs.vr_eflags & EFLAGS_CF)
 		return false;
 	count = ((u32)(state.vr_regs.vr_edx & 0xffff) |
@@ -292,8 +297,9 @@ PRIVATE ATTR_FREETEXT bool NOTHROW(KCALL detect_c7)(void) {
 	state.vr_regs.vr_eax = 0xc7;
 	state.vr_regs.vr_esi = VM86_BUFFER_OFFSET;
 	state.vr_regs.vr_ds  = VM86_BUFFER_SEG;
+	/* Execute realmode interrupt. */
 	if (!interrupt(&state, 0x15))
-		return false; /* Execute realmode interrupt. */
+		return false;
 	if (state.vr_regs.vr_eflags & EFLAGS_CF)
 		return false;
 	if (C7_RECORD->r_1x > 0x3c00)
@@ -304,17 +310,17 @@ PRIVATE ATTR_FREETEXT bool NOTHROW(KCALL detect_c7)(void) {
 }
 
 
-PRIVATE ATTR_FREETEXT void
+PRIVATE ATTR_FREETEXT NONNULL((1)) void
 NOTHROW(KCALL log_beginmethod)(char const *name) {
 	printk(FREESTR(KERN_INFO "[bios] Attempting memory detection method: %s\n"), name);
 }
 
-PRIVATE ATTR_FREETEXT void
+PRIVATE ATTR_FREETEXT NONNULL((1)) void
 NOTHROW(KCALL log_okmethod)(char const *name) {
 	printk(FREESTR(KERN_INFO "[bios] Attempting memory detection method: %s (ok)\n"), name);
 }
 
-PRIVATE ATTR_FREETEXT void
+PRIVATE ATTR_FREETEXT NONNULL((1)) void
 NOTHROW(KCALL log_badmethod)(char const *name) {
 	printk(FREESTR(KERN_INFO "[bios] Attempting memory detection method: %s (failed)\n"), name);
 }

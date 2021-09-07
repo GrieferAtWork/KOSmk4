@@ -201,7 +201,8 @@ NOTHROW(KCALL metadata_clearall)(void) {
  * NOTE: When called before `x86_initialize_phys2virt64()',
  *       this function may throw an E_SEGFAULT. Afterwards,
  *       this function is unconditionally NOTHROW! */
-PUBLIC NOBLOCK NOPREEMPT void KCALL x86_phys2virt64_require(void *addr) {
+PUBLIC NOBLOCK NOPREEMPT void KCALL
+x86_phys2virt64_require(void *addr) {
 	unsigned int vec4, vec3;
 	union p64_pdir_e3 e3;
 	physaddr_t new_e3_word;

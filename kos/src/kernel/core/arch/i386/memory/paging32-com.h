@@ -75,16 +75,16 @@ INTERN ATTR_PAGING_READMOSTLY u64 used_pxx_page_fglobal = PAE_PAGE_FGLOBAL; /* C
 
 
 #ifndef CONFIG_NO_PAGING_P32
-#define HAVE_4MIB_PAGES            X86_HAVE_4MIB_PAGES
+#define HAVE_4MIB_PAGES           X86_HAVE_4MIB_PAGES
 #endif /* !CONFIG_NO_PAGING_P32 */
 
 #ifndef CONFIG_NO_PAGING_PAE
-#define HAVE_2MIB_PAGES            1 /* Always supported */
+#define HAVE_2MIB_PAGES           1 /* Always supported */
 /* TODO: Take this into account:  When you set  bit 34 of  the 0x01A0 MSR  on an Intel  processor
  *                                you clear the bit 20 of EDX for CPUID/EAX=800000001h, disabling
  *                                your ability to enable the execute disable bit
  * From: https://forum.osdev.org/viewtopic.php?f=1&t=18945 */
-#define HAVE_EXECUTE_DISABLE       X86_HAVE_EXECUTE_DISABLE
+#define HAVE_EXECUTE_DISABLE      X86_HAVE_EXECUTE_DISABLE
 #endif /* !CONFIG_NO_PAGING_PAE */
 
 

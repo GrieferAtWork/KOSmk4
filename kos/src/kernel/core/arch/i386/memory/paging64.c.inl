@@ -116,7 +116,7 @@ INTDEF byte_t __kernel_free_end[] ASMNAME("__kernel_end");
 /* Prepare 2 consecutive (and 2-page aligned) pages of  virtual
  * memory for the purpose of doing the initial prepare required
  * for `THIS_TRAMPOLINE_PAGE' of `boottask' and also `bootidle' */
-INTERN NOBLOCK ATTR_FREETEXT void *
+INTERN NOBLOCK ATTR_FREETEXT WUNUSED void *
 NOTHROW(FCALL kernel_initialize_boot_trampolines)(void) {
 	u64 e1_word, e2_word;
 	byte_t *trampoline_addr;
@@ -360,7 +360,7 @@ PRIVATE ATTR_WRITEMOSTLY WEAK uintptr_t x86_pagedir_prepare_version = 0;
 	} __WHILE0
 
 
-LOCAL NOBLOCK physpage_t
+LOCAL NOBLOCK WUNUSED NONNULL((1)) physpage_t
 NOTHROW(FCALL p64_create_e1_vector_from_e2_word)(struct mptram *__restrict ptram,
                                                  u64 e2_word,
                                                  unsigned int vec1_prepare_start,
@@ -418,7 +418,7 @@ done:
 }
 
 /* Create an E2-vector from a given E3-word  */
-LOCAL NOBLOCK physpage_t
+LOCAL NOBLOCK WUNUSED NONNULL((1)) physpage_t
 NOTHROW(FCALL p64_create_e2_vector_from_e3_word_and_e1_vector)(struct mptram *__restrict ptram,
                                                                u64 e3_word,
                                                                unsigned int vec2,
@@ -473,7 +473,7 @@ done:
 
 
 /* Convert an E3-word into an E2-word (replacing 1GIB with 2MIB) */
-LOCAL NOBLOCK u64
+LOCAL NOBLOCK ATTR_CONST WUNUSED u64
 NOTHROW(FCALL p64_e3word_to_e2word)(u64 e3_word) {
 	u64 e2_word = e3_word;
 #if P64_PAGE_FPAT_1GIB != P64_PAGE_FPAT_2MIB
@@ -567,6 +567,7 @@ err_e3_vector:
 			goto err_e3_vector;
 		}
 		mptram_init(&ptram);
+
 		/* Initialize the E1-vector. */
 		e1_p = (union p64_pdir_e1 *)mptram_mappage(&ptram, e1_vector);
 		if (vec1_prepare_size == 512) {
@@ -578,6 +579,7 @@ err_e3_vector:
 			e1_p = (union p64_pdir_e1 *)mempsetq(e1_p, P64_PAGE_ABSENT,
 			                                     512 - (vec1_prepare_start + vec1_prepare_size));
 		}
+
 		/* Initialize the E2-vector. */
 		e2_p = (union p64_pdir_e2 *)mptram_mappage(&ptram, e2_vector);
 #if P64_PAGE_ABSENT == 0
@@ -588,6 +590,7 @@ err_e3_vector:
 		}
 		e2_p[vec2].p_word = (u64)physpage2addr(e1_vector) | P64_PAGE_FPRESENT |
 		                    P64_PAGE_FWRITE | P64_PAGE_FUSER;
+
 		/* Initialize the E3-vector. */
 		e3_p = (union p64_pdir_e3 *)mptram_mappage(&ptram, e3_vector);
 #if P64_PAGE_ABSENT == 0
@@ -600,6 +603,7 @@ err_e3_vector:
 		                    P64_PAGE_FWRITE | P64_PAGE_FUSER;
 		COMPILER_BARRIER();
 		mptram_fini(&ptram);
+
 		/* Try to install the new E3-vector as an E4-word. */
 		new_e4_word = (u64)physpage2addr(e3_vector) | P64_PAGE_FPRESENT |
 		              P64_PAGE_FWRITE | P64_PAGE_FUSER;
@@ -613,6 +617,7 @@ err_e3_vector:
 		}
 		goto success;
 	}
+
 	/* Only  need  to  acquire  the  PREPARE-lock  for accessing
 	 * our  associated  `P64_PDIR_E3_IDENTITY[vec4][vec3]'  when
 	 * the E3-vector is located in user-space. For kernel-space,
@@ -627,6 +632,7 @@ err_e3_vector:
 			goto again;
 		}
 	}
+
 	e3.p_word = ATOMIC_READ(P64_PDIR_E3_IDENTITY[vec4][vec3].p_word);
 	if (!e3.p_vec2.v_present || e3.p_1gib.d_1gib_1) {
 		/* Convert the 1GiB mapping into
@@ -638,8 +644,10 @@ err_e3_vector:
 		u64 new_word, new_e3_word;
 		if (VEC4_IS_USERSPACE)
 			X86_PAGEDIR_PREPARE_LOCK_RELEASE_READ(was);
+
 		/* Create an E1 vector and mark all of the requested items as being prepared. */
 		e2_word.p_word = p64_e3word_to_e2word(e3.p_word);
+
 		/* Adjust the E2-word such that it properly represent a 2MiB page
 		 * offset from a 1GiB page (using a shift of `vec2 * 2MiB' bytes) */
 		if (e3.p_vec2.v_present) {
@@ -658,6 +666,7 @@ err_e3_vector:
 			mptram_fini(&ptram);
 			goto err;
 		}
+
 		/* Construct an E2 vector pointing to the E1 vector created earlier. */
 		e2_vector = p64_create_e2_vector_from_e3_word_and_e1_vector(&ptram, e3.p_word,
 		                                                            vec2, e1_vector,
@@ -687,6 +696,7 @@ word_changed_after_e2_vector:
 			page_freeone(e1_vector);
 			goto again;
 		}
+
 		/* Try to install the new E2-vector. */
 		if unlikely(!ATOMIC_CMPXCH(P64_PDIR_E3_IDENTITY[vec4][vec3].p_word,
 		                           e3.p_word, new_e3_word))
@@ -717,6 +727,7 @@ word_changed_after_e2_vector:
 		mptram_fini(&ptram);
 		if unlikely(e1_vector == PHYSPAGE_INVALID)
 			goto err;
+
 		/* Re-acquire the prepare lock and make sure that the  vectors
 		 * leading up to the one we've just allocated haven't changed. */
 		X86_PAGEDIR_PREPARE_LOCK_ACQUIRE_READ(was);
@@ -736,6 +747,7 @@ word_changed_after_e1_vector:
 		                            P64_PAGE_FPCD | P64_PAGE_FGLOBAL);
 		if (VEC4_IS_USERSPACE)
 			new_e2_word |= P64_PAGE_FUSER;
+
 		/* Try to install the new E1-vector. */
 		if unlikely(!ATOMIC_CMPXCH(P64_PDIR_E2_IDENTITY[vec4][vec3][vec2].p_word,
 		                           e2.p_word, new_e2_word))
@@ -743,6 +755,7 @@ word_changed_after_e1_vector:
 		X86_PAGEDIR_PREPARE_LOCK_RELEASE_READ(was);
 		goto success;
 	}
+
 	/* The E1-vector already exists.
 	 * In this case, we simply have to set the PREPARED bit for every indicated entry!
 	 * Note  that for this purpose, we only need  to keep hold of the PREPARE-LOCK for
@@ -760,6 +773,7 @@ word_changed_after_e1_vector:
 			p64_pagedir_set_prepared(&e1_p[vec1]);
 		COMPILER_WRITE_BARRIER();
 	}
+
 	/* And we're done! */
 success:
 	return true;
@@ -772,7 +786,7 @@ err:
 
 
 
-LOCAL NOBLOCK WUNUSED bool
+LOCAL NOBLOCK WUNUSED NONNULL((1, 2)) bool
 NOTHROW(KCALL p64_pagedir_can_flatten_e1_vector)(union p64_pdir_e1 const e1_p[512],
                                                  u64 *__restrict new_e2_word,
                                                  unsigned int still_prepared_vec2) {
@@ -834,7 +848,7 @@ NOTHROW(KCALL p64_pagedir_can_flatten_e1_vector)(union p64_pdir_e1 const e1_p[51
 	return true;
 }
 
-LOCAL NOBLOCK WUNUSED bool
+LOCAL NOBLOCK WUNUSED NONNULL((1, 2)) bool
 NOTHROW(KCALL p64_pagedir_can_flatten_e2_vector)(union p64_pdir_e2 const e2_p[512],
                                                  u64 *__restrict new_e3_word) {
 	unsigned int vec2;
@@ -888,7 +902,7 @@ NOTHROW(KCALL p64_pagedir_can_flatten_e2_vector)(union p64_pdir_e2 const e2_p[51
 	return true;
 }
 
-LOCAL NOBLOCK WUNUSED bool
+LOCAL NOBLOCK WUNUSED NONNULL((1, 2)) bool
 NOTHROW(KCALL p64_pagedir_can_flatten_e3_vector)(union p64_pdir_e3 const e3_p[512],
                                                  u64 *__restrict new_e4_word) {
 	unsigned int vec3;
@@ -919,7 +933,7 @@ NOTHROW(KCALL p64_pagedir_can_flatten_e3_vector)(union p64_pdir_e3 const e3_p[51
 	p64_pagedir_unset_prepared(e1_p)
 #endif /* NDEBUG */
 
-LOCAL NOBLOCK void
+LOCAL NOBLOCK NONNULL((1)) void
 NOTHROW(FCALL p64_pagedir_unset_prepared)(union p64_pdir_e1 *__restrict e1_p
 #ifndef NDEBUG
                                           ,
@@ -1834,7 +1848,7 @@ INTERN u64 p64_pageperm_matrix[0x40] = {
 #undef COMMON_PRESENT
 };
 
-LOCAL NOBLOCK u64
+LOCAL NOBLOCK WUNUSED u64
 NOTHROW(FCALL p64_pagedir_encode_4kib)(PAGEDIR_PAGEALIGNED VIRT void *addr,
                                        PAGEDIR_PAGEALIGNED PHYS physaddr_t phys,
                                        u16 perm) {
@@ -2392,8 +2406,8 @@ DEFINE_PUBLIC_ALIAS(pagedir_haschanged, p64_pagedir_haschanged);
 DEFINE_PUBLIC_ALIAS(pagedir_unsetchanged, p64_pagedir_unsetchanged);
 
 
-INTERN ATTR_FREETEXT ATTR_CONST union p64_pdir_e1 *
-NOTHROW(FCALL x86_get_cpu_iob_pointer_p64)(struct cpu *__restrict self) {
+INTERN ATTR_FREETEXT ATTR_CONST WUNUSED NONNULL((1)) union p64_pdir_e1 *
+NOTHROW(FCALL x86_get_cpu_iob_pointer_p64)(struct cpu const *__restrict self) {
 	union p64_pdir_e1 *e1_pointer;
 	uintptr_t iobp;
 	iobp       = (uintptr_t)&FORCPU(self, thiscpu_x86_iob[0]);
@@ -2456,7 +2470,7 @@ NOTHROW(KCALL x86_initialize_paging)(void) {
 
 /* NOTE: This function must do its own tracing of continuous page ranges.
  *       The caller is may not necessary ensure that the function is only
- *       called once for a single, continous range.
+ *       called once for a single, continuous range.
  * @param: word: The page directory starting control word.
  *               When `P64_PAGE_FPRESENT' is set, refers to a mapped page range
  *               When `P64_PAGE_FISAHINT' is set, refers to a mapped page range */
@@ -2467,8 +2481,8 @@ typedef void (KCALL *p64_enumfun_t)(void *arg, void *start, size_t num_bytes, u6
 
 #define P64_PAGE_FPAT P64_PAGE_FPAT_4KIB
 /* Convert an En | n >= 2 word into an E1 word */
-PRIVATE ATTR_DBGTEXT ATTR_CONST u64 KCALL
-p64_convert_en_to_e1(u64 word) {
+PRIVATE ATTR_DBGTEXT ATTR_CONST WUNUSED u64
+NOTHROW(KCALL p64_convert_en_to_e1)(u64 word) {
 	assert(word & P64_PAGE_FPRESENT);
 	assert(word & P64_PAGE_F2MIB);
 	word &= ~P64_PAGE_F2MIB;
@@ -2482,7 +2496,7 @@ p64_convert_en_to_e1(u64 word) {
 }
 
 #define P64_PDIR_E1_ISUSED(e1_word) (((e1_word) & (P64_PAGE_FPRESENT | P64_PAGE_FISAHINT | P64_PAGE_FPREPARED)) != 0)
-PRIVATE ATTR_DBGTEXT void KCALL
+PRIVATE ATTR_DBGTEXT NONNULL((1)) void KCALL
 p64_enum_e1(p64_enumfun_t func, void *arg,
             unsigned int vec4,
             unsigned int vec3,
@@ -2528,7 +2542,7 @@ docall:
 	}
 }
 
-PRIVATE ATTR_DBGTEXT void KCALL
+PRIVATE ATTR_DBGTEXT NONNULL((1)) void KCALL
 p64_enum_e2(p64_enumfun_t func, void *arg,
             unsigned int vec4,
             unsigned int vec3, u64 mask) {
@@ -2586,7 +2600,7 @@ docall:
 	}
 }
 
-PRIVATE ATTR_DBGTEXT void KCALL
+PRIVATE ATTR_DBGTEXT NONNULL((1)) void KCALL
 p64_enum_e3(p64_enumfun_t func, void *arg,
             unsigned int vec4, u64 mask) {
 	unsigned int vec3 = 1, laststart = 0;
@@ -2643,7 +2657,7 @@ docall:
 	}
 }
 
-PRIVATE ATTR_DBGTEXT void KCALL
+PRIVATE ATTR_DBGTEXT NONNULL((1)) void KCALL
 p64_enum_e4(p64_enumfun_t func, void *arg, unsigned int vec4_max) {
 	unsigned int vec4;
 	union p64_pdir_e4 *e4 = P64_PDIR_E4_IDENTITY;
@@ -2667,7 +2681,7 @@ struct p64_enumdat {
 	bool   ed_skipident;
 };
 
-PRIVATE ATTR_DBGTEXT void KCALL
+PRIVATE ATTR_DBGTEXT NONNULL((1)) void KCALL
 p64_printident(struct p64_enumdat *__restrict data) {
 	dbg_printf(DBGSTR(AC_WHITE("%p") "-" AC_WHITE("%p") ": " AC_WHITE("%" PRIuSIZ) " identity mappings\n"),
 	           (byte_t *)P64_MMAN_KERNEL_PDIR_IDENTITY_BASE,
@@ -2676,7 +2690,7 @@ p64_printident(struct p64_enumdat *__restrict data) {
 	data->ed_identcnt = 0;
 }
 
-PRIVATE ATTR_DBGTEXT void KCALL
+PRIVATE ATTR_DBGTEXT NONNULL((1)) void KCALL
 p64_doenum(struct p64_enumdat *__restrict data,
            void *start, size_t num_bytes, u64 word, u64 mask) {
 	assert((word & P64_PAGE_FPRESENT) || (word & P64_PAGE_FISAHINT));
@@ -2760,7 +2774,7 @@ p64_doenum(struct p64_enumdat *__restrict data,
 	}
 }
 
-PRIVATE ATTR_DBGTEXT void KCALL
+PRIVATE ATTR_DBGTEXT NONNULL((1)) void KCALL
 p64_enumfun(void *arg, void *start, size_t num_bytes, u64 word) {
 	struct p64_enumdat *data;
 	data = (struct p64_enumdat *)arg;
@@ -2797,7 +2811,8 @@ done_print:
 	data->ed_prevword    = word;
 }
 
-PRIVATE ATTR_DBGTEXT void KCALL p64_do_ldpd(unsigned int vec4_max) {
+PRIVATE ATTR_DBGTEXT void KCALL
+p64_do_lspd(unsigned int vec4_max) {
 	struct p64_enumdat data;
 	data.ed_prevstart = 0;
 	data.ed_prevsize  = 0;
@@ -2845,11 +2860,11 @@ DBG_COMMAND_AUTO(lspd, DBG_COMMANDHOOK_FLAG_AUTOEXCLUSIVE,
 	pdir = dbg_getpagedir();
 	if (pdir == pagedir_kernel_phys) {
 do_ls_kernel:
-		p64_do_ldpd(512);
+		p64_do_lspd(512);
 		return 0;
 	}
 	PAGEDIR_P_BEGINUSE(pdir) {
-		p64_do_ldpd(256);
+		p64_do_lspd(256);
 	}
 	PAGEDIR_P_ENDUSE(pdir);
 	return 0;

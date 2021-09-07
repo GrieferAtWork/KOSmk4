@@ -102,7 +102,7 @@ NOTHROW(FCALL p32_pagedir_fini)(VIRT struct p32_pdir *__restrict self) {
 
 
 
-LOCAL NOBLOCK void
+LOCAL NOBLOCK NONNULL((1)) void
 NOTHROW(FCALL p32_pagedir_set_prepared)(union p32_pdir_e1 *__restrict e1_p) {
 	u32 word;
 	for (;;) {
@@ -121,7 +121,7 @@ NOTHROW(FCALL p32_pagedir_set_prepared)(union p32_pdir_e1 *__restrict e1_p) {
 /* Try to widen a 4MiB mapping to a 1024*4KiB vector of linear memory
  * Alternatively, if the specified vector is absent, pre-allocate it.
  * @return: false: Failed to allocate physical memory */
-PRIVATE NOBLOCK bool
+PRIVATE NOBLOCK WUNUSED bool
 NOTHROW(FCALL p32_pagedir_prepare_impl_widen)(unsigned int vec2,
                                               unsigned int vec1_prepare_start,
                                               unsigned int vec1_prepare_size) {
@@ -275,7 +275,7 @@ NOTHROW(FCALL p32_pagedir_sync_flattened_e1_vector)(unsigned int vec2) {
 
 
 
-LOCAL NOBLOCK bool
+LOCAL NOBLOCK NONNULL((1, 2)) bool
 NOTHROW(KCALL p32_pagedir_can_flatten_e1_vector)(union p32_pdir_e1 const e1_p[1024],
                                                  u32 *__restrict new_e2_word,
                                                  unsigned int still_prepared_vec2) {
@@ -342,7 +342,7 @@ NOTHROW(KCALL p32_pagedir_can_flatten_e1_vector)(union p32_pdir_e1 const e1_p[10
 	p32_pagedir_unset_prepared(e1_p)
 #endif /* NDEBUG */
 
-LOCAL NOBLOCK void
+LOCAL NOBLOCK NONNULL((1)) void
 NOTHROW(FCALL p32_pagedir_unset_prepared)(union p32_pdir_e1 *__restrict e1_p
 #ifndef NDEBUG
                                           ,
@@ -744,7 +744,7 @@ INTERN_CONST ATTR_PAGING_READMOSTLY u32 const p32_pageperm_matrix[0x40] = {
 #undef COMMON_PRESENT
 };
 
-LOCAL NOBLOCK u32
+LOCAL NOBLOCK WUNUSED u32
 NOTHROW(FCALL p32_pagedir_encode_4kib)(PAGEDIR_PAGEALIGNED VIRT void *addr,
                                        PAGEDIR_PAGEALIGNED PHYS physaddr_t phys,
                                        u16 perm) {
@@ -1235,7 +1235,7 @@ NOTHROW(KCALL pagedir_haschanged_p)(VIRT pagedir_t *__restrict self, VIRT pageid
 
 /* NOTE: This function must do its own tracing of continuous page ranges.
  *       The caller is may not necessary ensure that the function is only
- *       called once for a single, continous range.
+ *       called once for a single, continuous range.
  * @param: word: The page directory starting control word.
  *               When `P32_PAGE_FPRESENT' is set, refers to a mapped page range
  *               When `P32_PAGE_FISAHINT' is set, refers to a mapped page range */
@@ -1246,8 +1246,8 @@ typedef void (KCALL *p32_enumfun_t)(void *arg, void *start, size_t num_bytes, u3
 
 #define P32_PAGE_FPAT P32_PAGE_FPAT_4KIB
 /* Convert an En | n >= 2 word into an E1 word */
-PRIVATE ATTR_DBGTEXT ATTR_CONST u32 KCALL
-p32_convert_en_to_e1(u32 word) {
+PRIVATE ATTR_DBGTEXT ATTR_CONST WUNUSED u32
+NOTHROW(KCALL p32_convert_en_to_e1)(u32 word) {
 	assert(word & P32_PAGE_FPRESENT);
 	assert(word & P32_PAGE_F4MIB);
 	word &= ~P32_PAGE_F4MIB;
@@ -1261,7 +1261,7 @@ p32_convert_en_to_e1(u32 word) {
 }
 
 #define P32_PDIR_E1_ISUSED(e1_word) (((e1_word) & (P32_PAGE_FPRESENT | P32_PAGE_FISAHINT | P32_PAGE_FPREPARED)) != 0)
-PRIVATE ATTR_DBGTEXT void KCALL
+PRIVATE ATTR_DBGTEXT NONNULL((1)) void KCALL
 p32_enum_e1(p32_enumfun_t func, void *arg,
             unsigned int vec2, u32 mask) {
 	unsigned int vec1, laststart = 0;
@@ -1303,7 +1303,7 @@ docall:
 	}
 }
 
-PRIVATE ATTR_DBGTEXT void KCALL
+PRIVATE ATTR_DBGTEXT NONNULL((1)) void KCALL
 p32_enum_e2(p32_enumfun_t func, void *arg, unsigned int vec2_max) {
 	unsigned int vec2 = 1, laststart = 0;
 	union p32_pdir_e2 *e2 = P32_PDIR_E2_IDENTITY;
@@ -1361,7 +1361,7 @@ struct p32_enumdat {
 	bool   ed_skipident;
 };
 
-PRIVATE ATTR_DBGTEXT void KCALL
+PRIVATE ATTR_DBGTEXT NONNULL((1)) void KCALL
 p32_printident(struct p32_enumdat *__restrict data) {
 	dbg_printf(DBGSTR(AC_WHITE("%p") "-" AC_WHITE("%p") ": " AC_WHITE("%" PRIuSIZ) " identity mappings\n"),
 	           (byte_t *)P32_MMAN_KERNEL_PDIR_IDENTITY_BASE,
@@ -1370,7 +1370,7 @@ p32_printident(struct p32_enumdat *__restrict data) {
 	data->ed_identcnt = 0;
 }
 
-PRIVATE ATTR_DBGTEXT void KCALL
+PRIVATE ATTR_DBGTEXT NONNULL((1)) void KCALL
 p32_doenum(struct p32_enumdat *__restrict data,
            void *start, size_t num_bytes, u32 word, u32 mask) {
 	assert((word & P32_PAGE_FPRESENT) || (word & P32_PAGE_FISAHINT));
@@ -1448,7 +1448,7 @@ p32_doenum(struct p32_enumdat *__restrict data,
 	}
 }
 
-PRIVATE ATTR_DBGTEXT void KCALL
+PRIVATE ATTR_DBGTEXT NONNULL((1)) void KCALL
 p32_enumfun(void *arg, void *start, size_t num_bytes, u32 word) {
 	struct p32_enumdat *data;
 	data = (struct p32_enumdat *)arg;
@@ -1483,7 +1483,8 @@ done_print:
 	data->ed_prevword    = word;
 }
 
-PRIVATE ATTR_DBGTEXT void KCALL p32_do_ldpd(unsigned int vec2_max) {
+PRIVATE ATTR_DBGTEXT void KCALL
+p32_do_lspd(unsigned int vec2_max) {
 	struct p32_enumdat data;
 	data.ed_prevstart = 0;
 	data.ed_prevsize  = 0;
@@ -1500,11 +1501,11 @@ PRIVATE ATTR_DBGTEXT void KCALL p32_do_ldpd(unsigned int vec2_max) {
 
 INTERN ATTR_DBGTEXT void FCALL p32_dbg_lspd(pagedir_phys_t pdir) {
 	if (pdir == pagedir_kernel_phys) {
-		p32_do_ldpd(1024);
+		p32_do_lspd(1024);
 		return;
 	}
 	PAGEDIR_P_BEGINUSE(pdir) {
-		p32_do_ldpd(768);
+		p32_do_lspd(768);
 	}
 	PAGEDIR_P_ENDUSE(pdir);
 }

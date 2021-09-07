@@ -170,7 +170,7 @@ NOTHROW(KCALL initialize_predefined_trampoline)(struct task *__restrict self,
 /* Prepare 2 consecutive (and 2-page aligned) pages of  virtual
  * memory for the purpose of doing the initial prepare required
  * for `THIS_TRAMPOLINE_PAGE' of `boottask' and also `bootidle' */
-INTDEF NOBLOCK FREE void *
+INTDEF NOBLOCK FREE WUNUSED void *
 NOTHROW(FCALL kernel_initialize_boot_trampolines)(void);
 #endif /* ARCH_PAGEDIR_NEED_PERPARE_FOR_KERNELSPACE */
 

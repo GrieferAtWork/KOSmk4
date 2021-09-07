@@ -172,9 +172,10 @@
 #define PAGEDIR_PROT_EXEC    0x0001 /* Permission bit: Allow execution within the mapping. */
 #define PAGEDIR_PROT_WRITE   0x0002 /* Permission bit: Permit write-access to memory within mapping. */
 #define PAGEDIR_PROT_READ    0x0004 /* Permission bit: Permit read-access to memory within mapping. */
-#define PAGEDIR_PROT_X86_PWT 0x0008 /* PAE_PAGE_FPWT */
-#define PAGEDIR_PROT_X86_PCD 0x0010 /* PAE_PAGE_FPCD */
-#define PAGEDIR_PROT_X86_PAT 0x0020 /* PAE_PAGE_FPAT_4KIB / PAE_PAGE_FPAT_2MIB */
+#define PAGEDIR_PROT_X86_PWT 0x0008 /* P32_PAGE_FPWT / PAE_PAGE_FPWT */
+#define PAGEDIR_PROT_X86_PCD 0x0010 /* P32_PAGE_FPCD / PAE_PAGE_FPCD */
+#define PAGEDIR_PROT_X86_PAT 0x0020 /* P32_PAGE_FPAT_4KIB / P32_PAGE_FPAT_4MIB
+                                     * PAE_PAGE_FPAT_4KIB / PAE_PAGE_FPAT_2MIB */
 #define PAGEDIR_PROT_MASK    0x003f /* Mask of valid permission bits. */
 #endif /* !PAGEDIR_PROT_MASK */
 
@@ -213,20 +214,20 @@ typedef union {
 /* Low-level Get/Set the physical address of the currently active page directory. */
 FORCELOCAL NOBLOCK ATTR_ARTIFICIAL ATTR_PURE WUNUSED PHYS pagedir_t *
 NOTHROW(KCALL pagedir_get)(void) {
-	pagedir_t *result;
-	__asm__("movl %%cr3, %0"
-	        : "=r" (result)
-	        :
-	        : "memory");
+	__register pagedir_t *result;
+	__asm__ __volatile__("movl %%cr3, %0"
+	                     : "=r" (result)
+	                     :
+	                     : "memory");
 	return result;
 }
 
 FORCELOCAL NOBLOCK ATTR_ARTIFICIAL void
 NOTHROW(KCALL pagedir_set)(PHYS pagedir_t *__restrict value) {
-	__asm__("movl %0, %%cr3"
-	        :
-	        : "r" (value)
-	        : "memory");
+	__asm__ __volatile__("movl %0, %%cr3"
+	                     :
+	                     : "r" (value)
+	                     : "memory");
 }
 #endif /* __CC__ */
 #endif /* !__INTELLISENSE__ */

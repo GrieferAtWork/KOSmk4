@@ -102,6 +102,7 @@ PUBLIC_FUNCTION(__x86_64_syscall_iret)
 	 * NOTE: If IRET was re-directed, then this check will fail! */
 	cmpw   $(SEGMENT_USER_CODE64_RPL), OFFSET_IRREGS_CS(%rsp)
 	jne    .Ldo_iret
+	.cfi_remember_state
 
 	/* Load the %rip register into its proper location
 	 * Even  if we end up using `iretq'  below, it doesn't matter if we've
@@ -138,21 +139,22 @@ PUBLIC_FUNCTION(__x86_64_syscall_iret)
 	swapgs
 	sysretq
 
-
+	/* Exception handler definitions. */
 	EXCEPT_HANDLERS_START
-	EXCEPT_HANDLERS_CATCH(E_SEGFAULT_UNMAPPED,
-	                      .Lsysret64_probe_begin,
-	                      .Lsysret64_probe_end,
-	                      .Lsysret64_probe_error)
-	EXCEPT_HANDLERS_CATCH(E_SEGFAULT_UNMAPPED,
-	                      .Lsysret64_probe_begin2,
-	                      .Lsysret64_probe_end2,
-	                      .Lsysret64_probe_error)
-	EXCEPT_HANDLERS_CATCH(E_WOULDBLOCK,
-	                      .Lsysret64_probe_begin,
-	                      .Lsysret64_probe_end,
-	                      .Lsysret64_probe_wouldblock)
+		EXCEPT_HANDLERS_CATCH(E_SEGFAULT_UNMAPPED,
+		                      .Lsysret64_probe_begin,
+		                      .Lsysret64_probe_end,
+		                      .Lsysret64_probe_error)
+		EXCEPT_HANDLERS_CATCH(E_SEGFAULT_UNMAPPED,
+		                      .Lsysret64_probe_begin2,
+		                      .Lsysret64_probe_end2,
+		                      .Lsysret64_probe_error)
+		EXCEPT_HANDLERS_CATCH(E_WOULDBLOCK,
+		                      .Lsysret64_probe_begin,
+		                      .Lsysret64_probe_end,
+		                      .Lsysret64_probe_wouldblock)
 	EXCEPT_HANDLERS_END
+
 .Lsysret64_probe_wouldblock:
 	/* Special case: Because the above  code touched  user-space memory  with
 	 *               interrupts disabled, there is  a chance that the  system
@@ -162,6 +164,9 @@ PUBLIC_FUNCTION(__x86_64_syscall_iret)
 	 *               case by doing another touch with preemption enabled, and
 	 *               then try again. */
 	sti
+	/* Clear the current exception (else the kernel might panic because
+	 * it  would  think  that  we  didn't  nest  exceptions   properly) */
+	movq   $(ERROR_CODEOF(E_OK)), %gs:this_exception_code
 .Lsysret64_probe_begin2:
 	ttest  mask=0, loc=0(%rcx)
 .Lsysret64_probe_end2:
@@ -172,13 +177,21 @@ PUBLIC_FUNCTION(__x86_64_syscall_iret)
 	 * RETHROW()    the   exception   if   that   flag   isn't   set. */
 	EXTERN(this_exception_args)
 	ttest  mask=E_SEGFAULT_CONTEXT_NONCANON, loc=this_exception_args + 8, seg=%gs
-	jnz    .Ldo_iret
+	jnz    .Ldo_iret_clearexcept
 	/* RETHROW() the exception. */
 	EXTERN(error_rethrow)
 	call   error_rethrow
 	/* UNREACHABLE */
 
+.Ldo_iret_clearexcept:
+	/* Clear the exception before returning to user-space (prevents
+	 * problems and potential kernel panics later down the line, as
+	 * the next system call might think that exceptions were  being
+	 * nested) */
+	movq   $(ERROR_CODEOF(E_OK)), %gs:this_exception_code
+
 .Ldo_iret:
+	.cfi_restore_state
 	swapgs_if_user_iret
 	iretq
 	.cfi_endproc

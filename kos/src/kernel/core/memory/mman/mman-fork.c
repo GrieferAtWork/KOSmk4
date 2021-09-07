@@ -529,7 +529,19 @@ mman_fork(void) THROWS(E_BADALLOC, ...) {
 	 * thread calls exec() while another calls  fork(), which could then result  in
 	 * both the exec(), as well as the fork() succeeding, but the fork() succeeding
 	 * in  the context of the program being exec'd by the first thread (which would
-	 * be no good), rather than the program that contained the fork() call. */
+	 * be no good), rather than the program that contained the fork() call.
+	 *
+	 * FIXME: To prevent this problem, we need to do this when acquring the mman lock:
+	 * >> for (;;) {
+	 * >>     mman_lock_acquire(ft.ft_oldmm);
+	 * >>     if (!task_shouldserve())
+	 * >>         break;
+	 * >>     mman_lock_release(ft.ft_oldmm);
+	 * >>     task_serve();
+	 * >> }
+	 *
+	 * That way, we are guarantied that the kill-other-threads callback gets checked
+	 * to not be present  in an interlocked  manor with us  acquring the mman  lock! */
 
 	SLIST_INIT(&ft.ft_freelist);
 	ft.ft_didunlck = false;

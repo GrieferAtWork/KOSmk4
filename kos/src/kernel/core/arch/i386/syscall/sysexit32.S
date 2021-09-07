@@ -56,6 +56,7 @@ PUBLIC_FUNCTION(__i386_syscall_iret)
 	/* When returning to vm86, we also cannot make use of `sysexit' */
 	ttest  mask=EFLAGS_VM, loc=OFFSET_IRREGS_EFLAGS(%esp)
 	jnz    .Ldo_iret
+	.cfi_remember_state
 
 	/* Technically, we'd also have to check for EFLAGS_IF being set,
 	 * however the KOS kernel assumes that all user-space code  runs
@@ -72,18 +73,27 @@ PUBLIC_FUNCTION(__i386_syscall_iret)
 	 * so we can explicitly enable it as interlocked with the `sysexit' instruction) */
 	addl   $(OFFSET_IRREGS_EFLAGS), %esp
 	.cfi_adjust_cfa_offset -OFFSET_IRREGS_EFLAGS
+
 	andl   $(~EFLAGS_IF), 0(%esp)
+/*[[[cfi{register="%eflags"} push %esp; deref; or $EFLAGS_IF # Set EFLAGS_IF during unwinding]]]*/
+	.cfi_escape 22,9,7,116,0,6,11,0,2,33
+/*[[[end]]]*/
+
 	popfl_cfi
-	.cfi_same_value %eflags /* Technically not, as EFLAGS.IF needs to be set... */
+/*[[[cfi{register="%eflags"} push %eflags; or $EFLAGS_IF # Set EFLAGS_IF during unwinding]]]*/
+	.cfi_escape 22,9,6,121,0,11,0,2,33
+/*[[[end]]]*/
 
 	/* Do the sysexit.
 	 * Note that `sti' has a special behavior where it will only enable interrupts after
 	 * the following instruction, meaning that we  are guarantied to not experience  any
 	 * interrupts before the following `sysexit' has also been executed. */
 	sti
+	.cfi_same_value %eflags
 	sysexit
 
 .Ldo_iret:
+	.cfi_restore_state
 	iret
 	.cfi_endproc
 END(__i386_syscall_iret)
