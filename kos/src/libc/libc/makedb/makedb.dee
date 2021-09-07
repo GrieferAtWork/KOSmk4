@@ -337,14 +337,15 @@ local out = file.open(output_name, "w");
 print out: copyright.strip();
 
 print out: "#define DESCRIPTORS_COUNT", #descriptors;
-print out: "PRIVATE ATTR_SECTION(\".rodata.crt.unicode.UTF.descriptors\") struct __unitraits const descriptors[" + #descriptors + "] = {";
+print out: "PRIVATE ATTR_SECTION(\".rodata.crt.unicode.UTF\")";
+print out: "struct __unitraits const descriptors[" + #descriptors + "] = {";
 for (local i, x: util::enumerate(descriptors)) {
 	print out: ("\t/* 0x%.2x */" % i)+" { 0x%x, %d, %d, %d, %d, %d }," % x;
 }
 print out: "};";
 
 function print_table(out, name, tab) {
-	print out: "PRIVATE ATTR_SECTION(\".rodata.crt.unicode.UTF." + name + "\")",
+	print out: "PRIVATE ATTR_SECTION(\".rodata.crt.unicode.UTF\")",
 		ctypeof(elem_size(tab)), "const " + name + "[" + #tab + "] = {\n\t",;
 	for (local i, x: util::enumerate(tab)) {
 		print out: "0x%x," % x,;
@@ -384,14 +385,14 @@ print out: "\t" + unifold_character_type + " uf_repl[UNICODE_FOLDED_MAX];";
 print out: "};";
 print out:;
 print out: "#define UNICODE_FOLD_DESCRIPTORS    ","0x%x" % (#fold_descriptors);
-print out: "PRIVATE ATTR_SECTION(\".rodata.crt.unicode.UTF.fold_descriptors\")";
+print out: "PRIVATE ATTR_SECTION(\".rodata.crt.unicode.UTF\")";
 print out: "struct unifold const fold_descriptors[" + #fold_descriptors + "] = {";
 for (local x: fold_descriptors) {
 	print out: "\t{ {", ", ".join(for (local y: x) "0x%x" % y), "} },";
 }
 print out: "};";
 print out:;
-print out: "INTERN_CONST ATTR_SECTION(\".rodata.crt.unicode.UTF.__unicode_asciiflags\")";
+print out: "INTERN_CONST ATTR_SECTION(\".rodata.crt.unicode.UTF\")";
 print out: "__UINT16_TYPE__ const libc___unicode_asciiflags[256] = {";
 print out: "\t",;
 for (local x: util::range(256)) {

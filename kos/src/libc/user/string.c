@@ -52,8 +52,7 @@ libc_signo_dos2kos(int dos_signo) {
 /* TODO: Declare these functions through magic
  * -> Simply use the [[ignore]] annotation to hide these from headers! */
 DEFINE_PUBLIC_ALIAS(memcasemem0_l, libc_memcasemem0_l);
-INTERN ATTR_PURE WUNUSED NONNULL((1, 3))
-ATTR_WEAK ATTR_SECTION(".text.crt.unicode.locale.memory.memcasemem0_l") void *
+INTERN ATTR_PURE WUNUSED ATTR_SECTION(".text.crt.unicode.locale.memory") NONNULL((1, 3)) void *
 NOTHROW_NCX(LIBCCALL libc_memcasemem0_l)(void const *haystack, size_t haystacklen,
                                          void const *needle, size_t needlelen,
                                          locale_t locale) {
@@ -82,8 +81,7 @@ got_candidate:
 }
 
 DEFINE_PUBLIC_ALIAS(memcasemem0, libc_memcasemem0);
-INTERN ATTR_PURE WUNUSED NONNULL((1, 3))
-ATTR_WEAK ATTR_SECTION(".text.crt.unicode.static.memory.memcasemem0") void *
+INTERN ATTR_PURE WUNUSED ATTR_SECTION(".text.crt.unicode.static.memory") NONNULL((1, 3)) void *
 NOTHROW_NCX(LIBCCALL libc_memcasemem0)(void const *haystack, size_t haystacklen,
                                        void const *needle, size_t needlelen) {
 	byte_t *candidate, marker;
@@ -111,8 +109,7 @@ got_candidate:
 }
 
 DEFINE_PUBLIC_ALIAS(memmem0, libc_memmem0);
-INTERN ATTR_PURE WUNUSED NONNULL((1, 3))
-ATTR_WEAK ATTR_SECTION(".text.crt.string.memory") void *
+INTERN ATTR_PURE WUNUSED ATTR_SECTION(".text.crt.string.memory") NONNULL((1, 3)) void *
 NOTHROW_NCX(LIBCCALL libc_memmem0)(void const *haystack, size_t haystacklen,
                                    void const *needle, size_t needlelen) {
 	byte_t *candidate, marker;
@@ -131,8 +128,7 @@ NOTHROW_NCX(LIBCCALL libc_memmem0)(void const *haystack, size_t haystacklen,
 }
 
 DEFINE_PUBLIC_ALIAS(memrmem0, libc_memrmem0);
-INTERN ATTR_PURE WUNUSED NONNULL((1, 3))
-ATTR_WEAK ATTR_SECTION(".text.crt.string.memory") void *
+INTERN ATTR_PURE WUNUSED ATTR_SECTION(".text.crt.string.memory") NONNULL((1, 3)) void *
 NOTHROW_NCX(LIBCCALL libc_memrmem0)(void const *haystack, size_t haystacklen,
                                     void const *needle, size_t needlelen) {
 	byte_t *candidate, marker;
@@ -167,7 +163,8 @@ struct ATTR_PACKED strerror_names_db_struct {
 typedef u16 strerror_offset_t;
 STATIC_ASSERT(sizeof(strerror_names_db) <= 0x10000);
 
-PRIVATE ATTR_SECTION(".rodata.crt.errno") strerror_offset_t const strerror_offsets_db[__ECOUNT] = {
+PRIVATE ATTR_SECTION(".rodata.crt.errno")
+strerror_offset_t const strerror_offsets_db[__ECOUNT] = {
 #define E(id, message) offsetof(struct strerror_names_db_struct, name_##id),
 #include "../libc/sys_errlist.def"
 #undef E

@@ -678,7 +678,7 @@ struct atexit_vector_struct {
 	int                     av_stat; /* Process exit status. */
 };
 
-PRIVATE ATTR_SECTION(".bss.crt.application.exit.atexit_vector")
+PRIVATE ATTR_SECTION(".bss.crt.application.exit")
 struct atexit_vector_struct atexit_vector = {
 	/* .av_lock = */ ATOMIC_RWLOCK_INIT,
 	/* .av_size = */ 0,
@@ -687,7 +687,7 @@ struct atexit_vector_struct atexit_vector = {
 };
 
 
-INTERN ATTR_SECTION(".text.crt.application.exit.libc_run_atexit")
+INTERN ATTR_SECTION(".text.crt.application.exit")
 void LIBCCALL libc_run_atexit(int status) {
 	size_t length;
 	ATOMIC_WRITE(atexit_vector.av_stat, status);
@@ -732,7 +732,7 @@ NOTHROW_NCX(LIBCCALL libc_on_exit)(__on_exit_func_t func,
 }
 /*[[[end:libc_on_exit]]]*/
 
-PRIVATE ATTR_SECTION(".text.crt.sched.process.libc_atexit_wrapper") void
+PRIVATE ATTR_SECTION(".text.crt.sched.process") void
 NOTHROW_NCX(LIBCCALL libc_atexit_wrapper)(int status, void *arg) {
 	(void)status;
 	(*(__atexit_func_t)arg)();
@@ -761,13 +761,13 @@ struct at_quick_exit_vector_struct {
 	struct at_quick_exit_callback *aqv_vect; /* [0..av_size][owned][lock(atexit_vector.av_lock)] Array of functions. */
 };
 
-PRIVATE ATTR_SECTION(".bss.crt.application.exit.at_quick_exit_vector")
+PRIVATE ATTR_SECTION(".bss.crt.application.exit")
 struct at_quick_exit_vector_struct at_quick_exit_vector = {
 	/* .av_size = */ 0,
 	/* .av_vect = */ NULL
 };
 
-INTERN ATTR_SECTION(".text.crt.application.exit.libc_run_at_quick_exit")
+INTERN ATTR_SECTION(".text.crt.application.exit")
 void LIBCCALL libc_run_at_quick_exit(int status) {
 	size_t length;
 	ATOMIC_WRITE(atexit_vector.av_stat, status);
@@ -852,7 +852,7 @@ INTERN ATTR_SECTION(".text.crt.application.exit") ATTR_NORETURN void
 }
 /*[[[end:libc__Exit]]]*/
 
-PRIVATE ATTR_SECTION(".text.crt.dos.sched.process.libc_onexit_wrapper")
+PRIVATE ATTR_SECTION(".text.crt.dos.sched.process")
 void LIBCCALL libc_onexit_wrapper(void *arg) {
 	(*(onexit_t)arg)();
 }

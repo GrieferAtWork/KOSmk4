@@ -61,8 +61,8 @@ NOTHROW_NCX(LIBCCALL libc_getrandom)(void *buf,
 #else /* SYS_getrandom */
 	ssize_t result;
 	fd_t fd;
-	PRIVATE ATTR_SECTION(".rodata.crt.system.random.str_dev_random") char const str_dev_random[] = "/dev/random";
-	PRIVATE ATTR_SECTION(".rodata.crt.system.random.str_dev_urandom") char const str_dev_urandom[] = "/dev/urandom";
+	PRIVATE ATTR_SECTION(".rodata.crt.system.random") char const str_dev_random[] = "/dev/random";
+	PRIVATE ATTR_SECTION(".rodata.crt.system.random") char const str_dev_urandom[] = "/dev/urandom";
 	if ((flags & ~(GRND_NONBLOCK | GRND_RANDOM)) != 0) {
 		libc_seterrno(EINVAL);
 		goto err;

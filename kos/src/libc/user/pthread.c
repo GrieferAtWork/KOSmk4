@@ -155,15 +155,15 @@ STATIC_ASSERT(offsetof(pthread_barrier_t, b_out) == __OFFSET_PTHREAD_BARRIER_OUT
 
 
 
-PRIVATE ATTR_SECTION(".rodata.crt.sched.pthread.rpc.libname") char const librpc_name[] = LIBRPC_LIBRARY_NAME;
-PRIVATE ATTR_SECTION(".bss.crt.sched.pthread.rpc.librpc") void *librpc = NULL;
-PRIVATE ATTR_SECTION(".bss.crt.sched.pthread.rpc.rpc_schedule") PRPC_SCHEDULE pdyn_rpc_schedule = NULL;
-PRIVATE ATTR_SECTION(".bss.crt.sched.pthread.rpc.rpc_service") PRPC_SERVICE pdyn_rpc_service = NULL;
-PRIVATE ATTR_SECTION(".rodata.crt.sched.pthread.rpc.name_rpc_schedule") char const name_rpc_schedule[] = "rpc_schedule";
-PRIVATE ATTR_SECTION(".rodata.crt.sched.pthread.rpc.name_rpc_service") char const name_rpc_service[] = "rpc_service";
+PRIVATE ATTR_SECTION(".rodata.crt.sched.pthread.rpc") char const librpc_name[] = LIBRPC_LIBRARY_NAME;
+PRIVATE ATTR_SECTION(".bss.crt.sched.pthread.rpc") void *librpc = NULL;
+PRIVATE ATTR_SECTION(".bss.crt.sched.pthread.rpc") PRPC_SCHEDULE pdyn_rpc_schedule = NULL;
+PRIVATE ATTR_SECTION(".bss.crt.sched.pthread.rpc") PRPC_SERVICE pdyn_rpc_service = NULL;
+PRIVATE ATTR_SECTION(".rodata.crt.sched.pthread.rpc") char const name_rpc_schedule[] = "rpc_schedule";
+PRIVATE ATTR_SECTION(".rodata.crt.sched.pthread.rpc") char const name_rpc_service[] = "rpc_service";
 
-PRIVATE ATTR_SECTION(".text.crt.sched.pthread.rpc.librpc_init")
-WUNUSED bool LIBCCALL librpc_init(void) {
+PRIVATE WUNUSED ATTR_SECTION(".text.crt.sched.pthread.rpc")
+bool NOTHROW(LIBCCALL librpc_init)(void) {
 	void *lib;
 again:
 	lib = ATOMIC_READ(librpc);
@@ -196,7 +196,7 @@ err_nolib:
 
 
 /* Destroy a given `pthread' `self' */
-LOCAL NONNULL((1)) void
+LOCAL ATTR_SECTION(".text.crt.sched.pthread") NONNULL((1)) void
 NOTHROW(LIBCCALL destroy)(struct pthread *__restrict self) {
 	dltlsfreeseg(self->pt_tls);
 }
@@ -204,16 +204,14 @@ NOTHROW(LIBCCALL destroy)(struct pthread *__restrict self) {
 
 /* Attributes  used  by  `pthread_create()'  when  the  given  `ATTR'  is  NULL
  * NOTE: When `pa_stacksize' is zero, `PTHREAD_STACK_MIN' will be used instead! */
-ATTR_SECTION(".bss.crt.sched.pthread.pthread_default_attr.attr")
-PRIVATE pthread_attr_t pthread_default_attr = {};
-ATTR_SECTION(".bss.crt.sched.pthread.pthread_default_attr.lock")
-PRIVATE struct atomic_rwlock pthread_default_attr_lock = ATOMIC_RWLOCK_INIT;
+PRIVATE ATTR_SECTION(".bss.crt.sched.pthread") pthread_attr_t pthread_default_attr = {};
+PRIVATE ATTR_SECTION(".bss.crt.sched.pthread") struct atomic_rwlock pthread_default_attr_lock = ATOMIC_RWLOCK_INIT;
 
 
 
 /* Called just before a thread exits (used to destroy() the thread's
  * `pthread_self'   structure  in  case  the  thread  was  detached) */
-INTERN ATTR_SECTION(".text.crt.sched.pthread.pthread_onexit") void
+INTERN ATTR_SECTION(".text.crt.sched.pthread") void
 NOTHROW(LIBCCALL libc_pthread_onexit)(struct pthread *__restrict me) {
 	if (ATOMIC_FETCHDEC(me->pt_refcnt) == 1) {
 		/* At some point,  our thread got  detached from its  creator,
@@ -239,7 +237,7 @@ libc_pthread_unmap_stack_and_exit(void *stackaddr,
 
 
 /* Perform cleanup & terminate the current thread `me'. */
-PRIVATE ATTR_NORETURN ATTR_SECTION(".text.crt.sched.pthread.pthread_exit_thread") void
+PRIVATE ATTR_NORETURN ATTR_SECTION(".text.crt.sched.pthread") void
 NOTHROW(LIBCCALL pthread_exit_thread)(struct pthread *__restrict me, int exitcode) {
 	/* Mask _all_ posix signals for our thread.
 	 *
@@ -294,7 +292,7 @@ NOTHROW(LIBCCALL pthread_exit_thread)(struct pthread *__restrict me, int exitcod
 	__builtin_unreachable();
 }
 
-INTERN ATTR_NORETURN ATTR_SECTION(".text.crt.sched.pthread.pthread_main") void
+INTERN ATTR_NORETURN ATTR_SECTION(".text.crt.sched.pthread") void
 NOTHROW(__FCALL libc_pthread_main)(struct pthread *__restrict me,
                                    __pthread_start_routine_t start) {
 	/* NOTE: At this point, me == &current */
@@ -341,8 +339,7 @@ INTDEF pid_t NOTHROW(__FCALL libc_pthread_clone)(struct pthread *__restrict thre
                                                  __pthread_start_routine_t start);
 
 
-PRIVATE NONNULL((1, 2, 3))
-ATTR_SECTION(".text.crt.sched.pthread.pthread_dp_create") errno_t
+PRIVATE ATTR_SECTION(".text.crt.sched.pthread") NONNULL((1, 2, 3)) errno_t
 NOTHROW_NCX(LIBCCALL libc_pthread_do_create)(pthread_t *__restrict newthread,
                                              pthread_attr_t const *__restrict attr,
                                              __pthread_start_routine_t start_routine,
@@ -1433,7 +1430,7 @@ NOTHROW_NCX(LIBCCALL libc_pthread_setname_np)(pthread_t target_thread,
 }
 /*[[[end:libc_pthread_setname_np]]]*/
 
-PRIVATE ATTR_SECTION(".bss.crt.sched.pthread.pthread_concurrency_level") int pthread_concurrency_level = 0;
+PRIVATE ATTR_SECTION(".bss.crt.sched.pthread") int pthread_concurrency_level = 0;
 
 /*[[[head:libc_pthread_getconcurrency,hash:CRC-32=0x2040f7e9]]]*/
 /* >> pthread_getconcurrency(3)
@@ -1600,7 +1597,7 @@ NOTHROW_NCX(LIBCCALL libc_pthread_setcanceltype)(int type,
 }
 /*[[[end:libc_pthread_setcanceltype]]]*/
 
-PRIVATE ATTR_SECTION(".text.crt.sched.pthread.pthread_cancel_self")
+PRIVATE ATTR_SECTION(".text.crt.sched.pthread")
 void LIBCCALL pthread_cancel_self(void) {
 	THROW(E_EXIT_THREAD);
 }

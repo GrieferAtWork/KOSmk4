@@ -81,7 +81,7 @@ DECL_BEGIN
 #define ASCII_TOUPPER(ch)  (ASCII_ISLOWER(ch) ? ((ch)-0x20) : (ch))
 
 
-PRIVATE ATTR_SECTION(".rodata.crt.unicode.static.ctype.__ctype_b_loc.matrix")
+PRIVATE ATTR_SECTION(".rodata.crt.unicode.static.ctype")
 uint16_t const libc___ctype_b_loc_matrix[384] = {
 /*[[[deemon
 
@@ -498,7 +498,7 @@ for (local x: [-128: 255+1]) {
 };
 
 
-PRIVATE ATTR_SECTION(".rodata.crt.unicode.static.ctype.__ctype_tolower_loc.matrix")
+PRIVATE ATTR_SECTION(".rodata.crt.unicode.static.ctype")
 int32_t const libc___ctype_tolower_loc_matrix[384] = {
 /*[[[deemon
 import * from deemon;
@@ -895,7 +895,7 @@ for (local x: [-128: 255+1]) {
 //[[[end]]]
 };
 
-PRIVATE ATTR_SECTION(".rodata.crt.unicode.static.ctype.__ctype_toupper_loc.matrix")
+PRIVATE ATTR_SECTION(".rodata.crt.unicode.static.ctype")
 int32_t const libc___ctype_toupper_loc_matrix[384] = {
 /*[[[deemon
 import * from deemon;
@@ -1293,15 +1293,9 @@ for (local x: [-128: 255+1]) {
 };
 
 
-
-PRIVATE ATTR_SECTION(".bss.crt.unicode.static.ctype.__ctype_b_loc.pointer")
-uint16_t const *libc___ctype_b_loc_pointer = NULL;
-PRIVATE ATTR_SECTION(".bss.crt.unicode.static.ctype.__ctype_tolower_loc.pointer")
-int32_t const *libc___ctype_tolower_loc_pointer = NULL;
-PRIVATE ATTR_SECTION(".bss.crt.unicode.static.ctype.__ctype_toupper_loc.pointer")
-int32_t const *libc___ctype_toupper_loc_pointer = NULL;
-
-
+PRIVATE ATTR_SECTION(".bss.crt.unicode.static.ctype") uint16_t const *libc___ctype_b_loc_pointer = NULL;
+PRIVATE ATTR_SECTION(".bss.crt.unicode.static.ctype") int32_t const *libc___ctype_tolower_loc_pointer = NULL;
+PRIVATE ATTR_SECTION(".bss.crt.unicode.static.ctype") int32_t const *libc___ctype_toupper_loc_pointer = NULL;
 
 
 /*[[[head:libc___ctype_b_loc,hash:CRC-32=0xde267e1c]]]*/

@@ -123,8 +123,7 @@ NOTHROW_NCX(LIBCCALL libc_sem_destroy)(sem_t *sem)
 
 
 
-PRIVATE ATTR_SECTION(".rodata.crt.sched.semaphore.named_prefix")
-char const named_prefix[] = "/dev/shm/sem.";
+PRIVATE ATTR_SECTION(".rodata.crt.sched.semaphore") char const named_prefix[] = "/dev/shm/sem.";
 #define NAMED_PREFIX_OFFSETOF_SEM COMPILER_STRLEN("/dev/shm/")
 
 

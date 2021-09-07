@@ -50,7 +50,7 @@ struct dfind {
 
 #define DFIND_INVALID ((struct dfind *)-1)
 
-PRIVATE WUNUSED ATTR_SECTION(".text.crt.dos.fs.dir.dfind_open")
+PRIVATE WUNUSED ATTR_SECTION(".text.crt.dos.fs.dir")
 struct dfind *LIBCCALL dfind_open(char const *__restrict filename) {
 	char const *pathend;
 	struct dfind *result;
@@ -62,7 +62,7 @@ struct dfind *LIBCCALL dfind_open(char const *__restrict filename) {
 	       (pathend[-1] != '/' && pathend[-1] != '\\'))
 		--pathend;
 	if unlikely(pathend <= filename) {
-		PRIVATE ATTR_SECTION(".rodata.crt.dos.fs.dir.pwd") char const pwd[] = ".";
+		PRIVATE ATTR_SECTION(".rodata.crt.dos.fs.dir") char const pwd[] = ".";
 		result->df_dir = fopendirat(AT_FDCWD, pwd, O_DOSPATH);
 	} else {
 		char *path;
@@ -89,14 +89,14 @@ err:
 	goto done;
 }
 
-PRIVATE ATTR_SECTION(".text.crt.dos.fs.dir.dfind_close")
+PRIVATE ATTR_SECTION(".text.crt.dos.fs.dir")
 void LIBCCALL dfind_close(struct dfind *__restrict self) {
 	closedir(self->df_dir);
 	free(self->df_query);
 	free(self);
 }
 
-PRIVATE WUNUSED ATTR_SECTION(".text.crt.dos.fs.dir.dfind_readdir")
+PRIVATE WUNUSED ATTR_SECTION(".text.crt.dos.fs.dir")
 struct dirent *LIBCCALL dfind_readdir(struct dfind *__restrict self) {
 	struct dirent *result;
 	while ((result = readdir(self->df_dir)) != NULL) {
@@ -111,7 +111,7 @@ struct dirent *LIBCCALL dfind_readdir(struct dfind *__restrict self) {
 	 (((st)->st_mode & 0222) ? 0 : _A_RDONLY) |          \
 	 ((ent)->d_name[0] == '.' ? _A_HIDDEN : 0))
 
-PRIVATE WUNUSED ATTR_SECTION(".text.crt.dos.fs.dir.dfind_read32") int LIBCCALL
+PRIVATE WUNUSED ATTR_SECTION(".text.crt.dos.fs.dir") int LIBCCALL
 dfind_read32(struct dfind *__restrict self,
              struct _finddata32_t *__restrict finddata) {
 	struct stat st;
@@ -136,7 +136,7 @@ err:
 	return -1;
 }
 
-PRIVATE WUNUSED ATTR_SECTION(".text.crt.dos.fs.dir.dfind_read32i64") int LIBCCALL
+PRIVATE WUNUSED ATTR_SECTION(".text.crt.dos.fs.dir") int LIBCCALL
 dfind_read32i64(struct dfind *__restrict self,
                 struct _finddata32i64_t *__restrict finddata) {
 	struct stat st;
@@ -161,7 +161,7 @@ err:
 	return -1;
 }
 
-PRIVATE WUNUSED ATTR_SECTION(".text.crt.dos.fs.dir.dfind_read64") int LIBCCALL
+PRIVATE WUNUSED ATTR_SECTION(".text.crt.dos.fs.dir") int LIBCCALL
 dfind_read64(struct dfind *__restrict self,
              struct __finddata64_t *__restrict finddata) {
 	struct stat st;

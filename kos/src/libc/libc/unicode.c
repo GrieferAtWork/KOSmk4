@@ -58,21 +58,21 @@ struct __unitraits {
 #endif /* !__UNICODE_FPRINT */
 
 #include "unicode_db.h"
+
 DEFINE_PUBLIC_ALIAS(__unicode_asciiflags, libc___unicode_asciiflags);
 
 
-PRIVATE ATTR_SECTION(".rodata.crt.unicode.UTF.default_traits")
+PRIVATE ATTR_SECTION(".rodata.crt.unicode.UTF")
 struct __unitraits const default_traits = { 0x0, 0, 0xff, 0, 0, 0 };
-INTERN ATTR_SECTION(".text.crt.unicode.UTF.__unicode_descriptor")
-ATTR_RETNONNULL ATTR_CONST struct __unitraits *
+
+INTERN ATTR_RETNONNULL ATTR_CONST ATTR_SECTION(".text.crt.unicode.UTF") struct __unitraits *
 NOTHROW(LIBCCALL libc___unicode_descriptor)(char32_t ch) {
 	if likely(ch < UNICODE_COUNT_VALID)
 		return (struct __unitraits *)&UNICODE_DESCRIPTOR(ch);
 	return (struct __unitraits *)&default_traits;
 }
 
-INTERN ATTR_SECTION(".text.crt.unicode.UTF.unicode_fold")
-ATTR_RETNONNULL NONNULL((2)) char32_t *
+INTERN ATTR_RETNONNULL ATTR_SECTION(".text.crt.unicode.UTF") NONNULL((2)) char32_t *
 NOTHROW_NCX(LIBCCALL libc_unicode_fold)(char32_t ch,
                                         char32_t buf[UNICODE_FOLDED_MAX]) {
 	struct __unitraits *trt;

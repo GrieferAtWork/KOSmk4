@@ -61,8 +61,7 @@ INTDEF ATTR_READMOSTLY unsigned int futex_spin_counter;
 
 
 
-LOCAL NONNULL((1, 2))
-ATTR_SECTION(".text.crt.sched.futexlock.libc_lfutexlock_impl") ssize_t
+LOCAL ATTR_SECTION(".text.crt.sched.futexlock") NONNULL((1, 2)) ssize_t
 NOTHROW_RPC(LIBCCALL libc_lfutexlock_impl)(lfutex_t *ulockaddr,
                                            lfutex_t *uaddr,
                                            syscall_ulong_t futex_op,

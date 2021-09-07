@@ -381,7 +381,7 @@ NOTHROW_RPC(LIBCCALL libc_pause)(void)
 }
 /*[[[end:libc_pause]]]*/
 
-PRIVATE ATTR_SECTION(".bss.crt.io.tty.ttyname_buffer") char ttyname_buffer[32];
+PRIVATE ATTR_SECTION(".bss.crt.io.tty") char ttyname_buffer[32];
 
 /*[[[head:libc_ttyname,hash:CRC-32=0x276e3f5]]]*/
 /* >> ttyname(3)
@@ -396,7 +396,7 @@ NOTHROW_RPC(LIBCCALL libc_ttyname)(fd_t fd)
 }
 /*[[[end:libc_ttyname]]]*/
 
-PRIVATE ATTR_SECTION(".rodata.crt.io.tty.devpath") char const devpath[] = "/dev";
+PRIVATE ATTR_SECTION(".rodata.crt.io.tty") char const devpath[] = "/dev";
 
 /*[[[head:libc_ttyname_r,hash:CRC-32=0x47a8f874]]]*/
 /* >> ttyname_r(3)
@@ -457,9 +457,9 @@ fallback:
 				continue;
 #if 0 /* These are symlinks (DT_LNK), so we've already skipped them ;) */
 			{
-				PRIVATE ATTR_SECTION(".rodata.crt.io.tty.str_stdin")  char const str_stdin[] = "stdin";
-				PRIVATE ATTR_SECTION(".rodata.crt.io.tty.str_stdout") char const str_stdout[] = "stdout";
-				PRIVATE ATTR_SECTION(".rodata.crt.io.tty.str_stderr") char const str_stderr[] = "stderr";
+				PRIVATE ATTR_SECTION(".rodata.crt.io.tty")  char const str_stdin[] = "stdin";
+				PRIVATE ATTR_SECTION(".rodata.crt.io.tty") char const str_stdout[] = "stdout";
+				PRIVATE ATTR_SECTION(".rodata.crt.io.tty") char const str_stderr[] = "stderr";
 				/* Ignore the /dev/std(in|out|err) aliases */
 				if (strcmp(d->d_name, str_stdin) == 0)
 					continue;
@@ -1757,8 +1757,8 @@ NOTHROW_RPC(LIBCCALL libc_setusershell)(void)
 }
 /*[[[end:libc_setusershell]]]*/
 
-PRIVATE ATTR_SECTION(".rodata.crt.system.utility.root") char const root[] = "/";
-PRIVATE ATTR_SECTION(".rodata.crt.system.utility.dev_null") char const dev_null[] = "/dev/null";
+PRIVATE ATTR_SECTION(".rodata.crt.system.utility") char const root[] = "/";
+PRIVATE ATTR_SECTION(".rodata.crt.system.utility") char const dev_null[] = "/dev/null";
 
 /*[[[head:libc_daemon,hash:CRC-32=0xbc774599]]]*/
 /* >> daemon(3) */

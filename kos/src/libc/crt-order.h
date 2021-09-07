@@ -217,7 +217,6 @@
 	CB(PREFIX.crt.application.init) \
 	CB(PREFIX.crt.errno_access) \
 	CB(PREFIX.crt.application.exit) \
-	CB(PREFIX.crt.application.exit.at_quick_exit_vector PREFIX.crt.application.exit.atexit_vector PREFIX.crt.application.exit.libc_run_at_quick_exit PREFIX.crt.application.exit.libc_run_atexit) \
 	CB(PREFIX.crt.fs.exec.exec PREFIX.crt.sched.access) \
 	CB(PREFIX.crt.sched.thread) \
 	CB(PREFIX.crt.sched.pthread) \
@@ -229,7 +228,7 @@
 	CB(PREFIX.crt.sched.utility) \
 	CB(PREFIX.crt.sched.user) \
 	CB(PREFIX.crt.sched.wait) \
-	CB(PREFIX.crt.sched.eventfd PREFIX.crt.sched.futexlock.libc_lfutexlock_impl PREFIX.crt.sched.process.libc_atexit_wrapper PREFIX.crt.sched.pthread.pthread_cancel_self PREFIX.crt.sched.pthread.pthread_concurrency_level PREFIX.crt.sched.pthread.pthread_default_attr.attr PREFIX.crt.sched.pthread.pthread_default_attr.lock PREFIX.crt.sched.pthread.pthread_dp_create PREFIX.crt.sched.pthread.pthread_exit_thread PREFIX.crt.sched.pthread.pthread_main PREFIX.crt.sched.pthread.pthread_onexit PREFIX.crt.sched.pthread.rpc.libname PREFIX.crt.sched.pthread.rpc.librpc PREFIX.crt.sched.pthread.rpc.librpc_init PREFIX.crt.sched.pthread.rpc.name_rpc_schedule PREFIX.crt.sched.pthread.rpc.name_rpc_service PREFIX.crt.sched.pthread.rpc.rpc_schedule PREFIX.crt.sched.pthread.rpc.rpc_service PREFIX.crt.sched.semaphore.named_prefix PREFIX.crt.sched.signalfd PREFIX.crt.sched.threads) \
+	CB(PREFIX.crt.sched.eventfd PREFIX.crt.sched.pthread.rpc PREFIX.crt.sched.signalfd PREFIX.crt.sched.threads) \
 	CB(PREFIX.crt.time) \
 	CB(PREFIX.crt.time.timezone) \
 	CB(PREFIX.crt.heap.mman) \
@@ -266,7 +265,7 @@
 	CB(PREFIX.crt.FILE.utility.memopen) \
 	CB(PREFIX.crt.FILE.utility.memstream) \
 	CB(PREFIX.crt.FILE.utility.ext) \
-	CB(PREFIX.crt.io.large.lock PREFIX.crt.io.large.seek PREFIX.crt.io.large.utility PREFIX.crt.io.lock PREFIX.crt.io.poll PREFIX.crt.io.seek PREFIX.crt.io.sync PREFIX.crt.io.tty.devpath PREFIX.crt.io.tty.str_stderr PREFIX.crt.io.tty.str_stdin PREFIX.crt.io.tty.str_stdout PREFIX.crt.io.tty.ttyname_buffer PREFIX.crt.io.utility) \
+	CB(PREFIX.crt.io.large.lock PREFIX.crt.io.large.seek PREFIX.crt.io.large.utility PREFIX.crt.io.lock PREFIX.crt.io.poll PREFIX.crt.io.seek PREFIX.crt.io.sync PREFIX.crt.io.utility) \
 	CB(PREFIX.crt.fs.basic_property PREFIX.crt.fs.property) \
 	CB(PREFIX.crt.fs.environ) \
 	CB(PREFIX.crt.fs.modify) \
@@ -283,7 +282,6 @@
 	CB(PREFIX.crt.unicode.locale.memory) \
 	CB(PREFIX.crt.unicode.locale.ctype) \
 	CB(PREFIX.crt.unicode.locale.convert) \
-	CB(PREFIX.crt.unicode.UTF.__unicode_asciiflags PREFIX.crt.unicode.UTF.__unicode_descriptor PREFIX.crt.unicode.UTF.default_traits PREFIX.crt.unicode.UTF.descriptors PREFIX.crt.unicode.UTF.fold_descriptors PREFIX.crt.unicode.UTF.tab1 PREFIX.crt.unicode.UTF.tab2 PREFIX.crt.unicode.UTF.unicode_fold PREFIX.crt.unicode.locale.memory.memcasemem0_l PREFIX.crt.unicode.static.ctype.__ctype_b_loc.matrix PREFIX.crt.unicode.static.ctype.__ctype_b_loc.pointer PREFIX.crt.unicode.static.ctype.__ctype_tolower_loc.matrix PREFIX.crt.unicode.static.ctype.__ctype_tolower_loc.pointer PREFIX.crt.unicode.static.ctype.__ctype_toupper_loc.matrix PREFIX.crt.unicode.static.ctype.__ctype_toupper_loc.pointer PREFIX.crt.unicode.static.memory.memcasemem0) \
 	CB(PREFIX.crt.except) \
 	CB(PREFIX.crt.net.socket) \
 	CB(PREFIX.crt.net.inet) \
@@ -317,7 +315,7 @@
 	CB(PREFIX.crt.system.auxv) \
 	CB(PREFIX.crt.utility.glob PREFIX.crt.utility.klog PREFIX.crt.utility.locale PREFIX.crt.utility.monetary PREFIX.crt.utility.regex PREFIX.crt.utility.search PREFIX.crt.utility.setjmp PREFIX.crt.utility.shm PREFIX.crt.utility.stdlib PREFIX.crt.utility) \
 	CB(PREFIX.crt.i18n) \
-	CB(PREFIX.crt.system.adjtime PREFIX.crt.system.getauxval PREFIX.crt.system.info PREFIX.crt.system.ioperm PREFIX.crt.system.mman PREFIX.crt.system.ptrace PREFIX.crt.system.random.str_dev_random PREFIX.crt.system.random.str_dev_urandom PREFIX.crt.system.reboot PREFIX.crt.system.rtm PREFIX.crt.system.syslog PREFIX.crt.system.utility PREFIX.crt.system.utility.dev_null PREFIX.crt.system.utility.root) \
+	CB(PREFIX.crt.system.adjtime PREFIX.crt.system.getauxval PREFIX.crt.system.info PREFIX.crt.system.ioperm PREFIX.crt.system.mman PREFIX.crt.system.ptrace PREFIX.crt.system.reboot PREFIX.crt.system.rtm PREFIX.crt.system.syslog PREFIX.crt.system.utility) \
 	CB(PREFIX.crt.debug) \
 	CB(PREFIX.crt.assert) \
 	CB(PREFIX.crt.ssp.string.memory) \
@@ -402,7 +400,7 @@
 	CB(PREFIX.crt.dos.sched.utility) \
 	CB(PREFIX.crt.dos.sched.user) \
 	CB(PREFIX.crt.dos.sched.wait) \
-	CB(PREFIX.crt.dos.sched.eventfd PREFIX.crt.dos.sched.process.libc_onexit_wrapper PREFIX.crt.dos.sched.signalfd PREFIX.crt.dos.sched.threads) \
+	CB(PREFIX.crt.dos.sched.eventfd PREFIX.crt.dos.sched.signalfd PREFIX.crt.dos.sched.threads) \
 	CB(PREFIX.crt.dos.time) \
 	CB(PREFIX.crt.dos.time.timezone) \
 	CB(PREFIX.crt.dos.heap.mman) \
@@ -485,7 +483,7 @@
 	CB(PREFIX.crt.dos.system.adjtime PREFIX.crt.dos.system.info PREFIX.crt.dos.system.ioperm PREFIX.crt.dos.system.mman PREFIX.crt.dos.system.ptrace PREFIX.crt.dos.system.reboot PREFIX.crt.dos.system.syslog PREFIX.crt.dos.system.utility PREFIX.crt.dos.system) \
 	CB(PREFIX.crt.dos.debug) \
 	CB(PREFIX.crt.dos.ssp.string.memory) \
-	CB(PREFIX.crt.dos.fs.dir.dfind_close PREFIX.crt.dos.fs.dir.dfind_open PREFIX.crt.dos.fs.dir.dfind_read32 PREFIX.crt.dos.fs.dir.dfind_read32i64 PREFIX.crt.dos.fs.dir.dfind_read64 PREFIX.crt.dos.fs.dir.dfind_readdir PREFIX.crt.dos.fs.dir.pwd PREFIX.crt.dos.fs.dlfcn PREFIX.crt.dos.fs.exec.posix_spawn PREFIX.crt.dos.fs.exec.spawn PREFIX.crt.dos.fs.exec.system PREFIX.crt.dos.fs.fts PREFIX.crt.dos.fs.ftw PREFIX.crt.dos.fs.io PREFIX.crt.dos.fs.statfs.statfs PREFIX.crt.dos.fs.statfs.statvfs) \
+	CB(PREFIX.crt.dos.fs.dlfcn PREFIX.crt.dos.fs.exec.posix_spawn PREFIX.crt.dos.fs.exec.spawn PREFIX.crt.dos.fs.exec.system PREFIX.crt.dos.fs.fts PREFIX.crt.dos.fs.ftw PREFIX.crt.dos.fs.io PREFIX.crt.dos.fs.statfs.statfs PREFIX.crt.dos.fs.statfs.statvfs) \
 	CB(PREFIX.crt.dos.sched.resource) \
 	CB(PREFIX.crt.dos.sched.msg) \
 	CB(PREFIX.crt.dos.string.encrypt) \
