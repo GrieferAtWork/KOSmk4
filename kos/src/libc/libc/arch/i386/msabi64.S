@@ -99,9 +99,10 @@
 /* Calculate the address of the libc_* variant from data set-up by the libd_* wrapper.
  * Upon return,  the  absolute  address of  the  libc_*  function is  stored  in  %rax
  * s.a.  The `#define DFUN()' macro below, which fills in the data used by this macro! */
-#define MSABI_LOAD_RETURN_ADDRESS()       \
-	popq   %r11;      /* offset-addent */ \
-	addq   %r11, %rax /* calculate absolute address */
+#define MSABI_LOAD_RETURN_ADDRESS()             \
+	movslq %eax, %rax; /* Sign-extend offset */ \
+	popq   %r11;       /* offset-addent */      \
+	addq   %r11, %rax  /* calculate absolute address */
 
 
 .section ".text.crt.dos.compat.dos.msabi64"
