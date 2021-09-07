@@ -112,25 +112,25 @@ __SYSDECL_BEGIN
  * might break, since everything from libc is allowed to assume that EFLAGS.DF=0
  * upon function entry)
  * HINT:
- * >>    .cfi_escape DW_CFA_KOS_startcapsule
- * >>    .cfi_escape DW_CFA_val_expression
- * >>    .cfi_escape CFI_X86_64_UNWIND_REGISTER_RFLAGS
- * >>    .cfi_escape 7 // Code size
- * >>    .cfi_escape DW_OP_regx
- * >>    .cfi_escape CFI_X86_64_UNWIND_REGISTER_RFLAGS
- * >>    .cfi_escape DW_OP_const2u
- * >>    .cfi_escape (EFLAGS_DF & 0x00ff)
- * >>    .cfi_escape (EFLAGS_DF & 0xff00) >> 8
- * >>    .cfi_escape DW_OP_not
- * >>    .cfi_escape DW_OP_and
+ * >>    .cfi_escape 56  = DW_CFA_KOS_startcapsule
+ * >>    .cfi_escape 22  = DW_CFA_val_expression
+ * >>    .cfi_escape 49  = CFI_X86_64_UNWIND_REGISTER_RFLAGS
+ * >>    .cfi_escape 7   = 7 // Code size
+ * >>    .cfi_escape 146 = DW_OP_bregx
+ * >>    .cfi_escape 49  = CFI_X86_64_UNWIND_REGISTER_RFLAGS
+ * >>    .cfi_escape 0   = 0 // SLEB128 offset for `DW_OP_bregx'
+ * >>    .cfi_escape 11  = DW_OP_const2s
+ * >>    .cfi_escape 255 = ((~EFLAGS_DF) & 0x00ff)
+ * >>    .cfi_escape 251 = ((~EFLAGS_DF) & 0xff00) >> 8
+ * >>    .cfi_escape 26  = DW_OP_and
  * >>    ...
- * >>    .cfi_escape DW_CFA_KOS_endcapsule */
-#define __X86_XSYSCALL_ASSEMBLY                                    \
-	"std\n\t"                                                      \
-	".cfi_escape 0x38,0x16,0x31,7,0x90,0x31,0xa,0,4,0x20,0x1a\n\t" \
-	"syscall\n\t"                                                  \
-	"cld\n\t"                                                      \
-	".cfi_escape 0x39"
+ * >>    .cfi_escape 57  = DW_CFA_KOS_endcapsule */
+#define __X86_XSYSCALL_ASSEMBLY                         \
+	"std\n\t"                                           \
+	".cfi_escape 56,22,49,7,146,49,0,11,255,251,26\n\t" \
+	"syscall\n\t"                                       \
+	"cld\n\t"                                           \
+	".cfi_escape 57"
 
 __FORCELOCAL __ATTR_ARTIFICIAL __syscall_ulong_t (__LIBKCALL __x86_syscall0)(__syscall_ulong_t __sysno) { __register __syscall_ulong_t __res; __asm__ __volatile__(__X86_SYSCALL_ASSEMBLY : "=a" (__res) : "0" (__sysno) : "memory", "cc", "rcx", "r11"); return __res; }
 __FORCELOCAL __ATTR_ARTIFICIAL __syscall_ulong_t (__LIBKCALL __x86_Xsyscall0)(__syscall_ulong_t __sysno) { __register __syscall_ulong_t __res; __asm__ __volatile__(__X86_XSYSCALL_ASSEMBLY : "=a" (__res) : "0" (__sysno) : "memory", "cc", "rcx", "r11"); return __res; }
@@ -211,24 +211,24 @@ __asm__(".hidden libc___i386_syscall\n\t.global libc___i386_syscall\n\t"
  * might break, since everything from libc is allowed to assume that EFLAGS.DF=0
  * upon function entry)
  * HINT:
- * >>    .cfi_escape DW_CFA_KOS_startcapsule
- * >>    .cfi_escape DW_CFA_val_expression
- * >>    .cfi_escape CFI_386_UNWIND_REGISTER_EFLAGS
- * >>    .cfi_escape 6 // Code size
- * >>    .cfi_escape DW_OP_reg0 + CFI_386_UNWIND_REGISTER_EFLAGS
- * >>    .cfi_escape DW_OP_const2u
- * >>    .cfi_escape (EFLAGS_DF & 0x00ff)
- * >>    .cfi_escape (EFLAGS_DF & 0xff00) >> 8
- * >>    .cfi_escape DW_OP_not
- * >>    .cfi_escape DW_OP_and
+ * >>    .cfi_escape 56  = DW_CFA_KOS_startcapsule
+ * >>    .cfi_escape 22  = DW_CFA_val_expression
+ * >>    .cfi_escape 9   = CFI_386_UNWIND_REGISTER_EFLAGS
+ * >>    .cfi_escape 6   = 6 // Code size
+ * >>    .cfi_escape 121 = DW_OP_breg9 = DW_OP_breg0 + CFI_386_UNWIND_REGISTER_EFLAGS
+ * >>    .cfi_escape 0   = 0 // SLEB128 offset for `DW_OP_breg9'
+ * >>    .cfi_escape 11  = DW_OP_const2s
+ * >>    .cfi_escape 255 = ((~EFLAGS_DF) & 0x00ff)
+ * >>    .cfi_escape 251 = ((~EFLAGS_DF) & 0xff00) >> 8
+ * >>    .cfi_escape 26  = DW_OP_and
  * >>    ...
- * >>    .cfi_escape DW_CFA_KOS_endcapsule */
-#define __X86_XSYSCALL_ASSEMBLY                            \
-	"std\n\t"                                              \
-	".cfi_escape 0x38,0x16,9,6,0x59,0xa,0,4,0x20,0x1a\n\t" \
-	"int {$0x80|80h}\n\t"                                  \
-	"cld\n\t"                                              \
-	".cfi_escape 0x39"
+ * >>    .cfi_escape 57  = DW_CFA_KOS_endcapsule */
+#define __X86_XSYSCALL_ASSEMBLY                       \
+	"std\n\t"                                         \
+	".cfi_escape 56,22,9,6,121,0,11,255,251,26\n\t" \
+	"int {$0x80|80h}\n\t"                             \
+	"cld\n\t"                                         \
+	".cfi_escape 57"
 #undef __X86_SYSCALL_MAY_CLOBBER_ECX_EDX
 #endif /* !__X86_SYSCALL_ASSEMBLY */
 
