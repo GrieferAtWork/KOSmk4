@@ -40,6 +40,7 @@
 
 #include "../libc/dl.h"
 #include "execinfo.h"
+#include "unistd.h"
 
 DECL_BEGIN
 
@@ -300,13 +301,7 @@ NOTHROW_NCX(LIBCCALL libc_backtrace_symbols_fd)(void *const *array,
 	for (i = 0; i < size; ++i) {
 		PRIVATE ATTR_SECTION(SECTION_DEBUG_STRING) char const debug_lf[1] = { '\n' };
 		PRIVATE ATTR_SECTION(SECTION_DEBUG_STRING) char const debug_unknown_name[1] = { '?' };
-#ifndef __LIBCCALL_IS_FORMATPRINTER_CC
-#error "Shouldn't happen?"
-#endif /* !__LIBCCALL_IS_FORMATPRINTER_CC */
-		error = print_function_name(array[i],
-		                            /* TODO: Dedicated function: `write_printer' */
-		                            (pformatprinter)(void *)&write,
-		                            (void *)(uintptr_t)(unsigned int)fd);
+		error = print_function_name(array[i], &libc_write_printer, WRITE_PRINTER_ARG(fd));
 		if unlikely(error < 0)
 			break;
 		if (!error)

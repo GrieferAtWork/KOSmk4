@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x6d25f3ac */
+/* HASH CRC-32:0x36b45e0f */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -42,7 +42,6 @@ __NAMESPACE_LOCAL_BEGIN
 #define __local___localdep_format_aprintf_printer_defined 1
 #ifdef __CRT_HAVE_format_aprintf_printer
 __NAMESPACE_LOCAL_END
-struct format_aprintf_data;
 #include <bits/crt/format-printer.h>
 #include <hybrid/typecore.h>
 __NAMESPACE_LOCAL_BEGIN

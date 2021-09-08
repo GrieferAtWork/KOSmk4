@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xdac59a03 */
+/* HASH CRC-32:0xf1a59052 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -21,14 +21,16 @@
 #ifndef __local_dprintf_defined
 #define __local_dprintf_defined 1
 #include <__crt.h>
-#if defined(__CRT_HAVE_vdprintf) || defined(__CRT_HAVE_write) || defined(__CRT_HAVE__write) || defined(__CRT_HAVE___write)
+#include <hybrid/typecore.h>
+#include <bits/crt/format-printer.h>
+#if defined(__CRT_HAVE_vdprintf) || defined(__CRT_HAVE_write_printer) || defined(__CRT_HAVE_writeall) || defined(__CRT_HAVE_write) || defined(__CRT_HAVE__write) || defined(__CRT_HAVE___write)
 #include <features.h>
 __NAMESPACE_LOCAL_BEGIN
 #ifndef __local___localdep_vdprintf_defined
 #define __local___localdep_vdprintf_defined 1
 #ifdef __CRT_HAVE_vdprintf
 __CREDIRECT(__ATTR_LIBC_PRINTF(2, 0) __ATTR_NONNULL((2)),__STDC_INT_AS_SSIZE_T,__NOTHROW_RPC,__localdep_vdprintf,(__fd_t __fd, char const *__restrict __format, __builtin_va_list __args),vdprintf,(__fd,__format,__args))
-#elif defined(__CRT_HAVE_write) || defined(__CRT_HAVE__write) || defined(__CRT_HAVE___write)
+#elif defined(__CRT_HAVE_write_printer) || defined(__CRT_HAVE_writeall) || defined(__CRT_HAVE_write) || defined(__CRT_HAVE__write) || defined(__CRT_HAVE___write)
 __NAMESPACE_LOCAL_END
 #include <libc/local/stdio/vdprintf.h>
 __NAMESPACE_LOCAL_BEGIN
@@ -51,7 +53,7 @@ __NAMESPACE_LOCAL_END
 #define __local___localdep_dprintf_defined 1
 #define __localdep_dprintf __LIBC_LOCAL_NAME(dprintf)
 #endif /* !__local___localdep_dprintf_defined */
-#else /* __CRT_HAVE_vdprintf || __CRT_HAVE_write || __CRT_HAVE__write || __CRT_HAVE___write */
+#else /* __CRT_HAVE_vdprintf || __CRT_HAVE_write_printer || __CRT_HAVE_writeall || __CRT_HAVE_write || __CRT_HAVE__write || __CRT_HAVE___write */
 #undef __local_dprintf_defined
-#endif /* !__CRT_HAVE_vdprintf && !__CRT_HAVE_write && !__CRT_HAVE__write && !__CRT_HAVE___write */
+#endif /* !__CRT_HAVE_vdprintf && !__CRT_HAVE_write_printer && !__CRT_HAVE_writeall && !__CRT_HAVE_write && !__CRT_HAVE__write && !__CRT_HAVE___write */
 #endif /* !__local_dprintf_defined */

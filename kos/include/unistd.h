@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x7e4e1c2e */
+/* HASH CRC-32:0x70fa97a9 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -70,6 +70,10 @@
 #ifdef __USE_NETBSD
 #include <asm/crt/getpassfd.h> /* __GETPASS_* */
 #endif /* __USE_NETBSD */
+
+#ifdef __USE_KOS
+#include <bits/crt/format-printer.h> /* __FORMATPRINTER_CC */
+#endif /* __USE_KOS */
 
 #ifdef __USE_SOLARIS
 #include <getopt.h>
@@ -990,7 +994,15 @@ __NAMESPACE_LOCAL_USING_OR_IMPL(readall, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_N
  * `writeall()' to immediately return `0') or the entirety of the given buffer has been
  * written (in which case `bufsize' is returned). */
 __CDECLARE(__ATTR_NONNULL((2)),ssize_t,__NOTHROW_RPC,writeall,(__fd_t __fd, void const *__buf, size_t __bufsize),(__fd,__buf,__bufsize))
-#elif (defined(__CRT_HAVE_write) || defined(__CRT_HAVE__write) || defined(__CRT_HAVE___write)) && (defined(__CRT_HAVE_lseek64) || defined(__CRT_HAVE__lseeki64) || defined(__CRT_HAVE_lseek) || defined(__CRT_HAVE__lseek) || defined(__CRT_HAVE___lseek))
+#else /* __CRT_HAVE_writeall */
+#include <bits/crt/format-printer.h>
+#if defined(__CRT_HAVE_write_printer) && defined(__LIBCCALL_IS_FORMATPRINTER_CC) && __SIZEOF_INT__ == __SIZEOF_POINTER__
+/* >> writeall(3)
+ * Same as `write(2)', however keep on  writing until `write()' indicates EOF  (causing
+ * `writeall()' to immediately return `0') or the entirety of the given buffer has been
+ * written (in which case `bufsize' is returned). */
+__CREDIRECT(__ATTR_NONNULL((2)),ssize_t,__NOTHROW_RPC,writeall,(__fd_t __fd, void const *__buf, size_t __bufsize),write_printer,(__fd,__buf,__bufsize))
+#elif defined(__CRT_HAVE_write) || defined(__CRT_HAVE__write) || defined(__CRT_HAVE___write)
 #include <libc/local/unistd/writeall.h>
 /* >> writeall(3)
  * Same as `write(2)', however keep on  writing until `write()' indicates EOF  (causing
@@ -1000,7 +1012,30 @@ __NAMESPACE_LOCAL_USING_OR_IMPL(writeall, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_
 #else /* ... */
 #undef __writeall_defined
 #endif /* !... */
+#endif /* !__CRT_HAVE_writeall */
 #endif /* !__writeall_defined */
+#include <bits/crt/format-printer.h>
+#if defined(__CRT_HAVE_writeall) && defined(__LIBCCALL_IS_FORMATPRINTER_CC) && __SIZEOF_INT__ == __SIZEOF_POINTER__
+/* >> write_printer(3)
+ * A pformatprinter-compatible consumer that dumps all input data into `fd' by use
+ * of `writeall(3)'. The given `fd' should be encoded by  `WRITE_PRINTER_ARG(fd)'.
+ * @return: * : Same as `writeall(3)' */
+__COMPILER_REDIRECT(__LIBC,__ATTR_NONNULL((2)),ssize_t,__NOTHROW_RPC,__FORMATPRINTER_CC,write_printer,(void *__fd, char const *__restrict __buf, size_t __bufsize),writeall,(__fd,__buf,__bufsize))
+#elif defined(__CRT_HAVE_write_printer)
+/* >> write_printer(3)
+ * A pformatprinter-compatible consumer that dumps all input data into `fd' by use
+ * of `writeall(3)'. The given `fd' should be encoded by  `WRITE_PRINTER_ARG(fd)'.
+ * @return: * : Same as `writeall(3)' */
+__LIBC __ATTR_NONNULL((2)) ssize_t __NOTHROW_RPC(__FORMATPRINTER_CC write_printer)(void *__fd, char const *__restrict __buf, size_t __bufsize) __CASMNAME_SAME("write_printer");
+#elif defined(__CRT_HAVE_writeall) || defined(__CRT_HAVE_write) || defined(__CRT_HAVE__write) || defined(__CRT_HAVE___write)
+#include <libc/local/unistd/write_printer.h>
+/* >> write_printer(3)
+ * A pformatprinter-compatible consumer that dumps all input data into `fd' by use
+ * of `writeall(3)'. The given `fd' should be encoded by  `WRITE_PRINTER_ARG(fd)'.
+ * @return: * : Same as `writeall(3)' */
+__NAMESPACE_LOCAL_USING_OR_IMPL(write_printer, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_NONNULL((2)) ssize_t __NOTHROW_RPC(__FORMATPRINTER_CC write_printer)(void *__fd, char const *__restrict __buf, size_t __bufsize) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(write_printer))(__fd, __buf, __bufsize); })
+#endif /* ... */
+#define WRITE_PRINTER_ARG(fd) ((void *)(__UINTPTR_TYPE__)(__CRT_PRIVATE_UINT(__SIZEOF_FD_T__))(fd))
 #endif /* __USE_KOS */
 
 #ifndef __lseek_defined

@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x9f8bf7ef */
+/* HASH CRC-32:0xa864d915 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -3004,6 +3004,11 @@ DEFINE_PUBLIC_ALIAS(DOS$_write, libd_write);
 DEFINE_PUBLIC_ALIAS(DOS$__write, libd_write);
 DEFINE_PUBLIC_ALIAS(DOS$write, libd_write);
 DEFINE_PUBLIC_ALIAS(DOS$readall, libd_readall);
+#include <hybrid/typecore.h>
+#include <bits/crt/format-printer.h>
+#if defined(__LIBCCALL_IS_FORMATPRINTER_CC) && __SIZEOF_INT__ == __SIZEOF_POINTER__
+DEFINE_PUBLIC_ALIAS(DOS$write_printer, libd_writeall);
+#endif /* __LIBCCALL_IS_FORMATPRINTER_CC && __SIZEOF_INT__ == __SIZEOF_POINTER__ */
 DEFINE_PUBLIC_ALIAS(DOS$writeall, libd_writeall);
 DEFINE_PUBLIC_ALIAS(DOS$_lseek, libd_lseek);
 DEFINE_PUBLIC_ALIAS(DOS$__lseek, libd_lseek);

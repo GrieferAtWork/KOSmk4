@@ -3608,7 +3608,7 @@ NOTHROW_NCX(LIBCCALL libc_ctermid_r)(char *s)
 
 
 
-/*[[[start:exports,hash:CRC-32=0x47337b48]]]*/
+/*[[[start:exports,hash:CRC-32=0x6beea8fb]]]*/
 #ifdef __LIBCCALL_IS_LIBDCALL
 DEFINE_PUBLIC_ALIAS(_execve, libc_execve);
 #endif /* __LIBCCALL_IS_LIBDCALL */
@@ -3661,6 +3661,11 @@ DEFINE_PUBLIC_ALIAS(_write, libc_write);
 DEFINE_PUBLIC_ALIAS(__write, libc_write);
 DEFINE_PUBLIC_ALIAS(write, libc_write);
 DEFINE_PUBLIC_ALIAS(readall, libc_readall);
+#include <hybrid/typecore.h>
+#include <bits/crt/format-printer.h>
+#if defined(__LIBCCALL_IS_FORMATPRINTER_CC) && __SIZEOF_INT__ == __SIZEOF_POINTER__
+DEFINE_PUBLIC_ALIAS(write_printer, libc_writeall);
+#endif /* __LIBCCALL_IS_FORMATPRINTER_CC && __SIZEOF_INT__ == __SIZEOF_POINTER__ */
 DEFINE_PUBLIC_ALIAS(writeall, libc_writeall);
 #ifdef __LIBCCALL_IS_LIBDCALL
 DEFINE_PUBLIC_ALIAS(_lseek, libc_lseek);

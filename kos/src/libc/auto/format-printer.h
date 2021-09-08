@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x9160fc55 */
+/* HASH CRC-32:0xca720e38 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -658,8 +658,8 @@ INTDEF ATTR_MALLOC ATTR_MALL_DEFAULT_ALIGNED WUNUSED ATTR_ALLOC_SIZE((2)) NONNUL
  * @return: NULL: Failed to allocate additional memory */
 INTDEF ATTR_MALLOC ATTR_MALL_DEFAULT_ALIGNED WUNUSED ATTR_ALLOC_SIZE((2)) NONNULL((1)) char *NOTHROW_NCX(LIBCCALL libc_format_aprintf_alloc)(struct format_aprintf_data *__restrict self, size_t num_chars);
 /* >> format_aprintf_printer(3)
- * Print data  to a  dynamically allocated  heap buffer.  On error,  -1 is  returned
- * This function is intended to be used as a pformatprinter-compatibile printer sink */
+ * Print data to  a dynamically  allocated heap buffer.  On error,  -1 is  returned
+ * This function is intended to be used as a pformatprinter-compatible printer sink */
 INTDEF WUNUSED NONNULL((1, 2)) ssize_t NOTHROW_NCX(__FORMATPRINTER_CC libc_format_aprintf_printer)(void *arg, char const *__restrict data, size_t datalen);
 #endif /* !__KERNEL__ */
 

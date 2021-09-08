@@ -1214,11 +1214,10 @@ err:
 
 
 @@>> format_aprintf_printer(3)
-@@Print data  to a  dynamically allocated  heap buffer.  On error,  -1 is  returned
-@@This function is intended to be used as a pformatprinter-compatibile printer sink
+@@Print data to  a dynamically  allocated heap buffer.  On error,  -1 is  returned
+@@This function is intended to be used as a pformatprinter-compatible printer sink
 [[wunused, requires_function(format_aprintf_alloc)]]
 [[no_crt_dos_wrapper, cc(__FORMATPRINTER_CC)]]
-[[decl_prefix(struct format_aprintf_data;)]]
 [[decl_include("<bits/crt/format-printer.h>", "<hybrid/typecore.h>")]]
 $ssize_t format_aprintf_printer([[nonnull]] /*struct format_aprintf_data **/ void *arg,
                                 [[nonnull]] /*utf-8*/ char const *__restrict data, $size_t datalen) {

@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xbe673a14 */
+/* HASH CRC-32:0x779fbebc */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -2188,15 +2188,22 @@ __NAMESPACE_STD_USING(snprintf)
 #ifdef __CRT_HAVE_vdprintf
 /* >> dprintf(3), vdprintf(3) */
 __CDECLARE(__ATTR_LIBC_PRINTF(2, 0) __ATTR_NONNULL((2)),__STDC_INT_AS_SSIZE_T,__NOTHROW_RPC,vdprintf,(__fd_t __fd, char const *__restrict __format, __builtin_va_list __args),(__fd,__format,__args))
-#elif defined(__CRT_HAVE_write) || defined(__CRT_HAVE__write) || defined(__CRT_HAVE___write)
+#else /* __CRT_HAVE_vdprintf */
+#include <hybrid/typecore.h>
+#include <bits/crt/format-printer.h>
+#if defined(__CRT_HAVE_write_printer) || defined(__CRT_HAVE_writeall) || defined(__CRT_HAVE_write) || defined(__CRT_HAVE__write) || defined(__CRT_HAVE___write)
 #include <libc/local/stdio/vdprintf.h>
 /* >> dprintf(3), vdprintf(3) */
 __NAMESPACE_LOCAL_USING_OR_IMPL(vdprintf, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_LIBC_PRINTF(2, 0) __ATTR_NONNULL((2)) __STDC_INT_AS_SSIZE_T __NOTHROW_RPC(__LIBCCALL vdprintf)(__fd_t __fd, char const *__restrict __format, __builtin_va_list __args) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(vdprintf))(__fd, __format, __args); })
-#endif /* ... */
+#endif /* __CRT_HAVE_write_printer || __CRT_HAVE_writeall || __CRT_HAVE_write || __CRT_HAVE__write || __CRT_HAVE___write */
+#endif /* !__CRT_HAVE_vdprintf */
 #ifdef __CRT_HAVE_dprintf
 /* >> dprintf(3), vdprintf(3) */
 __LIBC __ATTR_LIBC_PRINTF(2, 3) __ATTR_NONNULL((2)) __STDC_INT_AS_SSIZE_T __NOTHROW_RPC(__VLIBCCALL dprintf)(__fd_t __fd, char const *__restrict __format, ...) __CASMNAME_SAME("dprintf");
-#elif defined(__CRT_HAVE_vdprintf) || defined(__CRT_HAVE_write) || defined(__CRT_HAVE__write) || defined(__CRT_HAVE___write)
+#else /* __CRT_HAVE_dprintf */
+#include <hybrid/typecore.h>
+#include <bits/crt/format-printer.h>
+#if defined(__CRT_HAVE_vdprintf) || defined(__CRT_HAVE_write_printer) || defined(__CRT_HAVE_writeall) || defined(__CRT_HAVE_write) || defined(__CRT_HAVE__write) || defined(__CRT_HAVE___write)
 #include <libc/local/stdio/dprintf.h>
 /* >> dprintf(3), vdprintf(3) */
 #ifdef __cplusplus
@@ -2204,7 +2211,8 @@ __NAMESPACE_LOCAL_USING_OR_IMPL(dprintf, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_L
 #else /* __cplusplus */
 #define dprintf (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(dprintf))
 #endif /* !__cplusplus */
-#endif /* ... */
+#endif /* __CRT_HAVE_vdprintf || __CRT_HAVE_write_printer || __CRT_HAVE_writeall || __CRT_HAVE_write || __CRT_HAVE__write || __CRT_HAVE___write */
+#endif /* !__CRT_HAVE_dprintf */
 #endif /* __USE_XOPEN2K8 */
 
 #ifdef __USE_ATFILE

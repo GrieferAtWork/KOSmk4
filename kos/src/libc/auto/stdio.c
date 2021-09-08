@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xb0d5921a */
+/* HASH CRC-32:0x7c0900e9 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -577,28 +577,14 @@ NOTHROW_NCX(VLIBCCALL libc_snprintf)(char *__restrict buf,
 #include <hybrid/typecore.h>
 #include <hybrid/host.h>
 #include <bits/crt/format-printer.h>
-#if !defined(__LIBCCALL_IS_FORMATPRINTER_CC) || __SIZEOF_INT__ != __SIZEOF_POINTER__
-__NAMESPACE_LOCAL_BEGIN
-__LOCAL_LIBC(vdprintf_printer) __ssize_t
-(__FORMATPRINTER_CC __vdprintf_printer)(void *__arg, char const *__restrict __data, __size_t __datalen) {
-	return (__ssize_t)libc_write((int)(unsigned int)(__UINTPTR_TYPE__)__arg, __data, __datalen);
-}
-__NAMESPACE_LOCAL_END
-#endif /* !__LIBCCALL_IS_FORMATPRINTER_CC || __SIZEOF_INT__ != __SIZEOF_POINTER__ */
 /* >> dprintf(3), vdprintf(3) */
 INTERN ATTR_SECTION(".text.crt.io.write") ATTR_LIBC_PRINTF(2, 0) NONNULL((2)) __STDC_INT_AS_SSIZE_T
 NOTHROW_RPC(LIBCCALL libc_vdprintf)(fd_t fd,
                                     char const *__restrict format,
                                     va_list args) {
-#if !defined(__LIBCCALL_IS_FORMATPRINTER_CC) || __SIZEOF_INT__ != __SIZEOF_POINTER__
-	return libc_format_vprintf(&__NAMESPACE_LOCAL_SYM __vdprintf_printer,
-	                      (void *)(__UINTPTR_TYPE__)(unsigned int)fd,
+	return libc_format_vprintf(&libc_write_printer,
+	                      (void *)(__UINTPTR_TYPE__)(__CRT_PRIVATE_UINT(__SIZEOF_FD_T__))fd,
 	                      format, args);
-#else /* !__LIBCCALL_IS_FORMATPRINTER_CC || __SIZEOF_INT__ != __SIZEOF_POINTER__ */
-	return libc_format_vprintf((pformatprinter)(void *)&libc_write,
-	                      (void *)(__UINTPTR_TYPE__)(unsigned int)fd,
-	                      format, args);
-#endif /* __LIBCCALL_IS_FORMATPRINTER_CC && __SIZEOF_INT__ == __SIZEOF_POINTER__ */
 }
 #endif /* !__KERNEL__ */
 #if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)

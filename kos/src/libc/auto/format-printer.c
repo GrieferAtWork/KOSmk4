@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xdd0e4852 */
+/* HASH CRC-32:0xdf60d269 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -1243,8 +1243,8 @@ err:
 	return NULL;
 }
 /* >> format_aprintf_printer(3)
- * Print data  to a  dynamically allocated  heap buffer.  On error,  -1 is  returned
- * This function is intended to be used as a pformatprinter-compatibile printer sink */
+ * Print data to  a dynamically  allocated heap buffer.  On error,  -1 is  returned
+ * This function is intended to be used as a pformatprinter-compatible printer sink */
 INTERN ATTR_SECTION(".text.crt.string.format") WUNUSED NONNULL((1, 2)) ssize_t
 NOTHROW_NCX(__FORMATPRINTER_CC libc_format_aprintf_printer)(void *arg,
                                                             char const *__restrict data,

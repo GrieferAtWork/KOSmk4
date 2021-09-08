@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xc9dfcad9 */
+/* HASH CRC-32:0x6bf48a87 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -6235,6 +6235,13 @@
 #define __CRT_HAVE_wreadlinkat
 #define __CRT_HAVE_wremove
 #define __CRT_HAVE_write
+#endif /* !__KERNEL__ */
+#include <hybrid/typecore.h>
+#include <bits/crt/format-printer.h>
+#if !defined(__KERNEL__) && (!defined(__LIBCCALL_IS_FORMATPRINTER_CC) || __SIZEOF_INT__ != __SIZEOF_POINTER__)
+#define __CRT_HAVE_write_printer
+#endif /* !__KERNEL__ && (!__LIBCCALL_IS_FORMATPRINTER_CC || __SIZEOF_INT__ != __SIZEOF_POINTER__) */
+#ifndef __KERNEL__
 #define __CRT_HAVE_writeall
 #define __CRT_HAVE_writev
 #define __CRT_HAVE_wrmdir

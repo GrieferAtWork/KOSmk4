@@ -98,6 +98,10 @@
 #include <asm/crt/getpassfd.h> /* __GETPASS_* */
 #endif /* __USE_NETBSD */
 
+#ifdef __USE_KOS
+#include <bits/crt/format-printer.h> /* __FORMATPRINTER_CC */
+#endif /* __USE_KOS */
+
 #ifdef __USE_SOLARIS
 #include <getopt.h>
 #define GF_PATH "/etc/group"
@@ -825,7 +829,8 @@ ssize_t readall($fd_t fd, [[outp(bufsize)]] void *buf, size_t bufsize) {
 @@`writeall()' to immediately return `0') or the entirety of the given buffer has been
 @@written (in which case `bufsize' is returned).
 [[cp, guard, section(".text.crt{|.dos}.io.write"), impl_include("<libc/errno.h>")]]
-[[userimpl, requires($has_function(write) && $has_function(lseek))]]
+[[if($extended_include_prefix("<hybrid/typecore.h>", "<bits/crt/format-printer.h>")defined(__LIBCCALL_IS_FORMATPRINTER_CC) && __SIZEOF_INT__ == __SIZEOF_POINTER__), export_alias("write_printer")]]
+[[userimpl, requires_function(write)]]
 [[decl_include("<bits/types.h>")]]
 ssize_t writeall($fd_t fd, [[inp(bufsize)]] void const *buf, size_t bufsize) {
 	ssize_t result, temp;
@@ -847,6 +852,32 @@ ssize_t writeall($fd_t fd, [[inp(bufsize)]] void const *buf, size_t bufsize) {
 	}
 	return result;
 }
+
+@@>> write_printer(3)
+@@A pformatprinter-compatible consumer that dumps all input data into `fd' by use
+@@of `writeall(3)'. The given `fd' should be encoded by  `WRITE_PRINTER_ARG(fd)'.
+@@@return: * : Same as `writeall(3)'
+[[cp, section(".text.crt{|.dos}.io.write"), decl_include("<bits/crt/format-printer.h>", "<hybrid/typecore.h>")]]
+[[requires_function(writeall), no_crt_dos_wrapper, cc(__FORMATPRINTER_CC), impl_include("<bits/types.h>")]]
+[[crt_impl_if($extended_include_prefix("<hybrid/typecore.h>", "<bits/crt/format-printer.h>")!defined(__KERNEL__) && (!defined(__LIBCCALL_IS_FORMATPRINTER_CC) || __SIZEOF_INT__ != __SIZEOF_POINTER__))]]
+[[if($extended_include_prefix("<hybrid/typecore.h>", "<bits/crt/format-printer.h>")defined(__LIBCCALL_IS_FORMATPRINTER_CC) && __SIZEOF_INT__ == __SIZEOF_POINTER__), preferred_alias("writeall")]]
+ssize_t write_printer(/*fd_t*/ void *fd,
+                      [[inp(bufsize)]] char const *__restrict buf,
+                      size_t bufsize) {
+	return writeall((fd_t)(__CRT_PRIVATE_UINT(__SIZEOF_FD_T__))(uintptr_t)fd, buf, bufsize);
+}
+
+%(auto_header){
+#if !defined(__KERNEL__) && (defined(__LIBCCALL_IS_FORMATPRINTER_CC) && __SIZEOF_INT__ == __SIZEOF_POINTER__)
+/* Define the libc internal header variant as an alias for writeall() when it would otherwise not be defined. */
+INTDEF NONNULL((2)) ssize_t NOTHROW_RPC(__FORMATPRINTER_CC libc_write_printer)(void *fd, char const *__restrict buf, size_t bufsize) ASMNAME("libc_writeall");
+#endif /* !__KERNEL__ && (__LIBCCALL_IS_FORMATPRINTER_CC && __SIZEOF_INT__ == __SIZEOF_POINTER__) */
+}
+
+%{
+#define WRITE_PRINTER_ARG(fd) ((void *)(__UINTPTR_TYPE__)(__CRT_PRIVATE_UINT(__SIZEOF_FD_T__))(fd))
+}
+
 %#endif /* __USE_KOS */
 %
 

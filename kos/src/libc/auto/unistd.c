@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xda264b07 */
+/* HASH CRC-32:0x3da735b3 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -244,6 +244,23 @@ NOTHROW_NCX(LIBCCALL libc_getlogin)(void) {
 	return libc_cuserid(NULL);
 #endif /* !__CRT_HAVE_getenv && !__LOCAL_environ */
 }
+#endif /* !__KERNEL__ */
+#include <hybrid/typecore.h>
+#include <bits/crt/format-printer.h>
+#if !defined(__KERNEL__) && (!defined(__LIBCCALL_IS_FORMATPRINTER_CC) || __SIZEOF_INT__ != __SIZEOF_POINTER__)
+#include <bits/types.h>
+/* >> write_printer(3)
+ * A pformatprinter-compatible consumer that dumps all input data into `fd' by use
+ * of `writeall(3)'. The given `fd' should be encoded by  `WRITE_PRINTER_ARG(fd)'.
+ * @return: * : Same as `writeall(3)' */
+INTERN ATTR_SECTION(".text.crt.io.write") NONNULL((2)) ssize_t
+NOTHROW_RPC(__FORMATPRINTER_CC libc_write_printer)(void *fd,
+                                                   char const *__restrict buf,
+                                                   size_t bufsize) {
+	return libc_writeall((fd_t)(__CRT_PRIVATE_UINT(__SIZEOF_FD_T__))(uintptr_t)fd, buf, bufsize);
+}
+#endif /* !__KERNEL__ && (!__LIBCCALL_IS_FORMATPRINTER_CC || __SIZEOF_INT__ != __SIZEOF_POINTER__) */
+#ifndef __KERNEL__
 #include <bits/os/termios.h>
 /* >> isatty(2)
  * Check if the given file handle `fd' refers to a TTY
@@ -1155,6 +1172,11 @@ DEFINE_PUBLIC_ALIAS(_execlpe, libc_execlpe);
 #endif /* __LIBCCALL_IS_LIBDCALL */
 DEFINE_PUBLIC_ALIAS(execlpe, libc_execlpe);
 DEFINE_PUBLIC_ALIAS(getlogin, libc_getlogin);
+#endif /* !__KERNEL__ */
+#if !defined(__KERNEL__) && (!defined(__LIBCCALL_IS_FORMATPRINTER_CC) || __SIZEOF_INT__ != __SIZEOF_POINTER__)
+DEFINE_PUBLIC_ALIAS(write_printer, libc_write_printer);
+#endif /* !__KERNEL__ && (!__LIBCCALL_IS_FORMATPRINTER_CC || __SIZEOF_INT__ != __SIZEOF_POINTER__) */
+#ifndef __KERNEL__
 #ifdef __LIBCCALL_IS_LIBDCALL
 DEFINE_PUBLIC_ALIAS(_isatty, libc_isatty);
 #endif /* __LIBCCALL_IS_LIBDCALL */

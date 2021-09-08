@@ -4530,6 +4530,7 @@
 #define __CRT_HAVE_wreadlinkat
 #define __CRT_HAVE_wremove
 #define __CRT_HAVE_write
+#define __CRT_HAVE_write_printer
 #define __CRT_HAVE_writeall
 #define __CRT_HAVE_writev
 #define __CRT_HAVE_wrmdir

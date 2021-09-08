@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xda1879d8 */
+/* HASH CRC-32:0x556e1636 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -21,7 +21,7 @@
 #ifndef __local_writeall_defined
 #define __local_writeall_defined 1
 #include <__crt.h>
-#if (defined(__CRT_HAVE_write) || defined(__CRT_HAVE__write) || defined(__CRT_HAVE___write)) && (defined(__CRT_HAVE_lseek64) || defined(__CRT_HAVE__lseeki64) || defined(__CRT_HAVE_lseek) || defined(__CRT_HAVE__lseek) || defined(__CRT_HAVE___lseek))
+#if defined(__CRT_HAVE_write) || defined(__CRT_HAVE__write) || defined(__CRT_HAVE___write)
 #include <bits/types.h>
 __NAMESPACE_LOCAL_BEGIN
 #ifndef __local___localdep_write_defined
@@ -65,7 +65,7 @@ __NAMESPACE_LOCAL_END
 #define __local___localdep_writeall_defined 1
 #define __localdep_writeall __LIBC_LOCAL_NAME(writeall)
 #endif /* !__local___localdep_writeall_defined */
-#else /* (__CRT_HAVE_write || __CRT_HAVE__write || __CRT_HAVE___write) && (__CRT_HAVE_lseek64 || __CRT_HAVE__lseeki64 || __CRT_HAVE_lseek || __CRT_HAVE__lseek || __CRT_HAVE___lseek) */
+#else /* __CRT_HAVE_write || __CRT_HAVE__write || __CRT_HAVE___write */
 #undef __local_writeall_defined
-#endif /* (!__CRT_HAVE_write && !__CRT_HAVE__write && !__CRT_HAVE___write) || (!__CRT_HAVE_lseek64 && !__CRT_HAVE__lseeki64 && !__CRT_HAVE_lseek && !__CRT_HAVE__lseek && !__CRT_HAVE___lseek) */
+#endif /* !__CRT_HAVE_write && !__CRT_HAVE__write && !__CRT_HAVE___write */
 #endif /* !__local_writeall_defined */

@@ -223,8 +223,7 @@ DlModule_OpenFilenameInPath(char const *__restrict path, size_t pathlen,
 	 *        - $LIB / ${LIB}:           Expand to `RTLD_LIB'
 	 *        - $PLATFORM / ${PLATFORM}: Expand to `RTLD_PLATFORM'
 	 */
-	buf = (char *)malloca((pathlen + 1 + filenamelen + 1) *
-	                      sizeof(char));
+	buf = (char *)malloca(pathlen + 1 + filenamelen + 1, sizeof(char));
 	if unlikely(!buf) {
 		dl_seterror_nomem();
 		return NULL;
@@ -246,8 +245,7 @@ NOTHROW_NCX(CC DlModule_FindFilenameInPathFromAll)(char const *__restrict path, 
 	REF DlModule *result;
 	while (pathlen && path[pathlen - 1] == '/')
 		--pathlen;
-	buf = (char *)malloca((pathlen + 1 + filenamelen + 1) *
-	                      sizeof(char));
+	buf = (char *)malloca(pathlen + 1 + filenamelen + 1, sizeof(char));
 	if unlikely(!buf) {
 		dl_seterror_nomem();
 		return NULL;

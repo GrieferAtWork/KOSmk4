@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x8fe5daed */
+/* HASH CRC-32:0x373bba95 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -863,14 +863,14 @@ __NAMESPACE_LOCAL_USING_OR_IMPL(format_aprintf_alloc, __FORCELOCAL __ATTR_ARTIFI
 #endif /* ... */
 #ifdef __CRT_HAVE_format_aprintf_printer
 /* >> format_aprintf_printer(3)
- * Print data  to a  dynamically allocated  heap buffer.  On error,  -1 is  returned
- * This function is intended to be used as a pformatprinter-compatibile printer sink */
+ * Print data to  a dynamically  allocated heap buffer.  On error,  -1 is  returned
+ * This function is intended to be used as a pformatprinter-compatible printer sink */
 __LIBC __ATTR_WUNUSED __ATTR_NONNULL((1, 2)) __SSIZE_TYPE__ __NOTHROW_NCX(__FORMATPRINTER_CC format_aprintf_printer)(void *__arg, char const *__restrict __data, __SIZE_TYPE__ __datalen) __CASMNAME_SAME("format_aprintf_printer");
 #elif defined(__CRT_HAVE_format_aprintf_alloc) || defined(__CRT_HAVE_realloc)
 #include <libc/local/format-printer/format_aprintf_printer.h>
 /* >> format_aprintf_printer(3)
- * Print data  to a  dynamically allocated  heap buffer.  On error,  -1 is  returned
- * This function is intended to be used as a pformatprinter-compatibile printer sink */
+ * Print data to  a dynamically  allocated heap buffer.  On error,  -1 is  returned
+ * This function is intended to be used as a pformatprinter-compatible printer sink */
 __NAMESPACE_LOCAL_USING_OR_IMPL(format_aprintf_printer, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_WUNUSED __ATTR_NONNULL((1, 2)) __SSIZE_TYPE__ __NOTHROW_NCX(__FORMATPRINTER_CC format_aprintf_printer)(void *__arg, char const *__restrict __data, __SIZE_TYPE__ __datalen) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(format_aprintf_printer))(__arg, __data, __datalen); })
 #endif /* ... */
 

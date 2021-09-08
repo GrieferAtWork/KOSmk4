@@ -1555,26 +1555,11 @@ __STDC_INT_AS_SIZE_T snprintf([[outp_opt(min(return, buflen))]] char *__restrict
 %#ifdef __USE_XOPEN2K8
 [[section(".text.crt{|.dos}.io.write"), decl_include("<features.h>"), doc_alias("dprintf")]]
 [[impl_include("<hybrid/typecore.h>", "<hybrid/host.h>", "<bits/crt/format-printer.h>")]]
-[[cp, requires_dependent_function(write), impl_prefix(
-@@pp_if !defined(__LIBCCALL_IS_FORMATPRINTER_CC) || __SIZEOF_INT__ != __SIZEOF_POINTER__@@
-@@push_namespace(local)@@
-__LOCAL_LIBC(@vdprintf_printer@) __ssize_t
-(__FORMATPRINTER_CC __vdprintf_printer)(void *__arg, char const *__restrict __data, __size_t __datalen) {
-	return (__ssize_t)write((int)(unsigned int)(__UINTPTR_TYPE__)__arg, __data, __datalen);
-}
-@@pop_namespace@@
-@@pp_endif@@
-), ATTR_LIBC_PRINTF(2, 0)]]
+[[cp, requires_dependent_function(write_printer), ATTR_LIBC_PRINTF(2, 0)]]
 __STDC_INT_AS_SSIZE_T vdprintf($fd_t fd, [[nonnull]] char const *__restrict format, $va_list args) {
-@@pp_if !defined(__LIBCCALL_IS_FORMATPRINTER_CC) || __SIZEOF_INT__ != __SIZEOF_POINTER__@@
-	return format_vprintf(&__NAMESPACE_LOCAL_SYM __vdprintf_printer,
-	                      (void *)(__UINTPTR_TYPE__)(unsigned int)fd,
+	return format_vprintf(&write_printer,
+	                      (void *)(__UINTPTR_TYPE__)(__CRT_PRIVATE_UINT(__SIZEOF_FD_T__))fd,
 	                      format, args);
-@@pp_else@@
-	return format_vprintf((pformatprinter)(void *)&write,
-	                      (void *)(__UINTPTR_TYPE__)(unsigned int)fd,
-	                      format, args);
-@@pp_endif@@
 }
 
 @@>> dprintf(3), vdprintf(3)
