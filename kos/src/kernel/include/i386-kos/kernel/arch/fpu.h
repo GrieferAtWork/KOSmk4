@@ -82,8 +82,12 @@ DATDEF u32 const x86_fxsave_mxcsr_mask;
 
 #ifdef __x86_64__
 struct fpustate32;
-FUNDEF NOBLOCK void KCALL fpustate32_loadfrom(USER CHECKED struct fpustate32 const *state) THROWS(E_SEGFAULT, E_BADALLOC);
-FUNDEF NOBLOCK void KCALL fpustate32_saveinto(USER CHECKED struct fpustate32 *state) THROWS(E_SEGFAULT);
+FUNDEF NOBLOCK void FCALL
+fpustate32_loadfrom(USER CHECKED struct fpustate32 const *state)
+		THROWS(E_SEGFAULT, E_BADALLOC);
+FUNDEF NOBLOCK /*WUNUSED*/ USER CHECKED struct fpustate32 *FCALL
+fpustate32_saveinto(USER CHECKED struct fpustate32 *state)
+		THROWS(E_SEGFAULT);
 #define fpustate64_loadfrom fpustate_loadfrom
 #define fpustate64_saveinto fpustate_saveinto
 #else /* __x86_64__ */

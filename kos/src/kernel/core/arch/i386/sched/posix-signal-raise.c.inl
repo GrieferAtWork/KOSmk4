@@ -159,6 +159,13 @@ sighand_raise_signal(struct icpustate *__restrict state,
 	}
 #endif /* DEFINE_RAISE64 */
 
+	/* Force proper alignment. */
+#ifdef DEFINE_RAISE32
+	usp = (USER CHECKED byte_t *)((uintptr_t)usp & ~3);
+#else /* DEFINE_RAISE32 */
+	usp = (USER CHECKED byte_t *)((uintptr_t)usp & ~7);
+#endif /* !DEFINE_RAISE32 */
+
 	/* At this point, the following options affect how we need to set up the stack:
 	 *  - sc_info:                                  When non-NULL, we must restart an interrupted system call
 	 *  - must_restore_sigmask:                     When true, we must restore `old_sigmask'
@@ -198,7 +205,7 @@ sighand_raise_signal(struct icpustate *__restrict state,
 		}
 		if (PERTASK_GET(this_fpustate)) {
 			user_fpustate = &user_ucontext->uc_mcontext.mc_fpu;
-			(NAME2(fpustate, _saveinto)(user_fpustate));
+			user_fpustate = (NAME2(fpustate, _saveinto)(user_fpustate));
 			user_ucontext->uc_mcontext.mc_flags |= x86_fpustate_variant == FPU_STATE_SSTATE
 			                                       ? __MCONTEXT_FLAG_HAVESFPU
 			                                       : __MCONTEXT_FLAG_HAVEXFPU;
@@ -227,7 +234,7 @@ sighand_raise_signal(struct icpustate *__restrict state,
 			                  MIN_C(sizeof(struct sfpustate),
 			                        sizeof(struct NAME(xfpustate))));
 			COMPILER_WRITE_BARRIER();
-			NAME2(fpustate, _saveinto)(user_fpustate);
+			user_fpustate = NAME2(fpustate, _saveinto)(user_fpustate);
 		}
 		/* Only save the sigmask if it was changed. */
 		if (must_restore_sigmask) {
@@ -318,7 +325,7 @@ sighand_raise_signal(struct icpustate *__restrict state,
 	 * >> if (must_restore_sigmask)
 	 * >>     RESTORE_SIGMASK(user_sigset);
 	 * >> if (user_fpustate)
-	 * >>     RESTORE_FPUSTATE(user_fpustate,x86_fpustate_variant);
+	 * >>     RESTORE_FPUSTATE(user_fpustate);
 	 * >> RESTORE_UCPUSTATE(&user_ucontext->uc_mcontext.mc_context);
 	 * >> if (user_sc_info)
 	 * >>     RESTART_SYSTEM_CALL(user_sc_info);

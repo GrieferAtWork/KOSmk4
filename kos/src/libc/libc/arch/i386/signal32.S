@@ -43,15 +43,37 @@ INTERN_FUNCTION(libc_sig_restore)
 
 /*[[[deemon
 import outputForAssembly from ......misc.libgen.cfi.comp;
+for (local reg, xoffset, soffset: {
+	("st0", "OFFSET_XFPUSTATE_ST0", "OFFSET_SFPUSTATE_ST0"),
+	("st1", "OFFSET_XFPUSTATE_ST1", "OFFSET_SFPUSTATE_ST1"),
+	("st2", "OFFSET_XFPUSTATE_ST2", "OFFSET_SFPUSTATE_ST2"),
+	("st3", "OFFSET_XFPUSTATE_ST3", "OFFSET_SFPUSTATE_ST3"),
+	("st4", "OFFSET_XFPUSTATE_ST4", "OFFSET_SFPUSTATE_ST4"),
+	("st5", "OFFSET_XFPUSTATE_ST5", "OFFSET_SFPUSTATE_ST5"),
+	("st6", "OFFSET_XFPUSTATE_ST6", "OFFSET_SFPUSTATE_ST6"),
+	("st7", "OFFSET_XFPUSTATE_ST7", "OFFSET_SFPUSTATE_ST7"),
+	("fcw", "OFFSET_XFPUSTATE_FCW", "OFFSET_SFPUSTATE_FCW"),
+	("fsw", "OFFSET_XFPUSTATE_FSW", "OFFSET_SFPUSTATE_FSW"),
+}) {
+	outputForAssembly('i386', reg, r'
+		push     %ebx
+		jz       top, 1f
+		dup
+		and      $1
+		jnz      pop, 2f
+		plus     ${xoffset}      # xfpustate32
+		jmp      3f
+2:		plus     ${soffset} - $1 # sfpustate
+3:		deref
+		ret
+1:		push     %{reg}
+	'.format({
+		.reg = reg,
+		.xoffset = xoffset,
+		.soffset = soffset,
+	}), linePrefix: "", lineSuffix: "", bytesPerLine: 32);
+}
 for (local reg, offset: {
-	("st0",   "OFFSET_XFPUSTATE_ST0"),   // TODO: Support for `struct sfpustate'
-	("st1",   "OFFSET_XFPUSTATE_ST1"),
-	("st2",   "OFFSET_XFPUSTATE_ST2"),
-	("st3",   "OFFSET_XFPUSTATE_ST3"),
-	("st4",   "OFFSET_XFPUSTATE_ST4"),
-	("st5",   "OFFSET_XFPUSTATE_ST5"),
-	("st6",   "OFFSET_XFPUSTATE_ST6"),
-	("st7",   "OFFSET_XFPUSTATE_ST7"),
 	("xmm0",  "OFFSET_XFPUSTATE_XMM0"),
 	("xmm1",  "OFFSET_XFPUSTATE_XMM1"),
 	("xmm2",  "OFFSET_XFPUSTATE_XMM2"),
@@ -60,57 +82,44 @@ for (local reg, offset: {
 	("xmm5",  "OFFSET_XFPUSTATE_XMM5"),
 	("xmm6",  "OFFSET_XFPUSTATE_XMM6"),
 	("xmm7",  "OFFSET_XFPUSTATE_XMM7"),
-	("fcw",   "OFFSET_XFPUSTATE_FCW"),
-	("fsw",   "OFFSET_XFPUSTATE_FSW"),
 	("mxcsr", "OFFSET_XFPUSTATE_MXCSR"),
 }) {
 	outputForAssembly('i386', reg, r'
 		push     %ebx
 		jz       top, 1f
-		plus     ${offset}
+		dup
+		and      $1
+		jnz      pop, 1f
+		plus     ${offset} # xfpustate32
 		deref
 		ret
 1:		push     %{reg}
 	'.format({
 		.reg = reg,
-		.offset = offset
+		.offset = offset,
 	}), linePrefix: "", lineSuffix: "", bytesPerLine: 32);
 }
 ]]]*/
-	.cfi_escape 22,11,15,115,0,18,32,40,6,0,35,32,6,47,2,0,123,0
-	.cfi_escape 22,12,15,115,0,18,32,40,6,0,35,48,6,47,2,0,124,0
-	.cfi_escape 22,13,15,115,0,18,32,40,6,0,35,64,6,47,2,0,125,0
-	.cfi_escape 22,14,15,115,0,18,32,40,6,0,35,80,6,47,2,0,126,0
-	.cfi_escape 22,15,15,115,0,18,32,40,6,0,35,96,6,47,2,0,127,0
-	.cfi_escape 22,16,15,115,0,18,32,40,6,0,35,112,6,47,2,0,128,0
-	.cfi_escape 22,17,16,115,0,18,32,40,7,0,35,128,1,6,47,2,0,129,0
-	.cfi_escape 22,18,16,115,0,18,32,40,7,0,35,144,1,6,47,2,0,130,0
-	.cfi_escape 22,21,16,115,0,18,32,40,7,0,35,160,1,6,47,2,0,133,0
-	.cfi_escape 22,22,16,115,0,18,32,40,7,0,35,176,1,6,47,2,0,134,0
-	.cfi_escape 22,23,16,115,0,18,32,40,7,0,35,192,1,6,47,2,0,135,0
-	.cfi_escape 22,24,16,115,0,18,32,40,7,0,35,208,1,6,47,2,0,136,0
-	.cfi_escape 22,25,16,115,0,18,32,40,7,0,35,224,1,6,47,2,0,137,0
-	.cfi_escape 22,26,16,115,0,18,32,40,7,0,35,240,1,6,47,2,0,138,0
-	.cfi_escape 22,27,16,115,0,18,32,40,7,0,35,128,2,6,47,2,0,139,0
-	.cfi_escape 22,28,16,115,0,18,32,40,7,0,35,144,2,6,47,2,0,140,0
-	.cfi_escape 22,37,14,115,0,18,32,40,4,0,6,47,3,0,146,37,0
-	.cfi_escape 22,38,16,115,0,18,32,40,6,0,35,2,6,47,3,0,146,38,0
-	.cfi_escape 22,39,16,115,0,18,32,40,6,0,35,24,6,47,3,0,146,39,0
+	.cfi_escape 22,11,26,115,0,18,32,40,17,0,18,49,26,40,5,0,35,32,47,2,0,35,27,6,47,2,0,123,0
+	.cfi_escape 22,12,26,115,0,18,32,40,17,0,18,49,26,40,5,0,35,48,47,2,0,35,37,6,47,2,0,124,0
+	.cfi_escape 22,13,26,115,0,18,32,40,17,0,18,49,26,40,5,0,35,64,47,2,0,35,47,6,47,2,0,125,0
+	.cfi_escape 22,14,26,115,0,18,32,40,17,0,18,49,26,40,5,0,35,80,47,2,0,35,57,6,47,2,0,126,0
+	.cfi_escape 22,15,26,115,0,18,32,40,17,0,18,49,26,40,5,0,35,96,47,2,0,35,67,6,47,2,0,127,0
+	.cfi_escape 22,16,26,115,0,18,32,40,17,0,18,49,26,40,5,0,35,112,47,2,0,35,77,6,47,2,0,128,0
+	.cfi_escape 22,17,27,115,0,18,32,40,18,0,18,49,26,40,6,0,35,128,1,47,2,0,35,87,6,47,2,0,129,0
+	.cfi_escape 22,18,27,115,0,18,32,40,18,0,18,49,26,40,6,0,35,144,1,47,2,0,35,97,6,47,2,0,130,0
+	.cfi_escape 22,37,26,115,0,18,32,40,16,0,18,49,26,40,3,0,47,3,0,9,255,34,6,47,3,0,146,37,0
+	.cfi_escape 22,38,27,115,0,18,32,40,17,0,18,49,26,40,5,0,35,2,47,2,0,35,3,6,47,3,0,146,38,0
+	.cfi_escape 22,21,22,115,0,18,32,40,13,0,18,49,26,40,7,0,35,160,1,6,47,2,0,133,0
+	.cfi_escape 22,22,22,115,0,18,32,40,13,0,18,49,26,40,7,0,35,176,1,6,47,2,0,134,0
+	.cfi_escape 22,23,22,115,0,18,32,40,13,0,18,49,26,40,7,0,35,192,1,6,47,2,0,135,0
+	.cfi_escape 22,24,22,115,0,18,32,40,13,0,18,49,26,40,7,0,35,208,1,6,47,2,0,136,0
+	.cfi_escape 22,25,22,115,0,18,32,40,13,0,18,49,26,40,7,0,35,224,1,6,47,2,0,137,0
+	.cfi_escape 22,26,22,115,0,18,32,40,13,0,18,49,26,40,7,0,35,240,1,6,47,2,0,138,0
+	.cfi_escape 22,27,22,115,0,18,32,40,13,0,18,49,26,40,7,0,35,128,2,6,47,2,0,139,0
+	.cfi_escape 22,28,22,115,0,18,32,40,13,0,18,49,26,40,7,0,35,144,2,6,47,2,0,140,0
+	.cfi_escape 22,39,22,115,0,18,32,40,12,0,18,49,26,40,6,0,35,24,6,47,3,0,146,39,0
 /*[[[end]]]*/
-
-
-	/* TODO: CFI expressions for conditional restoring of FPU registers:
-	 *    >> if (EBX) {
-	 *    >>     SOME_FPU_REGISTER = RESTORE_FROM_FPUSTATE(EBX);
-	 *    >> } else {
-	 *    >>     SOME_FPU_REGISTER = SAME_VALUE;
-	 *    >> }
-	 * TODO: Add some way for user-code to select the type of FPU context
-	 *       that  will  get  loaded  by  the  sigreturn()  system  call.
-	 *       Idea: Use  the lowest bit  of the `struct fpustate const *restore_fpu' pointer
-	 *             Adding a field to the struct is a bad idea, since `fxsave' might already
-	 *             be using any of the "reserved" fields.
-	 */
 
 	movl  $(SYS_sigreturn), %eax
 	int   $(0x80)

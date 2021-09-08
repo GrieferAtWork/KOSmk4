@@ -216,6 +216,7 @@ PUBLIC NOBLOCK void KCALL
 fpustate_loadfrom(USER CHECKED struct fpustate const *state)
 		THROWS(E_SEGFAULT, E_BADALLOC) {
 	struct fpustate *mystate;
+	/* TODO: Decode format from `(uintptr_t)state & 1' */
 	mystate = PERTASK_GET(this_fpustate);
 	if (mystate) {
 		pflag_t was;
@@ -241,17 +242,24 @@ fpustate_loadfrom(USER CHECKED struct fpustate const *state)
 	}
 }
 
-PUBLIC NOBLOCK void KCALL
+PUBLIC NOBLOCK /*WUNUSED*/ USER CHECKED struct fpustate *KCALL
 fpustate_saveinto(USER CHECKED struct fpustate *state)
 		THROWS(E_SEGFAULT) {
+	assert(((uintptr_t)state & 1) == 0);
 	if (!PERTASK_GET(this_fpustate)) {
 		memset(state, 0, SIZEOF_FPUSTATE);
 		x86_fpustate_init(state);
-		return;
+		return state;
 	}
 	/* Make sure that the calling thread's FPU state has been saved. */
 	fpustate_save();
 	memcpy(state, PERTASK_GET(this_fpustate), SIZEOF_FPUSTATE);
+#if 0 /* TODO: Encode format into `(uintptr_t)state & 1'
+       * TODO: Change it so that `FPU_STATE_SSTATE == 1', `FPU_STATE_XSTATE == 0' */
+	if unlikely(x86_fpustate_variant == FPU_STATE_SSTATE)
+		state = (USER CHECKED struct fpustate *)((uintptr_t)state | 1);
+#endif
+	return state;
 }
 
 
@@ -518,6 +526,7 @@ fpustate32_loadfrom(USER CHECKED struct fpustate32 const *state)
 		THROWS(E_SEGFAULT, E_BADALLOC) {
 	struct fpustate fst;
 	if (x86_fpustate_variant == FPU_STATE_SSTATE) {
+		state = (USER CHECKED struct fpustate32 const *)((uintptr_t)state & ~1);
 		memcpy(&fst.f_ssave, &state->f_ssave, sizeof(struct sfpustate));
 	} else {
 		fpustate_saveinto(&fst);
@@ -527,17 +536,20 @@ fpustate32_loadfrom(USER CHECKED struct fpustate32 const *state)
 	fpustate_loadfrom(&fst);
 }
 
-PUBLIC NOBLOCK void KCALL
+PUBLIC NOBLOCK /*WUNUSED*/ USER CHECKED struct fpustate32 *KCALL
 fpustate32_saveinto(USER CHECKED struct fpustate32 *state)
 		THROWS(E_SEGFAULT) {
 	struct fpustate fst;
+	assert(!((uintptr_t)state & 1));
 	fpustate_saveinto(&fst);
 	if (x86_fpustate_variant == FPU_STATE_SSTATE) {
 		memcpy(&state->f_ssave, &fst.f_ssave, sizeof(struct sfpustate));
+		/* TODO: state = (USER CHECKED struct fpustate32 *)((uintptr_t)state | 1); */
 	} else {
 		xfpustate_to_xfpustate32(&fst.f_xsave,
 		                         &state->f_xsave);
 	}
+	return state;
 }
 #endif /* __x86_64__ */
 

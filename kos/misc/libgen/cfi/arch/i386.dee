@@ -86,6 +86,7 @@ global final ARCH = Architecture(
 		"kos/include/i386-kos/asm/registers.h",
 		"kos/include/i386-kos/asm/syscalls32.h",
 		"kos/include/i386-kos/asm/syscalls32_d.h",
+		"kos/include/i386-kos/kos/kernel/fpu-sstate.h",
 		"kos/include/i386-kos/kos/kernel/fpu-state32.h",
 		"kos/include/i386-kos/kos/kernel/gdb-cpu-state32.h",
 		"kos/include/i386-kos/kos/kernel/gdt.h",
