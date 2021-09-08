@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x75d21c8c */
+/* HASH CRC-32:0xeddf1c21 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -40,9 +40,9 @@ __CREDIRECT_VOID(,__NOTHROW_NCX,__localdep_free,(void *__mallptr),cfree,(__mallp
 #endif /* !__local___localdep_free_defined */
 __LOCAL_LIBC(tdestroy) __ATTR_NONNULL((2)) void
 __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(tdestroy))(void *__root, __free_fn_t __freefct) {
-__again:
 	if (__root) {
 		void *__l, *__r;
+__again:
 		__l = ((void **)__root)[1];
 		__r = ((void **)__root)[2];
 		(*__freefct)(((void **)__root)[0]);

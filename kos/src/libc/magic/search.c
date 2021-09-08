@@ -410,7 +410,7 @@ int hcreate_r(size_t nel, struct hsearch_data *htab) {
 		return 0;
 	if (nel < 3)
 		nel = 3;
-	for (nel |= 1; ; nel += 2) {
+	for (nel |= 1;; nel += 2) {
 		if (UINT_MAX - 2 < nel) {
 @@pp_ifdef ENOMEM@@
 			(void)__libc_seterrno(ENOMEM);
@@ -873,9 +873,9 @@ typedef void (__LIBKCALL *__free_fn_t)(void *__nodep);
 [[decl_prefix(DEFINE_FREE_FN_T)]]
 void tdestroy([[nullable]] void *root,
               [[nonnull]] __free_fn_t freefct) {
-again:
 	if (root) {
 		void *l, *r;
+again:
 		l = ((void **)root)[1];
 		r = ((void **)root)[2];
 		(*freefct)(((void **)root)[0]);
@@ -926,7 +926,7 @@ void *lsearch(void const *key, [[nonnull]] void *base,
 	result = lfind(key, base, nmemb, size, compar);
 	if (result == NULL) {
 		result = memcpy((byte_t *)base + (*nmemb) * size, key, size);
-		++(*nmemb);
+		++*nmemb;
 	}
 	return result;
 }

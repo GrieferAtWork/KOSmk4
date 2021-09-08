@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xff231c34 */
+/* HASH CRC-32:0x9e3906d3 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -271,7 +271,7 @@ NOTHROW_NCX(LIBCCALL libc_hcreate_r)(size_t nel,
 		return 0;
 	if (nel < 3)
 		nel = 3;
-	for (nel |= 1; ; nel += 2) {
+	for (nel |= 1;; nel += 2) {
 		if (UINT_MAX - 2 < nel) {
 #ifdef ENOMEM
 			(void)__libc_seterrno(ENOMEM);
@@ -678,9 +678,9 @@ NOTHROW_NCX(LIBCCALL libc_twalk)(void const *root,
 INTERN ATTR_SECTION(".text.crt.utility.search") NONNULL((2)) void
 NOTHROW_NCX(LIBCCALL libc_tdestroy)(void *root,
                                     __free_fn_t freefct) {
-again:
 	if (root) {
 		void *l, *r;
+again:
 		l = ((void **)root)[1];
 		r = ((void **)root)[2];
 		(*freefct)(((void **)root)[0]);
@@ -729,7 +729,7 @@ NOTHROW_NCX(LIBCCALL libc_lsearch)(void const *key,
 	result = libc_lfind(key, base, nmemb, size, compar);
 	if (result == NULL) {
 		result = libc_memcpy((byte_t *)base + (*nmemb) * size, key, size);
-		++(*nmemb);
+		++*nmemb;
 	}
 	return result;
 }

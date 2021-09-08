@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x484053a4 */
+/* HASH CRC-32:0x191e1ab2 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -92,7 +92,7 @@ __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(hcreate_r))(__SIZE_TYPE__ __nel, stru
 		return 0;
 	if (__nel < 3)
 		__nel = 3;
-	for (__nel |= 1; ; __nel += 2) {
+	for (__nel |= 1;; __nel += 2) {
 		if (__UINT_MAX__ - 2 < __nel) {
 #ifdef __ENOMEM
 			(void)__libc_seterrno(__ENOMEM);
