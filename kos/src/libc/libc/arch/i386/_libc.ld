@@ -89,7 +89,7 @@ SECTIONS {
 	} PHDR(rodata)
 
 	.gcc_except_table : {
-		KEEP(*(.gcc_except_table))
+		KEEP(*(.gcc_except_table .gcc_except_table.*))
 	} PHDR(rodata)
 
 	.eh_frame_hdr : {

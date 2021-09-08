@@ -73,7 +73,7 @@ SECTIONS {
 
 	.gcc_except_table BLOCK(1) : {
 		PROVIDE_HIDDEN(__rtld_gcc_except_table_start = .);
-		KEEP(*(.gcc_except_table))
+		KEEP(*(.gcc_except_table .gcc_except_table.*))
 		PROVIDE_HIDDEN(__rtld_gcc_except_table_end = .);
 	} PHDR(text)
 
