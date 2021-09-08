@@ -69,6 +69,8 @@
  *   - '@<value>':   Raw carry-though
  *
  * Recognized instructions:
+ *
+ * ```
  *     push   top           alias for `dup'
  *     push   $<value>      DW_OP_lit*,
  *                          DW_OP_const1s, DW_OP_const1u,
@@ -99,22 +101,22 @@
  *     constu $<value>      DW_OP_constu, $<value>
  *     consts $<value>      DW_OP_consts, $<value>
  *
- *     and DW_OP_and
- *     div DW_OP_div
- *     minus DW_OP_minus
- *     mod     DW_OP_mod
- *     mul     DW_OP_mul
- *     or DW_OP_or
- *     shl   DW_OP_shl
- *     shr   DW_OP_shr
- *     shra DW_OP_shra
- *     xor   DW_OP_xor
- *     eq     DW_OP_eq
- *     ge     DW_OP_ge
- *     gt     DW_OP_gt
- *     le     DW_OP_le
- *     lt     DW_OP_lt
- *     ne DW_OP_ne
+ *     and                  DW_OP_and
+ *     div                  DW_OP_div
+ *     minus                DW_OP_minus
+ *     mod                  DW_OP_mod
+ *     mul                  DW_OP_mul
+ *     or                   DW_OP_or
+ *     shl                  DW_OP_shl
+ *     shr                  DW_OP_shr
+ *     shra                 DW_OP_shra
+ *     xor                  DW_OP_xor
+ *     eq                   DW_OP_eq
+ *     ge                   DW_OP_ge
+ *     gt                   DW_OP_gt
+ *     le                   DW_OP_le
+ *     lt                   DW_OP_lt
+ *     ne                   DW_OP_ne
  *
  *     and    <value>       alias for 'push <value>; and;'
  *     div    <value>       alias for 'push <value>; div;'
@@ -169,42 +171,50 @@
  *     piece  $<nbytes>     DW_OP_piece, <nbytes>
  *     bit_piece $<nbits>   DW_OP_bit_piece, <nbits>
  *
- *     dup   DW_OP_dup
- *     drop DW_OP_drop
- *     over DW_OP_over
- *     swap DW_OP_swap
- *     rot   DW_OP_rot
- *     abs   DW_OP_abs
- *     neg   DW_OP_neg
- *     not   DW_OP_not
- *     nop DW_OP_nop
- *     push_object_address DW_OP_push_object_address
- *     form_tls_address       DW_OP_form_tls_address
- *     call_frame_cfa           DW_OP_call_frame_cfa
- *     stack_value DW_OP_stack_value
+ *     dup                  DW_OP_dup
+ *     drop                 DW_OP_drop
+ *     over                 DW_OP_over
+ *     swap                 DW_OP_swap
+ *     rot                  DW_OP_rot
+ *     abs                  DW_OP_abs
+ *     neg                  DW_OP_neg
+ *     not                  DW_OP_not
+ *     nop                  DW_OP_nop
+ *     push_object_address  DW_OP_push_object_address
+ *     form_tls_address     DW_OP_form_tls_address
+ *     call_frame_cfa       DW_OP_call_frame_cfa
+ *     stack_value          DW_OP_stack_value
  *     GNU_push_tls_address DW_OP_GNU_push_tls_address
- *     GNU_uninit DW_OP_GNU_uninit
+ *     GNU_uninit           DW_OP_GNU_uninit
  *
  *     implicit_value "ABCD"   DW_OP_implicit_value, 4, 'A', 'B', 'C', 'D'
+ * ```
+ *
  *
  *
  * Advanced instructions:
+ *
+ * ```
  *     ret                  Convenience instruction to perform a jump to the very end
  *
  *     .cfi_escape "foo"    Raw output bytes: 'f', 'o', 'o'
- *     .cfi_escape $<x>     Raw output bytes: <x>
+ *     .cfi_escape $<x>     Raw output byte: <x>
  *     .cfi_escape $<x>, $<y>, $<z>  Raw output bytes: <x>, <y>, <z>
  *
  *     ifnotimpl "IMPL", <symbol>  Alias for: >>     skip 1f
  *                                            >> .cfi_escape "IMPL"
  *                                            >> 1:  skip <symbol>
- *                          When "IMPL" is "KOS", the kos-specific implementation will not
- *                          jump to <symbol>, but  will instead execute after  immediately
- *                          after this instruction. Use this  to encode program code  only
- *                          understood on KOS (but not by GDB)
+ *                          When "IMPL" is "KOS", the kos-specific implementation will
+ *                          not jump to <symbol>, but  will instead execute immediately
+ *                          after this instruction. Use this to encode program code
+ *                          only understood on KOS (but not by GDB)
+ * ```
+ *
  *
  *
  * Aliases:
+ *
+ * ```
  *     add    [...]         alias for 'plus'
  *     sub    [...]         alias for 'minus'
  *     pop                  alias for 'drop'
@@ -219,6 +229,7 @@
  *     jmp    <symbol>      Alias for 'skip <symbol>;'
  *     regx   ...           alias for `reg ...'
  *     bregx  ...           alias for `breg ...'
+ * ```
  *
  */
 
@@ -1450,16 +1461,17 @@ function assemble(arch: string, outputRegister: string, code: string): {int | st
 function outputBytesForAssembly(bytes: {int | string...},
                                 linePrefix: string = "__ASM_L(",
                                 lineSuffix: string = ")",
-                                outputFile: File = none) {
+                                outputFile: File = none,
+                                bytesPerLine: int = 16) {
 	if (outputFile is none)
 		outputFile = File.stdout;
 #if 0
 	import(".disasm").disassemble(asm.arch, bytes);
-	for (local line: bytes.segments(8))
+	for (local line: bytes.segments(bytesPerLine))
 		print outputFile: (linePrefix, "\t.cfi_escape ", ",".join(
 			for (local b: line) b !is int ? b : "0x" + b.hex()[2:].zfill(2)), lineSuffix);
 #else
-	for (local line: bytes.segments(16))
+	for (local line: bytes.segments(bytesPerLine))
 		print outputFile: (linePrefix, "\t.cfi_escape ", ",".join(line), lineSuffix);
 #endif
 }
@@ -1468,7 +1480,8 @@ function outputForAssembly(arch: string, outputRegister: string, code: string,
                            linePrefix: string = "__ASM_L(", lineSuffix: string = ")",
                            outputFile: File = none,
                            asmArgPrefix: string | none = none,
-                           asmArgSuffix: string | none = none) {
+                           asmArgSuffix: string | none = none,
+                           bytesPerLine: int = 16) {
 	if (outputFile is none)
 		outputFile = File.stdout;
 	local asm = Assembler(arch, code);
@@ -1487,7 +1500,7 @@ function outputForAssembly(arch: string, outputRegister: string, code: string,
 			print outputFile: (linePrefix, isFirst ? ".if " : ".elseif ", cond, lineSuffix);
 			isFirst = false;
 		}
-		outputBytesForAssembly(bytes, linePrefix, lineSuffix, outputFile);
+		outputBytesForAssembly(bytes, linePrefix, lineSuffix, outputFile, bytesPerLine);
 		if (cond == "1")
 			break;
 	}

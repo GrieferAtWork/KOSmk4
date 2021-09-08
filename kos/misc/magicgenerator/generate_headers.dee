@@ -718,7 +718,7 @@ again_search_wildcard:
 			<< " ".join(for (local name: line) "PREFIX" + name)
 			<< ") \\\n";
 	}
-	newMacroText = newMacroText.string[:-2] + "\n";
+	newMacroText = newMacroText.string[:-3] + "\n";
 	local newData = "{}{}{}".format({
 		data[:orderOutputStart],
 		newMacroText,

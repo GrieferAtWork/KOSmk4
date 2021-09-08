@@ -552,5 +552,5 @@
 	CB(PREFIX.crt.dos.except.fs.utility) \
 	CB(PREFIX.crt.dos.except.fs.modify_time) \
 	CB(PREFIX.crt.dos.except.system.utility) \
-	CB(PREFIX.crt.dos.except.system.configuration) 
+	CB(PREFIX.crt.dos.except.system.configuration)
 /*[[[end]]]*/

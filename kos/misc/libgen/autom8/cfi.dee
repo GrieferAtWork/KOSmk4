@@ -102,8 +102,16 @@ function main(parser: Autom8Parser, body: string) {
 				arch = "x86_64";
 			}
 		}
-		if (arch is none)
-			throw Error("Attribute 'arch' not set by " + repr body[:i]);
+		if (arch is none) {
+			if (register !is none) {
+				/* TODO: Enumerate all support  arches (fs.dir("../cfi/arch"))  and
+				 *       load each one in turn. If we find that exactly one of them
+				 *       defines a register named `register', then we know that  it
+				 *       must be the arch our caller is referring to. */
+			}
+			if (arch is none)
+				throw Error("Attribute 'arch' not set by " + repr body[:i]);
+		}
 	}
 	if (register is none)
 		throw Error("Attribute 'register' not set by " + repr body[:i]);
