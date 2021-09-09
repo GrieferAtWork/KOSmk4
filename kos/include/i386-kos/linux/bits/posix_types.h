@@ -22,12 +22,12 @@
 
 #include <hybrid/host.h>
 
-#ifdef __i386__
+#if defined(__i386__) && !defined(__x86_64__)
 #include "posix_types_32.h"
 #elif defined(__ILP32__)
 #include "posix_types_x32.h"
-#else
+#else /* ... */
 #include "posix_types_64.h"
-#endif
+#endif /* !... */
 
 #endif /* !_I386_KOS_LINUX_BITS_POSIX_TYPES_H */

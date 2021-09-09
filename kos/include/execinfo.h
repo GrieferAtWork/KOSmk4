@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x3191cf17 */
+/* HASH CRC-32:0x6d7872f9 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -44,7 +44,7 @@ __SYSDECL_BEGIN
  * the  calling function, their  caller, and so  forth. On KOS, this
  * information is constructed with the help of CFI  instrumentation,
  * and  the  functions  from  `<libunwind/...>'.  However,  on other
- * systems, this function is fairly dump and relies on all traversed
+ * systems, this function is fairly dumb and relies on all traversed
  * code having been compiled with function frames enabled.
  * @return: * : The actual number of pointers written to `array' (always `<= size') */
 __CDECLARE(__ATTR_NONNULL((1)),__STDC_INT_AS_SIZE_T,__NOTHROW_NCX,backtrace,(void **__array, __STDC_INT_AS_SIZE_T __size),(__array,__size))
@@ -54,7 +54,7 @@ __CDECLARE(__ATTR_NONNULL((1)),__STDC_INT_AS_SIZE_T,__NOTHROW_NCX,backtrace,(voi
  * the  calling function, their  caller, and so  forth. On KOS, this
  * information is constructed with the help of CFI  instrumentation,
  * and  the  functions  from  `<libunwind/...>'.  However,  on other
- * systems, this function is fairly dump and relies on all traversed
+ * systems, this function is fairly dumb and relies on all traversed
  * code having been compiled with function frames enabled.
  * @return: * : The actual number of pointers written to `array' (always `<= size') */
 __CREDIRECT(__ATTR_NONNULL((1)),__STDC_INT_AS_SIZE_T,__NOTHROW_NCX,backtrace,(void **__array, __STDC_INT_AS_SIZE_T __size),__backtrace,(__array,__size))
@@ -67,7 +67,7 @@ __CREDIRECT(__ATTR_NONNULL((1)),__STDC_INT_AS_SIZE_T,__NOTHROW_NCX,backtrace,(vo
  * On KOS,  the  names  of  functions are  gathered  with  the  help  of
  * functions  from  `<libdebuginfo/...>', meaning  that many  sources of
  * function names are looked  at, including `.dynsym' and  `.debug_info'
- * On other systems,  this function  is fairly  dump and  only looks  at
+ * On other systems,  this function  is fairly  dumb and  only looks  at
  * names from `.dynsym', meaning that functions not declared as `PUBLIC'
  * would not show up.
  * The returned pointer  is a size-element  long vector of  strings
@@ -85,7 +85,7 @@ __CDECLARE(__ATTR_NONNULL((1)),char **,__NOTHROW_NCX,backtrace_symbols,(void *co
  * On KOS,  the  names  of  functions are  gathered  with  the  help  of
  * functions  from  `<libdebuginfo/...>', meaning  that many  sources of
  * function names are looked  at, including `.dynsym' and  `.debug_info'
- * On other systems,  this function  is fairly  dump and  only looks  at
+ * On other systems,  this function  is fairly  dumb and  only looks  at
  * names from `.dynsym', meaning that functions not declared as `PUBLIC'
  * would not show up.
  * The returned pointer  is a size-element  long vector of  strings

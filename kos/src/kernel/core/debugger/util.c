@@ -276,17 +276,11 @@ again_printlevel:
 			             level == 0 ? (size_t)(module_relative_start_pc - info.al_symstart)
 			                        : (size_t)(info.al_linestart - info.al_symstart));
 			if (message_format) {
+				va_list copy;
 				dbg_logecho(DBGSTR(" ["));
-#ifdef __i386__
-				dbg_vlogechof(message_format, args);
-#else /* __i386__ */
-				{
-					va_list copy;
-					va_copy(copy, args);
-					dbg_vlogechof(message_format, args);
-					va_end(copy);
-				}
-#endif /* !__i386__ */
+				va_copy(copy, args);
+				dbg_vlogechof(message_format, copy);
+				va_end(copy);
 				dbg_logecho(DBGSTR("]"));
 			}
 			dbg_logecho(DBGSTR("\n"));

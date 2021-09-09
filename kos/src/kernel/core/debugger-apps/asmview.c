@@ -73,9 +73,9 @@ if (gcc_opt.removeif([](x) -> x.startswith("-O")))
 #include <libinstrlen/instrlen.h>
 #endif /* !CONFIG_ASMVIEW_INSTRLEN_USE_DISASM_PRINTER */
 
-#ifdef __i386__
+#if defined(__i386__) && !defined(__x86_64__)
 #include <asm/cpu-flags.h>
-#endif /* __i386__ */
+#endif /* __i386__ && !__x86_64__ */
 
 DECL_BEGIN
 

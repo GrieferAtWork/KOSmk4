@@ -43,7 +43,7 @@ __SYSDECL_BEGIN
 @@the  calling function, their  caller, and so  forth. On KOS, this
 @@information is constructed with the help of CFI  instrumentation,
 @@and  the  functions  from  `<libunwind/...>'.  However,  on other
-@@systems, this function is fairly dump and relies on all traversed
+@@systems, this function is fairly dumb and relies on all traversed
 @@code having been compiled with function frames enabled.
 @@@return: * : The actual number of pointers written to `array' (always `<= size')
 [[export_alias("__backtrace"), decl_include("<features.h>")]]
@@ -57,7 +57,7 @@ __STDC_INT_AS_SIZE_T backtrace([[nonnull]] void **array,
 @@On KOS,  the  names  of  functions are  gathered  with  the  help  of
 @@functions  from  `<libdebuginfo/...>', meaning  that many  sources of
 @@function names are looked  at, including `.dynsym' and  `.debug_info'
-@@On other systems,  this function  is fairly  dump and  only looks  at
+@@On other systems,  this function  is fairly  dumb and  only looks  at
 @@names from `.dynsym', meaning that functions not declared as `PUBLIC'
 @@would not show up.
 @@The returned pointer  is a size-element  long vector of  strings

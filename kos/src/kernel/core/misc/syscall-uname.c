@@ -57,10 +57,10 @@ DECL_BEGIN
 PUBLIC_CONST u32 const kernel_version = KOS_VERSION_CODE;
 
 
-#ifdef __i386__
-#define MACHINE_NAME "i386"
-#elif defined(__x86_64__)
+#ifdef __x86_64__
 #define MACHINE_NAME "x86_64"
+#elif defined(__i386__)
+#define MACHINE_NAME "i386"
 #elif defined(__arm__)
 #define MACHINE_NAME "arm"
 #else

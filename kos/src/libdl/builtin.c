@@ -2691,7 +2691,7 @@ libdl_dlauxctrl(USER DlModule *self, unsigned int cmd, ...)
 			result = NULL;
 		break;
 
-#ifdef __i386__
+#if defined(__i386__) && !defined(__x86_64__)
 		/* Special case for data-base on i386:
 		 * For reference, see glibc: `/sysdeps/generic/unwind-dw2-fde-glibc.c' */
 #define DEFINED_DLAUXCTRL_GET_DATABASE
@@ -2700,7 +2700,7 @@ libdl_dlauxctrl(USER DlModule *self, unsigned int cmd, ...)
 		 * This we already keep track of (s.a. module-init.c:DlModule_ElfInitialize) */
 		result = self->dm_elf.de_pltgot;
 		break;
-#endif /* __i386__ */
+#endif /* __i386__ && !__x86_64__ */
 
 	case DLAUXCTRL_GET_TEXTBASE: {
 		ElfW(Half) i;

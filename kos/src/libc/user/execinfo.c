@@ -135,13 +135,13 @@ NOTHROW(LIBCCALL init_libdebuginfo)(void) {
 
 
 
-/*[[[head:libc_backtrace,hash:CRC-32=0x58f22579]]]*/
+/*[[[head:libc_backtrace,hash:CRC-32=0xd3626744]]]*/
 /* >> backtrace(3)
  * Create a  traceback of  up to  `size' instruction  pointers  from
  * the  calling function, their  caller, and so  forth. On KOS, this
  * information is constructed with the help of CFI  instrumentation,
  * and  the  functions  from  `<libunwind/...>'.  However,  on other
- * systems, this function is fairly dump and relies on all traversed
+ * systems, this function is fairly dumb and relies on all traversed
  * code having been compiled with function frames enabled.
  * @return: * : The actual number of pointers written to `array' (always `<= size') */
 INTERN ATTR_SECTION(".text.crt.debug") NONNULL((1)) __STDC_INT_AS_SIZE_T
@@ -219,7 +219,7 @@ err0:
 	return 0;
 }
 
-/*[[[head:libc_backtrace_symbols,hash:CRC-32=0x27903a0b]]]*/
+/*[[[head:libc_backtrace_symbols,hash:CRC-32=0x77332862]]]*/
 /* >> backtrace_symbols(3)
  * Return  an  array  of  exactly  `size'  elements  that  contains  the
  * names   associated  with  program-counters  from  the  given  `array'
@@ -227,7 +227,7 @@ err0:
  * On KOS,  the  names  of  functions are  gathered  with  the  help  of
  * functions  from  `<libdebuginfo/...>', meaning  that many  sources of
  * function names are looked  at, including `.dynsym' and  `.debug_info'
- * On other systems,  this function  is fairly  dump and  only looks  at
+ * On other systems,  this function  is fairly  dumb and  only looks  at
  * names from `.dynsym', meaning that functions not declared as `PUBLIC'
  * would not show up.
  * The returned pointer  is a size-element  long vector of  strings

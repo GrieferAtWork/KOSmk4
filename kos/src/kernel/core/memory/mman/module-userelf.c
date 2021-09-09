@@ -270,7 +270,7 @@ done:
 
 PRIVATE WUNUSED NONNULL((1)) void const *
 NOTHROW(FCALL uem_get_dbase)(struct userelf_module *__restrict self) {
-#ifdef __i386__
+#if defined(__i386__) && !defined(__x86_64__)
 	return uem_get_dbase_386(self);
 #elif defined(__x86_64__) && defined(__ARCH_HAVE_COMPAT)
 	void const *result;

@@ -27,6 +27,14 @@
  *       The order used is that rules are applied in order of longest --> shortest.
  */
 
+/* TODO: Now that generate_headers.dee literally scans source files for
+ *       mentions of section names, there is no longer a need to limit
+ *       ourselves to the .text, .rodata, .data and .bss prefixes.
+ * Instead, generate_headers.dee could keep track of full section names
+ * and we could have 4 distinct order macros be generated, one for each
+ * of the traditional base sections. */
+
+
 /*[[[order
 
 # The ordering should be repeated for every section starting with one of these prefixes

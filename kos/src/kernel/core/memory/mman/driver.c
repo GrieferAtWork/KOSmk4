@@ -4310,7 +4310,7 @@ NOTHROW(FCALL driver_get_tbase)(struct driver const *__restrict self) {
 
 PRIVATE ATTR_PURE WUNUSED NONNULL((1)) void const *
 NOTHROW(FCALL driver_get_dbase)(struct driver const *__restrict self) {
-#ifdef __i386__
+#if defined(__i386__) && !defined(__x86_64__)
 	/* Special case for data-base on i386:
 	 * For reference, see glibc: `/sysdeps/generic/unwind-dw2-fde-glibc.c' */
 	size_t i;
@@ -4321,9 +4321,9 @@ NOTHROW(FCALL driver_get_dbase)(struct driver const *__restrict self) {
 		}
 	}
 	return NULL;
-#else /* __i386__ */
+#else /* __i386__ && !__x86_64__ */
 	return get_segment_start_byflags(self, PF_R | PF_W);
-#endif /* !__i386__ */
+#endif /* !__i386__ || __x86_64__ */
 }
 
 
