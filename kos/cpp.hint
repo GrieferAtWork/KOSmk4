@@ -816,18 +816,21 @@
 #define __CEIREDIRECT_DOS_GCCNCX(attr,Treturn,nothrow,name,param,asmname,...)                                      Treturn name param;
 #define __CEIREDIRECT_KOS_GCCNCX(attr,Treturn,nothrow,name,param,asmname,...)                                      Treturn name param;
 
-#define DEFINE_PRIVATE_ALIAS(new,old) int new() {}
-#define DEFINE_PUBLIC_ALIAS(new,old) int new() {}
-#define DEFINE_INTERN_ALIAS(new,old) int new() {}
-#define DEFINE_PRIVATE_WEAK_ALIAS(new,old) int new() {}
-#define DEFINE_PUBLIC_WEAK_ALIAS(new,old) int new() {}
-#define DEFINE_INTERN_WEAK_ALIAS(new,old) int new() {}
-#define __DEFINE_PRIVATE_ALIAS(new,old) int new() {}
-#define __DEFINE_PUBLIC_ALIAS(new,old) int new() {}
-#define __DEFINE_INTERN_ALIAS(new,old) int new() {}
-#define __DEFINE_PRIVATE_WEAK_ALIAS(new,old) int new() {}
-#define __DEFINE_PUBLIC_WEAK_ALIAS(new,old) int new() {}
-#define __DEFINE_INTERN_WEAK_ALIAS(new,old) int new() {}
+#define DEFINE_PRIVATE_ALIAS(new,old) int new(){}
+#define DEFINE_PUBLIC_ALIAS(new,old) int new(){}
+#define DEFINE_INTERN_ALIAS(new,old) int new(){}
+#define DEFINE_PRIVATE_WEAK_ALIAS(new,old) int new(){}
+#define DEFINE_PUBLIC_WEAK_ALIAS(new,old) int new(){}
+#define DEFINE_INTERN_WEAK_ALIAS(new,old) int new(){}
+#define __DEFINE_PRIVATE_ALIAS(new,old) int new(){}
+#define __DEFINE_PUBLIC_ALIAS(new,old) int new(){}
+#define __DEFINE_INTERN_ALIAS(new,old) int new(){}
+#define __DEFINE_PRIVATE_WEAK_ALIAS(new,old) int new(){}
+#define __DEFINE_PUBLIC_WEAK_ALIAS(new,old) int new(){}
+#define __DEFINE_INTERN_WEAK_ALIAS(new,old) int new(){}
+#define DEFINE_PUBLIC_IDATA_G(name,resolve, size_) int name(){}
+#define DEFINE_PUBLIC_IDATA(name,resolve) int name(){}
+#define DEFINE_PUBLIC_IDATA_EX(name,resolve,size) int name(){}
 
 #define REFCNT_METHODS(T) int
 #define REFCNT_METHODS_P(i) int

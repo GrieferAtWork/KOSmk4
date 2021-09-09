@@ -67,9 +67,9 @@ DECL_BEGIN
 	struct iofile_data_novtab default_##name##_io = IOFILE_DATA_NOVTAB_INIT(); \
 	INTERN ATTR_SECTION(".data.crt.FILE.std_files") FILE default_##name =      \
 	__IO_FILE_INIT(NULL, 0, NULL, io_flags, fd, { 0 }, 0, (struct iofile_data *)&default_##name##_io)
-DEFINE_DEFAULT_STD_FILE(stdin, IO_LNBUF, STDIN_FILENO);
-DEFINE_DEFAULT_STD_FILE(stdout, IO_RW | IO_LNIFTYY, STDOUT_FILENO);
-DEFINE_DEFAULT_STD_FILE(stderr, IO_RW | IO_LNIFTYY, STDERR_FILENO);
+DEFINE_DEFAULT_STD_FILE(stdin, IO_LNBUF, STDIN_FILENO);             /* !Relocation: &default_stdin_io */
+DEFINE_DEFAULT_STD_FILE(stdout, IO_RW | IO_LNIFTYY, STDOUT_FILENO); /* !Relocation: &default_stdout_io */
+DEFINE_DEFAULT_STD_FILE(stderr, IO_RW | IO_LNIFTYY, STDERR_FILENO); /* !Relocation: &default_stderr_io */
 #undef DEFINE_DEFAULT_STD_FILE
 
 DEFINE_PUBLIC_ALIAS(_IO_2_1_stdin_, default_stdin);
@@ -80,9 +80,9 @@ DEFINE_PUBLIC_ALIAS(_IO_2_1_stderr_, default_stderr);
 DATDEF FILE *g_stdin ASMNAME("stdin");
 DATDEF FILE *g_stdout ASMNAME("stdout");
 DATDEF FILE *g_stderr ASMNAME("stderr");
-PUBLIC ATTR_SECTION(".data.crt.FILE.locked.read.read") FILE *g_stdin    = &default_stdin;  /* !Relocation */
-PUBLIC ATTR_SECTION(".data.crt.FILE.locked.write.write") FILE *g_stdout = &default_stdout; /* !Relocation */
-PUBLIC ATTR_SECTION(".data.crt.FILE.locked.write.write") FILE *g_stderr = &default_stderr; /* !Relocation */
+PUBLIC ATTR_SECTION(".data.crt.FILE.locked.read.read") FILE *g_stdin    = &default_stdin;  /* !Relocation: &default_stdin */
+PUBLIC ATTR_SECTION(".data.crt.FILE.locked.write.write") FILE *g_stdout = &default_stdout; /* !Relocation: &default_stdout */
+PUBLIC ATTR_SECTION(".data.crt.FILE.locked.write.write") FILE *g_stderr = &default_stderr; /* !Relocation: &default_stderr */
 
 
 typedef LIST_HEAD_P(FILE) FileList;
