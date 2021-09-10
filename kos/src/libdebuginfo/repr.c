@@ -32,6 +32,10 @@ if (gcc_opt.removeif([](x) -> x.startswith("-O")))
 #ifndef __KERNEL__
 #include <hybrid/compiler.h>
 
+#include <hybrid/unaligned.h>
+
+#include <alloca.h>
+#include <assert.h>
 #include <ctype.h>
 #include <inttypes.h>
 #include <stdbool.h>
@@ -379,7 +383,464 @@ NOTHROW(CC libdi_debug_repr_DW_EH_PE)(uint8_t value) {
 	return result;
 }
 
+
+
+/************************************************************************/
+#define DO(expr)                         \
+	do {                                 \
+		if unlikely((temp = (expr)) < 0) \
+			goto err;                    \
+		result += temp;                  \
+	} __WHILE0
+#define PRINT(s)            DO((*printer)(arg, REPR_STRING(s), COMPILER_STRLEN(s)))
+#define PRINTF(format, ...) DO(format_printf(printer, arg, REPR_STRING(format), ##__VA_ARGS__))
+
 INTDEF char const unknown_string[];
+
+struct label_entry {
+	byte_t const *le_dest; /* [1..1] Label destination address. */
+};
+struct label_buffer {
+	size_t                                      lb_alloc;    /* Allocated size. */
+	size_t                                      lb_count;    /* Used size. */
+	COMPILER_FLEXIBLE_ARRAY(struct label_entry, lb_entries); /* [lb_count] Label entries. (sorted ascendingly) */
+};
+
+/* Return the entry associated with `addr' (if any) or NULLO */
+PRIVATE NOBLOCK ATTR_PURE NONNULL((1, 2)) struct label_entry const *
+NOTHROW(CC label_buffer_locate)(struct label_buffer const *__restrict self,
+                                byte_t const *__restrict addr) {
+	size_t lo, hi;
+	lo = 0;
+	hi = self->lb_count;
+	while (lo < hi) {
+		size_t index;
+		index = (lo + hi) / 2;
+		if (addr < self->lb_entries[index].le_dest) {
+			hi = index;
+		} else if (addr > self->lb_entries[index].le_dest) {
+			lo = index + 1;
+		} else {
+			/* Address is already being tracked. */
+			return &self->lb_entries[index];
+		}
+	}
+	return NULL;
+}
+
+/* Insert (if  sufficient space  is available)  the given  address
+ * into the label buffer (at  the proper location). When no  space
+ * is available, still increment the count variable but do nothing
+ * else. */
+PRIVATE NOBLOCK NONNULL((1, 2)) void
+NOTHROW(CC label_buffer_insert)(struct label_buffer *__restrict self,
+                                byte_t const *__restrict addr) {
+	size_t lo, hi;
+	if unlikely(self->lb_count >= self->lb_alloc)
+		goto done;
+	/* Find the appropriate location where `addr' should be inserted. */
+	lo = 0;
+	hi = self->lb_count;
+	while (lo < hi) {
+		size_t index;
+		index = (lo + hi) / 2;
+		if (addr < self->lb_entries[index].le_dest) {
+			hi = index;
+		} else if (addr > self->lb_entries[index].le_dest) {
+			lo = index + 1;
+		} else {
+			/* Address is already being tracked. */
+			return;
+		}
+	}
+	/* Insert at `index = lo = hi' */
+	assert(lo == hi);
+	memmoveup(&self->lb_entries[lo + 1],
+	          &self->lb_entries[lo],
+	          (self->lb_count + 1) - lo,
+	          sizeof(struct label_entry));
+	self->lb_entries[lo].le_dest = addr;
+done:
+	++self->lb_count;
+}
+
+
+/* Same as `unwind_instruction_succ()', but never returns
+ * NULL. Also guarantied to always  `return > unwind_pc'. */
+PRIVATE ATTR_PURE ATTR_RETNONNULL WUNUSED NONNULL((1)) byte_t const *CC
+unwind_instruction_succ_failsafe(byte_t const *__restrict unwind_pc,
+                                 byte_t addrsize, byte_t ptrsize) {
+	byte_t const *result;
+	result = unwind_instruction_succ(unwind_pc, addrsize, ptrsize);
+	if unlikely(result == NULL)
+		result = unwind_pc + 1;
+	assert(result > unwind_pc);
+	return result;
+}
+
+
+
+PRIVATE REPR_TEXTSECTION NONNULL((1, 3, 6)) ssize_t CC
+print_cfi_instruction(pformatprinter printer, void *arg,
+                      byte_t const *__restrict reader,
+                      byte_t addrsize, byte_t ptrsize,
+                      struct label_buffer const *__restrict labels,
+                      size_t indent) {
+	ssize_t result, temp;
+	byte_t opcode = *reader;
+	char const *name;
+	/* Try to decode the name of the instruction. */
+	name = libdi_debug_repr_DW_OP(opcode);
+	if likely(name) {
+		result = (*printer)(arg, REPR_STRING("DW_OP_"), 6);
+		if unlikely(result < 0)
+			goto done;
+		DO((*printer)(arg, name, strlen(name)));
+		/* Print operands. */
+		++reader;
+		switch (opcode) {
+
+		case DW_OP_bra:
+		case DW_OP_skip: {
+			int16_t offset;
+			struct label_entry const *label;
+			offset = (int16_t)UNALIGNED_GET16((uint16_t const *)reader);
+			reader += 2;
+			reader += offset;
+			label = label_buffer_locate(labels, reader);
+			if likely(label) {
+				PRINTF("\tL%" PRIuSIZ, (size_t)(label - labels->lb_entries));
+			} else {
+				PRINTF("\t.%+" PRIdSIZ, (ssize_t)(offset - 3));
+			}
+		}	break;
+
+		case DW_OP_addr: {
+			uintmax_t addend;
+			if (addrsize >= sizeof(uintmax_t)) {
+#if __SIZEOF_INTMAX_T__ == 8
+		case DW_OP_const8u:
+#define HAVE_CASE_DW_OP_const8u
+#endif /* __SIZEOF_INTMAX_T__ > 8 */
+				addend = UNALIGNED_GET((uintmax_t const *)reader);
+#if __SIZEOF_INTMAX_T__ > 8
+			} else if (addrsize >= 8) {
+		case DW_OP_const8u:
+#define HAVE_CASE_DW_OP_const8u
+				addend = UNALIGNED_GET64((uint64_t const *)reader);
+#endif /* __SIZEOF_INTMAX_T__ > 8 */
+#if __SIZEOF_INTMAX_T__ > 4
+			} else if (addrsize >= 4) {
+		case DW_OP_const4u:
+		case DW_OP_call4:
+#define HAVE_CASE_DW_OP_const4u
+				addend = UNALIGNED_GET32((uint32_t const *)reader);
+#endif /* __SIZEOF_INTMAX_T__ > 4 */
+			} else if (addrsize >= 2) {
+		case DW_OP_const2u:
+		case DW_OP_call2:
+				addend = UNALIGNED_GET16((uint16_t const *)reader);
+			} else {
+		case DW_OP_const1u:
+				addend = *(uint8_t const *)reader;
+			}
+#ifndef HAVE_CASE_DW_OP_const8u
+			__IF0 {
+		case DW_OP_const8u:
+				addend = (uintmax_t)UNALIGNED_GET((uint64_t const *)reader);
+			}
+#endif /* !HAVE_CASE_DW_OP_const8u */
+#ifndef HAVE_CASE_DW_OP_const4u
+			__IF0 {
+		case DW_OP_const4u:
+		case DW_OP_call4:
+				addend = (uintmax_t)UNALIGNED_GET((uint32_t const *)reader);
+			}
+#endif /* !HAVE_CASE_DW_OP_const4u */
+			__IF0 {
+		case DW_OP_constu:
+		case DW_OP_plus_uconst:
+		case DW_OP_call_ref:
+		case DW_OP_addrx:
+		case DW_OP_GNU_addr_index:
+		case DW_OP_constx:
+		case DW_OP_GNU_const_index:
+				addend = dwarf_decode_uleb128((byte_t const **)&reader);
+			}
+			PRINTF("\t$%#" PRIxMAX, addend);
+		}	break;
+
+		{
+			intmax_t addend;
+			__IF0 { case DW_OP_const1s: addend = (intmax_t)(*(int8_t const *)reader); }
+			__IF0 { case DW_OP_const2s: addend = (intmax_t)UNALIGNED_GET16((int16_t const *)reader); }
+			__IF0 { case DW_OP_const4s: addend = (intmax_t)UNALIGNED_GET32((int32_t const *)reader); }
+			__IF0 { case DW_OP_const8s: addend = (intmax_t)UNALIGNED_GET64((int64_t const *)reader); }
+			__IF0 {
+		case DW_OP_consts:
+		case DW_OP_breg0 ... DW_OP_breg31:
+		case DW_OP_fbreg:
+				addend = (intmax_t)dwarf_decode_sleb128((byte_t const **)&reader);
+			}
+			PRINTF("\t$%" PRIdMAX, addend);
+		}	break;
+
+		case DW_OP_pick:
+		case DW_OP_deref_size:
+		case DW_OP_xderef_size: {
+			uint8_t value = *(uint8_t const *)reader;
+			PRINTF("\t$%#" PRIu8, value);
+		}	break;
+
+		case DW_OP_regx:
+		case DW_OP_piece: {
+			uintptr_t value;
+			value = dwarf_decode_uleb128((byte_t const **)&reader);
+			PRINTF("\t$%" PRIuPTR, value);
+		}	break;
+
+		case DW_OP_bregx: {
+			uintptr_t regno;
+			intptr_t offset;
+			regno  = dwarf_decode_uleb128((byte_t const **)&reader);
+			offset = dwarf_decode_sleb128((byte_t const **)&reader);
+			PRINTF("\t$%" PRIuPTR ", $%" PRIdPTR, regno, offset);
+		}	break;
+
+		case DW_OP_bit_piece: {
+			uintptr_t size;
+			uintptr_t offset;
+			size   = dwarf_decode_uleb128((byte_t const **)&reader);
+			offset = dwarf_decode_uleb128((byte_t const **)&reader);
+			PRINTF("\t$%" PRIuPTR ", $%" PRIuPTR, size, offset);
+		}	break;
+
+		case DW_OP_implicit_value: {
+			uintptr_t size;
+			size = dwarf_decode_uleb128((byte_t const **)&reader);
+			PRINTF("\t%$q", size, reader);
+		}	break;
+
+		case DW_OP_entry_value:
+		case DW_OP_GNU_entry_value:
+			PRINT("\t");
+			DO(libdl_debug_repr_cfi_expression(printer, arg, reader, indent + 1, addrsize, ptrsize));
+			break;
+
+		case DW_OP_GNU_encoded_addr: {
+			uint8_t encoding = *reader++;
+			void *pointer    = dwarf_decode_pointer((byte_t const **)&reader, encoding, addrsize, NULL);
+			PRINTF("\t$%#" PRIxPTR, pointer);
+		}	break;
+
+		default:
+			break;
+		}
+	} else {
+		/* Fallback: emit raw bytes. */
+		size_t i, length;
+		length = (size_t)(unwind_instruction_succ_failsafe(reader,
+		                                                   addrsize,
+		                                                   ptrsize) -
+		                  reader);
+		assert(length >= 1);
+		result = (*printer)(arg, REPR_STRING(".cfi_escape "), 12);
+		if unlikely(result < 0)
+			goto done;
+		for (i = 0; i < length; ++i) {
+			if (i != 0)
+				PRINT(",");
+			PRINTF("%#.2" PRIx8, reader[i]);
+		}
+	}
+done:
+	return result;
+err:
+	return temp;
+}
+
+PRIVATE ATTR_NOINLINE REPR_TEXTSECTION NONNULL((1, 3)) ssize_t CC
+print_cfi_expression_with_labels(pformatprinter printer, void *arg,
+                                 byte_t const *__restrict pc, size_t length,
+                                 size_t indent, byte_t addrsize, byte_t ptrsize,
+                                 struct label_buffer const *__restrict labels,
+                                 bool indent_on_first_line) {
+	ssize_t temp, result = 0;
+	byte_t const *reader, *end;
+	bool is_first;
+	reader   = pc;
+	end      = pc + length;
+	is_first = true;
+	while (reader < end) {
+		struct label_entry const *label;
+		if (!is_first)
+			PRINT("\n");
+		/* Check if there is a label at this instruction. */
+		label = label_buffer_locate(labels, reader);
+		if (label != NULL) {
+			if (indent_on_first_line && indent >= 2)
+				DO(format_repeat(printer, arg, '\t', indent - 1));
+			PRINTF("L%" PRIuSIZ ":\t", (size_t)(label - labels->lb_entries));
+		} else if (indent_on_first_line) {
+			DO(format_repeat(printer, arg, '\t', indent));
+		}
+		/* Print the actual instruction. */
+		DO(print_cfi_instruction(printer, arg, reader, addrsize, ptrsize, labels, indent));
+		is_first             = false;
+		indent_on_first_line = true;
+		/* Advance to the next instruction */
+		reader = unwind_instruction_succ_failsafe(reader, addrsize, ptrsize);
+	}
+	return result;
+err:
+	return temp;
+}
+
+PRIVATE ATTR_NOINLINE REPR_TEXTSECTION NONNULL((1, 3)) size_t CC
+print_cfi_expression_with_label_bufsize(pformatprinter printer, void *arg,
+                                        byte_t const *__restrict pc, size_t length,
+                                        size_t indent, size_t label_bufsize,
+                                        ssize_t *__restrict presult,
+                                        byte_t addrsize, byte_t ptrsize,
+                                        bool indent_on_first_line) {
+	byte_t const *reader, *end;
+	struct label_buffer *labels;
+	labels = (struct label_buffer *)alloca(offsetof(struct label_buffer, lb_entries) +
+	                                       (label_bufsize * sizeof(struct label_entry)));
+	labels->lb_count = 0;
+	labels->lb_alloc = label_bufsize;
+	/* Scan for labels. */
+	reader = pc;
+	end    = pc + length;
+	while (reader < end) {
+		byte_t opcode;
+		opcode = *reader;
+		if (opcode == DW_OP_skip || opcode == DW_OP_bra) {
+			int16_t offset;
+			reader += 1;
+			offset = (int16_t)UNALIGNED_GET16((uint16_t const *)reader);
+			reader += 2;
+			label_buffer_insert(labels, reader + offset);
+		} else {
+			reader = unwind_instruction_succ_failsafe(reader, addrsize, ptrsize);
+		}
+	}
+	if (labels->lb_count <= labels->lb_alloc) {
+		/* All labels were gathered. -> Actually print the thing! */
+		*presult = print_cfi_expression_with_labels(printer, arg, pc, length, indent,
+		                                            addrsize, ptrsize, labels,
+		                                            indent_on_first_line);
+	}
+	return labels->lb_count;
+}
+
+
+/* Print the  disassembly of  a given  CFI expression  starting at  `pc',
+ * covering a total  of `length'  bytes. One instruction  is printed  per
+ * line, and  no trailing  line-feed is  printed. Each  new-line that  is
+ * printed is  succeeded  by  `indent' TAB-characters  (unless  the  line
+ * starts with a label definition, in which case `indent ? indent - 1: 0'
+ * leading TAB  characters  are  printed, followed  by  the  label  name,
+ * followed by another TAB character).
+ * @param: printer:              Output printer.
+ * @param: arg:                  Output printer cookie.
+ * @param: pc:                   Starting address of the expression.
+ * @param: length:               Length (in bytes) of the expression.
+ * @param: addrsize:             s.a. `unwind_instruction_succ(3)'
+ * @param: ptrsize:              s.a. `unwind_instruction_succ(3)'
+ * @param: indent_on_first_line: When true, also output an indentation
+ *                               before the first  line, the same  way
+ *                               it would be if it wasn't actually the
+ *                               first line.
+ * @return: * : The usual pformatprinter-style value. */
+INTERN REPR_TEXTSECTION NONNULL((1, 3)) ssize_t CC
+libdl_debug_repr_cfi_expression_ex(pformatprinter printer, void *arg,
+                                   byte_t const *__restrict pc, size_t length,
+                                   size_t indent, byte_t addrsize, byte_t ptrsize,
+                                   bool indent_on_first_line) {
+	ssize_t result;
+	size_t req_label_bufsize, label_bufsize = 0;
+	for (;;) {
+		req_label_bufsize = print_cfi_expression_with_label_bufsize(printer, arg, pc, length,
+		                                                            indent, label_bufsize, &result,
+		                                                            addrsize, ptrsize,
+		                                                            indent_on_first_line);
+		if (req_label_bufsize <= label_bufsize)
+			break;
+		label_bufsize = req_label_bufsize;
+	}
+	return result;
+}
+
+/* Same as `debug_repr_cfi_expression_ex(3)', but wrap the expression in
+ * a pair of `{ ... }', either  like `{ nop }' when the expression  only
+ * contains a single instruction, or
+ *     [\t * (indent)] {
+ *     [\t * (indent+1)] nop
+ *     [\t * (indent+1)] nop
+ *     [\t * (indent)] }
+ * When where are at least 2 instructions. No trailing linefeed is printed.
+ * @param: printer:  Output printer.
+ * @param: arg:      Output printer cookie.
+ * @param: pc:       Starting address of the expression.
+ * @param: length:   Length (in bytes) of the expression.
+ * @param: addrsize: s.a. `unwind_instruction_succ(3)'
+ * @param: ptrsize:  s.a. `unwind_instruction_succ(3)'
+ * @return: * : The usual pformatprinter-style value. */
+INTERN REPR_TEXTSECTION NONNULL((1, 3)) ssize_t CC
+libdl_debug_repr_cfi_expression_with_length(pformatprinter printer, void *arg,
+                                            byte_t const *__restrict expr,
+                                            size_t length, size_t indent,
+                                            byte_t addrsize, byte_t ptrsize) {
+	ssize_t temp, result = 0;
+	if unlikely(!length) {
+		result = (*printer)(arg, REPR_STRING("{}"), 2);
+	} else {
+		byte_t const *instr2;
+		instr2 = unwind_instruction_succ_failsafe(expr, addrsize, ptrsize);
+		if (instr2 >= expr + length) {
+			/* Single instruction -> Print in-line. */
+			result = (*printer)(arg, REPR_STRING("{ "), 2);
+			if unlikely(result < 0)
+				goto done;
+			DO(libdl_debug_repr_cfi_expression_ex(printer, arg, expr, length, 0,
+			                                      addrsize, ptrsize, false));
+			PRINT(" }");
+		} else {
+			/* Multiple instructions -> Print one per line. */
+			PRINT("{\n");
+			DO(libdl_debug_repr_cfi_expression_ex(printer, arg, expr, length,
+			                                      indent + 1, addrsize, ptrsize,
+			                                      true));
+			PRINT("\n");
+			DO(format_repeat(printer, arg, '\t', indent));
+			PRINT("}");
+		}
+	}
+done:
+	return result;
+err:
+	return temp;
+}
+
+/* Read the expression length as ULEB128 from `*expr' and print
+ * the  disassembled contents of the succeeding CFI expression.
+ * Same as `debug_repr_cfi_expression_with_length()'
+ * @param: printer:  Output printer.
+ * @param: arg:      Output printer cookie.
+ * @param: pc:       Starting address of the expression.
+ * @param: addrsize: s.a. `unwind_instruction_succ(3)'
+ * @param: ptrsize:  s.a. `unwind_instruction_succ(3)'
+ * @return: * : The usual pformatprinter-style value. */
+INTERN REPR_TEXTSECTION NONNULL((1, 3)) ssize_t CC
+libdl_debug_repr_cfi_expression(pformatprinter printer, void *arg,
+                                byte_t const *__restrict expr, size_t indent,
+                                byte_t addrsize, byte_t ptrsize) {
+	size_t length = dwarf_decode_uleb128((byte_t const **)&expr);
+	return libdl_debug_repr_cfi_expression_with_length(printer, arg, expr, length,
+	                                                   indent, addrsize, ptrsize);
+}
+
 
 /* Dump the given debug information in a human-readable format to `printer':
  * >> void *dump_module = dlgetmodule("libc");
@@ -415,20 +876,12 @@ libdi_debug_repr_dump(pformatprinter printer, void *arg,
 	cu_sections.cps_debug_loc_end      = debug_loc_end;
 	cu_sections.cps_debug_str_start    = debug_str_start;
 	cu_sections.cps_debug_str_end      = debug_str_end;
-#define DO(expr)                         \
-	do {                                 \
-		if unlikely((temp = (expr)) < 0) \
-			goto err;                    \
-		result += temp;                  \
-	} __WHILE0
-#define PRINT(s) DO((*printer)(arg, REPR_STRING(s), COMPILER_STRLEN(s)))
 	while (libdi_debuginfo_cu_parser_loadunit(&debug_info_iter, debug_info_end,
 	                                          &cu_sections, &parser,
 	                                          &abbrev, NULL) == DEBUG_INFO_ERROR_SUCCESS) {
 		do {
 			DO(format_repeat(printer, arg, '\t', parser.dup_child_depth));
-			DO(format_printf(printer, arg, REPR_STRING("%#p:"),
-			                 parser.dup_cu_info_pos - debug_info_start));
+			PRINTF("%#p:", parser.dup_cu_info_pos - debug_info_start);
 			s = libdi_debug_repr_DW_TAG(parser.dup_comp.dic_tag);
 			DO(s ? format_printf(printer, arg, REPR_STRING("DW_TAG_%s:\n"), s)
 			     : format_printf(printer, arg, REPR_STRING("%#" PRIxPTR ":\n"), (uintptr_t)parser.dup_comp.dic_tag));
@@ -450,14 +903,14 @@ libdi_debug_repr_dump(pformatprinter printer, void *arg,
 					char const *value;
 					if (!libdi_debuginfo_cu_parser_getstring(&parser, attr.dica_form, &value))
 						goto err_bad_value;
-					DO(format_printf(printer, arg, REPR_STRING("%q"), value));
+					PRINTF("%q", value);
 				}	break;
 
 				case DW_FORM_addr: {
 					uintptr_t value;
 					if (!libdi_debuginfo_cu_parser_getaddr(&parser, attr.dica_form, &value))
 						goto err_bad_value;
-					DO(format_printf(printer, arg, REPR_STRING("%#p"), value));
+					PRINTF("%#p", value);
 				}	break;
 
 				case DW_FORM_data1:
@@ -471,7 +924,7 @@ libdi_debug_repr_dump(pformatprinter printer, void *arg,
 					uintptr_t value;
 					if (!libdi_debuginfo_cu_parser_getconst(&parser, attr.dica_form, &value))
 						goto err_bad_value;
-					DO(format_printf(printer, arg, REPR_STRING("%" PRIuPTR " (%#" PRIxPTR ")"), value, value));
+					PRINTF("%" PRIuPTR " (%#" PRIxPTR ")", value, value);
 				}	break;
 
 				case DW_FORM_flag:
@@ -499,8 +952,7 @@ libdi_debug_repr_dump(pformatprinter printer, void *arg,
 					if unlikely(!libdi_debuginfo_cu_parser_next(&p2)) {
 						PRINT("<BAD REFERENCE>");
 					} else {
-						DO(format_printf(printer, arg, REPR_STRING("%#p:"),
-						                 p2.dup_cu_info_pos - debug_info_start));
+						PRINTF("%#p:", p2.dup_cu_info_pos - debug_info_start);
 						s = libdi_debug_repr_DW_TAG(p2.dup_comp.dic_tag);
 						DO(s ? format_printf(printer, arg, REPR_STRING("DW_TAG_%s"), s)
 						     : format_printf(printer, arg, REPR_STRING("%#" PRIxPTR),
@@ -536,10 +988,9 @@ libdi_debug_repr_dump(pformatprinter printer, void *arg,
 							linelen = block.b_size;
 							if (linelen > MAX_BLOCK_LINE_LENGTH)
 								linelen = MAX_BLOCK_LINE_LENGTH;
-							DO(format_printf(printer, arg, REPR_STRING("%.*" PRIxSIZ ":"),
-							                 digits, offset));
+							PRINTF("%.*" PRIxSIZ ":", digits, offset);
 							for (i = 0; i < linelen; ++i)
-								DO(format_printf(printer, arg, REPR_STRING(" %.2" PRIX8), block.b_addr[i]));
+								PRINTF(" %.2" PRIX8, block.b_addr[i]);
 							i = 1;
 							if (linelen < MAX_BLOCK_LINE_LENGTH && offset != 0)
 								i += MAX_BLOCK_LINE_LENGTH - linelen;
@@ -566,8 +1017,76 @@ libdi_debug_repr_dump(pformatprinter printer, void *arg,
 					di_debuginfo_location_t value;
 					if (!libdi_debuginfo_cu_parser_getexpr(&parser, attr.dica_form, &value))
 						goto err_bad_value;
-					/* TODO: Disassemble the expression */
-					PRINT("<EXPR>");
+					assert(value.l_llist || value.l_expr);
+					assert(!(value.l_llist && value.l_expr));
+					if (value.l_expr) {
+						DO(libdl_debug_repr_cfi_expression(printer, arg, value.l_expr,
+						                                   parser.dup_child_depth + 1,
+						                                   parser.dup_addrsize,
+						                                   parser.dup_ptrsize));
+					} else {
+						uintptr_t cu_base;
+						size_t indent;
+						bool isfirst;
+						indent  = parser.dup_child_depth + 2;
+						cu_base = 0;
+						isfirst = true;
+						for (;;) {
+							uint16_t length;
+							uintptr_t range_start, range_end;
+							if (parser.dup_addrsize >= sizeof(uintptr_t)) {
+								range_start = UNALIGNED_GET((uintptr_t const *)value.l_llist);
+								value.l_llist += parser.dup_addrsize;
+								range_end = UNALIGNED_GET((uintptr_t const *)value.l_llist);
+								value.l_llist += parser.dup_addrsize;
+#if __SIZEOF_POINTER__ > 4
+							} else if (parser.dup_addrsize >= 4) {
+								range_start = UNALIGNED_GET32((uint32_t const *)value.l_llist);
+								value.l_llist += parser.dup_addrsize;
+								range_end = UNALIGNED_GET32((uint32_t const *)value.l_llist);
+								value.l_llist += parser.dup_addrsize;
+#endif /* __SIZEOF_POINTER__ > 4 */
+							} else if (parser.dup_addrsize >= 2) {
+								range_start = UNALIGNED_GET16((uint16_t const *)value.l_llist);
+								value.l_llist += parser.dup_addrsize;
+								range_end = UNALIGNED_GET16((uint16_t const *)value.l_llist);
+								value.l_llist += parser.dup_addrsize;
+							} else {
+								range_start = *(uint8_t const *)value.l_llist;
+								value.l_llist += parser.dup_addrsize;
+								range_end = *(uint8_t const *)value.l_llist;
+								value.l_llist += parser.dup_addrsize;
+							}
+							length = UNALIGNED_GET16((uint16_t const *)value.l_llist);
+							value.l_llist += 2;
+							if (range_start == (uintptr_t)-1) {
+								/* Base address selection entry! */
+								cu_base = range_end;
+							} else if (!range_start && !range_end) {
+								break; /* Location list end entry. */
+							} else {
+								if (isfirst) {
+									PRINT("{\n");
+									isfirst = false;
+								}
+								range_start += cu_base;
+								range_end += cu_base;
+								DO(format_repeat(printer, arg, '\t', indent));
+								PRINTF("%#" PRIxPTR "-%#" PRIxPTR ": ", range_start, range_end);
+								DO(libdl_debug_repr_cfi_expression_with_length(printer, arg, value.l_llist,
+								                                               length, indent,
+								                                               parser.dup_addrsize,
+								                                               parser.dup_ptrsize));
+							}
+							value.l_llist += length;
+						}
+						if unlikely(isfirst) {
+							PRINT("{}");
+						} else {
+							DO(format_repeat(printer, arg, '\t', indent - 1));
+							PRINT("}");
+						}
+					}
 				}	break;
 
 				default:
@@ -597,6 +1116,9 @@ DEFINE_PUBLIC_ALIAS(debug_repr_DW_OP, libdi_debug_repr_DW_OP);
 DEFINE_PUBLIC_ALIAS(debug_repr_DW_CFA, libdi_debug_repr_DW_CFA);
 DEFINE_PUBLIC_ALIAS(debug_repr_DW_EH_PE, libdi_debug_repr_DW_EH_PE);
 DEFINE_PUBLIC_ALIAS(debug_repr_dump, libdi_debug_repr_dump);
+DEFINE_PUBLIC_ALIAS(debug_repr_cfi_expression_ex, libdl_debug_repr_cfi_expression_ex);
+DEFINE_PUBLIC_ALIAS(debug_repr_cfi_expression_with_length, libdl_debug_repr_cfi_expression_with_length);
+DEFINE_PUBLIC_ALIAS(debug_repr_cfi_expression, libdl_debug_repr_cfi_expression);
 
 DECL_END
 #endif /* __KERNEL__ */

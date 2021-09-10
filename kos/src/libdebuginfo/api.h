@@ -24,14 +24,19 @@
 #include <__crt.h>
 #include <hybrid/compiler.h>
 
+#include <kos/anno.h>
+
 #include <libdebuginfo/api.h>
 
 #define CC LIBDEBUGINFO_CC
 
 #ifndef REF
-#include <kos/anno.h>
 #define REF __REF
 #endif /* !REF */
+
+#ifndef NOBLOCK
+#define NOBLOCK __NOBLOCK
+#endif /* !NOBLOCK */
 
 #ifdef __KERNEL__
 #include <kernel/compiler.h>

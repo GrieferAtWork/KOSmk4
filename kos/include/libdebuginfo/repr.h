@@ -88,6 +88,87 @@ LIBDEBUGINFO_DECL __ATTR_NONNULL((1)) __ssize_t
                                   __byte_t const *debug_str_start, __byte_t const *debug_str_end);
 #endif /* LIBDEBUGINFO_WANT_PROTOTYPES */
 
+
+/* Print the  disassembly of  a given  CFI expression  starting at  `pc',
+ * covering a total  of `length'  bytes. One instruction  is printed  per
+ * line, and  no trailing  line-feed is  printed. Each  new-line that  is
+ * printed is  succeeded  by  `indent' TAB-characters  (unless  the  line
+ * starts with a label definition, in which case `indent ? indent - 1: 0'
+ * leading TAB  characters  are  printed, followed  by  the  label  name,
+ * followed by another TAB character).
+ * @param: printer:              Output printer.
+ * @param: arg:                  Output printer cookie.
+ * @param: pc:                   Starting address of the expression.
+ * @param: length:               Length (in bytes) of the expression.
+ * @param: addrsize:             s.a. `unwind_instruction_succ(3)'
+ * @param: ptrsize:              s.a. `unwind_instruction_succ(3)'
+ * @param: indent_on_first_line: When true, also output an indentation
+ *                               before the first  line, the same  way
+ *                               it would be if it wasn't actually the
+ *                               first line.
+ * @return: * : The usual pformatprinter-style value. */
+typedef __ATTR_NONNULL((1, 3)) __ssize_t
+(LIBDEBUGINFO_CC *PDEBUG_REPR_CFI_EXPRESSION_EX)(__pformatprinter printer, void *arg,
+                                                 __byte_t const *__restrict pc, __size_t length,
+                                                 __size_t indent, __byte_t addrsize, __byte_t ptrsize,
+                                                 __BOOL indent_on_first_line);
+#ifdef LIBDEBUGINFO_WANT_PROTOTYPES
+LIBDEBUGINFO_DECL __ATTR_NONNULL((1, 3)) __ssize_t LIBDEBUGINFO_CC
+debug_repr_cfi_expression_ex(__pformatprinter printer, void *arg,
+                             __byte_t const *__restrict pc, __size_t length,
+                             __size_t indent, __byte_t addrsize, __byte_t ptrsize,
+                             __BOOL indent_on_first_line);
+#endif /* LIBDEBUGINFO_WANT_PROTOTYPES */
+
+/* Same as `debug_repr_cfi_expression_ex(3)', but wrap the expression in
+ * a pair of `{ ... }', either  like `{ nop }' when the expression  only
+ * contains a single instruction, or
+ *     [\t * (indent)] {
+ *     [\t * (indent+1)] nop
+ *     [\t * (indent+1)] nop
+ *     [\t * (indent)] }
+ * When where are at least 2 instructions. No trailing linefeed is printed.
+ * @param: printer:  Output printer.
+ * @param: arg:      Output printer cookie.
+ * @param: pc:       Starting address of the expression.
+ * @param: length:   Length (in bytes) of the expression.
+ * @param: addrsize: s.a. `unwind_instruction_succ(3)'
+ * @param: ptrsize:  s.a. `unwind_instruction_succ(3)'
+ * @return: * : The usual pformatprinter-style value. */
+typedef __ATTR_NONNULL((1, 3)) __ssize_t
+(LIBDEBUGINFO_CC *PDEBUG_REPR_CFI_EXPRESSION_WITH_LENGTH)(__pformatprinter printer, void *arg,
+                                                          __byte_t const *__restrict expr,
+                                                          __size_t length, __size_t indent,
+                                                          __byte_t addrsize, __byte_t ptrsize);
+#ifdef LIBDEBUGINFO_WANT_PROTOTYPES
+LIBDEBUGINFO_DECL __ATTR_NONNULL((1, 3)) __ssize_t LIBDEBUGINFO_CC
+debug_repr_cfi_expression_with_length(__pformatprinter printer, void *arg,
+                                      __byte_t const *__restrict expr,
+                                      __size_t length, __size_t indent,
+                                      __byte_t addrsize, __byte_t ptrsize);
+#endif /* LIBDEBUGINFO_WANT_PROTOTYPES */
+
+/* Read the expression length as ULEB128 from `*expr' and print
+ * the  disassembled contents of the succeeding CFI expression.
+ * Same as `debug_repr_cfi_expression_with_length()'
+ * @param: printer:  Output printer.
+ * @param: arg:      Output printer cookie.
+ * @param: pc:       Starting address of the expression.
+ * @param: addrsize: s.a. `unwind_instruction_succ(3)'
+ * @param: ptrsize:  s.a. `unwind_instruction_succ(3)'
+ * @return: * : The usual pformatprinter-style value. */
+typedef __ATTR_NONNULL((1, 3)) __ssize_t
+(LIBDEBUGINFO_CC *PDEBUG_REPR_CFI_EXPRESSION)(__pformatprinter printer, void *arg,
+                                              __byte_t const *__restrict expr, __size_t indent,
+                                              __byte_t addrsize, __byte_t ptrsize);
+#ifdef LIBDEBUGINFO_WANT_PROTOTYPES
+LIBDEBUGINFO_DECL __ATTR_NONNULL((1, 3)) __ssize_t LIBDEBUGINFO_CC
+debug_repr_cfi_expression(__pformatprinter printer, void *arg,
+                          __byte_t const *__restrict expr, __size_t indent,
+                          __byte_t addrsize, __byte_t ptrsize);
+#endif /* LIBDEBUGINFO_WANT_PROTOTYPES */
+
+
 #endif /* __KERNEL__ */
 
 
