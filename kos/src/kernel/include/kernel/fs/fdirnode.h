@@ -57,57 +57,67 @@ struct flookup_info {
 #define FMKFILE_F_NOCASE FS_MODE_FDOSPATH /* [in] Ignore case */
 #define FMKFILE_F_EXISTS 0x0001           /* [out] File already existed (no new file created) */
 
+struct fcreatfile_info {
+	uid_t                      c_owner;     /* [in] File owner */
+	gid_t                      c_group;     /* [in] File group */
+	struct timespec            c_atime;     /* [in] File access timestamp */
+	struct timespec            c_mtime;     /* [in] File modified timestamp */
+	struct timespec            c_ctime;     /* [in] File created timestamp */
+	union {
+		dev_t                  c_rdev;      /* [valid_if(S_ISDEV(mkf_fmode))][in] Referenced device. */
+		struct {
+			CHECKED USER /*utf-8*/ char const *s_text; /* [?..s_size][in] Symlink text. */
+			size_t                             s_size; /* [in] Symlink text length (in characters; excluding trailing \0). */
+		}                      c_symlink;   /* [valid_if(S_ISLNK(mkf_fmode))] Symlink text. */
+	};
+};
+
 /* Info descriptor for: creat(2), mkdir(2), mknod(2), symlink(2) and link(2) */
 struct fmkfile_info {
-	CHECKED USER /*utf-8*/ char const *mkf_name;    /* [?..mkf_namelen][in] Name for the new file. */
-	uintptr_t                          mkf_hash;    /* [in] Hash for `mkf_name' (s.a. `fdirent_hash()') */
-	u16                                mkf_namelen; /* [in] Length of `mkf_name' */
-	u16                               _mkf_pad;     /* ... */
-	u32                                mkf_flags;   /* [in|out] Set of `FMKFILE_F_*' */
+	union {
+		struct {
+			CHECKED USER /*utf-8*/ char const *mkf_name;    /* [?..mkf_namelen][in] Name for the new file. */
+			uintptr_t                          mkf_hash;    /* [in] Hash for `mkf_name' (s.a. `fdirent_hash()') */
+			u16                                mkf_namelen; /* [in] Length of `mkf_name' */
+			u16                               _mkf_pad;     /* ... */
+			u32                                mkf_flags;   /* [in|out] Set of `FMKFILE_F_*' */
+		};
+		struct flookup_info            mkf_lookup_info;     /* [in] Lookup info for the new file being created. */
+	};
 	REF struct fdirent                *mkf_dent;    /* [1..1][out] Directory entry for the new file (s.a. `dno_lookup') */
 	mode_t                             mkf_fmode;   /* [in] File  type & access  permissions for the new  file-node. If a hard-
 	                                                 * link  should be created, this is field is set to ZERO. For this purpose,
 	                                                 * node that all S_IF*-file-type-flags are non-zero, meaning you can simply
 	                                                 * switch on this field and use `0' for hard-link. */
 	union {
-		/* [1..1][out] The newly constructed file-node. */
-		REF struct fnode              *mkf_rnode;   /* ... */
-		REF struct fregnode           *mkf_rreg;    /* [valid_if(S_ISREG(mkf_fmode) || (mkf_fmode == 0 && fnode_isreg(mkf_hrdlnk.hl_node)))] */
-		REF struct fdirnode           *mkf_rdir;    /* [valid_if(S_ISDIR(mkf_fmode) || (mkf_fmode == 0 && fnode_isdir(mkf_hrdlnk.hl_node)))] */
-		REF struct flnknode           *mkf_rlnk;    /* [valid_if(S_ISLNK(mkf_fmode) || (mkf_fmode == 0 && fnode_islnk(mkf_hrdlnk.hl_node)))] */
-		REF struct ffifonode          *mkf_rfifo;   /* [valid_if(S_ISFIFO(mkf_fmode) || (mkf_fmode == 0 && fnode_isfifo(mkf_hrdlnk.hl_node)))] */
-		REF struct fsocknode          *mkf_rsock;   /* [valid_if(S_ISSOCK(mkf_fmode) || (mkf_fmode == 0 && fnode_issock(mkf_hrdlnk.hl_node)))] */
-		REF struct fdevnode           *mkf_rdev;    /* [valid_if(S_ISDEV(mkf_fmode) || (mkf_fmode == 0 && fnode_isdev(mkf_hrdlnk.hl_node)))] */
+		REF struct fnode              *mkf_rnode;   /* [1..1][out] The newly constructed file-node. */
+		REF struct fregnode           *mkf_rreg;    /* [1..1][out][valid_if(S_ISREG(mkf_fmode) || (mkf_fmode == 0 && fnode_isreg(mkf_hrdlnk.hl_node)))] */
+		REF struct fdirnode           *mkf_rdir;    /* [1..1][out][valid_if(S_ISDIR(mkf_fmode) || (mkf_fmode == 0 && fnode_isdir(mkf_hrdlnk.hl_node)))] */
+		REF struct flnknode           *mkf_rlnk;    /* [1..1][out][valid_if(S_ISLNK(mkf_fmode) || (mkf_fmode == 0 && fnode_islnk(mkf_hrdlnk.hl_node)))] */
+		REF struct ffifonode          *mkf_rfifo;   /* [1..1][out][valid_if(S_ISFIFO(mkf_fmode) || (mkf_fmode == 0 && fnode_isfifo(mkf_hrdlnk.hl_node)))] */
+		REF struct fsocknode          *mkf_rsock;   /* [1..1][out][valid_if(S_ISSOCK(mkf_fmode) || (mkf_fmode == 0 && fnode_issock(mkf_hrdlnk.hl_node)))] */
+		REF struct fdevnode           *mkf_rdev;    /* [1..1][out][valid_if(S_ISDEV(mkf_fmode) || (mkf_fmode == 0 && fnode_isdev(mkf_hrdlnk.hl_node)))] */
 	};
 	union {
 		struct {
 			struct fnode              *hl_node;     /* [1..1][in] The file to which to create a hard-link. */
-		} mkf_hrdlnk;                               /* [valid_if(FMKFILE_F_HRDLNK)] Hardlink creation info. */
-
-		struct {
-			uid_t                      c_owner;     /* [in] File owner */
-			gid_t                      c_group;     /* [in] File group */
-			struct timespec            c_atime;     /* [in] File access timestamp */
-			struct timespec            c_mtime;     /* [in] File modified timestamp */
-			struct timespec            c_ctime;     /* [in] File created timestamp */
-			union {
-				dev_t                  c_rdev;      /* [valid_if(S_ISDEV(mkf_fmode))][in] Referenced device. */
-				struct {
-					CHECKED USER /*utf-8*/ char const *s_text; /* [?..s_size][in] Symlink text. */
-					size_t                             s_size; /* [in] Symlink text length (in characters; excluding trailing \0). */
-				}                      c_symlink;   /* [valid_if(S_ISLNK(mkf_fmode))] Symlink text. */
-			};
-		} mkf_creat;                                /* [valid_if(mkf_fmode != 0)] File creation info. */
+		}                      mkf_hrdlnk; /* [valid_if(mkf_fmode == 0)] Hardlink creation info. */
+		struct fcreatfile_info mkf_creat;  /* [valid_if(mkf_fmode != 0)] File creation info. */
 	};
 };
 
 /* Info descriptor for: rename(2) */
 struct frename_info {
-	CHECKED USER /*utf-8*/ char const *frn_name;    /* [?..frn_namelen] Name for the new file. */
-	uintptr_t                          frn_hash;    /* Hash for `frn_name' (s.a. `fdirent_hash()') */
-	u16                                frn_namelen; /* Length of `frn_name' */
-	u16                               _frn_pad;     /* ... */
-	u32                                frn_flags;   /* Set of `0 | FS_MODE_FDOSPATH' */
+	union {
+		struct {
+			CHECKED USER /*utf-8*/ char const *frn_name;    /* [?..frn_namelen][in] Name for the new file. */
+			uintptr_t                          frn_hash;    /* [in] Hash for `frn_name' (s.a. `fdirent_hash()') */
+			u16                                frn_namelen; /* [in] Length of `frn_name' */
+			u16                               _frn_pad;     /* ... */
+			u32                                frn_flags;   /* [in] Set of `0 | FS_MODE_FDOSPATH' */
+		};
+		struct flookup_info            frn_lookup_info;     /* [in] Lookup info for the new file being created. */
+	};
 	REF struct fdirent                *frn_dent;    /* [1..1][out] New directory entry for the file. */
 	struct fnode                      *frn_file;    /* [1..1][in] The file that should be renamed. */
 	struct fdirent                    *frn_oldent;  /* [1..1][in] Directory of `frn_file' in `frn_olddir' */
@@ -172,6 +182,13 @@ struct fdirnode_ops {
 	WUNUSED NONNULL((1, 2)) REF struct fdirent *                                        \
 	(KCALL *prefix##lookup)(T *__restrict self,                                         \
 	                        struct flookup_info *__restrict info);                      \
+	                                                                                    \
+	/* [0..1] Optional helper to directly lookup a file-node w/o going                  \
+	 *        through the fdirent indirection.                                          \
+	 * @return: NULL: No entry exists that is matching the given name. */               \
+	WUNUSED NONNULL((1, 2)) REF struct fnode *                                          \
+	(KCALL *prefix##lookup_fnode)(T *__restrict self,                                   \
+	                              struct flookup_info *__restrict info);                \
 	                                                                                    \
 	/* [1..1] Construct a directory enumerator object in `*result'.                     \
 	 * This  function  must  initialize _all_  fields  of `*result'                     \
@@ -287,7 +304,8 @@ struct fdirnode
 	(decref_nokill((self)->fn_super), decref_nokill((self)->dn_parent))
 
 /* Default operators for `fdirnode_ops::dno_*' */
-FUNDEF NOBLOCK NONNULL((1)) void NOTHROW(KCALL fdirnode_v_destroy)(struct fdirnode *__restrict self);
+FUNDEF NOBLOCK NONNULL((1)) void
+NOTHROW(KCALL fdirnode_v_destroy)(struct fdirnode *__restrict self);
 
 
 /* Public API (high-level wrappers around low-level operators) */
@@ -296,6 +314,13 @@ FUNDEF NOBLOCK NONNULL((1)) void NOTHROW(KCALL fdirnode_v_destroy)(struct fdirno
  * @return: NULL: No entry exists that is matching the given name. */
 #define fdirnode_lookup(self, info) \
 	(*fdirnode_getops(self)->dno_lookup)(self, info)
+
+/* Lookup the INode associated with a given name within `self'.
+ * @return: NULL: No entry exists that is matching the given name. */
+FUNDEF WUNUSED NONNULL((1, 2)) REF struct fnode *KCALL
+fdirnode_lookup_fnode(struct fdirnode *__restrict self,
+                      struct flookup_info *__restrict info);
+
 
 /* Construct a directory  enumerator object in  `*result'.
  * This function must initialize _all_ fields of `*result'

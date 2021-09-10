@@ -50,14 +50,14 @@ struct fdyndirnode_ops {
 #define fdyndirnode_ops_as_fdirnode_ops(ops) ((struct fdirnode_ops const *)&(ops)->_fdirnode_ops_firstfield(ddno_))
 #define fdyndirnode_ops_as_fnode_ops(ops)    ((struct fnode_ops const *)&(ops)->_fnode_ops_firstfield(ddno_))
 #define fdyndirnode_ops_as_mfile_ops(ops)    ((struct mfile_ops const *)&(ops)->_mfile_ops_firstfield(ddno_))
-#define FDYNDIRNODE_OPS_FIELDS(prefix, T)                                             \
-	FDIRNODE_OPS_FIELDS(prefix, T);                                                   \
-	                                                                                  \
-	/* [1..1] Enumerate all files within the directory, calling `cb' for each         \
-	 * Enumeration is allowed (but not required) to stop prematurely when the         \
-	 * given `cb' returns `false'. Otherwise, _all_ files must be enumerated. */      \
-	WUNUSED NONNULL((1, 2)) void                                                      \
-	(KCALL *prefix##enumdir)(T *__restrict self,                                      \
+#define FDYNDIRNODE_OPS_FIELDS(prefix, T)                                        \
+	FDIRNODE_OPS_FIELDS(prefix, T);                                              \
+	                                                                             \
+	/* [1..1] Enumerate all files within the directory, calling `cb' for each    \
+	 * Enumeration is allowed (but not required) to stop prematurely when the    \
+	 * given `cb' returns `false'. Otherwise, _all_ files must be enumerated. */ \
+	WUNUSED NONNULL((1, 2)) void                                                 \
+	(KCALL *prefix##enumdir)(T *__restrict self,                                 \
 	                         fdyndir_enum_callback_t cb, void *cookie)
 
 	/* Operators... */
@@ -84,13 +84,13 @@ struct fdyndirnode
 
 /* Default callback for `fdyndirnode_ops::ddno_lookup' */
 FUNDEF WUNUSED NONNULL((1, 2)) REF struct fdirent *KCALL
-fdyndirnode_lookup(struct fdyndirnode *__restrict self,
-                   struct flookup_info *__restrict info);
+fdyndirnode_v_lookup(struct fdyndirnode *__restrict self,
+                     struct flookup_info *__restrict info);
 
 /* Default callback for `fdyndirnode_ops::ddno_enum' */
 FUNDEF NONNULL((1, 2)) void KCALL
-fdyndirnode_enum(struct fdyndirnode *__restrict self,
-                 struct fdirenum *__restrict result);
+fdyndirnode_v_enum(struct fdyndirnode *__restrict self,
+                   struct fdirenum *__restrict result);
 
 
 

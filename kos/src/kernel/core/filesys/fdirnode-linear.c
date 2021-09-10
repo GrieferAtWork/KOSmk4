@@ -197,6 +197,39 @@ lindir_readmore_and_endread(struct flindirnode *__restrict self) {
 }
 
 
+PRIVATE WUNUSED NONNULL((1, 2)) struct flindirent *KCALL
+lookup_with_lock(struct flindirnode *__restrict self,
+                 struct flookup_info *__restrict info) {
+	REF struct flindirent *result;
+	struct flindirbucket *bucket;
+	bucket = &self->ldn_dat.ldd_byname_tab[info->flu_hash & self->ldn_dat.ldd_byname_msk];
+	result = SLIST_FIRST(&bucket->ldb_entires);
+
+	/* Search through this list. */
+	for (; result; result = SLIST_NEXT(result, fld_byname)) {
+		if (result->fld_hash != info->flu_hash)
+			continue;
+		if (result->fld_ent.fd_namelen != info->flu_namelen)
+			continue;
+		if (memcmp(result->fld_ent.fd_name, info->flu_name,
+		           info->flu_namelen * sizeof(char)) != 0)
+			continue;
+		return result; /* Found it! */
+	}
+
+	if (info->flu_flags & FS_MODE_FDOSPATH) {
+		/* Search through all entires, but ignore ASCII casing. */
+		TAILQ_FOREACH (result, &self->ldn_dat.ldd_bypos, fld_bypos) {
+			if (result->fld_ent.fd_namelen != info->flu_namelen)
+				continue;
+			if (memcasecmp(result->fld_ent.fd_name, info->flu_name,
+			               info->flu_namelen * sizeof(char)) != 0)
+				continue;
+			return result; /* Found it! */
+		}
+	}
+	return NULL;
+}
 
 /* Default callback for `flindirnode_ops::ldno_*' */
 PUBLIC WUNUSED NONNULL((1, 2)) REF struct fdirent *KCALL
@@ -488,12 +521,45 @@ flindirnode_v_mkfile(struct flindirnode *__restrict self,
 	sync_endwrite(&self->ldn_dat.ldd_flock);
 }
 
+/* Clear the `lde_ent' field of all directory enumerators using the given dirent.
+ * The caller must be holding a write-lock to `self->ldd_flock' */
+PRIVATE NOBLOCK NONNULL((1, 2)) void
+NOTHROW(FCALL flindirnode_clear_direnum_with_dirent)(struct flindirnode *__restrict self,
+                                                     struct flindirent const *__restrict entry) {
+	struct flindirenum *iter;
+	mfile_tslock_acquire(self);
+	LIST_FOREACH (iter, &self->ldn_dat.ldd_enum, lde_all) {
+		/* No need to do ATOMIC_CMPXCH because we have a write-lock to `self->ldd_flock' */
+		if (ATOMIC_READ(iter->lde_ent) == entry)
+			ATOMIC_WRITE(iter->lde_ent, NULL);
+	}
+	mfile_tslock_release(self);
+}
+
 PUBLIC NONNULL((1, 2, 3)) void KCALL
 flindirnode_v_unlink(struct flindirnode *__restrict self,
                      struct fdirent *__restrict entry,
                      struct fnode *__restrict file) {
+	struct flindirent *ldentry;
+	struct flindirnode_ops const *ops;
+	ldentry = flindirent_from_fdirent(entry);
+	ops     = flindirnode_getops(self);
+	if unlikely(!ops->ldno_linunlink)
+		THROW(E_FSERROR_READONLY);
 	lindir_loadall_and_write(self);
-	/* TODO */
+
+	/* Modify the underlying physical file. */
+	TRY {
+		(*ops->ldno_linunlink)(self, ldentry);
+	} EXCEPT {
+		sync_endwrite(&self->ldn_dat.ldd_flock);
+		RETHROW();
+	}
+
+	/* With the entry removed,  */
+
+
+	flindirnode_clear_direnum_with_dirent(self, ldentry);
 	sync_endwrite(&self->ldn_dat.ldd_flock);
 }
 
@@ -502,6 +568,7 @@ flindirnode_v_rename(struct flindirnode *__restrict self,
                      struct frename_info *__restrict info) {
 	lindir_loadall_and_write(self);
 	/* TODO */
+
 	sync_endwrite(&self->ldn_dat.ldd_flock);
 }
 

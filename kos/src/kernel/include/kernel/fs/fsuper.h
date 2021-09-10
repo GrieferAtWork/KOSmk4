@@ -156,6 +156,7 @@ LIST_HEAD(vmount_list, vmount);
 
 struct fsuper {
 	/* More fields of custom (fs-specific) `fsuper' sub-classes go here. */
+	nlink_t                     fs_nlink_max;     /* [const][>= 1] Max allowed NLINK value for file-nodes. */
 	REF_IF([*].mf_flags & MFILE_F_PERSISTENT)
 	LLRBTREE_ROOT(fnode)        fs_nodes;         /* [0..n][lock(fs_nodeslock)] Tree of  known nodes (ordered  by INO  number)
 	                                               * This tree holds a reference to any file that has the `MFILE_F_PERSISTENT'

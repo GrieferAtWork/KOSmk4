@@ -61,7 +61,8 @@ struct flindirent {
 	struct fdirent          fld_ent;    /* The underlying directory entry. */
 };
 
-#define flindirent_destroy(self) fdirent_destroy(&(self)->fld_ent)
+#define flindirent_from_fdirent(self) COMPILER_CONTAINER_OF(self, struct flindirent, fld_ent)
+#define flindirent_destroy(self)      fdirent_destroy(&(self)->fld_ent)
 DEFINE_REFCOUNT_FUNCTIONS(struct flindirent, fld_ent.fd_refcnt, flindirent_destroy)
 
 
@@ -77,20 +78,20 @@ TAILQ_HEAD(flindirent_tailq, flindirent);
 
 
 
-struct flinrename_info {
-	CHECKED USER /*utf-8*/ char const *flrn_name;    /* [?..flrn_namelen] Name for the new file. */
-	uintptr_t                          flrn_hash;    /* Hash for `flrn_name' (s.a. `fdirent_hash()') */
-	u16                                flrn_namelen; /* Length of `flrn_name' */
-	u16                               _flrn_pad;     /* ... */
-	u32                               _flrn_pad2;    /* ... */
-	REF struct flindirent             *flrn_dent;    /* [1..1][out] New directory entry for the file. */
-	struct fnode                      *flrn_file;    /* [1..1][in] The file that should be renamed. */
-	struct flindirent                 *flrn_oldent;  /* [1..1][in] Directory of `frn_file' in `frn_olddir' */
-	struct flindirnode                *flrn_olddir;  /* [1..1][in] Old containing directory. (Part of the same superblock!)
-	                                                  * NOTE: The new  directory  is  guarantied  not to  be  a  child  of  this
-	                                                  *       directory! (this must be asserted by the caller of `dno_rename()') */
+struct flinmkent_info {
+	union {
+		struct {
+			CHECKED USER /*utf-8*/ char const *lmk_name;    /* [?..lmk_namelen][in] Name for the new file. */
+			uintptr_t                          lmk_hash;    /* [in] Hash for `lmk_name' (s.a. `fdirent_hash()') */
+			u16                                lmk_namelen; /* [in] Length of `lmk_name' */
+			u16                               _lmk_pad;     /* ... */
+			u16                               _lmk_pad2;    /* ... */
+		};
+		struct flookup_info            lmk_lookup_info;     /* [in] Lookup info for the new file being created. */
+	};
+	REF struct flindirent             *lmk_dent; /* [1..1][out] Directory entry for the new file (s.a. `dno_lookup') */
+	struct fnode                      *lmk_node; /* [1..1][in] The file-node for which the entry should be created. */
 };
-
 
 struct flindirnode_ops {
 #define _flindirnode_ops_firstfield(prefix)  _fdirnode_ops_firstfield(prefix)
@@ -134,12 +135,35 @@ struct flindirnode_ops {
 	 *   - entry->fld_ent.fd_type    = ...;                                           \
 	 *   - entry->fld_ent.fd_name    = ...; */                                        \
 	NONNULL((1, 2)) void                                                              \
-	(KCALL *prefix##linunlink)(T *__restrict self,                                    \
-	                           struct flindirent const *__restrict entry);            \
+	(KCALL *prefix##linrment)(T *__restrict self,                                     \
+	                          struct flindirent const *__restrict entry);             \
 	                                                                                  \
 	/* [0..1][lock(WRITE(ldd_flock))]                                                 \
-	 * Try  to  create  a  new  file  within  a  directory  at  the  given  `pos'.    \
-	 * Upon success (see @return below), the caller will fill in `info->mkf_dent':    \
+	 * Create a new on-disk directory entry for some given file-node.                 \
+	 *   - info->lmk_name     = [in:const];                                           \
+	 *   - info->lmk_hash     = [in:const];                                           \
+	 *   - info->lmk_namelen  = [in:const];                                           \
+	 *   - info->lmk_dent     = [out];            // Set to NULL to indicate reserved \
+	 *                                            // directory space.  In this  case, \
+	 *                                            // `return' if # of reserved  bytes \
+	 *                                            // starting at `pos'                \
+	 * @param: pos:      The position where the new entry should go.                  \
+	 * @param: size:     The max # of bytes which may be                              \
+	 * @return: > size:  The  required  amount of  free  directory-file space.        \
+	 *                   In this case, all out-fields of `info' are undefined.        \
+	 * @return: <= size: The total amount of required file space.                     \
+	 *                   When `info->lmk_dent == NULL',  */                           \
+	WUNUSED NONNULL((1, 2)) size_t                                                    \
+	(KCALL *prefix##linmkent)(T *__restrict self,                                     \
+	                          struct flinmkent_info *__restrict info,                 \
+	                          pos_t pos, size_t size);                                \
+	                                                                                  \
+	/* [0..1][lock(WRITE(ldd_flock))]                                                 \
+	 * Same as `ldno_linmkent', but create a new file rather than link an existing.   \
+	 * This function will not be called for for the purpose of hard-linking, which    \
+	 * is handled via `ldno_linmkent' (with respect to `f_super->fs_nlink_max'),      \
+	 * meaning that this is the function used to create new files in a directory,     \
+	 * as well as allocating their fnode objects.                                     \
 	 *   - info->mkf_name     = [in:const];                                           \
 	 *   - info->mkf_hash     = [in:const];                                           \
 	 *   - info->mkf_namelen  = [in:const];                                           \
@@ -151,7 +175,6 @@ struct flindirnode_ops {
 	 *                                            // starting at `pos'                \
 	 *   - info->mkf_fmode    = [in:const];                                           \
 	 *   - info->mkf_rnode    = [out];            // Already added to tree of nodes   \
-	 *   - info->mkf_hrdlnk.* = [in:const];       // This op must inc nlink!          \
 	 *   - info->mkf_creat.*  = [in:const];                                           \
 	 * @param: pos:      The position where the new entry should go.                  \
 	 * @param: size:     The max # of bytes which may be                              \
@@ -162,36 +185,10 @@ struct flindirnode_ops {
 	 *                   In this case, all out-fields of `info' are undefined.        \
 	 * @return: <= size: The total amount of required file space.                     \
 	 *                   When `info->mkf_dent == NULL',  */                           \
-	WUNUSED NONNULL((1, 2)) size_t                                                    \
-	(KCALL *prefix##linmkfile)(T *__restrict self,                                    \
-	                           struct fmkfile_info *__restrict info,                  \
-	                           pos_t pos, size_t size);                               \
-	                                                                                  \
-	/* [0..1][lock(WRITE(self->ldd_flock) && WRITE(info->flrn_olddir->ldd_flock))]    \
-	 * Try  to  create  a  new  file  within  a  directory  at  the  given  `pos'.    \
-	 *   - info->flrn_name     = [in:const];                                          \
-	 *   - info->flrn_hash     = [in:const];                                          \
-	 *   - info->flrn_namelen  = [in:const];                                          \
-	 *   - info->flrn_dent     = [out];           // Set to NULL to indicate reserved \
-	 *                                            // directory space.  In this  case, \
-	 *                                            // `return' if # of reserved  bytes \
-	 *                                            // starting at `pos'                \
-	 *   - info->flrn_file     = [in:const];                                          \
-	 *   - info->flrn_oldent   = [in:const];                                          \
-	 *   - info->flrn_olddir   = [in:const];                                          \
-	 * @param: pos:      The position where the new entry should go.                  \
-	 * @param: size:     The max # of bytes which may be                              \
-	 * @return: 0:       Unsupported operation.                                       \
-	 *                   Same as not implementing this operator.                      \
-	 *                   Caller will throw `E_FSERROR_UNSUPPORTED_OPERATION'          \
-	 * @return: > size:  The  required  amount of  free  directory-file space.        \
-	 *                   In this case, all out-fields of `info' are undefined.        \
-	 * @return: <= size: The total amount of required file space.                     \
-	 *                   When `info->flrn_dent == NULL',  */                          \
-	WUNUSED NONNULL((1, 2)) size_t                                                    \
-	(KCALL *prefix##linrename)(T *__restrict self,                                    \
-	                           struct flinrename_info *__restrict info,               \
-	                           pos_t pos, size_t size)
+	WUNUSED NONNULL((1, 3)) size_t                                                    \
+	(KCALL *prefix##linmkfil)(T *__restrict self, mode_t mode,                        \
+	                          struct fcreatfile_info const *__restrict info);
+
 
 	/* Operators... */
 	FLINDIRNODE_OPS_FIELDS(ldno_, struct flindirnode);
@@ -206,7 +203,9 @@ struct flindirenum {
 	                                     * counter is decremented when this enumerator is
 	                                     * destroyed. */
 	atomic64_t                 lde_pos; /* Lower bound for the next-to-be-read entry's `fld_minpos' */
-	WEAK struct flindirent    *lde_ent; /* [0..1] Cache for  the next  entry  to-be read.  NULL  if
+	WEAK struct flindirent    *lde_ent; /* [0..1][lock(lde_dir->ldd_flock)]
+	                                     * [lock(WRITE_NULL(ATOMIC))] // To write NULL, you don't need a the lock!
+	                                     * Cache for  the next  entry  to-be read.  NULL  if
 	                                     * the next entry  was deleted  before it was  read, or  if
 	                                     * the  next  entry  has   yet  to  be  loaded   from-disk.
 	                                     * In either case, `lde_pos' must be used to in conjunction

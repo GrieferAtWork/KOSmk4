@@ -169,7 +169,7 @@ struct fnode_ops {
 /* Filesystem node. */
 struct fnode
 #ifdef __cplusplus
-    : mfile                             /* Underlying mem-file */
+    : mfile                                  /* Underlying mem-file */
 #endif /* __cplusplus */
 {
 	/* NOTE: `fn_file.mf_flags' may also contain `MFILE_FN_*' flags! */

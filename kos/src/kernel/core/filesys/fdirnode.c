@@ -23,6 +23,7 @@
 
 #include <kernel/compiler.h>
 
+#include <kernel/fs/fdirent.h>
 #include <kernel/fs/fdirnode.h>
 
 #include <kos/except.h>
@@ -38,6 +39,29 @@ NOTHROW(KCALL fdirnode_v_destroy)(struct fdirnode *__restrict self) {
 	decref_unlikely(self->dn_parent);
 	fnode_v_destroy(self);
 }
+
+/* Lookup the INode associated with a given name within `self'.
+ * @return: NULL: No entry exists that is matching the given name. */
+PUBLIC WUNUSED NONNULL((1, 2)) REF struct fnode *KCALL
+fdirnode_lookup_fnode(struct fdirnode *__restrict self,
+                      struct flookup_info *__restrict info) {
+	struct fdirnode_ops const *ops;
+	REF struct fdirent *dirent;
+	REF struct fnode *result;
+	ops = fdirnode_getops(self);
+	if (ops->dno_lookup_fnode)
+		return (*ops->dno_lookup_fnode)(self, info);
+	assert(ops->dno_lookup);
+	dirent = (*ops->dno_lookup)(self, info);
+	if (!dirent)
+		return NULL;
+	{
+		FINALLY_DECREF_UNLIKELY(dirent);
+		result = (*dirent->fd_ops->fdo_opennode)(dirent, self);
+	}
+	return result;
+}
+
 
 /* Create new files within a given directory.
  * If another  file with  the same  name already  existed,  then
