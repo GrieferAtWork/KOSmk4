@@ -36,8 +36,6 @@
 
 DECL_BEGIN
 
-#ifdef __CC__
-
 /* Libc library initializer / finalizer.
  * These  functions are  bound to the  DT_INIT / DT_FINI  tags of libc.so.
  * Since use of __attribute__((constructor)) / __attribute__((destructor))
@@ -90,8 +88,6 @@ libc_start_main(int (*main)(int, char **, char **),
 }
 
 DEFINE_PUBLIC_ALIAS(__libc_start_main, libc_start_main);
-
-#endif /* __CC__ */
 
 DECL_END
 

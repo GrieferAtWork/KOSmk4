@@ -98,6 +98,7 @@ NOTHROW_NCX(LIBCCALL libc_error_subclass)(void) {
 
 #undef error_info
 #undef error_data
+#undef error_register_state
 #undef error_code
 #undef error_active
 #undef error_class
@@ -134,17 +135,17 @@ PRIVATE SECTION_EXCEPT_BSS PUNWIND_CFA_SIGFRAME_APPLY /*    */ pdyn_unwind_cfa_s
 	(ATOMIC_READ(pdyn_libunwind) != NULL || (initialize_libunwind(), 0))
 
 PRIVATE SECTION_EXCEPT_STRING char const name_libunwind_so[] = LIBUNWIND_LIBRARY_NAME;
-PRIVATE SECTION_EXCEPT_STRING char const name_unwind_fde_find[]                        = "unwind_fde_find";
-PRIVATE SECTION_EXCEPT_STRING char const name_unwind_getreg_error_register_state[]     = UNWIND_GETREG_ERROR_REGISTER_STATE_NAME;
-PRIVATE SECTION_EXCEPT_STRING char const name_unwind_setreg_error_register_state[]     = UNWIND_SETREG_ERROR_REGISTER_STATE_NAME;
-PRIVATE SECTION_EXCEPT_STRING char const name_unwind_fde_exec[]                        = "unwind_fde_exec";
-PRIVATE SECTION_EXCEPT_STRING char const name_unwind_cfa_apply[]                       = "unwind_cfa_apply";
-PRIVATE SECTION_EXCEPT_STRING char const name_unwind_fde_exec_cfa[]                    = "unwind_fde_exec_cfa";
-PRIVATE SECTION_EXCEPT_STRING char const name_unwind_fde_calculate_cfa[]               = "unwind_fde_calculate_cfa";
-PRIVATE SECTION_EXCEPT_STRING char const name_unwind_fde_landing_exec[]                = "unwind_fde_landing_exec";
-PRIVATE SECTION_EXCEPT_STRING char const name_unwind_cfa_landing_apply[]               = "unwind_cfa_landing_apply";
-PRIVATE SECTION_EXCEPT_STRING char const name_dwarf_decode_pointer[]                   = "dwarf_decode_pointer";
-PRIVATE SECTION_EXCEPT_STRING char const name_dwarf_decode_uleb128[]                   = "dwarf_decode_uleb128";
+PRIVATE SECTION_EXCEPT_STRING char const name_unwind_fde_find[]                    = "unwind_fde_find";
+PRIVATE SECTION_EXCEPT_STRING char const name_unwind_getreg_error_register_state[] = UNWIND_GETREG_ERROR_REGISTER_STATE_NAME;
+PRIVATE SECTION_EXCEPT_STRING char const name_unwind_setreg_error_register_state[] = UNWIND_SETREG_ERROR_REGISTER_STATE_NAME;
+PRIVATE SECTION_EXCEPT_STRING char const name_unwind_fde_exec[]                    = "unwind_fde_exec";
+PRIVATE SECTION_EXCEPT_STRING char const name_unwind_cfa_apply[]                   = "unwind_cfa_apply";
+PRIVATE SECTION_EXCEPT_STRING char const name_unwind_fde_exec_cfa[]                = "unwind_fde_exec_cfa";
+PRIVATE SECTION_EXCEPT_STRING char const name_unwind_fde_calculate_cfa[]           = "unwind_fde_calculate_cfa";
+PRIVATE SECTION_EXCEPT_STRING char const name_unwind_fde_landing_exec[]            = "unwind_fde_landing_exec";
+PRIVATE SECTION_EXCEPT_STRING char const name_unwind_cfa_landing_apply[]           = "unwind_cfa_landing_apply";
+PRIVATE SECTION_EXCEPT_STRING char const name_dwarf_decode_pointer[]               = "dwarf_decode_pointer";
+PRIVATE SECTION_EXCEPT_STRING char const name_dwarf_decode_uleb128[]               = "dwarf_decode_uleb128";
 #ifndef CFI_UNWIND_NO_SIGFRAME_COMMON_UNCOMMON_REGISTERS
 PRIVATE SECTION_EXCEPT_STRING char const name_unwind_fde_sigframe_exec[]  = "unwind_fde_sigframe_exec";
 PRIVATE SECTION_EXCEPT_STRING char const name_unwind_cfa_sigframe_apply[] = "unwind_cfa_sigframe_apply";
@@ -229,7 +230,7 @@ PRIVATE SECTION_EXCEPT_DATA struct _Unwind_Exception kos_unwind_exception = {
 	/* .private_2         = */ 0,
 };
 
-PRIVATE SECTION_EXCEPT_TEXT WUNUSED struct _Unwind_Exception *LIBCCALL
+PRIVATE ATTR_RETNONNULL SECTION_EXCEPT_TEXT WUNUSED struct _Unwind_Exception *LIBCCALL
 libc_get_kos_unwind_exception(void) {
 	if (!kos_unwind_exception.exception_cleanup)
 		kos_unwind_exception.exception_cleanup = &kos_unwind_exception_cleanup;
@@ -1188,8 +1189,8 @@ INTERN ATTR_NOINLINE ATTR_SECTION(".text.crt.compat.linux.__register_frame")
 void LIBCCALL initialize_libunwind_rf(void) {
 	ENSURE_LIBUNWIND_LOADED();
 	/* Dynamically bind functions. */
-#define BIND(func, name)                                                  \
-	if unlikely ((*(void **)&func = dlsym(pdyn_libunwind, name)) == NULL) \
+#define BIND(func, name)                                                 \
+	if unlikely((*(void **)&func = dlsym(pdyn_libunwind, name)) == NULL) \
 		goto err_init_failed
 	BIND(pdyn___register_frame_info_bases, name___register_frame_info_bases);
 	BIND(pdyn___register_frame_info_table_bases, name___register_frame_info_table_bases);

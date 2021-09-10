@@ -2124,13 +2124,12 @@ NOTHROW_NCX(CC libuw_debuginfo_location_select)(di_debuginfo_location_t const *_
 			if (range_start == (uintptr_t)-1) {
 				/* Base address selection entry! */
 				cu_base = range_end;
-			} else if (!range_start && !range_end) {
-				/* Location list end entry. */
-				break;
-			} else {
-				range_start += cu_base;
-				range_end += cu_base;
+				goto skip_entry;
 			}
+			if (!range_start && !range_end)
+				break; /* Location list end entry. */
+			range_start += cu_base;
+			range_end += cu_base;
 			TRACE("%p: RANGE(%p-%p) with %I16u\n",
 			      reader - 2 * addrsize,
 			      range_start,
@@ -2145,6 +2144,7 @@ NOTHROW_NCX(CC libuw_debuginfo_location_select)(di_debuginfo_location_t const *_
 			/* Skip the associated expression. */
 			{
 				uint16_t expr_length;
+skip_entry:
 				expr_length = UNALIGNED_GET16((uint16_t const *)reader);
 				reader += 2;
 				reader += expr_length;

@@ -40,10 +40,10 @@ DECL_BEGIN
 DEFINE_TEST(libgen) {
 #define ASSERT_DIRNAME_BASENAME(in, out_dirname, out_xpg_basename, out_basename)                          \
 	do {                                                                                                  \
-		char *_s_ou;                                                                                      \
 		char _s_in[]  = in;                                                                               \
 		char _s_in2[] = in;                                                                               \
-		_s_ou         = dirname(_s_in);                                                                   \
+		char *_s_ou;                                                                                      \
+		_s_ou = dirname(_s_in);                                                                           \
 		assertf(strcmp(_s_ou, out_dirname) == 0, "dirname: %q != %q", _s_ou, out_dirname);                \
 		_s_ou = __xpg_basename(_s_in2);                                                                   \
 		assertf(strcmp(_s_ou, out_xpg_basename) == 0, "xpg_basename: %q != %q", _s_ou, out_xpg_basename); \
