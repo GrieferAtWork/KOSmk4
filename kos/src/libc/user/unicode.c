@@ -23,10 +23,18 @@
 #include "../api.h"
 /**/
 
+#include <stdio.h>
+
 #include "unicode.h"
 
 DECL_BEGIN
 
+
+/* Representation of a unicode character numerical value (s.a. `unicode_getnumeric(3)')
+ * Because characters exist that represent  fractions (like ½), we  need to be able  to
+ * represent  not just whole numbers, but also  fractions. For this purpose, the follow
+ * structure  exists, which can either be a whole 63-bit unsigned number, or a fraction
+ * consisting of 2x 31-bit signed integers. */
 typedef union {
 #define _UNIDIGIT_ISFRAC     UINT64_C(0x8000000000000000)
 #define _UNIDIGIT_WHOLE_MASK UINT64_C(0x7fffffffffffffff)
@@ -66,7 +74,7 @@ PRIVATE struct __unitraits const unicode_descriptors[UNICODE_DESCRIPTOR_COUNT];
 #define unicode_default_descriptor   unicode_descriptors[0]
 PRIVATE uint16_t const unicode_tab1[42];
 PRIVATE uint16_t const unicode_tab2[42];
-INTERN_CONST uint16_t const libc___unicode_latin1flags[256];
+INTERN_CONST uint16_t const libc___unicode_latin1flags[257];
 #else /* __INTELLISENSE__ */
 #include "unicode/db.dat"
 #endif /* !__INTELLISENSE__ */
@@ -75,6 +83,8 @@ STATIC_ASSERT_MSG(UNICODE_FOLD_MAXLEN <= UNICODE_FOLDED_MAX, "UNICODE_FOLDED_MAX
 
 /* Export the latin-1 flags matrix */
 DEFINE_PUBLIC_ALIAS(__unicode_latin1flags, libc___unicode_latin1flags);
+STATIC_ASSERT_MSG(EOF == -1, "This is assumed by `__unicode_latin1flags'");
+
 
 /*[[[head:libc___unicode_descriptor,hash:CRC-32=0xf10a2df2]]]*/
 /* Return the internal descriptor for the given `ch' */
@@ -88,11 +98,11 @@ NOTHROW(LIBCCALL libc___unicode_descriptor)(char32_t ch)
 }
 /*[[[end:libc___unicode_descriptor]]]*/
 
-/*[[[head:libc___unicode_descriptor_digit,hash:CRC-32=0xd38c907e]]]*/
+/*[[[head:libc___unicode_descriptor_digit,hash:CRC-32=0xa54824cb]]]*/
 /* Return the integer constant associated with a given digit index
  * Returns `0' if the given index is invalid
  * @param: digit_idx: As read from `__unitraits::__ut_digit_idx' */
-INTERN ATTR_SECTION(".text.crt.unicode.UTF") ATTR_CONST uint8_t
+INTERN ATTR_SECTION(".text.crt.unicode.UTF") ATTR_CONST WUNUSED uint8_t
 NOTHROW(LIBCCALL libc___unicode_descriptor_digit)(uint8_t digit_idx)
 /*[[[body:libc___unicode_descriptor_digit]]]*/
 {
@@ -107,11 +117,11 @@ NOTHROW(LIBCCALL libc___unicode_descriptor_digit)(uint8_t digit_idx)
 }
 /*[[[end:libc___unicode_descriptor_digit]]]*/
 
-/*[[[head:libc___unicode_descriptor_digit64,hash:CRC-32=0xc379838e]]]*/
+/*[[[head:libc___unicode_descriptor_digit64,hash:CRC-32=0x1c4cd216]]]*/
 /* Return the integer constant associated with a given digit index
  * Returns `0' if the given index is invalid
  * @param: digit_idx: As read from `__unitraits::__ut_digit_idx' */
-INTERN ATTR_SECTION(".text.crt.unicode.UTF") ATTR_CONST uint64_t
+INTERN ATTR_SECTION(".text.crt.unicode.UTF") ATTR_CONST WUNUSED uint64_t
 NOTHROW(LIBCCALL libc___unicode_descriptor_digit64)(uint8_t digit_idx)
 /*[[[body:libc___unicode_descriptor_digit64]]]*/
 {
@@ -126,11 +136,11 @@ NOTHROW(LIBCCALL libc___unicode_descriptor_digit64)(uint8_t digit_idx)
 }
 /*[[[end:libc___unicode_descriptor_digit64]]]*/
 
-/*[[[head:libc___unicode_descriptor_digitd,hash:CRC-32=0x681d7284]]]*/
+/*[[[head:libc___unicode_descriptor_digitd,hash:CRC-32=0x8ffa1063]]]*/
 /* Return the floating-point constant associated with a given digit index
  * Returns `0.0' if the given index is invalid
  * @param: digit_idx: As read from `__unitraits::__ut_digit_idx' */
-INTERN ATTR_SECTION(".text.crt.unicode.UTF") ATTR_CONST double
+INTERN ATTR_SECTION(".text.crt.unicode.UTF") ATTR_CONST WUNUSED double
 NOTHROW(LIBCCALL libc___unicode_descriptor_digitd)(uint8_t digit_idx)
 /*[[[body:libc___unicode_descriptor_digitd]]]*/
 {
@@ -145,11 +155,11 @@ NOTHROW(LIBCCALL libc___unicode_descriptor_digitd)(uint8_t digit_idx)
 }
 /*[[[end:libc___unicode_descriptor_digitd]]]*/
 
-/*[[[head:libc___unicode_descriptor_digitld,hash:CRC-32=0x9a7e5dee]]]*/
+/*[[[head:libc___unicode_descriptor_digitld,hash:CRC-32=0xc8190968]]]*/
 /* Return the floating-point constant associated with a given digit index
  * Returns `0.0' if the given index is invalid
  * @param: digit_idx: As read from `__unitraits::__ut_digit_idx' */
-INTERN ATTR_SECTION(".text.crt.unicode.UTF") ATTR_CONST __LONGDOUBLE
+INTERN ATTR_SECTION(".text.crt.unicode.UTF") ATTR_CONST WUNUSED __LONGDOUBLE
 NOTHROW(LIBCCALL libc___unicode_descriptor_digitld)(uint8_t digit_idx)
 /*[[[body:libc___unicode_descriptor_digitld]]]*/
 {

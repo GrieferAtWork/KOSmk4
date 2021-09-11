@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x82280a67 */
+/* HASH CRC-32:0xa46ac05d */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -1142,7 +1142,7 @@ __CDECLARE(__ATTR_CONST __ATTR_RETNONNULL,struct __unitraits const *,__NOTHROW,_
 /* Return the integer constant associated with a given digit index
  * Returns `0' if the given index is invalid
  * @param: digit_idx: As read from `__unitraits::__ut_digit_idx' */
-__CDECLARE(__ATTR_CONST,__UINT8_TYPE__,__NOTHROW,__unicode_descriptor_digit,(__UINT8_TYPE__ __digit_idx),(__digit_idx))
+__CDECLARE(__ATTR_CONST __ATTR_WUNUSED,__UINT8_TYPE__,__NOTHROW,__unicode_descriptor_digit,(__UINT8_TYPE__ __digit_idx),(__digit_idx))
 #endif /* !____unicode_descriptor_digit_defined && __CRT_HAVE___unicode_descriptor_digit */
 #ifdef __UINT64_TYPE__
 #if !defined(____unicode_descriptor_digit64_defined) && defined(__CRT_HAVE___unicode_descriptor_digit64)
@@ -1150,7 +1150,7 @@ __CDECLARE(__ATTR_CONST,__UINT8_TYPE__,__NOTHROW,__unicode_descriptor_digit,(__U
 /* Return the integer constant associated with a given digit index
  * Returns `0' if the given index is invalid
  * @param: digit_idx: As read from `__unitraits::__ut_digit_idx' */
-__CDECLARE(__ATTR_CONST,__UINT64_TYPE__,__NOTHROW,__unicode_descriptor_digit64,(__UINT8_TYPE__ __digit_idx),(__digit_idx))
+__CDECLARE(__ATTR_CONST __ATTR_WUNUSED,__UINT64_TYPE__,__NOTHROW,__unicode_descriptor_digit64,(__UINT8_TYPE__ __digit_idx),(__digit_idx))
 #endif /* !____unicode_descriptor_digit64_defined && __CRT_HAVE___unicode_descriptor_digit64 */
 #endif /* __UINT64_TYPE__ */
 #ifndef __NO_FPU
@@ -1159,7 +1159,7 @@ __CDECLARE(__ATTR_CONST,__UINT64_TYPE__,__NOTHROW,__unicode_descriptor_digit64,(
 /* Return the floating-point constant associated with a given digit index
  * Returns `0.0' if the given index is invalid
  * @param: digit_idx: As read from `__unitraits::__ut_digit_idx' */
-__CDECLARE(__ATTR_CONST,double,__NOTHROW,__unicode_descriptor_digitd,(__UINT8_TYPE__ __digit_idx),(__digit_idx))
+__CDECLARE(__ATTR_CONST __ATTR_WUNUSED,double,__NOTHROW,__unicode_descriptor_digitd,(__UINT8_TYPE__ __digit_idx),(__digit_idx))
 #endif /* !____unicode_descriptor_digitd_defined && __CRT_HAVE___unicode_descriptor_digitd */
 #ifdef __COMPILER_HAVE_LONGDOUBLE
 #if !defined(____unicode_descriptor_digitld_defined) && defined(__CRT_HAVE___unicode_descriptor_digitld)
@@ -1167,7 +1167,7 @@ __CDECLARE(__ATTR_CONST,double,__NOTHROW,__unicode_descriptor_digitd,(__UINT8_TY
 /* Return the floating-point constant associated with a given digit index
  * Returns `0.0' if the given index is invalid
  * @param: digit_idx: As read from `__unitraits::__ut_digit_idx' */
-__CDECLARE(__ATTR_CONST,__LONGDOUBLE,__NOTHROW,__unicode_descriptor_digitld,(__UINT8_TYPE__ __digit_idx),(__digit_idx))
+__CDECLARE(__ATTR_CONST __ATTR_WUNUSED,__LONGDOUBLE,__NOTHROW,__unicode_descriptor_digitld,(__UINT8_TYPE__ __digit_idx),(__digit_idx))
 #endif /* !____unicode_descriptor_digitld_defined && __CRT_HAVE___unicode_descriptor_digitld */
 #endif /* __COMPILER_HAVE_LONGDOUBLE */
 #endif /* !__NO_FPU */
@@ -1175,15 +1175,15 @@ __CDECLARE(__ATTR_CONST,__LONGDOUBLE,__NOTHROW,__unicode_descriptor_digitld,(__U
 #ifdef __CRT_HAVE___unicode_latin1flags
 #ifndef ____unicode_latin1flags_defined
 #define ____unicode_latin1flags_defined
-__LIBC __UINT16_TYPE__ const __unicode_latin1flags[256];
+__LIBC __UINT16_TYPE__ const __unicode_latin1flags[257] __CASMNAME_SAME("__unicode_latin1flags");
 #endif /* !____unicode_latin1flags_defined */
 #endif /* __CRT_HAVE___unicode_latin1flags */
 
 /* >> uint16_t __unicode_flags(char32_t ch); */
 #ifndef __unicode_flags
 #if defined(____unicode_descriptor_defined) && defined(____unicode_latin1flags_defined)
-#define __unicode_flags(ch)                                        \
-	(sizeof(ch) == 1 ? __unicode_latin1flags[(__UINT8_TYPE__)(ch)] \
+#define __unicode_flags(ch)                                            \
+	(sizeof(ch) == 1 ? (__unicode_latin1flags+1)[(__UINT8_TYPE__)(ch)] \
 	                 : __unicode_descriptor(ch)->__ut_flags)
 #elif defined(____unicode_descriptor_defined)
 #define __unicode_flags(ch) (__unicode_descriptor(ch)->__ut_flags)

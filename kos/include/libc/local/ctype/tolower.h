@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x4007fe64 */
+/* HASH CRC-32:0x2a324843 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -21,38 +21,15 @@
 #ifndef __local_tolower_defined
 #define __local_tolower_defined 1
 #include <__crt.h>
+#include <bits/crt/ctype.h>
 __NAMESPACE_LOCAL_BEGIN
-#if !defined(__local___localdep___ctype_tolower_loc_defined) && defined(__CRT_HAVE___ctype_tolower_loc)
-#define __local___localdep___ctype_tolower_loc_defined 1
-__NAMESPACE_LOCAL_END
-#include <hybrid/typecore.h>
-__NAMESPACE_LOCAL_BEGIN
-__CREDIRECT(__ATTR_PURE __ATTR_WUNUSED,__INT32_TYPE__ const **,__NOTHROW,__localdep___ctype_tolower_loc,(void),__ctype_tolower_loc,())
-#endif /* !__local___localdep___ctype_tolower_loc_defined && __CRT_HAVE___ctype_tolower_loc */
-#ifndef __local___localdep_isupper_defined
-#define __local___localdep_isupper_defined 1
-#if __has_builtin(__builtin_isupper) && defined(__LIBC_BIND_CRTBUILTINS) && defined(__CRT_HAVE_isupper)
-__CEIREDIRECT(__ATTR_CONST __ATTR_WUNUSED,int,__NOTHROW,__localdep_isupper,(int __ch),isupper,{ return __builtin_isupper(__ch); })
-#elif defined(__CRT_HAVE_isupper)
-__CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,int,__NOTHROW,__localdep_isupper,(int __ch),isupper,(__ch))
-#else /* ... */
-__NAMESPACE_LOCAL_END
-#include <libc/local/ctype/isupper.h>
-__NAMESPACE_LOCAL_BEGIN
-#define __localdep_isupper __LIBC_LOCAL_NAME(isupper)
-#endif /* !... */
-#endif /* !__local___localdep_isupper_defined */
 __LOCAL_LIBC(tolower) __ATTR_CONST __ATTR_WUNUSED int
 __NOTHROW(__LIBCCALL __LIBC_LOCAL_NAME(tolower))(int __ch) {
-
-
-
-#if defined(__CRT_HAVE___ctype_tolower_loc) && defined(__CRT_CYG)
-	return __ch >= -128 && __ch < 256 ? (*__localdep___ctype_tolower_loc())[__ch] : __ch;
-#else /* __CRT_HAVE___ctype_tolower_loc && __CRT_CYG */
-	return __localdep_isupper(__ch) ? ((__UINT8_TYPE__)__ch+0x20) : __ch;
-#endif /* !__CRT_HAVE___ctype_tolower_loc || !__CRT_CYG */
-
+#ifdef __crt_tolower
+	return __crt_tolower(__ch);
+#else /* __crt_tolower */
+	return __ascii_tolower(__ch);
+#endif /* !__crt_tolower */
 }
 __NAMESPACE_LOCAL_END
 #ifndef __local___localdep_tolower_defined

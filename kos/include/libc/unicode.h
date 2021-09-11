@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x6326e1cb */
+/* HASH CRC-32:0x9dbec6b1 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -93,19 +93,19 @@ __DECL_BEGIN
 #ifdef __CRT_HAVE___unicode_latin1flags
 #ifndef ____unicode_latin1flags_defined
 #define ____unicode_latin1flags_defined
-__LIBC __UINT16_TYPE__ const __unicode_latin1flags[256];
+__LIBC __UINT16_TYPE__ const __unicode_latin1flags[257] __CASMNAME_SAME("__unicode_latin1flags");
 #endif /* !____unicode_latin1flags_defined */
 #endif /* __CRT_HAVE___unicode_latin1flags */
 
 /* >> uint16_t __unicode_flags(char32_t ch); */
 #ifndef __unicode_flags
 #if defined(____unicode_descriptor_defined) && defined(____unicode_latin1flags_defined)
-#define __unicode_flags(ch)                                        \
-	(sizeof(ch) == 1 ? __unicode_latin1flags[(__UINT8_TYPE__)(ch)] \
+#define __unicode_flags(ch)                                            \
+	(sizeof(ch) == 1 ? (__unicode_latin1flags+1)[(__UINT8_TYPE__)(ch)] \
 	                 : __unicode_descriptor(ch)->__ut_flags)
 #elif defined(__libc___unicode_descriptor_defined) && defined(____unicode_latin1flags_defined)
-#define __unicode_flags(ch)                                        \
-	(sizeof(ch) == 1 ? __unicode_latin1flags[(__UINT8_TYPE__)(ch)] \
+#define __unicode_flags(ch)                                            \
+	(sizeof(ch) == 1 ? (__unicode_latin1flags+1)[(__UINT8_TYPE__)(ch)] \
 	                 : __libc___unicode_descriptor(ch)->__ut_flags)
 #elif defined(____unicode_descriptor_defined)
 #define __unicode_flags(ch) (__unicode_descriptor(ch)->__ut_flags)

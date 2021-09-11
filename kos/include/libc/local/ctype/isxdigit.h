@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x9583e553 */
+/* HASH CRC-32:0x803546fe */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -21,59 +21,15 @@
 #ifndef __local_isxdigit_defined
 #define __local_isxdigit_defined 1
 #include <__crt.h>
+#include <bits/crt/ctype.h>
 __NAMESPACE_LOCAL_BEGIN
-#if !defined(__local___localdep___ctype_b_loc_defined) && defined(__CRT_HAVE___ctype_b_loc)
-#define __local___localdep___ctype_b_loc_defined 1
-__NAMESPACE_LOCAL_END
-#include <hybrid/typecore.h>
-__NAMESPACE_LOCAL_BEGIN
-__CREDIRECT(__ATTR_PURE __ATTR_WUNUSED,__UINT16_TYPE__ const **,__NOTHROW,__localdep___ctype_b_loc,(void),__ctype_b_loc,())
-#endif /* !__local___localdep___ctype_b_loc_defined && __CRT_HAVE___ctype_b_loc */
-#if !defined(__local___localdep___locale_ctype_ptr_defined) && defined(__CRT_HAVE___locale_ctype_ptr)
-#define __local___localdep___locale_ctype_ptr_defined 1
-__CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,char const *,__NOTHROW,__localdep___locale_ctype_ptr,(void),__locale_ctype_ptr,())
-#endif /* !__local___localdep___locale_ctype_ptr_defined && __CRT_HAVE___locale_ctype_ptr */
-#if !defined(__local___localdep__isctype_defined) && defined(__CRT_HAVE__isctype)
-#define __local___localdep__isctype_defined 1
-__CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,int,__NOTHROW,__localdep__isctype,(int __ch, int __mask),_isctype,(__ch,__mask))
-#endif /* !__local___localdep__isctype_defined && __CRT_HAVE__isctype */
-#ifndef __local___localdep_isdigit_defined
-#define __local___localdep_isdigit_defined 1
-#if __has_builtin(__builtin_isdigit) && defined(__LIBC_BIND_CRTBUILTINS) && defined(__CRT_HAVE_isdigit)
-__CEIREDIRECT(__ATTR_CONST __ATTR_WUNUSED,int,__NOTHROW,__localdep_isdigit,(int __ch),isdigit,{ return __builtin_isdigit(__ch); })
-#elif defined(__CRT_HAVE_isdigit)
-__CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,int,__NOTHROW,__localdep_isdigit,(int __ch),isdigit,(__ch))
-#else /* ... */
-__NAMESPACE_LOCAL_END
-#include <libc/local/ctype/isdigit.h>
-__NAMESPACE_LOCAL_BEGIN
-#define __localdep_isdigit __LIBC_LOCAL_NAME(isdigit)
-#endif /* !... */
-#endif /* !__local___localdep_isdigit_defined */
 __LOCAL_LIBC(isxdigit) __ATTR_CONST __ATTR_WUNUSED int
 __NOTHROW(__LIBCCALL __LIBC_LOCAL_NAME(isxdigit))(int __ch) {
-
-
-
-
-
-#if defined(__CRT_HAVE___ctype_b_loc) && defined(__CRT_GLC)
-#include <hybrid/byteorder.h>
-#if __BYTE_ORDER__ == __ORDER_BIG_ENDIAN__
-	return (*__localdep___ctype_b_loc())[__ch] & (1 << 4);
-#else /* __BYTE_ORDER__ == __ORDER_BIG_ENDIAN__ */
-	return (*__localdep___ctype_b_loc())[__ch] & (1 << 12);
-#endif /* __BYTE_ORDER__ != __ORDER_BIG_ENDIAN__ */
-#elif defined(__CRT_HAVE___locale_ctype_ptr) && defined(__CRT_CYG)
-	return ((__localdep___locale_ctype_ptr() + 1)[__ch & 0xff] & 0104) != 0;
-#elif defined(__CRT_HAVE__isctype) && defined(__CRT_DOS)
-	return __localdep__isctype(__ch, 0x0080);
-#else /* ... */
-	return __localdep_isdigit(__ch) ||
-	       ((__UINT8_TYPE__)__ch >= 0x41 && (__UINT8_TYPE__)__ch <= 0x46) ||
-	       ((__UINT8_TYPE__)__ch >= 0x61 && (__UINT8_TYPE__)__ch <= 0x66);
-#endif /* !... */
-
+#ifdef __crt_isxdigit
+	return __crt_isxdigit(__ch);
+#else /* __crt_isxdigit */
+	return __ascii_isxdigit(__ch);
+#endif /* !__crt_isxdigit */
 }
 __NAMESPACE_LOCAL_END
 #ifndef __local___localdep_isxdigit_defined

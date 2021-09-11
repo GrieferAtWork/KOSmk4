@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x8bc173bf */
+/* HASH CRC-32:0xafac11f7 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -26,6 +26,9 @@
 #define __CRT_HAVE___afail
 #define __CRT_HAVE___afailf
 #define __CRT_HAVE___crt_unreachable
+#define __CRT_HAVE___ctype_flags
+#define __CRT_HAVE___ctype_tolower
+#define __CRT_HAVE___ctype_toupper
 #define __CRT_HAVE___cxa_begin_catch
 #define __CRT_HAVE___cxa_end_catch
 #define __CRT_HAVE___cxa_rethrow
@@ -69,18 +72,6 @@
 #define __CRT_HAVE_format_vprintf
 #define __CRT_HAVE_format_vscanf
 #define __CRT_HAVE_format_width
-#define __CRT_HAVE_isalnum
-#define __CRT_HAVE_isalpha
-#define __CRT_HAVE_isblank
-#define __CRT_HAVE_iscntrl
-#define __CRT_HAVE_isdigit
-#define __CRT_HAVE_isgraph
-#define __CRT_HAVE_islower
-#define __CRT_HAVE_isprint
-#define __CRT_HAVE_ispunct
-#define __CRT_HAVE_isspace
-#define __CRT_HAVE_isupper
-#define __CRT_HAVE_isxdigit
 #define __CRT_HAVE_memcasecmp
 #define __CRT_HAVE_memchr
 #define __CRT_HAVE_memchrl
@@ -201,8 +192,6 @@
 #define __CRT_HAVE_strtou32_r
 #define __CRT_HAVE_strtou64
 #define __CRT_HAVE_strtou64_r
-#define __CRT_HAVE_tolower
-#define __CRT_HAVE_toupper
 #define __CRT_HAVE_unicode_16to32
 #define __CRT_HAVE_unicode_16to8
 #define __CRT_HAVE_unicode_32to16

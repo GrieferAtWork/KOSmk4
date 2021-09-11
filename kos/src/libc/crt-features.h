@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xf93c43aa */
+/* HASH CRC-32:0xe854f906 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -3223,7 +3223,18 @@
 #define __CRT_HAVE___crt_unreachable
 #ifndef __KERNEL__
 #define __CRT_HAVE___ctype_b_loc
+#endif /* !__KERNEL__ */
+#ifdef __KERNEL__
+#define __CRT_HAVE___ctype_flags
+#define __CRT_HAVE___ctype_tolower
+#endif /* __KERNEL__ */
+#ifndef __KERNEL__
 #define __CRT_HAVE___ctype_tolower_loc
+#endif /* !__KERNEL__ */
+#ifdef __KERNEL__
+#define __CRT_HAVE___ctype_toupper
+#endif /* __KERNEL__ */
+#ifndef __KERNEL__
 #define __CRT_HAVE___ctype_toupper_loc
 #endif /* !__KERNEL__ */
 #define __CRT_HAVE___cxa_begin_catch
@@ -4657,60 +4668,38 @@
 #define __CRT_HAVE_iopl
 #define __CRT_HAVE_iruserok
 #define __CRT_HAVE_iruserok_af
-#endif /* !__KERNEL__ */
 #define __CRT_HAVE_isalnum
-#ifndef __KERNEL__
 #define __CRT_HAVE_isalnum_l
-#endif /* !__KERNEL__ */
 #define __CRT_HAVE_isalpha
-#ifndef __KERNEL__
 #define __CRT_HAVE_isalpha_l
 #define __CRT_HAVE_isascii
 #define __CRT_HAVE_isastream
 #define __CRT_HAVE_isatty
-#endif /* !__KERNEL__ */
 #define __CRT_HAVE_isblank
-#ifndef __KERNEL__
 #define __CRT_HAVE_isblank_l
-#endif /* !__KERNEL__ */
 #define __CRT_HAVE_iscntrl
-#ifndef __KERNEL__
 #define __CRT_HAVE_iscntrl_l
-#endif /* !__KERNEL__ */
 #define __CRT_HAVE_isdigit
-#ifndef __KERNEL__
 #define __CRT_HAVE_isdigit_l
 #define __CRT_HAVE_isfdtype
-#endif /* !__KERNEL__ */
 #define __CRT_HAVE_isgraph
-#ifndef __KERNEL__
 #define __CRT_HAVE_isgraph_l
 #define __CRT_HAVE_isinf
 #define __CRT_HAVE_isinff
 #define __CRT_HAVE_isinfl
 #define __CRT_HAVE_isleadbyte
-#endif /* !__KERNEL__ */
 #define __CRT_HAVE_islower
-#ifndef __KERNEL__
 #define __CRT_HAVE_islower_l
 #define __CRT_HAVE_isnan
 #define __CRT_HAVE_isnanf
 #define __CRT_HAVE_isnanl
-#endif /* !__KERNEL__ */
 #define __CRT_HAVE_isprint
-#ifndef __KERNEL__
 #define __CRT_HAVE_isprint_l
-#endif /* !__KERNEL__ */
 #define __CRT_HAVE_ispunct
-#ifndef __KERNEL__
 #define __CRT_HAVE_ispunct_l
-#endif /* !__KERNEL__ */
 #define __CRT_HAVE_isspace
-#ifndef __KERNEL__
 #define __CRT_HAVE_isspace_l
-#endif /* !__KERNEL__ */
 #define __CRT_HAVE_isupper
-#ifndef __KERNEL__
 #define __CRT_HAVE_isupper_l
 #define __CRT_HAVE_iswalnum
 #define __CRT_HAVE_iswalnum_l
@@ -4739,9 +4728,7 @@
 #define __CRT_HAVE_iswupper_l
 #define __CRT_HAVE_iswxdigit
 #define __CRT_HAVE_iswxdigit_l
-#endif /* !__KERNEL__ */
 #define __CRT_HAVE_isxdigit
-#ifndef __KERNEL__
 #define __CRT_HAVE_isxdigit_l
 #define __CRT_HAVE_itoa
 #define __CRT_HAVE_j0
@@ -5948,13 +5935,9 @@
 #define __CRT_HAVE_tmpnam_r
 #define __CRT_HAVE_tmpnam_s
 #define __CRT_HAVE_toascii
-#endif /* !__KERNEL__ */
 #define __CRT_HAVE_tolower
-#ifndef __KERNEL__
 #define __CRT_HAVE_tolower_l
-#endif /* !__KERNEL__ */
 #define __CRT_HAVE_toupper
-#ifndef __KERNEL__
 #define __CRT_HAVE_toupper_l
 #define __CRT_HAVE_towctrans
 #define __CRT_HAVE_towctrans_l

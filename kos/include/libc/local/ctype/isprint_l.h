@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xf05afcbf */
+/* HASH CRC-32:0xb389a15a */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -22,17 +22,16 @@
 #define __local_isprint_l_defined 1
 #include <__crt.h>
 __NAMESPACE_LOCAL_BEGIN
-#if !defined(__local___localdep___locale_ctype_ptr_l_defined) && defined(__CRT_HAVE___locale_ctype_ptr_l)
-#define __local___localdep___locale_ctype_ptr_l_defined 1
-__CREDIRECT(__ATTR_PURE __ATTR_WUNUSED,char const *,__NOTHROW_NCX,__localdep___locale_ctype_ptr_l,(__locale_t __locale),__locale_ctype_ptr_l,(__locale))
-#endif /* !__local___localdep___locale_ctype_ptr_l_defined && __CRT_HAVE___locale_ctype_ptr_l */
-#if !defined(__local___localdep__isctype_l_defined) && defined(__CRT_HAVE__isctype_l)
-#define __local___localdep__isctype_l_defined 1
-__CREDIRECT(__ATTR_PURE __ATTR_WUNUSED,int,__NOTHROW_NCX,__localdep__isctype_l,(int __ch, int __mask, __locale_t __locale),_isctype_l,(__ch,__mask,__locale))
-#endif /* !__local___localdep__isctype_l_defined && __CRT_HAVE__isctype_l */
 #ifndef __local___localdep_isprint_defined
 #define __local___localdep_isprint_defined 1
-#if __has_builtin(__builtin_isprint) && defined(__LIBC_BIND_CRTBUILTINS) && defined(__CRT_HAVE_isprint)
+__NAMESPACE_LOCAL_END
+#include <bits/crt/ctype.h>
+__NAMESPACE_LOCAL_BEGIN
+#if defined(__crt_isprint) && defined(__CRT_HAVE_isprint)
+__CEIREDIRECT(__ATTR_CONST __ATTR_WUNUSED,int,__NOTHROW,__localdep_isprint,(int __ch),isprint,{ return __crt_isprint(__ch); })
+#elif defined(__crt_isprint)
+__LOCAL __ATTR_CONST __ATTR_WUNUSED int __NOTHROW(__LIBCCALL __localdep_isprint)(int __ch) { return __crt_isprint(__ch); }
+#elif __has_builtin(__builtin_isprint) && defined(__LIBC_BIND_CRTBUILTINS) && defined(__CRT_HAVE_isprint)
 __CEIREDIRECT(__ATTR_CONST __ATTR_WUNUSED,int,__NOTHROW,__localdep_isprint,(int __ch),isprint,{ return __builtin_isprint(__ch); })
 #elif defined(__CRT_HAVE_isprint)
 __CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,int,__NOTHROW,__localdep_isprint,(int __ch),isprint,(__ch))
@@ -45,28 +44,9 @@ __NAMESPACE_LOCAL_BEGIN
 #endif /* !__local___localdep_isprint_defined */
 __LOCAL_LIBC(isprint_l) __ATTR_PURE __ATTR_WUNUSED int
 __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(isprint_l))(int __ch, __locale_t __locale) {
-
-
-
-
-
-#if defined(__CRT_HAVE___ctype_b_loc) && defined(__CRT_GLC)
-#include <hybrid/byteorder.h>
-#if __BYTE_ORDER__ == __ORDER_BIG_ENDIAN__
-	return __locale->__ctype_b[__ch] & (1 << 6);
-#else /* __BYTE_ORDER__ == __ORDER_BIG_ENDIAN__ */
-	return __locale->__ctype_b[__ch] & (1 << 14);
-#endif /* __BYTE_ORDER__ != __ORDER_BIG_ENDIAN__ */
-#elif defined(__CRT_HAVE___locale_ctype_ptr_l) && defined(__CRT_CYG)
-	return ((__localdep___locale_ctype_ptr_l(__locale) + 1)[__ch & 0xff] & 0227) != 0;
-#elif defined(__CRT_HAVE__isctype_l) && defined(__CRT_DOS)
-	return __localdep__isctype_l(__ch, 0x0157, __locale);
-#else /* ... */
-	(void)__locale;
 	__COMPILER_IMPURE();
+	(void)__locale;
 	return __localdep_isprint(__ch);
-#endif /* !... */
-
 }
 __NAMESPACE_LOCAL_END
 #ifndef __local___localdep_isprint_l_defined

@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x73abab92 */
+/* HASH CRC-32:0x5e4496f1 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -108,28 +108,28 @@ __CREDIRECT(__ATTR_CONST __ATTR_RETNONNULL,struct __unitraits const *,__NOTHROW,
 /* Return the integer constant associated with a given digit index
  * Returns `0' if the given index is invalid
  * @param: digit_idx: As read from `__unitraits::__ut_digit_idx' */
-__CREDIRECT(__ATTR_CONST,__UINT8_TYPE__,__NOTHROW,__libc_core___unicode_descriptor_digit,(__UINT8_TYPE__ __digit_idx),__unicode_descriptor_digit,(__digit_idx))
+__CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,__UINT8_TYPE__,__NOTHROW,__libc_core___unicode_descriptor_digit,(__UINT8_TYPE__ __digit_idx),__unicode_descriptor_digit,(__digit_idx))
 #endif /* !____libc_core___unicode_descriptor_digit_defined && __CRT_HAVE___unicode_descriptor_digit */
 #if !defined(____libc_core___unicode_descriptor_digit64_defined) && defined(__CRT_HAVE___unicode_descriptor_digit64)
 #define ____libc_core___unicode_descriptor_digit64_defined 1
 /* Return the integer constant associated with a given digit index
  * Returns `0' if the given index is invalid
  * @param: digit_idx: As read from `__unitraits::__ut_digit_idx' */
-__CREDIRECT(__ATTR_CONST,__UINT64_TYPE__,__NOTHROW,__libc_core___unicode_descriptor_digit64,(__UINT8_TYPE__ __digit_idx),__unicode_descriptor_digit64,(__digit_idx))
+__CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,__UINT64_TYPE__,__NOTHROW,__libc_core___unicode_descriptor_digit64,(__UINT8_TYPE__ __digit_idx),__unicode_descriptor_digit64,(__digit_idx))
 #endif /* !____libc_core___unicode_descriptor_digit64_defined && __CRT_HAVE___unicode_descriptor_digit64 */
 #if !defined(____libc_core___unicode_descriptor_digitd_defined) && defined(__CRT_HAVE___unicode_descriptor_digitd)
 #define ____libc_core___unicode_descriptor_digitd_defined 1
 /* Return the floating-point constant associated with a given digit index
  * Returns `0.0' if the given index is invalid
  * @param: digit_idx: As read from `__unitraits::__ut_digit_idx' */
-__CREDIRECT(__ATTR_CONST,double,__NOTHROW,__libc_core___unicode_descriptor_digitd,(__UINT8_TYPE__ __digit_idx),__unicode_descriptor_digitd,(__digit_idx))
+__CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,double,__NOTHROW,__libc_core___unicode_descriptor_digitd,(__UINT8_TYPE__ __digit_idx),__unicode_descriptor_digitd,(__digit_idx))
 #endif /* !____libc_core___unicode_descriptor_digitd_defined && __CRT_HAVE___unicode_descriptor_digitd */
 #if !defined(____libc_core___unicode_descriptor_digitld_defined) && defined(__CRT_HAVE___unicode_descriptor_digitld)
 #define ____libc_core___unicode_descriptor_digitld_defined 1
 /* Return the floating-point constant associated with a given digit index
  * Returns `0.0' if the given index is invalid
  * @param: digit_idx: As read from `__unitraits::__ut_digit_idx' */
-__CREDIRECT(__ATTR_CONST,__LONGDOUBLE,__NOTHROW,__libc_core___unicode_descriptor_digitld,(__UINT8_TYPE__ __digit_idx),__unicode_descriptor_digitld,(__digit_idx))
+__CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,__LONGDOUBLE,__NOTHROW,__libc_core___unicode_descriptor_digitld,(__UINT8_TYPE__ __digit_idx),__unicode_descriptor_digitld,(__digit_idx))
 #endif /* !____libc_core___unicode_descriptor_digitld_defined && __CRT_HAVE___unicode_descriptor_digitld */
 #ifdef __CRT_HAVE_unicode_fold
 /* Fold the given unicode character `ch' */

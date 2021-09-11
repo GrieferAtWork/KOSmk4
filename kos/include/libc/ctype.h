@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x71f73b7 */
+/* HASH CRC-32:0x8f5a74bb */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -27,19 +27,33 @@
 #include <__crt.h>
 #include "core/ctype.h"
 
+/* >> iscntrl(3) */
 #define __libc_iscntrl __libc_core_iscntrl
+/* >> isspace(3) */
 #define __libc_isspace __libc_core_isspace
+/* >> isupper(3) */
 #define __libc_isupper __libc_core_isupper
+/* >> islower(3) */
 #define __libc_islower __libc_core_islower
+/* >> isalpha(3) */
 #define __libc_isalpha __libc_core_isalpha
+/* >> isdigit(3) */
 #define __libc_isdigit __libc_core_isdigit
+/* >> isxdigit(3) */
 #define __libc_isxdigit __libc_core_isxdigit
+/* >> isalnum(3) */
 #define __libc_isalnum __libc_core_isalnum
+/* >> ispunct(3) */
 #define __libc_ispunct __libc_core_ispunct
+/* >> isgraph(3) */
 #define __libc_isgraph __libc_core_isgraph
+/* >> isprint(3) */
 #define __libc_isprint __libc_core_isprint
+/* >> tolower(3) */
 #define __libc_tolower __libc_core_tolower
+/* >> toupper(3) */
 #define __libc_toupper __libc_core_toupper
+/* >> isblank(3) */
 #define __libc_isblank __libc_core_isblank
 
 #endif /* __CC__ */

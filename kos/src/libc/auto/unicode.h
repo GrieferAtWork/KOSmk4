@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x9ab70910 */
+/* HASH CRC-32:0xb8c210b4 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -386,19 +386,19 @@ INTDEF ATTR_CONST ATTR_RETNONNULL struct __unitraits const *NOTHROW(LIBDCALL lib
 /* Return the integer constant associated with a given digit index
  * Returns `0' if the given index is invalid
  * @param: digit_idx: As read from `__unitraits::__ut_digit_idx' */
-INTDEF ATTR_CONST uint8_t NOTHROW(LIBDCALL libd___unicode_descriptor_digit)(uint8_t digit_idx);
+INTDEF ATTR_CONST WUNUSED uint8_t NOTHROW(LIBDCALL libd___unicode_descriptor_digit)(uint8_t digit_idx);
 /* Return the integer constant associated with a given digit index
  * Returns `0' if the given index is invalid
  * @param: digit_idx: As read from `__unitraits::__ut_digit_idx' */
-INTDEF ATTR_CONST uint64_t NOTHROW(LIBDCALL libd___unicode_descriptor_digit64)(uint8_t digit_idx);
+INTDEF ATTR_CONST WUNUSED uint64_t NOTHROW(LIBDCALL libd___unicode_descriptor_digit64)(uint8_t digit_idx);
 /* Return the floating-point constant associated with a given digit index
  * Returns `0.0' if the given index is invalid
  * @param: digit_idx: As read from `__unitraits::__ut_digit_idx' */
-INTDEF ATTR_CONST double NOTHROW(LIBDCALL libd___unicode_descriptor_digitd)(uint8_t digit_idx);
+INTDEF ATTR_CONST WUNUSED double NOTHROW(LIBDCALL libd___unicode_descriptor_digitd)(uint8_t digit_idx);
 /* Return the floating-point constant associated with a given digit index
  * Returns `0.0' if the given index is invalid
  * @param: digit_idx: As read from `__unitraits::__ut_digit_idx' */
-INTDEF ATTR_CONST __LONGDOUBLE NOTHROW(LIBDCALL libd___unicode_descriptor_digitld)(uint8_t digit_idx);
+INTDEF ATTR_CONST WUNUSED __LONGDOUBLE NOTHROW(LIBDCALL libd___unicode_descriptor_digitld)(uint8_t digit_idx);
 /* Fold the given unicode character `ch' */
 INTDEF ATTR_RETNONNULL NONNULL((2)) char32_t *NOTHROW_NCX(LIBDCALL libd_unicode_fold)(char32_t ch, char32_t buf[3]);
 #endif /* !__LIBCCALL_IS_LIBDCALL && !__KERNEL__ */

@@ -1874,21 +1874,21 @@ $ssize_t format_32to16(/*struct format_32to16_data **/ void *arg,
 
 
 @@Return the internal descriptor for the given `ch'
-[[guard, libc, decl_include("<bits/crt/unicode.h>")]]
-[[const, nonnull, nothrow]]
+[[decl_include("<bits/crt/unicode.h>")]]
+[[guard, libc, const, nonnull, nothrow]]
 struct __unitraits const *__unicode_descriptor(char32_t ch);
 
 @@Return the integer constant associated with a given digit index
 @@Returns `0' if the given index is invalid
 @@@param: digit_idx: As read from `__unitraits::__ut_digit_idx'
-[[guard, libc, const, nothrow]]
+[[guard, libc, wunused, const, nothrow]]
 $uint8_t __unicode_descriptor_digit($uint8_t digit_idx);
 
 %#ifdef __UINT64_TYPE__
 @@Return the integer constant associated with a given digit index
 @@Returns `0' if the given index is invalid
 @@@param: digit_idx: As read from `__unitraits::__ut_digit_idx'
-[[guard, libc, const, nothrow]]
+[[guard, libc, wunused, const, nothrow]]
 $uint64_t __unicode_descriptor_digit64($uint8_t digit_idx);
 %#endif /* __UINT64_TYPE__ */
 
@@ -1896,11 +1896,12 @@ $uint64_t __unicode_descriptor_digit64($uint8_t digit_idx);
 @@Return the floating-point constant associated with a given digit index
 @@Returns `0.0' if the given index is invalid
 @@@param: digit_idx: As read from `__unitraits::__ut_digit_idx'
-[[guard, libc, const, nothrow]]
+[[guard, libc, wunused, const, nothrow]]
 double __unicode_descriptor_digitd($uint8_t digit_idx);
 
 %#ifdef __COMPILER_HAVE_LONGDOUBLE
-[[guard, libc, const, nothrow, doc_alias("__unicode_descriptor_digitd")]]
+[[guard, libc, wunused, const, nothrow]]
+[[doc_alias("__unicode_descriptor_digitd")]]
 __LONGDOUBLE __unicode_descriptor_digitld($uint8_t digit_idx);
 %#endif /* __COMPILER_HAVE_LONGDOUBLE */
 %#endif /* !__NO_FPU */
@@ -1910,15 +1911,15 @@ __LONGDOUBLE __unicode_descriptor_digitld($uint8_t digit_idx);
 #ifdef __CRT_HAVE___unicode_latin1flags
 #ifndef ____unicode_latin1flags_defined
 #define ____unicode_latin1flags_defined
-__LIBC __UINT16_TYPE__ const __unicode_latin1flags[256];
+__LIBC __UINT16_TYPE__ const __unicode_latin1flags[257] __CASMNAME_SAME("__unicode_latin1flags");
 #endif /* !____unicode_latin1flags_defined */
 #endif /* __CRT_HAVE___unicode_latin1flags */
 
 /* >> uint16_t __unicode_flags(char32_t ch); */
 #ifndef __unicode_flags
 #if defined(____unicode_descriptor_defined) && defined(____unicode_latin1flags_defined)
-#define __unicode_flags(ch)                                        \
-	(sizeof(ch) == 1 ? __unicode_latin1flags[(__UINT8_TYPE__)(ch)] \
+#define __unicode_flags(ch)                                            \
+	(sizeof(ch) == 1 ? (__unicode_latin1flags+1)[(__UINT8_TYPE__)(ch)] \
 	                 : __unicode_descriptor(ch)->__ut_flags)
 #elif defined(____unicode_descriptor_defined)
 #define __unicode_flags(ch) (__unicode_descriptor(ch)->__ut_flags)
@@ -2205,19 +2206,19 @@ __DECL_BEGIN
 #ifdef __CRT_HAVE___unicode_latin1flags
 #ifndef ____unicode_latin1flags_defined
 #define ____unicode_latin1flags_defined
-__LIBC __UINT16_TYPE__ const __unicode_latin1flags[256];
+__LIBC __UINT16_TYPE__ const __unicode_latin1flags[257] __CASMNAME_SAME("__unicode_latin1flags");
 #endif /* !____unicode_latin1flags_defined */
 #endif /* __CRT_HAVE___unicode_latin1flags */
 
 /* >> uint16_t __unicode_flags(char32_t ch); */
 #ifndef __unicode_flags
 #if defined(____unicode_descriptor_defined) && defined(____unicode_latin1flags_defined)
-#define __unicode_flags(ch)                                        \
-	(sizeof(ch) == 1 ? __unicode_latin1flags[(__UINT8_TYPE__)(ch)] \
+#define __unicode_flags(ch)                                            \
+	(sizeof(ch) == 1 ? (__unicode_latin1flags+1)[(__UINT8_TYPE__)(ch)] \
 	                 : __unicode_descriptor(ch)->__ut_flags)
 #elif defined(__libc___unicode_descriptor_defined) && defined(____unicode_latin1flags_defined)
-#define __unicode_flags(ch)                                        \
-	(sizeof(ch) == 1 ? __unicode_latin1flags[(__UINT8_TYPE__)(ch)] \
+#define __unicode_flags(ch)                                            \
+	(sizeof(ch) == 1 ? (__unicode_latin1flags+1)[(__UINT8_TYPE__)(ch)] \
 	                 : __libc___unicode_descriptor(ch)->__ut_flags)
 #elif defined(____unicode_descriptor_defined)
 #define __unicode_flags(ch) (__unicode_descriptor(ch)->__ut_flags)

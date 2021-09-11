@@ -1189,9 +1189,7 @@
 #define __CRT_HAVE__tempnam
 #define __CRT_HAVE__tempnam_dbg
 #define __CRT_HAVE__time64
-#define __CRT_HAVE__tolower
 #define __CRT_HAVE__tolower_l
-#define __CRT_HAVE__toupper
 #define __CRT_HAVE__toupper_l
 #define __CRT_HAVE__towlower_l
 #define __CRT_HAVE__towupper_l

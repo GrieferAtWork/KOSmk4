@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x750df04 */
+/* HASH CRC-32:0x3e25d93c */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -22,17 +22,16 @@
 #define __local_isspace_l_defined 1
 #include <__crt.h>
 __NAMESPACE_LOCAL_BEGIN
-#if !defined(__local___localdep___locale_ctype_ptr_l_defined) && defined(__CRT_HAVE___locale_ctype_ptr_l)
-#define __local___localdep___locale_ctype_ptr_l_defined 1
-__CREDIRECT(__ATTR_PURE __ATTR_WUNUSED,char const *,__NOTHROW_NCX,__localdep___locale_ctype_ptr_l,(__locale_t __locale),__locale_ctype_ptr_l,(__locale))
-#endif /* !__local___localdep___locale_ctype_ptr_l_defined && __CRT_HAVE___locale_ctype_ptr_l */
-#if !defined(__local___localdep__isctype_l_defined) && defined(__CRT_HAVE__isctype_l)
-#define __local___localdep__isctype_l_defined 1
-__CREDIRECT(__ATTR_PURE __ATTR_WUNUSED,int,__NOTHROW_NCX,__localdep__isctype_l,(int __ch, int __mask, __locale_t __locale),_isctype_l,(__ch,__mask,__locale))
-#endif /* !__local___localdep__isctype_l_defined && __CRT_HAVE__isctype_l */
 #ifndef __local___localdep_isspace_defined
 #define __local___localdep_isspace_defined 1
-#if __has_builtin(__builtin_isspace) && defined(__LIBC_BIND_CRTBUILTINS) && defined(__CRT_HAVE_isspace)
+__NAMESPACE_LOCAL_END
+#include <bits/crt/ctype.h>
+__NAMESPACE_LOCAL_BEGIN
+#if defined(__crt_isspace) && defined(__CRT_HAVE_isspace)
+__CEIREDIRECT(__ATTR_CONST __ATTR_WUNUSED,int,__NOTHROW,__localdep_isspace,(int __ch),isspace,{ return __crt_isspace(__ch); })
+#elif defined(__crt_isspace)
+__LOCAL __ATTR_CONST __ATTR_WUNUSED int __NOTHROW(__LIBCCALL __localdep_isspace)(int __ch) { return __crt_isspace(__ch); }
+#elif __has_builtin(__builtin_isspace) && defined(__LIBC_BIND_CRTBUILTINS) && defined(__CRT_HAVE_isspace)
 __CEIREDIRECT(__ATTR_CONST __ATTR_WUNUSED,int,__NOTHROW,__localdep_isspace,(int __ch),isspace,{ return __builtin_isspace(__ch); })
 #elif defined(__CRT_HAVE_isspace)
 __CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,int,__NOTHROW,__localdep_isspace,(int __ch),isspace,(__ch))
@@ -45,28 +44,9 @@ __NAMESPACE_LOCAL_BEGIN
 #endif /* !__local___localdep_isspace_defined */
 __LOCAL_LIBC(isspace_l) __ATTR_PURE __ATTR_WUNUSED int
 __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(isspace_l))(int __ch, __locale_t __locale) {
-
-
-
-
-
-#if defined(__CRT_HAVE___ctype_b_loc) && defined(__CRT_GLC)
-#include <hybrid/byteorder.h>
-#if __BYTE_ORDER__ == __ORDER_BIG_ENDIAN__
-	return __locale->__ctype_b[__ch] & (1 << 5);
-#else /* __BYTE_ORDER__ == __ORDER_BIG_ENDIAN__ */
-	return __locale->__ctype_b[__ch] & (1 << 13);
-#endif /* __BYTE_ORDER__ != __ORDER_BIG_ENDIAN__ */
-#elif defined(__CRT_HAVE___locale_ctype_ptr_l) && defined(__CRT_CYG)
-	return ((__localdep___locale_ctype_ptr_l(__locale) + 1)[__ch & 0xff] & 010) != 0;
-#elif defined(__CRT_HAVE__isctype_l) && defined(__CRT_DOS)
-	return __localdep__isctype_l(__ch, 0x0008, __locale);
-#else /* ... */
-	(void)__locale;
 	__COMPILER_IMPURE();
+	(void)__locale;
 	return __localdep_isspace(__ch);
-#endif /* !... */
-
 }
 __NAMESPACE_LOCAL_END
 #ifndef __local___localdep_isspace_l_defined

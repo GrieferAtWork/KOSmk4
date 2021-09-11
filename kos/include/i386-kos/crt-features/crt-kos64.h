@@ -5548,9 +5548,7 @@
 #define __CRT_HAVE__telli64
 #define __CRT_HAVE__tempnam
 #define __CRT_HAVE__time64
-#define __CRT_HAVE__tolower
 #define __CRT_HAVE__tolower_l
-#define __CRT_HAVE__toupper
 #define __CRT_HAVE__toupper_l
 #define __CRT_HAVE__towlower_l
 #define __CRT_HAVE__towupper_l
@@ -9112,9 +9110,7 @@
 #define __CRT_HAVE_DOS$_telli64
 #define __CRT_HAVE_DOS$_tempnam
 #define __CRT_HAVE_DOS$_time64
-#define __CRT_HAVE_DOS$_tolower
 #define __CRT_HAVE_DOS$_tolower_l
-#define __CRT_HAVE_DOS$_toupper
 #define __CRT_HAVE_DOS$_toupper_l
 #define __CRT_HAVE_DOS$_towlower_l
 #define __CRT_HAVE_DOS$_towupper_l

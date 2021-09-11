@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x7710e59a */
+/* HASH CRC-32:0x4951454a */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -162,9 +162,7 @@ DEFINE_PUBLIC_ALIAS(DOS$isalnum, libd_isalnum);
 DEFINE_PUBLIC_ALIAS(DOS$ispunct, libd_ispunct);
 DEFINE_PUBLIC_ALIAS(DOS$isgraph, libd_isgraph);
 DEFINE_PUBLIC_ALIAS(DOS$isprint, libd_isprint);
-DEFINE_PUBLIC_ALIAS(DOS$_tolower, libd_tolower);
 DEFINE_PUBLIC_ALIAS(DOS$tolower, libd_tolower);
-DEFINE_PUBLIC_ALIAS(DOS$_toupper, libd_toupper);
 DEFINE_PUBLIC_ALIAS(DOS$toupper, libd_toupper);
 DEFINE_PUBLIC_ALIAS(DOS$isblank, libd_isblank);
 DEFINE_PUBLIC_ALIAS(DOS$__iscntrl_l, libd_iscntrl_l);

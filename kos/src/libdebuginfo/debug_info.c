@@ -2035,7 +2035,8 @@ struct varname_prefix {
 	unsigned int           vp_fmt;  /* Format option name. */
 };
 
-LOCAL bool CC need_space(char a, char b) {
+LOCAL ATTR_CONST bool
+NOTHROW(CC need_space)(char a, char b) {
 	if (a == b && (a == '*' || a == '&'))
 		return true; /* &[ ]&  (prevent token concat) */
 	if (isalnum(a))

@@ -54,18 +54,181 @@
 %[define_str2wcs_replacement(iscntrl  = iswcntrl)]
 %[define_str2wcs_replacement(isblank  = iswblank)]
 
+%[declare_kernel_only_export("__ctype_flags")]
+%[declare_kernel_only_export("__ctype_tolower")]
+%[declare_kernel_only_export("__ctype_toupper")]
+
+
+/* In kernel-space, functions from <ctype.h> are implemented as ASCII-only
+ * by use of a couple of lookup  tables. (one for flags, one for  tolower,
+ * and one for toupper)
+ *
+ * Kernel CTYPE flags are defined as follows:
+ *     0x01: iscntrl   00-1F, 7F
+ *     0x02: isspace   09-0D, 20
+ *     0x04: islower   61-7A
+ *     0x08: isupper   41-5A
+ *     0x10: isdigit   30-39
+ *     0x20: ishex     41-46, 61-66
+ *     0x40: ispunct   21-2F, 3A-40, 5B-60, 7B-7E
+ *     0x80: -         20 */
+/*[[[deemon
+local CTYPE = [0] * 256;
+local TOLOWER = [0] * 256;
+local TOUPPER = [0] * 256;
+for (local i: [:256]) {
+	local flags = 0;
+	if ((i >= 0x00 && i <= 0x1F) || i == 0x7F)
+		flags |= 0x01;
+	if ((i >= 0x09 && i <= 0x0D) || i == 0x20)
+		flags |= 0x02;
+	if (i >= 0x61 && i <= 0x7A)
+		flags |= 0x04;
+	if (i >= 0x41 && i <= 0x5A)
+		flags |= 0x08;
+	if (i >= 0x30 && i <= 0x39)
+		flags |= 0x10;
+	if ((i >= 0x41 && i <= 0x46) || (i >= 0x61 && i <= 0x66))
+		flags |= 0x20;
+	if ((i >= 0x21 && i <= 0x2F) || (i >= 0x3A && i <= 0x40) ||
+	    (i >= 0x5B && i <= 0x60) || (i >= 0x7B && i <= 0x7E))
+		flags |= 0x40;
+	if (i == 0x20)
+		flags |= 0x80;
+	CTYPE[i] = flags;
+	local tolower = i;
+	local toupper = i;
+	if (i >= 0x41 && i <= 0x5a)
+		tolower = i + 0x20;
+	if (i >= 0x61 && i <= 0x7a)
+		toupper = i - 0x20;
+	TOLOWER[i] = tolower;
+	TOUPPER[i] = toupper;
+}
+function printTable(name, tab) {
+	print("INTDEF __UINT8_TYPE__ const ", name, "[256];");
+	print("INTERN_CONST ATTR_SECTION(\".rodata.crt.unicode.static.ctype\") __UINT8_TYPE__ const ", name, "[256] = {");
+	for (local line: tab.segments(16))
+		print("	", ",".join(for (local x: line) "0x" + x.hex()[2:].zfill(2)), ",");
+	print("};");
+}
+print("%(auto_source){");
+print("#ifdef __KERNEL__");
+print("DEFINE_PUBLIC_ALIAS(__ctype_flags, libc___ctype_flags);");
+print("DEFINE_PUBLIC_ALIAS(__ctype_tolower, libc___ctype_tolower);");
+print("DEFINE_PUBLIC_ALIAS(__ctype_toupper, libc___ctype_toupper);");
+printTable("libc___ctype_flags", CTYPE);
+printTable("libc___ctype_tolower", TOLOWER);
+printTable("libc___ctype_toupper", TOUPPER);
+print("#endif /" "* __KERNEL__ *" "/");
+print("}");
+]]]*/
+%(auto_source){
+#ifdef __KERNEL__
+DEFINE_PUBLIC_ALIAS(__ctype_flags, libc___ctype_flags);
+DEFINE_PUBLIC_ALIAS(__ctype_tolower, libc___ctype_tolower);
+DEFINE_PUBLIC_ALIAS(__ctype_toupper, libc___ctype_toupper);
+INTDEF __UINT8_TYPE__ const libc___ctype_flags[256];
+INTERN_CONST ATTR_SECTION(".rodata.crt.unicode.static.ctype") __UINT8_TYPE__ const libc___ctype_flags[256] = {
+	0x01,0x01,0x01,0x01,0x01,0x01,0x01,0x01,0x01,0x03,0x03,0x03,0x03,0x03,0x01,0x01,
+	0x01,0x01,0x01,0x01,0x01,0x01,0x01,0x01,0x01,0x01,0x01,0x01,0x01,0x01,0x01,0x01,
+	0x82,0x40,0x40,0x40,0x40,0x40,0x40,0x40,0x40,0x40,0x40,0x40,0x40,0x40,0x40,0x40,
+	0x10,0x10,0x10,0x10,0x10,0x10,0x10,0x10,0x10,0x10,0x40,0x40,0x40,0x40,0x40,0x40,
+	0x40,0x28,0x28,0x28,0x28,0x28,0x28,0x08,0x08,0x08,0x08,0x08,0x08,0x08,0x08,0x08,
+	0x08,0x08,0x08,0x08,0x08,0x08,0x08,0x08,0x08,0x08,0x08,0x40,0x40,0x40,0x40,0x40,
+	0x40,0x24,0x24,0x24,0x24,0x24,0x24,0x04,0x04,0x04,0x04,0x04,0x04,0x04,0x04,0x04,
+	0x04,0x04,0x04,0x04,0x04,0x04,0x04,0x04,0x04,0x04,0x04,0x40,0x40,0x40,0x40,0x01,
+	0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,
+	0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,
+	0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,
+	0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,
+	0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,
+	0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,
+	0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,
+	0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,
+};
+INTDEF __UINT8_TYPE__ const libc___ctype_tolower[256];
+INTERN_CONST ATTR_SECTION(".rodata.crt.unicode.static.ctype") __UINT8_TYPE__ const libc___ctype_tolower[256] = {
+	0x00,0x01,0x02,0x03,0x04,0x05,0x06,0x07,0x08,0x09,0x0a,0x0b,0x0c,0x0d,0x0e,0x0f,
+	0x10,0x11,0x12,0x13,0x14,0x15,0x16,0x17,0x18,0x19,0x1a,0x1b,0x1c,0x1d,0x1e,0x1f,
+	0x20,0x21,0x22,0x23,0x24,0x25,0x26,0x27,0x28,0x29,0x2a,0x2b,0x2c,0x2d,0x2e,0x2f,
+	0x30,0x31,0x32,0x33,0x34,0x35,0x36,0x37,0x38,0x39,0x3a,0x3b,0x3c,0x3d,0x3e,0x3f,
+	0x40,0x61,0x62,0x63,0x64,0x65,0x66,0x67,0x68,0x69,0x6a,0x6b,0x6c,0x6d,0x6e,0x6f,
+	0x70,0x71,0x72,0x73,0x74,0x75,0x76,0x77,0x78,0x79,0x7a,0x5b,0x5c,0x5d,0x5e,0x5f,
+	0x60,0x61,0x62,0x63,0x64,0x65,0x66,0x67,0x68,0x69,0x6a,0x6b,0x6c,0x6d,0x6e,0x6f,
+	0x70,0x71,0x72,0x73,0x74,0x75,0x76,0x77,0x78,0x79,0x7a,0x7b,0x7c,0x7d,0x7e,0x7f,
+	0x80,0x81,0x82,0x83,0x84,0x85,0x86,0x87,0x88,0x89,0x8a,0x8b,0x8c,0x8d,0x8e,0x8f,
+	0x90,0x91,0x92,0x93,0x94,0x95,0x96,0x97,0x98,0x99,0x9a,0x9b,0x9c,0x9d,0x9e,0x9f,
+	0xa0,0xa1,0xa2,0xa3,0xa4,0xa5,0xa6,0xa7,0xa8,0xa9,0xaa,0xab,0xac,0xad,0xae,0xaf,
+	0xb0,0xb1,0xb2,0xb3,0xb4,0xb5,0xb6,0xb7,0xb8,0xb9,0xba,0xbb,0xbc,0xbd,0xbe,0xbf,
+	0xc0,0xc1,0xc2,0xc3,0xc4,0xc5,0xc6,0xc7,0xc8,0xc9,0xca,0xcb,0xcc,0xcd,0xce,0xcf,
+	0xd0,0xd1,0xd2,0xd3,0xd4,0xd5,0xd6,0xd7,0xd8,0xd9,0xda,0xdb,0xdc,0xdd,0xde,0xdf,
+	0xe0,0xe1,0xe2,0xe3,0xe4,0xe5,0xe6,0xe7,0xe8,0xe9,0xea,0xeb,0xec,0xed,0xee,0xef,
+	0xf0,0xf1,0xf2,0xf3,0xf4,0xf5,0xf6,0xf7,0xf8,0xf9,0xfa,0xfb,0xfc,0xfd,0xfe,0xff,
+};
+INTDEF __UINT8_TYPE__ const libc___ctype_toupper[256];
+INTERN_CONST ATTR_SECTION(".rodata.crt.unicode.static.ctype") __UINT8_TYPE__ const libc___ctype_toupper[256] = {
+	0x00,0x01,0x02,0x03,0x04,0x05,0x06,0x07,0x08,0x09,0x0a,0x0b,0x0c,0x0d,0x0e,0x0f,
+	0x10,0x11,0x12,0x13,0x14,0x15,0x16,0x17,0x18,0x19,0x1a,0x1b,0x1c,0x1d,0x1e,0x1f,
+	0x20,0x21,0x22,0x23,0x24,0x25,0x26,0x27,0x28,0x29,0x2a,0x2b,0x2c,0x2d,0x2e,0x2f,
+	0x30,0x31,0x32,0x33,0x34,0x35,0x36,0x37,0x38,0x39,0x3a,0x3b,0x3c,0x3d,0x3e,0x3f,
+	0x40,0x41,0x42,0x43,0x44,0x45,0x46,0x47,0x48,0x49,0x4a,0x4b,0x4c,0x4d,0x4e,0x4f,
+	0x50,0x51,0x52,0x53,0x54,0x55,0x56,0x57,0x58,0x59,0x5a,0x5b,0x5c,0x5d,0x5e,0x5f,
+	0x60,0x41,0x42,0x43,0x44,0x45,0x46,0x47,0x48,0x49,0x4a,0x4b,0x4c,0x4d,0x4e,0x4f,
+	0x50,0x51,0x52,0x53,0x54,0x55,0x56,0x57,0x58,0x59,0x5a,0x7b,0x7c,0x7d,0x7e,0x7f,
+	0x80,0x81,0x82,0x83,0x84,0x85,0x86,0x87,0x88,0x89,0x8a,0x8b,0x8c,0x8d,0x8e,0x8f,
+	0x90,0x91,0x92,0x93,0x94,0x95,0x96,0x97,0x98,0x99,0x9a,0x9b,0x9c,0x9d,0x9e,0x9f,
+	0xa0,0xa1,0xa2,0xa3,0xa4,0xa5,0xa6,0xa7,0xa8,0xa9,0xaa,0xab,0xac,0xad,0xae,0xaf,
+	0xb0,0xb1,0xb2,0xb3,0xb4,0xb5,0xb6,0xb7,0xb8,0xb9,0xba,0xbb,0xbc,0xbd,0xbe,0xbf,
+	0xc0,0xc1,0xc2,0xc3,0xc4,0xc5,0xc6,0xc7,0xc8,0xc9,0xca,0xcb,0xcc,0xcd,0xce,0xcf,
+	0xd0,0xd1,0xd2,0xd3,0xd4,0xd5,0xd6,0xd7,0xd8,0xd9,0xda,0xdb,0xdc,0xdd,0xde,0xdf,
+	0xe0,0xe1,0xe2,0xe3,0xe4,0xe5,0xe6,0xe7,0xe8,0xe9,0xea,0xeb,0xec,0xed,0xee,0xef,
+	0xf0,0xf1,0xf2,0xf3,0xf4,0xf5,0xf6,0xf7,0xf8,0xf9,0xfa,0xfb,0xfc,0xfd,0xfe,0xff,
+};
+#endif /* __KERNEL__ */
+}
+/*[[[end]]]*/
+
+
+%(auto_header){
+/* Because the kernel (no longer) exports ctype functions, we must define
+ * them as macros in internal  libc headers so that auto  implementations
+ * can still make use of them!
+ *
+ * For the sake  of optimization  (allowing libc auto  functions to  make
+ * direct use of `__unicode_latin1flags'), we do the same for user-space. */
+#define libc_iscntrl(ch)  __crt_iscntrl(ch)
+#define libc_isspace(ch)  __crt_isspace(ch)
+#define libc_isupper(ch)  __crt_isupper(ch)
+#define libc_islower(ch)  __crt_islower(ch)
+#define libc_isalpha(ch)  __crt_isalpha(ch)
+#define libc_isdigit(ch)  __crt_isdigit(ch)
+#define libc_isxdigit(ch) __crt_isxdigit(ch)
+#define libc_isalnum(ch)  __crt_isalnum(ch)
+#define libc_ispunct(ch)  __crt_ispunct(ch)
+#define libc_isgraph(ch)  __crt_isgraph(ch)
+#define libc_isprint(ch)  __crt_isprint(ch)
+#define libc_isblank(ch)  __crt_isblank(ch)
+#ifdef __KERNEL__ /* Only the kernel has a lookup table for tolower/toupper */
+#define libc_tolower(ch)  __crt_tolower(ch)
+#define libc_toupper(ch)  __crt_toupper(ch)
+#endif /* __KERNEL__ */
+}
+
 
 %[insert:prefix(
 #include <features.h>
-)]%{
-
+)]%[insert:prefix(
+#include <bits/crt/ctype.h>
+)]%[insert:prefix(
 #ifdef __USE_XOPEN2K8
 #include <xlocale.h>
 #endif /* __USE_XOPEN2K8 */
-
+)]%[insert:prefix(
 #ifdef __USE_GLIBC
 #include <endian.h>
 #endif /* __USE_GLIBC */
+)]%{
 
 #ifdef __CC__
 __SYSDECL_BEGIN
@@ -74,29 +237,29 @@ __SYSDECL_BEGIN
 
 %[default:section(".text.crt{|.dos}.unicode.static.ctype")];
 
-[[ignore, ATTR_CONST, wunused, nothrow]]
+[[ignore, const, wunused, nothrow]]
 char const *__locale_ctype_ptr();
 
-[[ignore, wunused, ATTR_PURE]]
+[[ignore, wunused, pure]]
 [[section(".text.crt{|.dos}.unicode.locale.ctype")]]
 char const *__locale_ctype_ptr_l($locale_t locale);
 
-[[ignore, wunused, ATTR_PURE, nothrow]]
+[[ignore, wunused, pure, nothrow]]
 [[decl_include("<hybrid/typecore.h>")]]
 $uint16_t const **__ctype_b_loc();
 
-[[ignore, wunused, ATTR_PURE, nothrow]]
+[[ignore, wunused, pure, nothrow]]
 [[decl_include("<hybrid/typecore.h>")]]
 $int32_t const **__ctype_tolower_loc();
 
-[[ignore, wunused, ATTR_PURE, nothrow]]
+[[ignore, wunused, pure, nothrow]]
 [[decl_include("<hybrid/typecore.h>")]]
 $int32_t const **__ctype_toupper_loc();
 
-[[ignore, ATTR_CONST, wunused, nothrow]]
+[[ignore, const, wunused, nothrow]]
 int _isctype(int ch, int mask);
 
-[[ignore, wunused, ATTR_PURE]]
+[[ignore, wunused, pure]]
 [[section(".text.crt{|.dos}.unicode.locale.ctype")]]
 int _isctype_l(int ch, int mask, $locale_t locale);
 
@@ -104,1013 +267,558 @@ int _isctype_l(int ch, int mask, $locale_t locale);
 %[insert:std]
 
 
-[[std, crtbuiltin, kernel]]
-[[ATTR_CONST, wunused, libc, nothrow]]
+/*[[[deemon
+local TRAITS = {
+	"iscntrl", "isspace", "isupper", "islower", "isalpha",
+	"isdigit", "isxdigit", "isalnum", "ispunct", "isgraph",
+	"isprint", "tolower", "toupper"
+};
+function printTrait(name) {
+	print("@@>> ", name, "(3)");
+	print("[[std, libc]]");
+	print("[[if($extended_include_prefix(\"<bits/crt/ctype.h>\")defined(__crt_", name, ")), preferred_extern_inline(", repr name, ", { return __crt_", name, "(ch); })]]");
+	print("[[if($extended_include_prefix(\"<bits/crt/ctype.h>\")defined(__crt_", name, ")), preferred_inline({ return __crt_", name, "(ch); })]]");
+	print("[[crtbuiltin, const, wunused, nothrow, impl_include(\"<bits/crt/ctype.h>\")]]");
+	print("int ", name, "(int ch) {");
+	print("@@pp_ifdef __crt_", name, "@@");
+	print("	return __crt_", name, "(ch);");
+	print("@@pp_else@@");
+	print("	return __ascii_", name, "(ch);");
+	print("@@pp_endif@@");
+	print("}");
+	print;
+}
+for (local name: TRAITS)
+	printTrait(name);
+print("%(c,std)#ifdef __USE_ISOC99");
+printTrait("isblank");
+print("%(c,std)#endif /" "* __USE_ISOC99 *" "/");
+]]]*/
+@@>> iscntrl(3)
+[[std, libc]]
+[[if($extended_include_prefix("<bits/crt/ctype.h>")defined(__crt_iscntrl)), preferred_extern_inline("iscntrl", { return __crt_iscntrl(ch); })]]
+[[if($extended_include_prefix("<bits/crt/ctype.h>")defined(__crt_iscntrl)), preferred_inline({ return __crt_iscntrl(ch); })]]
+[[crtbuiltin, const, wunused, nothrow, impl_include("<bits/crt/ctype.h>")]]
 int iscntrl(int ch) {
-@@pp_ifdef __BUILDING_LIBC@@
-	return (u8)ch <= 0x1f || (u8)ch == 0x7f;
+@@pp_ifdef __crt_iscntrl@@
+	return __crt_iscntrl(ch);
 @@pp_else@@
-@@pp_if defined(__CRT_HAVE___ctype_b_loc) && defined(__CRT_GLC)@@
-#include <hybrid/byteorder.h>
-@@pp_if __BYTE_ORDER__ == __ORDER_BIG_ENDIAN__@@
-	return (*__ctype_b_loc())[ch] & (1 << 9);
-@@pp_else@@
-	return (*__ctype_b_loc())[ch] & (1 << 1);
-@@pp_endif@@
-@@pp_elif defined(__CRT_HAVE___locale_ctype_ptr) && defined(__CRT_CYG)@@
-	return ((__locale_ctype_ptr() + 1)[ch & 0xff] & 040) != 0;
-@@pp_elif defined(__CRT_HAVE__isctype) && defined(__CRT_DOS)@@
-	return _isctype(ch, 0x0020);
-@@pp_else@@
-	return (u8)ch <= 0x1f || (u8)ch == 0x7f;
-@@pp_endif@@
+	return __ascii_iscntrl(ch);
 @@pp_endif@@
 }
 
-
-[[ATTR_CONST, wunused, libc, nothrow]]
-[[std, crtbuiltin, kernel]]
+@@>> isspace(3)
+[[std, libc]]
+[[if($extended_include_prefix("<bits/crt/ctype.h>")defined(__crt_isspace)), preferred_extern_inline("isspace", { return __crt_isspace(ch); })]]
+[[if($extended_include_prefix("<bits/crt/ctype.h>")defined(__crt_isspace)), preferred_inline({ return __crt_isspace(ch); })]]
+[[crtbuiltin, const, wunused, nothrow, impl_include("<bits/crt/ctype.h>")]]
 int isspace(int ch) {
-@@pp_ifdef __BUILDING_LIBC@@
-	return ((u8)ch >= 0x09 && (u8)ch <= 0x0d) || (u8)ch == 0x20;
+@@pp_ifdef __crt_isspace@@
+	return __crt_isspace(ch);
 @@pp_else@@
-@@pp_if defined(__CRT_HAVE___ctype_b_loc) && defined(__CRT_GLC)@@
-#include <hybrid/byteorder.h>
-@@pp_if __BYTE_ORDER__ == __ORDER_BIG_ENDIAN__@@
-	return (*__ctype_b_loc())[ch] & (1 << 5);
-@@pp_else@@
-	return (*__ctype_b_loc())[ch] & (1 << 13);
-@@pp_endif@@
-@@pp_elif defined(__CRT_HAVE___locale_ctype_ptr) && defined(__CRT_CYG)@@
-	return ((__locale_ctype_ptr() + 1)[ch & 0xff] & 010) != 0;
-@@pp_elif defined(__CRT_HAVE__isctype) && defined(__CRT_DOS)@@
-	return _isctype(ch, 0x0008);
-@@pp_else@@
-	return ((u8)ch >= 0x09 && (u8)ch <= 0x0d) || (u8)ch == 0x20;
-@@pp_endif@@
+	return __ascii_isspace(ch);
 @@pp_endif@@
 }
 
-[[ATTR_CONST, wunused, libc, nothrow]]
-[[std, crtbuiltin, kernel]]
+@@>> isupper(3)
+[[std, libc]]
+[[if($extended_include_prefix("<bits/crt/ctype.h>")defined(__crt_isupper)), preferred_extern_inline("isupper", { return __crt_isupper(ch); })]]
+[[if($extended_include_prefix("<bits/crt/ctype.h>")defined(__crt_isupper)), preferred_inline({ return __crt_isupper(ch); })]]
+[[crtbuiltin, const, wunused, nothrow, impl_include("<bits/crt/ctype.h>")]]
 int isupper(int ch) {
-@@pp_ifdef __BUILDING_LIBC@@
-	return (u8)ch >= 0x41 && (u8)ch <= 0x5a;
+@@pp_ifdef __crt_isupper@@
+	return __crt_isupper(ch);
 @@pp_else@@
-@@pp_if defined(__CRT_HAVE___ctype_b_loc) && defined(__CRT_GLC)@@
-#include <hybrid/byteorder.h>
-@@pp_if __BYTE_ORDER__ == __ORDER_BIG_ENDIAN__@@
-	return (*__ctype_b_loc())[ch] & (1 << 0);
-@@pp_else@@
-	return (*__ctype_b_loc())[ch] & (1 << 8);
-@@pp_endif@@
-@@pp_elif defined(__CRT_HAVE___locale_ctype_ptr) && defined(__CRT_CYG)@@
-	return ((__locale_ctype_ptr() + 1)[ch & 0xff] & 3) == 1;
-@@pp_elif defined(__CRT_HAVE__isctype) && defined(__CRT_DOS)@@
-	return _isctype(ch, 0x0001);
-@@pp_else@@
-	return (u8)ch >= 0x41 && (u8)ch <= 0x5a;
-@@pp_endif@@
+	return __ascii_isupper(ch);
 @@pp_endif@@
 }
 
-
-[[ATTR_CONST, wunused, libc, nothrow]]
-[[std, crtbuiltin, kernel]]
+@@>> islower(3)
+[[std, libc]]
+[[if($extended_include_prefix("<bits/crt/ctype.h>")defined(__crt_islower)), preferred_extern_inline("islower", { return __crt_islower(ch); })]]
+[[if($extended_include_prefix("<bits/crt/ctype.h>")defined(__crt_islower)), preferred_inline({ return __crt_islower(ch); })]]
+[[crtbuiltin, const, wunused, nothrow, impl_include("<bits/crt/ctype.h>")]]
 int islower(int ch) {
-@@pp_ifdef __BUILDING_LIBC@@
-	return (u8)ch >= 0x61 && (u8)ch <= 0x7a;
+@@pp_ifdef __crt_islower@@
+	return __crt_islower(ch);
 @@pp_else@@
-@@pp_if defined(__CRT_HAVE___ctype_b_loc) && defined(__CRT_GLC)@@
-#include <hybrid/byteorder.h>
-@@pp_if __BYTE_ORDER__ == __ORDER_BIG_ENDIAN__@@
-	return (*__ctype_b_loc())[ch] & (1 << 1);
-@@pp_else@@
-	return (*__ctype_b_loc())[ch] & (1 << 9);
-@@pp_endif@@
-@@pp_elif defined(__CRT_HAVE___locale_ctype_ptr) && defined(__CRT_CYG)@@
-	return ((__locale_ctype_ptr() + 1)[ch & 0xff] & 3) == 2;
-@@pp_elif defined(__CRT_HAVE__isctype) && defined(__CRT_DOS)@@
-	return _isctype(ch, 0x0002);
-@@pp_else@@
-	return (u8)ch >= 0x61 && (u8)ch <= 0x7a;
-@@pp_endif@@
+	return __ascii_islower(ch);
 @@pp_endif@@
 }
 
-[[ATTR_CONST, wunused, libc, nothrow]]
-[[std, crtbuiltin, kernel]]
+@@>> isalpha(3)
+[[std, libc]]
+[[if($extended_include_prefix("<bits/crt/ctype.h>")defined(__crt_isalpha)), preferred_extern_inline("isalpha", { return __crt_isalpha(ch); })]]
+[[if($extended_include_prefix("<bits/crt/ctype.h>")defined(__crt_isalpha)), preferred_inline({ return __crt_isalpha(ch); })]]
+[[crtbuiltin, const, wunused, nothrow, impl_include("<bits/crt/ctype.h>")]]
 int isalpha(int ch) {
-@@pp_ifdef __BUILDING_LIBC@@
-	return libc_isupper(ch) || libc_islower(ch);
+@@pp_ifdef __crt_isalpha@@
+	return __crt_isalpha(ch);
 @@pp_else@@
-@@pp_if defined(__CRT_HAVE___ctype_b_loc) && defined(__CRT_GLC)@@
-#include <hybrid/byteorder.h>
-@@pp_if __BYTE_ORDER__ == __ORDER_BIG_ENDIAN__@@
-	return (*__ctype_b_loc())[ch] & (1 << 2);
-@@pp_else@@
-	return (*__ctype_b_loc())[ch] & (1 << 10);
-@@pp_endif@@
-@@pp_elif defined(__CRT_HAVE___locale_ctype_ptr) && defined(__CRT_CYG)@@
-	return ((__locale_ctype_ptr() + 1)[ch & 0xff] & 3) != 0;
-@@pp_elif defined(__CRT_HAVE__isctype) && defined(__CRT_DOS)@@
-	return _isctype(ch, 0x0103);
-@@pp_else@@
-	return isupper(ch) || islower(ch);
-@@pp_endif@@
+	return __ascii_isalpha(ch);
 @@pp_endif@@
 }
 
-[[ATTR_CONST, wunused, libc, nothrow]]
-[[std, crtbuiltin, kernel]]
+@@>> isdigit(3)
+[[std, libc]]
+[[if($extended_include_prefix("<bits/crt/ctype.h>")defined(__crt_isdigit)), preferred_extern_inline("isdigit", { return __crt_isdigit(ch); })]]
+[[if($extended_include_prefix("<bits/crt/ctype.h>")defined(__crt_isdigit)), preferred_inline({ return __crt_isdigit(ch); })]]
+[[crtbuiltin, const, wunused, nothrow, impl_include("<bits/crt/ctype.h>")]]
 int isdigit(int ch) {
-@@pp_ifdef __BUILDING_LIBC@@
-	return (u8)ch >= 0x30 && (u8)ch <= 0x39;
+@@pp_ifdef __crt_isdigit@@
+	return __crt_isdigit(ch);
 @@pp_else@@
-@@pp_if defined(__CRT_HAVE___ctype_b_loc) && defined(__CRT_GLC)@@
-#include <hybrid/byteorder.h>
-@@pp_if __BYTE_ORDER__ == __ORDER_BIG_ENDIAN__@@
-	return (*__ctype_b_loc())[ch] & (1 << 3);
-@@pp_else@@
-	return (*__ctype_b_loc())[ch] & (1 << 11);
-@@pp_endif@@
-@@pp_elif defined(__CRT_HAVE___locale_ctype_ptr) && defined(__CRT_CYG)@@
-	return ((__locale_ctype_ptr() + 1)[ch & 0xff] & 4) != 0;
-@@pp_elif defined(__CRT_HAVE__isctype) && defined(__CRT_DOS)@@
-	return _isctype(ch, 0x0004);
-@@pp_else@@
-	return (u8)ch >= 0x30 && (u8)ch <= 0x39;
-@@pp_endif@@
+	return __ascii_isdigit(ch);
 @@pp_endif@@
 }
 
-[[ATTR_CONST, wunused, libc, nothrow]]
-[[std, crtbuiltin, kernel]]
+@@>> isxdigit(3)
+[[std, libc]]
+[[if($extended_include_prefix("<bits/crt/ctype.h>")defined(__crt_isxdigit)), preferred_extern_inline("isxdigit", { return __crt_isxdigit(ch); })]]
+[[if($extended_include_prefix("<bits/crt/ctype.h>")defined(__crt_isxdigit)), preferred_inline({ return __crt_isxdigit(ch); })]]
+[[crtbuiltin, const, wunused, nothrow, impl_include("<bits/crt/ctype.h>")]]
 int isxdigit(int ch) {
-@@pp_ifdef __BUILDING_LIBC@@
-	return isdigit(ch) ||
-	       ((u8)ch >= 0x41 && (u8)ch <= 0x46) ||
-	       ((u8)ch >= 0x61 && (u8)ch <= 0x66);
+@@pp_ifdef __crt_isxdigit@@
+	return __crt_isxdigit(ch);
 @@pp_else@@
-@@pp_if defined(__CRT_HAVE___ctype_b_loc) && defined(__CRT_GLC)@@
-#include <hybrid/byteorder.h>
-@@pp_if __BYTE_ORDER__ == __ORDER_BIG_ENDIAN__@@
-	return (*__ctype_b_loc())[ch] & (1 << 4);
-@@pp_else@@
-	return (*__ctype_b_loc())[ch] & (1 << 12);
-@@pp_endif@@
-@@pp_elif defined(__CRT_HAVE___locale_ctype_ptr) && defined(__CRT_CYG)@@
-	return ((__locale_ctype_ptr() + 1)[ch & 0xff] & 0104) != 0;
-@@pp_elif defined(__CRT_HAVE__isctype) && defined(__CRT_DOS)@@
-	return _isctype(ch, 0x0080);
-@@pp_else@@
-	return isdigit(ch) ||
-	       ((u8)ch >= 0x41 && (u8)ch <= 0x46) ||
-	       ((u8)ch >= 0x61 && (u8)ch <= 0x66);
-@@pp_endif@@
+	return __ascii_isxdigit(ch);
 @@pp_endif@@
 }
 
-[[ATTR_CONST, wunused, libc, nothrow]]
-[[std, crtbuiltin, kernel]]
+@@>> isalnum(3)
+[[std, libc]]
+[[if($extended_include_prefix("<bits/crt/ctype.h>")defined(__crt_isalnum)), preferred_extern_inline("isalnum", { return __crt_isalnum(ch); })]]
+[[if($extended_include_prefix("<bits/crt/ctype.h>")defined(__crt_isalnum)), preferred_inline({ return __crt_isalnum(ch); })]]
+[[crtbuiltin, const, wunused, nothrow, impl_include("<bits/crt/ctype.h>")]]
 int isalnum(int ch) {
-@@pp_ifdef __BUILDING_LIBC@@
-	return isupper(ch) || islower(ch) || isdigit(ch);
+@@pp_ifdef __crt_isalnum@@
+	return __crt_isalnum(ch);
 @@pp_else@@
-@@pp_if defined(__CRT_HAVE___ctype_b_loc) && defined(__CRT_GLC)@@
-#include <hybrid/byteorder.h>
-@@pp_if __BYTE_ORDER__ == __ORDER_BIG_ENDIAN__@@
-	return (*__ctype_b_loc())[ch] & (1 << 11);
-@@pp_else@@
-	return (*__ctype_b_loc())[ch] & (1 << 3);
-@@pp_endif@@
-@@pp_elif defined(__CRT_HAVE___locale_ctype_ptr) && defined(__CRT_CYG)@@
-	return ((__locale_ctype_ptr() + 1)[ch & 0xff] & 7) != 0;
-@@pp_elif defined(__CRT_HAVE__isctype) && defined(__CRT_DOS)@@
-	return _isctype(ch, 0x0107);
-@@pp_else@@
-	return isupper(ch) || islower(ch) || isdigit(ch);
-@@pp_endif@@
+	return __ascii_isalnum(ch);
 @@pp_endif@@
 }
 
-[[ATTR_CONST, wunused, libc, nothrow]]
-[[std, crtbuiltin, kernel]]
-int ispunct(int ch)  {
-@@pp_ifdef __BUILDING_LIBC@@
-	return ((u8)ch >= 0x21 && (u8)ch <= 0x2f) ||
-	       ((u8)ch >= 0x3a && (u8)ch <= 0x40) ||
-	       ((u8)ch >= 0x5b && (u8)ch <= 0x60) ||
-	       ((u8)ch >= 0x7b && (u8)ch <= 0x7e);
+@@>> ispunct(3)
+[[std, libc]]
+[[if($extended_include_prefix("<bits/crt/ctype.h>")defined(__crt_ispunct)), preferred_extern_inline("ispunct", { return __crt_ispunct(ch); })]]
+[[if($extended_include_prefix("<bits/crt/ctype.h>")defined(__crt_ispunct)), preferred_inline({ return __crt_ispunct(ch); })]]
+[[crtbuiltin, const, wunused, nothrow, impl_include("<bits/crt/ctype.h>")]]
+int ispunct(int ch) {
+@@pp_ifdef __crt_ispunct@@
+	return __crt_ispunct(ch);
 @@pp_else@@
-@@pp_if defined(__CRT_HAVE___ctype_b_loc) && defined(__CRT_GLC)@@
-#include <hybrid/byteorder.h>
-@@pp_if __BYTE_ORDER__ == __ORDER_BIG_ENDIAN__@@
-	return (*__ctype_b_loc())[ch] & (1 << 10);
-@@pp_else@@
-	return (*__ctype_b_loc())[ch] & (1 << 2);
-@@pp_endif@@
-@@pp_elif defined(__CRT_HAVE___locale_ctype_ptr) && defined(__CRT_CYG)@@
-	return ((__locale_ctype_ptr() + 1)[ch & 0xff] & 020) != 0;
-@@pp_elif defined(__CRT_HAVE__isctype) && defined(__CRT_DOS)@@
-	return _isctype(ch, 0x0010);
-@@pp_else@@
-	return ((u8)ch >= 0x21 && (u8)ch <= 0x2f) ||
-	       ((u8)ch >= 0x3a && (u8)ch <= 0x40) ||
-	       ((u8)ch >= 0x5b && (u8)ch <= 0x60) ||
-	       ((u8)ch >= 0x7b && (u8)ch <= 0x7e);
-@@pp_endif@@
+	return __ascii_ispunct(ch);
 @@pp_endif@@
 }
 
-[[ATTR_CONST, wunused, libc, nothrow]]
-[[std, crtbuiltin, kernel]]
+@@>> isgraph(3)
+[[std, libc]]
+[[if($extended_include_prefix("<bits/crt/ctype.h>")defined(__crt_isgraph)), preferred_extern_inline("isgraph", { return __crt_isgraph(ch); })]]
+[[if($extended_include_prefix("<bits/crt/ctype.h>")defined(__crt_isgraph)), preferred_inline({ return __crt_isgraph(ch); })]]
+[[crtbuiltin, const, wunused, nothrow, impl_include("<bits/crt/ctype.h>")]]
 int isgraph(int ch) {
-@@pp_ifdef __BUILDING_LIBC@@
-	return (u8)ch >= 0x21 && (u8)ch <= 0x7e;
+@@pp_ifdef __crt_isgraph@@
+	return __crt_isgraph(ch);
 @@pp_else@@
-@@pp_if defined(__CRT_HAVE___ctype_b_loc) && defined(__CRT_GLC)@@
-#include <hybrid/byteorder.h>
-@@pp_if __BYTE_ORDER__ == __ORDER_BIG_ENDIAN__@@
-	return (*__ctype_b_loc())[ch] & (1 << 7);
-@@pp_else@@
-	return (*__ctype_b_loc())[ch] & (1 << 15);
-@@pp_endif@@
-@@pp_elif defined(__CRT_HAVE___locale_ctype_ptr) && defined(__CRT_CYG)@@
-	return ((__locale_ctype_ptr() + 1)[ch & 0xff] & 027) != 0;
-@@pp_elif defined(__CRT_HAVE__isctype) && defined(__CRT_DOS)@@
-	return _isctype(ch, 0x0117);
-@@pp_else@@
-	return (u8)ch >= 0x21 && (u8)ch <= 0x7e;
-@@pp_endif@@
+	return __ascii_isgraph(ch);
 @@pp_endif@@
 }
 
-[[ATTR_CONST, wunused, libc, nothrow]]
-[[std, crtbuiltin, kernel]]
+@@>> isprint(3)
+[[std, libc]]
+[[if($extended_include_prefix("<bits/crt/ctype.h>")defined(__crt_isprint)), preferred_extern_inline("isprint", { return __crt_isprint(ch); })]]
+[[if($extended_include_prefix("<bits/crt/ctype.h>")defined(__crt_isprint)), preferred_inline({ return __crt_isprint(ch); })]]
+[[crtbuiltin, const, wunused, nothrow, impl_include("<bits/crt/ctype.h>")]]
 int isprint(int ch) {
-@@pp_ifdef __BUILDING_LIBC@@
-	return (u8)ch >= 0x20 && (u8)ch <= 0x7e;
+@@pp_ifdef __crt_isprint@@
+	return __crt_isprint(ch);
 @@pp_else@@
-@@pp_if defined(__CRT_HAVE___ctype_b_loc) && defined(__CRT_GLC)@@
-#include <hybrid/byteorder.h>
-@@pp_if __BYTE_ORDER__ == __ORDER_BIG_ENDIAN__@@
-	return (*__ctype_b_loc())[ch] & (1 << 6);
-@@pp_else@@
-	return (*__ctype_b_loc())[ch] & (1 << 14);
-@@pp_endif@@
-@@pp_elif defined(__CRT_HAVE___locale_ctype_ptr) && defined(__CRT_CYG)@@
-	return ((__locale_ctype_ptr() + 1)[ch & 0xff] & 0227) != 0;
-@@pp_elif defined(__CRT_HAVE__isctype) && defined(__CRT_DOS)@@
-	return _isctype(ch, 0x0157);
-@@pp_else@@
-	return (u8)ch >= 0x20 && (u8)ch <= 0x7e;
-@@pp_endif@@
+	return __ascii_isprint(ch);
 @@pp_endif@@
 }
 
-[[ATTR_CONST, wunused, nothrow, crtbuiltin]]
-[[libc, std, kernel, alias("_tolower")]]
-[[if(!defined(__KERNEL__)), dos_only_export_as("_tolower")]]
+@@>> tolower(3)
+[[std, libc]]
+[[if($extended_include_prefix("<bits/crt/ctype.h>")defined(__crt_tolower)), preferred_extern_inline("tolower", { return __crt_tolower(ch); })]]
+[[if($extended_include_prefix("<bits/crt/ctype.h>")defined(__crt_tolower)), preferred_inline({ return __crt_tolower(ch); })]]
+[[crtbuiltin, const, wunused, nothrow, impl_include("<bits/crt/ctype.h>")]]
 int tolower(int ch) {
-@@pp_ifdef __BUILDING_LIBC@@
-	return isupper(ch) ? ((u8)ch+0x20) : ch;
+@@pp_ifdef __crt_tolower@@
+	return __crt_tolower(ch);
 @@pp_else@@
-@@pp_if $has_function(__ctype_tolower_loc) && defined(__CRT_CYG)@@
-	return ch >= -128 && ch < 256 ? (*__ctype_tolower_loc())[ch] : ch;
-@@pp_else@@
-	return isupper(ch) ? ((u8)ch+0x20) : ch;
-@@pp_endif@@
+	return __ascii_tolower(ch);
 @@pp_endif@@
 }
 
-[[ATTR_CONST, wunused, nothrow, crtbuiltin]]
-[[libc, std, kernel, alias("_toupper")]]
-[[if(!defined(__KERNEL__)), dos_only_export_as("_toupper")]]
+@@>> toupper(3)
+[[std, libc]]
+[[if($extended_include_prefix("<bits/crt/ctype.h>")defined(__crt_toupper)), preferred_extern_inline("toupper", { return __crt_toupper(ch); })]]
+[[if($extended_include_prefix("<bits/crt/ctype.h>")defined(__crt_toupper)), preferred_inline({ return __crt_toupper(ch); })]]
+[[crtbuiltin, const, wunused, nothrow, impl_include("<bits/crt/ctype.h>")]]
 int toupper(int ch) {
-@@pp_ifdef __BUILDING_LIBC@@
-	return islower(ch) ? ((u8)ch-0x20) : ch;
+@@pp_ifdef __crt_toupper@@
+	return __crt_toupper(ch);
 @@pp_else@@
-@@pp_if $has_function(__ctype_toupper_loc) && defined(__CRT_CYG)@@
-	return ch >= -128 && ch < 256 ? (*__ctype_toupper_loc())[ch] : ch;
-@@pp_else@@
-	return islower(ch) ? ((u8)ch-0x20) : ch;
-@@pp_endif@@
+	return __ascii_toupper(ch);
 @@pp_endif@@
 }
 
-
-%#ifdef __USE_ISOC99
-[[ATTR_CONST, wunused, nothrow]]
-[[crtbuiltin, libc, std, kernel]]
+%(c,std)#ifdef __USE_ISOC99
+@@>> isblank(3)
+[[std, libc]]
+[[if($extended_include_prefix("<bits/crt/ctype.h>")defined(__crt_isblank)), preferred_extern_inline("isblank", { return __crt_isblank(ch); })]]
+[[if($extended_include_prefix("<bits/crt/ctype.h>")defined(__crt_isblank)), preferred_inline({ return __crt_isblank(ch); })]]
+[[crtbuiltin, const, wunused, nothrow, impl_include("<bits/crt/ctype.h>")]]
 int isblank(int ch) {
-@@pp_ifdef __BUILDING_LIBC@@
-	return (u8)ch == 0x09 || (u8)ch == 0x20;
+@@pp_ifdef __crt_isblank@@
+	return __crt_isblank(ch);
 @@pp_else@@
-@@pp_if defined(__CRT_HAVE___ctype_b_loc) && defined(__CRT_GLC)@@
-#include <hybrid/byteorder.h>
-@@pp_if __BYTE_ORDER__ == __ORDER_BIG_ENDIAN__@@
-	return (*__ctype_b_loc())[ch] & (1 << 8);
-@@pp_else@@
-	return (*__ctype_b_loc())[ch] & (1 << 0);
-@@pp_endif@@
-@@pp_elif defined(__CRT_HAVE___locale_ctype_ptr) && defined(__CRT_CYG)@@
-	return ((__locale_ctype_ptr() + 1)[ch & 0xff] & 0200) != 0 || ch == '\t';
-@@pp_else@@
-	return (u8)ch == 0x09 || (u8)ch == 0x20;
-@@pp_endif@@
+	return __ascii_isblank(ch);
 @@pp_endif@@
 }
-%{
-#endif /* __USE_ISOC99 */
 
-#ifdef __USE_XOPEN2K8
-}
+%(c,std)#endif /* __USE_ISOC99 */
+/*[[[end]]]*/
+
+
+
+%
+%#ifdef __USE_XOPEN2K8
 
 %[default:section(".text.crt{|.dos}.unicode.locale.ctype")]
 
-[[wunused, ATTR_PURE, export_alias("__iscntrl_l")]]
-int iscntrl_l(int ch, __locale_t locale) {
-@@pp_ifdef __BUILDING_LIBC@@
-	(void)locale;
+/*[[[deemon
+local TRAITS = {
+	"iscntrl", "isspace", "isupper", "islower", "isalpha",
+	"isdigit", "isxdigit", "isalnum", "ispunct", "isgraph",
+	"isprint", "isblank", "tolower", "toupper"
+};
+function printTrait(name) {
+	print("@@>> ", name, "_l(3)");
+	print("[[if($extended_include_prefix(\"<bits/crt/ctype.h>\")defined(__crt_", name, "_l)), preferred_extern_inline(\"", name, "_l\", { return __crt_", name, "_l(ch, locale); })]]");
+	print("[[if($extended_include_prefix(\"<bits/crt/ctype.h>\")defined(__crt_", name, "_l)), preferred_extern_inline(\"__", name, "_l\", { return __crt_", name, "_l(ch, locale); })]]");
+	print("[[if($extended_include_prefix(\"<bits/crt/ctype.h>\")defined(__crt_", name, "_l)), preferred_inline({ return __crt_", name, "_l(ch, locale); })]]");
+	print("[[wunused, pure, "),;
+	if (name in ["tolower", "toupper"])
+		print("dos_only_export_alias(\"_", name, "_l\"), "),;
+	print("export_alias(\"__", name, "_l\")]]");
+	print("int ", name, "_l(int ch, $locale_t locale) {");
+	print("	COMPILER_IMPURE();");
+	print("	(void)locale;");
+	print("	return ", name, "(ch);");
+	print("}");
+}
+for (local name: TRAITS)
+	printTrait(name);
+]]]*/
+@@>> iscntrl_l(3)
+[[if($extended_include_prefix("<bits/crt/ctype.h>")defined(__crt_iscntrl_l)), preferred_extern_inline("iscntrl_l", { return __crt_iscntrl_l(ch, locale); })]]
+[[if($extended_include_prefix("<bits/crt/ctype.h>")defined(__crt_iscntrl_l)), preferred_extern_inline("__iscntrl_l", { return __crt_iscntrl_l(ch, locale); })]]
+[[if($extended_include_prefix("<bits/crt/ctype.h>")defined(__crt_iscntrl_l)), preferred_inline({ return __crt_iscntrl_l(ch, locale); })]]
+[[wunused, pure, export_alias("__iscntrl_l")]]
+int iscntrl_l(int ch, $locale_t locale) {
 	COMPILER_IMPURE();
+	(void)locale;
 	return iscntrl(ch);
-@@pp_else@@
-@@pp_if defined(__CRT_HAVE___ctype_b_loc) && defined(__CRT_GLC)@@
-#include <hybrid/byteorder.h>
-@@pp_if __BYTE_ORDER__ == __ORDER_BIG_ENDIAN__@@
-	return locale->__ctype_b[ch] & (1 << 9);
-@@pp_else@@
-	return locale->__ctype_b[ch] & (1 << 1);
-@@pp_endif@@
-@@pp_elif defined(@__CRT_HAVE___locale_ctype_ptr_l@) && defined(__CRT_CYG)@@
-	return ((__locale_ctype_ptr_l(locale) + 1)[ch & 0xff] & 040) != 0;
-@@pp_elif defined(@__CRT_HAVE__isctype_l@) && defined(__CRT_DOS)@@
-	return _isctype_l(ch, 0x0020, locale);
-@@pp_else@@
-	(void)locale;
-	COMPILER_IMPURE();
-	return iscntrl(ch);
-@@pp_endif@@
-@@pp_endif@@
 }
-
-
-[[wunused, ATTR_PURE, export_alias("__isspace_l")]]
-int isspace_l(int ch, __locale_t locale) {
-@@pp_ifdef __BUILDING_LIBC@@
-	(void)locale;
+@@>> isspace_l(3)
+[[if($extended_include_prefix("<bits/crt/ctype.h>")defined(__crt_isspace_l)), preferred_extern_inline("isspace_l", { return __crt_isspace_l(ch, locale); })]]
+[[if($extended_include_prefix("<bits/crt/ctype.h>")defined(__crt_isspace_l)), preferred_extern_inline("__isspace_l", { return __crt_isspace_l(ch, locale); })]]
+[[if($extended_include_prefix("<bits/crt/ctype.h>")defined(__crt_isspace_l)), preferred_inline({ return __crt_isspace_l(ch, locale); })]]
+[[wunused, pure, export_alias("__isspace_l")]]
+int isspace_l(int ch, $locale_t locale) {
 	COMPILER_IMPURE();
+	(void)locale;
 	return isspace(ch);
-@@pp_else@@
-@@pp_if defined(__CRT_HAVE___ctype_b_loc) && defined(__CRT_GLC)@@
-#include <hybrid/byteorder.h>
-@@pp_if __BYTE_ORDER__ == __ORDER_BIG_ENDIAN__@@
-	return locale->__ctype_b[ch] & (1 << 5);
-@@pp_else@@
-	return locale->__ctype_b[ch] & (1 << 13);
-@@pp_endif@@
-@@pp_elif defined(@__CRT_HAVE___locale_ctype_ptr_l@) && defined(__CRT_CYG)@@
-	return ((__locale_ctype_ptr_l(locale) + 1)[ch & 0xff] & 010) != 0;
-@@pp_elif defined(@__CRT_HAVE__isctype_l@) && defined(__CRT_DOS)@@
-	return _isctype_l(ch, 0x0008, locale);
-@@pp_else@@
-	(void)locale;
-	COMPILER_IMPURE();
-	return isspace(ch);
-@@pp_endif@@
-@@pp_endif@@
 }
-
-[[wunused, ATTR_PURE, export_alias("__isupper_l")]]
-int isupper_l(int ch, __locale_t locale) {
-@@pp_ifdef __BUILDING_LIBC@@
-	(void)locale;
+@@>> isupper_l(3)
+[[if($extended_include_prefix("<bits/crt/ctype.h>")defined(__crt_isupper_l)), preferred_extern_inline("isupper_l", { return __crt_isupper_l(ch, locale); })]]
+[[if($extended_include_prefix("<bits/crt/ctype.h>")defined(__crt_isupper_l)), preferred_extern_inline("__isupper_l", { return __crt_isupper_l(ch, locale); })]]
+[[if($extended_include_prefix("<bits/crt/ctype.h>")defined(__crt_isupper_l)), preferred_inline({ return __crt_isupper_l(ch, locale); })]]
+[[wunused, pure, export_alias("__isupper_l")]]
+int isupper_l(int ch, $locale_t locale) {
 	COMPILER_IMPURE();
+	(void)locale;
 	return isupper(ch);
-@@pp_else@@
-@@pp_if defined(__CRT_HAVE___ctype_b_loc) && defined(__CRT_GLC)@@
-#include <hybrid/byteorder.h>
-@@pp_if __BYTE_ORDER__ == __ORDER_BIG_ENDIAN__@@
-	return locale->__ctype_b[ch] & (1 << 0);
-@@pp_else@@
-	return locale->__ctype_b[ch] & (1 << 8);
-@@pp_endif@@
-@@pp_elif defined(@__CRT_HAVE___locale_ctype_ptr_l@) && defined(__CRT_CYG)@@
-	return ((__locale_ctype_ptr_l(locale) + 1)[ch & 0xff] & 3) == 1;
-@@pp_elif defined(@__CRT_HAVE__isctype_l@) && defined(__CRT_DOS)@@
-	return _isctype_l(ch, 0x0001, locale);
-@@pp_else@@
-	(void)locale;
-	COMPILER_IMPURE();
-	return isupper(ch);
-@@pp_endif@@
-@@pp_endif@@
 }
-
-[[wunused, ATTR_PURE, export_alias("__islower_l")]]
-int islower_l(int ch, __locale_t locale) {
-@@pp_ifdef __BUILDING_LIBC@@
-	(void)locale;
+@@>> islower_l(3)
+[[if($extended_include_prefix("<bits/crt/ctype.h>")defined(__crt_islower_l)), preferred_extern_inline("islower_l", { return __crt_islower_l(ch, locale); })]]
+[[if($extended_include_prefix("<bits/crt/ctype.h>")defined(__crt_islower_l)), preferred_extern_inline("__islower_l", { return __crt_islower_l(ch, locale); })]]
+[[if($extended_include_prefix("<bits/crt/ctype.h>")defined(__crt_islower_l)), preferred_inline({ return __crt_islower_l(ch, locale); })]]
+[[wunused, pure, export_alias("__islower_l")]]
+int islower_l(int ch, $locale_t locale) {
 	COMPILER_IMPURE();
+	(void)locale;
 	return islower(ch);
-@@pp_else@@
-@@pp_if defined(__CRT_HAVE___ctype_b_loc) && defined(__CRT_GLC)@@
-#include <hybrid/byteorder.h>
-@@pp_if __BYTE_ORDER__ == __ORDER_BIG_ENDIAN__@@
-	return locale->__ctype_b[ch] & (1 << 1);
-@@pp_else@@
-	return locale->__ctype_b[ch] & (1 << 9);
-@@pp_endif@@
-@@pp_elif defined(@__CRT_HAVE___locale_ctype_ptr_l@) && defined(__CRT_CYG)@@
-	return ((__locale_ctype_ptr_l(locale) + 1)[ch & 0xff] & 3) == 2;
-@@pp_elif defined(@__CRT_HAVE__isctype_l@) && defined(__CRT_DOS)@@
-	return _isctype_l(ch, 0x0002, locale);
-@@pp_else@@
-	(void)locale;
-	COMPILER_IMPURE();
-	return islower(ch);
-@@pp_endif@@
-@@pp_endif@@
 }
-
-[[wunused, ATTR_PURE, export_alias("__isalpha_l")]]
-int isalpha_l(int ch, __locale_t locale) {
-@@pp_ifdef __BUILDING_LIBC@@
-	(void)locale;
+@@>> isalpha_l(3)
+[[if($extended_include_prefix("<bits/crt/ctype.h>")defined(__crt_isalpha_l)), preferred_extern_inline("isalpha_l", { return __crt_isalpha_l(ch, locale); })]]
+[[if($extended_include_prefix("<bits/crt/ctype.h>")defined(__crt_isalpha_l)), preferred_extern_inline("__isalpha_l", { return __crt_isalpha_l(ch, locale); })]]
+[[if($extended_include_prefix("<bits/crt/ctype.h>")defined(__crt_isalpha_l)), preferred_inline({ return __crt_isalpha_l(ch, locale); })]]
+[[wunused, pure, export_alias("__isalpha_l")]]
+int isalpha_l(int ch, $locale_t locale) {
 	COMPILER_IMPURE();
+	(void)locale;
 	return isalpha(ch);
-@@pp_else@@
-@@pp_if defined(__CRT_HAVE___ctype_b_loc) && defined(__CRT_GLC)@@
-#include <hybrid/byteorder.h>
-@@pp_if __BYTE_ORDER__ == __ORDER_BIG_ENDIAN__@@
-	return locale->__ctype_b[ch] & (1 << 2);
-@@pp_else@@
-	return locale->__ctype_b[ch] & (1 << 10);
-@@pp_endif@@
-@@pp_elif defined(@__CRT_HAVE___locale_ctype_ptr_l@) && defined(__CRT_CYG)@@
-	return ((__locale_ctype_ptr_l(locale) + 1)[ch & 0xff] & 3) != 0;
-@@pp_elif defined(@__CRT_HAVE__isctype_l@) && defined(__CRT_DOS)@@
-	return _isctype_l(ch, 0x0103, locale);
-@@pp_else@@
-	(void)locale;
-	COMPILER_IMPURE();
-	return isalpha(ch);
-@@pp_endif@@
-@@pp_endif@@
 }
-
-[[wunused, ATTR_PURE, export_alias("__isdigit_l")]]
-int isdigit_l(int ch, __locale_t locale) {
-@@pp_ifdef __BUILDING_LIBC@@
-	(void)locale;
+@@>> isdigit_l(3)
+[[if($extended_include_prefix("<bits/crt/ctype.h>")defined(__crt_isdigit_l)), preferred_extern_inline("isdigit_l", { return __crt_isdigit_l(ch, locale); })]]
+[[if($extended_include_prefix("<bits/crt/ctype.h>")defined(__crt_isdigit_l)), preferred_extern_inline("__isdigit_l", { return __crt_isdigit_l(ch, locale); })]]
+[[if($extended_include_prefix("<bits/crt/ctype.h>")defined(__crt_isdigit_l)), preferred_inline({ return __crt_isdigit_l(ch, locale); })]]
+[[wunused, pure, export_alias("__isdigit_l")]]
+int isdigit_l(int ch, $locale_t locale) {
 	COMPILER_IMPURE();
+	(void)locale;
 	return isdigit(ch);
-@@pp_else@@
-@@pp_if defined(__CRT_HAVE___ctype_b_loc) && defined(__CRT_GLC)@@
-#include <hybrid/byteorder.h>
-@@pp_if __BYTE_ORDER__ == __ORDER_BIG_ENDIAN__@@
-	return locale->__ctype_b[ch] & (1 << 3);
-@@pp_else@@
-	return locale->__ctype_b[ch] & (1 << 11);
-@@pp_endif@@
-@@pp_elif defined(@__CRT_HAVE___locale_ctype_ptr_l@) && defined(__CRT_CYG)@@
-	return ((__locale_ctype_ptr_l(locale) + 1)[ch & 0xff] & 4) != 0;
-@@pp_elif defined(@__CRT_HAVE__isctype_l@) && defined(__CRT_DOS)@@
-	return _isctype_l(ch, 0x0004, locale);
-@@pp_else@@
-	(void)locale;
-	COMPILER_IMPURE();
-	return isdigit(ch);
-@@pp_endif@@
-@@pp_endif@@
 }
-
-[[wunused, ATTR_PURE, export_alias("__isxdigit_l")]]
-int isxdigit_l(int ch, __locale_t locale) {
-@@pp_ifdef __BUILDING_LIBC@@
-	(void)locale;
+@@>> isxdigit_l(3)
+[[if($extended_include_prefix("<bits/crt/ctype.h>")defined(__crt_isxdigit_l)), preferred_extern_inline("isxdigit_l", { return __crt_isxdigit_l(ch, locale); })]]
+[[if($extended_include_prefix("<bits/crt/ctype.h>")defined(__crt_isxdigit_l)), preferred_extern_inline("__isxdigit_l", { return __crt_isxdigit_l(ch, locale); })]]
+[[if($extended_include_prefix("<bits/crt/ctype.h>")defined(__crt_isxdigit_l)), preferred_inline({ return __crt_isxdigit_l(ch, locale); })]]
+[[wunused, pure, export_alias("__isxdigit_l")]]
+int isxdigit_l(int ch, $locale_t locale) {
 	COMPILER_IMPURE();
+	(void)locale;
 	return isxdigit(ch);
-@@pp_else@@
-@@pp_if defined(__CRT_HAVE___ctype_b_loc) && defined(__CRT_GLC)@@
-#include <hybrid/byteorder.h>
-@@pp_if __BYTE_ORDER__ == __ORDER_BIG_ENDIAN__@@
-	return locale->__ctype_b[ch] & (1 << 4);
-@@pp_else@@
-	return locale->__ctype_b[ch] & (1 << 12);
-@@pp_endif@@
-@@pp_elif defined(@__CRT_HAVE___locale_ctype_ptr_l@) && defined(__CRT_CYG)@@
-	return ((__locale_ctype_ptr_l(locale) + 1)[ch & 0xff] & 0104) != 0;
-@@pp_elif defined(@__CRT_HAVE__isctype_l@) && defined(__CRT_DOS)@@
-	return _isctype_l(ch, 0x0080, locale);
-@@pp_else@@
-	(void)locale;
-	COMPILER_IMPURE();
-	return isxdigit(ch);
-@@pp_endif@@
-@@pp_endif@@
 }
-
-[[wunused, ATTR_PURE, export_alias("__isalnum_l")]]
-int isalnum_l(int ch, __locale_t locale) {
-@@pp_ifdef __BUILDING_LIBC@@
-	(void)locale;
+@@>> isalnum_l(3)
+[[if($extended_include_prefix("<bits/crt/ctype.h>")defined(__crt_isalnum_l)), preferred_extern_inline("isalnum_l", { return __crt_isalnum_l(ch, locale); })]]
+[[if($extended_include_prefix("<bits/crt/ctype.h>")defined(__crt_isalnum_l)), preferred_extern_inline("__isalnum_l", { return __crt_isalnum_l(ch, locale); })]]
+[[if($extended_include_prefix("<bits/crt/ctype.h>")defined(__crt_isalnum_l)), preferred_inline({ return __crt_isalnum_l(ch, locale); })]]
+[[wunused, pure, export_alias("__isalnum_l")]]
+int isalnum_l(int ch, $locale_t locale) {
 	COMPILER_IMPURE();
+	(void)locale;
 	return isalnum(ch);
-@@pp_else@@
-@@pp_if defined(__CRT_HAVE___ctype_b_loc) && defined(__CRT_GLC)@@
-#include <hybrid/byteorder.h>
-@@pp_if __BYTE_ORDER__ == __ORDER_BIG_ENDIAN__@@
-	return locale->__ctype_b[ch] & (1 << 11);
-@@pp_else@@
-	return locale->__ctype_b[ch] & (1 << 3);
-@@pp_endif@@
-@@pp_elif defined(@__CRT_HAVE___locale_ctype_ptr_l@) && defined(__CRT_CYG)@@
-	return ((__locale_ctype_ptr_l(locale) + 1)[ch & 0xff] & 7) != 0;
-@@pp_elif defined(@__CRT_HAVE__isctype_l@) && defined(__CRT_DOS)@@
-	return _isctype_l(ch, 0x0107, locale);
-@@pp_else@@
-	(void)locale;
-	COMPILER_IMPURE();
-	return isalnum(ch);
-@@pp_endif@@
-@@pp_endif@@
 }
-
-[[wunused, ATTR_PURE, export_alias("__ispunct_l")]]
-int ispunct_l(int ch, __locale_t locale) {
-@@pp_ifdef __BUILDING_LIBC@@
-	(void)locale;
+@@>> ispunct_l(3)
+[[if($extended_include_prefix("<bits/crt/ctype.h>")defined(__crt_ispunct_l)), preferred_extern_inline("ispunct_l", { return __crt_ispunct_l(ch, locale); })]]
+[[if($extended_include_prefix("<bits/crt/ctype.h>")defined(__crt_ispunct_l)), preferred_extern_inline("__ispunct_l", { return __crt_ispunct_l(ch, locale); })]]
+[[if($extended_include_prefix("<bits/crt/ctype.h>")defined(__crt_ispunct_l)), preferred_inline({ return __crt_ispunct_l(ch, locale); })]]
+[[wunused, pure, export_alias("__ispunct_l")]]
+int ispunct_l(int ch, $locale_t locale) {
 	COMPILER_IMPURE();
+	(void)locale;
 	return ispunct(ch);
-@@pp_else@@
-@@pp_if defined(__CRT_HAVE___ctype_b_loc) && defined(__CRT_GLC)@@
-#include <hybrid/byteorder.h>
-@@pp_if __BYTE_ORDER__ == __ORDER_BIG_ENDIAN__@@
-	return locale->__ctype_b[ch] & (1 << 10);
-@@pp_else@@
-	return locale->__ctype_b[ch] & (1 << 2);
-@@pp_endif@@
-@@pp_elif defined(@__CRT_HAVE___locale_ctype_ptr_l@) && defined(__CRT_CYG)@@
-	return ((__locale_ctype_ptr_l(locale) + 1)[ch & 0xff] & 020) != 0;
-@@pp_elif defined(@__CRT_HAVE__isctype_l@) && defined(__CRT_DOS)@@
-	return _isctype_l(ch, 0x0010, locale);
-@@pp_else@@
-	(void)locale;
-	COMPILER_IMPURE();
-	return ispunct(ch);
-@@pp_endif@@
-@@pp_endif@@
 }
-
-[[wunused, ATTR_PURE, export_alias("__isgraph_l")]]
-int isgraph_l(int ch, __locale_t locale) {
-@@pp_ifdef __BUILDING_LIBC@@
-	(void)locale;
+@@>> isgraph_l(3)
+[[if($extended_include_prefix("<bits/crt/ctype.h>")defined(__crt_isgraph_l)), preferred_extern_inline("isgraph_l", { return __crt_isgraph_l(ch, locale); })]]
+[[if($extended_include_prefix("<bits/crt/ctype.h>")defined(__crt_isgraph_l)), preferred_extern_inline("__isgraph_l", { return __crt_isgraph_l(ch, locale); })]]
+[[if($extended_include_prefix("<bits/crt/ctype.h>")defined(__crt_isgraph_l)), preferred_inline({ return __crt_isgraph_l(ch, locale); })]]
+[[wunused, pure, export_alias("__isgraph_l")]]
+int isgraph_l(int ch, $locale_t locale) {
 	COMPILER_IMPURE();
+	(void)locale;
 	return isgraph(ch);
-@@pp_else@@
-@@pp_if defined(__CRT_HAVE___ctype_b_loc) && defined(__CRT_GLC)@@
-#include <hybrid/byteorder.h>
-@@pp_if __BYTE_ORDER__ == __ORDER_BIG_ENDIAN__@@
-	return locale->__ctype_b[ch] & (1 << 7);
-@@pp_else@@
-	return locale->__ctype_b[ch] & (1 << 15);
-@@pp_endif@@
-@@pp_elif defined(@__CRT_HAVE___locale_ctype_ptr_l@) && defined(__CRT_CYG)@@
-	return ((__locale_ctype_ptr_l(locale) + 1)[ch & 0xff] & 027) != 0;
-@@pp_elif defined(@__CRT_HAVE__isctype_l@) && defined(__CRT_DOS)@@
-	return _isctype_l(ch, 0x0117, locale);
-@@pp_else@@
-	(void)locale;
-	COMPILER_IMPURE();
-	return isgraph(ch);
-@@pp_endif@@
-@@pp_endif@@
 }
-
-[[wunused, ATTR_PURE, export_alias("__isprint_l")]]
-int isprint_l(int ch, __locale_t locale) {
-@@pp_ifdef __BUILDING_LIBC@@
-	(void)locale;
+@@>> isprint_l(3)
+[[if($extended_include_prefix("<bits/crt/ctype.h>")defined(__crt_isprint_l)), preferred_extern_inline("isprint_l", { return __crt_isprint_l(ch, locale); })]]
+[[if($extended_include_prefix("<bits/crt/ctype.h>")defined(__crt_isprint_l)), preferred_extern_inline("__isprint_l", { return __crt_isprint_l(ch, locale); })]]
+[[if($extended_include_prefix("<bits/crt/ctype.h>")defined(__crt_isprint_l)), preferred_inline({ return __crt_isprint_l(ch, locale); })]]
+[[wunused, pure, export_alias("__isprint_l")]]
+int isprint_l(int ch, $locale_t locale) {
 	COMPILER_IMPURE();
+	(void)locale;
 	return isprint(ch);
-@@pp_else@@
-@@pp_if defined(__CRT_HAVE___ctype_b_loc) && defined(__CRT_GLC)@@
-#include <hybrid/byteorder.h>
-@@pp_if __BYTE_ORDER__ == __ORDER_BIG_ENDIAN__@@
-	return locale->__ctype_b[ch] & (1 << 6);
-@@pp_else@@
-	return locale->__ctype_b[ch] & (1 << 14);
-@@pp_endif@@
-@@pp_elif defined(@__CRT_HAVE___locale_ctype_ptr_l@) && defined(__CRT_CYG)@@
-	return ((__locale_ctype_ptr_l(locale) + 1)[ch & 0xff] & 0227) != 0;
-@@pp_elif defined(@__CRT_HAVE__isctype_l@) && defined(__CRT_DOS)@@
-	return _isctype_l(ch, 0x0157, locale);
-@@pp_else@@
-	(void)locale;
-	COMPILER_IMPURE();
-	return isprint(ch);
-@@pp_endif@@
-@@pp_endif@@
 }
-
-[[wunused, ATTR_PURE, export_alias("__isblank_l")]]
-int isblank_l(int ch, __locale_t locale) {
-@@pp_ifdef __BUILDING_LIBC@@
-	(void)locale;
+@@>> isblank_l(3)
+[[if($extended_include_prefix("<bits/crt/ctype.h>")defined(__crt_isblank_l)), preferred_extern_inline("isblank_l", { return __crt_isblank_l(ch, locale); })]]
+[[if($extended_include_prefix("<bits/crt/ctype.h>")defined(__crt_isblank_l)), preferred_extern_inline("__isblank_l", { return __crt_isblank_l(ch, locale); })]]
+[[if($extended_include_prefix("<bits/crt/ctype.h>")defined(__crt_isblank_l)), preferred_inline({ return __crt_isblank_l(ch, locale); })]]
+[[wunused, pure, export_alias("__isblank_l")]]
+int isblank_l(int ch, $locale_t locale) {
 	COMPILER_IMPURE();
-	return isblank(ch);
-@@pp_else@@
-@@pp_if defined(__CRT_HAVE___ctype_b_loc) && defined(__CRT_GLC)@@
-#include <hybrid/byteorder.h>
-@@pp_if __BYTE_ORDER__ == __ORDER_BIG_ENDIAN__@@
-	return locale->__ctype_b[ch] & (1 << 8);
-@@pp_else@@
-	return locale->__ctype_b[ch] & (1 << 0);
-@@pp_endif@@
-@@pp_elif defined(@__CRT_HAVE___locale_ctype_ptr_l@) && defined(__CRT_CYG)@@
-	return ((__locale_ctype_ptr_l(locale) + 1)[ch & 0xff] & 0200) != 0 || ch == '\t';
-@@pp_else@@
 	(void)locale;
-	COMPILER_IMPURE();
 	return isblank(ch);
-@@pp_endif@@
-@@pp_endif@@
 }
-
-
-[[wunused, ATTR_PURE]]
-[[dos_only_export_alias("_tolower_l"), export_alias("__tolower_l")]]
-int tolower_l(int ch, __locale_t locale) {
-	/* TODO: GLC has a variant for this! */
-	(void)locale;
+@@>> tolower_l(3)
+[[if($extended_include_prefix("<bits/crt/ctype.h>")defined(__crt_tolower_l)), preferred_extern_inline("tolower_l", { return __crt_tolower_l(ch, locale); })]]
+[[if($extended_include_prefix("<bits/crt/ctype.h>")defined(__crt_tolower_l)), preferred_extern_inline("__tolower_l", { return __crt_tolower_l(ch, locale); })]]
+[[if($extended_include_prefix("<bits/crt/ctype.h>")defined(__crt_tolower_l)), preferred_inline({ return __crt_tolower_l(ch, locale); })]]
+[[wunused, pure, dos_only_export_alias("_tolower_l"), export_alias("__tolower_l")]]
+int tolower_l(int ch, $locale_t locale) {
 	COMPILER_IMPURE();
+	(void)locale;
 	return tolower(ch);
 }
-
-[[wunused, ATTR_PURE]]
-[[dos_only_export_alias("_toupper_l"), export_alias("__toupper_l")]]
-int toupper_l(int ch, __locale_t locale) {
-	/* TODO: GLC has a variant for this! */
-	(void)locale;
+@@>> toupper_l(3)
+[[if($extended_include_prefix("<bits/crt/ctype.h>")defined(__crt_toupper_l)), preferred_extern_inline("toupper_l", { return __crt_toupper_l(ch, locale); })]]
+[[if($extended_include_prefix("<bits/crt/ctype.h>")defined(__crt_toupper_l)), preferred_extern_inline("__toupper_l", { return __crt_toupper_l(ch, locale); })]]
+[[if($extended_include_prefix("<bits/crt/ctype.h>")defined(__crt_toupper_l)), preferred_inline({ return __crt_toupper_l(ch, locale); })]]
+[[wunused, pure, dos_only_export_alias("_toupper_l"), export_alias("__toupper_l")]]
+int toupper_l(int ch, $locale_t locale) {
 	COMPILER_IMPURE();
+	(void)locale;
 	return toupper(ch);
 }
+/*[[[end]]]*/
+
+
+%#endif /* __USE_XOPEN2K8 */
 
 
 %{
-#endif /* __USE_XOPEN2K8 */
-
-
-/* ASCII-only, inline variants. */
-#ifndef __NO_ATTR_INLINE
-__LOCAL __ATTR_WUNUSED __ATTR_CONST __BOOL __NOTHROW(__LIBCCALL __ascii_iscntrl)(int __ch) { return (__UINT8_TYPE__)__ch <= 0x1f || (__UINT8_TYPE__)__ch == 0x7f; }
-__LOCAL __ATTR_WUNUSED __ATTR_CONST __BOOL __NOTHROW(__LIBCCALL __ascii_isspace)(int __ch) { return ((__UINT8_TYPE__)__ch >= 0x09 && (__UINT8_TYPE__)__ch <= 0x0d) || (__UINT8_TYPE__)__ch == 0x20; }
-__LOCAL __ATTR_WUNUSED __ATTR_CONST __BOOL __NOTHROW(__LIBCCALL __ascii_isupper)(int __ch) { return (__UINT8_TYPE__)__ch >= 0x41 && (__UINT8_TYPE__)__ch <= 0x5a; }
-__LOCAL __ATTR_WUNUSED __ATTR_CONST __BOOL __NOTHROW(__LIBCCALL __ascii_islower)(int __ch) { return (__UINT8_TYPE__)__ch >= 0x61 && (__UINT8_TYPE__)__ch <= 0x7a; }
-__LOCAL __ATTR_WUNUSED __ATTR_CONST __BOOL __NOTHROW(__LIBCCALL __ascii_isalpha)(int __ch) { return __ascii_isupper(__ch) || __ascii_islower(__ch); }
-__LOCAL __ATTR_WUNUSED __ATTR_CONST __BOOL __NOTHROW(__LIBCCALL __ascii_isdigit)(int __ch) { return (__UINT8_TYPE__)__ch >= 0x30 && (__UINT8_TYPE__)__ch <= 0x39; }
-__LOCAL __ATTR_WUNUSED __ATTR_CONST __BOOL __NOTHROW(__LIBCCALL __ascii_isxdigit)(int __ch) { return __ascii_isdigit(__ch) || ((__UINT8_TYPE__)__ch >= 0x41 && (__UINT8_TYPE__)__ch <= 0x46) || ((__UINT8_TYPE__)__ch >= 0x61 && (__UINT8_TYPE__)__ch <= 0x66); }
-__LOCAL __ATTR_WUNUSED __ATTR_CONST __BOOL __NOTHROW(__LIBCCALL __ascii_isalnum)(int __ch) { return __ascii_isupper(__ch) || __ascii_islower(__ch) || __ascii_isdigit(__ch); }
-__LOCAL __ATTR_WUNUSED __ATTR_CONST __BOOL __NOTHROW(__LIBCCALL __ascii_ispunct)(int __ch) { return ((__UINT8_TYPE__)__ch >= 0x21 && (__UINT8_TYPE__)__ch <= 0x2f) || ((__UINT8_TYPE__)__ch >= 0x3a && (__UINT8_TYPE__)__ch <= 0x40) || ((__UINT8_TYPE__)__ch >= 0x5b && (__UINT8_TYPE__)__ch <= 0x60) || ((__UINT8_TYPE__)__ch >= 0x7b && (__UINT8_TYPE__)__ch <= 0x7e); }
-__LOCAL __ATTR_WUNUSED __ATTR_CONST __BOOL __NOTHROW(__LIBCCALL __ascii_isgraph)(int __ch) { return (__UINT8_TYPE__)__ch >= 0x21 && (__UINT8_TYPE__)__ch <= 0x7e; }
-__LOCAL __ATTR_WUNUSED __ATTR_CONST __BOOL __NOTHROW(__LIBCCALL __ascii_isprint)(int __ch) { return (__UINT8_TYPE__)__ch >= 0x20 && (__UINT8_TYPE__)__ch <= 0x7e; }
-__LOCAL __ATTR_WUNUSED __ATTR_CONST int __NOTHROW(__LIBCCALL __ascii_tolower)(int __ch) { return __ascii_isupper(__ch) ? ((__UINT8_TYPE__)__ch+0x20) : __ch; }
-__LOCAL __ATTR_WUNUSED __ATTR_CONST int __NOTHROW(__LIBCCALL __ascii_toupper)(int __ch) { return __ascii_islower(__ch) ? ((__UINT8_TYPE__)__ch-0x20) : __ch; }
-#ifdef __USE_ISOC99
-__LOCAL __ATTR_WUNUSED __ATTR_CONST __BOOL __NOTHROW(__LIBCCALL __ascii_isblank)(int __ch) { return (__UINT8_TYPE__)__ch == 0x09 || (__UINT8_TYPE__)__ch == 0x20; }
-#endif /* __USE_ISOC99 */
-#elif !defined(__NO_XBLOCK)
-#define __ascii_iscntrl(ch)  __XBLOCK({ __UINT8_TYPE__ const __ac_ch = (__UINT8_TYPE__)(ch); __XRETURN __ac_ch <= 0x1f || __ac_ch == 0x7f; })
-#define __ascii_isspace(ch)  __XBLOCK({ __UINT8_TYPE__ const __ac_ch = (__UINT8_TYPE__)(ch); __XRETURN (__ac_ch >= 0x09 && __ac_ch <= 0x0d) || __ac_ch == 0x20; })
-#define __ascii_isupper(ch)  __XBLOCK({ __UINT8_TYPE__ const __ac_ch = (__UINT8_TYPE__)(ch); __XRETURN __ac_ch >= 0x41 && __ac_ch <= 0x5a; })
-#define __ascii_islower(ch)  __XBLOCK({ __UINT8_TYPE__ const __ac_ch = (__UINT8_TYPE__)(ch); __XRETURN __ac_ch >= 0x61 && __ac_ch <= 0x7a; })
-#define __ascii_isalpha(ch)  __XBLOCK({ __UINT8_TYPE__ const __ac_ch = (__UINT8_TYPE__)(ch); __XRETURN __ascii_isupper(__ac_ch) || __ascii_islower(__ac_ch); })
-#define __ascii_isdigit(ch)  __XBLOCK({ __UINT8_TYPE__ const __ac_ch = (__UINT8_TYPE__)(ch); __XRETURN __ac_ch >= 0x30 && __ac_ch <= 0x39; })
-#define __ascii_isxdigit(ch) __XBLOCK({ __UINT8_TYPE__ const __ac_ch = (__UINT8_TYPE__)(ch); __XRETURN __ascii_isdigit(__ac_ch) || (__ac_ch >= 0x41 && __ac_ch <= 0x46) || (__ac_ch >= 0x61 && __ac_ch <= 0x66); })
-#define __ascii_isalnum(ch)  __XBLOCK({ __UINT8_TYPE__ const __ac_ch = (__UINT8_TYPE__)(ch); __XRETURN __ascii_isupper(__ac_ch) || __ascii_islower(__ac_ch) || __ascii_isdigit(__ac_ch); })
-#define __ascii_ispunct(ch)  __XBLOCK({ __UINT8_TYPE__ const __ac_ch = (__UINT8_TYPE__)(ch); __XRETURN (__ac_ch >= 0x21 && __ac_ch <= 0x2f) || (__ac_ch >= 0x3a && __ac_ch <= 0x40) || (__ac_ch >= 0x5b && __ac_ch <= 0x60) || (__ac_ch >= 0x7b && __ac_ch <= 0x7e); })
-#define __ascii_isgraph(ch)  __XBLOCK({ __UINT8_TYPE__ const __ac_ch = (__UINT8_TYPE__)(ch); __XRETURN __ac_ch >= 0x21 && __ac_ch <= 0x7e; })
-#define __ascii_isprint(ch)  __XBLOCK({ __UINT8_TYPE__ const __ac_ch = (__UINT8_TYPE__)(ch); __XRETURN __ac_ch >= 0x20 && __ac_ch <= 0x7e; })
-#define __ascii_tolower(ch)  __XBLOCK({ __UINT8_TYPE__ const __ac_ch = (__UINT8_TYPE__)(ch); __XRETURN (int)(__ascii_isupper(ch) ? (__ac_ch+0x20) : __ac_ch); })
-#define __ascii_toupper(ch)  __XBLOCK({ __UINT8_TYPE__ const __ac_ch = (__UINT8_TYPE__)(ch); __XRETURN (int)(__ascii_islower(ch) ? (__ac_ch-0x20) : __ac_ch); })
-#ifdef __USE_ISOC99
-#define __ascii_isblank(ch)  __XBLOCK({ __UINT8_TYPE__ const __ac_ch = (__UINT8_TYPE__)(ch); __XRETURN __ac_ch == 0x09 || __ac_ch == 0x20; })
-#endif /* __USE_ISOC99 */
-#else /* ... */
-#define __ascii_iscntrl(ch)  ((__UINT8_TYPE__)(ch) <= 0x1f || (__UINT8_TYPE__)(ch) == 0x7f)
-#define __ascii_isspace(ch) (((__UINT8_TYPE__)(ch) >= 0x09 && (__UINT8_TYPE__)(ch) <= 0x0d) || \
-                              (__UINT8_TYPE__)(ch) == 0x20)
-#define __ascii_isupper(ch)  ((__UINT8_TYPE__)(ch) >= 0x41 && (__UINT8_TYPE__)(ch) <= 0x5a)
-#define __ascii_islower(ch)  ((__UINT8_TYPE__)(ch) >= 0x61 && (__UINT8_TYPE__)(ch) <= 0x7a)
-#define __ascii_isalpha(ch)  (__ascii_isupper(ch) || __ascii_islower(ch))
-#define __ascii_isdigit(ch)  ((__UINT8_TYPE__)(ch) >= 0x30 && (__UINT8_TYPE__)(ch) <= 0x39)
-#define __ascii_isxdigit(ch)  (__ascii_isdigit(ch) || \
-                             ((__UINT8_TYPE__)(ch) >= 0x41 && (__UINT8_TYPE__)(ch) <= 0x46) || \
-                             ((__UINT8_TYPE__)(ch) >= 0x61 && (__UINT8_TYPE__)(ch) <= 0x66))
-#define __ascii_isalnum(ch)   (__ascii_isupper(ch) || __ascii_islower(ch) || __ascii_isdigit(ch))
-#define __ascii_ispunct(ch) (((__UINT8_TYPE__)(ch) >= 0x21 && (__UINT8_TYPE__)(ch) <= 0x2f) || \
-                             ((__UINT8_TYPE__)(ch) >= 0x3a && (__UINT8_TYPE__)(ch) <= 0x40) || \
-                             ((__UINT8_TYPE__)(ch) >= 0x5b && (__UINT8_TYPE__)(ch) <= 0x60) || \
-                             ((__UINT8_TYPE__)(ch) >= 0x7b && (__UINT8_TYPE__)(ch) <= 0x7e))
-#define __ascii_isgraph(ch)  ((__UINT8_TYPE__)(ch) >= 0x21 && (__UINT8_TYPE__)(ch) <= 0x7e)
-#define __ascii_isprint(ch)  ((__UINT8_TYPE__)(ch) >= 0x20 && (__UINT8_TYPE__)(ch) <= 0x7e)
-#define __ascii_tolower(ch)  ((int)(__ascii_isupper(ch) ? ((ch)+0x20) : (ch)))
-#define __ascii_toupper(ch)  ((int)(__ascii_islower(ch) ? ((ch)-0x20) : (ch)))
-#ifdef __USE_ISOC99
-#define __ascii_isblank(ch)  ((__UINT8_TYPE__)(ch) == 0x09 || (__UINT8_TYPE__)(ch) == 0x20)
-#endif /* __USE_ISOC99 */
-#endif /* !... */
-
 
 #if (!defined(__cplusplus) || defined(__USE_CTYPE_MACROS)) && !defined(__CXX_SYSTEM_HEADER)
 
-#if defined(__CRT_GLC) && defined(__CRT_HAVE___ctype_b_loc)  /* ---- GLIBC */
-__NAMESPACE_INT_BEGIN
-__CDECLARE(__ATTR_CONST __ATTR_RETNONNULL __ATTR_WUNUSED,__UINT16_TYPE__ const **,__NOTHROW,__ctype_b_loc,(void),())
-#ifndef __NO_XBLOCK
-#ifdef __CRT_HAVE___ctype_tolower_loc
-__CDECLARE(__ATTR_CONST __ATTR_RETNONNULL __ATTR_WUNUSED,__INT32_TYPE__ const **,__NOTHROW,__ctype_tolower_loc,(void),())
-#endif /* __CRT_HAVE___ctype_tolower_loc */
-#ifdef __CRT_HAVE___ctype_toupper_loc
-__CDECLARE(__ATTR_CONST __ATTR_RETNONNULL __ATTR_WUNUSED,__INT32_TYPE__ const **,__NOTHROW,__ctype_toupper_loc,(void),())
-#endif /* __CRT_HAVE___ctype_toupper_loc */
-#endif /* !__NO_XBLOCK */
-__NAMESPACE_INT_END
-#include <hybrid/byteorder.h>
-#if __BYTE_ORDER__ == __ORDER_BIG_ENDIAN__
-#define __inline_isupper(ch)  ((*__NAMESPACE_INT_SYM __ctype_b_loc())[ch] & (1 << 0))
-#define __inline_islower(ch)  ((*__NAMESPACE_INT_SYM __ctype_b_loc())[ch] & (1 << 1))
-#define __inline_isalpha(ch)  ((*__NAMESPACE_INT_SYM __ctype_b_loc())[ch] & (1 << 2))
-#define __inline_isdigit(ch)  ((*__NAMESPACE_INT_SYM __ctype_b_loc())[ch] & (1 << 3))
-#define __inline_isxdigit(ch) ((*__NAMESPACE_INT_SYM __ctype_b_loc())[ch] & (1 << 4))
-#define __inline_isspace(ch)  ((*__NAMESPACE_INT_SYM __ctype_b_loc())[ch] & (1 << 5))
-#define __inline_isprint(ch)  ((*__NAMESPACE_INT_SYM __ctype_b_loc())[ch] & (1 << 6))
-#define __inline_isgraph(ch)  ((*__NAMESPACE_INT_SYM __ctype_b_loc())[ch] & (1 << 7))
-#define __inline_iscntrl(ch)  ((*__NAMESPACE_INT_SYM __ctype_b_loc())[ch] & (1 << 9))
-#define __inline_ispunct(ch)  ((*__NAMESPACE_INT_SYM __ctype_b_loc())[ch] & (1 << 10))
-#define __inline_isalnum(ch)  ((*__NAMESPACE_INT_SYM __ctype_b_loc())[ch] & (1 << 11))
-#ifdef __USE_ISOC99
-#define __inline_isblank(ch)  ((*__NAMESPACE_INT_SYM __ctype_b_loc())[ch] & (1 << 8))
-#endif /* __USE_ISOC99 */
-#ifndef __USE_XOPEN2K8
-#define __inline_isupper_l(ch, locale)  ((locale)->__ctype_b[ch] & (1 << 0))
-#define __inline_islower_l(ch, locale)  ((locale)->__ctype_b[ch] & (1 << 1))
-#define __inline_isalpha_l(ch, locale)  ((locale)->__ctype_b[ch] & (1 << 2))
-#define __inline_isdigit_l(ch, locale)  ((locale)->__ctype_b[ch] & (1 << 3))
-#define __inline_isxdigit_l(ch, locale) ((locale)->__ctype_b[ch] & (1 << 4))
-#define __inline_isspace_l(ch, locale)  ((locale)->__ctype_b[ch] & (1 << 5))
-#define __inline_isprint_l(ch, locale)  ((locale)->__ctype_b[ch] & (1 << 6))
-#define __inline_isgraph_l(ch, locale)  ((locale)->__ctype_b[ch] & (1 << 7))
-#define __inline_iscntrl_l(ch, locale)  ((locale)->__ctype_b[ch] & (1 << 9))
-#define __inline_ispunct_l(ch, locale)  ((locale)->__ctype_b[ch] & (1 << 10))
-#define __inline_isalnum_l(ch, locale)  ((locale)->__ctype_b[ch] & (1 << 11))
-#define __inline_isblank_l(ch, locale)  ((locale)->__ctype_b[ch] & (1 << 8))
-#endif /* !__USE_XOPEN2K8 */
-#else /* __BYTE_ORDER__ == __ORDER_BIG_ENDIAN__ */
-#define __inline_isupper(ch)  ((*__NAMESPACE_INT_SYM __ctype_b_loc())[(int)(ch)] & (1 << 8))
-#define __inline_islower(ch)  ((*__NAMESPACE_INT_SYM __ctype_b_loc())[(int)(ch)] & (1 << 9))
-#define __inline_isalpha(ch)  ((*__NAMESPACE_INT_SYM __ctype_b_loc())[(int)(ch)] & (1 << 10))
-#define __inline_isdigit(ch)  ((*__NAMESPACE_INT_SYM __ctype_b_loc())[(int)(ch)] & (1 << 11))
-#define __inline_isxdigit(ch) ((*__NAMESPACE_INT_SYM __ctype_b_loc())[(int)(ch)] & (1 << 12))
-#define __inline_isspace(ch)  ((*__NAMESPACE_INT_SYM __ctype_b_loc())[(int)(ch)] & (1 << 13))
-#define __inline_isprint(ch)  ((*__NAMESPACE_INT_SYM __ctype_b_loc())[(int)(ch)] & (1 << 14))
-#define __inline_isgraph(ch)  ((*__NAMESPACE_INT_SYM __ctype_b_loc())[(int)(ch)] & (1 << 15))
-#define __inline_iscntrl(ch)  ((*__NAMESPACE_INT_SYM __ctype_b_loc())[(int)(ch)] & (1 << 1))
-#define __inline_ispunct(ch)  ((*__NAMESPACE_INT_SYM __ctype_b_loc())[(int)(ch)] & (1 << 2))
-#define __inline_isalnum(ch)  ((*__NAMESPACE_INT_SYM __ctype_b_loc())[(int)(ch)] & (1 << 3))
-#ifdef __USE_ISOC99
-#define __inline_isblank(ch)  ((*__NAMESPACE_INT_SYM __ctype_b_loc())[(int)(ch)] & (1 << 0))
-#endif /* __USE_ISOC99 */
 #ifdef __USE_XOPEN2K8
-#define __inline_isupper_l(ch, locale)  ((locale)->__ctype_b[(int)(ch)] & (1 << 8))
-#define __inline_islower_l(ch, locale)  ((locale)->__ctype_b[(int)(ch)] & (1 << 9))
-#define __inline_isalpha_l(ch, locale)  ((locale)->__ctype_b[(int)(ch)] & (1 << 10))
-#define __inline_isdigit_l(ch, locale)  ((locale)->__ctype_b[(int)(ch)] & (1 << 11))
-#define __inline_isxdigit_l(ch, locale) ((locale)->__ctype_b[(int)(ch)] & (1 << 12))
-#define __inline_isspace_l(ch, locale)  ((locale)->__ctype_b[(int)(ch)] & (1 << 13))
-#define __inline_isprint_l(ch, locale)  ((locale)->__ctype_b[(int)(ch)] & (1 << 14))
-#define __inline_isgraph_l(ch, locale)  ((locale)->__ctype_b[(int)(ch)] & (1 << 15))
-#define __inline_iscntrl_l(ch, locale)  ((locale)->__ctype_b[(int)(ch)] & (1 << 1))
-#define __inline_ispunct_l(ch, locale)  ((locale)->__ctype_b[(int)(ch)] & (1 << 2))
-#define __inline_isalnum_l(ch, locale)  ((locale)->__ctype_b[(int)(ch)] & (1 << 3))
-#define __inline_isblank_l(ch, locale)  ((locale)->__ctype_b[(int)(ch)] & (1 << 0))
-#endif /* !__USE_XOPEN2K8 */
-#endif /* __BYTE_ORDER__ != __ORDER_BIG_ENDIAN__ */
-#ifndef __NO_XBLOCK
-#ifdef __CRT_HAVE___ctype_tolower_loc
-#define __inline_tolower(ch)  __XBLOCK({ int __tol_ch = (int)(ch); __XRETURN __tol_ch >= -128 && __tol_ch < 256 ? (*__ctype_tolower_loc())[__tol_ch] : __tol_ch; })
-#endif /* __CRT_HAVE___ctype_tolower_loc */
-#ifdef __CRT_HAVE___ctype_toupper_loc
-#define __inline_toupper(ch)  __XBLOCK({ int __tol_ch = (int)(ch); __XRETURN __tol_ch >= -128 && __tol_ch < 256 ? (*__ctype_toupper_loc())[__tol_ch] : __tol_ch; })
-#endif /* __CRT_HAVE___ctype_toupper_loc */
-#endif /* !__NO_XBLOCK */
-#elif defined(__CRT_CYG) && defined(__CRT_HAVE___locale_ctype_ptr)  /* ---- CYGWIN */
-__NAMESPACE_INT_BEGIN
-__CDECLARE(__ATTR_CONST __ATTR_RETNONNULL __ATTR_WUNUSED,char const *,__NOTHROW,__locale_ctype_ptr,(void),())
-#ifdef __CRT_HAVE___locale_ctype_ptr_l
-__CDECLARE(__ATTR_PURE __ATTR_RETNONNULL __ATTR_WUNUSED,char const *,__NOTHROW_NCX,__locale_ctype_ptr_l,(__locale_t __locale),(__locale))
-#endif /* __CRT_HAVE___locale_ctype_ptr_l */
-__NAMESPACE_INT_END
-#define __chtype_lookup(ch)           ((__NAMESPACE_INT_SYM __locale_ctype_ptr()+1)[(int)(ch)])
-#ifdef __CRT_HAVE___locale_ctype_ptr_l
-#define __chtype_lookup_l(ch, locale) ((__NAMESPACE_INT_SYM __locale_ctype_ptr_l(locale)+1)[(int)(ch)])
-#else /* __CRT_HAVE___locale_ctype_ptr_l */
-#define __chtype_lookup_l(ch, locale) ((__NAMESPACE_INT_SYM __locale_ctype_ptr(locale)+1)[(int)(ch)])
-#endif /* !__CRT_HAVE___locale_ctype_ptr_l */
-#define __inline_isalpha(ch)           (__chtype_lookup(ch)&3)
-#define __inline_isupper(ch)          ((__chtype_lookup(ch)&3)==1)
-#define __inline_islower(ch)          ((__chtype_lookup(ch)&3)==2)
-#define __inline_isdigit(ch)           (__chtype_lookup(ch)&4)
-#define __inline_isxdigit(ch)          (__chtype_lookup(ch)&014)
-#define __inline_isspace(ch)           (__chtype_lookup(ch)&010)
-#define __inline_ispunct(ch)           (__chtype_lookup(ch)&020)
-#define __inline_isalnum(ch)           (__chtype_lookup(ch)&7)
-#define __inline_isprint(ch)           (__chtype_lookup(ch)&0227)
-#define __inline_isgraph(ch)           (__chtype_lookup(ch)&027)
-#define __inline_iscntrl(ch)           (__chtype_lookup(ch)&040)
-#ifdef __USE_XOPEN2K8
-#define __inline_isalpha_l(ch, locale)  (__chtype_lookup_l(ch, locale)&3)
-#define __inline_isupper_l(ch, locale) ((__chtype_lookup_l(ch, locale)&3)==1)
-#define __inline_islower_l(ch, locale) ((__chtype_lookup_l(ch, locale)&3)==2)
-#define __inline_isdigit_l(ch, locale)  (__chtype_lookup_l(ch, locale)&4)
-#define __inline_isxdigit_l(ch, locale) (__chtype_lookup_l(ch, locale)&014)
-#define __inline_isspace_l(ch, locale)  (__chtype_lookup_l(ch, locale)&010)
-#define __inline_ispunct_l(ch, locale)  (__chtype_lookup_l(ch, locale)&020)
-#define __inline_isalnum_l(ch, locale)  (__chtype_lookup_l(ch, locale)&7)
-#define __inline_isprint_l(ch, locale)  (__chtype_lookup_l(ch, locale)&0227)
-#define __inline_isgraph_l(ch, locale)  (__chtype_lookup_l(ch, locale)&027)
-#define __inline_iscntrl_l(ch, locale)  (__chtype_lookup_l(ch, locale)&040)
-#endif /* __USE_XOPEN2K8 */
-#ifdef __USE_ISOC99
-#ifndef __NO_XBLOCK
-#define __inline_isblank(ch)           __XBLOCK({ int __x = (ch); __XRETURN (__chtype_lookup(__x) & 0200) || (__x) == '\t'; })
-#define __inline_isblank_l(ch, locale) __XBLOCK({ int __x = (ch); __XRETURN (__chtype_lookup_l(__x, locale) & 0200) || (__x) == '\t'; })
-#endif /* !__NO_XBLOCK */
-#endif /* __USE_ISOC99 */
-#elif defined(__CRT_DOS) && defined(__CRT_HAVE__isctype) /* ---- DOS (MSVC) */
-__NAMESPACE_INT_BEGIN
-__CDECLARE(__ATTR_CONST __ATTR_WUNUSED,int,__NOTHROW,_isctype,(int __ch, int __mask),(__ch,__mask))
-#ifdef __CRT_HAVE__isctype_l
-__CDECLARE(__ATTR_PURE __ATTR_WUNUSED,int,__NOTHROW_NCX,_isctype_l,(int __ch, int __mask, __locale_t __locale),(__ch,__mask,__locale))
-#endif /* __CRT_HAVE__isctype_l */
-__NAMESPACE_INT_END
-#define __dos_isctype(ch, mask)      (__NAMESPACE_INT_SYM _isctype)(ch, mask)
-#ifdef __CRT_HAVE__isctype_l
-#define _isctype_l(ch, mask, locale) (__NAMESPACE_INT_SYM _isctype_l)(ch, mask, locale)
-#else /* __CRT_HAVE__isctype_l */
-#define _isctype_l(ch, mask, locale) (__NAMESPACE_INT_SYM _isctype)(ch, mask)
-#endif /* !__CRT_HAVE__isctype_l */
-#define __inline_isalnum(ch)            __dos_isctype((ch), 0x0107)
-#define __inline_isalpha(ch)            __dos_isctype((ch), 0x0103)
-#define __inline_isupper(ch)            __dos_isctype((ch), 0x0001)
-#define __inline_islower(ch)            __dos_isctype((ch), 0x0002)
-#define __inline_isdigit(ch)            __dos_isctype((ch), 0x0004)
-#define __inline_isxdigit(ch)           __dos_isctype((ch), 0x0080)
-#define __inline_isspace(ch)            __dos_isctype((ch), 0x0008)
-#define __inline_ispunct(ch)            __dos_isctype((ch), 0x0010)
-#define __inline_isprint(ch)            __dos_isctype((ch), 0x0157)
-#define __inline_isgraph(ch)            __dos_isctype((ch), 0x0117)
-#define __inline_iscntrl(ch)            __dos_isctype((ch), 0x0020)
-#ifdef __USE_XOPEN2K8
-#define __inline_isalnum_l(ch, locale)   _isctype_l((ch), 0x0107, (locale))
-#define __inline_isalpha_l(ch, locale)   _isctype_l((ch), 0x0103, (locale))
-#define __inline_isupper_l(ch, locale)   _isctype_l((ch), 0x0001, (locale))
-#define __inline_islower_l(ch, locale)   _isctype_l((ch), 0x0002, (locale))
-#define __inline_isdigit_l(ch, locale)   _isctype_l((ch), 0x0004, (locale))
-#define __inline_isxdigit_l(ch, locale)  _isctype_l((ch), 0x0080, (locale))
-#define __inline_isspace_l(ch, locale)   _isctype_l((ch), 0x0008, (locale))
-#define __inline_ispunct_l(ch, locale)   _isctype_l((ch), 0x0010, (locale))
-#define __inline_isprint_l(ch, locale)   _isctype_l((ch), 0x0157, (locale))
-#define __inline_isgraph_l(ch, locale)   _isctype_l((ch), 0x0117, (locale))
-#define __inline_iscntrl_l(ch, locale)   _isctype_l((ch), 0x0020, (locale))
-#endif /* __USE_XOPEN2K8 */
-#endif /* CRT... */
-
-#ifndef __inline_isalnum
-#define __inline_isalnum(ch) (isalnum)(ch)
-#endif /* !__inline_isalnum */
-#ifndef __inline_isalpha
-#define __inline_isalpha(ch) (isalpha)(ch)
-#endif /* !__inline_isalpha */
-#ifndef __inline_isupper
-#define __inline_isupper(ch) (isupper)(ch)
-#endif /* !__inline_isupper */
-#ifndef __inline_islower
-#define __inline_islower(ch) (islower)(ch)
-#endif /* !__inline_islower */
-#ifndef __inline_isdigit
-#define __inline_isdigit(ch) (isdigit)(ch)
-#endif /* !__inline_isdigit */
-#ifndef __inline_isxdigit
-#define __inline_isxdigit(ch) (isxdigit)(ch)
-#endif /* !__inline_isxdigit */
-#ifndef __inline_isspace
-#define __inline_isspace(ch) (isspace)(ch)
-#endif /* !__inline_isspace */
-#ifndef __inline_ispunct
-#define __inline_ispunct(ch) (ispunct)(ch)
-#endif /* !__inline_ispunct */
-#ifndef __inline_isprint
-#define __inline_isprint(ch) (isprint)(ch)
-#endif /* !__inline_isprint */
-#ifndef __inline_isgraph
-#define __inline_isgraph(ch) (isgraph)(ch)
-#endif /* !__inline_isgraph */
-#ifndef __inline_iscntrl
-#define __inline_iscntrl(ch) (iscntrl)(ch)
-#endif /* !__inline_iscntrl */
-#ifdef __USE_ISOC99
-#ifndef __inline_isblank
-#define __inline_isblank(ch) (isblank)(ch)
-#endif /* !__inline_isblank */
-#endif /* __USE_ISOC99 */
-
-#ifdef __USE_XOPEN2K8
-#ifdef __inline_isalnum_l
-#define isalnum_l(ch, locale)  __inline_isalnum_l(ch, locale)
-#endif /* __inline_isalnum_l */
-#ifdef __inline_isalpha_l
-#define isalpha_l(ch, locale)  __inline_isalpha_l(ch, locale)
-#endif /* __inline_isalpha_l */
-#ifdef __inline_isupper_l
-#define isupper_l(ch, locale)  __inline_isupper_l(ch, locale)
-#endif /* __inline_isupper_l */
-#ifdef __inline_islower_l
-#define islower_l(ch, locale)  __inline_islower_l(ch, locale)
-#endif /* __inline_islower_l */
-#ifdef __inline_isdigit_l
-#define isdigit_l(ch, locale)  __inline_isdigit_l(ch, locale)
-#endif /* __inline_isdigit_l */
-#ifdef __inline_isxdigit_l
-#define isxdigit_l(ch, locale) __inline_isxdigit_l(ch, locale)
-#endif /* __inline_isxdigit_l */
-#ifdef __inline_isspace_l
-#define isspace_l(ch, locale)  __inline_isspace_l(ch, locale)
-#endif /* __inline_isspace_l */
-#ifdef __inline_ispunct_l
-#define ispunct_l(ch, locale)  __inline_ispunct_l(ch, locale)
-#endif /* __inline_ispunct_l */
-#ifdef __inline_isprint_l
-#define isprint_l(ch, locale)  __inline_isprint_l(ch, locale)
-#endif /* __inline_isprint_l */
-#ifdef __inline_isgraph_l
-#define isgraph_l(ch, locale)  __inline_isgraph_l(ch, locale)
-#endif /* __inline_isgraph_l */
-#ifdef __inline_iscntrl_l
-#define iscntrl_l(ch, locale)  __inline_iscntrl_l(ch, locale)
-#endif /* __inline_iscntrl_l */
+#ifdef __crt_isalnum_l
+#define isalnum_l(ch, locale)  __crt_isalnum_l(ch, locale)
+#endif /* __crt_isalnum_l */
+#ifdef __crt_isalpha_l
+#define isalpha_l(ch, locale)  __crt_isalpha_l(ch, locale)
+#endif /* __crt_isalpha_l */
+#ifdef __crt_isupper_l
+#define isupper_l(ch, locale)  __crt_isupper_l(ch, locale)
+#endif /* __crt_isupper_l */
+#ifdef __crt_islower_l
+#define islower_l(ch, locale)  __crt_islower_l(ch, locale)
+#endif /* __crt_islower_l */
+#ifdef __crt_isdigit_l
+#define isdigit_l(ch, locale)  __crt_isdigit_l(ch, locale)
+#endif /* __crt_isdigit_l */
+#ifdef __crt_isxdigit_l
+#define isxdigit_l(ch, locale) __crt_isxdigit_l(ch, locale)
+#endif /* __crt_isxdigit_l */
+#ifdef __crt_isspace_l
+#define isspace_l(ch, locale)  __crt_isspace_l(ch, locale)
+#endif /* __crt_isspace_l */
+#ifdef __crt_ispunct_l
+#define ispunct_l(ch, locale)  __crt_ispunct_l(ch, locale)
+#endif /* __crt_ispunct_l */
+#ifdef __crt_isprint_l
+#define isprint_l(ch, locale)  __crt_isprint_l(ch, locale)
+#endif /* __crt_isprint_l */
+#ifdef __crt_isgraph_l
+#define isgraph_l(ch, locale)  __crt_isgraph_l(ch, locale)
+#endif /* __crt_isgraph_l */
+#ifdef __crt_iscntrl_l
+#define iscntrl_l(ch, locale)  __crt_iscntrl_l(ch, locale)
+#endif /* __crt_iscntrl_l */
+#ifdef __crt_isblank_l
+#define isblank_l(ch, locale)  __crt_isblank_l(ch, locale)
+#endif /* __crt_isblank_l */
+#ifdef __crt_tolower_l
+#define tolower_l(ch, locale)  __crt_tolower_l(ch, locale)
+#endif /* __crt_tolower_l */
+#ifdef __crt_toupper_l
+#define toupper_l(ch, locale)  __crt_toupper_l(ch, locale)
+#endif /* __crt_toupper_l */
 #endif /* __USE_XOPEN2K8 */
 
 #ifndef __NO_builtin_constant_p
 #ifndef __NO_builtin_choose_expr
-#define isalnum(ch)  __builtin_choose_expr(__builtin_constant_p(ch), __ascii_isalnum(ch), __inline_isalnum(ch))
-#define isalpha(ch)  __builtin_choose_expr(__builtin_constant_p(ch), __ascii_isalpha(ch), __inline_isalpha(ch))
-#define isupper(ch)  __builtin_choose_expr(__builtin_constant_p(ch), __ascii_isupper(ch), __inline_isupper(ch))
-#define islower(ch)  __builtin_choose_expr(__builtin_constant_p(ch), __ascii_islower(ch), __inline_islower(ch))
-#define isdigit(ch)  __builtin_choose_expr(__builtin_constant_p(ch), __ascii_isdigit(ch), __inline_isdigit(ch))
-#define isxdigit(ch) __builtin_choose_expr(__builtin_constant_p(ch), __ascii_isxdigit(ch), __inline_isxdigit(ch))
-#define isspace(ch)  __builtin_choose_expr(__builtin_constant_p(ch), __ascii_isspace(ch), __inline_isspace(ch))
-#define ispunct(ch)  __builtin_choose_expr(__builtin_constant_p(ch), __ascii_ispunct(ch), __inline_ispunct(ch))
-#define isprint(ch)  __builtin_choose_expr(__builtin_constant_p(ch), __ascii_isprint(ch), __inline_isprint(ch))
-#define isgraph(ch)  __builtin_choose_expr(__builtin_constant_p(ch), __ascii_isgraph(ch), __inline_isgraph(ch))
-#define iscntrl(ch)  __builtin_choose_expr(__builtin_constant_p(ch), __ascii_iscntrl(ch), __inline_iscntrl(ch))
-#ifdef __USE_ISOC99
-#define isblank(ch)  __builtin_choose_expr(__builtin_constant_p(ch), __ascii_isblank(ch), __inline_isblank(ch))
-#endif /* __USE_ISOC99 */
+#ifdef __crt_isalnum
+#define isalnum(ch)  __builtin_choose_expr(__builtin_constant_p(ch), __ascii_isalnum(ch), __crt_isalnum(ch))
+#endif /* __crt_isalnum */
+#ifdef __crt_isalpha
+#define isalpha(ch)  __builtin_choose_expr(__builtin_constant_p(ch), __ascii_isalpha(ch), __crt_isalpha(ch))
+#endif /* __crt_isalpha */
+#ifdef __crt_isupper
+#define isupper(ch)  __builtin_choose_expr(__builtin_constant_p(ch), __ascii_isupper(ch), __crt_isupper(ch))
+#endif /* __crt_isupper */
+#ifdef __crt_islower
+#define islower(ch)  __builtin_choose_expr(__builtin_constant_p(ch), __ascii_islower(ch), __crt_islower(ch))
+#endif /* __crt_islower */
+#ifdef __crt_isdigit
+#define isdigit(ch)  __builtin_choose_expr(__builtin_constant_p(ch), __ascii_isdigit(ch), __crt_isdigit(ch))
+#endif /* __crt_isdigit */
+#ifdef __crt_isxdigit
+#define isxdigit(ch) __builtin_choose_expr(__builtin_constant_p(ch), __ascii_isxdigit(ch), __crt_isxdigit(ch))
+#endif /* __crt_isxdigit */
+#ifdef __crt_isspace
+#define isspace(ch)  __builtin_choose_expr(__builtin_constant_p(ch), __ascii_isspace(ch), __crt_isspace(ch))
+#endif /* __crt_isspace */
+#ifdef __crt_ispunct
+#define ispunct(ch)  __builtin_choose_expr(__builtin_constant_p(ch), __ascii_ispunct(ch), __crt_ispunct(ch))
+#endif /* __crt_ispunct */
+#ifdef __crt_isprint
+#define isprint(ch)  __builtin_choose_expr(__builtin_constant_p(ch), __ascii_isprint(ch), __crt_isprint(ch))
+#endif /* __crt_isprint */
+#ifdef __crt_isgraph
+#define isgraph(ch)  __builtin_choose_expr(__builtin_constant_p(ch), __ascii_isgraph(ch), __crt_isgraph(ch))
+#endif /* __crt_isgraph */
+#ifdef __crt_iscntrl
+#define iscntrl(ch)  __builtin_choose_expr(__builtin_constant_p(ch), __ascii_iscntrl(ch), __crt_iscntrl(ch))
+#endif /* __crt_iscntrl */
+#if defined(__USE_ISOC99) && defined(__crt_isblank)
+#define isblank(ch)  __builtin_choose_expr(__builtin_constant_p(ch), __ascii_isblank(ch), __crt_isblank(ch))
+#endif /* __USE_ISOC99 && __crt_isblank */
 #else /* !__NO_builtin_choose_expr */
-#define isalnum(ch)  (__builtin_constant_p(ch) ? __ascii_isalnum(ch) : __inline_isalnum(ch))
-#define isalpha(ch)  (__builtin_constant_p(ch) ? __ascii_isalpha(ch) : __inline_isalpha(ch))
-#define isupper(ch)  (__builtin_constant_p(ch) ? __ascii_isupper(ch) : __inline_isupper(ch))
-#define islower(ch)  (__builtin_constant_p(ch) ? __ascii_islower(ch) : __inline_islower(ch))
-#define isdigit(ch)  (__builtin_constant_p(ch) ? __ascii_isdigit(ch) : __inline_isdigit(ch))
-#define isxdigit(ch) (__builtin_constant_p(ch) ? __ascii_isxdigit(ch) : __inline_isxdigit(ch))
-#define isspace(ch)  (__builtin_constant_p(ch) ? __ascii_isspace(ch) : __inline_isspace(ch))
-#define ispunct(ch)  (__builtin_constant_p(ch) ? __ascii_ispunct(ch) : __inline_ispunct(ch))
-#define isprint(ch)  (__builtin_constant_p(ch) ? __ascii_isprint(ch) : __inline_isprint(ch))
-#define isgraph(ch)  (__builtin_constant_p(ch) ? __ascii_isgraph(ch) : __inline_isgraph(ch))
-#define iscntrl(ch)  (__builtin_constant_p(ch) ? __ascii_iscntrl(ch) : __inline_iscntrl(ch))
-#ifdef __USE_ISOC99
-#define isblank(ch)  (__builtin_constant_p(ch) ? __ascii_isblank(ch) : __inline_isblank(ch))
-#endif /* __USE_ISOC99 */
+#ifdef __crt_isalnum
+#define isalnum(ch)  (__builtin_constant_p(ch) ? __ascii_isalnum(ch) : __crt_isalnum(ch))
+#endif /* __crt_isalnum */
+#ifdef __crt_isalpha
+#define isalpha(ch)  (__builtin_constant_p(ch) ? __ascii_isalpha(ch) : __crt_isalpha(ch))
+#endif /* __crt_isalpha */
+#ifdef __crt_isupper
+#define isupper(ch)  (__builtin_constant_p(ch) ? __ascii_isupper(ch) : __crt_isupper(ch))
+#endif /* __crt_isupper */
+#ifdef __crt_islower
+#define islower(ch)  (__builtin_constant_p(ch) ? __ascii_islower(ch) : __crt_islower(ch))
+#endif /* __crt_islower */
+#ifdef __crt_isdigit
+#define isdigit(ch)  (__builtin_constant_p(ch) ? __ascii_isdigit(ch) : __crt_isdigit(ch))
+#endif /* __crt_isdigit */
+#ifdef __crt_isxdigit
+#define isxdigit(ch) (__builtin_constant_p(ch) ? __ascii_isxdigit(ch) : __crt_isxdigit(ch))
+#endif /* __crt_isxdigit */
+#ifdef __crt_isspace
+#define isspace(ch)  (__builtin_constant_p(ch) ? __ascii_isspace(ch) : __crt_isspace(ch))
+#endif /* __crt_isspace */
+#ifdef __crt_ispunct
+#define ispunct(ch)  (__builtin_constant_p(ch) ? __ascii_ispunct(ch) : __crt_ispunct(ch))
+#endif /* __crt_ispunct */
+#ifdef __crt_isprint
+#define isprint(ch)  (__builtin_constant_p(ch) ? __ascii_isprint(ch) : __crt_isprint(ch))
+#endif /* __crt_isprint */
+#ifdef __crt_isgraph
+#define isgraph(ch)  (__builtin_constant_p(ch) ? __ascii_isgraph(ch) : __crt_isgraph(ch))
+#endif /* __crt_isgraph */
+#ifdef __crt_iscntrl
+#define iscntrl(ch)  (__builtin_constant_p(ch) ? __ascii_iscntrl(ch) : __crt_iscntrl(ch))
+#endif /* __crt_iscntrl */
+#if defined(__USE_ISOC99) && defined(__crt_isblank)
+#define isblank(ch)  (__builtin_constant_p(ch) ? __ascii_isblank(ch) : __crt_isblank(ch))
+#endif /* __USE_ISOC99 && __crt_isblank */
 #endif /* __NO_builtin_choose_expr */
 #else /* !__NO_builtin_constant_p */
-#define isalnum(ch)  __inline_isalnum(ch)
-#define isalpha(ch)  __inline_isalpha(ch)
-#define isupper(ch)  __inline_isupper(ch)
-#define islower(ch)  __inline_islower(ch)
-#define isdigit(ch)  __inline_isdigit(ch)
-#define isxdigit(ch) __inline_isxdigit(ch)
-#define isspace(ch)  __inline_isspace(ch)
-#define ispunct(ch)  __inline_ispunct(ch)
-#define isprint(ch)  __inline_isprint(ch)
-#define isgraph(ch)  __inline_isgraph(ch)
-#define iscntrl(ch)  __inline_iscntrl(ch)
-#ifdef __USE_ISOC99
-#define isblank(ch)  __inline_isblank(ch)
-#endif /* __USE_ISOC99 */
+#ifdef __crt_isalnum
+#define isalnum(ch)  __crt_isalnum(ch)
+#endif /* __crt_isalnum */
+#ifdef __crt_isalpha
+#define isalpha(ch)  __crt_isalpha(ch)
+#endif /* __crt_isalpha */
+#ifdef __crt_isupper
+#define isupper(ch)  __crt_isupper(ch)
+#endif /* __crt_isupper */
+#ifdef __crt_islower
+#define islower(ch)  __crt_islower(ch)
+#endif /* __crt_islower */
+#ifdef __crt_isdigit
+#define isdigit(ch)  __crt_isdigit(ch)
+#endif /* __crt_isdigit */
+#ifdef __crt_isxdigit
+#define isxdigit(ch) __crt_isxdigit(ch)
+#endif /* __crt_isxdigit */
+#ifdef __crt_isspace
+#define isspace(ch)  __crt_isspace(ch)
+#endif /* __crt_isspace */
+#ifdef __crt_ispunct
+#define ispunct(ch)  __crt_ispunct(ch)
+#endif /* __crt_ispunct */
+#ifdef __crt_isprint
+#define isprint(ch)  __crt_isprint(ch)
+#endif /* __crt_isprint */
+#ifdef __crt_isgraph
+#define isgraph(ch)  __crt_isgraph(ch)
+#endif /* __crt_isgraph */
+#ifdef __crt_iscntrl
+#define iscntrl(ch)  __crt_iscntrl(ch)
+#endif /* __crt_iscntrl */
+#if defined(__USE_ISOC99) && defined(__crt_isblank)
+#define isblank(ch)  __crt_isblank(ch)
+#endif /* __USE_ISOC99 && __crt_isblank */
 #endif /* __NO_builtin_constant_p */
 
 #endif /* (!__cplusplus || __USE_CTYPE_MACROS) && !__CXX_SYSTEM_HEADER */
@@ -1121,13 +829,13 @@ __NAMESPACE_INT_END
 %[default:section(".text.crt{|.dos}.unicode.static.ctype")];
 
 @@Returns non-zero if `(C & ~0x7f) == 0'
-[[nothrow, ATTR_CONST]]
+[[nothrow, const, inline]]
 int isascii(int c) {
 	return (c & ~0x7f) == 0;
 }
 
 @@Re-returns `C & 0x7f'
-[[nothrow, ATTR_CONST]]
+[[nothrow, const, inline]]
 int toascii(int c) {
 	return c & 0x7f;
 }
