@@ -164,8 +164,6 @@ NOTHROW(LIBCCALL libc___unicode_descriptor_digitld)(uint8_t digit_idx)
 }
 /*[[[end:libc___unicode_descriptor_digitld]]]*/
 
-#include <syslog.h>
-
 /*[[[head:libc_unicode_fold,hash:CRC-32=0x6e2a0f6c]]]*/
 /* Fold the given unicode character `ch' */
 INTERN ATTR_SECTION(".text.crt.unicode.UTF") ATTR_RETNONNULL NONNULL((2)) char32_t *
@@ -176,8 +174,6 @@ NOTHROW_NCX(LIBCCALL libc_unicode_fold)(char32_t ch,
 	struct __unitraits const *trt;
 	struct unifold const *fold;
 	trt = libc___unicode_descriptor(ch);
-	syslog(LOG_DEBUG, "libc_unicode_fold(%#I32x)\n", ch);
-	syslog(LOG_DEBUG, "	trt->__ut_fold_idx = %#I8x\n", trt->__ut_fold_idx);
 	if (trt->__ut_fold_idx >= UNICODE_FOLD_COUNT) {
 		buf[0] = unicode_tolower(ch);
 		return buf + 1;
