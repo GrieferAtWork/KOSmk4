@@ -712,6 +712,21 @@ NOTHROW(KCALL __i386_kernel_main)(struct icpustate *__restrict state) {
 	 * Also: When unloading unused parts isn't enough, we could also try to
 	 *       off-load    not-recently-accessed     parts     into     swap. */
 
+	/* TODO: Re-design `unicode_db.h' to include everything needed by <ctype.h>
+	 *       and make use of `__unicode_asciiflags' to implement functions from
+	 *       ctype such that they're using this table.
+	 *       Note that it's OK if  we use fixed tables  here, since KOS uses  unicode
+	 *       throughout, meaning that  locale differences only  matter when it  comes
+	 *       to actual translations and locale-specific conventions (`localeconv(3)')
+	 * NOTE: If new flags don't end up fitting into 16 bits, just extend the flags
+	 *       field to 32-bit. The additional size-increase in libc is  neglegible,
+	 *       so long as there aren't too many different unicode descriptors!
+	 * Also: Functions from <wctype.h> should be identical to unicode character
+	 *       traits   functions   (e.g.  `iswlower(c) <==> unicode_islower(c)')
+	 * TODO: Also rename `__unicode_asciiflags' to `__unicode_latin1flags' */
+
+	/* TODO: iconv extensions (take a look at FreeBSD's <iconv.h> header) */
+
 	return state;
 }
 

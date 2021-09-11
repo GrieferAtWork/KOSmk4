@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xf43eb546 */
+/* HASH CRC-32:0x72e7f5ee */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -29,7 +29,7 @@
 #include "../user/stdio.h"
 #include "../user/stdlib.h"
 #include "../user/string.h"
-#include "unicode.h"
+#include "../user/unicode.h"
 #include "wctype.h"
 
 DECL_BEGIN

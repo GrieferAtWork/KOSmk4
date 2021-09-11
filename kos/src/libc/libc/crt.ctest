@@ -33,6 +33,7 @@
 #include <math.h>
 #include <stdio.h>
 #include <stdlib.h>
+#include <unicode.h>
 
 DECL_BEGIN
 
@@ -53,6 +54,20 @@ DEFINE_TEST(strtod_works_correctly) {
 	double a, b;
 	char *p = (char *)" 1.0, 1.5";
 	ssize_t n;
+
+	/* Because  this test implicitly  makes use of unicode,
+	 * also make sure that simple integers have the correct
+	 * properties. */
+	assert(!unicode_isalpha('1'));
+	assert(unicode_isdigit('1'));
+	assert(!unicode_isalpha('5'));
+	assert(unicode_isdigit('5'));
+	assert(!unicode_isalpha('0'));
+	assert(unicode_isdigit('0'));
+	EQu(unicode_getnumeric('1'), 1);
+	EQu(unicode_getnumeric('5'), 5);
+	EQu(unicode_getnumeric('0'), 0);
+
 	n = sscanf(p, "%lf ,%lf", &a, &b);
 	assertf(n == 2, "n = %Id", n);
 	assertf(fabs(a - 1.0) < 0.01, "a = %f", a);

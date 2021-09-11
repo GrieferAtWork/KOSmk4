@@ -34,10 +34,10 @@ __DECL_BEGIN
                                                              * Allow `$' to match immediately before a  line-feed. (else: only match at the end  of input data, unless `REGEX_FLAG_NOT_END_OF_LINE' is  set) */
 #define REGEX_FLAG_NOCASE                        0x00000008 /* Ignore case when matching single characters, or character ranges. */
 #define REGEX_FLAG_NO_BACKSLASH_UNICODE_DECIMAL  0x00000010 /* Don't support non-standard unicode numeric matching:
-                                                             *  - "(?\\d=3)" Match any unicode character for `unicode_isdecimal(x) && unicode_asdigit(x) == 3'
-                                                             *  - "(?\\d<7)" Match any unicode character for `unicode_isdecimal(x) && unicode_asdigit(x) < 7'
-                                                             *  - "(?\\d>4)" Match any unicode character for `unicode_isdecimal(x) && unicode_asdigit(x) > 4'
-                                                             *  - "(?\\d<=3>=1)" Match any unicode character for `unicode_isdecimal(x) && unicode_asdigit(x) >= 1 && unicode_asdigit(x) <= 3' */
+                                                             *  - "(?\\d=3)" Match any unicode character for `unicode_isdigit(x) && unicode_asu64(x) == 3'
+                                                             *  - "(?\\d<7)" Match any unicode character for `unicode_isdigit(x) && unicode_asu64(x) < 7'
+                                                             *  - "(?\\d>4)" Match any unicode character for `unicode_isdigit(x) && unicode_asu64(x) > 4'
+                                                             *  - "(?\\d<=3>=1)" Match any unicode character for `unicode_isdigit(x) && unicode_asu64(x) >= 1 && unicode_asu64(x) <= 3' */
 #define REGEX_FLAG_NO_CHARACTER_CLASSES          0x00000020 /* Don't support unicode character classes in ranges */
 #define REGEX_FLAG_ESCAPED_INTERVALS             0x00000040 /* Swap the meaning of { and } with \{ and \} */
 #define REGEX_FLAG_ALLOW_EMPTY_RANGES            0x00000080 /* Allow (and ignore) invalid ranges, such as "[z-a]" (prevents `REGEX_ERROR_EMPTY_RANGE') */

@@ -746,8 +746,12 @@
 #define __CRT_HAVE___tsearch
 #define __CRT_HAVE___twalk
 #define __CRT_HAVE___tzname
-#define __CRT_HAVE___unicode_asciiflags
 #define __CRT_HAVE___unicode_descriptor
+#define __CRT_HAVE___unicode_descriptor_digit
+#define __CRT_HAVE___unicode_descriptor_digit64
+#define __CRT_HAVE___unicode_descriptor_digitd
+#define __CRT_HAVE___unicode_descriptor_digitld
+#define __CRT_HAVE___unicode_latin1flags
 #define __CRT_HAVE___uselocale
 #define __CRT_HAVE___vfork
 #define __CRT_HAVE___vfscanf
@@ -5157,6 +5161,11 @@
 #define __CRT_HAVE_KOS$__tsearch
 #define __CRT_HAVE_KOS$__twalk
 #define __CRT_HAVE_KOS$__tzname
+#define __CRT_HAVE_KOS$__unicode_descriptor
+#define __CRT_HAVE_KOS$__unicode_descriptor_digit
+#define __CRT_HAVE_KOS$__unicode_descriptor_digit64
+#define __CRT_HAVE_KOS$__unicode_descriptor_digitd
+#define __CRT_HAVE_KOS$__unicode_descriptor_digitld
 #define __CRT_HAVE_KOS$__uselocale
 #define __CRT_HAVE_KOS$__vfscanf
 #define __CRT_HAVE_KOS$__vsnprintf
@@ -7841,6 +7850,7 @@
 #define __CRT_HAVE_KOS$unicode_c16toc8
 #define __CRT_HAVE_KOS$unicode_c8toc16
 #define __CRT_HAVE_KOS$unicode_c8toc32
+#define __CRT_HAVE_KOS$unicode_fold
 #define __CRT_HAVE_KOS$unicode_readutf16
 #define __CRT_HAVE_KOS$unicode_readutf16_n
 #define __CRT_HAVE_KOS$unicode_readutf16_rev
@@ -8715,6 +8725,11 @@
 #define __CRT_HAVE_DOS$__tsearch
 #define __CRT_HAVE_DOS$__twalk
 #define __CRT_HAVE_DOS$__tzname
+#define __CRT_HAVE_DOS$__unicode_descriptor
+#define __CRT_HAVE_DOS$__unicode_descriptor_digit
+#define __CRT_HAVE_DOS$__unicode_descriptor_digit64
+#define __CRT_HAVE_DOS$__unicode_descriptor_digitd
+#define __CRT_HAVE_DOS$__unicode_descriptor_digitld
 #define __CRT_HAVE_DOS$__uselocale
 #define __CRT_HAVE_DOS$__vfscanf
 #define __CRT_HAVE_DOS$__vsnprintf
@@ -11399,6 +11414,7 @@
 #define __CRT_HAVE_DOS$unicode_c16toc8
 #define __CRT_HAVE_DOS$unicode_c8toc16
 #define __CRT_HAVE_DOS$unicode_c8toc32
+#define __CRT_HAVE_DOS$unicode_fold
 #define __CRT_HAVE_DOS$unicode_readutf16
 #define __CRT_HAVE_DOS$unicode_readutf16_n
 #define __CRT_HAVE_DOS$unicode_readutf16_rev

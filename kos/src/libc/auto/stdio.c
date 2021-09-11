@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x7c0900e9 */
+/* HASH CRC-32:0x6d05b029 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -28,7 +28,7 @@
 #include "format-printer.h"
 #include "../user/stdlib.h"
 #include "../user/string.h"
-#include "unicode.h"
+#include "../user/unicode.h"
 #include "../user/unistd.h"
 
 DECL_BEGIN

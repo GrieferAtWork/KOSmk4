@@ -366,18 +366,7 @@ __read_chr_after_radix_prefix:
 			/* Parse the integer. */
 			while (__width) {
 				__UINT8_TYPE__ __digit;
-				if ((__CHAR32_TYPE__)__temp >= '0' && (__CHAR32_TYPE__)__temp <= '9')
-					__digit = (__UINT8_TYPE__)__temp - '0';
-				else if ((__CHAR32_TYPE__)__temp >= 'A' && (__CHAR32_TYPE__)__temp <= 'F')
-					__digit = 10 + ((__UINT8_TYPE__)__temp - 'A');
-				else if ((__CHAR32_TYPE__)__temp >= 'a' && (__CHAR32_TYPE__)__temp <= 'f')
-					__digit = 10 + ((__UINT8_TYPE__)__temp - 'a');
-				else if (__libc_unicode_isdecimal((__CHAR32_TYPE__)__temp))
-					__digit = __libc_unicode_asdigit((__CHAR32_TYPE__)__temp);
-				else {
-					break;
-				}
-				if (__digit >= __radix)
+				if (!__libc_unicode_asdigit((__CHAR32_TYPE__)__temp, __radix, &__digit))
 					break; /* Invalid number for radix. */
 				__val *= __radix; /* XXX: Overflow? */
 				__val += __digit; /* XXX: Overflow? */
@@ -872,19 +861,8 @@ __do_consume_fp_sign:
 __fp_loop:
 				__fp_start = __read_count;
 				for (;;) {
-					unsigned int __digit;
-					if (__temp >= '0' && __temp <= '9')
-						__digit = (unsigned int)(__temp - '0');
-					else if (__temp >= 'a' && __temp <= 'f')
-						__digit = (unsigned int)(__temp - 'a');
-					else if (__temp >= 'A' && __temp <= 'F')
-						__digit = (unsigned int)(__temp - 'A');
-					else if (__libc_unicode_isdecimal((__CHAR32_TYPE__)__temp))
-						__digit = __libc_unicode_asdigit((__CHAR32_TYPE__)__temp);
-					else {
-						break;
-					}
-					if (__digit >= __fp_basei)
+					__UINT8_TYPE__ __digit;
+					if (!__libc_unicode_asdigit((__CHAR32_TYPE__)__temp, __fp_basei, &__digit))
 						break;
 					__val = __val * __fp_basef + (__FP_VAL_TYPE)__digit;
 					++__read_count;

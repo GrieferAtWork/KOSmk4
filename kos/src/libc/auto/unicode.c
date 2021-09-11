@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x3ddacebd */
+/* HASH CRC-32:0x1c58733d */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -24,7 +24,7 @@
 #include "../api.h"
 #include <hybrid/typecore.h>
 #include <kos/types.h>
-#include "unicode.h"
+#include "../user/unicode.h"
 
 DECL_BEGIN
 

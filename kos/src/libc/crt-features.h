@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x6bf48a87 */
+/* HASH CRC-32:0xf93c43aa */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -231,6 +231,15 @@
 #ifndef __KERNEL__
 #define __CRT_HAVE_DOS$__sys_errlist
 #define __CRT_HAVE_DOS$__sys_nerr
+#endif /* !__KERNEL__ */
+#if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
+#define __CRT_HAVE_DOS$__unicode_descriptor
+#define __CRT_HAVE_DOS$__unicode_descriptor_digit
+#define __CRT_HAVE_DOS$__unicode_descriptor_digit64
+#define __CRT_HAVE_DOS$__unicode_descriptor_digitd
+#define __CRT_HAVE_DOS$__unicode_descriptor_digitld
+#endif /* !__LIBCCALL_IS_LIBDCALL && !__KERNEL__ */
+#ifndef __KERNEL__
 #define __CRT_HAVE_DOS$__wcserror
 #define __CRT_HAVE_DOS$__wcserror_s
 #endif /* !__KERNEL__ */
@@ -2750,6 +2759,7 @@
 #define __CRT_HAVE_DOS$unicode_c16toc8
 #define __CRT_HAVE_DOS$unicode_c8toc16
 #define __CRT_HAVE_DOS$unicode_c8toc32
+#define __CRT_HAVE_DOS$unicode_fold
 #define __CRT_HAVE_DOS$unicode_readutf16
 #define __CRT_HAVE_DOS$unicode_readutf16_n
 #define __CRT_HAVE_DOS$unicode_readutf16_rev
@@ -3338,8 +3348,12 @@
 #define __CRT_HAVE___strncpy_chk
 #define __CRT_HAVE___sys_errlist
 #define __CRT_HAVE___sys_nerr
-#define __CRT_HAVE___unicode_asciiflags
 #define __CRT_HAVE___unicode_descriptor
+#define __CRT_HAVE___unicode_descriptor_digit
+#define __CRT_HAVE___unicode_descriptor_digit64
+#define __CRT_HAVE___unicode_descriptor_digitd
+#define __CRT_HAVE___unicode_descriptor_digitld
+#define __CRT_HAVE___unicode_latin1flags
 #define __CRT_HAVE___wcserror
 #define __CRT_HAVE___wcserror_s
 #define __CRT_HAVE___xpg_basename

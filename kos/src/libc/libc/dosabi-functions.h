@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x59d3041c */
+/* HASH CRC-32:0x3cbe4d48 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -2435,6 +2435,12 @@ DFUN(".text.crt.dos.unicode.UTF", libd_unicode_c8toc32, libc_unicode_c8toc32, TI
 DFUN(".text.crt.dos.unicode.UTF", libd_unicode_c16toc8, libc_unicode_c16toc8, TI, 3, TP, TI16, TP)
 DFUN(".text.crt.dos.unicode.UTF", libd_format_8to16, libc_format_8to16, TI, 3, TP, TP, TI)
 DFUN(".text.crt.dos.unicode.UTF", libd_format_8to32, libc_format_8to32, TI, 3, TP, TP, TI)
+DFUN(".text.crt.dos.unicode.UTF", libd___unicode_descriptor, libc___unicode_descriptor, TP, 1, TI32)
+DFUN(".text.crt.dos.unicode.UTF", libd___unicode_descriptor_digit, libc___unicode_descriptor_digit, TI8, 1, TI8)
+DFUN(".text.crt.dos.unicode.UTF", libd___unicode_descriptor_digit64, libc___unicode_descriptor_digit64, TI64, 1, TI8)
+DFUN(".text.crt.dos.unicode.UTF", libd___unicode_descriptor_digitd, libc___unicode_descriptor_digitd, TFD, 1, TI8)
+DFUN(".text.crt.dos.unicode.UTF", libd___unicode_descriptor_digitld, libc___unicode_descriptor_digitld, TFL, 1, TI8)
+DFUN(".text.crt.dos.unicode.UTF", libd_unicode_fold, libc_unicode_fold, TP, 2, TI32, TP)
 
 /* unistd */
 DFUN(".text.crt.dos.fs.exec.exec", libd_execv, libc_execv, TD, 2, TP, TP)

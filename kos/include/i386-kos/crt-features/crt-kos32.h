@@ -749,8 +749,12 @@
 #define __CRT_HAVE___tsearch
 #define __CRT_HAVE___twalk
 #define __CRT_HAVE___tzname
-#define __CRT_HAVE___unicode_asciiflags
 #define __CRT_HAVE___unicode_descriptor
+#define __CRT_HAVE___unicode_descriptor_digit
+#define __CRT_HAVE___unicode_descriptor_digit64
+#define __CRT_HAVE___unicode_descriptor_digitd
+#define __CRT_HAVE___unicode_descriptor_digitld
+#define __CRT_HAVE___unicode_latin1flags
 #define __CRT_HAVE___uselocale
 #define __CRT_HAVE___vfork
 #define __CRT_HAVE___vfscanf

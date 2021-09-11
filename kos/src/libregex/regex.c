@@ -122,9 +122,9 @@ do_questionmark:
 			ch32 = unicode_readutf8_n((char const **)&pattern_iter, pattern_end);
 			if (ch32 == ',') {
 				result->mc_min = 0;
-			} else if (unicode_isdecimal(ch32)) {
+			} else if (unicode_isdigit(ch32)) {
 				/* Digit. */
-				result->mc_min = unicode_asdigit(ch32);
+				result->mc_min = unicode_getnumeric(ch32);
 				for (;;) {
 					if (pattern_iter >= pattern_end) {
 err_eof_in_repeat_escaped:
@@ -132,10 +132,10 @@ err_eof_in_repeat_escaped:
 						goto handle_interval_error;
 					}
 					ch32 = unicode_readutf8_n((char const **)&pattern_iter, pattern_end);
-					if (!unicode_isdecimal(ch32))
+					if (!unicode_isdigit(ch32))
 						break;
 					result->mc_min *= 10;
-					result->mc_min += unicode_asdigit(ch32);
+					result->mc_min += unicode_getnumeric(ch32);
 				}
 			} else {
 				interval_error = (char *)REGEX_ERROR_LBRACE_NO_COMMA_OR_DECIMAL;
@@ -156,16 +156,16 @@ err_eof_in_repeat_escaped:
 					++pattern_iter;
 					result->mc_max = (size_t)-1;
 				} else {
-					if (unicode_isdecimal(ch32)) {
-						result->mc_max = unicode_asdigit(ch32);
+					if (unicode_isdigit(ch32)) {
+						result->mc_max = unicode_getnumeric(ch32);
 						for (;;) {
 							if (pattern_iter >= pattern_end)
 								goto err_eof_in_repeat_escaped;
 							ch32 = unicode_readutf8_n((char const **)&pattern_iter, pattern_end);
-							if (!unicode_isdecimal(ch32))
+							if (!unicode_isdigit(ch32))
 								break;
 							result->mc_max *= 10;
-							result->mc_max += unicode_asdigit(ch32);
+							result->mc_max += unicode_getnumeric(ch32);
 						}
 					}
 					if (ch32 != '\\' || *pattern_iter != '}') {
@@ -208,9 +208,9 @@ err_eof_in_repeat_escaped:
 			ch32 = unicode_readutf8_n((char const **)&pattern_iter, pattern_end);
 			if (ch32 == ',') {
 				result->mc_min = 0;
-			} else if (unicode_isdecimal(ch32)) {
+			} else if (unicode_isdigit(ch32)) {
 				/* Digit. */
-				result->mc_min = unicode_asdigit(ch32);
+				result->mc_min = unicode_getnumeric(ch32);
 				for (;;) {
 					if (pattern_iter >= pattern_end) {
 err_eof_in_repeat:
@@ -218,10 +218,10 @@ err_eof_in_repeat:
 						goto handle_interval_error;
 					}
 					ch32 = unicode_readutf8_n((char const **)&pattern_iter, pattern_end);
-					if (!unicode_isdecimal(ch32))
+					if (!unicode_isdigit(ch32))
 						break;
 					result->mc_min *= 10;
-					result->mc_min += unicode_asdigit(ch32);
+					result->mc_min += unicode_getnumeric(ch32);
 				}
 			} else {
 				interval_error = (char *)REGEX_ERROR_LBRACE_NO_COMMA_OR_DECIMAL;
@@ -240,16 +240,16 @@ err_eof_in_repeat:
 				if (ch32 == '}') {
 					result->mc_max = (size_t)-1;
 				} else {
-					if (unicode_isdecimal(ch32)) {
-						result->mc_max = unicode_asdigit(ch32);
+					if (unicode_isdigit(ch32)) {
+						result->mc_max = unicode_getnumeric(ch32);
 						for (;;) {
 							if (pattern_iter >= pattern_end)
 								goto err_eof_in_repeat;
 							ch32 = unicode_readutf8_n((char const **)&pattern_iter, pattern_end);
-							if (!unicode_isdecimal(ch32))
+							if (!unicode_isdigit(ch32))
 								break;
 							result->mc_max *= 10;
-							result->mc_max += unicode_asdigit(ch32);
+							result->mc_max += unicode_getnumeric(ch32);
 						}
 					}
 					if (ch32 != '}') {
@@ -426,8 +426,8 @@ is_in_range(char *range_start, char *range_end,
 				case '0' ... '9':
 					if (data->flags & REGEX_FLAG_NO_BACKSLASH_DIGIT)
 						goto match_single_nocase;
-					if (unicode_isdecimal(data_ch) &&
-					    unicode_asdigit(data_ch) == (uint8_t)(ch - '0'))
+					if (unicode_isdigit(data_ch) &&
+					    unicode_getnumeric(data_ch) == (uint8_t)(ch - '0'))
 						goto ok;
 					break;
 
@@ -514,8 +514,8 @@ match_single_nocase2:
 				case '0' ... '9':
 					if (data->flags & REGEX_FLAG_NO_BACKSLASH_DIGIT)
 						goto match_single;
-					if (unicode_isdecimal(data_ch) &&
-					    unicode_asdigit(data_ch) == (uint8_t)(ch - '0'))
+					if (unicode_isdigit(data_ch) &&
+					    unicode_getnumeric(data_ch) == (uint8_t)(ch - '0'))
 						goto ok;
 					break;
 
@@ -734,12 +734,12 @@ parse_u8(char **__restrict ppattern_iter, char *pattern_end,
 		uint32_t ch;
 		prev_piter = *ppattern_iter;
 		ch         = unicode_readutf8_n((char const **)ppattern_iter, pattern_end);
-		if (!unicode_isdecimal(ch)) {
+		if (!unicode_isdigit(ch)) {
 			*ppattern_iter = prev_piter;
 			break;
 		}
 		*result *= 10;
-		*result += unicode_asdigit(ch);
+		*result += unicode_getnumeric(ch);
 		is_first = false;
 	}
 	if unlikely(is_first)
@@ -920,9 +920,9 @@ do_match_lparen_escaped:
 							break;
 						prev_diter = data_iter;
 						data_ch    = unicode_readutf8_n((char const **)&data_iter, data_end);
-						if (!unicode_isdecimal(data_ch) ||
-						    unicode_asdigit(data_ch) < low ||
-						    unicode_asdigit(data_ch) > high) {
+						if (!unicode_isdigit(data_ch) ||
+						    unicode_getnumeric(data_ch) < low ||
+						    unicode_getnumeric(data_ch) > high) {
 							data_iter = prev_diter;
 							break;
 						}
@@ -1378,14 +1378,14 @@ has_infinite_submatch:
 				goto err;
 			}
 			digit_value = (uint8_t)(ch - '0');
-			DO_CHARACTERWISE_MATCH(unicode_isdecimal(data_ch) &&
-			                       unicode_asdigit(data_ch) == digit_value);
+			DO_CHARACTERWISE_MATCH(unicode_isdigit(data_ch) &&
+			                       unicode_getnumeric(data_ch) == digit_value);
 			goto check_match;
 		}	break;
 
 		case 'd':
-			mask = __UNICODE_FDIGIT;
-			flag = __UNICODE_FDIGIT;
+			mask = __UNICODE_ISNUMERIC;
+			flag = __UNICODE_ISNUMERIC;
 match_unicode_trait:
 			pattern_iter = parse_match_count(pattern_iter, pattern_end, &match, data);
 			if unlikely(REGEX_ISERROR(pattern_iter)) {
@@ -1395,15 +1395,15 @@ match_unicode_trait:
 			DO_CHARACTERWISE_MATCH((__unicode_flags(data_ch) & mask) == flag);
 			goto check_match;
 		case 'D':
-			mask = __UNICODE_FDIGIT;
+			mask = __UNICODE_ISNUMERIC;
 			flag = 0;
 			goto match_unicode_trait;
 		case 's':
-			mask = __UNICODE_FSPACE;
-			flag = __UNICODE_FSPACE;
+			mask = __UNICODE_ISSPACE;
+			flag = __UNICODE_ISSPACE;
 			goto match_unicode_trait;
 		case 'S':
-			mask = __UNICODE_FSPACE;
+			mask = __UNICODE_ISSPACE;
 			flag = 0;
 			goto match_unicode_trait;
 		case 'w':
@@ -1413,11 +1413,11 @@ match_unicode_trait:
 				goto err;
 			}
 			DO_CHARACTERWISE_MATCH(__unicode_flags(data_ch) &
-			                       (__UNICODE_FALPHA | __UNICODE_FDECIMAL |
-			                        __UNICODE_FSYMSTRT | __UNICODE_FSYMCONT));
+			                       (__UNICODE_ISALPHA | __UNICODE_ISDIGIT |
+			                        __UNICODE_ISSYMSTRT | __UNICODE_ISSYMCONT));
 			goto check_match;
 		case 'W':
-			mask = __UNICODE_FALPHA | __UNICODE_FDECIMAL | __UNICODE_FSYMSTRT | __UNICODE_FSYMCONT;
+			mask = __UNICODE_ISALPHA | __UNICODE_ISDIGIT | __UNICODE_ISSYMSTRT | __UNICODE_ISSYMCONT;
 			flag = 0;
 			goto match_unicode_trait;
 
@@ -1446,7 +1446,7 @@ match_unicode_trait:
 			goto check_match;
 
 		case 'N':
-			mask = __UNICODE_FLF;
+			mask = __UNICODE_ISLF;
 			flag = 0;
 			goto match_unicode_trait;
 
@@ -1465,8 +1465,8 @@ match_unicode_trait:
 
 
 #define IS_ALNUM_EXTENDED(ch)                                                                                \
-	(__unicode_flags(data_ch) & (__UNICODE_FALPHA | __UNICODE_FLOWER | __UNICODE_FUPPER | __UNICODE_FTITLE | \
-	                             __UNICODE_FDECIMAL | __UNICODE_FSYMSTRT | __UNICODE_FSYMCONT))
+	(__unicode_flags(data_ch) & (__UNICODE_ISALPHA | __UNICODE_ISLOWER | __UNICODE_ISUPPER | __UNICODE_ISTITLE | \
+	                             __UNICODE_ISDIGIT | __UNICODE_ISSYMSTRT | __UNICODE_ISSYMCONT))
 		case 'b':
 		case 'B': {
 			char *temp_diter;

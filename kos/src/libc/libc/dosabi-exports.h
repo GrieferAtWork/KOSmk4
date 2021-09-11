@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xa864d915 */
+/* HASH CRC-32:0x7710e59a */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -2968,6 +2968,12 @@ DEFINE_PUBLIC_ALIAS(DOS$unicode_c8toc32, libd_unicode_c8toc32);
 DEFINE_PUBLIC_ALIAS(DOS$unicode_c16toc8, libd_unicode_c16toc8);
 DEFINE_PUBLIC_ALIAS(DOS$format_8to16, libd_format_8to16);
 DEFINE_PUBLIC_ALIAS(DOS$format_8to32, libd_format_8to32);
+DEFINE_PUBLIC_ALIAS(DOS$__unicode_descriptor, libd___unicode_descriptor);
+DEFINE_PUBLIC_ALIAS(DOS$__unicode_descriptor_digit, libd___unicode_descriptor_digit);
+DEFINE_PUBLIC_ALIAS(DOS$__unicode_descriptor_digit64, libd___unicode_descriptor_digit64);
+DEFINE_PUBLIC_ALIAS(DOS$__unicode_descriptor_digitd, libd___unicode_descriptor_digitd);
+DEFINE_PUBLIC_ALIAS(DOS$__unicode_descriptor_digitld, libd___unicode_descriptor_digitld);
+DEFINE_PUBLIC_ALIAS(DOS$unicode_fold, libd_unicode_fold);
 
 /* unistd */
 DEFINE_PUBLIC_ALIAS(DOS$_execv, libd_execv);

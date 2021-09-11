@@ -1,0 +1,608 @@
+global final COPYRIGHT =
+"/* Copyright (c) 2019-2021 Griefer@Work                                       *
+ *                                                                            *
+ * This software is provided 'as-is', without any express or implied          *
+ * warranty. In no event will the authors be held liable for any damages      *
+ * arising from the use of this software.                                     *
+ *                                                                            *
+ * Permission is granted to anyone to use this software for any purpose,      *
+ * including commercial applications, and to alter it and redistribute it     *
+ * freely, subject to the following restrictions:                             *
+ *                                                                            *
+ * 1. The origin of this software must not be misrepresented; you must not    *
+ *    claim that you wrote the original software. If you use this software    *
+ *    in a product, an acknowledgement (see the following) in the product     *
+ *    documentation is required:                                              *
+ *    Portions Copyright (c) 2019-2021 Griefer@Work                           *
+ * 2. Altered source versions must be plainly marked as such, and must not be *
+ *    misrepresented as being the original software.                          *
+ * 3. This notice may not be removed or altered from any source distribution. *
+ */";
+
+import * from deemon;
+
+@@Mapping of uni_ord: (0: flags, 1: digit, 2: foldSeq, 3: lower, 4: upper, 5: title)
+global TRAITS: {int: (int, int | string | none, {int...} | none, int, int, int)} = Dict();
+
+@@Read lines from the given file, but skip comments and empty lines
+function readLines(filename: string): {Bytes...} {
+	print("Parsing file: ", repr filename);
+	with (local fp = File.open(filename, "rb")) {
+		for (local line: fp) {
+			local com = line.find("#");
+			if (com >= 0)
+				line = line[:com];
+			line = line.strip();
+			if (line)
+				yield line;
+		}
+	}
+}
+
+function cTypeForSizeof(sizeof: int): string {
+	if (sizeof >= 8)
+		return "uint64_t";
+	if (sizeof >= 4)
+		return "uint32_t";
+	if (sizeof >= 2)
+		return "uint16_t";
+	return "uint8_t";
+}
+
+function cTypeForInteger(maxIntVal: int): string {
+	if (maxIntVal > 0xffffffff)
+		return "uint64_t";
+	if (maxIntVal > 0xffff)
+		return "uint32_t";
+	if (maxIntVal > 0xff)
+		return "uint16_t";
+	return "uint8_t";
+}
+
+function sizeofGreatestIntegerInBytes(values: {int...}): int {
+	local maxIntVal = values ? (values > ...) : 0;
+	if (maxIntVal > 0xffffffff)
+		return 8;
+	if (maxIntVal > 0xffff)
+		return 4;
+	if (maxIntVal > 0xff)
+		return 2;
+	return 1;
+}
+
+@@Split a sequence of ints into two smaller ones + a shift (int)
+@@that  can be used to store the original values more compactly,
+@@while   accessing    the   original    values   as    follows:
+@@>> local a, b, shift = return...;
+@@>> tab[i] == b[(a[(unsigned)i >> shift] << shift) + (i & ((1 << shift)-1))];
+@@HINT: If  no  mapping exists  to optimize  for this,  shift will  equal `0'
+function splitTables(tab: {int: int}, errorValue: int) {
+	local maxShift = 0;
+	local table = List();
+	for (local key, value: tab) {
+		if (key > #table)
+			table.resize(key + 1, errorValue);
+		table[key] = value;
+	}
+	assert table.non_empty();
+	{
+		local len = #table - 1;
+		while (len) {
+			len >>= 1;
+			++maxShift;
+		}
+	}
+	local result = ([], [], 0);
+	local resultScore = 0xffffffff;
+	for (local shift: [:maxShift]) {
+		print File.stderr: ("Testing shift ", shift, "..."),;
+		File.stderr.sync();
+		local size = 2 ** shift;
+		local a = [];
+		local b = [];
+		local cache = Dict();
+		for (local i: [:#table, size]) {
+			local part = table[i:i + size];
+			local offset = cache.get(part);
+			if (offset is none) {
+				/* Add a new section. */
+				offset = #b;
+				cache[part] = offset;
+				b.extend(part);
+			}
+			a.append(offset >> shift);
+		}
+		local score = (sizeofGreatestIntegerInBytes(a) * #a) +
+		              (sizeofGreatestIntegerInBytes(b) * #b);
+		if (score < resultScore) {
+			/* Better fit. */
+			result = (a, b, shift);
+			resultScore = score;
+		}
+		print File.stderr: (" done (Score: ", score, "; a: ", #a, "; b: ", #b, ")");
+	}
+	return result;
+}
+
+/* Unicode flags defined for compatibility with <ctype.h> in "C" locale
+ * Note that unicode characters also use these flags, but only the ASCII
+ * ranges are documented here. e.g. `U+200B' has `UNICODE_ISWHITE' set!
+ *
+ * Meaning:
+ *   - UNICODE_ISCNTRL:    Control characters (UnicodeData.txt: fields[2] == "Cc")
+ *   - UNICODE_ISCTAB:     Only the character U+0009
+ *   - UNICODE_ISXTAB:     Only the characters U+000B and U+000C
+ *   - UNICODE_ISWHITE:    Whitespace (excluding line-feeds)
+ *   - UNICODE_ISLF:       Line-feeds
+ *   - UNICODE_ISLOWER:    Lower-case
+ *   - UNICODE_ISUPPER:    Upper-case
+ *   - UNICODE_ISTITLE:    Title-case
+ *   - UNICODE_ISXALPHA:   Alphabetic (excluding lower-, upper- and title-case, as well as digits and numerics)
+ *   - UNICODE_ISDIGIT:    Digits which may appear in numbers        1 (NOTE: implements the `digit` TRAIT proper becomes valid)
+ *   - UNICODE_ISXNUMERIC: Characters with numeric meaning           ² (NOTE: implements the `digit` TRAIT proper becomes valid)
+ *   - UNICODE_ISHEX:      Only U+0041-U+0046 and U+0061-U+0066      A (NOTE: implements the `digit` TRAIT proper becomes valid)
+ *   - UNICODE_ISPUNCT:    Punctuation
+ *
+ * Invariants:
+ *   - No overlap exists between:
+ *        - UNICODE_ISLOWER, UNICODE_ISUPPER, UNICODE_ISTITLE, UNICODE_ISXALPHA, UNICODE_ISPUNCT, UNICODE_ISDIGIT, UNICODE_ISXNUMERIC
+ *   - The union of the following forms all printable characters:
+ *        - UNICODE_ISLOWER, UNICODE_ISUPPER, UNICODE_ISTITLE, UNICODE_ISXALPHA, UNICODE_ISPUNCT, UNICODE_ISDIGIT, UNICODE_ISXNUMERIC
+ *
+ */
+#define UNICODE_ISCNTRL   0x0001                              /* iscntrl: 00-1F, 7F */
+#define UNICODE_ISCTAB    0x0002                              /*          09 */
+#define UNICODE_ISXTAB    0x0004                              /*          0B-0C */
+#define UNICODE_ISTAB     (UNICODE_ISCTAB | UNICODE_ISXTAB)   /*          09, 0B-0C */
+#define UNICODE_ISWHITE   0x0008                              /*          20 */
+#define UNICODE_ISEMPTY   (UNICODE_ISTAB | UNICODE_ISWHITE)   /*          09, 0B-0C, 20 */
+#define UNICODE_ISLF      0x0010                              /*          0A, 0D */
+#define UNICODE_ISSPACE   (UNICODE_ISEMPTY | UNICODE_ISLF)    /* isspace: 09-0D, 20 */
+#define UNICODE_ISLOWER   0x0020                              /* islower: 61-7A */
+#define UNICODE_ISUPPER   0x0040                              /* isupper: 41-5A */
+#define UNICODE_ISXALPHA  0x0080                              /* <Misc alpha characters> (doesn't appear in ASCII) */
+#define UNICODE_ISALPHA   (UNICODE_ISLOWER | UNICODE_ISUPPER | UNICODE_ISTITLE | UNICODE_ISXALPHA) /* isalpha: 41-5A, 61-7A */
+#define UNICODE_ISDIGIT   0x0100                              /*          30-39 */
+#define UNICODE_ISHEX     0x0200                              /*          41-46, 61-66 */
+#define UNICODE_ISXDIGIT  (UNICODE_ISDIGIT | UNICODE_ISHEX)   /* isxdigit: 30-39, 41-46, 61-66 */
+#define UNICODE_ISALNUM   (UNICODE_ISALPHA | UNICODE_ISDIGIT) /* isalnum: 30-39, 41-5A, 61-7A */
+#define UNICODE_ISPUNCT   0x0400                              /* ispunct: 21-2F, 3A-40, 5B-60, 7B-7E */
+#define UNICODE_ISGRAPH   (UNICODE_ISPUNCT | UNICODE_ISALNUM | UNICODE_ISXNUMERIC) /* isgraph: 21-7E */
+#define UNICODE_ISPRINT   (UNICODE_ISWHITE | UNICODE_ISGRAPH) /* isprint: 20-7E */
+#define UNICODE_ISBLANK   (UNICODE_ISCTAB | UNICODE_ISWHITE)  /* isblank: 09, 20 */
+/* Extended unicode flags. */
+#define UNICODE_ISTITLE    0x0800 /* Is title cased */
+#define UNICODE_ISXNUMERIC 0x1000 /* + all other characters that contain numbers, such as ² */
+#define UNICODE_ISNUMERIC  (UNICODE_ISDIGIT | UNICODE_ISXNUMERIC) /* All numeric characters */
+#define UNICODE_ISSYMSTRT  0x2000 /* Symbol start character */
+#define UNICODE_ISSYMCONT  0x4000 /* Symbol continue character */
+
+
+
+/* Parse UnicodeData.txt
+ * Source: https://ftp.unicode.org/Public/UNIDATA/UnicodeData.txt
+ * Format: https://www.unicode.org/L2/L1999/UnicodeData.html
+ *
+ * ';'-separated unicode traits database
+ * Each line has 15 fields, with the following meaning:
+ * - 0:  Code value                       "0061"
+ * - 1:  Character name                   "LATIN SMALL LETTER A"
+ * - 2:  General category                 "Ll"
+ * - 3:  Canonical combining classes      "0"
+ * - 4:  Bidirectional category           "L"
+ * - 5:  Character decomposition mapping  ""
+ * - 6:  Decimal digit value              ""
+ * - 7:  Digit value                      ""
+ * - 8:  Numeric value                    ""
+ * - 9:  Mirrored                         "N"
+ * - 10: Unicode 1.0 Name                 ""
+ * - 11: 10646 comment field              ""
+ * - 12: Uppercase mapping                "0041"
+ * - 13: Lowercase mapping                ""
+ * - 14: Titlecase mapping                "0041"
+ */
+for (local line: readLines("UnicodeData.txt")) {
+	local fields = line.split(";");
+	local ord    = int(fields[0], 16);
+	if (ord <= 0x7f)
+		continue; /* ASCII is encoded manually to guaranty <ctype.h> compatibility. */
+	local flags  = 0;
+	local digit  = none;
+	local lower  = ord;
+	local upper  = ord;
+	local title  = ord;
+	local generalCategory = fields[2];
+	local biDiCategory    = fields[4];
+
+	if (generalCategory in ["Cc", "Cf", "Cs", "Co", "Cn"])
+		flags |= UNICODE_ISCNTRL;
+	if (biDiCategory == "B" || generalCategory in ["Zl", "Zp"]) {
+		flags |= UNICODE_ISLF;
+	} else if (biDiCategory in ["WS", "S"] || generalCategory == "Zs") {
+		flags |= UNICODE_ISWHITE;
+	}
+
+	if (generalCategory == "Ll") {
+		flags |= UNICODE_ISLOWER;
+	} else if (generalCategory == "Lu") {
+		flags |= UNICODE_ISUPPER;
+	} else if (generalCategory == "Lt") {
+		flags |= UNICODE_ISTITLE;
+	} else if (generalCategory == "Lo") {
+		flags |= UNICODE_ISXALPHA;
+	} else if (generalCategory == "Lm") {
+		flags |= UNICODE_ISXALPHA | UNICODE_ISCNTRL; /* Modifier characters are considered control */
+	} else if (generalCategory in ["Mn", "Mc", "Me"]) {
+		flags |= UNICODE_ISPUNCT; /* Mark characters? */
+	} else if (generalCategory in ["Pc", "Pd", "Ps", "Pe", "Pi", "Pf", "Po"]) {
+		flags |= UNICODE_ISPUNCT;
+	} else if (generalCategory in ["Sm"]) {
+		flags |= UNICODE_ISPUNCT; /* Math symbols */
+	} else if (generalCategory in ["Sc"]) {
+		/* Currency symbols are technically punctuation (because the "C" locale
+		 * defines "$" as ispunct), but we also allow them to appear in symbol names. */
+		flags |= UNICODE_ISPUNCT | UNICODE_ISSYMSTRT | UNICODE_ISSYMCONT;
+	} else if (generalCategory in ["Sk", "So"]) {
+		flags |= UNICODE_ISPUNCT;
+	}
+
+	if (fields[6]) {
+		flags |= UNICODE_ISDIGIT;
+		digit = int(fields[6]);
+	} else if (fields[7]) {
+		flags |= UNICODE_ISXNUMERIC;
+		digit = int(fields[7]);
+	} else if (fields[8]) {
+		local intval = fields[8];
+		if ("/" in intval) {
+			local a, none, b = intval.partition("/")...;
+			digit = "D_FRAC({},{})".format({ a.strip(), b.strip() });
+		} else {
+			digit = int(intval);
+		}
+		flags |= UNICODE_ISXNUMERIC;
+	} else {
+		assert generalCategory !in ["Nd", "Nl", "No"], "Shouldn't be a number category!";
+	}
+
+	/* By default, symstrt/symcont are defined like this: */
+	if (flags & UNICODE_ISALPHA)
+		flags |= UNICODE_ISSYMSTRT;
+	if (flags & UNICODE_ISALNUM)
+		flags |= UNICODE_ISSYMCONT;
+
+	if (fields[12])
+		upper = int(fields[12], 16);
+	if (fields[13])
+		lower = int(fields[13], 16);
+	if (fields[14])
+		title = int(fields[14], 16);
+
+	/* Save in our database */
+	if (flags || lower != ord || upper != ord || title != ord)
+		TRAITS[ord] = (flags, digit, none, lower, upper, title);
+}
+
+
+
+/* Parse DerivedCoreProperties.txt
+ * Source: https://ftp.unicode.org/Public/UNIDATA/DerivedCoreProperties.txt */
+local DerivedCoreProperties: {int: HashSet with string} = Dict();
+for (local line: readLines("DerivedCoreProperties.txt")) {
+	local a, none, b = line.partition(";")...;
+	a = a.rstrip();
+	b = b.lstrip().decode("utf-8");
+	local lo, hi;
+	if (".." in a) {
+		lo, none, hi = a.partition("..")...;
+		lo = int(lo.rstrip(), 16);
+		hi = int(hi.lstrip(), 16);
+	} else {
+		lo = hi = int(a, 16);
+	}
+	if (lo < 0x80)
+		lo = 0x80; /* Skip ASCII */
+	if (lo > hi)
+		continue;
+	for (local ord: [lo:hi+1]) {
+		local prop = DerivedCoreProperties.get(ord);
+		if (prop is none)
+			DerivedCoreProperties[ord] = prop = HashSet();
+		prop.insert(b);
+	}
+}
+for (local ord, prop: DerivedCoreProperties) {
+	local oldFlags = TRAITS.get(ord, (0,)).first;
+	local newFlags = oldFlags;
+	if ("Lowercase" in prop) {
+		newFlags |= UNICODE_ISLOWER | UNICODE_ISSYMCONT | UNICODE_ISSYMSTRT;
+	} else if ("Uppercase" in prop) {
+		newFlags |= UNICODE_ISUPPER | UNICODE_ISSYMCONT | UNICODE_ISSYMSTRT;
+	} else if ("Alphabetic" in prop) {
+		newFlags |= UNICODE_ISXALPHA | UNICODE_ISSYMCONT | UNICODE_ISSYMSTRT;
+	} else {
+		if ("XID_Start" in prop)
+			newFlags |= UNICODE_ISSYMSTRT;
+		if ("XID_Continue" in prop)
+			newFlags |= UNICODE_ISSYMCONT;
+	}
+	if (newFlags != oldFlags) {
+		local oldTraits = TRAITS.get(ord, (0, none, none, ord, ord, ord));
+		local newTraits = Tuple({ newFlags, oldTraits[1:]... });
+		TRAITS[ord]     = newTraits;
+	}
+}
+del DerivedCoreProperties;
+
+
+/* Parse CaseFolding.txt
+ * Source: https://ftp.unicode.org/Public/UNIDATA/CaseFolding.txt */
+for (local line: readLines("CaseFolding.txt")) {
+	local ord, status, mapping, none = line.split(";")...;
+	ord = int(ord.strip(), 16);
+	if (ord <= 0x7f)
+		continue; /* Skip ASCII */
+	status = status.strip();
+	if (status !in ["C", "F"])
+		continue; /* We implement full case folding (iow: C + F) */
+	mapping = Tuple(for (local e: mapping.strip().split(" ")) int(e, 16));
+	local oldEnt = TRAITS.get(ord, (0, none, none, ord, ord, ord));
+	if (#mapping == 1 && oldEnt[3] == mapping.first)
+		continue; /* Case-folding can also be achieved via tolower()! */
+	TRAITS[ord] = Tuple({ oldEnt[:2]..., mapping, oldEnt[3:]... });
+}
+
+
+
+#define ascii_iscntrl(ch)  ((ch) <= 0x1f || (ch) == 0x7f)
+#define ascii_isspace(ch)  (((ch) >= 0x09 && (ch) <= 0x0d) || (ch) == 0x20)
+#define ascii_isupper(ch)  ((ch) >= 0x41 && (ch) <= 0x5a)
+#define ascii_islower(ch)  ((ch) >= 0x61 && (ch) <= 0x7a)
+#define ascii_isalpha(ch)  (ascii_isupper(ch) || ascii_islower(ch))
+#define ascii_isdigit(ch)  ((ch) >= 0x30 && (ch) <= 0x39)
+#define ascii_isxdigit(ch) (ascii_isdigit(ch) || ((ch) >= 0x41 && (ch) <= 0x46) || ((ch) >= 0x61 && (ch) <= 0x66))
+#define ascii_isalnum(ch)  (ascii_isupper(ch) || ascii_islower(ch) || ascii_isdigit(ch))
+#define ascii_ispunct(ch)  (((ch) >= 0x21 && (ch) <= 0x2f) || ((ch) >= 0x3a && (ch) <= 0x40) || ((ch) >= 0x5b && (ch) <= 0x60) || ((ch) >= 0x7b && (ch) <= 0x7e))
+#define ascii_isgraph(ch)  ((ch) >= 0x21 && (ch) <= 0x7e)
+#define ascii_isprint(ch)  ((ch) >= 0x20 && (ch) <= 0x7e)
+#define ascii_tolower(ch)  (ascii_isupper(ch) ? ((ch) + 0x20) : (ch))
+#define ascii_toupper(ch)  (ascii_islower(ch) ? ((ch) - 0x20) : (ch))
+#define ascii_isblank(ch)  ((ch) == 0x09 || (ch) == 0x20)
+
+/* ASCII traits */
+for (local ord: [:0x80]) {
+	local flags  = 0;
+	local digit  = none;
+	local lower  = ascii_tolower(ord);
+	local upper  = ascii_toupper(ord);
+	if (ascii_iscntrl(ord))
+		flags |= UNICODE_ISCNTRL;
+	if (ord == 0x09)
+		flags |= UNICODE_ISCTAB;
+	if (ord == 0x0B || ord == 0x0C)
+		flags |= UNICODE_ISXTAB;
+	if (ord == 0x20)
+		flags |= UNICODE_ISWHITE;
+	if (ord == 0x0A || ord == 0x0D)
+		flags |= UNICODE_ISLF;
+	if (ascii_islower(ord))
+		flags |= UNICODE_ISLOWER;
+	if (ascii_isupper(ord))
+		flags |= UNICODE_ISUPPER;
+	if (ascii_isdigit(ord)) {
+		flags |= UNICODE_ISDIGIT;
+		digit = ord - 0x30;
+	} else if (ord >= 0x41 && ord <= 0x46) {
+		flags |= UNICODE_ISHEX;
+		digit = 10 + ord - 0x41;
+	} else if (ord >= 0x61 && ord <= 0x66) {
+		flags |= UNICODE_ISHEX;
+		digit = 10 + ord - 0x61;
+	}
+	if (ascii_ispunct(ord))
+		flags |= UNICODE_ISPUNCT;
+	if (ord in [0x24, 0x5F]) /* string.chr(ord) in "$_" */
+		flags |= UNICODE_ISSYMCONT | UNICODE_ISSYMSTRT;
+	if (flags & UNICODE_ISALPHA)
+		flags |= UNICODE_ISSYMSTRT;
+	if (flags & UNICODE_ISALNUM)
+		flags |= UNICODE_ISSYMCONT;
+	if (flags || lower != ord || upper != ord)
+		TRAITS[ord] = (flags, digit, none, lower, upper, upper);
+	else {
+		del TRAITS[ord];
+	}
+}
+
+/* Assert that ASCII traits are correct */
+for (local ord: [:0x80]) {
+	local flags = TRAITS.get(ord, (0,)).first;
+#define assert_trait(ascii_isfoo, UNICODE_ISFOO) \
+	assert !!ascii_isfoo(ord) == !!(flags & UNICODE_ISFOO), ord.hex()
+	assert_trait(ascii_iscntrl, UNICODE_ISCNTRL);
+	assert_trait(ascii_isspace, UNICODE_ISSPACE);
+	assert_trait(ascii_isupper, UNICODE_ISUPPER);
+	assert_trait(ascii_islower, UNICODE_ISLOWER);
+	assert_trait(ascii_isalpha, UNICODE_ISALPHA);
+	assert_trait(ascii_isdigit, UNICODE_ISDIGIT);
+	assert_trait(ascii_isxdigit, UNICODE_ISXDIGIT);
+	assert_trait(ascii_isalnum, UNICODE_ISALNUM);
+	assert_trait(ascii_ispunct, UNICODE_ISPUNCT);
+	assert_trait(ascii_isgraph, UNICODE_ISGRAPH);
+	assert_trait(ascii_isprint, UNICODE_ISPRINT);
+	assert_trait(ascii_isblank, UNICODE_ISBLANK);
+#undef assert_trait
+}
+
+/* Traits overrides */
+TRAITS[0x200B] = (UNICODE_ISWHITE | UNICODE_ISCNTRL, none, none, 0x200B, 0x200B, 0x200B); /* ZERO WIDTH SPACE */
+TRAITS[0xFEFF] = (UNICODE_ISWHITE | UNICODE_ISCNTRL, none, none, 0xFEFF, 0xFEFF, 0xFEFF); /* ZERO WIDTH NO-BREAK SPACE */
+
+
+
+function generateUnicodeDatabase() {
+	/* Generate case-folding descriptors. */
+	local fold2Index: {{int...}: int} = Dict();
+	local index2Fold: {{int...}...} = List();
+	local effectiveMaxFoldLen = 0;
+	local effectiveMaxFoldOrd = 0;
+	for (local none, none, foldSeq, none, none, none: TRAITS.values) {
+		if (foldSeq is none)
+			continue;
+		if (foldSeq in fold2Index)
+			continue;
+		local index = #index2Fold;
+		index2Fold.append(foldSeq);
+		fold2Index[foldSeq] = index;
+		local len = #foldSeq;
+		if (effectiveMaxFoldLen < len)
+			effectiveMaxFoldLen = len;
+		local max = foldSeq > ...;
+		if (effectiveMaxFoldOrd < max)
+			effectiveMaxFoldOrd = max;
+	}
+
+	/* Print the fold-database */
+	print("#define UNICODE_FOLD_MAXLEN ", effectiveMaxFoldLen);
+	print("#define UNICODE_FOLD_COUNT  ", #index2Fold);
+	print("struct unifold {");
+	print("	", cTypeForInteger(effectiveMaxFoldOrd), " uf_repl[", effectiveMaxFoldLen, "];");
+	print("};");
+	print("PRIVATE ATTR_SECTION(\".rodata.crt.unicode.UTF\")");
+	print("struct unifold const unicode_fold_descriptors[", #index2Fold, "] = {");
+	for (local foldSeq: index2Fold) {
+		print("	{ { ", ", ".join(
+			for (local b: foldSeq)
+				"0x" + b.hex()[2:].upper().zfill(4)
+			), " } },");
+	}
+	print("};");
+
+	/* Generate the unicode digit decode table. */
+	local digit2Index: {int | string | none: int} = Dict();
+	local index2Digit: {(int | string | none)...} = [];
+	/* Special case: the first 50 digits have one-on-one mapping!
+	 * NOTE: This 50 is hard-coded as `__UNICODE_DIGIT_IDENTITY_MAX' */
+	for (local x: [:50+1]) {
+		digit2Index[x] = x;
+		assert #index2Digit == x;
+		index2Digit.append(x);
+	}
+	for (local none, digit, none, none, none, none: TRAITS.values) {
+		if (digit is none)
+			continue;
+		local digitIndex = digit2Index.get(digit);
+		if (digitIndex is none) {
+			digitIndex = #index2Digit;
+			digit2Index[digit] = digitIndex;
+			index2Digit.append(digit);
+		}
+	}
+	print("#define UNICODE_DIGIT_COUNT ", #index2Digit);
+	print("PRIVATE ATTR_SECTION(\".rodata.crt.unicode.UTF\")");
+	print("unidigit_t const unicode_digits[", #index2Digit, "] = {");
+	for (local digit: index2Digit) {
+		print("	", digit !is int ? digit : "D_INT({})".format({ digit }), ",");
+	}
+	print("};");
+
+	/* Generate unicode traits descriptors.
+	 * NOTE: These are (0: flags, 1: digit, 2: foldSeq, 3: lowerDelta, 4: upperDelta, 5: titleDelta) */
+	local final NULL_DESCRIPTOR = (0, 0xff, 0xff, 0, 0, 0);
+	local desc2Index: {(int,int,int,int,int,int): int} = Dict({ NULL_DESCRIPTOR: 0 });
+	local index2Desc: {(int,int,int,int,int,int)...}   = [NULL_DESCRIPTOR];
+	function makeTraitsDescriptor(ord: int,
+			desc: (int, int | string | none, {int...} | none, int, int, int))
+			: (int,int,int,int,int,int) {
+		local flags, digit, foldSeq, lower, upper, title = desc...;
+		digit   = digit is none ? 0xff : digit2Index[digit];
+		foldSeq = foldSeq is none ? 0xff : fold2Index[foldSeq];
+		return (flags, digit, foldSeq, lower - ord, upper - ord, title - ord);
+	}
+	@@Mapping from Unicode ordinal to descriptor index
+	local ord2DescIndex: {int: int} = Dict();
+	for (local ord, traits: TRAITS) {
+		local desc = makeTraitsDescriptor(ord, traits);
+		local index = desc2Index.get(desc);
+		if (index is none) {
+			index = #index2Desc;
+			desc2Index[desc] = index;
+			index2Desc.append(desc);
+		}
+		ord2DescIndex[ord] = index;
+	}
+
+	/* Print the traits descriptors */
+	print("#define UNICODE_DESCRIPTOR_COUNT ", #index2Desc);
+	print("PRIVATE ATTR_SECTION(\".rodata.crt.unicode.UTF\")");
+	print("struct __unitraits const unicode_descriptors[", #index2Desc, "] = {");
+	for (local flags, foldSeq, digit, lowerDelta, upperDelta, titleDelta: index2Desc) {
+		print("	{ ", flags.hex(), ", ", foldSeq, ", ", digit, ", ",
+			lowerDelta, ", ", upperDelta, ", ", titleDelta, " },");
+	}
+	print("};");
+
+	/* Figure out how best to encode the translation matrix for ORD -> DESC_INDEX */
+	local unicode_tab1, unicode_tab2, shift =
+		splitTables(ord2DescIndex, desc2Index[NULL_DESCRIPTOR])...;
+	function printTable(name: string, tab: {int...}) {
+		print("PRIVATE ATTR_SECTION(\".rodata.crt.unicode.UTF\") ",
+			cTypeForSizeof(sizeofGreatestIntegerInBytes(tab)),
+			" const ", name, "[", #tab, "] = {");
+		for (local line: tab.segments(16)) {
+			print("	", ",".join(line), ",");
+		}
+		print("};");
+	}
+
+	local tab1_mask = ((1 << shift) - 1);
+	local validCount = #unicode_tab1 << shift;
+	print("#define UNICODE_COUNT                ", ((ord2DescIndex.keys > ...) + 1).hex());
+	print("#define UNICODE_COUNT_VALID          ", validCount.hex());
+	print("#define UNICODE_SHIFT                ", shift);
+	print("#define UNICODE_TAB1_MASK            ", tab1_mask.hex());
+	print("#define UNICODE_DESCRIPTOR_INDEX(ch) ",
+		"unicode_tab2[(unicode_tab1[(", cTypeForInteger(validCount - 1), ")(ch) >> ", shift, "] << ", shift,
+		") + ((", cTypeForInteger(tab1_mask), ")(ch) & ", tab1_mask.hex(), ")]");
+	print("#define UNICODE_DESCRIPTOR(ch)       unicode_descriptors[UNICODE_DESCRIPTOR_INDEX(ch)]");
+	print("#define unicode_default_descriptor   unicode_descriptors[", desc2Index[NULL_DESCRIPTOR], "]");
+	printTable("unicode_tab1", unicode_tab1);
+	printTable("unicode_tab2", unicode_tab2);
+	
+	function lookup(ch) {
+		return index2Desc[unicode_tab2[(unicode_tab1[ch >> shift] << shift) + (ch & tab1_mask)]];
+	}
+	/* Generate unicode traits descriptors.
+	 * NOTE: These are (0: flags, 1: digit, 2: foldSeq, 3: lowerDelta, 4: upperDelta, 5: titleDelta) */
+	assert lookup('1'.ord())[0] & UNICODE_ISDIGIT;
+	assert lookup('1'.ord())[1] != 0xff;
+	assert index2Digit[lookup('1'.ord())[1]] == 1;
+	
+
+	/* Print LATIN-1 flags. */
+	print("INTERN_CONST ATTR_SECTION(\".rodata.crt.unicode.UTF\")");
+	print("uint16_t const libc___unicode_latin1flags[256] = {");
+	for (local line: [:256].segments(16)) {
+		print("	", ",".join(
+			for (local ord: line)
+				TRAITS.get(ord, (0,)).first.hex()
+				), ",");
+	}
+	print("};");
+
+}
+
+
+#ifdef __MAIN__
+with (local fp = File.open("db.dat", "w")) {
+	local oldStdout = File.stdout;
+	try {
+		File.stdout = fp;
+		print COPYRIGHT;
+		generateUnicodeDatabase();
+	} finally {
+		File.stdout = oldStdout;
+	}
+}
+#endif /* __MAIN__ */
+

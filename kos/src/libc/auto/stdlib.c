@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x3d24747c */
+/* HASH CRC-32:0x6c4467aa */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -36,7 +36,7 @@
 #include "../user/sys.stat.h"
 #include "../user/sys.time.h"
 #include "../user/sys.wait.h"
-#include "unicode.h"
+#include "../user/unicode.h"
 #include "../user/unistd.h"
 #include "../user/wchar.h"
 

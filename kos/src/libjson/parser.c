@@ -506,7 +506,7 @@ again:
 
 	case '-':
 		ch = json_getc(self);
-		if unlikely(!unicode_isdecimal(ch))
+		if unlikely(!unicode_isdigit(ch))
 			goto syn2;
 		if (ch == '0')
 			goto do_decimal_0;
@@ -545,7 +545,7 @@ again:
 		break;
 
 	default:
-		if (unicode_isdecimal(ch)) {
+		if (unicode_isdigit(ch)) {
 		case '0':
 do_decimal_0:
 			prev = self->jp_pos;
@@ -562,15 +562,13 @@ do_decimal:
 				ch = json_getc(self);
 do_digit_inner:
 				;
-			} while (unicode_isdecimal(ch) ||
-			         (ch >= 'a' && ch <= 'f') ||
-			         (ch >= 'A' && ch <= 'F'));
+			} while (unicode_isxdigit(ch));
 			if (ch == '.') {
 				/* Fractional part. */
 				do {
 					prev = self->jp_pos;
 					ch = json_getc(self);
-				} while (unicode_isdecimal(ch));
+				} while (unicode_isdigit(ch));
 			}
 			if (ch == 'e' || ch == 'E') {
 				/* Exponent. */
@@ -580,7 +578,7 @@ do_digit_inner:
 				do {
 					prev = self->jp_pos;
 					ch = json_getc(self);
-				} while (unicode_isdecimal(ch));
+				} while (unicode_isdigit(ch));
 			}
 			self->jp_pos = prev;
 			result = JSON_PARSER_NUMBER;
@@ -730,7 +728,7 @@ again:
 		break;
 
 	default:
-		if (unicode_isdecimal(ch)) {
+		if (unicode_isdigit(ch)) {
 		case '0': case '1': case '2': case '3':
 		case '4': case '5': case '6': case '7':
 		case '8': case '9':
@@ -741,24 +739,24 @@ again:
 				ch = json_ungetc(self);
 do_decimal:
 				;
-			} while (unicode_isdecimal(ch));
+			} while (unicode_isdigit(ch));
 			if (ch == '+' || ch == '-') {
 				do {
 					next = self->jp_pos;
 					ch = json_ungetc(self);
-				} while (unicode_isdecimal(ch));
+				} while (unicode_isdigit(ch));
 			}
 			if (ch == 'e' || ch == 'E') {
 				do {
 					next = self->jp_pos;
 					ch = json_ungetc(self);
-				} while (unicode_isdecimal(ch));
+				} while (unicode_isdigit(ch));
 			}
 			if (ch == '.') {
 				do {
 					next = self->jp_pos;
 					ch = json_ungetc(self);
-				} while (unicode_isdecimal(ch));
+				} while (unicode_isdigit(ch));
 			}
 			if (isradixch(ch)) {
 				next = self->jp_pos;
@@ -1288,18 +1286,11 @@ NOTHROW_NCX(CC libjson_parser_printstring)(struct json_parser *__restrict self,
 				uint32_t c = 0;
 				unsigned int i, n = ch == 'u' ? 4 : 8;
 				for (i = 0; i < n; ++i) {
+					uint8_t digit;
 					ch = json_getc(self);
-					if (ch >= '0' && ch <= '9')
-						ch -= '0';
-					else if (ch >= 'a' && ch <= 'f')
-						ch = 10 + (ch - 'a');
-					else if (ch >= 'A' && ch <= 'F')
-						ch = 10 + (ch - 'A');
-					else if (unicode_isdecimal(ch))
-						ch = unicode_asdigit(ch);
-					else {
+					if (!unicode_asdigit(ch, 16, &digit))
 						return JSON_ERROR_SYNTAX;
-					}
+					c |= (uint32_t)digit << ((n - i) * 4);
 				}
 				ch = (char32_t)c;
 			}	break;
@@ -1465,7 +1456,7 @@ NOTHROW_NCX(CC libjson_parser_getnumber)(struct json_parser *__restrict self,
 		ch = json_getc(self);
 		negative = true;
 	}
-	if (!unicode_isdecimal(ch)) {
+	if (!unicode_isdigit(ch)) {
 		if (negative)
 			return JSON_ERROR_SYNTAX;
 bad_integer:
@@ -1486,9 +1477,7 @@ bad_integer:
 		} else {
 			radix = 8;
 		}
-		if (!unicode_isdecimal(ch) &&
-		    !(ch >= 'a' && ch <= 'f') &&
-		    !(ch >= 'A' && ch <= 'F')) {
+		if (!unicode_isxdigit(ch)) {
 			if (radix == 8) {
 				/* Special case: '0' */
 				start = pos;
@@ -1500,16 +1489,7 @@ bad_integer:
 	for (;;) {
 		uint8_t digit;
 again_parse_ch:
-		if (ch >= '0' && ch <= '9') {
-			digit = (uint8_t)(ch - '0');
-		} else if (ch >= 'a' && ch <= 'f') {
-			digit = 10 + (uint8_t)(ch - 'a');
-		} else if (ch >= 'A' && ch <= 'F') {
-			digit = 10 + (uint8_t)(ch - 'A');
-		} else {
-			digit = unicode_asdigit(ch);
-		}
-		if unlikely(digit > radix)
+		if unlikely(!unicode_asdigit(ch, radix, &digit))
 			return JSON_ERROR_SYNTAX;
 		new_result = (result * radix) + digit;
 		if (new_result < result) {
@@ -1521,11 +1501,10 @@ again_parse_ch:
 				ch = json_getc(self);
 				/* If this was the last digit, then the
 				 * number  doesn't  actually  overflow! */
-				if (!unicode_isdecimal(ch)) {
+				if (!unicode_isdigit(ch)) {
 					if (radix < 16)
 						break;
-					if (!(ch >= 'a' && ch <= 'f') &&
-					    !(ch >= 'A' && ch <= 'F'))
+					if (!unicode_ishex(ch))
 						break;
 				}
 				error = JSON_ERROR_RANGE;
@@ -1536,12 +1515,10 @@ again_parse_ch:
 		result = new_result;
 		start  = self->jp_pos;
 		ch     = json_getc(self);
-		if (unicode_isdecimal(ch))
+		if (unicode_isdigit(ch))
 			continue;
 		if (radix >= 16) {
-			if (ch >= 'a' && ch <= 'f')
-				continue;
-			if (ch >= 'A' && ch <= 'F')
+			if (unicode_ishex(ch))
 				continue;
 		}
 		break;
@@ -1574,7 +1551,7 @@ NOTHROW_NCX(CC libjson_parser_getint64)(struct json_parser *__restrict self,
 		ch = json_getc(self);
 		negative = true;
 	}
-	if (!unicode_isdecimal(ch)) {
+	if (!unicode_isdigit(ch)) {
 		if (negative)
 			return JSON_ERROR_SYNTAX;
 bad_integer:
@@ -1595,9 +1572,7 @@ bad_integer:
 		} else {
 			radix = 8;
 		}
-		if (!unicode_isdecimal(ch) &&
-		    !(ch >= 'a' && ch <= 'f') &&
-		    !(ch >= 'A' && ch <= 'F')) {
+		if (!unicode_isxdigit(ch)) {
 			if (radix == 8) {
 				/* Special case: '0' */
 				start = pos;
@@ -1609,16 +1584,7 @@ bad_integer:
 	for (;;) {
 		uint8_t digit;
 again_parse_ch:
-		if (ch >= '0' && ch <= '9') {
-			digit = (uint8_t)(ch - '0');
-		} else if (ch >= 'a' && ch <= 'f') {
-			digit = 10 + (uint8_t)(ch - 'a');
-		} else if (ch >= 'A' && ch <= 'F') {
-			digit = 10 + (uint8_t)(ch - 'A');
-		} else {
-			digit = unicode_asdigit(ch);
-		}
-		if unlikely(digit > radix)
+		if unlikely(!unicode_asdigit(ch, radix, &digit))
 			return JSON_ERROR_SYNTAX;
 		new_result = (result * radix) + digit;
 		if (new_result < result) {
@@ -1630,11 +1596,10 @@ again_parse_ch:
 				ch = json_getc(self);
 				/* If this was the last digit, then the
 				 * number  doesn't  actually  overflow! */
-				if (!unicode_isdecimal(ch)) {
+				if (!unicode_isdigit(ch)) {
 					if (radix < 16)
 						break;
-					if (!(ch >= 'a' && ch <= 'f') &&
-					    !(ch >= 'A' && ch <= 'F'))
+					if (!unicode_ishex(ch))
 						break;
 				}
 				error = JSON_ERROR_RANGE;
@@ -1645,12 +1610,10 @@ again_parse_ch:
 		result = new_result;
 		start  = self->jp_pos;
 		ch     = json_getc(self);
-		if (unicode_isdecimal(ch))
+		if (unicode_isdigit(ch))
 			continue;
 		if (radix >= 16) {
-			if (ch >= 'a' && ch <= 'f')
-				continue;
-			if (ch >= 'A' && ch <= 'F')
+			if (unicode_ishex(ch))
 				continue;
 		}
 		break;
@@ -1682,7 +1645,7 @@ NOTHROW_NCX(CC libjson_parser_getfloat)(struct json_parser *__restrict self,
 		ch = json_getc(self);
 		negative = true;
 	}
-	if (!unicode_isdecimal(ch)) {
+	if (!unicode_isdigit(ch)) {
 		if (negative)
 			return JSON_ERROR_SYNTAX;
 		self->jp_pos = start;
@@ -1691,23 +1654,23 @@ NOTHROW_NCX(CC libjson_parser_getfloat)(struct json_parser *__restrict self,
 	result_whole = 0;
 	do {
 		result_whole *= 10;
-		result_whole += unicode_asdigit(ch);
+		result_whole += unicode_getnumeric(ch);
 		start = self->jp_pos;
 		ch = json_getc(self);
-	} while (unicode_isdecimal(ch));
+	} while (unicode_isdigit(ch));
 	result_frac = 0.0;
 	if (ch == '.') {
 		uintptr_t base = 10;
 		ch = json_getc(self);
-		if (!unicode_isdecimal(ch))
+		if (!unicode_isdigit(ch))
 			return JSON_ERROR_SYNTAX;
 		do {
 			base *= 10;
 			result_frac *= 10.0;
-			result_frac += unicode_asdigit(ch);
+			result_frac += unicode_getnumeric(ch);
 			start = self->jp_pos;
 			ch = json_getc(self);
-		} while (unicode_isdecimal(ch));
+		} while (unicode_isdigit(ch));
 		result_frac /= (double)base;
 	}
 	result = (double)result_whole + result_frac;
@@ -1719,14 +1682,14 @@ NOTHROW_NCX(CC libjson_parser_getfloat)(struct json_parser *__restrict self,
 			exp_negative = ch == '-';
 			ch = json_getc(self);
 		}
-		if (!unicode_isdecimal(ch))
+		if (!unicode_isdigit(ch))
 			return JSON_ERROR_SYNTAX;
 		do {
 			exp *= 10;
-			exp += unicode_asdigit(ch);
+			exp += unicode_getnumeric(ch);
 			start = self->jp_pos;
 			ch = json_getc(self);
-		} while (unicode_isdecimal(ch));
+		} while (unicode_isdigit(ch));
 		/* TODO: Use the same trick for converting string->float
 		 *       as is  also  being  used  by  `format_scanf()'!
 		 *       It's much more precise, and doesn't require any
