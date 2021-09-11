@@ -58,16 +58,28 @@ __DECL_BEGIN
  *                 generated, starting at `0' and ending as soon as  this
  *                 function returns `(size_t)-1' to indicate that no more
  *                 possible transliterations are available.
+ * @param: what:   What to try (set of `ICONV_TRANSLITERATE_F_*')
  * @return: (size_t)-1: No (more) transliterations available.
  * @return: * : The # of characters written to `result' (may be 0). */
 typedef __ATTR_WUNUSED __ATTR_NONNULL((1)) __size_t
 /*__NOTHROW_NCX*/ (LIBICONV_CC *PICONV_TRANSLITERATE)(__CHAR32_TYPE__ result[ICONV_TRANSLITERATE_MAXLEN],
-                                                      __CHAR32_TYPE__ uni_ch, __size_t nth);
+                                                      __CHAR32_TYPE__ uni_ch, __size_t nth,
+                                                      unsigned int what);
 #ifdef LIBICONV_WANT_PROTOTYPES
 LIBICONV_DECL __ATTR_WUNUSED __ATTR_NONNULL((1)) __size_t
 __NOTHROW_NCX(LIBICONV_CC iconv_transliterate)(__CHAR32_TYPE__ result[ICONV_TRANSLITERATE_MAXLEN],
-                                               __CHAR32_TYPE__ uni_ch, __size_t nth);
+                                               __CHAR32_TYPE__ uni_ch, __size_t nth,
+                                               unsigned int what);
 #endif /* LIBICONV_WANT_PROTOTYPES */
+
+/* Possible flags for `iconv_transliterate::what' */
+#define ICONV_TRANSLITERATE_F_LOWER    0x0001 /* Flag: attempt to use `unicode_tolower()' */
+#define ICONV_TRANSLITERATE_F_UPPER    0x0002 /* Flag: attempt to use `unicode_toupper()' */
+#define ICONV_TRANSLITERATE_F_TITLE    0x0004 /* Flag: attempt to use `unicode_totitle()' */
+#define ICONV_TRANSLITERATE_F_FOLD     0x0008 /* Flag: attempt to use `unicode_fold()' */
+#define ICONV_TRANSLITERATE_F_TRANSLIT 0x0010 /* Flag: attempt to replace with similar-looking character(s) */
+#define ICONV_TRANSLITERATE_F_ALL      0xffff /* Attempt everything. (used by `ICONV_ERR_TRANSLIT') */
+
 
 
 __DECL_END
