@@ -1918,8 +1918,8 @@ __LIBC __UINT16_TYPE__ const __unicode_latin1flags[257] __CASMNAME_SAME("__unico
 /* >> uint16_t __unicode_flags(char32_t ch); */
 #ifndef __unicode_flags
 #if defined(____unicode_descriptor_defined) && defined(____unicode_latin1flags_defined)
-#define __unicode_flags(ch)                                            \
-	(sizeof(ch) == 1 ? (__unicode_latin1flags+1)[(__UINT8_TYPE__)(ch)] \
+#define __unicode_flags(ch)                                   \
+	(sizeof(ch) == 1 ? (__unicode_latin1flags + 1)[(int)(ch)] \
 	                 : __unicode_descriptor(ch)->__ut_flags)
 #elif defined(____unicode_descriptor_defined)
 #define __unicode_flags(ch) (__unicode_descriptor(ch)->__ut_flags)
@@ -2213,12 +2213,12 @@ __LIBC __UINT16_TYPE__ const __unicode_latin1flags[257] __CASMNAME_SAME("__unico
 /* >> uint16_t __unicode_flags(char32_t ch); */
 #ifndef __unicode_flags
 #if defined(____unicode_descriptor_defined) && defined(____unicode_latin1flags_defined)
-#define __unicode_flags(ch)                                            \
-	(sizeof(ch) == 1 ? (__unicode_latin1flags+1)[(__UINT8_TYPE__)(ch)] \
+#define __unicode_flags(ch)                                   \
+	(sizeof(ch) == 1 ? (__unicode_latin1flags + 1)[(int)(ch)] \
 	                 : __unicode_descriptor(ch)->__ut_flags)
 #elif defined(__libc___unicode_descriptor_defined) && defined(____unicode_latin1flags_defined)
-#define __unicode_flags(ch)                                            \
-	(sizeof(ch) == 1 ? (__unicode_latin1flags+1)[(__UINT8_TYPE__)(ch)] \
+#define __unicode_flags(ch)                                   \
+	(sizeof(ch) == 1 ? (__unicode_latin1flags + 1)[(int)(ch)] \
 	                 : __libc___unicode_descriptor(ch)->__ut_flags)
 #elif defined(____unicode_descriptor_defined)
 #define __unicode_flags(ch) (__unicode_descriptor(ch)->__ut_flags)

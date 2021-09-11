@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xa46ac05d */
+/* HASH CRC-32:0x4aa66e2b */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -1182,8 +1182,8 @@ __LIBC __UINT16_TYPE__ const __unicode_latin1flags[257] __CASMNAME_SAME("__unico
 /* >> uint16_t __unicode_flags(char32_t ch); */
 #ifndef __unicode_flags
 #if defined(____unicode_descriptor_defined) && defined(____unicode_latin1flags_defined)
-#define __unicode_flags(ch)                                            \
-	(sizeof(ch) == 1 ? (__unicode_latin1flags+1)[(__UINT8_TYPE__)(ch)] \
+#define __unicode_flags(ch)                                   \
+	(sizeof(ch) == 1 ? (__unicode_latin1flags + 1)[(int)(ch)] \
 	                 : __unicode_descriptor(ch)->__ut_flags)
 #elif defined(____unicode_descriptor_defined)
 #define __unicode_flags(ch) (__unicode_descriptor(ch)->__ut_flags)

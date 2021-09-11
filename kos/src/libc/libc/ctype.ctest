@@ -1,0 +1,116 @@
+/* Copyright (c) 2019-2021 Griefer@Work                                       *
+ *                                                                            *
+ * This software is provided 'as-is', without any express or implied          *
+ * warranty. In no event will the authors be held liable for any damages      *
+ * arising from the use of this software.                                     *
+ *                                                                            *
+ * Permission is granted to anyone to use this software for any purpose,      *
+ * including commercial applications, and to alter it and redistribute it     *
+ * freely, subject to the following restrictions:                             *
+ *                                                                            *
+ * 1. The origin of this software must not be misrepresented; you must not    *
+ *    claim that you wrote the original software. If you use this software    *
+ *    in a product, an acknowledgement (see the following) in the product     *
+ *    documentation is required:                                              *
+ *    Portions Copyright (c) 2019-2021 Griefer@Work                           *
+ * 2. Altered source versions must be plainly marked as such, and must not be *
+ *    misrepresented as being the original software.                          *
+ * 3. This notice may not be removed or altered from any source distribution. *
+ */
+#ifndef GUARD_LIBC_LIBC_CRT_CTEST
+#define GUARD_LIBC_LIBC_CRT_CTEST 1
+#define _KOS_SOURCE 1
+#undef NDEBUG
+
+#include <hybrid/compiler.h>
+
+#include <kos/types.h>
+#include <system-test/ctest.h>
+
+#include <assert.h>
+#include <ctype.h>
+#include <stdio.h>
+#include <unicode.h>
+
+DECL_BEGIN
+
+#define ascii_iscntrl(ch)  ((ch) >= 0 && ((uint8_t)(ch) <= 0x1f || (uint8_t)(ch) == 0x7f))
+#define ascii_isspace(ch)  ((ch) >= 0 && (((uint8_t)(ch) >= 0x09 && (uint8_t)(ch) <= 0x0d) || (uint8_t)(ch) == 0x20))
+#define ascii_isupper(ch)  ((ch) >= 0 && ((uint8_t)(ch) >= 0x41 && (uint8_t)(ch) <= 0x5a))
+#define ascii_islower(ch)  ((ch) >= 0 && ((uint8_t)(ch) >= 0x61 && (uint8_t)(ch) <= 0x7a))
+#define ascii_isalpha(ch)  ((ch) >= 0 && (ascii_isupper(ch) || ascii_islower(ch)))
+#define ascii_isdigit(ch)  ((ch) >= 0 && ((uint8_t)(ch) >= 0x30 && (uint8_t)(ch) <= 0x39))
+#define ascii_isxdigit(ch) ((ch) >= 0 && (ascii_isdigit(ch) || ((uint8_t)(ch) >= 0x41 && (uint8_t)(ch) <= 0x46) || ((uint8_t)(ch) >= 0x61 && (uint8_t)(ch) <= 0x66)))
+#define ascii_isalnum(ch)  ((ch) >= 0 && (ascii_isupper(ch) || ascii_islower(ch) || ascii_isdigit(ch)))
+#define ascii_ispunct(ch)  ((ch) >= 0 && (((uint8_t)(ch) >= 0x21 && (uint8_t)(ch) <= 0x2f) || ((uint8_t)(ch) >= 0x3a && (uint8_t)(ch) <= 0x40) || ((uint8_t)(ch) >= 0x5b && (uint8_t)(ch) <= 0x60) || ((uint8_t)(ch) >= 0x7b && (uint8_t)(ch) <= 0x7e)))
+#define ascii_isgraph(ch)  ((ch) >= 0 && ((uint8_t)(ch) >= 0x21 && (uint8_t)(ch) <= 0x7e))
+#define ascii_isprint(ch)  ((ch) >= 0 && ((uint8_t)(ch) >= 0x20 && (uint8_t)(ch) <= 0x7e))
+#define ascii_isblank(ch)  ((ch) >= 0 && ((uint8_t)(ch) == 0x09 || (uint8_t)(ch) == 0x20))
+#define ascii__tolower(ch) ((ch) + 0x20)
+#define ascii__toupper(ch) ((ch) - 0x20)
+#define ascii_tolower(ch)  (ascii_isupper(ch) ? ascii__tolower(ch) : (ch))
+#define ascii_toupper(ch)  (ascii_islower(ch) ? ascii__toupper(ch) : (ch))
+
+static void testchar(int ch) {
+	/* <ctype.h> */
+	assertf(ascii_tolower(ch) == tolower(ch), "%d", ch);
+	assertf(ascii_toupper(ch) == toupper(ch), "%d", ch);
+	assertf(!!ascii_iscntrl(ch) == !!iscntrl(ch), "%d", ch);
+	assertf(!!ascii_isspace(ch) == !!isspace(ch), "%d", ch);
+	assertf(!!ascii_isupper(ch) == !!isupper(ch), "%d", ch);
+	assertf(!!ascii_islower(ch) == !!islower(ch), "%d", ch);
+	assertf(!!ascii_isalpha(ch) == !!isalpha(ch), "%d", ch);
+	assertf(!!ascii_isdigit(ch) == !!isdigit(ch), "%d", ch);
+	assertf(!!ascii_isxdigit(ch) == !!isxdigit(ch), "%d", ch);
+	assertf(!!ascii_isalnum(ch) == !!isalnum(ch), "%d", ch);
+	assertf(!!ascii_ispunct(ch) == !!ispunct(ch), "%d", ch);
+	assertf(!!ascii_isgraph(ch) == !!isgraph(ch), "%d", ch);
+	assertf(!!ascii_isprint(ch) == !!isprint(ch), "%d", ch);
+	assertf(!!ascii_isblank(ch) == !!isblank(ch), "%d", ch);
+
+	/* <unicode.h> */
+	assertf(ascii_tolower(ch) == unicode_tolower(ch), "%d", ch);
+	assertf(ascii_toupper(ch) == unicode_toupper(ch), "%d", ch);
+	/* Unicode feature macros (may) contain optimizations based on the
+	 * sizeof() of the  given character variable.  As such, test  both
+	 * variations,  though  the single-byte  variation  should already
+	 * be identical to what it used in <ctype.h>! */
+	assertf(!!ascii_iscntrl(ch) == !!unicode_iscntrl((char32_t)ch), "%d", ch);
+	assertf(!!ascii_iscntrl(ch) == !!unicode_iscntrl((char)ch), "%d", ch);
+	assertf(!!ascii_isspace(ch) == !!unicode_isspace((char32_t)ch), "%d", ch);
+	assertf(!!ascii_isspace(ch) == !!unicode_isspace((char)ch), "%d", ch);
+	assertf(!!ascii_isupper(ch) == !!unicode_isupper((char32_t)ch), "%d", ch);
+	assertf(!!ascii_isupper(ch) == !!unicode_isupper((char)ch), "%d", ch);
+	assertf(!!ascii_islower(ch) == !!unicode_islower((char32_t)ch), "%d", ch);
+	assertf(!!ascii_islower(ch) == !!unicode_islower((char)ch), "%d", ch);
+	assertf(!!ascii_isalpha(ch) == !!unicode_isalpha((char32_t)ch), "%d", ch);
+	assertf(!!ascii_isalpha(ch) == !!unicode_isalpha((char)ch), "%d", ch);
+	assertf(!!ascii_isdigit(ch) == !!unicode_isdigit((char32_t)ch), "%d", ch);
+	assertf(!!ascii_isdigit(ch) == !!unicode_isdigit((char)ch), "%d", ch);
+	assertf(!!ascii_isxdigit(ch) == !!unicode_isxdigit((char32_t)ch), "%d", ch);
+	assertf(!!ascii_isxdigit(ch) == !!unicode_isxdigit((char)ch), "%d", ch);
+	assertf(!!ascii_isalnum(ch) == !!unicode_isalnum((char32_t)ch), "%d", ch);
+	assertf(!!ascii_isalnum(ch) == !!unicode_isalnum((char)ch), "%d", ch);
+	assertf(!!ascii_ispunct(ch) == !!unicode_ispunct((char32_t)ch), "%d", ch);
+	assertf(!!ascii_ispunct(ch) == !!unicode_ispunct((char)ch), "%d", ch);
+	assertf(!!ascii_isgraph(ch) == !!unicode_isgraph((char32_t)ch), "%d", ch);
+	assertf(!!ascii_isgraph(ch) == !!unicode_isgraph((char)ch), "%d", ch);
+	assertf(!!ascii_isprint(ch) == !!unicode_isprint((char32_t)ch), "%d", ch);
+	assertf(!!ascii_isprint(ch) == !!unicode_isprint((char)ch), "%d", ch);
+	assertf(!!ascii_isblank(ch) == !!unicode_isblank((char32_t)ch), "%d", ch);
+	assertf(!!ascii_isblank(ch) == !!unicode_isblank((char)ch), "%d", ch);
+}
+
+
+/* Assert that ctype and unicode macros all function properly. */
+DEFINE_TEST(ctype) {
+	int ch;
+	testchar(EOF);
+
+	for (ch = 0; ch < 128; ++ch)
+		testchar(ch);
+}
+
+DECL_END
+
+#endif /* !GUARD_LIBC_LIBC_CRT_CTEST */
