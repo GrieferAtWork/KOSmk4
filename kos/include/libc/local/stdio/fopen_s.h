@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xda35a18f */
+/* HASH CRC-32:0xa6bc314d */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -52,7 +52,7 @@ __NOTHROW_RPC(__LIBCCALL __LIBC_LOCAL_NAME(fopen_s))(__FILE **__pstream, char co
 		return 1;
 #endif /* !__EINVAL */
 	}
-	__result = __localdep_fopen64(__filename, __modes);
+	__result = __NAMESPACE_LOCAL_SYM __localdep_fopen64(__filename, __modes);
 	if __unlikely(!__result) {
 #ifdef __ENOMEM
 		return __libc_geterrno_or(__ENOMEM);

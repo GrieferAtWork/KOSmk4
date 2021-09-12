@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x416fc328 */
+/* HASH CRC-32:0x6add2730 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -41,7 +41,7 @@ __LOCAL_LIBC(wctype_l) __ATTR_WUNUSED __ATTR_NONNULL((1)) __wctype_t
 __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(wctype_l))(char const *__prop, __locale_t __locale) {
 	(void)__locale;
 	__COMPILER_IMPURE();
-	return __localdep_wctype(__prop);
+	return __NAMESPACE_LOCAL_SYM __localdep_wctype(__prop);
 }
 __NAMESPACE_LOCAL_END
 #ifndef __local___localdep_wctype_l_defined

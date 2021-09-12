@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x14fe51d8 */
+/* HASH CRC-32:0xb03c2906 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -48,7 +48,7 @@ __LOCAL_LIBC(_aligned_offset_malloc) __ATTR_MALLOC __ATTR_WUNUSED __ATTR_ALLOC_S
 __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(_aligned_offset_malloc))(__SIZE_TYPE__ __num_bytes, __SIZE_TYPE__ __min_alignment, __SIZE_TYPE__ __offset) {
 	void *__result;
 	__offset &= (__min_alignment - 1);
-	__result = __localdep_malloc(__num_bytes + 2 * sizeof(void *) + __min_alignment - 1 + (__min_alignment - __offset));
+	__result = __NAMESPACE_LOCAL_SYM __localdep_malloc(__num_bytes + 2 * sizeof(void *) + __min_alignment - 1 + (__min_alignment - __offset));
 	if (__result) {
 		void *__base = (void *)((((__UINTPTR_TYPE__)__result + (__min_alignment - 1)) & ~(__min_alignment - 1)) + __offset);
 		((void **)__base)[-1] = __result;

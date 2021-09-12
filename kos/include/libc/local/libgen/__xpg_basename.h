@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xbad5d558 */
+/* HASH CRC-32:0xb2ea3ee0 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -39,7 +39,7 @@ __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(__xpg_basename))(char *__filename) {
 	/* Handle the empty-path case. */
 	if (!__filename || !*__filename)
 		goto __fallback;
-	__iter = __localdep_strend(__filename);
+	__iter = __NAMESPACE_LOCAL_SYM __localdep_strend(__filename);
 	for (;;) {
 		--__iter;
 		if (*__iter != '/')

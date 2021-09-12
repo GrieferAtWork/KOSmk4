@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xcf2c3152 */
+/* HASH CRC-32:0xdd17a119 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -51,7 +51,7 @@ __CREDIRECT_KOS(,__SIZE_TYPE__,__NOTHROW_NCX,__localdep_uchar_c32rtomb,(char *__
 __NAMESPACE_LOCAL_END
 #include <libc/local/wchar/wcrtomb.h>
 __NAMESPACE_LOCAL_BEGIN
-#define __localdep_uchar_c32rtomb (*(__SIZE_TYPE__(__LIBKCALL *)(char *__restrict, __CHAR32_TYPE__, struct __mbstate *))&__LIBC_LOCAL_NAME(wcrtomb))
+#define __localdep_uchar_c32rtomb __NAMESPACE_LOCAL_TYPEHAX(__SIZE_TYPE__(__LIBKCALL*)(char *__restrict,__CHAR32_TYPE__,struct __mbstate *),__SIZE_TYPE__(__LIBKCALL&)(char *__restrict,__CHAR32_TYPE__,struct __mbstate *),wcrtomb)
 #else /* ... */
 __NAMESPACE_LOCAL_END
 #include <libc/local/uchar/uchar_c32rtomb.h>
@@ -66,14 +66,14 @@ __NOTHROW_NCX(__LIBKCALL __LIBC_LOCAL_NAME(c32rtombs))(char *__dst, __CHAR32_TYP
 	while (__dstlen) {
 		__SIZE_TYPE__ __error;
 		char __buf[7];
-		__error = __localdep_uchar_c32rtomb(__buf, *__src, __mbs);
+		__error = __NAMESPACE_LOCAL_SYM __localdep_uchar_c32rtomb(__buf, *__src, __mbs);
 		if (!__error)
 			break;
 		if (__error == (__SIZE_TYPE__)-1)
 			return (__SIZE_TYPE__)-1; /* EILSEQ */
 		if (__error > __dstlen)
 			break;
-		__dst = (char *)__localdep_mempcpy(__dst, __buf, __error);
+		__dst = (char *)__NAMESPACE_LOCAL_SYM __localdep_mempcpy(__dst, __buf, __error);
 		__result += __error;
 		__dstlen -= __error;
 		++__src;

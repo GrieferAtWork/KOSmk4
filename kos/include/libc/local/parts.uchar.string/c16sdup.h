@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xf0109892 */
+/* HASH CRC-32:0x65c1d34d */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -39,7 +39,7 @@ __CREDIRECT_DOS(__ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1)),__SIZE_TYPE__,__N
 __NAMESPACE_LOCAL_END
 #include <libc/local/wchar/wcslen.h>
 __NAMESPACE_LOCAL_BEGIN
-#define __localdep_c16slen (*(__SIZE_TYPE__(__LIBDCALL *)(__CHAR16_TYPE__ const *__restrict))&__LIBC_LOCAL_NAME(wcslen))
+#define __localdep_c16slen __NAMESPACE_LOCAL_TYPEHAX(__SIZE_TYPE__(__LIBDCALL*)(__CHAR16_TYPE__ const *__restrict),__SIZE_TYPE__(__LIBDCALL&)(__CHAR16_TYPE__ const *__restrict),wcslen)
 #else /* ... */
 __NAMESPACE_LOCAL_END
 #include <libc/local/parts.uchar.string/c16slen.h>
@@ -87,10 +87,10 @@ __NAMESPACE_LOCAL_END
 __NAMESPACE_LOCAL_BEGIN
 __LOCAL_LIBC(c16sdup) __ATTR_MALLOC __ATTR_MALL_DEFAULT_ALIGNED __ATTR_WUNUSED __ATTR_NONNULL((1)) __CHAR16_TYPE__ *
 __NOTHROW_NCX(__LIBDCALL __LIBC_LOCAL_NAME(c16sdup))(__CHAR16_TYPE__ const *__restrict __string) {
-	__SIZE_TYPE__ __resultsize = (__localdep_c16slen(__string) + 1) * sizeof(__CHAR16_TYPE__);
-	__CHAR16_TYPE__ *__result = (__CHAR16_TYPE__ *)__localdep_malloc(__resultsize);
+	__SIZE_TYPE__ __resultsize = (__NAMESPACE_LOCAL_SYM __localdep_c16slen(__string) + 1) * sizeof(__CHAR16_TYPE__);
+	__CHAR16_TYPE__ *__result = (__CHAR16_TYPE__ *)__NAMESPACE_LOCAL_SYM __localdep_malloc(__resultsize);
 	if __likely(__result)
-		__localdep_memcpy(__result, __string, __resultsize);
+		__NAMESPACE_LOCAL_SYM __localdep_memcpy(__result, __string, __resultsize);
 	return __result;
 }
 __NAMESPACE_LOCAL_END

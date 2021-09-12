@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x53673474 */
+/* HASH CRC-32:0x2c323259 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -31,10 +31,10 @@ __LOCAL_LIBC(gai_suspend64) int
 __NOTHROW_RPC(__LIBCCALL __LIBC_LOCAL_NAME(gai_suspend64))(struct gaicb const *const __list[], int __ent, struct __timespec64 const *__timeout) {
 	struct __timespec32 __tmo32;
 	if (!__timeout)
-		return __localdep_gai_suspend32(__list, __ent, __NULLPTR);
+		return __NAMESPACE_LOCAL_SYM __localdep_gai_suspend32(__list, __ent, __NULLPTR);
 	__tmo32.tv_sec  = (__time32_t)__timeout->tv_sec;
 	__tmo32.tv_nsec = __timeout->tv_nsec;
-	return __localdep_gai_suspend32(__list, __ent, &__tmo32);
+	return __NAMESPACE_LOCAL_SYM __localdep_gai_suspend32(__list, __ent, &__tmo32);
 }
 __NAMESPACE_LOCAL_END
 #ifndef __local___localdep_gai_suspend64_defined

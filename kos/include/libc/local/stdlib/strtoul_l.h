@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xafd219e4 */
+/* HASH CRC-32:0x5b8f8ab4 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -70,7 +70,7 @@ __NAMESPACE_LOCAL_BEGIN
 __LOCAL_LIBC(strtoul_l) __ATTR_NONNULL((1)) unsigned long
 __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(strtoul_l))(char const *__restrict __nptr, char **__endptr, __STDC_INT_AS_UINT_T __base, __locale_t __locale) {
 	(void)__locale;
-	return __localdep_strtoul(__nptr, __endptr, __base);
+	return __NAMESPACE_LOCAL_SYM __localdep_strtoul(__nptr, __endptr, __base);
 }
 __NAMESPACE_LOCAL_END
 #ifndef __local___localdep_strtoul_l_defined

@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x3eddddd3 */
+/* HASH CRC-32:0xc2620fbe */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -59,7 +59,7 @@ __NOTHROW(__LIBCCALL __LIBC_LOCAL_NAME(llrintl))(__LONGDOUBLE __x) {
 #ifdef __LIBM_MATHFUNIL
 	return __LIBM_MATHFUNIL(llrint, __x);
 #else /* __LIBM_MATHFUNIL */
-	return (__LONGLONG)__localdep_rintl(__x);
+	return (__LONGLONG)__NAMESPACE_LOCAL_SYM __localdep_rintl(__x);
 #endif /* !__LIBM_MATHFUNIL */
 }
 __NAMESPACE_LOCAL_END

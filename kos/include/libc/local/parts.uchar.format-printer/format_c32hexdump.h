@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x4dcf4ee4 */
+/* HASH CRC-32:0xd5d597aa */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -35,7 +35,7 @@ __CREDIRECT_KOS(__ATTR_NONNULL((1)),__SSIZE_TYPE__,__THROWING,__localdep_format_
 __NAMESPACE_LOCAL_END
 #include <libc/local/parts.wchar.format-printer/format_wrepeat.h>
 __NAMESPACE_LOCAL_BEGIN
-#define __localdep_format_c32repeat (*(__SSIZE_TYPE__(__LIBKCALL *)(__pc32formatprinter, void *, __CHAR32_TYPE__, __SIZE_TYPE__))&__LIBC_LOCAL_NAME(format_wrepeat))
+#define __localdep_format_c32repeat __NAMESPACE_LOCAL_TYPEHAX(__SSIZE_TYPE__(__LIBKCALL*)(__pc32formatprinter,void *,__CHAR32_TYPE__,__SIZE_TYPE__),__SSIZE_TYPE__(__LIBKCALL&)(__pc32formatprinter,void *,__CHAR32_TYPE__,__SIZE_TYPE__),format_wrepeat)
 #else /* ... */
 __NAMESPACE_LOCAL_END
 #include <libc/local/parts.uchar.format-printer/format_c32repeat.h>
@@ -62,7 +62,7 @@ __CREDIRECT_KOS(__ATTR_CONST __ATTR_WUNUSED,int,__NOTHROW,__localdep_isprint32,(
 __NAMESPACE_LOCAL_END
 #include <libc/local/wctype/iswprint.h>
 __NAMESPACE_LOCAL_BEGIN
-#define __localdep_isprint32 (*(int(__LIBKCALL *)(__WINT32_TYPE__))&__LIBC_LOCAL_NAME(iswprint))
+#define __localdep_isprint32 __NAMESPACE_LOCAL_TYPEHAX(int(__LIBKCALL*)(__WINT32_TYPE__),int(__LIBKCALL&)(__WINT32_TYPE__),iswprint)
 #else /* ... */
 __NAMESPACE_LOCAL_END
 #include <libc/local/parts.uchar.wctype/isprint32.h>
@@ -230,7 +230,7 @@ __LOCAL_LIBC(format_c32hexdump) __ATTR_NONNULL((1)) __SSIZE_TYPE__
 				__tailspace_count -= 3;
 			}
 			if (__tailspace_count) {
-				__temp = __localdep_format_c32repeat(__printer, __arg, ' ', __tailspace_count);
+				__temp = __NAMESPACE_LOCAL_SYM __localdep_format_c32repeat(__printer, __arg, ' ', __tailspace_count);
 				if __unlikely(__temp < 0)
 					goto __err;
 				__result += __temp;
@@ -239,7 +239,7 @@ __LOCAL_LIBC(format_c32hexdump) __ATTR_NONNULL((1)) __SSIZE_TYPE__
 		if (!(__flags & 0x0010)) {
 			for (__i = 0; __i < __line_len; ++__i) {
 				__BYTE_TYPE__ __b = __line_data[__i];
-				if (!__localdep_isprint32(__b))
+				if (!__NAMESPACE_LOCAL_SYM __localdep_isprint32(__b))
 					__b = '.';
 				__temp = (*__printer)(__arg, (__CHAR32_TYPE__ const *)&__b, 1);
 				if __unlikely(__temp < 0)

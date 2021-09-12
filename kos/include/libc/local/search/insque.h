@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xdbc86f7d */
+/* HASH CRC-32:0x8fab7fb3 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -22,41 +22,23 @@
 #define __local_insque_defined 1
 #include <__crt.h>
 __NAMESPACE_LOCAL_BEGIN
-#ifndef __local___localdep_link_defined
-#define __local___localdep_link_defined 1
-#ifdef __CRT_HAVE_link
-__CREDIRECT(__ATTR_NONNULL((1, 2)),int,__NOTHROW_RPC,__localdep_link,(char const *__from, char const *__to),link,(__from,__to))
-#else /* __CRT_HAVE_link */
-__NAMESPACE_LOCAL_END
-#include <asm/os/fcntl.h>
-__NAMESPACE_LOCAL_BEGIN
-#if defined(__AT_FDCWD) && defined(__CRT_HAVE_linkat)
-__NAMESPACE_LOCAL_END
-#include <libc/local/unistd/link.h>
-__NAMESPACE_LOCAL_BEGIN
-#define __localdep_link __LIBC_LOCAL_NAME(link)
-#else /* __AT_FDCWD && __CRT_HAVE_linkat */
-#undef __local___localdep_link_defined
-#endif /* !__AT_FDCWD || !__CRT_HAVE_linkat */
-#endif /* !__CRT_HAVE_link */
-#endif /* !__local___localdep_link_defined */
 __LOCAL_LIBC(insque) __ATTR_NONNULL((1)) void
 __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(insque))(void *__restrict __elem, void *__prev) {
-	struct __localdep_link {
-		struct __localdep_link *__l_forw; /* [0..1] Forward link */
-		struct __localdep_link *__l_back; /* [0..1] Backward link */
+	struct __queue_link {
+		struct __queue_link *__l_forw; /* [0..1] Forward link */
+		struct __queue_link *__l_back; /* [0..1] Backward link */
 	};
 	if (__prev) {
-		struct __localdep_link *__next;
-		__next = ((struct __localdep_link *)__prev)->__l_forw;
-		((struct __localdep_link *)__elem)->__l_back = (struct __localdep_link *)__prev;
-		((struct __localdep_link *)__elem)->__l_forw = __next;
-		((struct __localdep_link *)__prev)->__l_forw = (struct __localdep_link *)__elem;
+		struct __queue_link *__next;
+		__next = ((struct __queue_link *)__prev)->__l_forw;
+		((struct __queue_link *)__elem)->__l_back = (struct __queue_link *)__prev;
+		((struct __queue_link *)__elem)->__l_forw = __next;
+		((struct __queue_link *)__prev)->__l_forw = (struct __queue_link *)__elem;
 		if (__next)
-			__next->__l_back = (struct __localdep_link *)__elem;
+			__next->__l_back = (struct __queue_link *)__elem;
 	} else {
-		((struct __localdep_link *)__elem)->__l_back = __NULLPTR;
-		((struct __localdep_link *)__elem)->__l_forw = __NULLPTR;
+		((struct __queue_link *)__elem)->__l_back = __NULLPTR;
+		((struct __queue_link *)__elem)->__l_forw = __NULLPTR;
 	}
 }
 __NAMESPACE_LOCAL_END

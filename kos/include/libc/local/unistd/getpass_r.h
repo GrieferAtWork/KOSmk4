@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xa5dc9c64 */
+/* HASH CRC-32:0xa5b0a343 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -69,15 +69,15 @@ __NOTHROW_RPC(__LIBCCALL __LIBC_LOCAL_NAME(getpass_r))(char const *__prompt, cha
 	 * user-friendly.  - But it it's not available, fall back on using
 	 * the regular, old `readpassphrase(3)' */
 #ifdef __GETPASS_ECHO_NL
-	return __localdep_getpassfd(__prompt, __buf, __bufsize, __NULLPTR, __GETPASS_ECHO_NL, 0);
+	return __NAMESPACE_LOCAL_SYM __localdep_getpassfd(__prompt, __buf, __bufsize, __NULLPTR, __GETPASS_ECHO_NL, 0);
 #else /* __GETPASS_ECHO_NL */
-	return __localdep_getpassfd(__prompt, __buf, __bufsize, __NULLPTR, 0, 0);
+	return __NAMESPACE_LOCAL_SYM __localdep_getpassfd(__prompt, __buf, __bufsize, __NULLPTR, 0, 0);
 #endif /* !__GETPASS_ECHO_NL */
 #else /* __CRT_HAVE_getpassfd || __CRT_HAVE_read || __CRT_HAVE__read || __CRT_HAVE___read */
 #ifdef __RPP_ECHO_OFF
-	return __localdep_readpassphrase(__prompt, __buf, __bufsize, __RPP_ECHO_OFF);
+	return __NAMESPACE_LOCAL_SYM __localdep_readpassphrase(__prompt, __buf, __bufsize, __RPP_ECHO_OFF);
 #else /* __RPP_ECHO_OFF */
-	return __localdep_readpassphrase(__prompt, __buf, __bufsize, 0);
+	return __NAMESPACE_LOCAL_SYM __localdep_readpassphrase(__prompt, __buf, __bufsize, 0);
 #endif /* !__RPP_ECHO_OFF */
 #endif /* !__CRT_HAVE_getpassfd && !__CRT_HAVE_read && !__CRT_HAVE__read && !__CRT_HAVE___read */
 }

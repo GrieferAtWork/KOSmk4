@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x133305ba */
+/* HASH CRC-32:0xb6cfbbab */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -87,12 +87,12 @@ __LOCAL_LIBC(c32pathconf) __ATTR_NONNULL((1)) __LONGPTR_TYPE__
 __NOTHROW_RPC(__LIBKCALL __LIBC_LOCAL_NAME(c32pathconf))(__CHAR32_TYPE__ const *__path, __STDC_INT_AS_UINT_T __name) {
 	__fd_t __fd;
 	__LONGPTR_TYPE__ __result;
-	__fd = __localdep_open(__path, __O_RDONLY);
+	__fd = __NAMESPACE_LOCAL_SYM __localdep_open(__path, __O_RDONLY);
 	if __unlikely(__fd < 0)
 		return -1;
-	__result = __localdep_fpathconf(__fd, __name);
+	__result = __NAMESPACE_LOCAL_SYM __localdep_fpathconf(__fd, __name);
 #if defined(__CRT_HAVE_close) || defined(__CRT_HAVE__close) || defined(__CRT_HAVE___close)
-	__localdep_close(__fd);
+	__NAMESPACE_LOCAL_SYM __localdep_close(__fd);
 #endif /* __CRT_HAVE_close || __CRT_HAVE__close || __CRT_HAVE___close */
 	return __result;
 }

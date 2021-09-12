@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xcf039247 */
+/* HASH CRC-32:0xa0531ef8 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -79,11 +79,11 @@ __NAMESPACE_LOCAL_BEGIN
 __LOCAL_LIBC(ether_line) __ATTR_WUNUSED __ATTR_NONNULL((1, 2, 3)) int
 __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(ether_line))(char const *__line, struct ether_addr *__addr, char *__hostname) {
 	__SIZE_TYPE__ __hnlen;
-	while (__localdep_isspace(*__line) && *__line != '\r' && *__line != '\n')
+	while (__NAMESPACE_LOCAL_SYM __localdep_isspace(*__line) && *__line != '\r' && *__line != '\n')
 		++__line;
-	if (!__localdep_ether_paton_r(&__line, __addr))
+	if (!__NAMESPACE_LOCAL_SYM __localdep_ether_paton_r(&__line, __addr))
 		return -1; /* This also handles comment lines! */
-	while (__localdep_isspace(*__line) && *__line != '\r' && *__line != '\n')
+	while (__NAMESPACE_LOCAL_SYM __localdep_isspace(*__line) && *__line != '\r' && *__line != '\n')
 		++__line;
 	/* The remainder of the line is the hostname. */
 	for (__hnlen = 0;
@@ -92,11 +92,11 @@ __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(ether_line))(char const *__line, stru
 	     __line[__hnlen] != '\n';
 	     ++__hnlen)
 		;
-	while (__hnlen && __localdep_isspace(__line[__hnlen - 1]))
+	while (__hnlen && __NAMESPACE_LOCAL_SYM __localdep_isspace(__line[__hnlen - 1]))
 		--__hnlen;
 	if (!__hnlen)
 		return -1; /* No hostname */
-	__hostname = (char *)__localdep_mempcpy(__hostname, __line, __hnlen);
+	__hostname = (char *)__NAMESPACE_LOCAL_SYM __localdep_mempcpy(__hostname, __line, __hnlen);
 	*__hostname = '\0'; /* NUL-terminate */
 	return 0;
 }

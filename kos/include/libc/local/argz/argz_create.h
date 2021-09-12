@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xe8246df8 */
+/* HASH CRC-32:0xe4b1531f */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -82,12 +82,12 @@ __LOCAL_LIBC(argz_create) __ATTR_NONNULL((1, 2, 3)) __errno_t
 __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(argz_create))(char *const ___argv[], char **__restrict __pargz, __SIZE_TYPE__ *__restrict __pargz_len) {
 	__SIZE_TYPE__ __i, ___argc, __total_len = 0;
 	for (___argc = 0; ___argv[___argc] != __NULLPTR; ++___argc)
-		__total_len += __localdep_strlen(___argv[___argc]) + 1;
+		__total_len += __NAMESPACE_LOCAL_SYM __localdep_strlen(___argv[___argc]) + 1;
 	if __unlikely(__total_len == 0) {
 		*__pargz = __NULLPTR;
 	} else {
 		char *__argz_string;
-		__argz_string = (char *)__localdep_malloc(__total_len * sizeof(char));
+		__argz_string = (char *)__NAMESPACE_LOCAL_SYM __localdep_malloc(__total_len * sizeof(char));
 		if __unlikely(!__argz_string) {
 			*__pargz = __NULLPTR;
 			*__pargz_len  = 0;
@@ -99,7 +99,7 @@ __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(argz_create))(char *const ___argv[], 
 		}
 		*__pargz = __argz_string;
 		for (__i = 0; __i < ___argc; ++__i) {
-			__argz_string = __localdep_stpcpy(__argz_string, ___argv[___argc]) + 1;
+			__argz_string = __NAMESPACE_LOCAL_SYM __localdep_stpcpy(__argz_string, ___argv[___argc]) + 1;
 		}
 		__hybrid_assert(__argz_string == *__pargz + __total_len);
 	}

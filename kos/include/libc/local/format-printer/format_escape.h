@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xec16a799 */
+/* HASH CRC-32:0x3634bb8a */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -75,7 +75,7 @@ __LOCAL_LIBC(format_escape) __ATTR_NONNULL((1)) __SSIZE_TYPE__
 		char const *__old_text = __text;
 		__UINT32_TYPE__ __ch;
 
-		__ch = __localdep_unicode_readutf8_n((char const **)&__text, __textend);
+		__ch = __NAMESPACE_LOCAL_SYM __localdep_unicode_readutf8_n((char const **)&__text, __textend);
 
 
 
@@ -104,7 +104,7 @@ __encode_oct:
 						char const *__new_text = __text;
 						__UINT32_TYPE__ __next_ch;
 
-						__next_ch = __localdep_unicode_readutf8_n((char const **)&__new_text, __textend);
+						__next_ch = __NAMESPACE_LOCAL_SYM __localdep_unicode_readutf8_n((char const **)&__new_text, __textend);
 
 
 
@@ -241,7 +241,7 @@ __encode_hex:
 					char const *__new_text = __text;
 					__UINT32_TYPE__ __next_ch;
 
-					__next_ch = __localdep_unicode_readutf8_n((char const **)&__new_text, __textend);
+					__next_ch = __NAMESPACE_LOCAL_SYM __localdep_unicode_readutf8_n((char const **)&__new_text, __textend);
 
 
 

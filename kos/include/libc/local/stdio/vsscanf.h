@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x1a9bad72 */
+/* HASH CRC-32:0xb0873e75 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -71,7 +71,7 @@ __NAMESPACE_LOCAL_BEGIN
 __LOCAL_LIBC(vsscanf_getc) __SSIZE_TYPE__
 (__FORMATPRINTER_CC __vsscanf_getc)(void *__arg) {
 	char const *__reader = *(char const **)__arg;
-	__CHAR32_TYPE__ __result = __localdep_unicode_readutf8(&__reader);
+	__CHAR32_TYPE__ __result = __NAMESPACE_LOCAL_SYM __localdep_unicode_readutf8(&__reader);
 	if (!__result)
 		return __EOF;
 	*(char const **)__arg = __reader;
@@ -79,7 +79,7 @@ __LOCAL_LIBC(vsscanf_getc) __SSIZE_TYPE__
 }
 __LOCAL_LIBC(vsscanf_ungetc) __SSIZE_TYPE__
 (__FORMATPRINTER_CC __vsscanf_ungetc)(void *__arg, __CHAR32_TYPE__ __UNUSED(__ch)) {
-	__localdep_unicode_readutf8_rev((char const **)__arg);
+	__NAMESPACE_LOCAL_SYM __localdep_unicode_readutf8_rev((char const **)__arg);
 	return 0;
 }
 __NAMESPACE_LOCAL_END
@@ -89,7 +89,7 @@ __LOCAL_LIBC(vsscanf) __ATTR_WUNUSED __ATTR_LIBC_SCANF(2, 0) __ATTR_NONNULL((1, 
 __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(vsscanf))(char const *__restrict __input, char const *__restrict __format, __builtin_va_list __args) {
 	char const *__input_pointer = __input;
 
-	return __localdep_format_vscanf(&__NAMESPACE_LOCAL_SYM __vsscanf_getc,
+	return __NAMESPACE_LOCAL_SYM __localdep_format_vscanf(&__NAMESPACE_LOCAL_SYM __vsscanf_getc,
 	                     &__NAMESPACE_LOCAL_SYM __vsscanf_ungetc,
 	                     (void *)&__input_pointer, __format, __args);
 

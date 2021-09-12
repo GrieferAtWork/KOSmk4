@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x37261ada */
+/* HASH CRC-32:0xb804dab7 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -40,7 +40,7 @@ __CREDIRECT_DOS(__ATTR_NONNULL((1, 2)),__SSIZE_TYPE__,__THROWING,__localdep_file
 __NAMESPACE_LOCAL_END
 #include <libc/local/wchar/file_wprinter_unlocked.h>
 __NAMESPACE_LOCAL_BEGIN
-#define __localdep_file_c16printer_unlocked (*(__SSIZE_TYPE__(__LIBDCALL *)(void *, __CHAR16_TYPE__ const *__restrict, __SIZE_TYPE__))&__LIBC_LOCAL_NAME(file_wprinter_unlocked))
+#define __localdep_file_c16printer_unlocked __NAMESPACE_LOCAL_TYPEHAX(__SSIZE_TYPE__(__LIBDCALL*)(void *,__CHAR16_TYPE__ const *__restrict,__SIZE_TYPE__),__SSIZE_TYPE__(__LIBDCALL&)(void *,__CHAR16_TYPE__ const *__restrict,__SIZE_TYPE__),file_wprinter_unlocked)
 #elif (defined(__CRT_HAVE_fputwc_unlocked) && __SIZEOF_WCHAR_T__ == 2 && defined(__LIBCCALL_IS_LIBDCALL)) || defined(__CRT_HAVE_DOS$fputwc_unlocked) || (defined(__CRT_HAVE__fputwc_nolock) && __SIZEOF_WCHAR_T__ == 2 && defined(__LIBCCALL_IS_LIBDCALL)) || defined(__CRT_HAVE_DOS$_fputwc_nolock)
 __NAMESPACE_LOCAL_END
 #include <libc/local/parts.uchar.stdio/file_c16printer_unlocked.h>
@@ -67,7 +67,7 @@ __NAMESPACE_LOCAL_END
 #include <bits/crt/uformat-printer.h>
 #include <libc/local/parts.wchar.format-printer/format_vwprintf.h>
 __NAMESPACE_LOCAL_BEGIN
-#define __localdep_format_vc16printf (*(__SSIZE_TYPE__(__LIBDCALL *)(__pc16formatprinter, void *, __CHAR16_TYPE__ const *__restrict, __builtin_va_list))&__LIBC_LOCAL_NAME(format_vwprintf))
+#define __localdep_format_vc16printf __NAMESPACE_LOCAL_TYPEHAX(__SSIZE_TYPE__(__LIBDCALL*)(__pc16formatprinter,void *,__CHAR16_TYPE__ const *__restrict,__builtin_va_list),__SSIZE_TYPE__(__LIBDCALL&)(__pc16formatprinter,void *,__CHAR16_TYPE__ const *__restrict,__builtin_va_list),format_vwprintf)
 #else /* ... */
 __NAMESPACE_LOCAL_END
 #include <libc/local/parts.uchar.format-printer/format_vc16printf.h>
@@ -77,7 +77,7 @@ __NAMESPACE_LOCAL_BEGIN
 #endif /* !__local___localdep_format_vc16printf_defined */
 __LOCAL_LIBC(vfc16printf_unlocked) __ATTR_LIBC_WPRINTF(2, 0) __ATTR_NONNULL((1, 2)) __STDC_INT_AS_SIZE_T
 (__LIBDCALL __LIBC_LOCAL_NAME(vfc16printf_unlocked))(__FILE *__restrict __stream, __CHAR16_TYPE__ const *__restrict __format, __builtin_va_list __args) __THROWS(...) {
-	return (__STDC_INT_AS_SSIZE_T)__localdep_format_vc16printf(&__localdep_file_c16printer_unlocked,
+	return (__STDC_INT_AS_SSIZE_T)__NAMESPACE_LOCAL_SYM __localdep_format_vc16printf(&__NAMESPACE_LOCAL_SYM __localdep_file_c16printer_unlocked,
 	                                              __stream, __format, __args);
 }
 __NAMESPACE_LOCAL_END

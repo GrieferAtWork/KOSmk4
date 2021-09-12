@@ -59,7 +59,7 @@ struct __unitraits;
 #define __UNICODE_ISSYMCONT  0x4000 /* Symbol continue character */
 
 /* When `__ut_digit_idx <= __UNICODE_DIGIT_IDENTITY_MAX', then the associated unicode
- * character has a digit value equal to `__ut_digit_idx' (iow: the digit decode step
+ * character has a digit value equal to `__ut_digit_idx' (iow: the digit decode  step
  * can be skipped, since `__ut_digit_idx' _is_ the digit value) */
 #define __UNICODE_DIGIT_IDENTITY_MAX 50
 

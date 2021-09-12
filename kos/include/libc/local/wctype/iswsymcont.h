@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x50973dce */
+/* HASH CRC-32:0xae40347a */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -56,10 +56,10 @@ __NAMESPACE_LOCAL_BEGIN
 __LOCAL_LIBC(iswsymcont) __ATTR_CONST __ATTR_WUNUSED int
 __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(iswsymcont))(__WINT_TYPE__ __wc) {
 #if defined(__CRT_KOS) && defined(__CRT_HAVE___unicode_descriptor)
-	struct __unitraits const *__traits = __localdep___unicode_descriptor(__wc);
+	struct __unitraits const *__traits = __NAMESPACE_LOCAL_SYM __localdep___unicode_descriptor(__wc);
 	return (int)(__traits->__ut_flags & __UNICODE_ISSYMCONT);
 #else /* __CRT_KOS && __CRT_HAVE___unicode_descriptor */
-	return __localdep_iswalnum(__wc) || __wc == '_' || __wc == '$';
+	return __NAMESPACE_LOCAL_SYM __localdep_iswalnum(__wc) || __wc == '_' || __wc == '$';
 #endif /* !__CRT_KOS || !__CRT_HAVE___unicode_descriptor */
 }
 __NAMESPACE_LOCAL_END

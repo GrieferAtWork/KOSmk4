@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xdab25214 */
+/* HASH CRC-32:0xf28e744f */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -95,7 +95,7 @@ __LOCAL_LIBC(getdelim) __ATTR_WUNUSED __ATTR_NONNULL((1, 2, 4)) __SSIZE_TYPE__
 			if (__new_bufsize <= __result + 1)
 				__new_bufsize = 16;
 			__hybrid_assert(__new_bufsize > __result + 1);
-			__buffer = (char *)__localdep_realloc(__buffer,
+			__buffer = (char *)__NAMESPACE_LOCAL_SYM __localdep_realloc(__buffer,
 			                         __new_bufsize *
 			                         sizeof(char));
 			if __unlikely(!__buffer)
@@ -104,7 +104,7 @@ __LOCAL_LIBC(getdelim) __ATTR_WUNUSED __ATTR_NONNULL((1, 2, 4)) __SSIZE_TYPE__
 			*__lineptr = __buffer;
 			*__pcount  = __bufsize;
 		}
-		__ch = __localdep_fgetc(__stream);
+		__ch = __NAMESPACE_LOCAL_SYM __localdep_fgetc(__stream);
 		if (__ch == __EOF)
 			break; /* EOF */
 		__buffer[__result++] = (char)__ch;
@@ -113,9 +113,9 @@ __LOCAL_LIBC(getdelim) __ATTR_WUNUSED __ATTR_NONNULL((1, 2, 4)) __SSIZE_TYPE__
 		/* Special case for line-delimiter. */
 		if (__delimiter == '\n' && __ch == '\r') {
 			/* Deal with '\r\n', as well as '\r' */
-			__ch = __localdep_fgetc(__stream);
+			__ch = __NAMESPACE_LOCAL_SYM __localdep_fgetc(__stream);
 			if (__ch != __EOF && __ch != '\n')
-				__localdep_ungetc(__ch, __stream);
+				__NAMESPACE_LOCAL_SYM __localdep_ungetc(__ch, __stream);
 			/* Unify linefeeds (to use POSIX notation) */
 			__buffer[__result - 1] = '\n';
 			break;

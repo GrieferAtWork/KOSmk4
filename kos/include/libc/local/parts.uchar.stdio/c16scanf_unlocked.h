@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x22ebe9e9 */
+/* HASH CRC-32:0x5ad593c0 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -36,7 +36,7 @@ __CREDIRECT_DOS(__ATTR_WUNUSED __ATTR_LIBC_SCANF(1, 0) __ATTR_NONNULL((1)),__STD
 __NAMESPACE_LOCAL_END
 #include <libc/local/wchar/vwscanf_unlocked.h>
 __NAMESPACE_LOCAL_BEGIN
-#define __localdep_vc16scanf_unlocked (*(__STDC_INT_AS_SIZE_T(__LIBDCALL *)(__CHAR16_TYPE__ const *__restrict, __builtin_va_list))&__LIBC_LOCAL_NAME(vwscanf_unlocked))
+#define __localdep_vc16scanf_unlocked __NAMESPACE_LOCAL_TYPEHAX(__STDC_INT_AS_SIZE_T(__LIBDCALL*)(__CHAR16_TYPE__ const *__restrict,__builtin_va_list),__STDC_INT_AS_SIZE_T(__LIBDCALL&)(__CHAR16_TYPE__ const *__restrict,__builtin_va_list),vwscanf_unlocked)
 #elif ((defined(__CRT_HAVE_vfwscanf_unlocked) && __SIZEOF_WCHAR_T__ == 2 && defined(__LIBCCALL_IS_LIBDCALL)) || defined(__CRT_HAVE_DOS$vfwscanf_unlocked) || (defined(__CRT_HAVE_vfwscanf) && __SIZEOF_WCHAR_T__ == 2 && defined(__LIBCCALL_IS_LIBDCALL)) || defined(__CRT_HAVE_DOS$vfwscanf)) && !defined(__NO_STDSTREAMS)
 __NAMESPACE_LOCAL_END
 #include <libc/local/parts.uchar.stdio/vc16scanf_unlocked.h>
@@ -51,7 +51,7 @@ __LOCAL_LIBC(c16scanf_unlocked) __ATTR_WUNUSED __ATTR_LIBC_SCANF(1, 2) __ATTR_NO
 	__STDC_INT_AS_SIZE_T __result;
 	__builtin_va_list __args;
 	__builtin_va_start(__args, __format);
-	__result = __localdep_vc16scanf_unlocked(__format, __args);
+	__result = __NAMESPACE_LOCAL_SYM __localdep_vc16scanf_unlocked(__format, __args);
 	__builtin_va_end(__args);
 	return __result;
 }

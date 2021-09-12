@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xfa480733 */
+/* HASH CRC-32:0x967c43a1 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -52,7 +52,7 @@ __NAMESPACE_LOCAL_BEGIN
 #endif /* !__local___localdep_execvpe_defined */
 __LOCAL_LIBC(execvp) __ATTR_NONNULL((1, 2)) int
 __NOTHROW_RPC(__LIBCCALL __LIBC_LOCAL_NAME(execvp))(char const *__restrict __file, __TARGV) {
-	return __localdep_execvpe(__file, ___argv, __LOCAL_environ);
+	return __NAMESPACE_LOCAL_SYM __localdep_execvpe(__file, ___argv, __LOCAL_environ);
 }
 __NAMESPACE_LOCAL_END
 #ifndef __local___localdep_execvp_defined

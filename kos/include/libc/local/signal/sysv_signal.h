@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x2472d512 */
+/* HASH CRC-32:0x321ce28a */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -61,8 +61,8 @@ __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(sysv_signal))(__signo_t __signo, __si
 	struct sigaction __act, __oact
 	__act.sa_handler = __handler;
 	__act.sa_flags   = __SA_RESETHAND | __SA_NODEFER;
-	__localdep_sigemptyset(&__act.sa_mask);
-	if (__localdep_sigaction(__signo, &__act, &__oact) != 0)
+	__NAMESPACE_LOCAL_SYM __localdep_sigemptyset(&__act.sa_mask);
+	if (__NAMESPACE_LOCAL_SYM __localdep_sigaction(__signo, &__act, &__oact) != 0)
 	    __oact.sa_handler = __SIG_ERR;
 	return __oact.sa_handler;
 }

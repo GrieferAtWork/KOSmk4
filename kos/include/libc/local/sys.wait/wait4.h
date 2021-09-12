@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x10354e3b */
+/* HASH CRC-32:0x767568e */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -61,12 +61,12 @@ __NOTHROW_RPC(__LIBCCALL __LIBC_LOCAL_NAME(wait4))(__pid_t __pid, __WAIT_STATUS 
 	__pid_t __result;
 #ifdef __CRT_HAVE_wait4
 	struct __rusage32 __ru32;
-	__result = __localdep_wait4_32(__pid, __stat_loc, __options, __usage ? &__ru32 : __NULLPTR);
+	__result = __NAMESPACE_LOCAL_SYM __localdep_wait4_32(__pid, __stat_loc, __options, __usage ? &__ru32 : __NULLPTR);
 	if (__result >= 0 && __usage)
 		rusage32_to_rusage(&__ru32, __usage);
 #else /* __CRT_HAVE_wait4 */
 	struct __rusage64 __ru64;
-	__result = __localdep_wait4_64(__pid, __stat_loc, __options, __usage ? &__ru64 : __NULLPTR);
+	__result = __NAMESPACE_LOCAL_SYM __localdep_wait4_64(__pid, __stat_loc, __options, __usage ? &__ru64 : __NULLPTR);
 	if (__result >= 0 && __usage)
 		rusage64_to_rusage(&__ru64, __usage);
 #endif /* !__CRT_HAVE_wait4 */

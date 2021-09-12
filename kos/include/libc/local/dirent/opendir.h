@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x4a308118 */
+/* HASH CRC-32:0xbf7fc295 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -42,7 +42,7 @@ __LOCAL_LIBC(opendir) __ATTR_WUNUSED __ATTR_NONNULL((1)) struct __dirstream *
 __NOTHROW_RPC(__LIBCCALL __LIBC_LOCAL_NAME(opendir))(char const *__name) {
 	/* TODO: Emulate using DOS's _find* functions */
 	/* TODO: Emulate using fdopendir(open(name, 0)) */
-	return __localdep_opendirat(__AT_FDCWD, __name);
+	return __NAMESPACE_LOCAL_SYM __localdep_opendirat(__AT_FDCWD, __name);
 }
 __NAMESPACE_LOCAL_END
 #ifndef __local___localdep_opendir_defined

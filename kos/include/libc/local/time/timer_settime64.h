@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x5bcf50f8 */
+/* HASH CRC-32:0x965fb62b */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -38,7 +38,7 @@ __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(timer_settime64))(__timer_t __timerid
 	__value32.__it_interval.tv_nsec = __value->__it_interval.tv_nsec;
 	__value32.__it_value.tv_sec     = (__time32_t)__value->__it_value.tv_sec;
 	__value32.__it_value.tv_nsec    = __value->__it_value.tv_nsec;
-	__result = __localdep_timer_settime32(__timerid, __flags, &__value32, __ovalue ? &__ovalue32 : __NULLPTR);
+	__result = __NAMESPACE_LOCAL_SYM __localdep_timer_settime32(__timerid, __flags, &__value32, __ovalue ? &__ovalue32 : __NULLPTR);
 	if (!__result && __ovalue) {
 		__ovalue->__it_interval.tv_sec  = (__time64_t)__ovalue32.__it_interval.tv_sec;
 		__ovalue->__it_interval.tv_nsec = __ovalue32.__it_interval.tv_nsec;

@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x7c858e42 */
+/* HASH CRC-32:0x7ecd01ef */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -78,7 +78,7 @@ __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(gmtime))(__TM_TYPE(time) const *__tim
 
 
 	__time64_t __tm64 = (__time64_t)*__timer;
-	return __localdep_gmtime64(&__tm64);
+	return __NAMESPACE_LOCAL_SYM __localdep_gmtime64(&__tm64);
 
 
 

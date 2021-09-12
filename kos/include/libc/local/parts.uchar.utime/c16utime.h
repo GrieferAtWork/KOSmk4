@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xd759bfbb */
+/* HASH CRC-32:0x81bc4c05 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -41,7 +41,7 @@ __CREDIRECT_DOS(__ATTR_NONNULL((1)),int,__NOTHROW_RPC,__localdep_c16utime64,(__C
 __NAMESPACE_LOCAL_END
 #include <libc/local/parts.wchar.utime/wutime64.h>
 __NAMESPACE_LOCAL_BEGIN
-#define __localdep_c16utime64 (*(int(__LIBDCALL *)(__CHAR16_TYPE__ const *, struct __utimbuf64 const *))&__LIBC_LOCAL_NAME(wutime64))
+#define __localdep_c16utime64 __NAMESPACE_LOCAL_TYPEHAX(int(__LIBDCALL*)(__CHAR16_TYPE__ const *,struct __utimbuf64 const *),int(__LIBDCALL&)(__CHAR16_TYPE__ const *,struct __utimbuf64 const *),wutime64)
 #elif (defined(__CRT_HAVE_wutime) && __SIZEOF_WCHAR_T__ == 2 && defined(__LIBCCALL_IS_LIBDCALL)) || defined(__CRT_HAVE_DOS$wutime) || (defined(__CRT_HAVE__wutime32) && __SIZEOF_WCHAR_T__ == 2 && defined(__LIBCCALL_IS_LIBDCALL)) || defined(__CRT_HAVE_DOS$_wutime32)
 __NAMESPACE_LOCAL_END
 #include <libc/local/parts.uchar.utime/c16utime64.h>
@@ -76,17 +76,17 @@ __NOTHROW_RPC(__LIBDCALL __LIBC_LOCAL_NAME(c16utime))(__CHAR16_TYPE__ const *__f
 #if (defined(__CRT_HAVE_wutime) && __SIZEOF_WCHAR_T__ == 2 && defined(__LIBCCALL_IS_LIBDCALL)) || defined(__CRT_HAVE_DOS$wutime) || (defined(__CRT_HAVE__wutime32) && __SIZEOF_WCHAR_T__ == 2 && defined(__LIBCCALL_IS_LIBDCALL)) || defined(__CRT_HAVE_DOS$_wutime32)
 	struct __utimbuf32 __buf32;
 	if (!__file_times)
-		return __localdep_crt_c16utime32(__filename, __NULLPTR);
+		return __NAMESPACE_LOCAL_SYM __localdep_crt_c16utime32(__filename, __NULLPTR);
 	__buf32.actime  = (__time32_t)__file_times->actime;
 	__buf32.modtime = (__time32_t)__file_times->modtime;
-	return __localdep_crt_c16utime32(__filename, &__buf32);
+	return __NAMESPACE_LOCAL_SYM __localdep_crt_c16utime32(__filename, &__buf32);
 #else /* (__CRT_HAVE_wutime && __SIZEOF_WCHAR_T__ == 2 && __LIBCCALL_IS_LIBDCALL) || __CRT_HAVE_DOS$wutime || (__CRT_HAVE__wutime32 && __SIZEOF_WCHAR_T__ == 2 && __LIBCCALL_IS_LIBDCALL) || __CRT_HAVE_DOS$_wutime32 */
 	struct __utimbuf64 __buf64;
 	if (!__file_times)
-		return __localdep_c16utime64(__filename, __NULLPTR);
+		return __NAMESPACE_LOCAL_SYM __localdep_c16utime64(__filename, __NULLPTR);
 	__buf64.actime  = (__time64_t)__file_times->actime;
 	__buf64.modtime = (__time64_t)__file_times->modtime;
-	return __localdep_c16utime64(__filename, &__buf64);
+	return __NAMESPACE_LOCAL_SYM __localdep_c16utime64(__filename, &__buf64);
 #endif /* (!__CRT_HAVE_wutime || __SIZEOF_WCHAR_T__ != 2 || !__LIBCCALL_IS_LIBDCALL) && !__CRT_HAVE_DOS$wutime && (!__CRT_HAVE__wutime32 || __SIZEOF_WCHAR_T__ != 2 || !__LIBCCALL_IS_LIBDCALL) && !__CRT_HAVE_DOS$_wutime32 */
 #ifdef __COMPILER_HAVE_PRAGMA_PUSHMACRO
 #pragma pop_macro("modtime")

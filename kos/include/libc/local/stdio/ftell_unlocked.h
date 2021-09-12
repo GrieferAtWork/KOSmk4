@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x5526c342 */
+/* HASH CRC-32:0x329b6d26 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -75,7 +75,7 @@ __NAMESPACE_LOCAL_BEGIN
 #endif /* !__local___localdep_ftell_defined */
 __LOCAL_LIBC(ftell_unlocked) __ATTR_WUNUSED __ATTR_NONNULL((1)) long int
 (__LIBCCALL __LIBC_LOCAL_NAME(ftell_unlocked))(__FILE *__restrict __stream) __THROWS(...) {
-	return __localdep_ftell(__stream);
+	return __NAMESPACE_LOCAL_SYM __localdep_ftell(__stream);
 }
 __NAMESPACE_LOCAL_END
 #ifndef __local___localdep_ftell_unlocked_defined

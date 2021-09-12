@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x75dc4984 */
+/* HASH CRC-32:0xfcf18e2b */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -100,9 +100,9 @@ __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(adjtimex))(struct timex *__restrict _
 	__nxtalt.modes  = __ntx->modes;
 	__nxtalt.status = __ntx->status;
 #if defined(__CRT_HAVE_adjtimex) || defined(__CRT_HAVE___adjtimex)
-	__result = __localdep_adjtimex32(&__nxtalt);
+	__result = __NAMESPACE_LOCAL_SYM __localdep_adjtimex32(&__nxtalt);
 #else /* __CRT_HAVE_adjtimex || __CRT_HAVE___adjtimex */
-	__result = __localdep_adjtimex64(&__nxtalt);
+	__result = __NAMESPACE_LOCAL_SYM __localdep_adjtimex64(&__nxtalt);
 #endif /* !__CRT_HAVE_adjtimex && !__CRT_HAVE___adjtimex */
 	if __likely(__result == 0) {
 #if defined(__CRT_HAVE_adjtimex) || defined(__CRT_HAVE___adjtimex)

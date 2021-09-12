@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xb3f17a34 */
+/* HASH CRC-32:0x81aa966b */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -47,7 +47,7 @@ __LOCAL_LIBC(thr_min_stack) __ATTR_CONST __SIZE_TYPE__
 __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(thr_min_stack))(void) {
 #if (defined(__CRT_HAVE_sysconf) || defined(__CRT_HAVE___sysconf)) && defined(_SC_THREAD_STACK_MIN)
 	__LONGPTR_TYPE__ __result;
-	__result = __localdep_sysconf(_SC_THREAD_STACK_MIN);
+	__result = __NAMESPACE_LOCAL_SYM __localdep_sysconf(_SC_THREAD_STACK_MIN);
 	if (__result != -1)
 		return (__SIZE_TYPE__)__result;
 #endif /* (__CRT_HAVE_sysconf || __CRT_HAVE___sysconf) && _SC_THREAD_STACK_MIN */

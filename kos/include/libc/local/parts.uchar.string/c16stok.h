@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x3e9c6dbf */
+/* HASH CRC-32:0x6652e4c7 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -33,7 +33,7 @@ __CREDIRECT_DOS(__ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1, 2)),__SIZE_TYPE__,
 __NAMESPACE_LOCAL_END
 #include <libc/local/wchar/wcscspn.h>
 __NAMESPACE_LOCAL_BEGIN
-#define __localdep_c16scspn (*(__SIZE_TYPE__(__LIBDCALL *)(__CHAR16_TYPE__ const *, __CHAR16_TYPE__ const *))&__LIBC_LOCAL_NAME(wcscspn))
+#define __localdep_c16scspn __NAMESPACE_LOCAL_TYPEHAX(__SIZE_TYPE__(__LIBDCALL*)(__CHAR16_TYPE__ const *,__CHAR16_TYPE__ const *),__SIZE_TYPE__(__LIBDCALL&)(__CHAR16_TYPE__ const *,__CHAR16_TYPE__ const *),wcscspn)
 #else /* ... */
 __NAMESPACE_LOCAL_END
 #include <libc/local/parts.uchar.string/c16scspn.h>
@@ -51,7 +51,7 @@ __CREDIRECT_DOS(__ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1, 2)),__SIZE_TYPE__,
 __NAMESPACE_LOCAL_END
 #include <libc/local/wchar/wcsspn.h>
 __NAMESPACE_LOCAL_BEGIN
-#define __localdep_c16sspn (*(__SIZE_TYPE__(__LIBDCALL *)(__CHAR16_TYPE__ const *, __CHAR16_TYPE__ const *))&__LIBC_LOCAL_NAME(wcsspn))
+#define __localdep_c16sspn __NAMESPACE_LOCAL_TYPEHAX(__SIZE_TYPE__(__LIBDCALL*)(__CHAR16_TYPE__ const *,__CHAR16_TYPE__ const *),__SIZE_TYPE__(__LIBDCALL&)(__CHAR16_TYPE__ const *,__CHAR16_TYPE__ const *),wcsspn)
 #else /* ... */
 __NAMESPACE_LOCAL_END
 #include <libc/local/parts.uchar.string/c16sspn.h>
@@ -68,12 +68,12 @@ __NOTHROW_NCX(__LIBDCALL __LIBC_LOCAL_NAME(c16stok))(__CHAR16_TYPE__ *__str, __C
 		*__save_ptr = __str;
 		return __NULLPTR;
 	}
-	__str += __localdep_c16sspn(__str, __delim);
+	__str += __NAMESPACE_LOCAL_SYM __localdep_c16sspn(__str, __delim);
 	if (!*__str) {
 		*__save_ptr = __str;
 		return __NULLPTR;
 	}
-	__end = __str + __localdep_c16scspn(__str, __delim);
+	__end = __str + __NAMESPACE_LOCAL_SYM __localdep_c16scspn(__str, __delim);
 	if (!*__end) {
 		*__save_ptr = __end;
 		return __str;

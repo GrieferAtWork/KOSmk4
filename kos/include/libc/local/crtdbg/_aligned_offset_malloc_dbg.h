@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x39f71bb0 */
+/* HASH CRC-32:0xa1046623 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -41,7 +41,7 @@ __LOCAL_LIBC(_aligned_offset_malloc_dbg) __ATTR_MALLOC __ATTR_WUNUSED __ATTR_ALL
 __NOTHROW_NCX(__LIBDCALL __LIBC_LOCAL_NAME(_aligned_offset_malloc_dbg))(__SIZE_TYPE__ __num_bytes, __SIZE_TYPE__ __min_alignment, __SIZE_TYPE__ __offset, char const *__filename, int __line) {
 	(void)__filename;
 	(void)__line;
-	return __localdep__aligned_offset_malloc(__num_bytes, __min_alignment, __offset);
+	return __NAMESPACE_LOCAL_SYM __localdep__aligned_offset_malloc(__num_bytes, __min_alignment, __offset);
 }
 __NAMESPACE_LOCAL_END
 #ifndef __local___localdep__aligned_offset_malloc_dbg_defined

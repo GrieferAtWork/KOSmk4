@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xf89fe106 */
+/* HASH CRC-32:0x9d9a42b8 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -67,14 +67,14 @@ __NAMESPACE_LOCAL_BEGIN
 __LOCAL_LIBC(_ftime32) __ATTR_NONNULL((1)) void
 __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(_ftime32))(struct __timeb32 *__timebuf) {
 #ifdef __CRT_HAVE__ftime32_s
-	if __unlikely(__localdep_crt_ftime32_s(__timebuf))
-		__localdep_memset(__timebuf, 0, sizeof(*__timebuf));
+	if __unlikely(__NAMESPACE_LOCAL_SYM __localdep_crt_ftime32_s(__timebuf))
+		__NAMESPACE_LOCAL_SYM __localdep_memset(__timebuf, 0, sizeof(*__timebuf));
 #elif defined(__CRT_HAVE_ftime)
-	if __unlikely(__localdep_crt_ftime32(__timebuf))
-		__localdep_memset(__timebuf, 0, sizeof(*__timebuf));
+	if __unlikely(__NAMESPACE_LOCAL_SYM __localdep_crt_ftime32(__timebuf))
+		__NAMESPACE_LOCAL_SYM __localdep_memset(__timebuf, 0, sizeof(*__timebuf));
 #elif defined(__CRT_HAVE__ftime64)
 	struct __timeb64 __temp;
-	__localdep_crt_dos_ftime64(&__temp)
+	__NAMESPACE_LOCAL_SYM __localdep_crt_dos_ftime64(&__temp)
 	__timebuf->time     = (__time32_t)__temp.time;
 	__timebuf->millitm  = __temp.millitm;
 	__timebuf->timezone = __temp.timezone;
@@ -82,12 +82,12 @@ __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(_ftime32))(struct __timeb32 *__timebu
 #else /* ... */
 	struct __timeb64 __temp;
 #ifdef __CRT_HAVE__ftime64_s
-	if __unlikely(__localdep_crt_ftime64_s(&__temp))
+	if __unlikely(__NAMESPACE_LOCAL_SYM __localdep_crt_ftime64_s(&__temp))
 #else /* __CRT_HAVE__ftime64_s */
-	if __unlikely(__localdep_crt_ftime64(&__temp))
+	if __unlikely(__NAMESPACE_LOCAL_SYM __localdep_crt_ftime64(&__temp))
 #endif /* !__CRT_HAVE__ftime64_s */
 	{
-		__localdep_memset(__timebuf, 0, sizeof(*__timebuf));
+		__NAMESPACE_LOCAL_SYM __localdep_memset(__timebuf, 0, sizeof(*__timebuf));
 	} else {
 		__timebuf->time     = (__time32_t)__temp.time;
 		__timebuf->millitm  = __temp.millitm;

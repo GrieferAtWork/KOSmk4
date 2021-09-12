@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x85c9abb4 */
+/* HASH CRC-32:0x2974fc42 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -58,17 +58,17 @@ __CREDIRECT_DOS(__ATTR_LEAF __ATTR_NONNULL((1)),__INTMAX_TYPE__,__NOTHROW_NCX,__
 __NAMESPACE_LOCAL_END
 #include <libc/local/wchar/wcsto64.h>
 __NAMESPACE_LOCAL_BEGIN
-#define __localdep_c16toimax (*(__INTMAX_TYPE__(__LIBDCALL *)(__CHAR16_TYPE__ const *__restrict, __CHAR16_TYPE__ **, __STDC_INT_AS_UINT_T))&__LIBC_LOCAL_NAME(wcsto64))
+#define __localdep_c16toimax __NAMESPACE_LOCAL_TYPEHAX(__INTMAX_TYPE__(__LIBDCALL*)(__CHAR16_TYPE__ const *__restrict,__CHAR16_TYPE__ **,__STDC_INT_AS_UINT_T),__INTMAX_TYPE__(__LIBDCALL&)(__CHAR16_TYPE__ const *__restrict,__CHAR16_TYPE__ **,__STDC_INT_AS_UINT_T),wcsto64)
 #elif __SIZEOF_INTMAX_T__ == 4 && __SIZEOF_WCHAR_T__ == 2
 __NAMESPACE_LOCAL_END
 #include <libc/local/wchar/wcsto32.h>
 __NAMESPACE_LOCAL_BEGIN
-#define __localdep_c16toimax (*(__INTMAX_TYPE__(__LIBDCALL *)(__CHAR16_TYPE__ const *__restrict, __CHAR16_TYPE__ **, __STDC_INT_AS_UINT_T))&__LIBC_LOCAL_NAME(wcsto32))
+#define __localdep_c16toimax __NAMESPACE_LOCAL_TYPEHAX(__INTMAX_TYPE__(__LIBDCALL*)(__CHAR16_TYPE__ const *__restrict,__CHAR16_TYPE__ **,__STDC_INT_AS_UINT_T),__INTMAX_TYPE__(__LIBDCALL&)(__CHAR16_TYPE__ const *__restrict,__CHAR16_TYPE__ **,__STDC_INT_AS_UINT_T),wcsto32)
 #elif __SIZEOF_WCHAR_T__ == 2
 __NAMESPACE_LOCAL_END
 #include <libc/local/inttypes/wcstoimax.h>
 __NAMESPACE_LOCAL_BEGIN
-#define __localdep_c16toimax (*(__INTMAX_TYPE__(__LIBDCALL *)(__CHAR16_TYPE__ const *__restrict, __CHAR16_TYPE__ **, __STDC_INT_AS_UINT_T))&__LIBC_LOCAL_NAME(wcstoimax))
+#define __localdep_c16toimax __NAMESPACE_LOCAL_TYPEHAX(__INTMAX_TYPE__(__LIBDCALL*)(__CHAR16_TYPE__ const *__restrict,__CHAR16_TYPE__ **,__STDC_INT_AS_UINT_T),__INTMAX_TYPE__(__LIBDCALL&)(__CHAR16_TYPE__ const *__restrict,__CHAR16_TYPE__ **,__STDC_INT_AS_UINT_T),wcstoimax)
 #else /* ... */
 __NAMESPACE_LOCAL_END
 #include <libc/local/parts.uchar.inttypes/c16toimax.h>
@@ -79,7 +79,7 @@ __NAMESPACE_LOCAL_BEGIN
 __LOCAL_LIBC(c16toimax_l) __ATTR_LEAF __ATTR_NONNULL((1)) __INTMAX_TYPE__
 __NOTHROW_NCX(__LIBDCALL __LIBC_LOCAL_NAME(c16toimax_l))(__CHAR16_TYPE__ const *__restrict __nptr, __CHAR16_TYPE__ **__endptr, __STDC_INT_AS_UINT_T __base, __locale_t __locale) {
 	(void)__locale;
-	return __localdep_c16toimax(__nptr, __endptr, __base);
+	return __NAMESPACE_LOCAL_SYM __localdep_c16toimax(__nptr, __endptr, __base);
 }
 __NAMESPACE_LOCAL_END
 #ifndef __local___localdep_c16toimax_l_defined

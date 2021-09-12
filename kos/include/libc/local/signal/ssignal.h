@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xe5bf3f75 */
+/* HASH CRC-32:0x1be00924 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -31,7 +31,7 @@ __CREDIRECT(,__sighandler_t,__NOTHROW_NCX,__localdep_bsd_signal,(__signo_t __sig
 #endif /* !__local___localdep_bsd_signal_defined */
 __LOCAL_LIBC(ssignal) __sighandler_t
 __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(ssignal))(__signo_t __signo, __sighandler_t __handler) {
-	return __localdep_bsd_signal(__signo, __handler);
+	return __NAMESPACE_LOCAL_SYM __localdep_bsd_signal(__signo, __handler);
 }
 __NAMESPACE_LOCAL_END
 #ifndef __local___localdep_ssignal_defined

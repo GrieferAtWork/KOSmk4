@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xd80dff22 */
+/* HASH CRC-32:0xc0ff8398 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -64,7 +64,7 @@ __CREDIRECT_KOS(,__SIZE_TYPE__,__NOTHROW_NCX,__localdep_uchar_mbrtoc32,(__CHAR32
 __NAMESPACE_LOCAL_END
 #include <libc/local/wchar/mbrtowc.h>
 __NAMESPACE_LOCAL_BEGIN
-#define __localdep_uchar_mbrtoc32 (*(__SIZE_TYPE__(__LIBKCALL *)(__CHAR32_TYPE__ *, char const *__restrict, __SIZE_TYPE__, struct __mbstate *))&__LIBC_LOCAL_NAME(mbrtowc))
+#define __localdep_uchar_mbrtoc32 __NAMESPACE_LOCAL_TYPEHAX(__SIZE_TYPE__(__LIBKCALL*)(__CHAR32_TYPE__ *,char const *__restrict,__SIZE_TYPE__,struct __mbstate *),__SIZE_TYPE__(__LIBKCALL&)(__CHAR32_TYPE__ *,char const *__restrict,__SIZE_TYPE__,struct __mbstate *),mbrtowc)
 #else /* ... */
 __NAMESPACE_LOCAL_END
 #include <libc/local/uchar/uchar_mbrtoc32.h>
@@ -74,7 +74,7 @@ __NAMESPACE_LOCAL_BEGIN
 #endif /* !__local___localdep_uchar_mbrtoc32_defined */
 __LOCAL_LIBC(mbtoc32) int
 __NOTHROW_NCX(__LIBKCALL __LIBC_LOCAL_NAME(mbtoc32))(__CHAR32_TYPE__ *__restrict __pwc, char const *__restrict __str, __SIZE_TYPE__ __maxlen) {
-	return __localdep_uchar_mbrtoc32(__pwc, __str, __maxlen, __NULLPTR);
+	return __NAMESPACE_LOCAL_SYM __localdep_uchar_mbrtoc32(__pwc, __str, __maxlen, __NULLPTR);
 }
 __NAMESPACE_LOCAL_END
 #ifndef __local___localdep_mbtoc32_defined

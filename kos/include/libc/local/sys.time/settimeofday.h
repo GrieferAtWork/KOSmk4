@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xa75396fa */
+/* HASH CRC-32:0x5876688e */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -49,17 +49,17 @@ __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(settimeofday))(struct timeval const *
 #ifdef __CRT_HAVE_settimeofday
 	struct __timeval32 __tv32;
 	if (!__tv)
-		return __localdep_settimeofday32(__NULLPTR, __tz);
+		return __NAMESPACE_LOCAL_SYM __localdep_settimeofday32(__NULLPTR, __tz);
 	__tv32.tv_sec  = (__time32_t)__tv->tv_sec;
 	__tv32.tv_usec = __tv->tv_usec;
-	return __localdep_settimeofday32(&__tv32, __tz);
+	return __NAMESPACE_LOCAL_SYM __localdep_settimeofday32(&__tv32, __tz);
 #else /* __CRT_HAVE_settimeofday */
 	struct __timeval64 __tv64;
 	if (!__tv)
-		return __localdep_settimeofday64(__NULLPTR, __tz);
+		return __NAMESPACE_LOCAL_SYM __localdep_settimeofday64(__NULLPTR, __tz);
 	__tv64.tv_sec  = (__time64_t)__tv->tv_sec;
 	__tv64.tv_usec = __tv->tv_usec;
-	return __localdep_settimeofday64(&__tv64, __tz);
+	return __NAMESPACE_LOCAL_SYM __localdep_settimeofday64(&__tv64, __tz);
 #endif /* !__CRT_HAVE_settimeofday */
 }
 __NAMESPACE_LOCAL_END

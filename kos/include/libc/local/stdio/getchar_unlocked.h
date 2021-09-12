@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x2014dad */
+/* HASH CRC-32:0x2caf6671 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -50,7 +50,7 @@ __NAMESPACE_LOCAL_END
 __NAMESPACE_LOCAL_BEGIN
 __LOCAL_LIBC(getchar_unlocked) int
 (__LIBCCALL __LIBC_LOCAL_NAME(getchar_unlocked))(void) __THROWS(...) {
-	return __localdep_fgetc_unlocked(__LOCAL_stdin);
+	return __NAMESPACE_LOCAL_SYM __localdep_fgetc_unlocked(__LOCAL_stdin);
 }
 __NAMESPACE_LOCAL_END
 #ifndef __local___localdep_getchar_unlocked_defined

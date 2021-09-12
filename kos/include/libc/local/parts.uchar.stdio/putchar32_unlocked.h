@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x46a75446 */
+/* HASH CRC-32:0x3a8e2d1b */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -44,7 +44,7 @@ __NAMESPACE_LOCAL_END
 __NAMESPACE_LOCAL_BEGIN
 __LOCAL_LIBC(putchar32_unlocked) __WINT32_TYPE__
 (__LIBKCALL __LIBC_LOCAL_NAME(putchar32_unlocked))(__CHAR32_TYPE__ __wc) __THROWS(...) {
-	return __localdep_fputc32_unlocked(__wc, __LOCAL_stdin);
+	return __NAMESPACE_LOCAL_SYM __localdep_fputc32_unlocked(__wc, __LOCAL_stdin);
 }
 __NAMESPACE_LOCAL_END
 #ifndef __local___localdep_putchar32_unlocked_defined

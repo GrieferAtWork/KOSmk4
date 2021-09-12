@@ -904,15 +904,18 @@ class FunctionPrototype {
 	@@NOTE: This function will not print a trailing line-feed after the declaration!
 	@@@param: escapeMode:      One of @ESCAPE_MODE_NONE, @ESCAPE_MODE_PART, @ESCAPE_MODE_FULL
 	@@@param: exposedName:     In the above example: @"wcslen"
-	@@@param: callToName:      In the above example: @"(__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(wcslen))"
+	@@@param: callToName:      In the above example: @"__LIBC_LOCAL_NAME(wcslen)"
 	@@@param: callToPrototype: In the above example: @(allLocalFunctionsByName["wcslen"].prototype)
+	@@@param: callToNamespace: In the above example: @LOCAL_NAMESPACE
 	public function cprintCallToMacro(
 			fp: CWriter, escapeMode: int, exposedName: string,
 			callToName: string, callToPrototype: FunctionPrototype,
-			explicitCastAllTypes: bool = false) {
+			callToNamespace: Namespace, explicitCastAllTypes: bool = false) {
 		fp << "#define " << exposedName;
 		/* Check if the prototypes are already compatible */
 		if (this.compatibleWith(callToPrototype)) {
+			if (callToNamespace.prefix && (callToNamespace !== LOCAL_NAMESPACE || fp.namespace !== LOCAL_NAMESPACE))
+				fp << " " << callToNamespace.prefix;
 			fp << " " << callToName << "\n";
 			return;
 		}
@@ -978,27 +981,45 @@ class FunctionPrototype {
 		/* Same   #   of   arguments,   and   same   ellipsis   behavior.
 		 * Assume that a  difference in  CC is intentional  and cast  the
 		 * other function's pointer into the intended prototype's format. */
-		fp << " (*(";
-		returnType.cprint(fp, escapeMode);
-		fp << "(";
-		if (cc) {
-			escapeTextIntoFile(fp, cc, escapeMode);
-			fp << " ";
+		function printFunctionPrototype(kind: string) {
+			returnType.cprint(fp, escapeMode);
+			fp << "(";
+			if (cc)
+				escapeTextIntoFile(fp, cc, escapeMode);
+			fp << kind << ")(";
+			local isFirst = true;
+			for (local a: argv) {
+				if (!isFirst)
+					fp << ",";
+				isFirst = false;
+				a.ctype.cprint(fp, escapeMode);
+			}
+			if (myHaveEllipsis) {
+				if (!isFirst)
+					fp << ",";
+				fp << "...";
+			}
+			fp << ")";
 		}
-		fp << "*)(";
-		local isFirst = true;
-		for (local a: argv) {
-			if (!isFirst)
-				fp << ", ";
-			isFirst = false;
-			a.ctype.cprint(fp, escapeMode);
+		if (fp.namespace === LOCAL_NAMESPACE &&
+		    callToNamespace === LOCAL_NAMESPACE &&
+		    callToName.startswith("__LIBC_LOCAL_NAME(") &&
+		    callToName.endswith(")")) {
+			/* Workaround so that the namespace prefix can be used unconditionally
+			 * when calling  local  functions  from within  the  local  namespace. */
+			fp << " __NAMESPACE_LOCAL_TYPEHAX(";
+			printFunctionPrototype("*");
+			fp << ",";
+			printFunctionPrototype("&");
+			fp << "," << callToName[18:-1] << ")\n";
+		} else {
+			fp << " (*(";
+			printFunctionPrototype("*");
+			fp << ")&";
+			if (callToNamespace.prefix)
+				fp << callToNamespace.prefix << " ";
+			fp << callToName << ")\n";
 		}
-		if (myHaveEllipsis) {
-			if (!isFirst)
-				fp << ", ";
-			fp << "...";
-		}
-		fp << "))&" << callToName << ")\n";
 	}
 
 	@@Print a declaration akin to:
@@ -1449,8 +1470,12 @@ class FunctionImplementation {
 				escapeNonRepeatingTextIntoFile(
 					fp, x, escapeMode,
 					keyEscape: [](keyword: string): string {
-						if (keyword in deps)
-							return keyDependency(keyword);
+						if (keyword in deps) {
+							local res = keyDependency(keyword);
+							if (LOCAL_NAMESPACE.prefix)
+								res = "{} {}".format({ LOCAL_NAMESPACE.prefix, res });
+							return res;
+						}
 						return none;
 					},
 					forceKeyEscape: true);
@@ -1485,8 +1510,52 @@ class FunctionImplementation {
 			keyEscape: [](keyword: string): string {
 				if (keyword == selfName)
 					return csymbolName;
-				if (keyword in deps)
-					return keyDependency(keyword);
+				if (keyword in deps) {
+					/* Always prefix with the  LOCAL namespace prefix. We  can't rely on the  compiler
+					 * being able to figure out what we want to do by using relative names. It doesn't
+					 * matter  that we're currently  inside the local namespace,  because c++ has this
+					 * weird,  non-sensical rule that  causes functions between  different names to be
+					 * ambiguous with each other, even when called  from the same namespace as one  of
+					 * the functions is defined within:
+					 *
+					 * >> struct opaque;
+					 * >> typedef struct opaque *opaque_struct_t;
+					 * >> typedef void          *opaque_void_t;
+					 * >> extern int foo_void(opaque_void_t p);
+					 * >> extern int foo_struct(opaque_struct_t p);
+					 * >> namespace ns {
+					 * >> extern int foo_void(opaque_void_t p);
+					 * >> extern int foo_struct(opaque_struct_t p);
+					 * >> int bar_void(opaque_void_t p)     { return foo_void(p); }    // OK
+					 * >> int bar_struct(opaque_struct_t p) { return foo_struct(p); }  // ERROR
+					 * >> }
+					 *
+					 * The call in  `bar_struct' is ambiguous™  because `struct opaque' was  first
+					 * declared in the global namespace (it doesn't matter if `ns' were to  import
+					 * `opaque' via `using ::opaque;'). But if one were to move the declaration of
+					 * `struct opaque' into the `ns' namespace, then the above would compile.
+					 *
+					 * In other words, c++ overload resolution with user-defined structure takes
+					 * into account which  namespaces those structures  were originally  defined
+					 * within, increasing the priority of  `::foo_struct' to the point of  being
+					 * equal to `ns::foo_struct', even though the call is made from `ns',  which
+					 * if you'd ask me should be much more important of an indicator!!!
+					 *
+					 * Originally, I though this  was a g++ bug,  but testing the above  snippet
+					 * with  practically  every compiler  on godbolt  ended  with _all_  of them
+					 * reporting on the same ambiguous call to `foo_struct', so I can only guess
+					 * that this is actually something the standard requires...
+					 *
+					 * *UGH* Anyways: the easiest work-around to this problem is to just always
+					 * use absolute symbol names in local implementations, thus preventing  any
+					 * issues from relying on compiler overload resolution order for  functions
+					 * that have been defined by different namespace.
+					 */
+					local res = keyDependency(keyword);
+					if (LOCAL_NAMESPACE.prefix)
+						res = "{} {}".format({ LOCAL_NAMESPACE.prefix, res });
+					return res;
+				}
 				return none;
 			},
 			forceKeyEscape: true
@@ -1653,10 +1722,6 @@ class LocalFunction {
 		fp.namespace = oldNs;
 		fp.externLinkage = oldExternLinkage;
 		local callToLocalName = LOCAL_NAMESPACE.keyCSymbolName(name);
-		if (oldNs !== LOCAL_NAMESPACE) {
-			if (LOCAL_NAMESPACE.prefix)
-				callToLocalName = "{} {}".format({ LOCAL_NAMESPACE.prefix, callToLocalName });
-		}
 		/* When only doing partial escaping of declaration, we must  still
 		 * do  full escaping within call-to-local expressions, since local
 		 * functions may use types in their declarations (which we in turn
@@ -1672,12 +1737,18 @@ class LocalFunction {
 			if (#prototypes == 1) {
 				prototypes.first.cprintCallToMacro(
 					fp, callToEscapeMode, exposedName,
-					callToLocalName, usedPrototype);
+					callToLocalName, usedPrototype,
+					LOCAL_NAMESPACE);
 			} else {
-				fp << "#define " << exposedName << " " << callToLocalName;
+				fp << "#define " << exposedName << " ";
+				if (oldNs !== LOCAL_NAMESPACE && LOCAL_NAMESPACE.prefix)
+					fp << LOCAL_NAMESPACE.prefix << " ";
+				fp << callToLocalName;
 			}
 			return;
 		}
+		if (oldNs !== LOCAL_NAMESPACE && LOCAL_NAMESPACE.prefix)
+			callToLocalName = "{} {}".format({ LOCAL_NAMESPACE.prefix, callToLocalName });
 		if (prototypes.each.hasEllipsis || ...) {
 			/* _Must_ (try to) use keyUsing for c++, or a macro for C */
 			if (doc)

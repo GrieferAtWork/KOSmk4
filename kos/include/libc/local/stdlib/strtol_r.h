@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x192aad74 */
+/* HASH CRC-32:0xce3a7ac7 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -59,11 +59,11 @@ __NAMESPACE_LOCAL_BEGIN
 __LOCAL_LIBC(strtol_r) __ATTR_LEAF __ATTR_NONNULL((1)) long
 __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(strtol_r))(char const *__restrict __nptr, char **__endptr, __STDC_INT_AS_UINT_T __base, __errno_t *__error) {
 #if __SIZEOF_LONG__ >= 8
-	return (long)__localdep_strto64_r(__nptr, __endptr, __base, __error);
+	return (long)__NAMESPACE_LOCAL_SYM __localdep_strto64_r(__nptr, __endptr, __base, __error);
 #elif __SIZEOF_LONG__ >= 4
-	return (long)__localdep_strto32_r(__nptr, __endptr, __base, __error);
+	return (long)__NAMESPACE_LOCAL_SYM __localdep_strto32_r(__nptr, __endptr, __base, __error);
 #else /* ... */
-	__INT32_TYPE__ __result = __localdep_strto32_r(__nptr, __endptr, __base, __error);
+	__INT32_TYPE__ __result = __NAMESPACE_LOCAL_SYM __localdep_strto32_r(__nptr, __endptr, __base, __error);
 	if (__result > __LONG_MAX__) {
 		if (__error) {
 #ifdef __ERANGE

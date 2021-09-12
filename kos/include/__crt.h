@@ -193,6 +193,26 @@
 
 /* Automatic namespacing for header-local implementations of functions. */
 #ifdef __cplusplus
+extern "C++" {namespace __local_imp {
+#if (__has_feature(cxx_alias_templates) ||                                  \
+     (defined(__cpp_alias_templates) && __cpp_alias_templates >= 200704) || \
+     (defined(__BORLANDC__) && __BORLANDC__ > 0x613) ||                     \
+     (defined(_MSC_FULL_VER) && _MSC_FULL_VER >= 180020827))
+/*#define __COMPILER_HAVE_CXX_TEMPLATE_USING*/
+/* Hacky work-around to define a  macro `__NAMESPACE_LOCAL_TYPEHAX' that can  be
+ * used to cast a given function into a (seemingly incompatible) prototype while
+ * also  allowing (read: requiring)  the caller to  prefix the entire expression
+ * with `__NAMESPACE_LOCAL_SYM'
+ *
+ * Used by `cheaders.dee' when generating macro for linking against functions
+ * from the __local_imp namespace. */
+template<class __T> using __loc_T = __T;
+#define __NAMESPACE_LOCAL_TYPEHAX(Tp, Tr, x) __loc_T<Tr>(::__local_imp::x)
+#else /* ... */
+template<class __S> struct __loc_T { typedef __S __T; };
+#define __NAMESPACE_LOCAL_TYPEHAX(Tp, Tr, x) __loc_T<Tr>::__T(::__local_imp::x)
+#endif /* !... */
+}}
 #define __NAMESPACE_LOCAL_BEGIN               namespace __local_imp {
 #define __NAMESPACE_LOCAL_END                 }
 #define __NAMESPACE_LOCAL_SYM                 ::__local_imp::
@@ -204,6 +224,7 @@
 #endif /* !__COMPILER_HAVE_BUG_BLOATY_CXX_USING */
 #define __LIBC_LOCAL_NAME(x)                  x
 #else /* __cplusplus */
+#define __NAMESPACE_LOCAL_TYPEHAX(Tp, Tr, x)  (*(Tp)&__local_##x)
 #define __NAMESPACE_LOCAL_BEGIN               /* nothing */
 #define __NAMESPACE_LOCAL_END                 /* nothing */
 #define __NAMESPACE_LOCAL_SYM                 /* nothing */
@@ -405,14 +426,7 @@ struct __IO_FILE;
 __NAMESPACE_STD_END
 #endif /* !__FILE */
 struct __locale_struct;
-#if 1 /* FIXME: ??? (GCC bug (or am I not getting how c++ is supposed to work))
-       * When `__locale_t' is defined as something other than `void *', then
-       * we get ambiguous call compiler errors in local implementations that
-       * call __localdep_* functions which have already been defined globally.
-       *
-       * I really don't get why that is ambiguous, though... */
-#define __locale_t void *
-#elif defined(__cplusplus)
+#ifdef __cplusplus
 #define __locale_t struct ::__locale_struct *
 #else /* __cplusplus */
 #define __locale_t struct __locale_struct *

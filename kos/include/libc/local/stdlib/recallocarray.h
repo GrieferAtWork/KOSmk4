@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xec8277c0 */
+/* HASH CRC-32:0xb5259f61 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -128,28 +128,28 @@ __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(recallocarray))(void *__mallptr, __SI
 	if (__mallptr != __NULLPTR && __old_elem_count != 0) {
 		void *__result;
 		__SIZE_TYPE__ __oldusable, __newneeded;
-		__oldusable = __localdep_malloc_usable_size(__mallptr);
+		__oldusable = __NAMESPACE_LOCAL_SYM __localdep_malloc_usable_size(__mallptr);
 		__newneeded = __new_elem_count * __elem_size;
 		if (__oldusable >= __newneeded) {
 			if (__old_elem_count > __new_elem_count) {
 				__SIZE_TYPE__ __zero_bytes;
 				__zero_bytes = (__old_elem_count - __new_elem_count) * __elem_size;
-				__localdep_explicit_bzero((__BYTE_TYPE__ *)__mallptr + __newneeded, __zero_bytes);
+				__NAMESPACE_LOCAL_SYM __localdep_explicit_bzero((__BYTE_TYPE__ *)__mallptr + __newneeded, __zero_bytes);
 			}
 			return __mallptr;
 		}
 		/* Allocate a new block so we can ensure that  an
 		 * existing block gets freezero()'ed in all cases */
-		__result = __localdep_calloc(__new_elem_count, __elem_size);
+		__result = __NAMESPACE_LOCAL_SYM __localdep_calloc(__new_elem_count, __elem_size);
 		if (__result) {
 			if (__oldusable > __newneeded)
 				__oldusable = __newneeded;
-			__localdep_memcpy(__result, __mallptr, __oldusable);
-			__localdep_freezero(__mallptr, __old_elem_count * __elem_size);
+			__NAMESPACE_LOCAL_SYM __localdep_memcpy(__result, __mallptr, __oldusable);
+			__NAMESPACE_LOCAL_SYM __localdep_freezero(__mallptr, __old_elem_count * __elem_size);
 		}
 		return __result;
 	}
-	return __localdep_recallocv(__mallptr, __new_elem_count, __elem_size);
+	return __NAMESPACE_LOCAL_SYM __localdep_recallocv(__mallptr, __new_elem_count, __elem_size);
 }
 __NAMESPACE_LOCAL_END
 #ifndef __local___localdep_recallocarray_defined

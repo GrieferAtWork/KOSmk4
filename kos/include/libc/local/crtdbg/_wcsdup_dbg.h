@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x9877d89e */
+/* HASH CRC-32:0xad4a55fc */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -38,7 +38,7 @@ __CREDIRECT_DOS(__ATTR_MALLOC __ATTR_MALL_DEFAULT_ALIGNED __ATTR_WUNUSED __ATTR_
 __NAMESPACE_LOCAL_END
 #include <libc/local/wchar/wcsdup.h>
 __NAMESPACE_LOCAL_BEGIN
-#define __localdep_c16sdup (*(__CHAR16_TYPE__ *(__LIBDCALL *)(__CHAR16_TYPE__ const *__restrict))&__LIBC_LOCAL_NAME(wcsdup))
+#define __localdep_c16sdup __NAMESPACE_LOCAL_TYPEHAX(__CHAR16_TYPE__ *(__LIBDCALL*)(__CHAR16_TYPE__ const *__restrict),__CHAR16_TYPE__ *(__LIBDCALL&)(__CHAR16_TYPE__ const *__restrict),wcsdup)
 #elif defined(__CRT_HAVE_malloc) || defined(__CRT_HAVE_calloc) || defined(__CRT_HAVE_realloc) || defined(__CRT_HAVE_memalign) || defined(__CRT_HAVE_aligned_alloc) || defined(__CRT_HAVE_posix_memalign)
 __NAMESPACE_LOCAL_END
 #include <libc/local/parts.uchar.string/c16sdup.h>
@@ -53,7 +53,7 @@ __NOTHROW_NCX(__LIBDCALL __LIBC_LOCAL_NAME(_wcsdup_dbg))(__WCHAR16_TYPE__ const 
 	(void)__block_type;
 	(void)__filename;
 	(void)__line;
-	return (__WCHAR16_TYPE__ *)__localdep_c16sdup((__CHAR16_TYPE__ const *)__string);
+	return (__WCHAR16_TYPE__ *)__NAMESPACE_LOCAL_SYM __localdep_c16sdup((__CHAR16_TYPE__ const *)__string);
 }
 __NAMESPACE_LOCAL_END
 #ifndef __local___localdep__wcsdup_dbg_defined

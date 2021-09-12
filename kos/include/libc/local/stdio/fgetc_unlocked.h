@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xb0ffe6d5 */
+/* HASH CRC-32:0x94306bad */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -60,10 +60,10 @@ __NAMESPACE_LOCAL_BEGIN
 __LOCAL_LIBC(fgetc_unlocked) __ATTR_NONNULL((1)) int
 (__LIBCCALL __LIBC_LOCAL_NAME(fgetc_unlocked))(__FILE *__restrict __stream) __THROWS(...) {
 #if defined(__CRT_DOS) && defined(__CRT_HAVE__filbuf)
-	return --__stream->__f_cnt >= 0 ? (int)((__UINT8_TYPE__)*__stream->__f_ptr++) : __localdep__filbuf(__stream);
+	return --__stream->__f_cnt >= 0 ? (int)((__UINT8_TYPE__)*__stream->__f_ptr++) : __NAMESPACE_LOCAL_SYM __localdep__filbuf(__stream);
 #else /* __CRT_DOS && __CRT_HAVE__filbuf */
 	char __ch;
-	if (!__localdep_crt_fread_unlocked(&__ch, sizeof(char), 1, __stream))
+	if (!__NAMESPACE_LOCAL_SYM __localdep_crt_fread_unlocked(&__ch, sizeof(char), 1, __stream))
 		return __EOF;
 	return (int)__ch;
 #endif /* !__CRT_DOS || !__CRT_HAVE__filbuf */

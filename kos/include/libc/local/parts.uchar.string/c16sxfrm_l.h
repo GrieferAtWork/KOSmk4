@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xcdb6c255 */
+/* HASH CRC-32:0x2adbdd3 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -33,7 +33,7 @@ __CREDIRECT_DOS(__ATTR_NONNULL((2)),__SIZE_TYPE__,__NOTHROW_NCX,__localdep_c16sx
 __NAMESPACE_LOCAL_END
 #include <libc/local/wchar/wcsxfrm.h>
 __NAMESPACE_LOCAL_BEGIN
-#define __localdep_c16sxfrm (*(__SIZE_TYPE__(__LIBDCALL *)(__CHAR16_TYPE__ *, __CHAR16_TYPE__ const *__restrict, __SIZE_TYPE__))&__LIBC_LOCAL_NAME(wcsxfrm))
+#define __localdep_c16sxfrm __NAMESPACE_LOCAL_TYPEHAX(__SIZE_TYPE__(__LIBDCALL*)(__CHAR16_TYPE__ *,__CHAR16_TYPE__ const *__restrict,__SIZE_TYPE__),__SIZE_TYPE__(__LIBDCALL&)(__CHAR16_TYPE__ *,__CHAR16_TYPE__ const *__restrict,__SIZE_TYPE__),wcsxfrm)
 #else /* ... */
 __NAMESPACE_LOCAL_END
 #include <libc/local/parts.uchar.string/c16sxfrm.h>
@@ -44,7 +44,7 @@ __NAMESPACE_LOCAL_BEGIN
 __LOCAL_LIBC(c16sxfrm_l) __ATTR_NONNULL((2)) __SIZE_TYPE__
 __NOTHROW_NCX(__LIBDCALL __LIBC_LOCAL_NAME(c16sxfrm_l))(__CHAR16_TYPE__ *__dst, __CHAR16_TYPE__ const *__restrict __src, __SIZE_TYPE__ __maxlen, __locale_t __locale) {
 	(void)__locale;
-	return __localdep_c16sxfrm(__dst, __src, __maxlen);
+	return __NAMESPACE_LOCAL_SYM __localdep_c16sxfrm(__dst, __src, __maxlen);
 }
 __NAMESPACE_LOCAL_END
 #ifndef __local___localdep_c16sxfrm_l_defined

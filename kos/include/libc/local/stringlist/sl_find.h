@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xf8478b31 */
+/* HASH CRC-32:0x72d74ea */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -50,7 +50,7 @@ __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(sl_find))(struct _stringlist __KOS_FI
 	__SIZE_TYPE__ __i, __count = __sl->sl_cur;
 	for (__i = 0; __i < __count; ++__i) {
 		char *__s = __sl->sl_str[__i];
-		if (__localdep_strcmp(__s, __name) == 0)
+		if (__NAMESPACE_LOCAL_SYM __localdep_strcmp(__s, __name) == 0)
 			return __s;
 	}
 	return __NULLPTR;

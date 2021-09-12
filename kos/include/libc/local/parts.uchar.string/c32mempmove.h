@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x565f33cb */
+/* HASH CRC-32:0x5cebd82f */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -69,7 +69,7 @@ __NOTHROW_NCX(__LIBKCALL __LIBC_LOCAL_NAME(c32mempmove))(__CHAR32_TYPE__ *__dst,
 
 
 
-	return (__CHAR32_TYPE__ *)__localdep_mempmovel(__dst, __src, __num_chars);
+	return (__CHAR32_TYPE__ *)__NAMESPACE_LOCAL_SYM __localdep_mempmovel(__dst, __src, __num_chars);
 
 
 

@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xf4c1293f */
+/* HASH CRC-32:0x442be2f2 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -47,17 +47,17 @@ __NOTHROW_RPC(__LIBCCALL __LIBC_LOCAL_NAME(gai_suspend))(struct gaicb const *con
 #ifdef __CRT_HAVE_gai_suspend
 	struct __timespec32 __tmo32;
 	if (!__timeout)
-		return __localdep_gai_suspend32(__list, __ent, __NULLPTR);
+		return __NAMESPACE_LOCAL_SYM __localdep_gai_suspend32(__list, __ent, __NULLPTR);
 	__tmo32.tv_sec  = (__time32_t)__timeout->tv_sec;
 	__tmo32.tv_nsec = __timeout->tv_nsec;
-	return __localdep_gai_suspend32(__list, __ent, &__tmo32);
+	return __NAMESPACE_LOCAL_SYM __localdep_gai_suspend32(__list, __ent, &__tmo32);
 #else /* __CRT_HAVE_gai_suspend */
 	struct __timespec64 __tmo64;
 	if (!__timeout)
-		return __localdep_gai_suspend64(__list, __ent, __NULLPTR);
+		return __NAMESPACE_LOCAL_SYM __localdep_gai_suspend64(__list, __ent, __NULLPTR);
 	__tmo64.tv_sec  = (__time64_t)__timeout->tv_sec;
 	__tmo64.tv_nsec = __timeout->tv_nsec;
-	return __localdep_gai_suspend64(__list, __ent, &__tmo64);
+	return __NAMESPACE_LOCAL_SYM __localdep_gai_suspend64(__list, __ent, &__tmo64);
 #endif /* !__CRT_HAVE_gai_suspend */
 }
 __NAMESPACE_LOCAL_END

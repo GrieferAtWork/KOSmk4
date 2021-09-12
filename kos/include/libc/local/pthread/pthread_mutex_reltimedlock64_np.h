@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x22e2d6b4 */
+/* HASH CRC-32:0xd903a0ad */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -36,7 +36,7 @@ __NOTHROW_RPC(__LIBCCALL __LIBC_LOCAL_NAME(pthread_mutex_reltimedlock64_np))(__p
 	struct __timespec32 __reltime32;
 	__reltime32.tv_sec  = (__time32_t)__reltime->tv_sec;
 	__reltime32.tv_nsec = __reltime->tv_nsec;
-	__result = __localdep_pthread_mutex_reltimedlock32_np(__mutex, &__reltime32);
+	__result = __NAMESPACE_LOCAL_SYM __localdep_pthread_mutex_reltimedlock32_np(__mutex, &__reltime32);
 	return __result;
 }
 __NAMESPACE_LOCAL_END

@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xe17ce103 */
+/* HASH CRC-32:0x86963152 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -60,24 +60,24 @@ __NAMESPACE_LOCAL_BEGIN
 __LOCAL_LIBC(ftime) __ATTR_NONNULL((1)) int
 __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(ftime))(struct timeb *__timebuf) {
 #if defined(__CRT_HAVE__ftime32_s) && !defined(__USE_TIME_BITS64)
-	__errno_t __error = __localdep_crt_ftime32_s(__timebuf);
+	__errno_t __error = __NAMESPACE_LOCAL_SYM __localdep_crt_ftime32_s(__timebuf);
 	if __unlikely(__error)
 		__error = __libc_seterrno(__error);
 	return (int)__error;
 #elif defined(__CRT_HAVE__ftime64_s) && defined(__USE_TIME_BITS64)
-	__errno_t __error = __localdep_crt_ftime64_s(__timebuf);
+	__errno_t __error = __NAMESPACE_LOCAL_SYM __localdep_crt_ftime64_s(__timebuf);
 	if __unlikely(__error)
 		__error = __libc_seterrno(__error);
 	return (int)__error;
 #elif defined(__CRT_HAVE__ftime32) && !defined(__USE_TIME_BITS64)
-	__localdep_crt_dos_ftime32(&__temp);
+	__NAMESPACE_LOCAL_SYM __localdep_crt_dos_ftime32(&__temp);
 	return 0;
 #elif defined(__CRT_HAVE__ftime64) && defined(__USE_TIME_BITS64)
-	__localdep_crt_dos_ftime64(&__temp);
+	__NAMESPACE_LOCAL_SYM __localdep_crt_dos_ftime64(&__temp);
 	return 0;
 #elif defined(__CRT_HAVE_ftime)
 	struct __timeb32 __temp;
-	int __error = __localdep_crt_ftime32(&__temp);
+	int __error = __NAMESPACE_LOCAL_SYM __localdep_crt_ftime32(&__temp);
 	if __likely(!__error) {
 		__timebuf->time     = (__time64_t)__temp.time;
 		__timebuf->millitm  = __temp.millitm;
@@ -87,7 +87,7 @@ __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(ftime))(struct timeb *__timebuf) {
 	return __error;
 #elif defined(__CRT_HAVE_ftime64)
 	struct __timeb64 __temp;
-	int __error = __localdep_crt_ftime64(&__temp);
+	int __error = __NAMESPACE_LOCAL_SYM __localdep_crt_ftime64(&__temp);
 	if __likely(!__error) {
 		__timebuf->time     = (__time32_t)__temp.time;
 		__timebuf->millitm  = __temp.millitm;
@@ -97,7 +97,7 @@ __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(ftime))(struct timeb *__timebuf) {
 	return __error;
 #elif defined(__CRT_HAVE__ftime32_s)
 	struct __timeb32 __temp;
-	__errno_t __error = __localdep_crt_ftime32_s(&__temp);
+	__errno_t __error = __NAMESPACE_LOCAL_SYM __localdep_crt_ftime32_s(&__temp);
 	if __unlikely(__error) {
 		__error = __libc_seterrno(__error);
 	} else {
@@ -109,7 +109,7 @@ __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(ftime))(struct timeb *__timebuf) {
 	return (int)__error;
 #elif defined(__CRT_HAVE__ftime64_s)
 	struct __timeb64 __temp;
-	__errno_t __error = __localdep_crt_ftime64_s(&__temp);
+	__errno_t __error = __NAMESPACE_LOCAL_SYM __localdep_crt_ftime64_s(&__temp);
 	if __unlikely(__error) {
 		__error = __libc_seterrno(__error);
 	} else {
@@ -121,7 +121,7 @@ __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(ftime))(struct timeb *__timebuf) {
 	return (int)__error;
 #elif defined(__CRT_HAVE__ftime32)
 	struct __timeb32 __temp;
-	__localdep_crt_dos_ftime32(&__temp);
+	__NAMESPACE_LOCAL_SYM __localdep_crt_dos_ftime32(&__temp);
 	__timebuf->time     = (__time64_t)__temp.time;
 	__timebuf->millitm  = __temp.millitm;
 	__timebuf->timezone = __temp.timezone;
@@ -129,7 +129,7 @@ __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(ftime))(struct timeb *__timebuf) {
 	return 0;
 #else /* ... */
 	struct __timeb64 __temp;
-	__localdep_crt_dos_ftime64(&__temp);
+	__NAMESPACE_LOCAL_SYM __localdep_crt_dos_ftime64(&__temp);
 	__timebuf->time     = (__time32_t)__temp.time;
 	__timebuf->millitm  = __temp.millitm;
 	__timebuf->timezone = __temp.timezone;

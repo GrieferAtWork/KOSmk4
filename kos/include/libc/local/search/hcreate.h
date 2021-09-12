@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xe44b81d3 */
+/* HASH CRC-32:0x1fa1fb14 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -59,7 +59,7 @@ __NAMESPACE_LOCAL_END
 __NAMESPACE_LOCAL_BEGIN
 __LOCAL_LIBC(hcreate) int
 __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(hcreate))(__SIZE_TYPE__ __nel) {
-	return __localdep_hcreate_r(__nel, &__NAMESPACE_LOCAL_SYM __htab);
+	return __NAMESPACE_LOCAL_SYM __localdep_hcreate_r(__nel, &__NAMESPACE_LOCAL_SYM __htab);
 }
 __NAMESPACE_LOCAL_END
 #ifndef __local___localdep_hcreate_defined

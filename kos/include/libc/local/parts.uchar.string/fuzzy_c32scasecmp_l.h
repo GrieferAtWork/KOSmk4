@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x810e42 */
+/* HASH CRC-32:0xc9cf01a2 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -35,7 +35,7 @@ __CREDIRECT_KOS(__ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1)),__SIZE_TYPE__,__N
 __NAMESPACE_LOCAL_END
 #include <libc/local/wchar/wcslen.h>
 __NAMESPACE_LOCAL_BEGIN
-#define __localdep_c32slen (*(__SIZE_TYPE__(__LIBKCALL *)(__CHAR32_TYPE__ const *__restrict))&__LIBC_LOCAL_NAME(wcslen))
+#define __localdep_c32slen __NAMESPACE_LOCAL_TYPEHAX(__SIZE_TYPE__(__LIBKCALL*)(__CHAR32_TYPE__ const *__restrict),__SIZE_TYPE__(__LIBKCALL&)(__CHAR32_TYPE__ const *__restrict),wcslen)
 #else /* ... */
 __NAMESPACE_LOCAL_END
 #include <libc/local/parts.uchar.string/c32slen.h>
@@ -53,7 +53,7 @@ __CREDIRECT_KOS(__ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1, 3)),__SIZE_TYPE__,
 __NAMESPACE_LOCAL_END
 #include <libc/local/wchar/fuzzy_wmemcasecmp_l.h>
 __NAMESPACE_LOCAL_BEGIN
-#define __localdep_fuzzy_c32memcasecmp_l (*(__SIZE_TYPE__(__LIBKCALL *)(__CHAR32_TYPE__ const *, __SIZE_TYPE__, __CHAR32_TYPE__ const *, __SIZE_TYPE__, __locale_t))&__LIBC_LOCAL_NAME(fuzzy_wmemcasecmp_l))
+#define __localdep_fuzzy_c32memcasecmp_l __NAMESPACE_LOCAL_TYPEHAX(__SIZE_TYPE__(__LIBKCALL*)(__CHAR32_TYPE__ const *,__SIZE_TYPE__,__CHAR32_TYPE__ const *,__SIZE_TYPE__,__locale_t),__SIZE_TYPE__(__LIBKCALL&)(__CHAR32_TYPE__ const *,__SIZE_TYPE__,__CHAR32_TYPE__ const *,__SIZE_TYPE__,__locale_t),fuzzy_wmemcasecmp_l)
 #elif !defined(__NO_MALLOCA)
 __NAMESPACE_LOCAL_END
 #include <libc/local/parts.uchar.string/fuzzy_c32memcasecmp_l.h>
@@ -65,7 +65,7 @@ __NAMESPACE_LOCAL_BEGIN
 #endif /* !__local___localdep_fuzzy_c32memcasecmp_l_defined */
 __LOCAL_LIBC(fuzzy_c32scasecmp_l) __ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1, 2)) __SIZE_TYPE__
 __NOTHROW_NCX(__LIBKCALL __LIBC_LOCAL_NAME(fuzzy_c32scasecmp_l))(__CHAR32_TYPE__ const *__s1, __CHAR32_TYPE__ const *__s2, __locale_t __locale) {
-	return __localdep_fuzzy_c32memcasecmp_l(__s1, __localdep_c32slen(__s1), __s2, __localdep_c32slen(__s2), __locale);
+	return __NAMESPACE_LOCAL_SYM __localdep_fuzzy_c32memcasecmp_l(__s1, __NAMESPACE_LOCAL_SYM __localdep_c32slen(__s1), __s2, __NAMESPACE_LOCAL_SYM __localdep_c32slen(__s2), __locale);
 }
 __NAMESPACE_LOCAL_END
 #ifndef __local___localdep_fuzzy_c32scasecmp_l_defined

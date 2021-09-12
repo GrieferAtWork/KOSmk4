@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x6b52a5b8 */
+/* HASH CRC-32:0xdd6636d1 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -56,7 +56,7 @@ __CREDIRECT_KOS(__ATTR_CONST __ATTR_WUNUSED,__WINT32_TYPE__,__NOTHROW,__localdep
 __NAMESPACE_LOCAL_END
 #include <libc/local/wctype/towlower.h>
 __NAMESPACE_LOCAL_BEGIN
-#define __localdep_tolower32 (*(__WINT32_TYPE__(__LIBKCALL *)(__WINT32_TYPE__))&__LIBC_LOCAL_NAME(towlower))
+#define __localdep_tolower32 __NAMESPACE_LOCAL_TYPEHAX(__WINT32_TYPE__(__LIBKCALL*)(__WINT32_TYPE__),__WINT32_TYPE__(__LIBKCALL&)(__WINT32_TYPE__),towlower)
 #else /* ... */
 __NAMESPACE_LOCAL_END
 #include <libc/local/parts.uchar.wctype/tolower32.h>
@@ -84,10 +84,10 @@ __NOTHROW_NCX(__LIBKCALL __LIBC_LOCAL_NAME(wildc32scasecmp))(__CHAR32_TYPE__ con
 				return 0; /* Pattern ends with '*' (matches everything) */
 			if (__card_post == '?')
 				goto __next; /* Match any --> already found */
-			__card_post = (__CHAR32_TYPE__)__localdep_tolower32((__CHAR32_TYPE__)__card_post);
+			__card_post = (__CHAR32_TYPE__)__NAMESPACE_LOCAL_SYM __localdep_tolower32((__CHAR32_TYPE__)__card_post);
 			for (;;) {
 				__CHAR32_TYPE__ __ch = *__string++;
-				if (__card_post == __ch || __card_post == (__CHAR32_TYPE__)__localdep_tolower32((__CHAR32_TYPE__)__ch)) {
+				if (__card_post == __ch || __card_post == (__CHAR32_TYPE__)__NAMESPACE_LOCAL_SYM __localdep_tolower32((__CHAR32_TYPE__)__ch)) {
 					/* Recursively check if the rest of the string and pattern match */
 					if (!__LIBC_LOCAL_NAME(wildc32scasecmp)(__string, __pattern))
 						return 0;
@@ -99,8 +99,8 @@ __NOTHROW_NCX(__LIBKCALL __LIBC_LOCAL_NAME(wildc32scasecmp))(__CHAR32_TYPE__ con
 		__pattern_ch = *__pattern;
 		__wcsing_ch = *__string;
 		if (__pattern_ch == __wcsing_ch || __pattern_ch == '?' ||
-		    (__pattern_ch = (__CHAR32_TYPE__)__localdep_tolower32((__CHAR32_TYPE__)__pattern_ch),
-		     __wcsing_ch  = (__CHAR32_TYPE__)__localdep_tolower32((__CHAR32_TYPE__)__wcsing_ch),
+		    (__pattern_ch = (__CHAR32_TYPE__)__NAMESPACE_LOCAL_SYM __localdep_tolower32((__CHAR32_TYPE__)__pattern_ch),
+		     __wcsing_ch  = (__CHAR32_TYPE__)__NAMESPACE_LOCAL_SYM __localdep_tolower32((__CHAR32_TYPE__)__wcsing_ch),
 		     __pattern_ch == __wcsing_ch)) {
 __next:
 			++__string;

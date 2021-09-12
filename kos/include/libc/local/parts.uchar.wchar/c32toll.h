@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xfe2f534c */
+/* HASH CRC-32:0x14d12206 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -88,7 +88,7 @@ __CREDIRECT_KOS(__ATTR_LEAF __ATTR_NONNULL((1)),__INT32_TYPE__,__NOTHROW_NCX,__l
 __NAMESPACE_LOCAL_END
 #include <libc/local/wchar/wcsto32.h>
 __NAMESPACE_LOCAL_BEGIN
-#define __localdep_c32sto32 (*(__INT32_TYPE__(__LIBKCALL *)(__CHAR32_TYPE__ const *__restrict, __CHAR32_TYPE__ **, __STDC_INT_AS_UINT_T))&__LIBC_LOCAL_NAME(wcsto32))
+#define __localdep_c32sto32 __NAMESPACE_LOCAL_TYPEHAX(__INT32_TYPE__(__LIBKCALL*)(__CHAR32_TYPE__ const *__restrict,__CHAR32_TYPE__ **,__STDC_INT_AS_UINT_T),__INT32_TYPE__(__LIBKCALL&)(__CHAR32_TYPE__ const *__restrict,__CHAR32_TYPE__ **,__STDC_INT_AS_UINT_T),wcsto32)
 #else /* ... */
 __NAMESPACE_LOCAL_END
 #include <libc/local/parts.uchar.wchar/c32sto32.h>
@@ -174,7 +174,7 @@ __CREDIRECT_KOS(__ATTR_LEAF __ATTR_NONNULL((1)),__INT64_TYPE__,__NOTHROW_NCX,__l
 __NAMESPACE_LOCAL_END
 #include <libc/local/wchar/wcsto64.h>
 __NAMESPACE_LOCAL_BEGIN
-#define __localdep_c32sto64 (*(__INT64_TYPE__(__LIBKCALL *)(__CHAR32_TYPE__ const *__restrict, __CHAR32_TYPE__ **, __STDC_INT_AS_UINT_T))&__LIBC_LOCAL_NAME(wcsto64))
+#define __localdep_c32sto64 __NAMESPACE_LOCAL_TYPEHAX(__INT64_TYPE__(__LIBKCALL*)(__CHAR32_TYPE__ const *__restrict,__CHAR32_TYPE__ **,__STDC_INT_AS_UINT_T),__INT64_TYPE__(__LIBKCALL&)(__CHAR32_TYPE__ const *__restrict,__CHAR32_TYPE__ **,__STDC_INT_AS_UINT_T),wcsto64)
 #else /* ... */
 __NAMESPACE_LOCAL_END
 #include <libc/local/parts.uchar.wchar/c32sto64.h>
@@ -185,9 +185,9 @@ __NAMESPACE_LOCAL_BEGIN
 __LOCAL_LIBC(c32toll) __ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1)) __LONGLONG
 __NOTHROW_NCX(__LIBKCALL __LIBC_LOCAL_NAME(c32toll))(__CHAR32_TYPE__ const *__nptr) {
 #if __SIZEOF_LONG_LONG__
-	return (__LONGLONG)__localdep_c32sto32(__nptr, __NULLPTR, 10);
+	return (__LONGLONG)__NAMESPACE_LOCAL_SYM __localdep_c32sto32(__nptr, __NULLPTR, 10);
 #else /* __SIZEOF_LONG_LONG__ */
-	return (__LONGLONG)__localdep_c32sto64(__nptr, __NULLPTR, 10);
+	return (__LONGLONG)__NAMESPACE_LOCAL_SYM __localdep_c32sto64(__nptr, __NULLPTR, 10);
 #endif /* !__SIZEOF_LONG_LONG__ */
 }
 __NAMESPACE_LOCAL_END

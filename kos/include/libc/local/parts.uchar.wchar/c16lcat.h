@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xa0192839 */
+/* HASH CRC-32:0xf37800b3 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -33,7 +33,7 @@ __CREDIRECT_DOS(__ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1)),__SIZE_TYPE__,__N
 __NAMESPACE_LOCAL_END
 #include <libc/local/wchar/wcslen.h>
 __NAMESPACE_LOCAL_BEGIN
-#define __localdep_c16slen (*(__SIZE_TYPE__(__LIBDCALL *)(__CHAR16_TYPE__ const *__restrict))&__LIBC_LOCAL_NAME(wcslen))
+#define __localdep_c16slen __NAMESPACE_LOCAL_TYPEHAX(__SIZE_TYPE__(__LIBDCALL*)(__CHAR16_TYPE__ const *__restrict),__SIZE_TYPE__(__LIBDCALL&)(__CHAR16_TYPE__ const *__restrict),wcslen)
 #else /* ... */
 __NAMESPACE_LOCAL_END
 #include <libc/local/parts.uchar.string/c16slen.h>
@@ -51,7 +51,7 @@ __CREDIRECT_DOS(__ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1)),__SIZE_TYPE__,__N
 __NAMESPACE_LOCAL_END
 #include <libc/local/wchar/wcsnlen.h>
 __NAMESPACE_LOCAL_BEGIN
-#define __localdep_c16snlen (*(__SIZE_TYPE__(__LIBDCALL *)(__CHAR16_TYPE__ const *__restrict, __SIZE_TYPE__))&__LIBC_LOCAL_NAME(wcsnlen))
+#define __localdep_c16snlen __NAMESPACE_LOCAL_TYPEHAX(__SIZE_TYPE__(__LIBDCALL*)(__CHAR16_TYPE__ const *__restrict,__SIZE_TYPE__),__SIZE_TYPE__(__LIBDCALL&)(__CHAR16_TYPE__ const *__restrict,__SIZE_TYPE__),wcsnlen)
 #else /* ... */
 __NAMESPACE_LOCAL_END
 #include <libc/local/parts.uchar.string/c16snlen.h>
@@ -72,12 +72,12 @@ __NAMESPACE_LOCAL_BEGIN
 #endif /* !__local___localdep_memcpy_defined */
 __LOCAL_LIBC(c16lcat) __ATTR_LEAF __ATTR_NONNULL((1, 2)) __SIZE_TYPE__
 __NOTHROW_NCX(__LIBDCALL __LIBC_LOCAL_NAME(c16lcat))(__CHAR16_TYPE__ *__restrict __dst, __CHAR16_TYPE__ const *__restrict __src, __SIZE_TYPE__ __bufsize) {
-	__SIZE_TYPE__ __result = __localdep_c16slen(__src);
-	__CHAR16_TYPE__ *__new_dst = __dst + __localdep_c16snlen(__dst, __bufsize);
+	__SIZE_TYPE__ __result = __NAMESPACE_LOCAL_SYM __localdep_c16slen(__src);
+	__CHAR16_TYPE__ *__new_dst = __dst + __NAMESPACE_LOCAL_SYM __localdep_c16snlen(__dst, __bufsize);
 	__SIZE_TYPE__ __copy_size;
 	__bufsize -= (__new_dst - __dst);
 	__copy_size = __result < __bufsize ? __result : __bufsize - 1;
-	__localdep_memcpy(__new_dst, __src, __copy_size*sizeof(__CHAR16_TYPE__));
+	__NAMESPACE_LOCAL_SYM __localdep_memcpy(__new_dst, __src, __copy_size*sizeof(__CHAR16_TYPE__));
 	__new_dst[__copy_size] = '\0';
 	return __result + (__new_dst - __dst);
 }

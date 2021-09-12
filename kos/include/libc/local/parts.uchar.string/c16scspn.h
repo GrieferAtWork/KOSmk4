@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x5103b5da */
+/* HASH CRC-32:0xbca00236 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -38,7 +38,7 @@ __CREDIRECT_DOS(__ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1)),__CHAR16_TYPE__ *
 __NAMESPACE_LOCAL_END
 #include <libc/local/wchar/wcschr.h>
 __NAMESPACE_LOCAL_BEGIN
-#define __localdep_c16schr (*(__CHAR16_TYPE__ *(__LIBDCALL *)(__CHAR16_TYPE__ const *__restrict, __CHAR16_TYPE__))&__LIBC_LOCAL_NAME(wcschr))
+#define __localdep_c16schr __NAMESPACE_LOCAL_TYPEHAX(__CHAR16_TYPE__ *(__LIBDCALL*)(__CHAR16_TYPE__ const *__restrict,__CHAR16_TYPE__),__CHAR16_TYPE__ *(__LIBDCALL&)(__CHAR16_TYPE__ const *__restrict,__CHAR16_TYPE__),wcschr)
 #else /* ... */
 __NAMESPACE_LOCAL_END
 #include <libc/local/parts.uchar.string/c16schr.h>
@@ -52,7 +52,7 @@ __NAMESPACE_LOCAL_BEGIN
 __LOCAL_LIBC(c16scspn) __ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1, 2)) __SIZE_TYPE__
 __NOTHROW_NCX(__LIBDCALL __LIBC_LOCAL_NAME(c16scspn))(__CHAR16_TYPE__ const *__haystack, __CHAR16_TYPE__ const *__reject) {
 	__CHAR16_TYPE__ const *__iter = __haystack;
-	while (*__iter && !__localdep_c16schr(__reject, *__iter))
+	while (*__iter && !__NAMESPACE_LOCAL_SYM __localdep_c16schr(__reject, *__iter))
 		++__iter;
 	return (__SIZE_TYPE__)(__iter - __haystack);
 }

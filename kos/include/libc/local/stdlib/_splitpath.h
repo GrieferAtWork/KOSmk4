@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x97a15048 */
+/* HASH CRC-32:0xce1e8e4d */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -38,7 +38,7 @@ __NAMESPACE_LOCAL_BEGIN
 #endif /* !__local___localdep__splitpath_s_defined */
 __LOCAL_LIBC(_splitpath) __ATTR_NONNULL((1)) void
 __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(_splitpath))(char const *__restrict __abspath, char *__drive, char *__dir, char *__file, char *__ext) {
-	__localdep__splitpath_s(__abspath,
+	__NAMESPACE_LOCAL_SYM __localdep__splitpath_s(__abspath,
 	             __drive, __drive ? 3 : 0,
 	             __dir, __dir ? 256 : 0,
 	             __file, __file ? 256 : 0,

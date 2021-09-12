@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x5dccce6c */
+/* HASH CRC-32:0xaa8165bc */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -76,7 +76,7 @@ __CREDIRECT_DOS(__ATTR_PURE __ATTR_WUNUSED,__WINT16_TYPE__,__NOTHROW_NCX,__local
 __NAMESPACE_LOCAL_END
 #include <libc/local/wctype/towupper_l.h>
 __NAMESPACE_LOCAL_BEGIN
-#define __localdep_toupper16_l (*(__WINT16_TYPE__(__LIBDCALL *)(__WINT16_TYPE__, __locale_t))&__LIBC_LOCAL_NAME(towupper_l))
+#define __localdep_toupper16_l __NAMESPACE_LOCAL_TYPEHAX(__WINT16_TYPE__(__LIBDCALL*)(__WINT16_TYPE__,__locale_t),__WINT16_TYPE__(__LIBDCALL&)(__WINT16_TYPE__,__locale_t),towupper_l)
 #else /* ... */
 __NAMESPACE_LOCAL_END
 #include <libc/local/parts.uchar.wctype/toupper16_l.h>
@@ -88,7 +88,7 @@ __LOCAL_LIBC(c16supr_l) __ATTR_LEAF __ATTR_RETNONNULL __ATTR_NONNULL((1)) __CHAR
 __NOTHROW_NCX(__LIBDCALL __LIBC_LOCAL_NAME(c16supr_l))(__CHAR16_TYPE__ *__restrict __str, __locale_t __locale) {
 	__CHAR16_TYPE__ *__iter, __ch;
 	for (__iter = __str; (__ch = *__iter) != '\0'; ++__iter)
-		*__iter = __localdep_toupper16_l(__ch, __locale);
+		*__iter = __NAMESPACE_LOCAL_SYM __localdep_toupper16_l(__ch, __locale);
 	return __str;
 }
 __NAMESPACE_LOCAL_END

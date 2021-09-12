@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xc89022bd */
+/* HASH CRC-32:0xf770ebc0 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -37,7 +37,7 @@ __NAMESPACE_LOCAL_BEGIN
 __LOCAL_LIBC(explicit_memset) __ATTR_LEAF __ATTR_RETNONNULL __ATTR_NONNULL((1)) void *
 __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(explicit_memset))(void *__restrict __dst, int __byte, __SIZE_TYPE__ __n_bytes) {
 	void *volatile __vdst = __dst;
-	return __localdep_memset(__vdst, __byte, __n_bytes);
+	return __NAMESPACE_LOCAL_SYM __localdep_memset(__vdst, __byte, __n_bytes);
 }
 __NAMESPACE_LOCAL_END
 #ifndef __local___localdep_explicit_memset_defined

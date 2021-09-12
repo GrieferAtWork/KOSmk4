@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x3a05c1f9 */
+/* HASH CRC-32:0xe1d4321d */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -40,7 +40,7 @@ __CREDIRECT_KOS(__ATTR_LEAF __ATTR_NONNULL((1)),__INT64_TYPE__,__NOTHROW_NCX,__l
 __NAMESPACE_LOCAL_END
 #include <libc/local/wchar/wcsto64_r.h>
 __NAMESPACE_LOCAL_BEGIN
-#define __localdep_c32sto64_r (*(__INT64_TYPE__(__LIBKCALL *)(__CHAR32_TYPE__ const *__restrict, __CHAR32_TYPE__ **, __STDC_INT_AS_UINT_T, __errno_t *))&__LIBC_LOCAL_NAME(wcsto64_r))
+#define __localdep_c32sto64_r __NAMESPACE_LOCAL_TYPEHAX(__INT64_TYPE__(__LIBKCALL*)(__CHAR32_TYPE__ const *__restrict,__CHAR32_TYPE__ **,__STDC_INT_AS_UINT_T,__errno_t *),__INT64_TYPE__(__LIBKCALL&)(__CHAR32_TYPE__ const *__restrict,__CHAR32_TYPE__ **,__STDC_INT_AS_UINT_T,__errno_t *),wcsto64_r)
 #else /* ... */
 __NAMESPACE_LOCAL_END
 #include <libc/local/parts.uchar.wchar/c32sto64_r.h>
@@ -56,12 +56,12 @@ __NOTHROW_NCX(__LIBKCALL __LIBC_LOCAL_NAME(c32sto64))(__CHAR32_TYPE__ const *__r
 #if defined(__libc_geterrno) && defined(__ERANGE)
 	__INT64_TYPE__ __result;
 	__errno_t __error;
-	__result = __localdep_c32sto64_r(__nptr, __endptr, __base, &__error);
+	__result = __NAMESPACE_LOCAL_SYM __localdep_c32sto64_r(__nptr, __endptr, __base, &__error);
 	if (__error == __ERANGE)
 		(void)__libc_seterrno(__ERANGE);
 	return __result;
 #else /* __libc_geterrno && __ERANGE */
-	return __localdep_c32sto64_r(__nptr, __endptr, __base, __NULLPTR);
+	return __NAMESPACE_LOCAL_SYM __localdep_c32sto64_r(__nptr, __endptr, __base, __NULLPTR);
 #endif /* !__libc_geterrno || !__ERANGE */
 }
 __NAMESPACE_LOCAL_END

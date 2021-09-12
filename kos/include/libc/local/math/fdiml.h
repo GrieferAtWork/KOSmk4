@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x1fbc4d20 */
+/* HASH CRC-32:0xdd77bf9b */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -40,7 +40,7 @@ __NAMESPACE_LOCAL_BEGIN
 __LOCAL_LIBC(fdiml) __ATTR_CONST __ATTR_WUNUSED __LONGDOUBLE
 __NOTHROW(__LIBCCALL __LIBC_LOCAL_NAME(fdiml))(__LONGDOUBLE __x, __LONGDOUBLE __y) {
 	/* TODO: ieee754-specific function */
-	return __localdep_fabsl(__y - __x);
+	return __NAMESPACE_LOCAL_SYM __localdep_fabsl(__y - __x);
 }
 __NAMESPACE_LOCAL_END
 #ifndef __local___localdep_fdiml_defined

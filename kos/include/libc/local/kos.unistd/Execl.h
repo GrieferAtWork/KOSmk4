@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xf538e6bf */
+/* HASH CRC-32:0x851bf442 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -45,7 +45,7 @@ __NAMESPACE_LOCAL_END
 __NAMESPACE_LOCAL_BEGIN
 __LOCAL_LIBC(Execl) __ATTR_NORETURN __ATTR_SENTINEL __ATTR_NONNULL((1)) void
 (__VLIBCCALL __LIBC_LOCAL_NAME(Execl))(char const *__restrict __path, char const *__args, ...) __THROWS(...) {
-	__REDIRECT_XEXECL(char, __localdep_Execv, __path, __args)
+	__REDIRECT_XEXECL(char, __NAMESPACE_LOCAL_SYM __localdep_Execv, __path, __args)
 }
 __NAMESPACE_LOCAL_END
 #ifndef __local___localdep_Execl_defined

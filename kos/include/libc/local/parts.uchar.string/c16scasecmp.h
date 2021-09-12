@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x228159c7 */
+/* HASH CRC-32:0x3ef34b69 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -56,7 +56,7 @@ __CREDIRECT_DOS(__ATTR_CONST __ATTR_WUNUSED,__WINT16_TYPE__,__NOTHROW,__localdep
 __NAMESPACE_LOCAL_END
 #include <libc/local/wctype/towlower.h>
 __NAMESPACE_LOCAL_BEGIN
-#define __localdep_tolower16 (*(__WINT16_TYPE__(__LIBDCALL *)(__WINT16_TYPE__))&__LIBC_LOCAL_NAME(towlower))
+#define __localdep_tolower16 __NAMESPACE_LOCAL_TYPEHAX(__WINT16_TYPE__(__LIBDCALL*)(__WINT16_TYPE__),__WINT16_TYPE__(__LIBDCALL&)(__WINT16_TYPE__),towlower)
 #else /* ... */
 __NAMESPACE_LOCAL_END
 #include <libc/local/parts.uchar.wctype/tolower16.h>
@@ -69,8 +69,8 @@ __NOTHROW_NCX(__LIBDCALL __LIBC_LOCAL_NAME(c16scasecmp))(__CHAR16_TYPE__ const *
 	__CHAR16_TYPE__ __c1, __c2;
 	do {
 		if ((__c1 = *__s1++) != (__c2 = *__s2++) &&
-		    ((__c1 = (__CHAR16_TYPE__)__localdep_tolower16((__CHAR16_TYPE__)__c1)) !=
-		     (__c2 = (__CHAR16_TYPE__)__localdep_tolower16((__CHAR16_TYPE__)__c2))))
+		    ((__c1 = (__CHAR16_TYPE__)__NAMESPACE_LOCAL_SYM __localdep_tolower16((__CHAR16_TYPE__)__c1)) !=
+		     (__c2 = (__CHAR16_TYPE__)__NAMESPACE_LOCAL_SYM __localdep_tolower16((__CHAR16_TYPE__)__c2))))
 			return (int)((__CHAR16_TYPE__)__c1 - (__CHAR16_TYPE__)__c2);
 	} while (__c1);
 	return 0;

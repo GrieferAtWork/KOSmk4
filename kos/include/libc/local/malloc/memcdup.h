@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x789e5b05 */
+/* HASH CRC-32:0xe317ac12 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -54,11 +54,11 @@ __LOCAL_LIBC(memcdup) __ATTR_MALLOC __ATTR_MALL_DEFAULT_ALIGNED __ATTR_WUNUSED _
 __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(memcdup))(void const *__restrict __ptr, int __needle, __SIZE_TYPE__ __n_bytes) {
 	if __likely(__n_bytes) {
 		void const *__endaddr;
-		__endaddr = __localdep_memchr(__ptr, __needle, __n_bytes - 1);
+		__endaddr = __NAMESPACE_LOCAL_SYM __localdep_memchr(__ptr, __needle, __n_bytes - 1);
 		if (__endaddr)
 			__n_bytes = ((__UINTPTR_TYPE__)__endaddr - (__UINTPTR_TYPE__)__ptr) + 1;
 	}
-	return __localdep_memdup(__ptr, __n_bytes);
+	return __NAMESPACE_LOCAL_SYM __localdep_memdup(__ptr, __n_bytes);
 }
 __NAMESPACE_LOCAL_END
 #ifndef __local___localdep_memcdup_defined

@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x8f0cc33c */
+/* HASH CRC-32:0x82b0c151 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -102,13 +102,13 @@ __NAMESPACE_LOCAL_BEGIN
 __LOCAL_LIBC(sigfillset) __ATTR_NONNULL((1)) int
 __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(sigfillset))(struct __sigset_struct *__set) {
 #if __SIZEOF_POINTER__ == 8
-	__localdep_memsetq(__set->__val, __UINT64_C(0xffffffffffffffff), __COMPILER_LENOF(__set->__val));
+	__NAMESPACE_LOCAL_SYM __localdep_memsetq(__set->__val, __UINT64_C(0xffffffffffffffff), __COMPILER_LENOF(__set->__val));
 #elif __SIZEOF_POINTER__ == 4
-	__localdep_memsetl(__set->__val, __UINT32_C(0xffffffff), __COMPILER_LENOF(__set->__val));
+	__NAMESPACE_LOCAL_SYM __localdep_memsetl(__set->__val, __UINT32_C(0xffffffff), __COMPILER_LENOF(__set->__val));
 #elif __SIZEOF_POINTER__ == 2
-	__localdep_memsetw(__set->__val, __UINT16_C(0xffff), __COMPILER_LENOF(__set->__val));
+	__NAMESPACE_LOCAL_SYM __localdep_memsetw(__set->__val, __UINT16_C(0xffff), __COMPILER_LENOF(__set->__val));
 #else /* ... */
-	__localdep_memset(__set->__val, __UINT8_C(0xff), __SIZEOF_SIGSET_T__);
+	__NAMESPACE_LOCAL_SYM __localdep_memset(__set->__val, __UINT8_C(0xff), __SIZEOF_SIGSET_T__);
 #endif /* !... */
 	return 0;
 }

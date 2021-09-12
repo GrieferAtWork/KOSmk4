@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x65475ae6 */
+/* HASH CRC-32:0xfc075f80 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -31,7 +31,7 @@ __CREDIRECT(__ATTR_NONNULL((1)),int,__NOTHROW_NCX,__localdep_ntp_gettime32,(stru
 __LOCAL_LIBC(ntp_gettime64) __ATTR_NONNULL((1)) int
 __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(ntp_gettime64))(struct __ntptimeval64 *__restrict __ntv) {
 	struct __ntptimeval32 __ntv32;
-	int __result = __localdep_ntp_gettime32(&__ntv32);
+	int __result = __NAMESPACE_LOCAL_SYM __localdep_ntp_gettime32(&__ntv32);
 	if __likely(__result == 0) {
 		__ntv->time.tv_sec       = (__time64_t)__ntv32.time.tv_sec;
 		__ntv->time.tv_usec      = __ntv32.time.tv_usec;

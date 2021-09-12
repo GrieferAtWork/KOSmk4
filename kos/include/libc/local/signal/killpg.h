@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xe6f8ae2 */
+/* HASH CRC-32:0xedfbb492 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -30,7 +30,7 @@ __CREDIRECT(,int,__NOTHROW_NCX,__localdep_kill,(__pid_t __pid, __signo_t __signo
 #endif /* !__local___localdep_kill_defined */
 __LOCAL_LIBC(killpg) int
 __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(killpg))(__pid_t __pgrp, __signo_t __signo) {
-	return __localdep_kill(-__pgrp, __signo);
+	return __NAMESPACE_LOCAL_SYM __localdep_kill(-__pgrp, __signo);
 }
 __NAMESPACE_LOCAL_END
 #ifndef __local___localdep_killpg_defined

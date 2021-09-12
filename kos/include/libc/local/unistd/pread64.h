@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xa7e446e2 */
+/* HASH CRC-32:0xaa5d90a4 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -83,30 +83,30 @@ __CREDIRECT(__ATTR_NONNULL((2)),__SSIZE_TYPE__,__NOTHROW_RPC,__localdep_read,(__
 __LOCAL_LIBC(pread64) __ATTR_NONNULL((2)) __SSIZE_TYPE__
 __NOTHROW_RPC(__LIBCCALL __LIBC_LOCAL_NAME(pread64))(__fd_t __fd, void *__buf, __SIZE_TYPE__ __bufsize, __PIO_OFFSET64 __offset) {
 #ifdef __CRT_HAVE_pread
-	return __localdep_pread32(__fd, __buf, __bufsize, (__pos32_t)__offset);
+	return __NAMESPACE_LOCAL_SYM __localdep_pread32(__fd, __buf, __bufsize, (__pos32_t)__offset);
 #elif defined(__CRT_HAVE_lseek64) || defined(__CRT_HAVE__lseeki64) || defined(__CRT_HAVE_lseek) || defined(__CRT_HAVE__lseek) || defined(__CRT_HAVE___lseek)
 	/* It may not be quick, and it may not be SMP-safe, but it'll still do the job! */
 	__off64_t __oldpos;
 	__SSIZE_TYPE__ __result;
-	__oldpos = __localdep_lseek64(__fd, 0, __SEEK_CUR);
+	__oldpos = __NAMESPACE_LOCAL_SYM __localdep_lseek64(__fd, 0, __SEEK_CUR);
 	if __unlikely(__oldpos < 0)
 		return -1;
-	if __unlikely(__localdep_lseek64(__fd, (__off64_t)__offset, __SEEK_SET) < 0)
+	if __unlikely(__NAMESPACE_LOCAL_SYM __localdep_lseek64(__fd, (__off64_t)__offset, __SEEK_SET) < 0)
 		return -1;
-	__result = __localdep_read(__fd, __buf, __bufsize);
-	__localdep_lseek64(__fd, __oldpos, __SEEK_SET);
+	__result = __NAMESPACE_LOCAL_SYM __localdep_read(__fd, __buf, __bufsize);
+	__NAMESPACE_LOCAL_SYM __localdep_lseek64(__fd, __oldpos, __SEEK_SET);
 	return __result;
 #else /* ... */
 	/* It may not be quick, and it may not be SMP-safe, but it'll still do the job! */
 	__off32_t __oldpos;
 	__SSIZE_TYPE__ __result;
-	__oldpos = __localdep_lseek32(__fd, 0, __SEEK_CUR);
+	__oldpos = __NAMESPACE_LOCAL_SYM __localdep_lseek32(__fd, 0, __SEEK_CUR);
 	if __unlikely(__oldpos < 0)
 		return -1;
-	if __unlikely(__localdep_lseek32(__fd, (__off32_t)__offset, __SEEK_SET) < 0)
+	if __unlikely(__NAMESPACE_LOCAL_SYM __localdep_lseek32(__fd, (__off32_t)__offset, __SEEK_SET) < 0)
 		return -1;
-	__result = __localdep_read(__fd, __buf, __bufsize);
-	__localdep_lseek32(__fd, __oldpos, __SEEK_SET);
+	__result = __NAMESPACE_LOCAL_SYM __localdep_read(__fd, __buf, __bufsize);
+	__NAMESPACE_LOCAL_SYM __localdep_lseek32(__fd, __oldpos, __SEEK_SET);
 	return __result;
 #endif /* !... */
 }

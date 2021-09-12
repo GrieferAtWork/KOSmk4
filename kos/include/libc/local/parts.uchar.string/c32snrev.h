@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xd63fc0d2 */
+/* HASH CRC-32:0x6207e46c */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -33,7 +33,7 @@ __CREDIRECT_KOS(__ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1)),__SIZE_TYPE__,__N
 __NAMESPACE_LOCAL_END
 #include <libc/local/wchar/wcsnlen.h>
 __NAMESPACE_LOCAL_BEGIN
-#define __localdep_c32snlen (*(__SIZE_TYPE__(__LIBKCALL *)(__CHAR32_TYPE__ const *__restrict, __SIZE_TYPE__))&__LIBC_LOCAL_NAME(wcsnlen))
+#define __localdep_c32snlen __NAMESPACE_LOCAL_TYPEHAX(__SIZE_TYPE__(__LIBKCALL*)(__CHAR32_TYPE__ const *__restrict,__SIZE_TYPE__),__SIZE_TYPE__(__LIBKCALL&)(__CHAR32_TYPE__ const *__restrict,__SIZE_TYPE__),wcsnlen)
 #else /* ... */
 __NAMESPACE_LOCAL_END
 #include <libc/local/parts.uchar.string/c32snlen.h>
@@ -79,7 +79,7 @@ __NOTHROW_NCX(__LIBKCALL __LIBC_LOCAL_NAME(c32snrev))(__CHAR32_TYPE__ *__restric
 
 
 
-	return (__CHAR32_TYPE__ *)__localdep_memrevl(__str, __localdep_c32snlen(__str, __maxlen));
+	return (__CHAR32_TYPE__ *)__NAMESPACE_LOCAL_SYM __localdep_memrevl(__str, __NAMESPACE_LOCAL_SYM __localdep_c32snlen(__str, __maxlen));
 
 
 

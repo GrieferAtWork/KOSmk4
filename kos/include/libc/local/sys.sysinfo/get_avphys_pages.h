@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x98083ce3 */
+/* HASH CRC-32:0xce6ecd9d */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -66,9 +66,9 @@ __NOTHROW(__LIBCCALL __LIBC_LOCAL_NAME(get_avphys_pages))(void) {
 	struct sysinfo __info;
 	__UINTPTR_TYPE__ __result;
 	__SIZE_TYPE__ __ps;
-	if (__localdep_sysinfo(&__info))
+	if (__NAMESPACE_LOCAL_SYM __localdep_sysinfo(&__info))
 		return -1;
-	__ps = __localdep_getpagesize();
+	__ps = __NAMESPACE_LOCAL_SYM __localdep_getpagesize();
 	while (__info.mem_unit > 1 && __ps > 1) {
 		__info.mem_unit >>= 1;
 		__ps >>= 1;

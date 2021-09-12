@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xc4c447d2 */
+/* HASH CRC-32:0xd9412c20 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -59,10 +59,10 @@ __NAMESPACE_LOCAL_END
 __NAMESPACE_LOCAL_BEGIN
 __LOCAL_LIBC(strfry) __ATTR_LEAF __ATTR_RETNONNULL __ATTR_NONNULL((1)) char *
 __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(strfry))(char *__restrict __str) {
-	__SIZE_TYPE__ __i, __count = __localdep_strlen(__str);
+	__SIZE_TYPE__ __i, __count = __NAMESPACE_LOCAL_SYM __localdep_strlen(__str);
 	for (__i = 0; __i < __count; ++__i) {
 		char __temp;
-		__SIZE_TYPE__ __j = __localdep_rand();
+		__SIZE_TYPE__ __j = __NAMESPACE_LOCAL_SYM __localdep_rand();
 		__j = __i + (__j % (__count - __i));
 		/* Swap these 2 characters. */
 		__temp = __str[__i];

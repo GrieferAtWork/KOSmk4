@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xa4ab2271 */
+/* HASH CRC-32:0x8d07ae73 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -37,7 +37,7 @@ __CREDIRECT_KOS(__ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1, 2)),int,__NOTHROW_
 __NAMESPACE_LOCAL_END
 #include <libc/local/wchar/wcscasecmp.h>
 __NAMESPACE_LOCAL_BEGIN
-#define __localdep_c32scasecmp (*(int(__LIBKCALL *)(__CHAR32_TYPE__ const *, __CHAR32_TYPE__ const *))&__LIBC_LOCAL_NAME(wcscasecmp))
+#define __localdep_c32scasecmp __NAMESPACE_LOCAL_TYPEHAX(int(__LIBKCALL*)(__CHAR32_TYPE__ const *,__CHAR32_TYPE__ const *),int(__LIBKCALL&)(__CHAR32_TYPE__ const *,__CHAR32_TYPE__ const *),wcscasecmp)
 #else /* ... */
 __NAMESPACE_LOCAL_END
 #include <libc/local/parts.uchar.string/c32scasecmp.h>
@@ -48,7 +48,7 @@ __NAMESPACE_LOCAL_BEGIN
 __LOCAL_LIBC(c32scasestr) __ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1)) __CHAR32_TYPE__ *
 __NOTHROW_NCX(__LIBKCALL __LIBC_LOCAL_NAME(c32scasestr))(__CHAR32_TYPE__ const *__haystack, __CHAR32_TYPE__ const *__needle) {
 	for (; *__haystack; ++__haystack) {
-		if (__localdep_c32scasecmp(__haystack, __needle) == 0)
+		if (__NAMESPACE_LOCAL_SYM __localdep_c32scasecmp(__haystack, __needle) == 0)
 			return (__CHAR32_TYPE__ *)__haystack;
 	}
 	return __NULLPTR;

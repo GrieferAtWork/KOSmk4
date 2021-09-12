@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xaaeec805 */
+/* HASH CRC-32:0x1b6cb17a */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -53,7 +53,7 @@ __LOCAL_LIBC(thrd_sleep64) __ATTR_NONNULL((1)) int
 __NOTHROW_RPC(__LIBCCALL __LIBC_LOCAL_NAME(thrd_sleep64))(struct __timespec64 const *__time_point, struct __timespec64 *__remaining) {
 #if defined(__CRT_HAVE_nanosleep64) || defined(__CRT_HAVE_nanosleep) || defined(__CRT_HAVE___nanosleep)
 	int __result;
-	__result = __localdep_nanosleep64(__time_point, __remaining);
+	__result = __NAMESPACE_LOCAL_SYM __localdep_nanosleep64(__time_point, __remaining);
 	if __likely(__result == 0)
 		return 0;
 #if defined(__libc_geterrno) && defined(__EINTR)
@@ -67,7 +67,7 @@ __NOTHROW_RPC(__LIBCCALL __LIBC_LOCAL_NAME(thrd_sleep64))(struct __timespec64 co
 	struct __timespec32 __rem32;
 	__tp32.tv_sec  = (__time32_t)__time_point->tv_sec;
 	__tp32.tv_nsec = __time_point->tv_nsec;
-	__result = __localdep_thrd_sleep32(&__tp32, __remaining ? &__rem32 : __NULLPTR);
+	__result = __NAMESPACE_LOCAL_SYM __localdep_thrd_sleep32(&__tp32, __remaining ? &__rem32 : __NULLPTR);
 	if (__result == -1 && __remaining) {
 		__remaining->tv_sec = (__time64_t)__rem32.tv_sec;
 		__remaining->tv_nsec = __rem32.tv_nsec;

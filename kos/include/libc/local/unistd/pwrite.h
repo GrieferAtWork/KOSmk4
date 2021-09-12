@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x62c33d6c */
+/* HASH CRC-32:0x24c8ddaa */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -88,7 +88,7 @@ __CREDIRECT(__ATTR_NONNULL((2)),__SSIZE_TYPE__,__NOTHROW_RPC,__localdep_write,(_
 __LOCAL_LIBC(pwrite) __ATTR_NONNULL((2)) __SSIZE_TYPE__
 __NOTHROW_RPC(__LIBCCALL __LIBC_LOCAL_NAME(pwrite))(__fd_t __fd, void const *__buf, __SIZE_TYPE__ __bufsize, __PIO_OFFSET __offset) {
 
-	return __localdep_pwrite64(__fd, __buf, __bufsize, (__PIO_OFFSET64)__offset);
+	return __NAMESPACE_LOCAL_SYM __localdep_pwrite64(__fd, __buf, __bufsize, (__PIO_OFFSET64)__offset);
 
 
 

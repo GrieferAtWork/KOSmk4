@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x828bfd2f */
+/* HASH CRC-32:0x9b608de3 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -33,7 +33,7 @@ __CREDIRECT_DOS(__ATTR_CONST __ATTR_WUNUSED,int,__NOTHROW_NCX,__localdep_c16tob,
 __NAMESPACE_LOCAL_END
 #include <libc/local/wchar/wctob.h>
 __NAMESPACE_LOCAL_BEGIN
-#define __localdep_c16tob (*(int(__LIBDCALL *)(__WINT16_TYPE__))&__LIBC_LOCAL_NAME(wctob))
+#define __localdep_c16tob __NAMESPACE_LOCAL_TYPEHAX(int(__LIBDCALL*)(__WINT16_TYPE__),int(__LIBDCALL&)(__WINT16_TYPE__),wctob)
 #else /* ... */
 __NAMESPACE_LOCAL_END
 #include <libc/local/parts.uchar.wchar/c16tob.h>
@@ -49,7 +49,7 @@ __NOTHROW(__LIBDCALL __LIBC_LOCAL_NAME(isspace16))(__WINT16_TYPE__ __wc) {
 #ifdef __crt_iswspace
 	return __crt_iswspace(__wc);
 #else /* __crt_iswspace */
-	return __LIBC_LOCAL_NAME(isspace16)(__localdep_c16tob(__wc));
+	return __LIBC_LOCAL_NAME(isspace16)(__NAMESPACE_LOCAL_SYM __localdep_c16tob(__wc));
 #endif /* !__crt_iswspace */
 }
 __NAMESPACE_LOCAL_END

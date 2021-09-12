@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x7e5f08a2 */
+/* HASH CRC-32:0x87c59668 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -52,7 +52,7 @@ __CREDIRECT_DOS(,__SIZE_TYPE__,__NOTHROW_NCX,__localdep_uchar_c16rtomb,(char *__
 __NAMESPACE_LOCAL_END
 #include <libc/local/wchar/wcrtomb.h>
 __NAMESPACE_LOCAL_BEGIN
-#define __localdep_uchar_c16rtomb (*(__SIZE_TYPE__(__LIBDCALL *)(char *__restrict, __CHAR16_TYPE__, struct __mbstate *))&__LIBC_LOCAL_NAME(wcrtomb))
+#define __localdep_uchar_c16rtomb __NAMESPACE_LOCAL_TYPEHAX(__SIZE_TYPE__(__LIBDCALL*)(char *__restrict,__CHAR16_TYPE__,struct __mbstate *),__SIZE_TYPE__(__LIBDCALL&)(char *__restrict,__CHAR16_TYPE__,struct __mbstate *),wcrtomb)
 #else /* ... */
 __NAMESPACE_LOCAL_END
 #include <libc/local/uchar/uchar_c16rtomb.h>
@@ -62,7 +62,7 @@ __NAMESPACE_LOCAL_BEGIN
 #endif /* !__local___localdep_uchar_c16rtomb_defined */
 __LOCAL_LIBC(c16tomb) int
 __NOTHROW_NCX(__LIBDCALL __LIBC_LOCAL_NAME(c16tomb))(char *__str, __CHAR16_TYPE__ __wc) {
-	return __localdep_uchar_c16rtomb(__str, __wc, __NULLPTR);
+	return __NAMESPACE_LOCAL_SYM __localdep_uchar_c16rtomb(__str, __wc, __NULLPTR);
 }
 __NAMESPACE_LOCAL_END
 #ifndef __local___localdep_c16tomb_defined

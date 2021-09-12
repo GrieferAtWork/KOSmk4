@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xdec7ae6 */
+/* HASH CRC-32:0xa8e6fac8 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -77,14 +77,14 @@ __NOTHROW_RPC(__LIBCCALL __LIBC_LOCAL_NAME(getlogin_r))(char *__name, __SIZE_TYP
 #endif /* __CRT_HAVE_getpwuid_r && __CRT_HAVE_geteuid */
 	char *__pwname;
 #if defined(__CRT_HAVE_getenv) || defined(__LOCAL_environ)
-	__pwname = __localdep_getenv("LOGNAME");
+	__pwname = __NAMESPACE_LOCAL_SYM __localdep_getenv("LOGNAME");
 #if defined(__CRT_HAVE_getpwuid_r) && defined(__CRT_HAVE_geteuid)
 	if (!__pwname)
 #endif /* __CRT_HAVE_getpwuid_r && __CRT_HAVE_geteuid */
 #endif /* __CRT_HAVE_getenv || __LOCAL_environ */
 #if defined(__CRT_HAVE_getpwuid_r) && defined(__CRT_HAVE_geteuid)
 	{
-		if (__localdep_getpwuid_r(__localdep_geteuid(), &__pwent, __buf,
+		if (__NAMESPACE_LOCAL_SYM __localdep_getpwuid_r(__NAMESPACE_LOCAL_SYM __localdep_geteuid(), &__pwent, __buf,
 		               sizeof(__buf), &__pwptr) ||
 		    __pwptr == __NULLPTR)
 			return -1;
@@ -95,7 +95,7 @@ __NOTHROW_RPC(__LIBCCALL __LIBC_LOCAL_NAME(getlogin_r))(char *__name, __SIZE_TYP
 #endif /* __CRT_HAVE_getpwuid_r && __CRT_HAVE_geteuid */
 	if (__name_len) {
 		__name[__name_len - 1] = '\0';
-		__localdep_strncpy(__name, __pwname, __name_len - 1);
+		__NAMESPACE_LOCAL_SYM __localdep_strncpy(__name, __pwname, __name_len - 1);
 	}
 	return 0;
 }

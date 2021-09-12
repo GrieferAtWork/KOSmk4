@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x715306cc */
+/* HASH CRC-32:0xe0e34f4f */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -46,7 +46,7 @@ __CREDIRECT(__ATTR_NONNULL((2, 3)),__FILE *,__NOTHROW_RPC,__localdep_fdreopen,(_
 #endif /* !__local___localdep_fdreopen_defined */
 __LOCAL_LIBC(fdreopen_unlocked) __ATTR_NONNULL((2, 3)) __FILE *
 __NOTHROW_RPC(__LIBCCALL __LIBC_LOCAL_NAME(fdreopen_unlocked))(__fd_t __fd, char const *__restrict __modes, __FILE *__restrict __stream) {
-	return __localdep_fdreopen(__fd, __modes, __stream);
+	return __NAMESPACE_LOCAL_SYM __localdep_fdreopen(__fd, __modes, __stream);
 }
 __NAMESPACE_LOCAL_END
 #ifndef __local___localdep_fdreopen_unlocked_defined

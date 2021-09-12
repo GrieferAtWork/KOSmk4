@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xc32de9af */
+/* HASH CRC-32:0x4c45f840 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -53,7 +53,7 @@ __CREDIRECT_DOS(__ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1, 2)),int,__NOTHROW_
 __NAMESPACE_LOCAL_END
 #include <libc/local/wchar/wcsncasecoll.h>
 __NAMESPACE_LOCAL_BEGIN
-#define __localdep_c16sncasecoll (*(int(__LIBDCALL *)(__CHAR16_TYPE__ const *, __CHAR16_TYPE__ const *, __SIZE_TYPE__))&__LIBC_LOCAL_NAME(wcsncasecoll))
+#define __localdep_c16sncasecoll __NAMESPACE_LOCAL_TYPEHAX(int(__LIBDCALL*)(__CHAR16_TYPE__ const *,__CHAR16_TYPE__ const *,__SIZE_TYPE__),int(__LIBDCALL&)(__CHAR16_TYPE__ const *,__CHAR16_TYPE__ const *,__SIZE_TYPE__),wcsncasecoll)
 #else /* ... */
 __NAMESPACE_LOCAL_END
 #include <libc/local/parts.uchar.string/c16sncasecoll.h>
@@ -64,7 +64,7 @@ __NAMESPACE_LOCAL_BEGIN
 __LOCAL_LIBC(c16sncasecoll_l) __ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1, 2)) int
 __NOTHROW_NCX(__LIBDCALL __LIBC_LOCAL_NAME(c16sncasecoll_l))(__CHAR16_TYPE__ const *__s1, __CHAR16_TYPE__ const *__s2, __SIZE_TYPE__ __maxlen, __locale_t __locale) {
 	(void)__locale;
-	return __localdep_c16sncasecoll(__s1, __s2, __maxlen);
+	return __NAMESPACE_LOCAL_SYM __localdep_c16sncasecoll(__s1, __s2, __maxlen);
 }
 __NAMESPACE_LOCAL_END
 #ifndef __local___localdep_c16sncasecoll_l_defined

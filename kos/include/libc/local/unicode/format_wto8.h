@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xa4db8628 */
+/* HASH CRC-32:0x7bae007e */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -55,7 +55,7 @@ __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(format_wto8))(void *__arg, __WCHAR_TY
 		__closure->__fd_surrogate = 0;
 		__ch += 0x10000;
 		__ch += ((__CHAR16_TYPE__ const *)__data)[0] - 0xdc00;
-		__dst = __localdep_unicode_writeutf8(__dst, __ch);
+		__dst = __NAMESPACE_LOCAL_SYM __localdep_unicode_writeutf8(__dst, __ch);
 		__i = 1;
 		goto __after_dst_write;
 	}
@@ -75,7 +75,7 @@ __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(format_wto8))(void *__arg, __WCHAR_TY
 			} else {
 				__ch = __ch16;
 			}
-			__dst = __localdep_unicode_writeutf8(__dst, __ch);
+			__dst = __NAMESPACE_LOCAL_SYM __localdep_unicode_writeutf8(__dst, __ch);
 __after_dst_write:
 			;
 		} while ((__dst + 4) < __COMPILER_ENDOF(__buf) && __i < __datalen);
@@ -101,7 +101,7 @@ __err:
 	while (__i < __datalen) {
 		char *__dst = __buf;
 		do {
-			__dst = __localdep_unicode_writeutf8(__dst, ((__CHAR32_TYPE__ const *)__data)[__i++]);
+			__dst = __NAMESPACE_LOCAL_SYM __localdep_unicode_writeutf8(__dst, ((__CHAR32_TYPE__ const *)__data)[__i++]);
 		} while ((__dst + 7) < __COMPILER_ENDOF(__buf) && __i < __datalen);
 		__temp = (*__closure->__fd_printer)(__closure->__fd_arg, __buf, (__SIZE_TYPE__)(__dst - __buf));
 		if __unlikely(__temp < 0)

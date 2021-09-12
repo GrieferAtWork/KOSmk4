@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x9d910527 */
+/* HASH CRC-32:0x7a0a2549 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -87,7 +87,7 @@ __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(tdelete))(void const *__restrict __ke
 				__retval = __NULLPTR;
 				goto __done;
 			}
-			__localdep_memcpyc(__newstack, __nodestack, __sp, sizeof(__node *));
+			__NAMESPACE_LOCAL_SYM __localdep_memcpyc(__newstack, __nodestack, __sp, sizeof(__node *));
 			__freea(__nodestack);
 			__nodestack = __newstack;
 		}
@@ -117,7 +117,7 @@ __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(tdelete))(void const *__restrict __ke
 					__retval = __NULLPTR;
 					goto __done;
 				}
-				__localdep_memcpyc(__newstack, __nodestack, __sp, sizeof(__node *));
+				__NAMESPACE_LOCAL_SYM __localdep_memcpyc(__newstack, __nodestack, __sp, sizeof(__node *));
 				__freea(__nodestack);
 				__nodestack = __newstack;
 			}
@@ -227,7 +227,7 @@ __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(tdelete))(void const *__restrict __ke
 			__r->__is_red = 0;
 	}
 #if defined(__CRT_HAVE_free) || defined(__CRT_HAVE_cfree)
-	__localdep_free(__unchained);
+	__NAMESPACE_LOCAL_SYM __localdep_free(__unchained);
 #endif /* __CRT_HAVE_free || __CRT_HAVE_cfree */
 __done:
 	__freea(__nodestack);

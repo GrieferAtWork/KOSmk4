@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xba7f4f0b */
+/* HASH CRC-32:0x94011a3c */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -43,7 +43,7 @@ __CREDIRECT(__ATTR_NONNULL((2, 3)),__STDC_INT_AS_SSIZE_T,__NOTHROW_RPC,__localde
 #endif /* !__local___localdep_scandirat_defined */
 __LOCAL_LIBC(scandir) __ATTR_NONNULL((1, 2)) __STDC_INT_AS_SSIZE_T
 __NOTHROW_RPC(__LIBCCALL __LIBC_LOCAL_NAME(scandir))(char const *__restrict __dir, struct dirent ***__restrict __namelist, __scandir_selector_t __selector, __scandir_cmp_t __cmp) {
-	return __localdep_scandirat(__AT_FDCWD, __dir, __namelist, __selector, __cmp);
+	return __NAMESPACE_LOCAL_SYM __localdep_scandirat(__AT_FDCWD, __dir, __namelist, __selector, __cmp);
 }
 __NAMESPACE_LOCAL_END
 #ifndef __local___localdep_scandir_defined

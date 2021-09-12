@@ -522,7 +522,7 @@ flindirnode_v_mkfile(struct flindirnode *__restrict self,
 }
 
 /* Clear the `lde_ent' field of all directory enumerators using the given dirent.
- * The caller must be holding a write-lock to `self->ldd_flock' */
+ * The   caller   must   be    holding   a   write-lock   to    `self->ldd_flock' */
 PRIVATE NOBLOCK NONNULL((1, 2)) void
 NOTHROW(FCALL flindirnode_clear_direnum_with_dirent)(struct flindirnode *__restrict self,
                                                      struct flindirent const *__restrict entry) {

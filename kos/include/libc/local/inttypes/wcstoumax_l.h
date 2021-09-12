@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x5f44ea8c */
+/* HASH CRC-32:0x50c4cf44 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -44,12 +44,12 @@ __CREDIRECT(__ATTR_LEAF __ATTR_NONNULL((1)),__UINTMAX_TYPE__,__NOTHROW_NCX,__loc
 __NAMESPACE_LOCAL_END
 #include <libc/local/wchar/wcstou64.h>
 __NAMESPACE_LOCAL_BEGIN
-#define __localdep_wcstoumax (*(__UINTMAX_TYPE__(__LIBCCALL *)(__WCHAR_TYPE__ const *__restrict, __WCHAR_TYPE__ **, __STDC_INT_AS_UINT_T))&__LIBC_LOCAL_NAME(wcstou64))
+#define __localdep_wcstoumax __NAMESPACE_LOCAL_TYPEHAX(__UINTMAX_TYPE__(__LIBCCALL*)(__WCHAR_TYPE__ const *__restrict,__WCHAR_TYPE__ **,__STDC_INT_AS_UINT_T),__UINTMAX_TYPE__(__LIBCCALL&)(__WCHAR_TYPE__ const *__restrict,__WCHAR_TYPE__ **,__STDC_INT_AS_UINT_T),wcstou64)
 #elif __SIZEOF_INTMAX_T__ == 4
 __NAMESPACE_LOCAL_END
 #include <libc/local/wchar/wcstou32.h>
 __NAMESPACE_LOCAL_BEGIN
-#define __localdep_wcstoumax (*(__UINTMAX_TYPE__(__LIBCCALL *)(__WCHAR_TYPE__ const *__restrict, __WCHAR_TYPE__ **, __STDC_INT_AS_UINT_T))&__LIBC_LOCAL_NAME(wcstou32))
+#define __localdep_wcstoumax __NAMESPACE_LOCAL_TYPEHAX(__UINTMAX_TYPE__(__LIBCCALL*)(__WCHAR_TYPE__ const *__restrict,__WCHAR_TYPE__ **,__STDC_INT_AS_UINT_T),__UINTMAX_TYPE__(__LIBCCALL&)(__WCHAR_TYPE__ const *__restrict,__WCHAR_TYPE__ **,__STDC_INT_AS_UINT_T),wcstou32)
 #else /* ... */
 __NAMESPACE_LOCAL_END
 #include <libc/local/inttypes/wcstoumax.h>
@@ -60,7 +60,7 @@ __NAMESPACE_LOCAL_BEGIN
 __LOCAL_LIBC(wcstoumax_l) __ATTR_LEAF __ATTR_NONNULL((1)) __UINTMAX_TYPE__
 __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(wcstoumax_l))(__WCHAR_TYPE__ const *__restrict __nptr, __WCHAR_TYPE__ **__endptr, __STDC_INT_AS_UINT_T __base, __locale_t __locale) {
 	(void)__locale;
-	return __localdep_wcstoumax(__nptr, __endptr, __base);
+	return __NAMESPACE_LOCAL_SYM __localdep_wcstoumax(__nptr, __endptr, __base);
 }
 __NAMESPACE_LOCAL_END
 #ifndef __local___localdep_wcstoumax_l_defined

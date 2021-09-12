@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xf9fc5960 */
+/* HASH CRC-32:0x9b940065 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -36,7 +36,7 @@ __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(malloc_trim))(__SIZE_TYPE__ __pad) {
 
 #ifdef __CRT_HAVE__heapmin
 	(void)__pad;
-	return __localdep__heapmin() ? 1 : 0;
+	return __NAMESPACE_LOCAL_SYM __localdep__heapmin() ? 1 : 0;
 #else /* __CRT_HAVE__heapmin */
 	/* NO-OP (indicate failure to release memory) */
 	__COMPILER_IMPURE();

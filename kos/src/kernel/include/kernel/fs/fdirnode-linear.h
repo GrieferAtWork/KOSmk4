@@ -160,9 +160,9 @@ struct flindirnode_ops {
 	                                                                                  \
 	/* [0..1][lock(WRITE(ldd_flock))]                                                 \
 	 * Same as `ldno_linmkent', but create a new file rather than link an existing.   \
-	 * This function will not be called for for the purpose of hard-linking, which    \
-	 * is handled via `ldno_linmkent' (with respect to `f_super->fs_nlink_max'),      \
-	 * meaning that this is the function used to create new files in a directory,     \
+	 * This function will not be called for for the purpose of hard-linking,  which   \
+	 * is handled via  `ldno_linmkent' (with  respect to  `f_super->fs_nlink_max'),   \
+	 * meaning that this is the function used  to create new files in a  directory,   \
 	 * as well as allocating their fnode objects.                                     \
 	 *   - info->mkf_name     = [in:const];                                           \
 	 *   - info->mkf_hash     = [in:const];                                           \
@@ -205,7 +205,7 @@ struct flindirenum {
 	atomic64_t                 lde_pos; /* Lower bound for the next-to-be-read entry's `fld_minpos' */
 	WEAK struct flindirent    *lde_ent; /* [0..1][lock(lde_dir->ldd_flock)]
 	                                     * [lock(WRITE_NULL(ATOMIC))] // To write NULL, you don't need a the lock!
-	                                     * Cache for  the next  entry  to-be read.  NULL  if
+	                                     * Cache for the next entry to-be read. NULL if
 	                                     * the next entry  was deleted  before it was  read, or  if
 	                                     * the  next  entry  has   yet  to  be  loaded   from-disk.
 	                                     * In either case, `lde_pos' must be used to in conjunction

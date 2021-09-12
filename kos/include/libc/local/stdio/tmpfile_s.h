@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xd80180f1 */
+/* HASH CRC-32:0xdbf224e6 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -46,7 +46,7 @@ __NOTHROW_RPC(__LIBCCALL __LIBC_LOCAL_NAME(tmpfile_s))(__FILE **__pstream) {
 		return 1;
 #endif /* !__EINVAL */
 	}
-	*__pstream = __localdep_tmpfile64();
+	*__pstream = __NAMESPACE_LOCAL_SYM __localdep_tmpfile64();
 	if (!*__pstream) {
 #ifdef __ENOMEM
 		return __libc_geterrno_or(__ENOMEM);

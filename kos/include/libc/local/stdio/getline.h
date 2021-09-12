@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xc431b3cd */
+/* HASH CRC-32:0x7f80979d */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -47,7 +47,7 @@ __NAMESPACE_LOCAL_BEGIN
 #endif /* !__local___localdep_getdelim_defined */
 __LOCAL_LIBC(getline) __ATTR_WUNUSED __ATTR_NONNULL((1, 2, 3)) __SSIZE_TYPE__
 (__LIBCCALL __LIBC_LOCAL_NAME(getline))(char **__restrict __lineptr, __SIZE_TYPE__ *__restrict __pcount, __FILE *__restrict __stream) __THROWS(...) {
-	return __localdep_getdelim(__lineptr, __pcount, '\n', __stream);
+	return __NAMESPACE_LOCAL_SYM __localdep_getdelim(__lineptr, __pcount, '\n', __stream);
 }
 __NAMESPACE_LOCAL_END
 #ifndef __local___localdep_getline_defined

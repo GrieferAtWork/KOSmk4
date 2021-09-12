@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x2895b067 */
+/* HASH CRC-32:0x5a4a09f2 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -72,24 +72,24 @@ __NOTHROW_RPC(__LIBCCALL __LIBC_LOCAL_NAME(shexec))(char const *__command) {
 
 #if defined(__CRT_HAVE_getenv) || defined(__LOCAL_environ)
 	/* Try to make use of $SHELL, if defined and an absolute path. */
-	char const *__environ_shell = __localdep_getenv("SHELL");
+	char const *__environ_shell = __NAMESPACE_LOCAL_SYM __localdep_getenv("SHELL");
 	if (__environ_shell && *__environ_shell == '/') {
 		char const *__environ_shell_sh;
-		__environ_shell_sh = __localdep_strrchrnul(__environ_shell, '/') + 1;
-		__localdep_execl(__environ_shell, __environ_shell_sh,
+		__environ_shell_sh = __NAMESPACE_LOCAL_SYM __localdep_strrchrnul(__environ_shell, '/') + 1;
+		__NAMESPACE_LOCAL_SYM __localdep_execl(__environ_shell, __environ_shell_sh,
 		      __arg__c, __command, (char *)__NULLPTR);
 	}
 #endif /* __CRT_HAVE_getenv || __LOCAL_environ */
 
 #ifdef __KOS__
 	/* By default, KOS uses busybox, so try to invoke that first. */
-	__localdep_execl("/bin/busybox", __arg_sh, __arg__c, __command, (char *)__NULLPTR);
-	__localdep_execl("/bin/sh", __arg_sh, __arg__c, __command, (char *)__NULLPTR);
-	__localdep_execl("/bin/bash", __arg_sh, __arg__c, __command, (char *)__NULLPTR);
+	__NAMESPACE_LOCAL_SYM __localdep_execl("/bin/busybox", __arg_sh, __arg__c, __command, (char *)__NULLPTR);
+	__NAMESPACE_LOCAL_SYM __localdep_execl("/bin/sh", __arg_sh, __arg__c, __command, (char *)__NULLPTR);
+	__NAMESPACE_LOCAL_SYM __localdep_execl("/bin/bash", __arg_sh, __arg__c, __command, (char *)__NULLPTR);
 #else /* __KOS__ */
-	__localdep_execl("/bin/sh", __arg_sh, __arg__c, __command, (char *)__NULLPTR);
-	__localdep_execl("/bin/bash", __arg_sh, __arg__c, __command, (char *)__NULLPTR);
-	__localdep_execl("/bin/busybox", __arg_sh, __arg__c, __command, (char *)__NULLPTR);
+	__NAMESPACE_LOCAL_SYM __localdep_execl("/bin/sh", __arg_sh, __arg__c, __command, (char *)__NULLPTR);
+	__NAMESPACE_LOCAL_SYM __localdep_execl("/bin/bash", __arg_sh, __arg__c, __command, (char *)__NULLPTR);
+	__NAMESPACE_LOCAL_SYM __localdep_execl("/bin/busybox", __arg_sh, __arg__c, __command, (char *)__NULLPTR);
 #endif /* !__KOS__ */
 	return -1;
 }

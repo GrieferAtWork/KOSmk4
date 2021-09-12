@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x98689f0e */
+/* HASH CRC-32:0xff44d77 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -50,17 +50,17 @@ __NOTHROW_RPC(__LIBCCALL __LIBC_LOCAL_NAME(lfutexexpr))(void *__base, __SIZE_TYP
 #ifdef __CRT_HAVE_lfutexexpr
 	struct __timespec32 __tms32;
 	if (!__timeout)
-		return __localdep_lfutexexpr32(__base, __exprc, __exprv, __NULLPTR, 0);
+		return __NAMESPACE_LOCAL_SYM __localdep_lfutexexpr32(__base, __exprc, __exprv, __NULLPTR, 0);
 	__tms32.tv_sec  = (__time32_t)__timeout->tv_sec;
 	__tms32.tv_nsec = __timeout->tv_nsec;
-	return __localdep_lfutexexpr32(__base, __exprc, __exprv, &__tms32, __timeout_flags);
+	return __NAMESPACE_LOCAL_SYM __localdep_lfutexexpr32(__base, __exprc, __exprv, &__tms32, __timeout_flags);
 #else /* __CRT_HAVE_lfutexexpr */
 	struct __timespec64 __tms64;
 	if (!__timeout)
-		return __localdep_lfutexexpr64(__base, __exprc, __exprv, __NULLPTR, 0);
+		return __NAMESPACE_LOCAL_SYM __localdep_lfutexexpr64(__base, __exprc, __exprv, __NULLPTR, 0);
 	__tms64.tv_sec  = (__time64_t)__timeout->tv_sec;
 	__tms64.tv_nsec = __timeout->tv_nsec;
-	return __localdep_lfutexexpr64(__base, __exprc, __exprv, &__tms64, __timeout_flags);
+	return __NAMESPACE_LOCAL_SYM __localdep_lfutexexpr64(__base, __exprc, __exprv, &__tms64, __timeout_flags);
 #endif /* !__CRT_HAVE_lfutexexpr */
 }
 __NAMESPACE_LOCAL_END

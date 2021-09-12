@@ -35,11 +35,11 @@
 /* KOS                                                                  */
 
 /* Because KOS uses UTF-8 through, functions from <ctype.h> must
- * operate on only those characters which can be represented in
+ * operate on only those characters which can be represented  in
  * single-byte mode (iow: ASCII)
  *
  * To improve performance, we make use of a lookup table define
- * flags and implement the tolower/toupper functions.
+ * flags   and   implement   the   tolower/toupper   functions.
  *
  * CTYPE flags are defined as follows:
  *     0x01: iscntrl   00-1F, 7F

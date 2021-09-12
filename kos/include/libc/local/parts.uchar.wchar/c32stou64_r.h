@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x84161894 */
+/* HASH CRC-32:0x6e8650a8 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -58,7 +58,7 @@ __CREDIRECT_KOS(__ATTR_CONST __ATTR_WUNUSED,int,__NOTHROW,__localdep_isspace32,(
 __NAMESPACE_LOCAL_END
 #include <libc/local/wctype/iswspace.h>
 __NAMESPACE_LOCAL_BEGIN
-#define __localdep_isspace32 (*(int(__LIBKCALL *)(__WINT32_TYPE__))&__LIBC_LOCAL_NAME(iswspace))
+#define __localdep_isspace32 __NAMESPACE_LOCAL_TYPEHAX(int(__LIBKCALL*)(__WINT32_TYPE__),int(__LIBKCALL&)(__WINT32_TYPE__),iswspace)
 #else /* ... */
 __NAMESPACE_LOCAL_END
 #include <libc/local/parts.uchar.wctype/isspace32.h>
@@ -75,7 +75,7 @@ __NOTHROW_NCX(__LIBKCALL __LIBC_LOCAL_NAME(c32stou64_r))(__CHAR32_TYPE__ const *
 	__UINT64_TYPE__ __result;
 	__CHAR32_TYPE__ const *__num_start = __nptr;
 	__CHAR32_TYPE__ const *__num_iter;
-	while (__localdep_isspace32(*__num_start))
+	while (__NAMESPACE_LOCAL_SYM __localdep_isspace32(*__num_start))
 		++__num_start;
 	if (__base == 0) {
 		/* Automatically deduce base. */
@@ -166,7 +166,7 @@ __NOTHROW_NCX(__LIBKCALL __LIBC_LOCAL_NAME(c32stou64_r))(__CHAR32_TYPE__ const *
 			*__error = 0;
 			/* Check for `EINVAL' */
 			if __unlikely(*__num_iter) {
-				while (__localdep_isspace32(*__num_iter))
+				while (__NAMESPACE_LOCAL_SYM __localdep_isspace32(*__num_iter))
 					++__num_iter;
 				if (*__num_iter) {
 #ifdef __EINVAL

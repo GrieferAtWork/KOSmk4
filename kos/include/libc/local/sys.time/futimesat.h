@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xa8e903fb */
+/* HASH CRC-32:0xca46e265 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -49,21 +49,21 @@ __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(futimesat))(__fd_t __fd, char const *
 #ifdef __CRT_HAVE_utimes
 	struct __timeval32 __tv32[2];
 	if (!__tvp)
-		return __localdep_futimesat32(__fd, __file, __NULLPTR);
+		return __NAMESPACE_LOCAL_SYM __localdep_futimesat32(__fd, __file, __NULLPTR);
 	__tv32[0].tv_sec  = (__time32_t)__tvp[0].tv_sec;
 	__tv32[0].tv_usec = __tvp[0].tv_usec;
 	__tv32[1].tv_sec  = (__time32_t)__tvp[1].tv_sec;
 	__tv32[1].tv_usec = __tvp[1].tv_usec;
-	return __localdep_futimesat32(__fd, __file, __tv32);
+	return __NAMESPACE_LOCAL_SYM __localdep_futimesat32(__fd, __file, __tv32);
 #else /* __CRT_HAVE_utimes */
 	struct __timeval64 __tv64[2];
 	if (!__tvp)
-		return __localdep_futimesat64(__fd, __file, __NULLPTR);
+		return __NAMESPACE_LOCAL_SYM __localdep_futimesat64(__fd, __file, __NULLPTR);
 	__tv64[0].tv_sec  = (__time64_t)__tvp[0].tv_sec;
 	__tv64[0].tv_usec = __tvp[0].tv_usec;
 	__tv64[1].tv_sec  = (__time64_t)__tvp[1].tv_sec;
 	__tv64[1].tv_usec = __tvp[1].tv_usec;
-	return __localdep_futimesat64(__fd, __file, __tv64);
+	return __NAMESPACE_LOCAL_SYM __localdep_futimesat64(__fd, __file, __tv64);
 #endif /* !__CRT_HAVE_utimes */
 }
 __NAMESPACE_LOCAL_END

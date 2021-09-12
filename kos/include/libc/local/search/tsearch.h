@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x959459f8 */
+/* HASH CRC-32:0xe209fbf7 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -152,7 +152,7 @@ __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(tsearch))(void const *__key, void **_
 		__gp_r = __p_r;
 		__p_r = __r;
 	}
-	__q = (__node)__localdep_malloc(sizeof(struct __node_struct));
+	__q = (__node)__NAMESPACE_LOCAL_SYM __localdep_malloc(sizeof(struct __node_struct));
 	if (__q != __NULLPTR) {
 		*__nextp = __q;
 		__q->__key = __key;

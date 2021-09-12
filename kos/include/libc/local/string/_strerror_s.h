@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xde65fc6d */
+/* HASH CRC-32:0xad3f0d26 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -62,17 +62,17 @@ __NOTHROW_RPC(__LIBCCALL __LIBC_LOCAL_NAME(_strerror_s))(char *__restrict __buf,
 	char const *__string;
 	__SIZE_TYPE__ __reqlen;
 	__errno_t __eno = __libc_geterrno();
-	__string = __localdep_strerrordesc_np(__eno);
+	__string = __NAMESPACE_LOCAL_SYM __localdep_strerrordesc_np(__eno);
 	if (__string) {
 		if (__message) {
-			__reqlen = __localdep_snprintf(__buf, __buflen, "%s: %s\n", __message, __string);
+			__reqlen = __NAMESPACE_LOCAL_SYM __localdep_snprintf(__buf, __buflen, "%s: %s\n", __message, __string);
 		} else {
-			__reqlen = __localdep_snprintf(__buf, __buflen, "%s\n", __string);
+			__reqlen = __NAMESPACE_LOCAL_SYM __localdep_snprintf(__buf, __buflen, "%s\n", __string);
 		}
 	} else if (__message) {
-		__reqlen = __localdep_snprintf(__buf, __buflen, "%s: Unknown error %d\n", __message, __eno);
+		__reqlen = __NAMESPACE_LOCAL_SYM __localdep_snprintf(__buf, __buflen, "%s: Unknown error %d\n", __message, __eno);
 	} else {
-		__reqlen = __localdep_snprintf(__buf, __buflen, "Unknown error %d\n", __eno);
+		__reqlen = __NAMESPACE_LOCAL_SYM __localdep_snprintf(__buf, __buflen, "Unknown error %d\n", __eno);
 	}
 	if (__reqlen > __buflen)
 		return 34;

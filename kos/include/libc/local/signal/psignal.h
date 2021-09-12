@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x4a64b839 */
+/* HASH CRC-32:0x860e314b */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -81,13 +81,13 @@ __NAMESPACE_LOCAL_BEGIN
 #endif /* !__local___localdep_sigabbrev_np_defined */
 __LOCAL_LIBC(psignal) void
 __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(psignal))(__signo_t __signo, char const *__s) {
-	char const *__signam = __localdep_sigabbrev_np(__signo);
+	char const *__signam = __NAMESPACE_LOCAL_SYM __localdep_sigabbrev_np(__signo);
 	if (__s && *__s)
-		__localdep_fprintf(__LOCAL_stderr, "%s: ", __s);
+		__NAMESPACE_LOCAL_SYM __localdep_fprintf(__LOCAL_stderr, "%s: ", __s);
 	if (__signam) {
-		__localdep_fprintf(__LOCAL_stderr, "SIG%s\n", __signam);
+		__NAMESPACE_LOCAL_SYM __localdep_fprintf(__LOCAL_stderr, "SIG%s\n", __signam);
 	} else {
-		__localdep_fprintf(__LOCAL_stderr, "Unknown signal %d\n", __signo);
+		__NAMESPACE_LOCAL_SYM __localdep_fprintf(__LOCAL_stderr, "Unknown signal %d\n", __signo);
 	}
 }
 __NAMESPACE_LOCAL_END

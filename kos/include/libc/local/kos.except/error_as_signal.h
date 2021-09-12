@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x7e95c7e2 */
+/* HASH CRC-32:0x40d81174 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -74,7 +74,7 @@ __NAMESPACE_LOCAL_BEGIN
 __LOCAL_LIBC(error_as_signal) __ATTR_WUNUSED __ATTR_NONNULL((1, 2)) __BOOL
 __NOTHROW_NCX(__LIBKCALL __LIBC_LOCAL_NAME(error_as_signal))(struct exception_data const *__restrict __self, struct __siginfo_struct *__restrict __result) {
 	__error_code_t __code = __self->e_code;
-	__localdep_bzero(__result, sizeof(*__result));
+	__NAMESPACE_LOCAL_SYM __localdep_bzero(__result, sizeof(*__result));
 	/* TODO: Make sure that this matches the sysv abi386 requirements:
 	 *       Figure    3-27:    Hardware   Exceptions    and   Signals
 	 *       0   divide error fault             SIGFPE
@@ -252,7 +252,7 @@ __NOTHROW_NCX(__LIBKCALL __LIBC_LOCAL_NAME(error_as_signal))(struct exception_da
 	default:
 		return 0;
 	}
-	__result->si_errno = __localdep_error_as_errno(__self);
+	__result->si_errno = __NAMESPACE_LOCAL_SYM __localdep_error_as_errno(__self);
 	return 1;
 }
 __NAMESPACE_LOCAL_END

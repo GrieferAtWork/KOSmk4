@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x703ab497 */
+/* HASH CRC-32:0x1a6bd9b */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -44,7 +44,7 @@ __NAMESPACE_LOCAL_END
 __NAMESPACE_LOCAL_BEGIN
 __LOCAL_LIBC(delay) void
 __NOTHROW_RPC(__LIBCCALL __LIBC_LOCAL_NAME(delay))(unsigned int __mill) {
-	__localdep_usleep((__useconds_t)__mill * 1000);
+	__NAMESPACE_LOCAL_SYM __localdep_usleep((__useconds_t)__mill * 1000);
 }
 __NAMESPACE_LOCAL_END
 #ifndef __local___localdep_delay_defined

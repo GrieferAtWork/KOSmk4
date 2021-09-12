@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x8dcd0a7a */
+/* HASH CRC-32:0xb180afe5 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -38,7 +38,7 @@ __CREDIRECT_KOS(__ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1)),__CHAR32_TYPE__ *
 __NAMESPACE_LOCAL_END
 #include <libc/local/wchar/wcschr.h>
 __NAMESPACE_LOCAL_BEGIN
-#define __localdep_c32schr (*(__CHAR32_TYPE__ *(__LIBKCALL *)(__CHAR32_TYPE__ const *__restrict, __CHAR32_TYPE__))&__LIBC_LOCAL_NAME(wcschr))
+#define __localdep_c32schr __NAMESPACE_LOCAL_TYPEHAX(__CHAR32_TYPE__ *(__LIBKCALL*)(__CHAR32_TYPE__ const *__restrict,__CHAR32_TYPE__),__CHAR32_TYPE__ *(__LIBKCALL&)(__CHAR32_TYPE__ const *__restrict,__CHAR32_TYPE__),wcschr)
 #else /* ... */
 __NAMESPACE_LOCAL_END
 #include <libc/local/parts.uchar.string/c32schr.h>
@@ -51,7 +51,7 @@ __NOTHROW_NCX(__LIBKCALL __LIBC_LOCAL_NAME(c32ssep))(__CHAR32_TYPE__ **__restric
 	__CHAR32_TYPE__ *__result, *__iter;
 	if ((__result = *__stringp) == __NULLPTR || !*__result)
 		return __NULLPTR;
-	for (__iter = __result; *__iter && !__localdep_c32schr(__delim, *__iter); ++__iter)
+	for (__iter = __result; *__iter && !__NAMESPACE_LOCAL_SYM __localdep_c32schr(__delim, *__iter); ++__iter)
 		;
 	if (*__iter)
 		*__iter++ = '\0';

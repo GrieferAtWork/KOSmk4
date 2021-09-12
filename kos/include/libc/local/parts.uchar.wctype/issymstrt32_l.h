@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x856264a2 */
+/* HASH CRC-32:0xe04f075a */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -50,7 +50,7 @@ __CREDIRECT_KOS(__ATTR_PURE __ATTR_WUNUSED,int,__NOTHROW_NCX,__localdep_isalpha3
 __NAMESPACE_LOCAL_END
 #include <libc/local/wctype/iswalpha_l.h>
 __NAMESPACE_LOCAL_BEGIN
-#define __localdep_isalpha32_l (*(int(__LIBKCALL *)(__WINT32_TYPE__, __locale_t))&__LIBC_LOCAL_NAME(iswalpha_l))
+#define __localdep_isalpha32_l __NAMESPACE_LOCAL_TYPEHAX(int(__LIBKCALL*)(__WINT32_TYPE__,__locale_t),int(__LIBKCALL&)(__WINT32_TYPE__,__locale_t),iswalpha_l)
 #else /* ... */
 __NAMESPACE_LOCAL_END
 #include <libc/local/parts.uchar.wctype/isalpha32_l.h>
@@ -65,7 +65,7 @@ __NOTHROW_NCX(__LIBKCALL __LIBC_LOCAL_NAME(issymstrt32_l))(__WINT32_TYPE__ __wc,
 	__COMPILER_IMPURE();
 	return __iswcsymf(__wc);
 #else /* __CRT_KOS && __CRT_HAVE___unicode_descriptor */
-	return __localdep_isalpha32_l(__wc, __locale) || __wc == '_' || __wc == '$';
+	return __NAMESPACE_LOCAL_SYM __localdep_isalpha32_l(__wc, __locale) || __wc == '_' || __wc == '$';
 #endif /* !__CRT_KOS || !__CRT_HAVE___unicode_descriptor */
 }
 __NAMESPACE_LOCAL_END

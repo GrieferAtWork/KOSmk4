@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xcac37461 */
+/* HASH CRC-32:0xa3c22f91 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -50,17 +50,17 @@ __NOTHROW_RPC(__LIBCCALL __LIBC_LOCAL_NAME(ppoll))(struct pollfd *__fds, __UINTP
 #ifdef __CRT_HAVE_ppoll
 	struct __timespec32 __tmo32;
 	if (!__timeout)
-		return __localdep_ppoll32(__fds, __nfds, __NULLPTR, __ss);
+		return __NAMESPACE_LOCAL_SYM __localdep_ppoll32(__fds, __nfds, __NULLPTR, __ss);
 	__tmo32.tv_sec  = (__time32_t)__timeout->tv_sec;
 	__tmo32.tv_nsec = __timeout->tv_nsec;
-	return __localdep_ppoll32(__fds, __nfds, &__tmo32, __ss);
+	return __NAMESPACE_LOCAL_SYM __localdep_ppoll32(__fds, __nfds, &__tmo32, __ss);
 #else /* __CRT_HAVE_ppoll */
 	struct __timespec64 __tmo64;
 	if (!__timeout)
-		return __localdep_ppoll64(__fds, __nfds, __NULLPTR, __ss);
+		return __NAMESPACE_LOCAL_SYM __localdep_ppoll64(__fds, __nfds, __NULLPTR, __ss);
 	__tmo64.tv_sec  = (__time64_t)__timeout->tv_sec;
 	__tmo64.tv_nsec = __timeout->tv_nsec;
-	return __localdep_ppoll64(__fds, __nfds, &__tmo64, __ss);
+	return __NAMESPACE_LOCAL_SYM __localdep_ppoll64(__fds, __nfds, &__tmo64, __ss);
 #endif /* !__CRT_HAVE_ppoll */
 }
 __NAMESPACE_LOCAL_END

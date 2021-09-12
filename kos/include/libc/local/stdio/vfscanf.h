@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xd295e28 */
+/* HASH CRC-32:0x9e047e59 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -71,7 +71,7 @@ __NAMESPACE_LOCAL_BEGIN
 #if !defined(__LIBCCALL_IS_FORMATPRINTER_CC) || __SIZEOF_SIZE_T__ != __SIZEOF_INT__
 __LOCAL_LIBC(vfscanf_getc) __SSIZE_TYPE__
 (__FORMATPRINTER_CC __vfscanf_getc)(void *__arg) {
-	return (__SSIZE_TYPE__)__localdep_fgetc((__FILE *)__arg);
+	return (__SSIZE_TYPE__)__NAMESPACE_LOCAL_SYM __localdep_fgetc((__FILE *)__arg);
 }
 #endif /* !__LIBCCALL_IS_FORMATPRINTER_CC || __SIZEOF_SIZE_T__ != __SIZEOF_INT__ */
 __LOCAL_LIBC(vfscanf_ungetc) __SSIZE_TYPE__
@@ -83,12 +83,12 @@ __NAMESPACE_LOCAL_BEGIN
 __LOCAL_LIBC(vfscanf) __ATTR_WUNUSED __ATTR_LIBC_SCANF(2, 0) __ATTR_NONNULL((1, 2)) __STDC_INT_AS_SIZE_T
 (__LIBCCALL __LIBC_LOCAL_NAME(vfscanf))(__FILE *__restrict __stream, char const *__restrict __format, __builtin_va_list __args) __THROWS(...) {
 #if defined(__LIBCCALL_IS_FORMATPRINTER_CC) && __SIZEOF_SIZE_T__ == __SIZEOF_INT__
-	return __localdep_format_vscanf((__pformatgetc)(void *)&__localdep_fgetc,
+	return __NAMESPACE_LOCAL_SYM __localdep_format_vscanf((__pformatgetc)(void *)&__NAMESPACE_LOCAL_SYM __localdep_fgetc,
 	                     &__NAMESPACE_LOCAL_SYM __vfscanf_ungetc,
 	                     (void *)__stream,
 	                     __format, __args);
 #else /* __LIBCCALL_IS_FORMATPRINTER_CC && __SIZEOF_SIZE_T__ == __SIZEOF_INT__ */
-	return __localdep_format_vscanf(&__NAMESPACE_LOCAL_SYM __vfscanf_getc,
+	return __NAMESPACE_LOCAL_SYM __localdep_format_vscanf(&__NAMESPACE_LOCAL_SYM __vfscanf_getc,
 	                     &__NAMESPACE_LOCAL_SYM __vfscanf_ungetc,
 	                     (void *)__stream,
 	                     __format, __args);

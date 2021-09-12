@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x222a7db6 */
+/* HASH CRC-32:0xf38e352 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -54,7 +54,7 @@ __NAMESPACE_LOCAL_BEGIN
 __LOCAL_LIBC(inet_ntoa_r) __ATTR_RETNONNULL __ATTR_NONNULL((2)) char *
 __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(inet_ntoa_r))(struct in_addr __inaddr, char __buf[16]) {
 	__UINT32_TYPE__ __addr = __hybrid_betoh32(__inaddr.s_addr);
-	__localdep_sprintf(__buf, "%u.%u.%u.%u",
+	__NAMESPACE_LOCAL_SYM __localdep_sprintf(__buf, "%u.%u.%u.%u",
 	        (unsigned int)(__UINT8_TYPE__)((__addr & __UINT32_C(0xff000000)) >> 24),
 	        (unsigned int)(__UINT8_TYPE__)((__addr & __UINT32_C(0x00ff0000)) >> 16),
 	        (unsigned int)(__UINT8_TYPE__)((__addr & __UINT32_C(0x0000ff00)) >> 8),

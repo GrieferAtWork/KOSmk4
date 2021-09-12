@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xf47f3498 */
+/* HASH CRC-32:0xb48f2a5c */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -51,12 +51,12 @@ __LOCAL_LIBC(Open64) __ATTR_WUNUSED __ATTR_NONNULL((1)) __fd_t
 	__builtin_va_list __args;
 	__builtin_va_start(__args, __oflags);
 #if defined(__AT_FDCWD) && (defined(__CRT_HAVE_OpenAt64) || defined(__CRT_HAVE_OpenAt))
-	__result = __localdep_OpenAt64(__AT_FDCWD, __filename, __oflags, __builtin_va_arg(__args, __mode_t));
+	__result = __NAMESPACE_LOCAL_SYM __localdep_OpenAt64(__AT_FDCWD, __filename, __oflags, __builtin_va_arg(__args, __mode_t));
 #else /* __AT_FDCWD && (__CRT_HAVE_OpenAt64 || __CRT_HAVE_OpenAt) */
 #ifdef __O_LARGEFILE
-	__result = __localdep_Open32(__filename, __oflags | __O_LARGEFILE, __builtin_va_arg(__args, __mode_t));
+	__result = __NAMESPACE_LOCAL_SYM __localdep_Open32(__filename, __oflags | __O_LARGEFILE, __builtin_va_arg(__args, __mode_t));
 #else /* __O_LARGEFILE */
-	__result = __localdep_Open32(__filename, __oflags, __builtin_va_arg(__args, __mode_t));
+	__result = __NAMESPACE_LOCAL_SYM __localdep_Open32(__filename, __oflags, __builtin_va_arg(__args, __mode_t));
 #endif /* !__O_LARGEFILE */
 #endif /* !__AT_FDCWD || (!__CRT_HAVE_OpenAt64 && !__CRT_HAVE_OpenAt) */
 	__builtin_va_end(__args);

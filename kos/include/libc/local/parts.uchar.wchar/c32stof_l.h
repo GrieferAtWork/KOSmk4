@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xbf399725 */
+/* HASH CRC-32:0xf3d6b257 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -32,7 +32,7 @@ __CREDIRECT_KOS(__ATTR_LEAF __ATTR_NONNULL((1)),float,__NOTHROW_NCX,__localdep_c
 __NAMESPACE_LOCAL_END
 #include <libc/local/wchar/wcstof.h>
 __NAMESPACE_LOCAL_BEGIN
-#define __localdep_c32stof (*(float(__LIBKCALL *)(__CHAR32_TYPE__ const *__restrict, __CHAR32_TYPE__ **))&__LIBC_LOCAL_NAME(wcstof))
+#define __localdep_c32stof __NAMESPACE_LOCAL_TYPEHAX(float(__LIBKCALL*)(__CHAR32_TYPE__ const *__restrict,__CHAR32_TYPE__ **),float(__LIBKCALL&)(__CHAR32_TYPE__ const *__restrict,__CHAR32_TYPE__ **),wcstof)
 #else /* ... */
 __NAMESPACE_LOCAL_END
 #include <libc/local/parts.uchar.wchar/c32stof.h>
@@ -43,7 +43,7 @@ __NAMESPACE_LOCAL_BEGIN
 __LOCAL_LIBC(c32stof_l) __ATTR_NONNULL((1)) float
 __NOTHROW_NCX(__LIBKCALL __LIBC_LOCAL_NAME(c32stof_l))(__CHAR32_TYPE__ const *__restrict __nptr, __CHAR32_TYPE__ **__endptr, __locale_t __locale) {
 	(void)__locale;
-	return __localdep_c32stof(__nptr, __endptr);
+	return __NAMESPACE_LOCAL_SYM __localdep_c32stof(__nptr, __endptr);
 }
 __NAMESPACE_LOCAL_END
 #ifndef __local___localdep_c32stof_l_defined

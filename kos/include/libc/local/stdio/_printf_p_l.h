@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x7a079630 */
+/* HASH CRC-32:0xfee2690d */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -43,7 +43,7 @@ __LOCAL_LIBC(_printf_p_l) __ATTR_LIBC_PRINTF_P(1, 3) __ATTR_NONNULL((1)) __STDC_
 	__STDC_INT_AS_SIZE_T __result;
 	__builtin_va_list __args;
 	__builtin_va_start(__args, __locale);
-	__result = __localdep__vprintf_p_l(__format, __locale, __args);
+	__result = __NAMESPACE_LOCAL_SYM __localdep__vprintf_p_l(__format, __locale, __args);
 	__builtin_va_end(__args);
 	return __result;
 }

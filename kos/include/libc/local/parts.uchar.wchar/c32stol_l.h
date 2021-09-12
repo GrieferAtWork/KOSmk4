@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x773ebc6a */
+/* HASH CRC-32:0xb7d38d86 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -99,7 +99,7 @@ __CREDIRECT_KOS(__ATTR_LEAF __ATTR_NONNULL((1)),long,__NOTHROW_NCX,__localdep_c3
 __NAMESPACE_LOCAL_END
 #include <libc/local/wchar/wcstol.h>
 __NAMESPACE_LOCAL_BEGIN
-#define __localdep_c32stol (*(long(__LIBKCALL *)(__CHAR32_TYPE__ const *__restrict, __CHAR32_TYPE__ **, __STDC_INT_AS_UINT_T))&__LIBC_LOCAL_NAME(wcstol))
+#define __localdep_c32stol __NAMESPACE_LOCAL_TYPEHAX(long(__LIBKCALL*)(__CHAR32_TYPE__ const *__restrict,__CHAR32_TYPE__ **,__STDC_INT_AS_UINT_T),long(__LIBKCALL&)(__CHAR32_TYPE__ const *__restrict,__CHAR32_TYPE__ **,__STDC_INT_AS_UINT_T),wcstol)
 #else /* ... */
 __NAMESPACE_LOCAL_END
 #include <libc/local/parts.uchar.wchar/c32stol.h>
@@ -110,7 +110,7 @@ __NAMESPACE_LOCAL_BEGIN
 __LOCAL_LIBC(c32stol_l) __ATTR_NONNULL((1)) long
 __NOTHROW_NCX(__LIBKCALL __LIBC_LOCAL_NAME(c32stol_l))(__CHAR32_TYPE__ const *__restrict __nptr, __CHAR32_TYPE__ **__endptr, __STDC_INT_AS_UINT_T __base, __locale_t __locale) {
 	(void)__locale;
-	return __localdep_c32stol(__nptr, __endptr, __base);
+	return __NAMESPACE_LOCAL_SYM __localdep_c32stol(__nptr, __endptr, __base);
 }
 __NAMESPACE_LOCAL_END
 #ifndef __local___localdep_c32stol_l_defined

@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xea045373 */
+/* HASH CRC-32:0xfd2e4149 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -72,12 +72,12 @@ __NAMESPACE_LOCAL_END
 #include <hybrid/typecore.h>
 #include <libc/local/stdlib/strto64.h>
 __NAMESPACE_LOCAL_BEGIN
-#define __localdep_strtoll (*(__LONGLONG(__LIBCCALL *)(char const *__restrict, char **, __STDC_INT_AS_UINT_T))&__LIBC_LOCAL_NAME(strto64))
+#define __localdep_strtoll __NAMESPACE_LOCAL_TYPEHAX(__LONGLONG(__LIBCCALL*)(char const *__restrict,char **,__STDC_INT_AS_UINT_T),__LONGLONG(__LIBCCALL&)(char const *__restrict,char **,__STDC_INT_AS_UINT_T),strto64)
 #elif __SIZEOF_LONG__ == 4
 __NAMESPACE_LOCAL_END
 #include <libc/local/stdlib/strto32.h>
 __NAMESPACE_LOCAL_BEGIN
-#define __localdep_strtoll (*(__LONGLONG(__LIBCCALL *)(char const *__restrict, char **, __STDC_INT_AS_UINT_T))&__LIBC_LOCAL_NAME(strto32))
+#define __localdep_strtoll __NAMESPACE_LOCAL_TYPEHAX(__LONGLONG(__LIBCCALL*)(char const *__restrict,char **,__STDC_INT_AS_UINT_T),__LONGLONG(__LIBCCALL&)(char const *__restrict,char **,__STDC_INT_AS_UINT_T),strto32)
 #else /* ... */
 __NAMESPACE_LOCAL_END
 #include <libc/local/stdlib/strtoll.h>
@@ -93,7 +93,7 @@ __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(strsuftollx))(char const *__desc, cha
 	(void)__hi;
 	if (__errbuflen)
 		*__errbuf = 0;
-	return __localdep_strtoll(__val, __NULLPTR, 10);
+	return __NAMESPACE_LOCAL_SYM __localdep_strtoll(__val, __NULLPTR, 10);
 }
 __NAMESPACE_LOCAL_END
 #ifndef __local___localdep_strsuftollx_defined

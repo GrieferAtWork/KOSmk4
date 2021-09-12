@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x6db6a003 */
+/* HASH CRC-32:0xa84f93f3 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -60,7 +60,7 @@ __again:
 			                      __PTHREAD_ONCE_INIT,
 			                      __ATOMIC_RELEASE);
 #ifdef __CRT_HAVE_error_rethrow
-			__localdep_error_rethrow();
+			__NAMESPACE_LOCAL_SYM __localdep_error_rethrow();
 #else /* __CRT_HAVE_error_rethrow */
 			throw;
 #endif /* !__CRT_HAVE_error_rethrow */

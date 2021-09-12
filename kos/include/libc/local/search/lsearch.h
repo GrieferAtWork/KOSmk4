@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xab3267d9 */
+/* HASH CRC-32:0x654befce */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -55,9 +55,9 @@ __NAMESPACE_LOCAL_BEGIN
 __LOCAL_LIBC(lsearch) __ATTR_NONNULL((2, 3, 5)) void *
 __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(lsearch))(void const *__key, void *__base, __SIZE_TYPE__ *__nmemb, __SIZE_TYPE__ __size, __compar_fn_t __compar) {
 	void *__result;
-	__result = __localdep_lfind(__key, __base, __nmemb, __size, __compar);
+	__result = __NAMESPACE_LOCAL_SYM __localdep_lfind(__key, __base, __nmemb, __size, __compar);
 	if (__result == __NULLPTR) {
-		__result = __localdep_memcpy((__BYTE_TYPE__ *)__base + (*__nmemb) * __size, __key, __size);
+		__result = __NAMESPACE_LOCAL_SYM __localdep_memcpy((__BYTE_TYPE__ *)__base + (*__nmemb) * __size, __key, __size);
 		++*__nmemb;
 	}
 	return __result;

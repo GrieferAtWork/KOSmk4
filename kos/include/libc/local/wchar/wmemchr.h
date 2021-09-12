@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xb62c8e16 */
+/* HASH CRC-32:0xcda16623 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -67,11 +67,11 @@ __NAMESPACE_LOCAL_BEGIN
 __LOCAL_LIBC(wmemchr) __ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1)) __WCHAR_TYPE__ *
 __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(wmemchr))(__WCHAR_TYPE__ const *__restrict __haystack, __WCHAR_TYPE__ __needle, __SIZE_TYPE__ __num_chars) {
 #if __SIZEOF_WCHAR_T__ == 2
-	return (__WCHAR_TYPE__ *)__localdep_memchrw(__haystack, __needle, __num_chars);
+	return (__WCHAR_TYPE__ *)__NAMESPACE_LOCAL_SYM __localdep_memchrw(__haystack, __needle, __num_chars);
 #elif __SIZEOF_WCHAR_T__ == 4
-	return (__WCHAR_TYPE__ *)__localdep_memchrl(__haystack, __needle, __num_chars);
+	return (__WCHAR_TYPE__ *)__NAMESPACE_LOCAL_SYM __localdep_memchrl(__haystack, __needle, __num_chars);
 #else /* ... */
-	return (__WCHAR_TYPE__ *)__localdep_memchr(__haystack, (int)__needle, __num_chars * sizeof(__WCHAR_TYPE__));
+	return (__WCHAR_TYPE__ *)__NAMESPACE_LOCAL_SYM __localdep_memchr(__haystack, (int)__needle, __num_chars * sizeof(__WCHAR_TYPE__));
 #endif /* !... */
 }
 __NAMESPACE_LOCAL_END

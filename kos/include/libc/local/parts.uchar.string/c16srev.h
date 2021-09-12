@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xb85f60ae */
+/* HASH CRC-32:0x2a5d97bb */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -33,7 +33,7 @@ __CREDIRECT_DOS(__ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1)),__SIZE_TYPE__,__N
 __NAMESPACE_LOCAL_END
 #include <libc/local/wchar/wcslen.h>
 __NAMESPACE_LOCAL_BEGIN
-#define __localdep_c16slen (*(__SIZE_TYPE__(__LIBDCALL *)(__CHAR16_TYPE__ const *__restrict))&__LIBC_LOCAL_NAME(wcslen))
+#define __localdep_c16slen __NAMESPACE_LOCAL_TYPEHAX(__SIZE_TYPE__(__LIBDCALL*)(__CHAR16_TYPE__ const *__restrict),__SIZE_TYPE__(__LIBDCALL&)(__CHAR16_TYPE__ const *__restrict),wcslen)
 #else /* ... */
 __NAMESPACE_LOCAL_END
 #include <libc/local/parts.uchar.string/c16slen.h>
@@ -77,7 +77,7 @@ __NAMESPACE_LOCAL_BEGIN
 __LOCAL_LIBC(c16srev) __ATTR_RETNONNULL __ATTR_NONNULL((1)) __CHAR16_TYPE__ *
 __NOTHROW_NCX(__LIBDCALL __LIBC_LOCAL_NAME(c16srev))(__CHAR16_TYPE__ *__restrict __str) {
 
-	return (__CHAR16_TYPE__ *)__localdep_memrevw(__str, __localdep_c16slen(__str));
+	return (__CHAR16_TYPE__ *)__NAMESPACE_LOCAL_SYM __localdep_memrevw(__str, __NAMESPACE_LOCAL_SYM __localdep_c16slen(__str));
 
 
 

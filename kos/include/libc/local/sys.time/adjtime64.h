@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xaa3e3f93 */
+/* HASH CRC-32:0x5bb03cf */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -36,7 +36,7 @@ __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(adjtime64))(struct __timeval64 const 
 		__delta32.tv_sec  = (__time32_t)__delta->tv_sec;
 		__delta32.tv_usec = __delta->tv_usec;
 	}
-	__result = __localdep_adjtime32(__which, __delta ? &__delta32 : __NULLPTR, __olddelta ? &__olddelta32 : __NULLPTR);
+	__result = __NAMESPACE_LOCAL_SYM __localdep_adjtime32(__which, __delta ? &__delta32 : __NULLPTR, __olddelta ? &__olddelta32 : __NULLPTR);
 	if (__likely(!__result) && __olddelta) {
 		__olddelta->tv_sec  = (__time64_t)__olddelta32.tv_sec;
 		__olddelta->tv_usec = __olddelta32.tv_usec;

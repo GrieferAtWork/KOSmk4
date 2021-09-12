@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xb38526b0 */
+/* HASH CRC-32:0x4bfd5101 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -41,7 +41,7 @@ __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(dup3))(__fd_t __oldfd, __fd_t __newfd
 	/* TODO: Document which `flags' actually do anything */
 	/* TODO: Emulate using dup2()+fcntl() */
 	(void)__flags;
-	return __newfd != __oldfd ? __localdep_dup2(__oldfd, __newfd) : -1;
+	return __newfd != __oldfd ? __NAMESPACE_LOCAL_SYM __localdep_dup2(__oldfd, __newfd) : -1;
 }
 __NAMESPACE_LOCAL_END
 #ifndef __local___localdep_dup3_defined

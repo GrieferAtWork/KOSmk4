@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x23795ae3 */
+/* HASH CRC-32:0x6d1c7654 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -64,7 +64,7 @@ __CREDIRECT(__ATTR_LEAF __ATTR_NONNULL((1)),long,__NOTHROW_NCX,__localdep_strtol
 __NAMESPACE_LOCAL_END
 #include <libc/local/stdlib/strto32.h>
 __NAMESPACE_LOCAL_BEGIN
-#define __localdep_strtol (*(long(__LIBCCALL *)(char const *__restrict, char **, __STDC_INT_AS_UINT_T))&__LIBC_LOCAL_NAME(strto32))
+#define __localdep_strtol __NAMESPACE_LOCAL_TYPEHAX(long(__LIBCCALL*)(char const *__restrict,char **,__STDC_INT_AS_UINT_T),long(__LIBCCALL&)(char const *__restrict,char **,__STDC_INT_AS_UINT_T),strto32)
 #else /* ... */
 __NAMESPACE_LOCAL_END
 #include <hybrid/typecore.h>
@@ -73,7 +73,7 @@ __NAMESPACE_LOCAL_BEGIN
 __NAMESPACE_LOCAL_END
 #include <libc/local/stdlib/strto64.h>
 __NAMESPACE_LOCAL_BEGIN
-#define __localdep_strtol (*(long(__LIBCCALL *)(char const *__restrict, char **, __STDC_INT_AS_UINT_T))&__LIBC_LOCAL_NAME(strto64))
+#define __localdep_strtol __NAMESPACE_LOCAL_TYPEHAX(long(__LIBCCALL*)(char const *__restrict,char **,__STDC_INT_AS_UINT_T),long(__LIBCCALL&)(char const *__restrict,char **,__STDC_INT_AS_UINT_T),strto64)
 #else /* __SIZEOF_LONG__ == 8 */
 __NAMESPACE_LOCAL_END
 #include <libc/local/stdlib/strtol.h>
@@ -85,7 +85,7 @@ __NAMESPACE_LOCAL_BEGIN
 __LOCAL_LIBC(strtol_l) __ATTR_NONNULL((1)) long
 __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(strtol_l))(char const *__restrict __nptr, char **__endptr, __STDC_INT_AS_UINT_T __base, __locale_t __locale) {
 	(void)__locale;
-	return __localdep_strtol(__nptr, __endptr, __base);
+	return __NAMESPACE_LOCAL_SYM __localdep_strtol(__nptr, __endptr, __base);
 }
 __NAMESPACE_LOCAL_END
 #ifndef __local___localdep_strtol_l_defined

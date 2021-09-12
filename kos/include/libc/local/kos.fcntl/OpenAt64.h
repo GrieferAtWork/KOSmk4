@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x3d218767 */
+/* HASH CRC-32:0x375794a2 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -38,9 +38,9 @@ __LOCAL_LIBC(OpenAt64) __ATTR_WUNUSED __ATTR_NONNULL((2)) __fd_t
 	__builtin_va_list __args;
 	__builtin_va_start(__args, __oflags);
 #ifdef __O_LARGEFILE
-	__result = __localdep_OpenAt32(__dirfd, __filename, __oflags | __O_LARGEFILE, __builtin_va_arg(__args, __mode_t));
+	__result = __NAMESPACE_LOCAL_SYM __localdep_OpenAt32(__dirfd, __filename, __oflags | __O_LARGEFILE, __builtin_va_arg(__args, __mode_t));
 #else /* __O_LARGEFILE */
-	__result = __localdep_OpenAt32(__dirfd, __filename, __oflags, __builtin_va_arg(__args, __mode_t));
+	__result = __NAMESPACE_LOCAL_SYM __localdep_OpenAt32(__dirfd, __filename, __oflags, __builtin_va_arg(__args, __mode_t));
 #endif /* !__O_LARGEFILE */
 	__builtin_va_end(__args);
 	return __result;

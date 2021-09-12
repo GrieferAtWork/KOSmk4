@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x296e0ce8 */
+/* HASH CRC-32:0xc659c309 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -35,7 +35,7 @@ __CREDIRECT_KOS(__ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1)),__SIZE_TYPE__,__N
 __NAMESPACE_LOCAL_END
 #include <libc/local/wchar/wcsnlen.h>
 __NAMESPACE_LOCAL_BEGIN
-#define __localdep_c32snlen (*(__SIZE_TYPE__(__LIBKCALL *)(__CHAR32_TYPE__ const *__restrict, __SIZE_TYPE__))&__LIBC_LOCAL_NAME(wcsnlen))
+#define __localdep_c32snlen __NAMESPACE_LOCAL_TYPEHAX(__SIZE_TYPE__(__LIBKCALL*)(__CHAR32_TYPE__ const *__restrict,__SIZE_TYPE__),__SIZE_TYPE__(__LIBKCALL&)(__CHAR32_TYPE__ const *__restrict,__SIZE_TYPE__),wcsnlen)
 #else /* ... */
 __NAMESPACE_LOCAL_END
 #include <libc/local/parts.uchar.string/c32snlen.h>
@@ -62,7 +62,7 @@ __NAMESPACE_LOCAL_BEGIN
 #endif /* !__local___localdep_fuzzy_memcmpl_defined */
 __LOCAL_LIBC(fuzzy_c32sncmp) __ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1, 3)) __SIZE_TYPE__
 __NOTHROW_NCX(__LIBKCALL __LIBC_LOCAL_NAME(fuzzy_c32sncmp))(__CHAR32_TYPE__ const *__s1, __SIZE_TYPE__ __s1_maxlen, __CHAR32_TYPE__ const *__s2, __SIZE_TYPE__ __s2_maxlen) {
-	return __localdep_fuzzy_memcmpl(__s1, __localdep_c32snlen(__s1, __s1_maxlen), __s2, __localdep_c32snlen(__s2, __s2_maxlen));
+	return __NAMESPACE_LOCAL_SYM __localdep_fuzzy_memcmpl(__s1, __NAMESPACE_LOCAL_SYM __localdep_c32snlen(__s1, __s1_maxlen), __s2, __NAMESPACE_LOCAL_SYM __localdep_c32snlen(__s2, __s2_maxlen));
 }
 __NAMESPACE_LOCAL_END
 #ifndef __local___localdep_fuzzy_c32sncmp_defined

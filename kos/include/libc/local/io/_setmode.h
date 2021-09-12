@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xcf44e18 */
+/* HASH CRC-32:0xea59a698 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -44,13 +44,13 @@ __CVREDIRECT(,__STDC_INT_AS_SSIZE_T,__NOTHROW_NCX,__localdep_fcntl,(__fd_t __fd,
 __LOCAL_LIBC(_setmode) __oflag_t
 __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(_setmode))(__fd_t __fd, __oflag_t __mode) {
 #ifdef __F_SETFL_XCH
-	return __localdep_fcntl(__fd, __F_SETFL_XCH, __mode);
+	return __NAMESPACE_LOCAL_SYM __localdep_fcntl(__fd, __F_SETFL_XCH, __mode);
 #else /* __F_SETFL_XCH */
 	__oflag_t __result;
-	__result = __localdep_fcntl(__fd, __F_GETFL);
+	__result = __NAMESPACE_LOCAL_SYM __localdep_fcntl(__fd, __F_GETFL);
 	if __unlikely(__result < 0)
 		return -1;
-	return __localdep_fcntl(__fd, __F_SETFL, __mode);
+	return __NAMESPACE_LOCAL_SYM __localdep_fcntl(__fd, __F_SETFL, __mode);
 #endif /* !__F_SETFL_XCH */
 }
 __NAMESPACE_LOCAL_END

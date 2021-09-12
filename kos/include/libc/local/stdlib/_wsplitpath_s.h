@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xdf47804f */
+/* HASH CRC-32:0xff4d59cd */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -58,7 +58,7 @@ __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(_wsplitpath_s))(__WCHAR_TYPE__ const 
 			if (__drive) {
 				if __unlikely(__drivelen <= __len)
 					goto __err_range;
-				__localdep_memcpyc(__drive, __abspath, __len, sizeof(__WCHAR_TYPE__));
+				__NAMESPACE_LOCAL_SYM __localdep_memcpyc(__drive, __abspath, __len, sizeof(__WCHAR_TYPE__));
 				__drive[__len] = 0;
 			}
 			__abspath += __len + 1;
@@ -83,7 +83,7 @@ __got_drive:
 		if (__dir) {
 			if __unlikely(__dirlen <= __last_slash)
 				goto __err_range;
-			__localdep_memcpyc(__dir, __abspath, __last_slash, sizeof(__WCHAR_TYPE__));
+			__NAMESPACE_LOCAL_SYM __localdep_memcpyc(__dir, __abspath, __last_slash, sizeof(__WCHAR_TYPE__));
 			__dir[__last_slash] = 0;
 		}
 	} else {
@@ -95,7 +95,7 @@ __got_drive:
 			__SIZE_TYPE__ __path_extlen = __len - __last_dot;
 			if __unlikely(__extlen <= __path_extlen)
 				goto __err_range;
-			__localdep_memcpyc(__ext, __abspath + __last_dot, __path_extlen, sizeof(__WCHAR_TYPE__));
+			__NAMESPACE_LOCAL_SYM __localdep_memcpyc(__ext, __abspath + __last_dot, __path_extlen, sizeof(__WCHAR_TYPE__));
 			__ext[__path_extlen] = 0;
 		}
 	} else {
@@ -107,7 +107,7 @@ __got_drive:
 		__len = __last_dot - __last_slash;
 		if __unlikely(__filelen <= __len)
 			goto __err_range;
-		__localdep_memcpyc(__file, __abspath + __last_slash, __len, sizeof(__WCHAR_TYPE__));
+		__NAMESPACE_LOCAL_SYM __localdep_memcpyc(__file, __abspath + __last_slash, __len, sizeof(__WCHAR_TYPE__));
 		__file[__len] = 0;
 	}
 	return 0;

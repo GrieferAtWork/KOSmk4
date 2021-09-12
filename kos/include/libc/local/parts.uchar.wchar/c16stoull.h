@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x56c608a3 */
+/* HASH CRC-32:0x94ea833f */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -50,7 +50,7 @@ __CREDIRECT_DOS(__ATTR_LEAF __ATTR_NONNULL((1)),__UINT32_TYPE__,__NOTHROW_NCX,__
 __NAMESPACE_LOCAL_END
 #include <libc/local/wchar/wcstou32.h>
 __NAMESPACE_LOCAL_BEGIN
-#define __localdep_c16stou32 (*(__UINT32_TYPE__(__LIBDCALL *)(__CHAR16_TYPE__ const *__restrict, __CHAR16_TYPE__ **, __STDC_INT_AS_UINT_T))&__LIBC_LOCAL_NAME(wcstou32))
+#define __localdep_c16stou32 __NAMESPACE_LOCAL_TYPEHAX(__UINT32_TYPE__(__LIBDCALL*)(__CHAR16_TYPE__ const *__restrict,__CHAR16_TYPE__ **,__STDC_INT_AS_UINT_T),__UINT32_TYPE__(__LIBDCALL&)(__CHAR16_TYPE__ const *__restrict,__CHAR16_TYPE__ **,__STDC_INT_AS_UINT_T),wcstou32)
 #else /* ... */
 __NAMESPACE_LOCAL_END
 #include <libc/local/parts.uchar.wchar/c16stou32.h>
@@ -88,7 +88,7 @@ __CREDIRECT_DOS(__ATTR_LEAF __ATTR_NONNULL((1)),__UINT64_TYPE__,__NOTHROW_NCX,__
 __NAMESPACE_LOCAL_END
 #include <libc/local/wchar/wcstou64.h>
 __NAMESPACE_LOCAL_BEGIN
-#define __localdep_c16stou64 (*(__UINT64_TYPE__(__LIBDCALL *)(__CHAR16_TYPE__ const *__restrict, __CHAR16_TYPE__ **, __STDC_INT_AS_UINT_T))&__LIBC_LOCAL_NAME(wcstou64))
+#define __localdep_c16stou64 __NAMESPACE_LOCAL_TYPEHAX(__UINT64_TYPE__(__LIBDCALL*)(__CHAR16_TYPE__ const *__restrict,__CHAR16_TYPE__ **,__STDC_INT_AS_UINT_T),__UINT64_TYPE__(__LIBDCALL&)(__CHAR16_TYPE__ const *__restrict,__CHAR16_TYPE__ **,__STDC_INT_AS_UINT_T),wcstou64)
 #else /* ... */
 __NAMESPACE_LOCAL_END
 #include <libc/local/parts.uchar.wchar/c16stou64.h>
@@ -99,9 +99,9 @@ __NAMESPACE_LOCAL_BEGIN
 __LOCAL_LIBC(c16stoull) __ATTR_LEAF __ATTR_NONNULL((1)) __ULONGLONG
 __NOTHROW_NCX(__LIBDCALL __LIBC_LOCAL_NAME(c16stoull))(__CHAR16_TYPE__ const *__restrict __nptr, __CHAR16_TYPE__ **__endptr, __STDC_INT_AS_UINT_T __base) {
 #if __SIZEOF_LONG_LONG__ <= 4
-	return (__ULONGLONG)__localdep_c16stou32(__nptr, __endptr, __base);
+	return (__ULONGLONG)__NAMESPACE_LOCAL_SYM __localdep_c16stou32(__nptr, __endptr, __base);
 #else /* __SIZEOF_LONG_LONG__ <= 4 */
-	return (__ULONGLONG)__localdep_c16stou64(__nptr, __endptr, __base);
+	return (__ULONGLONG)__NAMESPACE_LOCAL_SYM __localdep_c16stou64(__nptr, __endptr, __base);
 #endif /* __SIZEOF_LONG_LONG__ > 4 */
 }
 __NAMESPACE_LOCAL_END

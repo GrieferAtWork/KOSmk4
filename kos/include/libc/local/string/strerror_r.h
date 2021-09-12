@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x91245135 */
+/* HASH CRC-32:0x6f0b9db */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -104,20 +104,20 @@ __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(strerror_r))(__errno_t __errnum, char
 		goto __fallback;
 	if (!__buflen)
 		goto __fallback;
-	__string = __localdep_strerrordesc_np(__errnum);
+	__string = __NAMESPACE_LOCAL_SYM __localdep_strerrordesc_np(__errnum);
 	if (__string) {
 		/* Copy the descriptor text. */
-		__SIZE_TYPE__ __msg_len = __localdep_strlen(__string) + 1;
+		__SIZE_TYPE__ __msg_len = __NAMESPACE_LOCAL_SYM __localdep_strlen(__string) + 1;
 		if (__msg_len > __buflen)
 			goto __fallback;
-		__localdep_memcpyc(__buf, __string, __msg_len, sizeof(char));
+		__NAMESPACE_LOCAL_SYM __localdep_memcpyc(__buf, __string, __msg_len, sizeof(char));
 	} else {
-		if (__localdep_snprintf(__buf, __buflen, "Unknown error %d", __errnum) >= __buflen)
+		if (__NAMESPACE_LOCAL_SYM __localdep_snprintf(__buf, __buflen, "Unknown error %d", __errnum) >= __buflen)
 			goto __fallback;
 	}
 	return __buf;
 __fallback:
-	return __localdep_strerror(__errnum);
+	return __NAMESPACE_LOCAL_SYM __localdep_strerror(__errnum);
 }
 __NAMESPACE_LOCAL_END
 #ifndef __local___localdep_strerror_r_defined

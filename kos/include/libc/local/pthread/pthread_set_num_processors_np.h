@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x377af91e */
+/* HASH CRC-32:0xf88d536f */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -51,7 +51,7 @@ __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(pthread_set_num_processors_np))(int _
 		if (!__CPU_SET_S(__i, sizeof(__cset), &__cset))
 			break;
 	}
-	__result = __localdep_sched_setaffinity(0, sizeof(__cset), &__cset);
+	__result = __NAMESPACE_LOCAL_SYM __localdep_sched_setaffinity(0, sizeof(__cset), &__cset);
 	if __unlikely(__result != 0)
 		__result = __libc_geterrno_or(1);
 	return __result;

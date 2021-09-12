@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xf018f58b */
+/* HASH CRC-32:0x78cab9f5 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -36,7 +36,7 @@ __CREDIRECT_DOS(__ATTR_LIBC_WPRINTF(2, 0) __ATTR_NONNULL((1, 2)),__STDC_INT_AS_S
 __NAMESPACE_LOCAL_END
 #include <libc/local/wchar/vfwprintf.h>
 __NAMESPACE_LOCAL_BEGIN
-#define __localdep_vfc16printf (*(__STDC_INT_AS_SIZE_T(__LIBDCALL *)(__FILE *__restrict, __CHAR16_TYPE__ const *__restrict, __builtin_va_list))&__LIBC_LOCAL_NAME(vfwprintf))
+#define __localdep_vfc16printf __NAMESPACE_LOCAL_TYPEHAX(__STDC_INT_AS_SIZE_T(__LIBDCALL*)(__FILE *__restrict,__CHAR16_TYPE__ const *__restrict,__builtin_va_list),__STDC_INT_AS_SIZE_T(__LIBDCALL&)(__FILE *__restrict,__CHAR16_TYPE__ const *__restrict,__builtin_va_list),vfwprintf)
 #elif (defined(__CRT_HAVE_file_wprinter) && __SIZEOF_WCHAR_T__ == 2 && defined(__LIBCCALL_IS_LIBDCALL)) || defined(__CRT_HAVE_DOS$file_wprinter) || (defined(__CRT_HAVE_file_wprinter_unlocked) && __SIZEOF_WCHAR_T__ == 2 && defined(__LIBCCALL_IS_LIBDCALL)) || defined(__CRT_HAVE_DOS$file_wprinter_unlocked) || ((defined(__CRT_HAVE_fputwc) || defined(__CRT_HAVE_putwc)) && __SIZEOF_WCHAR_T__ == 2) || (defined(__CRT_HAVE_fputwc) && __SIZEOF_WCHAR_T__ == 2 && defined(__LIBCCALL_IS_LIBDCALL)) || defined(__CRT_HAVE_DOS$fputwc) || (defined(__CRT_HAVE_putwc) && __SIZEOF_WCHAR_T__ == 2 && defined(__LIBCCALL_IS_LIBDCALL)) || defined(__CRT_HAVE_DOS$putwc)
 __NAMESPACE_LOCAL_END
 #include <libc/local/parts.uchar.stdio/vfc16printf.h>
@@ -51,7 +51,7 @@ __LOCAL_LIBC(fc16printf) __ATTR_LIBC_WPRINTF(2, 3) __ATTR_NONNULL((1, 2)) __STDC
 	__STDC_INT_AS_SIZE_T __result;
 	__builtin_va_list __args;
 	__builtin_va_start(__args, __format);
-	__result = __localdep_vfc16printf(__stream, __format, __args);
+	__result = __NAMESPACE_LOCAL_SYM __localdep_vfc16printf(__stream, __format, __args);
 	__builtin_va_end(__args);
 	return __result;
 }

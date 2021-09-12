@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x67b54618 */
+/* HASH CRC-32:0x2e82210d */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -66,20 +66,20 @@ __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(wcrtomb))(char *__restrict __str, __W
 		__ch32 = ((__mbs->__mb_word & 0x000003ff) << 10) +
 		       0x10000 + ((__UINT16_TYPE__)__wc - 0xdc00);
 		__mbs->__mb_word = __MBSTATE_TYPE_EMPTY;
-		__endptr = __localdep_unicode_writeutf8(__str, __ch32);
+		__endptr = __NAMESPACE_LOCAL_SYM __localdep_unicode_writeutf8(__str, __ch32);
 	} else if ((__UINT16_TYPE__)__wc >= 0xd800 &&
 	           (__UINT16_TYPE__)__wc <= 0xdbff) {
 		__mbs->__mb_word = __MBSTATE_TYPE_UTF16_LO | ((__UINT16_TYPE__)__wc - 0xd800);
 		return 0;
 	} else {
-		__endptr = __localdep_unicode_writeutf8(__str, (__CHAR32_TYPE__)(__UINT32_TYPE__)(__UINT16_TYPE__)__wc);
+		__endptr = __NAMESPACE_LOCAL_SYM __localdep_unicode_writeutf8(__str, (__CHAR32_TYPE__)(__UINT32_TYPE__)(__UINT16_TYPE__)__wc);
 	}
 #else /* __SIZEOF_WCHAR_T__ == 2 */
 	/* unicode_c32toc8() */
 	(void)__mbs;
 	if (!__str)
 		return 1;
-	__endptr = __localdep_unicode_writeutf8(__str, (__CHAR32_TYPE__)__wc);
+	__endptr = __NAMESPACE_LOCAL_SYM __localdep_unicode_writeutf8(__str, (__CHAR32_TYPE__)__wc);
 #endif /* __SIZEOF_WCHAR_T__ != 2 */
 	__result = (__SIZE_TYPE__)(__endptr - __str);
 	return __result;

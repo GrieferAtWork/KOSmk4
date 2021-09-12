@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x71dab400 */
+/* HASH CRC-32:0xa26846b8 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -83,12 +83,12 @@ __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(wildstrcasecmp_l))(char const *__patt
 				return 0; /* Pattern ends with '*' (matches everything) */
 			if (__card_post == '?')
 				goto __next; /* Match any --> already found */
-			__card_post = __localdep_tolower_l(__card_post, __locale);
+			__card_post = __NAMESPACE_LOCAL_SYM __localdep_tolower_l(__card_post, __locale);
 			for (;;) {
 				char __ch = *__string++;
-				if (__card_post == __ch || __card_post == __localdep_tolower_l(__ch, __locale)) {
+				if (__card_post == __ch || __card_post == __NAMESPACE_LOCAL_SYM __localdep_tolower_l(__ch, __locale)) {
 					/* Recursively check if the rest of the string and pattern match */
-					if (!__localdep_strcasecmp_l(__string, __pattern, __locale))
+					if (!__NAMESPACE_LOCAL_SYM __localdep_strcasecmp_l(__string, __pattern, __locale))
 						return 0;
 				} else if (!__ch) {
 					return -(int)(unsigned char)__card_post; /* Wildcard suffix not found */
@@ -98,8 +98,8 @@ __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(wildstrcasecmp_l))(char const *__patt
 		__pattern_ch = *__pattern;
 		__string_ch = *__string;
 		if (__pattern_ch == __string_ch || __pattern_ch == '?' ||
-		   (__pattern_ch = __localdep_tolower_l(__pattern_ch, __locale),
-		    __string_ch = __localdep_tolower_l(__string_ch, __locale),
+		   (__pattern_ch = __NAMESPACE_LOCAL_SYM __localdep_tolower_l(__pattern_ch, __locale),
+		    __string_ch = __NAMESPACE_LOCAL_SYM __localdep_tolower_l(__string_ch, __locale),
 		    __pattern_ch == __string_ch)) {
 __next:
 			++__string;

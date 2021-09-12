@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x677405d */
+/* HASH CRC-32:0xb7b3e0f4 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -371,8 +371,8 @@ __NOTHROW_RPC(__LIBCCALL __LIBC_LOCAL_NAME(getpassfd))(char const *__prompt, cha
 	/* Initialize locals. */
 #if (defined(__CRT_HAVE_tcgetattr) || (defined(__CRT_HAVE_ioctl) && defined(__TCGETA))) && (defined(__CRT_HAVE_tcsetattr) || defined(__CRT_HAVE_ioctl))
 	struct termios __old_ios, __new_ios;
-	__localdep_memset(&__old_ios, -1, sizeof(__old_ios));
-	__localdep_memset(&__new_ios, -1, sizeof(__new_ios));
+	__NAMESPACE_LOCAL_SYM __localdep_memset(&__old_ios, -1, sizeof(__old_ios));
+	__NAMESPACE_LOCAL_SYM __localdep_memset(&__new_ios, -1, sizeof(__new_ios));
 #endif /* (__CRT_HAVE_tcgetattr || (__CRT_HAVE_ioctl && __TCGETA)) && (__CRT_HAVE_tcsetattr || __CRT_HAVE_ioctl) */
 	__result          = __NULLPTR;
 	__interrupt_signo = 0;
@@ -383,10 +383,10 @@ __NOTHROW_RPC(__LIBCCALL __LIBC_LOCAL_NAME(getpassfd))(char const *__prompt, cha
 	__heap_buf = 0;
 	if (!__buf) {
 		__buflen = 512;
-		__buf = (char *)__localdep_malloc(__buflen * sizeof(char));
+		__buf = (char *)__NAMESPACE_LOCAL_SYM __localdep_malloc(__buflen * sizeof(char));
 		if __unlikely(!__buf) {
 			__buflen = 1;
-			__buf = (char *)__localdep_malloc(__buflen * sizeof(char));
+			__buf = (char *)__NAMESPACE_LOCAL_SYM __localdep_malloc(__buflen * sizeof(char));
 			if __unlikely(!__buf)
 				goto __out;
 		}
@@ -431,13 +431,13 @@ __NOTHROW_RPC(__LIBCCALL __LIBC_LOCAL_NAME(getpassfd))(char const *__prompt, cha
 #define __PRIVATE_GETPASSFD_PATH_TTY "/dev/tty"
 #endif /* !_PATH_TTY */
 #if __PRIVATE_GETPASSFD_O_NONBLOCK != 0
-		__default_fds[2] = __localdep_open(__PRIVATE_GETPASSFD_PATH_TTY,
+		__default_fds[2] = __NAMESPACE_LOCAL_SYM __localdep_open(__PRIVATE_GETPASSFD_PATH_TTY,
 		                      __PRIVATE_GETPASSFD_O_CLOEXEC |
 		                      __PRIVATE_GETPASSFD_O_CLOFORK |
 		                      __PRIVATE_GETPASSFD_O_RDWR |
 		                      (__timeout_in_seconds != 0 ? __PRIVATE_GETPASSFD_O_NONBLOCK : 0));
 #else /* __PRIVATE_GETPASSFD_O_NONBLOCK != 0 */
-		__default_fds[2] = __localdep_open(__PRIVATE_GETPASSFD_PATH_TTY,
+		__default_fds[2] = __NAMESPACE_LOCAL_SYM __localdep_open(__PRIVATE_GETPASSFD_PATH_TTY,
 		                      __PRIVATE_GETPASSFD_O_CLOEXEC |
 		                      __PRIVATE_GETPASSFD_O_CLOFORK |
 		                      __PRIVATE_GETPASSFD_O_RDWR);
@@ -455,8 +455,8 @@ __NOTHROW_RPC(__LIBCCALL __LIBC_LOCAL_NAME(getpassfd))(char const *__prompt, cha
 
 	/* Load terminal settings. */
 #if (defined(__CRT_HAVE_tcgetattr) || (defined(__CRT_HAVE_ioctl) && defined(__TCGETA))) && (defined(__CRT_HAVE_tcsetattr) || defined(__CRT_HAVE_ioctl))
-	if (__localdep_tcgetattr(__fds[0], &__old_ios) == 0) {
-		__localdep_memcpy(&__new_ios, &__old_ios, sizeof(struct termios));
+	if (__NAMESPACE_LOCAL_SYM __localdep_tcgetattr(__fds[0], &__old_ios) == 0) {
+		__NAMESPACE_LOCAL_SYM __localdep_memcpy(&__new_ios, &__old_ios, sizeof(struct termios));
 
 		/* Configure new settings. */
 #if defined(__ECHO) || defined(__ECHOK) || defined(__ECHOE) || defined(__ECHOKE) || defined(__ECHOCTL) || defined(__ISIG) || defined(__ICANON)
@@ -493,11 +493,11 @@ __NOTHROW_RPC(__LIBCCALL __LIBC_LOCAL_NAME(getpassfd))(char const *__prompt, cha
 #endif /* __VTIME */
 
 #if defined(__TCSAFLUSH) && defined(__TCSASOFT)
-		if (__localdep_tcsetattr(__fds[0], __TCSAFLUSH | __TCSASOFT, &__new_ios) != 0)
+		if (__NAMESPACE_LOCAL_SYM __localdep_tcsetattr(__fds[0], __TCSAFLUSH | __TCSASOFT, &__new_ios) != 0)
 #elif defined(__TCSAFLUSH)
-		if (__localdep_tcsetattr(__fds[0], __TCSAFLUSH, &__new_ios) != 0)
+		if (__NAMESPACE_LOCAL_SYM __localdep_tcsetattr(__fds[0], __TCSAFLUSH, &__new_ios) != 0)
 #else /* ... */
-		if (__localdep_tcsetattr(__fds[0], 0, &__new_ios) != 0)
+		if (__NAMESPACE_LOCAL_SYM __localdep_tcsetattr(__fds[0], 0, &__new_ios) != 0)
 #endif /* !... */
 		{
 			goto __out;
@@ -507,14 +507,14 @@ __NOTHROW_RPC(__LIBCCALL __LIBC_LOCAL_NAME(getpassfd))(char const *__prompt, cha
 			goto __out; /* tcgetattr() should have already set errno=ENOTTY */
 	}
 #elif defined(__CRT_HAVE_isatty) || defined(__CRT_HAVE__isatty) || defined(__CRT_HAVE_tcgetattr) || (defined(__CRT_HAVE_ioctl) && defined(__TCGETA))
-	if ((__flags & __GETPASS_NEED_TTY) && !__localdep_isatty(__fds[0]))
+	if ((__flags & __GETPASS_NEED_TTY) && !__NAMESPACE_LOCAL_SYM __localdep_isatty(__fds[0]))
 		goto __out; /* isatty() should have already set errno=ENOTTY */
 #endif /* ... */
 
 	/* Print the given prompt */
 #if defined(__CRT_HAVE_write) || defined(__CRT_HAVE__write) || defined(__CRT_HAVE___write)
 	if (__prompt && *__prompt) {
-		if (__localdep_write(__fds[1], __prompt, __localdep_strlen(__prompt)) == -1)
+		if (__NAMESPACE_LOCAL_SYM __localdep_write(__fds[1], __prompt, __NAMESPACE_LOCAL_SYM __localdep_strlen(__prompt)) == -1)
 			goto __out;
 	}
 #else /* __CRT_HAVE_write || __CRT_HAVE__write || __CRT_HAVE___write */
@@ -544,7 +544,7 @@ __NOTHROW_RPC(__LIBCCALL __LIBC_LOCAL_NAME(getpassfd))(char const *__prompt, cha
 #else /* ... */
 				__pfd.events  = 0;
 #endif /* !... */
-				__status = __localdep_poll(&__pfd, 1, __timeout_in_seconds * 1000);
+				__status = __NAMESPACE_LOCAL_SYM __localdep_poll(&__pfd, 1, __timeout_in_seconds * 1000);
 				if __unlikely(__status == -1)
 					goto __out; /* Error... */
 				if __unlikely(__status == 0) {
@@ -564,7 +564,7 @@ __NOTHROW_RPC(__LIBCCALL __LIBC_LOCAL_NAME(getpassfd))(char const *__prompt, cha
 			/* Actually read the next character. */
 			{
 				__SSIZE_TYPE__ __status;
-				__status = __localdep_read(__fds[0], &__ch, sizeof(__ch));
+				__status = __NAMESPACE_LOCAL_SYM __localdep_read(__fds[0], &__ch, sizeof(__ch));
 				if (__status < (__SSIZE_TYPE__)sizeof(char)) {
 					if (__status < 0)
 						goto __out; /* Error */
@@ -650,7 +650,7 @@ __handle_eof:
 #if defined(__CRT_HAVE_write) || defined(__CRT_HAVE__write) || defined(__CRT_HAVE___write)
 					if (__flags & (__GETPASS_ECHO | __GETPASS_ECHO_STAR)) {
 						while (__dst > (unsigned char *)__buf) {
-							if (__localdep_write(__fds[1], "\b \b", 3 * sizeof(char)) == -1)
+							if (__NAMESPACE_LOCAL_SYM __localdep_write(__fds[1], "\b \b", 3 * sizeof(char)) == -1)
 								goto __out;
 							--__dst;
 						}
@@ -722,7 +722,7 @@ __handle_eof:
 						__libc_explicit_bzero(__dst, sizeof(char));
 #if defined(__CRT_HAVE_write) || defined(__CRT_HAVE__write) || defined(__CRT_HAVE___write)
 						if (__flags & (__GETPASS_ECHO | __GETPASS_ECHO_STAR)) {
-							if (__localdep_write(__fds[1], "\b \b", 3 * sizeof(char)) == -1)
+							if (__NAMESPACE_LOCAL_SYM __localdep_write(__fds[1], "\b \b", 3 * sizeof(char)) == -1)
 								goto __out;
 						}
 #endif /* __CRT_HAVE_write || __CRT_HAVE__write || __CRT_HAVE___write */
@@ -731,7 +731,7 @@ __handle_eof:
 __maybe_beep:
 #if defined(__CRT_HAVE_write) || defined(__CRT_HAVE__write) || defined(__CRT_HAVE___write)
 					if (!(__flags & __GETPASS_NO_BEEP)) {
-						if (__localdep_write(__fds[2], "\7" /*BEL*/, sizeof(char)) == -1)
+						if (__NAMESPACE_LOCAL_SYM __localdep_write(__fds[2], "\7" /*BEL*/, sizeof(char)) == -1)
 							goto __out;
 					}
 #endif /* __CRT_HAVE_write || __CRT_HAVE__write || __CRT_HAVE___write */
@@ -758,17 +758,17 @@ __maybe_beep:
 					__SIZE_TYPE__ __new_buflen;
 					char *__new_buf;
 					__new_buflen = __buflen * 2;
-					__new_buf = (char *)__localdep_malloc(__new_buflen * sizeof(char));
+					__new_buf = (char *)__NAMESPACE_LOCAL_SYM __localdep_malloc(__new_buflen * sizeof(char));
 					if __unlikely(!__new_buf) {
 						__new_buflen = __buflen + 1;
-						__new_buf = (char *)__localdep_malloc(__new_buflen * sizeof(char));
+						__new_buf = (char *)__NAMESPACE_LOCAL_SYM __localdep_malloc(__new_buflen * sizeof(char));
 						if __unlikely(!__new_buf)
 							goto __out;
 					}
-					__localdep_memcpyc(__new_buf, __buf, __buflen, sizeof(char));
+					__NAMESPACE_LOCAL_SYM __localdep_memcpyc(__new_buf, __buf, __buflen, sizeof(char));
 					__libc_explicit_bzero(__buf, __buflen * sizeof(char));
 #if defined(__CRT_HAVE_free) || defined(__CRT_HAVE_cfree)
-					__localdep_free(__buf);
+					__NAMESPACE_LOCAL_SYM __localdep_free(__buf);
 #endif /* __CRT_HAVE_free || __CRT_HAVE_cfree */
 					__dst    = (unsigned char *)__new_buf + (__SIZE_TYPE__)(__dst - (unsigned char *)__buf);
 					__bufend = (unsigned char *)__new_buf + __new_buflen - 1;
@@ -786,21 +786,21 @@ __maybe_beep:
 			if (__flags & __GETPASS_7BIT)
 				__ch &= 0x7f;
 			if (__flags & __GETPASS_FORCE_LOWER)
-				__ch = (unsigned char)__localdep_tolower((char)__ch);
+				__ch = (unsigned char)__NAMESPACE_LOCAL_SYM __localdep_tolower((char)__ch);
 			if (__flags & __GETPASS_FORCE_UPPER)
-				__ch = (unsigned char)__localdep_toupper((char)__ch);
+				__ch = (unsigned char)__NAMESPACE_LOCAL_SYM __localdep_toupper((char)__ch);
 
 			/* Append to the result buffer. */
 			*__dst++ = __ch;
 
 #if defined(__CRT_HAVE_write) || defined(__CRT_HAVE__write) || defined(__CRT_HAVE___write)
 			if (__flags & __GETPASS_ECHO_STAR) {
-				if (__localdep_write(__fds[1], "*", sizeof(char)) == -1)
+				if (__NAMESPACE_LOCAL_SYM __localdep_write(__fds[1], "*", sizeof(char)) == -1)
 					goto __out;
 			} else if (__flags & __GETPASS_ECHO) {
-				if (!__localdep_isprint((char)__ch))
+				if (!__NAMESPACE_LOCAL_SYM __localdep_isprint((char)__ch))
 					__ch = (unsigned char)'?';
-				if (__localdep_write(__fds[1], &__ch, sizeof(char)) == -1)
+				if (__NAMESPACE_LOCAL_SYM __localdep_write(__fds[1], &__ch, sizeof(char)) == -1)
 					goto __out;
 			}
 #endif /* __CRT_HAVE_write || __CRT_HAVE__write || __CRT_HAVE___write */
@@ -810,7 +810,7 @@ __maybe_beep:
 		/* If requested to do so by the caller, write a trailing '\n' upon success. */
 #if defined(__CRT_HAVE_write) || defined(__CRT_HAVE__write) || defined(__CRT_HAVE___write)
 		if (__flags & __GETPASS_ECHO_NL) {
-			if (__localdep_write(__fds[1], "\n", 1) == -1)
+			if (__NAMESPACE_LOCAL_SYM __localdep_write(__fds[1], "\n", 1) == -1)
 				goto __out;
 		}
 #endif /* __CRT_HAVE_write || __CRT_HAVE__write || __CRT_HAVE___write */
@@ -824,12 +824,12 @@ __maybe_beep:
 			__SIZE_TYPE__ __new_buflen;
 			char *__new_buf;
 			__new_buflen = (__SIZE_TYPE__)((__dst + 1) - (unsigned char *)__buf);
-			__new_buf    = (char *)__localdep_malloc(__new_buflen * sizeof(char));
+			__new_buf    = (char *)__NAMESPACE_LOCAL_SYM __localdep_malloc(__new_buflen * sizeof(char));
 			if __likely(__new_buf) {
-				__localdep_memcpyc(__new_buf, __buf, __new_buflen, sizeof(char));
+				__NAMESPACE_LOCAL_SYM __localdep_memcpyc(__new_buf, __buf, __new_buflen, sizeof(char));
 				__libc_explicit_bzero(__buf, __buflen * sizeof(char));
 #if defined(__CRT_HAVE_free) || defined(__CRT_HAVE_cfree)
-				__localdep_free(__buf);
+				__NAMESPACE_LOCAL_SYM __localdep_free(__buf);
 #endif /* __CRT_HAVE_free || __CRT_HAVE_cfree */
 				__buf    = __new_buf;
 				__buflen = __new_buflen;
@@ -844,13 +844,13 @@ __out:
 
 	/* Restore old terminal settings. */
 #if (defined(__CRT_HAVE_tcgetattr) || (defined(__CRT_HAVE_ioctl) && defined(__TCGETA))) && (defined(__CRT_HAVE_tcsetattr) || defined(__CRT_HAVE_ioctl))
-	if (__localdep_memcmp(&__old_ios, &__new_ios, sizeof(struct termios)) != 0) {
+	if (__NAMESPACE_LOCAL_SYM __localdep_memcmp(&__old_ios, &__new_ios, sizeof(struct termios)) != 0) {
 #if defined(__TCSAFLUSH) && defined(__TCSASOFT)
-		(void)__localdep_tcsetattr(__fds[0], __TCSAFLUSH | __TCSASOFT, &__old_ios);
+		(void)__NAMESPACE_LOCAL_SYM __localdep_tcsetattr(__fds[0], __TCSAFLUSH | __TCSASOFT, &__old_ios);
 #elif defined(__TCSAFLUSH)
-		(void)__localdep_tcsetattr(__fds[0], __TCSAFLUSH, &__old_ios);
+		(void)__NAMESPACE_LOCAL_SYM __localdep_tcsetattr(__fds[0], __TCSAFLUSH, &__old_ios);
 #else /* ... */
-		(void)__localdep_tcsetattr(__fds[0], 0, &__old_ios);
+		(void)__NAMESPACE_LOCAL_SYM __localdep_tcsetattr(__fds[0], 0, &__old_ios);
 #endif /* !... */
 	}
 #endif /* (__CRT_HAVE_tcgetattr || (__CRT_HAVE_ioctl && __TCGETA)) && (__CRT_HAVE_tcsetattr || __CRT_HAVE_ioctl) */
@@ -858,7 +858,7 @@ __out:
 	/* Close our file handle to /dev/tty */
 #if defined(__CRT_HAVE_close) || defined(__CRT_HAVE__close) || defined(__CRT_HAVE___close)
 	if (__default_fds[0] != __STDIN_FILENO)
-		__localdep_close(__default_fds[0]);
+		__NAMESPACE_LOCAL_SYM __localdep_close(__default_fds[0]);
 #endif /* __CRT_HAVE_close || __CRT_HAVE__close || __CRT_HAVE___close */
 
 	/* Error-only cleanup... */
@@ -870,7 +870,7 @@ __out:
 		/* Free a dynamically allocated password buffer. */
 #if (defined(__CRT_HAVE_malloc) || defined(__CRT_HAVE_calloc) || defined(__CRT_HAVE_realloc) || defined(__CRT_HAVE_memalign) || defined(__CRT_HAVE_aligned_alloc) || defined(__CRT_HAVE_posix_memalign)) && (defined(__CRT_HAVE_free) || defined(__CRT_HAVE_cfree))
 		if (__heap_buf)
-			__localdep_free(__buf);
+			__NAMESPACE_LOCAL_SYM __localdep_free(__buf);
 #endif /* (__CRT_HAVE_malloc || __CRT_HAVE_calloc || __CRT_HAVE_realloc || __CRT_HAVE_memalign || __CRT_HAVE_aligned_alloc || __CRT_HAVE_posix_memalign) && (__CRT_HAVE_free || __CRT_HAVE_cfree) */
 
 		/* Raise the signal of a given control character, and/or set
@@ -879,7 +879,7 @@ __out:
 		if (__interrupt_signo != 0) {
 #if defined(__CRT_HAVE_raise) || (defined(__CRT_HAVE_pthread_kill) && (defined(__CRT_HAVE_pthread_self) || defined(__CRT_HAVE_thrd_current))) || (defined(__CRT_HAVE_kill) && (defined(__CRT_HAVE_getpid) || defined(__CRT_HAVE__getpid) || defined(__CRT_HAVE___getpid)))
 			if (!(__flags & __GETPASS_NO_SIGNAL))
-				(void)__localdep_raise(__interrupt_signo);
+				(void)__NAMESPACE_LOCAL_SYM __localdep_raise(__interrupt_signo);
 #endif /* __CRT_HAVE_raise || (__CRT_HAVE_pthread_kill && (__CRT_HAVE_pthread_self || __CRT_HAVE_thrd_current)) || (__CRT_HAVE_kill && (__CRT_HAVE_getpid || __CRT_HAVE__getpid || __CRT_HAVE___getpid)) */
 #ifdef __EINTR
 			(void)__libc_seterrno(__EINTR);

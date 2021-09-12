@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xe081e708 */
+/* HASH CRC-32:0x8b6c5165 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -51,9 +51,9 @@ __CREDIRECT(,int,__NOTHROW_RPC,__localdep_lockf32,(__fd_t __fd, __STDC_INT_AS_UI
 __LOCAL_LIBC(lockf64) int
 __NOTHROW_RPC(__LIBCCALL __LIBC_LOCAL_NAME(lockf64))(__fd_t __fd, __STDC_INT_AS_UINT_T __cmd, __PIO_OFFSET64 __length) {
 #ifdef __CRT_HAVE_lockf
-	return __localdep_lockf32(__fd, __cmd, (__pos32_t)__length);
+	return __NAMESPACE_LOCAL_SYM __localdep_lockf32(__fd, __cmd, (__pos32_t)__length);
 #else /* __CRT_HAVE_lockf */
-	return __localdep_crt_locking(__fd, __cmd, (__pos32_t)__length);
+	return __NAMESPACE_LOCAL_SYM __localdep_crt_locking(__fd, __cmd, (__pos32_t)__length);
 #endif /* !__CRT_HAVE_lockf */
 }
 __NAMESPACE_LOCAL_END

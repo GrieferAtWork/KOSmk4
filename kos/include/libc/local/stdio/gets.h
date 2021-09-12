@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xd189e3ec */
+/* HASH CRC-32:0xc7166712 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -48,7 +48,7 @@ __NAMESPACE_LOCAL_END
 __NAMESPACE_LOCAL_BEGIN
 __LOCAL_LIBC(gets) __ATTR_WUNUSED __ATTR_DEPRECATED("No buffer size checks (use `fgets\' instead)") __ATTR_NONNULL((1)) char *
 (__LIBCCALL __LIBC_LOCAL_NAME(gets))(char *__restrict __buf) __THROWS(...) {
-	return __localdep_fgets(__buf, __INT_MAX__, __LOCAL_stdin);
+	return __NAMESPACE_LOCAL_SYM __localdep_fgets(__buf, __INT_MAX__, __LOCAL_stdin);
 }
 __NAMESPACE_LOCAL_END
 #ifndef __local___localdep_gets_defined

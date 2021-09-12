@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xf0ef74c8 */
+/* HASH CRC-32:0xa6ae6ea6 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -34,7 +34,7 @@ __CREDIRECT_DOS(__ATTR_WUNUSED __ATTR_LIBC_WSCANF(2, 0) __ATTR_NONNULL((1, 2)),_
 __NAMESPACE_LOCAL_END
 #include <libc/local/wchar/vswscanf.h>
 __NAMESPACE_LOCAL_BEGIN
-#define __localdep_vsc16scanf (*(__STDC_INT_AS_SIZE_T(__LIBDCALL *)(__CHAR16_TYPE__ const *__restrict, __CHAR16_TYPE__ const *__restrict, __builtin_va_list))&__LIBC_LOCAL_NAME(vswscanf))
+#define __localdep_vsc16scanf __NAMESPACE_LOCAL_TYPEHAX(__STDC_INT_AS_SIZE_T(__LIBDCALL*)(__CHAR16_TYPE__ const *__restrict,__CHAR16_TYPE__ const *__restrict,__builtin_va_list),__STDC_INT_AS_SIZE_T(__LIBDCALL&)(__CHAR16_TYPE__ const *__restrict,__CHAR16_TYPE__ const *__restrict,__builtin_va_list),vswscanf)
 #else /* ... */
 __NAMESPACE_LOCAL_END
 #include <libc/local/parts.uchar.stdio/vsc16scanf.h>
@@ -47,7 +47,7 @@ __NOTHROW_NCX(__VLIBDCALL __LIBC_LOCAL_NAME(sc16scanf))(__CHAR16_TYPE__ const *_
 	__STDC_INT_AS_SIZE_T __result;
 	__builtin_va_list __args;
 	__builtin_va_start(__args, __format);
-	__result = __localdep_vsc16scanf(__src, __format, __args);
+	__result = __NAMESPACE_LOCAL_SYM __localdep_vsc16scanf(__src, __format, __args);
 	__builtin_va_end(__args);
 	return __result;
 }

@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xaa0316d3 */
+/* HASH CRC-32:0xf1119deb */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -133,16 +133,16 @@ __NAMESPACE_LOCAL_BEGIN
 __LOCAL_LIBC(c32truncate64) __ATTR_NONNULL((1)) int
 __NOTHROW_NCX(__LIBKCALL __LIBC_LOCAL_NAME(c32truncate64))(__CHAR32_TYPE__ const *__file, __PIO_OFFSET64 __length) {
 #if (defined(__CRT_HAVE_wtruncate) && __SIZEOF_WCHAR_T__ == 4 && defined(__LIBCCALL_IS_LIBKCALL)) || defined(__CRT_HAVE_KOS$wtruncate)
-	return __localdep_c32truncate32(__file, (__PIO_OFFSET)__length);
+	return __NAMESPACE_LOCAL_SYM __localdep_c32truncate32(__file, (__PIO_OFFSET)__length);
 #else /* (__CRT_HAVE_wtruncate && __SIZEOF_WCHAR_T__ == 4 && __LIBCCALL_IS_LIBKCALL) || __CRT_HAVE_KOS$wtruncate */
 	int __result;
 	__fd_t __fd;
-	__fd = __localdep_open64(__file, 1); /* O_WRONLY */
+	__fd = __NAMESPACE_LOCAL_SYM __localdep_open64(__file, 1); /* O_WRONLY */
 	if __unlikely(__fd < 0)
 		return -1;
-	__result = __localdep_ftruncate64(__fd, __length);
+	__result = __NAMESPACE_LOCAL_SYM __localdep_ftruncate64(__fd, __length);
 #if defined(__CRT_HAVE_close) || defined(__CRT_HAVE__close) || defined(__CRT_HAVE___close)
-	__localdep_close(__fd);
+	__NAMESPACE_LOCAL_SYM __localdep_close(__fd);
 #endif /* __CRT_HAVE_close || __CRT_HAVE__close || __CRT_HAVE___close */
 	return __result;
 #endif /* (!__CRT_HAVE_wtruncate || __SIZEOF_WCHAR_T__ != 4 || !__LIBCCALL_IS_LIBKCALL) && !__CRT_HAVE_KOS$wtruncate */

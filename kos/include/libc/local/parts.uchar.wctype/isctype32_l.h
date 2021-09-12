@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x9f3790ca */
+/* HASH CRC-32:0x8681f42 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -43,7 +43,7 @@ __CREDIRECT_KOS(__ATTR_CONST __ATTR_WUNUSED,int,__NOTHROW_NCX,__localdep_isctype
 __NAMESPACE_LOCAL_END
 #include <libc/local/wctype/iswctype.h>
 __NAMESPACE_LOCAL_BEGIN
-#define __localdep_isctype32 (*(int(__LIBKCALL *)(__WINT32_TYPE__, __wctype_t))&__LIBC_LOCAL_NAME(iswctype))
+#define __localdep_isctype32 __NAMESPACE_LOCAL_TYPEHAX(int(__LIBKCALL*)(__WINT32_TYPE__,__wctype_t),int(__LIBKCALL&)(__WINT32_TYPE__,__wctype_t),iswctype)
 #elif defined(__CRT_KOS) && defined(__CRT_HAVE___unicode_descriptor)
 __NAMESPACE_LOCAL_END
 #include <libc/local/parts.uchar.wctype/isctype32.h>
@@ -57,7 +57,7 @@ __LOCAL_LIBC(isctype32_l) __ATTR_PURE __ATTR_WUNUSED int
 __NOTHROW_NCX(__LIBKCALL __LIBC_LOCAL_NAME(isctype32_l))(__WINT32_TYPE__ __wc, __wctype_t __type, __locale_t __locale) {
 	(void)__locale;
 	__COMPILER_IMPURE();
-	return __localdep_isctype32(__wc, __type);
+	return __NAMESPACE_LOCAL_SYM __localdep_isctype32(__wc, __type);
 }
 __NAMESPACE_LOCAL_END
 #ifndef __local___localdep_isctype32_l_defined

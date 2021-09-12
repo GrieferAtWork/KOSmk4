@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x43af8b5c */
+/* HASH CRC-32:0x6c14ad27 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -33,12 +33,12 @@ __LOCAL_LIBC(futimesat64) __ATTR_NONNULL((2)) int
 __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(futimesat64))(__fd_t __fd, char const *__file, struct __timeval64 const __tvp[2]) {
 	struct __timeval32 __tv32[2];
 	if (!__tvp)
-		return __localdep_futimesat32(__fd, __file, __NULLPTR);
+		return __NAMESPACE_LOCAL_SYM __localdep_futimesat32(__fd, __file, __NULLPTR);
 	__tv32[0].tv_sec  = (__time32_t)__tvp[0].tv_sec;
 	__tv32[0].tv_usec = __tvp[0].tv_usec;
 	__tv32[1].tv_sec  = (__time32_t)__tvp[1].tv_sec;
 	__tv32[1].tv_usec = __tvp[1].tv_usec;
-	return __localdep_futimesat32(__fd, __file, __tv32);
+	return __NAMESPACE_LOCAL_SYM __localdep_futimesat32(__fd, __file, __tv32);
 }
 __NAMESPACE_LOCAL_END
 #ifndef __local___localdep_futimesat64_defined

@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x91573d4c */
+/* HASH CRC-32:0x295ae98a */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -37,7 +37,7 @@ __CREDIRECT(__ATTR_WUNUSED,__SSIZE_TYPE__,__NOTHROW_RPC,__localdep_kreaddirf64,(
 #endif /* !__local___localdep_kreaddirf64_defined */
 __LOCAL_LIBC(kreaddir64) __ATTR_WUNUSED __SSIZE_TYPE__
 __NOTHROW_RPC(__LIBCCALL __LIBC_LOCAL_NAME(kreaddir64))(__fd_t __fd, struct dirent64 *__buf, __SIZE_TYPE__ __bufsize, unsigned int __mode) {
-	return __localdep_kreaddirf64(__fd, __buf, __bufsize, __mode, 0);
+	return __NAMESPACE_LOCAL_SYM __localdep_kreaddirf64(__fd, __buf, __bufsize, __mode, 0);
 }
 __NAMESPACE_LOCAL_END
 #ifndef __local___localdep_kreaddir64_defined

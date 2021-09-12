@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x8513ebc7 */
+/* HASH CRC-32:0x502bc64c */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -91,14 +91,14 @@ __LOCAL_LIBC(envz_add) __ATTR_NONNULL((1, 2, 3)) __errno_t
 __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(envz_add))(char **__restrict __penvz, __SIZE_TYPE__ *__restrict __penvz_len, char const *__restrict __name, char const *__value) {
 	char *__new_envz;
 	__SIZE_TYPE__ __namelen, __valuelen, __morelen;
-	__localdep_envz_remove(__penvz, __penvz_len, __name);
+	__NAMESPACE_LOCAL_SYM __localdep_envz_remove(__penvz, __penvz_len, __name);
 	if (!__value)
-		return __localdep_argz_add(__penvz, __penvz_len, __name);
+		return __NAMESPACE_LOCAL_SYM __localdep_argz_add(__penvz, __penvz_len, __name);
 	/* Append a new string `name=value\0' */
-	__namelen  = __localdep_strlen(__name);
-	__valuelen = __localdep_strlen(__value);
+	__namelen  = __NAMESPACE_LOCAL_SYM __localdep_strlen(__name);
+	__valuelen = __NAMESPACE_LOCAL_SYM __localdep_strlen(__value);
 	__morelen  = __namelen + 1 + __valuelen + 1;
-	__new_envz = (char *)__localdep_realloc(*__penvz, (*__penvz_len + __morelen) * sizeof(char));
+	__new_envz = (char *)__NAMESPACE_LOCAL_SYM __localdep_realloc(*__penvz, (*__penvz_len + __morelen) * sizeof(char));
 	if __unlikely(!__new_envz) {
 #ifdef __ENOMEM
 		return __ENOMEM;
@@ -109,9 +109,9 @@ __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(envz_add))(char **__restrict __penvz,
 	*__penvz = __new_envz;
 	__new_envz += *__penvz_len;
 	*__penvz_len += __morelen;
-	__new_envz = (char *)__localdep_mempcpyc(__new_envz, __name, __namelen, sizeof(char));
+	__new_envz = (char *)__NAMESPACE_LOCAL_SYM __localdep_mempcpyc(__new_envz, __name, __namelen, sizeof(char));
 	*__new_envz++ = '=';
-	__new_envz = (char *)__localdep_mempcpyc(__new_envz, __value, __valuelen, sizeof(char));
+	__new_envz = (char *)__NAMESPACE_LOCAL_SYM __localdep_mempcpyc(__new_envz, __value, __valuelen, sizeof(char));
 	*__new_envz = '\0';
 	return 0;
 }

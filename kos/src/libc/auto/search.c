@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x9e3906d3 */
+/* HASH CRC-32:0x77f5aef2 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -27,7 +27,6 @@
 #include "search.h"
 #include "../user/stdlib.h"
 #include "../user/string.h"
-#include "../user/unistd.h"
 
 DECL_BEGIN
 
@@ -37,34 +36,34 @@ DECL_BEGIN
 INTERN ATTR_SECTION(".text.crt.utility.search") NONNULL((1)) void
 NOTHROW_NCX(LIBCCALL libc_insque)(void *__restrict elem,
                                   void *prev) {
-	struct libc_link {
-		struct libc_link *l_forw; /* [0..1] Forward link */
-		struct libc_link *l_back; /* [0..1] Backward link */
+	struct __queue_link {
+		struct __queue_link *l_forw; /* [0..1] Forward link */
+		struct __queue_link *l_back; /* [0..1] Backward link */
 	};
 	if (prev) {
-		struct libc_link *next;
-		next = ((struct libc_link *)prev)->l_forw;
-		((struct libc_link *)elem)->l_back = (struct libc_link *)prev;
-		((struct libc_link *)elem)->l_forw = next;
-		((struct libc_link *)prev)->l_forw = (struct libc_link *)elem;
+		struct __queue_link *next;
+		next = ((struct __queue_link *)prev)->l_forw;
+		((struct __queue_link *)elem)->l_back = (struct __queue_link *)prev;
+		((struct __queue_link *)elem)->l_forw = next;
+		((struct __queue_link *)prev)->l_forw = (struct __queue_link *)elem;
 		if (next)
-			next->l_back = (struct libc_link *)elem;
+			next->l_back = (struct __queue_link *)elem;
 	} else {
-		((struct libc_link *)elem)->l_back = NULL;
-		((struct libc_link *)elem)->l_forw = NULL;
+		((struct __queue_link *)elem)->l_back = NULL;
+		((struct __queue_link *)elem)->l_forw = NULL;
 	}
 }
 /* >> remque(3)
  * Unlink ELEM from the doubly-linked list that it is in */
 INTERN ATTR_SECTION(".text.crt.utility.search") NONNULL((1)) void
 NOTHROW_NCX(LIBCCALL libc_remque)(void *__restrict elem) {
-	struct libc_link {
-		struct libc_link *l_forw; /* [0..1] Forward link */
-		struct libc_link *l_back; /* [0..1] Backward link */
+	struct __queue_link {
+		struct __queue_link *l_forw; /* [0..1] Forward link */
+		struct __queue_link *l_back; /* [0..1] Backward link */
 	};
-	struct libc_link *prev, *next;
-	prev = ((struct libc_link *)elem)->l_back;
-	next = ((struct libc_link *)elem)->l_forw;
+	struct __queue_link *prev, *next;
+	prev = ((struct __queue_link *)elem)->l_back;
+	next = ((struct __queue_link *)elem)->l_forw;
 	if (prev)
 		prev->l_forw = next;
 	if (next)

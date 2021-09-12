@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x51582b27 */
+/* HASH CRC-32:0x4343a56a */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -39,7 +39,7 @@ __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(dirname))(char *__path) {
 	/* Handle the empty-path case. */
 	if (!__path || !*__path)
 		goto __fallback;
-	__iter = __localdep_strend(__path);
+	__iter = __NAMESPACE_LOCAL_SYM __localdep_strend(__path);
 	for (;;) {
 		--__iter;
 		if (*__iter != '/')

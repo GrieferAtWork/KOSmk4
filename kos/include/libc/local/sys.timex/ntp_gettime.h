@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xa870e3fe */
+/* HASH CRC-32:0x8218e0ee */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -47,7 +47,7 @@ __LOCAL_LIBC(ntp_gettime) __ATTR_NONNULL((1)) int
 __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(ntp_gettime))(struct ntptimeval *__restrict __ntv) {
 #ifdef __CRT_HAVE_ntp_gettimex
 	struct __ntptimeval32 __ntv32;
-	int __result = __localdep_ntp_gettime32(&__ntv32);
+	int __result = __NAMESPACE_LOCAL_SYM __localdep_ntp_gettime32(&__ntv32);
 	if __likely(__result == 0) {
 		__ntv->time.tv_sec       = (__time64_t)__ntv32.time.tv_sec;
 		__ntv->time.tv_usec      = __ntv32.time.tv_usec;
@@ -62,7 +62,7 @@ __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(ntp_gettime))(struct ntptimeval *__re
 	return __result;
 #else /* __CRT_HAVE_ntp_gettimex */
 	struct __ntptimeval64 __ntv64;
-	int __result = __localdep_ntp_gettime64(&__ntv64);
+	int __result = __NAMESPACE_LOCAL_SYM __localdep_ntp_gettime64(&__ntv64);
 	if __likely(__result == 0) {
 		__ntv->time.tv_sec       = (__time32_t)__ntv64.time.tv_sec;
 		__ntv->time.tv_usec      = __ntv64.time.tv_usec;

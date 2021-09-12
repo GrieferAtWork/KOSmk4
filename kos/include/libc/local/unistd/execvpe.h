@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xc5c5d414 */
+/* HASH CRC-32:0xa591d0b9 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -135,11 +135,11 @@ __LOCAL_LIBC(__execvpe_impl) __ATTR_NOINLINE __ATTR_NONNULL((1, 3, 5, 6)) int
 #endif /* !_WIN32 */
 	__fullpath = (char *)__hybrid_alloca((__path_len + 1 + __file_len + 1) *
 	                                   sizeof(char));
-	__dst = (char *)__localdep_mempcpyc(__fullpath, __path, __path_len, sizeof(char));
+	__dst = (char *)__NAMESPACE_LOCAL_SYM __localdep_mempcpyc(__fullpath, __path, __path_len, sizeof(char));
 	*__dst++ = '/';
-	__dst = (char *)__localdep_mempcpyc(__dst, __file, __file_len, sizeof(char));
+	__dst = (char *)__NAMESPACE_LOCAL_SYM __localdep_mempcpyc(__dst, __file, __file_len, sizeof(char));
 	*__dst = '\0';
-	return __localdep_execve(__fullpath, ___argv, ___envp);
+	return __NAMESPACE_LOCAL_SYM __localdep_execve(__fullpath, ___argv, ___envp);
 }
 __NAMESPACE_LOCAL_END
 __NAMESPACE_LOCAL_BEGIN
@@ -152,22 +152,22 @@ __NOTHROW_RPC(__LIBCCALL __LIBC_LOCAL_NAME(execvpe))(char const *__restrict __fi
 	 * pathname is executed.
 	 * [...] */
 #ifdef _WIN32
-	if (__localdep_strchr(__file, '/') || __localdep_strchr(__file, '\\'))
-		return __localdep_execve(__file, ___argv, ___envp);
+	if (__NAMESPACE_LOCAL_SYM __localdep_strchr(__file, '/') || __NAMESPACE_LOCAL_SYM __localdep_strchr(__file, '\\'))
+		return __NAMESPACE_LOCAL_SYM __localdep_execve(__file, ___argv, ___envp);
 #else /* _WIN32 */
-	if (__localdep_strchr(__file, '/'))
-		return __localdep_execve(__file, ___argv, ___envp);
+	if (__NAMESPACE_LOCAL_SYM __localdep_strchr(__file, '/'))
+		return __NAMESPACE_LOCAL_SYM __localdep_execve(__file, ___argv, ___envp);
 #endif /* !_WIN32 */
-	__env_path = __localdep_getenv("path");
+	__env_path = __NAMESPACE_LOCAL_SYM __localdep_getenv("path");
 	if (__env_path && *__env_path) {
 		__SIZE_TYPE__ __filelen;
-		__filelen = __localdep_strlen(__file);
+		__filelen = __NAMESPACE_LOCAL_SYM __localdep_strlen(__file);
 		for (;;) {
 			char *__path_end;
 #ifdef _WIN32
-			__path_end = __localdep_strchrnul(__env_path, ';');
+			__path_end = __NAMESPACE_LOCAL_SYM __localdep_strchrnul(__env_path, ';');
 #else /* _WIN32 */
-			__path_end = __localdep_strchrnul(__env_path, ':');
+			__path_end = __NAMESPACE_LOCAL_SYM __localdep_strchrnul(__env_path, ':');
 #endif /* !_WIN32 */
 			(__NAMESPACE_LOCAL_SYM __execvpe_impl)(__env_path, (__SIZE_TYPE__)(__path_end - __env_path),
 			                                       __file, __filelen, ___argv, ___envp);

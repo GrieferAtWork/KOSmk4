@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xce937a58 */
+/* HASH CRC-32:0x2cdc2fa1 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -52,7 +52,7 @@ __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(setitimer))(int __which, struct itime
 	__new32.it_interval.tv_usec = __newval->it_interval.tv_usec;
 	__new32.it_value.tv_sec     = (__time32_t)__newval->it_value.tv_sec;
 	__new32.it_value.tv_usec    = __newval->it_value.tv_usec;
-	__result = __localdep_setitimer32(__which, &__new32, __oldval ? &__old32 : __NULLPTR);
+	__result = __NAMESPACE_LOCAL_SYM __localdep_setitimer32(__which, &__new32, __oldval ? &__old32 : __NULLPTR);
 	if (__likely(!__result) && __oldval) {
 		__oldval->it_interval.tv_sec  = (__time64_t)__old32.it_interval.tv_sec;
 		__oldval->it_interval.tv_usec = __old32.it_interval.tv_usec;
@@ -67,7 +67,7 @@ __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(setitimer))(int __which, struct itime
 	__new64.it_interval.tv_usec = __newval->it_interval.tv_usec;
 	__new64.it_value.tv_sec     = (__time64_t)__newval->it_value.tv_sec;
 	__new64.it_value.tv_usec    = __newval->it_value.tv_usec;
-	__result = __localdep_setitimer64(__which, &__new64, __oldval ? &__old64 : __NULLPTR);
+	__result = __NAMESPACE_LOCAL_SYM __localdep_setitimer64(__which, &__new64, __oldval ? &__old64 : __NULLPTR);
 	if (__likely(!__result) && __oldval) {
 		__oldval->it_interval.tv_sec  = (__time32_t)__old64.it_interval.tv_sec;
 		__oldval->it_interval.tv_usec = __old64.it_interval.tv_usec;

@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xade57ac */
+/* HASH CRC-32:0x88dd0680 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -75,9 +75,9 @@ __LOCAL_LIBC(format_wescape) __ATTR_NONNULL((1)) __SSIZE_TYPE__
 		__WCHAR_TYPE__ const *__old_text = __text;
 		__UINT32_TYPE__ __ch;
 #if __SIZEOF_WCHAR_T__ == 1
-		__ch = __localdep_unicode_readutf8_n((__WCHAR_TYPE__ const **)&__text, __textend);
+		__ch = __NAMESPACE_LOCAL_SYM __localdep_unicode_readutf8_n((__WCHAR_TYPE__ const **)&__text, __textend);
 #elif __SIZEOF_WCHAR_T__ == 2
-		__ch = __localdep_unicode_readutf16_n((__CHAR16_TYPE__ const **)&__text,
+		__ch = __NAMESPACE_LOCAL_SYM __localdep_unicode_readutf16_n((__CHAR16_TYPE__ const **)&__text,
 		                         (__CHAR16_TYPE__ const *)__textend);
 #else /* ... */
 		__ch = (__UINT32_TYPE__)*__text++;
@@ -104,9 +104,9 @@ __encode_oct:
 						__WCHAR_TYPE__ const *__new_text = __text;
 						__UINT32_TYPE__ __next_ch;
 #if __SIZEOF_WCHAR_T__ == 1
-						__next_ch = __localdep_unicode_readutf8_n((__WCHAR_TYPE__ const **)&__new_text, __textend);
+						__next_ch = __NAMESPACE_LOCAL_SYM __localdep_unicode_readutf8_n((__WCHAR_TYPE__ const **)&__new_text, __textend);
 #elif __SIZEOF_WCHAR_T__ == 2
-						__next_ch = __localdep_unicode_readutf16_n((__CHAR16_TYPE__ const **)&__new_text,
+						__next_ch = __NAMESPACE_LOCAL_SYM __localdep_unicode_readutf16_n((__CHAR16_TYPE__ const **)&__new_text,
 						                              (__CHAR16_TYPE__ const *)__textend);
 #else /* ... */
 						__next_ch = (__UINT32_TYPE__)*__new_text++;
@@ -241,9 +241,9 @@ __encode_hex:
 					__WCHAR_TYPE__ const *__new_text = __text;
 					__UINT32_TYPE__ __next_ch;
 #if __SIZEOF_WCHAR_T__ == 1
-					__next_ch = __localdep_unicode_readutf8_n((__WCHAR_TYPE__ const **)&__new_text, __textend);
+					__next_ch = __NAMESPACE_LOCAL_SYM __localdep_unicode_readutf8_n((__WCHAR_TYPE__ const **)&__new_text, __textend);
 #elif __SIZEOF_WCHAR_T__ == 2
-					__next_ch = __localdep_unicode_readutf16_n((__CHAR16_TYPE__ const **)&__new_text,
+					__next_ch = __NAMESPACE_LOCAL_SYM __localdep_unicode_readutf16_n((__CHAR16_TYPE__ const **)&__new_text,
 					                              (__CHAR16_TYPE__ const *)__textend);
 #else /* ... */
 					__next_ch = (__UINT32_TYPE__)*__new_text++;

@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xa797922a */
+/* HASH CRC-32:0x8f10158a */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -40,7 +40,7 @@ __NAMESPACE_LOCAL_BEGIN
 __LOCAL_LIBC(__memcpy_chk) __ATTR_LEAF __ATTR_RETNONNULL __ATTR_NONNULL((1, 2)) void *
 __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(__memcpy_chk))(void *__restrict __dst, void const *__restrict __src, __SIZE_TYPE__ __n_bytes, __SIZE_TYPE__ __dst_objsize) {
 	__ssp_chk_dstbuf("memcpy", __dst, __n_bytes, __dst_objsize);
-	return __localdep_memcpy(__dst, __src, __n_bytes);
+	return __NAMESPACE_LOCAL_SYM __localdep_memcpy(__dst, __src, __n_bytes);
 }
 __NAMESPACE_LOCAL_END
 #ifndef __local___localdep___memcpy_chk_defined

@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xabf84d0e */
+/* HASH CRC-32:0x18325603 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -58,10 +58,10 @@ __NOTHROW_RPC(__VLIBCCALL __LIBC_LOCAL_NAME(lfutex))(__uintptr_t *__uaddr, __sys
 	__val2 = __builtin_va_arg(__args, __uintptr_t);
 	__builtin_va_end(__args);
 	if (!__timeout || !LFUTEX_USES_TIMEOUT(__futex_op))
-		return __localdep_lfutex32(__uaddr, __futex_op, __val, (struct __timespec32 *)__NULLPTR, __val2);
+		return __NAMESPACE_LOCAL_SYM __localdep_lfutex32(__uaddr, __futex_op, __val, (struct __timespec32 *)__NULLPTR, __val2);
 	__tms32.tv_sec  = (__time32_t)__timeout->tv_sec;
 	__tms32.tv_nsec = __timeout->tv_nsec;
-	return __localdep_lfutex32(__uaddr, __futex_op, __val, &__tms32, __val2);
+	return __NAMESPACE_LOCAL_SYM __localdep_lfutex32(__uaddr, __futex_op, __val, &__tms32, __val2);
 #else /* __CRT_HAVE_lfutex */
 	__builtin_va_list __args;
 	__uintptr_t __val2;
@@ -72,10 +72,10 @@ __NOTHROW_RPC(__VLIBCCALL __LIBC_LOCAL_NAME(lfutex))(__uintptr_t *__uaddr, __sys
 	__val2 = __builtin_va_arg(__args, __uintptr_t);
 	__builtin_va_end(__args);
 	if (!__timeout || !LFUTEX_USES_TIMEOUT(__futex_op))
-		return __localdep_lfutex64(__uaddr, __futex_op, __val, (struct __timespec64 const *)__NULLPTR, __val2);
+		return __NAMESPACE_LOCAL_SYM __localdep_lfutex64(__uaddr, __futex_op, __val, (struct __timespec64 const *)__NULLPTR, __val2);
 	__tms64.tv_sec  = (__time64_t)__timeout->tv_sec;
 	__tms64.tv_nsec = __timeout->tv_nsec;
-	return __localdep_lfutex64(__uaddr, __futex_op, __val, &__tms64, __val2);
+	return __NAMESPACE_LOCAL_SYM __localdep_lfutex64(__uaddr, __futex_op, __val, &__tms64, __val2);
 #endif /* !__CRT_HAVE_lfutex */
 }
 __NAMESPACE_LOCAL_END

@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x5adb7eae */
+/* HASH CRC-32:0x6e4064d7 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -33,7 +33,7 @@ __CREDIRECT_DOS(__ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1)),__SIZE_TYPE__,__N
 __NAMESPACE_LOCAL_END
 #include <libc/local/wchar/wcsnlen.h>
 __NAMESPACE_LOCAL_BEGIN
-#define __localdep_c16snlen (*(__SIZE_TYPE__(__LIBDCALL *)(__CHAR16_TYPE__ const *__restrict, __SIZE_TYPE__))&__LIBC_LOCAL_NAME(wcsnlen))
+#define __localdep_c16snlen __NAMESPACE_LOCAL_TYPEHAX(__SIZE_TYPE__(__LIBDCALL*)(__CHAR16_TYPE__ const *__restrict,__SIZE_TYPE__),__SIZE_TYPE__(__LIBDCALL&)(__CHAR16_TYPE__ const *__restrict,__SIZE_TYPE__),wcsnlen)
 #else /* ... */
 __NAMESPACE_LOCAL_END
 #include <libc/local/parts.uchar.string/c16snlen.h>
@@ -55,8 +55,8 @@ __NAMESPACE_LOCAL_BEGIN
 __LOCAL_LIBC(c16sxfrm) __ATTR_NONNULL((2)) __SIZE_TYPE__
 __NOTHROW_NCX(__LIBDCALL __LIBC_LOCAL_NAME(c16sxfrm))(__CHAR16_TYPE__ *__dst, __CHAR16_TYPE__ const *__restrict __src, __SIZE_TYPE__ __maxlen) {
 	/* XXX: Implement me */
-	__SIZE_TYPE__ __n = __localdep_c16snlen(__src, __maxlen);
-	__localdep_memcpy(__dst, __src, __n * sizeof(__CHAR16_TYPE__));
+	__SIZE_TYPE__ __n = __NAMESPACE_LOCAL_SYM __localdep_c16snlen(__src, __maxlen);
+	__NAMESPACE_LOCAL_SYM __localdep_memcpy(__dst, __src, __n * sizeof(__CHAR16_TYPE__));
 	return __n;
 }
 __NAMESPACE_LOCAL_END

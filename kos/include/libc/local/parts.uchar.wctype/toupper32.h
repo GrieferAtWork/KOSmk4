@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xa15ce9f9 */
+/* HASH CRC-32:0x77cb58a8 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -33,7 +33,7 @@ __CREDIRECT_KOS(__ATTR_CONST __ATTR_WUNUSED,__WINT32_TYPE__,__NOTHROW_NCX,__loca
 __NAMESPACE_LOCAL_END
 #include <libc/local/wchar/btowc.h>
 __NAMESPACE_LOCAL_BEGIN
-#define __localdep_btoc32 (*(__WINT32_TYPE__(__LIBKCALL *)(int))&__LIBC_LOCAL_NAME(btowc))
+#define __localdep_btoc32 __NAMESPACE_LOCAL_TYPEHAX(__WINT32_TYPE__(__LIBKCALL*)(int),__WINT32_TYPE__(__LIBKCALL&)(int),btowc)
 #else /* ... */
 __NAMESPACE_LOCAL_END
 #include <libc/local/parts.uchar.wchar/btoc32.h>
@@ -51,7 +51,7 @@ __CREDIRECT_KOS(__ATTR_CONST __ATTR_WUNUSED,int,__NOTHROW_NCX,__localdep_c32tob,
 __NAMESPACE_LOCAL_END
 #include <libc/local/wchar/wctob.h>
 __NAMESPACE_LOCAL_BEGIN
-#define __localdep_c32tob (*(int(__LIBKCALL *)(__WINT32_TYPE__))&__LIBC_LOCAL_NAME(wctob))
+#define __localdep_c32tob __NAMESPACE_LOCAL_TYPEHAX(int(__LIBKCALL*)(__WINT32_TYPE__),int(__LIBKCALL&)(__WINT32_TYPE__),wctob)
 #else /* ... */
 __NAMESPACE_LOCAL_END
 #include <libc/local/parts.uchar.wchar/c32tob.h>
@@ -67,7 +67,7 @@ __NOTHROW(__LIBKCALL __LIBC_LOCAL_NAME(toupper32))(__WINT32_TYPE__ __wc) {
 #ifdef __crt_towupper
 	return __crt_towupper(__wc);
 #else /* __crt_towupper */
-	return __localdep_btoc32(__LIBC_LOCAL_NAME(toupper32)(__localdep_c32tob(__wc)));
+	return __NAMESPACE_LOCAL_SYM __localdep_btoc32(__LIBC_LOCAL_NAME(toupper32)(__NAMESPACE_LOCAL_SYM __localdep_c32tob(__wc)));
 #endif /* !__crt_towupper */
 }
 __NAMESPACE_LOCAL_END

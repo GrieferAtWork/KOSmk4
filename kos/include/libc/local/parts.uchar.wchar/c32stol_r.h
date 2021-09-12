@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x691b67d4 */
+/* HASH CRC-32:0x3f4215f */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -39,7 +39,7 @@ __CREDIRECT_KOS(__ATTR_LEAF __ATTR_NONNULL((1)),__INT32_TYPE__,__NOTHROW_NCX,__l
 __NAMESPACE_LOCAL_END
 #include <libc/local/wchar/wcsto32_r.h>
 __NAMESPACE_LOCAL_BEGIN
-#define __localdep_c32sto32_r (*(__INT32_TYPE__(__LIBKCALL *)(__CHAR32_TYPE__ const *__restrict, __CHAR32_TYPE__ **, __STDC_INT_AS_UINT_T, __errno_t *))&__LIBC_LOCAL_NAME(wcsto32_r))
+#define __localdep_c32sto32_r __NAMESPACE_LOCAL_TYPEHAX(__INT32_TYPE__(__LIBKCALL*)(__CHAR32_TYPE__ const *__restrict,__CHAR32_TYPE__ **,__STDC_INT_AS_UINT_T,__errno_t *),__INT32_TYPE__(__LIBKCALL&)(__CHAR32_TYPE__ const *__restrict,__CHAR32_TYPE__ **,__STDC_INT_AS_UINT_T,__errno_t *),wcsto32_r)
 #else /* ... */
 __NAMESPACE_LOCAL_END
 #include <libc/local/parts.uchar.wchar/c32sto32_r.h>
@@ -63,7 +63,7 @@ __CREDIRECT_KOS(__ATTR_LEAF __ATTR_NONNULL((1)),__INT64_TYPE__,__NOTHROW_NCX,__l
 __NAMESPACE_LOCAL_END
 #include <libc/local/wchar/wcsto64_r.h>
 __NAMESPACE_LOCAL_BEGIN
-#define __localdep_c32sto64_r (*(__INT64_TYPE__(__LIBKCALL *)(__CHAR32_TYPE__ const *__restrict, __CHAR32_TYPE__ **, __STDC_INT_AS_UINT_T, __errno_t *))&__LIBC_LOCAL_NAME(wcsto64_r))
+#define __localdep_c32sto64_r __NAMESPACE_LOCAL_TYPEHAX(__INT64_TYPE__(__LIBKCALL*)(__CHAR32_TYPE__ const *__restrict,__CHAR32_TYPE__ **,__STDC_INT_AS_UINT_T,__errno_t *),__INT64_TYPE__(__LIBKCALL&)(__CHAR32_TYPE__ const *__restrict,__CHAR32_TYPE__ **,__STDC_INT_AS_UINT_T,__errno_t *),wcsto64_r)
 #else /* ... */
 __NAMESPACE_LOCAL_END
 #include <libc/local/parts.uchar.wchar/c32sto64_r.h>
@@ -79,11 +79,11 @@ __NAMESPACE_LOCAL_BEGIN
 __LOCAL_LIBC(c32stol_r) __ATTR_LEAF __ATTR_NONNULL((1)) long
 __NOTHROW_NCX(__LIBKCALL __LIBC_LOCAL_NAME(c32stol_r))(__CHAR32_TYPE__ const *__restrict __nptr, __CHAR32_TYPE__ **__endptr, __STDC_INT_AS_UINT_T __base, __errno_t *__error) {
 #if __SIZEOF_LONG__ >= 8
-	return (long)__localdep_c32sto64_r(__nptr, __endptr, __base, __error);
+	return (long)__NAMESPACE_LOCAL_SYM __localdep_c32sto64_r(__nptr, __endptr, __base, __error);
 #elif __SIZEOF_LONG__ >= 4
-	return (long)__localdep_c32sto32_r(__nptr, __endptr, __base, __error);
+	return (long)__NAMESPACE_LOCAL_SYM __localdep_c32sto32_r(__nptr, __endptr, __base, __error);
 #else /* ... */
-	__INT32_TYPE__ __result = __localdep_c32sto32_r(__nptr, __endptr, __base, __error);
+	__INT32_TYPE__ __result = __NAMESPACE_LOCAL_SYM __localdep_c32sto32_r(__nptr, __endptr, __base, __error);
 	if (__result > __LONG_MAX__) {
 		if (__error) {
 #ifdef __ERANGE

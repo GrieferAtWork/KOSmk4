@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x2cbfe544 */
+/* HASH CRC-32:0x4371e820 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -46,7 +46,7 @@ __NOTHROW_NCX(__FORMATPRINTER_CC __LIBC_LOCAL_NAME(format_snprintf_printer))(voi
 	__ctrl = (struct __local_format_snprintf_data *)__arg;
 	if (__result > __ctrl->__sd_bufsiz)
 		__result = __ctrl->__sd_bufsiz;
-	__localdep_memcpyc(__ctrl->__sd_buffer, __data, __result, sizeof(char));
+	__NAMESPACE_LOCAL_SYM __localdep_memcpyc(__ctrl->__sd_buffer, __data, __result, sizeof(char));
 	__ctrl->__sd_buffer += __datalen;
 	__ctrl->__sd_bufsiz -= __result;
 	return (__SSIZE_TYPE__)__datalen;

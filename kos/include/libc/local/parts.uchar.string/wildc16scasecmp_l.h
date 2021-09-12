@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x20701683 */
+/* HASH CRC-32:0x9053909d */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -40,7 +40,7 @@ __CREDIRECT_DOS(__ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1, 2)),int,__NOTHROW_
 __NAMESPACE_LOCAL_END
 #include <libc/local/wchar/wcscasecmp_l.h>
 __NAMESPACE_LOCAL_BEGIN
-#define __localdep_c16scasecmp_l (*(int(__LIBDCALL *)(__CHAR16_TYPE__ const *, __CHAR16_TYPE__ const *, __locale_t))&__LIBC_LOCAL_NAME(wcscasecmp_l))
+#define __localdep_c16scasecmp_l __NAMESPACE_LOCAL_TYPEHAX(int(__LIBDCALL*)(__CHAR16_TYPE__ const *,__CHAR16_TYPE__ const *,__locale_t),int(__LIBDCALL&)(__CHAR16_TYPE__ const *,__CHAR16_TYPE__ const *,__locale_t),wcscasecmp_l)
 #else /* ... */
 __NAMESPACE_LOCAL_END
 #include <libc/local/parts.uchar.string/c16scasecmp_l.h>
@@ -102,7 +102,7 @@ __CREDIRECT_DOS(__ATTR_PURE __ATTR_WUNUSED,__WINT16_TYPE__,__NOTHROW_NCX,__local
 __NAMESPACE_LOCAL_END
 #include <libc/local/wctype/towlower_l.h>
 __NAMESPACE_LOCAL_BEGIN
-#define __localdep_tolower16_l (*(__WINT16_TYPE__(__LIBDCALL *)(__WINT16_TYPE__, __locale_t))&__LIBC_LOCAL_NAME(towlower_l))
+#define __localdep_tolower16_l __NAMESPACE_LOCAL_TYPEHAX(__WINT16_TYPE__(__LIBDCALL*)(__WINT16_TYPE__,__locale_t),__WINT16_TYPE__(__LIBDCALL&)(__WINT16_TYPE__,__locale_t),towlower_l)
 #else /* ... */
 __NAMESPACE_LOCAL_END
 #include <libc/local/parts.uchar.wctype/tolower16_l.h>
@@ -130,12 +130,12 @@ __NOTHROW_NCX(__LIBDCALL __LIBC_LOCAL_NAME(wildc16scasecmp_l))(__CHAR16_TYPE__ c
 				return 0; /* Pattern ends with '*' (matches everything) */
 			if (__card_post == '?')
 				goto __next; /* Match any --> already found */
-			__card_post = __localdep_tolower16_l(__card_post, __locale);
+			__card_post = __NAMESPACE_LOCAL_SYM __localdep_tolower16_l(__card_post, __locale);
 			for (;;) {
 				__CHAR16_TYPE__ __ch = *__string++;
-				if (__card_post == __ch || __card_post == __localdep_tolower16_l(__ch, __locale)) {
+				if (__card_post == __ch || __card_post == __NAMESPACE_LOCAL_SYM __localdep_tolower16_l(__ch, __locale)) {
 					/* Recursively check if the rest of the string and pattern match */
-					if (!__localdep_c16scasecmp_l(__string, __pattern, __locale))
+					if (!__NAMESPACE_LOCAL_SYM __localdep_c16scasecmp_l(__string, __pattern, __locale))
 						return 0;
 				} else if (!__ch) {
 					return -(int)(__CHAR16_TYPE__)__card_post; /* Wildcard suffix not found */
@@ -145,8 +145,8 @@ __NOTHROW_NCX(__LIBDCALL __LIBC_LOCAL_NAME(wildc16scasecmp_l))(__CHAR16_TYPE__ c
 		__pattern_ch = *__pattern;
 		__wcsing_ch = *__string;
 		if (__pattern_ch == __wcsing_ch || __pattern_ch == '?' ||
-		   (__pattern_ch = __localdep_tolower16_l(__pattern_ch, __locale),
-		    __wcsing_ch = __localdep_tolower16_l(__wcsing_ch, __locale),
+		   (__pattern_ch = __NAMESPACE_LOCAL_SYM __localdep_tolower16_l(__pattern_ch, __locale),
+		    __wcsing_ch = __NAMESPACE_LOCAL_SYM __localdep_tolower16_l(__wcsing_ch, __locale),
 		    __pattern_ch == __wcsing_ch)) {
 __next:
 			++__string;

@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xfbcc3390 */
+/* HASH CRC-32:0x292ca915 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -52,7 +52,7 @@ __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(adjtime))(struct timeval const *__del
 		__delta32.tv_sec  = (__time32_t)__delta->tv_sec;
 		__delta32.tv_usec = __delta->tv_usec;
 	}
-	__result = __localdep_adjtime32(__which, __delta ? &__delta32 : __NULLPTR, __olddelta ? &__olddelta32 : __NULLPTR);
+	__result = __NAMESPACE_LOCAL_SYM __localdep_adjtime32(__which, __delta ? &__delta32 : __NULLPTR, __olddelta ? &__olddelta32 : __NULLPTR);
 	if (__likely(!__result) && __olddelta) {
 		__olddelta->tv_sec  = (__time64_t)__olddelta32.tv_sec;
 		__olddelta->tv_usec = __olddelta32.tv_usec;
@@ -65,7 +65,7 @@ __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(adjtime))(struct timeval const *__del
 		__delta64.tv_sec  = (__time64_t)__delta->tv_sec;
 		__delta64.tv_usec = __delta->tv_usec;
 	}
-	__result = __localdep_adjtime64(__which, __delta ? &__delta64 : __NULLPTR, __olddelta ? &__olddelta64 : __NULLPTR);
+	__result = __NAMESPACE_LOCAL_SYM __localdep_adjtime64(__which, __delta ? &__delta64 : __NULLPTR, __olddelta ? &__olddelta64 : __NULLPTR);
 	if (__likely(!__result) && __olddelta) {
 		__olddelta->tv_sec  = (__time32_t)__olddelta64.tv_sec;
 		__olddelta->tv_usec = __olddelta64.tv_usec;

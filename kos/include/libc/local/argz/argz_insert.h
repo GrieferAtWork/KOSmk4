@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xe28b06d5 */
+/* HASH CRC-32:0x9f78c775 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -103,7 +103,7 @@ __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(argz_insert))(char **__restrict __par
 	__SIZE_TYPE__ __entry_len;
 	__SIZE_TYPE__ __insert_offset;
 	if (!__before)
-		return __localdep_argz_add(__pargz, __pargz_len, __entry);
+		return __NAMESPACE_LOCAL_SYM __localdep_argz_add(__pargz, __pargz_len, __entry);
 	__argz     = *__pargz;
 	__argz_len = *__pargz_len;
 	if (__before < __argz || __before >= __argz + __argz_len) {
@@ -127,10 +127,10 @@ __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(argz_insert))(char **__restrict __par
 	 */
 	while (__before > __argz && __before[-1])
 		--__before;
-	__entry_len = __localdep_strlen(__entry) + 1;
+	__entry_len = __NAMESPACE_LOCAL_SYM __localdep_strlen(__entry) + 1;
 	__argz_len += __entry_len;
 	__insert_offset = (__SIZE_TYPE__)(__before - __argz);
-	__argz = (char *)__localdep_realloc(__argz, __argz_len * sizeof(char));
+	__argz = (char *)__NAMESPACE_LOCAL_SYM __localdep_realloc(__argz, __argz_len * sizeof(char));
 	if __unlikely(!__argz) {
 #ifdef __ENOMEM
 		return __ENOMEM;
@@ -142,12 +142,12 @@ __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(argz_insert))(char **__restrict __par
 	*__pargz     = __argz;
 	*__pargz_len = __argz_len;
 	/* Make space for the new entry. */
-	__localdep_memmoveupc(__argz + __insert_offset + __entry_len,
+	__NAMESPACE_LOCAL_SYM __localdep_memmoveupc(__argz + __insert_offset + __entry_len,
 	           __argz + __insert_offset,
 	           (__argz_len - (__insert_offset + __entry_len)),
 	           sizeof(char));
 	/* Insert the new entry. */
-	__localdep_memcpyc(__argz + __insert_offset,
+	__NAMESPACE_LOCAL_SYM __localdep_memcpyc(__argz + __insert_offset,
 	        __entry, __entry_len,
 	        sizeof(char));
 	return 0;

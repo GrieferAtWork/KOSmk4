@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x38987080 */
+/* HASH CRC-32:0x2b50d2be */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -39,7 +39,7 @@ __NAMESPACE_LOCAL_END
 __NAMESPACE_LOCAL_BEGIN
 __LOCAL_LIBC(ether_aton_r) __ATTR_WUNUSED __ATTR_NONNULL((1, 2)) struct ether_addr *
 __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(ether_aton_r))(char const *__restrict __asc, struct ether_addr *__restrict __addr) {
-	return __localdep_ether_paton_r((char const **)&__asc, __addr);
+	return __NAMESPACE_LOCAL_SYM __localdep_ether_paton_r((char const **)&__asc, __addr);
 }
 __NAMESPACE_LOCAL_END
 #ifndef __local___localdep_ether_aton_r_defined

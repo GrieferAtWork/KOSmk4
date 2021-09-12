@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x9a0fc235 */
+/* HASH CRC-32:0x775beda0 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -33,7 +33,7 @@ __CREDIRECT_KOS(__ATTR_CONST __ATTR_WUNUSED,int,__NOTHROW_NCX,__localdep_c32tob,
 __NAMESPACE_LOCAL_END
 #include <libc/local/wchar/wctob.h>
 __NAMESPACE_LOCAL_BEGIN
-#define __localdep_c32tob (*(int(__LIBKCALL *)(__WINT32_TYPE__))&__LIBC_LOCAL_NAME(wctob))
+#define __localdep_c32tob __NAMESPACE_LOCAL_TYPEHAX(int(__LIBKCALL*)(__WINT32_TYPE__),int(__LIBKCALL&)(__WINT32_TYPE__),wctob)
 #else /* ... */
 __NAMESPACE_LOCAL_END
 #include <libc/local/parts.uchar.wchar/c32tob.h>
@@ -49,7 +49,7 @@ __NOTHROW(__LIBKCALL __LIBC_LOCAL_NAME(iscntrl32))(__WINT32_TYPE__ __wc) {
 #ifdef __crt_iswcntrl
 	return __crt_iswcntrl(__wc);
 #else /* __crt_iswcntrl */
-	return __LIBC_LOCAL_NAME(iscntrl32)(__localdep_c32tob(__wc));
+	return __LIBC_LOCAL_NAME(iscntrl32)(__NAMESPACE_LOCAL_SYM __localdep_c32tob(__wc));
 #endif /* !__crt_iswcntrl */
 }
 __NAMESPACE_LOCAL_END

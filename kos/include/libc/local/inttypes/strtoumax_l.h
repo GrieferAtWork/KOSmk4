@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xf5e597d6 */
+/* HASH CRC-32:0x380f660f */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -44,12 +44,12 @@ __CREDIRECT(__ATTR_LEAF __ATTR_NONNULL((1)),__UINTMAX_TYPE__,__NOTHROW_NCX,__loc
 __NAMESPACE_LOCAL_END
 #include <libc/local/stdlib/strtou64.h>
 __NAMESPACE_LOCAL_BEGIN
-#define __localdep_strtoumax (*(__UINTMAX_TYPE__(__LIBCCALL *)(char const *__restrict, char **, __STDC_INT_AS_UINT_T))&__LIBC_LOCAL_NAME(strtou64))
+#define __localdep_strtoumax __NAMESPACE_LOCAL_TYPEHAX(__UINTMAX_TYPE__(__LIBCCALL*)(char const *__restrict,char **,__STDC_INT_AS_UINT_T),__UINTMAX_TYPE__(__LIBCCALL&)(char const *__restrict,char **,__STDC_INT_AS_UINT_T),strtou64)
 #elif __SIZEOF_INTMAX_T__ == 4
 __NAMESPACE_LOCAL_END
 #include <libc/local/stdlib/strtou32.h>
 __NAMESPACE_LOCAL_BEGIN
-#define __localdep_strtoumax (*(__UINTMAX_TYPE__(__LIBCCALL *)(char const *__restrict, char **, __STDC_INT_AS_UINT_T))&__LIBC_LOCAL_NAME(strtou32))
+#define __localdep_strtoumax __NAMESPACE_LOCAL_TYPEHAX(__UINTMAX_TYPE__(__LIBCCALL*)(char const *__restrict,char **,__STDC_INT_AS_UINT_T),__UINTMAX_TYPE__(__LIBCCALL&)(char const *__restrict,char **,__STDC_INT_AS_UINT_T),strtou32)
 #else /* ... */
 __NAMESPACE_LOCAL_END
 #include <libc/local/inttypes/strtoumax.h>
@@ -60,7 +60,7 @@ __NAMESPACE_LOCAL_BEGIN
 __LOCAL_LIBC(strtoumax_l) __ATTR_LEAF __ATTR_NONNULL((1)) __UINTMAX_TYPE__
 __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(strtoumax_l))(char const *__restrict __nptr, char **__endptr, __STDC_INT_AS_UINT_T __base, __locale_t __locale) {
 	(void)__locale;
-	return __localdep_strtoumax(__nptr, __endptr, __base);
+	return __NAMESPACE_LOCAL_SYM __localdep_strtoumax(__nptr, __endptr, __base);
 }
 __NAMESPACE_LOCAL_END
 #ifndef __local___localdep_strtoumax_l_defined

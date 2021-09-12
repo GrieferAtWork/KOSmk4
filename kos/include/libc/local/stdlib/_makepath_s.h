@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xd1ea0e19 */
+/* HASH CRC-32:0xc10ed5cf */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -60,7 +60,7 @@ __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(_makepath_s))(char *__buf, __SIZE_TYP
 	do {                                                 \
 		if __unlikely(__buflen < __n)                          \
 			goto __err_buflen;                             \
-		__buf = (char *)__localdep_mempcpyc(__buf, __p, __n, sizeof(char)); \
+		__buf = (char *)__NAMESPACE_LOCAL_SYM __localdep_mempcpyc(__buf, __p, __n, sizeof(char)); \
 	} __WHILE0
 #define __path_putc(__ch)          \
 	do {                       \
@@ -73,17 +73,17 @@ __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(_makepath_s))(char *__buf, __SIZE_TYP
 		__path_putc(':');
 	}
 	if (__dir && *__dir) {
-		__SIZE_TYPE__ __len = __localdep_strlen(__dir);
+		__SIZE_TYPE__ __len = __NAMESPACE_LOCAL_SYM __localdep_strlen(__dir);
 		__path_putn(__dir, __len);
 		if (__dir[__len - 1] != '/' && __dir[__len - 1] != '\\')
 			__path_putc('\\');
 	}
 	if (__file && *__file) {
-		__SIZE_TYPE__ __len = __localdep_strlen(__file);
+		__SIZE_TYPE__ __len = __NAMESPACE_LOCAL_SYM __localdep_strlen(__file);
 		__path_putn(__file, __len);
 	}
 	if (__ext && *__ext) {
-		__SIZE_TYPE__ __len = __localdep_strlen(__ext);
+		__SIZE_TYPE__ __len = __NAMESPACE_LOCAL_SYM __localdep_strlen(__ext);
 		if (*__ext != '.')
 			__path_putc('.');
 		__path_putn(__ext, __len);

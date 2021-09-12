@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x5b14f63a */
+/* HASH CRC-32:0xc329236a */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -42,7 +42,7 @@ __CREDIRECT_DOS(,__SIZE_TYPE__,__NOTHROW_NCX,__localdep_uchar_mbrtoc16,(__CHAR16
 __NAMESPACE_LOCAL_END
 #include <libc/local/wchar/mbrtowc.h>
 __NAMESPACE_LOCAL_BEGIN
-#define __localdep_uchar_mbrtoc16 (*(__SIZE_TYPE__(__LIBDCALL *)(__CHAR16_TYPE__ *, char const *__restrict, __SIZE_TYPE__, struct __mbstate *))&__LIBC_LOCAL_NAME(mbrtowc))
+#define __localdep_uchar_mbrtoc16 __NAMESPACE_LOCAL_TYPEHAX(__SIZE_TYPE__(__LIBDCALL*)(__CHAR16_TYPE__ *,char const *__restrict,__SIZE_TYPE__,struct __mbstate *),__SIZE_TYPE__(__LIBDCALL&)(__CHAR16_TYPE__ *,char const *__restrict,__SIZE_TYPE__,struct __mbstate *),mbrtowc)
 #else /* ... */
 __NAMESPACE_LOCAL_END
 #include <libc/local/uchar/uchar_mbrtoc16.h>
@@ -57,7 +57,7 @@ __NOTHROW_NCX(__LIBDCALL __LIBC_LOCAL_NAME(mbsrtoc16))(__CHAR16_TYPE__ *__restri
 	while (__dstlen) {
 		__SIZE_TYPE__ __error;
 		__CHAR16_TYPE__ __wc;
-		__error = __localdep_uchar_mbrtoc16(&__wc, __src, (__SIZE_TYPE__)-1, __mbs);
+		__error = __NAMESPACE_LOCAL_SYM __localdep_uchar_mbrtoc16(&__wc, __src, (__SIZE_TYPE__)-1, __mbs);
 		if (!__error)
 			break;
 		if (__error == (__SIZE_TYPE__)-1)

@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xbef2e3a5 */
+/* HASH CRC-32:0x67893477 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -122,10 +122,10 @@ __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(argz_replace))(char **__restrict __pa
 	__SIZE_TYPE__ __find_offset;
 	if __unlikely(!__str)
 		return 0; /* no-op */
-	__findlen = __localdep_strlen(__str);
+	__findlen = __NAMESPACE_LOCAL_SYM __localdep_strlen(__str);
 	if __unlikely(!__findlen)
 		return 0; /* no-op */
-	__repllen = __localdep_strlen(__with);
+	__repllen = __NAMESPACE_LOCAL_SYM __localdep_strlen(__with);
 	__find_offset = 0;
 	/* I have no  idea what the  GLibc implementation does  here, and I'm  not
 	 * quite sure it  knows either.  - At first  I though  that this  function
@@ -143,7 +143,7 @@ __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(argz_replace))(char **__restrict __pa
 	 * Anyways... At least my version is readable... */
 	while (__find_offset < *__pargz_len) {
 		char *__pos;
-		__pos = (char *)__localdep_memmem(*__pargz + __find_offset,
+		__pos = (char *)__NAMESPACE_LOCAL_SYM __localdep_memmem(*__pargz + __find_offset,
 		                     *__pargz_len - __find_offset,
 		                     __str, __findlen);
 		if (!__pos)
@@ -152,13 +152,13 @@ __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(argz_replace))(char **__restrict __pa
 			/* Simple case: The replacement string is smaller than the find-string */
 			char *__old_argz, *__new_argz;
 			__SIZE_TYPE__ __diff, __trailing_characters;
-			__pos  = (char *)__localdep_mempcpyc(__pos, __with, __repllen, sizeof(char));
+			__pos  = (char *)__NAMESPACE_LOCAL_SYM __localdep_mempcpyc(__pos, __with, __repllen, sizeof(char));
 			__diff = __findlen - __repllen;
 			*__pargz_len -= __diff;
 			__old_argz = *__pargz;
 			__trailing_characters = *__pargz_len - (__SIZE_TYPE__)(__pos - __old_argz);
-			__localdep_memmovedownc(__pos, __pos + __diff, __trailing_characters, sizeof(char));
-			__new_argz = (char *)__localdep_realloc(__old_argz, *__pargz_len * sizeof(char));
+			__NAMESPACE_LOCAL_SYM __localdep_memmovedownc(__pos, __pos + __diff, __trailing_characters, sizeof(char));
+			__new_argz = (char *)__NAMESPACE_LOCAL_SYM __localdep_realloc(__old_argz, *__pargz_len * sizeof(char));
 			if __likely(__new_argz) {
 				__pos    = __new_argz + (__pos - __old_argz);
 				*__pargz = __new_argz;
@@ -172,7 +172,7 @@ __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(argz_replace))(char **__restrict __pa
 			__old_argzlen = *__pargz_len;
 			__new_argzlen = __old_argzlen + __diff;
 			__old_argz = *__pargz;
-			__new_argz = (char *)__localdep_realloc(__old_argz, __new_argzlen * sizeof(char));
+			__new_argz = (char *)__NAMESPACE_LOCAL_SYM __localdep_realloc(__old_argz, __new_argzlen * sizeof(char));
 			if __unlikely(!__new_argz) {
 #ifdef __ENOMEM
 				return __ENOMEM;
@@ -183,15 +183,15 @@ __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(argz_replace))(char **__restrict __pa
 			__pos = __new_argz + (__pos - __old_argz);
 			/* Make space for extra data */
 			__trailing_characters = __new_argzlen - ((__pos + __repllen) - __new_argz);
-			__localdep_memmoveupc(__pos + __repllen,
+			__NAMESPACE_LOCAL_SYM __localdep_memmoveupc(__pos + __repllen,
 			           __pos + __findlen,
 			           __trailing_characters,
 			           sizeof(char));
 			/* Fill in the replacement string. */
-			__pos = (char *)__localdep_mempcpyc(__pos, __with, __repllen, sizeof(char));
+			__pos = (char *)__NAMESPACE_LOCAL_SYM __localdep_mempcpyc(__pos, __with, __repllen, sizeof(char));
 		} else {
 			/* Simple case: The replacement string has the same length as the find-string */
-			__pos = (char *)__localdep_mempcpyc(__pos, __with, __repllen, sizeof(char));
+			__pos = (char *)__NAMESPACE_LOCAL_SYM __localdep_mempcpyc(__pos, __with, __repllen, sizeof(char));
 		}
 		if (__replace_count)
 			++*__replace_count;

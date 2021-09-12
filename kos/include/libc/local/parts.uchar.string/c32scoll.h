@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xcc4bba52 */
+/* HASH CRC-32:0xb3dabd7a */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -32,7 +32,7 @@ __CREDIRECT_KOS(__ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1, 2)),int,__NOTHROW_
 __NAMESPACE_LOCAL_END
 #include <libc/local/wchar/wcscmp.h>
 __NAMESPACE_LOCAL_BEGIN
-#define __localdep_c32scmp (*(int(__LIBKCALL *)(__CHAR32_TYPE__ const *, __CHAR32_TYPE__ const *))&__LIBC_LOCAL_NAME(wcscmp))
+#define __localdep_c32scmp __NAMESPACE_LOCAL_TYPEHAX(int(__LIBKCALL*)(__CHAR32_TYPE__ const *,__CHAR32_TYPE__ const *),int(__LIBKCALL&)(__CHAR32_TYPE__ const *,__CHAR32_TYPE__ const *),wcscmp)
 #else /* ... */
 __NAMESPACE_LOCAL_END
 #include <libc/local/parts.uchar.string/c32scmp.h>
@@ -42,7 +42,7 @@ __NAMESPACE_LOCAL_BEGIN
 #endif /* !__local___localdep_c32scmp_defined */
 __LOCAL_LIBC(c32scoll) __ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1, 2)) int
 __NOTHROW_NCX(__LIBKCALL __LIBC_LOCAL_NAME(c32scoll))(__CHAR32_TYPE__ const *__s1, __CHAR32_TYPE__ const *__s2) {
-	return __localdep_c32scmp(__s1, __s2);
+	return __NAMESPACE_LOCAL_SYM __localdep_c32scmp(__s1, __s2);
 }
 __NAMESPACE_LOCAL_END
 #ifndef __local___localdep_c32scoll_defined

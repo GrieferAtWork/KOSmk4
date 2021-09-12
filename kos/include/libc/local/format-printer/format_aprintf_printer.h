@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xbe8f49b5 */
+/* HASH CRC-32:0x24c46f5 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -55,11 +55,11 @@ __NAMESPACE_LOCAL_BEGIN
 __LOCAL_LIBC(format_aprintf_printer) __ATTR_WUNUSED __ATTR_NONNULL((1, 2)) __SSIZE_TYPE__
 __NOTHROW_NCX(__FORMATPRINTER_CC __LIBC_LOCAL_NAME(format_aprintf_printer))(void *__arg, char const *__restrict __data, __SIZE_TYPE__ __datalen) {
 	char *__buf;
-	__buf = __localdep_format_aprintf_alloc((struct format_aprintf_data *)__arg,
+	__buf = __NAMESPACE_LOCAL_SYM __localdep_format_aprintf_alloc((struct format_aprintf_data *)__arg,
 	                           __datalen);
 	if __unlikely(!__buf)
 		goto __err;
-	__localdep_memcpyc(__buf, __data, __datalen, sizeof(char));
+	__NAMESPACE_LOCAL_SYM __localdep_memcpyc(__buf, __data, __datalen, sizeof(char));
 	return (__SSIZE_TYPE__)__datalen;
 __err:
 	return -1;

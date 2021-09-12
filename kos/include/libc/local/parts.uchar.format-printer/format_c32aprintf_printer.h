@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x74071ea9 */
+/* HASH CRC-32:0x2f9b6298 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -53,7 +53,7 @@ __CREDIRECT_KOS(__ATTR_MALLOC __ATTR_MALL_DEFAULT_ALIGNED __ATTR_WUNUSED __ATTR_
 __NAMESPACE_LOCAL_END
 #include <libc/local/parts.wchar.format-printer/format_waprintf_alloc.h>
 __NAMESPACE_LOCAL_BEGIN
-#define __localdep_format_c32aprintf_alloc (*(__CHAR32_TYPE__ *(__LIBKCALL *)(struct format_c32aprintf_data *__restrict, __SIZE_TYPE__))&__LIBC_LOCAL_NAME(format_waprintf_alloc))
+#define __localdep_format_c32aprintf_alloc __NAMESPACE_LOCAL_TYPEHAX(__CHAR32_TYPE__ *(__LIBKCALL*)(struct format_c32aprintf_data *__restrict,__SIZE_TYPE__),__CHAR32_TYPE__ *(__LIBKCALL&)(struct format_c32aprintf_data *__restrict,__SIZE_TYPE__),format_waprintf_alloc)
 #elif defined(__CRT_HAVE_realloc)
 __NAMESPACE_LOCAL_END
 #include <libc/local/parts.uchar.format-printer/format_c32aprintf_alloc.h>
@@ -90,10 +90,10 @@ __NAMESPACE_LOCAL_BEGIN
 __LOCAL_LIBC(format_c32aprintf_printer) __ATTR_WUNUSED __ATTR_NONNULL((1, 2)) __SSIZE_TYPE__
 __NOTHROW_NCX(__LIBKCALL __LIBC_LOCAL_NAME(format_c32aprintf_printer))(void *__arg, __CHAR32_TYPE__ const *__restrict __data, __SIZE_TYPE__ __datalen) {
 	__CHAR32_TYPE__ *__buf;
-	__buf = __localdep_format_c32aprintf_alloc((struct format_c32aprintf_data *)__arg, __datalen);
+	__buf = __NAMESPACE_LOCAL_SYM __localdep_format_c32aprintf_alloc((struct format_c32aprintf_data *)__arg, __datalen);
 	if __unlikely(!__buf)
 		goto __err;
-	(__CHAR32_TYPE__ *)__localdep_memcpyl(__buf, __data, __datalen);
+	(__CHAR32_TYPE__ *)__NAMESPACE_LOCAL_SYM __localdep_memcpyl(__buf, __data, __datalen);
 	return (__SSIZE_TYPE__)__datalen;
 __err:
 	return -1;

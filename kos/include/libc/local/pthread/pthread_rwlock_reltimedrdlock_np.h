@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xaad090d1 */
+/* HASH CRC-32:0x153234cf */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -52,14 +52,14 @@ __NOTHROW_RPC(__LIBCCALL __LIBC_LOCAL_NAME(pthread_rwlock_reltimedrdlock_np))(__
 	struct __timespec32 __reltime32;
 	__reltime32.tv_sec  = (__time32_t)__reltime->tv_sec;
 	__reltime32.tv_nsec = __reltime->tv_nsec;
-	__result = __localdep_pthread_rwlock_reltimedrdlock32_np(__rwlock, &__reltime32);
+	__result = __NAMESPACE_LOCAL_SYM __localdep_pthread_rwlock_reltimedrdlock32_np(__rwlock, &__reltime32);
 	return __result;
 #else /* __CRT_HAVE_pthread_rwlock_reltimedrdlock_np */
 	__errno_t __result;
 	struct __timespec64 __reltime64;
 	__reltime64.tv_sec  = (__time64_t)__reltime->tv_sec;
 	__reltime64.tv_nsec = __reltime->tv_nsec;
-	__result = __localdep_pthread_rwlock_reltimedrdlock64_np(__rwlock, &__reltime32);
+	__result = __NAMESPACE_LOCAL_SYM __localdep_pthread_rwlock_reltimedrdlock64_np(__rwlock, &__reltime32);
 	return __result;
 #endif /* !__CRT_HAVE_pthread_rwlock_reltimedrdlock_np */
 }

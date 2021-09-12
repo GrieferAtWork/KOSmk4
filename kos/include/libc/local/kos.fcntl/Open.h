@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x3d0d8c53 */
+/* HASH CRC-32:0x8a122ccb */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -62,7 +62,7 @@ __LOCAL_LIBC(Open) __ATTR_WUNUSED __ATTR_NONNULL((1)) __fd_t
 	__builtin_va_list __args;
 	__builtin_va_start(__args, __oflags);
 
-	__result = __localdep_Open64(__filename, __oflags, __builtin_va_arg(__args, __mode_t));
+	__result = __NAMESPACE_LOCAL_SYM __localdep_Open64(__filename, __oflags, __builtin_va_arg(__args, __mode_t));
 
 
 

@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xf9d71d17 */
+/* HASH CRC-32:0xc48e531f */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -54,7 +54,7 @@ __NAMESPACE_LOCAL_BEGIN
 #endif /* !__local___localdep_fsetpos_defined */
 __LOCAL_LIBC(fsetpos_unlocked) __ATTR_NONNULL((1, 2)) int
 (__LIBCCALL __LIBC_LOCAL_NAME(fsetpos_unlocked))(__FILE *__restrict __stream, __FS_TYPE(fpos) const *__restrict __pos) __THROWS(...) {
-	return __localdep_fsetpos(__stream, __pos);
+	return __NAMESPACE_LOCAL_SYM __localdep_fsetpos(__stream, __pos);
 }
 __NAMESPACE_LOCAL_END
 #ifndef __local___localdep_fsetpos_unlocked_defined

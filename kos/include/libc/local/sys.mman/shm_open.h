@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xc3d3ae8b */
+/* HASH CRC-32:0xfb02db34 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -142,25 +142,25 @@ __NOTHROW_RPC(__LIBCCALL __LIBC_LOCAL_NAME(shm_open))(char const *__name, __ofla
 	while (*__name == '/')
 		++__name;
 #endif /* !... */
-	__namelen  = __localdep_strlen(__name);
+	__namelen  = __NAMESPACE_LOCAL_SYM __localdep_strlen(__name);
 	__fullname = (char *)__malloca((__COMPILER_STRLEN(__PATH_SHM) + 1 +
 	                              __namelen + 1) *
 	                             sizeof(char));
 	if __unlikely(!__fullname)
 		return -1;
-	__localdep_memcpy(__localdep_mempcpy(__fullname, __PATH_SHM "/",
+	__NAMESPACE_LOCAL_SYM __localdep_memcpy(__NAMESPACE_LOCAL_SYM __localdep_mempcpy(__fullname, __PATH_SHM "/",
 	               (__COMPILER_STRLEN(__PATH_SHM) + 1) *
 	               sizeof(char)),
 	       __fullname,
 	       (__namelen + 1) *
 	       sizeof(char));
-	__result = __localdep_open(__fullname, __oflags, __mode);
+	__result = __NAMESPACE_LOCAL_SYM __localdep_open(__fullname, __oflags, __mode);
 #if defined(__ENOENT) && defined(__O_CREAT) && (defined(__CRT_HAVE_mkdir) || (defined(__CRT_DOS_PRIMARY) && defined(__CRT_HAVE__mkdir)))
 	if (__result < 0 && (__oflags & __O_CREAT) != 0 && __libc_geterrno_or(__ENOENT) == __ENOENT) {
 		/* Lazily create the SHM directory (/dev/shm), if it hadn't been created already.
 		 * XXX:   This    assumes    that    `headof(__PATH_SHM)'    already    exists... */
-		__localdep_mkdir(__PATH_SHM, 0777);
-		__result = __localdep_open(__fullname, __oflags, __mode);
+		__NAMESPACE_LOCAL_SYM __localdep_mkdir(__PATH_SHM, 0777);
+		__result = __NAMESPACE_LOCAL_SYM __localdep_open(__fullname, __oflags, __mode);
 	}
 #endif /* __ENOENT && __O_CREAT && (__CRT_HAVE_mkdir || (__CRT_DOS_PRIMARY && __CRT_HAVE__mkdir)) */
 	__freea(__fullname);

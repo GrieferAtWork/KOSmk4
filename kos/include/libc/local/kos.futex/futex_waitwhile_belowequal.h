@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xa1c36a73 */
+/* HASH CRC-32:0x53df8b8 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -46,8 +46,8 @@ __NAMESPACE_LOCAL_BEGIN
 __LOCAL_LIBC(futex_waitwhile_belowequal) __ATTR_NONNULL((1)) int
 __NOTHROW_RPC(__LIBCCALL __LIBC_LOCAL_NAME(futex_waitwhile_belowequal))(__uintptr_t *__uaddr, __uintptr_t __below_equal_value) {
 	if __unlikely(__below_equal_value == (__uintptr_t)-1)
-		return __localdep_lfutex64(__uaddr, LFUTEX_WAIT, 0, (struct __timespec64 const *)__NULLPTR);
-	return __localdep_lfutex64(__uaddr, LFUTEX_WAIT_WHILE_BELOW, __below_equal_value + 1, (struct __timespec64 const *)__NULLPTR);
+		return __NAMESPACE_LOCAL_SYM __localdep_lfutex64(__uaddr, LFUTEX_WAIT, 0, (struct __timespec64 const *)__NULLPTR);
+	return __NAMESPACE_LOCAL_SYM __localdep_lfutex64(__uaddr, LFUTEX_WAIT_WHILE_BELOW, __below_equal_value + 1, (struct __timespec64 const *)__NULLPTR);
 }
 __NAMESPACE_LOCAL_END
 #ifndef __local___localdep_futex_waitwhile_belowequal_defined

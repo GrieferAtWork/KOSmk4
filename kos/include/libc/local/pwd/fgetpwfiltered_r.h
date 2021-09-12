@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xa8204164 */
+/* HASH CRC-32:0xa706835b */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -308,11 +308,11 @@ __NOTHROW_RPC(__LIBCCALL __LIBC_LOCAL_NAME(fgetpwfiltered_r))(__FILE *__restrict
 	char *__dbline;
 	__fpos64_t __startpos, __curpos;
 	__fpos64_t __maxpos = (__fpos64_t)-1;
-	if (__localdep_fgetpos64(__stream, &__startpos))
+	if (__NAMESPACE_LOCAL_SYM __localdep_fgetpos64(__stream, &__startpos))
 		goto __err_nodbline;
 	__curpos = __startpos;
 __again_parseln:
-	__dbline = __localdep_fparseln(__stream, __NULLPTR, __NULLPTR, "\0\0#", 0);
+	__dbline = __NAMESPACE_LOCAL_SYM __localdep_fparseln(__stream, __NULLPTR, __NULLPTR, "\0\0#", 0);
 	if __unlikely(!__dbline)
 		goto __err_restore;
 	if (!*__dbline) {
@@ -320,9 +320,9 @@ __again_parseln:
 			__maxpos   = __startpos;
 			__startpos = 0;
 #if defined(__CRT_HAVE_rewind) || defined(__CRT_HAVE_rewind_unlocked) || defined(__CRT_HAVE_fseeko64) || defined(__CRT_HAVE_fseek64) || defined(__CRT_HAVE__fseeki64) || defined(__CRT_HAVE_fseeko64_unlocked) || defined(__CRT_HAVE_fseek64_unlocked) || defined(__CRT_HAVE__fseeki64_nolock) || defined(__CRT_HAVE_fsetpos) || defined(__CRT_HAVE__IO_fsetpos) || defined(__CRT_HAVE_fsetpos_unlocked) || defined(__CRT_HAVE_fsetpos64) || defined(__CRT_HAVE__IO_fsetpos64) || defined(__CRT_HAVE_fsetpos64_unlocked) || defined(__CRT_HAVE_fseeko) || defined(__CRT_HAVE_fseeko_unlocked) || defined(__CRT_HAVE_fseek) || defined(__CRT_HAVE_fseek_unlocked) || defined(__CRT_HAVE__fseek_nolock)
-			__localdep_rewind(__stream);
+			__NAMESPACE_LOCAL_SYM __localdep_rewind(__stream);
 #else /* __CRT_HAVE_rewind || __CRT_HAVE_rewind_unlocked || __CRT_HAVE_fseeko64 || __CRT_HAVE_fseek64 || __CRT_HAVE__fseeki64 || __CRT_HAVE_fseeko64_unlocked || __CRT_HAVE_fseek64_unlocked || __CRT_HAVE__fseeki64_nolock || __CRT_HAVE_fsetpos || __CRT_HAVE__IO_fsetpos || __CRT_HAVE_fsetpos_unlocked || __CRT_HAVE_fsetpos64 || __CRT_HAVE__IO_fsetpos64 || __CRT_HAVE_fsetpos64_unlocked || __CRT_HAVE_fseeko || __CRT_HAVE_fseeko_unlocked || __CRT_HAVE_fseek || __CRT_HAVE_fseek_unlocked || __CRT_HAVE__fseek_nolock */
-			if (__localdep_fsetpos64(__stream, &__startpos))
+			if (__NAMESPACE_LOCAL_SYM __localdep_fsetpos64(__stream, &__startpos))
 				goto __err;
 #endif /* !__CRT_HAVE_rewind && !__CRT_HAVE_rewind_unlocked && !__CRT_HAVE_fseeko64 && !__CRT_HAVE_fseek64 && !__CRT_HAVE__fseeki64 && !__CRT_HAVE_fseeko64_unlocked && !__CRT_HAVE_fseek64_unlocked && !__CRT_HAVE__fseeki64_nolock && !__CRT_HAVE_fsetpos && !__CRT_HAVE__IO_fsetpos && !__CRT_HAVE_fsetpos_unlocked && !__CRT_HAVE_fsetpos64 && !__CRT_HAVE__IO_fsetpos64 && !__CRT_HAVE_fsetpos64_unlocked && !__CRT_HAVE_fseeko && !__CRT_HAVE_fseeko_unlocked && !__CRT_HAVE_fseek && !__CRT_HAVE_fseek_unlocked && !__CRT_HAVE__fseek_nolock */
 			/* Search for the requested uid/name prior to the initial search-start position. */
@@ -350,7 +350,7 @@ __eof:
 		__field_starts[6] = (char *)""; /* pw_shell */
 		for (__i = 0; __i < 4; ++__i) {
 			__field_starts[__i] = __iter;
-			__iter = __localdep_strchrnul(__iter, ':');
+			__iter = __NAMESPACE_LOCAL_SYM __localdep_strchrnul(__iter, ':');
 			if __unlikely(!*__iter) {
 				if (__i == 3)
 					goto __got_all_fields; /* This is allowed! */
@@ -360,12 +360,12 @@ __eof:
 		}
 		/* Right now, `iter' points at the start of `pw_gecos' or `pw_dir' */
 		__field_starts[4] = __iter; /* pw_gecos */
-		__iter = __localdep_strchrnul(__iter, ':');
+		__iter = __NAMESPACE_LOCAL_SYM __localdep_strchrnul(__iter, ':');
 		if __unlikely(!*__iter)
 			goto __badline;
 		*__iter++ = '\0';
 		__field_starts[5] = __iter; /* pw_dir */
-		__iter = __localdep_strchrnul(__iter, ':');
+		__iter = __NAMESPACE_LOCAL_SYM __localdep_strchrnul(__iter, ':');
 		if (!*__iter) {
 			/* pw_gecos wasn't given. */
 			__field_starts[6] = __field_starts[5]; /* pw_shell */
@@ -375,13 +375,13 @@ __eof:
 			*__iter++ = '\0';
 			__field_starts[6] = __iter; /* pw_shell */
 			/* Make sure there aren't any more fields! */
-			__iter = __localdep_strchrnul(__iter, ':');
+			__iter = __NAMESPACE_LOCAL_SYM __localdep_strchrnul(__iter, ':');
 			if __unlikely(*__iter)
 				goto __badline;
 		}
 __got_all_fields:
 		if (__filtered_name) {
-			if (__localdep_strcmp(__field_starts[0], __filtered_name) != 0)
+			if (__NAMESPACE_LOCAL_SYM __localdep_strcmp(__field_starts[0], __filtered_name) != 0)
 				goto __nextline;
 		}
 		/* All right! we've got all of the fields!
@@ -390,7 +390,7 @@ __got_all_fields:
 		 * entry into a bad line) */
 		if __unlikely(!*__field_starts[2])
 			goto __badline;
-		__resultbuf->pw_uid = (__gid_t)__localdep_strtoul(__field_starts[2], &__iter, 10);
+		__resultbuf->pw_uid = (__gid_t)__NAMESPACE_LOCAL_SYM __localdep_strtoul(__field_starts[2], &__iter, 10);
 		if __unlikely(*__iter)
 			goto __badline;
 		if (__filtered_uid != (__uid_t)-1) {
@@ -399,7 +399,7 @@ __got_all_fields:
 		}
 		if __unlikely(!*__field_starts[3])
 			goto __badline;
-		__resultbuf->pw_gid = (__gid_t)__localdep_strtoul(__field_starts[3], &__iter, 10);
+		__resultbuf->pw_gid = (__gid_t)__NAMESPACE_LOCAL_SYM __localdep_strtoul(__field_starts[3], &__iter, 10);
 		if __unlikely(*__iter)
 			goto __badline;
 		/* All right! Now to fill in all of the string fields.
@@ -422,20 +422,20 @@ __got_all_fields:
 			if (__offset == (__UINTPTR_TYPE__)-1)
 				continue;
 			__str = __field_starts[__i];
-			__len = (__localdep_strlen(__str) + 1) * sizeof(char);
+			__len = (__NAMESPACE_LOCAL_SYM __localdep_strlen(__str) + 1) * sizeof(char);
 			/* Ensure that sufficient space is available in the user-provided buffer. */
 			if __unlikely(__buflen < __len)
 				goto __err_ERANGE;
 			/* Set the associated pointer in `resultbuf' */
 			*(char **)((__BYTE_TYPE__ *)__resultbuf + __offset) = __buffer;
 			/* Copy the string to the user-provided buffer. */
-			__buffer = (char *)__localdep_mempcpy(__buffer, __str, __len);
+			__buffer = (char *)__NAMESPACE_LOCAL_SYM __localdep_mempcpy(__buffer, __str, __len);
 			__buflen -= __len;
 		}
 	}
 __done_free_dbline:
 #if defined(__CRT_HAVE_free) || defined(__CRT_HAVE_cfree)
-	__localdep_free(__dbline);
+	__NAMESPACE_LOCAL_SYM __localdep_free(__dbline);
 #endif /* __CRT_HAVE_free || __CRT_HAVE_cfree */
 	*__result = __retval ? __NULLPTR : __resultbuf;
 	return __retval;
@@ -447,7 +447,7 @@ __err_ERANGE:
 	/* FALLTHRU */
 __err_restore:
 	__retval = __libc_geterrno_or(1);
-	if __unlikely(__localdep_fsetpos64(__stream, &__curpos))
+	if __unlikely(__NAMESPACE_LOCAL_SYM __localdep_fsetpos64(__stream, &__curpos))
 		goto __err;
 	goto __done_free_dbline;
 
@@ -460,14 +460,14 @@ __err:
 
 __badline:
 #if defined(__LOG_ERR) && (defined(__CRT_HAVE_syslog) || defined(__CRT_HAVE_vsyslog) || defined(__CRT_HAVE_syslog_printer))
-	__localdep_syslog(__LOG_ERR, "[passwd] Bad password line %q\n", __dbline);
+	__NAMESPACE_LOCAL_SYM __localdep_syslog(__LOG_ERR, "[passwd] Bad password line %q\n", __dbline);
 #endif /* __LOG_ERR && (__CRT_HAVE_syslog || __CRT_HAVE_vsyslog || __CRT_HAVE_syslog_printer) */
 	/* FALLTHRU */
 __nextline:
 #if defined(__CRT_HAVE_free) || defined(__CRT_HAVE_cfree)
-	__localdep_free(__dbline);
+	__NAMESPACE_LOCAL_SYM __localdep_free(__dbline);
 #endif /* __CRT_HAVE_free || __CRT_HAVE_cfree */
-	if __unlikely(__localdep_fgetpos64(__stream, &__curpos))
+	if __unlikely(__NAMESPACE_LOCAL_SYM __localdep_fgetpos64(__stream, &__curpos))
 		goto __err_nodbline;
 	if (__curpos >= __maxpos)
 		goto __eof;

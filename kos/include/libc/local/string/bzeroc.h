@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x65ea708a */
+/* HASH CRC-32:0xd7a78a3d */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -80,29 +80,29 @@ __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(bzeroc))(void *__restrict __dst, __SI
 	switch (__elem_size) {
 
 	case 1:
-		__localdep_bzero(__dst, __elem_count);
+		__NAMESPACE_LOCAL_SYM __localdep_bzero(__dst, __elem_count);
 		break;
 
 	case 2:
-		__localdep_bzerow(__dst, __elem_count);
+		__NAMESPACE_LOCAL_SYM __localdep_bzerow(__dst, __elem_count);
 		break;
 
 	case 4:
-		__localdep_bzerol(__dst, __elem_count);
+		__NAMESPACE_LOCAL_SYM __localdep_bzerol(__dst, __elem_count);
 		break;
 
 #ifdef __UINT64_TYPE__
 	case 8:
-		__localdep_bzeroq(__dst, __elem_count);
+		__NAMESPACE_LOCAL_SYM __localdep_bzeroq(__dst, __elem_count);
 		break;
 #endif /* __UINT64_TYPE__ */
 
 	default:
-		__localdep_bzero(__dst, __elem_count * __elem_size);
+		__NAMESPACE_LOCAL_SYM __localdep_bzero(__dst, __elem_count * __elem_size);
 		break;
 	}
 #else /* __ARCH_HAVE_UNALIGNED_MEMORY_ACCESS */
-	__localdep_bzero(__dst, __elem_count * __elem_size);
+	__NAMESPACE_LOCAL_SYM __localdep_bzero(__dst, __elem_count * __elem_size);
 #endif /* !__ARCH_HAVE_UNALIGNED_MEMORY_ACCESS */
 }
 __NAMESPACE_LOCAL_END

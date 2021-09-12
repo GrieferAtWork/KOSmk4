@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x166b118d */
+/* HASH CRC-32:0x7ce0321d */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -55,7 +55,7 @@ __NAMESPACE_LOCAL_END
 __NAMESPACE_LOCAL_BEGIN
 __LOCAL_LIBC(hdestroy) void
 __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(hdestroy))(void) {
-	__localdep_hdestroy_r(&__NAMESPACE_LOCAL_SYM __htab);
+	__NAMESPACE_LOCAL_SYM __localdep_hdestroy_r(&__NAMESPACE_LOCAL_SYM __htab);
 }
 __NAMESPACE_LOCAL_END
 #ifndef __local___localdep_hdestroy_defined

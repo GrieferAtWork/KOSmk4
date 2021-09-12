@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xa9a32b8c */
+/* HASH CRC-32:0xec1b718a */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -39,7 +39,7 @@ __CREDIRECT_DOS(__ATTR_NONNULL((1, 2)),__SIZE_TYPE__,__NOTHROW_NCX,__localdep_mb
 __NAMESPACE_LOCAL_END
 #include <libc/local/wchar/mbsrtowcs.h>
 __NAMESPACE_LOCAL_BEGIN
-#define __localdep_mbsrtoc16 (*(__SIZE_TYPE__(__LIBDCALL *)(__CHAR16_TYPE__ *__restrict, char const **__restrict, __SIZE_TYPE__, struct __mbstate *))&__LIBC_LOCAL_NAME(mbsrtowcs))
+#define __localdep_mbsrtoc16 __NAMESPACE_LOCAL_TYPEHAX(__SIZE_TYPE__(__LIBDCALL*)(__CHAR16_TYPE__ *__restrict,char const **__restrict,__SIZE_TYPE__,struct __mbstate *),__SIZE_TYPE__(__LIBDCALL&)(__CHAR16_TYPE__ *__restrict,char const **__restrict,__SIZE_TYPE__,struct __mbstate *),mbsrtowcs)
 #else /* ... */
 __NAMESPACE_LOCAL_END
 #include <libc/local/parts.uchar.wchar/mbsrtoc16.h>
@@ -49,7 +49,7 @@ __NAMESPACE_LOCAL_BEGIN
 #endif /* !__local___localdep_mbsrtoc16_defined */
 __LOCAL_LIBC(mbstoc16s) __ATTR_NONNULL((1, 2)) __SIZE_TYPE__
 __NOTHROW_NCX(__LIBDCALL __LIBC_LOCAL_NAME(mbstoc16s))(__CHAR16_TYPE__ *__restrict __dst, char const *__restrict __src, __SIZE_TYPE__ __dstlen) {
-	return __localdep_mbsrtoc16(__dst, (char const **)&__src, __dstlen, __NULLPTR);
+	return __NAMESPACE_LOCAL_SYM __localdep_mbsrtoc16(__dst, (char const **)&__src, __dstlen, __NULLPTR);
 }
 __NAMESPACE_LOCAL_END
 #ifndef __local___localdep_mbstoc16s_defined

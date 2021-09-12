@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xdc4f4d27 */
+/* HASH CRC-32:0xf931dc40 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -46,7 +46,7 @@ __NAMESPACE_LOCAL_BEGIN
 __LOCAL_LIBC(wcstou32_l) __ATTR_LEAF __ATTR_NONNULL((1)) __UINT32_TYPE__
 __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(wcstou32_l))(__WCHAR_TYPE__ const *__restrict __nptr, __WCHAR_TYPE__ **__endptr, __STDC_INT_AS_UINT_T __base, __locale_t __locale) {
 	(void)__locale;
-	return __localdep_wcstou32(__nptr, __endptr, __base);
+	return __NAMESPACE_LOCAL_SYM __localdep_wcstou32(__nptr, __endptr, __base);
 }
 __NAMESPACE_LOCAL_END
 #ifndef __local___localdep_wcstou32_l_defined

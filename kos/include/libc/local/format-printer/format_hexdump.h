@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x5726750b */
+/* HASH CRC-32:0x7d39682e */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -216,7 +216,7 @@ __LOCAL_LIBC(format_hexdump) __ATTR_NONNULL((1)) __SSIZE_TYPE__
 				__tailspace_count -= 3;
 			}
 			if (__tailspace_count) {
-				__temp = __localdep_format_repeat(__printer, __arg, ' ', __tailspace_count);
+				__temp = __NAMESPACE_LOCAL_SYM __localdep_format_repeat(__printer, __arg, ' ', __tailspace_count);
 				if __unlikely(__temp < 0)
 					goto __err;
 				__result += __temp;
@@ -225,7 +225,7 @@ __LOCAL_LIBC(format_hexdump) __ATTR_NONNULL((1)) __SSIZE_TYPE__
 		if (!(__flags & 0x0010)) {
 			for (__i = 0; __i < __line_len; ++__i) {
 				__BYTE_TYPE__ __b = __line_data[__i];
-				if (!__localdep_isprint(__b))
+				if (!__NAMESPACE_LOCAL_SYM __localdep_isprint(__b))
 					__b = '.';
 				__temp = (*__printer)(__arg, (char const *)&__b, 1);
 				if __unlikely(__temp < 0)

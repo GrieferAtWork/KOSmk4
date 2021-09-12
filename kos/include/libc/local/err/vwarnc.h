@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x840bd86a */
+/* HASH CRC-32:0x1fc663a9 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -112,17 +112,17 @@ __NAMESPACE_LOCAL_BEGIN
 __LOCAL_LIBC(vwarnc) __ATTR_LIBC_PRINTF(1, 0) void
 (__LIBCCALL __LIBC_LOCAL_NAME(vwarnc))(__errno_t __used_errno, char const *__format, __builtin_va_list __args) __THROWS(...) {
 #if (defined(__CRT_HAVE_flockfile) || defined(__CRT_HAVE__lock_file) || defined(__CRT_HAVE__IO_flockfile)) && (defined(__CRT_HAVE_funlockfile) || defined(__CRT_HAVE__unlock_file) || defined(__CRT_HAVE__IO_funlockfile))
-	__localdep_flockfile(__LOCAL_stderr);
+	__NAMESPACE_LOCAL_SYM __localdep_flockfile(__LOCAL_stderr);
 #endif /* (__CRT_HAVE_flockfile || __CRT_HAVE__lock_file || __CRT_HAVE__IO_flockfile) && (__CRT_HAVE_funlockfile || __CRT_HAVE__unlock_file || __CRT_HAVE__IO_funlockfile) */
-	__localdep_fprintf(__LOCAL_stderr, "%s: ", __LOCAL_program_invocation_short_name);
+	__NAMESPACE_LOCAL_SYM __localdep_fprintf(__LOCAL_stderr, "%s: ", __LOCAL_program_invocation_short_name);
 	if (__format) {
-		__localdep_vfprintf(__LOCAL_stderr, __format, __args);
-		__localdep_fprintf(__LOCAL_stderr, ": %s\n", __localdep_strerror(__used_errno));
+		__NAMESPACE_LOCAL_SYM __localdep_vfprintf(__LOCAL_stderr, __format, __args);
+		__NAMESPACE_LOCAL_SYM __localdep_fprintf(__LOCAL_stderr, ": %s\n", __NAMESPACE_LOCAL_SYM __localdep_strerror(__used_errno));
 	} else {
-		__localdep_fprintf(__LOCAL_stderr, "%s\n", __localdep_strerror(__used_errno));
+		__NAMESPACE_LOCAL_SYM __localdep_fprintf(__LOCAL_stderr, "%s\n", __NAMESPACE_LOCAL_SYM __localdep_strerror(__used_errno));
 	}
 #if (defined(__CRT_HAVE_flockfile) || defined(__CRT_HAVE__lock_file) || defined(__CRT_HAVE__IO_flockfile)) && (defined(__CRT_HAVE_funlockfile) || defined(__CRT_HAVE__unlock_file) || defined(__CRT_HAVE__IO_funlockfile))
-	__localdep_funlockfile(__LOCAL_stderr);
+	__NAMESPACE_LOCAL_SYM __localdep_funlockfile(__LOCAL_stderr);
 #endif /* (__CRT_HAVE_flockfile || __CRT_HAVE__lock_file || __CRT_HAVE__IO_flockfile) && (__CRT_HAVE_funlockfile || __CRT_HAVE__unlock_file || __CRT_HAVE__IO_funlockfile) */
 }
 __NAMESPACE_LOCAL_END

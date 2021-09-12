@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x7a55ee0f */
+/* HASH CRC-32:0xe7f6415a */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -38,7 +38,7 @@ __CREDIRECT_VOID(,__NOTHROW_NCX,__localdep_free,(void *__mallptr),cfree,(__mallp
 __LOCAL_LIBC(_free_dbg) void
 __NOTHROW_NCX(__LIBDCALL __LIBC_LOCAL_NAME(_free_dbg))(void *__ptr, int __block_type) {
 	(void)__block_type;
-	__localdep_free(__ptr);
+	__NAMESPACE_LOCAL_SYM __localdep_free(__ptr);
 }
 __NAMESPACE_LOCAL_END
 #ifndef __local___localdep__free_dbg_defined

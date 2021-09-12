@@ -152,34 +152,34 @@ struct qelem {
 @@>> insque(3)
 @@Insert ELEM into a doubly-linked list, after PREV
 void insque([[nonnull]] void *__restrict elem, void *prev) {
-	struct link {
-		struct link *l_forw; /* [0..1] Forward link */
-		struct link *l_back; /* [0..1] Backward link */
+	struct __queue_link {
+		struct __queue_link *l_forw; /* [0..1] Forward link */
+		struct __queue_link *l_back; /* [0..1] Backward link */
 	};
 	if (prev) {
-		struct link *next;
-		next = ((struct link *)prev)->l_forw;
-		((struct link *)elem)->l_back = (struct link *)prev;
-		((struct link *)elem)->l_forw = next;
-		((struct link *)prev)->l_forw = (struct link *)elem;
+		struct __queue_link *next;
+		next = ((struct __queue_link *)prev)->l_forw;
+		((struct __queue_link *)elem)->l_back = (struct __queue_link *)prev;
+		((struct __queue_link *)elem)->l_forw = next;
+		((struct __queue_link *)prev)->l_forw = (struct __queue_link *)elem;
 		if (next)
-			next->l_back = (struct link *)elem;
+			next->l_back = (struct __queue_link *)elem;
 	} else {
-		((struct link *)elem)->l_back = NULL;
-		((struct link *)elem)->l_forw = NULL;
+		((struct __queue_link *)elem)->l_back = NULL;
+		((struct __queue_link *)elem)->l_forw = NULL;
 	}
 }
 
 @@>> remque(3)
 @@Unlink ELEM from the doubly-linked list that it is in
 void remque([[nonnull]] void *__restrict elem) {
-	struct link {
-		struct link *l_forw; /* [0..1] Forward link */
-		struct link *l_back; /* [0..1] Backward link */
+	struct __queue_link {
+		struct __queue_link *l_forw; /* [0..1] Forward link */
+		struct __queue_link *l_back; /* [0..1] Backward link */
 	};
-	struct link *prev, *next;
-	prev = ((struct link *)elem)->l_back;
-	next = ((struct link *)elem)->l_forw;
+	struct __queue_link *prev, *next;
+	prev = ((struct __queue_link *)elem)->l_back;
+	next = ((struct __queue_link *)elem)->l_forw;
 	if (prev)
 		prev->l_forw = next;
 	if (next)

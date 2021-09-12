@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xbfc1ee5f */
+/* HASH CRC-32:0x4f5a52c */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -58,11 +58,11 @@ __CREDIRECT(__ATTR_MALL_DEFAULT_ALIGNED __ATTR_WUNUSED __ATTR_ALLOC_SIZE((2)),vo
 __LOCAL_LIBC(malloc) __ATTR_MALLOC __ATTR_MALL_DEFAULT_ALIGNED __ATTR_WUNUSED __ATTR_ALLOC_SIZE((1)) void *
 __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(malloc))(__SIZE_TYPE__ __num_bytes) {
 #ifdef __CRT_HAVE_calloc
-	return __localdep_crt_calloc(1, __num_bytes);
+	return __NAMESPACE_LOCAL_SYM __localdep_crt_calloc(1, __num_bytes);
 #elif defined(__CRT_HAVE_realloc)
-	return __localdep_realloc(__NULLPTR, __num_bytes);
+	return __NAMESPACE_LOCAL_SYM __localdep_realloc(__NULLPTR, __num_bytes);
 #else /* ... */
-	return __localdep_memalign(__LIBC_MALLOC_ALIGNMENT, __num_bytes);
+	return __NAMESPACE_LOCAL_SYM __localdep_memalign(__LIBC_MALLOC_ALIGNMENT, __num_bytes);
 #endif /* !... */
 }
 __NAMESPACE_LOCAL_END

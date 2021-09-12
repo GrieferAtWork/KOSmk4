@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x98c22d75 */
+/* HASH CRC-32:0x3f80e30a */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -62,13 +62,13 @@ __NAMESPACE_LOCAL_BEGIN
 __LOCAL_LIBC(sl_init) __ATTR_WUNUSED struct _stringlist *
 __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(sl_init))(void) {
 	struct _stringlist *__result;
-	__result = (struct _stringlist *)__localdep_malloc(sizeof(struct _stringlist));
+	__result = (struct _stringlist *)__NAMESPACE_LOCAL_SYM __localdep_malloc(sizeof(struct _stringlist));
 	if __likely(__result != __NULLPTR) {
 		__result->sl_cur = 0;
 		__result->sl_max = 20;
-		__result->sl_str = (char **)__localdep_malloc(20 * sizeof(char *));
+		__result->sl_str = (char **)__NAMESPACE_LOCAL_SYM __localdep_malloc(20 * sizeof(char *));
 		if __unlikely(__result->sl_str == __NULLPTR) {
-			__localdep_free(__result);
+			__NAMESPACE_LOCAL_SYM __localdep_free(__result);
 			__result = __NULLPTR;
 		}
 	}

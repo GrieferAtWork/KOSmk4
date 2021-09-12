@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x8d718592 */
+/* HASH CRC-32:0x3664e80b */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -56,10 +56,10 @@ __NOTHROW_RPC(__LIBCCALL __LIBC_LOCAL_NAME(select))(__STDC_INT_AS_SIZE_T __nfds,
 
 	struct __timeval64 __tmv;
 	if (!__timeout)
-		return __localdep_select64(__nfds, __readfds, __writefds, __exceptfds, __NULLPTR);
+		return __NAMESPACE_LOCAL_SYM __localdep_select64(__nfds, __readfds, __writefds, __exceptfds, __NULLPTR);
 	__tmv.tv_sec  = (__time64_t)__timeout->tv_sec;
 	__tmv.tv_usec = __timeout->tv_usec;
-	return __localdep_select64(__nfds, __readfds, __writefds, __exceptfds, &__tmv);
+	return __NAMESPACE_LOCAL_SYM __localdep_select64(__nfds, __readfds, __writefds, __exceptfds, &__tmv);
 
 
 

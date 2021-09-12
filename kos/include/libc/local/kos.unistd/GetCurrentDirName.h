@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x76af2b5c */
+/* HASH CRC-32:0xfab0c9da */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -34,7 +34,7 @@ __CREDIRECT(,char *,__THROWING,__localdep_GetCwd,(char *__buf, __SIZE_TYPE__ __b
 #endif /* !__local___localdep_GetCwd_defined */
 __LOCAL_LIBC(GetCurrentDirName) __ATTR_MALLOC __ATTR_MALL_DEFAULT_ALIGNED __ATTR_RETNONNULL __ATTR_WUNUSED char *
 (__LIBCCALL __LIBC_LOCAL_NAME(GetCurrentDirName))(void) __THROWS(...) {
-	return __localdep_GetCwd(__NULLPTR, 0);
+	return __NAMESPACE_LOCAL_SYM __localdep_GetCwd(__NULLPTR, 0);
 }
 __NAMESPACE_LOCAL_END
 #ifndef __local___localdep_GetCurrentDirName_defined

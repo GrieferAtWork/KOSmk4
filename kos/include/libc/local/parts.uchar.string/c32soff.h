@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x7aef47ac */
+/* HASH CRC-32:0x8fe213ba */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -33,7 +33,7 @@ __CREDIRECT_KOS(__ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1)),__CHAR32_TYPE__ *
 __NAMESPACE_LOCAL_END
 #include <libc/local/wchar/wcschrnul.h>
 __NAMESPACE_LOCAL_BEGIN
-#define __localdep_c32schrnul (*(__CHAR32_TYPE__ *(__LIBKCALL *)(__CHAR32_TYPE__ const *, __CHAR32_TYPE__))&__LIBC_LOCAL_NAME(wcschrnul))
+#define __localdep_c32schrnul __NAMESPACE_LOCAL_TYPEHAX(__CHAR32_TYPE__ *(__LIBKCALL*)(__CHAR32_TYPE__ const *,__CHAR32_TYPE__),__CHAR32_TYPE__ *(__LIBKCALL&)(__CHAR32_TYPE__ const *,__CHAR32_TYPE__),wcschrnul)
 #else /* ... */
 __NAMESPACE_LOCAL_END
 #include <libc/local/parts.uchar.string/c32schrnul.h>
@@ -43,7 +43,7 @@ __NAMESPACE_LOCAL_BEGIN
 #endif /* !__local___localdep_c32schrnul_defined */
 __LOCAL_LIBC(c32soff) __ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1)) __SIZE_TYPE__
 __NOTHROW_NCX(__LIBKCALL __LIBC_LOCAL_NAME(c32soff))(__CHAR32_TYPE__ const *__restrict __haystack, __CHAR32_TYPE__ __needle) {
-	return (__SIZE_TYPE__)(__localdep_c32schrnul(__haystack, __needle) - __haystack);
+	return (__SIZE_TYPE__)(__NAMESPACE_LOCAL_SYM __localdep_c32schrnul(__haystack, __needle) - __haystack);
 }
 __NAMESPACE_LOCAL_END
 #ifndef __local___localdep_c32soff_defined

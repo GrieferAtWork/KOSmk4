@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x63498de7 */
+/* HASH CRC-32:0x61eaaed6 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -48,7 +48,7 @@ __NAMESPACE_LOCAL_END
 __NAMESPACE_LOCAL_BEGIN
 __LOCAL_LIBC(creat64) __ATTR_WUNUSED __ATTR_NONNULL((1)) __fd_t
 __NOTHROW_RPC(__LIBCCALL __LIBC_LOCAL_NAME(creat64))(char const *__filename, __mode_t __mode) {
-	return __localdep_open64(__filename, __O_CREAT | __O_WRONLY | __O_TRUNC, __mode);
+	return __NAMESPACE_LOCAL_SYM __localdep_open64(__filename, __O_CREAT | __O_WRONLY | __O_TRUNC, __mode);
 }
 __NAMESPACE_LOCAL_END
 #ifndef __local___localdep_creat64_defined

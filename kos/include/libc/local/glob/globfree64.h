@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x50be8cbc */
+/* HASH CRC-32:0x5afb5234 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -30,7 +30,7 @@ __CREDIRECT_VOID(,__NOTHROW_NCX,__localdep_globfree32,(void *__pglob),globfree,(
 __LOCAL_LIBC(globfree64) __ATTR_NONNULL((1)) void
 __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(globfree64))(struct __glob64_struct *__pglob) {
 #ifdef __CRT_HAVE_globfree
-	__localdep_globfree32(__pglob);
+	__NAMESPACE_LOCAL_SYM __localdep_globfree32(__pglob);
 #else /* __CRT_HAVE_globfree */
 	__COMPILER_IMPURE();
 	(void)__pglob;

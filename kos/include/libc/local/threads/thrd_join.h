@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x7c51a976 */
+/* HASH CRC-32:0xd0935fa8 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -40,14 +40,14 @@ __NOTHROW_RPC(__LIBCCALL __LIBC_LOCAL_NAME(thrd_join))(__thrd_t __thr, int *__re
 	__errno_t __error;
 #if __SIZEOF_POINTER__ != __SIZEOF_INT__
 	void *__resptr;
-	__error = __localdep_pthread_join((__pthread_t)__thr, __res ? &__resptr : __NULLPTR);
+	__error = __NAMESPACE_LOCAL_SYM __localdep_pthread_join((__pthread_t)__thr, __res ? &__resptr : __NULLPTR);
 	if __likely(!__error) {
 		if (__res)
 			*__res = (int)(unsigned int)(__UINTPTR_TYPE__)__resptr;
 		return __thrd_success;
 	}
 #else /* __SIZEOF_POINTER__ != __SIZEOF_INT__ */
-	__error = __localdep_pthread_join((__pthread_t)__thr, (void **)__res);
+	__error = __NAMESPACE_LOCAL_SYM __localdep_pthread_join((__pthread_t)__thr, (void **)__res);
 	if __likely(!__error)
 		return __thrd_success;
 #endif /* __SIZEOF_POINTER__ == __SIZEOF_INT__ */

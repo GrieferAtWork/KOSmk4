@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x55af2771 */
+/* HASH CRC-32:0x1bf0d70c */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -55,7 +55,7 @@ __NAMESPACE_LOCAL_BEGIN
 __LOCAL_LIBC(reallocf) __ATTR_MALL_DEFAULT_ALIGNED __ATTR_WUNUSED __ATTR_ALLOC_SIZE((2)) void *
 __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(reallocf))(void *__mallptr, __SIZE_TYPE__ __num_bytes) {
 	void *__result;
-	__result = __localdep_realloc(__mallptr, __num_bytes);
+	__result = __NAMESPACE_LOCAL_SYM __localdep_realloc(__mallptr, __num_bytes);
 #if defined(__CRT_HAVE_free) || defined(__CRT_HAVE_cfree)
 #ifdef __REALLOC_ZERO_IS_NONNULL
 	if __unlikely(!__result)
@@ -72,7 +72,7 @@ __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(reallocf))(void *__mallptr, __SIZE_TY
 	if __unlikely(!__result && __num_bytes != 0)
 #endif /* !__REALLOC_ZERO_IS_NONNULL */
 	{
-		__localdep_free(__mallptr);
+		__NAMESPACE_LOCAL_SYM __localdep_free(__mallptr);
 	}
 #endif /* __CRT_HAVE_free || __CRT_HAVE_cfree */
 	return __result;

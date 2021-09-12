@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x1d57d51b */
+/* HASH CRC-32:0x5aed5b17 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -42,7 +42,7 @@ __CREDIRECT_DOS(__ATTR_CONST __ATTR_WUNUSED,int,__NOTHROW,__localdep_isalnum16,(
 __NAMESPACE_LOCAL_END
 #include <libc/local/wctype/iswalnum.h>
 __NAMESPACE_LOCAL_BEGIN
-#define __localdep_isalnum16 (*(int(__LIBDCALL *)(__WINT16_TYPE__))&__LIBC_LOCAL_NAME(iswalnum))
+#define __localdep_isalnum16 __NAMESPACE_LOCAL_TYPEHAX(int(__LIBDCALL*)(__WINT16_TYPE__),int(__LIBDCALL&)(__WINT16_TYPE__),iswalnum)
 #else /* ... */
 __NAMESPACE_LOCAL_END
 #include <libc/local/parts.uchar.wctype/isalnum16.h>
@@ -54,7 +54,7 @@ __LOCAL_LIBC(isalnum16_l) __ATTR_PURE __ATTR_WUNUSED int
 __NOTHROW_NCX(__LIBDCALL __LIBC_LOCAL_NAME(isalnum16_l))(__WINT16_TYPE__ __ch, __locale_t __locale) {
 	__COMPILER_IMPURE();
 	(void)__locale;
-	return __localdep_isalnum16(__ch);
+	return __NAMESPACE_LOCAL_SYM __localdep_isalnum16(__ch);
 }
 __NAMESPACE_LOCAL_END
 #ifndef __local___localdep_isalnum16_l_defined

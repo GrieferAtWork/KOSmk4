@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x9bf2586d */
+/* HASH CRC-32:0x7d8421e4 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -51,10 +51,10 @@ __NOTHROW_RPC(__LIBCCALL __LIBC_LOCAL_NAME(recvmmsg))(__fd_t __sockfd, struct mm
 
 	struct __timespec64 __tmo64;
 	if (!__tmo)
-		return __localdep_recvmmsg64(__sockfd, __vmessages, __vlen, __msg_flags, __NULLPTR);
+		return __NAMESPACE_LOCAL_SYM __localdep_recvmmsg64(__sockfd, __vmessages, __vlen, __msg_flags, __NULLPTR);
 	__tmo32.tv_sec  = (__time64_t)__tmo->tv_sec,
 	__tmo32.tv_nsec = __tmo->tv_nsec;
-	return __localdep_recvmmsg64(__sockfd, __vmessages, __vlen, __msg_flags, &__tmo64);
+	return __NAMESPACE_LOCAL_SYM __localdep_recvmmsg64(__sockfd, __vmessages, __vlen, __msg_flags, &__tmo64);
 
 
 

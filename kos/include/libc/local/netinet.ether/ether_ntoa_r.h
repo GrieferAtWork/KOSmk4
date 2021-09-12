@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x3195ae3a */
+/* HASH CRC-32:0xfb1d743f */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -52,7 +52,7 @@ __NAMESPACE_LOCAL_END
 __NAMESPACE_LOCAL_BEGIN
 __LOCAL_LIBC(ether_ntoa_r) __ATTR_RETNONNULL __ATTR_NONNULL((1, 2)) char *
 __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(ether_ntoa_r))(struct ether_addr const *__restrict __addr, char *__restrict __buf) {
-	__localdep_sprintf(__buf, "%x:%x:%x:%x:%x:%x",
+	__NAMESPACE_LOCAL_SYM __localdep_sprintf(__buf, "%x:%x:%x:%x:%x:%x",
 	        __addr->ether_addr_octet[0], __addr->ether_addr_octet[1],
 	        __addr->ether_addr_octet[2], __addr->ether_addr_octet[3],
 	        __addr->ether_addr_octet[4], __addr->ether_addr_octet[5]);

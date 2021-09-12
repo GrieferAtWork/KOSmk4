@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xd7e8f261 */
+/* HASH CRC-32:0xadeeec94 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -33,7 +33,7 @@ __CREDIRECT_KOS(__ATTR_PURE __ATTR_RETNONNULL __ATTR_WUNUSED __ATTR_NONNULL((1))
 __NAMESPACE_LOCAL_END
 #include <libc/local/wchar/wcsend.h>
 __NAMESPACE_LOCAL_BEGIN
-#define __localdep_c32send (*(__CHAR32_TYPE__ *(__LIBKCALL *)(__CHAR32_TYPE__ const *__restrict))&__LIBC_LOCAL_NAME(wcsend))
+#define __localdep_c32send __NAMESPACE_LOCAL_TYPEHAX(__CHAR32_TYPE__ *(__LIBKCALL*)(__CHAR32_TYPE__ const *__restrict),__CHAR32_TYPE__ *(__LIBKCALL&)(__CHAR32_TYPE__ const *__restrict),wcsend)
 #else /* ... */
 __NAMESPACE_LOCAL_END
 #include <libc/local/parts.uchar.string/c32send.h>
@@ -51,7 +51,7 @@ __CREDIRECT_KOS(__ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1)),__SIZE_TYPE__,__N
 __NAMESPACE_LOCAL_END
 #include <libc/local/wchar/wcsnlen.h>
 __NAMESPACE_LOCAL_BEGIN
-#define __localdep_c32snlen (*(__SIZE_TYPE__(__LIBKCALL *)(__CHAR32_TYPE__ const *__restrict, __SIZE_TYPE__))&__LIBC_LOCAL_NAME(wcsnlen))
+#define __localdep_c32snlen __NAMESPACE_LOCAL_TYPEHAX(__SIZE_TYPE__(__LIBKCALL*)(__CHAR32_TYPE__ const *__restrict,__SIZE_TYPE__),__SIZE_TYPE__(__LIBKCALL&)(__CHAR32_TYPE__ const *__restrict,__SIZE_TYPE__),wcsnlen)
 #else /* ... */
 __NAMESPACE_LOCAL_END
 #include <libc/local/parts.uchar.string/c32snlen.h>
@@ -76,9 +76,9 @@ __NAMESPACE_LOCAL_BEGIN
 #endif /* !__local___localdep_memcpyl_defined */
 __LOCAL_LIBC(c32sncat) __ATTR_RETNONNULL __ATTR_NONNULL((1, 2)) __CHAR32_TYPE__ *
 __NOTHROW_NCX(__LIBKCALL __LIBC_LOCAL_NAME(c32sncat))(__CHAR32_TYPE__ *__restrict __buf, __CHAR32_TYPE__ const *__restrict __src, __SIZE_TYPE__ __buflen) {
-	__SIZE_TYPE__ __srclen = __localdep_c32snlen(__src, __buflen);
-	__CHAR32_TYPE__ *__dst = __localdep_c32send(__buf);
-	(__CHAR32_TYPE__ *)__localdep_memcpyl(__dst, __src, __srclen);
+	__SIZE_TYPE__ __srclen = __NAMESPACE_LOCAL_SYM __localdep_c32snlen(__src, __buflen);
+	__CHAR32_TYPE__ *__dst = __NAMESPACE_LOCAL_SYM __localdep_c32send(__buf);
+	(__CHAR32_TYPE__ *)__NAMESPACE_LOCAL_SYM __localdep_memcpyl(__dst, __src, __srclen);
 	__dst[__srclen] = '\0';
 	return __buf;
 }

@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x12f9f5c3 */
+/* HASH CRC-32:0xbd60f805 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -80,19 +80,19 @@ __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(getsubopt))(char **__restrict __optio
 	__option  = *__optionp;
 	*__valuep = __NULLPTR;
 	/* Find the next option */
-	__nextopt = __localdep_strchr(__option, ',');
+	__nextopt = __NAMESPACE_LOCAL_SYM __localdep_strchr(__option, ',');
 	if (__nextopt) {
 		__option_len = (__SIZE_TYPE__)(__nextopt - __option);
 		*__nextopt++ = '\0';
 	} else {
-		__option_len = __localdep_strlen(__option);
+		__option_len = __NAMESPACE_LOCAL_SYM __localdep_strlen(__option);
 		__nextopt = __option + __option_len;
 	}
 	*__optionp = __nextopt;
 	for (__i = 0; __tokens[__i]; ++__i) {
-		__SIZE_TYPE__ __toklen = __localdep_strlen(__tokens[__i]);
+		__SIZE_TYPE__ __toklen = __NAMESPACE_LOCAL_SYM __localdep_strlen(__tokens[__i]);
 		/* Check if this token is matches the found option */
-		if (__localdep_memcmp(__tokens[__i], __option, __toklen * sizeof(char)) != 0)
+		if (__NAMESPACE_LOCAL_SYM __localdep_memcmp(__tokens[__i], __option, __toklen * sizeof(char)) != 0)
 			continue;
 		/* Deal with a potential option value. */
 		if (__option[__toklen] == '=') {

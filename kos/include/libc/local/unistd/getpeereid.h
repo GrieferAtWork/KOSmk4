@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xb082191f */
+/* HASH CRC-32:0xf428d15a */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -41,7 +41,7 @@ __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(getpeereid))(__fd_t __sockfd, __uid_t
 	int __result;
 	struct ucred __cred;
 	__socklen_t __len = sizeof(__cred);
-	__result = __localdep_getsockopt(__sockfd, __SOL_SOCKET, __SO_PEERCRED, &__cred, &__len);
+	__result = __NAMESPACE_LOCAL_SYM __localdep_getsockopt(__sockfd, __SOL_SOCKET, __SO_PEERCRED, &__cred, &__len);
 	if (__result == 0) {
 		/* Safety check that enough data was read... */
 		if (__len < (__COMPILER_OFFSETAFTER(struct ucred, uid) >

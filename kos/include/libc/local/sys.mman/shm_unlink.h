@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x54811d31 */
+/* HASH CRC-32:0xdca4ffd9 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -102,19 +102,19 @@ __NOTHROW_RPC(__LIBCCALL __LIBC_LOCAL_NAME(shm_unlink))(char const *__name) {
 	while (*__name == '/')
 		++__name;
 #endif /* !_WIN32 */
-	__namelen  = __localdep_strlen(__name);
+	__namelen  = __NAMESPACE_LOCAL_SYM __localdep_strlen(__name);
 	__fullname = (char *)__malloca((__COMPILER_STRLEN(__PATH_SHM) + 1 +
 	                              __namelen + 1) *
 	                             sizeof(char));
 	if __unlikely(!__fullname)
 		return -1;
-	__localdep_memcpy(__localdep_mempcpy(__fullname, __PATH_SHM "/",
+	__NAMESPACE_LOCAL_SYM __localdep_memcpy(__NAMESPACE_LOCAL_SYM __localdep_mempcpy(__fullname, __PATH_SHM "/",
 	               (__COMPILER_STRLEN(__PATH_SHM) + 1) *
 	               sizeof(char)),
 	       __fullname,
 	       (__namelen + 1) *
 	       sizeof(char));
-	__result = __localdep_unlink(__fullname);
+	__result = __NAMESPACE_LOCAL_SYM __localdep_unlink(__fullname);
 	__freea(__fullname);
 	return __result;
 }

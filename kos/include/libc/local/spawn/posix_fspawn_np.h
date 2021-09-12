@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xdb87d917 */
+/* HASH CRC-32:0x23649a7 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -498,7 +498,7 @@ __NOTHROW_RPC(__LIBCCALL __LIBC_LOCAL_NAME(posix_fspawn_np))(__pid_t *__restrict
 	__old_errno = __libc_geterrno_or(0);
 #if defined(__ARCH_HAVE_SHARED_VM_VFORK) && (defined(__CRT_HAVE_vfork) || defined(__CRT_HAVE___vfork))
 	(void)__libc_seterrno(0);
-	__child = __localdep_vfork();
+	__child = __NAMESPACE_LOCAL_SYM __localdep_vfork();
 	if (__child == 0)
 		goto __do_exec;
 	/* Check if the vfork() from  the child returned success, but  left
@@ -522,13 +522,13 @@ __NOTHROW_RPC(__LIBCCALL __LIBC_LOCAL_NAME(posix_fspawn_np))(__pid_t *__restrict
 	return __result;
 #else /* __ARCH_HAVE_SHARED_VM_VFORK && (__CRT_HAVE_vfork || __CRT_HAVE___vfork) */
 	/* Create a pair of pipes for temporary communication. */
-	if (__localdep_pipe2(__pipes, __O_CLOEXEC)) {
+	if (__NAMESPACE_LOCAL_SYM __localdep_pipe2(__pipes, __O_CLOEXEC)) {
 __err_without_child:
 		__result = __libc_geterrno_or(0);
 		(void)__libc_seterrno(__old_errno);
 		return __result;
 	}
-	__child = __localdep_fork();
+	__child = __NAMESPACE_LOCAL_SYM __localdep_fork();
 	if (__child == 0)
 		goto __do_exec;
 	if (__child < 0)
@@ -536,9 +536,9 @@ __err_without_child:
 	/* Read from the communication pipe
 	 * (NOTE: If exec() succeeds, the pipe will be
 	 *        closed and  read() returns  ZERO(0)) */
-	__localdep_close(__pipes[1]); /* Close the writer. */
-	__temp = __localdep_read(__pipes[0], &__result, sizeof(__result));
-	__localdep_close(__pipes[0]); /* Close the reader. */
+	__NAMESPACE_LOCAL_SYM __localdep_close(__pipes[1]); /* Close the writer. */
+	__temp = __NAMESPACE_LOCAL_SYM __localdep_read(__pipes[0], &__result, sizeof(__result));
+	__NAMESPACE_LOCAL_SYM __localdep_close(__pipes[0]); /* Close the reader. */
 	if (__temp < 0)
 		goto __err_join_zombie_child;
 	/* This means that `fexecve()' below closed the pipe during a successful exec(). */
@@ -552,7 +552,7 @@ __err_join_zombie_child:
 	/* Unless the child was already spawned as detached,
 	 * we still have to re-join  it, or else it will  be
 	 * left dangling as a zombie process! */
-	if (__localdep_waitpid(__child, &__status, 0) < 0) {
+	if (__NAMESPACE_LOCAL_SYM __localdep_waitpid(__child, &__status, 0) < 0) {
 #ifdef __EINTR
 		if (__libc_geterrno() == __EINTR)
 			goto __err_join_zombie_child;
@@ -581,7 +581,7 @@ __do_exec:
 #else /* !__CRT_HAVE_close && !__CRT_HAVE__close && !__CRT_HAVE___close */
 			case __POSIX_SPAWN_ACTION_CLOSE:
 				/* Close a file handle */
-				if __unlikely(__localdep_close(__act->__sa_action.__sa_close_action.__sa_fd))
+				if __unlikely(__NAMESPACE_LOCAL_SYM __localdep_close(__act->__sa_action.__sa_close_action.__sa_fd))
 					goto __child_error;
 				break;
 #endif /* __CRT_HAVE_close || __CRT_HAVE__close || __CRT_HAVE___close */
@@ -592,7 +592,7 @@ __do_exec:
 #else /* !__CRT_HAVE_dup2 && !__CRT_HAVE__dup2 && !__CRT_HAVE___dup2 */
 			case __POSIX_SPAWN_ACTION_DUP2:
 				/* Duplicate a file handle */
-				if __unlikely(__localdep_dup2(__act->__sa_action.__sa_dup2_action.__sa_oldfd,
+				if __unlikely(__NAMESPACE_LOCAL_SYM __localdep_dup2(__act->__sa_action.__sa_dup2_action.__sa_oldfd,
 				                 __act->__sa_action.__sa_dup2_action.__sa_newfd))
 					goto __child_error;
 				break;
@@ -605,15 +605,15 @@ __do_exec:
 			case __POSIX_SPAWN_ACTION_OPEN: {
 				/* Open a file using `open(2)' */
 				__fd_t __tempfd;
-				__tempfd = __localdep_open(__act->__sa_action.__sa_open_action.__sa_path,
+				__tempfd = __NAMESPACE_LOCAL_SYM __localdep_open(__act->__sa_action.__sa_open_action.__sa_path,
 				              __act->__sa_action.__sa_open_action.__sa_oflag,
 				              __act->__sa_action.__sa_open_action.__sa_mode);
 				if __unlikely(__tempfd < 0)
 					goto __child_error;
 				if __likely(__tempfd != __act->__sa_action.__sa_open_action.__sa_fd) {
-					if __unlikely(__localdep_dup2(__tempfd, __act->__sa_action.__sa_open_action.__sa_fd))
+					if __unlikely(__NAMESPACE_LOCAL_SYM __localdep_dup2(__tempfd, __act->__sa_action.__sa_open_action.__sa_fd))
 						goto __child_error;
-					__localdep_close(__tempfd);
+					__NAMESPACE_LOCAL_SYM __localdep_close(__tempfd);
 				}
 			}	break;
 #endif /* (__CRT_HAVE_open64 || __CRT_HAVE___open64 || __CRT_HAVE_open || __CRT_HAVE__open || __CRT_HAVE___open || (__AT_FDCWD && (__CRT_HAVE_openat64 || __CRT_HAVE_openat))) && (__CRT_HAVE_dup2 || __CRT_HAVE__dup2 || __CRT_HAVE___dup2) && (__CRT_HAVE_close || __CRT_HAVE__close || __CRT_HAVE___close) */
@@ -625,7 +625,7 @@ __do_exec:
 			case __POSIX_SPAWN_ACTION_CHDIR: {
 				/* Change direction using `chdir(2)' */
 				int __error;
-				__error = __localdep_chdir(__act->__sa_action.__sa_chdir_action.__sa_path);
+				__error = __NAMESPACE_LOCAL_SYM __localdep_chdir(__act->__sa_action.__sa_chdir_action.__sa_path);
 				if __unlikely(__error != 0)
 					goto __child_error;
 			}	break;
@@ -638,7 +638,7 @@ __do_exec:
 			case __POSIX_SPAWN_ACTION_FCHDIR: {
 				/* Change direction using `fchdir(2)' */
 				int __error;
-				__error = __localdep_fchdir(__act->__sa_action.__sa_fchdir_action.__sa_fd);
+				__error = __NAMESPACE_LOCAL_SYM __localdep_fchdir(__act->__sa_action.__sa_fchdir_action.__sa_fd);
 				if __unlikely(__error != 0)
 					goto __child_error;
 			}	break;
@@ -651,7 +651,7 @@ __do_exec:
 #else /* !__CRT_HAVE_tcsetpgrp */
 			case __POSIX_SPAWN_ACTION_TCSETPGRP:
 				/* NOTE: Passing `0' as second argument to `tcsetpgrp()' is the same as `getpid()' */
-				if __unlikely(__localdep_tcsetpgrp(__act->__sa_action.__sa_tcsetpgrp_action.__sa_fd, 0))
+				if __unlikely(__NAMESPACE_LOCAL_SYM __localdep_tcsetpgrp(__act->__sa_action.__sa_tcsetpgrp_action.__sa_fd, 0))
 					goto __child_error;
 				break;
 #endif /* __CRT_HAVE_tcsetpgrp */
@@ -663,7 +663,7 @@ __do_exec:
 #define __POSIX_SPAWN_HAVE_UNSUPPORTED_FILE_ACTION 1
 #else /* !__CRT_HAVE_closefrom && ((!__CRT_HAVE_fcntl && !__CRT_HAVE___fcntl) || !__F_CLOSEM) */
 			case __POSIX_SPAWN_ACTION_CLOSEFROM:
-				__localdep_closefrom(__act->__sa_action.__sa_closefrom_action.__sa_fd);
+				__NAMESPACE_LOCAL_SYM __localdep_closefrom(__act->__sa_action.__sa_closefrom_action.__sa_fd);
 				break;
 #endif /* __CRT_HAVE_closefrom || ((__CRT_HAVE_fcntl || __CRT_HAVE___fcntl) && __F_CLOSEM) */
 #endif /* __POSIX_SPAWN_ACTION_CLOSEFROM */
@@ -695,11 +695,11 @@ __do_exec:
 		if (__attrp->__flags & __POSIX_SPAWN_RESETIDS) {
 #if (defined(__CRT_HAVE_seteuid) && defined(__CRT_HAVE_getuid)) || (defined(__CRT_HAVE_setegid) && defined(__CRT_HAVE_getgid))
 #if defined(__CRT_HAVE_seteuid) && defined(__CRT_HAVE_getuid)
-			if (__localdep_seteuid(__localdep_getuid()))
+			if (__NAMESPACE_LOCAL_SYM __localdep_seteuid(__NAMESPACE_LOCAL_SYM __localdep_getuid()))
 				goto __child_error;
 #endif /* __CRT_HAVE_seteuid && __CRT_HAVE_getuid */
 #if defined(__CRT_HAVE_setegid) && defined(__CRT_HAVE_getgid)
-			if (__localdep_setegid(__localdep_getgid()))
+			if (__NAMESPACE_LOCAL_SYM __localdep_setegid(__NAMESPACE_LOCAL_SYM __localdep_getgid()))
 				goto __child_error;
 #endif /* __CRT_HAVE_setegid && __CRT_HAVE_getgid */
 #else /* (__CRT_HAVE_seteuid && __CRT_HAVE_getuid) || (__CRT_HAVE_setegid && __CRT_HAVE_getgid) */
@@ -716,7 +716,7 @@ __do_exec:
 		if (__attrp->__flags & __POSIX_SPAWN_SETPGROUP) {
 #if defined(__CRT_HAVE_setpgid) || defined(__CRT_HAVE___setpgid)
 			/* HINT: Passing `0' as first argument is the same as passing `getpid()'! */
-			if __unlikely(__localdep_setpgid(0, __attrp->__pgrp))
+			if __unlikely(__NAMESPACE_LOCAL_SYM __localdep_setpgid(0, __attrp->__pgrp))
 				goto __child_error;
 #else /* __CRT_HAVE_setpgid || __CRT_HAVE___setpgid */
 #ifdef __ENOSYS
@@ -735,11 +735,11 @@ __do_exec:
 			struct sigaction __sa;
 			__sa.sa_handler = (__sighandler_t)__SIG_DFL;
 			__sa.sa_flags   = 0;
-			__localdep_sigemptyset(&__sa.sa_mask);
+			__NAMESPACE_LOCAL_SYM __localdep_sigemptyset(&__sa.sa_mask);
 			for (__i = 0; (unsigned int)__i < (unsigned int)(sizeof(__attrp->__sd) / 8); ++__i) {
-				if (!__localdep_sigismember(&__attrp->__sd, __i))
+				if (!__NAMESPACE_LOCAL_SYM __localdep_sigismember(&__attrp->__sd, __i))
 					continue;
-				if __unlikely(__localdep_sigaction(__i, &__sa, __NULLPTR))
+				if __unlikely(__NAMESPACE_LOCAL_SYM __localdep_sigaction(__i, &__sa, __NULLPTR))
 					goto __child_error;
 			}
 #else /* (__CRT_HAVE_sigaction || __CRT_HAVE___sigaction) && __SIG_DFL */
@@ -755,7 +755,7 @@ __do_exec:
 		}
 		if (__attrp->__flags & __POSIX_SPAWN_SETSIGMASK) {
 #if (defined(__CRT_HAVE_sigprocmask) || defined(__CRT_HAVE_pthread_sigmask)) && defined(__SIG_SETMASK)
-			if __unlikely(__localdep_sigprocmask(__SIG_SETMASK, &__attrp->__ss, __NULLPTR))
+			if __unlikely(__NAMESPACE_LOCAL_SYM __localdep_sigprocmask(__SIG_SETMASK, &__attrp->__ss, __NULLPTR))
 				goto __child_error;
 #else /* (__CRT_HAVE_sigprocmask || __CRT_HAVE_pthread_sigmask) && __SIG_SETMASK */
 #ifdef __ENOSYS
@@ -773,14 +773,14 @@ __do_exec:
 			int __error;
 			if ((__attrp->__flags & (__POSIX_SPAWN_SETSCHEDPARAM | __POSIX_SPAWN_SETSCHEDULER)) ==
 			    /*               */ (__POSIX_SPAWN_SETSCHEDPARAM | __POSIX_SPAWN_SETSCHEDULER)) {
-				__error = __localdep_sched_setscheduler(0, __attrp->__policy, &__attrp->__sp);
+				__error = __NAMESPACE_LOCAL_SYM __localdep_sched_setscheduler(0, __attrp->__policy, &__attrp->__sp);
 			} else if (__attrp->__flags & __POSIX_SPAWN_SETSCHEDPARAM) {
-				__error = __localdep_sched_setparam(0, &__attrp->__sp);
+				__error = __NAMESPACE_LOCAL_SYM __localdep_sched_setparam(0, &__attrp->__sp);
 			} else {
 				struct sched_param __param;
-				__error = __localdep_sched_getparam(0, &__param);
+				__error = __NAMESPACE_LOCAL_SYM __localdep_sched_getparam(0, &__param);
 				if __likely(__error == 0)
-					__error = __localdep_sched_setscheduler(0, __attrp->__policy, &__param);
+					__error = __NAMESPACE_LOCAL_SYM __localdep_sched_setscheduler(0, __attrp->__policy, &__param);
 			}
 			if __unlikely(__error)
 				goto __child_error;
@@ -798,7 +798,7 @@ __do_exec:
 	}
 	/* When the exec succeeds, the pipe is auto-
 	 * closed because it's marked as  O_CLOEXEC! */
-	__localdep_fexecve(__execfd, ___argv, ___envp);
+	__NAMESPACE_LOCAL_SYM __localdep_fexecve(__execfd, ___argv, ___envp);
 #ifdef __POSIX_SPAWN_NOEXECERR
 	if (__attrp && __attrp->__flags & __POSIX_SPAWN_NOEXECERR) {
 		/* Suppress the exec error. */
@@ -823,15 +823,15 @@ __child_error:
 		__error = __libc_geterrno_or(1);
 #endif /* !__ENOENT */
 		/* Communicate back why this failed. */
-		__localdep_write(__pipes[1], &__error, sizeof(__error));
+		__NAMESPACE_LOCAL_SYM __localdep_write(__pipes[1], &__error, sizeof(__error));
 		/* No need to close the pipe, it's auto-closed by the kernel! */
 #endif /* !__ARCH_HAVE_SHARED_VM_VFORK || (!__CRT_HAVE_vfork && !__CRT_HAVE___vfork) */
 	}
-	__localdep__Exit(127);
+	__NAMESPACE_LOCAL_SYM __localdep__Exit(127);
 #else /* __POSIX_SPAWN_USE_KOS && ((__ARCH_HAVE_SHARED_VM_VFORK && (__CRT_HAVE_vfork || __CRT_HAVE___vfork)) || ((__CRT_HAVE_fork || __CRT_HAVE___fork) && (__CRT_HAVE_pipe2 || __CRT_HAVE_pipe || __CRT_HAVE___pipe || __CRT_HAVE__pipe) && __O_CLOEXEC && (__CRT_HAVE_read || __CRT_HAVE__read || __CRT_HAVE___read) && (__CRT_HAVE_write || __CRT_HAVE__write || __CRT_HAVE___write) && (__CRT_HAVE_close || __CRT_HAVE__close || __CRT_HAVE___close))) && __CRT_HAVE_fexecve && (__CRT_HAVE_waitpid || __CRT_HAVE___waitpid) */
 	char __buf[32];
-	__localdep_sprintf(__buf, "/proc/self/fd/%d", __execfd);
-	return __localdep_crt_posix_spawn(__pid, __buf, __file_actions, __attrp, ___argv, ___envp);
+	__NAMESPACE_LOCAL_SYM __localdep_sprintf(__buf, "/proc/self/fd/%d", __execfd);
+	return __NAMESPACE_LOCAL_SYM __localdep_crt_posix_spawn(__pid, __buf, __file_actions, __attrp, ___argv, ___envp);
 #endif /* !__POSIX_SPAWN_USE_KOS || ((!__ARCH_HAVE_SHARED_VM_VFORK || (!__CRT_HAVE_vfork && !__CRT_HAVE___vfork)) && ((!__CRT_HAVE_fork && !__CRT_HAVE___fork) || (!__CRT_HAVE_pipe2 && !__CRT_HAVE_pipe && !__CRT_HAVE___pipe && !__CRT_HAVE__pipe) || !__O_CLOEXEC || (!__CRT_HAVE_read && !__CRT_HAVE__read && !__CRT_HAVE___read) || (!__CRT_HAVE_write && !__CRT_HAVE__write && !__CRT_HAVE___write) || (!__CRT_HAVE_close && !__CRT_HAVE__close && !__CRT_HAVE___close))) || !__CRT_HAVE_fexecve || (!__CRT_HAVE_waitpid && !__CRT_HAVE___waitpid) */
 }
 __NAMESPACE_LOCAL_END

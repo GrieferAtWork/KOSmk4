@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xc786e783 */
+/* HASH CRC-32:0x22bfef26 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -71,7 +71,7 @@ __LOCAL_LIBC(argz_add_sep) __ATTR_NONNULL((1, 2, 3)) __errno_t
 __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(argz_add_sep))(char **__restrict __pargz, __SIZE_TYPE__ *__restrict __pargz_len, char const *__restrict __string, int __sep) {
 	char *__result_string, *__dst;
 	__SIZE_TYPE__ __oldlen;
-	__SIZE_TYPE__ __slen = __localdep_strlen(__string);
+	__SIZE_TYPE__ __slen = __NAMESPACE_LOCAL_SYM __localdep_strlen(__string);
 	if __unlikely(!__slen)
 		return 0;
 	__oldlen = *__pargz_len;
@@ -91,7 +91,7 @@ __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(argz_add_sep))(char **__restrict __pa
 	 * Glibc's version  of `argz_append()',  which handles  that case  as
 	 * leaving all pointers unmodified (just as one should)
 	 */
-	__result_string = (char *)__localdep_realloc(*__pargz, (__oldlen + (__slen + 1)) * sizeof(char));
+	__result_string = (char *)__NAMESPACE_LOCAL_SYM __localdep_realloc(*__pargz, (__oldlen + (__slen + 1)) * sizeof(char));
 	if __unlikely(!__result_string) {
 #ifdef __ENOMEM
 		return __ENOMEM;
@@ -121,7 +121,7 @@ __again_check_ch:
 	}
 	if __unlikely(__dst == __result_string) {
 		/* Empty string. (this can happen if `string' only consisted of `sep' characters) */
-		__localdep_free(__result_string);
+		__NAMESPACE_LOCAL_SYM __localdep_free(__result_string);
 		*__pargz     = __NULLPTR;
 		*__pargz_len = 0;
 		return 0;

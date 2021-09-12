@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x8b0be229 */
+/* HASH CRC-32:0x3bedc481 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -63,21 +63,21 @@ __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(inet_neta))(__UINT32_TYPE__ __net, ch
 		if (!__net) {
 			__reqlen = 8;
 			if __likely(__len >= 8)
-				__localdep_memcpy(__buf, "0.0.0.0", 8 * sizeof(char));
+				__NAMESPACE_LOCAL_SYM __localdep_memcpy(__buf, "0.0.0.0", 8 * sizeof(char));
 		} else {
-			__reqlen = __localdep_snprintf(__buf, __len, "%u", (unsigned int)__net);
+			__reqlen = __NAMESPACE_LOCAL_SYM __localdep_snprintf(__buf, __len, "%u", (unsigned int)__net);
 		}
 	} else if (__net <= 0xffff) {
-		__reqlen = __localdep_snprintf(__buf, __len, "%u.%u",
+		__reqlen = __NAMESPACE_LOCAL_SYM __localdep_snprintf(__buf, __len, "%u.%u",
 		                  (unsigned int)((__net & 0xff00) >> 8),
 		                  (unsigned int)(__net & 0xff));
 	} else if (__net <= 0xffffff) {
-		__reqlen = __localdep_snprintf(__buf, __len, "%u.%u.%u",
+		__reqlen = __NAMESPACE_LOCAL_SYM __localdep_snprintf(__buf, __len, "%u.%u.%u",
 		                  (unsigned int)((__net & 0xff0000) >> 16),
 		                  (unsigned int)((__net & 0xff00) >> 8),
 		                  (unsigned int)(__net & 0xff));
 	} else {
-		__reqlen = __localdep_snprintf(__buf, __len, "%u.%u.%u.%u",
+		__reqlen = __NAMESPACE_LOCAL_SYM __localdep_snprintf(__buf, __len, "%u.%u.%u.%u",
 		                  (unsigned int)((__net & 0xff000000) >> 24),
 		                  (unsigned int)((__net & 0xff0000) >> 16),
 		                  (unsigned int)((__net & 0xff00) >> 8),

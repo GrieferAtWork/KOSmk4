@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x3fa97968 */
+/* HASH CRC-32:0x931b9ef */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -109,25 +109,25 @@ __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(forkpty))(__fd_t *__amaster, char *__
 	int __error;
 	__fd_t __master, __slave;
 	__pid_t __pid;
-	__error = __localdep_openpty(&__master, &__slave, __name, __termp, __winp);
+	__error = __NAMESPACE_LOCAL_SYM __localdep_openpty(&__master, &__slave, __name, __termp, __winp);
 	if __unlikely(__error)
 		return __error;
-	__pid = __localdep_fork();
+	__pid = __NAMESPACE_LOCAL_SYM __localdep_fork();
 	if __unlikely(__pid == -1) {
-		__localdep_close(__master);
+		__NAMESPACE_LOCAL_SYM __localdep_close(__master);
 		goto __done_slave;
 	}
 	if (__pid == 0) {
 		/* Child process. */
-		__localdep_close(__master);
-		if (__localdep_login_tty(__slave))
-			__localdep__Exit(1);
+		__NAMESPACE_LOCAL_SYM __localdep_close(__master);
+		if (__NAMESPACE_LOCAL_SYM __localdep_login_tty(__slave))
+			__NAMESPACE_LOCAL_SYM __localdep__Exit(1);
 		return 0;
 	}
 	/* Parent process. */
 	*__amaster = __master;
 __done_slave:
-	__localdep_close(__slave);
+	__NAMESPACE_LOCAL_SYM __localdep_close(__slave);
 	return __pid;
 }
 __NAMESPACE_LOCAL_END

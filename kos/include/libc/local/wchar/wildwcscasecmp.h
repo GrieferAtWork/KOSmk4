@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x32162f63 */
+/* HASH CRC-32:0x52d57092 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -74,10 +74,10 @@ __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(wildwcscasecmp))(__WCHAR_TYPE__ const
 				return 0; /* Pattern ends with '*' (matches everything) */
 			if (__card_post == '?')
 				goto __next; /* Match any --> already found */
-			__card_post = (__WCHAR_TYPE__)__localdep_towlower((__WCHAR_TYPE__)__card_post);
+			__card_post = (__WCHAR_TYPE__)__NAMESPACE_LOCAL_SYM __localdep_towlower((__WCHAR_TYPE__)__card_post);
 			for (;;) {
 				__WCHAR_TYPE__ __ch = *__string++;
-				if (__card_post == __ch || __card_post == (__WCHAR_TYPE__)__localdep_towlower((__WCHAR_TYPE__)__ch)) {
+				if (__card_post == __ch || __card_post == (__WCHAR_TYPE__)__NAMESPACE_LOCAL_SYM __localdep_towlower((__WCHAR_TYPE__)__ch)) {
 					/* Recursively check if the rest of the string and pattern match */
 					if (!__LIBC_LOCAL_NAME(wildwcscasecmp)(__string, __pattern))
 						return 0;
@@ -89,8 +89,8 @@ __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(wildwcscasecmp))(__WCHAR_TYPE__ const
 		__pattern_ch = *__pattern;
 		__wcsing_ch = *__string;
 		if (__pattern_ch == __wcsing_ch || __pattern_ch == '?' ||
-		    (__pattern_ch = (__WCHAR_TYPE__)__localdep_towlower((__WCHAR_TYPE__)__pattern_ch),
-		     __wcsing_ch  = (__WCHAR_TYPE__)__localdep_towlower((__WCHAR_TYPE__)__wcsing_ch),
+		    (__pattern_ch = (__WCHAR_TYPE__)__NAMESPACE_LOCAL_SYM __localdep_towlower((__WCHAR_TYPE__)__pattern_ch),
+		     __wcsing_ch  = (__WCHAR_TYPE__)__NAMESPACE_LOCAL_SYM __localdep_towlower((__WCHAR_TYPE__)__wcsing_ch),
 		     __pattern_ch == __wcsing_ch)) {
 __next:
 			++__string;

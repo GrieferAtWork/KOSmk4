@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x191e1ab2 */
+/* HASH CRC-32:0x40714d24 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -104,7 +104,7 @@ __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(hcreate_r))(__SIZE_TYPE__ __nel, stru
 	}
 	__htab->size   = __nel;
 	__htab->filled = 0;
-	__htab->table  = (struct _ENTRY *)__localdep_calloc(__htab->size + 1, sizeof(__entry_type));
+	__htab->table  = (struct _ENTRY *)__NAMESPACE_LOCAL_SYM __localdep_calloc(__htab->size + 1, sizeof(__entry_type));
 	if (__htab->table == __NULLPTR)
 		return 0;
 	return 1;

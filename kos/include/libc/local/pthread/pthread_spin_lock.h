@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x74ba195c */
+/* HASH CRC-32:0x18a70823 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -41,7 +41,7 @@ __NAMESPACE_LOCAL_END
 __NAMESPACE_LOCAL_BEGIN
 __LOCAL_LIBC(pthread_spin_lock) __ATTR_NONNULL((1)) __errno_t
 __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(pthread_spin_lock))(__pthread_spinlock_t *__lock) {
-	while (__localdep_pthread_spin_trylock(__lock) != 0)
+	while (__NAMESPACE_LOCAL_SYM __localdep_pthread_spin_trylock(__lock) != 0)
 		__hybrid_yield();
 	return 0;
 }

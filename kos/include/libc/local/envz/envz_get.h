@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xe8ff7906 */
+/* HASH CRC-32:0xd8b99ca6 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -54,9 +54,9 @@ __NAMESPACE_LOCAL_BEGIN
 __LOCAL_LIBC(envz_get) __ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((3)) char *
 __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(envz_get))(char const *__restrict __envz, __SIZE_TYPE__ __envz_len, char const *__restrict __name) {
 	char *__result;
-	__result = (char *)__localdep_envz_entry(__envz, __envz_len, __name);
+	__result = (char *)__NAMESPACE_LOCAL_SYM __localdep_envz_entry(__envz, __envz_len, __name);
 	if (__result) {
-		__result = __localdep_strchr(__result, '=');
+		__result = __NAMESPACE_LOCAL_SYM __localdep_strchr(__result, '=');
 		if (__result)
 			++__result; /* Point to the value-portion */
 	}

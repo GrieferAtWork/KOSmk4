@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x8585d4a7 */
+/* HASH CRC-32:0x32ec69c1 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -63,7 +63,7 @@ __NOTHROW_NCX(__LIBDCALL __LIBC_LOCAL_NAME(uchar_mbrtoc16))(__CHAR16_TYPE__ *__p
 	if (!__maxlen || !*__str)
 		return 0;
 
-	__error = __localdep_unicode_c8toc16((__CHAR16_TYPE__ *)__pwc, __str, __maxlen, __mbs);
+	__error = __NAMESPACE_LOCAL_SYM __localdep_unicode_c8toc16((__CHAR16_TYPE__ *)__pwc, __str, __maxlen, __mbs);
 
 
 

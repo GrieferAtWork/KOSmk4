@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xfc891397 */
+/* HASH CRC-32:0x38fb13cd */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -143,7 +143,7 @@ __LOCAL_LIBC(__funopen_to_funopen2_closefn) int
 	if (__holder->__fh_closefn != __NULLPTR)
 		__result = (*__holder->__fh_closefn)(__holder->__fh_cookie);
 #if defined(__CRT_HAVE_free) || defined(__CRT_HAVE_cfree)
-	__localdep_free(__holder);
+	__NAMESPACE_LOCAL_SYM __localdep_free(__holder);
 #endif /* __CRT_HAVE_free || __CRT_HAVE_cfree */
 	return __result;
 }
@@ -219,8 +219,8 @@ __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(funopen2))(void const *__cookie, __fu
 	__FILE *__result;
 	struct __NAMESPACE_LOCAL_SYM __funopen2_holder *__holder;
 	if (!__seekfn)
-		return __localdep_funopen2_64(__cookie, __readfn, __writefn, __NULLPTR, __flushfn, __closefn);
-	__holder = (struct __NAMESPACE_LOCAL_SYM __funopen2_holder *)__localdep_malloc(sizeof(struct __NAMESPACE_LOCAL_SYM __funopen2_holder));
+		return __NAMESPACE_LOCAL_SYM __localdep_funopen2_64(__cookie, __readfn, __writefn, __NULLPTR, __flushfn, __closefn);
+	__holder = (struct __NAMESPACE_LOCAL_SYM __funopen2_holder *)__NAMESPACE_LOCAL_SYM __localdep_malloc(sizeof(struct __NAMESPACE_LOCAL_SYM __funopen2_holder));
 	if __unlikely(!__holder)
 		return __NULLPTR;
 	__holder->__f2h_cookie  = (void *)__cookie;
@@ -230,14 +230,14 @@ __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(funopen2))(void const *__cookie, __fu
 	__holder->__f2h_flushfn = __flushfn;
 	__holder->__f2h_closefn = __closefn;
 #if __SIZEOF_INT__ == __SIZEOF_SIZE_T__
-	__result = __localdep_funopen2_64(/* cookie:  */ __holder,
+	__result = __NAMESPACE_LOCAL_SYM __localdep_funopen2_64(/* cookie:  */ __holder,
 	                     /* readfn:  */ __readfn ? (__funopen2_readfn_t)&__NAMESPACE_LOCAL_SYM __funopen_to_funopen2_readfn : __NULLPTR,
 	                     /* writefn: */ __writefn ? (__funopen2_writefn_t)&__NAMESPACE_LOCAL_SYM __funopen_to_funopen2_writefn : __NULLPTR,
 	                     /* seekfn:  */ __seekfn ? &__NAMESPACE_LOCAL_SYM __funopen_to_funopen64_seekfn : __NULLPTR,
 	                     /* flushfn: */ __flushfn ? &__NAMESPACE_LOCAL_SYM __funopen2_to_funopen2_64_flushfn : __NULLPTR,
 	                     /* closefn: */ &__NAMESPACE_LOCAL_SYM __funopen_to_funopen2_closefn);
 #else /* __SIZEOF_INT__ == __SIZEOF_SIZE_T__ */
-	__result = __localdep_funopen2_64(/* cookie:  */ __holder,
+	__result = __NAMESPACE_LOCAL_SYM __localdep_funopen2_64(/* cookie:  */ __holder,
 	                     /* readfn:  */ __readfn ? &__NAMESPACE_LOCAL_SYM __funopen2_to_funopen2_64_readfn : __NULLPTR,
 	                     /* writefn: */ __writefn ? &__NAMESPACE_LOCAL_SYM __funopen2_to_funopen2_64_writefn : __NULLPTR,
 	                     /* seekfn:  */ __seekfn ? &__NAMESPACE_LOCAL_SYM __funopen_to_funopen64_seekfn : __NULLPTR,
@@ -246,7 +246,7 @@ __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(funopen2))(void const *__cookie, __fu
 #endif /* __SIZEOF_INT__ != __SIZEOF_SIZE_T__ */
 #if defined(__CRT_HAVE_free) || defined(__CRT_HAVE_cfree)
 	if __unlikely(!__result)
-		__localdep_free(__holder);
+		__NAMESPACE_LOCAL_SYM __localdep_free(__holder);
 #endif /* __CRT_HAVE_free || __CRT_HAVE_cfree */
 	return __result;
 }

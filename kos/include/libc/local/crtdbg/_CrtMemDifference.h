@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xec502d3f */
+/* HASH CRC-32:0x57a018eb */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -40,7 +40,7 @@ __LOCAL_LIBC(_CrtMemDifference) __ATTR_NONNULL((1, 2, 3)) int
 __NOTHROW_NCX(__LIBDCALL __LIBC_LOCAL_NAME(_CrtMemDifference))(_CrtMemState *__state, _CrtMemState const *__old_state, _CrtMemState const *__new_state) {
 	(void)__old_state;
 	(void)__new_state;
-	__localdep_memset(__state, 0, sizeof(*__state));
+	__NAMESPACE_LOCAL_SYM __localdep_memset(__state, 0, sizeof(*__state));
 	return 0;
 }
 __NAMESPACE_LOCAL_END

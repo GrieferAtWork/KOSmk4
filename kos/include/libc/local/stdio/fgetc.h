@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x36e4de07 */
+/* HASH CRC-32:0xd0ac8d4d */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -70,10 +70,10 @@ __NAMESPACE_LOCAL_BEGIN
 __LOCAL_LIBC(fgetc) __ATTR_NONNULL((1)) int
 (__LIBCCALL __LIBC_LOCAL_NAME(fgetc))(__FILE *__restrict __stream) __THROWS(...) {
 #if defined(__CRT_DOS) && defined(__CRT_HAVE__filbuf) && (!defined(__USE_STDIO_UNLOCKED) || (!defined(__CRT_HAVE_fread) && !defined(__CRT_HAVE__IO_fread) && !defined(__CRT_HAVE_fread_unlocked) && !defined(__CRT_HAVE__fread_nolock)))
-	return --__stream->__f_cnt >= 0 ? (int)((__UINT8_TYPE__)*__stream->__f_ptr++) : __localdep__filbuf(__stream);
+	return --__stream->__f_cnt >= 0 ? (int)((__UINT8_TYPE__)*__stream->__f_ptr++) : __NAMESPACE_LOCAL_SYM __localdep__filbuf(__stream);
 #else /* __CRT_DOS && __CRT_HAVE__filbuf && (!__USE_STDIO_UNLOCKED || (!__CRT_HAVE_fread && !__CRT_HAVE__IO_fread && !__CRT_HAVE_fread_unlocked && !__CRT_HAVE__fread_nolock)) */
 	char __ch;
-	if (!__localdep_crt_fread(&__ch, sizeof(char), 1, __stream))
+	if (!__NAMESPACE_LOCAL_SYM __localdep_crt_fread(&__ch, sizeof(char), 1, __stream))
 		return __EOF;
 	return (int)__ch;
 #endif /* !__CRT_DOS || !__CRT_HAVE__filbuf || (__USE_STDIO_UNLOCKED && (__CRT_HAVE_fread || __CRT_HAVE__IO_fread || __CRT_HAVE_fread_unlocked || __CRT_HAVE__fread_nolock)) */

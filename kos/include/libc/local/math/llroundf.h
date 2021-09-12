@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x5851e735 */
+/* HASH CRC-32:0x9e37baec */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -46,7 +46,7 @@ __NOTHROW(__LIBCCALL __LIBC_LOCAL_NAME(llroundf))(float __x) {
 #ifdef __LIBM_MATHFUNIF
 	return __LIBM_MATHFUNIF(llround, __x);
 #else /* __LIBM_MATHFUNIF */
-	return (__LONGLONG)__localdep_roundf(__x);
+	return (__LONGLONG)__NAMESPACE_LOCAL_SYM __localdep_roundf(__x);
 #endif /* !__LIBM_MATHFUNIF */
 }
 __NAMESPACE_LOCAL_END

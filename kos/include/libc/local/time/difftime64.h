@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x1b6c2985 */
+/* HASH CRC-32:0xc284d076 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -38,7 +38,7 @@ __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(difftime64))(__time64_t __time1, __ti
 
 
 #if defined(__CRT_HAVE_difftime) || defined(__CRT_HAVE__difftime32)
-	return __localdep_difftime32((__time32_t)__time1, (__time32_t)__time0);
+	return __NAMESPACE_LOCAL_SYM __localdep_difftime32((__time32_t)__time1, (__time32_t)__time0);
 #else /* __CRT_HAVE_difftime || __CRT_HAVE__difftime32 */
 	return __time1 > __time0 ? __time1 - __time0 : __time0 - __time1;
 #endif /* !__CRT_HAVE_difftime && !__CRT_HAVE__difftime32 */

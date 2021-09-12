@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x10cc6820 */
+/* HASH CRC-32:0xe243dbfc */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -44,7 +44,7 @@ __CVREDIRECT(,__STDC_INT_AS_SSIZE_T,__NOTHROW_NCX,__localdep_fcntl,(__fd_t __fd,
 #endif /* !__local___localdep_fcntl_defined */
 __LOCAL_LIBC(closefrom) void
 __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(closefrom))(__fd_t __lowfd) {
-	__localdep_fcntl(__lowfd, __F_CLOSEM);
+	__NAMESPACE_LOCAL_SYM __localdep_fcntl(__lowfd, __F_CLOSEM);
 }
 __NAMESPACE_LOCAL_END
 #ifndef __local___localdep_closefrom_defined

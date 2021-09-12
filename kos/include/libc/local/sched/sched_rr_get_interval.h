@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x56616932 */
+/* HASH CRC-32:0xba3a92bd */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -49,17 +49,17 @@ __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(sched_rr_get_interval))(__pid_t __pid
 #ifdef __CRT_HAVE_sched_rr_get_interval
 	struct __timespec32 __tms32;
 	if (!__tms)
-		return __localdep_sched_rr_get_interval32(__pid, __NULLPTR);
+		return __NAMESPACE_LOCAL_SYM __localdep_sched_rr_get_interval32(__pid, __NULLPTR);
 	__tms32.tv_sec  = (__time32_t)__tms->tv_sec;
 	__tms32.tv_nsec = __tms->tv_nsec;
-	return __localdep_sched_rr_get_interval32(__pid, &__tms32);
+	return __NAMESPACE_LOCAL_SYM __localdep_sched_rr_get_interval32(__pid, &__tms32);
 #else /* __CRT_HAVE_sched_rr_get_interval */
 	struct __timespec64 __tms64;
 	if (!__tms)
-		return __localdep_sched_rr_get_interval64(__pid, __NULLPTR);
+		return __NAMESPACE_LOCAL_SYM __localdep_sched_rr_get_interval64(__pid, __NULLPTR);
 	__tms64.tv_sec  = (__time64_t)__tms->tv_sec;
 	__tms64.tv_nsec = __tms->tv_nsec;
-	return __localdep_sched_rr_get_interval64(__pid, &__tms64);
+	return __NAMESPACE_LOCAL_SYM __localdep_sched_rr_get_interval64(__pid, &__tms64);
 #endif /* !__CRT_HAVE_sched_rr_get_interval */
 }
 __NAMESPACE_LOCAL_END

@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xc455367a */
+/* HASH CRC-32:0xa0c56d6c */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -37,7 +37,7 @@ __CREDIRECT(__ATTR_WUNUSED,double,__NOTHROW,__localdep_erfc,(double __x),__erfc,
 #endif /* !__local___localdep_erfc_defined */
 __LOCAL_LIBC(erfcf) __ATTR_WUNUSED float
 __NOTHROW(__LIBCCALL __LIBC_LOCAL_NAME(erfcf))(float __x) {
-	return (float)__localdep_erfc((double)__x);
+	return (float)__NAMESPACE_LOCAL_SYM __localdep_erfc((double)__x);
 }
 __NAMESPACE_LOCAL_END
 #ifndef __local___localdep_erfcf_defined

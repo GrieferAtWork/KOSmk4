@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xbb9399c9 */
+/* HASH CRC-32:0x1afed002 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -33,7 +33,7 @@ __CREDIRECT_KOS(__ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1)),__SIZE_TYPE__,__N
 __NAMESPACE_LOCAL_END
 #include <libc/local/wchar/wcsnlen.h>
 __NAMESPACE_LOCAL_BEGIN
-#define __localdep_c32snlen (*(__SIZE_TYPE__(__LIBKCALL *)(__CHAR32_TYPE__ const *__restrict, __SIZE_TYPE__))&__LIBC_LOCAL_NAME(wcsnlen))
+#define __localdep_c32snlen __NAMESPACE_LOCAL_TYPEHAX(__SIZE_TYPE__(__LIBKCALL*)(__CHAR32_TYPE__ const *__restrict,__SIZE_TYPE__),__SIZE_TYPE__(__LIBKCALL&)(__CHAR32_TYPE__ const *__restrict,__SIZE_TYPE__),wcsnlen)
 #else /* ... */
 __NAMESPACE_LOCAL_END
 #include <libc/local/parts.uchar.string/c32snlen.h>
@@ -73,9 +73,9 @@ __NAMESPACE_LOCAL_BEGIN
 #endif /* !__local___localdep_mempsetl_defined */
 __LOCAL_LIBC(c32spncpy) __ATTR_LEAF __ATTR_RETNONNULL __ATTR_NONNULL((1, 2)) __CHAR32_TYPE__ *
 __NOTHROW_NCX(__LIBKCALL __LIBC_LOCAL_NAME(c32spncpy))(__CHAR32_TYPE__ *__restrict __buf, __CHAR32_TYPE__ const *__restrict __src, __SIZE_TYPE__ __buflen) {
-	__SIZE_TYPE__ __srclen = __localdep_c32snlen(__src, __buflen);
-	(__CHAR32_TYPE__ *)__localdep_memcpyl(__buf, __src, __srclen);
-	return (__CHAR32_TYPE__ *)__localdep_mempsetl(__buf + __srclen, '\0', __buflen - __srclen);
+	__SIZE_TYPE__ __srclen = __NAMESPACE_LOCAL_SYM __localdep_c32snlen(__src, __buflen);
+	(__CHAR32_TYPE__ *)__NAMESPACE_LOCAL_SYM __localdep_memcpyl(__buf, __src, __srclen);
+	return (__CHAR32_TYPE__ *)__NAMESPACE_LOCAL_SYM __localdep_mempsetl(__buf + __srclen, '\0', __buflen - __srclen);
 }
 __NAMESPACE_LOCAL_END
 #ifndef __local___localdep_c32spncpy_defined

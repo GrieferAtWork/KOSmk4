@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x9512fa97 */
+/* HASH CRC-32:0xd74aaf25 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -62,10 +62,10 @@ __CREDIRECT(__ATTR_NONNULL((1, 4)),__SIZE_TYPE__,__THROWING,__localdep_crt_fwrit
 __LOCAL_LIBC(fputc_unlocked) __ATTR_NONNULL((2)) int
 (__LIBCCALL __LIBC_LOCAL_NAME(fputc_unlocked))(int __ch, __FILE *__restrict __stream) __THROWS(...) {
 #if defined(__CRT_DOS) && defined(__CRT_HAVE__flsbuf)
-	return --__stream->__f_cnt >= 0 ? (int)((__UINT8_TYPE__)(*__stream->__f_ptr++ = (char)__ch)) : __localdep__flsbuf(__ch, __stream);
+	return --__stream->__f_cnt >= 0 ? (int)((__UINT8_TYPE__)(*__stream->__f_ptr++ = (char)__ch)) : __NAMESPACE_LOCAL_SYM __localdep__flsbuf(__ch, __stream);
 #else /* __CRT_DOS && __CRT_HAVE__flsbuf */
 	unsigned char __byte = (unsigned char)(unsigned int)__ch;
-	if (!__localdep_crt_fwrite_unlocked(&__byte, sizeof(unsigned char), 1, __stream))
+	if (!__NAMESPACE_LOCAL_SYM __localdep_crt_fwrite_unlocked(&__byte, sizeof(unsigned char), 1, __stream))
 		return __EOF;
 	return __ch;
 #endif /* !__CRT_DOS || !__CRT_HAVE__flsbuf */

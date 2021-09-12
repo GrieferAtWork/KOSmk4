@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x7549457a */
+/* HASH CRC-32:0x64a46eef */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -97,11 +97,11 @@ __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(strerror))(__errno_t __errnum) {
 	char *__result;
 	char const *__string;
 	__result = __strerror_buf;
-	__string = __localdep_strerrordesc_np(__errnum);
+	__string = __NAMESPACE_LOCAL_SYM __localdep_strerrordesc_np(__errnum);
 	if (__string) {
 		/* Copy the descriptor text. */
 		__result[__COMPILER_LENOF(__strerror_buf) - 1] = '\0';
-		__localdep_strncpy(__result, __string, __COMPILER_LENOF(__strerror_buf) - 1);
+		__NAMESPACE_LOCAL_SYM __localdep_strncpy(__result, __string, __COMPILER_LENOF(__strerror_buf) - 1);
 	} else {
 
 
@@ -118,7 +118,7 @@ __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(strerror))(__errno_t __errnum) {
 		if (__errnum < 0)
 			*--__result = '-';
 		__result -= 14;
-		__localdep_memcpy(__result, "Unknown error ", 14 * sizeof(char));
+		__NAMESPACE_LOCAL_SYM __localdep_memcpy(__result, "Unknown error ", 14 * sizeof(char));
 
 	}
 	return __result;

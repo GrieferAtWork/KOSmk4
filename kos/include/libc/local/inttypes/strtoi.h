@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xf4af706c */
+/* HASH CRC-32:0x975e4443 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -37,12 +37,12 @@ __CREDIRECT(__ATTR_LEAF __ATTR_NONNULL((1)),__INTMAX_TYPE__,__NOTHROW_NCX,__loca
 __NAMESPACE_LOCAL_END
 #include <libc/local/stdlib/strto64_r.h>
 __NAMESPACE_LOCAL_BEGIN
-#define __localdep_strtoimax_r (*(__INTMAX_TYPE__(__LIBCCALL *)(char const *__restrict, char **, __STDC_INT_AS_UINT_T, __errno_t *))&__LIBC_LOCAL_NAME(strto64_r))
+#define __localdep_strtoimax_r __NAMESPACE_LOCAL_TYPEHAX(__INTMAX_TYPE__(__LIBCCALL*)(char const *__restrict,char **,__STDC_INT_AS_UINT_T,__errno_t *),__INTMAX_TYPE__(__LIBCCALL&)(char const *__restrict,char **,__STDC_INT_AS_UINT_T,__errno_t *),strto64_r)
 #elif __SIZEOF_INTMAX_T__ == 4
 __NAMESPACE_LOCAL_END
 #include <libc/local/stdlib/strto32_r.h>
 __NAMESPACE_LOCAL_BEGIN
-#define __localdep_strtoimax_r (*(__INTMAX_TYPE__(__LIBCCALL *)(char const *__restrict, char **, __STDC_INT_AS_UINT_T, __errno_t *))&__LIBC_LOCAL_NAME(strto32_r))
+#define __localdep_strtoimax_r __NAMESPACE_LOCAL_TYPEHAX(__INTMAX_TYPE__(__LIBCCALL*)(char const *__restrict,char **,__STDC_INT_AS_UINT_T,__errno_t *),__INTMAX_TYPE__(__LIBCCALL&)(char const *__restrict,char **,__STDC_INT_AS_UINT_T,__errno_t *),strto32_r)
 #else /* ... */
 __NAMESPACE_LOCAL_END
 #include <libc/local/inttypes/strtoimax_r.h>
@@ -57,7 +57,7 @@ __LOCAL_LIBC(strtoi) __ATTR_LEAF __ATTR_NONNULL((1)) __INTMAX_TYPE__
 __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(strtoi))(char const *__restrict __nptr, char **__restrict __endptr, __STDC_INT_AS_UINT_T __base, __INTMAX_TYPE__ __lo, __INTMAX_TYPE__ __hi, __errno_t *__rstatus) {
 	char *__used_endptr;
 	__INTMAX_TYPE__ __result;
-	__result = __localdep_strtoimax_r(__nptr, &__used_endptr, __base, __rstatus);
+	__result = __NAMESPACE_LOCAL_SYM __localdep_strtoimax_r(__nptr, &__used_endptr, __base, __rstatus);
 	if (__endptr)
 		*__endptr = __used_endptr;
 	if (__rstatus && *__rstatus == 0) {

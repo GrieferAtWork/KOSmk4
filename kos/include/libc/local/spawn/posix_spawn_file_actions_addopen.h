@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x6ce6e54a */
+/* HASH CRC-32:0xccdf0f48 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -72,9 +72,9 @@ __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(posix_spawn_file_actions_addopen))(st
 	 * the posix_spawn_file_actions_addopen() function.
 	 * """
 	 * iow: We need to strdup(path) here! */
-	if __unlikely((__path = __localdep_strdup(__path)) == __NULLPTR)
+	if __unlikely((__path = __NAMESPACE_LOCAL_SYM __localdep_strdup(__path)) == __NULLPTR)
 		goto __err;
-	__action = __localdep_posix_spawn_file_actions_alloc(__file_actions);
+	__action = __NAMESPACE_LOCAL_SYM __localdep_posix_spawn_file_actions_alloc(__file_actions);
 	if __unlikely(!__action)
 		goto __err_path;
 	/* Fill in the new mode. */
@@ -86,7 +86,7 @@ __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(posix_spawn_file_actions_addopen))(st
 	return 0;
 __err_path:
 #if defined(__CRT_HAVE_free) || defined(__CRT_HAVE_cfree)
-	__localdep_free((char *)__path);
+	__NAMESPACE_LOCAL_SYM __localdep_free((char *)__path);
 #endif /* __CRT_HAVE_free || __CRT_HAVE_cfree */
 __err:
 #ifdef __ENOMEM

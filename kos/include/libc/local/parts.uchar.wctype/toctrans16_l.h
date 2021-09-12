@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xf3c52cb8 */
+/* HASH CRC-32:0xee92a6e1 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -39,7 +39,7 @@ __CREDIRECT_DOS(__ATTR_CONST __ATTR_WUNUSED,__WINT16_TYPE__,__NOTHROW_NCX,__loca
 __NAMESPACE_LOCAL_END
 #include <libc/local/wctype/towctrans.h>
 __NAMESPACE_LOCAL_BEGIN
-#define __localdep_toctrans16 (*(__WINT16_TYPE__(__LIBDCALL *)(__WINT16_TYPE__, __wctrans_t))&__LIBC_LOCAL_NAME(towctrans))
+#define __localdep_toctrans16 __NAMESPACE_LOCAL_TYPEHAX(__WINT16_TYPE__(__LIBDCALL*)(__WINT16_TYPE__,__wctrans_t),__WINT16_TYPE__(__LIBDCALL&)(__WINT16_TYPE__,__wctrans_t),towctrans)
 #elif defined(__CRT_KOS) && defined(__CRT_HAVE___unicode_descriptor)
 __NAMESPACE_LOCAL_END
 #include <libc/local/parts.uchar.wctype/toctrans16.h>
@@ -53,7 +53,7 @@ __LOCAL_LIBC(toctrans16_l) __ATTR_WUNUSED __WINT16_TYPE__
 __NOTHROW_NCX(__LIBDCALL __LIBC_LOCAL_NAME(toctrans16_l))(__WINT16_TYPE__ __wc, __wctrans_t __desc, __locale_t __locale) {
 	(void)__locale;
 	__COMPILER_IMPURE();
-	return __localdep_toctrans16(__wc, __desc);
+	return __NAMESPACE_LOCAL_SYM __localdep_toctrans16(__wc, __desc);
 }
 __NAMESPACE_LOCAL_END
 #ifndef __local___localdep_toctrans16_l_defined

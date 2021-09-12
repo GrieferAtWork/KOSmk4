@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x3798f668 */
+/* HASH CRC-32:0xd164870 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -42,7 +42,7 @@ __CREDIRECT(__ATTR_NONNULL((1)),int,__NOTHROW_NCX,__localdep_setvbuf,(__FILE *__
 #endif /* !__local___localdep_setvbuf_defined */
 __LOCAL_LIBC(setbuffer) __ATTR_NONNULL((1)) void
 __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(setbuffer))(__FILE *__restrict __stream, char *__buf, __SIZE_TYPE__ __bufsize) {
-	__localdep_setvbuf(__stream,
+	__NAMESPACE_LOCAL_SYM __localdep_setvbuf(__stream,
 	        __buf,
 	        __buf ? ___IOFBF : ___IONBF,
 	        __buf ? __bufsize : (__SIZE_TYPE__)0);

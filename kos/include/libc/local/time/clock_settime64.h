@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x40a97467 */
+/* HASH CRC-32:0x15a3158b */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -40,7 +40,7 @@ __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(clock_settime64))(__clockid_t __clock
 	struct __timespec32 __tp32;
 	__tp32.tv_sec  = (__time32_t)__tp->tv_sec;
 	__tp32.tv_nsec = __tp->tv_nsec;
-	return __localdep_clock_settime32(__clock_id, &__tp32);
+	return __NAMESPACE_LOCAL_SYM __localdep_clock_settime32(__clock_id, &__tp32);
 }
 __NAMESPACE_LOCAL_END
 #ifndef __local___localdep_clock_settime64_defined

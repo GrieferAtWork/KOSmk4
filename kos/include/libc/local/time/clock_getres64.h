@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xe2e8e70e */
+/* HASH CRC-32:0xbc36e2d5 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -39,7 +39,7 @@ __LOCAL_LIBC(clock_getres64) __ATTR_NONNULL((2)) int
 __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(clock_getres64))(__clockid_t __clock_id, struct __timespec64 *__res) {
 	int __result;
 	struct __timespec32 __res32;
-	__result = __localdep_clock_getres32(__clock_id, &__res32);
+	__result = __NAMESPACE_LOCAL_SYM __localdep_clock_getres32(__clock_id, &__res32);
 	if (!__result) {
 		__res->tv_sec  = (__time64_t)__res32.tv_sec;
 		__res->tv_nsec = __res32.tv_nsec;

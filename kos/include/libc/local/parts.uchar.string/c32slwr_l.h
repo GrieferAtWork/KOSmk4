@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xac4b0f12 */
+/* HASH CRC-32:0x12cd3678 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -76,7 +76,7 @@ __CREDIRECT_KOS(__ATTR_PURE __ATTR_WUNUSED,__WINT32_TYPE__,__NOTHROW_NCX,__local
 __NAMESPACE_LOCAL_END
 #include <libc/local/wctype/towlower_l.h>
 __NAMESPACE_LOCAL_BEGIN
-#define __localdep_tolower32_l (*(__WINT32_TYPE__(__LIBKCALL *)(__WINT32_TYPE__, __locale_t))&__LIBC_LOCAL_NAME(towlower_l))
+#define __localdep_tolower32_l __NAMESPACE_LOCAL_TYPEHAX(__WINT32_TYPE__(__LIBKCALL*)(__WINT32_TYPE__,__locale_t),__WINT32_TYPE__(__LIBKCALL&)(__WINT32_TYPE__,__locale_t),towlower_l)
 #else /* ... */
 __NAMESPACE_LOCAL_END
 #include <libc/local/parts.uchar.wctype/tolower32_l.h>
@@ -88,7 +88,7 @@ __LOCAL_LIBC(c32slwr_l) __ATTR_LEAF __ATTR_RETNONNULL __ATTR_NONNULL((1)) __CHAR
 __NOTHROW_NCX(__LIBKCALL __LIBC_LOCAL_NAME(c32slwr_l))(__CHAR32_TYPE__ *__restrict __str, __locale_t __locale) {
 	__CHAR32_TYPE__ *__iter, __ch;
 	for (__iter = __str; (__ch = *__iter) != '\0'; ++__iter)
-		*__iter = __localdep_tolower32_l(__ch, __locale);
+		*__iter = __NAMESPACE_LOCAL_SYM __localdep_tolower32_l(__ch, __locale);
 	return __str;
 }
 __NAMESPACE_LOCAL_END

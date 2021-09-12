@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x9874ec77 */
+/* HASH CRC-32:0x8ce451b0 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -172,9 +172,9 @@ __CREDIRECT(__ATTR_NONNULL((1)),int,__NOTHROW_RPC,__localdep_sigsuspend,(struct 
 __LOCAL_LIBC(sigpause) int
 __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(sigpause))(__signo_t __signo) {
 	struct __sigset_struct __mask;
-	__localdep_sigemptyset(&__mask);
-	__localdep_sigaddset(&__mask, __signo);
-	return __localdep_sigsuspend(&__mask);
+	__NAMESPACE_LOCAL_SYM __localdep_sigemptyset(&__mask);
+	__NAMESPACE_LOCAL_SYM __localdep_sigaddset(&__mask, __signo);
+	return __NAMESPACE_LOCAL_SYM __localdep_sigsuspend(&__mask);
 }
 __NAMESPACE_LOCAL_END
 #ifndef __local___localdep_sigpause_defined

@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xdc4296a */
+/* HASH CRC-32:0x4e38581 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -82,13 +82,13 @@ __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(strsignal))(__signo_t __signo) {
 	static char __strsignal_buf[64];
 	char *__result = __strsignal_buf;
 	char const *__string;
-	__string = __localdep_sigdescr_np(__signo);
+	__string = __NAMESPACE_LOCAL_SYM __localdep_sigdescr_np(__signo);
 	if (__string) {
 		/* Copy the descriptor text. */
 		__result[__COMPILER_LENOF(__strsignal_buf) - 1] = '\0';
-		__localdep_strncpy(__result, __string, __COMPILER_LENOF(__strsignal_buf) - 1);
+		__NAMESPACE_LOCAL_SYM __localdep_strncpy(__result, __string, __COMPILER_LENOF(__strsignal_buf) - 1);
 	} else {
-		__localdep_sprintf(__result, "Unknown signal %d", __signo);
+		__NAMESPACE_LOCAL_SYM __localdep_sprintf(__result, "Unknown signal %d", __signo);
 	}
 	return __result;
 }

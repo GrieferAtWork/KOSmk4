@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x3edb6938 */
+/* HASH CRC-32:0xa653a9a3 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -178,17 +178,17 @@ __CREDIRECT(__ATTR_NONNULL((1)),__off64_t,__THROWING,__localdep_crt_ftello64,(__
 __LOCAL_LIBC(fgetpos64) __ATTR_NONNULL((1, 2)) int
 (__LIBCCALL __LIBC_LOCAL_NAME(fgetpos64))(__FILE *__restrict __stream, __fpos64_t *__restrict __pos) __THROWS(...) {
 #if (defined(__CRT_HAVE_ftell) && __SIZEOF_OFF64_T__ == __SIZEOF_LONG__) || (defined(__CRT_HAVE__IO_ftell) && __SIZEOF_OFF64_T__ == __SIZEOF_LONG__) || (defined(__CRT_HAVE_ftello) && __SIZEOF_OFF64_T__ == __SIZEOF_OFF32_T__) || defined(__CRT_HAVE_ftello64) || defined(__CRT_HAVE_ftell64) || defined(__CRT_HAVE__ftelli64) || (defined(__CRT_HAVE_ftell_unlocked) && __SIZEOF_OFF64_T__ == __SIZEOF_LONG__) || (defined(__CRT_HAVE__ftell_nolock) && __SIZEOF_OFF64_T__ == __SIZEOF_LONG__) || (defined(__CRT_HAVE_ftello_unlocked) && __SIZEOF_OFF64_T__ == __SIZEOF_OFF32_T__) || defined(__CRT_HAVE_ftello64_unlocked) || defined(__CRT_HAVE_ftell64_unlocked) || defined(__CRT_HAVE__ftelli64_nolock)
-	return (__INT64_TYPE__)(*__pos = (__fpos64_t)__localdep_crt_ftello64(__stream)) < 0 ? -1 : 0;
+	return (__INT64_TYPE__)(*__pos = (__fpos64_t)__NAMESPACE_LOCAL_SYM __localdep_crt_ftello64(__stream)) < 0 ? -1 : 0;
 #elif defined(__CRT_HAVE_fgetpos) || defined(__CRT_HAVE__IO_fgetpos) || (defined(__CRT_HAVE_fgetpos64) && __SIZEOF_OFF32_T__ == __SIZEOF_OFF64_T__) || (defined(__CRT_HAVE__IO_fgetpos64) && __SIZEOF_OFF32_T__ == __SIZEOF_OFF64_T__) || defined(__CRT_HAVE_fgetpos_unlocked) || (defined(__CRT_HAVE_fgetpos64_unlocked) && __SIZEOF_OFF32_T__ == __SIZEOF_OFF64_T__)
 	__pos32_t __pos32;
-	int __result = __localdep_crt_fgetpos(__stream, &__pos32);
+	int __result = __NAMESPACE_LOCAL_SYM __localdep_crt_fgetpos(__stream, &__pos32);
 	if (!__result)
 		*__pos = (__fpos64_t)__pos32;
 	return __result;
 #elif (defined(__CRT_HAVE_ftell) && __SIZEOF_OFF32_T__ == __SIZEOF_LONG__) || (defined(__CRT_HAVE__IO_ftell) && __SIZEOF_OFF32_T__ == __SIZEOF_LONG__) || defined(__CRT_HAVE_ftello) || (defined(__CRT_HAVE_ftell_unlocked) && __SIZEOF_OFF32_T__ == __SIZEOF_LONG__) || (defined(__CRT_HAVE__ftell_nolock) && __SIZEOF_OFF32_T__ == __SIZEOF_LONG__) || defined(__CRT_HAVE_ftello_unlocked)
-	return (__INT64_TYPE__)(*__pos = (__fpos64_t)__localdep_crt_ftello(__stream)) < 0 ? -1 : 0;
+	return (__INT64_TYPE__)(*__pos = (__fpos64_t)__NAMESPACE_LOCAL_SYM __localdep_crt_ftello(__stream)) < 0 ? -1 : 0;
 #else /* ... */
-	return (__INT64_TYPE__)(*__pos = (__fpos64_t)__localdep_crt_ftell(__stream)) < 0 ? -1 : 0;
+	return (__INT64_TYPE__)(*__pos = (__fpos64_t)__NAMESPACE_LOCAL_SYM __localdep_crt_ftell(__stream)) < 0 ? -1 : 0;
 #endif /* !... */
 }
 __NAMESPACE_LOCAL_END

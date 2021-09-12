@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xae6220a6 */
+/* HASH CRC-32:0x5d5ad5fa */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -304,25 +304,25 @@ __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(sigset))(__signo_t __signo, __sighand
 	struct __sigset_struct __set, __oset;
 	if __unlikely(__disp == (__sighandler_t)__SIG_ERR)
 		goto __err_inval;
-	__localdep_sigemptyset(&__set);
-	__localdep_sigaddset(&__set, __signo);
+	__NAMESPACE_LOCAL_SYM __localdep_sigemptyset(&__set);
+	__NAMESPACE_LOCAL_SYM __localdep_sigaddset(&__set, __signo);
 	if (__disp == (__sighandler_t)__SIG_HOLD) {
-		if __unlikely(__localdep_sigprocmask(__SIG_BLOCK, &__set, &__oset) != 0)
+		if __unlikely(__NAMESPACE_LOCAL_SYM __localdep_sigprocmask(__SIG_BLOCK, &__set, &__oset) != 0)
 			goto __err;
-		if __unlikely(__localdep_sigismember(&__oset, __signo))
+		if __unlikely(__NAMESPACE_LOCAL_SYM __localdep_sigismember(&__oset, __signo))
 			goto __err;
-		if __unlikely(__localdep_sigaction(__signo, __NULLPTR, &__oact) != 0)
+		if __unlikely(__NAMESPACE_LOCAL_SYM __localdep_sigaction(__signo, __NULLPTR, &__oact) != 0)
 			goto __err;
 		return __oact.sa_handler;
 	}
 	__act.sa_handler = __disp;
-	__localdep_sigemptyset(&__act.sa_mask);
+	__NAMESPACE_LOCAL_SYM __localdep_sigemptyset(&__act.sa_mask);
 	__act.sa_flags = 0;
-	if __unlikely(__localdep_sigaction(__signo, &__act, &__oact) != 0)
+	if __unlikely(__NAMESPACE_LOCAL_SYM __localdep_sigaction(__signo, &__act, &__oact) != 0)
 		goto __err;
-	if __unlikely(__localdep_sigprocmask(__SIG_UNBLOCK, &__set, &__oset) != 0)
+	if __unlikely(__NAMESPACE_LOCAL_SYM __localdep_sigprocmask(__SIG_UNBLOCK, &__set, &__oset) != 0)
 		goto __err;
-	return __localdep_sigismember(&__oset, __signo)
+	return __NAMESPACE_LOCAL_SYM __localdep_sigismember(&__oset, __signo)
 	       ? (__sighandler_t)__SIG_HOLD
 	       : __oact.sa_handler;
 __err_inval:

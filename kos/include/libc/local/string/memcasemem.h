@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x8a0bf719 */
+/* HASH CRC-32:0xe201e6db */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -75,17 +75,17 @@ __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(memcasemem))(void const *__haystack, 
 		return __NULLPTR;
 #endif /* !__USE_MEMMEM_EMPTY_NEEDLE_NULL || __BUILDING_LIBC */
 	__haystacklen -= (__needlelen - 1);
-	__marker       = (__BYTE_TYPE__)__localdep_tolower(*(__BYTE_TYPE__ *)__needle);
+	__marker       = (__BYTE_TYPE__)__NAMESPACE_LOCAL_SYM __localdep_tolower(*(__BYTE_TYPE__ *)__needle);
 	__hayend       = (__BYTE_TYPE__ *)__haystack + __haystacklen;
 	for (;;) {
 		for (__candidate = (__BYTE_TYPE__ *)__haystack; __candidate < __hayend; ++__candidate) {
 			__BYTE_TYPE__ __b = *__candidate;
-			if (__b == __marker || (__BYTE_TYPE__)__localdep_tolower(__b) == __marker)
+			if (__b == __marker || (__BYTE_TYPE__)__NAMESPACE_LOCAL_SYM __localdep_tolower(__b) == __marker)
 				goto __got_candidate;
 		}
 		break;
 __got_candidate:
-		if (__localdep_memcasecmp(__candidate, __needle, __needlelen) == 0)
+		if (__NAMESPACE_LOCAL_SYM __localdep_memcasecmp(__candidate, __needle, __needlelen) == 0)
 			return (void *)__candidate;
 		++__candidate;
 		__haystacklen = ((__BYTE_TYPE__ *)__haystack + __haystacklen) - __candidate;

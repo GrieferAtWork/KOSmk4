@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x432c9053 */
+/* HASH CRC-32:0x70b29d01 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -46,12 +46,12 @@ __CREDIRECT(__ATTR_RETNONNULL __ATTR_NONNULL((1, 2)),__WCHAR_TYPE__ *,__NOTHROW_
 __NAMESPACE_LOCAL_END
 #include <libc/local/string/mempcpyw.h>
 __NAMESPACE_LOCAL_BEGIN
-#define __localdep_wmempcpy (*(__WCHAR_TYPE__ *(__LIBCCALL *)(__WCHAR_TYPE__ *__restrict, __WCHAR_TYPE__ const *__restrict, __SIZE_TYPE__))&__LIBC_LOCAL_NAME(mempcpyw))
+#define __localdep_wmempcpy __NAMESPACE_LOCAL_TYPEHAX(__WCHAR_TYPE__ *(__LIBCCALL*)(__WCHAR_TYPE__ *__restrict,__WCHAR_TYPE__ const *__restrict,__SIZE_TYPE__),__WCHAR_TYPE__ *(__LIBCCALL&)(__WCHAR_TYPE__ *__restrict,__WCHAR_TYPE__ const *__restrict,__SIZE_TYPE__),mempcpyw)
 #elif __SIZEOF_WCHAR_T__ == 4
 __NAMESPACE_LOCAL_END
 #include <libc/local/string/mempcpyl.h>
 __NAMESPACE_LOCAL_BEGIN
-#define __localdep_wmempcpy (*(__WCHAR_TYPE__ *(__LIBCCALL *)(__WCHAR_TYPE__ *__restrict, __WCHAR_TYPE__ const *__restrict, __SIZE_TYPE__))&__LIBC_LOCAL_NAME(mempcpyl))
+#define __localdep_wmempcpy __NAMESPACE_LOCAL_TYPEHAX(__WCHAR_TYPE__ *(__LIBCCALL*)(__WCHAR_TYPE__ *__restrict,__WCHAR_TYPE__ const *__restrict,__SIZE_TYPE__),__WCHAR_TYPE__ *(__LIBCCALL&)(__WCHAR_TYPE__ *__restrict,__WCHAR_TYPE__ const *__restrict,__SIZE_TYPE__),mempcpyl)
 #else /* ... */
 __NAMESPACE_LOCAL_END
 #include <libc/local/wchar/wmempcpy.h>
@@ -61,7 +61,7 @@ __NAMESPACE_LOCAL_BEGIN
 #endif /* !__local___localdep_wmempcpy_defined */
 __LOCAL_LIBC(wcspcpy) __ATTR_LEAF __ATTR_RETNONNULL __ATTR_NONNULL((1, 2)) __WCHAR_TYPE__ *
 __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(wcspcpy))(__WCHAR_TYPE__ *__restrict __buf, __WCHAR_TYPE__ const *__restrict __src) {
-	return __localdep_wmempcpy(__buf, __src, __localdep_wcslen(__src) + 1);
+	return __NAMESPACE_LOCAL_SYM __localdep_wmempcpy(__buf, __src, __NAMESPACE_LOCAL_SYM __localdep_wcslen(__src) + 1);
 }
 __NAMESPACE_LOCAL_END
 #ifndef __local___localdep_wcspcpy_defined

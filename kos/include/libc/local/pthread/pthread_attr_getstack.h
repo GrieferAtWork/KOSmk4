@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xb19db34c */
+/* HASH CRC-32:0x5b4b469a */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -36,9 +36,9 @@ __CREDIRECT(__ATTR_NONNULL((1, 2)),__errno_t,__NOTHROW_NCX,__localdep_crt_pthrea
 __LOCAL_LIBC(pthread_attr_getstack) __ATTR_NONNULL((1, 2, 3)) __errno_t
 __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(pthread_attr_getstack))(__pthread_attr_t const *__restrict __attr, void **__restrict __stackaddr, __SIZE_TYPE__ *__restrict __stacksize) {
 	__errno_t __result;
-	__result = __localdep_crt_pthread_attr_getstackaddr(__attr, __stackaddr);
+	__result = __NAMESPACE_LOCAL_SYM __localdep_crt_pthread_attr_getstackaddr(__attr, __stackaddr);
 	if __likely(__result == 0)
-		__result = __localdep_crt_pthread_attr_getstacksize(__attr, __stacksize);
+		__result = __NAMESPACE_LOCAL_SYM __localdep_crt_pthread_attr_getstacksize(__attr, __stacksize);
 	return __result;
 }
 __NAMESPACE_LOCAL_END

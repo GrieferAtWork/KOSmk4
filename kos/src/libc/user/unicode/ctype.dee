@@ -124,7 +124,7 @@ function splitTables(tab: {int: int}, errorValue: int) {
 	return result;
 }
 
-/* Unicode flags defined for compatibility with <ctype.h> in "C" locale
+/* Unicode flags defined for compatibility with <ctype.h> in "C"  locale
  * Note that unicode characters also use these flags, but only the ASCII
  * ranges are documented here. e.g. `U+200B' has `UNICODE_ISWHITE' set!
  *
@@ -239,7 +239,7 @@ for (local line: readLines("UnicodeData.txt")) {
 	} else if (generalCategory in ["Sm"]) {
 		flags |= UNICODE_ISPUNCT; /* Math symbols */
 	} else if (generalCategory in ["Sc"]) {
-		/* Currency symbols are technically punctuation (because the "C" locale
+		/* Currency symbols  are  technically  punctuation (because  the  "C"  locale
 		 * defines "$" as ispunct), but we also allow them to appear in symbol names. */
 		flags |= UNICODE_ISPUNCT | UNICODE_ISSYMSTRT | UNICODE_ISSYMCONT;
 	} else if (generalCategory in ["Sk", "So"]) {
@@ -592,4 +592,3 @@ with (local fp = File.open("db.dat", "w")) {
 	}
 }
 #endif /* __MAIN__ */
-

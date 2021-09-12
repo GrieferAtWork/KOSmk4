@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x4a09d6ed */
+/* HASH CRC-32:0xd6a2783d */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -32,10 +32,10 @@ __LOCAL_LIBC(sigtimedwait64) __ATTR_NONNULL((1)) int
 __NOTHROW_RPC(__LIBCCALL __LIBC_LOCAL_NAME(sigtimedwait64))(struct __sigset_struct const *__restrict __set, struct __siginfo_struct *__restrict __info, struct __timespec64 const *__rel_timeout) {
 	struct __timespec32 __tmv;
 	if (!__rel_timeout)
-		return __localdep_sigtimedwait32(__set, __info, __NULLPTR);
+		return __NAMESPACE_LOCAL_SYM __localdep_sigtimedwait32(__set, __info, __NULLPTR);
 	__tmv.tv_sec  = (__time32_t)__rel_timeout->tv_sec;
 	__tmv.tv_nsec = __rel_timeout->tv_nsec;
-	return __localdep_sigtimedwait32(__set, __info, __NULLPTR);
+	return __NAMESPACE_LOCAL_SYM __localdep_sigtimedwait32(__set, __info, __NULLPTR);
 }
 __NAMESPACE_LOCAL_END
 #ifndef __local___localdep_sigtimedwait64_defined

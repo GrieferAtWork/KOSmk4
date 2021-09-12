@@ -157,7 +157,7 @@ struct __ATTR_ALIGNED(ALIGNOF_XFPUSTATE64) xfpustate64 /*[PREFIX(fx_)]*/ {
 struct __ATTR_ALIGNED(ALIGNOF_FPUSTATE64) fpustate64 /*[PREFIX(f_)]*/ {
 	union {
 		/* NOTE: The FPU state encoding is selected by the least significant bit
-		 *       of the `struct fpustate32' itself. When clear it's `f_xsave'.
+		 *       of  the `struct fpustate32' itself.  When clear it's `f_xsave'.
 		 *       Otherwise, it's `f_ssave'! */
 		struct sfpustate   f_ssave; /* State saved by `fsave' / `fnsave' */
 		struct xfpustate64 f_xsave; /* State saved by `fxsave' */
