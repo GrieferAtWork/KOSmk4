@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x7a3209c3 */
+/* HASH CRC-32:0x5d48e0a4 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -72,10 +72,10 @@ __NAMESPACE_LOCAL_BEGIN
 #endif /* !__local___localdep_mempcpy_defined */
 __LOCAL_LIBC(c32sndup) __ATTR_MALLOC __ATTR_MALL_DEFAULT_ALIGNED __ATTR_WUNUSED __ATTR_NONNULL((1)) __CHAR32_TYPE__ *
 __NOTHROW_NCX(__LIBKCALL __LIBC_LOCAL_NAME(c32sndup))(__CHAR32_TYPE__ const *__restrict __str, __SIZE_TYPE__ __max_chars) {
-	__SIZE_TYPE__ __resultsize = __NAMESPACE_LOCAL_SYM __localdep_c32snlen(__str, __max_chars) * sizeof(__CHAR32_TYPE__);
-	__CHAR32_TYPE__ *__result = (__CHAR32_TYPE__ *)__NAMESPACE_LOCAL_SYM __localdep_malloc(__resultsize + sizeof(__CHAR32_TYPE__));
+	__SIZE_TYPE__ __resultsize = (__NAMESPACE_LOCAL_SYM __localdep_c32snlen)(__str, __max_chars) * sizeof(__CHAR32_TYPE__);
+	__CHAR32_TYPE__ *__result = (__CHAR32_TYPE__ *)(__NAMESPACE_LOCAL_SYM __localdep_malloc)(__resultsize + sizeof(__CHAR32_TYPE__));
 	if __likely(__result) {
-		*(__CHAR32_TYPE__ *)__NAMESPACE_LOCAL_SYM __localdep_mempcpy(__result, __str, __resultsize) = '\0';
+		*(__CHAR32_TYPE__ *)(__NAMESPACE_LOCAL_SYM __localdep_mempcpy)(__result, __str, __resultsize) = '\0';
 	}
 	return __result;
 }

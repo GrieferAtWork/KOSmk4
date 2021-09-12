@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x106f80af */
+/* HASH CRC-32:0xe1a2982a */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -47,9 +47,9 @@ __NAMESPACE_LOCAL_BEGIN
 __LOCAL_LIBC(PRead) __ATTR_NONNULL((2)) __SIZE_TYPE__
 (__LIBCCALL __LIBC_LOCAL_NAME(PRead))(__fd_t __fd, void *__buf, __SIZE_TYPE__ __bufsize, __FS_TYPE(pos) __offset) __THROWS(...) {
 #ifdef __CRT_HAVE_PRead
-	return __NAMESPACE_LOCAL_SYM __localdep_PRead32(__fd, __buf, __bufsize, (__pos32_t)__offset);
+	return (__NAMESPACE_LOCAL_SYM __localdep_PRead32)(__fd, __buf, __bufsize, (__pos32_t)__offset);
 #else /* __CRT_HAVE_PRead */
-	return __NAMESPACE_LOCAL_SYM __localdep_PRead64(__fd, __buf, __bufsize, (__pos64_t)__offset);
+	return (__NAMESPACE_LOCAL_SYM __localdep_PRead64)(__fd, __buf, __bufsize, (__pos64_t)__offset);
 #endif /* !__CRT_HAVE_PRead */
 }
 __NAMESPACE_LOCAL_END

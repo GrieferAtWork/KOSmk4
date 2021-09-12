@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xeeb777ba */
+/* HASH CRC-32:0x426a8757 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -66,7 +66,7 @@ __LOCAL_LIBC(qsort_s) __ATTR_NONNULL((1, 4)) void
 	struct __NAMESPACE_LOCAL_SYM __invoke_compare_helper_s_data __data;
 	__data.__fun = __compar;
 	__data.__arg = __arg;
-	return __NAMESPACE_LOCAL_SYM __localdep_qsort_r(__base, __elem_count, __elem_size,
+	return (__NAMESPACE_LOCAL_SYM __localdep_qsort_r)(__base, __elem_count, __elem_size,
 	               &__NAMESPACE_LOCAL_SYM __invoke_compare_helper_s,
 	               &__data);
 }

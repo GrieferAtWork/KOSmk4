@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x19776c23 */
+/* HASH CRC-32:0x91d2d232 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -41,7 +41,7 @@ __LOCAL_LIBC(_aligned_malloc_dbg) __ATTR_MALLOC __ATTR_WUNUSED __ATTR_ALLOC_ALIG
 __NOTHROW_NCX(__LIBDCALL __LIBC_LOCAL_NAME(_aligned_malloc_dbg))(__SIZE_TYPE__ __num_bytes, __SIZE_TYPE__ __min_alignment, char const *__filename, int __line) {
 	(void)__filename;
 	(void)__line;
-	return __NAMESPACE_LOCAL_SYM __localdep__aligned_malloc(__num_bytes, __min_alignment);
+	return (__NAMESPACE_LOCAL_SYM __localdep__aligned_malloc)(__num_bytes, __min_alignment);
 }
 __NAMESPACE_LOCAL_END
 #ifndef __local___localdep__aligned_malloc_dbg_defined

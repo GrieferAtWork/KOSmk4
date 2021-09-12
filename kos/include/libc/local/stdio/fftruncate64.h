@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x87526cfa */
+/* HASH CRC-32:0x54638ca0 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -69,9 +69,9 @@ __NAMESPACE_LOCAL_BEGIN
 __LOCAL_LIBC(fftruncate64) __ATTR_NONNULL((1)) int
 (__LIBCCALL __LIBC_LOCAL_NAME(fftruncate64))(__FILE *__restrict __stream, __PIO_OFFSET64 __length) __THROWS(...) {
 	int __result = -1;
-	__fd_t __fd = __NAMESPACE_LOCAL_SYM __localdep_fileno(__stream);
+	__fd_t __fd = (__NAMESPACE_LOCAL_SYM __localdep_fileno)(__stream);
 	if __likely(__fd >= 0)
-		__result = __NAMESPACE_LOCAL_SYM __localdep_ftruncate64(__fd, __length);
+		__result = (__NAMESPACE_LOCAL_SYM __localdep_ftruncate64)(__fd, __length);
 	return __result;
 }
 __NAMESPACE_LOCAL_END

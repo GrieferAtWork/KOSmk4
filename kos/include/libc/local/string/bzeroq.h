@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x5f756c1a */
+/* HASH CRC-32:0xa1f66b60 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -48,9 +48,9 @@ __NAMESPACE_LOCAL_BEGIN
 __LOCAL_LIBC(bzeroq) __ATTR_LEAF __ATTR_NONNULL((1)) void
 __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(bzeroq))(void *__restrict __dst, __SIZE_TYPE__ __num_qwords) {
 #if defined(__UINT64_TYPE__) && __SIZEOF_BUSINT__ >= 8
-	__NAMESPACE_LOCAL_SYM __localdep_memsetq(__dst, 0, __num_qwords);
+	(__NAMESPACE_LOCAL_SYM __localdep_memsetq)(__dst, 0, __num_qwords);
 #else /* __UINT64_TYPE__ && __SIZEOF_BUSINT__ >= 8 */
-	__NAMESPACE_LOCAL_SYM __localdep_bzerol(__dst, __num_qwords * 2);
+	(__NAMESPACE_LOCAL_SYM __localdep_bzerol)(__dst, __num_qwords * 2);
 #endif /* !__UINT64_TYPE__ || __SIZEOF_BUSINT__ < 8 */
 }
 __NAMESPACE_LOCAL_END

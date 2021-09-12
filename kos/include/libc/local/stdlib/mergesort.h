@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x4d9c496f */
+/* HASH CRC-32:0xce99677b */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -42,7 +42,7 @@ __NAMESPACE_LOCAL_BEGIN
 __LOCAL_LIBC(mergesort) __ATTR_NONNULL((1, 4)) int
 (__LIBCCALL __LIBC_LOCAL_NAME(mergesort))(void *__pbase, __SIZE_TYPE__ __item_count, __SIZE_TYPE__ __item_size, __compar_fn_t __cmp) __THROWS(...) {
 	/* TODO: Actually do merge-sort! */
-	__NAMESPACE_LOCAL_SYM __localdep_qsort(__pbase, __item_count, __item_size, __cmp);
+	(__NAMESPACE_LOCAL_SYM __localdep_qsort)(__pbase, __item_count, __item_size, __cmp);
 	return 0;
 }
 __NAMESPACE_LOCAL_END

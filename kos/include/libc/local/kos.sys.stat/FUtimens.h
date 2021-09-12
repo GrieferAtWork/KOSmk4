@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x8eb3dd26 */
+/* HASH CRC-32:0x3e8c342a */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -48,24 +48,24 @@ __LOCAL_LIBC(FUtimens) void
 #if defined(__CRT_HAVE_UTimensAt64) || defined(__CRT_HAVE_UTimensAt)
 	struct __timespec64 __tms[2];
 	if (!__times) {
-		__NAMESPACE_LOCAL_SYM __localdep_FUtimens64(__fd, __NULLPTR);
+		(__NAMESPACE_LOCAL_SYM __localdep_FUtimens64)(__fd, __NULLPTR);
 	} else {
 		__tms[0].tv_sec  = (__time64_t)__times[0].tv_sec;
 		__tms[0].tv_nsec = __times[0].tv_nsec;
 		__tms[1].tv_sec  = (__time64_t)__times[1].tv_sec;
 		__tms[1].tv_nsec = __times[1].tv_nsec;
-		__NAMESPACE_LOCAL_SYM __localdep_FUtimens64(__fd, __tms);
+		(__NAMESPACE_LOCAL_SYM __localdep_FUtimens64)(__fd, __tms);
 	}
 #else /* __CRT_HAVE_UTimensAt64 || __CRT_HAVE_UTimensAt */
 	struct __timespec32 __tms[2];
 	if (!__times) {
-		__NAMESPACE_LOCAL_SYM __localdep_FUtimens32(__fd, __NULLPTR);
+		(__NAMESPACE_LOCAL_SYM __localdep_FUtimens32)(__fd, __NULLPTR);
 	} else {
 		__tms[0].tv_sec  = (__time32_t)__times[0].tv_sec;
 		__tms[0].tv_nsec = __times[0].tv_nsec;
 		__tms[1].tv_sec  = (__time32_t)__times[1].tv_sec;
 		__tms[1].tv_nsec = __times[1].tv_nsec;
-		__NAMESPACE_LOCAL_SYM __localdep_FUtimens32(__fd, __tms);
+		(__NAMESPACE_LOCAL_SYM __localdep_FUtimens32)(__fd, __tms);
 	}
 #endif /* !__CRT_HAVE_UTimensAt64 && !__CRT_HAVE_UTimensAt */
 }

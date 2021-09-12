@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x239cb1cf */
+/* HASH CRC-32:0x23cdb698 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -69,7 +69,7 @@ __LOCAL_LIBC(__xpg_strerror_r) __ATTR_COLD __ATTR_NONNULL((2)) __errno_t
 __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(__xpg_strerror_r))(__errno_t __errnum, char *__buf, __SIZE_TYPE__ __buflen) {
 	__SIZE_TYPE__ __msg_len;
 	char const *__string;
-	__string = __NAMESPACE_LOCAL_SYM __localdep_strerrordesc_np(__errnum);
+	__string = (__NAMESPACE_LOCAL_SYM __localdep_strerrordesc_np)(__errnum);
 	if (!__buf)
 		__buflen = 0;
 	if (!__string) {
@@ -80,7 +80,7 @@ __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(__xpg_strerror_r))(__errno_t __errnum
 #endif /* !__EINVAL */
 	}
 	/* Copy the descriptor text. */
-	__msg_len = __NAMESPACE_LOCAL_SYM __localdep_strlen(__string) + 1;
+	__msg_len = (__NAMESPACE_LOCAL_SYM __localdep_strlen)(__string) + 1;
 	if (__msg_len > __buflen) {
 #ifdef __ERANGE
 		return __ERANGE;
@@ -88,7 +88,7 @@ __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(__xpg_strerror_r))(__errno_t __errnum
 		return 1;
 #endif /* !__ERANGE */
 	}
-	__NAMESPACE_LOCAL_SYM __localdep_memcpyc(__buf, __string, __msg_len, sizeof(char));
+	(__NAMESPACE_LOCAL_SYM __localdep_memcpyc)(__buf, __string, __msg_len, sizeof(char));
 	return __EOK;
 }
 __NAMESPACE_LOCAL_END

@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x4070acbd */
+/* HASH CRC-32:0xbac5f393 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -42,7 +42,7 @@ __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(mempatq))(void *__restrict __dst, __U
 	__BYTE_TYPE__ *__iter = (__BYTE_TYPE__ *)__dst;
 	for (; __n_bytes && (__UINTPTR_TYPE__)__iter & 7; ++__iter, --__n_bytes)
 		*__iter = __INT64_BYTE(__pattern, (__UINTPTR_TYPE__)__iter & 7);
-	__iter = (__BYTE_TYPE__ *)__NAMESPACE_LOCAL_SYM __localdep_mempsetq(__iter, __pattern, __n_bytes / 8);
+	__iter = (__BYTE_TYPE__ *)(__NAMESPACE_LOCAL_SYM __localdep_mempsetq)(__iter, __pattern, __n_bytes / 8);
 	for (__n_bytes &= 7; __n_bytes; ++__iter, --__n_bytes)
 		*__iter = __INT64_BYTE(__pattern, (__UINTPTR_TYPE__)__iter & 7);
 	return __dst;

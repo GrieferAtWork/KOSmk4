@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xe3dbeb96 */
+/* HASH CRC-32:0x3e6deac1 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -55,7 +55,7 @@ __NAMESPACE_LOCAL_BEGIN
 __LOCAL_LIBC(mtx_timedlock) __ATTR_NONNULL((1, 2)) int
 __NOTHROW_RPC(__LIBCCALL __LIBC_LOCAL_NAME(mtx_timedlock))(__mtx_t *__restrict __mutex, struct timespec const *__restrict __time_point) {
 	__errno_t __error;
-	__error = __NAMESPACE_LOCAL_SYM __localdep_pthread_mutex_timedlock((__pthread_mutex_t *)__mutex, __time_point);
+	__error = (__NAMESPACE_LOCAL_SYM __localdep_pthread_mutex_timedlock)((__pthread_mutex_t *)__mutex, __time_point);
 	if __likely(!__error)
 		return __thrd_success;
 #ifdef __ETIMEDOUT

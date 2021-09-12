@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xd749adc1 */
+/* HASH CRC-32:0xc80641ee */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -42,7 +42,7 @@ __NAMESPACE_LOCAL_BEGIN
 __LOCAL_LIBC(_vsnprintf) __ATTR_LIBC_PRINTF(3, 0) __ATTR_NONNULL((3)) __STDC_INT_AS_SIZE_T
 __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(_vsnprintf))(char *__restrict __buf, __SIZE_TYPE__ __bufsize, char const *__restrict __format, __builtin_va_list __args) {
 	__STDC_INT_AS_SIZE_T __result;
-	__result = __NAMESPACE_LOCAL_SYM __localdep_vsnprintf(__buf, __bufsize, __format, __args);
+	__result = (__NAMESPACE_LOCAL_SYM __localdep_vsnprintf)(__buf, __bufsize, __format, __args);
 	if ((__SIZE_TYPE__)__result > __bufsize)
 		__result = (__STDC_INT_AS_SIZE_T)__bufsize;
 	return __result;

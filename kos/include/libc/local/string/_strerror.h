@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x652e5d65 */
+/* HASH CRC-32:0x4ee05d64 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -43,7 +43,7 @@ __NAMESPACE_LOCAL_BEGIN
 __LOCAL_LIBC(_strerror) __ATTR_WUNUSED char *
 __NOTHROW_RPC(__LIBCCALL __LIBC_LOCAL_NAME(_strerror))(char const *__message) {
 	static char __strerror_buf[64];
-	if (__NAMESPACE_LOCAL_SYM __localdep__strerror_s(__strerror_buf,
+	if ((__NAMESPACE_LOCAL_SYM __localdep__strerror_s)(__strerror_buf,
 	                __COMPILER_LENOF(__strerror_buf),
 	                __message))
 		return __NULLPTR;

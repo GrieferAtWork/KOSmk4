@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x87238b9c */
+/* HASH CRC-32:0x45ca3f17 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -181,23 +181,23 @@ __LOCAL_LIBC(error) __ATTR_LIBC_PRINTF(3, 4) void
 	} else
 #endif /* __LOCAL_error_print_progname */
 	{
-		__NAMESPACE_LOCAL_SYM __localdep_fflush(__LOCAL_stdout);
-		__NAMESPACE_LOCAL_SYM __localdep_fprintf(__LOCAL_stderr, "%s: ", __LOCAL_program_invocation_short_name);
+		(__NAMESPACE_LOCAL_SYM __localdep_fflush)(__LOCAL_stdout);
+		(__NAMESPACE_LOCAL_SYM __localdep_fprintf)(__LOCAL_stderr, "%s: ", __LOCAL_program_invocation_short_name);
 	}
 	if (__format) {
 		__builtin_va_list __args;
 		__builtin_va_start(__args, __format);
-		__NAMESPACE_LOCAL_SYM __localdep_vfprintf(__LOCAL_stderr, __format, __args);
+		(__NAMESPACE_LOCAL_SYM __localdep_vfprintf)(__LOCAL_stderr, __format, __args);
 		__builtin_va_end(__args);
 	}
 #ifdef __LOCAL_error_message_count
 	++__LOCAL_error_message_count;
 #endif /* __LOCAL_error_message_count */
 	if (__errnum != 0)
-		__NAMESPACE_LOCAL_SYM __localdep_fprintf(__LOCAL_stderr, ": %s", __NAMESPACE_LOCAL_SYM __localdep_strerror(__errnum));
-	__NAMESPACE_LOCAL_SYM __localdep_fputc('\n', __LOCAL_stderr);
+		(__NAMESPACE_LOCAL_SYM __localdep_fprintf)(__LOCAL_stderr, ": %s", (__NAMESPACE_LOCAL_SYM __localdep_strerror)(__errnum));
+	(__NAMESPACE_LOCAL_SYM __localdep_fputc)('\n', __LOCAL_stderr);
 	if (__status != 0)
-		__NAMESPACE_LOCAL_SYM __localdep_exit(__status);
+		(__NAMESPACE_LOCAL_SYM __localdep_exit)(__status);
 }
 __NAMESPACE_LOCAL_END
 #ifndef __local___localdep_error_defined

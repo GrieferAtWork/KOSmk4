@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xec255a6 */
+/* HASH CRC-32:0x6cd00038 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -42,7 +42,7 @@ __LOCAL_LIBC(file_wprinter) __ATTR_NONNULL((1, 2)) __SSIZE_TYPE__
 (__LIBCCALL __LIBC_LOCAL_NAME(file_wprinter))(void *__arg, __WCHAR_TYPE__ const *__restrict __data, __SIZE_TYPE__ __datalen) __THROWS(...) {
 	__SIZE_TYPE__ __i;
 	for (__i = 0; __i < __datalen; ++__i) {
-		if (__NAMESPACE_LOCAL_SYM __localdep_fputwc(__data[__i], (__FILE *)__arg) == __WEOF)
+		if ((__NAMESPACE_LOCAL_SYM __localdep_fputwc)(__data[__i], (__FILE *)__arg) == __WEOF)
 			break;
 	}
 	return (__SSIZE_TYPE__)__i;

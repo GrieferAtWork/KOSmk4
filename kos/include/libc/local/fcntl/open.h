@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xfc4f416b */
+/* HASH CRC-32:0x1bf92cfc */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -65,9 +65,9 @@ __NOTHROW_RPC(__VLIBCCALL __LIBC_LOCAL_NAME(open))(char const *__filename, __ofl
 	__builtin_va_list __args;
 	__builtin_va_start(__args, __oflags);
 #if defined(__CRT_HAVE_open64) || defined(__CRT_HAVE___open64) || defined(__CRT_HAVE_open) || defined(__CRT_HAVE__open) || defined(__CRT_HAVE___open)
-	__result = __NAMESPACE_LOCAL_SYM __localdep_open64(__filename, __oflags, __builtin_va_arg(__args, __mode_t));
+	__result = (__NAMESPACE_LOCAL_SYM __localdep_open64)(__filename, __oflags, __builtin_va_arg(__args, __mode_t));
 #else /* __CRT_HAVE_open64 || __CRT_HAVE___open64 || __CRT_HAVE_open || __CRT_HAVE__open || __CRT_HAVE___open */
-	__result = __NAMESPACE_LOCAL_SYM __localdep_openat(__AT_FDCWD, __filename, __oflags, __builtin_va_arg(__args, __mode_t));
+	__result = (__NAMESPACE_LOCAL_SYM __localdep_openat)(__AT_FDCWD, __filename, __oflags, __builtin_va_arg(__args, __mode_t));
 #endif /* !__CRT_HAVE_open64 && !__CRT_HAVE___open64 && !__CRT_HAVE_open && !__CRT_HAVE__open && !__CRT_HAVE___open */
 	__builtin_va_end(__args);
 	return __result;

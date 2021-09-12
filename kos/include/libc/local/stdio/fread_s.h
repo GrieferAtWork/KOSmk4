@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xa6ab79e2 */
+/* HASH CRC-32:0x1d50dee6 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -86,7 +86,7 @@ __NOTHROW_RPC(__LIBCCALL __LIBC_LOCAL_NAME(fread_s))(void *__restrict __buf, __S
 #endif /* __EINVAL */
 		return 0;
 	}
-	return __NAMESPACE_LOCAL_SYM __localdep_fread(__buf, __elemsize, __elemcount, __stream);
+	return (__NAMESPACE_LOCAL_SYM __localdep_fread)(__buf, __elemsize, __elemcount, __stream);
 }
 __NAMESPACE_LOCAL_END
 #ifndef __local___localdep_fread_s_defined

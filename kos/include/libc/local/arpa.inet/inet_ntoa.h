@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x5fa27bbe */
+/* HASH CRC-32:0xa511d57b */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -39,7 +39,7 @@ __NAMESPACE_LOCAL_BEGIN
 __LOCAL_LIBC(inet_ntoa) __ATTR_RETNONNULL __ATTR_WUNUSED char *
 __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(inet_ntoa))(struct in_addr __inaddr) {
 	static char __buf[16];
-	return __NAMESPACE_LOCAL_SYM __localdep_inet_ntoa_r(__inaddr, __buf);
+	return (__NAMESPACE_LOCAL_SYM __localdep_inet_ntoa_r)(__inaddr, __buf);
 }
 __NAMESPACE_LOCAL_END
 #ifndef __local___localdep_inet_ntoa_defined

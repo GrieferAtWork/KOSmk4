@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xe52556e */
+/* HASH CRC-32:0xc5353f76 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -73,7 +73,7 @@ __NAMESPACE_LOCAL_BEGIN
 #endif /* !__local___localdep_fseek_defined */
 __LOCAL_LIBC(fseek_unlocked) __ATTR_NONNULL((1)) int
 (__LIBCCALL __LIBC_LOCAL_NAME(fseek_unlocked))(__FILE *__restrict __stream, long int __off, int __whence) __THROWS(...) {
-	return __NAMESPACE_LOCAL_SYM __localdep_fseek(__stream, __off, __whence);
+	return (__NAMESPACE_LOCAL_SYM __localdep_fseek)(__stream, __off, __whence);
 }
 __NAMESPACE_LOCAL_END
 #ifndef __local___localdep_fseek_unlocked_defined

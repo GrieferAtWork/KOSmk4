@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x63cbdaaa */
+/* HASH CRC-32:0x68cf9275 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -46,7 +46,7 @@ __NAMESPACE_LOCAL_BEGIN
 __LOCAL_LIBC(__mempmoveupl_chk) __ATTR_LEAF __ATTR_RETNONNULL __ATTR_NONNULL((1, 2)) __UINT32_TYPE__ *
 __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(__mempmoveupl_chk))(void *__dst, void const *__src, __SIZE_TYPE__ __n_dwords, __SIZE_TYPE__ __dst_objsize) {
 	__ssp_chk_dstbuf("mempmoveupl", __dst, __n_dwords * 4, __dst_objsize);
-	return __NAMESPACE_LOCAL_SYM __localdep_mempmoveupl(__dst, __src, __n_dwords);
+	return (__NAMESPACE_LOCAL_SYM __localdep_mempmoveupl)(__dst, __src, __n_dwords);
 }
 __NAMESPACE_LOCAL_END
 #ifndef __local___localdep___mempmoveupl_chk_defined

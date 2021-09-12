@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x20fac32b */
+/* HASH CRC-32:0x2549e9c5 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -76,11 +76,11 @@ __NAMESPACE_LOCAL_BEGIN
 __LOCAL_LIBC(readall) __ATTR_NONNULL((2)) __SSIZE_TYPE__
 __NOTHROW_RPC(__LIBCCALL __LIBC_LOCAL_NAME(readall))(__fd_t __fd, void *__buf, __SIZE_TYPE__ __bufsize) {
 	__SSIZE_TYPE__ __result, __temp;
-	__result = __NAMESPACE_LOCAL_SYM __localdep_read(__fd, __buf, __bufsize);
+	__result = (__NAMESPACE_LOCAL_SYM __localdep_read)(__fd, __buf, __bufsize);
 	if (__result > 0 && (__SIZE_TYPE__)__result < __bufsize) {
 		/* Keep on reading */
 		for (;;) {
-			__temp = __NAMESPACE_LOCAL_SYM __localdep_read(__fd,
+			__temp = (__NAMESPACE_LOCAL_SYM __localdep_read)(__fd,
 			            (__BYTE_TYPE__ *)__buf + (__SIZE_TYPE__)__result,
 			            __bufsize - (__SIZE_TYPE__)__result);
 			if (__temp <= 0) {
@@ -88,7 +88,7 @@ __NOTHROW_RPC(__LIBCCALL __LIBC_LOCAL_NAME(readall))(__fd_t __fd, void *__buf, _
 				int __old_error = __libc_geterrno();
 #endif /* __libc_geterrno */
 				/* Try to un-read data that had already been loaded. */
-				__NAMESPACE_LOCAL_SYM __localdep_lseek(__fd, -(__FS_TYPE(off))(__FS_TYPE(pos))__result, __SEEK_CUR);
+				(__NAMESPACE_LOCAL_SYM __localdep_lseek)(__fd, -(__FS_TYPE(off))(__FS_TYPE(pos))__result, __SEEK_CUR);
 #ifdef __libc_geterrno
 				(void)__libc_seterrno(__old_error);
 #endif /* __libc_geterrno */

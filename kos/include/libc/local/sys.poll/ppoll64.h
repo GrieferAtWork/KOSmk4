@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x8b635dfd */
+/* HASH CRC-32:0x213dcb64 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -34,10 +34,10 @@ __LOCAL_LIBC(ppoll64) __ATTR_NONNULL((1)) int
 __NOTHROW_RPC(__LIBCCALL __LIBC_LOCAL_NAME(ppoll64))(struct pollfd *__fds, __UINTPTR_TYPE__ __nfds, struct __timespec64 const *__timeout, struct __sigset_struct const *__ss) {
 	struct __timespec32 __tmo32;
 	if (!__timeout)
-		return __NAMESPACE_LOCAL_SYM __localdep_ppoll32(__fds, __nfds, __NULLPTR, __ss);
+		return (__NAMESPACE_LOCAL_SYM __localdep_ppoll32)(__fds, __nfds, __NULLPTR, __ss);
 	__tmo32.tv_sec  = (__time32_t)__timeout->tv_sec;
 	__tmo32.tv_nsec = __timeout->tv_nsec;
-	return __NAMESPACE_LOCAL_SYM __localdep_ppoll32(__fds, __nfds, &__tmo32, __ss);
+	return (__NAMESPACE_LOCAL_SYM __localdep_ppoll32)(__fds, __nfds, &__tmo32, __ss);
 }
 __NAMESPACE_LOCAL_END
 #ifndef __local___localdep_ppoll64_defined

@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x90d81e19 */
+/* HASH CRC-32:0x4fadb149 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -45,7 +45,7 @@ __LOCAL_LIBC(_fscanf_l) __ATTR_LIBC_SCANF(2, 4) __ATTR_NONNULL((1, 2)) __STDC_IN
 	__STDC_INT_AS_SIZE_T __result;
 	__builtin_va_list __args;
 	__builtin_va_start(__args, __locale);
-	__result = __NAMESPACE_LOCAL_SYM __localdep__vfscanf_l(__stream, __format, __locale, __args);
+	__result = (__NAMESPACE_LOCAL_SYM __localdep__vfscanf_l)(__stream, __format, __locale, __args);
 	__builtin_va_end(__args);
 	return __result;
 }

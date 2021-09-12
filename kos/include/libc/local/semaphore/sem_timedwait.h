@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x492a00d1 */
+/* HASH CRC-32:0x38d01441 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -50,12 +50,12 @@ __NOTHROW_RPC(__LIBCCALL __LIBC_LOCAL_NAME(sem_timedwait))(__sem_t *__restrict _
 	struct __timespec32 __ts32;
 	__ts32.tv_sec = (__time32_t)__abstime->tv_sec;
 	__ts32.tv_nsec = __abstime->tv_nsec;
-	return __NAMESPACE_LOCAL_SYM __localdep_sem_timedwait32(__sem, &__ts32);
+	return (__NAMESPACE_LOCAL_SYM __localdep_sem_timedwait32)(__sem, &__ts32);
 #else /* __CRT_HAVE_sem_timedwait */
 	struct __timespec64 __ts64;
 	__ts64.tv_sec = (__time64_t)__abstime->tv_sec;
 	__ts64.tv_nsec = __abstime->tv_nsec;
-	return __NAMESPACE_LOCAL_SYM __localdep_sem_timedwait64(__sem, &__ts64);
+	return (__NAMESPACE_LOCAL_SYM __localdep_sem_timedwait64)(__sem, &__ts64);
 #endif /* !__CRT_HAVE_sem_timedwait */
 }
 __NAMESPACE_LOCAL_END

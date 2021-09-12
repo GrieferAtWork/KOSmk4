@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xb2907bba */
+/* HASH CRC-32:0x910df4ec */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -90,24 +90,24 @@ __LOCAL_LIBC(fgets_unlocked) __ATTR_WUNUSED __ATTR_NONNULL((1, 3)) char *
 		return __NULLPTR;
 	}
 	for (__n = 0; __n < __bufsize - 1; ++__n) {
-		int __ch = __NAMESPACE_LOCAL_SYM __localdep_fgetc_unlocked(__stream);
+		int __ch = (__NAMESPACE_LOCAL_SYM __localdep_fgetc_unlocked)(__stream);
 		if (__ch == __EOF) {
-			if (__n == 0 || __NAMESPACE_LOCAL_SYM __localdep_ferror_unlocked(__stream))
+			if (__n == 0 || (__NAMESPACE_LOCAL_SYM __localdep_ferror_unlocked)(__stream))
 				return __NULLPTR;
 			break;
 		}
 		if (__ch == '\r') {
 			/* Special handling to convert both `\r' and `\r\n' into `\n' */
 			__buf[__n++] = '\n';
-			__ch = __NAMESPACE_LOCAL_SYM __localdep_fgetc_unlocked(__stream);
+			__ch = (__NAMESPACE_LOCAL_SYM __localdep_fgetc_unlocked)(__stream);
 			if (__ch == __EOF) {
-				if (__n == 0 || __NAMESPACE_LOCAL_SYM __localdep_ferror_unlocked(__stream))
+				if (__n == 0 || (__NAMESPACE_LOCAL_SYM __localdep_ferror_unlocked)(__stream))
 					return __NULLPTR;
 				break;
 			}
 			if (__ch == '\r')
 				continue;
-			__NAMESPACE_LOCAL_SYM __localdep_ungetc_unlocked(__ch, __stream);
+			(__NAMESPACE_LOCAL_SYM __localdep_ungetc_unlocked)(__ch, __stream);
 			break;
 		}
 		__buf[__n] = (char)__ch;

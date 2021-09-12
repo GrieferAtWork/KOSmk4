@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xc9cf01a2 */
+/* HASH CRC-32:0x4424f4a8 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -65,7 +65,7 @@ __NAMESPACE_LOCAL_BEGIN
 #endif /* !__local___localdep_fuzzy_c32memcasecmp_l_defined */
 __LOCAL_LIBC(fuzzy_c32scasecmp_l) __ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1, 2)) __SIZE_TYPE__
 __NOTHROW_NCX(__LIBKCALL __LIBC_LOCAL_NAME(fuzzy_c32scasecmp_l))(__CHAR32_TYPE__ const *__s1, __CHAR32_TYPE__ const *__s2, __locale_t __locale) {
-	return __NAMESPACE_LOCAL_SYM __localdep_fuzzy_c32memcasecmp_l(__s1, __NAMESPACE_LOCAL_SYM __localdep_c32slen(__s1), __s2, __NAMESPACE_LOCAL_SYM __localdep_c32slen(__s2), __locale);
+	return (__NAMESPACE_LOCAL_SYM __localdep_fuzzy_c32memcasecmp_l)(__s1, (__NAMESPACE_LOCAL_SYM __localdep_c32slen)(__s1), __s2, (__NAMESPACE_LOCAL_SYM __localdep_c32slen)(__s2), __locale);
 }
 __NAMESPACE_LOCAL_END
 #ifndef __local___localdep_fuzzy_c32scasecmp_l_defined

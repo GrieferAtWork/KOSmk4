@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xd932f652 */
+/* HASH CRC-32:0x5c19507b */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -48,7 +48,7 @@ __NOTHROW(__LIBKCALL __LIBC_LOCAL_NAME(error_active))(void) {
 #ifdef __arch_error_active
 	return __arch_error_active();
 #else /* __arch_error_active */
-	return __NAMESPACE_LOCAL_SYM __localdep_error_code() != E_OK;
+	return (__NAMESPACE_LOCAL_SYM __localdep_error_code)() != E_OK;
 #endif /* !__arch_error_active */
 }
 __NAMESPACE_LOCAL_END

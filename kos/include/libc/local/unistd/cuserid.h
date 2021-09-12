@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x10b959dd */
+/* HASH CRC-32:0x4b979567 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -49,12 +49,12 @@ __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(cuserid))(char *__s) {
 	static char __cuserid_buffer[__L_cuserid];
 	if (!__s)
 		__s = __cuserid_buffer;
-	return __NAMESPACE_LOCAL_SYM __localdep_getlogin_r(__s, __L_cuserid) ? __NULLPTR : __s;
+	return (__NAMESPACE_LOCAL_SYM __localdep_getlogin_r)(__s, __L_cuserid) ? __NULLPTR : __s;
 #else /* __L_cuserid */
 	static char __cuserid_buffer[9];
 	if (!__s)
 		__s = __cuserid_buffer;
-	return __NAMESPACE_LOCAL_SYM __localdep_getlogin_r(__s, 9) ? __NULLPTR : __s;
+	return (__NAMESPACE_LOCAL_SYM __localdep_getlogin_r)(__s, 9) ? __NULLPTR : __s;
 #endif /* !__L_cuserid */
 }
 __NAMESPACE_LOCAL_END

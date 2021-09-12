@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xed4d11b1 */
+/* HASH CRC-32:0xa561f9e */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -40,7 +40,7 @@ __NAMESPACE_LOCAL_BEGIN
 __LOCAL_LIBC(fgetpwuid_r) __ATTR_NONNULL((1, 3, 4, 6)) __errno_t
 __NOTHROW_RPC(__LIBCCALL __LIBC_LOCAL_NAME(fgetpwuid_r))(__FILE *__restrict __stream, __uid_t __uid, struct passwd *__restrict __resultbuf, char *__restrict __buffer, __SIZE_TYPE__ __buflen, struct passwd **__restrict __result) {
 	__errno_t __error;
-	__error = __NAMESPACE_LOCAL_SYM __localdep_fgetpwfiltered_r(__stream, __resultbuf, __buffer, __buflen,
+	__error = (__NAMESPACE_LOCAL_SYM __localdep_fgetpwfiltered_r)(__stream, __resultbuf, __buffer, __buflen,
 	                         __result, __uid, __NULLPTR);
 #ifdef __ENOENT
 	if (__error == __ENOENT)

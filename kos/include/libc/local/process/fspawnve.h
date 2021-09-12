@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x3338d544 */
+/* HASH CRC-32:0xacdbd797 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -183,35 +183,35 @@ __NOTHROW_RPC(__LIBCCALL __LIBC_LOCAL_NAME(fspawnve))(__STDC_INT_AS_UINT_T __mod
 #endif /* __ARCH_HAVE_SHARED_VM_VFORK && (__CRT_HAVE_vfork || __CRT_HAVE___vfork) */
 	__pid_t __child;
 	if (__mode == __P_OVERLAY)
-		return __NAMESPACE_LOCAL_SYM __localdep_fexecve(__execfd, ___argv, ___envp);
+		return (__NAMESPACE_LOCAL_SYM __localdep_fexecve)(__execfd, ___argv, ___envp);
 #if defined(__ARCH_HAVE_SHARED_VM_VFORK) && (defined(__CRT_HAVE_vfork) || defined(__CRT_HAVE___vfork))
 	__old_errno = __libc_geterrno_or(0);
 	(void)__libc_seterrno(0);
 #endif /* __ARCH_HAVE_SHARED_VM_VFORK && (__CRT_HAVE_vfork || __CRT_HAVE___vfork) */
 #if !defined(__ARCH_HAVE_SHARED_VM_VFORK) || (!defined(__CRT_HAVE_vfork) && !defined(__CRT_HAVE___vfork))
 	/* Create a pair of pipes for temporary communication. */
-	if (__NAMESPACE_LOCAL_SYM __localdep_pipe2(__pipes, __O_CLOEXEC))
+	if ((__NAMESPACE_LOCAL_SYM __localdep_pipe2)(__pipes, __O_CLOEXEC))
 		goto __err;
 #endif /* !__ARCH_HAVE_SHARED_VM_VFORK || (!__CRT_HAVE_vfork && !__CRT_HAVE___vfork) */
 	if (__mode == __P_DETACH) {
 		/* Daemonize (detach) the process using detach(2), or double-fork. */
 #if defined(__CRT_HAVE_vfork) || defined(__CRT_HAVE___vfork)
-		if (__NAMESPACE_LOCAL_SYM __localdep_vfork() == 0)
+		if ((__NAMESPACE_LOCAL_SYM __localdep_vfork)() == 0)
 #else /* __CRT_HAVE_vfork || __CRT_HAVE___vfork */
-		if (__NAMESPACE_LOCAL_SYM __localdep_fork() == 0)
+		if ((__NAMESPACE_LOCAL_SYM __localdep_fork)() == 0)
 #endif /* !__CRT_HAVE_vfork && !__CRT_HAVE___vfork */
 		{
 #ifdef __CRT_HAVE_detach
-			__NAMESPACE_LOCAL_SYM __localdep_detach(0); /* Detach myself from my parent. */
+			(__NAMESPACE_LOCAL_SYM __localdep_detach)(0); /* Detach myself from my parent. */
 			goto __do_exec;
 #else /* __CRT_HAVE_detach */
 #if defined(__CRT_HAVE_vfork) || defined(__CRT_HAVE___vfork)
-			if (__NAMESPACE_LOCAL_SYM __localdep_vfork() == 0)
+			if ((__NAMESPACE_LOCAL_SYM __localdep_vfork)() == 0)
 #else /* __CRT_HAVE_vfork || __CRT_HAVE___vfork */
-			if (__NAMESPACE_LOCAL_SYM __localdep_fork() == 0)
+			if ((__NAMESPACE_LOCAL_SYM __localdep_fork)() == 0)
 #endif /* !__CRT_HAVE_vfork && !__CRT_HAVE___vfork */
 				goto __do_exec;
-			__NAMESPACE_LOCAL_SYM __localdep__Exit(0); /* Just terminate the intermediate process. */
+			(__NAMESPACE_LOCAL_SYM __localdep__Exit)(0); /* Just terminate the intermediate process. */
 #endif /* !__CRT_HAVE_detach */
 		}
 		__child = 0;
@@ -220,9 +220,9 @@ __NOTHROW_RPC(__LIBCCALL __LIBC_LOCAL_NAME(fspawnve))(__STDC_INT_AS_UINT_T __mod
 	if (__mode == __P_WAIT) {
 		/* Spawn and join the process */
 #if defined(__ARCH_HAVE_SHARED_VM_VFORK) && (defined(__CRT_HAVE_vfork) || defined(__CRT_HAVE___vfork))
-		__child = __NAMESPACE_LOCAL_SYM __localdep_vfork();
+		__child = (__NAMESPACE_LOCAL_SYM __localdep_vfork)();
 #else /* __ARCH_HAVE_SHARED_VM_VFORK && (__CRT_HAVE_vfork || __CRT_HAVE___vfork) */
-		__child = __NAMESPACE_LOCAL_SYM __localdep_fork();
+		__child = (__NAMESPACE_LOCAL_SYM __localdep_fork)();
 #endif /* !__ARCH_HAVE_SHARED_VM_VFORK || (!__CRT_HAVE_vfork && !__CRT_HAVE___vfork) */
 		if (__child == 0)
 			goto __do_exec;
@@ -237,9 +237,9 @@ __NOTHROW_RPC(__LIBCCALL __LIBC_LOCAL_NAME(fspawnve))(__STDC_INT_AS_UINT_T __mod
 		 * since  we  overwrote it  to be  0 above) */
 		(void)__libc_seterrno(__old_errno);
 #else /* __ARCH_HAVE_SHARED_VM_VFORK && (__CRT_HAVE_vfork || __CRT_HAVE___vfork) */
-		__NAMESPACE_LOCAL_SYM __localdep_close(__pipes[1]); /* Close the writer. */
-		__temp = __NAMESPACE_LOCAL_SYM __localdep_read(__pipes[0], &__error, sizeof(__error));
-		__NAMESPACE_LOCAL_SYM __localdep_close(__pipes[0]); /* Close the reader. */
+		(__NAMESPACE_LOCAL_SYM __localdep_close)(__pipes[1]); /* Close the writer. */
+		__temp = (__NAMESPACE_LOCAL_SYM __localdep_read)(__pipes[0], &__error, sizeof(__error));
+		(__NAMESPACE_LOCAL_SYM __localdep_close)(__pipes[0]); /* Close the reader. */
 		if (__temp < 0)
 			goto __err_join_zombie_child;
 		if (__temp == sizeof(__error)) {
@@ -249,7 +249,7 @@ __NOTHROW_RPC(__LIBCCALL __LIBC_LOCAL_NAME(fspawnve))(__STDC_INT_AS_UINT_T __mod
 		}
 #endif /* !__ARCH_HAVE_SHARED_VM_VFORK || (!__CRT_HAVE_vfork && !__CRT_HAVE___vfork) */
 		/* Join the child. */
-		while (__NAMESPACE_LOCAL_SYM __localdep_waitpid(__child, &__status, 0) < 0) {
+		while ((__NAMESPACE_LOCAL_SYM __localdep_waitpid)(__child, &__status, 0) < 0) {
 #ifdef __EINTR
 			if (__libc_geterrno() == __EINTR)
 				continue;
@@ -261,9 +261,9 @@ __NOTHROW_RPC(__LIBCCALL __LIBC_LOCAL_NAME(fspawnve))(__STDC_INT_AS_UINT_T __mod
 
 	/* Spawn asynchronously. */
 #if defined(__ARCH_HAVE_SHARED_VM_VFORK) && (defined(__CRT_HAVE_vfork) || defined(__CRT_HAVE___vfork))
-	__child = __NAMESPACE_LOCAL_SYM __localdep_vfork();
+	__child = (__NAMESPACE_LOCAL_SYM __localdep_vfork)();
 #else /* __ARCH_HAVE_SHARED_VM_VFORK && (__CRT_HAVE_vfork || __CRT_HAVE___vfork) */
-	__child = __NAMESPACE_LOCAL_SYM __localdep_fork();
+	__child = (__NAMESPACE_LOCAL_SYM __localdep_fork)();
 #endif /* !__ARCH_HAVE_SHARED_VM_VFORK || (!__CRT_HAVE_vfork && !__CRT_HAVE___vfork) */
 	if (__child == 0)
 		goto __do_exec;
@@ -284,9 +284,9 @@ __read_child_errors:
 	/* Read from the communication pipe
 	 * (NOTE: If exec() succeeds, the pipe will be
 	 *        closed and  read() returns  ZERO(0)) */
-	__NAMESPACE_LOCAL_SYM __localdep_close(__pipes[1]); /* Close the writer. */
-	__temp = __NAMESPACE_LOCAL_SYM __localdep_read(__pipes[0], &__error, sizeof(__error));
-	__NAMESPACE_LOCAL_SYM __localdep_close(__pipes[0]); /* Close the reader. */
+	(__NAMESPACE_LOCAL_SYM __localdep_close)(__pipes[1]); /* Close the writer. */
+	__temp = (__NAMESPACE_LOCAL_SYM __localdep_read)(__pipes[0], &__error, sizeof(__error));
+	(__NAMESPACE_LOCAL_SYM __localdep_close)(__pipes[0]); /* Close the reader. */
 	if (__temp < 0)
 		goto __err_join_zombie_child;
 	/* This means that `fexecve()' below closed the pipe during a successful exec(). */
@@ -300,7 +300,7 @@ __err_join_zombie_child:
 		/* Unless the child was already spawned as detached,
 		 * we still have to re-join  it, or else it will  be
 		 * left dangling as a zombie process! */
-		if (__NAMESPACE_LOCAL_SYM __localdep_waitpid(__child, &__status, 0) < 0) {
+		if ((__NAMESPACE_LOCAL_SYM __localdep_waitpid)(__child, &__status, 0) < 0) {
 #ifdef __EINTR
 			if (__libc_geterrno() == __EINTR)
 				goto __err_join_zombie_child;
@@ -312,7 +312,7 @@ __err:
 __do_exec:
 	/* When the exec succeeds, the pipe is auto-
 	 * closed because it's marked as  O_CLOEXEC! */
-	__NAMESPACE_LOCAL_SYM __localdep_fexecve(__execfd, ___argv, ___envp);
+	(__NAMESPACE_LOCAL_SYM __localdep_fexecve)(__execfd, ___argv, ___envp);
 #if defined(__ARCH_HAVE_SHARED_VM_VFORK) && (defined(__CRT_HAVE_vfork) || defined(__CRT_HAVE___vfork))
 	/* If the exec fails, it will have modified `errno' to indicate this fact.
 	 * And since we're sharing VMs with  our parent process, the error  reason
@@ -326,10 +326,10 @@ __do_exec:
 	__error = __libc_geterrno_or(1);
 #endif /* !__ENOENT */
 	/* Communicate back why this failed. */
-	__NAMESPACE_LOCAL_SYM __localdep_write(__pipes[1], &__error, sizeof(__error));
+	(__NAMESPACE_LOCAL_SYM __localdep_write)(__pipes[1], &__error, sizeof(__error));
 	/* No need to close the pipe, it's auto-closed by the kernel! */
 #endif /* !__ARCH_HAVE_SHARED_VM_VFORK || (!__CRT_HAVE_vfork && !__CRT_HAVE___vfork) */
-	__NAMESPACE_LOCAL_SYM __localdep__Exit(127);
+	(__NAMESPACE_LOCAL_SYM __localdep__Exit)(127);
 }
 __NAMESPACE_LOCAL_END
 #ifndef __local___localdep_fspawnve_defined

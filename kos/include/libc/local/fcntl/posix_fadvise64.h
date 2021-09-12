@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xea8b212b */
+/* HASH CRC-32:0x2ff67720 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -40,7 +40,7 @@ __CREDIRECT(,int,__NOTHROW_NCX,__localdep_posix_fadvise32,(__fd_t __fd, __off32_
 __LOCAL_LIBC(posix_fadvise64) int
 __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(posix_fadvise64))(__fd_t __fd, __PIO_OFFSET64 __offset, __PIO_OFFSET64 __length, __STDC_INT_AS_UINT_T __advise) {
 #ifdef __CRT_HAVE_posix_fadvise
-	return __NAMESPACE_LOCAL_SYM __localdep_posix_fadvise32(__fd, (__pos32_t)__offset, (__pos32_t)__length, __advise);
+	return (__NAMESPACE_LOCAL_SYM __localdep_posix_fadvise32)(__fd, (__pos32_t)__offset, (__pos32_t)__length, __advise);
 #else /* __CRT_HAVE_posix_fadvise */
 	(void)__fd;
 	(void)__offset;

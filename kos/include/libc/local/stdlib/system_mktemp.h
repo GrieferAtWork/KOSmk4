@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x8330e9b8 */
+/* HASH CRC-32:0xa784e2a4 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -279,12 +279,12 @@ __NOTHROW_RPC(__LIBCCALL __LIBC_LOCAL_NAME(system_mktemp))(unsigned int __what, 
 	 * O_DOSPATH... */
 	static char const __letters[] = "abcdefghijklmnopqrstuvwxyz0123456789";
 #define __NUM_LETTERS 36
-	char *__xloc = __NAMESPACE_LOCAL_SYM __localdep_strend(__template_) - (__suffixlen + 6);
+	char *__xloc = (__NAMESPACE_LOCAL_SYM __localdep_strend)(__template_) - (__suffixlen + 6);
 	__UINT32_TYPE__ __seed, __overflow;
 	__SIZE_TYPE__ __i, __attempt;
 	__fd_t __result;
 	/* Verify the validity of the input template. */
-	if __unlikely(__xloc < __template_ || __NAMESPACE_LOCAL_SYM __localdep_memcmp(__xloc, "XXXXXX", 6 * sizeof(char)) != 0) {
+	if __unlikely(__xloc < __template_ || (__NAMESPACE_LOCAL_SYM __localdep_memcmp)(__xloc, "XXXXXX", 6 * sizeof(char)) != 0) {
 #ifdef __EINVAL
 		return __libc_seterrno(__EINVAL);
 #else /* __EINVAL */
@@ -301,7 +301,7 @@ __again:
 	{
 #if (defined(__CRT_HAVE_gettimeofday64) || defined(__CRT_HAVE_gettimeofday) || defined(__CRT_HAVE___gettimeofday)) && __SIZEOF_TIME32_T__ != __SIZEOF_TIME64_T__
 		struct __timeval64 __tv;
-		if (__NAMESPACE_LOCAL_SYM __localdep_gettimeofday64(&__tv, __NULLPTR) == 0) {
+		if ((__NAMESPACE_LOCAL_SYM __localdep_gettimeofday64)(&__tv, __NULLPTR) == 0) {
 			__seed = (__UINT32_TYPE__)(__tv.tv_sec) ^
 			       (__UINT32_TYPE__)(__tv.tv_sec >> 32) ^
 			       (__UINT32_TYPE__)(__tv.tv_usec << 12); /* The  max value is 0xf423f, so shift
@@ -310,7 +310,7 @@ __again:
 		} else
 #elif defined(__CRT_HAVE_gettimeofday64) || defined(__CRT_HAVE_gettimeofday) || defined(__CRT_HAVE___gettimeofday)
 		struct timeval __tv;
-		if (__NAMESPACE_LOCAL_SYM __localdep_gettimeofday(&__tv, __NULLPTR) == 0) {
+		if ((__NAMESPACE_LOCAL_SYM __localdep_gettimeofday)(&__tv, __NULLPTR) == 0) {
 			__seed = (__UINT32_TYPE__)(__tv.tv_sec) ^
 #if __SIZEOF_TIME_T__ > 4
 			       (__UINT32_TYPE__)(__tv.tv_sec >> 32) ^
@@ -331,15 +331,15 @@ __again:
 			/* Generate at least 32 bits of random data. */
 			do {
 				__seed *= __LIBC_RAND_MAX;
-				__seed += (__UINT32_TYPE__)__NAMESPACE_LOCAL_SYM __localdep_rand();
+				__seed += (__UINT32_TYPE__)(__NAMESPACE_LOCAL_SYM __localdep_rand)();
 			} while (!__hybrid_overflow_uadd(__sum, __LIBC_RAND_MAX, &__sum));
 #undef __LIBC_RAND_MAX
 		}
 	}
 #ifdef __CRT_HAVE_gettid
-	__seed ^= __NAMESPACE_LOCAL_SYM __localdep_gettid();
+	__seed ^= (__NAMESPACE_LOCAL_SYM __localdep_gettid)();
 #elif defined(__CRT_HAVE_getpid) || defined(__CRT_HAVE__getpid) || defined(__CRT_HAVE___getpid)
-	__seed ^= __NAMESPACE_LOCAL_SYM __localdep_getpid();
+	__seed ^= (__NAMESPACE_LOCAL_SYM __localdep_getpid)();
 #endif /* ... */
 
 	/* Using the seed, generate some initial random data.
@@ -384,13 +384,13 @@ __again:
 #ifdef __O_EXCL
 		__flags |= __O_EXCL;
 #endif /* __O_EXCL */
-		__result = __NAMESPACE_LOCAL_SYM __localdep_open(__template_, __flags, 0600);
+		__result = (__NAMESPACE_LOCAL_SYM __localdep_open)(__template_, __flags, 0600);
 	}	break;
 #endif /* __CRT_HAVE_open64 || __CRT_HAVE___open64 || __CRT_HAVE_open || __CRT_HAVE__open || __CRT_HAVE___open || (__AT_FDCWD && (__CRT_HAVE_openat64 || __CRT_HAVE_openat)) */
 
 #if defined(__CRT_HAVE_mkdir) || (defined(__CRT_DOS_PRIMARY) && defined(__CRT_HAVE__mkdir))
 	case 1:
-		__result = __NAMESPACE_LOCAL_SYM __localdep_mkdir(__template_, 0700);
+		__result = (__NAMESPACE_LOCAL_SYM __localdep_mkdir)(__template_, 0700);
 		break;
 #endif /* __CRT_HAVE_mkdir || (__CRT_DOS_PRIMARY && __CRT_HAVE__mkdir) */
 
@@ -398,9 +398,9 @@ __again:
 	case 2: {
 #if (defined(__CRT_HAVE_kstat) && defined(__CRT_KOS_PRIMARY)) || (defined(__CRT_HAVE_kstat64) && defined(__CRT_KOS_PRIMARY)) || (defined(__CRT_HAVE__stat64) && defined(__CRT_DOS_PRIMARY) && defined(__USE_TIME_BITS64)) || (defined(__CRT_HAVE__stat64i32) && defined(__CRT_DOS_PRIMARY) && defined(__USE_TIME_BITS64)) || (defined(__CRT_HAVE__stati64) && defined(__CRT_DOS_PRIMARY) && !defined(__USE_TIME_BITS64) && defined(__USE_FILE_OFFSET64)) || (defined(__CRT_HAVE__stat32i64) && defined(__CRT_DOS_PRIMARY) && !defined(__USE_TIME_BITS64) && defined(__USE_FILE_OFFSET64)) || (defined(__CRT_HAVE__stat) && defined(__CRT_DOS_PRIMARY) && !defined(__USE_TIME_BITS64) && !defined(__USE_FILE_OFFSET64)) || (defined(__CRT_HAVE__stat32) && defined(__CRT_DOS_PRIMARY) && !defined(__USE_TIME_BITS64) && !defined(__USE_FILE_OFFSET64)) || (defined(__CRT_HAVE_stat64) && defined(__USE_FILE_OFFSET64)) || (defined(__CRT_HAVE_stat) && !defined(__USE_FILE_OFFSET64))
 		struct stat __st;
-		__result = __NAMESPACE_LOCAL_SYM __localdep_stat(__template_, &__st);
+		__result = (__NAMESPACE_LOCAL_SYM __localdep_stat)(__template_, &__st);
 #else /* (__CRT_HAVE_kstat && __CRT_KOS_PRIMARY) || (__CRT_HAVE_kstat64 && __CRT_KOS_PRIMARY) || (__CRT_HAVE__stat64 && __CRT_DOS_PRIMARY && __USE_TIME_BITS64) || (__CRT_HAVE__stat64i32 && __CRT_DOS_PRIMARY && __USE_TIME_BITS64) || (__CRT_HAVE__stati64 && __CRT_DOS_PRIMARY && !__USE_TIME_BITS64 && __USE_FILE_OFFSET64) || (__CRT_HAVE__stat32i64 && __CRT_DOS_PRIMARY && !__USE_TIME_BITS64 && __USE_FILE_OFFSET64) || (__CRT_HAVE__stat && __CRT_DOS_PRIMARY && !__USE_TIME_BITS64 && !__USE_FILE_OFFSET64) || (__CRT_HAVE__stat32 && __CRT_DOS_PRIMARY && !__USE_TIME_BITS64 && !__USE_FILE_OFFSET64) || (__CRT_HAVE_stat64 && __USE_FILE_OFFSET64) || (__CRT_HAVE_stat && !__USE_FILE_OFFSET64) */
-		__result = __NAMESPACE_LOCAL_SYM __localdep_open(__template_,
+		__result = (__NAMESPACE_LOCAL_SYM __localdep_open)(__template_,
 #ifdef __O_RDONLY
 		              __O_RDONLY
 #elif defined(__O_RDWR)
@@ -419,7 +419,7 @@ __again:
 		} else {
 			/* File does already exist. */
 #if (!defined(__CRT_HAVE_kstat) || !defined(__CRT_KOS_PRIMARY)) && (!defined(__CRT_HAVE_kstat64) || !defined(__CRT_KOS_PRIMARY)) && (!defined(__CRT_HAVE__stat64) || !defined(__CRT_DOS_PRIMARY) || !defined(__USE_TIME_BITS64)) && (!defined(__CRT_HAVE__stat64i32) || !defined(__CRT_DOS_PRIMARY) || !defined(__USE_TIME_BITS64)) && (!defined(__CRT_HAVE__stati64) || !defined(__CRT_DOS_PRIMARY) || defined(__USE_TIME_BITS64) || !defined(__USE_FILE_OFFSET64)) && (!defined(__CRT_HAVE__stat32i64) || !defined(__CRT_DOS_PRIMARY) || defined(__USE_TIME_BITS64) || !defined(__USE_FILE_OFFSET64)) && (!defined(__CRT_HAVE__stat) || !defined(__CRT_DOS_PRIMARY) || defined(__USE_TIME_BITS64) || defined(__USE_FILE_OFFSET64)) && (!defined(__CRT_HAVE__stat32) || !defined(__CRT_DOS_PRIMARY) || defined(__USE_TIME_BITS64) || defined(__USE_FILE_OFFSET64)) && (!defined(__CRT_HAVE_stat64) || !defined(__USE_FILE_OFFSET64)) && (!defined(__CRT_HAVE_stat) || defined(__USE_FILE_OFFSET64)) && (defined(__CRT_HAVE_close) || defined(__CRT_HAVE__close) || defined(__CRT_HAVE___close))
-			__NAMESPACE_LOCAL_SYM __localdep_close(__result);
+			(__NAMESPACE_LOCAL_SYM __localdep_close)(__result);
 #endif /* (!__CRT_HAVE_kstat || !__CRT_KOS_PRIMARY) && (!__CRT_HAVE_kstat64 || !__CRT_KOS_PRIMARY) && (!__CRT_HAVE__stat64 || !__CRT_DOS_PRIMARY || !__USE_TIME_BITS64) && (!__CRT_HAVE__stat64i32 || !__CRT_DOS_PRIMARY || !__USE_TIME_BITS64) && (!__CRT_HAVE__stati64 || !__CRT_DOS_PRIMARY || __USE_TIME_BITS64 || !__USE_FILE_OFFSET64) && (!__CRT_HAVE__stat32i64 || !__CRT_DOS_PRIMARY || __USE_TIME_BITS64 || !__USE_FILE_OFFSET64) && (!__CRT_HAVE__stat || !__CRT_DOS_PRIMARY || __USE_TIME_BITS64 || __USE_FILE_OFFSET64) && (!__CRT_HAVE__stat32 || !__CRT_DOS_PRIMARY || __USE_TIME_BITS64 || __USE_FILE_OFFSET64) && (!__CRT_HAVE_stat64 || !__USE_FILE_OFFSET64) && (!__CRT_HAVE_stat || __USE_FILE_OFFSET64) && (__CRT_HAVE_close || __CRT_HAVE__close || __CRT_HAVE___close) */
 #ifdef __EEXIST
 			__result = __libc_seterrno(__EEXIST);

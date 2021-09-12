@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x163c223d */
+/* HASH CRC-32:0xe100055b */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -1238,7 +1238,7 @@ __CDECLARE(__ATTR_NONNULL((2)),int,__NOTHROW_RPC,recvmmsg,(__fd_t __sockfd, stru
  *                            MSG_WAITFORONE'
  * @return: * : The # of datagrams successfully received.
  * @return: -1: Error (s.a. `recvmsg(2)') */
-__NAMESPACE_LOCAL_USING_OR_IMPL(recvmmsg, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_NONNULL((2)) int __NOTHROW_RPC(__LIBCCALL recvmmsg)(__fd_t __sockfd, struct mmsghdr *__vmessages, __STDC_UINT_AS_SIZE_T __vlen, __STDC_INT_AS_UINT_T __msg_flags, struct timespec *__tmo) { return __NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(recvmmsg)(__sockfd, __vmessages, __vlen, __msg_flags, __tmo); })
+__NAMESPACE_LOCAL_USING_OR_IMPL(recvmmsg, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_NONNULL((2)) int __NOTHROW_RPC(__LIBCCALL recvmmsg)(__fd_t __sockfd, struct mmsghdr *__vmessages, __STDC_UINT_AS_SIZE_T __vlen, __STDC_INT_AS_UINT_T __msg_flags, struct timespec *__tmo) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(recvmmsg))(__sockfd, __vmessages, __vlen, __msg_flags, __tmo); })
 #endif /* ... */
 #ifdef __USE_TIME64
 #ifdef __CRT_HAVE_recvmmsg64
@@ -1274,7 +1274,7 @@ __CREDIRECT(__ATTR_NONNULL((2)),int,__NOTHROW_RPC,recvmmsg64,(__fd_t __sockfd, s
  *                            MSG_WAITFORONE'
  * @return: * : The # of datagrams successfully received.
  * @return: -1: Error (s.a. `recvmsg(2)') */
-__NAMESPACE_LOCAL_USING_OR_IMPL(recvmmsg64, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_NONNULL((2)) int __NOTHROW_RPC(__LIBCCALL recvmmsg64)(__fd_t __sockfd, struct mmsghdr *__vmessages, __STDC_UINT_AS_SIZE_T __vlen, __STDC_INT_AS_UINT_T __msg_flags, struct __timespec64 *__tmo) { return __NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(recvmmsg64)(__sockfd, __vmessages, __vlen, __msg_flags, __tmo); })
+__NAMESPACE_LOCAL_USING_OR_IMPL(recvmmsg64, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_NONNULL((2)) int __NOTHROW_RPC(__LIBCCALL recvmmsg64)(__fd_t __sockfd, struct mmsghdr *__vmessages, __STDC_UINT_AS_SIZE_T __vlen, __STDC_INT_AS_UINT_T __msg_flags, struct __timespec64 *__tmo) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(recvmmsg64))(__sockfd, __vmessages, __vlen, __msg_flags, __tmo); })
 #endif /* ... */
 #endif /* __USE_TIME64 */
 #endif /* __USE_GNU */

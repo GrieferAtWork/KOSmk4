@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x250306f7 */
+/* HASH CRC-32:0x10e32fed */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -43,7 +43,7 @@ __LOCAL_LIBC(errx) __ATTR_NORETURN __ATTR_LIBC_PRINTF(2, 3) void
 (__VLIBCCALL __LIBC_LOCAL_NAME(errx))(int __status, char const *__format, ...) __THROWS(...) {
 	__builtin_va_list __args;
 	__builtin_va_start(__args, __format);
-	__NAMESPACE_LOCAL_SYM __localdep_verrx(__status, __format, __args);
+	(__NAMESPACE_LOCAL_SYM __localdep_verrx)(__status, __format, __args);
 }
 __NAMESPACE_LOCAL_END
 #ifndef __local___localdep_errx_defined

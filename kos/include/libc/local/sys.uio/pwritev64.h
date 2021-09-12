@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x10f5e215 */
+/* HASH CRC-32:0xc51e2d3e */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -32,7 +32,7 @@ __CREDIRECT(__ATTR_NONNULL((2)),__SSIZE_TYPE__,__NOTHROW_RPC,__localdep_pwritev3
 #endif /* !__local___localdep_pwritev32_defined */
 __LOCAL_LIBC(pwritev64) __ATTR_NONNULL((2)) __SSIZE_TYPE__
 __NOTHROW_RPC(__LIBCCALL __LIBC_LOCAL_NAME(pwritev64))(__fd_t __fd, struct iovec const *__iov, __STDC_INT_AS_SIZE_T __count, __off64_t __offset) {
-	return __NAMESPACE_LOCAL_SYM __localdep_pwritev32(__fd, __iov, __count, (__off32_t)__offset);
+	return (__NAMESPACE_LOCAL_SYM __localdep_pwritev32)(__fd, __iov, __count, (__off32_t)__offset);
 }
 __NAMESPACE_LOCAL_END
 #ifndef __local___localdep_pwritev64_defined

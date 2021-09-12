@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x337c1ea8 */
+/* HASH CRC-32:0xb4734f67 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -73,7 +73,7 @@ __NOTHROW_NCX(__LIBDCALL __LIBC_LOCAL_NAME(format_c16aprintf_pack))(struct forma
 	__CHAR16_TYPE__ *__result;
 	if (__self->ap_avail != 0) {
 		__CHAR16_TYPE__ *__newbuf;
-		__newbuf = (__CHAR16_TYPE__ *)__NAMESPACE_LOCAL_SYM __localdep_realloc(__self->ap_base,
+		__newbuf = (__CHAR16_TYPE__ *)(__NAMESPACE_LOCAL_SYM __localdep_realloc)(__self->ap_base,
 		                         (__self->ap_used + 1) * sizeof(__CHAR16_TYPE__));
 		if __likely(__newbuf)
 			__self->ap_base = __newbuf;
@@ -82,7 +82,7 @@ __NOTHROW_NCX(__LIBDCALL __LIBC_LOCAL_NAME(format_c16aprintf_pack))(struct forma
 			/* Special case: Nothing was printed. */
 			__hybrid_assert(!__self->ap_base);
 
-			__self->ap_base = (__CHAR16_TYPE__ *)__NAMESPACE_LOCAL_SYM __localdep_malloc(1 * sizeof(__CHAR16_TYPE__));
+			__self->ap_base = (__CHAR16_TYPE__ *)(__NAMESPACE_LOCAL_SYM __localdep_malloc)(1 * sizeof(__CHAR16_TYPE__));
 
 
 

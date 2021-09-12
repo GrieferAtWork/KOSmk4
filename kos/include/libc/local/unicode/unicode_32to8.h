@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xfda42e1f */
+/* HASH CRC-32:0xe54ff547 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -36,7 +36,7 @@ __NAMESPACE_LOCAL_BEGIN
 __LOCAL_LIBC(unicode_32to8) __ATTR_RETNONNULL __ATTR_NONNULL((1, 2)) char *
 __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(unicode_32to8))(char *__restrict __utf8_dst, __CHAR32_TYPE__ const *__restrict __utf32_text, __SIZE_TYPE__ __utf32_characters) {
 	while (__utf32_characters--)
-		__utf8_dst = __NAMESPACE_LOCAL_SYM __localdep_unicode_writeutf8(__utf8_dst, *__utf32_text++);
+		__utf8_dst = (__NAMESPACE_LOCAL_SYM __localdep_unicode_writeutf8)(__utf8_dst, *__utf32_text++);
 	return __utf8_dst;
 }
 __NAMESPACE_LOCAL_END

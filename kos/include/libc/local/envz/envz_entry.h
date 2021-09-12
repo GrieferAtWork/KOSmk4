@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xe668f47 */
+/* HASH CRC-32:0xbb9bf3b7 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -62,12 +62,12 @@ __LOCAL_LIBC(envz_entry) __ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((3)) char *
 __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(envz_entry))(char const *__restrict __envz, __SIZE_TYPE__ __envz_len, char const *__restrict __name) {
 	__SIZE_TYPE__ __namelen;
 	char *__envz_end = (char *)(__envz + __envz_len);
-	__namelen = __NAMESPACE_LOCAL_SYM __localdep_stroff(__name, '=');
+	__namelen = (__NAMESPACE_LOCAL_SYM __localdep_stroff)(__name, '=');
 	while (__envz < __envz_end) {
-		if (__NAMESPACE_LOCAL_SYM __localdep_memcmp(__envz, __name, __namelen) == 0 &&
+		if ((__NAMESPACE_LOCAL_SYM __localdep_memcmp)(__envz, __name, __namelen) == 0 &&
 		    (__envz[__namelen] == '\0' || __envz[__namelen] == '='))
 			return (char *)__envz; /* Found it! */
-		__envz = __NAMESPACE_LOCAL_SYM __localdep_strend(__envz) + 1;
+		__envz = (__NAMESPACE_LOCAL_SYM __localdep_strend)(__envz) + 1;
 	}
 	return __NULLPTR;
 }

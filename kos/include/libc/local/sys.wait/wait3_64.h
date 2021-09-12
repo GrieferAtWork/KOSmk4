@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x8e7239a3 */
+/* HASH CRC-32:0xb5f91c6f */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -38,7 +38,7 @@ __LOCAL_LIBC(wait3_64) __pid_t
 __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(wait3_64))(__WAIT_STATUS __stat_loc, __STDC_INT_AS_UINT_T __options, struct __rusage64 *__usage) {
 	__pid_t __result;
 	struct __rusage32 __ru32;
-	__result = __NAMESPACE_LOCAL_SYM __localdep_wait3_32(__stat_loc, __options, __usage ? &__ru32 : __NULLPTR);
+	__result = (__NAMESPACE_LOCAL_SYM __localdep_wait3_32)(__stat_loc, __options, __usage ? &__ru32 : __NULLPTR);
 	if (__result >= 0 && __usage)
 		rusage32_to_rusage64(&__ru32, __usage);
 	return __result;

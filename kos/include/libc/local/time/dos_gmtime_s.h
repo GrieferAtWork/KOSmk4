@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x4a2d24de */
+/* HASH CRC-32:0x8117268d */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -46,7 +46,7 @@ __LOCAL_LIBC(dos_gmtime_s) __ATTR_NONNULL((1, 2)) __errno_t
 __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(dos_gmtime_s))(struct __NAMESPACE_STD_SYM tm *__restrict __tp, __TM_TYPE(time) const *__restrict __timer) {
 
 	__time64_t __tm64 = *__timer;
-	return __NAMESPACE_LOCAL_SYM __localdep_dos_gmtime64_s(__tp, &__tm64);
+	return (__NAMESPACE_LOCAL_SYM __localdep_dos_gmtime64_s)(__tp, &__tm64);
 
 
 

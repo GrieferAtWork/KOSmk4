@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x37515c16 */
+/* HASH CRC-32:0x2e628ac6 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -40,7 +40,7 @@ __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(sigstack))(struct sigstack *__ss, str
 		__ass.ss_sp   = __ss->ss_sp;
 		__ass.ss_size = (__SIZE_TYPE__)-1;
 	}
-	__result = __NAMESPACE_LOCAL_SYM __localdep_sigaltstack(__ss ? &__ass : __NULLPTR,
+	__result = (__NAMESPACE_LOCAL_SYM __localdep_sigaltstack)(__ss ? &__ass : __NULLPTR,
 	                     __oss ? &__aoss : __NULLPTR);
 	if (__likely(!__result) && __oss) {
 		__oss->ss_onstack = !!(__aoss.ss_flags & __SS_ONSTACK);

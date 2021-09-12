@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x5591d143 */
+/* HASH CRC-32:0x1576ac5d */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -52,9 +52,9 @@ __NAMESPACE_LOCAL_BEGIN
 __LOCAL_LIBC(glob) __ATTR_NONNULL((1, 4)) int
 __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(glob))(char const *__restrict __pattern, __STDC_INT_AS_UINT_T __flags, __glob_errfunc_t __errfunc, struct __glob_struct *__restrict __pglob) {
 #ifdef __CRT_HAVE_glob
-	return __NAMESPACE_LOCAL_SYM __localdep_glob32(__pattern, __flags, __errfunc, __pglob);
+	return (__NAMESPACE_LOCAL_SYM __localdep_glob32)(__pattern, __flags, __errfunc, __pglob);
 #else /* __CRT_HAVE_glob */
-	return __NAMESPACE_LOCAL_SYM __localdep_glob64(__pattern, __flags, __errfunc, (struct __glob64_struct *)__pglob);
+	return (__NAMESPACE_LOCAL_SYM __localdep_glob64)(__pattern, __flags, __errfunc, (struct __glob64_struct *)__pglob);
 
 
 

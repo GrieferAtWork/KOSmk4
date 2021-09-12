@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x8cdfd570 */
+/* HASH CRC-32:0x193ac6ab */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -158,18 +158,18 @@ __LOCAL_LIBC(ftello64) __ATTR_WUNUSED __ATTR_NONNULL((1)) __off64_t
 (__LIBCCALL __LIBC_LOCAL_NAME(ftello64))(__FILE *__restrict __stream) __THROWS(...) {
 #if (defined(__CRT_HAVE_fgetpos) && __SIZEOF_OFF64_T__ == __SIZEOF_OFF32_T__) || (defined(__CRT_HAVE__IO_fgetpos) && __SIZEOF_OFF64_T__ == __SIZEOF_OFF32_T__) || defined(__CRT_HAVE_fgetpos64) || defined(__CRT_HAVE__IO_fgetpos64) || (defined(__CRT_HAVE_fgetpos_unlocked) && __SIZEOF_OFF64_T__ == __SIZEOF_OFF32_T__) || defined(__CRT_HAVE_fgetpos64_unlocked)
 	__pos64_t __pos;
-	if (__NAMESPACE_LOCAL_SYM __localdep_crt_fgetpos64(__stream, &__pos))
+	if ((__NAMESPACE_LOCAL_SYM __localdep_crt_fgetpos64)(__stream, &__pos))
 		return -1;
 	return (__off64_t)__pos;
 #elif defined(__CRT_HAVE_fgetpos) || defined(__CRT_HAVE__IO_fgetpos) || defined(__CRT_HAVE_fgetpos_unlocked)
 	__pos32_t __pos;
-	if (__NAMESPACE_LOCAL_SYM __localdep_crt_fgetpos(__stream, &__pos))
+	if ((__NAMESPACE_LOCAL_SYM __localdep_crt_fgetpos)(__stream, &__pos))
 		return -1;
 	return (__off64_t)(__off32_t)__pos;
 #elif (defined(__CRT_HAVE_ftell) && __SIZEOF_OFF32_T__ == __SIZEOF_LONG__) || (defined(__CRT_HAVE__IO_ftell) && __SIZEOF_OFF32_T__ == __SIZEOF_LONG__) || defined(__CRT_HAVE_ftello) || (defined(__CRT_HAVE_ftello64) && __SIZEOF_OFF32_T__ == __SIZEOF_OFF64_T__) || (defined(__CRT_HAVE_ftell64) && __SIZEOF_OFF32_T__ == __SIZEOF_OFF64_T__) || (defined(__CRT_HAVE__ftelli64) && __SIZEOF_OFF32_T__ == __SIZEOF_OFF64_T__) || (defined(__CRT_HAVE_ftell_unlocked) && __SIZEOF_OFF32_T__ == __SIZEOF_LONG__) || (defined(__CRT_HAVE__ftell_nolock) && __SIZEOF_OFF32_T__ == __SIZEOF_LONG__) || defined(__CRT_HAVE_ftello_unlocked) || (defined(__CRT_HAVE_ftello64_unlocked) && __SIZEOF_OFF32_T__ == __SIZEOF_OFF64_T__) || (defined(__CRT_HAVE_ftell64_unlocked) && __SIZEOF_OFF32_T__ == __SIZEOF_OFF64_T__) || (defined(__CRT_HAVE__ftelli64_nolock) && __SIZEOF_OFF32_T__ == __SIZEOF_OFF64_T__)
-	return (__off64_t)__NAMESPACE_LOCAL_SYM __localdep_crt_ftello(__stream);
+	return (__off64_t)(__NAMESPACE_LOCAL_SYM __localdep_crt_ftello)(__stream);
 #else /* ... */
-	return (__off64_t)__NAMESPACE_LOCAL_SYM __localdep_crt_ftell(__stream);
+	return (__off64_t)(__NAMESPACE_LOCAL_SYM __localdep_crt_ftell)(__stream);
 #endif /* !... */
 }
 __NAMESPACE_LOCAL_END

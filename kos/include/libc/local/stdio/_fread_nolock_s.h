@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x204754ff */
+/* HASH CRC-32:0x1aff1760 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -58,7 +58,7 @@ __NAMESPACE_LOCAL_BEGIN
 __LOCAL_LIBC(_fread_nolock_s) __ATTR_WUNUSED __ATTR_NONNULL((1, 5)) __SIZE_TYPE__
 (__LIBCCALL __LIBC_LOCAL_NAME(_fread_nolock_s))(void *__restrict __buf, __SIZE_TYPE__ __bufsize, __SIZE_TYPE__ __elemsize, __SIZE_TYPE__ __elemcount, __FILE *__restrict __stream) __THROWS(...) {
 	__bufsize = __elemsize ? __bufsize / __elemsize : 0;
-	return __NAMESPACE_LOCAL_SYM __localdep_fread_unlocked(__buf, __elemsize,
+	return (__NAMESPACE_LOCAL_SYM __localdep_fread_unlocked)(__buf, __elemsize,
 	                      __bufsize < __elemcount
 	                      ? __bufsize
 	                      : __elemcount,

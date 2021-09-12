@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xb9b4ba90 */
+/* HASH CRC-32:0xbb223a1d */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -92,14 +92,14 @@ __LOCAL_LIBC(_aligned_recalloc) __ATTR_WUNUSED __ATTR_ALLOC_ALIGN(4) __ATTR_ALLO
 __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(_aligned_recalloc))(void *__aligned_mallptr, __SIZE_TYPE__ __count, __SIZE_TYPE__ __num_bytes, __SIZE_TYPE__ __min_alignment) {
 	void *__result;
 	__num_bytes *= __count;
-	__result = __NAMESPACE_LOCAL_SYM __localdep__aligned_malloc(__num_bytes, __min_alignment);
+	__result = (__NAMESPACE_LOCAL_SYM __localdep__aligned_malloc)(__num_bytes, __min_alignment);
 	if (__result) {
-		__SIZE_TYPE__ __temp = __NAMESPACE_LOCAL_SYM __localdep__aligned_msize(__aligned_mallptr, __min_alignment, 0);
+		__SIZE_TYPE__ __temp = (__NAMESPACE_LOCAL_SYM __localdep__aligned_msize)(__aligned_mallptr, __min_alignment, 0);
 		if (__temp > __num_bytes)
 			__temp = __num_bytes;
-		__NAMESPACE_LOCAL_SYM __localdep_memcpy(__result, __aligned_mallptr, __temp);
-		__NAMESPACE_LOCAL_SYM __localdep_memset((__BYTE_TYPE__ *)__result + __temp, 0, __num_bytes - __temp);
-		__NAMESPACE_LOCAL_SYM __localdep__aligned_free(__aligned_mallptr);
+		(__NAMESPACE_LOCAL_SYM __localdep_memcpy)(__result, __aligned_mallptr, __temp);
+		(__NAMESPACE_LOCAL_SYM __localdep_memset)((__BYTE_TYPE__ *)__result + __temp, 0, __num_bytes - __temp);
+		(__NAMESPACE_LOCAL_SYM __localdep__aligned_free)(__aligned_mallptr);
 	}
 	return __result;
 }

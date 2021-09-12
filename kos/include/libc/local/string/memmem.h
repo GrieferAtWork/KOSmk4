@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xcde67a83 */
+/* HASH CRC-32:0xce86049b */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -64,8 +64,8 @@ __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(memmem))(void const *__haystack, __SI
 #endif /* !__USE_MEMMEM_EMPTY_NEEDLE_NULL || __BUILDING_LIBC */
 	__haystacklen -= (__needlelen - 1);
 	__marker       = *(__BYTE_TYPE__ *)__needle;
-	while ((__candidate = (__BYTE_TYPE__ *)__NAMESPACE_LOCAL_SYM __localdep_memchr(__haystack, __marker, __haystacklen)) != __NULLPTR) {
-		if (__NAMESPACE_LOCAL_SYM __localdep_memcmp(__candidate, __needle, __needlelen) == 0)
+	while ((__candidate = (__BYTE_TYPE__ *)(__NAMESPACE_LOCAL_SYM __localdep_memchr)(__haystack, __marker, __haystacklen)) != __NULLPTR) {
+		if ((__NAMESPACE_LOCAL_SYM __localdep_memcmp)(__candidate, __needle, __needlelen) == 0)
 			return (void *)__candidate;
 		++__candidate;
 		__haystacklen = ((__BYTE_TYPE__ *)__haystack + __haystacklen) - __candidate;

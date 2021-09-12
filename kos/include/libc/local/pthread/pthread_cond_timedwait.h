@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xd868987b */
+/* HASH CRC-32:0x96877992 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -52,14 +52,14 @@ __NOTHROW_RPC(__LIBCCALL __LIBC_LOCAL_NAME(pthread_cond_timedwait))(__pthread_co
 	struct __timespec32 __abstime32;
 	__abstime32.tv_sec  = (__time32_t)__abstime->tv_sec;
 	__abstime32.tv_nsec = __abstime->tv_nsec;
-	__result = __NAMESPACE_LOCAL_SYM __localdep_pthread_cond_timedwait32(__cond, __mutex, &__abstime32);
+	__result = (__NAMESPACE_LOCAL_SYM __localdep_pthread_cond_timedwait32)(__cond, __mutex, &__abstime32);
 	return __result;
 #else /* __CRT_HAVE_pthread_cond_timedwait */
 	__errno_t __result;
 	struct __timespec64 __abstime64;
 	__abstime64.tv_sec  = (__time64_t)__abstime->tv_sec;
 	__abstime64.tv_nsec = __abstime->tv_nsec;
-	__result = __NAMESPACE_LOCAL_SYM __localdep_pthread_cond_timedwait64(__cond, __mutex, &__abstime64);
+	__result = (__NAMESPACE_LOCAL_SYM __localdep_pthread_cond_timedwait64)(__cond, __mutex, &__abstime64);
 	return __result;
 #endif /* !__CRT_HAVE_pthread_cond_timedwait */
 }

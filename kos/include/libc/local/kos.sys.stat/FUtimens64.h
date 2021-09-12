@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xb4fb845 */
+/* HASH CRC-32:0x7f82d87e */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -32,13 +32,13 @@ __LOCAL_LIBC(FUtimens64) void
 (__LIBCCALL __LIBC_LOCAL_NAME(FUtimens64))(__fd_t __fd, struct __timespec64 const __times[2 /*or:3*/]) __THROWS(...) {
 	struct __timespec32 __tms[2];
 	if (!__times) {
-		__NAMESPACE_LOCAL_SYM __localdep_FUtimens32(__fd, __NULLPTR);
+		(__NAMESPACE_LOCAL_SYM __localdep_FUtimens32)(__fd, __NULLPTR);
 	} else {
 		__tms[0].tv_sec  = (__time32_t)__times[0].tv_sec;
 		__tms[0].tv_nsec = __times[0].tv_nsec;
 		__tms[1].tv_sec  = (__time32_t)__times[1].tv_sec;
 		__tms[1].tv_nsec = __times[1].tv_nsec;
-		__NAMESPACE_LOCAL_SYM __localdep_FUtimens32(__fd, __tms);
+		(__NAMESPACE_LOCAL_SYM __localdep_FUtimens32)(__fd, __tms);
 	}
 }
 __NAMESPACE_LOCAL_END

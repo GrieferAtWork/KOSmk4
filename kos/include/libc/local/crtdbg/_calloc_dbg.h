@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x91d27753 */
+/* HASH CRC-32:0x1769ca56 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -44,7 +44,7 @@ __NOTHROW_NCX(__LIBDCALL __LIBC_LOCAL_NAME(_calloc_dbg))(__SIZE_TYPE__ __count, 
 	(void)__block_type;
 	(void)__filename;
 	(void)__line;
-	return __NAMESPACE_LOCAL_SYM __localdep_calloc(__count, __num_bytes);
+	return (__NAMESPACE_LOCAL_SYM __localdep_calloc)(__count, __num_bytes);
 }
 __NAMESPACE_LOCAL_END
 #ifndef __local___localdep__calloc_dbg_defined

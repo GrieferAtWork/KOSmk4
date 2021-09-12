@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xb9e83e58 */
+/* HASH CRC-32:0xa15dbfc5 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -37,7 +37,7 @@ __NAMESPACE_LOCAL_END
 __NAMESPACE_LOCAL_BEGIN
 __LOCAL_LIBC(towctrans) __ATTR_CONST __ATTR_WUNUSED __WINT_TYPE__
 __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(towctrans))(__WINT_TYPE__ __wc, __wctrans_t __desc) {
-	struct __unitraits const *__traits = __NAMESPACE_LOCAL_SYM __localdep___unicode_descriptor(__wc);
+	struct __unitraits const *__traits = (__NAMESPACE_LOCAL_SYM __localdep___unicode_descriptor)(__wc);
 	return __wc + *((__INT32_TYPE__ const *)__traits + (__UINTPTR_TYPE__)__desc);
 }
 __NAMESPACE_LOCAL_END

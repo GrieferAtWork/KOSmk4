@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xdc5081cc */
+/* HASH CRC-32:0xc2d21d85 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -48,7 +48,7 @@ __NAMESPACE_LOCAL_BEGIN
 #endif /* !__local___localdep__ultoa_s_defined */
 __LOCAL_LIBC(ultoa) __ATTR_NONNULL((2)) char *
 __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(ultoa))(unsigned long __val, char *__buf, int __radix) {
-	__NAMESPACE_LOCAL_SYM __localdep__ultoa_s(__val, __buf, (__SIZE_TYPE__)-1, __radix);
+	(__NAMESPACE_LOCAL_SYM __localdep__ultoa_s)(__val, __buf, (__SIZE_TYPE__)-1, __radix);
 	return __buf;
 }
 __NAMESPACE_LOCAL_END

@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xad5c4bdb */
+/* HASH CRC-32:0xfb4d22c4 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -47,9 +47,9 @@ __NAMESPACE_LOCAL_BEGIN
 __LOCAL_LIBC(LSeek) __FS_TYPE(pos)
 (__LIBCCALL __LIBC_LOCAL_NAME(LSeek))(__fd_t __fd, __FS_TYPE(off) __offset, int __whence) __THROWS(...) {
 #ifdef __CRT_HAVE_LSeek
-	return __NAMESPACE_LOCAL_SYM __localdep_LSeek32(__fd, (__off32_t)__offset, __whence);
+	return (__NAMESPACE_LOCAL_SYM __localdep_LSeek32)(__fd, (__off32_t)__offset, __whence);
 #else /* __CRT_HAVE_LSeek */
-	return __NAMESPACE_LOCAL_SYM __localdep_LSeek64(__fd, (__off64_t)__offset, __whence);
+	return (__NAMESPACE_LOCAL_SYM __localdep_LSeek64)(__fd, (__off64_t)__offset, __whence);
 #endif /* !__CRT_HAVE_LSeek */
 }
 __NAMESPACE_LOCAL_END

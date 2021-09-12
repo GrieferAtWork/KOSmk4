@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xc5a41558 */
+/* HASH CRC-32:0xd6ed5a2b */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -38,7 +38,7 @@ __NAMESPACE_LOCAL_BEGIN
 #endif /* !__local___localdep__makepath_s_defined */
 __LOCAL_LIBC(_makepath) __ATTR_NONNULL((1)) void
 __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(_makepath))(char *__restrict __buf, char const *__drive, char const *__dir, char const *__file, char const *__ext) {
-	__NAMESPACE_LOCAL_SYM __localdep__makepath_s(__buf, (__SIZE_TYPE__)-1, __drive, __dir, __file, __ext);
+	(__NAMESPACE_LOCAL_SYM __localdep__makepath_s)(__buf, (__SIZE_TYPE__)-1, __drive, __dir, __file, __ext);
 }
 __NAMESPACE_LOCAL_END
 #ifndef __local___localdep__makepath_defined

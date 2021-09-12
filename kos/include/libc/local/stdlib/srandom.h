@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x2d3606d */
+/* HASH CRC-32:0x6c1d9737 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -42,7 +42,7 @@ __NAMESPACE_LOCAL_BEGIN
 #endif /* !__local___localdep_srand_defined */
 __LOCAL_LIBC(srandom) void
 __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(srandom))(unsigned int __seed) {
-	__NAMESPACE_LOCAL_SYM __localdep_srand((long)__seed);
+	(__NAMESPACE_LOCAL_SYM __localdep_srand)((long)__seed);
 }
 __NAMESPACE_LOCAL_END
 #ifndef __local___localdep_srandom_defined

@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xe3d3e620 */
+/* HASH CRC-32:0x729fa811 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -124,7 +124,7 @@ __CDECLARE_OPT(,uintptr_t,__NOTHROW_NCX,_beginthreadex,(void *__sec, __UINT32_TY
 __CDECLARE_VOID(,__NOTHROW_NCX,_endthread,(void),())
 #elif defined(__CRT_HAVE__endthreadex)
 #include <libc/local/process/_endthread.h>
-__NAMESPACE_LOCAL_USING_OR_IMPL(_endthread, __FORCELOCAL __ATTR_ARTIFICIAL void __NOTHROW_NCX(__LIBCCALL _endthread)(void) { __NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(_endthread)(); })
+__NAMESPACE_LOCAL_USING_OR_IMPL(_endthread, __FORCELOCAL __ATTR_ARTIFICIAL void __NOTHROW_NCX(__LIBCCALL _endthread)(void) { (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(_endthread))(); })
 #endif /* ... */
 __CDECLARE_VOID_OPT(,__NOTHROW_NCX,_endthreadex,(__UINT32_TYPE__ __exitcode),(__exitcode))
 
@@ -162,7 +162,7 @@ __CREDIRECT_VOID_GCCNCX(__ATTR_NORETURN,__THROWING,abort,(void),_ZSt9terminatev,
 __CREDIRECT_VOID_GCCNCX(__ATTR_NORETURN,__THROWING,abort,(void),?terminate@@YAXXZ,())
 #elif defined(__CRT_HAVE__Exit) || defined(__CRT_HAVE__exit) || defined(__CRT_HAVE_quick_exit) || defined(__CRT_HAVE_exit)
 #include <libc/local/stdlib/abort.h>
-__NAMESPACE_LOCAL_USING_OR_IMPL(abort, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_NORETURN void (__LIBCCALL abort)(void) __THROWS(...) { __NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(abort)(); })
+__NAMESPACE_LOCAL_USING_OR_IMPL(abort, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_NORETURN void (__LIBCCALL abort)(void) __THROWS(...) { (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(abort))(); })
 #else /* ... */
 #undef __abort_defined
 #endif /* !... */
@@ -191,7 +191,7 @@ __CDECLARE_VOID_OPT(,__THROWING,_cexit,(void),())
 __CDECLARE_VOID(,__THROWING,_c_exit,(void),())
 #else /* __CRT_HAVE__c_exit */
 #include <libc/local/process/_c_exit.h>
-__NAMESPACE_LOCAL_USING_OR_IMPL(_c_exit, __FORCELOCAL __ATTR_ARTIFICIAL void (__LIBCCALL _c_exit)(void) __THROWS(...) { __NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(_c_exit)(); })
+__NAMESPACE_LOCAL_USING_OR_IMPL(_c_exit, __FORCELOCAL __ATTR_ARTIFICIAL void (__LIBCCALL _c_exit)(void) __THROWS(...) { (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(_c_exit))(); })
 #endif /* !__CRT_HAVE__c_exit */
 #ifdef __CRT_HAVE_getpid
 /* >> getpid(2)
@@ -231,7 +231,7 @@ __CDECLARE(__ATTR_NONNULL((1, 2)),int,__NOTHROW_NCX,_execv,(char const *__restri
 /* >> execv(3)
  * Replace the calling  process with  the application  image referred  to by  `path' /  `file'
  * and execute it's `main()' method, passing the given `argv', and setting `environ' to `envp' */
-__FORCELOCAL __ATTR_ARTIFICIAL __ATTR_NONNULL((1, 2)) int __NOTHROW_NCX(__LIBCCALL _execv)(char const *__restrict __path, char const *const *___argv) { return __NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(execv)(__path, (__TARGV)___argv); }
+__FORCELOCAL __ATTR_ARTIFICIAL __ATTR_NONNULL((1, 2)) int __NOTHROW_NCX(__LIBCCALL _execv)(char const *__restrict __path, char const *const *___argv) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(execv))(__path, (__TARGV)___argv); }
 #endif /* (__CRT_HAVE_execve || __CRT_HAVE__execve) && __LOCAL_environ */
 #endif /* !... */
 #if __has_builtin(__builtin_execvp) && defined(__LIBC_BIND_CRTBUILTINS) && defined(__CRT_HAVE_execvp)
@@ -257,7 +257,7 @@ __CDECLARE(__ATTR_NONNULL((1, 2)),int,__NOTHROW_NCX,_execvp,(char const *__restr
 /* >> execvp(3)
  * Replace the calling  process with  the application  image referred  to by  `path' /  `file'
  * and execute it's `main()' method, passing the given `argv', and setting `environ' to `envp' */
-__FORCELOCAL __ATTR_ARTIFICIAL __ATTR_NONNULL((1, 2)) int __NOTHROW_NCX(__LIBCCALL _execvp)(char const *__restrict __file, char const *const *___argv) { return __NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(execvp)(__file, (__TARGV)___argv); }
+__FORCELOCAL __ATTR_ARTIFICIAL __ATTR_NONNULL((1, 2)) int __NOTHROW_NCX(__LIBCCALL _execvp)(char const *__restrict __file, char const *const *___argv) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(execvp))(__file, (__TARGV)___argv); }
 #endif /* (__CRT_HAVE_execvpe || __CRT_HAVE__execvpe || ((__CRT_HAVE_execve || __CRT_HAVE__execve) && __hybrid_alloca)) && __LOCAL_environ */
 #endif /* !... */
 #if __has_builtin(__builtin_execve) && defined(__LIBC_BIND_CRTBUILTINS) && defined(__CRT_HAVE_execve)
@@ -294,7 +294,7 @@ __CDECLARE(__ATTR_NONNULL((1, 2, 3)),int,__NOTHROW_NCX,_execvpe,(char const *__r
 /* >> execvpe(3)
  * Replace the  calling process  with the  application  image referred  to by  `file'  and
  * execute it's `main()' method, passing the given `argv', and setting `environ' to `envp' */
-__FORCELOCAL __ATTR_ARTIFICIAL __ATTR_NONNULL((1, 2, 3)) int __NOTHROW_NCX(__LIBCCALL _execvpe)(char const *__restrict __file, char const *const *___argv, char const *const *___envp) { return __NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(execvpe)(__file, (__TARGV)___argv, (__TENVP)___envp); }
+__FORCELOCAL __ATTR_ARTIFICIAL __ATTR_NONNULL((1, 2, 3)) int __NOTHROW_NCX(__LIBCCALL _execvpe)(char const *__restrict __file, char const *const *___argv, char const *const *___envp) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(execvpe))(__file, (__TARGV)___argv, (__TENVP)___envp); }
 #endif /* (__CRT_HAVE_getenv || __LOCAL_environ) && (__CRT_HAVE_execve || __CRT_HAVE__execve) && __hybrid_alloca */
 #endif /* !... */
 #if __has_builtin(__builtin_execl) && defined(__LIBC_BIND_CRTBUILTINS) && defined(__CRT_HAVE_execl) && __has_builtin(__builtin_va_arg_pack)
@@ -319,7 +319,7 @@ __LIBC __ATTR_SENTINEL __ATTR_NONNULL((1)) int __NOTHROW_RPC(__VLIBCCALL _execl)
 /* >> execl(3)
  * Replace the calling process with the application image referred to by `path' / `file'
  * and execute it's  `main()' method,  passing the list  of NULL-terminated  `args'-list */
-#define _execl __NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(execl)
+#define _execl (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(execl))
 #endif /* __CRT_HAVE_execv || __CRT_HAVE__execv || ((__CRT_HAVE_execve || __CRT_HAVE__execve) && __LOCAL_environ) */
 #endif /* !... */
 #if __has_builtin(__builtin_execlp) && defined(__LIBC_BIND_CRTBUILTINS) && defined(__CRT_HAVE_execlp) && __has_builtin(__builtin_va_arg_pack)
@@ -345,7 +345,7 @@ __LIBC __ATTR_SENTINEL __ATTR_NONNULL((1)) int __NOTHROW_RPC(__VLIBCCALL _execlp
 /* >> execlp(3)
  * Replace the calling process with the application image referred to by `path' / `file'
  * and execute it's  `main()' method,  passing the list  of NULL-terminated  `args'-list */
-#define _execlp __NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(execlp)
+#define _execlp (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(execlp))
 #endif /* __CRT_HAVE_execvp || __CRT_HAVE__execvp || ((__CRT_HAVE_execvpe || __CRT_HAVE__execvpe || ((__CRT_HAVE_execve || __CRT_HAVE__execve) && __hybrid_alloca)) && __LOCAL_environ) */
 #endif /* !... */
 #if __has_builtin(__builtin_execle) && defined(__LIBC_BIND_CRTBUILTINS) && defined(__CRT_HAVE_execle) && __has_builtin(__builtin_va_arg_pack)
@@ -372,7 +372,7 @@ __LIBC __ATTR_SENTINEL_O(1) __ATTR_NONNULL((1)) int __NOTHROW_RPC(__VLIBCCALL _e
  * Replace the calling process with the application image referred to by `path' / `file'
  * and  execute it's `main()'  method, passing the  list of NULL-terminated `args'-list,
  * and setting `environ' to a `char **' passed after the NULL sentinel */
-#define _execle __NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(execle)
+#define _execle (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(execle))
 #endif /* ... */
 #ifdef __CRT_HAVE_execlpe
 /* >> execlpe(3)
@@ -395,7 +395,7 @@ __LIBC __ATTR_SENTINEL_O(1) __ATTR_NONNULL((1)) int __NOTHROW_RPC(__VLIBCCALL _e
  * Replace the calling process with the application image referred to by `path' / `file'
  * and  execute it's `main()'  method, passing the  list of NULL-terminated `args'-list,
  * and setting `environ' to a `char **' passed after the NULL sentinel */
-#define _execlpe __NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(execlpe)
+#define _execlpe (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(execlpe))
 #endif /* __CRT_HAVE_execvpe || __CRT_HAVE__execvpe || ((__CRT_HAVE_getenv || __LOCAL_environ) && (__CRT_HAVE_execve || __CRT_HAVE__execve) && __hybrid_alloca) */
 #endif /* !... */
 #ifdef __CRT_HAVE_cwait
@@ -404,7 +404,7 @@ __CREDIRECT(,__pid_t,__NOTHROW_RPC,_cwait,(int *__tstat, __pid_t __pid, __STDC_I
 __CDECLARE(,__pid_t,__NOTHROW_RPC,_cwait,(int *__tstat, __pid_t __pid, __STDC_INT_AS_UINT_T __action),(__tstat,__pid,__action))
 #elif defined(__CRT_HAVE_waitpid) || defined(__CRT_HAVE___waitpid)
 #include <libc/local/process/cwait.h>
-__FORCELOCAL __ATTR_ARTIFICIAL __pid_t __NOTHROW_RPC(__LIBCCALL _cwait)(int *__tstat, __pid_t __pid, __STDC_INT_AS_UINT_T __action) { return __NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(cwait)(__tstat, __pid, __action); }
+__FORCELOCAL __ATTR_ARTIFICIAL __pid_t __NOTHROW_RPC(__LIBCCALL _cwait)(int *__tstat, __pid_t __pid, __STDC_INT_AS_UINT_T __action) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(cwait))(__tstat, __pid, __action); }
 #endif /* ... */
 #ifdef __CRT_HAVE_spawnv
 __CREDIRECT(__ATTR_NONNULL((2, 3)),intptr_t,__NOTHROW_NCX,_spawnv,(__STDC_INT_AS_UINT_T __mode, char const *__restrict __path, char const *const *___argv),spawnv,(__mode,__path,___argv))
@@ -417,7 +417,7 @@ __CDECLARE(__ATTR_NONNULL((2, 3)),intptr_t,__NOTHROW_NCX,_spawnv,(__STDC_INT_AS_
 #include <asm/os/vfork.h>
 #if (defined(__CRT_HAVE_spawnve) || defined(__CRT_HAVE__spawnve) || ((defined(__CRT_HAVE_open64) || defined(__CRT_HAVE___open64) || defined(__CRT_HAVE_open) || defined(__CRT_HAVE__open) || defined(__CRT_HAVE___open) || (defined(__AT_FDCWD) && (defined(__CRT_HAVE_openat64) || defined(__CRT_HAVE_openat)))) && (defined(__CRT_HAVE_fspawnve) || ((defined(__CRT_HAVE__Exit) || defined(__CRT_HAVE__exit) || defined(__CRT_HAVE_quick_exit) || defined(__CRT_HAVE_exit)) && ((defined(__ARCH_HAVE_SHARED_VM_VFORK) && (defined(__CRT_HAVE_vfork) || defined(__CRT_HAVE___vfork))) || ((defined(__CRT_HAVE_fork) || defined(__CRT_HAVE___fork)) && (defined(__CRT_HAVE_pipe2) || defined(__CRT_HAVE_pipe) || defined(__CRT_HAVE___pipe) || defined(__CRT_HAVE__pipe)) && defined(__O_CLOEXEC) && (defined(__CRT_HAVE_read) || defined(__CRT_HAVE__read) || defined(__CRT_HAVE___read)) && (defined(__CRT_HAVE_write) || defined(__CRT_HAVE__write) || defined(__CRT_HAVE___write)) && (defined(__CRT_HAVE_close) || defined(__CRT_HAVE__close) || defined(__CRT_HAVE___close)))) && defined(__CRT_HAVE_fexecve) && (defined(__CRT_HAVE_waitpid) || defined(__CRT_HAVE___waitpid)))))) && defined(__LOCAL_environ)
 #include <libc/local/process/spawnv.h>
-__FORCELOCAL __ATTR_ARTIFICIAL __ATTR_NONNULL((2, 3)) intptr_t __NOTHROW_NCX(__LIBCCALL _spawnv)(__STDC_INT_AS_UINT_T __mode, char const *__restrict __path, char const *const *___argv) { return (__INTPTR_TYPE__)__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(spawnv)(__mode, __path, (__TARGV)___argv); }
+__FORCELOCAL __ATTR_ARTIFICIAL __ATTR_NONNULL((2, 3)) intptr_t __NOTHROW_NCX(__LIBCCALL _spawnv)(__STDC_INT_AS_UINT_T __mode, char const *__restrict __path, char const *const *___argv) { return (__INTPTR_TYPE__)(__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(spawnv))(__mode, __path, (__TARGV)___argv); }
 #endif /* (__CRT_HAVE_spawnve || __CRT_HAVE__spawnve || ((__CRT_HAVE_open64 || __CRT_HAVE___open64 || __CRT_HAVE_open || __CRT_HAVE__open || __CRT_HAVE___open || (__AT_FDCWD && (__CRT_HAVE_openat64 || __CRT_HAVE_openat))) && (__CRT_HAVE_fspawnve || ((__CRT_HAVE__Exit || __CRT_HAVE__exit || __CRT_HAVE_quick_exit || __CRT_HAVE_exit) && ((__ARCH_HAVE_SHARED_VM_VFORK && (__CRT_HAVE_vfork || __CRT_HAVE___vfork)) || ((__CRT_HAVE_fork || __CRT_HAVE___fork) && (__CRT_HAVE_pipe2 || __CRT_HAVE_pipe || __CRT_HAVE___pipe || __CRT_HAVE__pipe) && __O_CLOEXEC && (__CRT_HAVE_read || __CRT_HAVE__read || __CRT_HAVE___read) && (__CRT_HAVE_write || __CRT_HAVE__write || __CRT_HAVE___write) && (__CRT_HAVE_close || __CRT_HAVE__close || __CRT_HAVE___close))) && __CRT_HAVE_fexecve && (__CRT_HAVE_waitpid || __CRT_HAVE___waitpid))))) && __LOCAL_environ */
 #endif /* !... */
 #ifdef __CRT_HAVE_spawnvp
@@ -432,7 +432,7 @@ __CDECLARE(__ATTR_NONNULL((2, 3)),intptr_t,__NOTHROW_NCX,_spawnvp,(__STDC_INT_AS
 #include <asm/os/vfork.h>
 #if (defined(__CRT_HAVE_spawnvpe) || defined(__CRT_HAVE__spawnvpe) || ((defined(__CRT_HAVE_spawnve) || defined(__CRT_HAVE__spawnve) || ((defined(__CRT_HAVE_open64) || defined(__CRT_HAVE___open64) || defined(__CRT_HAVE_open) || defined(__CRT_HAVE__open) || defined(__CRT_HAVE___open) || (defined(__AT_FDCWD) && (defined(__CRT_HAVE_openat64) || defined(__CRT_HAVE_openat)))) && (defined(__CRT_HAVE_fspawnve) || ((defined(__CRT_HAVE__Exit) || defined(__CRT_HAVE__exit) || defined(__CRT_HAVE_quick_exit) || defined(__CRT_HAVE_exit)) && ((defined(__ARCH_HAVE_SHARED_VM_VFORK) && (defined(__CRT_HAVE_vfork) || defined(__CRT_HAVE___vfork))) || ((defined(__CRT_HAVE_fork) || defined(__CRT_HAVE___fork)) && (defined(__CRT_HAVE_pipe2) || defined(__CRT_HAVE_pipe) || defined(__CRT_HAVE___pipe) || defined(__CRT_HAVE__pipe)) && defined(__O_CLOEXEC) && (defined(__CRT_HAVE_read) || defined(__CRT_HAVE__read) || defined(__CRT_HAVE___read)) && (defined(__CRT_HAVE_write) || defined(__CRT_HAVE__write) || defined(__CRT_HAVE___write)) && (defined(__CRT_HAVE_close) || defined(__CRT_HAVE__close) || defined(__CRT_HAVE___close)))) && defined(__CRT_HAVE_fexecve) && (defined(__CRT_HAVE_waitpid) || defined(__CRT_HAVE___waitpid)))))) && defined(__hybrid_alloca))) && defined(__LOCAL_environ)
 #include <libc/local/process/spawnvp.h>
-__FORCELOCAL __ATTR_ARTIFICIAL __ATTR_NONNULL((2, 3)) intptr_t __NOTHROW_NCX(__LIBCCALL _spawnvp)(__STDC_INT_AS_UINT_T __mode, char const *__restrict __file, char const *const *___argv) { return (__INTPTR_TYPE__)__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(spawnvp)(__mode, __file, (__TARGV)___argv); }
+__FORCELOCAL __ATTR_ARTIFICIAL __ATTR_NONNULL((2, 3)) intptr_t __NOTHROW_NCX(__LIBCCALL _spawnvp)(__STDC_INT_AS_UINT_T __mode, char const *__restrict __file, char const *const *___argv) { return (__INTPTR_TYPE__)(__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(spawnvp))(__mode, __file, (__TARGV)___argv); }
 #endif /* (__CRT_HAVE_spawnvpe || __CRT_HAVE__spawnvpe || ((__CRT_HAVE_spawnve || __CRT_HAVE__spawnve || ((__CRT_HAVE_open64 || __CRT_HAVE___open64 || __CRT_HAVE_open || __CRT_HAVE__open || __CRT_HAVE___open || (__AT_FDCWD && (__CRT_HAVE_openat64 || __CRT_HAVE_openat))) && (__CRT_HAVE_fspawnve || ((__CRT_HAVE__Exit || __CRT_HAVE__exit || __CRT_HAVE_quick_exit || __CRT_HAVE_exit) && ((__ARCH_HAVE_SHARED_VM_VFORK && (__CRT_HAVE_vfork || __CRT_HAVE___vfork)) || ((__CRT_HAVE_fork || __CRT_HAVE___fork) && (__CRT_HAVE_pipe2 || __CRT_HAVE_pipe || __CRT_HAVE___pipe || __CRT_HAVE__pipe) && __O_CLOEXEC && (__CRT_HAVE_read || __CRT_HAVE__read || __CRT_HAVE___read) && (__CRT_HAVE_write || __CRT_HAVE__write || __CRT_HAVE___write) && (__CRT_HAVE_close || __CRT_HAVE__close || __CRT_HAVE___close))) && __CRT_HAVE_fexecve && (__CRT_HAVE_waitpid || __CRT_HAVE___waitpid))))) && __hybrid_alloca)) && __LOCAL_environ */
 #endif /* !... */
 #ifdef __CRT_HAVE_spawnve
@@ -445,7 +445,7 @@ __CDECLARE(__ATTR_NONNULL((2, 3, 4)),intptr_t,__NOTHROW_NCX,_spawnve,(__STDC_INT
 #include <asm/os/vfork.h>
 #if (defined(__CRT_HAVE_open64) || defined(__CRT_HAVE___open64) || defined(__CRT_HAVE_open) || defined(__CRT_HAVE__open) || defined(__CRT_HAVE___open) || (defined(__AT_FDCWD) && (defined(__CRT_HAVE_openat64) || defined(__CRT_HAVE_openat)))) && (defined(__CRT_HAVE_fspawnve) || ((defined(__CRT_HAVE__Exit) || defined(__CRT_HAVE__exit) || defined(__CRT_HAVE_quick_exit) || defined(__CRT_HAVE_exit)) && ((defined(__ARCH_HAVE_SHARED_VM_VFORK) && (defined(__CRT_HAVE_vfork) || defined(__CRT_HAVE___vfork))) || ((defined(__CRT_HAVE_fork) || defined(__CRT_HAVE___fork)) && (defined(__CRT_HAVE_pipe2) || defined(__CRT_HAVE_pipe) || defined(__CRT_HAVE___pipe) || defined(__CRT_HAVE__pipe)) && defined(__O_CLOEXEC) && (defined(__CRT_HAVE_read) || defined(__CRT_HAVE__read) || defined(__CRT_HAVE___read)) && (defined(__CRT_HAVE_write) || defined(__CRT_HAVE__write) || defined(__CRT_HAVE___write)) && (defined(__CRT_HAVE_close) || defined(__CRT_HAVE__close) || defined(__CRT_HAVE___close)))) && defined(__CRT_HAVE_fexecve) && (defined(__CRT_HAVE_waitpid) || defined(__CRT_HAVE___waitpid))))
 #include <libc/local/process/spawnve.h>
-__FORCELOCAL __ATTR_ARTIFICIAL __ATTR_NONNULL((2, 3, 4)) intptr_t __NOTHROW_NCX(__LIBCCALL _spawnve)(__STDC_INT_AS_UINT_T __mode, char const *__restrict __path, char const *const *___argv, char const *const *___envp) { return (__INTPTR_TYPE__)__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(spawnve)(__mode, __path, (__TARGV)___argv, (__TENVP)___envp); }
+__FORCELOCAL __ATTR_ARTIFICIAL __ATTR_NONNULL((2, 3, 4)) intptr_t __NOTHROW_NCX(__LIBCCALL _spawnve)(__STDC_INT_AS_UINT_T __mode, char const *__restrict __path, char const *const *___argv, char const *const *___envp) { return (__INTPTR_TYPE__)(__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(spawnve))(__mode, __path, (__TARGV)___argv, (__TENVP)___envp); }
 #endif /* (__CRT_HAVE_open64 || __CRT_HAVE___open64 || __CRT_HAVE_open || __CRT_HAVE__open || __CRT_HAVE___open || (__AT_FDCWD && (__CRT_HAVE_openat64 || __CRT_HAVE_openat))) && (__CRT_HAVE_fspawnve || ((__CRT_HAVE__Exit || __CRT_HAVE__exit || __CRT_HAVE_quick_exit || __CRT_HAVE_exit) && ((__ARCH_HAVE_SHARED_VM_VFORK && (__CRT_HAVE_vfork || __CRT_HAVE___vfork)) || ((__CRT_HAVE_fork || __CRT_HAVE___fork) && (__CRT_HAVE_pipe2 || __CRT_HAVE_pipe || __CRT_HAVE___pipe || __CRT_HAVE__pipe) && __O_CLOEXEC && (__CRT_HAVE_read || __CRT_HAVE__read || __CRT_HAVE___read) && (__CRT_HAVE_write || __CRT_HAVE__write || __CRT_HAVE___write) && (__CRT_HAVE_close || __CRT_HAVE__close || __CRT_HAVE___close))) && __CRT_HAVE_fexecve && (__CRT_HAVE_waitpid || __CRT_HAVE___waitpid))) */
 #endif /* !... */
 #ifdef __CRT_HAVE_spawnvpe
@@ -460,7 +460,7 @@ __CDECLARE(__ATTR_NONNULL((2, 3, 4)),intptr_t,__NOTHROW_NCX,_spawnvpe,(__STDC_IN
 #include <asm/os/vfork.h>
 #if (defined(__CRT_HAVE_getenv) || defined(__LOCAL_environ)) && (defined(__CRT_HAVE_spawnve) || defined(__CRT_HAVE__spawnve) || ((defined(__CRT_HAVE_open64) || defined(__CRT_HAVE___open64) || defined(__CRT_HAVE_open) || defined(__CRT_HAVE__open) || defined(__CRT_HAVE___open) || (defined(__AT_FDCWD) && (defined(__CRT_HAVE_openat64) || defined(__CRT_HAVE_openat)))) && (defined(__CRT_HAVE_fspawnve) || ((defined(__CRT_HAVE__Exit) || defined(__CRT_HAVE__exit) || defined(__CRT_HAVE_quick_exit) || defined(__CRT_HAVE_exit)) && ((defined(__ARCH_HAVE_SHARED_VM_VFORK) && (defined(__CRT_HAVE_vfork) || defined(__CRT_HAVE___vfork))) || ((defined(__CRT_HAVE_fork) || defined(__CRT_HAVE___fork)) && (defined(__CRT_HAVE_pipe2) || defined(__CRT_HAVE_pipe) || defined(__CRT_HAVE___pipe) || defined(__CRT_HAVE__pipe)) && defined(__O_CLOEXEC) && (defined(__CRT_HAVE_read) || defined(__CRT_HAVE__read) || defined(__CRT_HAVE___read)) && (defined(__CRT_HAVE_write) || defined(__CRT_HAVE__write) || defined(__CRT_HAVE___write)) && (defined(__CRT_HAVE_close) || defined(__CRT_HAVE__close) || defined(__CRT_HAVE___close)))) && defined(__CRT_HAVE_fexecve) && (defined(__CRT_HAVE_waitpid) || defined(__CRT_HAVE___waitpid)))))) && defined(__hybrid_alloca)
 #include <libc/local/process/spawnvpe.h>
-__FORCELOCAL __ATTR_ARTIFICIAL __ATTR_NONNULL((2, 3, 4)) intptr_t __NOTHROW_NCX(__LIBCCALL _spawnvpe)(__STDC_INT_AS_UINT_T __mode, char const *__restrict __file, char const *const *___argv, char const *const *___envp) { return (__INTPTR_TYPE__)__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(spawnvpe)(__mode, __file, (__TARGV)___argv, (__TENVP)___envp); }
+__FORCELOCAL __ATTR_ARTIFICIAL __ATTR_NONNULL((2, 3, 4)) intptr_t __NOTHROW_NCX(__LIBCCALL _spawnvpe)(__STDC_INT_AS_UINT_T __mode, char const *__restrict __file, char const *const *___argv, char const *const *___envp) { return (__INTPTR_TYPE__)(__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(spawnvpe))(__mode, __file, (__TARGV)___argv, (__TENVP)___envp); }
 #endif /* (__CRT_HAVE_getenv || __LOCAL_environ) && (__CRT_HAVE_spawnve || __CRT_HAVE__spawnve || ((__CRT_HAVE_open64 || __CRT_HAVE___open64 || __CRT_HAVE_open || __CRT_HAVE__open || __CRT_HAVE___open || (__AT_FDCWD && (__CRT_HAVE_openat64 || __CRT_HAVE_openat))) && (__CRT_HAVE_fspawnve || ((__CRT_HAVE__Exit || __CRT_HAVE__exit || __CRT_HAVE_quick_exit || __CRT_HAVE_exit) && ((__ARCH_HAVE_SHARED_VM_VFORK && (__CRT_HAVE_vfork || __CRT_HAVE___vfork)) || ((__CRT_HAVE_fork || __CRT_HAVE___fork) && (__CRT_HAVE_pipe2 || __CRT_HAVE_pipe || __CRT_HAVE___pipe || __CRT_HAVE__pipe) && __O_CLOEXEC && (__CRT_HAVE_read || __CRT_HAVE__read || __CRT_HAVE___read) && (__CRT_HAVE_write || __CRT_HAVE__write || __CRT_HAVE___write) && (__CRT_HAVE_close || __CRT_HAVE__close || __CRT_HAVE___close))) && __CRT_HAVE_fexecve && (__CRT_HAVE_waitpid || __CRT_HAVE___waitpid))))) && __hybrid_alloca */
 #endif /* !... */
 #ifdef __CRT_HAVE_spawnl
@@ -474,7 +474,7 @@ __LIBC __ATTR_SENTINEL __ATTR_NONNULL((2)) intptr_t __NOTHROW_NCX(__VLIBCCALL _s
 #include <asm/os/vfork.h>
 #if defined(__CRT_HAVE_spawnv) || defined(__CRT_HAVE__spawnv) || ((defined(__CRT_HAVE_spawnve) || defined(__CRT_HAVE__spawnve) || ((defined(__CRT_HAVE_open64) || defined(__CRT_HAVE___open64) || defined(__CRT_HAVE_open) || defined(__CRT_HAVE__open) || defined(__CRT_HAVE___open) || (defined(__AT_FDCWD) && (defined(__CRT_HAVE_openat64) || defined(__CRT_HAVE_openat)))) && (defined(__CRT_HAVE_fspawnve) || ((defined(__CRT_HAVE__Exit) || defined(__CRT_HAVE__exit) || defined(__CRT_HAVE_quick_exit) || defined(__CRT_HAVE_exit)) && ((defined(__ARCH_HAVE_SHARED_VM_VFORK) && (defined(__CRT_HAVE_vfork) || defined(__CRT_HAVE___vfork))) || ((defined(__CRT_HAVE_fork) || defined(__CRT_HAVE___fork)) && (defined(__CRT_HAVE_pipe2) || defined(__CRT_HAVE_pipe) || defined(__CRT_HAVE___pipe) || defined(__CRT_HAVE__pipe)) && defined(__O_CLOEXEC) && (defined(__CRT_HAVE_read) || defined(__CRT_HAVE__read) || defined(__CRT_HAVE___read)) && (defined(__CRT_HAVE_write) || defined(__CRT_HAVE__write) || defined(__CRT_HAVE___write)) && (defined(__CRT_HAVE_close) || defined(__CRT_HAVE__close) || defined(__CRT_HAVE___close)))) && defined(__CRT_HAVE_fexecve) && (defined(__CRT_HAVE_waitpid) || defined(__CRT_HAVE___waitpid)))))) && defined(__LOCAL_environ))
 #include <libc/local/process/spawnl.h>
-#define _spawnl __NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(spawnl)
+#define _spawnl (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(spawnl))
 #endif /* __CRT_HAVE_spawnv || __CRT_HAVE__spawnv || ((__CRT_HAVE_spawnve || __CRT_HAVE__spawnve || ((__CRT_HAVE_open64 || __CRT_HAVE___open64 || __CRT_HAVE_open || __CRT_HAVE__open || __CRT_HAVE___open || (__AT_FDCWD && (__CRT_HAVE_openat64 || __CRT_HAVE_openat))) && (__CRT_HAVE_fspawnve || ((__CRT_HAVE__Exit || __CRT_HAVE__exit || __CRT_HAVE_quick_exit || __CRT_HAVE_exit) && ((__ARCH_HAVE_SHARED_VM_VFORK && (__CRT_HAVE_vfork || __CRT_HAVE___vfork)) || ((__CRT_HAVE_fork || __CRT_HAVE___fork) && (__CRT_HAVE_pipe2 || __CRT_HAVE_pipe || __CRT_HAVE___pipe || __CRT_HAVE__pipe) && __O_CLOEXEC && (__CRT_HAVE_read || __CRT_HAVE__read || __CRT_HAVE___read) && (__CRT_HAVE_write || __CRT_HAVE__write || __CRT_HAVE___write) && (__CRT_HAVE_close || __CRT_HAVE__close || __CRT_HAVE___close))) && __CRT_HAVE_fexecve && (__CRT_HAVE_waitpid || __CRT_HAVE___waitpid))))) && __LOCAL_environ) */
 #endif /* !... */
 #ifdef __CRT_HAVE_spawnlp
@@ -489,7 +489,7 @@ __LIBC __ATTR_SENTINEL __ATTR_NONNULL((2)) intptr_t __NOTHROW_NCX(__VLIBCCALL _s
 #include <asm/os/vfork.h>
 #if defined(__CRT_HAVE_spawnvp) || defined(__CRT_HAVE__spawnvp) || ((defined(__CRT_HAVE_spawnvpe) || defined(__CRT_HAVE__spawnvpe) || ((defined(__CRT_HAVE_spawnve) || defined(__CRT_HAVE__spawnve) || ((defined(__CRT_HAVE_open64) || defined(__CRT_HAVE___open64) || defined(__CRT_HAVE_open) || defined(__CRT_HAVE__open) || defined(__CRT_HAVE___open) || (defined(__AT_FDCWD) && (defined(__CRT_HAVE_openat64) || defined(__CRT_HAVE_openat)))) && (defined(__CRT_HAVE_fspawnve) || ((defined(__CRT_HAVE__Exit) || defined(__CRT_HAVE__exit) || defined(__CRT_HAVE_quick_exit) || defined(__CRT_HAVE_exit)) && ((defined(__ARCH_HAVE_SHARED_VM_VFORK) && (defined(__CRT_HAVE_vfork) || defined(__CRT_HAVE___vfork))) || ((defined(__CRT_HAVE_fork) || defined(__CRT_HAVE___fork)) && (defined(__CRT_HAVE_pipe2) || defined(__CRT_HAVE_pipe) || defined(__CRT_HAVE___pipe) || defined(__CRT_HAVE__pipe)) && defined(__O_CLOEXEC) && (defined(__CRT_HAVE_read) || defined(__CRT_HAVE__read) || defined(__CRT_HAVE___read)) && (defined(__CRT_HAVE_write) || defined(__CRT_HAVE__write) || defined(__CRT_HAVE___write)) && (defined(__CRT_HAVE_close) || defined(__CRT_HAVE__close) || defined(__CRT_HAVE___close)))) && defined(__CRT_HAVE_fexecve) && (defined(__CRT_HAVE_waitpid) || defined(__CRT_HAVE___waitpid)))))) && defined(__hybrid_alloca))) && defined(__LOCAL_environ))
 #include <libc/local/process/spawnlp.h>
-#define _spawnlp __NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(spawnlp)
+#define _spawnlp (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(spawnlp))
 #endif /* __CRT_HAVE_spawnvp || __CRT_HAVE__spawnvp || ((__CRT_HAVE_spawnvpe || __CRT_HAVE__spawnvpe || ((__CRT_HAVE_spawnve || __CRT_HAVE__spawnve || ((__CRT_HAVE_open64 || __CRT_HAVE___open64 || __CRT_HAVE_open || __CRT_HAVE__open || __CRT_HAVE___open || (__AT_FDCWD && (__CRT_HAVE_openat64 || __CRT_HAVE_openat))) && (__CRT_HAVE_fspawnve || ((__CRT_HAVE__Exit || __CRT_HAVE__exit || __CRT_HAVE_quick_exit || __CRT_HAVE_exit) && ((__ARCH_HAVE_SHARED_VM_VFORK && (__CRT_HAVE_vfork || __CRT_HAVE___vfork)) || ((__CRT_HAVE_fork || __CRT_HAVE___fork) && (__CRT_HAVE_pipe2 || __CRT_HAVE_pipe || __CRT_HAVE___pipe || __CRT_HAVE__pipe) && __O_CLOEXEC && (__CRT_HAVE_read || __CRT_HAVE__read || __CRT_HAVE___read) && (__CRT_HAVE_write || __CRT_HAVE__write || __CRT_HAVE___write) && (__CRT_HAVE_close || __CRT_HAVE__close || __CRT_HAVE___close))) && __CRT_HAVE_fexecve && (__CRT_HAVE_waitpid || __CRT_HAVE___waitpid))))) && __hybrid_alloca)) && __LOCAL_environ) */
 #endif /* !... */
 #ifdef __CRT_HAVE_spawnle
@@ -502,7 +502,7 @@ __LIBC __ATTR_SENTINEL_O(1) __ATTR_NONNULL((2)) intptr_t __NOTHROW_NCX(__VLIBCCA
 #include <asm/os/vfork.h>
 #if defined(__CRT_HAVE_spawnve) || defined(__CRT_HAVE__spawnve) || ((defined(__CRT_HAVE_open64) || defined(__CRT_HAVE___open64) || defined(__CRT_HAVE_open) || defined(__CRT_HAVE__open) || defined(__CRT_HAVE___open) || (defined(__AT_FDCWD) && (defined(__CRT_HAVE_openat64) || defined(__CRT_HAVE_openat)))) && (defined(__CRT_HAVE_fspawnve) || ((defined(__CRT_HAVE__Exit) || defined(__CRT_HAVE__exit) || defined(__CRT_HAVE_quick_exit) || defined(__CRT_HAVE_exit)) && ((defined(__ARCH_HAVE_SHARED_VM_VFORK) && (defined(__CRT_HAVE_vfork) || defined(__CRT_HAVE___vfork))) || ((defined(__CRT_HAVE_fork) || defined(__CRT_HAVE___fork)) && (defined(__CRT_HAVE_pipe2) || defined(__CRT_HAVE_pipe) || defined(__CRT_HAVE___pipe) || defined(__CRT_HAVE__pipe)) && defined(__O_CLOEXEC) && (defined(__CRT_HAVE_read) || defined(__CRT_HAVE__read) || defined(__CRT_HAVE___read)) && (defined(__CRT_HAVE_write) || defined(__CRT_HAVE__write) || defined(__CRT_HAVE___write)) && (defined(__CRT_HAVE_close) || defined(__CRT_HAVE__close) || defined(__CRT_HAVE___close)))) && defined(__CRT_HAVE_fexecve) && (defined(__CRT_HAVE_waitpid) || defined(__CRT_HAVE___waitpid)))))
 #include <libc/local/process/spawnle.h>
-#define _spawnle __NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(spawnle)
+#define _spawnle (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(spawnle))
 #endif /* __CRT_HAVE_spawnve || __CRT_HAVE__spawnve || ((__CRT_HAVE_open64 || __CRT_HAVE___open64 || __CRT_HAVE_open || __CRT_HAVE__open || __CRT_HAVE___open || (__AT_FDCWD && (__CRT_HAVE_openat64 || __CRT_HAVE_openat))) && (__CRT_HAVE_fspawnve || ((__CRT_HAVE__Exit || __CRT_HAVE__exit || __CRT_HAVE_quick_exit || __CRT_HAVE_exit) && ((__ARCH_HAVE_SHARED_VM_VFORK && (__CRT_HAVE_vfork || __CRT_HAVE___vfork)) || ((__CRT_HAVE_fork || __CRT_HAVE___fork) && (__CRT_HAVE_pipe2 || __CRT_HAVE_pipe || __CRT_HAVE___pipe || __CRT_HAVE__pipe) && __O_CLOEXEC && (__CRT_HAVE_read || __CRT_HAVE__read || __CRT_HAVE___read) && (__CRT_HAVE_write || __CRT_HAVE__write || __CRT_HAVE___write) && (__CRT_HAVE_close || __CRT_HAVE__close || __CRT_HAVE___close))) && __CRT_HAVE_fexecve && (__CRT_HAVE_waitpid || __CRT_HAVE___waitpid)))) */
 #endif /* !... */
 #ifdef __CRT_HAVE_spawnlpe
@@ -517,7 +517,7 @@ __LIBC __ATTR_SENTINEL_O(1) __ATTR_NONNULL((2)) intptr_t __NOTHROW_NCX(__VLIBCCA
 #include <asm/os/vfork.h>
 #if defined(__CRT_HAVE_spawnvpe) || defined(__CRT_HAVE__spawnvpe) || ((defined(__CRT_HAVE_getenv) || defined(__LOCAL_environ)) && (defined(__CRT_HAVE_spawnve) || defined(__CRT_HAVE__spawnve) || ((defined(__CRT_HAVE_open64) || defined(__CRT_HAVE___open64) || defined(__CRT_HAVE_open) || defined(__CRT_HAVE__open) || defined(__CRT_HAVE___open) || (defined(__AT_FDCWD) && (defined(__CRT_HAVE_openat64) || defined(__CRT_HAVE_openat)))) && (defined(__CRT_HAVE_fspawnve) || ((defined(__CRT_HAVE__Exit) || defined(__CRT_HAVE__exit) || defined(__CRT_HAVE_quick_exit) || defined(__CRT_HAVE_exit)) && ((defined(__ARCH_HAVE_SHARED_VM_VFORK) && (defined(__CRT_HAVE_vfork) || defined(__CRT_HAVE___vfork))) || ((defined(__CRT_HAVE_fork) || defined(__CRT_HAVE___fork)) && (defined(__CRT_HAVE_pipe2) || defined(__CRT_HAVE_pipe) || defined(__CRT_HAVE___pipe) || defined(__CRT_HAVE__pipe)) && defined(__O_CLOEXEC) && (defined(__CRT_HAVE_read) || defined(__CRT_HAVE__read) || defined(__CRT_HAVE___read)) && (defined(__CRT_HAVE_write) || defined(__CRT_HAVE__write) || defined(__CRT_HAVE___write)) && (defined(__CRT_HAVE_close) || defined(__CRT_HAVE__close) || defined(__CRT_HAVE___close)))) && defined(__CRT_HAVE_fexecve) && (defined(__CRT_HAVE_waitpid) || defined(__CRT_HAVE___waitpid)))))) && defined(__hybrid_alloca))
 #include <libc/local/process/spawnlpe.h>
-#define _spawnlpe __NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(spawnlpe)
+#define _spawnlpe (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(spawnlpe))
 #endif /* __CRT_HAVE_spawnvpe || __CRT_HAVE__spawnvpe || ((__CRT_HAVE_getenv || __LOCAL_environ) && (__CRT_HAVE_spawnve || __CRT_HAVE__spawnve || ((__CRT_HAVE_open64 || __CRT_HAVE___open64 || __CRT_HAVE_open || __CRT_HAVE__open || __CRT_HAVE___open || (__AT_FDCWD && (__CRT_HAVE_openat64 || __CRT_HAVE_openat))) && (__CRT_HAVE_fspawnve || ((__CRT_HAVE__Exit || __CRT_HAVE__exit || __CRT_HAVE_quick_exit || __CRT_HAVE_exit) && ((__ARCH_HAVE_SHARED_VM_VFORK && (__CRT_HAVE_vfork || __CRT_HAVE___vfork)) || ((__CRT_HAVE_fork || __CRT_HAVE___fork) && (__CRT_HAVE_pipe2 || __CRT_HAVE_pipe || __CRT_HAVE___pipe || __CRT_HAVE__pipe) && __O_CLOEXEC && (__CRT_HAVE_read || __CRT_HAVE__read || __CRT_HAVE___read) && (__CRT_HAVE_write || __CRT_HAVE__write || __CRT_HAVE___write) && (__CRT_HAVE_close || __CRT_HAVE__close || __CRT_HAVE___close))) && __CRT_HAVE_fexecve && (__CRT_HAVE_waitpid || __CRT_HAVE___waitpid))))) && __hybrid_alloca) */
 #endif /* !... */
 #ifndef __system_defined
@@ -545,7 +545,7 @@ __CDECLARE(,int,__NOTHROW_RPC,system,(char const *__command),(__command))
  * The   return   value   is   the   exit   status   after   running  `command'
  * When `command' is `NULL' only check if a system interpreter is available.
  * When  no   system   interpreter   is  available,   `127'   is   returned. */
-__NAMESPACE_LOCAL_USING_OR_IMPL(system, __FORCELOCAL __ATTR_ARTIFICIAL int __NOTHROW_RPC(__LIBCCALL system)(char const *__command) { return __NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(system)(__command); })
+__NAMESPACE_LOCAL_USING_OR_IMPL(system, __FORCELOCAL __ATTR_ARTIFICIAL int __NOTHROW_RPC(__LIBCCALL system)(char const *__command) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(system))(__command); })
 #else /* (__CRT_HAVE_shexec || __CRT_HAVE_execl || __CRT_HAVE__execl || __CRT_HAVE_execv || __CRT_HAVE__execv || ((__CRT_HAVE_execve || __CRT_HAVE__execve) && __LOCAL_environ)) && (__CRT_HAVE__Exit || __CRT_HAVE__exit || __CRT_HAVE_quick_exit || __CRT_HAVE_exit) && (__CRT_HAVE_waitpid || __CRT_HAVE___waitpid) && (__CRT_HAVE_vfork || __CRT_HAVE___vfork || __CRT_HAVE_fork || __CRT_HAVE___fork) */
 #undef __system_defined
 #endif /* (!__CRT_HAVE_shexec && !__CRT_HAVE_execl && !__CRT_HAVE__execl && !__CRT_HAVE_execv && !__CRT_HAVE__execv && ((!__CRT_HAVE_execve && !__CRT_HAVE__execve) || !__LOCAL_environ)) || (!__CRT_HAVE__Exit && !__CRT_HAVE__exit && !__CRT_HAVE_quick_exit && !__CRT_HAVE_exit) || (!__CRT_HAVE_waitpid && !__CRT_HAVE___waitpid) || (!__CRT_HAVE_vfork && !__CRT_HAVE___vfork && !__CRT_HAVE_fork && !__CRT_HAVE___fork) */
@@ -560,14 +560,14 @@ __CDECLARE(,intptr_t,__THROWING,_loaddll,(char __KOS_FIXED_CONST *__file),(__fil
 #include <libdl/asm/dlfcn.h>
 #ifdef __CRT_HAVE_dlopen
 #include <libc/local/process/_loaddll.h>
-__NAMESPACE_LOCAL_USING_OR_IMPL(_loaddll, __FORCELOCAL __ATTR_ARTIFICIAL intptr_t (__LIBCCALL _loaddll)(char __KOS_FIXED_CONST *__file) __THROWS(...) { return __NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(_loaddll)(__file); })
+__NAMESPACE_LOCAL_USING_OR_IMPL(_loaddll, __FORCELOCAL __ATTR_ARTIFICIAL intptr_t (__LIBCCALL _loaddll)(char __KOS_FIXED_CONST *__file) __THROWS(...) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(_loaddll))(__file); })
 #endif /* __CRT_HAVE_dlopen */
 #endif /* !__CRT_HAVE__loaddll */
 #ifdef __CRT_HAVE__unloaddll
 __CDECLARE(,int,__THROWING,_unloaddll,(intptr_t __hnd),(__hnd))
 #else /* __CRT_HAVE__unloaddll */
 #include <libc/local/process/_unloaddll.h>
-__NAMESPACE_LOCAL_USING_OR_IMPL(_unloaddll, __FORCELOCAL __ATTR_ARTIFICIAL int (__LIBCCALL _unloaddll)(intptr_t __hnd) __THROWS(...) { return __NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(_unloaddll)(__hnd); })
+__NAMESPACE_LOCAL_USING_OR_IMPL(_unloaddll, __FORCELOCAL __ATTR_ARTIFICIAL int (__LIBCCALL _unloaddll)(intptr_t __hnd) __THROWS(...) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(_unloaddll))(__hnd); })
 #endif /* !__CRT_HAVE__unloaddll */
 
 #ifndef ____procfun_defined
@@ -580,7 +580,7 @@ __CDECLARE(,__procfun,__THROWING,_getdllprocaddr,(intptr_t __hnd, char __KOS_FIX
 #include <libdl/asm/dlfcn.h>
 #ifdef __CRT_HAVE_dlsym
 #include <libc/local/process/_getdllprocaddr.h>
-__NAMESPACE_LOCAL_USING_OR_IMPL(_getdllprocaddr, __FORCELOCAL __ATTR_ARTIFICIAL __procfun (__LIBCCALL _getdllprocaddr)(intptr_t __hnd, char __KOS_FIXED_CONST *__symname, intptr_t __ord) __THROWS(...) { return __NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(_getdllprocaddr)(__hnd, __symname, __ord); })
+__NAMESPACE_LOCAL_USING_OR_IMPL(_getdllprocaddr, __FORCELOCAL __ATTR_ARTIFICIAL __procfun (__LIBCCALL _getdllprocaddr)(intptr_t __hnd, char __KOS_FIXED_CONST *__symname, intptr_t __ord) __THROWS(...) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(_getdllprocaddr))(__hnd, __symname, __ord); })
 #endif /* __CRT_HAVE_dlsym */
 #endif /* !__CRT_HAVE__getdllprocaddr */
 
@@ -633,7 +633,7 @@ __LIBC __ATTR_SENTINEL __ATTR_NONNULL((1)) int __NOTHROW_RPC(__VLIBCCALL _wexecl
 __LIBC __ATTR_SENTINEL __ATTR_NONNULL((1)) int __NOTHROW_RPC(__VLIBCCALL _wexecl)(wchar_t const *__restrict __path, wchar_t const *__args, ...) __CASMNAME_SAME("_wexecl");
 #elif defined(__CRT_HAVE_wexecv) || defined(__CRT_HAVE__wexecv)
 #include <libc/local/parts.wchar.process/wexecl.h>
-#define _wexecl __NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(wexecl)
+#define _wexecl (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(wexecl))
 #endif /* ... */
 #ifdef __CRT_HAVE_wexeclp
 __LIBC __ATTR_SENTINEL __ATTR_NONNULL((1)) int __NOTHROW_RPC(__VLIBCCALL _wexeclp)(wchar_t const *__restrict __file, wchar_t const *__args, ...) __CASMNAME("wexeclp");
@@ -641,7 +641,7 @@ __LIBC __ATTR_SENTINEL __ATTR_NONNULL((1)) int __NOTHROW_RPC(__VLIBCCALL _wexecl
 __LIBC __ATTR_SENTINEL __ATTR_NONNULL((1)) int __NOTHROW_RPC(__VLIBCCALL _wexeclp)(wchar_t const *__restrict __file, wchar_t const *__args, ...) __CASMNAME_SAME("_wexeclp");
 #elif defined(__CRT_HAVE_wexecvp) || defined(__CRT_HAVE__wexecvp)
 #include <libc/local/parts.wchar.process/wexeclp.h>
-#define _wexeclp __NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(wexeclp)
+#define _wexeclp (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(wexeclp))
 #endif /* ... */
 #ifdef __CRT_HAVE_wexecle
 __LIBC __ATTR_SENTINEL_O(1) __ATTR_NONNULL((1)) int __NOTHROW_RPC(__VLIBCCALL _wexecle)(wchar_t const *__restrict __path, wchar_t const *__args, ...) __CASMNAME("wexecle");
@@ -649,7 +649,7 @@ __LIBC __ATTR_SENTINEL_O(1) __ATTR_NONNULL((1)) int __NOTHROW_RPC(__VLIBCCALL _w
 __LIBC __ATTR_SENTINEL_O(1) __ATTR_NONNULL((1)) int __NOTHROW_RPC(__VLIBCCALL _wexecle)(wchar_t const *__restrict __path, wchar_t const *__args, ...) __CASMNAME_SAME("_wexecle");
 #elif defined(__CRT_HAVE_wexecve) || defined(__CRT_HAVE__wexecve)
 #include <libc/local/parts.wchar.process/wexecle.h>
-#define _wexecle __NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(wexecle)
+#define _wexecle (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(wexecle))
 #endif /* ... */
 #ifdef __CRT_HAVE_wexeclpe
 __LIBC __ATTR_SENTINEL_O(1) __ATTR_NONNULL((1)) int __NOTHROW_RPC(__VLIBCCALL _wexeclpe)(wchar_t const *__restrict __file, wchar_t const *__args, ...) __CASMNAME("wexeclpe");
@@ -657,7 +657,7 @@ __LIBC __ATTR_SENTINEL_O(1) __ATTR_NONNULL((1)) int __NOTHROW_RPC(__VLIBCCALL _w
 __LIBC __ATTR_SENTINEL_O(1) __ATTR_NONNULL((1)) int __NOTHROW_RPC(__VLIBCCALL _wexeclpe)(wchar_t const *__restrict __file, wchar_t const *__args, ...) __CASMNAME_SAME("_wexeclpe");
 #elif defined(__CRT_HAVE_wexecvpe) || defined(__CRT_HAVE__wexecvpe)
 #include <libc/local/parts.wchar.process/wexeclpe.h>
-#define _wexeclpe __NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(wexeclpe)
+#define _wexeclpe (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(wexeclpe))
 #endif /* ... */
 #ifdef __CRT_HAVE_wspawnv
 __CREDIRECT(__ATTR_NONNULL((2, 3)),intptr_t,__NOTHROW_NCX,_wspawnv,(__STDC_INT_AS_UINT_T __mode, wchar_t const *__restrict __path, wchar_t const *const *__restrict ___argv),wspawnv,(__mode,__path,___argv))
@@ -685,7 +685,7 @@ __LIBC __ATTR_SENTINEL __ATTR_NONNULL((2)) intptr_t __NOTHROW_NCX(__VLIBCCALL _w
 __LIBC __ATTR_SENTINEL __ATTR_NONNULL((2)) intptr_t __NOTHROW_NCX(__VLIBCCALL _wspawnl)(__STDC_INT_AS_UINT_T __mode, wchar_t const *__restrict __path, wchar_t const *__args, ...) __CASMNAME_SAME("_wspawnl");
 #elif defined(__CRT_HAVE_wspawnv) || defined(__CRT_HAVE__wspawnv)
 #include <libc/local/parts.wchar.process/wspawnl.h>
-#define _wspawnl __NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(wspawnl)
+#define _wspawnl (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(wspawnl))
 #endif /* ... */
 #ifdef __CRT_HAVE_wspawnlp
 __LIBC __ATTR_SENTINEL __ATTR_NONNULL((2)) intptr_t __NOTHROW_NCX(__VLIBCCALL _wspawnlp)(__STDC_INT_AS_UINT_T __mode, wchar_t const *__restrict __file, wchar_t const *__args, ...) __CASMNAME("wspawnlp");
@@ -693,7 +693,7 @@ __LIBC __ATTR_SENTINEL __ATTR_NONNULL((2)) intptr_t __NOTHROW_NCX(__VLIBCCALL _w
 __LIBC __ATTR_SENTINEL __ATTR_NONNULL((2)) intptr_t __NOTHROW_NCX(__VLIBCCALL _wspawnlp)(__STDC_INT_AS_UINT_T __mode, wchar_t const *__restrict __file, wchar_t const *__args, ...) __CASMNAME_SAME("_wspawnlp");
 #elif defined(__CRT_HAVE_wspawnvp) || defined(__CRT_HAVE__wspawnvp)
 #include <libc/local/parts.wchar.process/wspawnlp.h>
-#define _wspawnlp __NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(wspawnlp)
+#define _wspawnlp (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(wspawnlp))
 #endif /* ... */
 #ifdef __CRT_HAVE_wspawnle
 __LIBC __ATTR_SENTINEL_O(1) __ATTR_NONNULL((2)) intptr_t __NOTHROW_NCX(__VLIBCCALL _wspawnle)(__STDC_INT_AS_UINT_T __mode, wchar_t const *__restrict __path, wchar_t const *__args, ...) __CASMNAME("wspawnle");
@@ -701,7 +701,7 @@ __LIBC __ATTR_SENTINEL_O(1) __ATTR_NONNULL((2)) intptr_t __NOTHROW_NCX(__VLIBCCA
 __LIBC __ATTR_SENTINEL_O(1) __ATTR_NONNULL((2)) intptr_t __NOTHROW_NCX(__VLIBCCALL _wspawnle)(__STDC_INT_AS_UINT_T __mode, wchar_t const *__restrict __path, wchar_t const *__args, ...) __CASMNAME_SAME("_wspawnle");
 #elif defined(__CRT_HAVE_wspawnve) || defined(__CRT_HAVE__wspawnve)
 #include <libc/local/parts.wchar.process/wspawnle.h>
-#define _wspawnle __NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(wspawnle)
+#define _wspawnle (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(wspawnle))
 #endif /* ... */
 #ifdef __CRT_HAVE_wspawnlpe
 __LIBC __ATTR_SENTINEL_O(1) __ATTR_NONNULL((2)) intptr_t __NOTHROW_NCX(__VLIBCCALL _wspawnlpe)(__STDC_INT_AS_UINT_T __mode, wchar_t const *__restrict __file, wchar_t const *__args, ...) __CASMNAME("wspawnlpe");
@@ -709,7 +709,7 @@ __LIBC __ATTR_SENTINEL_O(1) __ATTR_NONNULL((2)) intptr_t __NOTHROW_NCX(__VLIBCCA
 __LIBC __ATTR_SENTINEL_O(1) __ATTR_NONNULL((2)) intptr_t __NOTHROW_NCX(__VLIBCCALL _wspawnlpe)(__STDC_INT_AS_UINT_T __mode, wchar_t const *__restrict __file, wchar_t const *__args, ...) __CASMNAME_SAME("_wspawnlpe");
 #elif defined(__CRT_HAVE_wspawnvpe) || defined(__CRT_HAVE__wspawnvpe)
 #include <libc/local/parts.wchar.process/wspawnlpe.h>
-#define _wspawnlpe __NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(wspawnlpe)
+#define _wspawnlpe (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(wspawnlpe))
 #endif /* ... */
 #endif /* !_WPROCESS_DEFINED */
 
@@ -774,7 +774,7 @@ __CREDIRECT_GCCNCX(__ATTR_NONNULL((1, 2)),int,__NOTHROW_RPC,execv,(char const *_
 /* >> execv(3)
  * Replace the calling  process with  the application  image referred  to by  `path' /  `file'
  * and execute it's `main()' method, passing the given `argv', and setting `environ' to `envp' */
-__NAMESPACE_LOCAL_USING_OR_IMPL(execv, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_NONNULL((1, 2)) int __NOTHROW_RPC(__LIBCCALL execv)(char const *__restrict __path, __TARGV) { return __NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(execv)(__path, ___argv); })
+__NAMESPACE_LOCAL_USING_OR_IMPL(execv, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_NONNULL((1, 2)) int __NOTHROW_RPC(__LIBCCALL execv)(char const *__restrict __path, __TARGV) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(execv))(__path, ___argv); })
 #else /* (__CRT_HAVE_execve || __CRT_HAVE__execve) && __LOCAL_environ */
 #undef __execv_defined
 #endif /* (!__CRT_HAVE_execve && !__CRT_HAVE__execve) || !__LOCAL_environ */
@@ -805,7 +805,7 @@ __CREDIRECT_GCCNCX(__ATTR_NONNULL((1, 2)),int,__NOTHROW_RPC,execvp,(char const *
 /* >> execvp(3)
  * Replace the calling  process with  the application  image referred  to by  `path' /  `file'
  * and execute it's `main()' method, passing the given `argv', and setting `environ' to `envp' */
-__NAMESPACE_LOCAL_USING_OR_IMPL(execvp, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_NONNULL((1, 2)) int __NOTHROW_RPC(__LIBCCALL execvp)(char const *__restrict __file, __TARGV) { return __NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(execvp)(__file, ___argv); })
+__NAMESPACE_LOCAL_USING_OR_IMPL(execvp, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_NONNULL((1, 2)) int __NOTHROW_RPC(__LIBCCALL execvp)(char const *__restrict __file, __TARGV) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(execvp))(__file, ___argv); })
 #else /* (__CRT_HAVE_execvpe || __CRT_HAVE__execvpe || ((__CRT_HAVE_execve || __CRT_HAVE__execve) && __hybrid_alloca)) && __LOCAL_environ */
 #undef __execvp_defined
 #endif /* (!__CRT_HAVE_execvpe && !__CRT_HAVE__execvpe && ((!__CRT_HAVE_execve && !__CRT_HAVE__execve) || !__hybrid_alloca)) || !__LOCAL_environ */
@@ -852,7 +852,7 @@ __CREDIRECT(__ATTR_NONNULL((1, 2, 3)),int,__NOTHROW_RPC,execvpe,(char const *__r
 /* >> execvpe(3)
  * Replace the  calling process  with the  application  image referred  to by  `file'  and
  * execute it's `main()' method, passing the given `argv', and setting `environ' to `envp' */
-__NAMESPACE_LOCAL_USING_OR_IMPL(execvpe, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_NONNULL((1, 2, 3)) int __NOTHROW_RPC(__LIBCCALL execvpe)(char const *__restrict __file, __TARGV, __TENVP) { return __NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(execvpe)(__file, ___argv, ___envp); })
+__NAMESPACE_LOCAL_USING_OR_IMPL(execvpe, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_NONNULL((1, 2, 3)) int __NOTHROW_RPC(__LIBCCALL execvpe)(char const *__restrict __file, __TARGV, __TENVP) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(execvpe))(__file, ___argv, ___envp); })
 #else /* (__CRT_HAVE_getenv || __LOCAL_environ) && (__CRT_HAVE_execve || __CRT_HAVE__execve) && __hybrid_alloca */
 #undef __execvpe_defined
 #endif /* (!__CRT_HAVE_getenv && !__LOCAL_environ) || (!__CRT_HAVE_execve && !__CRT_HAVE__execve) || !__hybrid_alloca */
@@ -895,9 +895,9 @@ __LIBC __ATTR_SENTINEL __ATTR_NONNULL((1)) int __NOTHROW_RPC(__VLIBCCALL execl)(
  * Replace the calling process with the application image referred to by `path' / `file'
  * and execute it's  `main()' method,  passing the list  of NULL-terminated  `args'-list */
 #ifdef __cplusplus
-__NAMESPACE_LOCAL_USING_OR_IMPL(execl, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_SENTINEL __ATTR_NONNULL((1)) int __NOTHROW_RPC(__VLIBCCALL execl)(char const *__restrict __path, char const *__args, ...) { return __NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(execl)(__path, __args, __builtin_va_arg_pack()); })
+__NAMESPACE_LOCAL_USING_OR_IMPL(execl, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_SENTINEL __ATTR_NONNULL((1)) int __NOTHROW_RPC(__VLIBCCALL execl)(char const *__restrict __path, char const *__args, ...) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(execl))(__path, __args, __builtin_va_arg_pack()); })
 #else /* __cplusplus */
-#define execl __NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(execl)
+#define execl (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(execl))
 #endif /* !__cplusplus */
 #else /* __CRT_HAVE_execv || __CRT_HAVE__execv || ((__CRT_HAVE_execve || __CRT_HAVE__execve) && __LOCAL_environ) */
 #undef __execl_defined
@@ -942,9 +942,9 @@ __LIBC __ATTR_SENTINEL __ATTR_NONNULL((1)) int __NOTHROW_RPC(__VLIBCCALL execlp)
  * Replace the calling process with the application image referred to by `path' / `file'
  * and execute it's  `main()' method,  passing the list  of NULL-terminated  `args'-list */
 #ifdef __cplusplus
-__NAMESPACE_LOCAL_USING_OR_IMPL(execlp, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_SENTINEL __ATTR_NONNULL((1)) int __NOTHROW_RPC(__VLIBCCALL execlp)(char const *__restrict __file, char const *__args, ...) { return __NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(execlp)(__file, __args, __builtin_va_arg_pack()); })
+__NAMESPACE_LOCAL_USING_OR_IMPL(execlp, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_SENTINEL __ATTR_NONNULL((1)) int __NOTHROW_RPC(__VLIBCCALL execlp)(char const *__restrict __file, char const *__args, ...) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(execlp))(__file, __args, __builtin_va_arg_pack()); })
 #else /* __cplusplus */
-#define execlp __NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(execlp)
+#define execlp (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(execlp))
 #endif /* !__cplusplus */
 #else /* __CRT_HAVE_execvp || __CRT_HAVE__execvp || ((__CRT_HAVE_execvpe || __CRT_HAVE__execvpe || ((__CRT_HAVE_execve || __CRT_HAVE__execve) && __hybrid_alloca)) && __LOCAL_environ) */
 #undef __execlp_defined
@@ -990,9 +990,9 @@ __LIBC __ATTR_SENTINEL_O(1) __ATTR_NONNULL((1)) int __NOTHROW_RPC(__VLIBCCALL ex
  * and  execute it's `main()'  method, passing the  list of NULL-terminated `args'-list,
  * and setting `environ' to a `char **' passed after the NULL sentinel */
 #ifdef __cplusplus
-__NAMESPACE_LOCAL_USING_OR_IMPL(execle, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_SENTINEL_O(1) __ATTR_NONNULL((1)) int __NOTHROW_RPC(__VLIBCCALL execle)(char const *__restrict __path, char const *__args, ...) { return __NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(execle)(__path, __args, __builtin_va_arg_pack()); })
+__NAMESPACE_LOCAL_USING_OR_IMPL(execle, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_SENTINEL_O(1) __ATTR_NONNULL((1)) int __NOTHROW_RPC(__VLIBCCALL execle)(char const *__restrict __path, char const *__args, ...) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(execle))(__path, __args, __builtin_va_arg_pack()); })
 #else /* __cplusplus */
-#define execle __NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(execle)
+#define execle (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(execle))
 #endif /* !__cplusplus */
 #else /* ... */
 #undef __execle_defined
@@ -1022,9 +1022,9 @@ __LIBC __ATTR_SENTINEL_O(1) __ATTR_NONNULL((1)) int __NOTHROW_RPC(__VLIBCCALL ex
  * and  execute it's `main()'  method, passing the  list of NULL-terminated `args'-list,
  * and setting `environ' to a `char **' passed after the NULL sentinel */
 #ifdef __cplusplus
-__NAMESPACE_LOCAL_USING_OR_IMPL(execlpe, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_SENTINEL_O(1) __ATTR_NONNULL((1)) int __NOTHROW_RPC(__VLIBCCALL execlpe)(char const *__restrict __file, char const *__args, ...) { return __NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(execlpe)(__file, __args, __builtin_va_arg_pack()); })
+__NAMESPACE_LOCAL_USING_OR_IMPL(execlpe, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_SENTINEL_O(1) __ATTR_NONNULL((1)) int __NOTHROW_RPC(__VLIBCCALL execlpe)(char const *__restrict __file, char const *__args, ...) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(execlpe))(__file, __args, __builtin_va_arg_pack()); })
 #else /* __cplusplus */
-#define execlpe __NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(execlpe)
+#define execlpe (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(execlpe))
 #endif /* !__cplusplus */
 #else /* __CRT_HAVE_execvpe || __CRT_HAVE__execvpe || ((__CRT_HAVE_getenv || __LOCAL_environ) && (__CRT_HAVE_execve || __CRT_HAVE__execve) && __hybrid_alloca) */
 #undef __execlpe_defined
@@ -1037,7 +1037,7 @@ __CDECLARE(,__pid_t,__NOTHROW_RPC,cwait,(int *__tstat, __pid_t __pid, __STDC_INT
 __CREDIRECT(,__pid_t,__NOTHROW_RPC,cwait,(int *__tstat, __pid_t __pid, __STDC_INT_AS_UINT_T __action),_cwait,(__tstat,__pid,__action))
 #elif defined(__CRT_HAVE_waitpid) || defined(__CRT_HAVE___waitpid)
 #include <libc/local/process/cwait.h>
-__NAMESPACE_LOCAL_USING_OR_IMPL(cwait, __FORCELOCAL __ATTR_ARTIFICIAL __pid_t __NOTHROW_RPC(__LIBCCALL cwait)(int *__tstat, __pid_t __pid, __STDC_INT_AS_UINT_T __action) { return __NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(cwait)(__tstat, __pid, __action); })
+__NAMESPACE_LOCAL_USING_OR_IMPL(cwait, __FORCELOCAL __ATTR_ARTIFICIAL __pid_t __NOTHROW_RPC(__LIBCCALL cwait)(int *__tstat, __pid_t __pid, __STDC_INT_AS_UINT_T __action) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(cwait))(__tstat, __pid, __action); })
 #endif /* ... */
 #ifndef __spawnv_defined
 #define __spawnv_defined 1
@@ -1052,7 +1052,7 @@ __CREDIRECT(__ATTR_NONNULL((2, 3)),__pid_t,__NOTHROW_RPC,spawnv,(__STDC_INT_AS_U
 #include <asm/os/vfork.h>
 #if (defined(__CRT_HAVE_spawnve) || defined(__CRT_HAVE__spawnve) || ((defined(__CRT_HAVE_open64) || defined(__CRT_HAVE___open64) || defined(__CRT_HAVE_open) || defined(__CRT_HAVE__open) || defined(__CRT_HAVE___open) || (defined(__AT_FDCWD) && (defined(__CRT_HAVE_openat64) || defined(__CRT_HAVE_openat)))) && (defined(__CRT_HAVE_fspawnve) || ((defined(__CRT_HAVE__Exit) || defined(__CRT_HAVE__exit) || defined(__CRT_HAVE_quick_exit) || defined(__CRT_HAVE_exit)) && ((defined(__ARCH_HAVE_SHARED_VM_VFORK) && (defined(__CRT_HAVE_vfork) || defined(__CRT_HAVE___vfork))) || ((defined(__CRT_HAVE_fork) || defined(__CRT_HAVE___fork)) && (defined(__CRT_HAVE_pipe2) || defined(__CRT_HAVE_pipe) || defined(__CRT_HAVE___pipe) || defined(__CRT_HAVE__pipe)) && defined(__O_CLOEXEC) && (defined(__CRT_HAVE_read) || defined(__CRT_HAVE__read) || defined(__CRT_HAVE___read)) && (defined(__CRT_HAVE_write) || defined(__CRT_HAVE__write) || defined(__CRT_HAVE___write)) && (defined(__CRT_HAVE_close) || defined(__CRT_HAVE__close) || defined(__CRT_HAVE___close)))) && defined(__CRT_HAVE_fexecve) && (defined(__CRT_HAVE_waitpid) || defined(__CRT_HAVE___waitpid)))))) && defined(__LOCAL_environ)
 #include <libc/local/process/spawnv.h>
-__NAMESPACE_LOCAL_USING_OR_IMPL(spawnv, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_NONNULL((2, 3)) __pid_t __NOTHROW_RPC(__LIBCCALL spawnv)(__STDC_INT_AS_UINT_T __mode, char const *__restrict __path, __TARGV) { return __NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(spawnv)(__mode, __path, ___argv); })
+__NAMESPACE_LOCAL_USING_OR_IMPL(spawnv, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_NONNULL((2, 3)) __pid_t __NOTHROW_RPC(__LIBCCALL spawnv)(__STDC_INT_AS_UINT_T __mode, char const *__restrict __path, __TARGV) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(spawnv))(__mode, __path, ___argv); })
 #else /* (__CRT_HAVE_spawnve || __CRT_HAVE__spawnve || ((__CRT_HAVE_open64 || __CRT_HAVE___open64 || __CRT_HAVE_open || __CRT_HAVE__open || __CRT_HAVE___open || (__AT_FDCWD && (__CRT_HAVE_openat64 || __CRT_HAVE_openat))) && (__CRT_HAVE_fspawnve || ((__CRT_HAVE__Exit || __CRT_HAVE__exit || __CRT_HAVE_quick_exit || __CRT_HAVE_exit) && ((__ARCH_HAVE_SHARED_VM_VFORK && (__CRT_HAVE_vfork || __CRT_HAVE___vfork)) || ((__CRT_HAVE_fork || __CRT_HAVE___fork) && (__CRT_HAVE_pipe2 || __CRT_HAVE_pipe || __CRT_HAVE___pipe || __CRT_HAVE__pipe) && __O_CLOEXEC && (__CRT_HAVE_read || __CRT_HAVE__read || __CRT_HAVE___read) && (__CRT_HAVE_write || __CRT_HAVE__write || __CRT_HAVE___write) && (__CRT_HAVE_close || __CRT_HAVE__close || __CRT_HAVE___close))) && __CRT_HAVE_fexecve && (__CRT_HAVE_waitpid || __CRT_HAVE___waitpid))))) && __LOCAL_environ */
 #undef __spawnv_defined
 #endif /* (!__CRT_HAVE_spawnve && !__CRT_HAVE__spawnve && ((!__CRT_HAVE_open64 && !__CRT_HAVE___open64 && !__CRT_HAVE_open && !__CRT_HAVE__open && !__CRT_HAVE___open && (!__AT_FDCWD || (!__CRT_HAVE_openat64 && !__CRT_HAVE_openat))) || (!__CRT_HAVE_fspawnve && ((!__CRT_HAVE__Exit && !__CRT_HAVE__exit && !__CRT_HAVE_quick_exit && !__CRT_HAVE_exit) || ((!__ARCH_HAVE_SHARED_VM_VFORK || (!__CRT_HAVE_vfork && !__CRT_HAVE___vfork)) && ((!__CRT_HAVE_fork && !__CRT_HAVE___fork) || (!__CRT_HAVE_pipe2 && !__CRT_HAVE_pipe && !__CRT_HAVE___pipe && !__CRT_HAVE__pipe) || !__O_CLOEXEC || (!__CRT_HAVE_read && !__CRT_HAVE__read && !__CRT_HAVE___read) || (!__CRT_HAVE_write && !__CRT_HAVE__write && !__CRT_HAVE___write) || (!__CRT_HAVE_close && !__CRT_HAVE__close && !__CRT_HAVE___close))) || !__CRT_HAVE_fexecve || (!__CRT_HAVE_waitpid && !__CRT_HAVE___waitpid))))) || !__LOCAL_environ */
@@ -1072,7 +1072,7 @@ __CREDIRECT(__ATTR_NONNULL((2, 3)),__pid_t,__NOTHROW_RPC,spawnvp,(__STDC_INT_AS_
 #include <asm/os/vfork.h>
 #if (defined(__CRT_HAVE_spawnvpe) || defined(__CRT_HAVE__spawnvpe) || ((defined(__CRT_HAVE_spawnve) || defined(__CRT_HAVE__spawnve) || ((defined(__CRT_HAVE_open64) || defined(__CRT_HAVE___open64) || defined(__CRT_HAVE_open) || defined(__CRT_HAVE__open) || defined(__CRT_HAVE___open) || (defined(__AT_FDCWD) && (defined(__CRT_HAVE_openat64) || defined(__CRT_HAVE_openat)))) && (defined(__CRT_HAVE_fspawnve) || ((defined(__CRT_HAVE__Exit) || defined(__CRT_HAVE__exit) || defined(__CRT_HAVE_quick_exit) || defined(__CRT_HAVE_exit)) && ((defined(__ARCH_HAVE_SHARED_VM_VFORK) && (defined(__CRT_HAVE_vfork) || defined(__CRT_HAVE___vfork))) || ((defined(__CRT_HAVE_fork) || defined(__CRT_HAVE___fork)) && (defined(__CRT_HAVE_pipe2) || defined(__CRT_HAVE_pipe) || defined(__CRT_HAVE___pipe) || defined(__CRT_HAVE__pipe)) && defined(__O_CLOEXEC) && (defined(__CRT_HAVE_read) || defined(__CRT_HAVE__read) || defined(__CRT_HAVE___read)) && (defined(__CRT_HAVE_write) || defined(__CRT_HAVE__write) || defined(__CRT_HAVE___write)) && (defined(__CRT_HAVE_close) || defined(__CRT_HAVE__close) || defined(__CRT_HAVE___close)))) && defined(__CRT_HAVE_fexecve) && (defined(__CRT_HAVE_waitpid) || defined(__CRT_HAVE___waitpid)))))) && defined(__hybrid_alloca))) && defined(__LOCAL_environ)
 #include <libc/local/process/spawnvp.h>
-__NAMESPACE_LOCAL_USING_OR_IMPL(spawnvp, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_NONNULL((2, 3)) __pid_t __NOTHROW_RPC(__LIBCCALL spawnvp)(__STDC_INT_AS_UINT_T __mode, char const *__restrict __file, __TARGV) { return __NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(spawnvp)(__mode, __file, ___argv); })
+__NAMESPACE_LOCAL_USING_OR_IMPL(spawnvp, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_NONNULL((2, 3)) __pid_t __NOTHROW_RPC(__LIBCCALL spawnvp)(__STDC_INT_AS_UINT_T __mode, char const *__restrict __file, __TARGV) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(spawnvp))(__mode, __file, ___argv); })
 #else /* (__CRT_HAVE_spawnvpe || __CRT_HAVE__spawnvpe || ((__CRT_HAVE_spawnve || __CRT_HAVE__spawnve || ((__CRT_HAVE_open64 || __CRT_HAVE___open64 || __CRT_HAVE_open || __CRT_HAVE__open || __CRT_HAVE___open || (__AT_FDCWD && (__CRT_HAVE_openat64 || __CRT_HAVE_openat))) && (__CRT_HAVE_fspawnve || ((__CRT_HAVE__Exit || __CRT_HAVE__exit || __CRT_HAVE_quick_exit || __CRT_HAVE_exit) && ((__ARCH_HAVE_SHARED_VM_VFORK && (__CRT_HAVE_vfork || __CRT_HAVE___vfork)) || ((__CRT_HAVE_fork || __CRT_HAVE___fork) && (__CRT_HAVE_pipe2 || __CRT_HAVE_pipe || __CRT_HAVE___pipe || __CRT_HAVE__pipe) && __O_CLOEXEC && (__CRT_HAVE_read || __CRT_HAVE__read || __CRT_HAVE___read) && (__CRT_HAVE_write || __CRT_HAVE__write || __CRT_HAVE___write) && (__CRT_HAVE_close || __CRT_HAVE__close || __CRT_HAVE___close))) && __CRT_HAVE_fexecve && (__CRT_HAVE_waitpid || __CRT_HAVE___waitpid))))) && __hybrid_alloca)) && __LOCAL_environ */
 #undef __spawnvp_defined
 #endif /* (!__CRT_HAVE_spawnvpe && !__CRT_HAVE__spawnvpe && ((!__CRT_HAVE_spawnve && !__CRT_HAVE__spawnve && ((!__CRT_HAVE_open64 && !__CRT_HAVE___open64 && !__CRT_HAVE_open && !__CRT_HAVE__open && !__CRT_HAVE___open && (!__AT_FDCWD || (!__CRT_HAVE_openat64 && !__CRT_HAVE_openat))) || (!__CRT_HAVE_fspawnve && ((!__CRT_HAVE__Exit && !__CRT_HAVE__exit && !__CRT_HAVE_quick_exit && !__CRT_HAVE_exit) || ((!__ARCH_HAVE_SHARED_VM_VFORK || (!__CRT_HAVE_vfork && !__CRT_HAVE___vfork)) && ((!__CRT_HAVE_fork && !__CRT_HAVE___fork) || (!__CRT_HAVE_pipe2 && !__CRT_HAVE_pipe && !__CRT_HAVE___pipe && !__CRT_HAVE__pipe) || !__O_CLOEXEC || (!__CRT_HAVE_read && !__CRT_HAVE__read && !__CRT_HAVE___read) || (!__CRT_HAVE_write && !__CRT_HAVE__write && !__CRT_HAVE___write) || (!__CRT_HAVE_close && !__CRT_HAVE__close && !__CRT_HAVE___close))) || !__CRT_HAVE_fexecve || (!__CRT_HAVE_waitpid && !__CRT_HAVE___waitpid))))) || !__hybrid_alloca)) || !__LOCAL_environ */
@@ -1090,7 +1090,7 @@ __CREDIRECT(__ATTR_NONNULL((2, 3, 4)),__pid_t,__NOTHROW_RPC,spawnve,(__STDC_INT_
 #include <asm/os/vfork.h>
 #if (defined(__CRT_HAVE_open64) || defined(__CRT_HAVE___open64) || defined(__CRT_HAVE_open) || defined(__CRT_HAVE__open) || defined(__CRT_HAVE___open) || (defined(__AT_FDCWD) && (defined(__CRT_HAVE_openat64) || defined(__CRT_HAVE_openat)))) && (defined(__CRT_HAVE_fspawnve) || ((defined(__CRT_HAVE__Exit) || defined(__CRT_HAVE__exit) || defined(__CRT_HAVE_quick_exit) || defined(__CRT_HAVE_exit)) && ((defined(__ARCH_HAVE_SHARED_VM_VFORK) && (defined(__CRT_HAVE_vfork) || defined(__CRT_HAVE___vfork))) || ((defined(__CRT_HAVE_fork) || defined(__CRT_HAVE___fork)) && (defined(__CRT_HAVE_pipe2) || defined(__CRT_HAVE_pipe) || defined(__CRT_HAVE___pipe) || defined(__CRT_HAVE__pipe)) && defined(__O_CLOEXEC) && (defined(__CRT_HAVE_read) || defined(__CRT_HAVE__read) || defined(__CRT_HAVE___read)) && (defined(__CRT_HAVE_write) || defined(__CRT_HAVE__write) || defined(__CRT_HAVE___write)) && (defined(__CRT_HAVE_close) || defined(__CRT_HAVE__close) || defined(__CRT_HAVE___close)))) && defined(__CRT_HAVE_fexecve) && (defined(__CRT_HAVE_waitpid) || defined(__CRT_HAVE___waitpid))))
 #include <libc/local/process/spawnve.h>
-__NAMESPACE_LOCAL_USING_OR_IMPL(spawnve, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_NONNULL((2, 3, 4)) __pid_t __NOTHROW_RPC(__LIBCCALL spawnve)(__STDC_INT_AS_UINT_T __mode, char const *__restrict __path, __TARGV, __TENVP) { return __NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(spawnve)(__mode, __path, ___argv, ___envp); })
+__NAMESPACE_LOCAL_USING_OR_IMPL(spawnve, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_NONNULL((2, 3, 4)) __pid_t __NOTHROW_RPC(__LIBCCALL spawnve)(__STDC_INT_AS_UINT_T __mode, char const *__restrict __path, __TARGV, __TENVP) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(spawnve))(__mode, __path, ___argv, ___envp); })
 #else /* (__CRT_HAVE_open64 || __CRT_HAVE___open64 || __CRT_HAVE_open || __CRT_HAVE__open || __CRT_HAVE___open || (__AT_FDCWD && (__CRT_HAVE_openat64 || __CRT_HAVE_openat))) && (__CRT_HAVE_fspawnve || ((__CRT_HAVE__Exit || __CRT_HAVE__exit || __CRT_HAVE_quick_exit || __CRT_HAVE_exit) && ((__ARCH_HAVE_SHARED_VM_VFORK && (__CRT_HAVE_vfork || __CRT_HAVE___vfork)) || ((__CRT_HAVE_fork || __CRT_HAVE___fork) && (__CRT_HAVE_pipe2 || __CRT_HAVE_pipe || __CRT_HAVE___pipe || __CRT_HAVE__pipe) && __O_CLOEXEC && (__CRT_HAVE_read || __CRT_HAVE__read || __CRT_HAVE___read) && (__CRT_HAVE_write || __CRT_HAVE__write || __CRT_HAVE___write) && (__CRT_HAVE_close || __CRT_HAVE__close || __CRT_HAVE___close))) && __CRT_HAVE_fexecve && (__CRT_HAVE_waitpid || __CRT_HAVE___waitpid))) */
 #undef __spawnve_defined
 #endif /* (!__CRT_HAVE_open64 && !__CRT_HAVE___open64 && !__CRT_HAVE_open && !__CRT_HAVE__open && !__CRT_HAVE___open && (!__AT_FDCWD || (!__CRT_HAVE_openat64 && !__CRT_HAVE_openat))) || (!__CRT_HAVE_fspawnve && ((!__CRT_HAVE__Exit && !__CRT_HAVE__exit && !__CRT_HAVE_quick_exit && !__CRT_HAVE_exit) || ((!__ARCH_HAVE_SHARED_VM_VFORK || (!__CRT_HAVE_vfork && !__CRT_HAVE___vfork)) && ((!__CRT_HAVE_fork && !__CRT_HAVE___fork) || (!__CRT_HAVE_pipe2 && !__CRT_HAVE_pipe && !__CRT_HAVE___pipe && !__CRT_HAVE__pipe) || !__O_CLOEXEC || (!__CRT_HAVE_read && !__CRT_HAVE__read && !__CRT_HAVE___read) || (!__CRT_HAVE_write && !__CRT_HAVE__write && !__CRT_HAVE___write) || (!__CRT_HAVE_close && !__CRT_HAVE__close && !__CRT_HAVE___close))) || !__CRT_HAVE_fexecve || (!__CRT_HAVE_waitpid && !__CRT_HAVE___waitpid))) */
@@ -1110,7 +1110,7 @@ __CREDIRECT(__ATTR_NONNULL((2, 3, 4)),__pid_t,__NOTHROW_RPC,spawnvpe,(__STDC_INT
 #include <asm/os/vfork.h>
 #if (defined(__CRT_HAVE_getenv) || defined(__LOCAL_environ)) && (defined(__CRT_HAVE_spawnve) || defined(__CRT_HAVE__spawnve) || ((defined(__CRT_HAVE_open64) || defined(__CRT_HAVE___open64) || defined(__CRT_HAVE_open) || defined(__CRT_HAVE__open) || defined(__CRT_HAVE___open) || (defined(__AT_FDCWD) && (defined(__CRT_HAVE_openat64) || defined(__CRT_HAVE_openat)))) && (defined(__CRT_HAVE_fspawnve) || ((defined(__CRT_HAVE__Exit) || defined(__CRT_HAVE__exit) || defined(__CRT_HAVE_quick_exit) || defined(__CRT_HAVE_exit)) && ((defined(__ARCH_HAVE_SHARED_VM_VFORK) && (defined(__CRT_HAVE_vfork) || defined(__CRT_HAVE___vfork))) || ((defined(__CRT_HAVE_fork) || defined(__CRT_HAVE___fork)) && (defined(__CRT_HAVE_pipe2) || defined(__CRT_HAVE_pipe) || defined(__CRT_HAVE___pipe) || defined(__CRT_HAVE__pipe)) && defined(__O_CLOEXEC) && (defined(__CRT_HAVE_read) || defined(__CRT_HAVE__read) || defined(__CRT_HAVE___read)) && (defined(__CRT_HAVE_write) || defined(__CRT_HAVE__write) || defined(__CRT_HAVE___write)) && (defined(__CRT_HAVE_close) || defined(__CRT_HAVE__close) || defined(__CRT_HAVE___close)))) && defined(__CRT_HAVE_fexecve) && (defined(__CRT_HAVE_waitpid) || defined(__CRT_HAVE___waitpid)))))) && defined(__hybrid_alloca)
 #include <libc/local/process/spawnvpe.h>
-__NAMESPACE_LOCAL_USING_OR_IMPL(spawnvpe, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_NONNULL((2, 3, 4)) __pid_t __NOTHROW_RPC(__LIBCCALL spawnvpe)(__STDC_INT_AS_UINT_T __mode, char const *__restrict __file, __TARGV, __TENVP) { return __NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(spawnvpe)(__mode, __file, ___argv, ___envp); })
+__NAMESPACE_LOCAL_USING_OR_IMPL(spawnvpe, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_NONNULL((2, 3, 4)) __pid_t __NOTHROW_RPC(__LIBCCALL spawnvpe)(__STDC_INT_AS_UINT_T __mode, char const *__restrict __file, __TARGV, __TENVP) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(spawnvpe))(__mode, __file, ___argv, ___envp); })
 #else /* (__CRT_HAVE_getenv || __LOCAL_environ) && (__CRT_HAVE_spawnve || __CRT_HAVE__spawnve || ((__CRT_HAVE_open64 || __CRT_HAVE___open64 || __CRT_HAVE_open || __CRT_HAVE__open || __CRT_HAVE___open || (__AT_FDCWD && (__CRT_HAVE_openat64 || __CRT_HAVE_openat))) && (__CRT_HAVE_fspawnve || ((__CRT_HAVE__Exit || __CRT_HAVE__exit || __CRT_HAVE_quick_exit || __CRT_HAVE_exit) && ((__ARCH_HAVE_SHARED_VM_VFORK && (__CRT_HAVE_vfork || __CRT_HAVE___vfork)) || ((__CRT_HAVE_fork || __CRT_HAVE___fork) && (__CRT_HAVE_pipe2 || __CRT_HAVE_pipe || __CRT_HAVE___pipe || __CRT_HAVE__pipe) && __O_CLOEXEC && (__CRT_HAVE_read || __CRT_HAVE__read || __CRT_HAVE___read) && (__CRT_HAVE_write || __CRT_HAVE__write || __CRT_HAVE___write) && (__CRT_HAVE_close || __CRT_HAVE__close || __CRT_HAVE___close))) && __CRT_HAVE_fexecve && (__CRT_HAVE_waitpid || __CRT_HAVE___waitpid))))) && __hybrid_alloca */
 #undef __spawnvpe_defined
 #endif /* (!__CRT_HAVE_getenv && !__LOCAL_environ) || (!__CRT_HAVE_spawnve && !__CRT_HAVE__spawnve && ((!__CRT_HAVE_open64 && !__CRT_HAVE___open64 && !__CRT_HAVE_open && !__CRT_HAVE__open && !__CRT_HAVE___open && (!__AT_FDCWD || (!__CRT_HAVE_openat64 && !__CRT_HAVE_openat))) || (!__CRT_HAVE_fspawnve && ((!__CRT_HAVE__Exit && !__CRT_HAVE__exit && !__CRT_HAVE_quick_exit && !__CRT_HAVE_exit) || ((!__ARCH_HAVE_SHARED_VM_VFORK || (!__CRT_HAVE_vfork && !__CRT_HAVE___vfork)) && ((!__CRT_HAVE_fork && !__CRT_HAVE___fork) || (!__CRT_HAVE_pipe2 && !__CRT_HAVE_pipe && !__CRT_HAVE___pipe && !__CRT_HAVE__pipe) || !__O_CLOEXEC || (!__CRT_HAVE_read && !__CRT_HAVE__read && !__CRT_HAVE___read) || (!__CRT_HAVE_write && !__CRT_HAVE__write && !__CRT_HAVE___write) || (!__CRT_HAVE_close && !__CRT_HAVE__close && !__CRT_HAVE___close))) || !__CRT_HAVE_fexecve || (!__CRT_HAVE_waitpid && !__CRT_HAVE___waitpid))))) || !__hybrid_alloca */
@@ -1130,9 +1130,9 @@ __LIBC __ATTR_SENTINEL __ATTR_NONNULL((2)) __pid_t __NOTHROW_RPC(__VLIBCCALL spa
 #if defined(__CRT_HAVE_spawnv) || defined(__CRT_HAVE__spawnv) || ((defined(__CRT_HAVE_spawnve) || defined(__CRT_HAVE__spawnve) || ((defined(__CRT_HAVE_open64) || defined(__CRT_HAVE___open64) || defined(__CRT_HAVE_open) || defined(__CRT_HAVE__open) || defined(__CRT_HAVE___open) || (defined(__AT_FDCWD) && (defined(__CRT_HAVE_openat64) || defined(__CRT_HAVE_openat)))) && (defined(__CRT_HAVE_fspawnve) || ((defined(__CRT_HAVE__Exit) || defined(__CRT_HAVE__exit) || defined(__CRT_HAVE_quick_exit) || defined(__CRT_HAVE_exit)) && ((defined(__ARCH_HAVE_SHARED_VM_VFORK) && (defined(__CRT_HAVE_vfork) || defined(__CRT_HAVE___vfork))) || ((defined(__CRT_HAVE_fork) || defined(__CRT_HAVE___fork)) && (defined(__CRT_HAVE_pipe2) || defined(__CRT_HAVE_pipe) || defined(__CRT_HAVE___pipe) || defined(__CRT_HAVE__pipe)) && defined(__O_CLOEXEC) && (defined(__CRT_HAVE_read) || defined(__CRT_HAVE__read) || defined(__CRT_HAVE___read)) && (defined(__CRT_HAVE_write) || defined(__CRT_HAVE__write) || defined(__CRT_HAVE___write)) && (defined(__CRT_HAVE_close) || defined(__CRT_HAVE__close) || defined(__CRT_HAVE___close)))) && defined(__CRT_HAVE_fexecve) && (defined(__CRT_HAVE_waitpid) || defined(__CRT_HAVE___waitpid)))))) && defined(__LOCAL_environ))
 #include <libc/local/process/spawnl.h>
 #ifdef __cplusplus
-__NAMESPACE_LOCAL_USING_OR_IMPL(spawnl, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_SENTINEL __ATTR_NONNULL((2)) __pid_t __NOTHROW_RPC(__VLIBCCALL spawnl)(__STDC_INT_AS_UINT_T __mode, char const *__restrict __path, char const *__args, ...) { return __NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(spawnl)(__mode, __path, __args, __builtin_va_arg_pack()); })
+__NAMESPACE_LOCAL_USING_OR_IMPL(spawnl, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_SENTINEL __ATTR_NONNULL((2)) __pid_t __NOTHROW_RPC(__VLIBCCALL spawnl)(__STDC_INT_AS_UINT_T __mode, char const *__restrict __path, char const *__args, ...) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(spawnl))(__mode, __path, __args, __builtin_va_arg_pack()); })
 #else /* __cplusplus */
-#define spawnl __NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(spawnl)
+#define spawnl (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(spawnl))
 #endif /* !__cplusplus */
 #else /* __CRT_HAVE_spawnv || __CRT_HAVE__spawnv || ((__CRT_HAVE_spawnve || __CRT_HAVE__spawnve || ((__CRT_HAVE_open64 || __CRT_HAVE___open64 || __CRT_HAVE_open || __CRT_HAVE__open || __CRT_HAVE___open || (__AT_FDCWD && (__CRT_HAVE_openat64 || __CRT_HAVE_openat))) && (__CRT_HAVE_fspawnve || ((__CRT_HAVE__Exit || __CRT_HAVE__exit || __CRT_HAVE_quick_exit || __CRT_HAVE_exit) && ((__ARCH_HAVE_SHARED_VM_VFORK && (__CRT_HAVE_vfork || __CRT_HAVE___vfork)) || ((__CRT_HAVE_fork || __CRT_HAVE___fork) && (__CRT_HAVE_pipe2 || __CRT_HAVE_pipe || __CRT_HAVE___pipe || __CRT_HAVE__pipe) && __O_CLOEXEC && (__CRT_HAVE_read || __CRT_HAVE__read || __CRT_HAVE___read) && (__CRT_HAVE_write || __CRT_HAVE__write || __CRT_HAVE___write) && (__CRT_HAVE_close || __CRT_HAVE__close || __CRT_HAVE___close))) && __CRT_HAVE_fexecve && (__CRT_HAVE_waitpid || __CRT_HAVE___waitpid))))) && __LOCAL_environ) */
 #undef __spawnl_defined
@@ -1154,9 +1154,9 @@ __LIBC __ATTR_SENTINEL __ATTR_NONNULL((2)) __pid_t __NOTHROW_RPC(__VLIBCCALL spa
 #if defined(__CRT_HAVE_spawnvp) || defined(__CRT_HAVE__spawnvp) || ((defined(__CRT_HAVE_spawnvpe) || defined(__CRT_HAVE__spawnvpe) || ((defined(__CRT_HAVE_spawnve) || defined(__CRT_HAVE__spawnve) || ((defined(__CRT_HAVE_open64) || defined(__CRT_HAVE___open64) || defined(__CRT_HAVE_open) || defined(__CRT_HAVE__open) || defined(__CRT_HAVE___open) || (defined(__AT_FDCWD) && (defined(__CRT_HAVE_openat64) || defined(__CRT_HAVE_openat)))) && (defined(__CRT_HAVE_fspawnve) || ((defined(__CRT_HAVE__Exit) || defined(__CRT_HAVE__exit) || defined(__CRT_HAVE_quick_exit) || defined(__CRT_HAVE_exit)) && ((defined(__ARCH_HAVE_SHARED_VM_VFORK) && (defined(__CRT_HAVE_vfork) || defined(__CRT_HAVE___vfork))) || ((defined(__CRT_HAVE_fork) || defined(__CRT_HAVE___fork)) && (defined(__CRT_HAVE_pipe2) || defined(__CRT_HAVE_pipe) || defined(__CRT_HAVE___pipe) || defined(__CRT_HAVE__pipe)) && defined(__O_CLOEXEC) && (defined(__CRT_HAVE_read) || defined(__CRT_HAVE__read) || defined(__CRT_HAVE___read)) && (defined(__CRT_HAVE_write) || defined(__CRT_HAVE__write) || defined(__CRT_HAVE___write)) && (defined(__CRT_HAVE_close) || defined(__CRT_HAVE__close) || defined(__CRT_HAVE___close)))) && defined(__CRT_HAVE_fexecve) && (defined(__CRT_HAVE_waitpid) || defined(__CRT_HAVE___waitpid)))))) && defined(__hybrid_alloca))) && defined(__LOCAL_environ))
 #include <libc/local/process/spawnlp.h>
 #ifdef __cplusplus
-__NAMESPACE_LOCAL_USING_OR_IMPL(spawnlp, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_SENTINEL __ATTR_NONNULL((2)) __pid_t __NOTHROW_RPC(__VLIBCCALL spawnlp)(__STDC_INT_AS_UINT_T __mode, char const *__restrict __file, char const *__args, ...) { return __NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(spawnlp)(__mode, __file, __args, __builtin_va_arg_pack()); })
+__NAMESPACE_LOCAL_USING_OR_IMPL(spawnlp, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_SENTINEL __ATTR_NONNULL((2)) __pid_t __NOTHROW_RPC(__VLIBCCALL spawnlp)(__STDC_INT_AS_UINT_T __mode, char const *__restrict __file, char const *__args, ...) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(spawnlp))(__mode, __file, __args, __builtin_va_arg_pack()); })
 #else /* __cplusplus */
-#define spawnlp __NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(spawnlp)
+#define spawnlp (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(spawnlp))
 #endif /* !__cplusplus */
 #else /* __CRT_HAVE_spawnvp || __CRT_HAVE__spawnvp || ((__CRT_HAVE_spawnvpe || __CRT_HAVE__spawnvpe || ((__CRT_HAVE_spawnve || __CRT_HAVE__spawnve || ((__CRT_HAVE_open64 || __CRT_HAVE___open64 || __CRT_HAVE_open || __CRT_HAVE__open || __CRT_HAVE___open || (__AT_FDCWD && (__CRT_HAVE_openat64 || __CRT_HAVE_openat))) && (__CRT_HAVE_fspawnve || ((__CRT_HAVE__Exit || __CRT_HAVE__exit || __CRT_HAVE_quick_exit || __CRT_HAVE_exit) && ((__ARCH_HAVE_SHARED_VM_VFORK && (__CRT_HAVE_vfork || __CRT_HAVE___vfork)) || ((__CRT_HAVE_fork || __CRT_HAVE___fork) && (__CRT_HAVE_pipe2 || __CRT_HAVE_pipe || __CRT_HAVE___pipe || __CRT_HAVE__pipe) && __O_CLOEXEC && (__CRT_HAVE_read || __CRT_HAVE__read || __CRT_HAVE___read) && (__CRT_HAVE_write || __CRT_HAVE__write || __CRT_HAVE___write) && (__CRT_HAVE_close || __CRT_HAVE__close || __CRT_HAVE___close))) && __CRT_HAVE_fexecve && (__CRT_HAVE_waitpid || __CRT_HAVE___waitpid))))) && __hybrid_alloca)) && __LOCAL_environ) */
 #undef __spawnlp_defined
@@ -1176,9 +1176,9 @@ __LIBC __ATTR_SENTINEL_O(1) __ATTR_NONNULL((2)) __pid_t __NOTHROW_RPC(__VLIBCCAL
 #if defined(__CRT_HAVE_spawnve) || defined(__CRT_HAVE__spawnve) || ((defined(__CRT_HAVE_open64) || defined(__CRT_HAVE___open64) || defined(__CRT_HAVE_open) || defined(__CRT_HAVE__open) || defined(__CRT_HAVE___open) || (defined(__AT_FDCWD) && (defined(__CRT_HAVE_openat64) || defined(__CRT_HAVE_openat)))) && (defined(__CRT_HAVE_fspawnve) || ((defined(__CRT_HAVE__Exit) || defined(__CRT_HAVE__exit) || defined(__CRT_HAVE_quick_exit) || defined(__CRT_HAVE_exit)) && ((defined(__ARCH_HAVE_SHARED_VM_VFORK) && (defined(__CRT_HAVE_vfork) || defined(__CRT_HAVE___vfork))) || ((defined(__CRT_HAVE_fork) || defined(__CRT_HAVE___fork)) && (defined(__CRT_HAVE_pipe2) || defined(__CRT_HAVE_pipe) || defined(__CRT_HAVE___pipe) || defined(__CRT_HAVE__pipe)) && defined(__O_CLOEXEC) && (defined(__CRT_HAVE_read) || defined(__CRT_HAVE__read) || defined(__CRT_HAVE___read)) && (defined(__CRT_HAVE_write) || defined(__CRT_HAVE__write) || defined(__CRT_HAVE___write)) && (defined(__CRT_HAVE_close) || defined(__CRT_HAVE__close) || defined(__CRT_HAVE___close)))) && defined(__CRT_HAVE_fexecve) && (defined(__CRT_HAVE_waitpid) || defined(__CRT_HAVE___waitpid)))))
 #include <libc/local/process/spawnle.h>
 #ifdef __cplusplus
-__NAMESPACE_LOCAL_USING_OR_IMPL(spawnle, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_SENTINEL_O(1) __ATTR_NONNULL((2)) __pid_t __NOTHROW_RPC(__VLIBCCALL spawnle)(__STDC_INT_AS_UINT_T __mode, char const *__restrict __path, char const *__args, ...) { return __NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(spawnle)(__mode, __path, __args, __builtin_va_arg_pack()); })
+__NAMESPACE_LOCAL_USING_OR_IMPL(spawnle, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_SENTINEL_O(1) __ATTR_NONNULL((2)) __pid_t __NOTHROW_RPC(__VLIBCCALL spawnle)(__STDC_INT_AS_UINT_T __mode, char const *__restrict __path, char const *__args, ...) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(spawnle))(__mode, __path, __args, __builtin_va_arg_pack()); })
 #else /* __cplusplus */
-#define spawnle __NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(spawnle)
+#define spawnle (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(spawnle))
 #endif /* !__cplusplus */
 #else /* __CRT_HAVE_spawnve || __CRT_HAVE__spawnve || ((__CRT_HAVE_open64 || __CRT_HAVE___open64 || __CRT_HAVE_open || __CRT_HAVE__open || __CRT_HAVE___open || (__AT_FDCWD && (__CRT_HAVE_openat64 || __CRT_HAVE_openat))) && (__CRT_HAVE_fspawnve || ((__CRT_HAVE__Exit || __CRT_HAVE__exit || __CRT_HAVE_quick_exit || __CRT_HAVE_exit) && ((__ARCH_HAVE_SHARED_VM_VFORK && (__CRT_HAVE_vfork || __CRT_HAVE___vfork)) || ((__CRT_HAVE_fork || __CRT_HAVE___fork) && (__CRT_HAVE_pipe2 || __CRT_HAVE_pipe || __CRT_HAVE___pipe || __CRT_HAVE__pipe) && __O_CLOEXEC && (__CRT_HAVE_read || __CRT_HAVE__read || __CRT_HAVE___read) && (__CRT_HAVE_write || __CRT_HAVE__write || __CRT_HAVE___write) && (__CRT_HAVE_close || __CRT_HAVE__close || __CRT_HAVE___close))) && __CRT_HAVE_fexecve && (__CRT_HAVE_waitpid || __CRT_HAVE___waitpid)))) */
 #undef __spawnle_defined
@@ -1200,9 +1200,9 @@ __LIBC __ATTR_SENTINEL_O(1) __ATTR_NONNULL((2)) __pid_t __NOTHROW_RPC(__VLIBCCAL
 #if defined(__CRT_HAVE_spawnvpe) || defined(__CRT_HAVE__spawnvpe) || ((defined(__CRT_HAVE_getenv) || defined(__LOCAL_environ)) && (defined(__CRT_HAVE_spawnve) || defined(__CRT_HAVE__spawnve) || ((defined(__CRT_HAVE_open64) || defined(__CRT_HAVE___open64) || defined(__CRT_HAVE_open) || defined(__CRT_HAVE__open) || defined(__CRT_HAVE___open) || (defined(__AT_FDCWD) && (defined(__CRT_HAVE_openat64) || defined(__CRT_HAVE_openat)))) && (defined(__CRT_HAVE_fspawnve) || ((defined(__CRT_HAVE__Exit) || defined(__CRT_HAVE__exit) || defined(__CRT_HAVE_quick_exit) || defined(__CRT_HAVE_exit)) && ((defined(__ARCH_HAVE_SHARED_VM_VFORK) && (defined(__CRT_HAVE_vfork) || defined(__CRT_HAVE___vfork))) || ((defined(__CRT_HAVE_fork) || defined(__CRT_HAVE___fork)) && (defined(__CRT_HAVE_pipe2) || defined(__CRT_HAVE_pipe) || defined(__CRT_HAVE___pipe) || defined(__CRT_HAVE__pipe)) && defined(__O_CLOEXEC) && (defined(__CRT_HAVE_read) || defined(__CRT_HAVE__read) || defined(__CRT_HAVE___read)) && (defined(__CRT_HAVE_write) || defined(__CRT_HAVE__write) || defined(__CRT_HAVE___write)) && (defined(__CRT_HAVE_close) || defined(__CRT_HAVE__close) || defined(__CRT_HAVE___close)))) && defined(__CRT_HAVE_fexecve) && (defined(__CRT_HAVE_waitpid) || defined(__CRT_HAVE___waitpid)))))) && defined(__hybrid_alloca))
 #include <libc/local/process/spawnlpe.h>
 #ifdef __cplusplus
-__NAMESPACE_LOCAL_USING_OR_IMPL(spawnlpe, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_SENTINEL_O(1) __ATTR_NONNULL((2)) __pid_t __NOTHROW_RPC(__VLIBCCALL spawnlpe)(__STDC_INT_AS_UINT_T __mode, char const *__restrict __file, char const *__args, ...) { return __NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(spawnlpe)(__mode, __file, __args, __builtin_va_arg_pack()); })
+__NAMESPACE_LOCAL_USING_OR_IMPL(spawnlpe, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_SENTINEL_O(1) __ATTR_NONNULL((2)) __pid_t __NOTHROW_RPC(__VLIBCCALL spawnlpe)(__STDC_INT_AS_UINT_T __mode, char const *__restrict __file, char const *__args, ...) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(spawnlpe))(__mode, __file, __args, __builtin_va_arg_pack()); })
 #else /* __cplusplus */
-#define spawnlpe __NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(spawnlpe)
+#define spawnlpe (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(spawnlpe))
 #endif /* !__cplusplus */
 #else /* __CRT_HAVE_spawnvpe || __CRT_HAVE__spawnvpe || ((__CRT_HAVE_getenv || __LOCAL_environ) && (__CRT_HAVE_spawnve || __CRT_HAVE__spawnve || ((__CRT_HAVE_open64 || __CRT_HAVE___open64 || __CRT_HAVE_open || __CRT_HAVE__open || __CRT_HAVE___open || (__AT_FDCWD && (__CRT_HAVE_openat64 || __CRT_HAVE_openat))) && (__CRT_HAVE_fspawnve || ((__CRT_HAVE__Exit || __CRT_HAVE__exit || __CRT_HAVE_quick_exit || __CRT_HAVE_exit) && ((__ARCH_HAVE_SHARED_VM_VFORK && (__CRT_HAVE_vfork || __CRT_HAVE___vfork)) || ((__CRT_HAVE_fork || __CRT_HAVE___fork) && (__CRT_HAVE_pipe2 || __CRT_HAVE_pipe || __CRT_HAVE___pipe || __CRT_HAVE__pipe) && __O_CLOEXEC && (__CRT_HAVE_read || __CRT_HAVE__read || __CRT_HAVE___read) && (__CRT_HAVE_write || __CRT_HAVE__write || __CRT_HAVE___write) && (__CRT_HAVE_close || __CRT_HAVE__close || __CRT_HAVE___close))) && __CRT_HAVE_fexecve && (__CRT_HAVE_waitpid || __CRT_HAVE___waitpid))))) && __hybrid_alloca) */
 #undef __spawnlpe_defined
@@ -1221,7 +1221,7 @@ __CREDIRECT(__ATTR_NONNULL((3, 4)),__pid_t,__NOTHROW_RPC,fspawnve,(__STDC_INT_AS
 #include <asm/os/vfork.h>
 #if (defined(__CRT_HAVE__Exit) || defined(__CRT_HAVE__exit) || defined(__CRT_HAVE_quick_exit) || defined(__CRT_HAVE_exit)) && ((defined(__ARCH_HAVE_SHARED_VM_VFORK) && (defined(__CRT_HAVE_vfork) || defined(__CRT_HAVE___vfork))) || ((defined(__CRT_HAVE_fork) || defined(__CRT_HAVE___fork)) && (defined(__CRT_HAVE_pipe2) || defined(__CRT_HAVE_pipe) || defined(__CRT_HAVE___pipe) || defined(__CRT_HAVE__pipe)) && defined(O_CLOEXEC) && (defined(__CRT_HAVE_read) || defined(__CRT_HAVE__read) || defined(__CRT_HAVE___read)) && (defined(__CRT_HAVE_write) || defined(__CRT_HAVE__write) || defined(__CRT_HAVE___write)) && (defined(__CRT_HAVE_close) || defined(__CRT_HAVE__close) || defined(__CRT_HAVE___close)))) && defined(__CRT_HAVE_fexecve) && (defined(__CRT_HAVE_waitpid) || defined(__CRT_HAVE___waitpid))
 #include <libc/local/process/fspawnve.h>
-__NAMESPACE_LOCAL_USING_OR_IMPL(fspawnve, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_NONNULL((3, 4)) __pid_t __NOTHROW_RPC(__LIBCCALL fspawnve)(__STDC_INT_AS_UINT_T __mode, __fd_t __execfd, __TARGV, __TENVP) { return __NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(fspawnve)(__mode, __path, ___argv, ___envp); })
+__NAMESPACE_LOCAL_USING_OR_IMPL(fspawnve, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_NONNULL((3, 4)) __pid_t __NOTHROW_RPC(__LIBCCALL fspawnve)(__STDC_INT_AS_UINT_T __mode, __fd_t __execfd, __TARGV, __TENVP) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(fspawnve))(__mode, __path, ___argv, ___envp); })
 #else /* (__CRT_HAVE__Exit || __CRT_HAVE__exit || __CRT_HAVE_quick_exit || __CRT_HAVE_exit) && ((__ARCH_HAVE_SHARED_VM_VFORK && (__CRT_HAVE_vfork || __CRT_HAVE___vfork)) || ((__CRT_HAVE_fork || __CRT_HAVE___fork) && (__CRT_HAVE_pipe2 || __CRT_HAVE_pipe || __CRT_HAVE___pipe || __CRT_HAVE__pipe) && O_CLOEXEC && (__CRT_HAVE_read || __CRT_HAVE__read || __CRT_HAVE___read) && (__CRT_HAVE_write || __CRT_HAVE__write || __CRT_HAVE___write) && (__CRT_HAVE_close || __CRT_HAVE__close || __CRT_HAVE___close))) && __CRT_HAVE_fexecve && (__CRT_HAVE_waitpid || __CRT_HAVE___waitpid) */
 #undef __fspawnve_defined
 #endif /* (!__CRT_HAVE__Exit && !__CRT_HAVE__exit && !__CRT_HAVE_quick_exit && !__CRT_HAVE_exit) || ((!__ARCH_HAVE_SHARED_VM_VFORK || (!__CRT_HAVE_vfork && !__CRT_HAVE___vfork)) && ((!__CRT_HAVE_fork && !__CRT_HAVE___fork) || (!__CRT_HAVE_pipe2 && !__CRT_HAVE_pipe && !__CRT_HAVE___pipe && !__CRT_HAVE__pipe) || !O_CLOEXEC || (!__CRT_HAVE_read && !__CRT_HAVE__read && !__CRT_HAVE___read) || (!__CRT_HAVE_write && !__CRT_HAVE__write && !__CRT_HAVE___write) || (!__CRT_HAVE_close && !__CRT_HAVE__close && !__CRT_HAVE___close))) || !__CRT_HAVE_fexecve || (!__CRT_HAVE_waitpid && !__CRT_HAVE___waitpid) */

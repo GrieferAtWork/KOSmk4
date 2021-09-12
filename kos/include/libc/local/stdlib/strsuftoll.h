@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x74760cc2 */
+/* HASH CRC-32:0xd2bbd9aa */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -59,14 +59,14 @@ __LOCAL_LIBC(strsuftoll) __ATTR_WUNUSED __ATTR_NONNULL((1, 2)) __LONGLONG
 __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(strsuftoll))(char const *__desc, char const *__val, __LONGLONG __lo, __LONGLONG __hi) {
 	__LONGLONG __result;
 	char __error_message[128];
-	__result = __NAMESPACE_LOCAL_SYM __localdep_strsuftollx(__desc, __val, __lo, __hi,
+	__result = (__NAMESPACE_LOCAL_SYM __localdep_strsuftollx)(__desc, __val, __lo, __hi,
 	                     __error_message,
 	                     sizeof(__error_message));
 	if (__result == 0 && *__error_message) {
 #ifdef __EXIT_FAILURE
-		__NAMESPACE_LOCAL_SYM __localdep_errx(__EXIT_FAILURE, "%s", __error_message);
+		(__NAMESPACE_LOCAL_SYM __localdep_errx)(__EXIT_FAILURE, "%s", __error_message);
 #else /* __EXIT_FAILURE */
-		__NAMESPACE_LOCAL_SYM __localdep_errx(1, "%s", __error_message);
+		(__NAMESPACE_LOCAL_SYM __localdep_errx)(1, "%s", __error_message);
 #endif /* !__EXIT_FAILURE */
 	}
 	return __result;

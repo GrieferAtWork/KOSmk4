@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x3e974ae5 */
+/* HASH CRC-32:0x68daaa9 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -57,7 +57,7 @@ __NAMESPACE_LOCAL_BEGIN
 __LOCAL_LIBC(hsearch) struct entry *
 __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(hsearch))(struct entry __item, int __action) {
 	struct entry *__result;
-	__NAMESPACE_LOCAL_SYM __localdep_hsearch_r(__item, __action, &__result, &__NAMESPACE_LOCAL_SYM __htab);
+	(__NAMESPACE_LOCAL_SYM __localdep_hsearch_r)(__item, __action, &__result, &__NAMESPACE_LOCAL_SYM __htab);
 	return __result;
 }
 __NAMESPACE_LOCAL_END

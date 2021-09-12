@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x56b37872 */
+/* HASH CRC-32:0x597ea5b6 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -41,7 +41,7 @@ __LOCAL_LIBC(syslog) __ATTR_LIBC_PRINTF(2, 3) __ATTR_NONNULL((2)) void
 __NOTHROW_RPC(__VLIBCCALL __LIBC_LOCAL_NAME(syslog))(__STDC_INT_AS_UINT_T __level, char const *__format, ...) {
 	__builtin_va_list __args;
 	__builtin_va_start(__args, __format);
-	__NAMESPACE_LOCAL_SYM __localdep_vsyslog(__level, __format, __args);
+	(__NAMESPACE_LOCAL_SYM __localdep_vsyslog)(__level, __format, __args);
 	__builtin_va_end(__args);
 }
 __NAMESPACE_LOCAL_END

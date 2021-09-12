@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xe679f5c9 */
+/* HASH CRC-32:0xe6027b68 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -54,11 +54,11 @@ __NAMESPACE_LOCAL_BEGIN
 __LOCAL_LIBC(wcstoumax_r) __ATTR_LEAF __ATTR_NONNULL((1)) __UINTMAX_TYPE__
 __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(wcstoumax_r))(__WCHAR_TYPE__ const *__restrict __nptr, __WCHAR_TYPE__ **__endptr, __STDC_INT_AS_UINT_T __base, __errno_t *__error) {
 #if __SIZEOF_INTMAX_T__ >= 8
-	return (__UINTMAX_TYPE__)__NAMESPACE_LOCAL_SYM __localdep_wcstou64_r(__nptr, __endptr, __base, __error);
+	return (__UINTMAX_TYPE__)(__NAMESPACE_LOCAL_SYM __localdep_wcstou64_r)(__nptr, __endptr, __base, __error);
 #elif __SIZEOF_INTMAX_T__ >= 4
-	return (__UINTMAX_TYPE__)__NAMESPACE_LOCAL_SYM __localdep_wcstou32_r(__nptr, __endptr, __base, __error);
+	return (__UINTMAX_TYPE__)(__NAMESPACE_LOCAL_SYM __localdep_wcstou32_r)(__nptr, __endptr, __base, __error);
 #else /* ... */
-	__UINT32_TYPE__ __result = __NAMESPACE_LOCAL_SYM __localdep_wcstou32_r(__nptr, __endptr, __base, __error);
+	__UINT32_TYPE__ __result = (__NAMESPACE_LOCAL_SYM __localdep_wcstou32_r)(__nptr, __endptr, __base, __error);
 	if (__result > __UINTMAX_MAX__) {
 		if (__error) {
 #ifdef __ERANGE

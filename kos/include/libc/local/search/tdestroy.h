@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x6ff880db */
+/* HASH CRC-32:0x3e8538fc */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -47,7 +47,7 @@ __again:
 		__r = ((void **)__root)[2];
 		(*__freefct)(((void **)__root)[0]);
 #if defined(__CRT_HAVE_free) || defined(__CRT_HAVE_cfree)
-		__NAMESPACE_LOCAL_SYM __localdep_free(__root);
+		(__NAMESPACE_LOCAL_SYM __localdep_free)(__root);
 #endif /* __CRT_HAVE_free || __CRT_HAVE_cfree */
 		if (__l) {
 			if (__r)

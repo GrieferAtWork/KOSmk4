@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x4f855096 */
+/* HASH CRC-32:0x36da88e8 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -60,13 +60,13 @@ __LOCAL_LIBC(recallocv) __ATTR_MALL_DEFAULT_ALIGNED __ATTR_WUNUSED __ATTR_ALLOC_
 __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(recallocv))(void *__mallptr, __SIZE_TYPE__ __elem_count, __SIZE_TYPE__ __elem_size) {
 	void *__result;
 	__SIZE_TYPE__ __total_bytes, __oldsize;
-	__oldsize = __NAMESPACE_LOCAL_SYM __localdep_malloc_usable_size(__mallptr);
+	__oldsize = (__NAMESPACE_LOCAL_SYM __localdep_malloc_usable_size)(__mallptr);
 	if __unlikely(__hybrid_overflow_umul(__elem_count, __elem_size, &__total_bytes))
 		__total_bytes = (__SIZE_TYPE__)-1; /* Force down-stream failure */
-	__result = __NAMESPACE_LOCAL_SYM __localdep_realloc(__mallptr, __total_bytes);
+	__result = (__NAMESPACE_LOCAL_SYM __localdep_realloc)(__mallptr, __total_bytes);
 	if __likely(__result) {
 		if (__total_bytes > __oldsize)
-			__NAMESPACE_LOCAL_SYM __localdep_memset((__BYTE_TYPE__ *)__result + __oldsize, 0, __total_bytes - __oldsize);
+			(__NAMESPACE_LOCAL_SYM __localdep_memset)((__BYTE_TYPE__ *)__result + __oldsize, 0, __total_bytes - __oldsize);
 	}
 	return __result;
 }

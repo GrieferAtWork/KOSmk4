@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x9a18f624 */
+/* HASH CRC-32:0x27ce7827 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -61,10 +61,10 @@ __NAMESPACE_LOCAL_BEGIN
 __LOCAL_LIBC(getpw) int
 __NOTHROW_RPC(__LIBCCALL __LIBC_LOCAL_NAME(getpw))(__uid_t __uid, char *__buffer) {
 	struct passwd *__ent;
-	__ent = __NAMESPACE_LOCAL_SYM __localdep_getpwuid(__uid);
+	__ent = (__NAMESPACE_LOCAL_SYM __localdep_getpwuid)(__uid);
 	if __unlikely(!__ent)
 		goto __err;
-	__NAMESPACE_LOCAL_SYM __localdep_sprintf(__buffer,
+	(__NAMESPACE_LOCAL_SYM __localdep_sprintf)(__buffer,
 	        "%s:%s:"
 	        "%" __PRIN_PREFIX(__SIZEOF_UID_T__) "u:"
 	        "%" __PRIN_PREFIX(__SIZEOF_GID_T__) "u:"

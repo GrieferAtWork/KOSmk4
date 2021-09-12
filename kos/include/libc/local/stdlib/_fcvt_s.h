@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xdd91feea */
+/* HASH CRC-32:0x495dc65d */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -41,7 +41,7 @@ __LOCAL_LIBC(_fcvt_s) __ATTR_NONNULL((1, 5, 6)) __errno_t
 __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(_fcvt_s))(char *__buf, __SIZE_TYPE__ __buflen, double __val, int __ndigit, int *__restrict __decptr, int *__restrict __sign) {
 	if (!__buf || !__decptr || !__sign)
 		return __EINVAL;
-	__NAMESPACE_LOCAL_SYM __localdep_fcvt_r(__val, __ndigit, __decptr, __sign, __buf, __buflen);
+	(__NAMESPACE_LOCAL_SYM __localdep_fcvt_r)(__val, __ndigit, __decptr, __sign, __buf, __buflen);
 	return 0;
 }
 __NAMESPACE_LOCAL_END

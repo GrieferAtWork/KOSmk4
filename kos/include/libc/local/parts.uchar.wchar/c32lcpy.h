@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x62f09951 */
+/* HASH CRC-32:0x1378ca06 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -54,9 +54,9 @@ __NAMESPACE_LOCAL_BEGIN
 #endif /* !__local___localdep_memcpy_defined */
 __LOCAL_LIBC(c32lcpy) __ATTR_LEAF __ATTR_NONNULL((1, 2)) __SIZE_TYPE__
 __NOTHROW_NCX(__LIBKCALL __LIBC_LOCAL_NAME(c32lcpy))(__CHAR32_TYPE__ *__restrict __dst, __CHAR32_TYPE__ const *__restrict __src, __SIZE_TYPE__ __bufsize) {
-	__SIZE_TYPE__ __result = __NAMESPACE_LOCAL_SYM __localdep_c32slen(__src);
+	__SIZE_TYPE__ __result = (__NAMESPACE_LOCAL_SYM __localdep_c32slen)(__src);
 	__SIZE_TYPE__ __copy_size = __result < __bufsize ? __result : __bufsize - 1;
-	__NAMESPACE_LOCAL_SYM __localdep_memcpy(__dst, __src, __copy_size*sizeof(__CHAR32_TYPE__));
+	(__NAMESPACE_LOCAL_SYM __localdep_memcpy)(__dst, __src, __copy_size*sizeof(__CHAR32_TYPE__));
 	__dst[__copy_size] = '\0';
 	return __result;
 }

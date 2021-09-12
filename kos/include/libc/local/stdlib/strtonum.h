@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x11df283e */
+/* HASH CRC-32:0x93753ded */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -45,7 +45,7 @@ __LOCAL_LIBC(strtonum) __ATTR_WUNUSED __ATTR_NONNULL((1, 4)) __LONGLONG
 __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(strtonum))(char const *__nptr, __LONGLONG __lo, __LONGLONG __hi, char const **__p_errstr) {
 	__errno_t __error;
 	__LONGLONG __result;
-	__result = (__LONGLONG)__NAMESPACE_LOCAL_SYM __localdep_strtoi(__nptr, __NULLPTR, 10, __lo, __hi, &__error);
+	__result = (__LONGLONG)(__NAMESPACE_LOCAL_SYM __localdep_strtoi)(__nptr, __NULLPTR, 10, __lo, __hi, &__error);
 	if (__error == 0) {
 		if (__p_errstr)
 			*__p_errstr = __NULLPTR;

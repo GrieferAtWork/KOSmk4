@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x2cfd499e */
+/* HASH CRC-32:0x9d35ae58 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -38,7 +38,7 @@ __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(qecvt))(__LONGDOUBLE __val, int __ndi
 
 	static char __qcvt_buffer[32];
 
-	if (__NAMESPACE_LOCAL_SYM __localdep_qecvt_r(__val, __ndigit, __decptr, __sign,  __qcvt_buffer, sizeof(__qcvt_buffer)))
+	if ((__NAMESPACE_LOCAL_SYM __localdep_qecvt_r)(__val, __ndigit, __decptr, __sign,  __qcvt_buffer, sizeof(__qcvt_buffer)))
 		return __NULLPTR;
 	return __qcvt_buffer;
 }

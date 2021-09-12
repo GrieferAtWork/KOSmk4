@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xd62a3a9a */
+/* HASH CRC-32:0x7776c241 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -55,7 +55,7 @@ __NOTHROW_NCX(__LIBDCALL __LIBC_LOCAL_NAME(format_16to8))(void *__arg, __CHAR16_
 		__closure->__fd_surrogate = 0;
 		__ch += 0x10000;
 		__ch += ((__CHAR16_TYPE__ const *)__data)[0] - 0xdc00;
-		__dst = __NAMESPACE_LOCAL_SYM __localdep_unicode_writeutf8(__dst, __ch);
+		__dst = (__NAMESPACE_LOCAL_SYM __localdep_unicode_writeutf8)(__dst, __ch);
 		__i = 1;
 		goto __after_dst_write;
 	}
@@ -75,7 +75,7 @@ __NOTHROW_NCX(__LIBDCALL __LIBC_LOCAL_NAME(format_16to8))(void *__arg, __CHAR16_
 			} else {
 				__ch = __ch16;
 			}
-			__dst = __NAMESPACE_LOCAL_SYM __localdep_unicode_writeutf8(__dst, __ch);
+			__dst = (__NAMESPACE_LOCAL_SYM __localdep_unicode_writeutf8)(__dst, __ch);
 __after_dst_write:
 			;
 		} while ((__dst + 4) < __COMPILER_ENDOF(__buf) && __i < __datalen);

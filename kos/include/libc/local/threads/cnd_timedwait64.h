@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x30829658 */
+/* HASH CRC-32:0x1f389ded */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -56,7 +56,7 @@ __NAMESPACE_LOCAL_BEGIN
 __LOCAL_LIBC(cnd_timedwait64) __ATTR_NONNULL((1, 2, 3)) int
 __NOTHROW_RPC(__LIBCCALL __LIBC_LOCAL_NAME(cnd_timedwait64))(__cnd_t *__restrict __cond, __mtx_t *__restrict __mutex, struct __timespec64 const *__restrict __time_point) {
 	__errno_t __error;
-	__error = __NAMESPACE_LOCAL_SYM __localdep_pthread_cond_timedwait64((__pthread_cond_t *)__cond,
+	__error = (__NAMESPACE_LOCAL_SYM __localdep_pthread_cond_timedwait64)((__pthread_cond_t *)__cond,
 	                                 (__pthread_mutex_t *)__mutex,
 	                                 __time_point);
 	if __likely(!__error)

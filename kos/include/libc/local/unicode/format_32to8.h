@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xaaab7b52 */
+/* HASH CRC-32:0x36282870 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -101,7 +101,7 @@ __NOTHROW_NCX(__LIBKCALL __LIBC_LOCAL_NAME(format_32to8))(void *__arg, __CHAR32_
 	while (__i < __datalen) {
 		char *__dst = __buf;
 		do {
-			__dst = __NAMESPACE_LOCAL_SYM __localdep_unicode_writeutf8(__dst, ((__CHAR32_TYPE__ const *)__data)[__i++]);
+			__dst = (__NAMESPACE_LOCAL_SYM __localdep_unicode_writeutf8)(__dst, ((__CHAR32_TYPE__ const *)__data)[__i++]);
 		} while ((__dst + 7) < __COMPILER_ENDOF(__buf) && __i < __datalen);
 		__temp = (*__closure->__fd_printer)(__closure->__fd_arg, __buf, (__SIZE_TYPE__)(__dst - __buf));
 		if __unlikely(__temp < 0)

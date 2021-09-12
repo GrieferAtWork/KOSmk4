@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xab1603a0 */
+/* HASH CRC-32:0xe15b2e17 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -61,12 +61,12 @@ __NAMESPACE_LOCAL_BEGIN
 __LOCAL_LIBC(filelength) __ATTR_WUNUSED __LONG32_TYPE__
 __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(filelength))(__fd_t __fd) {
 	__LONG32_TYPE__ __oldpos, __result;
-	__oldpos = __NAMESPACE_LOCAL_SYM __localdep_lseek(__fd, 0, __SEEK_CUR);
+	__oldpos = (__NAMESPACE_LOCAL_SYM __localdep_lseek)(__fd, 0, __SEEK_CUR);
 	if __unlikely(__oldpos < 0)
 		return -1;
-	__result = __NAMESPACE_LOCAL_SYM __localdep_lseek(__fd, 0, __SEEK_END);
+	__result = (__NAMESPACE_LOCAL_SYM __localdep_lseek)(__fd, 0, __SEEK_END);
 	if __likely(__result >= 0)
-		__NAMESPACE_LOCAL_SYM __localdep_lseek(__fd, __oldpos, __SEEK_SET);
+		(__NAMESPACE_LOCAL_SYM __localdep_lseek)(__fd, __oldpos, __SEEK_SET);
 	return __result;
 }
 __NAMESPACE_LOCAL_END

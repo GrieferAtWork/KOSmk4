@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x382a2589 */
+/* HASH CRC-32:0x6512b343 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -78,14 +78,14 @@ __LOCAL_LIBC(argz_create_sep) __ATTR_NONNULL((1, 3, 4)) __errno_t
 __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(argz_create_sep))(char const *__restrict __string, int __sep, char **__restrict __pargz, __SIZE_TYPE__ *__restrict __pargz_len) {
 	/* return string.replace(sep, "\0").replaceall("\0\0", "\0"); */
 	char *__result_string, *__dst;
-	__SIZE_TYPE__ __slen = __NAMESPACE_LOCAL_SYM __localdep_strlen(__string);
+	__SIZE_TYPE__ __slen = (__NAMESPACE_LOCAL_SYM __localdep_strlen)(__string);
 	if __unlikely(!__slen) {
 __empty_argz:
 		*__pargz     = __NULLPTR;
 		*__pargz_len = 0;
 		return 0;
 	}
-	__result_string = (char *)__NAMESPACE_LOCAL_SYM __localdep_malloc((__slen + 1) * sizeof(char));
+	__result_string = (char *)(__NAMESPACE_LOCAL_SYM __localdep_malloc)((__slen + 1) * sizeof(char));
 	*__pargz = __result_string;
 	if __unlikely(!__result_string) {
 		*__pargz_len = 0;
@@ -116,7 +116,7 @@ __again_check_ch:
 	}
 	if __unlikely(__dst == __result_string) {
 		/* Empty string. (this can happen if `string' only consisted of `sep' characters) */
-		__NAMESPACE_LOCAL_SYM __localdep_free(__result_string);
+		(__NAMESPACE_LOCAL_SYM __localdep_free)(__result_string);
 		goto __empty_argz;
 	}
 	/* Write the terminating NUL-byte (if there isn't one already) */

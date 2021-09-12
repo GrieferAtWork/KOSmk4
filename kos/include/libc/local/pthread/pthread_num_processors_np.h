@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x10c71008 */
+/* HASH CRC-32:0x4a340e26 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -38,7 +38,7 @@ __NAMESPACE_LOCAL_BEGIN
 __LOCAL_LIBC(pthread_num_processors_np) __STDC_INT_AS_SIZE_T
 __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(pthread_num_processors_np))(void) {
 	struct __cpu_set_struct __cset;
-	if __unlikely(__NAMESPACE_LOCAL_SYM __localdep_sched_getaffinity(0, sizeof(__cset), &__cset) != 0)
+	if __unlikely((__NAMESPACE_LOCAL_SYM __localdep_sched_getaffinity)(0, sizeof(__cset), &__cset) != 0)
 		return 1;
 	return (__STDC_INT_AS_SIZE_T)__CPU_COUNT_S(sizeof(__cset), &__cset);
 }

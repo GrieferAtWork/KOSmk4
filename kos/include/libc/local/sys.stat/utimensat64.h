@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xe5fec131 */
+/* HASH CRC-32:0xe49b3a5d */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -37,7 +37,7 @@ __NOTHROW_RPC(__LIBCCALL __LIBC_LOCAL_NAME(utimensat64))(__fd_t __dirfd, char co
 #ifdef __AT_CHANGE_CTIME
 	struct __timespec32 __tms[3];
 	if (!__times)
-		return __NAMESPACE_LOCAL_SYM __localdep_utimensat32(__dirfd, __filename, __NULLPTR, __flags);
+		return (__NAMESPACE_LOCAL_SYM __localdep_utimensat32)(__dirfd, __filename, __NULLPTR, __flags);
 	__tms[0].tv_sec  = (__time32_t)__times[0].tv_sec;
 	__tms[0].tv_nsec = __times[0].tv_nsec;
 	__tms[1].tv_sec  = (__time32_t)__times[1].tv_sec;
@@ -46,16 +46,16 @@ __NOTHROW_RPC(__LIBCCALL __LIBC_LOCAL_NAME(utimensat64))(__fd_t __dirfd, char co
 		__tms[2].tv_sec  = (__time32_t)__times[2].tv_sec;
 		__tms[2].tv_nsec = __times[2].tv_nsec;
 	}
-	return __NAMESPACE_LOCAL_SYM __localdep_utimensat32(__dirfd, __filename, __tms, __flags);
+	return (__NAMESPACE_LOCAL_SYM __localdep_utimensat32)(__dirfd, __filename, __tms, __flags);
 #else /* __AT_CHANGE_CTIME */
 	struct __timespec32 __tms[2];
 	if (!__times)
-		return __NAMESPACE_LOCAL_SYM __localdep_utimensat32(__dirfd, __filename, __NULLPTR, __flags);
+		return (__NAMESPACE_LOCAL_SYM __localdep_utimensat32)(__dirfd, __filename, __NULLPTR, __flags);
 	__tms[0].tv_sec  = (__time32_t)__times[0].tv_sec;
 	__tms[0].tv_nsec = __times[0].tv_nsec;
 	__tms[1].tv_sec  = (__time32_t)__times[1].tv_sec;
 	__tms[1].tv_nsec = __times[1].tv_nsec;
-	return __NAMESPACE_LOCAL_SYM __localdep_utimensat32(__dirfd, __filename, __tms, __flags);
+	return (__NAMESPACE_LOCAL_SYM __localdep_utimensat32)(__dirfd, __filename, __tms, __flags);
 #endif /* !__AT_CHANGE_CTIME */
 }
 __NAMESPACE_LOCAL_END

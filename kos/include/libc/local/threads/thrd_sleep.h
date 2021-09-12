@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xc0bd4a1f */
+/* HASH CRC-32:0x3636b476 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -60,7 +60,7 @@ __NOTHROW_RPC(__LIBCCALL __LIBC_LOCAL_NAME(thrd_sleep))(struct timespec const *_
 	struct __timespec32 __tp32, __rem32;
 	__tp32.tv_sec  = (__time32_t)__time_point->tv_sec;
 	__tp32.tv_nsec = __time_point->tv_nsec;
-	__result = __NAMESPACE_LOCAL_SYM __localdep_thrd_sleep32(&__tp32, __remaining ? &__rem32 : __NULLPTR);
+	__result = (__NAMESPACE_LOCAL_SYM __localdep_thrd_sleep32)(&__tp32, __remaining ? &__rem32 : __NULLPTR);
 	if (__result == -1 && __remaining) {
 		__remaining->tv_sec = (__time64_t)__rem32.tv_sec;
 		__remaining->tv_nsec = __rem32.tv_nsec;
@@ -71,7 +71,7 @@ __NOTHROW_RPC(__LIBCCALL __LIBC_LOCAL_NAME(thrd_sleep))(struct timespec const *_
 	struct __timespec64 __tp64, __rem64;
 	__tp64.tv_sec  = (__time64_t)__time_point->tv_sec;
 	__tp64.tv_nsec = __time_point->tv_nsec;
-	__result = __NAMESPACE_LOCAL_SYM __localdep_crt_thrd_sleep64(&__tp64, __remaining ? &__rem64 : __NULLPTR);
+	__result = (__NAMESPACE_LOCAL_SYM __localdep_crt_thrd_sleep64)(&__tp64, __remaining ? &__rem64 : __NULLPTR);
 	if (__result == -1 && __remaining) {
 		__remaining->tv_sec = (__time32_t)__rem64.tv_sec;
 		__remaining->tv_nsec = __rem64.tv_nsec;
@@ -79,7 +79,7 @@ __NOTHROW_RPC(__LIBCCALL __LIBC_LOCAL_NAME(thrd_sleep))(struct timespec const *_
 	return __result;
 #else /* ... */
 	int __result;
-	__result = __NAMESPACE_LOCAL_SYM __localdep_nanosleep(__time_point, __remaining);
+	__result = (__NAMESPACE_LOCAL_SYM __localdep_nanosleep)(__time_point, __remaining);
 	if __likely(__result == 0)
 		return 0;
 #if defined(__libc_geterrno) && defined(__EINTR)

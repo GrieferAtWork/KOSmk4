@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x81a22893 */
+/* HASH CRC-32:0xbf7ffee3 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -197,7 +197,7 @@ __NOTHROW_RPC(__LIBCCALL __LIBC_LOCAL_NAME(fparseln))(__FILE *__stream, __SIZE_T
 		__SSIZE_TYPE__ __line_len;
 		__SIZE_TYPE__ __i;
 __again_getline:
-		__line_len = __NAMESPACE_LOCAL_SYM __localdep_getline(&__linebuf_ptr, &__linebuf_alloc, __stream);
+		__line_len = (__NAMESPACE_LOCAL_SYM __localdep_getline)(&__linebuf_ptr, &__linebuf_alloc, __stream);
 		if __unlikely(__line_len < 0)
 			goto __err;
 		if (!__line_len)
@@ -221,7 +221,7 @@ __apped_current_line_and_stop:
 				__ch = __linebuf_ptr[__i];
 				if (__ch == __delim_escape && (__flags & __FPARSELN_UNESCESC)) {
 __do_erase_character_preceding_i_without_rescan:
-					__NAMESPACE_LOCAL_SYM __localdep_memmovedownc(&__linebuf_ptr[__i - 1],
+					(__NAMESPACE_LOCAL_SYM __localdep_memmovedownc)(&__linebuf_ptr[__i - 1],
 					             &__linebuf_ptr[__i],
 					             (__SIZE_TYPE__)__line_len - __i,
 					             sizeof(char));
@@ -234,7 +234,7 @@ __do_erase_character_preceding_i_without_rescan:
 					--__i;
 __deleted_escaped_newline_starting_at_i:
 					__line_len -= 2;
-					__NAMESPACE_LOCAL_SYM __localdep_memmovedownc(&__linebuf_ptr[__i],
+					(__NAMESPACE_LOCAL_SYM __localdep_memmovedownc)(&__linebuf_ptr[__i],
 					             &__linebuf_ptr[__i + 2],
 					             (__SIZE_TYPE__)__line_len - __i,
 					             sizeof(char));
@@ -257,17 +257,17 @@ __apped_current_line_and_continue_or_stop:
 								__SIZE_TYPE__ __new_alloc = __result_alloc * 2;
 								if (__new_alloc < __total_length)
 									__new_alloc = __total_length + 1;
-								__new_result = (char *)__NAMESPACE_LOCAL_SYM __localdep_realloc(__result, __new_alloc * sizeof(char));
+								__new_result = (char *)(__NAMESPACE_LOCAL_SYM __localdep_realloc)(__result, __new_alloc * sizeof(char));
 								if __unlikely(!__new_result) {
 									__new_alloc = __total_length + 1;
-									__new_result = (char *)__NAMESPACE_LOCAL_SYM __localdep_realloc(__result, __new_alloc * sizeof(char));
+									__new_result = (char *)(__NAMESPACE_LOCAL_SYM __localdep_realloc)(__result, __new_alloc * sizeof(char));
 									if __unlikely(!__new_result)
 										goto __err;
 								}
 								__result       = __new_result;
 								__result_alloc = __new_alloc;
 							}
-							__NAMESPACE_LOCAL_SYM __localdep_memcpyc(__result + __result_length, __linebuf_ptr,
+							(__NAMESPACE_LOCAL_SYM __localdep_memcpyc)(__result + __result_length, __linebuf_ptr,
 							        (__SIZE_TYPE__)__line_len, sizeof(char));
 							__result_length = __total_length;
 						}
@@ -306,19 +306,19 @@ __apped_current_line_and_continue_or_stop:
 					 *       the given `stream' pointed at the first character of the
 					 *       line succeeding the one returned by getline()! */
 					for (;;) {
-						int __comment_ch = __NAMESPACE_LOCAL_SYM __localdep_fgetc(__stream);
+						int __comment_ch = (__NAMESPACE_LOCAL_SYM __localdep_fgetc)(__stream);
 __again_check_ch_in_comment:
 						if (__comment_ch == __EOF)
 							break; /* end-of-file */
 						if (__comment_ch == __delim_escape && __delim_escape) {
-							__comment_ch = __NAMESPACE_LOCAL_SYM __localdep_fgetc(__stream);
+							__comment_ch = (__NAMESPACE_LOCAL_SYM __localdep_fgetc)(__stream);
 							if (__comment_ch == '\r' || __comment_ch == '\n') {
 								if (__plineno)
 									++*__plineno;
 								if (__comment_ch == '\r') {
-									__comment_ch = __NAMESPACE_LOCAL_SYM __localdep_fgetc(__stream);
+									__comment_ch = (__NAMESPACE_LOCAL_SYM __localdep_fgetc)(__stream);
 									if (__comment_ch != '\n')
-										__NAMESPACE_LOCAL_SYM __localdep_ungetc(__comment_ch, __stream);
+										(__NAMESPACE_LOCAL_SYM __localdep_ungetc)(__comment_ch, __stream);
 								}
 								if (__delim_escape == __delim_continue)
 									continue;
@@ -327,14 +327,14 @@ __again_check_ch_in_comment:
 							continue;
 						}
 						if (__comment_ch == __delim_continue && __delim_continue) {
-							__comment_ch = __NAMESPACE_LOCAL_SYM __localdep_fgetc(__stream);
+							__comment_ch = (__NAMESPACE_LOCAL_SYM __localdep_fgetc)(__stream);
 							if (__comment_ch == '\r' || __comment_ch == '\n') {
 								if (__plineno)
 									++*__plineno;
 								if (__comment_ch == '\r') {
-									__comment_ch = __NAMESPACE_LOCAL_SYM __localdep_fgetc(__stream);
+									__comment_ch = (__NAMESPACE_LOCAL_SYM __localdep_fgetc)(__stream);
 									if (__comment_ch != '\n')
-										__NAMESPACE_LOCAL_SYM __localdep_ungetc(__comment_ch, __stream);
+										(__NAMESPACE_LOCAL_SYM __localdep_ungetc)(__comment_ch, __stream);
 								}
 								continue; /* Escaped line-feed */
 							}
@@ -347,9 +347,9 @@ __do_increment_lineno_and_break_comment:
 							break;
 						}
 						if (__comment_ch == '\r') {
-							__comment_ch = __NAMESPACE_LOCAL_SYM __localdep_fgetc(__stream);
+							__comment_ch = (__NAMESPACE_LOCAL_SYM __localdep_fgetc)(__stream);
 							if (__comment_ch != '\n')
-								__NAMESPACE_LOCAL_SYM __localdep_ungetc(__comment_ch, __stream);
+								(__NAMESPACE_LOCAL_SYM __localdep_ungetc)(__comment_ch, __stream);
 							goto __do_increment_lineno_and_break_comment;
 						}
 					}
@@ -371,7 +371,7 @@ __got_result:
 			/*linebuf_alloc = 0;*/ /* Not needed */
 		} else {
 
-			__result = (char *)__NAMESPACE_LOCAL_SYM __localdep_malloc(sizeof(char));
+			__result = (char *)(__NAMESPACE_LOCAL_SYM __localdep_malloc)(sizeof(char));
 
 
 
@@ -381,7 +381,7 @@ __got_result:
 		}
 	}
 #if defined(__CRT_HAVE_free) || defined(__CRT_HAVE_cfree)
-	__NAMESPACE_LOCAL_SYM __localdep_free(__linebuf_ptr);
+	(__NAMESPACE_LOCAL_SYM __localdep_free)(__linebuf_ptr);
 #endif /* __CRT_HAVE_free || __CRT_HAVE_cfree */
 	/* Trim a potential trailing line-feed */
 	if (__result_length && __result[__result_length - 1] == '\n')
@@ -390,7 +390,7 @@ __got_result:
 	if (__result_length + 1 < __result_alloc) {
 		/* Try to release unused memory. */
 		char *__new_result;
-		__new_result = (char *)__NAMESPACE_LOCAL_SYM __localdep_realloc(__result,
+		__new_result = (char *)(__NAMESPACE_LOCAL_SYM __localdep_realloc)(__result,
 		                             (__result_length + 1) *
 		                             sizeof(char));
 		if __likely(__new_result)
@@ -404,8 +404,8 @@ __done:
 	return __result;
 __err:
 #if defined(__CRT_HAVE_free) || defined(__CRT_HAVE_cfree)
-	__NAMESPACE_LOCAL_SYM __localdep_free(__linebuf_ptr);
-	__NAMESPACE_LOCAL_SYM __localdep_free(__result);
+	(__NAMESPACE_LOCAL_SYM __localdep_free)(__linebuf_ptr);
+	(__NAMESPACE_LOCAL_SYM __localdep_free)(__result);
 #endif /* __CRT_HAVE_free || __CRT_HAVE_cfree */
 	return __NULLPTR;
 }

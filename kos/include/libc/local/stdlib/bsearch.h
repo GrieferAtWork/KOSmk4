@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xbc9a9b3e */
+/* HASH CRC-32:0x6cb9af23 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -61,11 +61,11 @@ __NAMESPACE_LOCAL_BEGIN
 __LOCAL_LIBC(bsearch) __ATTR_WUNUSED __ATTR_NONNULL((1, 2, 5)) void *
 (__LIBCCALL __LIBC_LOCAL_NAME(bsearch))(void const *__pkey, void const *__pbase, __SIZE_TYPE__ __item_count, __SIZE_TYPE__ __item_size, __compar_fn_t __cmp) __THROWS(...) {
 #ifdef __LIBCCALL_CALLER_CLEANUP
-	return (void *)__NAMESPACE_LOCAL_SYM __localdep_bsearch_r(__pkey, __pbase, __item_count, __item_size,
+	return (void *)(__NAMESPACE_LOCAL_SYM __localdep_bsearch_r)(__pkey, __pbase, __item_count, __item_size,
 	                         (int(__LIBCCALL *)(void const *, void const *, void *))(void *)__cmp,
 	                         __NULLPTR);
 #else /* __LIBCCALL_CALLER_CLEANUP */
-	return (void *)__NAMESPACE_LOCAL_SYM __localdep_bsearch_r(__pkey, __pbase, __item_count, __item_size,
+	return (void *)(__NAMESPACE_LOCAL_SYM __localdep_bsearch_r)(__pkey, __pbase, __item_count, __item_size,
 	                         &__NAMESPACE_LOCAL_SYM __invoke_compare_helper,
 	                         (void *)__cmp);
 #endif /* !__LIBCCALL_CALLER_CLEANUP */

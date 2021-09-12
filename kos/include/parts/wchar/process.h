@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xb3a8556 */
+/* HASH CRC-32:0xc5a2bcb3 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -99,9 +99,9 @@ __LIBC __ATTR_SENTINEL __ATTR_NONNULL((1)) int __NOTHROW_RPC(__VLIBCCALL wexecl)
 #elif defined(__CRT_HAVE_wexecv) || defined(__CRT_HAVE__wexecv)
 #include <libc/local/parts.wchar.process/wexecl.h>
 #ifdef __cplusplus
-__NAMESPACE_LOCAL_USING_OR_IMPL(wexecl, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_SENTINEL __ATTR_NONNULL((1)) int __NOTHROW_RPC(__VLIBCCALL wexecl)(wchar_t const *__restrict __path, wchar_t const *__args, ...) { return __NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(wexecl)(__path, __args, __builtin_va_arg_pack()); })
+__NAMESPACE_LOCAL_USING_OR_IMPL(wexecl, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_SENTINEL __ATTR_NONNULL((1)) int __NOTHROW_RPC(__VLIBCCALL wexecl)(wchar_t const *__restrict __path, wchar_t const *__args, ...) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(wexecl))(__path, __args, __builtin_va_arg_pack()); })
 #else /* __cplusplus */
-#define wexecl __NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(wexecl)
+#define wexecl (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(wexecl))
 #endif /* !__cplusplus */
 #else /* ... */
 #undef __wexecl_defined
@@ -116,9 +116,9 @@ __LIBC __ATTR_SENTINEL __ATTR_NONNULL((1)) int __NOTHROW_RPC(__VLIBCCALL wexeclp
 #elif defined(__CRT_HAVE_wexecvp) || defined(__CRT_HAVE__wexecvp)
 #include <libc/local/parts.wchar.process/wexeclp.h>
 #ifdef __cplusplus
-__NAMESPACE_LOCAL_USING_OR_IMPL(wexeclp, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_SENTINEL __ATTR_NONNULL((1)) int __NOTHROW_RPC(__VLIBCCALL wexeclp)(wchar_t const *__restrict __file, wchar_t const *__args, ...) { return __NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(wexeclp)(__file, __args, __builtin_va_arg_pack()); })
+__NAMESPACE_LOCAL_USING_OR_IMPL(wexeclp, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_SENTINEL __ATTR_NONNULL((1)) int __NOTHROW_RPC(__VLIBCCALL wexeclp)(wchar_t const *__restrict __file, wchar_t const *__args, ...) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(wexeclp))(__file, __args, __builtin_va_arg_pack()); })
 #else /* __cplusplus */
-#define wexeclp __NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(wexeclp)
+#define wexeclp (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(wexeclp))
 #endif /* !__cplusplus */
 #else /* ... */
 #undef __wexeclp_defined
@@ -133,9 +133,9 @@ __LIBC __ATTR_SENTINEL_O(1) __ATTR_NONNULL((1)) int __NOTHROW_RPC(__VLIBCCALL we
 #elif defined(__CRT_HAVE_wexecve) || defined(__CRT_HAVE__wexecve)
 #include <libc/local/parts.wchar.process/wexecle.h>
 #ifdef __cplusplus
-__NAMESPACE_LOCAL_USING_OR_IMPL(wexecle, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_SENTINEL_O(1) __ATTR_NONNULL((1)) int __NOTHROW_RPC(__VLIBCCALL wexecle)(wchar_t const *__restrict __path, wchar_t const *__args, ...) { return __NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(wexecle)(__path, __args, __builtin_va_arg_pack()); })
+__NAMESPACE_LOCAL_USING_OR_IMPL(wexecle, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_SENTINEL_O(1) __ATTR_NONNULL((1)) int __NOTHROW_RPC(__VLIBCCALL wexecle)(wchar_t const *__restrict __path, wchar_t const *__args, ...) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(wexecle))(__path, __args, __builtin_va_arg_pack()); })
 #else /* __cplusplus */
-#define wexecle __NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(wexecle)
+#define wexecle (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(wexecle))
 #endif /* !__cplusplus */
 #else /* ... */
 #undef __wexecle_defined
@@ -150,9 +150,9 @@ __LIBC __ATTR_SENTINEL_O(1) __ATTR_NONNULL((1)) int __NOTHROW_RPC(__VLIBCCALL we
 #elif defined(__CRT_HAVE_wexecvpe) || defined(__CRT_HAVE__wexecvpe)
 #include <libc/local/parts.wchar.process/wexeclpe.h>
 #ifdef __cplusplus
-__NAMESPACE_LOCAL_USING_OR_IMPL(wexeclpe, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_SENTINEL_O(1) __ATTR_NONNULL((1)) int __NOTHROW_RPC(__VLIBCCALL wexeclpe)(wchar_t const *__restrict __file, wchar_t const *__args, ...) { return __NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(wexeclpe)(__file, __args, __builtin_va_arg_pack()); })
+__NAMESPACE_LOCAL_USING_OR_IMPL(wexeclpe, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_SENTINEL_O(1) __ATTR_NONNULL((1)) int __NOTHROW_RPC(__VLIBCCALL wexeclpe)(wchar_t const *__restrict __file, wchar_t const *__args, ...) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(wexeclpe))(__file, __args, __builtin_va_arg_pack()); })
 #else /* __cplusplus */
-#define wexeclpe __NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(wexeclpe)
+#define wexeclpe (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(wexeclpe))
 #endif /* !__cplusplus */
 #else /* ... */
 #undef __wexeclpe_defined
@@ -207,9 +207,9 @@ __LIBC __ATTR_SENTINEL __ATTR_NONNULL((2)) __pid_t __NOTHROW_RPC(__VLIBCCALL wsp
 #elif defined(__CRT_HAVE_wspawnv) || defined(__CRT_HAVE__wspawnv)
 #include <libc/local/parts.wchar.process/wspawnl.h>
 #ifdef __cplusplus
-__NAMESPACE_LOCAL_USING_OR_IMPL(wspawnl, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_SENTINEL __ATTR_NONNULL((2)) __pid_t __NOTHROW_RPC(__VLIBCCALL wspawnl)(__STDC_INT_AS_UINT_T __mode, wchar_t const *__restrict __path, wchar_t const *__args, ...) { return __NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(wspawnl)(__mode, __path, __args, __builtin_va_arg_pack()); })
+__NAMESPACE_LOCAL_USING_OR_IMPL(wspawnl, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_SENTINEL __ATTR_NONNULL((2)) __pid_t __NOTHROW_RPC(__VLIBCCALL wspawnl)(__STDC_INT_AS_UINT_T __mode, wchar_t const *__restrict __path, wchar_t const *__args, ...) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(wspawnl))(__mode, __path, __args, __builtin_va_arg_pack()); })
 #else /* __cplusplus */
-#define wspawnl __NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(wspawnl)
+#define wspawnl (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(wspawnl))
 #endif /* !__cplusplus */
 #else /* ... */
 #undef __wspawnl_defined
@@ -224,9 +224,9 @@ __LIBC __ATTR_SENTINEL __ATTR_NONNULL((2)) __pid_t __NOTHROW_RPC(__VLIBCCALL wsp
 #elif defined(__CRT_HAVE_wspawnvp) || defined(__CRT_HAVE__wspawnvp)
 #include <libc/local/parts.wchar.process/wspawnlp.h>
 #ifdef __cplusplus
-__NAMESPACE_LOCAL_USING_OR_IMPL(wspawnlp, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_SENTINEL __ATTR_NONNULL((2)) __pid_t __NOTHROW_RPC(__VLIBCCALL wspawnlp)(__STDC_INT_AS_UINT_T __mode, wchar_t const *__restrict __file, wchar_t const *__args, ...) { return __NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(wspawnlp)(__mode, __file, __args, __builtin_va_arg_pack()); })
+__NAMESPACE_LOCAL_USING_OR_IMPL(wspawnlp, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_SENTINEL __ATTR_NONNULL((2)) __pid_t __NOTHROW_RPC(__VLIBCCALL wspawnlp)(__STDC_INT_AS_UINT_T __mode, wchar_t const *__restrict __file, wchar_t const *__args, ...) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(wspawnlp))(__mode, __file, __args, __builtin_va_arg_pack()); })
 #else /* __cplusplus */
-#define wspawnlp __NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(wspawnlp)
+#define wspawnlp (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(wspawnlp))
 #endif /* !__cplusplus */
 #else /* ... */
 #undef __wspawnlp_defined
@@ -241,9 +241,9 @@ __LIBC __ATTR_SENTINEL_O(1) __ATTR_NONNULL((2)) __pid_t __NOTHROW_RPC(__VLIBCCAL
 #elif defined(__CRT_HAVE_wspawnve) || defined(__CRT_HAVE__wspawnve)
 #include <libc/local/parts.wchar.process/wspawnle.h>
 #ifdef __cplusplus
-__NAMESPACE_LOCAL_USING_OR_IMPL(wspawnle, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_SENTINEL_O(1) __ATTR_NONNULL((2)) __pid_t __NOTHROW_RPC(__VLIBCCALL wspawnle)(__STDC_INT_AS_UINT_T __mode, wchar_t const *__restrict __path, wchar_t const *__args, ...) { return __NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(wspawnle)(__mode, __path, __args, __builtin_va_arg_pack()); })
+__NAMESPACE_LOCAL_USING_OR_IMPL(wspawnle, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_SENTINEL_O(1) __ATTR_NONNULL((2)) __pid_t __NOTHROW_RPC(__VLIBCCALL wspawnle)(__STDC_INT_AS_UINT_T __mode, wchar_t const *__restrict __path, wchar_t const *__args, ...) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(wspawnle))(__mode, __path, __args, __builtin_va_arg_pack()); })
 #else /* __cplusplus */
-#define wspawnle __NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(wspawnle)
+#define wspawnle (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(wspawnle))
 #endif /* !__cplusplus */
 #else /* ... */
 #undef __wspawnle_defined
@@ -258,9 +258,9 @@ __LIBC __ATTR_SENTINEL_O(1) __ATTR_NONNULL((2)) __pid_t __NOTHROW_RPC(__VLIBCCAL
 #elif defined(__CRT_HAVE_wspawnvpe) || defined(__CRT_HAVE__wspawnvpe)
 #include <libc/local/parts.wchar.process/wspawnlpe.h>
 #ifdef __cplusplus
-__NAMESPACE_LOCAL_USING_OR_IMPL(wspawnlpe, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_SENTINEL_O(1) __ATTR_NONNULL((2)) __pid_t __NOTHROW_RPC(__VLIBCCALL wspawnlpe)(__STDC_INT_AS_UINT_T __mode, wchar_t const *__restrict __file, wchar_t const *__args, ...) { return __NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(wspawnlpe)(__mode, __file, __args, __builtin_va_arg_pack()); })
+__NAMESPACE_LOCAL_USING_OR_IMPL(wspawnlpe, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_SENTINEL_O(1) __ATTR_NONNULL((2)) __pid_t __NOTHROW_RPC(__VLIBCCALL wspawnlpe)(__STDC_INT_AS_UINT_T __mode, wchar_t const *__restrict __file, wchar_t const *__args, ...) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(wspawnlpe))(__mode, __file, __args, __builtin_va_arg_pack()); })
 #else /* __cplusplus */
-#define wspawnlpe __NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(wspawnlpe)
+#define wspawnlpe (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(wspawnlpe))
 #endif /* !__cplusplus */
 #else /* ... */
 #undef __wspawnlpe_defined

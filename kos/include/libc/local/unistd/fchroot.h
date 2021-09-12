@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xbc3f1ce6 */
+/* HASH CRC-32:0x9ffc2e5b */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -48,7 +48,7 @@ __CREDIRECT(,__fd_t,__NOTHROW_NCX,__localdep_dup2,(__fd_t __oldfd, __fd_t __newf
 __LOCAL_LIBC(fchroot) int
 __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(fchroot))(__fd_t __fd) {
 	__fd_t __result;
-	__result = __NAMESPACE_LOCAL_SYM __localdep_dup2(__fd, __AT_FDROOT);
+	__result = (__NAMESPACE_LOCAL_SYM __localdep_dup2)(__fd, __AT_FDROOT);
 	if __likely(__result >= 0)
 		__result = 0;
 	return __result;

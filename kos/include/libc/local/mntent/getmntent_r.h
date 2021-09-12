@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xc19272bf */
+/* HASH CRC-32:0x547d9 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -95,62 +95,62 @@ __LOCAL_LIBC(getmntent_r) __ATTR_NONNULL((1, 2, 3)) struct mntent *
 __NOTHROW_RPC(__LIBCCALL __LIBC_LOCAL_NAME(getmntent_r))(__FILE *__restrict __stream, struct mntent *__restrict __result, char *__restrict __buffer, __STDC_INT_AS_SIZE_T __bufsize) {
 	char *__line;
 	do {
-		__line = __NAMESPACE_LOCAL_SYM __localdep_fgets(__buffer, __bufsize, __stream);
+		__line = (__NAMESPACE_LOCAL_SYM __localdep_fgets)(__buffer, __bufsize, __stream);
 		if (!__line)
 			goto __err;
-		while (*__line && __NAMESPACE_LOCAL_SYM __localdep_isspace(*__line))
+		while (*__line && (__NAMESPACE_LOCAL_SYM __localdep_isspace)(*__line))
 			++__line;
 	} while (*__line == '#');
 
 	__result->mnt_fsname = __line;
-	while (*__line && !__NAMESPACE_LOCAL_SYM __localdep_isspace(*__line))
+	while (*__line && !(__NAMESPACE_LOCAL_SYM __localdep_isspace)(*__line))
 		++__line;
 	if (!*__line)
 		goto __err;
 	*__line++ = '\0';
-	while (*__line && __NAMESPACE_LOCAL_SYM __localdep_isspace(*__line))
+	while (*__line && (__NAMESPACE_LOCAL_SYM __localdep_isspace)(*__line))
 		++__line;
 
 	__result->mnt_dir = __line;
-	while (*__line && !__NAMESPACE_LOCAL_SYM __localdep_isspace(*__line))
+	while (*__line && !(__NAMESPACE_LOCAL_SYM __localdep_isspace)(*__line))
 		++__line;
 	if (!*__line)
 		goto __err;
 	*__line++ = '\0';
-	while (*__line && __NAMESPACE_LOCAL_SYM __localdep_isspace(*__line))
+	while (*__line && (__NAMESPACE_LOCAL_SYM __localdep_isspace)(*__line))
 		++__line;
 
 	__result->mnt_type = __line;
-	while (*__line && !__NAMESPACE_LOCAL_SYM __localdep_isspace(*__line))
+	while (*__line && !(__NAMESPACE_LOCAL_SYM __localdep_isspace)(*__line))
 		++__line;
 	if (!*__line)
 		goto __err;
 	*__line++ = '\0';
-	while (*__line && __NAMESPACE_LOCAL_SYM __localdep_isspace(*__line))
+	while (*__line && (__NAMESPACE_LOCAL_SYM __localdep_isspace)(*__line))
 		++__line;
 
 	__result->mnt_opts = __line;
-	while (*__line && !__NAMESPACE_LOCAL_SYM __localdep_isspace(*__line))
+	while (*__line && !(__NAMESPACE_LOCAL_SYM __localdep_isspace)(*__line))
 		++__line;
 	if (!*__line)
 		goto __err;
 	*__line++ = '\0';
-	while (*__line && __NAMESPACE_LOCAL_SYM __localdep_isspace(*__line))
+	while (*__line && (__NAMESPACE_LOCAL_SYM __localdep_isspace)(*__line))
 		++__line;
 
 	__result->mnt_freq = 0;
-	while (*__line && __NAMESPACE_LOCAL_SYM __localdep_isdigit(*__line)) {
+	while (*__line && (__NAMESPACE_LOCAL_SYM __localdep_isdigit)(*__line)) {
 		__result->mnt_freq *= 10;
 		__result->mnt_freq += *__line - '0';
 		++__line;
 	}
 	if (!*__line)
 		goto __err;
-	while (*__line && __NAMESPACE_LOCAL_SYM __localdep_isspace(*__line))
+	while (*__line && (__NAMESPACE_LOCAL_SYM __localdep_isspace)(*__line))
 		++__line;
 
 	__result->mnt_passno = 0;
-	while (*__line && __NAMESPACE_LOCAL_SYM __localdep_isdigit(*__line)) {
+	while (*__line && (__NAMESPACE_LOCAL_SYM __localdep_isdigit)(*__line)) {
 		__result->mnt_passno *= 10;
 		__result->mnt_passno += *__line - '0';
 		++__line;

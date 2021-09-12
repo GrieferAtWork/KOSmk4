@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x21f45e94 */
+/* HASH CRC-32:0x658590d0 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -86,7 +86,7 @@ __NAMESPACE_LOCAL_BEGIN
 __LOCAL_LIBC(vsc16scanf_getc) __SSIZE_TYPE__
 (__FORMATPRINTER_CC __vsc16scanf_getc)(void *__arg) {
 	__CHAR16_TYPE__ const *__reader = *(__CHAR16_TYPE__ const **)__arg;
-	__CHAR32_TYPE__ __result = __NAMESPACE_LOCAL_SYM __localdep_unicode_readutf16(&__reader);
+	__CHAR32_TYPE__ __result = (__NAMESPACE_LOCAL_SYM __localdep_unicode_readutf16)(&__reader);
 	if (!__result)
 		return __EOF;
 	*(__CHAR16_TYPE__ const **)__arg = __reader;
@@ -94,7 +94,7 @@ __LOCAL_LIBC(vsc16scanf_getc) __SSIZE_TYPE__
 }
 __LOCAL_LIBC(vsc16scanf_ungetc) __SSIZE_TYPE__
 (__FORMATPRINTER_CC __vsc16scanf_ungetc)(void *__arg, __CHAR32_TYPE__ __UNUSED(__ch)) {
-	__NAMESPACE_LOCAL_SYM __localdep_unicode_readutf16_rev((__CHAR16_TYPE__ const **)__arg);
+	(__NAMESPACE_LOCAL_SYM __localdep_unicode_readutf16_rev)((__CHAR16_TYPE__ const **)__arg);
 	return 0;
 }
 __NAMESPACE_LOCAL_END
@@ -130,7 +130,7 @@ __NOTHROW_NCX(__LIBDCALL __LIBC_LOCAL_NAME(c16stod))(__CHAR16_TYPE__ const *__re
 
 
 
-	if (!__NAMESPACE_LOCAL_SYM __localdep_format_scanf(&__NAMESPACE_LOCAL_SYM __vsc16scanf_getc,
+	if (!(__NAMESPACE_LOCAL_SYM __localdep_format_scanf)(&__NAMESPACE_LOCAL_SYM __vsc16scanf_getc,
 	                  &__NAMESPACE_LOCAL_SYM __vsc16scanf_ungetc,
 	                  (void *)&__text_pointer, "%lf", &__result))
 		__result = 0.0;

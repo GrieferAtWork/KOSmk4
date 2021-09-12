@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x17c8c3bd */
+/* HASH CRC-32:0xa0574b47 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -67,10 +67,10 @@ __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(ctime_r))(__TM_TYPE(time) const *__re
 
 
 #if defined(__CRT_HAVE__ctime64_s) || defined(__CRT_HAVE__ctime32_s)
-	return __NAMESPACE_LOCAL_SYM __localdep_dos_ctime_s(__buf, 26, __timer) ? __NULLPTR : __buf;
+	return (__NAMESPACE_LOCAL_SYM __localdep_dos_ctime_s)(__buf, 26, __timer) ? __NULLPTR : __buf;
 #else /* __CRT_HAVE__ctime64_s || __CRT_HAVE__ctime32_s */
 	struct __NAMESPACE_STD_SYM tm __ltm;
-	return __NAMESPACE_LOCAL_SYM __localdep_asctime_r(__NAMESPACE_LOCAL_SYM __localdep_localtime_r(__timer, &__ltm), __buf);
+	return (__NAMESPACE_LOCAL_SYM __localdep_asctime_r)((__NAMESPACE_LOCAL_SYM __localdep_localtime_r)(__timer, &__ltm), __buf);
 #endif /* !__CRT_HAVE__ctime64_s && !__CRT_HAVE__ctime32_s */
 }
 __NAMESPACE_LOCAL_END

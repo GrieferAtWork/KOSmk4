@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x63ea6d25 */
+/* HASH CRC-32:0xb544a898 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -48,7 +48,7 @@ __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(getitimer))(int __which, struct itime
 #ifdef __CRT_HAVE_getitimer
 	int __result;
 	struct __itimerval32 __tv32;
-	__result = __NAMESPACE_LOCAL_SYM __localdep_getitimer32(__which, &__tv32);
+	__result = (__NAMESPACE_LOCAL_SYM __localdep_getitimer32)(__which, &__tv32);
 	if __likely(!__result) {
 		__curr_value->it_interval.tv_sec  = (__time64_t)__tv32.it_interval.tv_sec;
 		__curr_value->it_interval.tv_usec = __tv32.it_interval.tv_usec;
@@ -59,7 +59,7 @@ __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(getitimer))(int __which, struct itime
 #else /* __CRT_HAVE_getitimer */
 	int __result;
 	struct __timeval64 __tv64;
-	__result = __NAMESPACE_LOCAL_SYM __localdep_getitimer64(__which, &__tv64);
+	__result = (__NAMESPACE_LOCAL_SYM __localdep_getitimer64)(__which, &__tv64);
 	if __likely(!__result) {
 		__curr_value->it_interval.tv_sec  = (__time32_t)__tv64.it_interval.tv_sec;
 		__curr_value->it_interval.tv_usec = __tv64.it_interval.tv_usec;

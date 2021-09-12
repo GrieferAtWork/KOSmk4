@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xdb6a006d */
+/* HASH CRC-32:0x6ad9eea5 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -42,7 +42,7 @@ __SYSDECL_BEGIN
 __CDECLARE(__ATTR_LEAF __ATTR_NONNULL((1, 2)),__SIZE_TYPE__,__NOTHROW_NCX,strlcpy,(char *__restrict __dst, char const *__restrict __src, __SIZE_TYPE__ __bufsize),(__dst,__src,__bufsize))
 #else /* __CRT_HAVE_strlcpy */
 #include <libc/local/string/strlcpy.h>
-__NAMESPACE_LOCAL_USING_OR_IMPL(strlcpy, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_LEAF __ATTR_NONNULL((1, 2)) __SIZE_TYPE__ __NOTHROW_NCX(__LIBCCALL strlcpy)(char *__restrict __dst, char const *__restrict __src, __SIZE_TYPE__ __bufsize) { return __NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(strlcpy)(__dst, __src, __bufsize); })
+__NAMESPACE_LOCAL_USING_OR_IMPL(strlcpy, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_LEAF __ATTR_NONNULL((1, 2)) __SIZE_TYPE__ __NOTHROW_NCX(__LIBCCALL strlcpy)(char *__restrict __dst, char const *__restrict __src, __SIZE_TYPE__ __bufsize) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(strlcpy))(__dst, __src, __bufsize); })
 #endif /* !__CRT_HAVE_strlcpy */
 #endif /* !__strlcpy_defined */
 #ifndef __strlcat_defined
@@ -51,7 +51,7 @@ __NAMESPACE_LOCAL_USING_OR_IMPL(strlcpy, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_L
 __CDECLARE(__ATTR_LEAF __ATTR_NONNULL((1, 2)),__SIZE_TYPE__,__NOTHROW_NCX,strlcat,(char *__restrict __dst, char const *__restrict __src, __SIZE_TYPE__ __bufsize),(__dst,__src,__bufsize))
 #else /* __CRT_HAVE_strlcat */
 #include <libc/local/string/strlcat.h>
-__NAMESPACE_LOCAL_USING_OR_IMPL(strlcat, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_LEAF __ATTR_NONNULL((1, 2)) __SIZE_TYPE__ __NOTHROW_NCX(__LIBCCALL strlcat)(char *__restrict __dst, char const *__restrict __src, __SIZE_TYPE__ __bufsize) { return __NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(strlcat)(__dst, __src, __bufsize); })
+__NAMESPACE_LOCAL_USING_OR_IMPL(strlcat, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_LEAF __ATTR_NONNULL((1, 2)) __SIZE_TYPE__ __NOTHROW_NCX(__LIBCCALL strlcat)(char *__restrict __dst, char const *__restrict __src, __SIZE_TYPE__ __bufsize) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(strlcat))(__dst, __src, __bufsize); })
 #endif /* !__CRT_HAVE_strlcat */
 #endif /* !__strlcat_defined */
 #ifndef __strnstr_defined
@@ -85,19 +85,19 @@ extern "C++" {
  * Search for `needle...+=strlen(needle)' within `haystack...+=strnlen(haystack, haystack_maxlen)'
  * If   found,   return  a   pointer   to  its   location   within  `str',   else   return  `NULL'
  * This function originates from BSD, but is also provided as a KOS extension */
-__FORCELOCAL __ATTR_ARTIFICIAL __ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1, 2)) char *__NOTHROW_NCX(__LIBCCALL strnstr)(char *__haystack, char *__needle, __SIZE_TYPE__ __haystack_maxlen) { return __NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(strnstr)(__haystack, __needle, __haystack_maxlen); }
+__FORCELOCAL __ATTR_ARTIFICIAL __ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1, 2)) char *__NOTHROW_NCX(__LIBCCALL strnstr)(char *__haystack, char *__needle, __SIZE_TYPE__ __haystack_maxlen) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(strnstr))(__haystack, __needle, __haystack_maxlen); }
 /* >> strnstr(3)
  * Search for `needle...+=strlen(needle)' within `haystack...+=strnlen(haystack, haystack_maxlen)'
  * If   found,   return  a   pointer   to  its   location   within  `str',   else   return  `NULL'
  * This function originates from BSD, but is also provided as a KOS extension */
-__FORCELOCAL __ATTR_ARTIFICIAL __ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1, 2)) char const *__NOTHROW_NCX(__LIBCCALL strnstr)(char const *__haystack, char const *__needle, __SIZE_TYPE__ __haystack_maxlen) { return __NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(strnstr)(__haystack, __needle, __haystack_maxlen); }
+__FORCELOCAL __ATTR_ARTIFICIAL __ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1, 2)) char const *__NOTHROW_NCX(__LIBCCALL strnstr)(char const *__haystack, char const *__needle, __SIZE_TYPE__ __haystack_maxlen) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(strnstr))(__haystack, __needle, __haystack_maxlen); }
 } /* extern "C++" */
 #else /* __cplusplus && __CORRECT_ISO_CPP_STRING_H_PROTO */
 /* >> strnstr(3)
  * Search for `needle...+=strlen(needle)' within `haystack...+=strnlen(haystack, haystack_maxlen)'
  * If   found,   return  a   pointer   to  its   location   within  `str',   else   return  `NULL'
  * This function originates from BSD, but is also provided as a KOS extension */
-__NAMESPACE_LOCAL_USING_OR_IMPL(strnstr, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1, 2)) char *__NOTHROW_NCX(__LIBCCALL strnstr)(char const *__haystack, char const *__needle, __SIZE_TYPE__ __haystack_maxlen) { return __NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(strnstr)(__haystack, __needle, __haystack_maxlen); })
+__NAMESPACE_LOCAL_USING_OR_IMPL(strnstr, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1, 2)) char *__NOTHROW_NCX(__LIBCCALL strnstr)(char const *__haystack, char const *__needle, __SIZE_TYPE__ __haystack_maxlen) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(strnstr))(__haystack, __needle, __haystack_maxlen); })
 #endif /* !__cplusplus || !__CORRECT_ISO_CPP_STRING_H_PROTO */
 #endif /* !__CRT_HAVE_strnstr */
 #endif /* !__strnstr_defined */
@@ -151,7 +151,7 @@ __CDECLARE_VOID(__ATTR_NONNULL((2)),__NOTHROW_NCX,strmode,(__mode_t __mode, char
  *    p[10] = ' '; // '+', if "alternate or additional access control
  *                 //          methods associated with the inode"
  *    p[11] = '\0'; */
-__NAMESPACE_LOCAL_USING_OR_IMPL(strmode, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_NONNULL((2)) void __NOTHROW_NCX(__LIBCCALL strmode)(__mode_t __mode, char __p[12]) { __NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(strmode)(__mode, __p); })
+__NAMESPACE_LOCAL_USING_OR_IMPL(strmode, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_NONNULL((2)) void __NOTHROW_NCX(__LIBCCALL strmode)(__mode_t __mode, char __p[12]) { (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(strmode))(__mode, __p); })
 #endif /* !__CRT_HAVE_strmode */
 #endif /* !__strmode_defined */
 #ifndef __explicit_bzero_defined
@@ -184,7 +184,7 @@ __CREDIRECT_VOID(,__NOTHROW_NCX,explicit_bzero,(void *__dst, size_t __n_bytes),_
  * away uses of this function when they (think) that clearing the memory
  * wouldn't  have  any visible  side-effects (though  those side-effects
  * may be a security-concious application trying to wipe sensitive data) */
-__NAMESPACE_LOCAL_USING_OR_IMPL(explicit_bzero, __FORCELOCAL __ATTR_ARTIFICIAL void __NOTHROW_NCX(__LIBCCALL explicit_bzero)(void *__dst, size_t __n_bytes) { __NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(explicit_bzero)(__dst, __n_bytes); })
+__NAMESPACE_LOCAL_USING_OR_IMPL(explicit_bzero, __FORCELOCAL __ATTR_ARTIFICIAL void __NOTHROW_NCX(__LIBCCALL explicit_bzero)(void *__dst, size_t __n_bytes) { (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(explicit_bzero))(__dst, __n_bytes); })
 #endif /* !... */
 #endif /* !__explicit_bzero_defined */
 

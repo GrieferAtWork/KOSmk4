@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xc81f2817 */
+/* HASH CRC-32:0x8ad0fc68 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -39,7 +39,7 @@ __NAMESPACE_LOCAL_BEGIN
 __LOCAL_LIBC(mtx_lock) __ATTR_NONNULL((1)) int
 __NOTHROW_RPC(__LIBCCALL __LIBC_LOCAL_NAME(mtx_lock))(__mtx_t *__restrict __mutex) {
 	__errno_t __error;
-	__error = __NAMESPACE_LOCAL_SYM __localdep_pthread_mutex_lock((__pthread_mutex_t *)__mutex);
+	__error = (__NAMESPACE_LOCAL_SYM __localdep_pthread_mutex_lock)((__pthread_mutex_t *)__mutex);
 	if __likely(!__error)
 		return __thrd_success;
 	return __thrd_error;

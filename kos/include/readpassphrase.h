@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x8f5e1453 */
+/* HASH CRC-32:0x75d16562 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -83,7 +83,7 @@ __CDECLARE(__ATTR_NONNULL((2)),char *,__NOTHROW_NCX,readpassphrase,(char const *
  * @param: flags: Set of `RPP_*' (from `<readpassphrase.h>')
  * @return: buf:  Success
  * @return: NULL: Error (s.a. `errno') */
-__NAMESPACE_LOCAL_USING_OR_IMPL(readpassphrase, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_NONNULL((2)) char *__NOTHROW_NCX(__LIBCCALL readpassphrase)(char const *__prompt, char *__buf, __SIZE_TYPE__ __bufsize, __STDC_INT_AS_UINT_T __flags) { return __NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(readpassphrase)(__prompt, __buf, __bufsize, __flags); })
+__NAMESPACE_LOCAL_USING_OR_IMPL(readpassphrase, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_NONNULL((2)) char *__NOTHROW_NCX(__LIBCCALL readpassphrase)(char const *__prompt, char *__buf, __SIZE_TYPE__ __bufsize, __STDC_INT_AS_UINT_T __flags) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(readpassphrase))(__prompt, __buf, __bufsize, __flags); })
 #endif /* __STDIN_FILENO && (__CRT_HAVE_read || __CRT_HAVE__read || __CRT_HAVE___read) */
 #endif /* !__CRT_HAVE_readpassphrase */
 

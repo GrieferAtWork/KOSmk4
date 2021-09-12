@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xb18b015c */
+/* HASH CRC-32:0x2c81dcdd */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -35,7 +35,7 @@ __CREDIRECT_VOID(,__NOTHROW_RPC,__localdep_dos_sleep,(unsigned int __duration),s
 #endif /* !__local___localdep_dos_sleep_defined */
 __LOCAL_LIBC(sleep) unsigned int
 __NOTHROW_RPC(__LIBCCALL __LIBC_LOCAL_NAME(sleep))(unsigned int __seconds) {
-	__NAMESPACE_LOCAL_SYM __localdep_dos_sleep((__UINT32_TYPE__)__seconds);
+	(__NAMESPACE_LOCAL_SYM __localdep_dos_sleep)((__UINT32_TYPE__)__seconds);
 	return 0;
 }
 __NAMESPACE_LOCAL_END

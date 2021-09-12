@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x98dbff45 */
+/* HASH CRC-32:0xa6bcc0c8 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -138,19 +138,19 @@ __NOTHROW_RPC(__LIBCCALL __LIBC_LOCAL_NAME(system))(char const *__command) {
 	int __status;
 	__pid_t __cpid, __error;
 #if defined(__CRT_HAVE_vfork) || defined(__CRT_HAVE___vfork)
-	__cpid = __NAMESPACE_LOCAL_SYM __localdep_vfork();
+	__cpid = (__NAMESPACE_LOCAL_SYM __localdep_vfork)();
 #else /* __CRT_HAVE_vfork || __CRT_HAVE___vfork */
-	__cpid = __NAMESPACE_LOCAL_SYM __localdep_fork();
+	__cpid = (__NAMESPACE_LOCAL_SYM __localdep_fork)();
 #endif /* !__CRT_HAVE_vfork && !__CRT_HAVE___vfork */
 	if (__cpid == 0) {
-		__NAMESPACE_LOCAL_SYM __localdep_shexec(__command);
+		(__NAMESPACE_LOCAL_SYM __localdep_shexec)(__command);
 		/* NOTE: system() must return ZERO(0) if no command processor is available. */
-		__NAMESPACE_LOCAL_SYM __localdep__Exit(__command ? 127 : 0);
+		(__NAMESPACE_LOCAL_SYM __localdep__Exit)(__command ? 127 : 0);
 	}
 	if (__cpid < 0)
 		return -1;
 	for (;;) {
-		__error = __NAMESPACE_LOCAL_SYM __localdep_waitpid(__cpid, &__status, 0);
+		__error = (__NAMESPACE_LOCAL_SYM __localdep_waitpid)(__cpid, &__status, 0);
 		if (__error == __cpid)
 			break;
 		if (__error >= 0)

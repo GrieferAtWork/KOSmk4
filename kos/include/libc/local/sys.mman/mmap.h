@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xf3a0e78b */
+/* HASH CRC-32:0xa1980217 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -46,7 +46,7 @@ __NAMESPACE_LOCAL_BEGIN
 __LOCAL_LIBC(mmap) __ATTR_WUNUSED void *
 __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(mmap))(void *__addr, __SIZE_TYPE__ __len, __STDC_INT_AS_UINT_T __prot, __STDC_INT_AS_UINT_T __flags, __fd_t __fd, __FS_TYPE(off) __offset) {
 
-	return __NAMESPACE_LOCAL_SYM __localdep_mmap64(__addr, __len, __prot, __flags, __fd, (__off64_t)__offset);
+	return (__NAMESPACE_LOCAL_SYM __localdep_mmap64)(__addr, __len, __prot, __flags, __fd, (__off64_t)__offset);
 
 
 

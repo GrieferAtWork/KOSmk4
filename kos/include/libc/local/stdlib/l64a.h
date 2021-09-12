@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x4f0f02de */
+/* HASH CRC-32:0x3332ef82 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -42,7 +42,7 @@ __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(l64a))(long __n) {
 	 * by 1 trailing NUL-character. So we can can calculate the max
 	 * required buffer size here, based on `sizeof(long)'! */
 	static char __buf[(((sizeof(long) * __CHAR_BIT__) + 5) / 6) + 1];
-	__NAMESPACE_LOCAL_SYM __localdep_l64a_r(__n, __buf, sizeof(__buf));
+	(__NAMESPACE_LOCAL_SYM __localdep_l64a_r)(__n, __buf, sizeof(__buf));
 	return __buf;
 }
 __NAMESPACE_LOCAL_END

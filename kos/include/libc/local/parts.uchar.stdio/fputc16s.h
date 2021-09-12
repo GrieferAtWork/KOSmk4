@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xe6cc5395 */
+/* HASH CRC-32:0x5fa88beb */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -75,7 +75,7 @@ __NAMESPACE_LOCAL_BEGIN
 __LOCAL_LIBC(fputc16s) __ATTR_NONNULL((1, 2)) __STDC_INT_AS_SIZE_T
 (__LIBDCALL __LIBC_LOCAL_NAME(fputc16s))(__CHAR16_TYPE__ const *__restrict __str, __FILE *__restrict __stream) __THROWS(...) {
 	__STDC_INT_AS_SIZE_T __result;
-	__result = __NAMESPACE_LOCAL_SYM __localdep_file_c16printer(__stream, __str, __NAMESPACE_LOCAL_SYM __localdep_c16slen(__str));
+	__result = (__NAMESPACE_LOCAL_SYM __localdep_file_c16printer)(__stream, __str, (__NAMESPACE_LOCAL_SYM __localdep_c16slen)(__str));
 	return __result;
 }
 __NAMESPACE_LOCAL_END

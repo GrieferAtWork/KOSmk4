@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xbdedf751 */
+/* HASH CRC-32:0xb2d5c2f2 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -90,7 +90,7 @@ __NOTHROW_NCX(__LIBKCALL __LIBC_LOCAL_NAME(fuzzy_c32memcmp))(__CHAR32_TYPE__ con
 
 
 
-	return __NAMESPACE_LOCAL_SYM __localdep_fuzzy_memcmpl(__s1, __s1_chars, __s2, __s2_chars);
+	return (__NAMESPACE_LOCAL_SYM __localdep_fuzzy_memcmpl)(__s1, __s1_chars, __s2, __s2_chars);
 
 
 

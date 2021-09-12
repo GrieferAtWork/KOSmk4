@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x33674e */
+/* HASH CRC-32:0xc0fc98dc */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -30,7 +30,7 @@ __CREDIRECT_VOID(__ATTR_NORETURN,__THROWING,__localdep_pthread_exit,(void *__ret
 #endif /* !__local___localdep_pthread_exit_defined */
 __LOCAL_LIBC(thrd_exit) __ATTR_NORETURN void
 (__LIBCCALL __LIBC_LOCAL_NAME(thrd_exit))(int __res) __THROWS(...) {
-	__NAMESPACE_LOCAL_SYM __localdep_pthread_exit((void *)(__UINTPTR_TYPE__)(unsigned int)__res);
+	(__NAMESPACE_LOCAL_SYM __localdep_pthread_exit)((void *)(__UINTPTR_TYPE__)(unsigned int)__res);
 }
 __NAMESPACE_LOCAL_END
 #ifndef __local___localdep_thrd_exit_defined

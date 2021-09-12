@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x14ac2004 */
+/* HASH CRC-32:0xc2e73b0f */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -67,11 +67,11 @@ __NAMESPACE_LOCAL_BEGIN
 __LOCAL_LIBC(wmempset) __ATTR_LEAF __ATTR_RETNONNULL __ATTR_NONNULL((1)) __WCHAR_TYPE__ *
 __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(wmempset))(__WCHAR_TYPE__ *__dst, __WCHAR_TYPE__ __filler, __SIZE_TYPE__ __num_chars) {
 #if __SIZEOF_WCHAR_T__ == 2
-	return (__WCHAR_TYPE__ *)__NAMESPACE_LOCAL_SYM __localdep_mempsetw(__dst, (__UINT16_TYPE__)__filler, __num_chars);
+	return (__WCHAR_TYPE__ *)(__NAMESPACE_LOCAL_SYM __localdep_mempsetw)(__dst, (__UINT16_TYPE__)__filler, __num_chars);
 #elif __SIZEOF_WCHAR_T__ == 4
-	return (__WCHAR_TYPE__ *)__NAMESPACE_LOCAL_SYM __localdep_mempsetl(__dst, (__UINT32_TYPE__)__filler, __num_chars);
+	return (__WCHAR_TYPE__ *)(__NAMESPACE_LOCAL_SYM __localdep_mempsetl)(__dst, (__UINT32_TYPE__)__filler, __num_chars);
 #else /* ... */
-	return (__WCHAR_TYPE__ *)__NAMESPACE_LOCAL_SYM __localdep_mempset(__dst, (int)__filler, __num_chars * sizeof(__WCHAR_TYPE__));
+	return (__WCHAR_TYPE__ *)(__NAMESPACE_LOCAL_SYM __localdep_mempset)(__dst, (int)__filler, __num_chars * sizeof(__WCHAR_TYPE__));
 #endif /* !... */
 }
 __NAMESPACE_LOCAL_END

@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xf2b617b */
+/* HASH CRC-32:0x6ffd8f91 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -42,7 +42,7 @@ __NAMESPACE_LOCAL_BEGIN
 __LOCAL_LIBC(__memmoveupq_chk) __ATTR_LEAF __ATTR_RETNONNULL __ATTR_NONNULL((1, 2)) __UINT64_TYPE__ *
 __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(__memmoveupq_chk))(void *__dst, void const *__src, __SIZE_TYPE__ __n_qwords, __SIZE_TYPE__ __dst_objsize) {
 	__ssp_chk_dstbuf("memmoveupq", __dst, __n_qwords * 8, __dst_objsize);
-	return __NAMESPACE_LOCAL_SYM __localdep_memmoveupq(__dst, __src, __n_qwords);
+	return (__NAMESPACE_LOCAL_SYM __localdep_memmoveupq)(__dst, __src, __n_qwords);
 }
 __NAMESPACE_LOCAL_END
 #ifndef __local___localdep___memmoveupq_chk_defined

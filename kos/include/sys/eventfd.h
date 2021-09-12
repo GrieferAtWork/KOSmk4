@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xdc056c5f */
+/* HASH CRC-32:0x7c02d7d1 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -117,7 +117,7 @@ __CDECLARE(,int,__NOTHROW_RPC,eventfd_read,(__fd_t __fd, eventfd_t *__value),(__
 #include <libc/local/sys.eventfd/eventfd_read.h>
 /* >> eventfd_read(3)
  * Read the event counter, and (if not `O_NONBLOCK'), wait for an event to happen */
-__NAMESPACE_LOCAL_USING_OR_IMPL(eventfd_read, __FORCELOCAL __ATTR_ARTIFICIAL int __NOTHROW_RPC(__LIBCCALL eventfd_read)(__fd_t __fd, eventfd_t *__value) { return __NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(eventfd_read)(__fd, __value); })
+__NAMESPACE_LOCAL_USING_OR_IMPL(eventfd_read, __FORCELOCAL __ATTR_ARTIFICIAL int __NOTHROW_RPC(__LIBCCALL eventfd_read)(__fd_t __fd, eventfd_t *__value) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(eventfd_read))(__fd, __value); })
 #endif /* ... */
 #ifdef __CRT_HAVE_eventfd_write
 /* >> eventfd_write(3)
@@ -127,7 +127,7 @@ __CDECLARE(,int,__NOTHROW_RPC,eventfd_write,(__fd_t __fd, eventfd_t __value),(__
 #include <libc/local/sys.eventfd/eventfd_write.h>
 /* >> eventfd_write(3)
  * Increment the event counter */
-__NAMESPACE_LOCAL_USING_OR_IMPL(eventfd_write, __FORCELOCAL __ATTR_ARTIFICIAL int __NOTHROW_RPC(__LIBCCALL eventfd_write)(__fd_t __fd, eventfd_t __value) { return __NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(eventfd_write)(__fd, __value); })
+__NAMESPACE_LOCAL_USING_OR_IMPL(eventfd_write, __FORCELOCAL __ATTR_ARTIFICIAL int __NOTHROW_RPC(__LIBCCALL eventfd_write)(__fd_t __fd, eventfd_t __value) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(eventfd_write))(__fd, __value); })
 #endif /* ... */
 #endif /* __CC__ */
 

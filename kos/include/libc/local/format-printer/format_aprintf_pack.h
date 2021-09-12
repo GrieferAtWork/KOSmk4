@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x5594beb3 */
+/* HASH CRC-32:0x547e3b5b */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -78,7 +78,7 @@ __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(format_aprintf_pack))(struct format_a
 	if (__self->ap_avail != 0) {
 #ifdef __CRT_HAVE_realloc
 		char *__newbuf;
-		__newbuf = (char *)__NAMESPACE_LOCAL_SYM __localdep_realloc(__self->ap_base,
+		__newbuf = (char *)(__NAMESPACE_LOCAL_SYM __localdep_realloc)(__self->ap_base,
 		                         (__self->ap_used + 1) *
 		                         sizeof(char));
 		if __likely(__newbuf)
@@ -89,7 +89,7 @@ __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(format_aprintf_pack))(struct format_a
 			/* Special case: Nothing was printed. */
 			__hybrid_assert(!__self->ap_base);
 #if defined(__CRT_HAVE_malloc) || defined(__CRT_HAVE_calloc) || defined(__CRT_HAVE_realloc) || defined(__CRT_HAVE_memalign) || defined(__CRT_HAVE_aligned_alloc) || defined(__CRT_HAVE_posix_memalign)
-			__self->ap_base = (char *)__NAMESPACE_LOCAL_SYM __localdep_malloc(1 * sizeof(char));
+			__self->ap_base = (char *)(__NAMESPACE_LOCAL_SYM __localdep_malloc)(1 * sizeof(char));
 			if __unlikely(!__self->ap_base)
 				return __NULLPTR;
 

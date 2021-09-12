@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x370a35a8 */
+/* HASH CRC-32:0xcd1f77f7 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -36,7 +36,7 @@ __NAMESPACE_LOCAL_BEGIN
 #endif /* !__local___localdep_fgetpwfiltered_r_defined */
 __LOCAL_LIBC(fgetpwent_r) __ATTR_NONNULL((1, 2, 3, 5)) __errno_t
 __NOTHROW_RPC(__LIBCCALL __LIBC_LOCAL_NAME(fgetpwent_r))(__FILE *__restrict __stream, struct passwd *__restrict __resultbuf, char *__restrict __buffer, __SIZE_TYPE__ __buflen, struct passwd **__restrict __result) {
-	return __NAMESPACE_LOCAL_SYM __localdep_fgetpwfiltered_r(__stream, __resultbuf, __buffer, __buflen,
+	return (__NAMESPACE_LOCAL_SYM __localdep_fgetpwfiltered_r)(__stream, __resultbuf, __buffer, __buflen,
 	                        __result, (__uid_t)-1, __NULLPTR);
 }
 __NAMESPACE_LOCAL_END

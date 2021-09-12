@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xb6b2c07e */
+/* HASH CRC-32:0x650f7b47 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -34,7 +34,7 @@ __NAMESPACE_LOCAL_BEGIN
 #endif /* !__local___localdep_set_single_signal_action_defined */
 __LOCAL_LIBC(sighold) int
 __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(sighold))(__signo_t __signo) {
-	return __NAMESPACE_LOCAL_SYM __localdep_set_single_signal_action(__signo, __SIG_BLOCK);
+	return (__NAMESPACE_LOCAL_SYM __localdep_set_single_signal_action)(__signo, __SIG_BLOCK);
 }
 __NAMESPACE_LOCAL_END
 #ifndef __local___localdep_sighold_defined

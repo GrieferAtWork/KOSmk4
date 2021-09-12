@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xb9ef19db */
+/* HASH CRC-32:0xd55a9841 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -44,9 +44,9 @@ __NAMESPACE_LOCAL_BEGIN
 __LOCAL_LIBC(globfree) __ATTR_NONNULL((1)) void
 __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(globfree))(struct __glob_struct *__pglob) {
 #ifdef __CRT_HAVE_globfree
-	__NAMESPACE_LOCAL_SYM __localdep_globfree32(__pglob);
+	(__NAMESPACE_LOCAL_SYM __localdep_globfree32)(__pglob);
 #else /* __CRT_HAVE_globfree */
-	__NAMESPACE_LOCAL_SYM __localdep_globfree64((struct __glob64_struct *)__pglob);
+	(__NAMESPACE_LOCAL_SYM __localdep_globfree64)((struct __glob64_struct *)__pglob);
 
 
 

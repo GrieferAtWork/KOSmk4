@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xef9ab054 */
+/* HASH CRC-32:0x3728af53 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -109,9 +109,9 @@ __CREDIRECT(__ATTR_NONNULL((1)),int,__THROWING,__localdep_crt_fseeko,(__FILE *__
 __LOCAL_LIBC(fseeko64) __ATTR_NONNULL((1)) int
 (__LIBCCALL __LIBC_LOCAL_NAME(fseeko64))(__FILE *__restrict __stream, __off64_t __off, int __whence) __THROWS(...) {
 #if (defined(__CRT_HAVE_fseek) && __SIZEOF_OFF32_T__ == __SIZEOF_LONG__) || defined(__CRT_HAVE_fseeko) || (defined(__CRT_HAVE_fseeko64) && __SIZEOF_OFF32_T__ == __SIZEOF_OFF64_T__) || (defined(__CRT_HAVE_fseek64) && __SIZEOF_OFF32_T__ == __SIZEOF_OFF64_T__) || (defined(__CRT_HAVE__fseeki64) && __SIZEOF_OFF32_T__ == __SIZEOF_OFF64_T__) || (defined(__CRT_HAVE_fseek_unlocked) && __SIZEOF_OFF32_T__ == __SIZEOF_LONG__) || (defined(__CRT_HAVE__fseek_nolock) && __SIZEOF_OFF32_T__ == __SIZEOF_LONG__) || defined(__CRT_HAVE_fseeko_unlocked) || (defined(__CRT_HAVE_fseeko64_unlocked) && __SIZEOF_OFF32_T__ == __SIZEOF_OFF64_T__) || (defined(__CRT_HAVE_fseek64_unlocked) && __SIZEOF_OFF32_T__ == __SIZEOF_OFF64_T__) || (defined(__CRT_HAVE__fseeki64_nolock) && __SIZEOF_OFF32_T__ == __SIZEOF_OFF64_T__)
-	return __NAMESPACE_LOCAL_SYM __localdep_crt_fseeko(__stream, (__off32_t)__off, __whence);
+	return (__NAMESPACE_LOCAL_SYM __localdep_crt_fseeko)(__stream, (__off32_t)__off, __whence);
 #else /* (__CRT_HAVE_fseek && __SIZEOF_OFF32_T__ == __SIZEOF_LONG__) || __CRT_HAVE_fseeko || (__CRT_HAVE_fseeko64 && __SIZEOF_OFF32_T__ == __SIZEOF_OFF64_T__) || (__CRT_HAVE_fseek64 && __SIZEOF_OFF32_T__ == __SIZEOF_OFF64_T__) || (__CRT_HAVE__fseeki64 && __SIZEOF_OFF32_T__ == __SIZEOF_OFF64_T__) || (__CRT_HAVE_fseek_unlocked && __SIZEOF_OFF32_T__ == __SIZEOF_LONG__) || (__CRT_HAVE__fseek_nolock && __SIZEOF_OFF32_T__ == __SIZEOF_LONG__) || __CRT_HAVE_fseeko_unlocked || (__CRT_HAVE_fseeko64_unlocked && __SIZEOF_OFF32_T__ == __SIZEOF_OFF64_T__) || (__CRT_HAVE_fseek64_unlocked && __SIZEOF_OFF32_T__ == __SIZEOF_OFF64_T__) || (__CRT_HAVE__fseeki64_nolock && __SIZEOF_OFF32_T__ == __SIZEOF_OFF64_T__) */
-	return __NAMESPACE_LOCAL_SYM __localdep_crt_fseek(__stream, (long int)__off, __whence);
+	return (__NAMESPACE_LOCAL_SYM __localdep_crt_fseek)(__stream, (long int)__off, __whence);
 #endif /* (!__CRT_HAVE_fseek || __SIZEOF_OFF32_T__ != __SIZEOF_LONG__) && !__CRT_HAVE_fseeko && (!__CRT_HAVE_fseeko64 || __SIZEOF_OFF32_T__ != __SIZEOF_OFF64_T__) && (!__CRT_HAVE_fseek64 || __SIZEOF_OFF32_T__ != __SIZEOF_OFF64_T__) && (!__CRT_HAVE__fseeki64 || __SIZEOF_OFF32_T__ != __SIZEOF_OFF64_T__) && (!__CRT_HAVE_fseek_unlocked || __SIZEOF_OFF32_T__ != __SIZEOF_LONG__) && (!__CRT_HAVE__fseek_nolock || __SIZEOF_OFF32_T__ != __SIZEOF_LONG__) && !__CRT_HAVE_fseeko_unlocked && (!__CRT_HAVE_fseeko64_unlocked || __SIZEOF_OFF32_T__ != __SIZEOF_OFF64_T__) && (!__CRT_HAVE_fseek64_unlocked || __SIZEOF_OFF32_T__ != __SIZEOF_OFF64_T__) && (!__CRT_HAVE__fseeki64_nolock || __SIZEOF_OFF32_T__ != __SIZEOF_OFF64_T__) */
 }
 __NAMESPACE_LOCAL_END

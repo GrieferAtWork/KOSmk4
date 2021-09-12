@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x2f9b6298 */
+/* HASH CRC-32:0x6a9b742e */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -90,10 +90,10 @@ __NAMESPACE_LOCAL_BEGIN
 __LOCAL_LIBC(format_c32aprintf_printer) __ATTR_WUNUSED __ATTR_NONNULL((1, 2)) __SSIZE_TYPE__
 __NOTHROW_NCX(__LIBKCALL __LIBC_LOCAL_NAME(format_c32aprintf_printer))(void *__arg, __CHAR32_TYPE__ const *__restrict __data, __SIZE_TYPE__ __datalen) {
 	__CHAR32_TYPE__ *__buf;
-	__buf = __NAMESPACE_LOCAL_SYM __localdep_format_c32aprintf_alloc((struct format_c32aprintf_data *)__arg, __datalen);
+	__buf = (__NAMESPACE_LOCAL_SYM __localdep_format_c32aprintf_alloc)((struct format_c32aprintf_data *)__arg, __datalen);
 	if __unlikely(!__buf)
 		goto __err;
-	(__CHAR32_TYPE__ *)__NAMESPACE_LOCAL_SYM __localdep_memcpyl(__buf, __data, __datalen);
+	(__CHAR32_TYPE__ *)(__NAMESPACE_LOCAL_SYM __localdep_memcpyl)(__buf, __data, __datalen);
 	return (__SSIZE_TYPE__)__datalen;
 __err:
 	return -1;

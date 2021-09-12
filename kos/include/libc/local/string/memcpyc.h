@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xf4e9e399 */
+/* HASH CRC-32:0x7695ecc8 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -84,24 +84,24 @@ __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(memcpyc))(void *__restrict __dst, voi
 	switch (__elem_size) {
 
 	case 1:
-		return __NAMESPACE_LOCAL_SYM __localdep_memcpy(__dst, __src, __elem_count);
+		return (__NAMESPACE_LOCAL_SYM __localdep_memcpy)(__dst, __src, __elem_count);
 
 	case 2:
-		return __NAMESPACE_LOCAL_SYM __localdep_memcpyw(__dst, __src, __elem_count);
+		return (__NAMESPACE_LOCAL_SYM __localdep_memcpyw)(__dst, __src, __elem_count);
 
 	case 4:
-		return __NAMESPACE_LOCAL_SYM __localdep_memcpyl(__dst, __src, __elem_count);
+		return (__NAMESPACE_LOCAL_SYM __localdep_memcpyl)(__dst, __src, __elem_count);
 
 #ifdef __UINT64_TYPE__
 	case 8:
-		return __NAMESPACE_LOCAL_SYM __localdep_memcpyq(__dst, __src, __elem_count);
+		return (__NAMESPACE_LOCAL_SYM __localdep_memcpyq)(__dst, __src, __elem_count);
 #endif /* __UINT64_TYPE__ */
 
 	default:
 		break;
 	}
 #endif /* __ARCH_HAVE_UNALIGNED_MEMORY_ACCESS */
-	return __NAMESPACE_LOCAL_SYM __localdep_memcpy(__dst, __src, __elem_count * __elem_size);
+	return (__NAMESPACE_LOCAL_SYM __localdep_memcpy)(__dst, __src, __elem_count * __elem_size);
 }
 __NAMESPACE_LOCAL_END
 #ifndef __local___localdep_memcpyc_defined

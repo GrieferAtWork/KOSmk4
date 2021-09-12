@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xcebd3d42 */
+/* HASH CRC-32:0x6ce8eccd */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -36,7 +36,7 @@ __NOTHROW_NCX(__LIBDCALL __LIBC_LOCAL_NAME(_getdcwd_dbg))(int __driveno, char *_
 	(void)__block_type;
 	(void)__filename;
 	(void)__line;
-	return __NAMESPACE_LOCAL_SYM __localdep__getdcwd(__driveno, __buf, __bufsize);
+	return (__NAMESPACE_LOCAL_SYM __localdep__getdcwd)(__driveno, __buf, __bufsize);
 }
 __NAMESPACE_LOCAL_END
 #ifndef __local___localdep__getdcwd_dbg_defined

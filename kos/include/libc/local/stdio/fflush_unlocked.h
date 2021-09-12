@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x64c82724 */
+/* HASH CRC-32:0x933f8fb5 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -39,7 +39,7 @@ __LOCAL_LIBC(fflush_unlocked) int
 	 * buffering being done, meaning this function isn't needed) */
 #if defined(__CRT_HAVE__flushall) || defined(__CRT_HAVE__IO_flush_all)
 	if (!__stream)
-		return __NAMESPACE_LOCAL_SYM __localdep_crt_flushall();
+		return (__NAMESPACE_LOCAL_SYM __localdep_crt_flushall)();
 #endif /* __CRT_HAVE__flushall || __CRT_HAVE__IO_flush_all */
 	(void)__stream;
 	return 0;

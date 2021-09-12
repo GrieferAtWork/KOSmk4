@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x7353dbca */
+/* HASH CRC-32:0x7cfbb79f */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -66,7 +66,7 @@ __NAMESPACE_LOCAL_BEGIN
 #if !defined(__LIBCCALL_IS_FORMATPRINTER_CC) || __SIZEOF_SIZE_T__ != __SIZEOF_INT__
 __LOCAL_LIBC(vfscanf_getc_unlocked) __SSIZE_TYPE__
 (__FORMATPRINTER_CC __vfscanf_getc_unlocked)(void *__arg) {
-	return (__SSIZE_TYPE__)__NAMESPACE_LOCAL_SYM __localdep_fgetc_unlocked((__FILE *)__arg);
+	return (__SSIZE_TYPE__)(__NAMESPACE_LOCAL_SYM __localdep_fgetc_unlocked)((__FILE *)__arg);
 }
 #endif /* !__LIBCCALL_IS_FORMATPRINTER_CC || __SIZEOF_SIZE_T__ != __SIZEOF_INT__ */
 __LOCAL_LIBC(vfscanf_ungetc_unlocked) __SSIZE_TYPE__
@@ -78,12 +78,12 @@ __NAMESPACE_LOCAL_BEGIN
 __LOCAL_LIBC(vfscanf_unlocked) __ATTR_WUNUSED __ATTR_LIBC_SCANF(2, 0) __ATTR_NONNULL((1, 2)) __STDC_INT_AS_SIZE_T
 (__LIBCCALL __LIBC_LOCAL_NAME(vfscanf_unlocked))(__FILE *__restrict __stream, char const *__restrict __format, __builtin_va_list __args) __THROWS(...) {
 #if defined(__LIBCCALL_IS_FORMATPRINTER_CC) && __SIZEOF_SIZE_T__ == __SIZEOF_INT__
-	return __NAMESPACE_LOCAL_SYM __localdep_format_vscanf((__pformatgetc)(void *)&__NAMESPACE_LOCAL_SYM __localdep_fgetc_unlocked,
+	return (__NAMESPACE_LOCAL_SYM __localdep_format_vscanf)((__pformatgetc)(void *)&(__NAMESPACE_LOCAL_SYM __localdep_fgetc_unlocked),
 	                     &__NAMESPACE_LOCAL_SYM __vfscanf_ungetc_unlocked,
 	                     (void *)__stream,
 	                     __format, __args);
 #else /* __LIBCCALL_IS_FORMATPRINTER_CC && __SIZEOF_SIZE_T__ == __SIZEOF_INT__ */
-	return __NAMESPACE_LOCAL_SYM __localdep_format_vscanf(&__NAMESPACE_LOCAL_SYM __vfscanf_getc_unlocked,
+	return (__NAMESPACE_LOCAL_SYM __localdep_format_vscanf)(&__NAMESPACE_LOCAL_SYM __vfscanf_getc_unlocked,
 	                     &__NAMESPACE_LOCAL_SYM __vfscanf_ungetc_unlocked,
 	                     (void *)__stream,
 	                     __format, __args);

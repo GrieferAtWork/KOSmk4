@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xa8d05f4a */
+/* HASH CRC-32:0x5b37a336 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -70,11 +70,11 @@ __NAMESPACE_LOCAL_BEGIN
 __LOCAL_LIBC(wcsrev) __ATTR_RETNONNULL __ATTR_NONNULL((1)) __WCHAR_TYPE__ *
 __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(wcsrev))(__WCHAR_TYPE__ *__restrict __str) {
 #if __SIZEOF_WCHAR_T__ == 2
-	return (__WCHAR_TYPE__ *)__NAMESPACE_LOCAL_SYM __localdep_memrevw(__str, __NAMESPACE_LOCAL_SYM __localdep_wcslen(__str));
+	return (__WCHAR_TYPE__ *)(__NAMESPACE_LOCAL_SYM __localdep_memrevw)(__str, (__NAMESPACE_LOCAL_SYM __localdep_wcslen)(__str));
 #elif __SIZEOF_WCHAR_T__ == 4
-	return (__WCHAR_TYPE__ *)__NAMESPACE_LOCAL_SYM __localdep_memrevl(__str, __NAMESPACE_LOCAL_SYM __localdep_wcslen(__str));
+	return (__WCHAR_TYPE__ *)(__NAMESPACE_LOCAL_SYM __localdep_memrevl)(__str, (__NAMESPACE_LOCAL_SYM __localdep_wcslen)(__str));
 #else /* ... */
-	return (__WCHAR_TYPE__ *)__NAMESPACE_LOCAL_SYM __localdep_memrev(__str, __NAMESPACE_LOCAL_SYM __localdep_wcslen(__str) * sizeof(__WCHAR_TYPE__));
+	return (__WCHAR_TYPE__ *)(__NAMESPACE_LOCAL_SYM __localdep_memrev)(__str, (__NAMESPACE_LOCAL_SYM __localdep_wcslen)(__str) * sizeof(__WCHAR_TYPE__));
 #endif /* !... */
 }
 __NAMESPACE_LOCAL_END

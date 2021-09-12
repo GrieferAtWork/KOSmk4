@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x608b3919 */
+/* HASH CRC-32:0x64806074 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -47,7 +47,7 @@ __LOCAL_LIBC(getpass) __ATTR_WUNUSED char *
 __NOTHROW_RPC(__LIBCCALL __LIBC_LOCAL_NAME(getpass))(char const *__restrict __prompt) {
 	static char __buf[257]; /* `getpassphrase()' requires passwords at least this long! */
 //	static char buf[129]; /* 129 == _PASSWORD_LEN + 1 */
-	return __NAMESPACE_LOCAL_SYM __localdep_getpass_r(__prompt, __buf, sizeof(__buf));
+	return (__NAMESPACE_LOCAL_SYM __localdep_getpass_r)(__prompt, __buf, sizeof(__buf));
 }
 __NAMESPACE_LOCAL_END
 #ifndef __local___localdep_getpass_defined

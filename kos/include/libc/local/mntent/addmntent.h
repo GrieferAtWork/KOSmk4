@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xd20c4059 */
+/* HASH CRC-32:0x8ab7b8b5 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -102,9 +102,9 @@ __LOCAL_LIBC(addmntent) __ATTR_NONNULL((1, 2)) int
 	            !__mnt->mnt_fsname || !__mnt->mnt_dir ||
 	            !__mnt->mnt_type || !__mnt->mnt_opts)
 		return 1;
-	if (__NAMESPACE_LOCAL_SYM __localdep_fseek(__stream, 0, __SEEK_END) < 0)
+	if ((__NAMESPACE_LOCAL_SYM __localdep_fseek)(__stream, 0, __SEEK_END) < 0)
 		return 1;
-	__NAMESPACE_LOCAL_SYM __localdep_fprintf(__stream, "%s %s %s %s %d %d\n",
+	(__NAMESPACE_LOCAL_SYM __localdep_fprintf)(__stream, "%s %s %s %s %d %d\n",
 	        __mnt->mnt_fsname,
 	        __mnt->mnt_dir,
 	        __mnt->mnt_type,

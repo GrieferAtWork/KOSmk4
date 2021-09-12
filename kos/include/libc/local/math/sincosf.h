@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xc600ff78 */
+/* HASH CRC-32:0x9873559f */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -39,7 +39,7 @@ __CREDIRECT_VOID(__DECL_SIMD_sincos __ATTR_NONNULL((2, 3)),__NOTHROW,__localdep_
 __LOCAL_LIBC(sincosf) __DECL_SIMD_sincosf __ATTR_NONNULL((2, 3)) void
 __NOTHROW(__LIBCCALL __LIBC_LOCAL_NAME(sincosf))(float __x, float *__psinx, float *__pcosx) {
 	double __sinx, __cosx;
-	__NAMESPACE_LOCAL_SYM __localdep_sincos((double)__x, &__sinx, &__cosx);
+	(__NAMESPACE_LOCAL_SYM __localdep_sincos)((double)__x, &__sinx, &__cosx);
 	*__psinx = (float)__sinx;
 	*__pcosx = (float)__cosx;
 }

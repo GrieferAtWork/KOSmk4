@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x1eaf77c2 */
+/* HASH CRC-32:0xa617f6b0 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -46,7 +46,7 @@ __LOCAL_LIBC(isalnum_l) __ATTR_PURE __ATTR_WUNUSED int
 __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(isalnum_l))(int __ch, __locale_t __locale) {
 	__COMPILER_IMPURE();
 	(void)__locale;
-	return __NAMESPACE_LOCAL_SYM __localdep_isalnum(__ch);
+	return (__NAMESPACE_LOCAL_SYM __localdep_isalnum)(__ch);
 }
 __NAMESPACE_LOCAL_END
 #ifndef __local___localdep_isalnum_l_defined

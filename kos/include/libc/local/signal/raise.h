@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xb75e5684 */
+/* HASH CRC-32:0x7f8434ad */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -64,12 +64,12 @@ __LOCAL_LIBC(raise) int
 __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(raise))(__signo_t __signo) {
 #if defined(__CRT_HAVE_pthread_kill) && (defined(__CRT_HAVE_pthread_self) || defined(__CRT_HAVE_thrd_current))
 	__errno_t __error;
-	__error = __NAMESPACE_LOCAL_SYM __localdep_pthread_kill(__NAMESPACE_LOCAL_SYM __localdep_pthread_self(), __signo);
+	__error = (__NAMESPACE_LOCAL_SYM __localdep_pthread_kill)((__NAMESPACE_LOCAL_SYM __localdep_pthread_self)(), __signo);
 	if __unlikely(__error != __EOK)
 		__error = (__errno_t)__libc_seterrno(__error);
 	return (int)__error;
 #else /* __CRT_HAVE_pthread_kill && (__CRT_HAVE_pthread_self || __CRT_HAVE_thrd_current) */
-	return __NAMESPACE_LOCAL_SYM __localdep_kill(__NAMESPACE_LOCAL_SYM __localdep_getpid(), __signo);
+	return (__NAMESPACE_LOCAL_SYM __localdep_kill)((__NAMESPACE_LOCAL_SYM __localdep_getpid)(), __signo);
 #endif /* !__CRT_HAVE_pthread_kill || (!__CRT_HAVE_pthread_self && !__CRT_HAVE_thrd_current) */
 }
 __NAMESPACE_LOCAL_END

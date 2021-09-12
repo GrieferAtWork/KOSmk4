@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x432eebfd */
+/* HASH CRC-32:0x25f37b2d */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -53,14 +53,14 @@ __NAMESPACE_LOCAL_BEGIN
 __LOCAL_LIBC(getlogin) __ATTR_WUNUSED char *
 __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(getlogin))(void) {
 #if defined(__CRT_HAVE_getenv) || defined(__LOCAL_environ)
-	char *__result = __NAMESPACE_LOCAL_SYM __localdep_getenv("LOGNAME");
+	char *__result = (__NAMESPACE_LOCAL_SYM __localdep_getenv)("LOGNAME");
 	if (!__result)
-		__result = __NAMESPACE_LOCAL_SYM __localdep_cuserid(__NULLPTR);
+		__result = (__NAMESPACE_LOCAL_SYM __localdep_cuserid)(__NULLPTR);
 	return __result;
 
 
 #else /* __CRT_HAVE_getenv || __LOCAL_environ */
-	return __NAMESPACE_LOCAL_SYM __localdep_cuserid(__NULLPTR);
+	return (__NAMESPACE_LOCAL_SYM __localdep_cuserid)(__NULLPTR);
 #endif /* !__CRT_HAVE_getenv && !__LOCAL_environ */
 }
 __NAMESPACE_LOCAL_END

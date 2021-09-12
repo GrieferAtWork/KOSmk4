@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x8cf476e1 */
+/* HASH CRC-32:0x8b0277e1 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -38,7 +38,7 @@ __NAMESPACE_LOCAL_BEGIN
 __LOCAL_LIBC(wcsftime_l) __ATTR_NONNULL((1, 3, 4)) __SIZE_TYPE__
 __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(wcsftime_l))(__WCHAR_TYPE__ *__restrict __buf, __SIZE_TYPE__ __maxsize, __WCHAR_TYPE__ const *__restrict __format, struct __NAMESPACE_STD_SYM tm const *__restrict __tp, __locale_t __locale) {
 	(void)__locale;
-	return __NAMESPACE_LOCAL_SYM __localdep_wcsftime(__buf, __maxsize, __format, __tp);
+	return (__NAMESPACE_LOCAL_SYM __localdep_wcsftime)(__buf, __maxsize, __format, __tp);
 }
 __NAMESPACE_LOCAL_END
 #ifndef __local___localdep_wcsftime_l_defined

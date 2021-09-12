@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x3907097b */
+/* HASH CRC-32:0x9e272477 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -268,7 +268,7 @@ print("@@pp_endif@@");
 	}
 	if (__result) {
 		for (; __code; --__code)
-			__result = __NAMESPACE_LOCAL_SYM __localdep_strend(__result) + 1;
+			__result = (__NAMESPACE_LOCAL_SYM __localdep_strend)(__result) + 1;
 		if (!*__result)
 			__result = __NULLPTR;
 	}

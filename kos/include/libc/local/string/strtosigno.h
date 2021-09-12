@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xc9479894 */
+/* HASH CRC-32:0x41603f75 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -64,8 +64,8 @@ __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(strtosigno))(const char *__name) {
 		return 0;
 	__name += 3;
 	for (__i = 1; __i < __NSIG; ++__i) {
-		char const *__s = __NAMESPACE_LOCAL_SYM __localdep_sigabbrev_np(__i);
-		if (__likely(__s) && __NAMESPACE_LOCAL_SYM __localdep_strcmp(__s, __name) == 0) {
+		char const *__s = (__NAMESPACE_LOCAL_SYM __localdep_sigabbrev_np)(__i);
+		if (__likely(__s) && (__NAMESPACE_LOCAL_SYM __localdep_strcmp)(__s, __name) == 0) {
 			__result = __i;
 			break;
 		}

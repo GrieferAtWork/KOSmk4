@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x78aa199c */
+/* HASH CRC-32:0xaddfb0ab */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -407,15 +407,15 @@ __again:
 #if defined(__CRT_HAVE_open64) || defined(__CRT_HAVE___open64) || defined(__CRT_HAVE_open) || defined(__CRT_HAVE__open) || defined(__CRT_HAVE___open) || (defined(__AT_FDCWD) && (defined(__CRT_HAVE_openat64) || defined(__CRT_HAVE_openat)))
 #ifdef _PATH_TTY
 #ifdef __O_RDWR
-		__infd = __NAMESPACE_LOCAL_SYM __localdep_open(_PATH_TTY, __O_RDWR);
+		__infd = (__NAMESPACE_LOCAL_SYM __localdep_open)(_PATH_TTY, __O_RDWR);
 #else /* __O_RDWR */
-		__infd = __NAMESPACE_LOCAL_SYM __localdep_open(_PATH_TTY, 0);
+		__infd = (__NAMESPACE_LOCAL_SYM __localdep_open)(_PATH_TTY, 0);
 #endif /* !__O_RDWR */
 #else /* _PATH_TTY */
 #ifdef __O_RDWR
-		__infd = __NAMESPACE_LOCAL_SYM __localdep_open("/dev/tty", __O_RDWR);
+		__infd = (__NAMESPACE_LOCAL_SYM __localdep_open)("/dev/tty", __O_RDWR);
 #else /* __O_RDWR */
-		__infd = __NAMESPACE_LOCAL_SYM __localdep_open("/dev/tty", 0);
+		__infd = (__NAMESPACE_LOCAL_SYM __localdep_open)("/dev/tty", 0);
 #endif /* !__O_RDWR */
 #endif /* !_PATH_TTY */
 		if __unlikely(__infd == -1) {
@@ -440,7 +440,7 @@ __again:
 
 	/* Update terminal IOS mode to our liking. */
 #if (defined(__CRT_HAVE_tcgetattr) || (defined(__CRT_HAVE_ioctl) && defined(__TCGETA))) && (defined(__CRT_HAVE_tcsetattr) || defined(__CRT_HAVE_ioctl))
-	if (__NAMESPACE_LOCAL_SYM __localdep_tcgetattr(__infd, &__old_ios) != 0) {
+	if ((__NAMESPACE_LOCAL_SYM __localdep_tcgetattr)(__infd, &__old_ios) != 0) {
 		if (__flags & __RPP_REQUIRE_TTY) {
 #ifdef __ENOTTY
 			(void)__libc_seterrno(__ENOTTY);
@@ -448,7 +448,7 @@ __again:
 			goto __err_infd;
 #define __PRIVATE_WANT_err_infd
 		}
-		__NAMESPACE_LOCAL_SYM __localdep_memcpy(&__new_ios, &__old_ios, sizeof(struct termios));
+		(__NAMESPACE_LOCAL_SYM __localdep_memcpy)(&__new_ios, &__old_ios, sizeof(struct termios));
 		if (!(__flags & __RPP_ECHO_ON)) {
 #if defined(__ECHO) && defined(__ECHONL)
 			__new_ios.c_lflag &= ~(__ECHO | __ECHONL);
@@ -462,22 +462,22 @@ __again:
 		if (__term.__c_cc[__VSTATUS] != __VDISABLE)
 			__term.__c_cc[__VSTATUS] = __VDISABLE;
 #endif /* __VSTATUS */
-		if (__NAMESPACE_LOCAL_SYM __localdep_memcmp(&__old_ios, &__new_ios, sizeof(struct termios)) != 0) {
+		if ((__NAMESPACE_LOCAL_SYM __localdep_memcmp)(&__old_ios, &__new_ios, sizeof(struct termios)) != 0) {
 #if defined(__TCSAFLUSH) && defined(__TCSASOFT)
-			if (__NAMESPACE_LOCAL_SYM __localdep_tcsetattr(__infd, __TCSAFLUSH | __TCSASOFT, &__new_ios) != 0)
+			if ((__NAMESPACE_LOCAL_SYM __localdep_tcsetattr)(__infd, __TCSAFLUSH | __TCSASOFT, &__new_ios) != 0)
 				goto __err_infd;
 #elif defined(__TCSAFLUSH)
-			if (__NAMESPACE_LOCAL_SYM __localdep_tcsetattr(__infd, __TCSAFLUSH, &__new_ios) != 0)
+			if ((__NAMESPACE_LOCAL_SYM __localdep_tcsetattr)(__infd, __TCSAFLUSH, &__new_ios) != 0)
 				goto __err_infd;
 #else /* ... */
-			if (__NAMESPACE_LOCAL_SYM __localdep_tcsetattr(__infd, 0, &__new_ios) != 0)
+			if ((__NAMESPACE_LOCAL_SYM __localdep_tcsetattr)(__infd, 0, &__new_ios) != 0)
 				goto __err_infd;
 #endif /* !... */
 #define __PRIVATE_WANT_err_infd
 		}
 	} else {
-		__NAMESPACE_LOCAL_SYM __localdep_memset(&__old_ios, 0, sizeof(struct termios));
-		__NAMESPACE_LOCAL_SYM __localdep_memset(&__new_ios, 0, sizeof(struct termios));
+		(__NAMESPACE_LOCAL_SYM __localdep_memset)(&__old_ios, 0, sizeof(struct termios));
+		(__NAMESPACE_LOCAL_SYM __localdep_memset)(&__new_ios, 0, sizeof(struct termios));
 #ifdef __ECHO
 		__old_ios.c_lflag = __ECHO;
 		__new_ios.c_lflag = __ECHO;
@@ -495,14 +495,14 @@ __again:
 	{
 		unsigned int __i;
 		struct sigaction __newact;
-		__NAMESPACE_LOCAL_SYM __localdep_memset((void *)__NAMESPACE_LOCAL_SYM __rpp_arrived, 0, sizeof(__NAMESPACE_LOCAL_SYM __rpp_arrived));
-		__NAMESPACE_LOCAL_SYM __localdep_memset(&__newact, 0, sizeof(__newact));
+		(__NAMESPACE_LOCAL_SYM __localdep_memset)((void *)__NAMESPACE_LOCAL_SYM __rpp_arrived, 0, sizeof(__NAMESPACE_LOCAL_SYM __rpp_arrived));
+		(__NAMESPACE_LOCAL_SYM __localdep_memset)(&__newact, 0, sizeof(__newact));
 		__newact.sa_handler = &__NAMESPACE_LOCAL_SYM __rpp_handler;
 		for (__i = 0; __i < __COMPILER_LENOF(__NAMESPACE_LOCAL_SYM __rpp_signals); ++__i) {
-			if __unlikely(__NAMESPACE_LOCAL_SYM __localdep_sigaction(__NAMESPACE_LOCAL_SYM __rpp_signals[__i], &__newact, &__old_sact[__i]) != 0) {
+			if __unlikely((__NAMESPACE_LOCAL_SYM __localdep_sigaction)(__NAMESPACE_LOCAL_SYM __rpp_signals[__i], &__newact, &__old_sact[__i]) != 0) {
 				while (__i) {
 					--__i;
-					(void)__NAMESPACE_LOCAL_SYM __localdep_sigaction(__NAMESPACE_LOCAL_SYM __rpp_signals[__i], &__newact, &__old_sact[__i]);
+					(void)(__NAMESPACE_LOCAL_SYM __localdep_sigaction)(__NAMESPACE_LOCAL_SYM __rpp_signals[__i], &__newact, &__old_sact[__i]);
 				}
 				goto __err_infd_oldios;
 #define __PRIVATE_WANT_err_infd_oldios
@@ -519,7 +519,7 @@ __again:
 	 *      when using /dev/tty as output,  but that's how BSD  does
 	 *      this, too... */
 	if (__prompt && *__prompt && !(__flags & __RPP_STDIN)) {
-		if (__NAMESPACE_LOCAL_SYM __localdep_write(__outfd, __prompt, __NAMESPACE_LOCAL_SYM __localdep_strlen(__prompt)) == -1)
+		if ((__NAMESPACE_LOCAL_SYM __localdep_write)(__outfd, __prompt, (__NAMESPACE_LOCAL_SYM __localdep_strlen)(__prompt)) == -1)
 			goto __err_infd_oldsact_oldios;
 	}
 #endif /* __CRT_HAVE_write || __CRT_HAVE__write || __CRT_HAVE___write */
@@ -532,7 +532,7 @@ __again:
 		for (;;) {
 			unsigned char __ch;
 			__SSIZE_TYPE__ __error;
-			__error = __NAMESPACE_LOCAL_SYM __localdep_read(__infd, &__ch, sizeof(char));
+			__error = (__NAMESPACE_LOCAL_SYM __localdep_read)(__infd, &__ch, sizeof(char));
 			if (__error < 1) {
 				if (__error >= 0)
 					break;
@@ -545,9 +545,9 @@ __again:
 				if (__flags & __RPP_SEVENBIT)
 					__ch &= 0x7f;
 				if (__flags & __RPP_FORCELOWER)
-					__ch = (unsigned char)__NAMESPACE_LOCAL_SYM __localdep_tolower((char)__ch);
+					__ch = (unsigned char)(__NAMESPACE_LOCAL_SYM __localdep_tolower)((char)__ch);
 				if (__flags & __RPP_FORCEUPPER)
-					__ch = (unsigned char)__NAMESPACE_LOCAL_SYM __localdep_toupper((char)__ch);
+					__ch = (unsigned char)(__NAMESPACE_LOCAL_SYM __localdep_toupper)((char)__ch);
 				*__dst++ = __ch;
 			}
 		}
@@ -562,7 +562,7 @@ __again:
 	if (!(__flags & __RPP_ECHO_ON))
 #endif /* (!__CRT_HAVE_tcgetattr && (!__CRT_HAVE_ioctl || !__TCGETA)) || (!__CRT_HAVE_tcsetattr && !__CRT_HAVE_ioctl) */
 	{
-		if (__NAMESPACE_LOCAL_SYM __localdep_write(__outfd, "\n", 1) == -1)
+		if ((__NAMESPACE_LOCAL_SYM __localdep_write)(__outfd, "\n", 1) == -1)
 			goto __err_infd_oldsact_oldios;
 	}
 #endif /* __CRT_HAVE_write || __CRT_HAVE__write || __CRT_HAVE___write */
@@ -571,13 +571,13 @@ __again:
 	/* Restore terminal IOS configuration */
 __done_infd_oldsact_oldios:
 #if (defined(__CRT_HAVE_tcgetattr) || (defined(__CRT_HAVE_ioctl) && defined(__TCGETA))) && (defined(__CRT_HAVE_tcsetattr) || defined(__CRT_HAVE_ioctl))
-	if (__NAMESPACE_LOCAL_SYM __localdep_memcmp(&__old_ios, &__new_ios, sizeof(struct termios)) != 0) {
+	if ((__NAMESPACE_LOCAL_SYM __localdep_memcmp)(&__old_ios, &__new_ios, sizeof(struct termios)) != 0) {
 #if defined(__TCSAFLUSH) && defined(__TCSASOFT)
-		(void)__NAMESPACE_LOCAL_SYM __localdep_tcsetattr(__infd, __TCSAFLUSH | __TCSASOFT, &__old_ios);
+		(void)(__NAMESPACE_LOCAL_SYM __localdep_tcsetattr)(__infd, __TCSAFLUSH | __TCSASOFT, &__old_ios);
 #elif defined(__TCSAFLUSH)
-		(void)__NAMESPACE_LOCAL_SYM __localdep_tcsetattr(__infd, __TCSAFLUSH, &__old_ios);
+		(void)(__NAMESPACE_LOCAL_SYM __localdep_tcsetattr)(__infd, __TCSAFLUSH, &__old_ios);
 #else /* ... */
-		(void)__NAMESPACE_LOCAL_SYM __localdep_tcsetattr(__infd, 0, &__old_ios);
+		(void)(__NAMESPACE_LOCAL_SYM __localdep_tcsetattr)(__infd, 0, &__old_ios);
 #endif /* !... */
 	}
 #endif /* (__CRT_HAVE_tcgetattr || (__CRT_HAVE_ioctl && __TCGETA)) && (__CRT_HAVE_tcsetattr || __CRT_HAVE_ioctl) */
@@ -587,7 +587,7 @@ __done_infd_oldsact_oldios:
 	{
 		unsigned int __i;
 		for (__i = 0; __i < __COMPILER_LENOF(__NAMESPACE_LOCAL_SYM __rpp_signals); ++__i)
-			(void)__NAMESPACE_LOCAL_SYM __localdep_sigaction(__NAMESPACE_LOCAL_SYM __rpp_signals[__i], &__old_sact[__i], __NULLPTR);
+			(void)(__NAMESPACE_LOCAL_SYM __localdep_sigaction)(__NAMESPACE_LOCAL_SYM __rpp_signals[__i], &__old_sact[__i], __NULLPTR);
 	}
 #endif /* __CRT_HAVE_sigaction || __CRT_HAVE___sigaction */
 
@@ -597,7 +597,7 @@ __done_infd:
 #endif /* __PRIVATE_WANT_err_infd */
 #if defined(__CRT_HAVE_close) || defined(__CRT_HAVE__close) || defined(__CRT_HAVE___close)
 	if (__infd != __STDIN_FILENO)
-		__NAMESPACE_LOCAL_SYM __localdep_close(__infd);
+		(__NAMESPACE_LOCAL_SYM __localdep_close)(__infd);
 #endif /* __CRT_HAVE_close || __CRT_HAVE__close || __CRT_HAVE___close */
 
 	/* Re-throw signals that arrived in the mean time. */
@@ -608,9 +608,9 @@ __done_infd:
 			if (!__NAMESPACE_LOCAL_SYM __rpp_arrived[__i])
 				continue;
 #if defined(__CRT_HAVE_kill) && (defined(__CRT_HAVE_getpid) || defined(__CRT_HAVE__getpid) || defined(__CRT_HAVE___getpid))
-			__NAMESPACE_LOCAL_SYM __localdep_kill(__NAMESPACE_LOCAL_SYM __localdep_getpid(), __NAMESPACE_LOCAL_SYM __rpp_signals[__i]);
+			(__NAMESPACE_LOCAL_SYM __localdep_kill)((__NAMESPACE_LOCAL_SYM __localdep_getpid)(), __NAMESPACE_LOCAL_SYM __rpp_signals[__i]);
 #elif defined(__CRT_HAVE_raise) || (defined(__CRT_HAVE_pthread_kill) && (defined(__CRT_HAVE_pthread_self) || defined(__CRT_HAVE_thrd_current)))
-			__NAMESPACE_LOCAL_SYM __localdep_raise(__NAMESPACE_LOCAL_SYM __rpp_signals[__i]);
+			(__NAMESPACE_LOCAL_SYM __localdep_raise)(__NAMESPACE_LOCAL_SYM __rpp_signals[__i]);
 #endif /* ... */
 
 			/* Handle signals for which we must start over when they're received. */
@@ -651,13 +651,13 @@ __err_infd_oldsact_oldios:
 __err_infd_oldios:
 	/* Restore terminal IOS configuration */
 #if (defined(__CRT_HAVE_tcgetattr) || (defined(__CRT_HAVE_ioctl) && defined(__TCGETA))) && (defined(__CRT_HAVE_tcsetattr) || defined(__CRT_HAVE_ioctl))
-	if (__NAMESPACE_LOCAL_SYM __localdep_memcmp(&__old_ios, &__new_ios, sizeof(struct termios)) != 0) {
+	if ((__NAMESPACE_LOCAL_SYM __localdep_memcmp)(&__old_ios, &__new_ios, sizeof(struct termios)) != 0) {
 #if defined(__TCSAFLUSH) && defined(__TCSASOFT)
-		(void)__NAMESPACE_LOCAL_SYM __localdep_tcsetattr(__infd, __TCSAFLUSH | __TCSASOFT, &__old_ios);
+		(void)(__NAMESPACE_LOCAL_SYM __localdep_tcsetattr)(__infd, __TCSAFLUSH | __TCSASOFT, &__old_ios);
 #elif defined(__TCSAFLUSH)
-		(void)__NAMESPACE_LOCAL_SYM __localdep_tcsetattr(__infd, __TCSAFLUSH, &__old_ios);
+		(void)(__NAMESPACE_LOCAL_SYM __localdep_tcsetattr)(__infd, __TCSAFLUSH, &__old_ios);
 #else /* ... */
-		(void)__NAMESPACE_LOCAL_SYM __localdep_tcsetattr(__infd, 0, &__old_ios);
+		(void)(__NAMESPACE_LOCAL_SYM __localdep_tcsetattr)(__infd, 0, &__old_ios);
 #endif /* !... */
 	}
 #endif /* (__CRT_HAVE_tcgetattr || (__CRT_HAVE_ioctl && __TCGETA)) && (__CRT_HAVE_tcsetattr || __CRT_HAVE_ioctl) */

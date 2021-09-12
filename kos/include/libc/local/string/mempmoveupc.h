@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xef66dea */
+/* HASH CRC-32:0x215325b4 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -92,24 +92,24 @@ __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(mempmoveupc))(void *__dst, void const
 	switch (__elem_size) {
 
 	case 1:
-		return __NAMESPACE_LOCAL_SYM __localdep_mempmoveup(__dst, __src, __elem_count);
+		return (__NAMESPACE_LOCAL_SYM __localdep_mempmoveup)(__dst, __src, __elem_count);
 
 	case 2:
-		return __NAMESPACE_LOCAL_SYM __localdep_mempmoveupw(__dst, __src, __elem_count);
+		return (__NAMESPACE_LOCAL_SYM __localdep_mempmoveupw)(__dst, __src, __elem_count);
 
 	case 4:
-		return __NAMESPACE_LOCAL_SYM __localdep_mempmoveupl(__dst, __src, __elem_count);
+		return (__NAMESPACE_LOCAL_SYM __localdep_mempmoveupl)(__dst, __src, __elem_count);
 
 #ifdef __UINT64_TYPE__
 	case 8:
-		return __NAMESPACE_LOCAL_SYM __localdep_mempmoveupq(__dst, __src, __elem_count);
+		return (__NAMESPACE_LOCAL_SYM __localdep_mempmoveupq)(__dst, __src, __elem_count);
 #endif /* __UINT64_TYPE__ */
 
 	default:
 		break;
 	}
 #endif /* __ARCH_HAVE_UNALIGNED_MEMORY_ACCESS */
-	return __NAMESPACE_LOCAL_SYM __localdep_mempmoveup(__dst, __src, __elem_count * __elem_size);
+	return (__NAMESPACE_LOCAL_SYM __localdep_mempmoveup)(__dst, __src, __elem_count * __elem_size);
 }
 __NAMESPACE_LOCAL_END
 #ifndef __local___localdep_mempmoveupc_defined

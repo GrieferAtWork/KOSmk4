@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xd2284230 */
+/* HASH CRC-32:0xd48d9665 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -74,10 +74,10 @@ __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(_wcsupr_s))(__WCHAR_TYPE__ *__buf, __
 	__WCHAR_TYPE__ *__iter, __ch;
 	if (__buf == __NULLPTR)
 		return 22;
-	if (__NAMESPACE_LOCAL_SYM __localdep_wcsnlen(__buf, __buflen) >= __buflen)
+	if ((__NAMESPACE_LOCAL_SYM __localdep_wcsnlen)(__buf, __buflen) >= __buflen)
 		return 22;
 	for (__iter = __buf; (__ch = *__iter) != '\0'; ++__iter)
-		*__iter = (__WCHAR_TYPE__)__NAMESPACE_LOCAL_SYM __localdep_towupper((__WCHAR_TYPE__)__ch);
+		*__iter = (__WCHAR_TYPE__)(__NAMESPACE_LOCAL_SYM __localdep_towupper)((__WCHAR_TYPE__)__ch);
 	return 0;
 }
 __NAMESPACE_LOCAL_END

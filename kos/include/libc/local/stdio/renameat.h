@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xefc7a5d6 */
+/* HASH CRC-32:0x5c1018a9 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -29,7 +29,7 @@ __CREDIRECT(__ATTR_NONNULL((2, 4)),int,__NOTHROW_RPC,__localdep_frenameat,(__fd_
 #endif /* !__local___localdep_frenameat_defined */
 __LOCAL_LIBC(renameat) __ATTR_NONNULL((2, 4)) int
 __NOTHROW_RPC(__LIBCCALL __LIBC_LOCAL_NAME(renameat))(__fd_t __oldfd, char const *__oldname, __fd_t __newfd, char const *__newname_or_path) {
-	return __NAMESPACE_LOCAL_SYM __localdep_frenameat(__oldfd, __oldname, __newfd, __newname_or_path, 0);
+	return (__NAMESPACE_LOCAL_SYM __localdep_frenameat)(__oldfd, __oldname, __newfd, __newname_or_path, 0);
 }
 __NAMESPACE_LOCAL_END
 #ifndef __local___localdep_renameat_defined

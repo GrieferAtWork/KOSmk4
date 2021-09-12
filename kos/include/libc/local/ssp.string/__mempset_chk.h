@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x9687854e */
+/* HASH CRC-32:0x2ead6756 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -40,7 +40,7 @@ __NAMESPACE_LOCAL_BEGIN
 __LOCAL_LIBC(__mempset_chk) __ATTR_LEAF __ATTR_RETNONNULL __ATTR_NONNULL((1)) void *
 __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(__mempset_chk))(void *__restrict __dst, int __byte, __SIZE_TYPE__ __n_bytes, __SIZE_TYPE__ __dst_objsize) {
 	__ssp_chk_dstbuf("mempset", __dst, __n_bytes, __dst_objsize);
-	return __NAMESPACE_LOCAL_SYM __localdep_mempset(__dst, __byte, __n_bytes);
+	return (__NAMESPACE_LOCAL_SYM __localdep_mempset)(__dst, __byte, __n_bytes);
 }
 __NAMESPACE_LOCAL_END
 #ifndef __local___localdep___mempset_chk_defined

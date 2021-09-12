@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xd3f7c1a5 */
+/* HASH CRC-32:0xe3ac9be3 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -76,18 +76,18 @@ __LOCAL_LIBC(mtx_init) __ATTR_NONNULL((1)) int
 __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(mtx_init))(__mtx_t *__restrict __mutex, __STDC_INT_AS_UINT_T __type) {
 	__errno_t __error;
 	if (__type == __mtx_plain) {
-		__error = __NAMESPACE_LOCAL_SYM __localdep_pthread_mutex_init((__pthread_mutex_t *)__mutex, __NULLPTR);
+		__error = (__NAMESPACE_LOCAL_SYM __localdep_pthread_mutex_init)((__pthread_mutex_t *)__mutex, __NULLPTR);
 	} else {
 		__pthread_mutexattr_t __attr;
-		__error = __NAMESPACE_LOCAL_SYM __localdep_pthread_mutexattr_init(&__attr);
+		__error = (__NAMESPACE_LOCAL_SYM __localdep_pthread_mutexattr_init)(&__attr);
 		if (__error == 0) {
-			__error = __NAMESPACE_LOCAL_SYM __localdep_pthread_mutexattr_settype(&__attr,
+			__error = (__NAMESPACE_LOCAL_SYM __localdep_pthread_mutexattr_settype)(&__attr,
 			                                  __type == __mtx_recursive
 			                                  ? __PTHREAD_MUTEX_RECURSIVE
 			                                  : __PTHREAD_MUTEX_TIMED);
 			if (__error == 0)
-				__error = __NAMESPACE_LOCAL_SYM __localdep_pthread_mutex_init((__pthread_mutex_t *)__mutex, &__attr);
-			__NAMESPACE_LOCAL_SYM __localdep_pthread_mutexattr_destroy(&__attr);
+				__error = (__NAMESPACE_LOCAL_SYM __localdep_pthread_mutex_init)((__pthread_mutex_t *)__mutex, &__attr);
+			(__NAMESPACE_LOCAL_SYM __localdep_pthread_mutexattr_destroy)(&__attr);
 		}
 	}
 	if __likely(!__error)

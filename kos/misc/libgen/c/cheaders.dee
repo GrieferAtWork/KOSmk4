@@ -1473,7 +1473,7 @@ class FunctionImplementation {
 						if (keyword in deps) {
 							local res = keyDependency(keyword);
 							if (LOCAL_NAMESPACE.prefix)
-								res = "{} {}".format({ LOCAL_NAMESPACE.prefix, res });
+								res = "({} {})".format({ LOCAL_NAMESPACE.prefix, res });
 							return res;
 						}
 						return none;
@@ -1552,8 +1552,10 @@ class FunctionImplementation {
 					 * that have been defined by different namespace.
 					 */
 					local res = keyDependency(keyword);
-					if (LOCAL_NAMESPACE.prefix)
-						res = "{} {}".format({ LOCAL_NAMESPACE.prefix, res });
+					if (LOCAL_NAMESPACE.prefix) {
+						/* Must always wrap in parenthesis to guard against user-defined function-like macros. */
+						res = "({} {})".format({ LOCAL_NAMESPACE.prefix, res });
+					}
 					return res;
 				}
 				return none;
@@ -1748,7 +1750,7 @@ class LocalFunction {
 			return;
 		}
 		if (oldNs !== LOCAL_NAMESPACE && LOCAL_NAMESPACE.prefix)
-			callToLocalName = "{} {}".format({ LOCAL_NAMESPACE.prefix, callToLocalName });
+			callToLocalName = "({} {})".format({ LOCAL_NAMESPACE.prefix, callToLocalName });
 		if (prototypes.each.hasEllipsis || ...) {
 			/* _Must_ (try to) use keyUsing for c++, or a macro for C */
 			if (doc)
@@ -1855,12 +1857,9 @@ class InlineFunction {
 					return exposedName;
 				if (keyword in deps) {
 					local res = keyDependency(keyword);
-					if (fp.namespace === dependenciesNamespace)
-						return res;
-					return "{} {}".format({
-						dependenciesNamespace.prefix,
-						res
-					});
+					if (fp.namespace === dependenciesNamespace || !dependenciesNamespace.prefix)
+						return "({})".format({ res });
+					return "({} {})".format({ dependenciesNamespace.prefix, res });
 				}
 				return none;
 			};
@@ -1900,8 +1899,8 @@ class InlineFunction {
 						if (keyword in deps) {
 							local res = keyDependency(keyword);
 							if (!dependenciesNamespace.prefix)
-								return res;
-							return "{} {}".format({ dependenciesNamespace.prefix, res });
+								return "({})".format({ res });
+							return "({} {})".format({ dependenciesNamespace.prefix, res });
 						}
 						return none;
 					},
@@ -2137,6 +2136,7 @@ class NamespaceBinding {
 			return; /* Shouldn't happen... */
 		if (namespace.prefix)
 			cSymbolName = "{} {}".format({ namespace.prefix, cSymbolName });
+		cSymbolName = "({})".format({ cSymbolName });
 		local isFirst = true;
 		local numAdditionalEndifs = 0;
 		for (local ppCond, prototypes: conditionalPrototypes) {

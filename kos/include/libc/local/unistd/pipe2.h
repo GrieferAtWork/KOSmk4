@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xaba5265b */
+/* HASH CRC-32:0x9c91fdf */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -44,7 +44,7 @@ __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(pipe2))(__fd_t __pipedes[2], __oflag_
 	/* TODO: Document which `flags' actually do anything */
 	/* TODO: Emulate using pipe()+fcntl() */
 	(void)__flags;
-	return __NAMESPACE_LOCAL_SYM __localdep_pipe(__pipedes);
+	return (__NAMESPACE_LOCAL_SYM __localdep_pipe)(__pipedes);
 }
 __NAMESPACE_LOCAL_END
 #ifndef __local___localdep_pipe2_defined

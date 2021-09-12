@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xe6fadb37 */
+/* HASH CRC-32:0xafff394a */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -43,7 +43,7 @@ __CREDIRECT_KOS(__ATTR_NONNULL((1, 3)),int,__NOTHROW_RPC,__localdep_c32symlinkat
 __LOCAL_LIBC(c32symlink) __ATTR_NONNULL((1, 2)) int
 __NOTHROW_RPC(__LIBKCALL __LIBC_LOCAL_NAME(c32symlink))(__CHAR32_TYPE__ const *__link_text, __CHAR32_TYPE__ const *__target_path) {
 	/* TODO: Header-implementation for `symlink()' on DOS (using the windows API) */
-	return __NAMESPACE_LOCAL_SYM __localdep_c32symlinkat(__link_text, __AT_FDCWD, __target_path);
+	return (__NAMESPACE_LOCAL_SYM __localdep_c32symlinkat)(__link_text, __AT_FDCWD, __target_path);
 }
 __NAMESPACE_LOCAL_END
 #ifndef __local___localdep_c32symlink_defined

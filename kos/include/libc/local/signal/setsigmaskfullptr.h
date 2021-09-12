@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x48e49c5a */
+/* HASH CRC-32:0x97decd80 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -31,7 +31,7 @@ __CREDIRECT(__ATTR_RETNONNULL __ATTR_NONNULL((1)),struct __sigset_struct *,__NOT
 __LOCAL_LIBC(setsigmaskfullptr) __ATTR_RETNONNULL struct __sigset_struct *
 __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(setsigmaskfullptr))(void) {
 	static struct __sigset_struct const __ss_full = __SIGSET_INIT((__ULONGPTR_TYPE__)-1);
-	return __NAMESPACE_LOCAL_SYM __localdep_setsigmaskptr((struct __sigset_struct *)&__ss_full);
+	return (__NAMESPACE_LOCAL_SYM __localdep_setsigmaskptr)((struct __sigset_struct *)&__ss_full);
 }
 __NAMESPACE_LOCAL_END
 #ifndef __local___localdep_setsigmaskfullptr_defined

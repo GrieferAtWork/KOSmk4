@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x5d612448 */
+/* HASH CRC-32:0x88e1e1b8 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -48,7 +48,7 @@ __NAMESPACE_LOCAL_BEGIN
 __LOCAL_LIBC(strcasecmp_l) __ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1, 2)) int
 __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(strcasecmp_l))(char const *__s1, char const *__s2, __locale_t __locale) {
 	(void)__locale;
-	return __NAMESPACE_LOCAL_SYM __localdep_strcasecmp(__s1, __s2);
+	return (__NAMESPACE_LOCAL_SYM __localdep_strcasecmp)(__s1, __s2);
 }
 __NAMESPACE_LOCAL_END
 #ifndef __local___localdep_strcasecmp_l_defined

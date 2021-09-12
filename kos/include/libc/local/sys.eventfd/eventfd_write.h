@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x41c37de5 */
+/* HASH CRC-32:0x585bbf37 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -42,7 +42,7 @@ __NAMESPACE_LOCAL_BEGIN
 __LOCAL_LIBC(eventfd_write) int
 __NOTHROW_RPC(__LIBCCALL __LIBC_LOCAL_NAME(eventfd_write))(__fd_t __fd, __UINT64_TYPE__ __value) {
 	__SSIZE_TYPE__ __error;
-	__error = __NAMESPACE_LOCAL_SYM __localdep_write(__fd, &__value, sizeof(__UINT64_TYPE__));
+	__error = (__NAMESPACE_LOCAL_SYM __localdep_write)(__fd, &__value, sizeof(__UINT64_TYPE__));
 	if (__error == sizeof(__UINT64_TYPE__))
 		return 0;
 #ifdef __EINVAL

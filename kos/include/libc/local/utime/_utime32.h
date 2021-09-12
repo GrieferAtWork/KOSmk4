@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xac4e2d9a */
+/* HASH CRC-32:0xea99a4f0 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -45,10 +45,10 @@ __NOTHROW_RPC(__LIBCCALL __LIBC_LOCAL_NAME(_utime32))(char const *__filename, st
 #undef modtime
 	struct __utimbuf64 __buf64;
 	if (!__file_times)
-		return __NAMESPACE_LOCAL_SYM __localdep_crt_utime64(__filename, __NULLPTR);
+		return (__NAMESPACE_LOCAL_SYM __localdep_crt_utime64)(__filename, __NULLPTR);
 	__buf64.actime  = (__time64_t)__file_times->actime;
 	__buf64.modtime = (__time64_t)__file_times->modtime;
-	return __NAMESPACE_LOCAL_SYM __localdep_crt_utime64(__filename, &__buf64);
+	return (__NAMESPACE_LOCAL_SYM __localdep_crt_utime64)(__filename, &__buf64);
 #ifdef __COMPILER_HAVE_PRAGMA_PUSHMACRO
 #pragma pop_macro("modtime")
 #pragma pop_macro("actime")

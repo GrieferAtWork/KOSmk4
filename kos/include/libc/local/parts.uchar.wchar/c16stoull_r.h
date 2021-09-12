@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x563dc5e6 */
+/* HASH CRC-32:0xcff454ce */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -79,11 +79,11 @@ __NAMESPACE_LOCAL_BEGIN
 __LOCAL_LIBC(c16stoull_r) __ATTR_LEAF __ATTR_NONNULL((1)) __ULONGLONG
 __NOTHROW_NCX(__LIBDCALL __LIBC_LOCAL_NAME(c16stoull_r))(__CHAR16_TYPE__ const *__restrict __nptr, __CHAR16_TYPE__ **__endptr, __STDC_INT_AS_UINT_T __base, __errno_t *__error) {
 #if __SIZEOF_LONG_LONG__ >= 8
-	return (__ULONGLONG)__NAMESPACE_LOCAL_SYM __localdep_c16stou64_r(__nptr, __endptr, __base, __error);
+	return (__ULONGLONG)(__NAMESPACE_LOCAL_SYM __localdep_c16stou64_r)(__nptr, __endptr, __base, __error);
 #elif __SIZEOF_LONG_LONG__ >= 4
-	return (__ULONGLONG)__NAMESPACE_LOCAL_SYM __localdep_c16stou32_r(__nptr, __endptr, __base, __error);
+	return (__ULONGLONG)(__NAMESPACE_LOCAL_SYM __localdep_c16stou32_r)(__nptr, __endptr, __base, __error);
 #else /* ... */
-	__UINT32_TYPE__ __result = __NAMESPACE_LOCAL_SYM __localdep_c16stou32_r(__nptr, __endptr, __base, __error);
+	__UINT32_TYPE__ __result = (__NAMESPACE_LOCAL_SYM __localdep_c16stou32_r)(__nptr, __endptr, __base, __error);
 	if (__result > __ULONG_LONG_MAX__) {
 		if (__error) {
 #ifdef __ERANGE

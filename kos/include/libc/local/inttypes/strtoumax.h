@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x1e3240bd */
+/* HASH CRC-32:0x5134431b */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -67,9 +67,9 @@ __NAMESPACE_LOCAL_BEGIN
 __LOCAL_LIBC(strtoumax) __ATTR_LEAF __ATTR_NONNULL((1)) __UINTMAX_TYPE__
 __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(strtoumax))(char const *__restrict __nptr, char **__endptr, __STDC_INT_AS_UINT_T __base) {
 #if __SIZEOF_INTMAX_T__ <= 4
-	return (__UINTMAX_TYPE__)__NAMESPACE_LOCAL_SYM __localdep_strtou32(__nptr, __endptr, __base);
+	return (__UINTMAX_TYPE__)(__NAMESPACE_LOCAL_SYM __localdep_strtou32)(__nptr, __endptr, __base);
 #else /* __SIZEOF_INTMAX_T__ <= 4 */
-	return (__UINTMAX_TYPE__)__NAMESPACE_LOCAL_SYM __localdep_strtou64(__nptr, __endptr, __base);
+	return (__UINTMAX_TYPE__)(__NAMESPACE_LOCAL_SYM __localdep_strtou64)(__nptr, __endptr, __base);
 #endif /* __SIZEOF_INTMAX_T__ > 4 */
 }
 __NAMESPACE_LOCAL_END

@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x5b9754d5 */
+/* HASH CRC-32:0x9615dcc7 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -37,7 +37,7 @@ __NAMESPACE_LOCAL_BEGIN
 __LOCAL_LIBC(strptime_l) __ATTR_NONNULL((1, 2, 3)) char *
 __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(strptime_l))(char const *__restrict __s, char const *__restrict __format, struct __NAMESPACE_STD_SYM tm *__restrict __tp, __locale_t __locale) {
 	(void)__locale;
-	return __NAMESPACE_LOCAL_SYM __localdep_strptime(__s, __format, __tp);
+	return (__NAMESPACE_LOCAL_SYM __localdep_strptime)(__s, __format, __tp);
 }
 __NAMESPACE_LOCAL_END
 #ifndef __local___localdep_strptime_l_defined

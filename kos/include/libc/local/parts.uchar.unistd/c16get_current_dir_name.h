@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x323da5f4 */
+/* HASH CRC-32:0xeab05541 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -156,18 +156,18 @@ __NOTHROW_RPC(__LIBDCALL __LIBC_LOCAL_NAME(c16get_current_dir_name))(void) {
 	/* Specs require us to return a duplicate of $PWD iff it's correct
 	 *   ***Author's comment: DUMB!***
 	 */
-	__CHAR16_TYPE__ *__pwd = __NAMESPACE_LOCAL_SYM __localdep_getenv("PWD");
+	__CHAR16_TYPE__ *__pwd = (__NAMESPACE_LOCAL_SYM __localdep_getenv)("PWD");
 	if (__pwd && *__pwd) {
 		struct stat __st_pwd, __st_cwd;
-		if (__NAMESPACE_LOCAL_SYM __localdep_stat(__pwd, &__st_pwd) == 0 &&
-		    __NAMESPACE_LOCAL_SYM __localdep_stat(".", &__st_cwd) == 0) {
+		if ((__NAMESPACE_LOCAL_SYM __localdep_stat)(__pwd, &__st_pwd) == 0 &&
+		    (__NAMESPACE_LOCAL_SYM __localdep_stat)(".", &__st_cwd) == 0) {
 			if (__st_pwd.st_dev == __st_cwd.st_dev &&
 			    __st_pwd.st_ino == __st_cwd.st_ino)
-				return __NAMESPACE_LOCAL_SYM __localdep_c16sdup(__pwd);
+				return (__NAMESPACE_LOCAL_SYM __localdep_c16sdup)(__pwd);
 		}
 	}
 #endif /* (__CRT_HAVE_getenv || __LOCAL_environ) && ((__CRT_HAVE_kstat && __CRT_KOS_PRIMARY) || (__CRT_HAVE_kstat64 && __CRT_KOS_PRIMARY) || (__CRT_HAVE__stat64 && __CRT_DOS_PRIMARY && __USE_TIME_BITS64) || (__CRT_HAVE__stat64i32 && __CRT_DOS_PRIMARY && __USE_TIME_BITS64) || (__CRT_HAVE__stati64 && __CRT_DOS_PRIMARY && !__USE_TIME_BITS64 && __USE_FILE_OFFSET64) || (__CRT_HAVE__stat32i64 && __CRT_DOS_PRIMARY && !__USE_TIME_BITS64 && __USE_FILE_OFFSET64) || (__CRT_HAVE__stat && __CRT_DOS_PRIMARY && !__USE_TIME_BITS64 && !__USE_FILE_OFFSET64) || (__CRT_HAVE__stat32 && __CRT_DOS_PRIMARY && !__USE_TIME_BITS64 && !__USE_FILE_OFFSET64) || (__CRT_HAVE_stat64 && __USE_FILE_OFFSET64) || (__CRT_HAVE_stat && !__USE_FILE_OFFSET64)) && ((__CRT_HAVE_wcsdup && __SIZEOF_WCHAR_T__ == 2 && __LIBCCALL_IS_LIBDCALL) || __CRT_HAVE_DOS$wcsdup || (__CRT_HAVE__wcsdup && __SIZEOF_WCHAR_T__ == 2 && __LIBCCALL_IS_LIBDCALL) || __CRT_HAVE_DOS$_wcsdup || __CRT_HAVE_malloc || __CRT_HAVE_calloc || __CRT_HAVE_realloc || __CRT_HAVE_memalign || __CRT_HAVE_aligned_alloc || __CRT_HAVE_posix_memalign) */
-	return __NAMESPACE_LOCAL_SYM __localdep_c16getcwd(__NULLPTR, 0);
+	return (__NAMESPACE_LOCAL_SYM __localdep_c16getcwd)(__NULLPTR, 0);
 }
 __NAMESPACE_LOCAL_END
 #ifndef __local___localdep_c16get_current_dir_name_defined

@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xdd49453b */
+/* HASH CRC-32:0xc9b9c5e2 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -35,7 +35,7 @@ __CREDIRECT(__ATTR_NONNULL((2, 3)),__SIZE_TYPE__,__THROWING,__localdep_ReadlinkA
 #endif /* !__local___localdep_ReadlinkAt_defined */
 __LOCAL_LIBC(Readlink) __ATTR_NONNULL((1, 2)) __SIZE_TYPE__
 (__LIBCCALL __LIBC_LOCAL_NAME(Readlink))(char const *__restrict __path, char *__restrict __buf, __SIZE_TYPE__ __buflen) __THROWS(...) {
-	__NAMESPACE_LOCAL_SYM __localdep_ReadlinkAt(__AT_FDCWD, __path, __buf, __buflen);
+	(__NAMESPACE_LOCAL_SYM __localdep_ReadlinkAt)(__AT_FDCWD, __path, __buf, __buflen);
 }
 __NAMESPACE_LOCAL_END
 #ifndef __local___localdep_Readlink_defined

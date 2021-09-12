@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xb9629cd */
+/* HASH CRC-32:0xf6eb9006 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -50,9 +50,9 @@ __NAMESPACE_LOCAL_BEGIN
 __LOCAL_LIBC(envz_remove) __ATTR_NONNULL((1, 2, 3)) void
 __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(envz_remove))(char **__restrict __penvz, __SIZE_TYPE__ *__restrict __penvz_len, char const *__restrict __name) {
 	char *__entry;
-	__entry = __NAMESPACE_LOCAL_SYM __localdep_envz_entry(*__penvz, *__penvz_len, __name);
+	__entry = (__NAMESPACE_LOCAL_SYM __localdep_envz_entry)(*__penvz, *__penvz_len, __name);
 	if (__entry)
-		__NAMESPACE_LOCAL_SYM __localdep_argz_delete(__penvz, __penvz_len, __entry);
+		(__NAMESPACE_LOCAL_SYM __localdep_argz_delete)(__penvz, __penvz_len, __entry);
 }
 __NAMESPACE_LOCAL_END
 #ifndef __local___localdep_envz_remove_defined

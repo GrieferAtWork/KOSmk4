@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x34d49cf4 */
+/* HASH CRC-32:0x697ccd39 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -91,10 +91,10 @@ __NOTHROW(__LIBCCALL __LIBC_LOCAL_NAME(finitef))(float __x) {
 #ifdef __LIBM_MATHFUNIF
 	return __LIBM_MATHFUNIF(finite, __x);
 #else /* __LIBM_MATHFUNIF */
-	return !__NAMESPACE_LOCAL_SYM __localdep_isinff(__x) && !__NAMESPACE_LOCAL_SYM __localdep_isnanf(__x);
+	return !(__NAMESPACE_LOCAL_SYM __localdep_isinff)(__x) && !(__NAMESPACE_LOCAL_SYM __localdep_isnanf)(__x);
 #endif /* !__LIBM_MATHFUNIF */
 #else /* __IEEE754_DOUBLE_TYPE_IS_FLOAT__ || __IEEE754_FLOAT_TYPE_IS_FLOAT__ || __IEEE854_LONG_DOUBLE_TYPE_IS_FLOAT__ || ((__CRT_HAVE_isinff || __CRT_HAVE___isinff || __INFINITYF || __HUGE_VALF || __CRT_HAVE_isinf || __CRT_HAVE___isinf || __IEEE754_DOUBLE_TYPE_IS_DOUBLE__ || __IEEE754_FLOAT_TYPE_IS_DOUBLE__ || __IEEE854_LONG_DOUBLE_TYPE_IS_DOUBLE__ || __INFINITY || __HUGE_VAL) && (__CRT_HAVE_isnanf || __CRT_HAVE___isnanf || __CRT_HAVE_isnan || __CRT_HAVE__isnan || __CRT_HAVE___isnan || __IEEE754_DOUBLE_TYPE_IS_DOUBLE__ || __IEEE754_FLOAT_TYPE_IS_DOUBLE__ || __IEEE854_LONG_DOUBLE_TYPE_IS_DOUBLE__)) */
-	return __NAMESPACE_LOCAL_SYM __localdep_finite((double)__x);
+	return (__NAMESPACE_LOCAL_SYM __localdep_finite)((double)__x);
 #endif /* !__IEEE754_DOUBLE_TYPE_IS_FLOAT__ && !__IEEE754_FLOAT_TYPE_IS_FLOAT__ && !__IEEE854_LONG_DOUBLE_TYPE_IS_FLOAT__ && ((!__CRT_HAVE_isinff && !__CRT_HAVE___isinff && !__INFINITYF && !__HUGE_VALF && !__CRT_HAVE_isinf && !__CRT_HAVE___isinf && !__IEEE754_DOUBLE_TYPE_IS_DOUBLE__ && !__IEEE754_FLOAT_TYPE_IS_DOUBLE__ && !__IEEE854_LONG_DOUBLE_TYPE_IS_DOUBLE__ && !__INFINITY && !__HUGE_VAL) || (!__CRT_HAVE_isnanf && !__CRT_HAVE___isnanf && !__CRT_HAVE_isnan && !__CRT_HAVE__isnan && !__CRT_HAVE___isnan && !__IEEE754_DOUBLE_TYPE_IS_DOUBLE__ && !__IEEE754_FLOAT_TYPE_IS_DOUBLE__ && !__IEEE854_LONG_DOUBLE_TYPE_IS_DOUBLE__)) */
 }
 __NAMESPACE_LOCAL_END

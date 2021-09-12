@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x6be9413b */
+/* HASH CRC-32:0x6dad5ce2 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -111,7 +111,7 @@ __NOTHROW_NCX(__LIBKCALL __LIBC_LOCAL_NAME(fuzzy_c32memcasecmp_l))(__CHAR32_TYPE
 		for (__j = 0; __j < __s2_bytes; __j++) {
 			__BYTE_TYPE__ __c1 = ((__BYTE_TYPE__ *)__s1)[__i];
 			__BYTE_TYPE__ __c2 = ((__BYTE_TYPE__ *)__s2)[__j];
-			__cost  = __c1 != __c2 && __NAMESPACE_LOCAL_SYM __localdep_tolower32_l(__c1, __locale) != __NAMESPACE_LOCAL_SYM __localdep_tolower32_l(__c2, __locale);
+			__cost  = __c1 != __c2 && (__NAMESPACE_LOCAL_SYM __localdep_tolower32_l)(__c1, __locale) != (__NAMESPACE_LOCAL_SYM __localdep_tolower32_l)(__c2, __locale);
 			__cost += __v0[__j];
 			__temp  = __v1[__j] + 1;
 			if (__cost > __temp)
@@ -121,7 +121,7 @@ __NOTHROW_NCX(__LIBKCALL __LIBC_LOCAL_NAME(fuzzy_c32memcasecmp_l))(__CHAR32_TYPE
 				__cost = __temp;
 			__v1[__j + 1] = __cost;
 		}
-		__NAMESPACE_LOCAL_SYM __localdep_memcpyc((__UINT8_TYPE__ *)__v0, (__UINT8_TYPE__ *)__v1, __s2_bytes, sizeof(__SIZE_TYPE__));
+		(__NAMESPACE_LOCAL_SYM __localdep_memcpyc)((__UINT8_TYPE__ *)__v0, (__UINT8_TYPE__ *)__v1, __s2_bytes, sizeof(__SIZE_TYPE__));
 	}
 	__temp = __v1[__s2_bytes];
 	__freea(__v1);

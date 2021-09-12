@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xd9ff6a9 */
+/* HASH CRC-32:0xcc371140 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -88,16 +88,16 @@ __NOTHROW_RPC(__LIBCCALL __LIBC_LOCAL_NAME(posix_spawn))(__pid_t *__restrict __p
 	__fd_t __fd;
 	__pid_t __result = -1;
 #if defined(__O_RDONLY) && defined(__O_CLOEXEC)
-	__fd = __NAMESPACE_LOCAL_SYM __localdep_open(__path, __O_RDONLY | __O_CLOEXEC);
+	__fd = (__NAMESPACE_LOCAL_SYM __localdep_open)(__path, __O_RDONLY | __O_CLOEXEC);
 #elif defined(__O_RDONLY)
-	__fd = __NAMESPACE_LOCAL_SYM __localdep_open(__path, __O_RDONLY);
+	__fd = (__NAMESPACE_LOCAL_SYM __localdep_open)(__path, __O_RDONLY);
 #else /* ... */
-	__fd = __NAMESPACE_LOCAL_SYM __localdep_open(__path, 0);
+	__fd = (__NAMESPACE_LOCAL_SYM __localdep_open)(__path, 0);
 #endif /* !... */
 	if __likely(__fd >= 0) {
-		__result = __NAMESPACE_LOCAL_SYM __localdep_posix_fspawn_np(__pid, __fd, __file_actions, __attrp, ___argv, ___envp);
+		__result = (__NAMESPACE_LOCAL_SYM __localdep_posix_fspawn_np)(__pid, __fd, __file_actions, __attrp, ___argv, ___envp);
 #if defined(__CRT_HAVE_close) || defined(__CRT_HAVE__close) || defined(__CRT_HAVE___close)
-		__NAMESPACE_LOCAL_SYM __localdep_close(__fd);
+		(__NAMESPACE_LOCAL_SYM __localdep_close)(__fd);
 #endif /* __CRT_HAVE_close || __CRT_HAVE__close || __CRT_HAVE___close */
 	}
 	return __result;

@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xa7a8d48 */
+/* HASH CRC-32:0x534c932f */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -54,7 +54,7 @@ __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(timerfd_settime))(__fd_t __ufd, __STD
 	__utmr32.__it_interval.tv_nsec = __utmr->__it_interval.tv_nsec;
 	__utmr32.__it_value.tv_sec     = (__time32_t)__utmr->__it_value.tv_sec;
 	__utmr32.__it_value.tv_nsec    = __utmr->__it_value.tv_nsec;
-	__result = __NAMESPACE_LOCAL_SYM __localdep_timerfd_settime32(__ufd, __flags, &__utmr32, __otmr ? &__otmr32 : __NULLPTR);
+	__result = (__NAMESPACE_LOCAL_SYM __localdep_timerfd_settime32)(__ufd, __flags, &__utmr32, __otmr ? &__otmr32 : __NULLPTR);
 	if (!__result && __otmr) {
 		__otmr->__it_interval.tv_sec  = (__time64_t)__otmr32.__it_interval.tv_sec;
 		__otmr->__it_interval.tv_nsec = __otmr32.__it_interval.tv_nsec;
@@ -69,7 +69,7 @@ __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(timerfd_settime))(__fd_t __ufd, __STD
 	__utmr64.__it_interval.tv_nsec = __utmr->__it_interval.tv_nsec;
 	__utmr64.__it_value.tv_sec     = (__time64_t)__utmr->__it_value.tv_sec;
 	__utmr64.__it_value.tv_nsec    = __utmr->__it_value.tv_nsec;
-	__result = __NAMESPACE_LOCAL_SYM __localdep_timerfd_settime64(__timerid, __flags, &__utmr64, __otmr ? &__otmr64 : __NULLPTR);
+	__result = (__NAMESPACE_LOCAL_SYM __localdep_timerfd_settime64)(__timerid, __flags, &__utmr64, __otmr ? &__otmr64 : __NULLPTR);
 	if (!__result && __otmr) {
 		__otmr->__it_interval.tv_sec  = (__time32_t)__otmr64.__it_interval.tv_sec;
 		__otmr->__it_interval.tv_nsec = __otmr64.__it_interval.tv_nsec;

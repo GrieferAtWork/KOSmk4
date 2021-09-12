@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x6ac05df4 */
+/* HASH CRC-32:0xe7f9ebb7 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -89,7 +89,7 @@ __CDECLARE(__ATTR_RETNONNULL,char *,__NOTHROW_NCX,dirname,(char *__path),(__path
  * >> dirname(NULL);              // Returns "."
  * Note  that for this purpose, `path' may be modified in-place, meaning
  * that you should really always pass an strdup()'d, or writable string. */
-__NAMESPACE_LOCAL_USING_OR_IMPL(dirname, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_RETNONNULL char *__NOTHROW_NCX(__LIBCCALL dirname)(char *__path) { return __NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(dirname)(__path); })
+__NAMESPACE_LOCAL_USING_OR_IMPL(dirname, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_RETNONNULL char *__NOTHROW_NCX(__LIBCCALL dirname)(char *__path) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(dirname))(__path); })
 #endif /* !__CRT_HAVE_dirname */
 #ifdef __CRT_HAVE___xpg_basename
 /* Return the filename-part, that is everything following
@@ -172,7 +172,7 @@ __CREDIRECT(__ATTR_RETNONNULL,char *,__NOTHROW_NCX,__xpg_basename,(char *__filen
  * where if you  include both  <libgen.h> and  <string.h>, you  can use  the
  * alternate function from <string.h>  by `#undef basename', or calling  the
  * function as `(basename)(...)' (as opposed to `basename(...)') */
-__NAMESPACE_LOCAL_USING_OR_IMPL(__xpg_basename, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_RETNONNULL char *__NOTHROW_NCX(__LIBCCALL __xpg_basename)(char *__filename) { return __NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(__xpg_basename)(__filename); })
+__NAMESPACE_LOCAL_USING_OR_IMPL(__xpg_basename, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_RETNONNULL char *__NOTHROW_NCX(__LIBCCALL __xpg_basename)(char *__filename) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(__xpg_basename))(__filename); })
 #endif /* !... */
 #define basename(path) __xpg_basename(path)
 

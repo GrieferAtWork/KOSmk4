@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xf13c9da6 */
+/* HASH CRC-32:0x8ab1c647 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -54,7 +54,7 @@ __LOCAL_LIBC(ispunct32_l) __ATTR_PURE __ATTR_WUNUSED int
 __NOTHROW_NCX(__LIBKCALL __LIBC_LOCAL_NAME(ispunct32_l))(__WINT32_TYPE__ __ch, __locale_t __locale) {
 	__COMPILER_IMPURE();
 	(void)__locale;
-	return __NAMESPACE_LOCAL_SYM __localdep_ispunct32(__ch);
+	return (__NAMESPACE_LOCAL_SYM __localdep_ispunct32)(__ch);
 }
 __NAMESPACE_LOCAL_END
 #ifndef __local___localdep_ispunct32_l_defined

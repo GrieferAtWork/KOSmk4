@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xb5beb41 */
+/* HASH CRC-32:0x2f70310b */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -56,7 +56,7 @@ __CDECLARE_VOID(,__NOTHROW_NCX,closefrom,(__fd_t __lowfd),(__lowfd))
 #include <libc/local/unistd/closefrom.h>
 /* >> closefrom(2)
  * Close all file descriptors with indices `>= lowfd' (s.a. `fcntl(F_CLOSEM)') */
-__NAMESPACE_LOCAL_USING_OR_IMPL(closefrom, __FORCELOCAL __ATTR_ARTIFICIAL void __NOTHROW_NCX(__LIBCCALL closefrom)(__fd_t __lowfd) { __NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(closefrom)(__lowfd); })
+__NAMESPACE_LOCAL_USING_OR_IMPL(closefrom, __FORCELOCAL __ATTR_ARTIFICIAL void __NOTHROW_NCX(__LIBCCALL closefrom)(__fd_t __lowfd) { (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(closefrom))(__lowfd); })
 #else /* (__CRT_HAVE_fcntl || __CRT_HAVE___fcntl) && __F_CLOSEM */
 #undef __closefrom_defined
 #endif /* (!__CRT_HAVE_fcntl && !__CRT_HAVE___fcntl) || !__F_CLOSEM */
@@ -79,7 +79,7 @@ __CDECLARE(__ATTR_NONNULL((2, 3)),int,__NOTHROW_NCX,getpeereid,(__fd_t __sockfd,
 #include <libc/local/unistd/getpeereid.h>
 /* >> getpeereid(3)
  * Convenience wrapper for `getsockopt(sockfd, SOL_SOCKET, SO_PEERCRED)' */
-__NAMESPACE_LOCAL_USING_OR_IMPL(getpeereid, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_NONNULL((2, 3)) int __NOTHROW_NCX(__LIBCCALL getpeereid)(__fd_t __sockfd, uid_t *__euid, gid_t *__egid) { return __NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(getpeereid)(__sockfd, __euid, __egid); })
+__NAMESPACE_LOCAL_USING_OR_IMPL(getpeereid, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_NONNULL((2, 3)) int __NOTHROW_NCX(__LIBCCALL getpeereid)(__fd_t __sockfd, uid_t *__euid, gid_t *__egid) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(getpeereid))(__sockfd, __euid, __egid); })
 #else /* __CRT_HAVE_getsockopt && __SOL_SOCKET && __SO_PEERCRED */
 #undef __getpeereid_defined
 #endif /* !__CRT_HAVE_getsockopt || !__SOL_SOCKET || !__SO_PEERCRED */

@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xc0733009 */
+/* HASH CRC-32:0x672b1cba */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -145,30 +145,30 @@ __NAMESPACE_LOCAL_BEGIN
 __LOCAL_LIBC(psiginfo) __ATTR_NONNULL((1)) void
 __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(psiginfo))(struct __siginfo_struct const *__pinfo, char const *__s) {
 	char const *__text;
-	__text = __NAMESPACE_LOCAL_SYM __localdep_sigabbrev_np(__pinfo->si_signo);
+	__text = (__NAMESPACE_LOCAL_SYM __localdep_sigabbrev_np)(__pinfo->si_signo);
 	if (__s && *__s)
-		__NAMESPACE_LOCAL_SYM __localdep_fprintf(__LOCAL_stderr, "%s: ", __s);
+		(__NAMESPACE_LOCAL_SYM __localdep_fprintf)(__LOCAL_stderr, "%s: ", __s);
 	if (__text) {
-		__NAMESPACE_LOCAL_SYM __localdep_fprintf(__LOCAL_stderr, "SIG%s (", __text);
+		(__NAMESPACE_LOCAL_SYM __localdep_fprintf)(__LOCAL_stderr, "SIG%s (", __text);
 #if (defined(__CRT_HAVE___libc_current_sigrtmin) || defined(__SIGRTMIN)) && (defined(__CRT_HAVE___libc_current_sigrtmax) || defined(__SIGRTMAX))
-	} else if (__pinfo->si_signo >= __NAMESPACE_LOCAL_SYM __localdep___libc_current_sigrtmin() &&
-	           __pinfo->si_signo <= __NAMESPACE_LOCAL_SYM __localdep___libc_current_sigrtmax()) {
+	} else if (__pinfo->si_signo >= (__NAMESPACE_LOCAL_SYM __localdep___libc_current_sigrtmin)() &&
+	           __pinfo->si_signo <= (__NAMESPACE_LOCAL_SYM __localdep___libc_current_sigrtmax)()) {
 		unsigned int __offset;
-		__offset = (unsigned int)(__pinfo->si_signo - __NAMESPACE_LOCAL_SYM __localdep___libc_current_sigrtmin());
+		__offset = (unsigned int)(__pinfo->si_signo - (__NAMESPACE_LOCAL_SYM __localdep___libc_current_sigrtmin)());
 		if (__offset != 0) {
-			__NAMESPACE_LOCAL_SYM __localdep_fprintf(__LOCAL_stderr, "SIGRTMIN+%u (", __offset);
+			(__NAMESPACE_LOCAL_SYM __localdep_fprintf)(__LOCAL_stderr, "SIGRTMIN+%u (", __offset);
 		} else {
-			__NAMESPACE_LOCAL_SYM __localdep_fprintf(__LOCAL_stderr, "SIGRTMIN (");
+			(__NAMESPACE_LOCAL_SYM __localdep_fprintf)(__LOCAL_stderr, "SIGRTMIN (");
 		}
 #endif /* (__CRT_HAVE___libc_current_sigrtmin || __SIGRTMIN) && (__CRT_HAVE___libc_current_sigrtmax || __SIGRTMAX) */
 	} else {
-		__NAMESPACE_LOCAL_SYM __localdep_fprintf(__LOCAL_stderr, "Unknown signal %d (", __pinfo->si_signo);
+		(__NAMESPACE_LOCAL_SYM __localdep_fprintf)(__LOCAL_stderr, "Unknown signal %d (", __pinfo->si_signo);
 	}
-	__text = __NAMESPACE_LOCAL_SYM __localdep_strsigcode_s(__pinfo->si_signo, __pinfo->si_code);
+	__text = (__NAMESPACE_LOCAL_SYM __localdep_strsigcode_s)(__pinfo->si_signo, __pinfo->si_code);
 	if (__text) {
-		__NAMESPACE_LOCAL_SYM __localdep_fprintf(__LOCAL_stderr, "%s ", __text);
+		(__NAMESPACE_LOCAL_SYM __localdep_fprintf)(__LOCAL_stderr, "%s ", __text);
 	} else {
-		__NAMESPACE_LOCAL_SYM __localdep_fprintf(__LOCAL_stderr, "%u ", (unsigned int)__pinfo->si_code);
+		(__NAMESPACE_LOCAL_SYM __localdep_fprintf)(__LOCAL_stderr, "%u ", (unsigned int)__pinfo->si_code);
 	}
 #if defined(__SIGILL) || defined(__SIGFPE) || defined(__SIGSEGV) || defined(__SIGBUS)
 	if (0
@@ -185,12 +185,12 @@ __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(psiginfo))(struct __siginfo_struct co
 	    || __pinfo->__si_signo == __SIGBUS
 #endif /* __SIGBUS */
 	    ) {
-		__NAMESPACE_LOCAL_SYM __localdep_fprintf(__LOCAL_stderr, "[%p])\n", __pinfo->si_addr);
+		(__NAMESPACE_LOCAL_SYM __localdep_fprintf)(__LOCAL_stderr, "[%p])\n", __pinfo->si_addr);
 	} else
 #endif /* __SIGILL || __SIGFPE || __SIGSEGV || __SIGBUS */
 #ifdef __SIGCHLD
 	if (__pinfo->__si_signo == __SIGCHLD) {
-		__NAMESPACE_LOCAL_SYM __localdep_fprintf(__LOCAL_stderr,
+		(__NAMESPACE_LOCAL_SYM __localdep_fprintf)(__LOCAL_stderr,
 		        "%" __PRIN_PREFIX(__SIZEOF_PID_T__) "d %d "
 		        "%" __PRIN_PREFIX(__SIZEOF_UID_T__) "d)\n",
 		        (__pid_t)__pinfo->si_pid,
@@ -200,12 +200,12 @@ __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(psiginfo))(struct __siginfo_struct co
 #endif /* __SIGCHLD */
 #ifdef __SIGPOLL
 	if (__pinfo->__si_signo == __SIGPOLL) {
-		__NAMESPACE_LOCAL_SYM __localdep_fprintf(__LOCAL_stderr, "%" __PRIN_PREFIX(__SIZEOF_POINTER__) "d)\n",
+		(__NAMESPACE_LOCAL_SYM __localdep_fprintf)(__LOCAL_stderr, "%" __PRIN_PREFIX(__SIZEOF_POINTER__) "d)\n",
 		        (__LONGPTR_TYPE__)__pinfo->si_band);
 	} else
 #endif /* __SIGPOLL */
 	{
-		__NAMESPACE_LOCAL_SYM __localdep_fprintf(__LOCAL_stderr,
+		(__NAMESPACE_LOCAL_SYM __localdep_fprintf)(__LOCAL_stderr,
 		        "%" __PRIN_PREFIX(__SIZEOF_PID_T__) "d "
 		        "%" __PRIN_PREFIX(__SIZEOF_UID_T__) "d)\n",
 		        (__pid_t)__pinfo->si_pid,

@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x172df346 */
+/* HASH CRC-32:0xbc97095a */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -68,7 +68,7 @@ __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(vsnprintf))(char *__restrict __buf, _
 	__STDC_INT_AS_SSIZE_T __result;
 	__data.__sd_buffer = __buf;
 	__data.__sd_bufsiz = __buflen;
-	__result = (__STDC_INT_AS_SSIZE_T)__NAMESPACE_LOCAL_SYM __localdep_format_vprintf(&__NAMESPACE_LOCAL_SYM __localdep_format_snprintf_printer,
+	__result = (__STDC_INT_AS_SSIZE_T)(__NAMESPACE_LOCAL_SYM __localdep_format_vprintf)(&(__NAMESPACE_LOCAL_SYM __localdep_format_snprintf_printer),
 	                                               (void *)&__data, __format, __args);
 	if (__result >= 0) {
 		if (__data.__sd_bufsiz != 0)

@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xa5bfe1ce */
+/* HASH CRC-32:0x23b08bb3 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -40,7 +40,7 @@ __NAMESPACE_LOCAL_BEGIN
 __LOCAL_LIBC(_pipe) __ATTR_NONNULL((1)) int
 __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(_pipe))(__fd_t __pipedes[2], __UINT32_TYPE__ __pipesize, __oflag_t __textmode) {
 	(void)__pipesize;
-	return __NAMESPACE_LOCAL_SYM __localdep_pipe2(__pipedes, __textmode);
+	return (__NAMESPACE_LOCAL_SYM __localdep_pipe2)(__pipedes, __textmode);
 }
 __NAMESPACE_LOCAL_END
 #ifndef __local___localdep__pipe_defined

@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xa526495d */
+/* HASH CRC-32:0x6bb47219 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -36,7 +36,7 @@ __NAMESPACE_LOCAL_BEGIN
 #endif /* !__local___localdep_inet_paton_defined */
 __LOCAL_LIBC(inet_aton) __ATTR_NONNULL((1, 2)) int
 __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(inet_aton))(char const *__restrict __cp, struct in_addr *__restrict __inp) {
-	return __NAMESPACE_LOCAL_SYM __localdep_inet_paton((char const **)&__cp, __inp, 0) && !*__cp;
+	return (__NAMESPACE_LOCAL_SYM __localdep_inet_paton)((char const **)&__cp, __inp, 0) && !*__cp;
 }
 __NAMESPACE_LOCAL_END
 #ifndef __local___localdep_inet_aton_defined

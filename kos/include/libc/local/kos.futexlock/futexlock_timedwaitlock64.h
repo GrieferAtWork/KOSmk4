@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xbd9f0fd9 */
+/* HASH CRC-32:0xfd52583b */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -45,7 +45,7 @@ __NAMESPACE_LOCAL_END
 __NAMESPACE_LOCAL_BEGIN
 __LOCAL_LIBC(futexlock_timedwaitlock64) __ATTR_NONNULL((1, 2)) int
 __NOTHROW_RPC(__LIBCCALL __LIBC_LOCAL_NAME(futexlock_timedwaitlock64))(__uintptr_t *__ulockaddr, __uintptr_t *__uaddr, struct __timespec64 const *__rel_timeout) {
-	return __NAMESPACE_LOCAL_SYM __localdep_lfutexlock64(__ulockaddr, __uaddr, LFUTEX_WAIT_LOCK, 0, __rel_timeout);
+	return (__NAMESPACE_LOCAL_SYM __localdep_lfutexlock64)(__ulockaddr, __uaddr, LFUTEX_WAIT_LOCK, 0, __rel_timeout);
 }
 __NAMESPACE_LOCAL_END
 #ifndef __local___localdep_futexlock_timedwaitlock64_defined

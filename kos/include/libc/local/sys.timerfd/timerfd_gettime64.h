@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x31811502 */
+/* HASH CRC-32:0x2ecac1ab */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -33,7 +33,7 @@ __LOCAL_LIBC(timerfd_gettime64) __ATTR_NONNULL((2)) int
 __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(timerfd_gettime64))(__fd_t __ufd, struct __itimerspec64 *__restrict __otmr) {
 	int __result;
 	struct __itimerspec32 __otmr32;
-	__result = __NAMESPACE_LOCAL_SYM __localdep_timerfd_gettime32(__timerid, &__otmr32);
+	__result = (__NAMESPACE_LOCAL_SYM __localdep_timerfd_gettime32)(__timerid, &__otmr32);
 	if (!__result) {
 		__otmr->__it_interval.tv_sec  = (__time64_t)__otmr32.__it_interval.tv_sec;
 		__otmr->__it_interval.tv_nsec = __otmr32.__it_interval.tv_nsec;

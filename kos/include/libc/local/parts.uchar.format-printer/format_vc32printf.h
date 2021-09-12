@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xb22d98d0 */
+/* HASH CRC-32:0x44f95af6 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -349,13 +349,13 @@ __LOCAL_LIBC(format_vc32printf) __ATTR_LIBC_WPRINTF(3, 0) __ATTR_NONNULL((1, 3))
 #define __FORMAT_ARGS               __args
 #define __CHAR_TYPE                 __CHAR32_TYPE__
 #define __CHAR_SIZE                 4
-#define __FORMAT_STRERROR           __NAMESPACE_LOCAL_SYM __localdep_strerror
-#define __FORMAT_REPEAT             __NAMESPACE_LOCAL_SYM __localdep_format_c32repeat
-#define __FORMAT_HEXDUMP            __NAMESPACE_LOCAL_SYM __localdep_format_c32hexdump
-#define __FORMAT_WIDTH              __NAMESPACE_LOCAL_SYM __localdep_format_c32width
-#define __FORMAT_ESCAPE             __NAMESPACE_LOCAL_SYM __localdep_format_c32escape
-#define __FORMAT_WIDTH8             __NAMESPACE_LOCAL_SYM __localdep_format_width
-#define __FORMAT_ESCAPE8            __NAMESPACE_LOCAL_SYM __localdep_format_escape
+#define __FORMAT_STRERROR           (__NAMESPACE_LOCAL_SYM __localdep_strerror)
+#define __FORMAT_REPEAT             (__NAMESPACE_LOCAL_SYM __localdep_format_c32repeat)
+#define __FORMAT_HEXDUMP            (__NAMESPACE_LOCAL_SYM __localdep_format_c32hexdump)
+#define __FORMAT_WIDTH              (__NAMESPACE_LOCAL_SYM __localdep_format_c32width)
+#define __FORMAT_ESCAPE             (__NAMESPACE_LOCAL_SYM __localdep_format_c32escape)
+#define __FORMAT_WIDTH8             (__NAMESPACE_LOCAL_SYM __localdep_format_width)
+#define __FORMAT_ESCAPE8            (__NAMESPACE_LOCAL_SYM __localdep_format_escape)
 
 
 
@@ -363,11 +363,11 @@ __LOCAL_LIBC(format_vc32printf) __ATTR_LIBC_WPRINTF(3, 0) __ATTR_NONNULL((1, 3))
 
 
 
-#define __FORMAT_WIDTH16            __NAMESPACE_LOCAL_SYM __localdep_format_c16width
-#define __FORMAT_ESCAPE16           __NAMESPACE_LOCAL_SYM __localdep_format_c16escape
+#define __FORMAT_WIDTH16            (__NAMESPACE_LOCAL_SYM __localdep_format_c16width)
+#define __FORMAT_ESCAPE16           (__NAMESPACE_LOCAL_SYM __localdep_format_c16escape)
 #define __FORMAT_UNICODE_WRITECHAR(__dst, __ch) ((__dst)[0] = (__ch), (__dst) + 1)
-#define __FORMAT_UNICODE_FORMAT8    __NAMESPACE_LOCAL_SYM __localdep_format_8to32
-#define __FORMAT_UNICODE_FORMAT16   __NAMESPACE_LOCAL_SYM __localdep_format_16to32
+#define __FORMAT_UNICODE_FORMAT8    (__NAMESPACE_LOCAL_SYM __localdep_format_8to32)
+#define __FORMAT_UNICODE_FORMAT16   (__NAMESPACE_LOCAL_SYM __localdep_format_16to32)
 
 #include <libc/local/format-printf.h>
 #endif /* !__INTELLISENSE__ */

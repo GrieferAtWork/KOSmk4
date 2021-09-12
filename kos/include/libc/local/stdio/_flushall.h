@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x4c2d42aa */
+/* HASH CRC-32:0xb2e78fc */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -49,7 +49,7 @@ __NAMESPACE_LOCAL_BEGIN
 #endif /* !__local___localdep_fflush_defined */
 __LOCAL_LIBC(_flushall) int
 (__LIBCCALL __LIBC_LOCAL_NAME(_flushall))(void) __THROWS(...) {
-	return __NAMESPACE_LOCAL_SYM __localdep_fflush(__NULLPTR);
+	return (__NAMESPACE_LOCAL_SYM __localdep_fflush)(__NULLPTR);
 }
 __NAMESPACE_LOCAL_END
 #ifndef __local___localdep__flushall_defined

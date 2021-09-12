@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x8dba3ea4 */
+/* HASH CRC-32:0xbfd1a705 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -42,7 +42,7 @@ __NAMESPACE_LOCAL_BEGIN
 #endif /* !__local___localdep_fopendirat_defined */
 __LOCAL_LIBC(opendirat) __ATTR_WUNUSED __ATTR_NONNULL((2)) struct __dirstream *
 __NOTHROW_RPC(__LIBCCALL __LIBC_LOCAL_NAME(opendirat))(__fd_t __dirfd, char const *__name) {
-	return __NAMESPACE_LOCAL_SYM __localdep_fopendirat(__dirfd, __name, 0);
+	return (__NAMESPACE_LOCAL_SYM __localdep_fopendirat)(__dirfd, __name, 0);
 }
 __NAMESPACE_LOCAL_END
 #ifndef __local___localdep_opendirat_defined

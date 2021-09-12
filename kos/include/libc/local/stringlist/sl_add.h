@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xc6fbe031 */
+/* HASH CRC-32:0x9ba1d427 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -46,7 +46,7 @@ __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(sl_add))(struct _stringlist *__sl, ch
 		char **__new_vector;
 		__SIZE_TYPE__ __new_alloc;
 		__new_alloc = __sl->sl_max + 20;
-		__new_vector = (char **)__NAMESPACE_LOCAL_SYM __localdep_realloc(__sl->sl_str, __new_alloc * sizeof(char *));
+		__new_vector = (char **)(__NAMESPACE_LOCAL_SYM __localdep_realloc)(__sl->sl_str, __new_alloc * sizeof(char *));
 		if __unlikely(__new_vector == __NULLPTR)
 			return -1;
 		__sl->sl_str = __new_vector;

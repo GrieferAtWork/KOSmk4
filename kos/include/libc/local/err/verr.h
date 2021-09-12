@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xe9ccc32f */
+/* HASH CRC-32:0x12f8e0d2 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -47,7 +47,7 @@ __NAMESPACE_LOCAL_END
 __NAMESPACE_LOCAL_BEGIN
 __LOCAL_LIBC(verr) __ATTR_NORETURN __ATTR_LIBC_PRINTF(2, 0) void
 (__LIBCCALL __LIBC_LOCAL_NAME(verr))(int __status, char const *__format, __builtin_va_list __args) __THROWS(...) {
-	__NAMESPACE_LOCAL_SYM __localdep_verrc(__status, __libc_geterrno_or(0), __format, __args);
+	(__NAMESPACE_LOCAL_SYM __localdep_verrc)(__status, __libc_geterrno_or(0), __format, __args);
 }
 __NAMESPACE_LOCAL_END
 #ifndef __local___localdep_verr_defined

@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x54d64c3 */
+/* HASH CRC-32:0xd71a09d4 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -41,7 +41,7 @@ __NOTHROW_RPC(__LIBCCALL __LIBC_LOCAL_NAME(nanosleep64))(struct __timespec64 con
 	struct __timespec32 __req32, __rem32;
 	__req32.tv_sec  = (__time32_t)__requested_time->tv_sec;
 	__req32.tv_nsec = __requested_time->tv_nsec;
-	__result = __NAMESPACE_LOCAL_SYM __localdep_nanosleep32(&__req32, &__rem32);
+	__result = (__NAMESPACE_LOCAL_SYM __localdep_nanosleep32)(&__req32, &__rem32);
 	if (!__result && __remaining) {
 		__remaining->tv_sec  = (__time64_t)__rem32.tv_sec;
 		__remaining->tv_nsec = __rem32.tv_nsec;

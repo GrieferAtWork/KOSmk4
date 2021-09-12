@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xa3547586 */
+/* HASH CRC-32:0x484551de */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -78,7 +78,7 @@ __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(ether_paton_r))(char const **__restri
 		if (__c == ':') {
 			if (__i >= 5)
 				return __NULLPTR;
-		} else if (!__c || __NAMESPACE_LOCAL_SYM __localdep_isspace(__c)) {
+		} else if (!__c || (__NAMESPACE_LOCAL_SYM __localdep_isspace)(__c)) {
 			if (__i < 5)
 				return __NULLPTR;
 		} else {

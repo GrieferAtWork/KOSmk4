@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x3e1539ee */
+/* HASH CRC-32:0xb2fc9320 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -51,18 +51,18 @@ __LOCAL_LIBC(pthread_stackseg_np) __ATTR_NONNULL((2)) __errno_t
 __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(pthread_stackseg_np))(__pthread_t __pthread, struct sigaltstack *__sinfo) {
 	__errno_t __result;
 	__pthread_attr_t __attr;
-	__result = __NAMESPACE_LOCAL_SYM __localdep_pthread_getattr_np(__pthread, &__attr);
+	__result = (__NAMESPACE_LOCAL_SYM __localdep_pthread_getattr_np)(__pthread, &__attr);
 	if __likely(__result == 0) {
 		void *__stackaddr;
 		__SIZE_TYPE__ __stacksize;
-		__result = __NAMESPACE_LOCAL_SYM __localdep_pthread_attr_getstack(&__attr, &__stackaddr, &__stacksize);
+		__result = (__NAMESPACE_LOCAL_SYM __localdep_pthread_attr_getstack)(&__attr, &__stackaddr, &__stacksize);
 		if __likely(__result == 0) {
 			__sinfo->ss_sp    = __stackaddr;
 			__sinfo->ss_size  = __stacksize;
 			__sinfo->ss_flags = 0;
 		}
 #ifdef __CRT_HAVE_pthread_attr_destroy
-		__NAMESPACE_LOCAL_SYM __localdep_pthread_attr_destroy(&__attr);
+		(__NAMESPACE_LOCAL_SYM __localdep_pthread_attr_destroy)(&__attr);
 #endif /* __CRT_HAVE_pthread_attr_destroy */
 	}
 	return __result;

@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xc55e136c */
+/* HASH CRC-32:0x2acd5c60 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -44,7 +44,7 @@ __NAMESPACE_LOCAL_END
 __NAMESPACE_LOCAL_BEGIN
 __LOCAL_LIBC(getchar16) __WINT16_TYPE__
 (__LIBDCALL __LIBC_LOCAL_NAME(getchar16))(void) __THROWS(...) {
-	return __NAMESPACE_LOCAL_SYM __localdep_fgetc16(__LOCAL_stdin);
+	return (__NAMESPACE_LOCAL_SYM __localdep_fgetc16)(__LOCAL_stdin);
 }
 __NAMESPACE_LOCAL_END
 #ifndef __local___localdep_getchar16_defined

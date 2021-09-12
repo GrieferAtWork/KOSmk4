@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xeec1047a */
+/* HASH CRC-32:0x14a96385 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -38,7 +38,7 @@ __CREDIRECT(__ATTR_WUNUSED __DECL_SIMD_sin,double,__NOTHROW,__localdep_sin,(doub
 #endif /* !__local___localdep_sin_defined */
 __LOCAL_LIBC(sinf) __ATTR_WUNUSED __DECL_SIMD_sinf float
 __NOTHROW(__LIBCCALL __LIBC_LOCAL_NAME(sinf))(float __x) {
-	return (float)__NAMESPACE_LOCAL_SYM __localdep_sin((double)__x);
+	return (float)(__NAMESPACE_LOCAL_SYM __localdep_sin)((double)__x);
 }
 __NAMESPACE_LOCAL_END
 #ifndef __local___localdep_sinf_defined

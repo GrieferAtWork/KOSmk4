@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xb73e3816 */
+/* HASH CRC-32:0xbafd58fb */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -38,7 +38,7 @@ __NOTHROW_NCX(__LIBDCALL __LIBC_LOCAL_NAME(_tempnam_dbg))(char const *__dir_name
 	(void)__block_type;
 	(void)__filename;
 	(void)__line;
-	return __NAMESPACE_LOCAL_SYM __localdep_tempnam(__dir_name, __file_prefix);
+	return (__NAMESPACE_LOCAL_SYM __localdep_tempnam)(__dir_name, __file_prefix);
 }
 __NAMESPACE_LOCAL_END
 #ifndef __local___localdep__tempnam_dbg_defined

@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xae845a1c */
+/* HASH CRC-32:0x8dc4ce42 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -251,7 +251,7 @@ __CDECLARE(__ATTR_NONNULL((1, 4)),int,__NOTHROW_NCX,glob,(char const *__restrict
  * @return: GLOB_ABORTED : ...
  * @return: GLOB_NOMATCH : ...
  * @return: GLOB_NOSYS   : ... */
-__NAMESPACE_LOCAL_USING_OR_IMPL(glob, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_NONNULL((1, 4)) int __NOTHROW_NCX(__LIBCCALL glob)(char const *__restrict __pattern, __STDC_INT_AS_UINT_T __flags, __glob_errfunc_t __errfunc, glob_t *__restrict __pglob) { return __NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(glob)(__pattern, __flags, __errfunc, __pglob); })
+__NAMESPACE_LOCAL_USING_OR_IMPL(glob, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_NONNULL((1, 4)) int __NOTHROW_NCX(__LIBCCALL glob)(char const *__restrict __pattern, __STDC_INT_AS_UINT_T __flags, __glob_errfunc_t __errfunc, glob_t *__restrict __pglob) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(glob))(__pattern, __flags, __errfunc, __pglob); })
 #endif /* !... */
 #if defined(__CRT_HAVE_globfree64) && defined(__USE_FILE_OFFSET64)
 __CREDIRECT_VOID(__ATTR_NONNULL((1)),__NOTHROW_NCX,globfree,(glob_t *__pglob),globfree64,(__pglob))
@@ -259,7 +259,7 @@ __CREDIRECT_VOID(__ATTR_NONNULL((1)),__NOTHROW_NCX,globfree,(glob_t *__pglob),gl
 __CDECLARE_VOID(__ATTR_NONNULL((1)),__NOTHROW_NCX,globfree,(glob_t *__pglob),(__pglob))
 #else /* ... */
 #include <libc/local/glob/globfree.h>
-__NAMESPACE_LOCAL_USING_OR_IMPL(globfree, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_NONNULL((1)) void __NOTHROW_NCX(__LIBCCALL globfree)(glob_t *__pglob) { __NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(globfree)(__pglob); })
+__NAMESPACE_LOCAL_USING_OR_IMPL(globfree, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_NONNULL((1)) void __NOTHROW_NCX(__LIBCCALL globfree)(glob_t *__pglob) { (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(globfree))(__pglob); })
 #endif /* !... */
 
 #ifdef __USE_LARGEFILE64
@@ -285,13 +285,13 @@ __CDECLARE(__ATTR_NONNULL((1, 4)),int,__NOTHROW_NCX,glob64,(const char *__restri
  * @return: GLOB_ABORTED : ...
  * @return: GLOB_NOMATCH : ...
  * @return: GLOB_NOSYS   : ... */
-__NAMESPACE_LOCAL_USING_OR_IMPL(glob64, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_NONNULL((1, 4)) int __NOTHROW_NCX(__LIBCCALL glob64)(const char *__restrict __pattern, __STDC_INT_AS_UINT_T __flags, __glob_errfunc_t __errfunc, struct __glob64_struct *__restrict __pglob) { return __NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(glob64)(__pattern, __flags, __errfunc, __pglob); })
+__NAMESPACE_LOCAL_USING_OR_IMPL(glob64, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_NONNULL((1, 4)) int __NOTHROW_NCX(__LIBCCALL glob64)(const char *__restrict __pattern, __STDC_INT_AS_UINT_T __flags, __glob_errfunc_t __errfunc, struct __glob64_struct *__restrict __pglob) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(glob64))(__pattern, __flags, __errfunc, __pglob); })
 #endif /* !__CRT_HAVE_glob64 */
 #ifdef __CRT_HAVE_globfree64
 __CDECLARE_VOID(__ATTR_NONNULL((1)),__NOTHROW_NCX,globfree64,(struct __glob64_struct *__pglob),(__pglob))
 #else /* __CRT_HAVE_globfree64 */
 #include <libc/local/glob/globfree64.h>
-__NAMESPACE_LOCAL_USING_OR_IMPL(globfree64, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_NONNULL((1)) void __NOTHROW_NCX(__LIBCCALL globfree64)(struct __glob64_struct *__pglob) { __NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(globfree64)(__pglob); })
+__NAMESPACE_LOCAL_USING_OR_IMPL(globfree64, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_NONNULL((1)) void __NOTHROW_NCX(__LIBCCALL globfree64)(struct __glob64_struct *__pglob) { (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(globfree64))(__pglob); })
 #endif /* !__CRT_HAVE_globfree64 */
 #endif /* __USE_LARGEFILE64 */
 

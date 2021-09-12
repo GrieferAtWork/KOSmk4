@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xed1f54bb */
+/* HASH CRC-32:0x53c87cdb */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -39,7 +39,7 @@ __NAMESPACE_LOCAL_BEGIN
 __LOCAL_LIBC(strerror_l) __ATTR_COLD __ATTR_WUNUSED char *
 __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(strerror_l))(int __errnum, __locale_t __locale) {
 	(void)__locale;
-	return __NAMESPACE_LOCAL_SYM __localdep_strerror(__errnum);
+	return (__NAMESPACE_LOCAL_SYM __localdep_strerror)(__errnum);
 }
 __NAMESPACE_LOCAL_END
 #ifndef __local___localdep_strerror_l_defined

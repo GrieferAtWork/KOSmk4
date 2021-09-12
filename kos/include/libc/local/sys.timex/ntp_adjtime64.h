@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xef9d9eca */
+/* HASH CRC-32:0x1fc4eef */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -53,7 +53,7 @@ __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(ntp_adjtime64))(struct __timex64 *__r
 /*	nxtalt.@errcnt@       = (time32_t)tntx->@errcnt@; */
 /*	nxtalt.@stbcnt@       = (time32_t)tntx->@stbcnt@; */
 /*	nxtalt.@tai@          = (time32_t)tntx->@tai@; */
-	__result = __NAMESPACE_LOCAL_SYM __localdep_ntp_adjtime32(&__nxtalt);
+	__result = (__NAMESPACE_LOCAL_SYM __localdep_ntp_adjtime32)(&__nxtalt);
 	if __likely(__result == 0) {
 		__tntx->time.tv_sec  = (__time64_t)__nxtalt.time.tv_sec;
 		__tntx->time.tv_usec = __nxtalt.time.tv_usec;

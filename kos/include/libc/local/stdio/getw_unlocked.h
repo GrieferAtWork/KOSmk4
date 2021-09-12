@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x31e3e94a */
+/* HASH CRC-32:0x52399794 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -61,7 +61,7 @@ __NAMESPACE_LOCAL_BEGIN
 __LOCAL_LIBC(getw_unlocked) __ATTR_NONNULL((1)) int
 (__LIBCCALL __LIBC_LOCAL_NAME(getw_unlocked))(__FILE *__restrict __stream) __THROWS(...) {
 	__UINT16_TYPE__ __result;
-	return __NAMESPACE_LOCAL_SYM __localdep_fread_unlocked(&__result, sizeof(__result), 1, __stream)
+	return (__NAMESPACE_LOCAL_SYM __localdep_fread_unlocked)(&__result, sizeof(__result), 1, __stream)
 	       ? (int)(unsigned int)__result
 	       : (int)__EOF;
 }

@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xf0f2f210 */
+/* HASH CRC-32:0x81fc91f0 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -30,7 +30,7 @@ __COMPILER_REDIRECT(__LIBC,,int *,__NOTHROW_NCX,__LIBDCALL,__localdep___p__crtDb
 __LOCAL_LIBC(_CrtSetDbgFlag) int
 __NOTHROW_NCX(__LIBDCALL __LIBC_LOCAL_NAME(_CrtSetDbgFlag))(int __new_flag) {
 	int __result, *__ptr;
-	__ptr = __NAMESPACE_LOCAL_SYM __localdep___p__crtDbgFlag();
+	__ptr = (__NAMESPACE_LOCAL_SYM __localdep___p__crtDbgFlag)();
 	__result = *__ptr;
 	*__ptr = __new_flag;
 	return __result;

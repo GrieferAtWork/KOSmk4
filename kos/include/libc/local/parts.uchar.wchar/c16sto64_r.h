@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x7ca69c6b */
+/* HASH CRC-32:0x8af9c3b1 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -77,7 +77,7 @@ __NOTHROW_NCX(__LIBDCALL __LIBC_LOCAL_NAME(c16sto64_r))(__CHAR16_TYPE__ const *_
 	__CHAR16_TYPE__ __sign;
 	__CHAR16_TYPE__ const *__num_start = __nptr;
 	__CHAR16_TYPE__ const *__num_iter;
-	while (__NAMESPACE_LOCAL_SYM __localdep_isspace16(*__num_start))
+	while ((__NAMESPACE_LOCAL_SYM __localdep_isspace16)(*__num_start))
 		++__num_start;
 	__sign = *__num_start;
 	if (__sign == '-' || __sign == '+')
@@ -180,7 +180,7 @@ __handle_overflow:
 			*__error = 0;
 			/* Check for `EINVAL' */
 			if __unlikely(*__num_iter) {
-				while (__NAMESPACE_LOCAL_SYM __localdep_isspace16(*__num_iter))
+				while ((__NAMESPACE_LOCAL_SYM __localdep_isspace16)(*__num_iter))
 					++__num_iter;
 				if (*__num_iter) {
 #ifdef __EINVAL

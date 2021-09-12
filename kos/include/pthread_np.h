@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x4c3723e0 */
+/* HASH CRC-32:0xd1a25810 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -126,7 +126,7 @@ __CREDIRECT(__ATTR_CONST,int,__NOTHROW,pthread_main_np,(void),thr_main,())
  * calling program), and 0  otherwise. Additionally, -1 is  returned
  * if the  calling  thread  "hasn't been initialized",  though  this
  * isn't a case that can actually happen under KOS's implementation. */
-__NAMESPACE_LOCAL_USING_OR_IMPL(pthread_main_np, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_CONST int __NOTHROW(__LIBCCALL pthread_main_np)(void) { return __NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(pthread_main_np)(); })
+__NAMESPACE_LOCAL_USING_OR_IMPL(pthread_main_np, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_CONST int __NOTHROW(__LIBCCALL pthread_main_np)(void) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(pthread_main_np))(); })
 #else /* ... */
 #undef __pthread_main_np_defined
 #endif /* !... */
@@ -139,7 +139,7 @@ __CDECLARE(__ATTR_NONNULL((2)),__errno_t,__NOTHROW_NCX,pthread_stackseg_np,(pthr
 #include <libc/local/pthread_np/pthread_stackseg_np.h>
 /* >> pthread_stackseg_np(3)
  * Convenience wrapper for `pthread_getattr_np(3)' + `pthread_attr_getstack()' */
-__NAMESPACE_LOCAL_USING_OR_IMPL(pthread_stackseg_np, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_NONNULL((2)) __errno_t __NOTHROW_NCX(__LIBCCALL pthread_stackseg_np)(pthread_t __pthread, stack_t *__sinfo) { return __NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(pthread_stackseg_np)(__pthread, __sinfo); })
+__NAMESPACE_LOCAL_USING_OR_IMPL(pthread_stackseg_np, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_NONNULL((2)) __errno_t __NOTHROW_NCX(__LIBCCALL pthread_stackseg_np)(pthread_t __pthread, stack_t *__sinfo) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(pthread_stackseg_np))(__pthread, __sinfo); })
 #endif /* ... */
 
 __SYSDECL_END

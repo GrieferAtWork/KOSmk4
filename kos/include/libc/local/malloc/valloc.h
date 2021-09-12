@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x7565e7ee */
+/* HASH CRC-32:0x98bafef7 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -72,7 +72,7 @@ __NAMESPACE_LOCAL_BEGIN
 #endif /* !__local___localdep_memalign_defined */
 __LOCAL_LIBC(valloc) __ATTR_MALL_PAGEALIGNED __ATTR_WUNUSED __ATTR_ALLOC_SIZE((1)) void *
 __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(valloc))(__SIZE_TYPE__ __n_bytes) {
-	return __NAMESPACE_LOCAL_SYM __localdep_memalign(__NAMESPACE_LOCAL_SYM __localdep_getpagesize(), __n_bytes);
+	return (__NAMESPACE_LOCAL_SYM __localdep_memalign)((__NAMESPACE_LOCAL_SYM __localdep_getpagesize)(), __n_bytes);
 }
 __NAMESPACE_LOCAL_END
 #ifndef __local___localdep_valloc_defined

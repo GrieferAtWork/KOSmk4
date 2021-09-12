@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xb8547380 */
+/* HASH CRC-32:0x6d33258b */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -77,13 +77,13 @@ __NAMESPACE_LOCAL_BEGIN
 __LOCAL_LIBC(_aligned_realloc) __ATTR_WUNUSED __ATTR_ALLOC_ALIGN(3) __ATTR_ALLOC_SIZE((2)) void *
 __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(_aligned_realloc))(void *__aligned_mallptr, __SIZE_TYPE__ __newsize, __SIZE_TYPE__ __min_alignment) {
 	void *__result;
-	__result = __NAMESPACE_LOCAL_SYM __localdep__aligned_malloc(__newsize, __min_alignment);
+	__result = (__NAMESPACE_LOCAL_SYM __localdep__aligned_malloc)(__newsize, __min_alignment);
 	if (__result && __aligned_mallptr) {
-		__SIZE_TYPE__ __temp = __NAMESPACE_LOCAL_SYM __localdep__aligned_msize(__aligned_mallptr, __min_alignment, 0);
+		__SIZE_TYPE__ __temp = (__NAMESPACE_LOCAL_SYM __localdep__aligned_msize)(__aligned_mallptr, __min_alignment, 0);
 		if (__temp > __newsize)
 			__temp = __newsize;
-		__NAMESPACE_LOCAL_SYM __localdep_memcpy(__result, __aligned_mallptr, __temp);
-		__NAMESPACE_LOCAL_SYM __localdep__aligned_free(__aligned_mallptr);
+		(__NAMESPACE_LOCAL_SYM __localdep_memcpy)(__result, __aligned_mallptr, __temp);
+		(__NAMESPACE_LOCAL_SYM __localdep__aligned_free)(__aligned_mallptr);
 	}
 	return __result;
 }

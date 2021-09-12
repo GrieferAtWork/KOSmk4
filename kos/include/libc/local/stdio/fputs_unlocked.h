@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x7e8dfbd1 */
+/* HASH CRC-32:0xa126cb01 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -78,9 +78,9 @@ __NAMESPACE_LOCAL_BEGIN
 __LOCAL_LIBC(fputs_unlocked) __ATTR_NONNULL((1, 2)) __STDC_INT_AS_SIZE_T
 (__LIBCCALL __LIBC_LOCAL_NAME(fputs_unlocked))(char const *__restrict __string, __FILE *__restrict __stream) __THROWS(...) {
 	__STDC_INT_AS_SIZE_T __result;
-	__result = __NAMESPACE_LOCAL_SYM __localdep_fwrite_unlocked(__string,
+	__result = (__NAMESPACE_LOCAL_SYM __localdep_fwrite_unlocked)(__string,
 	                         sizeof(char),
-	                         __NAMESPACE_LOCAL_SYM __localdep_strlen(__string),
+	                         (__NAMESPACE_LOCAL_SYM __localdep_strlen)(__string),
 	                         __stream);
 	return __result;
 }

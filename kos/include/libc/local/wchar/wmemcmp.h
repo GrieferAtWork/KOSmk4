@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x5476dc21 */
+/* HASH CRC-32:0x9f9225ce */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -69,11 +69,11 @@ __NAMESPACE_LOCAL_BEGIN
 __LOCAL_LIBC(wmemcmp) __ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1, 2)) int
 __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(wmemcmp))(__WCHAR_TYPE__ const *__s1, __WCHAR_TYPE__ const *__s2, __SIZE_TYPE__ __num_chars) {
 #if __SIZEOF_WCHAR_T__ == 2
-	return __NAMESPACE_LOCAL_SYM __localdep_memcmpw(__s1, __s2, __num_chars);
+	return (__NAMESPACE_LOCAL_SYM __localdep_memcmpw)(__s1, __s2, __num_chars);
 #elif __SIZEOF_WCHAR_T__ == 4
-	return __NAMESPACE_LOCAL_SYM __localdep_memcmpl(__s1, __s2, __num_chars);
+	return (__NAMESPACE_LOCAL_SYM __localdep_memcmpl)(__s1, __s2, __num_chars);
 #else /* ... */
-	return __NAMESPACE_LOCAL_SYM __localdep_memcmp(__s1, __s2, __num_chars * sizeof(__WCHAR_TYPE__));
+	return (__NAMESPACE_LOCAL_SYM __localdep_memcmp)(__s1, __s2, __num_chars * sizeof(__WCHAR_TYPE__));
 #endif /* !... */
 }
 __NAMESPACE_LOCAL_END

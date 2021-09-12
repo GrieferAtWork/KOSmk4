@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xc89970c4 */
+/* HASH CRC-32:0x1e33ce5c */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -45,7 +45,7 @@ __NAMESPACE_LOCAL_END
 __NAMESPACE_LOCAL_BEGIN
 __LOCAL_LIBC(futex_timedwaitwhile_cmpxch64) __ATTR_NONNULL((1)) int
 __NOTHROW_RPC(__LIBCCALL __LIBC_LOCAL_NAME(futex_timedwaitwhile_cmpxch64))(__uintptr_t *__uaddr, __uintptr_t __old_value, __uintptr_t __new_value, struct __timespec64 const *__rel_timeout) {
-	return __NAMESPACE_LOCAL_SYM __localdep_lfutex64(__uaddr, LFUTEX_WAIT_WHILE_CMPXCH, __old_value, __rel_timeout, __new_value);
+	return (__NAMESPACE_LOCAL_SYM __localdep_lfutex64)(__uaddr, LFUTEX_WAIT_WHILE_CMPXCH, __old_value, __rel_timeout, __new_value);
 }
 __NAMESPACE_LOCAL_END
 #ifndef __local___localdep_futex_timedwaitwhile_cmpxch64_defined

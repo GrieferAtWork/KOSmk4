@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xcdee898c */
+/* HASH CRC-32:0x1c385b23 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -55,9 +55,9 @@ __LOCAL_LIBC(isatty) __ATTR_WUNUSED int
 __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(isatty))(__fd_t __fd) {
 	struct termios __ios;
 #if defined(__CRT_HAVE_ioctl) && defined(__TCGETA)
-	return __NAMESPACE_LOCAL_SYM __localdep_ioctl(__fd, __TCGETA, &__ios) < 0 ? 0 : 1;
+	return (__NAMESPACE_LOCAL_SYM __localdep_ioctl)(__fd, __TCGETA, &__ios) < 0 ? 0 : 1;
 #else /* __CRT_HAVE_ioctl && __TCGETA */
-	return __NAMESPACE_LOCAL_SYM __localdep_tcgetattr(__fd, &__ios) != 0 ? 0 : 1;
+	return (__NAMESPACE_LOCAL_SYM __localdep_tcgetattr)(__fd, &__ios) != 0 ? 0 : 1;
 #endif /* !__CRT_HAVE_ioctl || !__TCGETA */
 }
 __NAMESPACE_LOCAL_END

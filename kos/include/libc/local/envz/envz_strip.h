@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x334e4344 */
+/* HASH CRC-32:0x46cae345 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -75,22 +75,22 @@ __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(envz_strip))(char **__restrict __penv
 	while (__ptr < __end) {
 		char *__next;
 		__SIZE_TYPE__ __partlen;
-		__next = __NAMESPACE_LOCAL_SYM __localdep_strchrnul(__ptr, '=');
+		__next = (__NAMESPACE_LOCAL_SYM __localdep_strchrnul)(__ptr, '=');
 		if (*__next) {
-			__ptr = __NAMESPACE_LOCAL_SYM __localdep_strend(__next) + 1;
+			__ptr = (__NAMESPACE_LOCAL_SYM __localdep_strend)(__next) + 1;
 			continue;
 		}
 		/* Remove this entry. */
-		__next = __NAMESPACE_LOCAL_SYM __localdep_strend(__next) + 1;
+		__next = (__NAMESPACE_LOCAL_SYM __localdep_strend)(__next) + 1;
 		__partlen = (__SIZE_TYPE__)(__end - __next);
-		__NAMESPACE_LOCAL_SYM __localdep_memmovedownc(__ptr, __next, __partlen, sizeof(char));
+		(__NAMESPACE_LOCAL_SYM __localdep_memmovedownc)(__ptr, __next, __partlen, sizeof(char));
 		__end -= __partlen;
 	}
 	__newlen = (__SIZE_TYPE__)(__end - __start);
 	if (__newlen < __oldlen) {
 		*__penvz_len = __newlen;
 #ifdef __CRT_HAVE_realloc
-		__start = (char *)__NAMESPACE_LOCAL_SYM __localdep_realloc(__start, __newlen);
+		__start = (char *)(__NAMESPACE_LOCAL_SYM __localdep_realloc)(__start, __newlen);
 		if __likely(__start)
 			*__penvz = __start;
 #endif /* __CRT_HAVE_realloc */

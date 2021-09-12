@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x328e9a37 */
+/* HASH CRC-32:0xec7980b8 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -104,13 +104,13 @@ __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(vasprintf))(char **__restrict __pstr,
 	__data.ap_avail = 0;
 	__data.ap_used  = 0;
 	__data.ap_base  = __NULLPTR;
-	__error = __NAMESPACE_LOCAL_SYM __localdep_format_vprintf(&__NAMESPACE_LOCAL_SYM __localdep_format_aprintf_printer, &__data, __format, __args);
+	__error = (__NAMESPACE_LOCAL_SYM __localdep_format_vprintf)(&(__NAMESPACE_LOCAL_SYM __localdep_format_aprintf_printer), &__data, __format, __args);
 	if __unlikely(__error < 0) {
-		__NAMESPACE_LOCAL_SYM __localdep_free(__data.ap_base);
+		(__NAMESPACE_LOCAL_SYM __localdep_free)(__data.ap_base);
 		*__pstr = __NULLPTR;
 		return -1;
 	}
-	__result = __NAMESPACE_LOCAL_SYM __localdep_format_aprintf_pack(&__data, __NULLPTR);
+	__result = (__NAMESPACE_LOCAL_SYM __localdep_format_aprintf_pack)(&__data, __NULLPTR);
 	*__pstr  = __result;
 	if __unlikely(!__result)
 		return -1;

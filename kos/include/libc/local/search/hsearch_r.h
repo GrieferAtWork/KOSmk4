@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xe40ecd62 */
+/* HASH CRC-32:0xd652aa16 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -77,7 +77,7 @@ __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(hsearch_r))(struct entry __item, int 
 		struct entry        __entry;
 	} __entry_type;
 	unsigned int __hval, __count, __idx;
-	unsigned int __len = __NAMESPACE_LOCAL_SYM __localdep_strlen(__item.key);
+	unsigned int __len = (__NAMESPACE_LOCAL_SYM __localdep_strlen)(__item.key);
 	__hval = __count = __len;
 	while (__count-- > 0) {
 		__hval <<= 4;
@@ -89,7 +89,7 @@ __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(hsearch_r))(struct entry __item, int 
 	if (((__entry_type *)__htab->table)[__idx].___used) {
 		unsigned int __hval2, __first_idx;
 		if (((__entry_type *)__htab->table)[__idx].___used == __hval &&
-		    __NAMESPACE_LOCAL_SYM __localdep_strcmp(__item.key, ((__entry_type *)__htab->table)[__idx].__entry.key) == 0) {
+		    (__NAMESPACE_LOCAL_SYM __localdep_strcmp)(__item.key, ((__entry_type *)__htab->table)[__idx].__entry.key) == 0) {
 			*__retval = &((__entry_type *)__htab->table)[__idx].__entry;
 			return 1;
 		}
@@ -103,7 +103,7 @@ __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(hsearch_r))(struct entry __item, int 
 			if (__idx == __first_idx)
 				break;
 			if (((__entry_type *)__htab->table)[__idx].___used == __hval &&
-			    __NAMESPACE_LOCAL_SYM __localdep_strcmp(__item.key, ((__entry_type *)__htab->table)[__idx].__entry.key) == 0) {
+			    (__NAMESPACE_LOCAL_SYM __localdep_strcmp)(__item.key, ((__entry_type *)__htab->table)[__idx].__entry.key) == 0) {
 				*__retval = &((__entry_type *)__htab->table)[__idx].__entry;
 				return 1;
 			}

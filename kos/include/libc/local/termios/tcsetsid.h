@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x88c196f9 */
+/* HASH CRC-32:0xda9931bd */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -45,14 +45,14 @@ __NAMESPACE_LOCAL_BEGIN
 __LOCAL_LIBC(tcsetsid) int
 __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(tcsetsid))(__fd_t __fd, __pid_t __pid) {
 	int __result;
-	if __unlikely(__pid != __NAMESPACE_LOCAL_SYM __localdep_getsid(0)) {
+	if __unlikely(__pid != (__NAMESPACE_LOCAL_SYM __localdep_getsid)(0)) {
 #ifdef __EINVAL
 		__result = __libc_seterrno(__EINVAL);
 #else /* __EINVAL */
 		__result = __libc_seterrno(1);
 #endif /* !__EINVAL */
 	} else {
-		__result = __NAMESPACE_LOCAL_SYM __localdep_ioctl(__fd, __TIOCSCTTY, __NULLPTR);
+		__result = (__NAMESPACE_LOCAL_SYM __localdep_ioctl)(__fd, __TIOCSCTTY, __NULLPTR);
 	}
 	return __result;
 }

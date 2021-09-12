@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x132274f8 */
+/* HASH CRC-32:0xf4a384 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -66,7 +66,7 @@ __NAMESPACE_LOCAL_END
 __NAMESPACE_LOCAL_BEGIN
 __LOCAL_LIBC(_getws_s) __WCHAR_TYPE__ *
 __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(_getws_s))(__WCHAR_TYPE__ *__buf, __SIZE_TYPE__ __buflen) {
-	return __NAMESPACE_LOCAL_SYM __localdep_fgetws(__buf, __buflen, __LOCAL_stdin);
+	return (__NAMESPACE_LOCAL_SYM __localdep_fgetws)(__buf, __buflen, __LOCAL_stdin);
 }
 __NAMESPACE_LOCAL_END
 #ifndef __local___localdep__getws_s_defined

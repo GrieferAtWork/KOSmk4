@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x6cc57e1b */
+/* HASH CRC-32:0x5ca2513e */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -39,7 +39,7 @@ __NAMESPACE_LOCAL_BEGIN
 __LOCAL_LIBC(cnd_broadcast) __ATTR_NONNULL((1)) int
 __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(cnd_broadcast))(__cnd_t *__restrict __cond) {
 	__errno_t __error;
-	__error = __NAMESPACE_LOCAL_SYM __localdep_pthread_cond_broadcast((__pthread_cond_t *)__cond);
+	__error = (__NAMESPACE_LOCAL_SYM __localdep_pthread_cond_broadcast)((__pthread_cond_t *)__cond);
 	if __likely(!__error)
 		return __thrd_success;
 	return __thrd_error;

@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x8ffc7fee */
+/* HASH CRC-32:0xebc0879a */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -42,7 +42,7 @@ __NAMESPACE_LOCAL_BEGIN
 #endif /* !__local___localdep_memcpy_defined */
 __LOCAL_LIBC(posix_spawnattr_getschedparam) __ATTR_NONNULL((1, 2)) __errno_t
 __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(posix_spawnattr_getschedparam))(struct __posix_spawnattr const *__restrict __attr, struct sched_param *__restrict __schedparam) {
-	__NAMESPACE_LOCAL_SYM __localdep_memcpy(__schedparam, &__attr->__sp, sizeof(struct sched_param));
+	(__NAMESPACE_LOCAL_SYM __localdep_memcpy)(__schedparam, &__attr->__sp, sizeof(struct sched_param));
 	return 0;
 }
 __NAMESPACE_LOCAL_END

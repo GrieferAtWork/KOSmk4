@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x8ea7aedb */
+/* HASH CRC-32:0xbc418b7 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -55,7 +55,7 @@ __NAMESPACE_LOCAL_BEGIN
 __LOCAL_LIBC(putpwent) __ATTR_NONNULL((1, 2)) int
 (__LIBCCALL __LIBC_LOCAL_NAME(putpwent))(struct passwd const *__restrict __ent, __FILE *__restrict __stream) __THROWS(...) {
 	__STDC_INT_AS_SSIZE_T __error;
-	__error = __NAMESPACE_LOCAL_SYM __localdep_fprintf(__stream,
+	__error = (__NAMESPACE_LOCAL_SYM __localdep_fprintf)(__stream,
 	                "%s:%s:"
 	                "%" __PRIN_PREFIX(__SIZEOF_UID_T__) "u:"
 	                "%" __PRIN_PREFIX(__SIZEOF_GID_T__) "u:"

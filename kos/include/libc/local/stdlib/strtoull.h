@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x5c70d429 */
+/* HASH CRC-32:0x37447ed2 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -67,9 +67,9 @@ __NAMESPACE_LOCAL_BEGIN
 __LOCAL_LIBC(strtoull) __ATTR_LEAF __ATTR_NONNULL((1)) __ULONGLONG
 __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(strtoull))(char const *__restrict __nptr, char **__endptr, __STDC_INT_AS_UINT_T __base) {
 #if __SIZEOF_LONG_LONG__ <= 4
-	return (__ULONGLONG)__NAMESPACE_LOCAL_SYM __localdep_strtou32(__nptr, __endptr, __base);
+	return (__ULONGLONG)(__NAMESPACE_LOCAL_SYM __localdep_strtou32)(__nptr, __endptr, __base);
 #else /* __SIZEOF_LONG_LONG__ <= 4 */
-	return (__ULONGLONG)__NAMESPACE_LOCAL_SYM __localdep_strtou64(__nptr, __endptr, __base);
+	return (__ULONGLONG)(__NAMESPACE_LOCAL_SYM __localdep_strtou64)(__nptr, __endptr, __base);
 #endif /* __SIZEOF_LONG_LONG__ > 4 */
 }
 __NAMESPACE_LOCAL_END

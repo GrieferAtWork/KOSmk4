@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x3c1de6f9 */
+/* HASH CRC-32:0xe6bf1572 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -86,31 +86,31 @@ __NAMESPACE_LOCAL_END
 __NAMESPACE_LOCAL_BEGIN
 __LOCAL_LIBC(login_tty) int
 __NOTHROW_RPC_KOS(__LIBCCALL __LIBC_LOCAL_NAME(login_tty))(__fd_t __fd) {
-	if __unlikely(__NAMESPACE_LOCAL_SYM __localdep_setsid() < 0)
+	if __unlikely((__NAMESPACE_LOCAL_SYM __localdep_setsid)() < 0)
 		goto __err;
-	if __unlikely(__NAMESPACE_LOCAL_SYM __localdep_ioctl(__fd, __TIOCSCTTY, 1) < 0)
+	if __unlikely((__NAMESPACE_LOCAL_SYM __localdep_ioctl)(__fd, __TIOCSCTTY, 1) < 0)
 		goto __err;
 #if __STDIN_FILENO <= 2 && __STDOUT_FILENO <= 2 && __STDERR_FILENO <= 2
 	{
 		__fd_t __i;
 		for (__i = 0; __i <= 2; ++__i) {
 			if __likely(__fd != __i) {
-				if __unlikely(__NAMESPACE_LOCAL_SYM __localdep_dup2(__fd, __i))
+				if __unlikely((__NAMESPACE_LOCAL_SYM __localdep_dup2)(__fd, __i))
 					goto __err;
 			}
 		}
 	}
 	if __likely(__fd >= 3)
-		__NAMESPACE_LOCAL_SYM __localdep_close(__fd);
+		(__NAMESPACE_LOCAL_SYM __localdep_close)(__fd);
 #else /* __STDIN_FILENO <= 2 && __STDOUT_FILENO <= 2 && __STDERR_FILENO <= 2 */
-	if (__likely(__fd != __STDIN_FILENO) && __unlikely(__NAMESPACE_LOCAL_SYM __localdep_dup2(__fd, __STDIN_FILENO)))
+	if (__likely(__fd != __STDIN_FILENO) && __unlikely((__NAMESPACE_LOCAL_SYM __localdep_dup2)(__fd, __STDIN_FILENO)))
 		goto __err;
-	if (__likely(__fd != __STDOUT_FILENO) && __unlikely(__NAMESPACE_LOCAL_SYM __localdep_dup2(__fd, __STDOUT_FILENO)))
+	if (__likely(__fd != __STDOUT_FILENO) && __unlikely((__NAMESPACE_LOCAL_SYM __localdep_dup2)(__fd, __STDOUT_FILENO)))
 		goto __err;
-	if (__likely(__fd != __STDERR_FILENO) && __unlikely(__NAMESPACE_LOCAL_SYM __localdep_dup2(__fd, __STDERR_FILENO)))
+	if (__likely(__fd != __STDERR_FILENO) && __unlikely((__NAMESPACE_LOCAL_SYM __localdep_dup2)(__fd, __STDERR_FILENO)))
 		goto __err;
 	if __likely(__fd != __STDIN_FILENO && __fd != __STDOUT_FILENO && __fd != __STDERR_FILENO)
-		__NAMESPACE_LOCAL_SYM __localdep_close(__fd);
+		(__NAMESPACE_LOCAL_SYM __localdep_close)(__fd);
 #endif /* __STDIN_FILENO > 2 || __STDOUT_FILENO > 2 || __STDERR_FILENO > 2 */
 	return 0;
 __err:

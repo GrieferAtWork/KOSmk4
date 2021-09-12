@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xee47ece6 */
+/* HASH CRC-32:0xbcb8e272 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -475,7 +475,7 @@ __CREDIRECT(__ATTR_NONNULL((2, 3)),int,__NOTHROW_NCX,fstatat64,(__fd_t __dirfd, 
 __CDECLARE(__ATTR_NONNULL((1)),int,__NOTHROW_RPC,mkdir,(char const *__pathname, __mode_t __mode),(__pathname,__mode))
 #elif defined(__CRT_DOS_PRIMARY) && defined(__CRT_HAVE__mkdir)
 #include <libc/local/sys.stat/mkdir.h>
-__NAMESPACE_LOCAL_USING_OR_IMPL(mkdir, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_NONNULL((1)) int __NOTHROW_RPC(__LIBCCALL mkdir)(char const *__pathname, __mode_t __mode) { return __NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(mkdir)(__pathname, __mode); })
+__NAMESPACE_LOCAL_USING_OR_IMPL(mkdir, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_NONNULL((1)) int __NOTHROW_RPC(__LIBCCALL mkdir)(char const *__pathname, __mode_t __mode) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(mkdir))(__pathname, __mode); })
 #else /* ... */
 #undef __mkdir_defined
 #endif /* !... */
@@ -527,7 +527,7 @@ __CDECLARE(,__mode_t,__NOTHROW_NCX,getumask,(void),())
 #include <libc/local/sys.stat/getumask.h>
 /* Return the current umask.
  * WARNING: This function isn't thread-safe */
-__NAMESPACE_LOCAL_USING_OR_IMPL(getumask, __FORCELOCAL __ATTR_ARTIFICIAL __mode_t __NOTHROW_NCX(__LIBCCALL getumask)(void) { return __NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(getumask)(); })
+__NAMESPACE_LOCAL_USING_OR_IMPL(getumask, __FORCELOCAL __ATTR_ARTIFICIAL __mode_t __NOTHROW_NCX(__LIBCCALL getumask)(void) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(getumask))(); })
 #endif /* ... */
 #endif /* __USE_GNU */
 
@@ -568,7 +568,7 @@ __CDECLARE(__ATTR_NONNULL((2)),int,__NOTHROW_RPC,utimensat,(__fd_t __dirfd, char
 #elif defined(__CRT_HAVE_utimensat64) || defined(__CRT_HAVE_utimensat)
 #include <libc/local/sys.stat/utimensat.h>
 /* @param flags: Set of `0|AT_SYMLINK_NOFOLLOW|AT_CHANGE_CTIME|AT_DOSPATH' */
-__NAMESPACE_LOCAL_USING_OR_IMPL(utimensat, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_NONNULL((2)) int __NOTHROW_RPC(__LIBCCALL utimensat)(__fd_t __dirfd, char const *__filename, struct timespec const __times[2 /*or:3*/], __atflag_t __flags) { return __NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(utimensat)(__dirfd, __filename, __times, __flags); })
+__NAMESPACE_LOCAL_USING_OR_IMPL(utimensat, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_NONNULL((2)) int __NOTHROW_RPC(__LIBCCALL utimensat)(__fd_t __dirfd, char const *__filename, struct timespec const __times[2 /*or:3*/], __atflag_t __flags) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(utimensat))(__dirfd, __filename, __times, __flags); })
 #endif /* ... */
 #ifdef __USE_TIME64
 #ifdef __CRT_HAVE_utimensat64
@@ -577,7 +577,7 @@ __CDECLARE(__ATTR_NONNULL((2)),int,__NOTHROW_RPC,utimensat64,(__fd_t __dirfd, ch
 __CREDIRECT(__ATTR_NONNULL((2)),int,__NOTHROW_RPC,utimensat64,(__fd_t __dirfd, char const *__filename, struct timespec64 const __times[2 /*or:3*/], __atflag_t __flags),utimensat,(__dirfd,__filename,__times,__flags))
 #elif defined(__CRT_HAVE_utimensat)
 #include <libc/local/sys.stat/utimensat64.h>
-__NAMESPACE_LOCAL_USING_OR_IMPL(utimensat64, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_NONNULL((2)) int __NOTHROW_RPC(__LIBCCALL utimensat64)(__fd_t __dirfd, char const *__filename, struct timespec64 const __times[2 /*or:3*/], __atflag_t __flags) { return __NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(utimensat64)(__dirfd, __filename, __times, __flags); })
+__NAMESPACE_LOCAL_USING_OR_IMPL(utimensat64, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_NONNULL((2)) int __NOTHROW_RPC(__LIBCCALL utimensat64)(__fd_t __dirfd, char const *__filename, struct timespec64 const __times[2 /*or:3*/], __atflag_t __flags) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(utimensat64))(__dirfd, __filename, __times, __flags); })
 #endif /* ... */
 #endif /* __USE_TIME64 */
 #endif /* __USE_ATFILE */
@@ -589,7 +589,7 @@ __CREDIRECT(,int,__NOTHROW_RPC,futimens,(__fd_t __fd, struct timespec const __ti
 __CDECLARE(,int,__NOTHROW_RPC,futimens,(__fd_t __fd, struct timespec const __times[2 /*or:3*/]),(__fd,__times))
 #elif defined(__CRT_HAVE_futimens64) || defined(__CRT_HAVE_futimens)
 #include <libc/local/sys.stat/futimens.h>
-__NAMESPACE_LOCAL_USING_OR_IMPL(futimens, __FORCELOCAL __ATTR_ARTIFICIAL int __NOTHROW_RPC(__LIBCCALL futimens)(__fd_t __fd, struct timespec const __times[2 /*or:3*/]) { return __NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(futimens)(__fd, __times); })
+__NAMESPACE_LOCAL_USING_OR_IMPL(futimens, __FORCELOCAL __ATTR_ARTIFICIAL int __NOTHROW_RPC(__LIBCCALL futimens)(__fd_t __fd, struct timespec const __times[2 /*or:3*/]) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(futimens))(__fd, __times); })
 #endif /* ... */
 #ifdef __USE_TIME64
 #ifdef __CRT_HAVE_futimens64
@@ -598,7 +598,7 @@ __CDECLARE(,int,__NOTHROW_RPC,futimens64,(__fd_t __fd, struct timespec64 const _
 __CREDIRECT(,int,__NOTHROW_RPC,futimens64,(__fd_t __fd, struct timespec64 const __times[2 /*or:3*/]),futimens,(__fd,__times))
 #elif defined(__CRT_HAVE_futimens)
 #include <libc/local/sys.stat/futimens64.h>
-__NAMESPACE_LOCAL_USING_OR_IMPL(futimens64, __FORCELOCAL __ATTR_ARTIFICIAL int __NOTHROW_RPC(__LIBCCALL futimens64)(__fd_t __fd, struct timespec64 const __times[2 /*or:3*/]) { return __NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(futimens64)(__fd, __times); })
+__NAMESPACE_LOCAL_USING_OR_IMPL(futimens64, __FORCELOCAL __ATTR_ARTIFICIAL int __NOTHROW_RPC(__LIBCCALL futimens64)(__fd_t __fd, struct timespec64 const __times[2 /*or:3*/]) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(futimens64))(__fd, __times); })
 #endif /* ... */
 #endif /* __USE_TIME64 */
 #endif /* __USE_XOPEN2K8 */

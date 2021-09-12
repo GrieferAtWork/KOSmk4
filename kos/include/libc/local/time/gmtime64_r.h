@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x94612b1c */
+/* HASH CRC-32:0x44ab2694 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -105,7 +105,7 @@ __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(gmtime64_r))(__time64_t const *__rest
 
 
 #if defined(__CRT_HAVE__gmtime64_s) || defined(__CRT_HAVE__gmtime32_s)
-	return __NAMESPACE_LOCAL_SYM __localdep_dos_gmtime64_s(__tp, __timer) ? __NULLPTR : __tp;
+	return (__NAMESPACE_LOCAL_SYM __localdep_dos_gmtime64_s)(__tp, __timer) ? __NULLPTR : __tp;
 #else /* __CRT_HAVE__gmtime64_s || __CRT_HAVE__gmtime32_s */
 	__time64_t __t; int __i;
 	__UINT16_TYPE__ const *__monthvec;

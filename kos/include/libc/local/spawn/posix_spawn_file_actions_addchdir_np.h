@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x266b33d0 */
+/* HASH CRC-32:0x4f028855 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -65,9 +65,9 @@ __NAMESPACE_LOCAL_BEGIN
 __LOCAL_LIBC(posix_spawn_file_actions_addchdir_np) __ATTR_NONNULL((1, 2)) __errno_t
 __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(posix_spawn_file_actions_addchdir_np))(struct __posix_spawn_file_actions *__restrict __file_actions, const char *__restrict __path) {
 	struct __spawn_action *__action;
-	if __unlikely((__path = __NAMESPACE_LOCAL_SYM __localdep_strdup(__path)) == __NULLPTR)
+	if __unlikely((__path = (__NAMESPACE_LOCAL_SYM __localdep_strdup)(__path)) == __NULLPTR)
 		goto __err;
-	__action = __NAMESPACE_LOCAL_SYM __localdep_posix_spawn_file_actions_alloc(__file_actions);
+	__action = (__NAMESPACE_LOCAL_SYM __localdep_posix_spawn_file_actions_alloc)(__file_actions);
 	if __unlikely(!__action)
 		goto __err_path;
 	/* Fill in the new mode. */
@@ -76,7 +76,7 @@ __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(posix_spawn_file_actions_addchdir_np)
 	return 0;
 __err_path:
 #if defined(__CRT_HAVE_free) || defined(__CRT_HAVE_cfree)
-	__NAMESPACE_LOCAL_SYM __localdep_free((char *)__path);
+	(__NAMESPACE_LOCAL_SYM __localdep_free)((char *)__path);
 #endif /* __CRT_HAVE_free || __CRT_HAVE_cfree */
 __err:
 #ifdef __ENOMEM

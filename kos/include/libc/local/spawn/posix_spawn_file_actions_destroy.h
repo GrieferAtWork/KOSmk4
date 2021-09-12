@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x6d637b55 */
+/* HASH CRC-32:0x93a1d4d4 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -67,21 +67,21 @@ __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(posix_spawn_file_actions_destroy))(st
 		switch (__act->__sa_tag) {
 
 		case __POSIX_SPAWN_ACTION_OPEN:
-			__NAMESPACE_LOCAL_SYM __localdep_free(__act->__sa_action.__sa_open_action.__sa_path);
+			(__NAMESPACE_LOCAL_SYM __localdep_free)(__act->__sa_action.__sa_open_action.__sa_path);
 			break;
 
 		default:
 			break;
 		}
 	}
-	__NAMESPACE_LOCAL_SYM __localdep_free(__file_actions->__actions);
+	(__NAMESPACE_LOCAL_SYM __localdep_free)(__file_actions->__actions);
 #ifdef __COMPILER_HAVE_PRAGMA_PUSHMACRO
 #pragma pop_macro("__actions")
 #pragma pop_macro("__used")
 #endif /* __COMPILER_HAVE_PRAGMA_PUSHMACRO */
 #endif /* __CRT_HAVE_free || __CRT_HAVE_cfree */
 #ifndef __NDEBUG
-	__NAMESPACE_LOCAL_SYM __localdep_memset(__file_actions, 0xcc, sizeof(*__file_actions));
+	(__NAMESPACE_LOCAL_SYM __localdep_memset)(__file_actions, 0xcc, sizeof(*__file_actions));
 #endif /* !__NDEBUG */
 	return 0;
 }

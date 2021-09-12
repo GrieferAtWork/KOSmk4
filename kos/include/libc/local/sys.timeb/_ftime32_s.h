@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x277f2354 */
+/* HASH CRC-32:0x12848e9c */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -51,15 +51,15 @@ __NAMESPACE_LOCAL_BEGIN
 __LOCAL_LIBC(_ftime32_s) __ATTR_NONNULL((1)) __errno_t
 __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(_ftime32_s))(struct __timeb32 *__timebuf) {
 #ifdef __CRT_HAVE_ftime
-	return __NAMESPACE_LOCAL_SYM __localdep_crt_ftime32(__timebuf) ? 0 : __libc_geterrno_or(EPERM);
+	return (__NAMESPACE_LOCAL_SYM __localdep_crt_ftime32)(__timebuf) ? 0 : __libc_geterrno_or(EPERM);
 #elif defined(__CRT_HAVE__ftime64_s) || defined(__CRT_HAVE_ftime64)
 	struct __timeb64 __temp;
 #ifdef __CRT_HAVE__ftime64_s
-	__errno_t __error = __NAMESPACE_LOCAL_SYM __localdep_crt_ftime64_s(&__temp);
+	__errno_t __error = (__NAMESPACE_LOCAL_SYM __localdep_crt_ftime64_s)(&__temp);
 	if (__error)
 		return __error;
 #else /* __CRT_HAVE__ftime64_s */
-	if (__NAMESPACE_LOCAL_SYM __localdep_crt_ftime64(&__temp))
+	if ((__NAMESPACE_LOCAL_SYM __localdep_crt_ftime64)(&__temp))
 		return __libc_geterrno_or(EPERM);
 #endif /* !__CRT_HAVE__ftime64_s */
 	__timebuf->time     = (__time32_t)__temp.time;
@@ -68,11 +68,11 @@ __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(_ftime32_s))(struct __timeb32 *__time
 	__timebuf->dstflag  = __temp.dstflag;
 	return 0;
 #elif defined(__CRT_HAVE__ftime32)
-	__NAMESPACE_LOCAL_SYM __localdep_crt_dos_ftime32(__timebuf);
+	(__NAMESPACE_LOCAL_SYM __localdep_crt_dos_ftime32)(__timebuf);
 	return 0;
 #else /* ... */
 	struct __timeb64 __temp;
-	__NAMESPACE_LOCAL_SYM __localdep_crt_dos_ftime64(&__temp);
+	(__NAMESPACE_LOCAL_SYM __localdep_crt_dos_ftime64)(&__temp);
 	__timebuf->time     = (__time32_t)__temp.time;
 	__timebuf->millitm  = __temp.millitm;
 	__timebuf->timezone = __temp.timezone;

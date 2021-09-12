@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x3aaea061 */
+/* HASH CRC-32:0x8157327d */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -134,7 +134,7 @@ __LOCAL_LIBC(__posix_spawnp_impl) __ATTR_NOINLINE __ATTR_NONNULL((1, 2, 4, 8, 9)
 	*__dst++ = '/';
 	__dst = (char *)__mempcpyc(__dst, __file, __file_len, sizeof(char));
 	*__dst = '\0';
-	return __NAMESPACE_LOCAL_SYM __localdep_posix_spawn(__pid, __fullpath, __file_actions, __attrp, ___argv, ___envp);
+	return (__NAMESPACE_LOCAL_SYM __localdep_posix_spawn)(__pid, __fullpath, __file_actions, __attrp, ___argv, ___envp);
 }
 __NAMESPACE_LOCAL_END
 __NAMESPACE_LOCAL_BEGIN
@@ -148,14 +148,14 @@ __NOTHROW_RPC(__LIBCCALL __LIBC_LOCAL_NAME(posix_spawnp))(__pid_t *__restrict __
 	 * pathname is executed.
 	 * [...] */
 #ifdef _WIN32
-	if (__NAMESPACE_LOCAL_SYM __localdep_strchr(__file, '/') || __NAMESPACE_LOCAL_SYM __localdep_strchr(__file, '\\'))
+	if ((__NAMESPACE_LOCAL_SYM __localdep_strchr)(__file, '/') || (__NAMESPACE_LOCAL_SYM __localdep_strchr)(__file, '\\'))
 #else /* _WIN32 */
-	if (__NAMESPACE_LOCAL_SYM __localdep_strchr(__file, '/'))
+	if ((__NAMESPACE_LOCAL_SYM __localdep_strchr)(__file, '/'))
 #endif /* !_WIN32 */
 	{
-		return __NAMESPACE_LOCAL_SYM __localdep_posix_spawn(__pid, __file, __file_actions, __attrp, ___argv, ___envp);
+		return (__NAMESPACE_LOCAL_SYM __localdep_posix_spawn)(__pid, __file, __file_actions, __attrp, ___argv, ___envp);
 	}
-	__env_path = __NAMESPACE_LOCAL_SYM __localdep_getenv("PATH");
+	__env_path = (__NAMESPACE_LOCAL_SYM __localdep_getenv)("PATH");
 #ifdef __ENOENT
 	__result = __ENOENT;
 #else /* __ENOENT */
@@ -163,13 +163,13 @@ __NOTHROW_RPC(__LIBCCALL __LIBC_LOCAL_NAME(posix_spawnp))(__pid_t *__restrict __
 #endif /* !__ENOENT */
 	if (__env_path && *__env_path) {
 		__SIZE_TYPE__ __filelen;
-		__filelen  = __NAMESPACE_LOCAL_SYM __localdep_strlen(__file);
+		__filelen  = (__NAMESPACE_LOCAL_SYM __localdep_strlen)(__file);
 		for (;;) {
 			char *__path_end;
 #ifdef _WIN32
-			__path_end = __NAMESPACE_LOCAL_SYM __localdep_strchrnul(__env_path, ';');
+			__path_end = (__NAMESPACE_LOCAL_SYM __localdep_strchrnul)(__env_path, ';');
 #else /* _WIN32 */
-			__path_end = __NAMESPACE_LOCAL_SYM __localdep_strchrnul(__env_path, ':');
+			__path_end = (__NAMESPACE_LOCAL_SYM __localdep_strchrnul)(__env_path, ':');
 #endif /* !_WIN32 */
 			__result = (__NAMESPACE_LOCAL_SYM __posix_spawnp_impl)(__pid, __env_path, (__SIZE_TYPE__)(__path_end - __env_path),
 			                                                     __file, __filelen, __file_actions, __attrp,

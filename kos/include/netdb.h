@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xc2b72561 */
+/* HASH CRC-32:0xe562154f */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -568,7 +568,7 @@ __CDECLARE(,int,__NOTHROW_RPC,gai_suspend,(struct gaicb const *const __list[], i
  * longest time the function keeps  waiting before returning with an  error.
  * This   function  is  not   part  of  POSIX   and  therefore  no  official
  * cancellation point */
-__NAMESPACE_LOCAL_USING_OR_IMPL(gai_suspend, __FORCELOCAL __ATTR_ARTIFICIAL int __NOTHROW_RPC(__LIBCCALL gai_suspend)(struct gaicb const *const __list[], int __ent, struct timespec const *__timeout) { return __NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(gai_suspend)(__list, __ent, __timeout); })
+__NAMESPACE_LOCAL_USING_OR_IMPL(gai_suspend, __FORCELOCAL __ATTR_ARTIFICIAL int __NOTHROW_RPC(__LIBCCALL gai_suspend)(struct gaicb const *const __list[], int __ent, struct timespec const *__timeout) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(gai_suspend))(__list, __ent, __timeout); })
 #endif /* ... */
 
 #ifdef __USE_TIME64
@@ -593,7 +593,7 @@ __CREDIRECT(,int,__NOTHROW_RPC,gai_suspend64,(struct gaicb const *const __list[]
  * longest time the function keeps  waiting before returning with an  error.
  * This   function  is  not   part  of  POSIX   and  therefore  no  official
  * cancellation point */
-__NAMESPACE_LOCAL_USING_OR_IMPL(gai_suspend64, __FORCELOCAL __ATTR_ARTIFICIAL int __NOTHROW_RPC(__LIBCCALL gai_suspend64)(struct gaicb const *const __list[], int __ent, struct timespec64 const *__timeout) { return __NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(gai_suspend64)(__list, __ent, __timeout); })
+__NAMESPACE_LOCAL_USING_OR_IMPL(gai_suspend64, __FORCELOCAL __ATTR_ARTIFICIAL int __NOTHROW_RPC(__LIBCCALL gai_suspend64)(struct gaicb const *const __list[], int __ent, struct timespec64 const *__timeout) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(gai_suspend64))(__list, __ent, __timeout); })
 #endif /* ... */
 #endif /* __USE_TIME64 */
 /* Get the error status of the request `req' */

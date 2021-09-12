@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x1f81b60f */
+/* HASH CRC-32:0x495d5ad */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -62,9 +62,9 @@ __NAMESPACE_LOCAL_BEGIN
 __LOCAL_LIBC(sigsetmask) __ATTR_DEPRECATED("Using `sigprocmask()\' instead") int
 __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(sigsetmask))(int __mask) {
 	struct __sigset_struct __sigset;
-	__NAMESPACE_LOCAL_SYM __localdep_sigemptyset(&__sigset);
+	(__NAMESPACE_LOCAL_SYM __localdep_sigemptyset)(&__sigset);
 	__sigset.__val[0] = (__UINTPTR_TYPE__)(unsigned int)__mask;
-	return __NAMESPACE_LOCAL_SYM __localdep_sigprocmask(__SIG_SETMASK, &__sigset, __NULLPTR);
+	return (__NAMESPACE_LOCAL_SYM __localdep_sigprocmask)(__SIG_SETMASK, &__sigset, __NULLPTR);
 }
 __NAMESPACE_LOCAL_END
 #ifndef __local___localdep_sigsetmask_defined

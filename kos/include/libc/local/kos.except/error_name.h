@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xa86169ae */
+/* HASH CRC-32:0xc9b352bd */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -130,7 +130,7 @@ __NOTHROW(__LIBKCALL __LIBC_LOCAL_NAME(error_name))(__error_code_t __code) {
 	}
 	while (__class_offset) {
 		--__class_offset;
-		__result = (char *)__NAMESPACE_LOCAL_SYM __localdep_rawmemchr(__result, '\1') + 1;
+		__result = (char *)(__NAMESPACE_LOCAL_SYM __localdep_rawmemchr)(__result, '\1') + 1;
 	}
 	__subclass_offset = __err_subclass;
 	for (;;) {
@@ -142,7 +142,7 @@ __NOTHROW(__LIBKCALL __LIBC_LOCAL_NAME(error_name))(__error_code_t __code) {
 			return __result;
 		}
 		--__subclass_offset;
-		__result = __NAMESPACE_LOCAL_SYM __localdep_strend(__result) + 1;
+		__result = (__NAMESPACE_LOCAL_SYM __localdep_strend)(__result) + 1;
 	}
 __non_linear_prefix:
 	switch(__err_class) {
@@ -179,7 +179,7 @@ __non_linear_prefix:
 	}
 	while (__subclass_offset) {
 		--__subclass_offset;
-		__result = __NAMESPACE_LOCAL_SYM __localdep_strend(__result) + 1;
+		__result = (__NAMESPACE_LOCAL_SYM __localdep_strend)(__result) + 1;
 	}
 	if (!*__result)
 		__result = __NULLPTR;
@@ -251,7 +251,7 @@ __non_linear_prefix:
 	}
 	while (__class_offset) {
 		--__class_offset;
-		__result = (char *)__NAMESPACE_LOCAL_SYM __localdep_rawmemchr(__result, '\1') + 1;
+		__result = (char *)(__NAMESPACE_LOCAL_SYM __localdep_rawmemchr)(__result, '\1') + 1;
 	}
 	__subclass_offset = __err_subclass;
 	for (;;) {
@@ -263,7 +263,7 @@ __non_linear_prefix:
 			return __result;
 		}
 		--__subclass_offset;
-		__result = __NAMESPACE_LOCAL_SYM __localdep_strend(__result) + 1;
+		__result = (__NAMESPACE_LOCAL_SYM __localdep_strend)(__result) + 1;
 	}
 __non_linear_prefix:
 	switch(__err_class) {
@@ -320,7 +320,7 @@ __non_linear_prefix:
 	}
 	while (__subclass_offset) {
 		--__subclass_offset;
-		__result = __NAMESPACE_LOCAL_SYM __localdep_strend(__result) + 1;
+		__result = (__NAMESPACE_LOCAL_SYM __localdep_strend)(__result) + 1;
 	}
 	if (!*__result)
 		__result = __NULLPTR;

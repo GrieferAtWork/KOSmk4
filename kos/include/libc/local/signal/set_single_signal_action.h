@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xfc08bac5 */
+/* HASH CRC-32:0x6b35c118 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -176,9 +176,9 @@ __CREDIRECT(,int,__NOTHROW_NCX,__localdep_sigprocmask,(__STDC_INT_AS_UINT_T __ho
 __LOCAL_LIBC(set_single_signal_action) int
 __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(set_single_signal_action))(int __sig, int __how) {
 	struct __sigset_struct __set;
-	__NAMESPACE_LOCAL_SYM __localdep_sigemptyset(&__set);
-	__NAMESPACE_LOCAL_SYM __localdep_sigaddset(&__set, __sig);
-	return __NAMESPACE_LOCAL_SYM __localdep_sigprocmask(__how, &__set, __NULLPTR);
+	(__NAMESPACE_LOCAL_SYM __localdep_sigemptyset)(&__set);
+	(__NAMESPACE_LOCAL_SYM __localdep_sigaddset)(&__set, __sig);
+	return (__NAMESPACE_LOCAL_SYM __localdep_sigprocmask)(__how, &__set, __NULLPTR);
 }
 __NAMESPACE_LOCAL_END
 #ifndef __local___localdep_set_single_signal_action_defined

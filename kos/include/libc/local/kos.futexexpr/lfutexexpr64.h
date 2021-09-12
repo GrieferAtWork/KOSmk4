@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xabf196c4 */
+/* HASH CRC-32:0x626f0310 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -33,10 +33,10 @@ __LOCAL_LIBC(lfutexexpr64) __ATTR_NONNULL((3)) int
 __NOTHROW_RPC(__LIBCCALL __LIBC_LOCAL_NAME(lfutexexpr64))(void *__base, __SIZE_TYPE__ __exprc, struct lfutexexpr const *__exprv, struct __timespec64 const *__timeout, unsigned int __timeout_flags) {
 	struct __timespec32 __tms32;
 	if (!__timeout)
-		return __NAMESPACE_LOCAL_SYM __localdep_lfutexexpr32(__base, __exprc, __exprv, __NULLPTR, 0);
+		return (__NAMESPACE_LOCAL_SYM __localdep_lfutexexpr32)(__base, __exprc, __exprv, __NULLPTR, 0);
 	__tms32.tv_sec  = (__time32_t)__timeout->tv_sec;
 	__tms32.tv_nsec = __timeout->tv_nsec;
-	return __NAMESPACE_LOCAL_SYM __localdep_lfutexexpr32(__base, __exprc, __exprv, &__tms32, __timeout_flags);
+	return (__NAMESPACE_LOCAL_SYM __localdep_lfutexexpr32)(__base, __exprc, __exprv, &__tms32, __timeout_flags);
 }
 __NAMESPACE_LOCAL_END
 #ifndef __local___localdep_lfutexexpr64_defined

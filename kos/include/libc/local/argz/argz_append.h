@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xa89d6c26 */
+/* HASH CRC-32:0x4c764d4 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -59,7 +59,7 @@ __LOCAL_LIBC(argz_append) __ATTR_NONNULL((1, 2)) __errno_t
 __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(argz_append))(char **__restrict __pargz, __SIZE_TYPE__ *__restrict __pargz_len, char const *__restrict __buf, __SIZE_TYPE__ __buf_len) {
 	__SIZE_TYPE__ __oldlen = *__pargz_len;
 	__SIZE_TYPE__ __newlen = __oldlen + __buf_len;
-	char *__newargz = (char *)__NAMESPACE_LOCAL_SYM __localdep_realloc(*__pargz, __newlen * sizeof(char));
+	char *__newargz = (char *)(__NAMESPACE_LOCAL_SYM __localdep_realloc)(*__pargz, __newlen * sizeof(char));
 	if __unlikely(!__newargz) {
 #ifdef __ENOMEM
 		return __ENOMEM;
@@ -67,7 +67,7 @@ __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(argz_append))(char **__restrict __par
 		return 1;
 #endif /* !__ENOMEM */
 	}
-	__NAMESPACE_LOCAL_SYM __localdep_memcpyc(__newargz + __oldlen, __buf, __buf_len, sizeof(char));
+	(__NAMESPACE_LOCAL_SYM __localdep_memcpyc)(__newargz + __oldlen, __buf, __buf_len, sizeof(char));
 	*__pargz     = __newargz;
 	*__pargz_len = __newlen;
 	return 0;

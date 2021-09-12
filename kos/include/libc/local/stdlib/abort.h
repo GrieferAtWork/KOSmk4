@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xef21d137 */
+/* HASH CRC-32:0xc63e68ad */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -47,7 +47,7 @@ __NAMESPACE_LOCAL_END
 __NAMESPACE_LOCAL_BEGIN
 __LOCAL_LIBC(abort) __ATTR_NORETURN void
 (__LIBCCALL __LIBC_LOCAL_NAME(abort))(void) __THROWS(...) {
-	__NAMESPACE_LOCAL_SYM __localdep__Exit(__EXIT_FAILURE);
+	(__NAMESPACE_LOCAL_SYM __localdep__Exit)(__EXIT_FAILURE);
 }
 __NAMESPACE_LOCAL_END
 #ifndef __local___localdep_abort_defined

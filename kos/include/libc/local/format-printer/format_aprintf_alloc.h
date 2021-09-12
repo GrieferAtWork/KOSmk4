@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x4355ec62 */
+/* HASH CRC-32:0xb0b6da0 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -60,10 +60,10 @@ __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(format_aprintf_alloc))(struct format_
 			__new_alloc = 8;
 		while (__new_alloc < __min_alloc)
 			__new_alloc *= 2;
-		__newbuf = (char *)__NAMESPACE_LOCAL_SYM __localdep_realloc(__self->ap_base, (__new_alloc + 1) * sizeof(char));
+		__newbuf = (char *)(__NAMESPACE_LOCAL_SYM __localdep_realloc)(__self->ap_base, (__new_alloc + 1) * sizeof(char));
 		if __unlikely(!__newbuf) {
 			__new_alloc = __min_alloc;
-			__newbuf    = (char *)__NAMESPACE_LOCAL_SYM __localdep_realloc(__self->ap_base, (__new_alloc + 1) * sizeof(char));
+			__newbuf    = (char *)(__NAMESPACE_LOCAL_SYM __localdep_realloc)(__self->ap_base, (__new_alloc + 1) * sizeof(char));
 			if __unlikely(!__newbuf)
 				goto __err;
 		}

@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xbee7c434 */
+/* HASH CRC-32:0x2f0c64fc */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -60,7 +60,7 @@ __LOCAL_LIBC(fwrite) __ATTR_NONNULL((1, 4)) __SIZE_TYPE__
 		for (__i = 0; __i < __elemsize; ++__i) {
 			unsigned char __byte;
 			__byte = *(unsigned char *)__buf;
-			if (__NAMESPACE_LOCAL_SYM __localdep_fputc((int)(unsigned int)__byte, __stream) == __EOF)
+			if ((__NAMESPACE_LOCAL_SYM __localdep_fputc)((int)(unsigned int)__byte, __stream) == __EOF)
 				goto __done;
 			__buf = (unsigned char *)__buf + 1;
 		}

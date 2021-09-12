@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xb2688f6b */
+/* HASH CRC-32:0x825ccb2c */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -58,7 +58,7 @@ __NOTHROW_RPC(__LIBCCALL __LIBC_LOCAL_NAME(clock_nanosleep))(__clockid_t __clock
 	struct __timespec32 __req32, __rem32;
 	__req32.tv_sec  = (__time32_t)__requested_time->tv_sec;
 	__req32.tv_nsec = __requested_time->tv_nsec;
-	__result = __NAMESPACE_LOCAL_SYM __localdep_clock_nanosleep32(__clock_id, __flags, &__req32, &__rem32);
+	__result = (__NAMESPACE_LOCAL_SYM __localdep_clock_nanosleep32)(__clock_id, __flags, &__req32, &__rem32);
 	if (!__result && __remaining) {
 		__remaining->tv_sec  = (__time64_t)__rem32.tv_sec;
 		__remaining->tv_nsec = __rem32.tv_nsec;
@@ -69,7 +69,7 @@ __NOTHROW_RPC(__LIBCCALL __LIBC_LOCAL_NAME(clock_nanosleep))(__clockid_t __clock
 	struct __timespec64 __req64, __rem64;
 	__req64.tv_sec  = (__time64_t)__requested_time->tv_sec;
 	__req64.tv_nsec = __requested_time->tv_nsec;
-	__result = __NAMESPACE_LOCAL_SYM __localdep_clock_nanosleep64(__clock_id, __flags, &__req64, &__rem64);
+	__result = (__NAMESPACE_LOCAL_SYM __localdep_clock_nanosleep64)(__clock_id, __flags, &__req64, &__rem64);
 	if (!__result && __remaining) {
 		__remaining->tv_sec  = (__time32_t)__rem64.tv_sec;
 		__remaining->tv_nsec = __rem64.tv_nsec;

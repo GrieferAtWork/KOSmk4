@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xb9a30617 */
+/* HASH CRC-32:0xeee4610e */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -84,13 +84,13 @@ __LOCAL_LIBC(envz_merge) __ATTR_NONNULL((1, 2, 3)) __errno_t
 __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(envz_merge))(char **__restrict __penvz, __SIZE_TYPE__ *__restrict __penvz_len, char const *__restrict __envz2, __SIZE_TYPE__ __envz2_len, int __override_) {
 	__errno_t __result = 0;
 	while (__envz2_len && __result == 0) {
-		char *__existing = __NAMESPACE_LOCAL_SYM __localdep_envz_entry(*__penvz, *__penvz_len, __envz2);
-		__SIZE_TYPE__ __newlen  = __NAMESPACE_LOCAL_SYM __localdep_strlen(__envz2) + 1;
+		char *__existing = (__NAMESPACE_LOCAL_SYM __localdep_envz_entry)(*__penvz, *__penvz_len, __envz2);
+		__SIZE_TYPE__ __newlen  = (__NAMESPACE_LOCAL_SYM __localdep_strlen)(__envz2) + 1;
 		if (!__existing)
-			__result = __NAMESPACE_LOCAL_SYM __localdep_argz_append(__penvz, __penvz_len, __envz2, __newlen);
+			__result = (__NAMESPACE_LOCAL_SYM __localdep_argz_append)(__penvz, __penvz_len, __envz2, __newlen);
 		else if (__override_) {
-			__NAMESPACE_LOCAL_SYM __localdep_argz_delete(__penvz, __penvz_len, __existing);
-			__result = __NAMESPACE_LOCAL_SYM __localdep_argz_append(__penvz, __penvz_len, __envz2, __newlen);
+			(__NAMESPACE_LOCAL_SYM __localdep_argz_delete)(__penvz, __penvz_len, __existing);
+			__result = (__NAMESPACE_LOCAL_SYM __localdep_argz_append)(__penvz, __penvz_len, __envz2, __newlen);
 		}
 		__envz2     += __newlen;
 		__envz2_len -= __newlen;

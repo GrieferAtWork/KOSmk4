@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xff9db9bc */
+/* HASH CRC-32:0x44f38ba7 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -55,11 +55,11 @@ __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(posix_spawn_file_actions_alloc))(stru
 	if ((unsigned int)__file_actions->__used >= (unsigned int)__file_actions->__allocated) {
 		unsigned int __newalloc;
 		__newalloc = (unsigned int)__file_actions->__used + 8;
-		__result   = (struct __spawn_action *)__NAMESPACE_LOCAL_SYM __localdep_realloc(__result, __newalloc * sizeof(struct __spawn_action));
+		__result   = (struct __spawn_action *)(__NAMESPACE_LOCAL_SYM __localdep_realloc)(__result, __newalloc * sizeof(struct __spawn_action));
 		if __unlikely(!__result) {
 			__newalloc = (unsigned int)__file_actions->__used + 1;
 			__result = __file_actions->__actions;
-			__result = (struct __spawn_action *)__NAMESPACE_LOCAL_SYM __localdep_realloc(__result, __newalloc * sizeof(struct __spawn_action));
+			__result = (struct __spawn_action *)(__NAMESPACE_LOCAL_SYM __localdep_realloc)(__result, __newalloc * sizeof(struct __spawn_action));
 			if __unlikely(!__result)
 				return __NULLPTR;
 		}
