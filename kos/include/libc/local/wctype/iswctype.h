@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x85e99fdc */
+/* HASH CRC-32:0x86eb77d9 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -21,19 +21,31 @@
 #ifndef __local_iswctype_defined
 #define __local_iswctype_defined 1
 #include <__crt.h>
+#if defined(__CRT_KOS) && defined(__CRT_HAVE___unicode_descriptor)
 #include <hybrid/typecore.h>
 #include <bits/crt/wctype.h>
 __NAMESPACE_LOCAL_BEGIN
+#ifndef __local___localdep___unicode_descriptor_defined
+#define __local___localdep___unicode_descriptor_defined 1
+__NAMESPACE_LOCAL_END
+#include <bits/crt/unicode.h>
+__NAMESPACE_LOCAL_BEGIN
+__CREDIRECT(__ATTR_CONST __ATTR_RETNONNULL,struct __unitraits const *,__NOTHROW,__localdep___unicode_descriptor,(__CHAR32_TYPE__ __ch),__unicode_descriptor,(__ch))
+#endif /* !__local___localdep___unicode_descriptor_defined */
+__NAMESPACE_LOCAL_END
+#include <bits/crt/unicode.h>
+__NAMESPACE_LOCAL_BEGIN
 __LOCAL_LIBC(iswctype) __ATTR_CONST __ATTR_WUNUSED int
 __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(iswctype))(__WINT_TYPE__ __wc, __wctype_t __desc) {
-	/* TODO */
-	(void)__wc;
-	(void)__desc;
-	return 0;
+	struct __unitraits const *__traits = __localdep___unicode_descriptor(__wc);
+	return (int)(__traits->__ut_flags & (__UINT16_TYPE__)__desc);
 }
 __NAMESPACE_LOCAL_END
 #ifndef __local___localdep_iswctype_defined
 #define __local___localdep_iswctype_defined 1
 #define __localdep_iswctype __LIBC_LOCAL_NAME(iswctype)
 #endif /* !__local___localdep_iswctype_defined */
+#else /* __CRT_KOS && __CRT_HAVE___unicode_descriptor */
+#undef __local_iswctype_defined
+#endif /* !__CRT_KOS || !__CRT_HAVE___unicode_descriptor */
 #endif /* !__local_iswctype_defined */

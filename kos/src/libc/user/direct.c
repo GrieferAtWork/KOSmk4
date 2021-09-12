@@ -63,7 +63,7 @@ INTERN ATTR_SECTION(".text.crt.dos.fs.property") int
 NOTHROW_RPC(LIBCCALL libc__chdrive)(int drive)
 /*[[[body:libc__chdrive]]]*/
 {
-	drive = toupper(drive);
+	drive = toupper((unsigned char)drive);
 	if unlikely(drive < AT_DOS_DRIVEMIN || drive > AT_DOS_DRIVEMAX)
 		return (int)libc_seterrno(EINVAL);
 	return fchdir(AT_FDDRIVE_ROOT(drive));

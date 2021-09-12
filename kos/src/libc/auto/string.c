@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x46b147ac */
+/* HASH CRC-32:0xce75ab6d */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -979,7 +979,9 @@ NOTHROW_NCX(LIBCCALL libc_strcasecmp)(char const *s1,
                                       char const *s2) {
 	char c1, c2;
 	do {
-		if ((c1 = *s1++) != (c2 = *s2++) && ((c1 = libc_tolower(c1)) != (c2 = libc_tolower(c2))))
+		if ((c1 = *s1++) != (c2 = *s2++) &&
+		    ((c1 = (char)libc_tolower((unsigned char)c1)) !=
+		     (c2 = (char)libc_tolower((unsigned char)c2))))
 			return (int)((unsigned char)c1 - (unsigned char)c2);
 	} while (c1);
 	return 0;
@@ -992,7 +994,9 @@ NOTHROW_NCX(LIBCCALL libc_strncasecmp)(char const *s1,
 	do {
 		if (!maxlen--)
 			break;
-		if ((c1 = *s1++) != (c2 = *s2++) && ((c1 = libc_tolower(c1)) != (c2 = libc_tolower(c2))))
+		if ((c1 = *s1++) != (c2 = *s2++) &&
+		    ((c1 = (char)libc_tolower((unsigned char)c1)) !=
+		     (c2 = (char)libc_tolower((unsigned char)c2))))
 			return (int)((unsigned char)c1 - (unsigned char)c2);
 	} while (c1);
 	return 0;
@@ -3053,8 +3057,10 @@ NOTHROW_NCX(LIBCCALL libc_memcasecmp)(void const *s1,
 	byte_t v1, v2;
 	v1 = v2 = 0;
 	while (n_bytes-- &&
-	    (((v1 = *p1++) == (v2 = *p2++)) ||
-	     ((v1 = libc_tolower(v1)) == (v2 = libc_tolower(v2)))));
+	       (((v1 = *p1++) == (v2 = *p2++)) ||
+	        ((v1 = (byte_t)libc_tolower(v1)) ==
+	         (v2 = (byte_t)libc_tolower(v2)))))
+		;
 	return (int)v1 - (int)v2;
 }
 #ifndef __KERNEL__
@@ -3084,12 +3090,12 @@ NOTHROW_NCX(LIBCCALL libc_memcasemem)(void const *haystack,
 		return NULL;
 #endif /* !__USE_MEMMEM_EMPTY_NEEDLE_NULL || __BUILDING_LIBC */
 	haystacklen -= (needlelen - 1);
-	marker       = libc_tolower(*(byte_t *)needle);
+	marker       = (byte_t)libc_tolower(*(byte_t *)needle);
 	hayend       = (byte_t *)haystack + haystacklen;
 	for (;;) {
 		for (candidate = (byte_t *)haystack; candidate < hayend; ++candidate) {
 			byte_t b = *candidate;
-			if (b == marker || libc_tolower(b) == marker)
+			if (b == marker || (byte_t)libc_tolower(b) == marker)
 				goto got_candidate;
 		}
 		break;
@@ -3262,10 +3268,10 @@ NOTHROW_NCX(LIBCCALL libc_wildstrcasecmp)(char const *pattern,
 				return 0; /* Pattern ends with '*' (matches everything) */
 			if (card_post == '?')
 				goto next; /* Match any --> already found */
-			card_post = libc_tolower(card_post);
+			card_post = (char)libc_tolower((unsigned char)card_post);
 			for (;;) {
 				char ch = *string++;
-				if (card_post == ch || card_post == libc_tolower(ch)) {
+				if (card_post == ch || card_post == (char)libc_tolower((unsigned char)ch)) {
 					/* Recursively check if the rest of the string and pattern match */
 					if (!libc_wildstrcasecmp(string, pattern))
 						return 0;
@@ -3277,9 +3283,9 @@ NOTHROW_NCX(LIBCCALL libc_wildstrcasecmp)(char const *pattern,
 		pattern_ch = *pattern;
 		string_ch = *string;
 		if (pattern_ch == string_ch || pattern_ch == '?' ||
-		   (pattern_ch = libc_tolower(pattern_ch),
-		    string_ch = libc_tolower(string_ch),
-		    pattern_ch == string_ch)) {
+		    (pattern_ch = (char)libc_tolower((unsigned char)pattern_ch),
+		     string_ch  = (char)libc_tolower((unsigned char)string_ch),
+		     pattern_ch == string_ch)) {
 next:
 			++string;
 			++pattern;
@@ -3416,7 +3422,8 @@ NOTHROW_NCX(LIBCCALL libc_fuzzy_memcasecmp)(void const *s1,
 		for (j = 0; j < s2_bytes; j++) {
 			byte_t c1 = ((byte_t *)s1)[i];
 			byte_t c2 = ((byte_t *)s2)[j];
-			cost  = c1 != c2 && libc_tolower(c1) != libc_tolower(c2);
+			cost  = c1 != c2 && (libc_tolower((unsigned char)c1) !=
+			                     libc_tolower((unsigned char)c2));
 			cost += v0[j];
 			temp  = v1[j] + 1;
 			if (cost > temp)
@@ -3758,7 +3765,7 @@ NOTHROW_NCX(LIBCCALL libc_strnlwr)(char *__restrict str,
                                    size_t maxlen) {
 	char *iter, ch;
 	for (iter = str; maxlen-- && (ch = *iter) != '\0'; ++iter)
-		*iter = libc_tolower(ch);
+		*iter = (char)libc_tolower((unsigned char)ch);
 	return str;
 }
 INTERN ATTR_SECTION(".text.crt.unicode.static.memory") ATTR_LEAF ATTR_RETNONNULL NONNULL((1)) char *
@@ -3766,7 +3773,7 @@ NOTHROW_NCX(LIBCCALL libc_strnupr)(char *__restrict str,
                                    size_t maxlen) {
 	char *iter, ch;
 	for (iter = str; maxlen-- && (ch = *iter) != '\0'; ++iter)
-		*iter = libc_toupper(ch);
+		*iter = (char)libc_toupper((unsigned char)ch);
 	return str;
 }
 INTERN ATTR_SECTION(".text.crt.unicode.locale.memory") ATTR_PURE WUNUSED NONNULL((1, 2)) int
@@ -3958,14 +3965,14 @@ INTERN ATTR_SECTION(".text.crt.unicode.static.memory") ATTR_RETNONNULL NONNULL((
 NOTHROW_NCX(LIBCCALL libc_strlwr)(char *__restrict str) {
 	char *iter, ch;
 	for (iter = str; (ch = *iter) != '\0'; ++iter)
-		*iter = libc_tolower(ch);
+		*iter = (char)libc_tolower((unsigned char)ch);
 	return str;
 }
 INTERN ATTR_SECTION(".text.crt.unicode.static.memory") ATTR_RETNONNULL NONNULL((1)) char *
 NOTHROW_NCX(LIBCCALL libc_strupr)(char *__restrict str) {
 	char *iter, ch;
 	for (iter = str; (ch = *iter) != '\0'; ++iter)
-		*iter = libc_toupper(ch);
+		*iter = (char)libc_toupper((unsigned char)ch);
 	return str;
 }
 INTERN ATTR_SECTION(".text.crt.string.memory") ATTR_LEAF ATTR_RETNONNULL NONNULL((1)) char *
@@ -4214,7 +4221,7 @@ NOTHROW_NCX(LIBCCALL libc__strlwr_s)(char *buf,
 	if (libc_strnlen(buf, buflen) >= buflen)
 		return 22;
 	for (iter = buf; (ch = *iter) != '\0'; ++iter)
-		*iter = libc_tolower(ch);
+		*iter = (char)libc_tolower((unsigned char)ch);
 	return 0;
 }
 INTERN ATTR_SECTION(".text.crt.dos.unicode.static.memory") errno_t
@@ -4226,7 +4233,7 @@ NOTHROW_NCX(LIBCCALL libc__strupr_s)(char *buf,
 	if (libc_strnlen(buf, buflen) >= buflen)
 		return 22;
 	for (iter = buf; (ch = *iter) != '\0'; ++iter)
-		*iter = libc_toupper(ch);
+		*iter = (char)libc_toupper((unsigned char)ch);
 	return 0;
 }
 INTERN ATTR_SECTION(".text.crt.dos.unicode.locale.memory") errno_t
@@ -4239,7 +4246,7 @@ NOTHROW_NCX(LIBCCALL libc__strlwr_s_l)(char *buf,
 	if (libc_strnlen(buf, buflen) >= buflen)
 		return 22;
 	for (iter = buf; (ch = *iter) != '\0'; ++iter)
-		*iter = libc_tolower_l(ch, locale);
+		*iter = (char)libc_tolower_l((unsigned char)ch, locale);
 	return 0;
 }
 INTERN ATTR_SECTION(".text.crt.dos.unicode.locale.memory") errno_t
@@ -4252,7 +4259,7 @@ NOTHROW_NCX(LIBCCALL libc__strupr_s_l)(char *buf,
 	if (libc_strnlen(buf, buflen) >= buflen)
 		return 22;
 	for (iter = buf; (ch = *iter) != '\0'; ++iter)
-		*iter = libc_toupper_l(ch, locale);
+		*iter = (char)libc_toupper_l((unsigned char)ch, locale);
 	return 0;
 }
 #include <libc/errno.h>

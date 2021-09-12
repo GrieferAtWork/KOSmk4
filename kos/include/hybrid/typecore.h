@@ -1205,12 +1205,33 @@
 #endif /* !__WINT_UNSIGNED__ */
 #endif /* !__WINT_TYPE__ */
 
+#ifndef __WINT16_TYPE__
+#if __SIZEOF_WINT_T__ == 2
+#define __WINT16_TYPE__ __WINT_TYPE__
+#elif defined(__WINT_UNSIGNED__)
+#define __WINT16_TYPE__ __UINT16_TYPE__
+#else /* ... */
+#define __WINT16_TYPE__ __INT16_TYPE__
+#endif /* !... */
+#endif /* !__WINT16_TYPE__ */
+
+#ifndef __WINT32_TYPE__
+#if __SIZEOF_WINT_T__ == 4
+#define __WINT32_TYPE__ __WINT_TYPE__
+#elif defined(__WINT_UNSIGNED__)
+#define __WINT32_TYPE__ __UINT32_TYPE__
+#else /* ... */
+#define __WINT32_TYPE__ __INT32_TYPE__
+#endif /* !... */
+#endif /* !__WINT32_TYPE__ */
+
 #ifndef __CHAR16_TYPE__
 #define __CHAR16_TYPE__ __UINT16_TYPE__
 #endif /* !__CHAR16_TYPE__ */
 #ifndef __CHAR32_TYPE__
 #define __CHAR32_TYPE__ __UINT32_TYPE__
 #endif /* !__CHAR32_TYPE__ */
+
 #ifndef __SIG_ATOMIC_TYPE__
 #define __SIG_ATOMIC_TYPE__ int
 #endif /* !__SIG_ATOMIC_TYPE__ */

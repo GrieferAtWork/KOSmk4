@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xd80faced */
+/* HASH CRC-32:0x6899b882 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -70,7 +70,7 @@ __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(_strupr_s))(char *__buf, __SIZE_TYPE_
 	if (__localdep_strnlen(__buf, __buflen) >= __buflen)
 		return 22;
 	for (__iter = __buf; (__ch = *__iter) != '\0'; ++__iter)
-		*__iter = __localdep_toupper(__ch);
+		*__iter = (char)__localdep_toupper((unsigned char)__ch);
 	return 0;
 }
 __NAMESPACE_LOCAL_END

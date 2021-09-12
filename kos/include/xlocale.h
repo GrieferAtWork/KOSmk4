@@ -25,18 +25,18 @@
 #include "__stdinc.h"
 #include "__crt.h"
 
-__SYSDECL_BEGIN
-
 #ifdef __CC__
+__DECL_BEGIN
+
 #ifndef __locale_t_defined
-#define __locale_t_defined 1
+#define __locale_t_defined
 typedef __locale_t locale_t;
 #endif /* !__locale_t_defined */
 #ifdef __USE_DOS
 /*typedef __locale_t __locale_t; * ??? */
 #endif /* __USE_DOS */
-#endif /* __CC__ */
 
-__SYSDECL_END
+__DECL_END
+#endif /* __CC__ */
 
 #endif /* !_XLOCALE_H */

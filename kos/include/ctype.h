@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x3122bd64 */
+/* HASH CRC-32:0xb252d221 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -662,162 +662,180 @@ __NAMESPACE_LOCAL_USING_OR_IMPL(toupper_l, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR
 
 #ifdef __USE_XOPEN2K8
 #ifdef __crt_isalnum_l
-#define isalnum_l(ch, locale)  __crt_isalnum_l(ch, locale)
+#define isalnum_l(ch, locale) __crt_isalnum_l(ch, locale)
 #endif /* __crt_isalnum_l */
 #ifdef __crt_isalpha_l
-#define isalpha_l(ch, locale)  __crt_isalpha_l(ch, locale)
+#define isalpha_l(ch, locale) __crt_isalpha_l(ch, locale)
 #endif /* __crt_isalpha_l */
 #ifdef __crt_isupper_l
-#define isupper_l(ch, locale)  __crt_isupper_l(ch, locale)
+#define isupper_l(ch, locale) __crt_isupper_l(ch, locale)
 #endif /* __crt_isupper_l */
 #ifdef __crt_islower_l
-#define islower_l(ch, locale)  __crt_islower_l(ch, locale)
+#define islower_l(ch, locale) __crt_islower_l(ch, locale)
 #endif /* __crt_islower_l */
 #ifdef __crt_isdigit_l
-#define isdigit_l(ch, locale)  __crt_isdigit_l(ch, locale)
+#define isdigit_l(ch, locale) __crt_isdigit_l(ch, locale)
 #endif /* __crt_isdigit_l */
 #ifdef __crt_isxdigit_l
 #define isxdigit_l(ch, locale) __crt_isxdigit_l(ch, locale)
 #endif /* __crt_isxdigit_l */
 #ifdef __crt_isspace_l
-#define isspace_l(ch, locale)  __crt_isspace_l(ch, locale)
+#define isspace_l(ch, locale) __crt_isspace_l(ch, locale)
 #endif /* __crt_isspace_l */
 #ifdef __crt_ispunct_l
-#define ispunct_l(ch, locale)  __crt_ispunct_l(ch, locale)
+#define ispunct_l(ch, locale) __crt_ispunct_l(ch, locale)
 #endif /* __crt_ispunct_l */
 #ifdef __crt_isprint_l
-#define isprint_l(ch, locale)  __crt_isprint_l(ch, locale)
+#define isprint_l(ch, locale) __crt_isprint_l(ch, locale)
 #endif /* __crt_isprint_l */
 #ifdef __crt_isgraph_l
-#define isgraph_l(ch, locale)  __crt_isgraph_l(ch, locale)
+#define isgraph_l(ch, locale) __crt_isgraph_l(ch, locale)
 #endif /* __crt_isgraph_l */
 #ifdef __crt_iscntrl_l
-#define iscntrl_l(ch, locale)  __crt_iscntrl_l(ch, locale)
+#define iscntrl_l(ch, locale) __crt_iscntrl_l(ch, locale)
 #endif /* __crt_iscntrl_l */
 #ifdef __crt_isblank_l
-#define isblank_l(ch, locale)  __crt_isblank_l(ch, locale)
+#define isblank_l(ch, locale) __crt_isblank_l(ch, locale)
 #endif /* __crt_isblank_l */
 #ifdef __crt_tolower_l
-#define tolower_l(ch, locale)  __crt_tolower_l(ch, locale)
+#define tolower_l(ch, locale) __crt_tolower_l(ch, locale)
 #endif /* __crt_tolower_l */
 #ifdef __crt_toupper_l
-#define toupper_l(ch, locale)  __crt_toupper_l(ch, locale)
+#define toupper_l(ch, locale) __crt_toupper_l(ch, locale)
 #endif /* __crt_toupper_l */
 #endif /* __USE_XOPEN2K8 */
 
 #ifndef __NO_builtin_constant_p
 #ifndef __NO_builtin_choose_expr
 #ifdef __crt_isalnum
-#define isalnum(ch)  __builtin_choose_expr(__builtin_constant_p(ch), __ascii_isalnum(ch), __crt_isalnum(ch))
+#define isalnum(ch) __builtin_choose_expr(__builtin_constant_p(ch), __ascii_isalnum(ch), __crt_isalnum(ch))
 #endif /* __crt_isalnum */
 #ifdef __crt_isalpha
-#define isalpha(ch)  __builtin_choose_expr(__builtin_constant_p(ch), __ascii_isalpha(ch), __crt_isalpha(ch))
+#define isalpha(ch) __builtin_choose_expr(__builtin_constant_p(ch), __ascii_isalpha(ch), __crt_isalpha(ch))
 #endif /* __crt_isalpha */
 #ifdef __crt_isupper
-#define isupper(ch)  __builtin_choose_expr(__builtin_constant_p(ch), __ascii_isupper(ch), __crt_isupper(ch))
+#define isupper(ch) __builtin_choose_expr(__builtin_constant_p(ch), __ascii_isupper(ch), __crt_isupper(ch))
 #endif /* __crt_isupper */
 #ifdef __crt_islower
-#define islower(ch)  __builtin_choose_expr(__builtin_constant_p(ch), __ascii_islower(ch), __crt_islower(ch))
+#define islower(ch) __builtin_choose_expr(__builtin_constant_p(ch), __ascii_islower(ch), __crt_islower(ch))
 #endif /* __crt_islower */
 #ifdef __crt_isdigit
-#define isdigit(ch)  __builtin_choose_expr(__builtin_constant_p(ch), __ascii_isdigit(ch), __crt_isdigit(ch))
+#define isdigit(ch) __builtin_choose_expr(__builtin_constant_p(ch), __ascii_isdigit(ch), __crt_isdigit(ch))
 #endif /* __crt_isdigit */
 #ifdef __crt_isxdigit
 #define isxdigit(ch) __builtin_choose_expr(__builtin_constant_p(ch), __ascii_isxdigit(ch), __crt_isxdigit(ch))
 #endif /* __crt_isxdigit */
 #ifdef __crt_isspace
-#define isspace(ch)  __builtin_choose_expr(__builtin_constant_p(ch), __ascii_isspace(ch), __crt_isspace(ch))
+#define isspace(ch) __builtin_choose_expr(__builtin_constant_p(ch), __ascii_isspace(ch), __crt_isspace(ch))
 #endif /* __crt_isspace */
 #ifdef __crt_ispunct
-#define ispunct(ch)  __builtin_choose_expr(__builtin_constant_p(ch), __ascii_ispunct(ch), __crt_ispunct(ch))
+#define ispunct(ch) __builtin_choose_expr(__builtin_constant_p(ch), __ascii_ispunct(ch), __crt_ispunct(ch))
 #endif /* __crt_ispunct */
 #ifdef __crt_isprint
-#define isprint(ch)  __builtin_choose_expr(__builtin_constant_p(ch), __ascii_isprint(ch), __crt_isprint(ch))
+#define isprint(ch) __builtin_choose_expr(__builtin_constant_p(ch), __ascii_isprint(ch), __crt_isprint(ch))
 #endif /* __crt_isprint */
 #ifdef __crt_isgraph
-#define isgraph(ch)  __builtin_choose_expr(__builtin_constant_p(ch), __ascii_isgraph(ch), __crt_isgraph(ch))
+#define isgraph(ch) __builtin_choose_expr(__builtin_constant_p(ch), __ascii_isgraph(ch), __crt_isgraph(ch))
 #endif /* __crt_isgraph */
 #ifdef __crt_iscntrl
-#define iscntrl(ch)  __builtin_choose_expr(__builtin_constant_p(ch), __ascii_iscntrl(ch), __crt_iscntrl(ch))
+#define iscntrl(ch) __builtin_choose_expr(__builtin_constant_p(ch), __ascii_iscntrl(ch), __crt_iscntrl(ch))
 #endif /* __crt_iscntrl */
 #if defined(__USE_ISOC99) && defined(__crt_isblank)
-#define isblank(ch)  __builtin_choose_expr(__builtin_constant_p(ch), __ascii_isblank(ch), __crt_isblank(ch))
+#define isblank(ch) __builtin_choose_expr(__builtin_constant_p(ch), __ascii_isblank(ch), __crt_isblank(ch))
 #endif /* __USE_ISOC99 && __crt_isblank */
+#ifdef __crt_tolower
+#define tolower(ch) __builtin_choose_expr(__builtin_constant_p(ch), __ascii_tolower(ch), __crt_tolower(ch))
+#endif /* __crt_tolower */
+#ifdef __crt_toupper
+#define toupper(ch) __builtin_choose_expr(__builtin_constant_p(ch), __ascii_toupper(ch), __crt_toupper(ch))
+#endif /* __crt_toupper */
 #else /* !__NO_builtin_choose_expr */
 #ifdef __crt_isalnum
-#define isalnum(ch)  (__builtin_constant_p(ch) ? __ascii_isalnum(ch) : __crt_isalnum(ch))
+#define isalnum(ch) (__builtin_constant_p(ch) ? __ascii_isalnum(ch) : __crt_isalnum(ch))
 #endif /* __crt_isalnum */
 #ifdef __crt_isalpha
-#define isalpha(ch)  (__builtin_constant_p(ch) ? __ascii_isalpha(ch) : __crt_isalpha(ch))
+#define isalpha(ch) (__builtin_constant_p(ch) ? __ascii_isalpha(ch) : __crt_isalpha(ch))
 #endif /* __crt_isalpha */
 #ifdef __crt_isupper
-#define isupper(ch)  (__builtin_constant_p(ch) ? __ascii_isupper(ch) : __crt_isupper(ch))
+#define isupper(ch) (__builtin_constant_p(ch) ? __ascii_isupper(ch) : __crt_isupper(ch))
 #endif /* __crt_isupper */
 #ifdef __crt_islower
-#define islower(ch)  (__builtin_constant_p(ch) ? __ascii_islower(ch) : __crt_islower(ch))
+#define islower(ch) (__builtin_constant_p(ch) ? __ascii_islower(ch) : __crt_islower(ch))
 #endif /* __crt_islower */
 #ifdef __crt_isdigit
-#define isdigit(ch)  (__builtin_constant_p(ch) ? __ascii_isdigit(ch) : __crt_isdigit(ch))
+#define isdigit(ch) (__builtin_constant_p(ch) ? __ascii_isdigit(ch) : __crt_isdigit(ch))
 #endif /* __crt_isdigit */
 #ifdef __crt_isxdigit
 #define isxdigit(ch) (__builtin_constant_p(ch) ? __ascii_isxdigit(ch) : __crt_isxdigit(ch))
 #endif /* __crt_isxdigit */
 #ifdef __crt_isspace
-#define isspace(ch)  (__builtin_constant_p(ch) ? __ascii_isspace(ch) : __crt_isspace(ch))
+#define isspace(ch) (__builtin_constant_p(ch) ? __ascii_isspace(ch) : __crt_isspace(ch))
 #endif /* __crt_isspace */
 #ifdef __crt_ispunct
-#define ispunct(ch)  (__builtin_constant_p(ch) ? __ascii_ispunct(ch) : __crt_ispunct(ch))
+#define ispunct(ch) (__builtin_constant_p(ch) ? __ascii_ispunct(ch) : __crt_ispunct(ch))
 #endif /* __crt_ispunct */
 #ifdef __crt_isprint
-#define isprint(ch)  (__builtin_constant_p(ch) ? __ascii_isprint(ch) : __crt_isprint(ch))
+#define isprint(ch) (__builtin_constant_p(ch) ? __ascii_isprint(ch) : __crt_isprint(ch))
 #endif /* __crt_isprint */
 #ifdef __crt_isgraph
-#define isgraph(ch)  (__builtin_constant_p(ch) ? __ascii_isgraph(ch) : __crt_isgraph(ch))
+#define isgraph(ch) (__builtin_constant_p(ch) ? __ascii_isgraph(ch) : __crt_isgraph(ch))
 #endif /* __crt_isgraph */
 #ifdef __crt_iscntrl
-#define iscntrl(ch)  (__builtin_constant_p(ch) ? __ascii_iscntrl(ch) : __crt_iscntrl(ch))
+#define iscntrl(ch) (__builtin_constant_p(ch) ? __ascii_iscntrl(ch) : __crt_iscntrl(ch))
 #endif /* __crt_iscntrl */
 #if defined(__USE_ISOC99) && defined(__crt_isblank)
-#define isblank(ch)  (__builtin_constant_p(ch) ? __ascii_isblank(ch) : __crt_isblank(ch))
+#define isblank(ch) (__builtin_constant_p(ch) ? __ascii_isblank(ch) : __crt_isblank(ch))
 #endif /* __USE_ISOC99 && __crt_isblank */
+#ifdef __crt_tolower
+#define tolower(ch) (__builtin_constant_p(ch) ? __ascii_tolower(ch) : __crt_tolower(ch))
+#endif /* __crt_tolower */
+#ifdef __crt_toupper
+#define toupper(ch) (__builtin_constant_p(ch) ? __ascii_toupper(ch) : __crt_toupper(ch))
+#endif /* __crt_toupper */
 #endif /* __NO_builtin_choose_expr */
 #else /* !__NO_builtin_constant_p */
 #ifdef __crt_isalnum
-#define isalnum(ch)  __crt_isalnum(ch)
+#define isalnum(ch) __crt_isalnum(ch)
 #endif /* __crt_isalnum */
 #ifdef __crt_isalpha
-#define isalpha(ch)  __crt_isalpha(ch)
+#define isalpha(ch) __crt_isalpha(ch)
 #endif /* __crt_isalpha */
 #ifdef __crt_isupper
-#define isupper(ch)  __crt_isupper(ch)
+#define isupper(ch) __crt_isupper(ch)
 #endif /* __crt_isupper */
 #ifdef __crt_islower
-#define islower(ch)  __crt_islower(ch)
+#define islower(ch) __crt_islower(ch)
 #endif /* __crt_islower */
 #ifdef __crt_isdigit
-#define isdigit(ch)  __crt_isdigit(ch)
+#define isdigit(ch) __crt_isdigit(ch)
 #endif /* __crt_isdigit */
 #ifdef __crt_isxdigit
 #define isxdigit(ch) __crt_isxdigit(ch)
 #endif /* __crt_isxdigit */
 #ifdef __crt_isspace
-#define isspace(ch)  __crt_isspace(ch)
+#define isspace(ch) __crt_isspace(ch)
 #endif /* __crt_isspace */
 #ifdef __crt_ispunct
-#define ispunct(ch)  __crt_ispunct(ch)
+#define ispunct(ch) __crt_ispunct(ch)
 #endif /* __crt_ispunct */
 #ifdef __crt_isprint
-#define isprint(ch)  __crt_isprint(ch)
+#define isprint(ch) __crt_isprint(ch)
 #endif /* __crt_isprint */
 #ifdef __crt_isgraph
-#define isgraph(ch)  __crt_isgraph(ch)
+#define isgraph(ch) __crt_isgraph(ch)
 #endif /* __crt_isgraph */
 #ifdef __crt_iscntrl
-#define iscntrl(ch)  __crt_iscntrl(ch)
+#define iscntrl(ch) __crt_iscntrl(ch)
 #endif /* __crt_iscntrl */
 #if defined(__USE_ISOC99) && defined(__crt_isblank)
-#define isblank(ch)  __crt_isblank(ch)
+#define isblank(ch) __crt_isblank(ch)
 #endif /* __USE_ISOC99 && __crt_isblank */
+#ifdef __crt_tolower
+#define tolower(ch) __crt_tolower(ch)
+#endif /* __crt_tolower */
+#ifdef __crt_toupper
+#define toupper(ch) __crt_toupper(ch)
+#endif /* __crt_toupper */
 #endif /* __NO_builtin_constant_p */
 
 #endif /* (!__cplusplus || __USE_CTYPE_MACROS) && !__CXX_SYSTEM_HEADER */

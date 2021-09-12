@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xfd701f34 */
+/* HASH CRC-32:0x5a7f461a */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -25,7 +25,20 @@
 __NAMESPACE_LOCAL_BEGIN
 #ifndef __local___localdep_towlower_defined
 #define __local___localdep_towlower_defined 1
-#if __has_builtin(__builtin_towlower) && defined(__LIBC_BIND_CRTBUILTINS) && defined(__CRT_HAVE_towlower)
+__NAMESPACE_LOCAL_END
+#include <bits/crt/wctype.h>
+__NAMESPACE_LOCAL_BEGIN
+#if defined(__crt_towlower) && defined(__CRT_HAVE_towlower)
+__NAMESPACE_LOCAL_END
+#include <hybrid/typecore.h>
+__NAMESPACE_LOCAL_BEGIN
+__CEIREDIRECT(__ATTR_CONST __ATTR_WUNUSED,__WINT_TYPE__,__NOTHROW,__localdep_towlower,(__WINT_TYPE__ __wc),towlower,{ return __crt_towlower(__wc); })
+#elif defined(__crt_towlower)
+__NAMESPACE_LOCAL_END
+#include <hybrid/typecore.h>
+__NAMESPACE_LOCAL_BEGIN
+__LOCAL __ATTR_CONST __ATTR_WUNUSED __WINT_TYPE__ __NOTHROW(__LIBCCALL __localdep_towlower)(__WINT_TYPE__ __wc) { return __crt_towlower(__wc); }
+#elif __has_builtin(__builtin_towlower) && defined(__LIBC_BIND_CRTBUILTINS) && defined(__CRT_HAVE_towlower)
 __NAMESPACE_LOCAL_END
 #include <hybrid/typecore.h>
 __NAMESPACE_LOCAL_BEGIN
@@ -67,7 +80,7 @@ __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(_wcslwr_s))(__WCHAR_TYPE__ *__buf, __
 	if (__localdep_wcsnlen(__buf, __buflen) >= __buflen)
 		return 22;
 	for (__iter = __buf; (__ch = *__iter) != '\0'; ++__iter)
-		*__iter = (__WCHAR_TYPE__)__localdep_towlower(__ch);
+		*__iter = (__WCHAR_TYPE__)__localdep_towlower((__WCHAR_TYPE__)__ch);
 	return 0;
 }
 __NAMESPACE_LOCAL_END

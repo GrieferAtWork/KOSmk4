@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xfaca324d */
+/* HASH CRC-32:0xb28be690 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -36,30 +36,63 @@
 #include <uchar.h>
 #endif /* !_UCHAR_H */
 
+#ifndef WEOF16
+#define WEOF16 __WEOF16
+#define WEOF32 __WEOF32
+#endif /* !WEOF16 */
+
 #ifdef __CC__
 __SYSDECL_BEGIN
 
+#ifndef __wint16_t_defined
+#define __wint16_t_defined
+typedef __WINT16_TYPE__ wint16_t;
+typedef __WINT32_TYPE__ wint32_t;
+#endif /* !__wint16_t_defined */
+
 #if defined(__CRT_HAVE_btowc) && __SIZEOF_WCHAR_T__ == 2 && defined(__LIBCCALL_IS_LIBDCALL)
-__CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,wint_t,__NOTHROW_NCX,btoc16,(int __ch),btowc,(__ch))
+__CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,wint16_t,__NOTHROW_NCX,btoc16,(int __ch),btowc,(__ch))
 #elif defined(__CRT_HAVE_DOS$btowc)
-__CREDIRECT_DOS(__ATTR_CONST __ATTR_WUNUSED,wint_t,__NOTHROW_NCX,btoc16,(int __ch),btowc,(__ch))
+__CREDIRECT_DOS(__ATTR_CONST __ATTR_WUNUSED,wint16_t,__NOTHROW_NCX,btoc16,(int __ch),btowc,(__ch))
 #elif __SIZEOF_WCHAR_T__ == 2
 #include <libc/local/wchar/btowc.h>
-__FORCELOCAL __ATTR_ARTIFICIAL __ATTR_CONST __ATTR_WUNUSED wint_t __NOTHROW_NCX(__LIBDCALL btoc16)(int __ch) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(btowc))(__ch); }
+__FORCELOCAL __ATTR_ARTIFICIAL __ATTR_CONST __ATTR_WUNUSED wint16_t __NOTHROW_NCX(__LIBDCALL btoc16)(int __ch) { return (__WINT16_TYPE__)(__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(btowc))(__ch); }
 #else /* ... */
 #include <libc/local/parts.uchar.wchar/btoc16.h>
-__NAMESPACE_LOCAL_USING_OR_IMPL(btoc16, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_CONST __ATTR_WUNUSED wint_t __NOTHROW_NCX(__LIBDCALL btoc16)(int __ch) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(btoc16))(__ch); })
+__NAMESPACE_LOCAL_USING_OR_IMPL(btoc16, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_CONST __ATTR_WUNUSED wint16_t __NOTHROW_NCX(__LIBDCALL btoc16)(int __ch) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(btoc16))(__ch); })
 #endif /* !... */
 #if defined(__CRT_HAVE_btowc) && __SIZEOF_WCHAR_T__ == 4 && defined(__LIBCCALL_IS_LIBKCALL)
-__CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,wint_t,__NOTHROW_NCX,btoc32,(int __ch),btowc,(__ch))
+__CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,wint32_t,__NOTHROW_NCX,btoc32,(int __ch),btowc,(__ch))
 #elif defined(__CRT_HAVE_KOS$btowc)
-__CREDIRECT_KOS(__ATTR_CONST __ATTR_WUNUSED,wint_t,__NOTHROW_NCX,btoc32,(int __ch),btowc,(__ch))
+__CREDIRECT_KOS(__ATTR_CONST __ATTR_WUNUSED,wint32_t,__NOTHROW_NCX,btoc32,(int __ch),btowc,(__ch))
 #elif __SIZEOF_WCHAR_T__ == 4
 #include <libc/local/wchar/btowc.h>
-__FORCELOCAL __ATTR_ARTIFICIAL __ATTR_CONST __ATTR_WUNUSED wint_t __NOTHROW_NCX(__LIBKCALL btoc32)(int __ch) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(btowc))(__ch); }
+__FORCELOCAL __ATTR_ARTIFICIAL __ATTR_CONST __ATTR_WUNUSED wint32_t __NOTHROW_NCX(__LIBKCALL btoc32)(int __ch) { return (__WINT32_TYPE__)(__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(btowc))(__ch); }
 #else /* ... */
 #include <libc/local/parts.uchar.wchar/btoc32.h>
-__NAMESPACE_LOCAL_USING_OR_IMPL(btoc32, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_CONST __ATTR_WUNUSED wint_t __NOTHROW_NCX(__LIBKCALL btoc32)(int __ch) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(btoc32))(__ch); })
+__NAMESPACE_LOCAL_USING_OR_IMPL(btoc32, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_CONST __ATTR_WUNUSED wint32_t __NOTHROW_NCX(__LIBKCALL btoc32)(int __ch) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(btoc32))(__ch); })
+#endif /* !... */
+#if defined(__CRT_HAVE_wctob) && __SIZEOF_WCHAR_T__ == 2 && defined(__LIBCCALL_IS_LIBDCALL)
+__CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,int,__NOTHROW_NCX,c16tob,(wint16_t __ch),wctob,(__ch))
+#elif defined(__CRT_HAVE_DOS$wctob)
+__CREDIRECT_DOS(__ATTR_CONST __ATTR_WUNUSED,int,__NOTHROW_NCX,c16tob,(wint16_t __ch),wctob,(__ch))
+#elif __SIZEOF_WCHAR_T__ == 2
+#include <libc/local/wchar/wctob.h>
+__FORCELOCAL __ATTR_ARTIFICIAL __ATTR_CONST __ATTR_WUNUSED int __NOTHROW_NCX(__LIBDCALL c16tob)(wint16_t __ch) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(wctob))((__WINT_TYPE__)__ch); }
+#else /* ... */
+#include <libc/local/parts.uchar.wchar/c16tob.h>
+__NAMESPACE_LOCAL_USING_OR_IMPL(c16tob, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_CONST __ATTR_WUNUSED int __NOTHROW_NCX(__LIBDCALL c16tob)(wint16_t __ch) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(c16tob))(__ch); })
+#endif /* !... */
+#if defined(__CRT_HAVE_wctob) && __SIZEOF_WCHAR_T__ == 4 && defined(__LIBCCALL_IS_LIBKCALL)
+__CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,int,__NOTHROW_NCX,c32tob,(wint32_t __ch),wctob,(__ch))
+#elif defined(__CRT_HAVE_KOS$wctob)
+__CREDIRECT_KOS(__ATTR_CONST __ATTR_WUNUSED,int,__NOTHROW_NCX,c32tob,(wint32_t __ch),wctob,(__ch))
+#elif __SIZEOF_WCHAR_T__ == 4
+#include <libc/local/wchar/wctob.h>
+__FORCELOCAL __ATTR_ARTIFICIAL __ATTR_CONST __ATTR_WUNUSED int __NOTHROW_NCX(__LIBKCALL c32tob)(wint32_t __ch) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(wctob))((__WINT_TYPE__)__ch); }
+#else /* ... */
+#include <libc/local/parts.uchar.wchar/c32tob.h>
+__NAMESPACE_LOCAL_USING_OR_IMPL(c32tob, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_CONST __ATTR_WUNUSED int __NOTHROW_NCX(__LIBKCALL c32tob)(wint32_t __ch) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(c32tob))(__ch); })
 #endif /* !... */
 #if defined(__CRT_HAVE_mbrlen) && __SIZEOF_WCHAR_T__ == 2 && defined(__LIBCCALL_IS_LIBDCALL)
 __CREDIRECT(__ATTR_WUNUSED,__SIZE_TYPE__,__NOTHROW_NCX,c16rlen,(char const *__restrict __str, __SIZE_TYPE__ __maxlen, struct __mbstate *__mbs),mbrlen,(__str,__maxlen,__mbs))

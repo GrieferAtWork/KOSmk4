@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x3c4321be */
+/* HASH CRC-32:0x6f9fb301 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -23,9 +23,23 @@
 #include <__crt.h>
 #include <hybrid/typecore.h>
 __NAMESPACE_LOCAL_BEGIN
+#if !defined(__local___localdep___unicode_descriptor_defined) && defined(__CRT_HAVE___unicode_descriptor)
+#define __local___localdep___unicode_descriptor_defined 1
+__NAMESPACE_LOCAL_END
+#include <bits/crt/unicode.h>
+__NAMESPACE_LOCAL_BEGIN
+__CREDIRECT(__ATTR_CONST __ATTR_RETNONNULL,struct __unitraits const *,__NOTHROW,__localdep___unicode_descriptor,(__CHAR32_TYPE__ __ch),__unicode_descriptor,(__ch))
+#endif /* !__local___localdep___unicode_descriptor_defined && __CRT_HAVE___unicode_descriptor */
 #ifndef __local___localdep_iswalpha_defined
 #define __local___localdep_iswalpha_defined 1
-#if __has_builtin(__builtin_iswalpha) && defined(__LIBC_BIND_CRTBUILTINS) && defined(__CRT_HAVE_iswalpha)
+__NAMESPACE_LOCAL_END
+#include <bits/crt/wctype.h>
+__NAMESPACE_LOCAL_BEGIN
+#if defined(__crt_iswalpha) && defined(__CRT_HAVE_iswalpha)
+__CEIREDIRECT(__ATTR_CONST __ATTR_WUNUSED,int,__NOTHROW,__localdep_iswalpha,(__WINT_TYPE__ __wc),iswalpha,{ return __crt_iswalpha(__wc); })
+#elif defined(__crt_iswalpha)
+__LOCAL __ATTR_CONST __ATTR_WUNUSED int __NOTHROW(__LIBCCALL __localdep_iswalpha)(__WINT_TYPE__ __wc) { return __crt_iswalpha(__wc); }
+#elif __has_builtin(__builtin_iswalpha) && defined(__LIBC_BIND_CRTBUILTINS) && defined(__CRT_HAVE_iswalpha)
 __CEIREDIRECT(__ATTR_CONST __ATTR_WUNUSED,int,__NOTHROW,__localdep_iswalpha,(__WINT_TYPE__ __wc),iswalpha,{ return __builtin_iswalpha(__wc); })
 #elif defined(__CRT_HAVE_iswalpha)
 __CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,int,__NOTHROW,__localdep_iswalpha,(__WINT_TYPE__ __wc),iswalpha,(__wc))
@@ -36,9 +50,17 @@ __NAMESPACE_LOCAL_BEGIN
 #define __localdep_iswalpha __LIBC_LOCAL_NAME(iswalpha)
 #endif /* !... */
 #endif /* !__local___localdep_iswalpha_defined */
+__NAMESPACE_LOCAL_END
+#include <bits/crt/unicode.h>
+__NAMESPACE_LOCAL_BEGIN
 __LOCAL_LIBC(__iswcsymf) __ATTR_CONST __ATTR_WUNUSED int
 __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(__iswcsymf))(__WINT_TYPE__ __wc) {
+#if defined(__CRT_KOS) && defined(__CRT_HAVE___unicode_descriptor)
+	struct __unitraits const *__traits = __localdep___unicode_descriptor(__wc);
+	return (int)(__traits->__ut_flags & __UNICODE_ISSYMSTRT);
+#else /* __CRT_KOS && __CRT_HAVE___unicode_descriptor */
 	return __localdep_iswalpha(__wc) || __wc == '_' || __wc == '$';
+#endif /* !__CRT_KOS || !__CRT_HAVE___unicode_descriptor */
 }
 __NAMESPACE_LOCAL_END
 #ifndef __local___localdep___iswcsymf_defined

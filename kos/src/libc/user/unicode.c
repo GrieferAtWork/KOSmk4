@@ -74,17 +74,11 @@ PRIVATE struct __unitraits const unicode_descriptors[UNICODE_DESCRIPTOR_COUNT];
 #define unicode_default_descriptor   unicode_descriptors[0]
 PRIVATE uint16_t const unicode_tab1[42];
 PRIVATE uint16_t const unicode_tab2[42];
-INTERN_CONST uint16_t const libc___unicode_latin1flags[257];
 #else /* __INTELLISENSE__ */
 #include "unicode/db.dat"
 #endif /* !__INTELLISENSE__ */
 
 STATIC_ASSERT_MSG(UNICODE_FOLD_MAXLEN <= UNICODE_FOLDED_MAX, "UNICODE_FOLDED_MAX must be increased!");
-
-/* Export the latin-1 flags matrix */
-DEFINE_PUBLIC_ALIAS(__unicode_latin1flags, libc___unicode_latin1flags);
-STATIC_ASSERT_MSG(EOF == -1, "This is assumed by `__unicode_latin1flags'");
-
 
 /*[[[head:libc___unicode_descriptor,hash:CRC-32=0xf10a2df2]]]*/
 /* Return the internal descriptor for the given `ch' */

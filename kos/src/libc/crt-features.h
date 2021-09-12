@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xe854f906 */
+/* HASH CRC-32:0x321afa9b */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -151,8 +151,12 @@
 #define __CRT_HAVE_DOS$__issignaling
 #define __CRT_HAVE_DOS$__issignalingf
 #define __CRT_HAVE_DOS$__issignalingl
+#endif /* !__LIBCCALL_IS_LIBDCALL && !__KERNEL__ */
+#ifndef __KERNEL__
 #define __CRT_HAVE_DOS$__iswcsym
 #define __CRT_HAVE_DOS$__iswcsymf
+#endif /* !__KERNEL__ */
+#if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
 #define __CRT_HAVE_DOS$__locale_ctype_ptr_l
 #define __CRT_HAVE_DOS$__lock_fhandle
 #define __CRT_HAVE_DOS$__memcpy_chk
@@ -352,8 +356,12 @@
 #define __CRT_HAVE_DOS$_isctype
 #define __CRT_HAVE_DOS$_isctype_l
 #define __CRT_HAVE_DOS$_isleadbyte_l
+#endif /* !__LIBCCALL_IS_LIBDCALL && !__KERNEL__ */
+#ifndef __KERNEL__
 #define __CRT_HAVE_DOS$_iswcsym_l
 #define __CRT_HAVE_DOS$_iswcsymf_l
+#endif /* !__KERNEL__ */
+#if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
 #define __CRT_HAVE_DOS$_itoa_s
 #endif /* !__LIBCCALL_IS_LIBDCALL && !__KERNEL__ */
 #ifndef __KERNEL__
@@ -1543,6 +1551,8 @@
 #define __CRT_HAVE_DOS$isspace_l
 #define __CRT_HAVE_DOS$isupper
 #define __CRT_HAVE_DOS$isupper_l
+#endif /* !__LIBCCALL_IS_LIBDCALL && !__KERNEL__ */
+#ifndef __KERNEL__
 #define __CRT_HAVE_DOS$iswalnum
 #define __CRT_HAVE_DOS$iswalnum_l
 #define __CRT_HAVE_DOS$iswalpha
@@ -1570,6 +1580,8 @@
 #define __CRT_HAVE_DOS$iswupper_l
 #define __CRT_HAVE_DOS$iswxdigit
 #define __CRT_HAVE_DOS$iswxdigit_l
+#endif /* !__KERNEL__ */
+#if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
 #define __CRT_HAVE_DOS$isxdigit
 #define __CRT_HAVE_DOS$isxdigit_l
 #define __CRT_HAVE_DOS$itoa
@@ -2715,12 +2727,16 @@
 #define __CRT_HAVE_DOS$tolower_l
 #define __CRT_HAVE_DOS$toupper
 #define __CRT_HAVE_DOS$toupper_l
+#endif /* !__LIBCCALL_IS_LIBDCALL && !__KERNEL__ */
+#ifndef __KERNEL__
 #define __CRT_HAVE_DOS$towctrans
 #define __CRT_HAVE_DOS$towctrans_l
 #define __CRT_HAVE_DOS$towlower
 #define __CRT_HAVE_DOS$towlower_l
 #define __CRT_HAVE_DOS$towupper
 #define __CRT_HAVE_DOS$towupper_l
+#endif /* !__KERNEL__ */
+#if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
 #define __CRT_HAVE_DOS$trunc
 #define __CRT_HAVE_DOS$truncate
 #define __CRT_HAVE_DOS$truncate64
@@ -2965,11 +2981,7 @@
 #define __CRT_HAVE_DOS$wcswidth
 #define __CRT_HAVE_DOS$wcsxfrm
 #define __CRT_HAVE_DOS$wcsxfrm_l
-#endif /* !__KERNEL__ */
-#if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
 #define __CRT_HAVE_DOS$wctob
-#endif /* !__LIBCCALL_IS_LIBDCALL && !__KERNEL__ */
-#ifndef __KERNEL__
 #define __CRT_HAVE_DOS$wctomb
 #define __CRT_HAVE_DOS$wctomb_s
 #endif /* !__KERNEL__ */
@@ -3224,16 +3236,12 @@
 #ifndef __KERNEL__
 #define __CRT_HAVE___ctype_b_loc
 #endif /* !__KERNEL__ */
-#ifdef __KERNEL__
 #define __CRT_HAVE___ctype_flags
 #define __CRT_HAVE___ctype_tolower
-#endif /* __KERNEL__ */
 #ifndef __KERNEL__
 #define __CRT_HAVE___ctype_tolower_loc
 #endif /* !__KERNEL__ */
-#ifdef __KERNEL__
 #define __CRT_HAVE___ctype_toupper
-#endif /* __KERNEL__ */
 #ifndef __KERNEL__
 #define __CRT_HAVE___ctype_toupper_loc
 #endif /* !__KERNEL__ */
@@ -3364,7 +3372,6 @@
 #define __CRT_HAVE___unicode_descriptor_digit64
 #define __CRT_HAVE___unicode_descriptor_digitd
 #define __CRT_HAVE___unicode_descriptor_digitld
-#define __CRT_HAVE___unicode_latin1flags
 #define __CRT_HAVE___wcserror
 #define __CRT_HAVE___wcserror_s
 #define __CRT_HAVE___xpg_basename

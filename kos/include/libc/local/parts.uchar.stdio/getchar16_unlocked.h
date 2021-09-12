@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x60931de8 */
+/* HASH CRC-32:0x54cfe1 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -28,13 +28,13 @@ __NAMESPACE_LOCAL_BEGIN
 #ifndef __local___localdep_fgetc16_unlocked_defined
 #define __local___localdep_fgetc16_unlocked_defined 1
 #if defined(__CRT_HAVE_fgetwc_unlocked) && __SIZEOF_WCHAR_T__ == 2 && defined(__LIBCCALL_IS_LIBDCALL)
-__CREDIRECT(__ATTR_NONNULL((1)),__WINT_TYPE__,__THROWING,__localdep_fgetc16_unlocked,(__FILE *__restrict __stream),fgetwc_unlocked,(__stream))
+__CREDIRECT(__ATTR_NONNULL((1)),__WINT16_TYPE__,__THROWING,__localdep_fgetc16_unlocked,(__FILE *__restrict __stream),fgetwc_unlocked,(__stream))
 #elif defined(__CRT_HAVE_DOS$fgetwc_unlocked)
-__CREDIRECT_DOS(__ATTR_NONNULL((1)),__WINT_TYPE__,__THROWING,__localdep_fgetc16_unlocked,(__FILE *__restrict __stream),fgetwc_unlocked,(__stream))
+__CREDIRECT_DOS(__ATTR_NONNULL((1)),__WINT16_TYPE__,__THROWING,__localdep_fgetc16_unlocked,(__FILE *__restrict __stream),fgetwc_unlocked,(__stream))
 #elif defined(__CRT_HAVE__fgetwc_nolock) && __SIZEOF_WCHAR_T__ == 2 && defined(__LIBCCALL_IS_LIBDCALL)
-__CREDIRECT(__ATTR_NONNULL((1)),__WINT_TYPE__,__THROWING,__localdep_fgetc16_unlocked,(__FILE *__restrict __stream),_fgetwc_nolock,(__stream))
+__CREDIRECT(__ATTR_NONNULL((1)),__WINT16_TYPE__,__THROWING,__localdep_fgetc16_unlocked,(__FILE *__restrict __stream),_fgetwc_nolock,(__stream))
 #elif defined(__CRT_HAVE_DOS$_fgetwc_nolock)
-__CREDIRECT_DOS(__ATTR_NONNULL((1)),__WINT_TYPE__,__THROWING,__localdep_fgetc16_unlocked,(__FILE *__restrict __stream),_fgetwc_nolock,(__stream))
+__CREDIRECT_DOS(__ATTR_NONNULL((1)),__WINT16_TYPE__,__THROWING,__localdep_fgetc16_unlocked,(__FILE *__restrict __stream),_fgetwc_nolock,(__stream))
 #else /* ... */
 #undef __local___localdep_fgetc16_unlocked_defined
 #endif /* !... */
@@ -42,7 +42,7 @@ __CREDIRECT_DOS(__ATTR_NONNULL((1)),__WINT_TYPE__,__THROWING,__localdep_fgetc16_
 __NAMESPACE_LOCAL_END
 #include <libc/local/stdstreams.h>
 __NAMESPACE_LOCAL_BEGIN
-__LOCAL_LIBC(getchar16_unlocked) __WINT_TYPE__
+__LOCAL_LIBC(getchar16_unlocked) __WINT16_TYPE__
 (__LIBDCALL __LIBC_LOCAL_NAME(getchar16_unlocked))(void) __THROWS(...) {
 	return __localdep_fgetc16_unlocked(__LOCAL_stdin);
 }

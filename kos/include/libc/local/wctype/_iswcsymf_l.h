@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x43f5edca */
+/* HASH CRC-32:0x2c7f13c6 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -23,14 +23,34 @@
 #include <__crt.h>
 #include <hybrid/typecore.h>
 __NAMESPACE_LOCAL_BEGIN
+#ifndef __local___localdep___iswcsymf_defined
+#define __local___localdep___iswcsymf_defined 1
+#ifdef __CRT_HAVE___iswcsymf
+__CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,int,__NOTHROW_NCX,__localdep___iswcsymf,(__WINT_TYPE__ __wc),__iswcsymf,(__wc))
+#else /* __CRT_HAVE___iswcsymf */
+__NAMESPACE_LOCAL_END
+#include <libc/local/wctype/__iswcsymf.h>
+__NAMESPACE_LOCAL_BEGIN
+#define __localdep___iswcsymf __LIBC_LOCAL_NAME(__iswcsymf)
+#endif /* !__CRT_HAVE___iswcsymf */
+#endif /* !__local___localdep___iswcsymf_defined */
 #ifndef __local___localdep_iswalpha_l_defined
 #define __local___localdep_iswalpha_l_defined 1
-#ifdef __CRT_HAVE_iswalpha_l
-__CREDIRECT(__ATTR_PURE __ATTR_WUNUSED,int,__NOTHROW_NCX,__localdep_iswalpha_l,(__WINT_TYPE__ __wc, __locale_t __locale),iswalpha_l,(__wc,__locale))
+__NAMESPACE_LOCAL_END
+#include <bits/crt/wctype.h>
+__NAMESPACE_LOCAL_BEGIN
+#if defined(__crt_iswalpha_l) && defined(__CRT_HAVE_iswalpha_l)
+__CEIREDIRECT(__ATTR_PURE __ATTR_WUNUSED,int,__NOTHROW_NCX,__localdep_iswalpha_l,(__WINT_TYPE__ __ch, __locale_t __locale),iswalpha_l,{ return __crt_iswalpha_l(__ch, __locale); })
+#elif defined(__crt_iswalpha_l) && defined(__CRT_HAVE___iswalpha_l)
+__CEIREDIRECT(__ATTR_PURE __ATTR_WUNUSED,int,__NOTHROW_NCX,__localdep_iswalpha_l,(__WINT_TYPE__ __ch, __locale_t __locale),__iswalpha_l,{ return __crt_iswalpha_l(__ch, __locale); })
+#elif defined(__crt_iswalpha_l)
+__LOCAL __ATTR_PURE __ATTR_WUNUSED int __NOTHROW_NCX(__LIBCCALL __localdep_iswalpha_l)(__WINT_TYPE__ __ch, __locale_t __locale) { return __crt_iswalpha_l(__ch, __locale); }
+#elif defined(__CRT_HAVE_iswalpha_l)
+__CREDIRECT(__ATTR_PURE __ATTR_WUNUSED,int,__NOTHROW_NCX,__localdep_iswalpha_l,(__WINT_TYPE__ __ch, __locale_t __locale),iswalpha_l,(__ch,__locale))
 #elif defined(__CRT_HAVE__iswalpha_l)
-__CREDIRECT(__ATTR_PURE __ATTR_WUNUSED,int,__NOTHROW_NCX,__localdep_iswalpha_l,(__WINT_TYPE__ __wc, __locale_t __locale),_iswalpha_l,(__wc,__locale))
+__CREDIRECT(__ATTR_PURE __ATTR_WUNUSED,int,__NOTHROW_NCX,__localdep_iswalpha_l,(__WINT_TYPE__ __ch, __locale_t __locale),_iswalpha_l,(__ch,__locale))
 #elif defined(__CRT_HAVE___iswalpha_l)
-__CREDIRECT(__ATTR_PURE __ATTR_WUNUSED,int,__NOTHROW_NCX,__localdep_iswalpha_l,(__WINT_TYPE__ __wc, __locale_t __locale),__iswalpha_l,(__wc,__locale))
+__CREDIRECT(__ATTR_PURE __ATTR_WUNUSED,int,__NOTHROW_NCX,__localdep_iswalpha_l,(__WINT_TYPE__ __ch, __locale_t __locale),__iswalpha_l,(__ch,__locale))
 #else /* ... */
 __NAMESPACE_LOCAL_END
 #include <libc/local/wctype/iswalpha_l.h>
@@ -40,7 +60,13 @@ __NAMESPACE_LOCAL_BEGIN
 #endif /* !__local___localdep_iswalpha_l_defined */
 __LOCAL_LIBC(_iswcsymf_l) __ATTR_PURE __ATTR_WUNUSED int
 __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(_iswcsymf_l))(__WINT_TYPE__ __wc, __locale_t __locale) {
+#if defined(__CRT_KOS) && defined(__CRT_HAVE___unicode_descriptor)
+	(void)__locale;
+	__COMPILER_IMPURE();
+	return __localdep___iswcsymf(__wc);
+#else /* __CRT_KOS && __CRT_HAVE___unicode_descriptor */
 	return __localdep_iswalpha_l(__wc, __locale) || __wc == '_' || __wc == '$';
+#endif /* !__CRT_KOS || !__CRT_HAVE___unicode_descriptor */
 }
 __NAMESPACE_LOCAL_END
 #ifndef __local___localdep__iswcsymf_l_defined

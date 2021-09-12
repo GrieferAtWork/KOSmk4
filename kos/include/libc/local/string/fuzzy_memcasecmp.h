@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x21cd5461 */
+/* HASH CRC-32:0x12ca47d3 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -96,7 +96,8 @@ __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(fuzzy_memcasecmp))(void const *__s1, 
 		for (__j = 0; __j < __s2_bytes; __j++) {
 			__BYTE_TYPE__ __c1 = ((__BYTE_TYPE__ *)__s1)[__i];
 			__BYTE_TYPE__ __c2 = ((__BYTE_TYPE__ *)__s2)[__j];
-			__cost  = __c1 != __c2 && __localdep_tolower(__c1) != __localdep_tolower(__c2);
+			__cost  = __c1 != __c2 && (__localdep_tolower((unsigned char)__c1) !=
+			                     __localdep_tolower((unsigned char)__c2));
 			__cost += __v0[__j];
 			__temp  = __v1[__j] + 1;
 			if (__cost > __temp)

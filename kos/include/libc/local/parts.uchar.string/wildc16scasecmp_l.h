@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x6d5af397 */
+/* HASH CRC-32:0xc16209ea */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -48,30 +48,68 @@ __NAMESPACE_LOCAL_BEGIN
 #define __localdep_c16scasecmp_l __LIBC_LOCAL_NAME(c16scasecmp_l)
 #endif /* !... */
 #endif /* !__local___localdep_c16scasecmp_l_defined */
-#ifndef __local___localdep_towlower_l_defined
-#define __local___localdep_towlower_l_defined 1
-#ifdef __CRT_HAVE_towlower_l
+#ifndef __local___localdep_toulower16_l_defined
+#define __local___localdep_toulower16_l_defined 1
+__NAMESPACE_LOCAL_END
+#include <bits/crt/wctype.h>
+__NAMESPACE_LOCAL_BEGIN
+#if defined(__crt_towlower_l) && defined(__CRT_HAVE_towlower_l) && __SIZEOF_WCHAR_T__ == 2
 __NAMESPACE_LOCAL_END
 #include <hybrid/typecore.h>
 __NAMESPACE_LOCAL_BEGIN
-__CREDIRECT(__ATTR_PURE __ATTR_WUNUSED,__WINT_TYPE__,__NOTHROW_NCX,__localdep_towlower_l,(__WINT_TYPE__ __wc, __locale_t __locale),towlower_l,(__wc,__locale))
-#elif defined(__CRT_HAVE__towlower_l)
+__COMPILER_EIREDIRECT(__ATTR_PURE __ATTR_WUNUSED,__WINT16_TYPE__,__NOTHROW_NCX,__LIBDCALL,__localdep_toulower16_l,(__WINT16_TYPE__ __ch, __locale_t __locale),towlower_l,{ return __crt_towlower_l(__ch, __locale); })
+#elif defined(__crt_towlower_l) && defined(__CRT_HAVE___towlower_l) && __SIZEOF_WCHAR_T__ == 2
 __NAMESPACE_LOCAL_END
 #include <hybrid/typecore.h>
 __NAMESPACE_LOCAL_BEGIN
-__CREDIRECT(__ATTR_PURE __ATTR_WUNUSED,__WINT_TYPE__,__NOTHROW_NCX,__localdep_towlower_l,(__WINT_TYPE__ __wc, __locale_t __locale),_towlower_l,(__wc,__locale))
-#elif defined(__CRT_HAVE___towlower_l)
+__COMPILER_EIREDIRECT(__ATTR_PURE __ATTR_WUNUSED,__WINT16_TYPE__,__NOTHROW_NCX,__LIBDCALL,__localdep_toulower16_l,(__WINT16_TYPE__ __ch, __locale_t __locale),__towlower_l,{ return __crt_towlower_l(__ch, __locale); })
+#elif defined(__crt_towlower_l) && __SIZEOF_WCHAR_T__ == 2
 __NAMESPACE_LOCAL_END
 #include <hybrid/typecore.h>
 __NAMESPACE_LOCAL_BEGIN
-__CREDIRECT(__ATTR_PURE __ATTR_WUNUSED,__WINT_TYPE__,__NOTHROW_NCX,__localdep_towlower_l,(__WINT_TYPE__ __wc, __locale_t __locale),__towlower_l,(__wc,__locale))
-#else /* ... */
+__LOCAL __ATTR_PURE __ATTR_WUNUSED __WINT16_TYPE__ __NOTHROW_NCX(__LIBDCALL __localdep_toulower16_l)(__WINT16_TYPE__ __ch, __locale_t __locale) { return __crt_towlower_l(__ch, __locale); }
+#elif defined(__CRT_HAVE_towlower_l) && __SIZEOF_WCHAR_T__ == 2 && defined(__LIBCCALL_IS_LIBDCALL)
+__NAMESPACE_LOCAL_END
+#include <hybrid/typecore.h>
+__NAMESPACE_LOCAL_BEGIN
+__CREDIRECT(__ATTR_PURE __ATTR_WUNUSED,__WINT16_TYPE__,__NOTHROW_NCX,__localdep_toulower16_l,(__WINT16_TYPE__ __ch, __locale_t __locale),towlower_l,(__ch,__locale))
+#elif defined(__CRT_HAVE_DOS$towlower_l)
+__NAMESPACE_LOCAL_END
+#include <hybrid/typecore.h>
+__NAMESPACE_LOCAL_BEGIN
+__CREDIRECT_DOS(__ATTR_PURE __ATTR_WUNUSED,__WINT16_TYPE__,__NOTHROW_NCX,__localdep_toulower16_l,(__WINT16_TYPE__ __ch, __locale_t __locale),towlower_l,(__ch,__locale))
+#elif defined(__CRT_HAVE__towlower_l) && __SIZEOF_WCHAR_T__ == 2 && defined(__LIBCCALL_IS_LIBDCALL)
+__NAMESPACE_LOCAL_END
+#include <hybrid/typecore.h>
+__NAMESPACE_LOCAL_BEGIN
+__CREDIRECT(__ATTR_PURE __ATTR_WUNUSED,__WINT16_TYPE__,__NOTHROW_NCX,__localdep_toulower16_l,(__WINT16_TYPE__ __ch, __locale_t __locale),_towlower_l,(__ch,__locale))
+#elif defined(__CRT_HAVE_DOS$_towlower_l)
+__NAMESPACE_LOCAL_END
+#include <hybrid/typecore.h>
+__NAMESPACE_LOCAL_BEGIN
+__CREDIRECT_DOS(__ATTR_PURE __ATTR_WUNUSED,__WINT16_TYPE__,__NOTHROW_NCX,__localdep_toulower16_l,(__WINT16_TYPE__ __ch, __locale_t __locale),_towlower_l,(__ch,__locale))
+#elif defined(__CRT_HAVE___towlower_l) && __SIZEOF_WCHAR_T__ == 2 && defined(__LIBCCALL_IS_LIBDCALL)
+__NAMESPACE_LOCAL_END
+#include <hybrid/typecore.h>
+__NAMESPACE_LOCAL_BEGIN
+__CREDIRECT(__ATTR_PURE __ATTR_WUNUSED,__WINT16_TYPE__,__NOTHROW_NCX,__localdep_toulower16_l,(__WINT16_TYPE__ __ch, __locale_t __locale),__towlower_l,(__ch,__locale))
+#elif defined(__CRT_HAVE_DOS$__towlower_l)
+__NAMESPACE_LOCAL_END
+#include <hybrid/typecore.h>
+__NAMESPACE_LOCAL_BEGIN
+__CREDIRECT_DOS(__ATTR_PURE __ATTR_WUNUSED,__WINT16_TYPE__,__NOTHROW_NCX,__localdep_toulower16_l,(__WINT16_TYPE__ __ch, __locale_t __locale),__towlower_l,(__ch,__locale))
+#elif __SIZEOF_WCHAR_T__ == 2
 __NAMESPACE_LOCAL_END
 #include <libc/local/wctype/towlower_l.h>
 __NAMESPACE_LOCAL_BEGIN
-#define __localdep_towlower_l __LIBC_LOCAL_NAME(towlower_l)
+#define __localdep_toulower16_l (*(__WINT16_TYPE__(__LIBDCALL *)(__WINT16_TYPE__, __locale_t))&__LIBC_LOCAL_NAME(towlower_l))
+#else /* ... */
+__NAMESPACE_LOCAL_END
+#include <libc/local/parts.uchar.wctype/toulower16_l.h>
+__NAMESPACE_LOCAL_BEGIN
+#define __localdep_toulower16_l __LIBC_LOCAL_NAME(toulower16_l)
 #endif /* !... */
-#endif /* !__local___localdep_towlower_l_defined */
+#endif /* !__local___localdep_toulower16_l_defined */
 __LOCAL_LIBC(wildc16scasecmp_l) __ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1, 2)) int
 __NOTHROW_NCX(__LIBDCALL __LIBC_LOCAL_NAME(wildc16scasecmp_l))(__CHAR16_TYPE__ const *__pattern, __CHAR16_TYPE__ const *__string, __locale_t __locale) {
 	__CHAR16_TYPE__ __card_post, __pattern_ch, __wcsing_ch;
@@ -92,10 +130,10 @@ __NOTHROW_NCX(__LIBDCALL __LIBC_LOCAL_NAME(wildc16scasecmp_l))(__CHAR16_TYPE__ c
 				return 0; /* Pattern ends with '*' (matches everything) */
 			if (__card_post == '?')
 				goto __next; /* Match any --> already found */
-			__card_post = (__CHAR16_TYPE__)__localdep_towlower_l(__card_post, __locale);
+			__card_post = __localdep_toulower16_l(__card_post, __locale);
 			for (;;) {
 				__CHAR16_TYPE__ __ch = *__string++;
-				if (__card_post == __ch || __card_post == (__CHAR16_TYPE__)__localdep_towlower_l(__ch, __locale)) {
+				if (__card_post == __ch || __card_post == __localdep_toulower16_l(__ch, __locale)) {
 					/* Recursively check if the rest of the string and pattern match */
 					if (!__localdep_c16scasecmp_l(__string, __pattern, __locale))
 						return 0;
@@ -107,8 +145,8 @@ __NOTHROW_NCX(__LIBDCALL __LIBC_LOCAL_NAME(wildc16scasecmp_l))(__CHAR16_TYPE__ c
 		__pattern_ch = *__pattern;
 		__wcsing_ch = *__string;
 		if (__pattern_ch == __wcsing_ch || __pattern_ch == '?' ||
-		   (__pattern_ch = (__CHAR16_TYPE__)__localdep_towlower_l(__pattern_ch, __locale),
-		    __wcsing_ch = (__CHAR16_TYPE__)__localdep_towlower_l(__wcsing_ch, __locale),
+		   (__pattern_ch = __localdep_toulower16_l(__pattern_ch, __locale),
+		    __wcsing_ch = __localdep_toulower16_l(__wcsing_ch, __locale),
 		    __pattern_ch == __wcsing_ch)) {
 __next:
 			++__string;

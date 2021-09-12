@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x432dfb6a */
+/* HASH CRC-32:0xc5fb36d1 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -10829,7 +10829,7 @@ typedef __double_t double_t;
 #if defined(__NO_XBLOCK) || !defined(__COMPILER_HAVE_TYPEOF)
 #define isgreater(x, y) (!isunordered(x, y) && (x) > (y))
 #else /* __NO_XBLOCK || !__COMPILER_HAVE_TYPEOF */
-#define isgreater(x, y) __XBLOCK({ __typeof__(x) __x = (x); __typeof__(y) __y = (y); __XRETURN !isunordered(__x, __y) && __x > __y; })
+#define isgreater(x, y) __XBLOCK({ __typeof__(x) __isg_x = (x); __typeof__(y) __isg_y = (y); __XRETURN !isunordered(__isg_x, __isg_y) && __isg_x > __isg_y; })
 #endif /* !__NO_XBLOCK && __COMPILER_HAVE_TYPEOF */
 #endif /* !isgreater */
 
@@ -10837,7 +10837,7 @@ typedef __double_t double_t;
 #if defined(__NO_XBLOCK) || !defined(__COMPILER_HAVE_TYPEOF)
 #define isgreaterequal(x, y) (!isunordered(x, y) && (x) >= (y))
 #else /* __NO_XBLOCK || !__COMPILER_HAVE_TYPEOF */
-#define isgreaterequal(x, y) __XBLOCK({ __typeof__(x) __x = (x); __typeof__(y) __y = (y); __XRETURN !isunordered(__x, __y) && __x >= __y; })
+#define isgreaterequal(x, y) __XBLOCK({ __typeof__(x) __isge_x = (x); __typeof__(y) __isge_y = (y); __XRETURN !isunordered(__isge_x, __isge_y) && __isge_x >= __isge_y; })
 #endif /* !__NO_XBLOCK && __COMPILER_HAVE_TYPEOF */
 #endif /* !isgreaterequal */
 
@@ -10845,7 +10845,7 @@ typedef __double_t double_t;
 #if defined(__NO_XBLOCK) || !defined(__COMPILER_HAVE_TYPEOF)
 #define isless(x, y) (!isunordered(x, y) && (x) < (y))
 #else /* __NO_XBLOCK || !__COMPILER_HAVE_TYPEOF */
-#define isless(x, y) __XBLOCK({ __typeof__(x) __x = (x); __typeof__(y) __y = (y); __XRETURN !isunordered(__x, __y) && __x < __y; })
+#define isless(x, y) __XBLOCK({ __typeof__(x) __isl_x = (x); __typeof__(y) __isl_y = (y); __XRETURN !isunordered(__isl_x, __isl_y) && __isl_x < __isl_y; })
 #endif /* !__NO_XBLOCK && __COMPILER_HAVE_TYPEOF */
 #endif /* !isless */
 
@@ -10853,7 +10853,7 @@ typedef __double_t double_t;
 #if defined(__NO_XBLOCK) || !defined(__COMPILER_HAVE_TYPEOF)
 #define islessequal(x, y) (!isunordered(x, y) && (x) <= (y))
 #else /* __NO_XBLOCK || !__COMPILER_HAVE_TYPEOF */
-#define islessequal(x, y) __XBLOCK({ __typeof__(x) __x = (x); __typeof__(y) __y = (y); __XRETURN !isunordered(__x, __y) && __x <= __y; })
+#define islessequal(x, y) __XBLOCK({ __typeof__(x) __isle_x = (x); __typeof__(y) __isle_y = (y); __XRETURN !isunordered(__isle_x, __isle_y) && __isle_x <= __isle_y; })
 #endif /* !__NO_XBLOCK && __COMPILER_HAVE_TYPEOF */
 #endif /* !islessequal */
 
@@ -10861,7 +10861,7 @@ typedef __double_t double_t;
 #if defined(__NO_XBLOCK) || !defined(__COMPILER_HAVE_TYPEOF)
 #define islessgreater(x, y) (!isunordered(x, y) && ((x) < (y) || (y) < (x)))
 #else /* __NO_XBLOCK || !__COMPILER_HAVE_TYPEOF */
-#define islessgreater(x, y) __XBLOCK({ __typeof__(x) __x = (x); __typeof__(y) __y = (y); __XRETURN !isunordered(__x, __y) && (__x < __y || __y < __x); })
+#define islessgreater(x, y) __XBLOCK({ __typeof__(x) __islg_x = (x); __typeof__(y) __islg_y = (y); __XRETURN !isunordered(__islg_x, __islg_y) && (__islg_x < __islg_y || __y < __x); })
 #endif /* !__NO_XBLOCK && __COMPILER_HAVE_TYPEOF */
 #endif /* !islessgreater */
 #endif /* __USE_ISOC99 */

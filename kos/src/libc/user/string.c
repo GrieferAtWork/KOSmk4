@@ -89,12 +89,12 @@ NOTHROW_NCX(LIBCCALL libc_memcasemem0)(void const *haystack, size_t haystacklen,
 	if unlikely(!needlelen || needlelen > haystacklen)
 		return NULL;
 	haystacklen -= (needlelen - 1);
-	marker       = tolower(*(byte_t *)needle);
+	marker       = (byte_t)tolower(*(byte_t *)needle);
 	hayend       = (byte_t *)haystack + haystacklen;
 	for (;;) {
 		for (candidate = (byte_t *)haystack; candidate < hayend; ++candidate) {
 			byte_t b = *candidate;
-			if (b == marker || tolower(b) == marker)
+			if (b == marker || (byte_t)tolower(b) == marker)
 				goto got_candidate;
 		}
 		break;

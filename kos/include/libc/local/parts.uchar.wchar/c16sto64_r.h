@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x3d45a8a9 */
+/* HASH CRC-32:0x18c5672b */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -24,25 +24,48 @@
 #include <features.h>
 #include <bits/types.h>
 __NAMESPACE_LOCAL_BEGIN
-#ifndef __local___localdep_iswspace_defined
-#define __local___localdep_iswspace_defined 1
-#if __has_builtin(__builtin_iswspace) && defined(__LIBC_BIND_CRTBUILTINS) && defined(__CRT_HAVE_iswspace)
+#ifndef __local___localdep_isuspace16_defined
+#define __local___localdep_isuspace16_defined 1
+__NAMESPACE_LOCAL_END
+#include <bits/crt/wctype.h>
+__NAMESPACE_LOCAL_BEGIN
+#if defined(__crt_iswspace) && defined(__CRT_HAVE_iswspace) && __SIZEOF_WCHAR_T__ == 2
 __NAMESPACE_LOCAL_END
 #include <hybrid/typecore.h>
 __NAMESPACE_LOCAL_BEGIN
-__CEIREDIRECT(__ATTR_CONST __ATTR_WUNUSED,int,__NOTHROW,__localdep_iswspace,(__WINT_TYPE__ __wc),iswspace,{ return __builtin_iswspace(__wc); })
-#elif defined(__CRT_HAVE_iswspace)
+__COMPILER_EIREDIRECT(__ATTR_CONST __ATTR_WUNUSED,int,__NOTHROW,__LIBDCALL,__localdep_isuspace16,(__WINT16_TYPE__ __wc),iswspace,{ return __crt_iswspace(__wc); })
+#elif defined(__crt_iswspace) && __SIZEOF_WCHAR_T__ == 2
 __NAMESPACE_LOCAL_END
 #include <hybrid/typecore.h>
 __NAMESPACE_LOCAL_BEGIN
-__CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,int,__NOTHROW,__localdep_iswspace,(__WINT_TYPE__ __wc),iswspace,(__wc))
-#else /* ... */
+__LOCAL __ATTR_CONST __ATTR_WUNUSED int __NOTHROW(__LIBDCALL __localdep_isuspace16)(__WINT16_TYPE__ __wc) { return __crt_iswspace(__wc); }
+#elif __has_builtin(__builtin_iswspace) && defined(__LIBC_BIND_CRTBUILTINS) && defined(__CRT_HAVE_iswspace) && __SIZEOF_WCHAR_T__ == 2
+__NAMESPACE_LOCAL_END
+#include <hybrid/typecore.h>
+__NAMESPACE_LOCAL_BEGIN
+__COMPILER_EIREDIRECT(__ATTR_CONST __ATTR_WUNUSED,int,__NOTHROW,__LIBDCALL,__localdep_isuspace16,(__WINT16_TYPE__ __wc),iswspace,{ return __builtin_iswspace(__wc); })
+#elif defined(__CRT_HAVE_iswspace) && __SIZEOF_WCHAR_T__ == 2 && defined(__LIBCCALL_IS_LIBDCALL)
+__NAMESPACE_LOCAL_END
+#include <hybrid/typecore.h>
+__NAMESPACE_LOCAL_BEGIN
+__CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,int,__NOTHROW,__localdep_isuspace16,(__WINT16_TYPE__ __wc),iswspace,(__wc))
+#elif defined(__CRT_HAVE_DOS$iswspace)
+__NAMESPACE_LOCAL_END
+#include <hybrid/typecore.h>
+__NAMESPACE_LOCAL_BEGIN
+__CREDIRECT_DOS(__ATTR_CONST __ATTR_WUNUSED,int,__NOTHROW,__localdep_isuspace16,(__WINT16_TYPE__ __wc),iswspace,(__wc))
+#elif __SIZEOF_WCHAR_T__ == 2
 __NAMESPACE_LOCAL_END
 #include <libc/local/wctype/iswspace.h>
 __NAMESPACE_LOCAL_BEGIN
-#define __localdep_iswspace __LIBC_LOCAL_NAME(iswspace)
+#define __localdep_isuspace16 (*(int(__LIBDCALL *)(__WINT16_TYPE__))&__LIBC_LOCAL_NAME(iswspace))
+#else /* ... */
+__NAMESPACE_LOCAL_END
+#include <libc/local/parts.uchar.wctype/isuspace16.h>
+__NAMESPACE_LOCAL_BEGIN
+#define __localdep_isuspace16 __LIBC_LOCAL_NAME(isuspace16)
 #endif /* !... */
-#endif /* !__local___localdep_iswspace_defined */
+#endif /* !__local___localdep_isuspace16_defined */
 __NAMESPACE_LOCAL_END
 #include <asm/os/errno.h>
 #include <hybrid/__overflow.h>
@@ -54,7 +77,7 @@ __NOTHROW_NCX(__LIBDCALL __LIBC_LOCAL_NAME(c16sto64_r))(__CHAR16_TYPE__ const *_
 	__CHAR16_TYPE__ __sign;
 	__CHAR16_TYPE__ const *__num_start = __nptr;
 	__CHAR16_TYPE__ const *__num_iter;
-	while (__localdep_iswspace(*__num_start))
+	while (__localdep_isuspace16(*__num_start))
 		++__num_start;
 	__sign = *__num_start;
 	if (__sign == '-' || __sign == '+')
@@ -157,7 +180,7 @@ __handle_overflow:
 			*__error = 0;
 			/* Check for `EINVAL' */
 			if __unlikely(*__num_iter) {
-				while (__localdep_iswspace(*__num_iter))
+				while (__localdep_isuspace16(*__num_iter))
 					++__num_iter;
 				if (*__num_iter) {
 #ifdef __EINVAL

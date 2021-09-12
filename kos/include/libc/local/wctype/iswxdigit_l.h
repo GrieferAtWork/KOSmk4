@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x5d84d934 */
+/* HASH CRC-32:0xfde59978 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -25,7 +25,14 @@
 __NAMESPACE_LOCAL_BEGIN
 #ifndef __local___localdep_iswxdigit_defined
 #define __local___localdep_iswxdigit_defined 1
-#if __has_builtin(__builtin_iswxdigit) && defined(__LIBC_BIND_CRTBUILTINS) && defined(__CRT_HAVE_iswxdigit)
+__NAMESPACE_LOCAL_END
+#include <bits/crt/wctype.h>
+__NAMESPACE_LOCAL_BEGIN
+#if defined(__crt_iswxdigit) && defined(__CRT_HAVE_iswxdigit)
+__CEIREDIRECT(__ATTR_CONST __ATTR_WUNUSED,int,__NOTHROW,__localdep_iswxdigit,(__WINT_TYPE__ __wc),iswxdigit,{ return __crt_iswxdigit(__wc); })
+#elif defined(__crt_iswxdigit)
+__LOCAL __ATTR_CONST __ATTR_WUNUSED int __NOTHROW(__LIBCCALL __localdep_iswxdigit)(__WINT_TYPE__ __wc) { return __crt_iswxdigit(__wc); }
+#elif __has_builtin(__builtin_iswxdigit) && defined(__LIBC_BIND_CRTBUILTINS) && defined(__CRT_HAVE_iswxdigit)
 __CEIREDIRECT(__ATTR_CONST __ATTR_WUNUSED,int,__NOTHROW,__localdep_iswxdigit,(__WINT_TYPE__ __wc),iswxdigit,{ return __builtin_iswxdigit(__wc); })
 #elif defined(__CRT_HAVE_iswxdigit)
 __CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,int,__NOTHROW,__localdep_iswxdigit,(__WINT_TYPE__ __wc),iswxdigit,(__wc))
@@ -37,10 +44,10 @@ __NAMESPACE_LOCAL_BEGIN
 #endif /* !... */
 #endif /* !__local___localdep_iswxdigit_defined */
 __LOCAL_LIBC(iswxdigit_l) __ATTR_PURE __ATTR_WUNUSED int
-__NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(iswxdigit_l))(__WINT_TYPE__ __wc, __locale_t __locale) {
-	(void)__locale;
+__NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(iswxdigit_l))(__WINT_TYPE__ __ch, __locale_t __locale) {
 	__COMPILER_IMPURE();
-	return __localdep_iswxdigit(__wc);
+	(void)__locale;
+	return __localdep_iswxdigit(__ch);
 }
 __NAMESPACE_LOCAL_END
 #ifndef __local___localdep_iswxdigit_l_defined

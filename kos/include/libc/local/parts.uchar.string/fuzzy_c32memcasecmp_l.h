@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x3a49914a */
+/* HASH CRC-32:0x90356675 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -36,21 +36,41 @@ __NAMESPACE_LOCAL_BEGIN
 #define __localdep_memcpyc __LIBC_LOCAL_NAME(memcpyc)
 #endif /* !__CRT_HAVE_memcpyc */
 #endif /* !__local___localdep_memcpyc_defined */
-#ifndef __local___localdep_towlower_l_defined
-#define __local___localdep_towlower_l_defined 1
-#ifdef __CRT_HAVE_towlower_l
-__CREDIRECT(__ATTR_PURE __ATTR_WUNUSED,__WINT_TYPE__,__NOTHROW_NCX,__localdep_towlower_l,(__WINT_TYPE__ __wc, __locale_t __locale),towlower_l,(__wc,__locale))
-#elif defined(__CRT_HAVE__towlower_l)
-__CREDIRECT(__ATTR_PURE __ATTR_WUNUSED,__WINT_TYPE__,__NOTHROW_NCX,__localdep_towlower_l,(__WINT_TYPE__ __wc, __locale_t __locale),_towlower_l,(__wc,__locale))
-#elif defined(__CRT_HAVE___towlower_l)
-__CREDIRECT(__ATTR_PURE __ATTR_WUNUSED,__WINT_TYPE__,__NOTHROW_NCX,__localdep_towlower_l,(__WINT_TYPE__ __wc, __locale_t __locale),__towlower_l,(__wc,__locale))
-#else /* ... */
+#ifndef __local___localdep_toulower32_l_defined
+#define __local___localdep_toulower32_l_defined 1
+__NAMESPACE_LOCAL_END
+#include <bits/crt/wctype.h>
+__NAMESPACE_LOCAL_BEGIN
+#if defined(__crt_towlower_l) && defined(__CRT_HAVE_towlower_l) && __SIZEOF_WCHAR_T__ == 4
+__COMPILER_EIREDIRECT(__ATTR_PURE __ATTR_WUNUSED,__WINT32_TYPE__,__NOTHROW_NCX,__LIBKCALL,__localdep_toulower32_l,(__WINT32_TYPE__ __ch, __locale_t __locale),towlower_l,{ return __crt_towlower_l(__ch, __locale); })
+#elif defined(__crt_towlower_l) && defined(__CRT_HAVE___towlower_l) && __SIZEOF_WCHAR_T__ == 4
+__COMPILER_EIREDIRECT(__ATTR_PURE __ATTR_WUNUSED,__WINT32_TYPE__,__NOTHROW_NCX,__LIBKCALL,__localdep_toulower32_l,(__WINT32_TYPE__ __ch, __locale_t __locale),__towlower_l,{ return __crt_towlower_l(__ch, __locale); })
+#elif defined(__crt_towlower_l) && __SIZEOF_WCHAR_T__ == 4
+__LOCAL __ATTR_PURE __ATTR_WUNUSED __WINT32_TYPE__ __NOTHROW_NCX(__LIBKCALL __localdep_toulower32_l)(__WINT32_TYPE__ __ch, __locale_t __locale) { return __crt_towlower_l(__ch, __locale); }
+#elif defined(__CRT_HAVE_towlower_l) && __SIZEOF_WCHAR_T__ == 4 && defined(__LIBCCALL_IS_LIBKCALL)
+__CREDIRECT(__ATTR_PURE __ATTR_WUNUSED,__WINT32_TYPE__,__NOTHROW_NCX,__localdep_toulower32_l,(__WINT32_TYPE__ __ch, __locale_t __locale),towlower_l,(__ch,__locale))
+#elif defined(__CRT_HAVE_KOS$towlower_l)
+__CREDIRECT_KOS(__ATTR_PURE __ATTR_WUNUSED,__WINT32_TYPE__,__NOTHROW_NCX,__localdep_toulower32_l,(__WINT32_TYPE__ __ch, __locale_t __locale),towlower_l,(__ch,__locale))
+#elif defined(__CRT_HAVE__towlower_l) && __SIZEOF_WCHAR_T__ == 4 && defined(__LIBCCALL_IS_LIBKCALL)
+__CREDIRECT(__ATTR_PURE __ATTR_WUNUSED,__WINT32_TYPE__,__NOTHROW_NCX,__localdep_toulower32_l,(__WINT32_TYPE__ __ch, __locale_t __locale),_towlower_l,(__ch,__locale))
+#elif defined(__CRT_HAVE_KOS$_towlower_l)
+__CREDIRECT_KOS(__ATTR_PURE __ATTR_WUNUSED,__WINT32_TYPE__,__NOTHROW_NCX,__localdep_toulower32_l,(__WINT32_TYPE__ __ch, __locale_t __locale),_towlower_l,(__ch,__locale))
+#elif defined(__CRT_HAVE___towlower_l) && __SIZEOF_WCHAR_T__ == 4 && defined(__LIBCCALL_IS_LIBKCALL)
+__CREDIRECT(__ATTR_PURE __ATTR_WUNUSED,__WINT32_TYPE__,__NOTHROW_NCX,__localdep_toulower32_l,(__WINT32_TYPE__ __ch, __locale_t __locale),__towlower_l,(__ch,__locale))
+#elif defined(__CRT_HAVE_KOS$__towlower_l)
+__CREDIRECT_KOS(__ATTR_PURE __ATTR_WUNUSED,__WINT32_TYPE__,__NOTHROW_NCX,__localdep_toulower32_l,(__WINT32_TYPE__ __ch, __locale_t __locale),__towlower_l,(__ch,__locale))
+#elif __SIZEOF_WCHAR_T__ == 4
 __NAMESPACE_LOCAL_END
 #include <libc/local/wctype/towlower_l.h>
 __NAMESPACE_LOCAL_BEGIN
-#define __localdep_towlower_l __LIBC_LOCAL_NAME(towlower_l)
+#define __localdep_toulower32_l (*(__WINT32_TYPE__(__LIBKCALL *)(__WINT32_TYPE__, __locale_t))&__LIBC_LOCAL_NAME(towlower_l))
+#else /* ... */
+__NAMESPACE_LOCAL_END
+#include <libc/local/parts.uchar.wctype/toulower32_l.h>
+__NAMESPACE_LOCAL_BEGIN
+#define __localdep_toulower32_l __LIBC_LOCAL_NAME(toulower32_l)
 #endif /* !... */
-#endif /* !__local___localdep_towlower_l_defined */
+#endif /* !__local___localdep_toulower32_l_defined */
 __LOCAL_LIBC(fuzzy_c32memcasecmp_l) __ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1, 3)) __SIZE_TYPE__
 __NOTHROW_NCX(__LIBKCALL __LIBC_LOCAL_NAME(fuzzy_c32memcasecmp_l))(__CHAR32_TYPE__ const *__s1, __SIZE_TYPE__ __s1_bytes, __CHAR32_TYPE__ const *__s2, __SIZE_TYPE__ __s2_bytes, __locale_t __locale) {
 	__SIZE_TYPE__ *__v0, *__v1, __i, __j, __cost, __temp;
@@ -91,7 +111,7 @@ __NOTHROW_NCX(__LIBKCALL __LIBC_LOCAL_NAME(fuzzy_c32memcasecmp_l))(__CHAR32_TYPE
 		for (__j = 0; __j < __s2_bytes; __j++) {
 			__BYTE_TYPE__ __c1 = ((__BYTE_TYPE__ *)__s1)[__i];
 			__BYTE_TYPE__ __c2 = ((__BYTE_TYPE__ *)__s2)[__j];
-			__cost  = __c1 != __c2 && (__CHAR32_TYPE__)__localdep_towlower_l(__c1, __locale) != (__CHAR32_TYPE__)__localdep_towlower_l(__c2, __locale);
+			__cost  = __c1 != __c2 && __localdep_toulower32_l(__c1, __locale) != __localdep_toulower32_l(__c2, __locale);
 			__cost += __v0[__j];
 			__temp  = __v1[__j] + 1;
 			if (__cost > __temp)

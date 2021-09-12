@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x72f3b56f */
+/* HASH CRC-32:0xe445ccce */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -23,29 +23,27 @@
 #include <__crt.h>
 #include <hybrid/typecore.h>
 __NAMESPACE_LOCAL_BEGIN
-#ifndef __local___localdep_islower_defined
-#define __local___localdep_islower_defined 1
+#ifndef __local___localdep_wctob_defined
+#define __local___localdep_wctob_defined 1
+#ifdef __CRT_HAVE_wctob
+__CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,int,__NOTHROW_NCX,__localdep_wctob,(__WINT_TYPE__ __ch),wctob,(__ch))
+#else /* __CRT_HAVE_wctob */
 __NAMESPACE_LOCAL_END
-#include <bits/crt/ctype.h>
+#include <libc/local/wchar/wctob.h>
 __NAMESPACE_LOCAL_BEGIN
-#if defined(__crt_islower) && defined(__CRT_HAVE_islower)
-__CEIREDIRECT(__ATTR_CONST __ATTR_WUNUSED,int,__NOTHROW,__localdep_islower,(int __ch),islower,{ return __crt_islower(__ch); })
-#elif defined(__crt_islower)
-__LOCAL __ATTR_CONST __ATTR_WUNUSED int __NOTHROW(__LIBCCALL __localdep_islower)(int __ch) { return __crt_islower(__ch); }
-#elif __has_builtin(__builtin_islower) && defined(__LIBC_BIND_CRTBUILTINS) && defined(__CRT_HAVE_islower)
-__CEIREDIRECT(__ATTR_CONST __ATTR_WUNUSED,int,__NOTHROW,__localdep_islower,(int __ch),islower,{ return __builtin_islower(__ch); })
-#elif defined(__CRT_HAVE_islower)
-__CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,int,__NOTHROW,__localdep_islower,(int __ch),islower,(__ch))
-#else /* ... */
+#define __localdep_wctob __LIBC_LOCAL_NAME(wctob)
+#endif /* !__CRT_HAVE_wctob */
+#endif /* !__local___localdep_wctob_defined */
 __NAMESPACE_LOCAL_END
-#include <libc/local/ctype/islower.h>
+#include <bits/crt/wctype.h>
 __NAMESPACE_LOCAL_BEGIN
-#define __localdep_islower __LIBC_LOCAL_NAME(islower)
-#endif /* !... */
-#endif /* !__local___localdep_islower_defined */
 __LOCAL_LIBC(iswlower) __ATTR_CONST __ATTR_WUNUSED int
 __NOTHROW(__LIBCCALL __LIBC_LOCAL_NAME(iswlower))(__WINT_TYPE__ __wc) {
-	return __localdep_islower((int)__wc);
+#ifdef __crt_iswlower
+	return __crt_iswlower(__wc);
+#else /* __crt_iswlower */
+	return __LIBC_LOCAL_NAME(iswlower)(__localdep_wctob(__wc));
+#endif /* !__crt_iswlower */
 }
 __NAMESPACE_LOCAL_END
 #ifndef __local___localdep_iswlower_defined

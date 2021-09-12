@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xce5113b6 */
+/* HASH CRC-32:0xf657c859 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -25,7 +25,14 @@
 __NAMESPACE_LOCAL_BEGIN
 #ifndef __local___localdep_towlower_defined
 #define __local___localdep_towlower_defined 1
-#if __has_builtin(__builtin_towlower) && defined(__LIBC_BIND_CRTBUILTINS) && defined(__CRT_HAVE_towlower)
+__NAMESPACE_LOCAL_END
+#include <bits/crt/wctype.h>
+__NAMESPACE_LOCAL_BEGIN
+#if defined(__crt_towlower) && defined(__CRT_HAVE_towlower)
+__CEIREDIRECT(__ATTR_CONST __ATTR_WUNUSED,__WINT_TYPE__,__NOTHROW,__localdep_towlower,(__WINT_TYPE__ __wc),towlower,{ return __crt_towlower(__wc); })
+#elif defined(__crt_towlower)
+__LOCAL __ATTR_CONST __ATTR_WUNUSED __WINT_TYPE__ __NOTHROW(__LIBCCALL __localdep_towlower)(__WINT_TYPE__ __wc) { return __crt_towlower(__wc); }
+#elif __has_builtin(__builtin_towlower) && defined(__LIBC_BIND_CRTBUILTINS) && defined(__CRT_HAVE_towlower)
 __CEIREDIRECT(__ATTR_CONST __ATTR_WUNUSED,__WINT_TYPE__,__NOTHROW,__localdep_towlower,(__WINT_TYPE__ __wc),towlower,{ return __builtin_towlower(__wc); })
 #elif defined(__CRT_HAVE_towlower)
 __CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,__WINT_TYPE__,__NOTHROW,__localdep_towlower,(__WINT_TYPE__ __wc),towlower,(__wc))
@@ -42,7 +49,9 @@ __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(wcsncasecmp))(__WCHAR_TYPE__ const *_
 	do {
 		if (!__maxlen--)
 			break;
-		if ((__c1 = *__s1++) != (__c2 = *__s2++) && ((__c1 = (__WCHAR_TYPE__)__localdep_towlower(__c1)) != (__c2 = (__WCHAR_TYPE__)__localdep_towlower(__c2))))
+		if ((__c1 = *__s1++) != (__c2 = *__s2++) &&
+		    ((__c1 = (__WCHAR_TYPE__)__localdep_towlower((__WCHAR_TYPE__)__c1)) !=
+		     (__c2 = (__WCHAR_TYPE__)__localdep_towlower((__WCHAR_TYPE__)__c2))))
 			return (int)((__WCHAR_TYPE__)__c1 - (__WCHAR_TYPE__)__c2);
 	} while (__c1);
 	return 0;

@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xab6f520f */
+/* HASH CRC-32:0xd0052de */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -39,14 +39,10 @@ typedef size_t rsize_t;
 #endif /* !__rsize_t_defined */
 
 #ifndef __KERNEL__
-INTDEF ATTR_CONST WUNUSED wint_t NOTHROW_NCX(LIBDCALL libd_btowc)(int ch);
-INTDEF ATTR_CONST WUNUSED wint_t NOTHROW_NCX(LIBKCALL libc_btowc)(int ch);
-#endif /* !__KERNEL__ */
-#if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
-INTDEF ATTR_CONST WUNUSED int NOTHROW_NCX(LIBDCALL libd_wctob)(wint_t ch);
-#endif /* !__LIBCCALL_IS_LIBDCALL && !__KERNEL__ */
-#ifndef __KERNEL__
-INTDEF ATTR_CONST WUNUSED int NOTHROW_NCX(LIBCCALL libc_wctob)(wint_t ch);
+INTDEF ATTR_CONST WUNUSED wint16_t NOTHROW_NCX(LIBDCALL libd_btowc)(int ch);
+INTDEF ATTR_CONST WUNUSED wint32_t NOTHROW_NCX(LIBKCALL libc_btowc)(int ch);
+INTDEF ATTR_CONST WUNUSED int NOTHROW_NCX(LIBDCALL libd_wctob)(wint16_t ch);
+INTDEF ATTR_CONST WUNUSED int NOTHROW_NCX(LIBKCALL libc_wctob)(wint32_t ch);
 INTDEF size_t NOTHROW_NCX(LIBDCALL libd_mbrtowc)(char16_t *pwc, char const *__restrict str, size_t maxlen, mbstate_t *mbs);
 INTDEF size_t NOTHROW_NCX(LIBKCALL libc_mbrtowc)(char32_t *pwc, char const *__restrict str, size_t maxlen, mbstate_t *mbs);
 INTDEF size_t NOTHROW_NCX(LIBDCALL libd_wcrtomb)(char *__restrict str, char16_t wc, mbstate_t *mbs);
@@ -91,10 +87,10 @@ INTDEF ATTR_PURE WUNUSED NONNULL((1, 2)) int NOTHROW_NCX(LIBDCALL libd_wcscoll)(
 INTDEF ATTR_PURE WUNUSED NONNULL((1, 2)) int NOTHROW_NCX(LIBKCALL libc_wcscoll)(char32_t const *s1, char32_t const *s2);
 INTDEF NONNULL((2)) size_t NOTHROW_NCX(LIBDCALL libd_wcsxfrm)(char16_t *dst, char16_t const *__restrict src, size_t maxlen);
 INTDEF NONNULL((2)) size_t NOTHROW_NCX(LIBKCALL libc_wcsxfrm)(char32_t *dst, char32_t const *__restrict src, size_t maxlen);
-INTDEF wint_t (LIBDCALL libd_getwchar)(void) THROWS(...);
-INTDEF wint_t (LIBKCALL libc_getwchar)(void) THROWS(...);
-INTDEF wint_t (LIBDCALL libd_putwchar)(char16_t wc) THROWS(...);
-INTDEF wint_t (LIBKCALL libc_putwchar)(char32_t wc) THROWS(...);
+INTDEF wint16_t (LIBDCALL libd_getwchar)(void) THROWS(...);
+INTDEF wint32_t (LIBKCALL libc_getwchar)(void) THROWS(...);
+INTDEF wint16_t (LIBDCALL libd_putwchar)(char16_t wc) THROWS(...);
+INTDEF wint32_t (LIBKCALL libc_putwchar)(char32_t wc) THROWS(...);
 INTDEF WUNUSED NONNULL((1, 3)) char16_t *(LIBDCALL libd_fgetws)(char16_t *__restrict buf, __STDC_INT_AS_SIZE_T bufsize, FILE *__restrict stream) THROWS(...);
 INTDEF WUNUSED NONNULL((1, 3)) char32_t *(LIBKCALL libc_fgetws)(char32_t *__restrict buf, __STDC_INT_AS_SIZE_T bufsize, FILE *__restrict stream) THROWS(...);
 INTDEF NONNULL((1, 2)) __STDC_INT_AS_SIZE_T (LIBDCALL libd_fputws)(char16_t const *__restrict str, FILE *__restrict stream) THROWS(...);
@@ -241,10 +237,10 @@ INTDEF NONNULL((1)) double NOTHROW_NCX(LIBDCALL libd_wcstod_l)(char16_t const *_
 INTDEF NONNULL((1)) double NOTHROW_NCX(LIBKCALL libc_wcstod_l)(char32_t const *__restrict nptr, char32_t **endptr, locale_t locale);
 INTDEF NONNULL((1)) __LONGDOUBLE NOTHROW_NCX(LIBDCALL libd_wcstold_l)(char16_t const *__restrict nptr, char16_t **endptr, locale_t locale);
 INTDEF NONNULL((1)) __LONGDOUBLE NOTHROW_NCX(LIBKCALL libc_wcstold_l)(char32_t const *__restrict nptr, char32_t **endptr, locale_t locale);
-INTDEF wint_t (LIBDCALL libd_getwchar_unlocked)(void) THROWS(...);
-INTDEF wint_t (LIBKCALL libc_getwchar_unlocked)(void) THROWS(...);
-INTDEF wint_t (LIBDCALL libd_putwchar_unlocked)(char16_t wc) THROWS(...);
-INTDEF wint_t (LIBKCALL libc_putwchar_unlocked)(char32_t wc) THROWS(...);
+INTDEF wint16_t (LIBDCALL libd_getwchar_unlocked)(void) THROWS(...);
+INTDEF wint32_t (LIBKCALL libc_getwchar_unlocked)(void) THROWS(...);
+INTDEF wint16_t (LIBDCALL libd_putwchar_unlocked)(char16_t wc) THROWS(...);
+INTDEF wint32_t (LIBKCALL libc_putwchar_unlocked)(char32_t wc) THROWS(...);
 INTDEF NONNULL((1, 3)) char16_t *(LIBDCALL libd_fgetws_unlocked)(char16_t *__restrict buf, __STDC_INT_AS_SIZE_T bufsize, FILE *__restrict stream) THROWS(...);
 INTDEF NONNULL((1, 3)) char32_t *(LIBKCALL libc_fgetws_unlocked)(char32_t *__restrict buf, __STDC_INT_AS_SIZE_T bufsize, FILE *__restrict stream) THROWS(...);
 INTDEF NONNULL((1, 2)) __STDC_INT_AS_SIZE_T (LIBDCALL libd_fputws_unlocked)(char16_t const *__restrict str, FILE *__restrict stream) THROWS(...);

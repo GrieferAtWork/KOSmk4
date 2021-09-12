@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xf15fcde */
+/* HASH CRC-32:0xdc4b1c9a */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -22,25 +22,48 @@
 #define __local_wildc32scasecmp_defined 1
 #include <__crt.h>
 __NAMESPACE_LOCAL_BEGIN
-#ifndef __local___localdep_towlower_defined
-#define __local___localdep_towlower_defined 1
-#if __has_builtin(__builtin_towlower) && defined(__LIBC_BIND_CRTBUILTINS) && defined(__CRT_HAVE_towlower)
+#ifndef __local___localdep_toulower32_defined
+#define __local___localdep_toulower32_defined 1
+__NAMESPACE_LOCAL_END
+#include <bits/crt/wctype.h>
+__NAMESPACE_LOCAL_BEGIN
+#if defined(__crt_towlower) && defined(__CRT_HAVE_towlower) && __SIZEOF_WCHAR_T__ == 4
 __NAMESPACE_LOCAL_END
 #include <hybrid/typecore.h>
 __NAMESPACE_LOCAL_BEGIN
-__CEIREDIRECT(__ATTR_CONST __ATTR_WUNUSED,__WINT_TYPE__,__NOTHROW,__localdep_towlower,(__WINT_TYPE__ __wc),towlower,{ return __builtin_towlower(__wc); })
-#elif defined(__CRT_HAVE_towlower)
+__COMPILER_EIREDIRECT(__ATTR_CONST __ATTR_WUNUSED,__WINT32_TYPE__,__NOTHROW,__LIBKCALL,__localdep_toulower32,(__WINT32_TYPE__ __wc),towlower,{ return __crt_towlower(__wc); })
+#elif defined(__crt_towlower) && __SIZEOF_WCHAR_T__ == 4
 __NAMESPACE_LOCAL_END
 #include <hybrid/typecore.h>
 __NAMESPACE_LOCAL_BEGIN
-__CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,__WINT_TYPE__,__NOTHROW,__localdep_towlower,(__WINT_TYPE__ __wc),towlower,(__wc))
-#else /* ... */
+__LOCAL __ATTR_CONST __ATTR_WUNUSED __WINT32_TYPE__ __NOTHROW(__LIBKCALL __localdep_toulower32)(__WINT32_TYPE__ __wc) { return __crt_towlower(__wc); }
+#elif __has_builtin(__builtin_towlower) && defined(__LIBC_BIND_CRTBUILTINS) && defined(__CRT_HAVE_towlower) && __SIZEOF_WCHAR_T__ == 4
+__NAMESPACE_LOCAL_END
+#include <hybrid/typecore.h>
+__NAMESPACE_LOCAL_BEGIN
+__COMPILER_EIREDIRECT(__ATTR_CONST __ATTR_WUNUSED,__WINT32_TYPE__,__NOTHROW,__LIBKCALL,__localdep_toulower32,(__WINT32_TYPE__ __wc),towlower,{ return __builtin_towlower(__wc); })
+#elif defined(__CRT_HAVE_towlower) && __SIZEOF_WCHAR_T__ == 4 && defined(__LIBCCALL_IS_LIBKCALL)
+__NAMESPACE_LOCAL_END
+#include <hybrid/typecore.h>
+__NAMESPACE_LOCAL_BEGIN
+__CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,__WINT32_TYPE__,__NOTHROW,__localdep_toulower32,(__WINT32_TYPE__ __wc),towlower,(__wc))
+#elif defined(__CRT_HAVE_KOS$towlower)
+__NAMESPACE_LOCAL_END
+#include <hybrid/typecore.h>
+__NAMESPACE_LOCAL_BEGIN
+__CREDIRECT_KOS(__ATTR_CONST __ATTR_WUNUSED,__WINT32_TYPE__,__NOTHROW,__localdep_toulower32,(__WINT32_TYPE__ __wc),towlower,(__wc))
+#elif __SIZEOF_WCHAR_T__ == 4
 __NAMESPACE_LOCAL_END
 #include <libc/local/wctype/towlower.h>
 __NAMESPACE_LOCAL_BEGIN
-#define __localdep_towlower __LIBC_LOCAL_NAME(towlower)
+#define __localdep_toulower32 (*(__WINT32_TYPE__(__LIBKCALL *)(__WINT32_TYPE__))&__LIBC_LOCAL_NAME(towlower))
+#else /* ... */
+__NAMESPACE_LOCAL_END
+#include <libc/local/parts.uchar.wctype/toulower32.h>
+__NAMESPACE_LOCAL_BEGIN
+#define __localdep_toulower32 __LIBC_LOCAL_NAME(toulower32)
 #endif /* !... */
-#endif /* !__local___localdep_towlower_defined */
+#endif /* !__local___localdep_toulower32_defined */
 __LOCAL_LIBC(wildc32scasecmp) __ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1, 2)) int
 __NOTHROW_NCX(__LIBKCALL __LIBC_LOCAL_NAME(wildc32scasecmp))(__CHAR32_TYPE__ const *__pattern, __CHAR32_TYPE__ const *__string) {
 	__CHAR32_TYPE__ __card_post, __pattern_ch, __wcsing_ch;
@@ -61,10 +84,10 @@ __NOTHROW_NCX(__LIBKCALL __LIBC_LOCAL_NAME(wildc32scasecmp))(__CHAR32_TYPE__ con
 				return 0; /* Pattern ends with '*' (matches everything) */
 			if (__card_post == '?')
 				goto __next; /* Match any --> already found */
-			__card_post = (__CHAR32_TYPE__)__localdep_towlower(__card_post);
+			__card_post = (__CHAR32_TYPE__)__localdep_toulower32((__CHAR32_TYPE__)__card_post);
 			for (;;) {
 				__CHAR32_TYPE__ __ch = *__string++;
-				if (__card_post == __ch || __card_post == (__CHAR32_TYPE__)__localdep_towlower(__ch)) {
+				if (__card_post == __ch || __card_post == (__CHAR32_TYPE__)__localdep_toulower32((__CHAR32_TYPE__)__ch)) {
 					/* Recursively check if the rest of the string and pattern match */
 					if (!__LIBC_LOCAL_NAME(wildc32scasecmp)(__string, __pattern))
 						return 0;
@@ -76,9 +99,9 @@ __NOTHROW_NCX(__LIBKCALL __LIBC_LOCAL_NAME(wildc32scasecmp))(__CHAR32_TYPE__ con
 		__pattern_ch = *__pattern;
 		__wcsing_ch = *__string;
 		if (__pattern_ch == __wcsing_ch || __pattern_ch == '?' ||
-		   (__pattern_ch = (__CHAR32_TYPE__)__localdep_towlower(__pattern_ch),
-		    __wcsing_ch = (__CHAR32_TYPE__)__localdep_towlower(__wcsing_ch),
-		    __pattern_ch == __wcsing_ch)) {
+		    (__pattern_ch = (__CHAR32_TYPE__)__localdep_toulower32((__CHAR32_TYPE__)__pattern_ch),
+		     __wcsing_ch  = (__CHAR32_TYPE__)__localdep_toulower32((__CHAR32_TYPE__)__wcsing_ch),
+		     __pattern_ch == __wcsing_ch)) {
 __next:
 			++__string;
 			++__pattern;

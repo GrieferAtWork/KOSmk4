@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x61a6d04 */
+/* HASH CRC-32:0x24802923 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -23,29 +23,27 @@
 #include <__crt.h>
 #include <hybrid/typecore.h>
 __NAMESPACE_LOCAL_BEGIN
-#ifndef __local___localdep_isprint_defined
-#define __local___localdep_isprint_defined 1
+#ifndef __local___localdep_wctob_defined
+#define __local___localdep_wctob_defined 1
+#ifdef __CRT_HAVE_wctob
+__CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,int,__NOTHROW_NCX,__localdep_wctob,(__WINT_TYPE__ __ch),wctob,(__ch))
+#else /* __CRT_HAVE_wctob */
 __NAMESPACE_LOCAL_END
-#include <bits/crt/ctype.h>
+#include <libc/local/wchar/wctob.h>
 __NAMESPACE_LOCAL_BEGIN
-#if defined(__crt_isprint) && defined(__CRT_HAVE_isprint)
-__CEIREDIRECT(__ATTR_CONST __ATTR_WUNUSED,int,__NOTHROW,__localdep_isprint,(int __ch),isprint,{ return __crt_isprint(__ch); })
-#elif defined(__crt_isprint)
-__LOCAL __ATTR_CONST __ATTR_WUNUSED int __NOTHROW(__LIBCCALL __localdep_isprint)(int __ch) { return __crt_isprint(__ch); }
-#elif __has_builtin(__builtin_isprint) && defined(__LIBC_BIND_CRTBUILTINS) && defined(__CRT_HAVE_isprint)
-__CEIREDIRECT(__ATTR_CONST __ATTR_WUNUSED,int,__NOTHROW,__localdep_isprint,(int __ch),isprint,{ return __builtin_isprint(__ch); })
-#elif defined(__CRT_HAVE_isprint)
-__CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,int,__NOTHROW,__localdep_isprint,(int __ch),isprint,(__ch))
-#else /* ... */
+#define __localdep_wctob __LIBC_LOCAL_NAME(wctob)
+#endif /* !__CRT_HAVE_wctob */
+#endif /* !__local___localdep_wctob_defined */
 __NAMESPACE_LOCAL_END
-#include <libc/local/ctype/isprint.h>
+#include <bits/crt/wctype.h>
 __NAMESPACE_LOCAL_BEGIN
-#define __localdep_isprint __LIBC_LOCAL_NAME(isprint)
-#endif /* !... */
-#endif /* !__local___localdep_isprint_defined */
 __LOCAL_LIBC(iswprint) __ATTR_CONST __ATTR_WUNUSED int
 __NOTHROW(__LIBCCALL __LIBC_LOCAL_NAME(iswprint))(__WINT_TYPE__ __wc) {
-	return __localdep_isprint((int)__wc);
+#ifdef __crt_iswprint
+	return __crt_iswprint(__wc);
+#else /* __crt_iswprint */
+	return __LIBC_LOCAL_NAME(iswprint)(__localdep_wctob(__wc));
+#endif /* !__crt_iswprint */
 }
 __NAMESPACE_LOCAL_END
 #ifndef __local___localdep_iswprint_defined

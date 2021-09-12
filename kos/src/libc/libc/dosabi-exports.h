@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x4951454a */
+/* HASH CRC-32:0x9e3fe3d0 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -3169,87 +3169,15 @@ DEFINE_PUBLIC_ALIAS(DOS$getutmp, libd_getutmp);
 DEFINE_PUBLIC_ALIAS(DOS$getutmpx, libd_getutmpx);
 
 /* wchar */
-DEFINE_PUBLIC_ALIAS(DOS$wctob, libd_wctob);
 DEFINE_PUBLIC_ALIAS(DOS$mbsinit, libd_mbsinit);
 DEFINE_PUBLIC_ALIAS(DOS$fwide, libd_fwide);
 
 /* wctype */
-DEFINE_PUBLIC_ALIAS(DOS$iswalnum, libd_iswalnum);
-DEFINE_PUBLIC_ALIAS(DOS$iswalpha, libd_iswalpha);
-DEFINE_PUBLIC_ALIAS(DOS$iswcntrl, libd_iswcntrl);
-DEFINE_PUBLIC_ALIAS(DOS$iswdigit, libd_iswdigit);
-DEFINE_PUBLIC_ALIAS(DOS$iswgraph, libd_iswgraph);
-DEFINE_PUBLIC_ALIAS(DOS$iswlower, libd_iswlower);
-DEFINE_PUBLIC_ALIAS(DOS$iswprint, libd_iswprint);
-DEFINE_PUBLIC_ALIAS(DOS$iswpunct, libd_iswpunct);
-DEFINE_PUBLIC_ALIAS(DOS$iswspace, libd_iswspace);
-DEFINE_PUBLIC_ALIAS(DOS$iswupper, libd_iswupper);
-DEFINE_PUBLIC_ALIAS(DOS$iswxdigit, libd_iswxdigit);
 DEFINE_PUBLIC_ALIAS(DOS$wctrans, libd_wctrans);
-DEFINE_PUBLIC_ALIAS(DOS$__towctrans, libd_towctrans);
-DEFINE_PUBLIC_ALIAS(DOS$towctrans, libd_towctrans);
 DEFINE_PUBLIC_ALIAS(DOS$wctype, libd_wctype);
-DEFINE_PUBLIC_ALIAS(DOS$is_wctype, libd_iswctype);
-DEFINE_PUBLIC_ALIAS(DOS$__iswctype, libd_iswctype);
-DEFINE_PUBLIC_ALIAS(DOS$iswctype, libd_iswctype);
-DEFINE_PUBLIC_ALIAS(DOS$iswblank, libd_iswblank);
-DEFINE_PUBLIC_ALIAS(DOS$towlower, libd_towlower);
-DEFINE_PUBLIC_ALIAS(DOS$towupper, libd_towupper);
-DEFINE_PUBLIC_ALIAS(DOS$iswascii, libd_iswascii);
-DEFINE_PUBLIC_ALIAS(DOS$_iswalnum_l, libd_iswalnum_l);
-DEFINE_PUBLIC_ALIAS(DOS$__iswalnum_l, libd_iswalnum_l);
-DEFINE_PUBLIC_ALIAS(DOS$iswalnum_l, libd_iswalnum_l);
-DEFINE_PUBLIC_ALIAS(DOS$_iswalpha_l, libd_iswalpha_l);
-DEFINE_PUBLIC_ALIAS(DOS$__iswalpha_l, libd_iswalpha_l);
-DEFINE_PUBLIC_ALIAS(DOS$iswalpha_l, libd_iswalpha_l);
-DEFINE_PUBLIC_ALIAS(DOS$_iswcntrl_l, libd_iswcntrl_l);
-DEFINE_PUBLIC_ALIAS(DOS$__iswcntrl_l, libd_iswcntrl_l);
-DEFINE_PUBLIC_ALIAS(DOS$iswcntrl_l, libd_iswcntrl_l);
-DEFINE_PUBLIC_ALIAS(DOS$_iswdigit_l, libd_iswdigit_l);
-DEFINE_PUBLIC_ALIAS(DOS$__iswdigit_l, libd_iswdigit_l);
-DEFINE_PUBLIC_ALIAS(DOS$iswdigit_l, libd_iswdigit_l);
-DEFINE_PUBLIC_ALIAS(DOS$_iswgraph_l, libd_iswgraph_l);
-DEFINE_PUBLIC_ALIAS(DOS$__iswgraph_l, libd_iswgraph_l);
-DEFINE_PUBLIC_ALIAS(DOS$iswgraph_l, libd_iswgraph_l);
-DEFINE_PUBLIC_ALIAS(DOS$_iswlower_l, libd_iswlower_l);
-DEFINE_PUBLIC_ALIAS(DOS$__iswlower_l, libd_iswlower_l);
-DEFINE_PUBLIC_ALIAS(DOS$iswlower_l, libd_iswlower_l);
-DEFINE_PUBLIC_ALIAS(DOS$_iswprint_l, libd_iswprint_l);
-DEFINE_PUBLIC_ALIAS(DOS$__iswprint_l, libd_iswprint_l);
-DEFINE_PUBLIC_ALIAS(DOS$iswprint_l, libd_iswprint_l);
-DEFINE_PUBLIC_ALIAS(DOS$_iswpunct_l, libd_iswpunct_l);
-DEFINE_PUBLIC_ALIAS(DOS$__iswpunct_l, libd_iswpunct_l);
-DEFINE_PUBLIC_ALIAS(DOS$iswpunct_l, libd_iswpunct_l);
-DEFINE_PUBLIC_ALIAS(DOS$_iswspace_l, libd_iswspace_l);
-DEFINE_PUBLIC_ALIAS(DOS$__iswspace_l, libd_iswspace_l);
-DEFINE_PUBLIC_ALIAS(DOS$iswspace_l, libd_iswspace_l);
-DEFINE_PUBLIC_ALIAS(DOS$_iswupper_l, libd_iswupper_l);
-DEFINE_PUBLIC_ALIAS(DOS$__iswupper_l, libd_iswupper_l);
-DEFINE_PUBLIC_ALIAS(DOS$iswupper_l, libd_iswupper_l);
-DEFINE_PUBLIC_ALIAS(DOS$_iswxdigit_l, libd_iswxdigit_l);
-DEFINE_PUBLIC_ALIAS(DOS$__iswxdigit_l, libd_iswxdigit_l);
-DEFINE_PUBLIC_ALIAS(DOS$iswxdigit_l, libd_iswxdigit_l);
-DEFINE_PUBLIC_ALIAS(DOS$_iswblank_l, libd_iswblank_l);
-DEFINE_PUBLIC_ALIAS(DOS$__iswblank_l, libd_iswblank_l);
-DEFINE_PUBLIC_ALIAS(DOS$iswblank_l, libd_iswblank_l);
-DEFINE_PUBLIC_ALIAS(DOS$_iswctype_l, libd_iswctype_l);
-DEFINE_PUBLIC_ALIAS(DOS$__iswctype_l, libd_iswctype_l);
-DEFINE_PUBLIC_ALIAS(DOS$iswctype_l, libd_iswctype_l);
-DEFINE_PUBLIC_ALIAS(DOS$_towupper_l, libd_towupper_l);
-DEFINE_PUBLIC_ALIAS(DOS$__towupper_l, libd_towupper_l);
-DEFINE_PUBLIC_ALIAS(DOS$towupper_l, libd_towupper_l);
-DEFINE_PUBLIC_ALIAS(DOS$_towlower_l, libd_towlower_l);
-DEFINE_PUBLIC_ALIAS(DOS$__towlower_l, libd_towlower_l);
-DEFINE_PUBLIC_ALIAS(DOS$towlower_l, libd_towlower_l);
 DEFINE_PUBLIC_ALIAS(DOS$__wctype_l, libd_wctype_l);
 DEFINE_PUBLIC_ALIAS(DOS$wctype_l, libd_wctype_l);
 DEFINE_PUBLIC_ALIAS(DOS$__wctrans_l, libd_wctrans_l);
 DEFINE_PUBLIC_ALIAS(DOS$wctrans_l, libd_wctrans_l);
-DEFINE_PUBLIC_ALIAS(DOS$__towctrans_l, libd_towctrans_l);
-DEFINE_PUBLIC_ALIAS(DOS$towctrans_l, libd_towctrans_l);
 DEFINE_PUBLIC_ALIAS(DOS$isleadbyte, libd_isleadbyte);
 DEFINE_PUBLIC_ALIAS(DOS$_isleadbyte_l, libd__isleadbyte_l);
-DEFINE_PUBLIC_ALIAS(DOS$__iswcsymf, libd___iswcsymf);
-DEFINE_PUBLIC_ALIAS(DOS$__iswcsym, libd___iswcsym);
-DEFINE_PUBLIC_ALIAS(DOS$_iswcsymf_l, libd__iswcsymf_l);
-DEFINE_PUBLIC_ALIAS(DOS$_iswcsym_l, libd__iswcsym_l);

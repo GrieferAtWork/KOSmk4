@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xa56777ae */
+/* HASH CRC-32:0xe171f928 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -37,152 +37,163 @@
 #include <uchar.h>
 #endif /* !_UCHAR_H */
 
+#ifndef WEOF16
+#define WEOF16 __WEOF16
+#define WEOF32 __WEOF32
+#endif /* !WEOF16 */
+
 #ifdef __CC__
 __SYSDECL_BEGIN
 
+#ifndef __wint16_t_defined
+#define __wint16_t_defined
+typedef __WINT16_TYPE__ wint16_t;
+typedef __WINT32_TYPE__ wint32_t;
+#endif /* !__wint16_t_defined */
+
 #if defined(__CRT_HAVE_getwchar) && __SIZEOF_WCHAR_T__ == 2 && defined(__LIBCCALL_IS_LIBDCALL)
-__CREDIRECT(,wint_t,__THROWING,getchar16,(void),getwchar,())
+__CREDIRECT(,wint16_t,__THROWING,getchar16,(void),getwchar,())
 #elif defined(__CRT_HAVE_DOS$getwchar)
-__CREDIRECT_DOS(,wint_t,__THROWING,getchar16,(void),getwchar,())
+__CREDIRECT_DOS(,wint16_t,__THROWING,getchar16,(void),getwchar,())
 #elif defined(__CRT_HAVE__fgetwchar) && __SIZEOF_WCHAR_T__ == 2 && defined(__LIBCCALL_IS_LIBDCALL)
-__CREDIRECT(,wint_t,__THROWING,getchar16,(void),_fgetwchar,())
+__CREDIRECT(,wint16_t,__THROWING,getchar16,(void),_fgetwchar,())
 #elif defined(__CRT_HAVE_DOS$_fgetwchar)
-__CREDIRECT_DOS(,wint_t,__THROWING,getchar16,(void),_fgetwchar,())
+__CREDIRECT_DOS(,wint16_t,__THROWING,getchar16,(void),_fgetwchar,())
 #else /* ... */
 #include <__crt.h>
 #if !defined(__NO_STDSTREAMS) && (defined(__CRT_HAVE_fgetwc) || defined(__CRT_HAVE_getwc)) && __SIZEOF_WCHAR_T__ == 2
 #include <libc/local/wchar/getwchar.h>
-__FORCELOCAL __ATTR_ARTIFICIAL wint_t (__LIBDCALL getchar16)(void) __THROWS(...) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(getwchar))(); }
+__FORCELOCAL __ATTR_ARTIFICIAL wint16_t (__LIBDCALL getchar16)(void) __THROWS(...) { return (__WINT16_TYPE__)(__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(getwchar))(); }
 #elif !defined(__NO_STDSTREAMS) && ((defined(__CRT_HAVE_fgetwc) && __SIZEOF_WCHAR_T__ == 2 && defined(__LIBCCALL_IS_LIBDCALL)) || defined(__CRT_HAVE_DOS$fgetwc) || (defined(__CRT_HAVE_getwc) && __SIZEOF_WCHAR_T__ == 2 && defined(__LIBCCALL_IS_LIBDCALL)) || defined(__CRT_HAVE_DOS$getwc))
 #include <libc/local/parts.uchar.stdio/getchar16.h>
-__NAMESPACE_LOCAL_USING_OR_IMPL(getchar16, __FORCELOCAL __ATTR_ARTIFICIAL wint_t (__LIBDCALL getchar16)(void) __THROWS(...) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(getchar16))(); })
+__NAMESPACE_LOCAL_USING_OR_IMPL(getchar16, __FORCELOCAL __ATTR_ARTIFICIAL wint16_t (__LIBDCALL getchar16)(void) __THROWS(...) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(getchar16))(); })
 #endif /* ... */
 #endif /* !... */
 #if defined(__CRT_HAVE_getwchar) && __SIZEOF_WCHAR_T__ == 4 && defined(__LIBCCALL_IS_LIBKCALL)
-__CREDIRECT(,wint_t,__THROWING,getchar32,(void),getwchar,())
+__CREDIRECT(,wint32_t,__THROWING,getchar32,(void),getwchar,())
 #elif defined(__CRT_HAVE_KOS$getwchar)
-__CREDIRECT_KOS(,wint_t,__THROWING,getchar32,(void),getwchar,())
+__CREDIRECT_KOS(,wint32_t,__THROWING,getchar32,(void),getwchar,())
 #elif defined(__CRT_HAVE__fgetwchar) && __SIZEOF_WCHAR_T__ == 4 && defined(__LIBCCALL_IS_LIBKCALL)
-__CREDIRECT(,wint_t,__THROWING,getchar32,(void),_fgetwchar,())
+__CREDIRECT(,wint32_t,__THROWING,getchar32,(void),_fgetwchar,())
 #elif defined(__CRT_HAVE_KOS$_fgetwchar)
-__CREDIRECT_KOS(,wint_t,__THROWING,getchar32,(void),_fgetwchar,())
+__CREDIRECT_KOS(,wint32_t,__THROWING,getchar32,(void),_fgetwchar,())
 #else /* ... */
 #include <__crt.h>
 #if !defined(__NO_STDSTREAMS) && (defined(__CRT_HAVE_fgetwc) || defined(__CRT_HAVE_getwc)) && __SIZEOF_WCHAR_T__ == 4
 #include <libc/local/wchar/getwchar.h>
-__FORCELOCAL __ATTR_ARTIFICIAL wint_t (__LIBKCALL getchar32)(void) __THROWS(...) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(getwchar))(); }
+__FORCELOCAL __ATTR_ARTIFICIAL wint32_t (__LIBKCALL getchar32)(void) __THROWS(...) { return (__WINT32_TYPE__)(__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(getwchar))(); }
 #elif !defined(__NO_STDSTREAMS) && ((defined(__CRT_HAVE_fgetwc) && __SIZEOF_WCHAR_T__ == 4 && defined(__LIBCCALL_IS_LIBKCALL)) || defined(__CRT_HAVE_KOS$fgetwc) || (defined(__CRT_HAVE_getwc) && __SIZEOF_WCHAR_T__ == 4 && defined(__LIBCCALL_IS_LIBKCALL)) || defined(__CRT_HAVE_KOS$getwc))
 #include <libc/local/parts.uchar.stdio/getchar32.h>
-__NAMESPACE_LOCAL_USING_OR_IMPL(getchar32, __FORCELOCAL __ATTR_ARTIFICIAL wint_t (__LIBKCALL getchar32)(void) __THROWS(...) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(getchar32))(); })
+__NAMESPACE_LOCAL_USING_OR_IMPL(getchar32, __FORCELOCAL __ATTR_ARTIFICIAL wint32_t (__LIBKCALL getchar32)(void) __THROWS(...) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(getchar32))(); })
 #endif /* ... */
 #endif /* !... */
 #if defined(__CRT_HAVE_fgetwc) && __SIZEOF_WCHAR_T__ == 2 && defined(__LIBCCALL_IS_LIBDCALL)
-__CREDIRECT(__ATTR_NONNULL((1)),wint_t,__THROWING,fgetc16,(FILE *__restrict __stream),fgetwc,(__stream))
+__CREDIRECT(__ATTR_NONNULL((1)),wint16_t,__THROWING,fgetc16,(FILE *__restrict __stream),fgetwc,(__stream))
 #elif defined(__CRT_HAVE_DOS$fgetwc)
-__CREDIRECT_DOS(__ATTR_NONNULL((1)),wint_t,__THROWING,fgetc16,(FILE *__restrict __stream),fgetwc,(__stream))
+__CREDIRECT_DOS(__ATTR_NONNULL((1)),wint16_t,__THROWING,fgetc16,(FILE *__restrict __stream),fgetwc,(__stream))
 #elif defined(__CRT_HAVE_getwc) && __SIZEOF_WCHAR_T__ == 2 && defined(__LIBCCALL_IS_LIBDCALL)
-__CREDIRECT(__ATTR_NONNULL((1)),wint_t,__THROWING,fgetc16,(FILE *__restrict __stream),getwc,(__stream))
+__CREDIRECT(__ATTR_NONNULL((1)),wint16_t,__THROWING,fgetc16,(FILE *__restrict __stream),getwc,(__stream))
 #elif defined(__CRT_HAVE_DOS$getwc)
-__CREDIRECT_DOS(__ATTR_NONNULL((1)),wint_t,__THROWING,fgetc16,(FILE *__restrict __stream),getwc,(__stream))
+__CREDIRECT_DOS(__ATTR_NONNULL((1)),wint16_t,__THROWING,fgetc16,(FILE *__restrict __stream),getwc,(__stream))
 #endif /* ... */
 #if defined(__CRT_HAVE_fgetwc) && __SIZEOF_WCHAR_T__ == 4 && defined(__LIBCCALL_IS_LIBKCALL)
-__CREDIRECT(__ATTR_NONNULL((1)),wint_t,__THROWING,fgetc32,(FILE *__restrict __stream),fgetwc,(__stream))
+__CREDIRECT(__ATTR_NONNULL((1)),wint32_t,__THROWING,fgetc32,(FILE *__restrict __stream),fgetwc,(__stream))
 #elif defined(__CRT_HAVE_KOS$fgetwc)
-__CREDIRECT_KOS(__ATTR_NONNULL((1)),wint_t,__THROWING,fgetc32,(FILE *__restrict __stream),fgetwc,(__stream))
+__CREDIRECT_KOS(__ATTR_NONNULL((1)),wint32_t,__THROWING,fgetc32,(FILE *__restrict __stream),fgetwc,(__stream))
 #elif defined(__CRT_HAVE_getwc) && __SIZEOF_WCHAR_T__ == 4 && defined(__LIBCCALL_IS_LIBKCALL)
-__CREDIRECT(__ATTR_NONNULL((1)),wint_t,__THROWING,fgetc32,(FILE *__restrict __stream),getwc,(__stream))
+__CREDIRECT(__ATTR_NONNULL((1)),wint32_t,__THROWING,fgetc32,(FILE *__restrict __stream),getwc,(__stream))
 #elif defined(__CRT_HAVE_KOS$getwc)
-__CREDIRECT_KOS(__ATTR_NONNULL((1)),wint_t,__THROWING,fgetc32,(FILE *__restrict __stream),getwc,(__stream))
+__CREDIRECT_KOS(__ATTR_NONNULL((1)),wint32_t,__THROWING,fgetc32,(FILE *__restrict __stream),getwc,(__stream))
 #endif /* ... */
 #if defined(__CRT_HAVE_fgetwc) && __SIZEOF_WCHAR_T__ == 2 && defined(__LIBCCALL_IS_LIBDCALL)
-__CREDIRECT(__ATTR_NONNULL((1)),wint_t,__THROWING,getc16,(FILE *__restrict __stream),fgetwc,(__stream))
+__CREDIRECT(__ATTR_NONNULL((1)),wint16_t,__THROWING,getc16,(FILE *__restrict __stream),fgetwc,(__stream))
 #elif defined(__CRT_HAVE_DOS$fgetwc)
-__CREDIRECT_DOS(__ATTR_NONNULL((1)),wint_t,__THROWING,getc16,(FILE *__restrict __stream),fgetwc,(__stream))
+__CREDIRECT_DOS(__ATTR_NONNULL((1)),wint16_t,__THROWING,getc16,(FILE *__restrict __stream),fgetwc,(__stream))
 #elif defined(__CRT_HAVE_getwc) && __SIZEOF_WCHAR_T__ == 2 && defined(__LIBCCALL_IS_LIBDCALL)
-__CREDIRECT(__ATTR_NONNULL((1)),wint_t,__THROWING,getc16,(FILE *__restrict __stream),getwc,(__stream))
+__CREDIRECT(__ATTR_NONNULL((1)),wint16_t,__THROWING,getc16,(FILE *__restrict __stream),getwc,(__stream))
 #elif defined(__CRT_HAVE_DOS$getwc)
-__CREDIRECT_DOS(__ATTR_NONNULL((1)),wint_t,__THROWING,getc16,(FILE *__restrict __stream),getwc,(__stream))
+__CREDIRECT_DOS(__ATTR_NONNULL((1)),wint16_t,__THROWING,getc16,(FILE *__restrict __stream),getwc,(__stream))
 #endif /* ... */
 #if defined(__CRT_HAVE_fgetwc) && __SIZEOF_WCHAR_T__ == 4 && defined(__LIBCCALL_IS_LIBKCALL)
-__CREDIRECT(__ATTR_NONNULL((1)),wint_t,__THROWING,getc32,(FILE *__restrict __stream),fgetwc,(__stream))
+__CREDIRECT(__ATTR_NONNULL((1)),wint32_t,__THROWING,getc32,(FILE *__restrict __stream),fgetwc,(__stream))
 #elif defined(__CRT_HAVE_KOS$fgetwc)
-__CREDIRECT_KOS(__ATTR_NONNULL((1)),wint_t,__THROWING,getc32,(FILE *__restrict __stream),fgetwc,(__stream))
+__CREDIRECT_KOS(__ATTR_NONNULL((1)),wint32_t,__THROWING,getc32,(FILE *__restrict __stream),fgetwc,(__stream))
 #elif defined(__CRT_HAVE_getwc) && __SIZEOF_WCHAR_T__ == 4 && defined(__LIBCCALL_IS_LIBKCALL)
-__CREDIRECT(__ATTR_NONNULL((1)),wint_t,__THROWING,getc32,(FILE *__restrict __stream),getwc,(__stream))
+__CREDIRECT(__ATTR_NONNULL((1)),wint32_t,__THROWING,getc32,(FILE *__restrict __stream),getwc,(__stream))
 #elif defined(__CRT_HAVE_KOS$getwc)
-__CREDIRECT_KOS(__ATTR_NONNULL((1)),wint_t,__THROWING,getc32,(FILE *__restrict __stream),getwc,(__stream))
+__CREDIRECT_KOS(__ATTR_NONNULL((1)),wint32_t,__THROWING,getc32,(FILE *__restrict __stream),getwc,(__stream))
 #endif /* ... */
 #if defined(__CRT_HAVE_putwchar) && __SIZEOF_WCHAR_T__ == 2 && defined(__LIBCCALL_IS_LIBDCALL)
-__CREDIRECT(,wint_t,__THROWING,putchar16,(char16_t __wc),putwchar,(__wc))
+__CREDIRECT(,wint16_t,__THROWING,putchar16,(char16_t __wc),putwchar,(__wc))
 #elif defined(__CRT_HAVE_DOS$putwchar)
-__CREDIRECT_DOS(,wint_t,__THROWING,putchar16,(char16_t __wc),putwchar,(__wc))
+__CREDIRECT_DOS(,wint16_t,__THROWING,putchar16,(char16_t __wc),putwchar,(__wc))
 #elif defined(__CRT_HAVE__fputwchar) && __SIZEOF_WCHAR_T__ == 2 && defined(__LIBCCALL_IS_LIBDCALL)
-__CREDIRECT(,wint_t,__THROWING,putchar16,(char16_t __wc),_fputwchar,(__wc))
+__CREDIRECT(,wint16_t,__THROWING,putchar16,(char16_t __wc),_fputwchar,(__wc))
 #elif defined(__CRT_HAVE_DOS$_fputwchar)
-__CREDIRECT_DOS(,wint_t,__THROWING,putchar16,(char16_t __wc),_fputwchar,(__wc))
+__CREDIRECT_DOS(,wint16_t,__THROWING,putchar16,(char16_t __wc),_fputwchar,(__wc))
 #else /* ... */
 #include <__crt.h>
 #if !defined(__NO_STDSTREAMS) && (defined(__CRT_HAVE_fputwc) || defined(__CRT_HAVE_putwc)) && __SIZEOF_WCHAR_T__ == 2
 #include <libc/local/wchar/putwchar.h>
-__FORCELOCAL __ATTR_ARTIFICIAL wint_t (__LIBDCALL putchar16)(char16_t __wc) __THROWS(...) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(putwchar))((__WCHAR_TYPE__)__wc); }
+__FORCELOCAL __ATTR_ARTIFICIAL wint16_t (__LIBDCALL putchar16)(char16_t __wc) __THROWS(...) { return (__WINT16_TYPE__)(__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(putwchar))((__WCHAR_TYPE__)__wc); }
 #elif !defined(__NO_STDSTREAMS) && ((defined(__CRT_HAVE_fputwc) && __SIZEOF_WCHAR_T__ == 2 && defined(__LIBCCALL_IS_LIBDCALL)) || defined(__CRT_HAVE_DOS$fputwc) || (defined(__CRT_HAVE_putwc) && __SIZEOF_WCHAR_T__ == 2 && defined(__LIBCCALL_IS_LIBDCALL)) || defined(__CRT_HAVE_DOS$putwc))
 #include <libc/local/parts.uchar.stdio/putchar16.h>
-__NAMESPACE_LOCAL_USING_OR_IMPL(putchar16, __FORCELOCAL __ATTR_ARTIFICIAL wint_t (__LIBDCALL putchar16)(char16_t __wc) __THROWS(...) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(putchar16))(__wc); })
+__NAMESPACE_LOCAL_USING_OR_IMPL(putchar16, __FORCELOCAL __ATTR_ARTIFICIAL wint16_t (__LIBDCALL putchar16)(char16_t __wc) __THROWS(...) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(putchar16))(__wc); })
 #endif /* ... */
 #endif /* !... */
 #if defined(__CRT_HAVE_putwchar) && __SIZEOF_WCHAR_T__ == 4 && defined(__LIBCCALL_IS_LIBKCALL)
-__CREDIRECT(,wint_t,__THROWING,putchar32,(char32_t __wc),putwchar,(__wc))
+__CREDIRECT(,wint32_t,__THROWING,putchar32,(char32_t __wc),putwchar,(__wc))
 #elif defined(__CRT_HAVE_KOS$putwchar)
-__CREDIRECT_KOS(,wint_t,__THROWING,putchar32,(char32_t __wc),putwchar,(__wc))
+__CREDIRECT_KOS(,wint32_t,__THROWING,putchar32,(char32_t __wc),putwchar,(__wc))
 #elif defined(__CRT_HAVE__fputwchar) && __SIZEOF_WCHAR_T__ == 4 && defined(__LIBCCALL_IS_LIBKCALL)
-__CREDIRECT(,wint_t,__THROWING,putchar32,(char32_t __wc),_fputwchar,(__wc))
+__CREDIRECT(,wint32_t,__THROWING,putchar32,(char32_t __wc),_fputwchar,(__wc))
 #elif defined(__CRT_HAVE_KOS$_fputwchar)
-__CREDIRECT_KOS(,wint_t,__THROWING,putchar32,(char32_t __wc),_fputwchar,(__wc))
+__CREDIRECT_KOS(,wint32_t,__THROWING,putchar32,(char32_t __wc),_fputwchar,(__wc))
 #else /* ... */
 #include <__crt.h>
 #if !defined(__NO_STDSTREAMS) && (defined(__CRT_HAVE_fputwc) || defined(__CRT_HAVE_putwc)) && __SIZEOF_WCHAR_T__ == 4
 #include <libc/local/wchar/putwchar.h>
-__FORCELOCAL __ATTR_ARTIFICIAL wint_t (__LIBKCALL putchar32)(char32_t __wc) __THROWS(...) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(putwchar))((__WCHAR_TYPE__)__wc); }
+__FORCELOCAL __ATTR_ARTIFICIAL wint32_t (__LIBKCALL putchar32)(char32_t __wc) __THROWS(...) { return (__WINT32_TYPE__)(__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(putwchar))((__WCHAR_TYPE__)__wc); }
 #elif !defined(__NO_STDSTREAMS) && ((defined(__CRT_HAVE_fputwc) && __SIZEOF_WCHAR_T__ == 4 && defined(__LIBCCALL_IS_LIBKCALL)) || defined(__CRT_HAVE_KOS$fputwc) || (defined(__CRT_HAVE_putwc) && __SIZEOF_WCHAR_T__ == 4 && defined(__LIBCCALL_IS_LIBKCALL)) || defined(__CRT_HAVE_KOS$putwc))
 #include <libc/local/parts.uchar.stdio/putchar32.h>
-__NAMESPACE_LOCAL_USING_OR_IMPL(putchar32, __FORCELOCAL __ATTR_ARTIFICIAL wint_t (__LIBKCALL putchar32)(char32_t __wc) __THROWS(...) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(putchar32))(__wc); })
+__NAMESPACE_LOCAL_USING_OR_IMPL(putchar32, __FORCELOCAL __ATTR_ARTIFICIAL wint32_t (__LIBKCALL putchar32)(char32_t __wc) __THROWS(...) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(putchar32))(__wc); })
 #endif /* ... */
 #endif /* !... */
 #if defined(__CRT_HAVE_fputwc) && __SIZEOF_WCHAR_T__ == 2 && defined(__LIBCCALL_IS_LIBDCALL)
-__CREDIRECT(__ATTR_NONNULL((2)),wint_t,__THROWING,fputc16,(char16_t __wc, FILE *__stream),fputwc,(__wc,__stream))
+__CREDIRECT(__ATTR_NONNULL((2)),wint16_t,__THROWING,fputc16,(char16_t __wc, FILE *__stream),fputwc,(__wc,__stream))
 #elif defined(__CRT_HAVE_DOS$fputwc)
-__CREDIRECT_DOS(__ATTR_NONNULL((2)),wint_t,__THROWING,fputc16,(char16_t __wc, FILE *__stream),fputwc,(__wc,__stream))
+__CREDIRECT_DOS(__ATTR_NONNULL((2)),wint16_t,__THROWING,fputc16,(char16_t __wc, FILE *__stream),fputwc,(__wc,__stream))
 #elif defined(__CRT_HAVE_putwc) && __SIZEOF_WCHAR_T__ == 2 && defined(__LIBCCALL_IS_LIBDCALL)
-__CREDIRECT(__ATTR_NONNULL((2)),wint_t,__THROWING,fputc16,(char16_t __wc, FILE *__stream),putwc,(__wc,__stream))
+__CREDIRECT(__ATTR_NONNULL((2)),wint16_t,__THROWING,fputc16,(char16_t __wc, FILE *__stream),putwc,(__wc,__stream))
 #elif defined(__CRT_HAVE_DOS$putwc)
-__CREDIRECT_DOS(__ATTR_NONNULL((2)),wint_t,__THROWING,fputc16,(char16_t __wc, FILE *__stream),putwc,(__wc,__stream))
+__CREDIRECT_DOS(__ATTR_NONNULL((2)),wint16_t,__THROWING,fputc16,(char16_t __wc, FILE *__stream),putwc,(__wc,__stream))
 #endif /* ... */
 #if defined(__CRT_HAVE_fputwc) && __SIZEOF_WCHAR_T__ == 4 && defined(__LIBCCALL_IS_LIBKCALL)
-__CREDIRECT(__ATTR_NONNULL((2)),wint_t,__THROWING,fputc32,(char32_t __wc, FILE *__stream),fputwc,(__wc,__stream))
+__CREDIRECT(__ATTR_NONNULL((2)),wint32_t,__THROWING,fputc32,(char32_t __wc, FILE *__stream),fputwc,(__wc,__stream))
 #elif defined(__CRT_HAVE_KOS$fputwc)
-__CREDIRECT_KOS(__ATTR_NONNULL((2)),wint_t,__THROWING,fputc32,(char32_t __wc, FILE *__stream),fputwc,(__wc,__stream))
+__CREDIRECT_KOS(__ATTR_NONNULL((2)),wint32_t,__THROWING,fputc32,(char32_t __wc, FILE *__stream),fputwc,(__wc,__stream))
 #elif defined(__CRT_HAVE_putwc) && __SIZEOF_WCHAR_T__ == 4 && defined(__LIBCCALL_IS_LIBKCALL)
-__CREDIRECT(__ATTR_NONNULL((2)),wint_t,__THROWING,fputc32,(char32_t __wc, FILE *__stream),putwc,(__wc,__stream))
+__CREDIRECT(__ATTR_NONNULL((2)),wint32_t,__THROWING,fputc32,(char32_t __wc, FILE *__stream),putwc,(__wc,__stream))
 #elif defined(__CRT_HAVE_KOS$putwc)
-__CREDIRECT_KOS(__ATTR_NONNULL((2)),wint_t,__THROWING,fputc32,(char32_t __wc, FILE *__stream),putwc,(__wc,__stream))
+__CREDIRECT_KOS(__ATTR_NONNULL((2)),wint32_t,__THROWING,fputc32,(char32_t __wc, FILE *__stream),putwc,(__wc,__stream))
 #endif /* ... */
 #if defined(__CRT_HAVE_fputwc) && __SIZEOF_WCHAR_T__ == 2 && defined(__LIBCCALL_IS_LIBDCALL)
-__CREDIRECT(__ATTR_NONNULL((2)),wint_t,__THROWING,putc16,(char16_t __wc, FILE *__stream),fputwc,(__wc,__stream))
+__CREDIRECT(__ATTR_NONNULL((2)),wint16_t,__THROWING,putc16,(char16_t __wc, FILE *__stream),fputwc,(__wc,__stream))
 #elif defined(__CRT_HAVE_DOS$fputwc)
-__CREDIRECT_DOS(__ATTR_NONNULL((2)),wint_t,__THROWING,putc16,(char16_t __wc, FILE *__stream),fputwc,(__wc,__stream))
+__CREDIRECT_DOS(__ATTR_NONNULL((2)),wint16_t,__THROWING,putc16,(char16_t __wc, FILE *__stream),fputwc,(__wc,__stream))
 #elif defined(__CRT_HAVE_putwc) && __SIZEOF_WCHAR_T__ == 2 && defined(__LIBCCALL_IS_LIBDCALL)
-__CREDIRECT(__ATTR_NONNULL((2)),wint_t,__THROWING,putc16,(char16_t __wc, FILE *__stream),putwc,(__wc,__stream))
+__CREDIRECT(__ATTR_NONNULL((2)),wint16_t,__THROWING,putc16,(char16_t __wc, FILE *__stream),putwc,(__wc,__stream))
 #elif defined(__CRT_HAVE_DOS$putwc)
-__CREDIRECT_DOS(__ATTR_NONNULL((2)),wint_t,__THROWING,putc16,(char16_t __wc, FILE *__stream),putwc,(__wc,__stream))
+__CREDIRECT_DOS(__ATTR_NONNULL((2)),wint16_t,__THROWING,putc16,(char16_t __wc, FILE *__stream),putwc,(__wc,__stream))
 #endif /* ... */
 #if defined(__CRT_HAVE_fputwc) && __SIZEOF_WCHAR_T__ == 4 && defined(__LIBCCALL_IS_LIBKCALL)
-__CREDIRECT(__ATTR_NONNULL((2)),wint_t,__THROWING,putc32,(char32_t __wc, FILE *__stream),fputwc,(__wc,__stream))
+__CREDIRECT(__ATTR_NONNULL((2)),wint32_t,__THROWING,putc32,(char32_t __wc, FILE *__stream),fputwc,(__wc,__stream))
 #elif defined(__CRT_HAVE_KOS$fputwc)
-__CREDIRECT_KOS(__ATTR_NONNULL((2)),wint_t,__THROWING,putc32,(char32_t __wc, FILE *__stream),fputwc,(__wc,__stream))
+__CREDIRECT_KOS(__ATTR_NONNULL((2)),wint32_t,__THROWING,putc32,(char32_t __wc, FILE *__stream),fputwc,(__wc,__stream))
 #elif defined(__CRT_HAVE_putwc) && __SIZEOF_WCHAR_T__ == 4 && defined(__LIBCCALL_IS_LIBKCALL)
-__CREDIRECT(__ATTR_NONNULL((2)),wint_t,__THROWING,putc32,(char32_t __wc, FILE *__stream),putwc,(__wc,__stream))
+__CREDIRECT(__ATTR_NONNULL((2)),wint32_t,__THROWING,putc32,(char32_t __wc, FILE *__stream),putwc,(__wc,__stream))
 #elif defined(__CRT_HAVE_KOS$putwc)
-__CREDIRECT_KOS(__ATTR_NONNULL((2)),wint_t,__THROWING,putc32,(char32_t __wc, FILE *__stream),putwc,(__wc,__stream))
+__CREDIRECT_KOS(__ATTR_NONNULL((2)),wint32_t,__THROWING,putc32,(char32_t __wc, FILE *__stream),putwc,(__wc,__stream))
 #endif /* ... */
 #if defined(__CRT_HAVE_fgetws_unlocked) && defined(__USE_STDIO_UNLOCKED) && __SIZEOF_WCHAR_T__ == 2 && defined(__LIBCCALL_IS_LIBDCALL)
 __CREDIRECT(__ATTR_WUNUSED __ATTR_NONNULL((1, 3)),char16_t *,__THROWING,fgetc16s,(char16_t *__restrict __buf, __STDC_INT_AS_SIZE_T __bufsize, FILE *__restrict __stream),fgetws_unlocked,(__buf,__bufsize,__stream))
@@ -293,30 +304,30 @@ __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_NONNULL((1, 2)) __STDC_INT_AS_SIZE_T (__LI
 __NAMESPACE_LOCAL_USING_OR_IMPL(fputc32s, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_NONNULL((1, 2)) __STDC_INT_AS_SIZE_T (__LIBKCALL fputc32s)(char32_t const *__restrict __str, FILE *__restrict __stream) __THROWS(...) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(fputc32s))(__str, __stream); })
 #endif /* ... */
 #if defined(__CRT_HAVE_ungetwc_unlocked) && defined(__USE_STDIO_UNLOCKED) && __SIZEOF_WCHAR_T__ == 2 && defined(__LIBCCALL_IS_LIBDCALL)
-__CREDIRECT(__ATTR_NONNULL((2)),wint_t,__NOTHROW_NCX,ungetc16,(wint_t __wc, FILE *__stream),ungetwc_unlocked,(__wc,__stream))
+__CREDIRECT(__ATTR_NONNULL((2)),wint16_t,__NOTHROW_NCX,ungetc16,(wint16_t __wc, FILE *__stream),ungetwc_unlocked,(__wc,__stream))
 #elif defined(__CRT_HAVE_DOS$ungetwc_unlocked) && defined(__USE_STDIO_UNLOCKED)
-__CREDIRECT_DOS(__ATTR_NONNULL((2)),wint_t,__NOTHROW_NCX,ungetc16,(wint_t __wc, FILE *__stream),ungetwc_unlocked,(__wc,__stream))
+__CREDIRECT_DOS(__ATTR_NONNULL((2)),wint16_t,__NOTHROW_NCX,ungetc16,(wint16_t __wc, FILE *__stream),ungetwc_unlocked,(__wc,__stream))
 #elif defined(__CRT_HAVE_ungetwc) && __SIZEOF_WCHAR_T__ == 2 && defined(__LIBCCALL_IS_LIBDCALL)
-__CREDIRECT(__ATTR_NONNULL((2)),wint_t,__NOTHROW_NCX,ungetc16,(wint_t __wc, FILE *__stream),ungetwc,(__wc,__stream))
+__CREDIRECT(__ATTR_NONNULL((2)),wint16_t,__NOTHROW_NCX,ungetc16,(wint16_t __wc, FILE *__stream),ungetwc,(__wc,__stream))
 #elif defined(__CRT_HAVE_DOS$ungetwc)
-__CREDIRECT_DOS(__ATTR_NONNULL((2)),wint_t,__NOTHROW_NCX,ungetc16,(wint_t __wc, FILE *__stream),ungetwc,(__wc,__stream))
+__CREDIRECT_DOS(__ATTR_NONNULL((2)),wint16_t,__NOTHROW_NCX,ungetc16,(wint16_t __wc, FILE *__stream),ungetwc,(__wc,__stream))
 #elif defined(__CRT_HAVE_ungetwc_unlocked) && __SIZEOF_WCHAR_T__ == 2 && defined(__LIBCCALL_IS_LIBDCALL)
-__CREDIRECT(__ATTR_NONNULL((2)),wint_t,__NOTHROW_NCX,ungetc16,(wint_t __wc, FILE *__stream),ungetwc_unlocked,(__wc,__stream))
+__CREDIRECT(__ATTR_NONNULL((2)),wint16_t,__NOTHROW_NCX,ungetc16,(wint16_t __wc, FILE *__stream),ungetwc_unlocked,(__wc,__stream))
 #elif defined(__CRT_HAVE_DOS$ungetwc_unlocked)
-__CREDIRECT_DOS(__ATTR_NONNULL((2)),wint_t,__NOTHROW_NCX,ungetc16,(wint_t __wc, FILE *__stream),ungetwc_unlocked,(__wc,__stream))
+__CREDIRECT_DOS(__ATTR_NONNULL((2)),wint16_t,__NOTHROW_NCX,ungetc16,(wint16_t __wc, FILE *__stream),ungetwc_unlocked,(__wc,__stream))
 #endif /* ... */
 #if defined(__CRT_HAVE_ungetwc_unlocked) && defined(__USE_STDIO_UNLOCKED) && __SIZEOF_WCHAR_T__ == 4 && defined(__LIBCCALL_IS_LIBKCALL)
-__CREDIRECT(__ATTR_NONNULL((2)),wint_t,__NOTHROW_NCX,ungetc32,(wint_t __wc, FILE *__stream),ungetwc_unlocked,(__wc,__stream))
+__CREDIRECT(__ATTR_NONNULL((2)),wint32_t,__NOTHROW_NCX,ungetc32,(wint32_t __wc, FILE *__stream),ungetwc_unlocked,(__wc,__stream))
 #elif defined(__CRT_HAVE_KOS$ungetwc_unlocked) && defined(__USE_STDIO_UNLOCKED)
-__CREDIRECT_KOS(__ATTR_NONNULL((2)),wint_t,__NOTHROW_NCX,ungetc32,(wint_t __wc, FILE *__stream),ungetwc_unlocked,(__wc,__stream))
+__CREDIRECT_KOS(__ATTR_NONNULL((2)),wint32_t,__NOTHROW_NCX,ungetc32,(wint32_t __wc, FILE *__stream),ungetwc_unlocked,(__wc,__stream))
 #elif defined(__CRT_HAVE_ungetwc) && __SIZEOF_WCHAR_T__ == 4 && defined(__LIBCCALL_IS_LIBKCALL)
-__CREDIRECT(__ATTR_NONNULL((2)),wint_t,__NOTHROW_NCX,ungetc32,(wint_t __wc, FILE *__stream),ungetwc,(__wc,__stream))
+__CREDIRECT(__ATTR_NONNULL((2)),wint32_t,__NOTHROW_NCX,ungetc32,(wint32_t __wc, FILE *__stream),ungetwc,(__wc,__stream))
 #elif defined(__CRT_HAVE_KOS$ungetwc)
-__CREDIRECT_KOS(__ATTR_NONNULL((2)),wint_t,__NOTHROW_NCX,ungetc32,(wint_t __wc, FILE *__stream),ungetwc,(__wc,__stream))
+__CREDIRECT_KOS(__ATTR_NONNULL((2)),wint32_t,__NOTHROW_NCX,ungetc32,(wint32_t __wc, FILE *__stream),ungetwc,(__wc,__stream))
 #elif defined(__CRT_HAVE_ungetwc_unlocked) && __SIZEOF_WCHAR_T__ == 4 && defined(__LIBCCALL_IS_LIBKCALL)
-__CREDIRECT(__ATTR_NONNULL((2)),wint_t,__NOTHROW_NCX,ungetc32,(wint_t __wc, FILE *__stream),ungetwc_unlocked,(__wc,__stream))
+__CREDIRECT(__ATTR_NONNULL((2)),wint32_t,__NOTHROW_NCX,ungetc32,(wint32_t __wc, FILE *__stream),ungetwc_unlocked,(__wc,__stream))
 #elif defined(__CRT_HAVE_KOS$ungetwc_unlocked)
-__CREDIRECT_KOS(__ATTR_NONNULL((2)),wint_t,__NOTHROW_NCX,ungetc32,(wint_t __wc, FILE *__stream),ungetwc_unlocked,(__wc,__stream))
+__CREDIRECT_KOS(__ATTR_NONNULL((2)),wint32_t,__NOTHROW_NCX,ungetc32,(wint32_t __wc, FILE *__stream),ungetwc_unlocked,(__wc,__stream))
 #endif /* ... */
 
 #if defined(__USE_ISOC95) || defined(__USE_UNIX98) || defined(__USE_DOS)
@@ -631,132 +642,132 @@ __NAMESPACE_LOCAL_USING_OR_IMPL(vsc32scanf, __FORCELOCAL __ATTR_ARTIFICIAL __ATT
 
 #ifdef __USE_GNU
 #if defined(__CRT_HAVE_getwchar_unlocked) && __SIZEOF_WCHAR_T__ == 2 && defined(__LIBCCALL_IS_LIBDCALL)
-__CREDIRECT(,__WINT_TYPE__,__THROWING,getchar16_unlocked,(void),getwchar_unlocked,())
+__CREDIRECT(,__WINT16_TYPE__,__THROWING,getchar16_unlocked,(void),getwchar_unlocked,())
 #elif defined(__CRT_HAVE_DOS$getwchar_unlocked)
-__CREDIRECT_DOS(,__WINT_TYPE__,__THROWING,getchar16_unlocked,(void),getwchar_unlocked,())
+__CREDIRECT_DOS(,__WINT16_TYPE__,__THROWING,getchar16_unlocked,(void),getwchar_unlocked,())
 #else /* ... */
 #include <__crt.h>
 #if (defined(__CRT_HAVE_fgetwc_unlocked) || defined(__CRT_HAVE__fgetwc_nolock)) && !defined(__NO_STDSTREAMS) && __SIZEOF_WCHAR_T__ == 2
 #include <libc/local/wchar/getwchar_unlocked.h>
-__FORCELOCAL __ATTR_ARTIFICIAL __WINT_TYPE__ (__LIBDCALL getchar16_unlocked)(void) __THROWS(...) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(getwchar_unlocked))(); }
+__FORCELOCAL __ATTR_ARTIFICIAL __WINT16_TYPE__ (__LIBDCALL getchar16_unlocked)(void) __THROWS(...) { return (__WINT16_TYPE__)(__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(getwchar_unlocked))(); }
 #elif ((defined(__CRT_HAVE_fgetwc_unlocked) && __SIZEOF_WCHAR_T__ == 2 && defined(__LIBCCALL_IS_LIBDCALL)) || defined(__CRT_HAVE_DOS$fgetwc_unlocked) || (defined(__CRT_HAVE__fgetwc_nolock) && __SIZEOF_WCHAR_T__ == 2 && defined(__LIBCCALL_IS_LIBDCALL)) || defined(__CRT_HAVE_DOS$_fgetwc_nolock)) && !defined(__NO_STDSTREAMS)
 #include <libc/local/parts.uchar.stdio/getchar16_unlocked.h>
-__NAMESPACE_LOCAL_USING_OR_IMPL(getchar16_unlocked, __FORCELOCAL __ATTR_ARTIFICIAL __WINT_TYPE__ (__LIBDCALL getchar16_unlocked)(void) __THROWS(...) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(getchar16_unlocked))(); })
+__NAMESPACE_LOCAL_USING_OR_IMPL(getchar16_unlocked, __FORCELOCAL __ATTR_ARTIFICIAL __WINT16_TYPE__ (__LIBDCALL getchar16_unlocked)(void) __THROWS(...) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(getchar16_unlocked))(); })
 #endif /* ... */
 #endif /* !... */
 #if defined(__CRT_HAVE_getwchar_unlocked) && __SIZEOF_WCHAR_T__ == 4 && defined(__LIBCCALL_IS_LIBKCALL)
-__CREDIRECT(,__WINT_TYPE__,__THROWING,getchar32_unlocked,(void),getwchar_unlocked,())
+__CREDIRECT(,__WINT32_TYPE__,__THROWING,getchar32_unlocked,(void),getwchar_unlocked,())
 #elif defined(__CRT_HAVE_KOS$getwchar_unlocked)
-__CREDIRECT_KOS(,__WINT_TYPE__,__THROWING,getchar32_unlocked,(void),getwchar_unlocked,())
+__CREDIRECT_KOS(,__WINT32_TYPE__,__THROWING,getchar32_unlocked,(void),getwchar_unlocked,())
 #else /* ... */
 #include <__crt.h>
 #if (defined(__CRT_HAVE_fgetwc_unlocked) || defined(__CRT_HAVE__fgetwc_nolock)) && !defined(__NO_STDSTREAMS) && __SIZEOF_WCHAR_T__ == 4
 #include <libc/local/wchar/getwchar_unlocked.h>
-__FORCELOCAL __ATTR_ARTIFICIAL __WINT_TYPE__ (__LIBKCALL getchar32_unlocked)(void) __THROWS(...) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(getwchar_unlocked))(); }
+__FORCELOCAL __ATTR_ARTIFICIAL __WINT32_TYPE__ (__LIBKCALL getchar32_unlocked)(void) __THROWS(...) { return (__WINT32_TYPE__)(__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(getwchar_unlocked))(); }
 #elif ((defined(__CRT_HAVE_fgetwc_unlocked) && __SIZEOF_WCHAR_T__ == 4 && defined(__LIBCCALL_IS_LIBKCALL)) || defined(__CRT_HAVE_KOS$fgetwc_unlocked) || (defined(__CRT_HAVE__fgetwc_nolock) && __SIZEOF_WCHAR_T__ == 4 && defined(__LIBCCALL_IS_LIBKCALL)) || defined(__CRT_HAVE_KOS$_fgetwc_nolock)) && !defined(__NO_STDSTREAMS)
 #include <libc/local/parts.uchar.stdio/getchar32_unlocked.h>
-__NAMESPACE_LOCAL_USING_OR_IMPL(getchar32_unlocked, __FORCELOCAL __ATTR_ARTIFICIAL __WINT_TYPE__ (__LIBKCALL getchar32_unlocked)(void) __THROWS(...) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(getchar32_unlocked))(); })
+__NAMESPACE_LOCAL_USING_OR_IMPL(getchar32_unlocked, __FORCELOCAL __ATTR_ARTIFICIAL __WINT32_TYPE__ (__LIBKCALL getchar32_unlocked)(void) __THROWS(...) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(getchar32_unlocked))(); })
 #endif /* ... */
 #endif /* !... */
 #if defined(__CRT_HAVE_putwchar_unlocked) && __SIZEOF_WCHAR_T__ == 2 && defined(__LIBCCALL_IS_LIBDCALL)
-__CREDIRECT(,__WINT_TYPE__,__THROWING,putchar16_unlocked,(char16_t __wc),putwchar_unlocked,(__wc))
+__CREDIRECT(,__WINT16_TYPE__,__THROWING,putchar16_unlocked,(char16_t __wc),putwchar_unlocked,(__wc))
 #elif defined(__CRT_HAVE_DOS$putwchar_unlocked)
-__CREDIRECT_DOS(,__WINT_TYPE__,__THROWING,putchar16_unlocked,(char16_t __wc),putwchar_unlocked,(__wc))
+__CREDIRECT_DOS(,__WINT16_TYPE__,__THROWING,putchar16_unlocked,(char16_t __wc),putwchar_unlocked,(__wc))
 #else /* ... */
 #include <__crt.h>
 #if (defined(__CRT_HAVE_fputwc_unlocked) || defined(__CRT_HAVE__fputwc_nolock)) && !defined(__NO_STDSTREAMS) && __SIZEOF_WCHAR_T__ == 2
 #include <libc/local/wchar/putwchar_unlocked.h>
-__FORCELOCAL __ATTR_ARTIFICIAL __WINT_TYPE__ (__LIBDCALL putchar16_unlocked)(char16_t __wc) __THROWS(...) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(putwchar_unlocked))((__WCHAR_TYPE__)__wc); }
+__FORCELOCAL __ATTR_ARTIFICIAL __WINT16_TYPE__ (__LIBDCALL putchar16_unlocked)(char16_t __wc) __THROWS(...) { return (__WINT16_TYPE__)(__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(putwchar_unlocked))((__WCHAR_TYPE__)__wc); }
 #elif ((defined(__CRT_HAVE_fputwc_unlocked) && __SIZEOF_WCHAR_T__ == 2 && defined(__LIBCCALL_IS_LIBDCALL)) || defined(__CRT_HAVE_DOS$fputwc_unlocked) || (defined(__CRT_HAVE__fputwc_nolock) && __SIZEOF_WCHAR_T__ == 2 && defined(__LIBCCALL_IS_LIBDCALL)) || defined(__CRT_HAVE_DOS$_fputwc_nolock)) && !defined(__NO_STDSTREAMS)
 #include <libc/local/parts.uchar.stdio/putchar16_unlocked.h>
-__NAMESPACE_LOCAL_USING_OR_IMPL(putchar16_unlocked, __FORCELOCAL __ATTR_ARTIFICIAL __WINT_TYPE__ (__LIBDCALL putchar16_unlocked)(char16_t __wc) __THROWS(...) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(putchar16_unlocked))(__wc); })
+__NAMESPACE_LOCAL_USING_OR_IMPL(putchar16_unlocked, __FORCELOCAL __ATTR_ARTIFICIAL __WINT16_TYPE__ (__LIBDCALL putchar16_unlocked)(char16_t __wc) __THROWS(...) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(putchar16_unlocked))(__wc); })
 #endif /* ... */
 #endif /* !... */
 #if defined(__CRT_HAVE_putwchar_unlocked) && __SIZEOF_WCHAR_T__ == 4 && defined(__LIBCCALL_IS_LIBKCALL)
-__CREDIRECT(,__WINT_TYPE__,__THROWING,putchar32_unlocked,(char32_t __wc),putwchar_unlocked,(__wc))
+__CREDIRECT(,__WINT32_TYPE__,__THROWING,putchar32_unlocked,(char32_t __wc),putwchar_unlocked,(__wc))
 #elif defined(__CRT_HAVE_KOS$putwchar_unlocked)
-__CREDIRECT_KOS(,__WINT_TYPE__,__THROWING,putchar32_unlocked,(char32_t __wc),putwchar_unlocked,(__wc))
+__CREDIRECT_KOS(,__WINT32_TYPE__,__THROWING,putchar32_unlocked,(char32_t __wc),putwchar_unlocked,(__wc))
 #else /* ... */
 #include <__crt.h>
 #if (defined(__CRT_HAVE_fputwc_unlocked) || defined(__CRT_HAVE__fputwc_nolock)) && !defined(__NO_STDSTREAMS) && __SIZEOF_WCHAR_T__ == 4
 #include <libc/local/wchar/putwchar_unlocked.h>
-__FORCELOCAL __ATTR_ARTIFICIAL __WINT_TYPE__ (__LIBKCALL putchar32_unlocked)(char32_t __wc) __THROWS(...) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(putwchar_unlocked))((__WCHAR_TYPE__)__wc); }
+__FORCELOCAL __ATTR_ARTIFICIAL __WINT32_TYPE__ (__LIBKCALL putchar32_unlocked)(char32_t __wc) __THROWS(...) { return (__WINT32_TYPE__)(__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(putwchar_unlocked))((__WCHAR_TYPE__)__wc); }
 #elif ((defined(__CRT_HAVE_fputwc_unlocked) && __SIZEOF_WCHAR_T__ == 4 && defined(__LIBCCALL_IS_LIBKCALL)) || defined(__CRT_HAVE_KOS$fputwc_unlocked) || (defined(__CRT_HAVE__fputwc_nolock) && __SIZEOF_WCHAR_T__ == 4 && defined(__LIBCCALL_IS_LIBKCALL)) || defined(__CRT_HAVE_KOS$_fputwc_nolock)) && !defined(__NO_STDSTREAMS)
 #include <libc/local/parts.uchar.stdio/putchar32_unlocked.h>
-__NAMESPACE_LOCAL_USING_OR_IMPL(putchar32_unlocked, __FORCELOCAL __ATTR_ARTIFICIAL __WINT_TYPE__ (__LIBKCALL putchar32_unlocked)(char32_t __wc) __THROWS(...) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(putchar32_unlocked))(__wc); })
+__NAMESPACE_LOCAL_USING_OR_IMPL(putchar32_unlocked, __FORCELOCAL __ATTR_ARTIFICIAL __WINT32_TYPE__ (__LIBKCALL putchar32_unlocked)(char32_t __wc) __THROWS(...) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(putchar32_unlocked))(__wc); })
 #endif /* ... */
 #endif /* !... */
 #if defined(__CRT_HAVE_fgetwc_unlocked) && __SIZEOF_WCHAR_T__ == 2 && defined(__LIBCCALL_IS_LIBDCALL)
-__CREDIRECT(__ATTR_NONNULL((1)),__WINT_TYPE__,__THROWING,fgetc16_unlocked,(__FILE *__restrict __stream),fgetwc_unlocked,(__stream))
+__CREDIRECT(__ATTR_NONNULL((1)),__WINT16_TYPE__,__THROWING,fgetc16_unlocked,(__FILE *__restrict __stream),fgetwc_unlocked,(__stream))
 #elif defined(__CRT_HAVE_DOS$fgetwc_unlocked)
-__CREDIRECT_DOS(__ATTR_NONNULL((1)),__WINT_TYPE__,__THROWING,fgetc16_unlocked,(__FILE *__restrict __stream),fgetwc_unlocked,(__stream))
+__CREDIRECT_DOS(__ATTR_NONNULL((1)),__WINT16_TYPE__,__THROWING,fgetc16_unlocked,(__FILE *__restrict __stream),fgetwc_unlocked,(__stream))
 #elif defined(__CRT_HAVE__fgetwc_nolock) && __SIZEOF_WCHAR_T__ == 2 && defined(__LIBCCALL_IS_LIBDCALL)
-__CREDIRECT(__ATTR_NONNULL((1)),__WINT_TYPE__,__THROWING,fgetc16_unlocked,(__FILE *__restrict __stream),_fgetwc_nolock,(__stream))
+__CREDIRECT(__ATTR_NONNULL((1)),__WINT16_TYPE__,__THROWING,fgetc16_unlocked,(__FILE *__restrict __stream),_fgetwc_nolock,(__stream))
 #elif defined(__CRT_HAVE_DOS$_fgetwc_nolock)
-__CREDIRECT_DOS(__ATTR_NONNULL((1)),__WINT_TYPE__,__THROWING,fgetc16_unlocked,(__FILE *__restrict __stream),_fgetwc_nolock,(__stream))
+__CREDIRECT_DOS(__ATTR_NONNULL((1)),__WINT16_TYPE__,__THROWING,fgetc16_unlocked,(__FILE *__restrict __stream),_fgetwc_nolock,(__stream))
 #endif /* ... */
 #if defined(__CRT_HAVE_fgetwc_unlocked) && __SIZEOF_WCHAR_T__ == 4 && defined(__LIBCCALL_IS_LIBKCALL)
-__CREDIRECT(__ATTR_NONNULL((1)),__WINT_TYPE__,__THROWING,fgetc32_unlocked,(__FILE *__restrict __stream),fgetwc_unlocked,(__stream))
+__CREDIRECT(__ATTR_NONNULL((1)),__WINT32_TYPE__,__THROWING,fgetc32_unlocked,(__FILE *__restrict __stream),fgetwc_unlocked,(__stream))
 #elif defined(__CRT_HAVE_KOS$fgetwc_unlocked)
-__CREDIRECT_KOS(__ATTR_NONNULL((1)),__WINT_TYPE__,__THROWING,fgetc32_unlocked,(__FILE *__restrict __stream),fgetwc_unlocked,(__stream))
+__CREDIRECT_KOS(__ATTR_NONNULL((1)),__WINT32_TYPE__,__THROWING,fgetc32_unlocked,(__FILE *__restrict __stream),fgetwc_unlocked,(__stream))
 #elif defined(__CRT_HAVE__fgetwc_nolock) && __SIZEOF_WCHAR_T__ == 4 && defined(__LIBCCALL_IS_LIBKCALL)
-__CREDIRECT(__ATTR_NONNULL((1)),__WINT_TYPE__,__THROWING,fgetc32_unlocked,(__FILE *__restrict __stream),_fgetwc_nolock,(__stream))
+__CREDIRECT(__ATTR_NONNULL((1)),__WINT32_TYPE__,__THROWING,fgetc32_unlocked,(__FILE *__restrict __stream),_fgetwc_nolock,(__stream))
 #elif defined(__CRT_HAVE_KOS$_fgetwc_nolock)
-__CREDIRECT_KOS(__ATTR_NONNULL((1)),__WINT_TYPE__,__THROWING,fgetc32_unlocked,(__FILE *__restrict __stream),_fgetwc_nolock,(__stream))
+__CREDIRECT_KOS(__ATTR_NONNULL((1)),__WINT32_TYPE__,__THROWING,fgetc32_unlocked,(__FILE *__restrict __stream),_fgetwc_nolock,(__stream))
 #endif /* ... */
 #if defined(__CRT_HAVE_fputwc_unlocked) && __SIZEOF_WCHAR_T__ == 2 && defined(__LIBCCALL_IS_LIBDCALL)
-__CREDIRECT(__ATTR_NONNULL((2)),__WINT_TYPE__,__THROWING,fputc16_unlocked,(char16_t __wc, __FILE *__restrict __stream),fputwc_unlocked,(__wc,__stream))
+__CREDIRECT(__ATTR_NONNULL((2)),__WINT16_TYPE__,__THROWING,fputc16_unlocked,(char16_t __wc, __FILE *__restrict __stream),fputwc_unlocked,(__wc,__stream))
 #elif defined(__CRT_HAVE_DOS$fputwc_unlocked)
-__CREDIRECT_DOS(__ATTR_NONNULL((2)),__WINT_TYPE__,__THROWING,fputc16_unlocked,(char16_t __wc, __FILE *__restrict __stream),fputwc_unlocked,(__wc,__stream))
+__CREDIRECT_DOS(__ATTR_NONNULL((2)),__WINT16_TYPE__,__THROWING,fputc16_unlocked,(char16_t __wc, __FILE *__restrict __stream),fputwc_unlocked,(__wc,__stream))
 #elif defined(__CRT_HAVE__fputwc_nolock) && __SIZEOF_WCHAR_T__ == 2 && defined(__LIBCCALL_IS_LIBDCALL)
-__CREDIRECT(__ATTR_NONNULL((2)),__WINT_TYPE__,__THROWING,fputc16_unlocked,(char16_t __wc, __FILE *__restrict __stream),_fputwc_nolock,(__wc,__stream))
+__CREDIRECT(__ATTR_NONNULL((2)),__WINT16_TYPE__,__THROWING,fputc16_unlocked,(char16_t __wc, __FILE *__restrict __stream),_fputwc_nolock,(__wc,__stream))
 #elif defined(__CRT_HAVE_DOS$_fputwc_nolock)
-__CREDIRECT_DOS(__ATTR_NONNULL((2)),__WINT_TYPE__,__THROWING,fputc16_unlocked,(char16_t __wc, __FILE *__restrict __stream),_fputwc_nolock,(__wc,__stream))
+__CREDIRECT_DOS(__ATTR_NONNULL((2)),__WINT16_TYPE__,__THROWING,fputc16_unlocked,(char16_t __wc, __FILE *__restrict __stream),_fputwc_nolock,(__wc,__stream))
 #endif /* ... */
 #if defined(__CRT_HAVE_fputwc_unlocked) && __SIZEOF_WCHAR_T__ == 4 && defined(__LIBCCALL_IS_LIBKCALL)
-__CREDIRECT(__ATTR_NONNULL((2)),__WINT_TYPE__,__THROWING,fputc32_unlocked,(char32_t __wc, __FILE *__restrict __stream),fputwc_unlocked,(__wc,__stream))
+__CREDIRECT(__ATTR_NONNULL((2)),__WINT32_TYPE__,__THROWING,fputc32_unlocked,(char32_t __wc, __FILE *__restrict __stream),fputwc_unlocked,(__wc,__stream))
 #elif defined(__CRT_HAVE_KOS$fputwc_unlocked)
-__CREDIRECT_KOS(__ATTR_NONNULL((2)),__WINT_TYPE__,__THROWING,fputc32_unlocked,(char32_t __wc, __FILE *__restrict __stream),fputwc_unlocked,(__wc,__stream))
+__CREDIRECT_KOS(__ATTR_NONNULL((2)),__WINT32_TYPE__,__THROWING,fputc32_unlocked,(char32_t __wc, __FILE *__restrict __stream),fputwc_unlocked,(__wc,__stream))
 #elif defined(__CRT_HAVE__fputwc_nolock) && __SIZEOF_WCHAR_T__ == 4 && defined(__LIBCCALL_IS_LIBKCALL)
-__CREDIRECT(__ATTR_NONNULL((2)),__WINT_TYPE__,__THROWING,fputc32_unlocked,(char32_t __wc, __FILE *__restrict __stream),_fputwc_nolock,(__wc,__stream))
+__CREDIRECT(__ATTR_NONNULL((2)),__WINT32_TYPE__,__THROWING,fputc32_unlocked,(char32_t __wc, __FILE *__restrict __stream),_fputwc_nolock,(__wc,__stream))
 #elif defined(__CRT_HAVE_KOS$_fputwc_nolock)
-__CREDIRECT_KOS(__ATTR_NONNULL((2)),__WINT_TYPE__,__THROWING,fputc32_unlocked,(char32_t __wc, __FILE *__restrict __stream),_fputwc_nolock,(__wc,__stream))
+__CREDIRECT_KOS(__ATTR_NONNULL((2)),__WINT32_TYPE__,__THROWING,fputc32_unlocked,(char32_t __wc, __FILE *__restrict __stream),_fputwc_nolock,(__wc,__stream))
 #endif /* ... */
 #if defined(__CRT_HAVE_fgetwc_unlocked) && __SIZEOF_WCHAR_T__ == 2 && defined(__LIBCCALL_IS_LIBDCALL)
-__CREDIRECT(__ATTR_NONNULL((1)),__WINT_TYPE__,__THROWING,getc16_unlocked,(__FILE *__restrict __stream),fgetwc_unlocked,(__stream))
+__CREDIRECT(__ATTR_NONNULL((1)),__WINT16_TYPE__,__THROWING,getc16_unlocked,(__FILE *__restrict __stream),fgetwc_unlocked,(__stream))
 #elif defined(__CRT_HAVE_DOS$fgetwc_unlocked)
-__CREDIRECT_DOS(__ATTR_NONNULL((1)),__WINT_TYPE__,__THROWING,getc16_unlocked,(__FILE *__restrict __stream),fgetwc_unlocked,(__stream))
+__CREDIRECT_DOS(__ATTR_NONNULL((1)),__WINT16_TYPE__,__THROWING,getc16_unlocked,(__FILE *__restrict __stream),fgetwc_unlocked,(__stream))
 #elif defined(__CRT_HAVE__fgetwc_nolock) && __SIZEOF_WCHAR_T__ == 2 && defined(__LIBCCALL_IS_LIBDCALL)
-__CREDIRECT(__ATTR_NONNULL((1)),__WINT_TYPE__,__THROWING,getc16_unlocked,(__FILE *__restrict __stream),_fgetwc_nolock,(__stream))
+__CREDIRECT(__ATTR_NONNULL((1)),__WINT16_TYPE__,__THROWING,getc16_unlocked,(__FILE *__restrict __stream),_fgetwc_nolock,(__stream))
 #elif defined(__CRT_HAVE_DOS$_fgetwc_nolock)
-__CREDIRECT_DOS(__ATTR_NONNULL((1)),__WINT_TYPE__,__THROWING,getc16_unlocked,(__FILE *__restrict __stream),_fgetwc_nolock,(__stream))
+__CREDIRECT_DOS(__ATTR_NONNULL((1)),__WINT16_TYPE__,__THROWING,getc16_unlocked,(__FILE *__restrict __stream),_fgetwc_nolock,(__stream))
 #endif /* ... */
 #if defined(__CRT_HAVE_fgetwc_unlocked) && __SIZEOF_WCHAR_T__ == 4 && defined(__LIBCCALL_IS_LIBKCALL)
-__CREDIRECT(__ATTR_NONNULL((1)),__WINT_TYPE__,__THROWING,getc32_unlocked,(__FILE *__restrict __stream),fgetwc_unlocked,(__stream))
+__CREDIRECT(__ATTR_NONNULL((1)),__WINT32_TYPE__,__THROWING,getc32_unlocked,(__FILE *__restrict __stream),fgetwc_unlocked,(__stream))
 #elif defined(__CRT_HAVE_KOS$fgetwc_unlocked)
-__CREDIRECT_KOS(__ATTR_NONNULL((1)),__WINT_TYPE__,__THROWING,getc32_unlocked,(__FILE *__restrict __stream),fgetwc_unlocked,(__stream))
+__CREDIRECT_KOS(__ATTR_NONNULL((1)),__WINT32_TYPE__,__THROWING,getc32_unlocked,(__FILE *__restrict __stream),fgetwc_unlocked,(__stream))
 #elif defined(__CRT_HAVE__fgetwc_nolock) && __SIZEOF_WCHAR_T__ == 4 && defined(__LIBCCALL_IS_LIBKCALL)
-__CREDIRECT(__ATTR_NONNULL((1)),__WINT_TYPE__,__THROWING,getc32_unlocked,(__FILE *__restrict __stream),_fgetwc_nolock,(__stream))
+__CREDIRECT(__ATTR_NONNULL((1)),__WINT32_TYPE__,__THROWING,getc32_unlocked,(__FILE *__restrict __stream),_fgetwc_nolock,(__stream))
 #elif defined(__CRT_HAVE_KOS$_fgetwc_nolock)
-__CREDIRECT_KOS(__ATTR_NONNULL((1)),__WINT_TYPE__,__THROWING,getc32_unlocked,(__FILE *__restrict __stream),_fgetwc_nolock,(__stream))
+__CREDIRECT_KOS(__ATTR_NONNULL((1)),__WINT32_TYPE__,__THROWING,getc32_unlocked,(__FILE *__restrict __stream),_fgetwc_nolock,(__stream))
 #endif /* ... */
 #if defined(__CRT_HAVE_fputwc_unlocked) && __SIZEOF_WCHAR_T__ == 2 && defined(__LIBCCALL_IS_LIBDCALL)
-__CREDIRECT(__ATTR_NONNULL((2)),__WINT_TYPE__,__THROWING,putc16_unlocked,(char16_t __wc, __FILE *__restrict __stream),fputwc_unlocked,(__wc,__stream))
+__CREDIRECT(__ATTR_NONNULL((2)),__WINT16_TYPE__,__THROWING,putc16_unlocked,(char16_t __wc, __FILE *__restrict __stream),fputwc_unlocked,(__wc,__stream))
 #elif defined(__CRT_HAVE_DOS$fputwc_unlocked)
-__CREDIRECT_DOS(__ATTR_NONNULL((2)),__WINT_TYPE__,__THROWING,putc16_unlocked,(char16_t __wc, __FILE *__restrict __stream),fputwc_unlocked,(__wc,__stream))
+__CREDIRECT_DOS(__ATTR_NONNULL((2)),__WINT16_TYPE__,__THROWING,putc16_unlocked,(char16_t __wc, __FILE *__restrict __stream),fputwc_unlocked,(__wc,__stream))
 #elif defined(__CRT_HAVE__fputwc_nolock) && __SIZEOF_WCHAR_T__ == 2 && defined(__LIBCCALL_IS_LIBDCALL)
-__CREDIRECT(__ATTR_NONNULL((2)),__WINT_TYPE__,__THROWING,putc16_unlocked,(char16_t __wc, __FILE *__restrict __stream),_fputwc_nolock,(__wc,__stream))
+__CREDIRECT(__ATTR_NONNULL((2)),__WINT16_TYPE__,__THROWING,putc16_unlocked,(char16_t __wc, __FILE *__restrict __stream),_fputwc_nolock,(__wc,__stream))
 #elif defined(__CRT_HAVE_DOS$_fputwc_nolock)
-__CREDIRECT_DOS(__ATTR_NONNULL((2)),__WINT_TYPE__,__THROWING,putc16_unlocked,(char16_t __wc, __FILE *__restrict __stream),_fputwc_nolock,(__wc,__stream))
+__CREDIRECT_DOS(__ATTR_NONNULL((2)),__WINT16_TYPE__,__THROWING,putc16_unlocked,(char16_t __wc, __FILE *__restrict __stream),_fputwc_nolock,(__wc,__stream))
 #endif /* ... */
 #if defined(__CRT_HAVE_fputwc_unlocked) && __SIZEOF_WCHAR_T__ == 4 && defined(__LIBCCALL_IS_LIBKCALL)
-__CREDIRECT(__ATTR_NONNULL((2)),__WINT_TYPE__,__THROWING,putc32_unlocked,(char32_t __wc, __FILE *__restrict __stream),fputwc_unlocked,(__wc,__stream))
+__CREDIRECT(__ATTR_NONNULL((2)),__WINT32_TYPE__,__THROWING,putc32_unlocked,(char32_t __wc, __FILE *__restrict __stream),fputwc_unlocked,(__wc,__stream))
 #elif defined(__CRT_HAVE_KOS$fputwc_unlocked)
-__CREDIRECT_KOS(__ATTR_NONNULL((2)),__WINT_TYPE__,__THROWING,putc32_unlocked,(char32_t __wc, __FILE *__restrict __stream),fputwc_unlocked,(__wc,__stream))
+__CREDIRECT_KOS(__ATTR_NONNULL((2)),__WINT32_TYPE__,__THROWING,putc32_unlocked,(char32_t __wc, __FILE *__restrict __stream),fputwc_unlocked,(__wc,__stream))
 #elif defined(__CRT_HAVE__fputwc_nolock) && __SIZEOF_WCHAR_T__ == 4 && defined(__LIBCCALL_IS_LIBKCALL)
-__CREDIRECT(__ATTR_NONNULL((2)),__WINT_TYPE__,__THROWING,putc32_unlocked,(char32_t __wc, __FILE *__restrict __stream),_fputwc_nolock,(__wc,__stream))
+__CREDIRECT(__ATTR_NONNULL((2)),__WINT32_TYPE__,__THROWING,putc32_unlocked,(char32_t __wc, __FILE *__restrict __stream),_fputwc_nolock,(__wc,__stream))
 #elif defined(__CRT_HAVE_KOS$_fputwc_nolock)
-__CREDIRECT_KOS(__ATTR_NONNULL((2)),__WINT_TYPE__,__THROWING,putc32_unlocked,(char32_t __wc, __FILE *__restrict __stream),_fputwc_nolock,(__wc,__stream))
+__CREDIRECT_KOS(__ATTR_NONNULL((2)),__WINT32_TYPE__,__THROWING,putc32_unlocked,(char32_t __wc, __FILE *__restrict __stream),_fputwc_nolock,(__wc,__stream))
 #endif /* ... */
 #if defined(__CRT_HAVE_fgetws_unlocked) && __SIZEOF_WCHAR_T__ == 2 && defined(__LIBCCALL_IS_LIBDCALL)
 __CREDIRECT(__ATTR_NONNULL((1, 3)),char16_t *,__THROWING,fgetc16s_unlocked,(char16_t *__restrict __buf, __STDC_INT_AS_SIZE_T __bufsize, __FILE *__restrict __stream),fgetws_unlocked,(__buf,__bufsize,__stream))
@@ -967,30 +978,30 @@ __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_NONNULL((1, 2)) __SSIZE_TYPE__ (__LIBKCALL
 __NAMESPACE_LOCAL_USING_OR_IMPL(file_c32printer_unlocked, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_NONNULL((1, 2)) __SSIZE_TYPE__ (__LIBKCALL file_c32printer_unlocked)(void *__arg, char32_t const *__restrict __data, __SIZE_TYPE__ __datalen) __THROWS(...) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(file_c32printer_unlocked))(__arg, __data, __datalen); })
 #endif /* ... */
 #if defined(__CRT_HAVE_ungetwc_unlocked) && __SIZEOF_WCHAR_T__ == 2 && defined(__LIBCCALL_IS_LIBDCALL)
-__CREDIRECT(__ATTR_NONNULL((2)),__WINT_TYPE__,__NOTHROW_NCX,ungetc16_unlocked,(__WINT_TYPE__ __ch, __FILE *__restrict __stream),ungetwc_unlocked,(__ch,__stream))
+__CREDIRECT(__ATTR_NONNULL((2)),__WINT16_TYPE__,__NOTHROW_NCX,ungetc16_unlocked,(__WINT16_TYPE__ __ch, __FILE *__restrict __stream),ungetwc_unlocked,(__ch,__stream))
 #elif defined(__CRT_HAVE_DOS$ungetwc_unlocked)
-__CREDIRECT_DOS(__ATTR_NONNULL((2)),__WINT_TYPE__,__NOTHROW_NCX,ungetc16_unlocked,(__WINT_TYPE__ __ch, __FILE *__restrict __stream),ungetwc_unlocked,(__ch,__stream))
+__CREDIRECT_DOS(__ATTR_NONNULL((2)),__WINT16_TYPE__,__NOTHROW_NCX,ungetc16_unlocked,(__WINT16_TYPE__ __ch, __FILE *__restrict __stream),ungetwc_unlocked,(__ch,__stream))
 #elif defined(__CRT_HAVE__ungetwc_nolock) && __SIZEOF_WCHAR_T__ == 2 && defined(__LIBCCALL_IS_LIBDCALL)
-__CREDIRECT(__ATTR_NONNULL((2)),__WINT_TYPE__,__NOTHROW_NCX,ungetc16_unlocked,(__WINT_TYPE__ __ch, __FILE *__restrict __stream),_ungetwc_nolock,(__ch,__stream))
+__CREDIRECT(__ATTR_NONNULL((2)),__WINT16_TYPE__,__NOTHROW_NCX,ungetc16_unlocked,(__WINT16_TYPE__ __ch, __FILE *__restrict __stream),_ungetwc_nolock,(__ch,__stream))
 #elif defined(__CRT_HAVE_DOS$_ungetwc_nolock)
-__CREDIRECT_DOS(__ATTR_NONNULL((2)),__WINT_TYPE__,__NOTHROW_NCX,ungetc16_unlocked,(__WINT_TYPE__ __ch, __FILE *__restrict __stream),_ungetwc_nolock,(__ch,__stream))
+__CREDIRECT_DOS(__ATTR_NONNULL((2)),__WINT16_TYPE__,__NOTHROW_NCX,ungetc16_unlocked,(__WINT16_TYPE__ __ch, __FILE *__restrict __stream),_ungetwc_nolock,(__ch,__stream))
 #elif defined(__CRT_HAVE_ungetwc) && __SIZEOF_WCHAR_T__ == 2 && defined(__LIBCCALL_IS_LIBDCALL)
-__CREDIRECT(__ATTR_NONNULL((2)),__WINT_TYPE__,__NOTHROW_NCX,ungetc16_unlocked,(__WINT_TYPE__ __ch, __FILE *__restrict __stream),ungetwc,(__ch,__stream))
+__CREDIRECT(__ATTR_NONNULL((2)),__WINT16_TYPE__,__NOTHROW_NCX,ungetc16_unlocked,(__WINT16_TYPE__ __ch, __FILE *__restrict __stream),ungetwc,(__ch,__stream))
 #elif defined(__CRT_HAVE_DOS$ungetwc)
-__CREDIRECT_DOS(__ATTR_NONNULL((2)),__WINT_TYPE__,__NOTHROW_NCX,ungetc16_unlocked,(__WINT_TYPE__ __ch, __FILE *__restrict __stream),ungetwc,(__ch,__stream))
+__CREDIRECT_DOS(__ATTR_NONNULL((2)),__WINT16_TYPE__,__NOTHROW_NCX,ungetc16_unlocked,(__WINT16_TYPE__ __ch, __FILE *__restrict __stream),ungetwc,(__ch,__stream))
 #endif /* ... */
 #if defined(__CRT_HAVE_ungetwc_unlocked) && __SIZEOF_WCHAR_T__ == 4 && defined(__LIBCCALL_IS_LIBKCALL)
-__CREDIRECT(__ATTR_NONNULL((2)),__WINT_TYPE__,__NOTHROW_NCX,ungetc32_unlocked,(__WINT_TYPE__ __ch, __FILE *__restrict __stream),ungetwc_unlocked,(__ch,__stream))
+__CREDIRECT(__ATTR_NONNULL((2)),__WINT32_TYPE__,__NOTHROW_NCX,ungetc32_unlocked,(__WINT32_TYPE__ __ch, __FILE *__restrict __stream),ungetwc_unlocked,(__ch,__stream))
 #elif defined(__CRT_HAVE_KOS$ungetwc_unlocked)
-__CREDIRECT_KOS(__ATTR_NONNULL((2)),__WINT_TYPE__,__NOTHROW_NCX,ungetc32_unlocked,(__WINT_TYPE__ __ch, __FILE *__restrict __stream),ungetwc_unlocked,(__ch,__stream))
+__CREDIRECT_KOS(__ATTR_NONNULL((2)),__WINT32_TYPE__,__NOTHROW_NCX,ungetc32_unlocked,(__WINT32_TYPE__ __ch, __FILE *__restrict __stream),ungetwc_unlocked,(__ch,__stream))
 #elif defined(__CRT_HAVE__ungetwc_nolock) && __SIZEOF_WCHAR_T__ == 4 && defined(__LIBCCALL_IS_LIBKCALL)
-__CREDIRECT(__ATTR_NONNULL((2)),__WINT_TYPE__,__NOTHROW_NCX,ungetc32_unlocked,(__WINT_TYPE__ __ch, __FILE *__restrict __stream),_ungetwc_nolock,(__ch,__stream))
+__CREDIRECT(__ATTR_NONNULL((2)),__WINT32_TYPE__,__NOTHROW_NCX,ungetc32_unlocked,(__WINT32_TYPE__ __ch, __FILE *__restrict __stream),_ungetwc_nolock,(__ch,__stream))
 #elif defined(__CRT_HAVE_KOS$_ungetwc_nolock)
-__CREDIRECT_KOS(__ATTR_NONNULL((2)),__WINT_TYPE__,__NOTHROW_NCX,ungetc32_unlocked,(__WINT_TYPE__ __ch, __FILE *__restrict __stream),_ungetwc_nolock,(__ch,__stream))
+__CREDIRECT_KOS(__ATTR_NONNULL((2)),__WINT32_TYPE__,__NOTHROW_NCX,ungetc32_unlocked,(__WINT32_TYPE__ __ch, __FILE *__restrict __stream),_ungetwc_nolock,(__ch,__stream))
 #elif defined(__CRT_HAVE_ungetwc) && __SIZEOF_WCHAR_T__ == 4 && defined(__LIBCCALL_IS_LIBKCALL)
-__CREDIRECT(__ATTR_NONNULL((2)),__WINT_TYPE__,__NOTHROW_NCX,ungetc32_unlocked,(__WINT_TYPE__ __ch, __FILE *__restrict __stream),ungetwc,(__ch,__stream))
+__CREDIRECT(__ATTR_NONNULL((2)),__WINT32_TYPE__,__NOTHROW_NCX,ungetc32_unlocked,(__WINT32_TYPE__ __ch, __FILE *__restrict __stream),ungetwc,(__ch,__stream))
 #elif defined(__CRT_HAVE_KOS$ungetwc)
-__CREDIRECT_KOS(__ATTR_NONNULL((2)),__WINT_TYPE__,__NOTHROW_NCX,ungetc32_unlocked,(__WINT_TYPE__ __ch, __FILE *__restrict __stream),ungetwc,(__ch,__stream))
+__CREDIRECT_KOS(__ATTR_NONNULL((2)),__WINT32_TYPE__,__NOTHROW_NCX,ungetc32_unlocked,(__WINT32_TYPE__ __ch, __FILE *__restrict __stream),ungetwc,(__ch,__stream))
 #endif /* ... */
 #if defined(__CRT_HAVE_vfwprintf_unlocked) && __SIZEOF_WCHAR_T__ == 2 && defined(__LIBCCALL_IS_LIBDCALL)
 __CREDIRECT(__ATTR_LIBC_WPRINTF(2, 0) __ATTR_NONNULL((1, 2)),__STDC_INT_AS_SIZE_T,__THROWING,vfc16printf_unlocked,(__FILE *__restrict __stream, char16_t const *__restrict __format, __builtin_va_list __args),vfwprintf_unlocked,(__stream,__format,__args))

@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x2336fece */
+/* HASH CRC-32:0xb864210e */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -23,14 +23,34 @@
 #include <__crt.h>
 #include <hybrid/typecore.h>
 __NAMESPACE_LOCAL_BEGIN
+#ifndef __local___localdep___iswcsym_defined
+#define __local___localdep___iswcsym_defined 1
+#ifdef __CRT_HAVE___iswcsym
+__CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,int,__NOTHROW_NCX,__localdep___iswcsym,(__WINT_TYPE__ __wc),__iswcsym,(__wc))
+#else /* __CRT_HAVE___iswcsym */
+__NAMESPACE_LOCAL_END
+#include <libc/local/wctype/__iswcsym.h>
+__NAMESPACE_LOCAL_BEGIN
+#define __localdep___iswcsym __LIBC_LOCAL_NAME(__iswcsym)
+#endif /* !__CRT_HAVE___iswcsym */
+#endif /* !__local___localdep___iswcsym_defined */
 #ifndef __local___localdep_iswalnum_l_defined
 #define __local___localdep_iswalnum_l_defined 1
-#ifdef __CRT_HAVE_iswalnum_l
-__CREDIRECT(__ATTR_PURE __ATTR_WUNUSED,int,__NOTHROW_NCX,__localdep_iswalnum_l,(__WINT_TYPE__ __wc, __locale_t __locale),iswalnum_l,(__wc,__locale))
+__NAMESPACE_LOCAL_END
+#include <bits/crt/wctype.h>
+__NAMESPACE_LOCAL_BEGIN
+#if defined(__crt_iswalnum_l) && defined(__CRT_HAVE_iswalnum_l)
+__CEIREDIRECT(__ATTR_PURE __ATTR_WUNUSED,int,__NOTHROW_NCX,__localdep_iswalnum_l,(__WINT_TYPE__ __ch, __locale_t __locale),iswalnum_l,{ return __crt_iswalnum_l(__ch, __locale); })
+#elif defined(__crt_iswalnum_l) && defined(__CRT_HAVE___iswalnum_l)
+__CEIREDIRECT(__ATTR_PURE __ATTR_WUNUSED,int,__NOTHROW_NCX,__localdep_iswalnum_l,(__WINT_TYPE__ __ch, __locale_t __locale),__iswalnum_l,{ return __crt_iswalnum_l(__ch, __locale); })
+#elif defined(__crt_iswalnum_l)
+__LOCAL __ATTR_PURE __ATTR_WUNUSED int __NOTHROW_NCX(__LIBCCALL __localdep_iswalnum_l)(__WINT_TYPE__ __ch, __locale_t __locale) { return __crt_iswalnum_l(__ch, __locale); }
+#elif defined(__CRT_HAVE_iswalnum_l)
+__CREDIRECT(__ATTR_PURE __ATTR_WUNUSED,int,__NOTHROW_NCX,__localdep_iswalnum_l,(__WINT_TYPE__ __ch, __locale_t __locale),iswalnum_l,(__ch,__locale))
 #elif defined(__CRT_HAVE__iswalnum_l)
-__CREDIRECT(__ATTR_PURE __ATTR_WUNUSED,int,__NOTHROW_NCX,__localdep_iswalnum_l,(__WINT_TYPE__ __wc, __locale_t __locale),_iswalnum_l,(__wc,__locale))
+__CREDIRECT(__ATTR_PURE __ATTR_WUNUSED,int,__NOTHROW_NCX,__localdep_iswalnum_l,(__WINT_TYPE__ __ch, __locale_t __locale),_iswalnum_l,(__ch,__locale))
 #elif defined(__CRT_HAVE___iswalnum_l)
-__CREDIRECT(__ATTR_PURE __ATTR_WUNUSED,int,__NOTHROW_NCX,__localdep_iswalnum_l,(__WINT_TYPE__ __wc, __locale_t __locale),__iswalnum_l,(__wc,__locale))
+__CREDIRECT(__ATTR_PURE __ATTR_WUNUSED,int,__NOTHROW_NCX,__localdep_iswalnum_l,(__WINT_TYPE__ __ch, __locale_t __locale),__iswalnum_l,(__ch,__locale))
 #else /* ... */
 __NAMESPACE_LOCAL_END
 #include <libc/local/wctype/iswalnum_l.h>
@@ -40,7 +60,13 @@ __NAMESPACE_LOCAL_BEGIN
 #endif /* !__local___localdep_iswalnum_l_defined */
 __LOCAL_LIBC(_iswcsym_l) __ATTR_PURE __ATTR_WUNUSED int
 __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(_iswcsym_l))(__WINT_TYPE__ __wc, __locale_t __locale) {
+#if defined(__CRT_KOS) && defined(__CRT_HAVE___unicode_descriptor)
+	(void)__locale;
+	__COMPILER_IMPURE();
+	return __localdep___iswcsym(__wc);
+#else /* __CRT_KOS && __CRT_HAVE___unicode_descriptor */
 	return __localdep_iswalnum_l(__wc, __locale) || __wc == '_' || __wc == '$';
+#endif /* !__CRT_KOS || !__CRT_HAVE___unicode_descriptor */
 }
 __NAMESPACE_LOCAL_END
 #ifndef __local___localdep__iswcsym_l_defined

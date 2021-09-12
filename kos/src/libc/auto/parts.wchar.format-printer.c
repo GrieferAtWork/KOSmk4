@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x72e7f5ee */
+/* HASH CRC-32:0x65052198 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -904,7 +904,7 @@ INTERN ATTR_SECTION(".text.crt.dos.wchar.string.format") NONNULL((1)) ssize_t
 		if (!(flags & 0x0010)) {
 			for (i = 0; i < line_len; ++i) {
 				byte_t b = line_data[i];
-				if (!libc_iswprint(b))
+				if (!libd_iswprint(b))
 					b = '.';
 				temp = (*printer)(arg, (char16_t const *)&b, 1);
 				if unlikely(temp < 0)

@@ -3029,7 +3029,9 @@ void bzeroc([[nonnull]] void *__restrict dst,
 int strcasecmp([[nonnull]] char const *s1, [[nonnull]] char const *s2) {
 	char c1, c2;
 	do {
-		if ((c1 = *s1++) != (c2 = *s2++) && ((c1 = tolower(c1)) != (c2 = tolower(c2))))
+		if ((c1 = *s1++) != (c2 = *s2++) &&
+		    ((c1 = (char)tolower((unsigned char)c1)) !=
+		     (c2 = (char)tolower((unsigned char)c2))))
 			return (int)((unsigned char)c1 - (unsigned char)c2);
 	} while (c1);
 	return 0;
@@ -3044,7 +3046,9 @@ int strncasecmp([[nonnull]] char const *s1, [[nonnull]] char const *s2, $size_t 
 	do {
 		if (!maxlen--)
 			break;
-		if ((c1 = *s1++) != (c2 = *s2++) && ((c1 = tolower(c1)) != (c2 = tolower(c2))))
+		if ((c1 = *s1++) != (c2 = *s2++) &&
+		    ((c1 = (char)tolower((unsigned char)c1)) !=
+		     (c2 = (char)tolower((unsigned char)c2))))
 			return (int)((unsigned char)c1 - (unsigned char)c2);
 	} while (c1);
 	return 0;
@@ -5744,8 +5748,10 @@ int memcasecmp([[nonnull]] void const *s1,
 	byte_t v1, v2;
 	v1 = v2 = 0;
 	while (n_bytes-- &&
-	    (((v1 = *p1++) == (v2 = *p2++)) ||
-	     ((v1 = tolower(v1)) == (v2 = tolower(v2)))));
+	       (((v1 = *p1++) == (v2 = *p2++)) ||
+	        ((v1 = (byte_t)tolower(v1)) ==
+	         (v2 = (byte_t)tolower(v2)))))
+		;
 	return (int)v1 - (int)v2;
 }
 
@@ -5779,12 +5785,12 @@ void *memcasemem([[nonnull]] void const *haystack, $size_t haystacklen, [[nonnul
 		return NULL;
 #endif /* !__USE_MEMMEM_EMPTY_NEEDLE_NULL || __BUILDING_LIBC */
 	haystacklen -= (needlelen - 1);
-	marker       = tolower(*(byte_t *)needle);
+	marker       = (byte_t)tolower(*(byte_t *)needle);
 	hayend       = (byte_t *)haystack + haystacklen;
 	for (;;) {
 		for (candidate = (byte_t *)haystack; candidate < hayend; ++candidate) {
 			byte_t b = *candidate;
-			if (b == marker || tolower(b) == marker)
+			if (b == marker || (byte_t)tolower(b) == marker)
 				goto got_candidate;
 		}
 		break;
@@ -6046,10 +6052,10 @@ int wildstrcasecmp([[nonnull]] char const *pattern,
 				return 0; /* Pattern ends with '*' (matches everything) */
 			if (card_post == '?')
 				goto next; /* Match any --> already found */
-			card_post = tolower(card_post);
+			card_post = (char)tolower((unsigned char)card_post);
 			for (;;) {
 				char ch = *string++;
-				if (card_post == ch || card_post == tolower(ch)) {
+				if (card_post == ch || card_post == (char)tolower((unsigned char)ch)) {
 					/* Recursively check if the rest of the string and pattern match */
 					if (!wildstrcasecmp(string, pattern))
 						return 0;
@@ -6061,9 +6067,9 @@ int wildstrcasecmp([[nonnull]] char const *pattern,
 		pattern_ch = *pattern;
 		string_ch = *string;
 		if (pattern_ch == string_ch || pattern_ch == '?' ||
-		   (pattern_ch = tolower(pattern_ch),
-		    string_ch = tolower(string_ch),
-		    pattern_ch == string_ch)) {
+		    (pattern_ch = (char)tolower((unsigned char)pattern_ch),
+		     string_ch  = (char)tolower((unsigned char)string_ch),
+		     pattern_ch == string_ch)) {
 next:
 			++string;
 			++pattern;
@@ -6205,7 +6211,8 @@ $size_t fuzzy_memcasecmp([[nonnull]] void const *s1, $size_t s1_bytes,
 		for (j = 0; j < s2_bytes; j++) {
 			byte_t c1 = ((byte_t *)s1)[i];
 			byte_t c2 = ((byte_t *)s2)[j];
-			cost  = c1 != c2 && tolower(c1) != tolower(c2);
+			cost  = c1 != c2 && (tolower((unsigned char)c1) !=
+			                     tolower((unsigned char)c2));
 			cost += v0[j];
 			temp  = v1[j] + 1;
 			if (cost > temp)
@@ -6584,7 +6591,7 @@ strnrev:([[nonnull]] char *__restrict str, $size_t maxlen) -> [[== str]] char * 
 strnlwr:([[nonnull]] char *__restrict str, $size_t maxlen) -> [[== str]] char * {
 	char *iter, ch;
 	for (iter = str; maxlen-- && (ch = *iter) != '\0'; ++iter)
-		*iter = tolower(ch);
+		*iter = (char)tolower((unsigned char)ch);
 	return str;
 }
 
@@ -6593,7 +6600,7 @@ strnlwr:([[nonnull]] char *__restrict str, $size_t maxlen) -> [[== str]] char * 
 strnupr:([[nonnull]] char *__restrict str, $size_t maxlen) -> [[== str]] char * {
 	char *iter, ch;
 	for (iter = str; maxlen-- && (ch = *iter) != '\0'; ++iter)
-		*iter = toupper(ch);
+		*iter = (char)toupper((unsigned char)ch);
 	return str;
 }
 
@@ -6812,7 +6819,7 @@ int strstartcmpz([[nonnull]] char const *str,
 strlwr:([[nonnull]] char *__restrict str) -> [[== str]] char * {
 	char *iter, ch;
 	for (iter = str; (ch = *iter) != '\0'; ++iter)
-		*iter = tolower(ch);
+		*iter = (char)tolower((unsigned char)ch);
 	return str;
 }
 
@@ -6821,7 +6828,7 @@ strlwr:([[nonnull]] char *__restrict str) -> [[== str]] char * {
 strupr:([[nonnull]] char *__restrict str) -> [[== str]] char * {
 	char *iter, ch;
 	for (iter = str; (ch = *iter) != '\0'; ++iter)
-		*iter = toupper(ch);
+		*iter = (char)toupper((unsigned char)ch);
 	return str;
 }
 
@@ -7103,7 +7110,7 @@ char *_strerror(char const *message) {
 	if (strnlen(buf, buflen) >= buflen)
 		return DOS_EINVAL;
 	for (iter = buf; (ch = *iter) != '\0'; ++iter)
-		*iter = tolower(ch);
+		*iter = (char)tolower((unsigned char)ch);
 	return 0;
 }
 
@@ -7116,7 +7123,7 @@ char *_strerror(char const *message) {
 	if (strnlen(buf, buflen) >= buflen)
 		return DOS_EINVAL;
 	for (iter = buf; (ch = *iter) != '\0'; ++iter)
-		*iter = toupper(ch);
+		*iter = (char)toupper((unsigned char)ch);
 	return 0;
 }
 
@@ -7129,7 +7136,7 @@ char *_strerror(char const *message) {
 	if (strnlen(buf, buflen) >= buflen)
 		return DOS_EINVAL;
 	for (iter = buf; (ch = *iter) != '\0'; ++iter)
-		*iter = tolower_l(ch, locale);
+		*iter = (char)tolower_l((unsigned char)ch, locale);
 	return 0;
 }
 
@@ -7142,7 +7149,7 @@ char *_strerror(char const *message) {
 	if (strnlen(buf, buflen) >= buflen)
 		return DOS_EINVAL;
 	for (iter = buf; (ch = *iter) != '\0'; ++iter)
-		*iter = toupper_l(ch, locale);
+		*iter = (char)toupper_l((unsigned char)ch, locale);
 	return 0;
 }
 

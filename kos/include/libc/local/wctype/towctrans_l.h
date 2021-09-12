@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x7790b6e2 */
+/* HASH CRC-32:0xd2521590 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -21,6 +21,7 @@
 #ifndef __local_towctrans_l_defined
 #define __local_towctrans_l_defined 1
 #include <__crt.h>
+#if defined(__CRT_HAVE_towctrans) || defined(__CRT_HAVE___towctrans) || (defined(__CRT_KOS) && defined(__CRT_HAVE___unicode_descriptor))
 #include <hybrid/typecore.h>
 #include <bits/crt/wctype.h>
 __NAMESPACE_LOCAL_BEGIN
@@ -30,11 +31,13 @@ __NAMESPACE_LOCAL_BEGIN
 __CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,__WINT_TYPE__,__NOTHROW_NCX,__localdep_towctrans,(__WINT_TYPE__ __wc, __wctrans_t __desc),towctrans,(__wc,__desc))
 #elif defined(__CRT_HAVE___towctrans)
 __CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,__WINT_TYPE__,__NOTHROW_NCX,__localdep_towctrans,(__WINT_TYPE__ __wc, __wctrans_t __desc),__towctrans,(__wc,__desc))
-#else /* ... */
+#elif defined(__CRT_KOS) && defined(__CRT_HAVE___unicode_descriptor)
 __NAMESPACE_LOCAL_END
 #include <libc/local/wctype/towctrans.h>
 __NAMESPACE_LOCAL_BEGIN
 #define __localdep_towctrans __LIBC_LOCAL_NAME(towctrans)
+#else /* ... */
+#undef __local___localdep_towctrans_defined
 #endif /* !... */
 #endif /* !__local___localdep_towctrans_defined */
 __LOCAL_LIBC(towctrans_l) __ATTR_WUNUSED __WINT_TYPE__
@@ -48,4 +51,7 @@ __NAMESPACE_LOCAL_END
 #define __local___localdep_towctrans_l_defined 1
 #define __localdep_towctrans_l __LIBC_LOCAL_NAME(towctrans_l)
 #endif /* !__local___localdep_towctrans_l_defined */
+#else /* __CRT_HAVE_towctrans || __CRT_HAVE___towctrans || (__CRT_KOS && __CRT_HAVE___unicode_descriptor) */
+#undef __local_towctrans_l_defined
+#endif /* !__CRT_HAVE_towctrans && !__CRT_HAVE___towctrans && (!__CRT_KOS || !__CRT_HAVE___unicode_descriptor) */
 #endif /* !__local_towctrans_l_defined */

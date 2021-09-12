@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x5e0e3c71 */
+/* HASH CRC-32:0x6abc088e */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -23,15 +23,11 @@
 #include <__crt.h>
 #include <hybrid/typecore.h>
 __NAMESPACE_LOCAL_BEGIN
-__LOCAL_LIBC(btoc32) __ATTR_CONST __ATTR_WUNUSED __WINT_TYPE__
+__LOCAL_LIBC(btoc32) __ATTR_CONST __ATTR_WUNUSED __WINT32_TYPE__
 __NOTHROW_NCX(__LIBKCALL __LIBC_LOCAL_NAME(btoc32))(int __ch) {
 	if (__ch >= 0 && __ch <= 0x7f)
-		return (__WINT_TYPE__)__ch;
-
-	return (__CCAST(__WINT_TYPE__)0xffffffffu);
-
-
-
+		return (__WINT32_TYPE__)__ch;
+	return __WEOF32;
 }
 __NAMESPACE_LOCAL_END
 #ifndef __local___localdep_btoc32_defined

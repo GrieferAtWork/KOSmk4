@@ -75,190 +75,189 @@ __SYSDECL_BEGIN
 
 
 #ifndef __NO_XBLOCK
-#define __malloca_stack(s)                                                     \
-	__XBLOCK({                                                                 \
-		__SIZE_TYPE__ const __s = (s) + __MALLOCA_ALIGN;                       \
-		__BYTE_TYPE__ *__res = (__BYTE_TYPE__ *)__hybrid_alloca(__s);          \
-		*__res = __MALLOCA_KEY_ALLOCA;                                         \
-		__res += __MALLOCA_ALIGN;                                              \
-		__XRETURN __MALLOCA_SKEW_ALLOCA(__res, __s - __MALLOCA_ALIGN); \
+#define __malloca_stack(s)                                                   \
+	__XBLOCK({                                                               \
+		__SIZE_TYPE__ const __ma_s = (s) + __MALLOCA_ALIGN;                  \
+		__BYTE_TYPE__ *__ma_res = (__BYTE_TYPE__ *)__hybrid_alloca(__ma_s);  \
+		*__ma_res = __MALLOCA_KEY_ALLOCA;                                    \
+		__ma_res += __MALLOCA_ALIGN;                                         \
+		__XRETURN __MALLOCA_SKEW_ALLOCA(__ma_res, __ma_s - __MALLOCA_ALIGN); \
 	})
-#define __calloca_stack(s)                                            \
-	__XBLOCK({                                                        \
-		__SIZE_TYPE__ const __s = (s) + __MALLOCA_ALIGN;              \
-		__BYTE_TYPE__ *__res = (__BYTE_TYPE__ *)__hybrid_alloca(__s); \
-		*__res = __MALLOCA_KEY_ALLOCA;                                \
-		__res += __MALLOCA_ALIGN;                                     \
-		__XRETURN __libc_memset(__res, 0, __s - __MALLOCA_ALIGN);     \
+#define __calloca_stack(s)                                                  \
+	__XBLOCK({                                                              \
+		__SIZE_TYPE__ const __ca_s = (s) + __MALLOCA_ALIGN;                 \
+		__BYTE_TYPE__ *__ca_res = (__BYTE_TYPE__ *)__hybrid_alloca(__ca_s); \
+		*__ca_res = __MALLOCA_KEY_ALLOCA;                                   \
+		__ca_res += __MALLOCA_ALIGN;                                        \
+		__XRETURN __libc_memset(__ca_res, 0, __ca_s - __MALLOCA_ALIGN);     \
 	})
 #if defined(__KOS__) && defined(__KERNEL__)
 #include <kernel/malloc.h>
 #ifdef __OMIT_KMALLOC_CONSTANT_P_WRAPPERS
-#define __malloca_heap(s)                                                                   \
-	__XBLOCK({                                                                              \
-		__BYTE_TYPE__ *__res = (__BYTE_TYPE__ *)kmalloc((s) + __MALLOCA_ALIGN, GFP_NORMAL); \
-		*__res = __MALLOCA_KEY_MALLOC;                                                      \
-		__res += __MALLOCA_ALIGN;                                                           \
-		__XRETURN (void *)__res;                                                            \
+#define __malloca_heap(s)                                                                       \
+	__XBLOCK({                                                                                  \
+		__BYTE_TYPE__ *__mah_res = (__BYTE_TYPE__ *)kmalloc((s) + __MALLOCA_ALIGN, GFP_NORMAL); \
+		*__mah_res = __MALLOCA_KEY_MALLOC;                                                      \
+		__mah_res += __MALLOCA_ALIGN;                                                           \
+		__XRETURN (void *)__mah_res;                                                            \
 	})
 #undef __malloca_mayfail
-#define __malloca(s)                                                   \
-	__XBLOCK({                                                         \
-		__SIZE_TYPE__ const __s = (s) + __MALLOCA_ALIGN;               \
-		__BYTE_TYPE__ *__res;                                          \
-		if (__s > __MALLOCA_MAX) {                                     \
-			__res  = (__BYTE_TYPE__ *)kmalloc(__s, GFP_NORMAL);        \
-			*__res = __MALLOCA_KEY_MALLOC;                             \
-			__res += __MALLOCA_ALIGN;                                  \
-		} else {                                                       \
-			__res  = (__BYTE_TYPE__ *)__hybrid_alloca(__s);            \
-			*__res = __MALLOCA_KEY_ALLOCA;                             \
-			__res += __MALLOCA_ALIGN;                                  \
-			(void)__MALLOCA_SKEW_ALLOCA(__res, __s - __MALLOCA_ALIGN); \
-		}                                                              \
-		__XRETURN (void *)__res;                                       \
+#define __malloca(s)                                                         \
+	__XBLOCK({                                                               \
+		__SIZE_TYPE__ const __ma_s = (s) + __MALLOCA_ALIGN;                  \
+		__BYTE_TYPE__ *__ma_res;                                             \
+		if (__ma_s > __MALLOCA_MAX) {                                        \
+			__ma_res  = (__BYTE_TYPE__ *)kmalloc(__ma_s, GFP_NORMAL);        \
+			*__ma_res = __MALLOCA_KEY_MALLOC;                                \
+			__ma_res += __MALLOCA_ALIGN;                                     \
+		} else {                                                             \
+			__ma_res  = (__BYTE_TYPE__ *)__hybrid_alloca(__ma_s);            \
+			*__ma_res = __MALLOCA_KEY_ALLOCA;                                \
+			__ma_res += __MALLOCA_ALIGN;                                     \
+			(void)__MALLOCA_SKEW_ALLOCA(__ma_res, __ma_s - __MALLOCA_ALIGN); \
+		}                                                                    \
+		__XRETURN (void *)__ma_res;                                          \
 	})
-#define __calloca_heap(s)                                                                   \
-	__XBLOCK({                                                                              \
-		__BYTE_TYPE__ *__res = (__BYTE_TYPE__ *)kmalloc((s) + __MALLOCA_ALIGN, GFP_CALLOC); \
-		*__res = __MALLOCA_KEY_MALLOC;                                                      \
-		__res += __MALLOCA_ALIGN;                                                           \
-		__XRETURN (void *)__res;                                                            \
+#define __calloca_heap(s)                                                                       \
+	__XBLOCK({                                                                                  \
+		__BYTE_TYPE__ *__cah_res = (__BYTE_TYPE__ *)kmalloc((s) + __MALLOCA_ALIGN, GFP_CALLOC); \
+		*__cah_res = __MALLOCA_KEY_MALLOC;                                                      \
+		__cah_res += __MALLOCA_ALIGN;                                                           \
+		__XRETURN (void *)__cah_res;                                                            \
 	})
-#define __calloca(s)                                                 \
-	__XBLOCK({                                                       \
-		__SIZE_TYPE__ const __s = (s) + __MALLOCA_ALIGN;             \
-		__BYTE_TYPE__ *__res;                                        \
-		if (__s > __MALLOCA_MAX) {                                   \
-			__res  = (__BYTE_TYPE__ *)kmalloc(__s, GFP_CALLOC);      \
-			*__res = __MALLOCA_KEY_MALLOC, __res += __MALLOCA_ALIGN; \
-		} else {                                                     \
-			__res  = (__BYTE_TYPE__ *)__hybrid_alloca(__s);          \
-			*__res = __MALLOCA_KEY_ALLOCA, __res += __MALLOCA_ALIGN; \
-			__libc_memset(__res, 0, __s - __MALLOCA_ALIGN);          \
-		}                                                            \
-		__XRETURN (void *)__res;                                     \
+#define __calloca(s)                                                       \
+	__XBLOCK({                                                             \
+		__SIZE_TYPE__ const __ca_s = (s) + __MALLOCA_ALIGN;                \
+		__BYTE_TYPE__ *__ca_res;                                           \
+		if (__ca_s > __MALLOCA_MAX) {                                      \
+			__ca_res  = (__BYTE_TYPE__ *)kmalloc(__ca_s, GFP_CALLOC);      \
+			*__ca_res = __MALLOCA_KEY_MALLOC, __ca_res += __MALLOCA_ALIGN; \
+		} else {                                                           \
+			__ca_res  = (__BYTE_TYPE__ *)__hybrid_alloca(__ca_s);          \
+			*__ca_res = __MALLOCA_KEY_ALLOCA, __ca_res += __MALLOCA_ALIGN; \
+			__libc_memset(__ca_res, 0, __ca_s - __MALLOCA_ALIGN);          \
+		}                                                                  \
+		__XRETURN (void *)__ca_res;                                        \
 	})
-#define __freea(p)                                                       \
-	__XBLOCK({                                                           \
-		void *const __p = (p);                                           \
-		if (__MALLOCA_MUSTFREE(__p))                                     \
-			__os_free((void *)((__BYTE_TYPE__ *)__p - __MALLOCA_ALIGN)); \
-		(void)0;                                                         \
+#define __freea(p)                                                          \
+	__XBLOCK({                                                              \
+		void *const __fa_p = (p);                                           \
+		if (__MALLOCA_MUSTFREE(__fa_p))                                     \
+			__os_free((void *)((__BYTE_TYPE__ *)__fa_p - __MALLOCA_ALIGN)); \
+		(void)0;                                                            \
 	})
 #else /* __OMIT_KMALLOC_CONSTANT_P_WRAPPERS */
-#define __malloca_heap(s)                                                                   \
-	__XBLOCK({                                                                              \
-		__BYTE_TYPE__ *__res = (__BYTE_TYPE__ *)kmalloc((s) + __MALLOCA_ALIGN, GFP_NORMAL); \
-		*__res = __MALLOCA_KEY_MALLOC;                                                      \
-		__res += __MALLOCA_ALIGN;                                                           \
-		__XRETURN (void *)__res;                                                            \
+#define __malloca_heap(s)                                                                       \
+	__XBLOCK({                                                                                  \
+		__BYTE_TYPE__ *__mah_res = (__BYTE_TYPE__ *)kmalloc((s) + __MALLOCA_ALIGN, GFP_NORMAL); \
+		*__mah_res = __MALLOCA_KEY_MALLOC;                                                      \
+		__mah_res += __MALLOCA_ALIGN;                                                           \
+		__XRETURN (void *)__mah_res;                                                            \
 	})
 #undef __malloca_mayfail
-#define __malloca(s)                                                   \
-	__XBLOCK({                                                         \
-		__SIZE_TYPE__ const __s = (s) + __MALLOCA_ALIGN;               \
-		__BYTE_TYPE__ *__res;                                          \
-		if (__s > __MALLOCA_MAX) {                                     \
-			__res  = (__BYTE_TYPE__ *)kmalloc(__s, GFP_NORMAL);        \
-			*__res = __MALLOCA_KEY_MALLOC, __res += __MALLOCA_ALIGN;   \
-		} else {                                                       \
-			__res  = (__BYTE_TYPE__ *)__hybrid_alloca(__s);            \
-			*__res = __MALLOCA_KEY_ALLOCA, __res += __MALLOCA_ALIGN;   \
-			(void)__MALLOCA_SKEW_ALLOCA(__res, __s - __MALLOCA_ALIGN); \
-		}                                                              \
-		__XRETURN (void *)__res;                                       \
+#define __malloca(s)                                                         \
+	__XBLOCK({                                                               \
+		__SIZE_TYPE__ const __ma_s = (s) + __MALLOCA_ALIGN;                  \
+		__BYTE_TYPE__ *__ma_res;                                             \
+		if (__ma_s > __MALLOCA_MAX) {                                        \
+			__ma_res  = (__BYTE_TYPE__ *)kmalloc(__ma_s, GFP_NORMAL);        \
+			*__ma_res = __MALLOCA_KEY_MALLOC, __ma_res += __MALLOCA_ALIGN;   \
+		} else {                                                             \
+			__ma_res  = (__BYTE_TYPE__ *)__hybrid_alloca(__ma_s);            \
+			*__ma_res = __MALLOCA_KEY_ALLOCA, __ma_res += __MALLOCA_ALIGN;   \
+			(void)__MALLOCA_SKEW_ALLOCA(__ma_res, __ma_s - __MALLOCA_ALIGN); \
+		}                                                                    \
+		__XRETURN (void *)__ma_res;                                          \
 	})
-#define __calloca_heap(s)                                                                   \
-	__XBLOCK({                                                                              \
-		__BYTE_TYPE__ *__res = (__BYTE_TYPE__ *)kmalloc((s) + __MALLOCA_ALIGN, GFP_CALLOC); \
-		*__res = __MALLOCA_KEY_MALLOC;                                                      \
-		__res += __MALLOCA_ALIGN;                                                           \
-		__XRETURN (void *)__res;                                                            \
+#define __calloca_heap(s)                                                                       \
+	__XBLOCK({                                                                                  \
+		__BYTE_TYPE__ *__cah_res = (__BYTE_TYPE__ *)kmalloc((s) + __MALLOCA_ALIGN, GFP_CALLOC); \
+		*__cah_res = __MALLOCA_KEY_MALLOC;                                                      \
+		__cah_res += __MALLOCA_ALIGN;                                                           \
+		__XRETURN (void *)__cah_res;                                                            \
 	})
-#define __calloca(s)                                                 \
-	__XBLOCK({                                                       \
-		__SIZE_TYPE__ const __s = (s) + __MALLOCA_ALIGN;             \
-		__BYTE_TYPE__ *__res;                                        \
-		if (__s > __MALLOCA_MAX) {                                   \
-			__res  = (__BYTE_TYPE__ *)kmalloc(__s, GFP_CALLOC);      \
-			*__res = __MALLOCA_KEY_MALLOC, __res += __MALLOCA_ALIGN; \
-		} else {                                                     \
-			__res  = (__BYTE_TYPE__ *)__hybrid_alloca(__s);          \
-			*__res = __MALLOCA_KEY_ALLOCA, __res += __MALLOCA_ALIGN; \
-			__libc_memset(__res, 0, __s - __MALLOCA_ALIGN);          \
-		}                                                            \
-		__XRETURN (void *)__res;                                     \
+#define __calloca(s)                                                       \
+	__XBLOCK({                                                             \
+		__SIZE_TYPE__ const __ca_s = (s) + __MALLOCA_ALIGN;                \
+		__BYTE_TYPE__ *__ca_res;                                           \
+		if (__ca_s > __MALLOCA_MAX) {                                      \
+			__ca_res  = (__BYTE_TYPE__ *)kmalloc(__ca_s, GFP_CALLOC);      \
+			*__ca_res = __MALLOCA_KEY_MALLOC, __ca_res += __MALLOCA_ALIGN; \
+		} else {                                                           \
+			__ca_res  = (__BYTE_TYPE__ *)__hybrid_alloca(__ca_s);          \
+			*__ca_res = __MALLOCA_KEY_ALLOCA, __ca_res += __MALLOCA_ALIGN; \
+			__libc_memset(__ca_res, 0, __ca_s - __MALLOCA_ALIGN);          \
+		}                                                                  \
+		__XRETURN (void *)__ca_res;                                        \
 	})
-#define __freea(p)                                                   \
-	__XBLOCK({                                                       \
-		void *const __p = (p);                                       \
-		if (__MALLOCA_MUSTFREE(__p))                                 \
-			kfree((void *)((__BYTE_TYPE__ *)__p - __MALLOCA_ALIGN)); \
-		(void)0;                                                     \
+#define __freea(p)                                                      \
+	__XBLOCK({                                                          \
+		void *const __fa_p = (p);                                       \
+		if (__MALLOCA_MUSTFREE(__fa_p))                                 \
+			kfree((void *)((__BYTE_TYPE__ *)__fa_p - __MALLOCA_ALIGN)); \
+		(void)0;                                                        \
 	})
 #endif /* !__OMIT_KMALLOC_CONSTANT_P_WRAPPERS */
 #else /* __KOS__ && __KERNEL__ */
-#define __malloca_heap(s)                                                             \
-	__XBLOCK({                                                                        \
-		__BYTE_TYPE__ *__res = (__BYTE_TYPE__ *)__libc_malloc((s) + __MALLOCA_ALIGN); \
-		if __likely(__res)                                                            \
-			*__res = __MALLOCA_KEY_MALLOC, __res += __MALLOCA_ALIGN;                  \
-		__XRETURN (void *)__res;                                                      \
+#define __malloca_heap(s)                                                                 \
+	__XBLOCK({                                                                            \
+		__BYTE_TYPE__ *__mah_res = (__BYTE_TYPE__ *)__libc_malloc((s) + __MALLOCA_ALIGN); \
+		if __likely(__mah_res)                                                            \
+			*__mah_res = __MALLOCA_KEY_MALLOC, __mah_res += __MALLOCA_ALIGN;              \
+		__XRETURN (void *)__mah_res;                                                      \
 	})
 #define __malloca_mayfail 1
-#define __malloca(s)                                                   \
-	__XBLOCK({                                                         \
-		__SIZE_TYPE__ const __s = (s) + __MALLOCA_ALIGN;               \
-		__BYTE_TYPE__ *__res;                                          \
-		if (__s > __MALLOCA_MAX) {                                     \
-			__res = (__BYTE_TYPE__ *)__libc_malloc(__s);               \
-			if __likely(__res) {                                       \
-				*__res = __MALLOCA_KEY_MALLOC;                         \
-				__res += __MALLOCA_ALIGN;                              \
-			}                                                          \
-		} else {                                                       \
-			__res  = (__BYTE_TYPE__ *)__hybrid_alloca(__s);            \
-			*__res = __MALLOCA_KEY_ALLOCA;                             \
-			__res += __MALLOCA_ALIGN;                                  \
-			(void)__MALLOCA_SKEW_ALLOCA(__res, __s - __MALLOCA_ALIGN); \
-		}                                                              \
-		__XRETURN (void *)__res;                                       \
+#define __malloca(s)                                                         \
+	__XBLOCK({                                                               \
+		__SIZE_TYPE__ const __ma_s = (s) + __MALLOCA_ALIGN;                  \
+		__BYTE_TYPE__ *__ma_res;                                             \
+		if (__ma_s > __MALLOCA_MAX) {                                        \
+			__ma_res = (__BYTE_TYPE__ *)__libc_malloc(__ma_s);               \
+			if __likely(__ma_res) {                                          \
+				*__ma_res = __MALLOCA_KEY_MALLOC;                            \
+				__ma_res += __MALLOCA_ALIGN;                                 \
+			}                                                                \
+		} else {                                                             \
+			__ma_res  = (__BYTE_TYPE__ *)__hybrid_alloca(__ma_s);            \
+			*__ma_res = __MALLOCA_KEY_ALLOCA;                                \
+			__ma_res += __MALLOCA_ALIGN;                                     \
+			(void)__MALLOCA_SKEW_ALLOCA(__ma_res, __ma_s - __MALLOCA_ALIGN); \
+		}                                                                    \
+		__XRETURN (void *)__ma_res;                                          \
 	})
-#define __calloca_heap(s)                                                 \
-	__XBLOCK({                                                            \
-		__SIZE_TYPE__ const __s = (s) + __MALLOCA_ALIGN;                  \
-		__BYTE_TYPE__ *__res    = (__BYTE_TYPE__ *)__libc_calloc(1, __s); \
-		if __likely(__res) {                                              \
-			*__res = __MALLOCA_KEY_MALLOC;                                \
-			__res += __MALLOCA_ALIGN;                                     \
-		}                                                                 \
-		__XRETURN (void *)__res;                                          \
+#define __calloca_heap(s)                                                                    \
+	__XBLOCK({                                                                               \
+		__BYTE_TYPE__ *__cah_res = (__BYTE_TYPE__ *)__libc_calloc(1, (s) + __MALLOCA_ALIGN); \
+		if __likely(__cah_res) {                                                             \
+			*__cah_res = __MALLOCA_KEY_MALLOC;                                               \
+			__cah_res += __MALLOCA_ALIGN;                                                    \
+		}                                                                                    \
+		__XRETURN (void *)__cah_res;                                                         \
 	})
-#define __calloca(s)                                        \
-	__XBLOCK({                                              \
-		__SIZE_TYPE__ const __s = (s) + __MALLOCA_ALIGN;    \
-		__BYTE_TYPE__ *__res;                               \
-		if (__s > __MALLOCA_MAX) {                          \
-			__res = (__BYTE_TYPE__ *)__libc_calloc(1, __s); \
-			if __likely(__res) {                            \
-				*__res = __MALLOCA_KEY_MALLOC;              \
-				__res += __MALLOCA_ALIGN;                   \
-			}                                               \
-		} else {                                            \
-			__res  = (__BYTE_TYPE__ *)__hybrid_alloca(__s); \
-			*__res = __MALLOCA_KEY_ALLOCA;                  \
-			__res += __MALLOCA_ALIGN;                       \
-			__libc_memset(__res, 0, __s - __MALLOCA_ALIGN); \
-		}                                                   \
-		__XRETURN (void *)__res;                            \
+#define __calloca(s)                                              \
+	__XBLOCK({                                                    \
+		__SIZE_TYPE__ const __ca_s = (s) + __MALLOCA_ALIGN;       \
+		__BYTE_TYPE__ *__ca_res;                                  \
+		if (__ca_s > __MALLOCA_MAX) {                             \
+			__ca_res = (__BYTE_TYPE__ *)__libc_calloc(1, __ca_s); \
+			if __likely(__ca_res) {                               \
+				*__ca_res = __MALLOCA_KEY_MALLOC;                 \
+				__ca_res += __MALLOCA_ALIGN;                      \
+			}                                                     \
+		} else {                                                  \
+			__ca_res  = (__BYTE_TYPE__ *)__hybrid_alloca(__ca_s); \
+			*__ca_res = __MALLOCA_KEY_ALLOCA;                     \
+			__ca_res += __MALLOCA_ALIGN;                          \
+			__libc_memset(__ca_res, 0, __ca_s - __MALLOCA_ALIGN); \
+		}                                                         \
+		__XRETURN (void *)__ca_res;                               \
 	})
-#define __freea(p)                                                         \
-	__XBLOCK({                                                             \
-		void *const __p = (p);                                             \
-		if (__MALLOCA_MUSTFREE(__p))                                       \
-			__libc_free((void *)((__BYTE_TYPE__ *)__p - __MALLOCA_ALIGN)); \
-		(void)0;                                                           \
+#define __freea(p)                                                            \
+	__XBLOCK({                                                                \
+		void *const __fa_p = (p);                                             \
+		if (__MALLOCA_MUSTFREE(__fa_p))                                       \
+			__libc_free((void *)((__BYTE_TYPE__ *)__fa_p - __MALLOCA_ALIGN)); \
+		(void)0;                                                              \
 	})
 #endif /* !__KOS__ || !__KERNEL__ */
 #else /* !__NO_XBLOCK */
@@ -361,98 +360,98 @@ __NAMESPACE_INT_END
 #endif /* __NO_XBLOCK */
 #if defined(__KOS__) && defined(__KERNEL__)
 #ifdef __OMIT_KMALLOC_CONSTANT_P_WRAPPERS
-#define __malloca_tryhard(result, s)                                                                          \
-	do {                                                                                                      \
-		__SIZE_TYPE__ const __s = (s) + __MALLOCA_ALIGN;                                                      \
-		__BYTE_TYPE__ *__res;                                                                                 \
-		if (__s > __MALLOCA_MAX && (__res = (__BYTE_TYPE__ *)__os_malloc_nx(__s, GFP_NORMAL)) != __NULLPTR) { \
-			*__res = __MALLOCA_KEY_MALLOC;                                                                    \
-			__res += __MALLOCA_ALIGN;                                                                         \
-		} else {                                                                                              \
-			__res  = (__BYTE_TYPE__ *)__hybrid_alloca(__s);                                                   \
-			*__res = __MALLOCA_KEY_ALLOCA;                                                                    \
-			__res += __MALLOCA_ALIGN;                                                                         \
-			(void)__MALLOCA_SKEW_ALLOCA(__res, __s - __MALLOCA_ALIGN);                                        \
-		}                                                                                                     \
-		*(void **)&(result) = __res;                                                                          \
+#define __malloca_tryhard(result, s)                                                                                         \
+	do {                                                                                                                     \
+		__SIZE_TYPE__ const __math_s = (s) + __MALLOCA_ALIGN;                                                                \
+		__BYTE_TYPE__ *__math_res;                                                                                           \
+		if (__math_s > __MALLOCA_MAX && (__math_res = (__BYTE_TYPE__ *)__os_malloc_nx(__math_s, GFP_NORMAL)) != __NULLPTR) { \
+			*__math_res = __MALLOCA_KEY_MALLOC;                                                                              \
+			__math_res += __MALLOCA_ALIGN;                                                                                   \
+		} else {                                                                                                             \
+			__math_res  = (__BYTE_TYPE__ *)__hybrid_alloca(__math_s);                                                        \
+			*__math_res = __MALLOCA_KEY_ALLOCA;                                                                              \
+			__math_res += __MALLOCA_ALIGN;                                                                                   \
+			(void)__MALLOCA_SKEW_ALLOCA(__math_res, __math_s - __MALLOCA_ALIGN);                                             \
+		}                                                                                                                    \
+		*(void **)&(result) = __math_res;                                                                                    \
 	} __WHILE0
-#define __calloca_tryhard(result, s)                                                                     \
-	do {                                                                                                 \
-		__SIZE_TYPE__ const __s = (s) + __MALLOCA_ALIGN;                                                 \
-		__BYTE_TYPE__ *__res;                                                                            \
-		if (__s > __MALLOCA_MAX && (__res = (__BYTE_TYPE__ *)__os_malloc_nx(GFP_CALLOC)) != __NULLPTR) { \
-			*__res = __MALLOCA_KEY_MALLOC;                                                               \
-			__res += __MALLOCA_ALIGN;                                                                    \
-		} else {                                                                                         \
-			__res  = (__BYTE_TYPE__ *)__hybrid_alloca(__s);                                              \
-			*__res = __MALLOCA_KEY_ALLOCA;                                                               \
-			__res += __MALLOCA_ALIGN;                                                                    \
-			__libc_memset(__res, 0, __s - __MALLOCA_ALIGN);                                              \
-		}                                                                                                \
-		*(void **)&(result) = __res;                                                                     \
+#define __calloca_tryhard(result, s)                                                                               \
+	do {                                                                                                           \
+		__SIZE_TYPE__ const __cath_s = (s) + __MALLOCA_ALIGN;                                                      \
+		__BYTE_TYPE__ *__cath_res;                                                                                 \
+		if (__cath_s > __MALLOCA_MAX && (__cath_res = (__BYTE_TYPE__ *)__os_malloc_nx(GFP_CALLOC)) != __NULLPTR) { \
+			*__cath_res = __MALLOCA_KEY_MALLOC;                                                                    \
+			__cath_res += __MALLOCA_ALIGN;                                                                         \
+		} else {                                                                                                   \
+			__cath_res  = (__BYTE_TYPE__ *)__hybrid_alloca(__cath_s);                                              \
+			*__cath_res = __MALLOCA_KEY_ALLOCA;                                                                    \
+			__cath_res += __MALLOCA_ALIGN;                                                                         \
+			__libc_memset(__cath_res, 0, __cath_s - __MALLOCA_ALIGN);                                              \
+		}                                                                                                          \
+		*(void **)&(result) = __cath_res;                                                                          \
 	} __WHILE0
 #else /* __OMIT_KMALLOC_CONSTANT_P_WRAPPERS */
-#define __malloca_tryhard(result, s)                                                                      \
-	do {                                                                                                  \
-		__SIZE_TYPE__ const __s = (s) + __MALLOCA_ALIGN;                                                  \
-		__BYTE_TYPE__ *__res;                                                                             \
-		if (__s > __MALLOCA_MAX && (__res = (__BYTE_TYPE__ *)kmalloc_nx(__s, GFP_NORMAL)) != __NULLPTR) { \
-			*__res = __MALLOCA_KEY_MALLOC;                                                                \
-			__res += __MALLOCA_ALIGN;                                                                     \
-		} else {                                                                                          \
-			__res  = (__BYTE_TYPE__ *)__hybrid_alloca(__s);                                               \
-			*__res = __MALLOCA_KEY_ALLOCA;                                                                \
-			__res += __MALLOCA_ALIGN;                                                                     \
-			(void)__MALLOCA_SKEW_ALLOCA(__res, __s - __MALLOCA_ALIGN);                                    \
-		}                                                                                                 \
-		*(void **)&(result) = __res;                                                                      \
+#define __malloca_tryhard(result, s)                                                                                     \
+	do {                                                                                                                 \
+		__SIZE_TYPE__ const __math_s = (s) + __MALLOCA_ALIGN;                                                            \
+		__BYTE_TYPE__ *__math_res;                                                                                       \
+		if (__math_s > __MALLOCA_MAX && (__math_res = (__BYTE_TYPE__ *)kmalloc_nx(__math_s, GFP_NORMAL)) != __NULLPTR) { \
+			*__math_res = __MALLOCA_KEY_MALLOC;                                                                          \
+			__math_res += __MALLOCA_ALIGN;                                                                               \
+		} else {                                                                                                         \
+			__math_res  = (__BYTE_TYPE__ *)__hybrid_alloca(__math_s);                                                    \
+			*__math_res = __MALLOCA_KEY_ALLOCA;                                                                          \
+			__math_res += __MALLOCA_ALIGN;                                                                               \
+			(void)__MALLOCA_SKEW_ALLOCA(__math_res, __math_s - __MALLOCA_ALIGN);                                         \
+		}                                                                                                                \
+		*(void **)&(result) = __math_res;                                                                                \
 	} __WHILE0
-#define __calloca_tryhard(result, s)                                                                 \
-	do {                                                                                             \
-		__SIZE_TYPE__ const __s = (s) + __MALLOCA_ALIGN;                                             \
-		__BYTE_TYPE__ *__res;                                                                        \
-		if (__s > __MALLOCA_MAX && (__res = (__BYTE_TYPE__ *)kmalloc_nx(GFP_CALLOC)) != __NULLPTR) { \
-			*__res = __MALLOCA_KEY_MALLOC;                                                           \
-			__res += __MALLOCA_ALIGN;                                                                \
-		} else {                                                                                     \
-			__res  = (__BYTE_TYPE__ *)__hybrid_alloca(__s);                                          \
-			*__res = __MALLOCA_KEY_ALLOCA;                                                           \
-			__res += __MALLOCA_ALIGN;                                                                \
-			__libc_memset(__res, 0, __s - __MALLOCA_ALIGN);                                          \
-		}                                                                                            \
-		*(void **)&(result) = __res;                                                                 \
+#define __calloca_tryhard(result, s)                                                                           \
+	do {                                                                                                       \
+		__SIZE_TYPE__ const __cath_s = (s) + __MALLOCA_ALIGN;                                                  \
+		__BYTE_TYPE__ *__cath_res;                                                                             \
+		if (__cath_s > __MALLOCA_MAX && (__cath_res = (__BYTE_TYPE__ *)kmalloc_nx(GFP_CALLOC)) != __NULLPTR) { \
+			*__cath_res = __MALLOCA_KEY_MALLOC;                                                                \
+			__cath_res += __MALLOCA_ALIGN;                                                                     \
+		} else {                                                                                               \
+			__cath_res  = (__BYTE_TYPE__ *)__hybrid_alloca(__cath_s);                                          \
+			*__cath_res = __MALLOCA_KEY_ALLOCA;                                                                \
+			__cath_res += __MALLOCA_ALIGN;                                                                     \
+			__libc_memset(__cath_res, 0, __cath_s - __MALLOCA_ALIGN);                                          \
+		}                                                                                                      \
+		*(void **)&(result) = __cath_res;                                                                      \
 	} __WHILE0
 #endif /* !__OMIT_KMALLOC_CONSTANT_P_WRAPPERS */
 #else  /* __KOS__ && __KERNEL__ */
-#define __malloca_tryhard(result, s)                                                             \
-	do {                                                                                         \
-		__SIZE_TYPE__ const __s = (s) + __MALLOCA_ALIGN;                                         \
-		__BYTE_TYPE__ *__res;                                                                    \
-		if (__s > __MALLOCA_MAX && (__res = (__BYTE_TYPE__ *)__libc_malloc(__s)) != __NULLPTR) { \
-			*__res = __MALLOCA_KEY_MALLOC;                                                       \
-			__res += __MALLOCA_ALIGN;                                                            \
-		} else {                                                                                 \
-			__res  = (__BYTE_TYPE__ *)__hybrid_alloca(__s);                                      \
-			*__res = __MALLOCA_KEY_ALLOCA;                                                       \
-			__res += __MALLOCA_ALIGN;                                                            \
-			(void)__MALLOCA_SKEW_ALLOCA(__res, __s - __MALLOCA_ALIGN);                           \
-		}                                                                                        \
-		*(void **)&(result) = __res;                                                             \
+#define __malloca_tryhard(result, s)                                                                            \
+	do {                                                                                                        \
+		__SIZE_TYPE__ const __math_s = (s) + __MALLOCA_ALIGN;                                                   \
+		__BYTE_TYPE__ *__math_res;                                                                              \
+		if (__math_s > __MALLOCA_MAX && (__math_res = (__BYTE_TYPE__ *)__libc_malloc(__math_s)) != __NULLPTR) { \
+			*__math_res = __MALLOCA_KEY_MALLOC;                                                                 \
+			__math_res += __MALLOCA_ALIGN;                                                                      \
+		} else {                                                                                                \
+			__math_res  = (__BYTE_TYPE__ *)__hybrid_alloca(__math_s);                                           \
+			*__math_res = __MALLOCA_KEY_ALLOCA;                                                                 \
+			__math_res += __MALLOCA_ALIGN;                                                                      \
+			(void)__MALLOCA_SKEW_ALLOCA(__math_res, __math_s - __MALLOCA_ALIGN);                                \
+		}                                                                                                       \
+		*(void **)&(result) = __math_res;                                                                       \
 	} __WHILE0
-#define __calloca_tryhard(result, s)                                                                \
-	do {                                                                                            \
-		__SIZE_TYPE__ const __s = (s) + __MALLOCA_ALIGN;                                            \
-		__BYTE_TYPE__ *__res;                                                                       \
-		if (__s > __MALLOCA_MAX && (__res = (__BYTE_TYPE__ *)__libc_calloc(1, __s)) != __NULLPTR) { \
-			*__res = __MALLOCA_KEY_MALLOC;                                                          \
-			__res += __MALLOCA_ALIGN;                                                               \
-		} else {                                                                                    \
-			__res  = (__BYTE_TYPE__ *)__hybrid_alloca(__s);                                         \
-			*__res = __MALLOCA_KEY_ALLOCA;                                                          \
-			__res += __MALLOCA_ALIGN;                                                               \
-			__libc_memset(__res, 0, __s - __MALLOCA_ALIGN);                                         \
-		}                                                                                           \
-		*(void **)&(result) = __res;                                                                \
+#define __calloca_tryhard(result, s)                                                                               \
+	do {                                                                                                           \
+		__SIZE_TYPE__ const __cath_s = (s) + __MALLOCA_ALIGN;                                                      \
+		__BYTE_TYPE__ *__cath_res;                                                                                 \
+		if (__cath_s > __MALLOCA_MAX && (__cath_res = (__BYTE_TYPE__ *)__libc_calloc(1, __cath_s)) != __NULLPTR) { \
+			*__cath_res = __MALLOCA_KEY_MALLOC;                                                                    \
+			__cath_res += __MALLOCA_ALIGN;                                                                         \
+		} else {                                                                                                   \
+			__cath_res  = (__BYTE_TYPE__ *)__hybrid_alloca(__cath_s);                                              \
+			*__cath_res = __MALLOCA_KEY_ALLOCA;                                                                    \
+			__cath_res += __MALLOCA_ALIGN;                                                                         \
+			__libc_memset(__cath_res, 0, __cath_s - __MALLOCA_ALIGN);                                              \
+		}                                                                                                          \
+		*(void **)&(result) = __cath_res;                                                                          \
 	} __WHILE0
 #endif /* !__KOS__ || !__KERNEL__ */
 #elif defined(__hybrid_alloca)

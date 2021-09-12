@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x423f6e81 */
+/* HASH CRC-32:0x79762f70 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -23,29 +23,38 @@
 #include <__crt.h>
 #include <hybrid/typecore.h>
 __NAMESPACE_LOCAL_BEGIN
-#ifndef __local___localdep_tolower_defined
-#define __local___localdep_tolower_defined 1
+#ifndef __local___localdep_btowc_defined
+#define __local___localdep_btowc_defined 1
+#ifdef __CRT_HAVE_btowc
+__CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,__WINT_TYPE__,__NOTHROW_NCX,__localdep_btowc,(int __ch),btowc,(__ch))
+#else /* __CRT_HAVE_btowc */
 __NAMESPACE_LOCAL_END
-#include <bits/crt/ctype.h>
+#include <libc/local/wchar/btowc.h>
 __NAMESPACE_LOCAL_BEGIN
-#if defined(__crt_tolower) && defined(__CRT_HAVE_tolower)
-__CEIREDIRECT(__ATTR_CONST __ATTR_WUNUSED,int,__NOTHROW,__localdep_tolower,(int __ch),tolower,{ return __crt_tolower(__ch); })
-#elif defined(__crt_tolower)
-__LOCAL __ATTR_CONST __ATTR_WUNUSED int __NOTHROW(__LIBCCALL __localdep_tolower)(int __ch) { return __crt_tolower(__ch); }
-#elif __has_builtin(__builtin_tolower) && defined(__LIBC_BIND_CRTBUILTINS) && defined(__CRT_HAVE_tolower)
-__CEIREDIRECT(__ATTR_CONST __ATTR_WUNUSED,int,__NOTHROW,__localdep_tolower,(int __ch),tolower,{ return __builtin_tolower(__ch); })
-#elif defined(__CRT_HAVE_tolower)
-__CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,int,__NOTHROW,__localdep_tolower,(int __ch),tolower,(__ch))
-#else /* ... */
+#define __localdep_btowc __LIBC_LOCAL_NAME(btowc)
+#endif /* !__CRT_HAVE_btowc */
+#endif /* !__local___localdep_btowc_defined */
+#ifndef __local___localdep_wctob_defined
+#define __local___localdep_wctob_defined 1
+#ifdef __CRT_HAVE_wctob
+__CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,int,__NOTHROW_NCX,__localdep_wctob,(__WINT_TYPE__ __ch),wctob,(__ch))
+#else /* __CRT_HAVE_wctob */
 __NAMESPACE_LOCAL_END
-#include <libc/local/ctype/tolower.h>
+#include <libc/local/wchar/wctob.h>
 __NAMESPACE_LOCAL_BEGIN
-#define __localdep_tolower __LIBC_LOCAL_NAME(tolower)
-#endif /* !... */
-#endif /* !__local___localdep_tolower_defined */
+#define __localdep_wctob __LIBC_LOCAL_NAME(wctob)
+#endif /* !__CRT_HAVE_wctob */
+#endif /* !__local___localdep_wctob_defined */
+__NAMESPACE_LOCAL_END
+#include <bits/crt/wctype.h>
+__NAMESPACE_LOCAL_BEGIN
 __LOCAL_LIBC(towlower) __ATTR_CONST __ATTR_WUNUSED __WINT_TYPE__
 __NOTHROW(__LIBCCALL __LIBC_LOCAL_NAME(towlower))(__WINT_TYPE__ __wc) {
-	return (__WINT_TYPE__)__localdep_tolower((int)__wc);
+#ifdef __crt_towlower
+	return __crt_towlower(__wc);
+#else /* __crt_towlower */
+	return __localdep_btowc(__LIBC_LOCAL_NAME(towlower)(__localdep_wctob(__wc)));
+#endif /* !__crt_towlower */
 }
 __NAMESPACE_LOCAL_END
 #ifndef __local___localdep_towlower_defined

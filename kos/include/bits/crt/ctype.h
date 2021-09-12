@@ -29,12 +29,19 @@
 
 #ifdef __CC__
 
-#if defined(__CRT_KOS_KERNEL) && defined(__CRT_HAVE___ctype_flags)
+#if defined(__CRT_KOS) && defined(__CRT_HAVE___ctype_flags)
 
 /************************************************************************/
-/* KOS (Kernel)                                                         */
+/* KOS                                                                  */
 
-/* Kernel CTYPE flags are defined as follows:
+/* Because KOS uses UTF-8 through, functions from <ctype.h> must
+ * operate on only those characters which can be represented in
+ * single-byte mode (iow: ASCII)
+ *
+ * To improve performance, we make use of a lookup table define
+ * flags and implement the tolower/toupper functions.
+ *
+ * CTYPE flags are defined as follows:
  *     0x01: iscntrl   00-1F, 7F
  *     0x02: isspace   09-0D, 20
  *     0x04: islower   61-7A
@@ -48,21 +55,21 @@
 __DECL_BEGIN __LIBC __UINT8_TYPE__ const __ctype_flags[256] __CASMNAME_SAME("__ctype_flags"); __DECL_END
 #endif /* !____ctype_flags_defined */
 
-#define __crt_iscntrl(ch)  ((__ctype_flags[(__UINT8_TYPE__)(ch)] & 0x01) != 0)
-#define __crt_isspace(ch)  ((__ctype_flags[(__UINT8_TYPE__)(ch)] & 0x02) != 0)
-#define __crt_islower(ch)  ((__ctype_flags[(__UINT8_TYPE__)(ch)] & 0x04) != 0)
-#define __crt_isupper(ch)  ((__ctype_flags[(__UINT8_TYPE__)(ch)] & 0x08) != 0)
-#define __crt_isalpha(ch)  ((__ctype_flags[(__UINT8_TYPE__)(ch)] & 0x0c) != 0)
-#define __crt_isdigit(ch)  ((__ctype_flags[(__UINT8_TYPE__)(ch)] & 0x10) != 0)
-#define __crt_isxdigit(ch) ((__ctype_flags[(__UINT8_TYPE__)(ch)] & 0x30) != 0)
-#define __crt_isalnum(ch)  ((__ctype_flags[(__UINT8_TYPE__)(ch)] & 0x1c) != 0)
-#define __crt_ispunct(ch)  ((__ctype_flags[(__UINT8_TYPE__)(ch)] & 0x40) != 0)
-#define __crt_isgraph(ch)  ((__ctype_flags[(__UINT8_TYPE__)(ch)] & 0x5c) != 0)
-#define __crt_isprint(ch)  ((__ctype_flags[(__UINT8_TYPE__)(ch)] & 0xdc) != 0)
+#define __crt_iscntrl(ch)  (__ctype_flags[(__UINT8_TYPE__)(ch)] & 0x01)
+#define __crt_isspace(ch)  (__ctype_flags[(__UINT8_TYPE__)(ch)] & 0x02)
+#define __crt_islower(ch)  (__ctype_flags[(__UINT8_TYPE__)(ch)] & 0x04)
+#define __crt_isupper(ch)  (__ctype_flags[(__UINT8_TYPE__)(ch)] & 0x08)
+#define __crt_isalpha(ch)  (__ctype_flags[(__UINT8_TYPE__)(ch)] & 0x0c)
+#define __crt_isdigit(ch)  (__ctype_flags[(__UINT8_TYPE__)(ch)] & 0x10)
+#define __crt_isxdigit(ch) (__ctype_flags[(__UINT8_TYPE__)(ch)] & 0x30)
+#define __crt_isalnum(ch)  (__ctype_flags[(__UINT8_TYPE__)(ch)] & 0x1c)
+#define __crt_ispunct(ch)  (__ctype_flags[(__UINT8_TYPE__)(ch)] & 0x40)
+#define __crt_isgraph(ch)  (__ctype_flags[(__UINT8_TYPE__)(ch)] & 0x5c)
+#define __crt_isprint(ch)  (__ctype_flags[(__UINT8_TYPE__)(ch)] & 0xdc)
 #ifdef __NO_XBLOCK
-#define __crt_isblank(ch) (__crt_ispunct(ch) || (ch) == 9)
+#define __crt_isblank(ch) ((__UINT8_TYPE__)(ch) == 9 || (__UINT8_TYPE__)(ch) == 0x20)
 #else /* __NO_XBLOCK */
-#define __crt_isblank(ch) __XBLOCK({ __UINT8_TYPE__ __ch = (__UINT8_TYPE__)(ch); __XRETURN __crt_ispunct(__ch) || (__ch) == 9; })
+#define __crt_isblank(ch) __XBLOCK({ __UINT8_TYPE__ __cib_ch = (__UINT8_TYPE__)(ch); __XRETURN (__cib_ch) == 9 || (__cib_ch) == 0x20; })
 #endif /* !__NO_XBLOCK */
 
 #ifdef __CRT_HAVE___ctype_tolower
@@ -80,36 +87,6 @@ __DECL_BEGIN __LIBC char const __ctype_toupper[256] __CASMNAME_SAME("__ctype_tou
 #endif /* !____ctype_toupper_defined */
 #define __crt_toupper(ch) __ctype_toupper[(__UINT8_TYPE__)(ch)]
 #endif /* __CRT_HAVE___ctype_toupper */
-/************************************************************************/
-
-
-#elif defined(__CRT_KOS) && defined(__CRT_HAVE___unicode_latin1flags)
-
-/************************************************************************/
-/* KOS                                                                  */
-#include <bits/crt/unicode.h>
-#include <libc/core/unicode.h>
-
-/* HINT: The first entry is always `0' and exists to support stuff like `isspace(EOF)',
- *       following the assumption that `EOF == -1' on KOS. */
-#ifndef ____unicode_latin1flags_defined
-#define ____unicode_latin1flags_defined
-__DECL_BEGIN __LIBC __UINT16_TYPE__ const __unicode_latin1flags[384] __CASMNAME_SAME("__unicode_latin1flags"); __DECL_END
-#endif /* !____unicode_latin1flags_defined */
-
-/* Implement <ctype.h> functions in terms of `__unicode_latin1flags' */
-#define __crt_iscntrl(ch)  (((__unicode_latin1flags + 1)[(int)(ch)] & __UNICODE_ISCNTRL) != 0)
-#define __crt_isspace(ch)  (((__unicode_latin1flags + 1)[(int)(ch)] & __UNICODE_ISSPACE) != 0)
-#define __crt_islower(ch)  (((__unicode_latin1flags + 1)[(int)(ch)] & __UNICODE_ISLOWER) != 0)
-#define __crt_isupper(ch)  (((__unicode_latin1flags + 1)[(int)(ch)] & __UNICODE_ISUPPER) != 0)
-#define __crt_isalpha(ch)  (((__unicode_latin1flags + 1)[(int)(ch)] & __UNICODE_ISALPHA) != 0)
-#define __crt_isdigit(ch)  (((__unicode_latin1flags + 1)[(int)(ch)] & __UNICODE_ISDIGIT) != 0)
-#define __crt_isxdigit(ch) (((__unicode_latin1flags + 1)[(int)(ch)] & __UNICODE_ISXDIGIT) != 0)
-#define __crt_isalnum(ch)  (((__unicode_latin1flags + 1)[(int)(ch)] & __UNICODE_ISALNUM) != 0)
-#define __crt_ispunct(ch)  (((__unicode_latin1flags + 1)[(int)(ch)] & __UNICODE_ISPUNCT) != 0)
-#define __crt_isgraph(ch)  (((__unicode_latin1flags + 1)[(int)(ch)] & __UNICODE_ISGRAPH) != 0)
-#define __crt_isprint(ch)  (((__unicode_latin1flags + 1)[(int)(ch)] & __UNICODE_ISPRINT) != 0)
-#define __crt_isblank(ch)  (((__unicode_latin1flags + 1)[(int)(ch)] & __UNICODE_ISBLANK) != 0)
 /************************************************************************/
 
 #elif defined(__CRT_GLC) && defined(__CRT_HAVE___ctype_b_loc)
@@ -199,21 +176,21 @@ __CDECLARE(__ATTR_CONST __ATTR_RETNONNULL __ATTR_WUNUSED,__INT32_TYPE__ const **
 __CDECLARE(__ATTR_CONST __ATTR_RETNONNULL __ATTR_WUNUSED,char const *,__NOTHROW,__locale_ctype_ptr,(void),())
 #endif /* !____locale_ctype_ptr_defined */
 #define __crt_chtype_lookup(ch)           ((__locale_ctype_ptr() + 1)[(int)(ch)])
-#define __crt_isalpha(ch)                 ((__crt_chtype_lookup(ch) & 3) != 0)
+#define __crt_isalpha(ch)                 (__crt_chtype_lookup(ch) & 3)
 #define __crt_isupper(ch)                 ((__crt_chtype_lookup(ch) & 3) == 1)
 #define __crt_islower(ch)                 ((__crt_chtype_lookup(ch) & 3) == 2)
-#define __crt_isdigit(ch)                 ((__crt_chtype_lookup(ch) & 4) != 0)
-#define __crt_isxdigit(ch)                ((__crt_chtype_lookup(ch) & 014) != 0)
-#define __crt_isspace(ch)                 ((__crt_chtype_lookup(ch) & 010) != 0)
-#define __crt_ispunct(ch)                 ((__crt_chtype_lookup(ch) & 020) != 0)
-#define __crt_isalnum(ch)                 ((__crt_chtype_lookup(ch) & 7) != 0)
-#define __crt_isprint(ch)                 ((__crt_chtype_lookup(ch) & 0227) != 0)
-#define __crt_isgraph(ch)                 ((__crt_chtype_lookup(ch) & 027) != 0)
-#define __crt_iscntrl(ch)                 ((__crt_chtype_lookup(ch) & 040) != 0)
+#define __crt_isdigit(ch)                 (__crt_chtype_lookup(ch) & 4)
+#define __crt_isxdigit(ch)                (__crt_chtype_lookup(ch) & 014)
+#define __crt_isspace(ch)                 (__crt_chtype_lookup(ch) & 010)
+#define __crt_ispunct(ch)                 (__crt_chtype_lookup(ch) & 020)
+#define __crt_isalnum(ch)                 (__crt_chtype_lookup(ch) & 7)
+#define __crt_isprint(ch)                 (__crt_chtype_lookup(ch) & 0227)
+#define __crt_isgraph(ch)                 (__crt_chtype_lookup(ch) & 027)
+#define __crt_iscntrl(ch)                 (__crt_chtype_lookup(ch) & 040)
 #ifdef __NO_XBLOCK
 #define __crt_isblank(ch) ((__crt_chtype_lookup(ch) & 0200) || (ch) == '\t')
 #else /* __NO_XBLOCK */
-#define __crt_isblank(ch) __XBLOCK({ int __x = (ch); __XRETURN (__crt_chtype_lookup(__x) & 0200) || (__x) == '\t'; })
+#define __crt_isblank(ch) __XBLOCK({ int __cib_ch = (ch); __XRETURN (__crt_chtype_lookup(__cib_ch) & 0200) || (__cib_ch) == '\t'; })
 #endif /* !__NO_XBLOCK */
 
 #ifdef __CRT_HAVE___locale_ctype_ptr_l
@@ -222,21 +199,21 @@ __CDECLARE(__ATTR_CONST __ATTR_RETNONNULL __ATTR_WUNUSED,char const *,__NOTHROW,
 __CDECLARE(__ATTR_PURE __ATTR_RETNONNULL __ATTR_WUNUSED,char const *,__NOTHROW_NCX,__locale_ctype_ptr_l,(__locale_t __locale),(__locale))
 #endif /* !____locale_ctype_ptr_l_defined */
 #define __crt_chtype_lookup_l(ch, locale) ((__locale_ctype_ptr_l(locale) + 1)[(int)(ch)])
-#define __crt_isalpha_l(ch, locale)       ((__crt_chtype_lookup_l(ch, locale) & 3) != 0)
+#define __crt_isalpha_l(ch, locale)       (__crt_chtype_lookup_l(ch, locale) & 3)
 #define __crt_isupper_l(ch, locale)       ((__crt_chtype_lookup_l(ch, locale) & 3) == 1)
 #define __crt_islower_l(ch, locale)       ((__crt_chtype_lookup_l(ch, locale) & 3) == 2)
-#define __crt_isdigit_l(ch, locale)       ((__crt_chtype_lookup_l(ch, locale) & 4) != 0)
-#define __crt_isxdigit_l(ch, locale)      ((__crt_chtype_lookup_l(ch, locale) & 014) != 0)
-#define __crt_isspace_l(ch, locale)       ((__crt_chtype_lookup_l(ch, locale) & 010) != 0)
-#define __crt_ispunct_l(ch, locale)       ((__crt_chtype_lookup_l(ch, locale) & 020) != 0)
-#define __crt_isalnum_l(ch, locale)       ((__crt_chtype_lookup_l(ch, locale) & 7) != 0)
-#define __crt_isprint_l(ch, locale)       ((__crt_chtype_lookup_l(ch, locale) & 0227) != 0)
-#define __crt_isgraph_l(ch, locale)       ((__crt_chtype_lookup_l(ch, locale) & 027) != 0)
-#define __crt_iscntrl_l(ch, locale)       ((__crt_chtype_lookup_l(ch, locale) & 040) != 0)
+#define __crt_isdigit_l(ch, locale)       (__crt_chtype_lookup_l(ch, locale) & 4)
+#define __crt_isxdigit_l(ch, locale)      (__crt_chtype_lookup_l(ch, locale) & 014)
+#define __crt_isspace_l(ch, locale)       (__crt_chtype_lookup_l(ch, locale) & 010)
+#define __crt_ispunct_l(ch, locale)       (__crt_chtype_lookup_l(ch, locale) & 020)
+#define __crt_isalnum_l(ch, locale)       (__crt_chtype_lookup_l(ch, locale) & 7)
+#define __crt_isprint_l(ch, locale)       (__crt_chtype_lookup_l(ch, locale) & 0227)
+#define __crt_isgraph_l(ch, locale)       (__crt_chtype_lookup_l(ch, locale) & 027)
+#define __crt_iscntrl_l(ch, locale)       (__crt_chtype_lookup_l(ch, locale) & 040)
 #ifdef __NO_XBLOCK
 #define __crt_isblank_l(ch, locale) ((__crt_chtype_lookup_l(ch, locale) & 0200) || (ch) == '\t')
 #else /* __NO_XBLOCK */
-#define __crt_isblank_l(ch, locale) __XBLOCK({ int __x = (ch); __XRETURN (__crt_chtype_lookup_l(__x, locale) & 0200) || (__x) == '\t'; })
+#define __crt_isblank_l(ch, locale) __XBLOCK({ int __cib_ch = (ch); __XRETURN (__crt_chtype_lookup_l(__cib_ch, locale) & 0200) || (__cib_ch) == '\t'; })
 #endif /* !__NO_XBLOCK */
 #endif /* __CRT_HAVE___locale_ctype_ptr_l */
 /************************************************************************/

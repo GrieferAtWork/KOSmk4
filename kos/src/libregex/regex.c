@@ -1392,7 +1392,7 @@ match_unicode_trait:
 				error = (int)(intptr_t)(uintptr_t)pattern_iter;
 				goto err;
 			}
-			DO_CHARACTERWISE_MATCH((__unicode_flags(data_ch) & mask) == flag);
+			DO_CHARACTERWISE_MATCH((__unicode_descriptor(data_ch)->__ut_flags & mask) == flag);
 			goto check_match;
 		case 'D':
 			mask = __UNICODE_ISNUMERIC;
@@ -1412,7 +1412,7 @@ match_unicode_trait:
 				error = (int)(intptr_t)(uintptr_t)pattern_iter;
 				goto err;
 			}
-			DO_CHARACTERWISE_MATCH(__unicode_flags(data_ch) &
+			DO_CHARACTERWISE_MATCH(__unicode_descriptor(data_ch)->__ut_flags &
 			                       (__UNICODE_ISALPHA | __UNICODE_ISDIGIT |
 			                        __UNICODE_ISSYMSTRT | __UNICODE_ISSYMCONT));
 			goto check_match;
@@ -1464,9 +1464,10 @@ match_unicode_trait:
 			goto nope;
 
 
-#define IS_ALNUM_EXTENDED(ch)                                                                                \
-	(__unicode_flags(data_ch) & (__UNICODE_ISALPHA | __UNICODE_ISLOWER | __UNICODE_ISUPPER | __UNICODE_ISTITLE | \
-	                             __UNICODE_ISDIGIT | __UNICODE_ISSYMSTRT | __UNICODE_ISSYMCONT))
+#define IS_ALNUM_EXTENDED(ch)                                                         \
+	(__unicode_descriptor(data_ch)->__ut_flags &                                      \
+	 (__UNICODE_ISALPHA | __UNICODE_ISLOWER | __UNICODE_ISUPPER | __UNICODE_ISTITLE | \
+	  __UNICODE_ISDIGIT | __UNICODE_ISSYMSTRT | __UNICODE_ISSYMCONT))
 		case 'b':
 		case 'B': {
 			char *temp_diter;

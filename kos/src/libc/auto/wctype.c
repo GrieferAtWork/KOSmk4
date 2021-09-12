@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xbb41bc2e */
+/* HASH CRC-32:0xf4e7baa0 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -25,228 +25,655 @@
 #include <hybrid/typecore.h>
 #include <kos/types.h>
 #include "wctype.h"
-#include "../user/ctype.h"
+#include "../user/string.h"
+#include "../user/unicode.h"
+#include "../user/wchar.h"
 
 DECL_BEGIN
 
 #ifndef __KERNEL__
-INTERN ATTR_SECTION(".text.crt.wchar.unicode.static.ctype") ATTR_CONST WUNUSED int
-NOTHROW(LIBCCALL libc_iswalnum)(wint_t wc) {
-	return libc_isalnum((int)wc);
+#include <bits/crt/wctype.h>
+/* >> iswcntrl(3) */
+INTERN ATTR_SECTION(".text.crt.dos.wchar.unicode.static.ctype") ATTR_CONST WUNUSED int
+NOTHROW(LIBDCALL libd_iswcntrl)(wint16_t wc) {
+#ifdef __crt_iswcntrl
+	return __crt_iswcntrl(wc);
+#else /* __crt_iswcntrl */
+	return libd_iswcntrl(libd_wctob(wc));
+#endif /* !__crt_iswcntrl */
 }
+#include <bits/crt/wctype.h>
+/* >> iswcntrl(3) */
 INTERN ATTR_SECTION(".text.crt.wchar.unicode.static.ctype") ATTR_CONST WUNUSED int
-NOTHROW(LIBCCALL libc_iswalpha)(wint_t wc) {
-	return libc_isalpha((int)wc);
+NOTHROW(LIBKCALL libc_iswcntrl)(wint32_t wc) {
+#ifdef __crt_iswcntrl
+	return __crt_iswcntrl(wc);
+#else /* __crt_iswcntrl */
+	return libc_iswcntrl(libc_wctob(wc));
+#endif /* !__crt_iswcntrl */
 }
+#include <bits/crt/wctype.h>
+/* >> iswspace(3) */
+INTERN ATTR_SECTION(".text.crt.dos.wchar.unicode.static.ctype") ATTR_CONST WUNUSED int
+NOTHROW(LIBDCALL libd_iswspace)(wint16_t wc) {
+#ifdef __crt_iswspace
+	return __crt_iswspace(wc);
+#else /* __crt_iswspace */
+	return libd_iswspace(libd_wctob(wc));
+#endif /* !__crt_iswspace */
+}
+#include <bits/crt/wctype.h>
+/* >> iswspace(3) */
 INTERN ATTR_SECTION(".text.crt.wchar.unicode.static.ctype") ATTR_CONST WUNUSED int
-NOTHROW(LIBCCALL libc_iswcntrl)(wint_t wc) {
-	return libc_iscntrl((int)wc);
+NOTHROW(LIBKCALL libc_iswspace)(wint32_t wc) {
+#ifdef __crt_iswspace
+	return __crt_iswspace(wc);
+#else /* __crt_iswspace */
+	return libc_iswspace(libc_wctob(wc));
+#endif /* !__crt_iswspace */
 }
+#include <bits/crt/wctype.h>
+/* >> iswupper(3) */
+INTERN ATTR_SECTION(".text.crt.dos.wchar.unicode.static.ctype") ATTR_CONST WUNUSED int
+NOTHROW(LIBDCALL libd_iswupper)(wint16_t wc) {
+#ifdef __crt_iswupper
+	return __crt_iswupper(wc);
+#else /* __crt_iswupper */
+	return libd_iswupper(libd_wctob(wc));
+#endif /* !__crt_iswupper */
+}
+#include <bits/crt/wctype.h>
+/* >> iswupper(3) */
 INTERN ATTR_SECTION(".text.crt.wchar.unicode.static.ctype") ATTR_CONST WUNUSED int
-NOTHROW(LIBCCALL libc_iswdigit)(wint_t wc) {
-	return libc_isdigit((int)wc);
+NOTHROW(LIBKCALL libc_iswupper)(wint32_t wc) {
+#ifdef __crt_iswupper
+	return __crt_iswupper(wc);
+#else /* __crt_iswupper */
+	return libc_iswupper(libc_wctob(wc));
+#endif /* !__crt_iswupper */
 }
+#include <bits/crt/wctype.h>
+/* >> iswlower(3) */
+INTERN ATTR_SECTION(".text.crt.dos.wchar.unicode.static.ctype") ATTR_CONST WUNUSED int
+NOTHROW(LIBDCALL libd_iswlower)(wint16_t wc) {
+#ifdef __crt_iswlower
+	return __crt_iswlower(wc);
+#else /* __crt_iswlower */
+	return libd_iswlower(libd_wctob(wc));
+#endif /* !__crt_iswlower */
+}
+#include <bits/crt/wctype.h>
+/* >> iswlower(3) */
 INTERN ATTR_SECTION(".text.crt.wchar.unicode.static.ctype") ATTR_CONST WUNUSED int
-NOTHROW(LIBCCALL libc_iswgraph)(wint_t wc) {
-	return libc_isgraph((int)wc);
+NOTHROW(LIBKCALL libc_iswlower)(wint32_t wc) {
+#ifdef __crt_iswlower
+	return __crt_iswlower(wc);
+#else /* __crt_iswlower */
+	return libc_iswlower(libc_wctob(wc));
+#endif /* !__crt_iswlower */
 }
+#include <bits/crt/wctype.h>
+/* >> iswalpha(3) */
+INTERN ATTR_SECTION(".text.crt.dos.wchar.unicode.static.ctype") ATTR_CONST WUNUSED int
+NOTHROW(LIBDCALL libd_iswalpha)(wint16_t wc) {
+#ifdef __crt_iswalpha
+	return __crt_iswalpha(wc);
+#else /* __crt_iswalpha */
+	return libd_iswalpha(libd_wctob(wc));
+#endif /* !__crt_iswalpha */
+}
+#include <bits/crt/wctype.h>
+/* >> iswalpha(3) */
 INTERN ATTR_SECTION(".text.crt.wchar.unicode.static.ctype") ATTR_CONST WUNUSED int
-NOTHROW(LIBCCALL libc_iswlower)(wint_t wc) {
-	return libc_islower((int)wc);
+NOTHROW(LIBKCALL libc_iswalpha)(wint32_t wc) {
+#ifdef __crt_iswalpha
+	return __crt_iswalpha(wc);
+#else /* __crt_iswalpha */
+	return libc_iswalpha(libc_wctob(wc));
+#endif /* !__crt_iswalpha */
 }
+#include <bits/crt/wctype.h>
+/* >> iswdigit(3) */
+INTERN ATTR_SECTION(".text.crt.dos.wchar.unicode.static.ctype") ATTR_CONST WUNUSED int
+NOTHROW(LIBDCALL libd_iswdigit)(wint16_t wc) {
+#ifdef __crt_iswdigit
+	return __crt_iswdigit(wc);
+#else /* __crt_iswdigit */
+	return libd_iswdigit(libd_wctob(wc));
+#endif /* !__crt_iswdigit */
+}
+#include <bits/crt/wctype.h>
+/* >> iswdigit(3) */
 INTERN ATTR_SECTION(".text.crt.wchar.unicode.static.ctype") ATTR_CONST WUNUSED int
-NOTHROW(LIBCCALL libc_iswprint)(wint_t wc) {
-	return libc_isprint((int)wc);
+NOTHROW(LIBKCALL libc_iswdigit)(wint32_t wc) {
+#ifdef __crt_iswdigit
+	return __crt_iswdigit(wc);
+#else /* __crt_iswdigit */
+	return libc_iswdigit(libc_wctob(wc));
+#endif /* !__crt_iswdigit */
 }
+#include <bits/crt/wctype.h>
+/* >> iswxdigit(3) */
+INTERN ATTR_SECTION(".text.crt.dos.wchar.unicode.static.ctype") ATTR_CONST WUNUSED int
+NOTHROW(LIBDCALL libd_iswxdigit)(wint16_t wc) {
+#ifdef __crt_iswxdigit
+	return __crt_iswxdigit(wc);
+#else /* __crt_iswxdigit */
+	return libd_iswxdigit(libd_wctob(wc));
+#endif /* !__crt_iswxdigit */
+}
+#include <bits/crt/wctype.h>
+/* >> iswxdigit(3) */
 INTERN ATTR_SECTION(".text.crt.wchar.unicode.static.ctype") ATTR_CONST WUNUSED int
-NOTHROW(LIBCCALL libc_iswpunct)(wint_t wc) {
-	return libc_ispunct((int)wc);
+NOTHROW(LIBKCALL libc_iswxdigit)(wint32_t wc) {
+#ifdef __crt_iswxdigit
+	return __crt_iswxdigit(wc);
+#else /* __crt_iswxdigit */
+	return libc_iswxdigit(libc_wctob(wc));
+#endif /* !__crt_iswxdigit */
 }
+#include <bits/crt/wctype.h>
+/* >> iswalnum(3) */
+INTERN ATTR_SECTION(".text.crt.dos.wchar.unicode.static.ctype") ATTR_CONST WUNUSED int
+NOTHROW(LIBDCALL libd_iswalnum)(wint16_t wc) {
+#ifdef __crt_iswalnum
+	return __crt_iswalnum(wc);
+#else /* __crt_iswalnum */
+	return libd_iswalnum(libd_wctob(wc));
+#endif /* !__crt_iswalnum */
+}
+#include <bits/crt/wctype.h>
+/* >> iswalnum(3) */
 INTERN ATTR_SECTION(".text.crt.wchar.unicode.static.ctype") ATTR_CONST WUNUSED int
-NOTHROW(LIBCCALL libc_iswspace)(wint_t wc) {
-	return libc_isspace((int)wc);
+NOTHROW(LIBKCALL libc_iswalnum)(wint32_t wc) {
+#ifdef __crt_iswalnum
+	return __crt_iswalnum(wc);
+#else /* __crt_iswalnum */
+	return libc_iswalnum(libc_wctob(wc));
+#endif /* !__crt_iswalnum */
 }
+#include <bits/crt/wctype.h>
+/* >> iswpunct(3) */
+INTERN ATTR_SECTION(".text.crt.dos.wchar.unicode.static.ctype") ATTR_CONST WUNUSED int
+NOTHROW(LIBDCALL libd_iswpunct)(wint16_t wc) {
+#ifdef __crt_iswpunct
+	return __crt_iswpunct(wc);
+#else /* __crt_iswpunct */
+	return libd_iswpunct(libd_wctob(wc));
+#endif /* !__crt_iswpunct */
+}
+#include <bits/crt/wctype.h>
+/* >> iswpunct(3) */
 INTERN ATTR_SECTION(".text.crt.wchar.unicode.static.ctype") ATTR_CONST WUNUSED int
-NOTHROW(LIBCCALL libc_iswupper)(wint_t wc) {
-	return libc_isupper((int)wc);
+NOTHROW(LIBKCALL libc_iswpunct)(wint32_t wc) {
+#ifdef __crt_iswpunct
+	return __crt_iswpunct(wc);
+#else /* __crt_iswpunct */
+	return libc_iswpunct(libc_wctob(wc));
+#endif /* !__crt_iswpunct */
 }
+#include <bits/crt/wctype.h>
+/* >> iswgraph(3) */
+INTERN ATTR_SECTION(".text.crt.dos.wchar.unicode.static.ctype") ATTR_CONST WUNUSED int
+NOTHROW(LIBDCALL libd_iswgraph)(wint16_t wc) {
+#ifdef __crt_iswgraph
+	return __crt_iswgraph(wc);
+#else /* __crt_iswgraph */
+	return libd_iswgraph(libd_wctob(wc));
+#endif /* !__crt_iswgraph */
+}
+#include <bits/crt/wctype.h>
+/* >> iswgraph(3) */
 INTERN ATTR_SECTION(".text.crt.wchar.unicode.static.ctype") ATTR_CONST WUNUSED int
-NOTHROW(LIBCCALL libc_iswxdigit)(wint_t wc) {
-	return libc_isdigit((int)wc);
+NOTHROW(LIBKCALL libc_iswgraph)(wint32_t wc) {
+#ifdef __crt_iswgraph
+	return __crt_iswgraph(wc);
+#else /* __crt_iswgraph */
+	return libc_iswgraph(libc_wctob(wc));
+#endif /* !__crt_iswgraph */
 }
-INTERN ATTR_SECTION(".text.crt.wchar.unicode.static.mbs") ATTR_PURE WUNUSED NONNULL((1)) wctrans_t
+#include <bits/crt/wctype.h>
+/* >> iswprint(3) */
+INTERN ATTR_SECTION(".text.crt.dos.wchar.unicode.static.ctype") ATTR_CONST WUNUSED int
+NOTHROW(LIBDCALL libd_iswprint)(wint16_t wc) {
+#ifdef __crt_iswprint
+	return __crt_iswprint(wc);
+#else /* __crt_iswprint */
+	return libd_iswprint(libd_wctob(wc));
+#endif /* !__crt_iswprint */
+}
+#include <bits/crt/wctype.h>
+/* >> iswprint(3) */
+INTERN ATTR_SECTION(".text.crt.wchar.unicode.static.ctype") ATTR_CONST WUNUSED int
+NOTHROW(LIBKCALL libc_iswprint)(wint32_t wc) {
+#ifdef __crt_iswprint
+	return __crt_iswprint(wc);
+#else /* __crt_iswprint */
+	return libc_iswprint(libc_wctob(wc));
+#endif /* !__crt_iswprint */
+}
+#include <bits/crt/wctype.h>
+/* >> towlower(3) */
+INTERN ATTR_SECTION(".text.crt.dos.wchar.unicode.static.ctype") ATTR_CONST WUNUSED wint16_t
+NOTHROW(LIBDCALL libd_towlower)(wint16_t wc) {
+#ifdef __crt_towlower
+	return __crt_towlower(wc);
+#else /* __crt_towlower */
+	return libd_btowc(libd_towlower(libd_wctob(wc)));
+#endif /* !__crt_towlower */
+}
+#include <bits/crt/wctype.h>
+/* >> towlower(3) */
+INTERN ATTR_SECTION(".text.crt.wchar.unicode.static.ctype") ATTR_CONST WUNUSED wint32_t
+NOTHROW(LIBKCALL libc_towlower)(wint32_t wc) {
+#ifdef __crt_towlower
+	return __crt_towlower(wc);
+#else /* __crt_towlower */
+	return libc_btowc(libc_towlower(libc_wctob(wc)));
+#endif /* !__crt_towlower */
+}
+#include <bits/crt/wctype.h>
+/* >> towupper(3) */
+INTERN ATTR_SECTION(".text.crt.dos.wchar.unicode.static.ctype") ATTR_CONST WUNUSED wint16_t
+NOTHROW(LIBDCALL libd_towupper)(wint16_t wc) {
+#ifdef __crt_towupper
+	return __crt_towupper(wc);
+#else /* __crt_towupper */
+	return libd_btowc(libd_towupper(libd_wctob(wc)));
+#endif /* !__crt_towupper */
+}
+#include <bits/crt/wctype.h>
+/* >> towupper(3) */
+INTERN ATTR_SECTION(".text.crt.wchar.unicode.static.ctype") ATTR_CONST WUNUSED wint32_t
+NOTHROW(LIBKCALL libc_towupper)(wint32_t wc) {
+#ifdef __crt_towupper
+	return __crt_towupper(wc);
+#else /* __crt_towupper */
+	return libc_btowc(libc_towupper(libc_wctob(wc)));
+#endif /* !__crt_towupper */
+}
+#include <bits/crt/wctype.h>
+/* >> iswblank(3) */
+INTERN ATTR_SECTION(".text.crt.dos.wchar.unicode.static.ctype") ATTR_CONST WUNUSED int
+NOTHROW(LIBDCALL libd_iswblank)(wint16_t wc) {
+#ifdef __crt_iswblank
+	return __crt_iswblank(wc);
+#else /* __crt_iswblank */
+	return libd_iswblank(libd_wctob(wc));
+#endif /* !__crt_iswblank */
+}
+#include <bits/crt/wctype.h>
+/* >> iswblank(3) */
+INTERN ATTR_SECTION(".text.crt.wchar.unicode.static.ctype") ATTR_CONST WUNUSED int
+NOTHROW(LIBKCALL libc_iswblank)(wint32_t wc) {
+#ifdef __crt_iswblank
+	return __crt_iswblank(wc);
+#else /* __crt_iswblank */
+	return libc_iswblank(libc_wctob(wc));
+#endif /* !__crt_iswblank */
+}
+#include <bits/crt/unicode.h>
+INTERN ATTR_SECTION(".text.crt.wchar.unicode.static.ctype") ATTR_PURE WUNUSED NONNULL((1)) wctrans_t
 NOTHROW_NCX(LIBCCALL libc_wctrans)(char const *prop) {
-	/* TODO */
-	(void)prop;
-	COMPILER_IMPURE();
-	return 0;
+	struct wctrans_entry {
+		char     we_name[8]; /* Name (with leading 'to' stripped) */
+		uint16_t we_offset;  /* Offset to `int32_t' field in `struct __unitraits' */
+	};
+	static struct wctrans_entry const entries[] = {
+		{ "tolower", offsetof(struct __unitraits, __ut_lower) },
+		{ "toupper", offsetof(struct __unitraits, __ut_upper) },
+		{ "totitle", offsetof(struct __unitraits, __ut_title) }, /* Kos extension! */
+	};
+	unsigned int i;
+	for (i = 0; i < COMPILER_LENOF(entries); ++i) {
+		if (libc_strcmp(prop, entries[i].we_name) == 0)
+			return (wctrans_t)(uintptr_t)entries[i].we_offset;
+	}
+	return (wctrans_t)0;
 }
-INTERN ATTR_SECTION(".text.crt.wchar.unicode.static.mbs") ATTR_CONST WUNUSED wint_t
-NOTHROW_NCX(LIBCCALL libc_towctrans)(wint_t wc,
+#include <bits/crt/unicode.h>
+INTERN ATTR_SECTION(".text.crt.dos.wchar.unicode.static.ctype") ATTR_CONST WUNUSED wint16_t
+NOTHROW_NCX(LIBDCALL libd_towctrans)(wint16_t wc,
                                      wctrans_t desc) {
-	/* TODO */
-	(void)wc;
-	(void)desc;
-	return 0;
+	struct __unitraits const *traits = libc___unicode_descriptor(wc);
+	return wc + *((s32 const *)traits + (uintptr_t)desc);
 }
-INTERN ATTR_SECTION(".text.crt.wchar.unicode.static.mbs") ATTR_PURE WUNUSED NONNULL((1)) wctype_t
+#include <bits/crt/unicode.h>
+INTERN ATTR_SECTION(".text.crt.wchar.unicode.static.ctype") ATTR_CONST WUNUSED wint32_t
+NOTHROW_NCX(LIBKCALL libc_towctrans)(wint32_t wc,
+                                     wctrans_t desc) {
+	struct __unitraits const *traits = libc___unicode_descriptor(wc);
+	return wc + *((s32 const *)traits + (uintptr_t)desc);
+}
+#include <bits/crt/unicode.h>
+INTERN ATTR_SECTION(".text.crt.wchar.unicode.static.ctype") ATTR_PURE WUNUSED NONNULL((1)) wctype_t
 NOTHROW_NCX(LIBCCALL libc_wctype)(char const *prop) {
-	/* TODO */
-	(void)prop;
-	COMPILER_IMPURE();
+	struct wctype_entry {
+		char     we_name[8]; /* Name (with leading 'to' stripped) */
+		uint16_t we_flags;   /* Flags that must be set. */
+	};
+	static struct wctype_entry const entries[] = {
+		{ "cntrl",   __UNICODE_ISCNTRL },
+		{ "space",   __UNICODE_ISSPACE },
+		{ "lower",   __UNICODE_ISLOWER },
+		{ "upper",   __UNICODE_ISUPPER },
+		{ "alpha",   __UNICODE_ISALPHA },
+		{ "digit",   __UNICODE_ISDIGIT },
+		{ "xdigit",  __UNICODE_ISXDIGIT },
+		{ "alnum",   __UNICODE_ISALNUM },
+		{ "punct",   __UNICODE_ISPUNCT },
+		{ "graph",   __UNICODE_ISGRAPH },
+		{ "print",   __UNICODE_ISPRINT },
+		{ "blank",   __UNICODE_ISBLANK },
+		/* All of the following are KOS extensions! */
+		{ "tab",     __UNICODE_ISTAB },
+		{ "white",   __UNICODE_ISWHITE },
+		{ "empty",   __UNICODE_ISEMPTY },
+		{ "lf",      __UNICODE_ISLF },
+		{ "hex",     __UNICODE_ISHEX },
+		{ "title",   __UNICODE_ISTITLE },
+		{ "numeric", __UNICODE_ISNUMERIC },
+		{ "symstrt", __UNICODE_ISSYMSTRT },
+		{ "symcont", __UNICODE_ISSYMCONT },
+	};
+	unsigned int i;
+	for (i = 0; i < COMPILER_LENOF(entries); ++i) {
+		if (libc_strcmp(prop, entries[i].we_name) == 0)
+			return entries[i].we_flags;
+	}
 	return 0;
 }
-INTERN ATTR_SECTION(".text.crt.wchar.unicode.static.mbs") ATTR_CONST WUNUSED int
-NOTHROW_NCX(LIBCCALL libc_iswctype)(wint_t wc,
+#include <bits/crt/unicode.h>
+INTERN ATTR_SECTION(".text.crt.dos.wchar.unicode.static.ctype") ATTR_CONST WUNUSED int
+NOTHROW_NCX(LIBDCALL libd_iswctype)(wint16_t wc,
                                     wctype_t desc) {
-	/* TODO */
-	(void)wc;
-	(void)desc;
-	return 0;
+	struct __unitraits const *traits = libc___unicode_descriptor(wc);
+	return (int)(traits->__ut_flags & (uint16_t)desc);
+}
+#include <bits/crt/unicode.h>
+INTERN ATTR_SECTION(".text.crt.wchar.unicode.static.ctype") ATTR_CONST WUNUSED int
+NOTHROW_NCX(LIBKCALL libc_iswctype)(wint32_t wc,
+                                    wctype_t desc) {
+	struct __unitraits const *traits = libc___unicode_descriptor(wc);
+	return (int)(traits->__ut_flags & (uint16_t)desc);
+}
+INTERN ATTR_SECTION(".text.crt.dos.wchar.unicode.static.ctype") ATTR_CONST WUNUSED int
+NOTHROW(LIBDCALL libd_iswascii)(wint16_t wc) {
+	return wc >= 0 && wc <= 0x7f;
 }
 INTERN ATTR_SECTION(".text.crt.wchar.unicode.static.ctype") ATTR_CONST WUNUSED int
-NOTHROW(LIBCCALL libc_iswblank)(wint_t wc) {
-	return libc_isblank((int)wc);
+NOTHROW(LIBKCALL libc_iswascii)(wint32_t wc) {
+	return wc >= 0 && wc <= 0x7f;
 }
-INTERN ATTR_SECTION(".text.crt.wchar.unicode.static.ctype") ATTR_CONST WUNUSED wint_t
-NOTHROW(LIBCCALL libc_towlower)(wint_t wc) {
-	return (wint_t)libc_tolower((int)wc);
-}
-INTERN ATTR_SECTION(".text.crt.wchar.unicode.static.ctype") ATTR_CONST WUNUSED wint_t
-NOTHROW(LIBCCALL libc_towupper)(wint_t wc) {
-	return (wint_t)libc_toupper((int)wc);
-}
-INTERN ATTR_SECTION(".text.crt.wchar.unicode.static.ctype") ATTR_CONST WUNUSED int
-NOTHROW(LIBCCALL libc_iswascii)(wint_t wc) {
-	return (unsigned int)wc <= 0x7f;
-}
-INTERN ATTR_SECTION(".text.crt.wchar.unicode.locale.ctype") ATTR_PURE WUNUSED int
-NOTHROW_NCX(LIBCCALL libc_iswalnum_l)(wint_t wc,
+/* >> iswcntrl_l(3) */
+INTERN ATTR_SECTION(".text.crt.dos.wchar.unicode.locale.ctype") ATTR_PURE WUNUSED int
+NOTHROW_NCX(LIBDCALL libd_iswcntrl_l)(wint16_t ch,
                                       locale_t locale) {
-	(void)locale;
 	COMPILER_IMPURE();
-	return libc_iswalnum(wc);
+	(void)locale;
+	return libd_iswcntrl(ch);
 }
+/* >> iswcntrl_l(3) */
 INTERN ATTR_SECTION(".text.crt.wchar.unicode.locale.ctype") ATTR_PURE WUNUSED int
-NOTHROW_NCX(LIBCCALL libc_iswalpha_l)(wint_t wc,
+NOTHROW_NCX(LIBKCALL libc_iswcntrl_l)(wint32_t ch,
                                       locale_t locale) {
-	(void)locale;
 	COMPILER_IMPURE();
-	return libc_iswalpha(wc);
+	(void)locale;
+	return libc_iswcntrl(ch);
 }
-INTERN ATTR_SECTION(".text.crt.wchar.unicode.locale.ctype") ATTR_PURE WUNUSED int
-NOTHROW_NCX(LIBCCALL libc_iswcntrl_l)(wint_t wc,
+/* >> iswspace_l(3) */
+INTERN ATTR_SECTION(".text.crt.dos.wchar.unicode.locale.ctype") ATTR_PURE WUNUSED int
+NOTHROW_NCX(LIBDCALL libd_iswspace_l)(wint16_t ch,
                                       locale_t locale) {
-	(void)locale;
 	COMPILER_IMPURE();
-	return libc_iswcntrl(wc);
+	(void)locale;
+	return libd_iswspace(ch);
 }
+/* >> iswspace_l(3) */
 INTERN ATTR_SECTION(".text.crt.wchar.unicode.locale.ctype") ATTR_PURE WUNUSED int
-NOTHROW_NCX(LIBCCALL libc_iswdigit_l)(wint_t wc,
+NOTHROW_NCX(LIBKCALL libc_iswspace_l)(wint32_t ch,
                                       locale_t locale) {
-	(void)locale;
 	COMPILER_IMPURE();
-	return libc_iswdigit(wc);
+	(void)locale;
+	return libc_iswspace(ch);
 }
-INTERN ATTR_SECTION(".text.crt.wchar.unicode.locale.ctype") ATTR_PURE WUNUSED int
-NOTHROW_NCX(LIBCCALL libc_iswgraph_l)(wint_t wc,
+/* >> iswupper_l(3) */
+INTERN ATTR_SECTION(".text.crt.dos.wchar.unicode.locale.ctype") ATTR_PURE WUNUSED int
+NOTHROW_NCX(LIBDCALL libd_iswupper_l)(wint16_t ch,
                                       locale_t locale) {
-	(void)locale;
 	COMPILER_IMPURE();
-	return libc_iswgraph(wc);
+	(void)locale;
+	return libd_iswupper(ch);
 }
+/* >> iswupper_l(3) */
 INTERN ATTR_SECTION(".text.crt.wchar.unicode.locale.ctype") ATTR_PURE WUNUSED int
-NOTHROW_NCX(LIBCCALL libc_iswlower_l)(wint_t wc,
+NOTHROW_NCX(LIBKCALL libc_iswupper_l)(wint32_t ch,
                                       locale_t locale) {
-	(void)locale;
 	COMPILER_IMPURE();
-	return libc_iswlower(wc);
+	(void)locale;
+	return libc_iswupper(ch);
 }
-INTERN ATTR_SECTION(".text.crt.wchar.unicode.locale.ctype") ATTR_PURE WUNUSED int
-NOTHROW_NCX(LIBCCALL libc_iswprint_l)(wint_t wc,
+/* >> iswlower_l(3) */
+INTERN ATTR_SECTION(".text.crt.dos.wchar.unicode.locale.ctype") ATTR_PURE WUNUSED int
+NOTHROW_NCX(LIBDCALL libd_iswlower_l)(wint16_t ch,
                                       locale_t locale) {
-	(void)locale;
 	COMPILER_IMPURE();
-	return libc_iswprint(wc);
+	(void)locale;
+	return libd_iswlower(ch);
 }
+/* >> iswlower_l(3) */
 INTERN ATTR_SECTION(".text.crt.wchar.unicode.locale.ctype") ATTR_PURE WUNUSED int
-NOTHROW_NCX(LIBCCALL libc_iswpunct_l)(wint_t wc,
+NOTHROW_NCX(LIBKCALL libc_iswlower_l)(wint32_t ch,
                                       locale_t locale) {
-	(void)locale;
 	COMPILER_IMPURE();
-	return libc_iswpunct(wc);
+	(void)locale;
+	return libc_iswlower(ch);
 }
-INTERN ATTR_SECTION(".text.crt.wchar.unicode.locale.ctype") ATTR_PURE WUNUSED int
-NOTHROW_NCX(LIBCCALL libc_iswspace_l)(wint_t wc,
+/* >> iswalpha_l(3) */
+INTERN ATTR_SECTION(".text.crt.dos.wchar.unicode.locale.ctype") ATTR_PURE WUNUSED int
+NOTHROW_NCX(LIBDCALL libd_iswalpha_l)(wint16_t ch,
                                       locale_t locale) {
-	(void)locale;
 	COMPILER_IMPURE();
-	return libc_iswspace(wc);
+	(void)locale;
+	return libd_iswalpha(ch);
 }
+/* >> iswalpha_l(3) */
 INTERN ATTR_SECTION(".text.crt.wchar.unicode.locale.ctype") ATTR_PURE WUNUSED int
-NOTHROW_NCX(LIBCCALL libc_iswupper_l)(wint_t wc,
+NOTHROW_NCX(LIBKCALL libc_iswalpha_l)(wint32_t ch,
                                       locale_t locale) {
-	(void)locale;
 	COMPILER_IMPURE();
-	return libc_iswupper(wc);
+	(void)locale;
+	return libc_iswalpha(ch);
 }
+/* >> iswdigit_l(3) */
+INTERN ATTR_SECTION(".text.crt.dos.wchar.unicode.locale.ctype") ATTR_PURE WUNUSED int
+NOTHROW_NCX(LIBDCALL libd_iswdigit_l)(wint16_t ch,
+                                      locale_t locale) {
+	COMPILER_IMPURE();
+	(void)locale;
+	return libd_iswdigit(ch);
+}
+/* >> iswdigit_l(3) */
 INTERN ATTR_SECTION(".text.crt.wchar.unicode.locale.ctype") ATTR_PURE WUNUSED int
-NOTHROW_NCX(LIBCCALL libc_iswxdigit_l)(wint_t wc,
+NOTHROW_NCX(LIBKCALL libc_iswdigit_l)(wint32_t ch,
+                                      locale_t locale) {
+	COMPILER_IMPURE();
+	(void)locale;
+	return libc_iswdigit(ch);
+}
+/* >> iswxdigit_l(3) */
+INTERN ATTR_SECTION(".text.crt.dos.wchar.unicode.locale.ctype") ATTR_PURE WUNUSED int
+NOTHROW_NCX(LIBDCALL libd_iswxdigit_l)(wint16_t ch,
                                        locale_t locale) {
-	(void)locale;
 	COMPILER_IMPURE();
-	return libc_iswxdigit(wc);
+	(void)locale;
+	return libd_iswxdigit(ch);
 }
+/* >> iswxdigit_l(3) */
 INTERN ATTR_SECTION(".text.crt.wchar.unicode.locale.ctype") ATTR_PURE WUNUSED int
-NOTHROW_NCX(LIBCCALL libc_iswblank_l)(wint_t wc,
+NOTHROW_NCX(LIBKCALL libc_iswxdigit_l)(wint32_t ch,
+                                       locale_t locale) {
+	COMPILER_IMPURE();
+	(void)locale;
+	return libc_iswxdigit(ch);
+}
+/* >> iswalnum_l(3) */
+INTERN ATTR_SECTION(".text.crt.dos.wchar.unicode.locale.ctype") ATTR_PURE WUNUSED int
+NOTHROW_NCX(LIBDCALL libd_iswalnum_l)(wint16_t ch,
+                                      locale_t locale) {
+	COMPILER_IMPURE();
+	(void)locale;
+	return libd_iswalnum(ch);
+}
+/* >> iswalnum_l(3) */
+INTERN ATTR_SECTION(".text.crt.wchar.unicode.locale.ctype") ATTR_PURE WUNUSED int
+NOTHROW_NCX(LIBKCALL libc_iswalnum_l)(wint32_t ch,
+                                      locale_t locale) {
+	COMPILER_IMPURE();
+	(void)locale;
+	return libc_iswalnum(ch);
+}
+/* >> iswpunct_l(3) */
+INTERN ATTR_SECTION(".text.crt.dos.wchar.unicode.locale.ctype") ATTR_PURE WUNUSED int
+NOTHROW_NCX(LIBDCALL libd_iswpunct_l)(wint16_t ch,
+                                      locale_t locale) {
+	COMPILER_IMPURE();
+	(void)locale;
+	return libd_iswpunct(ch);
+}
+/* >> iswpunct_l(3) */
+INTERN ATTR_SECTION(".text.crt.wchar.unicode.locale.ctype") ATTR_PURE WUNUSED int
+NOTHROW_NCX(LIBKCALL libc_iswpunct_l)(wint32_t ch,
+                                      locale_t locale) {
+	COMPILER_IMPURE();
+	(void)locale;
+	return libc_iswpunct(ch);
+}
+/* >> iswgraph_l(3) */
+INTERN ATTR_SECTION(".text.crt.dos.wchar.unicode.locale.ctype") ATTR_PURE WUNUSED int
+NOTHROW_NCX(LIBDCALL libd_iswgraph_l)(wint16_t ch,
+                                      locale_t locale) {
+	COMPILER_IMPURE();
+	(void)locale;
+	return libd_iswgraph(ch);
+}
+/* >> iswgraph_l(3) */
+INTERN ATTR_SECTION(".text.crt.wchar.unicode.locale.ctype") ATTR_PURE WUNUSED int
+NOTHROW_NCX(LIBKCALL libc_iswgraph_l)(wint32_t ch,
+                                      locale_t locale) {
+	COMPILER_IMPURE();
+	(void)locale;
+	return libc_iswgraph(ch);
+}
+/* >> iswprint_l(3) */
+INTERN ATTR_SECTION(".text.crt.dos.wchar.unicode.locale.ctype") ATTR_PURE WUNUSED int
+NOTHROW_NCX(LIBDCALL libd_iswprint_l)(wint16_t ch,
+                                      locale_t locale) {
+	COMPILER_IMPURE();
+	(void)locale;
+	return libd_iswprint(ch);
+}
+/* >> iswprint_l(3) */
+INTERN ATTR_SECTION(".text.crt.wchar.unicode.locale.ctype") ATTR_PURE WUNUSED int
+NOTHROW_NCX(LIBKCALL libc_iswprint_l)(wint32_t ch,
+                                      locale_t locale) {
+	COMPILER_IMPURE();
+	(void)locale;
+	return libc_iswprint(ch);
+}
+/* >> iswblank_l(3) */
+INTERN ATTR_SECTION(".text.crt.dos.wchar.unicode.locale.ctype") ATTR_PURE WUNUSED int
+NOTHROW_NCX(LIBDCALL libd_iswblank_l)(wint16_t ch,
+                                      locale_t locale) {
+	COMPILER_IMPURE();
+	(void)locale;
+	return libd_iswblank(ch);
+}
+/* >> iswblank_l(3) */
+INTERN ATTR_SECTION(".text.crt.wchar.unicode.locale.ctype") ATTR_PURE WUNUSED int
+NOTHROW_NCX(LIBKCALL libc_iswblank_l)(wint32_t ch,
+                                      locale_t locale) {
+	COMPILER_IMPURE();
+	(void)locale;
+	return libc_iswblank(ch);
+}
+/* >> towlower_l(3) */
+INTERN ATTR_SECTION(".text.crt.dos.wchar.unicode.locale.ctype") ATTR_PURE WUNUSED wint16_t
+NOTHROW_NCX(LIBDCALL libd_towlower_l)(wint16_t ch,
+                                      locale_t locale) {
+	COMPILER_IMPURE();
+	(void)locale;
+	return libd_towlower(ch);
+}
+/* >> towlower_l(3) */
+INTERN ATTR_SECTION(".text.crt.wchar.unicode.locale.ctype") ATTR_PURE WUNUSED wint32_t
+NOTHROW_NCX(LIBKCALL libc_towlower_l)(wint32_t ch,
+                                      locale_t locale) {
+	COMPILER_IMPURE();
+	(void)locale;
+	return libc_towlower(ch);
+}
+/* >> towupper_l(3) */
+INTERN ATTR_SECTION(".text.crt.dos.wchar.unicode.locale.ctype") ATTR_PURE WUNUSED wint16_t
+NOTHROW_NCX(LIBDCALL libd_towupper_l)(wint16_t ch,
+                                      locale_t locale) {
+	COMPILER_IMPURE();
+	(void)locale;
+	return libd_towupper(ch);
+}
+/* >> towupper_l(3) */
+INTERN ATTR_SECTION(".text.crt.wchar.unicode.locale.ctype") ATTR_PURE WUNUSED wint32_t
+NOTHROW_NCX(LIBKCALL libc_towupper_l)(wint32_t ch,
+                                      locale_t locale) {
+	COMPILER_IMPURE();
+	(void)locale;
+	return libc_towupper(ch);
+}
+INTERN ATTR_SECTION(".text.crt.dos.wchar.unicode.locale.ctype") ATTR_PURE WUNUSED int
+NOTHROW_NCX(LIBDCALL libd_iswctype_l)(wint16_t wc,
+                                      wctype_t type,
                                       locale_t locale) {
 	(void)locale;
 	COMPILER_IMPURE();
-	return libc_iswblank(wc);
+	return libd_iswctype(wc, type);
 }
 INTERN ATTR_SECTION(".text.crt.wchar.unicode.locale.ctype") ATTR_PURE WUNUSED int
-NOTHROW_NCX(LIBCCALL libc_iswctype_l)(wint_t wc,
+NOTHROW_NCX(LIBKCALL libc_iswctype_l)(wint32_t wc,
                                       wctype_t type,
                                       locale_t locale) {
 	(void)locale;
 	COMPILER_IMPURE();
 	return libc_iswctype(wc, type);
 }
-INTERN ATTR_SECTION(".text.crt.wchar.unicode.locale.ctype") ATTR_PURE WUNUSED wint_t
-NOTHROW_NCX(LIBCCALL libc_towupper_l)(wint_t wc,
-                                      locale_t locale) {
-	(void)locale;
-	COMPILER_IMPURE();
-	return libc_towupper(wc);
-}
-INTERN ATTR_SECTION(".text.crt.wchar.unicode.locale.ctype") ATTR_PURE WUNUSED wint_t
-NOTHROW_NCX(LIBCCALL libc_towlower_l)(wint_t wc,
-                                      locale_t locale) {
-	(void)locale;
-	COMPILER_IMPURE();
-	return libc_towlower(wc);
-}
-INTERN ATTR_SECTION(".text.crt.wchar.unicode.locale.mbs") WUNUSED NONNULL((1)) wctype_t
+INTERN ATTR_SECTION(".text.crt.wchar.unicode.locale.ctype") WUNUSED NONNULL((1)) wctype_t
 NOTHROW_NCX(LIBCCALL libc_wctype_l)(char const *prop,
                                     locale_t locale) {
 	(void)locale;
 	COMPILER_IMPURE();
 	return libc_wctype(prop);
 }
-INTERN ATTR_SECTION(".text.crt.wchar.unicode.locale.mbs") WUNUSED NONNULL((1)) wctrans_t
-NOTHROW_NCX(LIBCCALL libc_wctrans_l)(char const *prop,
-                                     locale_t locale) {
+INTERN ATTR_SECTION(".text.crt.dos.wchar.unicode.locale.ctype") WUNUSED wint16_t
+NOTHROW_NCX(LIBDCALL libd_towctrans_l)(wint16_t wc,
+                                       wctrans_t desc,
+                                       locale_t locale) {
 	(void)locale;
 	COMPILER_IMPURE();
-	return libc_wctrans(prop);
+	return libd_towctrans(wc, desc);
 }
-INTERN ATTR_SECTION(".text.crt.wchar.unicode.locale.mbs") WUNUSED wint_t
-NOTHROW_NCX(LIBCCALL libc_towctrans_l)(wint_t wc,
+INTERN ATTR_SECTION(".text.crt.wchar.unicode.locale.ctype") WUNUSED wint32_t
+NOTHROW_NCX(LIBKCALL libc_towctrans_l)(wint32_t wc,
                                        wctrans_t desc,
                                        locale_t locale) {
 	(void)locale;
 	COMPILER_IMPURE();
 	return libc_towctrans(wc, desc);
+}
+INTERN ATTR_SECTION(".text.crt.wchar.unicode.locale.ctype") WUNUSED NONNULL((1)) wctrans_t
+NOTHROW_NCX(LIBCCALL libc_wctrans_l)(char const *prop,
+                                     locale_t locale) {
+	(void)locale;
+	COMPILER_IMPURE();
+	return libc_wctrans(prop);
 }
 INTERN ATTR_SECTION(".text.crt.wchar.unicode.static.mbs") ATTR_CONST WUNUSED int
 NOTHROW_NCX(LIBCCALL libc_isleadbyte)(int wc) {
@@ -259,137 +686,274 @@ NOTHROW_NCX(LIBCCALL libc__isleadbyte_l)(int wc,
 	COMPILER_IMPURE();
 	return libc_isleadbyte(wc);
 }
-INTERN ATTR_SECTION(".text.crt.wchar.unicode.static.mbs") ATTR_CONST WUNUSED int
-NOTHROW_NCX(LIBCCALL libc___iswcsymf)(wint_t wc) {
+#include <bits/crt/unicode.h>
+INTERN ATTR_SECTION(".text.crt.dos.wchar.unicode.static.mbs") ATTR_CONST WUNUSED int
+NOTHROW_NCX(LIBDCALL libd___iswcsymf)(wint16_t wc) {
+#if defined(__CRT_KOS) && defined(__CRT_HAVE___unicode_descriptor)
+	struct __unitraits const *traits = libc___unicode_descriptor(wc);
+	return (int)(traits->__ut_flags & __UNICODE_ISSYMSTRT);
+#else /* __CRT_KOS && __CRT_HAVE___unicode_descriptor */
+	return libd_iswalpha(wc) || wc == '_' || wc == '$';
+#endif /* !__CRT_KOS || !__CRT_HAVE___unicode_descriptor */
+}
+#include <bits/crt/unicode.h>
+INTERN ATTR_SECTION(".text.crt.dos.wchar.unicode.static.mbs") ATTR_CONST WUNUSED int
+NOTHROW_NCX(LIBKCALL libc___iswcsymf)(wint32_t wc) {
+#if defined(__CRT_KOS) && defined(__CRT_HAVE___unicode_descriptor)
+	struct __unitraits const *traits = libc___unicode_descriptor(wc);
+	return (int)(traits->__ut_flags & __UNICODE_ISSYMSTRT);
+#else /* __CRT_KOS && __CRT_HAVE___unicode_descriptor */
 	return libc_iswalpha(wc) || wc == '_' || wc == '$';
+#endif /* !__CRT_KOS || !__CRT_HAVE___unicode_descriptor */
 }
-INTERN ATTR_SECTION(".text.crt.wchar.unicode.static.mbs") ATTR_CONST WUNUSED int
-NOTHROW_NCX(LIBCCALL libc___iswcsym)(wint_t wc) {
+#include <bits/crt/unicode.h>
+INTERN ATTR_SECTION(".text.crt.dos.wchar.unicode.static.mbs") ATTR_CONST WUNUSED int
+NOTHROW_NCX(LIBDCALL libd___iswcsym)(wint16_t wc) {
+#if defined(__CRT_KOS) && defined(__CRT_HAVE___unicode_descriptor)
+	struct __unitraits const *traits = libc___unicode_descriptor(wc);
+	return (int)(traits->__ut_flags & __UNICODE_ISSYMCONT);
+#else /* __CRT_KOS && __CRT_HAVE___unicode_descriptor */
+	return libd_iswalnum(wc) || wc == '_' || wc == '$';
+#endif /* !__CRT_KOS || !__CRT_HAVE___unicode_descriptor */
+}
+#include <bits/crt/unicode.h>
+INTERN ATTR_SECTION(".text.crt.dos.wchar.unicode.static.mbs") ATTR_CONST WUNUSED int
+NOTHROW_NCX(LIBKCALL libc___iswcsym)(wint32_t wc) {
+#if defined(__CRT_KOS) && defined(__CRT_HAVE___unicode_descriptor)
+	struct __unitraits const *traits = libc___unicode_descriptor(wc);
+	return (int)(traits->__ut_flags & __UNICODE_ISSYMCONT);
+#else /* __CRT_KOS && __CRT_HAVE___unicode_descriptor */
 	return libc_iswalnum(wc) || wc == '_' || wc == '$';
+#endif /* !__CRT_KOS || !__CRT_HAVE___unicode_descriptor */
 }
-INTERN ATTR_SECTION(".text.crt.wchar.unicode.locale.mbs") ATTR_PURE WUNUSED int
-NOTHROW_NCX(LIBCCALL libc__iswcsymf_l)(wint_t wc,
+INTERN ATTR_SECTION(".text.crt.dos.wchar.unicode.locale.mbs") ATTR_PURE WUNUSED int
+NOTHROW_NCX(LIBDCALL libd__iswcsymf_l)(wint16_t wc,
                                        locale_t locale) {
-	return libc_iswalpha_l(wc, locale) || wc == '_' || wc == '$';
+#if defined(__CRT_KOS) && defined(__CRT_HAVE___unicode_descriptor)
+	(void)locale;
+	COMPILER_IMPURE();
+	return libd___iswcsymf(wc);
+#else /* __CRT_KOS && __CRT_HAVE___unicode_descriptor */
+	return libd_iswalpha_l(wc, locale) || wc == '_' || wc == '$';
+#endif /* !__CRT_KOS || !__CRT_HAVE___unicode_descriptor */
 }
-INTERN ATTR_SECTION(".text.crt.wchar.unicode.locale.mbs") ATTR_PURE WUNUSED int
-NOTHROW_NCX(LIBCCALL libc__iswcsym_l)(wint_t wc,
+INTERN ATTR_SECTION(".text.crt.dos.wchar.unicode.locale.mbs") ATTR_PURE WUNUSED int
+NOTHROW_NCX(LIBKCALL libc__iswcsymf_l)(wint32_t wc,
+                                       locale_t locale) {
+#if defined(__CRT_KOS) && defined(__CRT_HAVE___unicode_descriptor)
+	(void)locale;
+	COMPILER_IMPURE();
+	return libc___iswcsymf(wc);
+#else /* __CRT_KOS && __CRT_HAVE___unicode_descriptor */
+	return libc_iswalpha_l(wc, locale) || wc == '_' || wc == '$';
+#endif /* !__CRT_KOS || !__CRT_HAVE___unicode_descriptor */
+}
+INTERN ATTR_SECTION(".text.crt.dos.wchar.unicode.locale.mbs") ATTR_PURE WUNUSED int
+NOTHROW_NCX(LIBDCALL libd__iswcsym_l)(wint16_t wc,
                                       locale_t locale) {
+#if defined(__CRT_KOS) && defined(__CRT_HAVE___unicode_descriptor)
+	(void)locale;
+	COMPILER_IMPURE();
+	return libd___iswcsym(wc);
+#else /* __CRT_KOS && __CRT_HAVE___unicode_descriptor */
+	return libd_iswalnum_l(wc, locale) || wc == '_' || wc == '$';
+#endif /* !__CRT_KOS || !__CRT_HAVE___unicode_descriptor */
+}
+INTERN ATTR_SECTION(".text.crt.dos.wchar.unicode.locale.mbs") ATTR_PURE WUNUSED int
+NOTHROW_NCX(LIBKCALL libc__iswcsym_l)(wint32_t wc,
+                                      locale_t locale) {
+#if defined(__CRT_KOS) && defined(__CRT_HAVE___unicode_descriptor)
+	(void)locale;
+	COMPILER_IMPURE();
+	return libc___iswcsym(wc);
+#else /* __CRT_KOS && __CRT_HAVE___unicode_descriptor */
 	return libc_iswalnum_l(wc, locale) || wc == '_' || wc == '$';
+#endif /* !__CRT_KOS || !__CRT_HAVE___unicode_descriptor */
 }
 #endif /* !__KERNEL__ */
 
 DECL_END
 
 #ifndef __KERNEL__
-DEFINE_PUBLIC_ALIAS(iswalnum, libc_iswalnum);
-DEFINE_PUBLIC_ALIAS(iswalpha, libc_iswalpha);
+DEFINE_PUBLIC_ALIAS(DOS$iswcntrl, libd_iswcntrl);
 DEFINE_PUBLIC_ALIAS(iswcntrl, libc_iswcntrl);
-DEFINE_PUBLIC_ALIAS(iswdigit, libc_iswdigit);
-DEFINE_PUBLIC_ALIAS(iswgraph, libc_iswgraph);
-DEFINE_PUBLIC_ALIAS(iswlower, libc_iswlower);
-DEFINE_PUBLIC_ALIAS(iswprint, libc_iswprint);
-DEFINE_PUBLIC_ALIAS(iswpunct, libc_iswpunct);
+DEFINE_PUBLIC_ALIAS(DOS$iswspace, libd_iswspace);
 DEFINE_PUBLIC_ALIAS(iswspace, libc_iswspace);
+DEFINE_PUBLIC_ALIAS(DOS$iswupper, libd_iswupper);
 DEFINE_PUBLIC_ALIAS(iswupper, libc_iswupper);
+DEFINE_PUBLIC_ALIAS(DOS$iswlower, libd_iswlower);
+DEFINE_PUBLIC_ALIAS(iswlower, libc_iswlower);
+DEFINE_PUBLIC_ALIAS(DOS$iswalpha, libd_iswalpha);
+DEFINE_PUBLIC_ALIAS(iswalpha, libc_iswalpha);
+DEFINE_PUBLIC_ALIAS(DOS$iswdigit, libd_iswdigit);
+DEFINE_PUBLIC_ALIAS(iswdigit, libc_iswdigit);
+DEFINE_PUBLIC_ALIAS(DOS$iswxdigit, libd_iswxdigit);
 DEFINE_PUBLIC_ALIAS(iswxdigit, libc_iswxdigit);
+DEFINE_PUBLIC_ALIAS(DOS$iswalnum, libd_iswalnum);
+DEFINE_PUBLIC_ALIAS(iswalnum, libc_iswalnum);
+DEFINE_PUBLIC_ALIAS(DOS$iswpunct, libd_iswpunct);
+DEFINE_PUBLIC_ALIAS(iswpunct, libc_iswpunct);
+DEFINE_PUBLIC_ALIAS(DOS$iswgraph, libd_iswgraph);
+DEFINE_PUBLIC_ALIAS(iswgraph, libc_iswgraph);
+DEFINE_PUBLIC_ALIAS(DOS$iswprint, libd_iswprint);
+DEFINE_PUBLIC_ALIAS(iswprint, libc_iswprint);
+DEFINE_PUBLIC_ALIAS(DOS$towlower, libd_towlower);
+DEFINE_PUBLIC_ALIAS(towlower, libc_towlower);
+DEFINE_PUBLIC_ALIAS(DOS$towupper, libd_towupper);
+DEFINE_PUBLIC_ALIAS(towupper, libc_towupper);
+DEFINE_PUBLIC_ALIAS(DOS$iswblank, libd_iswblank);
+DEFINE_PUBLIC_ALIAS(iswblank, libc_iswblank);
 DEFINE_PUBLIC_ALIAS(wctrans, libc_wctrans);
+DEFINE_PUBLIC_ALIAS(DOS$__towctrans, libd_towctrans);
+DEFINE_PUBLIC_ALIAS(DOS$towctrans, libd_towctrans);
 DEFINE_PUBLIC_ALIAS(__towctrans, libc_towctrans);
 DEFINE_PUBLIC_ALIAS(towctrans, libc_towctrans);
 DEFINE_PUBLIC_ALIAS(wctype, libc_wctype);
+DEFINE_PUBLIC_ALIAS(DOS$is_wctype, libd_iswctype);
+DEFINE_PUBLIC_ALIAS(DOS$__iswctype, libd_iswctype);
+DEFINE_PUBLIC_ALIAS(DOS$iswctype, libd_iswctype);
 DEFINE_PUBLIC_ALIAS(is_wctype, libc_iswctype);
 DEFINE_PUBLIC_ALIAS(__iswctype, libc_iswctype);
 DEFINE_PUBLIC_ALIAS(iswctype, libc_iswctype);
-DEFINE_PUBLIC_ALIAS(iswblank, libc_iswblank);
-DEFINE_PUBLIC_ALIAS(towlower, libc_towlower);
-DEFINE_PUBLIC_ALIAS(towupper, libc_towupper);
+DEFINE_PUBLIC_ALIAS(DOS$iswascii, libd_iswascii);
 DEFINE_PUBLIC_ALIAS(iswascii, libc_iswascii);
-#ifdef __LIBCCALL_IS_LIBDCALL
-DEFINE_PUBLIC_ALIAS(_iswalnum_l, libc_iswalnum_l);
-#endif /* __LIBCCALL_IS_LIBDCALL */
-DEFINE_PUBLIC_ALIAS(__iswalnum_l, libc_iswalnum_l);
-DEFINE_PUBLIC_ALIAS(iswalnum_l, libc_iswalnum_l);
-#ifdef __LIBCCALL_IS_LIBDCALL
-DEFINE_PUBLIC_ALIAS(_iswalpha_l, libc_iswalpha_l);
-#endif /* __LIBCCALL_IS_LIBDCALL */
-DEFINE_PUBLIC_ALIAS(__iswalpha_l, libc_iswalpha_l);
-DEFINE_PUBLIC_ALIAS(iswalpha_l, libc_iswalpha_l);
+DEFINE_PUBLIC_ALIAS(DOS$_iswcntrl_l, libd_iswcntrl_l);
+DEFINE_PUBLIC_ALIAS(DOS$__iswcntrl_l, libd_iswcntrl_l);
+DEFINE_PUBLIC_ALIAS(DOS$iswcntrl_l, libd_iswcntrl_l);
 #ifdef __LIBCCALL_IS_LIBDCALL
 DEFINE_PUBLIC_ALIAS(_iswcntrl_l, libc_iswcntrl_l);
 #endif /* __LIBCCALL_IS_LIBDCALL */
 DEFINE_PUBLIC_ALIAS(__iswcntrl_l, libc_iswcntrl_l);
 DEFINE_PUBLIC_ALIAS(iswcntrl_l, libc_iswcntrl_l);
-#ifdef __LIBCCALL_IS_LIBDCALL
-DEFINE_PUBLIC_ALIAS(_iswdigit_l, libc_iswdigit_l);
-#endif /* __LIBCCALL_IS_LIBDCALL */
-DEFINE_PUBLIC_ALIAS(__iswdigit_l, libc_iswdigit_l);
-DEFINE_PUBLIC_ALIAS(iswdigit_l, libc_iswdigit_l);
-#ifdef __LIBCCALL_IS_LIBDCALL
-DEFINE_PUBLIC_ALIAS(_iswgraph_l, libc_iswgraph_l);
-#endif /* __LIBCCALL_IS_LIBDCALL */
-DEFINE_PUBLIC_ALIAS(__iswgraph_l, libc_iswgraph_l);
-DEFINE_PUBLIC_ALIAS(iswgraph_l, libc_iswgraph_l);
-#ifdef __LIBCCALL_IS_LIBDCALL
-DEFINE_PUBLIC_ALIAS(_iswlower_l, libc_iswlower_l);
-#endif /* __LIBCCALL_IS_LIBDCALL */
-DEFINE_PUBLIC_ALIAS(__iswlower_l, libc_iswlower_l);
-DEFINE_PUBLIC_ALIAS(iswlower_l, libc_iswlower_l);
-#ifdef __LIBCCALL_IS_LIBDCALL
-DEFINE_PUBLIC_ALIAS(_iswprint_l, libc_iswprint_l);
-#endif /* __LIBCCALL_IS_LIBDCALL */
-DEFINE_PUBLIC_ALIAS(__iswprint_l, libc_iswprint_l);
-DEFINE_PUBLIC_ALIAS(iswprint_l, libc_iswprint_l);
-#ifdef __LIBCCALL_IS_LIBDCALL
-DEFINE_PUBLIC_ALIAS(_iswpunct_l, libc_iswpunct_l);
-#endif /* __LIBCCALL_IS_LIBDCALL */
-DEFINE_PUBLIC_ALIAS(__iswpunct_l, libc_iswpunct_l);
-DEFINE_PUBLIC_ALIAS(iswpunct_l, libc_iswpunct_l);
+DEFINE_PUBLIC_ALIAS(DOS$_iswspace_l, libd_iswspace_l);
+DEFINE_PUBLIC_ALIAS(DOS$__iswspace_l, libd_iswspace_l);
+DEFINE_PUBLIC_ALIAS(DOS$iswspace_l, libd_iswspace_l);
 #ifdef __LIBCCALL_IS_LIBDCALL
 DEFINE_PUBLIC_ALIAS(_iswspace_l, libc_iswspace_l);
 #endif /* __LIBCCALL_IS_LIBDCALL */
 DEFINE_PUBLIC_ALIAS(__iswspace_l, libc_iswspace_l);
 DEFINE_PUBLIC_ALIAS(iswspace_l, libc_iswspace_l);
+DEFINE_PUBLIC_ALIAS(DOS$_iswupper_l, libd_iswupper_l);
+DEFINE_PUBLIC_ALIAS(DOS$__iswupper_l, libd_iswupper_l);
+DEFINE_PUBLIC_ALIAS(DOS$iswupper_l, libd_iswupper_l);
 #ifdef __LIBCCALL_IS_LIBDCALL
 DEFINE_PUBLIC_ALIAS(_iswupper_l, libc_iswupper_l);
 #endif /* __LIBCCALL_IS_LIBDCALL */
 DEFINE_PUBLIC_ALIAS(__iswupper_l, libc_iswupper_l);
 DEFINE_PUBLIC_ALIAS(iswupper_l, libc_iswupper_l);
+DEFINE_PUBLIC_ALIAS(DOS$_iswlower_l, libd_iswlower_l);
+DEFINE_PUBLIC_ALIAS(DOS$__iswlower_l, libd_iswlower_l);
+DEFINE_PUBLIC_ALIAS(DOS$iswlower_l, libd_iswlower_l);
+#ifdef __LIBCCALL_IS_LIBDCALL
+DEFINE_PUBLIC_ALIAS(_iswlower_l, libc_iswlower_l);
+#endif /* __LIBCCALL_IS_LIBDCALL */
+DEFINE_PUBLIC_ALIAS(__iswlower_l, libc_iswlower_l);
+DEFINE_PUBLIC_ALIAS(iswlower_l, libc_iswlower_l);
+DEFINE_PUBLIC_ALIAS(DOS$_iswalpha_l, libd_iswalpha_l);
+DEFINE_PUBLIC_ALIAS(DOS$__iswalpha_l, libd_iswalpha_l);
+DEFINE_PUBLIC_ALIAS(DOS$iswalpha_l, libd_iswalpha_l);
+#ifdef __LIBCCALL_IS_LIBDCALL
+DEFINE_PUBLIC_ALIAS(_iswalpha_l, libc_iswalpha_l);
+#endif /* __LIBCCALL_IS_LIBDCALL */
+DEFINE_PUBLIC_ALIAS(__iswalpha_l, libc_iswalpha_l);
+DEFINE_PUBLIC_ALIAS(iswalpha_l, libc_iswalpha_l);
+DEFINE_PUBLIC_ALIAS(DOS$_iswdigit_l, libd_iswdigit_l);
+DEFINE_PUBLIC_ALIAS(DOS$__iswdigit_l, libd_iswdigit_l);
+DEFINE_PUBLIC_ALIAS(DOS$iswdigit_l, libd_iswdigit_l);
+#ifdef __LIBCCALL_IS_LIBDCALL
+DEFINE_PUBLIC_ALIAS(_iswdigit_l, libc_iswdigit_l);
+#endif /* __LIBCCALL_IS_LIBDCALL */
+DEFINE_PUBLIC_ALIAS(__iswdigit_l, libc_iswdigit_l);
+DEFINE_PUBLIC_ALIAS(iswdigit_l, libc_iswdigit_l);
+DEFINE_PUBLIC_ALIAS(DOS$_iswxdigit_l, libd_iswxdigit_l);
+DEFINE_PUBLIC_ALIAS(DOS$__iswxdigit_l, libd_iswxdigit_l);
+DEFINE_PUBLIC_ALIAS(DOS$iswxdigit_l, libd_iswxdigit_l);
 #ifdef __LIBCCALL_IS_LIBDCALL
 DEFINE_PUBLIC_ALIAS(_iswxdigit_l, libc_iswxdigit_l);
 #endif /* __LIBCCALL_IS_LIBDCALL */
 DEFINE_PUBLIC_ALIAS(__iswxdigit_l, libc_iswxdigit_l);
 DEFINE_PUBLIC_ALIAS(iswxdigit_l, libc_iswxdigit_l);
+DEFINE_PUBLIC_ALIAS(DOS$_iswalnum_l, libd_iswalnum_l);
+DEFINE_PUBLIC_ALIAS(DOS$__iswalnum_l, libd_iswalnum_l);
+DEFINE_PUBLIC_ALIAS(DOS$iswalnum_l, libd_iswalnum_l);
+#ifdef __LIBCCALL_IS_LIBDCALL
+DEFINE_PUBLIC_ALIAS(_iswalnum_l, libc_iswalnum_l);
+#endif /* __LIBCCALL_IS_LIBDCALL */
+DEFINE_PUBLIC_ALIAS(__iswalnum_l, libc_iswalnum_l);
+DEFINE_PUBLIC_ALIAS(iswalnum_l, libc_iswalnum_l);
+DEFINE_PUBLIC_ALIAS(DOS$_iswpunct_l, libd_iswpunct_l);
+DEFINE_PUBLIC_ALIAS(DOS$__iswpunct_l, libd_iswpunct_l);
+DEFINE_PUBLIC_ALIAS(DOS$iswpunct_l, libd_iswpunct_l);
+#ifdef __LIBCCALL_IS_LIBDCALL
+DEFINE_PUBLIC_ALIAS(_iswpunct_l, libc_iswpunct_l);
+#endif /* __LIBCCALL_IS_LIBDCALL */
+DEFINE_PUBLIC_ALIAS(__iswpunct_l, libc_iswpunct_l);
+DEFINE_PUBLIC_ALIAS(iswpunct_l, libc_iswpunct_l);
+DEFINE_PUBLIC_ALIAS(DOS$_iswgraph_l, libd_iswgraph_l);
+DEFINE_PUBLIC_ALIAS(DOS$__iswgraph_l, libd_iswgraph_l);
+DEFINE_PUBLIC_ALIAS(DOS$iswgraph_l, libd_iswgraph_l);
+#ifdef __LIBCCALL_IS_LIBDCALL
+DEFINE_PUBLIC_ALIAS(_iswgraph_l, libc_iswgraph_l);
+#endif /* __LIBCCALL_IS_LIBDCALL */
+DEFINE_PUBLIC_ALIAS(__iswgraph_l, libc_iswgraph_l);
+DEFINE_PUBLIC_ALIAS(iswgraph_l, libc_iswgraph_l);
+DEFINE_PUBLIC_ALIAS(DOS$_iswprint_l, libd_iswprint_l);
+DEFINE_PUBLIC_ALIAS(DOS$__iswprint_l, libd_iswprint_l);
+DEFINE_PUBLIC_ALIAS(DOS$iswprint_l, libd_iswprint_l);
+#ifdef __LIBCCALL_IS_LIBDCALL
+DEFINE_PUBLIC_ALIAS(_iswprint_l, libc_iswprint_l);
+#endif /* __LIBCCALL_IS_LIBDCALL */
+DEFINE_PUBLIC_ALIAS(__iswprint_l, libc_iswprint_l);
+DEFINE_PUBLIC_ALIAS(iswprint_l, libc_iswprint_l);
+DEFINE_PUBLIC_ALIAS(DOS$_iswblank_l, libd_iswblank_l);
+DEFINE_PUBLIC_ALIAS(DOS$__iswblank_l, libd_iswblank_l);
+DEFINE_PUBLIC_ALIAS(DOS$iswblank_l, libd_iswblank_l);
 #ifdef __LIBCCALL_IS_LIBDCALL
 DEFINE_PUBLIC_ALIAS(_iswblank_l, libc_iswblank_l);
 #endif /* __LIBCCALL_IS_LIBDCALL */
 DEFINE_PUBLIC_ALIAS(__iswblank_l, libc_iswblank_l);
 DEFINE_PUBLIC_ALIAS(iswblank_l, libc_iswblank_l);
-#ifdef __LIBCCALL_IS_LIBDCALL
-DEFINE_PUBLIC_ALIAS(_iswctype_l, libc_iswctype_l);
-#endif /* __LIBCCALL_IS_LIBDCALL */
-DEFINE_PUBLIC_ALIAS(__iswctype_l, libc_iswctype_l);
-DEFINE_PUBLIC_ALIAS(iswctype_l, libc_iswctype_l);
-#ifdef __LIBCCALL_IS_LIBDCALL
-DEFINE_PUBLIC_ALIAS(_towupper_l, libc_towupper_l);
-#endif /* __LIBCCALL_IS_LIBDCALL */
-DEFINE_PUBLIC_ALIAS(__towupper_l, libc_towupper_l);
-DEFINE_PUBLIC_ALIAS(towupper_l, libc_towupper_l);
+DEFINE_PUBLIC_ALIAS(DOS$_towlower_l, libd_towlower_l);
+DEFINE_PUBLIC_ALIAS(DOS$__towlower_l, libd_towlower_l);
+DEFINE_PUBLIC_ALIAS(DOS$towlower_l, libd_towlower_l);
 #ifdef __LIBCCALL_IS_LIBDCALL
 DEFINE_PUBLIC_ALIAS(_towlower_l, libc_towlower_l);
 #endif /* __LIBCCALL_IS_LIBDCALL */
 DEFINE_PUBLIC_ALIAS(__towlower_l, libc_towlower_l);
 DEFINE_PUBLIC_ALIAS(towlower_l, libc_towlower_l);
+DEFINE_PUBLIC_ALIAS(DOS$_towupper_l, libd_towupper_l);
+DEFINE_PUBLIC_ALIAS(DOS$__towupper_l, libd_towupper_l);
+DEFINE_PUBLIC_ALIAS(DOS$towupper_l, libd_towupper_l);
+#ifdef __LIBCCALL_IS_LIBDCALL
+DEFINE_PUBLIC_ALIAS(_towupper_l, libc_towupper_l);
+#endif /* __LIBCCALL_IS_LIBDCALL */
+DEFINE_PUBLIC_ALIAS(__towupper_l, libc_towupper_l);
+DEFINE_PUBLIC_ALIAS(towupper_l, libc_towupper_l);
+DEFINE_PUBLIC_ALIAS(DOS$_iswctype_l, libd_iswctype_l);
+DEFINE_PUBLIC_ALIAS(DOS$__iswctype_l, libd_iswctype_l);
+DEFINE_PUBLIC_ALIAS(DOS$iswctype_l, libd_iswctype_l);
+#ifdef __LIBCCALL_IS_LIBDCALL
+DEFINE_PUBLIC_ALIAS(_iswctype_l, libc_iswctype_l);
+#endif /* __LIBCCALL_IS_LIBDCALL */
+DEFINE_PUBLIC_ALIAS(__iswctype_l, libc_iswctype_l);
+DEFINE_PUBLIC_ALIAS(iswctype_l, libc_iswctype_l);
 DEFINE_PUBLIC_ALIAS(__wctype_l, libc_wctype_l);
 DEFINE_PUBLIC_ALIAS(wctype_l, libc_wctype_l);
-DEFINE_PUBLIC_ALIAS(__wctrans_l, libc_wctrans_l);
-DEFINE_PUBLIC_ALIAS(wctrans_l, libc_wctrans_l);
+DEFINE_PUBLIC_ALIAS(DOS$__towctrans_l, libd_towctrans_l);
+DEFINE_PUBLIC_ALIAS(DOS$towctrans_l, libd_towctrans_l);
 DEFINE_PUBLIC_ALIAS(__towctrans_l, libc_towctrans_l);
 DEFINE_PUBLIC_ALIAS(towctrans_l, libc_towctrans_l);
+DEFINE_PUBLIC_ALIAS(__wctrans_l, libc_wctrans_l);
+DEFINE_PUBLIC_ALIAS(wctrans_l, libc_wctrans_l);
 DEFINE_PUBLIC_ALIAS(isleadbyte, libc_isleadbyte);
 DEFINE_PUBLIC_ALIAS(_isleadbyte_l, libc__isleadbyte_l);
+DEFINE_PUBLIC_ALIAS(DOS$__iswcsymf, libd___iswcsymf);
 DEFINE_PUBLIC_ALIAS(__iswcsymf, libc___iswcsymf);
+DEFINE_PUBLIC_ALIAS(DOS$__iswcsym, libd___iswcsym);
 DEFINE_PUBLIC_ALIAS(__iswcsym, libc___iswcsym);
+DEFINE_PUBLIC_ALIAS(DOS$_iswcsymf_l, libd__iswcsymf_l);
 DEFINE_PUBLIC_ALIAS(_iswcsymf_l, libc__iswcsymf_l);
+DEFINE_PUBLIC_ALIAS(DOS$_iswcsym_l, libd__iswcsym_l);
 DEFINE_PUBLIC_ALIAS(_iswcsym_l, libc__iswcsym_l);
 #endif /* !__KERNEL__ */
 

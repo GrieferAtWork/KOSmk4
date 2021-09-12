@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x70fa97a9 */
+/* HASH CRC-32:0x2b390a44 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -2788,33 +2788,33 @@ __NAMESPACE_LOCAL_USING_OR_IMPL(lockf64, __FORCELOCAL __ATTR_ARTIFICIAL int __NO
 
 #ifdef __USE_GNU
 #if defined(__COMPILER_HAVE_AUTOTYPE) && defined(__COMPILER_HAVE_TYPEOF)
-#define TEMP_FAILURE_RETRY(expression)                     \
-	__XBLOCK({                                             \
-		__auto_type __result;                              \
-		do {                                               \
-			__result = (expression);                       \
-		} while (__result == (__typeof__(__result)) - 1 && \
-		         errno == EINTR);                          \
-		__XRETURN __result;                                \
+#define TEMP_FAILURE_RETRY(expression)                             \
+	__XBLOCK({                                                     \
+		__auto_type __tfr_result;                                  \
+		do {                                                       \
+			__tfr_result = (expression);                           \
+		} while (__tfr_result == (__typeof__(__tfr_result)) - 1 && \
+		         errno == EINTR);                                  \
+		__XRETURN __tfr_result;                                    \
 	})
 #elif defined(__COMPILER_HAVE_TYPEOF)
-#define TEMP_FAILURE_RETRY(expression)                     \
-	__XBLOCK({                                             \
-		__typeof__(expression) __result;                   \
-		do {                                               \
-			__result = (expression);                       \
-		} while (__result == (__typeof__(__result)) - 1 && \
-		         errno == EINTR);                          \
-		__XRETURN __result;                                \
+#define TEMP_FAILURE_RETRY(expression)                             \
+	__XBLOCK({                                                     \
+		__typeof__(expression) __tfr_result;                       \
+		do {                                                       \
+			__tfr_result = (expression);                           \
+		} while (__tfr_result == (__typeof__(__tfr_result)) - 1 && \
+		         errno == EINTR);                                  \
+		__XRETURN __tfr_result;                                    \
 	})
 #else /* __COMPILER_HAVE_TYPEOF */
-#define TEMP_FAILURE_RETRY(expression)               \
-	__XBLOCK({                                       \
-		long int __result;                           \
-		do {                                         \
-			__result = (long int)(expression);       \
-		} while (__result == -1L && errno == EINTR); \
-		__XRETURN __result;                          \
+#define TEMP_FAILURE_RETRY(expression)                   \
+	__XBLOCK({                                           \
+		long int __tfr_result;                           \
+		do {                                             \
+			__tfr_result = (long int)(expression);       \
+		} while (__tfr_result == -1L && errno == EINTR); \
+		__XRETURN __tfr_result;                          \
 	})
 #endif /* !__COMPILER_HAVE_TYPEOF */
 #endif /* __USE_GNU */

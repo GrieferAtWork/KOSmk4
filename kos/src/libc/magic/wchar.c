@@ -45,6 +45,13 @@
 %[define_replacement(WEOF = __WEOF)]
 %[define_replacement(mbstate_isempty = __mbstate_isempty)]
 %[define_replacement(mbstate_init = __mbstate_init)]
+
+%[define_wchar_replacement(wchar_t = char16_t, char32_t)]
+%[define_wchar_replacement(wint_t = wint16_t, wint32_t)]
+%[define_wchar_replacement(__WINT_TYPE__ = __WINT16_TYPE__, __WINT32_TYPE__)]
+%[define_wchar_replacement(__WCHAR_TYPE__ = __CHAR16_TYPE__, __CHAR32_TYPE__)]
+%[define_wchar_replacement(__SIZEOF_WINT_T__ = "2", "4")]
+%[define_wchar_replacement(__SIZEOF_WCHAR_T__ = "2", "4")]
 %[define_wchar_replacement(WEOF = __WEOF16, __WEOF32)]
 %[define_wchar_replacement(__WEOF = __WEOF16, __WEOF32)]
 
@@ -215,29 +222,22 @@ __NAMESPACE_STD_USING(wint_t)
 
 
 %[default:section(".text.crt{|.dos}.wchar.unicode.static.mbs")];
-[[std, wunused, ATTR_CONST, wchar]]
+[[wchar, std, wunused, const, wchar]]
 [[decl_include("<hybrid/typecore.h>")]]
 wint_t btowc(int ch) {
 	if (ch >= 0 && ch <= 0x7f)
 		return (wint_t)ch;
-@@pp_if __SIZEOF_WCHAR_T__ == 4@@
-	return (__CCAST(__WINT_TYPE__)0xffffffffu);
-@@pp_else@@
-	return (__CCAST(__WINT_TYPE__)0xffff);
-@@pp_endif@@
-};
+	return WEOF;
+}
 
-%(auto_source)#include <stdio.h>
-;
-
-[[std, wunused, ATTR_CONST]]
+[[wchar, std, wunused, const]]
 [[impl_include("<asm/crt/stdio.h>")]]
 [[decl_include("<hybrid/typecore.h>")]]
 int wctob(wint_t ch) {
 	if (ch >= 0 && ch <= 0x7f)
 		return (int)ch;
 	return EOF;
-};
+}
 
 
 %[declare_user_export("mbrtoc16", "c16rtomb")]
@@ -1038,7 +1038,7 @@ wcsdup(*) %{generate(str2wcs("strdup"))}
 %
 %#ifdef __USE_XOPEN
 [[decl_include("<hybrid/typecore.h>")]]
-[[wchar, wunused, ATTR_CONST, impl_include("<libc/unicode.h>")]]
+[[wchar, wunused, const, impl_include("<libc/unicode.h>")]]
 [[section(".text.crt{|.dos}.wchar.unicode.static.mbs")]]
 int wcwidth(wchar_t ch) {
 @@pp_if __SIZEOF_WCHAR_T__ == 2@@

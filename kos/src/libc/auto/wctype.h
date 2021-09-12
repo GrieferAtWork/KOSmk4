@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x5d5b47aa */
+/* HASH CRC-32:0xb01c11cd */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -29,227 +29,171 @@
 
 DECL_BEGIN
 
-#if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
-INTDEF ATTR_CONST WUNUSED int NOTHROW(LIBDCALL libd_iswalnum)(wint_t wc);
-#endif /* !__LIBCCALL_IS_LIBDCALL && !__KERNEL__ */
+/* For the sake of optimization, allow libc auto
+ * functions to make direct use of unicode data. */
 #ifndef __KERNEL__
-INTDEF ATTR_CONST WUNUSED int NOTHROW(LIBCCALL libc_iswalnum)(wint_t wc);
+#define libc_iswcntrl(ch)  __crt_iswcntrl(ch)
+#define libc_iswspace(ch)  __crt_iswspace(ch)
+#define libc_iswupper(ch)  __crt_iswupper(ch)
+#define libc_iswlower(ch)  __crt_iswlower(ch)
+#define libc_iswalpha(ch)  __crt_iswalpha(ch)
+#define libc_iswdigit(ch)  __crt_iswdigit(ch)
+#define libc_iswxdigit(ch) __crt_iswxdigit(ch)
+#define libc_iswalnum(ch)  __crt_iswalnum(ch)
+#define libc_iswpunct(ch)  __crt_iswpunct(ch)
+#define libc_iswgraph(ch)  __crt_iswgraph(ch)
+#define libc_iswprint(ch)  __crt_iswprint(ch)
+#define libc_iswblank(ch)  __crt_iswblank(ch)
+#define libc_towlower(ch)  __crt_towlower(ch)
+#define libc_towupper(ch)  __crt_towupper(ch)
 #endif /* !__KERNEL__ */
-#if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
-INTDEF ATTR_CONST WUNUSED int NOTHROW(LIBDCALL libd_iswalpha)(wint_t wc);
-#endif /* !__LIBCCALL_IS_LIBDCALL && !__KERNEL__ */
 #ifndef __KERNEL__
-INTDEF ATTR_CONST WUNUSED int NOTHROW(LIBCCALL libc_iswalpha)(wint_t wc);
-#endif /* !__KERNEL__ */
-#if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
-INTDEF ATTR_CONST WUNUSED int NOTHROW(LIBDCALL libd_iswcntrl)(wint_t wc);
-#endif /* !__LIBCCALL_IS_LIBDCALL && !__KERNEL__ */
-#ifndef __KERNEL__
-INTDEF ATTR_CONST WUNUSED int NOTHROW(LIBCCALL libc_iswcntrl)(wint_t wc);
-#endif /* !__KERNEL__ */
-#if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
-INTDEF ATTR_CONST WUNUSED int NOTHROW(LIBDCALL libd_iswdigit)(wint_t wc);
-#endif /* !__LIBCCALL_IS_LIBDCALL && !__KERNEL__ */
-#ifndef __KERNEL__
-INTDEF ATTR_CONST WUNUSED int NOTHROW(LIBCCALL libc_iswdigit)(wint_t wc);
-#endif /* !__KERNEL__ */
-#if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
-INTDEF ATTR_CONST WUNUSED int NOTHROW(LIBDCALL libd_iswgraph)(wint_t wc);
-#endif /* !__LIBCCALL_IS_LIBDCALL && !__KERNEL__ */
-#ifndef __KERNEL__
-INTDEF ATTR_CONST WUNUSED int NOTHROW(LIBCCALL libc_iswgraph)(wint_t wc);
-#endif /* !__KERNEL__ */
-#if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
-INTDEF ATTR_CONST WUNUSED int NOTHROW(LIBDCALL libd_iswlower)(wint_t wc);
-#endif /* !__LIBCCALL_IS_LIBDCALL && !__KERNEL__ */
-#ifndef __KERNEL__
-INTDEF ATTR_CONST WUNUSED int NOTHROW(LIBCCALL libc_iswlower)(wint_t wc);
-#endif /* !__KERNEL__ */
-#if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
-INTDEF ATTR_CONST WUNUSED int NOTHROW(LIBDCALL libd_iswprint)(wint_t wc);
-#endif /* !__LIBCCALL_IS_LIBDCALL && !__KERNEL__ */
-#ifndef __KERNEL__
-INTDEF ATTR_CONST WUNUSED int NOTHROW(LIBCCALL libc_iswprint)(wint_t wc);
-#endif /* !__KERNEL__ */
-#if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
-INTDEF ATTR_CONST WUNUSED int NOTHROW(LIBDCALL libd_iswpunct)(wint_t wc);
-#endif /* !__LIBCCALL_IS_LIBDCALL && !__KERNEL__ */
-#ifndef __KERNEL__
-INTDEF ATTR_CONST WUNUSED int NOTHROW(LIBCCALL libc_iswpunct)(wint_t wc);
-#endif /* !__KERNEL__ */
-#if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
-INTDEF ATTR_CONST WUNUSED int NOTHROW(LIBDCALL libd_iswspace)(wint_t wc);
-#endif /* !__LIBCCALL_IS_LIBDCALL && !__KERNEL__ */
-#ifndef __KERNEL__
-INTDEF ATTR_CONST WUNUSED int NOTHROW(LIBCCALL libc_iswspace)(wint_t wc);
-#endif /* !__KERNEL__ */
-#if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
-INTDEF ATTR_CONST WUNUSED int NOTHROW(LIBDCALL libd_iswupper)(wint_t wc);
-#endif /* !__LIBCCALL_IS_LIBDCALL && !__KERNEL__ */
-#ifndef __KERNEL__
-INTDEF ATTR_CONST WUNUSED int NOTHROW(LIBCCALL libc_iswupper)(wint_t wc);
-#endif /* !__KERNEL__ */
-#if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
-INTDEF ATTR_CONST WUNUSED int NOTHROW(LIBDCALL libd_iswxdigit)(wint_t wc);
-#endif /* !__LIBCCALL_IS_LIBDCALL && !__KERNEL__ */
-#ifndef __KERNEL__
-INTDEF ATTR_CONST WUNUSED int NOTHROW(LIBCCALL libc_iswxdigit)(wint_t wc);
+/* >> iswcntrl(3) */
+INTDEF ATTR_CONST WUNUSED int NOTHROW(LIBDCALL libd_iswcntrl)(wint16_t wc);
+/* >> iswcntrl(3) */
+INTDEF ATTR_CONST WUNUSED int NOTHROW(LIBKCALL libc_iswcntrl)(wint32_t wc);
+/* >> iswspace(3) */
+INTDEF ATTR_CONST WUNUSED int NOTHROW(LIBDCALL libd_iswspace)(wint16_t wc);
+/* >> iswspace(3) */
+INTDEF ATTR_CONST WUNUSED int NOTHROW(LIBKCALL libc_iswspace)(wint32_t wc);
+/* >> iswupper(3) */
+INTDEF ATTR_CONST WUNUSED int NOTHROW(LIBDCALL libd_iswupper)(wint16_t wc);
+/* >> iswupper(3) */
+INTDEF ATTR_CONST WUNUSED int NOTHROW(LIBKCALL libc_iswupper)(wint32_t wc);
+/* >> iswlower(3) */
+INTDEF ATTR_CONST WUNUSED int NOTHROW(LIBDCALL libd_iswlower)(wint16_t wc);
+/* >> iswlower(3) */
+INTDEF ATTR_CONST WUNUSED int NOTHROW(LIBKCALL libc_iswlower)(wint32_t wc);
+/* >> iswalpha(3) */
+INTDEF ATTR_CONST WUNUSED int NOTHROW(LIBDCALL libd_iswalpha)(wint16_t wc);
+/* >> iswalpha(3) */
+INTDEF ATTR_CONST WUNUSED int NOTHROW(LIBKCALL libc_iswalpha)(wint32_t wc);
+/* >> iswdigit(3) */
+INTDEF ATTR_CONST WUNUSED int NOTHROW(LIBDCALL libd_iswdigit)(wint16_t wc);
+/* >> iswdigit(3) */
+INTDEF ATTR_CONST WUNUSED int NOTHROW(LIBKCALL libc_iswdigit)(wint32_t wc);
+/* >> iswxdigit(3) */
+INTDEF ATTR_CONST WUNUSED int NOTHROW(LIBDCALL libd_iswxdigit)(wint16_t wc);
+/* >> iswxdigit(3) */
+INTDEF ATTR_CONST WUNUSED int NOTHROW(LIBKCALL libc_iswxdigit)(wint32_t wc);
+/* >> iswalnum(3) */
+INTDEF ATTR_CONST WUNUSED int NOTHROW(LIBDCALL libd_iswalnum)(wint16_t wc);
+/* >> iswalnum(3) */
+INTDEF ATTR_CONST WUNUSED int NOTHROW(LIBKCALL libc_iswalnum)(wint32_t wc);
+/* >> iswpunct(3) */
+INTDEF ATTR_CONST WUNUSED int NOTHROW(LIBDCALL libd_iswpunct)(wint16_t wc);
+/* >> iswpunct(3) */
+INTDEF ATTR_CONST WUNUSED int NOTHROW(LIBKCALL libc_iswpunct)(wint32_t wc);
+/* >> iswgraph(3) */
+INTDEF ATTR_CONST WUNUSED int NOTHROW(LIBDCALL libd_iswgraph)(wint16_t wc);
+/* >> iswgraph(3) */
+INTDEF ATTR_CONST WUNUSED int NOTHROW(LIBKCALL libc_iswgraph)(wint32_t wc);
+/* >> iswprint(3) */
+INTDEF ATTR_CONST WUNUSED int NOTHROW(LIBDCALL libd_iswprint)(wint16_t wc);
+/* >> iswprint(3) */
+INTDEF ATTR_CONST WUNUSED int NOTHROW(LIBKCALL libc_iswprint)(wint32_t wc);
+/* >> towlower(3) */
+INTDEF ATTR_CONST WUNUSED wint16_t NOTHROW(LIBDCALL libd_towlower)(wint16_t wc);
+/* >> towlower(3) */
+INTDEF ATTR_CONST WUNUSED wint32_t NOTHROW(LIBKCALL libc_towlower)(wint32_t wc);
+/* >> towupper(3) */
+INTDEF ATTR_CONST WUNUSED wint16_t NOTHROW(LIBDCALL libd_towupper)(wint16_t wc);
+/* >> towupper(3) */
+INTDEF ATTR_CONST WUNUSED wint32_t NOTHROW(LIBKCALL libc_towupper)(wint32_t wc);
+/* >> iswblank(3) */
+INTDEF ATTR_CONST WUNUSED int NOTHROW(LIBDCALL libd_iswblank)(wint16_t wc);
+/* >> iswblank(3) */
+INTDEF ATTR_CONST WUNUSED int NOTHROW(LIBKCALL libc_iswblank)(wint32_t wc);
 #endif /* !__KERNEL__ */
 #if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
 INTDEF ATTR_PURE WUNUSED NONNULL((1)) wctrans_t NOTHROW_NCX(LIBDCALL libd_wctrans)(char const *prop);
 #endif /* !__LIBCCALL_IS_LIBDCALL && !__KERNEL__ */
 #ifndef __KERNEL__
 INTDEF ATTR_PURE WUNUSED NONNULL((1)) wctrans_t NOTHROW_NCX(LIBCCALL libc_wctrans)(char const *prop);
-#endif /* !__KERNEL__ */
-#if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
-INTDEF ATTR_CONST WUNUSED wint_t NOTHROW_NCX(LIBDCALL libd_towctrans)(wint_t wc, wctrans_t desc);
-#endif /* !__LIBCCALL_IS_LIBDCALL && !__KERNEL__ */
-#ifndef __KERNEL__
-INTDEF ATTR_CONST WUNUSED wint_t NOTHROW_NCX(LIBCCALL libc_towctrans)(wint_t wc, wctrans_t desc);
+INTDEF ATTR_CONST WUNUSED wint16_t NOTHROW_NCX(LIBDCALL libd_towctrans)(wint16_t wc, wctrans_t desc);
+INTDEF ATTR_CONST WUNUSED wint32_t NOTHROW_NCX(LIBKCALL libc_towctrans)(wint32_t wc, wctrans_t desc);
 #endif /* !__KERNEL__ */
 #if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
 INTDEF ATTR_PURE WUNUSED NONNULL((1)) wctype_t NOTHROW_NCX(LIBDCALL libd_wctype)(char const *prop);
 #endif /* !__LIBCCALL_IS_LIBDCALL && !__KERNEL__ */
 #ifndef __KERNEL__
 INTDEF ATTR_PURE WUNUSED NONNULL((1)) wctype_t NOTHROW_NCX(LIBCCALL libc_wctype)(char const *prop);
-#endif /* !__KERNEL__ */
-#if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
-INTDEF ATTR_CONST WUNUSED int NOTHROW_NCX(LIBDCALL libd_iswctype)(wint_t wc, wctype_t desc);
-#endif /* !__LIBCCALL_IS_LIBDCALL && !__KERNEL__ */
-#ifndef __KERNEL__
-INTDEF ATTR_CONST WUNUSED int NOTHROW_NCX(LIBCCALL libc_iswctype)(wint_t wc, wctype_t desc);
-#endif /* !__KERNEL__ */
-#if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
-INTDEF ATTR_CONST WUNUSED int NOTHROW(LIBDCALL libd_iswblank)(wint_t wc);
-#endif /* !__LIBCCALL_IS_LIBDCALL && !__KERNEL__ */
-#ifndef __KERNEL__
-INTDEF ATTR_CONST WUNUSED int NOTHROW(LIBCCALL libc_iswblank)(wint_t wc);
-#endif /* !__KERNEL__ */
-#if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
-INTDEF ATTR_CONST WUNUSED wint_t NOTHROW(LIBDCALL libd_towlower)(wint_t wc);
-#endif /* !__LIBCCALL_IS_LIBDCALL && !__KERNEL__ */
-#ifndef __KERNEL__
-INTDEF ATTR_CONST WUNUSED wint_t NOTHROW(LIBCCALL libc_towlower)(wint_t wc);
-#endif /* !__KERNEL__ */
-#if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
-INTDEF ATTR_CONST WUNUSED wint_t NOTHROW(LIBDCALL libd_towupper)(wint_t wc);
-#endif /* !__LIBCCALL_IS_LIBDCALL && !__KERNEL__ */
-#ifndef __KERNEL__
-INTDEF ATTR_CONST WUNUSED wint_t NOTHROW(LIBCCALL libc_towupper)(wint_t wc);
-#endif /* !__KERNEL__ */
-#if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
-INTDEF ATTR_CONST WUNUSED int NOTHROW(LIBDCALL libd_iswascii)(wint_t wc);
-#endif /* !__LIBCCALL_IS_LIBDCALL && !__KERNEL__ */
-#ifndef __KERNEL__
-INTDEF ATTR_CONST WUNUSED int NOTHROW(LIBCCALL libc_iswascii)(wint_t wc);
-#endif /* !__KERNEL__ */
-#if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
-INTDEF ATTR_PURE WUNUSED int NOTHROW_NCX(LIBDCALL libd_iswalnum_l)(wint_t wc, locale_t locale);
-#endif /* !__LIBCCALL_IS_LIBDCALL && !__KERNEL__ */
-#ifndef __KERNEL__
-INTDEF ATTR_PURE WUNUSED int NOTHROW_NCX(LIBCCALL libc_iswalnum_l)(wint_t wc, locale_t locale);
-#endif /* !__KERNEL__ */
-#if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
-INTDEF ATTR_PURE WUNUSED int NOTHROW_NCX(LIBDCALL libd_iswalpha_l)(wint_t wc, locale_t locale);
-#endif /* !__LIBCCALL_IS_LIBDCALL && !__KERNEL__ */
-#ifndef __KERNEL__
-INTDEF ATTR_PURE WUNUSED int NOTHROW_NCX(LIBCCALL libc_iswalpha_l)(wint_t wc, locale_t locale);
-#endif /* !__KERNEL__ */
-#if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
-INTDEF ATTR_PURE WUNUSED int NOTHROW_NCX(LIBDCALL libd_iswcntrl_l)(wint_t wc, locale_t locale);
-#endif /* !__LIBCCALL_IS_LIBDCALL && !__KERNEL__ */
-#ifndef __KERNEL__
-INTDEF ATTR_PURE WUNUSED int NOTHROW_NCX(LIBCCALL libc_iswcntrl_l)(wint_t wc, locale_t locale);
-#endif /* !__KERNEL__ */
-#if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
-INTDEF ATTR_PURE WUNUSED int NOTHROW_NCX(LIBDCALL libd_iswdigit_l)(wint_t wc, locale_t locale);
-#endif /* !__LIBCCALL_IS_LIBDCALL && !__KERNEL__ */
-#ifndef __KERNEL__
-INTDEF ATTR_PURE WUNUSED int NOTHROW_NCX(LIBCCALL libc_iswdigit_l)(wint_t wc, locale_t locale);
-#endif /* !__KERNEL__ */
-#if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
-INTDEF ATTR_PURE WUNUSED int NOTHROW_NCX(LIBDCALL libd_iswgraph_l)(wint_t wc, locale_t locale);
-#endif /* !__LIBCCALL_IS_LIBDCALL && !__KERNEL__ */
-#ifndef __KERNEL__
-INTDEF ATTR_PURE WUNUSED int NOTHROW_NCX(LIBCCALL libc_iswgraph_l)(wint_t wc, locale_t locale);
-#endif /* !__KERNEL__ */
-#if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
-INTDEF ATTR_PURE WUNUSED int NOTHROW_NCX(LIBDCALL libd_iswlower_l)(wint_t wc, locale_t locale);
-#endif /* !__LIBCCALL_IS_LIBDCALL && !__KERNEL__ */
-#ifndef __KERNEL__
-INTDEF ATTR_PURE WUNUSED int NOTHROW_NCX(LIBCCALL libc_iswlower_l)(wint_t wc, locale_t locale);
-#endif /* !__KERNEL__ */
-#if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
-INTDEF ATTR_PURE WUNUSED int NOTHROW_NCX(LIBDCALL libd_iswprint_l)(wint_t wc, locale_t locale);
-#endif /* !__LIBCCALL_IS_LIBDCALL && !__KERNEL__ */
-#ifndef __KERNEL__
-INTDEF ATTR_PURE WUNUSED int NOTHROW_NCX(LIBCCALL libc_iswprint_l)(wint_t wc, locale_t locale);
-#endif /* !__KERNEL__ */
-#if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
-INTDEF ATTR_PURE WUNUSED int NOTHROW_NCX(LIBDCALL libd_iswpunct_l)(wint_t wc, locale_t locale);
-#endif /* !__LIBCCALL_IS_LIBDCALL && !__KERNEL__ */
-#ifndef __KERNEL__
-INTDEF ATTR_PURE WUNUSED int NOTHROW_NCX(LIBCCALL libc_iswpunct_l)(wint_t wc, locale_t locale);
-#endif /* !__KERNEL__ */
-#if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
-INTDEF ATTR_PURE WUNUSED int NOTHROW_NCX(LIBDCALL libd_iswspace_l)(wint_t wc, locale_t locale);
-#endif /* !__LIBCCALL_IS_LIBDCALL && !__KERNEL__ */
-#ifndef __KERNEL__
-INTDEF ATTR_PURE WUNUSED int NOTHROW_NCX(LIBCCALL libc_iswspace_l)(wint_t wc, locale_t locale);
-#endif /* !__KERNEL__ */
-#if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
-INTDEF ATTR_PURE WUNUSED int NOTHROW_NCX(LIBDCALL libd_iswupper_l)(wint_t wc, locale_t locale);
-#endif /* !__LIBCCALL_IS_LIBDCALL && !__KERNEL__ */
-#ifndef __KERNEL__
-INTDEF ATTR_PURE WUNUSED int NOTHROW_NCX(LIBCCALL libc_iswupper_l)(wint_t wc, locale_t locale);
-#endif /* !__KERNEL__ */
-#if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
-INTDEF ATTR_PURE WUNUSED int NOTHROW_NCX(LIBDCALL libd_iswxdigit_l)(wint_t wc, locale_t locale);
-#endif /* !__LIBCCALL_IS_LIBDCALL && !__KERNEL__ */
-#ifndef __KERNEL__
-INTDEF ATTR_PURE WUNUSED int NOTHROW_NCX(LIBCCALL libc_iswxdigit_l)(wint_t wc, locale_t locale);
-#endif /* !__KERNEL__ */
-#if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
-INTDEF ATTR_PURE WUNUSED int NOTHROW_NCX(LIBDCALL libd_iswblank_l)(wint_t wc, locale_t locale);
-#endif /* !__LIBCCALL_IS_LIBDCALL && !__KERNEL__ */
-#ifndef __KERNEL__
-INTDEF ATTR_PURE WUNUSED int NOTHROW_NCX(LIBCCALL libc_iswblank_l)(wint_t wc, locale_t locale);
-#endif /* !__KERNEL__ */
-#if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
-INTDEF ATTR_PURE WUNUSED int NOTHROW_NCX(LIBDCALL libd_iswctype_l)(wint_t wc, wctype_t type, locale_t locale);
-#endif /* !__LIBCCALL_IS_LIBDCALL && !__KERNEL__ */
-#ifndef __KERNEL__
-INTDEF ATTR_PURE WUNUSED int NOTHROW_NCX(LIBCCALL libc_iswctype_l)(wint_t wc, wctype_t type, locale_t locale);
-#endif /* !__KERNEL__ */
-#if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
-INTDEF ATTR_PURE WUNUSED wint_t NOTHROW_NCX(LIBDCALL libd_towupper_l)(wint_t wc, locale_t locale);
-#endif /* !__LIBCCALL_IS_LIBDCALL && !__KERNEL__ */
-#ifndef __KERNEL__
-INTDEF ATTR_PURE WUNUSED wint_t NOTHROW_NCX(LIBCCALL libc_towupper_l)(wint_t wc, locale_t locale);
-#endif /* !__KERNEL__ */
-#if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
-INTDEF ATTR_PURE WUNUSED wint_t NOTHROW_NCX(LIBDCALL libd_towlower_l)(wint_t wc, locale_t locale);
-#endif /* !__LIBCCALL_IS_LIBDCALL && !__KERNEL__ */
-#ifndef __KERNEL__
-INTDEF ATTR_PURE WUNUSED wint_t NOTHROW_NCX(LIBCCALL libc_towlower_l)(wint_t wc, locale_t locale);
+INTDEF ATTR_CONST WUNUSED int NOTHROW_NCX(LIBDCALL libd_iswctype)(wint16_t wc, wctype_t desc);
+INTDEF ATTR_CONST WUNUSED int NOTHROW_NCX(LIBKCALL libc_iswctype)(wint32_t wc, wctype_t desc);
+INTDEF ATTR_CONST WUNUSED int NOTHROW(LIBDCALL libd_iswascii)(wint16_t wc);
+INTDEF ATTR_CONST WUNUSED int NOTHROW(LIBKCALL libc_iswascii)(wint32_t wc);
+/* >> iswcntrl_l(3) */
+INTDEF ATTR_PURE WUNUSED int NOTHROW_NCX(LIBDCALL libd_iswcntrl_l)(wint16_t ch, locale_t locale);
+/* >> iswcntrl_l(3) */
+INTDEF ATTR_PURE WUNUSED int NOTHROW_NCX(LIBKCALL libc_iswcntrl_l)(wint32_t ch, locale_t locale);
+/* >> iswspace_l(3) */
+INTDEF ATTR_PURE WUNUSED int NOTHROW_NCX(LIBDCALL libd_iswspace_l)(wint16_t ch, locale_t locale);
+/* >> iswspace_l(3) */
+INTDEF ATTR_PURE WUNUSED int NOTHROW_NCX(LIBKCALL libc_iswspace_l)(wint32_t ch, locale_t locale);
+/* >> iswupper_l(3) */
+INTDEF ATTR_PURE WUNUSED int NOTHROW_NCX(LIBDCALL libd_iswupper_l)(wint16_t ch, locale_t locale);
+/* >> iswupper_l(3) */
+INTDEF ATTR_PURE WUNUSED int NOTHROW_NCX(LIBKCALL libc_iswupper_l)(wint32_t ch, locale_t locale);
+/* >> iswlower_l(3) */
+INTDEF ATTR_PURE WUNUSED int NOTHROW_NCX(LIBDCALL libd_iswlower_l)(wint16_t ch, locale_t locale);
+/* >> iswlower_l(3) */
+INTDEF ATTR_PURE WUNUSED int NOTHROW_NCX(LIBKCALL libc_iswlower_l)(wint32_t ch, locale_t locale);
+/* >> iswalpha_l(3) */
+INTDEF ATTR_PURE WUNUSED int NOTHROW_NCX(LIBDCALL libd_iswalpha_l)(wint16_t ch, locale_t locale);
+/* >> iswalpha_l(3) */
+INTDEF ATTR_PURE WUNUSED int NOTHROW_NCX(LIBKCALL libc_iswalpha_l)(wint32_t ch, locale_t locale);
+/* >> iswdigit_l(3) */
+INTDEF ATTR_PURE WUNUSED int NOTHROW_NCX(LIBDCALL libd_iswdigit_l)(wint16_t ch, locale_t locale);
+/* >> iswdigit_l(3) */
+INTDEF ATTR_PURE WUNUSED int NOTHROW_NCX(LIBKCALL libc_iswdigit_l)(wint32_t ch, locale_t locale);
+/* >> iswxdigit_l(3) */
+INTDEF ATTR_PURE WUNUSED int NOTHROW_NCX(LIBDCALL libd_iswxdigit_l)(wint16_t ch, locale_t locale);
+/* >> iswxdigit_l(3) */
+INTDEF ATTR_PURE WUNUSED int NOTHROW_NCX(LIBKCALL libc_iswxdigit_l)(wint32_t ch, locale_t locale);
+/* >> iswalnum_l(3) */
+INTDEF ATTR_PURE WUNUSED int NOTHROW_NCX(LIBDCALL libd_iswalnum_l)(wint16_t ch, locale_t locale);
+/* >> iswalnum_l(3) */
+INTDEF ATTR_PURE WUNUSED int NOTHROW_NCX(LIBKCALL libc_iswalnum_l)(wint32_t ch, locale_t locale);
+/* >> iswpunct_l(3) */
+INTDEF ATTR_PURE WUNUSED int NOTHROW_NCX(LIBDCALL libd_iswpunct_l)(wint16_t ch, locale_t locale);
+/* >> iswpunct_l(3) */
+INTDEF ATTR_PURE WUNUSED int NOTHROW_NCX(LIBKCALL libc_iswpunct_l)(wint32_t ch, locale_t locale);
+/* >> iswgraph_l(3) */
+INTDEF ATTR_PURE WUNUSED int NOTHROW_NCX(LIBDCALL libd_iswgraph_l)(wint16_t ch, locale_t locale);
+/* >> iswgraph_l(3) */
+INTDEF ATTR_PURE WUNUSED int NOTHROW_NCX(LIBKCALL libc_iswgraph_l)(wint32_t ch, locale_t locale);
+/* >> iswprint_l(3) */
+INTDEF ATTR_PURE WUNUSED int NOTHROW_NCX(LIBDCALL libd_iswprint_l)(wint16_t ch, locale_t locale);
+/* >> iswprint_l(3) */
+INTDEF ATTR_PURE WUNUSED int NOTHROW_NCX(LIBKCALL libc_iswprint_l)(wint32_t ch, locale_t locale);
+/* >> iswblank_l(3) */
+INTDEF ATTR_PURE WUNUSED int NOTHROW_NCX(LIBDCALL libd_iswblank_l)(wint16_t ch, locale_t locale);
+/* >> iswblank_l(3) */
+INTDEF ATTR_PURE WUNUSED int NOTHROW_NCX(LIBKCALL libc_iswblank_l)(wint32_t ch, locale_t locale);
+/* >> towlower_l(3) */
+INTDEF ATTR_PURE WUNUSED wint16_t NOTHROW_NCX(LIBDCALL libd_towlower_l)(wint16_t ch, locale_t locale);
+/* >> towlower_l(3) */
+INTDEF ATTR_PURE WUNUSED wint32_t NOTHROW_NCX(LIBKCALL libc_towlower_l)(wint32_t ch, locale_t locale);
+/* >> towupper_l(3) */
+INTDEF ATTR_PURE WUNUSED wint16_t NOTHROW_NCX(LIBDCALL libd_towupper_l)(wint16_t ch, locale_t locale);
+/* >> towupper_l(3) */
+INTDEF ATTR_PURE WUNUSED wint32_t NOTHROW_NCX(LIBKCALL libc_towupper_l)(wint32_t ch, locale_t locale);
+INTDEF ATTR_PURE WUNUSED int NOTHROW_NCX(LIBDCALL libd_iswctype_l)(wint16_t wc, wctype_t type, locale_t locale);
+INTDEF ATTR_PURE WUNUSED int NOTHROW_NCX(LIBKCALL libc_iswctype_l)(wint32_t wc, wctype_t type, locale_t locale);
 #endif /* !__KERNEL__ */
 #if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
 INTDEF WUNUSED NONNULL((1)) wctype_t NOTHROW_NCX(LIBDCALL libd_wctype_l)(char const *prop, locale_t locale);
 #endif /* !__LIBCCALL_IS_LIBDCALL && !__KERNEL__ */
 #ifndef __KERNEL__
 INTDEF WUNUSED NONNULL((1)) wctype_t NOTHROW_NCX(LIBCCALL libc_wctype_l)(char const *prop, locale_t locale);
+INTDEF WUNUSED wint16_t NOTHROW_NCX(LIBDCALL libd_towctrans_l)(wint16_t wc, wctrans_t desc, locale_t locale);
+INTDEF WUNUSED wint32_t NOTHROW_NCX(LIBKCALL libc_towctrans_l)(wint32_t wc, wctrans_t desc, locale_t locale);
 #endif /* !__KERNEL__ */
 #if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
 INTDEF WUNUSED NONNULL((1)) wctrans_t NOTHROW_NCX(LIBDCALL libd_wctrans_l)(char const *prop, locale_t locale);
 #endif /* !__LIBCCALL_IS_LIBDCALL && !__KERNEL__ */
 #ifndef __KERNEL__
 INTDEF WUNUSED NONNULL((1)) wctrans_t NOTHROW_NCX(LIBCCALL libc_wctrans_l)(char const *prop, locale_t locale);
-#endif /* !__KERNEL__ */
-#if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
-INTDEF WUNUSED wint_t NOTHROW_NCX(LIBDCALL libd_towctrans_l)(wint_t wc, wctrans_t desc, locale_t locale);
-#endif /* !__LIBCCALL_IS_LIBDCALL && !__KERNEL__ */
-#ifndef __KERNEL__
-INTDEF WUNUSED wint_t NOTHROW_NCX(LIBCCALL libc_towctrans_l)(wint_t wc, wctrans_t desc, locale_t locale);
 #endif /* !__KERNEL__ */
 #if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
 INTDEF ATTR_CONST WUNUSED int NOTHROW_NCX(LIBDCALL libd_isleadbyte)(int wc);
@@ -262,30 +206,14 @@ INTDEF ATTR_PURE WUNUSED int NOTHROW_NCX(LIBDCALL libd__isleadbyte_l)(int wc, lo
 #endif /* !__LIBCCALL_IS_LIBDCALL && !__KERNEL__ */
 #ifndef __KERNEL__
 INTDEF ATTR_PURE WUNUSED int NOTHROW_NCX(LIBCCALL libc__isleadbyte_l)(int wc, locale_t locale);
-#endif /* !__KERNEL__ */
-#if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
-INTDEF ATTR_CONST WUNUSED int NOTHROW_NCX(LIBDCALL libd___iswcsymf)(wint_t wc);
-#endif /* !__LIBCCALL_IS_LIBDCALL && !__KERNEL__ */
-#ifndef __KERNEL__
-INTDEF ATTR_CONST WUNUSED int NOTHROW_NCX(LIBCCALL libc___iswcsymf)(wint_t wc);
-#endif /* !__KERNEL__ */
-#if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
-INTDEF ATTR_CONST WUNUSED int NOTHROW_NCX(LIBDCALL libd___iswcsym)(wint_t wc);
-#endif /* !__LIBCCALL_IS_LIBDCALL && !__KERNEL__ */
-#ifndef __KERNEL__
-INTDEF ATTR_CONST WUNUSED int NOTHROW_NCX(LIBCCALL libc___iswcsym)(wint_t wc);
-#endif /* !__KERNEL__ */
-#if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
-INTDEF ATTR_PURE WUNUSED int NOTHROW_NCX(LIBDCALL libd__iswcsymf_l)(wint_t wc, locale_t locale);
-#endif /* !__LIBCCALL_IS_LIBDCALL && !__KERNEL__ */
-#ifndef __KERNEL__
-INTDEF ATTR_PURE WUNUSED int NOTHROW_NCX(LIBCCALL libc__iswcsymf_l)(wint_t wc, locale_t locale);
-#endif /* !__KERNEL__ */
-#if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
-INTDEF ATTR_PURE WUNUSED int NOTHROW_NCX(LIBDCALL libd__iswcsym_l)(wint_t wc, locale_t locale);
-#endif /* !__LIBCCALL_IS_LIBDCALL && !__KERNEL__ */
-#ifndef __KERNEL__
-INTDEF ATTR_PURE WUNUSED int NOTHROW_NCX(LIBCCALL libc__iswcsym_l)(wint_t wc, locale_t locale);
+INTDEF ATTR_CONST WUNUSED int NOTHROW_NCX(LIBDCALL libd___iswcsymf)(wint16_t wc);
+INTDEF ATTR_CONST WUNUSED int NOTHROW_NCX(LIBKCALL libc___iswcsymf)(wint32_t wc);
+INTDEF ATTR_CONST WUNUSED int NOTHROW_NCX(LIBDCALL libd___iswcsym)(wint16_t wc);
+INTDEF ATTR_CONST WUNUSED int NOTHROW_NCX(LIBKCALL libc___iswcsym)(wint32_t wc);
+INTDEF ATTR_PURE WUNUSED int NOTHROW_NCX(LIBDCALL libd__iswcsymf_l)(wint16_t wc, locale_t locale);
+INTDEF ATTR_PURE WUNUSED int NOTHROW_NCX(LIBKCALL libc__iswcsymf_l)(wint32_t wc, locale_t locale);
+INTDEF ATTR_PURE WUNUSED int NOTHROW_NCX(LIBDCALL libd__iswcsym_l)(wint16_t wc, locale_t locale);
+INTDEF ATTR_PURE WUNUSED int NOTHROW_NCX(LIBKCALL libc__iswcsym_l)(wint32_t wc, locale_t locale);
 #endif /* !__KERNEL__ */
 
 DECL_END

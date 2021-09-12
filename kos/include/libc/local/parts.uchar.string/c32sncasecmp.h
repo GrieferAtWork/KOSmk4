@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xf11a3fea */
+/* HASH CRC-32:0x9559ff09 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -23,26 +23,42 @@
 #include <__crt.h>
 #include <hybrid/typecore.h>
 __NAMESPACE_LOCAL_BEGIN
-#ifndef __local___localdep_towlower_defined
-#define __local___localdep_towlower_defined 1
-#if __has_builtin(__builtin_towlower) && defined(__LIBC_BIND_CRTBUILTINS) && defined(__CRT_HAVE_towlower)
-__CEIREDIRECT(__ATTR_CONST __ATTR_WUNUSED,__WINT_TYPE__,__NOTHROW,__localdep_towlower,(__WINT_TYPE__ __wc),towlower,{ return __builtin_towlower(__wc); })
-#elif defined(__CRT_HAVE_towlower)
-__CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,__WINT_TYPE__,__NOTHROW,__localdep_towlower,(__WINT_TYPE__ __wc),towlower,(__wc))
-#else /* ... */
+#ifndef __local___localdep_toulower32_defined
+#define __local___localdep_toulower32_defined 1
+__NAMESPACE_LOCAL_END
+#include <bits/crt/wctype.h>
+__NAMESPACE_LOCAL_BEGIN
+#if defined(__crt_towlower) && defined(__CRT_HAVE_towlower) && __SIZEOF_WCHAR_T__ == 4
+__COMPILER_EIREDIRECT(__ATTR_CONST __ATTR_WUNUSED,__WINT32_TYPE__,__NOTHROW,__LIBKCALL,__localdep_toulower32,(__WINT32_TYPE__ __wc),towlower,{ return __crt_towlower(__wc); })
+#elif defined(__crt_towlower) && __SIZEOF_WCHAR_T__ == 4
+__LOCAL __ATTR_CONST __ATTR_WUNUSED __WINT32_TYPE__ __NOTHROW(__LIBKCALL __localdep_toulower32)(__WINT32_TYPE__ __wc) { return __crt_towlower(__wc); }
+#elif __has_builtin(__builtin_towlower) && defined(__LIBC_BIND_CRTBUILTINS) && defined(__CRT_HAVE_towlower) && __SIZEOF_WCHAR_T__ == 4
+__COMPILER_EIREDIRECT(__ATTR_CONST __ATTR_WUNUSED,__WINT32_TYPE__,__NOTHROW,__LIBKCALL,__localdep_toulower32,(__WINT32_TYPE__ __wc),towlower,{ return __builtin_towlower(__wc); })
+#elif defined(__CRT_HAVE_towlower) && __SIZEOF_WCHAR_T__ == 4 && defined(__LIBCCALL_IS_LIBKCALL)
+__CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,__WINT32_TYPE__,__NOTHROW,__localdep_toulower32,(__WINT32_TYPE__ __wc),towlower,(__wc))
+#elif defined(__CRT_HAVE_KOS$towlower)
+__CREDIRECT_KOS(__ATTR_CONST __ATTR_WUNUSED,__WINT32_TYPE__,__NOTHROW,__localdep_toulower32,(__WINT32_TYPE__ __wc),towlower,(__wc))
+#elif __SIZEOF_WCHAR_T__ == 4
 __NAMESPACE_LOCAL_END
 #include <libc/local/wctype/towlower.h>
 __NAMESPACE_LOCAL_BEGIN
-#define __localdep_towlower __LIBC_LOCAL_NAME(towlower)
+#define __localdep_toulower32 (*(__WINT32_TYPE__(__LIBKCALL *)(__WINT32_TYPE__))&__LIBC_LOCAL_NAME(towlower))
+#else /* ... */
+__NAMESPACE_LOCAL_END
+#include <libc/local/parts.uchar.wctype/toulower32.h>
+__NAMESPACE_LOCAL_BEGIN
+#define __localdep_toulower32 __LIBC_LOCAL_NAME(toulower32)
 #endif /* !... */
-#endif /* !__local___localdep_towlower_defined */
+#endif /* !__local___localdep_toulower32_defined */
 __LOCAL_LIBC(c32sncasecmp) __ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1, 2)) int
 __NOTHROW_NCX(__LIBKCALL __LIBC_LOCAL_NAME(c32sncasecmp))(__CHAR32_TYPE__ const *__s1, __CHAR32_TYPE__ const *__s2, __SIZE_TYPE__ __maxlen) {
 	__CHAR32_TYPE__ __c1, __c2;
 	do {
 		if (!__maxlen--)
 			break;
-		if ((__c1 = *__s1++) != (__c2 = *__s2++) && ((__c1 = (__CHAR32_TYPE__)__localdep_towlower(__c1)) != (__c2 = (__CHAR32_TYPE__)__localdep_towlower(__c2))))
+		if ((__c1 = *__s1++) != (__c2 = *__s2++) &&
+		    ((__c1 = (__CHAR32_TYPE__)__localdep_toulower32((__CHAR32_TYPE__)__c1)) !=
+		     (__c2 = (__CHAR32_TYPE__)__localdep_toulower32((__CHAR32_TYPE__)__c2))))
 			return (int)((__CHAR32_TYPE__)__c1 - (__CHAR32_TYPE__)__c2);
 	} while (__c1);
 	return 0;

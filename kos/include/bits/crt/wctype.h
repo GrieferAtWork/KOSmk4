@@ -21,6 +21,7 @@
 #define _BITS_CRT_WCTYPE_H 1
 
 #include <__crt.h>
+
 #include <hybrid/typecore.h>
 
 #ifdef __CRT_DOS_PRIMARY
@@ -33,7 +34,6 @@
 
 #ifdef __CC__
 __DECL_BEGIN
-
 #ifdef __CRT_DOS_PRIMARY
 typedef __UINT16_TYPE__ __wctype_t;
 typedef __WCHAR16_TYPE__ __wctrans_t;
@@ -41,8 +41,46 @@ typedef __WCHAR16_TYPE__ __wctrans_t;
 typedef __ULONGPTR_TYPE__ __wctype_t;
 typedef __INT32_TYPE__ const *__wctrans_t;
 #endif /* !__CRT_DOS_PRIMARY */
-
 __DECL_END
+
+
+#if defined(__CRT_KOS) && defined(__CRT_HAVE___unicode_descriptor)
+
+/************************************************************************/
+/* KOS                                                                  */
+#include <bits/crt/unicode.h>
+#include <libc/core/unicode.h>
+
+/* Implement <ctype.h> functions in terms of `__unicode_descriptor' */
+#ifdef ____libc_core___unicode_descriptor_defined
+#define __crt_iswcntrl(ch)  ((__libc_core___unicode_descriptor(ch)->__ut_flags & __UNICODE_ISCNTRL) != 0)
+#define __crt_iswspace(ch)  ((__libc_core___unicode_descriptor(ch)->__ut_flags & __UNICODE_ISSPACE) != 0)
+#define __crt_iswlower(ch)  ((__libc_core___unicode_descriptor(ch)->__ut_flags & __UNICODE_ISLOWER) != 0)
+#define __crt_iswupper(ch)  ((__libc_core___unicode_descriptor(ch)->__ut_flags & __UNICODE_ISUPPER) != 0)
+#define __crt_iswalpha(ch)  ((__libc_core___unicode_descriptor(ch)->__ut_flags & __UNICODE_ISALPHA) != 0)
+#define __crt_iswdigit(ch)  ((__libc_core___unicode_descriptor(ch)->__ut_flags & __UNICODE_ISDIGIT) != 0)
+#define __crt_iswxdigit(ch) ((__libc_core___unicode_descriptor(ch)->__ut_flags & __UNICODE_ISXDIGIT) != 0)
+#define __crt_iswalnum(ch)  ((__libc_core___unicode_descriptor(ch)->__ut_flags & __UNICODE_ISALNUM) != 0)
+#define __crt_iswpunct(ch)  ((__libc_core___unicode_descriptor(ch)->__ut_flags & __UNICODE_ISPUNCT) != 0)
+#define __crt_iswgraph(ch)  ((__libc_core___unicode_descriptor(ch)->__ut_flags & __UNICODE_ISGRAPH) != 0)
+#define __crt_iswprint(ch)  ((__libc_core___unicode_descriptor(ch)->__ut_flags & __UNICODE_ISPRINT) != 0)
+#define __crt_iswblank(ch)  ((__libc_core___unicode_descriptor(ch)->__ut_flags & __UNICODE_ISBLANK) != 0)
+#ifdef __NO_XBLOCK
+#define __crt_towlower(ch) ((__WINT_TYPE__)(ch) + __libc_core___unicode_descriptor(ch)->__ut_lower)
+#define __crt_towupper(ch) ((__WINT_TYPE__)(ch) + __libc_core___unicode_descriptor(ch)->__ut_upper)
+#else /* __NO_XBLOCK */
+#define __crt_towlower(ch) __XBLOCK({ __WINT_TYPE__ __ctl_ch = (ch); __XRETURN __ctl_ch + __libc_core___unicode_descriptor(__ctl_ch)->__ut_lower; })
+#define __crt_towupper(ch) __XBLOCK({ __WINT_TYPE__ __ctu_ch = (ch); __XRETURN __ctu_ch + __libc_core___unicode_descriptor(__ctu_ch)->__ut_upper; })
+#endif /* !__NO_XBLOCK */
+#endif /* ____libc_core___unicode_descriptor_defined */
+/************************************************************************/
+
+#else /* ... */
+
+/* Generic CRT or CRT doesn't provide wctype lookup matrix */
+
+#endif /* !... */
+
 #endif /* __CC__ */
 
 #endif /* !_BITS_CRT_WCTYPE_H */

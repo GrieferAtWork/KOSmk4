@@ -317,38 +317,38 @@ $uint64_t ntohq($uint64_t netquad) {
 #define IN6_IS_ADDR_MULTICAST(a) \
 	(((__uint8_t const *)(a))[0] == __UINT8_C(0xff))
 #ifndef __NO_XBLOCK
-#define IN6_IS_ADDR_UNSPECIFIED(a)                                    \
-	__XBLOCK({                                                        \
-		struct in6_addr const *__a = (struct in6_addr const *)(a);    \
-		__XRETURN(__a->s6_addr32[0] == 0 && __a->s6_addr32[1] == 0 && \
-		          __a->s6_addr32[2] == 0 && __a->s6_addr32[3] == 0);  \
+#define IN6_IS_ADDR_UNSPECIFIED(a)                                            \
+	__XBLOCK({                                                                \
+		struct in6_addr const *__in6_a = (struct in6_addr const *)(a);        \
+		__XRETURN(__in6_a->s6_addr32[0] == 0 && __in6_a->s6_addr32[1] == 0 && \
+		          __in6_a->s6_addr32[2] == 0 && __in6_a->s6_addr32[3] == 0);  \
 	})
-#define IN6_IS_ADDR_LOOPBACK(a)                                             \
-	__XBLOCK({                                                              \
-		struct in6_addr const *__a = (struct in6_addr const *)(a);          \
-		__XRETURN(__a->s6_addr32[0] == 0 && __a->s6_addr32[1] == 0 &&       \
-		          __a->s6_addr32[2] == 0 && __a->s6_addr32[3] == htonl(1)); \
+#define IN6_IS_ADDR_LOOPBACK(a)                                                     \
+	__XBLOCK({                                                                      \
+		struct in6_addr const *__in6_a = (struct in6_addr const *)(a);              \
+		__XRETURN(__in6_a->s6_addr32[0] == 0 && __in6_a->s6_addr32[1] == 0 &&       \
+		          __in6_a->s6_addr32[2] == 0 && __in6_a->s6_addr32[3] == htonl(1)); \
 	})
-#define IN6_IS_ADDR_V4MAPPED(a)                                        \
+#define IN6_IS_ADDR_V4MAPPED(a)                                               \
+	__XBLOCK({                                                                \
+		struct in6_addr const *__in6_a = (struct in6_addr const *)(a);        \
+		__XRETURN(__in6_a->s6_addr32[0] == 0 && __in6_a->s6_addr32[1] == 0 && \
+		          __in6_a->s6_addr32[2] == htonl(__UINT32_C(0x0000ffff)));    \
+	})
+#define IN6_IS_ADDR_V4COMPAT(a)                                                    \
+	__XBLOCK({                                                                     \
+		struct in6_addr const *__in6_a = (struct in6_addr const *)(a);             \
+		__XRETURN(__in6_a->s6_addr32[0] == 0 && __in6_a->s6_addr32[1] == 0 &&      \
+		          __in6_a->s6_addr32[2] == 0 && ntohl(__in6_a->s6_addr32[3]) > 1); \
+	})
+#define IN6_ARE_ADDR_EQUAL(a, b)                                       \
 	__XBLOCK({                                                         \
-		struct in6_addr const *__a = (struct in6_addr const *)(a);     \
-		__XRETURN(__a->s6_addr32[0] == 0 && __a->s6_addr32[1] == 0 &&  \
-		          __a->s6_addr32[2] == htonl(__UINT32_C(0x0000ffff))); \
-	})
-#define IN6_IS_ADDR_V4COMPAT(a)                                            \
-	__XBLOCK({                                                             \
-		struct in6_addr const *__a = (struct in6_addr const *)(a);         \
-		__XRETURN(__a->s6_addr32[0] == 0 && __a->s6_addr32[1] == 0 &&      \
-		          __a->s6_addr32[2] == 0 && ntohl(__a->s6_addr32[3]) > 1); \
-	})
-#define IN6_ARE_ADDR_EQUAL(a, b)                                   \
-	__XBLOCK({                                                     \
-		struct in6_addr const *__a = (struct in6_addr const *)(a); \
-		struct in6_addr const *__b = (struct in6_addr const *)(b); \
-		__XRETURN(__a->s6_addr32[0] == __b->s6_addr32[0] &&        \
-		          __a->s6_addr32[1] == __b->s6_addr32[1] &&        \
-		          __a->s6_addr32[2] == __b->s6_addr32[2] &&        \
-		          __a->s6_addr32[3] == __b->s6_addr32[3]);         \
+		struct in6_addr const *__in6_a = (struct in6_addr const *)(a); \
+		struct in6_addr const *__in6_b = (struct in6_addr const *)(b); \
+		__XRETURN(__in6_a->s6_addr32[0] == __in6_b->s6_addr32[0] &&    \
+		          __in6_a->s6_addr32[1] == __in6_b->s6_addr32[1] &&    \
+		          __in6_a->s6_addr32[2] == __in6_b->s6_addr32[2] &&    \
+		          __in6_a->s6_addr32[3] == __in6_b->s6_addr32[3]);     \
 	})
 #else /* !__NO_XBLOCK */
 #define IN6_IS_ADDR_UNSPECIFIED(a)        \

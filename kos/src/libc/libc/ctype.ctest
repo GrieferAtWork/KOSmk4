@@ -20,6 +20,7 @@
 #ifndef GUARD_LIBC_LIBC_CRT_CTEST
 #define GUARD_LIBC_LIBC_CRT_CTEST 1
 #define _KOS_SOURCE 1
+#define _UTF_SOURCE 1
 #undef NDEBUG
 
 #include <hybrid/compiler.h>
@@ -30,10 +31,13 @@
 #include <assert.h>
 #include <ctype.h>
 #include <stdio.h>
+#include <uchar.h>
 #include <unicode.h>
+#include <wctype.h>
 
 DECL_BEGIN
 
+/* Reference implementation of <ctype.h> macros (for the "C" locale) */
 #define ascii_iscntrl(ch)  ((ch) >= 0 && ((uint8_t)(ch) <= 0x1f || (uint8_t)(ch) == 0x7f))
 #define ascii_isspace(ch)  ((ch) >= 0 && (((uint8_t)(ch) >= 0x09 && (uint8_t)(ch) <= 0x0d) || (uint8_t)(ch) == 0x20))
 #define ascii_isupper(ch)  ((ch) >= 0 && ((uint8_t)(ch) >= 0x41 && (uint8_t)(ch) <= 0x5a))
@@ -51,7 +55,7 @@ DECL_BEGIN
 #define ascii_tolower(ch)  (ascii_isupper(ch) ? ascii__tolower(ch) : (ch))
 #define ascii_toupper(ch)  (ascii_islower(ch) ? ascii__toupper(ch) : (ch))
 
-static void testchar(int ch) {
+static void testc(int ch) {
 	/* <ctype.h> */
 	assertf(ascii_tolower(ch) == tolower(ch), "%d", ch);
 	assertf(ascii_toupper(ch) == toupper(ch), "%d", ch);
@@ -101,14 +105,87 @@ static void testchar(int ch) {
 	assertf(!!ascii_isblank(ch) == !!unicode_isblank((char)ch), "%d", ch);
 }
 
+static void testw(wint_t ch) {
+	if (ch == WEOF) {
+		assertf(WEOF == towlower(ch), "%d", ch);
+		assertf(WEOF == towupper(ch), "%d", ch);
+	} else {
+		assertf((wint_t)ascii_tolower(ch) == towlower(ch), "%d", ch);
+		assertf((wint_t)ascii_toupper(ch) == towupper(ch), "%d", ch);
+	}
+	assertf(!!ascii_iscntrl(ch) == !!iswcntrl(ch), "%d", ch);
+	assertf(!!ascii_isspace(ch) == !!iswspace(ch), "%d", ch);
+	assertf(!!ascii_isupper(ch) == !!iswupper(ch), "%d", ch);
+	assertf(!!ascii_islower(ch) == !!iswlower(ch), "%d", ch);
+	assertf(!!ascii_isalpha(ch) == !!iswalpha(ch), "%d", ch);
+	assertf(!!ascii_isdigit(ch) == !!iswdigit(ch), "%d", ch);
+	assertf(!!ascii_isxdigit(ch) == !!iswxdigit(ch), "%d", ch);
+	assertf(!!ascii_isalnum(ch) == !!iswalnum(ch), "%d", ch);
+	assertf(!!ascii_ispunct(ch) == !!iswpunct(ch), "%d", ch);
+	assertf(!!ascii_isgraph(ch) == !!iswgraph(ch), "%d", ch);
+	assertf(!!ascii_isprint(ch) == !!iswprint(ch), "%d", ch);
+	assertf(!!ascii_isblank(ch) == !!iswblank(ch), "%d", ch);
+}
+
+static void testw16(wint16_t ch) {
+	if (ch == WEOF16) {
+		assertf(WEOF16 == toulower16(ch), "%d", ch);
+		assertf(WEOF16 == touupper16(ch), "%d", ch);
+	} else {
+		assertf((wint16_t)ascii_tolower(ch) == toulower16(ch), "%d", ch);
+		assertf((wint16_t)ascii_toupper(ch) == touupper16(ch), "%d", ch);
+	}
+	assertf(!!ascii_iscntrl(ch) == !!isucntrl16(ch), "%d", ch);
+	assertf(!!ascii_isspace(ch) == !!isuspace16(ch), "%d", ch);
+	assertf(!!ascii_isupper(ch) == !!isuupper16(ch), "%d", ch);
+	assertf(!!ascii_islower(ch) == !!isulower16(ch), "%d", ch);
+	assertf(!!ascii_isalpha(ch) == !!isualpha16(ch), "%d", ch);
+	assertf(!!ascii_isdigit(ch) == !!isudigit16(ch), "%d", ch);
+	assertf(!!ascii_isxdigit(ch) == !!isuxdigit16(ch), "%d", ch);
+	assertf(!!ascii_isalnum(ch) == !!isualnum16(ch), "%d", ch);
+	assertf(!!ascii_ispunct(ch) == !!isupunct16(ch), "%d", ch);
+	assertf(!!ascii_isgraph(ch) == !!isugraph16(ch), "%d", ch);
+	assertf(!!ascii_isprint(ch) == !!isuprint16(ch), "%d", ch);
+	assertf(!!ascii_isblank(ch) == !!isublank16(ch), "%d", ch);
+}
+
+static void testw32(wint32_t ch) {
+	if (ch == WEOF32) {
+		assertf(WEOF32 == toulower32(ch), "%d", ch);
+		assertf(WEOF32 == touupper32(ch), "%d", ch);
+	} else {
+		assertf((wint32_t)ascii_tolower(ch) == toulower32(ch), "%d", ch);
+		assertf((wint32_t)ascii_toupper(ch) == touupper32(ch), "%d", ch);
+	}
+	assertf(!!ascii_iscntrl(ch) == !!isucntrl32(ch), "%d", ch);
+	assertf(!!ascii_isspace(ch) == !!isuspace32(ch), "%d", ch);
+	assertf(!!ascii_isupper(ch) == !!isuupper32(ch), "%d", ch);
+	assertf(!!ascii_islower(ch) == !!isulower32(ch), "%d", ch);
+	assertf(!!ascii_isalpha(ch) == !!isualpha32(ch), "%d", ch);
+	assertf(!!ascii_isdigit(ch) == !!isudigit32(ch), "%d", ch);
+	assertf(!!ascii_isxdigit(ch) == !!isuxdigit32(ch), "%d", ch);
+	assertf(!!ascii_isalnum(ch) == !!isualnum32(ch), "%d", ch);
+	assertf(!!ascii_ispunct(ch) == !!isupunct32(ch), "%d", ch);
+	assertf(!!ascii_isgraph(ch) == !!isugraph32(ch), "%d", ch);
+	assertf(!!ascii_isprint(ch) == !!isuprint32(ch), "%d", ch);
+	assertf(!!ascii_isblank(ch) == !!isublank32(ch), "%d", ch);
+}
+
 
 /* Assert that ctype and unicode macros all function properly. */
 DEFINE_TEST(ctype) {
 	int ch;
-	testchar(EOF);
-
-	for (ch = 0; ch < 128; ++ch)
-		testchar(ch);
+	/* Specs say that <ctype.h> functions should also work with EOF! */
+	testc(EOF);
+	testw(WEOF);
+	testw16(WEOF16);
+	testw32(WEOF32);
+	for (ch = 0; ch < 128; ++ch) {
+		testc(ch);
+		testw(ch);
+		testw16(ch);
+		testw32(ch);
+	}
 }
 
 DECL_END

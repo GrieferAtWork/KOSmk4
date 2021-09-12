@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xe2f214c */
+/* HASH CRC-32:0x71224090 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -25,7 +25,7 @@
 __NAMESPACE_LOCAL_BEGIN
 __LOCAL_LIBC(iswascii) __ATTR_CONST __ATTR_WUNUSED int
 __NOTHROW(__LIBCCALL __LIBC_LOCAL_NAME(iswascii))(__WINT_TYPE__ __wc) {
-	return (unsigned int)__wc <= 0x7f;
+	return __wc >= 0 && __wc <= 0x7f;
 }
 __NAMESPACE_LOCAL_END
 #ifndef __local___localdep_iswascii_defined

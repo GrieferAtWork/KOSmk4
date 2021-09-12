@@ -216,9 +216,9 @@
 #endif /* !__NO_RPC_EXCEPTIONS */
 
 #if defined(__COMPILER_HAVE_AUTOTYPE) && !defined(__NO_XBLOCK)
-#define __COMPILER_UNUSED(expr) __XBLOCK({ __auto_type __expr = (expr); __expr; })
+#define __COMPILER_UNUSED(expr) __XBLOCK({ __auto_type __cu_expr = (expr); __cu_expr; })
 #elif defined(__COMPILER_HAVE_TYPEOF) && !defined(__NO_XBLOCK)
-#define __COMPILER_UNUSED(expr) __XBLOCK({ __typeof__(expr) __expr = (expr); __expr; })
+#define __COMPILER_UNUSED(expr) __XBLOCK({ __typeof__(expr) __cu_expr = (expr); __cu_expr; })
 #else /* ... */
 #define __COMPILER_UNUSED /* nothing */
 #endif /* !... */

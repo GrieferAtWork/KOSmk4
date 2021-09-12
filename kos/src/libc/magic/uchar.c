@@ -255,6 +255,10 @@ __SYSDECL_END
 #if defined(_WCHAR_H) && !defined(_PARTS_UCHAR_WCHAR_H)
 #include <parts/uchar/wchar.h>
 #endif /* _WCHAR_H && !_PARTS_UCHAR_WCHAR_H */
+
+#if defined(_WCTYPE_H) && !defined(_PARTS_UCHAR_WCTYPE_H)
+#include <parts/uchar/wctype.h>
+#endif /* _WCTYPE_H && !_PARTS_UCHAR_WCTYPE_H */
 #endif /* __USE_UTF */
 
 }

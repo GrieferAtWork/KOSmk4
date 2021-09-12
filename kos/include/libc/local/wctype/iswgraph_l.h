@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x93b78d2b */
+/* HASH CRC-32:0x8ed252f1 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -25,7 +25,14 @@
 __NAMESPACE_LOCAL_BEGIN
 #ifndef __local___localdep_iswgraph_defined
 #define __local___localdep_iswgraph_defined 1
-#if __has_builtin(__builtin_iswgraph) && defined(__LIBC_BIND_CRTBUILTINS) && defined(__CRT_HAVE_iswgraph)
+__NAMESPACE_LOCAL_END
+#include <bits/crt/wctype.h>
+__NAMESPACE_LOCAL_BEGIN
+#if defined(__crt_iswgraph) && defined(__CRT_HAVE_iswgraph)
+__CEIREDIRECT(__ATTR_CONST __ATTR_WUNUSED,int,__NOTHROW,__localdep_iswgraph,(__WINT_TYPE__ __wc),iswgraph,{ return __crt_iswgraph(__wc); })
+#elif defined(__crt_iswgraph)
+__LOCAL __ATTR_CONST __ATTR_WUNUSED int __NOTHROW(__LIBCCALL __localdep_iswgraph)(__WINT_TYPE__ __wc) { return __crt_iswgraph(__wc); }
+#elif __has_builtin(__builtin_iswgraph) && defined(__LIBC_BIND_CRTBUILTINS) && defined(__CRT_HAVE_iswgraph)
 __CEIREDIRECT(__ATTR_CONST __ATTR_WUNUSED,int,__NOTHROW,__localdep_iswgraph,(__WINT_TYPE__ __wc),iswgraph,{ return __builtin_iswgraph(__wc); })
 #elif defined(__CRT_HAVE_iswgraph)
 __CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,int,__NOTHROW,__localdep_iswgraph,(__WINT_TYPE__ __wc),iswgraph,(__wc))
@@ -37,10 +44,10 @@ __NAMESPACE_LOCAL_BEGIN
 #endif /* !... */
 #endif /* !__local___localdep_iswgraph_defined */
 __LOCAL_LIBC(iswgraph_l) __ATTR_PURE __ATTR_WUNUSED int
-__NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(iswgraph_l))(__WINT_TYPE__ __wc, __locale_t __locale) {
-	(void)__locale;
+__NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(iswgraph_l))(__WINT_TYPE__ __ch, __locale_t __locale) {
 	__COMPILER_IMPURE();
-	return __localdep_iswgraph(__wc);
+	(void)__locale;
+	return __localdep_iswgraph(__ch);
 }
 __NAMESPACE_LOCAL_END
 #ifndef __local___localdep_iswgraph_l_defined

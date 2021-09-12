@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x74ba6373 */
+/* HASH CRC-32:0x7f2bd292 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -24,21 +24,39 @@
 __NAMESPACE_LOCAL_BEGIN
 #ifndef __local___localdep_towlower_l_defined
 #define __local___localdep_towlower_l_defined 1
-#ifdef __CRT_HAVE_towlower_l
+__NAMESPACE_LOCAL_END
+#include <bits/crt/wctype.h>
+__NAMESPACE_LOCAL_BEGIN
+#if defined(__crt_towlower_l) && defined(__CRT_HAVE_towlower_l)
 __NAMESPACE_LOCAL_END
 #include <hybrid/typecore.h>
 __NAMESPACE_LOCAL_BEGIN
-__CREDIRECT(__ATTR_PURE __ATTR_WUNUSED,__WINT_TYPE__,__NOTHROW_NCX,__localdep_towlower_l,(__WINT_TYPE__ __wc, __locale_t __locale),towlower_l,(__wc,__locale))
+__CEIREDIRECT(__ATTR_PURE __ATTR_WUNUSED,__WINT_TYPE__,__NOTHROW_NCX,__localdep_towlower_l,(__WINT_TYPE__ __ch, __locale_t __locale),towlower_l,{ return __crt_towlower_l(__ch, __locale); })
+#elif defined(__crt_towlower_l) && defined(__CRT_HAVE___towlower_l)
+__NAMESPACE_LOCAL_END
+#include <hybrid/typecore.h>
+__NAMESPACE_LOCAL_BEGIN
+__CEIREDIRECT(__ATTR_PURE __ATTR_WUNUSED,__WINT_TYPE__,__NOTHROW_NCX,__localdep_towlower_l,(__WINT_TYPE__ __ch, __locale_t __locale),__towlower_l,{ return __crt_towlower_l(__ch, __locale); })
+#elif defined(__crt_towlower_l)
+__NAMESPACE_LOCAL_END
+#include <hybrid/typecore.h>
+__NAMESPACE_LOCAL_BEGIN
+__LOCAL __ATTR_PURE __ATTR_WUNUSED __WINT_TYPE__ __NOTHROW_NCX(__LIBCCALL __localdep_towlower_l)(__WINT_TYPE__ __ch, __locale_t __locale) { return __crt_towlower_l(__ch, __locale); }
+#elif defined(__CRT_HAVE_towlower_l)
+__NAMESPACE_LOCAL_END
+#include <hybrid/typecore.h>
+__NAMESPACE_LOCAL_BEGIN
+__CREDIRECT(__ATTR_PURE __ATTR_WUNUSED,__WINT_TYPE__,__NOTHROW_NCX,__localdep_towlower_l,(__WINT_TYPE__ __ch, __locale_t __locale),towlower_l,(__ch,__locale))
 #elif defined(__CRT_HAVE__towlower_l)
 __NAMESPACE_LOCAL_END
 #include <hybrid/typecore.h>
 __NAMESPACE_LOCAL_BEGIN
-__CREDIRECT(__ATTR_PURE __ATTR_WUNUSED,__WINT_TYPE__,__NOTHROW_NCX,__localdep_towlower_l,(__WINT_TYPE__ __wc, __locale_t __locale),_towlower_l,(__wc,__locale))
+__CREDIRECT(__ATTR_PURE __ATTR_WUNUSED,__WINT_TYPE__,__NOTHROW_NCX,__localdep_towlower_l,(__WINT_TYPE__ __ch, __locale_t __locale),_towlower_l,(__ch,__locale))
 #elif defined(__CRT_HAVE___towlower_l)
 __NAMESPACE_LOCAL_END
 #include <hybrid/typecore.h>
 __NAMESPACE_LOCAL_BEGIN
-__CREDIRECT(__ATTR_PURE __ATTR_WUNUSED,__WINT_TYPE__,__NOTHROW_NCX,__localdep_towlower_l,(__WINT_TYPE__ __wc, __locale_t __locale),__towlower_l,(__wc,__locale))
+__CREDIRECT(__ATTR_PURE __ATTR_WUNUSED,__WINT_TYPE__,__NOTHROW_NCX,__localdep_towlower_l,(__WINT_TYPE__ __ch, __locale_t __locale),__towlower_l,(__ch,__locale))
 #else /* ... */
 __NAMESPACE_LOCAL_END
 #include <libc/local/wctype/towlower_l.h>
@@ -81,10 +99,10 @@ __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(wildwcscasecmp_l))(__WCHAR_TYPE__ con
 				return 0; /* Pattern ends with '*' (matches everything) */
 			if (__card_post == '?')
 				goto __next; /* Match any --> already found */
-			__card_post = (__WCHAR_TYPE__)__localdep_towlower_l(__card_post, __locale);
+			__card_post = __localdep_towlower_l(__card_post, __locale);
 			for (;;) {
 				__WCHAR_TYPE__ __ch = *__string++;
-				if (__card_post == __ch || __card_post == (__WCHAR_TYPE__)__localdep_towlower_l(__ch, __locale)) {
+				if (__card_post == __ch || __card_post == __localdep_towlower_l(__ch, __locale)) {
 					/* Recursively check if the rest of the string and pattern match */
 					if (!__localdep_wcscasecmp_l(__string, __pattern, __locale))
 						return 0;
@@ -96,8 +114,8 @@ __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(wildwcscasecmp_l))(__WCHAR_TYPE__ con
 		__pattern_ch = *__pattern;
 		__wcsing_ch = *__string;
 		if (__pattern_ch == __wcsing_ch || __pattern_ch == '?' ||
-		   (__pattern_ch = (__WCHAR_TYPE__)__localdep_towlower_l(__pattern_ch, __locale),
-		    __wcsing_ch = (__WCHAR_TYPE__)__localdep_towlower_l(__wcsing_ch, __locale),
+		   (__pattern_ch = __localdep_towlower_l(__pattern_ch, __locale),
+		    __wcsing_ch = __localdep_towlower_l(__wcsing_ch, __locale),
 		    __pattern_ch == __wcsing_ch)) {
 __next:
 			++__string;

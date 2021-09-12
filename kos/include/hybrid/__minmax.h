@@ -37,15 +37,15 @@
 #define __hybrid_min    __builtin_min
 #define __hybrid_max    __builtin_max
 #elif defined(__COMPILER_HAVE_AUTOTYPE) && !defined(__NO_XBLOCK)
-#define __hybrid_min_r2(a, b) __XBLOCK({ __auto_type _a = (a); __auto_type _b = (b); __XRETURN _a < _b ? _a : _b; })
-#define __hybrid_max_r2(a, b) __XBLOCK({ __auto_type _a = (a); __auto_type _b = (b); __XRETURN _b < _a ? _a : _b; })
-#define __hybrid_min2(a, b)   __XBLOCK({ __auto_type _a = (a); __auto_type _b = (b); __XRETURN _a < _b ? _a : _b; })
-#define __hybrid_max2(a, b)   __XBLOCK({ __auto_type _a = (a); __auto_type _b = (b); __XRETURN _b < _a ? _a : _b; })
+#define __hybrid_min_r2(a, b) __XBLOCK({ __auto_type __hmima_a = (a); __auto_type __hmima_b = (b); __XRETURN __hmima_a < __hmima_b ? __hmima_a : __hmima_b; })
+#define __hybrid_max_r2(a, b) __XBLOCK({ __auto_type __hmima_a = (a); __auto_type __hmima_b = (b); __XRETURN __hmima_b < __hmima_a ? __hmima_a : __hmima_b; })
+#define __hybrid_min2(a, b)   __XBLOCK({ __auto_type __hmima_a = (a); __auto_type __hmima_b = (b); __XRETURN __hmima_a < __hmima_b ? __hmima_a : __hmima_b; })
+#define __hybrid_max2(a, b)   __XBLOCK({ __auto_type __hmima_a = (a); __auto_type __hmima_b = (b); __XRETURN __hmima_b < __hmima_a ? __hmima_a : __hmima_b; })
 #elif defined(__COMPILER_HAVE_TYPEOF) && !defined(__NO_XBLOCK)
-#define __hybrid_min_r2(a, b) __XBLOCK({ __typeof__(a) _a = (a); __typeof__(b) _b = (b); __XRETURN _a < _b ? _a : _b; })
-#define __hybrid_max_r2(a, b) __XBLOCK({ __typeof__(a) _a = (a); __typeof__(b) _b = (b); __XRETURN _b < _a ? _a : _b; })
-#define __hybrid_min2(a, b)   __XBLOCK({ __typeof__(a) _a = (a); __typeof__(b) _b = (b); __XRETURN _a < _b ? _a : _b; })
-#define __hybrid_max2(a, b)   __XBLOCK({ __typeof__(a) _a = (a); __typeof__(b) _b = (b); __XRETURN _b < _a ? _a : _b; })
+#define __hybrid_min_r2(a, b) __XBLOCK({ __typeof__(a) __hmima_a = (a); __typeof__(b) __hmima_b = (b); __XRETURN __hmima_a < __hmima_b ? __hmima_a : __hmima_b; })
+#define __hybrid_max_r2(a, b) __XBLOCK({ __typeof__(a) __hmima_a = (a); __typeof__(b) __hmima_b = (b); __XRETURN __hmima_b < __hmima_a ? __hmima_a : __hmima_b; })
+#define __hybrid_min2(a, b)   __XBLOCK({ __typeof__(a) __hmima_a = (a); __typeof__(b) __hmima_b = (b); __XRETURN __hmima_a < __hmima_b ? __hmima_a : __hmima_b; })
+#define __hybrid_max2(a, b)   __XBLOCK({ __typeof__(a) __hmima_a = (a); __typeof__(b) __hmima_b = (b); __XRETURN __hmima_b < __hmima_a ? __hmima_a : __hmima_b; })
 #endif /* ... */
 
 #ifndef __hybrid_min2

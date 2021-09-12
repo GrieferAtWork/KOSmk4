@@ -299,7 +299,10 @@
 #define __CRT_HAVE___crtSleep
 #define __CRT_HAVE___crt_unreachable
 #define __CRT_HAVE___ctype_b_loc
+#define __CRT_HAVE___ctype_flags
+#define __CRT_HAVE___ctype_tolower
 #define __CRT_HAVE___ctype_tolower_loc
+#define __CRT_HAVE___ctype_toupper
 #define __CRT_HAVE___ctype_toupper_loc
 #define __CRT_HAVE___cxa_atexit
 #define __CRT_HAVE___cxa_begin_catch
@@ -751,7 +754,6 @@
 #define __CRT_HAVE___unicode_descriptor_digit64
 #define __CRT_HAVE___unicode_descriptor_digitd
 #define __CRT_HAVE___unicode_descriptor_digitld
-#define __CRT_HAVE___unicode_latin1flags
 #define __CRT_HAVE___uselocale
 #define __CRT_HAVE___vfork
 #define __CRT_HAVE___vfscanf

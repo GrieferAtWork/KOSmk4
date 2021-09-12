@@ -40,13 +40,10 @@
 #endif /* !__CRT_DOS_PRIMARY */
 
 #define __EOF    (-1)
-#define __WEOF16 (__CCAST(__WINT_TYPE__)__UINT16_C(0xffff))
-#define __WEOF32 (__CCAST(__WINT_TYPE__)__UINT32_C(0xffffffff))
-#if __SIZEOF_WCHAR_T__ == 4
-#define __WEOF __WEOF32
-#else /* __SIZEOF_WCHAR_T__ == 4 */
-#define __WEOF __WEOF16
-#endif /* __SIZEOF_WCHAR_T__ != 4 */
+#define __WEOF16 (__CCAST(__WINT16_TYPE__)-1)
+#define __WEOF32 (__CCAST(__WINT32_TYPE__)-1)
+#define __WEOF   (__CCAST(__WINT_TYPE__)-1)
+
 
 #ifdef __CRT_DOS_PRIMARY
 #define __L_tmpnam     14    /* Minimum buffer size for temporary file names */

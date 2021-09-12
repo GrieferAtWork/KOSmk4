@@ -42,6 +42,7 @@
 %[define_replacement(wint_t = __WINT_TYPE__)]
 %[define_replacement(wctype_t = __wctype_t)]
 %[define_replacement(wctrans_t = __wctrans_t)]
+%[define_replacement(offsetof = __builtin_offsetof)]
 
 %[define_str2wcs_replacement(iscntrl = iswcntrl)]
 %[define_str2wcs_replacement(isspace = iswspace)]
@@ -54,8 +55,8 @@
 %[define_str2wcs_replacement(ispunct = iswpunct)]
 %[define_str2wcs_replacement(isgraph = iswgraph)]
 %[define_str2wcs_replacement(isprint = iswprint)]
-%[define_str2wcs_replacement(tolower = "(wchar_t)towlower")]
-%[define_str2wcs_replacement(toupper = "(wchar_t)towupper")]
+%[define_str2wcs_replacement(tolower = towlower)]
+%[define_str2wcs_replacement(toupper = towupper)]
 %[define_str2wcs_replacement(isblank = iswblank)]
 %[define_str2wcs_replacement(iscntrl_l = iswcntrl_l)]
 %[define_str2wcs_replacement(isspace_l = iswspace_l)]
@@ -69,26 +70,53 @@
 %[define_str2wcs_replacement(isgraph_l = iswgraph_l)]
 %[define_str2wcs_replacement(isprint_l = iswprint_l)]
 %[define_str2wcs_replacement(isblank_l = iswblank_l)]
-%[define_str2wcs_replacement(tolower_l = "(wchar_t)towlower_l")]
-%[define_str2wcs_replacement(toupper_l = "(wchar_t)towupper_l")]
+%[define_str2wcs_replacement(tolower_l = towlower_l)]
+%[define_str2wcs_replacement(toupper_l = towupper_l)]
 %[define_str2wcs_replacement(isascii = iswascii)]
 //%[define_str2wcs_replacement(toascii = "(wchar_t)towascii")]
+
+%[define_wchar_replacement(wchar_t = char16_t, char32_t)]
+%[define_wchar_replacement(wint_t = wint16_t, wint32_t)]
+%[define_wchar_replacement(__WINT_TYPE__ = __WINT16_TYPE__, __WINT32_TYPE__)]
+%[define_wchar_replacement(__WCHAR_TYPE__ = __CHAR16_TYPE__, __CHAR32_TYPE__)]
+%[define_wchar_replacement(__SIZEOF_WINT_T__ = "2", "4")]
+%[define_wchar_replacement(__SIZEOF_WCHAR_T__ = "2", "4")]
+%[define_wchar_replacement(WEOF = __WEOF16, __WEOF32)]
+%[define_wchar_replacement(__WEOF = __WEOF16, __WEOF32)]
+
+
+%(auto_header){
+/* For the sake of optimization, allow libc auto
+ * functions to make direct use of unicode data. */
+#ifndef __KERNEL__
+#define libc_iswcntrl(ch)  __crt_iswcntrl(ch)
+#define libc_iswspace(ch)  __crt_iswspace(ch)
+#define libc_iswupper(ch)  __crt_iswupper(ch)
+#define libc_iswlower(ch)  __crt_iswlower(ch)
+#define libc_iswalpha(ch)  __crt_iswalpha(ch)
+#define libc_iswdigit(ch)  __crt_iswdigit(ch)
+#define libc_iswxdigit(ch) __crt_iswxdigit(ch)
+#define libc_iswalnum(ch)  __crt_iswalnum(ch)
+#define libc_iswpunct(ch)  __crt_iswpunct(ch)
+#define libc_iswgraph(ch)  __crt_iswgraph(ch)
+#define libc_iswprint(ch)  __crt_iswprint(ch)
+#define libc_iswblank(ch)  __crt_iswblank(ch)
+#define libc_towlower(ch)  __crt_towlower(ch)
+#define libc_towupper(ch)  __crt_towupper(ch)
+#endif /* !__KERNEL__ */
+}
 
 
 %[insert:prefix(
 #include <features.h>
-)]%{
-
-}%[insert:prefix(
+)]%[insert:prefix(
 #include <hybrid/byteorder.h>
 )]%[insert:prefix(
 #include <hybrid/typecore.h>
-)]%{
-
-}%[insert:prefix(
-#include <asm/crt/stdio.h>   /* __WEOF */
 )]%[insert:prefix(
-#include <bits/crt/wctype.h> /* __wctype_t, __wctrans_t */
+#include <asm/crt/stdio.h>
+)]%[insert:prefix(
+#include <bits/crt/wctype.h>
 )]%[insert:prefix(
 #include <bits/types.h>
 )]%{
@@ -111,11 +139,11 @@ __SYSDECL_BEGIN
 
 __NAMESPACE_STD_BEGIN
 #ifndef __std_wint_t_defined
-#define __std_wint_t_defined 1
+#define __std_wint_t_defined
 typedef __WINT_TYPE__ wint_t;
 #endif /* !__std_wint_t_defined */
 #ifndef __std_wctype_t_defined
-#define __std_wctype_t_defined 1
+#define __std_wctype_t_defined
 typedef __wctype_t wctype_t;
 #endif /* !__std_wctype_t_defined */
 __NAMESPACE_STD_END
@@ -123,18 +151,18 @@ __NAMESPACE_STD_END
 #ifndef __CXX_SYSTEM_HEADER
 }%(c, ccompat){
 #ifndef __wint_t_defined
-#define __wint_t_defined 1
+#define __wint_t_defined
 __NAMESPACE_STD_USING(wint_t)
 #endif /* !__wint_t_defined */
 #ifndef __wctype_t_defined
-#define __wctype_t_defined 1
+#define __wctype_t_defined
 __NAMESPACE_STD_USING(wctype_t)
 #endif /* !__wctype_t_defined */
 }%{
 #endif /* !__CXX_SYSTEM_HEADER */
 
 #ifndef __wchar_t_defined
-#define __wchar_t_defined 1
+#define __wchar_t_defined
 typedef __WCHAR_TYPE__ wchar_t;
 #endif /* !__wchar_t_defined */
 
@@ -144,7 +172,7 @@ typedef __WCHAR_TYPE__ wchar_t;
 #if defined(__USE_ISOC99) || defined(__USE_XOPEN2K8)
 }%{
 #ifndef __std_wctrans_t_defined
-#define __std_wctrans_t_defined 1
+#define __std_wctrans_t_defined
 __NAMESPACE_STD_BEGIN
 typedef __wctrans_t wctrans_t;
 __NAMESPACE_STD_END
@@ -153,7 +181,7 @@ __NAMESPACE_STD_END
 #ifndef __CXX_SYSTEM_HEADER
 }%(c, ccompat){
 #ifndef __wctrans_t_defined
-#define __wctrans_t_defined 1
+#define __wctrans_t_defined
 __NAMESPACE_STD_USING(wctrans_t)
 #endif /* !__wctrans_t_defined */
 }%{
@@ -168,140 +196,302 @@ __NAMESPACE_STD_USING(wctrans_t)
 %[insert:std]
 %[default:section(".text.crt{|.dos}.wchar.unicode.static.ctype")];
 
-[[decl_include("<hybrid/typecore.h>")]]
-[[std, wunused, nothrow, ATTR_CONST, crtbuiltin]]
-int iswalnum(wint_t wc) {
-	return isalnum((int)wc);
+/*[[[deemon
+local TRAITS = {
+	"iswcntrl", "iswspace", "iswupper", "iswlower", "iswalpha",
+	"iswdigit", "iswxdigit", "iswalnum", "iswpunct", "iswgraph",
+	"iswprint", "towlower", "towupper"
+};
+function printTrait(name) {
+	local isto = name.startswith("to");
+	print("@@>> ", name, "(3)");
+	print("[[if($extended_include_prefix(\"<bits/crt/wctype.h>\")defined(__crt_", name, ")), preferred_extern_inline(\"", name, "\", { return __crt_", name, "(wc); })]]");
+	print("[[if($extended_include_prefix(\"<bits/crt/wctype.h>\")defined(__crt_", name, ")), preferred_inline({ return __crt_", name, "(wc); })]]");
+	print("[[wchar, std, crtbuiltin, const, wunused, nothrow, impl_include(\"<bits/crt/wctype.h>\"), decl_include(\"<hybrid/typecore.h>\")]]");
+	print(isto ? "wint_t " : "int ", name, "(wint_t wc) {");
+	print("@@pp_ifdef __crt_", name, "@@");
+	print("	return __crt_", name, "(wc);");
+	print("@@pp_else@@");
+	if (isto) {
+		print("	return btowc(", name, "(wctob(wc)));");
+	} else {
+		print("	return ", name, "(wctob(wc));");
+	}
+	print("@@pp_endif@@");
+	print("}");
+	print;
 }
-
-[[decl_include("<hybrid/typecore.h>")]]
-[[std, wunused, nothrow, ATTR_CONST, crtbuiltin]]
-int iswalpha(wint_t wc) {
-	return isalpha((int)wc);
-}
-
-[[decl_include("<hybrid/typecore.h>")]]
-[[std, wunused, nothrow, ATTR_CONST, crtbuiltin]]
+for (local name: TRAITS)
+	printTrait(name);
+print("%(c,std)#ifdef __USE_ISOC99");
+printTrait("iswblank");
+print("%(c,std)#endif /" "* __USE_ISOC99 *" "/");
+]]]*/
+@@>> iswcntrl(3)
+[[if($extended_include_prefix("<bits/crt/wctype.h>")defined(__crt_iswcntrl)), preferred_extern_inline("iswcntrl", { return __crt_iswcntrl(wc); })]]
+[[if($extended_include_prefix("<bits/crt/wctype.h>")defined(__crt_iswcntrl)), preferred_inline({ return __crt_iswcntrl(wc); })]]
+[[wchar, std, crtbuiltin, const, wunused, nothrow, impl_include("<bits/crt/wctype.h>"), decl_include("<hybrid/typecore.h>")]]
 int iswcntrl(wint_t wc) {
-	return iscntrl((int)wc);
+@@pp_ifdef __crt_iswcntrl@@
+	return __crt_iswcntrl(wc);
+@@pp_else@@
+	return iswcntrl(wctob(wc));
+@@pp_endif@@
 }
 
-[[decl_include("<hybrid/typecore.h>")]]
-[[std, wunused, nothrow, ATTR_CONST, crtbuiltin]]
-int iswdigit(wint_t wc) {
-	return isdigit((int)wc);
-}
-
-[[decl_include("<hybrid/typecore.h>")]]
-[[std, wunused, nothrow, ATTR_CONST, crtbuiltin]]
-int iswgraph(wint_t wc) {
-	return isgraph((int)wc);
-}
-
-[[decl_include("<hybrid/typecore.h>")]]
-[[std, wunused, nothrow, ATTR_CONST, crtbuiltin]]
-int iswlower(wint_t wc) {
-	return islower((int)wc);
-}
-
-[[decl_include("<hybrid/typecore.h>")]]
-[[std, wunused, nothrow, ATTR_CONST, crtbuiltin]]
-int iswprint(wint_t wc) {
-	return isprint((int)wc);
-}
-
-[[decl_include("<hybrid/typecore.h>")]]
-[[std, wunused, nothrow, ATTR_CONST, crtbuiltin]]
-int iswpunct(wint_t wc) {
-	return ispunct((int)wc);
-}
-
-[[decl_include("<hybrid/typecore.h>")]]
-[[std, wunused, nothrow, ATTR_CONST, crtbuiltin]]
+@@>> iswspace(3)
+[[if($extended_include_prefix("<bits/crt/wctype.h>")defined(__crt_iswspace)), preferred_extern_inline("iswspace", { return __crt_iswspace(wc); })]]
+[[if($extended_include_prefix("<bits/crt/wctype.h>")defined(__crt_iswspace)), preferred_inline({ return __crt_iswspace(wc); })]]
+[[wchar, std, crtbuiltin, const, wunused, nothrow, impl_include("<bits/crt/wctype.h>"), decl_include("<hybrid/typecore.h>")]]
 int iswspace(wint_t wc) {
-	return isspace((int)wc);
+@@pp_ifdef __crt_iswspace@@
+	return __crt_iswspace(wc);
+@@pp_else@@
+	return iswspace(wctob(wc));
+@@pp_endif@@
 }
 
-[[decl_include("<hybrid/typecore.h>")]]
-[[std, wunused, nothrow, ATTR_CONST, crtbuiltin]]
+@@>> iswupper(3)
+[[if($extended_include_prefix("<bits/crt/wctype.h>")defined(__crt_iswupper)), preferred_extern_inline("iswupper", { return __crt_iswupper(wc); })]]
+[[if($extended_include_prefix("<bits/crt/wctype.h>")defined(__crt_iswupper)), preferred_inline({ return __crt_iswupper(wc); })]]
+[[wchar, std, crtbuiltin, const, wunused, nothrow, impl_include("<bits/crt/wctype.h>"), decl_include("<hybrid/typecore.h>")]]
 int iswupper(wint_t wc) {
-	return isupper((int)wc);
+@@pp_ifdef __crt_iswupper@@
+	return __crt_iswupper(wc);
+@@pp_else@@
+	return iswupper(wctob(wc));
+@@pp_endif@@
 }
 
-[[decl_include("<hybrid/typecore.h>")]]
-[[std, wunused, nothrow, ATTR_CONST, crtbuiltin]]
+@@>> iswlower(3)
+[[if($extended_include_prefix("<bits/crt/wctype.h>")defined(__crt_iswlower)), preferred_extern_inline("iswlower", { return __crt_iswlower(wc); })]]
+[[if($extended_include_prefix("<bits/crt/wctype.h>")defined(__crt_iswlower)), preferred_inline({ return __crt_iswlower(wc); })]]
+[[wchar, std, crtbuiltin, const, wunused, nothrow, impl_include("<bits/crt/wctype.h>"), decl_include("<hybrid/typecore.h>")]]
+int iswlower(wint_t wc) {
+@@pp_ifdef __crt_iswlower@@
+	return __crt_iswlower(wc);
+@@pp_else@@
+	return iswlower(wctob(wc));
+@@pp_endif@@
+}
+
+@@>> iswalpha(3)
+[[if($extended_include_prefix("<bits/crt/wctype.h>")defined(__crt_iswalpha)), preferred_extern_inline("iswalpha", { return __crt_iswalpha(wc); })]]
+[[if($extended_include_prefix("<bits/crt/wctype.h>")defined(__crt_iswalpha)), preferred_inline({ return __crt_iswalpha(wc); })]]
+[[wchar, std, crtbuiltin, const, wunused, nothrow, impl_include("<bits/crt/wctype.h>"), decl_include("<hybrid/typecore.h>")]]
+int iswalpha(wint_t wc) {
+@@pp_ifdef __crt_iswalpha@@
+	return __crt_iswalpha(wc);
+@@pp_else@@
+	return iswalpha(wctob(wc));
+@@pp_endif@@
+}
+
+@@>> iswdigit(3)
+[[if($extended_include_prefix("<bits/crt/wctype.h>")defined(__crt_iswdigit)), preferred_extern_inline("iswdigit", { return __crt_iswdigit(wc); })]]
+[[if($extended_include_prefix("<bits/crt/wctype.h>")defined(__crt_iswdigit)), preferred_inline({ return __crt_iswdigit(wc); })]]
+[[wchar, std, crtbuiltin, const, wunused, nothrow, impl_include("<bits/crt/wctype.h>"), decl_include("<hybrid/typecore.h>")]]
+int iswdigit(wint_t wc) {
+@@pp_ifdef __crt_iswdigit@@
+	return __crt_iswdigit(wc);
+@@pp_else@@
+	return iswdigit(wctob(wc));
+@@pp_endif@@
+}
+
+@@>> iswxdigit(3)
+[[if($extended_include_prefix("<bits/crt/wctype.h>")defined(__crt_iswxdigit)), preferred_extern_inline("iswxdigit", { return __crt_iswxdigit(wc); })]]
+[[if($extended_include_prefix("<bits/crt/wctype.h>")defined(__crt_iswxdigit)), preferred_inline({ return __crt_iswxdigit(wc); })]]
+[[wchar, std, crtbuiltin, const, wunused, nothrow, impl_include("<bits/crt/wctype.h>"), decl_include("<hybrid/typecore.h>")]]
 int iswxdigit(wint_t wc) {
-	return isdigit((int)wc);
+@@pp_ifdef __crt_iswxdigit@@
+	return __crt_iswxdigit(wc);
+@@pp_else@@
+	return iswxdigit(wctob(wc));
+@@pp_endif@@
 }
 
-%(std)#ifdef __USE_ISOC99
-%[default:section(".text.crt{|.dos}.wchar.unicode.static.mbs")];
-
-[[std, guard, wunused, ATTR_PURE]]
-[[decl_include("<bits/crt/wctype.h>")]]
-wctrans_t wctrans([[nonnull]] char const *prop) {
-	/* TODO */
-	(void)prop;
-	COMPILER_IMPURE();
-	return 0;
+@@>> iswalnum(3)
+[[if($extended_include_prefix("<bits/crt/wctype.h>")defined(__crt_iswalnum)), preferred_extern_inline("iswalnum", { return __crt_iswalnum(wc); })]]
+[[if($extended_include_prefix("<bits/crt/wctype.h>")defined(__crt_iswalnum)), preferred_inline({ return __crt_iswalnum(wc); })]]
+[[wchar, std, crtbuiltin, const, wunused, nothrow, impl_include("<bits/crt/wctype.h>"), decl_include("<hybrid/typecore.h>")]]
+int iswalnum(wint_t wc) {
+@@pp_ifdef __crt_iswalnum@@
+	return __crt_iswalnum(wc);
+@@pp_else@@
+	return iswalnum(wctob(wc));
+@@pp_endif@@
 }
 
-[[std, guard, wunused, export_alias("__towctrans"), ATTR_CONST]]
-[[decl_include("<hybrid/typecore.h>", "<bits/crt/wctype.h>")]]
-wint_t towctrans(wint_t wc, wctrans_t desc) {
-	/* TODO */
-	(void)wc;
-	(void)desc;
-	return 0;
-}
-%(std)#endif /* __USE_ISOC99 */
-
-[[std, wunused, ATTR_PURE]]
-[[decl_include("<bits/crt/wctype.h>")]]
-wctype_t wctype([[nonnull]] char const *prop) {
-	/* TODO */
-	(void)prop;
-	COMPILER_IMPURE();
-	return 0;
+@@>> iswpunct(3)
+[[if($extended_include_prefix("<bits/crt/wctype.h>")defined(__crt_iswpunct)), preferred_extern_inline("iswpunct", { return __crt_iswpunct(wc); })]]
+[[if($extended_include_prefix("<bits/crt/wctype.h>")defined(__crt_iswpunct)), preferred_inline({ return __crt_iswpunct(wc); })]]
+[[wchar, std, crtbuiltin, const, wunused, nothrow, impl_include("<bits/crt/wctype.h>"), decl_include("<hybrid/typecore.h>")]]
+int iswpunct(wint_t wc) {
+@@pp_ifdef __crt_iswpunct@@
+	return __crt_iswpunct(wc);
+@@pp_else@@
+	return iswpunct(wctob(wc));
+@@pp_endif@@
 }
 
-[[decl_include("<hybrid/typecore.h>", "<bits/crt/wctype.h>")]]
-[[std, wunused, ATTR_CONST, export_alias("is_wctype", "__iswctype")]]
-int iswctype(wint_t wc, wctype_t desc) {
-	/* TODO */
-	(void)wc;
-	(void)desc;
-	return 0;
+@@>> iswgraph(3)
+[[if($extended_include_prefix("<bits/crt/wctype.h>")defined(__crt_iswgraph)), preferred_extern_inline("iswgraph", { return __crt_iswgraph(wc); })]]
+[[if($extended_include_prefix("<bits/crt/wctype.h>")defined(__crt_iswgraph)), preferred_inline({ return __crt_iswgraph(wc); })]]
+[[wchar, std, crtbuiltin, const, wunused, nothrow, impl_include("<bits/crt/wctype.h>"), decl_include("<hybrid/typecore.h>")]]
+int iswgraph(wint_t wc) {
+@@pp_ifdef __crt_iswgraph@@
+	return __crt_iswgraph(wc);
+@@pp_else@@
+	return iswgraph(wctob(wc));
+@@pp_endif@@
 }
 
-%[default:section(".text.crt{|.dos}.wchar.unicode.static.ctype")]
-%(std)#ifdef __USE_ISOC99
-[[decl_include("<hybrid/typecore.h>")]]
-[[std, guard, wunused, nothrow, ATTR_CONST, crtbuiltin]]
-int iswblank(wint_t wc) {
-	return isblank((int)wc);
+@@>> iswprint(3)
+[[if($extended_include_prefix("<bits/crt/wctype.h>")defined(__crt_iswprint)), preferred_extern_inline("iswprint", { return __crt_iswprint(wc); })]]
+[[if($extended_include_prefix("<bits/crt/wctype.h>")defined(__crt_iswprint)), preferred_inline({ return __crt_iswprint(wc); })]]
+[[wchar, std, crtbuiltin, const, wunused, nothrow, impl_include("<bits/crt/wctype.h>"), decl_include("<hybrid/typecore.h>")]]
+int iswprint(wint_t wc) {
+@@pp_ifdef __crt_iswprint@@
+	return __crt_iswprint(wc);
+@@pp_else@@
+	return iswprint(wctob(wc));
+@@pp_endif@@
 }
-%(std)#endif /* __USE_ISOC99 */
 
-[[decl_include("<hybrid/typecore.h>")]]
-[[std, wunused, nothrow, ATTR_CONST, crtbuiltin]]
+@@>> towlower(3)
+[[if($extended_include_prefix("<bits/crt/wctype.h>")defined(__crt_towlower)), preferred_extern_inline("towlower", { return __crt_towlower(wc); })]]
+[[if($extended_include_prefix("<bits/crt/wctype.h>")defined(__crt_towlower)), preferred_inline({ return __crt_towlower(wc); })]]
+[[wchar, std, crtbuiltin, const, wunused, nothrow, impl_include("<bits/crt/wctype.h>"), decl_include("<hybrid/typecore.h>")]]
 wint_t towlower(wint_t wc) {
-	return (wint_t)tolower((int)wc);
+@@pp_ifdef __crt_towlower@@
+	return __crt_towlower(wc);
+@@pp_else@@
+	return btowc(towlower(wctob(wc)));
+@@pp_endif@@
 }
 
-[[decl_include("<hybrid/typecore.h>")]]
-[[std, wunused, nothrow, ATTR_CONST, crtbuiltin]]
+@@>> towupper(3)
+[[if($extended_include_prefix("<bits/crt/wctype.h>")defined(__crt_towupper)), preferred_extern_inline("towupper", { return __crt_towupper(wc); })]]
+[[if($extended_include_prefix("<bits/crt/wctype.h>")defined(__crt_towupper)), preferred_inline({ return __crt_towupper(wc); })]]
+[[wchar, std, crtbuiltin, const, wunused, nothrow, impl_include("<bits/crt/wctype.h>"), decl_include("<hybrid/typecore.h>")]]
 wint_t towupper(wint_t wc) {
-	return (wint_t)toupper((int)wc);
+@@pp_ifdef __crt_towupper@@
+	return __crt_towupper(wc);
+@@pp_else@@
+	return btowc(towupper(wctob(wc)));
+@@pp_endif@@
+}
+
+%(c,std)#ifdef __USE_ISOC99
+@@>> iswblank(3)
+[[if($extended_include_prefix("<bits/crt/wctype.h>")defined(__crt_iswblank)), preferred_extern_inline("iswblank", { return __crt_iswblank(wc); })]]
+[[if($extended_include_prefix("<bits/crt/wctype.h>")defined(__crt_iswblank)), preferred_inline({ return __crt_iswblank(wc); })]]
+[[wchar, std, crtbuiltin, const, wunused, nothrow, impl_include("<bits/crt/wctype.h>"), decl_include("<hybrid/typecore.h>")]]
+int iswblank(wint_t wc) {
+@@pp_ifdef __crt_iswblank@@
+	return __crt_iswblank(wc);
+@@pp_else@@
+	return iswblank(wctob(wc));
+@@pp_endif@@
+}
+
+%(c,std)#endif /* __USE_ISOC99 */
+/*[[[end]]]*/
+
+
+
+
+%(c,std)#ifdef __USE_ISOC99
+
+[[std, guard, wunused, pure, requires(defined(__CRT_KOS))]]
+[[decl_include("<bits/crt/wctype.h>")]]
+[[impl_include("<bits/crt/unicode.h>")]]
+wctrans_t wctrans([[nonnull]] char const *prop) {
+	struct wctrans_entry {
+		char     we_name[8]; /* Name (with leading 'to' stripped) */
+		uint16_t we_offset;  /* Offset to `int32_t' field in `struct __unitraits' */
+	};
+	static struct wctrans_entry const entries[] = {
+		{ "tolower", offsetof(struct @__unitraits@, @__ut_lower@) },
+		{ "toupper", offsetof(struct @__unitraits@, @__ut_upper@) },
+		{ "totitle", offsetof(struct @__unitraits@, @__ut_title@) }, /* Kos extension! */
+	};
+	unsigned int i;
+	for (i = 0; i < COMPILER_LENOF(entries); ++i) {
+		if (strcmp(prop, entries[i].we_name) == 0)
+			return (wctrans_t)(uintptr_t)entries[i].we_offset;
+	}
+	return (wctrans_t)0;
+}
+
+[[decl_include("<hybrid/typecore.h>", "<bits/crt/wctype.h>")]]
+[[std, wchar, guard, const, wunused, export_alias("__towctrans")]]
+[[requires(defined(__CRT_KOS) && $has_function(__unicode_descriptor))]]
+[[impl_include("<bits/crt/unicode.h>")]]
+wint_t towctrans(wint_t wc, wctrans_t desc) {
+	struct @__unitraits@ const *traits = __unicode_descriptor(wc);
+	return wc + *((s32 const *)traits + (uintptr_t)desc);
+}
+%(c,std)#endif /* __USE_ISOC99 */
+
+[[std, wunused, pure]]
+[[decl_include("<bits/crt/wctype.h>")]]
+[[requires(defined(__CRT_KOS) && $has_function(__unicode_descriptor))]]
+[[impl_include("<bits/crt/unicode.h>")]]
+wctype_t wctype([[nonnull]] char const *prop) {
+	struct wctype_entry {
+		char     we_name[8]; /* Name (with leading 'to' stripped) */
+		uint16_t we_flags;   /* Flags that must be set. */
+	};
+	static struct wctype_entry const entries[] = {
+		{ "cntrl",   __UNICODE_ISCNTRL },
+		{ "space",   __UNICODE_ISSPACE },
+		{ "lower",   __UNICODE_ISLOWER },
+		{ "upper",   __UNICODE_ISUPPER },
+		{ "alpha",   __UNICODE_ISALPHA },
+		{ "digit",   __UNICODE_ISDIGIT },
+		{ "xdigit",  __UNICODE_ISXDIGIT },
+		{ "alnum",   __UNICODE_ISALNUM },
+		{ "punct",   __UNICODE_ISPUNCT },
+		{ "graph",   __UNICODE_ISGRAPH },
+		{ "print",   __UNICODE_ISPRINT },
+		{ "blank",   __UNICODE_ISBLANK },
+		/* All of the following are KOS extensions! */
+		{ "tab",     __UNICODE_ISTAB },
+		{ "white",   __UNICODE_ISWHITE },
+		{ "empty",   __UNICODE_ISEMPTY },
+		{ "lf",      __UNICODE_ISLF },
+		{ "hex",     __UNICODE_ISHEX },
+		{ "title",   __UNICODE_ISTITLE },
+		{ "numeric", __UNICODE_ISNUMERIC },
+		{ "symstrt", __UNICODE_ISSYMSTRT },
+		{ "symcont", __UNICODE_ISSYMCONT },
+	};
+	unsigned int i;
+	for (i = 0; i < COMPILER_LENOF(entries); ++i) {
+		if (strcmp(prop, entries[i].we_name) == 0)
+			return entries[i].we_flags;
+	}
+	return 0;
+}
+
+[[decl_include("<hybrid/typecore.h>", "<bits/crt/wctype.h>")]]
+[[std, wchar, wunused, const, export_alias("is_wctype", "__iswctype")]]
+[[requires(defined(__CRT_KOS) && $has_function(__unicode_descriptor))]]
+[[impl_include("<bits/crt/unicode.h>")]]
+int iswctype($wint_t wc, $wctype_t desc) {
+	struct @__unitraits@ const *traits = __unicode_descriptor(wc);
+	return (int)(traits->@__ut_flags@ & (uint16_t)desc);
 }
 
 
 %
 %#if defined(__USE_KOS) || defined(__USE_DOS)
 [[decl_include("<hybrid/typecore.h>")]]
-[[wunused, nothrow, ATTR_CONST]]
+[[wchar, const, wunused, nothrow]]
 int iswascii($wint_t wc) {
-	return (unsigned int)wc <= 0x7f;
+	return wc >= 0 && wc <= 0x7f;
 }
 %#endif /* __USE_KOS || __USE_DOS */
 
@@ -309,160 +499,247 @@ int iswascii($wint_t wc) {
 %
 %#ifdef __USE_XOPEN2K8
 
-%[default:section(".text.crt{|.dos}.wchar.unicode.locale.ctype")];
+%[default:section(".text.crt{|.dos}.wchar.unicode.locale.ctype")]
 
-[[wunused, ATTR_PURE, decl_include("<hybrid/typecore.h>")]]
-[[dos_only_export_alias("_iswalnum_l"), export_alias("__iswalnum_l")]]
-int iswalnum_l($wint_t wc, $locale_t locale) {
-	(void)locale;
-	COMPILER_IMPURE();
-	return iswalnum(wc);
+/*[[[deemon
+local TRAITS = {
+	"iswcntrl", "iswspace", "iswupper", "iswlower", "iswalpha",
+	"iswdigit", "iswxdigit", "iswalnum", "iswpunct", "iswgraph",
+	"iswprint", "iswblank", "towlower", "towupper"
+};
+function printTrait(name) {
+	print("@@>> ", name, "_l(3)");
+	print("[[if($extended_include_prefix(\"<bits/crt/wctype.h>\")defined(__crt_", name, "_l)), preferred_extern_inline(\"", name, "_l\", { return __crt_", name, "_l(ch, locale); })]]");
+	print("[[if($extended_include_prefix(\"<bits/crt/wctype.h>\")defined(__crt_", name, "_l)), preferred_extern_inline(\"__", name, "_l\", { return __crt_", name, "_l(ch, locale); })]]");
+	print("[[if($extended_include_prefix(\"<bits/crt/wctype.h>\")defined(__crt_", name, "_l)), preferred_inline({ return __crt_", name, "_l(ch, locale); })]]");
+	print("[[dos_only_export_alias(\"_", name, "_l\"), export_alias(\"__", name, "_l\")]]");
+	print("[[wchar, wunused, pure, decl_include(\"<hybrid/typecore.h>\")]]");
+	print(name.startswith("to") ? "$wint_t " : "int ", name, "_l($wint_t ch, $locale_t locale) {");
+	print("	COMPILER_IMPURE();");
+	print("	(void)locale;");
+	print("	return ", name, "(ch);");
+	print("}");
+	print;
 }
-
-[[wunused, ATTR_PURE, decl_include("<hybrid/typecore.h>")]]
-[[dos_only_export_alias("_iswalpha_l"), export_alias("__iswalpha_l")]]
-int iswalpha_l($wint_t wc, $locale_t locale) {
-	(void)locale;
-	COMPILER_IMPURE();
-	return iswalpha(wc);
-}
-
-[[wunused, ATTR_PURE, decl_include("<hybrid/typecore.h>")]]
+for (local name: TRAITS)
+	printTrait(name);
+]]]*/
+@@>> iswcntrl_l(3)
+[[if($extended_include_prefix("<bits/crt/wctype.h>")defined(__crt_iswcntrl_l)), preferred_extern_inline("iswcntrl_l", { return __crt_iswcntrl_l(ch, locale); })]]
+[[if($extended_include_prefix("<bits/crt/wctype.h>")defined(__crt_iswcntrl_l)), preferred_extern_inline("__iswcntrl_l", { return __crt_iswcntrl_l(ch, locale); })]]
+[[if($extended_include_prefix("<bits/crt/wctype.h>")defined(__crt_iswcntrl_l)), preferred_inline({ return __crt_iswcntrl_l(ch, locale); })]]
 [[dos_only_export_alias("_iswcntrl_l"), export_alias("__iswcntrl_l")]]
-int iswcntrl_l($wint_t wc, $locale_t locale) {
-	(void)locale;
+[[wchar, wunused, pure, decl_include("<hybrid/typecore.h>")]]
+int iswcntrl_l($wint_t ch, $locale_t locale) {
 	COMPILER_IMPURE();
-	return iswcntrl(wc);
+	(void)locale;
+	return iswcntrl(ch);
 }
 
-[[wunused, ATTR_PURE, decl_include("<hybrid/typecore.h>")]]
-[[dos_only_export_alias("_iswdigit_l"), export_alias("__iswdigit_l")]]
-int iswdigit_l($wint_t wc, $locale_t locale) {
-	(void)locale;
-	COMPILER_IMPURE();
-	return iswdigit(wc);
-}
-
-[[wunused, ATTR_PURE, decl_include("<hybrid/typecore.h>")]]
-[[dos_only_export_alias("_iswgraph_l"), export_alias("__iswgraph_l")]]
-int iswgraph_l($wint_t wc, $locale_t locale) {
-	(void)locale;
-	COMPILER_IMPURE();
-	return iswgraph(wc);
-}
-
-[[wunused, ATTR_PURE, decl_include("<hybrid/typecore.h>")]]
-[[dos_only_export_alias("_iswlower_l"), export_alias("__iswlower_l")]]
-int iswlower_l($wint_t wc, $locale_t locale) {
-	(void)locale;
-	COMPILER_IMPURE();
-	return iswlower(wc);
-}
-
-[[wunused, ATTR_PURE, decl_include("<hybrid/typecore.h>")]]
-[[dos_only_export_alias("_iswprint_l"), export_alias("__iswprint_l")]]
-int iswprint_l($wint_t wc, $locale_t locale) {
-	(void)locale;
-	COMPILER_IMPURE();
-	return iswprint(wc);
-}
-
-[[wunused, ATTR_PURE, decl_include("<hybrid/typecore.h>")]]
-[[dos_only_export_alias("_iswpunct_l"), export_alias("__iswpunct_l")]]
-int iswpunct_l($wint_t wc, $locale_t locale) {
-	(void)locale;
-	COMPILER_IMPURE();
-	return iswpunct(wc);
-}
-
-[[wunused, ATTR_PURE, decl_include("<hybrid/typecore.h>")]]
+@@>> iswspace_l(3)
+[[if($extended_include_prefix("<bits/crt/wctype.h>")defined(__crt_iswspace_l)), preferred_extern_inline("iswspace_l", { return __crt_iswspace_l(ch, locale); })]]
+[[if($extended_include_prefix("<bits/crt/wctype.h>")defined(__crt_iswspace_l)), preferred_extern_inline("__iswspace_l", { return __crt_iswspace_l(ch, locale); })]]
+[[if($extended_include_prefix("<bits/crt/wctype.h>")defined(__crt_iswspace_l)), preferred_inline({ return __crt_iswspace_l(ch, locale); })]]
 [[dos_only_export_alias("_iswspace_l"), export_alias("__iswspace_l")]]
-int iswspace_l($wint_t wc, $locale_t locale) {
-	(void)locale;
+[[wchar, wunused, pure, decl_include("<hybrid/typecore.h>")]]
+int iswspace_l($wint_t ch, $locale_t locale) {
 	COMPILER_IMPURE();
-	return iswspace(wc);
+	(void)locale;
+	return iswspace(ch);
 }
 
-[[wunused, ATTR_PURE, decl_include("<hybrid/typecore.h>")]]
+@@>> iswupper_l(3)
+[[if($extended_include_prefix("<bits/crt/wctype.h>")defined(__crt_iswupper_l)), preferred_extern_inline("iswupper_l", { return __crt_iswupper_l(ch, locale); })]]
+[[if($extended_include_prefix("<bits/crt/wctype.h>")defined(__crt_iswupper_l)), preferred_extern_inline("__iswupper_l", { return __crt_iswupper_l(ch, locale); })]]
+[[if($extended_include_prefix("<bits/crt/wctype.h>")defined(__crt_iswupper_l)), preferred_inline({ return __crt_iswupper_l(ch, locale); })]]
 [[dos_only_export_alias("_iswupper_l"), export_alias("__iswupper_l")]]
-int iswupper_l($wint_t wc, $locale_t locale) {
-	(void)locale;
+[[wchar, wunused, pure, decl_include("<hybrid/typecore.h>")]]
+int iswupper_l($wint_t ch, $locale_t locale) {
 	COMPILER_IMPURE();
-	return iswupper(wc);
+	(void)locale;
+	return iswupper(ch);
 }
 
-[[wunused, ATTR_PURE, decl_include("<hybrid/typecore.h>")]]
+@@>> iswlower_l(3)
+[[if($extended_include_prefix("<bits/crt/wctype.h>")defined(__crt_iswlower_l)), preferred_extern_inline("iswlower_l", { return __crt_iswlower_l(ch, locale); })]]
+[[if($extended_include_prefix("<bits/crt/wctype.h>")defined(__crt_iswlower_l)), preferred_extern_inline("__iswlower_l", { return __crt_iswlower_l(ch, locale); })]]
+[[if($extended_include_prefix("<bits/crt/wctype.h>")defined(__crt_iswlower_l)), preferred_inline({ return __crt_iswlower_l(ch, locale); })]]
+[[dos_only_export_alias("_iswlower_l"), export_alias("__iswlower_l")]]
+[[wchar, wunused, pure, decl_include("<hybrid/typecore.h>")]]
+int iswlower_l($wint_t ch, $locale_t locale) {
+	COMPILER_IMPURE();
+	(void)locale;
+	return iswlower(ch);
+}
+
+@@>> iswalpha_l(3)
+[[if($extended_include_prefix("<bits/crt/wctype.h>")defined(__crt_iswalpha_l)), preferred_extern_inline("iswalpha_l", { return __crt_iswalpha_l(ch, locale); })]]
+[[if($extended_include_prefix("<bits/crt/wctype.h>")defined(__crt_iswalpha_l)), preferred_extern_inline("__iswalpha_l", { return __crt_iswalpha_l(ch, locale); })]]
+[[if($extended_include_prefix("<bits/crt/wctype.h>")defined(__crt_iswalpha_l)), preferred_inline({ return __crt_iswalpha_l(ch, locale); })]]
+[[dos_only_export_alias("_iswalpha_l"), export_alias("__iswalpha_l")]]
+[[wchar, wunused, pure, decl_include("<hybrid/typecore.h>")]]
+int iswalpha_l($wint_t ch, $locale_t locale) {
+	COMPILER_IMPURE();
+	(void)locale;
+	return iswalpha(ch);
+}
+
+@@>> iswdigit_l(3)
+[[if($extended_include_prefix("<bits/crt/wctype.h>")defined(__crt_iswdigit_l)), preferred_extern_inline("iswdigit_l", { return __crt_iswdigit_l(ch, locale); })]]
+[[if($extended_include_prefix("<bits/crt/wctype.h>")defined(__crt_iswdigit_l)), preferred_extern_inline("__iswdigit_l", { return __crt_iswdigit_l(ch, locale); })]]
+[[if($extended_include_prefix("<bits/crt/wctype.h>")defined(__crt_iswdigit_l)), preferred_inline({ return __crt_iswdigit_l(ch, locale); })]]
+[[dos_only_export_alias("_iswdigit_l"), export_alias("__iswdigit_l")]]
+[[wchar, wunused, pure, decl_include("<hybrid/typecore.h>")]]
+int iswdigit_l($wint_t ch, $locale_t locale) {
+	COMPILER_IMPURE();
+	(void)locale;
+	return iswdigit(ch);
+}
+
+@@>> iswxdigit_l(3)
+[[if($extended_include_prefix("<bits/crt/wctype.h>")defined(__crt_iswxdigit_l)), preferred_extern_inline("iswxdigit_l", { return __crt_iswxdigit_l(ch, locale); })]]
+[[if($extended_include_prefix("<bits/crt/wctype.h>")defined(__crt_iswxdigit_l)), preferred_extern_inline("__iswxdigit_l", { return __crt_iswxdigit_l(ch, locale); })]]
+[[if($extended_include_prefix("<bits/crt/wctype.h>")defined(__crt_iswxdigit_l)), preferred_inline({ return __crt_iswxdigit_l(ch, locale); })]]
 [[dos_only_export_alias("_iswxdigit_l"), export_alias("__iswxdigit_l")]]
-int iswxdigit_l($wint_t wc, $locale_t locale) {
-	(void)locale;
+[[wchar, wunused, pure, decl_include("<hybrid/typecore.h>")]]
+int iswxdigit_l($wint_t ch, $locale_t locale) {
 	COMPILER_IMPURE();
-	return iswxdigit(wc);
+	(void)locale;
+	return iswxdigit(ch);
 }
 
-[[wunused, ATTR_PURE, decl_include("<hybrid/typecore.h>")]]
+@@>> iswalnum_l(3)
+[[if($extended_include_prefix("<bits/crt/wctype.h>")defined(__crt_iswalnum_l)), preferred_extern_inline("iswalnum_l", { return __crt_iswalnum_l(ch, locale); })]]
+[[if($extended_include_prefix("<bits/crt/wctype.h>")defined(__crt_iswalnum_l)), preferred_extern_inline("__iswalnum_l", { return __crt_iswalnum_l(ch, locale); })]]
+[[if($extended_include_prefix("<bits/crt/wctype.h>")defined(__crt_iswalnum_l)), preferred_inline({ return __crt_iswalnum_l(ch, locale); })]]
+[[dos_only_export_alias("_iswalnum_l"), export_alias("__iswalnum_l")]]
+[[wchar, wunused, pure, decl_include("<hybrid/typecore.h>")]]
+int iswalnum_l($wint_t ch, $locale_t locale) {
+	COMPILER_IMPURE();
+	(void)locale;
+	return iswalnum(ch);
+}
+
+@@>> iswpunct_l(3)
+[[if($extended_include_prefix("<bits/crt/wctype.h>")defined(__crt_iswpunct_l)), preferred_extern_inline("iswpunct_l", { return __crt_iswpunct_l(ch, locale); })]]
+[[if($extended_include_prefix("<bits/crt/wctype.h>")defined(__crt_iswpunct_l)), preferred_extern_inline("__iswpunct_l", { return __crt_iswpunct_l(ch, locale); })]]
+[[if($extended_include_prefix("<bits/crt/wctype.h>")defined(__crt_iswpunct_l)), preferred_inline({ return __crt_iswpunct_l(ch, locale); })]]
+[[dos_only_export_alias("_iswpunct_l"), export_alias("__iswpunct_l")]]
+[[wchar, wunused, pure, decl_include("<hybrid/typecore.h>")]]
+int iswpunct_l($wint_t ch, $locale_t locale) {
+	COMPILER_IMPURE();
+	(void)locale;
+	return iswpunct(ch);
+}
+
+@@>> iswgraph_l(3)
+[[if($extended_include_prefix("<bits/crt/wctype.h>")defined(__crt_iswgraph_l)), preferred_extern_inline("iswgraph_l", { return __crt_iswgraph_l(ch, locale); })]]
+[[if($extended_include_prefix("<bits/crt/wctype.h>")defined(__crt_iswgraph_l)), preferred_extern_inline("__iswgraph_l", { return __crt_iswgraph_l(ch, locale); })]]
+[[if($extended_include_prefix("<bits/crt/wctype.h>")defined(__crt_iswgraph_l)), preferred_inline({ return __crt_iswgraph_l(ch, locale); })]]
+[[dos_only_export_alias("_iswgraph_l"), export_alias("__iswgraph_l")]]
+[[wchar, wunused, pure, decl_include("<hybrid/typecore.h>")]]
+int iswgraph_l($wint_t ch, $locale_t locale) {
+	COMPILER_IMPURE();
+	(void)locale;
+	return iswgraph(ch);
+}
+
+@@>> iswprint_l(3)
+[[if($extended_include_prefix("<bits/crt/wctype.h>")defined(__crt_iswprint_l)), preferred_extern_inline("iswprint_l", { return __crt_iswprint_l(ch, locale); })]]
+[[if($extended_include_prefix("<bits/crt/wctype.h>")defined(__crt_iswprint_l)), preferred_extern_inline("__iswprint_l", { return __crt_iswprint_l(ch, locale); })]]
+[[if($extended_include_prefix("<bits/crt/wctype.h>")defined(__crt_iswprint_l)), preferred_inline({ return __crt_iswprint_l(ch, locale); })]]
+[[dos_only_export_alias("_iswprint_l"), export_alias("__iswprint_l")]]
+[[wchar, wunused, pure, decl_include("<hybrid/typecore.h>")]]
+int iswprint_l($wint_t ch, $locale_t locale) {
+	COMPILER_IMPURE();
+	(void)locale;
+	return iswprint(ch);
+}
+
+@@>> iswblank_l(3)
+[[if($extended_include_prefix("<bits/crt/wctype.h>")defined(__crt_iswblank_l)), preferred_extern_inline("iswblank_l", { return __crt_iswblank_l(ch, locale); })]]
+[[if($extended_include_prefix("<bits/crt/wctype.h>")defined(__crt_iswblank_l)), preferred_extern_inline("__iswblank_l", { return __crt_iswblank_l(ch, locale); })]]
+[[if($extended_include_prefix("<bits/crt/wctype.h>")defined(__crt_iswblank_l)), preferred_inline({ return __crt_iswblank_l(ch, locale); })]]
 [[dos_only_export_alias("_iswblank_l"), export_alias("__iswblank_l")]]
-int iswblank_l($wint_t wc, $locale_t locale) {
-	(void)locale;
+[[wchar, wunused, pure, decl_include("<hybrid/typecore.h>")]]
+int iswblank_l($wint_t ch, $locale_t locale) {
 	COMPILER_IMPURE();
-	return iswblank(wc);
+	(void)locale;
+	return iswblank(ch);
 }
 
-[[wunused, ATTR_PURE, decl_include("<hybrid/typecore.h>", "<bits/crt/wctype.h>")]]
+@@>> towlower_l(3)
+[[if($extended_include_prefix("<bits/crt/wctype.h>")defined(__crt_towlower_l)), preferred_extern_inline("towlower_l", { return __crt_towlower_l(ch, locale); })]]
+[[if($extended_include_prefix("<bits/crt/wctype.h>")defined(__crt_towlower_l)), preferred_extern_inline("__towlower_l", { return __crt_towlower_l(ch, locale); })]]
+[[if($extended_include_prefix("<bits/crt/wctype.h>")defined(__crt_towlower_l)), preferred_inline({ return __crt_towlower_l(ch, locale); })]]
+[[dos_only_export_alias("_towlower_l"), export_alias("__towlower_l")]]
+[[wchar, wunused, pure, decl_include("<hybrid/typecore.h>")]]
+$wint_t towlower_l($wint_t ch, $locale_t locale) {
+	COMPILER_IMPURE();
+	(void)locale;
+	return towlower(ch);
+}
+
+@@>> towupper_l(3)
+[[if($extended_include_prefix("<bits/crt/wctype.h>")defined(__crt_towupper_l)), preferred_extern_inline("towupper_l", { return __crt_towupper_l(ch, locale); })]]
+[[if($extended_include_prefix("<bits/crt/wctype.h>")defined(__crt_towupper_l)), preferred_extern_inline("__towupper_l", { return __crt_towupper_l(ch, locale); })]]
+[[if($extended_include_prefix("<bits/crt/wctype.h>")defined(__crt_towupper_l)), preferred_inline({ return __crt_towupper_l(ch, locale); })]]
+[[dos_only_export_alias("_towupper_l"), export_alias("__towupper_l")]]
+[[wchar, wunused, pure, decl_include("<hybrid/typecore.h>")]]
+$wint_t towupper_l($wint_t ch, $locale_t locale) {
+	COMPILER_IMPURE();
+	(void)locale;
+	return towupper(ch);
+}
+/*[[[end]]]*/
+
+
 [[dos_only_export_alias("_iswctype_l"), export_alias("__iswctype_l")]]
+[[wchar, wunused, pure, decl_include("<hybrid/typecore.h>", "<bits/crt/wctype.h>")]]
+[[requires_function(iswctype)]]
 int iswctype_l($wint_t wc, $wctype_t type, $locale_t locale) {
 	(void)locale;
 	COMPILER_IMPURE();
 	return iswctype(wc, type);
 }
 
-[[wunused, ATTR_PURE, decl_include("<hybrid/typecore.h>")]]
-[[dos_only_export_alias("_towupper_l"), export_alias("__towupper_l")]]
-$wint_t towupper_l($wint_t wc, $locale_t locale) {
-	(void)locale;
-	COMPILER_IMPURE();
-	return towupper(wc);
-}
-
-[[wunused, ATTR_PURE, decl_include("<hybrid/typecore.h>")]]
-[[dos_only_export_alias("_towlower_l"), export_alias("__towlower_l")]]
-$wint_t towlower_l($wint_t wc, $locale_t locale) {
-	(void)locale;
-	COMPILER_IMPURE();
-	return towlower(wc);
-}
-
-%[default:section(".text.crt{|.dos}.wchar.unicode.locale.mbs")];
-
 [[decl_include("<bits/crt/wctype.h>")]]
 [[wunused, export_alias("__wctype_l")]]
+[[requires_function(wctype)]]
 $wctype_t wctype_l([[nonnull]] char const *prop, $locale_t locale) {
 	(void)locale;
 	COMPILER_IMPURE();
 	return wctype(prop);
 }
 
-[[decl_include("<bits/crt/wctype.h>")]]
-[[wunused, export_alias("__wctrans_l")]]
-$wctrans_t wctrans_l([[nonnull]] char const *prop, $locale_t locale) {
-	(void)locale;
-	COMPILER_IMPURE();
-	return wctrans(prop);
-}
-
 [[decl_include("<hybrid/typecore.h>", "<bits/crt/wctype.h>")]]
-[[wunused, export_alias("__towctrans_l")]]
+[[wchar, wunused, export_alias("__towctrans_l")]]
+[[requires_function(towctrans)]]
 $wint_t towctrans_l($wint_t wc, $wctrans_t desc, $locale_t locale) {
 	(void)locale;
 	COMPILER_IMPURE();
 	return towctrans(wc, desc);
 }
 
+[[decl_include("<bits/crt/wctype.h>")]]
+[[wunused, export_alias("__wctrans_l")]]
+[[requires_function(wctrans)]]
+$wctrans_t wctrans_l([[nonnull]] char const *prop, $locale_t locale) {
+	(void)locale;
+	COMPILER_IMPURE();
+	return wctrans(prop);
+}
+
 %#endif /* __USE_XOPEN2K8 */
+
+
+%[default:section(".text.crt{|.dos}.wchar.unicode.locale.mbs")]
+
 
 %
 %#ifdef __USE_DOS
 %#ifndef __wctype_t_defined
-%#define __wctype_t_defined 1
+%#define __wctype_t_defined
 %__NAMESPACE_STD_USING(wctype_t)
 %#endif /* !__wctype_t_defined */
 %#ifndef _WCTYPE_DEFINED
@@ -486,13 +763,13 @@ $wint_t towctrans_l($wint_t wc, $wctrans_t desc, $locale_t locale) {
 %[insert:function(is_wctype = iswctype)]
 
 %
-[[wunused, ATTR_CONST]]
+[[wunused, const]]
 [[section(".text.crt{|.dos}.wchar.unicode.static.mbs")]]
 int isleadbyte(int wc) {
 	return wc >= 192 && wc <= 255;
 }
 
-[[wunused, ATTR_PURE]]
+[[wunused, pure]]
 [[section(".text.crt{|.dos}.wchar.unicode.locale.mbs")]]
 int _isleadbyte_l(int wc, $locale_t locale) {
 	(void)locale;
@@ -500,27 +777,50 @@ int _isleadbyte_l(int wc, $locale_t locale) {
 	return isleadbyte(wc);
 }
 
-%[default:section(".text.crt{|.dos}.wchar.unicode.static.mbs")];
-[[wunused, ATTR_CONST, decl_include("<hybrid/typecore.h>")]]
+%[default:section(".text.crt.dos.wchar.unicode.static.mbs")]
+[[wchar, wunused, const, decl_include("<hybrid/typecore.h>")]]
+[[impl_include("<bits/crt/unicode.h>")]]
 int __iswcsymf($wint_t wc) {
+@@pp_if defined(__CRT_KOS) && $has_function(__unicode_descriptor)@@
+	struct @__unitraits@ const *traits = __unicode_descriptor(wc);
+	return (int)(traits->@__ut_flags@ & __UNICODE_ISSYMSTRT);
+@@pp_else@@
 	return iswalpha(wc) || wc == '_' || wc == '$';
+@@pp_endif@@
 }
 
-[[wunused, ATTR_CONST, decl_include("<hybrid/typecore.h>")]]
+[[wchar, wunused, const, decl_include("<hybrid/typecore.h>")]]
+[[impl_include("<bits/crt/unicode.h>")]]
 int __iswcsym($wint_t wc) {
+@@pp_if defined(__CRT_KOS) && $has_function(__unicode_descriptor)@@
+	struct @__unitraits@ const *traits = __unicode_descriptor(wc);
+	return (int)(traits->@__ut_flags@ & __UNICODE_ISSYMCONT);
+@@pp_else@@
 	return iswalnum(wc) || wc == '_' || wc == '$';
+@@pp_endif@@
 }
 
-%
-%[default:section(".text.crt{|.dos}.wchar.unicode.locale.mbs")];
-[[wunused, ATTR_PURE, decl_include("<hybrid/typecore.h>")]]
+%[default:section(".text.crt.dos.wchar.unicode.locale.mbs")]
+[[wchar, wunused, pure, decl_include("<hybrid/typecore.h>")]]
 int _iswcsymf_l($wint_t wc, $locale_t locale) {
+@@pp_if defined(__CRT_KOS) && $has_function(__unicode_descriptor)@@
+	(void)locale;
+	COMPILER_IMPURE();
+	return __iswcsymf(wc);
+@@pp_else@@
 	return iswalpha_l(wc, locale) || wc == '_' || wc == '$';
+@@pp_endif@@
 }
 
-[[wunused, ATTR_PURE, decl_include("<hybrid/typecore.h>")]]
+[[wchar, wunused, pure, decl_include("<hybrid/typecore.h>")]]
 int _iswcsym_l($wint_t wc, $locale_t locale) {
+@@pp_if defined(__CRT_KOS) && $has_function(__unicode_descriptor)@@
+	(void)locale;
+	COMPILER_IMPURE();
+	return __iswcsym(wc);
+@@pp_else@@
 	return iswalnum_l(wc, locale) || wc == '_' || wc == '$';
+@@pp_endif@@
 }
 
 %#endif /* !_WCTYPE_DEFINED */
@@ -532,5 +832,11 @@ int _iswcsym_l($wint_t wc, $locale_t locale) {
 
 __SYSDECL_END
 #endif /* __CC__ */
+
+#ifdef __USE_UTF
+#if defined(_UCHAR_H) && !defined(_PARTS_UCHAR_WCTYPE_H)
+#include <parts/uchar/wctype.h>
+#endif /* _UCHAR_H && !_PARTS_UCHAR_WCTYPE_H */
+#endif /* __USE_UTF */
 
 }

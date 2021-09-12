@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xff87be51 */
+/* HASH CRC-32:0xce52040d */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -25,7 +25,14 @@
 __NAMESPACE_LOCAL_BEGIN
 #ifndef __local___localdep_iswpunct_defined
 #define __local___localdep_iswpunct_defined 1
-#if __has_builtin(__builtin_iswpunct) && defined(__LIBC_BIND_CRTBUILTINS) && defined(__CRT_HAVE_iswpunct)
+__NAMESPACE_LOCAL_END
+#include <bits/crt/wctype.h>
+__NAMESPACE_LOCAL_BEGIN
+#if defined(__crt_iswpunct) && defined(__CRT_HAVE_iswpunct)
+__CEIREDIRECT(__ATTR_CONST __ATTR_WUNUSED,int,__NOTHROW,__localdep_iswpunct,(__WINT_TYPE__ __wc),iswpunct,{ return __crt_iswpunct(__wc); })
+#elif defined(__crt_iswpunct)
+__LOCAL __ATTR_CONST __ATTR_WUNUSED int __NOTHROW(__LIBCCALL __localdep_iswpunct)(__WINT_TYPE__ __wc) { return __crt_iswpunct(__wc); }
+#elif __has_builtin(__builtin_iswpunct) && defined(__LIBC_BIND_CRTBUILTINS) && defined(__CRT_HAVE_iswpunct)
 __CEIREDIRECT(__ATTR_CONST __ATTR_WUNUSED,int,__NOTHROW,__localdep_iswpunct,(__WINT_TYPE__ __wc),iswpunct,{ return __builtin_iswpunct(__wc); })
 #elif defined(__CRT_HAVE_iswpunct)
 __CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,int,__NOTHROW,__localdep_iswpunct,(__WINT_TYPE__ __wc),iswpunct,(__wc))
@@ -37,10 +44,10 @@ __NAMESPACE_LOCAL_BEGIN
 #endif /* !... */
 #endif /* !__local___localdep_iswpunct_defined */
 __LOCAL_LIBC(iswpunct_l) __ATTR_PURE __ATTR_WUNUSED int
-__NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(iswpunct_l))(__WINT_TYPE__ __wc, __locale_t __locale) {
-	(void)__locale;
+__NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(iswpunct_l))(__WINT_TYPE__ __ch, __locale_t __locale) {
 	__COMPILER_IMPURE();
-	return __localdep_iswpunct(__wc);
+	(void)__locale;
+	return __localdep_iswpunct(__ch);
 }
 __NAMESPACE_LOCAL_END
 #ifndef __local___localdep_iswpunct_l_defined

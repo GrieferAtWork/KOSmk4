@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x98a0d0a3 */
+/* HASH CRC-32:0xab75c3de */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -46,7 +46,9 @@ __LOCAL_LIBC(strcasecmp) __ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1, 2)) int
 __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(strcasecmp))(char const *__s1, char const *__s2) {
 	char __c1, __c2;
 	do {
-		if ((__c1 = *__s1++) != (__c2 = *__s2++) && ((__c1 = __localdep_tolower(__c1)) != (__c2 = __localdep_tolower(__c2))))
+		if ((__c1 = *__s1++) != (__c2 = *__s2++) &&
+		    ((__c1 = (char)__localdep_tolower((unsigned char)__c1)) !=
+		     (__c2 = (char)__localdep_tolower((unsigned char)__c2))))
 			return (int)((unsigned char)__c1 - (unsigned char)__c2);
 	} while (__c1);
 	return 0;

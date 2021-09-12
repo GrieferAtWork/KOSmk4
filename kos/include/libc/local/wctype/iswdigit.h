@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x19685803 */
+/* HASH CRC-32:0xe04888c1 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -23,29 +23,27 @@
 #include <__crt.h>
 #include <hybrid/typecore.h>
 __NAMESPACE_LOCAL_BEGIN
-#ifndef __local___localdep_isdigit_defined
-#define __local___localdep_isdigit_defined 1
+#ifndef __local___localdep_wctob_defined
+#define __local___localdep_wctob_defined 1
+#ifdef __CRT_HAVE_wctob
+__CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,int,__NOTHROW_NCX,__localdep_wctob,(__WINT_TYPE__ __ch),wctob,(__ch))
+#else /* __CRT_HAVE_wctob */
 __NAMESPACE_LOCAL_END
-#include <bits/crt/ctype.h>
+#include <libc/local/wchar/wctob.h>
 __NAMESPACE_LOCAL_BEGIN
-#if defined(__crt_isdigit) && defined(__CRT_HAVE_isdigit)
-__CEIREDIRECT(__ATTR_CONST __ATTR_WUNUSED,int,__NOTHROW,__localdep_isdigit,(int __ch),isdigit,{ return __crt_isdigit(__ch); })
-#elif defined(__crt_isdigit)
-__LOCAL __ATTR_CONST __ATTR_WUNUSED int __NOTHROW(__LIBCCALL __localdep_isdigit)(int __ch) { return __crt_isdigit(__ch); }
-#elif __has_builtin(__builtin_isdigit) && defined(__LIBC_BIND_CRTBUILTINS) && defined(__CRT_HAVE_isdigit)
-__CEIREDIRECT(__ATTR_CONST __ATTR_WUNUSED,int,__NOTHROW,__localdep_isdigit,(int __ch),isdigit,{ return __builtin_isdigit(__ch); })
-#elif defined(__CRT_HAVE_isdigit)
-__CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,int,__NOTHROW,__localdep_isdigit,(int __ch),isdigit,(__ch))
-#else /* ... */
+#define __localdep_wctob __LIBC_LOCAL_NAME(wctob)
+#endif /* !__CRT_HAVE_wctob */
+#endif /* !__local___localdep_wctob_defined */
 __NAMESPACE_LOCAL_END
-#include <libc/local/ctype/isdigit.h>
+#include <bits/crt/wctype.h>
 __NAMESPACE_LOCAL_BEGIN
-#define __localdep_isdigit __LIBC_LOCAL_NAME(isdigit)
-#endif /* !... */
-#endif /* !__local___localdep_isdigit_defined */
 __LOCAL_LIBC(iswdigit) __ATTR_CONST __ATTR_WUNUSED int
 __NOTHROW(__LIBCCALL __LIBC_LOCAL_NAME(iswdigit))(__WINT_TYPE__ __wc) {
-	return __localdep_isdigit((int)__wc);
+#ifdef __crt_iswdigit
+	return __crt_iswdigit(__wc);
+#else /* __crt_iswdigit */
+	return __LIBC_LOCAL_NAME(iswdigit)(__localdep_wctob(__wc));
+#endif /* !__crt_iswdigit */
 }
 __NAMESPACE_LOCAL_END
 #ifndef __local___localdep_iswdigit_defined

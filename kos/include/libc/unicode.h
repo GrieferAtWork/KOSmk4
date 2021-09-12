@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x100a44b9 */
+/* HASH CRC-32:0x9588a7aa */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -88,56 +88,144 @@
 #include <hybrid/typecore.h>
 #include <bits/crt/unicode.h>
 
+/* Unicode character traits test functions */
+#ifdef ____libc___unicode_descriptor_defined
+#define __libc_unicode_iscntrl(ch)   ((__libc___unicode_descriptor(ch)->__ut_flags & __UNICODE_ISCNTRL) != 0)   /* Control characters */
+#define __libc_unicode_istab(ch)     ((__libc___unicode_descriptor(ch)->__ut_flags & __UNICODE_ISTAB) != 0)     /* 09, 0B-0C */
+#define __libc_unicode_iswhite(ch)   ((__libc___unicode_descriptor(ch)->__ut_flags & __UNICODE_ISWHITE) != 0)   /* Pure whitespace characters (excluding tabs and line-feeds) */
+#define __libc_unicode_isempty(ch)   ((__libc___unicode_descriptor(ch)->__ut_flags & __UNICODE_ISEMPTY) != 0)   /* unicode_istab || unicode_iswhite */
+#define __libc_unicode_islf(ch)      ((__libc___unicode_descriptor(ch)->__ut_flags & __UNICODE_ISLF) != 0)      /* Line-feed characters */
+#define __libc_unicode_isspace(ch)   ((__libc___unicode_descriptor(ch)->__ut_flags & __UNICODE_ISSPACE) != 0)   /* unicode_isempty | unicode_islf */
+#define __libc_unicode_islower(ch)   ((__libc___unicode_descriptor(ch)->__ut_flags & __UNICODE_ISLOWER) != 0)   /* Lowercase characters */
+#define __libc_unicode_isupper(ch)   ((__libc___unicode_descriptor(ch)->__ut_flags & __UNICODE_ISUPPER) != 0)   /* Uppercase characters */
+#define __libc_unicode_isalpha(ch)   ((__libc___unicode_descriptor(ch)->__ut_flags & __UNICODE_ISALPHA) != 0)   /* Alphabetical characters */
+#define __libc_unicode_isdigit(ch)   ((__libc___unicode_descriptor(ch)->__ut_flags & __UNICODE_ISDIGIT) != 0)   /* Only includes stuff like "2" */
+#define __libc_unicode_ishex(ch)     ((__libc___unicode_descriptor(ch)->__ut_flags & __UNICODE_ISHEX) != 0)     /* 'a'-'f', 'A'-'F' */
+#define __libc_unicode_isxdigit(ch)  ((__libc___unicode_descriptor(ch)->__ut_flags & __UNICODE_ISXDIGIT) != 0)  /* unicode_isdigit || unicode_ishex */
+#define __libc_unicode_isalnum(ch)   ((__libc___unicode_descriptor(ch)->__ut_flags & __UNICODE_ISALNUM) != 0)   /* unicode_isdigit || unicode_isalpha */
+#define __libc_unicode_ispunct(ch)   ((__libc___unicode_descriptor(ch)->__ut_flags & __UNICODE_ISPUNCT) != 0)   /* Punctuation (such as '.') */
+#define __libc_unicode_isgraph(ch)   ((__libc___unicode_descriptor(ch)->__ut_flags & __UNICODE_ISGRAPH) != 0)   /* Graphical characters (everything printable, excluding spaces) */
+#define __libc_unicode_isprint(ch)   ((__libc___unicode_descriptor(ch)->__ut_flags & __UNICODE_ISPRINT) != 0)   /* unicode_isgraph || unicode_iswhite */
+#define __libc_unicode_isblank(ch)   ((__libc___unicode_descriptor(ch)->__ut_flags & __UNICODE_ISBLANK) != 0)   /* unicode_iswhite || (ch == '\t') */
+#define __libc_unicode_istitle(ch)   ((__libc___unicode_descriptor(ch)->__ut_flags & __UNICODE_ISTITLE) != 0)   /* title-case */
+#define __libc_unicode_isnumeric(ch) ((__libc___unicode_descriptor(ch)->__ut_flags & __UNICODE_ISNUMERIC) != 0) /* Includes stuff like "²" */
+#define __libc_unicode_issymstrt(ch) ((__libc___unicode_descriptor(ch)->__ut_flags & __UNICODE_ISSYMSTRT) != 0) /* Character may appear at the start of a symbol name */
+#define __libc_unicode_issymcont(ch) ((__libc___unicode_descriptor(ch)->__ut_flags & __UNICODE_ISSYMCONT) != 0) /* Character may appear in the middle of a symbol name */
+
+#define __libc_unicode_tolower(ch) ((ch) + __libc___unicode_descriptor(ch)->__ut_lower)
+#define __libc_unicode_toupper(ch) ((ch) + __libc___unicode_descriptor(ch)->__ut_upper)
+#define __libc_unicode_totitle(ch) ((ch) + __libc___unicode_descriptor(ch)->__ut_title)
+
 __DECL_BEGIN
 
-#ifdef __CRT_HAVE___unicode_latin1flags
-#ifndef ____unicode_latin1flags_defined
-#define ____unicode_latin1flags_defined
-__LIBC __UINT16_TYPE__ const __unicode_latin1flags[257] __CASMNAME_SAME("__unicode_latin1flags");
-#endif /* !____unicode_latin1flags_defined */
-#endif /* __CRT_HAVE___unicode_latin1flags */
+/* >> unicode_asdigit(3)
+ * Check if `ch' is a digit- or hex-character (s.a. `unicode_isxdigit()'),
+ * and if so, store  its digit value in  `*presult' and return `true'  iff
+ * its  digit value is  less than `radix'.  Otherwise, leave `*presult' as
+ * undefined and return `false'.
+ * Note that `radix' values >= 16 are supported, but the cut-off  value
+ * until which they are is  implementation-defined (but always >=  16).
+ * If digit characters which equate to values greater than 16 should be
+ * supported, then `unicode_getnumeric(64|dbl|ldbl)' should be used! */
+#ifdef __INTELLISENSE__
+__ATTR_WUNUSED __ATTR_NONNULL((3)) __BOOL
+__NOTHROW_NCX(__libc_unicode_asdigit)(__CHAR32_TYPE__ ch, __UINT8_TYPE__ radix,
+                                      __UINT8_TYPE__ * __restrict presult);
+#else /* __INTELLISENSE__ */
+#define __libc_unicode_asdigit(ch, radix, presult) \
+	((*(presult) = __unicode_asdigit(ch)) <= (radix))
+#endif /* !__INTELLISENSE__ */
 
-/* >> uint16_t __unicode_flags(char32_t ch); */
-#ifndef __unicode_flags
-#if defined(____unicode_descriptor_defined) && defined(____unicode_latin1flags_defined)
-#define __unicode_flags(ch)                                   \
-	(sizeof(ch) == 1 ? (__unicode_latin1flags + 1)[(int)(ch)] \
-	                 : __unicode_descriptor(ch)->__ut_flags)
-#elif defined(__libc___unicode_descriptor_defined) && defined(____unicode_latin1flags_defined)
-#define __unicode_flags(ch)                                   \
-	(sizeof(ch) == 1 ? (__unicode_latin1flags + 1)[(int)(ch)] \
-	                 : __libc___unicode_descriptor(ch)->__ut_flags)
-#elif defined(____unicode_descriptor_defined)
-#define __unicode_flags(ch) (__unicode_descriptor(ch)->__ut_flags)
-#elif defined(__libc___unicode_descriptor_defined)
-#define __unicode_flags(ch) (__libc___unicode_descriptor(ch)->__ut_flags)
-#endif /* ... */
-#endif /* !__unicode_flags */
+#ifndef ____unicode_asdigit_defined
+#define ____unicode_asdigit_defined
+__LOCAL __ATTR_CONST __ATTR_WUNUSED __UINT8_TYPE__
+__NOTHROW(__LIBCCALL __unicode_asdigit)(__CHAR32_TYPE__ __ch) {
+	struct __unitraits const *__traits = __libc___unicode_descriptor(__ch);
+	if (!(__traits->__ut_flags & __UNICODE_ISXDIGIT))
+		return 0xff;
+	return __traits->__ut_digit_idx;
+}
+#endif /* !____unicode_asdigit_defined */
 
-/* Unicode character traits test functions */
-#ifdef __unicode_flags
-#define __libc_unicode_iscntrl(ch)   ((__unicode_flags(ch) & __UNICODE_ISCNTRL) != 0)   /* Control characters */
-#define __libc_unicode_istab(ch)     ((__unicode_flags(ch) & __UNICODE_ISTAB) != 0)     /* 09, 0B-0C */
-#define __libc_unicode_iswhite(ch)   ((__unicode_flags(ch) & __UNICODE_ISWHITE) != 0)   /* Pure whitespace characters (excluding tabs and line-feeds) */
-#define __libc_unicode_isempty(ch)   ((__unicode_flags(ch) & __UNICODE_ISEMPTY) != 0)   /* unicode_istab || unicode_iswhite */
-#define __libc_unicode_islf(ch)      ((__unicode_flags(ch) & __UNICODE_ISLF) != 0)      /* Line-feed characters */
-#define __libc_unicode_isspace(ch)   ((__unicode_flags(ch) & __UNICODE_ISSPACE) != 0)   /* unicode_isempty | unicode_islf */
-#define __libc_unicode_islower(ch)   ((__unicode_flags(ch) & __UNICODE_ISLOWER) != 0)   /* Lowercase characters */
-#define __libc_unicode_isupper(ch)   ((__unicode_flags(ch) & __UNICODE_ISUPPER) != 0)   /* Uppercase characters */
-#define __libc_unicode_isalpha(ch)   ((__unicode_flags(ch) & __UNICODE_ISALPHA) != 0)   /* Alphabetical characters */
-#define __libc_unicode_isdigit(ch)   ((__unicode_flags(ch) & __UNICODE_ISDIGIT) != 0)   /* Only includes stuff like "2" */
-#define __libc_unicode_ishex(ch)     ((__unicode_flags(ch) & __UNICODE_ISHEX) != 0)     /* 'a'-'f', 'A'-'F' */
-#define __libc_unicode_isxdigit(ch)  ((__unicode_flags(ch) & __UNICODE_ISXDIGIT) != 0)  /* unicode_isdigit || unicode_ishex */
-#define __libc_unicode_isalnum(ch)   ((__unicode_flags(ch) & __UNICODE_ISALNUM) != 0)   /* unicode_isdigit || unicode_isalpha */
-#define __libc_unicode_ispunct(ch)   ((__unicode_flags(ch) & __UNICODE_ISPUNCT) != 0)   /* Punctuation (such as '.') */
-#define __libc_unicode_isgraph(ch)   ((__unicode_flags(ch) & __UNICODE_ISGRAPH) != 0)   /* Graphical characters (everything printable, excluding spaces) */
-#define __libc_unicode_isprint(ch)   ((__unicode_flags(ch) & __UNICODE_ISPRINT) != 0)   /* unicode_isgraph || unicode_iswhite */
-#define __libc_unicode_isblank(ch)   ((__unicode_flags(ch) & __UNICODE_ISBLANK) != 0)   /* unicode_iswhite || (ch == '\t') */
-#define __libc_unicode_istitle(ch)   ((__unicode_flags(ch) & __UNICODE_ISTITLE) != 0)   /* title-case */
-#define __libc_unicode_isnumeric(ch) ((__unicode_flags(ch) & __UNICODE_ISNUMERIC) != 0) /* Includes stuff like "²" */
-#define __libc_unicode_issymstrt(ch) ((__unicode_flags(ch) & __UNICODE_ISSYMSTRT) != 0) /* Character may appear at the start of a symbol name */
-#define __libc_unicode_issymcont(ch) ((__unicode_flags(ch) & __UNICODE_ISSYMCONT) != 0) /* Character may appear in the middle of a symbol name */
-#else /* __unicode_flags */
+/* >> unicode_getnumeric(3), unicode_getnumeric64(3), unicode_getnumericdbl(3), unicode_getnumericldbl(3)
+ * Return  the numerical  variable for which  `ch' is representative  (s.a. `unicode_isnumeric(3)'). When
+ * `ch' doesn't represent  a numerical character,  return `0'.  Note that this  function also  recognizes
+ * 'a'-'f' and 'A'-'F' as numeric characters (representing their hex values) */
+__LOCAL __ATTR_CONST __ATTR_WUNUSED __UINT8_TYPE__
+__NOTHROW(__LIBCCALL __libc_unicode_getnumeric)(__CHAR32_TYPE__ __ch) {
+	struct __unitraits const *__traits = __libc___unicode_descriptor(__ch);
+	if __likely(__traits->__ut_digit_idx <= __UNICODE_DIGIT_IDENTITY_MAX)
+		return __traits->__ut_digit_idx;
+#ifdef ____libc___unicode_descriptor_digit_defined
+	return __libc___unicode_descriptor_digit(__traits->__ut_digit_idx);
+#elif defined(____libc___unicode_descriptor_digit64_defined)
+	return (__UINT8_TYPE__)__libc___unicode_descriptor_digit64(__traits->__ut_digit_idx);
+#else /* ... */
+	return 0;
+#endif /* !... */
+}
+
+#ifdef __UINT64_TYPE__
+/* >> unicode_getnumeric(3), unicode_getnumeric64(3), unicode_getnumericdbl(3), unicode_getnumericldbl(3)
+ * Return  the numerical  variable for which  `ch' is representative  (s.a. `unicode_isnumeric(3)'). When
+ * `ch' doesn't represent  a numerical character,  return `0'.  Note that this  function also  recognizes
+ * 'a'-'f' and 'A'-'F' as numeric characters (representing their hex values) */
+__LOCAL __ATTR_CONST __ATTR_WUNUSED __UINT64_TYPE__
+__NOTHROW(__LIBCCALL __libc_unicode_getnumeric64)(__CHAR32_TYPE__ __ch) {
+	struct __unitraits const *__traits = __libc___unicode_descriptor(__ch);
+	if __likely(__traits->__ut_digit_idx <= __UNICODE_DIGIT_IDENTITY_MAX)
+		return __traits->__ut_digit_idx;
+#ifdef ____libc___unicode_descriptor_digit64_defined
+	return __libc___unicode_descriptor_digit64(__traits->__ut_digit_idx);
+#elif defined(____libc___unicode_descriptor_digit_defined)
+	return __libc___unicode_descriptor_digit(__traits->__ut_digit_idx);
+#else /* ... */
+	return 0;
+#endif /* !... */
+}
+#endif /* __UINT64_TYPE__ */
+
+#ifndef __NO_FPU
+/* >> unicode_getnumeric(3), unicode_getnumeric64(3), unicode_getnumericdbl(3), unicode_getnumericldbl(3)
+ * Return  the numerical  variable for which  `ch' is representative  (s.a. `unicode_isnumeric(3)'). When
+ * `ch' doesn't represent  a numerical character,  return `0'.  Note that this  function also  recognizes
+ * 'a'-'f' and 'A'-'F' as numeric characters (representing their hex values) */
+__LOCAL __ATTR_CONST __ATTR_WUNUSED double
+__NOTHROW(__LIBCCALL __libc_unicode_getnumericdbl)(__CHAR32_TYPE__ __ch) {
+	struct __unitraits const *__traits = __libc___unicode_descriptor(__ch);
+	if __likely(__traits->__ut_digit_idx <= __UNICODE_DIGIT_IDENTITY_MAX)
+		return (double)__traits->__ut_digit_idx;
+#ifdef ____libc___unicode_descriptor_digitd_defined
+	return __libc___unicode_descriptor_digitd(__traits->__ut_digit_idx);
+#else /* ____libc___unicode_descriptor_digitd_defined */
+	return 0.0;
+#endif /* !____libc___unicode_descriptor_digitd_defined */
+}
+
+#ifdef __COMPILER_HAVE_LONGDOUBLE
+/* >> unicode_getnumeric(3), unicode_getnumeric64(3), unicode_getnumericdbl(3), unicode_getnumericldbl(3)
+ * Return  the numerical  variable for which  `ch' is representative  (s.a. `unicode_isnumeric(3)'). When
+ * `ch' doesn't represent  a numerical character,  return `0'.  Note that this  function also  recognizes
+ * 'a'-'f' and 'A'-'F' as numeric characters (representing their hex values) */
+__LOCAL __ATTR_CONST __ATTR_WUNUSED __LONGDOUBLE
+__NOTHROW(__LIBCCALL __libc_unicode_getnumericldbl)(__CHAR32_TYPE__ __ch) {
+	struct __unitraits const *__traits = __libc___unicode_descriptor(__ch);
+	if __likely(__traits->__ut_digit_idx <= __UNICODE_DIGIT_IDENTITY_MAX)
+		return (__LONGDOUBLE)__traits->__ut_digit_idx;
+#ifdef ____libc___unicode_descriptor_digitld_defined
+	return __libc___unicode_descriptor_digitld(__traits->__ut_digit_idx);
+#elif defined(____libc___unicode_descriptor_digitd_defined)
+	return __libc___unicode_descriptor_digitd(__traits->__ut_digit_idx);
+#else /* ... */
+	return 0.0L;
+#endif /* !... */
+}
+#endif /* __COMPILER_HAVE_LONGDOUBLE */
+#endif /* !__NO_FPU */
+__DECL_END
+
+#else /* ____libc___unicode_descriptor_defined */
+
 #include <libc/ctype.h>
 #define __libc_unicode_iscntrl(ch)   ((__UINT32_TYPE__)(ch) <= 0x7f && __libc_iscntrl(ch))              /* Control characters */
 #define __libc_unicode_istab(ch)     ((ch) == 9 || (ch) == 0xb || (ch) == 0xc)                          /* 09, 0B-0C */
@@ -160,119 +248,7 @@ __LIBC __UINT16_TYPE__ const __unicode_latin1flags[257] __CASMNAME_SAME("__unico
 #define __libc_unicode_isnumeric(ch) __libc_unicode_isdigit(ch)                                         /* Includes stuff like "²" */
 #define __libc_unicode_issymstrt(ch) (__libc_unicode_isalpha(ch) || (ch) == 0x5f || (ch) == 0x24)       /* Character may appear at the start of a symbol name */
 #define __libc_unicode_issymcont(ch) (__libc_unicode_isalnum(ch) || (ch) == 0x5f || (ch) == 0x24)       /* Character may appear in the middle of a symbol name */
-#endif /* !__unicode_flags */
 
-#ifdef ____libc___unicode_descriptor_defined
-#define __libc_unicode_tolower(ch) ((ch) + __libc___unicode_descriptor(ch)->__ut_lower)
-#define __libc_unicode_toupper(ch) ((ch) + __libc___unicode_descriptor(ch)->__ut_upper)
-#define __libc_unicode_totitle(ch) ((ch) + __libc___unicode_descriptor(ch)->__ut_title)
-
-/* >> unicode_asdigit(3)
- * Check if `ch' is a digit- or hex-character (s.a. `unicode_isxdigit()'),
- * and if so, store  its digit value in  `*presult' and return `true'  iff
- * its  digit value is  less than `radix'.  Otherwise, leave `*presult' as
- * undefined and return `false'.
- * Note that `radix' values >= 16 are supported, but the cut-off  value
- * until which they are is  implementation-defined (but always >=  16).
- * If digit characters which equate to values greater than 16 should be
- * supported, then `unicode_getnumeric(64|dbl|ldbl)' should be used! */
-#ifdef __INTELLISENSE__
-__ATTR_WUNUSED __ATTR_NONNULL((3)) __BOOL
-__NOTHROW_NCX(__libc_unicode_asdigit)(char32_t ch, __UINT8_TYPE__ radix,
-                                      __UINT8_TYPE__ * __restrict presult);
-#else /* __INTELLISENSE__ */
-#define __libc_unicode_asdigit(ch, radix, presult) \
-	((*(presult) = __unicode_asdigit(ch)) <= (radix))
-#endif /* !__INTELLISENSE__ */
-
-#ifndef ____unicode_asdigit_defined
-#define ____unicode_asdigit_defined
-__LOCAL __ATTR_CONST __ATTR_WUNUSED __UINT8_TYPE__
-__NOTHROW(__LIBCCALL __unicode_asdigit)(char32_t __ch) {
-	struct __unitraits const *__traits = __libc___unicode_descriptor(__ch);
-	if (!(__traits->__ut_flags & __UNICODE_ISXDIGIT))
-		return 0xff;
-	return __traits->__ut_digit_idx;
-}
-#endif /* !____unicode_asdigit_defined */
-
-/* >> unicode_getnumeric(3), unicode_getnumeric64(3), unicode_getnumericdbl(3), unicode_getnumericldbl(3)
- * Return  the numerical  variable for which  `ch' is representative  (s.a. `unicode_isnumeric(3)'). When
- * `ch' doesn't represent  a numerical character,  return `0'.  Note that this  function also  recognizes
- * 'a'-'f' and 'A'-'F' as numeric characters (representing their hex values) */
-__LOCAL __ATTR_CONST __ATTR_WUNUSED __UINT8_TYPE__
-__NOTHROW(__LIBCCALL __libc_unicode_getnumeric)(char32_t __ch) {
-	struct __unitraits const *__traits = __libc___unicode_descriptor(__ch);
-	if __likely(__traits->__ut_digit_idx <= __UNICODE_DIGIT_IDENTITY_MAX)
-		return __traits->__ut_digit_idx;
-#ifdef ____libc___unicode_descriptor_digit_defined
-	return __libc___unicode_descriptor_digit(__traits->__ut_digit_idx);
-#elif defined(____libc___unicode_descriptor_digit64_defined)
-	return (__UINT8_TYPE__)__libc___unicode_descriptor_digit64(__traits->__ut_digit_idx);
-#else /* ... */
-	return 0;
-#endif /* !... */
-}
-
-#ifdef __UINT64_TYPE__
-/* >> unicode_getnumeric(3), unicode_getnumeric64(3), unicode_getnumericdbl(3), unicode_getnumericldbl(3)
- * Return  the numerical  variable for which  `ch' is representative  (s.a. `unicode_isnumeric(3)'). When
- * `ch' doesn't represent  a numerical character,  return `0'.  Note that this  function also  recognizes
- * 'a'-'f' and 'A'-'F' as numeric characters (representing their hex values) */
-__LOCAL __ATTR_CONST __ATTR_WUNUSED __UINT64_TYPE__
-__NOTHROW(__LIBCCALL __libc_unicode_getnumeric64)(char32_t __ch) {
-	struct __unitraits const *__traits = __libc___unicode_descriptor(__ch);
-	if __likely(__traits->__ut_digit_idx <= __UNICODE_DIGIT_IDENTITY_MAX)
-		return __traits->__ut_digit_idx;
-#ifdef ____libc___unicode_descriptor_digit64_defined
-	return __libc___unicode_descriptor_digit64(__traits->__ut_digit_idx);
-#elif defined(____libc___unicode_descriptor_digit_defined)
-	return __libc___unicode_descriptor_digit(__traits->__ut_digit_idx);
-#else /* ... */
-	return 0;
-#endif /* !... */
-}
-#endif /* __UINT64_TYPE__ */
-
-#ifndef __NO_FPU
-/* >> unicode_getnumeric(3), unicode_getnumeric64(3), unicode_getnumericdbl(3), unicode_getnumericldbl(3)
- * Return  the numerical  variable for which  `ch' is representative  (s.a. `unicode_isnumeric(3)'). When
- * `ch' doesn't represent  a numerical character,  return `0'.  Note that this  function also  recognizes
- * 'a'-'f' and 'A'-'F' as numeric characters (representing their hex values) */
-__LOCAL __ATTR_CONST __ATTR_WUNUSED double
-__NOTHROW(__LIBCCALL __libc_unicode_getnumericdbl)(char32_t __ch) {
-	struct __unitraits const *__traits = __libc___unicode_descriptor(__ch);
-	if __likely(__traits->__ut_digit_idx <= __UNICODE_DIGIT_IDENTITY_MAX)
-		return (double)__traits->__ut_digit_idx;
-#ifdef ____libc___unicode_descriptor_digitd_defined
-	return __libc___unicode_descriptor_digitd(__traits->__ut_digit_idx);
-#else /* ____libc___unicode_descriptor_digitd_defined */
-	return 0.0;
-#endif /* !____libc___unicode_descriptor_digitd_defined */
-}
-
-#ifdef __COMPILER_HAVE_LONGDOUBLE
-/* >> unicode_getnumeric(3), unicode_getnumeric64(3), unicode_getnumericdbl(3), unicode_getnumericldbl(3)
- * Return  the numerical  variable for which  `ch' is representative  (s.a. `unicode_isnumeric(3)'). When
- * `ch' doesn't represent  a numerical character,  return `0'.  Note that this  function also  recognizes
- * 'a'-'f' and 'A'-'F' as numeric characters (representing their hex values) */
-__LOCAL __ATTR_CONST __ATTR_WUNUSED __LONGDOUBLE
-__NOTHROW(__LIBCCALL __libc_unicode_getnumericldbl)(char32_t __ch) {
-	struct __unitraits const *__traits = __libc___unicode_descriptor(__ch);
-	if __likely(__traits->__ut_digit_idx <= __UNICODE_DIGIT_IDENTITY_MAX)
-		return (__LONGDOUBLE)__traits->__ut_digit_idx;
-#ifdef ____libc___unicode_descriptor_digitld_defined
-	return __libc___unicode_descriptor_digitld(__traits->__ut_digit_idx);
-#elif defined(____libc___unicode_descriptor_digitd_defined)
-	return __libc___unicode_descriptor_digitd(__traits->__ut_digit_idx);
-#else /* ... */
-	return 0.0L;
-#endif /* !... */
-}
-#endif /* __COMPILER_HAVE_LONGDOUBLE */
-#endif /* !__NO_FPU */
-#else /* ____libc___unicode_descriptor_defined */
-#include <libc/ctype.h>
 #define __libc_unicode_tolower(ch) ((__UINT32_TYPE__)(ch) <= 0x7f ? __libc_tolower(ch) : (ch))
 #define __libc_unicode_toupper(ch) ((__UINT32_TYPE__)(ch) <= 0x7f ? __libc_toupper(ch) : (ch))
 #define __libc_unicode_totitle(ch) __libc_unicode_toupper(ch)
@@ -288,7 +264,7 @@ __NOTHROW(__LIBCCALL __libc_unicode_getnumericldbl)(char32_t __ch) {
  * supported, then `unicode_getnumeric(64|dbl|ldbl)' should be used! */
 #ifdef __INTELLISENSE__
 __ATTR_WUNUSED __ATTR_NONNULL((3)) __BOOL
-__NOTHROW_NCX(__libc_unicode_asdigit)(char32_t ch, __UINT8_TYPE__ radix,
+__NOTHROW_NCX(__libc_unicode_asdigit)(__CHAR32_TYPE__ ch, __UINT8_TYPE__ radix,
                                       __UINT8_TYPE__ *__restrict presult);
 #else /* __INTELLISENSE__ */
 #define __libc_unicode_asdigit(ch, radix, presult)                                         \
@@ -341,8 +317,6 @@ __NOTHROW_NCX(__libc_unicode_asdigit)(char32_t ch, __UINT8_TYPE__ radix,
 #endif /* !__NO_FPU */
 #endif /* !____libc___unicode_descriptor_defined */
 
-
-__DECL_END
 
 #endif /* __CC__ */
 

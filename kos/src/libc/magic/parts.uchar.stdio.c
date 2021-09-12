@@ -33,8 +33,19 @@
 #include <uchar.h>
 #endif /* !_UCHAR_H */
 
+#ifndef WEOF16
+#define WEOF16 __WEOF16
+#define WEOF32 __WEOF32
+#endif /* !WEOF16 */
+
 #ifdef __CC__
 __SYSDECL_BEGIN
+
+#ifndef __wint16_t_defined
+#define __wint16_t_defined
+typedef __WINT16_TYPE__ wint16_t;
+typedef __WINT32_TYPE__ wint32_t;
+#endif /* !__wint16_t_defined */
 
 }
 

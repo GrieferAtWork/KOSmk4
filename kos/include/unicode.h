@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x4aa66e2b */
+/* HASH CRC-32:0xac094b4 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -1172,25 +1172,6 @@ __CDECLARE(__ATTR_CONST __ATTR_WUNUSED,__LONGDOUBLE,__NOTHROW,__unicode_descript
 #endif /* __COMPILER_HAVE_LONGDOUBLE */
 #endif /* !__NO_FPU */
 
-#ifdef __CRT_HAVE___unicode_latin1flags
-#ifndef ____unicode_latin1flags_defined
-#define ____unicode_latin1flags_defined
-__LIBC __UINT16_TYPE__ const __unicode_latin1flags[257] __CASMNAME_SAME("__unicode_latin1flags");
-#endif /* !____unicode_latin1flags_defined */
-#endif /* __CRT_HAVE___unicode_latin1flags */
-
-/* >> uint16_t __unicode_flags(char32_t ch); */
-#ifndef __unicode_flags
-#if defined(____unicode_descriptor_defined) && defined(____unicode_latin1flags_defined)
-#define __unicode_flags(ch)                                   \
-	(sizeof(ch) == 1 ? (__unicode_latin1flags + 1)[(int)(ch)] \
-	                 : __unicode_descriptor(ch)->__ut_flags)
-#elif defined(____unicode_descriptor_defined)
-#define __unicode_flags(ch) (__unicode_descriptor(ch)->__ut_flags)
-#endif /* ... */
-#endif /* !__unicode_flags */
-
-
 /* The max number of characters ever written by `unicode_fold' */
 #define UNICODE_FOLDED_MAX 3
 
@@ -1203,54 +1184,29 @@ __LOCAL __ATTR_RETNONNULL __ATTR_NONNULL((2)) char32_t *__NOTHROW_NCX(__LIBCCALL
 #endif /* !__CRT_HAVE_unicode_fold */
 
 /* Unicode character traits test functions */
-#ifdef __unicode_flags
-#define unicode_iscntrl(ch)   ((__unicode_flags(ch) & __UNICODE_ISCNTRL) != 0)   /* Control characters */
-#define unicode_istab(ch)     ((__unicode_flags(ch) & __UNICODE_ISTAB) != 0)     /* 09, 0B-0C */
-#define unicode_iswhite(ch)   ((__unicode_flags(ch) & __UNICODE_ISWHITE) != 0)   /* Pure whitespace characters (excluding tabs and line-feeds) */
-#define unicode_isempty(ch)   ((__unicode_flags(ch) & __UNICODE_ISEMPTY) != 0)   /* unicode_istab || unicode_iswhite */
-#define unicode_islf(ch)      ((__unicode_flags(ch) & __UNICODE_ISLF) != 0)      /* Line-feed characters */
-#define unicode_isspace(ch)   ((__unicode_flags(ch) & __UNICODE_ISSPACE) != 0)   /* unicode_isempty | unicode_islf */
-#define unicode_islower(ch)   ((__unicode_flags(ch) & __UNICODE_ISLOWER) != 0)   /* Lowercase characters */
-#define unicode_isupper(ch)   ((__unicode_flags(ch) & __UNICODE_ISUPPER) != 0)   /* Uppercase characters */
-#define unicode_isalpha(ch)   ((__unicode_flags(ch) & __UNICODE_ISALPHA) != 0)   /* Alphabetical characters */
-#define unicode_isdigit(ch)   ((__unicode_flags(ch) & __UNICODE_ISDIGIT) != 0)   /* Only includes stuff like "2" */
-#define unicode_ishex(ch)     ((__unicode_flags(ch) & __UNICODE_ISHEX) != 0)     /* 'a'-'f', 'A'-'F' */
-#define unicode_isxdigit(ch)  ((__unicode_flags(ch) & __UNICODE_ISXDIGIT) != 0)  /* unicode_isdigit || unicode_ishex */
-#define unicode_isalnum(ch)   ((__unicode_flags(ch) & __UNICODE_ISALNUM) != 0)   /* unicode_isdigit || unicode_isalpha */
-#define unicode_ispunct(ch)   ((__unicode_flags(ch) & __UNICODE_ISPUNCT) != 0)   /* Punctuation (such as '.') */
-#define unicode_isgraph(ch)   ((__unicode_flags(ch) & __UNICODE_ISGRAPH) != 0)   /* Graphical characters (everything printable, excluding spaces) */
-#define unicode_isprint(ch)   ((__unicode_flags(ch) & __UNICODE_ISPRINT) != 0)   /* unicode_isgraph || unicode_iswhite */
-#define unicode_isblank(ch)   ((__unicode_flags(ch) & __UNICODE_ISBLANK) != 0)   /* unicode_iswhite || (ch == '\t') */
-#define unicode_istitle(ch)   ((__unicode_flags(ch) & __UNICODE_ISTITLE) != 0)   /* title-case */
-#define unicode_isnumeric(ch) ((__unicode_flags(ch) & __UNICODE_ISNUMERIC) != 0) /* Includes stuff like "²" */
-#define unicode_issymstrt(ch) ((__unicode_flags(ch) & __UNICODE_ISSYMSTRT) != 0) /* Character may appear at the start of a symbol name */
-#define unicode_issymcont(ch) ((__unicode_flags(ch) & __UNICODE_ISSYMCONT) != 0) /* Character may appear in the middle of a symbol name */
-#else /* __unicode_flags */
-#include <libc/ctype.h>
-#define unicode_iscntrl(ch)   ((__UINT32_TYPE__)(ch) <= 0x7f && __libc_iscntrl(ch))              /* Control characters */
-#define unicode_istab(ch)     ((ch) == 9 || (ch) == 0xb || (ch) == 0xc)                          /* 09, 0B-0C */
-#define unicode_iswhite(ch)   ((ch) == 0x20)                                                     /* Pure whitespace characters (excluding tabs and line-feeds) */
-#define unicode_isempty(ch)   (unicode_istab(ch) || unicode_iswhite(ch))                         /* unicode_istab || unicode_iswhite */
-#define unicode_islf(ch)      ((ch) == 0xa || (ch) == 0xd)                                       /* Line-feed characters */
-#define unicode_isspace(ch)   ((__UINT32_TYPE__)(ch) <= 0x7f && __libc_isspace(ch))              /* unicode_isempty | unicode_islf */
-#define unicode_islower(ch)   ((__UINT32_TYPE__)(ch) <= 0x7f && __libc_islower(ch))              /* Lowercase characters */
-#define unicode_isupper(ch)   ((__UINT32_TYPE__)(ch) <= 0x7f && __libc_isupper(ch))              /* Uppercase characters */
-#define unicode_isalpha(ch)   ((__UINT32_TYPE__)(ch) <= 0x7f && __libc_isalpha(ch))              /* Alphabetical characters */
-#define unicode_isdigit(ch)   ((__UINT32_TYPE__)(ch) <= 0x7f && __libc_isdigit(ch))              /* Only includes stuff like "2" */
-#define unicode_ishex(ch)     ((ch) >= (0x41 && (ch) <= 0x46) || ((ch) >= 0x61 && (ch) <= 0x66)) /* 'a'-'f', 'A'-'F' */
-#define unicode_isxdigit(ch)  ((__UINT32_TYPE__)(ch) <= 0x7f && __libc_isxdigit(ch))             /* unicode_isdigit || unicode_ishex */
-#define unicode_isalnum(ch)   ((__UINT32_TYPE__)(ch) <= 0x7f && __libc_isalnum(ch))              /* unicode_isdigit || unicode_isalpha */
-#define unicode_ispunct(ch)   ((__UINT32_TYPE__)(ch) <= 0x7f && __libc_ispunct(ch))              /* Punctuation (such as '.') */
-#define unicode_isgraph(ch)   ((__UINT32_TYPE__)(ch) <= 0x7f && __libc_isgraph(ch))              /* Graphical characters (everything printable, excluding spaces) */
-#define unicode_isprint(ch)   ((__UINT32_TYPE__)(ch) <= 0x7f && __libc_isprint(ch))              /* unicode_isgraph || unicode_iswhite */
-#define unicode_isblank(ch)   ((__UINT32_TYPE__)(ch) <= 0x7f && __libc_isblank(ch))              /* unicode_iswhite || (ch == '\t') */
-#define unicode_istitle(ch)   unicode_isupper(ch)                                                /* title-case */
-#define unicode_isnumeric(ch) unicode_isdigit(ch)                                                /* Includes stuff like "²" */
-#define unicode_issymstrt(ch) (unicode_isalpha(ch) || (ch) == 0x5f || (ch) == 0x24)              /* Character may appear at the start of a symbol name */
-#define unicode_issymcont(ch) (unicode_isalnum(ch) || (ch) == 0x5f || (ch) == 0x24)              /* Character may appear in the middle of a symbol name */
-#endif /* !__unicode_flags */
-
 #ifdef ____unicode_descriptor_defined
+#define unicode_iscntrl(ch)   ((__unicode_descriptor(ch)->__ut_flags & __UNICODE_ISCNTRL) != 0)   /* Control characters */
+#define unicode_istab(ch)     ((__unicode_descriptor(ch)->__ut_flags & __UNICODE_ISTAB) != 0)     /* 09, 0B-0C */
+#define unicode_iswhite(ch)   ((__unicode_descriptor(ch)->__ut_flags & __UNICODE_ISWHITE) != 0)   /* Pure whitespace characters (excluding tabs and line-feeds) */
+#define unicode_isempty(ch)   ((__unicode_descriptor(ch)->__ut_flags & __UNICODE_ISEMPTY) != 0)   /* unicode_istab || unicode_iswhite */
+#define unicode_islf(ch)      ((__unicode_descriptor(ch)->__ut_flags & __UNICODE_ISLF) != 0)      /* Line-feed characters */
+#define unicode_isspace(ch)   ((__unicode_descriptor(ch)->__ut_flags & __UNICODE_ISSPACE) != 0)   /* unicode_isempty | unicode_islf */
+#define unicode_islower(ch)   ((__unicode_descriptor(ch)->__ut_flags & __UNICODE_ISLOWER) != 0)   /* Lowercase characters */
+#define unicode_isupper(ch)   ((__unicode_descriptor(ch)->__ut_flags & __UNICODE_ISUPPER) != 0)   /* Uppercase characters */
+#define unicode_isalpha(ch)   ((__unicode_descriptor(ch)->__ut_flags & __UNICODE_ISALPHA) != 0)   /* Alphabetical characters */
+#define unicode_isdigit(ch)   ((__unicode_descriptor(ch)->__ut_flags & __UNICODE_ISDIGIT) != 0)   /* Only includes stuff like "2" */
+#define unicode_ishex(ch)     ((__unicode_descriptor(ch)->__ut_flags & __UNICODE_ISHEX) != 0)     /* 'a'-'f', 'A'-'F' */
+#define unicode_isxdigit(ch)  ((__unicode_descriptor(ch)->__ut_flags & __UNICODE_ISXDIGIT) != 0)  /* unicode_isdigit || unicode_ishex */
+#define unicode_isalnum(ch)   ((__unicode_descriptor(ch)->__ut_flags & __UNICODE_ISALNUM) != 0)   /* unicode_isdigit || unicode_isalpha */
+#define unicode_ispunct(ch)   ((__unicode_descriptor(ch)->__ut_flags & __UNICODE_ISPUNCT) != 0)   /* Punctuation (such as '.') */
+#define unicode_isgraph(ch)   ((__unicode_descriptor(ch)->__ut_flags & __UNICODE_ISGRAPH) != 0)   /* Graphical characters (everything printable, excluding spaces) */
+#define unicode_isprint(ch)   ((__unicode_descriptor(ch)->__ut_flags & __UNICODE_ISPRINT) != 0)   /* unicode_isgraph || unicode_iswhite */
+#define unicode_isblank(ch)   ((__unicode_descriptor(ch)->__ut_flags & __UNICODE_ISBLANK) != 0)   /* unicode_iswhite || (ch == '\t') */
+#define unicode_istitle(ch)   ((__unicode_descriptor(ch)->__ut_flags & __UNICODE_ISTITLE) != 0)   /* title-case */
+#define unicode_isnumeric(ch) ((__unicode_descriptor(ch)->__ut_flags & __UNICODE_ISNUMERIC) != 0) /* Includes stuff like "²" */
+#define unicode_issymstrt(ch) ((__unicode_descriptor(ch)->__ut_flags & __UNICODE_ISSYMSTRT) != 0) /* Character may appear at the start of a symbol name */
+#define unicode_issymcont(ch) ((__unicode_descriptor(ch)->__ut_flags & __UNICODE_ISSYMCONT) != 0) /* Character may appear in the middle of a symbol name */
+
 #define unicode_tolower(ch) ((ch) + __unicode_descriptor(ch)->__ut_lower)
 #define unicode_toupper(ch) ((ch) + __unicode_descriptor(ch)->__ut_upper)
 #define unicode_totitle(ch) ((ch) + __unicode_descriptor(ch)->__ut_title)
@@ -1359,8 +1315,32 @@ __NOTHROW(__LIBCCALL unicode_getnumericldbl)(char32_t __ch) {
 }
 #endif /* __COMPILER_HAVE_LONGDOUBLE */
 #endif /* !__NO_FPU */
+
 #else /* ____unicode_descriptor_defined */
+
 #include <libc/ctype.h>
+#define unicode_iscntrl(ch)   ((__UINT32_TYPE__)(ch) <= 0x7f && __libc_iscntrl(ch))              /* Control characters */
+#define unicode_istab(ch)     ((ch) == 9 || (ch) == 0xb || (ch) == 0xc)                          /* 09, 0B-0C */
+#define unicode_iswhite(ch)   ((ch) == 0x20)                                                     /* Pure whitespace characters (excluding tabs and line-feeds) */
+#define unicode_isempty(ch)   (unicode_istab(ch) || unicode_iswhite(ch))                         /* unicode_istab || unicode_iswhite */
+#define unicode_islf(ch)      ((ch) == 0xa || (ch) == 0xd)                                       /* Line-feed characters */
+#define unicode_isspace(ch)   ((__UINT32_TYPE__)(ch) <= 0x7f && __libc_isspace(ch))              /* unicode_isempty | unicode_islf */
+#define unicode_islower(ch)   ((__UINT32_TYPE__)(ch) <= 0x7f && __libc_islower(ch))              /* Lowercase characters */
+#define unicode_isupper(ch)   ((__UINT32_TYPE__)(ch) <= 0x7f && __libc_isupper(ch))              /* Uppercase characters */
+#define unicode_isalpha(ch)   ((__UINT32_TYPE__)(ch) <= 0x7f && __libc_isalpha(ch))              /* Alphabetical characters */
+#define unicode_isdigit(ch)   ((__UINT32_TYPE__)(ch) <= 0x7f && __libc_isdigit(ch))              /* Only includes stuff like "2" */
+#define unicode_ishex(ch)     ((ch) >= (0x41 && (ch) <= 0x46) || ((ch) >= 0x61 && (ch) <= 0x66)) /* 'a'-'f', 'A'-'F' */
+#define unicode_isxdigit(ch)  ((__UINT32_TYPE__)(ch) <= 0x7f && __libc_isxdigit(ch))             /* unicode_isdigit || unicode_ishex */
+#define unicode_isalnum(ch)   ((__UINT32_TYPE__)(ch) <= 0x7f && __libc_isalnum(ch))              /* unicode_isdigit || unicode_isalpha */
+#define unicode_ispunct(ch)   ((__UINT32_TYPE__)(ch) <= 0x7f && __libc_ispunct(ch))              /* Punctuation (such as '.') */
+#define unicode_isgraph(ch)   ((__UINT32_TYPE__)(ch) <= 0x7f && __libc_isgraph(ch))              /* Graphical characters (everything printable, excluding spaces) */
+#define unicode_isprint(ch)   ((__UINT32_TYPE__)(ch) <= 0x7f && __libc_isprint(ch))              /* unicode_isgraph || unicode_iswhite */
+#define unicode_isblank(ch)   ((__UINT32_TYPE__)(ch) <= 0x7f && __libc_isblank(ch))              /* unicode_iswhite || (ch == '\t') */
+#define unicode_istitle(ch)   unicode_isupper(ch)                                                /* title-case */
+#define unicode_isnumeric(ch) unicode_isdigit(ch)                                                /* Includes stuff like "²" */
+#define unicode_issymstrt(ch) (unicode_isalpha(ch) || (ch) == 0x5f || (ch) == 0x24)              /* Character may appear at the start of a symbol name */
+#define unicode_issymcont(ch) (unicode_isalnum(ch) || (ch) == 0x5f || (ch) == 0x24)              /* Character may appear in the middle of a symbol name */
+
 #define unicode_tolower(ch) ((__UINT32_TYPE__)(ch) <= 0x7f ? __libc_tolower(ch) : (ch))
 #define unicode_toupper(ch) ((__UINT32_TYPE__)(ch) <= 0x7f ? __libc_toupper(ch) : (ch))
 #define unicode_totitle(ch) unicode_toupper(ch)

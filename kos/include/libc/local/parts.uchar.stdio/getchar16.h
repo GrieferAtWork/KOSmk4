@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xcf8e44ad */
+/* HASH CRC-32:0x1b66157b */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -28,13 +28,13 @@ __NAMESPACE_LOCAL_BEGIN
 #ifndef __local___localdep_fgetc16_defined
 #define __local___localdep_fgetc16_defined 1
 #if defined(__CRT_HAVE_fgetwc) && __SIZEOF_WCHAR_T__ == 2 && defined(__LIBCCALL_IS_LIBDCALL)
-__CREDIRECT(__ATTR_NONNULL((1)),__WINT_TYPE__,__THROWING,__localdep_fgetc16,(__FILE *__restrict __stream),fgetwc,(__stream))
+__CREDIRECT(__ATTR_NONNULL((1)),__WINT16_TYPE__,__THROWING,__localdep_fgetc16,(__FILE *__restrict __stream),fgetwc,(__stream))
 #elif defined(__CRT_HAVE_DOS$fgetwc)
-__CREDIRECT_DOS(__ATTR_NONNULL((1)),__WINT_TYPE__,__THROWING,__localdep_fgetc16,(__FILE *__restrict __stream),fgetwc,(__stream))
+__CREDIRECT_DOS(__ATTR_NONNULL((1)),__WINT16_TYPE__,__THROWING,__localdep_fgetc16,(__FILE *__restrict __stream),fgetwc,(__stream))
 #elif defined(__CRT_HAVE_getwc) && __SIZEOF_WCHAR_T__ == 2 && defined(__LIBCCALL_IS_LIBDCALL)
-__CREDIRECT(__ATTR_NONNULL((1)),__WINT_TYPE__,__THROWING,__localdep_fgetc16,(__FILE *__restrict __stream),getwc,(__stream))
+__CREDIRECT(__ATTR_NONNULL((1)),__WINT16_TYPE__,__THROWING,__localdep_fgetc16,(__FILE *__restrict __stream),getwc,(__stream))
 #elif defined(__CRT_HAVE_DOS$getwc)
-__CREDIRECT_DOS(__ATTR_NONNULL((1)),__WINT_TYPE__,__THROWING,__localdep_fgetc16,(__FILE *__restrict __stream),getwc,(__stream))
+__CREDIRECT_DOS(__ATTR_NONNULL((1)),__WINT16_TYPE__,__THROWING,__localdep_fgetc16,(__FILE *__restrict __stream),getwc,(__stream))
 #else /* ... */
 #undef __local___localdep_fgetc16_defined
 #endif /* !... */
@@ -42,7 +42,7 @@ __CREDIRECT_DOS(__ATTR_NONNULL((1)),__WINT_TYPE__,__THROWING,__localdep_fgetc16,
 __NAMESPACE_LOCAL_END
 #include <libc/local/stdstreams.h>
 __NAMESPACE_LOCAL_BEGIN
-__LOCAL_LIBC(getchar16) __WINT_TYPE__
+__LOCAL_LIBC(getchar16) __WINT16_TYPE__
 (__LIBDCALL __LIBC_LOCAL_NAME(getchar16))(void) __THROWS(...) {
 	return __localdep_fgetc16(__LOCAL_stdin);
 }

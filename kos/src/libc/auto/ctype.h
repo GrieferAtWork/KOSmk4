@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xeeb95ec7 */
+/* HASH CRC-32:0x46a45104 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -29,12 +29,8 @@
 
 DECL_BEGIN
 
-/* Because the kernel (no longer) exports ctype functions, we must define
- * them as macros in internal  libc headers so that auto  implementations
- * can still make use of them!
- *
- * For the sake  of optimization  (allowing libc auto  functions to  make
- * direct use of `__unicode_latin1flags'), we do the same for user-space. */
+/* For the sake  of optimization,  allow libc  auto
+ * functions to make direct use of `__ctype_flags'. */
 #define libc_iscntrl(ch)  __crt_iscntrl(ch)
 #define libc_isspace(ch)  __crt_isspace(ch)
 #define libc_isupper(ch)  __crt_isupper(ch)
@@ -47,10 +43,8 @@ DECL_BEGIN
 #define libc_isgraph(ch)  __crt_isgraph(ch)
 #define libc_isprint(ch)  __crt_isprint(ch)
 #define libc_isblank(ch)  __crt_isblank(ch)
-#ifdef __KERNEL__ /* Only the kernel has a lookup table for tolower/toupper */
 #define libc_tolower(ch)  __crt_tolower(ch)
 #define libc_toupper(ch)  __crt_toupper(ch)
-#endif /* __KERNEL__ */
 #if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
 INTDEF ATTR_PURE WUNUSED char const *NOTHROW_NCX(LIBDCALL libd___locale_ctype_ptr_l)(locale_t locale);
 INTDEF ATTR_CONST WUNUSED int NOTHROW(LIBDCALL libd__isctype)(int ch, int mask);
