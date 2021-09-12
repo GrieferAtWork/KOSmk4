@@ -43,11 +43,14 @@
 
 DECL_BEGIN
 
-#undef EOF
-#undef WEOF
-#define EOF   __EOF
-#define EOF16 ((char16_t)__WEOF16)
-#define EOF32 ((char32_t)__WEOF32)
+#ifndef EOF
+#define EOF __EOF
+#endif /* !EOF */
+
+#ifndef WEOF16
+#define WEOF16 __WEOF16
+#define WEOF32 __WEOF32
+#endif /* !WEOF16 */
 
 #ifndef __mbstate_t_defined
 #define __mbstate_t_defined 1
@@ -220,17 +223,6 @@ INTDEF NONNULL((1)) pos64_t LIBCCALL file_seek(FILE *__restrict self, off64_t of
 INTDEF WUNUSED NONNULL((1)) int LIBCCALL file_getc(FILE *__restrict self);
 INTDEF WUNUSED NONNULL((1)) int LIBCCALL file_ungetc(FILE *__restrict self, unsigned char ch);
 INTDEF WUNUSED NONNULL((1)) int LIBCCALL file_truncate(FILE *__restrict self, pos64_t new_size);
-
-/* Unicode integration */
-INTDEF WUNUSED NONNULL((1)) char16_t LIBCCALL file_getc16(FILE *__restrict self);
-INTDEF WUNUSED NONNULL((1)) char16_t LIBCCALL file_ungetc16(FILE *__restrict self, char16_t ch);
-INTDEF WUNUSED NONNULL((1)) char32_t LIBCCALL file_getc32(FILE *__restrict self);
-INTDEF WUNUSED NONNULL((1)) char32_t LIBCCALL file_ungetc32(FILE *__restrict self, char32_t ch);
-
-/* 8/16/32-bit format-printers for FILE objects. */
-INTDEF WUNUSED NONNULL((1)) ssize_t LIBCCALL file_print16(void *self, char16_t const *__restrict data, size_t datalen);
-INTDEF WUNUSED NONNULL((1)) ssize_t LIBCCALL file_print32(void *self, char32_t const *__restrict data, size_t datalen);
-
 
 /* @param: poflags: When non-NULL, filled with `O_*'
  * @return: * :     Set of `IO_*' */

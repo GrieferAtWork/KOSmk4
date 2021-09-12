@@ -23,14 +23,16 @@
 #include "../api.h"
 /**/
 
-#include <libc/unicode.h>
 #include <stdio.h>
 #include <string.h>
 #include <uchar.h>
+#include <unicode.h>
+
+#include <libc/unicode.h>
 
 #include "../auto/parts.wchar.format-printer.h"
-#include "../libc/uchar.h"
 #include "../libc/globals.h"
+#include "../libc/uchar.h"
 #include "malloc.h"
 #include "stdio-api.h"
 #include "stdio.h"
@@ -39,6 +41,9 @@
 #include "wchar.h"
 
 DECL_BEGIN
+
+#define file_print16 libd_file_wprinter_unlocked
+#define file_print32 libc_file_wprinter_unlocked
 
 /* The DOS version of wcstok() doesn't take the 3rd safe-ptr argument,
  * but rather only takes 2  arguments (under DOS, the 3-argument  form
@@ -65,8 +70,37 @@ INTERN ATTR_SECTION(".text.crt.wchar.FILE.unlocked.read.getc") NONNULL((1)) wint
 (LIBKCALL libc_fgetwc_unlocked)(FILE *__restrict stream) THROWS(...)
 /*[[[body:libc_fgetwc_unlocked]]]*/
 {
-	wint_t result;
-	result = (wint_t)file_getc32(stream);
+	wint32_t result;
+	struct iofile_data *ex;
+	assert(stream);
+	ex = stream->if_exdata;
+	assert(ex);
+	/* Try to complete an in-progress utf-8 sequence. */
+	for (;;) {
+		size_t error;
+		char buf[1];
+		char32_t ch32;
+		int ch;
+		ch = file_getc(stream);
+		if (ch == EOF) {
+			result = WEOF32;
+			goto done;
+		}
+		buf[0] = (char)(unsigned char)(unsigned int)ch;
+		error  = unicode_c8toc32(&ch32, buf, 1, &ex->io_mbs);
+		result = (wint32_t)ch32;
+		if likely(error > 0) /* Completed sequence. */
+			goto done;
+		if unlikely(error == (size_t)-1) {
+			/* Unicode error. */
+			libc_seterrno(EILSEQ);
+			stream->if_flag |= IO_ERR;
+			result = WEOF32;
+			goto done;
+		}
+		/* Incomplete sequence (continue reading...) */
+	}
+done:
 	return result;
 }
 /*[[[end:libc_fgetwc_unlocked]]]*/
@@ -76,8 +110,49 @@ INTERN ATTR_SECTION(".text.crt.dos.wchar.FILE.unlocked.read.getc") NONNULL((1)) 
 (LIBDCALL libd_fgetwc_unlocked)(FILE *__restrict stream) THROWS(...)
 /*[[[body:libd_fgetwc_unlocked]]]*/
 {
-	wint_t result;
-	result = (wint_t)file_getc16(stream);
+	wint16_t result;
+	struct iofile_data *ex;
+	assert(stream);
+	ex = stream->if_exdata;
+	assert(ex);
+	/* Check for a pending surrogate */
+	if ((ex->io_mbs.__mb_word & __MBSTATE_TYPE_MASK) == __MBSTATE_TYPE_WR_UTF16_LO) {
+		result = (char16_t)(0xdc00 + (ex->io_mbs.__mb_word & 0x000003ff));
+		ex->io_mbs.__mb_word = __MBSTATE_TYPE_EMPTY;
+		goto done;
+	}
+	/* Try to complete an in-progress utf-8 sequence. */
+	for (;;) {
+		size_t error;
+		char buf[1];
+		char16_t ch16;
+		int ch;
+		ch = file_getc(stream);
+		if (ch == EOF) {
+			result = WEOF16;
+			goto done;
+		}
+		buf[0] = (char)(unsigned char)(unsigned int)ch;
+		error  = unicode_c8toc16(&ch16, buf, 1, &ex->io_mbs);
+		result = (wint16_t)ch16;
+		if likely(error > 0) /* Completed sequence. */
+			goto done;
+		if unlikely(error == 0) {
+			/* Shouldn't happen (a surrogate was written) */
+			if (file_ungetc(stream, (unsigned char)buf[0]) == EOF)
+				result = WEOF16;
+			goto done;
+		}
+		if unlikely(error == (size_t)-1) {
+			/* Unicode error. */
+			libc_seterrno(EILSEQ);
+			stream->if_flag |= IO_ERR;
+			result = WEOF16;
+			goto done;
+		}
+		/* Incomplete sequence (continue reading...) */
+	}
+done:
 	return result;
 }
 /*[[[end:libd_fgetwc_unlocked]]]*/
@@ -87,13 +162,13 @@ INTERN ATTR_SECTION(".text.crt.wchar.FILE.locked.read.getc") NONNULL((1)) wint32
 (LIBKCALL libc_fgetwc)(FILE *__restrict stream) THROWS(...)
 /*[[[body:libc_fgetwc]]]*/
 {
-	wint_t result;
+	wint32_t result;
 	if (FMUSTLOCK(stream)) {
 		file_lock_write(stream);
-		result = (wint_t)file_getc32(stream);
+		result = libc_fgetwc_unlocked(stream);
 		file_lock_endwrite(stream);
 	} else {
-		result = (wint_t)file_getc32(stream);
+		result = libc_fgetwc_unlocked(stream);
 	}
 	return result;
 }
@@ -104,13 +179,13 @@ INTERN ATTR_SECTION(".text.crt.dos.wchar.FILE.locked.read.getc") NONNULL((1)) wi
 (LIBDCALL libd_fgetwc)(FILE *__restrict stream) THROWS(...)
 /*[[[body:libd_fgetwc]]]*/
 {
-	wint_t result;
+	wint16_t result;
 	if (FMUSTLOCK(stream)) {
 		file_lock_write(stream);
-		result = (wint_t)file_getc16(stream);
+		result = libd_fgetwc_unlocked(stream);
 		file_lock_endwrite(stream);
 	} else {
-		result = (wint_t)file_getc16(stream);
+		result = libd_fgetwc_unlocked(stream);
 	}
 	return result;
 }
@@ -122,8 +197,17 @@ NOTHROW_NCX(LIBKCALL libc_ungetwc_unlocked)(wint32_t ch,
                                             FILE *__restrict stream)
 /*[[[body:libc_ungetwc_unlocked]]]*/
 {
-	wint_t result;
-	result = (wint_t)file_ungetc32(stream, (char32_t)ch);
+	wint32_t result = ch;
+	char buf[UNICODE_UTF8_CURLEN], *end;
+	end = unicode_writeutf8(buf, (char32_t)ch);
+	assert(end > buf);
+	do {
+		--end;
+		if (file_ungetc(stream, (unsigned char)*end) == EOF) {
+			result = WEOF32;
+			break;
+		}
+	} while (end > buf);
 	return result;
 }
 /*[[[end:libc_ungetwc_unlocked]]]*/
@@ -134,8 +218,39 @@ NOTHROW_NCX(LIBDCALL libd_ungetwc_unlocked)(wint16_t ch,
                                             FILE *__restrict stream)
 /*[[[body:libd_ungetwc_unlocked]]]*/
 {
-	wint_t result;
-	result = (wint_t)file_ungetc16(stream, (char16_t)ch);
+	char32_t unget_char;
+	wint16_t result = ch;
+	struct iofile_data *ex;
+	assert(stream);
+	ex = stream->if_exdata;
+	assert(ex);
+	/* Check for a pending surrogate */
+	if ((ex->io_mbs.__mb_word & __MBSTATE_TYPE_MASK) == __MBSTATE_TYPE_WR_UTF16_LO) {
+		char16_t lo_surrogate;
+		if unlikely((char16_t)ch < UTF16_HIGH_SURROGATE_MIN ||
+		            (char16_t)ch > UTF16_HIGH_SURROGATE_MAX) {
+set_ilseq:
+			libc_seterrno(EILSEQ);
+			stream->if_flag |= IO_ERR;
+			result = WEOF16;
+			goto done;
+		}
+		lo_surrogate = (char16_t)(0xdc00 + (ex->io_mbs.__mb_word & 0x000003ff));
+		ex->io_mbs.__mb_word = __MBSTATE_TYPE_EMPTY;
+		unget_char = (char32_t)(char16_t)ch;
+		unget_char -= 0xd800;
+		unget_char <<= 10;
+		unget_char += 0x10000 - 0xdc00;
+		unget_char += lo_surrogate;
+	} else {
+		if unlikely((char16_t)ch >= UTF16_HIGH_SURROGATE_MIN &&
+		            (char16_t)ch <= UTF16_HIGH_SURROGATE_MAX)
+			goto set_ilseq;
+		unget_char = (char32_t)(char16_t)ch;
+	}
+	if (libc_ungetwc_unlocked(unget_char, stream) == WEOF32)
+		result = WEOF16;
+done:
 	return result;
 }
 /*[[[end:libd_ungetwc_unlocked]]]*/
@@ -146,13 +261,13 @@ NOTHROW_NCX(LIBKCALL libc_ungetwc)(wint32_t wc,
                                    FILE *stream)
 /*[[[body:libc_ungetwc]]]*/
 {
-	wint_t result;
+	wint32_t result;
 	if (FMUSTLOCK(stream)) {
 		file_lock_write(stream);
-		result = (wint_t)file_ungetc32(stream, (char32_t)wc);
+		result = libc_ungetwc_unlocked(wc, stream);
 		file_lock_endwrite(stream);
 	} else {
-		result = (wint_t)file_ungetc32(stream, (char32_t)wc);
+		result = libc_ungetwc_unlocked(wc, stream);
 	}
 	return result;
 }
@@ -164,13 +279,13 @@ NOTHROW_NCX(LIBDCALL libd_ungetwc)(wint16_t wc,
                                    FILE *stream)
 /*[[[body:libd_ungetwc]]]*/
 {
-	wint_t result;
+	wint16_t result;
 	if (FMUSTLOCK(stream)) {
 		file_lock_write(stream);
-		result = (wint_t)file_ungetc16(stream, (char16_t)wc);
+		result = libd_ungetwc_unlocked(wc, stream);
 		file_lock_endwrite(stream);
 	} else {
-		result = (wint_t)file_ungetc16(stream, (char16_t)wc);
+		result = libd_ungetwc_unlocked(wc, stream);
 	}
 	return result;
 }
@@ -182,9 +297,9 @@ INTERN ATTR_SECTION(".text.crt.wchar.FILE.unlocked.write.putc") NONNULL((2)) win
                                 FILE *__restrict stream) THROWS(...)
 /*[[[body:libc_fputwc_unlocked]]]*/
 {
-	wint_t result = (wint_t)wc;
+	wint32_t result = (wint32_t)wc;
 	if (file_print32(stream, &wc, 1) <= 0)
-		result = (wint_t)EOF32;
+		result = WEOF32;
 	return result;
 }
 /*[[[end:libc_fputwc_unlocked]]]*/
@@ -195,9 +310,9 @@ INTERN ATTR_SECTION(".text.crt.dos.wchar.FILE.unlocked.write.putc") NONNULL((2))
                                 FILE *__restrict stream) THROWS(...)
 /*[[[body:libd_fputwc_unlocked]]]*/
 {
-	wint_t result = (wint_t)wc;
+	wint16_t result = (wint16_t)wc;
 	if (file_print16(stream, &wc, 1) <= 0)
-		result = (wint_t)EOF16;
+		result = WEOF16;
 	return result;
 }
 /*[[[end:libd_fputwc_unlocked]]]*/
@@ -209,7 +324,7 @@ INTERN ATTR_SECTION(".text.crt.wchar.FILE.locked.write.putc") NONNULL((2)) wint3
 /*[[[body:libc_fputwc]]]*/
 {
 	ssize_t error;
-	wint_t result = (wint_t)wc;
+	wint32_t result = (wint32_t)wc;
 	if (FMUSTLOCK(stream)) {
 		file_lock_write(stream);
 		error = file_print32(stream, &wc, 1);
@@ -218,7 +333,7 @@ INTERN ATTR_SECTION(".text.crt.wchar.FILE.locked.write.putc") NONNULL((2)) wint3
 		error = file_print32(stream, &wc, 1);
 	}
 	if (error <= 0)
-		result = (wint_t)EOF32;
+		result = WEOF32;
 	return result;
 }
 /*[[[end:libc_fputwc]]]*/
@@ -230,7 +345,7 @@ INTERN ATTR_SECTION(".text.crt.dos.wchar.FILE.locked.write.putc") NONNULL((2)) w
 /*[[[body:libd_fputwc]]]*/
 {
 	ssize_t error;
-	wint_t result = (wint_t)wc;
+	wint16_t result = (wint16_t)wc;
 	if (FMUSTLOCK(stream)) {
 		file_lock_write(stream);
 		error = file_print16(stream, &wc, 1);
@@ -239,7 +354,7 @@ INTERN ATTR_SECTION(".text.crt.dos.wchar.FILE.locked.write.putc") NONNULL((2)) w
 		error = file_print16(stream, &wc, 1);
 	}
 	if (error <= 0)
-		result = (wint_t)EOF16;
+		result = WEOF16;
 	return result;
 }
 /*[[[end:libd_fputwc]]]*/
@@ -408,9 +523,10 @@ INTERN ATTR_SECTION(".text.crt.wchar.FILE.unlocked.write.write") NONNULL((1, 2))
                                        size_t datalen) THROWS(...)
 /*[[[body:libc_file_wprinter_unlocked]]]*/
 {
-	ssize_t result;
-	result = file_print32(arg, data, datalen);
-	return result;
+	struct format_32to8_data format;
+	format.fd_printer = &libc_file_printer_unlocked;
+	format.fd_arg     = arg;
+	return format_32to8(&format, data, datalen);
 }
 /*[[[end:libc_file_wprinter_unlocked]]]*/
 
@@ -446,7 +562,24 @@ INTERN ATTR_SECTION(".text.crt.dos.wchar.FILE.unlocked.write.write") NONNULL((1,
 /*[[[body:libd_file_wprinter_unlocked]]]*/
 {
 	ssize_t result;
-	result = file_print16(arg, data, datalen);
+	struct format_16to8_data format;
+	struct iofile_data *ex;
+	FILE *me = (FILE *)arg;
+	assert(me);
+	ex = me->if_exdata;
+	assert(ex);
+	format.fd_arg       = arg;
+	format.fd_printer   = &libc_file_printer_unlocked;
+	format.fd_surrogate = 0;
+	/* Check for a the pending surrogate pair */
+	if ((ex->io_mbs.__mb_word & __MBSTATE_TYPE_MASK) == __MBSTATE_TYPE_UTF16_LO) {
+		format.fd_surrogate = 0xdc00 + (ex->io_mbs.__mb_word & 0x000003ff);
+		ex->io_mbs.__mb_word = __MBSTATE_TYPE_EMPTY;
+	}
+	result = format_16to8(&format, data, datalen);
+	/* Update the pending surrogate pair */
+	if (format.fd_surrogate)
+		ex->io_mbs.__mb_word = __MBSTATE_TYPE_UTF16_LO | (format.fd_surrogate - 0xdc00);
 	return result;
 }
 /*[[[end:libd_file_wprinter_unlocked]]]*/
