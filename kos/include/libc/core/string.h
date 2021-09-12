@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xa41ab8b0 */
+/* HASH CRC-32:0x2955cac */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -40,7 +40,7 @@ __CREDIRECT(__ATTR_LEAF __ATTR_RETNONNULL __ATTR_NONNULL((1, 2)),void *,__NOTHRO
 /* >> memcpy(3)
  * Copy memory between non-overlapping memory blocks.
  * @return: * : Always re-returns `dst' */
-#define __libc_core_memcpy (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(memcpy))
+#define __libc_core_memcpy __NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(memcpy)
 #endif /* !__CRT_HAVE_memcpy */
 #ifdef __CRT_HAVE_memmove
 #include <hybrid/typecore.h>
@@ -53,7 +53,7 @@ __CREDIRECT(__ATTR_LEAF __ATTR_RETNONNULL __ATTR_NONNULL((1, 2)),void *,__NOTHRO
 /* >> memmove(3)
  * Move memory between potentially overlapping memory blocks.
  * @return: * : Always re-returns `dst' */
-#define __libc_core_memmove (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(memmove))
+#define __libc_core_memmove __NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(memmove)
 #endif /* !__CRT_HAVE_memmove */
 #ifdef __CRT_HAVE_memset
 #include <hybrid/typecore.h>
@@ -66,7 +66,7 @@ __CREDIRECT(__ATTR_LEAF __ATTR_RETNONNULL __ATTR_NONNULL((1)),void *,__NOTHROW_N
 /* >> memset(3)
  * Fill memory with a given byte
  * @return: * : Always re-returns `dst' */
-#define __libc_core_memset (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(memset))
+#define __libc_core_memset __NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(memset)
 #endif /* !__CRT_HAVE_memset */
 #ifdef __CRT_HAVE_memcmp
 #include <hybrid/typecore.h>
@@ -91,7 +91,7 @@ __CREDIRECT(__ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1, 2)),int,__NOTHROW_NCX,
  * @return:  < 0: `s1...+=n_bytes'  < `s2...+=n_bytes'
  * @return: == 0: `s1...+=n_bytes' == `s2...+=n_bytes'
  * @return:  > 0: `s1...+=n_bytes'  > `s2...+=n_bytes' */
-#define __libc_core_memcmp (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(memcmp))
+#define __libc_core_memcmp __NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(memcmp)
 #endif /* !... */
 #ifdef __CRT_HAVE_memchr
 #include <hybrid/typecore.h>
@@ -104,7 +104,7 @@ __CREDIRECT(__ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1)),void *,__NOTHROW_NCX,
 /* >> memchr(3)
  * Ascendingly search for `needle', starting at `haystack'.
  * Return `NULL' if `needle' wasn't found. */
-#define __libc_core_memchr (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(memchr))
+#define __libc_core_memchr __NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(memchr)
 #endif /* !__CRT_HAVE_memchr */
 #ifdef __CRT_HAVE_strlen
 #include <hybrid/typecore.h>
@@ -115,7 +115,7 @@ __CREDIRECT(__ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1)),__SIZE_TYPE__,__NOTHR
 #include <libc/local/string/strlen.h>
 /* >> strlen(3)
  * Return the length of the string in characters (Same as `rawmemlen[...](str, '\0')') */
-#define __libc_core_strlen (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(strlen))
+#define __libc_core_strlen __NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(strlen)
 #endif /* !__CRT_HAVE_strlen */
 #if __has_builtin(__builtin_strchr) && defined(__LIBC_BIND_CRTBUILTINS) && defined(__CRT_HAVE_strchr)
 /* >> strchr(3)
@@ -137,7 +137,7 @@ __CREDIRECT(__ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1)),char *,__NOTHROW_NCX,
 #include <libc/local/string/strchr.h>
 /* >> strchr(3)
  * Return the pointer of the first instance of `needle', or `NULL' if `needle' wasn't found. */
-#define __libc_core_strchr (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(strchr))
+#define __libc_core_strchr __NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(strchr)
 #endif /* !... */
 #if __has_builtin(__builtin_strcmp) && defined(__LIBC_BIND_CRTBUILTINS) && defined(__CRT_HAVE_strcmp)
 /* >> strcmp(3)
@@ -151,7 +151,7 @@ __CREDIRECT(__ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1, 2)),int,__NOTHROW_NCX,
 #include <libc/local/string/strcmp.h>
 /* >> strcmp(3)
  * Compare 2 strings and return the difference of the first non-matching character, or `0' if they are identical */
-#define __libc_core_strcmp (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(strcmp))
+#define __libc_core_strcmp __NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(strcmp)
 #endif /* !... */
 #if __has_builtin(__builtin_strnlen) && defined(__LIBC_BIND_CRTBUILTINS) && defined(__CRT_HAVE_strnlen)
 #include <hybrid/typecore.h>
@@ -167,7 +167,7 @@ __CREDIRECT(__ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1)),__SIZE_TYPE__,__NOTHR
 #include <libc/local/string/strnlen.h>
 /* >> strnlen(3)
  * Same as `strlen', but don't exceed `max_chars' characters (Same as `memlen[...](str, '\0', max_chars)´) */
-#define __libc_core_strnlen (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(strnlen))
+#define __libc_core_strnlen __NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(strnlen)
 #endif /* !... */
 #ifdef __CRT_HAVE_memrchr
 #include <hybrid/typecore.h>
@@ -180,7 +180,7 @@ __CREDIRECT(__ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1)),void *,__NOTHROW_NCX,
 /* >> memrchr(3)
  * Descendingly search for `needle', starting at `haystack + n_bytes'.
  * Return `NULL' if `needle' wasn't found. */
-#define __libc_core_memrchr (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(memrchr))
+#define __libc_core_memrchr __NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(memrchr)
 #endif /* !__CRT_HAVE_memrchr */
 #if defined(__CRT_HAVE_memmem0) && defined(__USE_MEMMEM_EMPTY_NEEDLE_NULL)
 #include <hybrid/typecore.h>
@@ -217,7 +217,7 @@ __CREDIRECT(__ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1, 3)),void *,__NOTHROW_N
  * #else // _MEMMEM_EMPTY_NEEDLE_NULL_SOURCE
  * When `needlelen' is ZERO(0), re-return `haystack' unconditionally.
  * #endif // !_MEMMEM_EMPTY_NEEDLE_NULL_SOURCE */
-#define __libc_core_memmem (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(memmem))
+#define __libc_core_memmem __NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(memmem)
 #endif /* !... */
 #ifdef __CRT_HAVE_mempcpy
 #include <hybrid/typecore.h>
@@ -233,7 +233,7 @@ __CREDIRECT(__ATTR_LEAF __ATTR_RETNONNULL __ATTR_NONNULL((1, 2)),void *,__NOTHRO
 #include <libc/local/string/mempcpy.h>
 /* >> mempcpy(3)
  * Same as `memcpy', but return `dst + n_bytes', rather than `dst' */
-#define __libc_core_mempcpy (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(mempcpy))
+#define __libc_core_mempcpy __NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(mempcpy)
 #endif /* !... */
 #ifdef __CRT_HAVE_bzero
 #include <hybrid/typecore.h>
@@ -246,35 +246,35 @@ __CREDIRECT_VOID(__ATTR_NONNULL((1)),__NOTHROW_NCX,__libc_core_bzero,(void *__re
 __CREDIRECT_VOID(__ATTR_NONNULL((1)),__NOTHROW_NCX,__libc_core_bzero,(void *__restrict __dst, __SIZE_TYPE__ __num_bytes),explicit_bzero,(__dst,__num_bytes))
 #else /* ... */
 #include <libc/local/string/bzero.h>
-#define __libc_core_bzero (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(bzero))
+#define __libc_core_bzero __NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(bzero)
 #endif /* !... */
 #ifdef __CRT_HAVE_bzerow
 #include <hybrid/typecore.h>
 __CREDIRECT_VOID(__ATTR_LEAF __ATTR_NONNULL((1)),__NOTHROW_NCX,__libc_core_bzerow,(void *__restrict __dst, __SIZE_TYPE__ __num_words),bzerow,(__dst,__num_words))
 #else /* __CRT_HAVE_bzerow */
 #include <libc/local/string/bzerow.h>
-#define __libc_core_bzerow (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(bzerow))
+#define __libc_core_bzerow __NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(bzerow)
 #endif /* !__CRT_HAVE_bzerow */
 #ifdef __CRT_HAVE_bzerol
 #include <hybrid/typecore.h>
 __CREDIRECT_VOID(__ATTR_LEAF __ATTR_NONNULL((1)),__NOTHROW_NCX,__libc_core_bzerol,(void *__restrict __dst, __SIZE_TYPE__ __num_dwords),bzerol,(__dst,__num_dwords))
 #else /* __CRT_HAVE_bzerol */
 #include <libc/local/string/bzerol.h>
-#define __libc_core_bzerol (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(bzerol))
+#define __libc_core_bzerol __NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(bzerol)
 #endif /* !__CRT_HAVE_bzerol */
 #ifdef __CRT_HAVE_bzeroq
 #include <hybrid/typecore.h>
 __CREDIRECT_VOID(__ATTR_LEAF __ATTR_NONNULL((1)),__NOTHROW_NCX,__libc_core_bzeroq,(void *__restrict __dst, __SIZE_TYPE__ __num_qwords),bzeroq,(__dst,__num_qwords))
 #else /* __CRT_HAVE_bzeroq */
 #include <libc/local/string/bzeroq.h>
-#define __libc_core_bzeroq (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(bzeroq))
+#define __libc_core_bzeroq __NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(bzeroq)
 #endif /* !__CRT_HAVE_bzeroq */
 #ifdef __CRT_HAVE_bzeroc
 #include <hybrid/typecore.h>
 __CREDIRECT_VOID(__ATTR_LEAF __ATTR_NONNULL((1)),__NOTHROW_NCX,__libc_core_bzeroc,(void *__restrict __dst, __SIZE_TYPE__ __elem_count, __SIZE_TYPE__ __elem_size),bzeroc,(__dst,__elem_count,__elem_size))
 #else /* __CRT_HAVE_bzeroc */
 #include <libc/local/string/bzeroc.h>
-#define __libc_core_bzeroc (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(bzeroc))
+#define __libc_core_bzeroc __NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(bzeroc)
 #endif /* !__CRT_HAVE_bzeroc */
 #ifdef __CRT_HAVE_memcpyw
 #include <hybrid/typecore.h>
@@ -291,7 +291,7 @@ __COMPILER_REDIRECT(__LIBC,__ATTR_LEAF __ATTR_RETNONNULL __ATTR_NONNULL((1, 2)),
 #else /* ... */
 #include <libc/local/string/memcpyw.h>
 /* Copy memory between non-overlapping memory blocks. */
-#define __libc_core_memcpyw (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(memcpyw))
+#define __libc_core_memcpyw __NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(memcpyw)
 #endif /* !... */
 #ifdef __CRT_HAVE_mempcpyw
 #include <hybrid/typecore.h>
@@ -308,7 +308,7 @@ __COMPILER_REDIRECT(__LIBC,__ATTR_LEAF __ATTR_RETNONNULL __ATTR_NONNULL((1, 2)),
 #else /* ... */
 #include <libc/local/string/mempcpyw.h>
 /* Same as `memcpyw', but return `dst + N_WORDS', rather than `dst' */
-#define __libc_core_mempcpyw (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(mempcpyw))
+#define __libc_core_mempcpyw __NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(mempcpyw)
 #endif /* !... */
 #ifdef __CRT_HAVE_memcpyl
 #include <hybrid/typecore.h>
@@ -325,7 +325,7 @@ __COMPILER_REDIRECT(__LIBC,__ATTR_LEAF __ATTR_RETNONNULL __ATTR_NONNULL((1, 2)),
 #else /* ... */
 #include <libc/local/string/memcpyl.h>
 /* Copy memory between non-overlapping memory blocks. */
-#define __libc_core_memcpyl (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(memcpyl))
+#define __libc_core_memcpyl __NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(memcpyl)
 #endif /* !... */
 #ifdef __CRT_HAVE_mempcpyl
 #include <hybrid/typecore.h>
@@ -342,7 +342,7 @@ __COMPILER_REDIRECT(__LIBC,__ATTR_LEAF __ATTR_RETNONNULL __ATTR_NONNULL((1, 2)),
 #else /* ... */
 #include <libc/local/string/mempcpyl.h>
 /* Same as `memcpyl', but return `dst + N_DWORDS', rather than `dst' */
-#define __libc_core_mempcpyl (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(mempcpyl))
+#define __libc_core_mempcpyl __NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(mempcpyl)
 #endif /* !... */
 #ifdef __CRT_HAVE_memmovew
 #include <hybrid/typecore.h>
@@ -359,7 +359,7 @@ __COMPILER_REDIRECT(__LIBC,__ATTR_LEAF __ATTR_RETNONNULL __ATTR_NONNULL((1, 2)),
 #else /* ... */
 #include <libc/local/string/memmovew.h>
 /* Move memory between potentially overlapping memory blocks. */
-#define __libc_core_memmovew (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(memmovew))
+#define __libc_core_memmovew __NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(memmovew)
 #endif /* !... */
 #ifdef __CRT_HAVE_mempmovew
 #include <hybrid/typecore.h>
@@ -376,7 +376,7 @@ __COMPILER_REDIRECT(__LIBC,__ATTR_LEAF __ATTR_RETNONNULL __ATTR_NONNULL((1, 2)),
 #else /* ... */
 #include <libc/local/string/mempmovew.h>
 /* Same as `memmovew', but return `dst + N_WORDS', rather than `dst' */
-#define __libc_core_mempmovew (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(mempmovew))
+#define __libc_core_mempmovew __NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(mempmovew)
 #endif /* !... */
 #ifdef __CRT_HAVE_memmovel
 #include <hybrid/typecore.h>
@@ -393,7 +393,7 @@ __COMPILER_REDIRECT(__LIBC,__ATTR_LEAF __ATTR_RETNONNULL __ATTR_NONNULL((1, 2)),
 #else /* ... */
 #include <libc/local/string/memmovel.h>
 /* Move memory between potentially overlapping memory blocks. */
-#define __libc_core_memmovel (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(memmovel))
+#define __libc_core_memmovel __NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(memmovel)
 #endif /* !... */
 #ifdef __CRT_HAVE_mempmovel
 #include <hybrid/typecore.h>
@@ -410,7 +410,7 @@ __COMPILER_REDIRECT(__LIBC,__ATTR_LEAF __ATTR_RETNONNULL __ATTR_NONNULL((1, 2)),
 #else /* ... */
 #include <libc/local/string/mempmovel.h>
 /* Same as `memmovew', but return `dst + N_DWORDS', rather than `dst' */
-#define __libc_core_mempmovel (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(mempmovel))
+#define __libc_core_mempmovel __NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(mempmovel)
 #endif /* !... */
 #ifdef __CRT_HAVE_memmoveupw
 #include <hybrid/typecore.h>
@@ -431,7 +431,7 @@ __COMPILER_REDIRECT(__LIBC,__ATTR_LEAF __ATTR_RETNONNULL __ATTR_NONNULL((1, 2)),
 #else /* ... */
 #include <libc/local/string/memmoveupw.h>
 /* Move memory between potentially overlapping memory blocks. (assumes that `dst >= src || !N_WORDS') */
-#define __libc_core_memmoveupw (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(memmoveupw))
+#define __libc_core_memmoveupw __NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(memmoveupw)
 #endif /* !... */
 #ifdef __CRT_HAVE_memmovedownw
 #include <hybrid/typecore.h>
@@ -452,7 +452,7 @@ __COMPILER_REDIRECT(__LIBC,__ATTR_LEAF __ATTR_RETNONNULL __ATTR_NONNULL((1, 2)),
 #else /* ... */
 #include <libc/local/string/memmovedownw.h>
 /* Move memory between potentially overlapping memory blocks. (assumes that `dst <= src || !N_WORDS') */
-#define __libc_core_memmovedownw (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(memmovedownw))
+#define __libc_core_memmovedownw __NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(memmovedownw)
 #endif /* !... */
 #ifdef __CRT_HAVE_mempmoveupw
 #include <hybrid/typecore.h>
@@ -473,7 +473,7 @@ __COMPILER_REDIRECT(__LIBC,__ATTR_LEAF __ATTR_RETNONNULL __ATTR_NONNULL((1, 2)),
 #else /* ... */
 #include <libc/local/string/mempmoveupw.h>
 /* Same as `memmovew', but return `dst + N_WORDS', rather than `dst' (assumes that `dst >= src || !N_WORDS') */
-#define __libc_core_mempmoveupw (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(mempmoveupw))
+#define __libc_core_mempmoveupw __NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(mempmoveupw)
 #endif /* !... */
 #ifdef __CRT_HAVE_mempmovedownw
 #include <hybrid/typecore.h>
@@ -494,7 +494,7 @@ __COMPILER_REDIRECT(__LIBC,__ATTR_LEAF __ATTR_RETNONNULL __ATTR_NONNULL((1, 2)),
 #else /* ... */
 #include <libc/local/string/mempmovedownw.h>
 /* Same as `memmovew', but return `dst + N_WORDS', rather than `dst' (assumes that `dst <= src || !N_WORDS') */
-#define __libc_core_mempmovedownw (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(mempmovedownw))
+#define __libc_core_mempmovedownw __NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(mempmovedownw)
 #endif /* !... */
 #ifdef __CRT_HAVE_memmoveupl
 #include <hybrid/typecore.h>
@@ -515,7 +515,7 @@ __COMPILER_REDIRECT(__LIBC,__ATTR_LEAF __ATTR_RETNONNULL __ATTR_NONNULL((1, 2)),
 #else /* ... */
 #include <libc/local/string/memmoveupl.h>
 /* Move memory between potentially overlapping memory blocks. (assumes that `dst >= src || !N_DWORDS') */
-#define __libc_core_memmoveupl (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(memmoveupl))
+#define __libc_core_memmoveupl __NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(memmoveupl)
 #endif /* !... */
 #ifdef __CRT_HAVE_memmovedownl
 #include <hybrid/typecore.h>
@@ -536,7 +536,7 @@ __COMPILER_REDIRECT(__LIBC,__ATTR_LEAF __ATTR_RETNONNULL __ATTR_NONNULL((1, 2)),
 #else /* ... */
 #include <libc/local/string/memmovedownl.h>
 /* Move memory between potentially overlapping memory blocks. (assumes that `dst <= src || !N_DWORDS') */
-#define __libc_core_memmovedownl (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(memmovedownl))
+#define __libc_core_memmovedownl __NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(memmovedownl)
 #endif /* !... */
 #ifdef __CRT_HAVE_mempmoveupl
 #include <hybrid/typecore.h>
@@ -557,7 +557,7 @@ __COMPILER_REDIRECT(__LIBC,__ATTR_LEAF __ATTR_RETNONNULL __ATTR_NONNULL((1, 2)),
 #else /* ... */
 #include <libc/local/string/mempmoveupl.h>
 /* Same as `memmovew', but return `dst + N_DWORDS', rather than `dst' (assumes that `dst >= src || !N_DWORDS') */
-#define __libc_core_mempmoveupl (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(mempmoveupl))
+#define __libc_core_mempmoveupl __NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(mempmoveupl)
 #endif /* !... */
 #ifdef __CRT_HAVE_mempmovedownl
 #include <hybrid/typecore.h>
@@ -578,7 +578,7 @@ __COMPILER_REDIRECT(__LIBC,__ATTR_LEAF __ATTR_RETNONNULL __ATTR_NONNULL((1, 2)),
 #else /* ... */
 #include <libc/local/string/mempmovedownl.h>
 /* Same as `memmovew', but return `dst + N_DWORDS', rather than `dst' (assumes that `dst <= src || !N_DWORDS') */
-#define __libc_core_mempmovedownl (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(mempmovedownl))
+#define __libc_core_mempmovedownl __NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(mempmovedownl)
 #endif /* !... */
 #ifdef __CRT_HAVE_memsetw
 #include <hybrid/typecore.h>
@@ -595,7 +595,7 @@ __COMPILER_REDIRECT(__LIBC,__ATTR_LEAF __ATTR_RETNONNULL __ATTR_NONNULL((1)),__U
 #else /* ... */
 #include <libc/local/string/memsetw.h>
 /* Fill memory with a given word */
-#define __libc_core_memsetw (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(memsetw))
+#define __libc_core_memsetw __NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(memsetw)
 #endif /* !... */
 #ifdef __CRT_HAVE_mempsetw
 #include <hybrid/typecore.h>
@@ -612,7 +612,7 @@ __COMPILER_REDIRECT(__LIBC,__ATTR_LEAF __ATTR_RETNONNULL __ATTR_NONNULL((1)),__U
 #else /* ... */
 #include <libc/local/string/mempsetw.h>
 /* Same as `memsetw', but return `dst + N_WORDS', rather than `dst' */
-#define __libc_core_mempsetw (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(mempsetw))
+#define __libc_core_mempsetw __NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(mempsetw)
 #endif /* !... */
 #ifdef __CRT_HAVE_memsetl
 #include <hybrid/typecore.h>
@@ -629,7 +629,7 @@ __COMPILER_REDIRECT(__LIBC,__ATTR_LEAF __ATTR_RETNONNULL __ATTR_NONNULL((1)),__U
 #else /* ... */
 #include <libc/local/string/memsetl.h>
 /* Fill memory with a given dword */
-#define __libc_core_memsetl (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(memsetl))
+#define __libc_core_memsetl __NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(memsetl)
 #endif /* !... */
 #ifdef __CRT_HAVE_mempsetl
 #include <hybrid/typecore.h>
@@ -646,7 +646,7 @@ __COMPILER_REDIRECT(__LIBC,__ATTR_LEAF __ATTR_RETNONNULL __ATTR_NONNULL((1)),__U
 #else /* ... */
 #include <libc/local/string/mempsetl.h>
 /* Same as `memsetl', but return `dst + N_DWORDS', rather than `dst' */
-#define __libc_core_mempsetl (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(mempsetl))
+#define __libc_core_mempsetl __NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(mempsetl)
 #endif /* !... */
 #ifdef __CRT_HAVE_memcmpw
 #include <hybrid/typecore.h>
@@ -663,7 +663,7 @@ __COMPILER_REDIRECT(__LIBC,__ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1, 2)),__I
 #else /* ... */
 #include <libc/local/string/memcmpw.h>
 /* Compare memory buffers and return the difference of the first non-matching word */
-#define __libc_core_memcmpw (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(memcmpw))
+#define __libc_core_memcmpw __NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(memcmpw)
 #endif /* !... */
 #ifdef __CRT_HAVE_memcmpl
 #include <hybrid/typecore.h>
@@ -680,7 +680,7 @@ __COMPILER_REDIRECT(__LIBC,__ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1, 2)),__I
 #else /* ... */
 #include <libc/local/string/memcmpl.h>
 /* Compare memory buffers and return the difference of the first non-matching dword */
-#define __libc_core_memcmpl (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(memcmpl))
+#define __libc_core_memcmpl __NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(memcmpl)
 #endif /* !... */
 #ifdef __CRT_HAVE_memchrw
 #include <hybrid/typecore.h>
@@ -697,7 +697,7 @@ __COMPILER_REDIRECT(__LIBC,__ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1)),__UINT
 #else /* ... */
 #include <libc/local/string/memchrw.h>
 /* Ascendingly search for `needle', starting at `haystack'. - Return `NULL' if `needle' wasn't found. */
-#define __libc_core_memchrw (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(memchrw))
+#define __libc_core_memchrw __NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(memchrw)
 #endif /* !... */
 #ifdef __CRT_HAVE_memchrl
 #include <hybrid/typecore.h>
@@ -714,7 +714,7 @@ __COMPILER_REDIRECT(__LIBC,__ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1)),__UINT
 #else /* ... */
 #include <libc/local/string/memchrl.h>
 /* Ascendingly search for `needle', starting at `haystack'. - Return `NULL' if `needle' wasn't found. */
-#define __libc_core_memchrl (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(memchrl))
+#define __libc_core_memchrl __NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(memchrl)
 #endif /* !... */
 #ifdef __CRT_HAVE_memrchrw
 #include <hybrid/typecore.h>
@@ -723,7 +723,7 @@ __CREDIRECT(__ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1)),__UINT16_TYPE__ *,__N
 #else /* __CRT_HAVE_memrchrw */
 #include <libc/local/string/memrchrw.h>
 /* Descendingly search for `needle', starting at `haystack + N_WORDS * 2'. - Return `NULL' if `needle' wasn't found. */
-#define __libc_core_memrchrw (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(memrchrw))
+#define __libc_core_memrchrw __NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(memrchrw)
 #endif /* !__CRT_HAVE_memrchrw */
 #ifdef __CRT_HAVE_memrchrl
 #include <hybrid/typecore.h>
@@ -732,7 +732,7 @@ __CREDIRECT(__ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1)),__UINT32_TYPE__ *,__N
 #else /* __CRT_HAVE_memrchrl */
 #include <libc/local/string/memrchrl.h>
 /* Descendingly search for `needle', starting at `haystack + N_DWORDS * 4'. - Return `NULL' if `needle' wasn't found. */
-#define __libc_core_memrchrl (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(memrchrl))
+#define __libc_core_memrchrl __NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(memrchrl)
 #endif /* !__CRT_HAVE_memrchrl */
 #ifdef __CRT_HAVE_memendw
 #include <hybrid/typecore.h>
@@ -741,7 +741,7 @@ __CREDIRECT(__ATTR_PURE __ATTR_RETNONNULL __ATTR_WUNUSED __ATTR_NONNULL((1)),__U
 #else /* __CRT_HAVE_memendw */
 #include <libc/local/string/memendw.h>
 /* Same as `memchrw', but return `haystack + N_WORDS * 2', rather than `NULL' if `needle' wasn't found. */
-#define __libc_core_memendw (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(memendw))
+#define __libc_core_memendw __NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(memendw)
 #endif /* !__CRT_HAVE_memendw */
 #ifdef __CRT_HAVE_memendl
 #include <hybrid/typecore.h>
@@ -750,7 +750,7 @@ __CREDIRECT(__ATTR_PURE __ATTR_RETNONNULL __ATTR_WUNUSED __ATTR_NONNULL((1)),__U
 #else /* __CRT_HAVE_memendl */
 #include <libc/local/string/memendl.h>
 /* Same as `memchrl', but return `haystack + N_DWORDS * 4', rather than `NULL' if `needle' wasn't found. */
-#define __libc_core_memendl (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(memendl))
+#define __libc_core_memendl __NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(memendl)
 #endif /* !__CRT_HAVE_memendl */
 #ifdef __CRT_HAVE_memrendw
 #include <hybrid/typecore.h>
@@ -759,7 +759,7 @@ __CREDIRECT(__ATTR_PURE __ATTR_RETNONNULL __ATTR_WUNUSED __ATTR_NONNULL((1)),__U
 #else /* __CRT_HAVE_memrendw */
 #include <libc/local/string/memrendw.h>
 /* Same as `memrchrw', but return `haystack - 2', rather than `NULL' if `needle' wasn't found. */
-#define __libc_core_memrendw (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(memrendw))
+#define __libc_core_memrendw __NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(memrendw)
 #endif /* !__CRT_HAVE_memrendw */
 #ifdef __CRT_HAVE_memrendl
 #include <hybrid/typecore.h>
@@ -768,7 +768,7 @@ __CREDIRECT(__ATTR_PURE __ATTR_RETNONNULL __ATTR_WUNUSED __ATTR_NONNULL((1)),__U
 #else /* __CRT_HAVE_memrendl */
 #include <libc/local/string/memrendl.h>
 /* Same as `memrchrl', but return `haystack - 4', rather than `NULL' if `needle' wasn't found. */
-#define __libc_core_memrendl (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(memrendl))
+#define __libc_core_memrendl __NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(memrendl)
 #endif /* !__CRT_HAVE_memrendl */
 #ifdef __CRT_HAVE_memcpyq
 #include <hybrid/typecore.h>
@@ -777,7 +777,7 @@ __CREDIRECT(__ATTR_LEAF __ATTR_RETNONNULL __ATTR_NONNULL((1, 2)),__UINT64_TYPE__
 #else /* __CRT_HAVE_memcpyq */
 #include <libc/local/string/memcpyq.h>
 /* Copy memory between non-overlapping memory blocks. */
-#define __libc_core_memcpyq (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(memcpyq))
+#define __libc_core_memcpyq __NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(memcpyq)
 #endif /* !__CRT_HAVE_memcpyq */
 #ifdef __CRT_HAVE_mempcpyq
 #include <hybrid/typecore.h>
@@ -786,7 +786,7 @@ __CREDIRECT(__ATTR_LEAF __ATTR_RETNONNULL __ATTR_NONNULL((1, 2)),__UINT64_TYPE__
 #else /* __CRT_HAVE_mempcpyq */
 #include <libc/local/string/mempcpyq.h>
 /* Same as `memcpyq', but return `dst + n_qwords', rather than `dst' */
-#define __libc_core_mempcpyq (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(mempcpyq))
+#define __libc_core_mempcpyq __NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(mempcpyq)
 #endif /* !__CRT_HAVE_mempcpyq */
 #ifdef __CRT_HAVE_memmoveq
 #include <hybrid/typecore.h>
@@ -795,7 +795,7 @@ __CREDIRECT(__ATTR_LEAF __ATTR_RETNONNULL __ATTR_NONNULL((1, 2)),__UINT64_TYPE__
 #else /* __CRT_HAVE_memmoveq */
 #include <libc/local/string/memmoveq.h>
 /* Move memory between potentially overlapping memory blocks. */
-#define __libc_core_memmoveq (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(memmoveq))
+#define __libc_core_memmoveq __NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(memmoveq)
 #endif /* !__CRT_HAVE_memmoveq */
 #ifdef __CRT_HAVE_mempmoveq
 #include <hybrid/typecore.h>
@@ -804,7 +804,7 @@ __CREDIRECT(__ATTR_LEAF __ATTR_RETNONNULL __ATTR_NONNULL((1, 2)),__UINT64_TYPE__
 #else /* __CRT_HAVE_mempmoveq */
 #include <libc/local/string/mempmoveq.h>
 /* Same as `memmovew', but return `dst + n_qwords', rather than `dst' */
-#define __libc_core_mempmoveq (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(mempmoveq))
+#define __libc_core_mempmoveq __NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(mempmoveq)
 #endif /* !__CRT_HAVE_mempmoveq */
 #ifdef __CRT_HAVE_memmoveupq
 #include <hybrid/typecore.h>
@@ -817,7 +817,7 @@ __CREDIRECT(__ATTR_LEAF __ATTR_RETNONNULL __ATTR_NONNULL((1, 2)),__UINT64_TYPE__
 #else /* ... */
 #include <libc/local/string/memmoveupq.h>
 /* Move memory between potentially overlapping memory blocks. (assumes that `dst >= src || !n_qwords') */
-#define __libc_core_memmoveupq (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(memmoveupq))
+#define __libc_core_memmoveupq __NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(memmoveupq)
 #endif /* !... */
 #ifdef __CRT_HAVE_memmovedownq
 #include <hybrid/typecore.h>
@@ -830,7 +830,7 @@ __CREDIRECT(__ATTR_LEAF __ATTR_RETNONNULL __ATTR_NONNULL((1, 2)),__UINT64_TYPE__
 #else /* ... */
 #include <libc/local/string/memmovedownq.h>
 /* Move memory between potentially overlapping memory blocks. (assumes that `dst <= src || !n_qwords') */
-#define __libc_core_memmovedownq (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(memmovedownq))
+#define __libc_core_memmovedownq __NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(memmovedownq)
 #endif /* !... */
 #ifdef __CRT_HAVE_mempmoveupq
 #include <hybrid/typecore.h>
@@ -843,7 +843,7 @@ __CREDIRECT(__ATTR_LEAF __ATTR_RETNONNULL __ATTR_NONNULL((1, 2)),__UINT64_TYPE__
 #else /* ... */
 #include <libc/local/string/mempmoveupq.h>
 /* Same as `memmovew', but return `dst + n_qwords', rather than `dst' (assumes that `dst >= src || !n_qwords') */
-#define __libc_core_mempmoveupq (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(mempmoveupq))
+#define __libc_core_mempmoveupq __NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(mempmoveupq)
 #endif /* !... */
 #ifdef __CRT_HAVE_mempmovedownq
 #include <hybrid/typecore.h>
@@ -856,7 +856,7 @@ __CREDIRECT(__ATTR_LEAF __ATTR_RETNONNULL __ATTR_NONNULL((1, 2)),__UINT64_TYPE__
 #else /* ... */
 #include <libc/local/string/mempmovedownq.h>
 /* Same as `memmovew', but return `dst + n_qwords', rather than `dst' (assumes that `dst <= src || !n_qwords') */
-#define __libc_core_mempmovedownq (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(mempmovedownq))
+#define __libc_core_mempmovedownq __NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(mempmovedownq)
 #endif /* !... */
 #ifdef __CRT_HAVE_memsetq
 #include <hybrid/typecore.h>
@@ -865,7 +865,7 @@ __CREDIRECT(__ATTR_LEAF __ATTR_RETNONNULL __ATTR_NONNULL((1)),__UINT64_TYPE__ *,
 #else /* __CRT_HAVE_memsetq */
 #include <libc/local/string/memsetq.h>
 /* Fill memory with a given qword */
-#define __libc_core_memsetq (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(memsetq))
+#define __libc_core_memsetq __NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(memsetq)
 #endif /* !__CRT_HAVE_memsetq */
 #ifdef __CRT_HAVE_mempsetq
 #include <hybrid/typecore.h>
@@ -874,7 +874,7 @@ __CREDIRECT(__ATTR_LEAF __ATTR_RETNONNULL __ATTR_NONNULL((1)),__UINT64_TYPE__ *,
 #else /* __CRT_HAVE_mempsetq */
 #include <libc/local/string/mempsetq.h>
 /* Same as `memsetq', but return `dst + n_qwords', rather than `dst' */
-#define __libc_core_mempsetq (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(mempsetq))
+#define __libc_core_mempsetq __NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(mempsetq)
 #endif /* !__CRT_HAVE_mempsetq */
 #ifdef __CRT_HAVE_memcmpq
 #include <hybrid/typecore.h>
@@ -883,7 +883,7 @@ __CREDIRECT(__ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1, 2)),__INT64_TYPE__,__N
 #else /* __CRT_HAVE_memcmpq */
 #include <libc/local/string/memcmpq.h>
 /* Compare memory buffers and return the difference of the first non-matching qword */
-#define __libc_core_memcmpq (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(memcmpq))
+#define __libc_core_memcmpq __NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(memcmpq)
 #endif /* !__CRT_HAVE_memcmpq */
 #ifdef __CRT_HAVE_memchrq
 #include <hybrid/typecore.h>
@@ -892,7 +892,7 @@ __CREDIRECT(__ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1)),__UINT64_TYPE__ *,__N
 #else /* __CRT_HAVE_memchrq */
 #include <libc/local/string/memchrq.h>
 /* Ascendingly search for `needle', starting at `haystack'. - Return `NULL' if `needle' wasn't found. */
-#define __libc_core_memchrq (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(memchrq))
+#define __libc_core_memchrq __NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(memchrq)
 #endif /* !__CRT_HAVE_memchrq */
 #ifdef __CRT_HAVE_memrchrq
 #include <hybrid/typecore.h>
@@ -901,7 +901,7 @@ __CREDIRECT(__ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1)),__UINT64_TYPE__ *,__N
 #else /* __CRT_HAVE_memrchrq */
 #include <libc/local/string/memrchrq.h>
 /* Descendingly search for `needle', starting at `haystack+n_qwords'. - Return `NULL' if `needle' wasn't found. */
-#define __libc_core_memrchrq (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(memrchrq))
+#define __libc_core_memrchrq __NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(memrchrq)
 #endif /* !__CRT_HAVE_memrchrq */
 #ifdef __CRT_HAVE_memendq
 #include <hybrid/typecore.h>
@@ -910,7 +910,7 @@ __CREDIRECT(__ATTR_PURE __ATTR_RETNONNULL __ATTR_WUNUSED __ATTR_NONNULL((1)),__U
 #else /* __CRT_HAVE_memendq */
 #include <libc/local/string/memendq.h>
 /* Same as `memchrq', but return `haystack+n_qwords', rather than `NULL' if `needle' wasn't found. */
-#define __libc_core_memendq (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(memendq))
+#define __libc_core_memendq __NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(memendq)
 #endif /* !__CRT_HAVE_memendq */
 #ifdef __CRT_HAVE_memrendq
 #include <hybrid/typecore.h>
@@ -919,7 +919,7 @@ __CREDIRECT(__ATTR_PURE __ATTR_RETNONNULL __ATTR_WUNUSED __ATTR_NONNULL((1)),__U
 #else /* __CRT_HAVE_memrendq */
 #include <libc/local/string/memrendq.h>
 /* Same as `memrchrq', but return `haystack - 8', rather than `NULL' if `needle' wasn't found. */
-#define __libc_core_memrendq (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(memrendq))
+#define __libc_core_memrendq __NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(memrendq)
 #endif /* !__CRT_HAVE_memrendq */
 #ifdef __CRT_HAVE_memlenq
 #include <hybrid/typecore.h>
@@ -930,7 +930,7 @@ __CREDIRECT(__ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1)),__SIZE_TYPE__,__NOTHR
 #include <libc/local/string/memlenq.h>
 /* Same as `memendq', but return the offset from `haystack', rather than the actual address.
  * Returns `n_qwords' if the given `needle' wasn't found */
-#define __libc_core_memlenq (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(memlenq))
+#define __libc_core_memlenq __NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(memlenq)
 #endif /* !__CRT_HAVE_memlenq */
 #ifdef __CRT_HAVE_memrlenq
 #include <hybrid/typecore.h>
@@ -941,7 +941,7 @@ __CREDIRECT(__ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1)),__SIZE_TYPE__,__NOTHR
 #include <libc/local/string/memrlenq.h>
 /* Same as `memrendq', but return the offset from `haystack', rather than the actual address.
  * Returns `(size_t)-1 / 8' if the given `needle' wasn't found */
-#define __libc_core_memrlenq (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(memrlenq))
+#define __libc_core_memrlenq __NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(memrlenq)
 #endif /* !__CRT_HAVE_memrlenq */
 #ifdef __CRT_HAVE_rawmemlenq
 #include <hybrid/typecore.h>
@@ -950,7 +950,7 @@ __CREDIRECT(__ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1)),__SIZE_TYPE__,__NOTHR
 #else /* __CRT_HAVE_rawmemlenq */
 #include <libc/local/string/rawmemlenq.h>
 /* Same as `rawmemchrq', but return the offset from `haystack', rather than the actual address. */
-#define __libc_core_rawmemlenq (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(rawmemlenq))
+#define __libc_core_rawmemlenq __NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(rawmemlenq)
 #endif /* !__CRT_HAVE_rawmemlenq */
 #ifdef __CRT_HAVE_rawmemrlenq
 #include <hybrid/typecore.h>
@@ -959,7 +959,7 @@ __CREDIRECT(__ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1)),__SIZE_TYPE__,__NOTHR
 #else /* __CRT_HAVE_rawmemrlenq */
 #include <libc/local/string/rawmemrlenq.h>
 /* Same as `rawmemrchrq', but return the offset from `haystack', rather than the actual address. */
-#define __libc_core_rawmemrlenq (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(rawmemrlenq))
+#define __libc_core_rawmemrlenq __NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(rawmemrlenq)
 #endif /* !__CRT_HAVE_rawmemrlenq */
 #ifdef __CRT_HAVE_memmoveup
 #include <hybrid/typecore.h>
@@ -975,7 +975,7 @@ __CREDIRECT(__ATTR_LEAF __ATTR_RETNONNULL __ATTR_NONNULL((1, 2)),void *,__NOTHRO
 #include <libc/local/string/memmoveup.h>
 /* Move memory between potentially overlapping memory blocks (assumes that `dst >= src || !n_bytes')
  * @return: * : Always re-returns `dst' */
-#define __libc_core_memmoveup (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(memmoveup))
+#define __libc_core_memmoveup __NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(memmoveup)
 #endif /* !... */
 #ifdef __CRT_HAVE_memmovedown
 #include <hybrid/typecore.h>
@@ -991,7 +991,7 @@ __CREDIRECT(__ATTR_LEAF __ATTR_RETNONNULL __ATTR_NONNULL((1, 2)),void *,__NOTHRO
 #include <libc/local/string/memmovedown.h>
 /* Move memory between potentially overlapping memory blocks (assumes that `dst <= src || !n_bytes')
  * @return: * : Always re-returns `dst' */
-#define __libc_core_memmovedown (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(memmovedown))
+#define __libc_core_memmovedown __NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(memmovedown)
 #endif /* !... */
 #ifdef __CRT_HAVE_memcpyc
 #include <hybrid/typecore.h>
@@ -1002,7 +1002,7 @@ __CREDIRECT(__ATTR_LEAF __ATTR_RETNONNULL __ATTR_NONNULL((1, 2)),void *,__NOTHRO
 #include <libc/local/string/memcpyc.h>
 /* Copy memory between non-overlapping memory blocks.
  * @return: * : Always re-returns `dst' */
-#define __libc_core_memcpyc (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(memcpyc))
+#define __libc_core_memcpyc __NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(memcpyc)
 #endif /* !__CRT_HAVE_memcpyc */
 #ifdef __CRT_HAVE_mempcpyc
 #include <hybrid/typecore.h>
@@ -1011,7 +1011,7 @@ __CREDIRECT(__ATTR_LEAF __ATTR_RETNONNULL __ATTR_NONNULL((1, 2)),void *,__NOTHRO
 #else /* __CRT_HAVE_mempcpyc */
 #include <libc/local/string/mempcpyc.h>
 /* Same as `memcpyc', but return `dst + (ELEM_COUNT * ELEM_SIZE)', rather than `dst' */
-#define __libc_core_mempcpyc (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(mempcpyc))
+#define __libc_core_mempcpyc __NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(mempcpyc)
 #endif /* !__CRT_HAVE_mempcpyc */
 #ifdef __CRT_HAVE_memmovec
 #include <hybrid/typecore.h>
@@ -1022,7 +1022,7 @@ __CREDIRECT(__ATTR_LEAF __ATTR_RETNONNULL __ATTR_NONNULL((1, 2)),void *,__NOTHRO
 #include <libc/local/string/memmovec.h>
 /* Move memory between potentially overlapping memory blocks
  * @return: * : Always re-returns `dst' */
-#define __libc_core_memmovec (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(memmovec))
+#define __libc_core_memmovec __NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(memmovec)
 #endif /* !__CRT_HAVE_memmovec */
 #ifdef __CRT_HAVE_mempmovec
 #include <hybrid/typecore.h>
@@ -1031,7 +1031,7 @@ __CREDIRECT(__ATTR_LEAF __ATTR_RETNONNULL __ATTR_NONNULL((1, 2)),void *,__NOTHRO
 #else /* __CRT_HAVE_mempmovec */
 #include <libc/local/string/mempmovec.h>
 /* Same as `memmovec', but return `dst + (ELEM_COUNT * ELEM_SIZE)', rather than `dst' */
-#define __libc_core_mempmovec (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(mempmovec))
+#define __libc_core_mempmovec __NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(mempmovec)
 #endif /* !__CRT_HAVE_mempmovec */
 #ifdef __CRT_HAVE_memmoveupc
 #include <hybrid/typecore.h>
@@ -1042,7 +1042,7 @@ __CREDIRECT(__ATTR_LEAF __ATTR_RETNONNULL __ATTR_NONNULL((1, 2)),void *,__NOTHRO
 #include <libc/local/string/memmoveupc.h>
 /* Move memory between potentially overlapping memory blocks (assumes that `dst >= src || !ELEM_COUNT || !ELEM_SIZE')
  * @return: * : Always re-returns `dst' */
-#define __libc_core_memmoveupc (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(memmoveupc))
+#define __libc_core_memmoveupc __NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(memmoveupc)
 #endif /* !__CRT_HAVE_memmoveupc */
 #ifdef __CRT_HAVE_mempmoveupc
 #include <hybrid/typecore.h>
@@ -1053,7 +1053,7 @@ __CREDIRECT(__ATTR_LEAF __ATTR_RETNONNULL __ATTR_NONNULL((1, 2)),void *,__NOTHRO
 #include <libc/local/string/mempmoveupc.h>
 /* Same   as   `memmoveupc',  but   return  `dst + (ELEM_COUNT * ELEM_SIZE)',
  * rather than `dst' (assumes that `dst >= src || !ELEM_COUNT || !ELEM_SIZE') */
-#define __libc_core_mempmoveupc (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(mempmoveupc))
+#define __libc_core_mempmoveupc __NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(mempmoveupc)
 #endif /* !__CRT_HAVE_mempmoveupc */
 #ifdef __CRT_HAVE_memmovedownc
 #include <hybrid/typecore.h>
@@ -1064,7 +1064,7 @@ __CREDIRECT(__ATTR_LEAF __ATTR_RETNONNULL __ATTR_NONNULL((1, 2)),void *,__NOTHRO
 #include <libc/local/string/memmovedownc.h>
 /* Move memory between potentially overlapping memory blocks (assumes that `dst <= src || !ELEM_COUNT || !ELEM_SIZE')
  * @return: * : Always re-returns `dst' */
-#define __libc_core_memmovedownc (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(memmovedownc))
+#define __libc_core_memmovedownc __NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(memmovedownc)
 #endif /* !__CRT_HAVE_memmovedownc */
 #ifdef __CRT_HAVE_mempmovedownc
 #include <hybrid/typecore.h>
@@ -1073,7 +1073,7 @@ __CREDIRECT(__ATTR_LEAF __ATTR_RETNONNULL __ATTR_NONNULL((1, 2)),void *,__NOTHRO
 #else /* __CRT_HAVE_mempmovedownc */
 #include <libc/local/string/mempmovedownc.h>
 /* Same as `memmovedownc', but return `dst + (ELEM_COUNT * ELEM_SIZE)', rather than `dst' (assumes that `dst <= src || !ELEM_COUNT || !ELEM_SIZE') */
-#define __libc_core_mempmovedownc (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(mempmovedownc))
+#define __libc_core_mempmovedownc __NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(mempmovedownc)
 #endif /* !__CRT_HAVE_mempmovedownc */
 #ifdef __CRT_HAVE_strend
 /* Same as `str + strlen(str)' */
@@ -1081,7 +1081,7 @@ __CREDIRECT(__ATTR_PURE __ATTR_RETNONNULL __ATTR_WUNUSED __ATTR_NONNULL((1)),cha
 #else /* __CRT_HAVE_strend */
 #include <libc/local/string/strend.h>
 /* Same as `str + strlen(str)' */
-#define __libc_core_strend (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(strend))
+#define __libc_core_strend __NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(strend)
 #endif /* !__CRT_HAVE_strend */
 #ifdef __CRT_HAVE_strnend
 #include <hybrid/typecore.h>
@@ -1090,7 +1090,7 @@ __CREDIRECT(__ATTR_PURE __ATTR_RETNONNULL __ATTR_WUNUSED __ATTR_NONNULL((1)),cha
 #else /* __CRT_HAVE_strnend */
 #include <libc/local/string/strnend.h>
 /* Same as `str + strnlen(str, max_chars)' */
-#define __libc_core_strnend (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(strnend))
+#define __libc_core_strnend __NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(strnend)
 #endif /* !__CRT_HAVE_strnend */
 #ifdef __CRT_HAVE_mempset
 #include <hybrid/typecore.h>
@@ -1099,7 +1099,7 @@ __CREDIRECT(__ATTR_LEAF __ATTR_RETNONNULL __ATTR_NONNULL((1)),void *,__NOTHROW_N
 #else /* __CRT_HAVE_mempset */
 #include <libc/local/string/mempset.h>
 /* Same as `memset', but return `dst + n_bytes', rather than `dst' */
-#define __libc_core_mempset (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(mempset))
+#define __libc_core_mempset __NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(mempset)
 #endif /* !__CRT_HAVE_mempset */
 #ifdef __CRT_HAVE_mempmove
 #include <hybrid/typecore.h>
@@ -1108,7 +1108,7 @@ __CREDIRECT(__ATTR_LEAF __ATTR_RETNONNULL __ATTR_NONNULL((1, 2)),void *,__NOTHRO
 #else /* __CRT_HAVE_mempmove */
 #include <libc/local/string/mempmove.h>
 /* Same as `memmove', but return `dst + n_bytes', rather than `dst' */
-#define __libc_core_mempmove (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(mempmove))
+#define __libc_core_mempmove __NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(mempmove)
 #endif /* !__CRT_HAVE_mempmove */
 #ifdef __CRT_HAVE_mempmoveup
 #include <hybrid/typecore.h>
@@ -1121,7 +1121,7 @@ __CREDIRECT(__ATTR_LEAF __ATTR_RETNONNULL __ATTR_NONNULL((1, 2)),void *,__NOTHRO
 #else /* ... */
 #include <libc/local/string/mempmoveup.h>
 /* Same as `memmoveup', but return `dst + n_bytes', rather than `dst' (assumes that `dst >= src || !n_bytes') */
-#define __libc_core_mempmoveup (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(mempmoveup))
+#define __libc_core_mempmoveup __NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(mempmoveup)
 #endif /* !... */
 #ifdef __CRT_HAVE_mempmovedown
 #include <hybrid/typecore.h>
@@ -1134,7 +1134,7 @@ __CREDIRECT(__ATTR_LEAF __ATTR_RETNONNULL __ATTR_NONNULL((1, 2)),void *,__NOTHRO
 #else /* ... */
 #include <libc/local/string/mempmovedown.h>
 /* Same as `memmovedown', but return `dst + n_bytes', rather than `dst' (assumes that `dst <= src || !n_bytes') */
-#define __libc_core_mempmovedown (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(mempmovedown))
+#define __libc_core_mempmovedown __NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(mempmovedown)
 #endif /* !... */
 #ifdef __CRT_HAVE_memend
 #include <hybrid/typecore.h>
@@ -1143,7 +1143,7 @@ __CREDIRECT(__ATTR_PURE __ATTR_RETNONNULL __ATTR_WUNUSED __ATTR_NONNULL((1)),voi
 #else /* __CRT_HAVE_memend */
 #include <libc/local/string/memend.h>
 /* Same as `memchr', but return `haystack + n_bytes', rather than `NULL' if `needle' wasn't found. */
-#define __libc_core_memend (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(memend))
+#define __libc_core_memend __NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(memend)
 #endif /* !__CRT_HAVE_memend */
 #ifdef __CRT_HAVE_memrend
 #include <hybrid/typecore.h>
@@ -1152,7 +1152,7 @@ __CREDIRECT(__ATTR_PURE __ATTR_RETNONNULL __ATTR_WUNUSED __ATTR_NONNULL((1)),voi
 #else /* __CRT_HAVE_memrend */
 #include <libc/local/string/memrend.h>
 /* Same as `memrchr', but return `haystack - 1', rather than `NULL' if `needle' wasn't found. */
-#define __libc_core_memrend (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(memrend))
+#define __libc_core_memrend __NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(memrend)
 #endif /* !__CRT_HAVE_memrend */
 #ifdef __CRT_HAVE_memlen
 #include <hybrid/typecore.h>
@@ -1163,7 +1163,7 @@ __CREDIRECT(__ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1)),__SIZE_TYPE__,__NOTHR
 #include <libc/local/string/memlen.h>
 /* Same as `memend', but return the offset from `haystack', rather than the actual address.
  * Returns `n_bytes' if the given `needle' wasn't found */
-#define __libc_core_memlen (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(memlen))
+#define __libc_core_memlen __NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(memlen)
 #endif /* !__CRT_HAVE_memlen */
 #ifdef __CRT_HAVE_memrlen
 #include <hybrid/typecore.h>
@@ -1174,7 +1174,7 @@ __CREDIRECT(__ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1)),__SIZE_TYPE__,__NOTHR
 #include <libc/local/string/memrlen.h>
 /* Same as `memrend', but return the offset from `haystack', rather than the actual address.
  * Returns `(size_t)-1' if the given `needle' wasn't found */
-#define __libc_core_memrlen (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(memrlen))
+#define __libc_core_memrlen __NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(memrlen)
 #endif /* !__CRT_HAVE_memrlen */
 #if defined(__CRT_HAVE_memrmem0) && defined(__USE_MEMMEM_EMPTY_NEEDLE_NULL)
 #include <hybrid/typecore.h>
@@ -1205,7 +1205,7 @@ __CREDIRECT(__ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1, 3)),void *,__NOTHROW_N
  * #else // _MEMMEM_EMPTY_NEEDLE_NULL_SOURCE
  * When `needlelen' is ZERO(0), re-return `haystack + haystacklen' unconditionally.
  * #endif // !_MEMMEM_EMPTY_NEEDLE_NULL_SOURCE */
-#define __libc_core_memrmem (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(memrmem))
+#define __libc_core_memrmem __NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(memrmem)
 #endif /* !... */
 #ifdef __CRT_HAVE_mempatw
 #include <hybrid/typecore.h>
@@ -1214,7 +1214,7 @@ __CREDIRECT(__ATTR_LEAF __ATTR_RETNONNULL __ATTR_NONNULL((1)),void *,__NOTHROW_N
 #else /* __CRT_HAVE_mempatw */
 #include <libc/local/string/mempatw.h>
 /* Same as `memsetw', but repeat a 2-byte pattern on aligned addresses. */
-#define __libc_core_mempatw (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(mempatw))
+#define __libc_core_mempatw __NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(mempatw)
 #endif /* !__CRT_HAVE_mempatw */
 #ifdef __CRT_HAVE_mempatl
 #include <hybrid/typecore.h>
@@ -1223,7 +1223,7 @@ __CREDIRECT(__ATTR_LEAF __ATTR_RETNONNULL __ATTR_NONNULL((1)),void *,__NOTHROW_N
 #else /* __CRT_HAVE_mempatl */
 #include <libc/local/string/mempatl.h>
 /* Same as `memsetl', but repeat a 4-byte pattern on aligned addresses. */
-#define __libc_core_mempatl (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(mempatl))
+#define __libc_core_mempatl __NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(mempatl)
 #endif /* !__CRT_HAVE_mempatl */
 #ifdef __CRT_HAVE_mempatq
 #include <hybrid/typecore.h>
@@ -1232,7 +1232,7 @@ __CREDIRECT(__ATTR_LEAF __ATTR_RETNONNULL __ATTR_NONNULL((1)),void *,__NOTHROW_N
 #else /* __CRT_HAVE_mempatq */
 #include <libc/local/string/mempatq.h>
 /* Same as `memsetq', but repeat an 8-byte pattern on aligned addresses. */
-#define __libc_core_mempatq (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(mempatq))
+#define __libc_core_mempatq __NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(mempatq)
 #endif /* !__CRT_HAVE_mempatq */
 
 __SYSDECL_END

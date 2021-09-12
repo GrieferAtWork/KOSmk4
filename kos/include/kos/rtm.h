@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x2b7c6618 */
+/* HASH CRC-32:0x705505b4 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -150,7 +150,7 @@ __CDECLARE(,rtm_status_t,__NOTHROW,rtm_begin,(void),())
  * @return: RTM_STARTED : RTM operation was started.
  * @return: RTM_NOSYS   : RTM isn't supposed because the RTM driver is missing, or cannot be loaded.
  * @return: RTM_ABORT_* : RTM operation failed (s.a. code from `<kos/rtm.h>') */
-__NAMESPACE_LOCAL_USING_OR_IMPL(rtm_begin, __FORCELOCAL __ATTR_ARTIFICIAL rtm_status_t __NOTHROW(__LIBCCALL rtm_begin)(void) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(rtm_begin))(); })
+__NAMESPACE_LOCAL_USING_OR_IMPL(rtm_begin, __FORCELOCAL __ATTR_ARTIFICIAL rtm_status_t __NOTHROW(__LIBCCALL rtm_begin)(void) { return __NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(rtm_begin)(); })
 #endif /* ... */
 #if defined(__arch_rtm_end) && defined(__CRT_HAVE_rtm_end)
 /* >> rtm_end(2)
@@ -173,7 +173,7 @@ __CDECLARE_VOID(,__NOTHROW,rtm_end,(void),())
  * If the transaction was successful, return normally
  * If the transaction failed, `rtm_begin()' returns `RTM_ABORT_*'
  * If no transaction was in  progress, the behavior is  undefined */
-__NAMESPACE_LOCAL_USING_OR_IMPL(rtm_end, __FORCELOCAL __ATTR_ARTIFICIAL void __NOTHROW(__LIBCCALL rtm_end)(void) { (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(rtm_end))(); })
+__NAMESPACE_LOCAL_USING_OR_IMPL(rtm_end, __FORCELOCAL __ATTR_ARTIFICIAL void __NOTHROW(__LIBCCALL rtm_end)(void) { __NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(rtm_end)(); })
 #endif /* ... */
 #if defined(__arch_rtm_abort) && defined(__CRT_HAVE_rtm_abort)
 /* >> rtm_abort(2)
@@ -196,7 +196,7 @@ __LIBC void __NOTHROW(__FCALL rtm_abort)(unsigned int __code) __CASMNAME_SAME("r
  * `RTM_ABORT_EXPLICIT | ((code << RTM_ABORT_CODE_S) & RTM_ABORT_CODE_M)'
  * If no  transaction  was  in  progress, behave  as  a  no-op.  Otherwise,  this
  * function does not return normally, but returns from the original `rtm_begin()' */
-__NAMESPACE_LOCAL_USING_OR_IMPL(rtm_abort, __FORCELOCAL __ATTR_ARTIFICIAL void __NOTHROW(__FCALL rtm_abort)(unsigned int __code) { (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(rtm_abort))(__code); })
+__NAMESPACE_LOCAL_USING_OR_IMPL(rtm_abort, __FORCELOCAL __ATTR_ARTIFICIAL void __NOTHROW(__FCALL rtm_abort)(unsigned int __code) { __NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(rtm_abort)(__code); })
 #endif /* ... */
 #if defined(__arch_rtm_test) && defined(__CRT_HAVE_rtm_test)
 /* >> rtm_test(2)
@@ -216,7 +216,7 @@ __CDECLARE(__ATTR_PURE __ATTR_WUNUSED,int,__NOTHROW,rtm_test,(void),())
  * Check if a transaction is currently in progress
  * @return: 0 : No RTM operation in progress
  * @return: 1 : An RTM operation is currently in progress */
-__NAMESPACE_LOCAL_USING_OR_IMPL(rtm_test, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_PURE __ATTR_WUNUSED int __NOTHROW(__LIBCCALL rtm_test)(void) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(rtm_test))(); })
+__NAMESPACE_LOCAL_USING_OR_IMPL(rtm_test, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_PURE __ATTR_WUNUSED int __NOTHROW(__LIBCCALL rtm_test)(void) { return __NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(rtm_test)(); })
 #endif /* ... */
 
 __SYSDECL_END

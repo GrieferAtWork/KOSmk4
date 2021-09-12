@@ -7283,8 +7283,14 @@ __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_WUNUSED __ATTR_CONST size_t __NOTHROW(__fo
 __NAMESPACE_STD_END
 #endif /* !__std___forward_size_defined */
 #ifndef __CXX_SYSTEM_HEADER
-__NAMESPACE_STD_USING(__forward_size)
+__NAMESPACE_GLB_USING_OR_IMPL(__forward_size, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_WUNUSED __ATTR_CONST size_t __NOTHROW(__forward_size)(size_t __x) { return __x; })
 #endif /* !__CXX_SYSTEM_HEADER */
+/* Must  also put a  symbol in `__local_impl'  so that the `#define __libc_core_strlen',
+ * (and its consumer `__libc_strlen()') from <libc/string.h> continue to work correctly. */
+__NAMESPACE_LOCAL_BEGIN
+__FORCELOCAL __ATTR_ARTIFICIAL __ATTR_WUNUSED __ATTR_CONST size_t __NOTHROW(__forward_size)(size_t __x) { return __x; }
+__NAMESPACE_LOCAL_END
+
 /* Special handling, so this macro also works as `std::strlen(...)' */
 #define strlen(x) __forward_size(__builtin_constant_p(x) ? __builtin_strlen(x) : (__NAMESPACE_STD_SYM strlen)(x))
 #else /* __cplusplus */

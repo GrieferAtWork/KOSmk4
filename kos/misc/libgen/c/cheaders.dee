@@ -1449,12 +1449,8 @@ class FunctionImplementation {
 				escapeNonRepeatingTextIntoFile(
 					fp, x, escapeMode,
 					keyEscape: [](keyword: string): string {
-						if (keyword in deps) {
-							local res = keyDependency(keyword);
-							if (fp.namespace !== LOCAL_NAMESPACE)
-								res = "({} {})".format({ LOCAL_NAMESPACE.prefix, res });
-							return res;
-						}
+						if (keyword in deps)
+							return keyDependency(keyword);
 						return none;
 					},
 					forceKeyEscape: true);
@@ -1660,7 +1656,6 @@ class LocalFunction {
 		if (oldNs !== LOCAL_NAMESPACE) {
 			if (LOCAL_NAMESPACE.prefix)
 				callToLocalName = "{} {}".format({ LOCAL_NAMESPACE.prefix, callToLocalName });
-			callToLocalName = "({})".format({ callToLocalName });
 		}
 		/* When only doing partial escaping of declaration, we must  still
 		 * do  full escaping within call-to-local expressions, since local
@@ -1791,7 +1786,7 @@ class InlineFunction {
 					local res = keyDependency(keyword);
 					if (fp.namespace === dependenciesNamespace)
 						return res;
-					return "({} {})".format({
+					return "{} {}".format({
 						dependenciesNamespace.prefix,
 						res
 					});
@@ -1833,12 +1828,9 @@ class InlineFunction {
 					keyEscape: [](keyword: string): string {
 						if (keyword in deps) {
 							local res = keyDependency(keyword);
-							if (fp.namespace === dependenciesNamespace)
+							if (!dependenciesNamespace.prefix)
 								return res;
-							return "({} {})".format({
-								dependenciesNamespace.prefix,
-								res
-							});
+							return "{} {}".format({ dependenciesNamespace.prefix, res });
 						}
 						return none;
 					},
@@ -1990,7 +1982,7 @@ class NamespaceBinding {
 			if (namespace === GLOBAL_NAMESPACE)
 				nsPrefix = "::";
 			if (nsPrefix)
-				cSymbolName = "({} {})".format({ nsPrefix, cSymbolName });
+				cSymbolName = "{} {}".format({ nsPrefix, cSymbolName });
 			if (#conditionalPrototypes == 1 && conditionalPrototypes.first[0] == "1") {
 				namespace.keyUsingOrImpl(fp, exposedName, []{
 					local prototypes = conditionalPrototypes.first[1];
@@ -2073,7 +2065,7 @@ class NamespaceBinding {
 		if (!conditionalPrototypes)
 			return; /* Shouldn't happen... */
 		if (namespace.prefix)
-			cSymbolName = "({} {})".format({ namespace.prefix, cSymbolName });
+			cSymbolName = "{} {}".format({ namespace.prefix, cSymbolName });
 		local isFirst = true;
 		local numAdditionalEndifs = 0;
 		for (local ppCond, prototypes: conditionalPrototypes) {

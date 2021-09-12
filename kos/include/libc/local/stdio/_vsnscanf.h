@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x38e029a3 */
+/* HASH CRC-32:0x98a17c89 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -71,13 +71,13 @@ struct __vsnscanf_data {
 __LOCAL_LIBC(vsnscanf_getc) __SSIZE_TYPE__
 (__FORMATPRINTER_CC __vsnscanf_getc)(void *__arg) {
 	__CHAR32_TYPE__ __result;
-	__result = (__NAMESPACE_LOCAL_SYM __localdep_unicode_readutf8_n)(&((struct __vsnscanf_data *)__arg)->__ptr,
+	__result = __localdep_unicode_readutf8_n(&((struct __vsnscanf_data *)__arg)->__ptr,
 	                              ((struct __vsnscanf_data *)__arg)->__end);
 	return __result ? (__SSIZE_TYPE__)__result : (__SSIZE_TYPE__)__EOF;
 }
 __LOCAL_LIBC(vsnscanf_ungetc) __SSIZE_TYPE__
 (__FORMATPRINTER_CC __vsnscanf_ungetc)(void *__arg, __CHAR32_TYPE__ __UNUSED(__ch)) {
-	(__NAMESPACE_LOCAL_SYM __localdep_unicode_readutf8_rev)(&((struct __vsnscanf_data *)__arg)->__ptr);
+	__localdep_unicode_readutf8_rev(&((struct __vsnscanf_data *)__arg)->__ptr);
 	return 0;
 }
 __NAMESPACE_LOCAL_END

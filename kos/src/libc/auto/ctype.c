@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x2f84cf53 */
+/* HASH CRC-32:0x1b0d1d3a */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -341,6 +341,18 @@ NOTHROW_NCX(LIBCCALL libc_toupper_l)(int ch,
 	(void)locale;
 	return libc_toupper(ch);
 }
+/* >> issymstrt(3)
+ * Test if `ch' can appear at the start of a symbol/keyword/identifier */
+INTERN ATTR_SECTION(".text.crt.dos.unicode.static.ctype") ATTR_CONST WUNUSED int
+NOTHROW_NCX(LIBCCALL libc___iscsymf)(int ch) {
+	return libc_isalpha(ch) || ch == '_' || ch == '$';
+}
+/* >> issymcont(3)
+ * Test if `ch' can appear in the middle of a symbol/keyword/identifier */
+INTERN ATTR_SECTION(".text.crt.dos.unicode.static.ctype") ATTR_CONST WUNUSED int
+NOTHROW_NCX(LIBCCALL libc___iscsym)(int ch) {
+	return libc_isalnum(ch) || ch == '_' || ch == '$';
+}
 /* Returns non-zero if `(C & ~0x7f) == 0' */
 INTERN ATTR_SECTION(".text.crt.unicode.static.ctype") ATTR_CONST int
 NOTHROW(LIBCCALL libc_isascii)(int c) {
@@ -350,6 +362,18 @@ NOTHROW(LIBCCALL libc_isascii)(int c) {
 INTERN ATTR_SECTION(".text.crt.unicode.static.ctype") ATTR_CONST int
 NOTHROW(LIBCCALL libc_toascii)(int c) {
 	return c & 0x7f;
+}
+/* >> _tolower(3)
+ * Same as `tolower(3)', but the caller must ensure that `isupper(ch)' */
+INTERN ATTR_SECTION(".text.crt.unicode.static.ctype") ATTR_CONST WUNUSED int
+NOTHROW(LIBCCALL libc__tolower)(int ch) {
+	return ch + 0x20;
+}
+/* >> _toupper(3)
+ * Same as `toupper(3)', but the caller must ensure that `islower(ch)' */
+INTERN ATTR_SECTION(".text.crt.unicode.static.ctype") ATTR_CONST WUNUSED int
+NOTHROW(LIBCCALL libc__toupper)(int ch) {
+	return ch - 0x20;
 }
 #endif /* !__KERNEL__ */
 
@@ -370,28 +394,64 @@ DEFINE_PUBLIC_ALIAS(isprint, libc_isprint);
 DEFINE_PUBLIC_ALIAS(tolower, libc_tolower);
 DEFINE_PUBLIC_ALIAS(toupper, libc_toupper);
 DEFINE_PUBLIC_ALIAS(isblank, libc_isblank);
+#ifdef __LIBCCALL_IS_LIBDCALL
+DEFINE_PUBLIC_ALIAS(_iscntrl_l, libc_iscntrl_l);
+#endif /* __LIBCCALL_IS_LIBDCALL */
 DEFINE_PUBLIC_ALIAS(__iscntrl_l, libc_iscntrl_l);
 DEFINE_PUBLIC_ALIAS(iscntrl_l, libc_iscntrl_l);
+#ifdef __LIBCCALL_IS_LIBDCALL
+DEFINE_PUBLIC_ALIAS(_isspace_l, libc_isspace_l);
+#endif /* __LIBCCALL_IS_LIBDCALL */
 DEFINE_PUBLIC_ALIAS(__isspace_l, libc_isspace_l);
 DEFINE_PUBLIC_ALIAS(isspace_l, libc_isspace_l);
+#ifdef __LIBCCALL_IS_LIBDCALL
+DEFINE_PUBLIC_ALIAS(_isupper_l, libc_isupper_l);
+#endif /* __LIBCCALL_IS_LIBDCALL */
 DEFINE_PUBLIC_ALIAS(__isupper_l, libc_isupper_l);
 DEFINE_PUBLIC_ALIAS(isupper_l, libc_isupper_l);
+#ifdef __LIBCCALL_IS_LIBDCALL
+DEFINE_PUBLIC_ALIAS(_islower_l, libc_islower_l);
+#endif /* __LIBCCALL_IS_LIBDCALL */
 DEFINE_PUBLIC_ALIAS(__islower_l, libc_islower_l);
 DEFINE_PUBLIC_ALIAS(islower_l, libc_islower_l);
+#ifdef __LIBCCALL_IS_LIBDCALL
+DEFINE_PUBLIC_ALIAS(_isalpha_l, libc_isalpha_l);
+#endif /* __LIBCCALL_IS_LIBDCALL */
 DEFINE_PUBLIC_ALIAS(__isalpha_l, libc_isalpha_l);
 DEFINE_PUBLIC_ALIAS(isalpha_l, libc_isalpha_l);
+#ifdef __LIBCCALL_IS_LIBDCALL
+DEFINE_PUBLIC_ALIAS(_isdigit_l, libc_isdigit_l);
+#endif /* __LIBCCALL_IS_LIBDCALL */
 DEFINE_PUBLIC_ALIAS(__isdigit_l, libc_isdigit_l);
 DEFINE_PUBLIC_ALIAS(isdigit_l, libc_isdigit_l);
+#ifdef __LIBCCALL_IS_LIBDCALL
+DEFINE_PUBLIC_ALIAS(_isxdigit_l, libc_isxdigit_l);
+#endif /* __LIBCCALL_IS_LIBDCALL */
 DEFINE_PUBLIC_ALIAS(__isxdigit_l, libc_isxdigit_l);
 DEFINE_PUBLIC_ALIAS(isxdigit_l, libc_isxdigit_l);
+#ifdef __LIBCCALL_IS_LIBDCALL
+DEFINE_PUBLIC_ALIAS(_isalnum_l, libc_isalnum_l);
+#endif /* __LIBCCALL_IS_LIBDCALL */
 DEFINE_PUBLIC_ALIAS(__isalnum_l, libc_isalnum_l);
 DEFINE_PUBLIC_ALIAS(isalnum_l, libc_isalnum_l);
+#ifdef __LIBCCALL_IS_LIBDCALL
+DEFINE_PUBLIC_ALIAS(_ispunct_l, libc_ispunct_l);
+#endif /* __LIBCCALL_IS_LIBDCALL */
 DEFINE_PUBLIC_ALIAS(__ispunct_l, libc_ispunct_l);
 DEFINE_PUBLIC_ALIAS(ispunct_l, libc_ispunct_l);
+#ifdef __LIBCCALL_IS_LIBDCALL
+DEFINE_PUBLIC_ALIAS(_isgraph_l, libc_isgraph_l);
+#endif /* __LIBCCALL_IS_LIBDCALL */
 DEFINE_PUBLIC_ALIAS(__isgraph_l, libc_isgraph_l);
 DEFINE_PUBLIC_ALIAS(isgraph_l, libc_isgraph_l);
+#ifdef __LIBCCALL_IS_LIBDCALL
+DEFINE_PUBLIC_ALIAS(_isprint_l, libc_isprint_l);
+#endif /* __LIBCCALL_IS_LIBDCALL */
 DEFINE_PUBLIC_ALIAS(__isprint_l, libc_isprint_l);
 DEFINE_PUBLIC_ALIAS(isprint_l, libc_isprint_l);
+#ifdef __LIBCCALL_IS_LIBDCALL
+DEFINE_PUBLIC_ALIAS(_isblank_l, libc_isblank_l);
+#endif /* __LIBCCALL_IS_LIBDCALL */
 DEFINE_PUBLIC_ALIAS(__isblank_l, libc_isblank_l);
 DEFINE_PUBLIC_ALIAS(isblank_l, libc_isblank_l);
 #ifdef __LIBCCALL_IS_LIBDCALL
@@ -404,8 +464,18 @@ DEFINE_PUBLIC_ALIAS(_toupper_l, libc_toupper_l);
 #endif /* __LIBCCALL_IS_LIBDCALL */
 DEFINE_PUBLIC_ALIAS(__toupper_l, libc_toupper_l);
 DEFINE_PUBLIC_ALIAS(toupper_l, libc_toupper_l);
+DEFINE_PUBLIC_ALIAS(__iscsymf, libc___iscsymf);
+DEFINE_PUBLIC_ALIAS(__iscsym, libc___iscsym);
+#ifdef __LIBCCALL_IS_LIBDCALL
+DEFINE_PUBLIC_ALIAS(__isascii, libc_isascii);
+#endif /* __LIBCCALL_IS_LIBDCALL */
 DEFINE_PUBLIC_ALIAS(isascii, libc_isascii);
+#ifdef __LIBCCALL_IS_LIBDCALL
+DEFINE_PUBLIC_ALIAS(__toascii, libc_toascii);
+#endif /* __LIBCCALL_IS_LIBDCALL */
 DEFINE_PUBLIC_ALIAS(toascii, libc_toascii);
+DEFINE_PUBLIC_ALIAS(_tolower, libc__tolower);
+DEFINE_PUBLIC_ALIAS(_toupper, libc__toupper);
 #endif /* !__KERNEL__ */
 
 #endif /* !GUARD_LIBC_AUTO_CTYPE_C */

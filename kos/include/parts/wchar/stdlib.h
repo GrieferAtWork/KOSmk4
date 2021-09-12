@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xa3e53710 */
+/* HASH CRC-32:0x8b005795 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -57,7 +57,7 @@ __CREDIRECT(__ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1)),int,__NOTHROW_NCX,wto
 __CREDIRECT(__ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1)),int,__NOTHROW_NCX,wtoi,(wchar_t const *__nptr),_wtoi64,(__nptr))
 #else /* ... */
 #include <libc/local/parts.wchar.stdlib/wtoi.h>
-__NAMESPACE_LOCAL_USING_OR_IMPL(wtoi, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1)) int __NOTHROW_NCX(__LIBCCALL wtoi)(wchar_t const *__nptr) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(wtoi))(__nptr); })
+__NAMESPACE_LOCAL_USING_OR_IMPL(wtoi, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1)) int __NOTHROW_NCX(__LIBCCALL wtoi)(wchar_t const *__nptr) { return __NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(wtoi)(__nptr); })
 #endif /* !... */
 #ifdef __CRT_HAVE_wtol
 __CDECLARE(__ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1)),long,__NOTHROW_NCX,wtol,(wchar_t const *__nptr),(__nptr))
@@ -75,7 +75,7 @@ __CREDIRECT(__ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1)),long,__NOTHROW_NCX,wt
 __CREDIRECT(__ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1)),long,__NOTHROW_NCX,wtol,(wchar_t const *__nptr),_wtoi64,(__nptr))
 #else /* ... */
 #include <libc/local/parts.wchar.stdlib/wtol.h>
-__NAMESPACE_LOCAL_USING_OR_IMPL(wtol, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1)) long __NOTHROW_NCX(__LIBCCALL wtol)(wchar_t const *__nptr) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(wtol))(__nptr); })
+__NAMESPACE_LOCAL_USING_OR_IMPL(wtol, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1)) long __NOTHROW_NCX(__LIBCCALL wtol)(wchar_t const *__nptr) { return __NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(wtol)(__nptr); })
 #endif /* !... */
 #ifdef __LONGLONG
 #ifdef __CRT_HAVE_wtoll
@@ -94,7 +94,7 @@ __CREDIRECT(__ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1)),__LONGLONG,__NOTHROW_
 __CREDIRECT(__ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1)),__LONGLONG,__NOTHROW_NCX,wtoll,(wchar_t const *__nptr),_wtoi64,(__nptr))
 #else /* ... */
 #include <libc/local/parts.wchar.stdlib/wtoll.h>
-__NAMESPACE_LOCAL_USING_OR_IMPL(wtoll, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1)) __LONGLONG __NOTHROW_NCX(__LIBCCALL wtoll)(wchar_t const *__nptr) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(wtoll))(__nptr); })
+__NAMESPACE_LOCAL_USING_OR_IMPL(wtoll, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1)) __LONGLONG __NOTHROW_NCX(__LIBCCALL wtoll)(wchar_t const *__nptr) { return __NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(wtoll)(__nptr); })
 #endif /* !... */
 #endif /* __LONGLONG */
 #endif /* __USE_KOS */

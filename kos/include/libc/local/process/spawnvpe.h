@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xd80a1354 */
+/* HASH CRC-32:0x3e54effa */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -133,7 +133,7 @@ __LOCAL_LIBC(__spawnvpe_impl) __ATTR_NOINLINE __ATTR_NONNULL((2, 4, 6, 7)) __pid
 	*__dst++ = '/';
 	__dst = (char *)__mempcpyc(__dst, __file, __file_len, sizeof(char));
 	*__dst = '\0';
-	return (__NAMESPACE_LOCAL_SYM __localdep_spawnve)(__mode, __fullpath, ___argv, ___envp);
+	return __localdep_spawnve(__mode, __fullpath, ___argv, ___envp);
 }
 __NAMESPACE_LOCAL_END
 __NAMESPACE_LOCAL_BEGIN

@@ -17,25 +17,36 @@
  *    misrepresented as being the original software.                          *
  * 3. This notice may not be removed or altered from any source distribution. *
  */
-/* (#) Portability: FreeBSD (/include/xlocale.h) */
-/* (#) Portability: uClibc  (/include/xlocale.h) */
-#ifndef _XLOCALE_H
-#define _XLOCALE_H 1
+#ifndef _BITS_CRT_LOCALE_H
+#define _BITS_CRT_LOCALE_H 1
 
-#include "__stdinc.h"
-/**/
+#include <__crt.h>
+#include <__stdinc.h>
+#include <features.h>
 
-#include <bits/crt/locale.h> /* struct __locale_struct */
+#include <hybrid/typecore.h>
 
 #ifdef __CC__
 __DECL_BEGIN
 
-#ifndef __locale_t_defined
-#define __locale_t_defined
-typedef __locale_t locale_t;
-#endif /* !__locale_t_defined */
+struct __locale_struct {
+#ifdef __CRT_GLC
+#undef __locales
+#undef __ctype_b
+#undef __ctype_tolower
+#undef __ctype_toupper
+#undef __names
+	struct __locale_data  *__locales[13]; /* 13 = __LC_LAST. */
+	__UINT16_TYPE__ const *__ctype_b;
+	__INT32_TYPE__ const  *__ctype_tolower;
+	__INT32_TYPE__ const  *__ctype_toupper;
+	char const            *__names[13];
+#else /* __CRT_GLC */
+	int __placeholder;
+#endif /* !__CRT_GLC */
+};
 
 __DECL_END
 #endif /* __CC__ */
 
-#endif /* !_XLOCALE_H */
+#endif /* !_BITS_CRT_LOCALE_H */

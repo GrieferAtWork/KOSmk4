@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x290c3251 */
+/* HASH CRC-32:0x3a67ff4a */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -171,8 +171,6 @@ DFUN(".text.crt.dos.string.encrypt", libd_encrypt_r, libc_encrypt_r, TV, 3, TP, 
 
 /* ctype */
 DFUN(".text.crt.dos.unicode.locale.ctype", libd___locale_ctype_ptr_l, libc___locale_ctype_ptr_l, TP, 1, TP)
-DFUN(".text.crt.dos.unicode.static.ctype", libd__isctype, libc__isctype, TD, 2, TD, TD)
-DFUN(".text.crt.dos.unicode.locale.ctype", libd__isctype_l, libc__isctype_l, TD, 3, TD, TD, TP)
 DFUN(".text.crt.dos.unicode.static.ctype", libd_iscntrl, libc_iscntrl, TD, 1, TD)
 DFUN(".text.crt.dos.unicode.static.ctype", libd_isspace, libc_isspace, TD, 1, TD)
 DFUN(".text.crt.dos.unicode.static.ctype", libd_isupper, libc_isupper, TD, 1, TD)
@@ -201,8 +199,14 @@ DFUN(".text.crt.dos.unicode.locale.ctype", libd_isprint_l, libc_isprint_l, TD, 2
 DFUN(".text.crt.dos.unicode.locale.ctype", libd_isblank_l, libc_isblank_l, TD, 2, TD, TP)
 DFUN(".text.crt.dos.unicode.locale.ctype", libd_tolower_l, libc_tolower_l, TD, 2, TD, TP)
 DFUN(".text.crt.dos.unicode.locale.ctype", libd_toupper_l, libc_toupper_l, TD, 2, TD, TP)
+DFUN(".text.crt.dos.unicode.static.ctype", libd___iscsymf, libc___iscsymf, TD, 1, TD)
+DFUN(".text.crt.dos.unicode.static.ctype", libd___iscsym, libc___iscsym, TD, 1, TD)
 DFUN(".text.crt.dos.unicode.static.ctype", libd_isascii, libc_isascii, TD, 1, TD)
 DFUN(".text.crt.dos.unicode.static.ctype", libd_toascii, libc_toascii, TD, 1, TD)
+DFUN(".text.crt.dos.unicode.static.ctype", libd__tolower, libc__tolower, TD, 1, TD)
+DFUN(".text.crt.dos.unicode.static.ctype", libd__toupper, libc__toupper, TD, 1, TD)
+DFUN(".text.crt.dos.unicode.static.ctype", libd__isctype, libc__isctype, TD, 2, TD, TD)
+DFUN(".text.crt.dos.unicode.locale.ctype", libd__isctype_l, libc__isctype_l, TD, 3, TD, TD, TP)
 
 /* direct */
 DFUN(".text.crt.dos.fs.property", libd__getdcwd, libc__getdcwd, TP, 3, TD, TP, TI)

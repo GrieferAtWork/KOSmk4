@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x2c29a365 */
+/* HASH CRC-32:0x4ecf8448 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -117,7 +117,7 @@ __CDECLARE(__ATTR_WUNUSED __ATTR_NONNULL((2)),ssize_t,__NOTHROW_RPC,preadv,(__fd
  * Same as  `readv(2)', but  read data  from a  file at  a
  * specific `offset', rather than the current R/W position
  * @return: <= SUM(iov[*].iov_len): The actual amount of read bytes */
-__NAMESPACE_LOCAL_USING_OR_IMPL(preadv, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_WUNUSED __ATTR_NONNULL((2)) ssize_t __NOTHROW_RPC(__LIBCCALL preadv)(__fd_t __fd, struct iovec const *__iov, __STDC_INT_AS_SIZE_T __count, __FS_TYPE(off) __offset) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(preadv))(__fd, __iov, __count, __offset); })
+__NAMESPACE_LOCAL_USING_OR_IMPL(preadv, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_WUNUSED __ATTR_NONNULL((2)) ssize_t __NOTHROW_RPC(__LIBCCALL preadv)(__fd_t __fd, struct iovec const *__iov, __STDC_INT_AS_SIZE_T __count, __FS_TYPE(off) __offset) { return __NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(preadv)(__fd, __iov, __count, __offset); })
 #endif /* ... */
 #if defined(__CRT_HAVE_pwritev64) && defined(__USE_FILE_OFFSET64)
 /* >> pwritev(2)
@@ -137,7 +137,7 @@ __CDECLARE(__ATTR_NONNULL((2)),ssize_t,__NOTHROW_RPC,pwritev,(__fd_t __fd, struc
  * Same as  `writev(2)', but  write data  to a  file at  a
  * specific `offset', rather than the current R/W position
  * @return: <= SUM(iov[*].iov_len): The actual amount of written bytes */
-__NAMESPACE_LOCAL_USING_OR_IMPL(pwritev, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_NONNULL((2)) ssize_t __NOTHROW_RPC(__LIBCCALL pwritev)(__fd_t __fd, struct iovec const *__iov, __STDC_INT_AS_SIZE_T __count, __FS_TYPE(off) __offset) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(pwritev))(__fd, __iov, __count, __offset); })
+__NAMESPACE_LOCAL_USING_OR_IMPL(pwritev, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_NONNULL((2)) ssize_t __NOTHROW_RPC(__LIBCCALL pwritev)(__fd_t __fd, struct iovec const *__iov, __STDC_INT_AS_SIZE_T __count, __FS_TYPE(off) __offset) { return __NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(pwritev)(__fd, __iov, __count, __offset); })
 #endif /* ... */
 
 #ifdef __USE_LARGEFILE64
@@ -159,7 +159,7 @@ __CREDIRECT(__ATTR_WUNUSED __ATTR_NONNULL((2)),ssize_t,__NOTHROW_RPC,preadv64,(_
  * Same as  `readv(2)', but  read data  from a  file at  a
  * specific `offset', rather than the current R/W position
  * @return: <= SUM(iov[*].iov_len): The actual amount of read bytes */
-__NAMESPACE_LOCAL_USING_OR_IMPL(preadv64, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_WUNUSED __ATTR_NONNULL((2)) ssize_t __NOTHROW_RPC(__LIBCCALL preadv64)(__fd_t __fd, struct iovec const *__iov, __STDC_INT_AS_SIZE_T __count, __off64_t __offset) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(preadv64))(__fd, __iov, __count, __offset); })
+__NAMESPACE_LOCAL_USING_OR_IMPL(preadv64, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_WUNUSED __ATTR_NONNULL((2)) ssize_t __NOTHROW_RPC(__LIBCCALL preadv64)(__fd_t __fd, struct iovec const *__iov, __STDC_INT_AS_SIZE_T __count, __off64_t __offset) { return __NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(preadv64)(__fd, __iov, __count, __offset); })
 #endif /* ... */
 #ifdef __CRT_HAVE_pwritev64
 /* >> pwritev(2)
@@ -179,7 +179,7 @@ __CREDIRECT(__ATTR_NONNULL((2)),ssize_t,__NOTHROW_RPC,pwritev64,(__fd_t __fd, st
  * Same as  `writev(2)', but  write data  to a  file at  a
  * specific `offset', rather than the current R/W position
  * @return: <= SUM(iov[*].iov_len): The actual amount of written bytes */
-__NAMESPACE_LOCAL_USING_OR_IMPL(pwritev64, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_NONNULL((2)) ssize_t __NOTHROW_RPC(__LIBCCALL pwritev64)(__fd_t __fd, struct iovec const *__iov, __STDC_INT_AS_SIZE_T __count, __off64_t __offset) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(pwritev64))(__fd, __iov, __count, __offset); })
+__NAMESPACE_LOCAL_USING_OR_IMPL(pwritev64, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_NONNULL((2)) ssize_t __NOTHROW_RPC(__LIBCCALL pwritev64)(__fd_t __fd, struct iovec const *__iov, __STDC_INT_AS_SIZE_T __count, __off64_t __offset) { return __NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(pwritev64)(__fd, __iov, __count, __offset); })
 #endif /* ... */
 #endif /* __USE_LARGEFILE64 */
 #endif /* !__USE_MISC */

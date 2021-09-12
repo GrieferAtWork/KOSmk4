@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x86d3f186 */
+/* HASH CRC-32:0x527542f3 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -677,7 +677,7 @@ __CDECLARE(,__errno_t,__NOTHROW_RPC,pthread_timedjoin_np,(pthread_t __pthread, v
  * @return: EOK:       Success
  * @return: EINVAL:    The given `abstime' is invalid
  * @return: ETIMEDOUT: The given `abstime' has expired */
-__NAMESPACE_LOCAL_USING_OR_IMPL(pthread_timedjoin_np, __FORCELOCAL __ATTR_ARTIFICIAL __errno_t __NOTHROW_RPC(__LIBCCALL pthread_timedjoin_np)(pthread_t __pthread, void **__thread_return, struct timespec const *__abstime) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(pthread_timedjoin_np))(__pthread, __thread_return, __abstime); })
+__NAMESPACE_LOCAL_USING_OR_IMPL(pthread_timedjoin_np, __FORCELOCAL __ATTR_ARTIFICIAL __errno_t __NOTHROW_RPC(__LIBCCALL pthread_timedjoin_np)(pthread_t __pthread, void **__thread_return, struct timespec const *__abstime) { return __NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(pthread_timedjoin_np)(__pthread, __thread_return, __abstime); })
 #endif /* ... */
 #ifdef __USE_TIME64
 #ifdef __CRT_HAVE_pthread_timedjoin64_np
@@ -707,7 +707,7 @@ __CREDIRECT(,__errno_t,__NOTHROW_RPC,pthread_timedjoin64_np,(pthread_t __pthread
  * @return: EOK:       Success
  * @return: EINVAL:    The given `abstime' is invalid
  * @return: ETIMEDOUT: The given `abstime' has expired */
-__NAMESPACE_LOCAL_USING_OR_IMPL(pthread_timedjoin64_np, __FORCELOCAL __ATTR_ARTIFICIAL __errno_t __NOTHROW_RPC(__LIBCCALL pthread_timedjoin64_np)(pthread_t __pthread, void **__thread_return, struct timespec64 const *__abstime) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(pthread_timedjoin64_np))(__pthread, __thread_return, __abstime); })
+__NAMESPACE_LOCAL_USING_OR_IMPL(pthread_timedjoin64_np, __FORCELOCAL __ATTR_ARTIFICIAL __errno_t __NOTHROW_RPC(__LIBCCALL pthread_timedjoin64_np)(pthread_t __pthread, void **__thread_return, struct timespec64 const *__abstime) { return __NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(pthread_timedjoin64_np)(__pthread, __thread_return, __abstime); })
 #endif /* ... */
 #endif /* __USE_TIME64 */
 #endif /* __USE_GNU */
@@ -822,7 +822,7 @@ __CDECLARE(__ATTR_DEPRECATED("Use pthread_attr_getstack()") __ATTR_NONNULL((1, 2
 /* >> pthread_attr_getstackaddr(3)
  * Return the previously set address for the stack
  * @return: EOK: Success */
-__NAMESPACE_LOCAL_USING_OR_IMPL(pthread_attr_getstackaddr, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_DEPRECATED("Use pthread_attr_getstack()") __ATTR_NONNULL((1, 2)) __errno_t __NOTHROW_NCX(__LIBCCALL pthread_attr_getstackaddr)(pthread_attr_t const *__restrict __attr, void **__restrict __stackaddr) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(pthread_attr_getstackaddr))(__attr, __stackaddr); })
+__NAMESPACE_LOCAL_USING_OR_IMPL(pthread_attr_getstackaddr, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_DEPRECATED("Use pthread_attr_getstack()") __ATTR_NONNULL((1, 2)) __errno_t __NOTHROW_NCX(__LIBCCALL pthread_attr_getstackaddr)(pthread_attr_t const *__restrict __attr, void **__restrict __stackaddr) { return __NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(pthread_attr_getstackaddr)(__attr, __stackaddr); })
 #endif /* ... */
 #ifdef __CRT_HAVE_pthread_attr_setstackaddr
 /* >> pthread_attr_setstackaddr(3)
@@ -842,7 +842,7 @@ __CDECLARE(__ATTR_DEPRECATED("Use pthread_attr_setstack()") __ATTR_NONNULL((1)),
  * minimal size of the block must be `PTHREAD_STACK_MIN'
  * @return: EOK:    Success
  * @return: EINVAL: The stack isn't suitably aligned */
-__NAMESPACE_LOCAL_USING_OR_IMPL(pthread_attr_setstackaddr, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_DEPRECATED("Use pthread_attr_setstack()") __ATTR_NONNULL((1)) __errno_t __NOTHROW_NCX(__LIBCCALL pthread_attr_setstackaddr)(pthread_attr_t *__attr, void *__stackaddr) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(pthread_attr_setstackaddr))(__attr, __stackaddr); })
+__NAMESPACE_LOCAL_USING_OR_IMPL(pthread_attr_setstackaddr, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_DEPRECATED("Use pthread_attr_setstack()") __ATTR_NONNULL((1)) __errno_t __NOTHROW_NCX(__LIBCCALL pthread_attr_setstackaddr)(pthread_attr_t *__attr, void *__stackaddr) { return __NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(pthread_attr_setstackaddr)(__attr, __stackaddr); })
 #endif /* ... */
 #ifdef __CRT_HAVE_pthread_attr_getstacksize
 /* >> pthread_attr_getstacksize(3)
@@ -854,7 +854,7 @@ __CDECLARE(__ATTR_NONNULL((1, 2)),__errno_t,__NOTHROW_NCX,pthread_attr_getstacks
 /* >> pthread_attr_getstacksize(3)
  * Return the currently used minimal stack size
  * @return: EOK: Success */
-__NAMESPACE_LOCAL_USING_OR_IMPL(pthread_attr_getstacksize, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_NONNULL((1, 2)) __errno_t __NOTHROW_NCX(__LIBCCALL pthread_attr_getstacksize)(pthread_attr_t const *__restrict __attr, size_t *__restrict __stacksize) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(pthread_attr_getstacksize))(__attr, __stacksize); })
+__NAMESPACE_LOCAL_USING_OR_IMPL(pthread_attr_getstacksize, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_NONNULL((1, 2)) __errno_t __NOTHROW_NCX(__LIBCCALL pthread_attr_getstacksize)(pthread_attr_t const *__restrict __attr, size_t *__restrict __stacksize) { return __NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(pthread_attr_getstacksize)(__attr, __stacksize); })
 #endif /* ... */
 #ifdef __CRT_HAVE_pthread_attr_setstacksize
 /* >> pthread_attr_setstacksize(3)
@@ -872,7 +872,7 @@ __CDECLARE(__ATTR_NONNULL((1)),__errno_t,__NOTHROW_NCX,pthread_attr_setstacksize
  * and must also not exceed the system limits
  * @return: EOK:    Success
  * @return: EINVAL: `stacksize' is too small */
-__NAMESPACE_LOCAL_USING_OR_IMPL(pthread_attr_setstacksize, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_NONNULL((1)) __errno_t __NOTHROW_NCX(__LIBCCALL pthread_attr_setstacksize)(pthread_attr_t *__attr, size_t __stacksize) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(pthread_attr_setstacksize))(__attr, __stacksize); })
+__NAMESPACE_LOCAL_USING_OR_IMPL(pthread_attr_setstacksize, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_NONNULL((1)) __errno_t __NOTHROW_NCX(__LIBCCALL pthread_attr_setstacksize)(pthread_attr_t *__attr, size_t __stacksize) { return __NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(pthread_attr_setstacksize)(__attr, __stacksize); })
 #endif /* ... */
 #ifdef __USE_XOPEN2K
 #ifdef __CRT_HAVE_pthread_attr_getstack
@@ -885,7 +885,7 @@ __CDECLARE(__ATTR_NONNULL((1, 2, 3)),__errno_t,__NOTHROW_NCX,pthread_attr_getsta
 /* >> pthread_attr_getstack(3)
  * Return the previously set address for the stack
  * @return: EOK: Success */
-__NAMESPACE_LOCAL_USING_OR_IMPL(pthread_attr_getstack, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_NONNULL((1, 2, 3)) __errno_t __NOTHROW_NCX(__LIBCCALL pthread_attr_getstack)(pthread_attr_t const *__restrict __attr, void **__restrict __stackaddr, size_t *__restrict __stacksize) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(pthread_attr_getstack))(__attr, __stackaddr, __stacksize); })
+__NAMESPACE_LOCAL_USING_OR_IMPL(pthread_attr_getstack, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_NONNULL((1, 2, 3)) __errno_t __NOTHROW_NCX(__LIBCCALL pthread_attr_getstack)(pthread_attr_t const *__restrict __attr, void **__restrict __stackaddr, size_t *__restrict __stacksize) { return __NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(pthread_attr_getstack)(__attr, __stackaddr, __stacksize); })
 #endif /* ... */
 #ifdef __CRT_HAVE_pthread_attr_setstack
 /* >> pthread_attr_setstack(3)
@@ -903,7 +903,7 @@ __CDECLARE(__ATTR_NONNULL((1)),__errno_t,__NOTHROW_NCX,pthread_attr_setstack,(pt
  * address will make the implementation on some architectures impossible
  * @return: EOK:    Success
  * @return: EINVAL: `stacksize' is too small, or the stack isn't suitably aligned */
-__NAMESPACE_LOCAL_USING_OR_IMPL(pthread_attr_setstack, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_NONNULL((1)) __errno_t __NOTHROW_NCX(__LIBCCALL pthread_attr_setstack)(pthread_attr_t *__attr, void *__stackaddr, size_t __stacksize) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(pthread_attr_setstack))(__attr, __stackaddr, __stacksize); })
+__NAMESPACE_LOCAL_USING_OR_IMPL(pthread_attr_setstack, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_NONNULL((1)) __errno_t __NOTHROW_NCX(__LIBCCALL pthread_attr_setstack)(pthread_attr_t *__attr, void *__stackaddr, size_t __stacksize) { return __NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(pthread_attr_setstack)(__attr, __stackaddr, __stacksize); })
 #endif /* ... */
 #endif /* __USE_XOPEN2K */
 #ifdef __USE_GNU
@@ -1095,7 +1095,7 @@ __CREDIRECT(__ATTR_NONNULL((1, 2)),__errno_t,__THROWING,pthread_once,(pthread_on
  * same `once_control' argument. `once_control' must  point to a static  or
  * extern variable initialized to `PTHREAD_ONCE_INIT'.
  * @return: EOK: Success */
-__NAMESPACE_LOCAL_USING_OR_IMPL(pthread_once, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_NONNULL((1, 2)) __errno_t (__LIBCCALL pthread_once)(pthread_once_t *__once_control, __pthread_once_routine_t __init_routine) __THROWS(...) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(pthread_once))(__once_control, __init_routine); })
+__NAMESPACE_LOCAL_USING_OR_IMPL(pthread_once, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_NONNULL((1, 2)) __errno_t (__LIBCCALL pthread_once)(pthread_once_t *__once_control, __pthread_once_routine_t __init_routine) __THROWS(...) { return __NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(pthread_once)(__once_control, __init_routine); })
 #endif /* !... */
 
 /* Functions for handling cancellation.
@@ -1392,7 +1392,7 @@ __CDECLARE(__ATTR_WUNUSED __ATTR_NONNULL((1, 2)),__errno_t,__NOTHROW_RPC,pthread
  * @return: EOK:       Success
  * @return: EINVAL:    The given `abstime' is invalid
  * @return: ETIMEDOUT: The given `abstime' has expired */
-__NAMESPACE_LOCAL_USING_OR_IMPL(pthread_mutex_timedlock, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_WUNUSED __ATTR_NONNULL((1, 2)) __errno_t __NOTHROW_RPC(__LIBCCALL pthread_mutex_timedlock)(pthread_mutex_t *__restrict __mutex, struct timespec const *__restrict __abstime) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(pthread_mutex_timedlock))(__mutex, __abstime); })
+__NAMESPACE_LOCAL_USING_OR_IMPL(pthread_mutex_timedlock, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_WUNUSED __ATTR_NONNULL((1, 2)) __errno_t __NOTHROW_RPC(__LIBCCALL pthread_mutex_timedlock)(pthread_mutex_t *__restrict __mutex, struct timespec const *__restrict __abstime) { return __NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(pthread_mutex_timedlock)(__mutex, __abstime); })
 #endif /* ... */
 #ifdef __USE_TIME64
 #ifdef __CRT_HAVE_pthread_mutex_timedlock64
@@ -1416,7 +1416,7 @@ __CREDIRECT(__ATTR_WUNUSED __ATTR_NONNULL((1, 2)),__errno_t,__NOTHROW_RPC,pthrea
  * @return: EOK:       Success
  * @return: EINVAL:    The given `abstime' is invalid
  * @return: ETIMEDOUT: The given `abstime' has expired */
-__NAMESPACE_LOCAL_USING_OR_IMPL(pthread_mutex_timedlock64, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_WUNUSED __ATTR_NONNULL((1, 2)) __errno_t __NOTHROW_RPC(__LIBCCALL pthread_mutex_timedlock64)(pthread_mutex_t *__restrict __mutex, struct timespec64 const *__restrict __abstime) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(pthread_mutex_timedlock64))(__mutex, __abstime); })
+__NAMESPACE_LOCAL_USING_OR_IMPL(pthread_mutex_timedlock64, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_WUNUSED __ATTR_NONNULL((1, 2)) __errno_t __NOTHROW_RPC(__LIBCCALL pthread_mutex_timedlock64)(pthread_mutex_t *__restrict __mutex, struct timespec64 const *__restrict __abstime) { return __NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(pthread_mutex_timedlock64)(__mutex, __abstime); })
 #endif /* ... */
 #endif /* __USE_TIME64 */
 #endif /* __USE_XOPEN2K */
@@ -1442,7 +1442,7 @@ __CDECLARE(__ATTR_WUNUSED __ATTR_NONNULL((1, 2)),__errno_t,__NOTHROW_RPC,pthread
  * @return: EOK:       Success
  * @return: EINVAL:    The given `reltime' is invalid
  * @return: ETIMEDOUT: The given `reltime' has expired */
-__NAMESPACE_LOCAL_USING_OR_IMPL(pthread_mutex_reltimedlock_np, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_WUNUSED __ATTR_NONNULL((1, 2)) __errno_t __NOTHROW_RPC(__LIBCCALL pthread_mutex_reltimedlock_np)(pthread_mutex_t *__restrict __mutex, struct timespec const *__restrict __reltime) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(pthread_mutex_reltimedlock_np))(__mutex, __reltime); })
+__NAMESPACE_LOCAL_USING_OR_IMPL(pthread_mutex_reltimedlock_np, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_WUNUSED __ATTR_NONNULL((1, 2)) __errno_t __NOTHROW_RPC(__LIBCCALL pthread_mutex_reltimedlock_np)(pthread_mutex_t *__restrict __mutex, struct timespec const *__restrict __reltime) { return __NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(pthread_mutex_reltimedlock_np)(__mutex, __reltime); })
 #endif /* ... */
 #ifdef __USE_TIME64
 #ifdef __CRT_HAVE_pthread_mutex_reltimedlock64_np
@@ -1466,7 +1466,7 @@ __CREDIRECT(__ATTR_WUNUSED __ATTR_NONNULL((1, 2)),__errno_t,__NOTHROW_RPC,pthrea
  * @return: EOK:       Success
  * @return: EINVAL:    The given `reltime' is invalid
  * @return: ETIMEDOUT: The given `reltime' has expired */
-__NAMESPACE_LOCAL_USING_OR_IMPL(pthread_mutex_reltimedlock64_np, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_WUNUSED __ATTR_NONNULL((1, 2)) __errno_t __NOTHROW_RPC(__LIBCCALL pthread_mutex_reltimedlock64_np)(pthread_mutex_t *__restrict __mutex, struct timespec64 const *__restrict __reltime) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(pthread_mutex_reltimedlock64_np))(__mutex, __reltime); })
+__NAMESPACE_LOCAL_USING_OR_IMPL(pthread_mutex_reltimedlock64_np, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_WUNUSED __ATTR_NONNULL((1, 2)) __errno_t __NOTHROW_RPC(__LIBCCALL pthread_mutex_reltimedlock64_np)(pthread_mutex_t *__restrict __mutex, struct timespec64 const *__restrict __reltime) { return __NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(pthread_mutex_reltimedlock64_np)(__mutex, __reltime); })
 #endif /* ... */
 #endif /* __USE_TIME64 */
 #endif /* __USE_SOLARIS */
@@ -1700,7 +1700,7 @@ __CDECLARE(__ATTR_WUNUSED __ATTR_NONNULL((1, 2)),__errno_t,__NOTHROW_RPC,pthread
  * @return: EOK:       Success
  * @return: EINVAL:    The given `abstime' is invalid
  * @return: ETIMEDOUT: The given `abstime' has expired */
-__NAMESPACE_LOCAL_USING_OR_IMPL(pthread_rwlock_timedrdlock, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_WUNUSED __ATTR_NONNULL((1, 2)) __errno_t __NOTHROW_RPC(__LIBCCALL pthread_rwlock_timedrdlock)(pthread_rwlock_t *__restrict __rwlock, struct timespec const *__restrict __abstime) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(pthread_rwlock_timedrdlock))(__rwlock, __abstime); })
+__NAMESPACE_LOCAL_USING_OR_IMPL(pthread_rwlock_timedrdlock, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_WUNUSED __ATTR_NONNULL((1, 2)) __errno_t __NOTHROW_RPC(__LIBCCALL pthread_rwlock_timedrdlock)(pthread_rwlock_t *__restrict __rwlock, struct timespec const *__restrict __abstime) { return __NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(pthread_rwlock_timedrdlock)(__rwlock, __abstime); })
 #endif /* ... */
 #if defined(__CRT_HAVE_pthread_rwlock_timedwrlock64) && defined(__USE_TIME_BITS64)
 /* >> pthread_rwlock_timedwrlock(3), pthread_rwlock_timedwrlock64(3)
@@ -1723,7 +1723,7 @@ __CDECLARE(__ATTR_WUNUSED __ATTR_NONNULL((1, 2)),__errno_t,__NOTHROW_RPC,pthread
  * @return: EOK:       Success
  * @return: EINVAL:    The given `abstime' is invalid
  * @return: ETIMEDOUT: The given `abstime' has expired */
-__NAMESPACE_LOCAL_USING_OR_IMPL(pthread_rwlock_timedwrlock, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_WUNUSED __ATTR_NONNULL((1, 2)) __errno_t __NOTHROW_RPC(__LIBCCALL pthread_rwlock_timedwrlock)(pthread_rwlock_t *__restrict __rwlock, struct timespec const *__restrict __abstime) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(pthread_rwlock_timedwrlock))(__rwlock, __abstime); })
+__NAMESPACE_LOCAL_USING_OR_IMPL(pthread_rwlock_timedwrlock, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_WUNUSED __ATTR_NONNULL((1, 2)) __errno_t __NOTHROW_RPC(__LIBCCALL pthread_rwlock_timedwrlock)(pthread_rwlock_t *__restrict __rwlock, struct timespec const *__restrict __abstime) { return __NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(pthread_rwlock_timedwrlock)(__rwlock, __abstime); })
 #endif /* ... */
 #ifdef __USE_TIME64
 #ifdef __CRT_HAVE_pthread_rwlock_timedrdlock64
@@ -1747,7 +1747,7 @@ __CREDIRECT(__ATTR_WUNUSED __ATTR_NONNULL((1, 2)),__errno_t,__NOTHROW_RPC,pthrea
  * @return: EOK:       Success
  * @return: EINVAL:    The given `abstime' is invalid
  * @return: ETIMEDOUT: The given `abstime' has expired */
-__NAMESPACE_LOCAL_USING_OR_IMPL(pthread_rwlock_timedrdlock64, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_WUNUSED __ATTR_NONNULL((1, 2)) __errno_t __NOTHROW_RPC(__LIBCCALL pthread_rwlock_timedrdlock64)(pthread_rwlock_t *__restrict __rwlock, struct timespec64 const *__restrict __abstime) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(pthread_rwlock_timedrdlock64))(__rwlock, __abstime); })
+__NAMESPACE_LOCAL_USING_OR_IMPL(pthread_rwlock_timedrdlock64, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_WUNUSED __ATTR_NONNULL((1, 2)) __errno_t __NOTHROW_RPC(__LIBCCALL pthread_rwlock_timedrdlock64)(pthread_rwlock_t *__restrict __rwlock, struct timespec64 const *__restrict __abstime) { return __NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(pthread_rwlock_timedrdlock64)(__rwlock, __abstime); })
 #endif /* ... */
 #ifdef __CRT_HAVE_pthread_rwlock_timedwrlock64
 /* >> pthread_rwlock_timedwrlock(3), pthread_rwlock_timedwrlock64(3)
@@ -1770,7 +1770,7 @@ __CREDIRECT(__ATTR_WUNUSED __ATTR_NONNULL((1, 2)),__errno_t,__NOTHROW_RPC,pthrea
  * @return: EOK:       Success
  * @return: EINVAL:    The given `abstime' is invalid
  * @return: ETIMEDOUT: The given `abstime' has expired */
-__NAMESPACE_LOCAL_USING_OR_IMPL(pthread_rwlock_timedwrlock64, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_WUNUSED __ATTR_NONNULL((1, 2)) __errno_t __NOTHROW_RPC(__LIBCCALL pthread_rwlock_timedwrlock64)(pthread_rwlock_t *__restrict __rwlock, struct timespec64 const *__restrict __abstime) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(pthread_rwlock_timedwrlock64))(__rwlock, __abstime); })
+__NAMESPACE_LOCAL_USING_OR_IMPL(pthread_rwlock_timedwrlock64, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_WUNUSED __ATTR_NONNULL((1, 2)) __errno_t __NOTHROW_RPC(__LIBCCALL pthread_rwlock_timedwrlock64)(pthread_rwlock_t *__restrict __rwlock, struct timespec64 const *__restrict __abstime) { return __NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(pthread_rwlock_timedwrlock64)(__rwlock, __abstime); })
 #endif /* ... */
 #endif /* __USE_TIME64 */
 #endif /* __USE_XOPEN2K */
@@ -1796,7 +1796,7 @@ __CDECLARE(__ATTR_WUNUSED __ATTR_NONNULL((1, 2)),__errno_t,__NOTHROW_RPC,pthread
  * @return: EOK:       Success
  * @return: EINVAL:    The given `reltime' is invalid
  * @return: ETIMEDOUT: The given `reltime' has expired */
-__NAMESPACE_LOCAL_USING_OR_IMPL(pthread_rwlock_reltimedrdlock_np, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_WUNUSED __ATTR_NONNULL((1, 2)) __errno_t __NOTHROW_RPC(__LIBCCALL pthread_rwlock_reltimedrdlock_np)(pthread_rwlock_t *__restrict __rwlock, struct timespec const *__restrict __reltime) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(pthread_rwlock_reltimedrdlock_np))(__rwlock, __reltime); })
+__NAMESPACE_LOCAL_USING_OR_IMPL(pthread_rwlock_reltimedrdlock_np, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_WUNUSED __ATTR_NONNULL((1, 2)) __errno_t __NOTHROW_RPC(__LIBCCALL pthread_rwlock_reltimedrdlock_np)(pthread_rwlock_t *__restrict __rwlock, struct timespec const *__restrict __reltime) { return __NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(pthread_rwlock_reltimedrdlock_np)(__rwlock, __reltime); })
 #endif /* ... */
 #if defined(__CRT_HAVE_pthread_rwlock_reltimedwrlock64_np) && defined(__USE_TIME_BITS64)
 /* >> pthread_rwlock_reltimedwrlock_np(3), pthread_rwlock_reltimedwrlock64_np(3)
@@ -1819,7 +1819,7 @@ __CDECLARE(__ATTR_WUNUSED __ATTR_NONNULL((1, 2)),__errno_t,__NOTHROW_RPC,pthread
  * @return: EOK:       Success
  * @return: EINVAL:    The given `reltime' is invalid
  * @return: ETIMEDOUT: The given `reltime' has expired */
-__NAMESPACE_LOCAL_USING_OR_IMPL(pthread_rwlock_reltimedwrlock_np, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_WUNUSED __ATTR_NONNULL((1, 2)) __errno_t __NOTHROW_RPC(__LIBCCALL pthread_rwlock_reltimedwrlock_np)(pthread_rwlock_t *__restrict __rwlock, struct timespec const *__restrict __reltime) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(pthread_rwlock_reltimedwrlock_np))(__rwlock, __reltime); })
+__NAMESPACE_LOCAL_USING_OR_IMPL(pthread_rwlock_reltimedwrlock_np, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_WUNUSED __ATTR_NONNULL((1, 2)) __errno_t __NOTHROW_RPC(__LIBCCALL pthread_rwlock_reltimedwrlock_np)(pthread_rwlock_t *__restrict __rwlock, struct timespec const *__restrict __reltime) { return __NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(pthread_rwlock_reltimedwrlock_np)(__rwlock, __reltime); })
 #endif /* ... */
 #ifdef __USE_TIME64
 #ifdef __CRT_HAVE_pthread_rwlock_reltimedrdlock64_np
@@ -1843,7 +1843,7 @@ __CREDIRECT(__ATTR_WUNUSED __ATTR_NONNULL((1, 2)),__errno_t,__NOTHROW_RPC,pthrea
  * @return: EOK:       Success
  * @return: EINVAL:    The given `reltime' is invalid
  * @return: ETIMEDOUT: The given `reltime' has expired */
-__NAMESPACE_LOCAL_USING_OR_IMPL(pthread_rwlock_reltimedrdlock64_np, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_WUNUSED __ATTR_NONNULL((1, 2)) __errno_t __NOTHROW_RPC(__LIBCCALL pthread_rwlock_reltimedrdlock64_np)(pthread_rwlock_t *__restrict __rwlock, struct timespec64 const *__restrict __reltime) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(pthread_rwlock_reltimedrdlock64_np))(__rwlock, __reltime); })
+__NAMESPACE_LOCAL_USING_OR_IMPL(pthread_rwlock_reltimedrdlock64_np, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_WUNUSED __ATTR_NONNULL((1, 2)) __errno_t __NOTHROW_RPC(__LIBCCALL pthread_rwlock_reltimedrdlock64_np)(pthread_rwlock_t *__restrict __rwlock, struct timespec64 const *__restrict __reltime) { return __NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(pthread_rwlock_reltimedrdlock64_np)(__rwlock, __reltime); })
 #endif /* ... */
 #ifdef __CRT_HAVE_pthread_rwlock_reltimedwrlock64_np
 /* >> pthread_rwlock_reltimedwrlock_np(3), pthread_rwlock_reltimedwrlock64_np(3)
@@ -1866,7 +1866,7 @@ __CREDIRECT(__ATTR_WUNUSED __ATTR_NONNULL((1, 2)),__errno_t,__NOTHROW_RPC,pthrea
  * @return: EOK:       Success
  * @return: EINVAL:    The given `reltime' is invalid
  * @return: ETIMEDOUT: The given `reltime' has expired */
-__NAMESPACE_LOCAL_USING_OR_IMPL(pthread_rwlock_reltimedwrlock64_np, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_WUNUSED __ATTR_NONNULL((1, 2)) __errno_t __NOTHROW_RPC(__LIBCCALL pthread_rwlock_reltimedwrlock64_np)(pthread_rwlock_t *__restrict __rwlock, struct timespec64 const *__restrict __reltime) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(pthread_rwlock_reltimedwrlock64_np))(__rwlock, __reltime); })
+__NAMESPACE_LOCAL_USING_OR_IMPL(pthread_rwlock_reltimedwrlock64_np, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_WUNUSED __ATTR_NONNULL((1, 2)) __errno_t __NOTHROW_RPC(__LIBCCALL pthread_rwlock_reltimedwrlock64_np)(pthread_rwlock_t *__restrict __rwlock, struct timespec64 const *__restrict __reltime) { return __NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(pthread_rwlock_reltimedwrlock64_np)(__rwlock, __reltime); })
 #endif /* ... */
 #endif /* __USE_TIME64 */
 #endif /* __USE_SOLARIS */
@@ -1972,7 +1972,7 @@ __CDECLARE(__ATTR_WUNUSED __ATTR_NONNULL((1, 2, 3)),__errno_t,__NOTHROW_RPC,pthr
  * @return: EOK:       Success
  * @return: EINVAL:    The given `abstime' is invalid
  * @return: ETIMEDOUT: The given `abstime' has expired */
-__NAMESPACE_LOCAL_USING_OR_IMPL(pthread_cond_timedwait, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_WUNUSED __ATTR_NONNULL((1, 2, 3)) __errno_t __NOTHROW_RPC(__LIBCCALL pthread_cond_timedwait)(pthread_cond_t *__restrict __cond, pthread_mutex_t *__restrict __mutex, struct timespec const *__restrict __abstime) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(pthread_cond_timedwait))(__cond, __mutex, __abstime); })
+__NAMESPACE_LOCAL_USING_OR_IMPL(pthread_cond_timedwait, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_WUNUSED __ATTR_NONNULL((1, 2, 3)) __errno_t __NOTHROW_RPC(__LIBCCALL pthread_cond_timedwait)(pthread_cond_t *__restrict __cond, pthread_mutex_t *__restrict __mutex, struct timespec const *__restrict __abstime) { return __NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(pthread_cond_timedwait)(__cond, __mutex, __abstime); })
 #endif /* ... */
 #ifdef __USE_TIME64
 #ifdef __CRT_HAVE_pthread_cond_timedwait64
@@ -2005,7 +2005,7 @@ __CREDIRECT(__ATTR_WUNUSED __ATTR_NONNULL((1, 2, 3)),__errno_t,__NOTHROW_RPC,pth
  * @return: EOK:       Success
  * @return: EINVAL:    The given `abstime' is invalid
  * @return: ETIMEDOUT: The given `abstime' has expired */
-__NAMESPACE_LOCAL_USING_OR_IMPL(pthread_cond_timedwait64, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_WUNUSED __ATTR_NONNULL((1, 2, 3)) __errno_t __NOTHROW_RPC(__LIBCCALL pthread_cond_timedwait64)(pthread_cond_t *__restrict __cond, pthread_mutex_t *__restrict __mutex, struct timespec64 const *__restrict __abstime) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(pthread_cond_timedwait64))(__cond, __mutex, __abstime); })
+__NAMESPACE_LOCAL_USING_OR_IMPL(pthread_cond_timedwait64, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_WUNUSED __ATTR_NONNULL((1, 2, 3)) __errno_t __NOTHROW_RPC(__LIBCCALL pthread_cond_timedwait64)(pthread_cond_t *__restrict __cond, pthread_mutex_t *__restrict __mutex, struct timespec64 const *__restrict __abstime) { return __NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(pthread_cond_timedwait64)(__cond, __mutex, __abstime); })
 #endif /* ... */
 #endif /* __USE_TIME64 */
 #ifdef __USE_SOLARIS
@@ -2033,7 +2033,7 @@ __CDECLARE(__ATTR_WUNUSED __ATTR_NONNULL((1, 2, 3)),__errno_t,__NOTHROW_RPC,pthr
  * @return: EOK:       Success
  * @return: EINVAL:    The given `reltime' is invalid
  * @return: ETIMEDOUT: The given `reltime' has expired */
-__NAMESPACE_LOCAL_USING_OR_IMPL(pthread_cond_reltimedwait_np, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_WUNUSED __ATTR_NONNULL((1, 2, 3)) __errno_t __NOTHROW_RPC(__LIBCCALL pthread_cond_reltimedwait_np)(pthread_cond_t *__restrict __cond, pthread_mutex_t *__restrict __mutex, struct timespec const *__restrict __reltime) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(pthread_cond_reltimedwait_np))(__cond, __mutex, __reltime); })
+__NAMESPACE_LOCAL_USING_OR_IMPL(pthread_cond_reltimedwait_np, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_WUNUSED __ATTR_NONNULL((1, 2, 3)) __errno_t __NOTHROW_RPC(__LIBCCALL pthread_cond_reltimedwait_np)(pthread_cond_t *__restrict __cond, pthread_mutex_t *__restrict __mutex, struct timespec const *__restrict __reltime) { return __NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(pthread_cond_reltimedwait_np)(__cond, __mutex, __reltime); })
 #endif /* ... */
 #ifdef __USE_TIME64
 #ifdef __CRT_HAVE_pthread_cond_reltimedwait64_np
@@ -2060,7 +2060,7 @@ __CREDIRECT(__ATTR_WUNUSED __ATTR_NONNULL((1, 2, 3)),__errno_t,__NOTHROW_RPC,pth
  * @return: EOK:       Success
  * @return: EINVAL:    The given `reltime' is invalid
  * @return: ETIMEDOUT: The given `reltime' has expired */
-__NAMESPACE_LOCAL_USING_OR_IMPL(pthread_cond_reltimedwait64_np, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_WUNUSED __ATTR_NONNULL((1, 2, 3)) __errno_t __NOTHROW_RPC(__LIBCCALL pthread_cond_reltimedwait64_np)(pthread_cond_t *__restrict __cond, pthread_mutex_t *__restrict __mutex, struct timespec64 const *__restrict __reltime) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(pthread_cond_reltimedwait64_np))(__cond, __mutex, __reltime); })
+__NAMESPACE_LOCAL_USING_OR_IMPL(pthread_cond_reltimedwait64_np, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_WUNUSED __ATTR_NONNULL((1, 2, 3)) __errno_t __NOTHROW_RPC(__LIBCCALL pthread_cond_reltimedwait64_np)(pthread_cond_t *__restrict __cond, pthread_mutex_t *__restrict __mutex, struct timespec64 const *__restrict __reltime) { return __NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(pthread_cond_reltimedwait64_np)(__cond, __mutex, __reltime); })
 #endif /* ... */
 #endif /* __USE_TIME64 */
 #endif /* __USE_SOLARIS */
@@ -2117,7 +2117,7 @@ __CDECLARE(__ATTR_NONNULL((1)),__errno_t,__NOTHROW_NCX,pthread_spin_init,(pthrea
  * Initialize the spinlock `lock'. If `pshared' is nonzero
  * the  spinlock can be shared between different processes
  * @return: EOK: Success */
-__NAMESPACE_LOCAL_USING_OR_IMPL(pthread_spin_init, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_NONNULL((1)) __errno_t __NOTHROW_NCX(__LIBCCALL pthread_spin_init)(pthread_spinlock_t *__lock, int __pshared) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(pthread_spin_init))(__lock, __pshared); })
+__NAMESPACE_LOCAL_USING_OR_IMPL(pthread_spin_init, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_NONNULL((1)) __errno_t __NOTHROW_NCX(__LIBCCALL pthread_spin_init)(pthread_spinlock_t *__lock, int __pshared) { return __NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(pthread_spin_init)(__lock, __pshared); })
 #endif /* !__CRT_HAVE_pthread_spin_init */
 #ifdef __CRT_HAVE_pthread_spin_destroy
 /* >> pthread_spin_destroy(3)
@@ -2129,7 +2129,7 @@ __CDECLARE(__ATTR_NONNULL((1)),__errno_t,__NOTHROW_NCX,pthread_spin_destroy,(pth
 /* >> pthread_spin_destroy(3)
  * Destroy the spinlock `lock'
  * @return: EOK: Success */
-__NAMESPACE_LOCAL_USING_OR_IMPL(pthread_spin_destroy, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_NONNULL((1)) __errno_t __NOTHROW_NCX(__LIBCCALL pthread_spin_destroy)(pthread_spinlock_t *__lock) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(pthread_spin_destroy))(__lock); })
+__NAMESPACE_LOCAL_USING_OR_IMPL(pthread_spin_destroy, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_NONNULL((1)) __errno_t __NOTHROW_NCX(__LIBCCALL pthread_spin_destroy)(pthread_spinlock_t *__lock) { return __NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(pthread_spin_destroy)(__lock); })
 #endif /* !__CRT_HAVE_pthread_spin_destroy */
 #ifdef __CRT_HAVE_pthread_spin_lock
 /* >> pthread_spin_lock(3)
@@ -2141,7 +2141,7 @@ __CDECLARE(__ATTR_NONNULL((1)),__errno_t,__NOTHROW_NCX,pthread_spin_lock,(pthrea
 /* >> pthread_spin_lock(3)
  * Wait until spinlock `lock' is retrieved
  * @return: EOK: Success */
-__NAMESPACE_LOCAL_USING_OR_IMPL(pthread_spin_lock, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_NONNULL((1)) __errno_t __NOTHROW_NCX(__LIBCCALL pthread_spin_lock)(pthread_spinlock_t *__lock) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(pthread_spin_lock))(__lock); })
+__NAMESPACE_LOCAL_USING_OR_IMPL(pthread_spin_lock, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_NONNULL((1)) __errno_t __NOTHROW_NCX(__LIBCCALL pthread_spin_lock)(pthread_spinlock_t *__lock) { return __NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(pthread_spin_lock)(__lock); })
 #endif /* !__CRT_HAVE_pthread_spin_lock */
 #ifdef __CRT_HAVE_pthread_spin_trylock
 /* >> pthread_spin_trylock(3)
@@ -2155,7 +2155,7 @@ __CDECLARE(__ATTR_WUNUSED __ATTR_NONNULL((1)),__errno_t,__NOTHROW_NCX,pthread_sp
  * Try to lock spinlock `lock'
  * @return: EOK:   Success
  * @return: EBUSY: Lock has already been acquired */
-__NAMESPACE_LOCAL_USING_OR_IMPL(pthread_spin_trylock, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_WUNUSED __ATTR_NONNULL((1)) __errno_t __NOTHROW_NCX(__LIBCCALL pthread_spin_trylock)(pthread_spinlock_t *__lock) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(pthread_spin_trylock))(__lock); })
+__NAMESPACE_LOCAL_USING_OR_IMPL(pthread_spin_trylock, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_WUNUSED __ATTR_NONNULL((1)) __errno_t __NOTHROW_NCX(__LIBCCALL pthread_spin_trylock)(pthread_spinlock_t *__lock) { return __NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(pthread_spin_trylock)(__lock); })
 #endif /* !__CRT_HAVE_pthread_spin_trylock */
 #ifdef __CRT_HAVE_pthread_spin_unlock
 /* >> pthread_spin_unlock(3)
@@ -2167,7 +2167,7 @@ __CDECLARE(__ATTR_NONNULL((1)),__errno_t,__NOTHROW_NCX,pthread_spin_unlock,(pthr
 /* >> pthread_spin_unlock(3)
  * Release  spinlock  `lock'
  * @return: EOK: Success */
-__NAMESPACE_LOCAL_USING_OR_IMPL(pthread_spin_unlock, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_NONNULL((1)) __errno_t __NOTHROW_NCX(__LIBCCALL pthread_spin_unlock)(pthread_spinlock_t *__lock) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(pthread_spin_unlock))(__lock); })
+__NAMESPACE_LOCAL_USING_OR_IMPL(pthread_spin_unlock, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_NONNULL((1)) __errno_t __NOTHROW_NCX(__LIBCCALL pthread_spin_unlock)(pthread_spinlock_t *__lock) { return __NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(pthread_spin_unlock)(__lock); })
 #endif /* !__CRT_HAVE_pthread_spin_unlock */
 
 
@@ -2263,7 +2263,7 @@ __CDECLARE(__ATTR_NONNULL((1)),__errno_t,__NOTHROW_NCX,pthread_key_create_once_n
  * function will no longer block, but simply return immediately.
  * @return: EOK:    Success
  * @return: ENOMEM: Insufficient memory to create the key */
-__NAMESPACE_LOCAL_USING_OR_IMPL(pthread_key_create_once_np, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_NONNULL((1)) __errno_t __NOTHROW_NCX(__LIBCCALL pthread_key_create_once_np)(pthread_key_t *__key, __pthread_destr_function_t __destr_function) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(pthread_key_create_once_np))(__key, __destr_function); })
+__NAMESPACE_LOCAL_USING_OR_IMPL(pthread_key_create_once_np, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_NONNULL((1)) __errno_t __NOTHROW_NCX(__LIBCCALL pthread_key_create_once_np)(pthread_key_t *__key, __pthread_destr_function_t __destr_function) { return __NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(pthread_key_create_once_np)(__key, __destr_function); })
 #endif /* ... */
 #endif /* __USE_SOLARIS */
 #ifdef __CRT_HAVE_pthread_key_delete
@@ -2342,7 +2342,7 @@ __CDECLARE(,__STDC_INT_AS_SIZE_T,__NOTHROW_NCX,pthread_num_processors_np,(void),
 #include <libc/local/pthread/pthread_num_processors_np.h>
 /* >> pthread_num_processors_np(3)
  * @return: * : The number of cpus that the calling thread is able to run on */
-__NAMESPACE_LOCAL_USING_OR_IMPL(pthread_num_processors_np, __FORCELOCAL __ATTR_ARTIFICIAL __STDC_INT_AS_SIZE_T __NOTHROW_NCX(__LIBCCALL pthread_num_processors_np)(void) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(pthread_num_processors_np))(); })
+__NAMESPACE_LOCAL_USING_OR_IMPL(pthread_num_processors_np, __FORCELOCAL __ATTR_ARTIFICIAL __STDC_INT_AS_SIZE_T __NOTHROW_NCX(__LIBCCALL pthread_num_processors_np)(void) { return __NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(pthread_num_processors_np)(); })
 #endif /* ... */
 #ifdef __CRT_HAVE_pthread_set_num_processors_np
 /* >> pthread_set_num_processors_np(3)
@@ -2358,7 +2358,7 @@ __CDECLARE(,__errno_t,__NOTHROW_NCX,pthread_set_num_processors_np,(int __n),(__n
  * @return: EOK:    Success
  * @return: EINVAL: `n' was specified as less than `1'
  * @return: * :     Same as `errno' after a call to `sched_setaffinity(2)' */
-__NAMESPACE_LOCAL_USING_OR_IMPL(pthread_set_num_processors_np, __FORCELOCAL __ATTR_ARTIFICIAL __errno_t __NOTHROW_NCX(__LIBCCALL pthread_set_num_processors_np)(int __n) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(pthread_set_num_processors_np))(__n); })
+__NAMESPACE_LOCAL_USING_OR_IMPL(pthread_set_num_processors_np, __FORCELOCAL __ATTR_ARTIFICIAL __errno_t __NOTHROW_NCX(__LIBCCALL pthread_set_num_processors_np)(int __n) { return __NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(pthread_set_num_processors_np)(__n); })
 #endif /* ... */
 #ifdef __USE_BSD
 #ifndef __pthread_main_np_defined
@@ -2387,7 +2387,7 @@ __CREDIRECT(__ATTR_CONST,int,__NOTHROW,pthread_main_np,(void),thr_main,())
  * calling program), and 0  otherwise. Additionally, -1 is  returned
  * if the  calling  thread  "hasn't been initialized",  though  this
  * isn't a case that can actually happen under KOS's implementation. */
-__NAMESPACE_LOCAL_USING_OR_IMPL(pthread_main_np, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_CONST int __NOTHROW(__LIBCCALL pthread_main_np)(void) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(pthread_main_np))(); })
+__NAMESPACE_LOCAL_USING_OR_IMPL(pthread_main_np, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_CONST int __NOTHROW(__LIBCCALL pthread_main_np)(void) { return __NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(pthread_main_np)(); })
 #else /* ... */
 #undef __pthread_main_np_defined
 #endif /* !... */

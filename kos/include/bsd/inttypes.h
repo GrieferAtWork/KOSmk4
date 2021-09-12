@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x379a93cf */
+/* HASH CRC-32:0xa0c51f61 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -62,7 +62,7 @@ __CDECLARE(__ATTR_LEAF __ATTR_NONNULL((1)),__INTMAX_TYPE__,__NOTHROW_NCX,strtoi,
  * to those bounds and set `*rstatus' (if non-`NULL') to `ERANGE'
  * @param: lo, hi:  Lo/Hi-bounds for the to-be returned integer.
  * @param: rstatus: When non-`NULL', set to a conversion error (if any) */
-__NAMESPACE_LOCAL_USING_OR_IMPL(strtoi, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_LEAF __ATTR_NONNULL((1)) __INTMAX_TYPE__ __NOTHROW_NCX(__LIBCCALL strtoi)(char const *__restrict __nptr, char **__restrict __endptr, __STDC_INT_AS_UINT_T __base, __INTMAX_TYPE__ __lo, __INTMAX_TYPE__ __hi, __errno_t *__rstatus) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(strtoi))(__nptr, __endptr, __base, __lo, __hi, __rstatus); })
+__NAMESPACE_LOCAL_USING_OR_IMPL(strtoi, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_LEAF __ATTR_NONNULL((1)) __INTMAX_TYPE__ __NOTHROW_NCX(__LIBCCALL strtoi)(char const *__restrict __nptr, char **__restrict __endptr, __STDC_INT_AS_UINT_T __base, __INTMAX_TYPE__ __lo, __INTMAX_TYPE__ __hi, __errno_t *__rstatus) { return __NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(strtoi)(__nptr, __endptr, __base, __lo, __hi, __rstatus); })
 #endif /* !__CRT_HAVE_strtoi */
 #endif /* !__strtoi_defined */
 #ifndef __strtou_defined
@@ -93,7 +93,7 @@ __CDECLARE(__ATTR_LEAF __ATTR_NONNULL((1)),__UINTMAX_TYPE__,__NOTHROW_NCX,strtou
  * to those bounds and set `*rstatus' (if non-`NULL') to `ERANGE'
  * @param: lo, hi:  Lo/Hi-bounds for the to-be returned integer.
  * @param: rstatus: When non-`NULL', set to a conversion error (if any) */
-__NAMESPACE_LOCAL_USING_OR_IMPL(strtou, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_LEAF __ATTR_NONNULL((1)) __UINTMAX_TYPE__ __NOTHROW_NCX(__LIBCCALL strtou)(char const *__restrict __nptr, char **__restrict __endptr, __STDC_INT_AS_UINT_T __base, __UINTMAX_TYPE__ __lo, __UINTMAX_TYPE__ __hi, __errno_t *__rstatus) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(strtou))(__nptr, __endptr, __base, __lo, __hi, __rstatus); })
+__NAMESPACE_LOCAL_USING_OR_IMPL(strtou, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_LEAF __ATTR_NONNULL((1)) __UINTMAX_TYPE__ __NOTHROW_NCX(__LIBCCALL strtou)(char const *__restrict __nptr, char **__restrict __endptr, __STDC_INT_AS_UINT_T __base, __UINTMAX_TYPE__ __lo, __UINTMAX_TYPE__ __hi, __errno_t *__rstatus) { return __NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(strtou)(__nptr, __endptr, __base, __lo, __hi, __rstatus); })
 #endif /* !__CRT_HAVE_strtou */
 #endif /* !__strtou_defined */
 

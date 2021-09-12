@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xafaef8d9 */
+/* HASH CRC-32:0xc5c5d414 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -135,11 +135,11 @@ __LOCAL_LIBC(__execvpe_impl) __ATTR_NOINLINE __ATTR_NONNULL((1, 3, 5, 6)) int
 #endif /* !_WIN32 */
 	__fullpath = (char *)__hybrid_alloca((__path_len + 1 + __file_len + 1) *
 	                                   sizeof(char));
-	__dst = (char *)(__NAMESPACE_LOCAL_SYM __localdep_mempcpyc)(__fullpath, __path, __path_len, sizeof(char));
+	__dst = (char *)__localdep_mempcpyc(__fullpath, __path, __path_len, sizeof(char));
 	*__dst++ = '/';
-	__dst = (char *)(__NAMESPACE_LOCAL_SYM __localdep_mempcpyc)(__dst, __file, __file_len, sizeof(char));
+	__dst = (char *)__localdep_mempcpyc(__dst, __file, __file_len, sizeof(char));
 	*__dst = '\0';
-	return (__NAMESPACE_LOCAL_SYM __localdep_execve)(__fullpath, ___argv, ___envp);
+	return __localdep_execve(__fullpath, ___argv, ___envp);
 }
 __NAMESPACE_LOCAL_END
 __NAMESPACE_LOCAL_BEGIN

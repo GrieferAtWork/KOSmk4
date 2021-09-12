@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x7ea9adef */
+/* HASH CRC-32:0xfb904847 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -75,7 +75,7 @@ __CDECLARE(,int,__NOTHROW_RPC_KOS,login_tty,(__fd_t __fd),(__fd))
  * stdout,   and  stderr.  Afterwards,  `fd'  is  closed.
  * @return: 0 : Success
  * @return: * : Error */
-__NAMESPACE_LOCAL_USING_OR_IMPL(login_tty, __FORCELOCAL __ATTR_ARTIFICIAL int __NOTHROW_RPC_KOS(__LIBCCALL login_tty)(__fd_t __fd) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(login_tty))(__fd); })
+__NAMESPACE_LOCAL_USING_OR_IMPL(login_tty, __FORCELOCAL __ATTR_ARTIFICIAL int __NOTHROW_RPC_KOS(__LIBCCALL login_tty)(__fd_t __fd) { return __NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(login_tty)(__fd); })
 #else /* __TIOCSCTTY && __CRT_HAVE_ioctl && __CRT_HAVE_setsid && (__CRT_HAVE_dup2 || __CRT_HAVE__dup2 || __CRT_HAVE___dup2) && (__CRT_HAVE_close || __CRT_HAVE__close || __CRT_HAVE___close) */
 #undef __login_tty_defined
 #endif /* !__TIOCSCTTY || !__CRT_HAVE_ioctl || !__CRT_HAVE_setsid || (!__CRT_HAVE_dup2 && !__CRT_HAVE__dup2 && !__CRT_HAVE___dup2) || (!__CRT_HAVE_close && !__CRT_HAVE__close && !__CRT_HAVE___close) */

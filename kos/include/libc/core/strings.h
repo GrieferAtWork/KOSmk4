@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xdd11bb1e */
+/* HASH CRC-32:0x467696c2 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -57,7 +57,7 @@ __CREDIRECT_VOID(,__NOTHROW_NCX,__libc_core_explicit_bzero,(void *__dst, __SIZE_
  * away uses of this function when they (think) that clearing the memory
  * wouldn't  have  any visible  side-effects (though  those side-effects
  * may be a security-concious application trying to wipe sensitive data) */
-#define __libc_core_explicit_bzero (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(explicit_bzero))
+#define __libc_core_explicit_bzero __NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(explicit_bzero)
 #endif /* !... */
 
 __SYSDECL_END

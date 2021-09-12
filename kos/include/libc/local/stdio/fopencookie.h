@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xfda6088 */
+/* HASH CRC-32:0x6ef998f0 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -225,7 +225,7 @@ __LOCAL_LIBC(__fopencookie_to_funopen_closefn) int
 	if (__holder->__foch_funcs.close != __NULLPTR)
 		__result = (*__holder->__foch_funcs.close)(__holder->__foch_cookie);
 #if defined(__CRT_HAVE_free) || defined(__CRT_HAVE_cfree)
-	(__NAMESPACE_LOCAL_SYM __localdep_free)(__holder);
+	__localdep_free(__holder);
 #endif /* __CRT_HAVE_free || __CRT_HAVE_cfree */
 	return __result;
 }

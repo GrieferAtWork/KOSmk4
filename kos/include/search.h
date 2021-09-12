@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x4d0a9c7c */
+/* HASH CRC-32:0x9d7b5ecd */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -169,7 +169,7 @@ __CDECLARE_VOID(__ATTR_NONNULL((1)),__NOTHROW_NCX,insque,(void *__restrict __ele
 #include <libc/local/search/insque.h>
 /* >> insque(3)
  * Insert ELEM into a doubly-linked list, after PREV */
-__NAMESPACE_LOCAL_USING_OR_IMPL(insque, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_NONNULL((1)) void __NOTHROW_NCX(__LIBCCALL insque)(void *__restrict __elem, void *__prev) { (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(insque))(__elem, __prev); })
+__NAMESPACE_LOCAL_USING_OR_IMPL(insque, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_NONNULL((1)) void __NOTHROW_NCX(__LIBCCALL insque)(void *__restrict __elem, void *__prev) { __NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(insque)(__elem, __prev); })
 #endif /* !__CRT_HAVE_insque */
 #ifdef __CRT_HAVE_remque
 /* >> remque(3)
@@ -179,7 +179,7 @@ __CDECLARE_VOID(__ATTR_NONNULL((1)),__NOTHROW_NCX,remque,(void *__restrict __ele
 #include <libc/local/search/remque.h>
 /* >> remque(3)
  * Unlink ELEM from the doubly-linked list that it is in */
-__NAMESPACE_LOCAL_USING_OR_IMPL(remque, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_NONNULL((1)) void __NOTHROW_NCX(__LIBCCALL remque)(void *__restrict __elem) { (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(remque))(__elem); })
+__NAMESPACE_LOCAL_USING_OR_IMPL(remque, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_NONNULL((1)) void __NOTHROW_NCX(__LIBCCALL remque)(void *__restrict __elem) { __NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(remque)(__elem); })
 #endif /* !__CRT_HAVE_remque */
 #endif /* __USE_MISC || __USE_XOPEN_EXTENDED */
 /* For use with hsearch(3).  */
@@ -221,7 +221,7 @@ __CDECLARE(,ENTRY *,__NOTHROW_NCX,hsearch,(ENTRY __item, ACTION __action),(__ite
  * Search for entry matching `item.key' in internal hash table.
  * If `action' is `FIND' return found entry or signal error by returning `NULL'.
  * If  `action'  is  `ENTER' replace  existing  data (if  any)  with `item.data' */
-__NAMESPACE_LOCAL_USING_OR_IMPL(hsearch, __FORCELOCAL __ATTR_ARTIFICIAL ENTRY *__NOTHROW_NCX(__LIBCCALL hsearch)(ENTRY __item, ACTION __action) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(hsearch))(__item, __action); })
+__NAMESPACE_LOCAL_USING_OR_IMPL(hsearch, __FORCELOCAL __ATTR_ARTIFICIAL ENTRY *__NOTHROW_NCX(__LIBCCALL hsearch)(ENTRY __item, ACTION __action) { return __NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(hsearch)(__item, __action); })
 #endif /* !__CRT_HAVE_hsearch */
 #ifdef __CRT_HAVE_hcreate
 /* >> hcreate(3)
@@ -231,7 +231,7 @@ __CDECLARE(,int,__NOTHROW_NCX,hcreate,(size_t __nel),(__nel))
 #include <libc/local/search/hcreate.h>
 /* >> hcreate(3)
  * Create a new hashing table which will at most contain `nel' elements */
-__NAMESPACE_LOCAL_USING_OR_IMPL(hcreate, __FORCELOCAL __ATTR_ARTIFICIAL int __NOTHROW_NCX(__LIBCCALL hcreate)(size_t __nel) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(hcreate))(__nel); })
+__NAMESPACE_LOCAL_USING_OR_IMPL(hcreate, __FORCELOCAL __ATTR_ARTIFICIAL int __NOTHROW_NCX(__LIBCCALL hcreate)(size_t __nel) { return __NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(hcreate)(__nel); })
 #endif /* ... */
 #ifdef __CRT_HAVE_hdestroy
 /* >> hdestroy(3)
@@ -241,7 +241,7 @@ __CDECLARE_VOID(,__NOTHROW_NCX,hdestroy,(void),())
 #include <libc/local/search/hdestroy.h>
 /* >> hdestroy(3)
  * Destroy current internal hashing table */
-__NAMESPACE_LOCAL_USING_OR_IMPL(hdestroy, __FORCELOCAL __ATTR_ARTIFICIAL void __NOTHROW_NCX(__LIBCCALL hdestroy)(void) { (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(hdestroy))(); })
+__NAMESPACE_LOCAL_USING_OR_IMPL(hdestroy, __FORCELOCAL __ATTR_ARTIFICIAL void __NOTHROW_NCX(__LIBCCALL hdestroy)(void) { __NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(hdestroy)(); })
 #endif /* !__CRT_HAVE_hdestroy */
 #ifdef __USE_GNU
 /* Data type for reentrant functions.  */
@@ -261,7 +261,7 @@ __CDECLARE(__ATTR_NONNULL((3, 4)),int,__NOTHROW_NCX,hsearch_r,(ENTRY __item, ACT
 #include <libc/local/search/hsearch_r.h>
 /* >> hsearch_r(3)
  * Reentrant versions which can handle multiple hashing tables at the same time */
-__NAMESPACE_LOCAL_USING_OR_IMPL(hsearch_r, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_NONNULL((3, 4)) int __NOTHROW_NCX(__LIBCCALL hsearch_r)(ENTRY __item, ACTION __action, ENTRY **__retval, struct hsearch_data *__htab) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(hsearch_r))(__item, __action, __retval, __htab); })
+__NAMESPACE_LOCAL_USING_OR_IMPL(hsearch_r, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_NONNULL((3, 4)) int __NOTHROW_NCX(__LIBCCALL hsearch_r)(ENTRY __item, ACTION __action, ENTRY **__retval, struct hsearch_data *__htab) { return __NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(hsearch_r)(__item, __action, __retval, __htab); })
 #endif /* !__CRT_HAVE_hsearch_r */
 #ifdef __CRT_HAVE_hcreate_r
 /* >> hcreate_r(3) */
@@ -269,7 +269,7 @@ __CDECLARE(,int,__NOTHROW_NCX,hcreate_r,(size_t __nel, struct hsearch_data *__ht
 #elif defined(__CRT_HAVE_malloc) || defined(__CRT_HAVE_calloc) || defined(__CRT_HAVE_realloc) || defined(__CRT_HAVE_memalign) || defined(__CRT_HAVE_aligned_alloc) || defined(__CRT_HAVE_posix_memalign)
 #include <libc/local/search/hcreate_r.h>
 /* >> hcreate_r(3) */
-__NAMESPACE_LOCAL_USING_OR_IMPL(hcreate_r, __FORCELOCAL __ATTR_ARTIFICIAL int __NOTHROW_NCX(__LIBCCALL hcreate_r)(size_t __nel, struct hsearch_data *__htab) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(hcreate_r))(__nel, __htab); })
+__NAMESPACE_LOCAL_USING_OR_IMPL(hcreate_r, __FORCELOCAL __ATTR_ARTIFICIAL int __NOTHROW_NCX(__LIBCCALL hcreate_r)(size_t __nel, struct hsearch_data *__htab) { return __NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(hcreate_r)(__nel, __htab); })
 #endif /* ... */
 #ifdef __CRT_HAVE_hdestroy_r
 /* >> hdestroy_r(3) */
@@ -277,7 +277,7 @@ __CDECLARE_VOID(,__NOTHROW_NCX,hdestroy_r,(struct hsearch_data *__htab),(__htab)
 #else /* __CRT_HAVE_hdestroy_r */
 #include <libc/local/search/hdestroy_r.h>
 /* >> hdestroy_r(3) */
-__NAMESPACE_LOCAL_USING_OR_IMPL(hdestroy_r, __FORCELOCAL __ATTR_ARTIFICIAL void __NOTHROW_NCX(__LIBCCALL hdestroy_r)(struct hsearch_data *__htab) { (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(hdestroy_r))(__htab); })
+__NAMESPACE_LOCAL_USING_OR_IMPL(hdestroy_r, __FORCELOCAL __ATTR_ARTIFICIAL void __NOTHROW_NCX(__LIBCCALL hdestroy_r)(struct hsearch_data *__htab) { __NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(hdestroy_r)(__htab); })
 #endif /* !__CRT_HAVE_hdestroy_r */
 #endif /* __USE_GNU */
 /* The tsearch routines are very interesting. They make  many
@@ -299,7 +299,7 @@ __CREDIRECT(__ATTR_NONNULL((3)),void *,__NOTHROW_NCX,tsearch,(void const *__key,
 /* >> tsearch(3)
  * Search for an  entry matching  the given `key'  in the  tree
  * pointed to by `*rootp' and insert a new element if not found */
-__NAMESPACE_LOCAL_USING_OR_IMPL(tsearch, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_NONNULL((3)) void *__NOTHROW_NCX(__LIBCCALL tsearch)(void const *__key, void **__vrootp, __compar_fn_t __compar) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(tsearch))(__key, __vrootp, __compar); })
+__NAMESPACE_LOCAL_USING_OR_IMPL(tsearch, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_NONNULL((3)) void *__NOTHROW_NCX(__LIBCCALL tsearch)(void const *__key, void **__vrootp, __compar_fn_t __compar) { return __NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(tsearch)(__key, __vrootp, __compar); })
 #endif /* ... */
 #ifdef __CRT_HAVE_tfind
 /* >> tfind(3)
@@ -316,7 +316,7 @@ __CREDIRECT(__ATTR_NONNULL((3)),void *,__NOTHROW_NCX,tfind,(void const *__key, v
 /* >> tfind(3)
  * Search for an entry matching the given `key' in the tree pointed
  * to  by `*rootp'. If no matching entry is available return `NULL' */
-__NAMESPACE_LOCAL_USING_OR_IMPL(tfind, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_NONNULL((3)) void *__NOTHROW_NCX(__LIBCCALL tfind)(void const *__key, void *const *__vrootp, __compar_fn_t __compar) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(tfind))(__key, __vrootp, __compar); })
+__NAMESPACE_LOCAL_USING_OR_IMPL(tfind, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_NONNULL((3)) void *__NOTHROW_NCX(__LIBCCALL tfind)(void const *__key, void *const *__vrootp, __compar_fn_t __compar) { return __NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(tfind)(__key, __vrootp, __compar); })
 #endif /* !... */
 #ifdef __CRT_HAVE_tdelete
 /* >> tdelete(3)
@@ -330,7 +330,7 @@ __CREDIRECT(__ATTR_NONNULL((3)),void *,__NOTHROW_NCX,tdelete,(void const *__rest
 #include <libc/local/search/tdelete.h>
 /* >> tdelete(3)
  * Remove the element matching `key' from the tree pointed to by `*rootp' */
-__NAMESPACE_LOCAL_USING_OR_IMPL(tdelete, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_NONNULL((3)) void *__NOTHROW_NCX(__LIBCCALL tdelete)(void const *__restrict __key, void **__restrict __vrootp, __compar_fn_t __compar) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(tdelete))(__key, __vrootp, __compar); })
+__NAMESPACE_LOCAL_USING_OR_IMPL(tdelete, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_NONNULL((3)) void *__NOTHROW_NCX(__LIBCCALL tdelete)(void const *__restrict __key, void **__restrict __vrootp, __compar_fn_t __compar) { return __NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(tdelete)(__key, __vrootp, __compar); })
 #endif /* !... */
 #ifndef __ACTION_FN_T
 #define __ACTION_FN_T 1
@@ -348,7 +348,7 @@ __CREDIRECT_VOID(,__NOTHROW_NCX,twalk,(void const *__root, __action_fn_t __actio
 #include <libc/local/search/twalk.h>
 /* >> twalk(3)
  * Walk through the whole tree and call the `action' callback for every node or leaf */
-__NAMESPACE_LOCAL_USING_OR_IMPL(twalk, __FORCELOCAL __ATTR_ARTIFICIAL void __NOTHROW_NCX(__LIBCCALL twalk)(void const *__root, __action_fn_t __action) { (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(twalk))(__root, __action); })
+__NAMESPACE_LOCAL_USING_OR_IMPL(twalk, __FORCELOCAL __ATTR_ARTIFICIAL void __NOTHROW_NCX(__LIBCCALL twalk)(void const *__root, __action_fn_t __action) { __NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(twalk)(__root, __action); })
 #endif /* !... */
 #ifdef __USE_GNU
 /* Callback type for function to free a tree node.
@@ -365,7 +365,7 @@ __CDECLARE_VOID(__ATTR_NONNULL((2)),__NOTHROW_NCX,tdestroy,(void *__root, __free
 #include <libc/local/search/tdestroy.h>
 /* >> tdestroy(3)
  * Destroy the whole tree, call `freefct' for each node or leaf */
-__NAMESPACE_LOCAL_USING_OR_IMPL(tdestroy, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_NONNULL((2)) void __NOTHROW_NCX(__LIBCCALL tdestroy)(void *__root, __free_fn_t __freefct) { (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(tdestroy))(__root, __freefct); })
+__NAMESPACE_LOCAL_USING_OR_IMPL(tdestroy, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_NONNULL((2)) void __NOTHROW_NCX(__LIBCCALL tdestroy)(void *__root, __free_fn_t __freefct) { __NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(tdestroy)(__root, __freefct); })
 #endif /* !__CRT_HAVE_tdestroy */
 #endif /* __USE_GNU */
 #ifdef __CRT_HAVE_lfind
@@ -389,15 +389,15 @@ __CDECLARE(__ATTR_NONNULL((2, 3, 5)),void *,__NOTHROW_NCX,lfind,(void const *__k
 extern "C++" {
 /* >> lfind(3)
  * Perform linear search for `key' by comparing by `compar' in an array [base, base+nmemb*size) */
-__FORCELOCAL __ATTR_ARTIFICIAL __ATTR_NONNULL((2, 3, 5)) void *__NOTHROW_NCX(__LIBCCALL lfind)(void const *__key, void *__base, size_t __KOS_FIXED_CONST *__nmemb, size_t __size, __compar_fn_t __compar) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(lfind))(__key, __base, __nmemb, __size, __compar); }
+__FORCELOCAL __ATTR_ARTIFICIAL __ATTR_NONNULL((2, 3, 5)) void *__NOTHROW_NCX(__LIBCCALL lfind)(void const *__key, void *__base, size_t __KOS_FIXED_CONST *__nmemb, size_t __size, __compar_fn_t __compar) { return __NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(lfind)(__key, __base, __nmemb, __size, __compar); }
 /* >> lfind(3)
  * Perform linear search for `key' by comparing by `compar' in an array [base, base+nmemb*size) */
-__FORCELOCAL __ATTR_ARTIFICIAL __ATTR_NONNULL((2, 3, 5)) void const *__NOTHROW_NCX(__LIBCCALL lfind)(void const *__key, void const *__base, size_t __KOS_FIXED_CONST *__nmemb, size_t __size, __compar_fn_t __compar) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(lfind))(__key, __base, __nmemb, __size, __compar); }
+__FORCELOCAL __ATTR_ARTIFICIAL __ATTR_NONNULL((2, 3, 5)) void const *__NOTHROW_NCX(__LIBCCALL lfind)(void const *__key, void const *__base, size_t __KOS_FIXED_CONST *__nmemb, size_t __size, __compar_fn_t __compar) { return __NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(lfind)(__key, __base, __nmemb, __size, __compar); }
 } /* extern "C++" */
 #else /* __cplusplus && __CORRECT_ISO_CPP_SEARCH_H_PROTO */
 /* >> lfind(3)
  * Perform linear search for `key' by comparing by `compar' in an array [base, base+nmemb*size) */
-__NAMESPACE_LOCAL_USING_OR_IMPL(lfind, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_NONNULL((2, 3, 5)) void *__NOTHROW_NCX(__LIBCCALL lfind)(void const *__key, void const *__base, size_t __KOS_FIXED_CONST *__nmemb, size_t __size, __compar_fn_t __compar) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(lfind))(__key, __base, __nmemb, __size, __compar); })
+__NAMESPACE_LOCAL_USING_OR_IMPL(lfind, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_NONNULL((2, 3, 5)) void *__NOTHROW_NCX(__LIBCCALL lfind)(void const *__key, void const *__base, size_t __KOS_FIXED_CONST *__nmemb, size_t __size, __compar_fn_t __compar) { return __NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(lfind)(__key, __base, __nmemb, __size, __compar); })
 #endif /* !__cplusplus || !__CORRECT_ISO_CPP_SEARCH_H_PROTO */
 #endif /* !__CRT_HAVE_lfind */
 #ifdef __CRT_HAVE_lsearch
@@ -410,7 +410,7 @@ __CDECLARE(__ATTR_NONNULL((2, 3, 5)),void *,__NOTHROW_NCX,lsearch,(void const *_
 /* >> lsearch(3)
  * Perform linear search for `key' by comparing by `compar' function
  * in array [base,  base+nmemb*size) and insert  entry if not  found */
-__NAMESPACE_LOCAL_USING_OR_IMPL(lsearch, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_NONNULL((2, 3, 5)) void *__NOTHROW_NCX(__LIBCCALL lsearch)(void const *__key, void *__base, size_t *__nmemb, size_t __size, __compar_fn_t __compar) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(lsearch))(__key, __base, __nmemb, __size, __compar); })
+__NAMESPACE_LOCAL_USING_OR_IMPL(lsearch, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_NONNULL((2, 3, 5)) void *__NOTHROW_NCX(__LIBCCALL lsearch)(void const *__key, void *__base, size_t *__nmemb, size_t __size, __compar_fn_t __compar) { return __NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(lsearch)(__key, __base, __nmemb, __size, __compar); })
 #endif /* !__CRT_HAVE_lsearch */
 
 #endif /* __CC__ */

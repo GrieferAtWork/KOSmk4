@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x9cd13cac */
+/* HASH CRC-32:0x9ede1ff9 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -143,7 +143,7 @@ __CDECLARE(__ATTR_NONNULL((1)),int,__NOTHROW_NCX,gettimeofday,(struct timeval *_
 __CREDIRECT(__ATTR_NONNULL((1)),int,__NOTHROW_NCX,gettimeofday,(struct timeval *__restrict __tv, __timezone_ptr_t __tz),__gettimeofday,(__tv,__tz))
 #elif defined(__CRT_HAVE_gettimeofday64) || defined(__CRT_HAVE_gettimeofday) || defined(__CRT_HAVE___gettimeofday)
 #include <libc/local/sys.time/gettimeofday.h>
-__NAMESPACE_LOCAL_USING_OR_IMPL(gettimeofday, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_NONNULL((1)) int __NOTHROW_NCX(__LIBCCALL gettimeofday)(struct timeval *__restrict __tv, __timezone_ptr_t __tz) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(gettimeofday))(__tv, __tz); })
+__NAMESPACE_LOCAL_USING_OR_IMPL(gettimeofday, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_NONNULL((1)) int __NOTHROW_NCX(__LIBCCALL gettimeofday)(struct timeval *__restrict __tv, __timezone_ptr_t __tz) { return __NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(gettimeofday)(__tv, __tz); })
 #endif /* ... */
 #if defined(__CRT_HAVE_getitimer64) && defined(__USE_TIME_BITS64)
 __CREDIRECT(__ATTR_NONNULL((2)),int,__NOTHROW_NCX,getitimer,(__itimer_which_t __which, struct itimerval *__curr_value),getitimer64,(__which,__curr_value))
@@ -151,7 +151,7 @@ __CREDIRECT(__ATTR_NONNULL((2)),int,__NOTHROW_NCX,getitimer,(__itimer_which_t __
 __CDECLARE(__ATTR_NONNULL((2)),int,__NOTHROW_NCX,getitimer,(__itimer_which_t __which, struct itimerval *__curr_value),(__which,__curr_value))
 #elif defined(__CRT_HAVE_getitimer64) || defined(__CRT_HAVE_getitimer)
 #include <libc/local/sys.time/getitimer.h>
-__NAMESPACE_LOCAL_USING_OR_IMPL(getitimer, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_NONNULL((2)) int __NOTHROW_NCX(__LIBCCALL getitimer)(__itimer_which_t __which, struct itimerval *__curr_value) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(getitimer))(__which, __curr_value); })
+__NAMESPACE_LOCAL_USING_OR_IMPL(getitimer, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_NONNULL((2)) int __NOTHROW_NCX(__LIBCCALL getitimer)(__itimer_which_t __which, struct itimerval *__curr_value) { return __NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(getitimer)(__which, __curr_value); })
 #endif /* ... */
 #if defined(__CRT_HAVE_setitimer64) && defined(__USE_TIME_BITS64)
 __CREDIRECT(__ATTR_NONNULL((2)),int,__NOTHROW_NCX,setitimer,(__itimer_which_t __which, struct itimerval const *__newval, struct itimerval *__oldval),setitimer64,(__which,__newval,__oldval))
@@ -159,7 +159,7 @@ __CREDIRECT(__ATTR_NONNULL((2)),int,__NOTHROW_NCX,setitimer,(__itimer_which_t __
 __CDECLARE(__ATTR_NONNULL((2)),int,__NOTHROW_NCX,setitimer,(__itimer_which_t __which, struct itimerval const *__newval, struct itimerval *__oldval),(__which,__newval,__oldval))
 #elif defined(__CRT_HAVE_setitimer64) || defined(__CRT_HAVE_setitimer)
 #include <libc/local/sys.time/setitimer.h>
-__NAMESPACE_LOCAL_USING_OR_IMPL(setitimer, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_NONNULL((2)) int __NOTHROW_NCX(__LIBCCALL setitimer)(__itimer_which_t __which, struct itimerval const *__newval, struct itimerval *__oldval) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(setitimer))(__which, __newval, __oldval); })
+__NAMESPACE_LOCAL_USING_OR_IMPL(setitimer, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_NONNULL((2)) int __NOTHROW_NCX(__LIBCCALL setitimer)(__itimer_which_t __which, struct itimerval const *__newval, struct itimerval *__oldval) { return __NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(setitimer)(__which, __newval, __oldval); })
 #endif /* ... */
 #if defined(__CRT_HAVE_utimes64) && defined(__USE_TIME_BITS64)
 __CREDIRECT(__ATTR_NONNULL((1)),int,__NOTHROW_NCX,utimes,(char const *__file, struct timeval const __tvp[2]),utimes64,(__file,__tvp))
@@ -167,7 +167,7 @@ __CREDIRECT(__ATTR_NONNULL((1)),int,__NOTHROW_NCX,utimes,(char const *__file, st
 __CDECLARE(__ATTR_NONNULL((1)),int,__NOTHROW_NCX,utimes,(char const *__file, struct timeval const __tvp[2]),(__file,__tvp))
 #elif defined(__CRT_HAVE_utimes64) || defined(__CRT_HAVE_utimes)
 #include <libc/local/sys.time/utimes.h>
-__NAMESPACE_LOCAL_USING_OR_IMPL(utimes, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_NONNULL((1)) int __NOTHROW_NCX(__LIBCCALL utimes)(char const *__file, struct timeval const __tvp[2]) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(utimes))(__file, __tvp); })
+__NAMESPACE_LOCAL_USING_OR_IMPL(utimes, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_NONNULL((1)) int __NOTHROW_NCX(__LIBCCALL utimes)(char const *__file, struct timeval const __tvp[2]) { return __NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(utimes)(__file, __tvp); })
 #endif /* ... */
 
 #ifdef __USE_GNU
@@ -177,7 +177,7 @@ __CREDIRECT(__ATTR_NONNULL((2)),int,__NOTHROW_NCX,futimesat,(__fd_t __fd, char c
 __CDECLARE(__ATTR_NONNULL((2)),int,__NOTHROW_NCX,futimesat,(__fd_t __fd, char const *__file, struct timeval const __tvp[2]),(__fd,__file,__tvp))
 #elif defined(__CRT_HAVE_futimesat64) || defined(__CRT_HAVE_futimesat)
 #include <libc/local/sys.time/futimesat.h>
-__NAMESPACE_LOCAL_USING_OR_IMPL(futimesat, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_NONNULL((2)) int __NOTHROW_NCX(__LIBCCALL futimesat)(__fd_t __fd, char const *__file, struct timeval const __tvp[2]) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(futimesat))(__fd, __file, __tvp); })
+__NAMESPACE_LOCAL_USING_OR_IMPL(futimesat, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_NONNULL((2)) int __NOTHROW_NCX(__LIBCCALL futimesat)(__fd_t __fd, char const *__file, struct timeval const __tvp[2]) { return __NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(futimesat)(__fd, __file, __tvp); })
 #endif /* ... */
 #endif /* __USE_GNU */
 
@@ -188,7 +188,7 @@ __CREDIRECT(,int,__NOTHROW_NCX,settimeofday,(struct timeval const *__tv, struct 
 __CDECLARE(,int,__NOTHROW_NCX,settimeofday,(struct timeval const *__tv, struct timezone const *__tz),(__tv,__tz))
 #elif defined(__CRT_HAVE_settimeofday64) || defined(__CRT_HAVE_settimeofday)
 #include <libc/local/sys.time/settimeofday.h>
-__NAMESPACE_LOCAL_USING_OR_IMPL(settimeofday, __FORCELOCAL __ATTR_ARTIFICIAL int __NOTHROW_NCX(__LIBCCALL settimeofday)(struct timeval const *__tv, struct timezone const *__tz) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(settimeofday))(__tv, __tz); })
+__NAMESPACE_LOCAL_USING_OR_IMPL(settimeofday, __FORCELOCAL __ATTR_ARTIFICIAL int __NOTHROW_NCX(__LIBCCALL settimeofday)(struct timeval const *__tv, struct timezone const *__tz) { return __NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(settimeofday)(__tv, __tz); })
 #endif /* ... */
 #if defined(__CRT_HAVE_adjtime64) && defined(__USE_TIME_BITS64)
 __CREDIRECT(,int,__NOTHROW_NCX,adjtime,(struct timeval const *__delta, struct timeval *__olddelta),adjtime64,(__delta,__olddelta))
@@ -196,7 +196,7 @@ __CREDIRECT(,int,__NOTHROW_NCX,adjtime,(struct timeval const *__delta, struct ti
 __CDECLARE(,int,__NOTHROW_NCX,adjtime,(struct timeval const *__delta, struct timeval *__olddelta),(__delta,__olddelta))
 #elif defined(__CRT_HAVE_adjtime64) || defined(__CRT_HAVE_adjtime)
 #include <libc/local/sys.time/adjtime.h>
-__NAMESPACE_LOCAL_USING_OR_IMPL(adjtime, __FORCELOCAL __ATTR_ARTIFICIAL int __NOTHROW_NCX(__LIBCCALL adjtime)(struct timeval const *__delta, struct timeval *__olddelta) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(adjtime))(__delta, __olddelta); })
+__NAMESPACE_LOCAL_USING_OR_IMPL(adjtime, __FORCELOCAL __ATTR_ARTIFICIAL int __NOTHROW_NCX(__LIBCCALL adjtime)(struct timeval const *__delta, struct timeval *__olddelta) { return __NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(adjtime)(__delta, __olddelta); })
 #endif /* ... */
 #if defined(__CRT_HAVE_lutimes64) && defined(__USE_TIME_BITS64)
 __CREDIRECT(__ATTR_NONNULL((1)),int,__NOTHROW_NCX,lutimes,(char const *__file, struct timeval const __tvp[2]),lutimes64,(__file,__tvp))
@@ -204,7 +204,7 @@ __CREDIRECT(__ATTR_NONNULL((1)),int,__NOTHROW_NCX,lutimes,(char const *__file, s
 __CDECLARE(__ATTR_NONNULL((1)),int,__NOTHROW_NCX,lutimes,(char const *__file, struct timeval const __tvp[2]),(__file,__tvp))
 #elif defined(__CRT_HAVE_lutimes64) || defined(__CRT_HAVE_lutimes)
 #include <libc/local/sys.time/lutimes.h>
-__NAMESPACE_LOCAL_USING_OR_IMPL(lutimes, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_NONNULL((1)) int __NOTHROW_NCX(__LIBCCALL lutimes)(char const *__file, struct timeval const __tvp[2]) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(lutimes))(__file, __tvp); })
+__NAMESPACE_LOCAL_USING_OR_IMPL(lutimes, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_NONNULL((1)) int __NOTHROW_NCX(__LIBCCALL lutimes)(char const *__file, struct timeval const __tvp[2]) { return __NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(lutimes)(__file, __tvp); })
 #endif /* ... */
 #if defined(__CRT_HAVE_futimes64) && defined(__USE_TIME_BITS64)
 __CREDIRECT(,int,__NOTHROW_NCX,futimes,(__fd_t __fd, struct timeval const __tvp[2]),futimes64,(__fd,__tvp))
@@ -212,7 +212,7 @@ __CREDIRECT(,int,__NOTHROW_NCX,futimes,(__fd_t __fd, struct timeval const __tvp[
 __CDECLARE(,int,__NOTHROW_NCX,futimes,(__fd_t __fd, struct timeval const __tvp[2]),(__fd,__tvp))
 #elif defined(__CRT_HAVE_futimes64) || (defined(__CRT_HAVE_lutimes) && __SIZEOF_TIME32_T__ == __SIZEOF_TIME64_T__) || defined(__CRT_HAVE_futimes)
 #include <libc/local/sys.time/futimes.h>
-__NAMESPACE_LOCAL_USING_OR_IMPL(futimes, __FORCELOCAL __ATTR_ARTIFICIAL int __NOTHROW_NCX(__LIBCCALL futimes)(__fd_t __fd, struct timeval const __tvp[2]) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(futimes))(__fd, __tvp); })
+__NAMESPACE_LOCAL_USING_OR_IMPL(futimes, __FORCELOCAL __ATTR_ARTIFICIAL int __NOTHROW_NCX(__LIBCCALL futimes)(__fd_t __fd, struct timeval const __tvp[2]) { return __NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(futimes)(__fd, __tvp); })
 #endif /* ... */
 #endif /* __USE_MISC */
 
@@ -223,7 +223,7 @@ __CDECLARE(__ATTR_NONNULL((1)),int,__NOTHROW_NCX,gettimeofday64,(struct timeval6
 __CREDIRECT(__ATTR_NONNULL((1)),int,__NOTHROW_NCX,gettimeofday64,(struct timeval64 *__restrict __tv, __timezone_ptr_t __tz),gettimeofday,(__tv,__tz))
 #elif defined(__CRT_HAVE_gettimeofday) || defined(__CRT_HAVE___gettimeofday)
 #include <libc/local/sys.time/gettimeofday64.h>
-__NAMESPACE_LOCAL_USING_OR_IMPL(gettimeofday64, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_NONNULL((1)) int __NOTHROW_NCX(__LIBCCALL gettimeofday64)(struct timeval64 *__restrict __tv, __timezone_ptr_t __tz) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(gettimeofday64))(__tv, __tz); })
+__NAMESPACE_LOCAL_USING_OR_IMPL(gettimeofday64, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_NONNULL((1)) int __NOTHROW_NCX(__LIBCCALL gettimeofday64)(struct timeval64 *__restrict __tv, __timezone_ptr_t __tz) { return __NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(gettimeofday64)(__tv, __tz); })
 #endif /* ... */
 #ifdef __CRT_HAVE_getitimer64
 __CDECLARE(__ATTR_NONNULL((2)),int,__NOTHROW_NCX,getitimer64,(__itimer_which_t __which, struct itimerval64 *__curr_value),(__which,__curr_value))
@@ -231,7 +231,7 @@ __CDECLARE(__ATTR_NONNULL((2)),int,__NOTHROW_NCX,getitimer64,(__itimer_which_t _
 __CREDIRECT(__ATTR_NONNULL((2)),int,__NOTHROW_NCX,getitimer64,(__itimer_which_t __which, struct itimerval64 *__curr_value),getitimer,(__which,__curr_value))
 #elif defined(__CRT_HAVE_getitimer)
 #include <libc/local/sys.time/getitimer64.h>
-__NAMESPACE_LOCAL_USING_OR_IMPL(getitimer64, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_NONNULL((2)) int __NOTHROW_NCX(__LIBCCALL getitimer64)(__itimer_which_t __which, struct itimerval64 *__curr_value) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(getitimer64))(__which, __curr_value); })
+__NAMESPACE_LOCAL_USING_OR_IMPL(getitimer64, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_NONNULL((2)) int __NOTHROW_NCX(__LIBCCALL getitimer64)(__itimer_which_t __which, struct itimerval64 *__curr_value) { return __NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(getitimer64)(__which, __curr_value); })
 #endif /* ... */
 #ifdef __CRT_HAVE_setitimer64
 __CDECLARE(__ATTR_NONNULL((2)),int,__NOTHROW_NCX,setitimer64,(__itimer_which_t __which, struct itimerval64 const *__newval, struct itimerval64 *__oldval),(__which,__newval,__oldval))
@@ -239,7 +239,7 @@ __CDECLARE(__ATTR_NONNULL((2)),int,__NOTHROW_NCX,setitimer64,(__itimer_which_t _
 __CREDIRECT(__ATTR_NONNULL((2)),int,__NOTHROW_NCX,setitimer64,(__itimer_which_t __which, struct itimerval64 const *__newval, struct itimerval64 *__oldval),setitimer,(__which,__newval,__oldval))
 #elif defined(__CRT_HAVE_setitimer)
 #include <libc/local/sys.time/setitimer64.h>
-__NAMESPACE_LOCAL_USING_OR_IMPL(setitimer64, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_NONNULL((2)) int __NOTHROW_NCX(__LIBCCALL setitimer64)(__itimer_which_t __which, struct itimerval64 const *__newval, struct itimerval64 *__oldval) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(setitimer64))(__which, __newval, __oldval); })
+__NAMESPACE_LOCAL_USING_OR_IMPL(setitimer64, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_NONNULL((2)) int __NOTHROW_NCX(__LIBCCALL setitimer64)(__itimer_which_t __which, struct itimerval64 const *__newval, struct itimerval64 *__oldval) { return __NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(setitimer64)(__which, __newval, __oldval); })
 #endif /* ... */
 #ifdef __CRT_HAVE_utimes64
 __CDECLARE(__ATTR_NONNULL((1)),int,__NOTHROW_NCX,utimes64,(char const *__file, struct timeval64 const __tvp[2]),(__file,__tvp))
@@ -247,7 +247,7 @@ __CDECLARE(__ATTR_NONNULL((1)),int,__NOTHROW_NCX,utimes64,(char const *__file, s
 __CREDIRECT(__ATTR_NONNULL((1)),int,__NOTHROW_NCX,utimes64,(char const *__file, struct timeval64 const __tvp[2]),utimes,(__file,__tvp))
 #elif defined(__CRT_HAVE_utimes)
 #include <libc/local/sys.time/utimes64.h>
-__NAMESPACE_LOCAL_USING_OR_IMPL(utimes64, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_NONNULL((1)) int __NOTHROW_NCX(__LIBCCALL utimes64)(char const *__file, struct timeval64 const __tvp[2]) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(utimes64))(__file, __tvp); })
+__NAMESPACE_LOCAL_USING_OR_IMPL(utimes64, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_NONNULL((1)) int __NOTHROW_NCX(__LIBCCALL utimes64)(char const *__file, struct timeval64 const __tvp[2]) { return __NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(utimes64)(__file, __tvp); })
 #endif /* ... */
 
 #ifdef __USE_MISC
@@ -257,7 +257,7 @@ __CDECLARE(,int,__NOTHROW_NCX,settimeofday64,(struct timeval64 const *__tv, stru
 __CREDIRECT(,int,__NOTHROW_NCX,settimeofday64,(struct timeval64 const *__tv, struct timezone const *__tz),settimeofday,(__tv,__tz))
 #elif defined(__CRT_HAVE_settimeofday)
 #include <libc/local/sys.time/settimeofday64.h>
-__NAMESPACE_LOCAL_USING_OR_IMPL(settimeofday64, __FORCELOCAL __ATTR_ARTIFICIAL int __NOTHROW_NCX(__LIBCCALL settimeofday64)(struct timeval64 const *__tv, struct timezone const *__tz) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(settimeofday64))(__tv, __tz); })
+__NAMESPACE_LOCAL_USING_OR_IMPL(settimeofday64, __FORCELOCAL __ATTR_ARTIFICIAL int __NOTHROW_NCX(__LIBCCALL settimeofday64)(struct timeval64 const *__tv, struct timezone const *__tz) { return __NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(settimeofday64)(__tv, __tz); })
 #endif /* ... */
 #ifdef __CRT_HAVE_adjtime64
 __CDECLARE(,int,__NOTHROW_NCX,adjtime64,(struct timeval64 const *__delta, struct timeval64 *__olddelta),(__delta,__olddelta))
@@ -265,7 +265,7 @@ __CDECLARE(,int,__NOTHROW_NCX,adjtime64,(struct timeval64 const *__delta, struct
 __CREDIRECT(,int,__NOTHROW_NCX,adjtime64,(struct timeval64 const *__delta, struct timeval64 *__olddelta),adjtime,(__delta,__olddelta))
 #elif defined(__CRT_HAVE_adjtime)
 #include <libc/local/sys.time/adjtime64.h>
-__NAMESPACE_LOCAL_USING_OR_IMPL(adjtime64, __FORCELOCAL __ATTR_ARTIFICIAL int __NOTHROW_NCX(__LIBCCALL adjtime64)(struct timeval64 const *__delta, struct timeval64 *__olddelta) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(adjtime64))(__delta, __olddelta); })
+__NAMESPACE_LOCAL_USING_OR_IMPL(adjtime64, __FORCELOCAL __ATTR_ARTIFICIAL int __NOTHROW_NCX(__LIBCCALL adjtime64)(struct timeval64 const *__delta, struct timeval64 *__olddelta) { return __NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(adjtime64)(__delta, __olddelta); })
 #endif /* ... */
 #ifdef __CRT_HAVE_lutimes64
 __CDECLARE(__ATTR_NONNULL((1)),int,__NOTHROW_NCX,lutimes64,(char const *__file, struct timeval64 const __tvp[2]),(__file,__tvp))
@@ -273,7 +273,7 @@ __CDECLARE(__ATTR_NONNULL((1)),int,__NOTHROW_NCX,lutimes64,(char const *__file, 
 __CREDIRECT(__ATTR_NONNULL((1)),int,__NOTHROW_NCX,lutimes64,(char const *__file, struct timeval64 const __tvp[2]),lutimes,(__file,__tvp))
 #elif defined(__CRT_HAVE_lutimes)
 #include <libc/local/sys.time/lutimes64.h>
-__NAMESPACE_LOCAL_USING_OR_IMPL(lutimes64, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_NONNULL((1)) int __NOTHROW_NCX(__LIBCCALL lutimes64)(char const *__file, struct timeval64 const __tvp[2]) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(lutimes64))(__file, __tvp); })
+__NAMESPACE_LOCAL_USING_OR_IMPL(lutimes64, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_NONNULL((1)) int __NOTHROW_NCX(__LIBCCALL lutimes64)(char const *__file, struct timeval64 const __tvp[2]) { return __NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(lutimes64)(__file, __tvp); })
 #endif /* ... */
 #ifdef __CRT_HAVE_futimes64
 __CDECLARE(,int,__NOTHROW_NCX,futimes64,(__fd_t __fd, struct timeval64 const __tvp[2]),(__fd,__tvp))
@@ -281,7 +281,7 @@ __CDECLARE(,int,__NOTHROW_NCX,futimes64,(__fd_t __fd, struct timeval64 const __t
 __CREDIRECT(,int,__NOTHROW_NCX,futimes64,(__fd_t __fd, struct timeval64 const __tvp[2]),lutimes,(__fd,__tvp))
 #elif defined(__CRT_HAVE_futimes)
 #include <libc/local/sys.time/futimes64.h>
-__NAMESPACE_LOCAL_USING_OR_IMPL(futimes64, __FORCELOCAL __ATTR_ARTIFICIAL int __NOTHROW_NCX(__LIBCCALL futimes64)(__fd_t __fd, struct timeval64 const __tvp[2]) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(futimes64))(__fd, __tvp); })
+__NAMESPACE_LOCAL_USING_OR_IMPL(futimes64, __FORCELOCAL __ATTR_ARTIFICIAL int __NOTHROW_NCX(__LIBCCALL futimes64)(__fd_t __fd, struct timeval64 const __tvp[2]) { return __NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(futimes64)(__fd, __tvp); })
 #endif /* ... */
 #endif /* __USE_MISC */
 
@@ -292,7 +292,7 @@ __CDECLARE(__ATTR_NONNULL((2)),int,__NOTHROW_NCX,futimesat64,(__fd_t __fd, char 
 __CREDIRECT(__ATTR_NONNULL((2)),int,__NOTHROW_NCX,futimesat64,(__fd_t __fd, char const *__file, struct timeval64 const __tvp[2]),futimesat,(__fd,__file,__tvp))
 #elif defined(__CRT_HAVE_futimesat)
 #include <libc/local/sys.time/futimesat64.h>
-__NAMESPACE_LOCAL_USING_OR_IMPL(futimesat64, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_NONNULL((2)) int __NOTHROW_NCX(__LIBCCALL futimesat64)(__fd_t __fd, char const *__file, struct timeval64 const __tvp[2]) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(futimesat64))(__fd, __file, __tvp); })
+__NAMESPACE_LOCAL_USING_OR_IMPL(futimesat64, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_NONNULL((2)) int __NOTHROW_NCX(__LIBCCALL futimesat64)(__fd_t __fd, char const *__file, struct timeval64 const __tvp[2]) { return __NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(futimesat64)(__fd, __file, __tvp); })
 #endif /* ... */
 #endif /* __USE_GNU */
 #endif /* __USE_TIME64 */

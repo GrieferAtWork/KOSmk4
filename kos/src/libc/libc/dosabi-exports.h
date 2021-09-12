@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x9e3fe3d0 */
+/* HASH CRC-32:0x8a72a912 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -149,8 +149,6 @@ DEFINE_PUBLIC_ALIAS(DOS$encrypt_r, libd_encrypt_r);
 
 /* ctype */
 DEFINE_PUBLIC_ALIAS(DOS$__locale_ctype_ptr_l, libd___locale_ctype_ptr_l);
-DEFINE_PUBLIC_ALIAS(DOS$_isctype, libd__isctype);
-DEFINE_PUBLIC_ALIAS(DOS$_isctype_l, libd__isctype_l);
 DEFINE_PUBLIC_ALIAS(DOS$iscntrl, libd_iscntrl);
 DEFINE_PUBLIC_ALIAS(DOS$isspace, libd_isspace);
 DEFINE_PUBLIC_ALIAS(DOS$isupper, libd_isupper);
@@ -165,28 +163,40 @@ DEFINE_PUBLIC_ALIAS(DOS$isprint, libd_isprint);
 DEFINE_PUBLIC_ALIAS(DOS$tolower, libd_tolower);
 DEFINE_PUBLIC_ALIAS(DOS$toupper, libd_toupper);
 DEFINE_PUBLIC_ALIAS(DOS$isblank, libd_isblank);
+DEFINE_PUBLIC_ALIAS(DOS$_iscntrl_l, libd_iscntrl_l);
 DEFINE_PUBLIC_ALIAS(DOS$__iscntrl_l, libd_iscntrl_l);
 DEFINE_PUBLIC_ALIAS(DOS$iscntrl_l, libd_iscntrl_l);
+DEFINE_PUBLIC_ALIAS(DOS$_isspace_l, libd_isspace_l);
 DEFINE_PUBLIC_ALIAS(DOS$__isspace_l, libd_isspace_l);
 DEFINE_PUBLIC_ALIAS(DOS$isspace_l, libd_isspace_l);
+DEFINE_PUBLIC_ALIAS(DOS$_isupper_l, libd_isupper_l);
 DEFINE_PUBLIC_ALIAS(DOS$__isupper_l, libd_isupper_l);
 DEFINE_PUBLIC_ALIAS(DOS$isupper_l, libd_isupper_l);
+DEFINE_PUBLIC_ALIAS(DOS$_islower_l, libd_islower_l);
 DEFINE_PUBLIC_ALIAS(DOS$__islower_l, libd_islower_l);
 DEFINE_PUBLIC_ALIAS(DOS$islower_l, libd_islower_l);
+DEFINE_PUBLIC_ALIAS(DOS$_isalpha_l, libd_isalpha_l);
 DEFINE_PUBLIC_ALIAS(DOS$__isalpha_l, libd_isalpha_l);
 DEFINE_PUBLIC_ALIAS(DOS$isalpha_l, libd_isalpha_l);
+DEFINE_PUBLIC_ALIAS(DOS$_isdigit_l, libd_isdigit_l);
 DEFINE_PUBLIC_ALIAS(DOS$__isdigit_l, libd_isdigit_l);
 DEFINE_PUBLIC_ALIAS(DOS$isdigit_l, libd_isdigit_l);
+DEFINE_PUBLIC_ALIAS(DOS$_isxdigit_l, libd_isxdigit_l);
 DEFINE_PUBLIC_ALIAS(DOS$__isxdigit_l, libd_isxdigit_l);
 DEFINE_PUBLIC_ALIAS(DOS$isxdigit_l, libd_isxdigit_l);
+DEFINE_PUBLIC_ALIAS(DOS$_isalnum_l, libd_isalnum_l);
 DEFINE_PUBLIC_ALIAS(DOS$__isalnum_l, libd_isalnum_l);
 DEFINE_PUBLIC_ALIAS(DOS$isalnum_l, libd_isalnum_l);
+DEFINE_PUBLIC_ALIAS(DOS$_ispunct_l, libd_ispunct_l);
 DEFINE_PUBLIC_ALIAS(DOS$__ispunct_l, libd_ispunct_l);
 DEFINE_PUBLIC_ALIAS(DOS$ispunct_l, libd_ispunct_l);
+DEFINE_PUBLIC_ALIAS(DOS$_isgraph_l, libd_isgraph_l);
 DEFINE_PUBLIC_ALIAS(DOS$__isgraph_l, libd_isgraph_l);
 DEFINE_PUBLIC_ALIAS(DOS$isgraph_l, libd_isgraph_l);
+DEFINE_PUBLIC_ALIAS(DOS$_isprint_l, libd_isprint_l);
 DEFINE_PUBLIC_ALIAS(DOS$__isprint_l, libd_isprint_l);
 DEFINE_PUBLIC_ALIAS(DOS$isprint_l, libd_isprint_l);
+DEFINE_PUBLIC_ALIAS(DOS$_isblank_l, libd_isblank_l);
 DEFINE_PUBLIC_ALIAS(DOS$__isblank_l, libd_isblank_l);
 DEFINE_PUBLIC_ALIAS(DOS$isblank_l, libd_isblank_l);
 DEFINE_PUBLIC_ALIAS(DOS$_tolower_l, libd_tolower_l);
@@ -195,8 +205,16 @@ DEFINE_PUBLIC_ALIAS(DOS$tolower_l, libd_tolower_l);
 DEFINE_PUBLIC_ALIAS(DOS$_toupper_l, libd_toupper_l);
 DEFINE_PUBLIC_ALIAS(DOS$__toupper_l, libd_toupper_l);
 DEFINE_PUBLIC_ALIAS(DOS$toupper_l, libd_toupper_l);
+DEFINE_PUBLIC_ALIAS(DOS$__iscsymf, libd___iscsymf);
+DEFINE_PUBLIC_ALIAS(DOS$__iscsym, libd___iscsym);
+DEFINE_PUBLIC_ALIAS(DOS$__isascii, libd_isascii);
 DEFINE_PUBLIC_ALIAS(DOS$isascii, libd_isascii);
+DEFINE_PUBLIC_ALIAS(DOS$__toascii, libd_toascii);
 DEFINE_PUBLIC_ALIAS(DOS$toascii, libd_toascii);
+DEFINE_PUBLIC_ALIAS(DOS$_tolower, libd__tolower);
+DEFINE_PUBLIC_ALIAS(DOS$_toupper, libd__toupper);
+DEFINE_PUBLIC_ALIAS(DOS$_isctype, libd__isctype);
+DEFINE_PUBLIC_ALIAS(DOS$_isctype_l, libd__isctype_l);
 
 /* direct */
 DEFINE_PUBLIC_ALIAS(DOS$_getdcwd, libd__getdcwd);

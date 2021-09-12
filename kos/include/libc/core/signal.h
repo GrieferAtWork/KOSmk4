@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xd5034830 */
+/* HASH CRC-32:0x2188912 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -50,7 +50,7 @@ __CREDIRECT(,int,__NOTHROW_NCX,__libc_core_raise,(__signo_t __signo),raise,(__si
  *   *=single: `kill(getpid(), signo)'
  * @return: 0:  Success
  * @return: -1: [errno=EINVAL] The given `signo' is invalid */
-#define __libc_core_raise (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(raise))
+#define __libc_core_raise __NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(raise)
 #else /* ... */
 #undef ____libc_core_raise_defined
 #endif /* !... */
@@ -68,7 +68,7 @@ __CREDIRECT(__ATTR_NONNULL((1)),int,__NOTHROW_NCX,__libc_core_sigfillset,(struct
  * Add all possible signals (possibly even including undefined signals,
  * though these would be ignored by the kernel) to the given signal set
  * @return: 0: Always returns `0' */
-#define __libc_core_sigfillset (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(sigfillset))
+#define __libc_core_sigfillset __NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(sigfillset)
 #endif /* !__CRT_HAVE_sigfillset */
 #ifndef ____libc_core_sigprocmask_defined
 #define ____libc_core_sigprocmask_defined 1
@@ -176,7 +176,7 @@ __CREDIRECT(__ATTR_RETNONNULL,struct __sigset_struct *,__NOTHROW_NCX,__libc_core
  * >> os = setsigmaskfullptr();
  * >> ...
  * >> setsigmaskptr(os); */
-#define __libc_core_setsigmaskfullptr (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(setsigmaskfullptr))
+#define __libc_core_setsigmaskfullptr __NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(setsigmaskfullptr)
 #else /* ... */
 #undef ____libc_core_setsigmaskfullptr_defined
 #endif /* !... */

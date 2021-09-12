@@ -404,7 +404,19 @@ __NAMESPACE_STD_BEGIN
 struct __IO_FILE;
 __NAMESPACE_STD_END
 #endif /* !__FILE */
+struct __locale_struct;
+#if 1 /* FIXME: ??? (GCC bug (or am I not getting how c++ is supposed to work))
+       * When `__locale_t' is defined as something other than `void *', then
+       * we get ambiguous call compiler errors in local implementations that
+       * call __localdep_* functions which have already been defined globally.
+       *
+       * I really don't get why that is ambiguous, though... */
 #define __locale_t void *
+#elif defined(__cplusplus)
+#define __locale_t struct ::__locale_struct *
+#else /* __cplusplus */
+#define __locale_t struct __locale_struct *
+#endif /* !__cplusplus */
 #endif /* ... */
 
 

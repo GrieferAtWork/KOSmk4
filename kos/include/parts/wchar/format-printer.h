@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xa7004a46 */
+/* HASH CRC-32:0x6425f1c1 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -79,7 +79,7 @@ __CDECLARE(__ATTR_NONNULL((1)),__SSIZE_TYPE__,__THROWING,format_wrepeat,(pwforma
  * Repeat  `ch'  a   number  of  `num_repetitions'   times
  * The usual format-printer rules apply, and this function
  * is  allowed to  call `printer'  as often  as it chooses */
-__NAMESPACE_LOCAL_USING_OR_IMPL(format_wrepeat, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_NONNULL((1)) __SSIZE_TYPE__ (__LIBCCALL format_wrepeat)(pwformatprinter __printer, void *__arg, wchar_t __ch, __SIZE_TYPE__ __num_repetitions) __THROWS(...) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(format_wrepeat))(__printer, __arg, __ch, __num_repetitions); })
+__NAMESPACE_LOCAL_USING_OR_IMPL(format_wrepeat, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_NONNULL((1)) __SSIZE_TYPE__ (__LIBCCALL format_wrepeat)(pwformatprinter __printer, void *__arg, wchar_t __ch, __SIZE_TYPE__ __num_repetitions) __THROWS(...) { return __NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(format_wrepeat)(__printer, __arg, __ch, __num_repetitions); })
 #endif /* !__CRT_HAVE_format_wrepeat */
 #ifdef __CRT_HAVE_format_wescape
 /* >> format_escape(3)
@@ -113,7 +113,7 @@ __CDECLARE(__ATTR_NONNULL((1)),__SSIZE_TYPE__,__THROWING,format_wescape,(pwforma
  * with the `FORMAT_ESCAPE_FFORCE*' flags
  * @param: printer: A function called for all quoted portions of the text
  * @param: textlen: The total number of bytes to escape, starting at `text' */
-__NAMESPACE_LOCAL_USING_OR_IMPL(format_wescape, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_NONNULL((1)) __SSIZE_TYPE__ (__LIBCCALL format_wescape)(pwformatprinter __printer, void *__arg, wchar_t const *__restrict __text, __SIZE_TYPE__ __textlen, unsigned int __flags) __THROWS(...) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(format_wescape))(__printer, __arg, __text, __textlen, __flags); })
+__NAMESPACE_LOCAL_USING_OR_IMPL(format_wescape, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_NONNULL((1)) __SSIZE_TYPE__ (__LIBCCALL format_wescape)(pwformatprinter __printer, void *__arg, wchar_t const *__restrict __text, __SIZE_TYPE__ __textlen, unsigned int __flags) __THROWS(...) { return __NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(format_wescape)(__printer, __arg, __text, __textlen, __flags); })
 #endif /* !__CRT_HAVE_format_wescape */
 #ifdef __CRT_HAVE_format_whexdump
 /* >> format_hexdump(3)
@@ -139,7 +139,7 @@ __CDECLARE(__ATTR_NONNULL((1)),__SSIZE_TYPE__,__THROWING,format_whexdump,(pwform
  * @param: flags:    A set of `"FORMAT_HEXDUMP_FLAG_*"'
  * @return: >= 0: The sum of all values returned by `printer'
  * @return: < 0:  The first negative value ever returned by `printer' (if any) */
-__NAMESPACE_LOCAL_USING_OR_IMPL(format_whexdump, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_NONNULL((1)) __SSIZE_TYPE__ (__LIBCCALL format_whexdump)(pwformatprinter __printer, void *__arg, void const *__restrict __data, __SIZE_TYPE__ __size, __SIZE_TYPE__ __linesize, unsigned int __flags) __THROWS(...) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(format_whexdump))(__printer, __arg, __data, __size, __linesize, __flags); })
+__NAMESPACE_LOCAL_USING_OR_IMPL(format_whexdump, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_NONNULL((1)) __SSIZE_TYPE__ (__LIBCCALL format_whexdump)(pwformatprinter __printer, void *__arg, void const *__restrict __data, __SIZE_TYPE__ __size, __SIZE_TYPE__ __linesize, unsigned int __flags) __THROWS(...) { return __NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(format_whexdump)(__printer, __arg, __data, __size, __linesize, __flags); })
 #endif /* !__CRT_HAVE_format_whexdump */
 
 
@@ -329,7 +329,7 @@ __CDECLARE(__ATTR_LIBC_WPRINTF(3, 0) __ATTR_NONNULL((1, 3)),__SSIZE_TYPE__,__THR
  *  - ...               There are a _lot_ more...
  * @return: >= 0: The sum of all values returned by `printer'
  * @return: < 0:  The first negative value ever returned by `printer' (if any) */
-__NAMESPACE_LOCAL_USING_OR_IMPL(format_vwprintf, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_LIBC_WPRINTF(3, 0) __ATTR_NONNULL((1, 3)) __SSIZE_TYPE__ (__LIBCCALL format_vwprintf)(pwformatprinter __printer, void *__arg, wchar_t const *__restrict __format, __builtin_va_list __args) __THROWS(...) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(format_vwprintf))(__printer, __arg, __format, __args); })
+__NAMESPACE_LOCAL_USING_OR_IMPL(format_vwprintf, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_LIBC_WPRINTF(3, 0) __ATTR_NONNULL((1, 3)) __SSIZE_TYPE__ (__LIBCCALL format_vwprintf)(pwformatprinter __printer, void *__arg, wchar_t const *__restrict __format, __builtin_va_list __args) __THROWS(...) { return __NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(format_vwprintf)(__printer, __arg, __format, __args); })
 #endif /* !__CRT_HAVE_format_vwprintf */
 #ifdef __CRT_HAVE_format_wprintf
 /* >> format_printf(3), format_vprintf(3)
@@ -516,9 +516,9 @@ __LIBC __ATTR_LIBC_WPRINTF(3, 0) __ATTR_NONNULL((1, 3)) __SSIZE_TYPE__ (__LIBCCA
  * @return: >= 0: The sum of all values returned by `printer'
  * @return: < 0:  The first negative value ever returned by `printer' (if any) */
 #ifdef __cplusplus
-__NAMESPACE_LOCAL_USING_OR_IMPL(format_wprintf, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_LIBC_WPRINTF(3, 0) __ATTR_NONNULL((1, 3)) __SSIZE_TYPE__ (__LIBCCALL format_wprintf)(pwformatprinter __printer, void *__arg, wchar_t const *__restrict __format, ...) __THROWS(...) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(format_wprintf))(__printer, __arg, __format, __builtin_va_arg_pack()); })
+__NAMESPACE_LOCAL_USING_OR_IMPL(format_wprintf, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_LIBC_WPRINTF(3, 0) __ATTR_NONNULL((1, 3)) __SSIZE_TYPE__ (__LIBCCALL format_wprintf)(pwformatprinter __printer, void *__arg, wchar_t const *__restrict __format, ...) __THROWS(...) { return __NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(format_wprintf)(__printer, __arg, __format, __builtin_va_arg_pack()); })
 #else /* __cplusplus */
-#define format_wprintf (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(format_wprintf))
+#define format_wprintf __NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(format_wprintf)
 #endif /* !__cplusplus */
 #endif /* !__CRT_HAVE_format_wprintf */
 
@@ -532,7 +532,7 @@ __CDECLARE(__ATTR_NONNULL((1, 2)),__SSIZE_TYPE__,__NOTHROW_NCX,format_wsprintf_p
 #include <libc/local/parts.wchar.format-printer/format_wsprintf_printer.h>
 /* Format-printer implementation for printing to a string buffer like `wsprintf' would
  * WARNING: No trailing NUL-character is implicitly appended */
-__NAMESPACE_LOCAL_USING_OR_IMPL(format_wsprintf_printer, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_NONNULL((1, 2)) __SSIZE_TYPE__ __NOTHROW_NCX(__LIBCCALL format_wsprintf_printer)(void *__arg, wchar_t const *__restrict __data, __SIZE_TYPE__ __datalen) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(format_wsprintf_printer))(__arg, __data, __datalen); })
+__NAMESPACE_LOCAL_USING_OR_IMPL(format_wsprintf_printer, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_NONNULL((1, 2)) __SSIZE_TYPE__ __NOTHROW_NCX(__LIBCCALL format_wsprintf_printer)(void *__arg, wchar_t const *__restrict __data, __SIZE_TYPE__ __datalen) { return __NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(format_wsprintf_printer)(__arg, __data, __datalen); })
 #endif /* !__CRT_HAVE_format_wsprintf_printer */
 
 
@@ -564,7 +564,7 @@ __CDECLARE(__ATTR_NONNULL((1, 2)),__SSIZE_TYPE__,__NOTHROW_NCX,format_wsnprintf_
  * NOTE: The number of written characters is `<orig_bufsize> - arg->sd_bufsiz'
  * NOTE: The   number   of   required   characters   is   `arg->sd_buffer - <orig_buf>',   or
  *       alternatively the sum of return values of all calls to `format_wsnprintf_printer(3)' */
-__NAMESPACE_LOCAL_USING_OR_IMPL(format_wsnprintf_printer, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_NONNULL((1, 2)) __SSIZE_TYPE__ __NOTHROW_NCX(__LIBCCALL format_wsnprintf_printer)(void *__arg, wchar_t const *__restrict __data, __SIZE_TYPE__ __datalen) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(format_wsnprintf_printer))(__arg, __data, __datalen); })
+__NAMESPACE_LOCAL_USING_OR_IMPL(format_wsnprintf_printer, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_NONNULL((1, 2)) __SSIZE_TYPE__ __NOTHROW_NCX(__LIBCCALL format_wsnprintf_printer)(void *__arg, wchar_t const *__restrict __data, __SIZE_TYPE__ __datalen) { return __NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(format_wsnprintf_printer)(__arg, __data, __datalen); })
 #endif /* !__CRT_HAVE_format_wsnprintf_printer */
 #include <hybrid/typecore.h>
 #if defined(__CRT_HAVE_format_length) && __SIZEOF_WCHAR_T__ == 4
@@ -582,7 +582,7 @@ __CDECLARE(__ATTR_PURE __ATTR_NONNULL((2)),__SSIZE_TYPE__,__NOTHROW_NCX,format_w
 /* >> format_width(3)
  * Returns the width (number of characters; not bytes) of the given unicode string
  * The  `arg'   argument   is   ignored,   and  you   may   safely   pass   `NULL' */
-__NAMESPACE_LOCAL_USING_OR_IMPL(format_wwidth, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_PURE __ATTR_NONNULL((2)) __SSIZE_TYPE__ __NOTHROW_NCX(__LIBCCALL format_wwidth)(void *__arg, wchar_t const *__restrict __data, __SIZE_TYPE__ __datalen) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(format_wwidth))(__arg, __data, __datalen); })
+__NAMESPACE_LOCAL_USING_OR_IMPL(format_wwidth, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_PURE __ATTR_NONNULL((2)) __SSIZE_TYPE__ __NOTHROW_NCX(__LIBCCALL format_wwidth)(void *__arg, wchar_t const *__restrict __data, __SIZE_TYPE__ __datalen) { return __NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(format_wwidth)(__arg, __data, __datalen); })
 #endif /* !... */
 #ifdef __CRT_HAVE_format_length
 /* >> format_length(3)
@@ -599,7 +599,7 @@ __COMPILER_REDIRECT(__LIBC,__ATTR_CONST,__SSIZE_TYPE__,__NOTHROW_NCX,__WFORMATPR
 /* >> format_length(3)
  * Always re-return `datalen' and ignore all other arguments
  * Both the `arg'  and `data' arguments  are simply  ignored */
-__FORCELOCAL __ATTR_ARTIFICIAL __ATTR_CONST __SSIZE_TYPE__ __NOTHROW_NCX(__WFORMATPRINTER_CC format_wlength)(void *__arg, wchar_t const *__restrict __data, __SIZE_TYPE__ __datalen) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(format_length))(__arg, (char const *)__data, __datalen); }
+__FORCELOCAL __ATTR_ARTIFICIAL __ATTR_CONST __SSIZE_TYPE__ __NOTHROW_NCX(__WFORMATPRINTER_CC format_wlength)(void *__arg, wchar_t const *__restrict __data, __SIZE_TYPE__ __datalen) { return __NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(format_length)(__arg, (char const *)__data, __datalen); }
 #endif /* !... */
 
 #ifndef __format_waprintf_data_defined
@@ -686,7 +686,7 @@ __CDECLARE(__ATTR_MALLOC __ATTR_MALL_DEFAULT_ALIGNED __ATTR_WUNUSED __ATTR_NONNU
  *                  but may differ from `wcslen(return)' when NUL characters  were
  *                  printed to the waprintf-printer at one point.
  *                  (e.g. `format_waprintf_printer(&my_printer, L"\0", 1)') */
-__NAMESPACE_LOCAL_USING_OR_IMPL(format_waprintf_pack, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_MALLOC __ATTR_MALL_DEFAULT_ALIGNED __ATTR_WUNUSED __ATTR_NONNULL((1)) wchar_t *__NOTHROW_NCX(__LIBCCALL format_waprintf_pack)(struct format_waprintf_data *__restrict __self, __SIZE_TYPE__ *__pstrlen) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(format_waprintf_pack))(__self, __pstrlen); })
+__NAMESPACE_LOCAL_USING_OR_IMPL(format_waprintf_pack, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_MALLOC __ATTR_MALL_DEFAULT_ALIGNED __ATTR_WUNUSED __ATTR_NONNULL((1)) wchar_t *__NOTHROW_NCX(__LIBCCALL format_waprintf_pack)(struct format_waprintf_data *__restrict __self, __SIZE_TYPE__ *__pstrlen) { return __NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(format_waprintf_pack)(__self, __pstrlen); })
 #endif /* ... */
 #ifdef __CRT_HAVE_format_waprintf_alloc
 /* >> format_waprintf_alloc(3)
@@ -704,7 +704,7 @@ __CDECLARE(__ATTR_MALLOC __ATTR_MALL_DEFAULT_ALIGNED __ATTR_WUNUSED __ATTR_NONNU
  * the format_aprintf buffer `self' is finalized,  or some other function is  used
  * to append additional data to the end of `self'
  * @return: NULL: Failed to allocate additional memory */
-__NAMESPACE_LOCAL_USING_OR_IMPL(format_waprintf_alloc, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_MALLOC __ATTR_MALL_DEFAULT_ALIGNED __ATTR_WUNUSED __ATTR_NONNULL((1)) wchar_t *__NOTHROW_NCX(__LIBCCALL format_waprintf_alloc)(struct format_waprintf_data *__restrict __self, __SIZE_TYPE__ __num_wchars) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(format_waprintf_alloc))(__self, __num_wchars); })
+__NAMESPACE_LOCAL_USING_OR_IMPL(format_waprintf_alloc, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_MALLOC __ATTR_MALL_DEFAULT_ALIGNED __ATTR_WUNUSED __ATTR_NONNULL((1)) wchar_t *__NOTHROW_NCX(__LIBCCALL format_waprintf_alloc)(struct format_waprintf_data *__restrict __self, __SIZE_TYPE__ __num_wchars) { return __NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(format_waprintf_alloc)(__self, __num_wchars); })
 #endif /* ... */
 #ifdef __CRT_HAVE_format_waprintf_printer
 /* >> format_waprintf_printer(3)
@@ -714,7 +714,7 @@ __CDECLARE(__ATTR_WUNUSED __ATTR_NONNULL((1, 2)),__SSIZE_TYPE__,__NOTHROW_NCX,fo
 #include <libc/local/parts.wchar.format-printer/format_waprintf_printer.h>
 /* >> format_waprintf_printer(3)
  * Print data to a dynamically allocated heap buffer. On error, `-1' is returned */
-__NAMESPACE_LOCAL_USING_OR_IMPL(format_waprintf_printer, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_WUNUSED __ATTR_NONNULL((1, 2)) __SSIZE_TYPE__ __NOTHROW_NCX(__LIBCCALL format_waprintf_printer)(void *__arg, wchar_t const *__restrict __data, __SIZE_TYPE__ __datalen) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(format_waprintf_printer))(__arg, __data, __datalen); })
+__NAMESPACE_LOCAL_USING_OR_IMPL(format_waprintf_printer, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_WUNUSED __ATTR_NONNULL((1, 2)) __SSIZE_TYPE__ __NOTHROW_NCX(__LIBCCALL format_waprintf_printer)(void *__arg, wchar_t const *__restrict __data, __SIZE_TYPE__ __datalen) { return __NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(format_waprintf_printer)(__arg, __data, __datalen); })
 #endif /* ... */
 
 __SYSDECL_END

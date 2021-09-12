@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x8982fb74 */
+/* HASH CRC-32:0x388cdfac */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -63,17 +63,17 @@ extern "C++" {
 /* Find and return the entry for `name' in `envz', or `NULL' if not found.
  * If `name' contains a `=' character, only characters leading up to  this
  * position are actually compared! */
-__FORCELOCAL __ATTR_ARTIFICIAL __ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((3)) char *__NOTHROW_NCX(__LIBCCALL envz_entry)(char *__restrict __envz, size_t __envz_len, char const *__restrict __name) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(envz_entry))(__envz, __envz_len, __name); }
+__FORCELOCAL __ATTR_ARTIFICIAL __ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((3)) char *__NOTHROW_NCX(__LIBCCALL envz_entry)(char *__restrict __envz, size_t __envz_len, char const *__restrict __name) { return __NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(envz_entry)(__envz, __envz_len, __name); }
 /* Find and return the entry for `name' in `envz', or `NULL' if not found.
  * If `name' contains a `=' character, only characters leading up to  this
  * position are actually compared! */
-__FORCELOCAL __ATTR_ARTIFICIAL __ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((3)) char const *__NOTHROW_NCX(__LIBCCALL envz_entry)(char const *__restrict __envz, size_t __envz_len, char const *__restrict __name) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(envz_entry))(__envz, __envz_len, __name); }
+__FORCELOCAL __ATTR_ARTIFICIAL __ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((3)) char const *__NOTHROW_NCX(__LIBCCALL envz_entry)(char const *__restrict __envz, size_t __envz_len, char const *__restrict __name) { return __NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(envz_entry)(__envz, __envz_len, __name); }
 } /* extern "C++" */
 #else /* __cplusplus && __CORRECT_ISO_CPP_ENVZ_H_PROTO */
 /* Find and return the entry for `name' in `envz', or `NULL' if not found.
  * If `name' contains a `=' character, only characters leading up to  this
  * position are actually compared! */
-__NAMESPACE_LOCAL_USING_OR_IMPL(envz_entry, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((3)) char *__NOTHROW_NCX(__LIBCCALL envz_entry)(char const *__restrict __envz, size_t __envz_len, char const *__restrict __name) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(envz_entry))(__envz, __envz_len, __name); })
+__NAMESPACE_LOCAL_USING_OR_IMPL(envz_entry, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((3)) char *__NOTHROW_NCX(__LIBCCALL envz_entry)(char const *__restrict __envz, size_t __envz_len, char const *__restrict __name) { return __NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(envz_entry)(__envz, __envz_len, __name); })
 #endif /* !__cplusplus || !__CORRECT_ISO_CPP_ENVZ_H_PROTO */
 #endif /* !__CRT_HAVE_envz_entry */
 #ifdef __CRT_HAVE_envz_get
@@ -101,17 +101,17 @@ extern "C++" {
 /* Return the value in `envz'  attached to `name', or  `NULL'
  * if no such entry exists, or the entry doesn't have a value
  * portion (i.e. doesn't contain a `='-character) */
-__FORCELOCAL __ATTR_ARTIFICIAL __ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((3)) char *__NOTHROW_NCX(__LIBCCALL envz_get)(char *__restrict __envz, size_t __envz_len, char const *__restrict __name) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(envz_get))(__envz, __envz_len, __name); }
+__FORCELOCAL __ATTR_ARTIFICIAL __ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((3)) char *__NOTHROW_NCX(__LIBCCALL envz_get)(char *__restrict __envz, size_t __envz_len, char const *__restrict __name) { return __NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(envz_get)(__envz, __envz_len, __name); }
 /* Return the value in `envz'  attached to `name', or  `NULL'
  * if no such entry exists, or the entry doesn't have a value
  * portion (i.e. doesn't contain a `='-character) */
-__FORCELOCAL __ATTR_ARTIFICIAL __ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((3)) char const *__NOTHROW_NCX(__LIBCCALL envz_get)(char const *__restrict __envz, size_t __envz_len, char const *__restrict __name) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(envz_get))(__envz, __envz_len, __name); }
+__FORCELOCAL __ATTR_ARTIFICIAL __ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((3)) char const *__NOTHROW_NCX(__LIBCCALL envz_get)(char const *__restrict __envz, size_t __envz_len, char const *__restrict __name) { return __NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(envz_get)(__envz, __envz_len, __name); }
 } /* extern "C++" */
 #else /* __cplusplus && __CORRECT_ISO_CPP_ENVZ_H_PROTO */
 /* Return the value in `envz'  attached to `name', or  `NULL'
  * if no such entry exists, or the entry doesn't have a value
  * portion (i.e. doesn't contain a `='-character) */
-__NAMESPACE_LOCAL_USING_OR_IMPL(envz_get, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((3)) char *__NOTHROW_NCX(__LIBCCALL envz_get)(char const *__restrict __envz, size_t __envz_len, char const *__restrict __name) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(envz_get))(__envz, __envz_len, __name); })
+__NAMESPACE_LOCAL_USING_OR_IMPL(envz_get, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((3)) char *__NOTHROW_NCX(__LIBCCALL envz_get)(char const *__restrict __envz, size_t __envz_len, char const *__restrict __name) { return __NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(envz_get)(__envz, __envz_len, __name); })
 #endif /* !__cplusplus || !__CORRECT_ISO_CPP_ENVZ_H_PROTO */
 #endif /* !__CRT_HAVE_envz_get */
 #ifdef __CRT_HAVE_envz_add
@@ -126,7 +126,7 @@ __CDECLARE(__ATTR_NONNULL((1, 2, 3)),error_t,__NOTHROW_NCX,envz_add,(char **__re
  * already existed before, that entry is removed. If `name' is NULL,
  * the entry created  doesn't have a  value-portion (i.e. `name'  is
  * added to `penvz' as-is, without the trailing `=value') */
-__NAMESPACE_LOCAL_USING_OR_IMPL(envz_add, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_NONNULL((1, 2, 3)) error_t __NOTHROW_NCX(__LIBCCALL envz_add)(char **__restrict __penvz, size_t *__restrict __penvz_len, char const *__restrict __name, char const *__value) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(envz_add))(__penvz, __penvz_len, __name, __value); })
+__NAMESPACE_LOCAL_USING_OR_IMPL(envz_add, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_NONNULL((1, 2, 3)) error_t __NOTHROW_NCX(__LIBCCALL envz_add)(char **__restrict __penvz, size_t *__restrict __penvz_len, char const *__restrict __name, char const *__value) { return __NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(envz_add)(__penvz, __penvz_len, __name, __value); })
 #endif /* ... */
 #ifdef __CRT_HAVE_envz_merge
 /* Add all entries from `envz2' to `penvz', as though `envz_add()' was
@@ -144,7 +144,7 @@ __CDECLARE(__ATTR_NONNULL((1, 2, 3)),error_t,__NOTHROW_NCX,envz_merge,(char **__
  * If individual entries already existed in `penvz', behavior  depends
  * on `override_', which if non-zero will cause existing entries to be
  * overwritten, and otherwise if zero, will cause them to stay. */
-__NAMESPACE_LOCAL_USING_OR_IMPL(envz_merge, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_NONNULL((1, 2, 3)) error_t __NOTHROW_NCX(__LIBCCALL envz_merge)(char **__restrict __penvz, size_t *__restrict __penvz_len, char const *__restrict __envz2, size_t __envz2_len, int __override_) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(envz_merge))(__penvz, __penvz_len, __envz2, __envz2_len, __override_); })
+__NAMESPACE_LOCAL_USING_OR_IMPL(envz_merge, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_NONNULL((1, 2, 3)) error_t __NOTHROW_NCX(__LIBCCALL envz_merge)(char **__restrict __penvz, size_t *__restrict __penvz_len, char const *__restrict __envz2, size_t __envz2_len, int __override_) { return __NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(envz_merge)(__penvz, __penvz_len, __envz2, __envz2_len, __override_); })
 #endif /* ... */
 #ifdef __CRT_HAVE_envz_remove
 /* Remove an entry matching `name' from `penvz',
@@ -154,7 +154,7 @@ __CDECLARE_VOID(__ATTR_NONNULL((1, 2, 3)),__NOTHROW_NCX,envz_remove,(char **__re
 #include <libc/local/envz/envz_remove.h>
 /* Remove an entry matching `name' from `penvz',
  * or  do  nothing  if  no  such  entry  exists. */
-__NAMESPACE_LOCAL_USING_OR_IMPL(envz_remove, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_NONNULL((1, 2, 3)) void __NOTHROW_NCX(__LIBCCALL envz_remove)(char **__restrict __penvz, size_t *__restrict __penvz_len, char const *__restrict __name) { (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(envz_remove))(__penvz, __penvz_len, __name); })
+__NAMESPACE_LOCAL_USING_OR_IMPL(envz_remove, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_NONNULL((1, 2, 3)) void __NOTHROW_NCX(__LIBCCALL envz_remove)(char **__restrict __penvz, size_t *__restrict __penvz_len, char const *__restrict __name) { __NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(envz_remove)(__penvz, __penvz_len, __name); })
 #endif /* !__CRT_HAVE_envz_remove */
 #ifdef __CRT_HAVE_envz_strip
 /* Remove all entries from `penvz' that don't have a value-portion. */
@@ -162,7 +162,7 @@ __CDECLARE_VOID(__ATTR_NONNULL((1, 2)),__NOTHROW_NCX,envz_strip,(char **__restri
 #else /* __CRT_HAVE_envz_strip */
 #include <libc/local/envz/envz_strip.h>
 /* Remove all entries from `penvz' that don't have a value-portion. */
-__NAMESPACE_LOCAL_USING_OR_IMPL(envz_strip, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_NONNULL((1, 2)) void __NOTHROW_NCX(__LIBCCALL envz_strip)(char **__restrict __penvz, size_t *__restrict __penvz_len) { (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(envz_strip))(__penvz, __penvz_len); })
+__NAMESPACE_LOCAL_USING_OR_IMPL(envz_strip, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_NONNULL((1, 2)) void __NOTHROW_NCX(__LIBCCALL envz_strip)(char **__restrict __penvz, size_t *__restrict __penvz_len) { __NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(envz_strip)(__penvz, __penvz_len); })
 #endif /* !__CRT_HAVE_envz_strip */
 
 __SYSDECL_END

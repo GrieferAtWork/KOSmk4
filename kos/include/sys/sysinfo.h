@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xf43cc049 */
+/* HASH CRC-32:0xaf5a061d */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -64,7 +64,7 @@ __CDECLARE(__ATTR_WUNUSED,__INTPTR_TYPE__,__NOTHROW,get_phys_pages,(void),())
 #include <libc/local/sys.sysinfo/get_phys_pages.h>
 /* >> get_phys_pages(3)
  * Return the total # of pages of physical memory */
-__NAMESPACE_LOCAL_USING_OR_IMPL(get_phys_pages, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_WUNUSED __INTPTR_TYPE__ __NOTHROW(__LIBCCALL get_phys_pages)(void) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(get_phys_pages))(); })
+__NAMESPACE_LOCAL_USING_OR_IMPL(get_phys_pages, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_WUNUSED __INTPTR_TYPE__ __NOTHROW(__LIBCCALL get_phys_pages)(void) { return __NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(get_phys_pages)(); })
 #endif /* __CRT_HAVE_sysinfo && !__solaris__ && (__CRT_HAVE_getpagesize || __CRT_HAVE___getpagesize || __ARCH_PAGESIZE) */
 #endif /* !__CRT_HAVE_get_phys_pages */
 #ifdef __CRT_HAVE_get_avphys_pages
@@ -77,7 +77,7 @@ __CDECLARE(__ATTR_WUNUSED,__INTPTR_TYPE__,__NOTHROW,get_avphys_pages,(void),())
 #include <libc/local/sys.sysinfo/get_avphys_pages.h>
 /* >> get_avphys_pages(3)
  * Return the total # of free pages of physical memory */
-__NAMESPACE_LOCAL_USING_OR_IMPL(get_avphys_pages, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_WUNUSED __INTPTR_TYPE__ __NOTHROW(__LIBCCALL get_avphys_pages)(void) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(get_avphys_pages))(); })
+__NAMESPACE_LOCAL_USING_OR_IMPL(get_avphys_pages, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_WUNUSED __INTPTR_TYPE__ __NOTHROW(__LIBCCALL get_avphys_pages)(void) { return __NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(get_avphys_pages)(); })
 #endif /* __CRT_HAVE_sysinfo && !__solaris__ && (__CRT_HAVE_getpagesize || __CRT_HAVE___getpagesize || __ARCH_PAGESIZE) */
 #endif /* !__CRT_HAVE_get_avphys_pages */
 __SYSDECL_END

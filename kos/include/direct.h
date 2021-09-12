@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x32914471 */
+/* HASH CRC-32:0xd4c6495d */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -80,7 +80,7 @@ __CDECLARE(__ATTR_NONNULL((1)),int,__NOTHROW_RPC,_rmdir,(char const *__path),(__
 #include <libc/local/unistd/rmdir.h>
 /* >> rmdir(2)
  * Remove a directory referred to by `path' */
-__FORCELOCAL __ATTR_ARTIFICIAL __ATTR_NONNULL((1)) int __NOTHROW_RPC(__LIBCCALL _rmdir)(char const *__path) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(rmdir))(__path); }
+__FORCELOCAL __ATTR_ARTIFICIAL __ATTR_NONNULL((1)) int __NOTHROW_RPC(__LIBCCALL _rmdir)(char const *__path) { return __NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(rmdir)(__path); }
 #endif /* __AT_FDCWD && __CRT_HAVE_unlinkat */
 #endif /* !... */
 #define _getdcwd_nolock _getdcwd
@@ -123,7 +123,7 @@ __CREDIRECT(__ATTR_NONNULL((1)),int,__NOTHROW_RPC,rmdir,(char const *__path),_rm
 #include <libc/local/unistd/rmdir.h>
 /* >> rmdir(2)
  * Remove a directory referred to by `path' */
-__NAMESPACE_LOCAL_USING_OR_IMPL(rmdir, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_NONNULL((1)) int __NOTHROW_RPC(__LIBCCALL rmdir)(char const *__path) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(rmdir))(__path); })
+__NAMESPACE_LOCAL_USING_OR_IMPL(rmdir, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_NONNULL((1)) int __NOTHROW_RPC(__LIBCCALL rmdir)(char const *__path) { return __NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(rmdir)(__path); })
 #else /* __AT_FDCWD && __CRT_HAVE_unlinkat */
 #undef __rmdir_defined
 #endif /* !__AT_FDCWD || !__CRT_HAVE_unlinkat */
@@ -133,7 +133,7 @@ __NAMESPACE_LOCAL_USING_OR_IMPL(rmdir, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_NON
 __CDECLARE(__ATTR_NONNULL((1)),int,__NOTHROW_RPC,_mkdir,(char const *__path),(__path))
 #elif defined(__CRT_HAVE_mkdir)
 #include <libc/local/direct/_mkdir.h>
-__NAMESPACE_LOCAL_USING_OR_IMPL(_mkdir, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_NONNULL((1)) int __NOTHROW_RPC(__LIBCCALL _mkdir)(char const *__path) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(_mkdir))(__path); })
+__NAMESPACE_LOCAL_USING_OR_IMPL(_mkdir, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_NONNULL((1)) int __NOTHROW_RPC(__LIBCCALL _mkdir)(char const *__path) { return __NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(_mkdir)(__path); })
 #endif /* ... */
 /* DOS  normally defines  mkdir() as  the 1-argument  form, but for
  * compatibility with <sys/stat.h>, we define it as the  2-argument
@@ -145,7 +145,7 @@ __NAMESPACE_LOCAL_USING_OR_IMPL(_mkdir, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_NO
 __CDECLARE(__ATTR_NONNULL((1)),int,__NOTHROW_RPC,mkdir,(char const *__pathname, __mode_t __mode),(__pathname,__mode))
 #elif defined(__CRT_DOS_PRIMARY) && defined(__CRT_HAVE__mkdir)
 #include <libc/local/sys.stat/mkdir.h>
-__NAMESPACE_LOCAL_USING_OR_IMPL(mkdir, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_NONNULL((1)) int __NOTHROW_RPC(__LIBCCALL mkdir)(char const *__pathname, __mode_t __mode) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(mkdir))(__pathname, __mode); })
+__NAMESPACE_LOCAL_USING_OR_IMPL(mkdir, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_NONNULL((1)) int __NOTHROW_RPC(__LIBCCALL mkdir)(char const *__pathname, __mode_t __mode) { return __NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(mkdir)(__pathname, __mode); })
 #else /* ... */
 #undef __mkdir_defined
 #endif /* !... */

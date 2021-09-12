@@ -265,13 +265,6 @@ $int32_t const **__ctype_tolower_loc();
 [[decl_include("<hybrid/typecore.h>")]]
 $int32_t const **__ctype_toupper_loc();
 
-[[ignore, const, wunused, nothrow]]
-int _isctype(int ch, int mask);
-
-[[ignore, wunused, pure]]
-[[section(".text.crt{|.dos}.unicode.locale.ctype")]]
-int _isctype_l(int ch, int mask, $locale_t locale);
-
 
 %[insert:std]
 
@@ -506,11 +499,9 @@ function printTrait(name) {
 	print("@@>> ", name, "_l(3)");
 	print("[[if($extended_include_prefix(\"<bits/crt/ctype.h>\")defined(__crt_", name, "_l)), preferred_extern_inline(\"", name, "_l\", { return __crt_", name, "_l(ch, locale); })]]");
 	print("[[if($extended_include_prefix(\"<bits/crt/ctype.h>\")defined(__crt_", name, "_l)), preferred_extern_inline(\"__", name, "_l\", { return __crt_", name, "_l(ch, locale); })]]");
+	print("[[if($extended_include_prefix(\"<bits/crt/ctype.h>\")defined(__crt_", name, "_l)), preferred_extern_inline(\"_", name, "_l\", { return __crt_", name, "_l(ch, locale); })]]");
 	print("[[if($extended_include_prefix(\"<bits/crt/ctype.h>\")defined(__crt_", name, "_l)), preferred_inline({ return __crt_", name, "_l(ch, locale); })]]");
-	print("[[wunused, pure, "),;
-	if (name in ["tolower", "toupper"])
-		print("dos_only_export_alias(\"_", name, "_l\"), "),;
-	print("export_alias(\"__", name, "_l\")]]");
+	print("[[wunused, pure, dos_only_export_alias(\"_", name, "_l\"), export_alias(\"__", name, "_l\")]]");
 	print("int ", name, "_l(int ch, $locale_t locale) {");
 	print("	COMPILER_IMPURE();");
 	print("	(void)locale;");
@@ -523,8 +514,9 @@ for (local name: TRAITS)
 @@>> iscntrl_l(3)
 [[if($extended_include_prefix("<bits/crt/ctype.h>")defined(__crt_iscntrl_l)), preferred_extern_inline("iscntrl_l", { return __crt_iscntrl_l(ch, locale); })]]
 [[if($extended_include_prefix("<bits/crt/ctype.h>")defined(__crt_iscntrl_l)), preferred_extern_inline("__iscntrl_l", { return __crt_iscntrl_l(ch, locale); })]]
+[[if($extended_include_prefix("<bits/crt/ctype.h>")defined(__crt_iscntrl_l)), preferred_extern_inline("_iscntrl_l", { return __crt_iscntrl_l(ch, locale); })]]
 [[if($extended_include_prefix("<bits/crt/ctype.h>")defined(__crt_iscntrl_l)), preferred_inline({ return __crt_iscntrl_l(ch, locale); })]]
-[[wunused, pure, export_alias("__iscntrl_l")]]
+[[wunused, pure, dos_only_export_alias("_iscntrl_l"), export_alias("__iscntrl_l")]]
 int iscntrl_l(int ch, $locale_t locale) {
 	COMPILER_IMPURE();
 	(void)locale;
@@ -533,8 +525,9 @@ int iscntrl_l(int ch, $locale_t locale) {
 @@>> isspace_l(3)
 [[if($extended_include_prefix("<bits/crt/ctype.h>")defined(__crt_isspace_l)), preferred_extern_inline("isspace_l", { return __crt_isspace_l(ch, locale); })]]
 [[if($extended_include_prefix("<bits/crt/ctype.h>")defined(__crt_isspace_l)), preferred_extern_inline("__isspace_l", { return __crt_isspace_l(ch, locale); })]]
+[[if($extended_include_prefix("<bits/crt/ctype.h>")defined(__crt_isspace_l)), preferred_extern_inline("_isspace_l", { return __crt_isspace_l(ch, locale); })]]
 [[if($extended_include_prefix("<bits/crt/ctype.h>")defined(__crt_isspace_l)), preferred_inline({ return __crt_isspace_l(ch, locale); })]]
-[[wunused, pure, export_alias("__isspace_l")]]
+[[wunused, pure, dos_only_export_alias("_isspace_l"), export_alias("__isspace_l")]]
 int isspace_l(int ch, $locale_t locale) {
 	COMPILER_IMPURE();
 	(void)locale;
@@ -543,8 +536,9 @@ int isspace_l(int ch, $locale_t locale) {
 @@>> isupper_l(3)
 [[if($extended_include_prefix("<bits/crt/ctype.h>")defined(__crt_isupper_l)), preferred_extern_inline("isupper_l", { return __crt_isupper_l(ch, locale); })]]
 [[if($extended_include_prefix("<bits/crt/ctype.h>")defined(__crt_isupper_l)), preferred_extern_inline("__isupper_l", { return __crt_isupper_l(ch, locale); })]]
+[[if($extended_include_prefix("<bits/crt/ctype.h>")defined(__crt_isupper_l)), preferred_extern_inline("_isupper_l", { return __crt_isupper_l(ch, locale); })]]
 [[if($extended_include_prefix("<bits/crt/ctype.h>")defined(__crt_isupper_l)), preferred_inline({ return __crt_isupper_l(ch, locale); })]]
-[[wunused, pure, export_alias("__isupper_l")]]
+[[wunused, pure, dos_only_export_alias("_isupper_l"), export_alias("__isupper_l")]]
 int isupper_l(int ch, $locale_t locale) {
 	COMPILER_IMPURE();
 	(void)locale;
@@ -553,8 +547,9 @@ int isupper_l(int ch, $locale_t locale) {
 @@>> islower_l(3)
 [[if($extended_include_prefix("<bits/crt/ctype.h>")defined(__crt_islower_l)), preferred_extern_inline("islower_l", { return __crt_islower_l(ch, locale); })]]
 [[if($extended_include_prefix("<bits/crt/ctype.h>")defined(__crt_islower_l)), preferred_extern_inline("__islower_l", { return __crt_islower_l(ch, locale); })]]
+[[if($extended_include_prefix("<bits/crt/ctype.h>")defined(__crt_islower_l)), preferred_extern_inline("_islower_l", { return __crt_islower_l(ch, locale); })]]
 [[if($extended_include_prefix("<bits/crt/ctype.h>")defined(__crt_islower_l)), preferred_inline({ return __crt_islower_l(ch, locale); })]]
-[[wunused, pure, export_alias("__islower_l")]]
+[[wunused, pure, dos_only_export_alias("_islower_l"), export_alias("__islower_l")]]
 int islower_l(int ch, $locale_t locale) {
 	COMPILER_IMPURE();
 	(void)locale;
@@ -563,8 +558,9 @@ int islower_l(int ch, $locale_t locale) {
 @@>> isalpha_l(3)
 [[if($extended_include_prefix("<bits/crt/ctype.h>")defined(__crt_isalpha_l)), preferred_extern_inline("isalpha_l", { return __crt_isalpha_l(ch, locale); })]]
 [[if($extended_include_prefix("<bits/crt/ctype.h>")defined(__crt_isalpha_l)), preferred_extern_inline("__isalpha_l", { return __crt_isalpha_l(ch, locale); })]]
+[[if($extended_include_prefix("<bits/crt/ctype.h>")defined(__crt_isalpha_l)), preferred_extern_inline("_isalpha_l", { return __crt_isalpha_l(ch, locale); })]]
 [[if($extended_include_prefix("<bits/crt/ctype.h>")defined(__crt_isalpha_l)), preferred_inline({ return __crt_isalpha_l(ch, locale); })]]
-[[wunused, pure, export_alias("__isalpha_l")]]
+[[wunused, pure, dos_only_export_alias("_isalpha_l"), export_alias("__isalpha_l")]]
 int isalpha_l(int ch, $locale_t locale) {
 	COMPILER_IMPURE();
 	(void)locale;
@@ -573,8 +569,9 @@ int isalpha_l(int ch, $locale_t locale) {
 @@>> isdigit_l(3)
 [[if($extended_include_prefix("<bits/crt/ctype.h>")defined(__crt_isdigit_l)), preferred_extern_inline("isdigit_l", { return __crt_isdigit_l(ch, locale); })]]
 [[if($extended_include_prefix("<bits/crt/ctype.h>")defined(__crt_isdigit_l)), preferred_extern_inline("__isdigit_l", { return __crt_isdigit_l(ch, locale); })]]
+[[if($extended_include_prefix("<bits/crt/ctype.h>")defined(__crt_isdigit_l)), preferred_extern_inline("_isdigit_l", { return __crt_isdigit_l(ch, locale); })]]
 [[if($extended_include_prefix("<bits/crt/ctype.h>")defined(__crt_isdigit_l)), preferred_inline({ return __crt_isdigit_l(ch, locale); })]]
-[[wunused, pure, export_alias("__isdigit_l")]]
+[[wunused, pure, dos_only_export_alias("_isdigit_l"), export_alias("__isdigit_l")]]
 int isdigit_l(int ch, $locale_t locale) {
 	COMPILER_IMPURE();
 	(void)locale;
@@ -583,8 +580,9 @@ int isdigit_l(int ch, $locale_t locale) {
 @@>> isxdigit_l(3)
 [[if($extended_include_prefix("<bits/crt/ctype.h>")defined(__crt_isxdigit_l)), preferred_extern_inline("isxdigit_l", { return __crt_isxdigit_l(ch, locale); })]]
 [[if($extended_include_prefix("<bits/crt/ctype.h>")defined(__crt_isxdigit_l)), preferred_extern_inline("__isxdigit_l", { return __crt_isxdigit_l(ch, locale); })]]
+[[if($extended_include_prefix("<bits/crt/ctype.h>")defined(__crt_isxdigit_l)), preferred_extern_inline("_isxdigit_l", { return __crt_isxdigit_l(ch, locale); })]]
 [[if($extended_include_prefix("<bits/crt/ctype.h>")defined(__crt_isxdigit_l)), preferred_inline({ return __crt_isxdigit_l(ch, locale); })]]
-[[wunused, pure, export_alias("__isxdigit_l")]]
+[[wunused, pure, dos_only_export_alias("_isxdigit_l"), export_alias("__isxdigit_l")]]
 int isxdigit_l(int ch, $locale_t locale) {
 	COMPILER_IMPURE();
 	(void)locale;
@@ -593,8 +591,9 @@ int isxdigit_l(int ch, $locale_t locale) {
 @@>> isalnum_l(3)
 [[if($extended_include_prefix("<bits/crt/ctype.h>")defined(__crt_isalnum_l)), preferred_extern_inline("isalnum_l", { return __crt_isalnum_l(ch, locale); })]]
 [[if($extended_include_prefix("<bits/crt/ctype.h>")defined(__crt_isalnum_l)), preferred_extern_inline("__isalnum_l", { return __crt_isalnum_l(ch, locale); })]]
+[[if($extended_include_prefix("<bits/crt/ctype.h>")defined(__crt_isalnum_l)), preferred_extern_inline("_isalnum_l", { return __crt_isalnum_l(ch, locale); })]]
 [[if($extended_include_prefix("<bits/crt/ctype.h>")defined(__crt_isalnum_l)), preferred_inline({ return __crt_isalnum_l(ch, locale); })]]
-[[wunused, pure, export_alias("__isalnum_l")]]
+[[wunused, pure, dos_only_export_alias("_isalnum_l"), export_alias("__isalnum_l")]]
 int isalnum_l(int ch, $locale_t locale) {
 	COMPILER_IMPURE();
 	(void)locale;
@@ -603,8 +602,9 @@ int isalnum_l(int ch, $locale_t locale) {
 @@>> ispunct_l(3)
 [[if($extended_include_prefix("<bits/crt/ctype.h>")defined(__crt_ispunct_l)), preferred_extern_inline("ispunct_l", { return __crt_ispunct_l(ch, locale); })]]
 [[if($extended_include_prefix("<bits/crt/ctype.h>")defined(__crt_ispunct_l)), preferred_extern_inline("__ispunct_l", { return __crt_ispunct_l(ch, locale); })]]
+[[if($extended_include_prefix("<bits/crt/ctype.h>")defined(__crt_ispunct_l)), preferred_extern_inline("_ispunct_l", { return __crt_ispunct_l(ch, locale); })]]
 [[if($extended_include_prefix("<bits/crt/ctype.h>")defined(__crt_ispunct_l)), preferred_inline({ return __crt_ispunct_l(ch, locale); })]]
-[[wunused, pure, export_alias("__ispunct_l")]]
+[[wunused, pure, dos_only_export_alias("_ispunct_l"), export_alias("__ispunct_l")]]
 int ispunct_l(int ch, $locale_t locale) {
 	COMPILER_IMPURE();
 	(void)locale;
@@ -613,8 +613,9 @@ int ispunct_l(int ch, $locale_t locale) {
 @@>> isgraph_l(3)
 [[if($extended_include_prefix("<bits/crt/ctype.h>")defined(__crt_isgraph_l)), preferred_extern_inline("isgraph_l", { return __crt_isgraph_l(ch, locale); })]]
 [[if($extended_include_prefix("<bits/crt/ctype.h>")defined(__crt_isgraph_l)), preferred_extern_inline("__isgraph_l", { return __crt_isgraph_l(ch, locale); })]]
+[[if($extended_include_prefix("<bits/crt/ctype.h>")defined(__crt_isgraph_l)), preferred_extern_inline("_isgraph_l", { return __crt_isgraph_l(ch, locale); })]]
 [[if($extended_include_prefix("<bits/crt/ctype.h>")defined(__crt_isgraph_l)), preferred_inline({ return __crt_isgraph_l(ch, locale); })]]
-[[wunused, pure, export_alias("__isgraph_l")]]
+[[wunused, pure, dos_only_export_alias("_isgraph_l"), export_alias("__isgraph_l")]]
 int isgraph_l(int ch, $locale_t locale) {
 	COMPILER_IMPURE();
 	(void)locale;
@@ -623,8 +624,9 @@ int isgraph_l(int ch, $locale_t locale) {
 @@>> isprint_l(3)
 [[if($extended_include_prefix("<bits/crt/ctype.h>")defined(__crt_isprint_l)), preferred_extern_inline("isprint_l", { return __crt_isprint_l(ch, locale); })]]
 [[if($extended_include_prefix("<bits/crt/ctype.h>")defined(__crt_isprint_l)), preferred_extern_inline("__isprint_l", { return __crt_isprint_l(ch, locale); })]]
+[[if($extended_include_prefix("<bits/crt/ctype.h>")defined(__crt_isprint_l)), preferred_extern_inline("_isprint_l", { return __crt_isprint_l(ch, locale); })]]
 [[if($extended_include_prefix("<bits/crt/ctype.h>")defined(__crt_isprint_l)), preferred_inline({ return __crt_isprint_l(ch, locale); })]]
-[[wunused, pure, export_alias("__isprint_l")]]
+[[wunused, pure, dos_only_export_alias("_isprint_l"), export_alias("__isprint_l")]]
 int isprint_l(int ch, $locale_t locale) {
 	COMPILER_IMPURE();
 	(void)locale;
@@ -633,8 +635,9 @@ int isprint_l(int ch, $locale_t locale) {
 @@>> isblank_l(3)
 [[if($extended_include_prefix("<bits/crt/ctype.h>")defined(__crt_isblank_l)), preferred_extern_inline("isblank_l", { return __crt_isblank_l(ch, locale); })]]
 [[if($extended_include_prefix("<bits/crt/ctype.h>")defined(__crt_isblank_l)), preferred_extern_inline("__isblank_l", { return __crt_isblank_l(ch, locale); })]]
+[[if($extended_include_prefix("<bits/crt/ctype.h>")defined(__crt_isblank_l)), preferred_extern_inline("_isblank_l", { return __crt_isblank_l(ch, locale); })]]
 [[if($extended_include_prefix("<bits/crt/ctype.h>")defined(__crt_isblank_l)), preferred_inline({ return __crt_isblank_l(ch, locale); })]]
-[[wunused, pure, export_alias("__isblank_l")]]
+[[wunused, pure, dos_only_export_alias("_isblank_l"), export_alias("__isblank_l")]]
 int isblank_l(int ch, $locale_t locale) {
 	COMPILER_IMPURE();
 	(void)locale;
@@ -643,6 +646,7 @@ int isblank_l(int ch, $locale_t locale) {
 @@>> tolower_l(3)
 [[if($extended_include_prefix("<bits/crt/ctype.h>")defined(__crt_tolower_l)), preferred_extern_inline("tolower_l", { return __crt_tolower_l(ch, locale); })]]
 [[if($extended_include_prefix("<bits/crt/ctype.h>")defined(__crt_tolower_l)), preferred_extern_inline("__tolower_l", { return __crt_tolower_l(ch, locale); })]]
+[[if($extended_include_prefix("<bits/crt/ctype.h>")defined(__crt_tolower_l)), preferred_extern_inline("_tolower_l", { return __crt_tolower_l(ch, locale); })]]
 [[if($extended_include_prefix("<bits/crt/ctype.h>")defined(__crt_tolower_l)), preferred_inline({ return __crt_tolower_l(ch, locale); })]]
 [[wunused, pure, dos_only_export_alias("_tolower_l"), export_alias("__tolower_l")]]
 int tolower_l(int ch, $locale_t locale) {
@@ -653,6 +657,7 @@ int tolower_l(int ch, $locale_t locale) {
 @@>> toupper_l(3)
 [[if($extended_include_prefix("<bits/crt/ctype.h>")defined(__crt_toupper_l)), preferred_extern_inline("toupper_l", { return __crt_toupper_l(ch, locale); })]]
 [[if($extended_include_prefix("<bits/crt/ctype.h>")defined(__crt_toupper_l)), preferred_extern_inline("__toupper_l", { return __crt_toupper_l(ch, locale); })]]
+[[if($extended_include_prefix("<bits/crt/ctype.h>")defined(__crt_toupper_l)), preferred_extern_inline("_toupper_l", { return __crt_toupper_l(ch, locale); })]]
 [[if($extended_include_prefix("<bits/crt/ctype.h>")defined(__crt_toupper_l)), preferred_inline({ return __crt_toupper_l(ch, locale); })]]
 [[wunused, pure, dos_only_export_alias("_toupper_l"), export_alias("__toupper_l")]]
 int toupper_l(int ch, $locale_t locale) {
@@ -849,20 +854,39 @@ int toupper_l(int ch, $locale_t locale) {
 #endif /* __NO_builtin_constant_p */
 
 #endif /* (!__cplusplus || __USE_CTYPE_MACROS) && !__CXX_SYSTEM_HEADER */
-
-
-#if defined(__USE_MISC) || defined(__USE_XOPEN)
 }
+
+%
+%#ifdef __USE_KOS
+%[default:section(".text.crt.dos.unicode.static.ctype")];
+
+@@>> issymstrt(3)
+@@Test if `ch' can appear at the start of a symbol/keyword/identifier
+[[wunused, const, decl_include("<hybrid/typecore.h>"), crt_name("__iscsymf")]]
+int issymstrt(int ch) {
+	return isalpha(ch) || ch == '_' || ch == '$';
+}
+
+@@>> issymcont(3)
+@@Test if `ch' can appear in the middle of a symbol/keyword/identifier
+[[wunused, const, decl_include("<hybrid/typecore.h>"), crt_name("__iscsym")]]
+int issymcont(int ch) {
+	return isalnum(ch) || ch == '_' || ch == '$';
+}
+%#endif /* __USE_KOS */
+
+%
+%#if defined(__USE_MISC) || defined(__USE_XOPEN)
 %[default:section(".text.crt{|.dos}.unicode.static.ctype")];
 
 @@Returns non-zero if `(C & ~0x7f) == 0'
-[[nothrow, const, inline]]
+[[nothrow, const, inline, dos_only_export_alias("__isascii")]]
 int isascii(int c) {
 	return (c & ~0x7f) == 0;
 }
 
 @@Re-returns `C & 0x7f'
-[[nothrow, const, inline]]
+[[nothrow, const, inline, dos_only_export_alias("__toascii")]]
 int toascii(int c) {
 	return c & 0x7f;
 }
@@ -872,8 +896,63 @@ int toascii(int c) {
 #define isascii(c) (((c) & ~0x7f) == 0)
 #define toascii(c) ((c) & 0x7f)
 #endif /* (!__cplusplus || __USE_CTYPE_MACROS) && !__CXX_SYSTEM_HEADER */
+}
+%#endif /* __USE_MISC || __USE_XOPEN */
 
-#endif /* __USE_MISC || __USE_XOPEN */
+
+%
+%#if defined(__USE_MISC) || defined(__USE_XOPEN) || defined(__USE_DOS)
+@@>> _tolower(3)
+@@Same as `tolower(3)', but the caller must ensure that `isupper(ch)'
+[[const, wunused, nothrow, inline]]
+int _tolower(int ch) {
+	return ch + 0x20;
+}
+
+@@>> _toupper(3)
+@@Same as `toupper(3)', but the caller must ensure that `islower(ch)'
+[[const, wunused, nothrow, inline]]
+int _toupper(int ch) {
+	return ch - 0x20;
+}
+%#endif /* __USE_MISC || __USE_XOPEN || __USE_DOS */
+
+
+%
+%#ifdef __USE_DOS
+%[default:section(".text.crt.dos.unicode.static.ctype")];
+
+[[guard, const, wunused, nothrow]]
+int _isctype(int ch, int mask);
+
+[[guard, wunused, pure]]
+[[section(".text.crt{|.dos}.unicode.locale.ctype")]]
+int _isctype_l(int ch, int mask, $locale_t locale);
+
+
+%[insert:function(_isalpha_l = isalpha_l)]
+%[insert:function(_isupper_l = isupper_l)]
+%[insert:function(_islower_l = islower_l)]
+%[insert:function(_isdigit_l = isdigit_l)]
+%[insert:function(_isxdigit_l = isxdigit_l)]
+%[insert:function(_isspace_l = isspace_l)]
+%[insert:function(_ispunct_l = ispunct_l)]
+%[insert:function(_isblank_l = isblank_l)]
+%[insert:function(_isalnum_l = isalnum_l)]
+%[insert:function(_isprint_l = isprint_l)]
+%[insert:function(_isgraph_l = isgraph_l)]
+%[insert:function(_iscntrl_l = iscntrl_l)]
+%[insert:function(_tolower_l = tolower_l)]
+%[insert:function(_toupper_l = toupper_l)]
+
+%[insert:function(__isascii = isascii)]
+%[insert:function(__toascii = toascii)]
+%[insert:function(__iscsymf = issymstrt)]
+%[insert:function(__iscsym = issymcont)]
+%#endif /* __USE_DOS */
+
+
+%{
 
 __SYSDECL_END
 #endif /* __CC__ */

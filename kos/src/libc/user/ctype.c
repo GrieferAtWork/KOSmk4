@@ -1355,8 +1355,8 @@ NOTHROW_NCX(LIBCCALL libc___locale_ctype_ptr_l)(locale_t locale)
 }
 /*[[[end:libc___locale_ctype_ptr_l]]]*/
 
-/*[[[head:libc__isctype,hash:CRC-32=0x9fc6416]]]*/
-INTERN ATTR_SECTION(".text.crt.unicode.static.ctype") ATTR_CONST WUNUSED int
+/*[[[head:libc__isctype,hash:CRC-32=0xc520f632]]]*/
+INTERN ATTR_SECTION(".text.crt.dos.unicode.static.ctype") ATTR_CONST WUNUSED int
 NOTHROW(LIBCCALL libc__isctype)(int ch,
                                 int mask)
 /*[[[body:libc__isctype]]]*/

@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xe63d1670 */
+/* HASH CRC-32:0x1831f6ae */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -36,7 +36,7 @@ __CREDIRECT(,int,__THROWING,__libc_core_feraiseexcept,(int __excepts),feraiseexc
 #else /* __CRT_HAVE_feraiseexcept */
 #include <libc/local/fenv/feraiseexcept.h>
 /* @param: EXCEPTS: Set of `FE_*' */
-#define __libc_core_feraiseexcept (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(feraiseexcept))
+#define __libc_core_feraiseexcept __NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(feraiseexcept)
 #endif /* !__CRT_HAVE_feraiseexcept */
 #ifdef __CRT_HAVE_fegetround
 /* Get the current rounding direction
@@ -54,7 +54,7 @@ __CREDIRECT(__ATTR_PURE __ATTR_WUNUSED,int,__NOTHROW,__libc_core_fegetround,(voi
  *             ... `FE_DOWNWARD':   floor()
  *             ... `FE_UPWARD':     ceil()
  *             ... `FE_TOWARDZERO': trunc() */
-#define __libc_core_fegetround (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(fegetround))
+#define __libc_core_fegetround __NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(fegetround)
 #endif /* !__CRT_HAVE_fegetround */
 #ifdef __CRT_HAVE_fesetround
 /* Set the current rounding direction
@@ -72,7 +72,7 @@ __CREDIRECT(,int,__NOTHROW,__libc_core_fesetround,(int __rounding_direction),fes
  *             ... `FE_DOWNWARD':   floor()
  *             ... `FE_UPWARD':     ceil()
  *             ... `FE_TOWARDZERO': trunc() */
-#define __libc_core_fesetround (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(fesetround))
+#define __libc_core_fesetround __NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(fesetround)
 #endif /* !__CRT_HAVE_fesetround */
 
 __SYSDECL_END

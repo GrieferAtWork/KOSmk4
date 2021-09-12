@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x46a45104 */
+/* HASH CRC-32:0xf523fa5d */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -47,8 +47,6 @@ DECL_BEGIN
 #define libc_toupper(ch)  __crt_toupper(ch)
 #if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
 INTDEF ATTR_PURE WUNUSED char const *NOTHROW_NCX(LIBDCALL libd___locale_ctype_ptr_l)(locale_t locale);
-INTDEF ATTR_CONST WUNUSED int NOTHROW(LIBDCALL libd__isctype)(int ch, int mask);
-INTDEF ATTR_PURE WUNUSED int NOTHROW_NCX(LIBDCALL libd__isctype_l)(int ch, int mask, locale_t locale);
 /* >> iscntrl(3) */
 INTDEF ATTR_CONST WUNUSED int NOTHROW(LIBDCALL libd_iscntrl)(int ch);
 #endif /* !__LIBCCALL_IS_LIBDCALL && !__KERNEL__ */
@@ -273,6 +271,26 @@ INTDEF ATTR_PURE WUNUSED int NOTHROW_NCX(LIBDCALL libd_toupper_l)(int ch, locale
 INTDEF ATTR_PURE WUNUSED int NOTHROW_NCX(LIBCCALL libc_toupper_l)(int ch, locale_t locale);
 #endif /* !__KERNEL__ */
 #if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
+/* >> issymstrt(3)
+ * Test if `ch' can appear at the start of a symbol/keyword/identifier */
+INTDEF ATTR_CONST WUNUSED int NOTHROW_NCX(LIBDCALL libd___iscsymf)(int ch);
+#endif /* !__LIBCCALL_IS_LIBDCALL && !__KERNEL__ */
+#ifndef __KERNEL__
+/* >> issymstrt(3)
+ * Test if `ch' can appear at the start of a symbol/keyword/identifier */
+INTDEF ATTR_CONST WUNUSED int NOTHROW_NCX(LIBCCALL libc___iscsymf)(int ch);
+#endif /* !__KERNEL__ */
+#if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
+/* >> issymcont(3)
+ * Test if `ch' can appear in the middle of a symbol/keyword/identifier */
+INTDEF ATTR_CONST WUNUSED int NOTHROW_NCX(LIBDCALL libd___iscsym)(int ch);
+#endif /* !__LIBCCALL_IS_LIBDCALL && !__KERNEL__ */
+#ifndef __KERNEL__
+/* >> issymcont(3)
+ * Test if `ch' can appear in the middle of a symbol/keyword/identifier */
+INTDEF ATTR_CONST WUNUSED int NOTHROW_NCX(LIBCCALL libc___iscsym)(int ch);
+#endif /* !__KERNEL__ */
+#if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
 /* Returns non-zero if `(C & ~0x7f) == 0' */
 INTDEF ATTR_CONST int NOTHROW(LIBDCALL libd_isascii)(int c);
 #endif /* !__LIBCCALL_IS_LIBDCALL && !__KERNEL__ */
@@ -288,6 +306,30 @@ INTDEF ATTR_CONST int NOTHROW(LIBDCALL libd_toascii)(int c);
 /* Re-returns `C & 0x7f' */
 INTDEF ATTR_CONST int NOTHROW(LIBCCALL libc_toascii)(int c);
 #endif /* !__KERNEL__ */
+#if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
+/* >> _tolower(3)
+ * Same as `tolower(3)', but the caller must ensure that `isupper(ch)' */
+INTDEF ATTR_CONST WUNUSED int NOTHROW(LIBDCALL libd__tolower)(int ch);
+#endif /* !__LIBCCALL_IS_LIBDCALL && !__KERNEL__ */
+#ifndef __KERNEL__
+/* >> _tolower(3)
+ * Same as `tolower(3)', but the caller must ensure that `isupper(ch)' */
+INTDEF ATTR_CONST WUNUSED int NOTHROW(LIBCCALL libc__tolower)(int ch);
+#endif /* !__KERNEL__ */
+#if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
+/* >> _toupper(3)
+ * Same as `toupper(3)', but the caller must ensure that `islower(ch)' */
+INTDEF ATTR_CONST WUNUSED int NOTHROW(LIBDCALL libd__toupper)(int ch);
+#endif /* !__LIBCCALL_IS_LIBDCALL && !__KERNEL__ */
+#ifndef __KERNEL__
+/* >> _toupper(3)
+ * Same as `toupper(3)', but the caller must ensure that `islower(ch)' */
+INTDEF ATTR_CONST WUNUSED int NOTHROW(LIBCCALL libc__toupper)(int ch);
+#endif /* !__KERNEL__ */
+#if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
+INTDEF ATTR_CONST WUNUSED int NOTHROW(LIBDCALL libd__isctype)(int ch, int mask);
+INTDEF ATTR_PURE WUNUSED int NOTHROW_NCX(LIBDCALL libd__isctype_l)(int ch, int mask, locale_t locale);
+#endif /* !__LIBCCALL_IS_LIBDCALL && !__KERNEL__ */
 
 DECL_END
 

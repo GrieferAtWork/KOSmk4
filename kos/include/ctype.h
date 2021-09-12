@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xb252d221 */
+/* HASH CRC-32:0x75b87ebb */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -96,7 +96,7 @@ __NAMESPACE_STD_END
 #include <libc/local/ctype/iscntrl.h>
 __NAMESPACE_STD_BEGIN
 /* >> iscntrl(3) */
-__NAMESPACE_LOCAL_USING_OR_IMPL(iscntrl, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_CONST __ATTR_WUNUSED int __NOTHROW(__LIBCCALL iscntrl)(int __ch) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(iscntrl))(__ch); })
+__NAMESPACE_LOCAL_USING_OR_IMPL(iscntrl, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_CONST __ATTR_WUNUSED int __NOTHROW(__LIBCCALL iscntrl)(int __ch) { return __NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(iscntrl)(__ch); })
 #endif /* !... */
 #if defined(__crt_isspace) && defined(__CRT_HAVE_isspace)
 /* >> isspace(3) */
@@ -115,7 +115,7 @@ __NAMESPACE_STD_END
 #include <libc/local/ctype/isspace.h>
 __NAMESPACE_STD_BEGIN
 /* >> isspace(3) */
-__NAMESPACE_LOCAL_USING_OR_IMPL(isspace, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_CONST __ATTR_WUNUSED int __NOTHROW(__LIBCCALL isspace)(int __ch) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(isspace))(__ch); })
+__NAMESPACE_LOCAL_USING_OR_IMPL(isspace, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_CONST __ATTR_WUNUSED int __NOTHROW(__LIBCCALL isspace)(int __ch) { return __NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(isspace)(__ch); })
 #endif /* !... */
 #if defined(__crt_isupper) && defined(__CRT_HAVE_isupper)
 /* >> isupper(3) */
@@ -134,7 +134,7 @@ __NAMESPACE_STD_END
 #include <libc/local/ctype/isupper.h>
 __NAMESPACE_STD_BEGIN
 /* >> isupper(3) */
-__NAMESPACE_LOCAL_USING_OR_IMPL(isupper, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_CONST __ATTR_WUNUSED int __NOTHROW(__LIBCCALL isupper)(int __ch) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(isupper))(__ch); })
+__NAMESPACE_LOCAL_USING_OR_IMPL(isupper, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_CONST __ATTR_WUNUSED int __NOTHROW(__LIBCCALL isupper)(int __ch) { return __NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(isupper)(__ch); })
 #endif /* !... */
 #if defined(__crt_islower) && defined(__CRT_HAVE_islower)
 /* >> islower(3) */
@@ -153,7 +153,7 @@ __NAMESPACE_STD_END
 #include <libc/local/ctype/islower.h>
 __NAMESPACE_STD_BEGIN
 /* >> islower(3) */
-__NAMESPACE_LOCAL_USING_OR_IMPL(islower, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_CONST __ATTR_WUNUSED int __NOTHROW(__LIBCCALL islower)(int __ch) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(islower))(__ch); })
+__NAMESPACE_LOCAL_USING_OR_IMPL(islower, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_CONST __ATTR_WUNUSED int __NOTHROW(__LIBCCALL islower)(int __ch) { return __NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(islower)(__ch); })
 #endif /* !... */
 #if defined(__crt_isalpha) && defined(__CRT_HAVE_isalpha)
 /* >> isalpha(3) */
@@ -172,7 +172,7 @@ __NAMESPACE_STD_END
 #include <libc/local/ctype/isalpha.h>
 __NAMESPACE_STD_BEGIN
 /* >> isalpha(3) */
-__NAMESPACE_LOCAL_USING_OR_IMPL(isalpha, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_CONST __ATTR_WUNUSED int __NOTHROW(__LIBCCALL isalpha)(int __ch) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(isalpha))(__ch); })
+__NAMESPACE_LOCAL_USING_OR_IMPL(isalpha, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_CONST __ATTR_WUNUSED int __NOTHROW(__LIBCCALL isalpha)(int __ch) { return __NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(isalpha)(__ch); })
 #endif /* !... */
 #if defined(__crt_isdigit) && defined(__CRT_HAVE_isdigit)
 /* >> isdigit(3) */
@@ -191,7 +191,7 @@ __NAMESPACE_STD_END
 #include <libc/local/ctype/isdigit.h>
 __NAMESPACE_STD_BEGIN
 /* >> isdigit(3) */
-__NAMESPACE_LOCAL_USING_OR_IMPL(isdigit, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_CONST __ATTR_WUNUSED int __NOTHROW(__LIBCCALL isdigit)(int __ch) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(isdigit))(__ch); })
+__NAMESPACE_LOCAL_USING_OR_IMPL(isdigit, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_CONST __ATTR_WUNUSED int __NOTHROW(__LIBCCALL isdigit)(int __ch) { return __NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(isdigit)(__ch); })
 #endif /* !... */
 #if defined(__crt_isxdigit) && defined(__CRT_HAVE_isxdigit)
 /* >> isxdigit(3) */
@@ -210,7 +210,7 @@ __NAMESPACE_STD_END
 #include <libc/local/ctype/isxdigit.h>
 __NAMESPACE_STD_BEGIN
 /* >> isxdigit(3) */
-__NAMESPACE_LOCAL_USING_OR_IMPL(isxdigit, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_CONST __ATTR_WUNUSED int __NOTHROW(__LIBCCALL isxdigit)(int __ch) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(isxdigit))(__ch); })
+__NAMESPACE_LOCAL_USING_OR_IMPL(isxdigit, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_CONST __ATTR_WUNUSED int __NOTHROW(__LIBCCALL isxdigit)(int __ch) { return __NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(isxdigit)(__ch); })
 #endif /* !... */
 #if defined(__crt_isalnum) && defined(__CRT_HAVE_isalnum)
 /* >> isalnum(3) */
@@ -229,7 +229,7 @@ __NAMESPACE_STD_END
 #include <libc/local/ctype/isalnum.h>
 __NAMESPACE_STD_BEGIN
 /* >> isalnum(3) */
-__NAMESPACE_LOCAL_USING_OR_IMPL(isalnum, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_CONST __ATTR_WUNUSED int __NOTHROW(__LIBCCALL isalnum)(int __ch) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(isalnum))(__ch); })
+__NAMESPACE_LOCAL_USING_OR_IMPL(isalnum, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_CONST __ATTR_WUNUSED int __NOTHROW(__LIBCCALL isalnum)(int __ch) { return __NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(isalnum)(__ch); })
 #endif /* !... */
 #if defined(__crt_ispunct) && defined(__CRT_HAVE_ispunct)
 /* >> ispunct(3) */
@@ -248,7 +248,7 @@ __NAMESPACE_STD_END
 #include <libc/local/ctype/ispunct.h>
 __NAMESPACE_STD_BEGIN
 /* >> ispunct(3) */
-__NAMESPACE_LOCAL_USING_OR_IMPL(ispunct, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_CONST __ATTR_WUNUSED int __NOTHROW(__LIBCCALL ispunct)(int __ch) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(ispunct))(__ch); })
+__NAMESPACE_LOCAL_USING_OR_IMPL(ispunct, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_CONST __ATTR_WUNUSED int __NOTHROW(__LIBCCALL ispunct)(int __ch) { return __NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(ispunct)(__ch); })
 #endif /* !... */
 #if defined(__crt_isgraph) && defined(__CRT_HAVE_isgraph)
 /* >> isgraph(3) */
@@ -267,7 +267,7 @@ __NAMESPACE_STD_END
 #include <libc/local/ctype/isgraph.h>
 __NAMESPACE_STD_BEGIN
 /* >> isgraph(3) */
-__NAMESPACE_LOCAL_USING_OR_IMPL(isgraph, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_CONST __ATTR_WUNUSED int __NOTHROW(__LIBCCALL isgraph)(int __ch) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(isgraph))(__ch); })
+__NAMESPACE_LOCAL_USING_OR_IMPL(isgraph, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_CONST __ATTR_WUNUSED int __NOTHROW(__LIBCCALL isgraph)(int __ch) { return __NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(isgraph)(__ch); })
 #endif /* !... */
 #if defined(__crt_isprint) && defined(__CRT_HAVE_isprint)
 /* >> isprint(3) */
@@ -286,7 +286,7 @@ __NAMESPACE_STD_END
 #include <libc/local/ctype/isprint.h>
 __NAMESPACE_STD_BEGIN
 /* >> isprint(3) */
-__NAMESPACE_LOCAL_USING_OR_IMPL(isprint, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_CONST __ATTR_WUNUSED int __NOTHROW(__LIBCCALL isprint)(int __ch) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(isprint))(__ch); })
+__NAMESPACE_LOCAL_USING_OR_IMPL(isprint, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_CONST __ATTR_WUNUSED int __NOTHROW(__LIBCCALL isprint)(int __ch) { return __NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(isprint)(__ch); })
 #endif /* !... */
 #if defined(__crt_tolower) && defined(__CRT_HAVE_tolower)
 /* >> tolower(3) */
@@ -305,7 +305,7 @@ __NAMESPACE_STD_END
 #include <libc/local/ctype/tolower.h>
 __NAMESPACE_STD_BEGIN
 /* >> tolower(3) */
-__NAMESPACE_LOCAL_USING_OR_IMPL(tolower, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_CONST __ATTR_WUNUSED int __NOTHROW(__LIBCCALL tolower)(int __ch) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(tolower))(__ch); })
+__NAMESPACE_LOCAL_USING_OR_IMPL(tolower, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_CONST __ATTR_WUNUSED int __NOTHROW(__LIBCCALL tolower)(int __ch) { return __NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(tolower)(__ch); })
 #endif /* !... */
 #if defined(__crt_toupper) && defined(__CRT_HAVE_toupper)
 /* >> toupper(3) */
@@ -324,7 +324,7 @@ __NAMESPACE_STD_END
 #include <libc/local/ctype/toupper.h>
 __NAMESPACE_STD_BEGIN
 /* >> toupper(3) */
-__NAMESPACE_LOCAL_USING_OR_IMPL(toupper, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_CONST __ATTR_WUNUSED int __NOTHROW(__LIBCCALL toupper)(int __ch) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(toupper))(__ch); })
+__NAMESPACE_LOCAL_USING_OR_IMPL(toupper, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_CONST __ATTR_WUNUSED int __NOTHROW(__LIBCCALL toupper)(int __ch) { return __NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(toupper)(__ch); })
 #endif /* !... */
 #ifdef __USE_ISOC99
 #if defined(__crt_isblank) && defined(__CRT_HAVE_isblank)
@@ -344,7 +344,7 @@ __NAMESPACE_STD_END
 #include <libc/local/ctype/isblank.h>
 __NAMESPACE_STD_BEGIN
 /* >> isblank(3) */
-__NAMESPACE_LOCAL_USING_OR_IMPL(isblank, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_CONST __ATTR_WUNUSED int __NOTHROW(__LIBCCALL isblank)(int __ch) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(isblank))(__ch); })
+__NAMESPACE_LOCAL_USING_OR_IMPL(isblank, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_CONST __ATTR_WUNUSED int __NOTHROW(__LIBCCALL isblank)(int __ch) { return __NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(isblank)(__ch); })
 #endif /* !... */
 #endif /* __USE_ISOC99 */
 __NAMESPACE_STD_END
@@ -376,19 +376,25 @@ __CEIDECLARE(__ATTR_PURE __ATTR_WUNUSED,int,__NOTHROW_NCX,iscntrl_l,(int __ch, _
 #elif defined(__crt_iscntrl_l) && defined(__CRT_HAVE___iscntrl_l)
 /* >> iscntrl_l(3) */
 __CEIREDIRECT(__ATTR_PURE __ATTR_WUNUSED,int,__NOTHROW_NCX,iscntrl_l,(int __ch, __locale_t __locale),__iscntrl_l,{ return __crt_iscntrl_l(__ch, __locale); })
+#elif defined(__crt_iscntrl_l) && defined(__CRT_HAVE__iscntrl_l)
+/* >> iscntrl_l(3) */
+__CEIREDIRECT(__ATTR_PURE __ATTR_WUNUSED,int,__NOTHROW_NCX,iscntrl_l,(int __ch, __locale_t __locale),_iscntrl_l,{ return __crt_iscntrl_l(__ch, __locale); })
 #elif defined(__crt_iscntrl_l)
 /* >> iscntrl_l(3) */
 __LOCAL __ATTR_PURE __ATTR_WUNUSED int __NOTHROW_NCX(__LIBCCALL iscntrl_l)(int __ch, __locale_t __locale) { return __crt_iscntrl_l(__ch, __locale); }
 #elif defined(__CRT_HAVE_iscntrl_l)
 /* >> iscntrl_l(3) */
 __CDECLARE(__ATTR_PURE __ATTR_WUNUSED,int,__NOTHROW_NCX,iscntrl_l,(int __ch, __locale_t __locale),(__ch,__locale))
+#elif defined(__CRT_HAVE__iscntrl_l)
+/* >> iscntrl_l(3) */
+__CREDIRECT(__ATTR_PURE __ATTR_WUNUSED,int,__NOTHROW_NCX,iscntrl_l,(int __ch, __locale_t __locale),_iscntrl_l,(__ch,__locale))
 #elif defined(__CRT_HAVE___iscntrl_l)
 /* >> iscntrl_l(3) */
 __CREDIRECT(__ATTR_PURE __ATTR_WUNUSED,int,__NOTHROW_NCX,iscntrl_l,(int __ch, __locale_t __locale),__iscntrl_l,(__ch,__locale))
 #else /* ... */
 #include <libc/local/ctype/iscntrl_l.h>
 /* >> iscntrl_l(3) */
-__NAMESPACE_LOCAL_USING_OR_IMPL(iscntrl_l, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_PURE __ATTR_WUNUSED int __NOTHROW_NCX(__LIBCCALL iscntrl_l)(int __ch, __locale_t __locale) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(iscntrl_l))(__ch, __locale); })
+__NAMESPACE_LOCAL_USING_OR_IMPL(iscntrl_l, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_PURE __ATTR_WUNUSED int __NOTHROW_NCX(__LIBCCALL iscntrl_l)(int __ch, __locale_t __locale) { return __NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(iscntrl_l)(__ch, __locale); })
 #endif /* !... */
 #if defined(__crt_isspace_l) && defined(__CRT_HAVE_isspace_l)
 /* >> isspace_l(3) */
@@ -396,19 +402,25 @@ __CEIDECLARE(__ATTR_PURE __ATTR_WUNUSED,int,__NOTHROW_NCX,isspace_l,(int __ch, _
 #elif defined(__crt_isspace_l) && defined(__CRT_HAVE___isspace_l)
 /* >> isspace_l(3) */
 __CEIREDIRECT(__ATTR_PURE __ATTR_WUNUSED,int,__NOTHROW_NCX,isspace_l,(int __ch, __locale_t __locale),__isspace_l,{ return __crt_isspace_l(__ch, __locale); })
+#elif defined(__crt_isspace_l) && defined(__CRT_HAVE__isspace_l)
+/* >> isspace_l(3) */
+__CEIREDIRECT(__ATTR_PURE __ATTR_WUNUSED,int,__NOTHROW_NCX,isspace_l,(int __ch, __locale_t __locale),_isspace_l,{ return __crt_isspace_l(__ch, __locale); })
 #elif defined(__crt_isspace_l)
 /* >> isspace_l(3) */
 __LOCAL __ATTR_PURE __ATTR_WUNUSED int __NOTHROW_NCX(__LIBCCALL isspace_l)(int __ch, __locale_t __locale) { return __crt_isspace_l(__ch, __locale); }
 #elif defined(__CRT_HAVE_isspace_l)
 /* >> isspace_l(3) */
 __CDECLARE(__ATTR_PURE __ATTR_WUNUSED,int,__NOTHROW_NCX,isspace_l,(int __ch, __locale_t __locale),(__ch,__locale))
+#elif defined(__CRT_HAVE__isspace_l)
+/* >> isspace_l(3) */
+__CREDIRECT(__ATTR_PURE __ATTR_WUNUSED,int,__NOTHROW_NCX,isspace_l,(int __ch, __locale_t __locale),_isspace_l,(__ch,__locale))
 #elif defined(__CRT_HAVE___isspace_l)
 /* >> isspace_l(3) */
 __CREDIRECT(__ATTR_PURE __ATTR_WUNUSED,int,__NOTHROW_NCX,isspace_l,(int __ch, __locale_t __locale),__isspace_l,(__ch,__locale))
 #else /* ... */
 #include <libc/local/ctype/isspace_l.h>
 /* >> isspace_l(3) */
-__NAMESPACE_LOCAL_USING_OR_IMPL(isspace_l, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_PURE __ATTR_WUNUSED int __NOTHROW_NCX(__LIBCCALL isspace_l)(int __ch, __locale_t __locale) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(isspace_l))(__ch, __locale); })
+__NAMESPACE_LOCAL_USING_OR_IMPL(isspace_l, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_PURE __ATTR_WUNUSED int __NOTHROW_NCX(__LIBCCALL isspace_l)(int __ch, __locale_t __locale) { return __NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(isspace_l)(__ch, __locale); })
 #endif /* !... */
 #if defined(__crt_isupper_l) && defined(__CRT_HAVE_isupper_l)
 /* >> isupper_l(3) */
@@ -416,19 +428,25 @@ __CEIDECLARE(__ATTR_PURE __ATTR_WUNUSED,int,__NOTHROW_NCX,isupper_l,(int __ch, _
 #elif defined(__crt_isupper_l) && defined(__CRT_HAVE___isupper_l)
 /* >> isupper_l(3) */
 __CEIREDIRECT(__ATTR_PURE __ATTR_WUNUSED,int,__NOTHROW_NCX,isupper_l,(int __ch, __locale_t __locale),__isupper_l,{ return __crt_isupper_l(__ch, __locale); })
+#elif defined(__crt_isupper_l) && defined(__CRT_HAVE__isupper_l)
+/* >> isupper_l(3) */
+__CEIREDIRECT(__ATTR_PURE __ATTR_WUNUSED,int,__NOTHROW_NCX,isupper_l,(int __ch, __locale_t __locale),_isupper_l,{ return __crt_isupper_l(__ch, __locale); })
 #elif defined(__crt_isupper_l)
 /* >> isupper_l(3) */
 __LOCAL __ATTR_PURE __ATTR_WUNUSED int __NOTHROW_NCX(__LIBCCALL isupper_l)(int __ch, __locale_t __locale) { return __crt_isupper_l(__ch, __locale); }
 #elif defined(__CRT_HAVE_isupper_l)
 /* >> isupper_l(3) */
 __CDECLARE(__ATTR_PURE __ATTR_WUNUSED,int,__NOTHROW_NCX,isupper_l,(int __ch, __locale_t __locale),(__ch,__locale))
+#elif defined(__CRT_HAVE__isupper_l)
+/* >> isupper_l(3) */
+__CREDIRECT(__ATTR_PURE __ATTR_WUNUSED,int,__NOTHROW_NCX,isupper_l,(int __ch, __locale_t __locale),_isupper_l,(__ch,__locale))
 #elif defined(__CRT_HAVE___isupper_l)
 /* >> isupper_l(3) */
 __CREDIRECT(__ATTR_PURE __ATTR_WUNUSED,int,__NOTHROW_NCX,isupper_l,(int __ch, __locale_t __locale),__isupper_l,(__ch,__locale))
 #else /* ... */
 #include <libc/local/ctype/isupper_l.h>
 /* >> isupper_l(3) */
-__NAMESPACE_LOCAL_USING_OR_IMPL(isupper_l, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_PURE __ATTR_WUNUSED int __NOTHROW_NCX(__LIBCCALL isupper_l)(int __ch, __locale_t __locale) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(isupper_l))(__ch, __locale); })
+__NAMESPACE_LOCAL_USING_OR_IMPL(isupper_l, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_PURE __ATTR_WUNUSED int __NOTHROW_NCX(__LIBCCALL isupper_l)(int __ch, __locale_t __locale) { return __NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(isupper_l)(__ch, __locale); })
 #endif /* !... */
 #if defined(__crt_islower_l) && defined(__CRT_HAVE_islower_l)
 /* >> islower_l(3) */
@@ -436,19 +454,25 @@ __CEIDECLARE(__ATTR_PURE __ATTR_WUNUSED,int,__NOTHROW_NCX,islower_l,(int __ch, _
 #elif defined(__crt_islower_l) && defined(__CRT_HAVE___islower_l)
 /* >> islower_l(3) */
 __CEIREDIRECT(__ATTR_PURE __ATTR_WUNUSED,int,__NOTHROW_NCX,islower_l,(int __ch, __locale_t __locale),__islower_l,{ return __crt_islower_l(__ch, __locale); })
+#elif defined(__crt_islower_l) && defined(__CRT_HAVE__islower_l)
+/* >> islower_l(3) */
+__CEIREDIRECT(__ATTR_PURE __ATTR_WUNUSED,int,__NOTHROW_NCX,islower_l,(int __ch, __locale_t __locale),_islower_l,{ return __crt_islower_l(__ch, __locale); })
 #elif defined(__crt_islower_l)
 /* >> islower_l(3) */
 __LOCAL __ATTR_PURE __ATTR_WUNUSED int __NOTHROW_NCX(__LIBCCALL islower_l)(int __ch, __locale_t __locale) { return __crt_islower_l(__ch, __locale); }
 #elif defined(__CRT_HAVE_islower_l)
 /* >> islower_l(3) */
 __CDECLARE(__ATTR_PURE __ATTR_WUNUSED,int,__NOTHROW_NCX,islower_l,(int __ch, __locale_t __locale),(__ch,__locale))
+#elif defined(__CRT_HAVE__islower_l)
+/* >> islower_l(3) */
+__CREDIRECT(__ATTR_PURE __ATTR_WUNUSED,int,__NOTHROW_NCX,islower_l,(int __ch, __locale_t __locale),_islower_l,(__ch,__locale))
 #elif defined(__CRT_HAVE___islower_l)
 /* >> islower_l(3) */
 __CREDIRECT(__ATTR_PURE __ATTR_WUNUSED,int,__NOTHROW_NCX,islower_l,(int __ch, __locale_t __locale),__islower_l,(__ch,__locale))
 #else /* ... */
 #include <libc/local/ctype/islower_l.h>
 /* >> islower_l(3) */
-__NAMESPACE_LOCAL_USING_OR_IMPL(islower_l, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_PURE __ATTR_WUNUSED int __NOTHROW_NCX(__LIBCCALL islower_l)(int __ch, __locale_t __locale) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(islower_l))(__ch, __locale); })
+__NAMESPACE_LOCAL_USING_OR_IMPL(islower_l, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_PURE __ATTR_WUNUSED int __NOTHROW_NCX(__LIBCCALL islower_l)(int __ch, __locale_t __locale) { return __NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(islower_l)(__ch, __locale); })
 #endif /* !... */
 #if defined(__crt_isalpha_l) && defined(__CRT_HAVE_isalpha_l)
 /* >> isalpha_l(3) */
@@ -456,19 +480,25 @@ __CEIDECLARE(__ATTR_PURE __ATTR_WUNUSED,int,__NOTHROW_NCX,isalpha_l,(int __ch, _
 #elif defined(__crt_isalpha_l) && defined(__CRT_HAVE___isalpha_l)
 /* >> isalpha_l(3) */
 __CEIREDIRECT(__ATTR_PURE __ATTR_WUNUSED,int,__NOTHROW_NCX,isalpha_l,(int __ch, __locale_t __locale),__isalpha_l,{ return __crt_isalpha_l(__ch, __locale); })
+#elif defined(__crt_isalpha_l) && defined(__CRT_HAVE__isalpha_l)
+/* >> isalpha_l(3) */
+__CEIREDIRECT(__ATTR_PURE __ATTR_WUNUSED,int,__NOTHROW_NCX,isalpha_l,(int __ch, __locale_t __locale),_isalpha_l,{ return __crt_isalpha_l(__ch, __locale); })
 #elif defined(__crt_isalpha_l)
 /* >> isalpha_l(3) */
 __LOCAL __ATTR_PURE __ATTR_WUNUSED int __NOTHROW_NCX(__LIBCCALL isalpha_l)(int __ch, __locale_t __locale) { return __crt_isalpha_l(__ch, __locale); }
 #elif defined(__CRT_HAVE_isalpha_l)
 /* >> isalpha_l(3) */
 __CDECLARE(__ATTR_PURE __ATTR_WUNUSED,int,__NOTHROW_NCX,isalpha_l,(int __ch, __locale_t __locale),(__ch,__locale))
+#elif defined(__CRT_HAVE__isalpha_l)
+/* >> isalpha_l(3) */
+__CREDIRECT(__ATTR_PURE __ATTR_WUNUSED,int,__NOTHROW_NCX,isalpha_l,(int __ch, __locale_t __locale),_isalpha_l,(__ch,__locale))
 #elif defined(__CRT_HAVE___isalpha_l)
 /* >> isalpha_l(3) */
 __CREDIRECT(__ATTR_PURE __ATTR_WUNUSED,int,__NOTHROW_NCX,isalpha_l,(int __ch, __locale_t __locale),__isalpha_l,(__ch,__locale))
 #else /* ... */
 #include <libc/local/ctype/isalpha_l.h>
 /* >> isalpha_l(3) */
-__NAMESPACE_LOCAL_USING_OR_IMPL(isalpha_l, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_PURE __ATTR_WUNUSED int __NOTHROW_NCX(__LIBCCALL isalpha_l)(int __ch, __locale_t __locale) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(isalpha_l))(__ch, __locale); })
+__NAMESPACE_LOCAL_USING_OR_IMPL(isalpha_l, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_PURE __ATTR_WUNUSED int __NOTHROW_NCX(__LIBCCALL isalpha_l)(int __ch, __locale_t __locale) { return __NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(isalpha_l)(__ch, __locale); })
 #endif /* !... */
 #if defined(__crt_isdigit_l) && defined(__CRT_HAVE_isdigit_l)
 /* >> isdigit_l(3) */
@@ -476,19 +506,25 @@ __CEIDECLARE(__ATTR_PURE __ATTR_WUNUSED,int,__NOTHROW_NCX,isdigit_l,(int __ch, _
 #elif defined(__crt_isdigit_l) && defined(__CRT_HAVE___isdigit_l)
 /* >> isdigit_l(3) */
 __CEIREDIRECT(__ATTR_PURE __ATTR_WUNUSED,int,__NOTHROW_NCX,isdigit_l,(int __ch, __locale_t __locale),__isdigit_l,{ return __crt_isdigit_l(__ch, __locale); })
+#elif defined(__crt_isdigit_l) && defined(__CRT_HAVE__isdigit_l)
+/* >> isdigit_l(3) */
+__CEIREDIRECT(__ATTR_PURE __ATTR_WUNUSED,int,__NOTHROW_NCX,isdigit_l,(int __ch, __locale_t __locale),_isdigit_l,{ return __crt_isdigit_l(__ch, __locale); })
 #elif defined(__crt_isdigit_l)
 /* >> isdigit_l(3) */
 __LOCAL __ATTR_PURE __ATTR_WUNUSED int __NOTHROW_NCX(__LIBCCALL isdigit_l)(int __ch, __locale_t __locale) { return __crt_isdigit_l(__ch, __locale); }
 #elif defined(__CRT_HAVE_isdigit_l)
 /* >> isdigit_l(3) */
 __CDECLARE(__ATTR_PURE __ATTR_WUNUSED,int,__NOTHROW_NCX,isdigit_l,(int __ch, __locale_t __locale),(__ch,__locale))
+#elif defined(__CRT_HAVE__isdigit_l)
+/* >> isdigit_l(3) */
+__CREDIRECT(__ATTR_PURE __ATTR_WUNUSED,int,__NOTHROW_NCX,isdigit_l,(int __ch, __locale_t __locale),_isdigit_l,(__ch,__locale))
 #elif defined(__CRT_HAVE___isdigit_l)
 /* >> isdigit_l(3) */
 __CREDIRECT(__ATTR_PURE __ATTR_WUNUSED,int,__NOTHROW_NCX,isdigit_l,(int __ch, __locale_t __locale),__isdigit_l,(__ch,__locale))
 #else /* ... */
 #include <libc/local/ctype/isdigit_l.h>
 /* >> isdigit_l(3) */
-__NAMESPACE_LOCAL_USING_OR_IMPL(isdigit_l, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_PURE __ATTR_WUNUSED int __NOTHROW_NCX(__LIBCCALL isdigit_l)(int __ch, __locale_t __locale) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(isdigit_l))(__ch, __locale); })
+__NAMESPACE_LOCAL_USING_OR_IMPL(isdigit_l, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_PURE __ATTR_WUNUSED int __NOTHROW_NCX(__LIBCCALL isdigit_l)(int __ch, __locale_t __locale) { return __NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(isdigit_l)(__ch, __locale); })
 #endif /* !... */
 #if defined(__crt_isxdigit_l) && defined(__CRT_HAVE_isxdigit_l)
 /* >> isxdigit_l(3) */
@@ -496,19 +532,25 @@ __CEIDECLARE(__ATTR_PURE __ATTR_WUNUSED,int,__NOTHROW_NCX,isxdigit_l,(int __ch, 
 #elif defined(__crt_isxdigit_l) && defined(__CRT_HAVE___isxdigit_l)
 /* >> isxdigit_l(3) */
 __CEIREDIRECT(__ATTR_PURE __ATTR_WUNUSED,int,__NOTHROW_NCX,isxdigit_l,(int __ch, __locale_t __locale),__isxdigit_l,{ return __crt_isxdigit_l(__ch, __locale); })
+#elif defined(__crt_isxdigit_l) && defined(__CRT_HAVE__isxdigit_l)
+/* >> isxdigit_l(3) */
+__CEIREDIRECT(__ATTR_PURE __ATTR_WUNUSED,int,__NOTHROW_NCX,isxdigit_l,(int __ch, __locale_t __locale),_isxdigit_l,{ return __crt_isxdigit_l(__ch, __locale); })
 #elif defined(__crt_isxdigit_l)
 /* >> isxdigit_l(3) */
 __LOCAL __ATTR_PURE __ATTR_WUNUSED int __NOTHROW_NCX(__LIBCCALL isxdigit_l)(int __ch, __locale_t __locale) { return __crt_isxdigit_l(__ch, __locale); }
 #elif defined(__CRT_HAVE_isxdigit_l)
 /* >> isxdigit_l(3) */
 __CDECLARE(__ATTR_PURE __ATTR_WUNUSED,int,__NOTHROW_NCX,isxdigit_l,(int __ch, __locale_t __locale),(__ch,__locale))
+#elif defined(__CRT_HAVE__isxdigit_l)
+/* >> isxdigit_l(3) */
+__CREDIRECT(__ATTR_PURE __ATTR_WUNUSED,int,__NOTHROW_NCX,isxdigit_l,(int __ch, __locale_t __locale),_isxdigit_l,(__ch,__locale))
 #elif defined(__CRT_HAVE___isxdigit_l)
 /* >> isxdigit_l(3) */
 __CREDIRECT(__ATTR_PURE __ATTR_WUNUSED,int,__NOTHROW_NCX,isxdigit_l,(int __ch, __locale_t __locale),__isxdigit_l,(__ch,__locale))
 #else /* ... */
 #include <libc/local/ctype/isxdigit_l.h>
 /* >> isxdigit_l(3) */
-__NAMESPACE_LOCAL_USING_OR_IMPL(isxdigit_l, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_PURE __ATTR_WUNUSED int __NOTHROW_NCX(__LIBCCALL isxdigit_l)(int __ch, __locale_t __locale) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(isxdigit_l))(__ch, __locale); })
+__NAMESPACE_LOCAL_USING_OR_IMPL(isxdigit_l, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_PURE __ATTR_WUNUSED int __NOTHROW_NCX(__LIBCCALL isxdigit_l)(int __ch, __locale_t __locale) { return __NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(isxdigit_l)(__ch, __locale); })
 #endif /* !... */
 #if defined(__crt_isalnum_l) && defined(__CRT_HAVE_isalnum_l)
 /* >> isalnum_l(3) */
@@ -516,19 +558,25 @@ __CEIDECLARE(__ATTR_PURE __ATTR_WUNUSED,int,__NOTHROW_NCX,isalnum_l,(int __ch, _
 #elif defined(__crt_isalnum_l) && defined(__CRT_HAVE___isalnum_l)
 /* >> isalnum_l(3) */
 __CEIREDIRECT(__ATTR_PURE __ATTR_WUNUSED,int,__NOTHROW_NCX,isalnum_l,(int __ch, __locale_t __locale),__isalnum_l,{ return __crt_isalnum_l(__ch, __locale); })
+#elif defined(__crt_isalnum_l) && defined(__CRT_HAVE__isalnum_l)
+/* >> isalnum_l(3) */
+__CEIREDIRECT(__ATTR_PURE __ATTR_WUNUSED,int,__NOTHROW_NCX,isalnum_l,(int __ch, __locale_t __locale),_isalnum_l,{ return __crt_isalnum_l(__ch, __locale); })
 #elif defined(__crt_isalnum_l)
 /* >> isalnum_l(3) */
 __LOCAL __ATTR_PURE __ATTR_WUNUSED int __NOTHROW_NCX(__LIBCCALL isalnum_l)(int __ch, __locale_t __locale) { return __crt_isalnum_l(__ch, __locale); }
 #elif defined(__CRT_HAVE_isalnum_l)
 /* >> isalnum_l(3) */
 __CDECLARE(__ATTR_PURE __ATTR_WUNUSED,int,__NOTHROW_NCX,isalnum_l,(int __ch, __locale_t __locale),(__ch,__locale))
+#elif defined(__CRT_HAVE__isalnum_l)
+/* >> isalnum_l(3) */
+__CREDIRECT(__ATTR_PURE __ATTR_WUNUSED,int,__NOTHROW_NCX,isalnum_l,(int __ch, __locale_t __locale),_isalnum_l,(__ch,__locale))
 #elif defined(__CRT_HAVE___isalnum_l)
 /* >> isalnum_l(3) */
 __CREDIRECT(__ATTR_PURE __ATTR_WUNUSED,int,__NOTHROW_NCX,isalnum_l,(int __ch, __locale_t __locale),__isalnum_l,(__ch,__locale))
 #else /* ... */
 #include <libc/local/ctype/isalnum_l.h>
 /* >> isalnum_l(3) */
-__NAMESPACE_LOCAL_USING_OR_IMPL(isalnum_l, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_PURE __ATTR_WUNUSED int __NOTHROW_NCX(__LIBCCALL isalnum_l)(int __ch, __locale_t __locale) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(isalnum_l))(__ch, __locale); })
+__NAMESPACE_LOCAL_USING_OR_IMPL(isalnum_l, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_PURE __ATTR_WUNUSED int __NOTHROW_NCX(__LIBCCALL isalnum_l)(int __ch, __locale_t __locale) { return __NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(isalnum_l)(__ch, __locale); })
 #endif /* !... */
 #if defined(__crt_ispunct_l) && defined(__CRT_HAVE_ispunct_l)
 /* >> ispunct_l(3) */
@@ -536,19 +584,25 @@ __CEIDECLARE(__ATTR_PURE __ATTR_WUNUSED,int,__NOTHROW_NCX,ispunct_l,(int __ch, _
 #elif defined(__crt_ispunct_l) && defined(__CRT_HAVE___ispunct_l)
 /* >> ispunct_l(3) */
 __CEIREDIRECT(__ATTR_PURE __ATTR_WUNUSED,int,__NOTHROW_NCX,ispunct_l,(int __ch, __locale_t __locale),__ispunct_l,{ return __crt_ispunct_l(__ch, __locale); })
+#elif defined(__crt_ispunct_l) && defined(__CRT_HAVE__ispunct_l)
+/* >> ispunct_l(3) */
+__CEIREDIRECT(__ATTR_PURE __ATTR_WUNUSED,int,__NOTHROW_NCX,ispunct_l,(int __ch, __locale_t __locale),_ispunct_l,{ return __crt_ispunct_l(__ch, __locale); })
 #elif defined(__crt_ispunct_l)
 /* >> ispunct_l(3) */
 __LOCAL __ATTR_PURE __ATTR_WUNUSED int __NOTHROW_NCX(__LIBCCALL ispunct_l)(int __ch, __locale_t __locale) { return __crt_ispunct_l(__ch, __locale); }
 #elif defined(__CRT_HAVE_ispunct_l)
 /* >> ispunct_l(3) */
 __CDECLARE(__ATTR_PURE __ATTR_WUNUSED,int,__NOTHROW_NCX,ispunct_l,(int __ch, __locale_t __locale),(__ch,__locale))
+#elif defined(__CRT_HAVE__ispunct_l)
+/* >> ispunct_l(3) */
+__CREDIRECT(__ATTR_PURE __ATTR_WUNUSED,int,__NOTHROW_NCX,ispunct_l,(int __ch, __locale_t __locale),_ispunct_l,(__ch,__locale))
 #elif defined(__CRT_HAVE___ispunct_l)
 /* >> ispunct_l(3) */
 __CREDIRECT(__ATTR_PURE __ATTR_WUNUSED,int,__NOTHROW_NCX,ispunct_l,(int __ch, __locale_t __locale),__ispunct_l,(__ch,__locale))
 #else /* ... */
 #include <libc/local/ctype/ispunct_l.h>
 /* >> ispunct_l(3) */
-__NAMESPACE_LOCAL_USING_OR_IMPL(ispunct_l, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_PURE __ATTR_WUNUSED int __NOTHROW_NCX(__LIBCCALL ispunct_l)(int __ch, __locale_t __locale) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(ispunct_l))(__ch, __locale); })
+__NAMESPACE_LOCAL_USING_OR_IMPL(ispunct_l, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_PURE __ATTR_WUNUSED int __NOTHROW_NCX(__LIBCCALL ispunct_l)(int __ch, __locale_t __locale) { return __NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(ispunct_l)(__ch, __locale); })
 #endif /* !... */
 #if defined(__crt_isgraph_l) && defined(__CRT_HAVE_isgraph_l)
 /* >> isgraph_l(3) */
@@ -556,19 +610,25 @@ __CEIDECLARE(__ATTR_PURE __ATTR_WUNUSED,int,__NOTHROW_NCX,isgraph_l,(int __ch, _
 #elif defined(__crt_isgraph_l) && defined(__CRT_HAVE___isgraph_l)
 /* >> isgraph_l(3) */
 __CEIREDIRECT(__ATTR_PURE __ATTR_WUNUSED,int,__NOTHROW_NCX,isgraph_l,(int __ch, __locale_t __locale),__isgraph_l,{ return __crt_isgraph_l(__ch, __locale); })
+#elif defined(__crt_isgraph_l) && defined(__CRT_HAVE__isgraph_l)
+/* >> isgraph_l(3) */
+__CEIREDIRECT(__ATTR_PURE __ATTR_WUNUSED,int,__NOTHROW_NCX,isgraph_l,(int __ch, __locale_t __locale),_isgraph_l,{ return __crt_isgraph_l(__ch, __locale); })
 #elif defined(__crt_isgraph_l)
 /* >> isgraph_l(3) */
 __LOCAL __ATTR_PURE __ATTR_WUNUSED int __NOTHROW_NCX(__LIBCCALL isgraph_l)(int __ch, __locale_t __locale) { return __crt_isgraph_l(__ch, __locale); }
 #elif defined(__CRT_HAVE_isgraph_l)
 /* >> isgraph_l(3) */
 __CDECLARE(__ATTR_PURE __ATTR_WUNUSED,int,__NOTHROW_NCX,isgraph_l,(int __ch, __locale_t __locale),(__ch,__locale))
+#elif defined(__CRT_HAVE__isgraph_l)
+/* >> isgraph_l(3) */
+__CREDIRECT(__ATTR_PURE __ATTR_WUNUSED,int,__NOTHROW_NCX,isgraph_l,(int __ch, __locale_t __locale),_isgraph_l,(__ch,__locale))
 #elif defined(__CRT_HAVE___isgraph_l)
 /* >> isgraph_l(3) */
 __CREDIRECT(__ATTR_PURE __ATTR_WUNUSED,int,__NOTHROW_NCX,isgraph_l,(int __ch, __locale_t __locale),__isgraph_l,(__ch,__locale))
 #else /* ... */
 #include <libc/local/ctype/isgraph_l.h>
 /* >> isgraph_l(3) */
-__NAMESPACE_LOCAL_USING_OR_IMPL(isgraph_l, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_PURE __ATTR_WUNUSED int __NOTHROW_NCX(__LIBCCALL isgraph_l)(int __ch, __locale_t __locale) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(isgraph_l))(__ch, __locale); })
+__NAMESPACE_LOCAL_USING_OR_IMPL(isgraph_l, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_PURE __ATTR_WUNUSED int __NOTHROW_NCX(__LIBCCALL isgraph_l)(int __ch, __locale_t __locale) { return __NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(isgraph_l)(__ch, __locale); })
 #endif /* !... */
 #if defined(__crt_isprint_l) && defined(__CRT_HAVE_isprint_l)
 /* >> isprint_l(3) */
@@ -576,19 +636,25 @@ __CEIDECLARE(__ATTR_PURE __ATTR_WUNUSED,int,__NOTHROW_NCX,isprint_l,(int __ch, _
 #elif defined(__crt_isprint_l) && defined(__CRT_HAVE___isprint_l)
 /* >> isprint_l(3) */
 __CEIREDIRECT(__ATTR_PURE __ATTR_WUNUSED,int,__NOTHROW_NCX,isprint_l,(int __ch, __locale_t __locale),__isprint_l,{ return __crt_isprint_l(__ch, __locale); })
+#elif defined(__crt_isprint_l) && defined(__CRT_HAVE__isprint_l)
+/* >> isprint_l(3) */
+__CEIREDIRECT(__ATTR_PURE __ATTR_WUNUSED,int,__NOTHROW_NCX,isprint_l,(int __ch, __locale_t __locale),_isprint_l,{ return __crt_isprint_l(__ch, __locale); })
 #elif defined(__crt_isprint_l)
 /* >> isprint_l(3) */
 __LOCAL __ATTR_PURE __ATTR_WUNUSED int __NOTHROW_NCX(__LIBCCALL isprint_l)(int __ch, __locale_t __locale) { return __crt_isprint_l(__ch, __locale); }
 #elif defined(__CRT_HAVE_isprint_l)
 /* >> isprint_l(3) */
 __CDECLARE(__ATTR_PURE __ATTR_WUNUSED,int,__NOTHROW_NCX,isprint_l,(int __ch, __locale_t __locale),(__ch,__locale))
+#elif defined(__CRT_HAVE__isprint_l)
+/* >> isprint_l(3) */
+__CREDIRECT(__ATTR_PURE __ATTR_WUNUSED,int,__NOTHROW_NCX,isprint_l,(int __ch, __locale_t __locale),_isprint_l,(__ch,__locale))
 #elif defined(__CRT_HAVE___isprint_l)
 /* >> isprint_l(3) */
 __CREDIRECT(__ATTR_PURE __ATTR_WUNUSED,int,__NOTHROW_NCX,isprint_l,(int __ch, __locale_t __locale),__isprint_l,(__ch,__locale))
 #else /* ... */
 #include <libc/local/ctype/isprint_l.h>
 /* >> isprint_l(3) */
-__NAMESPACE_LOCAL_USING_OR_IMPL(isprint_l, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_PURE __ATTR_WUNUSED int __NOTHROW_NCX(__LIBCCALL isprint_l)(int __ch, __locale_t __locale) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(isprint_l))(__ch, __locale); })
+__NAMESPACE_LOCAL_USING_OR_IMPL(isprint_l, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_PURE __ATTR_WUNUSED int __NOTHROW_NCX(__LIBCCALL isprint_l)(int __ch, __locale_t __locale) { return __NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(isprint_l)(__ch, __locale); })
 #endif /* !... */
 #if defined(__crt_isblank_l) && defined(__CRT_HAVE_isblank_l)
 /* >> isblank_l(3) */
@@ -596,19 +662,25 @@ __CEIDECLARE(__ATTR_PURE __ATTR_WUNUSED,int,__NOTHROW_NCX,isblank_l,(int __ch, _
 #elif defined(__crt_isblank_l) && defined(__CRT_HAVE___isblank_l)
 /* >> isblank_l(3) */
 __CEIREDIRECT(__ATTR_PURE __ATTR_WUNUSED,int,__NOTHROW_NCX,isblank_l,(int __ch, __locale_t __locale),__isblank_l,{ return __crt_isblank_l(__ch, __locale); })
+#elif defined(__crt_isblank_l) && defined(__CRT_HAVE__isblank_l)
+/* >> isblank_l(3) */
+__CEIREDIRECT(__ATTR_PURE __ATTR_WUNUSED,int,__NOTHROW_NCX,isblank_l,(int __ch, __locale_t __locale),_isblank_l,{ return __crt_isblank_l(__ch, __locale); })
 #elif defined(__crt_isblank_l)
 /* >> isblank_l(3) */
 __LOCAL __ATTR_PURE __ATTR_WUNUSED int __NOTHROW_NCX(__LIBCCALL isblank_l)(int __ch, __locale_t __locale) { return __crt_isblank_l(__ch, __locale); }
 #elif defined(__CRT_HAVE_isblank_l)
 /* >> isblank_l(3) */
 __CDECLARE(__ATTR_PURE __ATTR_WUNUSED,int,__NOTHROW_NCX,isblank_l,(int __ch, __locale_t __locale),(__ch,__locale))
+#elif defined(__CRT_HAVE__isblank_l)
+/* >> isblank_l(3) */
+__CREDIRECT(__ATTR_PURE __ATTR_WUNUSED,int,__NOTHROW_NCX,isblank_l,(int __ch, __locale_t __locale),_isblank_l,(__ch,__locale))
 #elif defined(__CRT_HAVE___isblank_l)
 /* >> isblank_l(3) */
 __CREDIRECT(__ATTR_PURE __ATTR_WUNUSED,int,__NOTHROW_NCX,isblank_l,(int __ch, __locale_t __locale),__isblank_l,(__ch,__locale))
 #else /* ... */
 #include <libc/local/ctype/isblank_l.h>
 /* >> isblank_l(3) */
-__NAMESPACE_LOCAL_USING_OR_IMPL(isblank_l, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_PURE __ATTR_WUNUSED int __NOTHROW_NCX(__LIBCCALL isblank_l)(int __ch, __locale_t __locale) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(isblank_l))(__ch, __locale); })
+__NAMESPACE_LOCAL_USING_OR_IMPL(isblank_l, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_PURE __ATTR_WUNUSED int __NOTHROW_NCX(__LIBCCALL isblank_l)(int __ch, __locale_t __locale) { return __NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(isblank_l)(__ch, __locale); })
 #endif /* !... */
 #if defined(__crt_tolower_l) && defined(__CRT_HAVE_tolower_l)
 /* >> tolower_l(3) */
@@ -616,6 +688,9 @@ __CEIDECLARE(__ATTR_PURE __ATTR_WUNUSED,int,__NOTHROW_NCX,tolower_l,(int __ch, _
 #elif defined(__crt_tolower_l) && defined(__CRT_HAVE___tolower_l)
 /* >> tolower_l(3) */
 __CEIREDIRECT(__ATTR_PURE __ATTR_WUNUSED,int,__NOTHROW_NCX,tolower_l,(int __ch, __locale_t __locale),__tolower_l,{ return __crt_tolower_l(__ch, __locale); })
+#elif defined(__crt_tolower_l) && defined(__CRT_HAVE__tolower_l)
+/* >> tolower_l(3) */
+__CEIREDIRECT(__ATTR_PURE __ATTR_WUNUSED,int,__NOTHROW_NCX,tolower_l,(int __ch, __locale_t __locale),_tolower_l,{ return __crt_tolower_l(__ch, __locale); })
 #elif defined(__crt_tolower_l)
 /* >> tolower_l(3) */
 __LOCAL __ATTR_PURE __ATTR_WUNUSED int __NOTHROW_NCX(__LIBCCALL tolower_l)(int __ch, __locale_t __locale) { return __crt_tolower_l(__ch, __locale); }
@@ -631,7 +706,7 @@ __CREDIRECT(__ATTR_PURE __ATTR_WUNUSED,int,__NOTHROW_NCX,tolower_l,(int __ch, __
 #else /* ... */
 #include <libc/local/ctype/tolower_l.h>
 /* >> tolower_l(3) */
-__NAMESPACE_LOCAL_USING_OR_IMPL(tolower_l, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_PURE __ATTR_WUNUSED int __NOTHROW_NCX(__LIBCCALL tolower_l)(int __ch, __locale_t __locale) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(tolower_l))(__ch, __locale); })
+__NAMESPACE_LOCAL_USING_OR_IMPL(tolower_l, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_PURE __ATTR_WUNUSED int __NOTHROW_NCX(__LIBCCALL tolower_l)(int __ch, __locale_t __locale) { return __NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(tolower_l)(__ch, __locale); })
 #endif /* !... */
 #if defined(__crt_toupper_l) && defined(__CRT_HAVE_toupper_l)
 /* >> toupper_l(3) */
@@ -639,6 +714,9 @@ __CEIDECLARE(__ATTR_PURE __ATTR_WUNUSED,int,__NOTHROW_NCX,toupper_l,(int __ch, _
 #elif defined(__crt_toupper_l) && defined(__CRT_HAVE___toupper_l)
 /* >> toupper_l(3) */
 __CEIREDIRECT(__ATTR_PURE __ATTR_WUNUSED,int,__NOTHROW_NCX,toupper_l,(int __ch, __locale_t __locale),__toupper_l,{ return __crt_toupper_l(__ch, __locale); })
+#elif defined(__crt_toupper_l) && defined(__CRT_HAVE__toupper_l)
+/* >> toupper_l(3) */
+__CEIREDIRECT(__ATTR_PURE __ATTR_WUNUSED,int,__NOTHROW_NCX,toupper_l,(int __ch, __locale_t __locale),_toupper_l,{ return __crt_toupper_l(__ch, __locale); })
 #elif defined(__crt_toupper_l)
 /* >> toupper_l(3) */
 __LOCAL __ATTR_PURE __ATTR_WUNUSED int __NOTHROW_NCX(__LIBCCALL toupper_l)(int __ch, __locale_t __locale) { return __crt_toupper_l(__ch, __locale); }
@@ -654,7 +732,7 @@ __CREDIRECT(__ATTR_PURE __ATTR_WUNUSED,int,__NOTHROW_NCX,toupper_l,(int __ch, __
 #else /* ... */
 #include <libc/local/ctype/toupper_l.h>
 /* >> toupper_l(3) */
-__NAMESPACE_LOCAL_USING_OR_IMPL(toupper_l, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_PURE __ATTR_WUNUSED int __NOTHROW_NCX(__LIBCCALL toupper_l)(int __ch, __locale_t __locale) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(toupper_l))(__ch, __locale); })
+__NAMESPACE_LOCAL_USING_OR_IMPL(toupper_l, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_PURE __ATTR_WUNUSED int __NOTHROW_NCX(__LIBCCALL toupper_l)(int __ch, __locale_t __locale) { return __NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(toupper_l)(__ch, __locale); })
 #endif /* !... */
 #endif /* __USE_XOPEN2K8 */
 
@@ -840,28 +918,491 @@ __NAMESPACE_LOCAL_USING_OR_IMPL(toupper_l, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR
 
 #endif /* (!__cplusplus || __USE_CTYPE_MACROS) && !__CXX_SYSTEM_HEADER */
 
+#ifdef __USE_KOS
+#ifdef __CRT_HAVE___iscsymf
+/* >> issymstrt(3)
+ * Test if `ch' can appear at the start of a symbol/keyword/identifier */
+__CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,int,__NOTHROW_NCX,issymstrt,(int __ch),__iscsymf,(__ch))
+#else /* __CRT_HAVE___iscsymf */
+#include <libc/local/ctype/issymstrt.h>
+/* >> issymstrt(3)
+ * Test if `ch' can appear at the start of a symbol/keyword/identifier */
+__NAMESPACE_LOCAL_USING_OR_IMPL(issymstrt, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_CONST __ATTR_WUNUSED int __NOTHROW_NCX(__LIBCCALL issymstrt)(int __ch) { return __NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(issymstrt)(__ch); })
+#endif /* !__CRT_HAVE___iscsymf */
+#ifdef __CRT_HAVE___iscsym
+/* >> issymcont(3)
+ * Test if `ch' can appear in the middle of a symbol/keyword/identifier */
+__CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,int,__NOTHROW_NCX,issymcont,(int __ch),__iscsym,(__ch))
+#else /* __CRT_HAVE___iscsym */
+#include <libc/local/ctype/issymcont.h>
+/* >> issymcont(3)
+ * Test if `ch' can appear in the middle of a symbol/keyword/identifier */
+__NAMESPACE_LOCAL_USING_OR_IMPL(issymcont, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_CONST __ATTR_WUNUSED int __NOTHROW_NCX(__LIBCCALL issymcont)(int __ch) { return __NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(issymcont)(__ch); })
+#endif /* !__CRT_HAVE___iscsym */
+#endif /* __USE_KOS */
 
 #if defined(__USE_MISC) || defined(__USE_XOPEN)
 #ifdef __CRT_HAVE_isascii
 /* Returns non-zero if `(C & ~0x7f) == 0' */
 __CEIDECLARE(__ATTR_CONST,int,__NOTHROW,isascii,(int __c),{ return (__c & ~0x7f) == 0; })
-#else /* __CRT_HAVE_isascii */
+#elif defined(__CRT_HAVE___isascii)
+/* Returns non-zero if `(C & ~0x7f) == 0' */
+__CEIREDIRECT(__ATTR_CONST,int,__NOTHROW,isascii,(int __c),__isascii,{ return (__c & ~0x7f) == 0; })
+#else /* ... */
 /* Returns non-zero if `(C & ~0x7f) == 0' */
 __LOCAL __ATTR_CONST int __NOTHROW(__LIBCCALL isascii)(int __c) { return (__c & ~0x7f) == 0; }
-#endif /* !__CRT_HAVE_isascii */
+#endif /* !... */
 #ifdef __CRT_HAVE_toascii
 /* Re-returns `C & 0x7f' */
 __CEIDECLARE(__ATTR_CONST,int,__NOTHROW,toascii,(int __c),{ return __c & 0x7f; })
-#else /* __CRT_HAVE_toascii */
+#elif defined(__CRT_HAVE___toascii)
+/* Re-returns `C & 0x7f' */
+__CEIREDIRECT(__ATTR_CONST,int,__NOTHROW,toascii,(int __c),__toascii,{ return __c & 0x7f; })
+#else /* ... */
 /* Re-returns `C & 0x7f' */
 __LOCAL __ATTR_CONST int __NOTHROW(__LIBCCALL toascii)(int __c) { return __c & 0x7f; }
-#endif /* !__CRT_HAVE_toascii */
+#endif /* !... */
 #if (!defined(__cplusplus) || defined(__USE_CTYPE_MACROS)) && !defined(__CXX_SYSTEM_HEADER)
 #define isascii(c) (((c) & ~0x7f) == 0)
 #define toascii(c) ((c) & 0x7f)
 #endif /* (!__cplusplus || __USE_CTYPE_MACROS) && !__CXX_SYSTEM_HEADER */
-
 #endif /* __USE_MISC || __USE_XOPEN */
+
+#if defined(__USE_MISC) || defined(__USE_XOPEN) || defined(__USE_DOS)
+#ifdef __CRT_HAVE__tolower
+/* >> _tolower(3)
+ * Same as `tolower(3)', but the caller must ensure that `isupper(ch)' */
+__CEIDECLARE(__ATTR_CONST __ATTR_WUNUSED,int,__NOTHROW,_tolower,(int __ch),{ return __ch + 0x20; })
+#else /* __CRT_HAVE__tolower */
+/* >> _tolower(3)
+ * Same as `tolower(3)', but the caller must ensure that `isupper(ch)' */
+__LOCAL __ATTR_CONST __ATTR_WUNUSED int __NOTHROW(__LIBCCALL _tolower)(int __ch) { return __ch + 0x20; }
+#endif /* !__CRT_HAVE__tolower */
+#ifdef __CRT_HAVE__toupper
+/* >> _toupper(3)
+ * Same as `toupper(3)', but the caller must ensure that `islower(ch)' */
+__CEIDECLARE(__ATTR_CONST __ATTR_WUNUSED,int,__NOTHROW,_toupper,(int __ch),{ return __ch - 0x20; })
+#else /* __CRT_HAVE__toupper */
+/* >> _toupper(3)
+ * Same as `toupper(3)', but the caller must ensure that `islower(ch)' */
+__LOCAL __ATTR_CONST __ATTR_WUNUSED int __NOTHROW(__LIBCCALL _toupper)(int __ch) { return __ch - 0x20; }
+#endif /* !__CRT_HAVE__toupper */
+#endif /* __USE_MISC || __USE_XOPEN || __USE_DOS */
+
+#ifdef __USE_DOS
+#if !defined(___isctype_defined) && defined(__CRT_HAVE__isctype)
+#define ___isctype_defined 1
+__CDECLARE(__ATTR_CONST __ATTR_WUNUSED,int,__NOTHROW,_isctype,(int __ch, int __mask),(__ch,__mask))
+#endif /* !___isctype_defined && __CRT_HAVE__isctype */
+#if !defined(___isctype_l_defined) && defined(__CRT_HAVE__isctype_l)
+#define ___isctype_l_defined 1
+__CDECLARE(__ATTR_PURE __ATTR_WUNUSED,int,__NOTHROW_NCX,_isctype_l,(int __ch, int __mask, __locale_t __locale),(__ch,__mask,__locale))
+#endif /* !___isctype_l_defined && __CRT_HAVE__isctype_l */
+#if defined(__crt_isalpha_l) && defined(__CRT_HAVE_isalpha_l)
+/* >> isalpha_l(3) */
+__CEIREDIRECT(__ATTR_PURE __ATTR_WUNUSED,int,__NOTHROW_NCX,_isalpha_l,(int __ch, __locale_t __locale),isalpha_l,{ return __crt_isalpha_l(__ch, __locale); })
+#elif defined(__crt_isalpha_l) && defined(__CRT_HAVE___isalpha_l)
+/* >> isalpha_l(3) */
+__CEIREDIRECT(__ATTR_PURE __ATTR_WUNUSED,int,__NOTHROW_NCX,_isalpha_l,(int __ch, __locale_t __locale),__isalpha_l,{ return __crt_isalpha_l(__ch, __locale); })
+#elif defined(__crt_isalpha_l) && defined(__CRT_HAVE__isalpha_l)
+/* >> isalpha_l(3) */
+__CEIDECLARE(__ATTR_PURE __ATTR_WUNUSED,int,__NOTHROW_NCX,_isalpha_l,(int __ch, __locale_t __locale),{ return __crt_isalpha_l(__ch, __locale); })
+#elif defined(__crt_isalpha_l)
+/* >> isalpha_l(3) */
+__LOCAL __ATTR_PURE __ATTR_WUNUSED int __NOTHROW_NCX(__LIBCCALL _isalpha_l)(int __ch, __locale_t __locale) { return __crt_isalpha_l(__ch, __locale); }
+#elif defined(__CRT_HAVE_isalpha_l)
+/* >> isalpha_l(3) */
+__CREDIRECT(__ATTR_PURE __ATTR_WUNUSED,int,__NOTHROW_NCX,_isalpha_l,(int __ch, __locale_t __locale),isalpha_l,(__ch,__locale))
+#elif defined(__CRT_HAVE__isalpha_l)
+/* >> isalpha_l(3) */
+__CDECLARE(__ATTR_PURE __ATTR_WUNUSED,int,__NOTHROW_NCX,_isalpha_l,(int __ch, __locale_t __locale),(__ch,__locale))
+#elif defined(__CRT_HAVE___isalpha_l)
+/* >> isalpha_l(3) */
+__CREDIRECT(__ATTR_PURE __ATTR_WUNUSED,int,__NOTHROW_NCX,_isalpha_l,(int __ch, __locale_t __locale),__isalpha_l,(__ch,__locale))
+#else /* ... */
+#include <libc/local/ctype/isalpha_l.h>
+/* >> isalpha_l(3) */
+__FORCELOCAL __ATTR_ARTIFICIAL __ATTR_PURE __ATTR_WUNUSED int __NOTHROW_NCX(__LIBCCALL _isalpha_l)(int __ch, __locale_t __locale) { return __NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(isalpha_l)(__ch, __locale); }
+#endif /* !... */
+#if defined(__crt_isupper_l) && defined(__CRT_HAVE_isupper_l)
+/* >> isupper_l(3) */
+__CEIREDIRECT(__ATTR_PURE __ATTR_WUNUSED,int,__NOTHROW_NCX,_isupper_l,(int __ch, __locale_t __locale),isupper_l,{ return __crt_isupper_l(__ch, __locale); })
+#elif defined(__crt_isupper_l) && defined(__CRT_HAVE___isupper_l)
+/* >> isupper_l(3) */
+__CEIREDIRECT(__ATTR_PURE __ATTR_WUNUSED,int,__NOTHROW_NCX,_isupper_l,(int __ch, __locale_t __locale),__isupper_l,{ return __crt_isupper_l(__ch, __locale); })
+#elif defined(__crt_isupper_l) && defined(__CRT_HAVE__isupper_l)
+/* >> isupper_l(3) */
+__CEIDECLARE(__ATTR_PURE __ATTR_WUNUSED,int,__NOTHROW_NCX,_isupper_l,(int __ch, __locale_t __locale),{ return __crt_isupper_l(__ch, __locale); })
+#elif defined(__crt_isupper_l)
+/* >> isupper_l(3) */
+__LOCAL __ATTR_PURE __ATTR_WUNUSED int __NOTHROW_NCX(__LIBCCALL _isupper_l)(int __ch, __locale_t __locale) { return __crt_isupper_l(__ch, __locale); }
+#elif defined(__CRT_HAVE_isupper_l)
+/* >> isupper_l(3) */
+__CREDIRECT(__ATTR_PURE __ATTR_WUNUSED,int,__NOTHROW_NCX,_isupper_l,(int __ch, __locale_t __locale),isupper_l,(__ch,__locale))
+#elif defined(__CRT_HAVE__isupper_l)
+/* >> isupper_l(3) */
+__CDECLARE(__ATTR_PURE __ATTR_WUNUSED,int,__NOTHROW_NCX,_isupper_l,(int __ch, __locale_t __locale),(__ch,__locale))
+#elif defined(__CRT_HAVE___isupper_l)
+/* >> isupper_l(3) */
+__CREDIRECT(__ATTR_PURE __ATTR_WUNUSED,int,__NOTHROW_NCX,_isupper_l,(int __ch, __locale_t __locale),__isupper_l,(__ch,__locale))
+#else /* ... */
+#include <libc/local/ctype/isupper_l.h>
+/* >> isupper_l(3) */
+__FORCELOCAL __ATTR_ARTIFICIAL __ATTR_PURE __ATTR_WUNUSED int __NOTHROW_NCX(__LIBCCALL _isupper_l)(int __ch, __locale_t __locale) { return __NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(isupper_l)(__ch, __locale); }
+#endif /* !... */
+#if defined(__crt_islower_l) && defined(__CRT_HAVE_islower_l)
+/* >> islower_l(3) */
+__CEIREDIRECT(__ATTR_PURE __ATTR_WUNUSED,int,__NOTHROW_NCX,_islower_l,(int __ch, __locale_t __locale),islower_l,{ return __crt_islower_l(__ch, __locale); })
+#elif defined(__crt_islower_l) && defined(__CRT_HAVE___islower_l)
+/* >> islower_l(3) */
+__CEIREDIRECT(__ATTR_PURE __ATTR_WUNUSED,int,__NOTHROW_NCX,_islower_l,(int __ch, __locale_t __locale),__islower_l,{ return __crt_islower_l(__ch, __locale); })
+#elif defined(__crt_islower_l) && defined(__CRT_HAVE__islower_l)
+/* >> islower_l(3) */
+__CEIDECLARE(__ATTR_PURE __ATTR_WUNUSED,int,__NOTHROW_NCX,_islower_l,(int __ch, __locale_t __locale),{ return __crt_islower_l(__ch, __locale); })
+#elif defined(__crt_islower_l)
+/* >> islower_l(3) */
+__LOCAL __ATTR_PURE __ATTR_WUNUSED int __NOTHROW_NCX(__LIBCCALL _islower_l)(int __ch, __locale_t __locale) { return __crt_islower_l(__ch, __locale); }
+#elif defined(__CRT_HAVE_islower_l)
+/* >> islower_l(3) */
+__CREDIRECT(__ATTR_PURE __ATTR_WUNUSED,int,__NOTHROW_NCX,_islower_l,(int __ch, __locale_t __locale),islower_l,(__ch,__locale))
+#elif defined(__CRT_HAVE__islower_l)
+/* >> islower_l(3) */
+__CDECLARE(__ATTR_PURE __ATTR_WUNUSED,int,__NOTHROW_NCX,_islower_l,(int __ch, __locale_t __locale),(__ch,__locale))
+#elif defined(__CRT_HAVE___islower_l)
+/* >> islower_l(3) */
+__CREDIRECT(__ATTR_PURE __ATTR_WUNUSED,int,__NOTHROW_NCX,_islower_l,(int __ch, __locale_t __locale),__islower_l,(__ch,__locale))
+#else /* ... */
+#include <libc/local/ctype/islower_l.h>
+/* >> islower_l(3) */
+__FORCELOCAL __ATTR_ARTIFICIAL __ATTR_PURE __ATTR_WUNUSED int __NOTHROW_NCX(__LIBCCALL _islower_l)(int __ch, __locale_t __locale) { return __NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(islower_l)(__ch, __locale); }
+#endif /* !... */
+#if defined(__crt_isdigit_l) && defined(__CRT_HAVE_isdigit_l)
+/* >> isdigit_l(3) */
+__CEIREDIRECT(__ATTR_PURE __ATTR_WUNUSED,int,__NOTHROW_NCX,_isdigit_l,(int __ch, __locale_t __locale),isdigit_l,{ return __crt_isdigit_l(__ch, __locale); })
+#elif defined(__crt_isdigit_l) && defined(__CRT_HAVE___isdigit_l)
+/* >> isdigit_l(3) */
+__CEIREDIRECT(__ATTR_PURE __ATTR_WUNUSED,int,__NOTHROW_NCX,_isdigit_l,(int __ch, __locale_t __locale),__isdigit_l,{ return __crt_isdigit_l(__ch, __locale); })
+#elif defined(__crt_isdigit_l) && defined(__CRT_HAVE__isdigit_l)
+/* >> isdigit_l(3) */
+__CEIDECLARE(__ATTR_PURE __ATTR_WUNUSED,int,__NOTHROW_NCX,_isdigit_l,(int __ch, __locale_t __locale),{ return __crt_isdigit_l(__ch, __locale); })
+#elif defined(__crt_isdigit_l)
+/* >> isdigit_l(3) */
+__LOCAL __ATTR_PURE __ATTR_WUNUSED int __NOTHROW_NCX(__LIBCCALL _isdigit_l)(int __ch, __locale_t __locale) { return __crt_isdigit_l(__ch, __locale); }
+#elif defined(__CRT_HAVE_isdigit_l)
+/* >> isdigit_l(3) */
+__CREDIRECT(__ATTR_PURE __ATTR_WUNUSED,int,__NOTHROW_NCX,_isdigit_l,(int __ch, __locale_t __locale),isdigit_l,(__ch,__locale))
+#elif defined(__CRT_HAVE__isdigit_l)
+/* >> isdigit_l(3) */
+__CDECLARE(__ATTR_PURE __ATTR_WUNUSED,int,__NOTHROW_NCX,_isdigit_l,(int __ch, __locale_t __locale),(__ch,__locale))
+#elif defined(__CRT_HAVE___isdigit_l)
+/* >> isdigit_l(3) */
+__CREDIRECT(__ATTR_PURE __ATTR_WUNUSED,int,__NOTHROW_NCX,_isdigit_l,(int __ch, __locale_t __locale),__isdigit_l,(__ch,__locale))
+#else /* ... */
+#include <libc/local/ctype/isdigit_l.h>
+/* >> isdigit_l(3) */
+__FORCELOCAL __ATTR_ARTIFICIAL __ATTR_PURE __ATTR_WUNUSED int __NOTHROW_NCX(__LIBCCALL _isdigit_l)(int __ch, __locale_t __locale) { return __NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(isdigit_l)(__ch, __locale); }
+#endif /* !... */
+#if defined(__crt_isxdigit_l) && defined(__CRT_HAVE_isxdigit_l)
+/* >> isxdigit_l(3) */
+__CEIREDIRECT(__ATTR_PURE __ATTR_WUNUSED,int,__NOTHROW_NCX,_isxdigit_l,(int __ch, __locale_t __locale),isxdigit_l,{ return __crt_isxdigit_l(__ch, __locale); })
+#elif defined(__crt_isxdigit_l) && defined(__CRT_HAVE___isxdigit_l)
+/* >> isxdigit_l(3) */
+__CEIREDIRECT(__ATTR_PURE __ATTR_WUNUSED,int,__NOTHROW_NCX,_isxdigit_l,(int __ch, __locale_t __locale),__isxdigit_l,{ return __crt_isxdigit_l(__ch, __locale); })
+#elif defined(__crt_isxdigit_l) && defined(__CRT_HAVE__isxdigit_l)
+/* >> isxdigit_l(3) */
+__CEIDECLARE(__ATTR_PURE __ATTR_WUNUSED,int,__NOTHROW_NCX,_isxdigit_l,(int __ch, __locale_t __locale),{ return __crt_isxdigit_l(__ch, __locale); })
+#elif defined(__crt_isxdigit_l)
+/* >> isxdigit_l(3) */
+__LOCAL __ATTR_PURE __ATTR_WUNUSED int __NOTHROW_NCX(__LIBCCALL _isxdigit_l)(int __ch, __locale_t __locale) { return __crt_isxdigit_l(__ch, __locale); }
+#elif defined(__CRT_HAVE_isxdigit_l)
+/* >> isxdigit_l(3) */
+__CREDIRECT(__ATTR_PURE __ATTR_WUNUSED,int,__NOTHROW_NCX,_isxdigit_l,(int __ch, __locale_t __locale),isxdigit_l,(__ch,__locale))
+#elif defined(__CRT_HAVE__isxdigit_l)
+/* >> isxdigit_l(3) */
+__CDECLARE(__ATTR_PURE __ATTR_WUNUSED,int,__NOTHROW_NCX,_isxdigit_l,(int __ch, __locale_t __locale),(__ch,__locale))
+#elif defined(__CRT_HAVE___isxdigit_l)
+/* >> isxdigit_l(3) */
+__CREDIRECT(__ATTR_PURE __ATTR_WUNUSED,int,__NOTHROW_NCX,_isxdigit_l,(int __ch, __locale_t __locale),__isxdigit_l,(__ch,__locale))
+#else /* ... */
+#include <libc/local/ctype/isxdigit_l.h>
+/* >> isxdigit_l(3) */
+__FORCELOCAL __ATTR_ARTIFICIAL __ATTR_PURE __ATTR_WUNUSED int __NOTHROW_NCX(__LIBCCALL _isxdigit_l)(int __ch, __locale_t __locale) { return __NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(isxdigit_l)(__ch, __locale); }
+#endif /* !... */
+#if defined(__crt_isspace_l) && defined(__CRT_HAVE_isspace_l)
+/* >> isspace_l(3) */
+__CEIREDIRECT(__ATTR_PURE __ATTR_WUNUSED,int,__NOTHROW_NCX,_isspace_l,(int __ch, __locale_t __locale),isspace_l,{ return __crt_isspace_l(__ch, __locale); })
+#elif defined(__crt_isspace_l) && defined(__CRT_HAVE___isspace_l)
+/* >> isspace_l(3) */
+__CEIREDIRECT(__ATTR_PURE __ATTR_WUNUSED,int,__NOTHROW_NCX,_isspace_l,(int __ch, __locale_t __locale),__isspace_l,{ return __crt_isspace_l(__ch, __locale); })
+#elif defined(__crt_isspace_l) && defined(__CRT_HAVE__isspace_l)
+/* >> isspace_l(3) */
+__CEIDECLARE(__ATTR_PURE __ATTR_WUNUSED,int,__NOTHROW_NCX,_isspace_l,(int __ch, __locale_t __locale),{ return __crt_isspace_l(__ch, __locale); })
+#elif defined(__crt_isspace_l)
+/* >> isspace_l(3) */
+__LOCAL __ATTR_PURE __ATTR_WUNUSED int __NOTHROW_NCX(__LIBCCALL _isspace_l)(int __ch, __locale_t __locale) { return __crt_isspace_l(__ch, __locale); }
+#elif defined(__CRT_HAVE_isspace_l)
+/* >> isspace_l(3) */
+__CREDIRECT(__ATTR_PURE __ATTR_WUNUSED,int,__NOTHROW_NCX,_isspace_l,(int __ch, __locale_t __locale),isspace_l,(__ch,__locale))
+#elif defined(__CRT_HAVE__isspace_l)
+/* >> isspace_l(3) */
+__CDECLARE(__ATTR_PURE __ATTR_WUNUSED,int,__NOTHROW_NCX,_isspace_l,(int __ch, __locale_t __locale),(__ch,__locale))
+#elif defined(__CRT_HAVE___isspace_l)
+/* >> isspace_l(3) */
+__CREDIRECT(__ATTR_PURE __ATTR_WUNUSED,int,__NOTHROW_NCX,_isspace_l,(int __ch, __locale_t __locale),__isspace_l,(__ch,__locale))
+#else /* ... */
+#include <libc/local/ctype/isspace_l.h>
+/* >> isspace_l(3) */
+__FORCELOCAL __ATTR_ARTIFICIAL __ATTR_PURE __ATTR_WUNUSED int __NOTHROW_NCX(__LIBCCALL _isspace_l)(int __ch, __locale_t __locale) { return __NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(isspace_l)(__ch, __locale); }
+#endif /* !... */
+#if defined(__crt_ispunct_l) && defined(__CRT_HAVE_ispunct_l)
+/* >> ispunct_l(3) */
+__CEIREDIRECT(__ATTR_PURE __ATTR_WUNUSED,int,__NOTHROW_NCX,_ispunct_l,(int __ch, __locale_t __locale),ispunct_l,{ return __crt_ispunct_l(__ch, __locale); })
+#elif defined(__crt_ispunct_l) && defined(__CRT_HAVE___ispunct_l)
+/* >> ispunct_l(3) */
+__CEIREDIRECT(__ATTR_PURE __ATTR_WUNUSED,int,__NOTHROW_NCX,_ispunct_l,(int __ch, __locale_t __locale),__ispunct_l,{ return __crt_ispunct_l(__ch, __locale); })
+#elif defined(__crt_ispunct_l) && defined(__CRT_HAVE__ispunct_l)
+/* >> ispunct_l(3) */
+__CEIDECLARE(__ATTR_PURE __ATTR_WUNUSED,int,__NOTHROW_NCX,_ispunct_l,(int __ch, __locale_t __locale),{ return __crt_ispunct_l(__ch, __locale); })
+#elif defined(__crt_ispunct_l)
+/* >> ispunct_l(3) */
+__LOCAL __ATTR_PURE __ATTR_WUNUSED int __NOTHROW_NCX(__LIBCCALL _ispunct_l)(int __ch, __locale_t __locale) { return __crt_ispunct_l(__ch, __locale); }
+#elif defined(__CRT_HAVE_ispunct_l)
+/* >> ispunct_l(3) */
+__CREDIRECT(__ATTR_PURE __ATTR_WUNUSED,int,__NOTHROW_NCX,_ispunct_l,(int __ch, __locale_t __locale),ispunct_l,(__ch,__locale))
+#elif defined(__CRT_HAVE__ispunct_l)
+/* >> ispunct_l(3) */
+__CDECLARE(__ATTR_PURE __ATTR_WUNUSED,int,__NOTHROW_NCX,_ispunct_l,(int __ch, __locale_t __locale),(__ch,__locale))
+#elif defined(__CRT_HAVE___ispunct_l)
+/* >> ispunct_l(3) */
+__CREDIRECT(__ATTR_PURE __ATTR_WUNUSED,int,__NOTHROW_NCX,_ispunct_l,(int __ch, __locale_t __locale),__ispunct_l,(__ch,__locale))
+#else /* ... */
+#include <libc/local/ctype/ispunct_l.h>
+/* >> ispunct_l(3) */
+__FORCELOCAL __ATTR_ARTIFICIAL __ATTR_PURE __ATTR_WUNUSED int __NOTHROW_NCX(__LIBCCALL _ispunct_l)(int __ch, __locale_t __locale) { return __NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(ispunct_l)(__ch, __locale); }
+#endif /* !... */
+#if defined(__crt_isblank_l) && defined(__CRT_HAVE_isblank_l)
+/* >> isblank_l(3) */
+__CEIREDIRECT(__ATTR_PURE __ATTR_WUNUSED,int,__NOTHROW_NCX,_isblank_l,(int __ch, __locale_t __locale),isblank_l,{ return __crt_isblank_l(__ch, __locale); })
+#elif defined(__crt_isblank_l) && defined(__CRT_HAVE___isblank_l)
+/* >> isblank_l(3) */
+__CEIREDIRECT(__ATTR_PURE __ATTR_WUNUSED,int,__NOTHROW_NCX,_isblank_l,(int __ch, __locale_t __locale),__isblank_l,{ return __crt_isblank_l(__ch, __locale); })
+#elif defined(__crt_isblank_l) && defined(__CRT_HAVE__isblank_l)
+/* >> isblank_l(3) */
+__CEIDECLARE(__ATTR_PURE __ATTR_WUNUSED,int,__NOTHROW_NCX,_isblank_l,(int __ch, __locale_t __locale),{ return __crt_isblank_l(__ch, __locale); })
+#elif defined(__crt_isblank_l)
+/* >> isblank_l(3) */
+__LOCAL __ATTR_PURE __ATTR_WUNUSED int __NOTHROW_NCX(__LIBCCALL _isblank_l)(int __ch, __locale_t __locale) { return __crt_isblank_l(__ch, __locale); }
+#elif defined(__CRT_HAVE_isblank_l)
+/* >> isblank_l(3) */
+__CREDIRECT(__ATTR_PURE __ATTR_WUNUSED,int,__NOTHROW_NCX,_isblank_l,(int __ch, __locale_t __locale),isblank_l,(__ch,__locale))
+#elif defined(__CRT_HAVE__isblank_l)
+/* >> isblank_l(3) */
+__CDECLARE(__ATTR_PURE __ATTR_WUNUSED,int,__NOTHROW_NCX,_isblank_l,(int __ch, __locale_t __locale),(__ch,__locale))
+#elif defined(__CRT_HAVE___isblank_l)
+/* >> isblank_l(3) */
+__CREDIRECT(__ATTR_PURE __ATTR_WUNUSED,int,__NOTHROW_NCX,_isblank_l,(int __ch, __locale_t __locale),__isblank_l,(__ch,__locale))
+#else /* ... */
+#include <libc/local/ctype/isblank_l.h>
+/* >> isblank_l(3) */
+__FORCELOCAL __ATTR_ARTIFICIAL __ATTR_PURE __ATTR_WUNUSED int __NOTHROW_NCX(__LIBCCALL _isblank_l)(int __ch, __locale_t __locale) { return __NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(isblank_l)(__ch, __locale); }
+#endif /* !... */
+#if defined(__crt_isalnum_l) && defined(__CRT_HAVE_isalnum_l)
+/* >> isalnum_l(3) */
+__CEIREDIRECT(__ATTR_PURE __ATTR_WUNUSED,int,__NOTHROW_NCX,_isalnum_l,(int __ch, __locale_t __locale),isalnum_l,{ return __crt_isalnum_l(__ch, __locale); })
+#elif defined(__crt_isalnum_l) && defined(__CRT_HAVE___isalnum_l)
+/* >> isalnum_l(3) */
+__CEIREDIRECT(__ATTR_PURE __ATTR_WUNUSED,int,__NOTHROW_NCX,_isalnum_l,(int __ch, __locale_t __locale),__isalnum_l,{ return __crt_isalnum_l(__ch, __locale); })
+#elif defined(__crt_isalnum_l) && defined(__CRT_HAVE__isalnum_l)
+/* >> isalnum_l(3) */
+__CEIDECLARE(__ATTR_PURE __ATTR_WUNUSED,int,__NOTHROW_NCX,_isalnum_l,(int __ch, __locale_t __locale),{ return __crt_isalnum_l(__ch, __locale); })
+#elif defined(__crt_isalnum_l)
+/* >> isalnum_l(3) */
+__LOCAL __ATTR_PURE __ATTR_WUNUSED int __NOTHROW_NCX(__LIBCCALL _isalnum_l)(int __ch, __locale_t __locale) { return __crt_isalnum_l(__ch, __locale); }
+#elif defined(__CRT_HAVE_isalnum_l)
+/* >> isalnum_l(3) */
+__CREDIRECT(__ATTR_PURE __ATTR_WUNUSED,int,__NOTHROW_NCX,_isalnum_l,(int __ch, __locale_t __locale),isalnum_l,(__ch,__locale))
+#elif defined(__CRT_HAVE__isalnum_l)
+/* >> isalnum_l(3) */
+__CDECLARE(__ATTR_PURE __ATTR_WUNUSED,int,__NOTHROW_NCX,_isalnum_l,(int __ch, __locale_t __locale),(__ch,__locale))
+#elif defined(__CRT_HAVE___isalnum_l)
+/* >> isalnum_l(3) */
+__CREDIRECT(__ATTR_PURE __ATTR_WUNUSED,int,__NOTHROW_NCX,_isalnum_l,(int __ch, __locale_t __locale),__isalnum_l,(__ch,__locale))
+#else /* ... */
+#include <libc/local/ctype/isalnum_l.h>
+/* >> isalnum_l(3) */
+__FORCELOCAL __ATTR_ARTIFICIAL __ATTR_PURE __ATTR_WUNUSED int __NOTHROW_NCX(__LIBCCALL _isalnum_l)(int __ch, __locale_t __locale) { return __NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(isalnum_l)(__ch, __locale); }
+#endif /* !... */
+#if defined(__crt_isprint_l) && defined(__CRT_HAVE_isprint_l)
+/* >> isprint_l(3) */
+__CEIREDIRECT(__ATTR_PURE __ATTR_WUNUSED,int,__NOTHROW_NCX,_isprint_l,(int __ch, __locale_t __locale),isprint_l,{ return __crt_isprint_l(__ch, __locale); })
+#elif defined(__crt_isprint_l) && defined(__CRT_HAVE___isprint_l)
+/* >> isprint_l(3) */
+__CEIREDIRECT(__ATTR_PURE __ATTR_WUNUSED,int,__NOTHROW_NCX,_isprint_l,(int __ch, __locale_t __locale),__isprint_l,{ return __crt_isprint_l(__ch, __locale); })
+#elif defined(__crt_isprint_l) && defined(__CRT_HAVE__isprint_l)
+/* >> isprint_l(3) */
+__CEIDECLARE(__ATTR_PURE __ATTR_WUNUSED,int,__NOTHROW_NCX,_isprint_l,(int __ch, __locale_t __locale),{ return __crt_isprint_l(__ch, __locale); })
+#elif defined(__crt_isprint_l)
+/* >> isprint_l(3) */
+__LOCAL __ATTR_PURE __ATTR_WUNUSED int __NOTHROW_NCX(__LIBCCALL _isprint_l)(int __ch, __locale_t __locale) { return __crt_isprint_l(__ch, __locale); }
+#elif defined(__CRT_HAVE_isprint_l)
+/* >> isprint_l(3) */
+__CREDIRECT(__ATTR_PURE __ATTR_WUNUSED,int,__NOTHROW_NCX,_isprint_l,(int __ch, __locale_t __locale),isprint_l,(__ch,__locale))
+#elif defined(__CRT_HAVE__isprint_l)
+/* >> isprint_l(3) */
+__CDECLARE(__ATTR_PURE __ATTR_WUNUSED,int,__NOTHROW_NCX,_isprint_l,(int __ch, __locale_t __locale),(__ch,__locale))
+#elif defined(__CRT_HAVE___isprint_l)
+/* >> isprint_l(3) */
+__CREDIRECT(__ATTR_PURE __ATTR_WUNUSED,int,__NOTHROW_NCX,_isprint_l,(int __ch, __locale_t __locale),__isprint_l,(__ch,__locale))
+#else /* ... */
+#include <libc/local/ctype/isprint_l.h>
+/* >> isprint_l(3) */
+__FORCELOCAL __ATTR_ARTIFICIAL __ATTR_PURE __ATTR_WUNUSED int __NOTHROW_NCX(__LIBCCALL _isprint_l)(int __ch, __locale_t __locale) { return __NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(isprint_l)(__ch, __locale); }
+#endif /* !... */
+#if defined(__crt_isgraph_l) && defined(__CRT_HAVE_isgraph_l)
+/* >> isgraph_l(3) */
+__CEIREDIRECT(__ATTR_PURE __ATTR_WUNUSED,int,__NOTHROW_NCX,_isgraph_l,(int __ch, __locale_t __locale),isgraph_l,{ return __crt_isgraph_l(__ch, __locale); })
+#elif defined(__crt_isgraph_l) && defined(__CRT_HAVE___isgraph_l)
+/* >> isgraph_l(3) */
+__CEIREDIRECT(__ATTR_PURE __ATTR_WUNUSED,int,__NOTHROW_NCX,_isgraph_l,(int __ch, __locale_t __locale),__isgraph_l,{ return __crt_isgraph_l(__ch, __locale); })
+#elif defined(__crt_isgraph_l) && defined(__CRT_HAVE__isgraph_l)
+/* >> isgraph_l(3) */
+__CEIDECLARE(__ATTR_PURE __ATTR_WUNUSED,int,__NOTHROW_NCX,_isgraph_l,(int __ch, __locale_t __locale),{ return __crt_isgraph_l(__ch, __locale); })
+#elif defined(__crt_isgraph_l)
+/* >> isgraph_l(3) */
+__LOCAL __ATTR_PURE __ATTR_WUNUSED int __NOTHROW_NCX(__LIBCCALL _isgraph_l)(int __ch, __locale_t __locale) { return __crt_isgraph_l(__ch, __locale); }
+#elif defined(__CRT_HAVE_isgraph_l)
+/* >> isgraph_l(3) */
+__CREDIRECT(__ATTR_PURE __ATTR_WUNUSED,int,__NOTHROW_NCX,_isgraph_l,(int __ch, __locale_t __locale),isgraph_l,(__ch,__locale))
+#elif defined(__CRT_HAVE__isgraph_l)
+/* >> isgraph_l(3) */
+__CDECLARE(__ATTR_PURE __ATTR_WUNUSED,int,__NOTHROW_NCX,_isgraph_l,(int __ch, __locale_t __locale),(__ch,__locale))
+#elif defined(__CRT_HAVE___isgraph_l)
+/* >> isgraph_l(3) */
+__CREDIRECT(__ATTR_PURE __ATTR_WUNUSED,int,__NOTHROW_NCX,_isgraph_l,(int __ch, __locale_t __locale),__isgraph_l,(__ch,__locale))
+#else /* ... */
+#include <libc/local/ctype/isgraph_l.h>
+/* >> isgraph_l(3) */
+__FORCELOCAL __ATTR_ARTIFICIAL __ATTR_PURE __ATTR_WUNUSED int __NOTHROW_NCX(__LIBCCALL _isgraph_l)(int __ch, __locale_t __locale) { return __NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(isgraph_l)(__ch, __locale); }
+#endif /* !... */
+#if defined(__crt_iscntrl_l) && defined(__CRT_HAVE_iscntrl_l)
+/* >> iscntrl_l(3) */
+__CEIREDIRECT(__ATTR_PURE __ATTR_WUNUSED,int,__NOTHROW_NCX,_iscntrl_l,(int __ch, __locale_t __locale),iscntrl_l,{ return __crt_iscntrl_l(__ch, __locale); })
+#elif defined(__crt_iscntrl_l) && defined(__CRT_HAVE___iscntrl_l)
+/* >> iscntrl_l(3) */
+__CEIREDIRECT(__ATTR_PURE __ATTR_WUNUSED,int,__NOTHROW_NCX,_iscntrl_l,(int __ch, __locale_t __locale),__iscntrl_l,{ return __crt_iscntrl_l(__ch, __locale); })
+#elif defined(__crt_iscntrl_l) && defined(__CRT_HAVE__iscntrl_l)
+/* >> iscntrl_l(3) */
+__CEIDECLARE(__ATTR_PURE __ATTR_WUNUSED,int,__NOTHROW_NCX,_iscntrl_l,(int __ch, __locale_t __locale),{ return __crt_iscntrl_l(__ch, __locale); })
+#elif defined(__crt_iscntrl_l)
+/* >> iscntrl_l(3) */
+__LOCAL __ATTR_PURE __ATTR_WUNUSED int __NOTHROW_NCX(__LIBCCALL _iscntrl_l)(int __ch, __locale_t __locale) { return __crt_iscntrl_l(__ch, __locale); }
+#elif defined(__CRT_HAVE_iscntrl_l)
+/* >> iscntrl_l(3) */
+__CREDIRECT(__ATTR_PURE __ATTR_WUNUSED,int,__NOTHROW_NCX,_iscntrl_l,(int __ch, __locale_t __locale),iscntrl_l,(__ch,__locale))
+#elif defined(__CRT_HAVE__iscntrl_l)
+/* >> iscntrl_l(3) */
+__CDECLARE(__ATTR_PURE __ATTR_WUNUSED,int,__NOTHROW_NCX,_iscntrl_l,(int __ch, __locale_t __locale),(__ch,__locale))
+#elif defined(__CRT_HAVE___iscntrl_l)
+/* >> iscntrl_l(3) */
+__CREDIRECT(__ATTR_PURE __ATTR_WUNUSED,int,__NOTHROW_NCX,_iscntrl_l,(int __ch, __locale_t __locale),__iscntrl_l,(__ch,__locale))
+#else /* ... */
+#include <libc/local/ctype/iscntrl_l.h>
+/* >> iscntrl_l(3) */
+__FORCELOCAL __ATTR_ARTIFICIAL __ATTR_PURE __ATTR_WUNUSED int __NOTHROW_NCX(__LIBCCALL _iscntrl_l)(int __ch, __locale_t __locale) { return __NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(iscntrl_l)(__ch, __locale); }
+#endif /* !... */
+#if defined(__crt_tolower_l) && defined(__CRT_HAVE_tolower_l)
+/* >> tolower_l(3) */
+__CEIREDIRECT(__ATTR_PURE __ATTR_WUNUSED,int,__NOTHROW_NCX,_tolower_l,(int __ch, __locale_t __locale),tolower_l,{ return __crt_tolower_l(__ch, __locale); })
+#elif defined(__crt_tolower_l) && defined(__CRT_HAVE___tolower_l)
+/* >> tolower_l(3) */
+__CEIREDIRECT(__ATTR_PURE __ATTR_WUNUSED,int,__NOTHROW_NCX,_tolower_l,(int __ch, __locale_t __locale),__tolower_l,{ return __crt_tolower_l(__ch, __locale); })
+#elif defined(__crt_tolower_l) && defined(__CRT_HAVE__tolower_l)
+/* >> tolower_l(3) */
+__CEIDECLARE(__ATTR_PURE __ATTR_WUNUSED,int,__NOTHROW_NCX,_tolower_l,(int __ch, __locale_t __locale),{ return __crt_tolower_l(__ch, __locale); })
+#elif defined(__crt_tolower_l)
+/* >> tolower_l(3) */
+__LOCAL __ATTR_PURE __ATTR_WUNUSED int __NOTHROW_NCX(__LIBCCALL _tolower_l)(int __ch, __locale_t __locale) { return __crt_tolower_l(__ch, __locale); }
+#elif defined(__CRT_HAVE_tolower_l)
+/* >> tolower_l(3) */
+__CREDIRECT(__ATTR_PURE __ATTR_WUNUSED,int,__NOTHROW_NCX,_tolower_l,(int __ch, __locale_t __locale),tolower_l,(__ch,__locale))
+#elif defined(__CRT_HAVE__tolower_l)
+/* >> tolower_l(3) */
+__CDECLARE(__ATTR_PURE __ATTR_WUNUSED,int,__NOTHROW_NCX,_tolower_l,(int __ch, __locale_t __locale),(__ch,__locale))
+#elif defined(__CRT_HAVE___tolower_l)
+/* >> tolower_l(3) */
+__CREDIRECT(__ATTR_PURE __ATTR_WUNUSED,int,__NOTHROW_NCX,_tolower_l,(int __ch, __locale_t __locale),__tolower_l,(__ch,__locale))
+#else /* ... */
+#include <libc/local/ctype/tolower_l.h>
+/* >> tolower_l(3) */
+__FORCELOCAL __ATTR_ARTIFICIAL __ATTR_PURE __ATTR_WUNUSED int __NOTHROW_NCX(__LIBCCALL _tolower_l)(int __ch, __locale_t __locale) { return __NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(tolower_l)(__ch, __locale); }
+#endif /* !... */
+#if defined(__crt_toupper_l) && defined(__CRT_HAVE_toupper_l)
+/* >> toupper_l(3) */
+__CEIREDIRECT(__ATTR_PURE __ATTR_WUNUSED,int,__NOTHROW_NCX,_toupper_l,(int __ch, __locale_t __locale),toupper_l,{ return __crt_toupper_l(__ch, __locale); })
+#elif defined(__crt_toupper_l) && defined(__CRT_HAVE___toupper_l)
+/* >> toupper_l(3) */
+__CEIREDIRECT(__ATTR_PURE __ATTR_WUNUSED,int,__NOTHROW_NCX,_toupper_l,(int __ch, __locale_t __locale),__toupper_l,{ return __crt_toupper_l(__ch, __locale); })
+#elif defined(__crt_toupper_l) && defined(__CRT_HAVE__toupper_l)
+/* >> toupper_l(3) */
+__CEIDECLARE(__ATTR_PURE __ATTR_WUNUSED,int,__NOTHROW_NCX,_toupper_l,(int __ch, __locale_t __locale),{ return __crt_toupper_l(__ch, __locale); })
+#elif defined(__crt_toupper_l)
+/* >> toupper_l(3) */
+__LOCAL __ATTR_PURE __ATTR_WUNUSED int __NOTHROW_NCX(__LIBCCALL _toupper_l)(int __ch, __locale_t __locale) { return __crt_toupper_l(__ch, __locale); }
+#elif defined(__CRT_HAVE_toupper_l)
+/* >> toupper_l(3) */
+__CREDIRECT(__ATTR_PURE __ATTR_WUNUSED,int,__NOTHROW_NCX,_toupper_l,(int __ch, __locale_t __locale),toupper_l,(__ch,__locale))
+#elif defined(__CRT_HAVE__toupper_l)
+/* >> toupper_l(3) */
+__CDECLARE(__ATTR_PURE __ATTR_WUNUSED,int,__NOTHROW_NCX,_toupper_l,(int __ch, __locale_t __locale),(__ch,__locale))
+#elif defined(__CRT_HAVE___toupper_l)
+/* >> toupper_l(3) */
+__CREDIRECT(__ATTR_PURE __ATTR_WUNUSED,int,__NOTHROW_NCX,_toupper_l,(int __ch, __locale_t __locale),__toupper_l,(__ch,__locale))
+#else /* ... */
+#include <libc/local/ctype/toupper_l.h>
+/* >> toupper_l(3) */
+__FORCELOCAL __ATTR_ARTIFICIAL __ATTR_PURE __ATTR_WUNUSED int __NOTHROW_NCX(__LIBCCALL _toupper_l)(int __ch, __locale_t __locale) { return __NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(toupper_l)(__ch, __locale); }
+#endif /* !... */
+#ifdef __CRT_HAVE_isascii
+/* Returns non-zero if `(C & ~0x7f) == 0' */
+__CEIREDIRECT(__ATTR_CONST,int,__NOTHROW,__isascii,(int __c),isascii,{ return (__c & ~0x7f) == 0; })
+#elif defined(__CRT_HAVE___isascii)
+/* Returns non-zero if `(C & ~0x7f) == 0' */
+__CEIDECLARE(__ATTR_CONST,int,__NOTHROW,__isascii,(int __c),{ return (__c & ~0x7f) == 0; })
+#else /* ... */
+/* Returns non-zero if `(C & ~0x7f) == 0' */
+__LOCAL __ATTR_CONST int __NOTHROW(__LIBCCALL __isascii)(int __c) { return (__c & ~0x7f) == 0; }
+#endif /* !... */
+#ifdef __CRT_HAVE_toascii
+/* Re-returns `C & 0x7f' */
+__CEIREDIRECT(__ATTR_CONST,int,__NOTHROW,__toascii,(int __c),toascii,{ return __c & 0x7f; })
+#elif defined(__CRT_HAVE___toascii)
+/* Re-returns `C & 0x7f' */
+__CEIDECLARE(__ATTR_CONST,int,__NOTHROW,__toascii,(int __c),{ return __c & 0x7f; })
+#else /* ... */
+/* Re-returns `C & 0x7f' */
+__LOCAL __ATTR_CONST int __NOTHROW(__LIBCCALL __toascii)(int __c) { return __c & 0x7f; }
+#endif /* !... */
+#ifdef __CRT_HAVE___iscsymf
+/* >> issymstrt(3)
+ * Test if `ch' can appear at the start of a symbol/keyword/identifier */
+__CDECLARE(__ATTR_CONST __ATTR_WUNUSED,int,__NOTHROW_NCX,__iscsymf,(int __ch),(__ch))
+#else /* __CRT_HAVE___iscsymf */
+#include <libc/local/ctype/issymstrt.h>
+/* >> issymstrt(3)
+ * Test if `ch' can appear at the start of a symbol/keyword/identifier */
+__FORCELOCAL __ATTR_ARTIFICIAL __ATTR_CONST __ATTR_WUNUSED int __NOTHROW_NCX(__LIBCCALL __iscsymf)(int __ch) { return __NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(issymstrt)(__ch); }
+#endif /* !__CRT_HAVE___iscsymf */
+#ifdef __CRT_HAVE___iscsym
+/* >> issymcont(3)
+ * Test if `ch' can appear in the middle of a symbol/keyword/identifier */
+__CDECLARE(__ATTR_CONST __ATTR_WUNUSED,int,__NOTHROW_NCX,__iscsym,(int __ch),(__ch))
+#else /* __CRT_HAVE___iscsym */
+#include <libc/local/ctype/issymcont.h>
+/* >> issymcont(3)
+ * Test if `ch' can appear in the middle of a symbol/keyword/identifier */
+__FORCELOCAL __ATTR_ARTIFICIAL __ATTR_CONST __ATTR_WUNUSED int __NOTHROW_NCX(__LIBCCALL __iscsym)(int __ch) { return __NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(issymcont)(__ch); }
+#endif /* !__CRT_HAVE___iscsym */
+#endif /* __USE_DOS */
 
 __SYSDECL_END
 #endif /* __CC__ */

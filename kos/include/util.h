@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x448ac693 */
+/* HASH CRC-32:0x1b8fa30 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -113,7 +113,7 @@ __CDECLARE(,int,__NOTHROW_RPC_KOS,login_tty,(__fd_t __fd),(__fd))
  * stdout,   and  stderr.  Afterwards,  `fd'  is  closed.
  * @return: 0 : Success
  * @return: * : Error */
-__NAMESPACE_LOCAL_USING_OR_IMPL(login_tty, __FORCELOCAL __ATTR_ARTIFICIAL int __NOTHROW_RPC_KOS(__LIBCCALL login_tty)(__fd_t __fd) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(login_tty))(__fd); })
+__NAMESPACE_LOCAL_USING_OR_IMPL(login_tty, __FORCELOCAL __ATTR_ARTIFICIAL int __NOTHROW_RPC_KOS(__LIBCCALL login_tty)(__fd_t __fd) { return __NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(login_tty)(__fd); })
 #else /* __TIOCSCTTY && __CRT_HAVE_ioctl && __CRT_HAVE_setsid && (__CRT_HAVE_dup2 || __CRT_HAVE__dup2 || __CRT_HAVE___dup2) && (__CRT_HAVE_close || __CRT_HAVE__close || __CRT_HAVE___close) */
 #undef __login_tty_defined
 #endif /* !__TIOCSCTTY || !__CRT_HAVE_ioctl || !__CRT_HAVE_setsid || (!__CRT_HAVE_dup2 && !__CRT_HAVE__dup2 && !__CRT_HAVE___dup2) || (!__CRT_HAVE_close && !__CRT_HAVE__close && !__CRT_HAVE___close) */
@@ -176,7 +176,7 @@ __CDECLARE(__ATTR_NONNULL((1)),__pid_t,__NOTHROW_NCX,forkpty,(__fd_t *__amaster,
  * it returns in  both the  parent and child  processes, returning  `0'
  * for the child, and the child's PID for the parent (or -1 in only the
  * parent if something went wrong) */
-__NAMESPACE_LOCAL_USING_OR_IMPL(forkpty, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_NONNULL((1)) __pid_t __NOTHROW_NCX(__LIBCCALL forkpty)(__fd_t *__amaster, char *__name, struct termios const *__termp, struct winsize const *__winp) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(forkpty))(__amaster, __name, __termp, __winp); })
+__NAMESPACE_LOCAL_USING_OR_IMPL(forkpty, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_NONNULL((1)) __pid_t __NOTHROW_NCX(__LIBCCALL forkpty)(__fd_t *__amaster, char *__name, struct termios const *__termp, struct winsize const *__winp) { return __NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(forkpty)(__amaster, __name, __termp, __winp); })
 #else /* __CRT_HAVE_openpty && (__CRT_HAVE_fork || __CRT_HAVE___fork) && (__CRT_HAVE_close || __CRT_HAVE__close || __CRT_HAVE___close) && (__CRT_HAVE_login_tty || (__TIOCSCTTY && __CRT_HAVE_ioctl && __CRT_HAVE_setsid && (__CRT_HAVE_dup2 || __CRT_HAVE__dup2 || __CRT_HAVE___dup2))) && (__CRT_HAVE__Exit || __CRT_HAVE__exit || __CRT_HAVE_quick_exit || __CRT_HAVE_exit) */
 #undef __forkpty_defined
 #endif /* !__CRT_HAVE_openpty || (!__CRT_HAVE_fork && !__CRT_HAVE___fork) || (!__CRT_HAVE_close && !__CRT_HAVE__close && !__CRT_HAVE___close) || (!__CRT_HAVE_login_tty && (!__TIOCSCTTY || !__CRT_HAVE_ioctl || !__CRT_HAVE_setsid || (!__CRT_HAVE_dup2 && !__CRT_HAVE__dup2 && !__CRT_HAVE___dup2))) || (!__CRT_HAVE__Exit && !__CRT_HAVE__exit && !__CRT_HAVE_quick_exit && !__CRT_HAVE_exit) */
@@ -222,7 +222,7 @@ __CDECLARE(__ATTR_WUNUSED __ATTR_NONNULL((1)),char *,__NOTHROW_RPC,fparseln,(__F
  *                  return of this function, `strdup("")' will be returned. (i.e.  NULL
  *                  is only returned in case of an error; _NOT_ in case of end-of-file)
  * @return: NULL:   Error (s.a. `errno' and `ferror(stream)') */
-__NAMESPACE_LOCAL_USING_OR_IMPL(fparseln, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_WUNUSED __ATTR_NONNULL((1)) char *__NOTHROW_RPC(__LIBCCALL fparseln)(__FILE *__stream, size_t *__plen, size_t *__plineno, char const __delim[3], __STDC_INT_AS_UINT_T __flags) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(fparseln))(__stream, __plen, __plineno, __delim, __flags); })
+__NAMESPACE_LOCAL_USING_OR_IMPL(fparseln, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_WUNUSED __ATTR_NONNULL((1)) char *__NOTHROW_RPC(__LIBCCALL fparseln)(__FILE *__stream, size_t *__plen, size_t *__plineno, char const __delim[3], __STDC_INT_AS_UINT_T __flags) { return __NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(fparseln)(__stream, __plen, __plineno, __delim, __flags); })
 #else /* ... */
 #undef __fparseln_defined
 #endif /* !... */

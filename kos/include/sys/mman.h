@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x18975c3d */
+/* HASH CRC-32:0x1e371fad */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -589,7 +589,7 @@ __CDECLARE(__ATTR_WUNUSED,void *,__NOTHROW_NCX,mmap,(void *__addr, size_t __len,
  *               with a set of `MAP_ANONYMOUS | MAP_FIXED | MAP_GROWSDOWN | MAP_LOCKED|
  *               MAP_NONBLOCK | MAP_NORESERVE | MAP_POPULATE  | MAP_STACK | MAP_SYNC  |
  *               MAP_UNINITIALIZED | MAP_DONT_MAP | MAP_FIXED_NOREPLACE' */
-__NAMESPACE_LOCAL_USING_OR_IMPL(mmap, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_WUNUSED void *__NOTHROW_NCX(__LIBCCALL mmap)(void *__addr, size_t __len, __STDC_INT_AS_UINT_T __prot, __STDC_INT_AS_UINT_T __flags, __fd_t __fd, __FS_TYPE(off) __offset) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(mmap))(__addr, __len, __prot, __flags, __fd, __offset); })
+__NAMESPACE_LOCAL_USING_OR_IMPL(mmap, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_WUNUSED void *__NOTHROW_NCX(__LIBCCALL mmap)(void *__addr, size_t __len, __STDC_INT_AS_UINT_T __prot, __STDC_INT_AS_UINT_T __flags, __fd_t __fd, __FS_TYPE(off) __offset) { return __NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(mmap)(__addr, __len, __prot, __flags, __fd, __offset); })
 #endif /* ... */
 /* Unmap memory from `addr...+=len' */
 __CDECLARE_OPT(__ATTR_NONNULL((1)),int,__NOTHROW_NCX,munmap,(void *__addr, size_t __len),(__addr,__len))
@@ -610,7 +610,7 @@ __CDECLARE(__ATTR_NONNULL((1)),__fd_t,__NOTHROW_RPC,shm_open,(char const *__name
 #include <asm/os/fcntl.h>
 #if defined(__CRT_HAVE_open64) || defined(__CRT_HAVE___open64) || defined(__CRT_HAVE_open) || defined(__CRT_HAVE__open) || defined(__CRT_HAVE___open) || (defined(__AT_FDCWD) && (defined(__CRT_HAVE_openat64) || defined(__CRT_HAVE_openat)))
 #include <libc/local/sys.mman/shm_open.h>
-__NAMESPACE_LOCAL_USING_OR_IMPL(shm_open, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_NONNULL((1)) __fd_t __NOTHROW_RPC(__LIBCCALL shm_open)(char const *__name, __oflag_t __oflags, mode_t __mode) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(shm_open))(__name, __oflags, __mode); })
+__NAMESPACE_LOCAL_USING_OR_IMPL(shm_open, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_NONNULL((1)) __fd_t __NOTHROW_RPC(__LIBCCALL shm_open)(char const *__name, __oflag_t __oflags, mode_t __mode) { return __NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(shm_open)(__name, __oflags, __mode); })
 #endif /* __CRT_HAVE_open64 || __CRT_HAVE___open64 || __CRT_HAVE_open || __CRT_HAVE__open || __CRT_HAVE___open || (__AT_FDCWD && (__CRT_HAVE_openat64 || __CRT_HAVE_openat)) */
 #endif /* !__CRT_HAVE_shm_open */
 #ifdef __CRT_HAVE_shm_unlink
@@ -619,7 +619,7 @@ __CDECLARE(__ATTR_NONNULL((1)),int,__NOTHROW_RPC,shm_unlink,(char const *__name)
 #include <asm/os/fcntl.h>
 #if defined(__CRT_HAVE_unlink) || defined(__CRT_HAVE__unlink) || (defined(__AT_FDCWD) && defined(__CRT_HAVE_unlinkat))
 #include <libc/local/sys.mman/shm_unlink.h>
-__NAMESPACE_LOCAL_USING_OR_IMPL(shm_unlink, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_NONNULL((1)) int __NOTHROW_RPC(__LIBCCALL shm_unlink)(char const *__name) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(shm_unlink))(__name); })
+__NAMESPACE_LOCAL_USING_OR_IMPL(shm_unlink, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_NONNULL((1)) int __NOTHROW_RPC(__LIBCCALL shm_unlink)(char const *__name) { return __NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(shm_unlink)(__name); })
 #endif /* __CRT_HAVE_unlink || __CRT_HAVE__unlink || (__AT_FDCWD && __CRT_HAVE_unlinkat) */
 #endif /* !__CRT_HAVE_shm_unlink */
 
@@ -630,7 +630,7 @@ __CDECLARE(__ATTR_NONNULL((1)),int,__NOTHROW_NCX,madvise,(void *__addr, size_t _
 __CREDIRECT(__ATTR_NONNULL((1)),int,__NOTHROW_NCX,madvise,(void *__addr, size_t __len, __STDC_INT_AS_UINT_T __advice),__madvise,(__addr,__len,__advice))
 #else /* ... */
 #include <libc/local/sys.mman/madvise.h>
-__NAMESPACE_LOCAL_USING_OR_IMPL(madvise, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_NONNULL((1)) int __NOTHROW_NCX(__LIBCCALL madvise)(void *__addr, size_t __len, __STDC_INT_AS_UINT_T __advice) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(madvise))(__addr, __len, __advice); })
+__NAMESPACE_LOCAL_USING_OR_IMPL(madvise, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_NONNULL((1)) int __NOTHROW_NCX(__LIBCCALL madvise)(void *__addr, size_t __len, __STDC_INT_AS_UINT_T __advice) { return __NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(madvise)(__addr, __len, __advice); })
 #endif /* !... */
 __CDECLARE_OPT(__ATTR_NONNULL((1)),int,__NOTHROW_NCX,mincore,(void *__start, size_t __len, unsigned char *__vec),(__start,__len,__vec))
 #endif /* __USE_MISC */
@@ -657,7 +657,7 @@ __CREDIRECT(__ATTR_WUNUSED,void *,__NOTHROW_NCX,mmap64,(void *__addr, size_t __l
  *               with a set of `MAP_ANONYMOUS | MAP_FIXED | MAP_GROWSDOWN | MAP_LOCKED|
  *               MAP_NONBLOCK | MAP_NORESERVE | MAP_POPULATE  | MAP_STACK | MAP_SYNC  |
  *               MAP_UNINITIALIZED | MAP_DONT_MAP | MAP_FIXED_NOREPLACE' */
-__NAMESPACE_LOCAL_USING_OR_IMPL(mmap64, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_WUNUSED void *__NOTHROW_NCX(__LIBCCALL mmap64)(void *__addr, size_t __len, __STDC_INT_AS_UINT_T __prot, __STDC_INT_AS_UINT_T __flags, __fd_t __fd, __off64_t __offset) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(mmap64))(__addr, __len, __prot, __flags, __fd, __offset); })
+__NAMESPACE_LOCAL_USING_OR_IMPL(mmap64, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_WUNUSED void *__NOTHROW_NCX(__LIBCCALL mmap64)(void *__addr, size_t __len, __STDC_INT_AS_UINT_T __prot, __STDC_INT_AS_UINT_T __flags, __fd_t __fd, __off64_t __offset) { return __NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(mmap64)(__addr, __len, __prot, __flags, __fd, __offset); })
 #endif /* ... */
 #endif /* __USE_LARGEFILE64 */
 
@@ -666,7 +666,7 @@ __NAMESPACE_LOCAL_USING_OR_IMPL(mmap64, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_WU
 __CDECLARE(__ATTR_NONNULL((1)),int,__NOTHROW_NCX,posix_madvise,(void *__addr, size_t __len, __STDC_INT_AS_UINT_T __advice),(__addr,__len,__advice))
 #else /* __CRT_HAVE_posix_madvise */
 #include <libc/local/sys.mman/posix_madvise.h>
-__NAMESPACE_LOCAL_USING_OR_IMPL(posix_madvise, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_NONNULL((1)) int __NOTHROW_NCX(__LIBCCALL posix_madvise)(void *__addr, size_t __len, __STDC_INT_AS_UINT_T __advice) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(posix_madvise))(__addr, __len, __advice); })
+__NAMESPACE_LOCAL_USING_OR_IMPL(posix_madvise, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_NONNULL((1)) int __NOTHROW_NCX(__LIBCCALL posix_madvise)(void *__addr, size_t __len, __STDC_INT_AS_UINT_T __advice) { return __NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(posix_madvise)(__addr, __len, __advice); })
 #endif /* !__CRT_HAVE_posix_madvise */
 #endif /* __USE_XOPEN2K */
 
@@ -685,7 +685,7 @@ __CDECLARE(,int,__NOTHROW_NCX,pkey_set,(int __pkey, unsigned int __access_rights
 #include <asm/pkey.h>
 #ifdef __ARCH_HAVE_PKEY
 #include <libc/local/sys.mman/pkey_set.h>
-__NAMESPACE_LOCAL_USING_OR_IMPL(pkey_set, __FORCELOCAL __ATTR_ARTIFICIAL int __NOTHROW_NCX(__LIBCCALL pkey_set)(int __pkey, unsigned int __access_rights) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(pkey_set))(__pkey, __access_rights); })
+__NAMESPACE_LOCAL_USING_OR_IMPL(pkey_set, __FORCELOCAL __ATTR_ARTIFICIAL int __NOTHROW_NCX(__LIBCCALL pkey_set)(int __pkey, unsigned int __access_rights) { return __NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(pkey_set)(__pkey, __access_rights); })
 #endif /* __ARCH_HAVE_PKEY */
 #endif /* !__CRT_HAVE_pkey_set */
 #ifdef __CRT_HAVE_pkey_get
@@ -694,7 +694,7 @@ __CDECLARE(,int,__NOTHROW_NCX,pkey_get,(int __pkey),(__pkey))
 #include <asm/pkey.h>
 #ifdef __ARCH_HAVE_PKEY
 #include <libc/local/sys.mman/pkey_get.h>
-__NAMESPACE_LOCAL_USING_OR_IMPL(pkey_get, __FORCELOCAL __ATTR_ARTIFICIAL int __NOTHROW_NCX(__LIBCCALL pkey_get)(int __pkey) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(pkey_get))(__pkey); })
+__NAMESPACE_LOCAL_USING_OR_IMPL(pkey_get, __FORCELOCAL __ATTR_ARTIFICIAL int __NOTHROW_NCX(__LIBCCALL pkey_get)(int __pkey) { return __NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(pkey_get)(__pkey); })
 #endif /* __ARCH_HAVE_PKEY */
 #endif /* !__CRT_HAVE_pkey_get */
 __CDECLARE_OPT(,int,__NOTHROW_NCX,pkey_free,(int __pkey),(__pkey))

@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x321afa9b */
+/* HASH CRC-32:0x9289221c */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -148,6 +148,8 @@
 #define __CRT_HAVE_DOS$__fsetlocking
 #define __CRT_HAVE_DOS$__fwritable
 #define __CRT_HAVE_DOS$__fwriting
+#define __CRT_HAVE_DOS$__iscsym
+#define __CRT_HAVE_DOS$__iscsymf
 #define __CRT_HAVE_DOS$__issignaling
 #define __CRT_HAVE_DOS$__issignalingf
 #define __CRT_HAVE_DOS$__issignalingl
@@ -491,6 +493,8 @@
 #define __CRT_HAVE_DOS$_swscanf_l
 #endif /* !__KERNEL__ */
 #if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
+#define __CRT_HAVE_DOS$_tolower
+#define __CRT_HAVE_DOS$_toupper
 #define __CRT_HAVE_DOS$_ui64toa
 #define __CRT_HAVE_DOS$_ui64toa_s
 #endif /* !__LIBCCALL_IS_LIBDCALL && !__KERNEL__ */
@@ -3270,6 +3274,8 @@
 #define __CRT_HAVE___gxx_personality_v0
 #ifndef __KERNEL__
 #define __CRT_HAVE___h_errno_location
+#define __CRT_HAVE___iscsym
+#define __CRT_HAVE___iscsymf
 #define __CRT_HAVE___issignaling
 #define __CRT_HAVE___issignalingf
 #define __CRT_HAVE___issignalingl
@@ -3608,6 +3614,8 @@
 #define __CRT_HAVE__swprintf_s_l
 #define __CRT_HAVE__swscanf_l
 #define __CRT_HAVE__tempnam_dbg
+#define __CRT_HAVE__tolower
+#define __CRT_HAVE__toupper
 #define __CRT_HAVE__ui64toa
 #define __CRT_HAVE__ui64toa_s
 #define __CRT_HAVE__ui64tow

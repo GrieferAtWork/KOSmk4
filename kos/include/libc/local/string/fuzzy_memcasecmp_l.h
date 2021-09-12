@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x169b2867 */
+/* HASH CRC-32:0xb8dbc021 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -45,6 +45,8 @@ __NAMESPACE_LOCAL_BEGIN
 __CEIREDIRECT(__ATTR_PURE __ATTR_WUNUSED,int,__NOTHROW_NCX,__localdep_tolower_l,(int __ch, __locale_t __locale),tolower_l,{ return __crt_tolower_l(__ch, __locale); })
 #elif defined(__crt_tolower_l) && defined(__CRT_HAVE___tolower_l)
 __CEIREDIRECT(__ATTR_PURE __ATTR_WUNUSED,int,__NOTHROW_NCX,__localdep_tolower_l,(int __ch, __locale_t __locale),__tolower_l,{ return __crt_tolower_l(__ch, __locale); })
+#elif defined(__crt_tolower_l) && defined(__CRT_HAVE__tolower_l)
+__CEIREDIRECT(__ATTR_PURE __ATTR_WUNUSED,int,__NOTHROW_NCX,__localdep_tolower_l,(int __ch, __locale_t __locale),_tolower_l,{ return __crt_tolower_l(__ch, __locale); })
 #elif defined(__crt_tolower_l)
 __LOCAL __ATTR_PURE __ATTR_WUNUSED int __NOTHROW_NCX(__LIBCCALL __localdep_tolower_l)(int __ch, __locale_t __locale) { return __crt_tolower_l(__ch, __locale); }
 #elif defined(__CRT_HAVE_tolower_l)

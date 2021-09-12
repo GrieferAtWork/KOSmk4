@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xe15241e9 */
+/* HASH CRC-32:0xfe1994b2 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -66,7 +66,7 @@ __NAMESPACE_LOCAL_BEGIN
 #if !defined(__LIBCCALL_IS_FORMATPRINTER_CC) || __SIZEOF_SIZE_T__ != __SIZEOF_INT__
 __LOCAL_LIBC(vfscanf_getc_unlocked) __SSIZE_TYPE__
 (__FORMATPRINTER_CC __vfscanf_getc_unlocked)(void *__arg) {
-	return (__SSIZE_TYPE__)(__NAMESPACE_LOCAL_SYM __localdep_fgetc_unlocked)((__FILE *)__arg);
+	return (__SSIZE_TYPE__)__localdep_fgetc_unlocked((__FILE *)__arg);
 }
 #endif /* !__LIBCCALL_IS_FORMATPRINTER_CC || __SIZEOF_SIZE_T__ != __SIZEOF_INT__ */
 __LOCAL_LIBC(vfscanf_ungetc_unlocked) __SSIZE_TYPE__

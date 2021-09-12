@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xabfdb9f5 */
+/* HASH CRC-32:0x73fefc34 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -133,7 +133,7 @@ __CDECLARE_VOID(__ATTR_NONNULL((2)),__THROWING,UTimensAt,(__fd_t __dirfd, char c
 #elif defined(__CRT_HAVE_UTimensAt64) || defined(__CRT_HAVE_UTimensAt)
 #include <libc/local/kos.sys.stat/UTimensAt.h>
 /* @param flags: Set of `0|AT_SYMLINK_NOFOLLOW|AT_CHANGE_CTIME|AT_DOSPATH' */
-__NAMESPACE_LOCAL_USING_OR_IMPL(UTimensAt, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_NONNULL((2)) void (__LIBCCALL UTimensAt)(__fd_t __dirfd, char const *__filename, struct timespec const __times[2 /*or:3*/], __atflag_t __flags) __THROWS(...) { (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(UTimensAt))(__dirfd, __filename, __times, __flags); })
+__NAMESPACE_LOCAL_USING_OR_IMPL(UTimensAt, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_NONNULL((2)) void (__LIBCCALL UTimensAt)(__fd_t __dirfd, char const *__filename, struct timespec const __times[2 /*or:3*/], __atflag_t __flags) __THROWS(...) { __NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(UTimensAt)(__dirfd, __filename, __times, __flags); })
 #endif /* ... */
 #ifdef __USE_TIME64
 #ifdef __CRT_HAVE_UTimensAt64
@@ -145,7 +145,7 @@ __CREDIRECT_VOID(__ATTR_NONNULL((2)),__THROWING,UTimensAt64,(__fd_t __dirfd, cha
 #elif defined(__CRT_HAVE_UTimensAt)
 #include <libc/local/kos.sys.stat/UTimensAt64.h>
 /* @param flags: Set of `0|AT_SYMLINK_NOFOLLOW|AT_CHANGE_CTIME|AT_DOSPATH' */
-__NAMESPACE_LOCAL_USING_OR_IMPL(UTimensAt64, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_NONNULL((2)) void (__LIBCCALL UTimensAt64)(__fd_t __dirfd, char const *__filename, struct timespec64 const __times[2 /*or:3*/], __atflag_t __flags) __THROWS(...) { (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(UTimensAt64))(__dirfd, __filename, __times, __flags); })
+__NAMESPACE_LOCAL_USING_OR_IMPL(UTimensAt64, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_NONNULL((2)) void (__LIBCCALL UTimensAt64)(__fd_t __dirfd, char const *__filename, struct timespec64 const __times[2 /*or:3*/], __atflag_t __flags) __THROWS(...) { __NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(UTimensAt64)(__dirfd, __filename, __times, __flags); })
 #endif /* ... */
 #endif /* __USE_TIME64 */
 #endif /* __USE_ATFILE */
@@ -157,7 +157,7 @@ __CREDIRECT_VOID(,__THROWING,FUtimens,(__fd_t __fd, struct timespec const __time
 __CDECLARE_VOID(,__THROWING,FUtimens,(__fd_t __fd, struct timespec const __times[2 /*or:3*/]),(__fd,__times))
 #elif defined(__CRT_HAVE_FUtimens64) || defined(__CRT_HAVE_FUtimens)
 #include <libc/local/kos.sys.stat/FUtimens.h>
-__NAMESPACE_LOCAL_USING_OR_IMPL(FUtimens, __FORCELOCAL __ATTR_ARTIFICIAL void (__LIBCCALL FUtimens)(__fd_t __fd, struct timespec const __times[2 /*or:3*/]) __THROWS(...) { (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(FUtimens))(__fd, __times); })
+__NAMESPACE_LOCAL_USING_OR_IMPL(FUtimens, __FORCELOCAL __ATTR_ARTIFICIAL void (__LIBCCALL FUtimens)(__fd_t __fd, struct timespec const __times[2 /*or:3*/]) __THROWS(...) { __NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(FUtimens)(__fd, __times); })
 #endif /* ... */
 #ifdef __USE_TIME64
 #ifdef __CRT_HAVE_FUtimens64
@@ -166,7 +166,7 @@ __CDECLARE_VOID(,__THROWING,FUtimens64,(__fd_t __fd, struct timespec64 const __t
 __CREDIRECT_VOID(,__THROWING,FUtimens64,(__fd_t __fd, struct timespec64 const __times[2 /*or:3*/]),FUtimens,(__fd,__times))
 #elif defined(__CRT_HAVE_FUtimens)
 #include <libc/local/kos.sys.stat/FUtimens64.h>
-__NAMESPACE_LOCAL_USING_OR_IMPL(FUtimens64, __FORCELOCAL __ATTR_ARTIFICIAL void (__LIBCCALL FUtimens64)(__fd_t __fd, struct timespec64 const __times[2 /*or:3*/]) __THROWS(...) { (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(FUtimens64))(__fd, __times); })
+__NAMESPACE_LOCAL_USING_OR_IMPL(FUtimens64, __FORCELOCAL __ATTR_ARTIFICIAL void (__LIBCCALL FUtimens64)(__fd_t __fd, struct timespec64 const __times[2 /*or:3*/]) __THROWS(...) { __NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(FUtimens64)(__fd, __times); })
 #endif /* ... */
 #endif /* __USE_TIME64 */
 #endif /* __USE_XOPEN2K8 */

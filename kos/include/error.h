@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xae0e9f1e */
+/* HASH CRC-32:0xfb94d643 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -46,7 +46,7 @@ __SYSDECL_BEGIN
  * The message is printed as: `<program_invocation_short_name>: <format...>[: <strerror(errnum)>]\n'
  * Also note that `stdout' is flushed before the message is printed.
  * If `STATUS' is non-zero, follow up with a call to `exit(status)' */
-__NAMESPACE_FAST_USING_OR_IMPL(error, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_LIBC_PRINTF(3, 4) void (__VLIBCCALL error)(int __status, __errno_t __errnum, const char *__format, ...) __THROWS(...) { (__NAMESPACE_FAST_SYM __LIBC_FAST_NAME(error))(__status, __errnum, __format, __builtin_va_arg_pack()); })
+__NAMESPACE_FAST_USING_OR_IMPL(error, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_LIBC_PRINTF(3, 4) void (__VLIBCCALL error)(int __status, __errno_t __errnum, const char *__format, ...) __THROWS(...) { __NAMESPACE_FAST_SYM __LIBC_FAST_NAME(error)(__status, __errnum, __format, __builtin_va_arg_pack()); })
 #elif defined(__CRT_HAVE_error)
 /* Helper  function  for printing  an error  message to  `stderr' and  possibly exiting  the program
  * The message is printed as: `<program_invocation_short_name>: <format...>[: <strerror(errnum)>]\n'
@@ -64,9 +64,9 @@ __LIBC __ATTR_LIBC_PRINTF(3, 4) void (__VLIBCCALL error)(int __status, __errno_t
  * Also note that `stdout' is flushed before the message is printed.
  * If `STATUS' is non-zero, follow up with a call to `exit(status)' */
 #ifdef __cplusplus
-__NAMESPACE_LOCAL_USING_OR_IMPL(error, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_LIBC_PRINTF(3, 4) void (__VLIBCCALL error)(int __status, __errno_t __errnum, const char *__format, ...) __THROWS(...) { (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(error))(__status, __errnum, __format, __builtin_va_arg_pack()); })
+__NAMESPACE_LOCAL_USING_OR_IMPL(error, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_LIBC_PRINTF(3, 4) void (__VLIBCCALL error)(int __status, __errno_t __errnum, const char *__format, ...) __THROWS(...) { __NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(error)(__status, __errnum, __format, __builtin_va_arg_pack()); })
 #else /* __cplusplus */
-#define error (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(error))
+#define error __NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(error)
 #endif /* !__cplusplus */
 #endif /* !__NO_STDSTREAMS && (__CRT_HAVE_exit || __CRT_HAVE_quick_exit || __CRT_HAVE__exit || __CRT_HAVE__Exit) && (__CRT_HAVE_fputc || __CRT_HAVE_putc || __CRT_HAVE__IO_putc || __CRT_HAVE_fputc_unlocked || __CRT_HAVE_putc_unlocked || (__CRT_DOS && __CRT_HAVE__flsbuf) || __CRT_HAVE_fwrite || __CRT_HAVE__IO_fwrite || __CRT_HAVE_fwrite_s || __CRT_HAVE_fwrite_unlocked || __CRT_HAVE__fwrite_nolock) && __LOCAL_program_invocation_short_name */
 #endif /* !... */
@@ -75,7 +75,7 @@ __NAMESPACE_LOCAL_USING_OR_IMPL(error, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_LIB
  * The message is printed as: `<program_invocation_short_name>:<filename>:<line>: <format...>[: <strerror(errnum)>]\n'
  * Additionally,    when   `error_one_per_line'   is    non-zero,   consecutive   calls    to   this   function   that
  * pass the same values for `filename' and `line' will not produce the error message. */
-__NAMESPACE_FAST_USING_OR_IMPL(error_at_line, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_LIBC_PRINTF(5, 6) void (__VLIBCCALL error_at_line)(int __status, __errno_t __errnum, char const *__filename, unsigned int __line, char const *__format, ...) __THROWS(...) { (__NAMESPACE_FAST_SYM __LIBC_FAST_NAME(error_at_line))(__status, __errnum, __filename, __line, __format, __builtin_va_arg_pack()); })
+__NAMESPACE_FAST_USING_OR_IMPL(error_at_line, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_LIBC_PRINTF(5, 6) void (__VLIBCCALL error_at_line)(int __status, __errno_t __errnum, char const *__filename, unsigned int __line, char const *__format, ...) __THROWS(...) { __NAMESPACE_FAST_SYM __LIBC_FAST_NAME(error_at_line)(__status, __errnum, __filename, __line, __format, __builtin_va_arg_pack()); })
 #elif defined(__CRT_HAVE_error_at_line)
 /* Same as `error()', but also include the given filename in the error message.
  * The message is printed as: `<program_invocation_short_name>:<filename>:<line>: <format...>[: <strerror(errnum)>]\n'
@@ -93,9 +93,9 @@ __LIBC __ATTR_LIBC_PRINTF(5, 6) void (__VLIBCCALL error_at_line)(int __status, _
  * Additionally,    when   `error_one_per_line'   is    non-zero,   consecutive   calls    to   this   function   that
  * pass the same values for `filename' and `line' will not produce the error message. */
 #ifdef __cplusplus
-__NAMESPACE_LOCAL_USING_OR_IMPL(error_at_line, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_LIBC_PRINTF(5, 6) void (__VLIBCCALL error_at_line)(int __status, __errno_t __errnum, char const *__filename, unsigned int __line, char const *__format, ...) __THROWS(...) { (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(error_at_line))(__status, __errnum, __filename, __line, __format, __builtin_va_arg_pack()); })
+__NAMESPACE_LOCAL_USING_OR_IMPL(error_at_line, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_LIBC_PRINTF(5, 6) void (__VLIBCCALL error_at_line)(int __status, __errno_t __errnum, char const *__filename, unsigned int __line, char const *__format, ...) __THROWS(...) { __NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(error_at_line)(__status, __errnum, __filename, __line, __format, __builtin_va_arg_pack()); })
 #else /* __cplusplus */
-#define error_at_line (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(error_at_line))
+#define error_at_line __NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(error_at_line)
 #endif /* !__cplusplus */
 #endif /* !__NO_STDSTREAMS && (__CRT_HAVE_exit || __CRT_HAVE_quick_exit || __CRT_HAVE__exit || __CRT_HAVE__Exit) && (__CRT_HAVE_fputc || __CRT_HAVE_putc || __CRT_HAVE__IO_putc || __CRT_HAVE_fputc_unlocked || __CRT_HAVE_putc_unlocked || (__CRT_DOS && __CRT_HAVE__flsbuf) || __CRT_HAVE_fwrite || __CRT_HAVE__IO_fwrite || __CRT_HAVE_fwrite_s || __CRT_HAVE_fwrite_unlocked || __CRT_HAVE__fwrite_nolock) && __LOCAL_program_invocation_short_name */
 #endif /* !... */

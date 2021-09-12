@@ -90,12 +90,15 @@ __DECL_BEGIN __LIBC char const __ctype_toupper[256] __CASMNAME_SAME("__ctype_tou
 /************************************************************************/
 
 #elif defined(__CRT_GLC) && defined(__CRT_HAVE___ctype_b_loc)
+#include <bits/crt/locale.h>
 
 /************************************************************************/
 /* GLibC                                                                */
 #ifndef ____ctype_b_loc_defined
 #define ____ctype_b_loc_defined
+__DECL_BEGIN
 __CDECLARE(__ATTR_CONST __ATTR_RETNONNULL __ATTR_WUNUSED,__UINT16_TYPE__ const **,__NOTHROW,__ctype_b_loc,(void),())
+__DECL_END
 #endif /* !____ctype_b_loc_defined */
 
 #if __BYTE_ORDER__ == __ORDER_BIG_ENDIAN__
@@ -173,7 +176,9 @@ __CDECLARE(__ATTR_CONST __ATTR_RETNONNULL __ATTR_WUNUSED,__INT32_TYPE__ const **
 /* Cygwin                                                               */
 #ifndef ____locale_ctype_ptr_defined
 #define ____locale_ctype_ptr_defined
+__DECL_BEGIN
 __CDECLARE(__ATTR_CONST __ATTR_RETNONNULL __ATTR_WUNUSED,char const *,__NOTHROW,__locale_ctype_ptr,(void),())
+__DECL_END
 #endif /* !____locale_ctype_ptr_defined */
 #define __crt_chtype_lookup(ch)           ((__locale_ctype_ptr() + 1)[(int)(ch)])
 #define __crt_isalpha(ch)                 (__crt_chtype_lookup(ch) & 3)
@@ -196,7 +201,9 @@ __CDECLARE(__ATTR_CONST __ATTR_RETNONNULL __ATTR_WUNUSED,char const *,__NOTHROW,
 #ifdef __CRT_HAVE___locale_ctype_ptr_l
 #ifndef ____locale_ctype_ptr_l_defined
 #define ____locale_ctype_ptr_l_defined
+__DECL_BEGIN
 __CDECLARE(__ATTR_PURE __ATTR_RETNONNULL __ATTR_WUNUSED,char const *,__NOTHROW_NCX,__locale_ctype_ptr_l,(__locale_t __locale),(__locale))
+__DECL_END
 #endif /* !____locale_ctype_ptr_l_defined */
 #define __crt_chtype_lookup_l(ch, locale) ((__locale_ctype_ptr_l(locale) + 1)[(int)(ch)])
 #define __crt_isalpha_l(ch, locale)       (__crt_chtype_lookup_l(ch, locale) & 3)
@@ -224,7 +231,9 @@ __CDECLARE(__ATTR_PURE __ATTR_RETNONNULL __ATTR_WUNUSED,char const *,__NOTHROW_N
 /* DOS (MSVC)                                                           */
 #ifndef ___isctype_defined
 #define ___isctype_defined
+__DECL_BEGIN
 __CDECLARE(__ATTR_CONST __ATTR_WUNUSED,int,__NOTHROW,_isctype,(int __ch, int __mask),(__ch,__mask))
+__DECL_END
 #endif /* !___isctype_defined */
 #define __crt_isalnum(ch)  _isctype(ch, 0x107)
 #define __crt_isalpha(ch)  _isctype(ch, 0x103)
@@ -241,7 +250,9 @@ __CDECLARE(__ATTR_CONST __ATTR_WUNUSED,int,__NOTHROW,_isctype,(int __ch, int __m
 #ifdef __CRT_HAVE__isctype_l
 #ifndef ___isctype_l_defined
 #define ___isctype_l_defined
+__DECL_BEGIN
 __CDECLARE(__ATTR_PURE __ATTR_WUNUSED,int,__NOTHROW_NCX,_isctype_l,(int __ch, int __mask, __locale_t __locale),(__ch,__mask,__locale))
+__DECL_END
 #endif /* !___isctype_l_defined */
 #define __crt_isalnum_l(ch, locale)  _isctype_l(ch, 0x107, locale)
 #define __crt_isalpha_l(ch, locale)  _isctype_l(ch, 0x103, locale)

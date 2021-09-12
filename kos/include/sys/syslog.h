@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x459d3892 */
+/* HASH CRC-32:0x97277237 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -153,9 +153,9 @@ __LIBC __ATTR_LIBC_PRINTF(2, 3) __ATTR_NONNULL((2)) void __NOTHROW_RPC(__VLIBCCA
 #elif defined(__CRT_HAVE_vsyslog) || defined(__CRT_HAVE_syslog_printer)
 #include <libc/local/sys.syslog/syslog.h>
 #ifdef __cplusplus
-__NAMESPACE_LOCAL_USING_OR_IMPL(syslog, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_LIBC_PRINTF(2, 3) __ATTR_NONNULL((2)) void __NOTHROW_RPC(__VLIBCCALL syslog)(__STDC_INT_AS_UINT_T __level, char const *__format, ...) { (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(syslog))(__level, __format, __builtin_va_arg_pack()); })
+__NAMESPACE_LOCAL_USING_OR_IMPL(syslog, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_LIBC_PRINTF(2, 3) __ATTR_NONNULL((2)) void __NOTHROW_RPC(__VLIBCCALL syslog)(__STDC_INT_AS_UINT_T __level, char const *__format, ...) { __NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(syslog)(__level, __format, __builtin_va_arg_pack()); })
 #else /* __cplusplus */
-#define syslog (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(syslog))
+#define syslog __NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(syslog)
 #endif /* !__cplusplus */
 #endif /* ... */
 
@@ -164,7 +164,7 @@ __NAMESPACE_LOCAL_USING_OR_IMPL(syslog, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_LI
 __CDECLARE_VOID(__ATTR_LIBC_PRINTF(2, 0) __ATTR_NONNULL((2)),__NOTHROW_RPC,vsyslog,(__STDC_INT_AS_UINT_T __level, char const *__format, __builtin_va_list __args),(__level,__format,__args))
 #elif defined(__CRT_HAVE_syslog_printer)
 #include <libc/local/sys.syslog/vsyslog.h>
-__NAMESPACE_LOCAL_USING_OR_IMPL(vsyslog, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_LIBC_PRINTF(2, 0) __ATTR_NONNULL((2)) void __NOTHROW_RPC(__LIBCCALL vsyslog)(__STDC_INT_AS_UINT_T __level, char const *__format, __builtin_va_list __args) { (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(vsyslog))(__level, __format, __args); })
+__NAMESPACE_LOCAL_USING_OR_IMPL(vsyslog, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_LIBC_PRINTF(2, 0) __ATTR_NONNULL((2)) void __NOTHROW_RPC(__LIBCCALL vsyslog)(__STDC_INT_AS_UINT_T __level, char const *__format, __builtin_va_list __args) { __NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(vsyslog)(__level, __format, __args); })
 #endif /* ... */
 #endif /* __USE_MISC */
 
