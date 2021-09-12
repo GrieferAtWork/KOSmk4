@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xf4e7baa0 */
+/* HASH CRC-32:0xb987156a */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -675,17 +675,6 @@ NOTHROW_NCX(LIBCCALL libc_wctrans_l)(char const *prop,
 	COMPILER_IMPURE();
 	return libc_wctrans(prop);
 }
-INTERN ATTR_SECTION(".text.crt.wchar.unicode.static.mbs") ATTR_CONST WUNUSED int
-NOTHROW_NCX(LIBCCALL libc_isleadbyte)(int wc) {
-	return wc >= 192 && wc <= 255;
-}
-INTERN ATTR_SECTION(".text.crt.wchar.unicode.locale.mbs") ATTR_PURE WUNUSED int
-NOTHROW_NCX(LIBCCALL libc__isleadbyte_l)(int wc,
-                                         locale_t locale) {
-	(void)locale;
-	COMPILER_IMPURE();
-	return libc_isleadbyte(wc);
-}
 #include <bits/crt/unicode.h>
 INTERN ATTR_SECTION(".text.crt.dos.wchar.unicode.static.mbs") ATTR_CONST WUNUSED int
 NOTHROW_NCX(LIBDCALL libd___iswcsymf)(wint16_t wc) {
@@ -732,7 +721,7 @@ NOTHROW_NCX(LIBDCALL libd__iswcsymf_l)(wint16_t wc,
 #if defined(__CRT_KOS) && defined(__CRT_HAVE___unicode_descriptor)
 	(void)locale;
 	COMPILER_IMPURE();
-	return libd___iswcsymf(wc);
+	return __iswcsymf(wc);
 #else /* __CRT_KOS && __CRT_HAVE___unicode_descriptor */
 	return libd_iswalpha_l(wc, locale) || wc == '_' || wc == '$';
 #endif /* !__CRT_KOS || !__CRT_HAVE___unicode_descriptor */
@@ -743,7 +732,7 @@ NOTHROW_NCX(LIBKCALL libc__iswcsymf_l)(wint32_t wc,
 #if defined(__CRT_KOS) && defined(__CRT_HAVE___unicode_descriptor)
 	(void)locale;
 	COMPILER_IMPURE();
-	return libc___iswcsymf(wc);
+	return __iswcsymf(wc);
 #else /* __CRT_KOS && __CRT_HAVE___unicode_descriptor */
 	return libc_iswalpha_l(wc, locale) || wc == '_' || wc == '$';
 #endif /* !__CRT_KOS || !__CRT_HAVE___unicode_descriptor */
@@ -754,7 +743,7 @@ NOTHROW_NCX(LIBDCALL libd__iswcsym_l)(wint16_t wc,
 #if defined(__CRT_KOS) && defined(__CRT_HAVE___unicode_descriptor)
 	(void)locale;
 	COMPILER_IMPURE();
-	return libd___iswcsym(wc);
+	return __iswcsym(wc);
 #else /* __CRT_KOS && __CRT_HAVE___unicode_descriptor */
 	return libd_iswalnum_l(wc, locale) || wc == '_' || wc == '$';
 #endif /* !__CRT_KOS || !__CRT_HAVE___unicode_descriptor */
@@ -765,10 +754,21 @@ NOTHROW_NCX(LIBKCALL libc__iswcsym_l)(wint32_t wc,
 #if defined(__CRT_KOS) && defined(__CRT_HAVE___unicode_descriptor)
 	(void)locale;
 	COMPILER_IMPURE();
-	return libc___iswcsym(wc);
+	return __iswcsym(wc);
 #else /* __CRT_KOS && __CRT_HAVE___unicode_descriptor */
 	return libc_iswalnum_l(wc, locale) || wc == '_' || wc == '$';
 #endif /* !__CRT_KOS || !__CRT_HAVE___unicode_descriptor */
+}
+INTERN ATTR_SECTION(".text.crt.wchar.unicode.static.mbs") ATTR_CONST WUNUSED int
+NOTHROW_NCX(LIBCCALL libc_isleadbyte)(int wc) {
+	return wc >= 192 && wc <= 255;
+}
+INTERN ATTR_SECTION(".text.crt.wchar.unicode.locale.mbs") ATTR_PURE WUNUSED int
+NOTHROW_NCX(LIBCCALL libc__isleadbyte_l)(int wc,
+                                         locale_t locale) {
+	(void)locale;
+	COMPILER_IMPURE();
+	return libc_isleadbyte(wc);
 }
 #endif /* !__KERNEL__ */
 
@@ -945,8 +945,6 @@ DEFINE_PUBLIC_ALIAS(__towctrans_l, libc_towctrans_l);
 DEFINE_PUBLIC_ALIAS(towctrans_l, libc_towctrans_l);
 DEFINE_PUBLIC_ALIAS(__wctrans_l, libc_wctrans_l);
 DEFINE_PUBLIC_ALIAS(wctrans_l, libc_wctrans_l);
-DEFINE_PUBLIC_ALIAS(isleadbyte, libc_isleadbyte);
-DEFINE_PUBLIC_ALIAS(_isleadbyte_l, libc__isleadbyte_l);
 DEFINE_PUBLIC_ALIAS(DOS$__iswcsymf, libd___iswcsymf);
 DEFINE_PUBLIC_ALIAS(__iswcsymf, libc___iswcsymf);
 DEFINE_PUBLIC_ALIAS(DOS$__iswcsym, libd___iswcsym);
@@ -955,6 +953,8 @@ DEFINE_PUBLIC_ALIAS(DOS$_iswcsymf_l, libd__iswcsymf_l);
 DEFINE_PUBLIC_ALIAS(_iswcsymf_l, libc__iswcsymf_l);
 DEFINE_PUBLIC_ALIAS(DOS$_iswcsym_l, libd__iswcsym_l);
 DEFINE_PUBLIC_ALIAS(_iswcsym_l, libc__iswcsym_l);
+DEFINE_PUBLIC_ALIAS(isleadbyte, libc_isleadbyte);
+DEFINE_PUBLIC_ALIAS(_isleadbyte_l, libc__isleadbyte_l);
 #endif /* !__KERNEL__ */
 
 #endif /* !GUARD_LIBC_AUTO_WCTYPE_C */

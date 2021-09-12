@@ -346,8 +346,6 @@
 	CB(PREFIX.crt.compat.linux.__register_frame) \
 	CB(PREFIX.crt.wchar.fs.exec.exec) \
 	CB(PREFIX.crt.wchar.heap.strdup) \
-	CB(PREFIX.crt.wchar.FILE.core.read) \
-	CB(PREFIX.crt.wchar.FILE.core.write) \
 	CB(PREFIX.crt.wchar.FILE.locked.access) \
 	CB(PREFIX.crt.wchar.FILE.locked.read.read) \
 	CB(PREFIX.crt.wchar.FILE.locked.read.scanf) \
@@ -509,8 +507,6 @@
 	CB(PREFIX.crt.dos.wchar.application.init) \
 	CB(PREFIX.crt.dos.wchar.fs.exec.exec) \
 	CB(PREFIX.crt.dos.wchar.heap.strdup) \
-	CB(PREFIX.crt.dos.wchar.FILE.core.read) \
-	CB(PREFIX.crt.dos.wchar.FILE.core.write) \
 	CB(PREFIX.crt.dos.wchar.FILE.locked.access) \
 	CB(PREFIX.crt.dos.wchar.FILE.locked.read.read) \
 	CB(PREFIX.crt.dos.wchar.FILE.locked.read.scanf) \

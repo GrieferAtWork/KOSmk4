@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xa181bb8f */
+/* HASH CRC-32:0x67caeaf2 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -43,33 +43,33 @@ __NAMESPACE_LOCAL_BEGIN
 #define __localdep_format_c16repeat __LIBC_LOCAL_NAME(format_c16repeat)
 #endif /* !... */
 #endif /* !__local___localdep_format_c16repeat_defined */
-#ifndef __local___localdep_isuprint16_defined
-#define __local___localdep_isuprint16_defined 1
+#ifndef __local___localdep_isprint16_defined
+#define __local___localdep_isprint16_defined 1
 __NAMESPACE_LOCAL_END
 #include <bits/crt/wctype.h>
 __NAMESPACE_LOCAL_BEGIN
 #if defined(__crt_iswprint) && defined(__CRT_HAVE_iswprint) && __SIZEOF_WCHAR_T__ == 2
-__COMPILER_EIREDIRECT(__ATTR_CONST __ATTR_WUNUSED,int,__NOTHROW,__LIBDCALL,__localdep_isuprint16,(__WINT16_TYPE__ __wc),iswprint,{ return __crt_iswprint(__wc); })
+__COMPILER_EIREDIRECT(__ATTR_CONST __ATTR_WUNUSED,int,__NOTHROW,__LIBDCALL,__localdep_isprint16,(__WINT16_TYPE__ __wc),iswprint,{ return __crt_iswprint(__wc); })
 #elif defined(__crt_iswprint) && __SIZEOF_WCHAR_T__ == 2
-__LOCAL __ATTR_CONST __ATTR_WUNUSED int __NOTHROW(__LIBDCALL __localdep_isuprint16)(__WINT16_TYPE__ __wc) { return __crt_iswprint(__wc); }
+__LOCAL __ATTR_CONST __ATTR_WUNUSED int __NOTHROW(__LIBDCALL __localdep_isprint16)(__WINT16_TYPE__ __wc) { return __crt_iswprint(__wc); }
 #elif __has_builtin(__builtin_iswprint) && defined(__LIBC_BIND_CRTBUILTINS) && defined(__CRT_HAVE_iswprint) && __SIZEOF_WCHAR_T__ == 2
-__COMPILER_EIREDIRECT(__ATTR_CONST __ATTR_WUNUSED,int,__NOTHROW,__LIBDCALL,__localdep_isuprint16,(__WINT16_TYPE__ __wc),iswprint,{ return __builtin_iswprint(__wc); })
+__COMPILER_EIREDIRECT(__ATTR_CONST __ATTR_WUNUSED,int,__NOTHROW,__LIBDCALL,__localdep_isprint16,(__WINT16_TYPE__ __wc),iswprint,{ return __builtin_iswprint(__wc); })
 #elif defined(__CRT_HAVE_iswprint) && __SIZEOF_WCHAR_T__ == 2 && defined(__LIBCCALL_IS_LIBDCALL)
-__CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,int,__NOTHROW,__localdep_isuprint16,(__WINT16_TYPE__ __wc),iswprint,(__wc))
+__CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,int,__NOTHROW,__localdep_isprint16,(__WINT16_TYPE__ __wc),iswprint,(__wc))
 #elif defined(__CRT_HAVE_DOS$iswprint)
-__CREDIRECT_DOS(__ATTR_CONST __ATTR_WUNUSED,int,__NOTHROW,__localdep_isuprint16,(__WINT16_TYPE__ __wc),iswprint,(__wc))
+__CREDIRECT_DOS(__ATTR_CONST __ATTR_WUNUSED,int,__NOTHROW,__localdep_isprint16,(__WINT16_TYPE__ __wc),iswprint,(__wc))
 #elif __SIZEOF_WCHAR_T__ == 2
 __NAMESPACE_LOCAL_END
 #include <libc/local/wctype/iswprint.h>
 __NAMESPACE_LOCAL_BEGIN
-#define __localdep_isuprint16 (*(int(__LIBDCALL *)(__WINT16_TYPE__))&__LIBC_LOCAL_NAME(iswprint))
+#define __localdep_isprint16 (*(int(__LIBDCALL *)(__WINT16_TYPE__))&__LIBC_LOCAL_NAME(iswprint))
 #else /* ... */
 __NAMESPACE_LOCAL_END
-#include <libc/local/parts.uchar.wctype/isuprint16.h>
+#include <libc/local/parts.uchar.wctype/isprint16.h>
 __NAMESPACE_LOCAL_BEGIN
-#define __localdep_isuprint16 __LIBC_LOCAL_NAME(isuprint16)
+#define __localdep_isprint16 __LIBC_LOCAL_NAME(isprint16)
 #endif /* !... */
-#endif /* !__local___localdep_isuprint16_defined */
+#endif /* !__local___localdep_isprint16_defined */
 __NAMESPACE_LOCAL_END
 #include <hybrid/__alloca.h>
 #include <hybrid/__unaligned.h>
@@ -239,7 +239,7 @@ __LOCAL_LIBC(format_c16hexdump) __ATTR_NONNULL((1)) __SSIZE_TYPE__
 		if (!(__flags & 0x0010)) {
 			for (__i = 0; __i < __line_len; ++__i) {
 				__BYTE_TYPE__ __b = __line_data[__i];
-				if (!__localdep_isuprint16(__b))
+				if (!__localdep_isprint16(__b))
 					__b = '.';
 				__temp = (*__printer)(__arg, (__CHAR16_TYPE__ const *)&__b, 1);
 				if __unlikely(__temp < 0)

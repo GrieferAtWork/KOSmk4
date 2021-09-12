@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xed6f7f00 */
+/* HASH CRC-32:0xb85712db */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -24,8 +24,8 @@
 #include <features.h>
 #include <bits/types.h>
 __NAMESPACE_LOCAL_BEGIN
-#ifndef __local___localdep_isuspace16_defined
-#define __local___localdep_isuspace16_defined 1
+#ifndef __local___localdep_isspace16_defined
+#define __local___localdep_isspace16_defined 1
 __NAMESPACE_LOCAL_END
 #include <bits/crt/wctype.h>
 __NAMESPACE_LOCAL_BEGIN
@@ -33,39 +33,39 @@ __NAMESPACE_LOCAL_BEGIN
 __NAMESPACE_LOCAL_END
 #include <hybrid/typecore.h>
 __NAMESPACE_LOCAL_BEGIN
-__COMPILER_EIREDIRECT(__ATTR_CONST __ATTR_WUNUSED,int,__NOTHROW,__LIBDCALL,__localdep_isuspace16,(__WINT16_TYPE__ __wc),iswspace,{ return __crt_iswspace(__wc); })
+__COMPILER_EIREDIRECT(__ATTR_CONST __ATTR_WUNUSED,int,__NOTHROW,__LIBDCALL,__localdep_isspace16,(__WINT16_TYPE__ __wc),iswspace,{ return __crt_iswspace(__wc); })
 #elif defined(__crt_iswspace) && __SIZEOF_WCHAR_T__ == 2
 __NAMESPACE_LOCAL_END
 #include <hybrid/typecore.h>
 __NAMESPACE_LOCAL_BEGIN
-__LOCAL __ATTR_CONST __ATTR_WUNUSED int __NOTHROW(__LIBDCALL __localdep_isuspace16)(__WINT16_TYPE__ __wc) { return __crt_iswspace(__wc); }
+__LOCAL __ATTR_CONST __ATTR_WUNUSED int __NOTHROW(__LIBDCALL __localdep_isspace16)(__WINT16_TYPE__ __wc) { return __crt_iswspace(__wc); }
 #elif __has_builtin(__builtin_iswspace) && defined(__LIBC_BIND_CRTBUILTINS) && defined(__CRT_HAVE_iswspace) && __SIZEOF_WCHAR_T__ == 2
 __NAMESPACE_LOCAL_END
 #include <hybrid/typecore.h>
 __NAMESPACE_LOCAL_BEGIN
-__COMPILER_EIREDIRECT(__ATTR_CONST __ATTR_WUNUSED,int,__NOTHROW,__LIBDCALL,__localdep_isuspace16,(__WINT16_TYPE__ __wc),iswspace,{ return __builtin_iswspace(__wc); })
+__COMPILER_EIREDIRECT(__ATTR_CONST __ATTR_WUNUSED,int,__NOTHROW,__LIBDCALL,__localdep_isspace16,(__WINT16_TYPE__ __wc),iswspace,{ return __builtin_iswspace(__wc); })
 #elif defined(__CRT_HAVE_iswspace) && __SIZEOF_WCHAR_T__ == 2 && defined(__LIBCCALL_IS_LIBDCALL)
 __NAMESPACE_LOCAL_END
 #include <hybrid/typecore.h>
 __NAMESPACE_LOCAL_BEGIN
-__CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,int,__NOTHROW,__localdep_isuspace16,(__WINT16_TYPE__ __wc),iswspace,(__wc))
+__CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,int,__NOTHROW,__localdep_isspace16,(__WINT16_TYPE__ __wc),iswspace,(__wc))
 #elif defined(__CRT_HAVE_DOS$iswspace)
 __NAMESPACE_LOCAL_END
 #include <hybrid/typecore.h>
 __NAMESPACE_LOCAL_BEGIN
-__CREDIRECT_DOS(__ATTR_CONST __ATTR_WUNUSED,int,__NOTHROW,__localdep_isuspace16,(__WINT16_TYPE__ __wc),iswspace,(__wc))
+__CREDIRECT_DOS(__ATTR_CONST __ATTR_WUNUSED,int,__NOTHROW,__localdep_isspace16,(__WINT16_TYPE__ __wc),iswspace,(__wc))
 #elif __SIZEOF_WCHAR_T__ == 2
 __NAMESPACE_LOCAL_END
 #include <libc/local/wctype/iswspace.h>
 __NAMESPACE_LOCAL_BEGIN
-#define __localdep_isuspace16 (*(int(__LIBDCALL *)(__WINT16_TYPE__))&__LIBC_LOCAL_NAME(iswspace))
+#define __localdep_isspace16 (*(int(__LIBDCALL *)(__WINT16_TYPE__))&__LIBC_LOCAL_NAME(iswspace))
 #else /* ... */
 __NAMESPACE_LOCAL_END
-#include <libc/local/parts.uchar.wctype/isuspace16.h>
+#include <libc/local/parts.uchar.wctype/isspace16.h>
 __NAMESPACE_LOCAL_BEGIN
-#define __localdep_isuspace16 __LIBC_LOCAL_NAME(isuspace16)
+#define __localdep_isspace16 __LIBC_LOCAL_NAME(isspace16)
 #endif /* !... */
-#endif /* !__local___localdep_isuspace16_defined */
+#endif /* !__local___localdep_isspace16_defined */
 __NAMESPACE_LOCAL_END
 #include <asm/os/errno.h>
 #include <hybrid/__overflow.h>
@@ -75,7 +75,7 @@ __NOTHROW_NCX(__LIBDCALL __LIBC_LOCAL_NAME(c16stou64_r))(__CHAR16_TYPE__ const *
 	__UINT64_TYPE__ __result;
 	__CHAR16_TYPE__ const *__num_start = __nptr;
 	__CHAR16_TYPE__ const *__num_iter;
-	while (__localdep_isuspace16(*__num_start))
+	while (__localdep_isspace16(*__num_start))
 		++__num_start;
 	if (__base == 0) {
 		/* Automatically deduce base. */
@@ -166,7 +166,7 @@ __NOTHROW_NCX(__LIBDCALL __LIBC_LOCAL_NAME(c16stou64_r))(__CHAR16_TYPE__ const *
 			*__error = 0;
 			/* Check for `EINVAL' */
 			if __unlikely(*__num_iter) {
-				while (__localdep_isuspace16(*__num_iter))
+				while (__localdep_isspace16(*__num_iter))
 					++__num_iter;
 				if (*__num_iter) {
 #ifdef __EINVAL

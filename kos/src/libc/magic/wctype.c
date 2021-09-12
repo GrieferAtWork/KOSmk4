@@ -733,8 +733,59 @@ $wctrans_t wctrans_l([[nonnull]] char const *prop, $locale_t locale) {
 %#endif /* __USE_XOPEN2K8 */
 
 
-%[default:section(".text.crt{|.dos}.wchar.unicode.locale.mbs")]
 
+%#ifdef __USE_KOS
+%[default:section(".text.crt.dos.wchar.unicode.static.mbs")]
+[[wchar, wunused, const, decl_include("<hybrid/typecore.h>")]]
+[[impl_include("<bits/crt/unicode.h>"), crt_name("__iswcsymf")]]
+int iswsymstrt($wint_t wc) {
+@@pp_if defined(__CRT_KOS) && $has_function(__unicode_descriptor)@@
+	struct @__unitraits@ const *traits = __unicode_descriptor(wc);
+	return (int)(traits->@__ut_flags@ & __UNICODE_ISSYMSTRT);
+@@pp_else@@
+	return iswalpha(wc) || wc == '_' || wc == '$';
+@@pp_endif@@
+}
+
+[[wchar, wunused, const, decl_include("<hybrid/typecore.h>")]]
+[[impl_include("<bits/crt/unicode.h>"), crt_name("__iswcsym")]]
+int iswsymcont($wint_t wc) {
+@@pp_if defined(__CRT_KOS) && $has_function(__unicode_descriptor)@@
+	struct @__unitraits@ const *traits = __unicode_descriptor(wc);
+	return (int)(traits->@__ut_flags@ & __UNICODE_ISSYMCONT);
+@@pp_else@@
+	return iswalnum(wc) || wc == '_' || wc == '$';
+@@pp_endif@@
+}
+
+%[default:section(".text.crt.dos.wchar.unicode.locale.mbs")]
+[[wchar, wunused, pure, decl_include("<hybrid/typecore.h>"), crt_name("_iswcsymf_l")]]
+int iswsymstrt_l($wint_t wc, $locale_t locale) {
+@@pp_if defined(__CRT_KOS) && $has_function(__unicode_descriptor)@@
+	(void)locale;
+	COMPILER_IMPURE();
+	return __iswcsymf(wc);
+@@pp_else@@
+	return iswalpha_l(wc, locale) || wc == '_' || wc == '$';
+@@pp_endif@@
+}
+
+[[wchar, wunused, pure, decl_include("<hybrid/typecore.h>"), crt_name("_iswcsym_l")]]
+int iswsymcont_l($wint_t wc, $locale_t locale) {
+@@pp_if defined(__CRT_KOS) && $has_function(__unicode_descriptor)@@
+	(void)locale;
+	COMPILER_IMPURE();
+	return __iswcsym(wc);
+@@pp_else@@
+	return iswalnum_l(wc, locale) || wc == '_' || wc == '$';
+@@pp_endif@@
+}
+
+%#endif /* __USE_KOS */
+
+
+
+%[default:section(".text.crt.dos.wchar.unicode.locale.mbs")]
 
 %
 %#ifdef __USE_DOS
@@ -777,52 +828,10 @@ int _isleadbyte_l(int wc, $locale_t locale) {
 	return isleadbyte(wc);
 }
 
-%[default:section(".text.crt.dos.wchar.unicode.static.mbs")]
-[[wchar, wunused, const, decl_include("<hybrid/typecore.h>")]]
-[[impl_include("<bits/crt/unicode.h>")]]
-int __iswcsymf($wint_t wc) {
-@@pp_if defined(__CRT_KOS) && $has_function(__unicode_descriptor)@@
-	struct @__unitraits@ const *traits = __unicode_descriptor(wc);
-	return (int)(traits->@__ut_flags@ & __UNICODE_ISSYMSTRT);
-@@pp_else@@
-	return iswalpha(wc) || wc == '_' || wc == '$';
-@@pp_endif@@
-}
-
-[[wchar, wunused, const, decl_include("<hybrid/typecore.h>")]]
-[[impl_include("<bits/crt/unicode.h>")]]
-int __iswcsym($wint_t wc) {
-@@pp_if defined(__CRT_KOS) && $has_function(__unicode_descriptor)@@
-	struct @__unitraits@ const *traits = __unicode_descriptor(wc);
-	return (int)(traits->@__ut_flags@ & __UNICODE_ISSYMCONT);
-@@pp_else@@
-	return iswalnum(wc) || wc == '_' || wc == '$';
-@@pp_endif@@
-}
-
-%[default:section(".text.crt.dos.wchar.unicode.locale.mbs")]
-[[wchar, wunused, pure, decl_include("<hybrid/typecore.h>")]]
-int _iswcsymf_l($wint_t wc, $locale_t locale) {
-@@pp_if defined(__CRT_KOS) && $has_function(__unicode_descriptor)@@
-	(void)locale;
-	COMPILER_IMPURE();
-	return __iswcsymf(wc);
-@@pp_else@@
-	return iswalpha_l(wc, locale) || wc == '_' || wc == '$';
-@@pp_endif@@
-}
-
-[[wchar, wunused, pure, decl_include("<hybrid/typecore.h>")]]
-int _iswcsym_l($wint_t wc, $locale_t locale) {
-@@pp_if defined(__CRT_KOS) && $has_function(__unicode_descriptor)@@
-	(void)locale;
-	COMPILER_IMPURE();
-	return __iswcsym(wc);
-@@pp_else@@
-	return iswalnum_l(wc, locale) || wc == '_' || wc == '$';
-@@pp_endif@@
-}
-
+%[insert:function(__iswcsymf = iswsymstrt)]
+%[insert:function(__iswcsym = iswsymcont)]
+%[insert:function(_iswcsymf_l = iswsymstrt_l)]
+%[insert:function(_iswcsym_l = iswsymcont_l)]
 %#endif /* !_WCTYPE_DEFINED */
 %#endif /* __USE_DOS */
 

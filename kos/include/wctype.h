@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x69935374 */
+/* HASH CRC-32:0x1311bf71 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -893,6 +893,32 @@ __CREDIRECT(__ATTR_WUNUSED __ATTR_NONNULL((1)),__wctrans_t,__NOTHROW_NCX,wctrans
 __NAMESPACE_LOCAL_USING_OR_IMPL(wctrans_l, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_WUNUSED __ATTR_NONNULL((1)) __wctrans_t __NOTHROW_NCX(__LIBCCALL wctrans_l)(char const *__prop, __locale_t __locale) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(wctrans_l))(__prop, __locale); })
 #endif /* ... */
 #endif /* __USE_XOPEN2K8 */
+#ifdef __USE_KOS
+#ifdef __CRT_HAVE___iswcsymf
+__CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,int,__NOTHROW_NCX,iswsymstrt,(__WINT_TYPE__ __wc),__iswcsymf,(__wc))
+#else /* __CRT_HAVE___iswcsymf */
+#include <libc/local/wctype/iswsymstrt.h>
+__NAMESPACE_LOCAL_USING_OR_IMPL(iswsymstrt, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_CONST __ATTR_WUNUSED int __NOTHROW_NCX(__LIBCCALL iswsymstrt)(__WINT_TYPE__ __wc) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(iswsymstrt))(__wc); })
+#endif /* !__CRT_HAVE___iswcsymf */
+#ifdef __CRT_HAVE___iswcsym
+__CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,int,__NOTHROW_NCX,iswsymcont,(__WINT_TYPE__ __wc),__iswcsym,(__wc))
+#else /* __CRT_HAVE___iswcsym */
+#include <libc/local/wctype/iswsymcont.h>
+__NAMESPACE_LOCAL_USING_OR_IMPL(iswsymcont, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_CONST __ATTR_WUNUSED int __NOTHROW_NCX(__LIBCCALL iswsymcont)(__WINT_TYPE__ __wc) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(iswsymcont))(__wc); })
+#endif /* !__CRT_HAVE___iswcsym */
+#ifdef __CRT_HAVE__iswcsymf_l
+__CREDIRECT(__ATTR_PURE __ATTR_WUNUSED,int,__NOTHROW_NCX,iswsymstrt_l,(__WINT_TYPE__ __wc, __locale_t __locale),_iswcsymf_l,(__wc,__locale))
+#else /* __CRT_HAVE__iswcsymf_l */
+#include <libc/local/wctype/iswsymstrt_l.h>
+__NAMESPACE_LOCAL_USING_OR_IMPL(iswsymstrt_l, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_PURE __ATTR_WUNUSED int __NOTHROW_NCX(__LIBCCALL iswsymstrt_l)(__WINT_TYPE__ __wc, __locale_t __locale) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(iswsymstrt_l))(__wc, __locale); })
+#endif /* !__CRT_HAVE__iswcsymf_l */
+#ifdef __CRT_HAVE__iswcsym_l
+__CREDIRECT(__ATTR_PURE __ATTR_WUNUSED,int,__NOTHROW_NCX,iswsymcont_l,(__WINT_TYPE__ __wc, __locale_t __locale),_iswcsym_l,(__wc,__locale))
+#else /* __CRT_HAVE__iswcsym_l */
+#include <libc/local/wctype/iswsymcont_l.h>
+__NAMESPACE_LOCAL_USING_OR_IMPL(iswsymcont_l, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_PURE __ATTR_WUNUSED int __NOTHROW_NCX(__LIBCCALL iswsymcont_l)(__WINT_TYPE__ __wc, __locale_t __locale) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(iswsymcont_l))(__wc, __locale); })
+#endif /* !__CRT_HAVE__iswcsym_l */
+#endif /* __USE_KOS */
 
 #ifdef __USE_DOS
 #ifndef __wctype_t_defined
@@ -1259,26 +1285,26 @@ __NAMESPACE_LOCAL_USING_OR_IMPL(_isleadbyte_l, __FORCELOCAL __ATTR_ARTIFICIAL __
 #ifdef __CRT_HAVE___iswcsymf
 __CDECLARE(__ATTR_CONST __ATTR_WUNUSED,int,__NOTHROW_NCX,__iswcsymf,(__WINT_TYPE__ __wc),(__wc))
 #else /* __CRT_HAVE___iswcsymf */
-#include <libc/local/wctype/__iswcsymf.h>
-__NAMESPACE_LOCAL_USING_OR_IMPL(__iswcsymf, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_CONST __ATTR_WUNUSED int __NOTHROW_NCX(__LIBCCALL __iswcsymf)(__WINT_TYPE__ __wc) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(__iswcsymf))(__wc); })
+#include <libc/local/wctype/iswsymstrt.h>
+__FORCELOCAL __ATTR_ARTIFICIAL __ATTR_CONST __ATTR_WUNUSED int __NOTHROW_NCX(__LIBCCALL __iswcsymf)(__WINT_TYPE__ __wc) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(iswsymstrt))(__wc); }
 #endif /* !__CRT_HAVE___iswcsymf */
 #ifdef __CRT_HAVE___iswcsym
 __CDECLARE(__ATTR_CONST __ATTR_WUNUSED,int,__NOTHROW_NCX,__iswcsym,(__WINT_TYPE__ __wc),(__wc))
 #else /* __CRT_HAVE___iswcsym */
-#include <libc/local/wctype/__iswcsym.h>
-__NAMESPACE_LOCAL_USING_OR_IMPL(__iswcsym, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_CONST __ATTR_WUNUSED int __NOTHROW_NCX(__LIBCCALL __iswcsym)(__WINT_TYPE__ __wc) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(__iswcsym))(__wc); })
+#include <libc/local/wctype/iswsymcont.h>
+__FORCELOCAL __ATTR_ARTIFICIAL __ATTR_CONST __ATTR_WUNUSED int __NOTHROW_NCX(__LIBCCALL __iswcsym)(__WINT_TYPE__ __wc) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(iswsymcont))(__wc); }
 #endif /* !__CRT_HAVE___iswcsym */
 #ifdef __CRT_HAVE__iswcsymf_l
 __CDECLARE(__ATTR_PURE __ATTR_WUNUSED,int,__NOTHROW_NCX,_iswcsymf_l,(__WINT_TYPE__ __wc, __locale_t __locale),(__wc,__locale))
 #else /* __CRT_HAVE__iswcsymf_l */
-#include <libc/local/wctype/_iswcsymf_l.h>
-__NAMESPACE_LOCAL_USING_OR_IMPL(_iswcsymf_l, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_PURE __ATTR_WUNUSED int __NOTHROW_NCX(__LIBCCALL _iswcsymf_l)(__WINT_TYPE__ __wc, __locale_t __locale) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(_iswcsymf_l))(__wc, __locale); })
+#include <libc/local/wctype/iswsymstrt_l.h>
+__FORCELOCAL __ATTR_ARTIFICIAL __ATTR_PURE __ATTR_WUNUSED int __NOTHROW_NCX(__LIBCCALL _iswcsymf_l)(__WINT_TYPE__ __wc, __locale_t __locale) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(iswsymstrt_l))(__wc, __locale); }
 #endif /* !__CRT_HAVE__iswcsymf_l */
 #ifdef __CRT_HAVE__iswcsym_l
 __CDECLARE(__ATTR_PURE __ATTR_WUNUSED,int,__NOTHROW_NCX,_iswcsym_l,(__WINT_TYPE__ __wc, __locale_t __locale),(__wc,__locale))
 #else /* __CRT_HAVE__iswcsym_l */
-#include <libc/local/wctype/_iswcsym_l.h>
-__NAMESPACE_LOCAL_USING_OR_IMPL(_iswcsym_l, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_PURE __ATTR_WUNUSED int __NOTHROW_NCX(__LIBCCALL _iswcsym_l)(__WINT_TYPE__ __wc, __locale_t __locale) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(_iswcsym_l))(__wc, __locale); })
+#include <libc/local/wctype/iswsymcont_l.h>
+__FORCELOCAL __ATTR_ARTIFICIAL __ATTR_PURE __ATTR_WUNUSED int __NOTHROW_NCX(__LIBCCALL _iswcsym_l)(__WINT_TYPE__ __wc, __locale_t __locale) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(iswsymcont_l))(__wc, __locale); }
 #endif /* !__CRT_HAVE__iswcsym_l */
 #endif /* !_WCTYPE_DEFINED */
 #endif /* __USE_DOS */

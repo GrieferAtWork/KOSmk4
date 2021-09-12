@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x9a230f7c */
+/* HASH CRC-32:0x228159c7 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -22,8 +22,8 @@
 #define __local_c16scasecmp_defined 1
 #include <__crt.h>
 __NAMESPACE_LOCAL_BEGIN
-#ifndef __local___localdep_toulower16_defined
-#define __local___localdep_toulower16_defined 1
+#ifndef __local___localdep_tolower16_defined
+#define __local___localdep_tolower16_defined 1
 __NAMESPACE_LOCAL_END
 #include <bits/crt/wctype.h>
 __NAMESPACE_LOCAL_BEGIN
@@ -31,46 +31,46 @@ __NAMESPACE_LOCAL_BEGIN
 __NAMESPACE_LOCAL_END
 #include <hybrid/typecore.h>
 __NAMESPACE_LOCAL_BEGIN
-__COMPILER_EIREDIRECT(__ATTR_CONST __ATTR_WUNUSED,__WINT16_TYPE__,__NOTHROW,__LIBDCALL,__localdep_toulower16,(__WINT16_TYPE__ __wc),towlower,{ return __crt_towlower(__wc); })
+__COMPILER_EIREDIRECT(__ATTR_CONST __ATTR_WUNUSED,__WINT16_TYPE__,__NOTHROW,__LIBDCALL,__localdep_tolower16,(__WINT16_TYPE__ __wc),towlower,{ return __crt_towlower(__wc); })
 #elif defined(__crt_towlower) && __SIZEOF_WCHAR_T__ == 2
 __NAMESPACE_LOCAL_END
 #include <hybrid/typecore.h>
 __NAMESPACE_LOCAL_BEGIN
-__LOCAL __ATTR_CONST __ATTR_WUNUSED __WINT16_TYPE__ __NOTHROW(__LIBDCALL __localdep_toulower16)(__WINT16_TYPE__ __wc) { return __crt_towlower(__wc); }
+__LOCAL __ATTR_CONST __ATTR_WUNUSED __WINT16_TYPE__ __NOTHROW(__LIBDCALL __localdep_tolower16)(__WINT16_TYPE__ __wc) { return __crt_towlower(__wc); }
 #elif __has_builtin(__builtin_towlower) && defined(__LIBC_BIND_CRTBUILTINS) && defined(__CRT_HAVE_towlower) && __SIZEOF_WCHAR_T__ == 2
 __NAMESPACE_LOCAL_END
 #include <hybrid/typecore.h>
 __NAMESPACE_LOCAL_BEGIN
-__COMPILER_EIREDIRECT(__ATTR_CONST __ATTR_WUNUSED,__WINT16_TYPE__,__NOTHROW,__LIBDCALL,__localdep_toulower16,(__WINT16_TYPE__ __wc),towlower,{ return __builtin_towlower(__wc); })
+__COMPILER_EIREDIRECT(__ATTR_CONST __ATTR_WUNUSED,__WINT16_TYPE__,__NOTHROW,__LIBDCALL,__localdep_tolower16,(__WINT16_TYPE__ __wc),towlower,{ return __builtin_towlower(__wc); })
 #elif defined(__CRT_HAVE_towlower) && __SIZEOF_WCHAR_T__ == 2 && defined(__LIBCCALL_IS_LIBDCALL)
 __NAMESPACE_LOCAL_END
 #include <hybrid/typecore.h>
 __NAMESPACE_LOCAL_BEGIN
-__CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,__WINT16_TYPE__,__NOTHROW,__localdep_toulower16,(__WINT16_TYPE__ __wc),towlower,(__wc))
+__CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,__WINT16_TYPE__,__NOTHROW,__localdep_tolower16,(__WINT16_TYPE__ __wc),towlower,(__wc))
 #elif defined(__CRT_HAVE_DOS$towlower)
 __NAMESPACE_LOCAL_END
 #include <hybrid/typecore.h>
 __NAMESPACE_LOCAL_BEGIN
-__CREDIRECT_DOS(__ATTR_CONST __ATTR_WUNUSED,__WINT16_TYPE__,__NOTHROW,__localdep_toulower16,(__WINT16_TYPE__ __wc),towlower,(__wc))
+__CREDIRECT_DOS(__ATTR_CONST __ATTR_WUNUSED,__WINT16_TYPE__,__NOTHROW,__localdep_tolower16,(__WINT16_TYPE__ __wc),towlower,(__wc))
 #elif __SIZEOF_WCHAR_T__ == 2
 __NAMESPACE_LOCAL_END
 #include <libc/local/wctype/towlower.h>
 __NAMESPACE_LOCAL_BEGIN
-#define __localdep_toulower16 (*(__WINT16_TYPE__(__LIBDCALL *)(__WINT16_TYPE__))&__LIBC_LOCAL_NAME(towlower))
+#define __localdep_tolower16 (*(__WINT16_TYPE__(__LIBDCALL *)(__WINT16_TYPE__))&__LIBC_LOCAL_NAME(towlower))
 #else /* ... */
 __NAMESPACE_LOCAL_END
-#include <libc/local/parts.uchar.wctype/toulower16.h>
+#include <libc/local/parts.uchar.wctype/tolower16.h>
 __NAMESPACE_LOCAL_BEGIN
-#define __localdep_toulower16 __LIBC_LOCAL_NAME(toulower16)
+#define __localdep_tolower16 __LIBC_LOCAL_NAME(tolower16)
 #endif /* !... */
-#endif /* !__local___localdep_toulower16_defined */
+#endif /* !__local___localdep_tolower16_defined */
 __LOCAL_LIBC(c16scasecmp) __ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1, 2)) int
 __NOTHROW_NCX(__LIBDCALL __LIBC_LOCAL_NAME(c16scasecmp))(__CHAR16_TYPE__ const *__s1, __CHAR16_TYPE__ const *__s2) {
 	__CHAR16_TYPE__ __c1, __c2;
 	do {
 		if ((__c1 = *__s1++) != (__c2 = *__s2++) &&
-		    ((__c1 = (__CHAR16_TYPE__)__localdep_toulower16((__CHAR16_TYPE__)__c1)) !=
-		     (__c2 = (__CHAR16_TYPE__)__localdep_toulower16((__CHAR16_TYPE__)__c2))))
+		    ((__c1 = (__CHAR16_TYPE__)__localdep_tolower16((__CHAR16_TYPE__)__c1)) !=
+		     (__c2 = (__CHAR16_TYPE__)__localdep_tolower16((__CHAR16_TYPE__)__c2))))
 			return (int)((__CHAR16_TYPE__)__c1 - (__CHAR16_TYPE__)__c2);
 	} while (__c1);
 	return 0;

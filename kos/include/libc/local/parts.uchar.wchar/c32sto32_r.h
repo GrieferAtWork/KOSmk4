@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x9eff3fe0 */
+/* HASH CRC-32:0x9bcafaff */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -24,8 +24,8 @@
 #include <features.h>
 #include <bits/types.h>
 __NAMESPACE_LOCAL_BEGIN
-#ifndef __local___localdep_isuspace32_defined
-#define __local___localdep_isuspace32_defined 1
+#ifndef __local___localdep_isspace32_defined
+#define __local___localdep_isspace32_defined 1
 __NAMESPACE_LOCAL_END
 #include <bits/crt/wctype.h>
 __NAMESPACE_LOCAL_BEGIN
@@ -33,39 +33,39 @@ __NAMESPACE_LOCAL_BEGIN
 __NAMESPACE_LOCAL_END
 #include <hybrid/typecore.h>
 __NAMESPACE_LOCAL_BEGIN
-__COMPILER_EIREDIRECT(__ATTR_CONST __ATTR_WUNUSED,int,__NOTHROW,__LIBKCALL,__localdep_isuspace32,(__WINT32_TYPE__ __wc),iswspace,{ return __crt_iswspace(__wc); })
+__COMPILER_EIREDIRECT(__ATTR_CONST __ATTR_WUNUSED,int,__NOTHROW,__LIBKCALL,__localdep_isspace32,(__WINT32_TYPE__ __wc),iswspace,{ return __crt_iswspace(__wc); })
 #elif defined(__crt_iswspace) && __SIZEOF_WCHAR_T__ == 4
 __NAMESPACE_LOCAL_END
 #include <hybrid/typecore.h>
 __NAMESPACE_LOCAL_BEGIN
-__LOCAL __ATTR_CONST __ATTR_WUNUSED int __NOTHROW(__LIBKCALL __localdep_isuspace32)(__WINT32_TYPE__ __wc) { return __crt_iswspace(__wc); }
+__LOCAL __ATTR_CONST __ATTR_WUNUSED int __NOTHROW(__LIBKCALL __localdep_isspace32)(__WINT32_TYPE__ __wc) { return __crt_iswspace(__wc); }
 #elif __has_builtin(__builtin_iswspace) && defined(__LIBC_BIND_CRTBUILTINS) && defined(__CRT_HAVE_iswspace) && __SIZEOF_WCHAR_T__ == 4
 __NAMESPACE_LOCAL_END
 #include <hybrid/typecore.h>
 __NAMESPACE_LOCAL_BEGIN
-__COMPILER_EIREDIRECT(__ATTR_CONST __ATTR_WUNUSED,int,__NOTHROW,__LIBKCALL,__localdep_isuspace32,(__WINT32_TYPE__ __wc),iswspace,{ return __builtin_iswspace(__wc); })
+__COMPILER_EIREDIRECT(__ATTR_CONST __ATTR_WUNUSED,int,__NOTHROW,__LIBKCALL,__localdep_isspace32,(__WINT32_TYPE__ __wc),iswspace,{ return __builtin_iswspace(__wc); })
 #elif defined(__CRT_HAVE_iswspace) && __SIZEOF_WCHAR_T__ == 4 && defined(__LIBCCALL_IS_LIBKCALL)
 __NAMESPACE_LOCAL_END
 #include <hybrid/typecore.h>
 __NAMESPACE_LOCAL_BEGIN
-__CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,int,__NOTHROW,__localdep_isuspace32,(__WINT32_TYPE__ __wc),iswspace,(__wc))
+__CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,int,__NOTHROW,__localdep_isspace32,(__WINT32_TYPE__ __wc),iswspace,(__wc))
 #elif defined(__CRT_HAVE_KOS$iswspace)
 __NAMESPACE_LOCAL_END
 #include <hybrid/typecore.h>
 __NAMESPACE_LOCAL_BEGIN
-__CREDIRECT_KOS(__ATTR_CONST __ATTR_WUNUSED,int,__NOTHROW,__localdep_isuspace32,(__WINT32_TYPE__ __wc),iswspace,(__wc))
+__CREDIRECT_KOS(__ATTR_CONST __ATTR_WUNUSED,int,__NOTHROW,__localdep_isspace32,(__WINT32_TYPE__ __wc),iswspace,(__wc))
 #elif __SIZEOF_WCHAR_T__ == 4
 __NAMESPACE_LOCAL_END
 #include <libc/local/wctype/iswspace.h>
 __NAMESPACE_LOCAL_BEGIN
-#define __localdep_isuspace32 (*(int(__LIBKCALL *)(__WINT32_TYPE__))&__LIBC_LOCAL_NAME(iswspace))
+#define __localdep_isspace32 (*(int(__LIBKCALL *)(__WINT32_TYPE__))&__LIBC_LOCAL_NAME(iswspace))
 #else /* ... */
 __NAMESPACE_LOCAL_END
-#include <libc/local/parts.uchar.wctype/isuspace32.h>
+#include <libc/local/parts.uchar.wctype/isspace32.h>
 __NAMESPACE_LOCAL_BEGIN
-#define __localdep_isuspace32 __LIBC_LOCAL_NAME(isuspace32)
+#define __localdep_isspace32 __LIBC_LOCAL_NAME(isspace32)
 #endif /* !... */
-#endif /* !__local___localdep_isuspace32_defined */
+#endif /* !__local___localdep_isspace32_defined */
 __NAMESPACE_LOCAL_END
 #include <asm/os/errno.h>
 #include <hybrid/__overflow.h>
@@ -77,7 +77,7 @@ __NOTHROW_NCX(__LIBKCALL __LIBC_LOCAL_NAME(c32sto32_r))(__CHAR32_TYPE__ const *_
 	__CHAR32_TYPE__ __sign;
 	__CHAR32_TYPE__ const *__num_start = __nptr;
 	__CHAR32_TYPE__ const *__num_iter;
-	while (__localdep_isuspace32(*__num_start))
+	while (__localdep_isspace32(*__num_start))
 		++__num_start;
 	__sign = *__num_start;
 	if (__sign == '-' || __sign == '+')
@@ -180,7 +180,7 @@ __handle_overflow:
 			*__error = 0;
 			/* Check for `EINVAL' */
 			if __unlikely(*__num_iter) {
-				while (__localdep_isuspace32(*__num_iter))
+				while (__localdep_isspace32(*__num_iter))
 					++__num_iter;
 				if (*__num_iter) {
 #ifdef __EINVAL

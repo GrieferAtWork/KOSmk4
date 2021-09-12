@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xc748cc35 */
+/* HASH CRC-32:0x333d2891 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -22,8 +22,8 @@
 #define __local_c16supr_defined 1
 #include <__crt.h>
 __NAMESPACE_LOCAL_BEGIN
-#ifndef __local___localdep_touupper16_defined
-#define __local___localdep_touupper16_defined 1
+#ifndef __local___localdep_toupper16_defined
+#define __local___localdep_toupper16_defined 1
 __NAMESPACE_LOCAL_END
 #include <bits/crt/wctype.h>
 __NAMESPACE_LOCAL_BEGIN
@@ -31,44 +31,44 @@ __NAMESPACE_LOCAL_BEGIN
 __NAMESPACE_LOCAL_END
 #include <hybrid/typecore.h>
 __NAMESPACE_LOCAL_BEGIN
-__COMPILER_EIREDIRECT(__ATTR_CONST __ATTR_WUNUSED,__WINT16_TYPE__,__NOTHROW,__LIBDCALL,__localdep_touupper16,(__WINT16_TYPE__ __wc),towupper,{ return __crt_towupper(__wc); })
+__COMPILER_EIREDIRECT(__ATTR_CONST __ATTR_WUNUSED,__WINT16_TYPE__,__NOTHROW,__LIBDCALL,__localdep_toupper16,(__WINT16_TYPE__ __wc),towupper,{ return __crt_towupper(__wc); })
 #elif defined(__crt_towupper) && __SIZEOF_WCHAR_T__ == 2
 __NAMESPACE_LOCAL_END
 #include <hybrid/typecore.h>
 __NAMESPACE_LOCAL_BEGIN
-__LOCAL __ATTR_CONST __ATTR_WUNUSED __WINT16_TYPE__ __NOTHROW(__LIBDCALL __localdep_touupper16)(__WINT16_TYPE__ __wc) { return __crt_towupper(__wc); }
+__LOCAL __ATTR_CONST __ATTR_WUNUSED __WINT16_TYPE__ __NOTHROW(__LIBDCALL __localdep_toupper16)(__WINT16_TYPE__ __wc) { return __crt_towupper(__wc); }
 #elif __has_builtin(__builtin_towupper) && defined(__LIBC_BIND_CRTBUILTINS) && defined(__CRT_HAVE_towupper) && __SIZEOF_WCHAR_T__ == 2
 __NAMESPACE_LOCAL_END
 #include <hybrid/typecore.h>
 __NAMESPACE_LOCAL_BEGIN
-__COMPILER_EIREDIRECT(__ATTR_CONST __ATTR_WUNUSED,__WINT16_TYPE__,__NOTHROW,__LIBDCALL,__localdep_touupper16,(__WINT16_TYPE__ __wc),towupper,{ return __builtin_towupper(__wc); })
+__COMPILER_EIREDIRECT(__ATTR_CONST __ATTR_WUNUSED,__WINT16_TYPE__,__NOTHROW,__LIBDCALL,__localdep_toupper16,(__WINT16_TYPE__ __wc),towupper,{ return __builtin_towupper(__wc); })
 #elif defined(__CRT_HAVE_towupper) && __SIZEOF_WCHAR_T__ == 2 && defined(__LIBCCALL_IS_LIBDCALL)
 __NAMESPACE_LOCAL_END
 #include <hybrid/typecore.h>
 __NAMESPACE_LOCAL_BEGIN
-__CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,__WINT16_TYPE__,__NOTHROW,__localdep_touupper16,(__WINT16_TYPE__ __wc),towupper,(__wc))
+__CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,__WINT16_TYPE__,__NOTHROW,__localdep_toupper16,(__WINT16_TYPE__ __wc),towupper,(__wc))
 #elif defined(__CRT_HAVE_DOS$towupper)
 __NAMESPACE_LOCAL_END
 #include <hybrid/typecore.h>
 __NAMESPACE_LOCAL_BEGIN
-__CREDIRECT_DOS(__ATTR_CONST __ATTR_WUNUSED,__WINT16_TYPE__,__NOTHROW,__localdep_touupper16,(__WINT16_TYPE__ __wc),towupper,(__wc))
+__CREDIRECT_DOS(__ATTR_CONST __ATTR_WUNUSED,__WINT16_TYPE__,__NOTHROW,__localdep_toupper16,(__WINT16_TYPE__ __wc),towupper,(__wc))
 #elif __SIZEOF_WCHAR_T__ == 2
 __NAMESPACE_LOCAL_END
 #include <libc/local/wctype/towupper.h>
 __NAMESPACE_LOCAL_BEGIN
-#define __localdep_touupper16 (*(__WINT16_TYPE__(__LIBDCALL *)(__WINT16_TYPE__))&__LIBC_LOCAL_NAME(towupper))
+#define __localdep_toupper16 (*(__WINT16_TYPE__(__LIBDCALL *)(__WINT16_TYPE__))&__LIBC_LOCAL_NAME(towupper))
 #else /* ... */
 __NAMESPACE_LOCAL_END
-#include <libc/local/parts.uchar.wctype/touupper16.h>
+#include <libc/local/parts.uchar.wctype/toupper16.h>
 __NAMESPACE_LOCAL_BEGIN
-#define __localdep_touupper16 __LIBC_LOCAL_NAME(touupper16)
+#define __localdep_toupper16 __LIBC_LOCAL_NAME(toupper16)
 #endif /* !... */
-#endif /* !__local___localdep_touupper16_defined */
+#endif /* !__local___localdep_toupper16_defined */
 __LOCAL_LIBC(c16supr) __ATTR_RETNONNULL __ATTR_NONNULL((1)) __CHAR16_TYPE__ *
 __NOTHROW_NCX(__LIBDCALL __LIBC_LOCAL_NAME(c16supr))(__CHAR16_TYPE__ *__restrict __str) {
 	__CHAR16_TYPE__ *__iter, __ch;
 	for (__iter = __str; (__ch = *__iter) != '\0'; ++__iter)
-		*__iter = (__CHAR16_TYPE__)__localdep_touupper16((__CHAR16_TYPE__)__ch);
+		*__iter = (__CHAR16_TYPE__)__localdep_toupper16((__CHAR16_TYPE__)__ch);
 	return __str;
 }
 __NAMESPACE_LOCAL_END

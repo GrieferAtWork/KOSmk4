@@ -129,46 +129,46 @@ static void testw(wint_t ch) {
 
 static void testw16(wint16_t ch) {
 	if (ch == WEOF16) {
-		assertf(WEOF16 == toulower16(ch), "%d", ch);
-		assertf(WEOF16 == touupper16(ch), "%d", ch);
+		assertf(WEOF16 == tolower16(ch), "%d", ch);
+		assertf(WEOF16 == toupper16(ch), "%d", ch);
 	} else {
-		assertf((wint16_t)ascii_tolower(ch) == toulower16(ch), "%d", ch);
-		assertf((wint16_t)ascii_toupper(ch) == touupper16(ch), "%d", ch);
+		assertf((wint16_t)ascii_tolower(ch) == tolower16(ch), "%d", ch);
+		assertf((wint16_t)ascii_toupper(ch) == toupper16(ch), "%d", ch);
 	}
-	assertf(!!ascii_iscntrl(ch) == !!isucntrl16(ch), "%d", ch);
-	assertf(!!ascii_isspace(ch) == !!isuspace16(ch), "%d", ch);
-	assertf(!!ascii_isupper(ch) == !!isuupper16(ch), "%d", ch);
-	assertf(!!ascii_islower(ch) == !!isulower16(ch), "%d", ch);
-	assertf(!!ascii_isalpha(ch) == !!isualpha16(ch), "%d", ch);
-	assertf(!!ascii_isdigit(ch) == !!isudigit16(ch), "%d", ch);
-	assertf(!!ascii_isxdigit(ch) == !!isuxdigit16(ch), "%d", ch);
-	assertf(!!ascii_isalnum(ch) == !!isualnum16(ch), "%d", ch);
-	assertf(!!ascii_ispunct(ch) == !!isupunct16(ch), "%d", ch);
-	assertf(!!ascii_isgraph(ch) == !!isugraph16(ch), "%d", ch);
-	assertf(!!ascii_isprint(ch) == !!isuprint16(ch), "%d", ch);
-	assertf(!!ascii_isblank(ch) == !!isublank16(ch), "%d", ch);
+	assertf(!!ascii_iscntrl(ch) == !!iscntrl16(ch), "%d", ch);
+	assertf(!!ascii_isspace(ch) == !!isspace16(ch), "%d", ch);
+	assertf(!!ascii_isupper(ch) == !!isupper16(ch), "%d", ch);
+	assertf(!!ascii_islower(ch) == !!islower16(ch), "%d", ch);
+	assertf(!!ascii_isalpha(ch) == !!isalpha16(ch), "%d", ch);
+	assertf(!!ascii_isdigit(ch) == !!isdigit16(ch), "%d", ch);
+	assertf(!!ascii_isxdigit(ch) == !!isxdigit16(ch), "%d", ch);
+	assertf(!!ascii_isalnum(ch) == !!isalnum16(ch), "%d", ch);
+	assertf(!!ascii_ispunct(ch) == !!ispunct16(ch), "%d", ch);
+	assertf(!!ascii_isgraph(ch) == !!isgraph16(ch), "%d", ch);
+	assertf(!!ascii_isprint(ch) == !!isprint16(ch), "%d", ch);
+	assertf(!!ascii_isblank(ch) == !!isblank16(ch), "%d", ch);
 }
 
 static void testw32(wint32_t ch) {
 	if (ch == WEOF32) {
-		assertf(WEOF32 == toulower32(ch), "%d", ch);
-		assertf(WEOF32 == touupper32(ch), "%d", ch);
+		assertf(WEOF32 == tolower32(ch), "%d", ch);
+		assertf(WEOF32 == toupper32(ch), "%d", ch);
 	} else {
-		assertf((wint32_t)ascii_tolower(ch) == toulower32(ch), "%d", ch);
-		assertf((wint32_t)ascii_toupper(ch) == touupper32(ch), "%d", ch);
+		assertf((wint32_t)ascii_tolower(ch) == tolower32(ch), "%d", ch);
+		assertf((wint32_t)ascii_toupper(ch) == toupper32(ch), "%d", ch);
 	}
-	assertf(!!ascii_iscntrl(ch) == !!isucntrl32(ch), "%d", ch);
-	assertf(!!ascii_isspace(ch) == !!isuspace32(ch), "%d", ch);
-	assertf(!!ascii_isupper(ch) == !!isuupper32(ch), "%d", ch);
-	assertf(!!ascii_islower(ch) == !!isulower32(ch), "%d", ch);
-	assertf(!!ascii_isalpha(ch) == !!isualpha32(ch), "%d", ch);
-	assertf(!!ascii_isdigit(ch) == !!isudigit32(ch), "%d", ch);
-	assertf(!!ascii_isxdigit(ch) == !!isuxdigit32(ch), "%d", ch);
-	assertf(!!ascii_isalnum(ch) == !!isualnum32(ch), "%d", ch);
-	assertf(!!ascii_ispunct(ch) == !!isupunct32(ch), "%d", ch);
-	assertf(!!ascii_isgraph(ch) == !!isugraph32(ch), "%d", ch);
-	assertf(!!ascii_isprint(ch) == !!isuprint32(ch), "%d", ch);
-	assertf(!!ascii_isblank(ch) == !!isublank32(ch), "%d", ch);
+	assertf(!!ascii_iscntrl(ch) == !!iscntrl32(ch), "%d", ch);
+	assertf(!!ascii_isspace(ch) == !!isspace32(ch), "%d", ch);
+	assertf(!!ascii_isupper(ch) == !!isupper32(ch), "%d", ch);
+	assertf(!!ascii_islower(ch) == !!islower32(ch), "%d", ch);
+	assertf(!!ascii_isalpha(ch) == !!isalpha32(ch), "%d", ch);
+	assertf(!!ascii_isdigit(ch) == !!isdigit32(ch), "%d", ch);
+	assertf(!!ascii_isxdigit(ch) == !!isxdigit32(ch), "%d", ch);
+	assertf(!!ascii_isalnum(ch) == !!isalnum32(ch), "%d", ch);
+	assertf(!!ascii_ispunct(ch) == !!ispunct32(ch), "%d", ch);
+	assertf(!!ascii_isgraph(ch) == !!isgraph32(ch), "%d", ch);
+	assertf(!!ascii_isprint(ch) == !!isprint32(ch), "%d", ch);
+	assertf(!!ascii_isblank(ch) == !!isblank32(ch), "%d", ch);
 }
 
 
