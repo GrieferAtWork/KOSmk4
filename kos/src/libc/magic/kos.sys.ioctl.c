@@ -20,6 +20,7 @@
 
 %[define_replacement(fd_t = __fd_t)]
 %[default:section(".text.crt{|.dos}.except.io.utility")]
+%[default:nodos]
 
 %[insert:prefix(
 #include <sys/ioctl.h>

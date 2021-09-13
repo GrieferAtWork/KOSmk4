@@ -18,6 +18,7 @@
  * 3. This notice may not be removed or altered from any source distribution. *
  */
 %[default:section(".text.crt{|.dos}.kos.syscalls")]
+%[default:nodos]
 
 %[insert:prefix(
 #include <hybrid/typecore.h>

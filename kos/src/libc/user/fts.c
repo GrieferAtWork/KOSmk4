@@ -56,13 +56,13 @@ NOTHROW_NCX(LIBCCALL libc_fts_close)(FTS *ftsp)
 }
 /*[[[end:libc_fts_close]]]*/
 
-/*[[[head:libc_fts_open,hash:CRC-32=0x49d98036]]]*/
+/*[[[head:libc_fts_open,hash:CRC-32=0xf32dec19]]]*/
 /* >> fts_open(3), fts_open64(3)
  * @param: options: Set of `FTS_COMFOLLOW | FTS_LOGICAL | ... | FTS_STOP' */
 INTERN ATTR_SECTION(".text.crt.fs.fts") WUNUSED NONNULL((1)) FTS *
 NOTHROW_RPC(LIBCCALL libc_fts_open)(char *const *path_argv,
                                     __STDC_INT_AS_UINT_T options,
-                                    __fts_open_compar_t compar)
+                                    int (LIBKCALL *compar)(FTSENT const **lhs, FTSENT const **rhs))
 /*[[[body:libc_fts_open]]]*/
 /*AUTO*/{
 	(void)path_argv;
@@ -142,7 +142,7 @@ NOTHROW_RPC(LIBCCALL libc_fts64_close)(FTS64 *ftsp)
 #endif /* MAGIC:alias */
 /*[[[end:libc_fts64_close]]]*/
 
-/*[[[head:libc_fts64_open,hash:CRC-32=0xa5c3f27c]]]*/
+/*[[[head:libc_fts64_open,hash:CRC-32=0x5538f786]]]*/
 #ifdef __FTS32_MATCHES_FTS64
 DEFINE_INTERN_ALIAS(libc_fts64_open, libc_fts_open);
 #else /* MAGIC:alias */
@@ -151,7 +151,7 @@ DEFINE_INTERN_ALIAS(libc_fts64_open, libc_fts_open);
 INTERN ATTR_SECTION(".text.crt.fs.fts") WUNUSED NONNULL((1)) FTS64 *
 NOTHROW_RPC(LIBCCALL libc_fts64_open)(char *const *path_argv,
                                       __STDC_INT_AS_UINT_T options,
-                                      __fts_open_compar64_t compar)
+                                      int (LIBKCALL *compar)(FTSENT64 const **lhs, FTSENT64 const **rhs))
 /*[[[body:libc_fts64_open]]]*/
 /*AUTO*/{
 	(void)path_argv;

@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x6aefdb12 */
+/* HASH CRC-32:0x3e0cbcb0 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -29,19 +29,19 @@
 
 DECL_BEGIN
 
-#if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
+#if !defined(__KERNEL__) && !defined(__LIBCCALL_IS_LIBDCALL)
 /* >> thrd_create(3)
  * Create and start a new thread (s.a. `pthread_create(3)')
  * @return: thrd_success: Success
  * @return: thrd_error:   Error */
-INTDEF int NOTHROW_NCX(LIBDCALL libd_thrd_create)(thrd_t *thr, thrd_start_t func, void *arg);
-#endif /* !__LIBCCALL_IS_LIBDCALL && !__KERNEL__ */
+INTDEF int NOTHROW_NCX(LIBDCALL libd_thrd_create)(thrd_t *thr, int (LIBDCALL *func)(void *arg), void *arg);
+#endif /* !__KERNEL__ && !__LIBCCALL_IS_LIBDCALL */
 #ifndef __KERNEL__
 /* >> thrd_create(3)
  * Create and start a new thread (s.a. `pthread_create(3)')
  * @return: thrd_success: Success
  * @return: thrd_error:   Error */
-INTDEF int NOTHROW_NCX(LIBCCALL libc_thrd_create)(thrd_t *thr, thrd_start_t func, void *arg);
+INTDEF int NOTHROW_NCX(LIBCCALL libc_thrd_create)(thrd_t *thr, int (LIBCCALL *func)(void *arg), void *arg);
 #endif /* !__KERNEL__ */
 #if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
 /* >> thrd_sleep(3), thrd_sleep64(3)
@@ -280,14 +280,14 @@ INTDEF NONNULL((1, 2, 3)) int NOTHROW_RPC(LIBCCALL libc_cnd_timedwait64)(cnd_t *
  * Create a new TLS key (s.a. `pthread_key_create(3)')
  * @return: thrd_success: Success
  * @return: thrd_error:   Error */
-INTDEF int NOTHROW_NCX(LIBDCALL libd_tss_create)(tss_t *tss_id, tss_dtor_t destructor);
+INTDEF int NOTHROW_NCX(LIBDCALL libd_tss_create)(tss_t *tss_id, void (LIBKCALL *destructor)(void *arg));
 #endif /* !__LIBCCALL_IS_LIBDCALL && !__KERNEL__ */
 #ifndef __KERNEL__
 /* >> tss_create(3)
  * Create a new TLS key (s.a. `pthread_key_create(3)')
  * @return: thrd_success: Success
  * @return: thrd_error:   Error */
-INTDEF int NOTHROW_NCX(LIBCCALL libc_tss_create)(tss_t *tss_id, tss_dtor_t destructor);
+INTDEF int NOTHROW_NCX(LIBCCALL libc_tss_create)(tss_t *tss_id, void (LIBKCALL *destructor)(void *arg));
 #endif /* !__KERNEL__ */
 #if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
 /* >> tss_set(3)

@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xf8496ac */
+/* HASH CRC-32:0xe7414ff1 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -57,7 +57,7 @@ typedef __TM_TYPE(time) time_t;
 #ifdef __USE_DOS
 #ifndef __errno_t_defined
 #define __errno_t_defined 1
-typedef int errno_t;
+typedef __errno_t errno_t;
 #endif /* !__errno_t_defined */
 #ifdef __CRT_HAVE__ftime32
 /* Fill in TIMEBUF with information about the current time */

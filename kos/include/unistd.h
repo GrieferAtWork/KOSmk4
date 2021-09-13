@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x2b390a44 */
+/* HASH CRC-32:0x71b2f444 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -2677,11 +2677,6 @@ __NAMESPACE_LOCAL_USING_OR_IMPL(getpeereid, __FORCELOCAL __ATTR_ARTIFICIAL __ATT
 
 
 #if defined(_EVERY_SOURCE) || defined(__USE_SOLARIS) || (defined(__USE_UNIX98) && !defined(__USE_XOPEN2K))
-#ifndef ____pthread_atfork_func_t_defined
-#define ____pthread_atfork_func_t_defined 1
-typedef void (__LIBKCALL *__pthread_atfork_func_t)(void);
-#endif /* !____pthread_atfork_func_t_defined */
-
 #if !defined(__pthread_atfork_defined) && defined(__CRT_HAVE_pthread_atfork)
 #define __pthread_atfork_defined 1
 /* >> pthread_atfork(3)
@@ -2697,7 +2692,7 @@ typedef void (__LIBKCALL *__pthread_atfork_func_t)(void);
  * called in FIFO order (first added -> first called)
  * @return: EOK:    Success
  * @return: ENOMEM: Insufficient memory to register callbacks */
-__CDECLARE(,__errno_t,__NOTHROW_NCX,pthread_atfork,(__pthread_atfork_func_t __prepare, __pthread_atfork_func_t __parent, __pthread_atfork_func_t __child),(__prepare,__parent,__child))
+__CDECLARE(,__errno_t,__NOTHROW_NCX,pthread_atfork,(void (__LIBCCALL *__prepare)(void), void (__LIBCCALL *__parent)(void), void (__LIBCCALL *__child)(void)),(__prepare,__parent,__child))
 #endif /* !__pthread_atfork_defined && __CRT_HAVE_pthread_atfork */
 #endif /* _EVERY_SOURCE || __USE_SOLARIS || (__USE_UNIX98 && !__USE_XOPEN2K) */
 

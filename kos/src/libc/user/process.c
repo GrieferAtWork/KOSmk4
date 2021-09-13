@@ -59,9 +59,9 @@ u32 _BEGINTHREADEX_CC simple_thread_entry(void *arg) {
 }
 
 
-/*[[[head:libc__beginthread,hash:CRC-32=0xd8642289]]]*/
+/*[[[head:libc__beginthread,hash:CRC-32=0xa17b8cf6]]]*/
 INTERN ATTR_SECTION(".text.crt.dos.sched.thread") uintptr_t
-NOTHROW_NCX(LIBCCALL libc__beginthread)(__dos_beginthread_entry_t entry,
+NOTHROW_NCX(LIBCCALL libc__beginthread)(void (LIBDCALL *entry)(void *arg),
                                         u32 stacksz,
                                         void *arg)
 /*[[[body:libc__beginthread]]]*/

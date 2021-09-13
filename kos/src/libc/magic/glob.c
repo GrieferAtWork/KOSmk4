@@ -218,27 +218,14 @@ typedef struct __glob64_struct glob64_t;
 
 #ifndef ____glob_errfunc_t_defined
 #define ____glob_errfunc_t_defined 1
-typedef int (__LIBKCALL *__glob_errfunc_t)(char const *__path, int __flags);
 #endif /* !____glob_errfunc_t_defined */
 
 }
 
-%[define_type_class(__glob_errfunc_t = "TP")]
-%[define_replacement(__glob_errfunc_t = __glob_errfunc_t)]
 
-
-%[define(DEFINE_GLOB_ERRFUNC_T =
-@@pp_ifndef ____glob_errfunc_t_defined@@
-#define ____glob_errfunc_t_defined 1
-typedef int (__LIBKCALL *__glob_errfunc_t)(char const *__path, int __flags);
-@@pp_endif@@
-)]
-
-
-[[decl_prefix(DEFINE_GLOB_ERRFUNC_T)]]
 [[ignore, nocrt, doc_alias("glob"), alias("glob")]]
 int glob32([[nonnull]] char const *__restrict pattern,
-           int flags, __glob_errfunc_t errfunc,
+           int flags, int (LIBKCALL *errfunc)(char const *path, int flags),
            [[nonnull]] void *__restrict pglob);
 [[ignore, nocrt, doc_alias("globfree"), alias("globfree")]]
 void globfree32(void *pglob);
@@ -254,15 +241,12 @@ void globfree32(void *pglob);
 @@@return: GLOB_NOMATCH : ...
 @@@return: GLOB_NOSYS   : ...
 [[userimpl, no_crt_self_import]]
-[[decl_prefix(DEFINE_GLOB_ERRFUNC_T)]]
 [[decl_prefix(struct __glob_struct;)]]
 [[if(defined(__USE_FILE_OFFSET64)), preferred_alias("glob64")]]
 [[if(!defined(__USE_FILE_OFFSET64)), preferred_alias("glob")]]
-[[decl_include("<features.h>")]]
-[[impl_include("<asm/crt/glob.h>")]]
-int glob([[nonnull]] char const *__restrict pattern,
-         __STDC_INT_AS_UINT_T flags,
-         [[nullable]] __glob_errfunc_t errfunc,
+[[nodos, decl_include("<features.h>"), impl_include("<asm/crt/glob.h>")]]
+int glob([[nonnull]] char const *__restrict pattern, __STDC_INT_AS_UINT_T flags,
+         [[nullable]] int (LIBKCALL *errfunc)(char const *path, int flags),
          [[nonnull]] glob_t *__restrict pglob) {
 @@pp_if $has_function(glob32)@@
 	return glob32(pattern, flags, errfunc, pglob);
@@ -298,13 +282,10 @@ void globfree([[nonnull]] glob_t *pglob) {
 
 %
 %#ifdef __USE_LARGEFILE64
-[[decl_prefix(DEFINE_GLOB_ERRFUNC_T)]]
 [[doc_alias("glob"), decl_prefix(struct __glob64_struct;), userimpl]]
-[[decl_include("<features.h>")]]
-[[impl_include("<asm/crt/glob.h>")]]
-int glob64([[nonnull]] const char *__restrict pattern,
-           __STDC_INT_AS_UINT_T flags,
-           [[nullable]] __glob_errfunc_t errfunc,
+[[nodos, decl_include("<features.h>"), impl_include("<asm/crt/glob.h>")]]
+int glob64([[nonnull]] const char *__restrict pattern, __STDC_INT_AS_UINT_T flags,
+           [[nullable]] int (LIBKCALL *errfunc)(char const *path, int flags),
            [[nonnull]] struct __glob64_struct *__restrict pglob) {
 @@pp_if $has_function(glob32)@@
 	return glob32(pattern, flags, errfunc, pglob);

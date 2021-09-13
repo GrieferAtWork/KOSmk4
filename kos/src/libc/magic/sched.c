@@ -325,12 +325,12 @@ __SYSDECL_BEGIN
 %[default:section(".text.crt{|.dos}.sched.utility")];
 
 %#if defined(__USE_GNU) || defined(__USE_KOS)
-%typedef int (__LIBKCALL *__clone_func_t)(void *__arg);
 %[define_type_class(__clone_func_t = "TP")]
 
 [[section(".text.crt{|.dos}.sched.access")]]
 [[vartypes($pid_t, void *, $pid_t), export_alias("__clone")]]
-$pid_t clone([[nonnull]] __clone_func_t fn, void *child_stack, int flags,
+[[crt_dos_impl_if(!defined(__LIBCCALL_IS_LIBDCALL)), crt_dos_variant]]
+$pid_t clone([[nonnull]] int (LIBCCALL *fn)(void *arg), void *child_stack, int flags,
              void *arg, ... /* pid_t *ptid, void *newtls, pid_t *ctid */);
 
 @@>> unshare(2)

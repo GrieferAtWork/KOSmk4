@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xe511c092 */
+/* HASH CRC-32:0x3477b662 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -30,6 +30,15 @@
 
 DECL_BEGIN
 
+#ifndef __LIBCCALL_IS_LIBDCALL
+/* >> pthread_create(3)
+ * Create a  new thread,  starting with  execution of  `start_routine'
+ * getting passed `arg'. Creation attributed come from `attr'. The new
+ * handle is stored in `*newthread'
+ * @return: EOK:    Success
+ * @return: EAGAIN: Insufficient resources, or operation-not-permitted */
+INTDEF NONNULL((1, 3)) errno_t NOTHROW_NCX(LIBDCALL libd_pthread_create)(pthread_t *__restrict newthread, pthread_attr_t const *__restrict attr, void *(LIBDCALL *start_routine)(void *arg), void *arg);
+#endif /* !__LIBCCALL_IS_LIBDCALL */
 #ifndef __KERNEL__
 /* >> pthread_create(3)
  * Create a  new thread,  starting with  execution of  `start_routine'
@@ -37,7 +46,7 @@ DECL_BEGIN
  * handle is stored in `*newthread'
  * @return: EOK:    Success
  * @return: EAGAIN: Insufficient resources, or operation-not-permitted */
-INTDEF NONNULL((1, 3)) errno_t NOTHROW_NCX(LIBCCALL libc_pthread_create)(pthread_t *__restrict newthread, pthread_attr_t const *__restrict attr, __pthread_start_routine_t start_routine, void *__restrict arg);
+INTDEF NONNULL((1, 3)) errno_t NOTHROW_NCX(LIBCCALL libc_pthread_create)(pthread_t *__restrict newthread, pthread_attr_t const *__restrict attr, void *(LIBCCALL *start_routine)(void *arg), void *arg);
 /* >> pthread_exit(3)
  * Terminate calling thread.
  * The registered cleanup handlers are called via exception handling */
@@ -634,7 +643,7 @@ INTDEF NONNULL((1)) errno_t NOTHROW_NCX(LIBCCALL libc_pthread_barrierattr_setpsh
  * when the key is destroyed
  * @return: EOK:    Success
  * @return: ENOMEM: Insufficient memory to create the key */
-INTDEF NONNULL((1)) errno_t NOTHROW_NCX(LIBCCALL libc_pthread_key_create)(pthread_key_t *key, __pthread_destr_function_t destr_function);
+INTDEF NONNULL((1)) errno_t NOTHROW_NCX(LIBCCALL libc_pthread_key_create)(pthread_key_t *key, void (LIBKCALL *destr_function)(void *value));
 /* >> pthread_key_delete(3)
  * Destroy the given  `key'
  * @return: EOK:    Success
@@ -671,7 +680,7 @@ INTDEF NONNULL((2)) errno_t NOTHROW_NCX(LIBCCALL libc_pthread_getcpuclockid)(pth
  * called in FIFO order (first added -> first called)
  * @return: EOK:    Success
  * @return: ENOMEM: Insufficient memory to register callbacks */
-INTDEF errno_t NOTHROW_NCX(LIBCCALL libc_pthread_atfork)(__pthread_atfork_func_t prepare, __pthread_atfork_func_t parent, __pthread_atfork_func_t child);
+INTDEF errno_t NOTHROW_NCX(LIBCCALL libc_pthread_atfork)(void (LIBCCALL *prepare)(void), void (LIBCCALL *parent)(void), void (LIBCCALL *child)(void));
 #endif /* !__KERNEL__ */
 
 DECL_END

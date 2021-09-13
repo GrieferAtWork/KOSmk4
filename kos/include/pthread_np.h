@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xd1a25810 */
+/* HASH CRC-32:0x86aa8962 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -40,7 +40,7 @@ __SYSDECL_BEGIN
 
 #ifndef __pthread_switch_routine_t_defined
 #define __pthread_switch_routine_t_defined 1
-typedef void (__LIBCCALL *pthread_switch_routine_t)(pthread_t, pthread_t);
+typedef void (__LIBKCALL *pthread_switch_routine_t)(pthread_t, pthread_t);
 #endif /* !__pthread_switch_routine_t_defined */
 
 #ifndef __stack_t_defined

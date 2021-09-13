@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x1576ac5d */
+/* HASH CRC-32:0xa45a938 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -21,16 +21,12 @@
 #ifndef __local_glob_defined
 #define __local_glob_defined 1
 #include <__crt.h>
-#ifndef ____glob_errfunc_t_defined
-#define ____glob_errfunc_t_defined 1
-typedef int (__LIBKCALL *__glob_errfunc_t)(char const *__path, int __flags);
-#endif /* !____glob_errfunc_t_defined */
 struct __glob_struct;
 #include <features.h>
 __NAMESPACE_LOCAL_BEGIN
 #if !defined(__local___localdep_glob32_defined) && defined(__CRT_HAVE_glob)
 #define __local___localdep_glob32_defined 1
-__CREDIRECT(__ATTR_NONNULL((1, 4)),int,__NOTHROW_NCX,__localdep_glob32,(char const *__restrict __pattern, int __flags, __glob_errfunc_t __errfunc, void *__restrict __pglob),glob,(__pattern,__flags,__errfunc,__pglob))
+__CREDIRECT(__ATTR_NONNULL((1, 4)),int,__NOTHROW_NCX,__localdep_glob32,(char const *__restrict __pattern, int __flags, int (__LIBKCALL *__errfunc)(char const *__path, int __flags), void *__restrict __pglob),glob,(__pattern,__flags,__errfunc,__pglob))
 #endif /* !__local___localdep_glob32_defined && __CRT_HAVE_glob */
 #ifndef __local___localdep_glob64_defined
 #define __local___localdep_glob64_defined 1
@@ -38,7 +34,7 @@ __CREDIRECT(__ATTR_NONNULL((1, 4)),int,__NOTHROW_NCX,__localdep_glob32,(char con
 __NAMESPACE_LOCAL_END
 struct __glob64_struct;
 __NAMESPACE_LOCAL_BEGIN
-__CREDIRECT(__ATTR_NONNULL((1, 4)),int,__NOTHROW_NCX,__localdep_glob64,(const char *__restrict __pattern, __STDC_INT_AS_UINT_T __flags, __glob_errfunc_t __errfunc, struct __glob64_struct *__restrict __pglob),glob64,(__pattern,__flags,__errfunc,__pglob))
+__CREDIRECT(__ATTR_NONNULL((1, 4)),int,__NOTHROW_NCX,__localdep_glob64,(const char *__restrict __pattern, __STDC_INT_AS_UINT_T __flags, int (__LIBKCALL *__errfunc)(char const *__path, int __flags), struct __glob64_struct *__restrict __pglob),glob64,(__pattern,__flags,__errfunc,__pglob))
 #else /* __CRT_HAVE_glob64 */
 __NAMESPACE_LOCAL_END
 #include <libc/local/glob/glob64.h>
@@ -50,7 +46,7 @@ __NAMESPACE_LOCAL_END
 #include <asm/crt/glob.h>
 __NAMESPACE_LOCAL_BEGIN
 __LOCAL_LIBC(glob) __ATTR_NONNULL((1, 4)) int
-__NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(glob))(char const *__restrict __pattern, __STDC_INT_AS_UINT_T __flags, __glob_errfunc_t __errfunc, struct __glob_struct *__restrict __pglob) {
+__NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(glob))(char const *__restrict __pattern, __STDC_INT_AS_UINT_T __flags, int (__LIBKCALL *__errfunc)(char const *__path, int __flags), struct __glob_struct *__restrict __pglob) {
 #ifdef __CRT_HAVE_glob
 	return (__NAMESPACE_LOCAL_SYM __localdep_glob32)(__pattern, __flags, __errfunc, __pglob);
 #else /* __CRT_HAVE_glob */

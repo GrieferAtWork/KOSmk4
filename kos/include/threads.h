@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x17f3ddb1 */
+/* HASH CRC-32:0xcbf6ea1d */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -164,8 +164,8 @@ enum {
 
 typedef __tss_t tss_t;
 typedef __thrd_t thrd_t;
-typedef __tss_dtor_t tss_dtor_t;
-typedef __thrd_start_t thrd_start_t;
+typedef void (__LIBKCALL *tss_dtor_t)(void *__arg); /* TODO: Dos support! */
+typedef int (__LIBCCALL *thrd_start_t)(void *__arg);
 typedef __once_flag once_flag;
 #define ONCE_FLAG_INIT __ONCE_FLAG_INIT
 typedef __mtx_t mtx_t;
@@ -176,42 +176,42 @@ typedef __cnd_t cnd_t;
  * Create and start a new thread (s.a. `pthread_create(3)')
  * @return: thrd_success: Success
  * @return: thrd_error:   Error */
-__CDECLARE(,int,__NOTHROW_NCX,thrd_create,(thrd_t *__thr, thrd_start_t __func, void *__arg),(__thr,__func,__arg))
+__CDECLARE(,int,__NOTHROW_NCX,thrd_create,(thrd_t *__thr, int (__LIBCCALL *__func)(void *__arg), void *__arg),(__thr,__func,__arg))
 #elif defined(__CRT_HAVE_pthread_create)
 #include <libc/local/threads/thrd_create.h>
 /* >> thrd_create(3)
  * Create and start a new thread (s.a. `pthread_create(3)')
  * @return: thrd_success: Success
  * @return: thrd_error:   Error */
-__NAMESPACE_LOCAL_USING_OR_IMPL(thrd_create, __FORCELOCAL __ATTR_ARTIFICIAL int __NOTHROW_NCX(__LIBCCALL thrd_create)(thrd_t *__thr, thrd_start_t __func, void *__arg) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(thrd_create))(__thr, __func, __arg); })
+__NAMESPACE_LOCAL_USING_OR_IMPL(thrd_create, __FORCELOCAL __ATTR_ARTIFICIAL int __NOTHROW_NCX(__LIBCCALL thrd_create)(thrd_t *__thr, int (__LIBCCALL *__func)(void *__arg), void *__arg) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(thrd_create))(__thr, __func, __arg); })
 #endif /* ... */
 #ifdef __CRT_HAVE_pthread_equal
 /* >> thrd_equal(3)
  * Return non-zero if `thr1' and `thr2' reference the same thread (s.a. `pthread_equal(3)')
  * @return: == 0: Threads are not equal
  * @return: != 0: Threads are qual */
-__CEIREDIRECT(,int,__NOTHROW_NCX,thrd_equal,(thrd_t __thr1, thrd_t __thr2),pthread_equal,{ return __thr1 == __thr2; })
+__CEIREDIRECT(__ATTR_WUNUSED,int,__NOTHROW_NCX,thrd_equal,(thrd_t __thr1, thrd_t __thr2),pthread_equal,{ return __thr1 == __thr2; })
 #elif defined(__CRT_HAVE_thrd_equal)
 /* >> thrd_equal(3)
  * Return non-zero if `thr1' and `thr2' reference the same thread (s.a. `pthread_equal(3)')
  * @return: == 0: Threads are not equal
  * @return: != 0: Threads are qual */
-__CEIDECLARE(,int,__NOTHROW_NCX,thrd_equal,(thrd_t __thr1, thrd_t __thr2),{ return __thr1 == __thr2; })
+__CEIDECLARE(__ATTR_WUNUSED,int,__NOTHROW_NCX,thrd_equal,(thrd_t __thr1, thrd_t __thr2),{ return __thr1 == __thr2; })
 #else /* ... */
 /* >> thrd_equal(3)
  * Return non-zero if `thr1' and `thr2' reference the same thread (s.a. `pthread_equal(3)')
  * @return: == 0: Threads are not equal
  * @return: != 0: Threads are qual */
-__LOCAL int __NOTHROW_NCX(__LIBCCALL thrd_equal)(thrd_t __thr1, thrd_t __thr2) { return __thr1 == __thr2; }
+__LOCAL __ATTR_WUNUSED int __NOTHROW_NCX(__LIBCCALL thrd_equal)(thrd_t __thr1, thrd_t __thr2) { return __thr1 == __thr2; }
 #endif /* !... */
 #ifdef __CRT_HAVE_pthread_self
 /* >> thrd_current(3)
  * Return the descriptor for the calling thread (s.a. `pthread_self(3)') */
-__CREDIRECT(,thrd_t,__NOTHROW_NCX,thrd_current,(void),pthread_self,())
+__CREDIRECT(__ATTR_WUNUSED,thrd_t,__NOTHROW_NCX,thrd_current,(void),pthread_self,())
 #elif defined(__CRT_HAVE_thrd_current)
 /* >> thrd_current(3)
  * Return the descriptor for the calling thread (s.a. `pthread_self(3)') */
-__CDECLARE(,thrd_t,__NOTHROW_NCX,thrd_current,(void),())
+__CDECLARE(__ATTR_WUNUSED,thrd_t,__NOTHROW_NCX,thrd_current,(void),())
 #endif /* ... */
 #if defined(__CRT_HAVE_thrd_sleep64) && defined(__USE_TIME_BITS64)
 /* >> thrd_sleep(3), thrd_sleep64(3)
@@ -442,16 +442,16 @@ __CDECLARE_VOID(__ATTR_NONNULL((1)),__NOTHROW_NCX,mtx_destroy,(mtx_t *__restrict
 #ifdef __CRT_HAVE_pthread_once
 /* >> call_once(3)
  * Invoke `func', but make sure this only happens once (s.a. `pthread_once()') */
-__CREDIRECT_VOID(__ATTR_NONNULL((1, 2)),__THROWING,call_once,(once_flag *__restrict __flag, __once_func_t __func),pthread_once,(__flag,__func))
+__CREDIRECT_VOID(__ATTR_NONNULL((1, 2)),__THROWING,call_once,(once_flag *__restrict __flag, void (__LIBCCALL *__func)(void)),pthread_once,(__flag,__func))
 #elif defined(__CRT_HAVE_call_once)
 /* >> call_once(3)
  * Invoke `func', but make sure this only happens once (s.a. `pthread_once()') */
-__CDECLARE_VOID(__ATTR_NONNULL((1, 2)),__THROWING,call_once,(once_flag *__restrict __flag, __once_func_t __func),(__flag,__func))
+__CDECLARE_VOID(__ATTR_NONNULL((1, 2)),__THROWING,call_once,(once_flag *__restrict __flag, void (__LIBCCALL *__func)(void)),(__flag,__func))
 #else /* ... */
 #include <libc/local/pthread/pthread_once.h>
 /* >> call_once(3)
  * Invoke `func', but make sure this only happens once (s.a. `pthread_once()') */
-__FORCELOCAL __ATTR_ARTIFICIAL __ATTR_NONNULL((1, 2)) void (__LIBCCALL call_once)(once_flag *__restrict __flag, __once_func_t __func) __THROWS(...) { (void)(__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(pthread_once))((__pthread_once_t *)__flag, (__pthread_once_routine_t)__func); }
+__FORCELOCAL __ATTR_ARTIFICIAL __ATTR_NONNULL((1, 2)) void (__LIBCCALL call_once)(once_flag *__restrict __flag, void (__LIBCCALL *__func)(void)) __THROWS(...) { (void)(__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(pthread_once))((__pthread_once_t *)__flag, __func); }
 #endif /* !... */
 
 
@@ -583,14 +583,14 @@ __CDECLARE_VOID(,__NOTHROW_NCX,cnd_destroy,(cnd_t *__cond),(__cond))
  * Create a new TLS key (s.a. `pthread_key_create(3)')
  * @return: thrd_success: Success
  * @return: thrd_error:   Error */
-__CDECLARE(,int,__NOTHROW_NCX,tss_create,(tss_t *__tss_id, tss_dtor_t __destructor),(__tss_id,__destructor))
+__CDECLARE(,int,__NOTHROW_NCX,tss_create,(tss_t *__tss_id, void (__LIBKCALL *__destructor)(void *__arg)),(__tss_id,__destructor))
 #elif defined(__CRT_HAVE_pthread_key_create)
 #include <libc/local/threads/tss_create.h>
 /* >> tss_create(3)
  * Create a new TLS key (s.a. `pthread_key_create(3)')
  * @return: thrd_success: Success
  * @return: thrd_error:   Error */
-__NAMESPACE_LOCAL_USING_OR_IMPL(tss_create, __FORCELOCAL __ATTR_ARTIFICIAL int __NOTHROW_NCX(__LIBCCALL tss_create)(tss_t *__tss_id, tss_dtor_t __destructor) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(tss_create))(__tss_id, __destructor); })
+__NAMESPACE_LOCAL_USING_OR_IMPL(tss_create, __FORCELOCAL __ATTR_ARTIFICIAL int __NOTHROW_NCX(__LIBCCALL tss_create)(tss_t *__tss_id, void (__LIBKCALL *__destructor)(void *__arg)) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(tss_create))(__tss_id, __destructor); })
 #endif /* ... */
 #ifdef __CRT_HAVE_pthread_getspecific
 /* >> tss_get(3)

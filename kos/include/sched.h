@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xf93f701a */
+/* HASH CRC-32:0xb5b2321 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -318,11 +318,10 @@ __SYSDECL_BEGIN
 
 #ifdef __CC__
 #if defined(__USE_GNU) || defined(__USE_KOS)
-typedef int (__LIBKCALL *__clone_func_t)(void *__arg);
 #ifdef __CRT_HAVE_clone
-__LIBC __ATTR_NONNULL((1)) __pid_t __NOTHROW_NCX(__VLIBCCALL clone)(__clone_func_t __fn, void *__child_stack, int __flags, void *__arg, ...) __CASMNAME_SAME("clone");
+__LIBC __ATTR_NONNULL((1)) __pid_t __NOTHROW_NCX(__VLIBCCALL clone)(int (__LIBCCALL *__fn)(void *__arg), void *__child_stack, int __flags, void *__arg, ...) __CASMNAME_SAME("clone");
 #elif defined(__CRT_HAVE___clone)
-__CVREDIRECT(__ATTR_NONNULL((1)),__pid_t,__NOTHROW_NCX,clone,(__clone_func_t __fn, void *__child_stack, int __flags, void *__arg),__clone,(__fn,__child_stack,__flags,__arg),__arg,3,(__pid_t,void *,__pid_t))
+__CVREDIRECT(__ATTR_NONNULL((1)),__pid_t,__NOTHROW_NCX,clone,(int (__LIBCCALL *__fn)(void *__arg), void *__child_stack, int __flags, void *__arg),__clone,(__fn,__child_stack,__flags,__arg),__arg,3,(__pid_t,void *,__pid_t))
 #endif /* ... */
 /* >> unshare(2)
  * Unshare  certain components of the calling thread  that may be shared with other

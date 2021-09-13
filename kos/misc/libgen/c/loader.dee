@@ -1030,6 +1030,11 @@ class FunctionFeatures {
 			crt_noDosWrapper = true; /* Can be re-enabled if ~really~ needed... */
 			goto oneword_nocond;
 
+		case "nodos":
+			crt_dosVariant = false;
+			crt_noDosWrapper = true;
+			goto oneword_nocond;
+
 		case "nocrt":
 		case "no_crt":
 			crt_noImpl       = true;
@@ -2841,13 +2846,35 @@ err:
 	}
 }
 
+function applyDosProtoOverrides(dosProto: FunctionPrototype, overrides: FunctionPrototype | none) {
+	if (overrides !is none) {
+		/* Override certain parts about the dos prototype */
+		dosProto.cc                    = overrides.cc;
+		dosProto.argv                  = overrides.argv;
+		dosProto.returnType            = overrides.returnType;
+		dosProto.ellipsisArgumentTypes = overrides.ellipsisArgumentTypes;
+		dosProto.declPrefix            = overrides.declPrefix;
+		/* Merge attributes (but overrides NONNULL). */
+		local newAttrib = List(overrides.attributes);
+		for (local attr: dosProto.attributes) {
+			if (attr !is Callable) {
+				local sattr = str(attr);
+				if (sattr.startswith("NONNULL(("))
+					continue; /* Skip! */
+			}
+			newAttrib.append(attr);
+		}
+		dosProto.attributes = newAttrib;
+	}
+}
+
 class CrtDosVariantCallbackMetadata: CrtDosVariantMetadata {
 	this = default;
 	public member dosProto: FunctionPrototype | none;
 	public member cookie: WrapperCookie | WrapperCookieStruct;
 	public member wrapperPrototype: FunctionPrototype;
 	public member wrapperBody: string | UserString;
-	public member implBody: string | UserString | none;
+	public member implBody: string | UserString;
 
 
 	@@Helper function to trigger an error
@@ -2874,7 +2901,7 @@ class CrtDosVariantCallbackMetadata: CrtDosVariantMetadata {
 		local dosProto = dosLibraryFunction.prototype;
 		if (dosProto !is FunctionPrototype) {
 			this.err("Indirect prototypes are not supported "
-			            "with [[crt_dos_variant(callback(...))]] (see: {!r})"
+			         "with [[crt_dos_variant(callback(...))]] (see: {!r})"
 				.format({ name }));
 		}
 		if (dosProto.nothrow != "THROWS(...)") {
@@ -2883,28 +2910,9 @@ class CrtDosVariantCallbackMetadata: CrtDosVariantMetadata {
 			         "any kind of exception!"
 				.format({ name }));
 		}
-		local dosProtoOverride = this.dosProto;
-		if (dosProtoOverride !is none) {
-			/* Override certain parts about the dos prototype */
-			dosProto.cc                    = dosProtoOverride.cc;
-			dosProto.argv                  = dosProtoOverride.argv;
-			dosProto.returnType            = dosProtoOverride.returnType;
-			dosProto.ellipsisArgumentTypes = dosProtoOverride.ellipsisArgumentTypes;
-			dosProto.declPrefix            = dosProtoOverride.declPrefix;
-			/* Merge attributes (but overrides NONNULL). */
-			local newAttrib = List(dosProtoOverride.attributes);
-			for (local attr: dosProto.attributes) {
-				if (attr !is Callable) {
-					local sattr = str(attr);
-					if (sattr.startswith("NONNULL(("))
-						continue; /* Skip! */
-				}
-				newAttrib.append(attr);
-			}
-			dosProto.attributes = newAttrib;
-		}
-		if (wrapperPrototype.nothrow == "")
-			wrapperPrototype.nothrow = dosProto.nothrow;
+
+		/* Override certain parts about the dos prototype */
+		applyDosProtoOverrides(dosProto, this.dosProto);
 
 		/* Figure out the section to put the wrapper function into */
 		local crt_dosSection = currentFeatures.crt_dosSection !is none
@@ -3032,10 +3040,11 @@ class CrtDosVariantCallbackMetadata: CrtDosVariantMetadata {
 @@>>     wrap: int($cook *c, void const *a, void const *b) { return (*c->compar)(c->arg, a, b); },
 @@>>     impl: _lfind_s(key, base, nmemb, size, $wrap, &$cook),
 @@>> ))]]
-function parseCrtDosVariantCallbackMetadata(self: CParser): CrtDosVariantMetadata {
+function parseCrtDosVariantCallbackMetadata(self: CParser): CrtDosVariantCallbackMetadata {
 	local dosProto: FunctionPrototype | none = none;
 	local cookie: WrapperCookie | WrapperCookieStruct = none;
-	local wrapperPrototype: FunctionPrototype = FunctionPrototype(cc: DEFAULT_CC, nothrow: "");
+	local wrapperPrototype: FunctionPrototype = FunctionPrototype(
+		cc: DEFAULT_CC, nothrow: "THROWS(...)");
 	local wrapperBody: string | UserString = none;
 	local implBody: string | UserString = none;
 	local tok = self.tok;
@@ -3124,15 +3133,126 @@ function parseCrtDosVariantCallbackMetadata(self: CParser): CrtDosVariantMetadat
 		implBody:         implBody);
 }
 
-function parseCrtDosVariantMetadata(self: CParser): Object {
+
+class CrtDosVariantCustomMetadata: CrtDosVariantMetadata {
+	this = default;
+	public member dosProto: FunctionPrototype | none = none;
+	public member implPrefix: {(string | UserString)...} = [];
+	public member implBody: string | UserString;
+
+	public function generate(
+			dosLibraryFunction: LibraryFunction,
+			currentFeatures: FunctionFeatures)
+			: FunctionImplementation | Callable {
+		local name = dosLibraryFunction.name;
+		if (dosLibraryFunction.prototype !is bound)
+			dosLibraryFunction.prototype = FunctionPrototype();
+		local dosProto = dosLibraryFunction.prototype;
+		if (dosProto !is FunctionPrototype) {
+			this.err("Indirect prototypes are not supported "
+			         "with [[crt_dos_variant({...})]] (see: {!r})"
+				.format({ name }));
+		}
+
+		/* Override certain parts about the dos prototype */
+		applyDosProtoOverrides(dosProto, this.dosProto);
+
+		/* Do the remaining work asynchronously once everything has been loaded. */
+		return []{
+			local result = FunctionImplementation(name: name);
+			result.implPrefix = implPrefix;
+			local implBodyStr = str(implBody);
+			if (implBodyStr.startswith("{") && implBodyStr.endswith("}")) {
+				result.body = implBody;
+			} else {
+				result.body = "{{\n\treturn {}; }}".format({ implBodyStr });
+			}
+			result.dependencies = []{
+				for (local body: { implBody, implPrefix... }) {
+					local deps = scanForNamesOfDependentFunctions(str(body), name, dosProto);
+					if (deps is Callable)
+						deps = deps();
+					yield deps...;
+				}
+			};
+			return result;
+		};
+	}
+}
+
+@@Parse the `...' of a `[[crt_dos_variant(callback(...))]]` annotation
+@@>> [[crt_dos_variant({
+@@>>     prefix: ...
+@@>>     impl: { ... },
+@@>> })]]
+function parseCrtDosVariantCustomMetadata(self: CParser): CrtDosVariantCustomMetadata {
+	local result = CrtDosVariantCustomMetadata(implBody: none);
+	local tok = self.tok;
+	while (tok != "}") {
+		switch (tok) {
+
+		case "decl":
+			if (result.dosProto !is none)
+				self.err("Duplicate `decl' tag");
+			self.next();
+			self.skip(":");
+			result.dosProto = FunctionPrototype(cc: DEFAULT_DOS_CC);
+			parseWholeFunctionPrototype(self, result.dosProto);
+			break;
+
+		case "impl":
+			if (result.implBody !is none)
+				self.err("Duplicate `impl' tag");
+			self.next();
+			self.skip(":");
+			result.implBody = self.parseAllUntilRParen();
+			break;
+
+		case "prefix": {
+			self.next();
+			self.skip(":");
+			local prefix;
+			if (self.tok == "{") {
+				self.next();
+				prefix = self.parseAllUntilRParen();
+				self.skip("}");
+			} else {
+				prefix = self.parseAllUntilRParen();
+			}
+			result.implPrefix.append(prefix);
+		}	break;
+
+		default:
+			self.err("Unknown key in [crt_dos_variant({ ... })]: {!r}"
+				.format({ tok }));
+		}
+		if (self.tok != ",")
+			break;
+		tok = self.next();
+	}
+	if (result.implPrefix is none)
+		self.err("No `impl' tag in [[crt_dos_variant({ ... })]]");
+	return result;
+}
+
+
+function parseCrtDosVariantMetadata(self: CParser): CrtDosVariantMetadata {
 	local result;
 	switch (self.tok) {
+
 	case "callback":
 		self.next();
 		self.skip("(");
 		result = parseCrtDosVariantCallbackMetadata(self);
 		self.skip(")");
 		break;
+
+	case "{":
+		self.next();
+		result = parseCrtDosVariantCustomMetadata(self);
+		self.skip("}");
+		break;
+
 	default:
 		self.err("Unknown crt_dos_variant command: {!r}".format({ self.tok }));
 	}
@@ -4182,6 +4302,7 @@ do_handle_alt_variant_of:
 						goto illegal_annotation_with_condition;
 					currentPrototype.cc = DEFAULT_DOS_CC;
 					currentFeatures.crt_noDosWrapper = true;
+					currentFeatures.crt_dosVariant   = false;
 					self.next();
 					break;
 

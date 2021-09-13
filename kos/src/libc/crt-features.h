@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x318e7d22 */
+/* HASH CRC-32:0xff0ce05a */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -29,110 +29,6 @@
 #define __CRT_HAVE_Creat64
 #endif /* !__KERNEL__ */
 #if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
-#define __CRT_HAVE_DOS$Calloc
-#define __CRT_HAVE_DOS$ChRoot
-#define __CRT_HAVE_DOS$Chdir
-#define __CRT_HAVE_DOS$Chmod
-#define __CRT_HAVE_DOS$Chown
-#define __CRT_HAVE_DOS$Creat
-#define __CRT_HAVE_DOS$Creat64
-#define __CRT_HAVE_DOS$Dup
-#define __CRT_HAVE_DOS$Dup2
-#define __CRT_HAVE_DOS$Dup3
-#define __CRT_HAVE_DOS$Execl
-#define __CRT_HAVE_DOS$Execle
-#define __CRT_HAVE_DOS$Execlpe
-#define __CRT_HAVE_DOS$Execpl
-#define __CRT_HAVE_DOS$Execv
-#define __CRT_HAVE_DOS$Execve
-#define __CRT_HAVE_DOS$Execvp
-#define __CRT_HAVE_DOS$Execvpe
-#define __CRT_HAVE_DOS$FChdir
-#define __CRT_HAVE_DOS$FChmod
-#define __CRT_HAVE_DOS$FChmodAt
-#define __CRT_HAVE_DOS$FChown
-#define __CRT_HAVE_DOS$FChownAt
-#define __CRT_HAVE_DOS$FDataSync
-#define __CRT_HAVE_DOS$FExecve
-#define __CRT_HAVE_DOS$FMkdirAt
-#define __CRT_HAVE_DOS$FMknodAt
-#define __CRT_HAVE_DOS$FReadlinkAt
-#define __CRT_HAVE_DOS$FSync
-#define __CRT_HAVE_DOS$FTruncate
-#define __CRT_HAVE_DOS$FTruncate64
-#define __CRT_HAVE_DOS$FUtimens
-#define __CRT_HAVE_DOS$FUtimens64
-#define __CRT_HAVE_DOS$Fcntl
-#define __CRT_HAVE_DOS$GetCwd
-#define __CRT_HAVE_DOS$GetDomainName
-#define __CRT_HAVE_DOS$GetHostName
-#define __CRT_HAVE_DOS$GetPGid
-#define __CRT_HAVE_DOS$GetResGid
-#define __CRT_HAVE_DOS$GetResUid
-#define __CRT_HAVE_DOS$GetSid
-#define __CRT_HAVE_DOS$Hop
-#define __CRT_HAVE_DOS$Hopf
-#define __CRT_HAVE_DOS$Ioctl
-#define __CRT_HAVE_DOS$LChmod
-#define __CRT_HAVE_DOS$LChown
-#define __CRT_HAVE_DOS$LSeek
-#define __CRT_HAVE_DOS$LSeek64
-#define __CRT_HAVE_DOS$Link
-#define __CRT_HAVE_DOS$LinkAt
-#define __CRT_HAVE_DOS$Malloc
-#define __CRT_HAVE_DOS$Memalign
-#define __CRT_HAVE_DOS$Memcdup
-#define __CRT_HAVE_DOS$Memdup
-#define __CRT_HAVE_DOS$Mkdir
-#define __CRT_HAVE_DOS$MkdirAt
-#define __CRT_HAVE_DOS$Mkfifo
-#define __CRT_HAVE_DOS$MkfifoAt
-#define __CRT_HAVE_DOS$Mknod
-#define __CRT_HAVE_DOS$MknodAt
-#define __CRT_HAVE_DOS$Nice
-#define __CRT_HAVE_DOS$Open
-#define __CRT_HAVE_DOS$Open64
-#define __CRT_HAVE_DOS$OpenAt
-#define __CRT_HAVE_DOS$OpenAt64
-#define __CRT_HAVE_DOS$PRead
-#define __CRT_HAVE_DOS$PRead64
-#define __CRT_HAVE_DOS$PReadAll
-#define __CRT_HAVE_DOS$PReadAll64
-#define __CRT_HAVE_DOS$PValloc
-#define __CRT_HAVE_DOS$PWrite
-#define __CRT_HAVE_DOS$PWrite64
-#define __CRT_HAVE_DOS$Pipe
-#define __CRT_HAVE_DOS$Pipe2
-#define __CRT_HAVE_DOS$Read
-#define __CRT_HAVE_DOS$ReadAll
-#define __CRT_HAVE_DOS$Readlink
-#define __CRT_HAVE_DOS$ReadlinkAt
-#define __CRT_HAVE_DOS$Realloc
-#define __CRT_HAVE_DOS$Rmdir
-#define __CRT_HAVE_DOS$SetDomainName
-#define __CRT_HAVE_DOS$SetEGid
-#define __CRT_HAVE_DOS$SetEUid
-#define __CRT_HAVE_DOS$SetGid
-#define __CRT_HAVE_DOS$SetHostName
-#define __CRT_HAVE_DOS$SetPGid
-#define __CRT_HAVE_DOS$SetReGid
-#define __CRT_HAVE_DOS$SetReUid
-#define __CRT_HAVE_DOS$SetResGid
-#define __CRT_HAVE_DOS$SetResUid
-#define __CRT_HAVE_DOS$SetUid
-#define __CRT_HAVE_DOS$Symlink
-#define __CRT_HAVE_DOS$SymlinkAt
-#define __CRT_HAVE_DOS$SyncFs
-#define __CRT_HAVE_DOS$Syscall
-#define __CRT_HAVE_DOS$Syscall64
-#define __CRT_HAVE_DOS$Truncate
-#define __CRT_HAVE_DOS$Truncate64
-#define __CRT_HAVE_DOS$UTimensAt
-#define __CRT_HAVE_DOS$UTimensAt64
-#define __CRT_HAVE_DOS$Unlink
-#define __CRT_HAVE_DOS$UnlinkAt
-#define __CRT_HAVE_DOS$Valloc
-#define __CRT_HAVE_DOS$Write
 #define __CRT_HAVE_DOS$_Exit
 #define __CRT_HAVE_DOS$__cmsg_nxthdr
 #define __CRT_HAVE_DOS$__control87_2
@@ -666,6 +562,7 @@
 #define __CRT_HAVE_DOS$asinhl
 #define __CRT_HAVE_DOS$asinl
 #define __CRT_HAVE_DOS$asprintf
+#define __CRT_HAVE_DOS$at_quick_exit
 #define __CRT_HAVE_DOS$atan
 #define __CRT_HAVE_DOS$atan2
 #define __CRT_HAVE_DOS$atan2f
@@ -675,6 +572,7 @@
 #define __CRT_HAVE_DOS$atanhf
 #define __CRT_HAVE_DOS$atanhl
 #define __CRT_HAVE_DOS$atanl
+#define __CRT_HAVE_DOS$atexit
 #define __CRT_HAVE_DOS$atof
 #define __CRT_HAVE_DOS$atoi
 #define __CRT_HAVE_DOS$atol
@@ -779,7 +677,11 @@
 #define __CRT_HAVE_DOS$clog
 #define __CRT_HAVE_DOS$clogf
 #define __CRT_HAVE_DOS$clogl
+#endif /* !__LIBCCALL_IS_LIBDCALL && !__KERNEL__ */
+#ifndef __LIBCCALL_IS_LIBDCALL
 #define __CRT_HAVE_DOS$clone
+#endif /* !__LIBCCALL_IS_LIBDCALL */
+#if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
 #define __CRT_HAVE_DOS$close
 #define __CRT_HAVE_DOS$closedir
 #define __CRT_HAVE_DOS$closefrom
@@ -906,8 +808,6 @@
 #define __CRT_HAVE_DOS$eventfd
 #define __CRT_HAVE_DOS$eventfd_read
 #define __CRT_HAVE_DOS$eventfd_write
-#define __CRT_HAVE_DOS$except_handler3
-#define __CRT_HAVE_DOS$except_handler4
 #define __CRT_HAVE_DOS$execl
 #define __CRT_HAVE_DOS$execle
 #define __CRT_HAVE_DOS$execlp
@@ -1165,97 +1065,11 @@
 #define __CRT_HAVE_DOS$fts_open
 #define __CRT_HAVE_DOS$fts_read
 #define __CRT_HAVE_DOS$fts_set
-#define __CRT_HAVE_DOS$ftw
-#define __CRT_HAVE_DOS$ftw64
 #define __CRT_HAVE_DOS$funlockfile
 #define __CRT_HAVE_DOS$funopen
 #define __CRT_HAVE_DOS$funopen2
 #define __CRT_HAVE_DOS$funopen2_64
 #define __CRT_HAVE_DOS$funopen64
-#define __CRT_HAVE_DOS$futex_setspin
-#define __CRT_HAVE_DOS$futex_timedwaitlock
-#define __CRT_HAVE_DOS$futex_timedwaitlock64
-#define __CRT_HAVE_DOS$futex_timedwaituntil
-#define __CRT_HAVE_DOS$futex_timedwaituntil64
-#define __CRT_HAVE_DOS$futex_timedwaituntil_cmpxch
-#define __CRT_HAVE_DOS$futex_timedwaituntil_cmpxch64
-#define __CRT_HAVE_DOS$futex_timedwaituntil_exactbits
-#define __CRT_HAVE_DOS$futex_timedwaituntil_exactbits64
-#define __CRT_HAVE_DOS$futex_timedwaitwhile
-#define __CRT_HAVE_DOS$futex_timedwaitwhile64
-#define __CRT_HAVE_DOS$futex_timedwaitwhile_above
-#define __CRT_HAVE_DOS$futex_timedwaitwhile_above64
-#define __CRT_HAVE_DOS$futex_timedwaitwhile_aboveequal
-#define __CRT_HAVE_DOS$futex_timedwaitwhile_aboveequal64
-#define __CRT_HAVE_DOS$futex_timedwaitwhile_allbits
-#define __CRT_HAVE_DOS$futex_timedwaitwhile_allbits64
-#define __CRT_HAVE_DOS$futex_timedwaitwhile_anybit
-#define __CRT_HAVE_DOS$futex_timedwaitwhile_anybit64
-#define __CRT_HAVE_DOS$futex_timedwaitwhile_below
-#define __CRT_HAVE_DOS$futex_timedwaitwhile_below64
-#define __CRT_HAVE_DOS$futex_timedwaitwhile_belowequal
-#define __CRT_HAVE_DOS$futex_timedwaitwhile_belowequal64
-#define __CRT_HAVE_DOS$futex_timedwaitwhile_cmpxch
-#define __CRT_HAVE_DOS$futex_timedwaitwhile_cmpxch64
-#define __CRT_HAVE_DOS$futex_timedwaitwhile_exactbits
-#define __CRT_HAVE_DOS$futex_timedwaitwhile_exactbits64
-#define __CRT_HAVE_DOS$futex_waitlock
-#define __CRT_HAVE_DOS$futex_waituntil
-#define __CRT_HAVE_DOS$futex_waituntil_cmpxch
-#define __CRT_HAVE_DOS$futex_waituntil_exactbits
-#define __CRT_HAVE_DOS$futex_waitwhile
-#define __CRT_HAVE_DOS$futex_waitwhile_above
-#define __CRT_HAVE_DOS$futex_waitwhile_aboveequal
-#define __CRT_HAVE_DOS$futex_waitwhile_allbits
-#define __CRT_HAVE_DOS$futex_waitwhile_anybit
-#define __CRT_HAVE_DOS$futex_waitwhile_below
-#define __CRT_HAVE_DOS$futex_waitwhile_belowequal
-#define __CRT_HAVE_DOS$futex_waitwhile_cmpxch
-#define __CRT_HAVE_DOS$futex_waitwhile_exactbits
-#define __CRT_HAVE_DOS$futex_wake
-#define __CRT_HAVE_DOS$futex_wakeall
-#define __CRT_HAVE_DOS$futex_wakemask
-#define __CRT_HAVE_DOS$futexlock_timedwaitlock
-#define __CRT_HAVE_DOS$futexlock_timedwaitlock64
-#define __CRT_HAVE_DOS$futexlock_timedwaituntil
-#define __CRT_HAVE_DOS$futexlock_timedwaituntil64
-#define __CRT_HAVE_DOS$futexlock_timedwaituntil_cmpxch
-#define __CRT_HAVE_DOS$futexlock_timedwaituntil_cmpxch64
-#define __CRT_HAVE_DOS$futexlock_timedwaituntil_exactbits
-#define __CRT_HAVE_DOS$futexlock_timedwaituntil_exactbits64
-#define __CRT_HAVE_DOS$futexlock_timedwaitwhile
-#define __CRT_HAVE_DOS$futexlock_timedwaitwhile64
-#define __CRT_HAVE_DOS$futexlock_timedwaitwhile_above
-#define __CRT_HAVE_DOS$futexlock_timedwaitwhile_above64
-#define __CRT_HAVE_DOS$futexlock_timedwaitwhile_aboveequal
-#define __CRT_HAVE_DOS$futexlock_timedwaitwhile_aboveequal64
-#define __CRT_HAVE_DOS$futexlock_timedwaitwhile_allbits
-#define __CRT_HAVE_DOS$futexlock_timedwaitwhile_allbits64
-#define __CRT_HAVE_DOS$futexlock_timedwaitwhile_anybit
-#define __CRT_HAVE_DOS$futexlock_timedwaitwhile_anybit64
-#define __CRT_HAVE_DOS$futexlock_timedwaitwhile_below
-#define __CRT_HAVE_DOS$futexlock_timedwaitwhile_below64
-#define __CRT_HAVE_DOS$futexlock_timedwaitwhile_belowequal
-#define __CRT_HAVE_DOS$futexlock_timedwaitwhile_belowequal64
-#define __CRT_HAVE_DOS$futexlock_timedwaitwhile_cmpxch
-#define __CRT_HAVE_DOS$futexlock_timedwaitwhile_cmpxch64
-#define __CRT_HAVE_DOS$futexlock_timedwaitwhile_exactbits
-#define __CRT_HAVE_DOS$futexlock_timedwaitwhile_exactbits64
-#define __CRT_HAVE_DOS$futexlock_waitlock
-#define __CRT_HAVE_DOS$futexlock_waituntil
-#define __CRT_HAVE_DOS$futexlock_waituntil_cmpxch
-#define __CRT_HAVE_DOS$futexlock_waituntil_exactbits
-#define __CRT_HAVE_DOS$futexlock_waitwhile
-#define __CRT_HAVE_DOS$futexlock_waitwhile_above
-#define __CRT_HAVE_DOS$futexlock_waitwhile_aboveequal
-#define __CRT_HAVE_DOS$futexlock_waitwhile_allbits
-#define __CRT_HAVE_DOS$futexlock_waitwhile_anybit
-#define __CRT_HAVE_DOS$futexlock_waitwhile_below
-#define __CRT_HAVE_DOS$futexlock_waitwhile_belowequal
-#define __CRT_HAVE_DOS$futexlock_waitwhile_cmpxch
-#define __CRT_HAVE_DOS$futexlock_waitwhile_exactbits
-#define __CRT_HAVE_DOS$futexlock_wake
-#define __CRT_HAVE_DOS$futexlock_wakeall
 #define __CRT_HAVE_DOS$futime
 #define __CRT_HAVE_DOS$futime64
 #define __CRT_HAVE_DOS$futimens
@@ -1309,7 +1123,6 @@
 #define __CRT_HAVE_DOS$gai_suspend
 #define __CRT_HAVE_DOS$gai_suspend64
 #define __CRT_HAVE_DOS$gcvt
-#define __CRT_HAVE_DOS$get_exception_handler
 #define __CRT_HAVE_DOS$getaddrinfo
 #define __CRT_HAVE_DOS$getaddrinfo_a
 #define __CRT_HAVE_DOS$getaliasbyname
@@ -1435,8 +1248,6 @@
 #if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
 #define __CRT_HAVE_DOS$getwd
 #define __CRT_HAVE_DOS$getxattr
-#define __CRT_HAVE_DOS$glob
-#define __CRT_HAVE_DOS$glob64
 #define __CRT_HAVE_DOS$globfree
 #define __CRT_HAVE_DOS$globfree64
 #define __CRT_HAVE_DOS$gmtime
@@ -1460,8 +1271,6 @@
 #define __CRT_HAVE_DOS$hdestroy_r
 #define __CRT_HAVE_DOS$heapsort
 #define __CRT_HAVE_DOS$herror
-#define __CRT_HAVE_DOS$hop
-#define __CRT_HAVE_DOS$hopf
 #define __CRT_HAVE_DOS$hsearch
 #define __CRT_HAVE_DOS$hsearch_r
 #define __CRT_HAVE_DOS$hstrerror
@@ -1622,14 +1431,6 @@
 #define __CRT_HAVE_DOS$ldexpl
 #define __CRT_HAVE_DOS$ldiv
 #define __CRT_HAVE_DOS$lfind
-#define __CRT_HAVE_DOS$lfutex
-#define __CRT_HAVE_DOS$lfutex64
-#define __CRT_HAVE_DOS$lfutexexpr
-#define __CRT_HAVE_DOS$lfutexexpr64
-#define __CRT_HAVE_DOS$lfutexlock
-#define __CRT_HAVE_DOS$lfutexlock64
-#define __CRT_HAVE_DOS$lfutexlockexpr
-#define __CRT_HAVE_DOS$lfutexlockexpr64
 #define __CRT_HAVE_DOS$lgamma
 #define __CRT_HAVE_DOS$lgamma_r
 #define __CRT_HAVE_DOS$lgammaf
@@ -1893,8 +1694,6 @@
 #define __CRT_HAVE_DOS$nextafterl
 #define __CRT_HAVE_DOS$nexttoward
 #define __CRT_HAVE_DOS$nexttowardf
-#define __CRT_HAVE_DOS$nftw
-#define __CRT_HAVE_DOS$nftw64
 #define __CRT_HAVE_DOS$ngettext
 #define __CRT_HAVE_DOS$nice
 #define __CRT_HAVE_DOS$nrand48
@@ -1908,7 +1707,11 @@
 #define __CRT_HAVE_DOS$ntp_gettimex64
 #define __CRT_HAVE_DOS$obstack_printf
 #define __CRT_HAVE_DOS$obstack_vprintf
+#endif /* !__LIBCCALL_IS_LIBDCALL && !__KERNEL__ */
+#if !defined(__KERNEL__) && !defined(__LIBCCALL_IS_LIBDCALL)
 #define __CRT_HAVE_DOS$on_exit
+#endif /* !__KERNEL__ && !__LIBCCALL_IS_LIBDCALL */
+#if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
 #define __CRT_HAVE_DOS$onexit
 #endif /* !__LIBCCALL_IS_LIBDCALL && !__KERNEL__ */
 #ifndef __KERNEL__
@@ -2057,7 +1860,11 @@
 #define __CRT_HAVE_DOS$pthread_condattr_init
 #define __CRT_HAVE_DOS$pthread_condattr_setclock
 #define __CRT_HAVE_DOS$pthread_condattr_setpshared
+#endif /* !__LIBCCALL_IS_LIBDCALL && !__KERNEL__ */
+#ifndef __LIBCCALL_IS_LIBDCALL
 #define __CRT_HAVE_DOS$pthread_create
+#endif /* !__LIBCCALL_IS_LIBDCALL */
+#if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
 #define __CRT_HAVE_DOS$pthread_detach
 #define __CRT_HAVE_DOS$pthread_equal
 #define __CRT_HAVE_DOS$pthread_exit
@@ -2070,8 +1877,6 @@
 #define __CRT_HAVE_DOS$pthread_getspecific
 #define __CRT_HAVE_DOS$pthread_gettid_np
 #define __CRT_HAVE_DOS$pthread_join
-#define __CRT_HAVE_DOS$pthread_key_create
-#define __CRT_HAVE_DOS$pthread_key_create_once_np
 #define __CRT_HAVE_DOS$pthread_key_delete
 #define __CRT_HAVE_DOS$pthread_kill
 #define __CRT_HAVE_DOS$pthread_mutex_consistent
@@ -2301,10 +2106,6 @@
 #define __CRT_HAVE_DOS$scalbn
 #define __CRT_HAVE_DOS$scalbnf
 #define __CRT_HAVE_DOS$scalbnl
-#define __CRT_HAVE_DOS$scandir
-#define __CRT_HAVE_DOS$scandir64
-#define __CRT_HAVE_DOS$scandirat
-#define __CRT_HAVE_DOS$scandirat64
 #define __CRT_HAVE_DOS$scanf
 #define __CRT_HAVE_DOS$scanf_unlocked
 #define __CRT_HAVE_DOS$sched_get_priority_max
@@ -2344,7 +2145,6 @@
 #define __CRT_HAVE_DOS$sendmmsg
 #define __CRT_HAVE_DOS$sendmsg
 #define __CRT_HAVE_DOS$sendto
-#define __CRT_HAVE_DOS$set_exception_handler
 #define __CRT_HAVE_DOS$setbuf
 #define __CRT_HAVE_DOS$setbuffer
 #define __CRT_HAVE_DOS$setdomainname
@@ -2703,7 +2503,11 @@
 #define __CRT_HAVE_DOS$tgammaf
 #define __CRT_HAVE_DOS$tgammal
 #define __CRT_HAVE_DOS$tgsigqueueinfo
+#endif /* !__LIBCCALL_IS_LIBDCALL && !__KERNEL__ */
+#if !defined(__KERNEL__) && !defined(__LIBCCALL_IS_LIBDCALL)
 #define __CRT_HAVE_DOS$thrd_create
+#endif /* !__KERNEL__ && !__LIBCCALL_IS_LIBDCALL */
+#if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
 #define __CRT_HAVE_DOS$thrd_detach
 #define __CRT_HAVE_DOS$thrd_exit
 #define __CRT_HAVE_DOS$thrd_join

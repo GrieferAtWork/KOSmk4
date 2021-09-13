@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x135832cd */
+/* HASH CRC-32:0x797b2c15 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -30,7 +30,7 @@
 DECL_BEGIN
 
 #if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
-INTDEF uintptr_t NOTHROW_NCX(LIBDCALL libd__beginthread)(__dos_beginthread_entry_t entry, u32 stacksz, void *arg);
+INTDEF uintptr_t NOTHROW_NCX(LIBDCALL libd__beginthread)(void (LIBDCALL *entry)(void *arg), u32 stacksz, void *arg);
 INTDEF uintptr_t NOTHROW_NCX(LIBDCALL libd__beginthreadex)(void *sec, u32 stacksz, __dos_beginthreadex_entry_t entry, void *arg, u32 flags, u32 *threadaddr);
 #endif /* !__LIBCCALL_IS_LIBDCALL && !__KERNEL__ */
 #ifndef __KERNEL__

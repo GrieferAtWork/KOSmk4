@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x48449bdc */
+/* HASH CRC-32:0x9b3abed0 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -31,7 +31,7 @@
 DECL_BEGIN
 
 #ifndef __KERNEL__
-INTDEF uintptr_t NOTHROW_NCX(LIBCCALL libc__beginthread)(__dos_beginthread_entry_t entry, u32 stacksz, void *arg);
+INTDEF uintptr_t NOTHROW_NCX(LIBCCALL libc__beginthread)(void (LIBDCALL *entry)(void *arg), u32 stacksz, void *arg);
 INTDEF uintptr_t NOTHROW_NCX(LIBCCALL libc__beginthreadex)(void *sec, u32 stacksz, __dos_beginthreadex_entry_t entry, void *arg, u32 flags, u32 *threadaddr);
 INTDEF void NOTHROW_NCX(LIBCCALL libc__endthreadex)(u32 exitcode);
 INTDEF void (LIBCCALL libc__cexit)(void) THROWS(...);

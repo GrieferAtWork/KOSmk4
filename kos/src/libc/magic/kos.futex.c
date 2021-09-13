@@ -21,6 +21,7 @@
 %[define_replacement(lfutex_t = __uintptr_t)]
 %[define_replacement(syscall_ulong_t = __syscall_ulong_t)]
 %[default:section(".text.crt{|.dos}.sched.futex")]
+%[default:nodos]
 
 %[insert:prefix(
 #include <features.h>

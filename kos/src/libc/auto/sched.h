@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xeb0e435b */
+/* HASH CRC-32:0x8edf3a99 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -30,7 +30,6 @@
 DECL_BEGIN
 
 #if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
-INTDEF NONNULL((1)) pid_t NOTHROW_NCX(VLIBDCALL libd_clone)(__clone_func_t fn, void *child_stack, int flags, void *arg, ...);
 /* >> unshare(2)
  * Unshare  certain components of the calling thread  that may be shared with other
  * threads  or  processes,  such as  the  filesystem, or  opened  file descriptors.

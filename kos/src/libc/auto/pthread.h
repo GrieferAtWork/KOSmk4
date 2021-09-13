@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xb6adc3f2 */
+/* HASH CRC-32:0xede9c437 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -30,13 +30,6 @@
 DECL_BEGIN
 
 #if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
-/* >> pthread_create(3)
- * Create a  new thread,  starting with  execution of  `start_routine'
- * getting passed `arg'. Creation attributed come from `attr'. The new
- * handle is stored in `*newthread'
- * @return: EOK:    Success
- * @return: EAGAIN: Insufficient resources, or operation-not-permitted */
-INTDEF NONNULL((1, 3)) errno_t NOTHROW_NCX(LIBDCALL libd_pthread_create)(pthread_t *__restrict newthread, pthread_attr_t const *__restrict attr, __pthread_start_routine_t start_routine, void *__restrict arg);
 /* >> pthread_exit(3)
  * Terminate calling thread.
  * The registered cleanup handlers are called via exception handling */
@@ -272,7 +265,7 @@ INTDEF NONNULL((3)) errno_t NOTHROW_NCX(LIBDCALL libd_pthread_getaffinity_np)(pt
  * same `once_control' argument. `once_control' must  point to a static  or
  * extern variable initialized to `PTHREAD_ONCE_INIT'.
  * @return: EOK: Success */
-INTDEF NONNULL((1, 2)) errno_t (LIBDCALL libd_pthread_once)(pthread_once_t *once_control, __pthread_once_routine_t init_routine) THROWS(...);
+INTDEF NONNULL((1, 2)) errno_t (LIBDCALL libd_pthread_once)(pthread_once_t *once_control, void (LIBDCALL *init_routine)(void)) THROWS(...);
 #endif /* !__LIBCCALL_IS_LIBDCALL && !__KERNEL__ */
 #ifndef __KERNEL__
 /* >> pthread_once(3)
@@ -281,7 +274,7 @@ INTDEF NONNULL((1, 2)) errno_t (LIBDCALL libd_pthread_once)(pthread_once_t *once
  * same `once_control' argument. `once_control' must  point to a static  or
  * extern variable initialized to `PTHREAD_ONCE_INIT'.
  * @return: EOK: Success */
-INTDEF NONNULL((1, 2)) errno_t (LIBCCALL libc_pthread_once)(pthread_once_t *once_control, __pthread_once_routine_t init_routine) THROWS(...);
+INTDEF NONNULL((1, 2)) errno_t (LIBCCALL libc_pthread_once)(pthread_once_t *once_control, void (LIBCCALL *init_routine)(void)) THROWS(...);
 #endif /* !__KERNEL__ */
 #if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
 /* >> pthread_setcancelstate(3)
@@ -720,26 +713,6 @@ INTDEF NONNULL((1, 2)) errno_t NOTHROW_NCX(LIBDCALL libd_pthread_barrierattr_get
  * @return: EOK:    Success
  * @return: EINVAL: Invalid/unsupported `pshared' */
 INTDEF NONNULL((1)) errno_t NOTHROW_NCX(LIBDCALL libd_pthread_barrierattr_setpshared)(pthread_barrierattr_t *attr, int pshared);
-/* >> pthread_key_create(3)
- * Create a key value identifying a location in the thread-specific
- * data area. Each thread maintains a distinct thread-specific data
- * area. `destr_function', if non-`NULL', is called with the  value
- * associated to that key when the key is destroyed.
- * `destr_function' is not called if the value associated is `NULL'
- * when the key is destroyed
- * @return: EOK:    Success
- * @return: ENOMEM: Insufficient memory to create the key */
-INTDEF NONNULL((1)) errno_t NOTHROW_NCX(LIBDCALL libd_pthread_key_create)(pthread_key_t *key, __pthread_destr_function_t destr_function);
-/* >> pthread_key_create_once_np(3)
- * Same as `pthread_key_create()', but the  given `key' must be  pre-initialized
- * using the static initializer `PTHREAD_ONCE_KEY_NP', whilst this function will
- * make  sure that  even in the  event of multiple  simultaneous threads calling
- * this function, only one will create the  key, and all others will wait  until
- * the key has been  created. Once the  key was created,  further calls to  this
- * function will no longer block, but simply return immediately.
- * @return: EOK:    Success
- * @return: ENOMEM: Insufficient memory to create the key */
-INTDEF NONNULL((1)) errno_t NOTHROW_NCX(LIBDCALL libd_pthread_key_create_once_np)(pthread_key_t *key, __pthread_destr_function_t destr_function);
 #endif /* !__LIBCCALL_IS_LIBDCALL && !__KERNEL__ */
 #ifndef __KERNEL__
 /* >> pthread_key_create_once_np(3)
@@ -751,7 +724,7 @@ INTDEF NONNULL((1)) errno_t NOTHROW_NCX(LIBDCALL libd_pthread_key_create_once_np
  * function will no longer block, but simply return immediately.
  * @return: EOK:    Success
  * @return: ENOMEM: Insufficient memory to create the key */
-INTDEF NONNULL((1)) errno_t NOTHROW_NCX(LIBCCALL libc_pthread_key_create_once_np)(pthread_key_t *key, __pthread_destr_function_t destr_function);
+INTDEF NONNULL((1)) errno_t NOTHROW_NCX(LIBCCALL libc_pthread_key_create_once_np)(pthread_key_t *key, void (LIBKCALL *destr_function)(void *));
 #endif /* !__KERNEL__ */
 #if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
 /* >> pthread_key_delete(3)
@@ -790,7 +763,7 @@ INTDEF NONNULL((2)) errno_t NOTHROW_NCX(LIBDCALL libd_pthread_getcpuclockid)(pth
  * called in FIFO order (first added -> first called)
  * @return: EOK:    Success
  * @return: ENOMEM: Insufficient memory to register callbacks */
-INTDEF errno_t NOTHROW_NCX(LIBDCALL libd_pthread_atfork)(__pthread_atfork_func_t prepare, __pthread_atfork_func_t parent, __pthread_atfork_func_t child);
+INTDEF errno_t NOTHROW_NCX(LIBDCALL libd_pthread_atfork)(void (LIBDCALL *prepare)(void), void (LIBDCALL *parent)(void), void (LIBDCALL *child)(void));
 #endif /* !__LIBCCALL_IS_LIBDCALL && !__KERNEL__ */
 #ifndef __KERNEL__
 /* >> pthread_num_processors_np(3)

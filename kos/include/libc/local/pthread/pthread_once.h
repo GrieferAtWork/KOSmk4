@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x541ea32d */
+/* HASH CRC-32:0xddb7233b */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -22,10 +22,6 @@
 #define __local_pthread_once_defined 1
 #include <__crt.h>
 #include <kos/anno.h>
-#ifndef ____pthread_once_routine_t_defined
-#define ____pthread_once_routine_t_defined 1
-typedef void (__LIBKCALL *__pthread_once_routine_t)(void);
-#endif /* !____pthread_once_routine_t_defined */
 #include <bits/types.h>
 #include <bits/crt/pthreadtypes.h>
 __NAMESPACE_LOCAL_BEGIN
@@ -40,7 +36,7 @@ __NAMESPACE_LOCAL_END
 #include <asm/os/errno.h>
 __NAMESPACE_LOCAL_BEGIN
 __LOCAL_LIBC(pthread_once) __ATTR_NONNULL((1, 2)) __errno_t
-(__LIBCCALL __LIBC_LOCAL_NAME(pthread_once))(__pthread_once_t *__once_control, __pthread_once_routine_t __init_routine) __THROWS(...) {
+(__LIBCCALL __LIBC_LOCAL_NAME(pthread_once))(__pthread_once_t *__once_control, void (__LIBCCALL *__init_routine)(void)) __THROWS(...) {
 	__pthread_once_t __status;
 __again:
 	__status = __hybrid_atomic_cmpxch_val(*__once_control,

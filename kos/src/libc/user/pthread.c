@@ -294,7 +294,7 @@ NOTHROW(LIBCCALL pthread_exit_thread)(struct pthread *__restrict me, int exitcod
 
 INTERN ATTR_NORETURN ATTR_SECTION(".text.crt.sched.pthread") void
 NOTHROW(__FCALL libc_pthread_main)(struct pthread *__restrict me,
-                                   __pthread_start_routine_t start) {
+                                   void *(LIBCCALL start)(void *arg)) {
 	/* NOTE: At this point, me == &current */
 	int exitcode = 0;
 	/* Apply the initial affinity mask (if given) */
@@ -336,13 +336,13 @@ NOTHROW(__FCALL libc_pthread_main)(struct pthread *__restrict me,
  * `libc_pthread_main()' within the context of the newly spawned thread.
  * NOTE: This function also fills in `thread->pt_tid' */
 INTDEF pid_t NOTHROW(__FCALL libc_pthread_clone)(struct pthread *__restrict thread,
-                                                 __pthread_start_routine_t start);
+                                                 void *(LIBCCALL start)(void *arg));
 
 
 PRIVATE ATTR_SECTION(".text.crt.sched.pthread") NONNULL((1, 2, 3)) errno_t
 NOTHROW_NCX(LIBCCALL libc_pthread_do_create)(pthread_t *__restrict newthread,
                                              pthread_attr_t const *__restrict attr,
-                                             __pthread_start_routine_t start_routine,
+                                             void *(LIBCCALL start_routine)(void *arg),
                                              void *__restrict arg) {
 	void *tls;
 	pid_t cpid;
@@ -418,8 +418,50 @@ err_nomem:
 }
 
 
+#ifndef __LIBCCALL_IS_LIBDCALL
+struct libd_pthread_create_wrapper_struct {
+	void *(LIBDCALL *start_routine)(void *arg);
+	void *arg;
+};
+PRIVATE ATTR_SECTION(".text.crt.dos.sched.pthread") void *LIBCCALL
+libd_pthread_create_wrapper(struct libd_pthread_create_wrapper_struct *arg) {
+	struct libd_pthread_create_wrapper_struct cookie = *arg;
+	free(arg);
+	return (*cookie.start_routine)(cookie.arg);
+}
+#endif /* !__LIBCCALL_IS_LIBDCALL */
 
-/*[[[head:libc_pthread_create,hash:CRC-32=0x60d30c83]]]*/
+/*[[[head:libd_pthread_create,hash:CRC-32=0x738bd8e1]]]*/
+#ifndef __LIBCCALL_IS_LIBDCALL
+/* >> pthread_create(3)
+ * Create a  new thread,  starting with  execution of  `start_routine'
+ * getting passed `arg'. Creation attributed come from `attr'. The new
+ * handle is stored in `*newthread'
+ * @return: EOK:    Success
+ * @return: EAGAIN: Insufficient resources, or operation-not-permitted */
+INTERN ATTR_SECTION(".text.crt.dos.sched.pthread") NONNULL((1, 3)) errno_t
+NOTHROW_NCX(LIBDCALL libd_pthread_create)(pthread_t *__restrict newthread,
+                                          pthread_attr_t const *__restrict attr,
+                                          void *(LIBDCALL *start_routine)(void *arg),
+                                          void *arg)
+/*[[[body:libd_pthread_create]]]*/
+{
+	errno_t result;
+	struct libd_pthread_create_wrapper_struct *cookie;
+	cookie = (struct libd_pthread_create_wrapper_struct *)malloc(sizeof(struct libd_pthread_create_wrapper_struct));
+	if unlikely(!cookie)
+		return ENOMEM;
+	cookie->start_routine = start_routine;
+	cookie->arg           = arg;
+	result = libc_pthread_create(newthread, attr, (void *(LIBCCALL *)(void *))&libd_pthread_create_wrapper, cookie);
+	if unlikely(result != EOK)
+		free(cookie);
+	return result;
+}
+#endif /* MAGIC:impl_if */
+/*[[[end:libd_pthread_create]]]*/
+
+/*[[[head:libc_pthread_create,hash:CRC-32=0x3e61b265]]]*/
 /* >> pthread_create(3)
  * Create a  new thread,  starting with  execution of  `start_routine'
  * getting passed `arg'. Creation attributed come from `attr'. The new
@@ -429,8 +471,8 @@ err_nomem:
 INTERN ATTR_SECTION(".text.crt.sched.pthread") NONNULL((1, 3)) errno_t
 NOTHROW_NCX(LIBCCALL libc_pthread_create)(pthread_t *__restrict newthread,
                                           pthread_attr_t const *__restrict attr,
-                                          __pthread_start_routine_t start_routine,
-                                          void *__restrict arg)
+                                          void *(LIBCCALL *start_routine)(void *arg),
+                                          void *arg)
 /*[[[body:libc_pthread_create]]]*/
 {
 	errno_t result;
@@ -1687,7 +1729,7 @@ NOTHROW_NCX(LIBCCALL libc_pthread_getcpuclockid)(pthread_t pthread,
 /* MISC PTHREAD FUNCTIONS                                               */
 /************************************************************************/
 
-/*[[[head:libc_pthread_atfork,hash:CRC-32=0x9bd2b0a1]]]*/
+/*[[[head:libc_pthread_atfork,hash:CRC-32=0xaf6eedad]]]*/
 /* >> pthread_atfork(3)
  * Install handlers to be called when a new process is created with  `fork(2)'.
  * The `prepare' handler is called in the parent process just before performing
@@ -1702,9 +1744,9 @@ NOTHROW_NCX(LIBCCALL libc_pthread_getcpuclockid)(pthread_t pthread,
  * @return: EOK:    Success
  * @return: ENOMEM: Insufficient memory to register callbacks */
 INTERN ATTR_SECTION(".text.crt.sched.pthread") errno_t
-NOTHROW_NCX(LIBCCALL libc_pthread_atfork)(__pthread_atfork_func_t prepare,
-                                          __pthread_atfork_func_t parent,
-                                          __pthread_atfork_func_t child)
+NOTHROW_NCX(LIBCCALL libc_pthread_atfork)(void (LIBCCALL *prepare)(void),
+                                          void (LIBCCALL *parent)(void),
+                                          void (LIBCCALL *child)(void))
 /*[[[body:libc_pthread_atfork]]]*/
 /*AUTO*/{
 	(void)prepare;
@@ -3389,9 +3431,11 @@ NOTHROW_RPC(LIBCCALL libc_pthread_barrier_wait)(pthread_barrier_t *barrier)
 /* pthread_key_t                                                        */
 /************************************************************************/
 
+typedef void (LIBCCALL *pthread_destr_function_t)(void *arg);
+
 /* [0..1][0..tls_count][owned] Vector TLS destructors.
  * A NULL-entry indicates a slot that was previously allocated, but has become available. */
-PRIVATE ATTR_SECTION(".bss.crt.sched.pthread") __pthread_destr_function_t *tls_dtors = NULL;
+PRIVATE ATTR_SECTION(".bss.crt.sched.pthread") pthread_destr_function_t *tls_dtors = NULL;
 
 /* Max allocated TLS key, plus 1. This describes the length of `tls_dtors' */
 PRIVATE ATTR_SECTION(".bss.crt.sched.pthread") size_t tls_count = 0;
@@ -3445,7 +3489,7 @@ pthread_tls_segment_fini(void *UNUSED(arg), void *base) {
 			void *tls_value;
 			tls_value = me->pts_values[i];
 			if (tls_value != NULL) {
-				__pthread_destr_function_t dtor;
+				pthread_destr_function_t dtor;
 				me->pts_values[i] = NULL;
 				dtor              = NULL;
 				atomic_rwlock_read(&tls_lock);
@@ -3544,7 +3588,7 @@ NOTHROW_NCX(LIBCCALL get_pthread_tls_slot)(size_t id) {
 PRIVATE void __LIBKCALL noop_dtor(void *UNUSED(value)) {
 }
 
-/*[[[head:libc_pthread_key_create,hash:CRC-32=0x3d8ba4dd]]]*/
+/*[[[head:libc_pthread_key_create,hash:CRC-32=0xd76210ef]]]*/
 /* >> pthread_key_create(3)
  * Create a key value identifying a location in the thread-specific
  * data area. Each thread maintains a distinct thread-specific data
@@ -3556,7 +3600,7 @@ PRIVATE void __LIBKCALL noop_dtor(void *UNUSED(value)) {
  * @return: ENOMEM: Insufficient memory to create the key */
 INTERN ATTR_SECTION(".text.crt.sched.pthread") NONNULL((1)) errno_t
 NOTHROW_NCX(LIBCCALL libc_pthread_key_create)(pthread_key_t *key,
-                                              __pthread_destr_function_t destr_function)
+                                              void (LIBKCALL *destr_function)(void *value))
 /*[[[body:libc_pthread_key_create]]]*/
 {
 	size_t i, avail, count;
@@ -3571,10 +3615,10 @@ again:
 			goto use_ith_slot; /* Re-use this slot! */
 	}
 	/* Check if we must increase the allocated size of the TLS-destructor-vector. */
-	avail = malloc_usable_size(tls_dtors) / sizeof(__pthread_destr_function_t);
+	avail = malloc_usable_size(tls_dtors) / sizeof(pthread_destr_function_t);
 	if (count >= avail) {
-		__pthread_destr_function_t *old_destructors;
-		__pthread_destr_function_t *new_destructors;
+		pthread_destr_function_t *old_destructors;
+		pthread_destr_function_t *new_destructors;
 		atomic_rwlock_endwrite(&tls_lock);
 
 		/* Allocate  a new (slightly larger) TLS destructor vector.
@@ -3584,8 +3628,8 @@ again:
 		 * After all: `tls_lock' is an _atomic_ lock, so we have to
 		 *            make a real effort to always hold it for  the
 		 *            least amount of time possible. */
-		new_destructors = (__pthread_destr_function_t *)malloc(count + 1,
-		                                                       sizeof(__pthread_destr_function_t));
+		new_destructors = (pthread_destr_function_t *)malloc(count + 1,
+		                                                       sizeof(pthread_destr_function_t));
 
 		/* Check if the allocation was ok. */
 		if unlikely(!new_destructors)
@@ -3602,7 +3646,7 @@ again:
 		/* Copy over old destructors. */
 		old_destructors = tls_dtors;
 		memcpy(new_destructors, old_destructors,
-		       count, sizeof(__pthread_destr_function_t));
+		       count, sizeof(pthread_destr_function_t));
 
 		/* Set the new destructors vector as active. */
 		tls_dtors = new_destructors;
@@ -3645,7 +3689,7 @@ NOTHROW_NCX(LIBCCALL libc_pthread_key_delete)(pthread_key_t key)
 				--tls_count;
 			/* Special case: If all TLS keys have been destroyed, free the destructor-vector. */
 			if (!tls_count) {
-				__pthread_destr_function_t *old_dtors;
+				pthread_destr_function_t *old_dtors;
 				old_dtors = tls_dtors;
 				tls_dtors = NULL;
 				atomic_rwlock_endwrite(&tls_lock);
@@ -3654,7 +3698,7 @@ NOTHROW_NCX(LIBCCALL libc_pthread_key_delete)(pthread_key_t key)
 			} else {
 				/* XXX: >> tls_dtors = realloc_nonblock(tls_dtors,
 				 *      >>                              tls_count,
-				 *      >>                              sizeof(__pthread_destr_function_t));
+				 *      >>                              sizeof(pthread_destr_function_t));
 				 */
 			}
 		}
@@ -3730,7 +3774,10 @@ NOTHROW_NCX(LIBCCALL libc_pthread_setspecific)(pthread_key_t key,
 
 
 
-/*[[[start:exports,hash:CRC-32=0x93eee596]]]*/
+/*[[[start:exports,hash:CRC-32=0x4ff42742]]]*/
+#ifndef __LIBCCALL_IS_LIBDCALL
+DEFINE_PUBLIC_ALIAS(DOS$pthread_create, libd_pthread_create);
+#endif /* !__LIBCCALL_IS_LIBDCALL */
 DEFINE_PUBLIC_ALIAS(pthread_create, libc_pthread_create);
 DEFINE_PUBLIC_ALIAS(pthread_exit, libc_pthread_exit);
 DEFINE_PUBLIC_ALIAS(pthread_join, libc_pthread_join);

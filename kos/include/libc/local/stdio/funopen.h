@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xa71c09d3 */
+/* HASH CRC-32:0x19e43470 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -25,13 +25,6 @@
 #include <features.h>
 #include <bits/types.h>
 #if (__SIZEOF_INT__ == __SIZEOF_SIZE_T__ && ((defined(__CRT_HAVE_funopen2) && __FS_SIZEOF(OFF) == __SIZEOF_OFF32_T__) || (defined(__CRT_HAVE_funopen2_64) && __FS_SIZEOF(OFF) == __SIZEOF_OFF64_T__) || ((defined(__CRT_HAVE_malloc) || defined(__CRT_HAVE_calloc) || defined(__CRT_HAVE_realloc) || defined(__CRT_HAVE_memalign) || defined(__CRT_HAVE_aligned_alloc) || defined(__CRT_HAVE_posix_memalign)) && ((defined(__CRT_HAVE_funopen2) && __SIZEOF_OFF64_T__ == __SIZEOF_OFF32_T__) || defined(__CRT_HAVE_funopen2_64) || defined(__CRT_HAVE_funopen2))))) || ((defined(__CRT_HAVE_malloc) || defined(__CRT_HAVE_calloc) || defined(__CRT_HAVE_realloc) || defined(__CRT_HAVE_memalign) || defined(__CRT_HAVE_aligned_alloc) || defined(__CRT_HAVE_posix_memalign)) && (defined(__CRT_HAVE_funopen2_64) || defined(__CRT_HAVE_funopen2) || defined(__CRT_HAVE_fopencookie) || defined(__CRT_HAVE_funopen64) || defined(__CRT_HAVE_funopen)))
-#ifndef ____funopen_types_defined
-#define ____funopen_types_defined 1
-typedef int (__LIBKCALL *__funopen_readfn_t)(void *__cookie, char *__buf, int __num_bytes);
-typedef int (__LIBKCALL *__funopen_writefn_t)(void *__cookie, char const *__buf, int __num_bytes);
-typedef __FS_TYPE(off) (__LIBKCALL *__funopen_seekfn_t)(void *__cookie, __FS_TYPE(off) __off, int __whence);
-typedef int (__LIBKCALL *__funopen_closefn_t)(void *__cookie);
-#endif /* !____funopen_types_defined */
 __NAMESPACE_LOCAL_BEGIN
 #if !defined(__local___localdep_crt_fopencookie_defined) && defined(__CRT_HAVE_fopencookie)
 #define __local___localdep_crt_fopencookie_defined 1
@@ -55,29 +48,9 @@ __CREDIRECT_VOID(,__NOTHROW_NCX,__localdep_free,(void *__mallptr),cfree,(__mallp
 #ifndef __local___localdep_funopen2_defined
 #define __local___localdep_funopen2_defined 1
 #if defined(__CRT_HAVE_funopen2) && __FS_SIZEOF(OFF) == __SIZEOF_OFF32_T__
-__NAMESPACE_LOCAL_END
-#ifndef ____funopen2_types_defined
-#define ____funopen2_types_defined 1
-typedef __ssize_t (__LIBKCALL *__funopen2_readfn_t)(void *__cookie, void *__buf, __size_t __num_bytes);
-typedef __ssize_t (__LIBKCALL *__funopen2_writefn_t)(void *__cookie, void const *__buf, __size_t __num_bytes);
-typedef __FS_TYPE(off) (__LIBKCALL *__funopen2_seekfn_t)(void *__cookie, __FS_TYPE(off) __off, int __whence);
-typedef int (__LIBKCALL *__funopen2_flushfn_t)(void *__cookie);
-typedef int (__LIBKCALL *__funopen2_closefn_t)(void *__cookie);
-#endif /* !____funopen2_types_defined */
-__NAMESPACE_LOCAL_BEGIN
-__CREDIRECT(__ATTR_WUNUSED,__FILE *,__NOTHROW_NCX,__localdep_funopen2,(void const *__cookie, __funopen2_readfn_t __readfn, __funopen2_writefn_t __writefn, __funopen2_seekfn_t __seekfn, __funopen2_flushfn_t __flushfn, __funopen2_closefn_t __closefn),funopen2,(__cookie,__readfn,__writefn,__seekfn,__flushfn,__closefn))
+__CREDIRECT(__ATTR_WUNUSED,__FILE *,__NOTHROW_NCX,__localdep_funopen2,(void const *__cookie, __SSIZE_TYPE__ (__LIBKCALL *__readfn)(void *__cookie, void *__buf, __SIZE_TYPE__ __num_bytes), __SSIZE_TYPE__ (__LIBKCALL *__writefn)(void *__cookie, void const *__buf, __SIZE_TYPE__ __num_bytes), __FS_TYPE(off) (__LIBKCALL *__seekfn)(void *__cookie, __FS_TYPE(off) __off, int __whence), int (__LIBKCALL *__flushfn)(void *__cookie), int (__LIBKCALL *__closefn)(void *__cookie)),funopen2,(__cookie,__readfn,__writefn,__seekfn,__flushfn,__closefn))
 #elif defined(__CRT_HAVE_funopen2_64) && __FS_SIZEOF(OFF) == __SIZEOF_OFF64_T__
-__NAMESPACE_LOCAL_END
-#ifndef ____funopen2_types_defined
-#define ____funopen2_types_defined 1
-typedef __ssize_t (__LIBKCALL *__funopen2_readfn_t)(void *__cookie, void *__buf, __size_t __num_bytes);
-typedef __ssize_t (__LIBKCALL *__funopen2_writefn_t)(void *__cookie, void const *__buf, __size_t __num_bytes);
-typedef __FS_TYPE(off) (__LIBKCALL *__funopen2_seekfn_t)(void *__cookie, __FS_TYPE(off) __off, int __whence);
-typedef int (__LIBKCALL *__funopen2_flushfn_t)(void *__cookie);
-typedef int (__LIBKCALL *__funopen2_closefn_t)(void *__cookie);
-#endif /* !____funopen2_types_defined */
-__NAMESPACE_LOCAL_BEGIN
-__CREDIRECT(__ATTR_WUNUSED,__FILE *,__NOTHROW_NCX,__localdep_funopen2,(void const *__cookie, __funopen2_readfn_t __readfn, __funopen2_writefn_t __writefn, __funopen2_seekfn_t __seekfn, __funopen2_flushfn_t __flushfn, __funopen2_closefn_t __closefn),funopen2_64,(__cookie,__readfn,__writefn,__seekfn,__flushfn,__closefn))
+__CREDIRECT(__ATTR_WUNUSED,__FILE *,__NOTHROW_NCX,__localdep_funopen2,(void const *__cookie, __SSIZE_TYPE__ (__LIBKCALL *__readfn)(void *__cookie, void *__buf, __SIZE_TYPE__ __num_bytes), __SSIZE_TYPE__ (__LIBKCALL *__writefn)(void *__cookie, void const *__buf, __SIZE_TYPE__ __num_bytes), __FS_TYPE(off) (__LIBKCALL *__seekfn)(void *__cookie, __FS_TYPE(off) __off, int __whence), int (__LIBKCALL *__flushfn)(void *__cookie), int (__LIBKCALL *__closefn)(void *__cookie)),funopen2_64,(__cookie,__readfn,__writefn,__seekfn,__flushfn,__closefn))
 #elif (defined(__CRT_HAVE_malloc) || defined(__CRT_HAVE_calloc) || defined(__CRT_HAVE_realloc) || defined(__CRT_HAVE_memalign) || defined(__CRT_HAVE_aligned_alloc) || defined(__CRT_HAVE_posix_memalign)) && ((defined(__CRT_HAVE_funopen2) && __SIZEOF_OFF64_T__ == __SIZEOF_OFF32_T__) || defined(__CRT_HAVE_funopen2_64) || defined(__CRT_HAVE_funopen2))
 __NAMESPACE_LOCAL_END
 #include <libc/local/stdio/funopen2.h>
@@ -90,21 +63,9 @@ __NAMESPACE_LOCAL_BEGIN
 #ifndef __local___localdep_funopen64_defined
 #define __local___localdep_funopen64_defined 1
 #if defined(__CRT_HAVE_funopen) && __SIZEOF_OFF64_T__ == __SIZEOF_OFF32_T__
-__NAMESPACE_LOCAL_END
-#ifndef ____funopen64_types_defined
-#define ____funopen64_types_defined 1
-typedef __off64_t (__LIBKCALL *__funopen64_seekfn_t)(void *__cookie, __off64_t __off, int __whence);
-#endif /* !____funopen64_types_defined */
-__NAMESPACE_LOCAL_BEGIN
-__CREDIRECT(__ATTR_WUNUSED,__FILE *,__NOTHROW_NCX,__localdep_funopen64,(void const *__cookie, __funopen_readfn_t __readfn, __funopen_writefn_t __writefn, __funopen64_seekfn_t __seekfn, __funopen_closefn_t __closefn),funopen,(__cookie,__readfn,__writefn,__seekfn,__closefn))
+__CREDIRECT(__ATTR_WUNUSED,__FILE *,__NOTHROW_NCX,__localdep_funopen64,(void const *__cookie, int (__LIBKCALL *__readfn)(void *__cookie, char *__buf, int __num_bytes), int (__LIBKCALL *__writefn)(void *__cookie, char const *__buf, int __num_bytes), __off64_t (__LIBKCALL *__seekfn)(void *__cookie, __off64_t __off, int __whence), int (__LIBKCALL *__closefn)(void *__cookie)),funopen,(__cookie,__readfn,__writefn,__seekfn,__closefn))
 #elif defined(__CRT_HAVE_funopen64)
-__NAMESPACE_LOCAL_END
-#ifndef ____funopen64_types_defined
-#define ____funopen64_types_defined 1
-typedef __off64_t (__LIBKCALL *__funopen64_seekfn_t)(void *__cookie, __off64_t __off, int __whence);
-#endif /* !____funopen64_types_defined */
-__NAMESPACE_LOCAL_BEGIN
-__CREDIRECT(__ATTR_WUNUSED,__FILE *,__NOTHROW_NCX,__localdep_funopen64,(void const *__cookie, __funopen_readfn_t __readfn, __funopen_writefn_t __writefn, __funopen64_seekfn_t __seekfn, __funopen_closefn_t __closefn),funopen64,(__cookie,__readfn,__writefn,__seekfn,__closefn))
+__CREDIRECT(__ATTR_WUNUSED,__FILE *,__NOTHROW_NCX,__localdep_funopen64,(void const *__cookie, int (__LIBKCALL *__readfn)(void *__cookie, char *__buf, int __num_bytes), int (__LIBKCALL *__writefn)(void *__cookie, char const *__buf, int __num_bytes), __off64_t (__LIBKCALL *__seekfn)(void *__cookie, __off64_t __off, int __whence), int (__LIBKCALL *__closefn)(void *__cookie)),funopen64,(__cookie,__readfn,__writefn,__seekfn,__closefn))
 #elif (__SIZEOF_INT__ == __SIZEOF_SIZE_T__ && ((defined(__CRT_HAVE_funopen2) && __SIZEOF_OFF64_T__ == __SIZEOF_OFF32_T__) || defined(__CRT_HAVE_funopen2_64) || ((defined(__CRT_HAVE_malloc) || defined(__CRT_HAVE_calloc) || defined(__CRT_HAVE_realloc) || defined(__CRT_HAVE_memalign) || defined(__CRT_HAVE_aligned_alloc) || defined(__CRT_HAVE_posix_memalign)) && defined(__CRT_HAVE_funopen2)))) || ((defined(__CRT_HAVE_malloc) || defined(__CRT_HAVE_calloc) || defined(__CRT_HAVE_realloc) || defined(__CRT_HAVE_memalign) || defined(__CRT_HAVE_aligned_alloc) || defined(__CRT_HAVE_posix_memalign)) && (defined(__CRT_HAVE_funopen2_64) || defined(__CRT_HAVE_funopen2) || defined(__CRT_HAVE_fopencookie) || defined(__CRT_HAVE_funopen)))
 __NAMESPACE_LOCAL_END
 #include <libc/local/stdio/funopen64.h>
@@ -130,34 +91,16 @@ __NAMESPACE_LOCAL_BEGIN
 #endif /* !... */
 #endif /* !__local___localdep_malloc_defined */
 __NAMESPACE_LOCAL_END
-#if __SIZEOF_INT__ == __SIZEOF_SIZE_T__ && ((defined(__CRT_HAVE_funopen2) && __FS_SIZEOF(OFF) == __SIZEOF_OFF32_T__) || (defined(__CRT_HAVE_funopen2_64) && __FS_SIZEOF(OFF) == __SIZEOF_OFF64_T__) || ((defined(__CRT_HAVE_malloc) || defined(__CRT_HAVE_calloc) || defined(__CRT_HAVE_realloc) || defined(__CRT_HAVE_memalign) || defined(__CRT_HAVE_aligned_alloc) || defined(__CRT_HAVE_posix_memalign)) && ((defined(__CRT_HAVE_funopen2) && __SIZEOF_OFF64_T__ == __SIZEOF_OFF32_T__) || defined(__CRT_HAVE_funopen2_64) || defined(__CRT_HAVE_funopen2))))
-#ifndef ____funopen2_types_defined
-#define ____funopen2_types_defined 1
-typedef __ssize_t (__LIBKCALL *__funopen2_readfn_t)(void *__cookie, void *__buf, __size_t __num_bytes);
-typedef __ssize_t (__LIBKCALL *__funopen2_writefn_t)(void *__cookie, void const *__buf, __size_t __num_bytes);
-typedef __FS_TYPE(off) (__LIBKCALL *__funopen2_seekfn_t)(void *__cookie, __FS_TYPE(off) __off, int __whence);
-typedef int (__LIBKCALL *__funopen2_flushfn_t)(void *__cookie);
-typedef int (__LIBKCALL *__funopen2_closefn_t)(void *__cookie);
-#endif /* !____funopen2_types_defined */
-
-#else /* __SIZEOF_INT__ == __SIZEOF_SIZE_T__ && ((__CRT_HAVE_funopen2 && __FS_SIZEOF(OFF) == __SIZEOF_OFF32_T__) || (__CRT_HAVE_funopen2_64 && __FS_SIZEOF(OFF) == __SIZEOF_OFF64_T__) || ((__CRT_HAVE_malloc || __CRT_HAVE_calloc || __CRT_HAVE_realloc || __CRT_HAVE_memalign || __CRT_HAVE_aligned_alloc || __CRT_HAVE_posix_memalign) && ((__CRT_HAVE_funopen2 && __SIZEOF_OFF64_T__ == __SIZEOF_OFF32_T__) || __CRT_HAVE_funopen2_64 || __CRT_HAVE_funopen2))) */
-#ifndef ____funopen_types_defined
-#define ____funopen_types_defined 1
-typedef int (__LIBKCALL *__funopen_readfn_t)(void *__cookie, char *__buf, int __num_bytes);
-typedef int (__LIBKCALL *__funopen_writefn_t)(void *__cookie, char const *__buf, int __num_bytes);
-typedef __FS_TYPE(off) (__LIBKCALL *__funopen_seekfn_t)(void *__cookie, __FS_TYPE(off) __off, int __whence);
-typedef int (__LIBKCALL *__funopen_closefn_t)(void *__cookie);
-#endif /* !____funopen_types_defined */
-
+#if __SIZEOF_INT__ != __SIZEOF_SIZE_T__ || ((!defined(__CRT_HAVE_funopen2) || __FS_SIZEOF(OFF) != __SIZEOF_OFF32_T__) && (!defined(__CRT_HAVE_funopen2_64) || __FS_SIZEOF(OFF) != __SIZEOF_OFF64_T__) && ((!defined(__CRT_HAVE_malloc) && !defined(__CRT_HAVE_calloc) && !defined(__CRT_HAVE_realloc) && !defined(__CRT_HAVE_memalign) && !defined(__CRT_HAVE_aligned_alloc) && !defined(__CRT_HAVE_posix_memalign)) || (!defined(__CRT_HAVE_funopen2_64) && !defined(__CRT_HAVE_funopen2))))
 #ifndef ____funopen_holder_defined
 __NAMESPACE_LOCAL_BEGIN
 #define ____funopen_holder_defined 1
 struct __funopen_holder {
-	void               *__fh_cookie;  /* [0..1] funopen readfn */
-	__funopen_readfn_t  __fh_readfn;  /* [0..1] funopen readfn */
-	__funopen_writefn_t __fh_writefn; /* [0..1] funopen writefn */
-	__funopen_seekfn_t  __fh_seekfn;  /* [0..1] funopen seekfn */
-	__funopen_closefn_t __fh_closefn; /* [0..1] funopen closefn */
+	void            *__fh_cookie;                                                 /* [0..1] funopen readfn */
+	int   (__LIBKCALL *__fh_readfn)(void *__cookie, char *__buf, int __num_bytes);        /* [0..1] funopen readfn */
+	int   (__LIBKCALL *__fh_writefn)(void *__cookie, char const *__buf, int __num_bytes); /* [0..1] funopen writefn */
+	__FS_TYPE(off) (__LIBKCALL *__fh_seekfn)(void *__cookie, __FS_TYPE(off) __off, int __whence);           /* [0..1] funopen seekfn */
+	int   (__LIBKCALL *__fh_closefn)(void *__cookie);                                 /* [0..1] funopen closefn */
 };
 __NAMESPACE_LOCAL_END
 #endif /* !____funopen_holder_defined */
@@ -207,15 +150,6 @@ __LOCAL_LIBC(__funopen_to_funopen2_writefn) __SSIZE_TYPE__
 __NAMESPACE_LOCAL_END
 #endif /* !__funopen_to_funopen2_writefn_defined */
 
-#ifndef ____funopen2_types_defined
-#define ____funopen2_types_defined 1
-typedef __ssize_t (__LIBKCALL *__funopen2_readfn_t)(void *__cookie, void *__buf, __size_t __num_bytes);
-typedef __ssize_t (__LIBKCALL *__funopen2_writefn_t)(void *__cookie, void const *__buf, __size_t __num_bytes);
-typedef __FS_TYPE(off) (__LIBKCALL *__funopen2_seekfn_t)(void *__cookie, __FS_TYPE(off) __off, int __whence);
-typedef int (__LIBKCALL *__funopen2_flushfn_t)(void *__cookie);
-typedef int (__LIBKCALL *__funopen2_closefn_t)(void *__cookie);
-#endif /* !____funopen2_types_defined */
-
 #ifndef __funopen_to_funopen2_seekfn_defined
 __NAMESPACE_LOCAL_BEGIN
 #define __funopen_to_funopen2_seekfn_defined 1
@@ -259,10 +193,10 @@ __NAMESPACE_LOCAL_END
 __NAMESPACE_LOCAL_BEGIN
 #define __funopen_to_fopencookie_seekfn_defined 1
 #ifdef __USE_KOS_ALTERATIONS
-__LOCAL_LIBC(__funopen_to_fopencookie_seekfn) int
+__LOCAL_LIBC(__funopen_to_fopencookie_seekfn) __ATTR_NONNULL((2)) int
 (__LIBKCALL __funopen_to_fopencookie_seekfn)(void *__cookie, __pos64_t *__pos, int __whence)
 #else /* __USE_KOS_ALTERATIONS */
-__LOCAL_LIBC(__funopen_to_fopencookie_seekfn) int
+__LOCAL_LIBC(__funopen_to_fopencookie_seekfn) __ATTR_NONNULL((2)) int
 (__LIBKCALL __funopen_to_fopencookie_seekfn)(void *__cookie, __off64_t *__pos, int __whence)
 #endif /* !__USE_KOS_ALTERATIONS */
 {
@@ -284,11 +218,6 @@ __NAMESPACE_LOCAL_END
 
 #include <libio.h>
 #else /* ... */
-#ifndef ____funopen64_types_defined
-#define ____funopen64_types_defined 1
-typedef __off64_t (__LIBKCALL *__funopen64_seekfn_t)(void *__cookie, __off64_t __off, int __whence);
-#endif /* !____funopen64_types_defined */
-
 #if __SIZEOF_INT__ == __SIZEOF_SIZE_T__
 #ifndef __funopen_to_funopen2_readfn_defined
 __NAMESPACE_LOCAL_BEGIN
@@ -358,11 +287,11 @@ __NAMESPACE_LOCAL_END
 #endif /* __SIZEOF_INT__ != __SIZEOF_SIZE_T__ || ((!__CRT_HAVE_funopen2 || __FS_SIZEOF(OFF) != __SIZEOF_OFF32_T__) && (!__CRT_HAVE_funopen2_64 || __FS_SIZEOF(OFF) != __SIZEOF_OFF64_T__) && ((!__CRT_HAVE_malloc && !__CRT_HAVE_calloc && !__CRT_HAVE_realloc && !__CRT_HAVE_memalign && !__CRT_HAVE_aligned_alloc && !__CRT_HAVE_posix_memalign) || (!__CRT_HAVE_funopen2_64 && !__CRT_HAVE_funopen2))) */
 __NAMESPACE_LOCAL_BEGIN
 __LOCAL_LIBC(funopen) __ATTR_WUNUSED __FILE *
-__NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(funopen))(void const *__cookie, __funopen_readfn_t __readfn, __funopen_writefn_t __writefn, __funopen_seekfn_t __seekfn, __funopen_closefn_t __closefn) {
+__NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(funopen))(void const *__cookie, int (__LIBKCALL *__readfn)(void *__cookie, char *__buf, int __num_bytes), int (__LIBKCALL *__writefn)(void *__cookie, char const *__buf, int __num_bytes), __FS_TYPE(off) (__LIBKCALL *__seekfn)(void *__cookie, __FS_TYPE(off) __off, int __whence), int (__LIBKCALL *__closefn)(void *__cookie)) {
 #if __SIZEOF_INT__ == __SIZEOF_SIZE_T__ && ((defined(__CRT_HAVE_funopen2) && __FS_SIZEOF(OFF) == __SIZEOF_OFF32_T__) || (defined(__CRT_HAVE_funopen2_64) && __FS_SIZEOF(OFF) == __SIZEOF_OFF64_T__) || ((defined(__CRT_HAVE_malloc) || defined(__CRT_HAVE_calloc) || defined(__CRT_HAVE_realloc) || defined(__CRT_HAVE_memalign) || defined(__CRT_HAVE_aligned_alloc) || defined(__CRT_HAVE_posix_memalign)) && ((defined(__CRT_HAVE_funopen2) && __SIZEOF_OFF64_T__ == __SIZEOF_OFF32_T__) || defined(__CRT_HAVE_funopen2_64) || defined(__CRT_HAVE_funopen2))))
 	return (__NAMESPACE_LOCAL_SYM __localdep_funopen2)(__cookie,
-	                (__funopen2_readfn_t)__readfn,
-	                (__funopen2_writefn_t)__writefn,
+	                (__SSIZE_TYPE__ (__LIBKCALL *)(void *, void *, __SIZE_TYPE__))__readfn,
+	                (__SSIZE_TYPE__ (__LIBKCALL *)(void *, void const *, __SIZE_TYPE__))__writefn,
 	                __seekfn, __NULLPTR, __closefn);
 #else /* __SIZEOF_INT__ == __SIZEOF_SIZE_T__ && ((__CRT_HAVE_funopen2 && __FS_SIZEOF(OFF) == __SIZEOF_OFF32_T__) || (__CRT_HAVE_funopen2_64 && __FS_SIZEOF(OFF) == __SIZEOF_OFF64_T__) || ((__CRT_HAVE_malloc || __CRT_HAVE_calloc || __CRT_HAVE_realloc || __CRT_HAVE_memalign || __CRT_HAVE_aligned_alloc || __CRT_HAVE_posix_memalign) && ((__CRT_HAVE_funopen2 && __SIZEOF_OFF64_T__ == __SIZEOF_OFF32_T__) || __CRT_HAVE_funopen2_64 || __CRT_HAVE_funopen2))) */
 	__FILE *__result;
@@ -398,8 +327,8 @@ __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(funopen))(void const *__cookie, __fun
 #else /* ... */
 #if __SIZEOF_INT__ == __SIZEOF_SIZE_T__
 	__result = (__NAMESPACE_LOCAL_SYM __localdep_funopen64)(/* cookie:  */ __holder,
-	                   /* readfn:  */ __readfn  ? (__funopen_readfn_t)&__NAMESPACE_LOCAL_SYM __funopen_to_funopen2_readfn  : __NULLPTR,
-	                   /* writefn: */ __writefn ? (__funopen_writefn_t)&__NAMESPACE_LOCAL_SYM __funopen_to_funopen2_writefn : __NULLPTR,
+	                   /* readfn:  */ __readfn  ? (int (__LIBKCALL *)(void *, char *, int))&__NAMESPACE_LOCAL_SYM __funopen_to_funopen2_readfn  : __NULLPTR,
+	                   /* writefn: */ __writefn ? (int (__LIBKCALL *)(void *, char const *, int))&__NAMESPACE_LOCAL_SYM __funopen_to_funopen2_writefn : __NULLPTR,
 	                   /* seekfn:  */ __seekfn  ? &__NAMESPACE_LOCAL_SYM __funopen_to_funopen64_seekfn  : __NULLPTR,
 	                   /* closefn: */ &__NAMESPACE_LOCAL_SYM __funopen_to_funopen2_closefn);
 #else /* __SIZEOF_INT__ == __SIZEOF_SIZE_T__ */

@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x65b623bd */
+/* HASH CRC-32:0x15dfb6b7 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -326,11 +326,6 @@ typedef int (__LIBCCALL *__compar_fn_t)(void const *__a, void const *__b);
 typedef __compar_fn_t comparison_fn_t;
 #endif /* __USE_GNU */
 #endif /* __COMPAR_FN_T */
-
-#ifndef ____atexit_func_t_defined
-#define ____atexit_func_t_defined 1
-typedef void (__LIBCCALL *__atexit_func_t)(void);
-#endif /* !____atexit_func_t_defined */
 
 
 #ifdef __USE_KOS
@@ -804,9 +799,9 @@ __CREDIRECT_VOID_GCCNCX(__ATTR_NORETURN,__THROWING,exit,(int __status),_Exit,(__
 #endif /* !... */
 #endif /* !__std_exit_defined */
 #ifdef __CRT_HAVE_atexit
-__CDECLARE(__ATTR_NONNULL((1)),int,__NOTHROW_NCX,atexit,(__atexit_func_t __func),(__func))
+__CDECLARE(__ATTR_NONNULL((1)),int,__NOTHROW_NCX,atexit,(void (__LIBCCALL *__func)(void)),(__func))
 #elif defined(__CRT_HAVE_at_quick_exit)
-__CREDIRECT(__ATTR_NONNULL((1)),int,__NOTHROW_NCX,atexit,(__atexit_func_t __func),at_quick_exit,(__func))
+__CREDIRECT(__ATTR_NONNULL((1)),int,__NOTHROW_NCX,atexit,(void (__LIBCCALL *__func)(void)),at_quick_exit,(__func))
 #endif /* ... */
 #if defined(__USE_ISOC11) || defined(__USE_ISOCXX11)
 #ifdef __CRT_HAVE_quick_exit
@@ -819,9 +814,9 @@ __CREDIRECT_VOID(__ATTR_NORETURN,__THROWING,quick_exit,(int __status),_exit,(__s
 __CREDIRECT_VOID(__ATTR_NORETURN,__THROWING,quick_exit,(int __status),_Exit,(__status))
 #endif /* ... */
 #ifdef __CRT_HAVE_at_quick_exit
-__CDECLARE(__ATTR_NONNULL((1)),int,__NOTHROW_NCX,at_quick_exit,(__atexit_func_t __func),(__func))
+__CDECLARE(__ATTR_NONNULL((1)),int,__NOTHROW_NCX,at_quick_exit,(void (__LIBCCALL *__func)(void)),(__func))
 #elif defined(__CRT_HAVE_atexit)
-__CREDIRECT(__ATTR_NONNULL((1)),int,__NOTHROW_NCX,at_quick_exit,(__atexit_func_t __func),atexit,(__func))
+__CREDIRECT(__ATTR_NONNULL((1)),int,__NOTHROW_NCX,at_quick_exit,(void (__LIBCCALL *__func)(void)),atexit,(__func))
 #endif /* ... */
 #endif /* __USE_ISOC11 || __USE_ISOCXX11 */
 #ifdef __USE_ISOC99
@@ -2245,8 +2240,7 @@ __CDECLARE_OPT(__ATTR_NONNULL((1, 2)),int,__NOTHROW_NCX,random_r,(struct random_
 __CDECLARE_OPT(__ATTR_NONNULL((2)),int,__NOTHROW_NCX,srandom_r,(unsigned int __seed, struct random_data *__buf),(__seed,__buf))
 __CDECLARE_OPT(__ATTR_NONNULL((2, 4)),int,__NOTHROW_NCX,initstate_r,(unsigned int __seed, char *__restrict __statebuf, __SIZE_TYPE__ __statelen, struct random_data *__restrict __buf),(__seed,__statebuf,__statelen,__buf))
 __CDECLARE_OPT(__ATTR_NONNULL((1, 2)),int,__NOTHROW_NCX,setstate_r,(char *__restrict __statebuf, struct random_data *__restrict __buf),(__statebuf,__buf))
-typedef void (__LIBCCALL *__on_exit_func_t)(int __status, void *__arg);
-__CDECLARE_OPT(__ATTR_NONNULL((1)),int,__NOTHROW_NCX,on_exit,(__on_exit_func_t __func, void *__arg),(__func,__arg))
+__CDECLARE_OPT(__ATTR_NONNULL((1)),int,__NOTHROW_NCX,on_exit,(void (__LIBCCALL *__func)(int __status, void *__arg), void *__arg),(__func,__arg))
 __CDECLARE_OPT(,int,__NOTHROW_NCX,clearenv,(void),())
 #ifndef __mkstemps_defined
 #define __mkstemps_defined 1

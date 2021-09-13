@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x8370b161 */
+/* HASH CRC-32:0xd49f4b57 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -53,7 +53,7 @@ NOTHROW(LIBCCALL libc_pthread_equal)(pthread_t thr1,
  * @return: EOK: Success */
 INTERN ATTR_SECTION(".text.crt.sched.pthread") NONNULL((1, 2)) errno_t
 (LIBCCALL libc_pthread_once)(pthread_once_t *once_control,
-                             __pthread_once_routine_t init_routine) THROWS(...) {
+                             void (LIBCCALL *init_routine)(void)) THROWS(...) {
 	pthread_once_t status;
 again:
 	status = __hybrid_atomic_cmpxch_val(*once_control,
@@ -196,7 +196,7 @@ NOTHROW_NCX(LIBCCALL libc_pthread_spin_unlock)(pthread_spinlock_t *lock) {
  * @return: ENOMEM: Insufficient memory to create the key */
 INTERN ATTR_SECTION(".text.crt.sched.pthread") NONNULL((1)) errno_t
 NOTHROW_NCX(LIBCCALL libc_pthread_key_create_once_np)(pthread_key_t *key,
-                                                      __pthread_destr_function_t destr_function) {
+                                                      void (LIBKCALL *destr_function)(void *)) {
 	pthread_key_t kv;
 	errno_t error;
 again:

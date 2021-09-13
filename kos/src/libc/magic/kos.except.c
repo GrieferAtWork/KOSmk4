@@ -18,6 +18,7 @@
  * 3. This notice may not be removed or altered from any source distribution. *
  */
 %[default:section(".text.crt{|.dos}.except.io.utility")]
+%[default:nodos]
 
 %(auto_source){
 #include <errno.h>
@@ -144,7 +145,7 @@ typedef __error_subclass_t error_subclass_t;
 
 
 /* Returns non-zero if there is an active exception. */
-[[kernel, no_crt_dos_wrapper, cc(LIBKCALL)]]
+[[kernel, cc(LIBKCALL)]]
 [[if($extended_include_prefix("<kos/bits/fastexcept.h>")defined(__arch_error_data)),
   preferred_fast_extern_inline("error_data", { return __arch_error_data(); })]]
 [[wunused, const, nothrow, nonnull, decl_prefix(struct exception_data;)]]
@@ -153,7 +154,7 @@ struct exception_data *error_data(void) {
 	return __arch_error_data();
 }
 
-[[kernel, no_crt_dos_wrapper, cc(LIBKCALL)]]
+[[kernel, cc(LIBKCALL)]]
 [[if($extended_include_prefix("<kos/bits/fastexcept.h>")defined(__arch_error_code)),
   preferred_fast_extern_inline("error_code", { return __arch_error_code(); })]]
 [[wunused, pure, nothrow, decl_include("<kos/bits/exception_data.h>")]]
@@ -167,7 +168,7 @@ error_code_t error_code(void) {
 @@pp_endif@@
 }
 
-[[kernel, no_crt_dos_wrapper, cc(LIBKCALL)]]
+[[kernel, cc(LIBKCALL)]]
 [[if($extended_include_prefix("<kos/bits/fastexcept.h>")defined(__arch_error_active)),
   preferred_fast_extern_inline("error_active", { return __arch_error_active(); })]]
 [[wunused, pure, nothrow, userimpl, requires_function(error_code)]]
@@ -182,7 +183,7 @@ $bool error_active(void) {
 @@pp_endif@@
 }
 
-[[kernel, no_crt_dos_wrapper, cc(LIBKCALL)]]
+[[kernel, cc(LIBKCALL)]]
 [[if($extended_include_prefix("<kos/bits/fastexcept.h>")defined(__arch_error_class)),
   preferred_fast_extern_inline("error_class", { return __arch_error_class(); })]]
 [[wunused, pure, nothrow, decl_include("<kos/bits/exception_data.h>")]]
@@ -197,7 +198,7 @@ error_class_t error_class(void) {
 @@pp_endif@@
 }
 
-[[kernel, no_crt_dos_wrapper, cc(LIBKCALL)]]
+[[kernel, cc(LIBKCALL)]]
 [[if($extended_include_prefix("<kos/bits/fastexcept.h>")defined(__arch_error_subclass)),
   preferred_fast_extern_inline("error_subclass", { return __arch_error_subclass(); })]]
 [[wunused, pure, nothrow, decl_include("<kos/bits/exception_data.h>")]]
@@ -212,7 +213,7 @@ error_subclass_t error_subclass(void) {
 @@pp_endif@@
 }
 
-[[kernel, no_crt_dos_wrapper, cc(LIBKCALL)]]
+[[kernel, cc(LIBKCALL)]]
 [[if($extended_include_prefix("<kos/bits/fastexcept.h>")defined(__arch_error_register_state)),
   preferred_fast_extern_inline("error_register_state", { return __arch_error_register_state(); })]]
 [[wunused, const, nothrow, nonnull, decl_include("<kos/bits/except.h>")]]
@@ -230,7 +231,7 @@ error_register_state_t *error_register_state(void) {
 }
 
 @@Transform the given exception into a posix errno value
-[[kernel, no_crt_dos_wrapper, cc(LIBKCALL)]]
+[[kernel, cc(LIBKCALL)]]
 [[wunused, pure, decl_include("<bits/types.h>")]]
 [[decl_prefix(struct exception_data;)]]
 [[impl_include("<asm/os/errno.h>")]]
@@ -810,7 +811,7 @@ for (local name: classes.keys.sorted()) {
 @@Transform the given exception into a posix signal.
 @@If   doing  this  is   possible,  fill  in   `*result'  and  return  `true'.
 @@Otherwise, `*result' is left in an undefined state, and `false' is returned.
-[[wunused, kernel, no_crt_dos_wrapper, cc(LIBKCALL)]]
+[[wunused, kernel, cc(LIBKCALL)]]
 [[decl_prefix(struct exception_data;)]]
 [[decl_prefix(struct __siginfo_struct;)]]
 [[impl_include("<hybrid/host.h>")]]
@@ -1010,7 +1011,7 @@ $bool error_as_signal([[nonnull]] struct exception_data const *__restrict self,
 @@Return the name of the given error, or `NULL' if unknown.
 @@This  name  is   the  same  as   the  `E_*'   identifier.
 @@E.g.: `error_name(ERROR_CODEOF(E_BADALLOC))' -> "E_BADALLOC"
-[[kernel, no_crt_dos_wrapper, cc(LIBKCALL)]]
+[[kernel, cc(LIBKCALL)]]
 [[wunused, const, nothrow, decl_include("<kos/bits/exception_data.h>")]]
 [[impl_include("<hybrid/host.h>", "<kos/except/codes.h>")]]
 char const *error_name(error_code_t code) {
@@ -1296,7 +1297,7 @@ non_linear_prefix:
 @@with greater priorities should take  the place of ones  with
 @@lower priorities in  situations where multiple  simultaneous
 @@errors can't be prevented.
-[[kernel, no_crt_dos_wrapper, cc(LIBKCALL)]]
+[[kernel, cc(LIBKCALL)]]
 [[wunused, const, nothrow]]
 [[impl_include("<kos/except/codes.h>")]]
 [[impl_include("<kos/bits/exception_data.h>")]]
@@ -1318,7 +1319,7 @@ unsigned int error_priority(error_code_t code) {
 
 
 %#ifdef __USE_KOS_KERNEL
-[[kernel, no_crt_dos_wrapper, cc(LIBKCALL)]]
+[[kernel, cc(LIBKCALL)]]
 [[if($extended_include_prefix("<kos/bits/fastexcept.h>")defined(__arch_error_info)),
   preferred_fast_extern_inline("error_info", { return __arch_error_info(); })]]
 [[wunused, const, nothrow, nonnull, decl_prefix(struct exception_info;)]]
@@ -1330,7 +1331,7 @@ struct exception_info *error_info(void) {
 
 @@Unwind the given register state to propagate the currently set error.
 @@Following this, the  returned register state  should then be  loaded.
-[[kernel, no_crt_dos_wrapper, cc(__ERROR_UNWIND_CC)]]
+[[kernel, cc(__ERROR_UNWIND_CC)]]
 [[wunused, nonnull, decl_include("<kos/bits/except.h>")]]
 [[decl_prefix(
 #ifndef __ERROR_UNWIND_CC
@@ -1351,12 +1352,12 @@ error_register_state_t *error_unwind([[nonnull]] error_register_state_t *__restr
 
 @@Throw the currently set (in `error_data()') exception.
 [[noreturn, cold, throws]]
-[[kernel, no_crt_dos_wrapper, cc(LIBKCALL)]]
+[[kernel, cc(LIBKCALL)]]
 void error_throw_current(void);
 
 @@Rethrow the current exception (same as a c++ `throw;' expression)
 [[guard, noreturn, cold, throws]]
-[[kernel, no_crt_dos_wrapper, cc(LIBKCALL)]]
+[[kernel, cc(LIBKCALL)]]
 void error_rethrow(void);
 
 
@@ -1408,7 +1409,7 @@ __ATTR_WUNUSED __BOOL __NOTHROW(was_thrown)(error_code_t __code);
 #endif /* !__ERROR_THROW_CC */
 )]]
 [[noreturn, cold, throws]]
-[[kernel, no_crt_dos_wrapper, cc(__ERROR_THROW_CC)]]
+[[kernel, cc(__ERROR_THROW_CC)]]
 void error_throw(error_code_t code);
 
 @@Throw an exception and load `argc' pointers from varargs
@@ -1418,7 +1419,7 @@ void error_throw(error_code_t code);
 #endif /* !__ERROR_THROWN_CC */
 )]]
 [[noreturn, cold, throws]]
-[[kernel, no_crt_dos_wrapper, cc(__ERROR_THROWN_CC)]]
+[[kernel, cc(__ERROR_THROWN_CC)]]
 void error_thrown(error_code_t code, unsigned int _argc, ...);
 
 
@@ -1494,7 +1495,7 @@ void error_thrown(error_code_t code, unsigned int _argc, ...);
 #ifndef __ERROR_NESTING_BEGIN_CC
 #define __ERROR_NESTING_BEGIN_CC __LIBKCALL
 #endif /* !__ERROR_NESTING_BEGIN_CC */
-), nothrow, kernel, no_crt_dos_wrapper, cc(__ERROR_NESTING_BEGIN_CC)]]
+), nothrow, kernel, cc(__ERROR_NESTING_BEGIN_CC)]]
 [[decl_include("<kos/bits/exception_info.h>", "<bits/types.h>")]]
 void error_nesting_begin([[nonnull]] struct _exception_nesting_data *__restrict saved) {
 	struct exception_info *info = error_info();
@@ -1521,7 +1522,7 @@ void error_nesting_begin([[nonnull]] struct _exception_nesting_data *__restrict 
 #ifndef __ERROR_NESTING_END_CC
 #define __ERROR_NESTING_END_CC __LIBKCALL
 #endif /* !__ERROR_NESTING_END_CC */
-), nothrow, kernel, no_crt_dos_wrapper, cc(__ERROR_NESTING_END_CC)]]
+), nothrow, kernel, cc(__ERROR_NESTING_END_CC)]]
 [[decl_include("<kos/bits/exception_info.h>")]]
 [[impl_include("<hybrid/__assert.h>")]]
 void error_nesting_end([[nonnull]] struct _exception_nesting_data *__restrict saved) {

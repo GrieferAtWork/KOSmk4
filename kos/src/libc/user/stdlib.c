@@ -97,37 +97,6 @@ bool LIBCCALL environ_remove_heapstring_locked(struct environ_heapstr *ptr) {
 }
 
 
-/* Provide wrappers for `qsort()', `bsearch()', `atexit()' and `at_quick_exit()'
- * for  DOS-mode, that take function pointers to LIBDCALL functions, rather than
- * `LIBKCALL' ones.
- * All other functions that take functions pointers (such as `bsearch_r()') always
- * take these pointers in the form of `LIBKCALL' prototypes, since these functions
- * don't  normally exist under DOS. (if I'm wrong about this, we might have to add
- * those functions to this list at some point...) */
-#ifndef __LIBDCALL_IS_LIBKCALL
-typedef void (__LIBDCALL *__dos_atexit_func_t)(void);
-typedef int (__LIBDCALL *__dos_compar_fn_t)(void const *__a, void const *__b);
-
-PRIVATE ATTR_SECTION(".text.crt.dos.sched.process") void
-NOTHROW_NCX(LIBCCALL libd_atexit_wrapper)(int status, void *arg) {
-	(void)status;
-	(*(__dos_atexit_func_t)arg)();
-}
-
-DEFINE_PUBLIC_ALIAS(DOS$atexit, libd_atexit);
-INTERN ATTR_SECTION(".text.crt.dos.sched.process") NONNULL((1)) int
-NOTHROW_NCX(LIBCCALL libd_atexit)(__dos_atexit_func_t func) {
-	return on_exit(&libd_atexit_wrapper, (void *)func);
-}
-
-/* Not really correct,  but prevents  having to  re-
- * design the KOS-mode `at_quick_exit()' function... */
-DEFINE_PUBLIC_ALIAS(DOS$at_quick_exit, libd_atexit);
-
-#endif /* !__LIBDCALL_IS_LIBKCALL */
-
-
-
 /* TODO: Add support for: __cxa_thread_atexit */
 /* TODO: Add support for: __cxa_thread_atexit_impl  */
 DEFINE_PUBLIC_ALIAS(__cxa_atexit, libc___cxa_atexit);
@@ -642,8 +611,8 @@ NOTHROW_RPC(LIBCCALL libc__searchenv_s)(char const *file,
 /*[[[end:libc__searchenv_s]]]*/
 
 struct atexit_callback {
-	__on_exit_func_t ac_func; /* [1..1] The function to-be invoked. */
-	void            *ac_arg;  /* Argument for `ac_func'. */
+	void (LIBCCALL *ac_func)(int status, void *arg); /* [1..1] The function to-be invoked. */
+	void           *ac_arg;                          /* Argument for `ac_func'. */
 };
 
 struct atexit_vector_struct {
@@ -676,9 +645,9 @@ void LIBCCALL libc_run_atexit(int status) {
 	}
 }
 
-/*[[[head:libc_on_exit,hash:CRC-32=0xc49f8108]]]*/
+/*[[[head:libc_on_exit,hash:CRC-32=0x28daac51]]]*/
 INTERN ATTR_SECTION(".text.crt.sched.process") NONNULL((1)) int
-NOTHROW_NCX(LIBCCALL libc_on_exit)(__on_exit_func_t func,
+NOTHROW_NCX(LIBCCALL libc_on_exit)(void (LIBCCALL *func)(int status, void *arg),
                                    void *arg)
 /*[[[body:libc_on_exit]]]*/
 {
@@ -707,15 +676,52 @@ NOTHROW_NCX(LIBCCALL libc_on_exit)(__on_exit_func_t func,
 }
 /*[[[end:libc_on_exit]]]*/
 
+#ifndef __LIBCCALL_IS_LIBDCALL
+struct libd_on_exit_cookie {
+	void (LIBDCALL *func)(int status, void *arg);
+	void *arg;
+};
+PRIVATE ATTR_SECTION(".text.crt.dos.sched.process") void LIBCCALL 
+libd_on_exit_wrapper(int status, void *arg) {
+	struct libd_on_exit_cookie cookie;
+	cookie = *(struct libd_on_exit_cookie *)arg;
+	free(arg);
+	(*cookie.func)(status, cookie.arg);
+}
+#endif /* __LIBCCALL_IS_LIBDCALL */
+
+/*[[[head:libd_on_exit,hash:CRC-32=0xc3379334]]]*/
+#ifndef __LIBCCALL_IS_LIBDCALL
+INTERN ATTR_SECTION(".text.crt.dos.sched.process") NONNULL((1)) int
+NOTHROW_NCX(LIBDCALL libd_on_exit)(void (LIBDCALL *func)(int status, void *arg),
+                                   void *arg)
+/*[[[body:libd_on_exit]]]*/
+{
+	int result;
+	struct libd_on_exit_cookie *cookie;
+	cookie = (struct libd_on_exit_cookie *)malloc(sizeof(struct libd_on_exit_cookie));
+	if unlikely(!cookie)
+		return -1;
+	cookie->func = func;
+	cookie->arg = arg;
+	result = libc_on_exit(&libd_on_exit_wrapper, cookie);
+	if unlikely(result != 0)
+		free(cookie);
+	return result;
+}
+#endif /* MAGIC:impl_if */
+/*[[[end:libd_on_exit]]]*/
+
+
 PRIVATE ATTR_SECTION(".text.crt.sched.process") void
 NOTHROW_NCX(LIBCCALL libc_atexit_wrapper)(int status, void *arg) {
 	(void)status;
-	(*(__atexit_func_t)arg)();
+	(*(void (LIBCCALL *)(void))arg)();
 }
 
-/*[[[head:libc_atexit,hash:CRC-32=0x1e48b9c9]]]*/
+/*[[[head:libc_atexit,hash:CRC-32=0xd7fad4d9]]]*/
 INTERN ATTR_SECTION(".text.crt.sched.process") NONNULL((1)) int
-NOTHROW_NCX(LIBCCALL libc_atexit)(__atexit_func_t func)
+NOTHROW_NCX(LIBCCALL libc_atexit)(void (LIBCCALL *func)(void))
 /*[[[body:libc_atexit]]]*/
 {
 	/* TODO: Instead of this right here, we should register `func'
@@ -728,7 +734,7 @@ NOTHROW_NCX(LIBCCALL libc_atexit)(__atexit_func_t func)
 
 
 struct at_quick_exit_callback {
-	__atexit_func_t aqc_func; /* [1..1] The function to-be invoked. */
+	void (LIBCCALL *aqc_func)(void); /* [1..1] The function to-be invoked. */
 };
 
 struct at_quick_exit_vector_struct {
@@ -756,9 +762,9 @@ void LIBCCALL libc_run_at_quick_exit(int status) {
 	}
 }
 
-/*[[[head:libc_at_quick_exit,hash:CRC-32=0x85221818]]]*/
+/*[[[head:libc_at_quick_exit,hash:CRC-32=0xb1cd172a]]]*/
 INTERN ATTR_SECTION(".text.crt.sched.process") NONNULL((1)) int
-NOTHROW_NCX(LIBCCALL libc_at_quick_exit)(__atexit_func_t func)
+NOTHROW_NCX(LIBCCALL libc_at_quick_exit)(void (LIBCCALL *func)(void))
 /*[[[body:libc_at_quick_exit]]]*/
 {
 	struct at_quick_exit_callback *new_vector;
@@ -2228,7 +2234,7 @@ NOTHROW_NCX(VLIBCCALL libc_setproctitle)(char const *format,
 
 
 
-/*[[[start:exports,hash:CRC-32=0xfa19944a]]]*/
+/*[[[start:exports,hash:CRC-32=0x23fce99b]]]*/
 DEFINE_PUBLIC_ALIAS(getenv, libc_getenv);
 DEFINE_PUBLIC_ALIAS(exit, libc_exit);
 DEFINE_PUBLIC_ALIAS(atexit, libc_atexit);
@@ -2252,6 +2258,9 @@ DEFINE_PUBLIC_ALIAS(random_r, libc_random_r);
 DEFINE_PUBLIC_ALIAS(srandom_r, libc_srandom_r);
 DEFINE_PUBLIC_ALIAS(initstate_r, libc_initstate_r);
 DEFINE_PUBLIC_ALIAS(setstate_r, libc_setstate_r);
+#ifndef __LIBCCALL_IS_LIBDCALL
+DEFINE_PUBLIC_ALIAS(DOS$on_exit, libd_on_exit);
+#endif /* !__LIBCCALL_IS_LIBDCALL */
 DEFINE_PUBLIC_ALIAS(on_exit, libc_on_exit);
 DEFINE_PUBLIC_ALIAS(clearenv, libc_clearenv);
 DEFINE_PUBLIC_ALIAS(getloadavg, libc_getloadavg);

@@ -360,46 +360,26 @@ $longptr_t telldir([[nonnull]] DIR *__restrict dirp);
 @@>> dirfd(3)
 @@Return the underlying file descriptor of the given directory stream
 [[decl_include("<features.h>", "<bits/types.h>")]]
-[[ATTR_PURE, decl_prefix(DEFINE_STRUCT_DIRSTREAM)]]
+[[pure, decl_prefix(DEFINE_STRUCT_DIRSTREAM)]]
 $fd_t dirfd([[nonnull]] DIR __KOS_FIXED_CONST *__restrict dirp);
 
-
-%{
-#ifndef ____scandir_selector_t_defined
-#define ____scandir_selector_t_defined 1
-typedef int (*__scandir_selector_t)(struct dirent const *);
-typedef int (*__scandir_cmp_t)(struct dirent const **, struct dirent const **);
-#endif /* !____scandir_selector_t_defined */
-}
-%[define_type_class(__scandir_selector_t = "TP")]
-%[define_type_class(__scandir_cmp_t = "TP")]
-
-%[define(DEFINE_SCANDIR_SELECTOR_T =
-@@pp_ifndef ____scandir_selector_t_defined@@
-#define ____scandir_selector_t_defined 1
-typedef int (*__scandir_selector_t)(struct dirent const *);
-typedef int (*__scandir_cmp_t)(struct dirent const **, struct dirent const **);
-@@pp_endif@@
-)]
-
-%
 @@>> scandir(3), scandir64(3)
 @@Scan a directory `dir' for all contained directory entries
 [[cp, no_crt_self_import, userimpl, requires_include("<asm/os/fcntl.h>")]]
-[[requires(defined(__AT_FDCWD) && $has_function(scandirat))]]
+[[nodos, requires(defined(__AT_FDCWD) && $has_function(scandirat))]]
 [[if(!defined(__USE_FILE_OFFSET64) || defined(_DIRENT_MATCHES_DIRENT64)), preferred_alias("scandir")]]
 [[if(defined(__USE_FILE_OFFSET64) || defined(_DIRENT_MATCHES_DIRENT64)), preferred_alias("scandir64")]]
-[[decl_include("<features.h>", "<bits/os/dirent.h>"), decl_prefix(DEFINE_SCANDIR_SELECTOR_T)]]
+[[decl_include("<features.h>", "<bits/os/dirent.h>")]]
 __STDC_INT_AS_SSIZE_T scandir([[nonnull]] char const *__restrict dir,
                               [[nonnull]] struct dirent ***__restrict namelist,
-                              __scandir_selector_t selector, __scandir_cmp_t cmp) {
+                              int (LIBKCALL *selector)(struct dirent const *entry),
+                              int (LIBKCALL *cmp)(struct dirent const **a, struct dirent const **b)) {
 	return scandirat(__AT_FDCWD, dir, namelist, selector, cmp);
 }
 
-%
 @@>> alphasort(3), alphasort64(3)
 @@Sort the 2 given directory entries `e1' and `e2' the same way `strcmp(3)' would
-[[ATTR_PURE, no_crt_self_import]]
+[[pure, no_crt_self_import]]
 [[if(!defined(__USE_FILE_OFFSET64) || defined(_DIRENT_MATCHES_DIRENT64)), preferred_alias("alphasort")]]
 [[if(defined(__USE_FILE_OFFSET64) || defined(_DIRENT_MATCHES_DIRENT64)), preferred_alias("alphasort64")]]
 [[decl_include("<bits/os/dirent.h>"), impl_include("<bits/os/dirent.h>")]]
@@ -407,8 +387,10 @@ int alphasort([[nonnull]] struct dirent const **e1,
               [[nonnull]] struct dirent const **e2) {
 	return strcoll((*e1)->@d_name@, (*e2)->@d_name@);
 }
+
+%
 %#ifdef __USE_LARGEFILE64
-[[ATTR_PURE, dirent64_variant_of(alphasort), doc_alias("alphasort")]]
+[[pure, dirent64_variant_of(alphasort), doc_alias("alphasort")]]
 [[decl_include("<bits/os/dirent.h>"), impl_include("<bits/os/dirent.h>")]]
 int alphasort64([[nonnull]] struct dirent64 const **e1,
                 [[nonnull]] struct dirent64 const **e2) {
@@ -420,49 +402,34 @@ int alphasort64([[nonnull]] struct dirent64 const **e1,
 %#ifdef __USE_GNU
 @@>> scandirat(3), scandirat64(3)
 @@Scan a directory `dirfd:dir' for all contained directory entries
-[[cp, no_crt_self_import]]
+[[nodos, cp, no_crt_self_import]]
 [[if(!defined(__USE_FILE_OFFSET64) || defined(_DIRENT_MATCHES_DIRENT64)), preferred_alias("scandirat")]]
 [[if(defined(__USE_FILE_OFFSET64) || defined(_DIRENT_MATCHES_DIRENT64)), preferred_alias("scandirat64")]]
-[[decl_include("<features.h>", "<bits/os/dirent.h>"), decl_prefix(DEFINE_SCANDIR_SELECTOR_T)]]
+[[decl_include("<features.h>", "<bits/os/dirent.h>")]]
 __STDC_INT_AS_SSIZE_T scandirat($fd_t dirfd, [[nonnull]] char const *__restrict dir,
                                 [[nonnull]] struct dirent ***__restrict namelist,
-                                __scandir_selector_t selector, __scandir_cmp_t cmp);
+                                int (LIBKCALL *selector)(struct dirent const *entry),
+                                int (LIBKCALL *cmp)(struct dirent const **a, struct dirent const **b));
 
 %
 %#ifdef __USE_LARGEFILE64
-%{
-#ifndef ____scandir64_selector_t_defined
-#define ____scandir64_selector_t_defined 1
-typedef int (*__scandir64_selector_t)(struct dirent64 const *);
-typedef int (*__scandir64_cmp_t)(struct dirent64 const **, struct dirent64 const **);
-#endif /* !____scandir64_selector_t_defined */
-}
-%[define_type_class(__scandir64_selector_t = "TP")]
-%[define_type_class(__scandir64_cmp_t = "TP")]
-
-%[define(DEFINE_SCANDIR64_SELECTOR_T =
-@@pp_ifndef ____scandir64_selector_t_defined@@
-#define ____scandir64_selector_t_defined 1
-typedef int (*__scandir64_selector_t)(struct dirent64 const *);
-typedef int (*__scandir64_cmp_t)(struct dirent64 const **, struct dirent64 const **);
-@@pp_endif@@
-)]
 
 [[cp, dirent64_variant_of(scandir), decl_include("<features.h>", "<bits/os/dirent.h>")]]
 [[userimpl, requires_include("<asm/os/fcntl.h>"), doc_alias("scandir")]]
-[[requires(defined(__AT_FDCWD) && $has_function(scandirat64))]]
-[[decl_prefix(DEFINE_SCANDIR64_SELECTOR_T)]]
+[[nodos, requires(defined(__AT_FDCWD) && $has_function(scandirat64))]]
 __STDC_INT_AS_SSIZE_T scandir64([[nonnull]] char const *__restrict dir,
                                 [[nonnull]] struct dirent64 ***__restrict namelist,
-                                __scandir64_selector_t selector, __scandir64_cmp_t cmp) {
+                                int (LIBKCALL *selector)(struct dirent64 const *entry),
+                                int (LIBKCALL *cmp)(struct dirent64 const **a, struct dirent64 const **b)) {
 	return scandirat64(__AT_FDCWD, dir, namelist, selector, cmp);
 }
 
-[[cp, dirent64_variant_of(scandirat), decl_include("<features.h>", "<bits/os/dirent.h>")]]
-[[decl_prefix(DEFINE_SCANDIR64_SELECTOR_T), doc_alias("scandirat")]]
+[[doc_alias("scandirat"), nodos, cp, dirent64_variant_of(scandirat)]]
+[[decl_include("<features.h>", "<bits/os/dirent.h>")]]
 __STDC_INT_AS_SSIZE_T scandirat64($fd_t dirfd, [[nonnull]] char const *__restrict dir,
                                   [[nonnull]] struct dirent64 ***__restrict namelist,
-                                  __scandir64_selector_t selector, __scandir64_cmp_t cmp);
+                                  int (LIBKCALL *selector)(struct dirent64 const *entry),
+                                  int (LIBKCALL *cmp)(struct dirent64 const **a, struct dirent64 const **b));
 
 %#endif /* __USE_LARGEFILE64 */
 %#endif /* __USE_GNU */
@@ -491,7 +458,7 @@ $ssize_t getdirentries64($fd_t fd, [[nonnull]] char *__restrict buf, size_t nbyt
 @@>> versionsort(3), versionsort64(3)
 @@Sort the 2 given directory entries `e1' and `e2' the same way `strvercmp(3)' would.
 [[decl_include("<bits/os/dirent.h>")]]
-[[ATTR_PURE, no_crt_self_import, impl_include("<bits/os/dirent.h>")]]
+[[pure, no_crt_self_import, impl_include("<bits/os/dirent.h>")]]
 [[if(!defined(__USE_FILE_OFFSET64) || defined(_DIRENT_MATCHES_DIRENT64)), preferred_alias("versionsort")]]
 [[if(defined(__USE_FILE_OFFSET64) || defined(_DIRENT_MATCHES_DIRENT64)), preferred_alias("versionsort64")]]
 int versionsort([[nonnull]] struct dirent const **e1,
@@ -500,7 +467,7 @@ int versionsort([[nonnull]] struct dirent const **e1,
 }
 %#ifdef __USE_LARGEFILE64
 [[decl_include("<bits/os/dirent.h>"), doc_alias("versionsort")]]
-[[ATTR_PURE, dirent64_variant_of(versionsort), impl_include("<bits/os/dirent.h>")]]
+[[pure, dirent64_variant_of(versionsort), impl_include("<bits/os/dirent.h>")]]
 int versionsort64([[nonnull]] struct dirent64 const **e1,
                   [[nonnull]] struct dirent64 const **e2) {
 	return strverscmp((*e1)->@d_name@, (*e2)->@d_name@);

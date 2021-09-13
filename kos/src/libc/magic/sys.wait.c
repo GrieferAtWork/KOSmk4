@@ -110,10 +110,13 @@ $pid_t waitpid($pid_t pid, [[nullable]] __WAIT_STATUS stat_loc,
 
 %
 %#if defined(__USE_XOPEN) || defined(__USE_XOPEN2K8)
-%#ifndef __id_t_defined
-%#define __id_t_defined 1
-%typedef __id_t id_t;
-%#endif /* !__id_t_defined */
+%{
+#ifndef __id_t_defined
+#define __id_t_defined 1
+typedef __id_t id_t;
+#endif /* !__id_t_defined */
+}
+
 @@>> waitid(2)
 @@@param: idtype:  One of `P_ALL', `P_PID', `P_PGID'
 @@@param: options: At least one of `WEXITED', `WSTOPPED', `WCONTINUED',

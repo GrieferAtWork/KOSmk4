@@ -576,11 +576,6 @@ struct _pthread_cleanup_buffer {
 	struct _pthread_cleanup_buffer *__prev;             /* Chaining of cleanup functions. */
 };
 
-#ifndef ____pthread_start_routine_t_defined
-#define ____pthread_start_routine_t_defined 1
-typedef void *(__LIBKCALL *__pthread_start_routine_t)(void *);
-#endif /* !____pthread_start_routine_t_defined */
-
 #ifndef __pthread_t_defined
 #define __pthread_t_defined 1
 typedef __pthread_t pthread_t;
@@ -641,14 +636,6 @@ typedef __pthread_barrierattr_t pthread_barrierattr_t;
 
 }
 
-%[define_type_class(__pthread_start_routine_t = "TP")]
-%[define(DEFINE_PTHREAD_START_ROUTINE_T =
-@@pp_ifndef ____pthread_start_routine_t_defined@@
-#define ____pthread_start_routine_t_defined 1
-typedef void *(__LIBKCALL *__pthread_start_routine_t)(void *);
-@@pp_endif@@
-)]
-
 @@>> pthread_create(3)
 @@Create a  new thread,  starting with  execution of  `start_routine'
 @@getting passed `arg'. Creation attributed come from `attr'. The new
@@ -656,9 +643,9 @@ typedef void *(__LIBKCALL *__pthread_start_routine_t)(void *);
 @@@return: EOK:    Success
 @@@return: EAGAIN: Insufficient resources, or operation-not-permitted
 [[decl_include("<bits/types.h>", "<bits/crt/pthreadtypes.h>")]]
-[[decl_prefix(DEFINE_PTHREAD_START_ROUTINE_T)]]
+[[crt_dos_impl_if(!defined(__LIBCCALL_IS_LIBDCALL)), crt_dos_variant]]
 $errno_t pthread_create([[nonnull]] pthread_t *__restrict newthread, pthread_attr_t const *__restrict attr,
-                        [[nonnull]] __pthread_start_routine_t start_routine, void *__restrict arg);
+                        [[nonnull]] void *(LIBCCALL *start_routine)(void *arg), void *arg);
 
 @@>> pthread_exit(3)
 @@Terminate calling thread.
@@ -1148,20 +1135,6 @@ $errno_t pthread_getaffinity_np(pthread_t pthread, size_t cpusetsize,
 %#endif /* __USE_GNU */
 
 
-%
-%#ifndef ____pthread_once_routine_t_defined
-%#define ____pthread_once_routine_t_defined 1
-%typedef void (__LIBKCALL *__pthread_once_routine_t)(void);
-%#endif /* !____pthread_once_routine_t_defined */
-%[define_type_class(__pthread_once_routine_t = "TP")]
-
-%[define(DEFINE_PTHREAD_ONCE_ROUTINE_T =
-@@pp_ifndef ____pthread_once_routine_t_defined@@
-#define ____pthread_once_routine_t_defined 1
-typedef void (__LIBKCALL *__pthread_once_routine_t)(void);
-@@pp_endif@@
-)]
-
 
 %
 %/* Functions for handling initialization. */
@@ -1174,12 +1147,11 @@ typedef void (__LIBKCALL *__pthread_once_routine_t)(void);
 @@extern variable initialized to `PTHREAD_ONCE_INIT'.
 @@@return: EOK: Success
 [[throws, export_alias("call_once")]]
-[[decl_prefix(DEFINE_PTHREAD_ONCE_ROUTINE_T)]]
 [[decl_include("<bits/types.h>", "<bits/crt/pthreadtypes.h>")]]
 [[impl_include("<asm/crt/pthreadvalues.h>", "<hybrid/__atomic.h>")]]
 [[impl_include("<hybrid/sched/__yield.h>", "<asm/os/errno.h>")]]
 $errno_t pthread_once([[nonnull]] pthread_once_t *once_control,
-                      [[nonnull]] __pthread_once_routine_t init_routine) {
+                      [[nonnull]] void (LIBCCALL *init_routine)(void)) {
 	pthread_once_t status;
 again:
 	status = __hybrid_atomic_cmpxch_val(*once_control,
@@ -2482,12 +2454,6 @@ $errno_t pthread_barrierattr_setpshared([[nonnull]] pthread_barrierattr_t *attr,
 %
 
 
-%{
-#ifndef ____pthread_destr_function_t_defined
-#define ____pthread_destr_function_t_defined 1
-typedef void (__LIBKCALL *__pthread_destr_function_t)(void *);
-#endif /* !____pthread_destr_function_t_defined */
-}
 %[define_type_class(__pthread_destr_function_t = "TP")]
 
 
@@ -2500,15 +2466,10 @@ typedef void (__LIBKCALL *__pthread_destr_function_t)(void *);
 @@when the key is destroyed
 @@@return: EOK:    Success
 @@@return: ENOMEM: Insufficient memory to create the key
-[[decl_prefix(
-#ifndef ____pthread_destr_function_t_defined
-#define ____pthread_destr_function_t_defined 1
-typedef void (__LIBKCALL *__pthread_destr_function_t)(void *);
-#endif /* !____pthread_destr_function_t_defined */
-)]]
-[[decl_include("<bits/types.h>", "<bits/crt/pthreadtypes.h>")]]
+[[nodos, decl_include("<bits/types.h>", "<bits/crt/pthreadtypes.h>")]]
 $errno_t pthread_key_create([[nonnull]] pthread_key_t *key,
-                            [[nullable]] __pthread_destr_function_t destr_function);
+                            [[nullable]] void (LIBKCALL *destr_function)(void *value));
+/* TODO: dos support for `pthread_key_create' (it's in cygwin, so it can exist on DOS!) */
 
 
 %#ifdef __USE_SOLARIS
@@ -2531,17 +2492,11 @@ $errno_t pthread_key_create([[nonnull]] pthread_key_t *key,
 @@function will no longer block, but simply return immediately.
 @@@return: EOK:    Success
 @@@return: ENOMEM: Insufficient memory to create the key
-[[decl_prefix(
-#ifndef ____pthread_destr_function_t_defined
-#define ____pthread_destr_function_t_defined 1
-typedef void (__LIBKCALL *__pthread_destr_function_t)(void *);
-#endif /* !____pthread_destr_function_t_defined */
-)]]
 [[decl_include("<bits/types.h>", "<bits/crt/pthreadtypes.h>")]]
 [[impl_include("<hybrid/__atomic.h>")]]
-[[requires_function(pthread_key_create)]]
+[[nodos, requires_function(pthread_key_create)]] /* TODO: dos support for `pthread_key_create_once_np' */
 $errno_t pthread_key_create_once_np([[nonnull]] pthread_key_t *key,
-                                    [[nullable]] __pthread_destr_function_t destr_function) {
+                                    [[nullable]] void (LIBKCALL *destr_function)(void *)) {
 	pthread_key_t kv;
 	errno_t error;
 again:
@@ -2616,20 +2571,6 @@ $errno_t pthread_setspecific(pthread_key_t key, void const *pointer);
 $errno_t pthread_getcpuclockid(pthread_t pthread, [[nonnull]] $clockid_t *clock_id);
 %#endif /* __USE_XOPEN2K */
 
-%
-%#ifndef ____pthread_atfork_func_t_defined
-%#define ____pthread_atfork_func_t_defined 1
-%typedef void (__LIBKCALL *__pthread_atfork_func_t)(void);
-%#endif /* !____pthread_atfork_func_t_defined */
-%[define_type_class(__pthread_atfork_func_t = "TP")]
-
-%[define(DEFINE_PTHREAD_ATFORK_FUNC_T =
-@@pp_ifndef ____pthread_atfork_func_t_defined@@
-#define ____pthread_atfork_func_t_defined 1
-typedef void (__LIBKCALL *__pthread_atfork_func_t)(void);
-@@pp_endif@@
-)]
-
 
 @@>> pthread_atfork(3)
 @@Install handlers to be called when a new process is created with  `fork(2)'.
@@ -2644,11 +2585,10 @@ typedef void (__LIBKCALL *__pthread_atfork_func_t)(void);
 @@called in FIFO order (first added -> first called)
 @@@return: EOK:    Success
 @@@return: ENOMEM: Insufficient memory to register callbacks
-[[guard, decl_prefix(DEFINE_PTHREAD_ATFORK_FUNC_T)]]
-[[decl_include("<bits/types.h>")]]
-$errno_t pthread_atfork([[nullable]] __pthread_atfork_func_t prepare,
-                        [[nullable]] __pthread_atfork_func_t parent,
-                        [[nullable]] __pthread_atfork_func_t child);
+[[guard, decl_include("<bits/types.h>")]]
+$errno_t pthread_atfork([[nullable]] void (LIBCCALL *prepare)(void),
+                        [[nullable]] void (LIBCCALL *parent)(void),
+                        [[nullable]] void (LIBCCALL *child)(void));
 
 %[default:section(".text.crt{|.dos}.sched.pthread_ext")]
 

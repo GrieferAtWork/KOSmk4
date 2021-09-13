@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x107a6446 */
+/* HASH CRC-32:0xe4671027 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -721,25 +721,25 @@ INTDEF WUNUSED NONNULL((1, 2)) char *NOTHROW_NCX(LIBDCALL libd_fgetln)(FILE *__r
  * config files: `printf(fmtcheck(get_user_fmt(), "%s %s"), "Foo", "Bar");' */
 INTDEF ATTR_RETNONNULL WUNUSED NONNULL((2)) __ATTR_FORMAT_ARG(2) char const *NOTHROW_NCX(LIBDCALL libd_fmtcheck)(char const *user_format, char const *good_format);
 /* >> funopen(3), funopen64(3) */
-INTDEF WUNUSED FILE *NOTHROW_NCX(LIBDCALL libd_funopen)(void const *cookie, __funopen_readfn_t readfn, __funopen_writefn_t writefn, __funopen_seekfn_t seekfn, __funopen_closefn_t closefn);
+INTDEF WUNUSED FILE *NOTHROW_NCX(LIBDCALL libd_funopen)(void const *cookie, int (LIBKCALL *readfn)(void *cookie, char *buf, int num_bytes), int (LIBKCALL *writefn)(void *cookie, char const *buf, int num_bytes), off_t (LIBKCALL *seekfn)(void *cookie, off_t off, int whence), int (LIBKCALL *closefn)(void *cookie));
 #endif /* !__LIBCCALL_IS_LIBDCALL && !__KERNEL__ */
 #ifndef __KERNEL__
 /* >> funopen(3), funopen64(3) */
-INTDEF WUNUSED FILE *NOTHROW_NCX(LIBCCALL libc_funopen)(void const *cookie, __funopen_readfn_t readfn, __funopen_writefn_t writefn, __funopen_seekfn_t seekfn, __funopen_closefn_t closefn);
+INTDEF WUNUSED FILE *NOTHROW_NCX(LIBCCALL libc_funopen)(void const *cookie, int (LIBKCALL *readfn)(void *cookie, char *buf, int num_bytes), int (LIBKCALL *writefn)(void *cookie, char const *buf, int num_bytes), off_t (LIBKCALL *seekfn)(void *cookie, off_t off, int whence), int (LIBKCALL *closefn)(void *cookie));
 #endif /* !__KERNEL__ */
 #if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
 /* >> funopen2(3), funopen2_64(3) */
-INTDEF WUNUSED FILE *NOTHROW_NCX(LIBDCALL libd_funopen2)(void const *cookie, __funopen2_readfn_t readfn, __funopen2_writefn_t writefn, __funopen2_seekfn_t seekfn, __funopen2_flushfn_t flushfn, __funopen2_closefn_t closefn);
+INTDEF WUNUSED FILE *NOTHROW_NCX(LIBDCALL libd_funopen2)(void const *cookie, ssize_t (LIBKCALL *readfn)(void *cookie, void *buf, size_t num_bytes), ssize_t (LIBKCALL *writefn)(void *cookie, void const *buf, size_t num_bytes), off_t (LIBKCALL *seekfn)(void *cookie, off_t off, int whence), int (LIBKCALL *flushfn)(void *cookie), int (LIBKCALL *closefn)(void *cookie));
 /* >> funopen(3), funopen64(3) */
-INTDEF WUNUSED FILE *NOTHROW_NCX(LIBDCALL libd_funopen64)(void const *cookie, __funopen_readfn_t readfn, __funopen_writefn_t writefn, __funopen64_seekfn_t seekfn, __funopen_closefn_t closefn);
+INTDEF WUNUSED FILE *NOTHROW_NCX(LIBDCALL libd_funopen64)(void const *cookie, int (LIBKCALL *readfn)(void *cookie, char *buf, int num_bytes), int (LIBKCALL *writefn)(void *cookie, char const *buf, int num_bytes), off64_t (LIBKCALL *seekfn)(void *cookie, off64_t off, int whence), int (LIBKCALL *closefn)(void *cookie));
 #endif /* !__LIBCCALL_IS_LIBDCALL && !__KERNEL__ */
 #ifndef __KERNEL__
 /* >> funopen(3), funopen64(3) */
-INTDEF WUNUSED FILE *NOTHROW_NCX(LIBCCALL libc_funopen64)(void const *cookie, __funopen_readfn_t readfn, __funopen_writefn_t writefn, __funopen64_seekfn_t seekfn, __funopen_closefn_t closefn);
+INTDEF WUNUSED FILE *NOTHROW_NCX(LIBCCALL libc_funopen64)(void const *cookie, int (LIBKCALL *readfn)(void *cookie, char *buf, int num_bytes), int (LIBKCALL *writefn)(void *cookie, char const *buf, int num_bytes), off64_t (LIBKCALL *seekfn)(void *cookie, off64_t off, int whence), int (LIBKCALL *closefn)(void *cookie));
 #endif /* !__KERNEL__ */
 #if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
 /* >> funopen2(3), funopen2_64(3) */
-INTDEF WUNUSED FILE *NOTHROW_NCX(LIBDCALL libd_funopen2_64)(void const *cookie, __funopen2_readfn_t readfn, __funopen2_writefn_t writefn, __funopen2_64_seekfn_t seekfn, __funopen2_flushfn_t flushfn, __funopen2_closefn_t closefn);
+INTDEF WUNUSED FILE *NOTHROW_NCX(LIBDCALL libd_funopen2_64)(void const *cookie, ssize_t (LIBKCALL *readfn)(void *cookie, void *buf, size_t num_bytes), ssize_t (LIBKCALL *writefn)(void *cookie, void const *buf, size_t num_bytes), off64_t (LIBKCALL *seekfn)(void *cookie, off64_t off, int whence), int (LIBKCALL *flushfn)(void *cookie), int (LIBKCALL *closefn)(void *cookie));
 INTDEF WUNUSED NONNULL((1, 2)) FILE *NOTHROW_RPC(LIBDCALL libd__fsopen)(char const *filename, char const *modes, int sflag);
 #endif /* !__LIBCCALL_IS_LIBDCALL && !__KERNEL__ */
 #ifndef __KERNEL__

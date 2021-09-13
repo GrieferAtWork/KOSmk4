@@ -64,7 +64,7 @@ END(libc_handle)
  * `libc_pthread_main()' within the context of the newly spawned thread.
  * NOTE: This function also fills in `thread->pt_tid' */
 /* INTDEF errno_t NOTHROW(__FCALL libc_pthread_clone)(struct pthread *__restrict thread,
- *                                                    __pthread_start_routine_t start); */
+ *                                                    void *(LIBCCALL start)(void *arg)); */
 .section .text.crt.sched.pthread
 INTERN_FUNCTION(libc_pthread_clone)
 	.cfi_startproc

@@ -224,10 +224,12 @@ int futime64($fd_t fd, [[nullable]] struct utimbuf64 const *file_times) {
 %
 %
 %#ifdef __USE_DOS
-%#ifndef __wchar_t_defined
-%#define __wchar_t_defined 1
-%typedef __WCHAR_TYPE__ wchar_t;
-%#endif /* !__wchar_t_defined */
+%{
+#ifndef __wchar_t_defined
+#define __wchar_t_defined 1
+typedef __WCHAR_TYPE__ wchar_t;
+#endif /* !__wchar_t_defined */
+}
 
 %[insert:function(_utime = utime)]
 %[insert:function(_futime = futime)]

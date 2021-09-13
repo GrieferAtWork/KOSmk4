@@ -23,6 +23,7 @@
 %[define_replacement(timespec32 = __timespec32)]
 %[define_replacement(timespec64 = __timespec64)]
 %[default:section(".text.crt{|.dos}.sched.futexexpr")]
+%[default:nodos]
 
 %[insert:prefix(
 #include <features.h>

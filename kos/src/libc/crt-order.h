@@ -398,7 +398,6 @@
 	CB(PREFIX.crt.dos.fs.exec.exec PREFIX.crt.dos.sched.access) \
 	CB(PREFIX.crt.dos.sched.thread) \
 	CB(PREFIX.crt.dos.sched.pthread) \
-	CB(PREFIX.crt.dos.sched.futex PREFIX.crt.dos.sched.futexlock PREFIX.crt.dos.sched.futexexpr PREFIX.crt.dos.sched.futexlockexpr) \
 	CB(PREFIX.crt.dos.sched.semaphore) \
 	CB(PREFIX.crt.dos.sched.param) \
 	CB(PREFIX.crt.dos.sched.process) \
@@ -472,7 +471,6 @@
 	CB(PREFIX.crt.dos.timer) \
 	CB(PREFIX.crt.dos.errno.utility PREFIX.crt.dos.errno) \
 	CB(PREFIX.crt.dos.error) \
-	CB(PREFIX.crt.dos.kos.syscalls) \
 	CB(PREFIX.crt.dos.database.group) \
 	CB(PREFIX.crt.dos.database.shadow) \
 	CB(PREFIX.crt.dos.database.pwd) \
@@ -489,7 +487,7 @@
 	CB(PREFIX.crt.dos.system.adjtime PREFIX.crt.dos.system.info PREFIX.crt.dos.system.ioperm PREFIX.crt.dos.system.mman PREFIX.crt.dos.system.ptrace PREFIX.crt.dos.system.reboot PREFIX.crt.dos.system.syslog PREFIX.crt.dos.system.utility PREFIX.crt.dos.system) \
 	CB(PREFIX.crt.dos.debug) \
 	CB(PREFIX.crt.dos.ssp.string.memory) \
-	CB(PREFIX.crt.dos.fs.dlfcn PREFIX.crt.dos.fs.exec.posix_spawn PREFIX.crt.dos.fs.exec.spawn PREFIX.crt.dos.fs.exec.system PREFIX.crt.dos.fs.fts PREFIX.crt.dos.fs.ftw PREFIX.crt.dos.fs.io PREFIX.crt.dos.fs.statfs.statfs PREFIX.crt.dos.fs.statfs.statvfs) \
+	CB(PREFIX.crt.dos.fs.dlfcn PREFIX.crt.dos.fs.exec.posix_spawn PREFIX.crt.dos.fs.exec.spawn PREFIX.crt.dos.fs.exec.system PREFIX.crt.dos.fs.fts PREFIX.crt.dos.fs.io PREFIX.crt.dos.fs.statfs.statfs PREFIX.crt.dos.fs.statfs.statvfs) \
 	CB(PREFIX.crt.dos.sched.resource) \
 	CB(PREFIX.crt.dos.sched.msg) \
 	CB(PREFIX.crt.dos.string.encrypt) \
@@ -541,20 +539,5 @@
 	CB(PREFIX.crt.dos.wchar.unicode.convert) \
 	CB(PREFIX.crt.dos.wchar.fs.modify_time) \
 	CB(PREFIX.crt.dos.wchar.errno) \
-	CB(PREFIX.crt.dos.wchar.fs.exec.spawn PREFIX.crt.dos.wchar.fs.exec.system) \
-	CB(PREFIX.crt.dos.except.fs.exec.exec) \
-	CB(PREFIX.crt.dos.except.sched.param) \
-	CB(PREFIX.crt.dos.except.sched.process) \
-	CB(PREFIX.crt.dos.except.sched.user) \
-	CB(PREFIX.crt.dos.except.heap.malloc) \
-	CB(PREFIX.crt.dos.except.heap.rare_helpers) \
-	CB(PREFIX.crt.dos.except.io.read PREFIX.crt.dos.except.io.large.read PREFIX.crt.dos.except.io.write PREFIX.crt.dos.except.io.large.write) \
-	CB(PREFIX.crt.dos.except.io.access) \
-	CB(PREFIX.crt.dos.except.io.large.seek PREFIX.crt.dos.except.io.seek PREFIX.crt.dos.except.io.sync PREFIX.crt.dos.except.io.utility) \
-	CB(PREFIX.crt.dos.except.fs.basic_property PREFIX.crt.dos.except.fs.property) \
-	CB(PREFIX.crt.dos.except.fs.modify) \
-	CB(PREFIX.crt.dos.except.fs.utility) \
-	CB(PREFIX.crt.dos.except.fs.modify_time) \
-	CB(PREFIX.crt.dos.except.system.utility) \
-	CB(PREFIX.crt.dos.except.system.configuration)
+	CB(PREFIX.crt.dos.wchar.fs.exec.spawn PREFIX.crt.dos.wchar.fs.exec.system)
 /*[[[end]]]*/

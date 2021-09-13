@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xfd0270d8 */
+/* HASH CRC-32:0x6365e638 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -250,9 +250,9 @@ INTDEF WUNUSED NONNULL((1, 2)) char *NOTHROW_NCX(LIBCCALL libc_fgetln)(FILE *__r
  * config files: `printf(fmtcheck(get_user_fmt(), "%s %s"), "Foo", "Bar");' */
 INTDEF ATTR_RETNONNULL WUNUSED NONNULL((2)) __ATTR_FORMAT_ARG(2) char const *NOTHROW_NCX(LIBCCALL libc_fmtcheck)(char const *user_format, char const *good_format);
 /* >> funopen2(3), funopen2_64(3) */
-INTDEF WUNUSED FILE *NOTHROW_NCX(LIBCCALL libc_funopen2)(void const *cookie, __funopen2_readfn_t readfn, __funopen2_writefn_t writefn, __funopen2_seekfn_t seekfn, __funopen2_flushfn_t flushfn, __funopen2_closefn_t closefn);
+INTDEF WUNUSED FILE *NOTHROW_NCX(LIBCCALL libc_funopen2)(void const *cookie, ssize_t (LIBKCALL *readfn)(void *cookie, void *buf, size_t num_bytes), ssize_t (LIBKCALL *writefn)(void *cookie, void const *buf, size_t num_bytes), off_t (LIBKCALL *seekfn)(void *cookie, off_t off, int whence), int (LIBKCALL *flushfn)(void *cookie), int (LIBKCALL *closefn)(void *cookie));
 /* >> funopen2(3), funopen2_64(3) */
-INTDEF WUNUSED FILE *NOTHROW_NCX(LIBCCALL libc_funopen2_64)(void const *cookie, __funopen2_readfn_t readfn, __funopen2_writefn_t writefn, __funopen2_64_seekfn_t seekfn, __funopen2_flushfn_t flushfn, __funopen2_closefn_t closefn);
+INTDEF WUNUSED FILE *NOTHROW_NCX(LIBCCALL libc_funopen2_64)(void const *cookie, ssize_t (LIBKCALL *readfn)(void *cookie, void *buf, size_t num_bytes), ssize_t (LIBKCALL *writefn)(void *cookie, void const *buf, size_t num_bytes), off64_t (LIBKCALL *seekfn)(void *cookie, off64_t off, int whence), int (LIBKCALL *flushfn)(void *cookie), int (LIBKCALL *closefn)(void *cookie));
 INTDEF int (LIBCCALL libc__flushall)(void) THROWS(...);
 INTDEF int NOTHROW_RPC(LIBCCALL libc__rmtmp)(void);
 INTDEF NONNULL((1)) int (LIBCCALL libc__filbuf)(FILE *__restrict stream) THROWS(...);

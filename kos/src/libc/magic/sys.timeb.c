@@ -72,7 +72,7 @@ int crt_ftime64([[nonnull]] struct $timeb64 *timebuf);
 %{
 #ifndef __errno_t_defined
 #define __errno_t_defined 1
-typedef int errno_t;
+typedef __errno_t errno_t;
 #endif /* !__errno_t_defined */
 }
 

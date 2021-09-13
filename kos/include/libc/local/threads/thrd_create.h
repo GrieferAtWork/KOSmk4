@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xf91ff164 */
+/* HASH CRC-32:0xe0335b5e */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -29,23 +29,19 @@ __NAMESPACE_LOCAL_BEGIN
 __NAMESPACE_LOCAL_END
 #include <bits/types.h>
 #include <bits/crt/pthreadtypes.h>
-#ifndef ____pthread_start_routine_t_defined
-#define ____pthread_start_routine_t_defined 1
-typedef void *(__LIBKCALL *__pthread_start_routine_t)(void *);
-#endif /* !____pthread_start_routine_t_defined */
 __NAMESPACE_LOCAL_BEGIN
-__CREDIRECT(__ATTR_NONNULL((1, 3)),__errno_t,__NOTHROW_NCX,__localdep_pthread_create,(__pthread_t *__restrict __newthread, __pthread_attr_t const *__restrict __attr, __pthread_start_routine_t __start_routine, void *__restrict __arg),pthread_create,(__newthread,__attr,__start_routine,__arg))
+__CREDIRECT(__ATTR_NONNULL((1, 3)),__errno_t,__NOTHROW_NCX,__localdep_pthread_create,(__pthread_t *__restrict __newthread, __pthread_attr_t const *__restrict __attr, void *(__LIBCCALL *__start_routine)(void *__arg), void *__arg),pthread_create,(__newthread,__attr,__start_routine,__arg))
 #endif /* !__local___localdep_pthread_create_defined */
 __NAMESPACE_LOCAL_END
 #include <asm/crt/threads.h>
 #include <libc/errno.h>
 __NAMESPACE_LOCAL_BEGIN
 __LOCAL_LIBC(thrd_create) int
-__NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(thrd_create))(__thrd_t *__thr, __thrd_start_t __func, void *__arg) {
+__NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(thrd_create))(__thrd_t *__thr, int (__LIBCCALL *__func)(void *__arg), void *__arg) {
 	__errno_t __error;
 	__STATIC_ASSERT(sizeof(int) <= sizeof(void *));
 	__error = (__NAMESPACE_LOCAL_SYM __localdep_pthread_create)((__pthread_t *)__thr, __NULLPTR,
-	                       (__pthread_start_routine_t)(void *)__func,
+	                       (void *(__LIBCCALL *)(void *))(void *)__func,
 	                       __arg);
 	if __likely(!__error)
 		return __thrd_success;

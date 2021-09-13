@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xd0052de */
+/* HASH CRC-32:0xc4544b91 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -31,7 +31,7 @@ DECL_BEGIN
 
 #ifndef __errno_t_defined
 #define __errno_t_defined 1
-typedef int errno_t;
+typedef __errno_t errno_t;
 #endif /* !__errno_t_defined */
 #ifndef __rsize_t_defined
 #define __rsize_t_defined 1

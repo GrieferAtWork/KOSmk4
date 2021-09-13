@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xabe8c1a1 */
+/* HASH CRC-32:0x7fdb4b23 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -38,7 +38,7 @@ INTDEF WUNUSED NONNULL((1)) FTSENT *NOTHROW_RPC(LIBCCALL libc_fts_children)(FTS 
 INTDEF NONNULL((1)) int NOTHROW_NCX(LIBCCALL libc_fts_close)(FTS *ftsp);
 /* >> fts_open(3), fts_open64(3)
  * @param: options: Set of `FTS_COMFOLLOW | FTS_LOGICAL | ... | FTS_STOP' */
-INTDEF WUNUSED NONNULL((1)) FTS *NOTHROW_RPC(LIBCCALL libc_fts_open)(char *const *path_argv, __STDC_INT_AS_UINT_T options, __fts_open_compar_t compar);
+INTDEF WUNUSED NONNULL((1)) FTS *NOTHROW_RPC(LIBCCALL libc_fts_open)(char *const *path_argv, __STDC_INT_AS_UINT_T options, int (LIBKCALL *compar)(FTSENT const **lhs, FTSENT const **rhs));
 /* >> fts_read(3), fts_read64(3) */
 INTDEF WUNUSED NONNULL((1)) FTSENT *NOTHROW_RPC(LIBCCALL libc_fts_read)(FTS *ftsp);
 /* >> fts_set(3), fts_set64(3)
@@ -51,7 +51,7 @@ INTDEF WUNUSED NONNULL((1)) FTSENT64 *NOTHROW_RPC(LIBCCALL libc_fts64_children)(
 INTDEF WUNUSED NONNULL((1)) int NOTHROW_RPC(LIBCCALL libc_fts64_close)(FTS64 *ftsp);
 /* >> fts_open(3), fts_open64(3)
  * @param: options: Set of `FTS_COMFOLLOW | FTS_LOGICAL | ... | FTS_STOP' */
-INTDEF WUNUSED NONNULL((1)) FTS64 *NOTHROW_RPC(LIBCCALL libc_fts64_open)(char *const *path_argv, __STDC_INT_AS_UINT_T options, __fts_open_compar64_t compar);
+INTDEF WUNUSED NONNULL((1)) FTS64 *NOTHROW_RPC(LIBCCALL libc_fts64_open)(char *const *path_argv, __STDC_INT_AS_UINT_T options, int (LIBKCALL *compar)(FTSENT64 const **lhs, FTSENT64 const **rhs));
 /* >> fts_read(3), fts_read64(3) */
 INTDEF WUNUSED NONNULL((1)) FTSENT64 *NOTHROW_RPC(LIBCCALL libc_fts64_read)(FTS64 *ftsp);
 /* >> fts_set(3), fts_set64(3)

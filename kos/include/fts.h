@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x291b911e */
+/* HASH CRC-32:0x71a66471 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -175,23 +175,18 @@ __CREDIRECT(__ATTR_NONNULL((1)),int,__NOTHROW_NCX,fts_close,(FTS *__ftsp),fts64_
 /* >> fts_close(3), fts_close64(3) */
 __CREDIRECT(__ATTR_NONNULL((1)),int,__NOTHROW_NCX,fts_close,(FTS *__ftsp),fts_children,(__ftsp))
 #endif /* ... */
-#ifndef ____fts_open_compar_t_defined
-#define ____fts_open_compar_t_defined 1
-typedef int (__LIBKCALL *__fts_open_compar_t)(struct _ftsent const **__lhs,
-                                              struct _ftsent const **__rhs);
-#endif /* !____fts_open_compar_t_defined */
 #if defined(__CRT_HAVE_fts_open) && defined(__FTS32_MATCHES_FTS64)
 /* >> fts_open(3), fts_open64(3)
  * @param: options: Set of `FTS_COMFOLLOW | FTS_LOGICAL | ... | FTS_STOP' */
-__CDECLARE(__ATTR_WUNUSED __ATTR_NONNULL((1)),FTS *,__NOTHROW_RPC,fts_open,(char *const *__path_argv, __STDC_INT_AS_UINT_T __options, __fts_open_compar_t __compar),(__path_argv,__options,__compar))
+__CDECLARE(__ATTR_WUNUSED __ATTR_NONNULL((1)),FTS *,__NOTHROW_RPC,fts_open,(char *const *__path_argv, __STDC_INT_AS_UINT_T __options, int (__LIBKCALL *__compar)(FTSENT const **__lhs, FTSENT const **__rhs)),(__path_argv,__options,__compar))
 #elif defined(__CRT_HAVE_fts64_open) && defined(__USE_FILE_OFFSET64)
 /* >> fts_open(3), fts_open64(3)
  * @param: options: Set of `FTS_COMFOLLOW | FTS_LOGICAL | ... | FTS_STOP' */
-__CREDIRECT(__ATTR_WUNUSED __ATTR_NONNULL((1)),FTS *,__NOTHROW_RPC,fts_open,(char *const *__path_argv, __STDC_INT_AS_UINT_T __options, __fts_open_compar_t __compar),fts64_open,(__path_argv,__options,__compar))
+__CREDIRECT(__ATTR_WUNUSED __ATTR_NONNULL((1)),FTS *,__NOTHROW_RPC,fts_open,(char *const *__path_argv, __STDC_INT_AS_UINT_T __options, int (__LIBKCALL *__compar)(FTSENT const **__lhs, FTSENT const **__rhs)),fts64_open,(__path_argv,__options,__compar))
 #elif defined(__CRT_HAVE_fts_open) && !defined(__USE_FILE_OFFSET64)
 /* >> fts_open(3), fts_open64(3)
  * @param: options: Set of `FTS_COMFOLLOW | FTS_LOGICAL | ... | FTS_STOP' */
-__CDECLARE(__ATTR_WUNUSED __ATTR_NONNULL((1)),FTS *,__NOTHROW_RPC,fts_open,(char *const *__path_argv, __STDC_INT_AS_UINT_T __options, __fts_open_compar_t __compar),(__path_argv,__options,__compar))
+__CDECLARE(__ATTR_WUNUSED __ATTR_NONNULL((1)),FTS *,__NOTHROW_RPC,fts_open,(char *const *__path_argv, __STDC_INT_AS_UINT_T __options, int (__LIBKCALL *__compar)(FTSENT const **__lhs, FTSENT const **__rhs)),(__path_argv,__options,__compar))
 #endif /* ... */
 #if defined(__CRT_HAVE_fts_read) && defined(__FTS32_MATCHES_FTS64)
 /* >> fts_read(3), fts_read64(3) */
@@ -235,19 +230,14 @@ __CREDIRECT(__ATTR_WUNUSED __ATTR_NONNULL((1)),int,__NOTHROW_RPC,fts64_close,(FT
 /* >> fts_close(3), fts_close64(3) */
 __CDECLARE(__ATTR_WUNUSED __ATTR_NONNULL((1)),int,__NOTHROW_RPC,fts64_close,(FTS64 *__ftsp),(__ftsp))
 #endif /* ... */
-#ifndef ____fts_open_compar64_t_defined
-#define ____fts_open_compar64_t_defined 1
-typedef int (__LIBKCALL *__fts_open_compar64_t)(struct __ftsent64 const **__lhs,
-                                                struct __ftsent64 const **__rhs);
-#endif /* !____fts_open_compar64_t_defined */
 #if defined(__CRT_HAVE_fts_open) && defined(__FTS32_MATCHES_FTS64)
 /* >> fts_open(3), fts_open64(3)
  * @param: options: Set of `FTS_COMFOLLOW | FTS_LOGICAL | ... | FTS_STOP' */
-__CREDIRECT(__ATTR_WUNUSED __ATTR_NONNULL((1)),FTS64 *,__NOTHROW_RPC,fts64_open,(char *const *__path_argv, __STDC_INT_AS_UINT_T __options, __fts_open_compar64_t __compar),fts_open,(__path_argv,__options,__compar))
+__CREDIRECT(__ATTR_WUNUSED __ATTR_NONNULL((1)),FTS64 *,__NOTHROW_RPC,fts64_open,(char *const *__path_argv, __STDC_INT_AS_UINT_T __options, int (__LIBKCALL *__compar)(FTSENT64 const **__lhs, FTSENT64 const **__rhs)),fts_open,(__path_argv,__options,__compar))
 #elif defined(__CRT_HAVE_fts64_open)
 /* >> fts_open(3), fts_open64(3)
  * @param: options: Set of `FTS_COMFOLLOW | FTS_LOGICAL | ... | FTS_STOP' */
-__CDECLARE(__ATTR_WUNUSED __ATTR_NONNULL((1)),FTS64 *,__NOTHROW_RPC,fts64_open,(char *const *__path_argv, __STDC_INT_AS_UINT_T __options, __fts_open_compar64_t __compar),(__path_argv,__options,__compar))
+__CDECLARE(__ATTR_WUNUSED __ATTR_NONNULL((1)),FTS64 *,__NOTHROW_RPC,fts64_open,(char *const *__path_argv, __STDC_INT_AS_UINT_T __options, int (__LIBKCALL *__compar)(FTSENT64 const **__lhs, FTSENT64 const **__rhs)),(__path_argv,__options,__compar))
 #endif /* ... */
 #if defined(__CRT_HAVE_fts_read) && defined(__FTS32_MATCHES_FTS64)
 /* >> fts_read(3), fts_read64(3) */

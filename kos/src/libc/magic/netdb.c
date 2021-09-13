@@ -683,11 +683,14 @@ int getnameinfo(struct sockaddr const *__restrict sa, socklen_t salen,
 
 %
 %#ifdef __USE_GNU
-%#ifndef __sigevent_t_defined
-%#define __sigevent_t_defined 1
-%typedef struct sigevent sigevent_t;
-%#endif /* !__sigevent_t_defined */
-%
+
+%{
+#ifndef __sigevent_t_defined
+#define __sigevent_t_defined 1
+typedef struct sigevent sigevent_t;
+#endif /* !__sigevent_t_defined */
+}
+
 
 @@Enqueue `ent' requests from the `list'. If `mode' is GAI_WAIT wait until all
 @@requests  are  handled. If  `wait'  is GAI_NOWAIT  return  immediately after

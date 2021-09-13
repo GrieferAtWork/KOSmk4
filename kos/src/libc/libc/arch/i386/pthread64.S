@@ -39,7 +39,7 @@
  * `libc_pthread_main()' within the context of the newly spawned thread.
  * NOTE: This function also fills in `thread->pt_tid' */
 /* INTDEF errno_t NOTHROW(__FCALL libc_pthread_clone)(struct pthread *__restrict thread,
- *                                                    __pthread_start_routine_t start); */
+ *                                                    void *(LIBCCALL start)(void *arg)); */
 .section .text.crt.sched.pthread
 INTERN_FUNCTION(libc_pthread_clone)
 	.cfi_startproc
@@ -50,7 +50,7 @@ INTERN_FUNCTION(libc_pthread_clone)
 	pushq_cfi_r %r14
 	pushq_cfi_r %r15
 	movq   %rdi, %r14 /* struct pthread *__restrict thread */
-	movq   %rsi, %r15 /* __pthread_start_routine_t start */
+	movq   %rsi, %r15 /* void *(LIBCCALL start)(void *arg) */
 
 	movq   __OFFSET_PTHREAD_TLS(%rdi), %r8        /* void *newtls */
 #if __OFFSET_PTHREAD_TID == 0
@@ -75,7 +75,7 @@ INTERN_FUNCTION(libc_pthread_clone)
 	testq  %rax, %rax
 	jnz    1f
 	movq   %r14, %rdi /* struct pthread *__restrict thread */
-	movq   %r15, %rsi /* __pthread_start_routine_t start */
+	movq   %r15, %rsi /* void *(LIBCCALL start)(void *arg) */
 	INTERN(libc_pthread_main)
 	jmp    libc_pthread_main
 

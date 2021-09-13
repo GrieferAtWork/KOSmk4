@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xa657823e */
+/* HASH CRC-32:0xde98bfc3 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -31,6 +31,27 @@
 DECL_BEGIN
 
 STATIC_ASSERT(sizeof(int) <= sizeof(void *));
+#if !defined(__KERNEL__) && !defined(__LIBCCALL_IS_LIBDCALL)
+/* >> thrd_create(3)
+ * Create and start a new thread (s.a. `pthread_create(3)')
+ * @return: thrd_success: Success
+ * @return: thrd_error:   Error */
+INTERN ATTR_SECTION(".text.crt.dos.sched.threads") int
+NOTHROW_NCX(LIBDCALL libd_thrd_create)(thrd_t *thr,
+                                       int (LIBDCALL *func)(void *arg),
+                                       void *arg) {
+	errno_t error;
+	STATIC_ASSERT(sizeof(int) <= sizeof(void *));
+	error = libd_pthread_create((pthread_t *)thr, NULL,
+	                            (void *(LIBDCALL *)(void *))(void *)func,
+	                            arg);
+	if likely(!error)
+		return thrd_success;
+	if (error == ENOMEM)
+		return thrd_nomem;
+	return thrd_error;
+}
+#endif /* !__KERNEL__ && !__LIBCCALL_IS_LIBDCALL */
 #ifndef __KERNEL__
 #include <asm/crt/threads.h>
 #include <libc/errno.h>
@@ -40,12 +61,12 @@ STATIC_ASSERT(sizeof(int) <= sizeof(void *));
  * @return: thrd_error:   Error */
 INTERN ATTR_SECTION(".text.crt.sched.threads") int
 NOTHROW_NCX(LIBCCALL libc_thrd_create)(thrd_t *thr,
-                                       thrd_start_t func,
+                                       int (LIBCCALL *func)(void *arg),
                                        void *arg) {
 	errno_t error;
 	STATIC_ASSERT(sizeof(int) <= sizeof(void *));
 	error = libc_pthread_create((pthread_t *)thr, NULL,
-	                       (__pthread_start_routine_t)(void *)func,
+	                       (void *(LIBCCALL *)(void *))(void *)func,
 	                       arg);
 	if likely(!error)
 		return thrd_success;
@@ -342,7 +363,7 @@ NOTHROW_RPC(LIBCCALL libc_cnd_timedwait64)(cnd_t *__restrict cond,
  * @return: thrd_error:   Error */
 INTERN ATTR_SECTION(".text.crt.sched.threads") int
 NOTHROW_NCX(LIBCCALL libc_tss_create)(tss_t *tss_id,
-                                      tss_dtor_t destructor) {
+                                      void (LIBKCALL *destructor)(void *arg)) {
 	errno_t error;
 	error = libc_pthread_key_create((pthread_key_t *)tss_id, destructor);
 	if likely(!error)
@@ -385,6 +406,9 @@ NOTHROW_NCX(LIBCCALL libc_thr_min_stack)(void) {
 
 DECL_END
 
+#if !defined(__KERNEL__) && !defined(__LIBCCALL_IS_LIBDCALL)
+DEFINE_PUBLIC_ALIAS(DOS$thrd_create, libd_thrd_create);
+#endif /* !__KERNEL__ && !__LIBCCALL_IS_LIBDCALL */
 #ifndef __KERNEL__
 DEFINE_PUBLIC_ALIAS(thrd_create, libc_thrd_create);
 DEFINE_PUBLIC_ALIAS(thrd_exit, libc_thrd_exit);

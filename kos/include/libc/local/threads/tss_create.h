@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xf58b5f30 */
+/* HASH CRC-32:0x75bf9ac8 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -27,21 +27,17 @@ __NAMESPACE_LOCAL_BEGIN
 #ifndef __local___localdep_pthread_key_create_defined
 #define __local___localdep_pthread_key_create_defined 1
 __NAMESPACE_LOCAL_END
-#ifndef ____pthread_destr_function_t_defined
-#define ____pthread_destr_function_t_defined 1
-typedef void (__LIBKCALL *__pthread_destr_function_t)(void *);
-#endif /* !____pthread_destr_function_t_defined */
 #include <bits/types.h>
 #include <bits/crt/pthreadtypes.h>
 __NAMESPACE_LOCAL_BEGIN
-__CREDIRECT(__ATTR_NONNULL((1)),__errno_t,__NOTHROW_NCX,__localdep_pthread_key_create,(__pthread_key_t *__key, __pthread_destr_function_t __destr_function),pthread_key_create,(__key,__destr_function))
+__CREDIRECT(__ATTR_NONNULL((1)),__errno_t,__NOTHROW_NCX,__localdep_pthread_key_create,(__pthread_key_t *__key, void (__LIBKCALL *__destr_function)(void *__value)),pthread_key_create,(__key,__destr_function))
 #endif /* !__local___localdep_pthread_key_create_defined */
 __NAMESPACE_LOCAL_END
 #include <asm/crt/threads.h>
 #include <bits/crt/pthreadtypes.h>
 __NAMESPACE_LOCAL_BEGIN
 __LOCAL_LIBC(tss_create) int
-__NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(tss_create))(__tss_t *__tss_id, __tss_dtor_t __destructor) {
+__NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(tss_create))(__tss_t *__tss_id, void (__LIBKCALL *__destructor)(void *__arg)) {
 	__errno_t __error;
 	__error = (__NAMESPACE_LOCAL_SYM __localdep_pthread_key_create)((__pthread_key_t *)__tss_id, __destructor);
 	if __likely(!__error)

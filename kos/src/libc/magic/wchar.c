@@ -64,7 +64,7 @@
 %(auto_header){
 #ifndef __errno_t_defined
 #define __errno_t_defined 1
-typedef int errno_t;
+typedef __errno_t errno_t;
 #endif /* !__errno_t_defined */
 #ifndef __rsize_t_defined
 #define __rsize_t_defined 1

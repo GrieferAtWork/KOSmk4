@@ -121,10 +121,6 @@ typedef __WCHAR_TYPE__ wchar_t;
 
 %[default:section(".text.crt.dos.sched.thread")]
 %{
-#ifndef ____dos_beginthread_entry_t_defined
-#define ____dos_beginthread_entry_t_defined 1
-typedef void (__LIBDCALL *__dos_beginthread_entry_t)(void *__arg);
-#endif /* !____dos_beginthread_entry_t_defined */
 #ifndef ____dos_beginthreadex_entry_t_defined
 #define ____dos_beginthreadex_entry_t_defined 1
 #ifdef __NO_ATTR_STDCALL
@@ -135,13 +131,6 @@ typedef __UINT32_TYPE__ (__ATTR_STDCALL *__dos_beginthreadex_entry_t)(void *__ar
 #endif /* !____dos_beginthreadex_entry_t_defined */
 }
 %
-
-%[define(DEFINE_DOS_BEGINTHREAD_ENTRY_T =
-@@pp_ifndef ____dos_beginthread_entry_t_defined@@
-#define ____dos_beginthread_entry_t_defined 1
-typedef void (__LIBDCALL *__dos_beginthread_entry_t)(void *__arg);
-@@pp_endif@@
-)]
 
 %[define(DEFINE_DOS_BEGINTHREADEX_ENTRY_T =
 @@pp_ifndef ____dos_beginthreadex_entry_t_defined@@
@@ -155,15 +144,11 @@ typedef __UINT32_TYPE__ (__ATTR_STDCALL *__dos_beginthreadex_entry_t)(void *__ar
 )]
 
 
-%[define_type_class(__dos_beginthread_entry_t = "TP")]
 %[define_type_class(__dos_beginthreadex_entry_t = "TP")]
-
-%[define_replacement(__dos_beginthread_entry_t = __dos_beginthread_entry_t)]
 %[define_replacement(__dos_beginthreadex_entry_t = __dos_beginthreadex_entry_t)]
 
 [[decl_include("<hybrid/typecore.h>")]]
-[[decl_prefix(DEFINE_DOS_BEGINTHREAD_ENTRY_T)]]
-uintptr_t _beginthread(__dos_beginthread_entry_t entry, $u32 stacksz, void *arg);
+uintptr_t _beginthread(void (LIBDCALL *entry)(void *arg), $u32 stacksz, void *arg);
 
 [[decl_include("<hybrid/typecore.h>")]]
 [[decl_prefix(DEFINE_DOS_BEGINTHREADEX_ENTRY_T)]]

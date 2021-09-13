@@ -180,18 +180,6 @@ FTSENT *fts_children([[nonnull]] FTS *ftsp, __STDC_INT_AS_UINT_T instr);
 int fts_close([[nonnull]] FTS *ftsp);
 
 
-%[define(DEFINE_FTS_OPEN_COMPAR_T =
-@@pp_ifndef ____fts_open_compar_t_defined@@
-#define ____fts_open_compar_t_defined 1
-typedef int (__LIBKCALL *__fts_open_compar_t)(struct _ftsent const **__lhs,
-                                              struct _ftsent const **__rhs);
-@@pp_endif@@
-)]
-%[insert:prefix(DEFINE_FTS_OPEN_COMPAR_T)]
-%[define_type_class(__fts_open_compar_t = "TP")]
-
-
-
 @@>> fts_open(3), fts_open64(3)
 @@@param: options: Set of `FTS_COMFOLLOW | FTS_LOGICAL | ... | FTS_STOP'
 [[cp, wunused, no_crt_self_import]]
@@ -199,9 +187,8 @@ typedef int (__LIBKCALL *__fts_open_compar_t)(struct _ftsent const **__lhs,
 [[if($extended_include_prefix("<bits/crt/fts.h>")defined(__FTS32_MATCHES_FTS64)), preferred_alias("fts_open")]]
 [[if($extended_include_prefix("<features.h>")defined(__USE_FILE_OFFSET64)), preferred_alias("fts64_open")]]
 [[if($extended_include_prefix("<features.h>")!defined(__USE_FILE_OFFSET64)), preferred_alias("fts_open")]]
-FTS *fts_open([[nonnull]] char *const *path_argv,
-              __STDC_INT_AS_UINT_T options,
-              __fts_open_compar_t compar);
+FTS *fts_open([[nonnull]] char *const *path_argv, __STDC_INT_AS_UINT_T options,
+              int (LIBKCALL *compar)(FTSENT const **lhs, FTSENT const **rhs));
 
 @@>> fts_read(3), fts_read64(3)
 [[cp, wunused, no_crt_self_import]]
@@ -234,23 +221,13 @@ FTSENT64 *fts64_children([[nonnull]] FTS64 *ftsp, __STDC_INT_AS_UINT_T instr);
 [[if($extended_include_prefix("<bits/crt/fts.h>")defined(__FTS32_MATCHES_FTS64)), preferred_alias("fts_close")]]
 int fts64_close([[nonnull]] FTS64 *ftsp);
 
-%[define(DEFINE_FTS_OPEN_COMPAR64_T =
-@@pp_ifndef ____fts_open_compar64_t_defined@@
-#define ____fts_open_compar64_t_defined 1
-typedef int (__LIBKCALL *__fts_open_compar64_t)(struct __ftsent64 const **__lhs,
-                                                struct __ftsent64 const **__rhs);
-@@pp_endif@@
-)]
-%[insert:prefix(DEFINE_FTS_OPEN_COMPAR64_T)]
-%[define_type_class(__fts_open_compar64_t = "TP")]
-
 [[cp, wunused, decl_include("<features.h>", "<bits/crt/fts.h>")]]
 [[doc_alias("fts_open"), fts64_variant_of(fts_open)]]
 [[decl_prefix(DEFINE_FTS_OPEN_COMPAR64_T)]]
 [[if($extended_include_prefix("<bits/crt/fts.h>")defined(__FTS32_MATCHES_FTS64)), preferred_alias("fts_open")]]
 FTS64 *fts64_open([[nonnull]] char *const *path_argv,
                   __STDC_INT_AS_UINT_T options,
-                  __fts_open_compar64_t compar);
+                  int (LIBKCALL *compar)(FTSENT64 const **lhs, FTSENT64 const **rhs));
 
 [[cp, wunused, decl_include("<bits/crt/fts.h>")]]
 [[doc_alias("fts_read"), fts64_variant_of(fts_read)]]

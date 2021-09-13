@@ -34,6 +34,27 @@ DECL_BEGIN
 /* Clone must be implemented in assembly! */
 /*[[[skip:libc_clone]]]*/
 
+/*[[[head:libd_clone,hash:CRC-32=0x61d7a9e7]]]*/
+#ifndef __LIBCCALL_IS_LIBDCALL
+INTERN ATTR_SECTION(".text.crt.dos.sched.access") NONNULL((1)) pid_t
+NOTHROW_NCX(VLIBDCALL libd_clone)(int (LIBDCALL *fn)(void *arg),
+                                  void *child_stack,
+                                  int flags,
+                                  void *arg,
+                                  ...)
+/*[[[body:libd_clone]]]*/
+/*AUTO*/{
+	(void)fn;
+	(void)child_stack;
+	(void)flags;
+	(void)arg;
+	CRT_UNIMPLEMENTED("clone"); /* TODO */
+	libc_seterrno(ENOSYS);
+	return 0;
+}
+#endif /* MAGIC:impl_if */
+/*[[[end:libd_clone]]]*/
+
 /*[[[head:libc_unshare,hash:CRC-32=0xf7fff3b0]]]*/
 /* >> unshare(2)
  * Unshare  certain components of the calling thread  that may be shared with other
@@ -288,7 +309,11 @@ NOTHROW_NCX(LIBCCALL libc_sched_rr_get_interval64)(pid_t pid,
 
 
 
-/*[[[start:exports,hash:CRC-32=0xccd61488]]]*/
+/*[[[start:exports,hash:CRC-32=0xa58ef2c5]]]*/
+#ifndef __LIBCCALL_IS_LIBDCALL
+DEFINE_PUBLIC_ALIAS(DOS$__clone, libd_clone);
+DEFINE_PUBLIC_ALIAS(DOS$clone, libd_clone);
+#endif /* !__LIBCCALL_IS_LIBDCALL */
 DEFINE_PUBLIC_ALIAS(unshare, libc_unshare);
 DEFINE_PUBLIC_ALIAS(sched_getcpu, libc_sched_getcpu);
 DEFINE_PUBLIC_ALIAS(setns, libc_setns);

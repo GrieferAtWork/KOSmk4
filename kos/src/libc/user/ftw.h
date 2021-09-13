@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x59d8526d */
+/* HASH CRC-32:0x45ef448b */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -22,7 +22,6 @@
 #define GUARD_LIBC_USER_FTW_H 1
 
 #include "../api.h"
-#include "../auto/ftw.h"
 
 #include <hybrid/typecore.h>
 #include <kos/types.h>

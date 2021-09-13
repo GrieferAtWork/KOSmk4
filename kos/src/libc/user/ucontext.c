@@ -123,7 +123,7 @@ NOTHROW_NCX(LIBCCALL libc_swapcontext)(ucontext_t *__restrict oucp,
 #endif /* MAGIC:impl_if */
 /*[[[end:libc_swapcontext]]]*/
 
-/*[[[head:libc_makecontext,hash:CRC-32=0x6afa0772]]]*/
+/*[[[head:libc_makecontext,hash:CRC-32=0x8f1cb88f]]]*/
 #ifndef LIBC_ARCH_HAVE_MAKECONTEXT
 /* >> makecontext(3)
  * Initialize  a  user-context  `ucp'  to  perform  a  call  to  `func',  which
@@ -146,7 +146,7 @@ NOTHROW_NCX(LIBCCALL libc_swapcontext)(ucontext_t *__restrict oucp,
  *     `func' should be handled as a call to `pthread_exit(NULL)' */
 INTERN ATTR_SECTION(".text.crt.cpu.ucontext") NONNULL((1, 2)) void
 NOTHROW_NCX(VLIBCCALL libc_makecontext)(ucontext_t *ucp,
-                                        __makecontext_func_t func,
+                                        void (LIBKCALL *func)(void),
                                         __STDC_INT_AS_SIZE_T argc,
                                         ...)
 /*[[[body:libc_makecontext]]]*/

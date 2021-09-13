@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xae0900b6 */
+/* HASH CRC-32:0xdcfddd58 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -101,7 +101,7 @@ INTDEF NONNULL((1, 2)) int NOTHROW_NCX(LIBCCALL libc_swapcontext)(ucontext_t *__
  *   - Have `ucp->uc_link' point to the context that should be  loaded
  *     when `func' returns normally, or set to `NULL' if the return of
  *     `func' should be handled as a call to `pthread_exit(NULL)' */
-INTDEF NONNULL((1, 2)) void NOTHROW_NCX(VLIBCCALL libc_makecontext)(ucontext_t *ucp, __makecontext_func_t func, __STDC_INT_AS_SIZE_T argc, ...);
+INTDEF NONNULL((1, 2)) void NOTHROW_NCX(VLIBCCALL libc_makecontext)(ucontext_t *ucp, void (LIBKCALL *func)(void), __STDC_INT_AS_SIZE_T argc, ...);
 #endif /* !__KERNEL__ */
 
 DECL_END

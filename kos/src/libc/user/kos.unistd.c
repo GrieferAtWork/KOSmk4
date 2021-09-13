@@ -122,33 +122,6 @@ INTERN ATTR_SECTION(".text.crt.except.fs.exec.exec") ATTR_NORETURN NONNULL((1, 2
 /*[[[end:libc_Execvpe]]]*/
 
 
-/*[[[head:libd_Execl,hash:CRC-32=0xfaa42a21]]]*/
-#ifndef __LIBCCALL_IS_LIBDCALL
-/* >> execl(3)
- * Replace the calling process with the application image referred to by `path' / `file'
- * and execute it's  `main()' method,  passing the list  of NULL-terminated  `args'-list */
-INTERN ATTR_SECTION(".text.crt.dos.except.fs.exec.exec") ATTR_NORETURN ATTR_SENTINEL NONNULL((1)) void
-(VLIBDCALL libd_Execl)(char const *__restrict path,
-                       char const *args,
-                       ...) THROWS(...)
-/*[[[body:libd_Execl]]]*/
-{
-#if defined(__i386__) && !defined(__x86_64__)
-	Execv(path, (char *const *)&args);
-#else
-	va_list vargs;
-	char **vector;
-	va_start(vargs, args);
-	CAPTURE_VARARGS_PLUS_ONE(char, vector, vargs, args);
-	va_end(vargs);
-	Execv(path, (char *const *)vector);
-#endif
-	__builtin_unreachable();
-}
-#endif /* MAGIC:impl_if */
-/*[[[end:libd_Execl]]]*/
-
-
 /*[[[head:libc_Execl,hash:CRC-32=0x7e39f891]]]*/
 /* >> execl(3)
  * Replace the calling process with the application image referred to by `path' / `file'
@@ -172,41 +145,6 @@ INTERN ATTR_SECTION(".text.crt.except.fs.exec.exec") ATTR_NORETURN ATTR_SENTINEL
 	__builtin_unreachable();
 }
 /*[[[end:libc_Execl]]]*/
-
-/*[[[head:libd_Execle,hash:CRC-32=0x81603cac]]]*/
-#ifndef __LIBCCALL_IS_LIBDCALL
-/* >> execle(3)
- * Replace the calling process with the application image referred to by `path' / `file'
- * and  execute it's `main()'  method, passing the  list of NULL-terminated `args'-list,
- * and setting `environ' to a `char **' passed after the NULL sentinel */
-INTERN ATTR_SECTION(".text.crt.dos.except.fs.exec.exec") ATTR_NORETURN ATTR_SENTINEL_O(1) NONNULL((1)) void
-(VLIBDCALL libd_Execle)(char const *__restrict path,
-                        char const *args,
-                        ...) THROWS(...)
-/*[[[body:libd_Execle]]]*/
-{
-#if defined(__i386__) && !defined(__x86_64__)
-	char ***penvp = (char ***)&args;
-	while (*penvp++)
-		; /* Envp is located 1 after the first NULL-entry */
-	Execve(path,
-	       (char *const *)&args,
-	       (char *const *)*penvp);
-#else
-	va_list vargs;
-	char **vector, **envp;
-	va_start(vargs, args);
-	CAPTURE_VARARGS_PLUS_ONE(char, vector, vargs, args);
-	envp = va_arg(vargs, char **);
-	va_end(vargs);
-	Execve(path,
-	       (char *const *)vector,
-	       (char *const *)envp);
-#endif
-	__builtin_unreachable();
-}
-#endif /* MAGIC:impl_if */
-/*[[[end:libd_Execle]]]*/
 
 /*[[[head:libc_Execle,hash:CRC-32=0xa4bfdc0a]]]*/
 /* >> execle(3)
@@ -241,32 +179,6 @@ INTERN ATTR_SECTION(".text.crt.except.fs.exec.exec") ATTR_NORETURN ATTR_SENTINEL
 }
 /*[[[end:libc_Execle]]]*/
 
-/*[[[head:libd_Execpl,hash:CRC-32=0x2cec8ab3]]]*/
-#ifndef __LIBCCALL_IS_LIBDCALL
-/* >> execlp(3)
- * Replace the calling process with the application image referred to by `path' / `file'
- * and execute it's  `main()' method,  passing the list  of NULL-terminated  `args'-list */
-INTERN ATTR_SECTION(".text.crt.dos.except.fs.exec.exec") ATTR_NORETURN ATTR_SENTINEL NONNULL((1)) void
-(VLIBDCALL libd_Execpl)(char const *__restrict file,
-                        char const *args,
-                        ...) THROWS(...)
-/*[[[body:libd_Execpl]]]*/
-{
-#if defined(__i386__) && !defined(__x86_64__)
-	Execvp(file, (char *const *)&args);
-#else
-	va_list vargs;
-	char **vector;
-	va_start(vargs, args);
-	CAPTURE_VARARGS_PLUS_ONE(char, vector, vargs, args);
-	va_end(vargs);
-	Execvp(file, (char *const *)vector);
-#endif
-	__builtin_unreachable();
-}
-#endif /* MAGIC:impl_if */
-/*[[[end:libd_Execpl]]]*/
-
 /*[[[head:libc_Execpl,hash:CRC-32=0x67de5ef2]]]*/
 /* >> execlp(3)
  * Replace the calling process with the application image referred to by `path' / `file'
@@ -290,41 +202,6 @@ INTERN ATTR_SECTION(".text.crt.except.fs.exec.exec") ATTR_NORETURN ATTR_SENTINEL
 	__builtin_unreachable();
 }
 /*[[[end:libc_Execpl]]]*/
-
-/*[[[head:libd_Execlpe,hash:CRC-32=0x3a6ef475]]]*/
-#ifndef __LIBCCALL_IS_LIBDCALL
-/* >> execle(3)
- * Replace the calling process with the application image referred to by `path' / `file'
- * and  execute it's `main()'  method, passing the  list of NULL-terminated `args'-list,
- * and setting `environ' to a `char **' passed after the NULL sentinel */
-INTERN ATTR_SECTION(".text.crt.dos.except.fs.exec.exec") ATTR_NORETURN ATTR_SENTINEL_O(1) NONNULL((1)) void
-(VLIBDCALL libd_Execlpe)(char const *__restrict file,
-                         char const *args,
-                         ...) THROWS(...)
-/*[[[body:libd_Execlpe]]]*/
-{
-#if defined(__i386__) && !defined(__x86_64__)
-	char ***penvp = (char ***)&args;
-	while (*penvp++)
-		; /* Envp is located 1 after the first NULL-entry */
-	Execvpe(file,
-	        (char *const *)&args,
-	        (char *const *)*penvp);
-#else
-	va_list vargs;
-	char **vector, **envp;
-	va_start(vargs, args);
-	CAPTURE_VARARGS_PLUS_ONE(char, vector, vargs, args);
-	envp = va_arg(vargs, char **);
-	va_end(vargs);
-	Execvpe(file,
-	        (char *const *)vector,
-	        (char *const *)envp);
-#endif
-	__builtin_unreachable();
-}
-#endif /* MAGIC:impl_if */
-/*[[[end:libd_Execlpe]]]*/
 
 /*[[[head:libc_Execlpe,hash:CRC-32=0xaf89e92b]]]*/
 /* >> execle(3)
@@ -741,24 +618,12 @@ INTERN ATTR_SECTION(".text.crt.except.system.configuration") NONNULL((1)) void
 
 
 
-/*[[[start:exports,hash:CRC-32=0xf6a78f81]]]*/
+/*[[[start:exports,hash:CRC-32=0x28eb2e37]]]*/
 DEFINE_PUBLIC_ALIAS(Execv, libc_Execv);
 DEFINE_PUBLIC_ALIAS(Execvp, libc_Execvp);
-#ifndef __LIBCCALL_IS_LIBDCALL
-DEFINE_PUBLIC_ALIAS(DOS$Execl, libd_Execl);
-#endif /* !__LIBCCALL_IS_LIBDCALL */
 DEFINE_PUBLIC_ALIAS(Execl, libc_Execl);
-#ifndef __LIBCCALL_IS_LIBDCALL
-DEFINE_PUBLIC_ALIAS(DOS$Execle, libd_Execle);
-#endif /* !__LIBCCALL_IS_LIBDCALL */
 DEFINE_PUBLIC_ALIAS(Execle, libc_Execle);
-#ifndef __LIBCCALL_IS_LIBDCALL
-DEFINE_PUBLIC_ALIAS(DOS$Execpl, libd_Execpl);
-#endif /* !__LIBCCALL_IS_LIBDCALL */
 DEFINE_PUBLIC_ALIAS(Execpl, libc_Execpl);
-#ifndef __LIBCCALL_IS_LIBDCALL
-DEFINE_PUBLIC_ALIAS(DOS$Execlpe, libd_Execlpe);
-#endif /* !__LIBCCALL_IS_LIBDCALL */
 DEFINE_PUBLIC_ALIAS(Execlpe, libc_Execlpe);
 DEFINE_PUBLIC_ALIAS(ReadAll, libc_ReadAll);
 DEFINE_PUBLIC_ALIAS(GetCwd, libc_GetCwd);

@@ -27,6 +27,7 @@
 %[define_replacement(time_t = "__TM_TYPE(time)")]
 %[define_replacement(time32_t = __time32_t)]
 %[define_replacement(time64_t = __time64_t)]
+%[default:nodos]
 
 %[insert:prefix(
 #include <features.h>

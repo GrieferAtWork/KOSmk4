@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x680d94ed */
+/* HASH CRC-32:0x57eca2d8 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -613,6 +613,10 @@
 #define __stub_DOS$_wsearchenv_s
 #define __stub_DOS$_wtempnam
 #define __stub_DOS$_wtmpnam_s
+#ifndef __LIBCCALL_IS_LIBDCALL
+#define __stub_DOS$__clone
+#define __stub_DOS$clone
+#endif /* !__LIBCCALL_IS_LIBDCALL */
 #define __stub_DOS$fgetwln
 #define __stub_DOS$mbsnrtowcs
 #define __stub_DOS$open_wmemstream

@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xe562154f */
+/* HASH CRC-32:0x25d2a870 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -540,7 +540,6 @@ __CDECLARE_OPT(,int,__NOTHROW_RPC,getnameinfo,(struct sockaddr const *__restrict
 #define __sigevent_t_defined 1
 typedef struct sigevent sigevent_t;
 #endif /* !__sigevent_t_defined */
-
 /* Enqueue `ent' requests from the `list'. If `mode' is GAI_WAIT wait until all
  * requests  are  handled. If  `wait'  is GAI_NOWAIT  return  immediately after
  * queueing  the   requests  and   signal   completion  according   to   `sig'.

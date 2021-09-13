@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x319d30b9 */
+/* HASH CRC-32:0xd7469549 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -237,12 +237,8 @@ DEFINE_PUBLIC_ALIAS(DOS$readdir64_r, libd_readdir64_r);
 DEFINE_PUBLIC_ALIAS(DOS$seekdir, libd_seekdir);
 DEFINE_PUBLIC_ALIAS(DOS$telldir, libd_telldir);
 DEFINE_PUBLIC_ALIAS(DOS$dirfd, libd_dirfd);
-DEFINE_PUBLIC_ALIAS(DOS$scandir, libd_scandir);
 DEFINE_PUBLIC_ALIAS(DOS$alphasort, libd_alphasort);
 DEFINE_PUBLIC_ALIAS(DOS$alphasort64, libd_alphasort64);
-DEFINE_PUBLIC_ALIAS(DOS$scandirat, libd_scandirat);
-DEFINE_PUBLIC_ALIAS(DOS$scandir64, libd_scandir64);
-DEFINE_PUBLIC_ALIAS(DOS$scandirat64, libd_scandirat64);
 DEFINE_PUBLIC_ALIAS(DOS$getdirentries, libd_getdirentries);
 DEFINE_PUBLIC_ALIAS(DOS$getdirentries64, libd_getdirentries64);
 DEFINE_PUBLIC_ALIAS(DOS$versionsort, libd_versionsort);
@@ -349,21 +345,13 @@ DEFINE_PUBLIC_ALIAS(DOS$fts64_open, libd_fts64_open);
 DEFINE_PUBLIC_ALIAS(DOS$fts64_read, libd_fts64_read);
 DEFINE_PUBLIC_ALIAS(DOS$fts64_set, libd_fts64_set);
 
-/* ftw */
-DEFINE_PUBLIC_ALIAS(DOS$ftw, libd_ftw);
-DEFINE_PUBLIC_ALIAS(DOS$ftw64, libd_ftw64);
-DEFINE_PUBLIC_ALIAS(DOS$nftw, libd_nftw);
-DEFINE_PUBLIC_ALIAS(DOS$nftw64, libd_nftw64);
-
 /* getopt */
 DEFINE_PUBLIC_ALIAS(DOS$getopt, libd_getopt);
 DEFINE_PUBLIC_ALIAS(DOS$getopt_long, libd_getopt_long);
 DEFINE_PUBLIC_ALIAS(DOS$getopt_long_only, libd_getopt_long_only);
 
 /* glob */
-DEFINE_PUBLIC_ALIAS(DOS$glob, libd_glob);
 DEFINE_PUBLIC_ALIAS(DOS$globfree, libd_globfree);
-DEFINE_PUBLIC_ALIAS(DOS$glob64, libd_glob64);
 DEFINE_PUBLIC_ALIAS(DOS$globfree64, libd_globfree64);
 
 /* grp */
@@ -427,224 +415,6 @@ DEFINE_PUBLIC_ALIAS(DOS$_sopen, libd_sopen);
 DEFINE_PUBLIC_ALIAS(DOS$sopen, libd_sopen);
 DEFINE_PUBLIC_ALIAS(DOS$_filelength, libd__filelength);
 DEFINE_PUBLIC_ALIAS(DOS$_eof, libd__eof);
-
-/* kos.except-handler */
-DEFINE_PUBLIC_ALIAS(DOS$set_exception_handler, libd_set_exception_handler);
-DEFINE_PUBLIC_ALIAS(DOS$get_exception_handler, libd_get_exception_handler);
-DEFINE_PUBLIC_ALIAS(DOS$except_handler3, libd_except_handler3);
-DEFINE_PUBLIC_ALIAS(DOS$except_handler4, libd_except_handler4);
-
-/* kos.fcntl */
-DEFINE_PUBLIC_ALIAS(DOS$Fcntl, libd_Fcntl);
-DEFINE_PUBLIC_ALIAS(DOS$Open, libd_Open);
-DEFINE_PUBLIC_ALIAS(DOS$Creat, libd_Creat);
-DEFINE_PUBLIC_ALIAS(DOS$Open64, libd_Open64);
-DEFINE_PUBLIC_ALIAS(DOS$Creat64, libd_Creat64);
-DEFINE_PUBLIC_ALIAS(DOS$OpenAt, libd_OpenAt);
-DEFINE_PUBLIC_ALIAS(DOS$OpenAt64, libd_OpenAt64);
-
-/* kos.futex */
-DEFINE_PUBLIC_ALIAS(DOS$lfutex, libd_lfutex);
-DEFINE_PUBLIC_ALIAS(DOS$lfutex64, libd_lfutex64);
-DEFINE_PUBLIC_ALIAS(DOS$futex_wake, libd_futex_wake);
-DEFINE_PUBLIC_ALIAS(DOS$futex_wakeall, libd_futex_wakeall);
-DEFINE_PUBLIC_ALIAS(DOS$futex_wakemask, libd_futex_wakemask);
-DEFINE_PUBLIC_ALIAS(DOS$futex_waitwhile, libd_futex_waitwhile);
-DEFINE_PUBLIC_ALIAS(DOS$futex_waituntil, libd_futex_waituntil);
-DEFINE_PUBLIC_ALIAS(DOS$futex_waitwhile_above, libd_futex_waitwhile_above);
-DEFINE_PUBLIC_ALIAS(DOS$futex_waitwhile_below, libd_futex_waitwhile_below);
-DEFINE_PUBLIC_ALIAS(DOS$futex_waitwhile_aboveequal, libd_futex_waitwhile_aboveequal);
-DEFINE_PUBLIC_ALIAS(DOS$futex_waitwhile_belowequal, libd_futex_waitwhile_belowequal);
-DEFINE_PUBLIC_ALIAS(DOS$futex_waitwhile_cmpxch, libd_futex_waitwhile_cmpxch);
-DEFINE_PUBLIC_ALIAS(DOS$futex_waituntil_cmpxch, libd_futex_waituntil_cmpxch);
-DEFINE_PUBLIC_ALIAS(DOS$futex_waitlock, libd_futex_waitlock);
-DEFINE_PUBLIC_ALIAS(DOS$futex_waitwhile_exactbits, libd_futex_waitwhile_exactbits);
-DEFINE_PUBLIC_ALIAS(DOS$futex_waituntil_exactbits, libd_futex_waituntil_exactbits);
-DEFINE_PUBLIC_ALIAS(DOS$futex_waitwhile_anybit, libd_futex_waitwhile_anybit);
-DEFINE_PUBLIC_ALIAS(DOS$futex_waitwhile_allbits, libd_futex_waitwhile_allbits);
-DEFINE_PUBLIC_ALIAS(DOS$futex_timedwaitwhile, libd_futex_timedwaitwhile);
-DEFINE_PUBLIC_ALIAS(DOS$futex_timedwaituntil, libd_futex_timedwaituntil);
-DEFINE_PUBLIC_ALIAS(DOS$futex_timedwaitwhile_above, libd_futex_timedwaitwhile_above);
-DEFINE_PUBLIC_ALIAS(DOS$futex_timedwaitwhile_below, libd_futex_timedwaitwhile_below);
-DEFINE_PUBLIC_ALIAS(DOS$futex_timedwaitwhile_aboveequal, libd_futex_timedwaitwhile_aboveequal);
-DEFINE_PUBLIC_ALIAS(DOS$futex_timedwaitwhile_belowequal, libd_futex_timedwaitwhile_belowequal);
-DEFINE_PUBLIC_ALIAS(DOS$futex_timedwaitwhile_cmpxch, libd_futex_timedwaitwhile_cmpxch);
-DEFINE_PUBLIC_ALIAS(DOS$futex_timedwaituntil_cmpxch, libd_futex_timedwaituntil_cmpxch);
-DEFINE_PUBLIC_ALIAS(DOS$futex_timedwaitlock, libd_futex_timedwaitlock);
-DEFINE_PUBLIC_ALIAS(DOS$futex_timedwaitwhile_exactbits, libd_futex_timedwaitwhile_exactbits);
-DEFINE_PUBLIC_ALIAS(DOS$futex_timedwaituntil_exactbits, libd_futex_timedwaituntil_exactbits);
-DEFINE_PUBLIC_ALIAS(DOS$futex_timedwaitwhile_anybit, libd_futex_timedwaitwhile_anybit);
-DEFINE_PUBLIC_ALIAS(DOS$futex_timedwaitwhile_allbits, libd_futex_timedwaitwhile_allbits);
-DEFINE_PUBLIC_ALIAS(DOS$futex_timedwaitwhile64, libd_futex_timedwaitwhile64);
-DEFINE_PUBLIC_ALIAS(DOS$futex_timedwaituntil64, libd_futex_timedwaituntil64);
-DEFINE_PUBLIC_ALIAS(DOS$futex_timedwaitwhile_above64, libd_futex_timedwaitwhile_above64);
-DEFINE_PUBLIC_ALIAS(DOS$futex_timedwaitwhile_below64, libd_futex_timedwaitwhile_below64);
-DEFINE_PUBLIC_ALIAS(DOS$futex_timedwaitwhile_aboveequal64, libd_futex_timedwaitwhile_aboveequal64);
-DEFINE_PUBLIC_ALIAS(DOS$futex_timedwaitwhile_belowequal64, libd_futex_timedwaitwhile_belowequal64);
-DEFINE_PUBLIC_ALIAS(DOS$futex_timedwaitwhile_cmpxch64, libd_futex_timedwaitwhile_cmpxch64);
-DEFINE_PUBLIC_ALIAS(DOS$futex_timedwaituntil_cmpxch64, libd_futex_timedwaituntil_cmpxch64);
-DEFINE_PUBLIC_ALIAS(DOS$futex_timedwaitlock64, libd_futex_timedwaitlock64);
-DEFINE_PUBLIC_ALIAS(DOS$futex_timedwaitwhile_exactbits64, libd_futex_timedwaitwhile_exactbits64);
-DEFINE_PUBLIC_ALIAS(DOS$futex_timedwaituntil_exactbits64, libd_futex_timedwaituntil_exactbits64);
-DEFINE_PUBLIC_ALIAS(DOS$futex_timedwaitwhile_anybit64, libd_futex_timedwaitwhile_anybit64);
-DEFINE_PUBLIC_ALIAS(DOS$futex_timedwaitwhile_allbits64, libd_futex_timedwaitwhile_allbits64);
-DEFINE_PUBLIC_ALIAS(DOS$futex_setspin, libd_futex_setspin);
-
-/* kos.futexexpr */
-DEFINE_PUBLIC_ALIAS(DOS$lfutexexpr, libd_lfutexexpr);
-DEFINE_PUBLIC_ALIAS(DOS$lfutexlockexpr, libd_lfutexlockexpr);
-DEFINE_PUBLIC_ALIAS(DOS$lfutexexpr64, libd_lfutexexpr64);
-DEFINE_PUBLIC_ALIAS(DOS$lfutexlockexpr64, libd_lfutexlockexpr64);
-
-/* kos.futexlock */
-DEFINE_PUBLIC_ALIAS(DOS$lfutexlock, libd_lfutexlock);
-DEFINE_PUBLIC_ALIAS(DOS$lfutexlock64, libd_lfutexlock64);
-DEFINE_PUBLIC_ALIAS(DOS$futexlock_wake, libd_futexlock_wake);
-DEFINE_PUBLIC_ALIAS(DOS$futexlock_wakeall, libd_futexlock_wakeall);
-DEFINE_PUBLIC_ALIAS(DOS$futexlock_waitwhile, libd_futexlock_waitwhile);
-DEFINE_PUBLIC_ALIAS(DOS$futexlock_waituntil, libd_futexlock_waituntil);
-DEFINE_PUBLIC_ALIAS(DOS$futexlock_waitwhile_above, libd_futexlock_waitwhile_above);
-DEFINE_PUBLIC_ALIAS(DOS$futexlock_waitwhile_below, libd_futexlock_waitwhile_below);
-DEFINE_PUBLIC_ALIAS(DOS$futexlock_waitwhile_aboveequal, libd_futexlock_waitwhile_aboveequal);
-DEFINE_PUBLIC_ALIAS(DOS$futexlock_waitwhile_belowequal, libd_futexlock_waitwhile_belowequal);
-DEFINE_PUBLIC_ALIAS(DOS$futexlock_waitwhile_cmpxch, libd_futexlock_waitwhile_cmpxch);
-DEFINE_PUBLIC_ALIAS(DOS$futexlock_waituntil_cmpxch, libd_futexlock_waituntil_cmpxch);
-DEFINE_PUBLIC_ALIAS(DOS$futexlock_waitlock, libd_futexlock_waitlock);
-DEFINE_PUBLIC_ALIAS(DOS$futexlock_waitwhile_exactbits, libd_futexlock_waitwhile_exactbits);
-DEFINE_PUBLIC_ALIAS(DOS$futexlock_waituntil_exactbits, libd_futexlock_waituntil_exactbits);
-DEFINE_PUBLIC_ALIAS(DOS$futexlock_waitwhile_anybit, libd_futexlock_waitwhile_anybit);
-DEFINE_PUBLIC_ALIAS(DOS$futexlock_waitwhile_allbits, libd_futexlock_waitwhile_allbits);
-DEFINE_PUBLIC_ALIAS(DOS$futexlock_timedwaitwhile, libd_futexlock_timedwaitwhile);
-DEFINE_PUBLIC_ALIAS(DOS$futexlock_timedwaituntil, libd_futexlock_timedwaituntil);
-DEFINE_PUBLIC_ALIAS(DOS$futexlock_timedwaitwhile_above, libd_futexlock_timedwaitwhile_above);
-DEFINE_PUBLIC_ALIAS(DOS$futexlock_timedwaitwhile_below, libd_futexlock_timedwaitwhile_below);
-DEFINE_PUBLIC_ALIAS(DOS$futexlock_timedwaitwhile_aboveequal, libd_futexlock_timedwaitwhile_aboveequal);
-DEFINE_PUBLIC_ALIAS(DOS$futexlock_timedwaitwhile_belowequal, libd_futexlock_timedwaitwhile_belowequal);
-DEFINE_PUBLIC_ALIAS(DOS$futexlock_timedwaitwhile_cmpxch, libd_futexlock_timedwaitwhile_cmpxch);
-DEFINE_PUBLIC_ALIAS(DOS$futexlock_timedwaituntil_cmpxch, libd_futexlock_timedwaituntil_cmpxch);
-DEFINE_PUBLIC_ALIAS(DOS$futexlock_timedwaitlock, libd_futexlock_timedwaitlock);
-DEFINE_PUBLIC_ALIAS(DOS$futexlock_timedwaitwhile_exactbits, libd_futexlock_timedwaitwhile_exactbits);
-DEFINE_PUBLIC_ALIAS(DOS$futexlock_timedwaituntil_exactbits, libd_futexlock_timedwaituntil_exactbits);
-DEFINE_PUBLIC_ALIAS(DOS$futexlock_timedwaitwhile_anybit, libd_futexlock_timedwaitwhile_anybit);
-DEFINE_PUBLIC_ALIAS(DOS$futexlock_timedwaitwhile_allbits, libd_futexlock_timedwaitwhile_allbits);
-DEFINE_PUBLIC_ALIAS(DOS$futexlock_timedwaitwhile64, libd_futexlock_timedwaitwhile64);
-DEFINE_PUBLIC_ALIAS(DOS$futexlock_timedwaituntil64, libd_futexlock_timedwaituntil64);
-DEFINE_PUBLIC_ALIAS(DOS$futexlock_timedwaitwhile_above64, libd_futexlock_timedwaitwhile_above64);
-DEFINE_PUBLIC_ALIAS(DOS$futexlock_timedwaitwhile_below64, libd_futexlock_timedwaitwhile_below64);
-DEFINE_PUBLIC_ALIAS(DOS$futexlock_timedwaitwhile_aboveequal64, libd_futexlock_timedwaitwhile_aboveequal64);
-DEFINE_PUBLIC_ALIAS(DOS$futexlock_timedwaitwhile_belowequal64, libd_futexlock_timedwaitwhile_belowequal64);
-DEFINE_PUBLIC_ALIAS(DOS$futexlock_timedwaitwhile_cmpxch64, libd_futexlock_timedwaitwhile_cmpxch64);
-DEFINE_PUBLIC_ALIAS(DOS$futexlock_timedwaituntil_cmpxch64, libd_futexlock_timedwaituntil_cmpxch64);
-DEFINE_PUBLIC_ALIAS(DOS$futexlock_timedwaitlock64, libd_futexlock_timedwaitlock64);
-DEFINE_PUBLIC_ALIAS(DOS$futexlock_timedwaitwhile_exactbits64, libd_futexlock_timedwaitwhile_exactbits64);
-DEFINE_PUBLIC_ALIAS(DOS$futexlock_timedwaituntil_exactbits64, libd_futexlock_timedwaituntil_exactbits64);
-DEFINE_PUBLIC_ALIAS(DOS$futexlock_timedwaitwhile_anybit64, libd_futexlock_timedwaitwhile_anybit64);
-DEFINE_PUBLIC_ALIAS(DOS$futexlock_timedwaitwhile_allbits64, libd_futexlock_timedwaitwhile_allbits64);
-
-/* kos.hop.api */
-DEFINE_PUBLIC_ALIAS(DOS$hop, libd_hop);
-DEFINE_PUBLIC_ALIAS(DOS$hopf, libd_hopf);
-DEFINE_PUBLIC_ALIAS(DOS$Hop, libd_Hop);
-DEFINE_PUBLIC_ALIAS(DOS$Hopf, libd_Hopf);
-
-/* kos.malloc */
-DEFINE_PUBLIC_ALIAS(DOS$Malloc, libd_Malloc);
-DEFINE_PUBLIC_ALIAS(DOS$Calloc, libd_Calloc);
-DEFINE_PUBLIC_ALIAS(DOS$Realloc, libd_Realloc);
-DEFINE_PUBLIC_ALIAS(DOS$Memalign, libd_Memalign);
-DEFINE_PUBLIC_ALIAS(DOS$PValloc, libd_PValloc);
-DEFINE_PUBLIC_ALIAS(DOS$Valloc, libd_Valloc);
-DEFINE_PUBLIC_ALIAS(DOS$Memdup, libd_Memdup);
-DEFINE_PUBLIC_ALIAS(DOS$Memcdup, libd_Memcdup);
-
-/* kos.sys.ioctl */
-DEFINE_PUBLIC_ALIAS(DOS$Ioctl, libd_Ioctl);
-
-/* kos.sys.stat */
-DEFINE_PUBLIC_ALIAS(DOS$Mkdir, libd_Mkdir);
-DEFINE_PUBLIC_ALIAS(DOS$Chmod, libd_Chmod);
-DEFINE_PUBLIC_ALIAS(DOS$LChmod, libd_LChmod);
-DEFINE_PUBLIC_ALIAS(DOS$FMkdirAt, libd_FMkdirAt);
-DEFINE_PUBLIC_ALIAS(DOS$FMknodAt, libd_FMknodAt);
-DEFINE_PUBLIC_ALIAS(DOS$Mkfifo, libd_Mkfifo);
-DEFINE_PUBLIC_ALIAS(DOS$FChmodAt, libd_FChmodAt);
-DEFINE_PUBLIC_ALIAS(DOS$MkdirAt, libd_MkdirAt);
-DEFINE_PUBLIC_ALIAS(DOS$MkfifoAt, libd_MkfifoAt);
-DEFINE_PUBLIC_ALIAS(DOS$FChmod, libd_FChmod);
-DEFINE_PUBLIC_ALIAS(DOS$Mknod, libd_Mknod);
-DEFINE_PUBLIC_ALIAS(DOS$MknodAt, libd_MknodAt);
-DEFINE_PUBLIC_ALIAS(DOS$UTimensAt, libd_UTimensAt);
-DEFINE_PUBLIC_ALIAS(DOS$UTimensAt64, libd_UTimensAt64);
-DEFINE_PUBLIC_ALIAS(DOS$FUtimens, libd_FUtimens);
-DEFINE_PUBLIC_ALIAS(DOS$FUtimens64, libd_FUtimens64);
-
-/* kos.unistd */
-DEFINE_PUBLIC_ALIAS(DOS$Execv, libd_Execv);
-DEFINE_PUBLIC_ALIAS(DOS$Execve, libd_Execve);
-DEFINE_PUBLIC_ALIAS(DOS$Execvp, libd_Execvp);
-DEFINE_PUBLIC_ALIAS(DOS$Pipe, libd_Pipe);
-DEFINE_PUBLIC_ALIAS(DOS$FSync, libd_FSync);
-DEFINE_PUBLIC_ALIAS(DOS$SetPGid, libd_SetPGid);
-DEFINE_PUBLIC_ALIAS(DOS$SetUid, libd_SetUid);
-DEFINE_PUBLIC_ALIAS(DOS$SetGid, libd_SetGid);
-DEFINE_PUBLIC_ALIAS(DOS$Chown, libd_Chown);
-DEFINE_PUBLIC_ALIAS(DOS$Link, libd_Link);
-DEFINE_PUBLIC_ALIAS(DOS$Read, libd_Read);
-DEFINE_PUBLIC_ALIAS(DOS$Write, libd_Write);
-DEFINE_PUBLIC_ALIAS(DOS$ReadAll, libd_ReadAll);
-DEFINE_PUBLIC_ALIAS(DOS$LSeek, libd_LSeek);
-DEFINE_PUBLIC_ALIAS(DOS$Dup2, libd_Dup2);
-DEFINE_PUBLIC_ALIAS(DOS$Dup, libd_Dup);
-DEFINE_PUBLIC_ALIAS(DOS$Chdir, libd_Chdir);
-DEFINE_PUBLIC_ALIAS(DOS$GetCwd, libd_GetCwd);
-DEFINE_PUBLIC_ALIAS(DOS$Unlink, libd_Unlink);
-DEFINE_PUBLIC_ALIAS(DOS$Rmdir, libd_Rmdir);
-DEFINE_PUBLIC_ALIAS(DOS$FChownAt, libd_FChownAt);
-DEFINE_PUBLIC_ALIAS(DOS$LinkAt, libd_LinkAt);
-DEFINE_PUBLIC_ALIAS(DOS$SymlinkAt, libd_SymlinkAt);
-DEFINE_PUBLIC_ALIAS(DOS$ReadlinkAt, libd_ReadlinkAt);
-DEFINE_PUBLIC_ALIAS(DOS$FReadlinkAt, libd_FReadlinkAt);
-DEFINE_PUBLIC_ALIAS(DOS$UnlinkAt, libd_UnlinkAt);
-DEFINE_PUBLIC_ALIAS(DOS$LSeek64, libd_LSeek64);
-DEFINE_PUBLIC_ALIAS(DOS$PRead, libd_PRead);
-DEFINE_PUBLIC_ALIAS(DOS$PWrite, libd_PWrite);
-DEFINE_PUBLIC_ALIAS(DOS$PReadAll, libd_PReadAll);
-DEFINE_PUBLIC_ALIAS(DOS$PRead64, libd_PRead64);
-DEFINE_PUBLIC_ALIAS(DOS$PWrite64, libd_PWrite64);
-DEFINE_PUBLIC_ALIAS(DOS$PReadAll64, libd_PReadAll64);
-DEFINE_PUBLIC_ALIAS(DOS$Pipe2, libd_Pipe2);
-DEFINE_PUBLIC_ALIAS(DOS$Dup3, libd_Dup3);
-DEFINE_PUBLIC_ALIAS(DOS$SyncFs, libd_SyncFs);
-DEFINE_PUBLIC_ALIAS(DOS$GetResUid, libd_GetResUid);
-DEFINE_PUBLIC_ALIAS(DOS$GetResGid, libd_GetResGid);
-DEFINE_PUBLIC_ALIAS(DOS$SetResUid, libd_SetResUid);
-DEFINE_PUBLIC_ALIAS(DOS$SetResGid, libd_SetResGid);
-DEFINE_PUBLIC_ALIAS(DOS$FChown, libd_FChown);
-DEFINE_PUBLIC_ALIAS(DOS$FChdir, libd_FChdir);
-DEFINE_PUBLIC_ALIAS(DOS$GetPGid, libd_GetPGid);
-DEFINE_PUBLIC_ALIAS(DOS$GetSid, libd_GetSid);
-DEFINE_PUBLIC_ALIAS(DOS$LChown, libd_LChown);
-DEFINE_PUBLIC_ALIAS(DOS$Truncate, libd_Truncate);
-DEFINE_PUBLIC_ALIAS(DOS$Truncate64, libd_Truncate64);
-DEFINE_PUBLIC_ALIAS(DOS$FExecve, libd_FExecve);
-DEFINE_PUBLIC_ALIAS(DOS$Execvpe, libd_Execvpe);
-DEFINE_PUBLIC_ALIAS(DOS$Nice, libd_Nice);
-DEFINE_PUBLIC_ALIAS(DOS$SetReUid, libd_SetReUid);
-DEFINE_PUBLIC_ALIAS(DOS$SetReGid, libd_SetReGid);
-DEFINE_PUBLIC_ALIAS(DOS$SetEUid, libd_SetEUid);
-DEFINE_PUBLIC_ALIAS(DOS$SetEGid, libd_SetEGid);
-DEFINE_PUBLIC_ALIAS(DOS$Symlink, libd_Symlink);
-DEFINE_PUBLIC_ALIAS(DOS$Readlink, libd_Readlink);
-DEFINE_PUBLIC_ALIAS(DOS$GetHostName, libd_GetHostName);
-DEFINE_PUBLIC_ALIAS(DOS$SetHostName, libd_SetHostName);
-DEFINE_PUBLIC_ALIAS(DOS$GetDomainName, libd_GetDomainName);
-DEFINE_PUBLIC_ALIAS(DOS$SetDomainName, libd_SetDomainName);
-DEFINE_PUBLIC_ALIAS(DOS$Syscall, libd_Syscall);
-DEFINE_PUBLIC_ALIAS(DOS$Syscall64, libd_Syscall64);
-DEFINE_PUBLIC_ALIAS(DOS$ChRoot, libd_ChRoot);
-DEFINE_PUBLIC_ALIAS(DOS$FTruncate, libd_FTruncate);
-DEFINE_PUBLIC_ALIAS(DOS$FTruncate64, libd_FTruncate64);
-DEFINE_PUBLIC_ALIAS(DOS$FDataSync, libd_FDataSync);
 
 /* libgen */
 DEFINE_PUBLIC_ALIAS(DOS$dirname, libd_dirname);
@@ -1304,7 +1074,6 @@ DEFINE_PUBLIC_ALIAS(DOS$_spawnve, libd_fspawnve);
 DEFINE_PUBLIC_ALIAS(DOS$fspawnve, libd_fspawnve);
 
 /* pthread */
-DEFINE_PUBLIC_ALIAS(DOS$pthread_create, libd_pthread_create);
 DEFINE_PUBLIC_ALIAS(DOS$pthread_exit, libd_pthread_exit);
 DEFINE_PUBLIC_ALIAS(DOS$pthread_join, libd_pthread_join);
 DEFINE_PUBLIC_ALIAS(DOS$pthread_tryjoin_np, libd_pthread_tryjoin_np);
@@ -1439,8 +1208,6 @@ DEFINE_PUBLIC_ALIAS(DOS$pthread_barrierattr_init, libd_pthread_barrierattr_init)
 DEFINE_PUBLIC_ALIAS(DOS$pthread_barrierattr_destroy, libd_pthread_barrierattr_destroy);
 DEFINE_PUBLIC_ALIAS(DOS$pthread_barrierattr_getpshared, libd_pthread_barrierattr_getpshared);
 DEFINE_PUBLIC_ALIAS(DOS$pthread_barrierattr_setpshared, libd_pthread_barrierattr_setpshared);
-DEFINE_PUBLIC_ALIAS(DOS$pthread_key_create, libd_pthread_key_create);
-DEFINE_PUBLIC_ALIAS(DOS$pthread_key_create_once_np, libd_pthread_key_create_once_np);
 DEFINE_PUBLIC_ALIAS(DOS$tss_delete, libd_pthread_key_delete);
 DEFINE_PUBLIC_ALIAS(DOS$pthread_key_delete, libd_pthread_key_delete);
 DEFINE_PUBLIC_ALIAS(DOS$tss_get, libd_pthread_getspecific);
@@ -1496,8 +1263,6 @@ DEFINE_PUBLIC_ALIAS(DOS$getrpcbynumber_r, libd_getrpcbynumber_r);
 DEFINE_PUBLIC_ALIAS(DOS$getrpcent_r, libd_getrpcent_r);
 
 /* sched */
-DEFINE_PUBLIC_ALIAS(DOS$__clone, libd_clone);
-DEFINE_PUBLIC_ALIAS(DOS$clone, libd_clone);
 DEFINE_PUBLIC_ALIAS(DOS$unshare, libd_unshare);
 DEFINE_PUBLIC_ALIAS(DOS$setns, libd_setns);
 DEFINE_PUBLIC_ALIAS(DOS$exit_thread, libd_exit_thread);
@@ -1943,7 +1708,9 @@ DEFINE_PUBLIC_ALIAS(DOS$getenv, libd_getenv);
 DEFINE_PUBLIC_ALIAS(DOS$mblen, libd_mblen);
 DEFINE_PUBLIC_ALIAS(DOS$system, libd_system);
 DEFINE_PUBLIC_ALIAS(DOS$exit, libd_exit);
+DEFINE_PUBLIC_ALIAS(DOS$atexit, libd_atexit);
 DEFINE_PUBLIC_ALIAS(DOS$quick_exit, libd_quick_exit);
+DEFINE_PUBLIC_ALIAS(DOS$at_quick_exit, libd_at_quick_exit);
 DEFINE_PUBLIC_ALIAS(DOS$_exit, libd__Exit);
 DEFINE_PUBLIC_ALIAS(DOS$_Exit, libd__Exit);
 DEFINE_PUBLIC_ALIAS(DOS$malloc, libd_malloc);
@@ -2004,7 +1771,6 @@ DEFINE_PUBLIC_ALIAS(DOS$random_r, libd_random_r);
 DEFINE_PUBLIC_ALIAS(DOS$srandom_r, libd_srandom_r);
 DEFINE_PUBLIC_ALIAS(DOS$initstate_r, libd_initstate_r);
 DEFINE_PUBLIC_ALIAS(DOS$setstate_r, libd_setstate_r);
-DEFINE_PUBLIC_ALIAS(DOS$on_exit, libd_on_exit);
 DEFINE_PUBLIC_ALIAS(DOS$mkstemps64, libd_mkstemps);
 DEFINE_PUBLIC_ALIAS(DOS$mkstemps, libd_mkstemps);
 DEFINE_PUBLIC_ALIAS(DOS$rpmatch, libd_rpmatch);
@@ -2840,7 +2606,6 @@ DEFINE_PUBLIC_ALIAS(DOS$cfmakeraw, libd_cfmakeraw);
 DEFINE_PUBLIC_ALIAS(DOS$cfmakesane, libd_cfmakesane);
 
 /* threads */
-DEFINE_PUBLIC_ALIAS(DOS$thrd_create, libd_thrd_create);
 DEFINE_PUBLIC_ALIAS(DOS$thrd_sleep, libd_thrd_sleep);
 DEFINE_PUBLIC_ALIAS(DOS$thrd_sleep64, libd_thrd_sleep64);
 DEFINE_PUBLIC_ALIAS(DOS$thrd_exit, libd_thrd_exit);

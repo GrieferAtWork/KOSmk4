@@ -55,7 +55,6 @@
 %[define_replacement(__WAIT_STATUS_DEFN = __WAIT_STATUS_DEFN)]
 %[define_type_class(__WAIT_STATUS      = "TP")]
 %[define_type_class(__WAIT_STATUS_DEFN = "TP")]
-%[define_type_class(__atexit_func_t    = "TP")]
 %[define_type_class(__on_exit_func_t   = "TP")]
 %[define_type_class(comparison_fn_t    = "TP")]
 %[define_type_class(__compar_fn_t      = "TP")]
@@ -232,11 +231,6 @@ typedef int (__LIBCCALL *__compar_fn_t)(void const *__a, void const *__b);
 typedef __compar_fn_t comparison_fn_t;
 #endif /* __USE_GNU */
 #endif /* __COMPAR_FN_T */
-
-#ifndef ____atexit_func_t_defined
-#define ____atexit_func_t_defined 1
-typedef void (__LIBCCALL *__atexit_func_t)(void);
-#endif /* !____atexit_func_t_defined */
 
 }
 
@@ -656,17 +650,8 @@ void abort() {
 [[alias("quick_exit", "_exit", "_Exit")]]
 void exit(int status);
 
-%[define(DEFINE_ATEXIT_FUNC_T =
-#ifndef ____atexit_func_t_defined
-#define ____atexit_func_t_defined 1
-typedef void (__LIBCCALL *__atexit_func_t)(void);
-#endif /* !____atexit_func_t_defined */
-)]
-
-[[no_crt_dos_wrapper]] /* The DOS wrapper is implemented manually */
-[[section(".text.crt{|.dos}.sched.process")]]
-[[std, alias("at_quick_exit"), decl_prefix(DEFINE_ATEXIT_FUNC_T)]]
-int atexit([[nonnull]] __atexit_func_t func);
+[[std, alias("at_quick_exit"), section(".text.crt{|.dos}.sched.process")]]
+int atexit([[nonnull]] void (LIBCCALL *func)(void));
 
 
 %(std, c, ccompat)#if defined(__USE_ISOC11) || defined(__USE_ISOCXX11)
@@ -674,10 +659,8 @@ int atexit([[nonnull]] __atexit_func_t func);
 [[std, ATTR_NORETURN, throws, alias("exit", "_exit", "_Exit")]]
 void quick_exit(int status);
 
-[[no_crt_dos_wrapper]] /* The DOS wrapper is implemented manually */
-[[section(".text.crt{|.dos}.sched.process")]]
-[[std, alias("atexit"), decl_prefix(DEFINE_ATEXIT_FUNC_T)]]
-int at_quick_exit([[nonnull]] __atexit_func_t func);
+[[std, alias("atexit"), section(".text.crt{|.dos}.sched.process")]]
+int at_quick_exit([[nonnull]] void (LIBCCALL *func)(void));
 %(std, c, ccompat)#endif /* __USE_ISOC11 || __USE_ISOCXX11 */
 
 %(std, c, ccompat)#ifdef __USE_ISOC99
@@ -2091,9 +2074,9 @@ int initstate_r(unsigned int seed, [[nonnull]] char *__restrict statebuf, $size_
 [[section(".text.crt{|.dos}.random")]]
 int setstate_r([[nonnull]] char *__restrict statebuf, [[nonnull]] struct random_data *__restrict buf);
 
-%typedef void (__LIBCCALL *__on_exit_func_t)(int __status, void *__arg);
-[[section(".text.crt{|.dos}.sched.process")]]
-int on_exit([[nonnull]] __on_exit_func_t func, void *arg);
+[[crt_dos_impl_if(!defined(__KERNEL__) && !defined(__LIBCCALL_IS_LIBDCALL))]]
+[[crt_dos_variant, section(".text.crt{|.dos}.sched.process")]]
+int on_exit([[nonnull]] void (LIBCCALL *func)(int status, void *arg), void *arg);
 
 [[section(".text.crt{|.dos}.fs.environ")]]
 int clearenv();

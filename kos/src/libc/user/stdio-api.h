@@ -149,19 +149,12 @@ struct iofile_data_novtab {
 		/* .io_mbs    = */ MBSTATE_INIT                    \
 	}
 
-#ifndef ____funopen2_types_defined
-#define ____funopen2_types_defined 1
-typedef __ssize_t (__LIBKCALL *__funopen2_readfn_t)(void *__cookie, void *__buf, __size_t __num_bytes);
-typedef __ssize_t (__LIBKCALL *__funopen2_writefn_t)(void *__cookie, void const *__buf, __size_t __num_bytes);
-typedef __FS_TYPE(off) (__LIBKCALL *__funopen2_seekfn_t)(void *__cookie, __FS_TYPE(off) __off, int __whence);
-typedef int (__LIBKCALL *__funopen2_flushfn_t)(void *__cookie);
-typedef int (__LIBKCALL *__funopen2_closefn_t)(void *__cookie);
-#endif /* !____funopen2_types_defined */
-
-#ifndef ____funopen2_64_types_defined
-#define ____funopen2_64_types_defined 1
-typedef __off64_t (__LIBKCALL *__funopen2_64_seekfn_t)(void *__cookie, __off64_t __off, int __whence);
-#endif /* !____funopen2_64_types_defined */
+typedef ssize_t (LIBKCALL *__funopen2_readfn_t)(void *cookie, void *buf, size_t num_bytes);
+typedef ssize_t (LIBKCALL *__funopen2_writefn_t)(void *cookie, void const *buf, size_t num_bytes);
+typedef off_t (LIBKCALL *__funopen2_seekfn_t)(void *cookie, off_t off, int whence);
+typedef off64_t (LIBKCALL *__funopen2_64_seekfn_t)(void *cookie, off64_t off, int whence);
+typedef int (LIBKCALL *__funopen2_flushfn_t)(void *cookie);
+typedef int (LIBKCALL *__funopen2_closefn_t)(void *cookie);
 
 struct iofile_data: iofile_data_novtab {
 	/* All of the following fields only exist when `IO_HASVTAB' is set. */

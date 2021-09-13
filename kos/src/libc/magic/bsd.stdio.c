@@ -32,14 +32,6 @@
 #ifdef __CC__
 __SYSDECL_BEGIN
 
-#ifndef ____funopen_types_defined
-#define ____funopen_types_defined 1
-typedef int (__LIBKCALL *__funopen_readfn_t)(void *__cookie, char *__buf, int __num_bytes);
-typedef int (__LIBKCALL *__funopen_writefn_t)(void *__cookie, char const *__buf, int __num_bytes);
-typedef __FS_TYPE(off) (__LIBKCALL *__funopen_seekfn_t)(void *__cookie, __FS_TYPE(off) __off, int __whence);
-typedef int (__LIBKCALL *__funopen_closefn_t)(void *__cookie);
-#endif /* !____funopen_types_defined */
-
 }
 
 %[insert:extern(fmtcheck)]

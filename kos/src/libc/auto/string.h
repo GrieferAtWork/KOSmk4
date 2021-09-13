@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xf812339b */
+/* HASH CRC-32:0xfc3c53bb */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -351,11 +351,11 @@ for (local f: funcs) {
 
 #ifndef __errno_t_defined
 #define __errno_t_defined 1
-typedef int errno_t;
+typedef __errno_t errno_t;
 #endif /* !__errno_t_defined */
 #ifndef __rsize_t_defined
 #define __rsize_t_defined 1
-typedef size_t rsize_t;
+typedef __size_t rsize_t;
 #endif /* !__rsize_t_defined */
 
 #if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)

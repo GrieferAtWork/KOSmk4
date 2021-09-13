@@ -22,6 +22,7 @@
 %[declare_user_export(__peb, __argc, __argv, _pgmptr)]
 %[declare_user_export(program_invocation_name, __progname_full)]
 %[declare_user_export(program_invocation_short_name, __progname)]
+%[default:nodos]
 
 
 %[insert:prefix(

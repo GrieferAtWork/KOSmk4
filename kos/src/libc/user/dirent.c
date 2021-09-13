@@ -376,29 +376,29 @@ NOTHROW_RPC(LIBCCALL libc_readdir_r)(DIR *__restrict dirp,
 /*[[[impl:libc_readdir64_r]]]*/
 DEFINE_INTERN_WEAK_ALIAS(libc_readdir64_r, libc_readdir_r);
 
-/*[[[head:libc_scandir,hash:CRC-32=0x7a9234a3]]]*/
+/*[[[head:libc_scandir,hash:CRC-32=0xf8c8f44f]]]*/
 /* >> scandir(3), scandir64(3)
  * Scan a directory `dir' for all contained directory entries */
 INTERN ATTR_SECTION(".text.crt.fs.dir") NONNULL((1, 2)) __STDC_INT_AS_SSIZE_T
 NOTHROW_RPC(LIBCCALL libc_scandir)(char const *__restrict dir,
                                    struct dirent ***__restrict namelist,
-                                   __scandir_selector_t selector,
-                                   __scandir_cmp_t cmp)
+                                   int (LIBKCALL *selector)(struct dirent const *entry),
+                                   int (LIBKCALL *cmp)(struct dirent const **a, struct dirent const **b))
 /*[[[body:libc_scandir]]]*/
 /*AUTO*/{
 	return scandirat(__AT_FDCWD, dir, namelist, selector, cmp);
 }
 /*[[[end:libc_scandir]]]*/
 
-/*[[[head:libc_scandirat,hash:CRC-32=0xb81b3bf4]]]*/
+/*[[[head:libc_scandirat,hash:CRC-32=0xd2b59bf3]]]*/
 /* >> scandirat(3), scandirat64(3)
  * Scan a directory `dirfd:dir' for all contained directory entries */
 INTERN ATTR_SECTION(".text.crt.fs.dir") NONNULL((2, 3)) __STDC_INT_AS_SSIZE_T
 NOTHROW_RPC(LIBCCALL libc_scandirat)(fd_t dirfd,
                                      char const *__restrict dir,
                                      struct dirent ***__restrict namelist,
-                                     __scandir_selector_t selector,
-                                     __scandir_cmp_t cmp)
+                                     int (LIBKCALL *selector)(struct dirent const *entry),
+                                     int (LIBKCALL *cmp)(struct dirent const **a, struct dirent const **b))
 /*[[[body:libc_scandirat]]]*/
 {
 	DIR stream;

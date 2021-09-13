@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xf61c563f */
+/* HASH CRC-32:0xcb9bfa61 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -33,9 +33,9 @@ DECL_BEGIN
 #ifndef __KERNEL__
 INTDEF WUNUSED NONNULL((1)) char *NOTHROW_NCX(LIBCCALL libc_getenv)(char const *varname);
 INTDEF ATTR_NORETURN void (LIBCCALL libc_exit)(int status) THROWS(...);
-INTDEF NONNULL((1)) int NOTHROW_NCX(LIBCCALL libc_atexit)(__atexit_func_t func);
+INTDEF NONNULL((1)) int NOTHROW_NCX(LIBCCALL libc_atexit)(void (LIBCCALL *func)(void));
 INTDEF ATTR_NORETURN void (LIBCCALL libc_quick_exit)(int status) THROWS(...);
-INTDEF NONNULL((1)) int NOTHROW_NCX(LIBCCALL libc_at_quick_exit)(__atexit_func_t func);
+INTDEF NONNULL((1)) int NOTHROW_NCX(LIBCCALL libc_at_quick_exit)(void (LIBCCALL *func)(void));
 INTDEF ATTR_NORETURN void (LIBCCALL libc__Exit)(int status) THROWS(...);
 INTDEF ATTR_MALLOC ATTR_MALL_DEFAULT_ALIGNED WUNUSED ATTR_ALLOC_SIZE((1)) void *NOTHROW_NCX(LIBCCALL libc_malloc)(size_t num_bytes);
 INTDEF ATTR_MALLOC ATTR_MALL_DEFAULT_ALIGNED WUNUSED ATTR_ALLOC_SIZE((1, 2)) void *NOTHROW_NCX(LIBCCALL libc_calloc)(size_t count, size_t num_bytes);
@@ -57,7 +57,12 @@ INTDEF NONNULL((1, 2)) int NOTHROW_NCX(LIBCCALL libc_random_r)(struct random_dat
 INTDEF NONNULL((2)) int NOTHROW_NCX(LIBCCALL libc_srandom_r)(unsigned int seed, struct random_data *buf);
 INTDEF NONNULL((2, 4)) int NOTHROW_NCX(LIBCCALL libc_initstate_r)(unsigned int seed, char *__restrict statebuf, size_t statelen, struct random_data *__restrict buf);
 INTDEF NONNULL((1, 2)) int NOTHROW_NCX(LIBCCALL libc_setstate_r)(char *__restrict statebuf, struct random_data *__restrict buf);
-INTDEF NONNULL((1)) int NOTHROW_NCX(LIBCCALL libc_on_exit)(__on_exit_func_t func, void *arg);
+#endif /* !__KERNEL__ */
+#if !defined(__KERNEL__) && !defined(__LIBCCALL_IS_LIBDCALL)
+INTDEF NONNULL((1)) int NOTHROW_NCX(LIBDCALL libd_on_exit)(void (LIBDCALL *func)(int status, void *arg), void *arg);
+#endif /* !__KERNEL__ && !__LIBCCALL_IS_LIBDCALL */
+#ifndef __KERNEL__
+INTDEF NONNULL((1)) int NOTHROW_NCX(LIBCCALL libc_on_exit)(void (LIBCCALL *func)(int status, void *arg), void *arg);
 INTDEF int NOTHROW_NCX(LIBCCALL libc_clearenv)(void);
 INTDEF int NOTHROW_RPC(LIBCCALL libc_getloadavg)(double loadavg[], __STDC_INT_AS_SIZE_T nelem);
 INTDEF NONNULL((1, 2)) int NOTHROW_NCX(LIBCCALL libc_setenv)(char const *varname, char const *val, int replace);

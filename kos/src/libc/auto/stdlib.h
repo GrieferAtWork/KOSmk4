@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xf9330660 */
+/* HASH CRC-32:0xd5baea0e */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -115,7 +115,9 @@ INTDEF ATTR_NORETURN void (LIBCCALL libc_abort)(void) THROWS(...);
 #endif /* !__KERNEL__ */
 #if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
 INTDEF ATTR_NORETURN void (LIBDCALL libd_exit)(int status) THROWS(...);
+INTDEF NONNULL((1)) int NOTHROW_NCX(LIBDCALL libd_atexit)(void (LIBDCALL *func)(void));
 INTDEF ATTR_NORETURN void (LIBDCALL libd_quick_exit)(int status) THROWS(...);
+INTDEF NONNULL((1)) int NOTHROW_NCX(LIBDCALL libd_at_quick_exit)(void (LIBDCALL *func)(void));
 INTDEF ATTR_NORETURN void (LIBDCALL libd__Exit)(int status) THROWS(...);
 INTDEF ATTR_MALLOC ATTR_MALL_DEFAULT_ALIGNED WUNUSED ATTR_ALLOC_SIZE((1)) void *NOTHROW_NCX(LIBDCALL libd_malloc)(size_t num_bytes);
 INTDEF ATTR_MALLOC ATTR_MALL_DEFAULT_ALIGNED WUNUSED ATTR_ALLOC_SIZE((1, 2)) void *NOTHROW_NCX(LIBDCALL libd_calloc)(size_t count, size_t num_bytes);
@@ -554,7 +556,6 @@ INTDEF NONNULL((1, 2)) int NOTHROW_NCX(LIBDCALL libd_random_r)(struct random_dat
 INTDEF NONNULL((2)) int NOTHROW_NCX(LIBDCALL libd_srandom_r)(unsigned int seed, struct random_data *buf);
 INTDEF NONNULL((2, 4)) int NOTHROW_NCX(LIBDCALL libd_initstate_r)(unsigned int seed, char *__restrict statebuf, size_t statelen, struct random_data *__restrict buf);
 INTDEF NONNULL((1, 2)) int NOTHROW_NCX(LIBDCALL libd_setstate_r)(char *__restrict statebuf, struct random_data *__restrict buf);
-INTDEF NONNULL((1)) int NOTHROW_NCX(LIBDCALL libd_on_exit)(__on_exit_func_t func, void *arg);
 /* >> mkstemps(3), mkstemps64(3)
  * Replace the last 6 characters of `template_' (which are followed by exactly
  * `suffixlen' more characters that are left alone), which must be filled with

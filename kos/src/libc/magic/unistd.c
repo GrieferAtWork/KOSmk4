@@ -2896,11 +2896,6 @@ int getpeereid($fd_t sockfd,
 %
 %
 %#if defined(_EVERY_SOURCE) || defined(__USE_SOLARIS) || (defined(__USE_UNIX98) && !defined(__USE_XOPEN2K))
-%#ifndef ____pthread_atfork_func_t_defined
-%#define ____pthread_atfork_func_t_defined 1
-%typedef void (__LIBKCALL *__pthread_atfork_func_t)(void);
-%#endif /* !____pthread_atfork_func_t_defined */
-%
 %[insert:extern(pthread_atfork)]
 %#endif /* _EVERY_SOURCE || __USE_SOLARIS || (__USE_UNIX98 && !__USE_XOPEN2K) */
 

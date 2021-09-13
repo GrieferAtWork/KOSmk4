@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xd98adfd4 */
+/* HASH CRC-32:0xc308970b */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -83,9 +83,6 @@ INTDEF NONNULL((1)) longptr_t NOTHROW_NCX(LIBDCALL libd_telldir)(DIR *__restrict
 /* >> dirfd(3)
  * Return the underlying file descriptor of the given directory stream */
 INTDEF ATTR_PURE NONNULL((1)) fd_t NOTHROW_NCX(LIBDCALL libd_dirfd)(DIR __KOS_FIXED_CONST *__restrict dirp);
-/* >> scandir(3), scandir64(3)
- * Scan a directory `dir' for all contained directory entries */
-INTDEF NONNULL((1, 2)) __STDC_INT_AS_SSIZE_T NOTHROW_RPC(LIBDCALL libd_scandir)(char const *__restrict dir, struct dirent ***__restrict namelist, __scandir_selector_t selector, __scandir_cmp_t cmp);
 /* >> alphasort(3), alphasort64(3)
  * Sort the 2 given directory entries `e1' and `e2' the same way `strcmp(3)' would */
 INTDEF ATTR_PURE NONNULL((1, 2)) int NOTHROW_NCX(LIBDCALL libd_alphasort)(struct dirent const **e1, struct dirent const **e2);
@@ -106,15 +103,6 @@ INTDEF ATTR_PURE NONNULL((1, 2)) int NOTHROW_NCX(LIBDCALL libd_alphasort64)(stru
 INTDEF ATTR_PURE NONNULL((1, 2)) int NOTHROW_NCX(LIBCCALL libc_alphasort64)(struct dirent64 const **e1, struct dirent64 const **e2);
 #endif /* !__KERNEL__ */
 #if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
-/* >> scandirat(3), scandirat64(3)
- * Scan a directory `dirfd:dir' for all contained directory entries */
-INTDEF NONNULL((2, 3)) __STDC_INT_AS_SSIZE_T NOTHROW_RPC(LIBDCALL libd_scandirat)(fd_t dirfd, char const *__restrict dir, struct dirent ***__restrict namelist, __scandir_selector_t selector, __scandir_cmp_t cmp);
-/* >> scandir(3), scandir64(3)
- * Scan a directory `dir' for all contained directory entries */
-INTDEF NONNULL((1, 2)) __STDC_INT_AS_SSIZE_T NOTHROW_RPC(LIBDCALL libd_scandir64)(char const *__restrict dir, struct dirent64 ***__restrict namelist, __scandir64_selector_t selector, __scandir64_cmp_t cmp);
-/* >> scandirat(3), scandirat64(3)
- * Scan a directory `dirfd:dir' for all contained directory entries */
-INTDEF NONNULL((2, 3)) __STDC_INT_AS_SSIZE_T NOTHROW_RPC(LIBDCALL libd_scandirat64)(fd_t dirfd, char const *__restrict dir, struct dirent64 ***__restrict namelist, __scandir64_selector_t selector, __scandir64_cmp_t cmp);
 /* >> getdirentries(2), getdirentries64(2)
  * Linux's underlying system call for reading the entries of a directory */
 INTDEF NONNULL((2, 4)) ssize_t NOTHROW_RPC(LIBDCALL libd_getdirentries)(fd_t fd, char *__restrict buf, size_t nbytes, off_t *__restrict basep);

@@ -32,7 +32,6 @@
 %[define_replacement(tss_t = __tss_t)]
 %[define_replacement(thrd_t = __thrd_t)]
 %[define_replacement(tss_dtor_t = __tss_dtor_t)]
-%[define_replacement(thrd_start_t = __thrd_start_t)]
 %[define_replacement(once_flag = __once_flag)]
 %[define_replacement(ONCE_FLAG_INIT = __ONCE_FLAG_INIT)]
 %[define_replacement(mtx_t = __mtx_t)]
@@ -196,8 +195,8 @@ enum {
 
 typedef __tss_t tss_t;
 typedef __thrd_t thrd_t;
-typedef __tss_dtor_t tss_dtor_t;
-typedef __thrd_start_t thrd_start_t;
+typedef void (__LIBKCALL *tss_dtor_t)(void *__arg); /* TODO: Dos support! */
+typedef int (__LIBCCALL *thrd_start_t)(void *__arg);
 typedef __once_flag once_flag;
 #define ONCE_FLAG_INIT __ONCE_FLAG_INIT
 typedef __mtx_t mtx_t;
@@ -213,11 +212,28 @@ typedef __cnd_t cnd_t;
 [[decl_include("<bits/crt/threads.h>")]]
 [[impl_include("<asm/crt/threads.h>", "<libc/errno.h>")]]
 [[requires_function(pthread_create)]]
-int thrd_create(thrd_t *thr, thrd_start_t func, void *arg) {
+[[crt_dos_impl_if(!defined(__KERNEL__) && !defined(__LIBCCALL_IS_LIBDCALL))]]
+[[crt_dos_variant({
+impl: {
+	$errno_t error;
+	STATIC_ASSERT(sizeof(int) <= sizeof(void *));
+	error = libd_pthread_create((pthread_t *)thr, NULL,
+	                            (void *(LIBDCALL *)(void *))(void *)func,
+	                            arg);
+	if likely(!error)
+		return thrd_success;
+	if (error == ENOMEM)
+		return thrd_nomem;
+	return thrd_error;
+}
+})]]
+int thrd_create(thrd_t *thr,
+                int (LIBCCALL *func)(void *arg),
+                void *arg) {
 	$errno_t error;
 	STATIC_ASSERT(sizeof(int) <= sizeof(void *));
 	error = pthread_create((pthread_t *)thr, NULL,
-	                       (__pthread_start_routine_t)(void *)func,
+	                       (void *(LIBCCALL *)(void *))(void *)func,
 	                       arg);
 	if likely(!error)
 		return thrd_success;
@@ -232,12 +248,12 @@ int thrd_create(thrd_t *thr, thrd_start_t func, void *arg) {
 @@Return non-zero if `thr1' and `thr2' reference the same thread (s.a. `pthread_equal(3)')
 @@@return: == 0: Threads are not equal
 @@@return: != 0: Threads are qual
-[[decl_include("<bits/crt/threads.h>")]]
+[[wunused, decl_include("<bits/crt/threads.h>")]]
 int thrd_equal(thrd_t thr1, thrd_t thr2) = pthread_equal;
 
 @@>> thrd_current(3)
 @@Return the descriptor for the calling thread (s.a. `pthread_self(3)')
-[[decl_include("<bits/crt/threads.h>")]]
+[[wunused, decl_include("<bits/crt/threads.h>")]]
 thrd_t thrd_current() = pthread_self;
 
 @@>> thrd_sleep(3), thrd_sleep64(3)
@@ -331,7 +347,7 @@ int thrd_sleep64([[nonnull]] struct timespec64 const *time_point,
 
 @@>> thrd_exit(3)
 @@Terminate the calling thread (s.a. `pthread_exit(3)')
-[[ATTR_NORETURN, throws, requires_function(pthread_exit)]]
+[[noreturn, throws, requires_function(pthread_exit)]]
 void thrd_exit(int res) {
 	pthread_exit((void *)(uintptr_t)(unsigned int)res);
 }
@@ -522,7 +538,7 @@ void mtx_destroy([[nonnull]] mtx_t *__restrict mutex) = pthread_mutex_destroy;
 @@Invoke `func', but make sure this only happens once (s.a. `pthread_once()')
 [[decl_include("<bits/crt/threads.h>"), throws]]
 void call_once([[nonnull]] once_flag *__restrict flag,
-               [[nonnull]] __once_func_t func) = pthread_once;
+               [[nonnull]] void (LIBCCALL *func)(void)) = pthread_once;
 
 %
 %
@@ -659,8 +675,8 @@ void cnd_destroy(cnd_t *cond) = pthread_cond_destroy;
 @@@return: thrd_error:   Error
 [[decl_include("<bits/crt/threads.h>")]]
 [[impl_include("<asm/crt/threads.h>", "<bits/crt/pthreadtypes.h>")]]
-[[requires_function(pthread_key_create)]]
-int tss_create(tss_t *tss_id, tss_dtor_t destructor) {
+[[requires_function(pthread_key_create)]] /* TODO: Dos support! */
+int tss_create(tss_t *tss_id, void (LIBKCALL *destructor)(void *arg)) {
 	$errno_t error;
 	error = pthread_key_create((pthread_key_t *)tss_id, destructor);
 	if likely(!error)

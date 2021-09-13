@@ -17,6 +17,8 @@
  *    misrepresented as being the original software.                          *
  * 3. This notice may not be removed or altered from any source distribution. *
  */
+%[default:section(".text.crt{|.dos}.except.heap.malloc")]
+%[default:nodos]
 
 %[insert:prefix(
 #include <features.h>
@@ -35,7 +37,6 @@ __SYSDECL_BEGIN
 
 }
 
-%[default:section(".text.crt{|.dos}.except.heap.malloc")]
 
 [[throws(E_BADALLOC), decl_include("<hybrid/typecore.h>")]]
 Malloc:(size_t num_bytes) -> [[nonnull, malloc(num_bytes)]] void *;

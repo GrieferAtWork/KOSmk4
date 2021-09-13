@@ -5,12 +5,12 @@ Documentation for magic definition files found in this folder
 
 | Name             | Description                                               |
 | ---------------- | --------------------------------------------------------- |
-| `c_prefix`       | Guard-prefix in `\<HEADER.h\>`                            |
-| `c`              | C-part in `\<HEADER.h\>`                                  |
-| `std`            | `namespace std`-part in `\<HEADER.h\>`                    |
-| `ccompat`        | c-compat-part in `\<HEADER.h\>`                           |
-| `libc_fast`      | `\<libc/HEADER.h\>`                                       |
-| `libc_core`      | `\<libc/core/HEADER.h\>`                                  |
+| `c_prefix`       | Guard-prefix in `<HEADER.h>`                            |
+| `c`              | C-part in `<HEADER.h>`                                  |
+| `std`            | `namespace std`-part in `<HEADER.h>`                    |
+| `ccompat`        | c-compat-part in `<HEADER.h>`                           |
+| `libc_fast`      | `<libc/HEADER.h>`                                       |
+| `libc_core`      | `<libc/core/HEADER.h>`                                  |
 | `auto_header`    | `/kos/src/libc/auto/HEADER.h`                             |
 | `auto_source`    | `/kos/src/libc/auto/HEADER.c`                             |
 | `user`           | `/kos/src/libc/user/HEADER.h`                             |
@@ -76,15 +76,15 @@ Usage (all of these are the same):
 | `%[insert:function(NAME, ATTRIB)]`               | Where `ATTRIB` is: `',' ~~ (ATTR_NAME ':' ATTR_VALEXPR)...` (`ATTR_NAME` is a member of `ExposedFunction` from `cheaders.dee` and `ATTR_VALEXPR` is a deemon-expression passed to `deemon.exec()`) |
 | `%[insert:function(EXPOSED_NAME = NAME)]`        | You can also specify a custom name by which the function is exposed (s.a. `ExposedFunction.exposedName`) |
 | `%[insert:function(EXPOSED_NAME = NAME, ATTRIB)]`| ... |
-| `%[insert:std_function(\<Same as above...\>)]`                 | Insert into the `std::` namespace and add `using` to also load it into the global namespace |
-| `%[insert:std_function_nousing(\<Same as above...\>)]`         | Same, but don't import into the global namespace |
-| `%[insert:guarded_function(\<Same as above...\>)]`             | Like above, but include `guardName = true` in `ATTRIB` |
-| `%[insert:guarded_std_function(\<Same as above...\>)]`         | ... |
-| `%[insert:guarded_std_function_nousing(\<Same as above...\>)]` | ... |
+| `%[insert:std_function(<Same as above...>)]`                 | Insert into the `std::` namespace and add `using` to also load it into the global namespace |
+| `%[insert:std_function_nousing(<Same as above...>)]`         | Same, but don't import into the global namespace |
+| `%[insert:guarded_function(<Same as above...>)]`             | Like above, but include `guardName = true` in `ATTRIB` |
+| `%[insert:guarded_std_function(<Same as above...>)]`         | ... |
+| `%[insert:guarded_std_function_nousing(<Same as above...>)]` | ... |
 |                                                  |                                                              |
 | `%[insert:extern(NAME)]`                         | Same as `%[insert:guarded_function(NAME)]`                   |
 |                                                  |                                                              |
-| `%[insert:std]`                                  | Marker for where to paste the std-namespace into the c-namespace in `\<HEADER.h\>` |
+| `%[insert:std]`                                  | Marker for where to paste the std-namespace into the c-namespace in `<HEADER.h>` |
 |                                                  |                                                              |
 | `%[define_wchar_replacement_header(ORIG = C16,C32)]` | Define header names to replace a `wchar_t`-header with its `char16_t` and `char32_t` equivalents (s.a. `wcharReplacementHeaders` from `wchar.dee`) |
 |                                                  |                                                              |
@@ -94,7 +94,7 @@ Usage (all of these are the same):
 |                                                  |                                                              |
 | `%[define_replacement(ORIG = ESCAPED)]`          | Define custom behavior for how to escape `ORIG` in headers (by default, escaping uses `__{ORIG}` or `_{ORIG[0].upper()}{ORIG[1:]}`) (s.a. `keywordEscapes` from `escape.dee`) |
 |                                                  |                                                              |
-| `%[define_partial_replacement(ORIG = ESCAPED)]`  | Similar to `define_replacement`, but these replacements also happen in partial replacement mode (used in `\<HEADER.h\>`, while full replacement is used in `\<libc/local/HEADER/FUNCTION.h\>`) (s.a. `partialKeywordEscapes` from `escape.dee`) |
+| `%[define_partial_replacement(ORIG = ESCAPED)]`  | Similar to `define_replacement`, but these replacements also happen in partial replacement mode (used in `<HEADER.h>`, while full replacement is used in `<libc/local/HEADER/FUNCTION.h>`) (s.a. `partialKeywordEscapes` from `escape.dee`) |
 |                                                  |                                                              |
 | `%[define_type_class(TYPENAME = CLASS)]`         | Specify the classification for `TYPENAME` (usually you'll use `"TP"` for `CLASS` to indicate pointer types) (s.a. `knownTypeClasses` from `typeclass.dee`) |
 |                                                  |                                                              |
@@ -120,7 +120,7 @@ TODO: Incomplete
 
 | Annotation               | Description                                               |
 | ------------------------ | --------------------------------------------------------- |
-| `[format_arg]`           | Add attribute `__ATTR_FORMAT_ARG(\<argumentIndex\>)`      |
+| `[format_arg]`           | Add attribute `__ATTR_FORMAT_ARG(<argumentIndex>)`      |
 | `[nullable]`             | no-op                                                     |
 | `[null]`                 | no-op                                                     |
 | `[nonnull]`              | Add arg index to `ATTR_NONNULL((...))`                    |
@@ -141,13 +141,13 @@ TODO: Incomplete
 
 | Annotation                        | Description                                               |
 | --------------------------------- | --------------------------------------------------------- |
-| `[== argName]`                    | If `ATTR_NONNULL((\<indexOf(argname)\>))`, add `ATTR_RETNONNULL` |
-| `[malloc_unaligned(size...)]`     | Add: `WUNUSED`, `ATTR_MALLOC`, `ATTR_ALLOC_SIZE(\<join(indexOf(size))\>)` |
+| `[== argName]`                    | If `ATTR_NONNULL((<indexOf(argname)>))`, add `ATTR_RETNONNULL` |
+| `[malloc_unaligned(size...)]`     | Add: `WUNUSED`, `ATTR_MALLOC`, `ATTR_ALLOC_SIZE(<join(indexOf(size))>)` |
 | `[malloc(size...)]`               | Like `[malloc_unaligned(size...)]`, but also add `ATTR_MALL_DEFAULT_ALIGNED` |
-| `[memalign(align, size...)]`      | Add `WUNUSED`, `ATTR_MALLOC`, `ATTR_ALLOC_SIZE(\<join(indexOf(size))\>)`, `ATTR_ALLOC_ALIGN(\<indexOf(align)\>)` (When `align` is `getpagesize()`, add `__ATTR_MALL_PAGEALIGNED` instead) |
-| `[realloc_unaligned(p, size...)]` | Add `WUNUSED`, `ATTR_ALLOC_SIZE(\<join(indexOf(size))\>)` |
+| `[memalign(align, size...)]`      | Add `WUNUSED`, `ATTR_MALLOC`, `ATTR_ALLOC_SIZE(<join(indexOf(size))>)`, `ATTR_ALLOC_ALIGN(<indexOf(align)>)` (When `align` is `getpagesize()`, add `__ATTR_MALL_PAGEALIGNED` instead) |
+| `[realloc_unaligned(p, size...)]` | Add `WUNUSED`, `ATTR_ALLOC_SIZE(<join(indexOf(size))>)` |
 | `[realloc(p, size...)]`           | Like `[realloc_unaligned(size...)]`, but also add `ATTR_MALL_DEFAULT_ALIGNED` |
-| `[realign(p, align, size...)]`    | Add `WUNUSED`, `ATTR_ALLOC_SIZE(\<join(indexOf(size))\>)`, `ATTR_ALLOC_ALIGN(\<indexOf(align)\>)` (When `align` is `getpagesize()`, add `__ATTR_MALL_PAGEALIGNED` instead) |
+| `[realign(p, align, size...)]`    | Add `WUNUSED`, `ATTR_ALLOC_SIZE(<join(indexOf(size))>)`, `ATTR_ALLOC_ALIGN(<indexOf(align)>)` (When `align` is `getpagesize()`, add `__ATTR_MALL_PAGEALIGNED` instead) |
 
 
 ### Annotations (functions / return types)
@@ -201,9 +201,9 @@ TODO: Incomplete
 | `[no_decl]`              | Set declaration: `__LIBC`                                 |
 | `[ignore]`               | Set namespaces: `[]`                                      |
 | `[no_ignore]`            | Set namespaces: `[""]`  (Global namespace) (__default__)  |
-| `[libc]`                 | Export in `\<libc/HEADER.h\>`: `true`                     |
-| `[nolibc]`               | Export in `\<libc/HEADER.h\>`: `false` (__default__)      |
-| `[no_libc]`              | Export in `\<libc/HEADER.h\>`: `false` (__default__)      |
+| `[libc]`                 | Export in `<libc/HEADER.h>`: `true`                     |
+| `[nolibc]`               | Export in `<libc/HEADER.h>`: `false` (__default__)      |
+| `[no_libc]`              | Export in `<libc/HEADER.h>`: `false` (__default__)      |
 | `[inline]`               | Set inline mode: `LOCAL`                                  |
 | `[forceinline]`          | Set inline mode: `FORCELOCAL`                             |
 | `[noinline]`             | Disable inline (__default__)                              |
@@ -212,9 +212,9 @@ TODO: Incomplete
 | `[no_inline_truncate]`   | Remove linefeeds from inline body: `false`                |
 | `[extern_inline]`        | Allow inline functions as extern-inline: `true` (__default__) |
 | `[no_extern_inline]`     | Allow inline functions as extern-inline: `false` |
-| `[local]`                | Enable linking again `\<libc/local/HEADER/FUNCTION.h\>`: `true` (__default__) |
-| `[noLocal]`              | Enable linking again `\<libc/local/HEADER/FUNCTION.h\>`: `false` |
-| `[no_local]`             | Enable linking again `\<libc/local/HEADER/FUNCTION.h\>`: `false` |
+| `[local]`                | Enable linking again `<libc/local/HEADER/FUNCTION.h>`: `true` (__default__) |
+| `[noLocal]`              | Enable linking again `<libc/local/HEADER/FUNCTION.h>`: `false` |
+| `[no_local]`             | Enable linking again `<libc/local/HEADER/FUNCTION.h>`: `false` |
 | `[norequires]`           | Set requires pp-condition: `1` (__default__) |
 | `[no_requires]`          | Set requires pp-condition: `1` (__default__) |
 | `[no_requires_prefix]`   | Set requires prefix block: /empty/ (__default__) |
@@ -224,14 +224,14 @@ TODO: Incomplete
 | `[noguard]`              | Enable declaration guard macros: `false` (__default__) |
 | `[no_guard]`             | Enable declaration guard macros: `false` (__default__) |
 | `[default_guard_names]`  | Set namespace-specific guard names: `__{{ns}_}{name}_defined` (__default__) |
-| `[default_exposed_name]` | Set exposed name in headers: `\<functionName\>` (__default__) |
+| `[default_exposed_name]` | Set exposed name in headers: `<functionName>` (__default__) |
 | `[wchar]`                | Enable special `wchar_t` treatment: `true` |
 | `[no_wchar]`             | Enable special `wchar_t` treatment: `false` (__default__) |
 | `[crt_dos_variant]`      | Enable dedicated DOS implementation in libc (i.e. `DOS$function`): `true` |
 | `[no_crt_dos_variant]`   | Enable dedicated DOS implementation in libc (i.e. `DOS$function`): `false` (__default__) |
 | `[crt_dos_wrapper]`      | Enable the libc DOS-wrapper when `!defined(__LIBCCALL_IS_LIBDCALL)`: `true` (__default__) (s.a. `/kos/src/libc/libc/dosabi-functions`) |
 | `[no_crt_dos_wrapper]`   | Enable the libc DOS-wrapper when `!defined(__LIBCCALL_IS_LIBDCALL)`: `false` |
-| `[default_crt_name]`     | Use `\<functionName\>` as the CRT name (the `DEFINE_PUBLIC_ALIAS()` name and the default asmname binding in headers; s.a. `[crt_name(...)]`) |
+| `[default_crt_name]`     | Use `<functionName>` as the CRT name (the `DEFINE_PUBLIC_ALIAS()` name and the default asmname binding in headers; s.a. `[crt_name(...)]`) |
 | `[crt_impl]`             | Provide an implementation in libc: `true` (__default__) |
 | `[no_crt_impl]`          | Provide an implementation in libc: `false` |
 | `[crt_self_import]`      | Bind against the function's primary asmname in headers: `true` (__default__) |
@@ -247,6 +247,7 @@ TODO: Incomplete
 | `[default_dos_section]`  | Use `.text.crt.dos.unsorted` for the DOS libc impl (__default__) |
 | `[auto_dependency_scanning]`  | Enable automatic scanning for dependencies: `true` (__default__) (auto-local-binding in `<libc/local/HEADER/FUNCTION.h>`) |
 | `[no_auto_dependency_scanning]`  | Enable automatic scanning for dependencies: `false` |
+| `[nodos]`                | Alias for `[no_crt_dos_variant]`, `[no_crt_dos_wrapper]` |
 | `[crt]`                  | Alias for `[crt_impl]`, `[crt_self_import]`, `[crt_self_export]` |
 | `[static]`               | Alias for `[ignore]`, `[macro_bindings]`, `[no_guard]`, `[no_crt_self_import]`, `[no_crt_self_export]`, `[no_crt_dos_wrapper]` |
 | `[nocrt]`                | Alias for `[no_crt_impl]`, `[no_crt_self_import]`, `[no_crt_self_export]` |
@@ -259,7 +260,7 @@ TODO: Incomplete
 | `[fast]`                 | Add `"fast"` (`__optimized_imp::` namespace) to namespaces (deprecated; use `[preferred_fastbind]`) |
 | `[nofast]`               | Remove `"fast"` (`__optimized_imp::` namespace) to namespaces (deprecated; use `[preferred_fastbind]`) |
 | `[requires(COND)]`       | Set `COND` as the preprocessor condition required for the local implementation (hint: `$has_function(NAME)`) (default: `[requires(1)]`) |
-| `[requires_function(NAMES...)]` | Alias for `[requires(\<"&&".join(for (n: NAMES) f"$has_function({n})")\>)]` |
+| `[requires_function(NAMES...)]` | Alias for `[requires(<"&&".join(for (n: NAMES) f"$has_function({n})")>)]` |
 | `[requires_dependent_function(NAMES...)]` | Same as `[requires_function(NAMES...)]`, but also add each function as a dependency (bound in local implementation) |
 | `[requires_include(HEADERS...)]` | same as `foreach h in HEADERS: [requires_prefix("#include {h}")]` |
 | `[requires_prefix(...)]` | Add prefix needed by the `[requires(...)]` expression |
@@ -271,8 +272,8 @@ TODO: Incomplete
 | `[decl(PREFIX)]`         | Set the declaration PREFIX (defaults to `__LIBC`) |
 | `[guard]`                | Enable declaration guard macros: `true` |
 | `[guard(IS_FUNC_DEFINED)]` | Set the guard macro name for the global namespace to `IS_FUNC_DEFINED` |
-| `[exposed_name(NAME)]`   | Set the name by which the function is exposed in headers (default: `\<functionName\>`) |
-| `[crt_name(NAME)]`       | Set the default name by which the function is exported from libc (default: `\<functionName\>`) |
+| `[exposed_name(NAME)]`   | Set the name by which the function is exposed in headers (default: `<functionName>`) |
+| `[crt_name(NAME)]`       | Set the default name by which the function is exported from libc (default: `<functionName>`) |
 | `[crt_impl_requires(COND)]` | Set requirements for automatic KOS+DOS variant impl inside of libc: `COND` |
 | `[crt_kos_impl_requires(COND)]` | Set requirements for automatic KOS variant impl inside of libc: `COND` |
 | `[crt_dos_impl_requires(COND)]` | Set requirements for automatic DOS variant impl inside of libc: `COND` |
@@ -294,8 +295,8 @@ Note on bindings:
 | Annotation                                       | Description                                               |
 | ------------------------------------------------ | --------------------------------------------------------- |
 | `[if(COND), ...]`                                | Make `...` (more annotations) conditionally dependent on `COND` If not supported, error out |
-| `[if_fast_defined(NAME), ...]`                   | Same as `[if(defined(__fast_{NAME}_defined))]`, but also include a prefix <br/>`#ifdef __LIBC_BIND_OPTIMIZATIONS`<br/>`#include \<optimized/HEADER.h\>`<br/>`#endif` |
-| `[if_fast_defined_always(NAME), ...]`            | Same as `[if(defined(__fast_{NAME}_defined))]`, but also include a prefix <br/>`#include \<optimized/HEADER.h\>` |
+| `[if_fast_defined(NAME), ...]`                   | Same as `[if(defined(__fast_{NAME}_defined))]`, but also include a prefix <br/>`#ifdef __LIBC_BIND_OPTIMIZATIONS`<br/>`#include <optimized/HEADER.h>`<br/>`#endif` |
+| `[if_fast_defined_always(NAME), ...]`            | Same as `[if(defined(__fast_{NAME}_defined))]`, but also include a prefix <br/>`#include <optimized/HEADER.h>` |
 | `[doc(TEXT)]`                                    | Append `TEXT` to the function's documentation (same as `@@TEXT`) |
 | `[doc_alias(FUNC)]`                              | Re-use the documentation of `FUNC` for this one           |
 | `[[...]]`                                        | Parenthesis...                                            |
@@ -326,20 +327,20 @@ Note on bindings:
 | `[preferred_raw_alias(ASMNAME)]`                 | Link against `ASMNAME` in headers (primary binding) |
 | `[bind_local_function(NAME)]`                    | Link against the local implementation of function `NAME` (tertiary binding) |
 | `[preferred_bind_local_function(NAME)]`          | Link against the local implementation of function `NAME` (primary binding) |
-| `[fastbind]`                                     | Same as `[fastbind(\<functionName\>)]` |
-| `[fastbind(NAME)]`                               | Same as `[fastbind(NAME(\<functionArgumentNames\>))]` (e.g. `[fastbind(memcpy(dst, src, num_bytes))]`) |
+| `[fastbind]`                                     | Same as `[fastbind(<functionName>)]` |
+| `[fastbind(NAME)]`                               | Same as `[fastbind(NAME(<functionArgumentNames>))]` (e.g. `[fastbind(memcpy(dst, src, num_bytes))]`) |
 | `[fastbind(NAME(ARGS...))]`                      | Same as `[fastbind(NAME(ARGS...), [NAME])]` |
 | `[fastbind(NAME(ARGS...), [ASMNAMES])]`          | Same as (`foreach ASMNAME in ASMNAME`) <br/>`[[if_fast_defined(NAME), fast_extern_inline(ASMNAME, { return (__NAMESPACE_FAST_SYM __LIBC_FAST_NAME(@NAME@))(ARGS); })]]`<br/>`[[if_fast_defined(NAME), fast_forceinline({ return (__NAMESPACE_FAST_SYM __LIBC_FAST_NAME(@NAME@))(ARGS); })]]` |
-| `[fastbind_always]`                              | Same as `[fastbind_always(\<functionName\>)]` |
-| `[fastbind_always(NAME)]`                        | Same as `[fastbind_always(NAME(\<functionArgumentNames\>))]` (e.g. `[fastbind(memcpy(dst, src, num_bytes))]`) |
+| `[fastbind_always]`                              | Same as `[fastbind_always(<functionName>)]` |
+| `[fastbind_always(NAME)]`                        | Same as `[fastbind_always(NAME(<functionArgumentNames>))]` (e.g. `[fastbind(memcpy(dst, src, num_bytes))]`) |
 | `[fastbind_always(NAME(ARGS...))]`               | Same as `[fastbind_always(NAME(ARGS...), [NAME])]` |
 | `[fastbind_always(NAME(ARGS...), [ASMNAMES])]`   | Same as (`foreach ASMNAME in ASMNAME`) <br/>`[[if_fast_defined_always(NAME), fast_extern_inline(ASMNAME, { return (__NAMESPACE_FAST_SYM __LIBC_FAST_NAME(@NAME@))(ARGS); })]]`<br/>`[[if_fast_defined_always(NAME), fast_forceinline({ return (__NAMESPACE_FAST_SYM __LIBC_FAST_NAME(@NAME@))(ARGS); })]]` |
-| `[preferred_fastbind]`                           | Same as `[preferred_fastbind(\<functionName\>)]` |
-| `[preferred_fastbind(NAME)]`                     | Same as `[preferred_fastbind(NAME(\<functionArgumentNames\>))]` (e.g. `[fastbind(memcpy(dst, src, num_bytes))]`) |
+| `[preferred_fastbind]`                           | Same as `[preferred_fastbind(<functionName>)]` |
+| `[preferred_fastbind(NAME)]`                     | Same as `[preferred_fastbind(NAME(<functionArgumentNames>))]` (e.g. `[fastbind(memcpy(dst, src, num_bytes))]`) |
 | `[preferred_fastbind(NAME(ARGS...))]`            | Same as `[preferred_fastbind(NAME(ARGS...), [NAME])]` |
 | `[preferred_fastbind(NAME(ARGS...), [ASMNAMES])]` | Same as (`foreach ASMNAME in ASMNAME`) <br/>`[[if_fast_defined(NAME), preferred_fast_extern_inline(ASMNAME, { return (__NAMESPACE_FAST_SYM __LIBC_FAST_NAME(@NAME@))(ARGS); })]]`<br/>`[[if_fast_defined(NAME), preferred_fast_forceinline({ return (__NAMESPACE_FAST_SYM __LIBC_FAST_NAME(@NAME@))(ARGS); })]]` |
-| `[preferred_fastbind_always]`                    | Same as `[preferred_fastbind_always(\<functionName\>)]` |
-| `[preferred_fastbind_always(NAME)]`              | Same as `[preferred_fastbind_always(NAME(\<functionArgumentNames\>))]` (e.g. `[fastbind(memcpy(dst, src, num_bytes))]`) |
+| `[preferred_fastbind_always]`                    | Same as `[preferred_fastbind_always(<functionName>)]` |
+| `[preferred_fastbind_always(NAME)]`              | Same as `[preferred_fastbind_always(NAME(<functionArgumentNames>))]` (e.g. `[fastbind(memcpy(dst, src, num_bytes))]`) |
 | `[preferred_fastbind_always(NAME(ARGS...))]`     | Same as `[preferred_fastbind_always(NAME(ARGS...), [NAME])]` |
 | `[preferred_fastbind_always(NAME(ARGS...), [ASMNAMES])]` | Same as (`foreach ASMNAME in ASMNAME`) <br/>`[[if_fast_defined_always(NAME), preferred_fast_extern_inline(ASMNAME, { return (__NAMESPACE_FAST_SYM __LIBC_FAST_NAME(@NAME@))(ARGS); })]]`<br/>`[[if_fast_defined_always(NAME), preferred_fast_forceinline({ return (__NAMESPACE_FAST_SYM __LIBC_FAST_NAME(@NAME@))(ARGS); })]]` |
 | `[inline({ INLINE_IMPLEMENTATION })]`                               | Implement inline via `INLINE_IMPLEMENTATION` (tertiary binding) |
@@ -350,15 +351,15 @@ Note on bindings:
 | `[preferred_forceinline({ INLINE_IMPLEMENTATION })]`                | Implement force-inline via `INLINE_IMPLEMENTATION` (primary binding) |
 | `[preferred_extern_inline(ASMNAME, { INLINE_IMPLEMENTATION })]`     | same as `[if(__CRT_HAVE_{ASMNAME}), preferred_raw_extern_inline(ASMNAME, { INLINE_IMPLEMENTATION })]` |
 | `[preferred_raw_extern_inline(ASMNAME, { INLINE_IMPLEMENTATION })]` | Implement as extern-inline, linking against `ASMNAME` and using `INLINE_IMPLEMENTATION` for inline (primary binding) |
-| `[fast_inline({ INLINE_IMPLEMENTATION })]`                               | Like `[inline({ INLINE_IMPLEMENTATION })]`, but don't link in `\<libc/core/HEADER.h\>` |
-| `[fast_forceinline({ INLINE_IMPLEMENTATION })]`                          | Like `[forceinline({ INLINE_IMPLEMENTATION })]`, but don't link in `\<libc/core/HEADER.h\>` |
-| `[fast_extern_inline(ASMNAME, { INLINE_IMPLEMENTATION })]`               | Like `[extern_inline({ INLINE_IMPLEMENTATION })]`, but don't link in `\<libc/core/HEADER.h\>` |
-| `[fast_raw_extern_inline(ASMNAME, { INLINE_IMPLEMENTATION })]`           | Like `[raw_extern_inline({ INLINE_IMPLEMENTATION })]`, but don't link in `\<libc/core/HEADER.h\>` |
-| `[preferred_fast_inline({ INLINE_IMPLEMENTATION })]`                     | Like `[preferred_inline({ INLINE_IMPLEMENTATION })]`, but don't link in `\<libc/core/HEADER.h\>` |
-| `[preferred_fast_forceinline({ INLINE_IMPLEMENTATION })]`                | Like `[preferred_forceinline({ INLINE_IMPLEMENTATION })]`, but don't link in `\<libc/core/HEADER.h\>` |
-| `[preferred_fast_extern_inline(ASMNAME, { INLINE_IMPLEMENTATION })]`     | Like `[preferred_extern_inline({ INLINE_IMPLEMENTATION })]`, but don't link in `\<libc/core/HEADER.h\>` |
-| `[preferred_fast_raw_extern_inline(ASMNAME, { INLINE_IMPLEMENTATION })]` | Like `[preferred_raw_extern_inline({ INLINE_IMPLEMENTATION })]`, but don't link in `\<libc/core/HEADER.h\>` |
-| `[crtbuiltin]`                                   | Same as `[if(__has_builtin(__builtin_{\<functionName\>}) && defined(__LIBC_BIND_CRTBUILTINS)), preferred_extern_inline({\<functionName\>}, { return __builtin_{\<functionName\>}({\<functionArgs\>}); })]` |
+| `[fast_inline({ INLINE_IMPLEMENTATION })]`                               | Like `[inline({ INLINE_IMPLEMENTATION })]`, but don't link in `<libc/core/HEADER.h>` |
+| `[fast_forceinline({ INLINE_IMPLEMENTATION })]`                          | Like `[forceinline({ INLINE_IMPLEMENTATION })]`, but don't link in `<libc/core/HEADER.h>` |
+| `[fast_extern_inline(ASMNAME, { INLINE_IMPLEMENTATION })]`               | Like `[extern_inline({ INLINE_IMPLEMENTATION })]`, but don't link in `<libc/core/HEADER.h>` |
+| `[fast_raw_extern_inline(ASMNAME, { INLINE_IMPLEMENTATION })]`           | Like `[raw_extern_inline({ INLINE_IMPLEMENTATION })]`, but don't link in `<libc/core/HEADER.h>` |
+| `[preferred_fast_inline({ INLINE_IMPLEMENTATION })]`                     | Like `[preferred_inline({ INLINE_IMPLEMENTATION })]`, but don't link in `<libc/core/HEADER.h>` |
+| `[preferred_fast_forceinline({ INLINE_IMPLEMENTATION })]`                | Like `[preferred_forceinline({ INLINE_IMPLEMENTATION })]`, but don't link in `<libc/core/HEADER.h>` |
+| `[preferred_fast_extern_inline(ASMNAME, { INLINE_IMPLEMENTATION })]`     | Like `[preferred_extern_inline({ INLINE_IMPLEMENTATION })]`, but don't link in `<libc/core/HEADER.h>` |
+| `[preferred_fast_raw_extern_inline(ASMNAME, { INLINE_IMPLEMENTATION })]` | Like `[preferred_raw_extern_inline({ INLINE_IMPLEMENTATION })]`, but don't link in `<libc/core/HEADER.h>` |
+| `[crtbuiltin]`                                   | Same as `[if(__has_builtin(__builtin_{<functionName>}) && defined(__LIBC_BIND_CRTBUILTINS)), preferred_extern_inline({<functionName>}, { return __builtin_{<functionName>}({<functionArgs>}); })]` |
 | `[crt_intern_kos_alias(INTERN_ASMNAME)]`         | Use `DEFINE_INTERN_ALIAS()` with `INTERN_ASMNAME` to provide the KOS libc implementation (hint: use with `[if(...)]` to make this conditional) |
 | `[crt_intern_dos_alias(INTERN_ASMNAME)]`         | Use `DEFINE_INTERN_ALIAS()` with `INTERN_ASMNAME` to provide the DOS libc implementation (hint: use with `[if(...)]` to make this conditional) |
 | `[rlim64_variant_of(ASMNAME)]`                   | Same as `[alt_variant_of(__SIZEOF_RLIM32_T__ == __SIZEOF_RLIM64_T__, ASMNAME)]` |
@@ -385,7 +386,86 @@ Note on bindings:
 | `[crt_impl_if(COND)]`                            | Same as `[crt_kos_impl_if(COND)]`, `[crt_dos_impl_if(!defined(__LIBCCALL_IS_LIBDCALL) && {COND})]` |
 | `[crt_kos_impl_if(COND)]`                        | Set the wrapping pp-condition that must be met for the KOS-variant to be implemented in libc to `COND` (default: `1`) |
 | `[crt_dos_impl_if(COND)]`                        | Set the wrapping pp-condition that must be met for the DOS-variant to be implemented in libc to `COND` (default: `!defined(__LIBCCALL_IS_LIBDCALL)`) |
-| `[crt_dos_only]`                                 | Same as `[cc(LIBDCALL)]`, `[no_crt_dos_wrapper]` |
+| `[crt_dos_only]`                                 | Same as `[cc(LIBDCALL)]`, `[nodos]` |
+| `[crt_dos_variant(*)]`                           | Custom implementations for dos variants (see below) |
+
+
+
+### Custom DOS implementations
+
+- `[crt_dos_variant(callback( ... ))]`: Automatic wrapper for when a DOS variant needs to be generated as a result of `LIBCCALL` differing from `LIBDCALL` (e.g. on `x86_64`). This annotation can be used to specify how that wrapper should be generated. The given `...` is a `,`-separated list of:
+	- `decl: <dosPrototype>`  
+	  Declare the function prototype used by the dos variant (optional)  
+	  Usually, this tag isn't required as the DOS prototype is automatically generated from the KOS prototype by replacing KOS-types and calling conventions of arguments with their DOS equivalents.
+	- `cook: struct { auto <name> = <init>, auto <name> = <init>, ... }`  
+	  Specify a structure to-be used for cookie data, as well as that structure's fields and initializers. This is the set of data that is passed via the `$cook` parameter to the wrapper function.  
+	  Note that `auto` may also be replaced with a custom type expression, though when `auto` is used, an attempt is made to deduce the effective type from `<init>`
+	  Example: `cook: struct { auto compar = compar; auto arg = arg; }`  
+	- `cook: auto = <init>`  
+	  Use this instead of the `struct { ... }` form when only a single parameter needs to be passed to the wrapper function (e.g. the DOS-wrapper for `qsort(3)` is implemented in terms of `qsort_r(3)` and only needs a single parameter `compar`, as no secondary cookie pointer can be passed to `qsort(3)`)
+	  Example: `cook: auto = compar`  
+	- `wrap: <wrapperPrototype> { <wrapperImplementation> }`  
+	  Specify the prototype and implementation of the wrapper. Within the prototype, `$cook` may be used as a placeholder for the cookie structure/argument type (the internal cookie `struct` or the evaluation of `auto` within the single-argument `cook` declaration)
+	  Example: `wrap: ($cook c, void const *a, void const *b): int { return (*c)(a, b); }`  
+	  Example: `wrap: ($cook *c, void const *a, void const *b): int { return (*c->compar)(c->arg, a, b); }`
+	- `impl: <dosImplementation>`  
+	  Implementation of the dos variant's function body (excluding the optional constructing and initialization of a cookie structure). This expression may either be of the form `{ ...; return ...; }`, or of the form `...`, in which case it is automatically wrapped by a `return` statement (unless the dos variant returns `void`)  
+	  Additionally, the given expression may contain `$wrap`, which is replaced with the name of the wrapper function, as well as `$cook`, which is replaced with the name of the fully initialized local cookie variable (in case struct-cookies are used), or the `<init>` expression when the single cookie-argument version is used.  
+	  Example: `_lfind_s(key, pbase, pitem_count, item_size, (int (LIBCCALL *)(void *, void const *, void const *))&$wrap, (void *)$cook)`
+  With all of that in mind, given something like:  
+
+  ```
+  [[crt_dos_variant(callback(
+      cook: struct { auto compar = compar; auto arg = arg; },
+      wrap: ($cook *c, void const *a, void const *b): int { return (*c->compar)(c->arg, a, b); },
+      impl: _lfind_s(key, pbase, pitem_count, item_size, (int (LIBCCALL *)(void *, void const *, void const *))&$wrap, &$cook),
+  ))]]
+  void *_lfind_s(void const *key, [[nonnull]] void const *pbase,
+                 [[nonnull]] size_t *pitem_count, size_t item_size,
+                 [[nonnull]] int (LIBCCALL *compar)(void *arg, void const *a, void const *b),
+                 void *arg);
+  ```
+
+  Construct the following code automatically (in `/kos/src/libc/auto/*.c`):
+
+  ```c
+  #if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
+  #ifndef __dwrap_sTPTP_TDTPTPTP_c0c1A1A2_defined
+  #define __dwrap_sTPTP_TDTPTPTP_c0c1A1A2_defined 1
+  struct _dwrap_cookie_struct_sTPTP_TDTPTPTP_c0c1A1A2 {
+      int (LIBDCALL *compar)(void *arg, void const *a, void const *b);
+      void *arg;
+  };
+  PRIVATE ATTR_SECTION(".text.crt.dos.utility.search") int
+  (LIBCCALL _dwrap_sTPTP_TDTPTPTP_c0c1A1A2)(struct _dwrap_cookie_struct_sTPTP_TDTPTPTP_c0c1A1A2 *c,
+                                            void const *a,
+                                            void const *b) THROWS(...){
+      return (*c->compar)(c->arg, a, b);
+  }
+  #endif /* !__dwrap_sTPTP_TDTPTPTP_c0c1A1A2_defined */
+  INTERN ATTR_SECTION(".text.crt.dos.utility.search") WUNUSED NONNULL((2, 3, 5)) void *
+  (LIBDCALL libd__lfind_s)(void const *key,
+                           void const *pbase,
+                           size_t *pitem_count,
+                           size_t item_size,
+                           int (LIBDCALL *compar)(void *arg, void const *a, void const *b),
+                           void *arg) THROWS(...) {
+      struct _dwrap_cookie_struct_sTPTP_TDTPTPTP_c0c1A1A2 libd__lfind_s_cookie;
+      libd__lfind_s_cookie.compar = compar;
+      libd__lfind_s_cookie.arg = arg;
+      return libc__lfind_s(key, pbase, pitem_count, item_size, (int (LIBCCALL *)(void *, void const *, void const *))&_dwrap_sTPTP_TDTPTPTP_c0c1A1A2, &libd__lfind_s_cookie);
+  }
+  #endif /* !__LIBCCALL_IS_LIBDCALL && !__KERNEL__ */
+  ```
+
+- `[crt_dos_variant({ ... })]`, where `...` is a `,`-separated list of
+	- `decl: <dosPrototype>`  
+	  Declare the function prototype used by the dos variant (optional)
+	- `impl: ...`  
+	  Set the implementation body of the dos variant (mandatory)
+	- `prefix: { ... }`, `prefix: ...`  
+	  Add an implementation prefix to-be prepended before the in-library implementation
+
 
 
 
@@ -399,22 +479,22 @@ Note on bindings:
 | `{ ... }`                                        | Normal body (used in `/kos/src/libc/auto/HEADER.c` (unless `[userimpl]`) and local impl) |
 | `= NAME;`                                        | Bind against another function (NOTE: If possible use `%[insert:function(...)]` instead) |
 | `%{chk(NAME,ARGS)}`                              | Generate a `__*_chk` style function body |
-| `%{printf}`                                      | Same as `%{printf(VPRINTF_FUNCTION_NAME)}` (`VPRINTF_FUNCTION_NAME` is auto-generated from `\<functionName\>`) |
-| `%{printf(*)}`                                   | Same as `%{printf(VPRINTF_FUNCTION_NAME)}` (`VPRINTF_FUNCTION_NAME` is auto-generated from `\<functionName\>`) |
-| `%{printf(%auto)}`                               | Same as `%{printf(VPRINTF_FUNCTION_NAME)}` (`VPRINTF_FUNCTION_NAME` is auto-generated from `\<functionName\>`) |
+| `%{printf}`                                      | Same as `%{printf(VPRINTF_FUNCTION_NAME)}` (`VPRINTF_FUNCTION_NAME` is auto-generated from `<functionName>`) |
+| `%{printf(*)}`                                   | Same as `%{printf(VPRINTF_FUNCTION_NAME)}` (`VPRINTF_FUNCTION_NAME` is auto-generated from `<functionName>`) |
+| `%{printf(%auto)}`                               | Same as `%{printf(VPRINTF_FUNCTION_NAME)}` (`VPRINTF_FUNCTION_NAME` is auto-generated from `<functionName>`) |
 | `%{printf(NAME)}`                                | Generate a call to a `vprintf`-style function `NAME` |
-| `%{generate(GENERATOR)}`                         | Same as `%{generate(GENERATOR, BASE_FUNCTION_NAME)}` (`BASE_FUNCTION_NAME` is (based on `GENERATOR`) auto-generated from `\<functionName\>`) |
-| `%{generate(GENERATOR(*))}`                      | Same as `%{generate(GENERATOR, BASE_FUNCTION_NAME)}` (`BASE_FUNCTION_NAME` is (based on `GENERATOR`) auto-generated from `\<functionName\>`) |
-| `%{generate(GENERATOR(%auto))}`                  | Same as `%{generate(GENERATOR, BASE_FUNCTION_NAME)}` (`BASE_FUNCTION_NAME` is (based on `GENERATOR`) auto-generated from `\<functionName\>`) |
+| `%{generate(GENERATOR)}`                         | Same as `%{generate(GENERATOR, BASE_FUNCTION_NAME)}` (`BASE_FUNCTION_NAME` is (based on `GENERATOR`) auto-generated from `<functionName>`) |
+| `%{generate(GENERATOR(*))}`                      | Same as `%{generate(GENERATOR, BASE_FUNCTION_NAME)}` (`BASE_FUNCTION_NAME` is (based on `GENERATOR`) auto-generated from `<functionName>`) |
+| `%{generate(GENERATOR(%auto))}`                  | Same as `%{generate(GENERATOR, BASE_FUNCTION_NAME)}` (`BASE_FUNCTION_NAME` is (based on `GENERATOR`) auto-generated from `<functionName>`) |
 | `%{generate(GENERATOR(NAME))}`                   | Generate a function based on `GENERATOR` and `NAME` (generators are `str2wcs`, `double2float` and `double2ldouble`) |
-| `%{uchar}`                                       | Either `%{uchar16}` or `%{uchar32}` (based on `\<functionName\>`) |
-| `%{uchar16}`                                     | Same as `%{uchar16(WCHAR_FUNCTION_NAME)}` (`WCHAR_FUNCTION_NAME` is auto-generated from `\<functionName\>`) |
-| `%{uchar16(*)}`                                  | Same as `%{uchar16(WCHAR_FUNCTION_NAME)}` (`WCHAR_FUNCTION_NAME` is auto-generated from `\<functionName\>`) |
-| `%{uchar16(%auto)}`                              | Same as `%{uchar16(WCHAR_FUNCTION_NAME)}` (`WCHAR_FUNCTION_NAME` is auto-generated from `\<functionName\>`) |
+| `%{uchar}`                                       | Either `%{uchar16}` or `%{uchar32}` (based on `<functionName>`) |
+| `%{uchar16}`                                     | Same as `%{uchar16(WCHAR_FUNCTION_NAME)}` (`WCHAR_FUNCTION_NAME` is auto-generated from `<functionName>`) |
+| `%{uchar16(*)}`                                  | Same as `%{uchar16(WCHAR_FUNCTION_NAME)}` (`WCHAR_FUNCTION_NAME` is auto-generated from `<functionName>`) |
+| `%{uchar16(%auto)}`                              | Same as `%{uchar16(WCHAR_FUNCTION_NAME)}` (`WCHAR_FUNCTION_NAME` is auto-generated from `<functionName>`) |
 | `%{uchar16(WCHAR_FUNCTION_NAME)}`                | Generate bindings and implementation for the `char16_t` variant of a wchar-function `WCHAR_FUNCTION_NAME` |
-| `%{uchar32}`                                     | Same as `%{uchar32(WCHAR_FUNCTION_NAME)}` (`WCHAR_FUNCTION_NAME` is auto-generated from `\<functionName\>`) |
-| `%{uchar32(*)}`                                  | Same as `%{uchar32(WCHAR_FUNCTION_NAME)}` (`WCHAR_FUNCTION_NAME` is auto-generated from `\<functionName\>`) |
-| `%{uchar32(%auto)}`                              | Same as `%{uchar32(WCHAR_FUNCTION_NAME)}` (`WCHAR_FUNCTION_NAME` is auto-generated from `\<functionName\>`) |
+| `%{uchar32}`                                     | Same as `%{uchar32(WCHAR_FUNCTION_NAME)}` (`WCHAR_FUNCTION_NAME` is auto-generated from `<functionName>`) |
+| `%{uchar32(*)}`                                  | Same as `%{uchar32(WCHAR_FUNCTION_NAME)}` (`WCHAR_FUNCTION_NAME` is auto-generated from `<functionName>`) |
+| `%{uchar32(%auto)}`                              | Same as `%{uchar32(WCHAR_FUNCTION_NAME)}` (`WCHAR_FUNCTION_NAME` is auto-generated from `<functionName>`) |
 | `%{uchar32(WCHAR_FUNCTION_NAME)}`                | Generate bindings and implementation for the `char32_t` variant of a wchar-function `WCHAR_FUNCTION_NAME` |
 
 

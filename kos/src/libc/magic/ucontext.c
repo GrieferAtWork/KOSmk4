@@ -48,7 +48,9 @@ __SYSDECL_BEGIN
 
 }
 
-%
+/* TODO: DOS Support for functions in this file! (Cygwin has these, so they exist in DOS, too!) */
+
+
 @@>> getcontext(3)
 @@Save the caller's current register  state into the given  `ucp'
 @@Usually, this function will never  fail and always return  `0'.
@@ -65,7 +67,6 @@ __SYSDECL_BEGIN
 [[crt_kos_impl_requires(!defined(LIBC_ARCH_HAVE_GETCONTEXT))]]
 int getcontext([[nonnull]] ucontext_t *__restrict ucp);
 
-%
 @@>> setcontext(3)
 @@Populate the current machine register state with values from `ucp',
 @@such  that this  function will not  return to the  caller, but will
@@ -92,7 +93,6 @@ int getcontext([[nonnull]] ucontext_t *__restrict ucp);
 [[crt_kos_impl_requires(!defined(LIBC_ARCH_HAVE_SETCONTEXT))]]
 int setcontext([[nonnull]] ucontext_t const *__restrict ucp);
 
-%
 @@>> swapcontext(3)
 @@Atomically perform both a `getcontext(oucp)',  as well as a  `setcontext(ucp)',
 @@such that execution will  continue at `ucp',  but code that  is hosted by  that
@@ -113,10 +113,6 @@ int setcontext([[nonnull]] ucontext_t const *__restrict ucp);
 int swapcontext([[nonnull]] ucontext_t *__restrict oucp,
                 [[nonnull]] ucontext_t const *__restrict ucp);
 
-%
-%typedef void (*__makecontext_func_t)(void);
-
-%
 @@>> makecontext(3)
 @@Initialize  a  user-context  `ucp'  to  perform  a  call  to  `func',  which
 @@should take exactly `argc' arguments  of integer or pointer type  (floating-
@@ -137,11 +133,11 @@ int swapcontext([[nonnull]] ucontext_t *__restrict oucp,
 @@    when `func' returns normally, or set to `NULL' if the return of
 @@    `func' should be handled as a call to `pthread_exit(NULL)'
 [[no_crt_dos_wrapper, decl_include("<features.h>", "<sys/ucontext.h>")]]
-[[decl_prefix(typedef void (*__makecontext_func_t)(void);)]]
 [[crt_kos_impl_requires(!defined(LIBC_ARCH_HAVE_MAKECONTEXT))]]
 void makecontext([[nonnull]] ucontext_t *ucp,
-                 [[nonnull]] __makecontext_func_t func,
+                 [[nonnull]] void (LIBKCALL *func)(void),
                  __STDC_INT_AS_SIZE_T argc, ...);
+
 
 %{
 

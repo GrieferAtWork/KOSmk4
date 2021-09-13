@@ -2641,15 +2641,15 @@ funopen2_32_closefn(void *cookie) {
 }
 #endif /* __SIZEOF_OFF64_T__ != __SIZEOF_OFF32_T__ */
 
-/*[[[head:libc_funopen2,hash:CRC-32=0xe336b5a4]]]*/
+/*[[[head:libc_funopen2,hash:CRC-32=0x556facc1]]]*/
 /* >> funopen2(3), funopen2_64(3) */
 INTERN ATTR_SECTION(".text.crt.FILE.locked.utility") WUNUSED FILE *
 NOTHROW_NCX(LIBCCALL libc_funopen2)(void const *cookie,
-                                    __funopen2_readfn_t readfn,
-                                    __funopen2_writefn_t writefn,
-                                    __funopen2_seekfn_t seekfn,
-                                    __funopen2_flushfn_t flushfn,
-                                    __funopen2_closefn_t closefn)
+                                    ssize_t (LIBKCALL *readfn)(void *cookie, void *buf, size_t num_bytes),
+                                    ssize_t (LIBKCALL *writefn)(void *cookie, void const *buf, size_t num_bytes),
+                                    off_t (LIBKCALL *seekfn)(void *cookie, off_t off, int whence),
+                                    int (LIBKCALL *flushfn)(void *cookie),
+                                    int (LIBKCALL *closefn)(void *cookie))
 /*[[[body:libc_funopen2]]]*/
 {
 #if __SIZEOF_OFF64_T__ == __SIZEOF_OFF32_T__
@@ -2683,18 +2683,18 @@ NOTHROW_NCX(LIBCCALL libc_funopen2)(void const *cookie,
 }
 /*[[[end:libc_funopen2]]]*/
 
-/*[[[head:libc_funopen2_64,hash:CRC-32=0x4a1b9dc7]]]*/
+/*[[[head:libc_funopen2_64,hash:CRC-32=0xfcfc6428]]]*/
 #if __SIZEOF_OFF64_T__ == __SIZEOF_OFF32_T__
 DEFINE_INTERN_ALIAS(libc_funopen2_64, libc_funopen2);
 #else /* MAGIC:alias */
 /* >> funopen2(3), funopen2_64(3) */
 INTERN ATTR_SECTION(".text.crt.FILE.locked.utility") WUNUSED FILE *
 NOTHROW_NCX(LIBCCALL libc_funopen2_64)(void const *cookie,
-                                       __funopen2_readfn_t readfn,
-                                       __funopen2_writefn_t writefn,
-                                       __funopen2_64_seekfn_t seekfn,
-                                       __funopen2_flushfn_t flushfn,
-                                       __funopen2_closefn_t closefn)
+                                       ssize_t (LIBKCALL *readfn)(void *cookie, void *buf, size_t num_bytes),
+                                       ssize_t (LIBKCALL *writefn)(void *cookie, void const *buf, size_t num_bytes),
+                                       off64_t (LIBKCALL *seekfn)(void *cookie, off64_t off, int whence),
+                                       int (LIBKCALL *flushfn)(void *cookie),
+                                       int (LIBKCALL *closefn)(void *cookie))
 /*[[[body:libc_funopen2_64]]]*/
 {
 	return file_funopen(cookie, readfn, writefn, seekfn, flushfn, closefn);

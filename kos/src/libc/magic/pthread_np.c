@@ -39,7 +39,7 @@ __SYSDECL_BEGIN
 
 #ifndef __pthread_switch_routine_t_defined
 #define __pthread_switch_routine_t_defined 1
-typedef void (__LIBCCALL *pthread_switch_routine_t)(pthread_t, pthread_t);
+typedef void (__LIBKCALL *pthread_switch_routine_t)(pthread_t, pthread_t);
 #endif /* !__pthread_switch_routine_t_defined */
 
 #ifndef __stack_t_defined

@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x86d3f186 */
+/* HASH CRC-32:0x9e75c73c */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -561,11 +561,6 @@ struct _pthread_cleanup_buffer {
 	struct _pthread_cleanup_buffer *__prev;             /* Chaining of cleanup functions. */
 };
 
-#ifndef ____pthread_start_routine_t_defined
-#define ____pthread_start_routine_t_defined 1
-typedef void *(__LIBKCALL *__pthread_start_routine_t)(void *);
-#endif /* !____pthread_start_routine_t_defined */
-
 #ifndef __pthread_t_defined
 #define __pthread_t_defined 1
 typedef __pthread_t pthread_t;
@@ -630,7 +625,7 @@ typedef __pthread_barrierattr_t pthread_barrierattr_t;
  * handle is stored in `*newthread'
  * @return: EOK:    Success
  * @return: EAGAIN: Insufficient resources, or operation-not-permitted */
-__CDECLARE_OPT(__ATTR_NONNULL((1, 3)),__errno_t,__NOTHROW_NCX,pthread_create,(pthread_t *__restrict __newthread, pthread_attr_t const *__restrict __attr, __pthread_start_routine_t __start_routine, void *__restrict __arg),(__newthread,__attr,__start_routine,__arg))
+__CDECLARE_OPT(__ATTR_NONNULL((1, 3)),__errno_t,__NOTHROW_NCX,pthread_create,(pthread_t *__restrict __newthread, pthread_attr_t const *__restrict __attr, void *(__LIBCCALL *__start_routine)(void *__arg), void *__arg),(__newthread,__attr,__start_routine,__arg))
 /* >> pthread_exit(3)
  * Terminate calling thread.
  * The registered cleanup handlers are called via exception handling */
@@ -1064,11 +1059,6 @@ __CDECLARE_OPT(__ATTR_NONNULL((3)),__errno_t,__NOTHROW_NCX,pthread_setaffinity_n
 __CDECLARE_OPT(__ATTR_NONNULL((3)),__errno_t,__NOTHROW_NCX,pthread_getaffinity_np,(pthread_t __pthread, size_t __cpusetsize, cpu_set_t *__cpuset),(__pthread,__cpusetsize,__cpuset))
 #endif /* __USE_GNU */
 
-#ifndef ____pthread_once_routine_t_defined
-#define ____pthread_once_routine_t_defined 1
-typedef void (__LIBKCALL *__pthread_once_routine_t)(void);
-#endif /* !____pthread_once_routine_t_defined */
-
 /* Functions for handling initialization. */
 
 #ifdef __CRT_HAVE_pthread_once
@@ -1078,7 +1068,7 @@ typedef void (__LIBKCALL *__pthread_once_routine_t)(void);
  * same `once_control' argument. `once_control' must  point to a static  or
  * extern variable initialized to `PTHREAD_ONCE_INIT'.
  * @return: EOK: Success */
-__CDECLARE(__ATTR_NONNULL((1, 2)),__errno_t,__THROWING,pthread_once,(pthread_once_t *__once_control, __pthread_once_routine_t __init_routine),(__once_control,__init_routine))
+__CDECLARE(__ATTR_NONNULL((1, 2)),__errno_t,__THROWING,pthread_once,(pthread_once_t *__once_control, void (__LIBCCALL *__init_routine)(void)),(__once_control,__init_routine))
 #elif defined(__CRT_HAVE_call_once)
 /* >> pthread_once(3)
  * Guarantee that the initialization function `init_routine' will be called
@@ -1086,7 +1076,7 @@ __CDECLARE(__ATTR_NONNULL((1, 2)),__errno_t,__THROWING,pthread_once,(pthread_onc
  * same `once_control' argument. `once_control' must  point to a static  or
  * extern variable initialized to `PTHREAD_ONCE_INIT'.
  * @return: EOK: Success */
-__CREDIRECT(__ATTR_NONNULL((1, 2)),__errno_t,__THROWING,pthread_once,(pthread_once_t *__once_control, __pthread_once_routine_t __init_routine),call_once,(__once_control,__init_routine))
+__CREDIRECT(__ATTR_NONNULL((1, 2)),__errno_t,__THROWING,pthread_once,(pthread_once_t *__once_control, void (__LIBCCALL *__init_routine)(void)),call_once,(__once_control,__init_routine))
 #else /* ... */
 #include <libc/local/pthread/pthread_once.h>
 /* >> pthread_once(3)
@@ -1095,7 +1085,7 @@ __CREDIRECT(__ATTR_NONNULL((1, 2)),__errno_t,__THROWING,pthread_once,(pthread_on
  * same `once_control' argument. `once_control' must  point to a static  or
  * extern variable initialized to `PTHREAD_ONCE_INIT'.
  * @return: EOK: Success */
-__NAMESPACE_LOCAL_USING_OR_IMPL(pthread_once, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_NONNULL((1, 2)) __errno_t (__LIBCCALL pthread_once)(pthread_once_t *__once_control, __pthread_once_routine_t __init_routine) __THROWS(...) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(pthread_once))(__once_control, __init_routine); })
+__NAMESPACE_LOCAL_USING_OR_IMPL(pthread_once, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_NONNULL((1, 2)) __errno_t (__LIBCCALL pthread_once)(pthread_once_t *__once_control, void (__LIBCCALL *__init_routine)(void)) __THROWS(...) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(pthread_once))(__once_control, __init_routine); })
 #endif /* !... */
 
 /* Functions for handling cancellation.
@@ -2219,10 +2209,6 @@ __CDECLARE_OPT(__ATTR_NONNULL((1)),__errno_t,__NOTHROW_NCX,pthread_barrierattr_s
 /* pthread_key_t                                                        */
 /************************************************************************/
 
-#ifndef ____pthread_destr_function_t_defined
-#define ____pthread_destr_function_t_defined 1
-typedef void (__LIBKCALL *__pthread_destr_function_t)(void *);
-#endif /* !____pthread_destr_function_t_defined */
 /* >> pthread_key_create(3)
  * Create a key value identifying a location in the thread-specific
  * data area. Each thread maintains a distinct thread-specific data
@@ -2232,7 +2218,7 @@ typedef void (__LIBKCALL *__pthread_destr_function_t)(void *);
  * when the key is destroyed
  * @return: EOK:    Success
  * @return: ENOMEM: Insufficient memory to create the key */
-__CDECLARE_OPT(__ATTR_NONNULL((1)),__errno_t,__NOTHROW_NCX,pthread_key_create,(pthread_key_t *__key, __pthread_destr_function_t __destr_function),(__key,__destr_function))
+__CDECLARE_OPT(__ATTR_NONNULL((1)),__errno_t,__NOTHROW_NCX,pthread_key_create,(pthread_key_t *__key, void (__LIBKCALL *__destr_function)(void *__value)),(__key,__destr_function))
 #ifdef __USE_SOLARIS
 #ifndef PTHREAD_ONCE_KEY_NP
 #ifdef __PTHREAD_ONCE_KEY_NP
@@ -2251,7 +2237,7 @@ __CDECLARE_OPT(__ATTR_NONNULL((1)),__errno_t,__NOTHROW_NCX,pthread_key_create,(p
  * function will no longer block, but simply return immediately.
  * @return: EOK:    Success
  * @return: ENOMEM: Insufficient memory to create the key */
-__CDECLARE(__ATTR_NONNULL((1)),__errno_t,__NOTHROW_NCX,pthread_key_create_once_np,(pthread_key_t *__key, __pthread_destr_function_t __destr_function),(__key,__destr_function))
+__CDECLARE(__ATTR_NONNULL((1)),__errno_t,__NOTHROW_NCX,pthread_key_create_once_np,(pthread_key_t *__key, void (__LIBKCALL *__destr_function)(void *)),(__key,__destr_function))
 #elif defined(__CRT_HAVE_pthread_key_create)
 #include <libc/local/pthread/pthread_key_create_once_np.h>
 /* >> pthread_key_create_once_np(3)
@@ -2263,7 +2249,7 @@ __CDECLARE(__ATTR_NONNULL((1)),__errno_t,__NOTHROW_NCX,pthread_key_create_once_n
  * function will no longer block, but simply return immediately.
  * @return: EOK:    Success
  * @return: ENOMEM: Insufficient memory to create the key */
-__NAMESPACE_LOCAL_USING_OR_IMPL(pthread_key_create_once_np, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_NONNULL((1)) __errno_t __NOTHROW_NCX(__LIBCCALL pthread_key_create_once_np)(pthread_key_t *__key, __pthread_destr_function_t __destr_function) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(pthread_key_create_once_np))(__key, __destr_function); })
+__NAMESPACE_LOCAL_USING_OR_IMPL(pthread_key_create_once_np, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_NONNULL((1)) __errno_t __NOTHROW_NCX(__LIBCCALL pthread_key_create_once_np)(pthread_key_t *__key, void (__LIBKCALL *__destr_function)(void *)) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(pthread_key_create_once_np))(__key, __destr_function); })
 #endif /* ... */
 #endif /* __USE_SOLARIS */
 #ifdef __CRT_HAVE_pthread_key_delete
@@ -2309,11 +2295,6 @@ __CDECLARE_OPT(,__errno_t,__NOTHROW_NCX,pthread_setspecific,(pthread_key_t __key
  * @return: EOK: Success */
 __CDECLARE_OPT(__ATTR_NONNULL((2)),__errno_t,__NOTHROW_NCX,pthread_getcpuclockid,(pthread_t __pthread, __clockid_t *__clock_id),(__pthread,__clock_id))
 #endif /* __USE_XOPEN2K */
-
-#ifndef ____pthread_atfork_func_t_defined
-#define ____pthread_atfork_func_t_defined 1
-typedef void (__LIBKCALL *__pthread_atfork_func_t)(void);
-#endif /* !____pthread_atfork_func_t_defined */
 #if !defined(__pthread_atfork_defined) && defined(__CRT_HAVE_pthread_atfork)
 #define __pthread_atfork_defined 1
 /* >> pthread_atfork(3)
@@ -2329,7 +2310,7 @@ typedef void (__LIBKCALL *__pthread_atfork_func_t)(void);
  * called in FIFO order (first added -> first called)
  * @return: EOK:    Success
  * @return: ENOMEM: Insufficient memory to register callbacks */
-__CDECLARE(,__errno_t,__NOTHROW_NCX,pthread_atfork,(__pthread_atfork_func_t __prepare, __pthread_atfork_func_t __parent, __pthread_atfork_func_t __child),(__prepare,__parent,__child))
+__CDECLARE(,__errno_t,__NOTHROW_NCX,pthread_atfork,(void (__LIBCCALL *__prepare)(void), void (__LIBCCALL *__parent)(void), void (__LIBCCALL *__child)(void)),(__prepare,__parent,__child))
 #endif /* !__pthread_atfork_defined && __CRT_HAVE_pthread_atfork */
 
 
