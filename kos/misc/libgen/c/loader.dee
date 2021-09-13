@@ -2643,6 +2643,15 @@ class WrapperCookieStruct {
 		for (local none, m: this.members)
 			m.replaceAutoTypes(proto);
 	}
+	function getMemberIndexByName(name: string): int | none {
+		local i = 0;
+		for (local memberName, none: this.members) {
+			if (memberName == name)
+				return i;
+			++i;
+		}
+		return none;
+	}
 	public property cookieTypeName: string = { get() -> cookieTypePrefix; }
 	public property cookieTypePrefix: string = { get() -> "struct " + this.name; }
 	public property cookieTypeSuffix: string = { get() -> ""; }
@@ -2670,6 +2679,168 @@ class CrtDosVariantMetadata {
 			: FunctionImplementation | Callable;
 	*/
 }
+
+
+
+@@Try to serialize the wrapper implementation, but return @none if that is impossible
+function trySerializeDosCallbackWrapper(
+		wrapperBody: string,
+		wrapperPrototype: FunctionPrototype,
+		cookie: WrapperCookie | WrapperCookieStruct)
+		: string | none {
+#undef DEBUG_DOS_CALLBACK_SERIALIZATION_FAILURE
+//#define DEBUG_DOS_CALLBACK_SERIALIZATION_FAILURE
+#ifdef DEBUG_DOS_CALLBACK_SERIALIZATION_FAILURE
+#define SERIAL_FAIL ({ print "SERIAL_FAIL:", __LINE__; goto err; })
+#else /* DEBUG_DOS_CALLBACK_SERIALIZATION_FAILURE */
+#define SERIAL_FAIL goto err
+#endif /* !DEBUG_DOS_CALLBACK_SERIALIZATION_FAILURE */
+	function fixTypeClass(x) -> x.replace("(", "").replace(")", "");
+	try {
+		File.Writer result;
+		/* Prevent redundant declarations of binary-compatible wrapper functions
+		 * by serializing `usedWrapperBody', `cookie' (types) and `wrapperPrototype' */
+		if (cookie is WrapperCookieStruct) {
+			result << "s";
+			for (local none, field: cookie.members)
+				result << fixTypeClass(field.ctype.requireTypeClass);
+		} else if (cookie is WrapperCookie) {
+			result << "c" << fixTypeClass(cookie.ctype.requireTypeClass);
+		} else {
+			SERIAL_FAIL;
+		}
+		result << "_" << fixTypeClass(wrapperPrototype.returnType.requireTypeClass);
+		local cookieArgument = none;
+		for (local a: wrapperPrototype.argv) {
+			local ct = a.ctype;
+			if ("$cook" in ct.beforeName) {
+				if (cookieArgument !is none)
+					SERIAL_FAIL;
+				cookieArgument = a;
+			}
+			local cl = ct.typeClass;
+			if (cl is none) {
+				if (ct.beforeName == "$cook" && ct.afterName == "")
+					cl = "TP";
+				else {
+					SERIAL_FAIL;
+				}
+			}
+			result << fixTypeClass(cl);
+		}
+		if (cookieArgument is none)
+			SERIAL_FAIL;
+		local cookieArgumentName = str(cookieArgument.name);
+		result << "_";
+		if (wrapperBody.startswith("{") && wrapperBody.endswith("}")) {
+			wrapperBody = wrapperBody[1:-1].strip();
+			if (!wrapperBody.endswith(";"))
+				SERIAL_FAIL;
+			wrapperBody = wrapperBody[:-1].rstrip();
+			if (wrapperBody.startswith("return ")) {
+				if (wrapperPrototype.returnType.isVoid)
+					goto err;
+				wrapperBody = wrapperBody[7:].lstrip();
+			} else {
+				if (!wrapperPrototype.returnType.isVoid)
+					goto err;
+			}
+		}
+		local parser = CParser(wrapperBody);
+		local tok = parser.next();
+		local callToSymbol;
+		local callToMember = none;
+		if (tok.issymbol()) {
+			callToSymbol = tok;
+			tok = parser.next();
+			if (tok == "->") {
+				callToMember = parser.next();
+				tok = parser.next();
+			}
+		} else if (tok == "(") {
+			if (parser.next() != "*")
+				SERIAL_FAIL;
+			callToSymbol = parser.next();
+			if (!callToSymbol.issymbol())
+				SERIAL_FAIL;
+			tok = parser.next();
+			if (tok == "->") {
+				callToMember = parser.next();
+				tok = parser.next();
+			}
+			if (tok != ")")
+				SERIAL_FAIL;
+			tok = parser.next();
+		} else {
+			SERIAL_FAIL;
+		}
+		if (tok != "(")
+			SERIAL_FAIL;
+		tok = parser.next();
+		if (callToSymbol != cookieArgumentName)
+			SERIAL_FAIL;
+		if (callToMember is none) {
+			if (cookie !is WrapperCookie)
+				SERIAL_FAIL;
+			result << "C";
+		} else {
+			if (cookie !is WrapperCookieStruct)
+				SERIAL_FAIL;
+			callToMember = cookie.getMemberIndexByName(callToMember);
+			if (callToMember is none)
+				SERIAL_FAIL;
+			result << "c" << callToMember;
+		}
+		while (tok != ")") {
+			if (!tok.issymbol())
+				SERIAL_FAIL;
+			if (tok == cookieArgumentName) {
+				if (cookie !is WrapperCookieStruct)
+					SERIAL_FAIL;
+				tok = parser.next();
+				if (tok != "->")
+					SERIAL_FAIL;
+				tok = parser.next();
+				if (!tok.issymbol())
+					SERIAL_FAIL;
+				callToMember = cookie.getMemberIndexByName(tok);
+				if (callToMember is none)
+					SERIAL_FAIL;
+				result << "c" << callToMember;
+			} else {
+				local i = 0;
+				for (local a: wrapperPrototype.argv) {
+					if (a.name == tok) {
+						result << "A" << i;
+						goto found_argument;
+					}
+					++i;
+				}
+				SERIAL_FAIL;
+			}
+found_argument:
+			tok = parser.next();
+			if (tok != ",")
+				break;
+			tok = parser.next();
+		}
+		if (tok != ")")
+			SERIAL_FAIL;
+		tok = parser.next();
+		if (tok != "")
+			SERIAL_FAIL;
+		return result.string;
+err:
+		return none;
+	} catch (e...) {
+#ifdef DEBUG_DOS_CALLBACK_SERIALIZATION_FAILURE
+		print "SERIAL_FAIL:", __LINE__, repr e;
+		print repr Traceback.current;
+#endif /* DEBUG_DOS_CALLBACK_SERIALIZATION_FAILURE */
+		return none;
+	}
+}
+
 class CrtDosVariantCallbackMetadata: CrtDosVariantMetadata {
 	this = default;
 	public member dosProto: FunctionPrototype | none;
@@ -2677,6 +2848,7 @@ class CrtDosVariantCallbackMetadata: CrtDosVariantMetadata {
 	public member wrapperPrototype: FunctionPrototype;
 	public member wrapperBody: string | UserString;
 	public member implBody: string | UserString | none;
+
 
 	@@Helper function to trigger an error
 	function err(message: string) {
@@ -2747,16 +2919,26 @@ class CrtDosVariantCallbackMetadata: CrtDosVariantMetadata {
 			local result = FunctionImplementation(name: name);
 			local dosBody = CWriter(File.Writer());
 			local dosPrefix = CWriter(File.Writer());
-			local wrapperFunctionName = name + "_cookie_struct";
+			local wrapperFunctionName = "_dwrap_" + name;
 			local usedWrapperBody = str(wrapperBody);
 			local usedImplBody = str(implBody);
 			local cookie = this.cookie;
-			/* TODO: Prevent redundant declarations of binary-compatible wrapper functions
-			 *       by serializing `usedWrapperBody', `cookie' (types) and `wrapperPrototype' */
+			local serial = trySerializeDosCallbackWrapper(
+				wrapperBody: usedWrapperBody,
+				wrapperPrototype: wrapperPrototype, cookie: cookie);
+			local serialKey = none;
 
 			/* Output the cookie struct definition. */
+			if (serial !is none) {
+				serialKey = "__dwrap_{}_defined".format({ serial });
+				dosPrefix.ppIfndef(serialKey);
+				dosPrefix.ppDefine(serialKey, "1");
+				wrapperFunctionName = "_dwrap_" + serial;
+			}
 			if (cookie is WrapperCookieStruct) {
-				cookie.name = name + "_cookie_struct";
+				cookie.name = serial !is none
+					? ("_dwrap_cookie_struct_" + serial)
+					: (name + "_dwrap_cookie_struct_");
 				dosPrefix << "struct " << cookie.name << " {\n";
 				for (local fieldName, fieldCookie: cookie.members) {
 					dosPrefix << "\t";
@@ -2790,6 +2972,8 @@ class CrtDosVariantCallbackMetadata: CrtDosVariantMetadata {
 				dosPrefix << usedWrapperBody << ";\n";
 				dosPrefix << "}\n";
 			}
+			if (serialKey !is none)
+				dosPrefix.ppEndif();
 
 			@@String to which to expand @"$cook" in @implBody
 			local cookieVariable: string;
