@@ -29,8 +29,8 @@
 #ifdef __CC__
 __DECL_BEGIN
 
-struct __locale_struct {
 #ifdef __CRT_GLC
+struct __locale_struct {
 #undef __locales
 #undef __ctype_b
 #undef __ctype_tolower
@@ -41,10 +41,29 @@ struct __locale_struct {
 	__INT32_TYPE__ const  *__ctype_tolower;
 	__INT32_TYPE__ const  *__ctype_toupper;
 	char const            *__names[13];
-#else /* __CRT_GLC */
-	int __placeholder;
-#endif /* !__CRT_GLC */
 };
+#elif defined(__CRT_DOS)
+struct __crt_locale_data;
+struct __crt_multibyte_data;
+struct __locale_struct {
+#ifdef __COMPILER_HAVE_PRAGMA_PUSHMACRO
+#pragma push_macro("locinfo")
+#pragma push_macro("mbcinfo")
+#endif /* __COMPILER_HAVE_PRAGMA_PUSHMACRO */
+#undef locinfo
+#undef mbcinfo
+	struct __crt_locale_data    *locinfo;
+	struct __crt_multibyte_data *mbcinfo;
+#ifdef __COMPILER_HAVE_PRAGMA_PUSHMACRO
+#pragma pop_macro("mbcinfo")
+#pragma pop_macro("locinfo")
+#endif /* __COMPILER_HAVE_PRAGMA_PUSHMACRO */
+};
+#else /* ... */
+struct __locale_struct {
+	int __placeholder;
+};
+#endif /* !... */
 
 __DECL_END
 #endif /* __CC__ */
