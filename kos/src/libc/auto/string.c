@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xce75ab6d */
+/* HASH CRC-32:0xe411f498 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -1355,7 +1355,8 @@ NOTHROW_NCX(LIBCCALL libc_memcmpw)(void const *s1,
 	s16 const *p2 = (s16 const *)s2;
 	s16 v1, v2;
 	v1 = v2 = 0;
-	while (n_words-- && ((v1 = *p1++) == (v2 = *p2++)));
+	while (n_words-- && ((v1 = *p1++) == (v2 = *p2++)))
+		;
 	return v1 - v2;
 }
 #endif /* !LIBC_ARCH_HAVE_MEMCMPW */
@@ -1369,7 +1370,8 @@ NOTHROW_NCX(LIBCCALL libc_memcmpl)(void const *s1,
 	s32 const *p2 = (s32 const *)s2;
 	s32 v1, v2;
 	v1 = v2 = 0;
-	while (n_dwords-- && ((v1 = *p1++) == (v2 = *p2++)));
+	while (n_dwords-- && ((v1 = *p1++) == (v2 = *p2++)))
+		;
 	return v1 - v2;
 }
 #endif /* !LIBC_ARCH_HAVE_MEMCMPL */
@@ -4918,15 +4920,15 @@ DEFINE_PUBLIC_ALIAS(wmempset, libc_mempsetl);
 DEFINE_PUBLIC_ALIAS(mempsetl, libc_mempsetl);
 #endif /* !LIBC_ARCH_HAVE_MEMPSETL */
 #ifndef LIBC_ARCH_HAVE_MEMCMPW
-#if !defined(__KERNEL__) && defined(__LIBCCALL_IS_LIBDCALL)
+#if !defined(__KERNEL__) && defined(__LIBCCALL_IS_LIBDCALL) && __SIZEOF_INT__ <= 2
 DEFINE_PUBLIC_ALIAS(DOS$wmemcmp, libc_memcmpw);
-#endif /* !__KERNEL__ && __LIBCCALL_IS_LIBDCALL */
+#endif /* !__KERNEL__ && __LIBCCALL_IS_LIBDCALL && __SIZEOF_INT__ <= 2 */
 DEFINE_PUBLIC_ALIAS(memcmpw, libc_memcmpw);
 #endif /* !LIBC_ARCH_HAVE_MEMCMPW */
 #ifndef LIBC_ARCH_HAVE_MEMCMPL
-#ifndef __KERNEL__
+#if !defined(__KERNEL__) && __SIZEOF_INT__ <= 4
 DEFINE_PUBLIC_ALIAS(wmemcmp, libc_memcmpl);
-#endif /* !__KERNEL__ */
+#endif /* !__KERNEL__ && __SIZEOF_INT__ <= 4 */
 DEFINE_PUBLIC_ALIAS(memcmpl, libc_memcmpl);
 #endif /* !LIBC_ARCH_HAVE_MEMCMPL */
 #ifndef LIBC_ARCH_HAVE_MEMCHRW

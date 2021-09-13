@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x15dfb6b7 */
+/* HASH CRC-32:0x1c5e9b72 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -3279,18 +3279,18 @@ __NAMESPACE_LOCAL_USING_OR_IMPL(getexecname, __FORCELOCAL __ATTR_ARTIFICIAL __AT
 #endif /* __LOCAL_program_invocation_name */
 #endif /* !__CRT_HAVE_getexecname */
 #ifdef __CRT_HAVE_fdwalk
-/* Enumerate all open file descriptors by invoking `(*walk)(arg, <fd>)' for each of them
- * If  during any of these invocations, `(*walk)(...)' returns non-zero, enumeration stops,
- * and `fdwalk()' returns with that same value.  If `(*walk)(...)' is never called, or  all
+/* Enumerate all open file descriptors by  invoking `(*walk)(arg, <fd>)' for each of  them
+ * If during any of these invocations, `(*walk)(...)' returns non-zero, enumeration stops,
+ * and  `fdwalk()' returns with that same value. If `(*walk)(...)' is never called, or all
  * invocations return 0, `fdwalk()' will also return 0. */
 __CDECLARE(__ATTR_NONNULL((1)),int,__THROWING,fdwalk,(int (__LIBCCALL *__walk)(void *__arg, __fd_t __fd), void *__arg),(__walk,__arg))
 #else /* __CRT_HAVE_fdwalk */
 #include <asm/os/fcntl.h>
 #if (defined(__CRT_HAVE_fcntl) || defined(__CRT_HAVE___fcntl)) && defined(__F_NEXT)
 #include <libc/local/stdlib/fdwalk.h>
-/* Enumerate all open file descriptors by invoking `(*walk)(arg, <fd>)' for each of them
- * If  during any of these invocations, `(*walk)(...)' returns non-zero, enumeration stops,
- * and `fdwalk()' returns with that same value.  If `(*walk)(...)' is never called, or  all
+/* Enumerate all open file descriptors by  invoking `(*walk)(arg, <fd>)' for each of  them
+ * If during any of these invocations, `(*walk)(...)' returns non-zero, enumeration stops,
+ * and  `fdwalk()' returns with that same value. If `(*walk)(...)' is never called, or all
  * invocations return 0, `fdwalk()' will also return 0. */
 __NAMESPACE_LOCAL_USING_OR_IMPL(fdwalk, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_NONNULL((1)) int (__LIBCCALL fdwalk)(int (__LIBCCALL *__walk)(void *__arg, __fd_t __fd), void *__arg) __THROWS(...) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(fdwalk))(__walk, __arg); })
 #endif /* (__CRT_HAVE_fcntl || __CRT_HAVE___fcntl) && __F_NEXT */
@@ -5460,118 +5460,162 @@ __CDECLARE(,int,__NOTHROW_RPC,_wsystem,(wchar_t const *__cmd),(__cmd))
 #ifndef __wcstol_defined
 #define __wcstol_defined 1
 #ifdef __std_wcstol_defined
+/* >> wcstol(3) */
 __NAMESPACE_STD_USING(wcstol)
 #elif defined(__CRT_HAVE_wcstol)
+/* >> wcstol(3) */
 __CDECLARE(__ATTR_LEAF __ATTR_NONNULL((1)),long,__NOTHROW_NCX,wcstol,(wchar_t const *__restrict __nptr, wchar_t **__endptr, __STDC_INT_AS_UINT_T __base),(__nptr,__endptr,__base))
 #elif defined(__CRT_HAVE_wcstoll) && __SIZEOF_LONG__ == __SIZEOF_LONG_LONG__
+/* >> wcstol(3) */
 __CREDIRECT(__ATTR_LEAF __ATTR_NONNULL((1)),long,__NOTHROW_NCX,wcstol,(wchar_t const *__restrict __nptr, wchar_t **__endptr, __STDC_INT_AS_UINT_T __base),wcstoll,(__nptr,__endptr,__base))
 #elif defined(__CRT_HAVE_wcstoq) && __SIZEOF_LONG__ == __SIZEOF_LONG_LONG__
+/* >> wcstol(3) */
 __CREDIRECT(__ATTR_LEAF __ATTR_NONNULL((1)),long,__NOTHROW_NCX,wcstol,(wchar_t const *__restrict __nptr, wchar_t **__endptr, __STDC_INT_AS_UINT_T __base),wcstoq,(__nptr,__endptr,__base))
 #elif defined(__CRT_HAVE_wcsto32) && __SIZEOF_LONG__ == 4
+/* >> wcstol(3) */
 __CREDIRECT(__ATTR_LEAF __ATTR_NONNULL((1)),long,__NOTHROW_NCX,wcstol,(wchar_t const *__restrict __nptr, wchar_t **__endptr, __STDC_INT_AS_UINT_T __base),wcsto32,(__nptr,__endptr,__base))
 #elif defined(__CRT_HAVE_wcsto64) && __SIZEOF_LONG__ == 8
+/* >> wcstol(3) */
 __CREDIRECT(__ATTR_LEAF __ATTR_NONNULL((1)),long,__NOTHROW_NCX,wcstol,(wchar_t const *__restrict __nptr, wchar_t **__endptr, __STDC_INT_AS_UINT_T __base),wcsto64,(__nptr,__endptr,__base))
 #elif defined(__CRT_HAVE__wcstoi64) && __SIZEOF_LONG__ == 8
+/* >> wcstol(3) */
 __CREDIRECT(__ATTR_LEAF __ATTR_NONNULL((1)),long,__NOTHROW_NCX,wcstol,(wchar_t const *__restrict __nptr, wchar_t **__endptr, __STDC_INT_AS_UINT_T __base),_wcstoi64,(__nptr,__endptr,__base))
 #elif defined(__CRT_HAVE_wcstoimax) && __SIZEOF_LONG__ == __SIZEOF_INTMAX_T__
+/* >> wcstol(3) */
 __CREDIRECT(__ATTR_LEAF __ATTR_NONNULL((1)),long,__NOTHROW_NCX,wcstol,(wchar_t const *__restrict __nptr, wchar_t **__endptr, __STDC_INT_AS_UINT_T __base),wcstoimax,(__nptr,__endptr,__base))
 #else /* ... */
 #include <libc/local/wchar/wcstol.h>
+/* >> wcstol(3) */
 __NAMESPACE_LOCAL_USING_OR_IMPL(wcstol, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_LEAF __ATTR_NONNULL((1)) long __NOTHROW_NCX(__LIBCCALL wcstol)(wchar_t const *__restrict __nptr, wchar_t **__endptr, __STDC_INT_AS_UINT_T __base) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(wcstol))(__nptr, __endptr, __base); })
 #endif /* !... */
 #endif /* !__wcstol_defined */
 #ifndef __wcstoll_defined
 #define __wcstoll_defined 1
 #ifdef __std_wcstoll_defined
+/* >> wcstoll(3) */
 __NAMESPACE_STD_USING(wcstoll)
 #elif defined(__CRT_HAVE_wcstoll)
+/* >> wcstoll(3) */
 __CDECLARE(__ATTR_LEAF __ATTR_NONNULL((1)),__LONGLONG,__NOTHROW_NCX,wcstoll,(wchar_t const *__restrict __nptr, wchar_t **__endptr, __STDC_INT_AS_UINT_T __base),(__nptr,__endptr,__base))
 #elif defined(__CRT_HAVE_wcstoq)
+/* >> wcstoll(3) */
 __CREDIRECT(__ATTR_LEAF __ATTR_NONNULL((1)),__LONGLONG,__NOTHROW_NCX,wcstoll,(wchar_t const *__restrict __nptr, wchar_t **__endptr, __STDC_INT_AS_UINT_T __base),wcstoq,(__nptr,__endptr,__base))
 #elif defined(__CRT_HAVE_wcstol) && __SIZEOF_LONG_LONG__ == __SIZEOF_LONG__
+/* >> wcstoll(3) */
 __CREDIRECT(__ATTR_LEAF __ATTR_NONNULL((1)),__LONGLONG,__NOTHROW_NCX,wcstoll,(wchar_t const *__restrict __nptr, wchar_t **__endptr, __STDC_INT_AS_UINT_T __base),wcstol,(__nptr,__endptr,__base))
 #elif defined(__CRT_HAVE_wcsto64) && __SIZEOF_LONG_LONG__ == 8
+/* >> wcstoll(3) */
 __CREDIRECT(__ATTR_LEAF __ATTR_NONNULL((1)),__LONGLONG,__NOTHROW_NCX,wcstoll,(wchar_t const *__restrict __nptr, wchar_t **__endptr, __STDC_INT_AS_UINT_T __base),wcsto64,(__nptr,__endptr,__base))
 #elif defined(__CRT_HAVE__wcstoi64) && __SIZEOF_LONG_LONG__ == 8
+/* >> wcstoll(3) */
 __CREDIRECT(__ATTR_LEAF __ATTR_NONNULL((1)),__LONGLONG,__NOTHROW_NCX,wcstoll,(wchar_t const *__restrict __nptr, wchar_t **__endptr, __STDC_INT_AS_UINT_T __base),_wcstoi64,(__nptr,__endptr,__base))
 #elif defined(__CRT_HAVE_wcsto32) && __SIZEOF_LONG_LONG__ == 4
+/* >> wcstoll(3) */
 __CREDIRECT(__ATTR_LEAF __ATTR_NONNULL((1)),__LONGLONG,__NOTHROW_NCX,wcstoll,(wchar_t const *__restrict __nptr, wchar_t **__endptr, __STDC_INT_AS_UINT_T __base),wcsto32,(__nptr,__endptr,__base))
 #elif defined(__CRT_HAVE_wcstoimax) && __SIZEOF_LONG_LONG__ == __SIZEOF_INTMAX_T__
+/* >> wcstoll(3) */
 __CREDIRECT(__ATTR_LEAF __ATTR_NONNULL((1)),__LONGLONG,__NOTHROW_NCX,wcstoll,(wchar_t const *__restrict __nptr, wchar_t **__endptr, __STDC_INT_AS_UINT_T __base),wcstoimax,(__nptr,__endptr,__base))
 #else /* ... */
 #include <libc/local/wchar/wcstoll.h>
+/* >> wcstoll(3) */
 __NAMESPACE_LOCAL_USING_OR_IMPL(wcstoll, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_LEAF __ATTR_NONNULL((1)) __LONGLONG __NOTHROW_NCX(__LIBCCALL wcstoll)(wchar_t const *__restrict __nptr, wchar_t **__endptr, __STDC_INT_AS_UINT_T __base) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(wcstoll))(__nptr, __endptr, __base); })
 #endif /* !... */
 #endif /* !__wcstoll_defined */
 #ifndef __wcstoul_defined
 #define __wcstoul_defined 1
 #ifdef __std_wcstoul_defined
+/* >> wcstoul(3) */
 __NAMESPACE_STD_USING(wcstoul)
 #elif defined(__CRT_HAVE_wcstoul)
+/* >> wcstoul(3) */
 __CDECLARE(__ATTR_LEAF __ATTR_NONNULL((1)),unsigned long,__NOTHROW_NCX,wcstoul,(wchar_t const *__restrict __nptr, wchar_t **__endptr, __STDC_INT_AS_UINT_T __base),(__nptr,__endptr,__base))
 #elif defined(__CRT_HAVE_wcstoull) && __SIZEOF_LONG__ == __SIZEOF_LONG_LONG__
+/* >> wcstoul(3) */
 __CREDIRECT(__ATTR_LEAF __ATTR_NONNULL((1)),unsigned long,__NOTHROW_NCX,wcstoul,(wchar_t const *__restrict __nptr, wchar_t **__endptr, __STDC_INT_AS_UINT_T __base),wcstoull,(__nptr,__endptr,__base))
 #elif defined(__CRT_HAVE_wcstouq) && __SIZEOF_LONG__ == __SIZEOF_LONG_LONG__
+/* >> wcstoul(3) */
 __CREDIRECT(__ATTR_LEAF __ATTR_NONNULL((1)),unsigned long,__NOTHROW_NCX,wcstoul,(wchar_t const *__restrict __nptr, wchar_t **__endptr, __STDC_INT_AS_UINT_T __base),wcstouq,(__nptr,__endptr,__base))
 #elif defined(__CRT_HAVE_wcstou32) && __SIZEOF_LONG__ == 4
+/* >> wcstoul(3) */
 __CREDIRECT(__ATTR_LEAF __ATTR_NONNULL((1)),unsigned long,__NOTHROW_NCX,wcstoul,(wchar_t const *__restrict __nptr, wchar_t **__endptr, __STDC_INT_AS_UINT_T __base),wcstou32,(__nptr,__endptr,__base))
 #elif defined(__CRT_HAVE_wcstou64) && __SIZEOF_LONG__ == 8
+/* >> wcstoul(3) */
 __CREDIRECT(__ATTR_LEAF __ATTR_NONNULL((1)),unsigned long,__NOTHROW_NCX,wcstoul,(wchar_t const *__restrict __nptr, wchar_t **__endptr, __STDC_INT_AS_UINT_T __base),wcstou64,(__nptr,__endptr,__base))
 #elif defined(__CRT_HAVE__wcstoui64) && __SIZEOF_LONG__ == 8
+/* >> wcstoul(3) */
 __CREDIRECT(__ATTR_LEAF __ATTR_NONNULL((1)),unsigned long,__NOTHROW_NCX,wcstoul,(wchar_t const *__restrict __nptr, wchar_t **__endptr, __STDC_INT_AS_UINT_T __base),_wcstoui64,(__nptr,__endptr,__base))
 #elif defined(__CRT_HAVE_wcstoumax) && __SIZEOF_LONG__ == __SIZEOF_INTMAX_T__
+/* >> wcstoul(3) */
 __CREDIRECT(__ATTR_LEAF __ATTR_NONNULL((1)),unsigned long,__NOTHROW_NCX,wcstoul,(wchar_t const *__restrict __nptr, wchar_t **__endptr, __STDC_INT_AS_UINT_T __base),wcstoumax,(__nptr,__endptr,__base))
 #else /* ... */
 #include <libc/local/wchar/wcstoul.h>
+/* >> wcstoul(3) */
 __NAMESPACE_LOCAL_USING_OR_IMPL(wcstoul, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_LEAF __ATTR_NONNULL((1)) unsigned long __NOTHROW_NCX(__LIBCCALL wcstoul)(wchar_t const *__restrict __nptr, wchar_t **__endptr, __STDC_INT_AS_UINT_T __base) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(wcstoul))(__nptr, __endptr, __base); })
 #endif /* !... */
 #endif /* !__wcstoul_defined */
 #ifndef __wcstoull_defined
 #define __wcstoull_defined 1
 #ifdef __std_wcstoull_defined
+/* >> wcstoull(3) */
 __NAMESPACE_STD_USING(wcstoull)
 #elif defined(__CRT_HAVE_wcstoull)
+/* >> wcstoull(3) */
 __CDECLARE(__ATTR_LEAF __ATTR_NONNULL((1)),__ULONGLONG,__NOTHROW_NCX,wcstoull,(wchar_t const *__restrict __nptr, wchar_t **__endptr, __STDC_INT_AS_UINT_T __base),(__nptr,__endptr,__base))
 #elif defined(__CRT_HAVE_wcstouq)
+/* >> wcstoull(3) */
 __CREDIRECT(__ATTR_LEAF __ATTR_NONNULL((1)),__ULONGLONG,__NOTHROW_NCX,wcstoull,(wchar_t const *__restrict __nptr, wchar_t **__endptr, __STDC_INT_AS_UINT_T __base),wcstouq,(__nptr,__endptr,__base))
 #elif defined(__CRT_HAVE_wcstoul) && __SIZEOF_LONG_LONG__ == __SIZEOF_LONG__
+/* >> wcstoull(3) */
 __CREDIRECT(__ATTR_LEAF __ATTR_NONNULL((1)),__ULONGLONG,__NOTHROW_NCX,wcstoull,(wchar_t const *__restrict __nptr, wchar_t **__endptr, __STDC_INT_AS_UINT_T __base),wcstoul,(__nptr,__endptr,__base))
 #elif defined(__CRT_HAVE_wcstou32) && __SIZEOF_LONG_LONG__ == 4
+/* >> wcstoull(3) */
 __CREDIRECT(__ATTR_LEAF __ATTR_NONNULL((1)),__ULONGLONG,__NOTHROW_NCX,wcstoull,(wchar_t const *__restrict __nptr, wchar_t **__endptr, __STDC_INT_AS_UINT_T __base),wcstou32,(__nptr,__endptr,__base))
 #elif defined(__CRT_HAVE_wcstou64) && __SIZEOF_LONG_LONG__ == 8
+/* >> wcstoull(3) */
 __CREDIRECT(__ATTR_LEAF __ATTR_NONNULL((1)),__ULONGLONG,__NOTHROW_NCX,wcstoull,(wchar_t const *__restrict __nptr, wchar_t **__endptr, __STDC_INT_AS_UINT_T __base),wcstou64,(__nptr,__endptr,__base))
 #elif defined(__CRT_HAVE__wcstoui64) && __SIZEOF_LONG_LONG__ == 8
+/* >> wcstoull(3) */
 __CREDIRECT(__ATTR_LEAF __ATTR_NONNULL((1)),__ULONGLONG,__NOTHROW_NCX,wcstoull,(wchar_t const *__restrict __nptr, wchar_t **__endptr, __STDC_INT_AS_UINT_T __base),_wcstoui64,(__nptr,__endptr,__base))
 #elif defined(__CRT_HAVE_wcstoumax) && __SIZEOF_LONG_LONG__ == __SIZEOF_INTMAX_T__
+/* >> wcstoull(3) */
 __CREDIRECT(__ATTR_LEAF __ATTR_NONNULL((1)),__ULONGLONG,__NOTHROW_NCX,wcstoull,(wchar_t const *__restrict __nptr, wchar_t **__endptr, __STDC_INT_AS_UINT_T __base),wcstoumax,(__nptr,__endptr,__base))
 #else /* ... */
 #include <libc/local/wchar/wcstoull.h>
+/* >> wcstoull(3) */
 __NAMESPACE_LOCAL_USING_OR_IMPL(wcstoull, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_LEAF __ATTR_NONNULL((1)) __ULONGLONG __NOTHROW_NCX(__LIBCCALL wcstoull)(wchar_t const *__restrict __nptr, wchar_t **__endptr, __STDC_INT_AS_UINT_T __base) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(wcstoull))(__nptr, __endptr, __base); })
 #endif /* !... */
 #endif /* !__wcstoull_defined */
 #ifndef ___wcstol_l_defined
 #define ___wcstol_l_defined 1
 #ifdef __CRT_HAVE_wcstol_l
+/* >> wcstol_l(3) */
 __CREDIRECT(__ATTR_NONNULL((1)),long,__NOTHROW_NCX,_wcstol_l,(wchar_t const *__restrict __nptr, wchar_t **__endptr, __STDC_INT_AS_UINT_T __base, __locale_t __locale),wcstol_l,(__nptr,__endptr,__base,__locale))
 #elif defined(__CRT_HAVE__wcstol_l)
+/* >> wcstol_l(3) */
 __CDECLARE(__ATTR_NONNULL((1)),long,__NOTHROW_NCX,_wcstol_l,(wchar_t const *__restrict __nptr, wchar_t **__endptr, __STDC_INT_AS_UINT_T __base, __locale_t __locale),(__nptr,__endptr,__base,__locale))
 #elif defined(__CRT_HAVE___wcstol_l)
+/* >> wcstol_l(3) */
 __CREDIRECT(__ATTR_NONNULL((1)),long,__NOTHROW_NCX,_wcstol_l,(wchar_t const *__restrict __nptr, wchar_t **__endptr, __STDC_INT_AS_UINT_T __base, __locale_t __locale),__wcstol_l,(__nptr,__endptr,__base,__locale))
 #else /* ... */
 #include <libc/local/wchar/wcstol_l.h>
+/* >> wcstol_l(3) */
 __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_NONNULL((1)) long __NOTHROW_NCX(__LIBCCALL _wcstol_l)(wchar_t const *__restrict __nptr, wchar_t **__endptr, __STDC_INT_AS_UINT_T __base, __locale_t __locale) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(wcstol_l))(__nptr, __endptr, __base, __locale); }
 #endif /* !... */
 #endif /* !___wcstol_l_defined */
 #ifndef ___wcstoul_l_defined
 #define ___wcstoul_l_defined 1
 #ifdef __CRT_HAVE_wcstoul_l
+/* >> wcstoul_l(3) */
 __CREDIRECT(__ATTR_NONNULL((1)),unsigned long,__NOTHROW_NCX,_wcstoul_l,(wchar_t const *__restrict __nptr, wchar_t **__endptr, __STDC_INT_AS_UINT_T __base, __locale_t __locale),wcstoul_l,(__nptr,__endptr,__base,__locale))
 #elif defined(__CRT_HAVE__wcstoul_l)
+/* >> wcstoul_l(3) */
 __CDECLARE(__ATTR_NONNULL((1)),unsigned long,__NOTHROW_NCX,_wcstoul_l,(wchar_t const *__restrict __nptr, wchar_t **__endptr, __STDC_INT_AS_UINT_T __base, __locale_t __locale),(__nptr,__endptr,__base,__locale))
 #elif defined(__CRT_HAVE___wcstoul_l)
+/* >> wcstoul_l(3) */
 __CREDIRECT(__ATTR_NONNULL((1)),unsigned long,__NOTHROW_NCX,_wcstoul_l,(wchar_t const *__restrict __nptr, wchar_t **__endptr, __STDC_INT_AS_UINT_T __base, __locale_t __locale),__wcstoul_l,(__nptr,__endptr,__base,__locale))
 #else /* ... */
 #include <libc/local/wchar/wcstoul_l.h>
+/* >> wcstoul_l(3) */
 __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_NONNULL((1)) unsigned long __NOTHROW_NCX(__LIBCCALL _wcstoul_l)(wchar_t const *__restrict __nptr, wchar_t **__endptr, __STDC_INT_AS_UINT_T __base, __locale_t __locale) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(wcstoul_l))(__nptr, __endptr, __base, __locale); }
 #endif /* !... */
 #endif /* !___wcstoul_l_defined */
@@ -5579,48 +5623,62 @@ __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_NONNULL((1)) unsigned long __NOTHROW_NCX(_
 #ifndef __wcstof_defined
 #define __wcstof_defined 1
 #ifdef __std_wcstof_defined
+/* >> wcstof(3) */
 __NAMESPACE_STD_USING(wcstof)
 #elif defined(__CRT_HAVE_wcstof)
+/* >> wcstof(3) */
 __CDECLARE(__ATTR_LEAF __ATTR_NONNULL((1)),float,__NOTHROW_NCX,wcstof,(wchar_t const *__restrict __nptr, wchar_t **__endptr),(__nptr,__endptr))
 #else /* ... */
 #include <libc/local/wchar/wcstof.h>
+/* >> wcstof(3) */
 __NAMESPACE_LOCAL_USING_OR_IMPL(wcstof, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_LEAF __ATTR_NONNULL((1)) float __NOTHROW_NCX(__LIBCCALL wcstof)(wchar_t const *__restrict __nptr, wchar_t **__endptr) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(wcstof))(__nptr, __endptr); })
 #endif /* !... */
 #endif /* !__wcstof_defined */
 #ifndef __wcstod_defined
 #define __wcstod_defined 1
 #ifdef __std_wcstod_defined
+/* >> wcstod(3) */
 __NAMESPACE_STD_USING(wcstod)
 #elif defined(__CRT_HAVE_wcstod)
+/* >> wcstod(3) */
 __CDECLARE(__ATTR_LEAF __ATTR_NONNULL((1)),double,__NOTHROW_NCX,wcstod,(wchar_t const *__restrict __nptr, wchar_t **__endptr),(__nptr,__endptr))
 #else /* ... */
 #include <libc/local/wchar/wcstod.h>
+/* >> wcstod(3) */
 __NAMESPACE_LOCAL_USING_OR_IMPL(wcstod, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_LEAF __ATTR_NONNULL((1)) double __NOTHROW_NCX(__LIBCCALL wcstod)(wchar_t const *__restrict __nptr, wchar_t **__endptr) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(wcstod))(__nptr, __endptr); })
 #endif /* !... */
 #endif /* !__wcstod_defined */
 #ifndef ___wcstof_l_defined
 #define ___wcstof_l_defined 1
 #ifdef __CRT_HAVE_wcstof_l
+/* >> wcstof_l(3) */
 __CREDIRECT(__ATTR_NONNULL((1)),float,__NOTHROW_NCX,_wcstof_l,(wchar_t const *__restrict __nptr, wchar_t **__endptr, __locale_t __locale),wcstof_l,(__nptr,__endptr,__locale))
 #elif defined(__CRT_HAVE__wcstof_l)
+/* >> wcstof_l(3) */
 __CDECLARE(__ATTR_NONNULL((1)),float,__NOTHROW_NCX,_wcstof_l,(wchar_t const *__restrict __nptr, wchar_t **__endptr, __locale_t __locale),(__nptr,__endptr,__locale))
 #elif defined(__CRT_HAVE___wcstof_l)
+/* >> wcstof_l(3) */
 __CREDIRECT(__ATTR_NONNULL((1)),float,__NOTHROW_NCX,_wcstof_l,(wchar_t const *__restrict __nptr, wchar_t **__endptr, __locale_t __locale),__wcstof_l,(__nptr,__endptr,__locale))
 #else /* ... */
 #include <libc/local/wchar/wcstof_l.h>
+/* >> wcstof_l(3) */
 __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_NONNULL((1)) float __NOTHROW_NCX(__LIBCCALL _wcstof_l)(wchar_t const *__restrict __nptr, wchar_t **__endptr, __locale_t __locale) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(wcstof_l))(__nptr, __endptr, __locale); }
 #endif /* !... */
 #endif /* !___wcstof_l_defined */
 #ifndef ___wcstod_l_defined
 #define ___wcstod_l_defined 1
 #ifdef __CRT_HAVE_wcstod_l
+/* >> wcstod_l(3) */
 __CREDIRECT(__ATTR_NONNULL((1)),double,__NOTHROW_NCX,_wcstod_l,(wchar_t const *__restrict __nptr, wchar_t **__endptr, __locale_t __locale),wcstod_l,(__nptr,__endptr,__locale))
 #elif defined(__CRT_HAVE__wcstod_l)
+/* >> wcstod_l(3) */
 __CDECLARE(__ATTR_NONNULL((1)),double,__NOTHROW_NCX,_wcstod_l,(wchar_t const *__restrict __nptr, wchar_t **__endptr, __locale_t __locale),(__nptr,__endptr,__locale))
 #elif defined(__CRT_HAVE___wcstod_l)
+/* >> wcstod_l(3) */
 __CREDIRECT(__ATTR_NONNULL((1)),double,__NOTHROW_NCX,_wcstod_l,(wchar_t const *__restrict __nptr, wchar_t **__endptr, __locale_t __locale),__wcstod_l,(__nptr,__endptr,__locale))
 #else /* ... */
 #include <libc/local/wchar/wcstod_l.h>
+/* >> wcstod_l(3) */
 __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_NONNULL((1)) double __NOTHROW_NCX(__LIBCCALL _wcstod_l)(wchar_t const *__restrict __nptr, wchar_t **__endptr, __locale_t __locale) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(wcstod_l))(__nptr, __endptr, __locale); }
 #endif /* !... */
 #endif /* !___wcstod_l_defined */
@@ -5628,24 +5686,31 @@ __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_NONNULL((1)) double __NOTHROW_NCX(__LIBCCA
 #ifndef __wcstold_defined
 #define __wcstold_defined 1
 #ifdef __std_wcstold_defined
+/* >> wcstold(3) */
 __NAMESPACE_STD_USING(wcstold)
 #elif defined(__CRT_HAVE_wcstold)
+/* >> wcstold(3) */
 __CDECLARE(__ATTR_LEAF __ATTR_NONNULL((1)),__LONGDOUBLE,__NOTHROW_NCX,wcstold,(wchar_t const *__restrict __nptr, wchar_t **__endptr),(__nptr,__endptr))
 #else /* ... */
 #include <libc/local/wchar/wcstold.h>
+/* >> wcstold(3) */
 __NAMESPACE_LOCAL_USING_OR_IMPL(wcstold, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_LEAF __ATTR_NONNULL((1)) __LONGDOUBLE __NOTHROW_NCX(__LIBCCALL wcstold)(wchar_t const *__restrict __nptr, wchar_t **__endptr) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(wcstold))(__nptr, __endptr); })
 #endif /* !... */
 #endif /* !__wcstold_defined */
 #ifndef ___wcstold_l_defined
 #define ___wcstold_l_defined 1
 #ifdef __CRT_HAVE_wcstold_l
+/* >> wcstold_l(3) */
 __CREDIRECT(__ATTR_NONNULL((1)),__LONGDOUBLE,__NOTHROW_NCX,_wcstold_l,(wchar_t const *__restrict __nptr, wchar_t **__endptr, __locale_t __locale),wcstold_l,(__nptr,__endptr,__locale))
 #elif defined(__CRT_HAVE__wcstold_l)
+/* >> wcstold_l(3) */
 __CDECLARE(__ATTR_NONNULL((1)),__LONGDOUBLE,__NOTHROW_NCX,_wcstold_l,(wchar_t const *__restrict __nptr, wchar_t **__endptr, __locale_t __locale),(__nptr,__endptr,__locale))
 #elif defined(__CRT_HAVE___wcstold_l)
+/* >> wcstold_l(3) */
 __CREDIRECT(__ATTR_NONNULL((1)),__LONGDOUBLE,__NOTHROW_NCX,_wcstold_l,(wchar_t const *__restrict __nptr, wchar_t **__endptr, __locale_t __locale),__wcstold_l,(__nptr,__endptr,__locale))
 #else /* ... */
 #include <libc/local/wchar/wcstold_l.h>
+/* >> wcstold_l(3) */
 __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_NONNULL((1)) __LONGDOUBLE __NOTHROW_NCX(__LIBCCALL _wcstold_l)(wchar_t const *__restrict __nptr, wchar_t **__endptr, __locale_t __locale) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(wcstold_l))(__nptr, __endptr, __locale); }
 #endif /* !... */
 #endif /* !___wcstold_l_defined */
@@ -5819,248 +5884,52 @@ __NAMESPACE_LOCAL_USING_OR_IMPL(_wtoi64, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_P
 #ifndef ___wcstoi64_defined
 #define ___wcstoi64_defined 1
 #ifdef __CRT_HAVE_wcsto64
-/* >> strto32(3), strto64(3), strtou32(3), strtou64(3)
- * Convert a string  (radix=`base') from `nptr'  into an  integer,
- * and store a  pointer to  the end  of the  number in  `*endptr'.
- * If `errno(3)' support is available, integer overflow is handled
- * by setting `errno=ERANGE', and returning the greatest or lowest
- * valid   integer   (`U?INTn_(MIN|MAX))'.   (though   note   that
- * `endptr'  (if  non-NULL)  is  still  updated  in  this   case!)
- * Upon success, `errno' is left  unchanged, and the integer  repr
- * of the parsed number is  returned. When no integer was  parsed,
- * then `0' is returned, `*endptr'  is set to `nptr', but  `errno'
- * will not have been modified.
- * @return: * :         Success: The parsed integer
- * @return: 0 :         [*endptr=nptr] error: Nothing was parsed
- * @return: INTn_MIN:   [errno=ERANGE] error: Value to low to represent
- * @return: U?INTn_MAX: [errno=ERANGE] error: Value to great to represent */
+/* >> wcsto64(3) */
 __CREDIRECT(__ATTR_LEAF __ATTR_NONNULL((1)),__INT64_TYPE__,__NOTHROW_NCX,_wcstoi64,(wchar_t const *__restrict __nptr, wchar_t **__endptr, __STDC_INT_AS_UINT_T __base),wcsto64,(__nptr,__endptr,__base))
 #elif defined(__CRT_HAVE__wcstoi64)
-/* >> strto32(3), strto64(3), strtou32(3), strtou64(3)
- * Convert a string  (radix=`base') from `nptr'  into an  integer,
- * and store a  pointer to  the end  of the  number in  `*endptr'.
- * If `errno(3)' support is available, integer overflow is handled
- * by setting `errno=ERANGE', and returning the greatest or lowest
- * valid   integer   (`U?INTn_(MIN|MAX))'.   (though   note   that
- * `endptr'  (if  non-NULL)  is  still  updated  in  this   case!)
- * Upon success, `errno' is left  unchanged, and the integer  repr
- * of the parsed number is  returned. When no integer was  parsed,
- * then `0' is returned, `*endptr'  is set to `nptr', but  `errno'
- * will not have been modified.
- * @return: * :         Success: The parsed integer
- * @return: 0 :         [*endptr=nptr] error: Nothing was parsed
- * @return: INTn_MIN:   [errno=ERANGE] error: Value to low to represent
- * @return: U?INTn_MAX: [errno=ERANGE] error: Value to great to represent */
+/* >> wcsto64(3) */
 __CDECLARE(__ATTR_LEAF __ATTR_NONNULL((1)),__INT64_TYPE__,__NOTHROW_NCX,_wcstoi64,(wchar_t const *__restrict __nptr, wchar_t **__endptr, __STDC_INT_AS_UINT_T __base),(__nptr,__endptr,__base))
 #elif defined(__CRT_HAVE_wcstol) && __SIZEOF_LONG__ == 8
-/* >> strto32(3), strto64(3), strtou32(3), strtou64(3)
- * Convert a string  (radix=`base') from `nptr'  into an  integer,
- * and store a  pointer to  the end  of the  number in  `*endptr'.
- * If `errno(3)' support is available, integer overflow is handled
- * by setting `errno=ERANGE', and returning the greatest or lowest
- * valid   integer   (`U?INTn_(MIN|MAX))'.   (though   note   that
- * `endptr'  (if  non-NULL)  is  still  updated  in  this   case!)
- * Upon success, `errno' is left  unchanged, and the integer  repr
- * of the parsed number is  returned. When no integer was  parsed,
- * then `0' is returned, `*endptr'  is set to `nptr', but  `errno'
- * will not have been modified.
- * @return: * :         Success: The parsed integer
- * @return: 0 :         [*endptr=nptr] error: Nothing was parsed
- * @return: INTn_MIN:   [errno=ERANGE] error: Value to low to represent
- * @return: U?INTn_MAX: [errno=ERANGE] error: Value to great to represent */
+/* >> wcsto64(3) */
 __CREDIRECT(__ATTR_LEAF __ATTR_NONNULL((1)),__INT64_TYPE__,__NOTHROW_NCX,_wcstoi64,(wchar_t const *__restrict __nptr, wchar_t **__endptr, __STDC_INT_AS_UINT_T __base),wcstol,(__nptr,__endptr,__base))
 #elif defined(__CRT_HAVE_wcstoll) && __SIZEOF_LONG_LONG__ == 8
-/* >> strto32(3), strto64(3), strtou32(3), strtou64(3)
- * Convert a string  (radix=`base') from `nptr'  into an  integer,
- * and store a  pointer to  the end  of the  number in  `*endptr'.
- * If `errno(3)' support is available, integer overflow is handled
- * by setting `errno=ERANGE', and returning the greatest or lowest
- * valid   integer   (`U?INTn_(MIN|MAX))'.   (though   note   that
- * `endptr'  (if  non-NULL)  is  still  updated  in  this   case!)
- * Upon success, `errno' is left  unchanged, and the integer  repr
- * of the parsed number is  returned. When no integer was  parsed,
- * then `0' is returned, `*endptr'  is set to `nptr', but  `errno'
- * will not have been modified.
- * @return: * :         Success: The parsed integer
- * @return: 0 :         [*endptr=nptr] error: Nothing was parsed
- * @return: INTn_MIN:   [errno=ERANGE] error: Value to low to represent
- * @return: U?INTn_MAX: [errno=ERANGE] error: Value to great to represent */
+/* >> wcsto64(3) */
 __CREDIRECT(__ATTR_LEAF __ATTR_NONNULL((1)),__INT64_TYPE__,__NOTHROW_NCX,_wcstoi64,(wchar_t const *__restrict __nptr, wchar_t **__endptr, __STDC_INT_AS_UINT_T __base),wcstoll,(__nptr,__endptr,__base))
 #elif defined(__CRT_HAVE_wcstoq) && __SIZEOF_LONG_LONG__ == 8
-/* >> strto32(3), strto64(3), strtou32(3), strtou64(3)
- * Convert a string  (radix=`base') from `nptr'  into an  integer,
- * and store a  pointer to  the end  of the  number in  `*endptr'.
- * If `errno(3)' support is available, integer overflow is handled
- * by setting `errno=ERANGE', and returning the greatest or lowest
- * valid   integer   (`U?INTn_(MIN|MAX))'.   (though   note   that
- * `endptr'  (if  non-NULL)  is  still  updated  in  this   case!)
- * Upon success, `errno' is left  unchanged, and the integer  repr
- * of the parsed number is  returned. When no integer was  parsed,
- * then `0' is returned, `*endptr'  is set to `nptr', but  `errno'
- * will not have been modified.
- * @return: * :         Success: The parsed integer
- * @return: 0 :         [*endptr=nptr] error: Nothing was parsed
- * @return: INTn_MIN:   [errno=ERANGE] error: Value to low to represent
- * @return: U?INTn_MAX: [errno=ERANGE] error: Value to great to represent */
+/* >> wcsto64(3) */
 __CREDIRECT(__ATTR_LEAF __ATTR_NONNULL((1)),__INT64_TYPE__,__NOTHROW_NCX,_wcstoi64,(wchar_t const *__restrict __nptr, wchar_t **__endptr, __STDC_INT_AS_UINT_T __base),wcstoq,(__nptr,__endptr,__base))
 #elif defined(__CRT_HAVE_wcstoimax) && __SIZEOF_INTMAX_T__ == 8
-/* >> strto32(3), strto64(3), strtou32(3), strtou64(3)
- * Convert a string  (radix=`base') from `nptr'  into an  integer,
- * and store a  pointer to  the end  of the  number in  `*endptr'.
- * If `errno(3)' support is available, integer overflow is handled
- * by setting `errno=ERANGE', and returning the greatest or lowest
- * valid   integer   (`U?INTn_(MIN|MAX))'.   (though   note   that
- * `endptr'  (if  non-NULL)  is  still  updated  in  this   case!)
- * Upon success, `errno' is left  unchanged, and the integer  repr
- * of the parsed number is  returned. When no integer was  parsed,
- * then `0' is returned, `*endptr'  is set to `nptr', but  `errno'
- * will not have been modified.
- * @return: * :         Success: The parsed integer
- * @return: 0 :         [*endptr=nptr] error: Nothing was parsed
- * @return: INTn_MIN:   [errno=ERANGE] error: Value to low to represent
- * @return: U?INTn_MAX: [errno=ERANGE] error: Value to great to represent */
+/* >> wcsto64(3) */
 __CREDIRECT(__ATTR_LEAF __ATTR_NONNULL((1)),__INT64_TYPE__,__NOTHROW_NCX,_wcstoi64,(wchar_t const *__restrict __nptr, wchar_t **__endptr, __STDC_INT_AS_UINT_T __base),wcstoimax,(__nptr,__endptr,__base))
 #else /* ... */
 #include <libc/local/wchar/wcsto64.h>
-/* >> strto32(3), strto64(3), strtou32(3), strtou64(3)
- * Convert a string  (radix=`base') from `nptr'  into an  integer,
- * and store a  pointer to  the end  of the  number in  `*endptr'.
- * If `errno(3)' support is available, integer overflow is handled
- * by setting `errno=ERANGE', and returning the greatest or lowest
- * valid   integer   (`U?INTn_(MIN|MAX))'.   (though   note   that
- * `endptr'  (if  non-NULL)  is  still  updated  in  this   case!)
- * Upon success, `errno' is left  unchanged, and the integer  repr
- * of the parsed number is  returned. When no integer was  parsed,
- * then `0' is returned, `*endptr'  is set to `nptr', but  `errno'
- * will not have been modified.
- * @return: * :         Success: The parsed integer
- * @return: 0 :         [*endptr=nptr] error: Nothing was parsed
- * @return: INTn_MIN:   [errno=ERANGE] error: Value to low to represent
- * @return: U?INTn_MAX: [errno=ERANGE] error: Value to great to represent */
+/* >> wcsto64(3) */
 __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_LEAF __ATTR_NONNULL((1)) __INT64_TYPE__ __NOTHROW_NCX(__LIBCCALL _wcstoi64)(wchar_t const *__restrict __nptr, wchar_t **__endptr, __STDC_INT_AS_UINT_T __base) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(wcsto64))(__nptr, __endptr, __base); }
 #endif /* !... */
 #endif /* !___wcstoi64_defined */
 #ifndef ___wcstoui64_defined
 #define ___wcstoui64_defined 1
 #ifdef __CRT_HAVE_wcstou64
-/* >> strto32(3), strto64(3), strtou32(3), strtou64(3)
- * Convert a string  (radix=`base') from `nptr'  into an  integer,
- * and store a  pointer to  the end  of the  number in  `*endptr'.
- * If `errno(3)' support is available, integer overflow is handled
- * by setting `errno=ERANGE', and returning the greatest or lowest
- * valid   integer   (`U?INTn_(MIN|MAX))'.   (though   note   that
- * `endptr'  (if  non-NULL)  is  still  updated  in  this   case!)
- * Upon success, `errno' is left  unchanged, and the integer  repr
- * of the parsed number is  returned. When no integer was  parsed,
- * then `0' is returned, `*endptr'  is set to `nptr', but  `errno'
- * will not have been modified.
- * @return: * :         Success: The parsed integer
- * @return: 0 :         [*endptr=nptr] error: Nothing was parsed
- * @return: INTn_MIN:   [errno=ERANGE] error: Value to low to represent
- * @return: U?INTn_MAX: [errno=ERANGE] error: Value to great to represent */
+/* >> wcstou64(3) */
 __CREDIRECT(__ATTR_LEAF __ATTR_NONNULL((1)),__UINT64_TYPE__,__NOTHROW_NCX,_wcstoui64,(wchar_t const *__restrict __nptr, wchar_t **__endptr, __STDC_INT_AS_UINT_T __base),wcstou64,(__nptr,__endptr,__base))
 #elif defined(__CRT_HAVE__wcstoui64)
-/* >> strto32(3), strto64(3), strtou32(3), strtou64(3)
- * Convert a string  (radix=`base') from `nptr'  into an  integer,
- * and store a  pointer to  the end  of the  number in  `*endptr'.
- * If `errno(3)' support is available, integer overflow is handled
- * by setting `errno=ERANGE', and returning the greatest or lowest
- * valid   integer   (`U?INTn_(MIN|MAX))'.   (though   note   that
- * `endptr'  (if  non-NULL)  is  still  updated  in  this   case!)
- * Upon success, `errno' is left  unchanged, and the integer  repr
- * of the parsed number is  returned. When no integer was  parsed,
- * then `0' is returned, `*endptr'  is set to `nptr', but  `errno'
- * will not have been modified.
- * @return: * :         Success: The parsed integer
- * @return: 0 :         [*endptr=nptr] error: Nothing was parsed
- * @return: INTn_MIN:   [errno=ERANGE] error: Value to low to represent
- * @return: U?INTn_MAX: [errno=ERANGE] error: Value to great to represent */
+/* >> wcstou64(3) */
 __CDECLARE(__ATTR_LEAF __ATTR_NONNULL((1)),__UINT64_TYPE__,__NOTHROW_NCX,_wcstoui64,(wchar_t const *__restrict __nptr, wchar_t **__endptr, __STDC_INT_AS_UINT_T __base),(__nptr,__endptr,__base))
 #elif defined(__CRT_HAVE_wcstoul) && __SIZEOF_LONG__ == 8
-/* >> strto32(3), strto64(3), strtou32(3), strtou64(3)
- * Convert a string  (radix=`base') from `nptr'  into an  integer,
- * and store a  pointer to  the end  of the  number in  `*endptr'.
- * If `errno(3)' support is available, integer overflow is handled
- * by setting `errno=ERANGE', and returning the greatest or lowest
- * valid   integer   (`U?INTn_(MIN|MAX))'.   (though   note   that
- * `endptr'  (if  non-NULL)  is  still  updated  in  this   case!)
- * Upon success, `errno' is left  unchanged, and the integer  repr
- * of the parsed number is  returned. When no integer was  parsed,
- * then `0' is returned, `*endptr'  is set to `nptr', but  `errno'
- * will not have been modified.
- * @return: * :         Success: The parsed integer
- * @return: 0 :         [*endptr=nptr] error: Nothing was parsed
- * @return: INTn_MIN:   [errno=ERANGE] error: Value to low to represent
- * @return: U?INTn_MAX: [errno=ERANGE] error: Value to great to represent */
+/* >> wcstou64(3) */
 __CREDIRECT(__ATTR_LEAF __ATTR_NONNULL((1)),__UINT64_TYPE__,__NOTHROW_NCX,_wcstoui64,(wchar_t const *__restrict __nptr, wchar_t **__endptr, __STDC_INT_AS_UINT_T __base),wcstoul,(__nptr,__endptr,__base))
 #elif defined(__CRT_HAVE_wcstoull) && __SIZEOF_LONG_LONG__ == 8
-/* >> strto32(3), strto64(3), strtou32(3), strtou64(3)
- * Convert a string  (radix=`base') from `nptr'  into an  integer,
- * and store a  pointer to  the end  of the  number in  `*endptr'.
- * If `errno(3)' support is available, integer overflow is handled
- * by setting `errno=ERANGE', and returning the greatest or lowest
- * valid   integer   (`U?INTn_(MIN|MAX))'.   (though   note   that
- * `endptr'  (if  non-NULL)  is  still  updated  in  this   case!)
- * Upon success, `errno' is left  unchanged, and the integer  repr
- * of the parsed number is  returned. When no integer was  parsed,
- * then `0' is returned, `*endptr'  is set to `nptr', but  `errno'
- * will not have been modified.
- * @return: * :         Success: The parsed integer
- * @return: 0 :         [*endptr=nptr] error: Nothing was parsed
- * @return: INTn_MIN:   [errno=ERANGE] error: Value to low to represent
- * @return: U?INTn_MAX: [errno=ERANGE] error: Value to great to represent */
+/* >> wcstou64(3) */
 __CREDIRECT(__ATTR_LEAF __ATTR_NONNULL((1)),__UINT64_TYPE__,__NOTHROW_NCX,_wcstoui64,(wchar_t const *__restrict __nptr, wchar_t **__endptr, __STDC_INT_AS_UINT_T __base),wcstoull,(__nptr,__endptr,__base))
 #elif defined(__CRT_HAVE_wcstouq) && __SIZEOF_LONG_LONG__ == 8
-/* >> strto32(3), strto64(3), strtou32(3), strtou64(3)
- * Convert a string  (radix=`base') from `nptr'  into an  integer,
- * and store a  pointer to  the end  of the  number in  `*endptr'.
- * If `errno(3)' support is available, integer overflow is handled
- * by setting `errno=ERANGE', and returning the greatest or lowest
- * valid   integer   (`U?INTn_(MIN|MAX))'.   (though   note   that
- * `endptr'  (if  non-NULL)  is  still  updated  in  this   case!)
- * Upon success, `errno' is left  unchanged, and the integer  repr
- * of the parsed number is  returned. When no integer was  parsed,
- * then `0' is returned, `*endptr'  is set to `nptr', but  `errno'
- * will not have been modified.
- * @return: * :         Success: The parsed integer
- * @return: 0 :         [*endptr=nptr] error: Nothing was parsed
- * @return: INTn_MIN:   [errno=ERANGE] error: Value to low to represent
- * @return: U?INTn_MAX: [errno=ERANGE] error: Value to great to represent */
+/* >> wcstou64(3) */
 __CREDIRECT(__ATTR_LEAF __ATTR_NONNULL((1)),__UINT64_TYPE__,__NOTHROW_NCX,_wcstoui64,(wchar_t const *__restrict __nptr, wchar_t **__endptr, __STDC_INT_AS_UINT_T __base),wcstouq,(__nptr,__endptr,__base))
 #elif defined(__CRT_HAVE_wcstoumax) && __SIZEOF_INTMAX_T__ == 8
-/* >> strto32(3), strto64(3), strtou32(3), strtou64(3)
- * Convert a string  (radix=`base') from `nptr'  into an  integer,
- * and store a  pointer to  the end  of the  number in  `*endptr'.
- * If `errno(3)' support is available, integer overflow is handled
- * by setting `errno=ERANGE', and returning the greatest or lowest
- * valid   integer   (`U?INTn_(MIN|MAX))'.   (though   note   that
- * `endptr'  (if  non-NULL)  is  still  updated  in  this   case!)
- * Upon success, `errno' is left  unchanged, and the integer  repr
- * of the parsed number is  returned. When no integer was  parsed,
- * then `0' is returned, `*endptr'  is set to `nptr', but  `errno'
- * will not have been modified.
- * @return: * :         Success: The parsed integer
- * @return: 0 :         [*endptr=nptr] error: Nothing was parsed
- * @return: INTn_MIN:   [errno=ERANGE] error: Value to low to represent
- * @return: U?INTn_MAX: [errno=ERANGE] error: Value to great to represent */
+/* >> wcstou64(3) */
 __CREDIRECT(__ATTR_LEAF __ATTR_NONNULL((1)),__UINT64_TYPE__,__NOTHROW_NCX,_wcstoui64,(wchar_t const *__restrict __nptr, wchar_t **__endptr, __STDC_INT_AS_UINT_T __base),wcstoumax,(__nptr,__endptr,__base))
 #else /* ... */
 #include <libc/local/wchar/wcstou64.h>
-/* >> strto32(3), strto64(3), strtou32(3), strtou64(3)
- * Convert a string  (radix=`base') from `nptr'  into an  integer,
- * and store a  pointer to  the end  of the  number in  `*endptr'.
- * If `errno(3)' support is available, integer overflow is handled
- * by setting `errno=ERANGE', and returning the greatest or lowest
- * valid   integer   (`U?INTn_(MIN|MAX))'.   (though   note   that
- * `endptr'  (if  non-NULL)  is  still  updated  in  this   case!)
- * Upon success, `errno' is left  unchanged, and the integer  repr
- * of the parsed number is  returned. When no integer was  parsed,
- * then `0' is returned, `*endptr'  is set to `nptr', but  `errno'
- * will not have been modified.
- * @return: * :         Success: The parsed integer
- * @return: 0 :         [*endptr=nptr] error: Nothing was parsed
- * @return: INTn_MIN:   [errno=ERANGE] error: Value to low to represent
- * @return: U?INTn_MAX: [errno=ERANGE] error: Value to great to represent */
+/* >> wcstou64(3) */
 __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_LEAF __ATTR_NONNULL((1)) __UINT64_TYPE__ __NOTHROW_NCX(__LIBCCALL _wcstoui64)(wchar_t const *__restrict __nptr, wchar_t **__endptr, __STDC_INT_AS_UINT_T __base) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(wcstou64))(__nptr, __endptr, __base); }
 #endif /* !... */
 #endif /* !___wcstoui64_defined */
@@ -6112,58 +5981,82 @@ __NAMESPACE_LOCAL_USING_OR_IMPL(_wtoi64_l, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR
 #ifndef ___wcstoi64_l_defined
 #define ___wcstoi64_l_defined 1
 #ifdef __CRT_HAVE_wcsto64_l
+/* >> wcsto64_l(3) */
 __CREDIRECT(__ATTR_LEAF __ATTR_NONNULL((1)),__INT64_TYPE__,__NOTHROW_NCX,_wcstoi64_l,(wchar_t const *__restrict __nptr, wchar_t **__endptr, __STDC_INT_AS_UINT_T __base, __locale_t __locale),wcsto64_l,(__nptr,__endptr,__base,__locale))
 #elif defined(__CRT_HAVE__wcstoi64_l)
+/* >> wcsto64_l(3) */
 __CDECLARE(__ATTR_LEAF __ATTR_NONNULL((1)),__INT64_TYPE__,__NOTHROW_NCX,_wcstoi64_l,(wchar_t const *__restrict __nptr, wchar_t **__endptr, __STDC_INT_AS_UINT_T __base, __locale_t __locale),(__nptr,__endptr,__base,__locale))
 #elif defined(__CRT_HAVE_wcstol_l) && __SIZEOF_LONG__ == 8
+/* >> wcsto64_l(3) */
 __CREDIRECT(__ATTR_LEAF __ATTR_NONNULL((1)),__INT64_TYPE__,__NOTHROW_NCX,_wcstoi64_l,(wchar_t const *__restrict __nptr, wchar_t **__endptr, __STDC_INT_AS_UINT_T __base, __locale_t __locale),wcstol_l,(__nptr,__endptr,__base,__locale))
 #elif defined(__CRT_HAVE__wcstol_l) && __SIZEOF_LONG__ == 8
+/* >> wcsto64_l(3) */
 __CREDIRECT(__ATTR_LEAF __ATTR_NONNULL((1)),__INT64_TYPE__,__NOTHROW_NCX,_wcstoi64_l,(wchar_t const *__restrict __nptr, wchar_t **__endptr, __STDC_INT_AS_UINT_T __base, __locale_t __locale),_wcstol_l,(__nptr,__endptr,__base,__locale))
 #elif defined(__CRT_HAVE___wcstol_l) && __SIZEOF_LONG__ == 8
+/* >> wcsto64_l(3) */
 __CREDIRECT(__ATTR_LEAF __ATTR_NONNULL((1)),__INT64_TYPE__,__NOTHROW_NCX,_wcstoi64_l,(wchar_t const *__restrict __nptr, wchar_t **__endptr, __STDC_INT_AS_UINT_T __base, __locale_t __locale),__wcstol_l,(__nptr,__endptr,__base,__locale))
 #elif defined(__CRT_HAVE_wcstoll_l) && __SIZEOF_LONG_LONG__ == 8
+/* >> wcsto64_l(3) */
 __CREDIRECT(__ATTR_LEAF __ATTR_NONNULL((1)),__INT64_TYPE__,__NOTHROW_NCX,_wcstoi64_l,(wchar_t const *__restrict __nptr, wchar_t **__endptr, __STDC_INT_AS_UINT_T __base, __locale_t __locale),wcstoll_l,(__nptr,__endptr,__base,__locale))
 #elif defined(__CRT_HAVE__wcstoll_l) && __SIZEOF_LONG_LONG__ == 8
+/* >> wcsto64_l(3) */
 __CREDIRECT(__ATTR_LEAF __ATTR_NONNULL((1)),__INT64_TYPE__,__NOTHROW_NCX,_wcstoi64_l,(wchar_t const *__restrict __nptr, wchar_t **__endptr, __STDC_INT_AS_UINT_T __base, __locale_t __locale),_wcstoll_l,(__nptr,__endptr,__base,__locale))
 #elif defined(__CRT_HAVE___wcstoll_l) && __SIZEOF_LONG_LONG__ == 8
+/* >> wcsto64_l(3) */
 __CREDIRECT(__ATTR_LEAF __ATTR_NONNULL((1)),__INT64_TYPE__,__NOTHROW_NCX,_wcstoi64_l,(wchar_t const *__restrict __nptr, wchar_t **__endptr, __STDC_INT_AS_UINT_T __base, __locale_t __locale),__wcstoll_l,(__nptr,__endptr,__base,__locale))
 #elif defined(__CRT_HAVE_wcstoimax_l) && __SIZEOF_INTMAX_T__ == 8
+/* >> wcsto64_l(3) */
 __CREDIRECT(__ATTR_LEAF __ATTR_NONNULL((1)),__INT64_TYPE__,__NOTHROW_NCX,_wcstoi64_l,(wchar_t const *__restrict __nptr, wchar_t **__endptr, __STDC_INT_AS_UINT_T __base, __locale_t __locale),wcstoimax_l,(__nptr,__endptr,__base,__locale))
 #elif defined(__CRT_HAVE__wcstoimax_l) && __SIZEOF_INTMAX_T__ == 8
+/* >> wcsto64_l(3) */
 __CREDIRECT(__ATTR_LEAF __ATTR_NONNULL((1)),__INT64_TYPE__,__NOTHROW_NCX,_wcstoi64_l,(wchar_t const *__restrict __nptr, wchar_t **__endptr, __STDC_INT_AS_UINT_T __base, __locale_t __locale),_wcstoimax_l,(__nptr,__endptr,__base,__locale))
 #elif defined(__CRT_HAVE___wcstoimax_l) && __SIZEOF_INTMAX_T__ == 8
+/* >> wcsto64_l(3) */
 __CREDIRECT(__ATTR_LEAF __ATTR_NONNULL((1)),__INT64_TYPE__,__NOTHROW_NCX,_wcstoi64_l,(wchar_t const *__restrict __nptr, wchar_t **__endptr, __STDC_INT_AS_UINT_T __base, __locale_t __locale),__wcstoimax_l,(__nptr,__endptr,__base,__locale))
 #else /* ... */
 #include <libc/local/wchar/wcsto64_l.h>
+/* >> wcsto64_l(3) */
 __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_LEAF __ATTR_NONNULL((1)) __INT64_TYPE__ __NOTHROW_NCX(__LIBCCALL _wcstoi64_l)(wchar_t const *__restrict __nptr, wchar_t **__endptr, __STDC_INT_AS_UINT_T __base, __locale_t __locale) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(wcsto64_l))(__nptr, __endptr, __base, __locale); }
 #endif /* !... */
 #endif /* !___wcstoi64_l_defined */
 #ifndef ___wcstoui64_l_defined
 #define ___wcstoui64_l_defined 1
 #ifdef __CRT_HAVE_wcstou64_l
+/* >> wcstou64_l(3) */
 __CREDIRECT(__ATTR_LEAF __ATTR_NONNULL((1)),__UINT64_TYPE__,__NOTHROW_NCX,_wcstoui64_l,(wchar_t const *__restrict __nptr, wchar_t **__endptr, __STDC_INT_AS_UINT_T __base, __locale_t __locale),wcstou64_l,(__nptr,__endptr,__base,__locale))
 #elif defined(__CRT_HAVE__wcstoui64_l)
+/* >> wcstou64_l(3) */
 __CDECLARE(__ATTR_LEAF __ATTR_NONNULL((1)),__UINT64_TYPE__,__NOTHROW_NCX,_wcstoui64_l,(wchar_t const *__restrict __nptr, wchar_t **__endptr, __STDC_INT_AS_UINT_T __base, __locale_t __locale),(__nptr,__endptr,__base,__locale))
 #elif defined(__CRT_HAVE_wcstoul_l) && __SIZEOF_LONG__ == 8
+/* >> wcstou64_l(3) */
 __CREDIRECT(__ATTR_LEAF __ATTR_NONNULL((1)),__UINT64_TYPE__,__NOTHROW_NCX,_wcstoui64_l,(wchar_t const *__restrict __nptr, wchar_t **__endptr, __STDC_INT_AS_UINT_T __base, __locale_t __locale),wcstoul_l,(__nptr,__endptr,__base,__locale))
 #elif defined(__CRT_HAVE__wcstoul_l) && __SIZEOF_LONG__ == 8
+/* >> wcstou64_l(3) */
 __CREDIRECT(__ATTR_LEAF __ATTR_NONNULL((1)),__UINT64_TYPE__,__NOTHROW_NCX,_wcstoui64_l,(wchar_t const *__restrict __nptr, wchar_t **__endptr, __STDC_INT_AS_UINT_T __base, __locale_t __locale),_wcstoul_l,(__nptr,__endptr,__base,__locale))
 #elif defined(__CRT_HAVE___wcstoul_l) && __SIZEOF_LONG__ == 8
+/* >> wcstou64_l(3) */
 __CREDIRECT(__ATTR_LEAF __ATTR_NONNULL((1)),__UINT64_TYPE__,__NOTHROW_NCX,_wcstoui64_l,(wchar_t const *__restrict __nptr, wchar_t **__endptr, __STDC_INT_AS_UINT_T __base, __locale_t __locale),__wcstoul_l,(__nptr,__endptr,__base,__locale))
 #elif defined(__CRT_HAVE_wcstoull_l) && __SIZEOF_LONG_LONG__ == 8
+/* >> wcstou64_l(3) */
 __CREDIRECT(__ATTR_LEAF __ATTR_NONNULL((1)),__UINT64_TYPE__,__NOTHROW_NCX,_wcstoui64_l,(wchar_t const *__restrict __nptr, wchar_t **__endptr, __STDC_INT_AS_UINT_T __base, __locale_t __locale),wcstoull_l,(__nptr,__endptr,__base,__locale))
 #elif defined(__CRT_HAVE__wcstoull_l) && __SIZEOF_LONG_LONG__ == 8
+/* >> wcstou64_l(3) */
 __CREDIRECT(__ATTR_LEAF __ATTR_NONNULL((1)),__UINT64_TYPE__,__NOTHROW_NCX,_wcstoui64_l,(wchar_t const *__restrict __nptr, wchar_t **__endptr, __STDC_INT_AS_UINT_T __base, __locale_t __locale),_wcstoull_l,(__nptr,__endptr,__base,__locale))
 #elif defined(__CRT_HAVE___wcstoull_l) && __SIZEOF_LONG_LONG__ == 8
+/* >> wcstou64_l(3) */
 __CREDIRECT(__ATTR_LEAF __ATTR_NONNULL((1)),__UINT64_TYPE__,__NOTHROW_NCX,_wcstoui64_l,(wchar_t const *__restrict __nptr, wchar_t **__endptr, __STDC_INT_AS_UINT_T __base, __locale_t __locale),__wcstoull_l,(__nptr,__endptr,__base,__locale))
 #elif defined(__CRT_HAVE_wcstoumax_l) && __SIZEOF_INTMAX_T__ == 8
+/* >> wcstou64_l(3) */
 __CREDIRECT(__ATTR_LEAF __ATTR_NONNULL((1)),__UINT64_TYPE__,__NOTHROW_NCX,_wcstoui64_l,(wchar_t const *__restrict __nptr, wchar_t **__endptr, __STDC_INT_AS_UINT_T __base, __locale_t __locale),wcstoumax_l,(__nptr,__endptr,__base,__locale))
 #elif defined(__CRT_HAVE__wcstoumax_l) && __SIZEOF_INTMAX_T__ == 8
+/* >> wcstou64_l(3) */
 __CREDIRECT(__ATTR_LEAF __ATTR_NONNULL((1)),__UINT64_TYPE__,__NOTHROW_NCX,_wcstoui64_l,(wchar_t const *__restrict __nptr, wchar_t **__endptr, __STDC_INT_AS_UINT_T __base, __locale_t __locale),_wcstoumax_l,(__nptr,__endptr,__base,__locale))
 #elif defined(__CRT_HAVE___wcstoumax_l) && __SIZEOF_INTMAX_T__ == 8
+/* >> wcstou64_l(3) */
 __CREDIRECT(__ATTR_LEAF __ATTR_NONNULL((1)),__UINT64_TYPE__,__NOTHROW_NCX,_wcstoui64_l,(wchar_t const *__restrict __nptr, wchar_t **__endptr, __STDC_INT_AS_UINT_T __base, __locale_t __locale),__wcstoumax_l,(__nptr,__endptr,__base,__locale))
 #else /* ... */
 #include <libc/local/wchar/wcstou64_l.h>
+/* >> wcstou64_l(3) */
 __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_LEAF __ATTR_NONNULL((1)) __UINT64_TYPE__ __NOTHROW_NCX(__LIBCCALL _wcstoui64_l)(wchar_t const *__restrict __nptr, wchar_t **__endptr, __STDC_INT_AS_UINT_T __base, __locale_t __locale) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(wcstou64_l))(__nptr, __endptr, __base, __locale); }
 #endif /* !... */
 #endif /* !___wcstoui64_l_defined */
@@ -6171,58 +6064,82 @@ __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_LEAF __ATTR_NONNULL((1)) __UINT64_TYPE__ _
 #ifndef ___wcstoll_l_defined
 #define ___wcstoll_l_defined 1
 #ifdef __CRT_HAVE_wcstoll_l
+/* >> wcstoll_l(3) */
 __CREDIRECT(__ATTR_NONNULL((1)),__LONGLONG,__NOTHROW_NCX,_wcstoll_l,(wchar_t const *__restrict __nptr, wchar_t **__endptr, __STDC_INT_AS_UINT_T __base, __locale_t __locale),wcstoll_l,(__nptr,__endptr,__base,__locale))
 #elif defined(__CRT_HAVE__wcstoll_l)
+/* >> wcstoll_l(3) */
 __CDECLARE(__ATTR_NONNULL((1)),__LONGLONG,__NOTHROW_NCX,_wcstoll_l,(wchar_t const *__restrict __nptr, wchar_t **__endptr, __STDC_INT_AS_UINT_T __base, __locale_t __locale),(__nptr,__endptr,__base,__locale))
 #elif defined(__CRT_HAVE___wcstoll_l)
+/* >> wcstoll_l(3) */
 __CREDIRECT(__ATTR_NONNULL((1)),__LONGLONG,__NOTHROW_NCX,_wcstoll_l,(wchar_t const *__restrict __nptr, wchar_t **__endptr, __STDC_INT_AS_UINT_T __base, __locale_t __locale),__wcstoll_l,(__nptr,__endptr,__base,__locale))
 #elif defined(__CRT_HAVE_wcstol_l) && __SIZEOF_LONG_LONG__ == __SIZEOF_LONG__
+/* >> wcstoll_l(3) */
 __CREDIRECT(__ATTR_NONNULL((1)),__LONGLONG,__NOTHROW_NCX,_wcstoll_l,(wchar_t const *__restrict __nptr, wchar_t **__endptr, __STDC_INT_AS_UINT_T __base, __locale_t __locale),wcstol_l,(__nptr,__endptr,__base,__locale))
 #elif defined(__CRT_HAVE__wcstol_l) && __SIZEOF_LONG_LONG__ == __SIZEOF_LONG__
+/* >> wcstoll_l(3) */
 __CREDIRECT(__ATTR_NONNULL((1)),__LONGLONG,__NOTHROW_NCX,_wcstoll_l,(wchar_t const *__restrict __nptr, wchar_t **__endptr, __STDC_INT_AS_UINT_T __base, __locale_t __locale),_wcstol_l,(__nptr,__endptr,__base,__locale))
 #elif defined(__CRT_HAVE___wcstol_l) && __SIZEOF_LONG_LONG__ == __SIZEOF_LONG__
+/* >> wcstoll_l(3) */
 __CREDIRECT(__ATTR_NONNULL((1)),__LONGLONG,__NOTHROW_NCX,_wcstoll_l,(wchar_t const *__restrict __nptr, wchar_t **__endptr, __STDC_INT_AS_UINT_T __base, __locale_t __locale),__wcstol_l,(__nptr,__endptr,__base,__locale))
 #elif defined(__CRT_HAVE_wcsto64_l) && __SIZEOF_LONG_LONG__ == 8
+/* >> wcstoll_l(3) */
 __CREDIRECT(__ATTR_NONNULL((1)),__LONGLONG,__NOTHROW_NCX,_wcstoll_l,(wchar_t const *__restrict __nptr, wchar_t **__endptr, __STDC_INT_AS_UINT_T __base, __locale_t __locale),wcsto64_l,(__nptr,__endptr,__base,__locale))
 #elif defined(__CRT_HAVE__wcstoi64_l) && __SIZEOF_LONG_LONG__ == 8
+/* >> wcstoll_l(3) */
 __CREDIRECT(__ATTR_NONNULL((1)),__LONGLONG,__NOTHROW_NCX,_wcstoll_l,(wchar_t const *__restrict __nptr, wchar_t **__endptr, __STDC_INT_AS_UINT_T __base, __locale_t __locale),_wcstoi64_l,(__nptr,__endptr,__base,__locale))
 #elif defined(__CRT_HAVE_wcstoimax_l) && __SIZEOF_LONG_LONG__ == __SIZEOF_INTMAX_T__
+/* >> wcstoll_l(3) */
 __CREDIRECT(__ATTR_NONNULL((1)),__LONGLONG,__NOTHROW_NCX,_wcstoll_l,(wchar_t const *__restrict __nptr, wchar_t **__endptr, __STDC_INT_AS_UINT_T __base, __locale_t __locale),wcstoimax_l,(__nptr,__endptr,__base,__locale))
 #elif defined(__CRT_HAVE__wcstoimax_l) && __SIZEOF_LONG_LONG__ == __SIZEOF_INTMAX_T__
+/* >> wcstoll_l(3) */
 __CREDIRECT(__ATTR_NONNULL((1)),__LONGLONG,__NOTHROW_NCX,_wcstoll_l,(wchar_t const *__restrict __nptr, wchar_t **__endptr, __STDC_INT_AS_UINT_T __base, __locale_t __locale),_wcstoimax_l,(__nptr,__endptr,__base,__locale))
 #elif defined(__CRT_HAVE___wcstoimax_l) && __SIZEOF_LONG_LONG__ == __SIZEOF_INTMAX_T__
+/* >> wcstoll_l(3) */
 __CREDIRECT(__ATTR_NONNULL((1)),__LONGLONG,__NOTHROW_NCX,_wcstoll_l,(wchar_t const *__restrict __nptr, wchar_t **__endptr, __STDC_INT_AS_UINT_T __base, __locale_t __locale),__wcstoimax_l,(__nptr,__endptr,__base,__locale))
 #else /* ... */
 #include <libc/local/wchar/wcstoll_l.h>
+/* >> wcstoll_l(3) */
 __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_NONNULL((1)) __LONGLONG __NOTHROW_NCX(__LIBCCALL _wcstoll_l)(wchar_t const *__restrict __nptr, wchar_t **__endptr, __STDC_INT_AS_UINT_T __base, __locale_t __locale) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(wcstoll_l))(__nptr, __endptr, __base, __locale); }
 #endif /* !... */
 #endif /* !___wcstoll_l_defined */
 #ifndef ___wcstoull_l_defined
 #define ___wcstoull_l_defined 1
 #ifdef __CRT_HAVE_wcstoull_l
+/* >> wcstoull_l(3) */
 __CREDIRECT(__ATTR_NONNULL((1)),__ULONGLONG,__NOTHROW_NCX,_wcstoull_l,(wchar_t const *__restrict __nptr, wchar_t **__endptr, __STDC_INT_AS_UINT_T __base, __locale_t __locale),wcstoull_l,(__nptr,__endptr,__base,__locale))
 #elif defined(__CRT_HAVE__wcstoull_l)
+/* >> wcstoull_l(3) */
 __CDECLARE(__ATTR_NONNULL((1)),__ULONGLONG,__NOTHROW_NCX,_wcstoull_l,(wchar_t const *__restrict __nptr, wchar_t **__endptr, __STDC_INT_AS_UINT_T __base, __locale_t __locale),(__nptr,__endptr,__base,__locale))
 #elif defined(__CRT_HAVE___wcstoull_l)
+/* >> wcstoull_l(3) */
 __CREDIRECT(__ATTR_NONNULL((1)),__ULONGLONG,__NOTHROW_NCX,_wcstoull_l,(wchar_t const *__restrict __nptr, wchar_t **__endptr, __STDC_INT_AS_UINT_T __base, __locale_t __locale),__wcstoull_l,(__nptr,__endptr,__base,__locale))
 #elif defined(__CRT_HAVE_wcstoul_l) && __SIZEOF_LONG_LONG__ == __SIZEOF_LONG__
+/* >> wcstoull_l(3) */
 __CREDIRECT(__ATTR_NONNULL((1)),__ULONGLONG,__NOTHROW_NCX,_wcstoull_l,(wchar_t const *__restrict __nptr, wchar_t **__endptr, __STDC_INT_AS_UINT_T __base, __locale_t __locale),wcstoul_l,(__nptr,__endptr,__base,__locale))
 #elif defined(__CRT_HAVE__wcstoul_l) && __SIZEOF_LONG_LONG__ == __SIZEOF_LONG__
+/* >> wcstoull_l(3) */
 __CREDIRECT(__ATTR_NONNULL((1)),__ULONGLONG,__NOTHROW_NCX,_wcstoull_l,(wchar_t const *__restrict __nptr, wchar_t **__endptr, __STDC_INT_AS_UINT_T __base, __locale_t __locale),_wcstoul_l,(__nptr,__endptr,__base,__locale))
 #elif defined(__CRT_HAVE___wcstoul_l) && __SIZEOF_LONG_LONG__ == __SIZEOF_LONG__
+/* >> wcstoull_l(3) */
 __CREDIRECT(__ATTR_NONNULL((1)),__ULONGLONG,__NOTHROW_NCX,_wcstoull_l,(wchar_t const *__restrict __nptr, wchar_t **__endptr, __STDC_INT_AS_UINT_T __base, __locale_t __locale),__wcstoul_l,(__nptr,__endptr,__base,__locale))
 #elif defined(__CRT_HAVE_wcstou64_l) && __SIZEOF_LONG_LONG__ == 8
+/* >> wcstoull_l(3) */
 __CREDIRECT(__ATTR_NONNULL((1)),__ULONGLONG,__NOTHROW_NCX,_wcstoull_l,(wchar_t const *__restrict __nptr, wchar_t **__endptr, __STDC_INT_AS_UINT_T __base, __locale_t __locale),wcstou64_l,(__nptr,__endptr,__base,__locale))
 #elif defined(__CRT_HAVE__wcstoui64_l) && __SIZEOF_LONG_LONG__ == 8
+/* >> wcstoull_l(3) */
 __CREDIRECT(__ATTR_NONNULL((1)),__ULONGLONG,__NOTHROW_NCX,_wcstoull_l,(wchar_t const *__restrict __nptr, wchar_t **__endptr, __STDC_INT_AS_UINT_T __base, __locale_t __locale),_wcstoui64_l,(__nptr,__endptr,__base,__locale))
 #elif defined(__CRT_HAVE_wcstoumax_l) && __SIZEOF_LONG_LONG__ == __SIZEOF_INTMAX_T__
+/* >> wcstoull_l(3) */
 __CREDIRECT(__ATTR_NONNULL((1)),__ULONGLONG,__NOTHROW_NCX,_wcstoull_l,(wchar_t const *__restrict __nptr, wchar_t **__endptr, __STDC_INT_AS_UINT_T __base, __locale_t __locale),wcstoumax_l,(__nptr,__endptr,__base,__locale))
 #elif defined(__CRT_HAVE__wcstoumax_l) && __SIZEOF_LONG_LONG__ == __SIZEOF_INTMAX_T__
+/* >> wcstoull_l(3) */
 __CREDIRECT(__ATTR_NONNULL((1)),__ULONGLONG,__NOTHROW_NCX,_wcstoull_l,(wchar_t const *__restrict __nptr, wchar_t **__endptr, __STDC_INT_AS_UINT_T __base, __locale_t __locale),_wcstoumax_l,(__nptr,__endptr,__base,__locale))
 #elif defined(__CRT_HAVE___wcstoumax_l) && __SIZEOF_LONG_LONG__ == __SIZEOF_INTMAX_T__
+/* >> wcstoull_l(3) */
 __CREDIRECT(__ATTR_NONNULL((1)),__ULONGLONG,__NOTHROW_NCX,_wcstoull_l,(wchar_t const *__restrict __nptr, wchar_t **__endptr, __STDC_INT_AS_UINT_T __base, __locale_t __locale),__wcstoumax_l,(__nptr,__endptr,__base,__locale))
 #else /* ... */
 #include <libc/local/wchar/wcstoull_l.h>
+/* >> wcstoull_l(3) */
 __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_NONNULL((1)) __ULONGLONG __NOTHROW_NCX(__LIBCCALL _wcstoull_l)(wchar_t const *__restrict __nptr, wchar_t **__endptr, __STDC_INT_AS_UINT_T __base, __locale_t __locale) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(wcstoull_l))(__nptr, __endptr, __base, __locale); }
 #endif /* !... */
 #endif /* !___wcstoull_l_defined */

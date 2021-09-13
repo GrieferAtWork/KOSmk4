@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x78a8511d */
+/* HASH CRC-32:0xb4f35a0 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -451,19 +451,19 @@ __NAMESPACE_LOCAL_USING_OR_IMPL(lfind, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_WUN
 #endif /* !... */
 #ifdef __CRT_HAVE_lsearch
 /* >> lsearch(3)
- * Perform linear search for `key' by comparing by `compar' function
- * in array [pbase,  pbase+pitem_count*item_size) and insert  entry if not  found */
+ * Perform  linear  search  for  `key'  by  comparing  by  `compar'   function
+ * in array [pbase, pbase+pitem_count*item_size) and insert entry if not found */
 __CDECLARE(__ATTR_NONNULL((2, 3, 5)),void *,__THROWING,lsearch,(void const *__key, void *__pbase, size_t *__pitem_count, size_t __item_size, int (__LIBCCALL *__compar)(void const *__a, void const *__b)),(__key,__pbase,__pitem_count,__item_size,__compar))
 #elif defined(__CRT_HAVE__lsearch)
 /* >> lsearch(3)
- * Perform linear search for `key' by comparing by `compar' function
- * in array [pbase,  pbase+pitem_count*item_size) and insert  entry if not  found */
+ * Perform  linear  search  for  `key'  by  comparing  by  `compar'   function
+ * in array [pbase, pbase+pitem_count*item_size) and insert entry if not found */
 __CREDIRECT(__ATTR_NONNULL((2, 3, 5)),void *,__THROWING,lsearch,(void const *__key, void *__pbase, size_t *__pitem_count, size_t __item_size, int (__LIBCCALL *__compar)(void const *__a, void const *__b)),_lsearch,(__key,__pbase,__pitem_count,__item_size,__compar))
 #else /* ... */
 #include <libc/local/search/lsearch.h>
 /* >> lsearch(3)
- * Perform linear search for `key' by comparing by `compar' function
- * in array [pbase,  pbase+pitem_count*item_size) and insert  entry if not  found */
+ * Perform  linear  search  for  `key'  by  comparing  by  `compar'   function
+ * in array [pbase, pbase+pitem_count*item_size) and insert entry if not found */
 __NAMESPACE_LOCAL_USING_OR_IMPL(lsearch, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_NONNULL((2, 3, 5)) void *(__LIBCCALL lsearch)(void const *__key, void *__pbase, size_t *__pitem_count, size_t __item_size, int (__LIBCCALL *__compar)(void const *__a, void const *__b)) __THROWS(...) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(lsearch))(__key, __pbase, __pitem_count, __item_size, __compar); })
 #endif /* !... */
 
@@ -519,19 +519,19 @@ __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_WUNUSED __ATTR_NONNULL((2, 3, 5)) void *(_
 #endif /* !... */
 #ifdef __CRT_HAVE_lsearch
 /* >> lsearch(3)
- * Perform linear search for `key' by comparing by `compar' function
- * in array [pbase,  pbase+pitem_count*item_size) and insert  entry if not  found */
+ * Perform  linear  search  for  `key'  by  comparing  by  `compar'   function
+ * in array [pbase, pbase+pitem_count*item_size) and insert entry if not found */
 __CREDIRECT(__ATTR_NONNULL((2, 3, 5)),void *,__THROWING,_lsearch,(void const *__key, void *__pbase, size_t *__pitem_count, size_t __item_size, int (__LIBCCALL *__compar)(void const *__a, void const *__b)),lsearch,(__key,__pbase,__pitem_count,__item_size,__compar))
 #elif defined(__CRT_HAVE__lsearch)
 /* >> lsearch(3)
- * Perform linear search for `key' by comparing by `compar' function
- * in array [pbase,  pbase+pitem_count*item_size) and insert  entry if not  found */
+ * Perform  linear  search  for  `key'  by  comparing  by  `compar'   function
+ * in array [pbase, pbase+pitem_count*item_size) and insert entry if not found */
 __CDECLARE(__ATTR_NONNULL((2, 3, 5)),void *,__THROWING,_lsearch,(void const *__key, void *__pbase, size_t *__pitem_count, size_t __item_size, int (__LIBCCALL *__compar)(void const *__a, void const *__b)),(__key,__pbase,__pitem_count,__item_size,__compar))
 #else /* ... */
 #include <libc/local/search/lsearch.h>
 /* >> lsearch(3)
- * Perform linear search for `key' by comparing by `compar' function
- * in array [pbase,  pbase+pitem_count*item_size) and insert  entry if not  found */
+ * Perform  linear  search  for  `key'  by  comparing  by  `compar'   function
+ * in array [pbase, pbase+pitem_count*item_size) and insert entry if not found */
 __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_NONNULL((2, 3, 5)) void *(__LIBCCALL _lsearch)(void const *__key, void *__pbase, size_t *__pitem_count, size_t __item_size, int (__LIBCCALL *__compar)(void const *__a, void const *__b)) __THROWS(...) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(lsearch))(__key, __pbase, __pitem_count, __item_size, __compar); }
 #endif /* !... */
 #ifndef __qsort_defined

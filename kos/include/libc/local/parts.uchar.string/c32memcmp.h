@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xc75e3db */
+/* HASH CRC-32:0x2950a9ee */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -18,8 +18,8 @@
  *    misrepresented as being the original software.                          *
  * 3. This notice may not be removed or altered from any source distribution. *
  */
-#ifndef __local_wmemcmp_defined
-#define __local_wmemcmp_defined 1
+#ifndef __local_c32memcmp_defined
+#define __local_c32memcmp_defined 1
 #include <__crt.h>
 #include <hybrid/typecore.h>
 __NAMESPACE_LOCAL_BEGIN
@@ -66,19 +66,19 @@ __NAMESPACE_LOCAL_BEGIN
 #define __localdep_memcmpw __LIBC_LOCAL_NAME(memcmpw)
 #endif /* !... */
 #endif /* !__local___localdep_memcmpw_defined */
-__LOCAL_LIBC(wmemcmp) __ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1, 2)) int
-__NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(wmemcmp))(__WCHAR_TYPE__ const *__s1, __WCHAR_TYPE__ const *__s2, __SIZE_TYPE__ __num_chars) {
-#if __SIZEOF_WCHAR_T__ == 2
-	return (int)(__NAMESPACE_LOCAL_SYM __localdep_memcmpw)(__s1, __s2, __num_chars);
-#elif __SIZEOF_WCHAR_T__ == 4
+__LOCAL_LIBC(c32memcmp) __ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1, 2)) int
+__NOTHROW_NCX(__LIBKCALL __LIBC_LOCAL_NAME(c32memcmp))(__CHAR32_TYPE__ const *__s1, __CHAR32_TYPE__ const *__s2, __SIZE_TYPE__ __num_chars) {
+
+
+
 	return (int)(__NAMESPACE_LOCAL_SYM __localdep_memcmpl)(__s1, __s2, __num_chars);
-#else /* ... */
-	return (int)(__NAMESPACE_LOCAL_SYM __localdep_memcmp)(__s1, __s2, __num_chars * sizeof(__WCHAR_TYPE__));
-#endif /* !... */
+
+
+
 }
 __NAMESPACE_LOCAL_END
-#ifndef __local___localdep_wmemcmp_defined
-#define __local___localdep_wmemcmp_defined 1
-#define __localdep_wmemcmp __LIBC_LOCAL_NAME(wmemcmp)
-#endif /* !__local___localdep_wmemcmp_defined */
-#endif /* !__local_wmemcmp_defined */
+#ifndef __local___localdep_c32memcmp_defined
+#define __local___localdep_c32memcmp_defined 1
+#define __localdep_c32memcmp __LIBC_LOCAL_NAME(c32memcmp)
+#endif /* !__local___localdep_c32memcmp_defined */
+#endif /* !__local_c32memcmp_defined */

@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x8a96005b */
+/* HASH CRC-32:0xe9d9a2a3 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -322,7 +322,7 @@ struct _dwrap_cookie_struct_sTPTP_TDTPTPTP_c0A0A1c1 {
 PRIVATE ATTR_SECTION(".text.crt.dos.utility.search") int
 (LIBCCALL _dwrap_sTPTP_TDTPTPTP_c0A0A1c1)(void const *a,
                                           void const *b,
-                                          struct _dwrap_cookie_struct_sTPTP_TDTPTPTP_c0A0A1c1 *c) THROWS(...){
+                                          struct _dwrap_cookie_struct_sTPTP_TDTPTPTP_c0A0A1c1 *c) THROWS(...) {
 	return (*c->compar)(a, b, c->arg);
 }
 #endif /* !__dwrap_sTPTP_TDTPTPTP_c0A0A1c1_defined */
@@ -336,7 +336,7 @@ INTERN ATTR_SECTION(".text.crt.dos.utility.search") NONNULL((3)) void *
                           void *arg) THROWS(...) {
 	struct _dwrap_cookie_struct_sTPTP_TDTPTPTP_c0A0A1c1 libd_tsearch_r_cookie;
 	libd_tsearch_r_cookie.compar = compar;
-	libd_tsearch_r_cookie.arg = arg;
+	libd_tsearch_r_cookie.arg    = arg;
 	return libc_tsearch_r(key, vrootp, (int (LIBCCALL *)(void const *, void const *, void *))&_dwrap_sTPTP_TDTPTPTP_c0A0A1c1, &libd_tsearch_r_cookie);
 }
 #endif /* !__LIBCCALL_IS_LIBDCALL && !__KERNEL__ */
@@ -476,7 +476,7 @@ struct _dwrap_cookie_struct_sTPTP_TDTPTPTP_c0A0A1c1 {
 PRIVATE ATTR_SECTION(".text.crt.dos.utility.search") int
 (LIBCCALL _dwrap_sTPTP_TDTPTPTP_c0A0A1c1)(void const *a,
                                           void const *b,
-                                          struct _dwrap_cookie_struct_sTPTP_TDTPTPTP_c0A0A1c1 *c) THROWS(...){
+                                          struct _dwrap_cookie_struct_sTPTP_TDTPTPTP_c0A0A1c1 *c) THROWS(...) {
 	return (*c->compar)(a, b, c->arg);
 }
 #endif /* !__dwrap_sTPTP_TDTPTPTP_c0A0A1c1_defined */
@@ -490,7 +490,7 @@ INTERN ATTR_SECTION(".text.crt.dos.utility.search") NONNULL((3)) void *
                         void *arg) THROWS(...) {
 	struct _dwrap_cookie_struct_sTPTP_TDTPTPTP_c0A0A1c1 libd_tfind_r_cookie;
 	libd_tfind_r_cookie.compar = compar;
-	libd_tfind_r_cookie.arg = arg;
+	libd_tfind_r_cookie.arg    = arg;
 	return libc_tfind_r(key, vrootp, (int (LIBCCALL *)(void const *, void const *, void *))&_dwrap_sTPTP_TDTPTPTP_c0A0A1c1, &libd_tfind_r_cookie);
 }
 #endif /* !__LIBCCALL_IS_LIBDCALL && !__KERNEL__ */
@@ -532,7 +532,7 @@ struct _dwrap_cookie_struct_sTPTP_TDTPTPTP_c0A0A1c1 {
 PRIVATE ATTR_SECTION(".text.crt.dos.utility.search") int
 (LIBCCALL _dwrap_sTPTP_TDTPTPTP_c0A0A1c1)(void const *a,
                                           void const *b,
-                                          struct _dwrap_cookie_struct_sTPTP_TDTPTPTP_c0A0A1c1 *c) THROWS(...){
+                                          struct _dwrap_cookie_struct_sTPTP_TDTPTPTP_c0A0A1c1 *c) THROWS(...) {
 	return (*c->compar)(a, b, c->arg);
 }
 #endif /* !__dwrap_sTPTP_TDTPTPTP_c0A0A1c1_defined */
@@ -545,7 +545,7 @@ INTERN ATTR_SECTION(".text.crt.dos.utility.search") NONNULL((3)) void *
                           void *arg) THROWS(...) {
 	struct _dwrap_cookie_struct_sTPTP_TDTPTPTP_c0A0A1c1 libd_tdelete_r_cookie;
 	libd_tdelete_r_cookie.compar = compar;
-	libd_tdelete_r_cookie.arg = arg;
+	libd_tdelete_r_cookie.arg    = arg;
 	return libc_tdelete_r(key, vrootp, (int (LIBCCALL *)(void const *, void const *, void *))&_dwrap_sTPTP_TDTPTPTP_c0A0A1c1, &libd_tdelete_r_cookie);
 }
 #endif /* !__LIBCCALL_IS_LIBDCALL && !__KERNEL__ */
@@ -746,7 +746,7 @@ PRIVATE ATTR_SECTION(".text.crt.dos.utility.search") void
 (LIBCCALL _dwrap_sTPTP_TVTPTDTDTP_c0A0A1A2c1)(void const *nodep,
                                               VISIT value,
                                               int level,
-                                              struct _dwrap_cookie_struct_sTPTP_TVTPTDTDTP_c0A0A1A2c1 *c) THROWS(...){
+                                              struct _dwrap_cookie_struct_sTPTP_TVTPTDTDTP_c0A0A1A2c1 *c) THROWS(...) {
 	(*c->action)(nodep, value, level, c->arg);
 }
 #endif /* !__dwrap_sTPTP_TVTPTDTDTP_c0A0A1A2c1_defined */
@@ -758,7 +758,7 @@ INTERN ATTR_SECTION(".text.crt.dos.utility.search") void
                         void *arg) THROWS(...) {
 	struct _dwrap_cookie_struct_sTPTP_TVTPTDTDTP_c0A0A1A2c1 libd_twalk_r_cookie;
 	libd_twalk_r_cookie.action = action;
-	libd_twalk_r_cookie.arg = arg;
+	libd_twalk_r_cookie.arg    = arg;
 	libc_twalk_r(root, (void (LIBCCALL *)(void const *, VISIT, int, void *))&_dwrap_sTPTP_TVTPTDTDTP_c0A0A1A2c1, &libd_twalk_r_cookie);
 }
 #endif /* !__LIBCCALL_IS_LIBDCALL && !__KERNEL__ */
@@ -806,7 +806,7 @@ struct _dwrap_cookie_struct_sTPTP_TVTPTP_c0A0c1 {
 };
 PRIVATE ATTR_SECTION(".text.crt.dos.utility.search") void
 (LIBCCALL _dwrap_sTPTP_TVTPTP_c0A0c1)(void *nodep,
-                                      struct _dwrap_cookie_struct_sTPTP_TVTPTP_c0A0c1 *c) THROWS(...){
+                                      struct _dwrap_cookie_struct_sTPTP_TVTPTP_c0A0c1 *c) THROWS(...) {
 	(*c->freefct)(nodep, c->arg);
 }
 #endif /* !__dwrap_sTPTP_TVTPTP_c0A0c1_defined */
@@ -818,7 +818,7 @@ INTERN ATTR_SECTION(".text.crt.dos.utility.search") NONNULL((2)) void
                            void *arg) THROWS(...) {
 	struct _dwrap_cookie_struct_sTPTP_TVTPTP_c0A0c1 libd_tdestroy_r_cookie;
 	libd_tdestroy_r_cookie.freefct = freefct;
-	libd_tdestroy_r_cookie.arg = arg;
+	libd_tdestroy_r_cookie.arg     = arg;
 	libc_tdestroy_r(root, (void (LIBCCALL *)(void *, void *))&_dwrap_sTPTP_TVTPTP_c0A0c1, &libd_tdestroy_r_cookie);
 }
 #endif /* !__LIBCCALL_IS_LIBDCALL && !__KERNEL__ */
@@ -856,7 +856,7 @@ again:
 PRIVATE ATTR_SECTION(".text.crt.dos.utility.search") int
 (LIBCCALL _dwrap_cTP_TDTPTPTP_CA0A1)(void const *a,
                                      void const *b,
-                                     int (LIBDCALL *c)(void const *a, void const *b)) THROWS(...){
+                                     int (LIBDCALL *c)(void const *a, void const *b)) THROWS(...) {
 	return (*c)(a, b);
 }
 #endif /* !__dwrap_cTP_TDTPTPTP_CA0A1_defined */
@@ -902,7 +902,7 @@ INTERN ATTR_SECTION(".text.crt.utility.search") NONNULL((3)) void *
 PRIVATE ATTR_SECTION(".text.crt.dos.utility.search") int
 (LIBCCALL _dwrap_cTP_TDTPTPTP_CA0A1)(void const *a,
                                      void const *b,
-                                     int (LIBDCALL *c)(void const *a, void const *b)) THROWS(...){
+                                     int (LIBDCALL *c)(void const *a, void const *b)) THROWS(...) {
 	return (*c)(a, b);
 }
 #endif /* !__dwrap_cTP_TDTPTPTP_CA0A1_defined */
@@ -948,7 +948,7 @@ INTERN ATTR_SECTION(".text.crt.utility.search") NONNULL((3)) void *
 PRIVATE ATTR_SECTION(".text.crt.dos.utility.search") int
 (LIBCCALL _dwrap_cTP_TDTPTPTP_CA0A1)(void const *a,
                                      void const *b,
-                                     int (LIBDCALL *c)(void const *a, void const *b)) THROWS(...){
+                                     int (LIBDCALL *c)(void const *a, void const *b)) THROWS(...) {
 	return (*c)(a, b);
 }
 #endif /* !__dwrap_cTP_TDTPTPTP_CA0A1_defined */
@@ -993,7 +993,7 @@ PRIVATE ATTR_SECTION(".text.crt.dos.utility.search") void
 (LIBCCALL _dwrap_cTP_TVTPTDTDTP_CA0A1A2)(void const *nodep,
                                          VISIT value,
                                          int level,
-                                         void (LIBDCALL *c)(void const *nodep, VISIT value, int level)) THROWS(...){
+                                         void (LIBDCALL *c)(void const *nodep, VISIT value, int level)) THROWS(...) {
 	(*c)(nodep, value, level);
 }
 #endif /* !__dwrap_cTP_TVTPTDTDTP_CA0A1A2_defined */
@@ -1034,7 +1034,7 @@ INTERN ATTR_SECTION(".text.crt.utility.search") void
 #define __dwrap_cTP_TVTPTP_CA0_defined 1
 PRIVATE ATTR_SECTION(".text.crt.dos.utility.search") void
 (LIBCCALL _dwrap_cTP_TVTPTP_CA0)(void *nodep,
-                                 void (LIBDCALL *c)(void *nodep)) THROWS(...){
+                                 void (LIBDCALL *c)(void *nodep)) THROWS(...) {
 	(*c)(nodep);
 }
 #endif /* !__dwrap_cTP_TVTPTP_CA0_defined */
@@ -1065,7 +1065,7 @@ INTERN ATTR_SECTION(".text.crt.utility.search") NONNULL((2)) void
 PRIVATE ATTR_SECTION(".text.crt.dos.utility.search") int
 (LIBCCALL _dwrap_cTP_TDTPTPTP_CA1A2)(__compar_fn_t c,
                                      void const *a,
-                                     void const *b) THROWS(...){
+                                     void const *b) THROWS(...) {
 	return (*c)(a, b);
 }
 #endif /* !__dwrap_cTP_TDTPTPTP_CA1A2_defined */
@@ -1105,13 +1105,13 @@ INTERN ATTR_SECTION(".text.crt.utility.search") WUNUSED NONNULL((2, 3, 5)) void 
 PRIVATE ATTR_SECTION(".text.crt.dos.utility.search") int
 (LIBCCALL _dwrap_cTP_TDTPTPTP_CA1A2)(int (LIBDCALL *c)(void const *a, void const *b),
                                      void const *a,
-                                     void const *b) THROWS(...){
+                                     void const *b) THROWS(...) {
 	return (*c)(a, b);
 }
 #endif /* !__dwrap_cTP_TDTPTPTP_CA1A2_defined */
 /* >> lsearch(3)
- * Perform linear search for `key' by comparing by `compar' function
- * in array [pbase,  pbase+pitem_count*item_size) and insert  entry if not  found */
+ * Perform  linear  search  for  `key'  by  comparing  by  `compar'   function
+ * in array [pbase, pbase+pitem_count*item_size) and insert entry if not found */
 INTERN ATTR_SECTION(".text.crt.dos.utility.search") NONNULL((2, 3, 5)) void *
 (LIBDCALL libd_lsearch)(void const *key,
                         void *pbase,
@@ -1123,8 +1123,8 @@ INTERN ATTR_SECTION(".text.crt.dos.utility.search") NONNULL((2, 3, 5)) void *
 #endif /* !__LIBCCALL_IS_LIBDCALL && !__KERNEL__ */
 #ifndef __KERNEL__
 /* >> lsearch(3)
- * Perform linear search for `key' by comparing by `compar' function
- * in array [pbase,  pbase+pitem_count*item_size) and insert  entry if not  found */
+ * Perform  linear  search  for  `key'  by  comparing  by  `compar'   function
+ * in array [pbase, pbase+pitem_count*item_size) and insert entry if not found */
 INTERN ATTR_SECTION(".text.crt.utility.search") NONNULL((2, 3, 5)) void *
 (LIBCCALL libc_lsearch)(void const *key,
                         void *pbase,
@@ -1150,7 +1150,7 @@ struct _dwrap_cookie_struct_sTPTP_TDTPTPTP_c0c1A1A2 {
 PRIVATE ATTR_SECTION(".text.crt.dos.utility.search") int
 (LIBCCALL _dwrap_sTPTP_TDTPTPTP_c0c1A1A2)(struct _dwrap_cookie_struct_sTPTP_TDTPTPTP_c0c1A1A2 *c,
                                           void const *a,
-                                          void const *b) THROWS(...){
+                                          void const *b) THROWS(...) {
 	return (*c->compar)(c->arg, a, b);
 }
 #endif /* !__dwrap_sTPTP_TDTPTPTP_c0c1A1A2_defined */
@@ -1163,7 +1163,7 @@ INTERN ATTR_SECTION(".text.crt.dos.utility.search") WUNUSED NONNULL((2, 3, 5)) v
                          void *arg) THROWS(...) {
 	struct _dwrap_cookie_struct_sTPTP_TDTPTPTP_c0c1A1A2 libd__lfind_s_cookie;
 	libd__lfind_s_cookie.compar = compar;
-	libd__lfind_s_cookie.arg = arg;
+	libd__lfind_s_cookie.arg    = arg;
 	return libc__lfind_s(key, pbase, pitem_count, item_size, (int (LIBCCALL *)(void *, void const *, void const *))&_dwrap_sTPTP_TDTPTPTP_c0c1A1A2, &libd__lfind_s_cookie);
 }
 #endif /* !__LIBCCALL_IS_LIBDCALL && !__KERNEL__ */
@@ -1195,7 +1195,7 @@ struct _dwrap_cookie_struct_sTPTP_TDTPTPTP_c0c1A1A2 {
 PRIVATE ATTR_SECTION(".text.crt.dos.utility.search") int
 (LIBCCALL _dwrap_sTPTP_TDTPTPTP_c0c1A1A2)(struct _dwrap_cookie_struct_sTPTP_TDTPTPTP_c0c1A1A2 *c,
                                           void const *a,
-                                          void const *b) THROWS(...){
+                                          void const *b) THROWS(...) {
 	return (*c->compar)(c->arg, a, b);
 }
 #endif /* !__dwrap_sTPTP_TDTPTPTP_c0c1A1A2_defined */
@@ -1208,7 +1208,7 @@ INTERN ATTR_SECTION(".text.crt.dos.utility.search") WUNUSED NONNULL((2, 3, 5)) v
                            void *arg) THROWS(...) {
 	struct _dwrap_cookie_struct_sTPTP_TDTPTPTP_c0c1A1A2 libd__lsearch_s_cookie;
 	libd__lsearch_s_cookie.compar = compar;
-	libd__lsearch_s_cookie.arg = arg;
+	libd__lsearch_s_cookie.arg    = arg;
 	return libc__lsearch_s(key, pbase, pitem_count, item_size, (int (LIBCCALL *)(void *, void const *, void const *))&_dwrap_sTPTP_TDTPTPTP_c0c1A1A2, &libd__lsearch_s_cookie);
 }
 #endif /* !__LIBCCALL_IS_LIBDCALL && !__KERNEL__ */

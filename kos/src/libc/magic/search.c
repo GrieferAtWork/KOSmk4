@@ -1020,8 +1020,8 @@ void *lfind(void const *key, [[nonnull]] void const *pbase, [[nonnull]] size_t _
 }
 
 @@>> lsearch(3)
-@@Perform linear search for `key' by comparing by `compar' function
-@@in array [pbase,  pbase+pitem_count*item_size) and insert  entry if not  found
+@@Perform  linear  search  for  `key'  by  comparing  by  `compar'   function
+@@in array [pbase, pbase+pitem_count*item_size) and insert entry if not found
 [[decl_include("<hybrid/typecore.h>")]]
 [[throws, dos_only_export_alias("_lsearch"), crt_dos_variant(callback(
 	cook: auto = compar,

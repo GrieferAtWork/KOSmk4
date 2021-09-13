@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xd230d5fa */
+/* HASH CRC-32:0x5383f7ba */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -367,7 +367,6 @@ NOTHROW_NCX(LIBCCALL libc_timegm64)(struct tm *tp) {
 
 }
 #endif /* __SIZEOF_TIME32_T__ != __SIZEOF_TIME64_T__ */
-#include <asm/crt/time.h>
 /* >> timespec_get(3), timespec_get64(3)
  * Set `ts' to calendar time based in time base `base' */
 INTERN ATTR_SECTION(".text.crt.time") NONNULL((1)) int
@@ -383,7 +382,6 @@ NOTHROW_NCX(LIBCCALL libc_timespec_get)(struct timespec *ts,
 #if __SIZEOF_TIME32_T__ == __SIZEOF_TIME64_T__
 DEFINE_INTERN_ALIAS(libc_timespec_get64, libc_timespec_get);
 #else /* __SIZEOF_TIME32_T__ == __SIZEOF_TIME64_T__ */
-#include <asm/crt/time.h>
 /* >> timespec_get(3), timespec_get64(3)
  * Set `ts' to calendar time based in time base `base' */
 INTERN ATTR_SECTION(".text.crt.time") NONNULL((1)) int
@@ -736,7 +734,7 @@ __NAMESPACE_LOCAL_END
 #define __LIBC_TIME_ABBR_MONTH_NAMES_DEFINED 1
 __NAMESPACE_LOCAL_BEGIN
 __LOCAL_LIBC_CONST_DATA(__abbr_month_names) char const __abbr_month_names[12][4] =
-	{ "Jan", "Feb", "Mar", "Apr", "May", "Jun",  "Jul", "Aug", "Sep", "Oct", "Nov", "Dec" };
+	{ "Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec" };
 __NAMESPACE_LOCAL_END
 #endif /* !__LIBC_TIME_ABBR_MONTH_NAMES_DEFINED */
 #endif /* __BUILDING_LIBC || !__CRT_HAVE_asctime_s */

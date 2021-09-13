@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x740e5293 */
+/* HASH CRC-32:0xade119c6 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -53,7 +53,7 @@ struct _dwrap_cookie_struct_sTPTP_TDTPTPTP_c0A0A1c1 {
 PRIVATE ATTR_SECTION(".text.crt.dos.utility.stdlib") int
 (LIBCCALL _dwrap_sTPTP_TDTPTPTP_c0A0A1c1)(void const *a,
                                           void const *b,
-                                          struct _dwrap_cookie_struct_sTPTP_TDTPTPTP_c0A0A1c1 *c) THROWS(...){
+                                          struct _dwrap_cookie_struct_sTPTP_TDTPTPTP_c0A0A1c1 *c) THROWS(...) {
 	return (*c->compar)(a, b, c->arg);
 }
 #endif /* !__dwrap_sTPTP_TDTPTPTP_c0A0A1c1_defined */
@@ -66,7 +66,7 @@ INTERN ATTR_SECTION(".text.crt.dos.utility.stdlib") WUNUSED NONNULL((1, 2, 5)) v
                           void *arg) THROWS(...) {
 	struct _dwrap_cookie_struct_sTPTP_TDTPTPTP_c0A0A1c1 libd_bsearch_r_cookie;
 	libd_bsearch_r_cookie.compar = compar;
-	libd_bsearch_r_cookie.arg = arg;
+	libd_bsearch_r_cookie.arg    = arg;
 	return libc_bsearch_r(pkey, pbase, item_count, item_size, (int (LIBCCALL *)(void const *, void const *, void *))&_dwrap_sTPTP_TDTPTPTP_c0A0A1c1, &libd_bsearch_r_cookie);
 }
 #endif /* !__LIBCCALL_IS_LIBDCALL && !__KERNEL__ */
@@ -120,7 +120,7 @@ INTERN ATTR_SECTION(".text.crt.utility.stdlib") WUNUSED NONNULL((1, 2, 5)) void 
 PRIVATE ATTR_SECTION(".text.crt.dos.utility.stdlib") int
 (LIBCCALL _dwrap_cTP_TDTPTPTP_CA0A1)(void const *a,
                                      void const *b,
-                                     int (LIBDCALL *c)(void const *a, void const *b)) THROWS(...){
+                                     int (LIBDCALL *c)(void const *a, void const *b)) THROWS(...) {
 	return (*c)(a, b);
 }
 #endif /* !__dwrap_cTP_TDTPTPTP_CA0A1_defined */
@@ -164,7 +164,7 @@ INTERN ATTR_SECTION(".text.crt.utility.stdlib") NONNULL((1, 4)) void
 PRIVATE ATTR_SECTION(".text.crt.dos.utility.stdlib") int
 (LIBCCALL _dwrap_cTP_TDTPTPTP_CA0A1)(void const *a,
                                      void const *b,
-                                     int (LIBDCALL *c)(void const *a, void const *b)) THROWS(...){
+                                     int (LIBDCALL *c)(void const *a, void const *b)) THROWS(...) {
 	return (*c)(a, b);
 }
 #endif /* !__dwrap_cTP_TDTPTPTP_CA0A1_defined */
@@ -2109,28 +2109,28 @@ struct _dwrap_cookie_struct_sTPTP_TDTPTIn__SIZEOF_FD_T___c0c1A1 {
 };
 PRIVATE ATTR_SECTION(".text.crt.dos.solaris") int
 (LIBCCALL _dwrap_sTPTP_TDTPTIn__SIZEOF_FD_T___c0c1A1)(struct _dwrap_cookie_struct_sTPTP_TDTPTIn__SIZEOF_FD_T___c0c1A1 *c,
-                                                      fd_t fd) THROWS(...){
+                                                      fd_t fd) THROWS(...) {
 	return (*c->walk)(c->arg, fd);
 }
 #endif /* !__dwrap_sTPTP_TDTPTIn__SIZEOF_FD_T___c0c1A1_defined */
-/* Enumerate all open file descriptors by invoking `(*walk)(arg, <fd>)' for each of them
- * If  during any of these invocations, `(*walk)(...)' returns non-zero, enumeration stops,
- * and `fdwalk()' returns with that same value.  If `(*walk)(...)' is never called, or  all
+/* Enumerate all open file descriptors by  invoking `(*walk)(arg, <fd>)' for each of  them
+ * If during any of these invocations, `(*walk)(...)' returns non-zero, enumeration stops,
+ * and  `fdwalk()' returns with that same value. If `(*walk)(...)' is never called, or all
  * invocations return 0, `fdwalk()' will also return 0. */
 INTERN ATTR_SECTION(".text.crt.dos.solaris") NONNULL((1)) int
 (LIBDCALL libd_fdwalk)(int (LIBDCALL *walk)(void *arg, fd_t fd),
                        void *arg) THROWS(...) {
 	struct _dwrap_cookie_struct_sTPTP_TDTPTIn__SIZEOF_FD_T___c0c1A1 libd_fdwalk_cookie;
 	libd_fdwalk_cookie.walk = walk;
-	libd_fdwalk_cookie.arg = arg;
+	libd_fdwalk_cookie.arg  = arg;
 	return libc_fdwalk((int (LIBCCALL *)(void *, fd_t))&_dwrap_sTPTP_TDTPTIn__SIZEOF_FD_T___c0c1A1, &libd_fdwalk_cookie);
 }
 #endif /* !__LIBCCALL_IS_LIBDCALL && !__KERNEL__ */
 #ifndef __KERNEL__
 #include <asm/os/fcntl.h>
-/* Enumerate all open file descriptors by invoking `(*walk)(arg, <fd>)' for each of them
- * If  during any of these invocations, `(*walk)(...)' returns non-zero, enumeration stops,
- * and `fdwalk()' returns with that same value.  If `(*walk)(...)' is never called, or  all
+/* Enumerate all open file descriptors by  invoking `(*walk)(arg, <fd>)' for each of  them
+ * If during any of these invocations, `(*walk)(...)' returns non-zero, enumeration stops,
+ * and  `fdwalk()' returns with that same value. If `(*walk)(...)' is never called, or all
  * invocations return 0, `fdwalk()' will also return 0. */
 INTERN ATTR_SECTION(".text.crt.solaris") NONNULL((1)) int
 (LIBCCALL libc_fdwalk)(int (LIBCCALL *walk)(void *arg, fd_t fd),
@@ -2321,7 +2321,7 @@ struct _dwrap_cookie_struct_sTPTP_TDTPTPTP_c0A0A1c1 {
 PRIVATE ATTR_SECTION(".text.crt.dos.utility.stdlib") int
 (LIBCCALL _dwrap_sTPTP_TDTPTPTP_c0A0A1c1)(void const *a,
                                           void const *b,
-                                          struct _dwrap_cookie_struct_sTPTP_TDTPTPTP_c0A0A1c1 *c) THROWS(...){
+                                          struct _dwrap_cookie_struct_sTPTP_TDTPTPTP_c0A0A1c1 *c) THROWS(...) {
 	return (*c->compar)(a, b, c->arg);
 }
 #endif /* !__dwrap_sTPTP_TDTPTPTP_c0A0A1c1_defined */
@@ -2333,7 +2333,7 @@ INTERN ATTR_SECTION(".text.crt.dos.utility.stdlib") NONNULL((1, 4)) void
                         void *arg) THROWS(...) {
 	struct _dwrap_cookie_struct_sTPTP_TDTPTPTP_c0A0A1c1 libd_qsort_r_cookie;
 	libd_qsort_r_cookie.compar = compar;
-	libd_qsort_r_cookie.arg = arg;
+	libd_qsort_r_cookie.arg    = arg;
 	libc_qsort_r(pbase, item_count, item_size, (int (LIBCCALL *)(void const *, void const *, void *))&_dwrap_sTPTP_TDTPTPTP_c0A0A1c1, &libd_qsort_r_cookie);
 }
 #endif /* !__LIBCCALL_IS_LIBDCALL && !__KERNEL__ */
@@ -2551,7 +2551,7 @@ struct _dwrap_cookie_struct_sTPTP_TDTPTPTP_c0c1A0A1 {
 PRIVATE ATTR_SECTION(".text.crt.dos.utility") int
 (LIBCCALL _dwrap_sTPTP_TDTPTPTP_c0c1A0A1)(void const *a,
                                           void const *b,
-                                          struct _dwrap_cookie_struct_sTPTP_TDTPTPTP_c0c1A0A1 *c) THROWS(...){
+                                          struct _dwrap_cookie_struct_sTPTP_TDTPTPTP_c0c1A0A1 *c) THROWS(...) {
 	return (*c->compar)(c->arg, a, b);
 }
 #endif /* !__dwrap_sTPTP_TDTPTPTP_c0c1A0A1_defined */
@@ -2564,7 +2564,7 @@ INTERN ATTR_SECTION(".text.crt.dos.utility") WUNUSED NONNULL((1, 2, 5)) void *
                           void *arg) THROWS(...) {
 	struct _dwrap_cookie_struct_sTPTP_TDTPTPTP_c0c1A0A1 libd_bsearch_s_cookie;
 	libd_bsearch_s_cookie.compar = compar;
-	libd_bsearch_s_cookie.arg = arg;
+	libd_bsearch_s_cookie.arg    = arg;
 	return libc_bsearch_r(key, base, elem_count, elem_size, (int (LIBCCALL *)(void const *, void const *, void *))&_dwrap_sTPTP_TDTPTPTP_c0c1A0A1, &libd_bsearch_s_cookie);
 }
 #endif /* !__LIBCCALL_IS_LIBDCALL && !__KERNEL__ */
@@ -2608,7 +2608,7 @@ struct _dwrap_cookie_struct_sTPTP_TDTPTPTP_c0c1A0A1 {
 PRIVATE ATTR_SECTION(".text.crt.dos.utility") int
 (LIBCCALL _dwrap_sTPTP_TDTPTPTP_c0c1A0A1)(void const *a,
                                           void const *b,
-                                          struct _dwrap_cookie_struct_sTPTP_TDTPTPTP_c0c1A0A1 *c) THROWS(...){
+                                          struct _dwrap_cookie_struct_sTPTP_TDTPTPTP_c0c1A0A1 *c) THROWS(...) {
 	return (*c->compar)(c->arg, a, b);
 }
 #endif /* !__dwrap_sTPTP_TDTPTPTP_c0c1A0A1_defined */
@@ -2620,7 +2620,7 @@ INTERN ATTR_SECTION(".text.crt.dos.utility") NONNULL((1, 4)) void
                         void *arg) THROWS(...) {
 	struct _dwrap_cookie_struct_sTPTP_TDTPTPTP_c0c1A0A1 libd_qsort_s_cookie;
 	libd_qsort_s_cookie.compar = compar;
-	libd_qsort_s_cookie.arg = arg;
+	libd_qsort_s_cookie.arg    = arg;
 	libc_qsort_r(base, elem_count, elem_size, (int (LIBCCALL *)(void const *, void const *, void *))&_dwrap_sTPTP_TDTPTPTP_c0c1A0A1, &libd_qsort_s_cookie);
 }
 #endif /* !__LIBCCALL_IS_LIBDCALL && !__KERNEL__ */

@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xd5baea0e */
+/* HASH CRC-32:0x2a0400b4 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -850,16 +850,16 @@ INTDEF int NOTHROW_RPC(LIBCCALL libc_shexec)(char const *command);
 INTDEF ATTR_CONST WUNUSED char const *NOTHROW_NCX(LIBCCALL libc_getexecname)(void);
 #endif /* !__KERNEL__ */
 #if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
-/* Enumerate all open file descriptors by invoking `(*walk)(arg, <fd>)' for each of them
- * If  during any of these invocations, `(*walk)(...)' returns non-zero, enumeration stops,
- * and `fdwalk()' returns with that same value.  If `(*walk)(...)' is never called, or  all
+/* Enumerate all open file descriptors by  invoking `(*walk)(arg, <fd>)' for each of  them
+ * If during any of these invocations, `(*walk)(...)' returns non-zero, enumeration stops,
+ * and  `fdwalk()' returns with that same value. If `(*walk)(...)' is never called, or all
  * invocations return 0, `fdwalk()' will also return 0. */
 INTDEF NONNULL((1)) int (LIBDCALL libd_fdwalk)(int (LIBDCALL *walk)(void *arg, fd_t fd), void *arg) THROWS(...);
 #endif /* !__LIBCCALL_IS_LIBDCALL && !__KERNEL__ */
 #ifndef __KERNEL__
-/* Enumerate all open file descriptors by invoking `(*walk)(arg, <fd>)' for each of them
- * If  during any of these invocations, `(*walk)(...)' returns non-zero, enumeration stops,
- * and `fdwalk()' returns with that same value.  If `(*walk)(...)' is never called, or  all
+/* Enumerate all open file descriptors by  invoking `(*walk)(arg, <fd>)' for each of  them
+ * If during any of these invocations, `(*walk)(...)' returns non-zero, enumeration stops,
+ * and  `fdwalk()' returns with that same value. If `(*walk)(...)' is never called, or all
  * invocations return 0, `fdwalk()' will also return 0. */
 INTDEF NONNULL((1)) int (LIBCCALL libc_fdwalk)(int (LIBCCALL *walk)(void *arg, fd_t fd), void *arg) THROWS(...);
 #endif /* !__KERNEL__ */

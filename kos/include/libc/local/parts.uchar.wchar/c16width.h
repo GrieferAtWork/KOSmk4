@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x7ae564d5 */
+/* HASH CRC-32:0xe42809e6 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -26,11 +26,6 @@
 __NAMESPACE_LOCAL_BEGIN
 __LOCAL_LIBC(c16width) __ATTR_CONST __ATTR_WUNUSED int
 __NOTHROW_NCX(__LIBDCALL __LIBC_LOCAL_NAME(c16width))(__CHAR16_TYPE__ __ch) {
-
-	if (__ch >= 0xd800 &&
-	    __ch <= 0xdfff)
-		return 0;
-
 	if (__libc_unicode_isprint(__ch))
 		return 1;
 	if (__ch == 0)

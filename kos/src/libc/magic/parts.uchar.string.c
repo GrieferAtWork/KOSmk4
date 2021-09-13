@@ -42,6 +42,8 @@ __SYSDECL_BEGIN
 
 c16memcpy(*) %{uchar16("wmemcpy")}
 c32memcpy(*) %{uchar32("wmemcpy")}
+c16memcmp(*) %{uchar16("wmemcmp")}
+c32memcmp(*) %{uchar32("wmemcmp")}
 c16memmove(*) %{uchar16("wmemmove")}
 c32memmove(*) %{uchar32("wmemmove")}
 c16memset(*) %{uchar16("wmemset")}

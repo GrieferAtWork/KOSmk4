@@ -71,6 +71,10 @@ class UserString {
 		return other in text;
 	}
 
+	public property length: int = {
+		get(): int -> #text;
+	}
+
 	public operator == (other: UserString | string): bool {
 		if (other is UserString)
 			other = other.text;

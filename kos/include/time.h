@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xca52aa8 */
+/* HASH CRC-32:0x19866f45 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -685,7 +685,7 @@ __CREDIRECT(__ATTR_NONNULL((1)),int,__NOTHROW_NCX,timespec_get,(struct timespec 
 /* >> timespec_get(3), timespec_get64(3)
  * Set `ts' to calendar time based in time base `base' */
 __CDECLARE(__ATTR_NONNULL((1)),int,__NOTHROW_NCX,timespec_get,(struct timespec *__ts, __STDC_INT_AS_UINT_T __base),(__ts,__base))
-#elif defined(__CLOCK_REALTIME) && (defined(__CRT_HAVE_clock_gettime64) || defined(__CRT_HAVE_clock_gettime) || defined(__CRT_HAVE___clock_gettime))
+#elif defined(__CLOCK_REALTIME) && defined(__TIME_UTC) && (defined(__CRT_HAVE_clock_gettime64) || defined(__CRT_HAVE_clock_gettime) || defined(__CRT_HAVE___clock_gettime))
 __NAMESPACE_STD_END
 #include <libc/local/time/timespec_get.h>
 __NAMESPACE_STD_BEGIN
@@ -1371,7 +1371,7 @@ __CDECLARE(__ATTR_NONNULL((1)),int,__NOTHROW_NCX,timespec_get64,(struct timespec
 /* >> timespec_get(3), timespec_get64(3)
  * Set `ts' to calendar time based in time base `base' */
 __CREDIRECT(__ATTR_NONNULL((1)),int,__NOTHROW_NCX,timespec_get64,(struct timespec64 *__ts, __STDC_INT_AS_UINT_T __base),timespec_get,(__ts,__base))
-#elif defined(__CLOCK_REALTIME) && (defined(__CRT_HAVE_clock_gettime64) || defined(__CRT_HAVE_clock_gettime) || defined(__CRT_HAVE___clock_gettime))
+#elif defined(__CLOCK_REALTIME) && defined(__TIME_UTC) && (defined(__CRT_HAVE_clock_gettime64) || defined(__CRT_HAVE_clock_gettime) || defined(__CRT_HAVE___clock_gettime))
 #include <libc/local/time/timespec_get64.h>
 /* >> timespec_get(3), timespec_get64(3)
  * Set `ts' to calendar time based in time base `base' */
@@ -1396,7 +1396,7 @@ __CREDIRECT(__ATTR_NONNULL((1)),int,__NOTHROW_NCX,timespec_get,(struct timespec 
 /* >> timespec_get(3), timespec_get64(3)
  * Set `ts' to calendar time based in time base `base' */
 __CDECLARE(__ATTR_NONNULL((1)),int,__NOTHROW_NCX,timespec_get,(struct timespec *__ts, __STDC_INT_AS_UINT_T __base),(__ts,__base))
-#elif defined(__CLOCK_REALTIME) && (defined(__CRT_HAVE_clock_gettime64) || defined(__CRT_HAVE_clock_gettime) || defined(__CRT_HAVE___clock_gettime))
+#elif defined(__CLOCK_REALTIME) && defined(__TIME_UTC) && (defined(__CRT_HAVE_clock_gettime64) || defined(__CRT_HAVE_clock_gettime) || defined(__CRT_HAVE___clock_gettime))
 #include <libc/local/time/timespec_get.h>
 /* >> timespec_get(3), timespec_get64(3)
  * Set `ts' to calendar time based in time base `base' */

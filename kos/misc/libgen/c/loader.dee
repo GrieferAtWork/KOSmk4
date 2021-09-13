@@ -81,6 +81,7 @@ global final SIMPLE_ATTRIBUTE_ANNOTATIONS: {string: string} = {
 	"pure"        : "ATTR_PURE",
 	"cold"        : "ATTR_COLD",
 	"hot"         : "ATTR_HOT",
+	"leaf"        : "ATTR_LEAF",
 };
 
 @@Same as @SIMPLE_ATTRIBUTE_ANNOTATIONS, but used to define @FunctionPrototype.nothrow
@@ -2703,7 +2704,7 @@ function trySerializeDosCallbackWrapper(
 	function fixTypeClass(x) -> x.replace("(", "").replace(")", "");
 	try {
 		File.Writer result;
-		/* Prevent redundant declarations of binary-compatible wrapper functions
+		/* Prevent  redundant  declarations of  binary-compatible  wrapper functions
 		 * by serializing `usedWrapperBody', `cookie' (types) and `wrapperPrototype' */
 		if (cookie is WrapperCookieStruct) {
 			result << "s";
@@ -2971,7 +2972,7 @@ class CrtDosVariantCallbackMetadata: CrtDosVariantMetadata {
 				exposedName:          wrapperFunctionName,
 				breakAfterReturnType: true,
 				oneArgumentPerLine:   true);
-			dosPrefix << "{\n\t";
+			dosPrefix << " {\n\t";
 			if (usedWrapperBody.startswith("{") && usedWrapperBody.endswith("}")) {
 				dosPrefix << usedWrapperBody[1:-1].strip() << "\n}\n";
 			} else {
@@ -2989,8 +2990,12 @@ class CrtDosVariantCallbackMetadata: CrtDosVariantMetadata {
 			if (cookie is WrapperCookieStruct) {
 				cookieVariable = name + "_cookie";
 				dosBody << "\tstruct " << cookie.name << " " << cookieVariable << ";\n";
-				for (local name, field: cookie.members)
-					dosBody << "\t" << cookieVariable << "." << name << " = " << field.init << ";\n";
+				local longestNameLen = cookie.members.each.first.length > ...;
+				for (local name, field: cookie.members) {
+					dosBody << "\t" << cookieVariable << "."
+						<< str(name).ljust(longestNameLen) << " = "
+						<< field.init << ";\n";
+				}
 			} else {
 				cookieVariable = str(cookie.init);
 			}

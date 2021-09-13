@@ -93,6 +93,10 @@
 #ifdef __x86_64__
 #define LIBC_ARCH_HAVE_MEMCMPQ 1
 #endif /* __x86_64__ */
+#ifndef __x86_64__
+#define LIBC_ARCH_HAVE_C16MEMCMP 1 /* Not implemented because of msabi64 */
+#endif /* !__x86_64__ */
+#define LIBC_ARCH_HAVE_C32MEMCMP 1
 
 /* strlen() */
 #define LIBC_ARCH_HAVE_STRLEN  1

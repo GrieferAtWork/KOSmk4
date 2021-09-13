@@ -222,7 +222,12 @@ __NAMESPACE_STD_USING(wint_t)
 
 
 %[default:section(".text.crt{|.dos}.wchar.unicode.static.mbs")];
-[[wchar, std, wunused, const, wchar]]
+
+@@>> btowc(3)
+@@Convert a single-byte into a wide character. If the given
+@@character `ch' isn't valid, or  is `EOF', then `WEOF'  is
+@@returned instead.
+[[wchar, std, wunused, const]]
 [[decl_include("<hybrid/typecore.h>")]]
 wint_t btowc(int ch) {
 	if (ch >= 0 && ch <= 0x7f)
@@ -230,6 +235,9 @@ wint_t btowc(int ch) {
 	return WEOF;
 }
 
+@@>> wctob(3)
+@@Convert a wide-character into a single-byte character. If
+@@doing so isn't possible, then `EOF' is returned  instead.
 [[wchar, std, wunused, const]]
 [[impl_include("<asm/crt/stdio.h>")]]
 [[decl_include("<hybrid/typecore.h>")]]
@@ -241,6 +249,8 @@ int wctob(wint_t ch) {
 
 
 %[declare_user_export("mbrtoc16", "c16rtomb")]
+%[declare_known_section_class(".crt.dos.wchar.unicode.static.mbs")]
+
 %(auto_source){
 #ifndef __KERNEL__
 #ifdef __LIBCCALL_IS_LIBDCALL
@@ -299,6 +309,7 @@ NOTHROW_NCX(LIBKCALL libc_c16rtomb)(char *__restrict str,
 #endif /* !__KERNEL__ */
 }
 
+@@>> mbrtowc(3)
 [[std, wchar, export_alias("__mbrtowc")]]
 [[if($extended_include_prefix("<hybrid/typecore.h>")__SIZEOF_WCHAR_T__ == 2), alias("mbrtoc16")]]
 [[if($extended_include_prefix("<hybrid/typecore.h>")__SIZEOF_WCHAR_T__ == 4), alias("mbrtoc32")]]
@@ -331,9 +342,10 @@ size_t mbrtowc([[nullable]] wchar_t *pwc,
 		(void)__libc_seterrno(EILSEQ);
 @@pp_endif@@
 	return error;
-};
+}
 
 
+@@>> wcrtomb(3)
 [[std, wchar]]
 [[decl_include("<bits/crt/mbstate.h>", "<hybrid/typecore.h>")]]
 [[impl_include("<libc/errno.h>")]]
@@ -387,16 +399,18 @@ size_t wcrtomb(char *__restrict str, wchar_t wc,
 @@pp_endif@@
 	result = (size_t)(endptr - str);
 	return result;
-};
+}
 
+@@>> mbrlen(3)
 [[std, wchar, wunused, export_alias("__mbrlen")]]
 [[decl_include("<bits/crt/mbstate.h>", "<hybrid/typecore.h>")]]
 $size_t mbrlen([[inp_opt(maxlen)]] char const *__restrict str, $size_t maxlen,
                [[nullable]] $mbstate_t *mbs) {
 	wchar_t wc;
 	return mbrtowc(&wc, str, maxlen, mbs);
-};
+}
 
+@@>> mbsrtowcs(3)
 [[std, wchar]]
 [[decl_include("<bits/crt/mbstate.h>", "<hybrid/typecore.h>")]]
 size_t mbsrtowcs([[outp(dstlen)]] wchar_t *__restrict dst,
@@ -419,8 +433,9 @@ size_t mbsrtowcs([[outp(dstlen)]] wchar_t *__restrict dst,
 	}
 	*psrc = src;
 	return result;
-};
+}
 
+@@>> wcsrtombs(3)
 [[std, wchar]]
 [[decl_include("<bits/crt/mbstate.h>", "<hybrid/typecore.h>")]]
 size_t wcsrtombs([[outp(dstlen)]] char *dst,
@@ -447,6 +462,7 @@ size_t wcsrtombs([[outp(dstlen)]] char *dst,
 	return result;
 }
 
+@@>> wcstol(3)
 [[std, guard, wchar]]
 [[no_crt_self_import, no_crt_self_export, export_alias(CNL_wcstol...)]]
 [[if($extended_include_prefix("<hybrid/typecore.h>")__SIZEOF_LONG__ == __SIZEOF_LONG_LONG__), alias(CNL_wcstoll...)]]
@@ -456,6 +472,7 @@ size_t wcsrtombs([[outp(dstlen)]] char *dst,
 [[section(".text.crt{|.dos}.wchar.unicode.static.convert")]]
 wcstol(*) %{generate(str2wcs("strtol"))}
 
+@@>> wcstoul(3)
 [[std, guard, wchar]]
 [[no_crt_self_import, no_crt_self_export, export_alias(CNL_wcstoul...)]]
 [[if($extended_include_prefix("<hybrid/typecore.h>")__SIZEOF_LONG__ == __SIZEOF_LONG_LONG__), alias(CNL_wcstoull...)]]
@@ -465,7 +482,8 @@ wcstol(*) %{generate(str2wcs("strtol"))}
 [[section(".text.crt{|.dos}.wchar.unicode.static.convert")]]
 wcstoul(*) %{generate(str2wcs("strtoul"))}
 
-[[std, wunused, ATTR_PURE, decl_include("<bits/crt/mbstate.h>")]]
+@@>> mbsinit(3)
+[[std, wunused, pure, decl_include("<bits/crt/mbstate.h>")]]
 [[section(".text.crt{|.dos}.wchar.unicode.static.mbs")]]
 [[decl_include("<bits/crt/mbstate.h>")]]
 int mbsinit([[nullable]] mbstate_t const *mbs) {
@@ -474,22 +492,31 @@ int mbsinit([[nullable]] mbstate_t const *mbs) {
 
 %[define_wchar_replacement(wmemcmp = memcmpw, memcmpl)]
 
-[[std, wchar, wunused, ATTR_PURE, no_crt_impl]]
-[[decl_include("<hybrid/typecore.h>")]]
+@@>> wmemcmp(3)
+[[std, wchar, wunused, pure, decl_include("<hybrid/typecore.h>")]]
+[[if($extended_include_prefix("<hybrid/typecore.h>")__SIZEOF_WCHAR_T__ == 2 && __SIZEOF_INT__ <= 2), alias("memcmpw")]]
+[[if($extended_include_prefix("<hybrid/typecore.h>")__SIZEOF_WCHAR_T__ == 4 && __SIZEOF_INT__ <= 4), alias("memcmpl")]]
+[[if($extended_include_prefix("<hybrid/typecore.h>")__SIZEOF_WCHAR_T__ == 2 && __SIZEOF_INT__ <= 2), bind_local_function(memcmpw)]]
+[[if($extended_include_prefix("<hybrid/typecore.h>")__SIZEOF_WCHAR_T__ == 4 && __SIZEOF_INT__ <= 4), bind_local_function(memcmpl)]]
+/* When sizeof(int) <= 2: export int wmemcmp(...) = int16_t memcmpw(...); */
+[[crt_dos_impl_requires(!defined(LIBC_ARCH_HAVE_C16MEMCMP) && __SIZEOF_INT__ > 2)]]
+/* When sizeof(int) <= 4: export int wmemcmp(...) = int32_t memcmpl(...); */
+[[crt_kos_impl_requires(!defined(LIBC_ARCH_HAVE_C32MEMCMP) && __SIZEOF_INT__ > 4)]]
 int wmemcmp([[inp(num_chars)]] wchar_t const *s1,
             [[inp(num_chars)]] wchar_t const *s2,
             size_t num_chars) {
 @@pp_if __SIZEOF_WCHAR_T__ == 2@@
-	return memcmpw(s1, s2, num_chars);
+	return (int)memcmpw(s1, s2, num_chars);
 @@pp_elif __SIZEOF_WCHAR_T__ == 4@@
-	return memcmpl(s1, s2, num_chars);
+	return (int)memcmpl(s1, s2, num_chars);
 @@pp_else@@
-	return memcmp(s1, s2, num_chars * sizeof(wchar_t));
+	return (int)memcmp(s1, s2, num_chars * sizeof(wchar_t));
 @@pp_endif@@
 }
 
 %[define_wchar_replacement(wmemcpy = "(char16_t *)memcpyw", "(char32_t *)memcpyl")]
 
+@@>> wmemcpy(3)
 [[std, wchar, nonnull, no_crt_impl]]
 [[decl_include("<hybrid/typecore.h>")]]
 [[if($extended_include_prefix("<hybrid/typecore.h>")__SIZEOF_WCHAR_T__ == 2), alias("memcpyw")]]
@@ -510,6 +537,7 @@ wchar_t *wmemcpy([[outp(num_chars)]] wchar_t *__restrict dst,
 
 %[define_wchar_replacement(wmemmove = "(char16_t *)memmovew", "(char32_t *)memmovel")]
 
+@@>> wmemmove(3)
 [[std, wchar, nonnull, no_crt_impl]]
 [[decl_include("<hybrid/typecore.h>")]]
 [[if($extended_include_prefix("<hybrid/typecore.h>")__SIZEOF_WCHAR_T__ == 2), alias("memmovew")]]
@@ -530,6 +558,7 @@ wchar_t *wmemmove([[outp(num_chars)]] wchar_t *dst,
 
 %[define_wchar_replacement(wmemset = "(char16_t *)memsetw", "(char32_t *)memsetl")]
 
+@@>> wmemset(3)
 [[std, wchar, no_crt_impl]]
 [[decl_include("<hybrid/typecore.h>")]]
 [[if($extended_include_prefix("<hybrid/typecore.h>")__SIZEOF_WCHAR_T__ == 2), alias("memsetw")]]
@@ -547,6 +576,7 @@ wchar_t *wmemmove([[outp(num_chars)]] wchar_t *dst,
 @@pp_endif@@
 }
 
+@@>> wcscpy(3)
 [[decl_include("<hybrid/typecore.h>")]]
 [[std, guard, wchar, section(".text.crt{|.dos}.wchar.string.memory")]]
 [[nonnull]] wchar_t *wcscpy([[nonnull]] wchar_t *__restrict buf,
@@ -554,6 +584,7 @@ wchar_t *wmemmove([[outp(num_chars)]] wchar_t *dst,
 	return wmemcpy(buf, src, wcslen(src) + 1);
 }
 
+@@>> wcscat(3)
 [[decl_include("<hybrid/typecore.h>")]]
 [[std, guard, wchar, section(".text.crt{|.dos}.wchar.string.memory")]]
 [[nonnull]] wchar_t *wcscat([[nonnull]] wchar_t *__restrict buf,
@@ -562,6 +593,7 @@ wchar_t *wmemmove([[outp(num_chars)]] wchar_t *dst,
 	return buf;
 }
 
+@@>> wcsncat(3)
 [[decl_include("<hybrid/typecore.h>")]]
 [[std, guard, wchar, section(".text.crt{|.dos}.wchar.string.memory")]]
 [[nonnull]] wchar_t *wcsncat([[nonnull]] wchar_t *__restrict buf,
@@ -574,6 +606,7 @@ wchar_t *wmemmove([[outp(num_chars)]] wchar_t *dst,
 	return buf;
 }
 
+@@>> wcsncpy(3)
 [[decl_include("<hybrid/typecore.h>")]]
 [[std, guard, wchar, section(".text.crt{|.dos}.wchar.string.memory")]]
 [[nonnull]] wchar_t *wcsncpy([[nonnull]] wchar_t *__restrict buf,
@@ -586,20 +619,26 @@ wchar_t *wmemmove([[outp(num_chars)]] wchar_t *dst,
 }
 
 
+@@>> wcscmp(3)
 [[std, guard, wchar, section(".text.crt{|.dos}.wchar.string.memory")]]
 wcscmp(*) %{generate(str2wcs("strcmp"))}
 
+@@>> wcsncmp(3)
 [[std, guard, wchar, section(".text.crt{|.dos}.wchar.string.memory")]]
 wcsncmp(*) %{generate(str2wcs("strncmp"))}
 
+@@>> wcscoll(3)
 [[std, guard, wchar, section(".text.crt{|.dos}.wchar.unicode.static.memory")]]
 wcscoll(*) %{generate(str2wcs("strcoll"))}
 
+@@>> wcsxfrm(3)
 [[std, guard, wchar, section(".text.crt{|.dos}.wchar.unicode.static.memory")]]
 wcsxfrm(*) %{generate(str2wcs("strxfrm"))}
 
 
 %[default:section(".text.crt{|.dos}.wchar.FILE.locked.read.getc")]
+
+@@>> getwchar(3)
 [[cp_stdio, std, guard, wchar, requires_include("<__crt.h>")]]
 [[requires(!defined(__NO_STDSTREAMS) && $has_function(fgetwc))]]
 [[impl_include("<libc/local/stdstreams.h>"), dos_export_alias("_fgetwchar")]]
@@ -608,12 +647,14 @@ wint_t getwchar() {
 	return fgetwc(stdin);
 }
 
+@@>> fgetwc(3)
 [[cp_stdio, std, guard, wchar, export_alias("getwc")]]
 [[decl_include("<hybrid/typecore.h>")]]
 wint_t fgetwc([[nonnull]] FILE *__restrict stream);
 
 %[insert:guarded_std_function(getwc = fgetwc)]
 
+@@>> putwchar(3)
 [[cp_stdio, std, guard, wchar, requires_include("<__crt.h>")]]
 [[requires(!defined(__NO_STDSTREAMS) && $has_function(fputwc))]]
 [[impl_include("<libc/local/stdstreams.h>"), dos_export_alias("_fputwchar")]]
@@ -623,6 +664,7 @@ wint_t putwchar(wchar_t wc) {
 	return fputwc(wc, stdout);
 }
 
+@@>> fputwc(3)
 [[cp_stdio, std, guard, wchar, export_alias("putwc")]]
 [[section(".text.crt{|.dos}.wchar.FILE.locked.write.putc")]]
 [[decl_include("<hybrid/typecore.h>")]]
@@ -631,7 +673,7 @@ wint_t fputwc(wchar_t wc, [[nonnull]] FILE *stream);
 %[insert:guarded_std_function(putwc = fputwc)]
 
 
-
+@@>> fgetws(3)
 [[section(".text.crt{|.dos}.wchar.FILE.locked.read.read")]]
 [[cp_stdio, std, guard, wchar, wunused, alias("fgetws_unlocked", "_fgetws_nolock")]]
 [[if(defined(__USE_STDIO_UNLOCKED)), preferred_alias("fgetws_unlocked", "_fgetws_nolock")]]
@@ -680,6 +722,7 @@ wchar_t *fgetws([[outp(bufsize)]] wchar_t *__restrict buf,
 
 
 
+@@>> fputws(3)
 [[requires_function(file_wprinter)]]
 [[cp_stdio, std, guard, wchar, alias("fputws_unlocked", "_fputws_nolock")]]
 [[decl_include("<features.h>", "<hybrid/typecore.h>")]]
@@ -692,12 +735,14 @@ __STDC_INT_AS_SIZE_T fputws([[nonnull]] wchar_t const *__restrict str,
 	return result;
 }
 
+@@>> ungetwc(3)
 [[decl_include("<hybrid/typecore.h>")]]
 [[std, guard, wchar, alias("ungetwc_unlocked")]]
 [[section(".text.crt{|.dos}.wchar.FILE.locked.write.putc")]]
 [[if(defined(__USE_STDIO_UNLOCKED)), preferred_alias("ungetwc_unlocked")]]
 wint_t ungetwc(wint_t wc, [[nonnull]] FILE *stream);
 
+@@>> wcsftime(3)
 [[std, guard, wchar]]
 [[decl_include("<hybrid/typecore.h>", "<bits/crt/tm.h>")]]
 [[section(".text.crt{|.dos}.wchar.unicode.static.format.strftime")]]
@@ -715,6 +760,8 @@ size_t wcsftime([[outp(min(return, buflen))]] wchar_t *__restrict buf, size_t bu
 %[default:section(".text.crt{|.dos}.wchar.string.memory")]
 %(std)
 %(std)#if !defined(__USE_DOS) || defined(__USE_ISOC95)
+
+@@>> wcstok(3)
 [[decl_include("<hybrid/typecore.h>")]]
 [[std, guard, wchar, no_crt_self_import, no_crt_self_export]]
 [[dos_export_as("DOS$wcstok_s"), kos_export_as("wcstok")]]
@@ -724,42 +771,50 @@ wchar_t *wcstok([[nullable]] wchar_t *str,
                 [[nonnull]] wchar_t const *__restrict delim,
                 [[nonnull]] wchar_t **__restrict save_ptr)
 	%{generate(str2wcs("strtok_r"))}
+
 %(std)#endif /* !__USE_DOS || __USE_ISOC95 */
 
+@@>> wcslen(3)
 [[std, guard, wchar]]
 [[crt_dos_impl_requires(!defined(LIBC_ARCH_HAVE_C16SLEN))]]
 [[crt_kos_impl_requires(!defined(LIBC_ARCH_HAVE_C32SLEN))]]
 wcslen(*) %{generate(str2wcs("strlen"))}
 
+@@>> wcsspn(3)
 [[std, guard, wchar]]
 wcsspn(*) %{generate(str2wcs("strspn"))}
 
+@@>> wcscspn(3)
 [[std, guard, wchar]]
 wcscspn(*) %{generate(str2wcs("strcspn"))}
 
+@@>> wcschr(3)
 [[decl_include("<hybrid/typecore.h>")]]
-[[std, guard, wchar, wunused, ATTR_PURE]]
+[[std, guard, wchar, wunused, pure]]
 wchar_t *wcschr([[nonnull]] wchar_t const *__restrict haystack, wchar_t needle)
 	[([[nonnull]] wchar_t *__restrict haystack, wchar_t needle): wchar_t *]
 	[([[nonnull]] wchar_t const *__restrict haystack, wchar_t needle): wchar_t const *]
 	%{generate(str2wcs("strchr"))}
 
+@@>> wcsrchr(3)
 [[decl_include("<hybrid/typecore.h>")]]
-[[std, guard, wchar, wunused, ATTR_PURE]]
+[[std, guard, wchar, wunused, pure]]
 wchar_t *wcsrchr([[nonnull]] wchar_t const *__restrict haystack, wchar_t needle)
 	[([[nonnull]] wchar_t *__restrict haystack, wchar_t needle): wchar_t *]
 	[([[nonnull]] wchar_t const *__restrict haystack, wchar_t needle): wchar_t const *]
 	%{generate(str2wcs("strrchr"))}
 
+@@>> wcspbrk(3)
 [[decl_include("<hybrid/typecore.h>")]]
-[[std, guard, wchar, wunused, ATTR_PURE]]
+[[std, guard, wchar, wunused, pure]]
 wchar_t *wcspbrk([[nonnull]] wchar_t const *haystack, [[nonnull]] wchar_t const *accept)
 	[([[nonnull]] wchar_t *haystack, [[nonnull]] wchar_t const *accept): wchar_t *]
 	[([[nonnull]] wchar_t const *haystack, [[nonnull]] wchar_t const *accept): wchar_t const *]
 	%{generate(str2wcs("strpbrk"))}
 
+@@>> wcsstr(3)
 [[decl_include("<hybrid/typecore.h>")]]
-[[std, guard, wchar, wunused, ATTR_PURE, export_alias("wcswcs")]]
+[[std, guard, wchar, wunused, pure, export_alias("wcswcs")]]
 wchar_t *wcsstr([[nonnull]] wchar_t const *haystack, [[nonnull]] wchar_t const *needle)
 	[([[nonnull]] wchar_t *haystack, [[nonnull]] wchar_t *needle): wchar_t *]
 	[([[nonnull]] wchar_t const *haystack, [[nonnull]] wchar_t const *needle): wchar_t const *]
@@ -767,8 +822,9 @@ wchar_t *wcsstr([[nonnull]] wchar_t const *haystack, [[nonnull]] wchar_t const *
 
 %[define_wchar_replacement(wmemchr = "(char16_t *)memchrw", "(char32_t *)memchrl")]
 
+@@>> wmemchr(3)
 [[decl_include("<hybrid/typecore.h>")]]
-[[std, wchar, wunused, ATTR_PURE, no_crt_impl]]
+[[std, wchar, wunused, pure, no_crt_impl]]
 [[if($extended_include_prefix("<hybrid/typecore.h>")__SIZEOF_WCHAR_T__ == 2), alias("memchrw")]]
 [[if($extended_include_prefix("<hybrid/typecore.h>")__SIZEOF_WCHAR_T__ == 4), alias("memchrl")]]
 [[if($extended_include_prefix("<hybrid/typecore.h>")__SIZEOF_WCHAR_T__ == 2), bind_local_function(memchrw)]]
@@ -787,6 +843,8 @@ wchar_t *wmemchr([[inp(num_chars)]] wchar_t const *__restrict haystack, wchar_t 
 }
 
 %(std)#if defined(__USE_ISOC95) || defined(__USE_UNIX98)
+
+@@>> fwide(3)
 [[std, guard]]
 [[section(".text.crt{|.dos}.wchar.FILE.locked.utility")]]
 int fwide([[nonnull]] FILE *fp, int mode) {
@@ -795,11 +853,13 @@ int fwide([[nonnull]] FILE *fp, int mode) {
 	COMPILER_IMPURE();
 	return 0;
 }
+
 %(std)#endif /* __USE_ISOC95 || __USE_UNIX98 */
 
 %(std)
 %(std)#if defined(__USE_ISOC95) || defined(__USE_UNIX98) || defined(__USE_DOS)
 
+@@>> fwprintf(3)
 [[cp_stdio, std, guard, wchar, ATTR_LIBC_WPRINTF(2, 3)]]
 [[decl_include("<features.h>", "<hybrid/typecore.h>")]]
 [[section(".text.crt{|.dos}.wchar.FILE.locked.write.printf")]]
@@ -807,6 +867,7 @@ __STDC_INT_AS_SIZE_T fwprintf([[nonnull]] FILE *__restrict stream,
                               [[nonnull]] wchar_t const *__restrict format, ...)
 	%{printf("vfwprintf")}
 
+@@>> vfwprintf(3)
 [[requires_dependent_function(file_wprinter)]]
 [[cp_stdio, std, guard, wchar, ATTR_LIBC_WPRINTF(2, 0)]]
 [[decl_include("<features.h>", "<hybrid/typecore.h>")]]
@@ -817,12 +878,14 @@ __STDC_INT_AS_SIZE_T vfwprintf([[nonnull]] FILE *__restrict stream,
 	return (__STDC_INT_AS_SSIZE_T)format_vwprintf(&file_wprinter, stream, format, args);
 }
 
+@@>> wprintf(3)
 [[cp_stdio, std, guard, wchar, ATTR_LIBC_WPRINTF(1, 2)]]
 [[decl_include("<features.h>", "<hybrid/typecore.h>")]]
 [[section(".text.crt{|.dos}.wchar.FILE.locked.write.printf")]]
 __STDC_INT_AS_SIZE_T wprintf([[nonnull]] wchar_t const *__restrict format, ...)
 	%{printf("vwprintf")}
 
+@@>> vwprintf(3)
 [[cp_stdio, std, guard, wchar, ATTR_LIBC_WPRINTF(1, 0)]]
 [[decl_include("<features.h>", "<hybrid/typecore.h>")]]
 [[requires_include("<__crt.h>"), impl_include("<libc/local/stdstreams.h>")]]
@@ -832,24 +895,28 @@ __STDC_INT_AS_SIZE_T vwprintf([[nonnull]] wchar_t const *__restrict format, $va_
 	return vfwprintf(stdout, format, args);
 }
 
+@@>> fwscanf(3)
 [[cp_stdio, std, guard, wchar, ATTR_LIBC_WSCANF(2, 3)]]
 [[decl_include("<features.h>", "<hybrid/typecore.h>")]]
 [[section(".text.crt{|.dos}.wchar.FILE.locked.read.scanf")]]
 __STDC_INT_AS_SIZE_T fwscanf([[nonnull]] FILE *__restrict stream, [[nonnull]] wchar_t const *__restrict format, ...)
 	%{printf("vfwscanf")}
 
+@@>> wscanf(3)
 [[cp_stdio, std, guard, wchar, ATTR_LIBC_WSCANF(1, 2)]]
 [[decl_include("<features.h>", "<hybrid/typecore.h>")]]
 [[section(".text.crt{|.dos}.wchar.FILE.locked.read.scanf")]]
 __STDC_INT_AS_SIZE_T wscanf([[nonnull]] wchar_t const *__restrict format, ...)
 	%{printf("vwscanf")}
 
+@@>> swscanf(3)
 [[std, guard, wchar, ATTR_LIBC_WSCANF(2, 3)]]
 [[decl_include("<features.h>", "<hybrid/typecore.h>")]]
 [[section(".text.crt{|.dos}.wchar.unicode.static.format.scanf")]]
 __STDC_INT_AS_SIZE_T swscanf([[nonnull]] wchar_t const *__restrict src, [[nonnull]] wchar_t const *__restrict format, ...)
 	%{printf("vswscanf")}
 
+@@>> vswprintf(3)
 [[std, guard, wchar, ATTR_LIBC_WPRINTF(3, 0)]]
 [[decl_include("<features.h>", "<hybrid/typecore.h>")]]
 [[section(".text.crt{|.dos}.wchar.unicode.static.format.printf")]]
@@ -864,6 +931,7 @@ __STDC_INT_AS_SIZE_T vswprintf([[outp_opt(min(return + 1, buflen))]] wchar_t *__
 	return 0;
 }
 
+@@>> swprintf(3)
 [[decl_include("<features.h>", "<hybrid/typecore.h>")]]
 [[std, guard, wchar, ATTR_LIBC_WPRINTF(3, 4), dos_export_alias("_swprintf")]]
 [[section(".text.crt{|.dos}.wchar.unicode.static.format.printf")]]
@@ -877,24 +945,33 @@ __STDC_INT_AS_SIZE_T swprintf([[outp_opt(min(return + 1, buflen))]] wchar_t *__r
 %(std)
 
 %(std,c,ccompat)#ifndef __NO_FPU
+
+@@>> wcstod(3)
 [[std, guard, wchar]]
 [[dependency(unicode_readutf16, unicode_readutf16_rev)]]
 wcstod(*) %{generate(str2wcs("strtod"))}
+
 %(std,c,ccompat)#endif /* !__NO_FPU */
 
 %(std)#ifdef __USE_ISOC99
 %(std,c,ccompat)#ifndef __NO_FPU
+
+@@>> wcstof(3)
 [[std, guard, wchar]]
 [[dependency(unicode_readutf16, unicode_readutf16_rev)]]
 wcstof(*) %{generate(str2wcs("strtof"))}
 
 %(std)#ifdef __COMPILER_HAVE_LONGDOUBLE
+
+@@>> wcstold(3)
 [[std, guard, wchar]]
 [[dependency(unicode_readutf16, unicode_readutf16_rev)]]
 wcstold(*) %{generate(str2wcs("strtold"))}
+
 %(std,c,ccompat)#endif /* !__NO_FPU */
 %(std)#endif /* __COMPILER_HAVE_LONGDOUBLE */
 
+@@>> wcstoll(3)
 [[std, guard, wchar]]
 [[no_crt_self_import, no_crt_self_export, export_alias(CNL_wcstoll...)]]
 [[if($extended_include_prefix("<hybrid/typecore.h>")__SIZEOF_LONG_LONG__ == __SIZEOF_LONG__),     alias(CNL_wcstol...)]]
@@ -903,6 +980,7 @@ wcstold(*) %{generate(str2wcs("strtold"))}
 [[if($extended_include_prefix("<hybrid/typecore.h>")__SIZEOF_LONG_LONG__ == __SIZEOF_INTMAX_T__), alias(CNL_wcstoimax...)]]
 wcstoll(*) %{generate(str2wcs("strtoll"))}
 
+@@>> wcstoull(3)
 [[std, guard, wchar]]
 [[no_crt_self_import, no_crt_self_export, export_alias(CNL_wcstoull...)]]
 [[if($extended_include_prefix("<hybrid/typecore.h>")__SIZEOF_LONG_LONG__ == __SIZEOF_LONG__),     alias(CNL_wcstoul...)]]
@@ -913,12 +991,14 @@ wcstoull(*) %{generate(str2wcs("strtoull"))}
 
 %[default:section(".text.crt{|.dos}.wchar.FILE.locked.read.scanf")]
 
+@@>> vfwscanf(3)
 [[decl_include("<features.h>", "<hybrid/typecore.h>")]]
 [[cp_stdio, std, guard, wchar, wunused, ATTR_LIBC_WSCANF(2, 0)]]
 __STDC_INT_AS_SIZE_T vfwscanf([[nonnull]] FILE *__restrict stream,
                               [[nonnull]] wchar_t const *__restrict format, $va_list args);
 /* TODO: format_scanf() implementation for `vfwscanf'! */
 
+@@>> vwscanf(3)
 [[decl_include("<features.h>", "<hybrid/typecore.h>")]]
 [[cp_stdio, std, guard, wchar, wunused, ATTR_LIBC_WSCANF(1, 0)]]
 [[requires_include("<__crt.h>"), impl_include("<libc/local/stdstreams.h>")]]
@@ -929,6 +1009,7 @@ __STDC_INT_AS_SIZE_T vwscanf([[nonnull]] wchar_t const *__restrict format, $va_l
 
 %[default:section(".text.crt{|.dos}.wchar.unicode.static.format.scanf")]
 
+@@>> vswscanf(3)
 [[decl_include("<features.h>", "<hybrid/typecore.h>")]]
 [[std, guard, wchar, wunused, ATTR_LIBC_WSCANF(2, 0)]]
 __STDC_INT_AS_SIZE_T vswscanf([[nonnull]] wchar_t const *__restrict src,
@@ -946,6 +1027,7 @@ __STDC_INT_AS_SIZE_T vswscanf([[nonnull]] wchar_t const *__restrict src,
 
 
 
+@@>> wcstok(3)
 @@Define wcstok() incorrectly, the same way DOS does
 [[decl_include("<hybrid/typecore.h>")]]
 [[std, guard, wchar, nocrt, inline, exposed_name("wcstok")]]
@@ -962,30 +1044,37 @@ wchar_t *broken_dos_wcstok([[nullable]] wchar_t *str,
 
 %
 %#ifdef __USE_XOPEN2K8
+@@>> wcscasecmp(3)
 [[wchar, dos_export_alias("_wcsicmp")]]
 [[section(".text.crt{|.dos}.wchar.unicode.static.memory")]]
 wcscasecmp(*) %{generate(str2wcs("strcasecmp"))}
 
+@@>> wcsncasecmp(3)
 [[wchar, dos_export_alias("_wcsnicmp")]]
 [[section(".text.crt{|.dos}.wchar.unicode.static.memory")]]
 wcsncasecmp(*) %{generate(str2wcs("strncasecmp"))}
 
+@@>> wcscasecmp_l(3)
 [[wchar, dos_export_alias("_wcsicmp_l"), export_alias("__wcscasecmp_l")]]
 [[section(".text.crt{|.dos}.wchar.unicode.locale.memory")]]
 wcscasecmp_l(*) %{generate(str2wcs("strcasecmp_l"))}
 
+@@>> wcsncasecmp_l(3)
 [[wchar, dos_export_alias("_wcsnicmp_l"), export_alias("__wcsncasecmp_l")]]
 [[section(".text.crt{|.dos}.wchar.unicode.locale.memory")]]
 wcsncasecmp_l(*) %{generate(str2wcs("strncasecmp_l"))}
 
+@@>> wcscoll_l(3)
 [[wchar, dos_export_alias("_wcscoll_l"), export_alias("__wcscoll_l")]]
 [[section(".text.crt{|.dos}.wchar.unicode.locale.memory")]]
 wcscoll_l(*) %{generate(str2wcs("strcoll_l"))}
 
+@@>> wcsxfrm_l(3)
 [[wchar, dos_export_alias("_wcsxfrm_l"), export_alias("__wcsxfrm_l")]]
 [[section(".text.crt{|.dos}.wchar.unicode.locale.memory")]]
 wcsxfrm_l(*) %{generate(str2wcs("strxfrm_l"))}
 
+@@>> wcpcpy(3)
 [[decl_include("<hybrid/typecore.h>")]]
 [[wchar, section(".text.crt{|.dos}.wchar.string.memory")]]
 [[nonnull]] wchar_t *wcpcpy([[nonnull]] wchar_t *__restrict dst,
@@ -993,6 +1082,7 @@ wcsxfrm_l(*) %{generate(str2wcs("strxfrm_l"))}
 	return wmempcpy(dst, src, wcslen(src) + 1);
 }
 
+@@>> wcpncpy(3)
 [[decl_include("<hybrid/typecore.h>")]]
 [[wchar, section(".text.crt{|.dos}.wchar.string.memory")]]
 [[nonnull]] wchar_t *wcpncpy([[nonnull]] wchar_t *__restrict buf,
@@ -1004,18 +1094,21 @@ wcsxfrm_l(*) %{generate(str2wcs("strxfrm_l"))}
 	return buf + srclen;
 }
 
+@@>> mbsnrtowcs(3)
 [[wchar, section(".text.crt{|.dos}.wchar.unicode.static.mbs")]]
 [[decl_include("<hybrid/typecore.h>", "<bits/crt/mbstate.h>")]]
 $size_t mbsnrtowcs([[nullable]] wchar_t *dst,
                    [[nonnull]] char const **__restrict psrc, $size_t nmc, $size_t len,
                    [[nullable]] $mbstate_t *mbs); /* TODO: Implement here */
 
+@@>> wcsnrtombs(3)
 [[wchar, section(".text.crt{|.dos}.wchar.unicode.static.mbs")]]
 [[decl_include("<hybrid/typecore.h>", "<bits/crt/mbstate.h>")]]
 $size_t wcsnrtombs([[nullable]] char *dst,
                    [[nonnull]] wchar_t const **__restrict psrc, $size_t nwc, $size_t len,
                    [[nullable]] $mbstate_t *mbs); /* TODO: Implement here */
 
+@@>> open_wmemstream(3)
 [[decl_include("<hybrid/typecore.h>")]]
 [[wchar, section(".text.crt{|.dos}.wchar.FILE.locked.access")]]
 $FILE *open_wmemstream(wchar_t **bufloc, $size_t *sizeloc);
@@ -1024,11 +1117,13 @@ $FILE *open_wmemstream(wchar_t **bufloc, $size_t *sizeloc);
 %
 %#if defined(__USE_XOPEN2K8) || defined(__USE_DOS)
 
+@@>> wcsnlen(3)
 [[guard, wchar, section(".text.crt{|.dos}.wchar.string.memory")]]
 [[crt_dos_impl_requires(!defined(LIBC_ARCH_HAVE_C16SNLEN))]]
 [[crt_kos_impl_requires(!defined(LIBC_ARCH_HAVE_C32SNLEN))]]
 wcsnlen(*) %{generate(str2wcs("strnlen"))}
 
+@@>> wcsdup(3)
 [[guard, wchar, dos_export_alias("_wcsdup")]]
 [[section(".text.crt{|.dos}.wchar.heap.strdup")]]
 wcsdup(*) %{generate(str2wcs("strdup"))}
@@ -1037,15 +1132,14 @@ wcsdup(*) %{generate(str2wcs("strdup"))}
 
 %
 %#ifdef __USE_XOPEN
+@@>> wcwidth(3)
+@@Returns the number of columns needed to display `ch' in a system terminal
+@@When `ch' cannot be  displayed at all, `-1'  is returned (but `errno'  is
+@@never modified by this function). Zero-width characters return `0'.
 [[decl_include("<hybrid/typecore.h>")]]
 [[wchar, wunused, const, impl_include("<libc/unicode.h>")]]
 [[section(".text.crt{|.dos}.wchar.unicode.static.mbs")]]
 int wcwidth(wchar_t ch) {
-@@pp_if __SIZEOF_WCHAR_T__ == 2@@
-	if (ch >= UTF16_HIGH_SURROGATE_MIN &&
-	    ch <= UTF16_LOW_SURROGATE_MAX)
-		return 0;
-@@pp_endif@@
 	if (__libc_unicode_isprint(ch))
 		return 1;
 	if (ch == 0)
@@ -1053,11 +1147,17 @@ int wcwidth(wchar_t ch) {
 	return -1;
 }
 
-[[decl_include("<hybrid/typecore.h>")]]
-[[wchar, wunused, ATTR_PURE, section(".text.crt{|.dos}.wchar.unicode.static.mbs")]]
-int wcswidth([[inp(num_chars)]] wchar_t const *__restrict str, $size_t num_chars) {
-	int temp, result = 0;
-	for (; num_chars; --num_chars, ++str) {
+@@>> wcswidth(3)
+@@Returns the number of columns needed to display `str...+=wcslen(str, num_chars)'
+@@in a system terminal. If any of the contained characters cannot be printed, then
+@@`-1' is returned. (s.a. `wcwidth(3)')
+[[section(".text.crt{|.dos}.wchar.unicode.static.mbs")]]
+[[wchar, wunused, pure, decl_include("<hybrid/typecore.h>", "<features.h>")]]
+__STDC_INT32_AS_SSIZE_T wcswidth([[inp(num_chars)]] wchar_t const *__restrict str,
+                                 $size_t num_chars) {
+	int temp;
+	__STDC_INT32_AS_SSIZE_T result = 0;
+	for (; num_chars; ++str, --num_chars) {
 		wchar_t ch = *str;
 		if (!ch)
 			break;
@@ -1066,7 +1166,7 @@ int wcswidth([[inp(num_chars)]] wchar_t const *__restrict str, $size_t num_chars
 			return temp;
 		result += temp;
 	}
-	return 0;
+	return result;
 }
 %#endif /* __USE_XOPEN */
 
@@ -1077,9 +1177,10 @@ int wcswidth([[inp(num_chars)]] wchar_t const *__restrict str, $size_t num_chars
 
 %
 %#ifdef __USE_GNU
+@@>> wcschrnul(3)
 @@Same as `wcschr', but return `wcsend(str)', rather than `NULL' if `needle' wasn't found.
 [[decl_include("<hybrid/typecore.h>")]]
-[[wchar, wunused, ATTR_PURE, section(".text.crt{|.dos}.wchar.string.memory")]]
+[[wchar, wunused, pure, section(".text.crt{|.dos}.wchar.string.memory")]]
 wchar_t *wcschrnul([[nonnull]] wchar_t const *haystack, wchar_t needle)
 	[([[nonnull]] wchar_t *__restrict haystack, wchar_t needle): wchar_t *]
 	[([[nonnull]] wchar_t const *__restrict haystack, wchar_t needle): wchar_t const *]
@@ -1088,6 +1189,7 @@ wchar_t *wcschrnul([[nonnull]] wchar_t const *haystack, wchar_t needle)
 
 %[define_wchar_replacement(wmempcpy = "(char16_t *)mempcpyw", "(char32_t *)mempcpyl")]
 
+@@>> wmempcpy(3)
 [[wchar, no_crt_impl, decl_include("<hybrid/typecore.h>")]]
 [[if($extended_include_prefix("<hybrid/typecore.h>")__SIZEOF_WCHAR_T__ == 2), alias("mempcpyw")]]
 [[if($extended_include_prefix("<hybrid/typecore.h>")__SIZEOF_WCHAR_T__ == 4), alias("mempcpyl")]]
@@ -1107,6 +1209,7 @@ wchar_t *wcschrnul([[nonnull]] wchar_t const *haystack, wchar_t needle)
 
 %[define_wchar_replacement(wmempmove = "(char16_t *)mempmovew", "(char32_t *)mempmovel")]
 
+@@>> wmempmove(3)
 [[std, wchar, no_crt_impl, decl_include("<hybrid/typecore.h>")]]
 [[if($extended_include_prefix("<hybrid/typecore.h>")__SIZEOF_WCHAR_T__ == 2), alias("mempmovew")]]
 [[if($extended_include_prefix("<hybrid/typecore.h>")__SIZEOF_WCHAR_T__ == 4), alias("mempmovel")]]
@@ -1124,10 +1227,12 @@ wchar_t *wcschrnul([[nonnull]] wchar_t const *haystack, wchar_t needle)
 @@pp_endif@@
 }
 
+@@>> wcstol_l(3)
 [[wchar, dos_export_alias("_wcstol_l"), export_alias("__wcstol_l")]]
 [[section(".text.crt{|.dos}.wchar.unicode.locale.convert")]]
 wcstol_l(*) %{generate(str2wcs("strtol_l"))}
 
+@@>> wcstoul_l(3)
 [[wchar, dos_export_alias("_wcstoul_l"), export_alias("__wcstoul_l")]]
 [[section(".text.crt{|.dos}.wchar.unicode.locale.convert")]]
 wcstoul_l(*) %{generate(str2wcs("strtoul_l"))}
@@ -1135,6 +1240,7 @@ wcstoul_l(*) %{generate(str2wcs("strtoul_l"))}
 %[insert:function(wcstoq = wcstoll)]
 %[insert:function(wcstouq = wcstoull)]
 
+@@>> wcstoll_l(3)
 [[wchar, dos_export_alias("_wcstoll_l"), export_alias("__wcstoll_l")]]
 [[if($extended_include_prefix("<hybrid/typecore.h>")__SIZEOF_LONG_LONG__ == __SIZEOF_LONG__),     alias(CNL_wcstol_l...)]]
 [[if($extended_include_prefix("<hybrid/typecore.h>")__SIZEOF_LONG_LONG__ == 8),                   alias(CNL_wcsto64_l...)]]
@@ -1142,6 +1248,7 @@ wcstoul_l(*) %{generate(str2wcs("strtoul_l"))}
 [[section(".text.crt{|.dos}.wchar.unicode.locale.convert")]]
 wcstoll_l(*) %{generate(str2wcs("strtoll_l"))}
 
+@@>> wcstoull_l(3)
 [[wchar, dos_export_alias("_wcstoull_l"), export_alias("__wcstoull_l")]]
 [[if($extended_include_prefix("<hybrid/typecore.h>")__SIZEOF_LONG_LONG__ == __SIZEOF_LONG__),     alias(CNL_wcstoul_l...)]]
 [[if($extended_include_prefix("<hybrid/typecore.h>")__SIZEOF_LONG_LONG__ == 8),                   alias(CNL_wcstou64_l...)]]
@@ -1150,21 +1257,25 @@ wcstoll_l(*) %{generate(str2wcs("strtoll_l"))}
 wcstoull_l(*) %{generate(str2wcs("strtoull_l"))}
 
 %#ifndef __NO_FPU
+@@>> wcstof_l(3)
 [[wchar, dos_export_alias("_wcstof_l"), export_alias("__wcstof_l")]]
 [[section(".text.crt{|.dos}.wchar.unicode.locale.convert")]]
 wcstof_l(*) %{generate(str2wcs("strtof_l"))}
 
+@@>> wcstod_l(3)
 [[wchar, dos_export_alias("_wcstod_l"), export_alias("__wcstod_l")]]
 [[section(".text.crt{|.dos}.wchar.unicode.locale.convert")]]
 wcstod_l(*) %{generate(str2wcs("strtod_l"))}
 
 %#ifdef __COMPILER_HAVE_LONGDOUBLE
+@@>> wcstold_l(3)
 [[wchar, dos_export_alias("_wcstold_l"), export_alias("__wcstold_l")]]
 [[section(".text.crt{|.dos}.wchar.unicode.locale.convert")]]
 wcstold_l(*) %{generate(str2wcs("strtold_l"))}
 %#endif /* __COMPILER_HAVE_LONGDOUBLE */
 %#endif /* !__NO_FPU */
 
+@@>> getwchar_unlocked(3)
 [[decl_include("<hybrid/typecore.h>")]]
 [[cp_stdio, wchar, requires_include("<__crt.h>"), impl_include("<libc/local/stdstreams.h>")]]
 [[requires($has_function(fgetwc_unlocked) && !defined(__NO_STDSTREAMS))]]
@@ -1173,6 +1284,7 @@ $wint_t getwchar_unlocked() {
 	return fgetwc_unlocked(stdin);
 }
 
+@@>> putwchar_unlocked(3)
 [[decl_include("<hybrid/typecore.h>")]]
 [[cp_stdio, wchar, requires_include("<__crt.h>"), impl_include("<libc/local/stdstreams.h>")]]
 [[requires($has_function(fputwc_unlocked) && !defined(__NO_STDSTREAMS))]]
@@ -1184,16 +1296,19 @@ $wint_t putwchar_unlocked(wchar_t wc) {
 %[insert:function(getwc_unlocked = fgetwc_unlocked)]
 %[insert:function(putwc_unlocked = fputwc_unlocked)]
 
+@@>> getwc_unlocked(3), fgetwc_unlocked(3)
 [[decl_include("<hybrid/typecore.h>")]]
 [[cp_stdio, wchar, dos_export_alias("_fgetwc_nolock")]]
 [[section(".text.crt{|.dos}.wchar.FILE.unlocked.read.getc")]]
 $wint_t fgetwc_unlocked([[nonnull]] $FILE *__restrict stream);
 
+@@>> putwc_unlocked(3), fputwc_unlocked(3)
 [[decl_include("<hybrid/typecore.h>")]]
 [[cp_stdio, wchar, dos_export_alias("_fputwc_nolock")]]
 [[section(".text.crt{|.dos}.wchar.FILE.unlocked.write.putc")]]
 $wint_t fputwc_unlocked(wchar_t wc, [[nonnull]] $FILE *__restrict stream);
 
+@@>> fgetws_unlocked(3)
 [[decl_include("<features.h>", "<hybrid/typecore.h>")]]
 [[cp_stdio, wchar, dos_export_alias("_fgetws_nolock"), alias("fgetws")]]
 [[section(".text.crt{|.dos}.wchar.FILE.unlocked.read.read")]]
@@ -1238,6 +1353,7 @@ wchar_t *fgetws_unlocked([[outp(bufsize)]] wchar_t *__restrict buf, __STDC_INT_A
 	return buf;
 }
 
+@@>> fputws_unlocked(3)
 [[decl_include("<features.h>", "<hybrid/typecore.h>")]]
 [[section(".text.crt{|.dos}.wchar.FILE.unlocked.write.write")]]
 [[cp_stdio, dos_export_alias("_fputws_nolock")]]
@@ -1250,6 +1366,7 @@ __STDC_INT_AS_SIZE_T fputws_unlocked([[nonnull]] wchar_t const *__restrict str,
 }
 
 
+@@>> wcsftime_l(3)
 [[wchar, decl_include("<bits/crt/tm.h>", "<hybrid/typecore.h>")]]
 [[dos_export_alias("_wcsftime_l"), export_alias("__wcsftime_l")]]
 [[section(".text.crt{|.dos}.wchar.unicode.locale.format.strftime")]]
@@ -1333,6 +1450,7 @@ $ssize_t file_wprinter_unlocked([[nonnull]] void *arg,
 }
 
 
+@@>> ungetwc_unlocked(3)
 [[decl_include("<hybrid/typecore.h>")]]
 [[wchar, dos_export_alias("_ungetwc_nolock"), alias("ungetwc")]]
 [[section(".text.crt{|.dos}.wchar.FILE.unlocked.write.putc")]]
@@ -1341,6 +1459,7 @@ $wint_t ungetwc_unlocked($wint_t ch, [[nonnull]] $FILE *__restrict stream);
 
 %[default:section(".text.crt{|.dos}.wchar.FILE.unlocked.write.printf")]
 
+@@>> vfwprintf_unlocked(3)
 [[decl_include("<features.h>", "<hybrid/typecore.h>")]]
 [[cp_stdio, wchar, ATTR_LIBC_WPRINTF(2, 0)]]
 [[requires_dependent_function(file_wprinter_unlocked)]]
@@ -1351,17 +1470,20 @@ __STDC_INT_AS_SIZE_T vfwprintf_unlocked([[nonnull]] $FILE *__restrict stream,
 	                                              stream, format, args);
 }
 
+@@>> fwprintf_unlocked(3)
 [[cp_stdio, wchar, ATTR_LIBC_WPRINTF(2, 3)]]
 [[decl_include("<features.h>", "<hybrid/typecore.h>")]]
 __STDC_INT_AS_SIZE_T fwprintf_unlocked([[nonnull]] $FILE *__restrict stream,
                                        [[nonnull]] wchar_t const *__restrict format, ...)
 	%{printf("vfwprintf_unlocked")}
 
+@@>> wprintf_unlocked(3)
 [[cp_stdio, wchar, ATTR_LIBC_WPRINTF(1, 2)]]
 [[decl_include("<features.h>", "<hybrid/typecore.h>")]]
 __STDC_INT_AS_SIZE_T wprintf_unlocked([[nonnull]] wchar_t const *__restrict format, ...)
 	%{printf("vwprintf_unlocked")}
 
+@@>> vwprintf_unlocked(3)
 [[cp_stdio, wchar, ATTR_LIBC_WPRINTF(1, 0)]]
 [[decl_include("<features.h>", "<hybrid/typecore.h>")]]
 [[requires_include("<__crt.h>"), impl_include("<libc/local/stdstreams.h>")]]
@@ -1372,6 +1494,7 @@ __STDC_INT_AS_SIZE_T vwprintf_unlocked([[nonnull]] wchar_t const *__restrict for
 
 %[default:section(".text.crt{|.dos}.wchar.FILE.unlocked.read.scanf")]
 
+@@>> vfwscanf_unlocked(3)
 [[decl_include("<features.h>", "<hybrid/typecore.h>")]]
 [[cp_stdio, wunused, ATTR_LIBC_WSCANF(2, 0), wchar, alias("vfwscanf")]]
 __STDC_INT_AS_SIZE_T vfwscanf_unlocked([[nonnull]] $FILE *__restrict stream,
@@ -1379,6 +1502,7 @@ __STDC_INT_AS_SIZE_T vfwscanf_unlocked([[nonnull]] $FILE *__restrict stream,
                                        $va_list args);
 /* TODO: Inline implementation for `vfwscanf_unlocked()' */
 
+@@>> vwscanf_unlocked(3)
 [[impl_include("<libc/local/stdstreams.h>")]]
 [[cp_stdio, wchar, ATTR_LIBC_SCANF(1, 0), wunused]]
 [[decl_include("<features.h>", "<hybrid/typecore.h>")]]
@@ -1387,12 +1511,14 @@ __STDC_INT_AS_SIZE_T vwscanf_unlocked([[nonnull]] wchar_t const *__restrict form
 	return vfwscanf_unlocked(stdin, format, args);
 }
 
+@@>> fwscanf_unlocked(3)
 [[cp_stdio, wchar, ATTR_LIBC_SCANF(2, 3), wunused]]
 [[decl_include("<features.h>", "<hybrid/typecore.h>")]]
 __STDC_INT_AS_SIZE_T fwscanf_unlocked([[nonnull]] $FILE *__restrict stream,
                                       [[nonnull]] wchar_t const *__restrict format, ...)
 	%{printf("vfwscanf_unlocked")}
 
+@@>> wscanf_unlocked(3)
 [[cp_stdio, wchar, ATTR_LIBC_SCANF(1, 2), wunused]]
 [[decl_include("<features.h>", "<hybrid/typecore.h>")]]
 __STDC_INT_AS_SIZE_T wscanf_unlocked([[nonnull]] wchar_t const *__restrict format, ...)
@@ -1407,8 +1533,9 @@ __STDC_INT_AS_SIZE_T wscanf_unlocked([[nonnull]] wchar_t const *__restrict forma
 
 
 /* KOS String extension functions. */
-@@Same as `str+wcslen(str)'
-[[wchar, wunused, ATTR_PURE]]
+@@>> wcsend(3)
+@@Same as `str + wcslen(str)'
+[[wchar, wunused, pure]]
 [[decl_include("<hybrid/typecore.h>")]]
 [[crt_dos_impl_requires(!defined(LIBC_ARCH_HAVE_C16SEND))]]
 [[crt_kos_impl_requires(!defined(LIBC_ARCH_HAVE_C32SEND))]]
@@ -1418,8 +1545,9 @@ __STDC_INT_AS_SIZE_T wscanf_unlocked([[nonnull]] wchar_t const *__restrict forma
 	[([[nonnull]] wchar_t const *__restrict str): [[nonnull]] wchar_t const *]
 	%{generate(str2wcs("strend"))}
 
-@@Same as `str+wcsnlen(str, max_chars)'
-[[wchar, wunused, ATTR_PURE]]
+@@>> wcsnend(3)
+@@Same as `str + wcsnlen(str, max_chars)'
+[[wchar, wunused, pure]]
 [[decl_include("<hybrid/typecore.h>")]]
 [[crt_dos_impl_requires(!defined(LIBC_ARCH_HAVE_C16SNEND))]]
 [[crt_kos_impl_requires(!defined(LIBC_ARCH_HAVE_C32SNEND))]]
@@ -1430,17 +1558,23 @@ __STDC_INT_AS_SIZE_T wscanf_unlocked([[nonnull]] wchar_t const *__restrict forma
 	%{generate(str2wcs("strnend"))}
 
 
+@@>> wcsto32_r(3)
 [[wchar, section(".text.crt{|.dos}.wchar.unicode.static.convert")]]
 wcsto32_r(*) %{generate(str2wcs("strto32_r"))}
+
+@@>> wcstou32_r(3)
 [[wchar, section(".text.crt{|.dos}.wchar.unicode.static.convert")]]
 wcstou32_r(*) %{generate(str2wcs("strtou32_r"))}
 
+
+@@>> wcsto32(3)
 [[wchar, section(".text.crt{|.dos}.wchar.unicode.static.convert")]]
 [[if($extended_include_prefix("<hybrid/typecore.h>")__SIZEOF_LONG__ == 4),      alias(CNL_wcstol...)]]
 [[if($extended_include_prefix("<hybrid/typecore.h>")__SIZEOF_LONG_LONG__ == 4), alias(CNL_wcstoll...)]]
 [[if($extended_include_prefix("<hybrid/typecore.h>")__SIZEOF_INTMAX_T__ == 4),  alias(CNL_wcstoimax...)]]
 wcsto32(*) %{generate(str2wcs("strto32"))}
 
+@@>> wcstou32(3)
 [[wchar, section(".text.crt{|.dos}.wchar.unicode.static.convert")]]
 [[if($extended_include_prefix("<hybrid/typecore.h>")__SIZEOF_LONG__ == 4),      alias(CNL_wcstoul...)]]
 [[if($extended_include_prefix("<hybrid/typecore.h>")__SIZEOF_LONG_LONG__ == 4), alias(CNL_wcstoull...)]]
@@ -1449,11 +1583,16 @@ wcstou32(*) %{generate(str2wcs("strtou32"))}
 
 %
 %#ifdef __UINT64_TYPE__
+@@>> wcsto64_r(3)
 [[wchar, section(".text.crt{|.dos}.wchar.unicode.static.convert")]]
 wcsto64_r(*) %{generate(str2wcs("strto64_r"))}
+
+@@>> wcstou64_r(3)
 [[wchar, section(".text.crt{|.dos}.wchar.unicode.static.convert")]]
 wcstou64_r(*) %{generate(str2wcs("strtou64_r"))}
 
+
+@@>> wcstou64(3)
 [[wchar, dos_export_alias("_wcstoui64")]]
 [[if($extended_include_prefix("<hybrid/typecore.h>")__SIZEOF_LONG__ == 8),      alias(CNL_wcstoul...)]]
 [[if($extended_include_prefix("<hybrid/typecore.h>")__SIZEOF_LONG_LONG__ == 8), alias(CNL_wcstoull...)]]
@@ -1461,6 +1600,7 @@ wcstou64_r(*) %{generate(str2wcs("strtou64_r"))}
 [[section(".text.crt{|.dos}.wchar.unicode.static.convert")]]
 wcstou64(*) %{generate(str2wcs("strtou64"))}
 
+@@>> wcsto64(3)
 [[wchar, dos_export_alias("_wcstoi64")]]
 [[if($extended_include_prefix("<hybrid/typecore.h>")__SIZEOF_LONG__ == 8),      alias(CNL_wcstol...)]]
 [[if($extended_include_prefix("<hybrid/typecore.h>")__SIZEOF_LONG_LONG__ == 8), alias(CNL_wcstoll...)]]
@@ -1472,6 +1612,7 @@ wcsto64(*) %{generate(str2wcs("strto64"))}
 /************************************************************************/
 /* WARNING: The following functions aren't exported by-name from libc!  */
 /************************************************************************/
+@@>> wcstol_r(3)
 [[wchar, nocrt]]
 [[if($extended_include_prefix("<hybrid/typecore.h>")__SIZEOF_LONG__ == 4), alias("wcsto32_r")]]
 [[if($extended_include_prefix("<hybrid/typecore.h>")__SIZEOF_LONG__ == 8), alias("wcsto64_r")]]
@@ -1479,6 +1620,7 @@ wcsto64(*) %{generate(str2wcs("strto64"))}
 [[if($extended_include_prefix("<hybrid/typecore.h>")__SIZEOF_LONG__ == 8), bind_local_function(wcsto64_r)]]
 wcstol_r(*) %{generate(str2wcs("strtol_r"))}
 
+@@>> wcstoul_r(3)
 [[wchar, nocrt]]
 [[if($extended_include_prefix("<hybrid/typecore.h>")__SIZEOF_LONG__ == 4), alias("wcstou32_r")]]
 [[if($extended_include_prefix("<hybrid/typecore.h>")__SIZEOF_LONG__ == 8), alias("wcstou64_r")]]
@@ -1487,6 +1629,7 @@ wcstol_r(*) %{generate(str2wcs("strtol_r"))}
 wcstoul_r(*) %{generate(str2wcs("strtoul_r"))}
 
 %#ifdef __LONGLONG
+@@>> wcstoll_r(3)
 [[wchar, nocrt]]
 [[if($extended_include_prefix("<hybrid/typecore.h>")__SIZEOF_LONG_LONG__ == 8), alias("wcsto64_r")]]
 [[if($extended_include_prefix("<hybrid/typecore.h>")__SIZEOF_LONG_LONG__ == 4), alias("wcsto32_r")]]
@@ -1494,6 +1637,7 @@ wcstoul_r(*) %{generate(str2wcs("strtoul_r"))}
 [[if($extended_include_prefix("<hybrid/typecore.h>")__SIZEOF_LONG_LONG__ == 4), bind_local_function(wcsto32_r)]]
 wcstoll_r(*) %{generate(str2wcs("strtoll_r"))}
 
+@@>> wcstoull_r(3)
 [[wchar, nocrt]]
 [[if($extended_include_prefix("<hybrid/typecore.h>")__SIZEOF_LONG_LONG__ == 8), alias("wcstou64_r")]]
 [[if($extended_include_prefix("<hybrid/typecore.h>")__SIZEOF_LONG_LONG__ == 4), alias("wcstou32_r")]]
@@ -1506,12 +1650,14 @@ wcstoull_r(*) %{generate(str2wcs("strtoull_r"))}
 
 %
 %#ifdef __USE_XOPEN2K8
+@@>> wcsto32_l(3)
 [[wchar, section(".text.crt{|.dos}.wchar.unicode.locale.convert")]]
 [[if($extended_include_prefix("<hybrid/typecore.h>")__SIZEOF_LONG__ == 4),      alias(CNL_wcstol_l...)]]
 [[if($extended_include_prefix("<hybrid/typecore.h>")__SIZEOF_LONG_LONG__ == 4), alias(CNL_wcstoll_l...)]]
 [[if($extended_include_prefix("<hybrid/typecore.h>")__SIZEOF_INTMAX_T__ == 4),  alias(CNL_wcstoimax_l...)]]
 wcsto32_l(*) %{generate(str2wcs("strto32_l"))}
 
+@@>> wcstou32_l(3)
 [[wchar, section(".text.crt{|.dos}.wchar.unicode.locale.convert")]]
 [[if($extended_include_prefix("<hybrid/typecore.h>")__SIZEOF_LONG__ == 4),      alias(CNL_wcstoul_l...)]]
 [[if($extended_include_prefix("<hybrid/typecore.h>")__SIZEOF_LONG_LONG__ == 4), alias(CNL_wcstoull_l...)]]
@@ -1520,6 +1666,7 @@ wcstou32_l(*) %{generate(str2wcs("strtou32_l"))}
 
 %
 %#ifdef __UINT64_TYPE__
+@@>> wcsto64_l(3)
 [[wchar, dos_export_alias("_wcstoi64_l")]]
 [[if($extended_include_prefix("<hybrid/typecore.h>")__SIZEOF_LONG__ == 8),      alias(CNL_wcstol_l...)]]
 [[if($extended_include_prefix("<hybrid/typecore.h>")__SIZEOF_LONG_LONG__ == 8), alias(CNL_wcstoll_l...)]]
@@ -1527,6 +1674,7 @@ wcstou32_l(*) %{generate(str2wcs("strtou32_l"))}
 [[section(".text.crt{|.dos}.wchar.unicode.locale.convert")]]
 wcsto64_l(*) %{generate(str2wcs("strto64_l"))}
 
+@@>> wcstou64_l(3)
 [[wchar, dos_export_alias("_wcstoui64_l")]]
 [[if($extended_include_prefix("<hybrid/typecore.h>")__SIZEOF_LONG__ == 8),      alias(CNL_wcstoul_l...)]]
 [[if($extended_include_prefix("<hybrid/typecore.h>")__SIZEOF_LONG_LONG__ == 8), alias(CNL_wcstoull_l...)]]
@@ -1540,22 +1688,26 @@ wcstou64_l(*) %{generate(str2wcs("strtou64_l"))}
 
 
 %
+@@>> wcsncoll(3)
 [[wchar, dos_export_alias("_wcsncoll")]]
 [[section(".text.crt{|.dos}.wchar.unicode.static.memory")]]
 wcsncoll(*) %{generate(str2wcs("strncoll"))}
 
+@@>> wcscasecoll(3)
 [[wchar, dos_export_alias("_wcsicoll"), alias("wcsicoll")]]
 [[alias("wcscasecmp", "_wcsicmp", "wcsicmp")]]
 [[section(".text.crt{|.dos}.wchar.unicode.static.memory")]]
 wcscasecoll(*) %{generate(str2wcs("strcasecoll"))}
 
+@@>> wcsncasecoll(3)
 [[wchar, dos_export_alias("_wcsnicoll"), alias("wcsnicoll")]]
 [[alias("wcsncasecmp", "_wcsnicmp", "wcsnicmp")]]
 [[section(".text.crt{|.dos}.wchar.unicode.static.memory")]]
 wcsncasecoll(*) %{generate(str2wcs("strncasecoll"))}
 
+@@>> wcsnrev(3)
 [[decl_include("<hybrid/typecore.h>")]]
-[[wchar, ATTR_LEAF, section(".text.crt{|.dos}.wchar.string.memory")]]
+[[wchar, leaf, section(".text.crt{|.dos}.wchar.string.memory")]]
 [[nonnull]] wchar_t *wcsnrev([[inoutp(maxlen)]] wchar_t *__restrict str, $size_t maxlen) {
 @@pp_if __SIZEOF_WCHAR_T__ == 2@@
 	return (wchar_t *)memrevw(str, wcsnlen(str, maxlen));
@@ -1566,30 +1718,35 @@ wcsncasecoll(*) %{generate(str2wcs("strncasecoll"))}
 @@pp_endif@@
 }
 
+@@>> wcsnlwr(3)
 [[wchar, section(".text.crt{|.dos}.wchar.unicode.static.memory")]]
 wcsnlwr(*) %{generate(str2wcs("strnlwr"))}
 
+@@>> wcsnupr(3)
 [[wchar, section(".text.crt{|.dos}.wchar.unicode.static.memory")]]
 wcsnupr(*) %{generate(str2wcs("strnupr"))}
 
+@@>> wcscasestr(3)
 [[decl_include("<hybrid/typecore.h>")]]
-[[wchar, wunused, ATTR_PURE, section(".text.crt{|.dos}.wchar.unicode.static.memory")]]
+[[wchar, wunused, pure, section(".text.crt{|.dos}.wchar.unicode.static.memory")]]
 wchar_t *wcscasestr([[nonnull]] wchar_t const *haystack, wchar_t const *needle)
 	[([[nonnull]] wchar_t *haystack, [[nonnull]] wchar_t *needle): wchar_t *]
 	[([[nonnull]] wchar_t const *haystack, [[nonnull]] wchar_t const *needle): wchar_t const *]
 	%{generate(str2wcs("strcasestr"))}
 
+@@>> wcspcpy(3)
 @@Same as wcscpy, but return a pointer after the last written character
 [[decl_include("<hybrid/typecore.h>")]]
-[[wchar, ATTR_LEAF, section(".text.crt{|.dos}.wchar.string.memory")]]
+[[wchar, leaf, section(".text.crt{|.dos}.wchar.string.memory")]]
 [[nonnull]] wchar_t *wcspcpy([[nonnull]] wchar_t *__restrict buf,
                              [[nonnull]] wchar_t const *__restrict src) {
 	return wmempcpy(buf, src, wcslen(src) + 1);
 }
 
+@@>> wcspncpy(3)
 @@Same as wcsncpy, but return a pointer after the last written character
 [[decl_include("<hybrid/typecore.h>")]]
-[[wchar, ATTR_LEAF, section(".text.crt{|.dos}.wchar.string.memory")]]
+[[wchar, leaf, section(".text.crt{|.dos}.wchar.string.memory")]]
 [[nonnull]] wchar_t *wcspncpy([[outp(buflen)]] wchar_t *__restrict buf,
                               [[nonnull]] wchar_t const *__restrict src, $size_t buflen) {
 	$size_t srclen = wcsnlen(src, buflen);
@@ -1599,8 +1756,9 @@ wchar_t *wcscasestr([[nonnull]] wchar_t const *haystack, wchar_t const *needle)
 
 %[define_wchar_replacement(wmempset = "(char16_t *)mempsetw", "(char32_t *)mempsetl")]
 
+@@>> wmempset(3)
 @@Same as wmemset, but return a pointer after the last written character
-[[wchar, ATTR_LEAF, no_crt_impl, decl_include("<hybrid/typecore.h>")]]
+[[wchar, leaf, no_crt_impl, decl_include("<hybrid/typecore.h>")]]
 [[if($extended_include_prefix("<hybrid/typecore.h>")__SIZEOF_WCHAR_T__ == 2), alias("mempsetw")]]
 [[if($extended_include_prefix("<hybrid/typecore.h>")__SIZEOF_WCHAR_T__ == 4), alias("mempsetl")]]
 [[if($extended_include_prefix("<hybrid/typecore.h>")__SIZEOF_WCHAR_T__ == 2), bind_local_function(mempsetw)]]
@@ -1617,85 +1775,98 @@ wchar_t *wcscasestr([[nonnull]] wchar_t const *haystack, wchar_t const *needle)
 }
 
 
+@@>> wcsnchr(3)
 @@Same as `wcschr', but don't exceed `max_chars' characters.
 [[decl_include("<hybrid/typecore.h>")]]
-[[wchar, wunused, ATTR_PURE, section(".text.crt{|.dos}.wchar.string.memory")]]
+[[wchar, wunused, pure, section(".text.crt{|.dos}.wchar.string.memory")]]
 wchar_t *wcsnchr([[inp(maxlen)]] wchar_t const *__restrict haystack, wchar_t needle, $size_t maxlen)
 	[([[inp(maxlen)]] wchar_t *__restrict haystack, wchar_t needle, $size_t maxlen): wchar_t *]
 	[([[inp(maxlen)]] wchar_t const *__restrict haystack, wchar_t needle, $size_t maxlen): wchar_t const *]
 	%{generate(str2wcs("strnchr"))}
 
+@@>> wcsnrchr(3)
 @@Same as `wcsrchr', but don't exceed `max_chars' characters.
 [[decl_include("<hybrid/typecore.h>")]]
-[[wchar, wunused, ATTR_PURE, section(".text.crt{|.dos}.wchar.string.memory")]]
+[[wchar, wunused, pure, section(".text.crt{|.dos}.wchar.string.memory")]]
 wchar_t *wcsnrchr([[inp(maxlen)]] wchar_t const *__restrict haystack, wchar_t needle, $size_t maxlen)
 	[([[inp(maxlen)]] wchar_t *__restrict haystack, wchar_t needle, $size_t maxlen): wchar_t *]
 	[([[inp(maxlen)]] wchar_t const *__restrict haystack, wchar_t needle, $size_t maxlen): wchar_t const *]
 	%{generate(str2wcs("strnrchr"))}
 
+@@>> wcssep(3)
 [[wchar, section(".text.crt{|.dos}.wchar.string.memory")]]
 wcssep(*) %{generate(str2wcs("strsep"))}
 
+@@>> wcsfry(3)
 [[wchar, section(".text.crt{|.dos}.wchar.string.memory")]]
 wcsfry(*) %{generate(str2wcs("strfry"))}
 
+@@>> wcsndup(3)
 [[wchar, section(".text.crt{|.dos}.wchar.heap.strdup")]]
 wcsndup(*) %{generate(str2wcs("strndup"))}
 
 
+@@>> wcsrchrnul(3)
 @@Same as `wcsrchr', but return `str-1', rather than `NULL' if `needle' wasn't found.
 [[decl_include("<hybrid/typecore.h>")]]
-[[wchar, wunused, ATTR_PURE, section(".text.crt{|.dos}.wchar.string.memory")]]
+[[wchar, wunused, pure, section(".text.crt{|.dos}.wchar.string.memory")]]
 [[nonnull]] wchar_t *wcsrchrnul([[nonnull]] wchar_t const *__restrict haystack, wchar_t needle)
 	[([[nonnull]] wchar_t *__restrict haystack, wchar_t needle): [[nonnull]] wchar_t *]
 	[([[nonnull]] wchar_t const *__restrict haystack, wchar_t needle): [[nonnull]] wchar_t const *]
 	%{generate(str2wcs("strrchrnul"))}
 
+@@>> wcsnchrnul(3)
 @@Same as `wcsnchr', but return `wcsnend(str, max_chars)', rather than `NULL' if `needle' wasn't found.
 [[decl_include("<hybrid/typecore.h>")]]
-[[wchar, wunused, ATTR_PURE, section(".text.crt{|.dos}.wchar.string.memory")]]
+[[wchar, wunused, pure, section(".text.crt{|.dos}.wchar.string.memory")]]
 [[nonnull]] wchar_t *wcsnchrnul([[inp(maxlen)]] wchar_t const *__restrict haystack, wchar_t needle, $size_t maxlen)
 	[([[inp(maxlen)]] wchar_t *__restrict haystack, wchar_t needle, $size_t maxlen): [[nonnull]] wchar_t *]
 	[([[inp(maxlen)]] wchar_t const *__restrict haystack, wchar_t needle, $size_t maxlen): [[nonnull]] wchar_t const *]
 	%{generate(str2wcs("strnchrnul"))}
 
+@@>> wcsnrchrnul(3)
 @@Same as `wcsnrchr', but return `str-1', rather than `NULL' if `needle' wasn't found.
 [[decl_include("<hybrid/typecore.h>")]]
-[[wchar, wunused, ATTR_PURE, section(".text.crt{|.dos}.wchar.string.memory")]]
+[[wchar, wunused, pure, section(".text.crt{|.dos}.wchar.string.memory")]]
 [[nonnull]] wchar_t *wcsnrchrnul([[inp(maxlen)]] wchar_t const *__restrict haystack, wchar_t needle, $size_t maxlen)
 	[([[inp(maxlen)]] wchar_t *__restrict haystack, wchar_t needle, $size_t maxlen): [[nonnull]] wchar_t *]
 	[([[inp(maxlen)]] wchar_t const *__restrict haystack, wchar_t needle, $size_t maxlen): [[nonnull]] wchar_t const *]
 	%{generate(str2wcs("strnrchrnul"))}
 
+@@>> wcsoff(3)
 @@Same as `wcschrnul', but return the offset from `str', rather than the actual address
 [[decl_include("<hybrid/typecore.h>")]]
-[[wchar, wunused, ATTR_PURE, section(".text.crt{|.dos}.wchar.string.memory")]]
+[[wchar, wunused, pure, section(".text.crt{|.dos}.wchar.string.memory")]]
 $size_t wcsoff([[nonnull]] wchar_t const *__restrict haystack, wchar_t needle)
 	%{generate(str2wcs("stroff"))}
 
+@@>> wcsroff(3)
 @@Same as `wcsrchrnul', but return the offset from `str', rather than the actual address
 [[decl_include("<hybrid/typecore.h>")]]
-[[wchar, wunused, ATTR_PURE, section(".text.crt{|.dos}.wchar.string.memory")]]
+[[wchar, wunused, pure, section(".text.crt{|.dos}.wchar.string.memory")]]
 $size_t wcsroff([[nonnull]] wchar_t const *__restrict haystack, wchar_t needle)
 	%{generate(str2wcs("strroff"))}
 
+@@>> wcsnoff(3)
 @@Same as `wcsnchrnul', but return the offset from `str', rather than the actual address
 [[decl_include("<hybrid/typecore.h>")]]
-[[wchar, wunused, ATTR_PURE, section(".text.crt{|.dos}.wchar.string.memory")]]
+[[wchar, wunused, pure, section(".text.crt{|.dos}.wchar.string.memory")]]
 $size_t wcsnoff([[nonnull]] wchar_t const *__restrict haystack, wchar_t needle, $size_t maxlen)
 	%{generate(str2wcs("strnoff"))}
 
+@@>> wcsnroff(3)
 @@Same as `wcsnrchrnul', but return the offset from `str', rather than the actual address
 [[decl_include("<hybrid/typecore.h>")]]
-[[wchar, wunused, ATTR_PURE, section(".text.crt{|.dos}.wchar.string.memory")]]
+[[wchar, wunused, pure, section(".text.crt{|.dos}.wchar.string.memory")]]
 $size_t wcsnroff([[nonnull]] wchar_t const *__restrict haystack, wchar_t needle, $size_t maxlen)
 	%{generate(str2wcs("strnroff"))}
 
 
 %[define_wchar_replacement(fuzzy_wmemcmp = fuzzy_memcmpw, fuzzy_memcmpl)]
 
+@@>> fuzzy_wmemcmp(3)
 [[decl_include("<hybrid/typecore.h>")]]
-[[wchar, wunused, ATTR_PURE, no_crt_impl]]
+[[wchar, wunused, pure, no_crt_impl]]
 [[if($extended_include_prefix("<hybrid/typecore.h>")__SIZEOF_WCHAR_T__ == 2), alias("fuzzy_memcmpw")]]
 [[if($extended_include_prefix("<hybrid/typecore.h>")__SIZEOF_WCHAR_T__ == 4), alias("fuzzy_memcmpl")]]
 [[if($extended_include_prefix("<hybrid/typecore.h>")__SIZEOF_WCHAR_T__ == 2), bind_local_function(fuzzy_memcmpw)]]
@@ -1711,49 +1882,57 @@ $size_t fuzzy_wmemcmp([[inp(s1_chars)]] wchar_t const *s1, $size_t s1_chars,
 @@pp_endif@@
 }
 
+@@>> fuzzy_wcscmp(3)
 [[decl_include("<hybrid/typecore.h>")]]
-[[wchar, wunused, ATTR_PURE, requires_function(fuzzy_wmemcmp)]]
+[[wchar, wunused, pure, requires_function(fuzzy_wmemcmp)]]
 [[section(".text.crt{|.dos}.wchar.string.memory")]]
 $size_t fuzzy_wcscmp([[nonnull]] wchar_t const *s1,
                      [[nonnull]] wchar_t const *s2) {
 	return fuzzy_wmemcmp(s1, wcslen(s1), s2, wcslen(s2));
 }
 
+@@>> fuzzy_wcsncmp(3)
 [[decl_include("<hybrid/typecore.h>")]]
-[[wchar, wunused, ATTR_PURE, requires_function(fuzzy_wmemcmp)]]
+[[wchar, wunused, pure, requires_function(fuzzy_wmemcmp)]]
 [[section(".text.crt{|.dos}.wchar.string.memory")]]
 $size_t fuzzy_wcsncmp([[inp(s1_maxlen)]] wchar_t const *s1, $size_t s1_maxlen,
                       [[inp(s2_maxlen)]] wchar_t const *s2, $size_t s2_maxlen) {
 	return fuzzy_wmemcmp(s1, wcsnlen(s1, s1_maxlen), s2, wcsnlen(s2, s2_maxlen));
 }
 
-[[wchar, wunused, ATTR_PURE, decl_include("<hybrid/typecore.h>")]]
+@@>> fuzzy_wmemcasecmp(3)
+[[wchar, wunused, pure, decl_include("<hybrid/typecore.h>")]]
 [[section(".text.crt{|.dos}.wchar.unicode.static.memory")]]
 $size_t fuzzy_wmemcasecmp([[inp(s1_bytes)]] wchar_t const *s1, $size_t s1_bytes,
                           [[inp(s2_bytes)]] wchar_t const *s2, $size_t s2_bytes)
 	%{generate(str2wcs("fuzzy_memcasecmp"))}
 
+@@>> fuzzy_wcscasecmp(3)
 [[decl_include("<hybrid/typecore.h>")]]
-[[wchar, wunused, ATTR_PURE, requires_function(fuzzy_wmemcasecmp)]]
+[[wchar, wunused, pure, requires_function(fuzzy_wmemcasecmp)]]
 [[section(".text.crt{|.dos}.wchar.unicode.static.memory")]]
 $size_t fuzzy_wcscasecmp([[nonnull]] wchar_t const *s1, [[nonnull]] wchar_t const *s2) {
 	return fuzzy_wmemcasecmp(s1, wcslen(s1), s2, wcslen(s2));
 }
 
+@@>> fuzzy_wcsncasecmp(3)
 [[decl_include("<hybrid/typecore.h>")]]
-[[wchar, wunused, ATTR_PURE, requires_function(fuzzy_wmemcasecmp)]]
+[[wchar, wunused, pure, requires_function(fuzzy_wmemcasecmp)]]
 [[section(".text.crt{|.dos}.wchar.unicode.static.memory")]]
 $size_t fuzzy_wcsncasecmp([[inp(s1_maxlen)]] wchar_t const *s1, $size_t s1_maxlen,
                           [[inp(s2_maxlen)]] wchar_t const *s2, $size_t s2_maxlen) {
 	return fuzzy_wmemcasecmp(s1, wcsnlen(s1, s1_maxlen), s2, wcsnlen(s2, s2_maxlen));
 }
 
+@@>> wildwcscmp(3)
 [[wchar, section(".text.crt{|.dos}.wchar.string.memory")]]
 wildwcscmp(*) %{generate(str2wcs("wildstrcmp"))}
 
+@@>> wildwcscasecmp(3)
 [[wchar, section(".text.crt{|.dos}.wchar.unicode.static.memory")]]
 wildwcscasecmp(*) %{generate(str2wcs("wildstrcasecmp"))}
 
+@@>> wcsverscmp(3)
 [[wchar, section(".text.crt{|.dos}.wchar.string.memory")]]
 wcsverscmp(*) %{generate(str2wcs("strverscmp"))}
 
@@ -1766,37 +1945,60 @@ wcsverscmp(*) %{generate(str2wcs("strverscmp"))}
 %#ifdef __USE_XOPEN2K8
 %[default:section(".text.crt{|.dos}.wchar.unicode.locale.memory")]
 
+@@>> wcsncoll_l(3)
 [[wchar, dos_export_alias("_wcsncoll_l")]]
 wcsncoll_l(*) %{generate(str2wcs("strncoll_l"))}
 
+@@>> wcscasecoll_l(3)
 [[wchar, dos_export_alias("_wcsicoll_l")]]
 [[alias("wcscasecmp_l", "_wcsicmp_l")]]
 wcscasecoll_l(*) %{generate(str2wcs("strcasecoll_l"))}
 
+@@>> wcsncasecoll_l(3)
 [[wchar, dos_export_alias("_wcsnicoll_l")]]
 [[alias("wcsncasecmp_l", "_wcsnicmp_l")]]
 wcsncasecoll_l(*) %{generate(str2wcs("strncasecoll_l"))}
 
+@@>> wcslwr_l(3)
 [[wchar, dos_export_alias("_wcslwr_l")]]
 wcslwr_l(*) %{generate(str2wcs("strlwr_l"))}
 
+@@>> wcsupr_l(3)
 [[wchar, dos_export_alias("_wcsupr_l")]]
 wcsupr_l(*) %{generate(str2wcs("strupr_l"))}
 
-[[wchar]] wcsnlwr_l(*) %{generate(str2wcs("strnlwr_l"))}
-[[wchar]] wcsnupr_l(*) %{generate(str2wcs("strnupr_l"))}
-[[wchar]] wcscasestr_l(*) %{generate(str2wcs("strcasestr_l"))}
+@@>> wcsnlwr_l(3)
+[[wchar]]
+wcsnlwr_l(*) %{generate(str2wcs("strnlwr_l"))}
 
-[[wchar, wunused, ATTR_PURE]]
+@@>> wcsnupr_l(3)
+[[wchar]]
+wcsnupr_l(*) %{generate(str2wcs("strnupr_l"))}
+
+@@>> wcscasestr_l(3)
+[[wchar]]
+wcscasestr_l(*) %{generate(str2wcs("strcasestr_l"))}
+
+
+@@>> fuzzy_wmemcasecmp_l(3)
+[[wchar, wunused, pure]]
 [[decl_include("<hybrid/typecore.h>")]]
 $size_t fuzzy_wmemcasecmp_l([[nonnull]] wchar_t const *s1, $size_t s1_bytes,
                             [[nonnull]] wchar_t const *s2, $size_t s2_bytes,
                             $locale_t locale)
 	%{generate(str2wcs("fuzzy_memcasecmp_l"))}
 
-[[wchar]] fuzzy_wcscasecmp_l(*) %{generate(str2wcs("fuzzy_strcasecmp_l"))}
-[[wchar]] fuzzy_wcsncasecmp_l(*) %{generate(str2wcs("fuzzy_strncasecmp_l"))}
-[[wchar]] wildwcscasecmp_l(*) %{generate(str2wcs("wildstrcasecmp_l"))}
+@@>> fuzzy_wcscasecmp_l(3)
+[[wchar]]
+fuzzy_wcscasecmp_l(*) %{generate(str2wcs("fuzzy_strcasecmp_l"))}
+
+@@>> fuzzy_wcsncasecmp_l(3)
+[[wchar]]
+fuzzy_wcsncasecmp_l(*) %{generate(str2wcs("fuzzy_strncasecmp_l"))}
+
+@@>> wildwcscasecmp_l(3)
+[[wchar]]
+wildwcscasecmp_l(*) %{generate(str2wcs("wildstrcasecmp_l"))}
 
 %#endif /* __USE_XOPEN2K8 */
 %#endif /* __USE_KOS */
@@ -1809,8 +2011,13 @@ $size_t fuzzy_wmemcasecmp_l([[nonnull]] wchar_t const *s1, $size_t s1_bytes,
 fgetwln([[nonnull]] FILE *__restrict fp,
         [[nonnull]] $size_t *__restrict lenp);
 
-[[wchar, guard]] wcslcat(*) %{generate(str2wcs("strlcat"))}
-[[wchar, guard]] wcslcpy(*) %{generate(str2wcs("strlcpy"))}
+@@>> wcslcat(3)
+[[wchar, guard]]
+wcslcat(*) %{generate(str2wcs("strlcat"))}
+
+@@>> wcslcpy(3)
+[[wchar, guard]]
+wcslcpy(*) %{generate(str2wcs("strlcpy"))}
 %#endif /* __USE_BSD */
 
 
@@ -1849,7 +2056,7 @@ wcscat_s(*) %{generate(str2wcs("strcat_s"))}
 wcscpy_s(*) %{generate(str2wcs("strcpy_s"))}
 
 [[decl_include("<hybrid/typecore.h>")]]
-[[guard, inline, nocrt, wunused, ATTR_PURE]]
+[[guard, inline, nocrt, wunused, pure]]
 $size_t wcsnlen_s([[nullable]] wchar_t const *str, $size_t maxlen) {
 	return str ? wcsnlen(str, maxlen) : 0;
 }

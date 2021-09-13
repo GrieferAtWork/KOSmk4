@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x1685b9d0 */
+/* HASH CRC-32:0x1873c1d3 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -22,7 +22,8 @@
 #define __local_timespec_get64_defined 1
 #include <__crt.h>
 #include <asm/os/clock.h>
-#if defined(__CLOCK_REALTIME) && (defined(__CRT_HAVE_clock_gettime64) || defined(__CRT_HAVE_clock_gettime) || defined(__CRT_HAVE___clock_gettime))
+#include <asm/crt/time.h>
+#if defined(__CLOCK_REALTIME) && defined(__TIME_UTC) && (defined(__CRT_HAVE_clock_gettime64) || defined(__CRT_HAVE_clock_gettime) || defined(__CRT_HAVE___clock_gettime))
 #include <features.h>
 #include <bits/os/timespec.h>
 __NAMESPACE_LOCAL_BEGIN
@@ -47,9 +48,6 @@ __NAMESPACE_LOCAL_BEGIN
 #undef __local___localdep_clock_gettime64_defined
 #endif /* !... */
 #endif /* !__local___localdep_clock_gettime64_defined */
-__NAMESPACE_LOCAL_END
-#include <asm/crt/time.h>
-__NAMESPACE_LOCAL_BEGIN
 __LOCAL_LIBC(timespec_get64) __ATTR_NONNULL((1)) int
 __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(timespec_get64))(struct __timespec64 *__ts, __STDC_INT_AS_UINT_T __base) {
 	if (__base == __TIME_UTC) {
@@ -64,7 +62,7 @@ __NAMESPACE_LOCAL_END
 #define __local___localdep_timespec_get64_defined 1
 #define __localdep_timespec_get64 __LIBC_LOCAL_NAME(timespec_get64)
 #endif /* !__local___localdep_timespec_get64_defined */
-#else /* __CLOCK_REALTIME && (__CRT_HAVE_clock_gettime64 || __CRT_HAVE_clock_gettime || __CRT_HAVE___clock_gettime) */
+#else /* __CLOCK_REALTIME && __TIME_UTC && (__CRT_HAVE_clock_gettime64 || __CRT_HAVE_clock_gettime || __CRT_HAVE___clock_gettime) */
 #undef __local_timespec_get64_defined
-#endif /* !__CLOCK_REALTIME || (!__CRT_HAVE_clock_gettime64 && !__CRT_HAVE_clock_gettime && !__CRT_HAVE___clock_gettime) */
+#endif /* !__CLOCK_REALTIME || !__TIME_UTC || (!__CRT_HAVE_clock_gettime64 && !__CRT_HAVE_clock_gettime && !__CRT_HAVE___clock_gettime) */
 #endif /* !__local_timespec_get64_defined */

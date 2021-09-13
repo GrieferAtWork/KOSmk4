@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xc23415ff */
+/* HASH CRC-32:0x39240841 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -31,23 +31,41 @@
 DECL_BEGIN
 
 #ifndef __KERNEL__
+/* >> fgetwc(3) */
 INTDEF NONNULL((1)) wint16_t (LIBDCALL libd_fgetwc)(FILE *__restrict stream) THROWS(...);
+/* >> fgetwc(3) */
 INTDEF NONNULL((1)) wint32_t (LIBKCALL libc_fgetwc)(FILE *__restrict stream) THROWS(...);
+/* >> fputwc(3) */
 INTDEF NONNULL((2)) wint16_t (LIBDCALL libd_fputwc)(char16_t wc, FILE *stream) THROWS(...);
+/* >> fputwc(3) */
 INTDEF NONNULL((2)) wint32_t (LIBKCALL libc_fputwc)(char32_t wc, FILE *stream) THROWS(...);
+/* >> ungetwc(3) */
 INTDEF NONNULL((2)) wint16_t NOTHROW_NCX(LIBDCALL libd_ungetwc)(wint16_t wc, FILE *stream);
+/* >> ungetwc(3) */
 INTDEF NONNULL((2)) wint32_t NOTHROW_NCX(LIBKCALL libc_ungetwc)(wint32_t wc, FILE *stream);
+/* >> vfwscanf(3) */
 INTDEF WUNUSED ATTR_LIBC_WSCANF(2, 0) NONNULL((1, 2)) __STDC_INT_AS_SIZE_T (LIBDCALL libd_vfwscanf)(FILE *__restrict stream, char16_t const *__restrict format, va_list args) THROWS(...);
+/* >> vfwscanf(3) */
 INTDEF WUNUSED ATTR_LIBC_WSCANF(2, 0) NONNULL((1, 2)) __STDC_INT_AS_SIZE_T (LIBKCALL libc_vfwscanf)(FILE *__restrict stream, char32_t const *__restrict format, va_list args) THROWS(...);
+/* >> mbsnrtowcs(3) */
 INTDEF NONNULL((2)) size_t NOTHROW_NCX(LIBDCALL libd_mbsnrtowcs)(char16_t *dst, char const **__restrict psrc, size_t nmc, size_t len, mbstate_t *mbs);
+/* >> mbsnrtowcs(3) */
 INTDEF NONNULL((2)) size_t NOTHROW_NCX(LIBKCALL libc_mbsnrtowcs)(char32_t *dst, char const **__restrict psrc, size_t nmc, size_t len, mbstate_t *mbs);
+/* >> wcsnrtombs(3) */
 INTDEF NONNULL((2)) size_t NOTHROW_NCX(LIBDCALL libd_wcsnrtombs)(char *dst, char16_t const **__restrict psrc, size_t nwc, size_t len, mbstate_t *mbs);
+/* >> wcsnrtombs(3) */
 INTDEF NONNULL((2)) size_t NOTHROW_NCX(LIBKCALL libc_wcsnrtombs)(char *dst, char32_t const **__restrict psrc, size_t nwc, size_t len, mbstate_t *mbs);
+/* >> open_wmemstream(3) */
 INTDEF FILE *NOTHROW_NCX(LIBDCALL libd_open_wmemstream)(char16_t **bufloc, size_t *sizeloc);
+/* >> open_wmemstream(3) */
 INTDEF FILE *NOTHROW_NCX(LIBKCALL libc_open_wmemstream)(char32_t **bufloc, size_t *sizeloc);
+/* >> getwc_unlocked(3), fgetwc_unlocked(3) */
 INTDEF NONNULL((1)) wint16_t (LIBDCALL libd_fgetwc_unlocked)(FILE *__restrict stream) THROWS(...);
+/* >> getwc_unlocked(3), fgetwc_unlocked(3) */
 INTDEF NONNULL((1)) wint32_t (LIBKCALL libc_fgetwc_unlocked)(FILE *__restrict stream) THROWS(...);
+/* >> putwc_unlocked(3), fputwc_unlocked(3) */
 INTDEF NONNULL((2)) wint16_t (LIBDCALL libd_fputwc_unlocked)(char16_t wc, FILE *__restrict stream) THROWS(...);
+/* >> putwc_unlocked(3), fputwc_unlocked(3) */
 INTDEF NONNULL((2)) wint32_t (LIBKCALL libc_fputwc_unlocked)(char32_t wc, FILE *__restrict stream) THROWS(...);
 /* >> file_wprinter(3)
  * For use with `format_wprintf()' and friends: Prints to a `FILE *' closure argument */
@@ -61,9 +79,13 @@ INTDEF NONNULL((1, 2)) ssize_t (LIBDCALL libd_file_wprinter_unlocked)(void *arg,
 /* >> file_wprinter_unlocked(3)
  * Same as `file_wprinter()', but performs I/O without acquiring a lock to `(FILE *)arg' */
 INTDEF NONNULL((1, 2)) ssize_t (LIBKCALL libc_file_wprinter_unlocked)(void *arg, char32_t const *__restrict data, size_t datalen) THROWS(...);
+/* >> ungetwc_unlocked(3) */
 INTDEF NONNULL((2)) wint16_t NOTHROW_NCX(LIBDCALL libd_ungetwc_unlocked)(wint16_t ch, FILE *__restrict stream);
+/* >> ungetwc_unlocked(3) */
 INTDEF NONNULL((2)) wint32_t NOTHROW_NCX(LIBKCALL libc_ungetwc_unlocked)(wint32_t ch, FILE *__restrict stream);
+/* >> vfwscanf_unlocked(3) */
 INTDEF WUNUSED ATTR_LIBC_WSCANF(2, 0) NONNULL((1, 2)) __STDC_INT_AS_SIZE_T (LIBDCALL libd_vfwscanf_unlocked)(FILE *__restrict stream, char16_t const *__restrict format, va_list args) THROWS(...);
+/* >> vfwscanf_unlocked(3) */
 INTDEF WUNUSED ATTR_LIBC_WSCANF(2, 0) NONNULL((1, 2)) __STDC_INT_AS_SIZE_T (LIBKCALL libc_vfwscanf_unlocked)(FILE *__restrict stream, char32_t const *__restrict format, va_list args) THROWS(...);
 /* >> fgetwln(3) */
 INTDEF WUNUSED NONNULL((1, 2)) char16_t *NOTHROW_NCX(LIBDCALL libd_fgetwln)(FILE *__restrict fp, size_t *__restrict lenp);

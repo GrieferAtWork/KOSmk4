@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x67cb0859 */
+/* HASH CRC-32:0x8e26b530 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -222,14 +222,14 @@ INTDEF WUNUSED NONNULL((2, 3, 5)) void *(LIBCCALL libc_lfind)(void const *key, v
 #endif /* !__KERNEL__ */
 #if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
 /* >> lsearch(3)
- * Perform linear search for `key' by comparing by `compar' function
- * in array [pbase,  pbase+pitem_count*item_size) and insert  entry if not  found */
+ * Perform  linear  search  for  `key'  by  comparing  by  `compar'   function
+ * in array [pbase, pbase+pitem_count*item_size) and insert entry if not found */
 INTDEF NONNULL((2, 3, 5)) void *(LIBDCALL libd_lsearch)(void const *key, void *pbase, size_t *pitem_count, size_t item_size, int (LIBDCALL *compar)(void const *a, void const *b)) THROWS(...);
 #endif /* !__LIBCCALL_IS_LIBDCALL && !__KERNEL__ */
 #ifndef __KERNEL__
 /* >> lsearch(3)
- * Perform linear search for `key' by comparing by `compar' function
- * in array [pbase,  pbase+pitem_count*item_size) and insert  entry if not  found */
+ * Perform  linear  search  for  `key'  by  comparing  by  `compar'   function
+ * in array [pbase, pbase+pitem_count*item_size) and insert entry if not found */
 INTDEF NONNULL((2, 3, 5)) void *(LIBCCALL libc_lsearch)(void const *key, void *pbase, size_t *pitem_count, size_t item_size, int (LIBCCALL *compar)(void const *a, void const *b)) THROWS(...);
 #endif /* !__KERNEL__ */
 #if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)

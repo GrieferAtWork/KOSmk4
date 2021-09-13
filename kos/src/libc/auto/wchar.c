@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xc66459bb */
+/* HASH CRC-32:0xc5892def */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -25,6 +25,12 @@
 #include <hybrid/typecore.h>
 #include <kos/types.h>
 #include "../user/wchar.h"
+#if !defined(LIBC_ARCH_HAVE_C32MEMCMP) && __SIZEOF_INT__ > 4
+#include "../user/string.h"
+#endif /* !LIBC_ARCH_HAVE_C32MEMCMP && __SIZEOF_INT__ > 4 */
+#if !defined(LIBC_ARCH_HAVE_C16MEMCMP) && __SIZEOF_INT__ > 2
+#include "../user/string.h"
+#endif /* !LIBC_ARCH_HAVE_C16MEMCMP && __SIZEOF_INT__ > 2 */
 #include "format-printer.h"
 #include "parts.wchar.format-printer.h"
 #include "../user/stdio.h"
@@ -37,12 +43,20 @@ DECL_BEGIN
 
 #include "../libc/globals.h"
 #ifndef __KERNEL__
+/* >> btowc(3)
+ * Convert a single-byte into a wide character. If the given
+ * character `ch' isn't valid, or  is `EOF', then `WEOF'  is
+ * returned instead. */
 INTERN ATTR_SECTION(".text.crt.dos.wchar.unicode.static.mbs") ATTR_CONST WUNUSED wint16_t
 NOTHROW_NCX(LIBDCALL libd_btowc)(int ch) {
 	if (ch >= 0 && ch <= 0x7f)
 		return (wint16_t)ch;
 	return __WEOF16;
 }
+/* >> btowc(3)
+ * Convert a single-byte into a wide character. If the given
+ * character `ch' isn't valid, or  is `EOF', then `WEOF'  is
+ * returned instead. */
 INTERN ATTR_SECTION(".text.crt.wchar.unicode.static.mbs") ATTR_CONST WUNUSED wint32_t
 NOTHROW_NCX(LIBKCALL libc_btowc)(int ch) {
 	if (ch >= 0 && ch <= 0x7f)
@@ -50,6 +64,9 @@ NOTHROW_NCX(LIBKCALL libc_btowc)(int ch) {
 	return __WEOF32;
 }
 #include <asm/crt/stdio.h>
+/* >> wctob(3)
+ * Convert a wide-character into a single-byte character. If
+ * doing so isn't possible, then `EOF' is returned  instead. */
 INTERN ATTR_SECTION(".text.crt.dos.wchar.unicode.static.mbs") ATTR_CONST WUNUSED int
 NOTHROW_NCX(LIBDCALL libd_wctob)(wint16_t ch) {
 	if (ch >= 0 && ch <= 0x7f)
@@ -57,6 +74,9 @@ NOTHROW_NCX(LIBDCALL libd_wctob)(wint16_t ch) {
 	return EOF;
 }
 #include <asm/crt/stdio.h>
+/* >> wctob(3)
+ * Convert a wide-character into a single-byte character. If
+ * doing so isn't possible, then `EOF' is returned  instead. */
 INTERN ATTR_SECTION(".text.crt.wchar.unicode.static.mbs") ATTR_CONST WUNUSED int
 NOTHROW_NCX(LIBKCALL libc_wctob)(wint32_t ch) {
 	if (ch >= 0 && ch <= 0x7f)
@@ -121,6 +141,7 @@ NOTHROW_NCX(LIBKCALL libc_c16rtomb)(char *__restrict str,
 #endif /* !__KERNEL__ */
 #ifndef __KERNEL__
 #include <libc/errno.h>
+/* >> mbrtowc(3) */
 INTERN ATTR_SECTION(".text.crt.dos.wchar.unicode.static.mbs") size_t
 NOTHROW_NCX(LIBDCALL libd_mbrtowc)(char16_t *pwc,
                                    char const *__restrict str,
@@ -149,6 +170,7 @@ NOTHROW_NCX(LIBDCALL libd_mbrtowc)(char16_t *pwc,
 	return error;
 }
 #include <libc/errno.h>
+/* >> mbrtowc(3) */
 INTERN ATTR_SECTION(".text.crt.wchar.unicode.static.mbs") size_t
 NOTHROW_NCX(LIBKCALL libc_mbrtowc)(char32_t *pwc,
                                    char const *__restrict str,
@@ -177,6 +199,7 @@ NOTHROW_NCX(LIBKCALL libc_mbrtowc)(char32_t *pwc,
 	return error;
 }
 #include <libc/errno.h>
+/* >> wcrtomb(3) */
 INTERN ATTR_SECTION(".text.crt.dos.wchar.unicode.static.mbs") size_t
 NOTHROW_NCX(LIBDCALL libd_wcrtomb)(char *__restrict str,
                                    char16_t wc,
@@ -226,6 +249,7 @@ NOTHROW_NCX(LIBDCALL libd_wcrtomb)(char *__restrict str,
 	return result;
 }
 #include <libc/errno.h>
+/* >> wcrtomb(3) */
 INTERN ATTR_SECTION(".text.crt.wchar.unicode.static.mbs") size_t
 NOTHROW_NCX(LIBKCALL libc_wcrtomb)(char *__restrict str,
                                    char32_t wc,
@@ -274,6 +298,7 @@ NOTHROW_NCX(LIBKCALL libc_wcrtomb)(char *__restrict str,
 	result = (size_t)(endptr - str);
 	return result;
 }
+/* >> mbrlen(3) */
 INTERN ATTR_SECTION(".text.crt.dos.wchar.unicode.static.mbs") WUNUSED size_t
 NOTHROW_NCX(LIBDCALL libd_mbrlen)(char const *__restrict str,
                                   size_t maxlen,
@@ -281,6 +306,7 @@ NOTHROW_NCX(LIBDCALL libd_mbrlen)(char const *__restrict str,
 	char16_t wc;
 	return libd_mbrtowc(&wc, str, maxlen, mbs);
 }
+/* >> mbrlen(3) */
 INTERN ATTR_SECTION(".text.crt.wchar.unicode.static.mbs") WUNUSED size_t
 NOTHROW_NCX(LIBKCALL libc_mbrlen)(char const *__restrict str,
                                   size_t maxlen,
@@ -288,6 +314,7 @@ NOTHROW_NCX(LIBKCALL libc_mbrlen)(char const *__restrict str,
 	char32_t wc;
 	return libc_mbrtowc(&wc, str, maxlen, mbs);
 }
+/* >> mbsrtowcs(3) */
 INTERN ATTR_SECTION(".text.crt.dos.wchar.unicode.static.mbs") NONNULL((1, 2)) size_t
 NOTHROW_NCX(LIBDCALL libd_mbsrtowcs)(char16_t *__restrict dst,
                                      char const **__restrict psrc,
@@ -311,6 +338,7 @@ NOTHROW_NCX(LIBDCALL libd_mbsrtowcs)(char16_t *__restrict dst,
 	*psrc = src;
 	return result;
 }
+/* >> mbsrtowcs(3) */
 INTERN ATTR_SECTION(".text.crt.wchar.unicode.static.mbs") NONNULL((1, 2)) size_t
 NOTHROW_NCX(LIBKCALL libc_mbsrtowcs)(char32_t *__restrict dst,
                                      char const **__restrict psrc,
@@ -334,6 +362,7 @@ NOTHROW_NCX(LIBKCALL libc_mbsrtowcs)(char32_t *__restrict dst,
 	*psrc = src;
 	return result;
 }
+/* >> wcsrtombs(3) */
 INTERN ATTR_SECTION(".text.crt.dos.wchar.unicode.static.mbs") NONNULL((1, 2)) size_t
 NOTHROW_NCX(LIBDCALL libd_wcsrtombs)(char *dst,
                                      char16_t const **__restrict psrc,
@@ -359,6 +388,7 @@ NOTHROW_NCX(LIBDCALL libd_wcsrtombs)(char *dst,
 	*psrc = src;
 	return result;
 }
+/* >> wcsrtombs(3) */
 INTERN ATTR_SECTION(".text.crt.wchar.unicode.static.mbs") NONNULL((1, 2)) size_t
 NOTHROW_NCX(LIBKCALL libc_wcsrtombs)(char *dst,
                                      char32_t const **__restrict psrc,
@@ -384,6 +414,7 @@ NOTHROW_NCX(LIBKCALL libc_wcsrtombs)(char *dst,
 	*psrc = src;
 	return result;
 }
+/* >> wcstol(3) */
 INTERN ATTR_SECTION(".text.crt.dos.wchar.unicode.static.convert") ATTR_LEAF NONNULL((1)) long
 NOTHROW_NCX(LIBDCALL libd_wcstol)(char16_t const *__restrict nptr,
                                   char16_t **endptr,
@@ -394,6 +425,7 @@ NOTHROW_NCX(LIBDCALL libd_wcstol)(char16_t const *__restrict nptr,
 	return (long)libd_wcsto64(nptr, endptr, base);
 #endif /* __SIZEOF_LONG__ > 4 */
 }
+/* >> wcstol(3) */
 INTERN ATTR_SECTION(".text.crt.wchar.unicode.static.convert") ATTR_LEAF NONNULL((1)) long
 NOTHROW_NCX(LIBKCALL libc_wcstol)(char32_t const *__restrict nptr,
                                   char32_t **endptr,
@@ -404,6 +436,7 @@ NOTHROW_NCX(LIBKCALL libc_wcstol)(char32_t const *__restrict nptr,
 	return (long)libc_wcsto64(nptr, endptr, base);
 #endif /* __SIZEOF_LONG__ > 4 */
 }
+/* >> wcstoul(3) */
 INTERN ATTR_SECTION(".text.crt.dos.wchar.unicode.static.convert") ATTR_LEAF NONNULL((1)) unsigned long
 NOTHROW_NCX(LIBDCALL libd_wcstoul)(char16_t const *__restrict nptr,
                                    char16_t **endptr,
@@ -414,6 +447,7 @@ NOTHROW_NCX(LIBDCALL libd_wcstoul)(char16_t const *__restrict nptr,
 	return (unsigned long)libd_wcstou64(nptr, endptr, base);
 #endif /* __SIZEOF_LONG__ > 4 */
 }
+/* >> wcstoul(3) */
 INTERN ATTR_SECTION(".text.crt.wchar.unicode.static.convert") ATTR_LEAF NONNULL((1)) unsigned long
 NOTHROW_NCX(LIBKCALL libc_wcstoul)(char32_t const *__restrict nptr,
                                    char32_t **endptr,
@@ -424,32 +458,68 @@ NOTHROW_NCX(LIBKCALL libc_wcstoul)(char32_t const *__restrict nptr,
 	return (unsigned long)libc_wcstou64(nptr, endptr, base);
 #endif /* __SIZEOF_LONG__ > 4 */
 }
+/* >> mbsinit(3) */
 INTERN ATTR_SECTION(".text.crt.wchar.unicode.static.mbs") ATTR_PURE WUNUSED int
 NOTHROW_NCX(LIBCCALL libc_mbsinit)(mbstate_t const *mbs) {
 	return !mbs || mbstate_isempty(mbs);
 }
+#if !defined(LIBC_ARCH_HAVE_C16MEMCMP) && __SIZEOF_INT__ > 2
+/* >> wmemcmp(3) */
+INTERN ATTR_SECTION(".text.crt.dos.wchar.unicode.static.mbs") ATTR_PURE WUNUSED NONNULL((1, 2)) int
+NOTHROW_NCX(LIBDCALL libd_wmemcmp)(char16_t const *s1,
+                                   char16_t const *s2,
+                                   size_t num_chars) {
+
+	return (int)libc_memcmpw(s1, s2, num_chars);
+
+
+
+
+
+}
+#endif /* !LIBC_ARCH_HAVE_C16MEMCMP && __SIZEOF_INT__ > 2 */
+#if !defined(LIBC_ARCH_HAVE_C32MEMCMP) && __SIZEOF_INT__ > 4
+/* >> wmemcmp(3) */
+INTERN ATTR_SECTION(".text.crt.wchar.unicode.static.mbs") ATTR_PURE WUNUSED NONNULL((1, 2)) int
+NOTHROW_NCX(LIBKCALL libc_wmemcmp)(char32_t const *s1,
+                                   char32_t const *s2,
+                                   size_t num_chars) {
+
+
+
+	return (int)libc_memcmpl(s1, s2, num_chars);
+
+
+
+}
+#endif /* !LIBC_ARCH_HAVE_C32MEMCMP && __SIZEOF_INT__ > 4 */
+/* >> wcscpy(3) */
 INTERN ATTR_SECTION(".text.crt.dos.wchar.string.memory") ATTR_RETNONNULL NONNULL((1, 2)) char16_t *
 NOTHROW_NCX(LIBDCALL libd_wcscpy)(char16_t *__restrict buf,
                                   char16_t const *__restrict src) {
 	return (char16_t *)libc_memcpyw(buf, src, libd_wcslen(src) + 1);
 }
+/* >> wcscpy(3) */
 INTERN ATTR_SECTION(".text.crt.wchar.string.memory") ATTR_RETNONNULL NONNULL((1, 2)) char32_t *
 NOTHROW_NCX(LIBKCALL libc_wcscpy)(char32_t *__restrict buf,
                                   char32_t const *__restrict src) {
 	return (char32_t *)libc_memcpyl(buf, src, libc_wcslen(src) + 1);
 }
+/* >> wcscat(3) */
 INTERN ATTR_SECTION(".text.crt.dos.wchar.string.memory") ATTR_RETNONNULL NONNULL((1, 2)) char16_t *
 NOTHROW_NCX(LIBDCALL libd_wcscat)(char16_t *__restrict buf,
                                   char16_t const *__restrict src) {
 	(char16_t *)libc_memcpyw(libd_wcsend(buf), src, libd_wcslen(src) + 1);
 	return buf;
 }
+/* >> wcscat(3) */
 INTERN ATTR_SECTION(".text.crt.wchar.string.memory") ATTR_RETNONNULL NONNULL((1, 2)) char32_t *
 NOTHROW_NCX(LIBKCALL libc_wcscat)(char32_t *__restrict buf,
                                   char32_t const *__restrict src) {
 	(char32_t *)libc_memcpyl(libc_wcsend(buf), src, libc_wcslen(src) + 1);
 	return buf;
 }
+/* >> wcsncat(3) */
 INTERN ATTR_SECTION(".text.crt.dos.wchar.string.memory") ATTR_RETNONNULL NONNULL((1, 2)) char16_t *
 NOTHROW_NCX(LIBDCALL libd_wcsncat)(char16_t *__restrict buf,
                                    char16_t const *__restrict src,
@@ -460,6 +530,7 @@ NOTHROW_NCX(LIBDCALL libd_wcsncat)(char16_t *__restrict buf,
 	dst[srclen] = '\0';
 	return buf;
 }
+/* >> wcsncat(3) */
 INTERN ATTR_SECTION(".text.crt.wchar.string.memory") ATTR_RETNONNULL NONNULL((1, 2)) char32_t *
 NOTHROW_NCX(LIBKCALL libc_wcsncat)(char32_t *__restrict buf,
                                    char32_t const *__restrict src,
@@ -470,6 +541,7 @@ NOTHROW_NCX(LIBKCALL libc_wcsncat)(char32_t *__restrict buf,
 	dst[srclen] = '\0';
 	return buf;
 }
+/* >> wcsncpy(3) */
 INTERN ATTR_SECTION(".text.crt.dos.wchar.string.memory") ATTR_RETNONNULL NONNULL((1, 2)) char16_t *
 NOTHROW_NCX(LIBDCALL libd_wcsncpy)(char16_t *__restrict buf,
                                    char16_t const *__restrict src,
@@ -479,6 +551,7 @@ NOTHROW_NCX(LIBDCALL libd_wcsncpy)(char16_t *__restrict buf,
 	(char16_t *)libc_memsetw(buf+srclen, '\0', buflen - srclen);
 	return buf;
 }
+/* >> wcsncpy(3) */
 INTERN ATTR_SECTION(".text.crt.wchar.string.memory") ATTR_RETNONNULL NONNULL((1, 2)) char32_t *
 NOTHROW_NCX(LIBKCALL libc_wcsncpy)(char32_t *__restrict buf,
                                    char32_t const *__restrict src,
@@ -488,8 +561,7 @@ NOTHROW_NCX(LIBKCALL libc_wcsncpy)(char32_t *__restrict buf,
 	(char32_t *)libc_memsetl(buf+srclen, '\0', buflen - srclen);
 	return buf;
 }
-/* >> strcmp(3)
- * Compare 2 strings and return the difference of the first non-matching character, or `0' if they are identical */
+/* >> wcscmp(3) */
 INTERN ATTR_SECTION(".text.crt.dos.wchar.string.memory") ATTR_PURE WUNUSED NONNULL((1, 2)) int
 NOTHROW_NCX(LIBDCALL libd_wcscmp)(char16_t const *s1,
                                   char16_t const *s2) {
@@ -500,8 +572,7 @@ NOTHROW_NCX(LIBDCALL libd_wcscmp)(char16_t const *s1,
 	} while (c1);
 	return 0;
 }
-/* >> strcmp(3)
- * Compare 2 strings and return the difference of the first non-matching character, or `0' if they are identical */
+/* >> wcscmp(3) */
 INTERN ATTR_SECTION(".text.crt.wchar.string.memory") ATTR_PURE WUNUSED NONNULL((1, 2)) int
 NOTHROW_NCX(LIBKCALL libc_wcscmp)(char32_t const *s1,
                                   char32_t const *s2) {
@@ -512,8 +583,7 @@ NOTHROW_NCX(LIBKCALL libc_wcscmp)(char32_t const *s1,
 	} while (c1);
 	return 0;
 }
-/* >> strncmp(3)
- * Same as `strcmp', but compare at most `maxlen' characters from either string */
+/* >> wcsncmp(3) */
 INTERN ATTR_SECTION(".text.crt.dos.wchar.string.memory") ATTR_PURE WUNUSED NONNULL((1, 2)) int
 NOTHROW_NCX(LIBDCALL libd_wcsncmp)(char16_t const *s1,
                                    char16_t const *s2,
@@ -527,8 +597,7 @@ NOTHROW_NCX(LIBDCALL libd_wcsncmp)(char16_t const *s1,
 	} while (c1);
 	return 0;
 }
-/* >> strncmp(3)
- * Same as `strcmp', but compare at most `maxlen' characters from either string */
+/* >> wcsncmp(3) */
 INTERN ATTR_SECTION(".text.crt.wchar.string.memory") ATTR_PURE WUNUSED NONNULL((1, 2)) int
 NOTHROW_NCX(LIBKCALL libc_wcsncmp)(char32_t const *s1,
                                    char32_t const *s2,
@@ -542,16 +611,19 @@ NOTHROW_NCX(LIBKCALL libc_wcsncmp)(char32_t const *s1,
 	} while (c1);
 	return 0;
 }
+/* >> wcscoll(3) */
 INTERN ATTR_SECTION(".text.crt.dos.wchar.unicode.static.memory") ATTR_PURE WUNUSED NONNULL((1, 2)) int
 NOTHROW_NCX(LIBDCALL libd_wcscoll)(char16_t const *s1,
                                    char16_t const *s2) {
 	return libd_wcscmp(s1, s2);
 }
+/* >> wcscoll(3) */
 INTERN ATTR_SECTION(".text.crt.wchar.unicode.static.memory") ATTR_PURE WUNUSED NONNULL((1, 2)) int
 NOTHROW_NCX(LIBKCALL libc_wcscoll)(char32_t const *s1,
                                    char32_t const *s2) {
 	return libc_wcscmp(s1, s2);
 }
+/* >> wcsxfrm(3) */
 INTERN ATTR_SECTION(".text.crt.dos.wchar.unicode.static.memory") NONNULL((2)) size_t
 NOTHROW_NCX(LIBDCALL libd_wcsxfrm)(char16_t *dst,
                                    char16_t const *__restrict src,
@@ -561,6 +633,7 @@ NOTHROW_NCX(LIBDCALL libd_wcsxfrm)(char16_t *dst,
 	libc_memcpy(dst, src, n * sizeof(char16_t));
 	return n;
 }
+/* >> wcsxfrm(3) */
 INTERN ATTR_SECTION(".text.crt.wchar.unicode.static.memory") NONNULL((2)) size_t
 NOTHROW_NCX(LIBKCALL libc_wcsxfrm)(char32_t *dst,
                                    char32_t const *__restrict src,
@@ -571,27 +644,32 @@ NOTHROW_NCX(LIBKCALL libc_wcsxfrm)(char32_t *dst,
 	return n;
 }
 #include <libc/local/stdstreams.h>
+/* >> getwchar(3) */
 INTERN ATTR_SECTION(".text.crt.dos.wchar.FILE.locked.read.getc") wint16_t
 (LIBDCALL libd_getwchar)(void) THROWS(...) {
 	return libd_fgetwc(stdin);
 }
 #include <libc/local/stdstreams.h>
+/* >> getwchar(3) */
 INTERN ATTR_SECTION(".text.crt.wchar.FILE.locked.read.getc") wint32_t
 (LIBKCALL libc_getwchar)(void) THROWS(...) {
 	return libc_fgetwc(stdin);
 }
 #include <libc/local/stdstreams.h>
+/* >> putwchar(3) */
 INTERN ATTR_SECTION(".text.crt.dos.wchar.FILE.locked.write.putc") wint16_t
 (LIBDCALL libd_putwchar)(char16_t wc) THROWS(...) {
 	return libd_fputwc(wc, stdout);
 }
 #include <libc/local/stdstreams.h>
+/* >> putwchar(3) */
 INTERN ATTR_SECTION(".text.crt.wchar.FILE.locked.write.putc") wint32_t
 (LIBKCALL libc_putwchar)(char32_t wc) THROWS(...) {
 	return libc_fputwc(wc, stdout);
 }
 #include <libc/errno.h>
 #include <asm/crt/stdio.h>
+/* >> fgetws(3) */
 INTERN ATTR_SECTION(".text.crt.dos.wchar.FILE.locked.read.read") WUNUSED NONNULL((1, 3)) char16_t *
 (LIBDCALL libd_fgetws)(char16_t *__restrict buf,
                        __STDC_INT_AS_SIZE_T bufsize,
@@ -634,6 +712,7 @@ INTERN ATTR_SECTION(".text.crt.dos.wchar.FILE.locked.read.read") WUNUSED NONNULL
 }
 #include <libc/errno.h>
 #include <asm/crt/stdio.h>
+/* >> fgetws(3) */
 INTERN ATTR_SECTION(".text.crt.wchar.FILE.locked.read.read") WUNUSED NONNULL((1, 3)) char32_t *
 (LIBKCALL libc_fgetws)(char32_t *__restrict buf,
                        __STDC_INT_AS_SIZE_T bufsize,
@@ -674,6 +753,7 @@ INTERN ATTR_SECTION(".text.crt.wchar.FILE.locked.read.read") WUNUSED NONNULL((1,
 	buf[n] = '\0';
 	return buf;
 }
+/* >> fputws(3) */
 INTERN ATTR_SECTION(".text.crt.dos.wchar.FILE.locked.write.write") NONNULL((1, 2)) __STDC_INT_AS_SIZE_T
 (LIBDCALL libd_fputws)(char16_t const *__restrict str,
                        FILE *__restrict stream) THROWS(...) {
@@ -681,6 +761,7 @@ INTERN ATTR_SECTION(".text.crt.dos.wchar.FILE.locked.write.write") NONNULL((1, 2
 	result = libd_file_wprinter(stream, str, libd_wcslen(str));
 	return result;
 }
+/* >> fputws(3) */
 INTERN ATTR_SECTION(".text.crt.wchar.FILE.locked.write.write") NONNULL((1, 2)) __STDC_INT_AS_SIZE_T
 (LIBKCALL libc_fputws)(char32_t const *__restrict str,
                        FILE *__restrict stream) THROWS(...) {
@@ -688,6 +769,7 @@ INTERN ATTR_SECTION(".text.crt.wchar.FILE.locked.write.write") NONNULL((1, 2)) _
 	result = libc_file_wprinter(stream, str, libc_wcslen(str));
 	return result;
 }
+/* >> wcsftime(3) */
 INTERN ATTR_SECTION(".text.crt.dos.wchar.unicode.static.format.strftime") NONNULL((1, 3, 4)) size_t
 NOTHROW_NCX(LIBDCALL libd_wcsftime)(char16_t *__restrict buf,
                                     size_t buflen,
@@ -700,6 +782,7 @@ NOTHROW_NCX(LIBDCALL libd_wcsftime)(char16_t *__restrict buf,
 	(void)tp;
 	return 0;
 }
+/* >> wcsftime(3) */
 INTERN ATTR_SECTION(".text.crt.wchar.unicode.static.format.strftime") NONNULL((1, 3, 4)) size_t
 NOTHROW_NCX(LIBKCALL libc_wcsftime)(char32_t *__restrict buf,
                                     size_t buflen,
@@ -712,6 +795,7 @@ NOTHROW_NCX(LIBKCALL libc_wcsftime)(char32_t *__restrict buf,
 	(void)tp;
 	return 0;
 }
+/* >> wcstok(3) */
 INTERN ATTR_SECTION(".text.crt.dos.wchar.string.memory") NONNULL((2, 3)) char16_t *
 NOTHROW_NCX(LIBDCALL libd_wcstok)(char16_t *str,
                                   char16_t const *__restrict delim,
@@ -737,6 +821,7 @@ NOTHROW_NCX(LIBDCALL libd_wcstok)(char16_t *str,
 	*save_ptr = end + 1;
 	return str;
 }
+/* >> wcstok(3) */
 INTERN ATTR_SECTION(".text.crt.wchar.string.memory") NONNULL((2, 3)) char32_t *
 NOTHROW_NCX(LIBKCALL libc_wcstok)(char32_t *str,
                                   char32_t const *__restrict delim,
@@ -763,25 +848,20 @@ NOTHROW_NCX(LIBKCALL libc_wcstok)(char32_t *str,
 	return str;
 }
 #ifndef LIBC_ARCH_HAVE_C16SLEN
-/* >> strlen(3)
- * Return the length of the string in characters (Same as `rawmemlen[...](str, '\0')') */
+/* >> wcslen(3) */
 INTERN ATTR_SECTION(".text.crt.dos.wchar.string.memory") ATTR_PURE WUNUSED NONNULL((1)) size_t
 NOTHROW_NCX(LIBDCALL libd_wcslen)(char16_t const *__restrict str) {
 	return (size_t)(libd_wcsend(str) - str);
 }
 #endif /* !LIBC_ARCH_HAVE_C16SLEN */
 #ifndef LIBC_ARCH_HAVE_C32SLEN
-/* >> strlen(3)
- * Return the length of the string in characters (Same as `rawmemlen[...](str, '\0')') */
+/* >> wcslen(3) */
 INTERN ATTR_SECTION(".text.crt.wchar.string.memory") ATTR_PURE WUNUSED NONNULL((1)) size_t
 NOTHROW_NCX(LIBKCALL libc_wcslen)(char32_t const *__restrict str) {
 	return (size_t)(libc_wcsend(str) - str);
 }
 #endif /* !LIBC_ARCH_HAVE_C32SLEN */
-/* >> strspn(3)
- * Return   the  offset  from  `haystack'  to  the  first
- * character   for   which  `strchr(reject, ch) == NULL'.
- * If no such character exists, return `strlen(haystack)' */
+/* >> wcsspn(3) */
 INTERN ATTR_SECTION(".text.crt.dos.wchar.string.memory") ATTR_PURE WUNUSED NONNULL((1, 2)) size_t
 NOTHROW_NCX(LIBDCALL libd_wcsspn)(char16_t const *haystack,
                                   char16_t const *accept) {
@@ -790,10 +870,7 @@ NOTHROW_NCX(LIBDCALL libd_wcsspn)(char16_t const *haystack,
 		++iter;
 	return (size_t)(iter - haystack);
 }
-/* >> strspn(3)
- * Return   the  offset  from  `haystack'  to  the  first
- * character   for   which  `strchr(reject, ch) == NULL'.
- * If no such character exists, return `strlen(haystack)' */
+/* >> wcsspn(3) */
 INTERN ATTR_SECTION(".text.crt.wchar.string.memory") ATTR_PURE WUNUSED NONNULL((1, 2)) size_t
 NOTHROW_NCX(LIBKCALL libc_wcsspn)(char32_t const *haystack,
                                   char32_t const *accept) {
@@ -803,10 +880,7 @@ NOTHROW_NCX(LIBKCALL libc_wcsspn)(char32_t const *haystack,
 	return (size_t)(iter - haystack);
 }
 #include <hybrid/typecore.h>
-/* >> strcspn(3)
- * Return   the  offset  from  `haystack'  to  the  first
- * character   for   which  `strchr(reject, ch) != NULL'.
- * If no such character exists, return `strlen(haystack)' */
+/* >> wcscspn(3) */
 INTERN ATTR_SECTION(".text.crt.dos.wchar.string.memory") ATTR_PURE WUNUSED NONNULL((1, 2)) size_t
 NOTHROW_NCX(LIBDCALL libd_wcscspn)(char16_t const *haystack,
                                    char16_t const *reject) {
@@ -816,10 +890,7 @@ NOTHROW_NCX(LIBDCALL libd_wcscspn)(char16_t const *haystack,
 	return (size_t)(iter - haystack);
 }
 #include <hybrid/typecore.h>
-/* >> strcspn(3)
- * Return   the  offset  from  `haystack'  to  the  first
- * character   for   which  `strchr(reject, ch) != NULL'.
- * If no such character exists, return `strlen(haystack)' */
+/* >> wcscspn(3) */
 INTERN ATTR_SECTION(".text.crt.wchar.string.memory") ATTR_PURE WUNUSED NONNULL((1, 2)) size_t
 NOTHROW_NCX(LIBKCALL libc_wcscspn)(char32_t const *haystack,
                                    char32_t const *reject) {
@@ -828,8 +899,7 @@ NOTHROW_NCX(LIBKCALL libc_wcscspn)(char32_t const *haystack,
 		++iter;
 	return (size_t)(iter - haystack);
 }
-/* >> strchr(3)
- * Return the pointer of the first instance of `needle', or `NULL' if `needle' wasn't found. */
+/* >> wcschr(3) */
 INTERN ATTR_SECTION(".text.crt.dos.wchar.string.memory") ATTR_PURE WUNUSED NONNULL((1)) char16_t *
 NOTHROW_NCX(LIBDCALL libd_wcschr)(char16_t const *__restrict haystack,
                                   char16_t needle) {
@@ -842,8 +912,7 @@ NOTHROW_NCX(LIBDCALL libd_wcschr)(char16_t const *__restrict haystack,
 	}
 	return NULL;
 }
-/* >> strchr(3)
- * Return the pointer of the first instance of `needle', or `NULL' if `needle' wasn't found. */
+/* >> wcschr(3) */
 INTERN ATTR_SECTION(".text.crt.wchar.string.memory") ATTR_PURE WUNUSED NONNULL((1)) char32_t *
 NOTHROW_NCX(LIBKCALL libc_wcschr)(char32_t const *__restrict haystack,
                                   char32_t needle) {
@@ -856,8 +925,7 @@ NOTHROW_NCX(LIBKCALL libc_wcschr)(char32_t const *__restrict haystack,
 	}
 	return NULL;
 }
-/* >> strrchr(3)
- * Return the pointer of the last instance of `needle', or `NULL' if `needle' wasn't found. */
+/* >> wcsrchr(3) */
 INTERN ATTR_SECTION(".text.crt.dos.wchar.string.memory") ATTR_PURE WUNUSED NONNULL((1)) char16_t *
 NOTHROW_NCX(LIBDCALL libd_wcsrchr)(char16_t const *__restrict haystack,
                                    char16_t needle) {
@@ -871,8 +939,7 @@ NOTHROW_NCX(LIBDCALL libd_wcsrchr)(char16_t const *__restrict haystack,
 	}
 	return (char16_t *)result;
 }
-/* >> strrchr(3)
- * Return the pointer of the last instance of `needle', or `NULL' if `needle' wasn't found. */
+/* >> wcsrchr(3) */
 INTERN ATTR_SECTION(".text.crt.wchar.string.memory") ATTR_PURE WUNUSED NONNULL((1)) char32_t *
 NOTHROW_NCX(LIBKCALL libc_wcsrchr)(char32_t const *__restrict haystack,
                                    char32_t needle) {
@@ -886,9 +953,7 @@ NOTHROW_NCX(LIBKCALL libc_wcsrchr)(char32_t const *__restrict haystack,
 	}
 	return (char32_t *)result;
 }
-/* >> strpbrk(3)
- * Return a pointer to the first character from `haystack' with `strchr(*return, accept) != NULL'
- * If no such character exists, return `NULL' instead. */
+/* >> wcspbrk(3) */
 INTERN ATTR_SECTION(".text.crt.dos.wchar.string.memory") ATTR_PURE WUNUSED NONNULL((1, 2)) char16_t *
 NOTHROW_NCX(LIBDCALL libd_wcspbrk)(char16_t const *haystack,
                                    char16_t const *accept) {
@@ -903,9 +968,7 @@ NOTHROW_NCX(LIBDCALL libd_wcspbrk)(char16_t const *haystack,
 	}
 	return NULL;
 }
-/* >> strpbrk(3)
- * Return a pointer to the first character from `haystack' with `strchr(*return, accept) != NULL'
- * If no such character exists, return `NULL' instead. */
+/* >> wcspbrk(3) */
 INTERN ATTR_SECTION(".text.crt.wchar.string.memory") ATTR_PURE WUNUSED NONNULL((1, 2)) char32_t *
 NOTHROW_NCX(LIBKCALL libc_wcspbrk)(char32_t const *haystack,
                                    char32_t const *accept) {
@@ -920,9 +983,7 @@ NOTHROW_NCX(LIBKCALL libc_wcspbrk)(char32_t const *haystack,
 	}
 	return NULL;
 }
-/* >> strstr(3)
- * Search for a given `needle' appearing as a sub-string within `haystack'
- * If no such needle exists, return `NULL' */
+/* >> wcsstr(3) */
 INTERN ATTR_SECTION(".text.crt.dos.wchar.string.memory") ATTR_PURE WUNUSED NONNULL((1, 2)) char16_t *
 NOTHROW_NCX(LIBDCALL libd_wcsstr)(char16_t const *haystack,
                                   char16_t const *needle) {
@@ -943,9 +1004,7 @@ miss:
 	}
 	return NULL;
 }
-/* >> strstr(3)
- * Search for a given `needle' appearing as a sub-string within `haystack'
- * If no such needle exists, return `NULL' */
+/* >> wcsstr(3) */
 INTERN ATTR_SECTION(".text.crt.wchar.string.memory") ATTR_PURE WUNUSED NONNULL((1, 2)) char32_t *
 NOTHROW_NCX(LIBKCALL libc_wcsstr)(char32_t const *haystack,
                                   char32_t const *needle) {
@@ -966,6 +1025,7 @@ miss:
 	}
 	return NULL;
 }
+/* >> fwide(3) */
 INTERN ATTR_SECTION(".text.crt.wchar.FILE.locked.utility") NONNULL((1)) int
 NOTHROW_NCX(LIBCCALL libc_fwide)(FILE *fp,
                                  int mode) {
@@ -974,6 +1034,7 @@ NOTHROW_NCX(LIBCCALL libc_fwide)(FILE *fp,
 	COMPILER_IMPURE();
 	return 0;
 }
+/* >> fwprintf(3) */
 INTERN ATTR_SECTION(".text.crt.dos.wchar.FILE.locked.write.printf") ATTR_LIBC_WPRINTF(2, 3) NONNULL((1, 2)) __STDC_INT_AS_SIZE_T
 (VLIBDCALL libd_fwprintf)(FILE *__restrict stream,
                           char16_t const *__restrict format,
@@ -985,6 +1046,7 @@ INTERN ATTR_SECTION(".text.crt.dos.wchar.FILE.locked.write.printf") ATTR_LIBC_WP
 	va_end(args);
 	return result;
 }
+/* >> fwprintf(3) */
 INTERN ATTR_SECTION(".text.crt.wchar.FILE.locked.write.printf") ATTR_LIBC_WPRINTF(2, 3) NONNULL((1, 2)) __STDC_INT_AS_SIZE_T
 (VLIBKCALL libc_fwprintf)(FILE *__restrict stream,
                           char32_t const *__restrict format,
@@ -996,18 +1058,21 @@ INTERN ATTR_SECTION(".text.crt.wchar.FILE.locked.write.printf") ATTR_LIBC_WPRINT
 	va_end(args);
 	return result;
 }
+/* >> vfwprintf(3) */
 INTERN ATTR_SECTION(".text.crt.dos.wchar.FILE.locked.write.printf") ATTR_LIBC_WPRINTF(2, 0) NONNULL((1, 2)) __STDC_INT_AS_SIZE_T
 (LIBDCALL libd_vfwprintf)(FILE *__restrict stream,
                           char16_t const *__restrict format,
                           va_list args) THROWS(...) {
 	return (__STDC_INT_AS_SSIZE_T)libd_format_vwprintf(&libd_file_wprinter, stream, format, args);
 }
+/* >> vfwprintf(3) */
 INTERN ATTR_SECTION(".text.crt.wchar.FILE.locked.write.printf") ATTR_LIBC_WPRINTF(2, 0) NONNULL((1, 2)) __STDC_INT_AS_SIZE_T
 (LIBKCALL libc_vfwprintf)(FILE *__restrict stream,
                           char32_t const *__restrict format,
                           va_list args) THROWS(...) {
 	return (__STDC_INT_AS_SSIZE_T)libc_format_vwprintf(&libc_file_wprinter, stream, format, args);
 }
+/* >> wprintf(3) */
 INTERN ATTR_SECTION(".text.crt.dos.wchar.FILE.locked.write.printf") ATTR_LIBC_WPRINTF(1, 2) NONNULL((1)) __STDC_INT_AS_SIZE_T
 (VLIBDCALL libd_wprintf)(char16_t const *__restrict format,
                          ...) THROWS(...) {
@@ -1018,6 +1083,7 @@ INTERN ATTR_SECTION(".text.crt.dos.wchar.FILE.locked.write.printf") ATTR_LIBC_WP
 	va_end(args);
 	return result;
 }
+/* >> wprintf(3) */
 INTERN ATTR_SECTION(".text.crt.wchar.FILE.locked.write.printf") ATTR_LIBC_WPRINTF(1, 2) NONNULL((1)) __STDC_INT_AS_SIZE_T
 (VLIBKCALL libc_wprintf)(char32_t const *__restrict format,
                          ...) THROWS(...) {
@@ -1029,17 +1095,20 @@ INTERN ATTR_SECTION(".text.crt.wchar.FILE.locked.write.printf") ATTR_LIBC_WPRINT
 	return result;
 }
 #include <libc/local/stdstreams.h>
+/* >> vwprintf(3) */
 INTERN ATTR_SECTION(".text.crt.dos.wchar.FILE.locked.write.printf") ATTR_LIBC_WPRINTF(1, 0) NONNULL((1)) __STDC_INT_AS_SIZE_T
 (LIBDCALL libd_vwprintf)(char16_t const *__restrict format,
                          va_list args) THROWS(...) {
 	return libd_vfwprintf(stdout, format, args);
 }
 #include <libc/local/stdstreams.h>
+/* >> vwprintf(3) */
 INTERN ATTR_SECTION(".text.crt.wchar.FILE.locked.write.printf") ATTR_LIBC_WPRINTF(1, 0) NONNULL((1)) __STDC_INT_AS_SIZE_T
 (LIBKCALL libc_vwprintf)(char32_t const *__restrict format,
                          va_list args) THROWS(...) {
 	return libc_vfwprintf(stdout, format, args);
 }
+/* >> fwscanf(3) */
 INTERN ATTR_SECTION(".text.crt.dos.wchar.FILE.locked.read.scanf") ATTR_LIBC_WSCANF(2, 3) NONNULL((1, 2)) __STDC_INT_AS_SIZE_T
 (VLIBDCALL libd_fwscanf)(FILE *__restrict stream,
                          char16_t const *__restrict format,
@@ -1051,6 +1120,7 @@ INTERN ATTR_SECTION(".text.crt.dos.wchar.FILE.locked.read.scanf") ATTR_LIBC_WSCA
 	va_end(args);
 	return result;
 }
+/* >> fwscanf(3) */
 INTERN ATTR_SECTION(".text.crt.wchar.FILE.locked.read.scanf") ATTR_LIBC_WSCANF(2, 3) NONNULL((1, 2)) __STDC_INT_AS_SIZE_T
 (VLIBKCALL libc_fwscanf)(FILE *__restrict stream,
                          char32_t const *__restrict format,
@@ -1062,6 +1132,7 @@ INTERN ATTR_SECTION(".text.crt.wchar.FILE.locked.read.scanf") ATTR_LIBC_WSCANF(2
 	va_end(args);
 	return result;
 }
+/* >> wscanf(3) */
 INTERN ATTR_SECTION(".text.crt.dos.wchar.FILE.locked.read.scanf") ATTR_LIBC_WSCANF(1, 2) NONNULL((1)) __STDC_INT_AS_SIZE_T
 (VLIBDCALL libd_wscanf)(char16_t const *__restrict format,
                         ...) THROWS(...) {
@@ -1072,6 +1143,7 @@ INTERN ATTR_SECTION(".text.crt.dos.wchar.FILE.locked.read.scanf") ATTR_LIBC_WSCA
 	va_end(args);
 	return result;
 }
+/* >> wscanf(3) */
 INTERN ATTR_SECTION(".text.crt.wchar.FILE.locked.read.scanf") ATTR_LIBC_WSCANF(1, 2) NONNULL((1)) __STDC_INT_AS_SIZE_T
 (VLIBKCALL libc_wscanf)(char32_t const *__restrict format,
                         ...) THROWS(...) {
@@ -1082,6 +1154,7 @@ INTERN ATTR_SECTION(".text.crt.wchar.FILE.locked.read.scanf") ATTR_LIBC_WSCANF(1
 	va_end(args);
 	return result;
 }
+/* >> swscanf(3) */
 INTERN ATTR_SECTION(".text.crt.dos.wchar.unicode.static.format.scanf") ATTR_LIBC_WSCANF(2, 3) NONNULL((1, 2)) __STDC_INT_AS_SIZE_T
 NOTHROW_NCX(VLIBDCALL libd_swscanf)(char16_t const *__restrict src,
                                     char16_t const *__restrict format,
@@ -1093,6 +1166,7 @@ NOTHROW_NCX(VLIBDCALL libd_swscanf)(char16_t const *__restrict src,
 	va_end(args);
 	return result;
 }
+/* >> swscanf(3) */
 INTERN ATTR_SECTION(".text.crt.wchar.unicode.static.format.scanf") ATTR_LIBC_WSCANF(2, 3) NONNULL((1, 2)) __STDC_INT_AS_SIZE_T
 NOTHROW_NCX(VLIBKCALL libc_swscanf)(char32_t const *__restrict src,
                                     char32_t const *__restrict format,
@@ -1104,6 +1178,7 @@ NOTHROW_NCX(VLIBKCALL libc_swscanf)(char32_t const *__restrict src,
 	va_end(args);
 	return result;
 }
+/* >> vswprintf(3) */
 INTERN ATTR_SECTION(".text.crt.dos.wchar.unicode.static.format.printf") ATTR_LIBC_WPRINTF(3, 0) NONNULL((3)) __STDC_INT_AS_SIZE_T
 NOTHROW_NCX(LIBDCALL libd_vswprintf)(char16_t *__restrict buf,
                                      size_t buflen,
@@ -1117,6 +1192,7 @@ NOTHROW_NCX(LIBDCALL libd_vswprintf)(char16_t *__restrict buf,
 	(void)args;
 	return 0;
 }
+/* >> vswprintf(3) */
 INTERN ATTR_SECTION(".text.crt.wchar.unicode.static.format.printf") ATTR_LIBC_WPRINTF(3, 0) NONNULL((3)) __STDC_INT_AS_SIZE_T
 NOTHROW_NCX(LIBKCALL libc_vswprintf)(char32_t *__restrict buf,
                                      size_t buflen,
@@ -1130,6 +1206,7 @@ NOTHROW_NCX(LIBKCALL libc_vswprintf)(char32_t *__restrict buf,
 	(void)args;
 	return 0;
 }
+/* >> swprintf(3) */
 INTERN ATTR_SECTION(".text.crt.dos.wchar.unicode.static.format.printf") ATTR_LIBC_WPRINTF(3, 4) NONNULL((3)) __STDC_INT_AS_SIZE_T
 NOTHROW_NCX(VLIBDCALL libd_swprintf)(char16_t *__restrict buf,
                                      size_t buflen,
@@ -1142,6 +1219,7 @@ NOTHROW_NCX(VLIBDCALL libd_swprintf)(char16_t *__restrict buf,
 	va_end(args);
 	return result;
 }
+/* >> swprintf(3) */
 INTERN ATTR_SECTION(".text.crt.wchar.unicode.static.format.printf") ATTR_LIBC_WPRINTF(3, 4) NONNULL((3)) __STDC_INT_AS_SIZE_T
 NOTHROW_NCX(VLIBKCALL libc_swprintf)(char32_t *__restrict buf,
                                      size_t buflen,
@@ -1212,6 +1290,7 @@ __NAMESPACE_LOCAL_BEGIN
 
 
 __NAMESPACE_LOCAL_END
+/* >> wcstod(3) */
 INTERN ATTR_SECTION(".text.crt.dos.wchar.unicode.static.convert") ATTR_LEAF NONNULL((1)) double
 NOTHROW_NCX(LIBDCALL libd_wcstod)(char16_t const *__restrict nptr,
                                   char16_t **endptr) {
@@ -1295,6 +1374,7 @@ __LOCAL_LIBC(vsc32scanf_ungetc) ssize_t
 }
 __NAMESPACE_LOCAL_END
 #endif /* !____vsc32scanf_getc_defined */
+/* >> wcstod(3) */
 INTERN ATTR_SECTION(".text.crt.wchar.unicode.static.convert") ATTR_LEAF NONNULL((1)) double
 NOTHROW_NCX(LIBKCALL libc_wcstod)(char32_t const *__restrict nptr,
                                   char32_t **endptr) {
@@ -1378,6 +1458,7 @@ __NAMESPACE_LOCAL_BEGIN
 
 
 __NAMESPACE_LOCAL_END
+/* >> wcstof(3) */
 INTERN ATTR_SECTION(".text.crt.dos.wchar.unicode.static.convert") ATTR_LEAF NONNULL((1)) float
 NOTHROW_NCX(LIBDCALL libd_wcstof)(char16_t const *__restrict nptr,
                                   char16_t **endptr) {
@@ -1461,6 +1542,7 @@ __LOCAL_LIBC(vsc32scanf_ungetc) ssize_t
 }
 __NAMESPACE_LOCAL_END
 #endif /* !____vsc32scanf_getc_defined */
+/* >> wcstof(3) */
 INTERN ATTR_SECTION(".text.crt.wchar.unicode.static.convert") ATTR_LEAF NONNULL((1)) float
 NOTHROW_NCX(LIBKCALL libc_wcstof)(char32_t const *__restrict nptr,
                                   char32_t **endptr) {
@@ -1544,6 +1626,7 @@ __NAMESPACE_LOCAL_BEGIN
 
 
 __NAMESPACE_LOCAL_END
+/* >> wcstold(3) */
 INTERN ATTR_SECTION(".text.crt.dos.wchar.unicode.static.convert") ATTR_LEAF NONNULL((1)) __LONGDOUBLE
 NOTHROW_NCX(LIBDCALL libd_wcstold)(char16_t const *__restrict nptr,
                                    char16_t **endptr) {
@@ -1627,6 +1710,7 @@ __LOCAL_LIBC(vsc32scanf_ungetc) ssize_t
 }
 __NAMESPACE_LOCAL_END
 #endif /* !____vsc32scanf_getc_defined */
+/* >> wcstold(3) */
 INTERN ATTR_SECTION(".text.crt.wchar.unicode.static.convert") ATTR_LEAF NONNULL((1)) __LONGDOUBLE
 NOTHROW_NCX(LIBKCALL libc_wcstold)(char32_t const *__restrict nptr,
                                    char32_t **endptr) {
@@ -1652,6 +1736,7 @@ NOTHROW_NCX(LIBKCALL libc_wcstold)(char32_t const *__restrict nptr,
 		*endptr = (char32_t *)text_pointer;
 	return result;
 }
+/* >> wcstoll(3) */
 INTERN ATTR_SECTION(".text.crt.dos.wchar.unicode.static.convert") ATTR_LEAF NONNULL((1)) __LONGLONG
 NOTHROW_NCX(LIBDCALL libd_wcstoll)(char16_t const *__restrict nptr,
                                    char16_t **endptr,
@@ -1662,6 +1747,7 @@ NOTHROW_NCX(LIBDCALL libd_wcstoll)(char16_t const *__restrict nptr,
 	return (__LONGLONG)libd_wcsto64(nptr, endptr, base);
 #endif /* __SIZEOF_LONG_LONG__ > 4 */
 }
+/* >> wcstoll(3) */
 INTERN ATTR_SECTION(".text.crt.wchar.unicode.static.convert") ATTR_LEAF NONNULL((1)) __LONGLONG
 NOTHROW_NCX(LIBKCALL libc_wcstoll)(char32_t const *__restrict nptr,
                                    char32_t **endptr,
@@ -1672,6 +1758,7 @@ NOTHROW_NCX(LIBKCALL libc_wcstoll)(char32_t const *__restrict nptr,
 	return (__LONGLONG)libc_wcsto64(nptr, endptr, base);
 #endif /* __SIZEOF_LONG_LONG__ > 4 */
 }
+/* >> wcstoull(3) */
 INTERN ATTR_SECTION(".text.crt.dos.wchar.unicode.static.convert") ATTR_LEAF NONNULL((1)) __ULONGLONG
 NOTHROW_NCX(LIBDCALL libd_wcstoull)(char16_t const *__restrict nptr,
                                     char16_t **endptr,
@@ -1682,6 +1769,7 @@ NOTHROW_NCX(LIBDCALL libd_wcstoull)(char16_t const *__restrict nptr,
 	return (__ULONGLONG)libd_wcstou64(nptr, endptr, base);
 #endif /* __SIZEOF_LONG_LONG__ > 4 */
 }
+/* >> wcstoull(3) */
 INTERN ATTR_SECTION(".text.crt.wchar.unicode.static.convert") ATTR_LEAF NONNULL((1)) __ULONGLONG
 NOTHROW_NCX(LIBKCALL libc_wcstoull)(char32_t const *__restrict nptr,
                                     char32_t **endptr,
@@ -1693,17 +1781,20 @@ NOTHROW_NCX(LIBKCALL libc_wcstoull)(char32_t const *__restrict nptr,
 #endif /* __SIZEOF_LONG_LONG__ > 4 */
 }
 #include <libc/local/stdstreams.h>
+/* >> vwscanf(3) */
 INTERN ATTR_SECTION(".text.crt.dos.wchar.FILE.locked.read.scanf") WUNUSED ATTR_LIBC_WSCANF(1, 0) NONNULL((1)) __STDC_INT_AS_SIZE_T
 (LIBDCALL libd_vwscanf)(char16_t const *__restrict format,
                         va_list args) THROWS(...) {
 	return libd_vfwscanf(stdin, format, args);
 }
 #include <libc/local/stdstreams.h>
+/* >> vwscanf(3) */
 INTERN ATTR_SECTION(".text.crt.wchar.FILE.locked.read.scanf") WUNUSED ATTR_LIBC_WSCANF(1, 0) NONNULL((1)) __STDC_INT_AS_SIZE_T
 (LIBKCALL libc_vwscanf)(char32_t const *__restrict format,
                         va_list args) THROWS(...) {
 	return libc_vfwscanf(stdin, format, args);
 }
+/* >> vswscanf(3) */
 INTERN ATTR_SECTION(".text.crt.dos.wchar.unicode.static.format.scanf") WUNUSED ATTR_LIBC_WSCANF(2, 0) NONNULL((1, 2)) __STDC_INT_AS_SIZE_T
 NOTHROW_NCX(LIBDCALL libd_vswscanf)(char16_t const *__restrict src,
                                     char16_t const *__restrict format,
@@ -1715,6 +1806,7 @@ NOTHROW_NCX(LIBDCALL libd_vswscanf)(char16_t const *__restrict src,
 	COMPILER_IMPURE();
 	return 0;
 }
+/* >> vswscanf(3) */
 INTERN ATTR_SECTION(".text.crt.wchar.unicode.static.format.scanf") WUNUSED ATTR_LIBC_WSCANF(2, 0) NONNULL((1, 2)) __STDC_INT_AS_SIZE_T
 NOTHROW_NCX(LIBKCALL libc_vswscanf)(char32_t const *__restrict src,
                                     char32_t const *__restrict format,
@@ -1726,6 +1818,7 @@ NOTHROW_NCX(LIBKCALL libc_vswscanf)(char32_t const *__restrict src,
 	COMPILER_IMPURE();
 	return 0;
 }
+/* >> wcscasecmp(3) */
 INTERN ATTR_SECTION(".text.crt.dos.wchar.unicode.static.memory") ATTR_PURE WUNUSED NONNULL((1, 2)) int
 NOTHROW_NCX(LIBDCALL libd_wcscasecmp)(char16_t const *s1,
                                       char16_t const *s2) {
@@ -1738,6 +1831,7 @@ NOTHROW_NCX(LIBDCALL libd_wcscasecmp)(char16_t const *s1,
 	} while (c1);
 	return 0;
 }
+/* >> wcscasecmp(3) */
 INTERN ATTR_SECTION(".text.crt.wchar.unicode.static.memory") ATTR_PURE WUNUSED NONNULL((1, 2)) int
 NOTHROW_NCX(LIBKCALL libc_wcscasecmp)(char32_t const *s1,
                                       char32_t const *s2) {
@@ -1750,6 +1844,7 @@ NOTHROW_NCX(LIBKCALL libc_wcscasecmp)(char32_t const *s1,
 	} while (c1);
 	return 0;
 }
+/* >> wcsncasecmp(3) */
 INTERN ATTR_SECTION(".text.crt.dos.wchar.unicode.static.memory") ATTR_PURE WUNUSED NONNULL((1, 2)) int
 NOTHROW_NCX(LIBDCALL libd_wcsncasecmp)(char16_t const *s1,
                                        char16_t const *s2,
@@ -1765,6 +1860,7 @@ NOTHROW_NCX(LIBDCALL libd_wcsncasecmp)(char16_t const *s1,
 	} while (c1);
 	return 0;
 }
+/* >> wcsncasecmp(3) */
 INTERN ATTR_SECTION(".text.crt.wchar.unicode.static.memory") ATTR_PURE WUNUSED NONNULL((1, 2)) int
 NOTHROW_NCX(LIBKCALL libc_wcsncasecmp)(char32_t const *s1,
                                        char32_t const *s2,
@@ -1780,6 +1876,7 @@ NOTHROW_NCX(LIBKCALL libc_wcsncasecmp)(char32_t const *s1,
 	} while (c1);
 	return 0;
 }
+/* >> wcscasecmp_l(3) */
 INTERN ATTR_SECTION(".text.crt.dos.wchar.unicode.locale.memory") ATTR_PURE WUNUSED NONNULL((1, 2)) int
 NOTHROW_NCX(LIBDCALL libd_wcscasecmp_l)(char16_t const *s1,
                                         char16_t const *s2,
@@ -1787,6 +1884,7 @@ NOTHROW_NCX(LIBDCALL libd_wcscasecmp_l)(char16_t const *s1,
 	(void)locale;
 	return libd_wcscasecmp(s1, s2);
 }
+/* >> wcscasecmp_l(3) */
 INTERN ATTR_SECTION(".text.crt.wchar.unicode.locale.memory") ATTR_PURE WUNUSED NONNULL((1, 2)) int
 NOTHROW_NCX(LIBKCALL libc_wcscasecmp_l)(char32_t const *s1,
                                         char32_t const *s2,
@@ -1794,6 +1892,7 @@ NOTHROW_NCX(LIBKCALL libc_wcscasecmp_l)(char32_t const *s1,
 	(void)locale;
 	return libc_wcscasecmp(s1, s2);
 }
+/* >> wcsncasecmp_l(3) */
 INTERN ATTR_SECTION(".text.crt.dos.wchar.unicode.locale.memory") ATTR_PURE WUNUSED NONNULL((1, 2)) int
 NOTHROW_NCX(LIBDCALL libd_wcsncasecmp_l)(char16_t const *s1,
                                          char16_t const *s2,
@@ -1802,6 +1901,7 @@ NOTHROW_NCX(LIBDCALL libd_wcsncasecmp_l)(char16_t const *s1,
 	(void)locale;
 	return libd_wcsncasecmp(s1, s2, maxlen);
 }
+/* >> wcsncasecmp_l(3) */
 INTERN ATTR_SECTION(".text.crt.wchar.unicode.locale.memory") ATTR_PURE WUNUSED NONNULL((1, 2)) int
 NOTHROW_NCX(LIBKCALL libc_wcsncasecmp_l)(char32_t const *s1,
                                          char32_t const *s2,
@@ -1810,6 +1910,7 @@ NOTHROW_NCX(LIBKCALL libc_wcsncasecmp_l)(char32_t const *s1,
 	(void)locale;
 	return libc_wcsncasecmp(s1, s2, maxlen);
 }
+/* >> wcscoll_l(3) */
 INTERN ATTR_SECTION(".text.crt.dos.wchar.unicode.locale.memory") ATTR_PURE WUNUSED NONNULL((1, 2)) int
 NOTHROW_NCX(LIBDCALL libd_wcscoll_l)(char16_t const *s1,
                                      char16_t const *s2,
@@ -1817,6 +1918,7 @@ NOTHROW_NCX(LIBDCALL libd_wcscoll_l)(char16_t const *s1,
 	(void)locale;
 	return libd_wcscoll(s1, s2);
 }
+/* >> wcscoll_l(3) */
 INTERN ATTR_SECTION(".text.crt.wchar.unicode.locale.memory") ATTR_PURE WUNUSED NONNULL((1, 2)) int
 NOTHROW_NCX(LIBKCALL libc_wcscoll_l)(char32_t const *s1,
                                      char32_t const *s2,
@@ -1824,6 +1926,7 @@ NOTHROW_NCX(LIBKCALL libc_wcscoll_l)(char32_t const *s1,
 	(void)locale;
 	return libc_wcscoll(s1, s2);
 }
+/* >> wcsxfrm_l(3) */
 INTERN ATTR_SECTION(".text.crt.dos.wchar.unicode.locale.memory") NONNULL((2)) size_t
 NOTHROW_NCX(LIBDCALL libd_wcsxfrm_l)(char16_t *dst,
                                      char16_t const *__restrict src,
@@ -1832,6 +1935,7 @@ NOTHROW_NCX(LIBDCALL libd_wcsxfrm_l)(char16_t *dst,
 	(void)locale;
 	return libd_wcsxfrm(dst, src, maxlen);
 }
+/* >> wcsxfrm_l(3) */
 INTERN ATTR_SECTION(".text.crt.wchar.unicode.locale.memory") NONNULL((2)) size_t
 NOTHROW_NCX(LIBKCALL libc_wcsxfrm_l)(char32_t *dst,
                                      char32_t const *__restrict src,
@@ -1840,16 +1944,19 @@ NOTHROW_NCX(LIBKCALL libc_wcsxfrm_l)(char32_t *dst,
 	(void)locale;
 	return libc_wcsxfrm(dst, src, maxlen);
 }
+/* >> wcpcpy(3) */
 INTERN ATTR_SECTION(".text.crt.dos.wchar.string.memory") ATTR_RETNONNULL NONNULL((1, 2)) char16_t *
 NOTHROW_NCX(LIBDCALL libd_wcpcpy)(char16_t *__restrict dst,
                                   char16_t const *__restrict src) {
 	return (char16_t *)libc_mempcpyw(dst, src, libd_wcslen(src) + 1);
 }
+/* >> wcpcpy(3) */
 INTERN ATTR_SECTION(".text.crt.wchar.string.memory") ATTR_RETNONNULL NONNULL((1, 2)) char32_t *
 NOTHROW_NCX(LIBKCALL libc_wcpcpy)(char32_t *__restrict dst,
                                   char32_t const *__restrict src) {
 	return (char32_t *)libc_mempcpyl(dst, src, libc_wcslen(src) + 1);
 }
+/* >> wcpncpy(3) */
 INTERN ATTR_SECTION(".text.crt.dos.wchar.string.memory") ATTR_RETNONNULL NONNULL((1, 2)) char16_t *
 NOTHROW_NCX(LIBDCALL libd_wcpncpy)(char16_t *__restrict buf,
                                    char16_t const *__restrict src,
@@ -1859,6 +1966,7 @@ NOTHROW_NCX(LIBDCALL libd_wcpncpy)(char16_t *__restrict buf,
 	(char16_t *)libc_memsetw(buf + srclen, '\0', (size_t)(buflen - srclen));
 	return buf + srclen;
 }
+/* >> wcpncpy(3) */
 INTERN ATTR_SECTION(".text.crt.wchar.string.memory") ATTR_RETNONNULL NONNULL((1, 2)) char32_t *
 NOTHROW_NCX(LIBKCALL libc_wcpncpy)(char32_t *__restrict buf,
                                    char32_t const *__restrict src,
@@ -1869,8 +1977,7 @@ NOTHROW_NCX(LIBKCALL libc_wcpncpy)(char32_t *__restrict buf,
 	return buf + srclen;
 }
 #ifndef LIBC_ARCH_HAVE_C16SNLEN
-/* >> strnlen(3)
- * Same as `strlen', but don't exceed `max_chars' characters (Same as `memlen[...](str, '\0', max_chars)´) */
+/* >> wcsnlen(3) */
 INTERN ATTR_SECTION(".text.crt.dos.wchar.string.memory") ATTR_PURE WUNUSED NONNULL((1)) size_t
 NOTHROW_NCX(LIBDCALL libd_wcsnlen)(char16_t const *__restrict str,
                                    size_t maxlen) {
@@ -1878,8 +1985,7 @@ NOTHROW_NCX(LIBDCALL libd_wcsnlen)(char16_t const *__restrict str,
 }
 #endif /* !LIBC_ARCH_HAVE_C16SNLEN */
 #ifndef LIBC_ARCH_HAVE_C32SNLEN
-/* >> strnlen(3)
- * Same as `strlen', but don't exceed `max_chars' characters (Same as `memlen[...](str, '\0', max_chars)´) */
+/* >> wcsnlen(3) */
 INTERN ATTR_SECTION(".text.crt.wchar.string.memory") ATTR_PURE WUNUSED NONNULL((1)) size_t
 NOTHROW_NCX(LIBKCALL libc_wcsnlen)(char32_t const *__restrict str,
                                    size_t maxlen) {
@@ -1887,6 +1993,7 @@ NOTHROW_NCX(LIBKCALL libc_wcsnlen)(char32_t const *__restrict str,
 }
 #endif /* !LIBC_ARCH_HAVE_C32SNLEN */
 #include <hybrid/typecore.h>
+/* >> wcsdup(3) */
 INTERN ATTR_SECTION(".text.crt.dos.wchar.heap.strdup") ATTR_MALLOC ATTR_MALL_DEFAULT_ALIGNED WUNUSED NONNULL((1)) char16_t *
 NOTHROW_NCX(LIBDCALL libd_wcsdup)(char16_t const *__restrict string) {
 	size_t resultsize = (libd_wcslen(string) + 1) * sizeof(char16_t);
@@ -1896,6 +2003,7 @@ NOTHROW_NCX(LIBDCALL libd_wcsdup)(char16_t const *__restrict string) {
 	return result;
 }
 #include <hybrid/typecore.h>
+/* >> wcsdup(3) */
 INTERN ATTR_SECTION(".text.crt.wchar.heap.strdup") ATTR_MALLOC ATTR_MALL_DEFAULT_ALIGNED WUNUSED NONNULL((1)) char32_t *
 NOTHROW_NCX(LIBKCALL libc_wcsdup)(char32_t const *__restrict string) {
 	size_t resultsize = (libc_wcslen(string) + 1) * sizeof(char32_t);
@@ -1905,13 +2013,12 @@ NOTHROW_NCX(LIBKCALL libc_wcsdup)(char32_t const *__restrict string) {
 	return result;
 }
 #include <libc/unicode.h>
+/* >> wcwidth(3)
+ * Returns the number of columns needed to display `ch' in a system terminal
+ * When `ch' cannot be  displayed at all, `-1'  is returned (but `errno'  is
+ * never modified by this function). Zero-width characters return `0'. */
 INTERN ATTR_SECTION(".text.crt.dos.wchar.unicode.static.mbs") ATTR_CONST WUNUSED int
 NOTHROW_NCX(LIBDCALL libd_wcwidth)(char16_t ch) {
-
-	if (ch >= 0xd800 &&
-	    ch <= 0xdfff)
-		return 0;
-
 	if (__libc_unicode_isprint(ch))
 		return 1;
 	if (ch == 0)
@@ -1919,24 +2026,28 @@ NOTHROW_NCX(LIBDCALL libd_wcwidth)(char16_t ch) {
 	return -1;
 }
 #include <libc/unicode.h>
+/* >> wcwidth(3)
+ * Returns the number of columns needed to display `ch' in a system terminal
+ * When `ch' cannot be  displayed at all, `-1'  is returned (but `errno'  is
+ * never modified by this function). Zero-width characters return `0'. */
 INTERN ATTR_SECTION(".text.crt.wchar.unicode.static.mbs") ATTR_CONST WUNUSED int
 NOTHROW_NCX(LIBKCALL libc_wcwidth)(char32_t ch) {
-
-
-
-
-
 	if (__libc_unicode_isprint(ch))
 		return 1;
 	if (ch == 0)
 		return 0;
 	return -1;
 }
-INTERN ATTR_SECTION(".text.crt.dos.wchar.unicode.static.mbs") ATTR_PURE WUNUSED NONNULL((1)) int
+/* >> wcswidth(3)
+ * Returns the number of columns needed to display `str...+=wcslen(str, num_chars)'
+ * in a system terminal. If any of the contained characters cannot be printed, then
+ * `-1' is returned. (s.a. `wcwidth(3)') */
+INTERN ATTR_SECTION(".text.crt.dos.wchar.unicode.static.mbs") ATTR_PURE WUNUSED NONNULL((1)) __STDC_INT32_AS_SSIZE_T
 NOTHROW_NCX(LIBDCALL libd_wcswidth)(char16_t const *__restrict str,
                                     size_t num_chars) {
-	int temp, result = 0;
-	for (; num_chars; --num_chars, ++str) {
+	int temp;
+	__STDC_INT32_AS_SSIZE_T result = 0;
+	for (; num_chars; ++str, --num_chars) {
 		char16_t ch = *str;
 		if (!ch)
 			break;
@@ -1945,13 +2056,18 @@ NOTHROW_NCX(LIBDCALL libd_wcswidth)(char16_t const *__restrict str,
 			return temp;
 		result += temp;
 	}
-	return 0;
+	return result;
 }
-INTERN ATTR_SECTION(".text.crt.wchar.unicode.static.mbs") ATTR_PURE WUNUSED NONNULL((1)) int
+/* >> wcswidth(3)
+ * Returns the number of columns needed to display `str...+=wcslen(str, num_chars)'
+ * in a system terminal. If any of the contained characters cannot be printed, then
+ * `-1' is returned. (s.a. `wcwidth(3)') */
+INTERN ATTR_SECTION(".text.crt.wchar.unicode.static.mbs") ATTR_PURE WUNUSED NONNULL((1)) __STDC_INT32_AS_SSIZE_T
 NOTHROW_NCX(LIBKCALL libc_wcswidth)(char32_t const *__restrict str,
                                     size_t num_chars) {
-	int temp, result = 0;
-	for (; num_chars; --num_chars, ++str) {
+	int temp;
+	__STDC_INT32_AS_SSIZE_T result = 0;
+	for (; num_chars; ++str, --num_chars) {
 		char32_t ch = *str;
 		if (!ch)
 			break;
@@ -1960,9 +2076,10 @@ NOTHROW_NCX(LIBKCALL libc_wcswidth)(char32_t const *__restrict str,
 			return temp;
 		result += temp;
 	}
-	return 0;
+	return result;
 }
-/* Same as `wcschr', but return `wcsend(str)', rather than `NULL' if `needle' wasn't found. */
+/* >> wcschrnul(3)
+ * Same as `wcschr', but return `wcsend(str)', rather than `NULL' if `needle' wasn't found. */
 INTERN ATTR_SECTION(".text.crt.dos.wchar.string.memory") ATTR_PURE WUNUSED NONNULL((1)) char16_t *
 NOTHROW_NCX(LIBDCALL libd_wcschrnul)(char16_t const *haystack,
                                      char16_t needle) {
@@ -1972,7 +2089,8 @@ NOTHROW_NCX(LIBDCALL libd_wcschrnul)(char16_t const *haystack,
 	}
 	return (char16_t *)haystack;
 }
-/* Same as `wcschr', but return `wcsend(str)', rather than `NULL' if `needle' wasn't found. */
+/* >> wcschrnul(3)
+ * Same as `wcschr', but return `wcsend(str)', rather than `NULL' if `needle' wasn't found. */
 INTERN ATTR_SECTION(".text.crt.wchar.string.memory") ATTR_PURE WUNUSED NONNULL((1)) char32_t *
 NOTHROW_NCX(LIBKCALL libc_wcschrnul)(char32_t const *haystack,
                                      char32_t needle) {
@@ -1982,6 +2100,7 @@ NOTHROW_NCX(LIBKCALL libc_wcschrnul)(char32_t const *haystack,
 	}
 	return (char32_t *)haystack;
 }
+/* >> wcstol_l(3) */
 INTERN ATTR_SECTION(".text.crt.dos.wchar.unicode.locale.convert") NONNULL((1)) long
 NOTHROW_NCX(LIBDCALL libd_wcstol_l)(char16_t const *__restrict nptr,
                                     char16_t **endptr,
@@ -1990,6 +2109,7 @@ NOTHROW_NCX(LIBDCALL libd_wcstol_l)(char16_t const *__restrict nptr,
 	(void)locale;
 	return libd_wcstol(nptr, endptr, base);
 }
+/* >> wcstol_l(3) */
 INTERN ATTR_SECTION(".text.crt.wchar.unicode.locale.convert") NONNULL((1)) long
 NOTHROW_NCX(LIBKCALL libc_wcstol_l)(char32_t const *__restrict nptr,
                                     char32_t **endptr,
@@ -1998,6 +2118,7 @@ NOTHROW_NCX(LIBKCALL libc_wcstol_l)(char32_t const *__restrict nptr,
 	(void)locale;
 	return libc_wcstol(nptr, endptr, base);
 }
+/* >> wcstoul_l(3) */
 INTERN ATTR_SECTION(".text.crt.dos.wchar.unicode.locale.convert") NONNULL((1)) unsigned long
 NOTHROW_NCX(LIBDCALL libd_wcstoul_l)(char16_t const *__restrict nptr,
                                      char16_t **endptr,
@@ -2006,6 +2127,7 @@ NOTHROW_NCX(LIBDCALL libd_wcstoul_l)(char16_t const *__restrict nptr,
 	(void)locale;
 	return libd_wcstoul(nptr, endptr, base);
 }
+/* >> wcstoul_l(3) */
 INTERN ATTR_SECTION(".text.crt.wchar.unicode.locale.convert") NONNULL((1)) unsigned long
 NOTHROW_NCX(LIBKCALL libc_wcstoul_l)(char32_t const *__restrict nptr,
                                      char32_t **endptr,
@@ -2014,6 +2136,7 @@ NOTHROW_NCX(LIBKCALL libc_wcstoul_l)(char32_t const *__restrict nptr,
 	(void)locale;
 	return libc_wcstoul(nptr, endptr, base);
 }
+/* >> wcstoll_l(3) */
 INTERN ATTR_SECTION(".text.crt.dos.wchar.unicode.locale.convert") NONNULL((1)) __LONGLONG
 NOTHROW_NCX(LIBDCALL libd_wcstoll_l)(char16_t const *__restrict nptr,
                                      char16_t **endptr,
@@ -2022,6 +2145,7 @@ NOTHROW_NCX(LIBDCALL libd_wcstoll_l)(char16_t const *__restrict nptr,
 	(void)locale;
 	return libd_wcstoll(nptr, endptr, base);
 }
+/* >> wcstoll_l(3) */
 INTERN ATTR_SECTION(".text.crt.wchar.unicode.locale.convert") NONNULL((1)) __LONGLONG
 NOTHROW_NCX(LIBKCALL libc_wcstoll_l)(char32_t const *__restrict nptr,
                                      char32_t **endptr,
@@ -2030,6 +2154,7 @@ NOTHROW_NCX(LIBKCALL libc_wcstoll_l)(char32_t const *__restrict nptr,
 	(void)locale;
 	return libc_wcstoll(nptr, endptr, base);
 }
+/* >> wcstoull_l(3) */
 INTERN ATTR_SECTION(".text.crt.dos.wchar.unicode.locale.convert") NONNULL((1)) __ULONGLONG
 NOTHROW_NCX(LIBDCALL libd_wcstoull_l)(char16_t const *__restrict nptr,
                                       char16_t **endptr,
@@ -2038,6 +2163,7 @@ NOTHROW_NCX(LIBDCALL libd_wcstoull_l)(char16_t const *__restrict nptr,
 	(void)locale;
 	return libd_wcstoull(nptr, endptr, base);
 }
+/* >> wcstoull_l(3) */
 INTERN ATTR_SECTION(".text.crt.wchar.unicode.locale.convert") NONNULL((1)) __ULONGLONG
 NOTHROW_NCX(LIBKCALL libc_wcstoull_l)(char32_t const *__restrict nptr,
                                       char32_t **endptr,
@@ -2046,6 +2172,7 @@ NOTHROW_NCX(LIBKCALL libc_wcstoull_l)(char32_t const *__restrict nptr,
 	(void)locale;
 	return libc_wcstoull(nptr, endptr, base);
 }
+/* >> wcstof_l(3) */
 INTERN ATTR_SECTION(".text.crt.dos.wchar.unicode.locale.convert") NONNULL((1)) float
 NOTHROW_NCX(LIBDCALL libd_wcstof_l)(char16_t const *__restrict nptr,
                                     char16_t **endptr,
@@ -2053,6 +2180,7 @@ NOTHROW_NCX(LIBDCALL libd_wcstof_l)(char16_t const *__restrict nptr,
 	(void)locale;
 	return libd_wcstof(nptr, endptr);
 }
+/* >> wcstof_l(3) */
 INTERN ATTR_SECTION(".text.crt.wchar.unicode.locale.convert") NONNULL((1)) float
 NOTHROW_NCX(LIBKCALL libc_wcstof_l)(char32_t const *__restrict nptr,
                                     char32_t **endptr,
@@ -2060,6 +2188,7 @@ NOTHROW_NCX(LIBKCALL libc_wcstof_l)(char32_t const *__restrict nptr,
 	(void)locale;
 	return libc_wcstof(nptr, endptr);
 }
+/* >> wcstod_l(3) */
 INTERN ATTR_SECTION(".text.crt.dos.wchar.unicode.locale.convert") NONNULL((1)) double
 NOTHROW_NCX(LIBDCALL libd_wcstod_l)(char16_t const *__restrict nptr,
                                     char16_t **endptr,
@@ -2067,6 +2196,7 @@ NOTHROW_NCX(LIBDCALL libd_wcstod_l)(char16_t const *__restrict nptr,
 	(void)locale;
 	return libd_wcstod(nptr, endptr);
 }
+/* >> wcstod_l(3) */
 INTERN ATTR_SECTION(".text.crt.wchar.unicode.locale.convert") NONNULL((1)) double
 NOTHROW_NCX(LIBKCALL libc_wcstod_l)(char32_t const *__restrict nptr,
                                     char32_t **endptr,
@@ -2074,6 +2204,7 @@ NOTHROW_NCX(LIBKCALL libc_wcstod_l)(char32_t const *__restrict nptr,
 	(void)locale;
 	return libc_wcstod(nptr, endptr);
 }
+/* >> wcstold_l(3) */
 INTERN ATTR_SECTION(".text.crt.dos.wchar.unicode.locale.convert") NONNULL((1)) __LONGDOUBLE
 NOTHROW_NCX(LIBDCALL libd_wcstold_l)(char16_t const *__restrict nptr,
                                      char16_t **endptr,
@@ -2081,6 +2212,7 @@ NOTHROW_NCX(LIBDCALL libd_wcstold_l)(char16_t const *__restrict nptr,
 	(void)locale;
 	return libd_wcstold(nptr, endptr);
 }
+/* >> wcstold_l(3) */
 INTERN ATTR_SECTION(".text.crt.wchar.unicode.locale.convert") NONNULL((1)) __LONGDOUBLE
 NOTHROW_NCX(LIBKCALL libc_wcstold_l)(char32_t const *__restrict nptr,
                                      char32_t **endptr,
@@ -2089,27 +2221,32 @@ NOTHROW_NCX(LIBKCALL libc_wcstold_l)(char32_t const *__restrict nptr,
 	return libc_wcstold(nptr, endptr);
 }
 #include <libc/local/stdstreams.h>
+/* >> getwchar_unlocked(3) */
 INTERN ATTR_SECTION(".text.crt.dos.wchar.FILE.unlocked.read.getc") wint16_t
 (LIBDCALL libd_getwchar_unlocked)(void) THROWS(...) {
 	return libd_fgetwc_unlocked(stdin);
 }
 #include <libc/local/stdstreams.h>
+/* >> getwchar_unlocked(3) */
 INTERN ATTR_SECTION(".text.crt.wchar.FILE.unlocked.read.getc") wint32_t
 (LIBKCALL libc_getwchar_unlocked)(void) THROWS(...) {
 	return libc_fgetwc_unlocked(stdin);
 }
 #include <libc/local/stdstreams.h>
+/* >> putwchar_unlocked(3) */
 INTERN ATTR_SECTION(".text.crt.dos.wchar.FILE.unlocked.write.putc") wint16_t
 (LIBDCALL libd_putwchar_unlocked)(char16_t wc) THROWS(...) {
 	return libd_fputwc_unlocked(wc, stdin);
 }
 #include <libc/local/stdstreams.h>
+/* >> putwchar_unlocked(3) */
 INTERN ATTR_SECTION(".text.crt.wchar.FILE.unlocked.write.putc") wint32_t
 (LIBKCALL libc_putwchar_unlocked)(char32_t wc) THROWS(...) {
 	return libc_fputwc_unlocked(wc, stdin);
 }
 #include <asm/crt/stdio.h>
 #include <libc/errno.h>
+/* >> fgetws_unlocked(3) */
 INTERN ATTR_SECTION(".text.crt.dos.wchar.FILE.unlocked.read.read") NONNULL((1, 3)) char16_t *
 (LIBDCALL libd_fgetws_unlocked)(char16_t *__restrict buf,
                                 __STDC_INT_AS_SIZE_T bufsize,
@@ -2152,6 +2289,7 @@ INTERN ATTR_SECTION(".text.crt.dos.wchar.FILE.unlocked.read.read") NONNULL((1, 3
 }
 #include <asm/crt/stdio.h>
 #include <libc/errno.h>
+/* >> fgetws_unlocked(3) */
 INTERN ATTR_SECTION(".text.crt.wchar.FILE.unlocked.read.read") NONNULL((1, 3)) char32_t *
 (LIBKCALL libc_fgetws_unlocked)(char32_t *__restrict buf,
                                 __STDC_INT_AS_SIZE_T bufsize,
@@ -2192,6 +2330,7 @@ INTERN ATTR_SECTION(".text.crt.wchar.FILE.unlocked.read.read") NONNULL((1, 3)) c
 	buf[n] = '\0';
 	return buf;
 }
+/* >> fputws_unlocked(3) */
 INTERN ATTR_SECTION(".text.crt.dos.wchar.FILE.unlocked.write.write") NONNULL((1, 2)) __STDC_INT_AS_SIZE_T
 (LIBDCALL libd_fputws_unlocked)(char16_t const *__restrict str,
                                 FILE *__restrict stream) THROWS(...) {
@@ -2199,6 +2338,7 @@ INTERN ATTR_SECTION(".text.crt.dos.wchar.FILE.unlocked.write.write") NONNULL((1,
 	result = libd_file_wprinter_unlocked(stream, str, libd_wcslen(str));
 	return result;
 }
+/* >> fputws_unlocked(3) */
 INTERN ATTR_SECTION(".text.crt.wchar.FILE.unlocked.write.write") NONNULL((1, 2)) __STDC_INT_AS_SIZE_T
 (LIBKCALL libc_fputws_unlocked)(char32_t const *__restrict str,
                                 FILE *__restrict stream) THROWS(...) {
@@ -2206,6 +2346,7 @@ INTERN ATTR_SECTION(".text.crt.wchar.FILE.unlocked.write.write") NONNULL((1, 2))
 	result = libc_file_wprinter_unlocked(stream, str, libc_wcslen(str));
 	return result;
 }
+/* >> wcsftime_l(3) */
 INTERN ATTR_SECTION(".text.crt.dos.wchar.unicode.locale.format.strftime") NONNULL((1, 3, 4)) size_t
 NOTHROW_NCX(LIBDCALL libd_wcsftime_l)(char16_t *__restrict buf,
                                       size_t maxsize,
@@ -2215,6 +2356,7 @@ NOTHROW_NCX(LIBDCALL libd_wcsftime_l)(char16_t *__restrict buf,
 	(void)locale;
 	return libd_wcsftime(buf, maxsize, format, tp);
 }
+/* >> wcsftime_l(3) */
 INTERN ATTR_SECTION(".text.crt.wchar.unicode.locale.format.strftime") NONNULL((1, 3, 4)) size_t
 NOTHROW_NCX(LIBKCALL libc_wcsftime_l)(char32_t *__restrict buf,
                                       size_t maxsize,
@@ -2224,6 +2366,7 @@ NOTHROW_NCX(LIBKCALL libc_wcsftime_l)(char32_t *__restrict buf,
 	(void)locale;
 	return libc_wcsftime(buf, maxsize, format, tp);
 }
+/* >> vfwprintf_unlocked(3) */
 INTERN ATTR_SECTION(".text.crt.dos.wchar.FILE.unlocked.write.printf") ATTR_LIBC_WPRINTF(2, 0) NONNULL((1, 2)) __STDC_INT_AS_SIZE_T
 (LIBDCALL libd_vfwprintf_unlocked)(FILE *__restrict stream,
                                    char16_t const *__restrict format,
@@ -2231,6 +2374,7 @@ INTERN ATTR_SECTION(".text.crt.dos.wchar.FILE.unlocked.write.printf") ATTR_LIBC_
 	return (__STDC_INT_AS_SSIZE_T)libd_format_vwprintf(&libd_file_wprinter_unlocked,
 	                                              stream, format, args);
 }
+/* >> vfwprintf_unlocked(3) */
 INTERN ATTR_SECTION(".text.crt.wchar.FILE.unlocked.write.printf") ATTR_LIBC_WPRINTF(2, 0) NONNULL((1, 2)) __STDC_INT_AS_SIZE_T
 (LIBKCALL libc_vfwprintf_unlocked)(FILE *__restrict stream,
                                    char32_t const *__restrict format,
@@ -2238,6 +2382,7 @@ INTERN ATTR_SECTION(".text.crt.wchar.FILE.unlocked.write.printf") ATTR_LIBC_WPRI
 	return (__STDC_INT_AS_SSIZE_T)libc_format_vwprintf(&libc_file_wprinter_unlocked,
 	                                              stream, format, args);
 }
+/* >> fwprintf_unlocked(3) */
 INTERN ATTR_SECTION(".text.crt.dos.wchar.FILE.unlocked.write.printf") ATTR_LIBC_WPRINTF(2, 3) NONNULL((1, 2)) __STDC_INT_AS_SIZE_T
 (VLIBDCALL libd_fwprintf_unlocked)(FILE *__restrict stream,
                                    char16_t const *__restrict format,
@@ -2249,6 +2394,7 @@ INTERN ATTR_SECTION(".text.crt.dos.wchar.FILE.unlocked.write.printf") ATTR_LIBC_
 	va_end(args);
 	return result;
 }
+/* >> fwprintf_unlocked(3) */
 INTERN ATTR_SECTION(".text.crt.wchar.FILE.unlocked.write.printf") ATTR_LIBC_WPRINTF(2, 3) NONNULL((1, 2)) __STDC_INT_AS_SIZE_T
 (VLIBKCALL libc_fwprintf_unlocked)(FILE *__restrict stream,
                                    char32_t const *__restrict format,
@@ -2260,6 +2406,7 @@ INTERN ATTR_SECTION(".text.crt.wchar.FILE.unlocked.write.printf") ATTR_LIBC_WPRI
 	va_end(args);
 	return result;
 }
+/* >> wprintf_unlocked(3) */
 INTERN ATTR_SECTION(".text.crt.dos.wchar.FILE.unlocked.write.printf") ATTR_LIBC_WPRINTF(1, 2) NONNULL((1)) __STDC_INT_AS_SIZE_T
 (VLIBDCALL libd_wprintf_unlocked)(char16_t const *__restrict format,
                                   ...) THROWS(...) {
@@ -2270,6 +2417,7 @@ INTERN ATTR_SECTION(".text.crt.dos.wchar.FILE.unlocked.write.printf") ATTR_LIBC_
 	va_end(args);
 	return result;
 }
+/* >> wprintf_unlocked(3) */
 INTERN ATTR_SECTION(".text.crt.wchar.FILE.unlocked.write.printf") ATTR_LIBC_WPRINTF(1, 2) NONNULL((1)) __STDC_INT_AS_SIZE_T
 (VLIBKCALL libc_wprintf_unlocked)(char32_t const *__restrict format,
                                   ...) THROWS(...) {
@@ -2281,29 +2429,34 @@ INTERN ATTR_SECTION(".text.crt.wchar.FILE.unlocked.write.printf") ATTR_LIBC_WPRI
 	return result;
 }
 #include <libc/local/stdstreams.h>
+/* >> vwprintf_unlocked(3) */
 INTERN ATTR_SECTION(".text.crt.dos.wchar.FILE.unlocked.write.printf") ATTR_LIBC_WPRINTF(1, 0) NONNULL((1)) __STDC_INT_AS_SIZE_T
 (LIBDCALL libd_vwprintf_unlocked)(char16_t const *__restrict format,
                                   va_list args) THROWS(...) {
 	return libd_vfwprintf_unlocked(stdout, format, args);
 }
 #include <libc/local/stdstreams.h>
+/* >> vwprintf_unlocked(3) */
 INTERN ATTR_SECTION(".text.crt.wchar.FILE.unlocked.write.printf") ATTR_LIBC_WPRINTF(1, 0) NONNULL((1)) __STDC_INT_AS_SIZE_T
 (LIBKCALL libc_vwprintf_unlocked)(char32_t const *__restrict format,
                                   va_list args) THROWS(...) {
 	return libc_vfwprintf_unlocked(stdout, format, args);
 }
 #include <libc/local/stdstreams.h>
+/* >> vwscanf_unlocked(3) */
 INTERN ATTR_SECTION(".text.crt.dos.wchar.FILE.unlocked.read.scanf") WUNUSED ATTR_LIBC_SCANF(1, 0) NONNULL((1)) __STDC_INT_AS_SIZE_T
 (LIBDCALL libd_vwscanf_unlocked)(char16_t const *__restrict format,
                                  va_list args) THROWS(...) {
 	return libd_vfwscanf_unlocked(stdin, format, args);
 }
 #include <libc/local/stdstreams.h>
+/* >> vwscanf_unlocked(3) */
 INTERN ATTR_SECTION(".text.crt.wchar.FILE.unlocked.read.scanf") WUNUSED ATTR_LIBC_SCANF(1, 0) NONNULL((1)) __STDC_INT_AS_SIZE_T
 (LIBKCALL libc_vwscanf_unlocked)(char32_t const *__restrict format,
                                  va_list args) THROWS(...) {
 	return libc_vfwscanf_unlocked(stdin, format, args);
 }
+/* >> fwscanf_unlocked(3) */
 INTERN ATTR_SECTION(".text.crt.dos.wchar.FILE.unlocked.read.scanf") WUNUSED ATTR_LIBC_SCANF(2, 3) NONNULL((1, 2)) __STDC_INT_AS_SIZE_T
 (VLIBDCALL libd_fwscanf_unlocked)(FILE *__restrict stream,
                                   char16_t const *__restrict format,
@@ -2315,6 +2468,7 @@ INTERN ATTR_SECTION(".text.crt.dos.wchar.FILE.unlocked.read.scanf") WUNUSED ATTR
 	va_end(args);
 	return result;
 }
+/* >> fwscanf_unlocked(3) */
 INTERN ATTR_SECTION(".text.crt.wchar.FILE.unlocked.read.scanf") WUNUSED ATTR_LIBC_SCANF(2, 3) NONNULL((1, 2)) __STDC_INT_AS_SIZE_T
 (VLIBKCALL libc_fwscanf_unlocked)(FILE *__restrict stream,
                                   char32_t const *__restrict format,
@@ -2326,6 +2480,7 @@ INTERN ATTR_SECTION(".text.crt.wchar.FILE.unlocked.read.scanf") WUNUSED ATTR_LIB
 	va_end(args);
 	return result;
 }
+/* >> wscanf_unlocked(3) */
 INTERN ATTR_SECTION(".text.crt.dos.wchar.FILE.unlocked.read.scanf") WUNUSED ATTR_LIBC_SCANF(1, 2) NONNULL((1)) __STDC_INT_AS_SIZE_T
 (VLIBDCALL libd_wscanf_unlocked)(char16_t const *__restrict format,
                                  ...) THROWS(...) {
@@ -2336,6 +2491,7 @@ INTERN ATTR_SECTION(".text.crt.dos.wchar.FILE.unlocked.read.scanf") WUNUSED ATTR
 	va_end(args);
 	return result;
 }
+/* >> wscanf_unlocked(3) */
 INTERN ATTR_SECTION(".text.crt.wchar.FILE.unlocked.read.scanf") WUNUSED ATTR_LIBC_SCANF(1, 2) NONNULL((1)) __STDC_INT_AS_SIZE_T
 (VLIBKCALL libc_wscanf_unlocked)(char32_t const *__restrict format,
                                  ...) THROWS(...) {
@@ -2347,7 +2503,8 @@ INTERN ATTR_SECTION(".text.crt.wchar.FILE.unlocked.read.scanf") WUNUSED ATTR_LIB
 	return result;
 }
 #ifndef LIBC_ARCH_HAVE_C16SEND
-/* Same as `str+wcslen(str)' */
+/* >> wcsend(3)
+ * Same as `str + wcslen(str)' */
 INTERN ATTR_SECTION(".text.crt.dos.wchar.string.memory") ATTR_PURE ATTR_RETNONNULL WUNUSED NONNULL((1)) char16_t *
 NOTHROW_NCX(LIBDCALL libd_wcsend)(char16_t const *__restrict str) {
 	while (*str)
@@ -2356,7 +2513,8 @@ NOTHROW_NCX(LIBDCALL libd_wcsend)(char16_t const *__restrict str) {
 }
 #endif /* !LIBC_ARCH_HAVE_C16SEND */
 #ifndef LIBC_ARCH_HAVE_C32SEND
-/* Same as `str+wcslen(str)' */
+/* >> wcsend(3)
+ * Same as `str + wcslen(str)' */
 INTERN ATTR_SECTION(".text.crt.wchar.string.memory") ATTR_PURE ATTR_RETNONNULL WUNUSED NONNULL((1)) char32_t *
 NOTHROW_NCX(LIBKCALL libc_wcsend)(char32_t const *__restrict str) {
 	while (*str)
@@ -2365,7 +2523,8 @@ NOTHROW_NCX(LIBKCALL libc_wcsend)(char32_t const *__restrict str) {
 }
 #endif /* !LIBC_ARCH_HAVE_C32SEND */
 #ifndef LIBC_ARCH_HAVE_C16SNEND
-/* Same as `str+wcsnlen(str, max_chars)' */
+/* >> wcsnend(3)
+ * Same as `str + wcsnlen(str, max_chars)' */
 INTERN ATTR_SECTION(".text.crt.dos.wchar.string.memory") ATTR_PURE ATTR_RETNONNULL WUNUSED NONNULL((1)) char16_t *
 NOTHROW_NCX(LIBDCALL libd_wcsnend)(char16_t const *__restrict str,
                                    size_t maxlen) {
@@ -2375,7 +2534,8 @@ NOTHROW_NCX(LIBDCALL libd_wcsnend)(char16_t const *__restrict str,
 }
 #endif /* !LIBC_ARCH_HAVE_C16SNEND */
 #ifndef LIBC_ARCH_HAVE_C32SNEND
-/* Same as `str+wcsnlen(str, max_chars)' */
+/* >> wcsnend(3)
+ * Same as `str + wcsnlen(str, max_chars)' */
 INTERN ATTR_SECTION(".text.crt.wchar.string.memory") ATTR_PURE ATTR_RETNONNULL WUNUSED NONNULL((1)) char32_t *
 NOTHROW_NCX(LIBKCALL libc_wcsnend)(char32_t const *__restrict str,
                                    size_t maxlen) {
@@ -2387,22 +2547,7 @@ NOTHROW_NCX(LIBKCALL libc_wcsnend)(char32_t const *__restrict str,
 #include <asm/os/errno.h>
 #include <hybrid/__overflow.h>
 #include <hybrid/limitcore.h>
-/* >> strto32_r(3), strtou32_r(3), strto64_r(3), strtou64_r(3)
- * Safely parse & return an integer from `nptr', and store any potential
- * errors in `*error' (if non-NULL).  The following errors are  defined:
- *  - 0:         Success
- *  - ECANCELED: Nothing was parsed.
- *               In this case, `*endptr' is set to the original `nptr'
- *               (iow: leading spaces are _not_ skipped in `*endptr'),
- *               and the returned integer is `0'
- *  - ERANGE:    Integer over- or under-flow while parsing.
- *               In this case, `*endptr' is still updated correctly,  and
- *               the  returned integer is the closest representable value
- *               to the integer given in `nptr' (i.e. `U?INTn_(MIN|MAX)')
- *               This error supercedes `EINVAL' if both conditions apply.
- *  - EINVAL:    Only when `endptr == NULL': The parsed number is followed
- *               by   at  least  1  additional  non-whitespace  character.
- *               The returned integer value is not affected by this error. */
+/* >> wcsto32_r(3) */
 INTERN ATTR_SECTION(".text.crt.dos.wchar.unicode.static.convert") ATTR_LEAF NONNULL((1)) int32_t
 NOTHROW_NCX(LIBDCALL libd_wcsto32_r)(char16_t const *__restrict nptr,
                                      char16_t **endptr,
@@ -2532,22 +2677,7 @@ handle_overflow:
 #include <asm/os/errno.h>
 #include <hybrid/__overflow.h>
 #include <hybrid/limitcore.h>
-/* >> strto32_r(3), strtou32_r(3), strto64_r(3), strtou64_r(3)
- * Safely parse & return an integer from `nptr', and store any potential
- * errors in `*error' (if non-NULL).  The following errors are  defined:
- *  - 0:         Success
- *  - ECANCELED: Nothing was parsed.
- *               In this case, `*endptr' is set to the original `nptr'
- *               (iow: leading spaces are _not_ skipped in `*endptr'),
- *               and the returned integer is `0'
- *  - ERANGE:    Integer over- or under-flow while parsing.
- *               In this case, `*endptr' is still updated correctly,  and
- *               the  returned integer is the closest representable value
- *               to the integer given in `nptr' (i.e. `U?INTn_(MIN|MAX)')
- *               This error supercedes `EINVAL' if both conditions apply.
- *  - EINVAL:    Only when `endptr == NULL': The parsed number is followed
- *               by   at  least  1  additional  non-whitespace  character.
- *               The returned integer value is not affected by this error. */
+/* >> wcsto32_r(3) */
 INTERN ATTR_SECTION(".text.crt.wchar.unicode.static.convert") ATTR_LEAF NONNULL((1)) int32_t
 NOTHROW_NCX(LIBKCALL libc_wcsto32_r)(char32_t const *__restrict nptr,
                                      char32_t **endptr,
@@ -2676,22 +2806,7 @@ handle_overflow:
 }
 #include <asm/os/errno.h>
 #include <hybrid/__overflow.h>
-/* >> strto32_r(3), strtou32_r(3), strto64_r(3), strtou64_r(3)
- * Safely parse & return an integer from `nptr', and store any potential
- * errors in `*error' (if non-NULL).  The following errors are  defined:
- *  - 0:         Success
- *  - ECANCELED: Nothing was parsed.
- *               In this case, `*endptr' is set to the original `nptr'
- *               (iow: leading spaces are _not_ skipped in `*endptr'),
- *               and the returned integer is `0'
- *  - ERANGE:    Integer over- or under-flow while parsing.
- *               In this case, `*endptr' is still updated correctly,  and
- *               the  returned integer is the closest representable value
- *               to the integer given in `nptr' (i.e. `U?INTn_(MIN|MAX)')
- *               This error supercedes `EINVAL' if both conditions apply.
- *  - EINVAL:    Only when `endptr == NULL': The parsed number is followed
- *               by   at  least  1  additional  non-whitespace  character.
- *               The returned integer value is not affected by this error. */
+/* >> wcstou32_r(3) */
 INTERN ATTR_SECTION(".text.crt.dos.wchar.unicode.static.convert") ATTR_LEAF NONNULL((1)) uint32_t
 NOTHROW_NCX(LIBDCALL libd_wcstou32_r)(char16_t const *__restrict nptr,
                                       char16_t **endptr,
@@ -2807,22 +2922,7 @@ NOTHROW_NCX(LIBDCALL libd_wcstou32_r)(char16_t const *__restrict nptr,
 }
 #include <asm/os/errno.h>
 #include <hybrid/__overflow.h>
-/* >> strto32_r(3), strtou32_r(3), strto64_r(3), strtou64_r(3)
- * Safely parse & return an integer from `nptr', and store any potential
- * errors in `*error' (if non-NULL).  The following errors are  defined:
- *  - 0:         Success
- *  - ECANCELED: Nothing was parsed.
- *               In this case, `*endptr' is set to the original `nptr'
- *               (iow: leading spaces are _not_ skipped in `*endptr'),
- *               and the returned integer is `0'
- *  - ERANGE:    Integer over- or under-flow while parsing.
- *               In this case, `*endptr' is still updated correctly,  and
- *               the  returned integer is the closest representable value
- *               to the integer given in `nptr' (i.e. `U?INTn_(MIN|MAX)')
- *               This error supercedes `EINVAL' if both conditions apply.
- *  - EINVAL:    Only when `endptr == NULL': The parsed number is followed
- *               by   at  least  1  additional  non-whitespace  character.
- *               The returned integer value is not affected by this error. */
+/* >> wcstou32_r(3) */
 INTERN ATTR_SECTION(".text.crt.wchar.unicode.static.convert") ATTR_LEAF NONNULL((1)) uint32_t
 NOTHROW_NCX(LIBKCALL libc_wcstou32_r)(char32_t const *__restrict nptr,
                                       char32_t **endptr,
@@ -2937,21 +3037,7 @@ NOTHROW_NCX(LIBKCALL libc_wcstou32_r)(char32_t const *__restrict nptr,
 	return result;
 }
 #include <libc/errno.h>
-/* >> strto32(3), strto64(3), strtou32(3), strtou64(3)
- * Convert a string  (radix=`base') from `nptr'  into an  integer,
- * and store a  pointer to  the end  of the  number in  `*endptr'.
- * If `errno(3)' support is available, integer overflow is handled
- * by setting `errno=ERANGE', and returning the greatest or lowest
- * valid   integer   (`U?INTn_(MIN|MAX))'.   (though   note   that
- * `endptr'  (if  non-NULL)  is  still  updated  in  this   case!)
- * Upon success, `errno' is left  unchanged, and the integer  repr
- * of the parsed number is  returned. When no integer was  parsed,
- * then `0' is returned, `*endptr'  is set to `nptr', but  `errno'
- * will not have been modified.
- * @return: * :         Success: The parsed integer
- * @return: 0 :         [*endptr=nptr] error: Nothing was parsed
- * @return: INTn_MIN:   [errno=ERANGE] error: Value to low to represent
- * @return: U?INTn_MAX: [errno=ERANGE] error: Value to great to represent */
+/* >> wcsto32(3) */
 INTERN ATTR_SECTION(".text.crt.dos.wchar.unicode.static.convert") ATTR_LEAF NONNULL((1)) int32_t
 NOTHROW_NCX(LIBDCALL libd_wcsto32)(char16_t const *__restrict nptr,
                                    char16_t **endptr,
@@ -2968,21 +3054,7 @@ NOTHROW_NCX(LIBDCALL libd_wcsto32)(char16_t const *__restrict nptr,
 #endif /* !__libc_geterrno || !ERANGE */
 }
 #include <libc/errno.h>
-/* >> strto32(3), strto64(3), strtou32(3), strtou64(3)
- * Convert a string  (radix=`base') from `nptr'  into an  integer,
- * and store a  pointer to  the end  of the  number in  `*endptr'.
- * If `errno(3)' support is available, integer overflow is handled
- * by setting `errno=ERANGE', and returning the greatest or lowest
- * valid   integer   (`U?INTn_(MIN|MAX))'.   (though   note   that
- * `endptr'  (if  non-NULL)  is  still  updated  in  this   case!)
- * Upon success, `errno' is left  unchanged, and the integer  repr
- * of the parsed number is  returned. When no integer was  parsed,
- * then `0' is returned, `*endptr'  is set to `nptr', but  `errno'
- * will not have been modified.
- * @return: * :         Success: The parsed integer
- * @return: 0 :         [*endptr=nptr] error: Nothing was parsed
- * @return: INTn_MIN:   [errno=ERANGE] error: Value to low to represent
- * @return: U?INTn_MAX: [errno=ERANGE] error: Value to great to represent */
+/* >> wcsto32(3) */
 INTERN ATTR_SECTION(".text.crt.wchar.unicode.static.convert") ATTR_LEAF NONNULL((1)) int32_t
 NOTHROW_NCX(LIBKCALL libc_wcsto32)(char32_t const *__restrict nptr,
                                    char32_t **endptr,
@@ -2999,21 +3071,7 @@ NOTHROW_NCX(LIBKCALL libc_wcsto32)(char32_t const *__restrict nptr,
 #endif /* !__libc_geterrno || !ERANGE */
 }
 #include <libc/errno.h>
-/* >> strto32(3), strto64(3), strtou32(3), strtou64(3)
- * Convert a string  (radix=`base') from `nptr'  into an  integer,
- * and store a  pointer to  the end  of the  number in  `*endptr'.
- * If `errno(3)' support is available, integer overflow is handled
- * by setting `errno=ERANGE', and returning the greatest or lowest
- * valid   integer   (`U?INTn_(MIN|MAX))'.   (though   note   that
- * `endptr'  (if  non-NULL)  is  still  updated  in  this   case!)
- * Upon success, `errno' is left  unchanged, and the integer  repr
- * of the parsed number is  returned. When no integer was  parsed,
- * then `0' is returned, `*endptr'  is set to `nptr', but  `errno'
- * will not have been modified.
- * @return: * :         Success: The parsed integer
- * @return: 0 :         [*endptr=nptr] error: Nothing was parsed
- * @return: INTn_MIN:   [errno=ERANGE] error: Value to low to represent
- * @return: U?INTn_MAX: [errno=ERANGE] error: Value to great to represent */
+/* >> wcstou32(3) */
 INTERN ATTR_SECTION(".text.crt.dos.wchar.unicode.static.convert") ATTR_LEAF NONNULL((1)) uint32_t
 NOTHROW_NCX(LIBDCALL libd_wcstou32)(char16_t const *__restrict nptr,
                                     char16_t **endptr,
@@ -3030,21 +3088,7 @@ NOTHROW_NCX(LIBDCALL libd_wcstou32)(char16_t const *__restrict nptr,
 #endif /* !__libc_geterrno || !ERANGE */
 }
 #include <libc/errno.h>
-/* >> strto32(3), strto64(3), strtou32(3), strtou64(3)
- * Convert a string  (radix=`base') from `nptr'  into an  integer,
- * and store a  pointer to  the end  of the  number in  `*endptr'.
- * If `errno(3)' support is available, integer overflow is handled
- * by setting `errno=ERANGE', and returning the greatest or lowest
- * valid   integer   (`U?INTn_(MIN|MAX))'.   (though   note   that
- * `endptr'  (if  non-NULL)  is  still  updated  in  this   case!)
- * Upon success, `errno' is left  unchanged, and the integer  repr
- * of the parsed number is  returned. When no integer was  parsed,
- * then `0' is returned, `*endptr'  is set to `nptr', but  `errno'
- * will not have been modified.
- * @return: * :         Success: The parsed integer
- * @return: 0 :         [*endptr=nptr] error: Nothing was parsed
- * @return: INTn_MIN:   [errno=ERANGE] error: Value to low to represent
- * @return: U?INTn_MAX: [errno=ERANGE] error: Value to great to represent */
+/* >> wcstou32(3) */
 INTERN ATTR_SECTION(".text.crt.wchar.unicode.static.convert") ATTR_LEAF NONNULL((1)) uint32_t
 NOTHROW_NCX(LIBKCALL libc_wcstou32)(char32_t const *__restrict nptr,
                                     char32_t **endptr,
@@ -3063,22 +3107,7 @@ NOTHROW_NCX(LIBKCALL libc_wcstou32)(char32_t const *__restrict nptr,
 #include <asm/os/errno.h>
 #include <hybrid/__overflow.h>
 #include <hybrid/limitcore.h>
-/* >> strto32_r(3), strtou32_r(3), strto64_r(3), strtou64_r(3)
- * Safely parse & return an integer from `nptr', and store any potential
- * errors in `*error' (if non-NULL).  The following errors are  defined:
- *  - 0:         Success
- *  - ECANCELED: Nothing was parsed.
- *               In this case, `*endptr' is set to the original `nptr'
- *               (iow: leading spaces are _not_ skipped in `*endptr'),
- *               and the returned integer is `0'
- *  - ERANGE:    Integer over- or under-flow while parsing.
- *               In this case, `*endptr' is still updated correctly,  and
- *               the  returned integer is the closest representable value
- *               to the integer given in `nptr' (i.e. `U?INTn_(MIN|MAX)')
- *               This error supercedes `EINVAL' if both conditions apply.
- *  - EINVAL:    Only when `endptr == NULL': The parsed number is followed
- *               by   at  least  1  additional  non-whitespace  character.
- *               The returned integer value is not affected by this error. */
+/* >> wcsto64_r(3) */
 INTERN ATTR_SECTION(".text.crt.dos.wchar.unicode.static.convert") ATTR_LEAF NONNULL((1)) int64_t
 NOTHROW_NCX(LIBDCALL libd_wcsto64_r)(char16_t const *__restrict nptr,
                                      char16_t **endptr,
@@ -3208,22 +3237,7 @@ handle_overflow:
 #include <asm/os/errno.h>
 #include <hybrid/__overflow.h>
 #include <hybrid/limitcore.h>
-/* >> strto32_r(3), strtou32_r(3), strto64_r(3), strtou64_r(3)
- * Safely parse & return an integer from `nptr', and store any potential
- * errors in `*error' (if non-NULL).  The following errors are  defined:
- *  - 0:         Success
- *  - ECANCELED: Nothing was parsed.
- *               In this case, `*endptr' is set to the original `nptr'
- *               (iow: leading spaces are _not_ skipped in `*endptr'),
- *               and the returned integer is `0'
- *  - ERANGE:    Integer over- or under-flow while parsing.
- *               In this case, `*endptr' is still updated correctly,  and
- *               the  returned integer is the closest representable value
- *               to the integer given in `nptr' (i.e. `U?INTn_(MIN|MAX)')
- *               This error supercedes `EINVAL' if both conditions apply.
- *  - EINVAL:    Only when `endptr == NULL': The parsed number is followed
- *               by   at  least  1  additional  non-whitespace  character.
- *               The returned integer value is not affected by this error. */
+/* >> wcsto64_r(3) */
 INTERN ATTR_SECTION(".text.crt.wchar.unicode.static.convert") ATTR_LEAF NONNULL((1)) int64_t
 NOTHROW_NCX(LIBKCALL libc_wcsto64_r)(char32_t const *__restrict nptr,
                                      char32_t **endptr,
@@ -3352,22 +3366,7 @@ handle_overflow:
 }
 #include <asm/os/errno.h>
 #include <hybrid/__overflow.h>
-/* >> strto32_r(3), strtou32_r(3), strto64_r(3), strtou64_r(3)
- * Safely parse & return an integer from `nptr', and store any potential
- * errors in `*error' (if non-NULL).  The following errors are  defined:
- *  - 0:         Success
- *  - ECANCELED: Nothing was parsed.
- *               In this case, `*endptr' is set to the original `nptr'
- *               (iow: leading spaces are _not_ skipped in `*endptr'),
- *               and the returned integer is `0'
- *  - ERANGE:    Integer over- or under-flow while parsing.
- *               In this case, `*endptr' is still updated correctly,  and
- *               the  returned integer is the closest representable value
- *               to the integer given in `nptr' (i.e. `U?INTn_(MIN|MAX)')
- *               This error supercedes `EINVAL' if both conditions apply.
- *  - EINVAL:    Only when `endptr == NULL': The parsed number is followed
- *               by   at  least  1  additional  non-whitespace  character.
- *               The returned integer value is not affected by this error. */
+/* >> wcstou64_r(3) */
 INTERN ATTR_SECTION(".text.crt.dos.wchar.unicode.static.convert") ATTR_LEAF NONNULL((1)) uint64_t
 NOTHROW_NCX(LIBDCALL libd_wcstou64_r)(char16_t const *__restrict nptr,
                                       char16_t **endptr,
@@ -3483,22 +3482,7 @@ NOTHROW_NCX(LIBDCALL libd_wcstou64_r)(char16_t const *__restrict nptr,
 }
 #include <asm/os/errno.h>
 #include <hybrid/__overflow.h>
-/* >> strto32_r(3), strtou32_r(3), strto64_r(3), strtou64_r(3)
- * Safely parse & return an integer from `nptr', and store any potential
- * errors in `*error' (if non-NULL).  The following errors are  defined:
- *  - 0:         Success
- *  - ECANCELED: Nothing was parsed.
- *               In this case, `*endptr' is set to the original `nptr'
- *               (iow: leading spaces are _not_ skipped in `*endptr'),
- *               and the returned integer is `0'
- *  - ERANGE:    Integer over- or under-flow while parsing.
- *               In this case, `*endptr' is still updated correctly,  and
- *               the  returned integer is the closest representable value
- *               to the integer given in `nptr' (i.e. `U?INTn_(MIN|MAX)')
- *               This error supercedes `EINVAL' if both conditions apply.
- *  - EINVAL:    Only when `endptr == NULL': The parsed number is followed
- *               by   at  least  1  additional  non-whitespace  character.
- *               The returned integer value is not affected by this error. */
+/* >> wcstou64_r(3) */
 INTERN ATTR_SECTION(".text.crt.wchar.unicode.static.convert") ATTR_LEAF NONNULL((1)) uint64_t
 NOTHROW_NCX(LIBKCALL libc_wcstou64_r)(char32_t const *__restrict nptr,
                                       char32_t **endptr,
@@ -3613,21 +3597,7 @@ NOTHROW_NCX(LIBKCALL libc_wcstou64_r)(char32_t const *__restrict nptr,
 	return result;
 }
 #include <libc/errno.h>
-/* >> strto32(3), strto64(3), strtou32(3), strtou64(3)
- * Convert a string  (radix=`base') from `nptr'  into an  integer,
- * and store a  pointer to  the end  of the  number in  `*endptr'.
- * If `errno(3)' support is available, integer overflow is handled
- * by setting `errno=ERANGE', and returning the greatest or lowest
- * valid   integer   (`U?INTn_(MIN|MAX))'.   (though   note   that
- * `endptr'  (if  non-NULL)  is  still  updated  in  this   case!)
- * Upon success, `errno' is left  unchanged, and the integer  repr
- * of the parsed number is  returned. When no integer was  parsed,
- * then `0' is returned, `*endptr'  is set to `nptr', but  `errno'
- * will not have been modified.
- * @return: * :         Success: The parsed integer
- * @return: 0 :         [*endptr=nptr] error: Nothing was parsed
- * @return: INTn_MIN:   [errno=ERANGE] error: Value to low to represent
- * @return: U?INTn_MAX: [errno=ERANGE] error: Value to great to represent */
+/* >> wcstou64(3) */
 INTERN ATTR_SECTION(".text.crt.dos.wchar.unicode.static.convert") ATTR_LEAF NONNULL((1)) uint64_t
 NOTHROW_NCX(LIBDCALL libd_wcstou64)(char16_t const *__restrict nptr,
                                     char16_t **endptr,
@@ -3644,21 +3614,7 @@ NOTHROW_NCX(LIBDCALL libd_wcstou64)(char16_t const *__restrict nptr,
 #endif /* !__libc_geterrno || !ERANGE */
 }
 #include <libc/errno.h>
-/* >> strto32(3), strto64(3), strtou32(3), strtou64(3)
- * Convert a string  (radix=`base') from `nptr'  into an  integer,
- * and store a  pointer to  the end  of the  number in  `*endptr'.
- * If `errno(3)' support is available, integer overflow is handled
- * by setting `errno=ERANGE', and returning the greatest or lowest
- * valid   integer   (`U?INTn_(MIN|MAX))'.   (though   note   that
- * `endptr'  (if  non-NULL)  is  still  updated  in  this   case!)
- * Upon success, `errno' is left  unchanged, and the integer  repr
- * of the parsed number is  returned. When no integer was  parsed,
- * then `0' is returned, `*endptr'  is set to `nptr', but  `errno'
- * will not have been modified.
- * @return: * :         Success: The parsed integer
- * @return: 0 :         [*endptr=nptr] error: Nothing was parsed
- * @return: INTn_MIN:   [errno=ERANGE] error: Value to low to represent
- * @return: U?INTn_MAX: [errno=ERANGE] error: Value to great to represent */
+/* >> wcstou64(3) */
 INTERN ATTR_SECTION(".text.crt.wchar.unicode.static.convert") ATTR_LEAF NONNULL((1)) uint64_t
 NOTHROW_NCX(LIBKCALL libc_wcstou64)(char32_t const *__restrict nptr,
                                     char32_t **endptr,
@@ -3675,21 +3631,7 @@ NOTHROW_NCX(LIBKCALL libc_wcstou64)(char32_t const *__restrict nptr,
 #endif /* !__libc_geterrno || !ERANGE */
 }
 #include <libc/errno.h>
-/* >> strto32(3), strto64(3), strtou32(3), strtou64(3)
- * Convert a string  (radix=`base') from `nptr'  into an  integer,
- * and store a  pointer to  the end  of the  number in  `*endptr'.
- * If `errno(3)' support is available, integer overflow is handled
- * by setting `errno=ERANGE', and returning the greatest or lowest
- * valid   integer   (`U?INTn_(MIN|MAX))'.   (though   note   that
- * `endptr'  (if  non-NULL)  is  still  updated  in  this   case!)
- * Upon success, `errno' is left  unchanged, and the integer  repr
- * of the parsed number is  returned. When no integer was  parsed,
- * then `0' is returned, `*endptr'  is set to `nptr', but  `errno'
- * will not have been modified.
- * @return: * :         Success: The parsed integer
- * @return: 0 :         [*endptr=nptr] error: Nothing was parsed
- * @return: INTn_MIN:   [errno=ERANGE] error: Value to low to represent
- * @return: U?INTn_MAX: [errno=ERANGE] error: Value to great to represent */
+/* >> wcsto64(3) */
 INTERN ATTR_SECTION(".text.crt.dos.wchar.unicode.static.convert") ATTR_LEAF NONNULL((1)) int64_t
 NOTHROW_NCX(LIBDCALL libd_wcsto64)(char16_t const *__restrict nptr,
                                    char16_t **endptr,
@@ -3706,21 +3648,7 @@ NOTHROW_NCX(LIBDCALL libd_wcsto64)(char16_t const *__restrict nptr,
 #endif /* !__libc_geterrno || !ERANGE */
 }
 #include <libc/errno.h>
-/* >> strto32(3), strto64(3), strtou32(3), strtou64(3)
- * Convert a string  (radix=`base') from `nptr'  into an  integer,
- * and store a  pointer to  the end  of the  number in  `*endptr'.
- * If `errno(3)' support is available, integer overflow is handled
- * by setting `errno=ERANGE', and returning the greatest or lowest
- * valid   integer   (`U?INTn_(MIN|MAX))'.   (though   note   that
- * `endptr'  (if  non-NULL)  is  still  updated  in  this   case!)
- * Upon success, `errno' is left  unchanged, and the integer  repr
- * of the parsed number is  returned. When no integer was  parsed,
- * then `0' is returned, `*endptr'  is set to `nptr', but  `errno'
- * will not have been modified.
- * @return: * :         Success: The parsed integer
- * @return: 0 :         [*endptr=nptr] error: Nothing was parsed
- * @return: INTn_MIN:   [errno=ERANGE] error: Value to low to represent
- * @return: U?INTn_MAX: [errno=ERANGE] error: Value to great to represent */
+/* >> wcsto64(3) */
 INTERN ATTR_SECTION(".text.crt.wchar.unicode.static.convert") ATTR_LEAF NONNULL((1)) int64_t
 NOTHROW_NCX(LIBKCALL libc_wcsto64)(char32_t const *__restrict nptr,
                                    char32_t **endptr,
@@ -3736,6 +3664,7 @@ NOTHROW_NCX(LIBKCALL libc_wcsto64)(char32_t const *__restrict nptr,
 	return libc_wcsto64_r(nptr, endptr, base, NULL);
 #endif /* !__libc_geterrno || !ERANGE */
 }
+/* >> wcsto32_l(3) */
 INTERN ATTR_SECTION(".text.crt.dos.wchar.unicode.locale.convert") ATTR_LEAF NONNULL((1)) int32_t
 NOTHROW_NCX(LIBDCALL libd_wcsto32_l)(char16_t const *__restrict nptr,
                                      char16_t **endptr,
@@ -3744,6 +3673,7 @@ NOTHROW_NCX(LIBDCALL libd_wcsto32_l)(char16_t const *__restrict nptr,
 	(void)locale;
 	return libd_wcsto32(nptr, endptr, base);
 }
+/* >> wcsto32_l(3) */
 INTERN ATTR_SECTION(".text.crt.wchar.unicode.locale.convert") ATTR_LEAF NONNULL((1)) int32_t
 NOTHROW_NCX(LIBKCALL libc_wcsto32_l)(char32_t const *__restrict nptr,
                                      char32_t **endptr,
@@ -3752,6 +3682,7 @@ NOTHROW_NCX(LIBKCALL libc_wcsto32_l)(char32_t const *__restrict nptr,
 	(void)locale;
 	return libc_wcsto32(nptr, endptr, base);
 }
+/* >> wcstou32_l(3) */
 INTERN ATTR_SECTION(".text.crt.dos.wchar.unicode.locale.convert") ATTR_LEAF NONNULL((1)) uint32_t
 NOTHROW_NCX(LIBDCALL libd_wcstou32_l)(char16_t const *__restrict nptr,
                                       char16_t **endptr,
@@ -3760,6 +3691,7 @@ NOTHROW_NCX(LIBDCALL libd_wcstou32_l)(char16_t const *__restrict nptr,
 	(void)locale;
 	return libd_wcstou32(nptr, endptr, base);
 }
+/* >> wcstou32_l(3) */
 INTERN ATTR_SECTION(".text.crt.wchar.unicode.locale.convert") ATTR_LEAF NONNULL((1)) uint32_t
 NOTHROW_NCX(LIBKCALL libc_wcstou32_l)(char32_t const *__restrict nptr,
                                       char32_t **endptr,
@@ -3768,6 +3700,7 @@ NOTHROW_NCX(LIBKCALL libc_wcstou32_l)(char32_t const *__restrict nptr,
 	(void)locale;
 	return libc_wcstou32(nptr, endptr, base);
 }
+/* >> wcsto64_l(3) */
 INTERN ATTR_SECTION(".text.crt.dos.wchar.unicode.locale.convert") ATTR_LEAF NONNULL((1)) int64_t
 NOTHROW_NCX(LIBDCALL libd_wcsto64_l)(char16_t const *__restrict nptr,
                                      char16_t **endptr,
@@ -3776,6 +3709,7 @@ NOTHROW_NCX(LIBDCALL libd_wcsto64_l)(char16_t const *__restrict nptr,
 	(void)locale;
 	return libd_wcsto64(nptr, endptr, base);
 }
+/* >> wcsto64_l(3) */
 INTERN ATTR_SECTION(".text.crt.wchar.unicode.locale.convert") ATTR_LEAF NONNULL((1)) int64_t
 NOTHROW_NCX(LIBKCALL libc_wcsto64_l)(char32_t const *__restrict nptr,
                                      char32_t **endptr,
@@ -3784,6 +3718,7 @@ NOTHROW_NCX(LIBKCALL libc_wcsto64_l)(char32_t const *__restrict nptr,
 	(void)locale;
 	return libc_wcsto64(nptr, endptr, base);
 }
+/* >> wcstou64_l(3) */
 INTERN ATTR_SECTION(".text.crt.dos.wchar.unicode.locale.convert") ATTR_LEAF NONNULL((1)) uint64_t
 NOTHROW_NCX(LIBDCALL libd_wcstou64_l)(char16_t const *__restrict nptr,
                                       char16_t **endptr,
@@ -3792,6 +3727,7 @@ NOTHROW_NCX(LIBDCALL libd_wcstou64_l)(char16_t const *__restrict nptr,
 	(void)locale;
 	return libd_wcstou64(nptr, endptr, base);
 }
+/* >> wcstou64_l(3) */
 INTERN ATTR_SECTION(".text.crt.wchar.unicode.locale.convert") ATTR_LEAF NONNULL((1)) uint64_t
 NOTHROW_NCX(LIBKCALL libc_wcstou64_l)(char32_t const *__restrict nptr,
                                       char32_t **endptr,
@@ -3800,40 +3736,47 @@ NOTHROW_NCX(LIBKCALL libc_wcstou64_l)(char32_t const *__restrict nptr,
 	(void)locale;
 	return libc_wcstou64(nptr, endptr, base);
 }
+/* >> wcsncoll(3) */
 INTERN ATTR_SECTION(".text.crt.dos.wchar.unicode.static.memory") ATTR_PURE WUNUSED NONNULL((1, 2)) int
 NOTHROW_NCX(LIBDCALL libd_wcsncoll)(char16_t const *s1,
                                     char16_t const *s2,
                                     size_t maxlen) {
 	return libd_wcsncmp(s1, s2, maxlen);
 }
+/* >> wcsncoll(3) */
 INTERN ATTR_SECTION(".text.crt.wchar.unicode.static.memory") ATTR_PURE WUNUSED NONNULL((1, 2)) int
 NOTHROW_NCX(LIBKCALL libc_wcsncoll)(char32_t const *s1,
                                     char32_t const *s2,
                                     size_t maxlen) {
 	return libc_wcsncmp(s1, s2, maxlen);
 }
+/* >> wcscasecoll(3) */
 INTERN ATTR_SECTION(".text.crt.dos.wchar.unicode.static.memory") ATTR_PURE WUNUSED NONNULL((1, 2)) int
 NOTHROW_NCX(LIBDCALL libd_wcscasecoll)(char16_t const *s1,
                                        char16_t const *s2) {
 	return libd_wcscasecmp(s1, s2);
 }
+/* >> wcscasecoll(3) */
 INTERN ATTR_SECTION(".text.crt.wchar.unicode.static.memory") ATTR_PURE WUNUSED NONNULL((1, 2)) int
 NOTHROW_NCX(LIBKCALL libc_wcscasecoll)(char32_t const *s1,
                                        char32_t const *s2) {
 	return libc_wcscasecmp(s1, s2);
 }
+/* >> wcsncasecoll(3) */
 INTERN ATTR_SECTION(".text.crt.dos.wchar.unicode.static.memory") ATTR_PURE WUNUSED NONNULL((1, 2)) int
 NOTHROW_NCX(LIBDCALL libd_wcsncasecoll)(char16_t const *s1,
                                         char16_t const *s2,
                                         size_t maxlen) {
 	return libd_wcsncasecmp(s1, s2, maxlen);
 }
+/* >> wcsncasecoll(3) */
 INTERN ATTR_SECTION(".text.crt.wchar.unicode.static.memory") ATTR_PURE WUNUSED NONNULL((1, 2)) int
 NOTHROW_NCX(LIBKCALL libc_wcsncasecoll)(char32_t const *s1,
                                         char32_t const *s2,
                                         size_t maxlen) {
 	return libc_wcsncasecmp(s1, s2, maxlen);
 }
+/* >> wcsnrev(3) */
 INTERN ATTR_SECTION(".text.crt.dos.wchar.string.memory") ATTR_LEAF ATTR_RETNONNULL NONNULL((1)) char16_t *
 NOTHROW_NCX(LIBDCALL libd_wcsnrev)(char16_t *__restrict str,
                                    size_t maxlen) {
@@ -3845,6 +3788,7 @@ NOTHROW_NCX(LIBDCALL libd_wcsnrev)(char16_t *__restrict str,
 
 
 }
+/* >> wcsnrev(3) */
 INTERN ATTR_SECTION(".text.crt.wchar.string.memory") ATTR_LEAF ATTR_RETNONNULL NONNULL((1)) char32_t *
 NOTHROW_NCX(LIBKCALL libc_wcsnrev)(char32_t *__restrict str,
                                    size_t maxlen) {
@@ -3856,6 +3800,7 @@ NOTHROW_NCX(LIBKCALL libc_wcsnrev)(char32_t *__restrict str,
 
 
 }
+/* >> wcsnlwr(3) */
 INTERN ATTR_SECTION(".text.crt.dos.wchar.unicode.static.memory") ATTR_LEAF ATTR_RETNONNULL NONNULL((1)) char16_t *
 NOTHROW_NCX(LIBDCALL libd_wcsnlwr)(char16_t *__restrict str,
                                    size_t maxlen) {
@@ -3864,6 +3809,7 @@ NOTHROW_NCX(LIBDCALL libd_wcsnlwr)(char16_t *__restrict str,
 		*iter = (char16_t)libd_towlower((char16_t)ch);
 	return str;
 }
+/* >> wcsnlwr(3) */
 INTERN ATTR_SECTION(".text.crt.wchar.unicode.static.memory") ATTR_LEAF ATTR_RETNONNULL NONNULL((1)) char32_t *
 NOTHROW_NCX(LIBKCALL libc_wcsnlwr)(char32_t *__restrict str,
                                    size_t maxlen) {
@@ -3872,6 +3818,7 @@ NOTHROW_NCX(LIBKCALL libc_wcsnlwr)(char32_t *__restrict str,
 		*iter = (char32_t)libc_towlower((char32_t)ch);
 	return str;
 }
+/* >> wcsnupr(3) */
 INTERN ATTR_SECTION(".text.crt.dos.wchar.unicode.static.memory") ATTR_LEAF ATTR_RETNONNULL NONNULL((1)) char16_t *
 NOTHROW_NCX(LIBDCALL libd_wcsnupr)(char16_t *__restrict str,
                                    size_t maxlen) {
@@ -3880,6 +3827,7 @@ NOTHROW_NCX(LIBDCALL libd_wcsnupr)(char16_t *__restrict str,
 		*iter = (char16_t)libd_towupper((char16_t)ch);
 	return str;
 }
+/* >> wcsnupr(3) */
 INTERN ATTR_SECTION(".text.crt.wchar.unicode.static.memory") ATTR_LEAF ATTR_RETNONNULL NONNULL((1)) char32_t *
 NOTHROW_NCX(LIBKCALL libc_wcsnupr)(char32_t *__restrict str,
                                    size_t maxlen) {
@@ -3888,8 +3836,7 @@ NOTHROW_NCX(LIBKCALL libc_wcsnupr)(char32_t *__restrict str,
 		*iter = (char32_t)libc_towupper((char32_t)ch);
 	return str;
 }
-/* >> strcasestr(3)
- * Same as `strstr', but ignore casing */
+/* >> wcscasestr(3) */
 INTERN ATTR_SECTION(".text.crt.dos.wchar.unicode.static.memory") ATTR_PURE WUNUSED NONNULL((1)) char16_t *
 NOTHROW_NCX(LIBDCALL libd_wcscasestr)(char16_t const *haystack,
                                       char16_t const *needle) {
@@ -3899,8 +3846,7 @@ NOTHROW_NCX(LIBDCALL libd_wcscasestr)(char16_t const *haystack,
 	}
 	return NULL;
 }
-/* >> strcasestr(3)
- * Same as `strstr', but ignore casing */
+/* >> wcscasestr(3) */
 INTERN ATTR_SECTION(".text.crt.wchar.unicode.static.memory") ATTR_PURE WUNUSED NONNULL((1)) char32_t *
 NOTHROW_NCX(LIBKCALL libc_wcscasestr)(char32_t const *haystack,
                                       char32_t const *needle) {
@@ -3910,19 +3856,22 @@ NOTHROW_NCX(LIBKCALL libc_wcscasestr)(char32_t const *haystack,
 	}
 	return NULL;
 }
-/* Same as wcscpy, but return a pointer after the last written character */
+/* >> wcspcpy(3)
+ * Same as wcscpy, but return a pointer after the last written character */
 INTERN ATTR_SECTION(".text.crt.dos.wchar.string.memory") ATTR_LEAF ATTR_RETNONNULL NONNULL((1, 2)) char16_t *
 NOTHROW_NCX(LIBDCALL libd_wcspcpy)(char16_t *__restrict buf,
                                    char16_t const *__restrict src) {
 	return (char16_t *)libc_mempcpyw(buf, src, libd_wcslen(src) + 1);
 }
-/* Same as wcscpy, but return a pointer after the last written character */
+/* >> wcspcpy(3)
+ * Same as wcscpy, but return a pointer after the last written character */
 INTERN ATTR_SECTION(".text.crt.wchar.string.memory") ATTR_LEAF ATTR_RETNONNULL NONNULL((1, 2)) char32_t *
 NOTHROW_NCX(LIBKCALL libc_wcspcpy)(char32_t *__restrict buf,
                                    char32_t const *__restrict src) {
 	return (char32_t *)libc_mempcpyl(buf, src, libc_wcslen(src) + 1);
 }
-/* Same as wcsncpy, but return a pointer after the last written character */
+/* >> wcspncpy(3)
+ * Same as wcsncpy, but return a pointer after the last written character */
 INTERN ATTR_SECTION(".text.crt.dos.wchar.string.memory") ATTR_LEAF ATTR_RETNONNULL NONNULL((1, 2)) char16_t *
 NOTHROW_NCX(LIBDCALL libd_wcspncpy)(char16_t *__restrict buf,
                                     char16_t const *__restrict src,
@@ -3931,7 +3880,8 @@ NOTHROW_NCX(LIBDCALL libd_wcspncpy)(char16_t *__restrict buf,
 	(char16_t *)libc_memcpyw(buf, src, srclen);
 	return (char16_t *)libc_mempsetw(buf + srclen, '\0', buflen - srclen);
 }
-/* Same as wcsncpy, but return a pointer after the last written character */
+/* >> wcspncpy(3)
+ * Same as wcsncpy, but return a pointer after the last written character */
 INTERN ATTR_SECTION(".text.crt.wchar.string.memory") ATTR_LEAF ATTR_RETNONNULL NONNULL((1, 2)) char32_t *
 NOTHROW_NCX(LIBKCALL libc_wcspncpy)(char32_t *__restrict buf,
                                     char32_t const *__restrict src,
@@ -3940,7 +3890,8 @@ NOTHROW_NCX(LIBKCALL libc_wcspncpy)(char32_t *__restrict buf,
 	(char32_t *)libc_memcpyl(buf, src, srclen);
 	return (char32_t *)libc_mempsetl(buf + srclen, '\0', buflen - srclen);
 }
-/* Same as `wcschr', but don't exceed `max_chars' characters. */
+/* >> wcsnchr(3)
+ * Same as `wcschr', but don't exceed `max_chars' characters. */
 INTERN ATTR_SECTION(".text.crt.dos.wchar.string.memory") ATTR_PURE WUNUSED NONNULL((1)) char16_t *
 NOTHROW_NCX(LIBDCALL libd_wcsnchr)(char16_t const *__restrict haystack,
                                    char16_t needle,
@@ -3951,7 +3902,8 @@ NOTHROW_NCX(LIBDCALL libd_wcsnchr)(char16_t const *__restrict haystack,
 	}
 	return NULL;
 }
-/* Same as `wcschr', but don't exceed `max_chars' characters. */
+/* >> wcsnchr(3)
+ * Same as `wcschr', but don't exceed `max_chars' characters. */
 INTERN ATTR_SECTION(".text.crt.wchar.string.memory") ATTR_PURE WUNUSED NONNULL((1)) char32_t *
 NOTHROW_NCX(LIBKCALL libc_wcsnchr)(char32_t const *__restrict haystack,
                                    char32_t needle,
@@ -3962,7 +3914,8 @@ NOTHROW_NCX(LIBKCALL libc_wcsnchr)(char32_t const *__restrict haystack,
 	}
 	return NULL;
 }
-/* Same as `wcsrchr', but don't exceed `max_chars' characters. */
+/* >> wcsnrchr(3)
+ * Same as `wcsrchr', but don't exceed `max_chars' characters. */
 INTERN ATTR_SECTION(".text.crt.dos.wchar.string.memory") ATTR_PURE WUNUSED NONNULL((1)) char16_t *
 NOTHROW_NCX(LIBDCALL libd_wcsnrchr)(char16_t const *__restrict haystack,
                                     char16_t needle,
@@ -3974,7 +3927,8 @@ NOTHROW_NCX(LIBDCALL libd_wcsnrchr)(char16_t const *__restrict haystack,
 	}
 	return (char16_t *)result;
 }
-/* Same as `wcsrchr', but don't exceed `max_chars' characters. */
+/* >> wcsnrchr(3)
+ * Same as `wcsrchr', but don't exceed `max_chars' characters. */
 INTERN ATTR_SECTION(".text.crt.wchar.string.memory") ATTR_PURE WUNUSED NONNULL((1)) char32_t *
 NOTHROW_NCX(LIBKCALL libc_wcsnrchr)(char32_t const *__restrict haystack,
                                     char32_t needle,
@@ -3986,6 +3940,7 @@ NOTHROW_NCX(LIBKCALL libc_wcsnrchr)(char32_t const *__restrict haystack,
 	}
 	return (char32_t *)result;
 }
+/* >> wcssep(3) */
 INTERN ATTR_SECTION(".text.crt.dos.wchar.string.memory") ATTR_LEAF NONNULL((1, 2)) char16_t *
 NOTHROW_NCX(LIBDCALL libd_wcssep)(char16_t **__restrict stringp,
                                   char16_t const *__restrict delim) {
@@ -3999,6 +3954,7 @@ NOTHROW_NCX(LIBDCALL libd_wcssep)(char16_t **__restrict stringp,
 	*stringp = iter;
 	return result;
 }
+/* >> wcssep(3) */
 INTERN ATTR_SECTION(".text.crt.wchar.string.memory") ATTR_LEAF NONNULL((1, 2)) char32_t *
 NOTHROW_NCX(LIBKCALL libc_wcssep)(char32_t **__restrict stringp,
                                   char32_t const *__restrict delim) {
@@ -4013,7 +3969,7 @@ NOTHROW_NCX(LIBKCALL libc_wcssep)(char32_t **__restrict stringp,
 	return result;
 }
 #include <hybrid/typecore.h>
-/* >> strfry(3) */
+/* >> wcsfry(3) */
 INTERN ATTR_SECTION(".text.crt.dos.wchar.string.memory") ATTR_LEAF ATTR_RETNONNULL NONNULL((1)) char16_t *
 NOTHROW_NCX(LIBDCALL libd_wcsfry)(char16_t *__restrict str) {
 	size_t i, count = libd_wcslen(str);
@@ -4029,7 +3985,7 @@ NOTHROW_NCX(LIBDCALL libd_wcsfry)(char16_t *__restrict str) {
 	return str;
 }
 #include <hybrid/typecore.h>
-/* >> strfry(3) */
+/* >> wcsfry(3) */
 INTERN ATTR_SECTION(".text.crt.wchar.string.memory") ATTR_LEAF ATTR_RETNONNULL NONNULL((1)) char32_t *
 NOTHROW_NCX(LIBKCALL libc_wcsfry)(char32_t *__restrict str) {
 	size_t i, count = libc_wcslen(str);
@@ -4044,6 +4000,7 @@ NOTHROW_NCX(LIBKCALL libc_wcsfry)(char32_t *__restrict str) {
 	}
 	return str;
 }
+/* >> wcsndup(3) */
 INTERN ATTR_SECTION(".text.crt.dos.wchar.heap.strdup") ATTR_MALLOC ATTR_MALL_DEFAULT_ALIGNED WUNUSED NONNULL((1)) char16_t *
 NOTHROW_NCX(LIBDCALL libd_wcsndup)(char16_t const *__restrict str,
                                    size_t max_chars) {
@@ -4054,6 +4011,7 @@ NOTHROW_NCX(LIBDCALL libd_wcsndup)(char16_t const *__restrict str,
 	}
 	return result;
 }
+/* >> wcsndup(3) */
 INTERN ATTR_SECTION(".text.crt.wchar.heap.strdup") ATTR_MALLOC ATTR_MALL_DEFAULT_ALIGNED WUNUSED NONNULL((1)) char32_t *
 NOTHROW_NCX(LIBKCALL libc_wcsndup)(char32_t const *__restrict str,
                                    size_t max_chars) {
@@ -4064,7 +4022,8 @@ NOTHROW_NCX(LIBKCALL libc_wcsndup)(char32_t const *__restrict str,
 	}
 	return result;
 }
-/* Same as `wcsrchr', but return `str-1', rather than `NULL' if `needle' wasn't found. */
+/* >> wcsrchrnul(3)
+ * Same as `wcsrchr', but return `str-1', rather than `NULL' if `needle' wasn't found. */
 INTERN ATTR_SECTION(".text.crt.dos.wchar.string.memory") ATTR_PURE ATTR_RETNONNULL WUNUSED NONNULL((1)) char16_t *
 NOTHROW_NCX(LIBDCALL libd_wcsrchrnul)(char16_t const *__restrict haystack,
                                       char16_t needle) {
@@ -4075,7 +4034,8 @@ NOTHROW_NCX(LIBDCALL libd_wcsrchrnul)(char16_t const *__restrict haystack,
 	} while (*haystack++);
 	return (char16_t *)result;
 }
-/* Same as `wcsrchr', but return `str-1', rather than `NULL' if `needle' wasn't found. */
+/* >> wcsrchrnul(3)
+ * Same as `wcsrchr', but return `str-1', rather than `NULL' if `needle' wasn't found. */
 INTERN ATTR_SECTION(".text.crt.wchar.string.memory") ATTR_PURE ATTR_RETNONNULL WUNUSED NONNULL((1)) char32_t *
 NOTHROW_NCX(LIBKCALL libc_wcsrchrnul)(char32_t const *__restrict haystack,
                                       char32_t needle) {
@@ -4086,7 +4046,8 @@ NOTHROW_NCX(LIBKCALL libc_wcsrchrnul)(char32_t const *__restrict haystack,
 	} while (*haystack++);
 	return (char32_t *)result;
 }
-/* Same as `wcsnchr', but return `wcsnend(str, max_chars)', rather than `NULL' if `needle' wasn't found. */
+/* >> wcsnchrnul(3)
+ * Same as `wcsnchr', but return `wcsnend(str, max_chars)', rather than `NULL' if `needle' wasn't found. */
 INTERN ATTR_SECTION(".text.crt.dos.wchar.string.memory") ATTR_PURE ATTR_RETNONNULL WUNUSED NONNULL((1)) char16_t *
 NOTHROW_NCX(LIBDCALL libd_wcsnchrnul)(char16_t const *__restrict haystack,
                                       char16_t needle,
@@ -4095,7 +4056,8 @@ NOTHROW_NCX(LIBDCALL libd_wcsnchrnul)(char16_t const *__restrict haystack,
 		;
 	return (char16_t *)haystack;
 }
-/* Same as `wcsnchr', but return `wcsnend(str, max_chars)', rather than `NULL' if `needle' wasn't found. */
+/* >> wcsnchrnul(3)
+ * Same as `wcsnchr', but return `wcsnend(str, max_chars)', rather than `NULL' if `needle' wasn't found. */
 INTERN ATTR_SECTION(".text.crt.wchar.string.memory") ATTR_PURE ATTR_RETNONNULL WUNUSED NONNULL((1)) char32_t *
 NOTHROW_NCX(LIBKCALL libc_wcsnchrnul)(char32_t const *__restrict haystack,
                                       char32_t needle,
@@ -4104,7 +4066,8 @@ NOTHROW_NCX(LIBKCALL libc_wcsnchrnul)(char32_t const *__restrict haystack,
 		;
 	return (char32_t *)haystack;
 }
-/* Same as `wcsnrchr', but return `str-1', rather than `NULL' if `needle' wasn't found. */
+/* >> wcsnrchrnul(3)
+ * Same as `wcsnrchr', but return `str-1', rather than `NULL' if `needle' wasn't found. */
 INTERN ATTR_SECTION(".text.crt.dos.wchar.string.memory") ATTR_PURE ATTR_RETNONNULL WUNUSED NONNULL((1)) char16_t *
 NOTHROW_NCX(LIBDCALL libd_wcsnrchrnul)(char16_t const *__restrict haystack,
                                        char16_t needle,
@@ -4116,7 +4079,8 @@ NOTHROW_NCX(LIBDCALL libd_wcsnrchrnul)(char16_t const *__restrict haystack,
 	}
 	return (char16_t *)result;
 }
-/* Same as `wcsnrchr', but return `str-1', rather than `NULL' if `needle' wasn't found. */
+/* >> wcsnrchrnul(3)
+ * Same as `wcsnrchr', but return `str-1', rather than `NULL' if `needle' wasn't found. */
 INTERN ATTR_SECTION(".text.crt.wchar.string.memory") ATTR_PURE ATTR_RETNONNULL WUNUSED NONNULL((1)) char32_t *
 NOTHROW_NCX(LIBKCALL libc_wcsnrchrnul)(char32_t const *__restrict haystack,
                                        char32_t needle,
@@ -4128,68 +4092,79 @@ NOTHROW_NCX(LIBKCALL libc_wcsnrchrnul)(char32_t const *__restrict haystack,
 	}
 	return (char32_t *)result;
 }
-/* Same as `wcschrnul', but return the offset from `str', rather than the actual address */
+/* >> wcsoff(3)
+ * Same as `wcschrnul', but return the offset from `str', rather than the actual address */
 INTERN ATTR_SECTION(".text.crt.dos.wchar.string.memory") ATTR_PURE WUNUSED NONNULL((1)) size_t
 NOTHROW_NCX(LIBDCALL libd_wcsoff)(char16_t const *__restrict haystack,
                                   char16_t needle) {
 	return (size_t)(libd_wcschrnul(haystack, needle) - haystack);
 }
-/* Same as `wcschrnul', but return the offset from `str', rather than the actual address */
+/* >> wcsoff(3)
+ * Same as `wcschrnul', but return the offset from `str', rather than the actual address */
 INTERN ATTR_SECTION(".text.crt.wchar.string.memory") ATTR_PURE WUNUSED NONNULL((1)) size_t
 NOTHROW_NCX(LIBKCALL libc_wcsoff)(char32_t const *__restrict haystack,
                                   char32_t needle) {
 	return (size_t)(libc_wcschrnul(haystack, needle) - haystack);
 }
-/* Same as `wcsrchrnul', but return the offset from `str', rather than the actual address */
+/* >> wcsroff(3)
+ * Same as `wcsrchrnul', but return the offset from `str', rather than the actual address */
 INTERN ATTR_SECTION(".text.crt.dos.wchar.string.memory") ATTR_PURE WUNUSED NONNULL((1)) size_t
 NOTHROW_NCX(LIBDCALL libd_wcsroff)(char16_t const *__restrict haystack,
                                    char16_t needle) {
 	return (size_t)(libd_wcsrchrnul(haystack, needle) - haystack);
 }
-/* Same as `wcsrchrnul', but return the offset from `str', rather than the actual address */
+/* >> wcsroff(3)
+ * Same as `wcsrchrnul', but return the offset from `str', rather than the actual address */
 INTERN ATTR_SECTION(".text.crt.wchar.string.memory") ATTR_PURE WUNUSED NONNULL((1)) size_t
 NOTHROW_NCX(LIBKCALL libc_wcsroff)(char32_t const *__restrict haystack,
                                    char32_t needle) {
 	return (size_t)(libc_wcsrchrnul(haystack, needle) - haystack);
 }
-/* Same as `wcsnchrnul', but return the offset from `str', rather than the actual address */
+/* >> wcsnoff(3)
+ * Same as `wcsnchrnul', but return the offset from `str', rather than the actual address */
 INTERN ATTR_SECTION(".text.crt.dos.wchar.string.memory") ATTR_PURE WUNUSED NONNULL((1)) size_t
 NOTHROW_NCX(LIBDCALL libd_wcsnoff)(char16_t const *__restrict haystack,
                                    char16_t needle,
                                    size_t maxlen) {
 	return (size_t)(libd_wcsnchrnul(haystack, needle, maxlen) - haystack);
 }
-/* Same as `wcsnchrnul', but return the offset from `str', rather than the actual address */
+/* >> wcsnoff(3)
+ * Same as `wcsnchrnul', but return the offset from `str', rather than the actual address */
 INTERN ATTR_SECTION(".text.crt.wchar.string.memory") ATTR_PURE WUNUSED NONNULL((1)) size_t
 NOTHROW_NCX(LIBKCALL libc_wcsnoff)(char32_t const *__restrict haystack,
                                    char32_t needle,
                                    size_t maxlen) {
 	return (size_t)(libc_wcsnchrnul(haystack, needle, maxlen) - haystack);
 }
-/* Same as `wcsnrchrnul', but return the offset from `str', rather than the actual address */
+/* >> wcsnroff(3)
+ * Same as `wcsnrchrnul', but return the offset from `str', rather than the actual address */
 INTERN ATTR_SECTION(".text.crt.dos.wchar.string.memory") ATTR_PURE WUNUSED NONNULL((1)) size_t
 NOTHROW_NCX(LIBDCALL libd_wcsnroff)(char16_t const *__restrict haystack,
                                     char16_t needle,
                                     size_t maxlen) {
 	return (size_t)(libd_wcsnrchrnul(haystack, needle, maxlen) - haystack);
 }
-/* Same as `wcsnrchrnul', but return the offset from `str', rather than the actual address */
+/* >> wcsnroff(3)
+ * Same as `wcsnrchrnul', but return the offset from `str', rather than the actual address */
 INTERN ATTR_SECTION(".text.crt.wchar.string.memory") ATTR_PURE WUNUSED NONNULL((1)) size_t
 NOTHROW_NCX(LIBKCALL libc_wcsnroff)(char32_t const *__restrict haystack,
                                     char32_t needle,
                                     size_t maxlen) {
 	return (size_t)(libc_wcsnrchrnul(haystack, needle, maxlen) - haystack);
 }
+/* >> fuzzy_wcscmp(3) */
 INTERN ATTR_SECTION(".text.crt.dos.wchar.string.memory") ATTR_PURE WUNUSED NONNULL((1, 2)) size_t
 NOTHROW_NCX(LIBDCALL libd_fuzzy_wcscmp)(char16_t const *s1,
                                         char16_t const *s2) {
 	return libc_fuzzy_memcmpw(s1, libd_wcslen(s1), s2, libd_wcslen(s2));
 }
+/* >> fuzzy_wcscmp(3) */
 INTERN ATTR_SECTION(".text.crt.wchar.string.memory") ATTR_PURE WUNUSED NONNULL((1, 2)) size_t
 NOTHROW_NCX(LIBKCALL libc_fuzzy_wcscmp)(char32_t const *s1,
                                         char32_t const *s2) {
 	return libc_fuzzy_memcmpl(s1, libc_wcslen(s1), s2, libc_wcslen(s2));
 }
+/* >> fuzzy_wcsncmp(3) */
 INTERN ATTR_SECTION(".text.crt.dos.wchar.string.memory") ATTR_PURE WUNUSED NONNULL((1, 3)) size_t
 NOTHROW_NCX(LIBDCALL libd_fuzzy_wcsncmp)(char16_t const *s1,
                                          size_t s1_maxlen,
@@ -4197,6 +4172,7 @@ NOTHROW_NCX(LIBDCALL libd_fuzzy_wcsncmp)(char16_t const *s1,
                                          size_t s2_maxlen) {
 	return libc_fuzzy_memcmpw(s1, libd_wcsnlen(s1, s1_maxlen), s2, libd_wcsnlen(s2, s2_maxlen));
 }
+/* >> fuzzy_wcsncmp(3) */
 INTERN ATTR_SECTION(".text.crt.wchar.string.memory") ATTR_PURE WUNUSED NONNULL((1, 3)) size_t
 NOTHROW_NCX(LIBKCALL libc_fuzzy_wcsncmp)(char32_t const *s1,
                                          size_t s1_maxlen,
@@ -4205,6 +4181,7 @@ NOTHROW_NCX(LIBKCALL libc_fuzzy_wcsncmp)(char32_t const *s1,
 	return libc_fuzzy_memcmpl(s1, libc_wcsnlen(s1, s1_maxlen), s2, libc_wcsnlen(s2, s2_maxlen));
 }
 #include <parts/malloca.h>
+/* >> fuzzy_wmemcasecmp(3) */
 INTERN ATTR_SECTION(".text.crt.dos.wchar.unicode.static.memory") ATTR_PURE WUNUSED NONNULL((1, 3)) size_t
 NOTHROW_NCX(LIBDCALL libd_fuzzy_wmemcasecmp)(char16_t const *s1,
                                              size_t s1_bytes,
@@ -4267,6 +4244,7 @@ NOTHROW_NCX(LIBDCALL libd_fuzzy_wmemcasecmp)(char16_t const *s1,
 	return temp;
 }
 #include <parts/malloca.h>
+/* >> fuzzy_wmemcasecmp(3) */
 INTERN ATTR_SECTION(".text.crt.wchar.unicode.static.memory") ATTR_PURE WUNUSED NONNULL((1, 3)) size_t
 NOTHROW_NCX(LIBKCALL libc_fuzzy_wmemcasecmp)(char32_t const *s1,
                                              size_t s1_bytes,
@@ -4328,16 +4306,19 @@ NOTHROW_NCX(LIBKCALL libc_fuzzy_wmemcasecmp)(char32_t const *s1,
 	__freea(v0);
 	return temp;
 }
+/* >> fuzzy_wcscasecmp(3) */
 INTERN ATTR_SECTION(".text.crt.dos.wchar.unicode.static.memory") ATTR_PURE WUNUSED NONNULL((1, 2)) size_t
 NOTHROW_NCX(LIBDCALL libd_fuzzy_wcscasecmp)(char16_t const *s1,
                                             char16_t const *s2) {
 	return libd_fuzzy_wmemcasecmp(s1, libd_wcslen(s1), s2, libd_wcslen(s2));
 }
+/* >> fuzzy_wcscasecmp(3) */
 INTERN ATTR_SECTION(".text.crt.wchar.unicode.static.memory") ATTR_PURE WUNUSED NONNULL((1, 2)) size_t
 NOTHROW_NCX(LIBKCALL libc_fuzzy_wcscasecmp)(char32_t const *s1,
                                             char32_t const *s2) {
 	return libc_fuzzy_wmemcasecmp(s1, libc_wcslen(s1), s2, libc_wcslen(s2));
 }
+/* >> fuzzy_wcsncasecmp(3) */
 INTERN ATTR_SECTION(".text.crt.dos.wchar.unicode.static.memory") ATTR_PURE WUNUSED NONNULL((1, 3)) size_t
 NOTHROW_NCX(LIBDCALL libd_fuzzy_wcsncasecmp)(char16_t const *s1,
                                              size_t s1_maxlen,
@@ -4345,6 +4326,7 @@ NOTHROW_NCX(LIBDCALL libd_fuzzy_wcsncasecmp)(char16_t const *s1,
                                              size_t s2_maxlen) {
 	return libd_fuzzy_wmemcasecmp(s1, libd_wcsnlen(s1, s1_maxlen), s2, libd_wcsnlen(s2, s2_maxlen));
 }
+/* >> fuzzy_wcsncasecmp(3) */
 INTERN ATTR_SECTION(".text.crt.wchar.unicode.static.memory") ATTR_PURE WUNUSED NONNULL((1, 3)) size_t
 NOTHROW_NCX(LIBKCALL libc_fuzzy_wcsncasecmp)(char32_t const *s1,
                                              size_t s1_maxlen,
@@ -4352,6 +4334,7 @@ NOTHROW_NCX(LIBKCALL libc_fuzzy_wcsncasecmp)(char32_t const *s1,
                                              size_t s2_maxlen) {
 	return libc_fuzzy_wmemcasecmp(s1, libc_wcsnlen(s1, s1_maxlen), s2, libc_wcsnlen(s2, s2_maxlen));
 }
+/* >> wildwcscmp(3) */
 INTERN ATTR_SECTION(".text.crt.dos.wchar.string.memory") ATTR_PURE WUNUSED NONNULL((1, 2)) int
 NOTHROW_NCX(LIBDCALL libd_wildwcscmp)(char16_t const *pattern,
                                       char16_t const *string) {
@@ -4395,6 +4378,7 @@ next:
 	}
 	return (int)((char16_t)*string - (char16_t)*pattern);
 }
+/* >> wildwcscmp(3) */
 INTERN ATTR_SECTION(".text.crt.wchar.string.memory") ATTR_PURE WUNUSED NONNULL((1, 2)) int
 NOTHROW_NCX(LIBKCALL libc_wildwcscmp)(char32_t const *pattern,
                                       char32_t const *string) {
@@ -4438,6 +4422,7 @@ next:
 	}
 	return (int)((char32_t)*string - (char32_t)*pattern);
 }
+/* >> wildwcscasecmp(3) */
 INTERN ATTR_SECTION(".text.crt.dos.wchar.unicode.static.memory") ATTR_PURE WUNUSED NONNULL((1, 2)) int
 NOTHROW_NCX(LIBDCALL libd_wildwcscasecmp)(char16_t const *pattern,
                                           char16_t const *string) {
@@ -4486,6 +4471,7 @@ next:
 	}
 	return (int)((char16_t)wcsing_ch - (char16_t)pattern_ch);
 }
+/* >> wildwcscasecmp(3) */
 INTERN ATTR_SECTION(".text.crt.wchar.unicode.static.memory") ATTR_PURE WUNUSED NONNULL((1, 2)) int
 NOTHROW_NCX(LIBKCALL libc_wildwcscasecmp)(char32_t const *pattern,
                                           char32_t const *string) {
@@ -4534,7 +4520,7 @@ next:
 	}
 	return (int)((char32_t)wcsing_ch - (char32_t)pattern_ch);
 }
-/* >> strverscmp(3) */
+/* >> wcsverscmp(3) */
 INTERN ATTR_SECTION(".text.crt.dos.wchar.string.memory") ATTR_PURE WUNUSED NONNULL((1, 2)) int
 NOTHROW_NCX(LIBDCALL libd_wcsverscmp)(char16_t const *s1,
                                       char16_t const *s2) {
@@ -4581,7 +4567,7 @@ NOTHROW_NCX(LIBDCALL libd_wcsverscmp)(char16_t const *s1,
 	} while (c1);
 	return 0;
 }
-/* >> strverscmp(3) */
+/* >> wcsverscmp(3) */
 INTERN ATTR_SECTION(".text.crt.wchar.string.memory") ATTR_PURE WUNUSED NONNULL((1, 2)) int
 NOTHROW_NCX(LIBKCALL libc_wcsverscmp)(char32_t const *s1,
                                       char32_t const *s2) {
@@ -4628,6 +4614,7 @@ NOTHROW_NCX(LIBKCALL libc_wcsverscmp)(char32_t const *s1,
 	} while (c1);
 	return 0;
 }
+/* >> wcsncoll_l(3) */
 INTERN ATTR_SECTION(".text.crt.dos.wchar.unicode.locale.memory") ATTR_PURE WUNUSED NONNULL((1, 2)) int
 NOTHROW_NCX(LIBDCALL libd_wcsncoll_l)(char16_t const *s1,
                                       char16_t const *s2,
@@ -4636,6 +4623,7 @@ NOTHROW_NCX(LIBDCALL libd_wcsncoll_l)(char16_t const *s1,
 	(void)locale;
 	return libd_wcsncoll(s1, s2, maxlen);
 }
+/* >> wcsncoll_l(3) */
 INTERN ATTR_SECTION(".text.crt.wchar.unicode.locale.memory") ATTR_PURE WUNUSED NONNULL((1, 2)) int
 NOTHROW_NCX(LIBKCALL libc_wcsncoll_l)(char32_t const *s1,
                                       char32_t const *s2,
@@ -4644,18 +4632,21 @@ NOTHROW_NCX(LIBKCALL libc_wcsncoll_l)(char32_t const *s1,
 	(void)locale;
 	return libc_wcsncoll(s1, s2, maxlen);
 }
+/* >> wcscasecoll_l(3) */
 INTERN ATTR_SECTION(".text.crt.dos.wchar.unicode.locale.memory") ATTR_PURE WUNUSED NONNULL((1, 2)) int
 NOTHROW_NCX(LIBDCALL libd_wcscasecoll_l)(char16_t const *s1,
                                          char16_t const *s2,
                                          locale_t locale) {
 	return libd_wcscasecmp_l(s1, s2, locale);
 }
+/* >> wcscasecoll_l(3) */
 INTERN ATTR_SECTION(".text.crt.wchar.unicode.locale.memory") ATTR_PURE WUNUSED NONNULL((1, 2)) int
 NOTHROW_NCX(LIBKCALL libc_wcscasecoll_l)(char32_t const *s1,
                                          char32_t const *s2,
                                          locale_t locale) {
 	return libc_wcscasecmp_l(s1, s2, locale);
 }
+/* >> wcsncasecoll_l(3) */
 INTERN ATTR_SECTION(".text.crt.dos.wchar.unicode.locale.memory") ATTR_PURE WUNUSED NONNULL((1, 2)) int
 NOTHROW_NCX(LIBDCALL libd_wcsncasecoll_l)(char16_t const *s1,
                                           char16_t const *s2,
@@ -4664,6 +4655,7 @@ NOTHROW_NCX(LIBDCALL libd_wcsncasecoll_l)(char16_t const *s1,
 	(void)locale;
 	return libd_wcsncasecoll(s1, s2, maxlen);
 }
+/* >> wcsncasecoll_l(3) */
 INTERN ATTR_SECTION(".text.crt.wchar.unicode.locale.memory") ATTR_PURE WUNUSED NONNULL((1, 2)) int
 NOTHROW_NCX(LIBKCALL libc_wcsncasecoll_l)(char32_t const *s1,
                                           char32_t const *s2,
@@ -4672,6 +4664,7 @@ NOTHROW_NCX(LIBKCALL libc_wcsncasecoll_l)(char32_t const *s1,
 	(void)locale;
 	return libc_wcsncasecoll(s1, s2, maxlen);
 }
+/* >> wcslwr_l(3) */
 INTERN ATTR_SECTION(".text.crt.dos.wchar.unicode.locale.memory") ATTR_LEAF ATTR_RETNONNULL NONNULL((1)) char16_t *
 NOTHROW_NCX(LIBDCALL libd_wcslwr_l)(char16_t *__restrict str,
                                     locale_t locale) {
@@ -4680,6 +4673,7 @@ NOTHROW_NCX(LIBDCALL libd_wcslwr_l)(char16_t *__restrict str,
 		*iter = libd_towlower_l(ch, locale);
 	return str;
 }
+/* >> wcslwr_l(3) */
 INTERN ATTR_SECTION(".text.crt.wchar.unicode.locale.memory") ATTR_LEAF ATTR_RETNONNULL NONNULL((1)) char32_t *
 NOTHROW_NCX(LIBKCALL libc_wcslwr_l)(char32_t *__restrict str,
                                     locale_t locale) {
@@ -4688,6 +4682,7 @@ NOTHROW_NCX(LIBKCALL libc_wcslwr_l)(char32_t *__restrict str,
 		*iter = libc_towlower_l(ch, locale);
 	return str;
 }
+/* >> wcsupr_l(3) */
 INTERN ATTR_SECTION(".text.crt.dos.wchar.unicode.locale.memory") ATTR_LEAF ATTR_RETNONNULL NONNULL((1)) char16_t *
 NOTHROW_NCX(LIBDCALL libd_wcsupr_l)(char16_t *__restrict str,
                                     locale_t locale) {
@@ -4696,6 +4691,7 @@ NOTHROW_NCX(LIBDCALL libd_wcsupr_l)(char16_t *__restrict str,
 		*iter = libd_towupper_l(ch, locale);
 	return str;
 }
+/* >> wcsupr_l(3) */
 INTERN ATTR_SECTION(".text.crt.wchar.unicode.locale.memory") ATTR_LEAF ATTR_RETNONNULL NONNULL((1)) char32_t *
 NOTHROW_NCX(LIBKCALL libc_wcsupr_l)(char32_t *__restrict str,
                                     locale_t locale) {
@@ -4704,6 +4700,7 @@ NOTHROW_NCX(LIBKCALL libc_wcsupr_l)(char32_t *__restrict str,
 		*iter = libc_towupper_l(ch, locale);
 	return str;
 }
+/* >> wcsnlwr_l(3) */
 INTERN ATTR_SECTION(".text.crt.dos.wchar.unicode.locale.memory") ATTR_LEAF ATTR_RETNONNULL NONNULL((1)) char16_t *
 NOTHROW_NCX(LIBDCALL libd_wcsnlwr_l)(char16_t *__restrict str,
                                      size_t maxlen,
@@ -4713,6 +4710,7 @@ NOTHROW_NCX(LIBDCALL libd_wcsnlwr_l)(char16_t *__restrict str,
 		*iter = libd_towlower_l(ch, locale);
 	return str;
 }
+/* >> wcsnlwr_l(3) */
 INTERN ATTR_SECTION(".text.crt.wchar.unicode.locale.memory") ATTR_LEAF ATTR_RETNONNULL NONNULL((1)) char32_t *
 NOTHROW_NCX(LIBKCALL libc_wcsnlwr_l)(char32_t *__restrict str,
                                      size_t maxlen,
@@ -4722,6 +4720,7 @@ NOTHROW_NCX(LIBKCALL libc_wcsnlwr_l)(char32_t *__restrict str,
 		*iter = libc_towlower_l(ch, locale);
 	return str;
 }
+/* >> wcsnupr_l(3) */
 INTERN ATTR_SECTION(".text.crt.dos.wchar.unicode.locale.memory") ATTR_LEAF ATTR_RETNONNULL NONNULL((1)) char16_t *
 NOTHROW_NCX(LIBDCALL libd_wcsnupr_l)(char16_t *__restrict str,
                                      size_t maxlen,
@@ -4731,6 +4730,7 @@ NOTHROW_NCX(LIBDCALL libd_wcsnupr_l)(char16_t *__restrict str,
 		*iter = libd_towupper_l(ch, locale);
 	return str;
 }
+/* >> wcsnupr_l(3) */
 INTERN ATTR_SECTION(".text.crt.wchar.unicode.locale.memory") ATTR_LEAF ATTR_RETNONNULL NONNULL((1)) char32_t *
 NOTHROW_NCX(LIBKCALL libc_wcsnupr_l)(char32_t *__restrict str,
                                      size_t maxlen,
@@ -4740,6 +4740,7 @@ NOTHROW_NCX(LIBKCALL libc_wcsnupr_l)(char32_t *__restrict str,
 		*iter = libc_towupper_l(ch, locale);
 	return str;
 }
+/* >> wcscasestr_l(3) */
 INTERN ATTR_SECTION(".text.crt.dos.wchar.unicode.locale.memory") ATTR_PURE WUNUSED NONNULL((1, 2)) char16_t *
 NOTHROW_NCX(LIBDCALL libd_wcscasestr_l)(char16_t const *haystack,
                                         char16_t const *needle,
@@ -4750,6 +4751,7 @@ NOTHROW_NCX(LIBDCALL libd_wcscasestr_l)(char16_t const *haystack,
 	}
 	return NULL;
 }
+/* >> wcscasestr_l(3) */
 INTERN ATTR_SECTION(".text.crt.wchar.unicode.locale.memory") ATTR_PURE WUNUSED NONNULL((1, 2)) char32_t *
 NOTHROW_NCX(LIBKCALL libc_wcscasestr_l)(char32_t const *haystack,
                                         char32_t const *needle,
@@ -4760,6 +4762,7 @@ NOTHROW_NCX(LIBKCALL libc_wcscasestr_l)(char32_t const *haystack,
 	}
 	return NULL;
 }
+/* >> fuzzy_wmemcasecmp_l(3) */
 INTERN ATTR_SECTION(".text.crt.dos.wchar.unicode.locale.memory") ATTR_PURE WUNUSED NONNULL((1, 3)) size_t
 NOTHROW_NCX(LIBDCALL libd_fuzzy_wmemcasecmp_l)(char16_t const *s1,
                                                size_t s1_bytes,
@@ -4821,6 +4824,7 @@ NOTHROW_NCX(LIBDCALL libd_fuzzy_wmemcasecmp_l)(char16_t const *s1,
 	__freea(v0);
 	return temp;
 }
+/* >> fuzzy_wmemcasecmp_l(3) */
 INTERN ATTR_SECTION(".text.crt.wchar.unicode.locale.memory") ATTR_PURE WUNUSED NONNULL((1, 3)) size_t
 NOTHROW_NCX(LIBKCALL libc_fuzzy_wmemcasecmp_l)(char32_t const *s1,
                                                size_t s1_bytes,
@@ -4882,18 +4886,21 @@ NOTHROW_NCX(LIBKCALL libc_fuzzy_wmemcasecmp_l)(char32_t const *s1,
 	__freea(v0);
 	return temp;
 }
+/* >> fuzzy_wcscasecmp_l(3) */
 INTERN ATTR_SECTION(".text.crt.dos.wchar.unicode.locale.memory") ATTR_PURE WUNUSED NONNULL((1, 2)) size_t
 NOTHROW_NCX(LIBDCALL libd_fuzzy_wcscasecmp_l)(char16_t const *s1,
                                               char16_t const *s2,
                                               locale_t locale) {
 	return libd_fuzzy_wmemcasecmp_l(s1, libd_wcslen(s1), s2, libd_wcslen(s2), locale);
 }
+/* >> fuzzy_wcscasecmp_l(3) */
 INTERN ATTR_SECTION(".text.crt.wchar.unicode.locale.memory") ATTR_PURE WUNUSED NONNULL((1, 2)) size_t
 NOTHROW_NCX(LIBKCALL libc_fuzzy_wcscasecmp_l)(char32_t const *s1,
                                               char32_t const *s2,
                                               locale_t locale) {
 	return libc_fuzzy_wmemcasecmp_l(s1, libc_wcslen(s1), s2, libc_wcslen(s2), locale);
 }
+/* >> fuzzy_wcsncasecmp_l(3) */
 INTERN ATTR_SECTION(".text.crt.dos.wchar.unicode.locale.memory") ATTR_PURE WUNUSED NONNULL((1, 3)) size_t
 NOTHROW_NCX(LIBDCALL libd_fuzzy_wcsncasecmp_l)(char16_t const *s1,
                                                size_t s1_maxlen,
@@ -4902,6 +4909,7 @@ NOTHROW_NCX(LIBDCALL libd_fuzzy_wcsncasecmp_l)(char16_t const *s1,
                                                locale_t locale) {
 	return libd_fuzzy_wmemcasecmp_l(s1, libd_wcsnlen(s1, s1_maxlen), s2, libd_wcsnlen(s2, s2_maxlen), locale);
 }
+/* >> fuzzy_wcsncasecmp_l(3) */
 INTERN ATTR_SECTION(".text.crt.wchar.unicode.locale.memory") ATTR_PURE WUNUSED NONNULL((1, 3)) size_t
 NOTHROW_NCX(LIBKCALL libc_fuzzy_wcsncasecmp_l)(char32_t const *s1,
                                                size_t s1_maxlen,
@@ -4910,6 +4918,7 @@ NOTHROW_NCX(LIBKCALL libc_fuzzy_wcsncasecmp_l)(char32_t const *s1,
                                                locale_t locale) {
 	return libc_fuzzy_wmemcasecmp_l(s1, libc_wcsnlen(s1, s1_maxlen), s2, libc_wcsnlen(s2, s2_maxlen), locale);
 }
+/* >> wildwcscasecmp_l(3) */
 INTERN ATTR_SECTION(".text.crt.dos.wchar.unicode.locale.memory") ATTR_PURE WUNUSED NONNULL((1, 2)) int
 NOTHROW_NCX(LIBDCALL libd_wildwcscasecmp_l)(char16_t const *pattern,
                                             char16_t const *string,
@@ -4959,6 +4968,7 @@ next:
 	}
 	return (int)((char16_t)wcsing_ch - (char16_t)pattern_ch);
 }
+/* >> wildwcscasecmp_l(3) */
 INTERN ATTR_SECTION(".text.crt.wchar.unicode.locale.memory") ATTR_PURE WUNUSED NONNULL((1, 2)) int
 NOTHROW_NCX(LIBKCALL libc_wildwcscasecmp_l)(char32_t const *pattern,
                                             char32_t const *string,
@@ -5008,6 +5018,7 @@ next:
 	}
 	return (int)((char32_t)wcsing_ch - (char32_t)pattern_ch);
 }
+/* >> wcslcat(3) */
 INTERN ATTR_SECTION(".text.crt.dos.wchar.unicode.locale.memory") ATTR_LEAF NONNULL((1, 2)) size_t
 NOTHROW_NCX(LIBDCALL libd_wcslcat)(char16_t *__restrict dst,
                                    char16_t const *__restrict src,
@@ -5021,6 +5032,7 @@ NOTHROW_NCX(LIBDCALL libd_wcslcat)(char16_t *__restrict dst,
 	new_dst[copy_size] = '\0';
 	return result + (new_dst - dst);
 }
+/* >> wcslcat(3) */
 INTERN ATTR_SECTION(".text.crt.wchar.unicode.locale.memory") ATTR_LEAF NONNULL((1, 2)) size_t
 NOTHROW_NCX(LIBKCALL libc_wcslcat)(char32_t *__restrict dst,
                                    char32_t const *__restrict src,
@@ -5034,6 +5046,7 @@ NOTHROW_NCX(LIBKCALL libc_wcslcat)(char32_t *__restrict dst,
 	new_dst[copy_size] = '\0';
 	return result + (new_dst - dst);
 }
+/* >> wcslcpy(3) */
 INTERN ATTR_SECTION(".text.crt.dos.wchar.unicode.locale.memory") ATTR_LEAF NONNULL((1, 2)) size_t
 NOTHROW_NCX(LIBDCALL libd_wcslcpy)(char16_t *__restrict dst,
                                    char16_t const *__restrict src,
@@ -5044,6 +5057,7 @@ NOTHROW_NCX(LIBDCALL libd_wcslcpy)(char16_t *__restrict dst,
 	dst[copy_size] = '\0';
 	return result;
 }
+/* >> wcslcpy(3) */
 INTERN ATTR_SECTION(".text.crt.wchar.unicode.locale.memory") ATTR_LEAF NONNULL((1, 2)) size_t
 NOTHROW_NCX(LIBKCALL libc_wcslcpy)(char32_t *__restrict dst,
                                    char32_t const *__restrict src,
@@ -6744,6 +6758,14 @@ DEFINE_PUBLIC_ALIAS(wcstol, libc_wcstol);
 DEFINE_PUBLIC_ALIAS(DOS$wcstoul, libd_wcstoul);
 DEFINE_PUBLIC_ALIAS(wcstoul, libc_wcstoul);
 DEFINE_PUBLIC_ALIAS(mbsinit, libc_mbsinit);
+#endif /* !__KERNEL__ */
+#if !defined(__KERNEL__) && !defined(LIBC_ARCH_HAVE_C16MEMCMP) && __SIZEOF_INT__ > 2
+DEFINE_PUBLIC_ALIAS(DOS$wmemcmp, libd_wmemcmp);
+#endif /* !__KERNEL__ && !LIBC_ARCH_HAVE_C16MEMCMP && __SIZEOF_INT__ > 2 */
+#if !defined(__KERNEL__) && !defined(LIBC_ARCH_HAVE_C32MEMCMP) && __SIZEOF_INT__ > 4
+DEFINE_PUBLIC_ALIAS(wmemcmp, libc_wmemcmp);
+#endif /* !__KERNEL__ && !LIBC_ARCH_HAVE_C32MEMCMP && __SIZEOF_INT__ > 4 */
+#ifndef __KERNEL__
 DEFINE_PUBLIC_ALIAS(DOS$wcscpy, libd_wcscpy);
 DEFINE_PUBLIC_ALIAS(wcscpy, libc_wcscpy);
 DEFINE_PUBLIC_ALIAS(DOS$wcscat, libd_wcscat);

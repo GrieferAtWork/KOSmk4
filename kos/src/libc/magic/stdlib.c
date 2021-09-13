@@ -3035,9 +3035,9 @@ char const *getexecname() {
 	return __LOCAL_program_invocation_name;
 }
 
-@@Enumerate all open file descriptors by invoking `(*walk)(arg, <fd>)' for each of them
-@@If  during any of these invocations, `(*walk)(...)' returns non-zero, enumeration stops,
-@@and `fdwalk()' returns with that same value.  If `(*walk)(...)' is never called, or  all
+@@Enumerate all open file descriptors by  invoking `(*walk)(arg, <fd>)' for each of  them
+@@If during any of these invocations, `(*walk)(...)' returns non-zero, enumeration stops,
+@@and  `fdwalk()' returns with that same value. If `(*walk)(...)' is never called, or all
 @@invocations return 0, `fdwalk()' will also return 0.
 [[requires_include("<asm/os/fcntl.h>")]]
 [[requires($has_function(fcntl) && defined(__F_NEXT))]]

@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xa7e7abaf */
+/* HASH CRC-32:0x3a8dfe9f */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -64,7 +64,7 @@ __NAMESPACE_LOCAL_END
 #define __LIBC_TIME_ABBR_MONTH_NAMES_DEFINED 1
 __NAMESPACE_LOCAL_BEGIN
 __LOCAL_LIBC_CONST_DATA(__abbr_month_names) char const __abbr_month_names[12][4] =
-	{ "Jan", "Feb", "Mar", "Apr", "May", "Jun",  "Jul", "Aug", "Sep", "Oct", "Nov", "Dec" };
+	{ "Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec" };
 __NAMESPACE_LOCAL_END
 #endif /* !__LIBC_TIME_ABBR_MONTH_NAMES_DEFINED */
 #endif /* __BUILDING_LIBC || !__CRT_HAVE_asctime_s */

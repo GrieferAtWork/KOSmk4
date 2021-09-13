@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xd7469549 */
+/* HASH CRC-32:0x79c019d7 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -2051,7 +2051,10 @@ DEFINE_PUBLIC_ALIAS(DOS$wmempset, libd_mempsetw);
 DEFINE_PUBLIC_ALIAS(DOS$mempsetw, libd_mempsetw);
 DEFINE_PUBLIC_ALIAS(DOS$memsetl, libd_memsetl);
 DEFINE_PUBLIC_ALIAS(DOS$mempsetl, libd_mempsetl);
+#include <hybrid/typecore.h>
+#if __SIZEOF_INT__ <= 2
 DEFINE_PUBLIC_ALIAS(DOS$wmemcmp, libd_memcmpw);
+#endif /* __SIZEOF_INT__ <= 2 */
 DEFINE_PUBLIC_ALIAS(DOS$memcmpw, libd_memcmpw);
 DEFINE_PUBLIC_ALIAS(DOS$memcmpl, libd_memcmpl);
 DEFINE_PUBLIC_ALIAS(DOS$wmemchr, libd_memchrw);
@@ -2775,7 +2778,6 @@ DEFINE_PUBLIC_ALIAS(DOS$_write, libd_write);
 DEFINE_PUBLIC_ALIAS(DOS$__write, libd_write);
 DEFINE_PUBLIC_ALIAS(DOS$write, libd_write);
 DEFINE_PUBLIC_ALIAS(DOS$readall, libd_readall);
-#include <hybrid/typecore.h>
 #include <bits/crt/format-printer.h>
 #if defined(__LIBCCALL_IS_FORMATPRINTER_CC) && __SIZEOF_INT__ == __SIZEOF_POINTER__
 DEFINE_PUBLIC_ALIAS(DOS$write_printer, libd_writeall);

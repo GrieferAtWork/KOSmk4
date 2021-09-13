@@ -35,10 +35,9 @@
 
 DECL_BEGIN
 
-DEFINE_PUBLIC_ALIAS(makecontext, libc_makecontext);
 INTERN ATTR_SECTION(".text.crt.cpu.ucontext") NONNULL((1, 2)) void
 NOTHROW_NCX(VLIBCCALL libc_makecontext)(ucontext_t *ucp,
-                                        __makecontext_func_t func,
+                                        void (LIBKCALL *func)(void),
                                         __STDC_INT_AS_SIZE_T argc,
                                         ...) {
 #ifdef __x86_64__
@@ -128,7 +127,7 @@ NOTHROW_NCX(VLIBCCALL libc_makecontext)(ucontext_t *ucp,
 #endif /* !__x86_64__ */
 }
 
-
+DEFINE_PUBLIC_ALIAS(makecontext, libc_makecontext);
 
 DECL_END
 

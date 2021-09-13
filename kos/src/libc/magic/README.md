@@ -167,6 +167,7 @@ TODO: Incomplete
 | `[pure]`                 | Add attribute: `ATTR_PURE`                                |
 | `[cold]`                 | Add attribute: `ATTR_COLD`                                |
 | `[hot]`                  | Add attribute: `ATTR_HOT`                                 |
+| `[leaf]`                 | Add attribute: `ATTR_LEAF`                                |
 | `[deprecated]`           | Add attribute: `ATTR_DEPRECATED_`                         |
 | `[deprecated("foo")]`    | Add attribute: `ATTR_DEPRECATED("foo")`                   |
 | `[no_nothrow]`           | Set nothrow: /empty/                                      |

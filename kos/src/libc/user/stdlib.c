@@ -681,7 +681,7 @@ struct libd_on_exit_cookie {
 	void (LIBDCALL *func)(int status, void *arg);
 	void *arg;
 };
-PRIVATE ATTR_SECTION(".text.crt.dos.sched.process") void LIBCCALL 
+PRIVATE ATTR_SECTION(".text.crt.dos.sched.process") void LIBCCALL
 libd_on_exit_wrapper(int status, void *arg) {
 	struct libd_on_exit_cookie cookie;
 	cookie = *(struct libd_on_exit_cookie *)arg;

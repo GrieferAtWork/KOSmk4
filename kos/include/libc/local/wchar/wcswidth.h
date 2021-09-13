@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xf5833316 */
+/* HASH CRC-32:0xdce1c2d7 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -22,6 +22,7 @@
 #define __local_wcswidth_defined 1
 #include <__crt.h>
 #include <hybrid/typecore.h>
+#include <features.h>
 __NAMESPACE_LOCAL_BEGIN
 #ifndef __local___localdep_wcwidth_defined
 #define __local___localdep_wcwidth_defined 1
@@ -34,10 +35,11 @@ __NAMESPACE_LOCAL_BEGIN
 #define __localdep_wcwidth __LIBC_LOCAL_NAME(wcwidth)
 #endif /* !__CRT_HAVE_wcwidth */
 #endif /* !__local___localdep_wcwidth_defined */
-__LOCAL_LIBC(wcswidth) __ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1)) int
+__LOCAL_LIBC(wcswidth) __ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1)) __STDC_INT32_AS_SSIZE_T
 __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(wcswidth))(__WCHAR_TYPE__ const *__restrict __str, __SIZE_TYPE__ __num_chars) {
-	int __temp, __result = 0;
-	for (; __num_chars; --__num_chars, ++__str) {
+	int __temp;
+	__STDC_INT32_AS_SSIZE_T __result = 0;
+	for (; __num_chars; ++__str, --__num_chars) {
 		__WCHAR_TYPE__ __ch = *__str;
 		if (!__ch)
 			break;
@@ -46,7 +48,7 @@ __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(wcswidth))(__WCHAR_TYPE__ const *__re
 			return __temp;
 		__result += __temp;
 	}
-	return 0;
+	return __result;
 }
 __NAMESPACE_LOCAL_END
 #ifndef __local___localdep_wcswidth_defined
