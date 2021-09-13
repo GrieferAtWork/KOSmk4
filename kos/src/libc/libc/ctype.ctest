@@ -77,8 +77,7 @@ static void testc(int ch) {
 	assertf(ascii_toupper(ch) == unicode_toupper(ch), "%d", ch);
 	/* Unicode feature macros (may) contain optimizations based on the
 	 * sizeof() of the  given character variable.  As such, test  both
-	 * variations,  though  the single-byte  variation  should already
-	 * be identical to what it used in <ctype.h>! */
+	 * variations! */
 	assertf(!!ascii_iscntrl(ch) == !!unicode_iscntrl((char32_t)ch), "%d", ch);
 	assertf(!!ascii_iscntrl(ch) == !!unicode_iscntrl((char)ch), "%d", ch);
 	assertf(!!ascii_isspace(ch) == !!unicode_isspace((char32_t)ch), "%d", ch);

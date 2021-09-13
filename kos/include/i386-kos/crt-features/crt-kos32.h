@@ -1017,6 +1017,8 @@
 #define __CRT_HAVE__itow_s
 #define __CRT_HAVE__ldclass
 #define __CRT_HAVE__ldsign
+#define __CRT_HAVE__lfind
+#define __CRT_HAVE__lfind_s
 #define __CRT_HAVE__loaddll
 #define __CRT_HAVE__localtime64
 #define __CRT_HAVE__lock_file
@@ -1025,6 +1027,8 @@
 #define __CRT_HAVE__longjmp
 #define __CRT_HAVE__lrotl
 #define __CRT_HAVE__lrotr
+#define __CRT_HAVE__lsearch
+#define __CRT_HAVE__lsearch_s
 #define __CRT_HAVE__lseek
 #define __CRT_HAVE__lseeki64
 #define __CRT_HAVE__ltoa
@@ -4533,7 +4537,9 @@
 #define __CRT_HAVE_tcsetpgrp
 #define __CRT_HAVE_tcsetsid
 #define __CRT_HAVE_tdelete
+#define __CRT_HAVE_tdelete_r
 #define __CRT_HAVE_tdestroy
+#define __CRT_HAVE_tdestroy_r
 #define __CRT_HAVE_tee
 #define __CRT_HAVE_tell
 #define __CRT_HAVE_tell64
@@ -4541,6 +4547,7 @@
 #define __CRT_HAVE_tempnam
 #define __CRT_HAVE_textdomain
 #define __CRT_HAVE_tfind
+#define __CRT_HAVE_tfind_r
 #define __CRT_HAVE_tgamma
 #define __CRT_HAVE_tgammaf
 #define __CRT_HAVE_tgammal
@@ -4602,6 +4609,7 @@
 #define __CRT_HAVE_truncf
 #define __CRT_HAVE_truncl
 #define __CRT_HAVE_tsearch
+#define __CRT_HAVE_tsearch_r
 #define __CRT_HAVE_tss_create
 #define __CRT_HAVE_tss_delete
 #define __CRT_HAVE_tss_get
@@ -4610,6 +4618,7 @@
 #define __CRT_HAVE_ttyname_r
 #define __CRT_HAVE_ttyslot
 #define __CRT_HAVE_twalk
+#define __CRT_HAVE_twalk_r
 #define __CRT_HAVE_tzname
 #define __CRT_HAVE_tzset
 #define __CRT_HAVE_ualarm

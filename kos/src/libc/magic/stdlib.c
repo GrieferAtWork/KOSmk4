@@ -263,18 +263,23 @@ typedef void (__LIBCCALL *__atexit_func_t)(void);
 %{
 #ifndef __compar_d_fn_t_defined
 #define __compar_d_fn_t_defined 1
-typedef int (__LIBKCALL *__compar_d_fn_t)(void const *__a, void const *__b, void *__arg);
+typedef int (__LIBCCALL *__compar_d_fn_t)(void const *__a, void const *__b, void *__arg);
 #endif /* !__compar_d_fn_t_defined */
 }
 
 [[section(".text.crt{|.dos}.utility.stdlib")]]
-[[decl_prefix(DEFINE_COMPAR_D_FN_T), throws, wunused, decl_include("<hybrid/typecore.h>")]]
-void *bsearch_r([[nonnull]] void const *pkey, [[nonnull]] void const *pbase, $size_t item_count, $size_t item_size, [[nonnull]] __compar_d_fn_t cmp, void *arg)
-	[([[nonnull]] void const *pkey, [[nonnull]] void *pbase, $size_t item_count, $size_t item_size, [[nonnull]] __compar_d_fn_t cmp, void *arg): void *]
-	[([[nonnull]] void const *pkey, [[nonnull]] void const *pbase, $size_t item_count, $size_t item_size, [[nonnull]] __compar_d_fn_t cmp, void *arg): void const *]
+[[throws, wunused, decl_include("<hybrid/typecore.h>")]]
+[[crt_dos_variant(callback(
+	cook: struct { auto compar = compar; auto arg = arg; },
+	wrap: (void const *a, void const *b, $cook *c): int { return (*c->compar)(a, b, c->arg); },
+	impl: bsearch_r(pkey, pbase, item_count, item_size, (int (LIBCCALL *)(void const *, void const *, void *))&$wrap, &$cook),
+))]]
+void *bsearch_r([[nonnull]] void const *pkey, [[nonnull]] void const *pbase, $size_t item_count, $size_t item_size, [[nonnull]] int (LIBCCALL *compar)(void const *a, void const *b, void *arg), void *arg)
+	[([[nonnull]] void const *pkey, [[nonnull]] void *pbase, $size_t item_count, $size_t item_size, [[nonnull]] int (LIBCCALL *compar)(void const *a, void const *b, void *arg), void *arg): void *]
+	[([[nonnull]] void const *pkey, [[nonnull]] void const *pbase, $size_t item_count, $size_t item_size, [[nonnull]] int (LIBCCALL *compar)(void const *a, void const *b, void *arg), void *arg): void const *]
 {
 	/* Optimize this function with the (allowed) assumption that `pbase' is sorted according to:
-	 * >> qsort_r(pbase, item_count, item_size, cmp, arg); */
+	 * >> qsort_r(pbase, item_count, item_size, compar, arg); */
 	size_t lo, hi;
 	lo = 0;
 	hi = item_count;
@@ -294,7 +299,7 @@ void *bsearch_r([[nonnull]] void const *pkey, [[nonnull]] void const *pbase, $si
 		test_index = (lo + hi) / 2;
 		item_addr  = (byte_t *)pbase + (test_index * item_size);
 		/* Check if the requested item lies above, or below the selected one */
-		difference = (*cmp)(pkey, item_addr, arg);
+		difference = (*compar)(pkey, item_addr, arg);
 		if (difference < 0)
 			/* KEY < ITEM --> Narrow the search-area to everything below */
 			hi = test_index;
@@ -316,13 +321,6 @@ void *bsearch_r([[nonnull]] void const *pkey, [[nonnull]] void const *pbase, $si
 %[insert:std]
 %
 
-%[define(DEFINE_COMPAR_FN_T =
-@@pp_ifndef ____compar_fn_t_defined@@
-#define ____compar_fn_t_defined 1
-typedef int (__LIBCCALL *__compar_fn_t)(void const *__a, void const *__b);
-@@pp_endif@@
-)]
-
 
 
 %[define(DEFINE_INVOKE_COMPARE_HELPER =
@@ -332,44 +330,52 @@ typedef int (__LIBCCALL *__compar_fn_t)(void const *__a, void const *__b);
 #define ____invoke_compare_helper_defined 1
 __LOCAL_LIBC(__invoke_compare_helper) int
 (__LIBCCALL __invoke_compare_helper)(void const *__a, void const *__b, void *__arg) {
-	return (*(__compar_fn_t)__arg)(__a, __b);
+	return (*(int (__LIBCCALL *)(void const *, void const *))__arg)(__a, __b);
 }
 @@pop_namespace@@
 @@pp_endif@@
 @@pp_endif@@
 )]
 
-[[section(".text.crt{|.dos}.utility.stdlib")]]
-[[decl_prefix(DEFINE_COMPAR_FN_T), no_crt_dos_wrapper]] /* The DOS wrapper is implemented manually */
-[[impl_prefix(DEFINE_INVOKE_COMPARE_HELPER), throws, std, kernel, decl_include("<hybrid/typecore.h>")]]
-void qsort([[nonnull]] void *pbase, size_t item_count,
-           size_t item_size, [[nonnull]] __compar_fn_t cmp) {
+[[guard, section(".text.crt{|.dos}.utility.stdlib")]]
+[[impl_prefix(DEFINE_INVOKE_COMPARE_HELPER), decl_include("<hybrid/typecore.h>")]]
+[[throws, std, kernel, crt_dos_variant(callback(
+	cook: auto = compar,
+	wrap: (void const *a, void const *b, $cook c): int { return (*c)(a, b); },
+	impl: qsort_r(pbase, item_count, item_size, (int (LIBCCALL *)(void const *, void const *, void *))&$wrap, (void *)$cook),
+))]]
+void qsort([[nonnull]] void *pbase, size_t item_count, size_t item_size,
+           [[nonnull]] int (LIBCCALL *compar)(void const *a, void const *b)) {
 @@pp_ifdef __LIBCCALL_CALLER_CLEANUP@@
 	qsort_r(pbase, item_count, item_size,
-	        (int(__LIBCCALL *)(void const *, void const *, void *))(void *)cmp,
+	        (int (LIBCCALL *)(void const *, void const *, void *))(void *)compar,
 	        NULL);
 @@pp_else@@
 	qsort_r(pbase, item_count, item_size,
 	        &__NAMESPACE_LOCAL_SYM __invoke_compare_helper,
-	        (void *)cmp);
+	        (void *)compar);
 @@pp_endif@@
 }
 
-[[section(".text.crt{|.dos}.utility.stdlib")]]
-[[decl_prefix(DEFINE_COMPAR_FN_T), no_crt_dos_wrapper]] /* The DOS wrapper is implemented manually */
-[[impl_prefix(DEFINE_INVOKE_COMPARE_HELPER), wunused, std, throws, decl_include("<hybrid/typecore.h>")]]
-void *bsearch([[nonnull]] void const *pkey, [[nonnull]] void const *pbase, size_t item_count, size_t item_size, [[nonnull]] __compar_fn_t cmp)
-	[([[nonnull]] void const *pkey, [[nonnull]] void *pbase, size_t item_count, size_t item_size, [[nonnull]] __compar_fn_t cmp): void *]
-	[([[nonnull]] void const *pkey, [[nonnull]] void const *pbase, size_t item_count, size_t item_size, [[nonnull]] __compar_fn_t cmp): void const *]
+[[wunused, std, throws, guard, section(".text.crt{|.dos}.utility.stdlib")]]
+[[impl_prefix(DEFINE_INVOKE_COMPARE_HELPER), decl_include("<hybrid/typecore.h>")]]
+[[crt_dos_variant(callback(
+	cook: auto = compar,
+	wrap: (void const *a, void const *b, $cook c): int { return (*c)(a, b); },
+	impl: bsearch_r(pkey, pbase, item_count, item_size, (int (LIBCCALL *)(void const *, void const *, void *))&$wrap, (void *)$cook),
+))]]
+void *bsearch([[nonnull]] void const *pkey, [[nonnull]] void const *pbase, size_t item_count, size_t item_size, [[nonnull]] int (LIBCCALL *compar)(void const *a, void const *b))
+	[([[nonnull]] void const *pkey, [[nonnull]] void *pbase, size_t item_count, size_t item_size, [[nonnull]] int (LIBCCALL *compar)(void const *a, void const *b)): void *]
+	[([[nonnull]] void const *pkey, [[nonnull]] void const *pbase, size_t item_count, size_t item_size, [[nonnull]] int (LIBCCALL *compar)(void const *a, void const *b)): void const *]
 {
 @@pp_ifdef __LIBCCALL_CALLER_CLEANUP@@
 	return (void *)bsearch_r(pkey, pbase, item_count, item_size,
-	                         (int(__LIBCCALL *)(void const *, void const *, void *))(void *)cmp,
+	                         (int (LIBCCALL *)(void const *, void const *, void *))(void *)compar,
 	                         NULL);
 @@pp_else@@
 	return (void *)bsearch_r(pkey, pbase, item_count, item_size,
 	                         &__NAMESPACE_LOCAL_SYM __invoke_compare_helper,
-	                         (void *)cmp);
+	                         (void *)compar);
 @@pp_endif@@
 }
 
@@ -2085,7 +2091,7 @@ int initstate_r(unsigned int seed, [[nonnull]] char *__restrict statebuf, $size_
 [[section(".text.crt{|.dos}.random")]]
 int setstate_r([[nonnull]] char *__restrict statebuf, [[nonnull]] struct random_data *__restrict buf);
 
-%typedef void (__LIBKCALL *__on_exit_func_t)(int __status, void *__arg);
+%typedef void (__LIBCCALL *__on_exit_func_t)(int __status, void *__arg);
 [[section(".text.crt{|.dos}.sched.process")]]
 int on_exit([[nonnull]] __on_exit_func_t func, void *arg);
 
@@ -3046,32 +3052,19 @@ char const *getexecname() {
 	return __LOCAL_program_invocation_name;
 }
 
-%{
-#ifndef ____fdwalk_func_t_defined
-#define ____fdwalk_func_t_defined 1
-typedef int (__LIBKCALL *__fdwalk_func_t)(void *__cookie, __fd_t __fd);
-#endif /* !____fdwalk_func_t_defined */
-}
-%[define_replacement(__fdwalk_func_t = __fdwalk_func_t)]
-%[define_type_class(__fdwalk_func_t = "TP")]
-
-%[define(DEFINE_FDWALK_FUNC_T =
-@@pp_ifndef ____fdwalk_func_t_defined@@
-#define ____fdwalk_func_t_defined 1
-typedef int (__LIBKCALL *__fdwalk_func_t)(void *__cookie, __fd_t __fd);
-@@pp_endif@@
-)]
-
-
-@@Enumerate all open file descriptors by invoking `(*func)(cookie, <fd>)' for each of them
-@@If  during any of these invocations, `(*func)(...)' returns non-zero, enumeration stops,
-@@and `fdwalk()' returns with that same value.  If `(*func)(...)' is never called, or  all
+@@Enumerate all open file descriptors by invoking `(*walk)(arg, <fd>)' for each of them
+@@If  during any of these invocations, `(*walk)(...)' returns non-zero, enumeration stops,
+@@and `fdwalk()' returns with that same value.  If `(*walk)(...)' is never called, or  all
 @@invocations return 0, `fdwalk()' will also return 0.
-[[decl_prefix(DEFINE_FDWALK_FUNC_T)]]
 [[requires_include("<asm/os/fcntl.h>")]]
 [[requires($has_function(fcntl) && defined(__F_NEXT))]]
 [[impl_include("<asm/os/fcntl.h>", "<libc/errno.h>")]]
-int fdwalk([[nonnull]] __fdwalk_func_t func, void *cookie) {
+[[throws, crt_dos_variant(callback(
+	cook: struct { auto walk = walk; auto arg = arg; },
+	wrap: ($cook *c, $fd_t fd): int { return (*c->walk)(c->arg, fd); },
+	impl: fdwalk((int (LIBCCALL *)(void *, $fd_t))&$wrap, &$cook),
+))]]
+int fdwalk([[nonnull]] int (LIBCCALL *walk)(void *arg, $fd_t fd), void *arg) {
 	/* TODO: Implementation alternative using `opendir("/proc/self/fd")' */
 	int result = 0;
 @@pp_ifdef __libc_geterrno@@
@@ -3091,7 +3084,7 @@ int fdwalk([[nonnull]] __fdwalk_func_t func, void *cookie) {
 @@pp_endif@@
 			break;
 		}
-		result = (*func)(cookie, fd);
+		result = (*walk)(arg, fd);
 		if (result != 0)
 			break;
 		++fd;
@@ -3296,21 +3289,19 @@ void setprogname(char const *name) {
 }
 
 
-[[guard, throws, decl_prefix(DEFINE_COMPAR_FN_T), decl_include("<hybrid/typecore.h>")]]
-int heapsort([[nonnull]] void *pbase,
-             $size_t item_count, $size_t item_size,
-             [[nonnull]] __compar_fn_t cmp) {
+[[/*TODO:crt_dos_variant,*/ guard, throws, decl_include("<hybrid/typecore.h>")]]
+int heapsort([[nonnull]] void *pbase, $size_t item_count, $size_t item_size,
+             [[nonnull]] int (LIBCCALL *compar)(void const *a, void const *b)) {
 	/* TODO: Actually do heap-sort! */
-	qsort(pbase, item_count, item_size, cmp);
+	qsort(pbase, item_count, item_size, compar);
 	return 0;
 }
 
-[[guard, throws, decl_prefix(DEFINE_COMPAR_FN_T), decl_include("<hybrid/typecore.h>")]]
-int mergesort([[nonnull]] void *pbase,
-              $size_t item_count, $size_t item_size,
-              [[nonnull]] __compar_fn_t cmp) {
+[[/*TODO:crt_dos_variant,*/ guard, throws, decl_include("<hybrid/typecore.h>")]]
+int mergesort([[nonnull]] void *pbase, $size_t item_count, $size_t item_size,
+              [[nonnull]] int (LIBCCALL *compar)(void const *a, void const *b)) {
 	/* TODO: Actually do merge-sort! */
-	qsort(pbase, item_count, item_size, cmp);
+	qsort(pbase, item_count, item_size, compar);
 	return 0;
 }
 
@@ -3375,23 +3366,21 @@ __LONGLONG strtonum([[nonnull]] char const *nptr,
 %{
 #ifndef __compar_d_fn_t_defined
 #define __compar_d_fn_t_defined 1
-typedef int (__LIBKCALL *__compar_d_fn_t)(void const *__a, void const *__b, void *__arg);
+typedef int (__LIBCCALL *__compar_d_fn_t)(void const *__a, void const *__b, void *__arg);
 #endif /* !__compar_d_fn_t_defined */
 }
 
 
-%[define(DEFINE_COMPAR_D_FN_T =
-@@pp_ifndef __compar_d_fn_t_defined@@
-#define __compar_d_fn_t_defined 1
-typedef int (__LIBKCALL *__compar_d_fn_t)(void const *__a, void const *__b, void *__arg);
-@@pp_endif@@
-)]
-
 [[decl_include("<hybrid/typecore.h>")]]
-[[section(".text.crt{|.dos}.utility.stdlib")]]
-[[decl_prefix(DEFINE_COMPAR_D_FN_T), throws, kernel]]
+[[throws, kernel, section(".text.crt{|.dos}.utility.stdlib")]]
+[[throws, crt_dos_variant(callback(
+	cook: struct { auto compar = compar; auto arg = arg; },
+	wrap: (void const *a, void const *b, $cook *c): int { return (*c->compar)(a, b, c->arg); },
+	impl: qsort_r(pbase, item_count, item_size, (int (LIBCCALL *)(void const *, void const *, void *))&$wrap, &$cook),
+))]]
 void qsort_r([[nonnull]] void *pbase, $size_t item_count, $size_t item_size,
-             [[nonnull]] __compar_d_fn_t cmp, void *arg) {
+             [[nonnull]] int (LIBCCALL *compar)(void const *a, void const *b, void *arg),
+             void *arg) {
 	/* A public domain qsort() drop-in implementation. I couldn't find the original
 	 * source referenced (see the comment below), but this code is the first  thing
 	 * that comes up when you search for `libc qsort public domain'.
@@ -3429,7 +3418,7 @@ void qsort_r([[nonnull]] void *pbase, $size_t item_count, $size_t item_size,
 				byte_t tmp, *a, *b;
 				a = (byte_t *)pbase + j;
 				b = a + gap_bytes;
-				if ((*cmp)(a, b, arg) <= 0)
+				if ((*compar)(a, b, arg) <= 0)
 					break;
 				swap_index = item_size;
 				do {
@@ -4143,33 +4132,17 @@ typedef __SIZE_TYPE__ rsize_t;
 %
 %#ifndef _CRT_ALGO_DEFINED
 %#define _CRT_ALGO_DEFINED 1
-%{
-#ifndef __dos_compar_d_fn_t_defined
-#define __dos_compar_d_fn_t_defined 1
-typedef int (__LIBDCALL *__dos_compar_d_fn_t)(void *__arg, void const *__a, void const *__b);
-#endif /* !__dos_compar_d_fn_t_defined */
-}
-
-
-%[define(DEFINE_DOS_COMPAR_D_FN_T =
-@@pp_ifndef __dos_compar_d_fn_t_defined@@
-#define __dos_compar_d_fn_t_defined 1
-typedef int (__LIBDCALL *__dos_compar_d_fn_t)(void *__arg, void const *__a, void const *__b);
-@@pp_endif@@
-)]
-%[define_replacement(__dos_compar_d_fn_t = __dos_compar_d_fn_t)]
-%[define_type_class(__dos_compar_d_fn_t = "TP")]
 
 %[define(DEFINE_INVOKE_COMPARE_HELPER_S =
 @@pp_ifndef ____invoke_compare_helper_s_defined@@
 #define ____invoke_compare_helper_s_defined 1
 @@push_namespace(local)@@
 struct __invoke_compare_helper_s_data {
-	__dos_compar_d_fn_t __fun;
-	void               *__arg;
+	int (__LIBCCALL *__fun)(void *__arg, void const *__a, void const *__b);
+	void            *__arg;
 };
 __LOCAL_LIBC(__invoke_compare_helper_s) int
-(__LIBKCALL __invoke_compare_helper_s)(void const *__a, void const *__b, void *__arg) {
+(__LIBCCALL __invoke_compare_helper_s)(void const *__a, void const *__b, void *__arg) {
 	void *__base_arg = ((struct __invoke_compare_helper_s_data *)__arg)->__arg;
 	return (*((struct __invoke_compare_helper_s_data *)__arg)->__fun)(__base_arg, __a, __b);
 }
@@ -4177,13 +4150,17 @@ __LOCAL_LIBC(__invoke_compare_helper_s) int
 @@pp_endif@@
 )]
 
-[[throws, wunused]]
-[[section(".text.crt.dos.utility")]]
-[[decl_prefix(DEFINE_DOS_COMPAR_D_FN_T)]]
+[[guard, throws, wunused, section(".text.crt.dos.utility")]]
 [[impl_prefix(DEFINE_INVOKE_COMPARE_HELPER_S)]]
+[[crt_dos_variant(callback(
+	cook: struct { auto compar = compar; auto arg = arg; },
+	wrap: (void const *a, void const *b, $cook *c): int { return (*c->compar)(c->arg, a, b); },
+	impl: bsearch_r(key, base, elem_count, elem_size, (int (LIBCCALL *)(void const *, void const *, void *))&$wrap, &$cook),
+))]]
 void *bsearch_s([[nonnull]] void const *key,
                 [[nonnull]] void const *base, $size_t elem_count, $size_t elem_size,
-                [[nonnull]] __dos_compar_d_fn_t compar, void *arg) {
+                [[nonnull]] int (LIBCCALL *compar)(void *arg, void const *a, void const *b),
+                void *arg) {
 	struct __NAMESPACE_LOCAL_SYM __invoke_compare_helper_s_data data;
 	data.__fun = compar;
 	data.__arg = arg;
@@ -4192,12 +4169,16 @@ void *bsearch_s([[nonnull]] void const *key,
 	                         &data);
 }
 
-[[throws]]
-[[section(".text.crt.dos.utility")]]
-[[decl_prefix(DEFINE_DOS_COMPAR_D_FN_T)]]
+[[guard, throws, section(".text.crt.dos.utility")]]
 [[impl_prefix(DEFINE_INVOKE_COMPARE_HELPER_S)]]
+[[crt_dos_variant(callback(
+	cook: struct { auto compar = compar; auto arg = arg; },
+	wrap: (void const *a, void const *b, $cook *c): int { return (*c->compar)(c->arg, a, b); },
+	impl: qsort_r(base, elem_count, elem_size, (int (LIBCCALL *)(void const *, void const *, void *))&$wrap, &$cook),
+))]]
 void qsort_s([[nonnull]] void *base, $size_t elem_count, $size_t elem_size,
-             [[nonnull]] __dos_compar_d_fn_t compar, void *arg) {
+             [[nonnull]] int (LIBCCALL *compar)(void *arg, void const *a, void const *b),
+             void *arg) {
 	struct __NAMESPACE_LOCAL_SYM __invoke_compare_helper_s_data data;
 	data.__fun = compar;
 	data.__arg = arg;

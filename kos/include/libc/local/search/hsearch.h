@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x68daaa9 */
+/* HASH CRC-32:0xa05d9c5f */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -22,6 +22,13 @@
 #define __local_hsearch_defined 1
 #include <__crt.h>
 struct entry;
+#ifndef __ACTION_defined
+#define __ACTION_defined
+typedef enum {
+	FIND  = 0,
+	ENTER = 1
+} ACTION;
+#endif /* !__ACTION_defined */
 __NAMESPACE_LOCAL_BEGIN
 #ifndef __local___localdep_hsearch_r_defined
 #define __local___localdep_hsearch_r_defined 1
@@ -29,7 +36,7 @@ __NAMESPACE_LOCAL_BEGIN
 __NAMESPACE_LOCAL_END
 struct hsearch_data;
 __NAMESPACE_LOCAL_BEGIN
-__CREDIRECT(__ATTR_NONNULL((3, 4)),int,__NOTHROW_NCX,__localdep_hsearch_r,(struct entry __item, int __action, struct entry **__retval, struct hsearch_data *__htab),hsearch_r,(__item,__action,__retval,__htab))
+__CREDIRECT(__ATTR_NONNULL((3, 4)),int,__NOTHROW_NCX,__localdep_hsearch_r,(struct entry __item, ACTION __action, struct entry **__retval, struct hsearch_data *__htab),hsearch_r,(__item,__action,__retval,__htab))
 #else /* __CRT_HAVE_hsearch_r */
 __NAMESPACE_LOCAL_END
 #include <libc/local/search/hsearch_r.h>
@@ -55,7 +62,7 @@ __NAMESPACE_LOCAL_END
 #endif /* !__local_htab_defined */
 __NAMESPACE_LOCAL_BEGIN
 __LOCAL_LIBC(hsearch) struct entry *
-__NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(hsearch))(struct entry __item, int __action) {
+__NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(hsearch))(struct entry __item, ACTION __action) {
 	struct entry *__result;
 	(__NAMESPACE_LOCAL_SYM __localdep_hsearch_r)(__item, __action, &__result, &__NAMESPACE_LOCAL_SYM __htab);
 	return __result;

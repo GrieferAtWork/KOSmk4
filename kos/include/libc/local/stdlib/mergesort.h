@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xce99677b */
+/* HASH CRC-32:0xeb687016 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -22,16 +22,12 @@
 #define __local_mergesort_defined 1
 #include <__crt.h>
 #include <kos/anno.h>
-#ifndef ____compar_fn_t_defined
-#define ____compar_fn_t_defined 1
-typedef int (__LIBCCALL *__compar_fn_t)(void const *__a, void const *__b);
-#endif /* !____compar_fn_t_defined */
 #include <hybrid/typecore.h>
 __NAMESPACE_LOCAL_BEGIN
 #ifndef __local___localdep_qsort_defined
 #define __local___localdep_qsort_defined 1
 #ifdef __CRT_HAVE_qsort
-__CREDIRECT_VOID(__ATTR_NONNULL((1, 4)),__THROWING,__localdep_qsort,(void *__pbase, __SIZE_TYPE__ __item_count, __SIZE_TYPE__ __item_size, __compar_fn_t __cmp),qsort,(__pbase,__item_count,__item_size,__cmp))
+__CREDIRECT_VOID(__ATTR_NONNULL((1, 4)),__THROWING,__localdep_qsort,(void *__pbase, __SIZE_TYPE__ __item_count, __SIZE_TYPE__ __item_size, int (__LIBCCALL *__compar)(void const *__a, void const *__b)),qsort,(__pbase,__item_count,__item_size,__compar))
 #else /* __CRT_HAVE_qsort */
 __NAMESPACE_LOCAL_END
 #include <libc/local/stdlib/qsort.h>
@@ -40,9 +36,9 @@ __NAMESPACE_LOCAL_BEGIN
 #endif /* !__CRT_HAVE_qsort */
 #endif /* !__local___localdep_qsort_defined */
 __LOCAL_LIBC(mergesort) __ATTR_NONNULL((1, 4)) int
-(__LIBCCALL __LIBC_LOCAL_NAME(mergesort))(void *__pbase, __SIZE_TYPE__ __item_count, __SIZE_TYPE__ __item_size, __compar_fn_t __cmp) __THROWS(...) {
+(__LIBCCALL __LIBC_LOCAL_NAME(mergesort))(void *__pbase, __SIZE_TYPE__ __item_count, __SIZE_TYPE__ __item_size, int (__LIBCCALL *__compar)(void const *__a, void const *__b)) __THROWS(...) {
 	/* TODO: Actually do merge-sort! */
-	(__NAMESPACE_LOCAL_SYM __localdep_qsort)(__pbase, __item_count, __item_size, __cmp);
+	(__NAMESPACE_LOCAL_SYM __localdep_qsort)(__pbase, __item_count, __item_size, __compar);
 	return 0;
 }
 __NAMESPACE_LOCAL_END

@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xf0860c42 */
+/* HASH CRC-32:0x65b623bd */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -61,8 +61,14 @@ __NAMESPACE_STD_USING(ldiv_t)
 __NAMESPACE_STD_USING(lldiv_t)
 #endif /* !__lldiv_t_defined */
 #endif /* __USE_ISOC99 */
+#if !defined(__qsort_defined) && defined(__std_qsort_defined)
+#define __qsort_defined 1
 __NAMESPACE_STD_USING(qsort)
+#endif /* !__qsort_defined && __std_qsort_defined */
+#if !defined(__bsearch_defined) && defined(__std_bsearch_defined)
+#define __bsearch_defined 1
 __NAMESPACE_STD_USING(bsearch)
+#endif /* !__bsearch_defined && __std_bsearch_defined */
 __NAMESPACE_STD_USING(labs)
 #ifdef __USE_ISOC99
 __NAMESPACE_STD_USING(llabs)
@@ -330,61 +336,82 @@ typedef void (__LIBCCALL *__atexit_func_t)(void);
 #ifdef __USE_KOS
 #ifndef __compar_d_fn_t_defined
 #define __compar_d_fn_t_defined 1
-typedef int (__LIBKCALL *__compar_d_fn_t)(void const *__a, void const *__b, void *__arg);
+typedef int (__LIBCCALL *__compar_d_fn_t)(void const *__a, void const *__b, void *__arg);
 #endif /* !__compar_d_fn_t_defined */
 #ifdef __CRT_HAVE_bsearch_r
 #if defined(__cplusplus) && defined(__CORRECT_ISO_CPP_STDLIB_H_PROTO)
 extern "C++" {
-__CREDIRECT(__ATTR_WUNUSED __ATTR_NONNULL((1, 2, 5)),void *,__THROWING,bsearch_r,(void const *__pkey, void *__pbase, __SIZE_TYPE__ __item_count, __SIZE_TYPE__ __item_size, __compar_d_fn_t __cmp, void *__arg),bsearch_r,(__pkey,__pbase,__item_count,__item_size,__cmp,__arg))
-__CREDIRECT(__ATTR_WUNUSED __ATTR_NONNULL((1, 2, 5)),void const *,__THROWING,bsearch_r,(void const *__pkey, void const *__pbase, __SIZE_TYPE__ __item_count, __SIZE_TYPE__ __item_size, __compar_d_fn_t __cmp, void *__arg),bsearch_r,(__pkey,__pbase,__item_count,__item_size,__cmp,__arg))
+__CREDIRECT(__ATTR_WUNUSED __ATTR_NONNULL((1, 2, 5)),void *,__THROWING,bsearch_r,(void const *__pkey, void *__pbase, __SIZE_TYPE__ __item_count, __SIZE_TYPE__ __item_size, int (__LIBCCALL *__compar)(void const *__a, void const *__b, void *__arg), void *__arg),bsearch_r,(__pkey,__pbase,__item_count,__item_size,__compar,__arg))
+__CREDIRECT(__ATTR_WUNUSED __ATTR_NONNULL((1, 2, 5)),void const *,__THROWING,bsearch_r,(void const *__pkey, void const *__pbase, __SIZE_TYPE__ __item_count, __SIZE_TYPE__ __item_size, int (__LIBCCALL *__compar)(void const *__a, void const *__b, void *__arg), void *__arg),bsearch_r,(__pkey,__pbase,__item_count,__item_size,__compar,__arg))
 } /* extern "C++" */
 #else /* __cplusplus && __CORRECT_ISO_CPP_STDLIB_H_PROTO */
-__CDECLARE(__ATTR_WUNUSED __ATTR_NONNULL((1, 2, 5)),void *,__THROWING,bsearch_r,(void const *__pkey, void const *__pbase, __SIZE_TYPE__ __item_count, __SIZE_TYPE__ __item_size, __compar_d_fn_t __cmp, void *__arg),(__pkey,__pbase,__item_count,__item_size,__cmp,__arg))
+__CDECLARE(__ATTR_WUNUSED __ATTR_NONNULL((1, 2, 5)),void *,__THROWING,bsearch_r,(void const *__pkey, void const *__pbase, __SIZE_TYPE__ __item_count, __SIZE_TYPE__ __item_size, int (__LIBCCALL *__compar)(void const *__a, void const *__b, void *__arg), void *__arg),(__pkey,__pbase,__item_count,__item_size,__compar,__arg))
 #endif /* !__cplusplus || !__CORRECT_ISO_CPP_STDLIB_H_PROTO */
 #else /* __CRT_HAVE_bsearch_r */
 #include <libc/local/stdlib/bsearch_r.h>
 #if defined(__cplusplus) && defined(__CORRECT_ISO_CPP_STDLIB_H_PROTO)
 extern "C++" {
-__FORCELOCAL __ATTR_ARTIFICIAL __ATTR_WUNUSED __ATTR_NONNULL((1, 2, 5)) void *(__LIBCCALL bsearch_r)(void const *__pkey, void *__pbase, __SIZE_TYPE__ __item_count, __SIZE_TYPE__ __item_size, __compar_d_fn_t __cmp, void *__arg) __THROWS(...) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(bsearch_r))(__pkey, __pbase, __item_count, __item_size, __cmp, __arg); }
-__FORCELOCAL __ATTR_ARTIFICIAL __ATTR_WUNUSED __ATTR_NONNULL((1, 2, 5)) void const *(__LIBCCALL bsearch_r)(void const *__pkey, void const *__pbase, __SIZE_TYPE__ __item_count, __SIZE_TYPE__ __item_size, __compar_d_fn_t __cmp, void *__arg) __THROWS(...) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(bsearch_r))(__pkey, __pbase, __item_count, __item_size, __cmp, __arg); }
+__FORCELOCAL __ATTR_ARTIFICIAL __ATTR_WUNUSED __ATTR_NONNULL((1, 2, 5)) void *(__LIBCCALL bsearch_r)(void const *__pkey, void *__pbase, __SIZE_TYPE__ __item_count, __SIZE_TYPE__ __item_size, int (__LIBCCALL *__compar)(void const *__a, void const *__b, void *__arg), void *__arg) __THROWS(...) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(bsearch_r))(__pkey, __pbase, __item_count, __item_size, __compar, __arg); }
+__FORCELOCAL __ATTR_ARTIFICIAL __ATTR_WUNUSED __ATTR_NONNULL((1, 2, 5)) void const *(__LIBCCALL bsearch_r)(void const *__pkey, void const *__pbase, __SIZE_TYPE__ __item_count, __SIZE_TYPE__ __item_size, int (__LIBCCALL *__compar)(void const *__a, void const *__b, void *__arg), void *__arg) __THROWS(...) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(bsearch_r))(__pkey, __pbase, __item_count, __item_size, __compar, __arg); }
 } /* extern "C++" */
 #else /* __cplusplus && __CORRECT_ISO_CPP_STDLIB_H_PROTO */
-__NAMESPACE_LOCAL_USING_OR_IMPL(bsearch_r, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_WUNUSED __ATTR_NONNULL((1, 2, 5)) void *(__LIBCCALL bsearch_r)(void const *__pkey, void const *__pbase, __SIZE_TYPE__ __item_count, __SIZE_TYPE__ __item_size, __compar_d_fn_t __cmp, void *__arg) __THROWS(...) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(bsearch_r))(__pkey, __pbase, __item_count, __item_size, __cmp, __arg); })
+__NAMESPACE_LOCAL_USING_OR_IMPL(bsearch_r, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_WUNUSED __ATTR_NONNULL((1, 2, 5)) void *(__LIBCCALL bsearch_r)(void const *__pkey, void const *__pbase, __SIZE_TYPE__ __item_count, __SIZE_TYPE__ __item_size, int (__LIBCCALL *__compar)(void const *__a, void const *__b, void *__arg), void *__arg) __THROWS(...) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(bsearch_r))(__pkey, __pbase, __item_count, __item_size, __compar, __arg); })
 #endif /* !__cplusplus || !__CORRECT_ISO_CPP_STDLIB_H_PROTO */
 #endif /* !__CRT_HAVE_bsearch_r */
 #endif /* __USE_KOS */
 
 __NAMESPACE_STD_BEGIN
-#ifdef __CRT_HAVE_qsort
-__CDECLARE_VOID(__ATTR_NONNULL((1, 4)),__THROWING,qsort,(void *__pbase, size_t __item_count, size_t __item_size, __compar_fn_t __cmp),(__pbase,__item_count,__item_size,__cmp))
-#else /* __CRT_HAVE_qsort */
+#ifndef __std_qsort_defined
+#define __std_qsort_defined 1
+#ifdef __qsort_defined
+__NAMESPACE_GLB_USING_OR_IMPL(qsort, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_NONNULL((1, 4)) void (__LIBCCALL qsort)(void *__pbase, size_t __item_count, size_t __item_size, int (__LIBCCALL *__compar)(void const *__a, void const *__b)) __THROWS(...) { :: qsort(__pbase, __item_count, __item_size, __compar); })
+#elif defined(__CRT_HAVE_qsort)
+__CDECLARE_VOID(__ATTR_NONNULL((1, 4)),__THROWING,qsort,(void *__pbase, size_t __item_count, size_t __item_size, int (__LIBCCALL *__compar)(void const *__a, void const *__b)),(__pbase,__item_count,__item_size,__compar))
+#else /* ... */
 __NAMESPACE_STD_END
 #include <libc/local/stdlib/qsort.h>
 __NAMESPACE_STD_BEGIN
-__NAMESPACE_LOCAL_USING_OR_IMPL(qsort, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_NONNULL((1, 4)) void (__LIBCCALL qsort)(void *__pbase, size_t __item_count, size_t __item_size, __compar_fn_t __cmp) __THROWS(...) { (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(qsort))(__pbase, __item_count, __item_size, __cmp); })
-#endif /* !__CRT_HAVE_qsort */
-#ifdef __CRT_HAVE_bsearch
+__NAMESPACE_LOCAL_USING_OR_IMPL(qsort, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_NONNULL((1, 4)) void (__LIBCCALL qsort)(void *__pbase, size_t __item_count, size_t __item_size, int (__LIBCCALL *__compar)(void const *__a, void const *__b)) __THROWS(...) { (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(qsort))(__pbase, __item_count, __item_size, __compar); })
+#endif /* !... */
+#endif /* !__std_qsort_defined */
+#ifndef __std_bsearch_defined
+#define __std_bsearch_defined 1
+#ifdef __bsearch_defined
+#if !defined(__COMPILER_HAVE_BUG_BLOATY_CXX_USING) || defined(__NO_NAMESPACE_STD)
+__NAMESPACE_GLB_USING(bsearch)
+#else /* !__COMPILER_HAVE_BUG_BLOATY_CXX_USING || __NO_NAMESPACE_STD */
 #if defined(__cplusplus) && defined(__CORRECT_ISO_CPP_STDLIB_H_PROTO)
 extern "C++" {
-__CREDIRECT(__ATTR_WUNUSED __ATTR_NONNULL((1, 2, 5)),void *,__THROWING,bsearch,(void const *__pkey, void *__pbase, size_t __item_count, size_t __item_size, __compar_fn_t __cmp),bsearch,(__pkey,__pbase,__item_count,__item_size,__cmp))
-__CREDIRECT(__ATTR_WUNUSED __ATTR_NONNULL((1, 2, 5)),void const *,__THROWING,bsearch,(void const *__pkey, void const *__pbase, size_t __item_count, size_t __item_size, __compar_fn_t __cmp),bsearch,(__pkey,__pbase,__item_count,__item_size,__cmp))
+__FORCELOCAL __ATTR_ARTIFICIAL __ATTR_WUNUSED __ATTR_NONNULL((1, 2, 5)) void *(__LIBCCALL bsearch)(void const *__pkey, void *__pbase, size_t __item_count, size_t __item_size, int (__LIBCCALL *__compar)(void const *__a, void const *__b)) __THROWS(...) { return :: bsearch(__pkey, __pbase, __item_count, __item_size, __compar); }
+__FORCELOCAL __ATTR_ARTIFICIAL __ATTR_WUNUSED __ATTR_NONNULL((1, 2, 5)) void const *(__LIBCCALL bsearch)(void const *__pkey, void const *__pbase, size_t __item_count, size_t __item_size, int (__LIBCCALL *__compar)(void const *__a, void const *__b)) __THROWS(...) { return :: bsearch(__pkey, __pbase, __item_count, __item_size, __compar); }
 } /* extern "C++" */
 #else /* __cplusplus && __CORRECT_ISO_CPP_STDLIB_H_PROTO */
-__CDECLARE(__ATTR_WUNUSED __ATTR_NONNULL((1, 2, 5)),void *,__THROWING,bsearch,(void const *__pkey, void const *__pbase, size_t __item_count, size_t __item_size, __compar_fn_t __cmp),(__pkey,__pbase,__item_count,__item_size,__cmp))
+__FORCELOCAL __ATTR_ARTIFICIAL __ATTR_WUNUSED __ATTR_NONNULL((1, 2, 5)) void *(__LIBCCALL bsearch)(void const *__pkey, void const *__pbase, size_t __item_count, size_t __item_size, int (__LIBCCALL *__compar)(void const *__a, void const *__b)) __THROWS(...) { return :: bsearch(__pkey, __pbase, __item_count, __item_size, __compar); }
 #endif /* !__cplusplus || !__CORRECT_ISO_CPP_STDLIB_H_PROTO */
-#else /* __CRT_HAVE_bsearch */
+#endif /* __COMPILER_HAVE_BUG_BLOATY_CXX_USING && !__NO_NAMESPACE_STD */
+#elif defined(__CRT_HAVE_bsearch)
+#if defined(__cplusplus) && defined(__CORRECT_ISO_CPP_STDLIB_H_PROTO)
+extern "C++" {
+__CREDIRECT(__ATTR_WUNUSED __ATTR_NONNULL((1, 2, 5)),void *,__THROWING,bsearch,(void const *__pkey, void *__pbase, size_t __item_count, size_t __item_size, int (__LIBCCALL *__compar)(void const *__a, void const *__b)),bsearch,(__pkey,__pbase,__item_count,__item_size,__compar))
+__CREDIRECT(__ATTR_WUNUSED __ATTR_NONNULL((1, 2, 5)),void const *,__THROWING,bsearch,(void const *__pkey, void const *__pbase, size_t __item_count, size_t __item_size, int (__LIBCCALL *__compar)(void const *__a, void const *__b)),bsearch,(__pkey,__pbase,__item_count,__item_size,__compar))
+} /* extern "C++" */
+#else /* __cplusplus && __CORRECT_ISO_CPP_STDLIB_H_PROTO */
+__CDECLARE(__ATTR_WUNUSED __ATTR_NONNULL((1, 2, 5)),void *,__THROWING,bsearch,(void const *__pkey, void const *__pbase, size_t __item_count, size_t __item_size, int (__LIBCCALL *__compar)(void const *__a, void const *__b)),(__pkey,__pbase,__item_count,__item_size,__compar))
+#endif /* !__cplusplus || !__CORRECT_ISO_CPP_STDLIB_H_PROTO */
+#else /* ... */
 __NAMESPACE_STD_END
 #include <libc/local/stdlib/bsearch.h>
 __NAMESPACE_STD_BEGIN
 #if defined(__cplusplus) && defined(__CORRECT_ISO_CPP_STDLIB_H_PROTO)
 extern "C++" {
-__FORCELOCAL __ATTR_ARTIFICIAL __ATTR_WUNUSED __ATTR_NONNULL((1, 2, 5)) void *(__LIBCCALL bsearch)(void const *__pkey, void *__pbase, size_t __item_count, size_t __item_size, __compar_fn_t __cmp) __THROWS(...) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(bsearch))(__pkey, __pbase, __item_count, __item_size, __cmp); }
-__FORCELOCAL __ATTR_ARTIFICIAL __ATTR_WUNUSED __ATTR_NONNULL((1, 2, 5)) void const *(__LIBCCALL bsearch)(void const *__pkey, void const *__pbase, size_t __item_count, size_t __item_size, __compar_fn_t __cmp) __THROWS(...) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(bsearch))(__pkey, __pbase, __item_count, __item_size, __cmp); }
+__FORCELOCAL __ATTR_ARTIFICIAL __ATTR_WUNUSED __ATTR_NONNULL((1, 2, 5)) void *(__LIBCCALL bsearch)(void const *__pkey, void *__pbase, size_t __item_count, size_t __item_size, int (__LIBCCALL *__compar)(void const *__a, void const *__b)) __THROWS(...) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(bsearch))(__pkey, __pbase, __item_count, __item_size, __compar); }
+__FORCELOCAL __ATTR_ARTIFICIAL __ATTR_WUNUSED __ATTR_NONNULL((1, 2, 5)) void const *(__LIBCCALL bsearch)(void const *__pkey, void const *__pbase, size_t __item_count, size_t __item_size, int (__LIBCCALL *__compar)(void const *__a, void const *__b)) __THROWS(...) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(bsearch))(__pkey, __pbase, __item_count, __item_size, __compar); }
 } /* extern "C++" */
 #else /* __cplusplus && __CORRECT_ISO_CPP_STDLIB_H_PROTO */
-__NAMESPACE_LOCAL_USING_OR_IMPL(bsearch, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_WUNUSED __ATTR_NONNULL((1, 2, 5)) void *(__LIBCCALL bsearch)(void const *__pkey, void const *__pbase, size_t __item_count, size_t __item_size, __compar_fn_t __cmp) __THROWS(...) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(bsearch))(__pkey, __pbase, __item_count, __item_size, __cmp); })
+__NAMESPACE_LOCAL_USING_OR_IMPL(bsearch, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_WUNUSED __ATTR_NONNULL((1, 2, 5)) void *(__LIBCCALL bsearch)(void const *__pkey, void const *__pbase, size_t __item_count, size_t __item_size, int (__LIBCCALL *__compar)(void const *__a, void const *__b)) __THROWS(...) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(bsearch))(__pkey, __pbase, __item_count, __item_size, __compar); })
 #endif /* !__cplusplus || !__CORRECT_ISO_CPP_STDLIB_H_PROTO */
-#endif /* !__CRT_HAVE_bsearch */
+#endif /* !... */
+#endif /* !__std_bsearch_defined */
 #if __has_builtin(__builtin_labs) && defined(__LIBC_BIND_CRTBUILTINS) && defined(__CRT_HAVE_labs)
 __CEIDECLARE(__ATTR_CONST __ATTR_WUNUSED,long,__NOTHROW,labs,(long __x),{ return __builtin_labs(__x); })
 #elif defined(__CRT_HAVE_labs)
@@ -1128,8 +1155,14 @@ __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_MALLOC __ATTR_WUNUSED __ATTR_ALLOC_ALIGN(1
 __NAMESPACE_STD_END
 
 #ifndef __CXX_SYSTEM_HEADER
+#if !defined(__qsort_defined) && defined(__std_qsort_defined)
+#define __qsort_defined 1
 __NAMESPACE_STD_USING(qsort)
+#endif /* !__qsort_defined && __std_qsort_defined */
+#if !defined(__bsearch_defined) && defined(__std_bsearch_defined)
+#define __bsearch_defined 1
 __NAMESPACE_STD_USING(bsearch)
+#endif /* !__bsearch_defined && __std_bsearch_defined */
 __NAMESPACE_STD_USING(labs)
 #endif /* !__CXX_SYSTEM_HEADER */
 #ifdef __USE_ISOC99
@@ -2212,7 +2245,7 @@ __CDECLARE_OPT(__ATTR_NONNULL((1, 2)),int,__NOTHROW_NCX,random_r,(struct random_
 __CDECLARE_OPT(__ATTR_NONNULL((2)),int,__NOTHROW_NCX,srandom_r,(unsigned int __seed, struct random_data *__buf),(__seed,__buf))
 __CDECLARE_OPT(__ATTR_NONNULL((2, 4)),int,__NOTHROW_NCX,initstate_r,(unsigned int __seed, char *__restrict __statebuf, __SIZE_TYPE__ __statelen, struct random_data *__restrict __buf),(__seed,__statebuf,__statelen,__buf))
 __CDECLARE_OPT(__ATTR_NONNULL((1, 2)),int,__NOTHROW_NCX,setstate_r,(char *__restrict __statebuf, struct random_data *__restrict __buf),(__statebuf,__buf))
-typedef void (__LIBKCALL *__on_exit_func_t)(int __status, void *__arg);
+typedef void (__LIBCCALL *__on_exit_func_t)(int __status, void *__arg);
 __CDECLARE_OPT(__ATTR_NONNULL((1)),int,__NOTHROW_NCX,on_exit,(__on_exit_func_t __func, void *__arg),(__func,__arg))
 __CDECLARE_OPT(,int,__NOTHROW_NCX,clearenv,(void),())
 #ifndef __mkstemps_defined
@@ -3251,25 +3284,21 @@ __CDECLARE(__ATTR_CONST __ATTR_WUNUSED,char const *,__NOTHROW_NCX,getexecname,(v
 __NAMESPACE_LOCAL_USING_OR_IMPL(getexecname, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_CONST __ATTR_WUNUSED char const *__NOTHROW_NCX(__LIBCCALL getexecname)(void) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(getexecname))(); })
 #endif /* __LOCAL_program_invocation_name */
 #endif /* !__CRT_HAVE_getexecname */
-#ifndef ____fdwalk_func_t_defined
-#define ____fdwalk_func_t_defined 1
-typedef int (__LIBKCALL *__fdwalk_func_t)(void *__cookie, __fd_t __fd);
-#endif /* !____fdwalk_func_t_defined */
 #ifdef __CRT_HAVE_fdwalk
-/* Enumerate all open file descriptors by invoking `(*func)(cookie, <fd>)' for each of them
- * If  during any of these invocations, `(*func)(...)' returns non-zero, enumeration stops,
- * and `fdwalk()' returns with that same value.  If `(*func)(...)' is never called, or  all
+/* Enumerate all open file descriptors by invoking `(*walk)(arg, <fd>)' for each of them
+ * If  during any of these invocations, `(*walk)(...)' returns non-zero, enumeration stops,
+ * and `fdwalk()' returns with that same value.  If `(*walk)(...)' is never called, or  all
  * invocations return 0, `fdwalk()' will also return 0. */
-__CDECLARE(__ATTR_NONNULL((1)),int,__NOTHROW_NCX,fdwalk,(__fdwalk_func_t __func, void *__cookie),(__func,__cookie))
+__CDECLARE(__ATTR_NONNULL((1)),int,__THROWING,fdwalk,(int (__LIBCCALL *__walk)(void *__arg, __fd_t __fd), void *__arg),(__walk,__arg))
 #else /* __CRT_HAVE_fdwalk */
 #include <asm/os/fcntl.h>
 #if (defined(__CRT_HAVE_fcntl) || defined(__CRT_HAVE___fcntl)) && defined(__F_NEXT)
 #include <libc/local/stdlib/fdwalk.h>
-/* Enumerate all open file descriptors by invoking `(*func)(cookie, <fd>)' for each of them
- * If  during any of these invocations, `(*func)(...)' returns non-zero, enumeration stops,
- * and `fdwalk()' returns with that same value.  If `(*func)(...)' is never called, or  all
+/* Enumerate all open file descriptors by invoking `(*walk)(arg, <fd>)' for each of them
+ * If  during any of these invocations, `(*walk)(...)' returns non-zero, enumeration stops,
+ * and `fdwalk()' returns with that same value.  If `(*walk)(...)' is never called, or  all
  * invocations return 0, `fdwalk()' will also return 0. */
-__NAMESPACE_LOCAL_USING_OR_IMPL(fdwalk, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_NONNULL((1)) int __NOTHROW_NCX(__LIBCCALL fdwalk)(__fdwalk_func_t __func, void *__cookie) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(fdwalk))(__func, __cookie); })
+__NAMESPACE_LOCAL_USING_OR_IMPL(fdwalk, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_NONNULL((1)) int (__LIBCCALL fdwalk)(int (__LIBCCALL *__walk)(void *__arg, __fd_t __fd), void *__arg) __THROWS(...) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(fdwalk))(__walk, __arg); })
 #endif /* (__CRT_HAVE_fcntl || __CRT_HAVE___fcntl) && __F_NEXT */
 #endif /* !__CRT_HAVE_fdwalk */
 #ifdef __CRT_HAVE_getpass
@@ -3416,19 +3445,19 @@ __NAMESPACE_LOCAL_USING_OR_IMPL(setprogname, __FORCELOCAL __ATTR_ARTIFICIAL void
 #ifndef __heapsort_defined
 #define __heapsort_defined 1
 #ifdef __CRT_HAVE_heapsort
-__CDECLARE(__ATTR_NONNULL((1, 4)),int,__THROWING,heapsort,(void *__pbase, __SIZE_TYPE__ __item_count, __SIZE_TYPE__ __item_size, __compar_fn_t __cmp),(__pbase,__item_count,__item_size,__cmp))
+__CDECLARE(__ATTR_NONNULL((1, 4)),int,__THROWING,heapsort,(void *__pbase, __SIZE_TYPE__ __item_count, __SIZE_TYPE__ __item_size, int (__LIBCCALL *__compar)(void const *__a, void const *__b)),(__pbase,__item_count,__item_size,__compar))
 #else /* __CRT_HAVE_heapsort */
 #include <libc/local/stdlib/heapsort.h>
-__NAMESPACE_LOCAL_USING_OR_IMPL(heapsort, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_NONNULL((1, 4)) int (__LIBCCALL heapsort)(void *__pbase, __SIZE_TYPE__ __item_count, __SIZE_TYPE__ __item_size, __compar_fn_t __cmp) __THROWS(...) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(heapsort))(__pbase, __item_count, __item_size, __cmp); })
+__NAMESPACE_LOCAL_USING_OR_IMPL(heapsort, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_NONNULL((1, 4)) int (__LIBCCALL heapsort)(void *__pbase, __SIZE_TYPE__ __item_count, __SIZE_TYPE__ __item_size, int (__LIBCCALL *__compar)(void const *__a, void const *__b)) __THROWS(...) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(heapsort))(__pbase, __item_count, __item_size, __compar); })
 #endif /* !__CRT_HAVE_heapsort */
 #endif /* !__heapsort_defined */
 #ifndef __mergesort_defined
 #define __mergesort_defined 1
 #ifdef __CRT_HAVE_mergesort
-__CDECLARE(__ATTR_NONNULL((1, 4)),int,__THROWING,mergesort,(void *__pbase, __SIZE_TYPE__ __item_count, __SIZE_TYPE__ __item_size, __compar_fn_t __cmp),(__pbase,__item_count,__item_size,__cmp))
+__CDECLARE(__ATTR_NONNULL((1, 4)),int,__THROWING,mergesort,(void *__pbase, __SIZE_TYPE__ __item_count, __SIZE_TYPE__ __item_size, int (__LIBCCALL *__compar)(void const *__a, void const *__b)),(__pbase,__item_count,__item_size,__compar))
 #else /* __CRT_HAVE_mergesort */
 #include <libc/local/stdlib/mergesort.h>
-__NAMESPACE_LOCAL_USING_OR_IMPL(mergesort, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_NONNULL((1, 4)) int (__LIBCCALL mergesort)(void *__pbase, __SIZE_TYPE__ __item_count, __SIZE_TYPE__ __item_size, __compar_fn_t __cmp) __THROWS(...) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(mergesort))(__pbase, __item_count, __item_size, __cmp); })
+__NAMESPACE_LOCAL_USING_OR_IMPL(mergesort, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_NONNULL((1, 4)) int (__LIBCCALL mergesort)(void *__pbase, __SIZE_TYPE__ __item_count, __SIZE_TYPE__ __item_size, int (__LIBCCALL *__compar)(void const *__a, void const *__b)) __THROWS(...) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(mergesort))(__pbase, __item_count, __item_size, __compar); })
 #endif /* !__CRT_HAVE_mergesort */
 #endif /* !__mergesort_defined */
 #if !defined(__radixsort_defined) && defined(__CRT_HAVE_radixsort)
@@ -3478,13 +3507,13 @@ __NAMESPACE_LOCAL_USING_OR_IMPL(strtonum, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_
 #if defined(__USE_GNU) || defined(__USE_BSD)
 #ifndef __compar_d_fn_t_defined
 #define __compar_d_fn_t_defined 1
-typedef int (__LIBKCALL *__compar_d_fn_t)(void const *__a, void const *__b, void *__arg);
+typedef int (__LIBCCALL *__compar_d_fn_t)(void const *__a, void const *__b, void *__arg);
 #endif /* !__compar_d_fn_t_defined */
 #ifdef __CRT_HAVE_qsort_r
-__CDECLARE_VOID(__ATTR_NONNULL((1, 4)),__THROWING,qsort_r,(void *__pbase, __SIZE_TYPE__ __item_count, __SIZE_TYPE__ __item_size, __compar_d_fn_t __cmp, void *__arg),(__pbase,__item_count,__item_size,__cmp,__arg))
+__CDECLARE_VOID(__ATTR_NONNULL((1, 4)),__THROWING,qsort_r,(void *__pbase, __SIZE_TYPE__ __item_count, __SIZE_TYPE__ __item_size, int (__LIBCCALL *__compar)(void const *__a, void const *__b, void *__arg), void *__arg),(__pbase,__item_count,__item_size,__compar,__arg))
 #else /* __CRT_HAVE_qsort_r */
 #include <libc/local/stdlib/qsort_r.h>
-__NAMESPACE_LOCAL_USING_OR_IMPL(qsort_r, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_NONNULL((1, 4)) void (__LIBCCALL qsort_r)(void *__pbase, __SIZE_TYPE__ __item_count, __SIZE_TYPE__ __item_size, __compar_d_fn_t __cmp, void *__arg) __THROWS(...) { (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(qsort_r))(__pbase, __item_count, __item_size, __cmp, __arg); })
+__NAMESPACE_LOCAL_USING_OR_IMPL(qsort_r, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_NONNULL((1, 4)) void (__LIBCCALL qsort_r)(void *__pbase, __SIZE_TYPE__ __item_count, __SIZE_TYPE__ __item_size, int (__LIBCCALL *__compar)(void const *__a, void const *__b, void *__arg), void *__arg) __THROWS(...) { (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(qsort_r))(__pbase, __item_count, __item_size, __compar, __arg); })
 #endif /* !__CRT_HAVE_qsort_r */
 #if defined(__CRT_HAVE_mkostemp64) && defined(__USE_FILE_OFFSET64)
 /* >> mkostemp(3), mkostemp64(3)
@@ -4223,22 +4252,24 @@ typedef __SIZE_TYPE__ rsize_t;
 
 #ifndef _CRT_ALGO_DEFINED
 #define _CRT_ALGO_DEFINED 1
-#ifndef __dos_compar_d_fn_t_defined
-#define __dos_compar_d_fn_t_defined 1
-typedef int (__LIBDCALL *__dos_compar_d_fn_t)(void *__arg, void const *__a, void const *__b);
-#endif /* !__dos_compar_d_fn_t_defined */
+#ifndef __bsearch_s_defined
+#define __bsearch_s_defined 1
 #ifdef __CRT_HAVE_bsearch_s
-__CDECLARE(__ATTR_WUNUSED __ATTR_NONNULL((1, 2, 5)),void *,__THROWING,bsearch_s,(void const *__key, void const *__base, __SIZE_TYPE__ __elem_count, __SIZE_TYPE__ __elem_size, __dos_compar_d_fn_t __compar, void *__arg),(__key,__base,__elem_count,__elem_size,__compar,__arg))
+__CDECLARE(__ATTR_WUNUSED __ATTR_NONNULL((1, 2, 5)),void *,__THROWING,bsearch_s,(void const *__key, void const *__base, __SIZE_TYPE__ __elem_count, __SIZE_TYPE__ __elem_size, int (__LIBCCALL *__compar)(void *__arg, void const *__a, void const *__b), void *__arg),(__key,__base,__elem_count,__elem_size,__compar,__arg))
 #else /* __CRT_HAVE_bsearch_s */
 #include <libc/local/stdlib/bsearch_s.h>
-__NAMESPACE_LOCAL_USING_OR_IMPL(bsearch_s, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_WUNUSED __ATTR_NONNULL((1, 2, 5)) void *(__LIBCCALL bsearch_s)(void const *__key, void const *__base, __SIZE_TYPE__ __elem_count, __SIZE_TYPE__ __elem_size, __dos_compar_d_fn_t __compar, void *__arg) __THROWS(...) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(bsearch_s))(__key, __base, __elem_count, __elem_size, __compar, __arg); })
+__NAMESPACE_LOCAL_USING_OR_IMPL(bsearch_s, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_WUNUSED __ATTR_NONNULL((1, 2, 5)) void *(__LIBCCALL bsearch_s)(void const *__key, void const *__base, __SIZE_TYPE__ __elem_count, __SIZE_TYPE__ __elem_size, int (__LIBCCALL *__compar)(void *__arg, void const *__a, void const *__b), void *__arg) __THROWS(...) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(bsearch_s))(__key, __base, __elem_count, __elem_size, __compar, __arg); })
 #endif /* !__CRT_HAVE_bsearch_s */
+#endif /* !__bsearch_s_defined */
+#ifndef __qsort_s_defined
+#define __qsort_s_defined 1
 #ifdef __CRT_HAVE_qsort_s
-__CDECLARE_VOID(__ATTR_NONNULL((1, 4)),__THROWING,qsort_s,(void *__base, __SIZE_TYPE__ __elem_count, __SIZE_TYPE__ __elem_size, __dos_compar_d_fn_t __compar, void *__arg),(__base,__elem_count,__elem_size,__compar,__arg))
+__CDECLARE_VOID(__ATTR_NONNULL((1, 4)),__THROWING,qsort_s,(void *__base, __SIZE_TYPE__ __elem_count, __SIZE_TYPE__ __elem_size, int (__LIBCCALL *__compar)(void *__arg, void const *__a, void const *__b), void *__arg),(__base,__elem_count,__elem_size,__compar,__arg))
 #else /* __CRT_HAVE_qsort_s */
 #include <libc/local/stdlib/qsort_s.h>
-__NAMESPACE_LOCAL_USING_OR_IMPL(qsort_s, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_NONNULL((1, 4)) void (__LIBCCALL qsort_s)(void *__base, __SIZE_TYPE__ __elem_count, __SIZE_TYPE__ __elem_size, __dos_compar_d_fn_t __compar, void *__arg) __THROWS(...) { (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(qsort_s))(__base, __elem_count, __elem_size, __compar, __arg); })
+__NAMESPACE_LOCAL_USING_OR_IMPL(qsort_s, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_NONNULL((1, 4)) void (__LIBCCALL qsort_s)(void *__base, __SIZE_TYPE__ __elem_count, __SIZE_TYPE__ __elem_size, int (__LIBCCALL *__compar)(void *__arg, void const *__a, void const *__b), void *__arg) __THROWS(...) { (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(qsort_s))(__base, __elem_count, __elem_size, __compar, __arg); })
 #endif /* !__CRT_HAVE_qsort_s */
+#endif /* !__qsort_s_defined */
 #endif  /* _CRT_ALGO_DEFINED */
 
 __CDECLARE_OPT(__ATTR_NONNULL((1, 2, 4)),errno_t,__NOTHROW_NCX,getenv_s,(__SIZE_TYPE__ *__psize, char *__buf, rsize_t __buflen, char const *__varname),(__psize,__buf,__buflen,__varname))

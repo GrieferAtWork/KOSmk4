@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x4d0a9c7c */
+/* HASH CRC-32:0x78a8511d */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -101,46 +101,24 @@ __SYSDECL_BEGIN
 #undef VISIT
 
 /* Action which shall be performed in the call the hsearch. */
-/*[[[enum]]]*/
-#ifdef __CC__
+#ifndef __ACTION_defined
+#define __ACTION_defined
 typedef enum {
 	FIND  = 0,
 	ENTER = 1
 } ACTION;
-#endif /* __CC__ */
-/*[[[AUTO]]]*/
-#ifdef __COMPILER_PREFERR_ENUMS
-#define FIND  FIND
-#define ENTER ENTER
-#else /* __COMPILER_PREFERR_ENUMS */
-#define FIND  0
-#define ENTER 1
-#endif /* !__COMPILER_PREFERR_ENUMS */
-/*[[[end]]]*/
+#endif /* !__ACTION_defined */
 
 /* For tsearch */
-/*[[[enum]]]*/
-#ifdef __CC__
+#ifndef __VISIT_defined
+#define __VISIT_defined
 typedef enum {
 	preorder  = 0,
 	postorder = 1,
 	endorder  = 2,
 	leaf      = 3
 } VISIT;
-#endif /* __CC__ */
-/*[[[AUTO]]]*/
-#ifdef __COMPILER_PREFERR_ENUMS
-#define preorder  preorder
-#define postorder postorder
-#define endorder  endorder
-#define leaf      leaf
-#else /* __COMPILER_PREFERR_ENUMS */
-#define preorder  0
-#define postorder 1
-#define endorder  2
-#define leaf      3
-#endif /* !__COMPILER_PREFERR_ENUMS */
-/*[[[end]]]*/
+#endif /* !__VISIT_defined */
 
 
 #ifdef __CC__
@@ -284,134 +262,361 @@ __NAMESPACE_LOCAL_USING_OR_IMPL(hdestroy_r, __FORCELOCAL __ATTR_ARTIFICIAL void 
  * assumptions about the compiler. It assumes that the  first
  * field in node must be the "key" field, which points to the
  * datum. Everything depends on that. */
-#ifdef __CRT_HAVE_tsearch
-/* >> tsearch(3)
+#ifdef __USE_KOS
+#ifdef __CRT_HAVE_tsearch_r
+/* >> tsearch(3), tsearch_r(3)
  * Search for an  entry matching  the given `key'  in the  tree
  * pointed to by `*rootp' and insert a new element if not found */
-__CDECLARE(__ATTR_NONNULL((3)),void *,__NOTHROW_NCX,tsearch,(void const *__key, void **__vrootp, __compar_fn_t __compar),(__key,__vrootp,__compar))
-#elif defined(__CRT_HAVE___tsearch)
-/* >> tsearch(3)
- * Search for an  entry matching  the given `key'  in the  tree
- * pointed to by `*rootp' and insert a new element if not found */
-__CREDIRECT(__ATTR_NONNULL((3)),void *,__NOTHROW_NCX,tsearch,(void const *__key, void **__vrootp, __compar_fn_t __compar),__tsearch,(__key,__vrootp,__compar))
+__CDECLARE(__ATTR_NONNULL((3)),void *,__THROWING,tsearch_r,(void const *__key, void **__vrootp, int (__LIBCCALL *__compar)(void const *__a, void const *__b, void *__arg), void *__arg),(__key,__vrootp,__compar,__arg))
 #elif defined(__CRT_HAVE_malloc) || defined(__CRT_HAVE_calloc) || defined(__CRT_HAVE_realloc) || defined(__CRT_HAVE_memalign) || defined(__CRT_HAVE_aligned_alloc) || defined(__CRT_HAVE_posix_memalign)
-#include <libc/local/search/tsearch.h>
-/* >> tsearch(3)
+#include <libc/local/search/tsearch_r.h>
+/* >> tsearch(3), tsearch_r(3)
  * Search for an  entry matching  the given `key'  in the  tree
  * pointed to by `*rootp' and insert a new element if not found */
-__NAMESPACE_LOCAL_USING_OR_IMPL(tsearch, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_NONNULL((3)) void *__NOTHROW_NCX(__LIBCCALL tsearch)(void const *__key, void **__vrootp, __compar_fn_t __compar) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(tsearch))(__key, __vrootp, __compar); })
+__NAMESPACE_LOCAL_USING_OR_IMPL(tsearch_r, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_NONNULL((3)) void *(__LIBCCALL tsearch_r)(void const *__key, void **__vrootp, int (__LIBCCALL *__compar)(void const *__a, void const *__b, void *__arg), void *__arg) __THROWS(...) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(tsearch_r))(__key, __vrootp, __compar, __arg); })
+#endif /* ... */
+#ifdef __CRT_HAVE_tfind_r
+/* >> tfind(3), tfind_r(3)
+ * Search for an entry matching the given `key' in the tree pointed
+ * to  by `*rootp'. If no matching entry is available return `NULL' */
+__CDECLARE(__ATTR_NONNULL((3)),void *,__THROWING,tfind_r,(void const *__key, void *const *__vrootp, int (__LIBCCALL *__compar)(void const *__a, void const *__b, void *__arg), void *__arg),(__key,__vrootp,__compar,__arg))
+#else /* __CRT_HAVE_tfind_r */
+#include <libc/local/search/tfind_r.h>
+/* >> tfind(3), tfind_r(3)
+ * Search for an entry matching the given `key' in the tree pointed
+ * to  by `*rootp'. If no matching entry is available return `NULL' */
+__NAMESPACE_LOCAL_USING_OR_IMPL(tfind_r, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_NONNULL((3)) void *(__LIBCCALL tfind_r)(void const *__key, void *const *__vrootp, int (__LIBCCALL *__compar)(void const *__a, void const *__b, void *__arg), void *__arg) __THROWS(...) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(tfind_r))(__key, __vrootp, __compar, __arg); })
+#endif /* !__CRT_HAVE_tfind_r */
+#ifdef __CRT_HAVE_tdelete_r
+/* >> tdelete(3), tdelete_r(3)
+ * Remove the element matching `key' from the tree pointed to by `*rootp' */
+__CDECLARE(__ATTR_NONNULL((3)),void *,__THROWING,tdelete_r,(void const *__restrict __key, void **__restrict __vrootp, int (__LIBCCALL *__compar)(void const *__a, void const *__b, void *__arg), void *__arg),(__key,__vrootp,__compar,__arg))
+#else /* __CRT_HAVE_tdelete_r */
+#include <libc/local/search/tdelete_r.h>
+/* >> tdelete(3), tdelete_r(3)
+ * Remove the element matching `key' from the tree pointed to by `*rootp' */
+__NAMESPACE_LOCAL_USING_OR_IMPL(tdelete_r, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_NONNULL((3)) void *(__LIBCCALL tdelete_r)(void const *__restrict __key, void **__restrict __vrootp, int (__LIBCCALL *__compar)(void const *__a, void const *__b, void *__arg), void *__arg) __THROWS(...) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(tdelete_r))(__key, __vrootp, __compar, __arg); })
+#endif /* !__CRT_HAVE_tdelete_r */
+#ifdef __CRT_HAVE_twalk_r
+/* >> twalk(3), twalk_r(3)
+ * Walk through the whole tree and call the `action' callback for every node or leaf */
+__CDECLARE_VOID(,__THROWING,twalk_r,(void const *__root, void (__LIBCCALL *__action)(void const *__nodep, VISIT __value, int __level, void *__arg), void *__arg),(__root,__action,__arg))
+#else /* __CRT_HAVE_twalk_r */
+#include <libc/local/search/twalk_r.h>
+/* >> twalk(3), twalk_r(3)
+ * Walk through the whole tree and call the `action' callback for every node or leaf */
+__NAMESPACE_LOCAL_USING_OR_IMPL(twalk_r, __FORCELOCAL __ATTR_ARTIFICIAL void (__LIBCCALL twalk_r)(void const *__root, void (__LIBCCALL *__action)(void const *__nodep, VISIT __value, int __level, void *__arg), void *__arg) __THROWS(...) { (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(twalk_r))(__root, __action, __arg); })
+#endif /* !__CRT_HAVE_twalk_r */
+#ifdef __CRT_HAVE_tdestroy_r
+/* >> tdestroy(3), tdestroy_r(3)
+ * Destroy the whole tree, call `freefct' for each node or leaf */
+__CDECLARE_VOID(__ATTR_NONNULL((2)),__THROWING,tdestroy_r,(void *__root, void (__LIBCCALL *__freefct)(void *__nodep, void *__arg), void *__arg),(__root,__freefct,__arg))
+#else /* __CRT_HAVE_tdestroy_r */
+#include <libc/local/search/tdestroy_r.h>
+/* >> tdestroy(3), tdestroy_r(3)
+ * Destroy the whole tree, call `freefct' for each node or leaf */
+__NAMESPACE_LOCAL_USING_OR_IMPL(tdestroy_r, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_NONNULL((2)) void (__LIBCCALL tdestroy_r)(void *__root, void (__LIBCCALL *__freefct)(void *__nodep, void *__arg), void *__arg) __THROWS(...) { (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(tdestroy_r))(__root, __freefct, __arg); })
+#endif /* !__CRT_HAVE_tdestroy_r */
+#endif /* __USE_KOS */
+#ifdef __CRT_HAVE_tsearch
+/* >> tsearch(3), tsearch_r(3)
+ * Search for an  entry matching  the given `key'  in the  tree
+ * pointed to by `*rootp' and insert a new element if not found */
+__CDECLARE(__ATTR_NONNULL((3)),void *,__THROWING,tsearch,(void const *__key, void **__vrootp, int (__LIBCCALL *__compar)(void const *__a, void const *__b)),(__key,__vrootp,__compar))
+#elif defined(__CRT_HAVE___tsearch)
+/* >> tsearch(3), tsearch_r(3)
+ * Search for an  entry matching  the given `key'  in the  tree
+ * pointed to by `*rootp' and insert a new element if not found */
+__CREDIRECT(__ATTR_NONNULL((3)),void *,__THROWING,tsearch,(void const *__key, void **__vrootp, int (__LIBCCALL *__compar)(void const *__a, void const *__b)),__tsearch,(__key,__vrootp,__compar))
+#elif defined(__CRT_HAVE_tsearch_r) || defined(__CRT_HAVE_malloc) || defined(__CRT_HAVE_calloc) || defined(__CRT_HAVE_realloc) || defined(__CRT_HAVE_memalign) || defined(__CRT_HAVE_aligned_alloc) || defined(__CRT_HAVE_posix_memalign)
+#include <libc/local/search/tsearch.h>
+/* >> tsearch(3), tsearch_r(3)
+ * Search for an  entry matching  the given `key'  in the  tree
+ * pointed to by `*rootp' and insert a new element if not found */
+__NAMESPACE_LOCAL_USING_OR_IMPL(tsearch, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_NONNULL((3)) void *(__LIBCCALL tsearch)(void const *__key, void **__vrootp, int (__LIBCCALL *__compar)(void const *__a, void const *__b)) __THROWS(...) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(tsearch))(__key, __vrootp, __compar); })
 #endif /* ... */
 #ifdef __CRT_HAVE_tfind
-/* >> tfind(3)
+/* >> tfind(3), tfind_r(3)
  * Search for an entry matching the given `key' in the tree pointed
  * to  by `*rootp'. If no matching entry is available return `NULL' */
-__CDECLARE(__ATTR_NONNULL((3)),void *,__NOTHROW_NCX,tfind,(void const *__key, void *const *__vrootp, __compar_fn_t __compar),(__key,__vrootp,__compar))
+__CDECLARE(__ATTR_NONNULL((3)),void *,__THROWING,tfind,(void const *__key, void *const *__vrootp, int (__LIBCCALL *__compar)(void const *__a, void const *__b)),(__key,__vrootp,__compar))
 #elif defined(__CRT_HAVE___tfind)
-/* >> tfind(3)
+/* >> tfind(3), tfind_r(3)
  * Search for an entry matching the given `key' in the tree pointed
  * to  by `*rootp'. If no matching entry is available return `NULL' */
-__CREDIRECT(__ATTR_NONNULL((3)),void *,__NOTHROW_NCX,tfind,(void const *__key, void *const *__vrootp, __compar_fn_t __compar),__tfind,(__key,__vrootp,__compar))
+__CREDIRECT(__ATTR_NONNULL((3)),void *,__THROWING,tfind,(void const *__key, void *const *__vrootp, int (__LIBCCALL *__compar)(void const *__a, void const *__b)),__tfind,(__key,__vrootp,__compar))
 #else /* ... */
 #include <libc/local/search/tfind.h>
-/* >> tfind(3)
+/* >> tfind(3), tfind_r(3)
  * Search for an entry matching the given `key' in the tree pointed
  * to  by `*rootp'. If no matching entry is available return `NULL' */
-__NAMESPACE_LOCAL_USING_OR_IMPL(tfind, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_NONNULL((3)) void *__NOTHROW_NCX(__LIBCCALL tfind)(void const *__key, void *const *__vrootp, __compar_fn_t __compar) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(tfind))(__key, __vrootp, __compar); })
+__NAMESPACE_LOCAL_USING_OR_IMPL(tfind, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_NONNULL((3)) void *(__LIBCCALL tfind)(void const *__key, void *const *__vrootp, int (__LIBCCALL *__compar)(void const *__a, void const *__b)) __THROWS(...) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(tfind))(__key, __vrootp, __compar); })
 #endif /* !... */
 #ifdef __CRT_HAVE_tdelete
-/* >> tdelete(3)
+/* >> tdelete(3), tdelete_r(3)
  * Remove the element matching `key' from the tree pointed to by `*rootp' */
-__CDECLARE(__ATTR_NONNULL((3)),void *,__NOTHROW_NCX,tdelete,(void const *__restrict __key, void **__restrict __vrootp, __compar_fn_t __compar),(__key,__vrootp,__compar))
+__CDECLARE(__ATTR_NONNULL((3)),void *,__THROWING,tdelete,(void const *__restrict __key, void **__restrict __vrootp, int (__LIBCCALL *__compar)(void const *__a, void const *__b)),(__key,__vrootp,__compar))
 #elif defined(__CRT_HAVE___tdelete)
-/* >> tdelete(3)
+/* >> tdelete(3), tdelete_r(3)
  * Remove the element matching `key' from the tree pointed to by `*rootp' */
-__CREDIRECT(__ATTR_NONNULL((3)),void *,__NOTHROW_NCX,tdelete,(void const *__restrict __key, void **__restrict __vrootp, __compar_fn_t __compar),__tdelete,(__key,__vrootp,__compar))
+__CREDIRECT(__ATTR_NONNULL((3)),void *,__THROWING,tdelete,(void const *__restrict __key, void **__restrict __vrootp, int (__LIBCCALL *__compar)(void const *__a, void const *__b)),__tdelete,(__key,__vrootp,__compar))
 #else /* ... */
 #include <libc/local/search/tdelete.h>
-/* >> tdelete(3)
+/* >> tdelete(3), tdelete_r(3)
  * Remove the element matching `key' from the tree pointed to by `*rootp' */
-__NAMESPACE_LOCAL_USING_OR_IMPL(tdelete, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_NONNULL((3)) void *__NOTHROW_NCX(__LIBCCALL tdelete)(void const *__restrict __key, void **__restrict __vrootp, __compar_fn_t __compar) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(tdelete))(__key, __vrootp, __compar); })
+__NAMESPACE_LOCAL_USING_OR_IMPL(tdelete, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_NONNULL((3)) void *(__LIBCCALL tdelete)(void const *__restrict __key, void **__restrict __vrootp, int (__LIBCCALL *__compar)(void const *__a, void const *__b)) __THROWS(...) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(tdelete))(__key, __vrootp, __compar); })
 #endif /* !... */
 #ifndef __ACTION_FN_T
 #define __ACTION_FN_T 1
-typedef void (__LIBKCALL *__action_fn_t)(void const *nodep, VISIT value, int level);
+typedef void (__LIBCCALL *__action_fn_t)(void const *nodep, VISIT value, int level);
 #endif /* !__ACTION_FN_T */
 #ifdef __CRT_HAVE_twalk
-/* >> twalk(3)
+/* >> twalk(3), twalk_r(3)
  * Walk through the whole tree and call the `action' callback for every node or leaf */
-__CDECLARE_VOID(,__NOTHROW_NCX,twalk,(void const *__root, __action_fn_t __action),(__root,__action))
+__CDECLARE_VOID(,__THROWING,twalk,(void const *__root, void (__LIBCCALL *__action)(void const *__nodep, VISIT __value, int __level)),(__root,__action))
 #elif defined(__CRT_HAVE___twalk)
-/* >> twalk(3)
+/* >> twalk(3), twalk_r(3)
  * Walk through the whole tree and call the `action' callback for every node or leaf */
-__CREDIRECT_VOID(,__NOTHROW_NCX,twalk,(void const *__root, __action_fn_t __action),__twalk,(__root,__action))
+__CREDIRECT_VOID(,__THROWING,twalk,(void const *__root, void (__LIBCCALL *__action)(void const *__nodep, VISIT __value, int __level)),__twalk,(__root,__action))
 #else /* ... */
 #include <libc/local/search/twalk.h>
-/* >> twalk(3)
+/* >> twalk(3), twalk_r(3)
  * Walk through the whole tree and call the `action' callback for every node or leaf */
-__NAMESPACE_LOCAL_USING_OR_IMPL(twalk, __FORCELOCAL __ATTR_ARTIFICIAL void __NOTHROW_NCX(__LIBCCALL twalk)(void const *__root, __action_fn_t __action) { (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(twalk))(__root, __action); })
+__NAMESPACE_LOCAL_USING_OR_IMPL(twalk, __FORCELOCAL __ATTR_ARTIFICIAL void (__LIBCCALL twalk)(void const *__root, void (__LIBCCALL *__action)(void const *__nodep, VISIT __value, int __level)) __THROWS(...) { (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(twalk))(__root, __action); })
 #endif /* !... */
 #ifdef __USE_GNU
 /* Callback type for function to free a tree node.
  * If the keys are atomic data this function should do nothing. */
 #ifndef ____free_fn_t_defined
 #define ____free_fn_t_defined 1
-typedef void (__LIBKCALL *__free_fn_t)(void *__nodep);
+typedef void (__LIBCCALL *__free_fn_t)(void *__nodep);
 #endif /* !____free_fn_t_defined */
 #ifdef __CRT_HAVE_tdestroy
-/* >> tdestroy(3)
+/* >> tdestroy(3), tdestroy_r(3)
  * Destroy the whole tree, call `freefct' for each node or leaf */
-__CDECLARE_VOID(__ATTR_NONNULL((2)),__NOTHROW_NCX,tdestroy,(void *__root, __free_fn_t __freefct),(__root,__freefct))
+__CDECLARE_VOID(__ATTR_NONNULL((2)),__THROWING,tdestroy,(void *__root, void (__LIBCCALL *__freefct)(void *__nodep)),(__root,__freefct))
 #else /* __CRT_HAVE_tdestroy */
 #include <libc/local/search/tdestroy.h>
-/* >> tdestroy(3)
+/* >> tdestroy(3), tdestroy_r(3)
  * Destroy the whole tree, call `freefct' for each node or leaf */
-__NAMESPACE_LOCAL_USING_OR_IMPL(tdestroy, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_NONNULL((2)) void __NOTHROW_NCX(__LIBCCALL tdestroy)(void *__root, __free_fn_t __freefct) { (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(tdestroy))(__root, __freefct); })
+__NAMESPACE_LOCAL_USING_OR_IMPL(tdestroy, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_NONNULL((2)) void (__LIBCCALL tdestroy)(void *__root, void (__LIBCCALL *__freefct)(void *__nodep)) __THROWS(...) { (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(tdestroy))(__root, __freefct); })
 #endif /* !__CRT_HAVE_tdestroy */
 #endif /* __USE_GNU */
 #ifdef __CRT_HAVE_lfind
 #if defined(__cplusplus) && defined(__CORRECT_ISO_CPP_SEARCH_H_PROTO)
 extern "C++" {
 /* >> lfind(3)
- * Perform linear search for `key' by comparing by `compar' in an array [base, base+nmemb*size) */
-__CREDIRECT(__ATTR_NONNULL((2, 3, 5)),void *,__NOTHROW_NCX,lfind,(void const *__key, void *__base, size_t __KOS_FIXED_CONST *__nmemb, size_t __size, __compar_fn_t __compar),lfind,(__key,__base,__nmemb,__size,__compar))
+ * Perform linear search for `key' by comparing by `compar' in an array [pbase, pbase+pitem_count*item_size) */
+__CREDIRECT(__ATTR_WUNUSED __ATTR_NONNULL((2, 3, 5)),void *,__THROWING,lfind,(void const *__key, void *__pbase, size_t __KOS_FIXED_CONST *__pitem_count, size_t __item_size, __compar_fn_t __compar),lfind,(__key,__pbase,__pitem_count,__item_size,__compar))
 /* >> lfind(3)
- * Perform linear search for `key' by comparing by `compar' in an array [base, base+nmemb*size) */
-__CREDIRECT(__ATTR_NONNULL((2, 3, 5)),void const *,__NOTHROW_NCX,lfind,(void const *__key, void const *__base, size_t __KOS_FIXED_CONST *__nmemb, size_t __size, __compar_fn_t __compar),lfind,(__key,__base,__nmemb,__size,__compar))
+ * Perform linear search for `key' by comparing by `compar' in an array [pbase, pbase+pitem_count*item_size) */
+__CREDIRECT(__ATTR_WUNUSED __ATTR_NONNULL((2, 3, 5)),void const *,__THROWING,lfind,(void const *__key, void const *__pbase, size_t __KOS_FIXED_CONST *__pitem_count, size_t __item_size, __compar_fn_t __compar),lfind,(__key,__pbase,__pitem_count,__item_size,__compar))
 } /* extern "C++" */
 #else /* __cplusplus && __CORRECT_ISO_CPP_SEARCH_H_PROTO */
 /* >> lfind(3)
- * Perform linear search for `key' by comparing by `compar' in an array [base, base+nmemb*size) */
-__CDECLARE(__ATTR_NONNULL((2, 3, 5)),void *,__NOTHROW_NCX,lfind,(void const *__key, void const *__base, size_t __KOS_FIXED_CONST *__nmemb, size_t __size, __compar_fn_t __compar),(__key,__base,__nmemb,__size,__compar))
+ * Perform linear search for `key' by comparing by `compar' in an array [pbase, pbase+pitem_count*item_size) */
+__CDECLARE(__ATTR_WUNUSED __ATTR_NONNULL((2, 3, 5)),void *,__THROWING,lfind,(void const *__key, void const *__pbase, size_t __KOS_FIXED_CONST *__pitem_count, size_t __item_size, __compar_fn_t __compar),(__key,__pbase,__pitem_count,__item_size,__compar))
 #endif /* !__cplusplus || !__CORRECT_ISO_CPP_SEARCH_H_PROTO */
-#else /* __CRT_HAVE_lfind */
+#elif defined(__CRT_HAVE__lfind)
+#if defined(__cplusplus) && defined(__CORRECT_ISO_CPP_SEARCH_H_PROTO)
+extern "C++" {
+/* >> lfind(3)
+ * Perform linear search for `key' by comparing by `compar' in an array [pbase, pbase+pitem_count*item_size) */
+__CREDIRECT(__ATTR_WUNUSED __ATTR_NONNULL((2, 3, 5)),void *,__THROWING,lfind,(void const *__key, void *__pbase, size_t __KOS_FIXED_CONST *__pitem_count, size_t __item_size, __compar_fn_t __compar),_lfind,(__key,__pbase,__pitem_count,__item_size,__compar))
+/* >> lfind(3)
+ * Perform linear search for `key' by comparing by `compar' in an array [pbase, pbase+pitem_count*item_size) */
+__CREDIRECT(__ATTR_WUNUSED __ATTR_NONNULL((2, 3, 5)),void const *,__THROWING,lfind,(void const *__key, void const *__pbase, size_t __KOS_FIXED_CONST *__pitem_count, size_t __item_size, __compar_fn_t __compar),_lfind,(__key,__pbase,__pitem_count,__item_size,__compar))
+} /* extern "C++" */
+#else /* __cplusplus && __CORRECT_ISO_CPP_SEARCH_H_PROTO */
+/* >> lfind(3)
+ * Perform linear search for `key' by comparing by `compar' in an array [pbase, pbase+pitem_count*item_size) */
+__CREDIRECT(__ATTR_WUNUSED __ATTR_NONNULL((2, 3, 5)),void *,__THROWING,lfind,(void const *__key, void const *__pbase, size_t __KOS_FIXED_CONST *__pitem_count, size_t __item_size, __compar_fn_t __compar),_lfind,(__key,__pbase,__pitem_count,__item_size,__compar))
+#endif /* !__cplusplus || !__CORRECT_ISO_CPP_SEARCH_H_PROTO */
+#else /* ... */
 #include <libc/local/search/lfind.h>
 #if defined(__cplusplus) && defined(__CORRECT_ISO_CPP_SEARCH_H_PROTO)
 extern "C++" {
 /* >> lfind(3)
- * Perform linear search for `key' by comparing by `compar' in an array [base, base+nmemb*size) */
-__FORCELOCAL __ATTR_ARTIFICIAL __ATTR_NONNULL((2, 3, 5)) void *__NOTHROW_NCX(__LIBCCALL lfind)(void const *__key, void *__base, size_t __KOS_FIXED_CONST *__nmemb, size_t __size, __compar_fn_t __compar) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(lfind))(__key, __base, __nmemb, __size, __compar); }
+ * Perform linear search for `key' by comparing by `compar' in an array [pbase, pbase+pitem_count*item_size) */
+__FORCELOCAL __ATTR_ARTIFICIAL __ATTR_WUNUSED __ATTR_NONNULL((2, 3, 5)) void *(__LIBCCALL lfind)(void const *__key, void *__pbase, size_t __KOS_FIXED_CONST *__pitem_count, size_t __item_size, __compar_fn_t __compar) __THROWS(...) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(lfind))(__key, __pbase, __pitem_count, __item_size, __compar); }
 /* >> lfind(3)
- * Perform linear search for `key' by comparing by `compar' in an array [base, base+nmemb*size) */
-__FORCELOCAL __ATTR_ARTIFICIAL __ATTR_NONNULL((2, 3, 5)) void const *__NOTHROW_NCX(__LIBCCALL lfind)(void const *__key, void const *__base, size_t __KOS_FIXED_CONST *__nmemb, size_t __size, __compar_fn_t __compar) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(lfind))(__key, __base, __nmemb, __size, __compar); }
+ * Perform linear search for `key' by comparing by `compar' in an array [pbase, pbase+pitem_count*item_size) */
+__FORCELOCAL __ATTR_ARTIFICIAL __ATTR_WUNUSED __ATTR_NONNULL((2, 3, 5)) void const *(__LIBCCALL lfind)(void const *__key, void const *__pbase, size_t __KOS_FIXED_CONST *__pitem_count, size_t __item_size, __compar_fn_t __compar) __THROWS(...) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(lfind))(__key, __pbase, __pitem_count, __item_size, __compar); }
 } /* extern "C++" */
 #else /* __cplusplus && __CORRECT_ISO_CPP_SEARCH_H_PROTO */
 /* >> lfind(3)
- * Perform linear search for `key' by comparing by `compar' in an array [base, base+nmemb*size) */
-__NAMESPACE_LOCAL_USING_OR_IMPL(lfind, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_NONNULL((2, 3, 5)) void *__NOTHROW_NCX(__LIBCCALL lfind)(void const *__key, void const *__base, size_t __KOS_FIXED_CONST *__nmemb, size_t __size, __compar_fn_t __compar) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(lfind))(__key, __base, __nmemb, __size, __compar); })
+ * Perform linear search for `key' by comparing by `compar' in an array [pbase, pbase+pitem_count*item_size) */
+__NAMESPACE_LOCAL_USING_OR_IMPL(lfind, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_WUNUSED __ATTR_NONNULL((2, 3, 5)) void *(__LIBCCALL lfind)(void const *__key, void const *__pbase, size_t __KOS_FIXED_CONST *__pitem_count, size_t __item_size, __compar_fn_t __compar) __THROWS(...) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(lfind))(__key, __pbase, __pitem_count, __item_size, __compar); })
 #endif /* !__cplusplus || !__CORRECT_ISO_CPP_SEARCH_H_PROTO */
-#endif /* !__CRT_HAVE_lfind */
+#endif /* !... */
 #ifdef __CRT_HAVE_lsearch
 /* >> lsearch(3)
  * Perform linear search for `key' by comparing by `compar' function
- * in array [base,  base+nmemb*size) and insert  entry if not  found */
-__CDECLARE(__ATTR_NONNULL((2, 3, 5)),void *,__NOTHROW_NCX,lsearch,(void const *__key, void *__base, size_t *__nmemb, size_t __size, __compar_fn_t __compar),(__key,__base,__nmemb,__size,__compar))
-#else /* __CRT_HAVE_lsearch */
+ * in array [pbase,  pbase+pitem_count*item_size) and insert  entry if not  found */
+__CDECLARE(__ATTR_NONNULL((2, 3, 5)),void *,__THROWING,lsearch,(void const *__key, void *__pbase, size_t *__pitem_count, size_t __item_size, int (__LIBCCALL *__compar)(void const *__a, void const *__b)),(__key,__pbase,__pitem_count,__item_size,__compar))
+#elif defined(__CRT_HAVE__lsearch)
+/* >> lsearch(3)
+ * Perform linear search for `key' by comparing by `compar' function
+ * in array [pbase,  pbase+pitem_count*item_size) and insert  entry if not  found */
+__CREDIRECT(__ATTR_NONNULL((2, 3, 5)),void *,__THROWING,lsearch,(void const *__key, void *__pbase, size_t *__pitem_count, size_t __item_size, int (__LIBCCALL *__compar)(void const *__a, void const *__b)),_lsearch,(__key,__pbase,__pitem_count,__item_size,__compar))
+#else /* ... */
 #include <libc/local/search/lsearch.h>
 /* >> lsearch(3)
  * Perform linear search for `key' by comparing by `compar' function
- * in array [base,  base+nmemb*size) and insert  entry if not  found */
-__NAMESPACE_LOCAL_USING_OR_IMPL(lsearch, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_NONNULL((2, 3, 5)) void *__NOTHROW_NCX(__LIBCCALL lsearch)(void const *__key, void *__base, size_t *__nmemb, size_t __size, __compar_fn_t __compar) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(lsearch))(__key, __base, __nmemb, __size, __compar); })
-#endif /* !__CRT_HAVE_lsearch */
+ * in array [pbase,  pbase+pitem_count*item_size) and insert  entry if not  found */
+__NAMESPACE_LOCAL_USING_OR_IMPL(lsearch, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_NONNULL((2, 3, 5)) void *(__LIBCCALL lsearch)(void const *__key, void *__pbase, size_t *__pitem_count, size_t __item_size, int (__LIBCCALL *__compar)(void const *__a, void const *__b)) __THROWS(...) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(lsearch))(__key, __pbase, __pitem_count, __item_size, __compar); })
+#endif /* !... */
+
+#ifdef __USE_DOS
+typedef int (__LIBCCALL *_CoreCrtSecureSearchSortCompareFunction)(void *__arg, void const *__a, void const *__b);
+typedef __compar_fn_t _CoreCrtMgdNonSecureSearchSortCompareFunction;
+#ifdef __CRT_HAVE_lfind
+#if defined(__cplusplus) && defined(__CORRECT_ISO_CPP_SEARCH_H_PROTO)
+extern "C++" {
+/* >> lfind(3)
+ * Perform linear search for `key' by comparing by `compar' in an array [pbase, pbase+pitem_count*item_size) */
+__CREDIRECT(__ATTR_WUNUSED __ATTR_NONNULL((2, 3, 5)),void *,__THROWING,_lfind,(void const *__key, void *__pbase, size_t __KOS_FIXED_CONST *__pitem_count, size_t __item_size, __compar_fn_t __compar),lfind,(__key,__pbase,__pitem_count,__item_size,__compar))
+/* >> lfind(3)
+ * Perform linear search for `key' by comparing by `compar' in an array [pbase, pbase+pitem_count*item_size) */
+__CREDIRECT(__ATTR_WUNUSED __ATTR_NONNULL((2, 3, 5)),void const *,__THROWING,_lfind,(void const *__key, void const *__pbase, size_t __KOS_FIXED_CONST *__pitem_count, size_t __item_size, __compar_fn_t __compar),lfind,(__key,__pbase,__pitem_count,__item_size,__compar))
+} /* extern "C++" */
+#else /* __cplusplus && __CORRECT_ISO_CPP_SEARCH_H_PROTO */
+/* >> lfind(3)
+ * Perform linear search for `key' by comparing by `compar' in an array [pbase, pbase+pitem_count*item_size) */
+__CREDIRECT(__ATTR_WUNUSED __ATTR_NONNULL((2, 3, 5)),void *,__THROWING,_lfind,(void const *__key, void const *__pbase, size_t __KOS_FIXED_CONST *__pitem_count, size_t __item_size, __compar_fn_t __compar),lfind,(__key,__pbase,__pitem_count,__item_size,__compar))
+#endif /* !__cplusplus || !__CORRECT_ISO_CPP_SEARCH_H_PROTO */
+#elif defined(__CRT_HAVE__lfind)
+#if defined(__cplusplus) && defined(__CORRECT_ISO_CPP_SEARCH_H_PROTO)
+extern "C++" {
+/* >> lfind(3)
+ * Perform linear search for `key' by comparing by `compar' in an array [pbase, pbase+pitem_count*item_size) */
+__CREDIRECT(__ATTR_WUNUSED __ATTR_NONNULL((2, 3, 5)),void *,__THROWING,_lfind,(void const *__key, void *__pbase, size_t __KOS_FIXED_CONST *__pitem_count, size_t __item_size, __compar_fn_t __compar),_lfind,(__key,__pbase,__pitem_count,__item_size,__compar))
+/* >> lfind(3)
+ * Perform linear search for `key' by comparing by `compar' in an array [pbase, pbase+pitem_count*item_size) */
+__CREDIRECT(__ATTR_WUNUSED __ATTR_NONNULL((2, 3, 5)),void const *,__THROWING,_lfind,(void const *__key, void const *__pbase, size_t __KOS_FIXED_CONST *__pitem_count, size_t __item_size, __compar_fn_t __compar),_lfind,(__key,__pbase,__pitem_count,__item_size,__compar))
+} /* extern "C++" */
+#else /* __cplusplus && __CORRECT_ISO_CPP_SEARCH_H_PROTO */
+/* >> lfind(3)
+ * Perform linear search for `key' by comparing by `compar' in an array [pbase, pbase+pitem_count*item_size) */
+__CDECLARE(__ATTR_WUNUSED __ATTR_NONNULL((2, 3, 5)),void *,__THROWING,_lfind,(void const *__key, void const *__pbase, size_t __KOS_FIXED_CONST *__pitem_count, size_t __item_size, __compar_fn_t __compar),(__key,__pbase,__pitem_count,__item_size,__compar))
+#endif /* !__cplusplus || !__CORRECT_ISO_CPP_SEARCH_H_PROTO */
+#else /* ... */
+#include <libc/local/search/lfind.h>
+#if defined(__cplusplus) && defined(__CORRECT_ISO_CPP_SEARCH_H_PROTO)
+extern "C++" {
+/* >> lfind(3)
+ * Perform linear search for `key' by comparing by `compar' in an array [pbase, pbase+pitem_count*item_size) */
+__FORCELOCAL __ATTR_ARTIFICIAL __ATTR_WUNUSED __ATTR_NONNULL((2, 3, 5)) void *(__LIBCCALL _lfind)(void const *__key, void *__pbase, size_t __KOS_FIXED_CONST *__pitem_count, size_t __item_size, __compar_fn_t __compar) __THROWS(...) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(lfind))(__key, __pbase, __pitem_count, __item_size, __compar); }
+/* >> lfind(3)
+ * Perform linear search for `key' by comparing by `compar' in an array [pbase, pbase+pitem_count*item_size) */
+__FORCELOCAL __ATTR_ARTIFICIAL __ATTR_WUNUSED __ATTR_NONNULL((2, 3, 5)) void const *(__LIBCCALL _lfind)(void const *__key, void const *__pbase, size_t __KOS_FIXED_CONST *__pitem_count, size_t __item_size, __compar_fn_t __compar) __THROWS(...) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(lfind))(__key, __pbase, __pitem_count, __item_size, __compar); }
+} /* extern "C++" */
+#else /* __cplusplus && __CORRECT_ISO_CPP_SEARCH_H_PROTO */
+/* >> lfind(3)
+ * Perform linear search for `key' by comparing by `compar' in an array [pbase, pbase+pitem_count*item_size) */
+__FORCELOCAL __ATTR_ARTIFICIAL __ATTR_WUNUSED __ATTR_NONNULL((2, 3, 5)) void *(__LIBCCALL _lfind)(void const *__key, void const *__pbase, size_t __KOS_FIXED_CONST *__pitem_count, size_t __item_size, __compar_fn_t __compar) __THROWS(...) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(lfind))(__key, __pbase, __pitem_count, __item_size, __compar); }
+#endif /* !__cplusplus || !__CORRECT_ISO_CPP_SEARCH_H_PROTO */
+#endif /* !... */
+#ifdef __CRT_HAVE_lsearch
+/* >> lsearch(3)
+ * Perform linear search for `key' by comparing by `compar' function
+ * in array [pbase,  pbase+pitem_count*item_size) and insert  entry if not  found */
+__CREDIRECT(__ATTR_NONNULL((2, 3, 5)),void *,__THROWING,_lsearch,(void const *__key, void *__pbase, size_t *__pitem_count, size_t __item_size, int (__LIBCCALL *__compar)(void const *__a, void const *__b)),lsearch,(__key,__pbase,__pitem_count,__item_size,__compar))
+#elif defined(__CRT_HAVE__lsearch)
+/* >> lsearch(3)
+ * Perform linear search for `key' by comparing by `compar' function
+ * in array [pbase,  pbase+pitem_count*item_size) and insert  entry if not  found */
+__CDECLARE(__ATTR_NONNULL((2, 3, 5)),void *,__THROWING,_lsearch,(void const *__key, void *__pbase, size_t *__pitem_count, size_t __item_size, int (__LIBCCALL *__compar)(void const *__a, void const *__b)),(__key,__pbase,__pitem_count,__item_size,__compar))
+#else /* ... */
+#include <libc/local/search/lsearch.h>
+/* >> lsearch(3)
+ * Perform linear search for `key' by comparing by `compar' function
+ * in array [pbase,  pbase+pitem_count*item_size) and insert  entry if not  found */
+__FORCELOCAL __ATTR_ARTIFICIAL __ATTR_NONNULL((2, 3, 5)) void *(__LIBCCALL _lsearch)(void const *__key, void *__pbase, size_t *__pitem_count, size_t __item_size, int (__LIBCCALL *__compar)(void const *__a, void const *__b)) __THROWS(...) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(lsearch))(__key, __pbase, __pitem_count, __item_size, __compar); }
+#endif /* !... */
+#ifndef __qsort_defined
+#define __qsort_defined 1
+#ifdef __std_qsort_defined
+__NAMESPACE_STD_USING(qsort)
+#elif defined(__CRT_HAVE_qsort)
+__CDECLARE_VOID(__ATTR_NONNULL((1, 4)),__THROWING,qsort,(void *__pbase, size_t __item_count, size_t __item_size, int (__LIBCCALL *__compar)(void const *__a, void const *__b)),(__pbase,__item_count,__item_size,__compar))
+#else /* ... */
+#include <libc/local/stdlib/qsort.h>
+__NAMESPACE_LOCAL_USING_OR_IMPL(qsort, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_NONNULL((1, 4)) void (__LIBCCALL qsort)(void *__pbase, size_t __item_count, size_t __item_size, int (__LIBCCALL *__compar)(void const *__a, void const *__b)) __THROWS(...) { (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(qsort))(__pbase, __item_count, __item_size, __compar); })
+#endif /* !... */
+#endif /* !__qsort_defined */
+#ifndef __bsearch_defined
+#define __bsearch_defined 1
+#ifdef __std_bsearch_defined
+__NAMESPACE_STD_USING(bsearch)
+#elif defined(__CRT_HAVE_bsearch)
+#if defined(__cplusplus) && defined(__CORRECT_ISO_CPP_STDLIB_H_PROTO)
+extern "C++" {
+__CREDIRECT(__ATTR_WUNUSED __ATTR_NONNULL((1, 2, 5)),void *,__THROWING,bsearch,(void const *__pkey, void *__pbase, size_t __item_count, size_t __item_size, int (__LIBCCALL *__compar)(void const *__a, void const *__b)),bsearch,(__pkey,__pbase,__item_count,__item_size,__compar))
+__CREDIRECT(__ATTR_WUNUSED __ATTR_NONNULL((1, 2, 5)),void const *,__THROWING,bsearch,(void const *__pkey, void const *__pbase, size_t __item_count, size_t __item_size, int (__LIBCCALL *__compar)(void const *__a, void const *__b)),bsearch,(__pkey,__pbase,__item_count,__item_size,__compar))
+} /* extern "C++" */
+#else /* __cplusplus && __CORRECT_ISO_CPP_STDLIB_H_PROTO */
+__CDECLARE(__ATTR_WUNUSED __ATTR_NONNULL((1, 2, 5)),void *,__THROWING,bsearch,(void const *__pkey, void const *__pbase, size_t __item_count, size_t __item_size, int (__LIBCCALL *__compar)(void const *__a, void const *__b)),(__pkey,__pbase,__item_count,__item_size,__compar))
+#endif /* !__cplusplus || !__CORRECT_ISO_CPP_STDLIB_H_PROTO */
+#else /* ... */
+#include <libc/local/stdlib/bsearch.h>
+#if defined(__cplusplus) && defined(__CORRECT_ISO_CPP_STDLIB_H_PROTO)
+extern "C++" {
+__FORCELOCAL __ATTR_ARTIFICIAL __ATTR_WUNUSED __ATTR_NONNULL((1, 2, 5)) void *(__LIBCCALL bsearch)(void const *__pkey, void *__pbase, size_t __item_count, size_t __item_size, int (__LIBCCALL *__compar)(void const *__a, void const *__b)) __THROWS(...) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(bsearch))(__pkey, __pbase, __item_count, __item_size, __compar); }
+__FORCELOCAL __ATTR_ARTIFICIAL __ATTR_WUNUSED __ATTR_NONNULL((1, 2, 5)) void const *(__LIBCCALL bsearch)(void const *__pkey, void const *__pbase, size_t __item_count, size_t __item_size, int (__LIBCCALL *__compar)(void const *__a, void const *__b)) __THROWS(...) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(bsearch))(__pkey, __pbase, __item_count, __item_size, __compar); }
+} /* extern "C++" */
+#else /* __cplusplus && __CORRECT_ISO_CPP_STDLIB_H_PROTO */
+__NAMESPACE_LOCAL_USING_OR_IMPL(bsearch, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_WUNUSED __ATTR_NONNULL((1, 2, 5)) void *(__LIBCCALL bsearch)(void const *__pkey, void const *__pbase, size_t __item_count, size_t __item_size, int (__LIBCCALL *__compar)(void const *__a, void const *__b)) __THROWS(...) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(bsearch))(__pkey, __pbase, __item_count, __item_size, __compar); })
+#endif /* !__cplusplus || !__CORRECT_ISO_CPP_STDLIB_H_PROTO */
+#endif /* !... */
+#endif /* !__bsearch_defined */
+#ifdef __CRT_HAVE__lfind_s
+#if defined(__cplusplus) && defined(__CORRECT_ISO_CPP_SEARCH_H_PROTO)
+extern "C++" {
+__CREDIRECT(__ATTR_WUNUSED __ATTR_NONNULL((2, 3, 5)),void *,__THROWING,_lfind_s,(void const *__key, void *__pbase, size_t __KOS_FIXED_CONST *__pitem_count, size_t __item_size, int (__LIBCCALL *__compar)(void *__arg, void const *__a, void const *__b), void *__arg),_lfind_s,(__key,__pbase,__pitem_count,__item_size,__compar,__arg))
+__CREDIRECT(__ATTR_WUNUSED __ATTR_NONNULL((2, 3, 5)),void const *,__THROWING,_lfind_s,(void const *__key, void const *__pbase, size_t __KOS_FIXED_CONST *__pitem_count, size_t __item_size, int (__LIBCCALL *__compar)(void *__arg, void const *__a, void const *__b), void *__arg),_lfind_s,(__key,__pbase,__pitem_count,__item_size,__compar,__arg))
+} /* extern "C++" */
+#else /* __cplusplus && __CORRECT_ISO_CPP_SEARCH_H_PROTO */
+__CDECLARE(__ATTR_WUNUSED __ATTR_NONNULL((2, 3, 5)),void *,__THROWING,_lfind_s,(void const *__key, void const *__pbase, size_t __KOS_FIXED_CONST *__pitem_count, size_t __item_size, int (__LIBCCALL *__compar)(void *__arg, void const *__a, void const *__b), void *__arg),(__key,__pbase,__pitem_count,__item_size,__compar,__arg))
+#endif /* !__cplusplus || !__CORRECT_ISO_CPP_SEARCH_H_PROTO */
+#else /* __CRT_HAVE__lfind_s */
+#include <libc/local/search/_lfind_s.h>
+#if defined(__cplusplus) && defined(__CORRECT_ISO_CPP_SEARCH_H_PROTO)
+extern "C++" {
+__FORCELOCAL __ATTR_ARTIFICIAL __ATTR_WUNUSED __ATTR_NONNULL((2, 3, 5)) void *(__LIBCCALL _lfind_s)(void const *__key, void *__pbase, size_t __KOS_FIXED_CONST *__pitem_count, size_t __item_size, int (__LIBCCALL *__compar)(void *__arg, void const *__a, void const *__b), void *__arg) __THROWS(...) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(_lfind_s))(__key, __pbase, __pitem_count, __item_size, __compar, __arg); }
+__FORCELOCAL __ATTR_ARTIFICIAL __ATTR_WUNUSED __ATTR_NONNULL((2, 3, 5)) void const *(__LIBCCALL _lfind_s)(void const *__key, void const *__pbase, size_t __KOS_FIXED_CONST *__pitem_count, size_t __item_size, int (__LIBCCALL *__compar)(void *__arg, void const *__a, void const *__b), void *__arg) __THROWS(...) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(_lfind_s))(__key, __pbase, __pitem_count, __item_size, __compar, __arg); }
+} /* extern "C++" */
+#else /* __cplusplus && __CORRECT_ISO_CPP_SEARCH_H_PROTO */
+__NAMESPACE_LOCAL_USING_OR_IMPL(_lfind_s, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_WUNUSED __ATTR_NONNULL((2, 3, 5)) void *(__LIBCCALL _lfind_s)(void const *__key, void const *__pbase, size_t __KOS_FIXED_CONST *__pitem_count, size_t __item_size, int (__LIBCCALL *__compar)(void *__arg, void const *__a, void const *__b), void *__arg) __THROWS(...) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(_lfind_s))(__key, __pbase, __pitem_count, __item_size, __compar, __arg); })
+#endif /* !__cplusplus || !__CORRECT_ISO_CPP_SEARCH_H_PROTO */
+#endif /* !__CRT_HAVE__lfind_s */
+#ifdef __CRT_HAVE__lsearch_s
+__CDECLARE(__ATTR_WUNUSED __ATTR_NONNULL((2, 3, 5)),void *,__THROWING,_lsearch_s,(void const *__key, void *__pbase, size_t *__pitem_count, size_t __item_size, int (__LIBCCALL *__compar)(void *__arg, void const *__a, void const *__b), void *__arg),(__key,__pbase,__pitem_count,__item_size,__compar,__arg))
+#else /* __CRT_HAVE__lsearch_s */
+#include <libc/local/search/_lsearch_s.h>
+__NAMESPACE_LOCAL_USING_OR_IMPL(_lsearch_s, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_WUNUSED __ATTR_NONNULL((2, 3, 5)) void *(__LIBCCALL _lsearch_s)(void const *__key, void *__pbase, size_t *__pitem_count, size_t __item_size, int (__LIBCCALL *__compar)(void *__arg, void const *__a, void const *__b), void *__arg) __THROWS(...) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(_lsearch_s))(__key, __pbase, __pitem_count, __item_size, __compar, __arg); })
+#endif /* !__CRT_HAVE__lsearch_s */
+#ifdef __USE_DOS_SLIB
+#ifndef __qsort_s_defined
+#define __qsort_s_defined 1
+#ifdef __CRT_HAVE_qsort_s
+__CDECLARE_VOID(__ATTR_NONNULL((1, 4)),__THROWING,qsort_s,(void *__base, __SIZE_TYPE__ __elem_count, __SIZE_TYPE__ __elem_size, int (__LIBCCALL *__compar)(void *__arg, void const *__a, void const *__b), void *__arg),(__base,__elem_count,__elem_size,__compar,__arg))
+#else /* __CRT_HAVE_qsort_s */
+#include <libc/local/stdlib/qsort_s.h>
+__NAMESPACE_LOCAL_USING_OR_IMPL(qsort_s, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_NONNULL((1, 4)) void (__LIBCCALL qsort_s)(void *__base, __SIZE_TYPE__ __elem_count, __SIZE_TYPE__ __elem_size, int (__LIBCCALL *__compar)(void *__arg, void const *__a, void const *__b), void *__arg) __THROWS(...) { (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(qsort_s))(__base, __elem_count, __elem_size, __compar, __arg); })
+#endif /* !__CRT_HAVE_qsort_s */
+#endif /* !__qsort_s_defined */
+#ifndef __bsearch_s_defined
+#define __bsearch_s_defined 1
+#ifdef __CRT_HAVE_bsearch_s
+__CDECLARE(__ATTR_WUNUSED __ATTR_NONNULL((1, 2, 5)),void *,__THROWING,bsearch_s,(void const *__key, void const *__base, __SIZE_TYPE__ __elem_count, __SIZE_TYPE__ __elem_size, int (__LIBCCALL *__compar)(void *__arg, void const *__a, void const *__b), void *__arg),(__key,__base,__elem_count,__elem_size,__compar,__arg))
+#else /* __CRT_HAVE_bsearch_s */
+#include <libc/local/stdlib/bsearch_s.h>
+__NAMESPACE_LOCAL_USING_OR_IMPL(bsearch_s, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_WUNUSED __ATTR_NONNULL((1, 2, 5)) void *(__LIBCCALL bsearch_s)(void const *__key, void const *__base, __SIZE_TYPE__ __elem_count, __SIZE_TYPE__ __elem_size, int (__LIBCCALL *__compar)(void *__arg, void const *__a, void const *__b), void *__arg) __THROWS(...) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(bsearch_s))(__key, __base, __elem_count, __elem_size, __compar, __arg); })
+#endif /* !__CRT_HAVE_bsearch_s */
+#endif /* !__bsearch_s_defined */
+#endif /* __USE_DOS_SLIB */
+#endif /* __USE_DOS */
 
 #endif /* __CC__ */
 

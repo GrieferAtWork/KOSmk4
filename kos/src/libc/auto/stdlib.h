@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x4a300740 */
+/* HASH CRC-32:0xf9330660 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -30,14 +30,20 @@
 DECL_BEGIN
 
 #if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
-INTDEF WUNUSED NONNULL((1, 2, 5)) void *(LIBDCALL libd_bsearch_r)(void const *pkey, void const *pbase, size_t item_count, size_t item_size, __compar_d_fn_t cmp, void *arg) THROWS(...);
+INTDEF WUNUSED NONNULL((1, 2, 5)) void *(LIBDCALL libd_bsearch_r)(void const *pkey, void const *pbase, size_t item_count, size_t item_size, int (LIBDCALL *compar)(void const *a, void const *b, void *arg), void *arg) THROWS(...);
 #endif /* !__LIBCCALL_IS_LIBDCALL && !__KERNEL__ */
 #ifndef __KERNEL__
-INTDEF WUNUSED NONNULL((1, 2, 5)) void *(LIBCCALL libc_bsearch_r)(void const *pkey, void const *pbase, size_t item_count, size_t item_size, __compar_d_fn_t cmp, void *arg) THROWS(...);
+INTDEF WUNUSED NONNULL((1, 2, 5)) void *(LIBCCALL libc_bsearch_r)(void const *pkey, void const *pbase, size_t item_count, size_t item_size, int (LIBCCALL *compar)(void const *a, void const *b, void *arg), void *arg) THROWS(...);
 #endif /* !__KERNEL__ */
-INTDEF NONNULL((1, 4)) void (LIBCCALL libc_qsort)(void *pbase, size_t item_count, size_t item_size, __compar_fn_t cmp) THROWS(...);
+#if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
+INTDEF NONNULL((1, 4)) void (LIBDCALL libd_qsort)(void *pbase, size_t item_count, size_t item_size, int (LIBDCALL *compar)(void const *a, void const *b)) THROWS(...);
+#endif /* !__LIBCCALL_IS_LIBDCALL && !__KERNEL__ */
+INTDEF NONNULL((1, 4)) void (LIBCCALL libc_qsort)(void *pbase, size_t item_count, size_t item_size, int (LIBCCALL *compar)(void const *a, void const *b)) THROWS(...);
+#if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
+INTDEF WUNUSED NONNULL((1, 2, 5)) void *(LIBDCALL libd_bsearch)(void const *pkey, void const *pbase, size_t item_count, size_t item_size, int (LIBDCALL *compar)(void const *a, void const *b)) THROWS(...);
+#endif /* !__LIBCCALL_IS_LIBDCALL && !__KERNEL__ */
 #ifndef __KERNEL__
-INTDEF WUNUSED NONNULL((1, 2, 5)) void *(LIBCCALL libc_bsearch)(void const *pkey, void const *pbase, size_t item_count, size_t item_size, __compar_fn_t cmp) THROWS(...);
+INTDEF WUNUSED NONNULL((1, 2, 5)) void *(LIBCCALL libc_bsearch)(void const *pkey, void const *pbase, size_t item_count, size_t item_size, int (LIBCCALL *compar)(void const *a, void const *b)) THROWS(...);
 #endif /* !__KERNEL__ */
 #if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
 INTDEF ATTR_CONST WUNUSED long NOTHROW(LIBDCALL libd_labs)(long x);
@@ -843,18 +849,18 @@ INTDEF int NOTHROW_RPC(LIBCCALL libc_shexec)(char const *command);
 INTDEF ATTR_CONST WUNUSED char const *NOTHROW_NCX(LIBCCALL libc_getexecname)(void);
 #endif /* !__KERNEL__ */
 #if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
-/* Enumerate all open file descriptors by invoking `(*func)(cookie, <fd>)' for each of them
- * If  during any of these invocations, `(*func)(...)' returns non-zero, enumeration stops,
- * and `fdwalk()' returns with that same value.  If `(*func)(...)' is never called, or  all
+/* Enumerate all open file descriptors by invoking `(*walk)(arg, <fd>)' for each of them
+ * If  during any of these invocations, `(*walk)(...)' returns non-zero, enumeration stops,
+ * and `fdwalk()' returns with that same value.  If `(*walk)(...)' is never called, or  all
  * invocations return 0, `fdwalk()' will also return 0. */
-INTDEF NONNULL((1)) int NOTHROW_NCX(LIBDCALL libd_fdwalk)(__fdwalk_func_t func, void *cookie);
+INTDEF NONNULL((1)) int (LIBDCALL libd_fdwalk)(int (LIBDCALL *walk)(void *arg, fd_t fd), void *arg) THROWS(...);
 #endif /* !__LIBCCALL_IS_LIBDCALL && !__KERNEL__ */
 #ifndef __KERNEL__
-/* Enumerate all open file descriptors by invoking `(*func)(cookie, <fd>)' for each of them
- * If  during any of these invocations, `(*func)(...)' returns non-zero, enumeration stops,
- * and `fdwalk()' returns with that same value.  If `(*func)(...)' is never called, or  all
+/* Enumerate all open file descriptors by invoking `(*walk)(arg, <fd>)' for each of them
+ * If  during any of these invocations, `(*walk)(...)' returns non-zero, enumeration stops,
+ * and `fdwalk()' returns with that same value.  If `(*walk)(...)' is never called, or  all
  * invocations return 0, `fdwalk()' will also return 0. */
-INTDEF NONNULL((1)) int NOTHROW_NCX(LIBCCALL libc_fdwalk)(__fdwalk_func_t func, void *cookie);
+INTDEF NONNULL((1)) int (LIBCCALL libc_fdwalk)(int (LIBCCALL *walk)(void *arg, fd_t fd), void *arg) THROWS(...);
 #endif /* !__KERNEL__ */
 #if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
 INTDEF ATTR_RETNONNULL WUNUSED NONNULL((2)) char *NOTHROW_NCX(LIBDCALL libd_lltostr)(__LONGLONG value, char *buf);
@@ -915,16 +921,16 @@ INTDEF void NOTHROW_NCX(LIBDCALL libd_setprogname)(char const *name);
 INTDEF void NOTHROW_NCX(LIBCCALL libc_setprogname)(char const *name);
 #endif /* !__KERNEL__ */
 #if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
-INTDEF NONNULL((1, 4)) int (LIBDCALL libd_heapsort)(void *pbase, size_t item_count, size_t item_size, __compar_fn_t cmp) THROWS(...);
+INTDEF NONNULL((1, 4)) int (LIBDCALL libd_heapsort)(void *pbase, size_t item_count, size_t item_size, int (LIBDCALL *compar)(void const *a, void const *b)) THROWS(...);
 #endif /* !__LIBCCALL_IS_LIBDCALL && !__KERNEL__ */
 #ifndef __KERNEL__
-INTDEF NONNULL((1, 4)) int (LIBCCALL libc_heapsort)(void *pbase, size_t item_count, size_t item_size, __compar_fn_t cmp) THROWS(...);
+INTDEF NONNULL((1, 4)) int (LIBCCALL libc_heapsort)(void *pbase, size_t item_count, size_t item_size, int (LIBCCALL *compar)(void const *a, void const *b)) THROWS(...);
 #endif /* !__KERNEL__ */
 #if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
-INTDEF NONNULL((1, 4)) int (LIBDCALL libd_mergesort)(void *pbase, size_t item_count, size_t item_size, __compar_fn_t cmp) THROWS(...);
+INTDEF NONNULL((1, 4)) int (LIBDCALL libd_mergesort)(void *pbase, size_t item_count, size_t item_size, int (LIBDCALL *compar)(void const *a, void const *b)) THROWS(...);
 #endif /* !__LIBCCALL_IS_LIBDCALL && !__KERNEL__ */
 #ifndef __KERNEL__
-INTDEF NONNULL((1, 4)) int (LIBCCALL libc_mergesort)(void *pbase, size_t item_count, size_t item_size, __compar_fn_t cmp) THROWS(...);
+INTDEF NONNULL((1, 4)) int (LIBCCALL libc_mergesort)(void *pbase, size_t item_count, size_t item_size, int (LIBCCALL *compar)(void const *a, void const *b)) THROWS(...);
 #endif /* !__KERNEL__ */
 #if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
 INTDEF NONNULL((1)) int NOTHROW_NCX(LIBDCALL libd_radixsort)(unsigned char const **base, int item_count, unsigned char const *table, unsigned endbyte);
@@ -957,9 +963,9 @@ INTDEF WUNUSED NONNULL((1, 4)) __LONGLONG NOTHROW_NCX(LIBDCALL libd_strtonum)(ch
 INTDEF WUNUSED NONNULL((1, 4)) __LONGLONG NOTHROW_NCX(LIBCCALL libc_strtonum)(char const *nptr, __LONGLONG lo, __LONGLONG hi, char const **p_errstr);
 #endif /* !__KERNEL__ */
 #if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
-INTDEF NONNULL((1, 4)) void (LIBDCALL libd_qsort_r)(void *pbase, size_t item_count, size_t item_size, __compar_d_fn_t cmp, void *arg) THROWS(...);
+INTDEF NONNULL((1, 4)) void (LIBDCALL libd_qsort_r)(void *pbase, size_t item_count, size_t item_size, int (LIBDCALL *compar)(void const *a, void const *b, void *arg), void *arg) THROWS(...);
 #endif /* !__LIBCCALL_IS_LIBDCALL && !__KERNEL__ */
-INTDEF NONNULL((1, 4)) void (LIBCCALL libc_qsort_r)(void *pbase, size_t item_count, size_t item_size, __compar_d_fn_t cmp, void *arg) THROWS(...);
+INTDEF NONNULL((1, 4)) void (LIBCCALL libc_qsort_r)(void *pbase, size_t item_count, size_t item_size, int (LIBCCALL *compar)(void const *a, void const *b, void *arg), void *arg) THROWS(...);
 #if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
 /* >> mkostemp(3), mkostemp64(3)
  * Replace  the  last 6  characters of  `template_' (which  are followed  by exactly
@@ -1099,16 +1105,16 @@ INTDEF ATTR_CONST WUNUSED u64 NOTHROW_NCX(LIBDCALL libd__byteswap_uint64)(u64 va
 INTDEF ATTR_CONST WUNUSED u64 NOTHROW_NCX(LIBCCALL libc__byteswap_uint64)(u64 val);
 #endif /* !__KERNEL__ */
 #if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
-INTDEF WUNUSED NONNULL((1, 2, 5)) void *(LIBDCALL libd_bsearch_s)(void const *key, void const *base, size_t elem_count, size_t elem_size, __dos_compar_d_fn_t compar, void *arg) THROWS(...);
+INTDEF WUNUSED NONNULL((1, 2, 5)) void *(LIBDCALL libd_bsearch_s)(void const *key, void const *base, size_t elem_count, size_t elem_size, int (LIBDCALL *compar)(void *arg, void const *a, void const *b), void *arg) THROWS(...);
 #endif /* !__LIBCCALL_IS_LIBDCALL && !__KERNEL__ */
 #ifndef __KERNEL__
-INTDEF WUNUSED NONNULL((1, 2, 5)) void *(LIBCCALL libc_bsearch_s)(void const *key, void const *base, size_t elem_count, size_t elem_size, __dos_compar_d_fn_t compar, void *arg) THROWS(...);
+INTDEF WUNUSED NONNULL((1, 2, 5)) void *(LIBCCALL libc_bsearch_s)(void const *key, void const *base, size_t elem_count, size_t elem_size, int (LIBCCALL *compar)(void *arg, void const *a, void const *b), void *arg) THROWS(...);
 #endif /* !__KERNEL__ */
 #if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
-INTDEF NONNULL((1, 4)) void (LIBDCALL libd_qsort_s)(void *base, size_t elem_count, size_t elem_size, __dos_compar_d_fn_t compar, void *arg) THROWS(...);
+INTDEF NONNULL((1, 4)) void (LIBDCALL libd_qsort_s)(void *base, size_t elem_count, size_t elem_size, int (LIBDCALL *compar)(void *arg, void const *a, void const *b), void *arg) THROWS(...);
 #endif /* !__LIBCCALL_IS_LIBDCALL && !__KERNEL__ */
 #ifndef __KERNEL__
-INTDEF NONNULL((1, 4)) void (LIBCCALL libc_qsort_s)(void *base, size_t elem_count, size_t elem_size, __dos_compar_d_fn_t compar, void *arg) THROWS(...);
+INTDEF NONNULL((1, 4)) void (LIBCCALL libc_qsort_s)(void *base, size_t elem_count, size_t elem_size, int (LIBCCALL *compar)(void *arg, void const *a, void const *b), void *arg) THROWS(...);
 #endif /* !__KERNEL__ */
 #if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
 INTDEF NONNULL((1, 2, 4)) errno_t NOTHROW_NCX(LIBDCALL libd_getenv_s)(size_t *psize, char *buf, rsize_t buflen, char const *varname);

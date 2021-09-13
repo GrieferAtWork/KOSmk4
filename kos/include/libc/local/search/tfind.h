@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xce4c99fa */
+/* HASH CRC-32:0xa125ea9d */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -21,30 +21,39 @@
 #ifndef __local_tfind_defined
 #define __local_tfind_defined 1
 #include <__crt.h>
-#ifndef ____compar_fn_t_defined
-#define ____compar_fn_t_defined 1
-typedef int (__LIBCCALL *__compar_fn_t)(void const *__a, void const *__b);
-#endif /* !____compar_fn_t_defined */
+#include <kos/anno.h>
+__NAMESPACE_LOCAL_BEGIN
+#ifndef __local___localdep_tfind_r_defined
+#define __local___localdep_tfind_r_defined 1
+#ifdef __CRT_HAVE_tfind_r
+__CREDIRECT(__ATTR_NONNULL((3)),void *,__THROWING,__localdep_tfind_r,(void const *__key, void *const *__vrootp, int (__LIBCCALL *__compar)(void const *__a, void const *__b, void *__arg), void *__arg),tfind_r,(__key,__vrootp,__compar,__arg))
+#else /* __CRT_HAVE_tfind_r */
+__NAMESPACE_LOCAL_END
+#include <libc/local/search/tfind_r.h>
+__NAMESPACE_LOCAL_BEGIN
+#define __localdep_tfind_r __LIBC_LOCAL_NAME(tfind_r)
+#endif /* !__CRT_HAVE_tfind_r */
+#endif /* !__local___localdep_tfind_r_defined */
+__NAMESPACE_LOCAL_END
+#ifndef __LIBCCALL_CALLER_CLEANUP
+#ifndef ____invoke_compare_helper_defined
+__NAMESPACE_LOCAL_BEGIN
+#define ____invoke_compare_helper_defined 1
+__LOCAL_LIBC(__invoke_compare_helper) int
+(__LIBCCALL __invoke_compare_helper)(void const *__a, void const *__b, void *__arg) {
+	return (*(int (__LIBCCALL *)(void const *, void const *))__arg)(__a, __b);
+}
+__NAMESPACE_LOCAL_END
+#endif /* !____invoke_compare_helper_defined */
+#endif /* !__LIBCCALL_CALLER_CLEANUP */
 __NAMESPACE_LOCAL_BEGIN
 __LOCAL_LIBC(tfind) __ATTR_NONNULL((3)) void *
-__NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(tfind))(void const *__key, void *const *__vrootp, __compar_fn_t __compar) {
-	typedef struct __node_struct {
-		void const           *__key;
-		struct __node_struct *__left_node;
-		struct __node_struct *__right_node;
-		__UINTPTR_TYPE__      __is_red;
-	} *__node;
-	__node __root, *__rootp = (__node *)__vrootp;
-	if (__rootp == __NULLPTR)
-		return __NULLPTR;
-	while ((__root = *__rootp) != __NULLPTR) {
-		int __r = (*__compar)(__key, __root->__key);
-		if (__r == 0)
-			return __root;
-		__rootp = __r < 0 ? &__root->__left_node
-		              : &__root->__right_node;
-	}
-	return __NULLPTR;
+(__LIBCCALL __LIBC_LOCAL_NAME(tfind))(void const *__key, void *const *__vrootp, int (__LIBCCALL *__compar)(void const *__a, void const *__b)) __THROWS(...) {
+#ifdef __LIBCCALL_CALLER_CLEANUP
+	return (__NAMESPACE_LOCAL_SYM __localdep_tfind_r)(__key, __vrootp, (int (__LIBCCALL *)(void const *, void const *, void *))(void *)__compar, __NULLPTR);
+#else /* __LIBCCALL_CALLER_CLEANUP */
+	return (__NAMESPACE_LOCAL_SYM __localdep_tfind_r)(__key, __vrootp, &__NAMESPACE_LOCAL_SYM __invoke_compare_helper, (void *)__compar);
+#endif /* !__LIBCCALL_CALLER_CLEANUP */
 }
 __NAMESPACE_LOCAL_END
 #ifndef __local___localdep_tfind_defined

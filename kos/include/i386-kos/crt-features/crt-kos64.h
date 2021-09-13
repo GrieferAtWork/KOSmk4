@@ -942,10 +942,12 @@
 #define __CRT_HAVE__itoa_s
 #define __CRT_HAVE__itow
 #define __CRT_HAVE__itow_s
+#define __CRT_HAVE__lfind_s
 #define __CRT_HAVE__loaddll
 #define __CRT_HAVE__longjmp
 #define __CRT_HAVE__lrotl
 #define __CRT_HAVE__lrotr
+#define __CRT_HAVE__lsearch_s
 #define __CRT_HAVE__ltoa_s
 #define __CRT_HAVE__ltow
 #define __CRT_HAVE__ltow_s
@@ -4186,7 +4188,9 @@
 #define __CRT_HAVE_tcsetpgrp
 #define __CRT_HAVE_tcsetsid
 #define __CRT_HAVE_tdelete
+#define __CRT_HAVE_tdelete_r
 #define __CRT_HAVE_tdestroy
+#define __CRT_HAVE_tdestroy_r
 #define __CRT_HAVE_tee
 #define __CRT_HAVE_tell
 #define __CRT_HAVE_tell64
@@ -4194,6 +4198,7 @@
 #define __CRT_HAVE_tempnam
 #define __CRT_HAVE_textdomain
 #define __CRT_HAVE_tfind
+#define __CRT_HAVE_tfind_r
 #define __CRT_HAVE_tgamma
 #define __CRT_HAVE_tgammaf
 #define __CRT_HAVE_tgammal
@@ -4255,6 +4260,7 @@
 #define __CRT_HAVE_truncf
 #define __CRT_HAVE_truncl
 #define __CRT_HAVE_tsearch
+#define __CRT_HAVE_tsearch_r
 #define __CRT_HAVE_tss_create
 #define __CRT_HAVE_tss_delete
 #define __CRT_HAVE_tss_get
@@ -4263,6 +4269,7 @@
 #define __CRT_HAVE_ttyname_r
 #define __CRT_HAVE_ttyslot
 #define __CRT_HAVE_twalk
+#define __CRT_HAVE_twalk_r
 #define __CRT_HAVE_tzname
 #define __CRT_HAVE_tzset
 #define __CRT_HAVE_ualarm
@@ -5396,6 +5403,8 @@
 #define __CRT_HAVE_KOS$_itow_s
 #define __CRT_HAVE__ldclass
 #define __CRT_HAVE__ldsign
+#define __CRT_HAVE__lfind
+#define __CRT_HAVE_KOS$_lfind_s
 #define __CRT_HAVE_KOS$_loaddll
 #define __CRT_HAVE__localtime64
 #define __CRT_HAVE__lock_file
@@ -5403,6 +5412,8 @@
 #define __CRT_HAVE__logb
 #define __CRT_HAVE_KOS$_lrotl
 #define __CRT_HAVE_KOS$_lrotr
+#define __CRT_HAVE__lsearch
+#define __CRT_HAVE_KOS$_lsearch_s
 #define __CRT_HAVE__lseek
 #define __CRT_HAVE__lseeki64
 #define __CRT_HAVE__ltoa
@@ -7780,7 +7791,9 @@
 #define __CRT_HAVE_KOS$tcsetpgrp
 #define __CRT_HAVE_KOS$tcsetsid
 #define __CRT_HAVE_KOS$tdelete
+#define __CRT_HAVE_KOS$tdelete_r
 #define __CRT_HAVE_KOS$tdestroy
+#define __CRT_HAVE_KOS$tdestroy_r
 #define __CRT_HAVE_KOS$tee
 #define __CRT_HAVE_KOS$tell
 #define __CRT_HAVE_KOS$tell64
@@ -7788,6 +7801,7 @@
 #define __CRT_HAVE_KOS$tempnam
 #define __CRT_HAVE_KOS$textdomain
 #define __CRT_HAVE_KOS$tfind
+#define __CRT_HAVE_KOS$tfind_r
 #define __CRT_HAVE_KOS$tgamma
 #define __CRT_HAVE_KOS$tgammaf
 #define __CRT_HAVE_KOS$tgammal
@@ -7842,6 +7856,7 @@
 #define __CRT_HAVE_KOS$truncf
 #define __CRT_HAVE_KOS$truncl
 #define __CRT_HAVE_KOS$tsearch
+#define __CRT_HAVE_KOS$tsearch_r
 #define __CRT_HAVE_KOS$tss_create
 #define __CRT_HAVE_KOS$tss_delete
 #define __CRT_HAVE_KOS$tss_get
@@ -7849,6 +7864,7 @@
 #define __CRT_HAVE_KOS$ttyname
 #define __CRT_HAVE_KOS$ttyname_r
 #define __CRT_HAVE_KOS$twalk
+#define __CRT_HAVE_KOS$twalk_r
 #define __CRT_HAVE_KOS$ualarm
 #define __CRT_HAVE_KOS$ulimit
 #define __CRT_HAVE_KOS$ulltostr
@@ -8976,6 +8992,8 @@
 #define __CRT_HAVE_DOS$_itow_s
 #define __CRT_HAVE_DOS$_ldclass
 #define __CRT_HAVE_DOS$_ldsign
+#define __CRT_HAVE_DOS$_lfind
+#define __CRT_HAVE_DOS$_lfind_s
 #define __CRT_HAVE_DOS$_loaddll
 #define __CRT_HAVE_DOS$_localtime64
 #define __CRT_HAVE_DOS$_lock_file
@@ -8983,6 +9001,8 @@
 #define __CRT_HAVE_DOS$_logb
 #define __CRT_HAVE_DOS$_lrotl
 #define __CRT_HAVE_DOS$_lrotr
+#define __CRT_HAVE_DOS$_lsearch
+#define __CRT_HAVE_DOS$_lsearch_s
 #define __CRT_HAVE_DOS$_lseek
 #define __CRT_HAVE_DOS$_lseeki64
 #define __CRT_HAVE_DOS$_ltoa
@@ -11360,7 +11380,9 @@
 #define __CRT_HAVE_DOS$tcsetpgrp
 #define __CRT_HAVE_DOS$tcsetsid
 #define __CRT_HAVE_DOS$tdelete
+#define __CRT_HAVE_DOS$tdelete_r
 #define __CRT_HAVE_DOS$tdestroy
+#define __CRT_HAVE_DOS$tdestroy_r
 #define __CRT_HAVE_DOS$tee
 #define __CRT_HAVE_DOS$tell
 #define __CRT_HAVE_DOS$tell64
@@ -11368,6 +11390,7 @@
 #define __CRT_HAVE_DOS$tempnam
 #define __CRT_HAVE_DOS$textdomain
 #define __CRT_HAVE_DOS$tfind
+#define __CRT_HAVE_DOS$tfind_r
 #define __CRT_HAVE_DOS$tgamma
 #define __CRT_HAVE_DOS$tgammaf
 #define __CRT_HAVE_DOS$tgammal
@@ -11422,6 +11445,7 @@
 #define __CRT_HAVE_DOS$truncf
 #define __CRT_HAVE_DOS$truncl
 #define __CRT_HAVE_DOS$tsearch
+#define __CRT_HAVE_DOS$tsearch_r
 #define __CRT_HAVE_DOS$tss_create
 #define __CRT_HAVE_DOS$tss_delete
 #define __CRT_HAVE_DOS$tss_get
@@ -11429,6 +11453,7 @@
 #define __CRT_HAVE_DOS$ttyname
 #define __CRT_HAVE_DOS$ttyname_r
 #define __CRT_HAVE_DOS$twalk
+#define __CRT_HAVE_DOS$twalk_r
 #define __CRT_HAVE_DOS$ualarm
 #define __CRT_HAVE_DOS$ulimit
 #define __CRT_HAVE_DOS$ulltostr

@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x17ec5763 */
+/* HASH CRC-32:0x6ebb6deb */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -21,21 +21,18 @@
 #ifndef __local_lfind_defined
 #define __local_lfind_defined 1
 #include <__crt.h>
-#ifndef ____compar_fn_t_defined
-#define ____compar_fn_t_defined 1
-typedef int (__LIBCCALL *__compar_fn_t)(void const *__a, void const *__b);
-#endif /* !____compar_fn_t_defined */
 #include <features.h>
 #include <hybrid/typecore.h>
+#include <kos/anno.h>
 __NAMESPACE_LOCAL_BEGIN
-__LOCAL_LIBC(lfind) __ATTR_NONNULL((2, 3, 5)) void *
-__NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(lfind))(void const *__key, void const *__base, __SIZE_TYPE__ __KOS_FIXED_CONST *__nmemb, __SIZE_TYPE__ __size, __compar_fn_t __compar) {
-	__SIZE_TYPE__ __i, __count = *__nmemb;
-	void const *__result = __base;
+__LOCAL_LIBC(lfind) __ATTR_WUNUSED __ATTR_NONNULL((2, 3, 5)) void *
+(__LIBCCALL __LIBC_LOCAL_NAME(lfind))(void const *__key, void const *__pbase, __SIZE_TYPE__ __KOS_FIXED_CONST *__pitem_count, __SIZE_TYPE__ __item_size, __compar_fn_t __compar) __THROWS(...) {
+	__SIZE_TYPE__ __i, __count = *__pitem_count;
+	void const *__result = __pbase;
 	for (__i = 0; __i < __count; ++__i) {
 		if ((*__compar)(__key, __result) == 0)
 			return (void *)__result;
-		__result = (__BYTE_TYPE__ *)__result + __size;
+		__result = (__BYTE_TYPE__ *)__result + __item_size;
 	}
 	return __NULLPTR;
 }

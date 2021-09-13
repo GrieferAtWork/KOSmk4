@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x96695c8f */
+/* HASH CRC-32:0x6d9141c8 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -22,14 +22,10 @@
 #define __local_qsort_r_defined 1
 #include <__crt.h>
 #include <hybrid/typecore.h>
-#ifndef __compar_d_fn_t_defined
-#define __compar_d_fn_t_defined 1
-typedef int (__LIBKCALL *__compar_d_fn_t)(void const *__a, void const *__b, void *__arg);
-#endif /* !__compar_d_fn_t_defined */
 #include <kos/anno.h>
 __NAMESPACE_LOCAL_BEGIN
 __LOCAL_LIBC(qsort_r) __ATTR_NONNULL((1, 4)) void
-(__LIBCCALL __LIBC_LOCAL_NAME(qsort_r))(void *__pbase, __SIZE_TYPE__ __item_count, __SIZE_TYPE__ __item_size, __compar_d_fn_t __cmp, void *__arg) __THROWS(...) {
+(__LIBCCALL __LIBC_LOCAL_NAME(qsort_r))(void *__pbase, __SIZE_TYPE__ __item_count, __SIZE_TYPE__ __item_size, int (__LIBCCALL *__compar)(void const *__a, void const *__b, void *__arg), void *__arg) __THROWS(...) {
 	/* A public domain qsort() drop-in implementation. I couldn't find the original
 	 * source referenced (see the comment below), but this code is the first  thing
 	 * that comes up when you search for `libc qsort public domain'.
@@ -67,7 +63,7 @@ __LOCAL_LIBC(qsort_r) __ATTR_NONNULL((1, 4)) void
 				__BYTE_TYPE__ __tmp, *__a, *__b;
 				__a = (__BYTE_TYPE__ *)__pbase + __j;
 				__b = __a + __gap_bytes;
-				if ((*__cmp)(__a, __b, __arg) <= 0)
+				if ((*__compar)(__a, __b, __arg) <= 0)
 					break;
 				__swap_index = __item_size;
 				do {

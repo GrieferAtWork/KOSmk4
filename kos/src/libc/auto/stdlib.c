@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x6c4467aa */
+/* HASH CRC-32:0xd37671ad */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -43,16 +43,40 @@
 DECL_BEGIN
 
 #include "../libc/globals.h"
+#if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
+struct libd_bsearch_r_cookie_struct {
+	int (LIBDCALL *compar)(void const *a, void const *b, void *arg);
+	void *arg;
+};
+PRIVATE ATTR_SECTION(".text.crt.dos.utility.stdlib") int
+(LIBCCALL libd_bsearch_r_cookie_struct)(void const *a,
+                                        void const *b,
+                                        struct libd_bsearch_r_cookie_struct *c) THROWS(...){
+	return (*c->compar)(a, b, c->arg);
+}
+INTERN ATTR_SECTION(".text.crt.dos.utility.stdlib") WUNUSED NONNULL((1, 2, 5)) void *
+(LIBDCALL libd_bsearch_r)(void const *pkey,
+                          void const *pbase,
+                          size_t item_count,
+                          size_t item_size,
+                          int (LIBDCALL *compar)(void const *a, void const *b, void *arg),
+                          void *arg) THROWS(...) {
+	struct libd_bsearch_r_cookie_struct libd_bsearch_r_cookie;
+	libd_bsearch_r_cookie.compar = compar;
+	libd_bsearch_r_cookie.arg = arg;
+	return libc_bsearch_r(pkey, pbase, item_count, item_size, (int (LIBCCALL *)(void const *, void const *, void *))&libd_bsearch_r_cookie_struct, &libd_bsearch_r_cookie);
+}
+#endif /* !__LIBCCALL_IS_LIBDCALL && !__KERNEL__ */
 #ifndef __KERNEL__
 INTERN ATTR_SECTION(".text.crt.utility.stdlib") WUNUSED NONNULL((1, 2, 5)) void *
 (LIBCCALL libc_bsearch_r)(void const *pkey,
                           void const *pbase,
                           size_t item_count,
                           size_t item_size,
-                          __compar_d_fn_t cmp,
+                          int (LIBCCALL *compar)(void const *a, void const *b, void *arg),
                           void *arg) THROWS(...) {
 	/* Optimize this function with the (allowed) assumption that `pbase' is sorted according to:
-	 * >> qsort_r(pbase, item_count, item_size, cmp, arg); */
+	 * >> qsort_r(pbase, item_count, item_size, compar, arg); */
 	size_t lo, hi;
 	lo = 0;
 	hi = item_count;
@@ -72,7 +96,7 @@ INTERN ATTR_SECTION(".text.crt.utility.stdlib") WUNUSED NONNULL((1, 2, 5)) void 
 		test_index = (lo + hi) / 2;
 		item_addr  = (byte_t *)pbase + (test_index * item_size);
 		/* Check if the requested item lies above, or below the selected one */
-		difference = (*cmp)(pkey, item_addr, arg);
+		difference = (*compar)(pkey, item_addr, arg);
 		if (difference < 0)
 			/* KEY < ITEM --> Narrow the search-area to everything below */
 			hi = test_index;
@@ -87,13 +111,28 @@ INTERN ATTR_SECTION(".text.crt.utility.stdlib") WUNUSED NONNULL((1, 2, 5)) void 
 	return NULL;
 }
 #endif /* !__KERNEL__ */
+#if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
+PRIVATE ATTR_SECTION(".text.crt.dos.utility.stdlib") int
+(LIBCCALL libd_qsort_cookie_struct)(void const *a,
+                                    void const *b,
+                                    int (LIBDCALL *c)(void const *a, void const *b)) THROWS(...){
+	return (*c)(a, b);
+}
+INTERN ATTR_SECTION(".text.crt.dos.utility.stdlib") NONNULL((1, 4)) void
+(LIBDCALL libd_qsort)(void *pbase,
+                      size_t item_count,
+                      size_t item_size,
+                      int (LIBDCALL *compar)(void const *a, void const *b)) THROWS(...) {
+	libc_qsort_r(pbase, item_count, item_size, (int (LIBCCALL *)(void const *, void const *, void *))&libd_qsort_cookie_struct, (void *)compar);
+}
+#endif /* !__LIBCCALL_IS_LIBDCALL && !__KERNEL__ */
 #ifndef __LIBCCALL_CALLER_CLEANUP
 #ifndef ____invoke_compare_helper_defined
 __NAMESPACE_LOCAL_BEGIN
 #define ____invoke_compare_helper_defined 1
 __LOCAL_LIBC(__invoke_compare_helper) int
 (__LIBCCALL __invoke_compare_helper)(void const *__a, void const *__b, void *__arg) {
-	return (*(__compar_fn_t)__arg)(__a, __b);
+	return (*(int (__LIBCCALL *)(void const *, void const *))__arg)(__a, __b);
 }
 __NAMESPACE_LOCAL_END
 #endif /* !____invoke_compare_helper_defined */
@@ -102,32 +141,48 @@ INTERN ATTR_SECTION(".text.crt.utility.stdlib") NONNULL((1, 4)) void
 (LIBCCALL libc_qsort)(void *pbase,
                       size_t item_count,
                       size_t item_size,
-                      __compar_fn_t cmp) THROWS(...) {
+                      int (LIBCCALL *compar)(void const *a, void const *b)) THROWS(...) {
 #ifdef __LIBCCALL_CALLER_CLEANUP
 	libc_qsort_r(pbase, item_count, item_size,
-	        (int(__LIBCCALL *)(void const *, void const *, void *))(void *)cmp,
+	        (int (LIBCCALL *)(void const *, void const *, void *))(void *)compar,
 	        NULL);
 #else /* __LIBCCALL_CALLER_CLEANUP */
 	libc_qsort_r(pbase, item_count, item_size,
 	        &__NAMESPACE_LOCAL_SYM __invoke_compare_helper,
-	        (void *)cmp);
+	        (void *)compar);
 #endif /* !__LIBCCALL_CALLER_CLEANUP */
 }
+#if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
+PRIVATE ATTR_SECTION(".text.crt.dos.utility.stdlib") int
+(LIBCCALL libd_bsearch_cookie_struct)(void const *a,
+                                      void const *b,
+                                      int (LIBDCALL *c)(void const *a, void const *b)) THROWS(...){
+	return (*c)(a, b);
+}
+INTERN ATTR_SECTION(".text.crt.dos.utility.stdlib") WUNUSED NONNULL((1, 2, 5)) void *
+(LIBDCALL libd_bsearch)(void const *pkey,
+                        void const *pbase,
+                        size_t item_count,
+                        size_t item_size,
+                        int (LIBDCALL *compar)(void const *a, void const *b)) THROWS(...) {
+	return libc_bsearch_r(pkey, pbase, item_count, item_size, (int (LIBCCALL *)(void const *, void const *, void *))&libd_bsearch_cookie_struct, (void *)compar);
+}
+#endif /* !__LIBCCALL_IS_LIBDCALL && !__KERNEL__ */
 #ifndef __KERNEL__
 INTERN ATTR_SECTION(".text.crt.utility.stdlib") WUNUSED NONNULL((1, 2, 5)) void *
 (LIBCCALL libc_bsearch)(void const *pkey,
                         void const *pbase,
                         size_t item_count,
                         size_t item_size,
-                        __compar_fn_t cmp) THROWS(...) {
+                        int (LIBCCALL *compar)(void const *a, void const *b)) THROWS(...) {
 #ifdef __LIBCCALL_CALLER_CLEANUP
 	return (void *)libc_bsearch_r(pkey, pbase, item_count, item_size,
-	                         (int(__LIBCCALL *)(void const *, void const *, void *))(void *)cmp,
+	                         (int (LIBCCALL *)(void const *, void const *, void *))(void *)compar,
 	                         NULL);
 #else /* __LIBCCALL_CALLER_CLEANUP */
 	return (void *)libc_bsearch_r(pkey, pbase, item_count, item_size,
 	                         &__NAMESPACE_LOCAL_SYM __invoke_compare_helper,
-	                         (void *)cmp);
+	                         (void *)compar);
 #endif /* !__LIBCCALL_CALLER_CLEANUP */
 }
 #if __SIZEOF_LONG__ == __SIZEOF_INT__
@@ -2035,14 +2090,39 @@ INTERN ATTR_SECTION(".text.crt.solaris") ATTR_CONST WUNUSED char const *
 NOTHROW_NCX(LIBCCALL libc_getexecname)(void) {
 	return __LOCAL_program_invocation_name;
 }
+#endif /* !__KERNEL__ */
+#if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
+struct libd_fdwalk_cookie_struct {
+	int (LIBDCALL *walk)(void *arg, fd_t fd);
+	void *arg;
+};
+PRIVATE ATTR_SECTION(".text.crt.dos.solaris") int
+(LIBCCALL libd_fdwalk_cookie_struct)(struct libd_fdwalk_cookie_struct *c,
+                                     fd_t fd) THROWS(...){
+	return (*c->walk)(c->arg, fd);
+}
+/* Enumerate all open file descriptors by invoking `(*walk)(arg, <fd>)' for each of them
+ * If  during any of these invocations, `(*walk)(...)' returns non-zero, enumeration stops,
+ * and `fdwalk()' returns with that same value.  If `(*walk)(...)' is never called, or  all
+ * invocations return 0, `fdwalk()' will also return 0. */
+INTERN ATTR_SECTION(".text.crt.dos.solaris") NONNULL((1)) int
+(LIBDCALL libd_fdwalk)(int (LIBDCALL *walk)(void *arg, fd_t fd),
+                       void *arg) THROWS(...) {
+	struct libd_fdwalk_cookie_struct libd_fdwalk_cookie;
+	libd_fdwalk_cookie.walk = walk;
+	libd_fdwalk_cookie.arg = arg;
+	return libc_fdwalk((int (LIBCCALL *)(void *, fd_t))&libd_fdwalk_cookie_struct, &libd_fdwalk_cookie);
+}
+#endif /* !__LIBCCALL_IS_LIBDCALL && !__KERNEL__ */
+#ifndef __KERNEL__
 #include <asm/os/fcntl.h>
-/* Enumerate all open file descriptors by invoking `(*func)(cookie, <fd>)' for each of them
- * If  during any of these invocations, `(*func)(...)' returns non-zero, enumeration stops,
- * and `fdwalk()' returns with that same value.  If `(*func)(...)' is never called, or  all
+/* Enumerate all open file descriptors by invoking `(*walk)(arg, <fd>)' for each of them
+ * If  during any of these invocations, `(*walk)(...)' returns non-zero, enumeration stops,
+ * and `fdwalk()' returns with that same value.  If `(*walk)(...)' is never called, or  all
  * invocations return 0, `fdwalk()' will also return 0. */
 INTERN ATTR_SECTION(".text.crt.solaris") NONNULL((1)) int
-NOTHROW_NCX(LIBCCALL libc_fdwalk)(__fdwalk_func_t func,
-                                  void *cookie) {
+(LIBCCALL libc_fdwalk)(int (LIBCCALL *walk)(void *arg, fd_t fd),
+                       void *arg) THROWS(...) {
 	/* TODO: Implementation alternative using `opendir("/proc/self/fd")' */
 	int result = 0;
 #ifdef __libc_geterrno
@@ -2062,7 +2142,7 @@ NOTHROW_NCX(LIBCCALL libc_fdwalk)(__fdwalk_func_t func,
 #endif /* __libc_geterrno */
 			break;
 		}
-		result = (*func)(cookie, fd);
+		result = (*walk)(arg, fd);
 		if (result != 0)
 			break;
 		++fd;
@@ -2167,18 +2247,18 @@ INTERN ATTR_SECTION(".text.crt.bsd") NONNULL((1, 4)) int
 (LIBCCALL libc_heapsort)(void *pbase,
                          size_t item_count,
                          size_t item_size,
-                         __compar_fn_t cmp) THROWS(...) {
+                         int (LIBCCALL *compar)(void const *a, void const *b)) THROWS(...) {
 	/* TODO: Actually do heap-sort! */
-	libc_qsort(pbase, item_count, item_size, cmp);
+	libc_qsort(pbase, item_count, item_size, compar);
 	return 0;
 }
 INTERN ATTR_SECTION(".text.crt.bsd") NONNULL((1, 4)) int
 (LIBCCALL libc_mergesort)(void *pbase,
                           size_t item_count,
                           size_t item_size,
-                          __compar_fn_t cmp) THROWS(...) {
+                          int (LIBCCALL *compar)(void const *a, void const *b)) THROWS(...) {
 	/* TODO: Actually do merge-sort! */
-	libc_qsort(pbase, item_count, item_size, cmp);
+	libc_qsort(pbase, item_count, item_size, compar);
 	return 0;
 }
 #include <bits/types.h>
@@ -2219,11 +2299,34 @@ NOTHROW_NCX(LIBCCALL libc_strtonum)(char const *nptr,
 	return 0;
 }
 #endif /* !__KERNEL__ */
+#if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
+struct libd_qsort_r_cookie_struct {
+	int (LIBDCALL *compar)(void const *a, void const *b, void *arg);
+	void *arg;
+};
+PRIVATE ATTR_SECTION(".text.crt.dos.utility.stdlib") int
+(LIBCCALL libd_qsort_r_cookie_struct)(void const *a,
+                                      void const *b,
+                                      struct libd_qsort_r_cookie_struct *c) THROWS(...){
+	return (*c->compar)(a, b, c->arg);
+}
+INTERN ATTR_SECTION(".text.crt.dos.utility.stdlib") NONNULL((1, 4)) void
+(LIBDCALL libd_qsort_r)(void *pbase,
+                        size_t item_count,
+                        size_t item_size,
+                        int (LIBDCALL *compar)(void const *a, void const *b, void *arg),
+                        void *arg) THROWS(...) {
+	struct libd_qsort_r_cookie_struct libd_qsort_r_cookie;
+	libd_qsort_r_cookie.compar = compar;
+	libd_qsort_r_cookie.arg = arg;
+	libc_qsort_r(pbase, item_count, item_size, (int (LIBCCALL *)(void const *, void const *, void *))&libd_qsort_r_cookie_struct, &libd_qsort_r_cookie);
+}
+#endif /* !__LIBCCALL_IS_LIBDCALL && !__KERNEL__ */
 INTERN ATTR_SECTION(".text.crt.utility.stdlib") NONNULL((1, 4)) void
 (LIBCCALL libc_qsort_r)(void *pbase,
                         size_t item_count,
                         size_t item_size,
-                        __compar_d_fn_t cmp,
+                        int (LIBCCALL *compar)(void const *a, void const *b, void *arg),
                         void *arg) THROWS(...) {
 	/* A public domain qsort() drop-in implementation. I couldn't find the original
 	 * source referenced (see the comment below), but this code is the first  thing
@@ -2262,7 +2365,7 @@ INTERN ATTR_SECTION(".text.crt.utility.stdlib") NONNULL((1, 4)) void
 				byte_t tmp, *a, *b;
 				a = (byte_t *)pbase + j;
 				b = a + gap_bytes;
-				if ((*cmp)(a, b, arg) <= 0)
+				if ((*compar)(a, b, arg) <= 0)
 					break;
 				swap_index = item_size;
 				do {
@@ -2422,15 +2525,41 @@ INTERN ATTR_SECTION(".text.crt.dos.math.utility") ATTR_CONST WUNUSED u64
 NOTHROW_NCX(LIBCCALL libc__byteswap_uint64)(u64 val) {
 	return __hybrid_bswap64(val);
 }
+#endif /* !__KERNEL__ */
+#if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
+struct libd_bsearch_s_cookie_struct {
+	int (LIBDCALL *compar)(void *arg, void const *a, void const *b);
+	void *arg;
+};
+PRIVATE ATTR_SECTION(".text.crt.dos.utility") int
+(LIBCCALL libd_bsearch_s_cookie_struct)(void const *a,
+                                        void const *b,
+                                        struct libd_bsearch_s_cookie_struct *c) THROWS(...){
+	return (*c->compar)(c->arg, a, b);
+}
+INTERN ATTR_SECTION(".text.crt.dos.utility") WUNUSED NONNULL((1, 2, 5)) void *
+(LIBDCALL libd_bsearch_s)(void const *key,
+                          void const *base,
+                          size_t elem_count,
+                          size_t elem_size,
+                          int (LIBDCALL *compar)(void *arg, void const *a, void const *b),
+                          void *arg) THROWS(...) {
+	struct libd_bsearch_s_cookie_struct libd_bsearch_s_cookie;
+	libd_bsearch_s_cookie.compar = compar;
+	libd_bsearch_s_cookie.arg = arg;
+	return libc_bsearch_r(key, base, elem_count, elem_size, (int (LIBCCALL *)(void const *, void const *, void *))&libd_bsearch_s_cookie_struct, &libd_bsearch_s_cookie);
+}
+#endif /* !__LIBCCALL_IS_LIBDCALL && !__KERNEL__ */
+#ifndef __KERNEL__
 #ifndef ____invoke_compare_helper_s_defined
 #define ____invoke_compare_helper_s_defined 1
 __NAMESPACE_LOCAL_BEGIN
 struct __invoke_compare_helper_s_data {
-	__dos_compar_d_fn_t __fun;
-	void               *__arg;
+	int (__LIBCCALL *__fun)(void *__arg, void const *__a, void const *__b);
+	void            *__arg;
 };
 __LOCAL_LIBC(__invoke_compare_helper_s) int
-(__LIBKCALL __invoke_compare_helper_s)(void const *__a, void const *__b, void *__arg) {
+(__LIBCCALL __invoke_compare_helper_s)(void const *__a, void const *__b, void *__arg) {
 	void *__base_arg = ((struct __invoke_compare_helper_s_data *)__arg)->__arg;
 	return (*((struct __invoke_compare_helper_s_data *)__arg)->__fun)(__base_arg, __a, __b);
 }
@@ -2441,7 +2570,7 @@ INTERN ATTR_SECTION(".text.crt.dos.utility") WUNUSED NONNULL((1, 2, 5)) void *
                           void const *base,
                           size_t elem_count,
                           size_t elem_size,
-                          __dos_compar_d_fn_t compar,
+                          int (LIBCCALL *compar)(void *arg, void const *a, void const *b),
                           void *arg) THROWS(...) {
 	struct __NAMESPACE_LOCAL_SYM __invoke_compare_helper_s_data data;
 	data.__fun = compar;
@@ -2450,15 +2579,40 @@ INTERN ATTR_SECTION(".text.crt.dos.utility") WUNUSED NONNULL((1, 2, 5)) void *
 	                         &__NAMESPACE_LOCAL_SYM __invoke_compare_helper_s,
 	                         &data);
 }
+#endif /* !__KERNEL__ */
+#if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
+struct libd_qsort_s_cookie_struct {
+	int (LIBDCALL *compar)(void *arg, void const *a, void const *b);
+	void *arg;
+};
+PRIVATE ATTR_SECTION(".text.crt.dos.utility") int
+(LIBCCALL libd_qsort_s_cookie_struct)(void const *a,
+                                      void const *b,
+                                      struct libd_qsort_s_cookie_struct *c) THROWS(...){
+	return (*c->compar)(c->arg, a, b);
+}
+INTERN ATTR_SECTION(".text.crt.dos.utility") NONNULL((1, 4)) void
+(LIBDCALL libd_qsort_s)(void *base,
+                        size_t elem_count,
+                        size_t elem_size,
+                        int (LIBDCALL *compar)(void *arg, void const *a, void const *b),
+                        void *arg) THROWS(...) {
+	struct libd_qsort_s_cookie_struct libd_qsort_s_cookie;
+	libd_qsort_s_cookie.compar = compar;
+	libd_qsort_s_cookie.arg = arg;
+	libc_qsort_r(base, elem_count, elem_size, (int (LIBCCALL *)(void const *, void const *, void *))&libd_qsort_s_cookie_struct, &libd_qsort_s_cookie);
+}
+#endif /* !__LIBCCALL_IS_LIBDCALL && !__KERNEL__ */
+#ifndef __KERNEL__
 #ifndef ____invoke_compare_helper_s_defined
 #define ____invoke_compare_helper_s_defined 1
 __NAMESPACE_LOCAL_BEGIN
 struct __invoke_compare_helper_s_data {
-	__dos_compar_d_fn_t __fun;
-	void               *__arg;
+	int (__LIBCCALL *__fun)(void *__arg, void const *__a, void const *__b);
+	void            *__arg;
 };
 __LOCAL_LIBC(__invoke_compare_helper_s) int
-(__LIBKCALL __invoke_compare_helper_s)(void const *__a, void const *__b, void *__arg) {
+(__LIBCCALL __invoke_compare_helper_s)(void const *__a, void const *__b, void *__arg) {
 	void *__base_arg = ((struct __invoke_compare_helper_s_data *)__arg)->__arg;
 	return (*((struct __invoke_compare_helper_s_data *)__arg)->__fun)(__base_arg, __a, __b);
 }
@@ -2468,7 +2622,7 @@ INTERN ATTR_SECTION(".text.crt.dos.utility") NONNULL((1, 4)) void
 (LIBCCALL libc_qsort_s)(void *base,
                         size_t elem_count,
                         size_t elem_size,
-                        __dos_compar_d_fn_t compar,
+                        int (LIBCCALL *compar)(void *arg, void const *a, void const *b),
                         void *arg) THROWS(...) {
 	struct __NAMESPACE_LOCAL_SYM __invoke_compare_helper_s_data data;
 	data.__fun = compar;
@@ -4362,10 +4516,19 @@ err_range:
 
 DECL_END
 
+#if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
+DEFINE_PUBLIC_ALIAS(DOS$bsearch_r, libd_bsearch_r);
+#endif /* !__LIBCCALL_IS_LIBDCALL && !__KERNEL__ */
 #ifndef __KERNEL__
 DEFINE_PUBLIC_ALIAS(bsearch_r, libc_bsearch_r);
 #endif /* !__KERNEL__ */
+#if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
+DEFINE_PUBLIC_ALIAS(DOS$qsort, libd_qsort);
+#endif /* !__LIBCCALL_IS_LIBDCALL && !__KERNEL__ */
 DEFINE_PUBLIC_ALIAS(qsort, libc_qsort);
+#if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
+DEFINE_PUBLIC_ALIAS(DOS$bsearch, libd_bsearch);
+#endif /* !__LIBCCALL_IS_LIBDCALL && !__KERNEL__ */
 #ifndef __KERNEL__
 DEFINE_PUBLIC_ALIAS(bsearch, libc_bsearch);
 DEFINE_PUBLIC_ALIAS(labs, libc_labs);
@@ -4506,6 +4669,11 @@ DEFINE_PUBLIC_ALIAS(__strtold_l, libc_strtold_l);
 DEFINE_PUBLIC_ALIAS(strtold_l, libc_strtold_l);
 DEFINE_PUBLIC_ALIAS(shexec, libc_shexec);
 DEFINE_PUBLIC_ALIAS(getexecname, libc_getexecname);
+#endif /* !__KERNEL__ */
+#if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
+DEFINE_PUBLIC_ALIAS(DOS$fdwalk, libd_fdwalk);
+#endif /* !__LIBCCALL_IS_LIBDCALL && !__KERNEL__ */
+#ifndef __KERNEL__
 DEFINE_PUBLIC_ALIAS(fdwalk, libc_fdwalk);
 DEFINE_PUBLIC_ALIAS(lltostr, libc_lltostr);
 DEFINE_PUBLIC_ALIAS(ulltostr, libc_ulltostr);
@@ -4517,6 +4685,9 @@ DEFINE_PUBLIC_ALIAS(heapsort, libc_heapsort);
 DEFINE_PUBLIC_ALIAS(mergesort, libc_mergesort);
 DEFINE_PUBLIC_ALIAS(strtonum, libc_strtonum);
 #endif /* !__KERNEL__ */
+#if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
+DEFINE_PUBLIC_ALIAS(DOS$qsort_r, libd_qsort_r);
+#endif /* !__LIBCCALL_IS_LIBDCALL && !__KERNEL__ */
 DEFINE_PUBLIC_ALIAS(qsort_r, libc_qsort_r);
 #ifndef __KERNEL__
 DEFINE_PUBLIC_ALIAS(mkostemp64, libc_mkostemp);
@@ -4539,7 +4710,17 @@ DEFINE_PUBLIC_ALIAS(_atoll_l, libc__atoll_l);
 DEFINE_PUBLIC_ALIAS(_byteswap_ushort, libc__byteswap_ushort);
 DEFINE_PUBLIC_ALIAS(_byteswap_ulong, libc__byteswap_ulong);
 DEFINE_PUBLIC_ALIAS(_byteswap_uint64, libc__byteswap_uint64);
+#endif /* !__KERNEL__ */
+#if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
+DEFINE_PUBLIC_ALIAS(DOS$bsearch_s, libd_bsearch_s);
+#endif /* !__LIBCCALL_IS_LIBDCALL && !__KERNEL__ */
+#ifndef __KERNEL__
 DEFINE_PUBLIC_ALIAS(bsearch_s, libc_bsearch_s);
+#endif /* !__KERNEL__ */
+#if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
+DEFINE_PUBLIC_ALIAS(DOS$qsort_s, libd_qsort_s);
+#endif /* !__LIBCCALL_IS_LIBDCALL && !__KERNEL__ */
+#ifndef __KERNEL__
 DEFINE_PUBLIC_ALIAS(qsort_s, libc_qsort_s);
 DEFINE_PUBLIC_ALIAS(_itoa_s, libc__itoa_s);
 DEFINE_PUBLIC_ALIAS(_ltoa_s, libc__ltoa_s);

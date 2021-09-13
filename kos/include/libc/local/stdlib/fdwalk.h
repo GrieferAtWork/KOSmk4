@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xfe765464 */
+/* HASH CRC-32:0xa363c594 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -23,10 +23,7 @@
 #include <__crt.h>
 #include <asm/os/fcntl.h>
 #if (defined(__CRT_HAVE_fcntl) || defined(__CRT_HAVE___fcntl)) && defined(__F_NEXT)
-#ifndef ____fdwalk_func_t_defined
-#define ____fdwalk_func_t_defined 1
-typedef int (__LIBKCALL *__fdwalk_func_t)(void *__cookie, __fd_t __fd);
-#endif /* !____fdwalk_func_t_defined */
+#include <kos/anno.h>
 __NAMESPACE_LOCAL_BEGIN
 #ifndef __local___localdep_fcntl_defined
 #define __local___localdep_fcntl_defined 1
@@ -50,7 +47,7 @@ __NAMESPACE_LOCAL_END
 #include <libc/errno.h>
 __NAMESPACE_LOCAL_BEGIN
 __LOCAL_LIBC(fdwalk) __ATTR_NONNULL((1)) int
-__NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(fdwalk))(__fdwalk_func_t __func, void *__cookie) {
+(__LIBCCALL __LIBC_LOCAL_NAME(fdwalk))(int (__LIBCCALL *__walk)(void *__arg, __fd_t __fd), void *__arg) __THROWS(...) {
 	/* TODO: Implementation alternative using `opendir("/proc/self/fd")' */
 	int __result = 0;
 #ifdef __libc_geterrno
@@ -70,7 +67,7 @@ __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(fdwalk))(__fdwalk_func_t __func, void
 #endif /* __libc_geterrno */
 			break;
 		}
-		__result = (*__func)(__cookie, __fd);
+		__result = (*__walk)(__arg, __fd);
 		if (__result != 0)
 			break;
 		++__fd;

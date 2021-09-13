@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x9b35ce76 */
+/* HASH CRC-32:0x8d3ac18f */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -18,33 +18,34 @@
  *    misrepresented as being the original software.                          *
  * 3. This notice may not be removed or altered from any source distribution. *
  */
-#ifndef __local_tdestroy_defined
-#define __local_tdestroy_defined 1
+#ifndef __local_tfind_r_defined
+#define __local_tfind_r_defined 1
 #include <__crt.h>
 #include <kos/anno.h>
 __NAMESPACE_LOCAL_BEGIN
-#ifndef __local___localdep_tdestroy_r_defined
-#define __local___localdep_tdestroy_r_defined 1
-#ifdef __CRT_HAVE_tdestroy_r
-__CREDIRECT_VOID(__ATTR_NONNULL((2)),__THROWING,__localdep_tdestroy_r,(void *__root, void (__LIBCCALL *__freefct)(void *__nodep, void *__arg), void *__arg),tdestroy_r,(__root,__freefct,__arg))
-#else /* __CRT_HAVE_tdestroy_r */
-__NAMESPACE_LOCAL_END
-#include <libc/local/search/tdestroy_r.h>
-__NAMESPACE_LOCAL_BEGIN
-#define __localdep_tdestroy_r __LIBC_LOCAL_NAME(tdestroy_r)
-#endif /* !__CRT_HAVE_tdestroy_r */
-#endif /* !__local___localdep_tdestroy_r_defined */
-__LOCAL_LIBC(tdestroy) __ATTR_NONNULL((2)) void
-(__LIBCCALL __LIBC_LOCAL_NAME(tdestroy))(void *__root, void (__LIBCCALL *__freefct)(void *__nodep)) __THROWS(...) {
-#ifdef __LIBCCALL_CALLER_CLEANUP
-	(__NAMESPACE_LOCAL_SYM __localdep_tdestroy_r)(__root, (void (__LIBCCALL *)(void *, void *))(void *)__freefct, __NULLPTR);
-#else /* __LIBCCALL_CALLER_CLEANUP */
-	(__NAMESPACE_LOCAL_SYM __localdep_tdestroy_r)(__root, &__NAMESPACE_LOCAL_SYM __invoke_free_fn_helper, (void *)__compar);
-#endif /* !__LIBCCALL_CALLER_CLEANUP */
+__LOCAL_LIBC(tfind_r) __ATTR_NONNULL((3)) void *
+(__LIBCCALL __LIBC_LOCAL_NAME(tfind_r))(void const *__key, void *const *__vrootp, int (__LIBCCALL *__compar)(void const *__a, void const *__b, void *__arg), void *__arg) __THROWS(...) {
+	typedef struct __node_struct {
+		void const           *__key;
+		struct __node_struct *__left_node;
+		struct __node_struct *__right_node;
+		__UINTPTR_TYPE__      __is_red;
+	} *__node;
+	__node __root, *__rootp = (__node *)__vrootp;
+	if (__rootp == __NULLPTR)
+		return __NULLPTR;
+	while ((__root = *__rootp) != __NULLPTR) {
+		int __r = (*__compar)(__key, __root->__key, __arg);
+		if (__r == 0)
+			return __root;
+		__rootp = __r < 0 ? &__root->__left_node
+		              : &__root->__right_node;
+	}
+	return __NULLPTR;
 }
 __NAMESPACE_LOCAL_END
-#ifndef __local___localdep_tdestroy_defined
-#define __local___localdep_tdestroy_defined 1
-#define __localdep_tdestroy __LIBC_LOCAL_NAME(tdestroy)
-#endif /* !__local___localdep_tdestroy_defined */
-#endif /* !__local_tdestroy_defined */
+#ifndef __local___localdep_tfind_r_defined
+#define __local___localdep_tfind_r_defined 1
+#define __localdep_tfind_r __LIBC_LOCAL_NAME(tfind_r)
+#endif /* !__local___localdep_tfind_r_defined */
+#endif /* !__local_tfind_r_defined */

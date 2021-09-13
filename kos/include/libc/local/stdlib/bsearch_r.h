@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x6c15b230 */
+/* HASH CRC-32:0xbc5d0481 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -21,17 +21,13 @@
 #ifndef __local_bsearch_r_defined
 #define __local_bsearch_r_defined 1
 #include <__crt.h>
-#ifndef __compar_d_fn_t_defined
-#define __compar_d_fn_t_defined 1
-typedef int (__LIBKCALL *__compar_d_fn_t)(void const *__a, void const *__b, void *__arg);
-#endif /* !__compar_d_fn_t_defined */
 #include <kos/anno.h>
 #include <hybrid/typecore.h>
 __NAMESPACE_LOCAL_BEGIN
 __LOCAL_LIBC(bsearch_r) __ATTR_WUNUSED __ATTR_NONNULL((1, 2, 5)) void *
-(__LIBCCALL __LIBC_LOCAL_NAME(bsearch_r))(void const *__pkey, void const *__pbase, __SIZE_TYPE__ __item_count, __SIZE_TYPE__ __item_size, __compar_d_fn_t __cmp, void *__arg) __THROWS(...) {
+(__LIBCCALL __LIBC_LOCAL_NAME(bsearch_r))(void const *__pkey, void const *__pbase, __SIZE_TYPE__ __item_count, __SIZE_TYPE__ __item_size, int (__LIBCCALL *__compar)(void const *__a, void const *__b, void *__arg), void *__arg) __THROWS(...) {
 	/* Optimize this function with the (allowed) assumption that `pbase' is sorted according to:
-	 * >> qsort_r(pbase, item_count, item_size, cmp, arg); */
+	 * >> qsort_r(pbase, item_count, item_size, compar, arg); */
 	__SIZE_TYPE__ __lo, __hi;
 	__lo = 0;
 	__hi = __item_count;
@@ -51,7 +47,7 @@ __LOCAL_LIBC(bsearch_r) __ATTR_WUNUSED __ATTR_NONNULL((1, 2, 5)) void *
 		__test_index = (__lo + __hi) / 2;
 		__item_addr  = (__BYTE_TYPE__ *)__pbase + (__test_index * __item_size);
 		/* Check if the requested item lies above, or below the selected one */
-		__difference = (*__cmp)(__pkey, __item_addr, __arg);
+		__difference = (*__compar)(__pkey, __item_addr, __arg);
 		if (__difference < 0)
 			/* KEY < ITEM --> Narrow the search-area to everything below */
 			__hi = __test_index;

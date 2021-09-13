@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x9b35ce76 */
+/* HASH CRC-32:0xe6386017 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -18,33 +18,26 @@
  *    misrepresented as being the original software.                          *
  * 3. This notice may not be removed or altered from any source distribution. *
  */
-#ifndef __local_tdestroy_defined
-#define __local_tdestroy_defined 1
+#ifndef __local__lfind_s_defined
+#define __local__lfind_s_defined 1
 #include <__crt.h>
 #include <kos/anno.h>
+#include <hybrid/typecore.h>
 __NAMESPACE_LOCAL_BEGIN
-#ifndef __local___localdep_tdestroy_r_defined
-#define __local___localdep_tdestroy_r_defined 1
-#ifdef __CRT_HAVE_tdestroy_r
-__CREDIRECT_VOID(__ATTR_NONNULL((2)),__THROWING,__localdep_tdestroy_r,(void *__root, void (__LIBCCALL *__freefct)(void *__nodep, void *__arg), void *__arg),tdestroy_r,(__root,__freefct,__arg))
-#else /* __CRT_HAVE_tdestroy_r */
-__NAMESPACE_LOCAL_END
-#include <libc/local/search/tdestroy_r.h>
-__NAMESPACE_LOCAL_BEGIN
-#define __localdep_tdestroy_r __LIBC_LOCAL_NAME(tdestroy_r)
-#endif /* !__CRT_HAVE_tdestroy_r */
-#endif /* !__local___localdep_tdestroy_r_defined */
-__LOCAL_LIBC(tdestroy) __ATTR_NONNULL((2)) void
-(__LIBCCALL __LIBC_LOCAL_NAME(tdestroy))(void *__root, void (__LIBCCALL *__freefct)(void *__nodep)) __THROWS(...) {
-#ifdef __LIBCCALL_CALLER_CLEANUP
-	(__NAMESPACE_LOCAL_SYM __localdep_tdestroy_r)(__root, (void (__LIBCCALL *)(void *, void *))(void *)__freefct, __NULLPTR);
-#else /* __LIBCCALL_CALLER_CLEANUP */
-	(__NAMESPACE_LOCAL_SYM __localdep_tdestroy_r)(__root, &__NAMESPACE_LOCAL_SYM __invoke_free_fn_helper, (void *)__compar);
-#endif /* !__LIBCCALL_CALLER_CLEANUP */
+__LOCAL_LIBC(_lfind_s) __ATTR_WUNUSED __ATTR_NONNULL((2, 3, 5)) void *
+(__LIBCCALL __LIBC_LOCAL_NAME(_lfind_s))(void const *__key, void const *__pbase, __SIZE_TYPE__ __KOS_FIXED_CONST *__pitem_count, __SIZE_TYPE__ __item_size, int (__LIBCCALL *__compar)(void *__arg, void const *__a, void const *__b), void *__arg) __THROWS(...) {
+	__SIZE_TYPE__ __i, __count = *__pitem_count;
+	void const *__result = __pbase;
+	for (__i = 0; __i < __count; ++__i) {
+		if ((*__compar)(__arg, __key, __result) == 0)
+			return (void *)__result;
+		__result = (__BYTE_TYPE__ *)__result + __item_size;
+	}
+	return __NULLPTR;
 }
 __NAMESPACE_LOCAL_END
-#ifndef __local___localdep_tdestroy_defined
-#define __local___localdep_tdestroy_defined 1
-#define __localdep_tdestroy __LIBC_LOCAL_NAME(tdestroy)
-#endif /* !__local___localdep_tdestroy_defined */
-#endif /* !__local_tdestroy_defined */
+#ifndef __local___localdep__lfind_s_defined
+#define __local___localdep__lfind_s_defined 1
+#define __localdep__lfind_s __LIBC_LOCAL_NAME(_lfind_s)
+#endif /* !__local___localdep__lfind_s_defined */
+#endif /* !__local__lfind_s_defined */

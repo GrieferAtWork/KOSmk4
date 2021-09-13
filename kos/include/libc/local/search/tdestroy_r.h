@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x9b35ce76 */
+/* HASH CRC-32:0x44a055c9 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -18,33 +18,48 @@
  *    misrepresented as being the original software.                          *
  * 3. This notice may not be removed or altered from any source distribution. *
  */
-#ifndef __local_tdestroy_defined
-#define __local_tdestroy_defined 1
+#ifndef __local_tdestroy_r_defined
+#define __local_tdestroy_r_defined 1
 #include <__crt.h>
 #include <kos/anno.h>
 __NAMESPACE_LOCAL_BEGIN
-#ifndef __local___localdep_tdestroy_r_defined
-#define __local___localdep_tdestroy_r_defined 1
-#ifdef __CRT_HAVE_tdestroy_r
-__CREDIRECT_VOID(__ATTR_NONNULL((2)),__THROWING,__localdep_tdestroy_r,(void *__root, void (__LIBCCALL *__freefct)(void *__nodep, void *__arg), void *__arg),tdestroy_r,(__root,__freefct,__arg))
-#else /* __CRT_HAVE_tdestroy_r */
-__NAMESPACE_LOCAL_END
-#include <libc/local/search/tdestroy_r.h>
-__NAMESPACE_LOCAL_BEGIN
-#define __localdep_tdestroy_r __LIBC_LOCAL_NAME(tdestroy_r)
-#endif /* !__CRT_HAVE_tdestroy_r */
-#endif /* !__local___localdep_tdestroy_r_defined */
-__LOCAL_LIBC(tdestroy) __ATTR_NONNULL((2)) void
-(__LIBCCALL __LIBC_LOCAL_NAME(tdestroy))(void *__root, void (__LIBCCALL *__freefct)(void *__nodep)) __THROWS(...) {
-#ifdef __LIBCCALL_CALLER_CLEANUP
-	(__NAMESPACE_LOCAL_SYM __localdep_tdestroy_r)(__root, (void (__LIBCCALL *)(void *, void *))(void *)__freefct, __NULLPTR);
-#else /* __LIBCCALL_CALLER_CLEANUP */
-	(__NAMESPACE_LOCAL_SYM __localdep_tdestroy_r)(__root, &__NAMESPACE_LOCAL_SYM __invoke_free_fn_helper, (void *)__compar);
-#endif /* !__LIBCCALL_CALLER_CLEANUP */
+#ifndef __local___localdep_free_defined
+#define __local___localdep_free_defined 1
+#if __has_builtin(__builtin_free) && defined(__LIBC_BIND_CRTBUILTINS) && defined(__CRT_HAVE_free)
+__CEIREDIRECT(,void,__NOTHROW_NCX,__localdep_free,(void *__mallptr),free,{ __builtin_free(__mallptr); })
+#elif defined(__CRT_HAVE_free)
+__CREDIRECT_VOID(,__NOTHROW_NCX,__localdep_free,(void *__mallptr),free,(__mallptr))
+#elif defined(__CRT_HAVE_cfree)
+__CREDIRECT_VOID(,__NOTHROW_NCX,__localdep_free,(void *__mallptr),cfree,(__mallptr))
+#else /* ... */
+#undef __local___localdep_free_defined
+#endif /* !... */
+#endif /* !__local___localdep_free_defined */
+__LOCAL_LIBC(tdestroy_r) __ATTR_NONNULL((2)) void
+(__LIBCCALL __LIBC_LOCAL_NAME(tdestroy_r))(void *__root, void (__LIBCCALL *__freefct)(void *__nodep, void *__arg), void *__arg) __THROWS(...) {
+	if (__root) {
+		void *__l, *__r;
+__again:
+		__l = ((void **)__root)[1];
+		__r = ((void **)__root)[2];
+		(*__freefct)(((void **)__root)[0], __arg);
+#if defined(__CRT_HAVE_free) || defined(__CRT_HAVE_cfree)
+		(__NAMESPACE_LOCAL_SYM __localdep_free)(__root);
+#endif /* __CRT_HAVE_free || __CRT_HAVE_cfree */
+		if (__l) {
+			__LIBC_LOCAL_NAME(tdestroy_r)(__r, __freefct, __arg);
+			__root = __l;
+			goto __again;
+		}
+		if (__r) {
+			__root = __r;
+			goto __again;
+		}
+	}
 }
 __NAMESPACE_LOCAL_END
-#ifndef __local___localdep_tdestroy_defined
-#define __local___localdep_tdestroy_defined 1
-#define __localdep_tdestroy __LIBC_LOCAL_NAME(tdestroy)
-#endif /* !__local___localdep_tdestroy_defined */
-#endif /* !__local_tdestroy_defined */
+#ifndef __local___localdep_tdestroy_r_defined
+#define __local___localdep_tdestroy_r_defined 1
+#define __localdep_tdestroy_r __LIBC_LOCAL_NAME(tdestroy_r)
+#endif /* !__local___localdep_tdestroy_r_defined */
+#endif /* !__local_tdestroy_r_defined */

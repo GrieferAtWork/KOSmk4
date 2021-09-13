@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x77f5aef2 */
+/* HASH CRC-32:0x73038bf */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -198,7 +198,7 @@ NOTHROW_NCX(LIBCCALL libc_hsearch_r)(ENTRY item,
 			}
 		} while (((entry_type *)htab->table)[idx].used);
 	}
-	if (action == 1) {
+	if (action == ENTER) {
 		if (htab->filled == htab->size) {
 #ifdef ENOMEM
 			(void)__libc_seterrno(ENOMEM);
@@ -311,6 +311,33 @@ NOTHROW_NCX(LIBCCALL libc_hdestroy_r)(struct hsearch_data *htab) {
 #endif /* __CRT_HAVE_free || __CRT_HAVE_cfree */
 	htab->table = NULL;
 }
+#endif /* !__KERNEL__ */
+#if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
+struct libd_tsearch_r_cookie_struct {
+	int (LIBDCALL *compar)(void const *a, void const *b, void *arg);
+	void *arg;
+};
+PRIVATE ATTR_SECTION(".text.crt.dos.utility.search") int
+(LIBCCALL libd_tsearch_r_cookie_struct)(void const *a,
+                                        void const *b,
+                                        struct libd_tsearch_r_cookie_struct *c) THROWS(...){
+	return (*c->compar)(a, b, c->arg);
+}
+/* >> tsearch(3), tsearch_r(3)
+ * Search for an  entry matching  the given `key'  in the  tree
+ * pointed to by `*rootp' and insert a new element if not found */
+INTERN ATTR_SECTION(".text.crt.dos.utility.search") NONNULL((3)) void *
+(LIBDCALL libd_tsearch_r)(void const *key,
+                          void **vrootp,
+                          int (LIBDCALL *compar)(void const *a, void const *b, void *arg),
+                          void *arg) THROWS(...) {
+	struct libd_tsearch_r_cookie_struct libd_tsearch_r_cookie;
+	libd_tsearch_r_cookie.compar = compar;
+	libd_tsearch_r_cookie.arg = arg;
+	return libc_tsearch_r(key, vrootp, (int (LIBCCALL *)(void const *, void const *, void *))&libd_tsearch_r_cookie_struct, &libd_tsearch_r_cookie);
+}
+#endif /* !__LIBCCALL_IS_LIBDCALL && !__KERNEL__ */
+#ifndef __KERNEL__
 __NAMESPACE_LOCAL_BEGIN
 /* Possibly  "split" a node with two red  successors, and/or fix up two red
  * edges in a  row. `rootp' is  a pointer  to the lowest  node we  visited,
@@ -375,13 +402,14 @@ __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(maybe_split_for_insert))(void **rootp
 	}
 }
 __NAMESPACE_LOCAL_END
-/* >> tsearch(3)
+/* >> tsearch(3), tsearch_r(3)
  * Search for an  entry matching  the given `key'  in the  tree
  * pointed to by `*rootp' and insert a new element if not found */
 INTERN ATTR_SECTION(".text.crt.utility.search") NONNULL((3)) void *
-NOTHROW_NCX(LIBCCALL libc_tsearch)(void const *key,
-                                   void **vrootp,
-                                   __compar_fn_t compar) {
+(LIBCCALL libc_tsearch_r)(void const *key,
+                          void **vrootp,
+                          int (LIBCCALL *compar)(void const *a, void const *b, void *arg),
+                          void *arg) THROWS(...) {
 	typedef struct __node_struct {
 		void const           *key;
 		struct __node_struct *left_node;
@@ -401,7 +429,7 @@ NOTHROW_NCX(LIBCCALL libc_tsearch)(void const *key,
 	nextp = rootp;
 	while (*nextp != NULL) {
 		root = *rootp;
-		r = (*compar)(key, root->key);
+		r = (*compar)(key, root->key, arg);
 		if (r == 0)
 			return root;
 		__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(maybe_split_for_insert)((void **)rootp,
@@ -434,13 +462,41 @@ NOTHROW_NCX(LIBCCALL libc_tsearch)(void const *key,
 	}
 	return q;
 }
-/* >> tfind(3)
+#endif /* !__KERNEL__ */
+#if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
+struct libd_tfind_r_cookie_struct {
+	int (LIBDCALL *compar)(void const *a, void const *b, void *arg);
+	void *arg;
+};
+PRIVATE ATTR_SECTION(".text.crt.dos.utility.search") int
+(LIBCCALL libd_tfind_r_cookie_struct)(void const *a,
+                                      void const *b,
+                                      struct libd_tfind_r_cookie_struct *c) THROWS(...){
+	return (*c->compar)(a, b, c->arg);
+}
+/* >> tfind(3), tfind_r(3)
+ * Search for an entry matching the given `key' in the tree pointed
+ * to  by `*rootp'. If no matching entry is available return `NULL' */
+INTERN ATTR_SECTION(".text.crt.dos.utility.search") NONNULL((3)) void *
+(LIBDCALL libd_tfind_r)(void const *key,
+                        void *const *vrootp,
+                        int (LIBDCALL *compar)(void const *a, void const *b, void *arg),
+                        void *arg) THROWS(...) {
+	struct libd_tfind_r_cookie_struct libd_tfind_r_cookie;
+	libd_tfind_r_cookie.compar = compar;
+	libd_tfind_r_cookie.arg = arg;
+	return libc_tfind_r(key, vrootp, (int (LIBCCALL *)(void const *, void const *, void *))&libd_tfind_r_cookie_struct, &libd_tfind_r_cookie);
+}
+#endif /* !__LIBCCALL_IS_LIBDCALL && !__KERNEL__ */
+#ifndef __KERNEL__
+/* >> tfind(3), tfind_r(3)
  * Search for an entry matching the given `key' in the tree pointed
  * to  by `*rootp'. If no matching entry is available return `NULL' */
 INTERN ATTR_SECTION(".text.crt.utility.search") NONNULL((3)) void *
-NOTHROW_NCX(LIBCCALL libc_tfind)(void const *key,
-                                 void *const *vrootp,
-                                 __compar_fn_t compar) {
+(LIBCCALL libc_tfind_r)(void const *key,
+                        void *const *vrootp,
+                        int (LIBCCALL *compar)(void const *a, void const *b, void *arg),
+                        void *arg) THROWS(...) {
 	typedef struct __node_struct {
 		void const           *key;
 		struct __node_struct *left_node;
@@ -451,7 +507,7 @@ NOTHROW_NCX(LIBCCALL libc_tfind)(void const *key,
 	if (rootp == NULL)
 		return NULL;
 	while ((root = *rootp) != NULL) {
-		int r = (*compar)(key, root->key);
+		int r = (*compar)(key, root->key, arg);
 		if (r == 0)
 			return root;
 		rootp = r < 0 ? &root->left_node
@@ -459,14 +515,41 @@ NOTHROW_NCX(LIBCCALL libc_tfind)(void const *key,
 	}
 	return NULL;
 }
+#endif /* !__KERNEL__ */
+#if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
+struct libd_tdelete_r_cookie_struct {
+	int (LIBDCALL *compar)(void const *a, void const *b, void *arg);
+	void *arg;
+};
+PRIVATE ATTR_SECTION(".text.crt.dos.utility.search") int
+(LIBCCALL libd_tdelete_r_cookie_struct)(void const *a,
+                                        void const *b,
+                                        struct libd_tdelete_r_cookie_struct *c) THROWS(...){
+	return (*c->compar)(a, b, c->arg);
+}
+/* >> tdelete(3), tdelete_r(3)
+ * Remove the element matching `key' from the tree pointed to by `*rootp' */
+INTERN ATTR_SECTION(".text.crt.dos.utility.search") NONNULL((3)) void *
+(LIBDCALL libd_tdelete_r)(void const *__restrict key,
+                          void **__restrict vrootp,
+                          int (LIBDCALL *compar)(void const *a, void const *b, void *arg),
+                          void *arg) THROWS(...) {
+	struct libd_tdelete_r_cookie_struct libd_tdelete_r_cookie;
+	libd_tdelete_r_cookie.compar = compar;
+	libd_tdelete_r_cookie.arg = arg;
+	return libc_tdelete_r(key, vrootp, (int (LIBCCALL *)(void const *, void const *, void *))&libd_tdelete_r_cookie_struct, &libd_tdelete_r_cookie);
+}
+#endif /* !__LIBCCALL_IS_LIBDCALL && !__KERNEL__ */
+#ifndef __KERNEL__
 #include <hybrid/typecore.h>
 #include <parts/malloca.h>
-/* >> tdelete(3)
+/* >> tdelete(3), tdelete_r(3)
  * Remove the element matching `key' from the tree pointed to by `*rootp' */
 INTERN ATTR_SECTION(".text.crt.utility.search") NONNULL((3)) void *
-NOTHROW_NCX(LIBCCALL libc_tdelete)(void const *__restrict key,
-                                   void **__restrict vrootp,
-                                   __compar_fn_t compar) {
+(LIBCCALL libc_tdelete_r)(void const *__restrict key,
+                          void **__restrict vrootp,
+                          int (LIBCCALL *compar)(void const *a, void const *b, void *arg),
+                          void *arg) THROWS(...) {
 	typedef struct __node_struct {
 		void const           *key;
 		struct __node_struct *left_node;
@@ -487,7 +570,7 @@ NOTHROW_NCX(LIBCCALL libc_tdelete)(void const *__restrict key,
 	if unlikely(!nodestack)
 		return NULL;
 	root = p;
-	while ((cmp = (*compar)(key, root->key)) != 0) {
+	while ((cmp = (*compar)(key, root->key, arg)) != 0) {
 		if (sp == stacksize) {
 			node **newstack;
 			stacksize += 20;
@@ -642,53 +725,106 @@ done:
 	__freea(nodestack);
 	return retval;
 }
+#endif /* !__KERNEL__ */
+#if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
+struct libd_twalk_r_cookie_struct {
+	void (LIBDCALL *action)(void const *nodep, VISIT value, int level, void *arg);
+	void *arg;
+};
+PRIVATE ATTR_SECTION(".text.crt.dos.utility.search") void
+(LIBCCALL libd_twalk_r_cookie_struct)(void const *nodep,
+                                      VISIT value,
+                                      int level,
+                                      struct libd_twalk_r_cookie_struct *c) THROWS(...){
+	(*c->action)(nodep, value, level, c->arg);
+}
+/* >> twalk(3), twalk_r(3)
+ * Walk through the whole tree and call the `action' callback for every node or leaf */
+INTERN ATTR_SECTION(".text.crt.dos.utility.search") void
+(LIBDCALL libd_twalk_r)(void const *root,
+                        void (LIBDCALL *action)(void const *nodep, VISIT value, int level, void *arg),
+                        void *arg) THROWS(...) {
+	struct libd_twalk_r_cookie_struct libd_twalk_r_cookie;
+	libd_twalk_r_cookie.action = action;
+	libd_twalk_r_cookie.arg = arg;
+	libc_twalk_r(root, (void (LIBCCALL *)(void const *, VISIT, int, void *))&libd_twalk_r_cookie_struct, &libd_twalk_r_cookie);
+}
+#endif /* !__LIBCCALL_IS_LIBDCALL && !__KERNEL__ */
+#ifndef __KERNEL__
 __NAMESPACE_LOCAL_BEGIN
 /* Walk the nodes of a tree.
  * `root' is the root of the tree to be walked, `action' the function to be
  * called at each node. `level'  is the level of  `root' in the whole  tree */
 __LOCAL_LIBC(trecurse) NONNULL((1, 2)) void
-__LIBC_LOCAL_NAME(trecurse)(void const *root, __action_fn_t action, int level) {
+(__LIBC_LOCAL_NAME(trecurse))(void const *root,
+                              void (LIBCCALL *action)(void const *nodep, VISIT value, int level, void *arg),
+                              void *arg, int level) {
 	void *l, *r;
 	l = ((void **)root)[1];
 	r = ((void **)root)[2];
 	if (!l && !r) {
-		(*action)(root, (VISIT)3, level);
+		(*action)(root, leaf, level, arg);
 	} else {
-		(*action)(root, (VISIT)0, level);
+		(*action)(root, preorder, level, arg);
 		if (l != NULL)
-			__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(trecurse)(l, action, level + 1);
-		(*action)(root, (VISIT)1, level);
+			__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(trecurse)(l, action, arg, level + 1);
+		(*action)(root, postorder, level, arg);
 		if (r != NULL)
-			__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(trecurse)(r, action, level + 1);
-		(*action)(root, (VISIT)2, level);
+			__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(trecurse)(r, action, arg, level + 1);
+		(*action)(root, endorder, level, arg);
 	}
 }
 __NAMESPACE_LOCAL_END
-/* >> twalk(3)
+/* >> twalk(3), twalk_r(3)
  * Walk through the whole tree and call the `action' callback for every node or leaf */
 INTERN ATTR_SECTION(".text.crt.utility.search") void
-NOTHROW_NCX(LIBCCALL libc_twalk)(void const *root,
-                                 __action_fn_t action) {
+(LIBCCALL libc_twalk_r)(void const *root,
+                        void (LIBCCALL *action)(void const *nodep, VISIT value, int level, void *arg),
+                        void *arg) THROWS(...) {
 	if (root && action)
-		__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(trecurse)(root, action, 0);
+		(__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(trecurse))(root, action, arg, 0);
 }
-/* >> tdestroy(3)
+#endif /* !__KERNEL__ */
+#if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
+struct libd_tdestroy_r_cookie_struct {
+	void (LIBDCALL *freefct)(void *nodep, void *arg);
+	void *arg;
+};
+PRIVATE ATTR_SECTION(".text.crt.dos.utility.search") void
+(LIBCCALL libd_tdestroy_r_cookie_struct)(void *nodep,
+                                         struct libd_tdestroy_r_cookie_struct *c) THROWS(...){
+	(*c->freefct)(nodep, c->arg);
+}
+/* >> tdestroy(3), tdestroy_r(3)
+ * Destroy the whole tree, call `freefct' for each node or leaf */
+INTERN ATTR_SECTION(".text.crt.dos.utility.search") NONNULL((2)) void
+(LIBDCALL libd_tdestroy_r)(void *root,
+                           void (LIBDCALL *freefct)(void *nodep, void *arg),
+                           void *arg) THROWS(...) {
+	struct libd_tdestroy_r_cookie_struct libd_tdestroy_r_cookie;
+	libd_tdestroy_r_cookie.freefct = freefct;
+	libd_tdestroy_r_cookie.arg = arg;
+	libc_tdestroy_r(root, (void (LIBCCALL *)(void *, void *))&libd_tdestroy_r_cookie_struct, &libd_tdestroy_r_cookie);
+}
+#endif /* !__LIBCCALL_IS_LIBDCALL && !__KERNEL__ */
+#ifndef __KERNEL__
+/* >> tdestroy(3), tdestroy_r(3)
  * Destroy the whole tree, call `freefct' for each node or leaf */
 INTERN ATTR_SECTION(".text.crt.utility.search") NONNULL((2)) void
-NOTHROW_NCX(LIBCCALL libc_tdestroy)(void *root,
-                                    __free_fn_t freefct) {
+(LIBCCALL libc_tdestroy_r)(void *root,
+                           void (LIBCCALL *freefct)(void *nodep, void *arg),
+                           void *arg) THROWS(...) {
 	if (root) {
 		void *l, *r;
 again:
 		l = ((void **)root)[1];
 		r = ((void **)root)[2];
-		(*freefct)(((void **)root)[0]);
+		(*freefct)(((void **)root)[0], arg);
 #if defined(__CRT_HAVE_free) || defined(__CRT_HAVE_cfree)
 		libc_free(root);
 #endif /* __CRT_HAVE_free || __CRT_HAVE_cfree */
 		if (l) {
-			if (r)
-				libc_tdestroy(r, freefct);
+			libc_tdestroy_r(r, freefct, arg);
 			root = l;
 			goto again;
 		}
@@ -698,37 +834,355 @@ again:
 		}
 	}
 }
+#endif /* !__KERNEL__ */
+#if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
+PRIVATE ATTR_SECTION(".text.crt.dos.utility.search") int
+(LIBCCALL libd_tsearch_cookie_struct)(void const *a,
+                                      void const *b,
+                                      int (LIBDCALL *c)(void const *a, void const *b)) THROWS(...){
+	return (*c)(a, b);
+}
+/* >> tsearch(3), tsearch_r(3)
+ * Search for an  entry matching  the given `key'  in the  tree
+ * pointed to by `*rootp' and insert a new element if not found */
+INTERN ATTR_SECTION(".text.crt.dos.utility.search") NONNULL((3)) void *
+(LIBDCALL libd_tsearch)(void const *key,
+                        void **vrootp,
+                        int (LIBDCALL *compar)(void const *a, void const *b)) THROWS(...) {
+	return libc_tsearch_r(key, vrootp, (int (LIBCCALL *)(void const *, void const *, void *))&libd_tsearch_cookie_struct, (void *)compar);
+}
+#endif /* !__LIBCCALL_IS_LIBDCALL && !__KERNEL__ */
+#ifndef __KERNEL__
+#ifndef __LIBCCALL_CALLER_CLEANUP
+#ifndef ____invoke_compare_helper_defined
+__NAMESPACE_LOCAL_BEGIN
+#define ____invoke_compare_helper_defined 1
+__LOCAL_LIBC(__invoke_compare_helper) int
+(__LIBCCALL __invoke_compare_helper)(void const *__a, void const *__b, void *__arg) {
+	return (*(int (__LIBCCALL *)(void const *, void const *))__arg)(__a, __b);
+}
+__NAMESPACE_LOCAL_END
+#endif /* !____invoke_compare_helper_defined */
+#endif /* !__LIBCCALL_CALLER_CLEANUP */
+/* >> tsearch(3), tsearch_r(3)
+ * Search for an  entry matching  the given `key'  in the  tree
+ * pointed to by `*rootp' and insert a new element if not found */
+INTERN ATTR_SECTION(".text.crt.utility.search") NONNULL((3)) void *
+(LIBCCALL libc_tsearch)(void const *key,
+                        void **vrootp,
+                        int (LIBCCALL *compar)(void const *a, void const *b)) THROWS(...) {
+#ifdef __LIBCCALL_CALLER_CLEANUP
+	return libc_tsearch_r(key, vrootp, (int (LIBCCALL *)(void const *, void const *, void *))(void *)compar, NULL);
+#else /* __LIBCCALL_CALLER_CLEANUP */
+	return libc_tsearch_r(key, vrootp, &__NAMESPACE_LOCAL_SYM __invoke_compare_helper, (void *)compar);
+#endif /* !__LIBCCALL_CALLER_CLEANUP */
+}
+#endif /* !__KERNEL__ */
+#if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
+PRIVATE ATTR_SECTION(".text.crt.dos.utility.search") int
+(LIBCCALL libd_tfind_cookie_struct)(void const *a,
+                                    void const *b,
+                                    int (LIBDCALL *c)(void const *a, void const *b)) THROWS(...){
+	return (*c)(a, b);
+}
+/* >> tfind(3), tfind_r(3)
+ * Search for an entry matching the given `key' in the tree pointed
+ * to  by `*rootp'. If no matching entry is available return `NULL' */
+INTERN ATTR_SECTION(".text.crt.dos.utility.search") NONNULL((3)) void *
+(LIBDCALL libd_tfind)(void const *key,
+                      void *const *vrootp,
+                      int (LIBDCALL *compar)(void const *a, void const *b)) THROWS(...) {
+	return libc_tfind_r(key, vrootp, (int (LIBCCALL *)(void const *, void const *, void *))&libd_tfind_cookie_struct, (void *)compar);
+}
+#endif /* !__LIBCCALL_IS_LIBDCALL && !__KERNEL__ */
+#ifndef __KERNEL__
+#ifndef __LIBCCALL_CALLER_CLEANUP
+#ifndef ____invoke_compare_helper_defined
+__NAMESPACE_LOCAL_BEGIN
+#define ____invoke_compare_helper_defined 1
+__LOCAL_LIBC(__invoke_compare_helper) int
+(__LIBCCALL __invoke_compare_helper)(void const *__a, void const *__b, void *__arg) {
+	return (*(int (__LIBCCALL *)(void const *, void const *))__arg)(__a, __b);
+}
+__NAMESPACE_LOCAL_END
+#endif /* !____invoke_compare_helper_defined */
+#endif /* !__LIBCCALL_CALLER_CLEANUP */
+/* >> tfind(3), tfind_r(3)
+ * Search for an entry matching the given `key' in the tree pointed
+ * to  by `*rootp'. If no matching entry is available return `NULL' */
+INTERN ATTR_SECTION(".text.crt.utility.search") NONNULL((3)) void *
+(LIBCCALL libc_tfind)(void const *key,
+                      void *const *vrootp,
+                      int (LIBCCALL *compar)(void const *a, void const *b)) THROWS(...) {
+#ifdef __LIBCCALL_CALLER_CLEANUP
+	return libc_tfind_r(key, vrootp, (int (LIBCCALL *)(void const *, void const *, void *))(void *)compar, NULL);
+#else /* __LIBCCALL_CALLER_CLEANUP */
+	return libc_tfind_r(key, vrootp, &__NAMESPACE_LOCAL_SYM __invoke_compare_helper, (void *)compar);
+#endif /* !__LIBCCALL_CALLER_CLEANUP */
+}
+#endif /* !__KERNEL__ */
+#if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
+PRIVATE ATTR_SECTION(".text.crt.dos.utility.search") int
+(LIBCCALL libd_tdelete_cookie_struct)(void const *a,
+                                      void const *b,
+                                      int (LIBDCALL *c)(void const *a, void const *b)) THROWS(...){
+	return (*c)(a, b);
+}
+/* >> tdelete(3), tdelete_r(3)
+ * Remove the element matching `key' from the tree pointed to by `*rootp' */
+INTERN ATTR_SECTION(".text.crt.dos.utility.search") NONNULL((3)) void *
+(LIBDCALL libd_tdelete)(void const *__restrict key,
+                        void **__restrict vrootp,
+                        int (LIBDCALL *compar)(void const *a, void const *b)) THROWS(...) {
+	return libc_tdelete_r(key, vrootp, (int (LIBCCALL *)(void const *, void const *, void *))&libd_tdelete_cookie_struct, (void *)compar);
+}
+#endif /* !__LIBCCALL_IS_LIBDCALL && !__KERNEL__ */
+#ifndef __KERNEL__
+#ifndef __LIBCCALL_CALLER_CLEANUP
+#ifndef ____invoke_compare_helper_defined
+__NAMESPACE_LOCAL_BEGIN
+#define ____invoke_compare_helper_defined 1
+__LOCAL_LIBC(__invoke_compare_helper) int
+(__LIBCCALL __invoke_compare_helper)(void const *__a, void const *__b, void *__arg) {
+	return (*(int (__LIBCCALL *)(void const *, void const *))__arg)(__a, __b);
+}
+__NAMESPACE_LOCAL_END
+#endif /* !____invoke_compare_helper_defined */
+#endif /* !__LIBCCALL_CALLER_CLEANUP */
+/* >> tdelete(3), tdelete_r(3)
+ * Remove the element matching `key' from the tree pointed to by `*rootp' */
+INTERN ATTR_SECTION(".text.crt.utility.search") NONNULL((3)) void *
+(LIBCCALL libc_tdelete)(void const *__restrict key,
+                        void **__restrict vrootp,
+                        int (LIBCCALL *compar)(void const *a, void const *b)) THROWS(...) {
+#ifdef __LIBCCALL_CALLER_CLEANUP
+	return libc_tdelete_r(key, vrootp, (int (LIBCCALL *)(void const *, void const *, void *))(void *)compar, NULL);
+#else /* __LIBCCALL_CALLER_CLEANUP */
+	return libc_tdelete_r(key, vrootp, &__NAMESPACE_LOCAL_SYM __invoke_compare_helper, (void *)compar);
+#endif /* !__LIBCCALL_CALLER_CLEANUP */
+}
+#endif /* !__KERNEL__ */
+#if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
+PRIVATE ATTR_SECTION(".text.crt.dos.utility.search") void
+(LIBCCALL libd_twalk_cookie_struct)(void const *nodep,
+                                    VISIT value,
+                                    int level,
+                                    void (LIBDCALL *c)(void const *nodep, VISIT value, int level)) THROWS(...){
+	(*c)(nodep, value, level);
+}
+/* >> twalk(3), twalk_r(3)
+ * Walk through the whole tree and call the `action' callback for every node or leaf */
+INTERN ATTR_SECTION(".text.crt.dos.utility.search") void
+(LIBDCALL libd_twalk)(void const *root,
+                      void (LIBDCALL *action)(void const *nodep, VISIT value, int level)) THROWS(...) {
+	libc_twalk_r(root, (void (LIBCCALL *)(void const *, VISIT, int, void *))&libd_twalk_cookie_struct, (void *)action);
+}
+#endif /* !__LIBCCALL_IS_LIBDCALL && !__KERNEL__ */
+#ifndef __KERNEL__
+#ifndef __LIBCCALL_CALLER_CLEANUP
+#ifndef ____invoke_twalk_action_helper_defined
+__NAMESPACE_LOCAL_BEGIN
+#define ____invoke_twalk_action_helper_defined 1
+__LOCAL_LIBC(__invoke_twalk_action_helper) int
+(__LIBCCALL __invoke_twalk_action_helper)(void const *nodep, VISIT value, int level, void *arg) {
+	return (*(void (LIBCCALL *)(void const *, VISIT, int))arg)(nodep, value, level);
+}
+__NAMESPACE_LOCAL_END
+#endif /* !____invoke_twalk_action_helper_defined */
+#endif /* !__LIBCCALL_CALLER_CLEANUP */
+/* >> twalk(3), twalk_r(3)
+ * Walk through the whole tree and call the `action' callback for every node or leaf */
+INTERN ATTR_SECTION(".text.crt.utility.search") void
+(LIBCCALL libc_twalk)(void const *root,
+                      void (LIBCCALL *action)(void const *nodep, VISIT value, int level)) THROWS(...) {
+#ifdef __LIBCCALL_CALLER_CLEANUP
+	libc_twalk_r(root, (void (LIBCCALL *)(void const *, VISIT, int, void *))(void *)action, NULL);
+#else /* __LIBCCALL_CALLER_CLEANUP */
+	libc_twalk_r(root, &__NAMESPACE_LOCAL_SYM __invoke_twalk_action_helper, (void *)action);
+#endif /* !__LIBCCALL_CALLER_CLEANUP */
+}
+#endif /* !__KERNEL__ */
+#if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
+PRIVATE ATTR_SECTION(".text.crt.dos.utility.search") void
+(LIBCCALL libd_tdestroy_cookie_struct)(void *nodep,
+                                       void (LIBDCALL *c)(void *nodep)) THROWS(...){
+	(*c)(nodep);
+}
+/* >> tdestroy(3), tdestroy_r(3)
+ * Destroy the whole tree, call `freefct' for each node or leaf */
+INTERN ATTR_SECTION(".text.crt.dos.utility.search") NONNULL((2)) void
+(LIBDCALL libd_tdestroy)(void *root,
+                         void (LIBDCALL *freefct)(void *nodep)) THROWS(...) {
+	libc_tdestroy_r(root, (void (LIBCCALL *)(void *, void *))&libd_tdestroy_cookie_struct, (void *)freefct);
+}
+#endif /* !__LIBCCALL_IS_LIBDCALL && !__KERNEL__ */
+#ifndef __KERNEL__
+/* >> tdestroy(3), tdestroy_r(3)
+ * Destroy the whole tree, call `freefct' for each node or leaf */
+INTERN ATTR_SECTION(".text.crt.utility.search") NONNULL((2)) void
+(LIBCCALL libc_tdestroy)(void *root,
+                         void (LIBCCALL *freefct)(void *nodep)) THROWS(...) {
+#ifdef __LIBCCALL_CALLER_CLEANUP
+	libc_tdestroy_r(root, (void (LIBCCALL *)(void *, void *))(void *)freefct, NULL);
+#else /* __LIBCCALL_CALLER_CLEANUP */
+	libc_tdestroy_r(root, &__NAMESPACE_LOCAL_SYM __invoke_free_fn_helper, (void *)compar);
+#endif /* !__LIBCCALL_CALLER_CLEANUP */
+}
+#endif /* !__KERNEL__ */
+#if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
+PRIVATE ATTR_SECTION(".text.crt.dos.utility.search") int
+(LIBCCALL libd_lfind_cookie_struct)(__compar_fn_t c,
+                                    void const *a,
+                                    void const *b) THROWS(...){
+	return (*c)(a, b);
+}
 /* >> lfind(3)
- * Perform linear search for `key' by comparing by `compar' in an array [base, base+nmemb*size) */
-INTERN ATTR_SECTION(".text.crt.utility.search") NONNULL((2, 3, 5)) void *
-NOTHROW_NCX(LIBCCALL libc_lfind)(void const *key,
-                                 void const *base,
-                                 size_t __KOS_FIXED_CONST *nmemb,
-                                 size_t size,
-                                 __compar_fn_t compar) {
-	size_t i, count = *nmemb;
-	void const *result = base;
+ * Perform linear search for `key' by comparing by `compar' in an array [pbase, pbase+pitem_count*item_size) */
+INTERN ATTR_SECTION(".text.crt.dos.utility.search") WUNUSED NONNULL((2, 3, 5)) void *
+(LIBDCALL libd_lfind)(void const *key,
+                      void const *pbase,
+                      size_t __KOS_FIXED_CONST *pitem_count,
+                      size_t item_size,
+                      __compar_fn_t compar) THROWS(...) {
+	return libc__lfind_s(key, pbase, pitem_count, item_size, (int (LIBCCALL *)(void *, void const *, void const *))&libd_lfind_cookie_struct, (void *)compar);
+}
+#endif /* !__LIBCCALL_IS_LIBDCALL && !__KERNEL__ */
+#ifndef __KERNEL__
+/* >> lfind(3)
+ * Perform linear search for `key' by comparing by `compar' in an array [pbase, pbase+pitem_count*item_size) */
+INTERN ATTR_SECTION(".text.crt.utility.search") WUNUSED NONNULL((2, 3, 5)) void *
+(LIBCCALL libc_lfind)(void const *key,
+                      void const *pbase,
+                      size_t __KOS_FIXED_CONST *pitem_count,
+                      size_t item_size,
+                      __compar_fn_t compar) THROWS(...) {
+	size_t i, count = *pitem_count;
+	void const *result = pbase;
 	for (i = 0; i < count; ++i) {
 		if ((*compar)(key, result) == 0)
 			return (void *)result;
-		result = (byte_t *)result + size;
+		result = (byte_t *)result + item_size;
 	}
 	return NULL;
 }
+#endif /* !__KERNEL__ */
+#if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
+PRIVATE ATTR_SECTION(".text.crt.dos.utility.search") int
+(LIBCCALL libd_lsearch_cookie_struct)(int (LIBDCALL *c)(void const *a, void const *b),
+                                      void const *a,
+                                      void const *b) THROWS(...){
+	return (*c)(a, b);
+}
 /* >> lsearch(3)
  * Perform linear search for `key' by comparing by `compar' function
- * in array [base,  base+nmemb*size) and insert  entry if not  found */
+ * in array [pbase,  pbase+pitem_count*item_size) and insert  entry if not  found */
+INTERN ATTR_SECTION(".text.crt.dos.utility.search") NONNULL((2, 3, 5)) void *
+(LIBDCALL libd_lsearch)(void const *key,
+                        void *pbase,
+                        size_t *pitem_count,
+                        size_t item_size,
+                        int (LIBDCALL *compar)(void const *a, void const *b)) THROWS(...) {
+	return libc__lsearch_s(key, pbase, pitem_count, item_size, (int (LIBCCALL *)(void *, void const *, void const *))&libd_lsearch_cookie_struct, (void *)compar);
+}
+#endif /* !__LIBCCALL_IS_LIBDCALL && !__KERNEL__ */
+#ifndef __KERNEL__
+/* >> lsearch(3)
+ * Perform linear search for `key' by comparing by `compar' function
+ * in array [pbase,  pbase+pitem_count*item_size) and insert  entry if not  found */
 INTERN ATTR_SECTION(".text.crt.utility.search") NONNULL((2, 3, 5)) void *
-NOTHROW_NCX(LIBCCALL libc_lsearch)(void const *key,
-                                   void *base,
-                                   size_t *nmemb,
-                                   size_t size,
-                                   __compar_fn_t compar) {
+(LIBCCALL libc_lsearch)(void const *key,
+                        void *pbase,
+                        size_t *pitem_count,
+                        size_t item_size,
+                        int (LIBCCALL *compar)(void const *a, void const *b)) THROWS(...) {
 	void *result;
-	result = libc_lfind(key, base, nmemb, size, compar);
+	result = libc_lfind(key, pbase, pitem_count, item_size, compar);
 	if (result == NULL) {
-		result = libc_memcpy((byte_t *)base + (*nmemb) * size, key, size);
-		++*nmemb;
+		result = libc_memcpy((byte_t *)pbase + (*pitem_count) * item_size, key, item_size);
+		++*pitem_count;
+	}
+	return result;
+}
+#endif /* !__KERNEL__ */
+#if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
+struct libd__lfind_s_cookie_struct {
+	int (LIBDCALL *compar)(void *arg, void const *a, void const *b);
+	void *arg;
+};
+PRIVATE ATTR_SECTION(".text.crt.dos.utility.search") int
+(LIBCCALL libd__lfind_s_cookie_struct)(struct libd__lfind_s_cookie_struct *c,
+                                       void const *a,
+                                       void const *b) THROWS(...){
+	return (*c->compar)(c->arg, a, b);
+}
+INTERN ATTR_SECTION(".text.crt.dos.utility.search") WUNUSED NONNULL((2, 3, 5)) void *
+(LIBDCALL libd__lfind_s)(void const *key,
+                         void const *pbase,
+                         size_t __KOS_FIXED_CONST *pitem_count,
+                         size_t item_size,
+                         int (LIBDCALL *compar)(void *arg, void const *a, void const *b),
+                         void *arg) THROWS(...) {
+	struct libd__lfind_s_cookie_struct libd__lfind_s_cookie;
+	libd__lfind_s_cookie.compar = compar;
+	libd__lfind_s_cookie.arg = arg;
+	return libc__lfind_s(key, pbase, pitem_count, item_size, (int (LIBCCALL *)(void *, void const *, void const *))&libd__lfind_s_cookie_struct, &libd__lfind_s_cookie);
+}
+#endif /* !__LIBCCALL_IS_LIBDCALL && !__KERNEL__ */
+#ifndef __KERNEL__
+INTERN ATTR_SECTION(".text.crt.dos.utility.search") WUNUSED NONNULL((2, 3, 5)) void *
+(LIBCCALL libc__lfind_s)(void const *key,
+                         void const *pbase,
+                         size_t __KOS_FIXED_CONST *pitem_count,
+                         size_t item_size,
+                         int (LIBCCALL *compar)(void *arg, void const *a, void const *b),
+                         void *arg) THROWS(...) {
+	size_t i, count = *pitem_count;
+	void const *result = pbase;
+	for (i = 0; i < count; ++i) {
+		if ((*compar)(arg, key, result) == 0)
+			return (void *)result;
+		result = (byte_t *)result + item_size;
+	}
+	return NULL;
+}
+#endif /* !__KERNEL__ */
+#if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
+struct libd__lsearch_s_cookie_struct {
+	int (LIBDCALL *compar)(void *arg, void const *a, void const *b);
+	void *arg;
+};
+PRIVATE ATTR_SECTION(".text.crt.dos.utility.search") int
+(LIBCCALL libd__lsearch_s_cookie_struct)(struct libd__lsearch_s_cookie_struct *c,
+                                         void const *a,
+                                         void const *b) THROWS(...){
+	return (*c->compar)(c->arg, a, b);
+}
+INTERN ATTR_SECTION(".text.crt.dos.utility.search") WUNUSED NONNULL((2, 3, 5)) void *
+(LIBDCALL libd__lsearch_s)(void const *key,
+                           void *pbase,
+                           size_t *pitem_count,
+                           size_t item_size,
+                           int (LIBDCALL *compar)(void *arg, void const *a, void const *b),
+                           void *arg) THROWS(...) {
+	struct libd__lsearch_s_cookie_struct libd__lsearch_s_cookie;
+	libd__lsearch_s_cookie.compar = compar;
+	libd__lsearch_s_cookie.arg = arg;
+	return libc__lsearch_s(key, pbase, pitem_count, item_size, (int (LIBCCALL *)(void *, void const *, void const *))&libd__lsearch_s_cookie_struct, &libd__lsearch_s_cookie);
+}
+#endif /* !__LIBCCALL_IS_LIBDCALL && !__KERNEL__ */
+#ifndef __KERNEL__
+INTERN ATTR_SECTION(".text.crt.dos.utility.search") WUNUSED NONNULL((2, 3, 5)) void *
+(LIBCCALL libc__lsearch_s)(void const *key,
+                           void *pbase,
+                           size_t *pitem_count,
+                           size_t item_size,
+                           int (LIBCCALL *compar)(void *arg, void const *a, void const *b),
+                           void *arg) THROWS(...) {
+	void *result;
+	result = libc__lfind_s(key, pbase, pitem_count, item_size, compar, arg);
+	if (result == NULL) {
+		result = libc_memcpy((byte_t *)pbase + (*pitem_count) * item_size, key, item_size);
+		++*pitem_count;
 	}
 	return result;
 }
@@ -745,17 +1199,106 @@ DEFINE_PUBLIC_ALIAS(hdestroy, libc_hdestroy);
 DEFINE_PUBLIC_ALIAS(hsearch_r, libc_hsearch_r);
 DEFINE_PUBLIC_ALIAS(hcreate_r, libc_hcreate_r);
 DEFINE_PUBLIC_ALIAS(hdestroy_r, libc_hdestroy_r);
+#endif /* !__KERNEL__ */
+#if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
+DEFINE_PUBLIC_ALIAS(DOS$tsearch_r, libd_tsearch_r);
+#endif /* !__LIBCCALL_IS_LIBDCALL && !__KERNEL__ */
+#ifndef __KERNEL__
+DEFINE_PUBLIC_ALIAS(tsearch_r, libc_tsearch_r);
+#endif /* !__KERNEL__ */
+#if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
+DEFINE_PUBLIC_ALIAS(DOS$tfind_r, libd_tfind_r);
+#endif /* !__LIBCCALL_IS_LIBDCALL && !__KERNEL__ */
+#ifndef __KERNEL__
+DEFINE_PUBLIC_ALIAS(tfind_r, libc_tfind_r);
+#endif /* !__KERNEL__ */
+#if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
+DEFINE_PUBLIC_ALIAS(DOS$tdelete_r, libd_tdelete_r);
+#endif /* !__LIBCCALL_IS_LIBDCALL && !__KERNEL__ */
+#ifndef __KERNEL__
+DEFINE_PUBLIC_ALIAS(tdelete_r, libc_tdelete_r);
+#endif /* !__KERNEL__ */
+#if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
+DEFINE_PUBLIC_ALIAS(DOS$twalk_r, libd_twalk_r);
+#endif /* !__LIBCCALL_IS_LIBDCALL && !__KERNEL__ */
+#ifndef __KERNEL__
+DEFINE_PUBLIC_ALIAS(twalk_r, libc_twalk_r);
+#endif /* !__KERNEL__ */
+#if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
+DEFINE_PUBLIC_ALIAS(DOS$tdestroy_r, libd_tdestroy_r);
+#endif /* !__LIBCCALL_IS_LIBDCALL && !__KERNEL__ */
+#ifndef __KERNEL__
+DEFINE_PUBLIC_ALIAS(tdestroy_r, libc_tdestroy_r);
+#endif /* !__KERNEL__ */
+#if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
+DEFINE_PUBLIC_ALIAS(DOS$__tsearch, libd_tsearch);
+DEFINE_PUBLIC_ALIAS(DOS$tsearch, libd_tsearch);
+#endif /* !__LIBCCALL_IS_LIBDCALL && !__KERNEL__ */
+#ifndef __KERNEL__
 DEFINE_PUBLIC_ALIAS(__tsearch, libc_tsearch);
 DEFINE_PUBLIC_ALIAS(tsearch, libc_tsearch);
+#endif /* !__KERNEL__ */
+#if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
+DEFINE_PUBLIC_ALIAS(DOS$__tfind, libd_tfind);
+DEFINE_PUBLIC_ALIAS(DOS$tfind, libd_tfind);
+#endif /* !__LIBCCALL_IS_LIBDCALL && !__KERNEL__ */
+#ifndef __KERNEL__
 DEFINE_PUBLIC_ALIAS(__tfind, libc_tfind);
 DEFINE_PUBLIC_ALIAS(tfind, libc_tfind);
+#endif /* !__KERNEL__ */
+#if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
+DEFINE_PUBLIC_ALIAS(DOS$__tdelete, libd_tdelete);
+DEFINE_PUBLIC_ALIAS(DOS$tdelete, libd_tdelete);
+#endif /* !__LIBCCALL_IS_LIBDCALL && !__KERNEL__ */
+#ifndef __KERNEL__
 DEFINE_PUBLIC_ALIAS(__tdelete, libc_tdelete);
 DEFINE_PUBLIC_ALIAS(tdelete, libc_tdelete);
+#endif /* !__KERNEL__ */
+#if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
+DEFINE_PUBLIC_ALIAS(DOS$__twalk, libd_twalk);
+DEFINE_PUBLIC_ALIAS(DOS$twalk, libd_twalk);
+#endif /* !__LIBCCALL_IS_LIBDCALL && !__KERNEL__ */
+#ifndef __KERNEL__
 DEFINE_PUBLIC_ALIAS(__twalk, libc_twalk);
 DEFINE_PUBLIC_ALIAS(twalk, libc_twalk);
+#endif /* !__KERNEL__ */
+#if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
+DEFINE_PUBLIC_ALIAS(DOS$tdestroy, libd_tdestroy);
+#endif /* !__LIBCCALL_IS_LIBDCALL && !__KERNEL__ */
+#ifndef __KERNEL__
 DEFINE_PUBLIC_ALIAS(tdestroy, libc_tdestroy);
+#endif /* !__KERNEL__ */
+#if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
+DEFINE_PUBLIC_ALIAS(DOS$_lfind, libd_lfind);
+DEFINE_PUBLIC_ALIAS(DOS$lfind, libd_lfind);
+#endif /* !__LIBCCALL_IS_LIBDCALL && !__KERNEL__ */
+#ifndef __KERNEL__
+#ifdef __LIBCCALL_IS_LIBDCALL
+DEFINE_PUBLIC_ALIAS(_lfind, libc_lfind);
+#endif /* __LIBCCALL_IS_LIBDCALL */
 DEFINE_PUBLIC_ALIAS(lfind, libc_lfind);
+#endif /* !__KERNEL__ */
+#if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
+DEFINE_PUBLIC_ALIAS(DOS$_lsearch, libd_lsearch);
+DEFINE_PUBLIC_ALIAS(DOS$lsearch, libd_lsearch);
+#endif /* !__LIBCCALL_IS_LIBDCALL && !__KERNEL__ */
+#ifndef __KERNEL__
+#ifdef __LIBCCALL_IS_LIBDCALL
+DEFINE_PUBLIC_ALIAS(_lsearch, libc_lsearch);
+#endif /* __LIBCCALL_IS_LIBDCALL */
 DEFINE_PUBLIC_ALIAS(lsearch, libc_lsearch);
+#endif /* !__KERNEL__ */
+#if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
+DEFINE_PUBLIC_ALIAS(DOS$_lfind_s, libd__lfind_s);
+#endif /* !__LIBCCALL_IS_LIBDCALL && !__KERNEL__ */
+#ifndef __KERNEL__
+DEFINE_PUBLIC_ALIAS(_lfind_s, libc__lfind_s);
+#endif /* !__KERNEL__ */
+#if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
+DEFINE_PUBLIC_ALIAS(DOS$_lsearch_s, libd__lsearch_s);
+#endif /* !__LIBCCALL_IS_LIBDCALL && !__KERNEL__ */
+#ifndef __KERNEL__
+DEFINE_PUBLIC_ALIAS(_lsearch_s, libc__lsearch_s);
 #endif /* !__KERNEL__ */
 
 #endif /* !GUARD_LIBC_AUTO_SEARCH_C */

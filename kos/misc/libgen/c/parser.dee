@@ -67,6 +67,10 @@ class UserString {
 		return repr text;
 	}
 
+	public operator contains(other: string): bool {
+		return other in text;
+	}
+
 	public operator == (other: UserString | string): bool {
 		if (other is UserString)
 			other = other.text;
@@ -479,6 +483,26 @@ twochar:
 				continue;
 			}
 			if (tok in ")]},")
+				break;
+			tok = next();
+		}
+		local resultEnd = tokStart;
+		while (resultEnd > resultStart && text.isspace(resultEnd - 1))
+			--resultEnd;
+		return getUserString(resultStart, resultEnd);
+	}
+
+	@@Parse everything until a trailing @")", @"]", @"}", @"," or @";"
+	function parseAllUntilRParenOrSemi(): UserString | string {
+		local tok = this.tok;
+		local resultStart = tokStart;
+		for (;;) {
+			if (tok in "([{") {
+				skipPair();
+				tok = next();
+				continue;
+			}
+			if (tok in ")]},;")
 				break;
 			tok = next();
 		}

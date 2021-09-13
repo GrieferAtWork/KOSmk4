@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x9289221c */
+/* HASH CRC-32:0x318e7d22 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -371,9 +371,11 @@
 #define __CRT_HAVE_DOS$_itow_s
 #endif /* !__KERNEL__ */
 #if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
+#define __CRT_HAVE_DOS$_lfind_s
 #define __CRT_HAVE_DOS$_loaddll
 #define __CRT_HAVE_DOS$_lrotl
 #define __CRT_HAVE_DOS$_lrotr
+#define __CRT_HAVE_DOS$_lsearch_s
 #define __CRT_HAVE_DOS$_ltoa_s
 #endif /* !__LIBCCALL_IS_LIBDCALL && !__KERNEL__ */
 #ifndef __KERNEL__
@@ -693,6 +695,7 @@
 #define __CRT_HAVE_DOS$bsd_signal
 #endif /* !__KERNEL__ */
 #if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
+#define __CRT_HAVE_DOS$bsearch
 #define __CRT_HAVE_DOS$bsearch_r
 #define __CRT_HAVE_DOS$bsearch_s
 #endif /* !__LIBCCALL_IS_LIBDCALL && !__KERNEL__ */
@@ -2172,6 +2175,7 @@
 #define __CRT_HAVE_DOS$qfcvt
 #define __CRT_HAVE_DOS$qfcvt_r
 #define __CRT_HAVE_DOS$qgcvt
+#define __CRT_HAVE_DOS$qsort
 #define __CRT_HAVE_DOS$qsort_r
 #define __CRT_HAVE_DOS$qsort_s
 #define __CRT_HAVE_DOS$quick_exit
@@ -2684,7 +2688,9 @@
 #define __CRT_HAVE_DOS$tcsetpgrp
 #define __CRT_HAVE_DOS$tcsetsid
 #define __CRT_HAVE_DOS$tdelete
+#define __CRT_HAVE_DOS$tdelete_r
 #define __CRT_HAVE_DOS$tdestroy
+#define __CRT_HAVE_DOS$tdestroy_r
 #define __CRT_HAVE_DOS$tee
 #define __CRT_HAVE_DOS$tell
 #define __CRT_HAVE_DOS$tell64
@@ -2692,6 +2698,7 @@
 #define __CRT_HAVE_DOS$tempnam
 #define __CRT_HAVE_DOS$textdomain
 #define __CRT_HAVE_DOS$tfind
+#define __CRT_HAVE_DOS$tfind_r
 #define __CRT_HAVE_DOS$tgamma
 #define __CRT_HAVE_DOS$tgammaf
 #define __CRT_HAVE_DOS$tgammal
@@ -2747,11 +2754,13 @@
 #define __CRT_HAVE_DOS$truncf
 #define __CRT_HAVE_DOS$truncl
 #define __CRT_HAVE_DOS$tsearch
+#define __CRT_HAVE_DOS$tsearch_r
 #define __CRT_HAVE_DOS$tss_create
 #define __CRT_HAVE_DOS$tss_set
 #define __CRT_HAVE_DOS$ttyname
 #define __CRT_HAVE_DOS$ttyname_r
 #define __CRT_HAVE_DOS$twalk
+#define __CRT_HAVE_DOS$twalk_r
 #define __CRT_HAVE_DOS$ualarm
 #define __CRT_HAVE_DOS$ulimit
 #define __CRT_HAVE_DOS$ulltostr
@@ -3509,9 +3518,11 @@
 #define __CRT_HAVE__itoa_s
 #define __CRT_HAVE__itow
 #define __CRT_HAVE__itow_s
+#define __CRT_HAVE__lfind_s
 #define __CRT_HAVE__loaddll
 #define __CRT_HAVE__lrotl
 #define __CRT_HAVE__lrotr
+#define __CRT_HAVE__lsearch_s
 #define __CRT_HAVE__ltoa_s
 #define __CRT_HAVE__ltow
 #define __CRT_HAVE__ltow_s
@@ -5904,7 +5915,9 @@
 #define __CRT_HAVE_tcsetpgrp
 #define __CRT_HAVE_tcsetsid
 #define __CRT_HAVE_tdelete
+#define __CRT_HAVE_tdelete_r
 #define __CRT_HAVE_tdestroy
+#define __CRT_HAVE_tdestroy_r
 #define __CRT_HAVE_tee
 #define __CRT_HAVE_tell
 #define __CRT_HAVE_tell64
@@ -5912,6 +5925,7 @@
 #define __CRT_HAVE_tempnam
 #define __CRT_HAVE_textdomain
 #define __CRT_HAVE_tfind
+#define __CRT_HAVE_tfind_r
 #define __CRT_HAVE_tgamma
 #define __CRT_HAVE_tgammaf
 #define __CRT_HAVE_tgammal
@@ -5966,12 +5980,14 @@
 #define __CRT_HAVE_truncf
 #define __CRT_HAVE_truncl
 #define __CRT_HAVE_tsearch
+#define __CRT_HAVE_tsearch_r
 #define __CRT_HAVE_tss_create
 #define __CRT_HAVE_tss_set
 #define __CRT_HAVE_ttyname
 #define __CRT_HAVE_ttyname_r
 #define __CRT_HAVE_ttyslot
 #define __CRT_HAVE_twalk
+#define __CRT_HAVE_twalk_r
 #define __CRT_HAVE_tzset
 #define __CRT_HAVE_ualarm
 #define __CRT_HAVE_ulckpwdf

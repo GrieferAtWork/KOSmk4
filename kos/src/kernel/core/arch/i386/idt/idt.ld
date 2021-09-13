@@ -90,7 +90,7 @@
 	                    : SEGMENT_DESCRIPTOR_TYPE_INTRGATE)
 
 #ifdef __x86_64__
-/* Can't safely make use  of traps on x86_64,  since only entry to  any
+/* Can't safely make  use of  traps on x86_64,  since on  entry to  any
  * kind of interrupt, we need to check if the interrupt originated from
  * user-space,  and if it  did, need to  invoke `swapgs', which would't
  * work properly if another interrupt could happen before then,  making

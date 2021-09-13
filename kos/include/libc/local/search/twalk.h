@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xefa465de */
+/* HASH CRC-32:0x54e85d94 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -21,37 +21,48 @@
 #ifndef __local_twalk_defined
 #define __local_twalk_defined 1
 #include <__crt.h>
-#ifndef __ACTION_FN_T
-#define __ACTION_FN_T 1
-typedef void (__LIBKCALL *__action_fn_t)(void const *__nodep, int __value, int __level);
-#endif /* !__ACTION_FN_T */
+#ifndef __VISIT_defined
+#define __VISIT_defined
+typedef enum {
+	preorder  = 0,
+	postorder = 1,
+	endorder  = 2,
+	leaf      = 3
+} VISIT;
+#endif /* !__VISIT_defined */
+#include <kos/anno.h>
 __NAMESPACE_LOCAL_BEGIN
-/* Walk the nodes of a tree.
- * `root' is the root of the tree to be walked, `action' the function to be
- * called at each node. `level'  is the level of  `root' in the whole  tree */
-__LOCAL_LIBC(__trecurse) __ATTR_NONNULL((1, 2)) void
-__LIBC_LOCAL_NAME(__trecurse)(void const *__root, __action_fn_t __action, int __level) {
-	void *__l, *__r;
-	__l = ((void **)__root)[1];
-	__r = ((void **)__root)[2];
-	if (!__l && !__r) {
-		(*__action)(__root, (VISIT)3, __level);
-	} else {
-		(*__action)(__root, (VISIT)0, __level);
-		if (__l != __NULLPTR)
-			__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(__trecurse)(__l, __action, __level + 1);
-		(*__action)(__root, (VISIT)1, __level);
-		if (__r != __NULLPTR)
-			__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(__trecurse)(__r, __action, __level + 1);
-		(*__action)(__root, (VISIT)2, __level);
-	}
+#ifndef __local___localdep_twalk_r_defined
+#define __local___localdep_twalk_r_defined 1
+#ifdef __CRT_HAVE_twalk_r
+__CREDIRECT_VOID(,__THROWING,__localdep_twalk_r,(void const *__root, void (__LIBCCALL *__action)(void const *__nodep, VISIT __value, int __level, void *__arg), void *__arg),twalk_r,(__root,__action,__arg))
+#else /* __CRT_HAVE_twalk_r */
+__NAMESPACE_LOCAL_END
+#include <libc/local/search/twalk_r.h>
+__NAMESPACE_LOCAL_BEGIN
+#define __localdep_twalk_r __LIBC_LOCAL_NAME(twalk_r)
+#endif /* !__CRT_HAVE_twalk_r */
+#endif /* !__local___localdep_twalk_r_defined */
+__NAMESPACE_LOCAL_END
+#ifndef __LIBCCALL_CALLER_CLEANUP
+#ifndef ____invoke_twalk_action_helper_defined
+__NAMESPACE_LOCAL_BEGIN
+#define ____invoke_twalk_action_helper_defined 1
+__LOCAL_LIBC(__invoke_twalk_action_helper) int
+(__LIBCCALL __invoke_twalk_action_helper)(void const *__nodep, VISIT __value, int __level, void *__arg) {
+	return (*(void (__LIBCCALL *)(void const *, VISIT, int))__arg)(__nodep, __value, __level);
 }
 __NAMESPACE_LOCAL_END
+#endif /* !____invoke_twalk_action_helper_defined */
+#endif /* !__LIBCCALL_CALLER_CLEANUP */
 __NAMESPACE_LOCAL_BEGIN
 __LOCAL_LIBC(twalk) void
-__NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(twalk))(void const *__root, __action_fn_t __action) {
-	if (__root && __action)
-		__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(__trecurse)(__root, __action, 0);
+(__LIBCCALL __LIBC_LOCAL_NAME(twalk))(void const *__root, void (__LIBCCALL *__action)(void const *__nodep, VISIT __value, int __level)) __THROWS(...) {
+#ifdef __LIBCCALL_CALLER_CLEANUP
+	(__NAMESPACE_LOCAL_SYM __localdep_twalk_r)(__root, (void (__LIBCCALL *)(void const *, VISIT, int, void *))(void *)__action, __NULLPTR);
+#else /* __LIBCCALL_CALLER_CLEANUP */
+	(__NAMESPACE_LOCAL_SYM __localdep_twalk_r)(__root, &__NAMESPACE_LOCAL_SYM __invoke_twalk_action_helper, (void *)__action);
+#endif /* !__LIBCCALL_CALLER_CLEANUP */
 }
 __NAMESPACE_LOCAL_END
 #ifndef __local___localdep_twalk_defined

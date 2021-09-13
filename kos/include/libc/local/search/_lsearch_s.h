@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x9e1a720e */
+/* HASH CRC-32:0xbc8fb6e8 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -18,31 +18,23 @@
  *    misrepresented as being the original software.                          *
  * 3. This notice may not be removed or altered from any source distribution. *
  */
-#ifndef __local_lsearch_defined
-#define __local_lsearch_defined 1
+#ifndef __local__lsearch_s_defined
+#define __local__lsearch_s_defined 1
 #include <__crt.h>
-#include <hybrid/typecore.h>
 #include <kos/anno.h>
+#include <hybrid/typecore.h>
 __NAMESPACE_LOCAL_BEGIN
-#ifndef __local___localdep_lfind_defined
-#define __local___localdep_lfind_defined 1
-#ifdef __CRT_HAVE_lfind
+#ifndef __local___localdep__lfind_s_defined
+#define __local___localdep__lfind_s_defined 1
+#ifdef __CRT_HAVE__lfind_s
+__CREDIRECT(__ATTR_WUNUSED __ATTR_NONNULL((2, 3, 5)),void *,__THROWING,__localdep__lfind_s,(void const *__key, void const *__pbase, __SIZE_TYPE__ __KOS_FIXED_CONST *__pitem_count, __SIZE_TYPE__ __item_size, int (__LIBCCALL *__compar)(void *__arg, void const *__a, void const *__b), void *__arg),_lfind_s,(__key,__pbase,__pitem_count,__item_size,__compar,__arg))
+#else /* __CRT_HAVE__lfind_s */
 __NAMESPACE_LOCAL_END
-#include <features.h>
+#include <libc/local/search/_lfind_s.h>
 __NAMESPACE_LOCAL_BEGIN
-__CREDIRECT(__ATTR_WUNUSED __ATTR_NONNULL((2, 3, 5)),void *,__THROWING,__localdep_lfind,(void const *__key, void const *__pbase, __SIZE_TYPE__ __KOS_FIXED_CONST *__pitem_count, __SIZE_TYPE__ __item_size, __compar_fn_t __compar),lfind,(__key,__pbase,__pitem_count,__item_size,__compar))
-#elif defined(__CRT_HAVE__lfind)
-__NAMESPACE_LOCAL_END
-#include <features.h>
-__NAMESPACE_LOCAL_BEGIN
-__CREDIRECT(__ATTR_WUNUSED __ATTR_NONNULL((2, 3, 5)),void *,__THROWING,__localdep_lfind,(void const *__key, void const *__pbase, __SIZE_TYPE__ __KOS_FIXED_CONST *__pitem_count, __SIZE_TYPE__ __item_size, __compar_fn_t __compar),_lfind,(__key,__pbase,__pitem_count,__item_size,__compar))
-#else /* ... */
-__NAMESPACE_LOCAL_END
-#include <libc/local/search/lfind.h>
-__NAMESPACE_LOCAL_BEGIN
-#define __localdep_lfind __LIBC_LOCAL_NAME(lfind)
-#endif /* !... */
-#endif /* !__local___localdep_lfind_defined */
+#define __localdep__lfind_s __LIBC_LOCAL_NAME(_lfind_s)
+#endif /* !__CRT_HAVE__lfind_s */
+#endif /* !__local___localdep__lfind_s_defined */
 #ifndef __local___localdep_memcpy_defined
 #define __local___localdep_memcpy_defined 1
 #ifdef __CRT_HAVE_memcpy
@@ -54,10 +46,10 @@ __NAMESPACE_LOCAL_BEGIN
 #define __localdep_memcpy __LIBC_LOCAL_NAME(memcpy)
 #endif /* !__CRT_HAVE_memcpy */
 #endif /* !__local___localdep_memcpy_defined */
-__LOCAL_LIBC(lsearch) __ATTR_NONNULL((2, 3, 5)) void *
-(__LIBCCALL __LIBC_LOCAL_NAME(lsearch))(void const *__key, void *__pbase, __SIZE_TYPE__ *__pitem_count, __SIZE_TYPE__ __item_size, int (__LIBCCALL *__compar)(void const *__a, void const *__b)) __THROWS(...) {
+__LOCAL_LIBC(_lsearch_s) __ATTR_WUNUSED __ATTR_NONNULL((2, 3, 5)) void *
+(__LIBCCALL __LIBC_LOCAL_NAME(_lsearch_s))(void const *__key, void *__pbase, __SIZE_TYPE__ *__pitem_count, __SIZE_TYPE__ __item_size, int (__LIBCCALL *__compar)(void *__arg, void const *__a, void const *__b), void *__arg) __THROWS(...) {
 	void *__result;
-	__result = (__NAMESPACE_LOCAL_SYM __localdep_lfind)(__key, __pbase, __pitem_count, __item_size, __compar);
+	__result = (__NAMESPACE_LOCAL_SYM __localdep__lfind_s)(__key, __pbase, __pitem_count, __item_size, __compar, __arg);
 	if (__result == __NULLPTR) {
 		__result = (__NAMESPACE_LOCAL_SYM __localdep_memcpy)((__BYTE_TYPE__ *)__pbase + (*__pitem_count) * __item_size, __key, __item_size);
 		++*__pitem_count;
@@ -65,8 +57,8 @@ __LOCAL_LIBC(lsearch) __ATTR_NONNULL((2, 3, 5)) void *
 	return __result;
 }
 __NAMESPACE_LOCAL_END
-#ifndef __local___localdep_lsearch_defined
-#define __local___localdep_lsearch_defined 1
-#define __localdep_lsearch __LIBC_LOCAL_NAME(lsearch)
-#endif /* !__local___localdep_lsearch_defined */
-#endif /* !__local_lsearch_defined */
+#ifndef __local___localdep__lsearch_s_defined
+#define __local___localdep__lsearch_s_defined 1
+#define __localdep__lsearch_s __LIBC_LOCAL_NAME(_lsearch_s)
+#endif /* !__local___localdep__lsearch_s_defined */
+#endif /* !__local__lsearch_s_defined */

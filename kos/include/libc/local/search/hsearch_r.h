@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xd652aa16 */
+/* HASH CRC-32:0xfe898913 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -23,6 +23,13 @@
 #include <__crt.h>
 struct entry;
 struct hsearch_data;
+#ifndef __ACTION_defined
+#define __ACTION_defined
+typedef enum {
+	FIND  = 0,
+	ENTER = 1
+} ACTION;
+#endif /* !__ACTION_defined */
 __NAMESPACE_LOCAL_BEGIN
 #ifndef __local___localdep_strcmp_defined
 #define __local___localdep_strcmp_defined 1
@@ -71,7 +78,7 @@ typedef struct entry {
 #include <libc/errno.h>
 __NAMESPACE_LOCAL_BEGIN
 __LOCAL_LIBC(hsearch_r) __ATTR_NONNULL((3, 4)) int
-__NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(hsearch_r))(struct entry __item, int __action, struct entry **__retval, struct hsearch_data *__htab) {
+__NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(hsearch_r))(struct entry __item, ACTION __action, struct entry **__retval, struct hsearch_data *__htab) {
 	typedef struct {
 		unsigned int ___used;
 		struct entry        __entry;
@@ -109,7 +116,7 @@ __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(hsearch_r))(struct entry __item, int 
 			}
 		} while (((__entry_type *)__htab->table)[__idx].___used);
 	}
-	if (__action == 1) {
+	if (__action == ENTER) {
 		if (__htab->filled == __htab->size) {
 #ifdef __ENOMEM
 			(void)__libc_seterrno(__ENOMEM);

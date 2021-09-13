@@ -30,6 +30,7 @@ import * from .wchar;
 import * from .generator;
 import * from .typeclass;
 import Function from .cheaders;
+import util;
 
 /* How auto vs. user implementation is selected:
  * >> if (HAS_MAGIC_IMPLEMENTION_BODY) {
@@ -243,14 +244,17 @@ continue_typename_expression:
 				}
 				if (tok in cLanguageKeywords)
 					continue;
+				if (tok.issymbol() && tok.isupper() && ("CALL" in tok || "CC" in tok))
+					continue; /* Calling convention macro... */
 				break;
 			}
 			ctype = CType(self.getUserString(typenameStart, typenameEnd));
 			if (isCString(tok)) {
 				varname = tok.decode("c-escape");
-				self.next();
+				tok = self.next();
 			} else if (tok.issymbol()) {
 				varname = self.userTok;
+				tok = self.next();
 			} else {
 				varname = "";
 			}
@@ -266,6 +270,11 @@ continue_typename_expression:
 					self.err("Unmatched {!r} in ctype expression"
 						.format({ unwindStack.last }));
 				}
+				afterNameEnd = self.tokEnd;
+				tok = self.next();
+			}
+			while (tok in "([") {
+				self.skipPair();
 				afterNameEnd = self.tokEnd;
 				tok = self.next();
 			}
@@ -886,7 +895,8 @@ class FunctionFeatures {
 	public member crt_noSelfImport: bool = false;                    /* [[no_]crt_self_import]       Prevent importing from ASMNAME(crt_name || current.name) */
 	public member crt_noSelfExport: bool = false;                    /* [[no_]crt_self_export]       Prevent exporting as ASMNAME(crt_name || current.name) */
 	public member crt_userimpl: bool = false;                        /* [[no_]userimpl]              Prevent implementation in libc/auto and always use libc/user */
-	public member crt_dosVariant: bool = false;                      /* [[no_]crt_dos_variant]       The function has a dedicated DOS-implementation */
+	public member crt_dosVariant: bool | FunctionImplementation | Callable = false;
+	                                                                 /* [[no_]crt_dos_variant]       The function has a dedicated DOS-implementation (may also be set to the actual impl, or a callable to generate said impl) */
 	public member crt_noDosWrapper: bool = false;                    /* [[no_]crt_dos_wrapper]       Don't generate a dos-wrapper function when (!wchar && !crt_dosVariant) */
 	public member crt_kosSection: UserString | string | none = none; /* [kos_section(...)]           Section name for the KOS implementation */
 	public member crt_dosSection: UserString | string | none = none; /* [dos_section(...)]           Section name for the DOS implementation (if @wchar) */
@@ -2525,32 +2535,426 @@ again:
 }
 
 
+function String_replaceDefaultCCWithDosCC(self: string | UserString): string {
+	return str(self)
+		.replace(DEFAULT_CC, DEFAULT_DOS_CC)
+		.replace(DEFAULT_VCC, DEFAULT_DOS_VCC);
+}
+function String_containsDefaultCC(self: string | UserString): bool {
+	return DEFAULT_CC in self || DEFAULT_VCC in self;
+}
+function CType_replaceDefaultCCWithDosCC(self: CType): CType {
+	if (String_containsDefaultCC(self.beforeName) ||
+	    String_containsDefaultCC(self.afterName)) {
+		return CType(
+			beforeName: String_replaceDefaultCCWithDosCC(self.beforeName),
+			afterName:  String_replaceDefaultCCWithDosCC(self.afterName));
+	}
+	return self;
+}
+function Argument_replaceDefaultCCWithDosCC(self: Argument): Argument {
+	local newCType = CType_replaceDefaultCCWithDosCC(self.ctype);
+	if (newCType === self.ctype)
+		return self;
+	local result = copy self;
+	result.ctype = newCType;
+	return result;
+}
+function Arguments_replaceDefaultCCWithDosCC(argv: {Argument...}): {Argument...} {
+	local i = 0;
+	for (local i, arg: util.enumerate(argv)) {
+		local newArg = Argument_replaceDefaultCCWithDosCC(arg);
+		if (newArg !== arg) {
+			local result = List(argv[:i]);
+			result.append(newArg);
+			for (;;) {
+				++i;
+				if (i >= #argv)
+					break;
+				result.append(Argument_replaceDefaultCCWithDosCC(argv[i]));
+			}
+			return result;
+		}
+	}
+	return argv;
+}
+
+
 @@Replace the @DEFAULT_CC and @DEFAULT_VCC in @prototype with their DOS equivalents
 function replaceFunctionPrototypeDefaultCCWithDefaultDosCC(
 		prototype: FunctionPrototype | Callable): FunctionPrototype | Callable {
-	if (prototype is Callable) {
-		return []{
-			local result: FunctionPrototype = prototype();
-			if (result.cc === DEFAULT_CC) {
-				result = copy result;
-				result.cc = DEFAULT_DOS_CC;
-			} else if (result.cc === DEFAULT_VCC) {
-				result = copy result;
-				result.cc = DEFAULT_DOS_VCC;
-			}
-			return result;
-		};
-	}
-	local result = prototype;
+	if (prototype is Callable)
+		return [] -> replaceFunctionPrototypeDefaultCCWithDefaultDosCC(prototype());
+	local result: FunctionPrototype = prototype;
+	local didCopy: bool = false;
 	if (result.cc === DEFAULT_CC) {
 		result = copy result;
+		didCopy = true;
 		result.cc = DEFAULT_DOS_CC;
 	} else if (result.cc === DEFAULT_VCC) {
 		result = copy result;
+		didCopy = true;
 		result.cc = DEFAULT_DOS_VCC;
+	}
+	local newReturnType = CType_replaceDefaultCCWithDosCC(result.returnType);
+	if (newReturnType !== result.returnType) {
+		if (!didCopy) {
+			result = copy result;
+			didCopy = true;
+		}
+		result.returnType = newReturnType;
+	}
+	local newArgv = Arguments_replaceDefaultCCWithDosCC(result.argv);
+	if (newArgv !== result.argv) {
+		if (!didCopy) {
+			result = copy result;
+			didCopy = true;
+		}
+		result.argv = newArgv;
 	}
 	return result;
 }
+
+
+class WrapperCookie {
+	this = default;
+	@@Cookie type
+	public member ctype: CType;
+	@@Initializer expression
+	public member init: string | UserString;
+	function replaceAutoTypes(proto: FunctionPrototype) {
+		if (this.ctype.beforeName == "auto" && this.ctype.afterName == "") {
+			local arg = proto.argsByName.get(this.init);
+			if (arg !is none)
+				this.ctype = arg.ctype;
+		}
+	}
+	public property cookieTypeName: string = { get() -> str this.ctype; }
+	public property cookieTypePrefix: string = { get() -> this.ctype.beforeName; }
+	public property cookieTypeSuffix: string = { get() -> this.ctype.afterName; }
+}
+class WrapperCookieStruct {
+	this = default;
+	@@Struct members
+	public member members: {(string, WrapperCookie)...} = [];
+	@@Struct name (automatically generated)
+	public member name: string;
+	function replaceAutoTypes(proto: FunctionPrototype) {
+		for (local none, m: this.members)
+			m.replaceAutoTypes(proto);
+	}
+	public property cookieTypeName: string = { get() -> cookieTypePrefix; }
+	public property cookieTypePrefix: string = { get() -> "struct " + this.name; }
+	public property cookieTypeSuffix: string = { get() -> ""; }
+}
+
+function updateCTypeForCookie(ctype: CType, cookie: WrapperCookie | WrapperCookieStruct) {
+	final local COOKIE_MARKER = "$cook";
+	if (ctype.beforeName == COOKIE_MARKER && ctype.afterName == "") {
+		ctype.beforeName = cookie.cookieTypePrefix;
+		ctype.afterName  = cookie.cookieTypeSuffix;
+	} else {
+		if (COOKIE_MARKER in ctype.beforeName)
+			ctype.beforeName = str(ctype.beforeName).replace(COOKIE_MARKER, cookie.cookieTypeName);
+		if (COOKIE_MARKER in ctype.afterName)
+			ctype.afterName = str(ctype.afterName).replace(COOKIE_MARKER, cookie.cookieTypeName);
+	}
+}
+
+class CrtDosVariantMetadata {
+	this = default;
+	/*
+	public function generate(
+			dosLibraryFunction: LibraryFunction,
+			currentFeatures: FunctionFeatures)
+			: FunctionImplementation | Callable;
+	*/
+}
+class CrtDosVariantCallbackMetadata: CrtDosVariantMetadata {
+	this = default;
+	public member dosProto: FunctionPrototype | none;
+	public member cookie: WrapperCookie | WrapperCookieStruct;
+	public member wrapperPrototype: FunctionPrototype;
+	public member wrapperBody: string | UserString;
+	public member implBody: string | UserString | none;
+
+	@@Helper function to trigger an error
+	function err(message: string) {
+		local loc = none;
+		if (wrapperBody is UserString) {
+			loc = wrapperBody;
+		} else if (implBody is UserString) {
+			loc = implBody;
+		}
+		loc.err(message);
+		throw Error(message); /* Fallback... */
+	}
+
+	public function generate(
+			dosLibraryFunction: LibraryFunction,
+			currentFeatures: FunctionFeatures)
+			: FunctionImplementation | Callable {
+		local name = dosLibraryFunction.name;
+		if (dosLibraryFunction.prototype !is bound)
+			dosLibraryFunction.prototype = FunctionPrototype();
+		dosLibraryFunction.ppCond = "!defined(__LIBCCALL_IS_LIBDCALL) && ({})"
+			.format({ dosLibraryFunction.ppCond });
+		local dosProto = dosLibraryFunction.prototype;
+		if (dosProto !is FunctionPrototype) {
+			this.err("Indirect prototypes are not supported "
+			            "with [[crt_dos_variant(callback(...))]] (see: {!r})"
+				.format({ name }));
+		}
+		if (dosProto.nothrow != "THROWS(...)") {
+			this.err("[[crt_dos_variant(callback(...))]] used on function {!r} not marked as [[throws]]. "
+			         "Because user-defined callbacks are invoked, obviously this function can throw "
+			         "any kind of exception!"
+				.format({ name }));
+		}
+		local dosProtoOverride = this.dosProto;
+		if (dosProtoOverride !is none) {
+			/* Override certain parts about the dos prototype */
+			dosProto.cc                    = dosProtoOverride.cc;
+			dosProto.argv                  = dosProtoOverride.argv;
+			dosProto.returnType            = dosProtoOverride.returnType;
+			dosProto.ellipsisArgumentTypes = dosProtoOverride.ellipsisArgumentTypes;
+			dosProto.declPrefix            = dosProtoOverride.declPrefix;
+			/* Merge attributes (but overrides NONNULL). */
+			local newAttrib = List(dosProtoOverride.attributes);
+			for (local attr: dosProto.attributes) {
+				if (attr !is Callable) {
+					local sattr = str(attr);
+					if (sattr.startswith("NONNULL(("))
+						continue; /* Skip! */
+				}
+				newAttrib.append(attr);
+			}
+			dosProto.attributes = newAttrib;
+		}
+		if (wrapperPrototype.nothrow == "")
+			wrapperPrototype.nothrow = dosProto.nothrow;
+
+		/* Figure out the section to put the wrapper function into */
+		local crt_dosSection = currentFeatures.crt_dosSection !is none
+			? currentFeatures.crt_dosSection
+			: DEFAULT_DOS_SECTION;
+
+		/* Replace `auto' in the types used by the cookie variable. */
+		this.cookie.replaceAutoTypes(dosProto);
+
+		/* Do the remaining work asynchronously once everything has been loaded. */
+		return []{
+			local result = FunctionImplementation(name: name);
+			local dosBody = CWriter(File.Writer());
+			local dosPrefix = CWriter(File.Writer());
+			local wrapperFunctionName = name + "_cookie_struct";
+			local usedWrapperBody = str(wrapperBody);
+			local usedImplBody = str(implBody);
+			local cookie = this.cookie;
+			/* TODO: Prevent redundant declarations of binary-compatible wrapper functions
+			 *       by serializing `usedWrapperBody', `cookie' (types) and `wrapperPrototype' */
+
+			/* Output the cookie struct definition. */
+			if (cookie is WrapperCookieStruct) {
+				cookie.name = name + "_cookie_struct";
+				dosPrefix << "struct " << cookie.name << " {\n";
+				for (local fieldName, fieldCookie: cookie.members) {
+					dosPrefix << "\t";
+					fieldCookie.ctype.cprintForGenerator(dosPrefix, fieldName);
+					dosPrefix << ";\n";
+				}
+				dosPrefix << "};\n";
+			}
+
+			/* Replace `$cook' with the cookie type name within the wrapper prototype */
+			for (local arg: wrapperPrototype.argv)
+				updateCTypeForCookie(arg.ctype, cookie);
+			if ("$cook" in usedWrapperBody)
+				usedWrapperBody = usedWrapperBody.replace("$cook", cookie.cookieTypeName);
+
+			/* Generate the wrapper implementation body. */
+			wrapperPrototype.cprintDeclarationWithoutTerminator(
+				fp:                   dosPrefix,
+				escapeMode:           ESCAPE_MODE_NONE,
+				decl:                 "PRIVATE",
+				injectedAttributes:   { "ATTR_SECTION({!r})".format({ crt_dosSection }) },
+				exposedName:          wrapperFunctionName,
+				breakAfterReturnType: true,
+				oneArgumentPerLine:   true);
+			dosPrefix << "{\n\t";
+			if (usedWrapperBody.startswith("{") && usedWrapperBody.endswith("}")) {
+				dosPrefix << usedWrapperBody[1:-1].strip() << "\n}\n";
+			} else {
+				if (!wrapperPrototype.returnType.isVoid)
+					dosPrefix << "return ";
+				dosPrefix << usedWrapperBody << ";\n";
+				dosPrefix << "}\n";
+			}
+
+			@@String to which to expand @"$cook" in @implBody
+			local cookieVariable: string;
+			dosBody << "{\n";
+			if (cookie is WrapperCookieStruct) {
+				cookieVariable = name + "_cookie";
+				dosBody << "\tstruct " << cookie.name << " " << cookieVariable << ";\n";
+				for (local name, field: cookie.members)
+					dosBody << "\t" << cookieVariable << "." << name << " = " << field.init << ";\n";
+			} else {
+				cookieVariable = str(cookie.init);
+			}
+
+			/* Replace marker strings in the implementation body. */
+			if ("$cook" in usedImplBody)
+				usedImplBody = usedImplBody.replace("$cook", cookieVariable);
+			if ("$wrap" in usedImplBody)
+				usedImplBody = usedImplBody.replace("$wrap", wrapperFunctionName);
+
+			/* Generate the implementation body */
+			dosBody << "\t";
+			if (usedImplBody.startswith("{") && usedImplBody.endswith("}")) {
+				dosBody << usedImplBody[1:-1].strip();
+			} else {
+				if (!dosProto.returnType.isVoid)
+					dosBody << "return ";
+				dosBody << usedImplBody << ";\n";
+			}
+			dosBody << "}";
+
+			/* Flush generated files. */
+			dosBody   = dosBody.flush().generator.fp.string;
+			dosPrefix = dosPrefix.flush().generator.fp.string;
+
+			/* Finalize the used FunctionImplementation */
+			result.implPrefix = (dosPrefix,);
+			result.body = dosBody;
+			result.dependencies = []{
+				for (local body: { usedWrapperBody, usedImplBody }) {
+					local deps = scanForNamesOfDependentFunctions(body, name, dosProto);
+					if (deps is Callable)
+						deps = deps();
+					yield deps...;
+				}
+			};
+			return result;
+		};
+	}
+}
+
+@@Parse the `...' of a `[[crt_dos_variant(callback(...))]]` annotation
+@@>> [[crt_dos_variant(callback(
+@@>>     decl: int(void const *key, void const *base, size_t *nmemb, size_t size,
+@@>>               int (LIBDCALL *compar)(void *, void const *, void const *), void *arg),
+@@>>     cook: struct { auto compar = compar; auto arg = arg; },
+@@>>     wrap: int($cook *c, void const *a, void const *b) { return (*c->compar)(c->arg, a, b); },
+@@>>     impl: _lfind_s(key, base, nmemb, size, $wrap, &$cook),
+@@>> ))]]
+function parseCrtDosVariantCallbackMetadata(self: CParser): CrtDosVariantMetadata {
+	local dosProto: FunctionPrototype | none = none;
+	local cookie: WrapperCookie | WrapperCookieStruct = none;
+	local wrapperPrototype: FunctionPrototype = FunctionPrototype(cc: DEFAULT_CC, nothrow: "");
+	local wrapperBody: string | UserString = none;
+	local implBody: string | UserString = none;
+	local tok = self.tok;
+	while (tok != ")") {
+		switch (tok) {
+
+		case "decl":
+			dosProto = FunctionPrototype(cc: DEFAULT_DOS_CC);
+			self.next();
+			self.skip(":");
+			parseWholeFunctionPrototype(self, dosProto);
+			break;
+
+		case "cook":
+			self.next();
+			tok = self.skip(":");
+			if (tok == "struct") {
+				self.next();
+				tok = self.skip("{");
+				cookie = WrapperCookieStruct();
+				while (tok != "}") {
+					local typ, name = parseCTypeAndName(self)...;
+					local field = WrapperCookie(ctype: typ);
+					self.skip("=");
+					field.init = self.parseAllUntilRParenOrSemi();
+					cookie.members.append((name, field));
+					if (self.tok !in ",;")
+						break;
+					tok = self.next();
+				}
+				tok = self.skip("}");
+			} else {
+				local typ, name = parseCTypeAndName(self)...;
+				if (name)
+					self.err("non-struct cookie has name {!r}".format({ name }));
+				cookie = WrapperCookie(ctype: typ);
+				self.skip("=");
+				cookie.init = self.parseAllUntilRParenOrSemi();
+			}
+			break;
+
+		case "wrap": {
+			self.next();
+			tok = self.skip(":");
+			if (tok == "[") {
+				parseWholeFunctionPrototype(self, wrapperPrototype);
+				self.skip("]");
+			} else {
+				parseWholeFunctionPrototype(self, wrapperPrototype);
+			}
+			if (self.tok == "{") {
+				local bodyStart = self.tokStart;
+				self.skipPair();
+				wrapperBody = self.getUserString(bodyStart, self.tokEnd);
+				self.next();
+			} else {
+				wrapperBody = self.parseAllUntilRParen();
+			}
+		}	break;
+
+		case "impl":
+			self.next();
+			self.skip(":");
+			implBody = self.parseAllUntilRParen();
+			break;
+
+		default:
+			self.err("Unknown key in [crt_dos_variant(callback(...))]: {!r}"
+				.format({ tok }));
+		}
+		if (self.tok != ",")
+			break;
+		tok = self.next();
+	}
+	if (cookie is none)
+		self.err("No cookie defined in [[crt_dos_variant(callback(...))]]");
+	if (wrapperBody is none)
+		self.err("No wrapper body defined in [[crt_dos_variant(callback(...))]]");
+	if (implBody is none)
+		self.err("No implementation body defined in [[crt_dos_variant(callback(...))]]");
+	return CrtDosVariantCallbackMetadata(
+		dosProto:         dosProto,
+		cookie:           cookie,
+		wrapperPrototype: wrapperPrototype,
+		wrapperBody:      wrapperBody,
+		implBody:         implBody);
+}
+
+function parseCrtDosVariantMetadata(self: CParser): Object {
+	local result;
+	switch (self.tok) {
+	case "callback":
+		self.next();
+		self.skip("(");
+		result = parseCrtDosVariantCallbackMetadata(self);
+		self.skip(")");
+		break;
+	default:
+		self.err("Unknown crt_dos_variant command: {!r}".format({ self.tok }));
+	}
+	return result;
+}
+
 
 
 @@Load system header definitions
@@ -3538,6 +3942,27 @@ do_handle_alt_variant_of:
 						currentKosLibraryFunction = LibraryFunction();
 					currentKosLibraryFunction.ppCond = "1";
 					self.next();
+					break;
+
+				case "crt_dos_variant":
+					/* >> [[crt_dos_variant(callback(
+					 * >>     decl: ...,
+					 * >>     cook: ...,
+					 * >>     wrap: ...,
+					 * >>     impl: ...,
+					 * >> ))]]
+					 * May be used to declare a custom implementation that
+					 * is used to generate wrappers for LIBDCALL callbacks
+					 * when !__LIBCCALL_IS_LIBDCALL. */
+					if (currentConditions !is none)
+						goto illegal_annotation_with_condition;
+					if (self.next() != "(") {
+						currentFeatures.crt_dosVariant = true;
+					} else {
+						self.next();
+						currentFeatures.crt_dosVariant = parseCrtDosVariantMetadata(self);
+						self.skip(")");
+					}
 					break;
 
 				case "crt_impl_if":
@@ -4936,7 +5361,7 @@ again_lookup_wcsCurrent:
 				local crt_kosSection = currentFeatures.crt_kosSection !is none
 					? currentFeatures.crt_kosSection
 					: DEFAULT_KOS_SECTION;
-				if (currentFeatures.wchar || currentFeatures.crt_dosVariant) {
+				if (currentFeatures.wchar || currentFeatures.crt_dosVariant !== false) {
 					/* Create 2 new functions that are then exported from libc. */
 					if (currentDosLibraryFunction is none)
 						currentDosLibraryFunction = LibraryFunction();
@@ -4961,6 +5386,8 @@ again_lookup_wcsCurrent:
 						? currentFeatures.crt_dosSection
 						: DEFAULT_DOS_SECTION;
 					if (currentFeatures.wchar) {
+						if (currentFeatures.crt_dosVariant !is bool)
+							self.errAt(currentNameTokStart, "Custom dos implementation cannot be used with [wchar]");
 						wcsCurrent.wc_internal_uchar = { currentDosLibraryFunction, currentKosLibraryFunction };
 						if (currentDosLibraryFunction.prototype !is bound) {
 							currentDosLibraryFunction.prototype = [] -> wcsCurrent
@@ -5012,19 +5439,27 @@ again_lookup_wcsCurrent:
 						local kosLibImpl: FunctionImplementation | Callable;
 						local dosLibImpl: FunctionImplementation | Callable;
 						if (loaderImpl !is none) {
-							kosLibImpl = dosLibImpl = loaderImpl is Callable
+							kosLibImpl = loaderImpl is Callable
 								? [] -> loaderImpl().impl
 								: loaderImpl.impl;
 						} else {
-							local dosProto = currentDosLibraryFunction.prototype;
-							local kosProto = currentKosLibraryFunction.prototype;
 							/* Create a default implementation for user-sources */
-							dosLibImpl = dosProto is Callable
-								? [] -> getDefaultLibraryImplementationForPrototype(dosProto(), crtName)
-								: DELAY_cb getDefaultLibraryImplementationForPrototype(dosProto, crtName);
+							local kosProto = currentKosLibraryFunction.prototype;
 							kosLibImpl = kosProto is Callable
 								? [] -> getDefaultLibraryImplementationForPrototype(kosProto(), crtName)
 								: DELAY_cb getDefaultLibraryImplementationForPrototype(kosProto, crtName);
+						}
+						if (currentFeatures.crt_dosVariant !is bool) {
+							/* Custom override for the dos implementation */
+							dosLibImpl = currentFeatures.crt_dosVariant.generate(
+								currentDosLibraryFunction, currentFeatures);
+						} else if (loaderImpl !is none) {
+							dosLibImpl = kosLibImpl;
+						} else {
+							local dosProto = currentDosLibraryFunction.prototype;
+							dosLibImpl = dosProto is Callable
+								? [] -> getDefaultLibraryImplementationForPrototype(dosProto(), crtName)
+								: DELAY_cb getDefaultLibraryImplementationForPrototype(dosProto, crtName);
 						}
 						currentDosLibraryFunction.bindings.append(LibraryFunctionBinding(
 							ppCond:      currentFeatures.crt_dosImplRequires,
