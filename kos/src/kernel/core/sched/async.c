@@ -700,7 +700,7 @@ PRIVATE struct aio_handle_type const async_aio_noretsize = {
  * after  which  point  `aio' will  be  notified once  the  job is
  * completed (when restarted later, or canceled before that point,
  * the AIO  handle will  not be  notified). Additionally,  use  of
- * `async_cancel()'  will  immediatly  indicate  completion  (with
+ * `async_cancel()' will  immediately  indicate  completion  (with
  * CANCEL  status),  and  `aio_handle_cancel()'  will  behave  the
  * same as `async_cancel()' */
 PUBLIC NOBLOCK NONNULL((1, 2)) void

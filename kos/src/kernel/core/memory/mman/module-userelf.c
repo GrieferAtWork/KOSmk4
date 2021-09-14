@@ -2392,7 +2392,7 @@ uem_next(struct mman *__restrict self,
 	bool must_merge;
 
 	/* Because UserELF modules can be embedded inside of each other,
-	 * we have to start looking  for them starting immediatly  after
+	 * we have to start looking for them starting immediately  after
 	 * the original node. */
 	minaddr = prev->md_loadmin + PAGESIZE;
 

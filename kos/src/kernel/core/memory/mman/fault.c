@@ -65,7 +65,7 @@ DECL_BEGIN
  *              returns. Note though that memory may have already been  unloaded
  *              by the time this function returns (unlikely), so the caller must
  *              still be ready to deal with the possibility that another attempt
- *              at doing nopf access at `*(byte_t *)addr' might immediatly  fail
+ *              at doing nopf access at `*(byte_t *)addr' might immediately fail
  *              again.
  *              Also note that for any memory  that had already been faulted  within
  *              the  given address range,  this function acts as  though it had been

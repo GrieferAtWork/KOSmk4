@@ -63,7 +63,7 @@ NOTHROW_NCX(LIBCCALL libc_aio_write)(struct aiocb *self)
 }
 /*[[[end:libc_aio_write]]]*/
 
-/*[[[head:libc_lio_listio,hash:CRC-32=0x709fa4c8]]]*/
+/*[[[head:libc_lio_listio,hash:CRC-32=0xc8d6bd98]]]*/
 /* >> lio_listio(3), lio_listio64(3)
  * Execute/perform  a `list' of  AIO operations, where  each element of `list'
  * describes a read (`elem->aio_lio_opcode == LIO_READ'), write (`LIO_WRITE'),
@@ -74,10 +74,10 @@ NOTHROW_NCX(LIBCCALL libc_aio_write)(struct aiocb *self)
  * failed (individual errors/return values can be queried via `aio_error(3)'
  * and `aio_return(3)' on each of the elements from `list')
  *
- * Alternatively, when `mode == LIO_NOWAIT', AIO is performed asynchronously,
- * and the function returns immediatly once all operations have been started.
- * If this was successful, return `0', or `-1' if doing so failed  (`errno').
- * Also note that on error, all  of the already-started operations will  have
+ * Alternatively,  when `mode == LIO_NOWAIT', AIO is performed asynchronously,
+ * and the function returns immediately once all operations have been started.
+ * If  this was successful, return `0', or  `-1' if doing so failed (`errno').
+ * Also  note that on  error, all of the  already-started operations will have
  * been canceled even before this function returns.
  * Additionally, the given `sig' (if non-NULL) will be assigned as a master
  * completion event that is only triggered once _all_ of the AIO operations
@@ -265,7 +265,7 @@ NOTHROW_NCX(LIBCCALL libc_aio_write64)(struct aiocb64 *self)
 #endif /* MAGIC:alias */
 /*[[[end:libc_aio_write64]]]*/
 
-/*[[[head:libc_lio_listio64,hash:CRC-32=0x14f16859]]]*/
+/*[[[head:libc_lio_listio64,hash:CRC-32=0xa8eb839a]]]*/
 #if __SIZEOF_OFF32_T__ == __SIZEOF_OFF64_T__
 DEFINE_INTERN_ALIAS(libc_lio_listio64, libc_lio_listio);
 #else /* MAGIC:alias */
@@ -279,10 +279,10 @@ DEFINE_INTERN_ALIAS(libc_lio_listio64, libc_lio_listio);
  * failed (individual errors/return values can be queried via `aio_error(3)'
  * and `aio_return(3)' on each of the elements from `list')
  *
- * Alternatively, when `mode == LIO_NOWAIT', AIO is performed asynchronously,
- * and the function returns immediatly once all operations have been started.
- * If this was successful, return `0', or `-1' if doing so failed  (`errno').
- * Also note that on error, all  of the already-started operations will  have
+ * Alternatively,  when `mode == LIO_NOWAIT', AIO is performed asynchronously,
+ * and the function returns immediately once all operations have been started.
+ * If  this was successful, return `0', or  `-1' if doing so failed (`errno').
+ * Also  note that on  error, all of the  already-started operations will have
  * been canceled even before this function returns.
  * Additionally, the given `sig' (if non-NULL) will be assigned as a master
  * completion event that is only triggered once _all_ of the AIO operations

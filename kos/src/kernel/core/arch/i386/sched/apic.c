@@ -895,7 +895,7 @@ all_online:
 		outb_p(X86_PIC1_DATA, 0);
 		outb_p(X86_PIC2_DATA, 0);
 
-		/* Have `arch_cpu_hwipi_pending_nopr()' immediatly return `false' */
+		/* Have `arch_cpu_hwipi_pending_nopr()' immediately return `false' */
 		x86_arch_cpu_hwipi_pending_nopr[0] = 0x31; /* xorl */
 		x86_arch_cpu_hwipi_pending_nopr[1] = 0xc0; /* %eax, %eax */
 		x86_arch_cpu_hwipi_pending_nopr[2] = 0xc3; /* ret */

@@ -40,7 +40,7 @@ struct mman;
  *                 and the thread has become a zombie)
  * @param: pid:    The PID of the thread (or `NULL' if there is none)
  * @return: >= 0: Add this value to the to-be returned value of the enumerator.
- * @return: <  0: Stop enumeration and immediatly re-return this value. */
+ * @return: <  0: Stop enumeration and immediately re-return this value. */
 typedef ssize_t (KCALL *task_enum_cb_t)(void *arg,
                                         struct task *thread,
                                         struct taskpid *pid);

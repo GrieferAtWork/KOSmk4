@@ -183,7 +183,7 @@ INTERN_FUNCTION(libc_x86_syscall_init)
 	/* Re-write the target of the `call' instruction that got us
 	 * here  to instead link up with `libc_x86_sysenter_common',
 	 * thus causing all future calls to bypass our function, and
-	 * immediatly invoke `sysenter' */
+	 * immediately invoke `sysenter' */
 	movl   %eax, -4(%edx)                                /* *(s32 *)(return_pc - 4) = (&libc_x86_sysenter_common - return_pc); */
 	cpuid                                                /* __flush_instruction_cache(); */
 	popl_cfi_r %ebx

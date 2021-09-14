@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xcd7fd9a3 */
+/* HASH CRC-32:0xbe4d3078 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -253,10 +253,10 @@ __CREDIRECT(__ATTR_NONNULL((2)),int,__NOTHROW_NCX,aio_fsync,(__oflag_t __operati
  * failed (individual errors/return values can be queried via `aio_error(3)'
  * and `aio_return(3)' on each of the elements from `list')
  *
- * Alternatively, when `mode == LIO_NOWAIT', AIO is performed asynchronously,
- * and the function returns immediatly once all operations have been started.
- * If this was successful, return `0', or `-1' if doing so failed  (`errno').
- * Also note that on error, all  of the already-started operations will  have
+ * Alternatively,  when `mode == LIO_NOWAIT', AIO is performed asynchronously,
+ * and the function returns immediately once all operations have been started.
+ * If  this was successful, return `0', or  `-1' if doing so failed (`errno').
+ * Also  note that on  error, all of the  already-started operations will have
  * been canceled even before this function returns.
  * Additionally, the given `sig' (if non-NULL) will be assigned as a master
  * completion event that is only triggered once _all_ of the AIO operations
@@ -279,10 +279,10 @@ __CDECLARE(__ATTR_NONNULL((2)),int,__NOTHROW_NCX,lio_listio,(int __mode, struct 
  * failed (individual errors/return values can be queried via `aio_error(3)'
  * and `aio_return(3)' on each of the elements from `list')
  *
- * Alternatively, when `mode == LIO_NOWAIT', AIO is performed asynchronously,
- * and the function returns immediatly once all operations have been started.
- * If this was successful, return `0', or `-1' if doing so failed  (`errno').
- * Also note that on error, all  of the already-started operations will  have
+ * Alternatively,  when `mode == LIO_NOWAIT', AIO is performed asynchronously,
+ * and the function returns immediately once all operations have been started.
+ * If  this was successful, return `0', or  `-1' if doing so failed (`errno').
+ * Also  note that on  error, all of the  already-started operations will have
  * been canceled even before this function returns.
  * Additionally, the given `sig' (if non-NULL) will be assigned as a master
  * completion event that is only triggered once _all_ of the AIO operations
@@ -496,10 +496,10 @@ __CDECLARE(__ATTR_NONNULL((2)),int,__NOTHROW_NCX,aio_fsync64,(int __operation, s
  * failed (individual errors/return values can be queried via `aio_error(3)'
  * and `aio_return(3)' on each of the elements from `list')
  *
- * Alternatively, when `mode == LIO_NOWAIT', AIO is performed asynchronously,
- * and the function returns immediatly once all operations have been started.
- * If this was successful, return `0', or `-1' if doing so failed  (`errno').
- * Also note that on error, all  of the already-started operations will  have
+ * Alternatively,  when `mode == LIO_NOWAIT', AIO is performed asynchronously,
+ * and the function returns immediately once all operations have been started.
+ * If  this was successful, return `0', or  `-1' if doing so failed (`errno').
+ * Also  note that on  error, all of the  already-started operations will have
  * been canceled even before this function returns.
  * Additionally, the given `sig' (if non-NULL) will be assigned as a master
  * completion event that is only triggered once _all_ of the AIO operations
@@ -522,10 +522,10 @@ __CREDIRECT(__ATTR_NONNULL((2)),int,__NOTHROW_NCX,lio_listio64,(int __mode, stru
  * failed (individual errors/return values can be queried via `aio_error(3)'
  * and `aio_return(3)' on each of the elements from `list')
  *
- * Alternatively, when `mode == LIO_NOWAIT', AIO is performed asynchronously,
- * and the function returns immediatly once all operations have been started.
- * If this was successful, return `0', or `-1' if doing so failed  (`errno').
- * Also note that on error, all  of the already-started operations will  have
+ * Alternatively,  when `mode == LIO_NOWAIT', AIO is performed asynchronously,
+ * and the function returns immediately once all operations have been started.
+ * If  this was successful, return `0', or  `-1' if doing so failed (`errno').
+ * Also  note that on  error, all of the  already-started operations will have
  * been canceled even before this function returns.
  * Additionally, the given `sig' (if non-NULL) will be assigned as a master
  * completion event that is only triggered once _all_ of the AIO operations

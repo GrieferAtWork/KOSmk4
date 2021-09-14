@@ -235,13 +235,13 @@ struct async {
 	 (self)->a_ops    = (ops),          \
 	 (self)->a_aio    = __NULLPTR)
 
-/* Initialize the given async controller and attach `aio'. The
- * caller must follow this up with a call to  `async_start()',
- * after  which point `aio'  will be notified  once the job is
- * completed (when restarted  later, or  canceled before  that
- * point, the AIO handle will not be notified).  Additionally,
- * use of `async_cancel()' will immediatly indicate completion
- * (with CANCEL status), and `aio_handle_cancel()' will behave
+/* Initialize the given async controller and attach `aio'.  The
+ * caller must follow this up  with a call to  `async_start()',
+ * after which point  `aio' will  be notified once  the job  is
+ * completed  (when  restarted later,  or canceled  before that
+ * point, the AIO handle  will not be notified).  Additionally,
+ * use of `async_cancel()' will immediately indicate completion
+ * (with  CANCEL status), and `aio_handle_cancel()' will behave
  * the same as `async_cancel()' */
 #define async_init_aio(self, ops, aio) \
 	((self)->a_ops = (ops), _async_init_aio(self, aio))

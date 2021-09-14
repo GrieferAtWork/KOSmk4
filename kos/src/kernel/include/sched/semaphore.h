@@ -95,7 +95,7 @@ NOTHROW(FCALL semaphore_post)(struct semaphore *__restrict self) {
 }
 
 /* Post multiple tickets to the semaphore and wake up the same # of threads.
- * @return: * : The # of tickets that will (likely) be consumed immediatly. */
+ * @return: * : The # of tickets that will (likely) be consumed immediately. */
 LOCAL NOBLOCK NONNULL((1)) size_t
 NOTHROW(FCALL semaphore_postmany)(struct semaphore *__restrict self, size_t count) {
 	__hybrid_atomic_add(self->s_count, count, __ATOMIC_SEQ_CST);
