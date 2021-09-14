@@ -1125,7 +1125,7 @@ try {
 		 *  - foo(*) = bar;
 		 * We could create some sort of database that contains information about
 		 * which source files define some feature/function, which might allow us
-		 * to not have to re-compile everything anything something changes!
+		 * to not have to re-compile everything anytime something changes!
 		 */
 		startTask(compileSystemHeaderSourceFile, (
 			fullPath, fs.fileof(filename)));

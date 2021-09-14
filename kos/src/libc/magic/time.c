@@ -1220,7 +1220,7 @@ int clock_gettime(clockid_t clock_id, [[nonnull]] struct timespec *tp) {
 int clock_settime32(clockid_t clock_id, [[nonnull]] struct $timespec32 const *tp);
 
 @@>> clock_settime(2), clock_settime64(2)
-@@Set clock `clock_id' to value `tp'
+@@Set  clock  `clock_id'  to  value  `tp'
 [[no_crt_self_import, export_as("__clock_settime"), decl_include("<bits/os/timespec.h>")]]
 [[if($extended_include_prefix("<features.h>") defined(__USE_TIME_BITS64)), preferred_alias("clock_settime64")]]
 [[if($extended_include_prefix("<features.h>")!defined(__USE_TIME_BITS64)), preferred_alias("clock_settime", "__clock_settime")]]

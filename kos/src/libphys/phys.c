@@ -19,6 +19,7 @@
  */
 #ifndef GUARD_LIBPHYS_PHYS_C
 #define GUARD_LIBPHYS_PHYS_C 1
+#define _GNU_SOURCE 1
 
 #include "api.h"
 /**/

@@ -65,7 +65,7 @@ gcc_opt.append("-O3"); // Force-enable optimizations (mainly for faster pci.ids 
 
 #ifndef __KERNEL__
 #define USER_TRY         NESTED_TRY
-#define USER_EXCEPT(...) EXCEPT __VA_ARGS__
+#define USER_EXCEPT(...) EXCEPT { __VA_ARGS__; }
 #else /* !__KERNEL__ */
 #define USER_TRY         /* nothing */
 #define USER_EXCEPT(...) /* nothing */
@@ -152,9 +152,8 @@ PRIVATE WUNUSED errno_t NOTHROW(CC conf1_probe)(void) {
 		if (inl(PCI_ADDR_PORT) == PCI_ADDR_FENABLED)
 			result = EOK;
 		outl(PCI_ADDR_PORT, saved);
-	} USER_EXCEPT ({
-		result = EACCES;
-	})
+	}
+	USER_EXCEPT(result = EACCES)
 	return result;
 }
 
@@ -170,9 +169,8 @@ PRIVATE WUNUSED errno_t NOTHROW(CC conf2_probe)(void) {
 		outb((port_t)0xcfa, 0);
 		if (inb((port_t)0xcf8) == 0 && inb((port_t)0xcfa) == 0)
 			result = EOK;
-	} USER_EXCEPT ({
-		result = EACCES;
-	})
+	}
+	USER_EXCEPT(result = EACCES)
 	return result;
 }
 
@@ -365,9 +363,8 @@ BEGIN_SCAN_FUNCTION(pci_scan_system, void) {
 				CALL_SCAN_FUNCTION(pci_scan_bus(PCI_ADDR(fun, 0, 0)));
 			}
 		}
-	} USER_EXCEPT ({
-		return EACCES;
-	})
+	}
+	USER_EXCEPT(return EACCES)
 }
 END_SCAN_FUNCTION
 
@@ -745,9 +742,8 @@ NOTHROW(CC libpci_device_probe)(struct pci_device *__restrict self) {
 			if ((dev4 & dev4_bits) != dev4_bits)
 				pci_wraddr(addr | PCI_DEV4, dev4 | dev4_bits);
 		}
-	} USER_EXCEPT ({
-		return EACCES;
-	})
+	}
+	USER_EXCEPT(return EACCES)
 #ifndef __KERNEL__
 	return EOK;
 #endif /* !__KERNEL__ */
@@ -780,9 +776,8 @@ NOTHROW(CC libpci_device_get_bridge_buses)(struct pci_device const *__restrict s
 		uint32_t bdev18;
 		USER_TRY {
 			bdev18 = pci_rdaddr(self->pd_addr | PCI_BDEV18);
-		} USER_EXCEPT ({
-			return EACCES;
-		})
+		}
+		USER_EXCEPT(return EACCES)
 		*primary_bus     = PCI_BDEV18_PRIMARY_BUS(bdev18);
 		*secondary_bus   = PCI_BDEV18_SECONDARY_BUS(bdev18);
 		*subordinate_bus = PCI_BDEV18_SUBORDINATE_BUS(bdev18);
@@ -831,9 +826,8 @@ NOTHROW(CC libpci_device_getinfo_agp)(struct pci_device const *__restrict self,
 			capptr = PCI_CAPPTR_NEXT(capword);
 		}
 #undef VISITED_OFFSETS_OP
-	} USER_EXCEPT ({
-		return EACCES;
-	})
+	}
+	USER_EXCEPT(return EACCES)
 	return ENOSYS;
 }
 
@@ -872,9 +866,8 @@ NOTHROW(CC libpci_device_getinfo_bridge)(struct pci_device const *__restrict sel
 		                                ((uint64_t)pci_rdaddr(self->pd_addr | PCI_BDEV_PREFETCHBASE_HI32) << 32);
 		result->pbi_prefetch_mem_limit = (uint64_t)(0xfff | (PCI_BDEV24_PREFETCH_MEMLIMIT(bdev24) & 0xf0) << 16) |
 		                                 ((uint64_t)pci_rdaddr(self->pd_addr | PCI_BDEV_PREFETCHLIMIT_HI32) << 32);
-	} USER_EXCEPT ({
-		return EACCES;
-	})
+	}
+	USER_EXCEPT(EACCES)
 	return EOK;
 }
 
@@ -905,9 +898,8 @@ NOTHROW(CC libpci_device_getinfo_pcmcia_bridge)(struct pci_device const *__restr
 		result->pcbi_io[0].i_limit         = pci_rdaddr(self->pd_addr | PCI_CDEV_IOLIMIT0);
 		result->pcbi_io[1].i_base          = pci_rdaddr(self->pd_addr | PCI_CDEV_IOBASE1);
 		result->pcbi_io[1].i_limit         = pci_rdaddr(self->pd_addr | PCI_CDEV_IOLIMIT1);
-	} USER_EXCEPT ({
-		return EACCES;
-	})
+	}
+	USER_EXCEPT(EACCES)
 	return EOK;
 }
 
@@ -933,9 +925,8 @@ NOTHROW(CC libpci_device_get_parent_bridge)(/*[0..1]*/ struct pci_device const *
 			uint32_t bdev18 = pci_rdaddr(iter->pd_addr | PCI_BDEV18);
 			if (PCI_BDEV18_SECONDARY_BUS(bdev18) == self->pd_bus)
 				return iter;
-		} USER_EXCEPT ({
-			return NULL;
-		})
+		}
+		USER_EXCEPT(NULL)
 	}
 	return NULL;
 }
@@ -1276,9 +1267,8 @@ NOTHROW_NCX(CC libpci_device_readcfg)(struct pci_device const *__restrict self,
 			memcpy(data, &word, size);
 			result += size;
 		}
-	} USER_EXCEPT ({
-		return -error_as_errno(error_data());
-	})
+	}
+	USER_EXCEPT(return -error_as_errno(error_data()))
 done:
 	return result;
 }
@@ -1327,9 +1317,8 @@ NOTHROW_NCX(CC libpci_device_writecfg)(struct pci_device *__restrict self,
 			pci_wraddr(self->pd_addr | offset, word);
 			result += size;
 		}
-	} USER_EXCEPT ({
-		return -error_as_errno(error_data());
-	})
+	}
+	USER_EXCEPT(return -error_as_errno(error_data()))
 done:
 	return result;
 }
@@ -1345,9 +1334,8 @@ NOTHROW(CC libpci_device_cfg_readb)(struct pci_device const *__restrict self, ui
 		word = pci_rdaddr(self->pd_addr | (reg & ~3));
 		word >>= (reg & 3) * 8;
 		result = (uint8_t)(word & UINT8_C(0xff));
-	} USER_EXCEPT ({
-		result = UINT8_C(0xff);
-	})
+	}
+	USER_EXCEPT(result = UINT8_C(0xff))
 	return result;
 }
 
@@ -1358,9 +1346,8 @@ NOTHROW(CC libpci_device_cfg_readw)(struct pci_device const *__restrict self, ui
 		uint32_t word;
 		USER_TRY {
 			word = pci_rdaddr(self->pd_addr | (reg & ~3));
-		} USER_EXCEPT ({
-			return UINT16_C(0xffff);
-		})
+		}
+		USER_EXCEPT(return UINT16_C(0xffff))
 		word >>= (reg & 2) * 8;
 		return (uint16_t)word;
 	} else {
@@ -1381,9 +1368,8 @@ NOTHROW(CC libpci_device_cfg_readl)(struct pci_device const *__restrict self, ui
 		uint32_t word;
 		USER_TRY {
 			word = pci_rdaddr(self->pd_addr | reg);
-		} USER_EXCEPT ({
-			return UINT32_C(0xffffffff);
-		})
+		}
+		USER_EXCEPT(return UINT32_C(0xffffffff))
 		return word;
 	} else {
 		union {

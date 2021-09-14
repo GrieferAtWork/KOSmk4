@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x8f103beb */
+/* HASH CRC-32:0x733a87 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -1172,20 +1172,20 @@ __NAMESPACE_LOCAL_USING_OR_IMPL(clock_gettime, __FORCELOCAL __ATTR_ARTIFICIAL __
 #endif /* ... */
 #if defined(__CRT_HAVE_clock_settime64) && defined(__USE_TIME_BITS64)
 /* >> clock_settime(2), clock_settime64(2)
- * Set clock `clock_id' to value `tp' */
+ * Set  clock  `clock_id'  to  value  `tp' */
 __CREDIRECT(__ATTR_NONNULL((2)),int,__NOTHROW_NCX,clock_settime,(clockid_t __clock_id, struct timespec const *__tp),clock_settime64,(__clock_id,__tp))
 #elif defined(__CRT_HAVE_clock_settime) && !defined(__USE_TIME_BITS64)
 /* >> clock_settime(2), clock_settime64(2)
- * Set clock `clock_id' to value `tp' */
+ * Set  clock  `clock_id'  to  value  `tp' */
 __CDECLARE(__ATTR_NONNULL((2)),int,__NOTHROW_NCX,clock_settime,(clockid_t __clock_id, struct timespec const *__tp),(__clock_id,__tp))
 #elif defined(__CRT_HAVE___clock_settime) && !defined(__USE_TIME_BITS64)
 /* >> clock_settime(2), clock_settime64(2)
- * Set clock `clock_id' to value `tp' */
+ * Set  clock  `clock_id'  to  value  `tp' */
 __CREDIRECT(__ATTR_NONNULL((2)),int,__NOTHROW_NCX,clock_settime,(clockid_t __clock_id, struct timespec const *__tp),__clock_settime,(__clock_id,__tp))
 #elif defined(__CRT_HAVE_clock_settime64) || defined(__CRT_HAVE_clock_settime) || defined(__CRT_HAVE___clock_settime)
 #include <libc/local/time/clock_settime.h>
 /* >> clock_settime(2), clock_settime64(2)
- * Set clock `clock_id' to value `tp' */
+ * Set  clock  `clock_id'  to  value  `tp' */
 __NAMESPACE_LOCAL_USING_OR_IMPL(clock_settime, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_NONNULL((2)) int __NOTHROW_NCX(__LIBCCALL clock_settime)(clockid_t __clock_id, struct timespec const *__tp) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(clock_settime))(__clock_id, __tp); })
 #endif /* ... */
 /* >> timer_create(2)
@@ -1301,16 +1301,16 @@ __NAMESPACE_LOCAL_USING_OR_IMPL(clock_gettime64, __FORCELOCAL __ATTR_ARTIFICIAL 
 #endif /* ... */
 #ifdef __CRT_HAVE_clock_settime64
 /* >> clock_settime(2), clock_settime64(2)
- * Set clock `clock_id' to value `tp' */
+ * Set  clock  `clock_id'  to  value  `tp' */
 __CDECLARE(__ATTR_NONNULL((2)),int,__NOTHROW_NCX,clock_settime64,(clockid_t __clock_id, struct timespec64 const *__tp),(__clock_id,__tp))
 #elif defined(__CRT_HAVE_clock_settime) && __SIZEOF_TIME32_T__ == __SIZEOF_TIME64_T__
 /* >> clock_settime(2), clock_settime64(2)
- * Set clock `clock_id' to value `tp' */
+ * Set  clock  `clock_id'  to  value  `tp' */
 __CREDIRECT(__ATTR_NONNULL((2)),int,__NOTHROW_NCX,clock_settime64,(clockid_t __clock_id, struct timespec64 const *__tp),clock_settime,(__clock_id,__tp))
 #elif defined(__CRT_HAVE_clock_settime) || defined(__CRT_HAVE___clock_settime)
 #include <libc/local/time/clock_settime64.h>
 /* >> clock_settime(2), clock_settime64(2)
- * Set clock `clock_id' to value `tp' */
+ * Set  clock  `clock_id'  to  value  `tp' */
 __NAMESPACE_LOCAL_USING_OR_IMPL(clock_settime64, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_NONNULL((2)) int __NOTHROW_NCX(__LIBCCALL clock_settime64)(clockid_t __clock_id, struct timespec64 const *__tp) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(clock_settime64))(__clock_id, __tp); })
 #endif /* ... */
 #ifdef __CRT_HAVE_timer_settime64

@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x177eb2d2 */
+/* HASH CRC-32:0x7a2b7e25 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -61,7 +61,7 @@ INTDEF NONNULL((2)) int NOTHROW_NCX(LIBCCALL libc_clock_getres)(clockid_t clock_
  * Get current value of clock `clock_id' and store it in `tp' */
 INTDEF NONNULL((2)) int NOTHROW_NCX(LIBCCALL libc_clock_gettime)(clockid_t clock_id, struct timespec *tp);
 /* >> clock_settime(2), clock_settime64(2)
- * Set clock `clock_id' to value `tp' */
+ * Set  clock  `clock_id'  to  value  `tp' */
 INTDEF NONNULL((2)) int NOTHROW_NCX(LIBCCALL libc_clock_settime)(clockid_t clock_id, struct timespec const *tp);
 /* >> timer_create(2)
  * Create new per-process timer using `clock_id' */
@@ -94,7 +94,7 @@ INTDEF NONNULL((2)) int NOTHROW_NCX(LIBCCALL libc_clock_getres64)(clockid_t cloc
  * Get current value of clock `clock_id' and store it in `tp' */
 INTDEF NONNULL((2)) int NOTHROW_NCX(LIBCCALL libc_clock_gettime64)(clockid_t clock_id, struct timespec64 *tp);
 /* >> clock_settime(2), clock_settime64(2)
- * Set clock `clock_id' to value `tp' */
+ * Set  clock  `clock_id'  to  value  `tp' */
 INTDEF NONNULL((2)) int NOTHROW_NCX(LIBCCALL libc_clock_settime64)(clockid_t clock_id, struct timespec64 const *tp);
 /* >> timer_settime(2), timer_settime64(2)
  * Set timer `timerid' to `value', returning old value in `ovalue' */
