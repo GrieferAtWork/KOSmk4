@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x70b4fe9e */
+/* HASH CRC-32:0x826a1351 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -22,7 +22,7 @@
 #define __local_aio_suspend64_defined 1
 #include <__crt.h>
 #include <bits/types.h>
-#if (defined(__CRT_HAVE_aio_suspendt64) && __SIZEOF_OFF32_T__ == __SIZEOF_OFF64_T__) || (defined(__CRT_HAVE_aio_suspend) && __SIZEOF_OFF32_T__ == __SIZEOF_OFF64_T__) || defined(__CRT_HAVE_aio_suspend64)
+#if (defined(__CRT_HAVE_aio_suspendt64) && __SIZEOF_OFF32_T__ == __SIZEOF_OFF64_T__) || defined(__CRT_HAVE_aio_suspend64t64) || (defined(__CRT_HAVE_aio_suspend) && __SIZEOF_OFF32_T__ == __SIZEOF_OFF64_T__) || defined(__CRT_HAVE_aio_suspend64)
 #include <features.h>
 #include <bits/crt/aiocb.h>
 #include <bits/os/timespec.h>
@@ -45,6 +45,8 @@ __CREDIRECT(__ATTR_NONNULL((1)),int,__NOTHROW_NCX,__localdep_aio_suspend64t64,(s
 __CREDIRECT(__ATTR_NONNULL((1)),int,__NOTHROW_NCX,__localdep_aio_suspend64t64,(struct aiocb64 const *const __list[], __STDC_INT_AS_SIZE_T __nent, struct __timespec64 const *__restrict __timeout),aio_suspendt64,(__list,__nent,__timeout))
 #elif defined(__CRT_HAVE_aio_suspend64) && __SIZEOF_TIME32_T__ == __SIZEOF_TIME64_T__
 __CREDIRECT(__ATTR_NONNULL((1)),int,__NOTHROW_NCX,__localdep_aio_suspend64t64,(struct aiocb64 const *const __list[], __STDC_INT_AS_SIZE_T __nent, struct __timespec64 const *__restrict __timeout),aio_suspend64,(__list,__nent,__timeout))
+#elif defined(__CRT_HAVE_aio_suspend64t64)
+__CREDIRECT(__ATTR_NONNULL((1)),int,__NOTHROW_NCX,__localdep_aio_suspend64t64,(struct aiocb64 const *const __list[], __STDC_INT_AS_SIZE_T __nent, struct __timespec64 const *__restrict __timeout),aio_suspend64t64,(__list,__nent,__timeout))
 #elif (defined(__CRT_HAVE_aio_suspend) && __SIZEOF_OFF32_T__ == __SIZEOF_OFF64_T__) || defined(__CRT_HAVE_aio_suspend64)
 __NAMESPACE_LOCAL_END
 #include <libc/local/aio/aio_suspend64t64.h>
@@ -77,7 +79,7 @@ __NAMESPACE_LOCAL_END
 #define __local___localdep_aio_suspend64_defined 1
 #define __localdep_aio_suspend64 __LIBC_LOCAL_NAME(aio_suspend64)
 #endif /* !__local___localdep_aio_suspend64_defined */
-#else /* (__CRT_HAVE_aio_suspendt64 && __SIZEOF_OFF32_T__ == __SIZEOF_OFF64_T__) || (__CRT_HAVE_aio_suspend && __SIZEOF_OFF32_T__ == __SIZEOF_OFF64_T__) || __CRT_HAVE_aio_suspend64 */
+#else /* (__CRT_HAVE_aio_suspendt64 && __SIZEOF_OFF32_T__ == __SIZEOF_OFF64_T__) || __CRT_HAVE_aio_suspend64t64 || (__CRT_HAVE_aio_suspend && __SIZEOF_OFF32_T__ == __SIZEOF_OFF64_T__) || __CRT_HAVE_aio_suspend64 */
 #undef __local_aio_suspend64_defined
-#endif /* (!__CRT_HAVE_aio_suspendt64 || __SIZEOF_OFF32_T__ != __SIZEOF_OFF64_T__) && (!__CRT_HAVE_aio_suspend || __SIZEOF_OFF32_T__ != __SIZEOF_OFF64_T__) && !__CRT_HAVE_aio_suspend64 */
+#endif /* (!__CRT_HAVE_aio_suspendt64 || __SIZEOF_OFF32_T__ != __SIZEOF_OFF64_T__) && !__CRT_HAVE_aio_suspend64t64 && (!__CRT_HAVE_aio_suspend || __SIZEOF_OFF32_T__ != __SIZEOF_OFF64_T__) && !__CRT_HAVE_aio_suspend64 */
 #endif /* !__local_aio_suspend64_defined */

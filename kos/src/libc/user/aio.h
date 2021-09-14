@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x72cde9c8 */
+/* HASH CRC-32:0x209689e8 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -55,7 +55,7 @@ INTDEF NONNULL((1)) int NOTHROW_NCX(LIBCCALL libc_aio_write)(struct aiocb *self)
  * >> NOTIFY_COMPLETION(&self->aio_sigevent);
  * @param: operation: One of `O_SYNC' or `O_DSYNC'
  * @return: 0 : Operation was started successfully
- * @return: -1: [errno=EAGAIN] Insufficient  ressources  (read: `ENOMEM',  but posix
+ * @return: -1: [errno=EAGAIN] Insufficient resources  (read:  `ENOMEM',  but  posix
  *                             didn't want to use that errno for whatever reason...)
  * @return: -1: [errno=EINVAL] `operation' was invalid */
 INTDEF NONNULL((2)) int NOTHROW_NCX(LIBCCALL libc_aio_fsync)(oflag_t operation, struct aiocb *self);
@@ -148,7 +148,7 @@ INTDEF NONNULL((1)) int NOTHROW_NCX(LIBCCALL libc_aio_write64)(struct aiocb64 *s
  * >> NOTIFY_COMPLETION(&self->aio_sigevent);
  * @param: operation: One of `O_SYNC' or `O_DSYNC'
  * @return: 0 : Operation was started successfully
- * @return: -1: [errno=EAGAIN] Insufficient  ressources  (read: `ENOMEM',  but posix
+ * @return: -1: [errno=EAGAIN] Insufficient resources  (read:  `ENOMEM',  but  posix
  *                             didn't want to use that errno for whatever reason...)
  * @return: -1: [errno=EINVAL] `operation' was invalid */
 INTDEF NONNULL((2)) int NOTHROW_NCX(LIBCCALL libc_aio_fsync64)(int operation, struct aiocb64 *self);

@@ -194,7 +194,7 @@ NOTHROW_RPC(LIBCCALL libc_aio_suspend)(struct aiocb const *const list[],
 }
 /*[[[end:libc_aio_suspend]]]*/
 
-/*[[[head:libc_aio_fsync,hash:CRC-32=0xd42cc512]]]*/
+/*[[[head:libc_aio_fsync,hash:CRC-32=0x1f05b6a9]]]*/
 /* >> aio_fsync(3), aio_fsync64(3)
  * Begin an async `fsync(2)' operation:
  * >> if (operation == O_SYNC) {
@@ -205,7 +205,7 @@ NOTHROW_RPC(LIBCCALL libc_aio_suspend)(struct aiocb const *const list[],
  * >> NOTIFY_COMPLETION(&self->aio_sigevent);
  * @param: operation: One of `O_SYNC' or `O_DSYNC'
  * @return: 0 : Operation was started successfully
- * @return: -1: [errno=EAGAIN] Insufficient  ressources  (read: `ENOMEM',  but posix
+ * @return: -1: [errno=EAGAIN] Insufficient resources  (read:  `ENOMEM',  but  posix
  *                             didn't want to use that errno for whatever reason...)
  * @return: -1: [errno=EINVAL] `operation' was invalid */
 INTERN ATTR_SECTION(".text.crt.utility.aio") NONNULL((2)) int
@@ -417,7 +417,7 @@ NOTHROW_NCX(LIBCCALL libc_aio_suspend64)(struct aiocb64 const *const list[],
 #endif /* MAGIC:alias */
 /*[[[end:libc_aio_suspend64]]]*/
 
-/*[[[head:libc_aio_fsync64,hash:CRC-32=0xa46572de]]]*/
+/*[[[head:libc_aio_fsync64,hash:CRC-32=0x6a58ee02]]]*/
 #if __SIZEOF_OFF32_T__ == __SIZEOF_OFF64_T__
 DEFINE_INTERN_ALIAS(libc_aio_fsync64, libc_aio_fsync);
 #else /* MAGIC:alias */
@@ -431,7 +431,7 @@ DEFINE_INTERN_ALIAS(libc_aio_fsync64, libc_aio_fsync);
  * >> NOTIFY_COMPLETION(&self->aio_sigevent);
  * @param: operation: One of `O_SYNC' or `O_DSYNC'
  * @return: 0 : Operation was started successfully
- * @return: -1: [errno=EAGAIN] Insufficient  ressources  (read: `ENOMEM',  but posix
+ * @return: -1: [errno=EAGAIN] Insufficient resources  (read:  `ENOMEM',  but  posix
  *                             didn't want to use that errno for whatever reason...)
  * @return: -1: [errno=EINVAL] `operation' was invalid */
 INTERN ATTR_SECTION(".text.crt.utility.aio") NONNULL((2)) int

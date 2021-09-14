@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xb6783d4a */
+/* HASH CRC-32:0x94d4f147 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -22,16 +22,17 @@
 #define __local_aio_suspendt64_defined 1
 #include <__crt.h>
 #include <features.h>
-#if (defined(__CRT_HAVE_aio_suspend64) && defined(__USE_FILE_OFFSET64)) || (defined(__CRT_HAVE_aio_suspend) && !defined(__USE_FILE_OFFSET64))
+#include <bits/types.h>
+#if (defined(__CRT_HAVE_aio_suspend) && (!defined(__USE_FILE_OFFSET64) || __SIZEOF_OFF32_T__ == __SIZEOF_OFF64_T__)) || (defined(__CRT_HAVE_aio_suspend64) && (defined(__USE_FILE_OFFSET64) || __SIZEOF_OFF32_T__ == __SIZEOF_OFF64_T__))
 #include <bits/crt/aiocb.h>
 #include <bits/os/timespec.h>
 __NAMESPACE_LOCAL_BEGIN
 #ifndef __local___localdep_aio_suspendt32_defined
 #define __local___localdep_aio_suspendt32_defined 1
-#if defined(__CRT_HAVE_aio_suspend64) && defined(__USE_FILE_OFFSET64)
-__CREDIRECT(__ATTR_NONNULL((1)),int,__NOTHROW_RPC,__localdep_aio_suspendt32,(struct aiocb const *const __list[], __STDC_INT_AS_SIZE_T __nent, struct __timespec32 const *__restrict __timeout),aio_suspend64,(__list,__nent,__timeout))
-#elif defined(__CRT_HAVE_aio_suspend) && !defined(__USE_FILE_OFFSET64)
+#if defined(__CRT_HAVE_aio_suspend) && (!defined(__USE_FILE_OFFSET64) || __SIZEOF_OFF32_T__ == __SIZEOF_OFF64_T__)
 __CREDIRECT(__ATTR_NONNULL((1)),int,__NOTHROW_RPC,__localdep_aio_suspendt32,(struct aiocb const *const __list[], __STDC_INT_AS_SIZE_T __nent, struct __timespec32 const *__restrict __timeout),aio_suspend,(__list,__nent,__timeout))
+#elif defined(__CRT_HAVE_aio_suspend64) && (defined(__USE_FILE_OFFSET64) || __SIZEOF_OFF32_T__ == __SIZEOF_OFF64_T__)
+__CREDIRECT(__ATTR_NONNULL((1)),int,__NOTHROW_RPC,__localdep_aio_suspendt32,(struct aiocb const *const __list[], __STDC_INT_AS_SIZE_T __nent, struct __timespec32 const *__restrict __timeout),aio_suspend64,(__list,__nent,__timeout))
 #else /* ... */
 #undef __local___localdep_aio_suspendt32_defined
 #endif /* !... */
@@ -50,7 +51,7 @@ __NAMESPACE_LOCAL_END
 #define __local___localdep_aio_suspendt64_defined 1
 #define __localdep_aio_suspendt64 __LIBC_LOCAL_NAME(aio_suspendt64)
 #endif /* !__local___localdep_aio_suspendt64_defined */
-#else /* (__CRT_HAVE_aio_suspend64 && __USE_FILE_OFFSET64) || (__CRT_HAVE_aio_suspend && !__USE_FILE_OFFSET64) */
+#else /* (__CRT_HAVE_aio_suspend && (!__USE_FILE_OFFSET64 || __SIZEOF_OFF32_T__ == __SIZEOF_OFF64_T__)) || (__CRT_HAVE_aio_suspend64 && (__USE_FILE_OFFSET64 || __SIZEOF_OFF32_T__ == __SIZEOF_OFF64_T__)) */
 #undef __local_aio_suspendt64_defined
-#endif /* (!__CRT_HAVE_aio_suspend64 || !__USE_FILE_OFFSET64) && (!__CRT_HAVE_aio_suspend || __USE_FILE_OFFSET64) */
+#endif /* (!__CRT_HAVE_aio_suspend || (__USE_FILE_OFFSET64 && __SIZEOF_OFF32_T__ != __SIZEOF_OFF64_T__)) && (!__CRT_HAVE_aio_suspend64 || (!__USE_FILE_OFFSET64 && __SIZEOF_OFF32_T__ != __SIZEOF_OFF64_T__)) */
 #endif /* !__local_aio_suspendt64_defined */
