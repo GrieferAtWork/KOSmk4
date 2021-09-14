@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x67096a5d */
+/* HASH CRC-32:0xe78d30f6 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -55,6 +55,27 @@
 #ifndef TI64
 #define TI64 TIn(8)
 #endif /* !TI64 */
+
+/* aio */
+DFUN(".text.crt.dos.utility.aio", libd_aio_read, libc_aio_read, TD, 1, TP)
+DFUN(".text.crt.dos.utility.aio", libd_aio_write, libc_aio_write, TD, 1, TP)
+DFUN(".text.crt.dos.utility.aio", libd_lio_listio, libc_lio_listio, TD, 4, TD, TP, TD, TP)
+DFUN(".text.crt.dos.utility.aio", libd_aio_error, libc_aio_error, TD, 1, TP)
+DFUN(".text.crt.dos.utility.aio", libd_aio_return, libc_aio_return, TI, 1, TP)
+DFUN(".text.crt.dos.utility.aio", libd_aio_cancel, libc_aio_cancel, TD, 2, TIn(__SIZEOF_FD_T__), TP)
+DFUN(".text.crt.dos.utility.aio", libd_aio_suspend, libc_aio_suspend, TD, 3, TP, TD, TP)
+DFUN(".text.crt.dos.utility.aio", libd_aio_fsync, libc_aio_fsync, TD, 2, TD, TP)
+DFUN(".text.crt.dos.utility.aio", libd_aio_read64, libc_aio_read64, TD, 1, TP)
+DFUN(".text.crt.dos.utility.aio", libd_aio_write64, libc_aio_write64, TD, 1, TP)
+DFUN(".text.crt.dos.utility.aio", libd_lio_listio64, libc_lio_listio64, TD, 4, TD, TP, TD, TP)
+DFUN(".text.crt.dos.utility.aio", libd_aio_error64, libc_aio_error64, TD, 1, TP)
+DFUN(".text.crt.dos.utility.aio", libd_aio_return64, libc_aio_return64, TI, 1, TP)
+DFUN(".text.crt.dos.utility.aio", libd_aio_cancel64, libc_aio_cancel64, TD, 2, TIn(__SIZEOF_FD_T__), TP)
+DFUN(".text.crt.dos.utility.aio", libd_aio_suspend64, libc_aio_suspend64, TD, 3, TP, TD, TP)
+DFUN(".text.crt.dos.utility.aio", libd_aio_fsync64, libc_aio_fsync64, TD, 2, TD, TP)
+DFUN(".text.crt.dos.utility.aio", libd_aio_suspendt64, libc_aio_suspendt64, TD, 3, TP, TD, TP)
+DFUN(".text.crt.dos.utility.aio", libd_aio_suspend64t64, libc_aio_suspend64t64, TD, 3, TP, TD, TP)
+DFUN(".text.crt.dos.utility.aio", libd_aio_init, libc_aio_init, TV, 1, TP)
 
 /* aliases */
 DFUN(".text.crt.dos.database.aliases", libd_getaliasent_r, libc_getaliasent_r, TIn(__SIZEOF_ERRNO_T__), 4, TP, TP, TI, TP)
@@ -656,6 +677,20 @@ DFUN(".text.crt.dos.database.mntent", libd_getmntent, libc_getmntent, TP, 1, TP)
 DFUN(".text.crt.dos.database.mntent", libd_getmntent_r, libc_getmntent_r, TP, 4, TP, TP, TP, TD)
 DFUN(".text.crt.dos.database.mntent", libd_addmntent, libc_addmntent, TD, 2, TP, TP)
 DFUN(".text.crt.dos.database.mntent", libd_hasmntopt, libc_hasmntopt, TP, 2, TP, TP)
+
+/* mqueue */
+DFUN(".text.crt.dos.utility.mqueue", libd_mq_open, libc_mq_open, TD, 3, TP, TIn(__SIZEOF_OFLAG_T__), TIn(__SIZEOF_MODE_T__))
+DFUN(".text.crt.dos.utility.mqueue", libd_mq_close, libc_mq_close, TD, 1, TD)
+DFUN(".text.crt.dos.utility.mqueue", libd_mq_getattr, libc_mq_getattr, TD, 2, TD, TP)
+DFUN(".text.crt.dos.utility.mqueue", libd_mq_setattr, libc_mq_setattr, TD, 3, TD, TP, TP)
+DFUN(".text.crt.dos.utility.mqueue", libd_mq_unlink, libc_mq_unlink, TD, 1, TP)
+DFUN(".text.crt.dos.utility.mqueue", libd_mq_notify, libc_mq_notify, TD, 2, TD, TP)
+DFUN(".text.crt.dos.utility.mqueue", libd_mq_receive, libc_mq_receive, TI, 4, TD, TP, TI, TP)
+DFUN(".text.crt.dos.utility.mqueue", libd_mq_send, libc_mq_send, TD, 4, TD, TP, TI, TD)
+DFUN(".text.crt.dos.utility.mqueue", libd_mq_timedreceive, libc_mq_timedreceive, TI, 5, TD, TP, TI, TP, TP)
+DFUN(".text.crt.dos.utility.mqueue", libd_mq_timedsend, libc_mq_timedsend, TD, 5, TD, TP, TI, TD, TP)
+DFUN(".text.crt.dos.utility.mqueue", libd_mq_timedreceive64, libc_mq_timedreceive64, TI, 5, TD, TP, TI, TP, TP)
+DFUN(".text.crt.dos.utility.mqueue", libd_mq_timedsend64, libc_mq_timedsend64, TD, 5, TD, TP, TI, TD, TP)
 
 /* net.if */
 DFUN(".text.crt.dos.net.interface", libd_if_nametoindex, libc_if_nametoindex, TD, 1, TP)

@@ -41,6 +41,6 @@
 //#define LIBNSS_TEST1_SO               "libnss_test1.so"
 #define LIBPTHREAD_SO                   LIBC_SO
 //#define LIBRESOLV_SO                  "libresolv.so"
-#define LIBRT_SO                        "librt.so"
+#define LIBRT_SO                        "libc.so" /* Integrated into libc */
 //#define LIBTHREAD_DB_SO               "libthread_db.so"
 #define LIBUTIL_SO                      LIBC_SO

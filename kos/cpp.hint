@@ -157,12 +157,6 @@
 #define LIBRPC_CC
 #define LIBRPC_VCC
 #define LIBRPC_DECL
-#define LIBRT_CC
-#define __LIBRT_CC
-#define LIBRT_VCC
-#define __LIBRT_VCC
-#define LIBRT_DECL
-#define __LIBRT_DECL
 #define LIBSCTRACE_CC
 #define LIBSCTRACE_DECL
 #define LIBTERM_CC

@@ -17,18 +17,29 @@
  *    misrepresented as being the original software.                          *
  * 3. This notice may not be removed or altered from any source distribution. *
  */
-#ifndef GUARD_LIBRT_API_H
-#define GUARD_LIBRT_API_H 1
+#ifndef _BITS_OS_GENERIC_MQUEUE_H
+#define _BITS_OS_GENERIC_MQUEUE_H 1
 
-#include <hybrid/compiler.h>
+#include <__stdinc.h>
 
-#include <librt/api.h>
+#include <bits/types.h>
 
-#define CC  LIBRT_CC
-#define VCC LIBRT_VCC
 
-/* TODO: Integrate this library  into libc.  (it doesn't  need
- *       to be stand-alone, and on (e.g.) cygwin, it's already
- *       integrated inside libc!) */
+#ifdef __CC__
+__SYSDECL_BEGIN
 
-#endif /* !GUARD_LIBRT_API_H */
+typedef __fd_t __mqd_t;
+
+struct mq_attr {
+	__syscall_slong_t mq_flags;   /* ... */
+	__syscall_slong_t mq_maxmsg;  /* ... */
+	__syscall_slong_t mq_msgsize; /* ... */
+	__syscall_slong_t mq_curmsgs; /* ... */
+	__syscall_slong_t __pad[4];   /* ... */
+};
+
+__SYSDECL_END
+#endif /* __CC__ */
+
+
+#endif /* !_BITS_OS_GENERIC_MQUEUE_H */

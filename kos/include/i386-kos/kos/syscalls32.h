@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x9fc6424a */
+/* HASH CRC-32:0x56892b70 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -40,6 +40,7 @@
 #include <bits/os/kos/timeb32.h>
 #include <bits/os/kos/tms32.h>
 #include <bits/os/kos/utimbuf32.h>
+#include <bits/os/mqueue.h>
 #include <bits/os/pollfd.h>
 #include <bits/os/sigaction.h>
 #include <bits/os/sigevent.h>
@@ -62,7 +63,6 @@
 #include <kos/kernel/fpu-state32.h>
 #include <kos/rtm.h>
 #include <librpc/bits/syscall-info32.h>
-#include <librt/bits/mqueue.h>
 
 
 #ifndef __CDECLARE_SC

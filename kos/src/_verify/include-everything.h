@@ -131,6 +131,7 @@ incdir("");
 #include <asm/__stdinc.h>
 #include <asm/asmword.h>
 #include <asm/cacheline.h>
+#include <asm/crt/aio.h>
 #include <asm/crt/confname.h>
 #include <asm/crt/getpassfd.h>
 #include <asm/crt/glob.h>
@@ -219,7 +220,10 @@ incdir("");
 #include <assert.h>
 #include <attr/xattr.h>
 #include <bits/crt/_diskfree_t.h>
+#include <bits/crt/aiocb.h>
+#include <bits/crt/aioinit.h>
 #include <bits/crt/crypt_data.h>
+#include <bits/crt/ctype.h>
 #include <bits/crt/db/aliases.h>
 #include <bits/crt/db/group.h>
 #include <bits/crt/db/mntent.h>
@@ -241,6 +245,7 @@ incdir("");
 #include <bits/crt/inttypes.h>
 #include <bits/crt/io-file.h>
 #include <bits/crt/lconv.h>
+#include <bits/crt/locale.h>
 #include <bits/crt/math-vector.h>
 #include <bits/crt/mathdef.h>
 #include <bits/crt/mbstate.h>
@@ -255,6 +260,7 @@ incdir("");
 #include <bits/crt/threads.h>
 #include <bits/crt/tm.h>
 #include <bits/crt/uformat-printer.h>
+#include <bits/crt/unicode.h>
 #include <bits/crt/wctype.h>
 #include <bits/crt/wformat-printer.h>
 #include <bits/elf-types.h>
@@ -276,6 +282,7 @@ incdir("");
 #include <bits/os/linger.h>
 #include <bits/os/mcontext.h>
 #include <bits/os/mmsghdr.h>
+#include <bits/os/mqueue.h>
 #include <bits/os/msgbuf.h>
 #include <bits/os/msghdr.h>
 #include <bits/os/msq.h>
@@ -429,7 +436,9 @@ incdir("");
 #include <compat/kos/exec/asm/elf.h>
 #include <compat/kos/exec/asm/rtld.h>
 #include <compat/kos/exec/bits/elf.h>
+#include <compat/kos/exec/bits/peb.h>
 #include <compat/kos/exec/elf.h>
+#include <compat/kos/exec/peb.h>
 #include <compat/kos/exec/rtld.h>
 #include <compat/kos/futex.h>
 #include <compat/kos/types.h>
@@ -543,6 +552,7 @@ incdir("");
 #include <hybrid/typecore.h>
 #include <hybrid/unaligned.h>
 #include <hybrid/wordbits.h>
+#include <iconv.h>
 #include <ieee754.h>
 #include <ieeefp.h>
 #include <ifaddrs.h>
@@ -713,6 +723,11 @@ incdir("");
 #include <libemu86/emu86.h>
 #include <libemu86/helpers.h>
 #include <libgen.h>
+#include <libiconv/api.h>
+#include <libiconv/codec.h>
+#include <libiconv/iconv.h>
+#include <libiconv/stdiconv.h>
+#include <libiconv/transliterate.h>
 #include <libinstrlen/api.h>
 #include <libinstrlen/bits/isa.h>
 #include <libinstrlen/instrlen.h>
@@ -796,14 +811,6 @@ incdir("");
 #include <librpc/bits/rpc.h>
 #include <librpc/bits/syscall-info.h>
 #include <librpc/rpc.h>
-#include <librt/_api.h>
-#include <librt/aio.h>
-#include <librt/api.h>
-#include <librt/asm/aio.h>
-#include <librt/bits/aiocb.h>
-#include <librt/bits/aioinit.h>
-#include <librt/bits/mqueue.h>
-#include <librt/mqueue.h>
 #include <libsctrace/api.h>
 #include <libsctrace/repr-types.h>
 #include <libsctrace/sctrace.h>
@@ -814,6 +821,7 @@ incdir("");
 #include <libunwind/cfi/i386.h>
 #include <libunwind/cfi/x86_64.h>
 #include <libunwind/cfi.h>
+#include <libunwind/dwarf.h>
 #include <libunwind/eh_frame.h>
 #include <libunwind/except.h>
 #include <libunwind/unwind.h>
@@ -952,6 +960,7 @@ incdir("");
 #include <parts/uchar/unistd.h>
 #include <parts/uchar/utime.h>
 #include <parts/uchar/wchar.h>
+#include <parts/uchar/wctype.h>
 #include <parts/waitmacros.h>
 #include <parts/wchar/format-printer.h>
 #include <parts/wchar/process.h>

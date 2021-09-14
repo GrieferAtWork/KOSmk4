@@ -17,14 +17,19 @@
  *    misrepresented as being the original software.                          *
  * 3. This notice may not be removed or altered from any source distribution. *
  */
-#ifndef _LIBRT_API_H
-#define _LIBRT_API_H 1
+#ifndef _BITS_OS_MQUEUE_H
+#define _BITS_OS_MQUEUE_H 1
 
-#include "_api.h"
+/* File:
+ *    <bits/os/mqueue.h>
+ *
+ * Definitions:
+ *    - typedef ... __mqd_t;
+ *    - struct mq_attr { ... };
+ */
 
-#define LIBRT_CC           __LIBRT_CC
-#define LIBRT_VCC          __LIBRT_VCC
-#define LIBRT_DECL         __LIBRT_DECL
-#define LIBRT_LIBRARY_NAME __LIBRT_LIBRARY_NAME
+#include <__stdinc.h>
 
-#endif /* !_LIBRT_API_H */
+#include <bits/os/generic/mqueue.h>
+
+#endif /* !_BITS_OS_MQUEUE_H */

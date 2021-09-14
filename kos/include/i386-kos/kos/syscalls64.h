@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x61b41fbf */
+/* HASH CRC-32:0xdec13a1c */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -39,6 +39,7 @@
 #include <bits/os/kos/statfs64.h>
 #include <bits/os/kos/tms64.h>
 #include <bits/os/kos/utimbuf64.h>
+#include <bits/os/mqueue.h>
 #include <bits/os/pollfd.h>
 #include <bits/os/sigevent.h>
 #include <bits/types.h>
@@ -56,7 +57,6 @@
 #include <kos/compat/linux-stat.h>
 #include <kos/kernel/cpu-state64.h>
 #include <kos/rtm.h>
-#include <librt/bits/mqueue.h>
 
 
 #ifndef __CDECLARE_SC

@@ -17,50 +17,28 @@
  *    misrepresented as being the original software.                          *
  * 3. This notice may not be removed or altered from any source distribution. *
  */
-#ifndef _LIBRT_BITS_AIOINIT_H
-#define _LIBRT_BITS_AIOINIT_H 1
+#ifndef _BITS_CRT_AIOINIT_H
+#define _BITS_CRT_AIOINIT_H 1
 
 #include <__stdinc.h>
 
 #include <hybrid/typecore.h>
 
-/* Documentation derived from Glibc /usr/include/aio.h */
-/* Copyright (C) 1996-2016 Free Software Foundation, Inc.
-   This file is part of the GNU C Library.
-
-   The GNU C Library is free software; you can redistribute it and/or
-   modify it under the terms of the GNU Lesser General Public
-   License as published by the Free Software Foundation; either
-   version 2.1 of the License, or (at your option) any later version.
-
-   The GNU C Library is distributed in the hope that it will be useful,
-   but WITHOUT ANY WARRANTY; without even the implied warranty of
-   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
-   Lesser General Public License for more details.
-
-   You should have received a copy of the GNU Lesser General Public
-   License along with the GNU C Library; if not, see
-   <http://www.gnu.org/licenses/>.  */
-
-__SYSDECL_BEGIN
-
-/* To customize the implementation one can use the following struct.
- * This implementation follows the one in Irix. */
-/*[[[struct]]]*/
 #ifdef __CC__
+__DECL_BEGIN
+
 struct aioinit {
-	__INT32_TYPE__ aio_threads;   /* Maximal number of threads. */
-	__INT32_TYPE__ aio_num;       /* Number of expected simultaneous requests. */
-	__INT32_TYPE__ aio_locks;     /* Not used. */
-	__INT32_TYPE__ aio_usedba;    /* Not used. */
-	__INT32_TYPE__ aio_debug;     /* Not used. */
-	__INT32_TYPE__ aio_numusers;  /* Not used. */
-	__INT32_TYPE__ aio_idle_time; /* Number of seconds before idle thread terminates. */
+	__INT32_TYPE__ aio_threads;   /* ... */
+	__INT32_TYPE__ aio_num;       /* ... */
+	__INT32_TYPE__ aio_locks;     /* ... */
+	__INT32_TYPE__ aio_usedba;    /* ... */
+	__INT32_TYPE__ aio_debug;     /* ... */
+	__INT32_TYPE__ aio_numusers;  /* ... */
+	__INT32_TYPE__ aio_idle_time; /* ... */
 	__INT32_TYPE__ aio_reserved;  /* ... */
 };
+
+__DECL_END
 #endif /* __CC__ */
-/*[[[end]]]*/
 
-__SYSDECL_END
-
-#endif /* !_LIBRT_BITS_AIOINIT_H */
+#endif /* !_BITS_CRT_AIOINIT_H */

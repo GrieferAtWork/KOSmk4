@@ -17,21 +17,21 @@
  *    misrepresented as being the original software.                          *
  * 3. This notice may not be removed or altered from any source distribution. *
  */
-#ifndef _LIBRT__API_H
-#define _LIBRT__API_H 1
+#ifndef _ASM_CRT_AIO_H
+#define _ASM_CRT_AIO_H 1
 
-#include <__crt.h>
-#include <__stdinc.h>
+/* Return values of cancellation function. */
+#define __AIO_CANCELED    0 /* ??? */
+#define __AIO_NOTCANCELED 1 /* ??? */
+#define __AIO_ALLDONE     2 /* ??? */
 
-#define __LIBRT_CC  __LIBKCALL
-#define __LIBRT_VCC __VLIBKCALL
-#ifdef __LIBRT_STATIC
-#define __LIBRT_DECL __INTDEF
-#else /* __LIBRT_STATIC */
-#define __LIBRT_DECL __IMPDEF
-#endif /* !__LIBRT_STATIC */
+/* Operation codes for `aio_lio_opcode'. */
+#define __LIO_READ  0 /* ??? */
+#define __LIO_WRITE 1 /* ??? */
+#define __LIO_NOP   2 /* ??? */
 
-/* Library name for use with `dlopen()' */
-#define __LIBRT_LIBRARY_NAME "librt.so"
+/* Synchronization options for `lio_listio' function. */
+#define __LIO_WAIT   0 /* ??? */
+#define __LIO_NOWAIT 1 /* ??? */
 
-#endif /* !_LIBRT__API_H */
+#endif /* !_ASM_CRT_AIO_H */

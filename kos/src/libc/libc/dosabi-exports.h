@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x79c019d7 */
+/* HASH CRC-32:0x4febd458 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -21,6 +21,27 @@
 #ifndef DEFINE_PUBLIC_ALIAS
 #define DEFINE_PUBLIC_ALIAS(new_name, old_name)
 #endif /* !DEFINE_PUBLIC_ALIAS */
+
+/* aio */
+DEFINE_PUBLIC_ALIAS(DOS$aio_read, libd_aio_read);
+DEFINE_PUBLIC_ALIAS(DOS$aio_write, libd_aio_write);
+DEFINE_PUBLIC_ALIAS(DOS$lio_listio, libd_lio_listio);
+DEFINE_PUBLIC_ALIAS(DOS$aio_error, libd_aio_error);
+DEFINE_PUBLIC_ALIAS(DOS$aio_return, libd_aio_return);
+DEFINE_PUBLIC_ALIAS(DOS$aio_cancel, libd_aio_cancel);
+DEFINE_PUBLIC_ALIAS(DOS$aio_suspend, libd_aio_suspend);
+DEFINE_PUBLIC_ALIAS(DOS$aio_fsync, libd_aio_fsync);
+DEFINE_PUBLIC_ALIAS(DOS$aio_read64, libd_aio_read64);
+DEFINE_PUBLIC_ALIAS(DOS$aio_write64, libd_aio_write64);
+DEFINE_PUBLIC_ALIAS(DOS$lio_listio64, libd_lio_listio64);
+DEFINE_PUBLIC_ALIAS(DOS$aio_error64, libd_aio_error64);
+DEFINE_PUBLIC_ALIAS(DOS$aio_return64, libd_aio_return64);
+DEFINE_PUBLIC_ALIAS(DOS$aio_cancel64, libd_aio_cancel64);
+DEFINE_PUBLIC_ALIAS(DOS$aio_suspend64, libd_aio_suspend64);
+DEFINE_PUBLIC_ALIAS(DOS$aio_fsync64, libd_aio_fsync64);
+DEFINE_PUBLIC_ALIAS(DOS$aio_suspendt64, libd_aio_suspendt64);
+DEFINE_PUBLIC_ALIAS(DOS$aio_suspend64t64, libd_aio_suspend64t64);
+DEFINE_PUBLIC_ALIAS(DOS$aio_init, libd_aio_init);
 
 /* aliases */
 DEFINE_PUBLIC_ALIAS(DOS$getaliasent_r, libd_getaliasent_r);
@@ -951,6 +972,20 @@ DEFINE_PUBLIC_ALIAS(DOS$__getmntent_r, libd_getmntent_r);
 DEFINE_PUBLIC_ALIAS(DOS$getmntent_r, libd_getmntent_r);
 DEFINE_PUBLIC_ALIAS(DOS$addmntent, libd_addmntent);
 DEFINE_PUBLIC_ALIAS(DOS$hasmntopt, libd_hasmntopt);
+
+/* mqueue */
+DEFINE_PUBLIC_ALIAS(DOS$mq_open, libd_mq_open);
+DEFINE_PUBLIC_ALIAS(DOS$mq_close, libd_mq_close);
+DEFINE_PUBLIC_ALIAS(DOS$mq_getattr, libd_mq_getattr);
+DEFINE_PUBLIC_ALIAS(DOS$mq_setattr, libd_mq_setattr);
+DEFINE_PUBLIC_ALIAS(DOS$mq_unlink, libd_mq_unlink);
+DEFINE_PUBLIC_ALIAS(DOS$mq_notify, libd_mq_notify);
+DEFINE_PUBLIC_ALIAS(DOS$mq_receive, libd_mq_receive);
+DEFINE_PUBLIC_ALIAS(DOS$mq_send, libd_mq_send);
+DEFINE_PUBLIC_ALIAS(DOS$mq_timedreceive, libd_mq_timedreceive);
+DEFINE_PUBLIC_ALIAS(DOS$mq_timedsend, libd_mq_timedsend);
+DEFINE_PUBLIC_ALIAS(DOS$mq_timedreceive64, libd_mq_timedreceive64);
+DEFINE_PUBLIC_ALIAS(DOS$mq_timedsend64, libd_mq_timedsend64);
 
 /* net.if */
 DEFINE_PUBLIC_ALIAS(DOS$if_nametoindex, libd_if_nametoindex);

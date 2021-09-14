@@ -1,3 +1,4 @@
+/* HASH CRC-32:0x2eb87404 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -35,38 +36,49 @@
 
 #include <features.h>
 
+#include <asm/crt/aio.h>
 #include <bits/os/sigevent.h> /* struct sigevent */
 #include <bits/os/timespec.h>
 #include <bits/types.h>
+#include <bits/crt/aiocb.h>
 
-#include <librt/_api.h>
-#include <librt/asm/aio.h>
-#include <librt/bits/aiocb.h>
 #ifdef __USE_GNU
-#include <librt/bits/aioinit.h>
+#include <bits/crt/aioinit.h>
 #endif /* __USE_GNU */
+
 #ifdef __USE_GLIBC
 #include <sys/types.h>
 #endif /* __USE_GLIBC */
 
+/* Return values of cancellation function. */
+#if !defined(AIO_CANCELED) && defined(__AIO_CANCELED)
+#define AIO_CANCELED    __AIO_CANCELED    /* ??? */
+#endif /* !AIO_CANCELED && __AIO_CANCELED */
+#if !defined(AIO_NOTCANCELED) && defined(__AIO_NOTCANCELED)
+#define AIO_NOTCANCELED __AIO_NOTCANCELED /* ??? */
+#endif /* !AIO_NOTCANCELED && __AIO_NOTCANCELED */
+#if !defined(AIO_ALLDONE) && defined(__AIO_ALLDONE)
+#define AIO_ALLDONE     __AIO_ALLDONE     /* ??? */
+#endif /* !AIO_ALLDONE && __AIO_ALLDONE */
 
-/* Documentation taken from Glibc /usr/include/aio.h */
-/* Copyright (C) 1996-2016 Free Software Foundation, Inc.
-   This file is part of the GNU C Library.
+/* Operation codes for `aio_lio_opcode'. */
+#if !defined(LIO_READ) && defined(__LIO_READ)
+#define LIO_READ  __LIO_READ  /* ??? */
+#endif /* !LIO_READ && __LIO_READ */
+#if !defined(LIO_WRITE) && defined(__LIO_WRITE)
+#define LIO_WRITE __LIO_WRITE /* ??? */
+#endif /* !LIO_WRITE && __LIO_WRITE */
+#if !defined(LIO_NOP) && defined(__LIO_NOP)
+#define LIO_NOP   __LIO_NOP   /* ??? */
+#endif /* !LIO_NOP && __LIO_NOP */
 
-   The GNU C Library is free software; you can redistribute it and/or
-   modify it under the terms of the GNU Lesser General Public
-   License as published by the Free Software Foundation; either
-   version 2.1 of the License, or (at your option) any later version.
-
-   The GNU C Library is distributed in the hope that it will be useful,
-   but WITHOUT ANY WARRANTY; without even the implied warranty of
-   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
-   Lesser General Public License for more details.
-
-   You should have received a copy of the GNU Lesser General Public
-   License along with the GNU C Library; if not, see
-   <http://www.gnu.org/licenses/>. */
+/* Synchronization options for `lio_listio' function. */
+#if !defined(LIO_WAIT) && defined(__LIO_WAIT)
+#define LIO_WAIT   __LIO_WAIT   /* ??? */
+#endif /* !LIO_WAIT && __LIO_WAIT */
+#if !defined(LIO_NOWAIT) && defined(__LIO_NOWAIT)
+#define LIO_NOWAIT __LIO_NOWAIT /* ??? */
+#endif /* !LIO_NOWAIT && __LIO_NOWAIT */
 
 #ifdef __CC__
 __SYSDECL_BEGIN
@@ -76,192 +88,174 @@ __SYSDECL_BEGIN
 typedef struct sigevent sigevent_t;
 #endif /* !__sigevent_t_defined */
 
-#ifdef __USE_GNU
-/* Allow user to specify optimization */
-#ifndef __aio_init_defined
-#define __aio_init_defined 1
-__LIBRT_DECL __ATTR_NONNULL((1)) void
-__NOTHROW_NCX(__LIBRT_CC aio_init)(struct aioinit const *__init);
-#endif /* !__aio_init_defined */
-#endif /* __USE_GNU */
-
-#ifdef __USE_FILE_OFFSET64
-#define __AIO_REDIRECT(attr, Treturn, nothrow, name, param, args) \
-	__COMPILER_REDIRECT(__LIBRT_DECL, attr, Treturn, nothrow, __LIBRT_CC, name, param, name##64, args)
-#else /* __USE_FILE_OFFSET64 */
-#define __AIO_REDIRECT(attr, Treturn, nothrow, name, param, args) \
-	__LIBRT_DECL attr Treturn nothrow(__LIBRT_CC name) param;
-#endif /* !__USE_FILE_OFFSET64 */
-
-/* Enqueue read request for given number of bytes and the given priority */
-#ifndef __aio_read_defined
-#define __aio_read_defined 1
-__AIO_REDIRECT(__ATTR_NONNULL((1)),int,__NOTHROW_NCX,aio_read,(struct aiocb *__aiocbp),(__aiocbp))
-#endif /* !__aio_read_defined */
-
-/* Enqueue write request for given number of bytes and the given priority */
-#ifndef __aio_write_defined
-#define __aio_write_defined 1
-__AIO_REDIRECT(__ATTR_NONNULL((1)),int,__NOTHROW_NCX,aio_write,(struct aiocb *__aiocbp),(__aiocbp))
-#endif /* !__aio_write_defined */
-
-/* Initiate list of I/O requests */
-#ifndef __lio_listio_defined
-#define __lio_listio_defined 1
-__AIO_REDIRECT(__ATTR_NONNULL((2)),int,__NOTHROW_NCX,lio_listio,
-               (int __mode, struct aiocb *const __list[__restrict_arr],
-                __STDC_INT_AS_SIZE_T __nent, struct sigevent *__restrict __sig),
-               (__mode, __list, __nent, __sig))
-#endif /* !__lio_listio_defined */
-
-/* Retrieve error status associated with AIOCBP */
-#ifndef __aio_error_defined
-#define __aio_error_defined 1
-__AIO_REDIRECT(__ATTR_WUNUSED __ATTR_NONNULL((1)),int,__NOTHROW_NCX,
-               aio_error,(struct aiocb const *__aiocbp),(__aiocbp))
-#endif /* !__aio_error_defined */
-
-/* Return status associated with AIOCBP */
-#ifndef __aio_return_defined
-#define __aio_return_defined 1
-__AIO_REDIRECT(__ATTR_NONNULL((1)),__ssize_t,__NOTHROW_NCX,
-               aio_return,(struct aiocb *__aiocbp),(__aiocbp))
-#endif /* !__aio_return_defined */
-
-/* Try to cancel asynchronous I/O requests outstanding against file descriptor FILDES */
-#ifndef __aio_cancel_defined
-#define __aio_cancel_defined 1
-__AIO_REDIRECT(,int,__NOTHROW_NCX,aio_cancel,(__fd_t __fildes, struct aiocb *__aiocbp),(__fildes,__aiocbp))
-#endif /* !__aio_cancel_defined */
-
-/* Suspend calling thread until at least one of the asynchronous
- * I/O    operations   referenced   by   LIST   has   completed. */
-#ifndef __aio_suspend_defined
-#define __aio_suspend_defined 1
-#ifdef __USE_TIME_BITS64
-#ifdef __USE_FILE_OFFSET64
-__COMPILER_REDIRECT(__LIBRT_DECL,__ATTR_NONNULL((1)),int,__NOTHROW_RPC,__LIBRT_CC,aio_suspend,
-                    (struct aiocb const *const __list[], __STDC_INT_AS_SIZE_T __nent,
-                     struct timespec const *__restrict __timeout),aio_suspend64t64,
-                    (__list, __nent, __timeout))
-#else /* __USE_FILE_OFFSET64 */
-__COMPILER_REDIRECT(__LIBRT_DECL,__ATTR_NONNULL((1)),int,__NOTHROW_RPC,__LIBRT_CC,aio_suspend,
-                    (struct aiocb const *const __list[], __STDC_INT_AS_SIZE_T __nent,
-                     struct timespec const *__restrict __timeout),aio_suspendt64,
-                    (__list, __nent, __timeout))
-#endif /* !__USE_FILE_OFFSET64 */
-#else /* __USE_TIME_BITS64 */
-__AIO_REDIRECT(__ATTR_NONNULL((1)),int,__NOTHROW_RPC,aio_suspend,
-               (struct aiocb const *const __list[], __STDC_INT_AS_SIZE_T __nent,
-                struct timespec const *__restrict __timeout),
-               (__list,__nent,__timeout))
-#endif /* !__USE_TIME_BITS64 */
-#endif /* !__aio_suspend_defined */
-
-/* Force all operations associated with file descriptor described by `aio_fildes' member of AIOCBP. */
-#ifndef __aio_fsync_defined
-#define __aio_fsync_defined 1
-__AIO_REDIRECT(__ATTR_NONNULL((2)),int,__NOTHROW_NCX,aio_fsync,
-               (int __operation, struct aiocb *__aiocbp),(__operation,__aiocbp))
-#endif /* !__aio_fsync_defined */
-
-#undef __AIO_REDIRECT
+#if defined(__CRT_HAVE_aio_read64) && defined(__USE_FILE_OFFSET64)
+/* >> aio_read(3) */
+__CREDIRECT(__ATTR_NONNULL((1)),int,__NOTHROW_NCX,aio_read,(struct aiocb *__aiocbp),aio_read64,(__aiocbp))
+#elif defined(__CRT_HAVE_aio_read) && !defined(__USE_FILE_OFFSET64)
+/* >> aio_read(3) */
+__CDECLARE(__ATTR_NONNULL((1)),int,__NOTHROW_NCX,aio_read,(struct aiocb *__aiocbp),(__aiocbp))
+#endif /* ... */
+#if defined(__CRT_HAVE_aio_write64) && defined(__USE_FILE_OFFSET64)
+/* >> aio_write(3) */
+__CREDIRECT(__ATTR_NONNULL((1)),int,__NOTHROW_NCX,aio_write,(struct aiocb *__aiocbp),aio_write64,(__aiocbp))
+#elif defined(__CRT_HAVE_aio_write) && !defined(__USE_FILE_OFFSET64)
+/* >> aio_write(3) */
+__CDECLARE(__ATTR_NONNULL((1)),int,__NOTHROW_NCX,aio_write,(struct aiocb *__aiocbp),(__aiocbp))
+#endif /* ... */
+__CDECLARE_OPT(__ATTR_NONNULL((2)),int,__NOTHROW_NCX,lio_listio,(int __mode, struct aiocb *const __list[__restrict_arr], __STDC_INT_AS_SIZE_T __nent, struct sigevent *__restrict __sig),(__mode,__list,__nent,__sig))
+#if defined(__CRT_HAVE_aio_error64) && defined(__USE_FILE_OFFSET64)
+/* >> aio_error(3) */
+__CREDIRECT(__ATTR_WUNUSED __ATTR_NONNULL((1)),int,__NOTHROW_NCX,aio_error,(struct aiocb const *__aiocbp),aio_error64,(__aiocbp))
+#elif defined(__CRT_HAVE_aio_error) && !defined(__USE_FILE_OFFSET64)
+/* >> aio_error(3) */
+__CDECLARE(__ATTR_WUNUSED __ATTR_NONNULL((1)),int,__NOTHROW_NCX,aio_error,(struct aiocb const *__aiocbp),(__aiocbp))
+#endif /* ... */
+#if defined(__CRT_HAVE_aio_return64) && defined(__USE_FILE_OFFSET64)
+/* >> aio_return(3) */
+__CREDIRECT(__ATTR_NONNULL((1)),__SSIZE_TYPE__,__NOTHROW_NCX,aio_return,(struct aiocb *__aiocbp),aio_return64,(__aiocbp))
+#elif defined(__CRT_HAVE_aio_return) && !defined(__USE_FILE_OFFSET64)
+/* >> aio_return(3) */
+__CDECLARE(__ATTR_NONNULL((1)),__SSIZE_TYPE__,__NOTHROW_NCX,aio_return,(struct aiocb *__aiocbp),(__aiocbp))
+#endif /* ... */
+#if defined(__CRT_HAVE_aio_cancel64) && defined(__USE_FILE_OFFSET64)
+/* >> aio_cancel(3) */
+__CREDIRECT(__ATTR_NONNULL((2)),int,__NOTHROW_NCX,aio_cancel,(__fd_t __fildes, struct aiocb *__aiocbp),aio_cancel64,(__fildes,__aiocbp))
+#elif defined(__CRT_HAVE_aio_cancel) && !defined(__USE_FILE_OFFSET64)
+/* >> aio_cancel(3) */
+__CDECLARE(__ATTR_NONNULL((2)),int,__NOTHROW_NCX,aio_cancel,(__fd_t __fildes, struct aiocb *__aiocbp),(__fildes,__aiocbp))
+#endif /* ... */
+#if defined(__CRT_HAVE_aio_suspend64t64) && defined(__USE_FILE_OFFSET64) && defined(__USE_TIME_BITS64)
+/* >> aio_suspend(3), aio_suspend64(3), aio_suspendt64(3), aio_suspend64t64(3) */
+__CREDIRECT(__ATTR_NONNULL((1)),int,__NOTHROW_RPC,aio_suspend,(struct aiocb const *const __list[], __STDC_INT_AS_SIZE_T __nent, struct timespec const *__restrict __timeout),aio_suspend64t64,(__list,__nent,__timeout))
+#elif defined(__CRT_HAVE_aio_suspendt64) && !defined(__USE_FILE_OFFSET64) && defined(__USE_TIME_BITS64)
+/* >> aio_suspend(3), aio_suspend64(3), aio_suspendt64(3), aio_suspend64t64(3) */
+__CREDIRECT(__ATTR_NONNULL((1)),int,__NOTHROW_RPC,aio_suspend,(struct aiocb const *const __list[], __STDC_INT_AS_SIZE_T __nent, struct timespec const *__restrict __timeout),aio_suspendt64,(__list,__nent,__timeout))
+#elif defined(__CRT_HAVE_aio_suspend64) && defined(__USE_FILE_OFFSET64) && !defined(__USE_TIME_BITS64)
+/* >> aio_suspend(3), aio_suspend64(3), aio_suspendt64(3), aio_suspend64t64(3) */
+__CREDIRECT(__ATTR_NONNULL((1)),int,__NOTHROW_RPC,aio_suspend,(struct aiocb const *const __list[], __STDC_INT_AS_SIZE_T __nent, struct timespec const *__restrict __timeout),aio_suspend64,(__list,__nent,__timeout))
+#elif defined(__CRT_HAVE_aio_suspend) && !defined(__USE_FILE_OFFSET64) && !defined(__USE_TIME_BITS64)
+/* >> aio_suspend(3), aio_suspend64(3), aio_suspendt64(3), aio_suspend64t64(3) */
+__CDECLARE(__ATTR_NONNULL((1)),int,__NOTHROW_RPC,aio_suspend,(struct aiocb const *const __list[], __STDC_INT_AS_SIZE_T __nent, struct timespec const *__restrict __timeout),(__list,__nent,__timeout))
+#elif (defined(__CRT_HAVE_aio_suspend64t64) && defined(__USE_FILE_OFFSET64)) || (defined(__CRT_HAVE_aio_suspendt64) && !defined(__USE_FILE_OFFSET64)) || (defined(__CRT_HAVE_aio_suspend) && __SIZEOF_TIME32_T__ == __SIZEOF_TIME64_T__) || (defined(__CRT_HAVE_aio_suspend64) && defined(__USE_FILE_OFFSET64)) || (defined(__CRT_HAVE_aio_suspend) && !defined(__USE_FILE_OFFSET64))
+#include <libc/local/aio/aio_suspend.h>
+/* >> aio_suspend(3), aio_suspend64(3), aio_suspendt64(3), aio_suspend64t64(3) */
+__NAMESPACE_LOCAL_USING_OR_IMPL(aio_suspend, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_NONNULL((1)) int __NOTHROW_RPC(__LIBCCALL aio_suspend)(struct aiocb const *const __list[], __STDC_INT_AS_SIZE_T __nent, struct timespec const *__restrict __timeout) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(aio_suspend))(__list, __nent, __timeout); })
+#endif /* ... */
+#if defined(__CRT_HAVE_aio_fsync64) && defined(__USE_FILE_OFFSET64)
+/* >> aio_fsync(3) */
+__CREDIRECT(__ATTR_NONNULL((2)),int,__NOTHROW_NCX,aio_fsync,(int __operation, struct aiocb *__aiocbp),aio_fsync64,(__operation,__aiocbp))
+#elif defined(__CRT_HAVE_aio_fsync) && !defined(__USE_FILE_OFFSET64)
+/* >> aio_fsync(3) */
+__CDECLARE(__ATTR_NONNULL((2)),int,__NOTHROW_NCX,aio_fsync,(int __operation, struct aiocb *__aiocbp),(__operation,__aiocbp))
+#endif /* ... */
 
 #ifdef __USE_LARGEFILE64
-/* Enqueue read request for given number of bytes and the given priority */
-#ifndef __aio_read64_defined
-#define __aio_read64_defined 1
-__LIBRT_DECL __ATTR_NONNULL((1)) int
-__NOTHROW_NCX(__LIBRT_CC aio_read64)(struct aiocb64 *__aiocbp);
-#endif /* !__aio_read64_defined */
-
-/* Enqueue write request for given number of bytes and the given priority */
-#ifndef __aio_write64_defined
-#define __aio_write64_defined 1
-__LIBRT_DECL __ATTR_NONNULL((1)) int
-__NOTHROW_NCX(__LIBRT_CC aio_write64)(struct aiocb64 *__aiocbp);
-#endif /* !__aio_write64_defined */
-
-/* Initiate list of I/O requests */
-#ifndef __lio_listio64_defined
-#define __lio_listio64_defined 1
-__LIBRT_DECL __ATTR_NONNULL((2)) int
-__NOTHROW_NCX(__LIBRT_CC lio_listio64)(int __mode, struct aiocb64 *const __list[__restrict_arr],
-                                       __STDC_INT_AS_SIZE_T __nent, struct sigevent *__restrict __sig);
-#endif /* !__lio_listio64_defined */
-
-/* Retrieve error status associated with AIOCBP */
-#ifndef __aio_error64_defined
-#define __aio_error64_defined 1
-__LIBRT_DECL __ATTR_WUNUSED __ATTR_NONNULL((1)) int
-__NOTHROW_NCX(__LIBRT_CC aio_error64)(struct aiocb64 const *__aiocbp);
-#endif /* !__aio_error64_defined */
-
-/* Return status associated with AIOCBP */
-#ifndef __aio_return64_defined
-#define __aio_return64_defined 1
-__LIBRT_DECL __ATTR_NONNULL((1)) __ssize_t
-__NOTHROW_NCX(__LIBRT_CC aio_return64)(struct aiocb64 *__aiocbp);
-#endif /* !__aio_return64_defined */
-
-/* Try to cancel asynchronous I/O requests outstanding against file descriptor FILDES */
-#ifndef __aio_cancel64_defined
-#define __aio_cancel64_defined 1
-__LIBRT_DECL int
-__NOTHROW_NCX(__LIBRT_CC aio_cancel64)(__fd_t __fildes, struct aiocb64 *__aiocbp);
-#endif /* !__aio_cancel64_defined */
-
-/* Suspend calling thread until at least one of the asynchronous
- * I/O    operations   referenced   by   LIST   has   completed. */
-#ifndef __aio_suspend64_defined
-#define __aio_suspend64_defined 1
-#ifdef __USE_TIME_BITS64
-__COMPILER_REDIRECT(__LIBRT_DECL,__ATTR_NONNULL((1)),int,__NOTHROW_RPC,__LIBRT_CC,aio_suspend64,
-                    (struct aiocb64 const *const __list[], __STDC_INT_AS_SIZE_T __nent, struct timespec const *__restrict __timeout),
-                    aio_suspend64t64,(__list, __nent, __timeout))
-#else /* __USE_TIME_BITS64 */
-__LIBRT_DECL __ATTR_NONNULL((1)) int
-__NOTHROW_RPC(__LIBRT_CC aio_suspend64)(struct aiocb64 const *const __list[], __STDC_INT_AS_SIZE_T __nent,
-                                        struct timespec const *__restrict __timeout);
-#endif /* !__USE_TIME_BITS64 */
-#endif /* !__aio_suspend64_defined */
-
-/* Force all operations associated with file descriptor described by `aio_fildes' member of AIOCBP. */
-#ifndef __aio_fsync64_defined
-#define __aio_fsync64_defined 1
-__LIBRT_DECL __ATTR_NONNULL((2)) int
-__NOTHROW_NCX(__LIBRT_CC aio_fsync64)(int __operation, struct aiocb64 *__aiocbp);
-#endif /* !__aio_fsync64_defined */
+#if defined(__CRT_HAVE_aio_read) && __SIZEOF_OFF32_T__ == __SIZEOF_OFF64_T__
+/* >> aio_read(3) */
+__CREDIRECT(__ATTR_NONNULL((1)),int,__NOTHROW_NCX,aio_read64,(struct aiocb64 *__aiocbp),aio_read,(__aiocbp))
+#elif defined(__CRT_HAVE_aio_read64)
+/* >> aio_read(3) */
+__CDECLARE(__ATTR_NONNULL((1)),int,__NOTHROW_NCX,aio_read64,(struct aiocb64 *__aiocbp),(__aiocbp))
+#endif /* ... */
+#if defined(__CRT_HAVE_aio_write) && __SIZEOF_OFF32_T__ == __SIZEOF_OFF64_T__
+/* >> aio_write(3) */
+__CREDIRECT(__ATTR_NONNULL((1)),int,__NOTHROW_NCX,aio_write64,(struct aiocb64 *__aiocbp),aio_write,(__aiocbp))
+#elif defined(__CRT_HAVE_aio_write64)
+/* >> aio_write(3) */
+__CDECLARE(__ATTR_NONNULL((1)),int,__NOTHROW_NCX,aio_write64,(struct aiocb64 *__aiocbp),(__aiocbp))
+#endif /* ... */
+#if defined(__CRT_HAVE_aio_write) && __SIZEOF_OFF32_T__ == __SIZEOF_OFF64_T__
+/* >> aio_write(3) */
+__CREDIRECT(__ATTR_NONNULL((2)),int,__NOTHROW_NCX,lio_listio64,(int __mode, struct aiocb64 *const __list[__restrict_arr], __STDC_INT_AS_SIZE_T __nent, struct sigevent *__restrict __sig),aio_write,(__mode,__list,__nent,__sig))
+#elif defined(__CRT_HAVE_lio_listio64)
+/* >> aio_write(3) */
+__CDECLARE(__ATTR_NONNULL((2)),int,__NOTHROW_NCX,lio_listio64,(int __mode, struct aiocb64 *const __list[__restrict_arr], __STDC_INT_AS_SIZE_T __nent, struct sigevent *__restrict __sig),(__mode,__list,__nent,__sig))
+#endif /* ... */
+#if defined(__CRT_HAVE_aio_error) && __SIZEOF_OFF32_T__ == __SIZEOF_OFF64_T__
+/* >> aio_error(3) */
+__CREDIRECT(__ATTR_WUNUSED __ATTR_NONNULL((1)),int,__NOTHROW_NCX,aio_error64,(struct aiocb64 const *__aiocbp),aio_error,(__aiocbp))
+#elif defined(__CRT_HAVE_aio_error64)
+/* >> aio_error(3) */
+__CDECLARE(__ATTR_WUNUSED __ATTR_NONNULL((1)),int,__NOTHROW_NCX,aio_error64,(struct aiocb64 const *__aiocbp),(__aiocbp))
+#endif /* ... */
+#if defined(__CRT_HAVE_aio_return) && __SIZEOF_OFF32_T__ == __SIZEOF_OFF64_T__
+/* >> aio_return(3) */
+__CREDIRECT(__ATTR_NONNULL((1)),__SSIZE_TYPE__,__NOTHROW_NCX,aio_return64,(struct aiocb64 *__aiocbp),aio_return,(__aiocbp))
+#elif defined(__CRT_HAVE_aio_return64)
+/* >> aio_return(3) */
+__CDECLARE(__ATTR_NONNULL((1)),__SSIZE_TYPE__,__NOTHROW_NCX,aio_return64,(struct aiocb64 *__aiocbp),(__aiocbp))
+#endif /* ... */
+#if defined(__CRT_HAVE_aio_cancel) && __SIZEOF_OFF32_T__ == __SIZEOF_OFF64_T__
+/* >> aio_cancel(3) */
+__CREDIRECT(__ATTR_NONNULL((2)),int,__NOTHROW_NCX,aio_cancel64,(__fd_t __fildes, struct aiocb64 *__aiocbp),aio_cancel,(__fildes,__aiocbp))
+#elif defined(__CRT_HAVE_aio_cancel64)
+/* >> aio_cancel(3) */
+__CDECLARE(__ATTR_NONNULL((2)),int,__NOTHROW_NCX,aio_cancel64,(__fd_t __fildes, struct aiocb64 *__aiocbp),(__fildes,__aiocbp))
+#endif /* ... */
+#if defined(__CRT_HAVE_aio_suspend) && __SIZEOF_OFF32_T__ == __SIZEOF_OFF64_T__ && (!defined(__USE_TIME_BITS64) || __SIZEOF_TIME32_T__ == __SIZEOF_TIME64_T__)
+/* >> aio_suspend(3), aio_suspend64(3), aio_suspendt64(3), aio_suspend64t64(3) */
+__CREDIRECT(__ATTR_NONNULL((1)),int,__NOTHROW_NCX,aio_suspend64,(struct aiocb64 const *const __list[], __STDC_INT_AS_SIZE_T __nent, struct timespec const *__restrict __timeout),aio_suspend,(__list,__nent,__timeout))
+#elif defined(__CRT_HAVE_aio_suspendt64) && __SIZEOF_OFF32_T__ == __SIZEOF_OFF64_T__ && (defined(__USE_TIME_BITS64) || __SIZEOF_TIME32_T__ == __SIZEOF_TIME64_T__)
+/* >> aio_suspend(3), aio_suspend64(3), aio_suspendt64(3), aio_suspend64t64(3) */
+__CREDIRECT(__ATTR_NONNULL((1)),int,__NOTHROW_NCX,aio_suspend64,(struct aiocb64 const *const __list[], __STDC_INT_AS_SIZE_T __nent, struct timespec const *__restrict __timeout),aio_suspendt64,(__list,__nent,__timeout))
+#elif defined(__CRT_HAVE_aio_suspend64) && (!defined(__USE_TIME_BITS64) || __SIZEOF_TIME32_T__ == __SIZEOF_TIME64_T__)
+/* >> aio_suspend(3), aio_suspend64(3), aio_suspendt64(3), aio_suspend64t64(3) */
+__CDECLARE(__ATTR_NONNULL((1)),int,__NOTHROW_NCX,aio_suspend64,(struct aiocb64 const *const __list[], __STDC_INT_AS_SIZE_T __nent, struct timespec const *__restrict __timeout),(__list,__nent,__timeout))
+#elif defined(__CRT_HAVE_aio_suspend64t64) && (defined(__USE_TIME_BITS64) || __SIZEOF_TIME32_T__ == __SIZEOF_TIME64_T__)
+/* >> aio_suspend(3), aio_suspend64(3), aio_suspendt64(3), aio_suspend64t64(3) */
+__CREDIRECT(__ATTR_NONNULL((1)),int,__NOTHROW_NCX,aio_suspend64,(struct aiocb64 const *const __list[], __STDC_INT_AS_SIZE_T __nent, struct timespec const *__restrict __timeout),aio_suspend64t64,(__list,__nent,__timeout))
+#elif (defined(__CRT_HAVE_aio_suspend) && __SIZEOF_OFF32_T__ == __SIZEOF_OFF64_T__ && __SIZEOF_TIME32_T__ == __SIZEOF_TIME64_T__) || (defined(__CRT_HAVE_aio_suspendt64) && __SIZEOF_OFF32_T__ == __SIZEOF_OFF64_T__) || (defined(__CRT_HAVE_aio_suspend) && __SIZEOF_OFF32_T__ == __SIZEOF_OFF64_T__) || defined(__CRT_HAVE_aio_suspend64)
+#include <libc/local/aio/aio_suspend64.h>
+/* >> aio_suspend(3), aio_suspend64(3), aio_suspendt64(3), aio_suspend64t64(3) */
+__NAMESPACE_LOCAL_USING_OR_IMPL(aio_suspend64, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_NONNULL((1)) int __NOTHROW_NCX(__LIBCCALL aio_suspend64)(struct aiocb64 const *const __list[], __STDC_INT_AS_SIZE_T __nent, struct timespec const *__restrict __timeout) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(aio_suspend64))(__list, __nent, __timeout); })
+#endif /* ... */
+#if defined(__CRT_HAVE_aio_fsync) && __SIZEOF_OFF32_T__ == __SIZEOF_OFF64_T__
+/* >> aio_fsync(3) */
+__CREDIRECT(__ATTR_NONNULL((2)),int,__NOTHROW_NCX,aio_fsync64,(int __operation, struct aiocb64 *__aiocbp),aio_fsync,(__operation,__aiocbp))
+#elif defined(__CRT_HAVE_aio_fsync64)
+/* >> aio_fsync(3) */
+__CDECLARE(__ATTR_NONNULL((2)),int,__NOTHROW_NCX,aio_fsync64,(int __operation, struct aiocb64 *__aiocbp),(__operation,__aiocbp))
+#endif /* ... */
 #endif /* __USE_LARGEFILE64 */
 
 #ifdef __USE_TIME64
-/* Suspend calling thread until at least one of the asynchronous
- * I/O    operations   referenced   by   LIST   has   completed. */
-#ifndef __aio_suspendt64_defined
-#define __aio_suspendt64_defined 1
-#ifdef __USE_FILE_OFFSET64
-__COMPILER_REDIRECT(__LIBRT_DECL,__ATTR_NONNULL((1)),int,__NOTHROW_RPC,__LIBRT_CC,aio_suspendt64,
-                    (struct aiocb const *const __list[], __STDC_INT_AS_SIZE_T __nent, struct timespec64 const *__restrict __timeout),
-                    aio_suspend64t64,(__list, __nent, __timeout))
-#else /* __USE_FILE_OFFSET64 */
-__LIBRT_DECL __ATTR_NONNULL((1)) int
-__NOTHROW_RPC(__LIBRT_CC aio_suspendt64)(struct aiocb const *const __list[], __STDC_INT_AS_SIZE_T __nent,
-                                         struct timespec64 const *__restrict __timeout);
-#endif /* !__USE_FILE_OFFSET64 */
-#endif /* !__aio_suspendt64_defined */
+#if defined(__CRT_HAVE_aio_suspend64t64) && defined(__USE_FILE_OFFSET64)
+/* >> aio_suspend(3), aio_suspend64(3), aio_suspendt64(3), aio_suspend64t64(3) */
+__CREDIRECT(__ATTR_NONNULL((1)),int,__NOTHROW_NCX,aio_suspendt64,(struct aiocb const *const __list[], __STDC_INT_AS_SIZE_T __nent, struct timespec64 const *__restrict __timeout),aio_suspend64t64,(__list,__nent,__timeout))
+#elif defined(__CRT_HAVE_aio_suspendt64) && !defined(__USE_FILE_OFFSET64)
+/* >> aio_suspend(3), aio_suspend64(3), aio_suspendt64(3), aio_suspend64t64(3) */
+__CDECLARE(__ATTR_NONNULL((1)),int,__NOTHROW_NCX,aio_suspendt64,(struct aiocb const *const __list[], __STDC_INT_AS_SIZE_T __nent, struct timespec64 const *__restrict __timeout),(__list,__nent,__timeout))
+#elif defined(__CRT_HAVE_aio_suspend) && __SIZEOF_TIME32_T__ == __SIZEOF_TIME64_T__
+/* >> aio_suspend(3), aio_suspend64(3), aio_suspendt64(3), aio_suspend64t64(3) */
+__CREDIRECT(__ATTR_NONNULL((1)),int,__NOTHROW_NCX,aio_suspendt64,(struct aiocb const *const __list[], __STDC_INT_AS_SIZE_T __nent, struct timespec64 const *__restrict __timeout),aio_suspend,(__list,__nent,__timeout))
+#elif (defined(__CRT_HAVE_aio_suspend64) && defined(__USE_FILE_OFFSET64)) || (defined(__CRT_HAVE_aio_suspend) && !defined(__USE_FILE_OFFSET64))
+#include <libc/local/aio/aio_suspendt64.h>
+/* >> aio_suspend(3), aio_suspend64(3), aio_suspendt64(3), aio_suspend64t64(3) */
+__NAMESPACE_LOCAL_USING_OR_IMPL(aio_suspendt64, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_NONNULL((1)) int __NOTHROW_NCX(__LIBCCALL aio_suspendt64)(struct aiocb const *const __list[], __STDC_INT_AS_SIZE_T __nent, struct timespec64 const *__restrict __timeout) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(aio_suspendt64))(__list, __nent, __timeout); })
+#endif /* ... */
 
-/* Suspend calling thread until at least one of the asynchronous
- * I/O    operations   referenced   by   LIST   has   completed. */
 #ifdef __USE_LARGEFILE64
-#ifndef __aio_suspend64t64_defined
-#define __aio_suspend64t64_defined 1
-__LIBRT_DECL __ATTR_NONNULL((1)) int
-__NOTHROW_RPC(__LIBRT_CC aio_suspend64t64)(struct aiocb64 const *const __list[], __STDC_INT_AS_SIZE_T __nent,
-                                           struct timespec64 const *__restrict __timeout);
-#endif /* !__aio_suspend64t64_defined */
+#if defined(__CRT_HAVE_aio_suspend) && __SIZEOF_OFF32_T__ == __SIZEOF_OFF64_T__ && __SIZEOF_TIME32_T__ == __SIZEOF_TIME64_T__
+/* >> aio_suspend(3), aio_suspend64(3), aio_suspendt64(3), aio_suspend64t64(3) */
+__CREDIRECT(__ATTR_NONNULL((1)),int,__NOTHROW_NCX,aio_suspend64t64,(struct aiocb64 const *const __list[], __STDC_INT_AS_SIZE_T __nent, struct timespec64 const *__restrict __timeout),aio_suspend,(__list,__nent,__timeout))
+#elif defined(__CRT_HAVE_aio_suspendt64) && __SIZEOF_OFF32_T__ == __SIZEOF_OFF64_T__
+/* >> aio_suspend(3), aio_suspend64(3), aio_suspendt64(3), aio_suspend64t64(3) */
+__CREDIRECT(__ATTR_NONNULL((1)),int,__NOTHROW_NCX,aio_suspend64t64,(struct aiocb64 const *const __list[], __STDC_INT_AS_SIZE_T __nent, struct timespec64 const *__restrict __timeout),aio_suspendt64,(__list,__nent,__timeout))
+#elif defined(__CRT_HAVE_aio_suspend64) && __SIZEOF_TIME32_T__ == __SIZEOF_TIME64_T__
+/* >> aio_suspend(3), aio_suspend64(3), aio_suspendt64(3), aio_suspend64t64(3) */
+__CREDIRECT(__ATTR_NONNULL((1)),int,__NOTHROW_NCX,aio_suspend64t64,(struct aiocb64 const *const __list[], __STDC_INT_AS_SIZE_T __nent, struct timespec64 const *__restrict __timeout),aio_suspend64,(__list,__nent,__timeout))
+#elif (defined(__CRT_HAVE_aio_suspend) && __SIZEOF_OFF32_T__ == __SIZEOF_OFF64_T__) || defined(__CRT_HAVE_aio_suspend64)
+#include <libc/local/aio/aio_suspend64t64.h>
+/* >> aio_suspend(3), aio_suspend64(3), aio_suspendt64(3), aio_suspend64t64(3) */
+__NAMESPACE_LOCAL_USING_OR_IMPL(aio_suspend64t64, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_NONNULL((1)) int __NOTHROW_NCX(__LIBCCALL aio_suspend64t64)(struct aiocb64 const *const __list[], __STDC_INT_AS_SIZE_T __nent, struct timespec64 const *__restrict __timeout) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(aio_suspend64t64))(__list, __nent, __timeout); })
+#endif /* ... */
 #endif /* __USE_LARGEFILE64 */
 #endif /* __USE_TIME64 */
 
+#ifdef __USE_GNU
+/* >> aio_init(3) */
+__CDECLARE_VOID_OPT(__ATTR_NONNULL((1)),__NOTHROW_NCX,aio_init,(struct aioinit const *__init),(__init))
+#endif /* __USE_GNU */
 
 __SYSDECL_END
 #endif /* __CC__ */

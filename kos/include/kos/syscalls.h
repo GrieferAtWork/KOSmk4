@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x8d842b45 */
+/* HASH CRC-32:0x326572ac */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -28,6 +28,7 @@
 #include <bits/os/itimerspec.h>
 #include <bits/os/itimerval.h>
 #include <bits/os/mmsghdr.h>
+#include <bits/os/mqueue.h>
 #include <bits/os/msghdr.h>
 #include <bits/os/pollfd.h>
 #include <bits/os/rusage.h>
@@ -47,7 +48,6 @@
 #include <kos/kernel/cpu-state.h>
 #include <kos/kernel/fpu-state.h>
 #include <librpc/bits/syscall-info.h>
-#include <librt/bits/mqueue.h>
 
 
 #ifndef __CDECLARE_SC

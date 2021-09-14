@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xf3e70071 */
+/* HASH CRC-32:0xd08d73cf */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -537,6 +537,23 @@
 #define __CRT_HAVE_DOS$adjtime64
 #define __CRT_HAVE_DOS$adjtimex
 #define __CRT_HAVE_DOS$adjtimex64
+#define __CRT_HAVE_DOS$aio_cancel
+#define __CRT_HAVE_DOS$aio_cancel64
+#define __CRT_HAVE_DOS$aio_error
+#define __CRT_HAVE_DOS$aio_error64
+#define __CRT_HAVE_DOS$aio_fsync
+#define __CRT_HAVE_DOS$aio_fsync64
+#define __CRT_HAVE_DOS$aio_init
+#define __CRT_HAVE_DOS$aio_read
+#define __CRT_HAVE_DOS$aio_read64
+#define __CRT_HAVE_DOS$aio_return
+#define __CRT_HAVE_DOS$aio_return64
+#define __CRT_HAVE_DOS$aio_suspend
+#define __CRT_HAVE_DOS$aio_suspend64
+#define __CRT_HAVE_DOS$aio_suspend64t64
+#define __CRT_HAVE_DOS$aio_suspendt64
+#define __CRT_HAVE_DOS$aio_write
+#define __CRT_HAVE_DOS$aio_write64
 #define __CRT_HAVE_DOS$alarm
 #define __CRT_HAVE_DOS$alphasort
 #define __CRT_HAVE_DOS$alphasort64
@@ -1440,6 +1457,8 @@
 #define __CRT_HAVE_DOS$lgetxattr
 #define __CRT_HAVE_DOS$link
 #define __CRT_HAVE_DOS$linkat
+#define __CRT_HAVE_DOS$lio_listio
+#define __CRT_HAVE_DOS$lio_listio64
 #define __CRT_HAVE_DOS$listen
 #define __CRT_HAVE_DOS$listxattr
 #define __CRT_HAVE_DOS$llabs
@@ -1667,6 +1686,18 @@
 #define __CRT_HAVE_DOS$modfl
 #define __CRT_HAVE_DOS$mount
 #define __CRT_HAVE_DOS$mprotect
+#define __CRT_HAVE_DOS$mq_close
+#define __CRT_HAVE_DOS$mq_getattr
+#define __CRT_HAVE_DOS$mq_notify
+#define __CRT_HAVE_DOS$mq_open
+#define __CRT_HAVE_DOS$mq_receive
+#define __CRT_HAVE_DOS$mq_send
+#define __CRT_HAVE_DOS$mq_setattr
+#define __CRT_HAVE_DOS$mq_timedreceive
+#define __CRT_HAVE_DOS$mq_timedreceive64
+#define __CRT_HAVE_DOS$mq_timedsend
+#define __CRT_HAVE_DOS$mq_timedsend64
+#define __CRT_HAVE_DOS$mq_unlink
 #define __CRT_HAVE_DOS$mrand48_r
 #define __CRT_HAVE_DOS$mremap
 #define __CRT_HAVE_DOS$msgctl
@@ -3561,6 +3592,23 @@
 #define __CRT_HAVE_adjtime64
 #define __CRT_HAVE_adjtimex
 #define __CRT_HAVE_adjtimex64
+#define __CRT_HAVE_aio_cancel
+#define __CRT_HAVE_aio_cancel64
+#define __CRT_HAVE_aio_error
+#define __CRT_HAVE_aio_error64
+#define __CRT_HAVE_aio_fsync
+#define __CRT_HAVE_aio_fsync64
+#define __CRT_HAVE_aio_init
+#define __CRT_HAVE_aio_read
+#define __CRT_HAVE_aio_read64
+#define __CRT_HAVE_aio_return
+#define __CRT_HAVE_aio_return64
+#define __CRT_HAVE_aio_suspend
+#define __CRT_HAVE_aio_suspend64
+#define __CRT_HAVE_aio_suspend64t64
+#define __CRT_HAVE_aio_suspendt64
+#define __CRT_HAVE_aio_write
+#define __CRT_HAVE_aio_write64
 #define __CRT_HAVE_alarm
 #define __CRT_HAVE_alphasort
 #define __CRT_HAVE_alphasort64
@@ -4618,6 +4666,8 @@
 #define __CRT_HAVE_lgetxattr
 #define __CRT_HAVE_link
 #define __CRT_HAVE_linkat
+#define __CRT_HAVE_lio_listio
+#define __CRT_HAVE_lio_listio64
 #define __CRT_HAVE_listen
 #define __CRT_HAVE_listxattr
 #define __CRT_HAVE_llabs
@@ -4867,6 +4917,18 @@
 #define __CRT_HAVE_modfl
 #define __CRT_HAVE_mount
 #define __CRT_HAVE_mprotect
+#define __CRT_HAVE_mq_close
+#define __CRT_HAVE_mq_getattr
+#define __CRT_HAVE_mq_notify
+#define __CRT_HAVE_mq_open
+#define __CRT_HAVE_mq_receive
+#define __CRT_HAVE_mq_send
+#define __CRT_HAVE_mq_setattr
+#define __CRT_HAVE_mq_timedreceive
+#define __CRT_HAVE_mq_timedreceive64
+#define __CRT_HAVE_mq_timedsend
+#define __CRT_HAVE_mq_timedsend64
+#define __CRT_HAVE_mq_unlink
 #define __CRT_HAVE_mrand48
 #define __CRT_HAVE_mrand48_r
 #define __CRT_HAVE_mremap

@@ -202,8 +202,8 @@
 #define __libc_seterrno         libc_seterrno
 #define ____errno_location_defined 1
 #define __errno_location()         libc_errno_p()
-#define libc_seterrno_syserr(e)       (likely(!E_ISERR(e)) ? (e) : libc_seterrno((errno_t) - (syscall_slong_t)(syscall_ulong_t)(e)))
-#define libc_seterrno_syserr2(e, ERR) (likely(!E_ISERR(e)) ? (e) : (libc_seterrno((errno_t) - (syscall_slong_t)(syscall_ulong_t)(e)), (ERR)))
+#define libc_seterrno_syserr(e)       (likely(!E_ISERR(e)) ? (e) : libc_seterrno((errno_t)-(syscall_slong_t)(syscall_ulong_t)(e)))
+#define libc_seterrno_syserr2(e, ERR) (likely(!E_ISERR(e)) ? (e) : (libc_seterrno((errno_t)-(syscall_slong_t)(syscall_ulong_t)(e)), (ERR)))
 #endif /* !__KERNEL__ */
 
 
