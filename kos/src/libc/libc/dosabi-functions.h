@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x4f6cf84f */
+/* HASH CRC-32:0x879cfe8a */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -59,7 +59,7 @@
 /* aio */
 DFUN(".text.crt.dos.utility.aio", libd_aio_read, libc_aio_read, TD, 1, TP)
 DFUN(".text.crt.dos.utility.aio", libd_aio_write, libc_aio_write, TD, 1, TP)
-DFUN(".text.crt.dos.utility.aio", libd_aio_fsync, libc_aio_fsync, TD, 2, TD, TP)
+DFUN(".text.crt.dos.utility.aio", libd_aio_fsync, libc_aio_fsync, TD, 2, TIn(__SIZEOF_OFLAG_T__), TP)
 DFUN(".text.crt.dos.utility.aio", libd_lio_listio, libc_lio_listio, TD, 4, TD, TP, TD, TP)
 DFUN(".text.crt.dos.utility.aio", libd_aio_error, libc_aio_error, TIn(__SIZEOF_ERRNO_T__), 1, TP)
 DFUN(".text.crt.dos.utility.aio", libd_aio_return, libc_aio_return, TI, 1, TP)

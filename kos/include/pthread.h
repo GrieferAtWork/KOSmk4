@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x48b22dd8 */
+/* HASH CRC-32:0xf865f199 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -622,7 +622,9 @@ typedef __pthread_barrierattr_t pthread_barrierattr_t;
  * getting passed `arg'. Creation attributed come from `attr'. The new
  * handle is stored in `*newthread'
  * @return: EOK:    Success
- * @return: EAGAIN: Insufficient resources, or operation-not-permitted */
+ * @return: EAGAIN: Insufficient resources, or operation-not-permitted
+ *                  (read: `ENOMEM', but posix didn't want to use that
+ *                  errno for whatever reason...) */
 __CDECLARE_OPT(__ATTR_NONNULL((1, 3)),__errno_t,__NOTHROW_NCX,pthread_create,(pthread_t *__restrict __newthread, pthread_attr_t const *__restrict __attr, void *(__LIBCCALL *__start_routine)(void *__arg), void *__arg),(__newthread,__attr,__start_routine,__arg))
 /* >> pthread_exit(3)
  * Terminate calling thread.

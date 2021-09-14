@@ -96,69 +96,215 @@ typedef struct sigevent sigevent_t;
 %[define_replacement(aiocb64 = aiocb64)]
 %[define_c_language_keyword(__restrict_arr)]
 
+%{
+/*
+ * The implementation of NOTIFY_COMPLETION behaves identical to:
+ *
+ * >> struct thread_cookie {
+ * >>     void (LIBKCALL *tc_func)(sigval_t value);
+ * >>     sigval_t        tc_value;
+ * >> };
+ * >> static void *LIBCCALL thread_wrapper(void *arg) {
+ * >>     struct thread_cookie cookie;
+ * >>     cookie = *(struct thread_cookie *)arg;
+ * >>     free(arg);
+ * >>     (*cookie.tc_func)(cookie.tc_value);
+ * >>     return NULL;
+ * >> }
+ * >>
+ * >> errno_t NOTIFY_COMPLETION(struct sigevent *ev) {
+ * >>     errno_t result = EOK;
+ * >>     if (ev->sigev_notify == SIGEV_THREAD) {
+ * >>         pthread_attr_t _attr;
+ * >>         pthread_attr_t *attr = ev->sigev_notify_attributes;
+ * >>         struct thread_cookie *cookie;
+ * >>         if (!attr) {
+ * >>             result = pthread_attr_init(&_attr);
+ * >>             if (result != EOK)
+ * >>                 goto done;
+ * >>             result = pthread_attr_setdetachstate(&_attr, PTHREAD_CREATE_DETACHED);
+ * >>             if (result != EOK) {
+ * >>                 pthread_attr_destroy(&_attr);
+ * >>                 goto done;
+ * >>             }
+ * >>             attr = &_attr;
+ * >>         }
+ * >>         cookie = (struct thread_cookie *)malloc(sizeof(struct thread_cookie));
+ * >>         if (!cookie)
+ * >>             result = errno; // Likely: ENOMEM
+ * >>         else {
+ * >>             pthread_t p;
+ * >>             cookie->tc_func  = ev->sigev_notify_function;
+ * >>             cookie->tc_value = ev->sigev_value;
+ * >>             result = pthread_create(&p, attr, &thread_wrapper, cookie);
+ * >>             if (result != EOK)
+ * >>                 free(cookie);
+ * >>         }
+ * >>         if (!ev->sigev_notify_attributes)
+ * >>             pthread_attr_destroy(&_attr);
+ * >>     } else if ((ev->sigev_notify == SIGEV_SIGNAL ||
+ * >>                 ev->sigev_notify == SIGEV_THREAD_ID) &&
+ * >>                (info.si_signo != 0)) {
+ * >>         // When `si_signo == 0', the below syscalls would become no-ops
+ * >>         // Or rather, would "test if we're allowed to send a signal".
+ * >>         siginfo_t info;
+ * >>         memset(&info, 0, sizeof(siginfo_t));
+ * >>         info.si_signo = ev->sigev_signo;
+ * >>         info.si_code  = SI_ASYNCIO;
+ * >>         info.si_pid   = getpid();
+ * >>         info.si_uid   = getuid();
+ * >>         info.si_value = ev->sigev_value;
+ * >>         if (ev->sigev_notify == SIGEV_SIGNAL) {
+ * >>             result = -sys_rt_sigqueueinfo(info.si_pid, info.si_signo, &info);
+ * >>         } else {
+ * >>             // PORTABILITY WARNING: Support for this case isn't implemented by
+ * >>             //                      gLibc, which only supports `SIGEV_SIGNAL'!
+ * >>             result = -sys_rt_tgsigqueueinfo(info.si_pid, ev->_tid,
+ * >>                                             info.si_signo, &info);
+ * >>         }
+ * >>     }
+ * >> done:
+ * >>     return result;
+ * >> }
+ *
+ * The error returned by `NOTIFY_COMPLETION()' is treated the same as an error
+ * caused  as a result of the actual  async operation returning to indicate an
+ * error. Iow:
+ *  - `aio_return(3)' will return `-1'
+ *  - `aio_error(3)' can be used to read this error
+ *
+ */
 
 
-@@>> aio_read(3)
-@@Begin an async `read(2)' operation (TODO: Document fields used)
+/* WARNING: ONCE STARTED, YOU MUST NOT FREE THE BACKING STRUCTURE
+ *          OF `struct aiocb' UNTIL `aio_error() != EINPROGRESS'!
+ *
+ * Until  that point, the address of structure itself may be used
+ * internally as part of linked lists which will become corrupted
+ * if one of their elements isn't properly removed prior to being
+ * deallocated.
+ */
+
+
+}
+
+
+
+@@>> aio_read(3), aio_read64(3)
+@@Begin an async `pread(2)' operation:
+@@>> pread(self->aio_fildes, self->aio_buf, self->aio_nbytes, self->aio_offset);
+@@>> NOTIFY_COMPLETION(&self->aio_sigevent);
+@@When `pread(2)' would fail due to the type of file that `self->aio_fildes' is,
+@@then `read(2)' is called instead (in which case `self->aio_offset' is ignored)
 [[no_crt_self_import, decl_include("<bits/crt/aiocb.h>")]]
 [[if($extended_include_prefix("<features.h>") defined(__USE_FILE_OFFSET64)), preferred_alias("aio_read64")]]
 [[if($extended_include_prefix("<features.h>")!defined(__USE_FILE_OFFSET64)), preferred_alias("aio_read")]]
-int aio_read([[nonnull]] struct aiocb *aiocbp);
+int aio_read([[nonnull]] struct aiocb *self);
 
-@@>> aio_write(3)
-@@Begin an async `write(2)' operation (TODO: Document fields used)
+@@>> aio_write(3), aio_write64(3)
+@@Begin an async `pwrite(2)' operation:
+@@>> pwrite(self->aio_fildes, self->aio_buf, self->aio_nbytes, self->aio_offset);
+@@>> NOTIFY_COMPLETION(&self->aio_sigevent);
+@@When `pwrite(2)' would fail due to the type of file that `self->aio_fildes' is,
+@@then `write(2)' is called instead (in which case `self->aio_offset' is ignored)
 [[no_crt_self_import, decl_include("<bits/crt/aiocb.h>")]]
 [[if($extended_include_prefix("<features.h>") defined(__USE_FILE_OFFSET64)), preferred_alias("aio_write64")]]
 [[if($extended_include_prefix("<features.h>")!defined(__USE_FILE_OFFSET64)), preferred_alias("aio_write")]]
-int aio_write([[nonnull]] struct aiocb *aiocbp);
+int aio_write([[nonnull]] struct aiocb *self);
 
 
-@@>> aio_fsync(3)
-@@Begin an async `fsync(2)' operation (TODO: Document fields used)
+@@>> aio_fsync(3), aio_fsync64(3)
+@@Begin an async `fsync(2)' operation:
+@@>> if (operation == O_SYNC) {
+@@>>     fsync(self->aio_fildes);
+@@>> } else if (operation == O_DSYNC) {
+@@>>     fdatasync(self->aio_fildes);
+@@>> }
+@@>> NOTIFY_COMPLETION(&self->aio_sigevent);
+@@@param: operation: One of `O_SYNC' or `O_DSYNC'
+@@@return: 0 : Operation was started successfully
+@@@return: -1: [errno=EAGAIN] Insufficient  ressources  (read: `ENOMEM',  but posix
+@@                            didn't want to use that errno for whatever reason...)
+@@@return: -1: [errno=EINVAL] `operation' was invalid
 [[no_crt_self_import, decl_include("<bits/types.h>", "<bits/crt/aiocb.h>")]]
 [[if($extended_include_prefix("<features.h>") defined(__USE_FILE_OFFSET64)), preferred_alias("aio_fsync64")]]
 [[if($extended_include_prefix("<features.h>")!defined(__USE_FILE_OFFSET64)), preferred_alias("aio_fsync")]]
-int aio_fsync(int operation, [[nonnull]] struct aiocb *aiocbp);
+int aio_fsync($oflag_t operation, [[nonnull]] struct aiocb *self);
 
 
-@@>> lio_listio(3)
-@@Execute/perform a `list' of AIO operations
+@@>> lio_listio(3), lio_listio64(3)
+@@Execute/perform  a `list' of  AIO operations, where  each element of `list'
+@@describes a read (`elem->aio_lio_opcode == LIO_READ'), write (`LIO_WRITE'),
+@@or no-op (`LIO_NOP') operation.
+@@
+@@Once all operations are in progress, and `mode == LIO_WAIT', wait for all
+@@of  them to complete  and return `0' on  success, or `-1'  is any of them
+@@failed (individual errors/return values can be queried via `aio_error(3)'
+@@and `aio_return(3)' on each of the elements from `list')
+@@
+@@Alternatively, when `mode == LIO_NOWAIT', AIO is performed asynchronously,
+@@and the function returns immediatly once all operations have been started.
+@@If this was successful, return `0', or `-1' if doing so failed  (`errno').
+@@Also note that on error, all  of the already-started operations will  have
+@@been canceled even before this function returns.
+@@Additionally, the given `sig' (if non-NULL) will be assigned as a master
+@@completion event that is only triggered once _all_ of the AIO operations
+@@have completed. Note that in this case, `sig' will/has always be invoked
+@@if this function returns `0', even if  any of the AIO operations end  up
+@@being canceled (s.a. `aio_cancel(3)') before they could be performed.
+@@
 @@@param: mode: One of `LIO_WAIT', `LIO_NOWAIT'
+@@@return: 0 : Success
+@@@return: -1: Error (s.a. `errno')
 [[decl_include("<features.h>", "<bits/os/sigevent.h>", "<bits/crt/aiocb.h>")]]
 int lio_listio(int mode, [[nonnull]] struct aiocb *const list[__restrict_arr],
-               __STDC_INT_AS_SIZE_T nent, struct sigevent *__restrict sig);
+               __STDC_INT_AS_SIZE_T nent, struct sigevent *__restrict sigev);
 
 
-@@>> aio_error(3)
+@@>> aio_error(3), aio_error64(3)
 @@@return: 0 :          Operation completed
-@@@return: EINPROGRESS: Async operation is still in progress
-@@@return: ECANCELED:   Operation was cancelled
-@@@return: * :          The  `errno'  with  which  the  async  operation  failed.
-@@                      s.a. `read(2)', `write(2)', `fsync(2)' and `fdatasync(2)'
+@@@return: EINPROGRESS: Async operation is still in progress (or pending)
+@@@return: ECANCELED:   Operation was canceled (s.a. `aio_cancel(3)')
+@@@return: * :          The   `errno'  with  which   the  async  operation  failed.
+@@                      s.a. `pread(2)', `pwrite(2)', `fsync(2)' and `fdatasync(2)'
 [[wunused, no_crt_self_import, decl_include("<bits/crt/aiocb.h>", "<bits/types.h>")]]
 [[if($extended_include_prefix("<features.h>") defined(__USE_FILE_OFFSET64)), preferred_alias("aio_error64")]]
 [[if($extended_include_prefix("<features.h>")!defined(__USE_FILE_OFFSET64)), preferred_alias("aio_error")]]
-$errno_t aio_error([[nonnull]] struct aiocb const *aiocbp);
+$errno_t aio_error([[nonnull]] struct aiocb const *self);
 
 
-@@>> aio_return(3)
-@@@return: * : Return value of async `read(2)', `write(2)', `fsync(2)' or `fdatasync(2)'
-@@@return: -1: Error (s.a. `errno')
+@@>> aio_return(3), aio_return64(3)
+@@@return: * : Return value of async `pread(2)', `pwrite(2)', `fsync(2)' or `fdatasync(2)'
+@@@return: -1: [errno=EINVAL] `self' is invalid (including the case where `self' is still
+@@                            in progress), or  its return value  has already been  read.
 [[no_crt_self_import, decl_include("<bits/crt/aiocb.h>")]]
 [[if($extended_include_prefix("<features.h>") defined(__USE_FILE_OFFSET64)), preferred_alias("aio_return64")]]
 [[if($extended_include_prefix("<features.h>")!defined(__USE_FILE_OFFSET64)), preferred_alias("aio_return")]]
-$ssize_t aio_return([[nonnull]] struct aiocb *aiocbp);
+$ssize_t aio_return([[nonnull]] struct aiocb *self);
 
 
-@@>> aio_cancel(3)
-@@@return: AIO_CANCELED:    Operations cancelled successfully
+@@>> aio_cancel(3), aio_cancel64(3)
+@@Cancel  a specific AIO  operation (self != NULL),  or all operations currently
+@@operating on a given `fd' (self !=  NULL && fd == self->aio_fildes). For  this
+@@purpose,  it is undefined if the numerical value of `fd' is used for searching
+@@active operations, or the pointed-to kernel object. As such, it is recommended
+@@that you always aio_cancel the same fd as was also used when the AIO operation
+@@was initiated.
+@@NOTE: When `AIO_CANCELED' is  returned, the completion  event of `self',  as
+@@      specified in `self->aio_sigevent' will _NOT_ have been triggered,  and
+@@      never  will be triggered. An exception to this is when `lio_listio(3)'
+@@      was used to start `self'  via `LIO_NOWAIT' and `sigev != NULL',  which
+@@      will still be triggered at some pointer after all remaining operations
+@@      of the same AIO set have completed, or were canceled as well. The same
+@@      also applies to operations of `fd' when `self == NULL'.
+@@@return: AIO_CANCELED:    Operations canceled successfully
 @@@return: AIO_NOTCANCELED: At least one operation was still in progress (s.a. `aio_error(3)')
 @@@return: AIO_ALLDONE:     Operations were already completed before the call was made
 @@@return: -1:              Error (s.a. `errno')
 [[no_crt_self_import, decl_include("<bits/types.h>", "<bits/crt/aiocb.h>")]]
 [[if($extended_include_prefix("<features.h>") defined(__USE_FILE_OFFSET64)), preferred_alias("aio_cancel64")]]
 [[if($extended_include_prefix("<features.h>")!defined(__USE_FILE_OFFSET64)), preferred_alias("aio_cancel")]]
-int aio_cancel($fd_t fildes, [[nonnull]] struct aiocb *aiocbp);
+int aio_cancel($fd_t fd, [[nullable]] struct aiocb *self);
 
 
 [[cp, ignore, nocrt, decl_include("<features.h>", "<bits/crt/aiocb.h>", "<bits/os/timespec.h>")]]
@@ -170,8 +316,8 @@ int aio_suspendt32([[nonnull]] struct aiocb const *const list[],
 
 
 @@>> aio_suspend(3), aio_suspend64(3), aio_suspendt64(3), aio_suspend64t64(3)
-@@Suspend the calling thread until at least one of the given AIO operations
-@@has been completed, a signal is delivered to, or (if non-NULL) the given
+@@Suspend  the calling thread until at least  one of the given AIO operations
+@@has been completed, a  signal is delivered to,  or (if non-NULL) the  given
 @@timeout expired.
 @@@return: 0:  Success (At least one of the given AIO operations has completed)
 @@@return: -1: [errno=EAGAIN] The given timeout expired
@@ -208,33 +354,33 @@ int aio_suspend([[nonnull]] struct aiocb const *const list[],
 %
 %#ifdef __USE_LARGEFILE64
 
-[[preferred_off64_variant_of(aio_read), doc_alias("aio_read")]]
-[[decl_include("<bits/crt/aiocb.h>")]]
-int aio_read64([[nonnull]] struct aiocb64 *aiocbp);
+[[preferred_off64_variant_of(aio_read)]]
+[[decl_include("<bits/crt/aiocb.h>"), doc_alias("aio_read")]]
+int aio_read64([[nonnull]] struct aiocb64 *self);
 
-[[preferred_off64_variant_of(aio_write), doc_alias("aio_write")]]
-[[decl_include("<bits/crt/aiocb.h>")]]
-int aio_write64([[nonnull]] struct aiocb64 *aiocbp);
+[[preferred_off64_variant_of(aio_write)]]
+[[decl_include("<bits/crt/aiocb.h>"), doc_alias("aio_write")]]
+int aio_write64([[nonnull]] struct aiocb64 *self);
 
 [[preferred_off64_variant_of(aio_fsync), doc_alias("aio_fsync")]]
-int aio_fsync64(int operation, [[nonnull]] struct aiocb64 *aiocbp);
+int aio_fsync64(int operation, [[nonnull]] struct aiocb64 *self);
 
-[[preferred_off64_variant_of(aio_write), doc_alias("aio_write")]]
+[[preferred_off64_variant_of(lio_listio), doc_alias("lio_listio")]]
 [[decl_include("<bits/os/sigevent.h>", "<bits/crt/aiocb.h>")]]
 int lio_listio64(int mode, [[nonnull]] struct aiocb64 *const list[__restrict_arr],
                  __STDC_INT_AS_SIZE_T nent, struct sigevent *__restrict sig);
 
 [[wunused, preferred_off64_variant_of(aio_error), doc_alias("aio_error")]]
 [[decl_include("<bits/crt/aiocb.h>")]]
-int aio_error64([[nonnull]] struct aiocb64 const *aiocbp);
+int aio_error64([[nonnull]] struct aiocb64 const *self);
 
 [[preferred_off64_variant_of(aio_return), doc_alias("aio_return")]]
 [[decl_include("<bits/crt/aiocb.h>")]]
-$ssize_t aio_return64([[nonnull]] struct aiocb64 *aiocbp);
+$ssize_t aio_return64([[nonnull]] struct aiocb64 *self);
 
 [[preferred_off64_variant_of(aio_cancel), doc_alias("aio_cancel")]]
 [[decl_include("<bits/crt/aiocb.h>")]]
-int aio_cancel64($fd_t fildes, [[nonnull]] struct aiocb64 *aiocbp);
+int aio_cancel64($fd_t fildes, [[nullable]] struct aiocb64 *self);
 
 [[if($extended_include_prefix("<bits/types.h>")__SIZEOF_OFF32_T__ == __SIZEOF_OFF64_T__), alias("aio_suspend")]]
 [[ignore, nocrt, doc_alias("aio_suspend"), alias("aio_suspend64")]]

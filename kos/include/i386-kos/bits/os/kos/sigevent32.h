@@ -83,7 +83,7 @@ union __pthread_attr;
 struct __sigeventx32 /*[NAME(sigeventx32)][PREFIX(sigev_)]*/ {
 	union __sigvalx32 sigev_value;
 	__INT32_TYPE__    sigev_signo;
-	__INT32_TYPE__    sigev_notify;
+	__INT32_TYPE__    sigev_notify; /* One of `SIGEV_*' */
 #if (defined(__COMPILER_HAVE_TRANSPARENT_STRUCT) && \
      defined(__COMPILER_HAVE_TRANSPARENT_UNION) &&  \
      defined(__HYBRID_PTR32_IN_TRANSPARENT_STRUCT))

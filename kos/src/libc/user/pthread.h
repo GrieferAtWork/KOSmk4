@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x3477b662 */
+/* HASH CRC-32:0xe2f9d67c */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -36,7 +36,9 @@ DECL_BEGIN
  * getting passed `arg'. Creation attributed come from `attr'. The new
  * handle is stored in `*newthread'
  * @return: EOK:    Success
- * @return: EAGAIN: Insufficient resources, or operation-not-permitted */
+ * @return: EAGAIN: Insufficient resources, or operation-not-permitted
+ *                  (read: `ENOMEM', but posix didn't want to use that
+ *                  errno for whatever reason...) */
 INTDEF NONNULL((1, 3)) errno_t NOTHROW_NCX(LIBDCALL libd_pthread_create)(pthread_t *__restrict newthread, pthread_attr_t const *__restrict attr, void *(LIBDCALL *start_routine)(void *arg), void *arg);
 #endif /* !__LIBCCALL_IS_LIBDCALL */
 #ifndef __KERNEL__
@@ -45,7 +47,9 @@ INTDEF NONNULL((1, 3)) errno_t NOTHROW_NCX(LIBDCALL libd_pthread_create)(pthread
  * getting passed `arg'. Creation attributed come from `attr'. The new
  * handle is stored in `*newthread'
  * @return: EOK:    Success
- * @return: EAGAIN: Insufficient resources, or operation-not-permitted */
+ * @return: EAGAIN: Insufficient resources, or operation-not-permitted
+ *                  (read: `ENOMEM', but posix didn't want to use that
+ *                  errno for whatever reason...) */
 INTDEF NONNULL((1, 3)) errno_t NOTHROW_NCX(LIBCCALL libc_pthread_create)(pthread_t *__restrict newthread, pthread_attr_t const *__restrict attr, void *(LIBCCALL *start_routine)(void *arg), void *arg);
 /* >> pthread_exit(3)
  * Terminate calling thread.

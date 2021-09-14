@@ -72,7 +72,7 @@ union __pthread_attr;
 struct __sigevent_cygwin /*[NAME(sigevent_cygwin)][PREFIX(sigev_)]*/ {
 	union sigval          sigev_value;
 	__INT32_TYPE__        sigev_signo;
-	__INT32_TYPE__        sigev_notify;
+	__INT32_TYPE__        sigev_notify; /* One of `SIGEV_*' */
 	void                (*sigev_notify_function)(union sigval);
 	union __pthread_attr *sigev_notify_attributes;
 };

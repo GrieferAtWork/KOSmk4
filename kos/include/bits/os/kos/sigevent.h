@@ -51,7 +51,7 @@ union __pthread_attr;
 struct sigevent /*[PREFIX(sigev_)]*/ {
 	union sigval   sigev_value;
 	__INT32_TYPE__ sigev_signo;
-	__INT32_TYPE__ sigev_notify;
+	__INT32_TYPE__ sigev_notify; /* One of `SIGEV_*' */
 #if (defined(__COMPILER_HAVE_TRANSPARENT_STRUCT) && \
      defined(__COMPILER_HAVE_TRANSPARENT_UNION))
 #ifndef __USE_KOS_ALTERATIONS

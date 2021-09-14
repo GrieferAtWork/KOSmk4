@@ -66,21 +66,18 @@ struct aiocb /*[PREFIX(aio_)]*/ {
 	char              __glibc_reserved[32];
 };
 
-#if __SIZEOF_OFF32_T__ == __SIZEOF_OFF64_T__
-#define _AIOCB_MATCHES_AIOCB64 1
-#endif /* __SIZEOF_OFF32_T__ == __SIZEOF_OFF64_T__ */
 
 #ifdef __USE_LARGEFILE64
-#if (defined(__USE_FILE_OFFSET64) || defined(_AIOCB_MATCHES_AIOCB64)) && defined(__USE_STRUCT64_MACRO)
+#if (defined(__USE_FILE_OFFSET64) || __SIZEOF_OFF32_T__ == __SIZEOF_OFF64_T__) && defined(__USE_STRUCT64_MACRO)
 #define aiocb64 aiocb
-#else /* (__USE_FILE_OFFSET64 || _AIOCB_MATCHES_AIOCB64) && __USE_STRUCT64_MACRO */
+#else /* (__USE_FILE_OFFSET64 || __SIZEOF_OFF32_T__ == __SIZEOF_OFF64_T__) && __USE_STRUCT64_MACRO */
 #define __aiocb64 aiocb64
-#endif /* (!__USE_FILE_OFFSET64 && !_AIOCB_MATCHES_AIOCB64) || !__USE_STRUCT64_MACRO */
+#endif /* (!__USE_FILE_OFFSET64 && __SIZEOF_OFF32_T__ != __SIZEOF_OFF64_T__) || !__USE_STRUCT64_MACRO */
 #endif /* __USE_LARGEFILE64 */
 
-#if (defined(__USE_FILE_OFFSET64) || defined(_AIOCB_MATCHES_AIOCB64)) && defined(__USE_STRUCT64_MACRO)
+#if (defined(__USE_FILE_OFFSET64) || __SIZEOF_OFF32_T__ == __SIZEOF_OFF64_T__) && defined(__USE_STRUCT64_MACRO)
 #define __aiocb64 aiocb
-#else /* (__USE_FILE_OFFSET64 || _AIOCB_MATCHES_AIOCB64) && __USE_STRUCT64_MACRO */
+#else /* (__USE_FILE_OFFSET64 || __SIZEOF_OFF32_T__ == __SIZEOF_OFF64_T__) && __USE_STRUCT64_MACRO */
 struct __aiocb64 /*[NAME(aiocb64)][PREFIX(tv_)]*/ {
 	__INT32_TYPE__      aio_fildes;     /* ... */
 	__INT32_TYPE__      aio_lio_opcode; /* ... */
@@ -107,46 +104,7 @@ struct __aiocb64 /*[NAME(aiocb64)][PREFIX(tv_)]*/ {
 #endif /* !__USE_KOS_ALTERATIONS */
 	char              __glibc_reserved[32];
 };
-#endif /* (!__USE_FILE_OFFSET64 && !_AIOCB_MATCHES_AIOCB64) || !__USE_STRUCT64_MACRO */
-
-#ifdef __USE_KOS
-#if !defined(__USE_FILE_OFFSET64) || __SIZEOF_OFF32_T__ == __SIZEOF_OFF64_T__
-#define aiocb32 aiocb
-#else /* !__USE_FILE_OFFSET64 || __SIZEOF_OFF32_T__ == __SIZEOF_OFF64_T__ */
-#define __aiocb32 aiocb32
-#endif /* __USE_FILE_OFFSET64 && __SIZEOF_OFF32_T__ != __SIZEOF_OFF64_T__ */
-#endif /* __USE_KOS */
-
-#if !defined(__USE_FILE_OFFSET64) || __SIZEOF_OFF32_T__ == __SIZEOF_OFF64_T__
-#define __aiocb32 aiocb
-#else /* !__USE_FILE_OFFSET64 || __SIZEOF_OFF32_T__ == __SIZEOF_OFF64_T__ */
-struct __aiocb32 /*[NAME(aiocb32)][PREFIX(tv_)]*/ {
-	__INT32_TYPE__      aio_fildes;     /* ... */
-	__INT32_TYPE__      aio_lio_opcode; /* ... */
-	__INT32_TYPE__      aio_reqprio;    /* ... */
-#if __SIZEOF_POINTER__ > 4
-	__INT32_TYPE__    __aio_pad0;       /* ... */
-#endif /* __SIZEOF_POINTER__ > 4 */
-	void volatile      *aio_buf;        /* ... */
-	__size_t            aio_nbytes;     /* ... */
-	struct sigevent     aio_sigevent;   /* ... */
-	/* Internal members. */
-	struct __aiocb32 *__next_prio;
-	__INT32_TYPE__    __abs_prio;
-	__INT32_TYPE__    __policy;
-	__INT32_TYPE__    __error_code;
-#if __SIZEOF_SIZE_T__ > 4
-	__INT32_TYPE__    __aio_pad1;       /* ... */
-#endif /* __SIZEOF_SIZE_T__ > 4 */
-	__ssize_t         __return_value;
-#ifdef __USE_KOS_ALTERATIONS
-	__pos32_t           aio_offset;     /* ... */
-#else /* __USE_KOS_ALTERATIONS */
-	__off32_t           aio_offset;     /* ... */
-#endif /* !__USE_KOS_ALTERATIONS */
-	char              __glibc_reserved[32];
-};
-#endif /* __USE_FILE_OFFSET64 && __SIZEOF_OFF32_T__ != __SIZEOF_OFF64_T__ */
+#endif /* (!__USE_FILE_OFFSET64 && __SIZEOF_OFF32_T__ != __SIZEOF_OFF64_T__) || !__USE_STRUCT64_MACRO */
 
 #ifdef __COMPILER_HAVE_PRAGMA_PUSHMACRO
 #pragma pop_macro("tv_nsec")

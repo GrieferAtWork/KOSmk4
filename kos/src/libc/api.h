@@ -73,6 +73,11 @@
 #undef _FILE_OFFSET_BITS
 #define _FILE_OFFSET_BITS 32
 
+/* This right here allows for some neat tricks, as well as less overall
+ * code which needs to be compiled. */
+#undef _STRUCT64_MACRO_SOURCE
+#define _STRUCT64_MACRO_SOURCE 1
+
 #include <__crt.h>
 
 /* Pull in CRT feature definitions */

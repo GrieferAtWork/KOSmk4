@@ -649,6 +649,8 @@ typedef __pthread_barrierattr_t pthread_barrierattr_t;
 @@handle is stored in `*newthread'
 @@@return: EOK:    Success
 @@@return: EAGAIN: Insufficient resources, or operation-not-permitted
+@@                 (read: `ENOMEM', but posix didn't want to use that
+@@                 errno for whatever reason...)
 [[decl_include("<bits/types.h>", "<bits/crt/pthreadtypes.h>")]]
 [[crt_dos_impl_if(!defined(__LIBCCALL_IS_LIBDCALL)), crt_dos_variant]]
 $errno_t pthread_create([[nonnull]] pthread_t *__restrict newthread, pthread_attr_t const *__restrict attr,
