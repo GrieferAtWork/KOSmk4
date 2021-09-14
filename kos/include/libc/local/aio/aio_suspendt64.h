@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x9d876fe4 */
+/* HASH CRC-32:0xb6783d4a */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -23,20 +23,14 @@
 #include <__crt.h>
 #include <features.h>
 #if (defined(__CRT_HAVE_aio_suspend64) && defined(__USE_FILE_OFFSET64)) || (defined(__CRT_HAVE_aio_suspend) && !defined(__USE_FILE_OFFSET64))
+#include <bits/crt/aiocb.h>
+#include <bits/os/timespec.h>
 __NAMESPACE_LOCAL_BEGIN
 #ifndef __local___localdep_aio_suspendt32_defined
 #define __local___localdep_aio_suspendt32_defined 1
 #if defined(__CRT_HAVE_aio_suspend64) && defined(__USE_FILE_OFFSET64)
-__NAMESPACE_LOCAL_END
-#include <bits/crt/aiocb.h>
-#include <bits/os/timespec.h>
-__NAMESPACE_LOCAL_BEGIN
 __CREDIRECT(__ATTR_NONNULL((1)),int,__NOTHROW_RPC,__localdep_aio_suspendt32,(struct aiocb const *const __list[], __STDC_INT_AS_SIZE_T __nent, struct __timespec32 const *__restrict __timeout),aio_suspend64,(__list,__nent,__timeout))
 #elif defined(__CRT_HAVE_aio_suspend) && !defined(__USE_FILE_OFFSET64)
-__NAMESPACE_LOCAL_END
-#include <bits/crt/aiocb.h>
-#include <bits/os/timespec.h>
-__NAMESPACE_LOCAL_BEGIN
 __CREDIRECT(__ATTR_NONNULL((1)),int,__NOTHROW_RPC,__localdep_aio_suspendt32,(struct aiocb const *const __list[], __STDC_INT_AS_SIZE_T __nent, struct __timespec32 const *__restrict __timeout),aio_suspend,(__list,__nent,__timeout))
 #else /* ... */
 #undef __local___localdep_aio_suspendt32_defined

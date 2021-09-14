@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xf0ce11d9 */
+/* HASH CRC-32:0x70b4fe9e */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -23,6 +23,9 @@
 #include <__crt.h>
 #include <bits/types.h>
 #if (defined(__CRT_HAVE_aio_suspendt64) && __SIZEOF_OFF32_T__ == __SIZEOF_OFF64_T__) || (defined(__CRT_HAVE_aio_suspend) && __SIZEOF_OFF32_T__ == __SIZEOF_OFF64_T__) || defined(__CRT_HAVE_aio_suspend64)
+#include <features.h>
+#include <bits/crt/aiocb.h>
+#include <bits/os/timespec.h>
 __NAMESPACE_LOCAL_BEGIN
 #ifndef __local___localdep_aio_suspend64t32_defined
 #define __local___localdep_aio_suspend64t32_defined 1

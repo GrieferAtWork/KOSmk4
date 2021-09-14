@@ -99,31 +99,51 @@ typedef struct sigevent sigevent_t;
 
 
 @@>> aio_read(3)
+@@Begin an async `read(2)' operation (TODO: Document fields used)
 [[no_crt_self_import, decl_include("<bits/crt/aiocb.h>")]]
 [[if($extended_include_prefix("<features.h>") defined(__USE_FILE_OFFSET64)), preferred_alias("aio_read64")]]
 [[if($extended_include_prefix("<features.h>")!defined(__USE_FILE_OFFSET64)), preferred_alias("aio_read")]]
 int aio_read([[nonnull]] struct aiocb *aiocbp);
 
 @@>> aio_write(3)
+@@Begin an async `write(2)' operation (TODO: Document fields used)
 [[no_crt_self_import, decl_include("<bits/crt/aiocb.h>")]]
 [[if($extended_include_prefix("<features.h>") defined(__USE_FILE_OFFSET64)), preferred_alias("aio_write64")]]
 [[if($extended_include_prefix("<features.h>")!defined(__USE_FILE_OFFSET64)), preferred_alias("aio_write")]]
 int aio_write([[nonnull]] struct aiocb *aiocbp);
 
 
+@@>> aio_fsync(3)
+@@Begin an async `fsync(2)' operation (TODO: Document fields used)
+[[no_crt_self_import, decl_include("<bits/types.h>", "<bits/crt/aiocb.h>")]]
+[[if($extended_include_prefix("<features.h>") defined(__USE_FILE_OFFSET64)), preferred_alias("aio_fsync64")]]
+[[if($extended_include_prefix("<features.h>")!defined(__USE_FILE_OFFSET64)), preferred_alias("aio_fsync")]]
+int aio_fsync(int operation, [[nonnull]] struct aiocb *aiocbp);
+
+
+@@>> lio_listio(3)
+@@Execute/perform a `list' of AIO operations
+@@@param: mode: One of `LIO_WAIT', `LIO_NOWAIT'
 [[decl_include("<features.h>", "<bits/os/sigevent.h>", "<bits/crt/aiocb.h>")]]
 int lio_listio(int mode, [[nonnull]] struct aiocb *const list[__restrict_arr],
                __STDC_INT_AS_SIZE_T nent, struct sigevent *__restrict sig);
 
 
 @@>> aio_error(3)
-[[wunused, no_crt_self_import, decl_include("<bits/crt/aiocb.h>")]]
+@@@return: 0 :          Operation completed
+@@@return: EINPROGRESS: Async operation is still in progress
+@@@return: ECANCELED:   Operation was cancelled
+@@@return: * :          The  `errno'  with  which  the  async  operation  failed.
+@@                      s.a. `read(2)', `write(2)', `fsync(2)' and `fdatasync(2)'
+[[wunused, no_crt_self_import, decl_include("<bits/crt/aiocb.h>", "<bits/types.h>")]]
 [[if($extended_include_prefix("<features.h>") defined(__USE_FILE_OFFSET64)), preferred_alias("aio_error64")]]
 [[if($extended_include_prefix("<features.h>")!defined(__USE_FILE_OFFSET64)), preferred_alias("aio_error")]]
-int aio_error([[nonnull]] struct aiocb const *aiocbp);
+$errno_t aio_error([[nonnull]] struct aiocb const *aiocbp);
 
 
 @@>> aio_return(3)
+@@@return: * : Return value of async `read(2)', `write(2)', `fsync(2)' or `fdatasync(2)'
+@@@return: -1: Error (s.a. `errno')
 [[no_crt_self_import, decl_include("<bits/crt/aiocb.h>")]]
 [[if($extended_include_prefix("<features.h>") defined(__USE_FILE_OFFSET64)), preferred_alias("aio_return64")]]
 [[if($extended_include_prefix("<features.h>")!defined(__USE_FILE_OFFSET64)), preferred_alias("aio_return")]]
@@ -131,6 +151,10 @@ $ssize_t aio_return([[nonnull]] struct aiocb *aiocbp);
 
 
 @@>> aio_cancel(3)
+@@@return: AIO_CANCELED:    Operations cancelled successfully
+@@@return: AIO_NOTCANCELED: At least one operation was still in progress (s.a. `aio_error(3)')
+@@@return: AIO_ALLDONE:     Operations were already completed before the call was made
+@@@return: -1:              Error (s.a. `errno')
 [[no_crt_self_import, decl_include("<bits/types.h>", "<bits/crt/aiocb.h>")]]
 [[if($extended_include_prefix("<features.h>") defined(__USE_FILE_OFFSET64)), preferred_alias("aio_cancel64")]]
 [[if($extended_include_prefix("<features.h>")!defined(__USE_FILE_OFFSET64)), preferred_alias("aio_cancel")]]
@@ -146,6 +170,13 @@ int aio_suspendt32([[nonnull]] struct aiocb const *const list[],
 
 
 @@>> aio_suspend(3), aio_suspend64(3), aio_suspendt64(3), aio_suspend64t64(3)
+@@Suspend the calling thread until at least one of the given AIO operations
+@@has been completed, a signal is delivered to, or (if non-NULL) the given
+@@timeout expired.
+@@@return: 0:  Success (At least one of the given AIO operations has completed)
+@@@return: -1: [errno=EAGAIN] The given timeout expired
+@@@return: -1: [errno=EINTR]  A signal was delivered to the calling thread
+@@@return: -1: Error (s.a. `errno')
 [[cp, no_crt_self_import, decl_include("<features.h>", "<bits/crt/aiocb.h>", "<bits/os/timespec.h>")]]
 [[if($extended_include_prefix("<features.h>") defined(__USE_FILE_OFFSET64) &&  defined(__USE_TIME_BITS64)), preferred_alias("aio_suspend64t64")]]
 [[if($extended_include_prefix("<features.h>")!defined(__USE_FILE_OFFSET64) &&  defined(__USE_TIME_BITS64)), preferred_alias("aio_suspendt64")]]
@@ -173,37 +204,41 @@ int aio_suspend([[nonnull]] struct aiocb const *const list[],
 }
 
 
-@@>> aio_fsync(3)
-[[no_crt_self_import, decl_include("<bits/types.h>", "<bits/crt/aiocb.h>")]]
-[[if($extended_include_prefix("<features.h>") defined(__USE_FILE_OFFSET64)), preferred_alias("aio_fsync64")]]
-[[if($extended_include_prefix("<features.h>")!defined(__USE_FILE_OFFSET64)), preferred_alias("aio_fsync")]]
-int aio_fsync(int operation, [[nonnull]] struct aiocb *aiocbp);
-
 
 %
 %#ifdef __USE_LARGEFILE64
 
 [[preferred_off64_variant_of(aio_read), doc_alias("aio_read")]]
+[[decl_include("<bits/crt/aiocb.h>")]]
 int aio_read64([[nonnull]] struct aiocb64 *aiocbp);
 
 [[preferred_off64_variant_of(aio_write), doc_alias("aio_write")]]
+[[decl_include("<bits/crt/aiocb.h>")]]
 int aio_write64([[nonnull]] struct aiocb64 *aiocbp);
 
+[[preferred_off64_variant_of(aio_fsync), doc_alias("aio_fsync")]]
+int aio_fsync64(int operation, [[nonnull]] struct aiocb64 *aiocbp);
+
 [[preferred_off64_variant_of(aio_write), doc_alias("aio_write")]]
+[[decl_include("<bits/os/sigevent.h>", "<bits/crt/aiocb.h>")]]
 int lio_listio64(int mode, [[nonnull]] struct aiocb64 *const list[__restrict_arr],
                  __STDC_INT_AS_SIZE_T nent, struct sigevent *__restrict sig);
 
 [[wunused, preferred_off64_variant_of(aio_error), doc_alias("aio_error")]]
+[[decl_include("<bits/crt/aiocb.h>")]]
 int aio_error64([[nonnull]] struct aiocb64 const *aiocbp);
 
 [[preferred_off64_variant_of(aio_return), doc_alias("aio_return")]]
+[[decl_include("<bits/crt/aiocb.h>")]]
 $ssize_t aio_return64([[nonnull]] struct aiocb64 *aiocbp);
 
 [[preferred_off64_variant_of(aio_cancel), doc_alias("aio_cancel")]]
+[[decl_include("<bits/crt/aiocb.h>")]]
 int aio_cancel64($fd_t fildes, [[nonnull]] struct aiocb64 *aiocbp);
 
 [[if($extended_include_prefix("<bits/types.h>")__SIZEOF_OFF32_T__ == __SIZEOF_OFF64_T__), alias("aio_suspend")]]
 [[ignore, nocrt, doc_alias("aio_suspend"), alias("aio_suspend64")]]
+[[decl_include("<features.h>", "<bits/crt/aiocb.h>", "<bits/os/timespec.h>")]]
 int aio_suspend64t32([[nonnull]] struct aiocb64 const *const list[],
                      __STDC_INT_AS_SIZE_T nent,
                      struct $timespec32 const *__restrict timeout);
@@ -214,6 +249,7 @@ int aio_suspend64t32([[nonnull]] struct aiocb64 const *const list[],
 [[if($extended_include_prefix("<features.h>", "<bits/types.h>")__SIZEOF_OFF32_T__ == __SIZEOF_OFF64_T__ && ( defined(__USE_TIME_BITS64) || __SIZEOF_TIME32_T__ == __SIZEOF_TIME64_T__)), preferred_alias("aio_suspendt64")]]
 [[if($extended_include_prefix("<features.h>", "<bits/types.h>")                                             !defined(__USE_TIME_BITS64) || __SIZEOF_TIME32_T__ == __SIZEOF_TIME64_T__),  preferred_alias("aio_suspend64")]]
 [[if($extended_include_prefix("<features.h>", "<bits/types.h>")                                              defined(__USE_TIME_BITS64) || __SIZEOF_TIME32_T__ == __SIZEOF_TIME64_T__),  preferred_alias("aio_suspend64t64")]]
+[[decl_include("<features.h>", "<bits/crt/aiocb.h>", "<bits/os/timespec.h>")]]
 [[userimpl, requires($has_function(aio_suspend64t32) || $has_function(aio_suspend64t64))]]
 int aio_suspend64([[nonnull]] struct aiocb64 const *const list[],
                   __STDC_INT_AS_SIZE_T nent,
@@ -235,9 +271,6 @@ int aio_suspend64([[nonnull]] struct aiocb64 const *const list[],
 @@pp_endif@@
 }
 
-[[preferred_off64_variant_of(aio_fsync), doc_alias("aio_fsync")]]
-int aio_fsync64(int operation, [[nonnull]] struct aiocb64 *aiocbp);
-
 %#endif /* __USE_LARGEFILE64 */
 
 
@@ -248,6 +281,7 @@ int aio_fsync64(int operation, [[nonnull]] struct aiocb64 *aiocbp);
 [[if($extended_include_prefix("<bits/types.h>")__SIZEOF_TIME32_T__ == __SIZEOF_TIME64_T__), crt_intern_kos_alias("libc_aio_suspend")]]
 [[if($extended_include_prefix("<features.h>") defined(__USE_FILE_OFFSET64)), preferred_alias("aio_suspend64t64")]]
 [[if($extended_include_prefix("<features.h>")!defined(__USE_FILE_OFFSET64)), preferred_alias("aio_suspendt64")]]
+[[decl_include("<features.h>", "<bits/crt/aiocb.h>", "<bits/os/timespec.h>")]]
 [[userimpl, requires_function(aio_suspendt32)]]
 int aio_suspendt64([[nonnull]] struct aiocb const *const list[],
                    __STDC_INT_AS_SIZE_T nent,
@@ -267,6 +301,7 @@ int aio_suspendt64([[nonnull]] struct aiocb const *const list[],
 [[if($extended_include_prefix("<bits/types.h>")__SIZEOF_OFF32_T__ == __SIZEOF_OFF64_T__ && __SIZEOF_TIME32_T__ == __SIZEOF_TIME64_T__), preferred_alt_variant_of(aio_suspend)]]
 [[if($extended_include_prefix("<bits/types.h>")__SIZEOF_OFF32_T__ == __SIZEOF_OFF64_T__), preferred_alt_variant_of(aio_suspendt64)]]
 [[if($extended_include_prefix("<bits/types.h>")__SIZEOF_TIME32_T__ == __SIZEOF_TIME64_T__), preferred_alt_variant_of(aio_suspend64)]]
+[[decl_include("<features.h>", "<bits/crt/aiocb.h>", "<bits/os/timespec.h>")]]
 [[userimpl, requires_function(aio_suspend64t32)]]
 int aio_suspend64t64([[nonnull]] struct aiocb64 const *const list[],
                      __STDC_INT_AS_SIZE_T nent,
@@ -299,4 +334,3 @@ __SYSDECL_END
 #endif /* __CC__ */
 
 }
-

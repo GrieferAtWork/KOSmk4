@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x4febd458 */
+/* HASH CRC-32:0xda5bd723 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -25,20 +25,20 @@
 /* aio */
 DEFINE_PUBLIC_ALIAS(DOS$aio_read, libd_aio_read);
 DEFINE_PUBLIC_ALIAS(DOS$aio_write, libd_aio_write);
+DEFINE_PUBLIC_ALIAS(DOS$aio_fsync, libd_aio_fsync);
 DEFINE_PUBLIC_ALIAS(DOS$lio_listio, libd_lio_listio);
 DEFINE_PUBLIC_ALIAS(DOS$aio_error, libd_aio_error);
 DEFINE_PUBLIC_ALIAS(DOS$aio_return, libd_aio_return);
 DEFINE_PUBLIC_ALIAS(DOS$aio_cancel, libd_aio_cancel);
 DEFINE_PUBLIC_ALIAS(DOS$aio_suspend, libd_aio_suspend);
-DEFINE_PUBLIC_ALIAS(DOS$aio_fsync, libd_aio_fsync);
 DEFINE_PUBLIC_ALIAS(DOS$aio_read64, libd_aio_read64);
 DEFINE_PUBLIC_ALIAS(DOS$aio_write64, libd_aio_write64);
+DEFINE_PUBLIC_ALIAS(DOS$aio_fsync64, libd_aio_fsync64);
 DEFINE_PUBLIC_ALIAS(DOS$lio_listio64, libd_lio_listio64);
 DEFINE_PUBLIC_ALIAS(DOS$aio_error64, libd_aio_error64);
 DEFINE_PUBLIC_ALIAS(DOS$aio_return64, libd_aio_return64);
 DEFINE_PUBLIC_ALIAS(DOS$aio_cancel64, libd_aio_cancel64);
 DEFINE_PUBLIC_ALIAS(DOS$aio_suspend64, libd_aio_suspend64);
-DEFINE_PUBLIC_ALIAS(DOS$aio_fsync64, libd_aio_fsync64);
 DEFINE_PUBLIC_ALIAS(DOS$aio_suspendt64, libd_aio_suspendt64);
 DEFINE_PUBLIC_ALIAS(DOS$aio_suspend64t64, libd_aio_suspend64t64);
 DEFINE_PUBLIC_ALIAS(DOS$aio_init, libd_aio_init);

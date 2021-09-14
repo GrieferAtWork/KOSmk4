@@ -27,8 +27,9 @@
 
 DECL_BEGIN
 
-/*[[[head:libc_aio_read,hash:CRC-32=0xa2205a2c]]]*/
-/* >> aio_read(3) */
+/*[[[head:libc_aio_read,hash:CRC-32=0x6b00dafd]]]*/
+/* >> aio_read(3)
+ * Begin an async `read(2)' operation (TODO: Document fields used) */
 INTERN ATTR_SECTION(".text.crt.utility.aio") NONNULL((1)) int
 NOTHROW_NCX(LIBCCALL libc_aio_read)(struct aiocb *aiocbp)
 /*[[[body:libc_aio_read]]]*/
@@ -40,8 +41,9 @@ NOTHROW_NCX(LIBCCALL libc_aio_read)(struct aiocb *aiocbp)
 }
 /*[[[end:libc_aio_read]]]*/
 
-/*[[[head:libc_aio_write,hash:CRC-32=0x37e8abb0]]]*/
-/* >> aio_write(3) */
+/*[[[head:libc_aio_write,hash:CRC-32=0x5f0b3a23]]]*/
+/* >> aio_write(3)
+ * Begin an async `write(2)' operation (TODO: Document fields used) */
 INTERN ATTR_SECTION(".text.crt.utility.aio") NONNULL((1)) int
 NOTHROW_NCX(LIBCCALL libc_aio_write)(struct aiocb *aiocbp)
 /*[[[body:libc_aio_write]]]*/
@@ -53,7 +55,10 @@ NOTHROW_NCX(LIBCCALL libc_aio_write)(struct aiocb *aiocbp)
 }
 /*[[[end:libc_aio_write]]]*/
 
-/*[[[head:libc_lio_listio,hash:CRC-32=0x20e6156f]]]*/
+/*[[[head:libc_lio_listio,hash:CRC-32=0xbfadfe9f]]]*/
+/* >> lio_listio(3)
+ * Execute/perform a `list' of AIO operations
+ * @param: mode: One of `LIO_WAIT', `LIO_NOWAIT' */
 INTERN ATTR_SECTION(".text.crt.utility.aio") NONNULL((2)) int
 NOTHROW_NCX(LIBCCALL libc_lio_listio)(int mode,
                                       struct aiocb *const list[__restrict_arr],
@@ -71,21 +76,27 @@ NOTHROW_NCX(LIBCCALL libc_lio_listio)(int mode,
 }
 /*[[[end:libc_lio_listio]]]*/
 
-/*[[[head:libc_aio_error,hash:CRC-32=0xf7f2e502]]]*/
-/* >> aio_error(3) */
-INTERN ATTR_SECTION(".text.crt.utility.aio") WUNUSED NONNULL((1)) int
+/*[[[head:libc_aio_error,hash:CRC-32=0xa63a105c]]]*/
+/* >> aio_error(3)
+ * @return: 0 :          Operation completed
+ * @return: EINPROGRESS: Async operation is still in progress
+ * @return: ECANCELED:   Operation was cancelled
+ * @return: * :          The  `errno'  with  which  the  async  operation  failed.
+ *                       s.a. `read(2)', `write(2)', `fsync(2)' and `fdatasync(2)' */
+INTERN ATTR_SECTION(".text.crt.utility.aio") WUNUSED NONNULL((1)) errno_t
 NOTHROW_NCX(LIBCCALL libc_aio_error)(struct aiocb const *aiocbp)
 /*[[[body:libc_aio_error]]]*/
 /*AUTO*/{
 	(void)aiocbp;
 	CRT_UNIMPLEMENTEDF("aio_error(%p)", aiocbp); /* TODO */
-	libc_seterrno(ENOSYS);
-	return 0;
+	return ENOSYS;
 }
 /*[[[end:libc_aio_error]]]*/
 
-/*[[[head:libc_aio_return,hash:CRC-32=0x9ee14214]]]*/
-/* >> aio_return(3) */
+/*[[[head:libc_aio_return,hash:CRC-32=0xda72ed56]]]*/
+/* >> aio_return(3)
+ * @return: * : Return value of async `read(2)', `write(2)', `fsync(2)' or `fdatasync(2)'
+ * @return: -1: Error (s.a. `errno') */
 INTERN ATTR_SECTION(".text.crt.utility.aio") NONNULL((1)) ssize_t
 NOTHROW_NCX(LIBCCALL libc_aio_return)(struct aiocb *aiocbp)
 /*[[[body:libc_aio_return]]]*/
@@ -97,8 +108,12 @@ NOTHROW_NCX(LIBCCALL libc_aio_return)(struct aiocb *aiocbp)
 }
 /*[[[end:libc_aio_return]]]*/
 
-/*[[[head:libc_aio_cancel,hash:CRC-32=0xc6cda7f]]]*/
-/* >> aio_cancel(3) */
+/*[[[head:libc_aio_cancel,hash:CRC-32=0x9892ab7c]]]*/
+/* >> aio_cancel(3)
+ * @return: AIO_CANCELED:    Operations cancelled successfully
+ * @return: AIO_NOTCANCELED: At least one operation was still in progress (s.a. `aio_error(3)')
+ * @return: AIO_ALLDONE:     Operations were already completed before the call was made
+ * @return: -1:              Error (s.a. `errno') */
 INTERN ATTR_SECTION(".text.crt.utility.aio") NONNULL((2)) int
 NOTHROW_NCX(LIBCCALL libc_aio_cancel)(fd_t fildes,
                                       struct aiocb *aiocbp)
@@ -112,8 +127,15 @@ NOTHROW_NCX(LIBCCALL libc_aio_cancel)(fd_t fildes,
 }
 /*[[[end:libc_aio_cancel]]]*/
 
-/*[[[head:libc_aio_suspend,hash:CRC-32=0xd42ea9e4]]]*/
-/* >> aio_suspend(3), aio_suspend64(3), aio_suspendt64(3), aio_suspend64t64(3) */
+/*[[[head:libc_aio_suspend,hash:CRC-32=0x47cb502a]]]*/
+/* >> aio_suspend(3), aio_suspend64(3), aio_suspendt64(3), aio_suspend64t64(3)
+ * Suspend the calling thread until at least one of the given AIO operations
+ * has been completed, a signal is delivered to, or (if non-NULL) the given
+ * timeout expired.
+ * @return: 0:  Success (At least one of the given AIO operations has completed)
+ * @return: -1: [errno=EAGAIN] The given timeout expired
+ * @return: -1: [errno=EINTR]  A signal was delivered to the calling thread
+ * @return: -1: Error (s.a. `errno') */
 INTERN ATTR_SECTION(".text.crt.utility.aio") NONNULL((1)) int
 NOTHROW_RPC(LIBCCALL libc_aio_suspend)(struct aiocb const *const list[],
                                        __STDC_INT_AS_SIZE_T nent,
@@ -129,8 +151,9 @@ NOTHROW_RPC(LIBCCALL libc_aio_suspend)(struct aiocb const *const list[],
 }
 /*[[[end:libc_aio_suspend]]]*/
 
-/*[[[head:libc_aio_fsync,hash:CRC-32=0xe89759c5]]]*/
-/* >> aio_fsync(3) */
+/*[[[head:libc_aio_fsync,hash:CRC-32=0x45d00f99]]]*/
+/* >> aio_fsync(3)
+ * Begin an async `fsync(2)' operation (TODO: Document fields used) */
 INTERN ATTR_SECTION(".text.crt.utility.aio") NONNULL((2)) int
 NOTHROW_NCX(LIBCCALL libc_aio_fsync)(int operation,
                                      struct aiocb *aiocbp)
@@ -144,11 +167,12 @@ NOTHROW_NCX(LIBCCALL libc_aio_fsync)(int operation,
 }
 /*[[[end:libc_aio_fsync]]]*/
 
-/*[[[head:libc_aio_read64,hash:CRC-32=0x7729d2a3]]]*/
+/*[[[head:libc_aio_read64,hash:CRC-32=0xf0e84912]]]*/
 #if __SIZEOF_OFF32_T__ == __SIZEOF_OFF64_T__
 DEFINE_INTERN_ALIAS(libc_aio_read64, libc_aio_read);
 #else /* MAGIC:alias */
-/* >> aio_read(3) */
+/* >> aio_read(3)
+ * Begin an async `read(2)' operation (TODO: Document fields used) */
 INTERN ATTR_SECTION(".text.crt.utility.aio") NONNULL((1)) int
 NOTHROW_NCX(LIBCCALL libc_aio_read64)(struct aiocb64 *aiocbp)
 /*[[[body:libc_aio_read64]]]*/
@@ -161,11 +185,12 @@ NOTHROW_NCX(LIBCCALL libc_aio_read64)(struct aiocb64 *aiocbp)
 #endif /* MAGIC:alias */
 /*[[[end:libc_aio_read64]]]*/
 
-/*[[[head:libc_aio_write64,hash:CRC-32=0xefb73f4c]]]*/
+/*[[[head:libc_aio_write64,hash:CRC-32=0x23e5a02c]]]*/
 #if __SIZEOF_OFF32_T__ == __SIZEOF_OFF64_T__
 DEFINE_INTERN_ALIAS(libc_aio_write64, libc_aio_write);
 #else /* MAGIC:alias */
-/* >> aio_write(3) */
+/* >> aio_write(3)
+ * Begin an async `write(2)' operation (TODO: Document fields used) */
 INTERN ATTR_SECTION(".text.crt.utility.aio") NONNULL((1)) int
 NOTHROW_NCX(LIBCCALL libc_aio_write64)(struct aiocb64 *aiocbp)
 /*[[[body:libc_aio_write64]]]*/
@@ -178,11 +203,12 @@ NOTHROW_NCX(LIBCCALL libc_aio_write64)(struct aiocb64 *aiocbp)
 #endif /* MAGIC:alias */
 /*[[[end:libc_aio_write64]]]*/
 
-/*[[[head:libc_lio_listio64,hash:CRC-32=0x2c76158f]]]*/
+/*[[[head:libc_lio_listio64,hash:CRC-32=0x9b40a72d]]]*/
 #if __SIZEOF_OFF32_T__ == __SIZEOF_OFF64_T__
 DEFINE_INTERN_ALIAS(libc_lio_listio64, libc_aio_write);
 #else /* MAGIC:alias */
-/* >> aio_write(3) */
+/* >> aio_write(3)
+ * Begin an async `write(2)' operation (TODO: Document fields used) */
 INTERN ATTR_SECTION(".text.crt.utility.aio") NONNULL((2)) int
 NOTHROW_NCX(LIBCCALL libc_lio_listio64)(int mode,
                                         struct aiocb64 *const list[__restrict_arr],
@@ -201,11 +227,16 @@ NOTHROW_NCX(LIBCCALL libc_lio_listio64)(int mode,
 #endif /* MAGIC:alias */
 /*[[[end:libc_lio_listio64]]]*/
 
-/*[[[head:libc_aio_error64,hash:CRC-32=0xd02c4e8]]]*/
+/*[[[head:libc_aio_error64,hash:CRC-32=0xc2a4b5f7]]]*/
 #if __SIZEOF_OFF32_T__ == __SIZEOF_OFF64_T__
 DEFINE_INTERN_ALIAS(libc_aio_error64, libc_aio_error);
 #else /* MAGIC:alias */
-/* >> aio_error(3) */
+/* >> aio_error(3)
+ * @return: 0 :          Operation completed
+ * @return: EINPROGRESS: Async operation is still in progress
+ * @return: ECANCELED:   Operation was cancelled
+ * @return: * :          The  `errno'  with  which  the  async  operation  failed.
+ *                       s.a. `read(2)', `write(2)', `fsync(2)' and `fdatasync(2)' */
 INTERN ATTR_SECTION(".text.crt.utility.aio") WUNUSED NONNULL((1)) int
 NOTHROW_NCX(LIBCCALL libc_aio_error64)(struct aiocb64 const *aiocbp)
 /*[[[body:libc_aio_error64]]]*/
@@ -218,11 +249,13 @@ NOTHROW_NCX(LIBCCALL libc_aio_error64)(struct aiocb64 const *aiocbp)
 #endif /* MAGIC:alias */
 /*[[[end:libc_aio_error64]]]*/
 
-/*[[[head:libc_aio_return64,hash:CRC-32=0xda8523c7]]]*/
+/*[[[head:libc_aio_return64,hash:CRC-32=0x847b7ca3]]]*/
 #if __SIZEOF_OFF32_T__ == __SIZEOF_OFF64_T__
 DEFINE_INTERN_ALIAS(libc_aio_return64, libc_aio_return);
 #else /* MAGIC:alias */
-/* >> aio_return(3) */
+/* >> aio_return(3)
+ * @return: * : Return value of async `read(2)', `write(2)', `fsync(2)' or `fdatasync(2)'
+ * @return: -1: Error (s.a. `errno') */
 INTERN ATTR_SECTION(".text.crt.utility.aio") NONNULL((1)) ssize_t
 NOTHROW_NCX(LIBCCALL libc_aio_return64)(struct aiocb64 *aiocbp)
 /*[[[body:libc_aio_return64]]]*/
@@ -235,11 +268,15 @@ NOTHROW_NCX(LIBCCALL libc_aio_return64)(struct aiocb64 *aiocbp)
 #endif /* MAGIC:alias */
 /*[[[end:libc_aio_return64]]]*/
 
-/*[[[head:libc_aio_cancel64,hash:CRC-32=0x2ed9234]]]*/
+/*[[[head:libc_aio_cancel64,hash:CRC-32=0xa9831f6d]]]*/
 #if __SIZEOF_OFF32_T__ == __SIZEOF_OFF64_T__
 DEFINE_INTERN_ALIAS(libc_aio_cancel64, libc_aio_cancel);
 #else /* MAGIC:alias */
-/* >> aio_cancel(3) */
+/* >> aio_cancel(3)
+ * @return: AIO_CANCELED:    Operations cancelled successfully
+ * @return: AIO_NOTCANCELED: At least one operation was still in progress (s.a. `aio_error(3)')
+ * @return: AIO_ALLDONE:     Operations were already completed before the call was made
+ * @return: -1:              Error (s.a. `errno') */
 INTERN ATTR_SECTION(".text.crt.utility.aio") NONNULL((2)) int
 NOTHROW_NCX(LIBCCALL libc_aio_cancel64)(fd_t fildes,
                                         struct aiocb64 *aiocbp)
@@ -254,11 +291,18 @@ NOTHROW_NCX(LIBCCALL libc_aio_cancel64)(fd_t fildes,
 #endif /* MAGIC:alias */
 /*[[[end:libc_aio_cancel64]]]*/
 
-/*[[[head:libc_aio_suspend64,hash:CRC-32=0x2134f30c]]]*/
+/*[[[head:libc_aio_suspend64,hash:CRC-32=0x48a2c74f]]]*/
 #if __SIZEOF_OFF32_T__ == __SIZEOF_OFF64_T__
 DEFINE_INTERN_ALIAS(libc_aio_suspend64, libc_aio_suspend);
 #else /* MAGIC:alias */
-/* >> aio_suspend(3), aio_suspend64(3), aio_suspendt64(3), aio_suspend64t64(3) */
+/* >> aio_suspend(3), aio_suspend64(3), aio_suspendt64(3), aio_suspend64t64(3)
+ * Suspend the calling thread until at least one of the given AIO operations
+ * has been completed, a signal is delivered to, or (if non-NULL) the given
+ * timeout expired.
+ * @return: 0:  Success (At least one of the given AIO operations has completed)
+ * @return: -1: [errno=EAGAIN] The given timeout expired
+ * @return: -1: [errno=EINTR]  A signal was delivered to the calling thread
+ * @return: -1: Error (s.a. `errno') */
 INTERN ATTR_SECTION(".text.crt.utility.aio") NONNULL((1)) int
 NOTHROW_NCX(LIBCCALL libc_aio_suspend64)(struct aiocb64 const *const list[],
                                          __STDC_INT_AS_SIZE_T nent,
@@ -275,11 +319,12 @@ NOTHROW_NCX(LIBCCALL libc_aio_suspend64)(struct aiocb64 const *const list[],
 #endif /* MAGIC:alias */
 /*[[[end:libc_aio_suspend64]]]*/
 
-/*[[[head:libc_aio_fsync64,hash:CRC-32=0xf8b8d0f5]]]*/
+/*[[[head:libc_aio_fsync64,hash:CRC-32=0xbdb2c539]]]*/
 #if __SIZEOF_OFF32_T__ == __SIZEOF_OFF64_T__
 DEFINE_INTERN_ALIAS(libc_aio_fsync64, libc_aio_fsync);
 #else /* MAGIC:alias */
-/* >> aio_fsync(3) */
+/* >> aio_fsync(3)
+ * Begin an async `fsync(2)' operation (TODO: Document fields used) */
 INTERN ATTR_SECTION(".text.crt.utility.aio") NONNULL((2)) int
 NOTHROW_NCX(LIBCCALL libc_aio_fsync64)(int operation,
                                        struct aiocb64 *aiocbp)
@@ -294,13 +339,20 @@ NOTHROW_NCX(LIBCCALL libc_aio_fsync64)(int operation,
 #endif /* MAGIC:alias */
 /*[[[end:libc_aio_fsync64]]]*/
 
-/*[[[head:libc_aio_suspendt64,hash:CRC-32=0x3ea5ca0]]]*/
+/*[[[head:libc_aio_suspendt64,hash:CRC-32=0xcbe8c7cc]]]*/
 #if __SIZEOF_TIME32_T__ == __SIZEOF_TIME64_T__
 DEFINE_INTERN_ALIAS(libc_aio_suspendt64, libc_aio_suspend);
 #elif __SIZEOF_TIME32_T__ == __SIZEOF_TIME64_T__
 DEFINE_INTERN_ALIAS(libc_aio_suspendt64, libc_aio_suspend);
 #else /* MAGIC:alias */
-/* >> aio_suspend(3), aio_suspend64(3), aio_suspendt64(3), aio_suspend64t64(3) */
+/* >> aio_suspend(3), aio_suspend64(3), aio_suspendt64(3), aio_suspend64t64(3)
+ * Suspend the calling thread until at least one of the given AIO operations
+ * has been completed, a signal is delivered to, or (if non-NULL) the given
+ * timeout expired.
+ * @return: 0:  Success (At least one of the given AIO operations has completed)
+ * @return: -1: [errno=EAGAIN] The given timeout expired
+ * @return: -1: [errno=EINTR]  A signal was delivered to the calling thread
+ * @return: -1: Error (s.a. `errno') */
 INTERN ATTR_SECTION(".text.crt.utility.aio") NONNULL((1)) int
 NOTHROW_NCX(LIBCCALL libc_aio_suspendt64)(struct aiocb const *const list[],
                                           __STDC_INT_AS_SIZE_T nent,
@@ -317,7 +369,7 @@ NOTHROW_NCX(LIBCCALL libc_aio_suspendt64)(struct aiocb const *const list[],
 #endif /* MAGIC:alias */
 /*[[[end:libc_aio_suspendt64]]]*/
 
-/*[[[head:libc_aio_suspend64t64,hash:CRC-32=0x50d2b351]]]*/
+/*[[[head:libc_aio_suspend64t64,hash:CRC-32=0x7753a2f4]]]*/
 #if __SIZEOF_OFF32_T__ == __SIZEOF_OFF64_T__ && __SIZEOF_TIME32_T__ == __SIZEOF_TIME64_T__
 DEFINE_INTERN_ALIAS(libc_aio_suspend64t64, libc_aio_suspend);
 #elif __SIZEOF_OFF32_T__ == __SIZEOF_OFF64_T__
@@ -325,7 +377,14 @@ DEFINE_INTERN_ALIAS(libc_aio_suspend64t64, libc_aio_suspendt64);
 #elif __SIZEOF_TIME32_T__ == __SIZEOF_TIME64_T__
 DEFINE_INTERN_ALIAS(libc_aio_suspend64t64, libc_aio_suspend64);
 #else /* MAGIC:alias */
-/* >> aio_suspend(3), aio_suspend64(3), aio_suspendt64(3), aio_suspend64t64(3) */
+/* >> aio_suspend(3), aio_suspend64(3), aio_suspendt64(3), aio_suspend64t64(3)
+ * Suspend the calling thread until at least one of the given AIO operations
+ * has been completed, a signal is delivered to, or (if non-NULL) the given
+ * timeout expired.
+ * @return: 0:  Success (At least one of the given AIO operations has completed)
+ * @return: -1: [errno=EAGAIN] The given timeout expired
+ * @return: -1: [errno=EINTR]  A signal was delivered to the calling thread
+ * @return: -1: Error (s.a. `errno') */
 INTERN ATTR_SECTION(".text.crt.utility.aio") NONNULL((1)) int
 NOTHROW_NCX(LIBCCALL libc_aio_suspend64t64)(struct aiocb64 const *const list[],
                                             __STDC_INT_AS_SIZE_T nent,
@@ -354,23 +413,23 @@ NOTHROW_NCX(LIBCCALL libc_aio_init)(struct aioinit const *init)
 }
 /*[[[end:libc_aio_init]]]*/
 
-/*[[[start:exports,hash:CRC-32=0x77876dac]]]*/
+/*[[[start:exports,hash:CRC-32=0x91b3c220]]]*/
 DEFINE_PUBLIC_ALIAS(aio_read, libc_aio_read);
 DEFINE_PUBLIC_ALIAS(aio_write, libc_aio_write);
+DEFINE_PUBLIC_ALIAS(aio_fsync, libc_aio_fsync);
 DEFINE_PUBLIC_ALIAS(lio_listio, libc_lio_listio);
 DEFINE_PUBLIC_ALIAS(aio_error, libc_aio_error);
 DEFINE_PUBLIC_ALIAS(aio_return, libc_aio_return);
 DEFINE_PUBLIC_ALIAS(aio_cancel, libc_aio_cancel);
 DEFINE_PUBLIC_ALIAS(aio_suspend, libc_aio_suspend);
-DEFINE_PUBLIC_ALIAS(aio_fsync, libc_aio_fsync);
 DEFINE_PUBLIC_ALIAS(aio_read64, libc_aio_read64);
 DEFINE_PUBLIC_ALIAS(aio_write64, libc_aio_write64);
+DEFINE_PUBLIC_ALIAS(aio_fsync64, libc_aio_fsync64);
 DEFINE_PUBLIC_ALIAS(lio_listio64, libc_lio_listio64);
 DEFINE_PUBLIC_ALIAS(aio_error64, libc_aio_error64);
 DEFINE_PUBLIC_ALIAS(aio_return64, libc_aio_return64);
 DEFINE_PUBLIC_ALIAS(aio_cancel64, libc_aio_cancel64);
 DEFINE_PUBLIC_ALIAS(aio_suspend64, libc_aio_suspend64);
-DEFINE_PUBLIC_ALIAS(aio_fsync64, libc_aio_fsync64);
 DEFINE_PUBLIC_ALIAS(aio_suspendt64, libc_aio_suspendt64);
 DEFINE_PUBLIC_ALIAS(aio_suspend64t64, libc_aio_suspend64t64);
 DEFINE_PUBLIC_ALIAS(aio_init, libc_aio_init);

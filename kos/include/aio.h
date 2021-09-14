@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x2eb87404 */
+/* HASH CRC-32:0xe92ba7c3 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -89,164 +89,351 @@ typedef struct sigevent sigevent_t;
 #endif /* !__sigevent_t_defined */
 
 #if defined(__CRT_HAVE_aio_read64) && defined(__USE_FILE_OFFSET64)
-/* >> aio_read(3) */
+/* >> aio_read(3)
+ * Begin an async `read(2)' operation (TODO: Document fields used) */
 __CREDIRECT(__ATTR_NONNULL((1)),int,__NOTHROW_NCX,aio_read,(struct aiocb *__aiocbp),aio_read64,(__aiocbp))
 #elif defined(__CRT_HAVE_aio_read) && !defined(__USE_FILE_OFFSET64)
-/* >> aio_read(3) */
+/* >> aio_read(3)
+ * Begin an async `read(2)' operation (TODO: Document fields used) */
 __CDECLARE(__ATTR_NONNULL((1)),int,__NOTHROW_NCX,aio_read,(struct aiocb *__aiocbp),(__aiocbp))
 #endif /* ... */
 #if defined(__CRT_HAVE_aio_write64) && defined(__USE_FILE_OFFSET64)
-/* >> aio_write(3) */
+/* >> aio_write(3)
+ * Begin an async `write(2)' operation (TODO: Document fields used) */
 __CREDIRECT(__ATTR_NONNULL((1)),int,__NOTHROW_NCX,aio_write,(struct aiocb *__aiocbp),aio_write64,(__aiocbp))
 #elif defined(__CRT_HAVE_aio_write) && !defined(__USE_FILE_OFFSET64)
-/* >> aio_write(3) */
+/* >> aio_write(3)
+ * Begin an async `write(2)' operation (TODO: Document fields used) */
 __CDECLARE(__ATTR_NONNULL((1)),int,__NOTHROW_NCX,aio_write,(struct aiocb *__aiocbp),(__aiocbp))
 #endif /* ... */
+#if defined(__CRT_HAVE_aio_fsync64) && defined(__USE_FILE_OFFSET64)
+/* >> aio_fsync(3)
+ * Begin an async `fsync(2)' operation (TODO: Document fields used) */
+__CREDIRECT(__ATTR_NONNULL((2)),int,__NOTHROW_NCX,aio_fsync,(int __operation, struct aiocb *__aiocbp),aio_fsync64,(__operation,__aiocbp))
+#elif defined(__CRT_HAVE_aio_fsync) && !defined(__USE_FILE_OFFSET64)
+/* >> aio_fsync(3)
+ * Begin an async `fsync(2)' operation (TODO: Document fields used) */
+__CDECLARE(__ATTR_NONNULL((2)),int,__NOTHROW_NCX,aio_fsync,(int __operation, struct aiocb *__aiocbp),(__operation,__aiocbp))
+#endif /* ... */
+/* >> lio_listio(3)
+ * Execute/perform a `list' of AIO operations
+ * @param: mode: One of `LIO_WAIT', `LIO_NOWAIT' */
 __CDECLARE_OPT(__ATTR_NONNULL((2)),int,__NOTHROW_NCX,lio_listio,(int __mode, struct aiocb *const __list[__restrict_arr], __STDC_INT_AS_SIZE_T __nent, struct sigevent *__restrict __sig),(__mode,__list,__nent,__sig))
 #if defined(__CRT_HAVE_aio_error64) && defined(__USE_FILE_OFFSET64)
-/* >> aio_error(3) */
-__CREDIRECT(__ATTR_WUNUSED __ATTR_NONNULL((1)),int,__NOTHROW_NCX,aio_error,(struct aiocb const *__aiocbp),aio_error64,(__aiocbp))
+/* >> aio_error(3)
+ * @return: 0 :          Operation completed
+ * @return: EINPROGRESS: Async operation is still in progress
+ * @return: ECANCELED:   Operation was cancelled
+ * @return: * :          The  `errno'  with  which  the  async  operation  failed.
+ *                       s.a. `read(2)', `write(2)', `fsync(2)' and `fdatasync(2)' */
+__CREDIRECT(__ATTR_WUNUSED __ATTR_NONNULL((1)),__errno_t,__NOTHROW_NCX,aio_error,(struct aiocb const *__aiocbp),aio_error64,(__aiocbp))
 #elif defined(__CRT_HAVE_aio_error) && !defined(__USE_FILE_OFFSET64)
-/* >> aio_error(3) */
-__CDECLARE(__ATTR_WUNUSED __ATTR_NONNULL((1)),int,__NOTHROW_NCX,aio_error,(struct aiocb const *__aiocbp),(__aiocbp))
+/* >> aio_error(3)
+ * @return: 0 :          Operation completed
+ * @return: EINPROGRESS: Async operation is still in progress
+ * @return: ECANCELED:   Operation was cancelled
+ * @return: * :          The  `errno'  with  which  the  async  operation  failed.
+ *                       s.a. `read(2)', `write(2)', `fsync(2)' and `fdatasync(2)' */
+__CDECLARE(__ATTR_WUNUSED __ATTR_NONNULL((1)),__errno_t,__NOTHROW_NCX,aio_error,(struct aiocb const *__aiocbp),(__aiocbp))
 #endif /* ... */
 #if defined(__CRT_HAVE_aio_return64) && defined(__USE_FILE_OFFSET64)
-/* >> aio_return(3) */
+/* >> aio_return(3)
+ * @return: * : Return value of async `read(2)', `write(2)', `fsync(2)' or `fdatasync(2)'
+ * @return: -1: Error (s.a. `errno') */
 __CREDIRECT(__ATTR_NONNULL((1)),__SSIZE_TYPE__,__NOTHROW_NCX,aio_return,(struct aiocb *__aiocbp),aio_return64,(__aiocbp))
 #elif defined(__CRT_HAVE_aio_return) && !defined(__USE_FILE_OFFSET64)
-/* >> aio_return(3) */
+/* >> aio_return(3)
+ * @return: * : Return value of async `read(2)', `write(2)', `fsync(2)' or `fdatasync(2)'
+ * @return: -1: Error (s.a. `errno') */
 __CDECLARE(__ATTR_NONNULL((1)),__SSIZE_TYPE__,__NOTHROW_NCX,aio_return,(struct aiocb *__aiocbp),(__aiocbp))
 #endif /* ... */
 #if defined(__CRT_HAVE_aio_cancel64) && defined(__USE_FILE_OFFSET64)
-/* >> aio_cancel(3) */
+/* >> aio_cancel(3)
+ * @return: AIO_CANCELED:    Operations cancelled successfully
+ * @return: AIO_NOTCANCELED: At least one operation was still in progress (s.a. `aio_error(3)')
+ * @return: AIO_ALLDONE:     Operations were already completed before the call was made
+ * @return: -1:              Error (s.a. `errno') */
 __CREDIRECT(__ATTR_NONNULL((2)),int,__NOTHROW_NCX,aio_cancel,(__fd_t __fildes, struct aiocb *__aiocbp),aio_cancel64,(__fildes,__aiocbp))
 #elif defined(__CRT_HAVE_aio_cancel) && !defined(__USE_FILE_OFFSET64)
-/* >> aio_cancel(3) */
+/* >> aio_cancel(3)
+ * @return: AIO_CANCELED:    Operations cancelled successfully
+ * @return: AIO_NOTCANCELED: At least one operation was still in progress (s.a. `aio_error(3)')
+ * @return: AIO_ALLDONE:     Operations were already completed before the call was made
+ * @return: -1:              Error (s.a. `errno') */
 __CDECLARE(__ATTR_NONNULL((2)),int,__NOTHROW_NCX,aio_cancel,(__fd_t __fildes, struct aiocb *__aiocbp),(__fildes,__aiocbp))
 #endif /* ... */
 #if defined(__CRT_HAVE_aio_suspend64t64) && defined(__USE_FILE_OFFSET64) && defined(__USE_TIME_BITS64)
-/* >> aio_suspend(3), aio_suspend64(3), aio_suspendt64(3), aio_suspend64t64(3) */
+/* >> aio_suspend(3), aio_suspend64(3), aio_suspendt64(3), aio_suspend64t64(3)
+ * Suspend the calling thread until at least one of the given AIO operations
+ * has been completed, a signal is delivered to, or (if non-NULL) the given
+ * timeout expired.
+ * @return: 0:  Success (At least one of the given AIO operations has completed)
+ * @return: -1: [errno=EAGAIN] The given timeout expired
+ * @return: -1: [errno=EINTR]  A signal was delivered to the calling thread
+ * @return: -1: Error (s.a. `errno') */
 __CREDIRECT(__ATTR_NONNULL((1)),int,__NOTHROW_RPC,aio_suspend,(struct aiocb const *const __list[], __STDC_INT_AS_SIZE_T __nent, struct timespec const *__restrict __timeout),aio_suspend64t64,(__list,__nent,__timeout))
 #elif defined(__CRT_HAVE_aio_suspendt64) && !defined(__USE_FILE_OFFSET64) && defined(__USE_TIME_BITS64)
-/* >> aio_suspend(3), aio_suspend64(3), aio_suspendt64(3), aio_suspend64t64(3) */
+/* >> aio_suspend(3), aio_suspend64(3), aio_suspendt64(3), aio_suspend64t64(3)
+ * Suspend the calling thread until at least one of the given AIO operations
+ * has been completed, a signal is delivered to, or (if non-NULL) the given
+ * timeout expired.
+ * @return: 0:  Success (At least one of the given AIO operations has completed)
+ * @return: -1: [errno=EAGAIN] The given timeout expired
+ * @return: -1: [errno=EINTR]  A signal was delivered to the calling thread
+ * @return: -1: Error (s.a. `errno') */
 __CREDIRECT(__ATTR_NONNULL((1)),int,__NOTHROW_RPC,aio_suspend,(struct aiocb const *const __list[], __STDC_INT_AS_SIZE_T __nent, struct timespec const *__restrict __timeout),aio_suspendt64,(__list,__nent,__timeout))
 #elif defined(__CRT_HAVE_aio_suspend64) && defined(__USE_FILE_OFFSET64) && !defined(__USE_TIME_BITS64)
-/* >> aio_suspend(3), aio_suspend64(3), aio_suspendt64(3), aio_suspend64t64(3) */
+/* >> aio_suspend(3), aio_suspend64(3), aio_suspendt64(3), aio_suspend64t64(3)
+ * Suspend the calling thread until at least one of the given AIO operations
+ * has been completed, a signal is delivered to, or (if non-NULL) the given
+ * timeout expired.
+ * @return: 0:  Success (At least one of the given AIO operations has completed)
+ * @return: -1: [errno=EAGAIN] The given timeout expired
+ * @return: -1: [errno=EINTR]  A signal was delivered to the calling thread
+ * @return: -1: Error (s.a. `errno') */
 __CREDIRECT(__ATTR_NONNULL((1)),int,__NOTHROW_RPC,aio_suspend,(struct aiocb const *const __list[], __STDC_INT_AS_SIZE_T __nent, struct timespec const *__restrict __timeout),aio_suspend64,(__list,__nent,__timeout))
 #elif defined(__CRT_HAVE_aio_suspend) && !defined(__USE_FILE_OFFSET64) && !defined(__USE_TIME_BITS64)
-/* >> aio_suspend(3), aio_suspend64(3), aio_suspendt64(3), aio_suspend64t64(3) */
+/* >> aio_suspend(3), aio_suspend64(3), aio_suspendt64(3), aio_suspend64t64(3)
+ * Suspend the calling thread until at least one of the given AIO operations
+ * has been completed, a signal is delivered to, or (if non-NULL) the given
+ * timeout expired.
+ * @return: 0:  Success (At least one of the given AIO operations has completed)
+ * @return: -1: [errno=EAGAIN] The given timeout expired
+ * @return: -1: [errno=EINTR]  A signal was delivered to the calling thread
+ * @return: -1: Error (s.a. `errno') */
 __CDECLARE(__ATTR_NONNULL((1)),int,__NOTHROW_RPC,aio_suspend,(struct aiocb const *const __list[], __STDC_INT_AS_SIZE_T __nent, struct timespec const *__restrict __timeout),(__list,__nent,__timeout))
 #elif (defined(__CRT_HAVE_aio_suspend64t64) && defined(__USE_FILE_OFFSET64)) || (defined(__CRT_HAVE_aio_suspendt64) && !defined(__USE_FILE_OFFSET64)) || (defined(__CRT_HAVE_aio_suspend) && __SIZEOF_TIME32_T__ == __SIZEOF_TIME64_T__) || (defined(__CRT_HAVE_aio_suspend64) && defined(__USE_FILE_OFFSET64)) || (defined(__CRT_HAVE_aio_suspend) && !defined(__USE_FILE_OFFSET64))
 #include <libc/local/aio/aio_suspend.h>
-/* >> aio_suspend(3), aio_suspend64(3), aio_suspendt64(3), aio_suspend64t64(3) */
+/* >> aio_suspend(3), aio_suspend64(3), aio_suspendt64(3), aio_suspend64t64(3)
+ * Suspend the calling thread until at least one of the given AIO operations
+ * has been completed, a signal is delivered to, or (if non-NULL) the given
+ * timeout expired.
+ * @return: 0:  Success (At least one of the given AIO operations has completed)
+ * @return: -1: [errno=EAGAIN] The given timeout expired
+ * @return: -1: [errno=EINTR]  A signal was delivered to the calling thread
+ * @return: -1: Error (s.a. `errno') */
 __NAMESPACE_LOCAL_USING_OR_IMPL(aio_suspend, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_NONNULL((1)) int __NOTHROW_RPC(__LIBCCALL aio_suspend)(struct aiocb const *const __list[], __STDC_INT_AS_SIZE_T __nent, struct timespec const *__restrict __timeout) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(aio_suspend))(__list, __nent, __timeout); })
-#endif /* ... */
-#if defined(__CRT_HAVE_aio_fsync64) && defined(__USE_FILE_OFFSET64)
-/* >> aio_fsync(3) */
-__CREDIRECT(__ATTR_NONNULL((2)),int,__NOTHROW_NCX,aio_fsync,(int __operation, struct aiocb *__aiocbp),aio_fsync64,(__operation,__aiocbp))
-#elif defined(__CRT_HAVE_aio_fsync) && !defined(__USE_FILE_OFFSET64)
-/* >> aio_fsync(3) */
-__CDECLARE(__ATTR_NONNULL((2)),int,__NOTHROW_NCX,aio_fsync,(int __operation, struct aiocb *__aiocbp),(__operation,__aiocbp))
 #endif /* ... */
 
 #ifdef __USE_LARGEFILE64
 #if defined(__CRT_HAVE_aio_read) && __SIZEOF_OFF32_T__ == __SIZEOF_OFF64_T__
-/* >> aio_read(3) */
+/* >> aio_read(3)
+ * Begin an async `read(2)' operation (TODO: Document fields used) */
 __CREDIRECT(__ATTR_NONNULL((1)),int,__NOTHROW_NCX,aio_read64,(struct aiocb64 *__aiocbp),aio_read,(__aiocbp))
 #elif defined(__CRT_HAVE_aio_read64)
-/* >> aio_read(3) */
+/* >> aio_read(3)
+ * Begin an async `read(2)' operation (TODO: Document fields used) */
 __CDECLARE(__ATTR_NONNULL((1)),int,__NOTHROW_NCX,aio_read64,(struct aiocb64 *__aiocbp),(__aiocbp))
 #endif /* ... */
 #if defined(__CRT_HAVE_aio_write) && __SIZEOF_OFF32_T__ == __SIZEOF_OFF64_T__
-/* >> aio_write(3) */
+/* >> aio_write(3)
+ * Begin an async `write(2)' operation (TODO: Document fields used) */
 __CREDIRECT(__ATTR_NONNULL((1)),int,__NOTHROW_NCX,aio_write64,(struct aiocb64 *__aiocbp),aio_write,(__aiocbp))
 #elif defined(__CRT_HAVE_aio_write64)
-/* >> aio_write(3) */
+/* >> aio_write(3)
+ * Begin an async `write(2)' operation (TODO: Document fields used) */
 __CDECLARE(__ATTR_NONNULL((1)),int,__NOTHROW_NCX,aio_write64,(struct aiocb64 *__aiocbp),(__aiocbp))
 #endif /* ... */
+#if defined(__CRT_HAVE_aio_fsync) && __SIZEOF_OFF32_T__ == __SIZEOF_OFF64_T__
+/* >> aio_fsync(3)
+ * Begin an async `fsync(2)' operation (TODO: Document fields used) */
+__CREDIRECT(__ATTR_NONNULL((2)),int,__NOTHROW_NCX,aio_fsync64,(int __operation, struct aiocb64 *__aiocbp),aio_fsync,(__operation,__aiocbp))
+#elif defined(__CRT_HAVE_aio_fsync64)
+/* >> aio_fsync(3)
+ * Begin an async `fsync(2)' operation (TODO: Document fields used) */
+__CDECLARE(__ATTR_NONNULL((2)),int,__NOTHROW_NCX,aio_fsync64,(int __operation, struct aiocb64 *__aiocbp),(__operation,__aiocbp))
+#endif /* ... */
 #if defined(__CRT_HAVE_aio_write) && __SIZEOF_OFF32_T__ == __SIZEOF_OFF64_T__
-/* >> aio_write(3) */
+/* >> aio_write(3)
+ * Begin an async `write(2)' operation (TODO: Document fields used) */
 __CREDIRECT(__ATTR_NONNULL((2)),int,__NOTHROW_NCX,lio_listio64,(int __mode, struct aiocb64 *const __list[__restrict_arr], __STDC_INT_AS_SIZE_T __nent, struct sigevent *__restrict __sig),aio_write,(__mode,__list,__nent,__sig))
 #elif defined(__CRT_HAVE_lio_listio64)
-/* >> aio_write(3) */
+/* >> aio_write(3)
+ * Begin an async `write(2)' operation (TODO: Document fields used) */
 __CDECLARE(__ATTR_NONNULL((2)),int,__NOTHROW_NCX,lio_listio64,(int __mode, struct aiocb64 *const __list[__restrict_arr], __STDC_INT_AS_SIZE_T __nent, struct sigevent *__restrict __sig),(__mode,__list,__nent,__sig))
 #endif /* ... */
 #if defined(__CRT_HAVE_aio_error) && __SIZEOF_OFF32_T__ == __SIZEOF_OFF64_T__
-/* >> aio_error(3) */
+/* >> aio_error(3)
+ * @return: 0 :          Operation completed
+ * @return: EINPROGRESS: Async operation is still in progress
+ * @return: ECANCELED:   Operation was cancelled
+ * @return: * :          The  `errno'  with  which  the  async  operation  failed.
+ *                       s.a. `read(2)', `write(2)', `fsync(2)' and `fdatasync(2)' */
 __CREDIRECT(__ATTR_WUNUSED __ATTR_NONNULL((1)),int,__NOTHROW_NCX,aio_error64,(struct aiocb64 const *__aiocbp),aio_error,(__aiocbp))
 #elif defined(__CRT_HAVE_aio_error64)
-/* >> aio_error(3) */
+/* >> aio_error(3)
+ * @return: 0 :          Operation completed
+ * @return: EINPROGRESS: Async operation is still in progress
+ * @return: ECANCELED:   Operation was cancelled
+ * @return: * :          The  `errno'  with  which  the  async  operation  failed.
+ *                       s.a. `read(2)', `write(2)', `fsync(2)' and `fdatasync(2)' */
 __CDECLARE(__ATTR_WUNUSED __ATTR_NONNULL((1)),int,__NOTHROW_NCX,aio_error64,(struct aiocb64 const *__aiocbp),(__aiocbp))
 #endif /* ... */
 #if defined(__CRT_HAVE_aio_return) && __SIZEOF_OFF32_T__ == __SIZEOF_OFF64_T__
-/* >> aio_return(3) */
+/* >> aio_return(3)
+ * @return: * : Return value of async `read(2)', `write(2)', `fsync(2)' or `fdatasync(2)'
+ * @return: -1: Error (s.a. `errno') */
 __CREDIRECT(__ATTR_NONNULL((1)),__SSIZE_TYPE__,__NOTHROW_NCX,aio_return64,(struct aiocb64 *__aiocbp),aio_return,(__aiocbp))
 #elif defined(__CRT_HAVE_aio_return64)
-/* >> aio_return(3) */
+/* >> aio_return(3)
+ * @return: * : Return value of async `read(2)', `write(2)', `fsync(2)' or `fdatasync(2)'
+ * @return: -1: Error (s.a. `errno') */
 __CDECLARE(__ATTR_NONNULL((1)),__SSIZE_TYPE__,__NOTHROW_NCX,aio_return64,(struct aiocb64 *__aiocbp),(__aiocbp))
 #endif /* ... */
 #if defined(__CRT_HAVE_aio_cancel) && __SIZEOF_OFF32_T__ == __SIZEOF_OFF64_T__
-/* >> aio_cancel(3) */
+/* >> aio_cancel(3)
+ * @return: AIO_CANCELED:    Operations cancelled successfully
+ * @return: AIO_NOTCANCELED: At least one operation was still in progress (s.a. `aio_error(3)')
+ * @return: AIO_ALLDONE:     Operations were already completed before the call was made
+ * @return: -1:              Error (s.a. `errno') */
 __CREDIRECT(__ATTR_NONNULL((2)),int,__NOTHROW_NCX,aio_cancel64,(__fd_t __fildes, struct aiocb64 *__aiocbp),aio_cancel,(__fildes,__aiocbp))
 #elif defined(__CRT_HAVE_aio_cancel64)
-/* >> aio_cancel(3) */
+/* >> aio_cancel(3)
+ * @return: AIO_CANCELED:    Operations cancelled successfully
+ * @return: AIO_NOTCANCELED: At least one operation was still in progress (s.a. `aio_error(3)')
+ * @return: AIO_ALLDONE:     Operations were already completed before the call was made
+ * @return: -1:              Error (s.a. `errno') */
 __CDECLARE(__ATTR_NONNULL((2)),int,__NOTHROW_NCX,aio_cancel64,(__fd_t __fildes, struct aiocb64 *__aiocbp),(__fildes,__aiocbp))
 #endif /* ... */
 #if defined(__CRT_HAVE_aio_suspend) && __SIZEOF_OFF32_T__ == __SIZEOF_OFF64_T__ && (!defined(__USE_TIME_BITS64) || __SIZEOF_TIME32_T__ == __SIZEOF_TIME64_T__)
-/* >> aio_suspend(3), aio_suspend64(3), aio_suspendt64(3), aio_suspend64t64(3) */
+/* >> aio_suspend(3), aio_suspend64(3), aio_suspendt64(3), aio_suspend64t64(3)
+ * Suspend the calling thread until at least one of the given AIO operations
+ * has been completed, a signal is delivered to, or (if non-NULL) the given
+ * timeout expired.
+ * @return: 0:  Success (At least one of the given AIO operations has completed)
+ * @return: -1: [errno=EAGAIN] The given timeout expired
+ * @return: -1: [errno=EINTR]  A signal was delivered to the calling thread
+ * @return: -1: Error (s.a. `errno') */
 __CREDIRECT(__ATTR_NONNULL((1)),int,__NOTHROW_NCX,aio_suspend64,(struct aiocb64 const *const __list[], __STDC_INT_AS_SIZE_T __nent, struct timespec const *__restrict __timeout),aio_suspend,(__list,__nent,__timeout))
 #elif defined(__CRT_HAVE_aio_suspendt64) && __SIZEOF_OFF32_T__ == __SIZEOF_OFF64_T__ && (defined(__USE_TIME_BITS64) || __SIZEOF_TIME32_T__ == __SIZEOF_TIME64_T__)
-/* >> aio_suspend(3), aio_suspend64(3), aio_suspendt64(3), aio_suspend64t64(3) */
+/* >> aio_suspend(3), aio_suspend64(3), aio_suspendt64(3), aio_suspend64t64(3)
+ * Suspend the calling thread until at least one of the given AIO operations
+ * has been completed, a signal is delivered to, or (if non-NULL) the given
+ * timeout expired.
+ * @return: 0:  Success (At least one of the given AIO operations has completed)
+ * @return: -1: [errno=EAGAIN] The given timeout expired
+ * @return: -1: [errno=EINTR]  A signal was delivered to the calling thread
+ * @return: -1: Error (s.a. `errno') */
 __CREDIRECT(__ATTR_NONNULL((1)),int,__NOTHROW_NCX,aio_suspend64,(struct aiocb64 const *const __list[], __STDC_INT_AS_SIZE_T __nent, struct timespec const *__restrict __timeout),aio_suspendt64,(__list,__nent,__timeout))
 #elif defined(__CRT_HAVE_aio_suspend64) && (!defined(__USE_TIME_BITS64) || __SIZEOF_TIME32_T__ == __SIZEOF_TIME64_T__)
-/* >> aio_suspend(3), aio_suspend64(3), aio_suspendt64(3), aio_suspend64t64(3) */
+/* >> aio_suspend(3), aio_suspend64(3), aio_suspendt64(3), aio_suspend64t64(3)
+ * Suspend the calling thread until at least one of the given AIO operations
+ * has been completed, a signal is delivered to, or (if non-NULL) the given
+ * timeout expired.
+ * @return: 0:  Success (At least one of the given AIO operations has completed)
+ * @return: -1: [errno=EAGAIN] The given timeout expired
+ * @return: -1: [errno=EINTR]  A signal was delivered to the calling thread
+ * @return: -1: Error (s.a. `errno') */
 __CDECLARE(__ATTR_NONNULL((1)),int,__NOTHROW_NCX,aio_suspend64,(struct aiocb64 const *const __list[], __STDC_INT_AS_SIZE_T __nent, struct timespec const *__restrict __timeout),(__list,__nent,__timeout))
 #elif defined(__CRT_HAVE_aio_suspend64t64) && (defined(__USE_TIME_BITS64) || __SIZEOF_TIME32_T__ == __SIZEOF_TIME64_T__)
-/* >> aio_suspend(3), aio_suspend64(3), aio_suspendt64(3), aio_suspend64t64(3) */
+/* >> aio_suspend(3), aio_suspend64(3), aio_suspendt64(3), aio_suspend64t64(3)
+ * Suspend the calling thread until at least one of the given AIO operations
+ * has been completed, a signal is delivered to, or (if non-NULL) the given
+ * timeout expired.
+ * @return: 0:  Success (At least one of the given AIO operations has completed)
+ * @return: -1: [errno=EAGAIN] The given timeout expired
+ * @return: -1: [errno=EINTR]  A signal was delivered to the calling thread
+ * @return: -1: Error (s.a. `errno') */
 __CREDIRECT(__ATTR_NONNULL((1)),int,__NOTHROW_NCX,aio_suspend64,(struct aiocb64 const *const __list[], __STDC_INT_AS_SIZE_T __nent, struct timespec const *__restrict __timeout),aio_suspend64t64,(__list,__nent,__timeout))
 #elif (defined(__CRT_HAVE_aio_suspend) && __SIZEOF_OFF32_T__ == __SIZEOF_OFF64_T__ && __SIZEOF_TIME32_T__ == __SIZEOF_TIME64_T__) || (defined(__CRT_HAVE_aio_suspendt64) && __SIZEOF_OFF32_T__ == __SIZEOF_OFF64_T__) || (defined(__CRT_HAVE_aio_suspend) && __SIZEOF_OFF32_T__ == __SIZEOF_OFF64_T__) || defined(__CRT_HAVE_aio_suspend64)
 #include <libc/local/aio/aio_suspend64.h>
-/* >> aio_suspend(3), aio_suspend64(3), aio_suspendt64(3), aio_suspend64t64(3) */
+/* >> aio_suspend(3), aio_suspend64(3), aio_suspendt64(3), aio_suspend64t64(3)
+ * Suspend the calling thread until at least one of the given AIO operations
+ * has been completed, a signal is delivered to, or (if non-NULL) the given
+ * timeout expired.
+ * @return: 0:  Success (At least one of the given AIO operations has completed)
+ * @return: -1: [errno=EAGAIN] The given timeout expired
+ * @return: -1: [errno=EINTR]  A signal was delivered to the calling thread
+ * @return: -1: Error (s.a. `errno') */
 __NAMESPACE_LOCAL_USING_OR_IMPL(aio_suspend64, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_NONNULL((1)) int __NOTHROW_NCX(__LIBCCALL aio_suspend64)(struct aiocb64 const *const __list[], __STDC_INT_AS_SIZE_T __nent, struct timespec const *__restrict __timeout) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(aio_suspend64))(__list, __nent, __timeout); })
-#endif /* ... */
-#if defined(__CRT_HAVE_aio_fsync) && __SIZEOF_OFF32_T__ == __SIZEOF_OFF64_T__
-/* >> aio_fsync(3) */
-__CREDIRECT(__ATTR_NONNULL((2)),int,__NOTHROW_NCX,aio_fsync64,(int __operation, struct aiocb64 *__aiocbp),aio_fsync,(__operation,__aiocbp))
-#elif defined(__CRT_HAVE_aio_fsync64)
-/* >> aio_fsync(3) */
-__CDECLARE(__ATTR_NONNULL((2)),int,__NOTHROW_NCX,aio_fsync64,(int __operation, struct aiocb64 *__aiocbp),(__operation,__aiocbp))
 #endif /* ... */
 #endif /* __USE_LARGEFILE64 */
 
 #ifdef __USE_TIME64
 #if defined(__CRT_HAVE_aio_suspend64t64) && defined(__USE_FILE_OFFSET64)
-/* >> aio_suspend(3), aio_suspend64(3), aio_suspendt64(3), aio_suspend64t64(3) */
+/* >> aio_suspend(3), aio_suspend64(3), aio_suspendt64(3), aio_suspend64t64(3)
+ * Suspend the calling thread until at least one of the given AIO operations
+ * has been completed, a signal is delivered to, or (if non-NULL) the given
+ * timeout expired.
+ * @return: 0:  Success (At least one of the given AIO operations has completed)
+ * @return: -1: [errno=EAGAIN] The given timeout expired
+ * @return: -1: [errno=EINTR]  A signal was delivered to the calling thread
+ * @return: -1: Error (s.a. `errno') */
 __CREDIRECT(__ATTR_NONNULL((1)),int,__NOTHROW_NCX,aio_suspendt64,(struct aiocb const *const __list[], __STDC_INT_AS_SIZE_T __nent, struct timespec64 const *__restrict __timeout),aio_suspend64t64,(__list,__nent,__timeout))
 #elif defined(__CRT_HAVE_aio_suspendt64) && !defined(__USE_FILE_OFFSET64)
-/* >> aio_suspend(3), aio_suspend64(3), aio_suspendt64(3), aio_suspend64t64(3) */
+/* >> aio_suspend(3), aio_suspend64(3), aio_suspendt64(3), aio_suspend64t64(3)
+ * Suspend the calling thread until at least one of the given AIO operations
+ * has been completed, a signal is delivered to, or (if non-NULL) the given
+ * timeout expired.
+ * @return: 0:  Success (At least one of the given AIO operations has completed)
+ * @return: -1: [errno=EAGAIN] The given timeout expired
+ * @return: -1: [errno=EINTR]  A signal was delivered to the calling thread
+ * @return: -1: Error (s.a. `errno') */
 __CDECLARE(__ATTR_NONNULL((1)),int,__NOTHROW_NCX,aio_suspendt64,(struct aiocb const *const __list[], __STDC_INT_AS_SIZE_T __nent, struct timespec64 const *__restrict __timeout),(__list,__nent,__timeout))
 #elif defined(__CRT_HAVE_aio_suspend) && __SIZEOF_TIME32_T__ == __SIZEOF_TIME64_T__
-/* >> aio_suspend(3), aio_suspend64(3), aio_suspendt64(3), aio_suspend64t64(3) */
+/* >> aio_suspend(3), aio_suspend64(3), aio_suspendt64(3), aio_suspend64t64(3)
+ * Suspend the calling thread until at least one of the given AIO operations
+ * has been completed, a signal is delivered to, or (if non-NULL) the given
+ * timeout expired.
+ * @return: 0:  Success (At least one of the given AIO operations has completed)
+ * @return: -1: [errno=EAGAIN] The given timeout expired
+ * @return: -1: [errno=EINTR]  A signal was delivered to the calling thread
+ * @return: -1: Error (s.a. `errno') */
 __CREDIRECT(__ATTR_NONNULL((1)),int,__NOTHROW_NCX,aio_suspendt64,(struct aiocb const *const __list[], __STDC_INT_AS_SIZE_T __nent, struct timespec64 const *__restrict __timeout),aio_suspend,(__list,__nent,__timeout))
 #elif (defined(__CRT_HAVE_aio_suspend64) && defined(__USE_FILE_OFFSET64)) || (defined(__CRT_HAVE_aio_suspend) && !defined(__USE_FILE_OFFSET64))
 #include <libc/local/aio/aio_suspendt64.h>
-/* >> aio_suspend(3), aio_suspend64(3), aio_suspendt64(3), aio_suspend64t64(3) */
+/* >> aio_suspend(3), aio_suspend64(3), aio_suspendt64(3), aio_suspend64t64(3)
+ * Suspend the calling thread until at least one of the given AIO operations
+ * has been completed, a signal is delivered to, or (if non-NULL) the given
+ * timeout expired.
+ * @return: 0:  Success (At least one of the given AIO operations has completed)
+ * @return: -1: [errno=EAGAIN] The given timeout expired
+ * @return: -1: [errno=EINTR]  A signal was delivered to the calling thread
+ * @return: -1: Error (s.a. `errno') */
 __NAMESPACE_LOCAL_USING_OR_IMPL(aio_suspendt64, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_NONNULL((1)) int __NOTHROW_NCX(__LIBCCALL aio_suspendt64)(struct aiocb const *const __list[], __STDC_INT_AS_SIZE_T __nent, struct timespec64 const *__restrict __timeout) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(aio_suspendt64))(__list, __nent, __timeout); })
 #endif /* ... */
 
 #ifdef __USE_LARGEFILE64
 #if defined(__CRT_HAVE_aio_suspend) && __SIZEOF_OFF32_T__ == __SIZEOF_OFF64_T__ && __SIZEOF_TIME32_T__ == __SIZEOF_TIME64_T__
-/* >> aio_suspend(3), aio_suspend64(3), aio_suspendt64(3), aio_suspend64t64(3) */
+/* >> aio_suspend(3), aio_suspend64(3), aio_suspendt64(3), aio_suspend64t64(3)
+ * Suspend the calling thread until at least one of the given AIO operations
+ * has been completed, a signal is delivered to, or (if non-NULL) the given
+ * timeout expired.
+ * @return: 0:  Success (At least one of the given AIO operations has completed)
+ * @return: -1: [errno=EAGAIN] The given timeout expired
+ * @return: -1: [errno=EINTR]  A signal was delivered to the calling thread
+ * @return: -1: Error (s.a. `errno') */
 __CREDIRECT(__ATTR_NONNULL((1)),int,__NOTHROW_NCX,aio_suspend64t64,(struct aiocb64 const *const __list[], __STDC_INT_AS_SIZE_T __nent, struct timespec64 const *__restrict __timeout),aio_suspend,(__list,__nent,__timeout))
 #elif defined(__CRT_HAVE_aio_suspendt64) && __SIZEOF_OFF32_T__ == __SIZEOF_OFF64_T__
-/* >> aio_suspend(3), aio_suspend64(3), aio_suspendt64(3), aio_suspend64t64(3) */
+/* >> aio_suspend(3), aio_suspend64(3), aio_suspendt64(3), aio_suspend64t64(3)
+ * Suspend the calling thread until at least one of the given AIO operations
+ * has been completed, a signal is delivered to, or (if non-NULL) the given
+ * timeout expired.
+ * @return: 0:  Success (At least one of the given AIO operations has completed)
+ * @return: -1: [errno=EAGAIN] The given timeout expired
+ * @return: -1: [errno=EINTR]  A signal was delivered to the calling thread
+ * @return: -1: Error (s.a. `errno') */
 __CREDIRECT(__ATTR_NONNULL((1)),int,__NOTHROW_NCX,aio_suspend64t64,(struct aiocb64 const *const __list[], __STDC_INT_AS_SIZE_T __nent, struct timespec64 const *__restrict __timeout),aio_suspendt64,(__list,__nent,__timeout))
 #elif defined(__CRT_HAVE_aio_suspend64) && __SIZEOF_TIME32_T__ == __SIZEOF_TIME64_T__
-/* >> aio_suspend(3), aio_suspend64(3), aio_suspendt64(3), aio_suspend64t64(3) */
+/* >> aio_suspend(3), aio_suspend64(3), aio_suspendt64(3), aio_suspend64t64(3)
+ * Suspend the calling thread until at least one of the given AIO operations
+ * has been completed, a signal is delivered to, or (if non-NULL) the given
+ * timeout expired.
+ * @return: 0:  Success (At least one of the given AIO operations has completed)
+ * @return: -1: [errno=EAGAIN] The given timeout expired
+ * @return: -1: [errno=EINTR]  A signal was delivered to the calling thread
+ * @return: -1: Error (s.a. `errno') */
 __CREDIRECT(__ATTR_NONNULL((1)),int,__NOTHROW_NCX,aio_suspend64t64,(struct aiocb64 const *const __list[], __STDC_INT_AS_SIZE_T __nent, struct timespec64 const *__restrict __timeout),aio_suspend64,(__list,__nent,__timeout))
 #elif (defined(__CRT_HAVE_aio_suspend) && __SIZEOF_OFF32_T__ == __SIZEOF_OFF64_T__) || defined(__CRT_HAVE_aio_suspend64)
 #include <libc/local/aio/aio_suspend64t64.h>
-/* >> aio_suspend(3), aio_suspend64(3), aio_suspendt64(3), aio_suspend64t64(3) */
+/* >> aio_suspend(3), aio_suspend64(3), aio_suspendt64(3), aio_suspend64t64(3)
+ * Suspend the calling thread until at least one of the given AIO operations
+ * has been completed, a signal is delivered to, or (if non-NULL) the given
+ * timeout expired.
+ * @return: 0:  Success (At least one of the given AIO operations has completed)
+ * @return: -1: [errno=EAGAIN] The given timeout expired
+ * @return: -1: [errno=EINTR]  A signal was delivered to the calling thread
+ * @return: -1: Error (s.a. `errno') */
 __NAMESPACE_LOCAL_USING_OR_IMPL(aio_suspend64t64, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_NONNULL((1)) int __NOTHROW_NCX(__LIBCCALL aio_suspend64t64)(struct aiocb64 const *const __list[], __STDC_INT_AS_SIZE_T __nent, struct timespec64 const *__restrict __timeout) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(aio_suspend64t64))(__list, __nent, __timeout); })
 #endif /* ... */
 #endif /* __USE_LARGEFILE64 */
