@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xf5179cba */
+/* HASH CRC-32:0xe3a5338 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -30,6 +30,7 @@
 DECL_BEGIN
 
 #if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
+/* >> times(2) */
 INTDEF clock_t NOTHROW_NCX(LIBDCALL libd_times)(struct tms *buffer);
 #endif /* !__LIBCCALL_IS_LIBDCALL && !__KERNEL__ */
 

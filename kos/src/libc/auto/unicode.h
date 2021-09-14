@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xb8c210b4 */
+/* HASH CRC-32:0x2b67958c */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -290,46 +290,70 @@ INTDEF ATTR_RETNONNULL NONNULL((1, 2)) char16_t *NOTHROW_NCX(LIBDCALL libd_unico
 INTDEF ATTR_RETNONNULL NONNULL((1, 2)) char16_t *NOTHROW_NCX(LIBCCALL libc_unicode_32to16)(char16_t *__restrict utf16_dst, char32_t const *__restrict utf32_text, size_t utf32_characters);
 #if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
 /* >> unicode_c8toc16(3)
- * @return: *:          Success (*pc16 was filled; the return value is the number of bytes taken from `s')
- * @return: 0:          Success (*pc16 was filled; `mbs' was modified, but nothing was read from `s'; in this case, a surrogate was written)
- * @return: (size_t)-1: Unicode error (the given input string isn't a valid unicode sequence)
- * @return: (size_t)-2: Success, but no character was generated (s...+=n, together with `mbs' doesn't for a full character, but `mbs' was updated) */
+ * @return: *:          Success (*pc16 was filled; the return value
+ *                      is  the  number  of bytes  taken  from `s')
+ * @return: 0:          Success (*pc16 was filled; `mbs' was modified,
+ *                      but nothing was read  from `s'; in this  case,
+ *                      a surrogate was written)
+ * @return: (size_t)-1: Unicode error (the given input string isn't
+ *                      a valid unicode sequence)
+ * @return: (size_t)-2: Success, but  no  character  was  generated
+ *                      (`s...+=n', together with `mbs' doesn't for
+ *                      a full  character, but  `mbs' was  updated) */
 INTDEF NONNULL((1, 2, 4)) size_t NOTHROW_NCX(LIBDCALL libd_unicode_c8toc16)(char16_t *__restrict pc16, char const *__restrict s, size_t n, mbstate_t *__restrict mbs);
 #endif /* !__LIBCCALL_IS_LIBDCALL && !__KERNEL__ */
 #ifndef __KERNEL__
 /* >> unicode_c8toc16(3)
- * @return: *:          Success (*pc16 was filled; the return value is the number of bytes taken from `s')
- * @return: 0:          Success (*pc16 was filled; `mbs' was modified, but nothing was read from `s'; in this case, a surrogate was written)
- * @return: (size_t)-1: Unicode error (the given input string isn't a valid unicode sequence)
- * @return: (size_t)-2: Success, but no character was generated (s...+=n, together with `mbs' doesn't for a full character, but `mbs' was updated) */
+ * @return: *:          Success (*pc16 was filled; the return value
+ *                      is  the  number  of bytes  taken  from `s')
+ * @return: 0:          Success (*pc16 was filled; `mbs' was modified,
+ *                      but nothing was read  from `s'; in this  case,
+ *                      a surrogate was written)
+ * @return: (size_t)-1: Unicode error (the given input string isn't
+ *                      a valid unicode sequence)
+ * @return: (size_t)-2: Success, but  no  character  was  generated
+ *                      (`s...+=n', together with `mbs' doesn't for
+ *                      a full  character, but  `mbs' was  updated) */
 INTDEF NONNULL((1, 2, 4)) size_t NOTHROW_NCX(LIBCCALL libc_unicode_c8toc16)(char16_t *__restrict pc16, char const *__restrict s, size_t n, mbstate_t *__restrict mbs);
 #endif /* !__KERNEL__ */
 #if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
 /* >> unicode_c8toc32(3)
- * @return: *:          Success (*pc32 was filled; the return value is the number of bytes taken from `s')
- * @return: (size_t)-1: Unicode error (the given input string isn't a valid unicode sequence)
- * @return: (size_t)-2: Success, but no character was generated (s...+=n, together with `mbs' doesn't for a full character, but `mbs' was updated) */
+ * @return: *:          Success (*pc32 was filled; the return value
+ *                      is  the  number  of bytes  taken  from `s')
+ * @return: (size_t)-1: Unicode error (the given input string isn't
+ *                      a valid unicode sequence)
+ * @return: (size_t)-2: Success, but  no  character  was  generated
+ *                      (`s...+=n', together with `mbs' doesn't for
+ *                      a full  character, but  `mbs' was  updated) */
 INTDEF NONNULL((1, 2, 4)) size_t NOTHROW_NCX(LIBDCALL libd_unicode_c8toc32)(char32_t *__restrict pc32, char const *__restrict s, size_t n, mbstate_t *__restrict mbs);
 #endif /* !__LIBCCALL_IS_LIBDCALL && !__KERNEL__ */
 #ifndef __KERNEL__
 /* >> unicode_c8toc32(3)
- * @return: *:          Success (*pc32 was filled; the return value is the number of bytes taken from `s')
- * @return: (size_t)-1: Unicode error (the given input string isn't a valid unicode sequence)
- * @return: (size_t)-2: Success, but no character was generated (s...+=n, together with `mbs' doesn't for a full character, but `mbs' was updated) */
+ * @return: *:          Success (*pc32 was filled; the return value
+ *                      is  the  number  of bytes  taken  from `s')
+ * @return: (size_t)-1: Unicode error (the given input string isn't
+ *                      a valid unicode sequence)
+ * @return: (size_t)-2: Success, but  no  character  was  generated
+ *                      (`s...+=n', together with `mbs' doesn't for
+ *                      a full  character, but  `mbs' was  updated) */
 INTDEF NONNULL((1, 2, 4)) size_t NOTHROW_NCX(LIBCCALL libc_unicode_c8toc32)(char32_t *__restrict pc32, char const *__restrict s, size_t n, mbstate_t *__restrict mbs);
 #endif /* !__KERNEL__ */
 #if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
 /* >> unicode_c16toc8(3)
  * @return: 0 :         Success, but no characters were generated
- * @return: * :         Success (this many bytes were written to `*pc8'; max is `UNICODE_16TO8_MAXBUF(1)')
- * @return: (size_t)-1: Unicode error (the given input string isn't a valid unicode sequence) */
+ * @return: * :         Success  (this many bytes were written to
+ *                      `*pc8'; max is `UNICODE_16TO8_MAXBUF(1)')
+ * @return: (size_t)-1: Unicode error (the given input string
+ *                      isn't  a   valid  unicode   sequence) */
 INTDEF NONNULL((1, 3)) size_t NOTHROW_NCX(LIBDCALL libd_unicode_c16toc8)(char pc8[3], char16_t c16, mbstate_t *__restrict mbs);
 #endif /* !__LIBCCALL_IS_LIBDCALL && !__KERNEL__ */
 #ifndef __KERNEL__
 /* >> unicode_c16toc8(3)
  * @return: 0 :         Success, but no characters were generated
- * @return: * :         Success (this many bytes were written to `*pc8'; max is `UNICODE_16TO8_MAXBUF(1)')
- * @return: (size_t)-1: Unicode error (the given input string isn't a valid unicode sequence) */
+ * @return: * :         Success  (this many bytes were written to
+ *                      `*pc8'; max is `UNICODE_16TO8_MAXBUF(1)')
+ * @return: (size_t)-1: Unicode error (the given input string
+ *                      isn't  a   valid  unicode   sequence) */
 INTDEF NONNULL((1, 3)) size_t NOTHROW_NCX(LIBCCALL libc_unicode_c16toc8)(char pc8[3], char16_t c16, mbstate_t *__restrict mbs);
 #endif /* !__KERNEL__ */
 #if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
@@ -381,25 +405,36 @@ INTDEF ssize_t NOTHROW_NCX(LIBDCALL libd_format_wto16)(void *arg, char16_t const
 INTDEF ssize_t NOTHROW_NCX(LIBKCALL libc_format_wto16)(void *arg, char32_t const *data, size_t datalen);
 #endif /* !__KERNEL__ */
 #if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
-/* Return the internal descriptor for the given `ch' */
+/* >> __unicode_descriptor(3)
+ * Return the internal descriptor for the given `ch'
+ * This is the main accessor function for the unicode database, but
+ * should not be called directly (unless you know what you're doing
+ * and are aware that your code might break should this API ever be
+ * changed)
+ * Also note that this function never returns `NULL'! */
 INTDEF ATTR_CONST ATTR_RETNONNULL struct __unitraits const *NOTHROW(LIBDCALL libd___unicode_descriptor)(char32_t ch);
-/* Return the integer constant associated with a given digit index
+/* >> __unicode_descriptor_digit(3), __unicode_descriptor_digit64(3)
+ * Return the integer constant associated  with a given digit  index
  * Returns `0' if the given index is invalid
  * @param: digit_idx: As read from `__unitraits::__ut_digit_idx' */
 INTDEF ATTR_CONST WUNUSED uint8_t NOTHROW(LIBDCALL libd___unicode_descriptor_digit)(uint8_t digit_idx);
-/* Return the integer constant associated with a given digit index
+/* >> __unicode_descriptor_digit(3), __unicode_descriptor_digit64(3)
+ * Return the integer constant associated  with a given digit  index
  * Returns `0' if the given index is invalid
  * @param: digit_idx: As read from `__unitraits::__ut_digit_idx' */
 INTDEF ATTR_CONST WUNUSED uint64_t NOTHROW(LIBDCALL libd___unicode_descriptor_digit64)(uint8_t digit_idx);
-/* Return the floating-point constant associated with a given digit index
+/* >> __unicode_descriptor_digitd(3), __unicode_descriptor_digitld(3)
+ * Return the floating-point constant associated with a given digit index
  * Returns `0.0' if the given index is invalid
  * @param: digit_idx: As read from `__unitraits::__ut_digit_idx' */
 INTDEF ATTR_CONST WUNUSED double NOTHROW(LIBDCALL libd___unicode_descriptor_digitd)(uint8_t digit_idx);
-/* Return the floating-point constant associated with a given digit index
+/* >> __unicode_descriptor_digitd(3), __unicode_descriptor_digitld(3)
+ * Return the floating-point constant associated with a given digit index
  * Returns `0.0' if the given index is invalid
  * @param: digit_idx: As read from `__unitraits::__ut_digit_idx' */
 INTDEF ATTR_CONST WUNUSED __LONGDOUBLE NOTHROW(LIBDCALL libd___unicode_descriptor_digitld)(uint8_t digit_idx);
-/* Fold the given unicode character `ch' */
+/* >> unicode_fold(3)
+ * Fold the given unicode character `ch' */
 INTDEF ATTR_RETNONNULL NONNULL((2)) char32_t *NOTHROW_NCX(LIBDCALL libd_unicode_fold)(char32_t ch, char32_t buf[3]);
 #endif /* !__LIBCCALL_IS_LIBDCALL && !__KERNEL__ */
 

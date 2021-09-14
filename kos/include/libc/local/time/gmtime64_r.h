@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x44ab2694 */
+/* HASH CRC-32:0xd4d04cd4 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -63,47 +63,6 @@ __NAMESPACE_LOCAL_END
 __NAMESPACE_LOCAL_BEGIN
 __LOCAL_LIBC(gmtime64_r) __ATTR_NONNULL((1, 2)) struct __NAMESPACE_STD_SYM tm *
 __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(gmtime64_r))(__time64_t const *__restrict __timer, struct __NAMESPACE_STD_SYM tm *__restrict __tp) {
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 #if defined(__CRT_HAVE__gmtime64_s) || defined(__CRT_HAVE__gmtime32_s)
 	return (__NAMESPACE_LOCAL_SYM __localdep_dos_gmtime64_s)(__tp, __timer) ? __NULLPTR : __tp;
 #else /* __CRT_HAVE__gmtime64_s || __CRT_HAVE__gmtime32_s */
@@ -111,8 +70,8 @@ __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(gmtime64_r))(__time64_t const *__rest
 	__UINT16_TYPE__ const *__monthvec;
 	__t = *__timer;
 	__tp->tm_sec  = (int)(__t % 60);
-	__tp->tm_min  = (int)((__t/60) % 60);
-	__tp->tm_hour = (int)((__t/(60*60)) % 24);
+	__tp->tm_min  = (int)((__t / 60) % 60);
+	__tp->tm_hour = (int)((__t / (60 * 60)) % 24);
 	__t /= 86400; /* SECONDS_PER_DAY */
 	__t += __yearstodays(1970); /* UNIX_TIME_START_YEAR */
 	__tp->tm_wday = (int)(__t % 7); /* DAYS_PER_WEEK */

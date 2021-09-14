@@ -51,6 +51,7 @@ typedef __clock_t clock_t;
 
 }
 
+@@>> times(2)
 [[decl_include("<bits/types.h>", "<bits/os/tms.h>")]]
 clock_t times(struct tms *buffer);
 

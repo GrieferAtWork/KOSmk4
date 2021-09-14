@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x751fd481 */
+/* HASH CRC-32:0x1073bdc2 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -21,6 +21,8 @@
 #ifndef __local_fopen_s_defined
 #define __local_fopen_s_defined 1
 #include <__crt.h>
+#include <asm/os/oflags.h>
+#include <features.h>
 #if defined(__CRT_HAVE_fopen) || defined(__CRT_HAVE__IO_fopen) || defined(__CRT_HAVE_fopen64)
 #include <bits/types.h>
 __NAMESPACE_LOCAL_BEGIN

@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x40ba6f7d */
+/* HASH CRC-32:0xa63784ca */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -74,14 +74,17 @@ __FORCELOCAL void (_enable)(void) { __sti(); }
 
 #ifdef __USE_OLD_DOS
 #ifdef __CRT_HAVE_delay
-/* Sleep for `mill' milliseconds (1/1.000 seconds) */
+/* >> delay(3)
+ * Sleep for `mill' milliseconds (1/1.000 seconds) */
 __CDECLARE_VOID(,__NOTHROW_RPC,delay,(unsigned int __mill),(__mill))
 #elif defined(__CRT_HAVE___crtSleep)
-/* Sleep for `mill' milliseconds (1/1.000 seconds) */
+/* >> delay(3)
+ * Sleep for `mill' milliseconds (1/1.000 seconds) */
 __CREDIRECT_VOID(,__NOTHROW_RPC,delay,(unsigned int __mill),__crtSleep,(__mill))
 #elif defined(__CRT_HAVE_usleep)
 #include <libc/local/dos/delay.h>
-/* Sleep for `mill' milliseconds (1/1.000 seconds) */
+/* >> delay(3)
+ * Sleep for `mill' milliseconds (1/1.000 seconds) */
 __NAMESPACE_LOCAL_USING_OR_IMPL(delay, __FORCELOCAL __ATTR_ARTIFICIAL void __NOTHROW_RPC(__LIBCCALL delay)(unsigned int __mill) { (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(delay))(__mill); })
 #endif /* ... */
 #ifdef __CRT_HAVE__getdiskfree
@@ -90,10 +93,12 @@ __CREDIRECT(,unsigned int,__NOTHROW_RPC,_dos_getdiskfree,(unsigned int __drive, 
 #ifndef __sleep_defined
 #define __sleep_defined 1
 #ifdef __CRT_HAVE__sleep
-/* Sleep for up to `duration' seconds */
+/* >> sleep(2)
+ * Sleep for up to `duration' seconds */
 __CREDIRECT_VOID(,__NOTHROW_RPC,sleep,(unsigned int __duration),_sleep,(__duration))
 #elif defined(__CRT_HAVE_sleep)
-/* Sleep for up to `duration' seconds */
+/* >> sleep(2)
+ * Sleep for up to `duration' seconds */
 __CDECLARE_VOID(,__NOTHROW_RPC,sleep,(unsigned int __duration),(__duration))
 #else /* ... */
 #undef __sleep_defined

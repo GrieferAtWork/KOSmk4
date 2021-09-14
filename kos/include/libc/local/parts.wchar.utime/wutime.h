@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x246c8ab4 */
+/* HASH CRC-32:0x2f1931c */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -37,7 +37,11 @@ __CREDIRECT(__ATTR_NONNULL((1)),int,__NOTHROW_RPC,__localdep_crt_wutime32,(__WCH
 #define __local___localdep_wutime64_defined 1
 #ifdef __CRT_HAVE_wutime64
 __CREDIRECT(__ATTR_NONNULL((1)),int,__NOTHROW_RPC,__localdep_wutime64,(__WCHAR_TYPE__ const *__filename, struct __utimbuf64 const *__file_times),wutime64,(__filename,__file_times))
-#elif defined(__CRT_HAVE_wutime) && __SIZEOF_TIME32_T__ == __SIZEOF_TIME64_T__
+#else /* __CRT_HAVE_wutime64 */
+__NAMESPACE_LOCAL_END
+#include <bits/types.h>
+__NAMESPACE_LOCAL_BEGIN
+#if defined(__CRT_HAVE_wutime) && __SIZEOF_TIME32_T__ == __SIZEOF_TIME64_T__
 __CREDIRECT(__ATTR_NONNULL((1)),int,__NOTHROW_RPC,__localdep_wutime64,(__WCHAR_TYPE__ const *__filename, struct __utimbuf64 const *__file_times),wutime,(__filename,__file_times))
 #elif defined(__CRT_HAVE__wutime64)
 __CREDIRECT(__ATTR_NONNULL((1)),int,__NOTHROW_RPC,__localdep_wutime64,(__WCHAR_TYPE__ const *__filename, struct __utimbuf64 const *__file_times),_wutime64,(__filename,__file_times))
@@ -49,6 +53,7 @@ __NAMESPACE_LOCAL_BEGIN
 #else /* ... */
 #undef __local___localdep_wutime64_defined
 #endif /* !... */
+#endif /* !__CRT_HAVE_wutime64 */
 #endif /* !__local___localdep_wutime64_defined */
 __LOCAL_LIBC(wutime) __ATTR_NONNULL((1)) int
 __NOTHROW_RPC(__LIBCCALL __LIBC_LOCAL_NAME(wutime))(__WCHAR_TYPE__ const *__filename, struct utimbuf const *__file_times) {

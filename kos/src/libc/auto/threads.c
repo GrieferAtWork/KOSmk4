@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xde98bfc3 */
+/* HASH CRC-32:0x14359a5d */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -184,6 +184,7 @@ NOTHROW_RPC(LIBCCALL libc_mtx_timedlock)(mtx_t *__restrict mutex,
 #endif /* ETIMEDOUT */
 	return thrd_error;
 }
+#include <bits/types.h>
 #if __SIZEOF_TIME32_T__ == __SIZEOF_TIME64_T__
 DEFINE_INTERN_ALIAS(libc_mtx_timedlock64, libc_mtx_timedlock);
 #else /* __SIZEOF_TIME32_T__ == __SIZEOF_TIME64_T__ */
@@ -327,6 +328,7 @@ NOTHROW_RPC(LIBCCALL libc_cnd_timedwait)(cnd_t *__restrict cond,
 #endif /* ETIMEDOUT */
 	return thrd_error;
 }
+#include <bits/types.h>
 #if __SIZEOF_TIME32_T__ == __SIZEOF_TIME64_T__
 DEFINE_INTERN_ALIAS(libc_cnd_timedwait64, libc_cnd_timedwait);
 #else /* __SIZEOF_TIME32_T__ == __SIZEOF_TIME64_T__ */

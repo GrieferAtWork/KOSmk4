@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xb5b2321 */
+/* HASH CRC-32:0x45962486 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -40,11 +40,10 @@
 #endif /* __COMPILER_HAVE_PRAGMA_GCC_SYSTEM_HEADER */
 
 #include <features.h>
-
 #include <asm/os/sched.h>
-#include <bits/os/cpu_set.h>  /* struct __cpu_set_struct */
-#include <bits/os/sched.h>    /* struct sched_param */
-#include <bits/os/timespec.h> /* struct timespec */
+#include <bits/os/cpu_set.h>
+#include <bits/os/sched.h>
+#include <bits/os/timespec.h>
 #include <bits/types.h>
 
 #ifdef __USE_KOS

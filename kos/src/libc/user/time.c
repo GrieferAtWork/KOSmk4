@@ -195,8 +195,8 @@ NOTHROW_NCX(LIBCCALL libc_time64)(time64_t *timer)
 #endif /* MAGIC:alias */
 /*[[[end:libc_time64]]]*/
 
-/*[[[head:libc_stime,hash:CRC-32=0xdc7ded8e]]]*/
-/* >> stime(3), stime64(3)
+/*[[[head:libc_stime,hash:CRC-32=0xa3d0ce95]]]*/
+/* >> stime(2), stime64(2)
  * Set the system time to `*when'. This call is restricted to the superuser */
 INTERN ATTR_SECTION(".text.crt.time") NONNULL((1)) int
 NOTHROW_NCX(LIBCCALL libc_stime)(time_t const *when)
@@ -215,11 +215,11 @@ NOTHROW_NCX(LIBCCALL libc_stime)(time_t const *when)
 }
 /*[[[end:libc_stime]]]*/
 
-/*[[[head:libc_stime64,hash:CRC-32=0xf7c9f588]]]*/
+/*[[[head:libc_stime64,hash:CRC-32=0x91c973a6]]]*/
 #if __SIZEOF_TIME32_T__ == __SIZEOF_TIME64_T__
 DEFINE_INTERN_ALIAS(libc_stime64, libc_stime);
 #else /* MAGIC:alias */
-/* >> stime(3), stime64(3)
+/* >> stime(2), stime64(2)
  * Set the system time to `*when'. This call is restricted to the superuser */
 INTERN ATTR_SECTION(".text.crt.time") NONNULL((1)) int
 NOTHROW_NCX(LIBCCALL libc_stime64)(time64_t const *when)
@@ -272,11 +272,11 @@ NOTHROW_RPC(LIBCCALL libc_nanosleep64)(struct timespec64 const *__restrict reque
 #endif /* MAGIC:alias */
 /*[[[end:libc_nanosleep64]]]*/
 
-/*[[[head:libc_clock_settime64,hash:CRC-32=0x4f6b29a7]]]*/
+/*[[[head:libc_clock_settime64,hash:CRC-32=0x27dfaa66]]]*/
 #if __SIZEOF_TIME32_T__ == __SIZEOF_TIME64_T__
 DEFINE_INTERN_ALIAS(libc_clock_settime64, libc_clock_settime);
 #else /* MAGIC:alias */
-/* >> clock_settime(2)
+/* >> clock_settime(2), clock_settime64(2)
  * Set clock `clock_id' to value `tp' */
 INTERN ATTR_SECTION(".text.crt.time") NONNULL((2)) int
 NOTHROW_NCX(LIBCCALL libc_clock_settime64)(clockid_t clock_id,
@@ -290,8 +290,8 @@ NOTHROW_NCX(LIBCCALL libc_clock_settime64)(clockid_t clock_id,
 #endif /* MAGIC:alias */
 /*[[[end:libc_clock_settime64]]]*/
 
-/*[[[head:libc_clock_settime,hash:CRC-32=0xb876b1cd]]]*/
-/* >> clock_settime(2)
+/*[[[head:libc_clock_settime,hash:CRC-32=0x4d8f456e]]]*/
+/* >> clock_settime(2), clock_settime64(2)
  * Set clock `clock_id' to value `tp' */
 INTERN ATTR_SECTION(".text.crt.time") NONNULL((2)) int
 NOTHROW_NCX(LIBCCALL libc_clock_settime)(clockid_t clock_id,

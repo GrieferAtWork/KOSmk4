@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xac094b4 */
+/* HASH CRC-32:0x55f1d1e0 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -940,46 +940,70 @@ __NAMESPACE_LOCAL_USING_OR_IMPL(unicode_32to16, __FORCELOCAL __ATTR_ARTIFICIAL _
 #endif /* !__CRT_HAVE_unicode_32to16 */
 #ifdef __CRT_HAVE_unicode_c8toc16
 /* >> unicode_c8toc16(3)
- * @return: *:          Success (*pc16 was filled; the return value is the number of bytes taken from `s')
- * @return: 0:          Success (*pc16 was filled; `mbs' was modified, but nothing was read from `s'; in this case, a surrogate was written)
- * @return: (size_t)-1: Unicode error (the given input string isn't a valid unicode sequence)
- * @return: (size_t)-2: Success, but no character was generated (s...+=n, together with `mbs' doesn't for a full character, but `mbs' was updated) */
+ * @return: *:          Success (*pc16 was filled; the return value
+ *                      is  the  number  of bytes  taken  from `s')
+ * @return: 0:          Success (*pc16 was filled; `mbs' was modified,
+ *                      but nothing was read  from `s'; in this  case,
+ *                      a surrogate was written)
+ * @return: (size_t)-1: Unicode error (the given input string isn't
+ *                      a valid unicode sequence)
+ * @return: (size_t)-2: Success, but  no  character  was  generated
+ *                      (`s...+=n', together with `mbs' doesn't for
+ *                      a full  character, but  `mbs' was  updated) */
 __CDECLARE(__ATTR_NONNULL((1, 2, 4)),__SIZE_TYPE__,__NOTHROW_NCX,unicode_c8toc16,(char16_t *__restrict __pc16, char const *__restrict __s, __SIZE_TYPE__ __n, mbstate_t *__restrict __mbs),(__pc16,__s,__n,__mbs))
 #else /* __CRT_HAVE_unicode_c8toc16 */
 #include <libc/local/unicode/unicode_c8toc16.h>
 /* >> unicode_c8toc16(3)
- * @return: *:          Success (*pc16 was filled; the return value is the number of bytes taken from `s')
- * @return: 0:          Success (*pc16 was filled; `mbs' was modified, but nothing was read from `s'; in this case, a surrogate was written)
- * @return: (size_t)-1: Unicode error (the given input string isn't a valid unicode sequence)
- * @return: (size_t)-2: Success, but no character was generated (s...+=n, together with `mbs' doesn't for a full character, but `mbs' was updated) */
+ * @return: *:          Success (*pc16 was filled; the return value
+ *                      is  the  number  of bytes  taken  from `s')
+ * @return: 0:          Success (*pc16 was filled; `mbs' was modified,
+ *                      but nothing was read  from `s'; in this  case,
+ *                      a surrogate was written)
+ * @return: (size_t)-1: Unicode error (the given input string isn't
+ *                      a valid unicode sequence)
+ * @return: (size_t)-2: Success, but  no  character  was  generated
+ *                      (`s...+=n', together with `mbs' doesn't for
+ *                      a full  character, but  `mbs' was  updated) */
 __NAMESPACE_LOCAL_USING_OR_IMPL(unicode_c8toc16, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_NONNULL((1, 2, 4)) __SIZE_TYPE__ __NOTHROW_NCX(__LIBCCALL unicode_c8toc16)(char16_t *__restrict __pc16, char const *__restrict __s, __SIZE_TYPE__ __n, mbstate_t *__restrict __mbs) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(unicode_c8toc16))(__pc16, __s, __n, __mbs); })
 #endif /* !__CRT_HAVE_unicode_c8toc16 */
 #ifdef __CRT_HAVE_unicode_c8toc32
 /* >> unicode_c8toc32(3)
- * @return: *:          Success (*pc32 was filled; the return value is the number of bytes taken from `s')
- * @return: (size_t)-1: Unicode error (the given input string isn't a valid unicode sequence)
- * @return: (size_t)-2: Success, but no character was generated (s...+=n, together with `mbs' doesn't for a full character, but `mbs' was updated) */
+ * @return: *:          Success (*pc32 was filled; the return value
+ *                      is  the  number  of bytes  taken  from `s')
+ * @return: (size_t)-1: Unicode error (the given input string isn't
+ *                      a valid unicode sequence)
+ * @return: (size_t)-2: Success, but  no  character  was  generated
+ *                      (`s...+=n', together with `mbs' doesn't for
+ *                      a full  character, but  `mbs' was  updated) */
 __CDECLARE(__ATTR_NONNULL((1, 2, 4)),__SIZE_TYPE__,__NOTHROW_NCX,unicode_c8toc32,(char32_t *__restrict __pc32, char const *__restrict __s, __SIZE_TYPE__ __n, mbstate_t *__restrict __mbs),(__pc32,__s,__n,__mbs))
 #else /* __CRT_HAVE_unicode_c8toc32 */
 #include <libc/local/unicode/unicode_c8toc32.h>
 /* >> unicode_c8toc32(3)
- * @return: *:          Success (*pc32 was filled; the return value is the number of bytes taken from `s')
- * @return: (size_t)-1: Unicode error (the given input string isn't a valid unicode sequence)
- * @return: (size_t)-2: Success, but no character was generated (s...+=n, together with `mbs' doesn't for a full character, but `mbs' was updated) */
+ * @return: *:          Success (*pc32 was filled; the return value
+ *                      is  the  number  of bytes  taken  from `s')
+ * @return: (size_t)-1: Unicode error (the given input string isn't
+ *                      a valid unicode sequence)
+ * @return: (size_t)-2: Success, but  no  character  was  generated
+ *                      (`s...+=n', together with `mbs' doesn't for
+ *                      a full  character, but  `mbs' was  updated) */
 __NAMESPACE_LOCAL_USING_OR_IMPL(unicode_c8toc32, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_NONNULL((1, 2, 4)) __SIZE_TYPE__ __NOTHROW_NCX(__LIBCCALL unicode_c8toc32)(char32_t *__restrict __pc32, char const *__restrict __s, __SIZE_TYPE__ __n, mbstate_t *__restrict __mbs) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(unicode_c8toc32))(__pc32, __s, __n, __mbs); })
 #endif /* !__CRT_HAVE_unicode_c8toc32 */
 #ifdef __CRT_HAVE_unicode_c16toc8
 /* >> unicode_c16toc8(3)
  * @return: 0 :         Success, but no characters were generated
- * @return: * :         Success (this many bytes were written to `*pc8'; max is `UNICODE_16TO8_MAXBUF(1)')
- * @return: (size_t)-1: Unicode error (the given input string isn't a valid unicode sequence) */
+ * @return: * :         Success  (this many bytes were written to
+ *                      `*pc8'; max is `UNICODE_16TO8_MAXBUF(1)')
+ * @return: (size_t)-1: Unicode error (the given input string
+ *                      isn't  a   valid  unicode   sequence) */
 __CDECLARE(__ATTR_NONNULL((1, 3)),__SIZE_TYPE__,__NOTHROW_NCX,unicode_c16toc8,(char __pc8[3], char16_t __c16, mbstate_t *__restrict __mbs),(__pc8,__c16,__mbs))
 #else /* __CRT_HAVE_unicode_c16toc8 */
 #include <libc/local/unicode/unicode_c16toc8.h>
 /* >> unicode_c16toc8(3)
  * @return: 0 :         Success, but no characters were generated
- * @return: * :         Success (this many bytes were written to `*pc8'; max is `UNICODE_16TO8_MAXBUF(1)')
- * @return: (size_t)-1: Unicode error (the given input string isn't a valid unicode sequence) */
+ * @return: * :         Success  (this many bytes were written to
+ *                      `*pc8'; max is `UNICODE_16TO8_MAXBUF(1)')
+ * @return: (size_t)-1: Unicode error (the given input string
+ *                      isn't  a   valid  unicode   sequence) */
 __NAMESPACE_LOCAL_USING_OR_IMPL(unicode_c16toc8, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_NONNULL((1, 3)) __SIZE_TYPE__ __NOTHROW_NCX(__LIBCCALL unicode_c16toc8)(char __pc8[3], char16_t __c16, mbstate_t *__restrict __mbs) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(unicode_c16toc8))(__pc8, __c16, __mbs); })
 #endif /* !__CRT_HAVE_unicode_c16toc8 */
 
@@ -1134,12 +1158,19 @@ __NAMESPACE_LOCAL_USING_OR_IMPL(format_32to16, __FORCELOCAL __ATTR_ARTIFICIAL __
 #endif /* !... */
 #if !defined(____unicode_descriptor_defined) && defined(__CRT_HAVE___unicode_descriptor)
 #define ____unicode_descriptor_defined 1
-/* Return the internal descriptor for the given `ch' */
+/* >> __unicode_descriptor(3)
+ * Return the internal descriptor for the given `ch'
+ * This is the main accessor function for the unicode database, but
+ * should not be called directly (unless you know what you're doing
+ * and are aware that your code might break should this API ever be
+ * changed)
+ * Also note that this function never returns `NULL'! */
 __CDECLARE(__ATTR_CONST __ATTR_RETNONNULL,struct __unitraits const *,__NOTHROW,__unicode_descriptor,(char32_t __ch),(__ch))
 #endif /* !____unicode_descriptor_defined && __CRT_HAVE___unicode_descriptor */
 #if !defined(____unicode_descriptor_digit_defined) && defined(__CRT_HAVE___unicode_descriptor_digit)
 #define ____unicode_descriptor_digit_defined 1
-/* Return the integer constant associated with a given digit index
+/* >> __unicode_descriptor_digit(3), __unicode_descriptor_digit64(3)
+ * Return the integer constant associated  with a given digit  index
  * Returns `0' if the given index is invalid
  * @param: digit_idx: As read from `__unitraits::__ut_digit_idx' */
 __CDECLARE(__ATTR_CONST __ATTR_WUNUSED,__UINT8_TYPE__,__NOTHROW,__unicode_descriptor_digit,(__UINT8_TYPE__ __digit_idx),(__digit_idx))
@@ -1147,7 +1178,8 @@ __CDECLARE(__ATTR_CONST __ATTR_WUNUSED,__UINT8_TYPE__,__NOTHROW,__unicode_descri
 #ifdef __UINT64_TYPE__
 #if !defined(____unicode_descriptor_digit64_defined) && defined(__CRT_HAVE___unicode_descriptor_digit64)
 #define ____unicode_descriptor_digit64_defined 1
-/* Return the integer constant associated with a given digit index
+/* >> __unicode_descriptor_digit(3), __unicode_descriptor_digit64(3)
+ * Return the integer constant associated  with a given digit  index
  * Returns `0' if the given index is invalid
  * @param: digit_idx: As read from `__unitraits::__ut_digit_idx' */
 __CDECLARE(__ATTR_CONST __ATTR_WUNUSED,__UINT64_TYPE__,__NOTHROW,__unicode_descriptor_digit64,(__UINT8_TYPE__ __digit_idx),(__digit_idx))
@@ -1156,7 +1188,8 @@ __CDECLARE(__ATTR_CONST __ATTR_WUNUSED,__UINT64_TYPE__,__NOTHROW,__unicode_descr
 #ifndef __NO_FPU
 #if !defined(____unicode_descriptor_digitd_defined) && defined(__CRT_HAVE___unicode_descriptor_digitd)
 #define ____unicode_descriptor_digitd_defined 1
-/* Return the floating-point constant associated with a given digit index
+/* >> __unicode_descriptor_digitd(3), __unicode_descriptor_digitld(3)
+ * Return the floating-point constant associated with a given digit index
  * Returns `0.0' if the given index is invalid
  * @param: digit_idx: As read from `__unitraits::__ut_digit_idx' */
 __CDECLARE(__ATTR_CONST __ATTR_WUNUSED,double,__NOTHROW,__unicode_descriptor_digitd,(__UINT8_TYPE__ __digit_idx),(__digit_idx))
@@ -1164,7 +1197,8 @@ __CDECLARE(__ATTR_CONST __ATTR_WUNUSED,double,__NOTHROW,__unicode_descriptor_dig
 #ifdef __COMPILER_HAVE_LONGDOUBLE
 #if !defined(____unicode_descriptor_digitld_defined) && defined(__CRT_HAVE___unicode_descriptor_digitld)
 #define ____unicode_descriptor_digitld_defined 1
-/* Return the floating-point constant associated with a given digit index
+/* >> __unicode_descriptor_digitd(3), __unicode_descriptor_digitld(3)
+ * Return the floating-point constant associated with a given digit index
  * Returns `0.0' if the given index is invalid
  * @param: digit_idx: As read from `__unitraits::__ut_digit_idx' */
 __CDECLARE(__ATTR_CONST __ATTR_WUNUSED,__LONGDOUBLE,__NOTHROW,__unicode_descriptor_digitld,(__UINT8_TYPE__ __digit_idx),(__digit_idx))
@@ -1176,10 +1210,12 @@ __CDECLARE(__ATTR_CONST __ATTR_WUNUSED,__LONGDOUBLE,__NOTHROW,__unicode_descript
 #define UNICODE_FOLDED_MAX 3
 
 #ifdef __CRT_HAVE_unicode_fold
-/* Fold the given unicode character `ch' */
+/* >> unicode_fold(3)
+ * Fold the given unicode character `ch' */
 __CDECLARE(__ATTR_RETNONNULL __ATTR_NONNULL((2)),char32_t *,__NOTHROW_NCX,unicode_fold,(char32_t __ch, char32_t __buf[3]),(__ch,__buf))
 #else /* __CRT_HAVE_unicode_fold */
-/* Fold the given unicode character `ch' */
+/* >> unicode_fold(3)
+ * Fold the given unicode character `ch' */
 __LOCAL __ATTR_RETNONNULL __ATTR_NONNULL((2)) char32_t *__NOTHROW_NCX(__LIBCCALL unicode_fold)(char32_t __ch, char32_t __buf[3]) { __buf[0] = __ch; return __buf + 1; }
 #endif /* !__CRT_HAVE_unicode_fold */
 

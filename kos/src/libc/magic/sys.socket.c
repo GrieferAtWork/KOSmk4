@@ -1221,8 +1221,8 @@ int recvmmsg32($fd_t sockfd, [inp(vlen)] struct mmsghdr *vmessages,
 @@@return: * : The # of datagrams successfully received.
 @@@return: -1: Error (s.a. `recvmsg(2)')
 [[cp, no_crt_self_import]]
-[[if(defined(__USE_TIME_BITS64)), preferred_alias("recvmmsg64")]]
-[[if(!defined(__USE_TIME_BITS64)), preferred_alias("recvmmsg")]]
+[[if($extended_include_prefix("<features.h>") defined(__USE_TIME_BITS64)), preferred_alias("recvmmsg64")]]
+[[if($extended_include_prefix("<features.h>")!defined(__USE_TIME_BITS64)), preferred_alias("recvmmsg")]]
 [[userimpl, requires($has_function(recvmmsg32) || $has_function(recvmmsg64))]]
 [[decl_include("<features.h>", "<bits/types.h>", "<bits/os/mmsghdr.h>", "<bits/os/timespec.h>")]]
 int recvmmsg($fd_t sockfd, [inp(vlen)] struct mmsghdr *vmessages,

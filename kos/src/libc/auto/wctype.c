@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xb987156a */
+/* HASH CRC-32:0x2f0882b9 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -676,6 +676,8 @@ NOTHROW_NCX(LIBCCALL libc_wctrans_l)(char const *prop,
 	return libc_wctrans(prop);
 }
 #include <bits/crt/unicode.h>
+/* >> iswsymstrt(3), iswsymstrt_l(3)
+ * Check if `wc' may appear at the start of a symbol/keyword/identifier */
 INTERN ATTR_SECTION(".text.crt.dos.wchar.unicode.static.mbs") ATTR_CONST WUNUSED int
 NOTHROW_NCX(LIBDCALL libd___iswcsymf)(wint16_t wc) {
 #if defined(__CRT_KOS) && defined(__CRT_HAVE___unicode_descriptor)
@@ -686,6 +688,8 @@ NOTHROW_NCX(LIBDCALL libd___iswcsymf)(wint16_t wc) {
 #endif /* !__CRT_KOS || !__CRT_HAVE___unicode_descriptor */
 }
 #include <bits/crt/unicode.h>
+/* >> iswsymstrt(3), iswsymstrt_l(3)
+ * Check if `wc' may appear at the start of a symbol/keyword/identifier */
 INTERN ATTR_SECTION(".text.crt.dos.wchar.unicode.static.mbs") ATTR_CONST WUNUSED int
 NOTHROW_NCX(LIBKCALL libc___iswcsymf)(wint32_t wc) {
 #if defined(__CRT_KOS) && defined(__CRT_HAVE___unicode_descriptor)
@@ -696,6 +700,8 @@ NOTHROW_NCX(LIBKCALL libc___iswcsymf)(wint32_t wc) {
 #endif /* !__CRT_KOS || !__CRT_HAVE___unicode_descriptor */
 }
 #include <bits/crt/unicode.h>
+/* >> iswsymcont(3), iswsymcont_l(3)
+ * Check if `wc' may appear in the middle of a symbol/keyword/identifier */
 INTERN ATTR_SECTION(".text.crt.dos.wchar.unicode.static.mbs") ATTR_CONST WUNUSED int
 NOTHROW_NCX(LIBDCALL libd___iswcsym)(wint16_t wc) {
 #if defined(__CRT_KOS) && defined(__CRT_HAVE___unicode_descriptor)
@@ -706,6 +712,8 @@ NOTHROW_NCX(LIBDCALL libd___iswcsym)(wint16_t wc) {
 #endif /* !__CRT_KOS || !__CRT_HAVE___unicode_descriptor */
 }
 #include <bits/crt/unicode.h>
+/* >> iswsymcont(3), iswsymcont_l(3)
+ * Check if `wc' may appear in the middle of a symbol/keyword/identifier */
 INTERN ATTR_SECTION(".text.crt.dos.wchar.unicode.static.mbs") ATTR_CONST WUNUSED int
 NOTHROW_NCX(LIBKCALL libc___iswcsym)(wint32_t wc) {
 #if defined(__CRT_KOS) && defined(__CRT_HAVE___unicode_descriptor)
@@ -715,6 +723,8 @@ NOTHROW_NCX(LIBKCALL libc___iswcsym)(wint32_t wc) {
 	return libc_iswalnum(wc) || wc == '_' || wc == '$';
 #endif /* !__CRT_KOS || !__CRT_HAVE___unicode_descriptor */
 }
+/* >> iswsymstrt(3), iswsymstrt_l(3)
+ * Check if `wc' may appear at the start of a symbol/keyword/identifier */
 INTERN ATTR_SECTION(".text.crt.dos.wchar.unicode.locale.mbs") ATTR_PURE WUNUSED int
 NOTHROW_NCX(LIBDCALL libd__iswcsymf_l)(wint16_t wc,
                                        locale_t locale) {
@@ -726,6 +736,8 @@ NOTHROW_NCX(LIBDCALL libd__iswcsymf_l)(wint16_t wc,
 	return libd_iswalpha_l(wc, locale) || wc == '_' || wc == '$';
 #endif /* !__CRT_KOS || !__CRT_HAVE___unicode_descriptor */
 }
+/* >> iswsymstrt(3), iswsymstrt_l(3)
+ * Check if `wc' may appear at the start of a symbol/keyword/identifier */
 INTERN ATTR_SECTION(".text.crt.dos.wchar.unicode.locale.mbs") ATTR_PURE WUNUSED int
 NOTHROW_NCX(LIBKCALL libc__iswcsymf_l)(wint32_t wc,
                                        locale_t locale) {
@@ -737,6 +749,8 @@ NOTHROW_NCX(LIBKCALL libc__iswcsymf_l)(wint32_t wc,
 	return libc_iswalpha_l(wc, locale) || wc == '_' || wc == '$';
 #endif /* !__CRT_KOS || !__CRT_HAVE___unicode_descriptor */
 }
+/* >> iswsymcont(3), iswsymcont_l(3)
+ * Check if `wc' may appear in the middle of a symbol/keyword/identifier */
 INTERN ATTR_SECTION(".text.crt.dos.wchar.unicode.locale.mbs") ATTR_PURE WUNUSED int
 NOTHROW_NCX(LIBDCALL libd__iswcsym_l)(wint16_t wc,
                                       locale_t locale) {
@@ -748,6 +762,8 @@ NOTHROW_NCX(LIBDCALL libd__iswcsym_l)(wint16_t wc,
 	return libd_iswalnum_l(wc, locale) || wc == '_' || wc == '$';
 #endif /* !__CRT_KOS || !__CRT_HAVE___unicode_descriptor */
 }
+/* >> iswsymcont(3), iswsymcont_l(3)
+ * Check if `wc' may appear in the middle of a symbol/keyword/identifier */
 INTERN ATTR_SECTION(".text.crt.dos.wchar.unicode.locale.mbs") ATTR_PURE WUNUSED int
 NOTHROW_NCX(LIBKCALL libc__iswcsym_l)(wint32_t wc,
                                       locale_t locale) {
@@ -759,6 +775,7 @@ NOTHROW_NCX(LIBKCALL libc__iswcsym_l)(wint32_t wc,
 	return libc_iswalnum_l(wc, locale) || wc == '_' || wc == '$';
 #endif /* !__CRT_KOS || !__CRT_HAVE___unicode_descriptor */
 }
+/* >> isleadbyte(3) */
 INTERN ATTR_SECTION(".text.crt.wchar.unicode.static.mbs") ATTR_CONST WUNUSED int
 NOTHROW_NCX(LIBCCALL libc_isleadbyte)(int wc) {
 	return wc >= 192 && wc <= 255;

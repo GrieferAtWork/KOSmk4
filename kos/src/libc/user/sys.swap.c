@@ -32,8 +32,9 @@ DECL_BEGIN
 
 
 
-/*[[[head:libc_swapon,hash:CRC-32=0x93b3e652]]]*/
-/* @param swapflags: Set of `SWAP_FLAG_*' */
+/*[[[head:libc_swapon,hash:CRC-32=0xf92aa9f3]]]*/
+/* >> swapon(2)
+ * @param swapflags: Set of `SWAP_FLAG_*' */
 INTERN ATTR_SECTION(".text.crt.fs.swap") NONNULL((1)) int
 NOTHROW_RPC(LIBCCALL libc_swapon)(char const *path,
                                   __STDC_INT_AS_UINT_T swapflags)
@@ -45,7 +46,8 @@ NOTHROW_RPC(LIBCCALL libc_swapon)(char const *path,
 }
 /*[[[end:libc_swapon]]]*/
 
-/*[[[head:libc_swapoff,hash:CRC-32=0x42376f40]]]*/
+/*[[[head:libc_swapoff,hash:CRC-32=0xcb014164]]]*/
+/* >> swapoff(2) */
 INTERN ATTR_SECTION(".text.crt.fs.swap") NONNULL((1)) int
 NOTHROW_RPC(LIBCCALL libc_swapoff)(char const *path)
 /*[[[body:libc_swapoff]]]*/

@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x1831f6ae */
+/* HASH CRC-32:0x5f5fce49 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -31,15 +31,18 @@ __SYSDECL_BEGIN
 
 #ifdef __CRT_HAVE_feraiseexcept
 #include <kos/anno.h>
-/* @param: EXCEPTS: Set of `FE_*' */
+/* >> feraiseexcept(3)
+ * @param: excepts: Set of `FE_*' */
 __CREDIRECT(,int,__THROWING,__libc_core_feraiseexcept,(int __excepts),feraiseexcept,(__excepts))
 #else /* __CRT_HAVE_feraiseexcept */
 #include <libc/local/fenv/feraiseexcept.h>
-/* @param: EXCEPTS: Set of `FE_*' */
+/* >> feraiseexcept(3)
+ * @param: excepts: Set of `FE_*' */
 #define __libc_core_feraiseexcept __NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(feraiseexcept)
 #endif /* !__CRT_HAVE_feraiseexcept */
 #ifdef __CRT_HAVE_fegetround
-/* Get the current rounding direction
+/* >> fegetround(3)
+ * Get the current rounding direction
  * @return: One of...
  *             ... `FE_TONEAREST':  round()
  *             ... `FE_DOWNWARD':   floor()
@@ -48,7 +51,8 @@ __CREDIRECT(,int,__THROWING,__libc_core_feraiseexcept,(int __excepts),feraiseexc
 __CREDIRECT(__ATTR_PURE __ATTR_WUNUSED,int,__NOTHROW,__libc_core_fegetround,(void),fegetround,())
 #else /* __CRT_HAVE_fegetround */
 #include <libc/local/fenv/fegetround.h>
-/* Get the current rounding direction
+/* >> fegetround(3)
+ * Get the current rounding direction
  * @return: One of...
  *             ... `FE_TONEAREST':  round()
  *             ... `FE_DOWNWARD':   floor()
@@ -57,7 +61,8 @@ __CREDIRECT(__ATTR_PURE __ATTR_WUNUSED,int,__NOTHROW,__libc_core_fegetround,(voi
 #define __libc_core_fegetround __NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(fegetround)
 #endif /* !__CRT_HAVE_fegetround */
 #ifdef __CRT_HAVE_fesetround
-/* Set the current rounding direction
+/* >> fesetround(3)
+ * Set the current rounding direction
  * @param: rounding_direction: One of...
  *             ... `FE_TONEAREST':  round()
  *             ... `FE_DOWNWARD':   floor()
@@ -66,7 +71,8 @@ __CREDIRECT(__ATTR_PURE __ATTR_WUNUSED,int,__NOTHROW,__libc_core_fegetround,(voi
 __CREDIRECT(,int,__NOTHROW,__libc_core_fesetround,(int __rounding_direction),fesetround,(__rounding_direction))
 #else /* __CRT_HAVE_fesetround */
 #include <libc/local/fenv/fesetround.h>
-/* Set the current rounding direction
+/* >> fesetround(3)
+ * Set the current rounding direction
  * @param: rounding_direction: One of...
  *             ... `FE_TONEAREST':  round()
  *             ... `FE_DOWNWARD':   floor()

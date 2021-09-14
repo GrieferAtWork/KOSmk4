@@ -88,20 +88,23 @@ __NAMESPACE_STD_USING(fexcept_t)
 %
 
 
-@@@param: EXCEPTS: Set of `FE_*'
+@@>> feclearexcept(3)
+@@@param: excepts: Set of `FE_*'
 [[std, nothrow, preferred_fastbind, impl_include("<bits/crt/fenv-inline.h>")]]
 int feclearexcept(int excepts) {
 	@__inline_feclearexcept@(excepts);
 	return 0;
 }
 
-@@@param: EXCEPTS: Set of `FE_*'
+@@>> feraiseexcept(3)
+@@@param: excepts: Set of `FE_*'
 [[std, throws, preferred_fastbind, libc, impl_include("<bits/crt/fenv-inline.h>")]]
 int feraiseexcept(int excepts) {
 	@__inline_feraiseexcept@(excepts);
 	return 0;
 }
 
+@@>> fegetexceptflag(3)
 [[std, preferred_fastbind, impl_include("<bits/crt/fenv-inline.h>")]]
 int fegetexceptflag([[nonnull]] fexcept_t *flagp, int excepts) {
 @@pp_ifdef __inline_fegetexceptflag@@
@@ -113,6 +116,7 @@ int fegetexceptflag([[nonnull]] fexcept_t *flagp, int excepts) {
 	return 0;
 }
 
+@@>> fesetexceptflag(3)
 [[std, preferred_fastbind, impl_include("<bits/crt/fenv-inline.h>")]]
 int fesetexceptflag([[nonnull]] fexcept_t const *flagp, int excepts) {
 @@pp_ifdef __inline_fesetexceptflag@@
@@ -125,12 +129,14 @@ int fesetexceptflag([[nonnull]] fexcept_t const *flagp, int excepts) {
 	return 0;
 }
 
+@@>> fetestexcept(3)
 [[std, nothrow, wunused, ATTR_PURE]]
 [[preferred_fastbind, impl_include("<bits/crt/fenv-inline.h>")]]
 int fetestexcept(int excepts) {
 	return __inline_fetestexcept(excepts);
 }
 
+@@>> fegetround(3)
 @@Get the current rounding direction
 @@@return: One of...
 @@            ... `FE_TONEAREST':  round()
@@ -143,6 +149,7 @@ int fegetround() {
 	return __inline_fegetround();
 }
 
+@@>> fesetround(3)
 @@Set the current rounding direction
 @@@param: rounding_direction: One of...
 @@            ... `FE_TONEAREST':  round()
@@ -155,24 +162,28 @@ int fesetround(int rounding_direction) {
 	return __inline_fesetround(rounding_direction);
 }
 
+@@>> fegetenv(3)
 [[std, preferred_fastbind, impl_include("<bits/crt/fenv-inline.h>")]]
 int fegetenv([[nonnull]] fenv_t *envp) {
 	__inline_fegetenv(envp);
 	return 0;
 }
 
+@@>> feholdexcept(3)
 [[std, preferred_fastbind, impl_include("<bits/crt/fenv-inline.h>")]]
 int feholdexcept([[nonnull]] fenv_t *envp) {
 	__inline_feholdexcept(envp);
 	return 0;
 }
 
+@@>> fesetenv(3)
 [[std, preferred_fastbind, impl_include("<bits/crt/fenv-inline.h>")]]
 int fesetenv([[nonnull]] fenv_t const *envp) {
 	__inline_fesetenv(envp);
 	return 0;
 }
 
+@@>> feupdateenv(3)
 [[std, preferred_fastbind, impl_include("<bits/crt/fenv-inline.h>")]]
 int feupdateenv([[nonnull]] fenv_t const *envp) {
 	__inline_feupdateenv(envp);
@@ -181,16 +192,19 @@ int feupdateenv([[nonnull]] fenv_t const *envp) {
 
 
 %#ifdef __USE_GNU
+@@>> feenableexcept(3)
 [[nothrow, preferred_fastbind, impl_include("<bits/crt/fenv-inline.h>")]]
 int feenableexcept(int excepts) {
 	return __inline_feenableexcept(excepts);
 }
 
+@@>> fedisableexcept(3)
 [[nothrow, preferred_fastbind, impl_include("<bits/crt/fenv-inline.h>")]]
 int fedisableexcept(int excepts) {
 	return __inline_fedisableexcept(excepts);
 }
 
+@@>> fegetexcept(3)
 [[wunused, nothrow, ATTR_PURE]]
 [[preferred_fastbind, impl_include("<bits/crt/fenv-inline.h>")]]
 int fegetexcept() {

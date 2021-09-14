@@ -853,7 +853,7 @@ do_line_wise_comment_block:
 					comLine = text[commentEnd+#leadingPrefix:eol];
 					if (comLine.endswith("\\"))
 						commentLines = none;
-					commentLines.append(comLine);
+					commentLines.append(comLine.rstrip());
 					commentEnd = eol;
 				}
 				if (commentLines is none || #commentLines < 2) {

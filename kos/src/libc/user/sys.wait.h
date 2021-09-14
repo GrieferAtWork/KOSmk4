@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xe6bf08bb */
+/* HASH CRC-32:0xa03efbe7 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -47,17 +47,19 @@ INTDEF pid_t NOTHROW_RPC(LIBCCALL libc_waitpid)(pid_t pid, __WAIT_STATUS stat_lo
  * @param: options: At least one of `WEXITED', `WSTOPPED', `WCONTINUED',
  *                  optionally     or'd     with     `WNOHANG | WNOWAIT' */
 INTDEF int NOTHROW_RPC(LIBCCALL libc_waitid)(idtype_t idtype, id_t id, siginfo_t *infop, __STDC_INT_AS_UINT_T options);
-/* Same as `waitpid(-1, STAT_LOC, OPTIONS)', though also fills in `USAGE' when non-NULL
+/* >> wait3(2), wait3_64(2)
+ * Same as `waitpid(-1, STAT_LOC, OPTIONS)', though also fills in `USAGE' when non-NULL
  * @param options: Set of `WNOHANG | WUNTRACED | WCONTINUED' (as a KOS extension, `WNOWAIT' is also accepted) */
 INTDEF pid_t NOTHROW_RPC(LIBCCALL libc_wait3)(__WAIT_STATUS stat_loc, __STDC_INT_AS_UINT_T options, struct rusage *usage);
-/* Same as `waitpid(-1, STAT_LOC, OPTIONS)', though also fills in `USAGE' when non-NULL
+/* >> wait3(2), wait3_64(2)
+ * Same as `waitpid(-1, STAT_LOC, OPTIONS)', though also fills in `USAGE' when non-NULL
  * @param options: Set of `WNOHANG | WUNTRACED | WCONTINUED' (as a KOS extension, `WNOWAIT' is also accepted) */
 INTDEF pid_t NOTHROW_NCX(LIBCCALL libc_wait3_64)(__WAIT_STATUS stat_loc, __STDC_INT_AS_UINT_T options, struct rusage64 *usage);
-/* >> wait4(2)
+/* >> wait4(2), wait4_64(2)
  * Same as `waitpid(pid, STAT_LOC, OPTIONS)', though also fills in `USAGE' when non-NULL
  * @param: options: Set of `WNOHANG | WUNTRACED | WCONTINUED' (as a KOS extension, `WNOWAIT' is also accepted) */
 INTDEF pid_t NOTHROW_RPC(LIBCCALL libc_wait4)(pid_t pid, __WAIT_STATUS stat_loc, __STDC_INT_AS_UINT_T options, struct rusage *usage);
-/* >> wait4(2)
+/* >> wait4(2), wait4_64(2)
  * Same as `waitpid(pid, STAT_LOC, OPTIONS)', though also fills in `USAGE' when non-NULL
  * @param: options: Set of `WNOHANG | WUNTRACED | WCONTINUED' (as a KOS extension, `WNOWAIT' is also accepted) */
 INTDEF pid_t NOTHROW_NCX(LIBCCALL libc_wait4_64)(pid_t pid, __WAIT_STATUS stat_loc, __STDC_INT_AS_UINT_T options, struct rusage64 *usage);
@@ -103,9 +105,9 @@ INTDEF pid_t NOTHROW_NCX(LIBCCALL libc_wait4_64)(pid_t pid, __WAIT_STATUS stat_l
  *     If no waitable children existed, `ECHILD' is set; else `0' is returned.
  * Before any of this is done, the thread referred to by `PID' is one of the following:
  *   - The leader of the process that called `fork()' or `clone()' without
- *    `CLONE_PARENT' to create the thread referred to by `PID'
- *   - The creator of the process containing a thread that called
- *    `clone()' with `CLONE_PARENT', which then created the thread
+ *     `CLONE_PARENT'  to  create   the  thread  referred   to  by   `PID'
+ *   - The creator of the process  containing a thread that  called
+ *     `clone()' with `CLONE_PARENT', which then created the thread
  *     referred to by `PID'.
  *   - Even if  the thread  doesn't deliver  a signal  upon it  terminating,
  *     the process that would have received such a signal is still relevant.
@@ -136,19 +138,19 @@ INTDEF pid_t NOTHROW_NCX(LIBCCALL libc_wait4_64)(pid_t pid, __WAIT_STATUS stat_l
  *       In other words,  the child  of a  fork() can't  do this,  and
  *       neither can the spawnee of  clone(CLONE_THREAD|CLONE_PARENT),
  *       clone(0) or clone(CLONE_PARENT).
- * @errno: EPERM:               The  calling  process isn't  the recipient  of signals
- *                              delivered when `PID'  changes state.  This can  either
- *                              be because `PID' has already been detached, or because
- *                              YOU CAN'T DETACH SOMEONE ELSE'S THREAD!
- *                              Another  possibility is that the thread was already
- *                              detached, then exited, following which a new thread
- *                              got created and had been  assigned the PID of  your
- *                              ancient, no longer existent thread.
- * @errno: ECHILD:             `PID' was equal to `-1', but no waitable children existed
- * @throw: E_PROCESS_EXITED:    The  process  referred  to  by  `PID'  doesn't exist.
- *                              This could  mean that  it had  already been  detached
- *                              and exited, or that the `PID' is just invalid  (which
- *                              would also be the case if it was valid at some point) */
+ * @errno: EPERM:            The  calling  process isn't  the recipient  of signals
+ *                           delivered when `PID'  changes state.  This can  either
+ *                           be because `PID' has already been detached, or because
+ *                           YOU CAN'T DETACH SOMEONE ELSE'S THREAD!
+ *                           Another  possibility is that the thread was already
+ *                           detached, then exited, following which a new thread
+ *                           got created and had been  assigned the PID of  your
+ *                           ancient, no longer existent thread.
+ * @errno: ECHILD:           `PID' was equal to `-1', but no waitable children existed
+ * @throw: E_PROCESS_EXITED: The  process  referred  to  by  `PID'  doesn't exist.
+ *                           This could  mean that  it had  already been  detached
+ *                           and exited, or that the `PID' is just invalid  (which
+ *                           would also be the case if it was valid at some point) */
 INTDEF int NOTHROW_NCX(LIBCCALL libc_detach)(pid_t pid);
 #endif /* !__KERNEL__ */
 

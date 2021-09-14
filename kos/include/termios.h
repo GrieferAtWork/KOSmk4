@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x63419327 */
+/* HASH CRC-32:0x239dba80 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -630,27 +630,35 @@ typedef __pid_t pid_t;
 #endif /* __USE_UNIX98 || __USE_XOPEN2K8 */
 
 #ifdef __CRT_HAVE_cfgetospeed
+/* >> cfgetospeed(3) */
 __CDECLARE(__ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1)),speed_t,__NOTHROW_NCX,cfgetospeed,(struct termios const *__restrict __termios_p),(__termios_p))
 #else /* __CRT_HAVE_cfgetospeed */
 #include <libc/local/termios/cfgetospeed.h>
+/* >> cfgetospeed(3) */
 __NAMESPACE_LOCAL_USING_OR_IMPL(cfgetospeed, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1)) speed_t __NOTHROW_NCX(__LIBCCALL cfgetospeed)(struct termios const *__restrict __termios_p) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(cfgetospeed))(__termios_p); })
 #endif /* !__CRT_HAVE_cfgetospeed */
 #ifdef __CRT_HAVE_cfgetispeed
+/* >> cfgetispeed(3) */
 __CDECLARE(__ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1)),speed_t,__NOTHROW_NCX,cfgetispeed,(struct termios const *__restrict __termios_p),(__termios_p))
 #else /* __CRT_HAVE_cfgetispeed */
 #include <libc/local/termios/cfgetispeed.h>
+/* >> cfgetispeed(3) */
 __NAMESPACE_LOCAL_USING_OR_IMPL(cfgetispeed, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1)) speed_t __NOTHROW_NCX(__LIBCCALL cfgetispeed)(struct termios const *__restrict __termios_p) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(cfgetispeed))(__termios_p); })
 #endif /* !__CRT_HAVE_cfgetispeed */
 #ifdef __CRT_HAVE_cfsetospeed
+/* >> cfsetospeed(3) */
 __CDECLARE(__ATTR_NONNULL((1)),int,__NOTHROW_NCX,cfsetospeed,(struct termios *__restrict __termios_p, speed_t __speed),(__termios_p,__speed))
 #else /* __CRT_HAVE_cfsetospeed */
 #include <libc/local/termios/cfsetospeed.h>
+/* >> cfsetospeed(3) */
 __NAMESPACE_LOCAL_USING_OR_IMPL(cfsetospeed, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_NONNULL((1)) int __NOTHROW_NCX(__LIBCCALL cfsetospeed)(struct termios *__restrict __termios_p, speed_t __speed) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(cfsetospeed))(__termios_p, __speed); })
 #endif /* !__CRT_HAVE_cfsetospeed */
 #ifdef __CRT_HAVE_cfsetispeed
+/* >> cfsetispeed(3) */
 __CDECLARE(__ATTR_NONNULL((1)),int,__NOTHROW_NCX,cfsetispeed,(struct termios *__restrict __termios_p, speed_t __speed),(__termios_p,__speed))
 #else /* __CRT_HAVE_cfsetispeed */
 #include <libc/local/termios/cfsetispeed.h>
+/* >> cfsetispeed(3) */
 __NAMESPACE_LOCAL_USING_OR_IMPL(cfsetispeed, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_NONNULL((1)) int __NOTHROW_NCX(__LIBCCALL cfsetispeed)(struct termios *__restrict __termios_p, speed_t __speed) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(cfsetispeed))(__termios_p, __speed); })
 #endif /* !__CRT_HAVE_cfsetispeed */
 #ifdef __CRT_HAVE_tcgetattr
@@ -679,53 +687,63 @@ __CDECLARE(__ATTR_NONNULL((3)),int,__NOTHROW_NCX,tcsetattr,(__fd_t __fd, __STDC_
 __NAMESPACE_LOCAL_USING_OR_IMPL(tcsetattr, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_NONNULL((3)) int __NOTHROW_NCX(__LIBCCALL tcsetattr)(__fd_t __fd, __STDC_INT_AS_UINT_T __optional_actions, struct termios const *__restrict __termios_p) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(tcsetattr))(__fd, __optional_actions, __termios_p); })
 #endif /* ... */
 #ifdef __CRT_HAVE_tcsendbreak
+/* >> tcsendbreak(3) */
 __CDECLARE(,int,__NOTHROW_NCX,tcsendbreak,(__fd_t __fd, int __duration),(__fd,__duration))
 #else /* __CRT_HAVE_tcsendbreak */
 #include <asm/os/tty.h>
 #if defined(__CRT_HAVE_ioctl) && defined(__TCSBRKP)
 #include <libc/local/termios/tcsendbreak.h>
+/* >> tcsendbreak(3) */
 __NAMESPACE_LOCAL_USING_OR_IMPL(tcsendbreak, __FORCELOCAL __ATTR_ARTIFICIAL int __NOTHROW_NCX(__LIBCCALL tcsendbreak)(__fd_t __fd, int __duration) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(tcsendbreak))(__fd, __duration); })
 #endif /* __CRT_HAVE_ioctl && __TCSBRKP */
 #endif /* !__CRT_HAVE_tcsendbreak */
 #ifdef __CRT_HAVE_tcdrain
+/* >> tcdrain(3) */
 __CDECLARE(,int,__NOTHROW_RPC,tcdrain,(__fd_t __fd),(__fd))
 #else /* __CRT_HAVE_tcdrain */
 #include <asm/os/tty.h>
 #if defined(__CRT_HAVE_ioctl) && defined(__TCSBRK)
 #include <libc/local/termios/tcdrain.h>
+/* >> tcdrain(3) */
 __NAMESPACE_LOCAL_USING_OR_IMPL(tcdrain, __FORCELOCAL __ATTR_ARTIFICIAL int __NOTHROW_RPC(__LIBCCALL tcdrain)(__fd_t __fd) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(tcdrain))(__fd); })
 #endif /* __CRT_HAVE_ioctl && __TCSBRK */
 #endif /* !__CRT_HAVE_tcdrain */
 #ifdef __CRT_HAVE_tcflush
-/* @param: queue_selector: One of `TCIFLUSH', `TCOFLUSH' or `TCIOFLUSH' */
+/* >> tcflush(3)
+ * @param: queue_selector: One of `TCIFLUSH', `TCOFLUSH' or `TCIOFLUSH' */
 __CDECLARE(,int,__NOTHROW_NCX,tcflush,(__fd_t __fd, __STDC_INT_AS_UINT_T __queue_selector),(__fd,__queue_selector))
 #else /* __CRT_HAVE_tcflush */
 #include <asm/os/tty.h>
 #if defined(__CRT_HAVE_ioctl) && defined(__TCFLSH)
 #include <libc/local/termios/tcflush.h>
-/* @param: queue_selector: One of `TCIFLUSH', `TCOFLUSH' or `TCIOFLUSH' */
+/* >> tcflush(3)
+ * @param: queue_selector: One of `TCIFLUSH', `TCOFLUSH' or `TCIOFLUSH' */
 __NAMESPACE_LOCAL_USING_OR_IMPL(tcflush, __FORCELOCAL __ATTR_ARTIFICIAL int __NOTHROW_NCX(__LIBCCALL tcflush)(__fd_t __fd, __STDC_INT_AS_UINT_T __queue_selector) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(tcflush))(__fd, __queue_selector); })
 #endif /* __CRT_HAVE_ioctl && __TCFLSH */
 #endif /* !__CRT_HAVE_tcflush */
 #ifdef __CRT_HAVE_tcflow
-/* @param: action: One of `TCOOFF', `TCOON', `TCIOFF', `TCION' */
+/* >> tcflow(3)
+ * @param: action: One of `TCOOFF', `TCOON', `TCIOFF', `TCION' */
 __CDECLARE(,int,__NOTHROW_NCX,tcflow,(__fd_t __fd, __STDC_INT_AS_UINT_T __action),(__fd,__action))
 #else /* __CRT_HAVE_tcflow */
 #include <asm/os/tty.h>
 #if defined(__CRT_HAVE_ioctl) && defined(__TCXONC)
 #include <libc/local/termios/tcflow.h>
-/* @param: action: One of `TCOOFF', `TCOON', `TCIOFF', `TCION' */
+/* >> tcflow(3)
+ * @param: action: One of `TCOOFF', `TCOON', `TCIOFF', `TCION' */
 __NAMESPACE_LOCAL_USING_OR_IMPL(tcflow, __FORCELOCAL __ATTR_ARTIFICIAL int __NOTHROW_NCX(__LIBCCALL tcflow)(__fd_t __fd, __STDC_INT_AS_UINT_T __action) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(tcflow))(__fd, __action); })
 #endif /* __CRT_HAVE_ioctl && __TCXONC */
 #endif /* !__CRT_HAVE_tcflow */
 
 #if defined(__USE_UNIX98) || defined(__USE_XOPEN2K8)
 #ifdef __CRT_HAVE_tcgetsid
+/* >> tcgetsid(3) */
 __CDECLARE(,__pid_t,__NOTHROW_NCX,tcgetsid,(__fd_t __fd),(__fd))
 #else /* __CRT_HAVE_tcgetsid */
 #include <asm/os/tty.h>
 #if defined(__CRT_HAVE_ioctl) && defined(__TIOCGSID)
 #include <libc/local/termios/tcgetsid.h>
+/* >> tcgetsid(3) */
 __NAMESPACE_LOCAL_USING_OR_IMPL(tcgetsid, __FORCELOCAL __ATTR_ARTIFICIAL __pid_t __NOTHROW_NCX(__LIBCCALL tcgetsid)(__fd_t __fd) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(tcgetsid))(__fd); })
 #endif /* __CRT_HAVE_ioctl && __TIOCGSID */
 #endif /* !__CRT_HAVE_tcgetsid */
@@ -733,11 +751,13 @@ __NAMESPACE_LOCAL_USING_OR_IMPL(tcgetsid, __FORCELOCAL __ATTR_ARTIFICIAL __pid_t
 
 #if defined(__USE_BSD)
 #ifdef __CRT_HAVE_tcsetsid
+/* >> tcsetsid(3) */
 __CDECLARE(,int,__NOTHROW_NCX,tcsetsid,(__fd_t __fd, __pid_t __pid),(__fd,__pid))
 #else /* __CRT_HAVE_tcsetsid */
 #include <asm/os/tty.h>
 #if defined(__CRT_HAVE_ioctl) && defined(__TIOCSCTTY)
 #include <libc/local/termios/tcsetsid.h>
+/* >> tcsetsid(3) */
 __NAMESPACE_LOCAL_USING_OR_IMPL(tcsetsid, __FORCELOCAL __ATTR_ARTIFICIAL int __NOTHROW_NCX(__LIBCCALL tcsetsid)(__fd_t __fd, __pid_t __pid) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(tcsetsid))(__fd, __pid); })
 #endif /* __CRT_HAVE_ioctl && __TIOCSCTTY */
 #endif /* !__CRT_HAVE_tcsetsid */
@@ -745,9 +765,11 @@ __NAMESPACE_LOCAL_USING_OR_IMPL(tcsetsid, __FORCELOCAL __ATTR_ARTIFICIAL int __N
 
 #ifdef __USE_MISC
 #ifdef __CRT_HAVE_cfsetspeed
+/* >> cfsetspeed(3) */
 __CDECLARE(__ATTR_NONNULL((1)),int,__NOTHROW_NCX,cfsetspeed,(struct termios *__restrict __termios_p, speed_t __speed),(__termios_p,__speed))
 #else /* __CRT_HAVE_cfsetspeed */
 #include <libc/local/termios/cfsetspeed.h>
+/* >> cfsetspeed(3) */
 __NAMESPACE_LOCAL_USING_OR_IMPL(cfsetspeed, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_NONNULL((1)) int __NOTHROW_NCX(__LIBCCALL cfsetspeed)(struct termios *__restrict __termios_p, speed_t __speed) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(cfsetspeed))(__termios_p, __speed); })
 #endif /* !__CRT_HAVE_cfsetspeed */
 #ifdef __CRT_HAVE_cfmakeraw

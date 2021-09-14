@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x1bf92cfc */
+/* HASH CRC-32:0x4fdf5f5e */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -22,6 +22,8 @@
 #define __local_open_defined 1
 #include <__crt.h>
 #include <asm/os/fcntl.h>
+#include <asm/os/oflags.h>
+#include <features.h>
 #if defined(__CRT_HAVE_open64) || defined(__CRT_HAVE___open64) || defined(__CRT_HAVE_open) || defined(__CRT_HAVE__open) || defined(__CRT_HAVE___open) || (defined(__AT_FDCWD) && (defined(__CRT_HAVE_openat64) || defined(__CRT_HAVE_openat)))
 #include <bits/types.h>
 __NAMESPACE_LOCAL_BEGIN

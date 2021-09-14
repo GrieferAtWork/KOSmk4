@@ -38,12 +38,15 @@
 %[define_replacement(sem_t = __sem_t)]
 %[default:section(".text.crt{|.dos}.sched.semaphore")]
 
-%{
+%[insert:prefix(
 #include <features.h>
-
-#include <asm/crt/semaphore.h>  /* __ARCH_HAVE_INTERPROCESS_SEMAPHORES, __ARCH_HAVE_NON_UNIQUE_SEM_OPEN */
-#include <bits/crt/semaphore.h> /* __sem_t */
+)]%[insert:prefix(
+#include <asm/crt/semaphore.h>
+)]%[insert:prefix(
+#include <bits/crt/semaphore.h>
+)]%[insert:prefix(
 #include <bits/types.h>
+)]%{
 #ifdef __USE_XOPEN2K
 #include <bits/os/timespec.h>
 #endif /* __USE_XOPEN2K */
@@ -152,8 +155,8 @@ int sem_timedwait32([[nonnull]] sem_t *__restrict sem,
 @@@return: -1: [errno=EINTR]     Interrupted.
 @@@return: -1: [errno=ETIMEDOUT] The given `abstime' expired before a ticket became available.
 [[cp, no_crt_self_import, decl_include("<bits/crt/semaphore.h>", "<bits/os/timespec.h>")]]
-[[if(!defined(__USE_TIME_BITS64)), preferred_alias("sem_timedwait")]]
-[[if(defined(__USE_TIME_BITS64)), preferred_alias("sem_timedwait64")]]
+[[if($extended_include_prefix("<features.h>")!defined(__USE_TIME_BITS64)), preferred_alias("sem_timedwait")]]
+[[if($extended_include_prefix("<features.h>") defined(__USE_TIME_BITS64)), preferred_alias("sem_timedwait64")]]
 [[userimpl, requires($has_function(sem_timedwait32) || $has_function(sem_timedwait64))]]
 int sem_timedwait([[nonnull]] sem_t *__restrict sem,
                   [[nonnull]] struct timespec const *__restrict abstime) {

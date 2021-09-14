@@ -55,15 +55,19 @@ __SYSDECL_BEGIN
 
 }
 
+@@>> getttyent(3)
 [[cp_kos, decl_include("<bits/crt/db/ttyent.h>")]]
 struct ttyent *getttyent();
 
+@@>> getttynam(3)
 [[cp_kos, decl_include("<bits/crt/db/ttyent.h>")]]
 struct ttyent *getttynam([[nonnull]] char const *tty);
 
+@@>> setttyent(3)
 [[cp_kos]]
 int setttyent();
 
+@@>> endttyent(3)
 int endttyent();
 
 

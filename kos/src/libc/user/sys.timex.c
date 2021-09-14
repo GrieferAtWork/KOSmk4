@@ -31,7 +31,8 @@ DECL_BEGIN
 
 
 
-/*[[[head:libc_adjtimex,hash:CRC-32=0xfff02b48]]]*/
+/*[[[head:libc_adjtimex,hash:CRC-32=0x5881aa58]]]*/
+/* >> adjtimex(2), adjtimex64(2) */
 INTERN ATTR_SECTION(".text.crt.unsorted") NONNULL((1)) int
 NOTHROW_NCX(LIBCCALL libc_adjtimex)(struct timex *__restrict ntx)
 /*[[[body:libc_adjtimex]]]*/
@@ -43,7 +44,8 @@ NOTHROW_NCX(LIBCCALL libc_adjtimex)(struct timex *__restrict ntx)
 }
 /*[[[end:libc_adjtimex]]]*/
 
-/*[[[head:libc_ntp_gettimex,hash:CRC-32=0xfb4798d2]]]*/
+/*[[[head:libc_ntp_gettimex,hash:CRC-32=0xd7f76542]]]*/
+/* >> ntp_gettime(3), ntp_gettime64(3) */
 INTERN ATTR_SECTION(".text.crt.unsorted") NONNULL((1)) int
 NOTHROW_NCX(LIBCCALL libc_ntp_gettimex)(struct ntptimeval *__restrict ntv)
 /*[[[body:libc_ntp_gettimex]]]*/
@@ -55,7 +57,8 @@ NOTHROW_NCX(LIBCCALL libc_ntp_gettimex)(struct ntptimeval *__restrict ntv)
 }
 /*[[[end:libc_ntp_gettimex]]]*/
 
-/*[[[head:libc_ntp_adjtime,hash:CRC-32=0x4ff3a4b]]]*/
+/*[[[head:libc_ntp_adjtime,hash:CRC-32=0xaf27ee42]]]*/
+/* >> ntp_adjtime(3), ntp_adjtime64(3) */
 INTERN ATTR_SECTION(".text.crt.unsorted") NONNULL((1)) int
 NOTHROW_NCX(LIBCCALL libc_ntp_adjtime)(struct timex *__restrict tntx)
 /*[[[body:libc_ntp_adjtime]]]*/
@@ -67,10 +70,11 @@ NOTHROW_NCX(LIBCCALL libc_ntp_adjtime)(struct timex *__restrict tntx)
 }
 /*[[[end:libc_ntp_adjtime]]]*/
 
-/*[[[head:libc_adjtimex64,hash:CRC-32=0xba95dc83]]]*/
+/*[[[head:libc_adjtimex64,hash:CRC-32=0xaf50d44]]]*/
 #if __SIZEOF_TIME32_T__ == __SIZEOF_TIME64_T__
 DEFINE_INTERN_ALIAS(libc_adjtimex64, libc_adjtimex);
 #else /* MAGIC:alias */
+/* >> adjtimex(2), adjtimex64(2) */
 INTERN ATTR_SECTION(".text.crt.unsorted") NONNULL((1)) int
 NOTHROW_NCX(LIBCCALL libc_adjtimex64)(struct timex64 *__restrict ntx)
 /*[[[body:libc_adjtimex64]]]*/
@@ -83,10 +87,11 @@ NOTHROW_NCX(LIBCCALL libc_adjtimex64)(struct timex64 *__restrict ntx)
 #endif /* MAGIC:alias */
 /*[[[end:libc_adjtimex64]]]*/
 
-/*[[[head:libc_ntp_adjtime64,hash:CRC-32=0x23aaeb28]]]*/
+/*[[[head:libc_ntp_adjtime64,hash:CRC-32=0x4d196228]]]*/
 #if __SIZEOF_TIME32_T__ == __SIZEOF_TIME64_T__
 DEFINE_INTERN_ALIAS(libc_ntp_adjtime64, libc_ntp_adjtime);
 #else /* MAGIC:alias */
+/* >> ntp_adjtime(3), ntp_adjtime64(3) */
 INTERN ATTR_SECTION(".text.crt.unsorted") NONNULL((1)) int
 NOTHROW_NCX(LIBCCALL libc_ntp_adjtime64)(struct timex64 *__restrict tntx)
 /*[[[body:libc_ntp_adjtime64]]]*/
@@ -99,10 +104,11 @@ NOTHROW_NCX(LIBCCALL libc_ntp_adjtime64)(struct timex64 *__restrict tntx)
 #endif /* MAGIC:alias */
 /*[[[end:libc_ntp_adjtime64]]]*/
 
-/*[[[head:libc_ntp_gettimex64,hash:CRC-32=0xcf37f2b4]]]*/
+/*[[[head:libc_ntp_gettimex64,hash:CRC-32=0x826becfb]]]*/
 #if __SIZEOF_TIME32_T__ == __SIZEOF_TIME64_T__
 DEFINE_INTERN_ALIAS(libc_ntp_gettimex64, libc_ntp_gettimex);
 #else /* MAGIC:alias */
+/* >> ntp_gettime(3), ntp_gettime64(3) */
 INTERN ATTR_SECTION(".text.crt.unsorted") NONNULL((1)) int
 NOTHROW_NCX(LIBCCALL libc_ntp_gettimex64)(struct ntptimeval64 *__restrict ntv)
 /*[[[body:libc_ntp_gettimex64]]]*/

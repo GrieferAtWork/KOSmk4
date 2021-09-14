@@ -2873,8 +2873,8 @@ INTERN ATTR_SECTION(".text.crt.FILE.locked.access") NONNULL((1)) int
 }
 /*[[[end:libc_fclose]]]*/
 
-/*[[[head:libc_fputc,hash:CRC-32=0xd4afb91b]]]*/
-/* >> fputc(3)
+/*[[[head:libc_fputc,hash:CRC-32=0x9f807d86]]]*/
+/* >> putc(3), fputc(3)
  * Write a single character `ch' to `stream' */
 INTERN ATTR_SECTION(".text.crt.FILE.locked.write.putc") NONNULL((2)) int
 (LIBCCALL libc_fputc)(int ch,
@@ -2918,8 +2918,8 @@ NOTHROW_NCX(LIBCCALL libc_fileno)(FILE *__restrict stream)
 
 
 
-/*[[[head:libc_fgetc,hash:CRC-32=0xafb31771]]]*/
-/* >> fgetc(3)
+/*[[[head:libc_fgetc,hash:CRC-32=0xe5d78be6]]]*/
+/* >> getc(3), fgetc(3)
  * Read and return a single character from `stream'
  * If  the given `stream' has been exhausted or if an error occurred, `EOF' is
  * returned and the exact cause can be determined by using `ferror' and `feof' */
@@ -3004,8 +3004,8 @@ NOTHROW_RPC(LIBCCALL libc_popenve)(char const *path,
 DEFINE_INTERN_ALIAS(libc_pclose, libc_fclose);
 
 
-/*[[[head:libc_tmpnam_r,hash:CRC-32=0xa1d59189]]]*/
-/* >> tmpnam_r(3) */
+/*[[[head:libc_tmpnam_r,hash:CRC-32=0x6e2a6d14]]]*/
+/* >> tmpnam(3), tmpnam_r(3) */
 INTERN ATTR_SECTION(".text.crt.fs.utility") WUNUSED NONNULL((1)) char *
 NOTHROW_NCX(LIBCCALL libc_tmpnam_r)(char *buf)
 /*[[[body:libc_tmpnam_r]]]*/
@@ -3294,7 +3294,8 @@ DEFINE_INTERN_ALIAS(libc__filbuf, libc_fgetc_unlocked);
 DEFINE_INTERN_ALIAS(libc__flsbuf, libc_fputc_unlocked);
 
 
-/*[[[head:libc_tmpnam,hash:CRC-32=0x70b5e353]]]*/
+/*[[[head:libc_tmpnam,hash:CRC-32=0x4918ba0a]]]*/
+/* >> tmpnam(3), tmpnam_r(3) */
 INTERN ATTR_SECTION(".text.crt.fs.utility") WUNUSED NONNULL((1)) char *
 NOTHROW_NCX(LIBCCALL libc_tmpnam)(char *buf)
 /*[[[body:libc_tmpnam]]]*/
@@ -3330,8 +3331,8 @@ NOTHROW_NCX(LIBCCALL libc_tempnam)(char const *dir,
 
 
 
-/*[[[head:libc_rename,hash:CRC-32=0x877dd557]]]*/
-/* >> rename(3)
+/*[[[head:libc_rename,hash:CRC-32=0xc8bce13c]]]*/
+/* >> rename(2)
  * Rename  a given file `oldname' to `newname_or_path', or in the event
  * that `newname_or_path' refers to a directory, place the file within. */
 INTERN ATTR_SECTION(".text.crt.fs.modify") NONNULL((1, 2)) int

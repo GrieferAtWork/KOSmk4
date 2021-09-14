@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x58bd4666 */
+/* HASH CRC-32:0x5dc8781f */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -21,8 +21,8 @@
 #ifndef __local_sched_rr_get_interval_defined
 #define __local_sched_rr_get_interval_defined 1
 #include <__crt.h>
-#if defined(__CRT_HAVE_sched_rr_get_interval64) || defined(__CRT_HAVE_sched_rr_get_interval)
 #include <bits/types.h>
+#if defined(__CRT_HAVE_sched_rr_get_interval64) || defined(__CRT_HAVE_sched_rr_get_interval)
 #include <bits/os/timespec.h>
 __NAMESPACE_LOCAL_BEGIN
 #if !defined(__local___localdep_sched_rr_get_interval32_defined) && defined(__CRT_HAVE_sched_rr_get_interval)

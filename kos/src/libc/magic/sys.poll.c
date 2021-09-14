@@ -163,8 +163,8 @@ int ppoll32([[inp(nfds)]] struct pollfd *fds, nfds_t nfds,
             [[nullable]] $sigset_t const *ss);
 
 [[cp, no_crt_self_import]]
-[[if(defined(__USE_TIME_BITS64)), preferred_alias("ppoll")]]
-[[if(!defined(__USE_TIME_BITS64)), preferred_alias("ppoll64")]]
+[[if($extended_include_prefix("<features.h>") defined(__USE_TIME_BITS64)), preferred_alias("ppoll")]]
+[[if($extended_include_prefix("<features.h>")!defined(__USE_TIME_BITS64)), preferred_alias("ppoll64")]]
 [[userimpl, requires($has_function(ppoll32) || $has_function(ppoll64))]]
 [[decl_include("<bits/os/pollfd.h>", "<bits/os/timespec.h>", "<bits/os/sigset.h>")]]
 int ppoll([[inp(nfds)]] struct pollfd *fds, nfds_t nfds,

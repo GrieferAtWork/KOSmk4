@@ -99,6 +99,7 @@ __LIBC int error_one_per_line;
 )]
 
 
+@@>> error(3)
 @@Helper  function  for printing  an error  message to  `stderr' and  possibly exiting  the program
 @@The message is printed as: `<program_invocation_short_name>: <format...>[: <strerror(errnum)>]\n'
 @@Also note that `stdout' is flushed before the message is printed.
@@ -141,6 +142,7 @@ void error(int status, $errno_t errnum, const char *format, ...) {
 }
 
 
+@@>> error_at_line(3)
 @@Same as `error()', but also include the given filename in the error message.
 @@The message is printed as: `<program_invocation_short_name>:<filename>:<line>: <format...>[: <strerror(errnum)>]\n'
 @@Additionally,    when   `error_one_per_line'   is    non-zero,   consecutive   calls    to   this   function   that

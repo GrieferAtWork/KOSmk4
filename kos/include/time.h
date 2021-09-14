@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x19866f45 */
+/* HASH CRC-32:0x8f103beb */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -61,6 +61,8 @@ __NAMESPACE_STD_USING(tm)
 #ifdef __CRT_HAVE_clock
 __NAMESPACE_STD_USING(clock)
 #endif /* __CRT_HAVE_clock */
+#include <features.h>
+#include <bits/types.h>
 #if defined(__CRT_HAVE_time64) || defined(__CRT_HAVE__time64) || defined(__CRT_HAVE_time) || defined(__CRT_HAVE__time32)
 __NAMESPACE_STD_USING(time)
 #endif /* __CRT_HAVE_time64 || __CRT_HAVE__time64 || __CRT_HAVE_time || __CRT_HAVE__time32 */
@@ -93,7 +95,6 @@ __NAMESPACE_STD_USING(timespec_get)
 #endif /* __COMPILER_HAVE_PRAGMA_GCC_SYSTEM_HEADER */
 
 #include <features.h>
-
 #include <bits/crt/tm.h>
 #include <asm/crt/time.h>
 #include <asm/os/clock.h>
@@ -659,13 +660,16 @@ __NAMESPACE_LOCAL_USING_OR_IMPL(asctime, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_R
 #ifndef __std_asctime_s_defined
 #define __std_asctime_s_defined 1
 #ifdef __asctime_s_defined
+/* >> asctime_s(3) */
 __NAMESPACE_GLB_USING_OR_IMPL(asctime_s, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_NONNULL((1, 3)) __errno_t __NOTHROW_NCX(__LIBCCALL asctime_s)(char *__restrict __buf, size_t __buflen, struct tm const *__restrict __tp) { return :: asctime_s(__buf, __buflen, __tp); })
 #elif defined(__CRT_HAVE_asctime_s)
+/* >> asctime_s(3) */
 __CDECLARE(__ATTR_NONNULL((1, 3)),__errno_t,__NOTHROW_NCX,asctime_s,(char *__restrict __buf, size_t __buflen, struct tm const *__restrict __tp),(__buf,__buflen,__tp))
 #else /* ... */
 __NAMESPACE_STD_END
 #include <libc/local/time/asctime_s.h>
 __NAMESPACE_STD_BEGIN
+/* >> asctime_s(3) */
 __NAMESPACE_LOCAL_USING_OR_IMPL(asctime_s, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_NONNULL((1, 3)) __errno_t __NOTHROW_NCX(__LIBCCALL asctime_s)(char *__restrict __buf, size_t __buflen, struct tm const *__restrict __tp) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(asctime_s))(__buf, __buflen, __tp); })
 #endif /* !... */
 #endif /* !__std_asctime_s_defined */
@@ -986,16 +990,16 @@ __LIBC __LONGPTR_TYPE__ timezone __ASMNAME("__timezone");
 #ifndef __stime_defined
 #define __stime_defined 1
 #if defined(__CRT_HAVE_stime64) && defined(__USE_TIME_BITS64)
-/* >> stime(3), stime64(3)
+/* >> stime(2), stime64(2)
  * Set the system time to `*when'. This call is restricted to the superuser */
 __CREDIRECT(__ATTR_NONNULL((1)),int,__NOTHROW_NCX,stime,(__TM_TYPE(time) const *__when),stime64,(__when))
 #elif defined(__CRT_HAVE_stime) && !defined(__USE_TIME_BITS64)
-/* >> stime(3), stime64(3)
+/* >> stime(2), stime64(2)
  * Set the system time to `*when'. This call is restricted to the superuser */
 __CDECLARE(__ATTR_NONNULL((1)),int,__NOTHROW_NCX,stime,(__TM_TYPE(time) const *__when),(__when))
 #elif defined(__CRT_HAVE_stime64) || defined(__CRT_HAVE_stime)
 #include <libc/local/time/stime.h>
-/* >> stime(3), stime64(3)
+/* >> stime(2), stime64(2)
  * Set the system time to `*when'. This call is restricted to the superuser */
 __NAMESPACE_LOCAL_USING_OR_IMPL(stime, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_NONNULL((1)) int __NOTHROW_NCX(__LIBCCALL stime)(__TM_TYPE(time) const *__when) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(stime))(__when); })
 #else /* ... */
@@ -1047,26 +1051,28 @@ __CDECLARE(__ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1)),__TM_TYPE(time),__NOTH
 __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1)) __TM_TYPE(time) __NOTHROW_NCX(__LIBCCALL timelocal)(struct __NAMESPACE_STD_SYM tm __KOS_FIXED_CONST *__tp) { return (__TM_TYPE(time))(__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(mktime))((struct __NAMESPACE_STD_SYM tm __KOS_FIXED_CONST *)__tp); }
 #endif /* !... */
 #ifdef __CRT_HAVE_dysize
-/* Return the number of days in YEAR */
+/* >> dysize(3)
+ * Return the number of days in YEAR */
 __CDECLARE(__ATTR_CONST __ATTR_WUNUSED,int,__NOTHROW_NCX,dysize,(__STDC_INT_AS_UINT_T __year),(__year))
 #else /* __CRT_HAVE_dysize */
 #include <libc/local/time/dysize.h>
-/* Return the number of days in YEAR */
+/* >> dysize(3)
+ * Return the number of days in YEAR */
 __NAMESPACE_LOCAL_USING_OR_IMPL(dysize, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_CONST __ATTR_WUNUSED int __NOTHROW_NCX(__LIBCCALL dysize)(__STDC_INT_AS_UINT_T __year) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(dysize))(__year); })
 #endif /* !__CRT_HAVE_dysize */
 
 #ifdef __USE_TIME64
 #ifdef __CRT_HAVE_stime64
-/* >> stime(3), stime64(3)
+/* >> stime(2), stime64(2)
  * Set the system time to `*when'. This call is restricted to the superuser */
 __CDECLARE(__ATTR_NONNULL((1)),int,__NOTHROW_NCX,stime64,(__time64_t const *__when),(__when))
 #elif defined(__CRT_HAVE_stime) && __SIZEOF_TIME32_T__ == __SIZEOF_TIME64_T__
-/* >> stime(3), stime64(3)
+/* >> stime(2), stime64(2)
  * Set the system time to `*when'. This call is restricted to the superuser */
 __CREDIRECT(__ATTR_NONNULL((1)),int,__NOTHROW_NCX,stime64,(__time64_t const *__when),stime,(__when))
 #elif defined(__CRT_HAVE_stime)
 #include <libc/local/time/stime64.h>
-/* >> stime(3), stime64(3)
+/* >> stime(2), stime64(2)
  * Set the system time to `*when'. This call is restricted to the superuser */
 __NAMESPACE_LOCAL_USING_OR_IMPL(stime64, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_NONNULL((1)) int __NOTHROW_NCX(__LIBCCALL stime64)(__time64_t const *__when) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(stime64))(__when); })
 #endif /* ... */
@@ -1165,20 +1171,20 @@ __CREDIRECT(__ATTR_NONNULL((2)),int,__NOTHROW_NCX,clock_gettime,(clockid_t __clo
 __NAMESPACE_LOCAL_USING_OR_IMPL(clock_gettime, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_NONNULL((2)) int __NOTHROW_NCX(__LIBCCALL clock_gettime)(clockid_t __clock_id, struct timespec *__tp) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(clock_gettime))(__clock_id, __tp); })
 #endif /* ... */
 #if defined(__CRT_HAVE_clock_settime64) && defined(__USE_TIME_BITS64)
-/* >> clock_settime(2)
+/* >> clock_settime(2), clock_settime64(2)
  * Set clock `clock_id' to value `tp' */
 __CREDIRECT(__ATTR_NONNULL((2)),int,__NOTHROW_NCX,clock_settime,(clockid_t __clock_id, struct timespec const *__tp),clock_settime64,(__clock_id,__tp))
 #elif defined(__CRT_HAVE_clock_settime) && !defined(__USE_TIME_BITS64)
-/* >> clock_settime(2)
+/* >> clock_settime(2), clock_settime64(2)
  * Set clock `clock_id' to value `tp' */
 __CDECLARE(__ATTR_NONNULL((2)),int,__NOTHROW_NCX,clock_settime,(clockid_t __clock_id, struct timespec const *__tp),(__clock_id,__tp))
 #elif defined(__CRT_HAVE___clock_settime) && !defined(__USE_TIME_BITS64)
-/* >> clock_settime(2)
+/* >> clock_settime(2), clock_settime64(2)
  * Set clock `clock_id' to value `tp' */
 __CREDIRECT(__ATTR_NONNULL((2)),int,__NOTHROW_NCX,clock_settime,(clockid_t __clock_id, struct timespec const *__tp),__clock_settime,(__clock_id,__tp))
 #elif defined(__CRT_HAVE_clock_settime64) || defined(__CRT_HAVE_clock_settime) || defined(__CRT_HAVE___clock_settime)
 #include <libc/local/time/clock_settime.h>
-/* >> clock_settime(2)
+/* >> clock_settime(2), clock_settime64(2)
  * Set clock `clock_id' to value `tp' */
 __NAMESPACE_LOCAL_USING_OR_IMPL(clock_settime, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_NONNULL((2)) int __NOTHROW_NCX(__LIBCCALL clock_settime)(clockid_t __clock_id, struct timespec const *__tp) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(clock_settime))(__clock_id, __tp); })
 #endif /* ... */
@@ -1294,16 +1300,16 @@ __CREDIRECT(__ATTR_NONNULL((2)),int,__NOTHROW_NCX,clock_gettime64,(clockid_t __c
 __NAMESPACE_LOCAL_USING_OR_IMPL(clock_gettime64, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_NONNULL((2)) int __NOTHROW_NCX(__LIBCCALL clock_gettime64)(clockid_t __clock_id, struct timespec64 *__tp) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(clock_gettime64))(__clock_id, __tp); })
 #endif /* ... */
 #ifdef __CRT_HAVE_clock_settime64
-/* >> clock_settime(2)
+/* >> clock_settime(2), clock_settime64(2)
  * Set clock `clock_id' to value `tp' */
 __CDECLARE(__ATTR_NONNULL((2)),int,__NOTHROW_NCX,clock_settime64,(clockid_t __clock_id, struct timespec64 const *__tp),(__clock_id,__tp))
 #elif defined(__CRT_HAVE_clock_settime) && __SIZEOF_TIME32_T__ == __SIZEOF_TIME64_T__
-/* >> clock_settime(2)
+/* >> clock_settime(2), clock_settime64(2)
  * Set clock `clock_id' to value `tp' */
 __CREDIRECT(__ATTR_NONNULL((2)),int,__NOTHROW_NCX,clock_settime64,(clockid_t __clock_id, struct timespec64 const *__tp),clock_settime,(__clock_id,__tp))
 #elif defined(__CRT_HAVE_clock_settime) || defined(__CRT_HAVE___clock_settime)
 #include <libc/local/time/clock_settime64.h>
-/* >> clock_settime(2)
+/* >> clock_settime(2), clock_settime64(2)
  * Set clock `clock_id' to value `tp' */
 __NAMESPACE_LOCAL_USING_OR_IMPL(clock_settime64, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_NONNULL((2)) int __NOTHROW_NCX(__LIBCCALL clock_settime64)(clockid_t __clock_id, struct timespec64 const *__tp) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(clock_settime64))(__clock_id, __tp); })
 #endif /* ... */

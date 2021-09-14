@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x492cb6f2 */
+/* HASH CRC-32:0xba4bf212 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -30,6 +30,7 @@
 DECL_BEGIN
 
 #if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
+/* >> getttynam(3) */
 INTDEF NONNULL((1)) struct ttyent *NOTHROW_RPC_KOS(LIBDCALL libd_getttynam)(char const *tty);
 #endif /* !__LIBCCALL_IS_LIBDCALL && !__KERNEL__ */
 

@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x1c5e9b72 */
+/* HASH CRC-32:0xf0986447 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -2279,6 +2279,7 @@ __CDECLARE(__ATTR_WUNUSED __ATTR_NONNULL((1)),__fd_t,__NOTHROW_NCX,mkstemps,(cha
 __CREDIRECT(__ATTR_WUNUSED __ATTR_NONNULL((1)),__fd_t,__NOTHROW_NCX,mkstemps,(char *__template_, __STDC_INT_AS_SIZE_T __suffixlen),mkstemps64,(__template_,__suffixlen))
 #else /* ... */
 #include <asm/os/fcntl.h>
+#include <asm/os/oflags.h>
 #if defined(__CRT_HAVE_mkostemps) || defined(__CRT_HAVE_mkostemps64) || defined(__CRT_HAVE_open64) || defined(__CRT_HAVE___open64) || defined(__CRT_HAVE_open) || defined(__CRT_HAVE__open) || defined(__CRT_HAVE___open) || (defined(__AT_FDCWD) && (defined(__CRT_HAVE_openat64) || defined(__CRT_HAVE_openat)))
 #include <libc/local/stdlib/mkstemps.h>
 /* >> mkstemps(3), mkstemps64(3)
@@ -2323,15 +2324,18 @@ __CDECLARE(,int,__NOTHROW_RPC,getloadavg,(double __loadavg[], __STDC_INT_AS_SIZE
 #ifdef __USE_LARGEFILE64
 #ifdef __CRT_HAVE_mkstemps64
 __CDECLARE(__ATTR_WUNUSED __ATTR_NONNULL((1)),__fd_t,__NOTHROW_NCX,mkstemps64,(char *__template_, __STDC_INT_AS_SIZE_T __suffixlen),(__template_,__suffixlen))
-#elif defined(__CRT_HAVE_mkstemps) && (!defined(__O_LARGEFILE) || !__O_LARGEFILE)
+#else /* __CRT_HAVE_mkstemps64 */
+#include <asm/os/oflags.h>
+#if defined(__CRT_HAVE_mkstemps) && (!defined(__O_LARGEFILE) || !__O_LARGEFILE)
 __CREDIRECT(__ATTR_WUNUSED __ATTR_NONNULL((1)),__fd_t,__NOTHROW_NCX,mkstemps64,(char *__template_, __STDC_INT_AS_SIZE_T __suffixlen),mkstemps,(__template_,__suffixlen))
-#else /* ... */
+#else /* __CRT_HAVE_mkstemps && (!__O_LARGEFILE || !__O_LARGEFILE) */
 #include <asm/os/fcntl.h>
 #if defined(__CRT_HAVE_mkostemps) || defined(__CRT_HAVE_mkostemps64) || defined(__CRT_HAVE_open64) || defined(__CRT_HAVE___open64) || defined(__CRT_HAVE_open) || defined(__CRT_HAVE__open) || defined(__CRT_HAVE___open) || (defined(__AT_FDCWD) && (defined(__CRT_HAVE_openat64) || defined(__CRT_HAVE_openat)))
 #include <libc/local/stdlib/mkstemps64.h>
 __NAMESPACE_LOCAL_USING_OR_IMPL(mkstemps64, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_WUNUSED __ATTR_NONNULL((1)) __fd_t __NOTHROW_NCX(__LIBCCALL mkstemps64)(char *__template_, __STDC_INT_AS_SIZE_T __suffixlen) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(mkstemps64))(__template_, __suffixlen); })
 #endif /* __CRT_HAVE_mkostemps || __CRT_HAVE_mkostemps64 || __CRT_HAVE_open64 || __CRT_HAVE___open64 || __CRT_HAVE_open || __CRT_HAVE__open || __CRT_HAVE___open || (__AT_FDCWD && (__CRT_HAVE_openat64 || __CRT_HAVE_openat)) */
-#endif /* !... */
+#endif /* !__CRT_HAVE_mkstemps || (__O_LARGEFILE && __O_LARGEFILE) */
+#endif /* !__CRT_HAVE_mkstemps64 */
 #endif /* __USE_LARGEFILE64 */
 #endif /* __USE_MISC */
 
@@ -2569,6 +2573,7 @@ __CREDIRECT(__ATTR_RETNONNULL __ATTR_NONNULL((1)),char *,__NOTHROW_NCX,mktemp,(c
 __CREDIRECT(__ATTR_RETNONNULL __ATTR_NONNULL((1)),char *,__NOTHROW_NCX,mktemp,(char *__template_),__mktemp,(__template_))
 #else /* ... */
 #include <asm/os/fcntl.h>
+#include <asm/os/oflags.h>
 #if defined(__CRT_HAVE_open64) || defined(__CRT_HAVE___open64) || defined(__CRT_HAVE_open) || defined(__CRT_HAVE__open) || defined(__CRT_HAVE___open) || (defined(__AT_FDCWD) && (defined(__CRT_HAVE_openat64) || defined(__CRT_HAVE_openat))) || (defined(__CRT_HAVE_kstat) && defined(__CRT_KOS_PRIMARY)) || (defined(__CRT_HAVE_kstat64) && defined(__CRT_KOS_PRIMARY)) || (defined(__CRT_HAVE__stat64) && defined(__CRT_DOS_PRIMARY) && defined(__USE_TIME_BITS64)) || (defined(__CRT_HAVE__stat64i32) && defined(__CRT_DOS_PRIMARY) && defined(__USE_TIME_BITS64)) || (defined(__CRT_HAVE__stati64) && defined(__CRT_DOS_PRIMARY) && !defined(__USE_TIME_BITS64) && defined(__USE_FILE_OFFSET64)) || (defined(__CRT_HAVE__stat32i64) && defined(__CRT_DOS_PRIMARY) && !defined(__USE_TIME_BITS64) && defined(__USE_FILE_OFFSET64)) || (defined(__CRT_HAVE__stat) && defined(__CRT_DOS_PRIMARY) && !defined(__USE_TIME_BITS64) && !defined(__USE_FILE_OFFSET64)) || (defined(__CRT_HAVE__stat32) && defined(__CRT_DOS_PRIMARY) && !defined(__USE_TIME_BITS64) && !defined(__USE_FILE_OFFSET64)) || (defined(__CRT_HAVE_stat64) && defined(__USE_FILE_OFFSET64)) || (defined(__CRT_HAVE_stat) && !defined(__USE_FILE_OFFSET64))
 #include <libc/local/stdlib/mktemp.h>
 /* >> mktemp(3)
@@ -2646,6 +2651,7 @@ __CDECLARE(__ATTR_WUNUSED __ATTR_NONNULL((1)),__fd_t,__NOTHROW_RPC,mkstemp,(char
 __CREDIRECT(__ATTR_WUNUSED __ATTR_NONNULL((1)),__fd_t,__NOTHROW_RPC,mkstemp,(char *__template_),mkstemp64,(__template_))
 #else /* ... */
 #include <asm/os/fcntl.h>
+#include <asm/os/oflags.h>
 #if defined(__CRT_HAVE_mkstemps) || defined(__CRT_HAVE_mkstemps64) || defined(__CRT_HAVE_mkostemps) || defined(__CRT_HAVE_mkostemps64) || defined(__CRT_HAVE_open64) || defined(__CRT_HAVE___open64) || defined(__CRT_HAVE_open) || defined(__CRT_HAVE__open) || defined(__CRT_HAVE___open) || (defined(__AT_FDCWD) && (defined(__CRT_HAVE_openat64) || defined(__CRT_HAVE_openat)))
 #include <libc/local/stdlib/mkstemp.h>
 /* >> mkstemp(3), mkstemp64(3)
@@ -2663,6 +2669,7 @@ __CDECLARE(__ATTR_WUNUSED __ATTR_NONNULL((1)),__fd_t,__NOTHROW_RPC,mkstemp64,(ch
 #elif defined(__CRT_HAVE_mkstemp)
 __CREDIRECT(__ATTR_WUNUSED __ATTR_NONNULL((1)),__fd_t,__NOTHROW_RPC,mkstemp64,(char *__template_),mkstemp,(__template_))
 #else /* ... */
+#include <asm/os/oflags.h>
 #include <asm/os/fcntl.h>
 #if defined(__CRT_HAVE_mkstemps64) || (defined(__CRT_HAVE_mkstemps) && (!defined(__O_LARGEFILE) || !__O_LARGEFILE)) || defined(__CRT_HAVE_mkostemps) || defined(__CRT_HAVE_mkostemps64) || defined(__CRT_HAVE_open64) || defined(__CRT_HAVE___open64) || defined(__CRT_HAVE_open) || defined(__CRT_HAVE__open) || defined(__CRT_HAVE___open) || (defined(__AT_FDCWD) && (defined(__CRT_HAVE_openat64) || defined(__CRT_HAVE_openat)))
 #include <libc/local/stdlib/mkstemp64.h>
@@ -2698,6 +2705,7 @@ __NAMESPACE_LOCAL_USING_OR_IMPL(mkdtemp, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_W
 #ifdef __USE_XOPEN
 #if !defined(__setkey_defined) && defined(__CRT_HAVE_setkey)
 #define __setkey_defined 1
+/* >> setkey(3), setkey_r(3) */
 __CDECLARE_VOID(__ATTR_NONNULL((1)),__NOTHROW_NCX,setkey,(char const *__key),(__key))
 #endif /* !__setkey_defined && __CRT_HAVE_setkey */
 __CDECLARE_OPT(,int,__NOTHROW_NCX,grantpt,(__fd_t __fd),(__fd))
@@ -3544,6 +3552,7 @@ __CDECLARE(__ATTR_WUNUSED __ATTR_NONNULL((1)),__fd_t,__NOTHROW_NCX,mkostemp,(cha
 __CREDIRECT(__ATTR_WUNUSED __ATTR_NONNULL((1)),__fd_t,__NOTHROW_NCX,mkostemp,(char *__template_, __oflag_t __flags),mkostemp64,(__template_,__flags))
 #else /* ... */
 #include <asm/os/fcntl.h>
+#include <asm/os/oflags.h>
 #if defined(__CRT_HAVE_mkostemps) || defined(__CRT_HAVE_mkostemps64) || defined(__CRT_HAVE_open64) || defined(__CRT_HAVE___open64) || defined(__CRT_HAVE_open) || defined(__CRT_HAVE__open) || defined(__CRT_HAVE___open) || (defined(__AT_FDCWD) && (defined(__CRT_HAVE_openat64) || defined(__CRT_HAVE_openat)))
 #include <libc/local/stdlib/mkostemp.h>
 /* >> mkostemp(3), mkostemp64(3)
@@ -3566,6 +3575,7 @@ __CDECLARE(__ATTR_WUNUSED __ATTR_NONNULL((1)),__fd_t,__NOTHROW_NCX,mkostemps,(ch
 __CREDIRECT(__ATTR_WUNUSED __ATTR_NONNULL((1)),__fd_t,__NOTHROW_NCX,mkostemps,(char *__template_, __STDC_INT_AS_SIZE_T __suffixlen, __oflag_t __flags),mkostemps64,(__template_,__suffixlen,__flags))
 #else /* ... */
 #include <asm/os/fcntl.h>
+#include <asm/os/oflags.h>
 #if defined(__CRT_HAVE_open64) || defined(__CRT_HAVE___open64) || defined(__CRT_HAVE_open) || defined(__CRT_HAVE__open) || defined(__CRT_HAVE___open) || (defined(__AT_FDCWD) && (defined(__CRT_HAVE_openat64) || defined(__CRT_HAVE_openat)))
 #include <libc/local/stdlib/mkostemps.h>
 __NAMESPACE_LOCAL_USING_OR_IMPL(mkostemps, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_WUNUSED __ATTR_NONNULL((1)) __fd_t __NOTHROW_NCX(__LIBCCALL mkostemps)(char *__template_, __STDC_INT_AS_SIZE_T __suffixlen, __oflag_t __flags) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(mkostemps))(__template_, __suffixlen, __flags); })
@@ -3574,26 +3584,32 @@ __NAMESPACE_LOCAL_USING_OR_IMPL(mkostemps, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR
 #ifdef __USE_LARGEFILE64
 #ifdef __CRT_HAVE_mkostemp64
 __CDECLARE(__ATTR_WUNUSED __ATTR_NONNULL((1)),__fd_t,__NOTHROW_NCX,mkostemp64,(char *__template_, __oflag_t __flags),(__template_,__flags))
-#elif defined(__CRT_HAVE_mkostemp) && (!defined(__O_LARGEFILE) || !__O_LARGEFILE)
+#else /* __CRT_HAVE_mkostemp64 */
+#include <asm/os/oflags.h>
+#if defined(__CRT_HAVE_mkostemp) && (!defined(__O_LARGEFILE) || !__O_LARGEFILE)
 __CREDIRECT(__ATTR_WUNUSED __ATTR_NONNULL((1)),__fd_t,__NOTHROW_NCX,mkostemp64,(char *__template_, __oflag_t __flags),mkostemp,(__template_,__flags))
-#else /* ... */
+#else /* __CRT_HAVE_mkostemp && (!__O_LARGEFILE || !__O_LARGEFILE) */
 #include <asm/os/fcntl.h>
 #if defined(__CRT_HAVE_mkostemps) || defined(__CRT_HAVE_mkostemps64) || defined(__CRT_HAVE_open64) || defined(__CRT_HAVE___open64) || defined(__CRT_HAVE_open) || defined(__CRT_HAVE__open) || defined(__CRT_HAVE___open) || (defined(__AT_FDCWD) && (defined(__CRT_HAVE_openat64) || defined(__CRT_HAVE_openat)))
 #include <libc/local/stdlib/mkostemp64.h>
 __NAMESPACE_LOCAL_USING_OR_IMPL(mkostemp64, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_WUNUSED __ATTR_NONNULL((1)) __fd_t __NOTHROW_NCX(__LIBCCALL mkostemp64)(char *__template_, __oflag_t __flags) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(mkostemp64))(__template_, __flags); })
 #endif /* __CRT_HAVE_mkostemps || __CRT_HAVE_mkostemps64 || __CRT_HAVE_open64 || __CRT_HAVE___open64 || __CRT_HAVE_open || __CRT_HAVE__open || __CRT_HAVE___open || (__AT_FDCWD && (__CRT_HAVE_openat64 || __CRT_HAVE_openat)) */
-#endif /* !... */
+#endif /* !__CRT_HAVE_mkostemp || (__O_LARGEFILE && __O_LARGEFILE) */
+#endif /* !__CRT_HAVE_mkostemp64 */
 #ifdef __CRT_HAVE_mkostemps64
 __CDECLARE(__ATTR_WUNUSED __ATTR_NONNULL((1)),__fd_t,__NOTHROW_NCX,mkostemps64,(char *__template_, __STDC_INT_AS_SIZE_T __suffixlen, __oflag_t __flags),(__template_,__suffixlen,__flags))
-#elif defined(__CRT_HAVE_mkostemps) && (!defined(__O_LARGEFILE) || !__O_LARGEFILE)
+#else /* __CRT_HAVE_mkostemps64 */
+#include <asm/os/oflags.h>
+#if defined(__CRT_HAVE_mkostemps) && (!defined(__O_LARGEFILE) || !__O_LARGEFILE)
 __CREDIRECT(__ATTR_WUNUSED __ATTR_NONNULL((1)),__fd_t,__NOTHROW_NCX,mkostemps64,(char *__template_, __STDC_INT_AS_SIZE_T __suffixlen, __oflag_t __flags),mkostemps,(__template_,__suffixlen,__flags))
-#else /* ... */
+#else /* __CRT_HAVE_mkostemps && (!__O_LARGEFILE || !__O_LARGEFILE) */
 #include <asm/os/fcntl.h>
 #if defined(__CRT_HAVE_mkostemps) || defined(__CRT_HAVE_open64) || defined(__CRT_HAVE___open64) || defined(__CRT_HAVE_open) || defined(__CRT_HAVE__open) || defined(__CRT_HAVE___open) || (defined(__AT_FDCWD) && (defined(__CRT_HAVE_openat64) || defined(__CRT_HAVE_openat)))
 #include <libc/local/stdlib/mkostemps64.h>
 __NAMESPACE_LOCAL_USING_OR_IMPL(mkostemps64, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_WUNUSED __ATTR_NONNULL((1)) __fd_t __NOTHROW_NCX(__LIBCCALL mkostemps64)(char *__template_, __STDC_INT_AS_SIZE_T __suffixlen, __oflag_t __flags) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(mkostemps64))(__template_, __suffixlen, __flags); })
 #endif /* __CRT_HAVE_mkostemps || __CRT_HAVE_open64 || __CRT_HAVE___open64 || __CRT_HAVE_open || __CRT_HAVE__open || __CRT_HAVE___open || (__AT_FDCWD && (__CRT_HAVE_openat64 || __CRT_HAVE_openat)) */
-#endif /* !... */
+#endif /* !__CRT_HAVE_mkostemps || (__O_LARGEFILE && __O_LARGEFILE) */
+#endif /* !__CRT_HAVE_mkostemps64 */
 #endif /* __USE_LARGEFILE64 */
 #endif /* __USE_GNU || __USE_BSD */
 
@@ -3862,10 +3878,13 @@ typedef int (__LIBDCALL *_onexit_t)(void);
 #ifndef ____errno_location_defined
 #define ____errno_location_defined 1
 #ifdef __CRT_HAVE___errno_location
+/* >> __errno_location(3) */
 __CDECLARE(__ATTR_CONST __ATTR_RETNONNULL __ATTR_WUNUSED,__errno_t *,__NOTHROW_NCX,__errno_location,(void),())
 #elif defined(__CRT_HAVE__errno)
+/* >> __errno_location(3) */
 __CREDIRECT(__ATTR_CONST __ATTR_RETNONNULL __ATTR_WUNUSED,__errno_t *,__NOTHROW_NCX,__errno_location,(void),_errno,())
 #elif defined(__CRT_HAVE___errno)
+/* >> __errno_location(3) */
 __CREDIRECT(__ATTR_CONST __ATTR_RETNONNULL __ATTR_WUNUSED,__errno_t *,__NOTHROW_NCX,__errno_location,(void),__errno,())
 #else /* ... */
 #undef ____errno_location_defined

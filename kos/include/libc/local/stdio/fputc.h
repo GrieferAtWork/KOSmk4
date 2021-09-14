@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xc3078c35 */
+/* HASH CRC-32:0x58b50a1e */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -75,14 +75,14 @@ __NAMESPACE_LOCAL_END
 __NAMESPACE_LOCAL_BEGIN
 __LOCAL_LIBC(fputc) __ATTR_NONNULL((2)) int
 (__LIBCCALL __LIBC_LOCAL_NAME(fputc))(int __ch, __FILE *__restrict __stream) __THROWS(...) {
-#if defined(__CRT_DOS) && defined(__CRT_HAVE__flsbuf) && (!defined(__USE_STDIO_UNLOCKED) || (!defined(__CRT_HAVE_fwrite) && !defined(__CRT_HAVE__IO_fwrite) && !defined(__CRT_HAVE_fwrite_s) && !defined(__CRT_HAVE_fwrite_unlocked) && !defined(__CRT_HAVE__fwrite_nolock)))
+#if defined(__CRT_DOS) && defined(__CRT_HAVE__flsbuf) && (defined(__USE_STDIO_UNLOCKED) || (!defined(__CRT_HAVE_fwrite) && !defined(__CRT_HAVE__IO_fwrite) && !defined(__CRT_HAVE_fwrite_s) && !defined(__CRT_HAVE_fwrite_unlocked) && !defined(__CRT_HAVE__fwrite_nolock)))
 	return --__stream->__f_cnt >= 0 ? (int)((__UINT8_TYPE__)(*__stream->__f_ptr++ = (char)__ch)) : (__NAMESPACE_LOCAL_SYM __localdep__flsbuf)(__ch, __stream);
-#else /* __CRT_DOS && __CRT_HAVE__flsbuf && (!__USE_STDIO_UNLOCKED || (!__CRT_HAVE_fwrite && !__CRT_HAVE__IO_fwrite && !__CRT_HAVE_fwrite_s && !__CRT_HAVE_fwrite_unlocked && !__CRT_HAVE__fwrite_nolock)) */
+#else /* __CRT_DOS && __CRT_HAVE__flsbuf && (__USE_STDIO_UNLOCKED || (!__CRT_HAVE_fwrite && !__CRT_HAVE__IO_fwrite && !__CRT_HAVE_fwrite_s && !__CRT_HAVE_fwrite_unlocked && !__CRT_HAVE__fwrite_nolock)) */
 	unsigned char __byte = (unsigned char)(unsigned int)__ch;
 	if (!(__NAMESPACE_LOCAL_SYM __localdep_crt_fwrite)(&__byte, sizeof(unsigned char), 1, __stream))
 		return __EOF;
 	return __ch;
-#endif /* !__CRT_DOS || !__CRT_HAVE__flsbuf || (__USE_STDIO_UNLOCKED && (__CRT_HAVE_fwrite || __CRT_HAVE__IO_fwrite || __CRT_HAVE_fwrite_s || __CRT_HAVE_fwrite_unlocked || __CRT_HAVE__fwrite_nolock)) */
+#endif /* !__CRT_DOS || !__CRT_HAVE__flsbuf || (!__USE_STDIO_UNLOCKED && (__CRT_HAVE_fwrite || __CRT_HAVE__IO_fwrite || __CRT_HAVE_fwrite_s || __CRT_HAVE_fwrite_unlocked || __CRT_HAVE__fwrite_nolock)) */
 }
 __NAMESPACE_LOCAL_END
 #ifndef __local___localdep_fputc_defined

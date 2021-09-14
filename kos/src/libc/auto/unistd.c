@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x3da735b3 */
+/* HASH CRC-32:0x95ab5ec4 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -1007,7 +1007,7 @@ NOTHROW_RPC(LIBCCALL libc_getpass_r)(char const *prompt,
                                      size_t bufsize) {
 #if defined(__CRT_HAVE_getpassfd) || defined(__CRT_HAVE_read) || defined(__CRT_HAVE__read) || defined(__CRT_HAVE___read)
 	/* Prefer using `getpassfd(3)' because I feel like that one's more
-	 * user-friendly.  - But it it's not available, fall back on using
+	 * user-friendly.  - But if it's not available, fall back on using
 	 * the regular, old `readpassphrase(3)' */
 #ifdef __GETPASS_ECHO_NL
 	return libc_getpassfd(prompt, buf, bufsize, NULL, __GETPASS_ECHO_NL, 0);

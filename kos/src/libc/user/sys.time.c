@@ -40,7 +40,8 @@ DECL_BEGIN
 
 
 
-/*[[[head:libc_gettimeofday,hash:CRC-32=0x87183b24]]]*/
+/*[[[head:libc_gettimeofday,hash:CRC-32=0x551925d8]]]*/
+/* >> gettimeofday(2), gettimeofday64(2) */
 INTERN ATTR_SECTION(".text.crt.time") NONNULL((1)) int
 NOTHROW_NCX(LIBCCALL libc_gettimeofday)(struct timeval *__restrict tv,
                                         __timezone_ptr_t tz)
@@ -52,7 +53,8 @@ NOTHROW_NCX(LIBCCALL libc_gettimeofday)(struct timeval *__restrict tv,
 }
 /*[[[end:libc_gettimeofday]]]*/
 
-/*[[[head:libc_getitimer,hash:CRC-32=0xce2dccb8]]]*/
+/*[[[head:libc_getitimer,hash:CRC-32=0x62644703]]]*/
+/* >> getitimer(2), getitimer64(2) */
 INTERN ATTR_SECTION(".text.crt.time") NONNULL((2)) int
 NOTHROW_NCX(LIBCCALL libc_getitimer)(__itimer_which_t which,
                                      struct itimerval *curr_value)
@@ -64,7 +66,8 @@ NOTHROW_NCX(LIBCCALL libc_getitimer)(__itimer_which_t which,
 }
 /*[[[end:libc_getitimer]]]*/
 
-/*[[[head:libc_setitimer,hash:CRC-32=0x8efda95f]]]*/
+/*[[[head:libc_setitimer,hash:CRC-32=0x3d5884bc]]]*/
+/* >> setitimer(2), setitimer64(2) */
 INTERN ATTR_SECTION(".text.crt.time") NONNULL((2)) int
 NOTHROW_NCX(LIBCCALL libc_setitimer)(__itimer_which_t which,
                                      struct itimerval const *newval,
@@ -77,7 +80,8 @@ NOTHROW_NCX(LIBCCALL libc_setitimer)(__itimer_which_t which,
 }
 /*[[[end:libc_setitimer]]]*/
 
-/*[[[head:libc_utimes,hash:CRC-32=0x1402dc3a]]]*/
+/*[[[head:libc_utimes,hash:CRC-32=0x6336be24]]]*/
+/* >> utimes(2), utimes64(2) */
 INTERN ATTR_SECTION(".text.crt.fs.modify_time") NONNULL((1)) int
 NOTHROW_NCX(LIBCCALL libc_utimes)(char const *file,
                                   struct timeval const tvp[2])
@@ -89,7 +93,8 @@ NOTHROW_NCX(LIBCCALL libc_utimes)(char const *file,
 }
 /*[[[end:libc_utimes]]]*/
 
-/*[[[head:libc_futimesat,hash:CRC-32=0xf65ecb84]]]*/
+/*[[[head:libc_futimesat,hash:CRC-32=0x50f0c1e]]]*/
+/* >> futimesat(2), futimesat64(2) */
 INTERN ATTR_SECTION(".text.crt.fs.modify_time") NONNULL((2)) int
 NOTHROW_NCX(LIBCCALL libc_futimesat)(fd_t fd,
                                      char const *file,
@@ -102,7 +107,8 @@ NOTHROW_NCX(LIBCCALL libc_futimesat)(fd_t fd,
 }
 /*[[[end:libc_futimesat]]]*/
 
-/*[[[head:libc_settimeofday,hash:CRC-32=0xfe65b390]]]*/
+/*[[[head:libc_settimeofday,hash:CRC-32=0x3452324c]]]*/
+/* >> settimeofday(2), settimeofday64(2) */
 INTERN ATTR_SECTION(".text.crt.system.adjtime") int
 NOTHROW_NCX(LIBCCALL libc_settimeofday)(struct timeval const *tv,
                                         struct timezone const *tz)
@@ -114,7 +120,8 @@ NOTHROW_NCX(LIBCCALL libc_settimeofday)(struct timeval const *tv,
 }
 /*[[[end:libc_settimeofday]]]*/
 
-/*[[[head:libc_adjtime,hash:CRC-32=0xca501209]]]*/
+/*[[[head:libc_adjtime,hash:CRC-32=0xb8553b33]]]*/
+/* >> adjtime(3), adjtime64(3) */
 INTERN ATTR_SECTION(".text.crt.system.adjtime") int
 NOTHROW_NCX(LIBCCALL libc_adjtime)(struct timeval const *delta,
                                    struct timeval *olddelta)
@@ -137,7 +144,8 @@ NOTHROW_NCX(LIBCCALL libc_adjtime)(struct timeval const *delta,
 }
 /*[[[end:libc_adjtime]]]*/
 
-/*[[[head:libc_lutimes,hash:CRC-32=0x77275ed0]]]*/
+/*[[[head:libc_lutimes,hash:CRC-32=0x22ffb430]]]*/
+/* >> lutimes(2), lutimes64(2) */
 INTERN ATTR_SECTION(".text.crt.fs.modify_time") NONNULL((1)) int
 NOTHROW_NCX(LIBCCALL libc_lutimes)(char const *file,
                                    struct timeval const tvp[2])
@@ -152,7 +160,8 @@ NOTHROW_NCX(LIBCCALL libc_lutimes)(char const *file,
 }
 /*[[[end:libc_lutimes]]]*/
 
-/*[[[head:libc_futimes,hash:CRC-32=0x78e561bd]]]*/
+/*[[[head:libc_futimes,hash:CRC-32=0x3db4442a]]]*/
+/* >> futimes(2), futimes64(2) */
 INTERN ATTR_SECTION(".text.crt.fs.modify_time") int
 NOTHROW_NCX(LIBCCALL libc_futimes)(fd_t fd,
                                    struct timeval const tvp[2])
@@ -171,10 +180,11 @@ NOTHROW_NCX(LIBCCALL libc_futimes)(fd_t fd,
 }
 /*[[[end:libc_futimes]]]*/
 
-/*[[[head:libc_gettimeofday64,hash:CRC-32=0x8b48c4a9]]]*/
+/*[[[head:libc_gettimeofday64,hash:CRC-32=0xebba64ac]]]*/
 #if __SIZEOF_TIME32_T__ == __SIZEOF_TIME64_T__
 DEFINE_INTERN_ALIAS(libc_gettimeofday64, libc_gettimeofday);
 #else /* MAGIC:alias */
+/* >> gettimeofday(2), gettimeofday64(2) */
 INTERN ATTR_SECTION(".text.crt.time") NONNULL((1)) int
 NOTHROW_NCX(LIBCCALL libc_gettimeofday64)(struct timeval64 *__restrict tv,
                                           __timezone_ptr_t tz)
@@ -187,10 +197,11 @@ NOTHROW_NCX(LIBCCALL libc_gettimeofday64)(struct timeval64 *__restrict tv,
 #endif /* MAGIC:alias */
 /*[[[end:libc_gettimeofday64]]]*/
 
-/*[[[head:libc_getitimer64,hash:CRC-32=0x8be4bd08]]]*/
+/*[[[head:libc_getitimer64,hash:CRC-32=0xfd404d20]]]*/
 #if __SIZEOF_TIME32_T__ == __SIZEOF_TIME64_T__
 DEFINE_INTERN_ALIAS(libc_getitimer64, libc_getitimer);
 #else /* MAGIC:alias */
+/* >> getitimer(2), getitimer64(2) */
 INTERN ATTR_SECTION(".text.crt.time") NONNULL((2)) int
 NOTHROW_NCX(LIBCCALL libc_getitimer64)(__itimer_which_t which,
                                        struct itimerval64 *curr_value)
@@ -203,10 +214,11 @@ NOTHROW_NCX(LIBCCALL libc_getitimer64)(__itimer_which_t which,
 #endif /* MAGIC:alias */
 /*[[[end:libc_getitimer64]]]*/
 
-/*[[[head:libc_setitimer64,hash:CRC-32=0xed58bc5d]]]*/
+/*[[[head:libc_setitimer64,hash:CRC-32=0x72b3a1cf]]]*/
 #if __SIZEOF_TIME32_T__ == __SIZEOF_TIME64_T__
 DEFINE_INTERN_ALIAS(libc_setitimer64, libc_setitimer);
 #else /* MAGIC:alias */
+/* >> setitimer(2), setitimer64(2) */
 INTERN ATTR_SECTION(".text.crt.time") NONNULL((2)) int
 NOTHROW_NCX(LIBCCALL libc_setitimer64)(__itimer_which_t which,
                                        struct itimerval64 const *newval,
@@ -220,10 +232,11 @@ NOTHROW_NCX(LIBCCALL libc_setitimer64)(__itimer_which_t which,
 #endif /* MAGIC:alias */
 /*[[[end:libc_setitimer64]]]*/
 
-/*[[[head:libc_utimes64,hash:CRC-32=0xe0c3235d]]]*/
+/*[[[head:libc_utimes64,hash:CRC-32=0xc5605bc3]]]*/
 #if __SIZEOF_TIME32_T__ == __SIZEOF_TIME64_T__
 DEFINE_INTERN_ALIAS(libc_utimes64, libc_utimes);
 #else /* MAGIC:alias */
+/* >> utimes(2), utimes64(2) */
 INTERN ATTR_SECTION(".text.crt.fs.modify_time") NONNULL((1)) int
 NOTHROW_NCX(LIBCCALL libc_utimes64)(char const *file,
                                     struct timeval64 const tvp[2])
@@ -236,10 +249,11 @@ NOTHROW_NCX(LIBCCALL libc_utimes64)(char const *file,
 #endif /* MAGIC:alias */
 /*[[[end:libc_utimes64]]]*/
 
-/*[[[head:libc_settimeofday64,hash:CRC-32=0xf1b620c3]]]*/
+/*[[[head:libc_settimeofday64,hash:CRC-32=0xde1f03bc]]]*/
 #if __SIZEOF_TIME32_T__ == __SIZEOF_TIME64_T__
 DEFINE_INTERN_ALIAS(libc_settimeofday64, libc_settimeofday);
 #else /* MAGIC:alias */
+/* >> settimeofday(2), settimeofday64(2) */
 INTERN ATTR_SECTION(".text.crt.system.adjtime") int
 NOTHROW_NCX(LIBCCALL libc_settimeofday64)(struct timeval64 const *tv,
                                           struct timezone const *tz)
@@ -252,10 +266,11 @@ NOTHROW_NCX(LIBCCALL libc_settimeofday64)(struct timeval64 const *tv,
 #endif /* MAGIC:alias */
 /*[[[end:libc_settimeofday64]]]*/
 
-/*[[[head:libc_adjtime64,hash:CRC-32=0xab39394f]]]*/
+/*[[[head:libc_adjtime64,hash:CRC-32=0x37813be7]]]*/
 #if __SIZEOF_TIME32_T__ == __SIZEOF_TIME64_T__
 DEFINE_INTERN_ALIAS(libc_adjtime64, libc_adjtime);
 #else /* MAGIC:alias */
+/* >> adjtime(3), adjtime64(3) */
 INTERN ATTR_SECTION(".text.crt.system.adjtime") int
 NOTHROW_NCX(LIBCCALL libc_adjtime64)(struct timeval64 const *delta,
                                      struct timeval64 *olddelta)
@@ -290,10 +305,11 @@ NOTHROW_NCX(LIBCCALL libc_adjtime64)(struct timeval64 const *delta,
 #endif /* MAGIC:alias */
 /*[[[end:libc_adjtime64]]]*/
 
-/*[[[head:libc_lutimes64,hash:CRC-32=0xd44d5b8]]]*/
+/*[[[head:libc_lutimes64,hash:CRC-32=0x92645335]]]*/
 #if __SIZEOF_TIME32_T__ == __SIZEOF_TIME64_T__
 DEFINE_INTERN_ALIAS(libc_lutimes64, libc_lutimes);
 #else /* MAGIC:alias */
+/* >> lutimes(2), lutimes64(2) */
 INTERN ATTR_SECTION(".text.crt.fs.modify_time") NONNULL((1)) int
 NOTHROW_NCX(LIBCCALL libc_lutimes64)(char const *file,
                                      struct timeval64 const tvp[2])
@@ -309,10 +325,11 @@ NOTHROW_NCX(LIBCCALL libc_lutimes64)(char const *file,
 #endif /* MAGIC:alias */
 /*[[[end:libc_lutimes64]]]*/
 
-/*[[[head:libc_futimes64,hash:CRC-32=0xad60c93b]]]*/
+/*[[[head:libc_futimes64,hash:CRC-32=0x7f11d811]]]*/
 #if __SIZEOF_TIME32_T__ == __SIZEOF_TIME64_T__
 DEFINE_INTERN_ALIAS(libc_futimes64, libc_lutimes);
 #else /* MAGIC:alias */
+/* >> lutimes(2), lutimes64(2) */
 INTERN ATTR_SECTION(".text.crt.fs.modify_time") int
 NOTHROW_NCX(LIBCCALL libc_futimes64)(fd_t fd,
                                      struct timeval64 const tvp[2])
@@ -344,10 +361,11 @@ NOTHROW_NCX(LIBCCALL libc_futimes64)(fd_t fd,
 #endif /* MAGIC:alias */
 /*[[[end:libc_futimes64]]]*/
 
-/*[[[head:libc_futimesat64,hash:CRC-32=0xb1c6a21d]]]*/
+/*[[[head:libc_futimesat64,hash:CRC-32=0xdc0f7013]]]*/
 #if __SIZEOF_TIME32_T__ == __SIZEOF_TIME64_T__
 DEFINE_INTERN_ALIAS(libc_futimesat64, libc_futimesat);
 #else /* MAGIC:alias */
+/* >> futimesat(2), futimesat64(2) */
 INTERN ATTR_SECTION(".text.crt.fs.modify_time") NONNULL((2)) int
 NOTHROW_NCX(LIBCCALL libc_futimesat64)(fd_t fd,
                                        char const *file,

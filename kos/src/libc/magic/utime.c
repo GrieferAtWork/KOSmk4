@@ -99,10 +99,12 @@ int crt_futime32($fd_t fd, [[nullable]] struct $utimbuf32 const *file_times);
 [[cp, ignore, nocrt, alias("futime64", "_futime64")]]
 int crt_futime64($fd_t fd, [[nullable]] struct $utimbuf64 const *file_times);
 
+
+@@>> utime(2), utime64(2)
 [[decl_include("<bits/os/utimbuf.h>")]]
 [[cp, export_as("_utime32"), no_crt_self_import]]
-[[if(defined(__USE_TIME_BITS64)), preferred_alias("utime64", "_utime64")]]
-[[if(!defined(__USE_TIME_BITS64)), preferred_alias("utime", "_utime32")]]
+[[if($extended_include_prefix("<features.h>") defined(__USE_TIME_BITS64)), preferred_alias("utime64", "_utime64")]]
+[[if($extended_include_prefix("<features.h>")!defined(__USE_TIME_BITS64)), preferred_alias("utime", "_utime32")]]
 [[userimpl, requires($has_function(crt_utime32) || $has_function(crt_utime64))]]
 int utime([[nonnull]] char const *filename, [[nullable]] struct utimbuf const *file_times) {
 #ifdef __COMPILER_HAVE_PRAGMA_PUSHMACRO
@@ -134,7 +136,7 @@ int utime([[nonnull]] char const *filename, [[nullable]] struct utimbuf const *f
 
 %
 %#ifdef __USE_TIME64
-[[decl_include("<bits/os/utimbuf.h>")]]
+[[decl_include("<bits/os/utimbuf.h>"), doc_alias("utime")]]
 [[cp, export_alias("_utime64"), time64_variant_of(utime)]]
 [[userimpl, requires_function(crt_utime32)]]
 int utime64([[nonnull]] char const *filename, [[nullable]] struct utimbuf64 const *file_times) {
@@ -160,10 +162,11 @@ int utime64([[nonnull]] char const *filename, [[nullable]] struct utimbuf64 cons
 %
 %
 %#ifdef __USE_KOS
+@@>> futime(3), futime64(3)
 [[decl_include("<bits/os/utimbuf.h>")]]
 [[cp, export_as("_futime32"), no_crt_self_import]]
-[[if(defined(__USE_TIME_BITS64)), preferred_alias("futime64", "_futime64")]]
-[[if(!defined(__USE_TIME_BITS64)), preferred_alias("futime", "_futime32")]]
+[[if($extended_include_prefix("<features.h>") defined(__USE_TIME_BITS64)), preferred_alias("futime64", "_futime64")]]
+[[if($extended_include_prefix("<features.h>")!defined(__USE_TIME_BITS64)), preferred_alias("futime", "_futime32")]]
 [[userimpl, requires($has_function(crt_futime32) || $has_function(crt_futime64))]]
 int futime($fd_t fd, [[nullable]] struct utimbuf const *file_times) {
 #ifdef __COMPILER_HAVE_PRAGMA_PUSHMACRO
@@ -195,7 +198,7 @@ int futime($fd_t fd, [[nullable]] struct utimbuf const *file_times) {
 
 %
 %#ifdef __USE_TIME64
-[[decl_include("<bits/os/utimbuf.h>")]]
+[[decl_include("<bits/os/utimbuf.h>"), doc_alias("futime")]]
 [[cp, export_alias("_futime64"), time64_variant_of(futime)]]
 [[userimpl, requires_function(crt_futime32)]]
 int futime64($fd_t fd, [[nullable]] struct utimbuf64 const *file_times) {

@@ -47,8 +47,8 @@ $fd_t Open32([[nonnull]] char const *filename, $oflag_t oflags, ...);
 
 [[decl_include("<bits/types.h>"), no_crt_self_import]]
 [[cp, throws, guard, wunused, vartypes($mode_t)]]
-[[if(defined(__USE_FILE_OFFSET64)), preferred_alias("Open64")]]
-[[if(!defined(__USE_FILE_OFFSET64)), preferred_alias("Open")]]
+[[if($extended_include_prefix("<features.h>") defined(__USE_FILE_OFFSET64)), preferred_alias("Open64")]]
+[[if($extended_include_prefix("<features.h>")!defined(__USE_FILE_OFFSET64)), preferred_alias("Open")]]
 [[userimpl, requires_include("<asm/os/fcntl.h>")]]
 [[requires($has_function(Open64) || (defined(__AT_FDCWD) && $has_function(OpenAt)))]]
 $fd_t Open([[nonnull]] char const *filename, $oflag_t oflags, ...) {
@@ -66,8 +66,8 @@ $fd_t Open([[nonnull]] char const *filename, $oflag_t oflags, ...) {
 
 [[decl_include("<bits/types.h>")]]
 [[cp, throws, guard, wunused, no_crt_self_import]]
-[[if(defined(__USE_FILE_OFFSET64)), preferred_alias("Creat64")]]
-[[if(!defined(__USE_FILE_OFFSET64)), preferred_alias("Creat")]]
+[[if($extended_include_prefix("<features.h>") defined(__USE_FILE_OFFSET64)), preferred_alias("Creat64")]]
+[[if($extended_include_prefix("<features.h>")!defined(__USE_FILE_OFFSET64)), preferred_alias("Creat")]]
 [[impl_include("<asm/os/oflags.h>"), userimpl, requires_function(Open)]]
 $fd_t Creat([[nonnull]] char const *filename, $mode_t mode) {
 	return Open(filename, O_CREAT | O_WRONLY | O_TRUNC, mode);
@@ -113,8 +113,8 @@ $fd_t OpenAt32($fd_t dirfd, [[nonnull]] char const *filename, $oflag_t oflags, .
 
 [[decl_include("<bits/types.h>")]]
 [[cp, throws, guard, wunused, vartypes($mode_t), no_crt_self_import]]
-[[if(defined(__USE_FILE_OFFSET64)), preferred_alias("OpenAt64")]]
-[[if(!defined(__USE_FILE_OFFSET64)), preferred_alias("OpenAt")]]
+[[if($extended_include_prefix("<features.h>") defined(__USE_FILE_OFFSET64)), preferred_alias("OpenAt64")]]
+[[if($extended_include_prefix("<features.h>")!defined(__USE_FILE_OFFSET64)), preferred_alias("OpenAt")]]
 [[userimpl, requires($has_function(OpenAt32) || $has_function(OpenAt64))]]
 $fd_t OpenAt($fd_t dirfd, [[nonnull]] char const *filename, $oflag_t oflags, ...) {
 	$fd_t result;

@@ -45,21 +45,21 @@ __SYSDECL_BEGIN
 %[default:section(".text.crt{|.dos}.except.fs.stat")]
 
 [[throws, nocrt, doc_alias("stat"), no_crt_self_import]]
-[[if(defined(__USE_FILE_OFFSET64)), preferred_alias("KStat")]]
-[[if(!defined(__USE_FILE_OFFSET64)), preferred_alias("KStat64")]]
+[[if($extended_include_prefix("<features.h>") defined(__USE_FILE_OFFSET64)), preferred_alias("KStat")]]
+[[if($extended_include_prefix("<features.h>")!defined(__USE_FILE_OFFSET64)), preferred_alias("KStat64")]]
 void Stat([[nonnull]] char const *__restrict filename, [[nonnull]] struct stat *__restrict buf);
 
 %
 [[throws, nocrt, doc_alias("fstat"), no_crt_self_import]]
-[[if(defined(__USE_FILE_OFFSET64)), preferred_alias("KFStat")]]
-[[if(!defined(__USE_FILE_OFFSET64)), preferred_alias("KFStat64")]]
+[[if($extended_include_prefix("<features.h>") defined(__USE_FILE_OFFSET64)), preferred_alias("KFStat")]]
+[[if($extended_include_prefix("<features.h>")!defined(__USE_FILE_OFFSET64)), preferred_alias("KFStat64")]]
 void FStat($fd_t fd, [[nonnull]] struct stat *__restrict buf);
 
 %
 %#if defined(__USE_XOPEN_EXTENDED) || defined(__USE_XOPEN2K)
 [[throws, nocrt, doc_alias("lstat"), no_crt_self_import]]
-[[if(defined(__USE_FILE_OFFSET64)), preferred_alias("KLStat")]]
-[[if(!defined(__USE_FILE_OFFSET64)), preferred_alias("KLStat64")]]
+[[if($extended_include_prefix("<features.h>") defined(__USE_FILE_OFFSET64)), preferred_alias("KLStat")]]
+[[if($extended_include_prefix("<features.h>")!defined(__USE_FILE_OFFSET64)), preferred_alias("KLStat64")]]
 void LStat([[nonnull]] char const *__restrict filename,
            [[nonnull]] struct stat *__restrict buf);
 %#endif /* __USE_XOPEN_EXTENDED || __USE_XOPEN2K */
@@ -89,8 +89,8 @@ void LStat64([[nonnull]] char const *__restrict filename,
 %#ifdef __USE_ATFILE
 
 [[throws, nocrt, doc_alias("fstatat"), no_crt_self_import]]
-[[if(defined(__USE_FILE_OFFSET64)), preferred_alias("KFStatAt")]]
-[[if(!defined(__USE_FILE_OFFSET64)), preferred_alias("KFStatAt64")]]
+[[if($extended_include_prefix("<features.h>") defined(__USE_FILE_OFFSET64)), preferred_alias("KFStatAt")]]
+[[if($extended_include_prefix("<features.h>")!defined(__USE_FILE_OFFSET64)), preferred_alias("KFStatAt64")]]
 void FStatAt($fd_t dirfd, [[nonnull]] char const *__restrict filename,
              [[nonnull]] struct stat *__restrict buf, $atflag_t flags);
 
@@ -169,8 +169,8 @@ void UTimensAt32($fd_t dirfd, [[nonnull]] char const *filename,
 %
 %#ifdef __USE_ATFILE
 [[cp, throws, doc_alias("utimensat"), no_crt_self_import]]
-[[if(defined(__USE_TIME_BITS64)), preferred_alias("UTimensAt64")]]
-[[if(!defined(__USE_TIME_BITS64)), preferred_alias("UTimensAt")]]
+[[if($extended_include_prefix("<features.h>") defined(__USE_TIME_BITS64)), preferred_alias("UTimensAt64")]]
+[[if($extended_include_prefix("<features.h>")!defined(__USE_TIME_BITS64)), preferred_alias("UTimensAt")]]
 [[userimpl, requires($has_function(UTimensAt32) || $has_function(UTimensAt64))]]
 [[impl_include("<asm/os/fcntl.h>")]]
 void UTimensAt($fd_t dirfd, [[nonnull]] char const *filename,
@@ -277,8 +277,8 @@ void FUtimens32($fd_t fd, [[nullable]] struct timespec const times[2 /*or:3*/]);
 %
 %#ifdef __USE_XOPEN2K8
 [[cp, throws, doc_alias("futimens"), no_crt_self_import]]
-[[if(defined(__USE_TIME_BITS64)), preferred_alias("FUtimens64")]]
-[[if(!defined(__USE_TIME_BITS64)), preferred_alias("FUtimens")]]
+[[if($extended_include_prefix("<features.h>") defined(__USE_TIME_BITS64)), preferred_alias("FUtimens64")]]
+[[if($extended_include_prefix("<features.h>")!defined(__USE_TIME_BITS64)), preferred_alias("FUtimens")]]
 [[userimpl, requires($has_function(FUtimens32) || $has_function(FUtimens64))]]
 FUtimens:($fd_t fd, [[nullable]] struct timespec const times[2 /*or:3*/]) {
 @@pp_if $has_function(UTimensAt64)@@

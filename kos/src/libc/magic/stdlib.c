@@ -2093,7 +2093,7 @@ int clearenv();
 @@                   after the required 6 trailing 'X'-characters.
 [[section(".text.crt{|.dos}.fs.utility")]]
 [[wunused, guard, decl_include("<features.h>", "<bits/types.h>")]]
-[[if(defined(__USE_FILE_OFFSET64)), preferred_alias("mkstemps64")]]
+[[if($extended_include_prefix("<features.h>") defined(__USE_FILE_OFFSET64)), preferred_alias("mkstemps64")]]
 [[export_alias("mkstemps64"), requires_function(mkostemps)]]
 $fd_t mkstemps([[nonnull]] char *template_, __STDC_INT_AS_SIZE_T suffixlen) {
 	return mkostemps(template_, suffixlen, 0);
@@ -2471,7 +2471,7 @@ int getsubopt([[nonnull]] char **__restrict optionp,
 @@will not already exists. Then, create a new file with `O_RDWR' and return
 @@the file descriptor of that file.
 [[section(".text.crt{|.dos}.fs.utility")]]
-[[if(defined(__USE_FILE_OFFSET64)), preferred_alias("mkstemp64")]]
+[[if($extended_include_prefix("<features.h>") defined(__USE_FILE_OFFSET64)), preferred_alias("mkstemp64")]]
 [[cp, wunused, export_alias("mkstemp64"), requires_function(mkstemps)]]
 [[decl_include("<bits/types.h>")]]
 $fd_t mkstemp([[nonnull]] char *template_) {
@@ -3427,7 +3427,7 @@ void qsort_r([[nonnull]] void *pbase, $size_t item_count, $size_t item_size,
 @@@param: flags: Additional  flags  to pass  to `open(2)',
 @@               but `O_ACCMODE' is always set to `O_RDWR'
 [[section(".text.crt{|.dos}.fs.utility")]]
-[[if(defined(__USE_FILE_OFFSET64)), preferred_alias("mkostemp64")]]
+[[if($extended_include_prefix("<features.h>") defined(__USE_FILE_OFFSET64)), preferred_alias("mkostemp64")]]
 [[wunused, export_alias("mkostemp64"), requires_function(mkostemps)]]
 [[decl_include("<bits/types.h>")]]
 $fd_t mkostemp([[nonnull]] char *template_, $oflag_t flags) {
@@ -3435,7 +3435,7 @@ $fd_t mkostemp([[nonnull]] char *template_, $oflag_t flags) {
 }
 
 [[section(".text.crt{|.dos}.fs.utility")]]
-[[if(defined(__USE_FILE_OFFSET64)), preferred_alias("mkostemps64")]]
+[[if($extended_include_prefix("<features.h>") defined(__USE_FILE_OFFSET64)), preferred_alias("mkostemps64")]]
 [[wunused, export_alias("mkostemps64")]]
 [[decl_include("<features.h>", "<bits/types.h>")]]
 [[requires_function(open, system_mktemp)]]

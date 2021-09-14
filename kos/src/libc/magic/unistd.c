@@ -888,8 +888,8 @@ $off32_t lseek32($fd_t fd, $off32_t offset, __STDC_INT_AS_UINT_T whence);
 @@>> lseek(2)
 @@Change the position of the file read/write pointer within a file referred to by `fd'
 [[guard, no_crt_self_import, decl_include("<features.h>", "<bits/types.h>")]]
-[[if(defined(__USE_FILE_OFFSET64)), preferred_alias("lseek64", "_lseeki64")]]
-[[if(!defined(__USE_FILE_OFFSET64)), preferred_alias("lseek", "_lseek", "__lseek")]]
+[[if($extended_include_prefix("<features.h>") defined(__USE_FILE_OFFSET64)), preferred_alias("lseek64", "_lseeki64")]]
+[[if($extended_include_prefix("<features.h>")!defined(__USE_FILE_OFFSET64)), preferred_alias("lseek", "_lseek", "__lseek")]]
 [[userimpl, requires($has_function(lseek32) || $has_function(lseek64))]]
 [[section(".text.crt{|.dos}.io.seek")]]
 [[dos_only_export_as("_lseek"), export_as("__lseek")]]
@@ -1113,8 +1113,8 @@ $off64_t lseek64($fd_t fd, $off64_t offset, __STDC_INT_AS_UINT_T whence) {
 @@Read data from a file at a specific `offset', rather than the current R/W position
 @@@return: <= bufsize: The actual amount of read bytes
 [[cp, decl_include("<features.h>", "<bits/types.h>"), decl_prefix(DEFINE_PIO_OFFSET), no_crt_self_import]]
-[[if(defined(__USE_FILE_OFFSET64)), preferred_alias("pread64")]]
-[[if(!defined(__USE_FILE_OFFSET64)), preferred_alias("pread")]]
+[[if($extended_include_prefix("<features.h>") defined(__USE_FILE_OFFSET64)), preferred_alias("pread64")]]
+[[if($extended_include_prefix("<features.h>")!defined(__USE_FILE_OFFSET64)), preferred_alias("pread")]]
 [[section(".text.crt{|.dos}.io.read"), requires_include("<asm/os/stdio.h>"), decl_include("<bits/types.h>")]]
 [[userimpl, requires($has_function(pread64) || ($has_function(lseek) && $has_function(read) && defined(__SEEK_SET) && defined(__SEEK_CUR)))]]
 ssize_t pread($fd_t fd, [[outp(bufsize)]] void *buf, size_t bufsize, __PIO_OFFSET offset) {
@@ -1139,8 +1139,8 @@ ssize_t pread($fd_t fd, [[outp(bufsize)]] void *buf, size_t bufsize, __PIO_OFFSE
 @@Write data to a file at a specific `offset', rather than the current R/W position
 @@@return: <= bufsize: The actual amount of written bytes
 [[cp, decl_include("<features.h>", "<bits/types.h>"), decl_prefix(DEFINE_PIO_OFFSET), no_crt_self_import]]
-[[if(defined(__USE_FILE_OFFSET64)), preferred_alias("pwrite64")]]
-[[if(!defined(__USE_FILE_OFFSET64)), preferred_alias("pwrite")]]
+[[if($extended_include_prefix("<features.h>") defined(__USE_FILE_OFFSET64)), preferred_alias("pwrite64")]]
+[[if($extended_include_prefix("<features.h>")!defined(__USE_FILE_OFFSET64)), preferred_alias("pwrite")]]
 [[section(".text.crt{|.dos}.io.write"), requires_include("<asm/os/stdio.h>"), decl_include("<bits/types.h>")]]
 [[userimpl, requires($has_function(pwrite64) || ($has_function(lseek) && $has_function(write) && defined(__SEEK_SET) && defined(__SEEK_CUR)))]]
 ssize_t pwrite($fd_t fd, [[inp(bufsize)]] void const *buf, size_t bufsize, __PIO_OFFSET offset) {
@@ -1167,8 +1167,8 @@ ssize_t pwrite($fd_t fd, [[inp(bufsize)]] void const *buf, size_t bufsize, __PIO
 @@>> preadall(3)
 @@Same as `readall(3)', but using `pread(2)' instead of `read()'
 [[cp, decl_include("<features.h>", "<bits/types.h>"), decl_prefix(DEFINE_PIO_OFFSET), no_crt_self_import]]
-[[if(defined(__USE_FILE_OFFSET64)), preferred_alias("preadall64")]]
-[[if(!defined(__USE_FILE_OFFSET64)), preferred_alias("preadall")]]
+[[if($extended_include_prefix("<features.h>") defined(__USE_FILE_OFFSET64)), preferred_alias("preadall64")]]
+[[if($extended_include_prefix("<features.h>")!defined(__USE_FILE_OFFSET64)), preferred_alias("preadall")]]
 [[section(".text.crt{|.dos}.io.read"), impl_include("<libc/errno.h>")]]
 [[userimpl, requires_function(preadall64), decl_include("<bits/types.h>")]]
 ssize_t preadall($fd_t fd, [[outp(bufsize)]] void *buf,
@@ -1179,8 +1179,8 @@ ssize_t preadall($fd_t fd, [[outp(bufsize)]] void *buf,
 @@>> pwriteall(3)
 @@Same as `writeall(3)', but using `pwrite(2)' instead of `write()'
 [[cp, decl_include("<features.h>", "<bits/types.h>"), decl_prefix(DEFINE_PIO_OFFSET), no_crt_self_import]]
-[[if(defined(__USE_FILE_OFFSET64)), preferred_alias("pwriteall64")]]
-[[if(!defined(__USE_FILE_OFFSET64)), preferred_alias("pwriteall")]]
+[[if($extended_include_prefix("<features.h>") defined(__USE_FILE_OFFSET64)), preferred_alias("pwriteall64")]]
+[[if($extended_include_prefix("<features.h>")!defined(__USE_FILE_OFFSET64)), preferred_alias("pwriteall")]]
 [[impl_include("<libc/errno.h>"), section(".text.crt{|.dos}.io.write")]]
 [[userimpl, requires_function(pwriteall64), decl_include("<bits/types.h>")]]
 ssize_t pwriteall($fd_t fd, [[inp(bufsize)]] void const *buf,
@@ -1587,8 +1587,8 @@ int truncate32([[nonnull]] char const *file, $pos32_t length);
 @@>> truncate(2)
 @@Truncate the given file `file' to a length of `length'
 [[decl_include("<features.h>", "<bits/types.h>"), decl_prefix(DEFINE_PIO_OFFSET), no_crt_self_import]]
-[[if(defined(__USE_FILE_OFFSET64)), preferred_alias("truncate64")]]
-[[if(!defined(__USE_FILE_OFFSET64)), preferred_alias("truncate")]]
+[[if($extended_include_prefix("<features.h>") defined(__USE_FILE_OFFSET64)), preferred_alias("truncate64")]]
+[[if($extended_include_prefix("<features.h>")!defined(__USE_FILE_OFFSET64)), preferred_alias("truncate")]]
 [[section(".text.crt{|.dos}.fs.modify"), decl_include("<bits/types.h>")]]
 [[userimpl, requires($has_function(truncate64) || $has_function(truncate32) ||
                      ($has_function(open) && $has_function(ftruncate)))]]
@@ -1697,7 +1697,10 @@ __LIBC int optopt;
 
 
 [[guard, wunused, no_crt_impl, crt_name("getopt"), exposed_name("getopt")]]
-[[if(defined(__USE_POSIX2) && !defined(__USE_POSIX_IMPLICITLY) && !defined(__USE_GNU)), preferred_alias("__posix_getopt")]]
+[[if($extended_include_prefix("<features.h>")defined(__USE_POSIX2) &&
+                                            !defined(__USE_POSIX_IMPLICITLY) &&
+                                            !defined(__USE_GNU)),
+  preferred_alias("__posix_getopt")]]
 int unistd_getopt(int argc, char *const argv[], char const *shortopts);
 
 %#endif /* __USE_POSIX2 */
@@ -2008,8 +2011,8 @@ int ftruncate32($fd_t fd, $pos32_t length);
 @@Truncate the given file `fd' to a length of `length'
 [[decl_include("<features.h>"), decl_prefix(DEFINE_PIO_OFFSET)]]
 [[no_crt_self_import, decl_include("<bits/types.h>")]]
-[[if(defined(__USE_FILE_OFFSET64)), preferred_alias("ftruncate64", "_chsize_s")]]
-[[if(!defined(__USE_FILE_OFFSET64)), preferred_alias("ftruncate", "_chsize", "chsize")]]
+[[if($extended_include_prefix("<features.h>") defined(__USE_FILE_OFFSET64)), preferred_alias("ftruncate64", "_chsize_s")]]
+[[if($extended_include_prefix("<features.h>")!defined(__USE_FILE_OFFSET64)), preferred_alias("ftruncate", "_chsize", "chsize")]]
 [[userimpl, requires($has_function(ftruncate32) || $has_function(ftruncate64))]]
 [[dos_only_export_as("_chsize"), export_as("chsize")]]
 [[section(".text.crt{|.dos}.io.write")]]
@@ -2812,7 +2815,7 @@ out:
 char *getpass_r([[nullable]] char const *prompt, char *buf, size_t bufsize) {
 @@pp_if $has_function(getpassfd)@@
 	/* Prefer using `getpassfd(3)' because I feel like that one's more
-	 * user-friendly.  - But it it's not available, fall back on using
+	 * user-friendly.  - But if it's not available, fall back on using
 	 * the regular, old `readpassphrase(3)' */
 @@pp_ifdef __GETPASS_ECHO_NL@@
 	return getpassfd(prompt, buf, bufsize, NULL, __GETPASS_ECHO_NL, 0);
@@ -3076,8 +3079,8 @@ __STDC_INT_AS_SSIZE_T resolvepath([[nonnull]] char const *filename,
 @@>> tell(3), tell64(3)
 @@Return the current file position (alias for `lseek(fd, 0, SEEK_CUR)')
 [[wunused, guard, no_crt_self_import, decl_include("<features.h>", "<bits/types.h>")]]
-[[if(defined(__USE_FILE_OFFSET64)), preferred_alias("tell64", "_telli64")]]
-[[if(!defined(__USE_FILE_OFFSET64)), preferred_alias("tell", "_tell")]]
+[[if($extended_include_prefix("<features.h>") defined(__USE_FILE_OFFSET64)), preferred_alias("tell64", "_telli64")]]
+[[if($extended_include_prefix("<features.h>")!defined(__USE_FILE_OFFSET64)), preferred_alias("tell", "_tell")]]
 [[requires_include("<asm/os/stdio.h>")]]
 [[requires($has_function(lseek) && defined(__SEEK_CUR))]]
 [[impl_include("<asm/os/stdio.h>"), dos_only_export_as("_tell")]]

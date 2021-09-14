@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x9e71a1f8 */
+/* HASH CRC-32:0x743f46c */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -33,12 +33,15 @@ __SYSDECL_BEGIN
 #define ____libc_core___errno_location_defined 1
 #ifdef __CRT_HAVE___errno_location
 #include <bits/types.h>
+/* >> __errno_location(3) */
 __CREDIRECT(__ATTR_CONST __ATTR_RETNONNULL __ATTR_WUNUSED,__errno_t *,__NOTHROW_NCX,__libc_core___errno_location,(void),__errno_location,())
 #elif defined(__CRT_HAVE__errno)
 #include <bits/types.h>
+/* >> __errno_location(3) */
 __CREDIRECT(__ATTR_CONST __ATTR_RETNONNULL __ATTR_WUNUSED,__errno_t *,__NOTHROW_NCX,__libc_core___errno_location,(void),_errno,())
 #elif defined(__CRT_HAVE___errno)
 #include <bits/types.h>
+/* >> __errno_location(3) */
 __CREDIRECT(__ATTR_CONST __ATTR_RETNONNULL __ATTR_WUNUSED,__errno_t *,__NOTHROW_NCX,__libc_core___errno_location,(void),__errno,())
 #else /* ... */
 #undef ____libc_core___errno_location_defined

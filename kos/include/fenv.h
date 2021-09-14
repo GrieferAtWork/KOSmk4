@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x9da2f6c9 */
+/* HASH CRC-32:0x7381c9aa */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -106,75 +106,96 @@ __NAMESPACE_STD_USING(fexcept_t)
 
 __NAMESPACE_STD_BEGIN
 #if defined(__fast_feclearexcept_defined) && defined(__CRT_HAVE_feclearexcept)
-/* @param: EXCEPTS: Set of `FE_*' */
+/* >> feclearexcept(3)
+ * @param: excepts: Set of `FE_*' */
 __CEIDECLARE(,int,__NOTHROW,feclearexcept,(int __excepts),{ return (__NAMESPACE_FAST_SYM __LIBC_FAST_NAME(feclearexcept))(__excepts); })
 #elif defined(__fast_feclearexcept_defined)
-/* @param: EXCEPTS: Set of `FE_*' */
+/* >> feclearexcept(3)
+ * @param: excepts: Set of `FE_*' */
 __FORCELOCAL int __NOTHROW(__LIBCCALL feclearexcept)(int __excepts) { return (__NAMESPACE_FAST_SYM __LIBC_FAST_NAME(feclearexcept))(__excepts); }
 #elif defined(__CRT_HAVE_feclearexcept)
-/* @param: EXCEPTS: Set of `FE_*' */
+/* >> feclearexcept(3)
+ * @param: excepts: Set of `FE_*' */
 __CDECLARE(,int,__NOTHROW,feclearexcept,(int __excepts),(__excepts))
 #else /* ... */
 __NAMESPACE_STD_END
 #include <libc/local/fenv/feclearexcept.h>
 __NAMESPACE_STD_BEGIN
-/* @param: EXCEPTS: Set of `FE_*' */
+/* >> feclearexcept(3)
+ * @param: excepts: Set of `FE_*' */
 __NAMESPACE_LOCAL_USING_OR_IMPL(feclearexcept, __FORCELOCAL __ATTR_ARTIFICIAL int __NOTHROW(__LIBCCALL feclearexcept)(int __excepts) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(feclearexcept))(__excepts); })
 #endif /* !... */
 #if defined(__fast_feraiseexcept_defined) && defined(__CRT_HAVE_feraiseexcept)
-/* @param: EXCEPTS: Set of `FE_*' */
+/* >> feraiseexcept(3)
+ * @param: excepts: Set of `FE_*' */
 __CEIDECLARE(,int,__THROWING,feraiseexcept,(int __excepts),{ return (__NAMESPACE_FAST_SYM __LIBC_FAST_NAME(feraiseexcept))(__excepts); })
 #elif defined(__fast_feraiseexcept_defined)
-/* @param: EXCEPTS: Set of `FE_*' */
+/* >> feraiseexcept(3)
+ * @param: excepts: Set of `FE_*' */
 __FORCELOCAL int (__LIBCCALL feraiseexcept)(int __excepts) __THROWS(...) { return (__NAMESPACE_FAST_SYM __LIBC_FAST_NAME(feraiseexcept))(__excepts); }
 #elif defined(__CRT_HAVE_feraiseexcept)
-/* @param: EXCEPTS: Set of `FE_*' */
+/* >> feraiseexcept(3)
+ * @param: excepts: Set of `FE_*' */
 __CDECLARE(,int,__THROWING,feraiseexcept,(int __excepts),(__excepts))
 #else /* ... */
 __NAMESPACE_STD_END
 #include <libc/local/fenv/feraiseexcept.h>
 __NAMESPACE_STD_BEGIN
-/* @param: EXCEPTS: Set of `FE_*' */
+/* >> feraiseexcept(3)
+ * @param: excepts: Set of `FE_*' */
 __NAMESPACE_LOCAL_USING_OR_IMPL(feraiseexcept, __FORCELOCAL __ATTR_ARTIFICIAL int (__LIBCCALL feraiseexcept)(int __excepts) __THROWS(...) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(feraiseexcept))(__excepts); })
 #endif /* !... */
 #if defined(__fast_fegetexceptflag_defined) && defined(__CRT_HAVE_fegetexceptflag)
+/* >> fegetexceptflag(3) */
 __CEIDECLARE_GCCNCX(__ATTR_NONNULL((1)),int,__NOTHROW_NCX,fegetexceptflag,(fexcept_t *__flagp, int __excepts),{ return (__NAMESPACE_FAST_SYM __LIBC_FAST_NAME(fegetexceptflag))(__flagp, __excepts); })
 #elif defined(__fast_fegetexceptflag_defined)
+/* >> fegetexceptflag(3) */
 __FORCELOCAL __ATTR_NONNULL((1)) int __NOTHROW_NCX(__LIBCCALL fegetexceptflag)(fexcept_t *__flagp, int __excepts) { return (__NAMESPACE_FAST_SYM __LIBC_FAST_NAME(fegetexceptflag))(__flagp, __excepts); }
 #elif defined(__CRT_HAVE_fegetexceptflag)
+/* >> fegetexceptflag(3) */
 __CDECLARE_GCCNCX(__ATTR_NONNULL((1)),int,__NOTHROW_NCX,fegetexceptflag,(fexcept_t *__flagp, int __excepts),(__flagp,__excepts))
 #else /* ... */
 __NAMESPACE_STD_END
 #include <libc/local/fenv/fegetexceptflag.h>
 __NAMESPACE_STD_BEGIN
+/* >> fegetexceptflag(3) */
 __NAMESPACE_LOCAL_USING_OR_IMPL(fegetexceptflag, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_NONNULL((1)) int __NOTHROW_NCX(__LIBCCALL fegetexceptflag)(fexcept_t *__flagp, int __excepts) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(fegetexceptflag))(__flagp, __excepts); })
 #endif /* !... */
 #if defined(__fast_fesetexceptflag_defined) && defined(__CRT_HAVE_fesetexceptflag)
+/* >> fesetexceptflag(3) */
 __CEIDECLARE_GCCNCX(__ATTR_NONNULL((1)),int,__NOTHROW_NCX,fesetexceptflag,(fexcept_t const *__flagp, int __excepts),{ return (__NAMESPACE_FAST_SYM __LIBC_FAST_NAME(fesetexceptflag))(__flagp, __excepts); })
 #elif defined(__fast_fesetexceptflag_defined)
+/* >> fesetexceptflag(3) */
 __FORCELOCAL __ATTR_NONNULL((1)) int __NOTHROW_NCX(__LIBCCALL fesetexceptflag)(fexcept_t const *__flagp, int __excepts) { return (__NAMESPACE_FAST_SYM __LIBC_FAST_NAME(fesetexceptflag))(__flagp, __excepts); }
 #elif defined(__CRT_HAVE_fesetexceptflag)
+/* >> fesetexceptflag(3) */
 __CDECLARE_GCCNCX(__ATTR_NONNULL((1)),int,__NOTHROW_NCX,fesetexceptflag,(fexcept_t const *__flagp, int __excepts),(__flagp,__excepts))
 #else /* ... */
 __NAMESPACE_STD_END
 #include <libc/local/fenv/fesetexceptflag.h>
 __NAMESPACE_STD_BEGIN
+/* >> fesetexceptflag(3) */
 __NAMESPACE_LOCAL_USING_OR_IMPL(fesetexceptflag, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_NONNULL((1)) int __NOTHROW_NCX(__LIBCCALL fesetexceptflag)(fexcept_t const *__flagp, int __excepts) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(fesetexceptflag))(__flagp, __excepts); })
 #endif /* !... */
 #if defined(__fast_fetestexcept_defined) && defined(__CRT_HAVE_fetestexcept)
+/* >> fetestexcept(3) */
 __CEIDECLARE(__ATTR_PURE __ATTR_WUNUSED,int,__NOTHROW,fetestexcept,(int __excepts),{ return (__NAMESPACE_FAST_SYM __LIBC_FAST_NAME(fetestexcept))(__excepts); })
 #elif defined(__fast_fetestexcept_defined)
+/* >> fetestexcept(3) */
 __FORCELOCAL __ATTR_PURE __ATTR_WUNUSED int __NOTHROW(__LIBCCALL fetestexcept)(int __excepts) { return (__NAMESPACE_FAST_SYM __LIBC_FAST_NAME(fetestexcept))(__excepts); }
 #elif defined(__CRT_HAVE_fetestexcept)
+/* >> fetestexcept(3) */
 __CDECLARE(__ATTR_PURE __ATTR_WUNUSED,int,__NOTHROW,fetestexcept,(int __excepts),(__excepts))
 #else /* ... */
 __NAMESPACE_STD_END
 #include <libc/local/fenv/fetestexcept.h>
 __NAMESPACE_STD_BEGIN
+/* >> fetestexcept(3) */
 __NAMESPACE_LOCAL_USING_OR_IMPL(fetestexcept, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_PURE __ATTR_WUNUSED int __NOTHROW(__LIBCCALL fetestexcept)(int __excepts) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(fetestexcept))(__excepts); })
 #endif /* !... */
 #if defined(__fast_fegetround_defined) && defined(__CRT_HAVE_fegetround)
-/* Get the current rounding direction
+/* >> fegetround(3)
+ * Get the current rounding direction
  * @return: One of...
  *             ... `FE_TONEAREST':  round()
  *             ... `FE_DOWNWARD':   floor()
@@ -182,7 +203,8 @@ __NAMESPACE_LOCAL_USING_OR_IMPL(fetestexcept, __FORCELOCAL __ATTR_ARTIFICIAL __A
  *             ... `FE_TOWARDZERO': trunc() */
 __CEIDECLARE(__ATTR_PURE __ATTR_WUNUSED,int,__NOTHROW,fegetround,(void),{ return (__NAMESPACE_FAST_SYM __LIBC_FAST_NAME(fegetround))(); })
 #elif defined(__fast_fegetround_defined)
-/* Get the current rounding direction
+/* >> fegetround(3)
+ * Get the current rounding direction
  * @return: One of...
  *             ... `FE_TONEAREST':  round()
  *             ... `FE_DOWNWARD':   floor()
@@ -190,7 +212,8 @@ __CEIDECLARE(__ATTR_PURE __ATTR_WUNUSED,int,__NOTHROW,fegetround,(void),{ return
  *             ... `FE_TOWARDZERO': trunc() */
 __FORCELOCAL __ATTR_PURE __ATTR_WUNUSED int __NOTHROW(__LIBCCALL fegetround)(void) { return (__NAMESPACE_FAST_SYM __LIBC_FAST_NAME(fegetround))(); }
 #elif defined(__CRT_HAVE_fegetround)
-/* Get the current rounding direction
+/* >> fegetround(3)
+ * Get the current rounding direction
  * @return: One of...
  *             ... `FE_TONEAREST':  round()
  *             ... `FE_DOWNWARD':   floor()
@@ -201,7 +224,8 @@ __CDECLARE(__ATTR_PURE __ATTR_WUNUSED,int,__NOTHROW,fegetround,(void),())
 __NAMESPACE_STD_END
 #include <libc/local/fenv/fegetround.h>
 __NAMESPACE_STD_BEGIN
-/* Get the current rounding direction
+/* >> fegetround(3)
+ * Get the current rounding direction
  * @return: One of...
  *             ... `FE_TONEAREST':  round()
  *             ... `FE_DOWNWARD':   floor()
@@ -210,7 +234,8 @@ __NAMESPACE_STD_BEGIN
 __NAMESPACE_LOCAL_USING_OR_IMPL(fegetround, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_PURE __ATTR_WUNUSED int __NOTHROW(__LIBCCALL fegetround)(void) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(fegetround))(); })
 #endif /* !... */
 #if defined(__fast_fesetround_defined) && defined(__CRT_HAVE_fesetround)
-/* Set the current rounding direction
+/* >> fesetround(3)
+ * Set the current rounding direction
  * @param: rounding_direction: One of...
  *             ... `FE_TONEAREST':  round()
  *             ... `FE_DOWNWARD':   floor()
@@ -218,7 +243,8 @@ __NAMESPACE_LOCAL_USING_OR_IMPL(fegetround, __FORCELOCAL __ATTR_ARTIFICIAL __ATT
  *             ... `FE_TOWARDZERO': trunc() */
 __CEIDECLARE(,int,__NOTHROW,fesetround,(int __rounding_direction),{ return (__NAMESPACE_FAST_SYM __LIBC_FAST_NAME(fesetround))(__rounding_direction); })
 #elif defined(__fast_fesetround_defined)
-/* Set the current rounding direction
+/* >> fesetround(3)
+ * Set the current rounding direction
  * @param: rounding_direction: One of...
  *             ... `FE_TONEAREST':  round()
  *             ... `FE_DOWNWARD':   floor()
@@ -226,7 +252,8 @@ __CEIDECLARE(,int,__NOTHROW,fesetround,(int __rounding_direction),{ return (__NA
  *             ... `FE_TOWARDZERO': trunc() */
 __FORCELOCAL int __NOTHROW(__LIBCCALL fesetround)(int __rounding_direction) { return (__NAMESPACE_FAST_SYM __LIBC_FAST_NAME(fesetround))(__rounding_direction); }
 #elif defined(__CRT_HAVE_fesetround)
-/* Set the current rounding direction
+/* >> fesetround(3)
+ * Set the current rounding direction
  * @param: rounding_direction: One of...
  *             ... `FE_TONEAREST':  round()
  *             ... `FE_DOWNWARD':   floor()
@@ -237,7 +264,8 @@ __CDECLARE(,int,__NOTHROW,fesetround,(int __rounding_direction),(__rounding_dire
 __NAMESPACE_STD_END
 #include <libc/local/fenv/fesetround.h>
 __NAMESPACE_STD_BEGIN
-/* Set the current rounding direction
+/* >> fesetround(3)
+ * Set the current rounding direction
  * @param: rounding_direction: One of...
  *             ... `FE_TONEAREST':  round()
  *             ... `FE_DOWNWARD':   floor()
@@ -246,51 +274,67 @@ __NAMESPACE_STD_BEGIN
 __NAMESPACE_LOCAL_USING_OR_IMPL(fesetround, __FORCELOCAL __ATTR_ARTIFICIAL int __NOTHROW(__LIBCCALL fesetround)(int __rounding_direction) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(fesetround))(__rounding_direction); })
 #endif /* !... */
 #if defined(__fast_fegetenv_defined) && defined(__CRT_HAVE_fegetenv)
+/* >> fegetenv(3) */
 __CEIDECLARE_GCCNCX(__ATTR_NONNULL((1)),int,__NOTHROW_NCX,fegetenv,(fenv_t *___envp),{ return (__NAMESPACE_FAST_SYM __LIBC_FAST_NAME(fegetenv))(___envp); })
 #elif defined(__fast_fegetenv_defined)
+/* >> fegetenv(3) */
 __FORCELOCAL __ATTR_NONNULL((1)) int __NOTHROW_NCX(__LIBCCALL fegetenv)(fenv_t *___envp) { return (__NAMESPACE_FAST_SYM __LIBC_FAST_NAME(fegetenv))(___envp); }
 #elif defined(__CRT_HAVE_fegetenv)
+/* >> fegetenv(3) */
 __CDECLARE_GCCNCX(__ATTR_NONNULL((1)),int,__NOTHROW_NCX,fegetenv,(fenv_t *___envp),(___envp))
 #else /* ... */
 __NAMESPACE_STD_END
 #include <libc/local/fenv/fegetenv.h>
 __NAMESPACE_STD_BEGIN
+/* >> fegetenv(3) */
 __NAMESPACE_LOCAL_USING_OR_IMPL(fegetenv, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_NONNULL((1)) int __NOTHROW_NCX(__LIBCCALL fegetenv)(fenv_t *___envp) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(fegetenv))(___envp); })
 #endif /* !... */
 #if defined(__fast_feholdexcept_defined) && defined(__CRT_HAVE_feholdexcept)
+/* >> feholdexcept(3) */
 __CEIDECLARE_GCCNCX(__ATTR_NONNULL((1)),int,__NOTHROW_NCX,feholdexcept,(fenv_t *___envp),{ return (__NAMESPACE_FAST_SYM __LIBC_FAST_NAME(feholdexcept))(___envp); })
 #elif defined(__fast_feholdexcept_defined)
+/* >> feholdexcept(3) */
 __FORCELOCAL __ATTR_NONNULL((1)) int __NOTHROW_NCX(__LIBCCALL feholdexcept)(fenv_t *___envp) { return (__NAMESPACE_FAST_SYM __LIBC_FAST_NAME(feholdexcept))(___envp); }
 #elif defined(__CRT_HAVE_feholdexcept)
+/* >> feholdexcept(3) */
 __CDECLARE_GCCNCX(__ATTR_NONNULL((1)),int,__NOTHROW_NCX,feholdexcept,(fenv_t *___envp),(___envp))
 #else /* ... */
 __NAMESPACE_STD_END
 #include <libc/local/fenv/feholdexcept.h>
 __NAMESPACE_STD_BEGIN
+/* >> feholdexcept(3) */
 __NAMESPACE_LOCAL_USING_OR_IMPL(feholdexcept, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_NONNULL((1)) int __NOTHROW_NCX(__LIBCCALL feholdexcept)(fenv_t *___envp) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(feholdexcept))(___envp); })
 #endif /* !... */
 #if defined(__fast_fesetenv_defined) && defined(__CRT_HAVE_fesetenv)
+/* >> fesetenv(3) */
 __CEIDECLARE_GCCNCX(__ATTR_NONNULL((1)),int,__NOTHROW_NCX,fesetenv,(fenv_t const *___envp),{ return (__NAMESPACE_FAST_SYM __LIBC_FAST_NAME(fesetenv))(___envp); })
 #elif defined(__fast_fesetenv_defined)
+/* >> fesetenv(3) */
 __FORCELOCAL __ATTR_NONNULL((1)) int __NOTHROW_NCX(__LIBCCALL fesetenv)(fenv_t const *___envp) { return (__NAMESPACE_FAST_SYM __LIBC_FAST_NAME(fesetenv))(___envp); }
 #elif defined(__CRT_HAVE_fesetenv)
+/* >> fesetenv(3) */
 __CDECLARE_GCCNCX(__ATTR_NONNULL((1)),int,__NOTHROW_NCX,fesetenv,(fenv_t const *___envp),(___envp))
 #else /* ... */
 __NAMESPACE_STD_END
 #include <libc/local/fenv/fesetenv.h>
 __NAMESPACE_STD_BEGIN
+/* >> fesetenv(3) */
 __NAMESPACE_LOCAL_USING_OR_IMPL(fesetenv, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_NONNULL((1)) int __NOTHROW_NCX(__LIBCCALL fesetenv)(fenv_t const *___envp) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(fesetenv))(___envp); })
 #endif /* !... */
 #if defined(__fast_feupdateenv_defined) && defined(__CRT_HAVE_feupdateenv)
+/* >> feupdateenv(3) */
 __CEIDECLARE_GCCNCX(__ATTR_NONNULL((1)),int,__NOTHROW_NCX,feupdateenv,(fenv_t const *___envp),{ return (__NAMESPACE_FAST_SYM __LIBC_FAST_NAME(feupdateenv))(___envp); })
 #elif defined(__fast_feupdateenv_defined)
+/* >> feupdateenv(3) */
 __FORCELOCAL __ATTR_NONNULL((1)) int __NOTHROW_NCX(__LIBCCALL feupdateenv)(fenv_t const *___envp) { return (__NAMESPACE_FAST_SYM __LIBC_FAST_NAME(feupdateenv))(___envp); }
 #elif defined(__CRT_HAVE_feupdateenv)
+/* >> feupdateenv(3) */
 __CDECLARE_GCCNCX(__ATTR_NONNULL((1)),int,__NOTHROW_NCX,feupdateenv,(fenv_t const *___envp),(___envp))
 #else /* ... */
 __NAMESPACE_STD_END
 #include <libc/local/fenv/feupdateenv.h>
 __NAMESPACE_STD_BEGIN
+/* >> feupdateenv(3) */
 __NAMESPACE_LOCAL_USING_OR_IMPL(feupdateenv, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_NONNULL((1)) int __NOTHROW_NCX(__LIBCCALL feupdateenv)(fenv_t const *___envp) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(feupdateenv))(___envp); })
 #endif /* !... */
 __NAMESPACE_STD_END
@@ -310,33 +354,45 @@ __NAMESPACE_STD_USING(feupdateenv)
 #endif /* !__CXX_SYSTEM_HEADER */
 #ifdef __USE_GNU
 #if defined(__fast_feenableexcept_defined) && defined(__CRT_HAVE_feenableexcept)
+/* >> feenableexcept(3) */
 __CEIDECLARE(,int,__NOTHROW,feenableexcept,(int __excepts),{ return (__NAMESPACE_FAST_SYM __LIBC_FAST_NAME(feenableexcept))(__excepts); })
 #elif defined(__fast_feenableexcept_defined)
+/* >> feenableexcept(3) */
 __FORCELOCAL int __NOTHROW(__LIBCCALL feenableexcept)(int __excepts) { return (__NAMESPACE_FAST_SYM __LIBC_FAST_NAME(feenableexcept))(__excepts); }
 #elif defined(__CRT_HAVE_feenableexcept)
+/* >> feenableexcept(3) */
 __CDECLARE(,int,__NOTHROW,feenableexcept,(int __excepts),(__excepts))
 #else /* ... */
 #include <libc/local/fenv/feenableexcept.h>
+/* >> feenableexcept(3) */
 __NAMESPACE_LOCAL_USING_OR_IMPL(feenableexcept, __FORCELOCAL __ATTR_ARTIFICIAL int __NOTHROW(__LIBCCALL feenableexcept)(int __excepts) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(feenableexcept))(__excepts); })
 #endif /* !... */
 #if defined(__fast_fedisableexcept_defined) && defined(__CRT_HAVE_fedisableexcept)
+/* >> fedisableexcept(3) */
 __CEIDECLARE(,int,__NOTHROW,fedisableexcept,(int __excepts),{ return (__NAMESPACE_FAST_SYM __LIBC_FAST_NAME(fedisableexcept))(__excepts); })
 #elif defined(__fast_fedisableexcept_defined)
+/* >> fedisableexcept(3) */
 __FORCELOCAL int __NOTHROW(__LIBCCALL fedisableexcept)(int __excepts) { return (__NAMESPACE_FAST_SYM __LIBC_FAST_NAME(fedisableexcept))(__excepts); }
 #elif defined(__CRT_HAVE_fedisableexcept)
+/* >> fedisableexcept(3) */
 __CDECLARE(,int,__NOTHROW,fedisableexcept,(int __excepts),(__excepts))
 #else /* ... */
 #include <libc/local/fenv/fedisableexcept.h>
+/* >> fedisableexcept(3) */
 __NAMESPACE_LOCAL_USING_OR_IMPL(fedisableexcept, __FORCELOCAL __ATTR_ARTIFICIAL int __NOTHROW(__LIBCCALL fedisableexcept)(int __excepts) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(fedisableexcept))(__excepts); })
 #endif /* !... */
 #if defined(__fast_fegetexcept_defined) && defined(__CRT_HAVE_fegetexcept)
+/* >> fegetexcept(3) */
 __CEIDECLARE(__ATTR_PURE __ATTR_WUNUSED,int,__NOTHROW,fegetexcept,(void),{ return (__NAMESPACE_FAST_SYM __LIBC_FAST_NAME(fegetexcept))(); })
 #elif defined(__fast_fegetexcept_defined)
+/* >> fegetexcept(3) */
 __FORCELOCAL __ATTR_PURE __ATTR_WUNUSED int __NOTHROW(__LIBCCALL fegetexcept)(void) { return (__NAMESPACE_FAST_SYM __LIBC_FAST_NAME(fegetexcept))(); }
 #elif defined(__CRT_HAVE_fegetexcept)
+/* >> fegetexcept(3) */
 __CDECLARE(__ATTR_PURE __ATTR_WUNUSED,int,__NOTHROW,fegetexcept,(void),())
 #else /* ... */
 #include <libc/local/fenv/fegetexcept.h>
+/* >> fegetexcept(3) */
 __NAMESPACE_LOCAL_USING_OR_IMPL(fegetexcept, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_PURE __ATTR_WUNUSED int __NOTHROW(__LIBCCALL fegetexcept)(void) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(fegetexcept))(); })
 #endif /* !... */
 #endif /* __USE_GNU */

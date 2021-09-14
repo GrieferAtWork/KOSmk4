@@ -116,6 +116,7 @@ typedef __CHAR32_TYPE__ char32_t;
 
 %[insert:std]
 
+@@>> mbrtoc16(3)
 [[std, no_crt, preferred_alias("mbrtoc16")]]
 [[if($extended_include_prefix("<hybrid/typecore.h>")__SIZEOF_WCHAR_T__ == 2), alias("mbrtowc", "__mbrtowc")]]
 [[if(defined(__LIBCCALL_IS_LIBDCALL)), alias("DOS$mbrtowc")]]
@@ -126,6 +127,7 @@ size_t stdc_mbrtoc16([[nullable]] char16_t *pc16,
                      [[inp_opt(maxlen)]] char const *__restrict str,
                      size_t maxlen, [[nullable]] mbstate_t *mbs);
 
+@@>> mbrtoc32(3)
 [[std, no_crt, preferred_alias("mbrtoc32")]]
 [[if($extended_include_prefix("<hybrid/typecore.h>")__SIZEOF_WCHAR_T__ == 4), alias("mbrtowc", "__mbrtowc")]]
 [[if(defined(__PE__) && defined(__LIBCCALL_IS_LIBKCALL)), alias("KOS$mbrtowc")]]
@@ -136,6 +138,7 @@ size_t stdc_mbrtoc32([[nullable]] char32_t *pc32,
                      [[inp_opt(maxlen)]] char const *__restrict str,
                      size_t maxlen, [[nullable]] mbstate_t *mbs);
 
+@@>> c16rtomb(3)
 [[std, no_crt, preferred_alias("c16rtomb")]]
 [[if($extended_include_prefix("<hybrid/typecore.h>")__SIZEOF_WCHAR_T__ == 2), alias("wcrtomb")]]
 [[if(defined(__LIBCCALL_IS_LIBDCALL)), alias("DOS$wcrtomb")]]
@@ -145,6 +148,7 @@ size_t stdc_mbrtoc32([[nullable]] char32_t *pc32,
 size_t stdc_c16rtomb(char *__restrict str, char16_t c16,
                      [[nullable]] mbstate_t *mbs);
 
+@@>> c32rtomb(3)
 [[std, no_crt, preferred_alias("c32rtomb")]]
 [[if($extended_include_prefix("<hybrid/typecore.h>")__SIZEOF_WCHAR_T__ == 4), alias("wcrtomb")]]
 [[if(defined(__PE__) && defined(__LIBCCALL_IS_LIBKCALL)), alias("KOS$wcrtomb")]]
@@ -182,7 +186,7 @@ size_t stdc_c32rtomb(char *__restrict str, char32_t c32,
  *
  * The only  exception to  this rule  are these  four  functions,
  * which due the fact of being mandated by the C standard,  still
- * have  to be exported not only by name, but also by be bound to
+ * have to be  exported not only  by name, but  also be bound  to
  * in headers by-name, _and_ be exposed with a consistent calling
  * convention that matches `LIBCCALL'!
  */
@@ -198,7 +202,18 @@ __SYSDECL_END
 #endif /* __CC__ */
 
 
-
+/* When  `#define _UTF_SOURCE' is  given, all  of KOS's  uchar variants are
+ * exposed when both <uchar.h> and the header of origin have been included.
+ *
+ * For example:
+ * >> #define _UTF_SOURCE
+ * >> #include <string.h>  // Order of #includes doesn't matter; <string.h>
+ * >> #include <uchar.h>   // also has a check if _UCHAR was already included
+ * >> // At this point, symbols `size_t c16slen(char16_t const *str)'
+ * >> // have been defined (but be aware that calling conventions may
+ * >> // not be identical between char16_t and char32_t variants of
+ * >> // libc functions!)
+ */
 #ifdef __USE_UTF
 #if defined(_STRING_H) && !defined(_PARTS_UCHAR_STRING_H)
 #include <parts/uchar/string.h>

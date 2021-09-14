@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xd17fd1e2 */
+/* HASH CRC-32:0x4635333f */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -895,27 +895,43 @@ __NAMESPACE_LOCAL_USING_OR_IMPL(wctrans_l, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR
 #endif /* __USE_XOPEN2K8 */
 #ifdef __USE_KOS
 #ifdef __CRT_HAVE___iswcsymf
+/* >> iswsymstrt(3), iswsymstrt_l(3)
+ * Check if `wc' may appear at the start of a symbol/keyword/identifier */
 __CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,int,__NOTHROW_NCX,iswsymstrt,(__WINT_TYPE__ __wc),__iswcsymf,(__wc))
 #else /* __CRT_HAVE___iswcsymf */
 #include <libc/local/wctype/iswsymstrt.h>
+/* >> iswsymstrt(3), iswsymstrt_l(3)
+ * Check if `wc' may appear at the start of a symbol/keyword/identifier */
 __NAMESPACE_LOCAL_USING_OR_IMPL(iswsymstrt, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_CONST __ATTR_WUNUSED int __NOTHROW_NCX(__LIBCCALL iswsymstrt)(__WINT_TYPE__ __wc) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(iswsymstrt))(__wc); })
 #endif /* !__CRT_HAVE___iswcsymf */
 #ifdef __CRT_HAVE___iswcsym
+/* >> iswsymcont(3), iswsymcont_l(3)
+ * Check if `wc' may appear in the middle of a symbol/keyword/identifier */
 __CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,int,__NOTHROW_NCX,iswsymcont,(__WINT_TYPE__ __wc),__iswcsym,(__wc))
 #else /* __CRT_HAVE___iswcsym */
 #include <libc/local/wctype/iswsymcont.h>
+/* >> iswsymcont(3), iswsymcont_l(3)
+ * Check if `wc' may appear in the middle of a symbol/keyword/identifier */
 __NAMESPACE_LOCAL_USING_OR_IMPL(iswsymcont, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_CONST __ATTR_WUNUSED int __NOTHROW_NCX(__LIBCCALL iswsymcont)(__WINT_TYPE__ __wc) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(iswsymcont))(__wc); })
 #endif /* !__CRT_HAVE___iswcsym */
 #ifdef __CRT_HAVE__iswcsymf_l
+/* >> iswsymstrt(3), iswsymstrt_l(3)
+ * Check if `wc' may appear at the start of a symbol/keyword/identifier */
 __CREDIRECT(__ATTR_PURE __ATTR_WUNUSED,int,__NOTHROW_NCX,iswsymstrt_l,(__WINT_TYPE__ __wc, __locale_t __locale),_iswcsymf_l,(__wc,__locale))
 #else /* __CRT_HAVE__iswcsymf_l */
 #include <libc/local/wctype/iswsymstrt_l.h>
+/* >> iswsymstrt(3), iswsymstrt_l(3)
+ * Check if `wc' may appear at the start of a symbol/keyword/identifier */
 __NAMESPACE_LOCAL_USING_OR_IMPL(iswsymstrt_l, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_PURE __ATTR_WUNUSED int __NOTHROW_NCX(__LIBCCALL iswsymstrt_l)(__WINT_TYPE__ __wc, __locale_t __locale) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(iswsymstrt_l))(__wc, __locale); })
 #endif /* !__CRT_HAVE__iswcsymf_l */
 #ifdef __CRT_HAVE__iswcsym_l
+/* >> iswsymcont(3), iswsymcont_l(3)
+ * Check if `wc' may appear in the middle of a symbol/keyword/identifier */
 __CREDIRECT(__ATTR_PURE __ATTR_WUNUSED,int,__NOTHROW_NCX,iswsymcont_l,(__WINT_TYPE__ __wc, __locale_t __locale),_iswcsym_l,(__wc,__locale))
 #else /* __CRT_HAVE__iswcsym_l */
 #include <libc/local/wctype/iswsymcont_l.h>
+/* >> iswsymcont(3), iswsymcont_l(3)
+ * Check if `wc' may appear in the middle of a symbol/keyword/identifier */
 __NAMESPACE_LOCAL_USING_OR_IMPL(iswsymcont_l, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_PURE __ATTR_WUNUSED int __NOTHROW_NCX(__LIBCCALL iswsymcont_l)(__WINT_TYPE__ __wc, __locale_t __locale) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(iswsymcont_l))(__wc, __locale); })
 #endif /* !__CRT_HAVE__iswcsym_l */
 #endif /* __USE_KOS */
@@ -1271,9 +1287,11 @@ __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_CONST __ATTR_WUNUSED int __NOTHROW_NCX(__L
 #endif /* ... */
 
 #ifdef __CRT_HAVE_isleadbyte
+/* >> isleadbyte(3) */
 __CDECLARE(__ATTR_CONST __ATTR_WUNUSED,int,__NOTHROW_NCX,isleadbyte,(int __wc),(__wc))
 #else /* __CRT_HAVE_isleadbyte */
 #include <libc/local/wctype/isleadbyte.h>
+/* >> isleadbyte(3) */
 __NAMESPACE_LOCAL_USING_OR_IMPL(isleadbyte, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_CONST __ATTR_WUNUSED int __NOTHROW_NCX(__LIBCCALL isleadbyte)(int __wc) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(isleadbyte))(__wc); })
 #endif /* !__CRT_HAVE_isleadbyte */
 #ifdef __CRT_HAVE__isleadbyte_l
@@ -1283,27 +1301,43 @@ __CDECLARE(__ATTR_PURE __ATTR_WUNUSED,int,__NOTHROW_NCX,_isleadbyte_l,(int __wc,
 __NAMESPACE_LOCAL_USING_OR_IMPL(_isleadbyte_l, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_PURE __ATTR_WUNUSED int __NOTHROW_NCX(__LIBCCALL _isleadbyte_l)(int __wc, __locale_t __locale) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(_isleadbyte_l))(__wc, __locale); })
 #endif /* !__CRT_HAVE__isleadbyte_l */
 #ifdef __CRT_HAVE___iswcsymf
+/* >> iswsymstrt(3), iswsymstrt_l(3)
+ * Check if `wc' may appear at the start of a symbol/keyword/identifier */
 __CDECLARE(__ATTR_CONST __ATTR_WUNUSED,int,__NOTHROW_NCX,__iswcsymf,(__WINT_TYPE__ __wc),(__wc))
 #else /* __CRT_HAVE___iswcsymf */
 #include <libc/local/wctype/iswsymstrt.h>
+/* >> iswsymstrt(3), iswsymstrt_l(3)
+ * Check if `wc' may appear at the start of a symbol/keyword/identifier */
 __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_CONST __ATTR_WUNUSED int __NOTHROW_NCX(__LIBCCALL __iswcsymf)(__WINT_TYPE__ __wc) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(iswsymstrt))(__wc); }
 #endif /* !__CRT_HAVE___iswcsymf */
 #ifdef __CRT_HAVE___iswcsym
+/* >> iswsymcont(3), iswsymcont_l(3)
+ * Check if `wc' may appear in the middle of a symbol/keyword/identifier */
 __CDECLARE(__ATTR_CONST __ATTR_WUNUSED,int,__NOTHROW_NCX,__iswcsym,(__WINT_TYPE__ __wc),(__wc))
 #else /* __CRT_HAVE___iswcsym */
 #include <libc/local/wctype/iswsymcont.h>
+/* >> iswsymcont(3), iswsymcont_l(3)
+ * Check if `wc' may appear in the middle of a symbol/keyword/identifier */
 __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_CONST __ATTR_WUNUSED int __NOTHROW_NCX(__LIBCCALL __iswcsym)(__WINT_TYPE__ __wc) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(iswsymcont))(__wc); }
 #endif /* !__CRT_HAVE___iswcsym */
 #ifdef __CRT_HAVE__iswcsymf_l
+/* >> iswsymstrt(3), iswsymstrt_l(3)
+ * Check if `wc' may appear at the start of a symbol/keyword/identifier */
 __CDECLARE(__ATTR_PURE __ATTR_WUNUSED,int,__NOTHROW_NCX,_iswcsymf_l,(__WINT_TYPE__ __wc, __locale_t __locale),(__wc,__locale))
 #else /* __CRT_HAVE__iswcsymf_l */
 #include <libc/local/wctype/iswsymstrt_l.h>
+/* >> iswsymstrt(3), iswsymstrt_l(3)
+ * Check if `wc' may appear at the start of a symbol/keyword/identifier */
 __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_PURE __ATTR_WUNUSED int __NOTHROW_NCX(__LIBCCALL _iswcsymf_l)(__WINT_TYPE__ __wc, __locale_t __locale) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(iswsymstrt_l))(__wc, __locale); }
 #endif /* !__CRT_HAVE__iswcsymf_l */
 #ifdef __CRT_HAVE__iswcsym_l
+/* >> iswsymcont(3), iswsymcont_l(3)
+ * Check if `wc' may appear in the middle of a symbol/keyword/identifier */
 __CDECLARE(__ATTR_PURE __ATTR_WUNUSED,int,__NOTHROW_NCX,_iswcsym_l,(__WINT_TYPE__ __wc, __locale_t __locale),(__wc,__locale))
 #else /* __CRT_HAVE__iswcsym_l */
 #include <libc/local/wctype/iswsymcont_l.h>
+/* >> iswsymcont(3), iswsymcont_l(3)
+ * Check if `wc' may appear in the middle of a symbol/keyword/identifier */
 __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_PURE __ATTR_WUNUSED int __NOTHROW_NCX(__LIBCCALL _iswcsym_l)(__WINT_TYPE__ __wc, __locale_t __locale) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(iswsymcont_l))(__wc, __locale); }
 #endif /* !__CRT_HAVE__iswcsym_l */
 #endif /* !_WCTYPE_DEFINED */

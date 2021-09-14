@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x6849797c */
+/* HASH CRC-32:0x258a5bdc */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -55,15 +55,15 @@ __NAMESPACE_LOCAL_BEGIN
 #ifndef __local___localdep_fputs_defined
 #define __local___localdep_fputs_defined 1
 #if __has_builtin(__builtin_fputs) && defined(__LIBC_BIND_CRTBUILTINS) && defined(__CRT_HAVE_fputs)
-__CEIREDIRECT(__ATTR_NONNULL((1, 2)),__STDC_INT_AS_SSIZE_T,__THROWING,__localdep_fputs,(char const *__restrict __str, __FILE *__restrict __stream),fputs,{ return __builtin_fputs(__str, __stream); })
+__CEIREDIRECT(__ATTR_NONNULL((1, 2)),__STDC_INT_AS_SSIZE_T,__THROWING,__localdep_fputs,(char const *__restrict __string, __FILE *__restrict __stream),fputs,{ return __builtin_fputs(__string, __stream); })
 #elif defined(__CRT_HAVE_fputs_unlocked) && defined(__USE_STDIO_UNLOCKED)
-__CREDIRECT(__ATTR_NONNULL((1, 2)),__STDC_INT_AS_SSIZE_T,__THROWING,__localdep_fputs,(char const *__restrict __str, __FILE *__restrict __stream),fputs_unlocked,(__str,__stream))
+__CREDIRECT(__ATTR_NONNULL((1, 2)),__STDC_INT_AS_SSIZE_T,__THROWING,__localdep_fputs,(char const *__restrict __string, __FILE *__restrict __stream),fputs_unlocked,(__string,__stream))
 #elif defined(__CRT_HAVE_fputs)
-__CREDIRECT(__ATTR_NONNULL((1, 2)),__STDC_INT_AS_SSIZE_T,__THROWING,__localdep_fputs,(char const *__restrict __str, __FILE *__restrict __stream),fputs,(__str,__stream))
+__CREDIRECT(__ATTR_NONNULL((1, 2)),__STDC_INT_AS_SSIZE_T,__THROWING,__localdep_fputs,(char const *__restrict __string, __FILE *__restrict __stream),fputs,(__string,__stream))
 #elif defined(__CRT_HAVE__IO_fputs)
-__CREDIRECT(__ATTR_NONNULL((1, 2)),__STDC_INT_AS_SSIZE_T,__THROWING,__localdep_fputs,(char const *__restrict __str, __FILE *__restrict __stream),_IO_fputs,(__str,__stream))
+__CREDIRECT(__ATTR_NONNULL((1, 2)),__STDC_INT_AS_SSIZE_T,__THROWING,__localdep_fputs,(char const *__restrict __string, __FILE *__restrict __stream),_IO_fputs,(__string,__stream))
 #elif defined(__CRT_HAVE_fputs_unlocked)
-__CREDIRECT(__ATTR_NONNULL((1, 2)),__STDC_INT_AS_SSIZE_T,__THROWING,__localdep_fputs,(char const *__restrict __str, __FILE *__restrict __stream),fputs_unlocked,(__str,__stream))
+__CREDIRECT(__ATTR_NONNULL((1, 2)),__STDC_INT_AS_SSIZE_T,__THROWING,__localdep_fputs,(char const *__restrict __string, __FILE *__restrict __stream),fputs_unlocked,(__string,__stream))
 #else /* ... */
 __NAMESPACE_LOCAL_END
 #include <libc/local/stdio/fputs.h>

@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x8c56fe12 */
+/* HASH CRC-32:0xe20c2510 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -21,10 +21,10 @@
 #ifndef __local_pwritev_defined
 #define __local_pwritev_defined 1
 #include <__crt.h>
+#include <bits/types.h>
 #if defined(__CRT_HAVE_pwritev64) || defined(__CRT_HAVE_pwritev)
 #include <features.h>
 #include <bits/os/iovec.h>
-#include <bits/types.h>
 __NAMESPACE_LOCAL_BEGIN
 #if !defined(__local___localdep_pwritev32_defined) && defined(__CRT_HAVE_pwritev)
 #define __local___localdep_pwritev32_defined 1

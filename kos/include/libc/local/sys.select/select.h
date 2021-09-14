@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x3a27827 */
+/* HASH CRC-32:0xf6b005db */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -21,6 +21,7 @@
 #ifndef __local_select_defined
 #define __local_select_defined 1
 #include <__crt.h>
+#include <bits/types.h>
 #if defined(__CRT_HAVE_select64) || defined(__CRT_HAVE_select) || defined(__CRT_HAVE___select)
 #include <features.h>
 #include <bits/os/timeval.h>

@@ -638,22 +638,26 @@ typedef __pid_t pid_t;
 
 }
 
+@@>> cfgetospeed(3)
 [[wunused, ATTR_PURE, decl_include("<bits/os/termios.h>", "<bits/types.h>")]]
 speed_t cfgetospeed([[nonnull]] struct termios const *__restrict termios_p) {
 	return termios_p->@c_ospeed@;
 }
 
+@@>> cfgetispeed(3)
 [[wunused, ATTR_PURE, decl_include("<bits/os/termios.h>", "<bits/types.h>")]]
 speed_t cfgetispeed([[nonnull]] struct termios const *__restrict termios_p) {
 	return termios_p->@c_ispeed@;
 }
 
+@@>> cfsetospeed(3)
 [[decl_include("<bits/os/termios.h>", "<bits/types.h>")]]
 int cfsetospeed([[nonnull]] struct termios *__restrict termios_p, speed_t speed) {
 	termios_p->@c_ospeed@ = speed;
 	return 0;
 }
 
+@@>> cfsetispeed(3)
 [[decl_include("<bits/os/termios.h>", "<bits/types.h>")]]
 int cfsetispeed([[nonnull]] struct termios *__restrict termios_p, speed_t speed) {
 	termios_p->@c_ispeed@ = speed;
@@ -709,12 +713,14 @@ int tcsetattr($fd_t fd, __STDC_INT_AS_UINT_T optional_actions,
 }
 
 
+@@>> tcsendbreak(3)
 [[requires_include("<asm/os/tty.h>")]]
 [[requires($has_function(ioctl) && defined(__TCSBRKP))]]
 int tcsendbreak($fd_t fd, int duration) {
 	return (int)ioctl(fd, __TCSBRKP, duration);
 }
 
+@@>> tcdrain(3)
 [[cp, requires_include("<asm/os/tty.h>")]]
 [[requires($has_function(ioctl) && defined(__TCSBRK))]]
 int tcdrain($fd_t fd) {
@@ -722,6 +728,7 @@ int tcdrain($fd_t fd) {
 }
 
 
+@@>> tcflush(3)
 @@@param: queue_selector: One of `TCIFLUSH', `TCOFLUSH' or `TCIOFLUSH'
 [[decl_include("<features.h>")]]
 [[requires_include("<asm/os/tty.h>")]]
@@ -730,6 +737,7 @@ int tcflush($fd_t fd, __STDC_INT_AS_UINT_T queue_selector) {
 	return (int)ioctl(fd, __TCFLSH, queue_selector);
 }
 
+@@>> tcflow(3)
 @@@param: action: One of `TCOOFF', `TCOON', `TCIOFF', `TCION'
 [[decl_include("<features.h>")]]
 [[requires_include("<asm/os/tty.h>")]]
@@ -740,6 +748,7 @@ int tcflow($fd_t fd, __STDC_INT_AS_UINT_T action) {
 
 %
 %#if defined(__USE_UNIX98) || defined(__USE_XOPEN2K8)
+@@>> tcgetsid(3)
 [[requires_include("<asm/os/tty.h>")]]
 [[requires($has_function(ioctl) && defined(__TIOCGSID))]]
 $pid_t tcgetsid($fd_t fd) {
@@ -752,6 +761,7 @@ $pid_t tcgetsid($fd_t fd) {
 
 %
 %#if defined(__USE_BSD)
+@@>> tcsetsid(3)
 [[impl_include("<libc/errno.h>")]]
 [[requires_include("<asm/os/tty.h>")]]
 [[requires($has_function(ioctl) && defined(__TIOCSCTTY))]]
@@ -772,6 +782,7 @@ int tcsetsid($fd_t fd, $pid_t pid) {
 
 %
 %#ifdef __USE_MISC
+@@>> cfsetspeed(3)
 [[decl_include("<bits/os/termios.h>", "<bits/types.h>")]]
 int cfsetspeed([[nonnull]] struct termios *__restrict termios_p, speed_t speed) {
 	termios_p->@c_ospeed@ = speed;

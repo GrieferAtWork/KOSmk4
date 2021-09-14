@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x46597b15 */
+/* HASH CRC-32:0x65cb32fd */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -21,6 +21,7 @@
 #ifndef __local_mtx_timedlock64_defined
 #define __local_mtx_timedlock64_defined 1
 #include <__crt.h>
+#include <bits/types.h>
 #if defined(__CRT_HAVE_pthread_mutex_timedlock64) || defined(__CRT_HAVE_pthread_mutex_timedlock)
 #include <bits/crt/threads.h>
 __NAMESPACE_LOCAL_BEGIN
@@ -28,14 +29,12 @@ __NAMESPACE_LOCAL_BEGIN
 #define __local___localdep_pthread_mutex_timedlock64_defined 1
 #ifdef __CRT_HAVE_pthread_mutex_timedlock64
 __NAMESPACE_LOCAL_END
-#include <bits/types.h>
 #include <bits/crt/pthreadtypes.h>
 #include <bits/os/timespec.h>
 __NAMESPACE_LOCAL_BEGIN
 __CREDIRECT(__ATTR_WUNUSED __ATTR_NONNULL((1, 2)),__errno_t,__NOTHROW_RPC,__localdep_pthread_mutex_timedlock64,(__pthread_mutex_t *__restrict __mutex, struct __timespec64 const *__restrict __abstime),pthread_mutex_timedlock64,(__mutex,__abstime))
 #elif defined(__CRT_HAVE_pthread_mutex_timedlock) && __SIZEOF_TIME32_T__ == __SIZEOF_TIME64_T__
 __NAMESPACE_LOCAL_END
-#include <bits/types.h>
 #include <bits/crt/pthreadtypes.h>
 #include <bits/os/timespec.h>
 __NAMESPACE_LOCAL_BEGIN

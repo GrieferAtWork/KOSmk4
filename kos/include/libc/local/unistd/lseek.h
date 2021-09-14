@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x9975a96b */
+/* HASH CRC-32:0xd65afd7e */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -21,9 +21,9 @@
 #ifndef __local_lseek_defined
 #define __local_lseek_defined 1
 #include <__crt.h>
+#include <bits/types.h>
 #if defined(__CRT_HAVE_lseek64) || defined(__CRT_HAVE__lseeki64) || defined(__CRT_HAVE_lseek) || defined(__CRT_HAVE__lseek) || defined(__CRT_HAVE___lseek)
 #include <features.h>
-#include <bits/types.h>
 __NAMESPACE_LOCAL_BEGIN
 #ifndef __local___localdep_lseek32_defined
 #define __local___localdep_lseek32_defined 1

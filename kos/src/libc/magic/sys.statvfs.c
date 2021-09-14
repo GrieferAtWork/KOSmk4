@@ -102,14 +102,14 @@ typedef __FS_TYPE(fsfilcnt) fsfilcnt_t; /* Type to count file system inodes.  */
 
 
 [[no_crt_self_import]]
-[[if(!defined(__USE_FILE_OFFSET64)), preferred_alias("statvfs")]]
-[[if(defined(__USE_FILE_OFFSET64)), preferred_alias("statvfs64")]]
+[[if($extended_include_prefix("<features.h>")!defined(__USE_FILE_OFFSET64)), preferred_alias("statvfs")]]
+[[if($extended_include_prefix("<features.h>") defined(__USE_FILE_OFFSET64)), preferred_alias("statvfs64")]]
 [[decl_include("<bits/os/statvfs.h>")]]
 int statvfs([[nonnull]] char const *file, [[nonnull]] struct statvfs *buf);
 
 [[no_crt_self_import]]
-[[if(!defined(__USE_FILE_OFFSET64)), preferred_alias("fstatvfs")]]
-[[if(defined(__USE_FILE_OFFSET64)), preferred_alias("fstatvfs64")]]
+[[if($extended_include_prefix("<features.h>")!defined(__USE_FILE_OFFSET64)), preferred_alias("fstatvfs")]]
+[[if($extended_include_prefix("<features.h>") defined(__USE_FILE_OFFSET64)), preferred_alias("fstatvfs64")]]
 [[decl_include("<bits/os/statvfs.h>")]]
 int fstatvfs($fd_t filedes, [[nonnull]] struct statvfs *buf);
 

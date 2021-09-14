@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xd8f98dfb */
+/* HASH CRC-32:0xe8a415ed */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -30,23 +30,41 @@
 DECL_BEGIN
 
 #if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
+/* >> gettimeofday(2), gettimeofday64(2) */
 INTDEF NONNULL((1)) int NOTHROW_NCX(LIBDCALL libd_gettimeofday)(struct timeval *__restrict tv, __timezone_ptr_t tz);
+/* >> getitimer(2), getitimer64(2) */
 INTDEF NONNULL((2)) int NOTHROW_NCX(LIBDCALL libd_getitimer)(__itimer_which_t which, struct itimerval *curr_value);
+/* >> setitimer(2), setitimer64(2) */
 INTDEF NONNULL((2)) int NOTHROW_NCX(LIBDCALL libd_setitimer)(__itimer_which_t which, struct itimerval const *newval, struct itimerval *oldval);
+/* >> utimes(2), utimes64(2) */
 INTDEF NONNULL((1)) int NOTHROW_NCX(LIBDCALL libd_utimes)(char const *file, struct timeval const tvp[2]);
+/* >> futimesat(2), futimesat64(2) */
 INTDEF NONNULL((2)) int NOTHROW_NCX(LIBDCALL libd_futimesat)(fd_t fd, char const *file, struct timeval const tvp[2]);
+/* >> settimeofday(2), settimeofday64(2) */
 INTDEF int NOTHROW_NCX(LIBDCALL libd_settimeofday)(struct timeval const *tv, struct timezone const *tz);
+/* >> adjtime(3), adjtime64(3) */
 INTDEF int NOTHROW_NCX(LIBDCALL libd_adjtime)(struct timeval const *delta, struct timeval *olddelta);
+/* >> lutimes(2), lutimes64(2) */
 INTDEF NONNULL((1)) int NOTHROW_NCX(LIBDCALL libd_lutimes)(char const *file, struct timeval const tvp[2]);
+/* >> futimes(2), futimes64(2) */
 INTDEF int NOTHROW_NCX(LIBDCALL libd_futimes)(fd_t fd, struct timeval const tvp[2]);
+/* >> gettimeofday(2), gettimeofday64(2) */
 INTDEF NONNULL((1)) int NOTHROW_NCX(LIBDCALL libd_gettimeofday64)(struct timeval64 *__restrict tv, __timezone_ptr_t tz);
+/* >> getitimer(2), getitimer64(2) */
 INTDEF NONNULL((2)) int NOTHROW_NCX(LIBDCALL libd_getitimer64)(__itimer_which_t which, struct itimerval64 *curr_value);
+/* >> setitimer(2), setitimer64(2) */
 INTDEF NONNULL((2)) int NOTHROW_NCX(LIBDCALL libd_setitimer64)(__itimer_which_t which, struct itimerval64 const *newval, struct itimerval64 *oldval);
+/* >> utimes(2), utimes64(2) */
 INTDEF NONNULL((1)) int NOTHROW_NCX(LIBDCALL libd_utimes64)(char const *file, struct timeval64 const tvp[2]);
+/* >> settimeofday(2), settimeofday64(2) */
 INTDEF int NOTHROW_NCX(LIBDCALL libd_settimeofday64)(struct timeval64 const *tv, struct timezone const *tz);
+/* >> adjtime(3), adjtime64(3) */
 INTDEF int NOTHROW_NCX(LIBDCALL libd_adjtime64)(struct timeval64 const *delta, struct timeval64 *olddelta);
+/* >> lutimes(2), lutimes64(2) */
 INTDEF NONNULL((1)) int NOTHROW_NCX(LIBDCALL libd_lutimes64)(char const *file, struct timeval64 const tvp[2]);
+/* >> lutimes(2), lutimes64(2) */
 INTDEF int NOTHROW_NCX(LIBDCALL libd_futimes64)(fd_t fd, struct timeval64 const tvp[2]);
+/* >> futimesat(2), futimesat64(2) */
 INTDEF NONNULL((2)) int NOTHROW_NCX(LIBDCALL libd_futimesat64)(fd_t fd, char const *file, struct timeval64 const tvp[2]);
 #endif /* !__LIBCCALL_IS_LIBDCALL && !__KERNEL__ */
 

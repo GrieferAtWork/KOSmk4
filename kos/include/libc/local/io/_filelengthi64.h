@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x9d2739aa */
+/* HASH CRC-32:0xcfceb97 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -22,8 +22,8 @@
 #define __local__filelengthi64_defined 1
 #include <__crt.h>
 #include <asm/os/stdio.h>
-#if (defined(__CRT_HAVE_lseek64) || defined(__CRT_HAVE__lseeki64) || defined(__CRT_HAVE_lseek) || defined(__CRT_HAVE__lseek) || defined(__CRT_HAVE___lseek)) && defined(__SEEK_CUR) && defined(__SEEK_END) && defined(__SEEK_SET)
 #include <bits/types.h>
+#if (defined(__CRT_HAVE_lseek64) || defined(__CRT_HAVE__lseeki64) || defined(__CRT_HAVE_lseek) || defined(__CRT_HAVE__lseek) || defined(__CRT_HAVE___lseek)) && defined(__SEEK_CUR) && defined(__SEEK_END) && defined(__SEEK_SET)
 __NAMESPACE_LOCAL_BEGIN
 #ifndef __local___localdep_lseek64_defined
 #define __local___localdep_lseek64_defined 1

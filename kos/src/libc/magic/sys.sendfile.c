@@ -66,8 +66,8 @@ ssize_t sendfile32($fd_t out_fd, $fd_t in_fd,
 
 
 [[no_crt_self_import, decl_include("<bits/types.h>")]]
-[[if(defined(__USE_FILE_OFFSET64)), preferred_alias("sendfile64")]]
-[[if(!defined(__USE_FILE_OFFSET64)), preferred_alias("sendfile")]]
+[[if($extended_include_prefix("<features.h>") defined(__USE_FILE_OFFSET64)), preferred_alias("sendfile64")]]
+[[if($extended_include_prefix("<features.h>")!defined(__USE_FILE_OFFSET64)), preferred_alias("sendfile")]]
 [[userimpl, requires($has_function(sendfile32) || $has_function(sendfile64))]]
 ssize_t sendfile($fd_t out_fd, $fd_t in_fd,
                  [[nullable]] $off_t *offset, size_t count) {

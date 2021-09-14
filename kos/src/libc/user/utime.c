@@ -33,7 +33,8 @@ DECL_BEGIN
 
 
 
-/*[[[head:libc_utime,hash:CRC-32=0xd118af7a]]]*/
+/*[[[head:libc_utime,hash:CRC-32=0x6ea63c2]]]*/
+/* >> utime(2), utime64(2) */
 INTERN ATTR_SECTION(".text.crt.fs.modify_time") NONNULL((1)) int
 NOTHROW_RPC(LIBCCALL libc_utime)(char const *filename,
                                  struct utimbuf const *file_times)
@@ -58,10 +59,11 @@ NOTHROW_RPC(LIBCCALL libc_utime)(char const *filename,
 }
 /*[[[end:libc_utime]]]*/
 
-/*[[[head:libc_utime64,hash:CRC-32=0x346a4a39]]]*/
+/*[[[head:libc_utime64,hash:CRC-32=0xe7eed121]]]*/
 #if __SIZEOF_TIME32_T__ == __SIZEOF_TIME64_T__
 DEFINE_INTERN_ALIAS(libc_utime64, libc_utime);
 #else /* MAGIC:alias */
+/* >> utime(2), utime64(2) */
 INTERN ATTR_SECTION(".text.crt.fs.modify_time") NONNULL((1)) int
 NOTHROW_RPC(LIBCCALL libc_utime64)(char const *filename,
                                    struct utimbuf64 const *file_times)
@@ -87,7 +89,8 @@ NOTHROW_RPC(LIBCCALL libc_utime64)(char const *filename,
 #endif /* MAGIC:alias */
 /*[[[end:libc_utime64]]]*/
 
-/*[[[head:libc_futime,hash:CRC-32=0xc0caffa1]]]*/
+/*[[[head:libc_futime,hash:CRC-32=0x386588df]]]*/
+/* >> futime(3), futime64(3) */
 INTERN ATTR_SECTION(".text.crt.fs.modify_time") int
 NOTHROW_RPC(LIBCCALL libc_futime)(fd_t fd,
                                   struct utimbuf const *file_times)
@@ -108,10 +111,11 @@ NOTHROW_RPC(LIBCCALL libc_futime)(fd_t fd,
 }
 /*[[[end:libc_futime]]]*/
 
-/*[[[head:libc_futime64,hash:CRC-32=0xeeb79d64]]]*/
+/*[[[head:libc_futime64,hash:CRC-32=0x78b68b81]]]*/
 #if __SIZEOF_TIME32_T__ == __SIZEOF_TIME64_T__
 DEFINE_INTERN_ALIAS(libc_futime64, libc_futime);
 #else /* MAGIC:alias */
+/* >> futime(3), futime64(3) */
 INTERN ATTR_SECTION(".text.crt.fs.modify_time") int
 NOTHROW_RPC(LIBCCALL libc_futime64)(fd_t fd,
                                     struct utimbuf64 const *file_times)

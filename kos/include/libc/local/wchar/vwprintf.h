@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x48ac3fb1 */
+/* HASH CRC-32:0xd6b6b131 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -21,9 +21,9 @@
 #ifndef __local_vwprintf_defined
 #define __local_vwprintf_defined 1
 #include <__crt.h>
+#include <features.h>
 #if (defined(__CRT_HAVE_vfwprintf) || defined(__CRT_HAVE_file_wprinter) || defined(__CRT_HAVE_file_wprinter_unlocked) || defined(__CRT_HAVE_fputwc) || defined(__CRT_HAVE_putwc)) && !defined(__NO_STDSTREAMS)
 #include <kos/anno.h>
-#include <features.h>
 #include <hybrid/typecore.h>
 __NAMESPACE_LOCAL_BEGIN
 #ifndef __local___localdep_vfwprintf_defined

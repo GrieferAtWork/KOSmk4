@@ -249,38 +249,38 @@ struct group_filter {
 
 %[default:section(".text.crt{|.dos}.net.convert")]
 [[guard, const, impl_include("<hybrid/__byteswap.h>")]]
-[[extern_inline, if(defined(__HYBRID_HTOBE_IS_BETOH)), alias("ntohs")]]
+[[extern_inline, if($extended_include_prefix("<hybrid/__byteswap.h>")defined(__HYBRID_HTOBE_IS_BETOH)), alias("ntohs")]]
 $uint16_t htons($uint16_t hostword) {
 	return ($uint16_t)__hybrid_htobe32(hostword);
 }
 
 [[guard, const, impl_include("<hybrid/__byteswap.h>")]]
-[[extern_inline, alt_variant_of(defined(__HYBRID_HTOBE_IS_BETOH), htons)]]
+[[extern_inline, alt_variant_of($extended_include_prefix("<hybrid/__byteswap.h>")defined(__HYBRID_HTOBE_IS_BETOH), htons)]]
 $uint16_t ntohs($uint16_t netshort) {
 	return ($uint16_t)__hybrid_betoh16(netshort);
 }
 
 [[guard, const, impl_include("<hybrid/__byteswap.h>")]]
-[[extern_inline, if(defined(__HYBRID_HTOBE_IS_BETOH)), alias("ntohl")]]
+[[extern_inline, if($extended_include_prefix("<hybrid/__byteswap.h>")defined(__HYBRID_HTOBE_IS_BETOH)), alias("ntohl")]]
 $uint32_t htonl($uint32_t hostlong) {
 	return ($uint32_t)__hybrid_htobe32(hostlong);
 }
 
 [[guard, const, impl_include("<hybrid/__byteswap.h>")]]
-[[extern_inline, alt_variant_of(defined(__HYBRID_HTOBE_IS_BETOH), htonl)]]
+[[extern_inline, alt_variant_of($extended_include_prefix("<hybrid/__byteswap.h>")defined(__HYBRID_HTOBE_IS_BETOH), htonl)]]
 $uint32_t ntohl($uint32_t netlong) {
 	return ($uint32_t)__hybrid_betoh32(netlong);
 }
 
 %#if defined(__USE_KOS) && defined(__UINT64_TYPE__)
 [[const, impl_include("<hybrid/__byteswap.h>")]]
-[[extern_inline, if(defined(__HYBRID_HTOBE_IS_BETOH)), alias("ntohq")]]
+[[extern_inline, if($extended_include_prefix("<hybrid/__byteswap.h>")defined(__HYBRID_HTOBE_IS_BETOH)), alias("ntohq")]]
 $uint64_t htonq($uint64_t hostquad) {
 	return ($uint64_t)__hybrid_htobe64(hostquad);
 }
 
 [[const, impl_include("<hybrid/__byteswap.h>")]]
-[[extern_inline, alt_variant_of(defined(__HYBRID_HTOBE_IS_BETOH), htonq)]]
+[[extern_inline, alt_variant_of($extended_include_prefix("<hybrid/__byteswap.h>")defined(__HYBRID_HTOBE_IS_BETOH), htonq)]]
 $uint64_t ntohq($uint64_t netquad) {
 	return ($uint64_t)__hybrid_betoh64(netquad);
 }
@@ -399,9 +399,9 @@ $uint64_t ntohq($uint64_t netquad) {
 	(IN6_IS_ADDR_MULTICAST(a) && ((((__uint8_t const *)(a))[1] & __UINT8_C(0xf)) == __UINT8_C(0xe)))
 }
 
+%
+%#ifdef __USE_GNU
 %{
-
-#ifdef __USE_GNU
 struct cmsghdr;
 
 /* IPv6 packet information. */

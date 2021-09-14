@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xa0574b47 */
+/* HASH CRC-32:0xc6745b8f */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -37,6 +37,9 @@ __NAMESPACE_LOCAL_BEGIN
 #endif /* !__local___localdep_asctime_r_defined */
 #ifndef __local___localdep_dos_ctime_s_defined
 #define __local___localdep_dos_ctime_s_defined 1
+__NAMESPACE_LOCAL_END
+#include <features.h>
+__NAMESPACE_LOCAL_BEGIN
 #if defined(__CRT_HAVE__ctime32_s) && defined(__USE_TIME_BITS64)
 __CREDIRECT(__ATTR_NONNULL((1, 3)),__errno_t,__NOTHROW_NCX,__localdep_dos_ctime_s,(char __buf[26], __SIZE_TYPE__ __bufsize, __TM_TYPE(time) const *__restrict __timer),_ctime32_s,(__buf,__bufsize,__timer))
 #elif defined(__CRT_HAVE__ctime64_s) && !defined(__USE_TIME_BITS64)
@@ -63,9 +66,6 @@ __NAMESPACE_LOCAL_BEGIN
 #endif /* !__local___localdep_localtime_r_defined */
 __LOCAL_LIBC(ctime_r) __ATTR_NONNULL((1, 2)) char *
 __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(ctime_r))(__TM_TYPE(time) const *__restrict __timer, char __buf[26]) {
-
-
-
 #if defined(__CRT_HAVE__ctime64_s) || defined(__CRT_HAVE__ctime32_s)
 	return (__NAMESPACE_LOCAL_SYM __localdep_dos_ctime_s)(__buf, 26, __timer) ? __NULLPTR : __buf;
 #else /* __CRT_HAVE__ctime64_s || __CRT_HAVE__ctime32_s */

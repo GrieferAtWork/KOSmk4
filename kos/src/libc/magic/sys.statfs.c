@@ -49,14 +49,14 @@ __SYSDECL_BEGIN
 }
 
 [[no_crt_self_import, export_as("__statfs")]]
-[[if(!defined(__USE_FILE_OFFSET64)), preferred_alias("statfs", "__statfs")]]
-[[if(defined(__USE_FILE_OFFSET64)), preferred_alias("statfs64")]]
+[[if($extended_include_prefix("<features.h>")!defined(__USE_FILE_OFFSET64)), preferred_alias("statfs", "__statfs")]]
+[[if($extended_include_prefix("<features.h>") defined(__USE_FILE_OFFSET64)), preferred_alias("statfs64")]]
 [[decl_include("<bits/os/statfs.h>")]]
 int statfs([[nonnull]] char const *file, [[nonnull]] struct statfs *buf);
 
 [[no_crt_self_import]]
-[[if(!defined(__USE_FILE_OFFSET64)), preferred_alias("fstatfs")]]
-[[if(defined(__USE_FILE_OFFSET64)), preferred_alias("fstatfs64")]]
+[[if($extended_include_prefix("<features.h>")!defined(__USE_FILE_OFFSET64)), preferred_alias("fstatfs")]]
+[[if($extended_include_prefix("<features.h>") defined(__USE_FILE_OFFSET64)), preferred_alias("fstatfs64")]]
 [[decl_include("<bits/os/statfs.h>")]]
 int fstatfs($fd_t filedes, [[nonnull]] struct statfs *buf);
 

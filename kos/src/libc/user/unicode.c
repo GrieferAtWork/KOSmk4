@@ -80,8 +80,14 @@ PRIVATE uint16_t const unicode_tab2[42];
 
 STATIC_ASSERT_MSG(UNICODE_FOLD_MAXLEN <= UNICODE_FOLDED_MAX, "UNICODE_FOLDED_MAX must be increased!");
 
-/*[[[head:libc___unicode_descriptor,hash:CRC-32=0xf10a2df2]]]*/
-/* Return the internal descriptor for the given `ch' */
+/*[[[head:libc___unicode_descriptor,hash:CRC-32=0x5884f74e]]]*/
+/* >> __unicode_descriptor(3)
+ * Return the internal descriptor for the given `ch'
+ * This is the main accessor function for the unicode database, but
+ * should not be called directly (unless you know what you're doing
+ * and are aware that your code might break should this API ever be
+ * changed)
+ * Also note that this function never returns `NULL'! */
 INTERN ATTR_SECTION(".text.crt.unicode.UTF") ATTR_CONST ATTR_RETNONNULL struct __unitraits const *
 NOTHROW(LIBCCALL libc___unicode_descriptor)(char32_t ch)
 /*[[[body:libc___unicode_descriptor]]]*/
@@ -92,8 +98,9 @@ NOTHROW(LIBCCALL libc___unicode_descriptor)(char32_t ch)
 }
 /*[[[end:libc___unicode_descriptor]]]*/
 
-/*[[[head:libc___unicode_descriptor_digit,hash:CRC-32=0xa54824cb]]]*/
-/* Return the integer constant associated with a given digit index
+/*[[[head:libc___unicode_descriptor_digit,hash:CRC-32=0x311033ed]]]*/
+/* >> __unicode_descriptor_digit(3), __unicode_descriptor_digit64(3)
+ * Return the integer constant associated  with a given digit  index
  * Returns `0' if the given index is invalid
  * @param: digit_idx: As read from `__unitraits::__ut_digit_idx' */
 INTERN ATTR_SECTION(".text.crt.unicode.UTF") ATTR_CONST WUNUSED uint8_t
@@ -111,8 +118,9 @@ NOTHROW(LIBCCALL libc___unicode_descriptor_digit)(uint8_t digit_idx)
 }
 /*[[[end:libc___unicode_descriptor_digit]]]*/
 
-/*[[[head:libc___unicode_descriptor_digit64,hash:CRC-32=0x1c4cd216]]]*/
-/* Return the integer constant associated with a given digit index
+/*[[[head:libc___unicode_descriptor_digit64,hash:CRC-32=0x40bfb580]]]*/
+/* >> __unicode_descriptor_digit(3), __unicode_descriptor_digit64(3)
+ * Return the integer constant associated  with a given digit  index
  * Returns `0' if the given index is invalid
  * @param: digit_idx: As read from `__unitraits::__ut_digit_idx' */
 INTERN ATTR_SECTION(".text.crt.unicode.UTF") ATTR_CONST WUNUSED uint64_t
@@ -130,8 +138,9 @@ NOTHROW(LIBCCALL libc___unicode_descriptor_digit64)(uint8_t digit_idx)
 }
 /*[[[end:libc___unicode_descriptor_digit64]]]*/
 
-/*[[[head:libc___unicode_descriptor_digitd,hash:CRC-32=0x8ffa1063]]]*/
-/* Return the floating-point constant associated with a given digit index
+/*[[[head:libc___unicode_descriptor_digitd,hash:CRC-32=0x56e14aaf]]]*/
+/* >> __unicode_descriptor_digitd(3), __unicode_descriptor_digitld(3)
+ * Return the floating-point constant associated with a given digit index
  * Returns `0.0' if the given index is invalid
  * @param: digit_idx: As read from `__unitraits::__ut_digit_idx' */
 INTERN ATTR_SECTION(".text.crt.unicode.UTF") ATTR_CONST WUNUSED double
@@ -149,8 +158,9 @@ NOTHROW(LIBCCALL libc___unicode_descriptor_digitd)(uint8_t digit_idx)
 }
 /*[[[end:libc___unicode_descriptor_digitd]]]*/
 
-/*[[[head:libc___unicode_descriptor_digitld,hash:CRC-32=0xc8190968]]]*/
-/* Return the floating-point constant associated with a given digit index
+/*[[[head:libc___unicode_descriptor_digitld,hash:CRC-32=0x22dd8786]]]*/
+/* >> __unicode_descriptor_digitd(3), __unicode_descriptor_digitld(3)
+ * Return the floating-point constant associated with a given digit index
  * Returns `0.0' if the given index is invalid
  * @param: digit_idx: As read from `__unitraits::__ut_digit_idx' */
 INTERN ATTR_SECTION(".text.crt.unicode.UTF") ATTR_CONST WUNUSED __LONGDOUBLE
@@ -168,8 +178,9 @@ NOTHROW(LIBCCALL libc___unicode_descriptor_digitld)(uint8_t digit_idx)
 }
 /*[[[end:libc___unicode_descriptor_digitld]]]*/
 
-/*[[[head:libc_unicode_fold,hash:CRC-32=0x6e2a0f6c]]]*/
-/* Fold the given unicode character `ch' */
+/*[[[head:libc_unicode_fold,hash:CRC-32=0x8b4f54d3]]]*/
+/* >> unicode_fold(3)
+ * Fold the given unicode character `ch' */
 INTERN ATTR_SECTION(".text.crt.unicode.UTF") ATTR_RETNONNULL NONNULL((2)) char32_t *
 NOTHROW_NCX(LIBCCALL libc_unicode_fold)(char32_t ch,
                                         char32_t buf[3])

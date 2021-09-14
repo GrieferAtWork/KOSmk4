@@ -1193,10 +1193,16 @@ char16_t *unicode_32to16([[nonnull]] /*utf-16*/ char16_t *__restrict utf16_dst,
 
 
 @@>> unicode_c8toc16(3)
-@@@return: *:          Success (*pc16 was filled; the return value is the number of bytes taken from `s')
-@@@return: 0:          Success (*pc16 was filled; `mbs' was modified, but nothing was read from `s'; in this case, a surrogate was written)
-@@@return: (size_t)-1: Unicode error (the given input string isn't a valid unicode sequence)
-@@@return: (size_t)-2: Success, but no character was generated (s...+=n, together with `mbs' doesn't for a full character, but `mbs' was updated)
+@@@return: *:          Success (*pc16 was filled; the return value
+@@                     is  the  number  of bytes  taken  from `s')
+@@@return: 0:          Success (*pc16 was filled; `mbs' was modified,
+@@                     but nothing was read  from `s'; in this  case,
+@@                     a surrogate was written)
+@@@return: (size_t)-1: Unicode error (the given input string isn't
+@@                     a valid unicode sequence)
+@@@return: (size_t)-2: Success, but  no  character  was  generated
+@@                     (`s...+=n', together with `mbs' doesn't for
+@@                     a full  character, but  `mbs' was  updated)
 [[decl_include("<bits/crt/mbstate.h>")]]
 $size_t unicode_c8toc16([[nonnull]] char16_t *__restrict pc16,
                         [[nonnull]] /*utf-8*/ char const *__restrict s, $size_t n,
@@ -1329,9 +1335,13 @@ done:
 
 
 @@>> unicode_c8toc32(3)
-@@@return: *:          Success (*pc32 was filled; the return value is the number of bytes taken from `s')
-@@@return: (size_t)-1: Unicode error (the given input string isn't a valid unicode sequence)
-@@@return: (size_t)-2: Success, but no character was generated (s...+=n, together with `mbs' doesn't for a full character, but `mbs' was updated)
+@@@return: *:          Success (*pc32 was filled; the return value
+@@                     is  the  number  of bytes  taken  from `s')
+@@@return: (size_t)-1: Unicode error (the given input string isn't
+@@                     a valid unicode sequence)
+@@@return: (size_t)-2: Success, but  no  character  was  generated
+@@                     (`s...+=n', together with `mbs' doesn't for
+@@                     a full  character, but  `mbs' was  updated)
 [[decl_include("<bits/crt/mbstate.h>")]]
 $size_t unicode_c8toc32([[nonnull]] char32_t *__restrict pc32,
                         [[nonnull]] /*utf-8*/ char const *__restrict s, $size_t n,
@@ -1448,8 +1458,10 @@ done:
 
 @@>> unicode_c16toc8(3)
 @@@return: 0 :         Success, but no characters were generated
-@@@return: * :         Success (this many bytes were written to `*pc8'; max is `UNICODE_16TO8_MAXBUF(1)')
-@@@return: (size_t)-1: Unicode error (the given input string isn't a valid unicode sequence)
+@@@return: * :         Success  (this many bytes were written to
+@@                     `*pc8'; max is `UNICODE_16TO8_MAXBUF(1)')
+@@@return: (size_t)-1: Unicode error (the given input string
+@@                     isn't  a   valid  unicode   sequence)
 [[decl_include("<bits/crt/mbstate.h>")]]
 $size_t unicode_c16toc8([[nonnull]] char pc8[3], char16_t c16,
                         [[nonnull]] mbstate_t *__restrict mbs) {
@@ -1871,26 +1883,32 @@ $ssize_t format_32to16(/*struct format_32to16_data **/ void *arg,
 
 
 
+@@>> __unicode_descriptor(3)
 @@Return the internal descriptor for the given `ch'
+@@This is the main accessor function for the unicode database, but
+@@should not be called directly (unless you know what you're doing
+@@and are aware that your code might break should this API ever be
+@@changed)
+@@Also note that this function never returns `NULL'!
 [[decl_include("<bits/crt/unicode.h>")]]
 [[guard, libc, const, nonnull, nothrow]]
 struct __unitraits const *__unicode_descriptor(char32_t ch);
 
-@@Return the integer constant associated with a given digit index
+@@>> __unicode_descriptor_digit(3), __unicode_descriptor_digit64(3)
+@@Return the integer constant associated  with a given digit  index
 @@Returns `0' if the given index is invalid
 @@@param: digit_idx: As read from `__unitraits::__ut_digit_idx'
 [[guard, libc, wunused, const, nothrow]]
 $uint8_t __unicode_descriptor_digit($uint8_t digit_idx);
 
 %#ifdef __UINT64_TYPE__
-@@Return the integer constant associated with a given digit index
-@@Returns `0' if the given index is invalid
-@@@param: digit_idx: As read from `__unitraits::__ut_digit_idx'
 [[guard, libc, wunused, const, nothrow]]
+[[doc_alias("__unicode_descriptor_digit")]]
 $uint64_t __unicode_descriptor_digit64($uint8_t digit_idx);
 %#endif /* __UINT64_TYPE__ */
 
 %#ifndef __NO_FPU
+@@>> __unicode_descriptor_digitd(3), __unicode_descriptor_digitld(3)
 @@Return the floating-point constant associated with a given digit index
 @@Returns `0.0' if the given index is invalid
 @@@param: digit_idx: As read from `__unitraits::__ut_digit_idx'
@@ -1912,6 +1930,7 @@ __LONGDOUBLE __unicode_descriptor_digitld($uint8_t digit_idx);
 
 }
 
+@@>> unicode_fold(3)
 @@Fold the given unicode character `ch'
 [[libc, inline, no_extern_inline, nonnull, userimpl]]
 char32_t *unicode_fold(char32_t ch, [[nonnull]] char32_t buf[3]) {

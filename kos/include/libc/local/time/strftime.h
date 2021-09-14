@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x29981ae1 */
+/* HASH CRC-32:0xd29f5890 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -37,14 +37,6 @@ __CREDIRECT(__ATTR_NONNULL((1, 3, 4)),__SIZE_TYPE__,__NOTHROW_NCX,__localdep_crt
 #endif /* !__local___localdep_crt_strftime_l_defined */
 __LOCAL_LIBC(strftime) __ATTR_NONNULL((1, 3, 4)) __SIZE_TYPE__
 __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(strftime))(char *__restrict __buf, __SIZE_TYPE__ __bufsize, char const *__restrict __format, struct __NAMESPACE_STD_SYM tm const *__restrict __tp) {
-
-
-
-
-
-
-
-
 #if defined(__CRT_HAVE_strftime_l) || defined(__CRT_HAVE__strftime_l) || defined(__CRT_HAVE___strftime_l)
 	return (__NAMESPACE_LOCAL_SYM __localdep_crt_strftime_l)(__buf, __bufsize, __format, __tp, __NULLPTR);
 #else /* __CRT_HAVE_strftime_l || __CRT_HAVE__strftime_l || __CRT_HAVE___strftime_l */

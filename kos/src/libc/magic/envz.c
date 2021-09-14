@@ -41,6 +41,7 @@ __SYSDECL_BEGIN
 %[define_replacement(error_t = __errno_t)]
 
 
+@@>> envz_entry(3)
 @@Find and return the entry for `name' in `envz', or `NULL' if not found.
 @@If `name' contains a `=' character, only characters leading up to  this
 @@position are actually compared!
@@ -61,6 +62,7 @@ char *envz_entry([inp_opt(envz_len)] char const *__restrict envz, size_t envz_le
 	return NULL;
 }
 
+@@>> envz_get(3)
 @@Return the value in `envz'  attached to `name', or  `NULL'
 @@if no such entry exists, or the entry doesn't have a value
 @@portion (i.e. doesn't contain a `='-character)
@@ -79,6 +81,7 @@ char *envz_get([inp_opt(envz_len)] char const *__restrict envz, size_t envz_len,
 	return result;
 }
 
+@@>> envz_add(3)
 @@Add an entry `name=value' to `penvz'. If another entry for `name'
 @@already existed before, that entry is removed. If `name' is NULL,
 @@the entry created  doesn't have a  value-portion (i.e. `name'  is
@@ -116,6 +119,7 @@ error_t envz_add([[nonnull]] char **__restrict penvz,
 	return 0;
 }
 
+@@>> envz_merge(3)
 @@Add all entries from `envz2' to `penvz', as though `envz_add()' was
 @@called for each contained `name=value' pair (using `NULL' for value
 @@on pairs that doesn't have a value-portion.
@@ -143,6 +147,7 @@ error_t envz_merge([[nonnull]] char **__restrict penvz,
 	return result;
 }
 
+@@>> envz_remove(3)
 @@Remove an entry matching `name' from `penvz',
 @@or  do  nothing  if  no  such  entry  exists.
 [[decl_include("<hybrid/typecore.h>")]]
@@ -156,6 +161,7 @@ void envz_remove([[nonnull]] char **__restrict penvz,
 }
 
 
+@@>> envz_strip(3)
 @@Remove all entries from `penvz' that don't have a value-portion.
 [[decl_include("<hybrid/typecore.h>")]]
 void envz_strip([[nonnull]] char **__restrict penvz,

@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xa95a531f */
+/* HASH CRC-32:0x42901fbc */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -111,9 +111,11 @@ INTDEF ATTR_RETNONNULL WUNUSED NONNULL((1)) char *NOTHROW_NCX(LIBDCALL libd_asct
 INTDEF ATTR_RETNONNULL WUNUSED NONNULL((1)) char *NOTHROW_NCX(LIBCCALL libc_asctime)(struct tm const *tp);
 #endif /* !__KERNEL__ */
 #if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
+/* >> asctime_s(3) */
 INTDEF NONNULL((1, 3)) errno_t NOTHROW_NCX(LIBDCALL libd_asctime_s)(char *__restrict buf, size_t buflen, struct tm const *__restrict tp);
 #endif /* !__LIBCCALL_IS_LIBDCALL && !__KERNEL__ */
 #ifndef __KERNEL__
+/* >> asctime_s(3) */
 INTDEF NONNULL((1, 3)) errno_t NOTHROW_NCX(LIBCCALL libc_asctime_s)(char *__restrict buf, size_t buflen, struct tm const *__restrict tp);
 #endif /* !__KERNEL__ */
 #if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
@@ -172,7 +174,7 @@ INTDEF ATTR_RETNONNULL WUNUSED NONNULL((1)) struct tm *NOTHROW_NCX(LIBDCALL libd
 INTDEF ATTR_RETNONNULL WUNUSED NONNULL((1)) struct tm *NOTHROW_NCX(LIBCCALL libc_localtime64)(time64_t const *timer);
 #endif /* !__KERNEL__ */
 #if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
-/* >> stime(3), stime64(3)
+/* >> stime(2), stime64(2)
  * Set the system time to `*when'. This call is restricted to the superuser */
 INTDEF NONNULL((1)) int NOTHROW_NCX(LIBDCALL libd_stime)(time_t const *when);
 /* >> timegm(3), timegm64(3)
@@ -185,15 +187,17 @@ INTDEF ATTR_PURE WUNUSED NONNULL((1)) time_t NOTHROW_NCX(LIBDCALL libd_timegm)(s
 INTDEF ATTR_PURE WUNUSED NONNULL((1)) time_t NOTHROW_NCX(LIBCCALL libc_timegm)(struct tm *tp);
 #endif /* !__KERNEL__ */
 #if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
-/* Return the number of days in YEAR */
+/* >> dysize(3)
+ * Return the number of days in YEAR */
 INTDEF ATTR_CONST WUNUSED int NOTHROW_NCX(LIBDCALL libd_dysize)(__STDC_INT_AS_UINT_T year);
 #endif /* !__LIBCCALL_IS_LIBDCALL && !__KERNEL__ */
 #ifndef __KERNEL__
-/* Return the number of days in YEAR */
+/* >> dysize(3)
+ * Return the number of days in YEAR */
 INTDEF ATTR_CONST WUNUSED int NOTHROW_NCX(LIBCCALL libc_dysize)(__STDC_INT_AS_UINT_T year);
 #endif /* !__KERNEL__ */
 #if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
-/* >> stime(3), stime64(3)
+/* >> stime(2), stime64(2)
  * Set the system time to `*when'. This call is restricted to the superuser */
 INTDEF NONNULL((1)) int NOTHROW_NCX(LIBDCALL libd_stime64)(time64_t const *when);
 /* >> timegm(3), timegm64(3)
@@ -215,7 +219,7 @@ INTDEF NONNULL((2)) int NOTHROW_NCX(LIBDCALL libd_clock_getres)(clockid_t clock_
 /* >> clock_gettime(2), clock_gettime64(2)
  * Get current value of clock `clock_id' and store it in `tp' */
 INTDEF NONNULL((2)) int NOTHROW_NCX(LIBDCALL libd_clock_gettime)(clockid_t clock_id, struct timespec *tp);
-/* >> clock_settime(2)
+/* >> clock_settime(2), clock_settime64(2)
  * Set clock `clock_id' to value `tp' */
 INTDEF NONNULL((2)) int NOTHROW_NCX(LIBDCALL libd_clock_settime)(clockid_t clock_id, struct timespec const *tp);
 /* >> timer_create(2)
@@ -248,7 +252,7 @@ INTDEF NONNULL((2)) int NOTHROW_NCX(LIBDCALL libd_clock_getres64)(clockid_t cloc
 /* >> clock_gettime(2), clock_gettime64(2)
  * Get current value of clock `clock_id' and store it in `tp' */
 INTDEF NONNULL((2)) int NOTHROW_NCX(LIBDCALL libd_clock_gettime64)(clockid_t clock_id, struct timespec64 *tp);
-/* >> clock_settime(2)
+/* >> clock_settime(2), clock_settime64(2)
  * Set clock `clock_id' to value `tp' */
 INTDEF NONNULL((2)) int NOTHROW_NCX(LIBDCALL libd_clock_settime64)(clockid_t clock_id, struct timespec64 const *tp);
 /* >> timer_settime(2), timer_settime64(2)

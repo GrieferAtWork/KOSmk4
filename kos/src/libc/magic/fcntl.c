@@ -1603,8 +1603,8 @@ $fd_t open_by_handle_at($fd_t mountdirfd,
 [[decl_include("<features.h>", "<bits/types.h>"), doc_alias("fallocate")]]
 int fallocate32($fd_t fd, __STDC_INT_AS_UINT_T mode, $pos32_t offset, $pos32_t length);
 
-[[if(defined(__USE_FILE_OFFSET64)), preferred_alias("fallocate64")]]
-[[if(!defined(__USE_FILE_OFFSET64)), preferred_alias("fallocate")]]
+[[if($extended_include_prefix("<features.h>") defined(__USE_FILE_OFFSET64)), preferred_alias("fallocate64")]]
+[[if($extended_include_prefix("<features.h>")!defined(__USE_FILE_OFFSET64)), preferred_alias("fallocate")]]
 [[decl_include("<features.h>"), decl_prefix(DEFINE_PIO_OFFSET)]]
 [[userimpl, decl_include("<bits/types.h>"), no_crt_self_import]]
 int fallocate($fd_t fd, __STDC_INT_AS_UINT_T mode,
@@ -1667,8 +1667,8 @@ $fd_t open32([[nonnull]] char const *filename, $oflag_t oflags, ...);
 @@  - *:                                  Certain filesystem names can literally return anything, such
 @@                                        as `/proc/self/fd/1234',  which  is  more  like  `dup(1234)'
 [[cp, guard, wunused, vartypes($mode_t), no_crt_self_import]]
-[[if(defined(__USE_FILE_OFFSET64)), preferred_alias("open64")]]
-[[if(!defined(__USE_FILE_OFFSET64)), preferred_alias("open", "_open", "__open")]]
+[[if($extended_include_prefix("<features.h>") defined(__USE_FILE_OFFSET64)), preferred_alias("open64")]]
+[[if($extended_include_prefix("<features.h>")!defined(__USE_FILE_OFFSET64)), preferred_alias("open", "_open", "__open")]]
 [[decl_include("<bits/types.h>"), export_as("__open")]]
 [[crt_dos_variant, dos_export_as("DOS$_open"), requires_include("<asm/os/fcntl.h>")]]
 [[userimpl, requires($has_function(open64) || (defined(__AT_FDCWD) && $has_function(openat)))]]
@@ -1688,8 +1688,8 @@ $fd_t open([[nonnull]] char const *filename, $oflag_t oflags, ...) {
 @@>> creat(2), creat64(2)
 @@Alias for `open(filename, O_CREAT | O_WRONLY | O_TRUNC, mode)'
 [[cp, guard, wunused, no_crt_self_import]]
-[[if(defined(__USE_FILE_OFFSET64)), preferred_alias("creat64")]]
-[[if(!defined(__USE_FILE_OFFSET64)), preferred_alias("creat", "_creat")]]
+[[if($extended_include_prefix("<features.h>") defined(__USE_FILE_OFFSET64)), preferred_alias("creat64")]]
+[[if($extended_include_prefix("<features.h>")!defined(__USE_FILE_OFFSET64)), preferred_alias("creat", "_creat")]]
 [[crt_dos_variant, dos_export_as("DOS$_creat")]]
 [[alias("creat", "_creat", "creat64")]]
 [[userimpl, requires_function(creat64, open)]]
@@ -1737,8 +1737,8 @@ $fd_t openat32($fd_t dirfd, [[nonnull]] char const *filename, $oflag_t oflags, .
 
 [[cp, wunused, guard, vartypes($mode_t), no_crt_self_import]]
 [[decl_include("<bits/types.h>"), doc_alias("open")]]
-[[if(defined(__USE_FILE_OFFSET64)), preferred_alias("openat64")]]
-[[if(!defined(__USE_FILE_OFFSET64)), preferred_alias("openat")]]
+[[if($extended_include_prefix("<features.h>") defined(__USE_FILE_OFFSET64)), preferred_alias("openat64")]]
+[[if($extended_include_prefix("<features.h>")!defined(__USE_FILE_OFFSET64)), preferred_alias("openat")]]
 [[crt_dos_variant, userimpl, requires_function(openat64)]]
 $fd_t openat($fd_t dirfd, [[nonnull]] char const *filename, $oflag_t oflags, ...) {
 	$fd_t result;
@@ -1791,8 +1791,8 @@ int posix_fadvise32($fd_t fd, $off32_t offset, $off32_t length,
 
 [[decl_include("<features.h>", "<bits/types.h>")]]
 [[no_crt_self_import, decl_prefix(DEFINE_PIO_OFFSET)]]
-[[if(defined(__USE_FILE_OFFSET64)), preferred_alias("posix_fadvise64")]]
-[[if(!defined(__USE_FILE_OFFSET64)), preferred_alias("posix_fadvise")]]
+[[if($extended_include_prefix("<features.h>") defined(__USE_FILE_OFFSET64)), preferred_alias("posix_fadvise64")]]
+[[if($extended_include_prefix("<features.h>")!defined(__USE_FILE_OFFSET64)), preferred_alias("posix_fadvise")]]
 [[userimpl, section(".text.crt{|.dos}.io.utility")]]
 int posix_fadvise($fd_t fd, __PIO_OFFSET offset, __PIO_OFFSET length,
                   __STDC_INT_AS_UINT_T advise) {
@@ -1815,8 +1815,8 @@ int posix_fallocate32($fd_t fd, $pos32_t offset, $pos32_t length);
 
 [[decl_include("<features.h>", "<bits/types.h>")]]
 [[no_crt_self_import, decl_prefix(DEFINE_PIO_OFFSET)]]
-[[if(defined(__USE_FILE_OFFSET64)), preferred_alias("posix_fallocate64")]]
-[[if(!defined(__USE_FILE_OFFSET64)), preferred_alias("posix_fallocate")]]
+[[if($extended_include_prefix("<features.h>") defined(__USE_FILE_OFFSET64)), preferred_alias("posix_fallocate64")]]
+[[if($extended_include_prefix("<features.h>")!defined(__USE_FILE_OFFSET64)), preferred_alias("posix_fallocate")]]
 [[userimpl, section(".text.crt{|.dos}.io.utility")]]
 int posix_fallocate($fd_t fd, __PIO_OFFSET offset, __PIO_OFFSET length) {
 @@pp_if $has_function(posix_fallocate64)@@
@@ -1890,8 +1890,8 @@ int crt_locking($fd_t fd, __STDC_INT_AS_UINT_T cmd, $pos32_t length);
 int lockf32($fd_t fd, __STDC_INT_AS_UINT_T cmd, $pos32_t length);
 
 [[cp, guard, dos_only_export_as("_locking"), no_crt_self_import]]
-[[if(defined(__USE_FILE_OFFSET64)), preferred_alias("lockf64")]]
-[[if(!defined(__USE_FILE_OFFSET64)), preferred_alias("lockf", "_locking")]]
+[[if($extended_include_prefix("<features.h>") defined(__USE_FILE_OFFSET64)), preferred_alias("lockf64")]]
+[[if($extended_include_prefix("<features.h>")!defined(__USE_FILE_OFFSET64)), preferred_alias("lockf", "_locking")]]
 [[decl_include("<features.h>", "<bits/types.h>")]]
 [[decl_prefix(DEFINE_PIO_OFFSET), section(".text.crt{|.dos}.io.lock")]]
 [[userimpl, requires($has_function(lockf64) || $has_function(lockf32) || $has_function(crt_locking))]]

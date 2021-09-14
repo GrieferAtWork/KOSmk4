@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x7c53e018 */
+/* HASH CRC-32:0xc0115745 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -30,7 +30,8 @@ DECL_BEGIN
 
 #include "../libc/globals.h"
 #ifndef __KERNEL__
-/* Alias for `strchr(argv[0], '/') ? strchr(argv[0], '/') + 1 : argv[0]', as passed to main() */
+/* >> __p_program_invocation_short_name(3)
+ * Alias for `strchr(argv[0], '/') ? strchr(argv[0], '/') + 1 : argv[0]', as passed to main() */
 INTERN ATTR_SECTION(".text.crt.errno.utility") ATTR_CONST ATTR_RETNONNULL WUNUSED char **
 NOTHROW_NCX(LIBCCALL libc___p_program_invocation_short_name)(void) {
 	return &__LOCAL_program_invocation_short_name_p;

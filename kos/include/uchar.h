@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xad028eea */
+/* HASH CRC-32:0x2b57d851 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -126,75 +126,97 @@ typedef __CHAR32_TYPE__ char32_t;
 
 __NAMESPACE_STD_BEGIN
 #ifdef __CRT_HAVE_mbrtoc16
+/* >> mbrtoc16(3) */
 __CDECLARE(,size_t,__NOTHROW_NCX,mbrtoc16,(char16_t *__pc16, char const *__restrict __str, size_t __maxlen, mbstate_t *__mbs),(__pc16,__str,__maxlen,__mbs))
 #elif defined(__CRT_HAVE_mbrtowc) && __SIZEOF_WCHAR_T__ == 2
+/* >> mbrtoc16(3) */
 __CREDIRECT(,size_t,__NOTHROW_NCX,mbrtoc16,(char16_t *__pc16, char const *__restrict __str, size_t __maxlen, mbstate_t *__mbs),mbrtowc,(__pc16,__str,__maxlen,__mbs))
 #elif defined(__CRT_HAVE___mbrtowc) && __SIZEOF_WCHAR_T__ == 2
+/* >> mbrtoc16(3) */
 __CREDIRECT(,size_t,__NOTHROW_NCX,mbrtoc16,(char16_t *__pc16, char const *__restrict __str, size_t __maxlen, mbstate_t *__mbs),__mbrtowc,(__pc16,__str,__maxlen,__mbs))
 #elif defined(__CRT_HAVE_DOS$mbrtowc) && defined(__LIBCCALL_IS_LIBDCALL)
+/* >> mbrtoc16(3) */
 __COMPILER_REDIRECT(__LIBC,,size_t,__NOTHROW_NCX,__LIBCCALL,mbrtoc16,(char16_t *__pc16, char const *__restrict __str, size_t __maxlen, mbstate_t *__mbs),DOS$mbrtowc,(__pc16,__str,__maxlen,__mbs))
 #elif __SIZEOF_WCHAR_T__ == 2
 __NAMESPACE_STD_END
 #include <libc/local/wchar/mbrtowc.h>
 __NAMESPACE_STD_BEGIN
+/* >> mbrtoc16(3) */
 __FORCELOCAL __ATTR_ARTIFICIAL size_t __NOTHROW_NCX(__LIBCCALL mbrtoc16)(char16_t *__pc16, char const *__restrict __str, size_t __maxlen, mbstate_t *__mbs) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(mbrtowc))((__WCHAR_TYPE__ *)__pc16, __str, __maxlen, __mbs); }
 #else /* ... */
 __NAMESPACE_STD_END
 #include <libc/local/uchar/uchar_mbrtoc16.h>
 __NAMESPACE_STD_BEGIN
+/* >> mbrtoc16(3) */
 __FORCELOCAL __ATTR_ARTIFICIAL size_t __NOTHROW_NCX(__LIBCCALL mbrtoc16)(char16_t *__pc16, char const *__restrict __str, size_t __maxlen, mbstate_t *__mbs) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(uchar_mbrtoc16))(__pc16, __str, __maxlen, __mbs); }
 #endif /* !... */
 #ifdef __CRT_HAVE_mbrtoc32
+/* >> mbrtoc32(3) */
 __CDECLARE(,size_t,__NOTHROW_NCX,mbrtoc32,(char32_t *__pc32, char const *__restrict __str, size_t __maxlen, mbstate_t *__mbs),(__pc32,__str,__maxlen,__mbs))
 #elif defined(__CRT_HAVE_mbrtowc) && __SIZEOF_WCHAR_T__ == 4
+/* >> mbrtoc32(3) */
 __CREDIRECT(,size_t,__NOTHROW_NCX,mbrtoc32,(char32_t *__pc32, char const *__restrict __str, size_t __maxlen, mbstate_t *__mbs),mbrtowc,(__pc32,__str,__maxlen,__mbs))
 #elif defined(__CRT_HAVE___mbrtowc) && __SIZEOF_WCHAR_T__ == 4
+/* >> mbrtoc32(3) */
 __CREDIRECT(,size_t,__NOTHROW_NCX,mbrtoc32,(char32_t *__pc32, char const *__restrict __str, size_t __maxlen, mbstate_t *__mbs),__mbrtowc,(__pc32,__str,__maxlen,__mbs))
 #elif defined(__CRT_HAVE_KOS$mbrtowc) && defined(__PE__) && defined(__LIBCCALL_IS_LIBKCALL)
+/* >> mbrtoc32(3) */
 __COMPILER_REDIRECT(__LIBC,,size_t,__NOTHROW_NCX,__LIBCCALL,mbrtoc32,(char32_t *__pc32, char const *__restrict __str, size_t __maxlen, mbstate_t *__mbs),KOS$mbrtowc,(__pc32,__str,__maxlen,__mbs))
 #elif __SIZEOF_WCHAR_T__ == 4
 __NAMESPACE_STD_END
 #include <libc/local/wchar/mbrtowc.h>
 __NAMESPACE_STD_BEGIN
+/* >> mbrtoc32(3) */
 __FORCELOCAL __ATTR_ARTIFICIAL size_t __NOTHROW_NCX(__LIBCCALL mbrtoc32)(char32_t *__pc32, char const *__restrict __str, size_t __maxlen, mbstate_t *__mbs) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(mbrtowc))((__WCHAR_TYPE__ *)__pc32, __str, __maxlen, __mbs); }
 #else /* ... */
 __NAMESPACE_STD_END
 #include <libc/local/uchar/uchar_mbrtoc32.h>
 __NAMESPACE_STD_BEGIN
+/* >> mbrtoc32(3) */
 __FORCELOCAL __ATTR_ARTIFICIAL size_t __NOTHROW_NCX(__LIBCCALL mbrtoc32)(char32_t *__pc32, char const *__restrict __str, size_t __maxlen, mbstate_t *__mbs) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(uchar_mbrtoc32))(__pc32, __str, __maxlen, __mbs); }
 #endif /* !... */
 #ifdef __CRT_HAVE_c16rtomb
+/* >> c16rtomb(3) */
 __CDECLARE(,size_t,__NOTHROW_NCX,c16rtomb,(char *__restrict __str, char16_t __c16, mbstate_t *__mbs),(__str,__c16,__mbs))
 #elif defined(__CRT_HAVE_wcrtomb) && __SIZEOF_WCHAR_T__ == 2
+/* >> c16rtomb(3) */
 __CREDIRECT(,size_t,__NOTHROW_NCX,c16rtomb,(char *__restrict __str, char16_t __c16, mbstate_t *__mbs),wcrtomb,(__str,__c16,__mbs))
 #elif defined(__CRT_HAVE_DOS$wcrtomb) && defined(__LIBCCALL_IS_LIBDCALL)
+/* >> c16rtomb(3) */
 __COMPILER_REDIRECT(__LIBC,,size_t,__NOTHROW_NCX,__LIBCCALL,c16rtomb,(char *__restrict __str, char16_t __c16, mbstate_t *__mbs),DOS$wcrtomb,(__str,__c16,__mbs))
 #elif __SIZEOF_WCHAR_T__ == 2
 __NAMESPACE_STD_END
 #include <libc/local/wchar/wcrtomb.h>
 __NAMESPACE_STD_BEGIN
+/* >> c16rtomb(3) */
 __FORCELOCAL __ATTR_ARTIFICIAL size_t __NOTHROW_NCX(__LIBCCALL c16rtomb)(char *__restrict __str, char16_t __c16, mbstate_t *__mbs) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(wcrtomb))(__str, (__WCHAR_TYPE__)__c16, __mbs); }
 #else /* ... */
 __NAMESPACE_STD_END
 #include <libc/local/uchar/uchar_c16rtomb.h>
 __NAMESPACE_STD_BEGIN
+/* >> c16rtomb(3) */
 __FORCELOCAL __ATTR_ARTIFICIAL size_t __NOTHROW_NCX(__LIBCCALL c16rtomb)(char *__restrict __str, char16_t __c16, mbstate_t *__mbs) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(uchar_c16rtomb))(__str, __c16, __mbs); }
 #endif /* !... */
 #ifdef __CRT_HAVE_c32rtomb
+/* >> c32rtomb(3) */
 __CDECLARE(,size_t,__NOTHROW_NCX,c32rtomb,(char *__restrict __str, char32_t __c32, mbstate_t *__mbs),(__str,__c32,__mbs))
 #elif defined(__CRT_HAVE_wcrtomb) && __SIZEOF_WCHAR_T__ == 4
+/* >> c32rtomb(3) */
 __CREDIRECT(,size_t,__NOTHROW_NCX,c32rtomb,(char *__restrict __str, char32_t __c32, mbstate_t *__mbs),wcrtomb,(__str,__c32,__mbs))
 #elif defined(__CRT_HAVE_KOS$wcrtomb) && defined(__PE__) && defined(__LIBCCALL_IS_LIBKCALL)
+/* >> c32rtomb(3) */
 __COMPILER_REDIRECT(__LIBC,,size_t,__NOTHROW_NCX,__LIBCCALL,c32rtomb,(char *__restrict __str, char32_t __c32, mbstate_t *__mbs),KOS$wcrtomb,(__str,__c32,__mbs))
 #elif __SIZEOF_WCHAR_T__ == 4
 __NAMESPACE_STD_END
 #include <libc/local/wchar/wcrtomb.h>
 __NAMESPACE_STD_BEGIN
+/* >> c32rtomb(3) */
 __FORCELOCAL __ATTR_ARTIFICIAL size_t __NOTHROW_NCX(__LIBCCALL c32rtomb)(char *__restrict __str, char32_t __c32, mbstate_t *__mbs) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(wcrtomb))(__str, (__WCHAR_TYPE__)__c32, __mbs); }
 #else /* ... */
 __NAMESPACE_STD_END
 #include <libc/local/uchar/uchar_c32rtomb.h>
 __NAMESPACE_STD_BEGIN
+/* >> c32rtomb(3) */
 __FORCELOCAL __ATTR_ARTIFICIAL size_t __NOTHROW_NCX(__LIBCCALL c32rtomb)(char *__restrict __str, char32_t __c32, mbstate_t *__mbs) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(uchar_c32rtomb))(__str, __c32, __mbs); }
 #endif /* !... */
 __NAMESPACE_STD_END
@@ -209,7 +231,18 @@ __SYSDECL_END
 #endif /* __CC__ */
 
 
-
+/* When  `#define _UTF_SOURCE' is  given, all  of KOS's  uchar variants are
+ * exposed when both <uchar.h> and the header of origin have been included.
+ *
+ * For example:
+ * >> #define _UTF_SOURCE
+ * >> #include <string.h>  // Order of #includes doesn't matter; <string.h>
+ * >> #include <uchar.h>   // also has a check if _UCHAR was already included
+ * >> // At this point, symbols `size_t c16slen(char16_t const *str)'
+ * >> // have been defined (but be aware that calling conventions may
+ * >> // not be identical between char16_t and char32_t variants of
+ * >> // libc functions!)
+ */
 #ifdef __USE_UTF
 #if defined(_STRING_H) && !defined(_PARTS_UCHAR_STRING_H)
 #include <parts/uchar/string.h>

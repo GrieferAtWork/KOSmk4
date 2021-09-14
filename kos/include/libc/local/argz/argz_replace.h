@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xb9a46be6 */
+/* HASH CRC-32:0x568bdcac */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -26,6 +26,9 @@
 __NAMESPACE_LOCAL_BEGIN
 #ifndef __local___localdep_memmem_defined
 #define __local___localdep_memmem_defined 1
+__NAMESPACE_LOCAL_END
+#include <features.h>
+__NAMESPACE_LOCAL_BEGIN
 #if defined(__CRT_HAVE_memmem0) && defined(__USE_MEMMEM_EMPTY_NEEDLE_NULL)
 __NAMESPACE_LOCAL_END
 #include <hybrid/typecore.h>

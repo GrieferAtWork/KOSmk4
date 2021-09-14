@@ -589,8 +589,8 @@ void *mmap32(void *addr, size_t len, __STDC_INT_AS_UINT_T prot,
 @@              MAP_UNINITIALIZED | MAP_DONT_MAP | MAP_FIXED_NOREPLACE'
 [[decl_include("<features.h>")]]
 [[wunused, section(".text.crt{|.dos}.heap.mman"), no_crt_self_import]]
-[[if(defined(__USE_FILE_OFFSET64)), preferred_alias("mmap64")]]
-[[if(!defined(__USE_FILE_OFFSET64)), preferred_alias("mmap")]]
+[[if($extended_include_prefix("<features.h>") defined(__USE_FILE_OFFSET64)), preferred_alias("mmap64")]]
+[[if($extended_include_prefix("<features.h>")!defined(__USE_FILE_OFFSET64)), preferred_alias("mmap")]]
 [[userimpl, requires($has_function(mmap32) || $has_function(mmap64))]]
 void *mmap(void *addr, size_t len, __STDC_INT_AS_UINT_T prot,
            __STDC_INT_AS_UINT_T flags, $fd_t fd, $off_t offset) {

@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x259af465 */
+/* HASH CRC-32:0x26789d6a */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -32,20 +32,24 @@
 DECL_BEGIN
 
 #ifndef __KERNEL__
+/* >> cfgetospeed(3) */
 INTERN ATTR_SECTION(".text.crt.io.tty") ATTR_PURE WUNUSED NONNULL((1)) speed_t
 NOTHROW_NCX(LIBCCALL libc_cfgetospeed)(struct termios const *__restrict termios_p) {
 	return termios_p->c_ospeed;
 }
+/* >> cfgetispeed(3) */
 INTERN ATTR_SECTION(".text.crt.io.tty") ATTR_PURE WUNUSED NONNULL((1)) speed_t
 NOTHROW_NCX(LIBCCALL libc_cfgetispeed)(struct termios const *__restrict termios_p) {
 	return termios_p->c_ispeed;
 }
+/* >> cfsetospeed(3) */
 INTERN ATTR_SECTION(".text.crt.io.tty") NONNULL((1)) int
 NOTHROW_NCX(LIBCCALL libc_cfsetospeed)(struct termios *__restrict termios_p,
                                        speed_t speed) {
 	termios_p->c_ospeed = speed;
 	return 0;
 }
+/* >> cfsetispeed(3) */
 INTERN ATTR_SECTION(".text.crt.io.tty") NONNULL((1)) int
 NOTHROW_NCX(LIBCCALL libc_cfsetispeed)(struct termios *__restrict termios_p,
                                        speed_t speed) {
@@ -99,27 +103,32 @@ NOTHROW_NCX(LIBCCALL libc_tcsetattr)(fd_t fd,
 	}
 	return (int)libc_ioctl(fd, cmd, termios_p);
 }
+/* >> tcsendbreak(3) */
 INTERN ATTR_SECTION(".text.crt.io.tty") int
 NOTHROW_NCX(LIBCCALL libc_tcsendbreak)(fd_t fd,
                                        int duration) {
 	return (int)libc_ioctl(fd, __TCSBRKP, duration);
 }
+/* >> tcdrain(3) */
 INTERN ATTR_SECTION(".text.crt.io.tty") int
 NOTHROW_RPC(LIBCCALL libc_tcdrain)(fd_t fd) {
 	return (int)libc_ioctl(fd, __TCSBRK, 1);
 }
-/* @param: queue_selector: One of `TCIFLUSH', `TCOFLUSH' or `TCIOFLUSH' */
+/* >> tcflush(3)
+ * @param: queue_selector: One of `TCIFLUSH', `TCOFLUSH' or `TCIOFLUSH' */
 INTERN ATTR_SECTION(".text.crt.io.tty") int
 NOTHROW_NCX(LIBCCALL libc_tcflush)(fd_t fd,
                                    __STDC_INT_AS_UINT_T queue_selector) {
 	return (int)libc_ioctl(fd, __TCFLSH, queue_selector);
 }
-/* @param: action: One of `TCOOFF', `TCOON', `TCIOFF', `TCION' */
+/* >> tcflow(3)
+ * @param: action: One of `TCOOFF', `TCOON', `TCIOFF', `TCION' */
 INTERN ATTR_SECTION(".text.crt.io.tty") int
 NOTHROW_NCX(LIBCCALL libc_tcflow)(fd_t fd,
                                   __STDC_INT_AS_UINT_T action) {
 	return (int)libc_ioctl(fd, __TCXONC, action);
 }
+/* >> tcgetsid(3) */
 INTERN ATTR_SECTION(".text.crt.io.tty") pid_t
 NOTHROW_NCX(LIBCCALL libc_tcgetsid)(fd_t fd) {
 	pid_t result;
@@ -128,6 +137,7 @@ NOTHROW_NCX(LIBCCALL libc_tcgetsid)(fd_t fd) {
 	return result;
 }
 #include <libc/errno.h>
+/* >> tcsetsid(3) */
 INTERN ATTR_SECTION(".text.crt.io.tty") int
 NOTHROW_NCX(LIBCCALL libc_tcsetsid)(fd_t fd,
                                     pid_t pid) {
@@ -143,6 +153,7 @@ NOTHROW_NCX(LIBCCALL libc_tcsetsid)(fd_t fd,
 	}
 	return result;
 }
+/* >> cfsetspeed(3) */
 INTERN ATTR_SECTION(".text.crt.io.tty") NONNULL((1)) int
 NOTHROW_NCX(LIBCCALL libc_cfsetspeed)(struct termios *__restrict termios_p,
                                       speed_t speed) {

@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xce21a35 */
+/* HASH CRC-32:0x42ddd70 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -22,9 +22,9 @@
 #define __local_scandir_defined 1
 #include <__crt.h>
 #include <asm/os/fcntl.h>
-#if defined(__AT_FDCWD) && ((defined(__CRT_HAVE_scandirat) && (!defined(__USE_FILE_OFFSET64) || defined(_DIRENT_MATCHES_DIRENT64))) || (defined(__CRT_HAVE_scandirat64) && (defined(__USE_FILE_OFFSET64) || defined(_DIRENT_MATCHES_DIRENT64))))
 #include <features.h>
 #include <bits/os/dirent.h>
+#if defined(__AT_FDCWD) && ((defined(__CRT_HAVE_scandirat) && (!defined(__USE_FILE_OFFSET64) || defined(_DIRENT_MATCHES_DIRENT64))) || (defined(__CRT_HAVE_scandirat64) && (defined(__USE_FILE_OFFSET64) || defined(_DIRENT_MATCHES_DIRENT64))))
 __NAMESPACE_LOCAL_BEGIN
 #ifndef __local___localdep_scandirat_defined
 #define __local___localdep_scandirat_defined 1

@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x2bf53a95 */
+/* HASH CRC-32:0xe384945a */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -31,6 +31,7 @@
 DECL_BEGIN
 
 #ifndef __KERNEL__
+/* >> __errno_location(3) */
 INTDEF ATTR_CONST ATTR_RETNONNULL WUNUSED errno_t *NOTHROW_NCX(LIBCCALL libc___errno_location)(void);
 #endif /* !__KERNEL__ */
 

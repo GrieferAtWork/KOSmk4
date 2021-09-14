@@ -242,8 +242,8 @@ void globfree32(void *pglob);
 @@@return: GLOB_NOSYS   : ...
 [[userimpl, no_crt_self_import]]
 [[decl_prefix(struct __glob_struct;)]]
-[[if(defined(__USE_FILE_OFFSET64)), preferred_alias("glob64")]]
-[[if(!defined(__USE_FILE_OFFSET64)), preferred_alias("glob")]]
+[[if($extended_include_prefix("<features.h>") defined(__USE_FILE_OFFSET64)), preferred_alias("glob64")]]
+[[if($extended_include_prefix("<features.h>")!defined(__USE_FILE_OFFSET64)), preferred_alias("glob")]]
 [[nodos, decl_include("<features.h>"), impl_include("<asm/crt/glob.h>")]]
 int glob([[nonnull]] char const *__restrict pattern, __STDC_INT_AS_UINT_T flags,
          [[nullable]] int (LIBKCALL *errfunc)(char const *path, int flags),
@@ -267,8 +267,8 @@ int glob([[nonnull]] char const *__restrict pattern, __STDC_INT_AS_UINT_T flags,
 
 [[userimpl, no_crt_self_import]]
 [[decl_prefix(struct __glob_struct;)]]
-[[if(defined(__USE_FILE_OFFSET64)), preferred_alias("globfree64")]]
-[[if(!defined(__USE_FILE_OFFSET64)), preferred_alias("globfree")]]
+[[if($extended_include_prefix("<features.h>") defined(__USE_FILE_OFFSET64)), preferred_alias("globfree64")]]
+[[if($extended_include_prefix("<features.h>")!defined(__USE_FILE_OFFSET64)), preferred_alias("globfree")]]
 void globfree([[nonnull]] glob_t *pglob) {
 @@pp_if $has_function(globfree32)@@
 	globfree32(pglob);

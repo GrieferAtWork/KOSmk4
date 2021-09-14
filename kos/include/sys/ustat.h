@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x234897f7 */
+/* HASH CRC-32:0x556c5607 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -42,6 +42,7 @@
 #ifdef __CC__
 __SYSDECL_BEGIN
 
+/* >> ustat(2) */
 __CDECLARE_OPT(__ATTR_NONNULL((2)),int,__NOTHROW_NCX,ustat,(__dev_t __dev, struct ustat *__ubuf),(__dev,__ubuf))
 
 __SYSDECL_END

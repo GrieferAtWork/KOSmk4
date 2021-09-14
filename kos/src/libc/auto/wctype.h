@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x6202f8ea */
+/* HASH CRC-32:0xcc0b26c5 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -194,19 +194,37 @@ INTDEF WUNUSED NONNULL((1)) wctrans_t NOTHROW_NCX(LIBDCALL libd_wctrans_l)(char 
 #endif /* !__LIBCCALL_IS_LIBDCALL && !__KERNEL__ */
 #ifndef __KERNEL__
 INTDEF WUNUSED NONNULL((1)) wctrans_t NOTHROW_NCX(LIBCCALL libc_wctrans_l)(char const *prop, locale_t locale);
+/* >> iswsymstrt(3), iswsymstrt_l(3)
+ * Check if `wc' may appear at the start of a symbol/keyword/identifier */
 INTDEF ATTR_CONST WUNUSED int NOTHROW_NCX(LIBDCALL libd___iswcsymf)(wint16_t wc);
+/* >> iswsymstrt(3), iswsymstrt_l(3)
+ * Check if `wc' may appear at the start of a symbol/keyword/identifier */
 INTDEF ATTR_CONST WUNUSED int NOTHROW_NCX(LIBKCALL libc___iswcsymf)(wint32_t wc);
+/* >> iswsymcont(3), iswsymcont_l(3)
+ * Check if `wc' may appear in the middle of a symbol/keyword/identifier */
 INTDEF ATTR_CONST WUNUSED int NOTHROW_NCX(LIBDCALL libd___iswcsym)(wint16_t wc);
+/* >> iswsymcont(3), iswsymcont_l(3)
+ * Check if `wc' may appear in the middle of a symbol/keyword/identifier */
 INTDEF ATTR_CONST WUNUSED int NOTHROW_NCX(LIBKCALL libc___iswcsym)(wint32_t wc);
+/* >> iswsymstrt(3), iswsymstrt_l(3)
+ * Check if `wc' may appear at the start of a symbol/keyword/identifier */
 INTDEF ATTR_PURE WUNUSED int NOTHROW_NCX(LIBDCALL libd__iswcsymf_l)(wint16_t wc, locale_t locale);
+/* >> iswsymstrt(3), iswsymstrt_l(3)
+ * Check if `wc' may appear at the start of a symbol/keyword/identifier */
 INTDEF ATTR_PURE WUNUSED int NOTHROW_NCX(LIBKCALL libc__iswcsymf_l)(wint32_t wc, locale_t locale);
+/* >> iswsymcont(3), iswsymcont_l(3)
+ * Check if `wc' may appear in the middle of a symbol/keyword/identifier */
 INTDEF ATTR_PURE WUNUSED int NOTHROW_NCX(LIBDCALL libd__iswcsym_l)(wint16_t wc, locale_t locale);
+/* >> iswsymcont(3), iswsymcont_l(3)
+ * Check if `wc' may appear in the middle of a symbol/keyword/identifier */
 INTDEF ATTR_PURE WUNUSED int NOTHROW_NCX(LIBKCALL libc__iswcsym_l)(wint32_t wc, locale_t locale);
 #endif /* !__KERNEL__ */
 #if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
+/* >> isleadbyte(3) */
 INTDEF ATTR_CONST WUNUSED int NOTHROW_NCX(LIBDCALL libd_isleadbyte)(int wc);
 #endif /* !__LIBCCALL_IS_LIBDCALL && !__KERNEL__ */
 #ifndef __KERNEL__
+/* >> isleadbyte(3) */
 INTDEF ATTR_CONST WUNUSED int NOTHROW_NCX(LIBCCALL libc_isleadbyte)(int wc);
 #endif /* !__KERNEL__ */
 #if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)

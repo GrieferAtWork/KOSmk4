@@ -33,7 +33,8 @@
 DECL_BEGIN
 
 
-/*[[[head:libc_FUtimens,hash:CRC-32=0x590d9e41]]]*/
+/*[[[head:libc_FUtimens,hash:CRC-32=0x5d32beb6]]]*/
+/* >> futimens(2), futimens64(2) */
 INTERN ATTR_SECTION(".text.crt.except.fs.modify_time") void
 (LIBCCALL libc_FUtimens)(fd_t fd,
                          struct timespec const times[2 /*or:3*/]) THROWS(...)
@@ -43,10 +44,11 @@ INTERN ATTR_SECTION(".text.crt.except.fs.modify_time") void
 }
 /*[[[end:libc_FUtimens]]]*/
 
-/*[[[head:libc_FUtimens64,hash:CRC-32=0xe66decc3]]]*/
+/*[[[head:libc_FUtimens64,hash:CRC-32=0x64aad75a]]]*/
 #if __SIZEOF_TIME32_T__ == __SIZEOF_TIME64_T__
 DEFINE_INTERN_ALIAS(libc_FUtimens64, libc_FUtimens);
 #else /* MAGIC:alias */
+/* >> futimens(2), futimens64(2) */
 INTERN ATTR_SECTION(".text.crt.except.fs.modify_time") void
 (LIBCCALL libc_FUtimens64)(fd_t fd,
                            struct timespec64 const times[2 /*or:3*/]) THROWS(...)
@@ -63,7 +65,8 @@ INTERN ATTR_SECTION(".text.crt.except.fs.modify_time") void
 #endif /* MAGIC:alias */
 /*[[[end:libc_FUtimens64]]]*/
 
-/*[[[head:libc_Mknod,hash:CRC-32=0xcc8c53fa]]]*/
+/*[[[head:libc_Mknod,hash:CRC-32=0x5928b00c]]]*/
+/* >> mknod(2) */
 INTERN ATTR_SECTION(".text.crt.except.fs.modify") NONNULL((1)) void
 (LIBCCALL libc_Mknod)(char const *nodename,
                       mode_t mode,
@@ -77,7 +80,8 @@ INTERN ATTR_SECTION(".text.crt.except.fs.modify") NONNULL((1)) void
 }
 /*[[[end:libc_Mknod]]]*/
 
-/*[[[head:libc_Mkfifo,hash:CRC-32=0x7144ebeb]]]*/
+/*[[[head:libc_Mkfifo,hash:CRC-32=0xfb4ad7a]]]*/
+/* >> mkfifo(2) */
 INTERN ATTR_SECTION(".text.crt.except.fs.modify") NONNULL((1)) void
 (LIBCCALL libc_Mkfifo)(char const *fifoname,
                        mode_t mode) THROWS(...)
@@ -87,7 +91,8 @@ INTERN ATTR_SECTION(".text.crt.except.fs.modify") NONNULL((1)) void
 }
 /*[[[end:libc_Mkfifo]]]*/
 
-/*[[[head:libc_MkfifoAt,hash:CRC-32=0x8e7f5a6f]]]*/
+/*[[[head:libc_MkfifoAt,hash:CRC-32=0x265f6ff8]]]*/
+/* >> mkfifoat(2) */
 INTERN ATTR_SECTION(".text.crt.except.fs.modify") NONNULL((2)) void
 (LIBCCALL libc_MkfifoAt)(fd_t dirfd,
                          char const *fifoname,
@@ -98,7 +103,8 @@ INTERN ATTR_SECTION(".text.crt.except.fs.modify") NONNULL((2)) void
 }
 /*[[[end:libc_MkfifoAt]]]*/
 
-/*[[[head:libc_LChmod,hash:CRC-32=0x3add021d]]]*/
+/*[[[head:libc_LChmod,hash:CRC-32=0xed3bf53b]]]*/
+/* >> lchmod(2) */
 INTERN ATTR_SECTION(".text.crt.except.fs.modify") NONNULL((1)) void
 (LIBCCALL libc_LChmod)(char const *filename,
                        mode_t mode) THROWS(...)

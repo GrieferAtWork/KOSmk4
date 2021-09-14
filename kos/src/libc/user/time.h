@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xed79aaa */
+/* HASH CRC-32:0x177eb2d2 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -45,10 +45,10 @@ INTDEF time64_t NOTHROW_NCX(LIBCCALL libc_time64)(time64_t *timer);
  * Set time conversion information from the `$TZ' environment variable.
  * If  `$TZ'  is  not  defined,  a  locale-dependent  default  is  used */
 INTDEF void NOTHROW_NCX(LIBCCALL libc_tzset)(void);
-/* >> stime(3), stime64(3)
+/* >> stime(2), stime64(2)
  * Set the system time to `*when'. This call is restricted to the superuser */
 INTDEF NONNULL((1)) int NOTHROW_NCX(LIBCCALL libc_stime)(time_t const *when);
-/* >> stime(3), stime64(3)
+/* >> stime(2), stime64(2)
  * Set the system time to `*when'. This call is restricted to the superuser */
 INTDEF NONNULL((1)) int NOTHROW_NCX(LIBCCALL libc_stime64)(time64_t const *when);
 /* >> nanosleep(2), nanosleep64(2)
@@ -60,7 +60,7 @@ INTDEF NONNULL((2)) int NOTHROW_NCX(LIBCCALL libc_clock_getres)(clockid_t clock_
 /* >> clock_gettime(2), clock_gettime64(2)
  * Get current value of clock `clock_id' and store it in `tp' */
 INTDEF NONNULL((2)) int NOTHROW_NCX(LIBCCALL libc_clock_gettime)(clockid_t clock_id, struct timespec *tp);
-/* >> clock_settime(2)
+/* >> clock_settime(2), clock_settime64(2)
  * Set clock `clock_id' to value `tp' */
 INTDEF NONNULL((2)) int NOTHROW_NCX(LIBCCALL libc_clock_settime)(clockid_t clock_id, struct timespec const *tp);
 /* >> timer_create(2)
@@ -93,7 +93,7 @@ INTDEF NONNULL((2)) int NOTHROW_NCX(LIBCCALL libc_clock_getres64)(clockid_t cloc
 /* >> clock_gettime(2), clock_gettime64(2)
  * Get current value of clock `clock_id' and store it in `tp' */
 INTDEF NONNULL((2)) int NOTHROW_NCX(LIBCCALL libc_clock_gettime64)(clockid_t clock_id, struct timespec64 *tp);
-/* >> clock_settime(2)
+/* >> clock_settime(2), clock_settime64(2)
  * Set clock `clock_id' to value `tp' */
 INTDEF NONNULL((2)) int NOTHROW_NCX(LIBCCALL libc_clock_settime64)(clockid_t clock_id, struct timespec64 const *tp);
 /* >> timer_settime(2), timer_settime64(2)

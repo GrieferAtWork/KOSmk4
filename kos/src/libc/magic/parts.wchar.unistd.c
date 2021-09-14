@@ -93,8 +93,8 @@ wget_current_dir_name(*)
 }
 
 [[wchar, userimpl, no_crt_self_import]]
-[[if(defined(__USE_FILE_OFFSET64)), preferred_alias("wtruncate64")]]
-[[if(!defined(__USE_FILE_OFFSET64)), preferred_alias("wtruncate")]]
+[[if($extended_include_prefix("<features.h>") defined(__USE_FILE_OFFSET64)), preferred_alias("wtruncate64")]]
+[[if($extended_include_prefix("<features.h>")!defined(__USE_FILE_OFFSET64)), preferred_alias("wtruncate")]]
 wtruncate(*) %{generate(str2wcs("truncate"))}
 
 [[wchar, ignore, nocrt, alias("wtruncate")]]

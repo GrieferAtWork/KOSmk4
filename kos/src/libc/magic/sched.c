@@ -40,14 +40,19 @@
 %[define_replacement(time64_t = __time64_t)]
 
 
-%{
+%[insert:prefix(
 #include <features.h>
-
+)]%[insert:prefix(
 #include <asm/os/sched.h>
-#include <bits/os/cpu_set.h>  /* struct __cpu_set_struct */
-#include <bits/os/sched.h>    /* struct sched_param */
-#include <bits/os/timespec.h> /* struct timespec */
+)]%[insert:prefix(
+#include <bits/os/cpu_set.h>
+)]%[insert:prefix(
+#include <bits/os/sched.h>
+)]%[insert:prefix(
+#include <bits/os/timespec.h>
+)]%[insert:prefix(
 #include <bits/types.h>
+)]%{
 
 #ifdef __USE_KOS
 #include <hybrid/host.h>
@@ -488,8 +493,8 @@ int sched_getaffinity($pid_t pid, $size_t cpusetsize, cpu_set_t *cpuset);
 int sched_rr_get_interval32($pid_t pid, struct $timespec32 *tms);
 
 [[no_crt_self_import]]
-[[if(defined(__USE_TIME_BITS64)), preferred_alias("sched_rr_get_interval64")]]
-[[if(!defined(__USE_TIME_BITS64)), preferred_alias("sched_rr_get_interval")]]
+[[if($extended_include_prefix("<features.h>") defined(__USE_TIME_BITS64)), preferred_alias("sched_rr_get_interval64")]]
+[[if($extended_include_prefix("<features.h>")!defined(__USE_TIME_BITS64)), preferred_alias("sched_rr_get_interval")]]
 [[userimpl, requires($has_function(sched_rr_get_interval32) || $has_function(sched_rr_get_interval64))]]
 [[decl_include("<bits/types.h>", "<bits/os/timespec.h>")]]
 int sched_rr_get_interval($pid_t pid, struct timespec *tms) {

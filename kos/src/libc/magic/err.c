@@ -51,6 +51,7 @@ __SYSDECL_BEGIN
 }
 
 
+@@>> warn(3), vwarn(3)
 @@Print to stderr: `<program_invocation_short_name>: <format...>: strerror(errno)\n'
 [[cp_stdio, ATTR_LIBC_PRINTF(1, 2)]]
 void warn(char const *format, ...)
@@ -65,6 +66,7 @@ void vwarn(char const *format, $va_list args) {
 
 %
 %#ifdef __USE_BSD
+@@>> warnc(3), vwarnc(3)
 @@Print to stderr: `<program_invocation_short_name>: <format...>: strerror(used_errno)\n'
 [[guard, cp_stdio, ATTR_LIBC_PRINTF(1, 2), decl_include("<bits/types.h>")]]
 void warnc($errno_t used_errno, char const *format, ...)
@@ -95,6 +97,7 @@ void vwarnc($errno_t used_errno, char const *format, $va_list args) {
 %
 
 
+@@>> warnx(3), vwarnx(3)
 @@Print to stderr: `<program_invocation_short_name>: <format...>\n'
 [[cp_stdio, ATTR_LIBC_PRINTF(1, 2)]]
 void warnx(char const *format, ...)
@@ -120,6 +123,7 @@ void vwarnx(char const *format, $va_list args) {
 }
 
 
+@@>> err(3), verr(3)
 @@Same as `warn()', but follow up by calling `exit(status)'
 [[throws, ATTR_NORETURN, ATTR_LIBC_PRINTF(2, 3)]]
 void err(int status, char const *format, ...)
@@ -133,6 +137,7 @@ void verr(int status, char const *format, $va_list args) {
 
 %
 %#ifdef __USE_BSD
+@@>> errc(3), verrc(3)
 @@Same as `warnc()', but follow up by calling `exit(status)'
 [[guard, throws, ATTR_NORETURN, ATTR_LIBC_PRINTF(2, 3)]]
 [[decl_include("<bits/types.h>")]]
@@ -149,6 +154,7 @@ void verrc(int status, $errno_t used_errno, char const *format, $va_list args) {
 %#endif /* __USE_BSD */
 %
 
+@@>> errx(3), verrx(3)
 @@Same as `warnx()', but follow up by calling `exit(status)'
 [[throws, ATTR_NORETURN, ATTR_LIBC_PRINTF(2, 3)]]
 [[requires_function(verrx)]]

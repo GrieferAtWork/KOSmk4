@@ -149,8 +149,8 @@ __STDC_INT_AS_SSIZE_T pselect32(__STDC_INT_AS_SIZE_T nfds,
 [[decl_include("<features.h>", "<bits/os/timeval.h>")]]
 [[decl_include("<bits/os/fd_set.h>")]]
 [[cp, no_crt_self_import, export_as("__select")]]
-[[if(defined(__USE_TIME_BITS64)), preferred_alias("select64")]]
-[[if(!defined(__USE_TIME_BITS64)), preferred_alias("select", "__select")]]
+[[if($extended_include_prefix("<features.h>") defined(__USE_TIME_BITS64)), preferred_alias("select64")]]
+[[if($extended_include_prefix("<features.h>")!defined(__USE_TIME_BITS64)), preferred_alias("select", "__select")]]
 [[userimpl, requires($has_function(select32) || $has_function(select64))]]
 __STDC_INT_AS_SSIZE_T select(__STDC_INT_AS_SIZE_T nfds,
                              [[nullable]] fd_set *__restrict readfds,
@@ -178,8 +178,8 @@ __STDC_INT_AS_SSIZE_T select(__STDC_INT_AS_SIZE_T nfds,
 [[decl_include("<features.h>", "<bits/os/timespec.h>", "<bits/os/sigset.h>")]]
 [[decl_include("<bits/os/fd_set.h>")]]
 [[cp, no_crt_self_import]]
-[[if(defined(__USE_TIME_BITS64)), preferred_alias("pselect64")]]
-[[if(!defined(__USE_TIME_BITS64)), preferred_alias("pselect")]]
+[[if($extended_include_prefix("<features.h>") defined(__USE_TIME_BITS64)), preferred_alias("pselect64")]]
+[[if($extended_include_prefix("<features.h>")!defined(__USE_TIME_BITS64)), preferred_alias("pselect")]]
 [[userimpl, requires($has_function(pselect32) || $has_function(pselect64))]]
 __STDC_INT_AS_SSIZE_T pselect(__STDC_INT_AS_SIZE_T nfds,
                               [[nullable]] fd_set *__restrict readfds,

@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x91b728f6 */
+/* HASH CRC-32:0xd83ffed8 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -21,6 +21,8 @@
 #ifndef __local_cnd_timedwait_defined
 #define __local_cnd_timedwait_defined 1
 #include <__crt.h>
+#include <features.h>
+#include <bits/types.h>
 #if defined(__CRT_HAVE_pthread_cond_timedwait64) || defined(__CRT_HAVE_pthread_cond_timedwait)
 #include <bits/crt/threads.h>
 #include <bits/os/timespec.h>
@@ -29,13 +31,11 @@ __NAMESPACE_LOCAL_BEGIN
 #define __local___localdep_pthread_cond_timedwait_defined 1
 #if defined(__CRT_HAVE_pthread_cond_timedwait64) && defined(__USE_TIME_BITS64)
 __NAMESPACE_LOCAL_END
-#include <bits/types.h>
 #include <bits/crt/pthreadtypes.h>
 __NAMESPACE_LOCAL_BEGIN
 __CREDIRECT(__ATTR_WUNUSED __ATTR_NONNULL((1, 2, 3)),__errno_t,__NOTHROW_RPC,__localdep_pthread_cond_timedwait,(__pthread_cond_t *__restrict __cond, __pthread_mutex_t *__restrict __mutex, struct timespec const *__restrict __abstime),pthread_cond_timedwait64,(__cond,__mutex,__abstime))
 #elif defined(__CRT_HAVE_pthread_cond_timedwait) && !defined(__USE_TIME_BITS64)
 __NAMESPACE_LOCAL_END
-#include <bits/types.h>
 #include <bits/crt/pthreadtypes.h>
 __NAMESPACE_LOCAL_BEGIN
 __CREDIRECT(__ATTR_WUNUSED __ATTR_NONNULL((1, 2, 3)),__errno_t,__NOTHROW_RPC,__localdep_pthread_cond_timedwait,(__pthread_cond_t *__restrict __cond, __pthread_mutex_t *__restrict __mutex, struct timespec const *__restrict __abstime),pthread_cond_timedwait,(__cond,__mutex,__abstime))

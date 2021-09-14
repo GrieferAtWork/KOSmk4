@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x2a312c0c */
+/* HASH CRC-32:0x717307ca */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -21,9 +21,9 @@
 #ifndef __local_timer_gettime_defined
 #define __local_timer_gettime_defined 1
 #include <__crt.h>
+#include <bits/types.h>
 #if defined(__CRT_HAVE_timer_gettime64) || defined(__CRT_HAVE_timer_gettime)
 #include <bits/os/itimerspec.h>
-#include <bits/types.h>
 __NAMESPACE_LOCAL_BEGIN
 #if !defined(__local___localdep_timer_gettime32_defined) && defined(__CRT_HAVE_timer_gettime)
 #define __local___localdep_timer_gettime32_defined 1

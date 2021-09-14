@@ -33,13 +33,17 @@
  * Anyways: What can be found below should be fairly self-explanatory.
  * Also:  With  magic, it's  fairly  easy to  automate  this header... */
 
+}%[insert:prefix(
 #include <features.h>
-
+)]%[insert:prefix(
 #include <hybrid/host.h>
+)]%[insert:prefix(
 #include <hybrid/typecore.h>
-
+)]%[insert:prefix(
 #include <asm/os/limits.h>
+)]%[insert:prefix(
 #include <bits/types.h>
+)]%{
 
 #undef STDC_HEADERS
 #define STDC_HEADERS 1

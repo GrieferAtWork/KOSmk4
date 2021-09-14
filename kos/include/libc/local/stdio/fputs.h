@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x38c7e4f1 */
+/* HASH CRC-32:0x6993db07 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -91,11 +91,11 @@ __NAMESPACE_LOCAL_BEGIN
 #endif /* !__CRT_HAVE_strlen */
 #endif /* !__local___localdep_strlen_defined */
 __LOCAL_LIBC(fputs) __ATTR_NONNULL((1, 2)) __STDC_INT_AS_SSIZE_T
-(__LIBCCALL __LIBC_LOCAL_NAME(fputs))(char const *__restrict __str, __FILE *__restrict __stream) __THROWS(...) {
+(__LIBCCALL __LIBC_LOCAL_NAME(fputs))(char const *__restrict __string, __FILE *__restrict __stream) __THROWS(...) {
 	__STDC_INT_AS_SIZE_T __result;
-	__result = (__NAMESPACE_LOCAL_SYM __localdep_fwrite)(__str,
+	__result = (__NAMESPACE_LOCAL_SYM __localdep_fwrite)(__string,
 	                sizeof(char),
-	                (__NAMESPACE_LOCAL_SYM __localdep_strlen)(__str),
+	                (__NAMESPACE_LOCAL_SYM __localdep_strlen)(__string),
 	                __stream);
 	return __result;
 }

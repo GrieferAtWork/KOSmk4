@@ -125,8 +125,8 @@ NOTHROW_RPC(LIBCCALL libc_writev)(fd_t fd,
 }
 /*[[[end:libc_writev]]]*/
 
-/*[[[head:libc_preadv,hash:CRC-32=0x14979fb2]]]*/
-/* >> preadv(2)
+/*[[[head:libc_preadv,hash:CRC-32=0x9fe261b7]]]*/
+/* >> preadv(2), preadv64(2)
  * Same as  `readv(2)', but  read data  from a  file at  a
  * specific `offset', rather than the current R/W position
  * @return: <= SUM(iov[*].iov_len): The actual amount of read bytes */
@@ -143,8 +143,8 @@ NOTHROW_RPC(LIBCCALL libc_preadv)(fd_t fd,
 }
 /*[[[end:libc_preadv]]]*/
 
-/*[[[head:libc_pwritev,hash:CRC-32=0x51e4a317]]]*/
-/* >> pwritev(2)
+/*[[[head:libc_pwritev,hash:CRC-32=0x76f28d7a]]]*/
+/* >> pwritev(2), pwritev64(2)
  * Same as  `writev(2)', but  write data  to a  file at  a
  * specific `offset', rather than the current R/W position
  * @return: <= SUM(iov[*].iov_len): The actual amount of written bytes */
@@ -161,11 +161,11 @@ NOTHROW_RPC(LIBCCALL libc_pwritev)(fd_t fd,
 }
 /*[[[end:libc_pwritev]]]*/
 
-/*[[[head:libc_preadv64,hash:CRC-32=0x2621ed19]]]*/
+/*[[[head:libc_preadv64,hash:CRC-32=0x72c40a6a]]]*/
 #if __SIZEOF_OFF32_T__ == __SIZEOF_OFF64_T__
 DEFINE_INTERN_ALIAS(libc_preadv64, libc_preadv);
 #else /* MAGIC:alias */
-/* >> preadv(2)
+/* >> preadv(2), preadv64(2)
  * Same as  `readv(2)', but  read data  from a  file at  a
  * specific `offset', rather than the current R/W position
  * @return: <= SUM(iov[*].iov_len): The actual amount of read bytes */
@@ -183,11 +183,11 @@ NOTHROW_RPC(LIBCCALL libc_preadv64)(fd_t fd,
 #endif /* MAGIC:alias */
 /*[[[end:libc_preadv64]]]*/
 
-/*[[[head:libc_pwritev64,hash:CRC-32=0x519209cc]]]*/
+/*[[[head:libc_pwritev64,hash:CRC-32=0x4d5715fd]]]*/
 #if __SIZEOF_OFF32_T__ == __SIZEOF_OFF64_T__
 DEFINE_INTERN_ALIAS(libc_pwritev64, libc_pwritev);
 #else /* MAGIC:alias */
-/* >> pwritev(2)
+/* >> pwritev(2), pwritev64(2)
  * Same as  `writev(2)', but  write data  to a  file at  a
  * specific `offset', rather than the current R/W position
  * @return: <= SUM(iov[*].iov_len): The actual amount of written bytes */

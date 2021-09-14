@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x3f5f91b3 */
+/* HASH CRC-32:0x8184193c */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -33,7 +33,8 @@ DECL_BEGIN
 
 #include "../libc/globals.h"
 #if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
-/* Print to stderr: `<program_invocation_short_name>: <format...>: strerror(errno)\n' */
+/* >> warn(3), vwarn(3)
+ * Print to stderr: `<program_invocation_short_name>: <format...>: strerror(errno)\n' */
 INTERN ATTR_SECTION(".text.crt.dos.error") ATTR_LIBC_PRINTF(1, 2) void
 (VLIBDCALL libd_warn)(char const *format,
                       ...) THROWS(...) {
@@ -44,7 +45,8 @@ INTERN ATTR_SECTION(".text.crt.dos.error") ATTR_LIBC_PRINTF(1, 2) void
 }
 #endif /* !__LIBCCALL_IS_LIBDCALL && !__KERNEL__ */
 #ifndef __KERNEL__
-/* Print to stderr: `<program_invocation_short_name>: <format...>: strerror(errno)\n' */
+/* >> warn(3), vwarn(3)
+ * Print to stderr: `<program_invocation_short_name>: <format...>: strerror(errno)\n' */
 INTERN ATTR_SECTION(".text.crt.error") ATTR_LIBC_PRINTF(1, 2) void
 (VLIBCCALL libc_warn)(char const *format,
                       ...) THROWS(...) {
@@ -54,7 +56,8 @@ INTERN ATTR_SECTION(".text.crt.error") ATTR_LIBC_PRINTF(1, 2) void
 	va_end(args);
 }
 #include <libc/errno.h>
-/* Print to stderr: `<program_invocation_short_name>: <format...>: strerror(errno)\n' */
+/* >> warn(3), vwarn(3)
+ * Print to stderr: `<program_invocation_short_name>: <format...>: strerror(errno)\n' */
 INTERN ATTR_SECTION(".text.crt.error") ATTR_LIBC_PRINTF(1, 0) void
 (LIBCCALL libc_vwarn)(char const *format,
                       va_list args) THROWS(...) {
@@ -62,7 +65,8 @@ INTERN ATTR_SECTION(".text.crt.error") ATTR_LIBC_PRINTF(1, 0) void
 }
 #endif /* !__KERNEL__ */
 #if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
-/* Print to stderr: `<program_invocation_short_name>: <format...>: strerror(used_errno)\n' */
+/* >> warnc(3), vwarnc(3)
+ * Print to stderr: `<program_invocation_short_name>: <format...>: strerror(used_errno)\n' */
 INTERN ATTR_SECTION(".text.crt.dos.error") ATTR_LIBC_PRINTF(1, 2) void
 (VLIBDCALL libd_warnc)(errno_t used_errno,
                        char const *format,
@@ -74,7 +78,8 @@ INTERN ATTR_SECTION(".text.crt.dos.error") ATTR_LIBC_PRINTF(1, 2) void
 }
 #endif /* !__LIBCCALL_IS_LIBDCALL && !__KERNEL__ */
 #ifndef __KERNEL__
-/* Print to stderr: `<program_invocation_short_name>: <format...>: strerror(used_errno)\n' */
+/* >> warnc(3), vwarnc(3)
+ * Print to stderr: `<program_invocation_short_name>: <format...>: strerror(used_errno)\n' */
 INTERN ATTR_SECTION(".text.crt.error") ATTR_LIBC_PRINTF(1, 2) void
 (VLIBCCALL libc_warnc)(errno_t used_errno,
                        char const *format,
@@ -86,7 +91,8 @@ INTERN ATTR_SECTION(".text.crt.error") ATTR_LIBC_PRINTF(1, 2) void
 }
 #include <libc/local/stdstreams.h>
 #include <libc/local/program_invocation_name.h>
-/* Print to stderr: `<program_invocation_short_name>: <format...>: strerror(used_errno)\n' */
+/* >> warnc(3), vwarnc(3)
+ * Print to stderr: `<program_invocation_short_name>: <format...>: strerror(used_errno)\n' */
 INTERN ATTR_SECTION(".text.crt.error") ATTR_LIBC_PRINTF(1, 0) void
 (LIBCCALL libc_vwarnc)(errno_t used_errno,
                        char const *format,
@@ -107,7 +113,8 @@ INTERN ATTR_SECTION(".text.crt.error") ATTR_LIBC_PRINTF(1, 0) void
 }
 #endif /* !__KERNEL__ */
 #if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
-/* Print to stderr: `<program_invocation_short_name>: <format...>\n' */
+/* >> warnx(3), vwarnx(3)
+ * Print to stderr: `<program_invocation_short_name>: <format...>\n' */
 INTERN ATTR_SECTION(".text.crt.dos.error") ATTR_LIBC_PRINTF(1, 2) void
 (VLIBDCALL libd_warnx)(char const *format,
                        ...) THROWS(...) {
@@ -118,7 +125,8 @@ INTERN ATTR_SECTION(".text.crt.dos.error") ATTR_LIBC_PRINTF(1, 2) void
 }
 #endif /* !__LIBCCALL_IS_LIBDCALL && !__KERNEL__ */
 #ifndef __KERNEL__
-/* Print to stderr: `<program_invocation_short_name>: <format...>\n' */
+/* >> warnx(3), vwarnx(3)
+ * Print to stderr: `<program_invocation_short_name>: <format...>\n' */
 INTERN ATTR_SECTION(".text.crt.error") ATTR_LIBC_PRINTF(1, 2) void
 (VLIBCCALL libc_warnx)(char const *format,
                        ...) THROWS(...) {
@@ -129,7 +137,8 @@ INTERN ATTR_SECTION(".text.crt.error") ATTR_LIBC_PRINTF(1, 2) void
 }
 #include <libc/local/stdstreams.h>
 #include <libc/local/program_invocation_name.h>
-/* Print to stderr: `<program_invocation_short_name>: <format...>\n' */
+/* >> warnx(3), vwarnx(3)
+ * Print to stderr: `<program_invocation_short_name>: <format...>\n' */
 INTERN ATTR_SECTION(".text.crt.error") ATTR_LIBC_PRINTF(1, 0) void
 (LIBCCALL libc_vwarnx)(char const *format,
                        va_list args) THROWS(...) {
@@ -146,7 +155,8 @@ INTERN ATTR_SECTION(".text.crt.error") ATTR_LIBC_PRINTF(1, 0) void
 }
 #endif /* !__KERNEL__ */
 #if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
-/* Same as `warn()', but follow up by calling `exit(status)' */
+/* >> err(3), verr(3)
+ * Same as `warn()', but follow up by calling `exit(status)' */
 INTERN ATTR_SECTION(".text.crt.dos.error") ATTR_NORETURN ATTR_LIBC_PRINTF(2, 3) void
 (VLIBDCALL libd_err)(int status,
                      char const *format,
@@ -157,7 +167,8 @@ INTERN ATTR_SECTION(".text.crt.dos.error") ATTR_NORETURN ATTR_LIBC_PRINTF(2, 3) 
 }
 #endif /* !__LIBCCALL_IS_LIBDCALL && !__KERNEL__ */
 #ifndef __KERNEL__
-/* Same as `warn()', but follow up by calling `exit(status)' */
+/* >> err(3), verr(3)
+ * Same as `warn()', but follow up by calling `exit(status)' */
 INTERN ATTR_SECTION(".text.crt.error") ATTR_NORETURN ATTR_LIBC_PRINTF(2, 3) void
 (VLIBCCALL libc_err)(int status,
                      char const *format,
@@ -167,7 +178,8 @@ INTERN ATTR_SECTION(".text.crt.error") ATTR_NORETURN ATTR_LIBC_PRINTF(2, 3) void
 	libc_verr(status, format, args);
 }
 #include <libc/errno.h>
-/* Same as `warn()', but follow up by calling `exit(status)' */
+/* >> err(3), verr(3)
+ * Same as `warn()', but follow up by calling `exit(status)' */
 INTERN ATTR_SECTION(".text.crt.error") ATTR_NORETURN ATTR_LIBC_PRINTF(2, 0) void
 (LIBCCALL libc_verr)(int status,
                      char const *format,
@@ -176,7 +188,8 @@ INTERN ATTR_SECTION(".text.crt.error") ATTR_NORETURN ATTR_LIBC_PRINTF(2, 0) void
 }
 #endif /* !__KERNEL__ */
 #if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
-/* Same as `warnc()', but follow up by calling `exit(status)' */
+/* >> errc(3), verrc(3)
+ * Same as `warnc()', but follow up by calling `exit(status)' */
 INTERN ATTR_SECTION(".text.crt.dos.error") ATTR_NORETURN ATTR_LIBC_PRINTF(2, 3) void
 (VLIBDCALL libd_errc)(int status,
                       errno_t used_errno,
@@ -188,7 +201,8 @@ INTERN ATTR_SECTION(".text.crt.dos.error") ATTR_NORETURN ATTR_LIBC_PRINTF(2, 3) 
 }
 #endif /* !__LIBCCALL_IS_LIBDCALL && !__KERNEL__ */
 #ifndef __KERNEL__
-/* Same as `warnc()', but follow up by calling `exit(status)' */
+/* >> errc(3), verrc(3)
+ * Same as `warnc()', but follow up by calling `exit(status)' */
 INTERN ATTR_SECTION(".text.crt.error") ATTR_NORETURN ATTR_LIBC_PRINTF(2, 3) void
 (VLIBCCALL libc_errc)(int status,
                       errno_t used_errno,
@@ -198,7 +212,8 @@ INTERN ATTR_SECTION(".text.crt.error") ATTR_NORETURN ATTR_LIBC_PRINTF(2, 3) void
 	va_start(args, format);
 	libc_verrc(status, used_errno, format, args);
 }
-/* Same as `warnc()', but follow up by calling `exit(status)' */
+/* >> errc(3), verrc(3)
+ * Same as `warnc()', but follow up by calling `exit(status)' */
 INTERN ATTR_SECTION(".text.crt.error") ATTR_NORETURN ATTR_LIBC_PRINTF(2, 0) void
 (LIBCCALL libc_verrc)(int status,
                       errno_t used_errno,
@@ -209,7 +224,8 @@ INTERN ATTR_SECTION(".text.crt.error") ATTR_NORETURN ATTR_LIBC_PRINTF(2, 0) void
 }
 #endif /* !__KERNEL__ */
 #if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
-/* Same as `warnx()', but follow up by calling `exit(status)' */
+/* >> errx(3), verrx(3)
+ * Same as `warnx()', but follow up by calling `exit(status)' */
 INTERN ATTR_SECTION(".text.crt.dos.error") ATTR_NORETURN ATTR_LIBC_PRINTF(2, 3) void
 (VLIBDCALL libd_errx)(int status,
                       char const *format,
@@ -220,7 +236,8 @@ INTERN ATTR_SECTION(".text.crt.dos.error") ATTR_NORETURN ATTR_LIBC_PRINTF(2, 3) 
 }
 #endif /* !__LIBCCALL_IS_LIBDCALL && !__KERNEL__ */
 #ifndef __KERNEL__
-/* Same as `warnx()', but follow up by calling `exit(status)' */
+/* >> errx(3), verrx(3)
+ * Same as `warnx()', but follow up by calling `exit(status)' */
 INTERN ATTR_SECTION(".text.crt.error") ATTR_NORETURN ATTR_LIBC_PRINTF(2, 3) void
 (VLIBCCALL libc_errx)(int status,
                       char const *format,
@@ -229,7 +246,8 @@ INTERN ATTR_SECTION(".text.crt.error") ATTR_NORETURN ATTR_LIBC_PRINTF(2, 3) void
 	va_start(args, format);
 	libc_verrx(status, format, args);
 }
-/* Same as `warnx()', but follow up by calling `exit(status)' */
+/* >> errx(3), verrx(3)
+ * Same as `warnx()', but follow up by calling `exit(status)' */
 INTERN ATTR_SECTION(".text.crt.error") ATTR_NORETURN ATTR_LIBC_PRINTF(2, 0) void
 (LIBCCALL libc_verrx)(int status,
                       char const *format,

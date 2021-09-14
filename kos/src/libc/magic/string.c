@@ -1098,8 +1098,8 @@ void *memrchr([[nonnull]] void const *__restrict haystack, int needle, $size_t n
 @@#endif // !_MEMMEM_EMPTY_NEEDLE_NULL_SOURCE
 [[decl_include("<hybrid/typecore.h>")]]
 [[libc, wunused, pure, no_crt_self_import]]
-[[if(defined(__USE_MEMMEM_EMPTY_NEEDLE_NULL)), preferred_alias("memmem0")]]
-[[if(!defined(__USE_MEMMEM_EMPTY_NEEDLE_NULL)), preferred_alias("memmem")]]
+[[if($extended_include_prefix("<features.h>") defined(__USE_MEMMEM_EMPTY_NEEDLE_NULL)), preferred_alias("memmem0")]]
+[[if($extended_include_prefix("<features.h>")!defined(__USE_MEMMEM_EMPTY_NEEDLE_NULL)), preferred_alias("memmem")]]
 [[crt_kos_impl_requires(!defined(LIBC_ARCH_HAVE_MEMMEM))]]
 [[impl_include("<features.h>")]]
 [[nullable]] void *memmem([[nonnull]] void const *haystack, $size_t haystacklen, [[nonnull]] void const *needle, $size_t needlelen)
@@ -5573,8 +5573,8 @@ $size_t rawmemrlen([[nonnull]] void const *__restrict haystack, int needle) {
 @@#endif // !_MEMMEM_EMPTY_NEEDLE_NULL_SOURCE
 [[libc, wunused, pure, no_crt_self_import]]
 [[impl_include("<features.h>"), decl_include("<hybrid/typecore.h>")]]
-[[if(defined(__USE_MEMMEM_EMPTY_NEEDLE_NULL)), preferred_alias("memrmem0")]]
-[[if(!defined(__USE_MEMMEM_EMPTY_NEEDLE_NULL)), preferred_alias("memrmem")]]
+[[if($extended_include_prefix("<features.h>") defined(__USE_MEMMEM_EMPTY_NEEDLE_NULL)), preferred_alias("memrmem0")]]
+[[if($extended_include_prefix("<features.h>")!defined(__USE_MEMMEM_EMPTY_NEEDLE_NULL)), preferred_alias("memrmem")]]
 [[crt_kos_impl_requires(!defined(LIBC_ARCH_HAVE_MEMRMEM))]]
 void *memrmem([[nonnull]] void const *haystack, $size_t haystacklen, [[nonnull]] void const *needle, $size_t needlelen)
 	[([[nonnull]] void *haystack, $size_t haystacklen, [[nonnull]] void const *needle, $size_t needlelen): void *]
@@ -5768,8 +5768,8 @@ int memcasecmp([[nonnull]] void const *s1,
 @@#endif // !_MEMMEM_EMPTY_NEEDLE_NULL_SOURCE
 [[wunused, pure, no_crt_self_import]]
 [[impl_include("<features.h>"), decl_include("<hybrid/typecore.h>")]]
-[[if(defined(__USE_MEMMEM_EMPTY_NEEDLE_NULL)), preferred_alias("memcasemem0")]]
-[[if(!defined(__USE_MEMMEM_EMPTY_NEEDLE_NULL)), preferred_alias("memcasemem")]]
+[[if($extended_include_prefix("<features.h>") defined(__USE_MEMMEM_EMPTY_NEEDLE_NULL)), preferred_alias("memcasemem0")]]
+[[if($extended_include_prefix("<features.h>")!defined(__USE_MEMMEM_EMPTY_NEEDLE_NULL)), preferred_alias("memcasemem")]]
 [[section(".text.crt{|.dos}.unicode.static.memory")]]
 void *memcasemem([[nonnull]] void const *haystack, $size_t haystacklen, [[nonnull]] void const *needle, $size_t needlelen)
 	[([[nonnull]] void *haystack, $size_t haystacklen, [[nonnull]] void const *needle, $size_t needlelen): void *]
@@ -5828,8 +5828,8 @@ int memcasecmp_l([[nonnull]] void const *s1,
 @@#endif // !_MEMMEM_EMPTY_NEEDLE_NULL_SOURCE
 [[wunused, pure, no_crt_self_import]]
 [[impl_include("<features.h>"), decl_include("<hybrid/typecore.h>")]]
-[[if(defined(__USE_MEMMEM_EMPTY_NEEDLE_NULL)), preferred_alias("memcasemem0_l")]]
-[[if(!defined(__USE_MEMMEM_EMPTY_NEEDLE_NULL)), preferred_alias("memcasemem_l")]]
+[[if($extended_include_prefix("<features.h>") defined(__USE_MEMMEM_EMPTY_NEEDLE_NULL)), preferred_alias("memcasemem0_l")]]
+[[if($extended_include_prefix("<features.h>")!defined(__USE_MEMMEM_EMPTY_NEEDLE_NULL)), preferred_alias("memcasemem_l")]]
 [[section(".text.crt{|.dos}.unicode.locale.memory")]]
 void *memcasemem_l([[nonnull]] void const *haystack, $size_t haystacklen, [[nonnull]] void const *needle, $size_t needlelen, $locale_t locale)
 	[([[nonnull]] void *haystack, $size_t haystacklen, [[nonnull]] void const *needle, $size_t needlelen, $locale_t locale): void *]

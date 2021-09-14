@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x787d3eb */
+/* HASH CRC-32:0xb6c3e3c5 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -21,8 +21,8 @@
 #ifndef __local_lfutexlockexpr_defined
 #define __local_lfutexlockexpr_defined 1
 #include <__crt.h>
-#if defined(__CRT_HAVE_lfutexlockexpr64) || defined(__CRT_HAVE_lfutexlockexpr)
 #include <bits/types.h>
+#if defined(__CRT_HAVE_lfutexlockexpr64) || defined(__CRT_HAVE_lfutexlockexpr)
 #include <bits/os/timespec.h>
 #include <kos/bits/futex-expr.h>
 __NAMESPACE_LOCAL_BEGIN

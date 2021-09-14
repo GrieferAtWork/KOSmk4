@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x988bf1e1 */
+/* HASH CRC-32:0x595d0545 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -21,7 +21,9 @@
 #ifndef __local_Creat_defined
 #define __local_Creat_defined 1
 #include <__crt.h>
+#include <features.h>
 #include <asm/os/fcntl.h>
+#include <asm/os/oflags.h>
 #if defined(__CRT_HAVE_Open64) || (defined(__AT_FDCWD) && (defined(__CRT_HAVE_OpenAt64) || defined(__CRT_HAVE_OpenAt))) || defined(__CRT_HAVE_Open)
 #include <bits/types.h>
 #include <kos/anno.h>
@@ -39,9 +41,6 @@ __NAMESPACE_LOCAL_BEGIN
 #define __localdep_Open __LIBC_LOCAL_NAME(Open)
 #endif /* !... */
 #endif /* !__local___localdep_Open_defined */
-__NAMESPACE_LOCAL_END
-#include <asm/os/oflags.h>
-__NAMESPACE_LOCAL_BEGIN
 __LOCAL_LIBC(Creat) __ATTR_WUNUSED __ATTR_NONNULL((1)) __fd_t
 (__LIBCCALL __LIBC_LOCAL_NAME(Creat))(char const *__filename, __mode_t __mode) __THROWS(...) {
 	return (__NAMESPACE_LOCAL_SYM __localdep_Open)(__filename, __O_CREAT | __O_WRONLY | __O_TRUNC, __mode);

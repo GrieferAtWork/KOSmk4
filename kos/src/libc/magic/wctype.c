@@ -736,6 +736,9 @@ $wctrans_t wctrans_l([[nonnull]] char const *prop, $locale_t locale) {
 
 %#ifdef __USE_KOS
 %[default:section(".text.crt.dos.wchar.unicode.static.mbs")]
+
+@@>> iswsymstrt(3), iswsymstrt_l(3)
+@@Check if `wc' may appear at the start of a symbol/keyword/identifier
 [[wchar, wunused, const, decl_include("<hybrid/typecore.h>")]]
 [[impl_include("<bits/crt/unicode.h>"), crt_name("__iswcsymf")]]
 int iswsymstrt($wint_t wc) {
@@ -747,6 +750,8 @@ int iswsymstrt($wint_t wc) {
 @@pp_endif@@
 }
 
+@@>> iswsymcont(3), iswsymcont_l(3)
+@@Check if `wc' may appear in the middle of a symbol/keyword/identifier
 [[wchar, wunused, const, decl_include("<hybrid/typecore.h>")]]
 [[impl_include("<bits/crt/unicode.h>"), crt_name("__iswcsym")]]
 int iswsymcont($wint_t wc) {
@@ -759,7 +764,9 @@ int iswsymcont($wint_t wc) {
 }
 
 %[default:section(".text.crt.dos.wchar.unicode.locale.mbs")]
-[[wchar, wunused, pure, decl_include("<hybrid/typecore.h>"), crt_name("_iswcsymf_l")]]
+
+[[wchar, wunused, pure, decl_include("<hybrid/typecore.h>")]]
+[[crt_name("_iswcsymf_l"), doc_alias("iswsymstrt")]]
 int iswsymstrt_l($wint_t wc, $locale_t locale) {
 @@pp_if defined(__CRT_KOS) && $has_function(__unicode_descriptor)@@
 	(void)locale;
@@ -770,7 +777,8 @@ int iswsymstrt_l($wint_t wc, $locale_t locale) {
 @@pp_endif@@
 }
 
-[[wchar, wunused, pure, decl_include("<hybrid/typecore.h>"), crt_name("_iswcsym_l")]]
+[[wchar, wunused, pure, decl_include("<hybrid/typecore.h>")]]
+[[crt_name("_iswcsym_l"), doc_alias("iswsymcont")]]
 int iswsymcont_l($wint_t wc, $locale_t locale) {
 @@pp_if defined(__CRT_KOS) && $has_function(__unicode_descriptor)@@
 	(void)locale;
@@ -814,6 +822,7 @@ int iswsymcont_l($wint_t wc, $locale_t locale) {
 %[insert:function(is_wctype = iswctype)]
 
 %
+@@>> isleadbyte(3)
 [[wunused, const]]
 [[section(".text.crt{|.dos}.wchar.unicode.static.mbs")]]
 int isleadbyte(int wc) {

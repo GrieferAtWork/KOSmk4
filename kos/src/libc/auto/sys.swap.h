@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xa64bce79 */
+/* HASH CRC-32:0x51f21a88 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -30,8 +30,10 @@
 DECL_BEGIN
 
 #if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
-/* @param swapflags: Set of `SWAP_FLAG_*' */
+/* >> swapon(2)
+ * @param swapflags: Set of `SWAP_FLAG_*' */
 INTDEF NONNULL((1)) int NOTHROW_RPC(LIBDCALL libd_swapon)(char const *path, __STDC_INT_AS_UINT_T swapflags);
+/* >> swapoff(2) */
 INTDEF NONNULL((1)) int NOTHROW_RPC(LIBDCALL libd_swapoff)(char const *path);
 #endif /* !__LIBCCALL_IS_LIBDCALL && !__KERNEL__ */
 

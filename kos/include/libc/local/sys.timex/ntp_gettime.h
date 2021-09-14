@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x66613085 */
+/* HASH CRC-32:0x129418eb */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -21,6 +21,7 @@
 #ifndef __local_ntp_gettime_defined
 #define __local_ntp_gettime_defined 1
 #include <__crt.h>
+#include <bits/types.h>
 #if defined(__CRT_HAVE_ntp_gettimex64) || defined(__CRT_HAVE_ntp_gettimex)
 #include <bits/crt/ntptimeval.h>
 __NAMESPACE_LOCAL_BEGIN

@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x8e0d01b8 */
+/* HASH CRC-32:0x9ec52f45 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -21,6 +21,7 @@
 #ifndef __local_ftruncate_defined
 #define __local_ftruncate_defined 1
 #include <__crt.h>
+#include <bits/types.h>
 #if defined(__CRT_HAVE_ftruncate64) || defined(__CRT_HAVE__chsize_s) || defined(__CRT_HAVE_ftruncate)
 #include <features.h>
 #ifndef __PIO_OFFSET
@@ -32,7 +33,6 @@
 #define __PIO_OFFSET64 __off64_t
 #endif /* !__USE_KOS_ALTERATIONS */
 #endif /* !__PIO_OFFSET */
-#include <bits/types.h>
 __NAMESPACE_LOCAL_BEGIN
 #if !defined(__local___localdep_ftruncate32_defined) && defined(__CRT_HAVE_ftruncate)
 #define __local___localdep_ftruncate32_defined 1

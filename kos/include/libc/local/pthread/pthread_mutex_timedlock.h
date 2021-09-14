@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x3a5a6177 */
+/* HASH CRC-32:0x2780d235 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -21,8 +21,8 @@
 #ifndef __local_pthread_mutex_timedlock_defined
 #define __local_pthread_mutex_timedlock_defined 1
 #include <__crt.h>
-#if defined(__CRT_HAVE_pthread_mutex_timedlock64) || defined(__CRT_HAVE_pthread_mutex_timedlock)
 #include <bits/types.h>
+#if defined(__CRT_HAVE_pthread_mutex_timedlock64) || defined(__CRT_HAVE_pthread_mutex_timedlock)
 #include <bits/crt/pthreadtypes.h>
 #include <bits/os/timespec.h>
 __NAMESPACE_LOCAL_BEGIN

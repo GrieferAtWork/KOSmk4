@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xc3345b7d */
+/* HASH CRC-32:0x1e7b32c2 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -21,6 +21,7 @@
 #ifndef __local_tmpfile_s_defined
 #define __local_tmpfile_s_defined 1
 #include <__crt.h>
+#include <asm/os/oflags.h>
 #if defined(__CRT_HAVE_tmpfile64) || defined(__CRT_HAVE_tmpfile)
 #include <bits/types.h>
 __NAMESPACE_LOCAL_BEGIN

@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x32914471 */
+/* HASH CRC-32:0x7ef0e5f4 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -142,9 +142,11 @@ __NAMESPACE_LOCAL_USING_OR_IMPL(_mkdir, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_NO
 #ifndef __mkdir_defined
 #define __mkdir_defined 1
 #ifdef __CRT_HAVE_mkdir
+/* >> mkdir(2) */
 __CDECLARE(__ATTR_NONNULL((1)),int,__NOTHROW_RPC,mkdir,(char const *__pathname, __mode_t __mode),(__pathname,__mode))
 #elif defined(__CRT_DOS_PRIMARY) && defined(__CRT_HAVE__mkdir)
 #include <libc/local/sys.stat/mkdir.h>
+/* >> mkdir(2) */
 __NAMESPACE_LOCAL_USING_OR_IMPL(mkdir, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_NONNULL((1)) int __NOTHROW_RPC(__LIBCCALL mkdir)(char const *__pathname, __mode_t __mode) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(mkdir))(__pathname, __mode); })
 #else /* ... */
 #undef __mkdir_defined

@@ -39,8 +39,9 @@ DECL_BEGIN
 
 
 
-/*[[[head:libc_ulimit,hash:CRC-32=0x9b432880]]]*/
-/* @param: cmd: One OF `UL_*' */
+/*[[[head:libc_ulimit,hash:CRC-32=0x2d1ef6b5]]]*/
+/* >> ulimit(2)
+ * @param: cmd: One OF `UL_*' */
 INTERN ATTR_SECTION(".text.crt.unsorted") longptr_t
 NOTHROW_NCX(VLIBCCALL libc_ulimit)(__STDC_INT_AS_UINT_T cmd,
                                    ...)

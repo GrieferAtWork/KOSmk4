@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xfd904654 */
+/* HASH CRC-32:0xb6f9b436 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -41,10 +41,8 @@
  * Also:  With  magic, it's  fairly  easy to  automate  this header... */
 
 #include <features.h>
-
 #include <hybrid/host.h>
 #include <hybrid/typecore.h>
-
 #include <asm/os/limits.h>
 #include <bits/types.h>
 
@@ -301,7 +299,6 @@
 
 #undef HAVE_FTW
 #include <bits/os/stat.h>
-#include <features.h>
 #if (defined(__CRT_HAVE_ftw) && defined(__STAT32_MATCHES_STAT64)) || (defined(__CRT_HAVE_ftw64) && defined(__USE_FILE_OFFSET64)) || (defined(__CRT_HAVE_ftw) && !defined(__USE_FILE_OFFSET64))
 #define HAVE_FTW 1
 #endif /* (__CRT_HAVE_ftw && __STAT32_MATCHES_STAT64) || (__CRT_HAVE_ftw64 && __USE_FILE_OFFSET64) || (__CRT_HAVE_ftw && !__USE_FILE_OFFSET64) */

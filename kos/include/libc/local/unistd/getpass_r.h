@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xe6bbe4c5 */
+/* HASH CRC-32:0x62fd5f49 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -66,7 +66,7 @@ __LOCAL_LIBC(getpass_r) __ATTR_WUNUSED char *
 __NOTHROW_RPC(__LIBCCALL __LIBC_LOCAL_NAME(getpass_r))(char const *__prompt, char *__buf, __SIZE_TYPE__ __bufsize) {
 #if defined(__CRT_HAVE_getpassfd) || defined(__CRT_HAVE_read) || defined(__CRT_HAVE__read) || defined(__CRT_HAVE___read)
 	/* Prefer using `getpassfd(3)' because I feel like that one's more
-	 * user-friendly.  - But it it's not available, fall back on using
+	 * user-friendly.  - But if it's not available, fall back on using
 	 * the regular, old `readpassphrase(3)' */
 #ifdef __GETPASS_ECHO_NL
 	return (__NAMESPACE_LOCAL_SYM __localdep_getpassfd)(__prompt, __buf, __bufsize, __NULLPTR, __GETPASS_ECHO_NL, 0);

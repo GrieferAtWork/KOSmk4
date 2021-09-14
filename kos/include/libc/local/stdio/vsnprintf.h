@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xbc97095a */
+/* HASH CRC-32:0xd2ed0261 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -102,8 +102,8 @@ __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(vsnprintf))(char *__restrict __buf, _
 			 * some garbled lines, as well as the line-feed that always got copied
 			 * at the end of a paragraph in its escaped form '^@'.
 			 *
-			 * But then again, NUL-termination on truncation seems to be  something
-			 * that happens on linux, and after all: KOS tries to be a much API/ABI
+			 * But then again, NUL-termination on  truncation seems to be  something
+			 * that happens on linux, and after all: KOS tries to be as much API/ABI
 			 * compatible with linux as possible, so: in this goes! */
 			if (__buflen != 0)
 				__buf[__buflen - 1] = '\0';

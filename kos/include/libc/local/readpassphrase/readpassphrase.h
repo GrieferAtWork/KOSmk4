@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xaddfb0ab */
+/* HASH CRC-32:0x40d40b11 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -137,6 +137,7 @@ __CVREDIRECT(__ATTR_WUNUSED __ATTR_NONNULL((1)),__fd_t,__NOTHROW_RPC,__localdep_
 #else /* ... */
 __NAMESPACE_LOCAL_END
 #include <asm/os/fcntl.h>
+#include <asm/os/oflags.h>
 __NAMESPACE_LOCAL_BEGIN
 #if defined(__CRT_HAVE_open64) || defined(__CRT_HAVE___open64) || defined(__CRT_HAVE_open) || defined(__CRT_HAVE__open) || defined(__CRT_HAVE___open) || (defined(__AT_FDCWD) && (defined(__CRT_HAVE_openat64) || defined(__CRT_HAVE_openat)))
 __NAMESPACE_LOCAL_END

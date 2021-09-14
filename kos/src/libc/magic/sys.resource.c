@@ -402,8 +402,8 @@ typedef int __priority_which_t;
 
 %#ifdef __USE_GNU
 [[no_crt_self_import]]
-[[if(defined(__USE_FILE_OFFSET64)), preferred_alias("prlimit64")]]
-[[if(!defined(__USE_FILE_OFFSET64)), preferred_alias("prlimit")]]
+[[if($extended_include_prefix("<features.h>") defined(__USE_FILE_OFFSET64)), preferred_alias("prlimit64")]]
+[[if($extended_include_prefix("<features.h>")!defined(__USE_FILE_OFFSET64)), preferred_alias("prlimit")]]
 int prlimit($pid_t pid, __rlimit_resource_t resource,
             [[nullable]] struct rlimit const *new_limit,
             [[nullable]] struct rlimit *old_limit);
@@ -418,22 +418,22 @@ int prlimit64($pid_t pid, __rlimit_resource_t resource,
 
 
 [[no_crt_self_import, export_as("__getrlimit")]]
-[[if(defined(__USE_FILE_OFFSET64)), preferred_alias("getrlimit64")]]
-[[if(!defined(__USE_FILE_OFFSET64)), preferred_alias("getrlimit", "__getrlimit")]]
+[[if($extended_include_prefix("<features.h>") defined(__USE_FILE_OFFSET64)), preferred_alias("getrlimit64")]]
+[[if($extended_include_prefix("<features.h>")!defined(__USE_FILE_OFFSET64)), preferred_alias("getrlimit", "__getrlimit")]]
 [[decl_include("<bits/os/rlimit.h>")]]
 int getrlimit(__rlimit_resource_t resource,
               [[nonnull]] struct rlimit *rlimits);
 
 [[no_crt_self_import]]
-[[if(defined(__USE_FILE_OFFSET64)), preferred_alias("setrlimit64")]]
-[[if(!defined(__USE_FILE_OFFSET64)), preferred_alias("setrlimit")]]
+[[if($extended_include_prefix("<features.h>") defined(__USE_FILE_OFFSET64)), preferred_alias("setrlimit64")]]
+[[if($extended_include_prefix("<features.h>")!defined(__USE_FILE_OFFSET64)), preferred_alias("setrlimit")]]
 [[decl_include("<bits/os/rlimit.h>")]]
 int setrlimit(__rlimit_resource_t resource,
               [[nonnull]] struct rlimit const *rlimits);
 
 [[no_crt_self_import, decl_include("<bits/os/rusage.h>")]]
-[[if(defined(__USE_FILE_OFFSET64)), preferred_alias("getrusage64")]]
-[[if(!defined(__USE_FILE_OFFSET64)), preferred_alias("getrusage")]]
+[[if($extended_include_prefix("<features.h>") defined(__USE_FILE_OFFSET64)), preferred_alias("getrusage64")]]
+[[if($extended_include_prefix("<features.h>")!defined(__USE_FILE_OFFSET64)), preferred_alias("getrusage")]]
 int getrusage(__rusage_who_t who,
               [[nonnull]] struct rusage *usage);
 

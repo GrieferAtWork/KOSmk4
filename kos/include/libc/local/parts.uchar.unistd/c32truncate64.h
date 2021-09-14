@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x1f8ca8a0 */
+/* HASH CRC-32:0xd8b63e8d */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -21,8 +21,9 @@
 #ifndef __local_c32truncate64_defined
 #define __local_c32truncate64_defined 1
 #include <__crt.h>
-#if (defined(__CRT_HAVE_wtruncate) && __SIZEOF_WCHAR_T__ == 4 && defined(__LIBCCALL_IS_LIBKCALL)) || defined(__CRT_HAVE_KOS$wtruncate) || ((defined(__CRT_HAVE_open64) || defined(__CRT_HAVE___open64) || defined(__CRT_HAVE_open) || defined(__CRT_HAVE__open) || defined(__CRT_HAVE___open)) && (defined(__CRT_HAVE_ftruncate64) || defined(__CRT_HAVE__chsize_s) || defined(__CRT_HAVE_ftruncate)))
+#include <asm/os/oflags.h>
 #include <bits/types.h>
+#if (defined(__CRT_HAVE_wtruncate) && __SIZEOF_WCHAR_T__ == 4 && defined(__LIBCCALL_IS_LIBKCALL)) || defined(__CRT_HAVE_KOS$wtruncate) || ((defined(__CRT_HAVE_open64) || defined(__CRT_HAVE___open64) || defined(__CRT_HAVE_open) || defined(__CRT_HAVE__open) || defined(__CRT_HAVE___open)) && (defined(__CRT_HAVE_ftruncate64) || defined(__CRT_HAVE__chsize_s) || defined(__CRT_HAVE_ftruncate)))
 __NAMESPACE_LOCAL_BEGIN
 #ifndef __local___localdep_c32truncate32_defined
 #define __local___localdep_c32truncate32_defined 1

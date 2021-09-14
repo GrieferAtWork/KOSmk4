@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x9fb6a9e5 */
+/* HASH CRC-32:0x5ed1bd10 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -30,20 +30,23 @@ DECL_BEGIN
 
 #ifndef __KERNEL__
 #include <bits/crt/fenv-inline.h>
-/* @param: EXCEPTS: Set of `FE_*' */
+/* >> feclearexcept(3)
+ * @param: excepts: Set of `FE_*' */
 INTERN ATTR_SECTION(".text.crt.math.fenv") int
 NOTHROW(LIBCCALL libc_feclearexcept)(int excepts) {
 	__inline_feclearexcept(excepts);
 	return 0;
 }
 #include <bits/crt/fenv-inline.h>
-/* @param: EXCEPTS: Set of `FE_*' */
+/* >> feraiseexcept(3)
+ * @param: excepts: Set of `FE_*' */
 INTERN ATTR_SECTION(".text.crt.math.fenv") int
 (LIBCCALL libc_feraiseexcept)(int excepts) THROWS(...) {
 	__inline_feraiseexcept(excepts);
 	return 0;
 }
 #include <bits/crt/fenv-inline.h>
+/* >> fegetexceptflag(3) */
 INTERN ATTR_SECTION(".text.crt.math.fenv") NONNULL((1)) int
 NOTHROW_NCX(LIBCCALL libc_fegetexceptflag)(fexcept_t *flagp,
                                            int excepts) {
@@ -56,6 +59,7 @@ NOTHROW_NCX(LIBCCALL libc_fegetexceptflag)(fexcept_t *flagp,
 	return 0;
 }
 #include <bits/crt/fenv-inline.h>
+/* >> fesetexceptflag(3) */
 INTERN ATTR_SECTION(".text.crt.math.fenv") NONNULL((1)) int
 NOTHROW_NCX(LIBCCALL libc_fesetexceptflag)(fexcept_t const *flagp,
                                            int excepts) {
@@ -69,12 +73,14 @@ NOTHROW_NCX(LIBCCALL libc_fesetexceptflag)(fexcept_t const *flagp,
 	return 0;
 }
 #include <bits/crt/fenv-inline.h>
+/* >> fetestexcept(3) */
 INTERN ATTR_SECTION(".text.crt.math.fenv") ATTR_PURE WUNUSED int
 NOTHROW(LIBCCALL libc_fetestexcept)(int excepts) {
 	return __inline_fetestexcept(excepts);
 }
 #include <bits/crt/fenv-inline.h>
-/* Get the current rounding direction
+/* >> fegetround(3)
+ * Get the current rounding direction
  * @return: One of...
  *             ... `FE_TONEAREST':  round()
  *             ... `FE_DOWNWARD':   floor()
@@ -85,7 +91,8 @@ NOTHROW(LIBCCALL libc_fegetround)(void) {
 	return __inline_fegetround();
 }
 #include <bits/crt/fenv-inline.h>
-/* Set the current rounding direction
+/* >> fesetround(3)
+ * Set the current rounding direction
  * @param: rounding_direction: One of...
  *             ... `FE_TONEAREST':  round()
  *             ... `FE_DOWNWARD':   floor()
@@ -96,40 +103,47 @@ NOTHROW(LIBCCALL libc_fesetround)(int rounding_direction) {
 	return __inline_fesetround(rounding_direction);
 }
 #include <bits/crt/fenv-inline.h>
+/* >> fegetenv(3) */
 INTERN ATTR_SECTION(".text.crt.math.fenv") NONNULL((1)) int
 NOTHROW_NCX(LIBCCALL libc_fegetenv)(fenv_t *envp) {
 	__inline_fegetenv(envp);
 	return 0;
 }
 #include <bits/crt/fenv-inline.h>
+/* >> feholdexcept(3) */
 INTERN ATTR_SECTION(".text.crt.math.fenv") NONNULL((1)) int
 NOTHROW_NCX(LIBCCALL libc_feholdexcept)(fenv_t *envp) {
 	__inline_feholdexcept(envp);
 	return 0;
 }
 #include <bits/crt/fenv-inline.h>
+/* >> fesetenv(3) */
 INTERN ATTR_SECTION(".text.crt.math.fenv") NONNULL((1)) int
 NOTHROW_NCX(LIBCCALL libc_fesetenv)(fenv_t const *envp) {
 	__inline_fesetenv(envp);
 	return 0;
 }
 #include <bits/crt/fenv-inline.h>
+/* >> feupdateenv(3) */
 INTERN ATTR_SECTION(".text.crt.math.fenv") NONNULL((1)) int
 NOTHROW_NCX(LIBCCALL libc_feupdateenv)(fenv_t const *envp) {
 	__inline_feupdateenv(envp);
 	return 0;
 }
 #include <bits/crt/fenv-inline.h>
+/* >> feenableexcept(3) */
 INTERN ATTR_SECTION(".text.crt.math.fenv") int
 NOTHROW(LIBCCALL libc_feenableexcept)(int excepts) {
 	return __inline_feenableexcept(excepts);
 }
 #include <bits/crt/fenv-inline.h>
+/* >> fedisableexcept(3) */
 INTERN ATTR_SECTION(".text.crt.math.fenv") int
 NOTHROW(LIBCCALL libc_fedisableexcept)(int excepts) {
 	return __inline_fedisableexcept(excepts);
 }
 #include <bits/crt/fenv-inline.h>
+/* >> fegetexcept(3) */
 INTERN ATTR_SECTION(".text.crt.math.fenv") ATTR_PURE WUNUSED int
 NOTHROW(LIBCCALL libc_fegetexcept)(void) {
 	return __inline_fegetexcept();

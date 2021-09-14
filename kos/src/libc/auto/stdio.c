@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xfe8dd558 */
+/* HASH CRC-32:0x8a318290 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -106,21 +106,24 @@ INTERN ATTR_SECTION(".text.crt.FILE.locked.read.read") WUNUSED NONNULL((1, 3)) c
 	return buf;
 }
 /* >> fputs(3)
- * Print a given string `str' to `stream'. This is identical to:
- * >> fwrite(str, sizeof(char), strlen(str), stream); */
+ * Print a given string `string' to `stream'. This is identical to:
+ * >> fwrite(string, sizeof(char), strlen(string), stream); */
 INTERN ATTR_SECTION(".text.crt.FILE.locked.write.write") NONNULL((1, 2)) __STDC_INT_AS_SSIZE_T
-(LIBCCALL libc_fputs)(char const *__restrict str,
+(LIBCCALL libc_fputs)(char const *__restrict string,
                       FILE *__restrict stream) THROWS(...) {
 	__STDC_INT_AS_SIZE_T result;
-	result = libc_fwrite(str,
+	result = libc_fwrite(string,
 	                sizeof(char),
-	                libc_strlen(str),
+	                libc_strlen(string),
 	                stream);
 	return result;
 }
 #include <libc/local/stdstreams.h>
 /* >> puts(3)
- * Print a given string `str', followed by a line-feed to `stdout' */
+ * Print a given string `string', followed by a line-feed to `stdout'. This is identical to:
+ * >> fputs(string, stdout);
+ * >> putchar('\n');
+ * Return the number of written characters, or `EOF' on error */
 INTERN ATTR_SECTION(".text.crt.FILE.locked.write.write") NONNULL((1)) __STDC_INT_AS_SSIZE_T
 (LIBCCALL libc_puts)(char const *__restrict string) THROWS(...) {
 	__STDC_INT_AS_SSIZE_T result, temp;
@@ -530,8 +533,8 @@ NOTHROW_NCX(LIBCCALL libc_vsnprintf)(char *__restrict buf,
 			 * some garbled lines, as well as the line-feed that always got copied
 			 * at the end of a paragraph in its escaped form '^@'.
 			 *
-			 * But then again, NUL-termination on truncation seems to be  something
-			 * that happens on linux, and after all: KOS tries to be a much API/ABI
+			 * But then again, NUL-termination on  truncation seems to be  something
+			 * that happens on linux, and after all: KOS tries to be as much API/ABI
 			 * compatible with linux as possible, so: in this goes! */
 			if (buflen != 0)
 				buf[buflen - 1] = '\0';

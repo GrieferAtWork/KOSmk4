@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xce91f5 */
+/* HASH CRC-32:0x337cfba5 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -21,8 +21,8 @@
 #ifndef __local_pthread_rwlock_timedrdlock_defined
 #define __local_pthread_rwlock_timedrdlock_defined 1
 #include <__crt.h>
-#if defined(__CRT_HAVE_pthread_rwlock_timedrdlock64) || defined(__CRT_HAVE_pthread_rwlock_timedrdlock)
 #include <bits/types.h>
+#if defined(__CRT_HAVE_pthread_rwlock_timedrdlock64) || defined(__CRT_HAVE_pthread_rwlock_timedrdlock)
 #include <bits/crt/pthreadtypes.h>
 #include <bits/os/timespec.h>
 __NAMESPACE_LOCAL_BEGIN

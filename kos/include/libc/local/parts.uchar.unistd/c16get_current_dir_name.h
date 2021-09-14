@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xeab05541 */
+/* HASH CRC-32:0x86a1fe12 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -103,7 +103,11 @@ __NAMESPACE_LOCAL_END
 #include <bits/os/stat.h>
 __NAMESPACE_LOCAL_BEGIN
 __CREDIRECT(__ATTR_NONNULL((1, 2)),int,__NOTHROW_NCX,__localdep_stat,(char const *__restrict __filename, struct stat *__restrict __buf),kstat64,(__filename,__buf))
-#elif defined(__CRT_HAVE__stat64) && defined(__CRT_DOS_PRIMARY) && defined(__USE_TIME_BITS64)
+#else /* ... */
+__NAMESPACE_LOCAL_END
+#include <features.h>
+__NAMESPACE_LOCAL_BEGIN
+#if defined(__CRT_HAVE__stat64) && defined(__CRT_DOS_PRIMARY) && defined(__USE_TIME_BITS64)
 __NAMESPACE_LOCAL_END
 #include <bits/os/stat.h>
 __NAMESPACE_LOCAL_BEGIN
@@ -145,6 +149,7 @@ __NAMESPACE_LOCAL_BEGIN
 __CREDIRECT(__ATTR_NONNULL((1, 2)),int,__NOTHROW_NCX,__localdep_stat,(char const *__restrict __filename, struct stat *__restrict __buf),stat,(__filename,__buf))
 #else /* ... */
 #undef __local___localdep_stat_defined
+#endif /* !... */
 #endif /* !... */
 #endif /* !__local___localdep_stat_defined */
 __NAMESPACE_LOCAL_END

@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x6365e638 */
+/* HASH CRC-32:0xcc08c0c9 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -34,10 +34,11 @@ DECL_BEGIN
 /* >> remove(3)
  * Remove a file or directory `filename' */
 INTDEF NONNULL((1)) int NOTHROW_RPC(LIBCCALL libc_remove)(char const *filename);
-/* >> rename(3)
+/* >> rename(2)
  * Rename  a given file `oldname' to `newname_or_path', or in the event
  * that `newname_or_path' refers to a directory, place the file within. */
 INTDEF NONNULL((1, 2)) int NOTHROW_RPC(LIBCCALL libc_rename)(char const *oldname, char const *newname_or_path);
+/* >> tmpnam(3), tmpnam_r(3) */
 INTDEF WUNUSED NONNULL((1)) char *NOTHROW_NCX(LIBCCALL libc_tmpnam)(char *buf);
 /* >> fclose(3)
  * Close and destroy a given file `stream' */
@@ -49,12 +50,12 @@ INTDEF int (LIBCCALL libc_fflush)(FILE *stream) THROWS(...);
  * Set the buffer and buffer-mode to-be used by the given `stream'
  * @param modes: One of `_IOFBF', `_IOLBF' or `_IONBF' */
 INTDEF NONNULL((1)) int NOTHROW_NCX(LIBCCALL libc_setvbuf)(FILE *__restrict stream, char *__restrict buf, __STDC_INT_AS_UINT_T modes, size_t bufsize);
-/* >> fgetc(3)
+/* >> getc(3), fgetc(3)
  * Read and return a single character from `stream'
  * If  the given `stream' has been exhausted or if an error occurred, `EOF' is
  * returned and the exact cause can be determined by using `ferror' and `feof' */
 INTDEF NONNULL((1)) int (LIBCCALL libc_fgetc)(FILE *__restrict stream) THROWS(...);
-/* >> fputc(3)
+/* >> putc(3), fputc(3)
  * Write a single character `ch' to `stream' */
 INTDEF NONNULL((2)) int (LIBCCALL libc_fputc)(int ch, FILE *__restrict stream) THROWS(...);
 /* >> ungetc(3)
@@ -108,7 +109,7 @@ INTDEF NONNULL((2)) int NOTHROW_RPC(LIBCCALL libc_removeat)(fd_t dirfd, char con
 /* >> frenameat(2)
  * @param flags: Set of `0 | AT_DOSPATH' */
 INTDEF NONNULL((2, 4)) int NOTHROW_RPC(LIBCCALL libc_frenameat)(fd_t oldfd, char const *oldname, fd_t newfd, char const *newname_or_path, atflag_t flags);
-/* >> tmpnam_r(3) */
+/* >> tmpnam(3), tmpnam_r(3) */
 INTDEF WUNUSED NONNULL((1)) char *NOTHROW_NCX(LIBCCALL libc_tmpnam_r)(char *buf);
 /* >> fflush_unlocked(3)
  * Same as `fflush()', but performs I/O without acquiring a lock to `stream' */

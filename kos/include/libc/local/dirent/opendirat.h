@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xbfd1a705 */
+/* HASH CRC-32:0xcdac7a42 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -21,6 +21,8 @@
 #ifndef __local_opendirat_defined
 #define __local_opendirat_defined 1
 #include <__crt.h>
+#include <features.h>
+#include <asm/os/oflags.h>
 #if defined(__CRT_HAVE_fopendirat) || (defined(__CRT_HAVE_fdopendir) && (defined(__CRT_HAVE_openat64) || defined(__CRT_HAVE_openat)))
 struct __dirstream;
 __NAMESPACE_LOCAL_BEGIN

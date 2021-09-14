@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xbc31b15b */
+/* HASH CRC-32:0x5acc5d02 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -30,7 +30,8 @@
 DECL_BEGIN
 
 #ifndef __KERNEL__
-/* Alias for `strchr(argv[0], '/') ? strchr(argv[0], '/') + 1 : argv[0]', as passed to main() */
+/* >> __p_program_invocation_short_name(3)
+ * Alias for `strchr(argv[0], '/') ? strchr(argv[0], '/') + 1 : argv[0]', as passed to main() */
 INTDEF ATTR_CONST ATTR_RETNONNULL WUNUSED char **NOTHROW_NCX(LIBCCALL libc___p_program_invocation_short_name)(void);
 #endif /* !__KERNEL__ */
 

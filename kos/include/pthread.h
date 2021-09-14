@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x9e75c73c */
+/* HASH CRC-32:0x48b22dd8 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -40,13 +40,11 @@
 #endif /* __COMPILER_HAVE_PRAGMA_GCC_SYSTEM_HEADER */
 
 #include <features.h>
-
 #include <asm/crt/pthreadvalues.h>
 #include <bits/crt/pthreadtypes.h>
 #include <bits/crt/setjmp.h>
 #include <bits/types.h>
 #include <kos/anno.h>
-
 #include <endian.h>
 #include <sched.h>
 #include <time.h>

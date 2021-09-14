@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xe9fa66b9 */
+/* HASH CRC-32:0x283d9f0b */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -21,9 +21,9 @@
 #ifndef __local_futimes_defined
 #define __local_futimes_defined 1
 #include <__crt.h>
+#include <bits/types.h>
 #if defined(__CRT_HAVE_futimes64) || (defined(__CRT_HAVE_lutimes) && __SIZEOF_TIME32_T__ == __SIZEOF_TIME64_T__) || defined(__CRT_HAVE_futimes)
 #include <bits/os/timeval.h>
-#include <bits/types.h>
 __NAMESPACE_LOCAL_BEGIN
 #if !defined(__local___localdep_futimes32_defined) && defined(__CRT_HAVE_futimes)
 #define __local___localdep_futimes32_defined 1

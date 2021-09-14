@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xe04cd4fb */
+/* HASH CRC-32:0x5bc16940 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -176,10 +176,13 @@ __CREDIRECT(__ATTR_NONNULL((1, 2)),int,__NOTHROW_RPC,ftw64,(char const *__dir, _
 #elif defined(__CRT_HAVE_ftw64)
 /* >> ftw(3), ftw64(3) */
 __CDECLARE(__ATTR_NONNULL((1, 2)),int,__NOTHROW_RPC,ftw64,(char const *__dir, __ftw64_func_t __func, __STDC_INT_AS_UINT_T __nopenfd),(__dir,__func,__nopenfd))
-#elif defined(__CRT_HAVE_ftw) && defined(__FTS32_MATCHES_FTS64)
+#else /* ... */
+#include <bits/crt/fts.h>
+#if defined(__CRT_HAVE_ftw) && defined(__FTS32_MATCHES_FTS64)
 /* >> ftw(3), ftw64(3) */
 __CREDIRECT(__ATTR_NONNULL((1, 2)),int,__NOTHROW_RPC,ftw64,(char const *__dir, __ftw64_func_t __func, __STDC_INT_AS_UINT_T __nopenfd),ftw,(__dir,__func,__nopenfd))
-#endif /* ... */
+#endif /* __CRT_HAVE_ftw && __FTS32_MATCHES_FTS64 */
+#endif /* !... */
 #endif /* __USE_LARGEFILE64 */
 
 #ifdef __USE_XOPEN_EXTENDED
@@ -206,11 +209,14 @@ __CREDIRECT(__ATTR_NONNULL((1, 2)),int,__NOTHROW_RPC,nftw64,(char const *__dir, 
 /* >> nftw(3), nftw64(3)
  * @Param: flags: Set of `FTW_PHYS | FTW_MOUNT | FTW_CHDIR | FTW_DEPTH | FTW_ACTIONRETVAL' */
 __CDECLARE(__ATTR_NONNULL((1, 2)),int,__NOTHROW_RPC,nftw64,(char const *__dir, __nftw64_func_t __func, __STDC_INT_AS_UINT_T __descriptors, __STDC_INT_AS_UINT_T __flags),(__dir,__func,__descriptors,__flags))
-#elif defined(__CRT_HAVE_ftw) && defined(__FTS32_MATCHES_FTS64)
+#else /* ... */
+#include <bits/crt/fts.h>
+#if defined(__CRT_HAVE_ftw) && defined(__FTS32_MATCHES_FTS64)
 /* >> nftw(3), nftw64(3)
  * @Param: flags: Set of `FTW_PHYS | FTW_MOUNT | FTW_CHDIR | FTW_DEPTH | FTW_ACTIONRETVAL' */
 __CREDIRECT(__ATTR_NONNULL((1, 2)),int,__NOTHROW_RPC,nftw64,(char const *__dir, __nftw64_func_t __func, __STDC_INT_AS_UINT_T __descriptors, __STDC_INT_AS_UINT_T __flags),ftw,(__dir,__func,__descriptors,__flags))
-#endif /* ... */
+#endif /* __CRT_HAVE_ftw && __FTS32_MATCHES_FTS64 */
+#endif /* !... */
 #endif /* __USE_LARGEFILE64 */
 #endif /* __USE_XOPEN_EXTENDED */
 

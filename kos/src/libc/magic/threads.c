@@ -262,8 +262,8 @@ thrd_t thrd_current() = pthread_self;
 @@@return:    -1: A signal was received while waiting, and `remaining' was filled in (if given)
 @@@return: <= -2: Some other error occurred
 [[cp, no_crt_self_import, decl_include("<bits/os/timespec.h>")]]
-[[if(defined(__USE_TIME_BITS64)), preferred_alias("thrd_sleep64")]]
-[[if(!defined(__USE_TIME_BITS64)), preferred_alias("thrd_sleep")]]
+[[if($extended_include_prefix("<features.h>") defined(__USE_TIME_BITS64)), preferred_alias("thrd_sleep64")]]
+[[if($extended_include_prefix("<features.h>")!defined(__USE_TIME_BITS64)), preferred_alias("thrd_sleep")]]
 [[impl_include("<asm/crt/threads.h>", "<libc/errno.h>")]]
 [[userimpl, requires($has_function(thrd_sleep32) || $has_function(crt_thrd_sleep64) || $has_function(nanosleep))]]
 int thrd_sleep([[nonnull]] struct timespec const *time_point,
@@ -454,8 +454,8 @@ int mtx_lock([[nonnull]] mtx_t *__restrict mutex) {
 @@@return: thrd_timedout: Timeout
 @@@return: thrd_error:    Error
 [[cp, no_crt_self_import]]
-[[if(defined(__USE_TIME_BITS64)), preferred_alias("mtx_timedlock64")]]
-[[if(!defined(__USE_TIME_BITS64)), preferred_alias("mtx_timedlock")]]
+[[if($extended_include_prefix("<features.h>") defined(__USE_TIME_BITS64)), preferred_alias("mtx_timedlock64")]]
+[[if($extended_include_prefix("<features.h>")!defined(__USE_TIME_BITS64)), preferred_alias("mtx_timedlock")]]
 [[decl_include("<bits/crt/threads.h>")]]
 [[impl_include("<asm/crt/threads.h>", "<bits/crt/pthreadtypes.h>", "<asm/os/errno.h>")]]
 [[requires_function(pthread_mutex_timedlock)]]
@@ -615,8 +615,8 @@ int cnd_wait([[nonnull]] cnd_t *__restrict cond,
 @@@return: thrd_timedout: Timeout
 @@@return: thrd_error:    Error
 [[cp, no_crt_self_import]]
-[[if(defined(__USE_TIME_BITS64)), preferred_alias("cnd_timedwait64")]]
-[[if(!defined(__USE_TIME_BITS64)), preferred_alias("cnd_timedwait")]]
+[[if($extended_include_prefix("<features.h>") defined(__USE_TIME_BITS64)), preferred_alias("cnd_timedwait64")]]
+[[if($extended_include_prefix("<features.h>")!defined(__USE_TIME_BITS64)), preferred_alias("cnd_timedwait")]]
 [[decl_include("<bits/crt/threads.h>", "<bits/os/timespec.h>")]]
 [[impl_include("<asm/crt/threads.h>", "<bits/crt/pthreadtypes.h>")]]
 [[impl_include("<asm/os/errno.h>")]]

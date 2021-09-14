@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xbc912e3a */
+/* HASH CRC-32:0x9c564448 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -51,16 +51,27 @@ __NAMESPACE_LOCAL_BEGIN
 __LOCAL_LIBC(_ftime64_s) __ATTR_NONNULL((1)) __errno_t
 __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(_ftime64_s))(struct __timeb64 *__timebuf) {
 #ifdef __CRT_HAVE_ftime64
-	return (__NAMESPACE_LOCAL_SYM __localdep_crt_ftime64)(__timebuf) ? 0 : __libc_geterrno_or(EPERM);
+	if __likely((__NAMESPACE_LOCAL_SYM __localdep_crt_ftime64)(__timebuf) == 0)
+		return 0;
+#ifdef __EPERM
+	return __libc_geterrno_or(__EPERM);
+#else /* __EPERM */
+	return __libc_geterrno_or(1);
+#endif /* !__EPERM */
 #elif defined(__CRT_HAVE__ftime32_s) || defined(__CRT_HAVE_ftime)
 	struct __timeb32 __temp;
 #ifdef __CRT_HAVE__ftime32_s
 	__errno_t __error = (__NAMESPACE_LOCAL_SYM __localdep_crt_ftime32_s)(&__temp);
-	if (__error)
+	if __unlikely(__error)
 		return __error;
 #else /* __CRT_HAVE__ftime32_s */
-	if ((__NAMESPACE_LOCAL_SYM __localdep_crt_ftime32)(&__temp))
-		return __libc_geterrno_or(EPERM);
+	if __unlikely((__NAMESPACE_LOCAL_SYM __localdep_crt_ftime32)(&__temp)) {
+#ifdef __EPERM
+		return __libc_geterrno_or(__EPERM);
+#else /* __EPERM */
+		return __libc_geterrno_or(1);
+#endif /* !__EPERM */
+	}
 #endif /* !__CRT_HAVE__ftime32_s */
 	__timebuf->time     = (__time64_t)__temp.time;
 	__timebuf->millitm  = __temp.millitm;

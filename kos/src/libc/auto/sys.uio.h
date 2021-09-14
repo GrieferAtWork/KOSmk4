@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x11b5c208 */
+/* HASH CRC-32:0x6e2d5154 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -60,22 +60,22 @@ INTDEF WUNUSED NONNULL((2)) ssize_t NOTHROW_RPC(LIBDCALL libd_readv)(fd_t fd, st
  * @return: <= SUM(iov[*].iov_len): The actual amount of written bytes
  * @return: 0                     : No more data can be written */
 INTDEF NONNULL((2)) ssize_t NOTHROW_RPC(LIBDCALL libd_writev)(fd_t fd, struct iovec const *iov, __STDC_INT_AS_SIZE_T count);
-/* >> preadv(2)
+/* >> preadv(2), preadv64(2)
  * Same as  `readv(2)', but  read data  from a  file at  a
  * specific `offset', rather than the current R/W position
  * @return: <= SUM(iov[*].iov_len): The actual amount of read bytes */
 INTDEF WUNUSED NONNULL((2)) ssize_t NOTHROW_RPC(LIBDCALL libd_preadv)(fd_t fd, struct iovec const *iov, __STDC_INT_AS_SIZE_T count, off_t offset);
-/* >> pwritev(2)
+/* >> pwritev(2), pwritev64(2)
  * Same as  `writev(2)', but  write data  to a  file at  a
  * specific `offset', rather than the current R/W position
  * @return: <= SUM(iov[*].iov_len): The actual amount of written bytes */
 INTDEF NONNULL((2)) ssize_t NOTHROW_RPC(LIBDCALL libd_pwritev)(fd_t fd, struct iovec const *iov, __STDC_INT_AS_SIZE_T count, off_t offset);
-/* >> preadv(2)
+/* >> preadv(2), preadv64(2)
  * Same as  `readv(2)', but  read data  from a  file at  a
  * specific `offset', rather than the current R/W position
  * @return: <= SUM(iov[*].iov_len): The actual amount of read bytes */
 INTDEF WUNUSED NONNULL((2)) ssize_t NOTHROW_RPC(LIBDCALL libd_preadv64)(fd_t fd, struct iovec const *iov, __STDC_INT_AS_SIZE_T count, off64_t offset);
-/* >> pwritev(2)
+/* >> pwritev(2), pwritev64(2)
  * Same as  `writev(2)', but  write data  to a  file at  a
  * specific `offset', rather than the current R/W position
  * @return: <= SUM(iov[*].iov_len): The actual amount of written bytes */

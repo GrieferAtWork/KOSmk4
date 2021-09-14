@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xc5827a6a */
+/* HASH CRC-32:0xe3b22152 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -34,7 +34,8 @@ __SYSDECL_BEGIN
 #ifdef __CRT_HAVE_error
 #include <kos/anno.h>
 #include <bits/types.h>
-/* Helper  function  for printing  an error  message to  `stderr' and  possibly exiting  the program
+/* >> error(3)
+ * Helper  function  for printing  an error  message to  `stderr' and  possibly exiting  the program
  * The message is printed as: `<program_invocation_short_name>: <format...>[: <strerror(errnum)>]\n'
  * Also note that `stdout' is flushed before the message is printed.
  * If `STATUS' is non-zero, follow up with a call to `exit(status)' */
@@ -45,7 +46,8 @@ __LIBC __ATTR_LIBC_PRINTF(3, 4) void (__VLIBCCALL __libc_core_error)(int __statu
 #include <features.h>
 #if !defined(__NO_STDSTREAMS) && (defined(__CRT_HAVE_exit) || defined(__CRT_HAVE_quick_exit) || defined(__CRT_HAVE__exit) || defined(__CRT_HAVE__Exit)) && (defined(__CRT_HAVE_fputc) || defined(__CRT_HAVE_putc) || defined(__CRT_HAVE__IO_putc) || defined(__CRT_HAVE_fputc_unlocked) || defined(__CRT_HAVE_putc_unlocked) || (defined(__CRT_DOS) && defined(__CRT_HAVE__flsbuf)) || defined(__CRT_HAVE_fwrite) || defined(__CRT_HAVE__IO_fwrite) || defined(__CRT_HAVE_fwrite_s) || defined(__CRT_HAVE_fwrite_unlocked) || defined(__CRT_HAVE__fwrite_nolock)) && defined(__LOCAL_program_invocation_short_name)
 #include <libc/local/error/error.h>
-/* Helper  function  for printing  an error  message to  `stderr' and  possibly exiting  the program
+/* >> error(3)
+ * Helper  function  for printing  an error  message to  `stderr' and  possibly exiting  the program
  * The message is printed as: `<program_invocation_short_name>: <format...>[: <strerror(errnum)>]\n'
  * Also note that `stdout' is flushed before the message is printed.
  * If `STATUS' is non-zero, follow up with a call to `exit(status)' */
@@ -60,7 +62,8 @@ __LIBC __ATTR_LIBC_PRINTF(3, 4) void (__VLIBCCALL __libc_core_error)(int __statu
 #ifdef __CRT_HAVE_error_at_line
 #include <kos/anno.h>
 #include <bits/types.h>
-/* Same as `error()', but also include the given filename in the error message.
+/* >> error_at_line(3)
+ * Same as `error()', but also include the given filename in the error message.
  * The message is printed as: `<program_invocation_short_name>:<filename>:<line>: <format...>[: <strerror(errnum)>]\n'
  * Additionally,    when   `error_one_per_line'   is    non-zero,   consecutive   calls    to   this   function   that
  * pass the same values for `filename' and `line' will not produce the error message. */
@@ -71,7 +74,8 @@ __LIBC __ATTR_LIBC_PRINTF(5, 6) void (__VLIBCCALL __libc_core_error_at_line)(int
 #include <features.h>
 #if !defined(__NO_STDSTREAMS) && (defined(__CRT_HAVE_exit) || defined(__CRT_HAVE_quick_exit) || defined(__CRT_HAVE__exit) || defined(__CRT_HAVE__Exit)) && (defined(__CRT_HAVE_fputc) || defined(__CRT_HAVE_putc) || defined(__CRT_HAVE__IO_putc) || defined(__CRT_HAVE_fputc_unlocked) || defined(__CRT_HAVE_putc_unlocked) || (defined(__CRT_DOS) && defined(__CRT_HAVE__flsbuf)) || defined(__CRT_HAVE_fwrite) || defined(__CRT_HAVE__IO_fwrite) || defined(__CRT_HAVE_fwrite_s) || defined(__CRT_HAVE_fwrite_unlocked) || defined(__CRT_HAVE__fwrite_nolock)) && defined(__LOCAL_program_invocation_short_name)
 #include <libc/local/error/error_at_line.h>
-/* Same as `error()', but also include the given filename in the error message.
+/* >> error_at_line(3)
+ * Same as `error()', but also include the given filename in the error message.
  * The message is printed as: `<program_invocation_short_name>:<filename>:<line>: <format...>[: <strerror(errnum)>]\n'
  * Additionally,    when   `error_one_per_line'   is    non-zero,   consecutive   calls    to   this   function   that
  * pass the same values for `filename' and `line' will not produce the error message. */

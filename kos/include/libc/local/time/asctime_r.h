@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x3a8dfe9f */
+/* HASH CRC-32:0x7f5b2c89 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -71,19 +71,6 @@ __NAMESPACE_LOCAL_END
 __NAMESPACE_LOCAL_BEGIN
 __LOCAL_LIBC(asctime_r) __ATTR_NONNULL((1, 2)) char *
 __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(asctime_r))(struct __NAMESPACE_STD_SYM tm const *__restrict __tp, char __buf[26]) {
-
-
-
-
-
-
-
-
-
-
-
-
-
 #ifdef __CRT_HAVE_asctime_s
 	return (__NAMESPACE_LOCAL_SYM __localdep_crt_asctime_s)(__buf, 26, __tp) ? __NULLPTR : __buf;
 #else /* __CRT_HAVE_asctime_s */

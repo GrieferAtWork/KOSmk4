@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x7bfd558a */
+/* HASH CRC-32:0xd7306685 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -182,6 +182,7 @@ __CREDIRECT(__ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1)),void *,__NOTHROW_NCX,
  * Return `NULL' if `needle' wasn't found. */
 #define __libc_core_memrchr __NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(memrchr)
 #endif /* !__CRT_HAVE_memrchr */
+#include <features.h>
 #if defined(__CRT_HAVE_memmem0) && defined(__USE_MEMMEM_EMPTY_NEEDLE_NULL)
 #include <hybrid/typecore.h>
 /* >> memmem(3)

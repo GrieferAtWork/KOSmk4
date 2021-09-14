@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xe49b3a5d */
+/* HASH CRC-32:0x64d774c4 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -42,7 +42,7 @@ __NOTHROW_RPC(__LIBCCALL __LIBC_LOCAL_NAME(utimensat64))(__fd_t __dirfd, char co
 	__tms[0].tv_nsec = __times[0].tv_nsec;
 	__tms[1].tv_sec  = (__time32_t)__times[1].tv_sec;
 	__tms[1].tv_nsec = __times[1].tv_nsec;
-	if (__flags & 0x0200) /* AT_CHANGE_CTIME */ {
+	if (__flags & __AT_CHANGE_CTIME) {
 		__tms[2].tv_sec  = (__time32_t)__times[2].tv_sec;
 		__tms[2].tv_nsec = __times[2].tv_nsec;
 	}

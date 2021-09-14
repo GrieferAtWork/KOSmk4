@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x65c119a9 */
+/* HASH CRC-32:0xdc721e79 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -26,6 +26,9 @@
 __NAMESPACE_LOCAL_BEGIN
 #ifndef __local___localdep_dos_localtime_s_defined
 #define __local___localdep_dos_localtime_s_defined 1
+__NAMESPACE_LOCAL_END
+#include <features.h>
+__NAMESPACE_LOCAL_BEGIN
 #if defined(__CRT_HAVE__localtime32_s) && defined(__USE_TIME_BITS64)
 __CREDIRECT(__ATTR_NONNULL((1, 2)),__errno_t,__NOTHROW_NCX,__localdep_dos_localtime_s,(struct __NAMESPACE_STD_SYM tm *__restrict __tp, __TM_TYPE(time) const *__restrict __timer),_localtime32_s,(__tp,__timer))
 #elif defined(__CRT_HAVE__localtime64_s) && !defined(__USE_TIME_BITS64)

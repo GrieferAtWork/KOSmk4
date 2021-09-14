@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xd43ebb7b */
+/* HASH CRC-32:0x2827beeb */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -216,6 +216,7 @@ typedef struct __dirstream DIR;
 __CDECLARE(__ATTR_WUNUSED __ATTR_NONNULL((1)),DIR *,__NOTHROW_RPC,opendir,(char const *__name),(__name))
 #else /* __CRT_HAVE_opendir */
 #include <asm/os/fcntl.h>
+#include <asm/os/oflags.h>
 #if defined(__AT_FDCWD) && (defined(__CRT_HAVE_opendirat) || defined(__CRT_HAVE_fopendirat) || (defined(__CRT_HAVE_fdopendir) && (defined(__CRT_HAVE_openat64) || defined(__CRT_HAVE_openat))))
 #include <libc/local/dirent/opendir.h>
 /* >> opendir(3)
@@ -229,22 +230,28 @@ __NAMESPACE_LOCAL_USING_OR_IMPL(opendir, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_W
 /* >> fopendirat(3)
  * Directory-handle-relative, and flags-enabled versions of `opendir(3)' */
 __CDECLARE(__ATTR_WUNUSED __ATTR_NONNULL((2)),DIR *,__NOTHROW_RPC,fopendirat,(__fd_t __dirfd, char const *__name, __oflag_t __oflags),(__dirfd,__name,__oflags))
-#elif defined(__CRT_HAVE_fdopendir) && (defined(__CRT_HAVE_openat64) || defined(__CRT_HAVE_openat))
+#else /* __CRT_HAVE_fopendirat */
+#include <asm/os/oflags.h>
+#if defined(__CRT_HAVE_fdopendir) && (defined(__CRT_HAVE_openat64) || defined(__CRT_HAVE_openat))
 #include <libc/local/dirent/fopendirat.h>
 /* >> fopendirat(3)
  * Directory-handle-relative, and flags-enabled versions of `opendir(3)' */
 __NAMESPACE_LOCAL_USING_OR_IMPL(fopendirat, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_WUNUSED __ATTR_NONNULL((2)) DIR *__NOTHROW_RPC(__LIBCCALL fopendirat)(__fd_t __dirfd, char const *__name, __oflag_t __oflags) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(fopendirat))(__dirfd, __name, __oflags); })
-#endif /* ... */
+#endif /* __CRT_HAVE_fdopendir && (__CRT_HAVE_openat64 || __CRT_HAVE_openat) */
+#endif /* !__CRT_HAVE_fopendirat */
 #ifdef __CRT_HAVE_opendirat
 /* >> opendirat(3)
  * Directory-handle-relative, and flags-enabled versions of `opendir(3)' */
 __CDECLARE(__ATTR_WUNUSED __ATTR_NONNULL((2)),DIR *,__NOTHROW_RPC,opendirat,(__fd_t __dirfd, char const *__name),(__dirfd,__name))
-#elif defined(__CRT_HAVE_fopendirat) || (defined(__CRT_HAVE_fdopendir) && (defined(__CRT_HAVE_openat64) || defined(__CRT_HAVE_openat)))
+#else /* __CRT_HAVE_opendirat */
+#include <asm/os/oflags.h>
+#if defined(__CRT_HAVE_fopendirat) || (defined(__CRT_HAVE_fdopendir) && (defined(__CRT_HAVE_openat64) || defined(__CRT_HAVE_openat)))
 #include <libc/local/dirent/opendirat.h>
 /* >> opendirat(3)
  * Directory-handle-relative, and flags-enabled versions of `opendir(3)' */
 __NAMESPACE_LOCAL_USING_OR_IMPL(opendirat, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_WUNUSED __ATTR_NONNULL((2)) DIR *__NOTHROW_RPC(__LIBCCALL opendirat)(__fd_t __dirfd, char const *__name) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(opendirat))(__dirfd, __name); })
-#endif /* ... */
+#endif /* __CRT_HAVE_fopendirat || (__CRT_HAVE_fdopendir && (__CRT_HAVE_openat64 || __CRT_HAVE_openat)) */
+#endif /* !__CRT_HAVE_opendirat */
 #endif /* __USE_KOS && __USE_ATFILE */
 
 /* >> closedir(3)

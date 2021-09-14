@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x6fbaea2f */
+/* HASH CRC-32:0x2f081a67 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -22,9 +22,9 @@
 #define __local_tell_defined 1
 #include <__crt.h>
 #include <asm/os/stdio.h>
-#if (defined(__CRT_HAVE_lseek64) || defined(__CRT_HAVE__lseeki64) || defined(__CRT_HAVE_lseek) || defined(__CRT_HAVE__lseek) || defined(__CRT_HAVE___lseek)) && defined(__SEEK_CUR)
 #include <features.h>
 #include <bits/types.h>
+#if (defined(__CRT_HAVE_lseek64) || defined(__CRT_HAVE__lseeki64) || defined(__CRT_HAVE_lseek) || defined(__CRT_HAVE__lseek) || defined(__CRT_HAVE___lseek)) && defined(__SEEK_CUR)
 __NAMESPACE_LOCAL_BEGIN
 #ifndef __local___localdep_lseek_defined
 #define __local___localdep_lseek_defined 1

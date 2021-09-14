@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xd32dd9be */
+/* HASH CRC-32:0x10f2ccd1 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -22,6 +22,8 @@
 #define __local_opendir_defined 1
 #include <__crt.h>
 #include <asm/os/fcntl.h>
+#include <features.h>
+#include <asm/os/oflags.h>
 #if defined(__AT_FDCWD) && (defined(__CRT_HAVE_opendirat) || defined(__CRT_HAVE_fopendirat) || (defined(__CRT_HAVE_fdopendir) && (defined(__CRT_HAVE_openat64) || defined(__CRT_HAVE_openat))))
 struct __dirstream;
 __NAMESPACE_LOCAL_BEGIN

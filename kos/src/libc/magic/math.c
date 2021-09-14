@@ -1341,7 +1341,7 @@ void sincosf(float x, [[nonnull]] float *psinx, [[nonnull]] float *pcosx) {
 %#ifdef __COMPILER_HAVE_LONGDOUBLE
 [[nothrow, crtbuiltin, export_alias("__sincosl"), doc_alias("sincos")]]
 [[attribute("__DECL_SIMD_sincosl"), decl_include("<bits/crt/math-vector.h>")]]
-[[if(defined(__ARCH_LONG_DOUBLE_IS_DOUBLE)), alias("__sincos", "sincos")]]
+[[if($extended_include_prefix("<hybrid/typecore.h>")defined(__ARCH_LONG_DOUBLE_IS_DOUBLE)), alias("__sincos", "sincos")]]
 [[requires_function(sincos)]]
 void sincosl(__LONGDOUBLE x, [[nonnull]] __LONGDOUBLE *psinx, [[nonnull]] __LONGDOUBLE *pcosx) {
 	double sinx, cosx;

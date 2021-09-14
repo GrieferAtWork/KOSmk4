@@ -108,7 +108,7 @@ typedef __rtm_status_t rtm_status_t;
 @@@return: RTM_NOSYS   : RTM isn't supposed because the RTM driver is missing, or cannot be loaded.
 @@@return: RTM_ABORT_* : RTM operation failed (s.a. code from `<kos/rtm.h>')
 [[nothrow, decl_include("<kos/bits/rtm.h>"), crt_kos_impl_requires(!defined(LIBC_ARCH_HAVE_RTM_BEGIN))]]
-[[if(defined(__arch_rtm_begin)), preferred_fast_extern_inline("rtm_begin", { return __arch_rtm_begin(); })]]
+[[if($extended_include_prefix("<kos/bits/rtm.h>")defined(__arch_rtm_begin)), preferred_fast_extern_inline("rtm_begin", { return __arch_rtm_begin(); })]]
 [[userimpl, requires_include("<kos/bits/rtm.h>"), requires(defined(__arch_rtm_begin))]]
 rtm_status_t rtm_begin() {
 	return __arch_rtm_begin();
@@ -120,7 +120,7 @@ rtm_status_t rtm_begin() {
 @@If the transaction failed, `rtm_begin()' returns `RTM_ABORT_*'
 @@If no transaction was in  progress, the behavior is  undefined
 [[nothrow, crt_kos_impl_requires(!defined(LIBC_ARCH_HAVE_RTM_END))]]
-[[if(defined(__arch_rtm_end)), preferred_fast_extern_inline("rtm_end", { __arch_rtm_end(); })]]
+[[if($extended_include_prefix("<kos/bits/rtm.h>")defined(__arch_rtm_end)), preferred_fast_extern_inline("rtm_end", { __arch_rtm_end(); })]]
 [[userimpl, requires_include("<kos/bits/rtm.h>"), requires(defined(__arch_rtm_end))]]
 void rtm_end() {
 	__arch_rtm_end();
@@ -132,7 +132,7 @@ void rtm_end() {
 @@If no  transaction  was  in  progress, behave  as  a  no-op.  Otherwise,  this
 @@function does not return normally, but returns from the original `rtm_begin()'
 [[nothrow, crt_kos_impl_requires(!defined(LIBC_ARCH_HAVE_RTM_ABORT))]]
-[[if(defined(__arch_rtm_abort)), preferred_fast_extern_inline("rtm_abort", { __arch_rtm_abort(code); })]]
+[[if($extended_include_prefix("<kos/bits/rtm.h>")defined(__arch_rtm_abort)), preferred_fast_extern_inline("rtm_abort", { __arch_rtm_abort(code); })]]
 [[userimpl, requires_include("<kos/bits/rtm.h>"), requires(defined(__arch_rtm_abort))]]
 [[no_crt_dos_wrapper, cc(__FCALL)]]
 void rtm_abort(unsigned int code) {
@@ -144,7 +144,7 @@ void rtm_abort(unsigned int code) {
 @@@return: 0 : No RTM operation in progress
 @@@return: 1 : An RTM operation is currently in progress
 [[nothrow, crt_kos_impl_requires(!defined(LIBC_ARCH_HAVE_RTM_TEST))]]
-[[if(defined(__arch_rtm_test)), preferred_fast_extern_inline("rtm_test", { return __arch_rtm_test(); })]]
+[[if($extended_include_prefix("<kos/bits/rtm.h>")defined(__arch_rtm_test)), preferred_fast_extern_inline("rtm_test", { return __arch_rtm_test(); })]]
 [[userimpl, requires_include("<kos/bits/rtm.h>"), requires(defined(__arch_rtm_test))]]
 [[wunused, ATTR_PURE]]
 int rtm_test() {

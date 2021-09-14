@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xe4671027 */
+/* HASH CRC-32:0xa7adf34 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -33,10 +33,11 @@ DECL_BEGIN
 /* >> remove(3)
  * Remove a file or directory `filename' */
 INTDEF NONNULL((1)) int NOTHROW_RPC(LIBDCALL libd_remove)(char const *filename);
-/* >> rename(3)
+/* >> rename(2)
  * Rename  a given file `oldname' to `newname_or_path', or in the event
  * that `newname_or_path' refers to a directory, place the file within. */
 INTDEF NONNULL((1, 2)) int NOTHROW_RPC(LIBDCALL libd_rename)(char const *oldname, char const *newname_or_path);
+/* >> tmpnam(3), tmpnam_r(3) */
 INTDEF WUNUSED NONNULL((1)) char *NOTHROW_NCX(LIBDCALL libd_tmpnam)(char *buf);
 /* >> fclose(3)
  * Close and destroy a given file `stream' */
@@ -58,7 +59,7 @@ INTDEF NONNULL((1)) void NOTHROW_NCX(LIBCCALL libc_setbuf)(FILE *__restrict stre
  * Set the buffer and buffer-mode to-be used by the given `stream'
  * @param modes: One of `_IOFBF', `_IOLBF' or `_IONBF' */
 INTDEF NONNULL((1)) int NOTHROW_NCX(LIBDCALL libd_setvbuf)(FILE *__restrict stream, char *__restrict buf, __STDC_INT_AS_UINT_T modes, size_t bufsize);
-/* >> fgetc(3)
+/* >> getc(3), fgetc(3)
  * Read and return a single character from `stream'
  * If  the given `stream' has been exhausted or if an error occurred, `EOF' is
  * returned and the exact cause can be determined by using `ferror' and `feof' */
@@ -70,7 +71,7 @@ INTDEF NONNULL((1)) int (LIBDCALL libd_fgetc)(FILE *__restrict stream) THROWS(..
 INTDEF int (LIBCCALL libc_getchar)(void) THROWS(...);
 #endif /* !__KERNEL__ */
 #if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
-/* >> fputc(3)
+/* >> putc(3), fputc(3)
  * Write a single character `ch' to `stream' */
 INTDEF NONNULL((2)) int (LIBDCALL libd_fputc)(int ch, FILE *__restrict stream) THROWS(...);
 /* >> putchar(3)
@@ -98,24 +99,30 @@ INTDEF WUNUSED NONNULL((1, 3)) char *(LIBCCALL libc_fgets)(char *__restrict buf,
 #endif /* !__KERNEL__ */
 #if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
 /* >> fputs(3)
- * Print a given string `str' to `stream'. This is identical to:
- * >> fwrite(str, sizeof(char), strlen(str), stream); */
-INTDEF NONNULL((1, 2)) __STDC_INT_AS_SSIZE_T (LIBDCALL libd_fputs)(char const *__restrict str, FILE *__restrict stream) THROWS(...);
+ * Print a given string `string' to `stream'. This is identical to:
+ * >> fwrite(string, sizeof(char), strlen(string), stream); */
+INTDEF NONNULL((1, 2)) __STDC_INT_AS_SSIZE_T (LIBDCALL libd_fputs)(char const *__restrict string, FILE *__restrict stream) THROWS(...);
 #endif /* !__LIBCCALL_IS_LIBDCALL && !__KERNEL__ */
 #ifndef __KERNEL__
 /* >> fputs(3)
- * Print a given string `str' to `stream'. This is identical to:
- * >> fwrite(str, sizeof(char), strlen(str), stream); */
-INTDEF NONNULL((1, 2)) __STDC_INT_AS_SSIZE_T (LIBCCALL libc_fputs)(char const *__restrict str, FILE *__restrict stream) THROWS(...);
+ * Print a given string `string' to `stream'. This is identical to:
+ * >> fwrite(string, sizeof(char), strlen(string), stream); */
+INTDEF NONNULL((1, 2)) __STDC_INT_AS_SSIZE_T (LIBCCALL libc_fputs)(char const *__restrict string, FILE *__restrict stream) THROWS(...);
 #endif /* !__KERNEL__ */
 #if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
 /* >> puts(3)
- * Print a given string `str', followed by a line-feed to `stdout' */
+ * Print a given string `string', followed by a line-feed to `stdout'. This is identical to:
+ * >> fputs(string, stdout);
+ * >> putchar('\n');
+ * Return the number of written characters, or `EOF' on error */
 INTDEF NONNULL((1)) __STDC_INT_AS_SSIZE_T (LIBDCALL libd_puts)(char const *__restrict string) THROWS(...);
 #endif /* !__LIBCCALL_IS_LIBDCALL && !__KERNEL__ */
 #ifndef __KERNEL__
 /* >> puts(3)
- * Print a given string `str', followed by a line-feed to `stdout' */
+ * Print a given string `string', followed by a line-feed to `stdout'. This is identical to:
+ * >> fputs(string, stdout);
+ * >> putchar('\n');
+ * Return the number of written characters, or `EOF' on error */
 INTDEF NONNULL((1)) __STDC_INT_AS_SSIZE_T (LIBCCALL libc_puts)(char const *__restrict string) THROWS(...);
 #endif /* !__KERNEL__ */
 #if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
@@ -373,7 +380,7 @@ INTDEF NONNULL((2)) int NOTHROW_RPC(LIBDCALL libd_removeat)(fd_t dirfd, char con
 /* >> frenameat(2)
  * @param flags: Set of `0 | AT_DOSPATH' */
 INTDEF NONNULL((2, 4)) int NOTHROW_RPC(LIBDCALL libd_frenameat)(fd_t oldfd, char const *oldname, fd_t newfd, char const *newname_or_path, atflag_t flags);
-/* >> tmpnam_r(3) */
+/* >> tmpnam(3), tmpnam_r(3) */
 INTDEF WUNUSED NONNULL((1)) char *NOTHROW_NCX(LIBDCALL libd_tmpnam_r)(char *buf);
 /* >> setbuffer(3)
  * Specify the location and size for the buffer to-be used by `stream' */

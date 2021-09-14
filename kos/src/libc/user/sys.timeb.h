@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x37ee2537 */
+/* HASH CRC-32:0x66037c4e */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -31,17 +31,35 @@
 DECL_BEGIN
 
 #ifndef __KERNEL__
-/* Fill in TIMEBUF with information about the current time */
+/* >> ftime(3), ftime64(3)
+ * Write information about the current time to `*timebuf'
+ * @return: 0 : Success
+ * @return: -1: Error (s.a. `errno') */
 INTDEF NONNULL((1)) void NOTHROW_NCX(LIBCCALL libc__ftime32)(struct timeb32 *timebuf);
-/* Fill in TIMEBUF with information about the current time */
+/* >> ftime(3), ftime64(3)
+ * Write information about the current time to `*timebuf'
+ * @return: 0 : Success
+ * @return: -1: Error (s.a. `errno') */
 INTDEF NONNULL((1)) void NOTHROW_NCX(LIBCCALL libc__ftime64)(struct timeb64 *timebuf);
-/* Fill in TIMEBUF with information about the current time */
+/* >> ftime(3), ftime64(3)
+ * Write information about the current time to `*timebuf'
+ * @return: 0 : Success
+ * @return: -1: Error (s.a. `errno') */
 INTDEF NONNULL((1)) errno_t NOTHROW_NCX(LIBCCALL libc__ftime32_s)(struct timeb32 *timebuf);
-/* Fill in TIMEBUF with information about the current time */
+/* >> ftime(3), ftime64(3)
+ * Write information about the current time to `*timebuf'
+ * @return: 0 : Success
+ * @return: -1: Error (s.a. `errno') */
 INTDEF NONNULL((1)) errno_t NOTHROW_NCX(LIBCCALL libc__ftime64_s)(struct timeb64 *timebuf);
-/* Fill in TIMEBUF with information about the current time */
+/* >> ftime(3), ftime64(3)
+ * Write information about the current time to `*timebuf'
+ * @return: 0 : Success
+ * @return: -1: Error (s.a. `errno') */
 INTDEF NONNULL((1)) int NOTHROW_NCX(LIBCCALL libc_ftime)(struct timeb *timebuf);
-/* Fill in TIMEBUF with information about the current time */
+/* >> ftime(3), ftime64(3)
+ * Write information about the current time to `*timebuf'
+ * @return: 0 : Success
+ * @return: -1: Error (s.a. `errno') */
 INTDEF NONNULL((1)) int NOTHROW_NCX(LIBCCALL libc_ftime64)(struct timeb64 *timebuf);
 #endif /* !__KERNEL__ */
 

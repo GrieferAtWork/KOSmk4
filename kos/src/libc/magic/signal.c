@@ -1279,7 +1279,7 @@ $sighandler_t sysv_signal($signo_t signo, $sighandler_t handler) {
 @@@return: * :      The previous signal handler function.
 @@@return: SIG_ERR: Error (s.a. `errno')
 [[std, no_crt_self_import, alias("sysv_signal")]]
-[[if(defined(__USE_MISC)), preferred_alias("signal", "_signal")]]
+[[if($extended_include_prefix("<features.h>")defined(__USE_MISC)), preferred_alias("signal", "_signal")]]
 [[crt_dos_variant, dos_export_as("DOS$_signal")]]
 [[decl_include("<bits/types.h>", "<bits/os/sigaction.h>")]]
 $sighandler_t signal($signo_t signo, $sighandler_t handler);
@@ -1741,8 +1741,8 @@ int sigtimedwait32([[nonnull]] $sigset_t const *__restrict set,
 @@@return: -1: [errno=EINTR]  The signal handler for `signo' was executed.
 @@@return: -1: [errno=EAGAIN] A total of `rel_timeout' has passed.
 [[cp, no_crt_self_import, decl_include("<bits/os/siginfo.h>")]]
-[[if(defined(__USE_TIME_BITS64)), preferred_alias("sigtimedwait64")]]
-[[if(!defined(__USE_TIME_BITS64)), preferred_alias("sigtimedwait")]]
+[[if($extended_include_prefix("<features.h>") defined(__USE_TIME_BITS64)), preferred_alias("sigtimedwait64")]]
+[[if($extended_include_prefix("<features.h>")!defined(__USE_TIME_BITS64)), preferred_alias("sigtimedwait")]]
 [[userimpl, requires($has_function(sigtimedwait32) || $has_function(sigtimedwait64))]]
 int sigtimedwait([[nonnull]] $sigset_t const *__restrict set,
                  [[nullable]] siginfo_t *__restrict info,

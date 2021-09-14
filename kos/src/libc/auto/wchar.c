@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xc5892def */
+/* HASH CRC-32:0x735e7df1 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -5069,6 +5069,7 @@ NOTHROW_NCX(LIBKCALL libc_wcslcpy)(char32_t *__restrict dst,
 	return result;
 }
 #include <libc/errno.h>
+/* >> wcscat_s(3) */
 INTERN ATTR_SECTION(".text.crt.dos.wchar.string.memory") errno_t
 NOTHROW_NCX(LIBDCALL libd_wcscat_s)(char16_t *dst,
                                     size_t dstsize,
@@ -5088,6 +5089,7 @@ NOTHROW_NCX(LIBDCALL libd_wcscat_s)(char16_t *dst,
 	return 0;
 }
 #include <libc/errno.h>
+/* >> wcscat_s(3) */
 INTERN ATTR_SECTION(".text.crt.dos.wchar.string.memory") errno_t
 NOTHROW_NCX(LIBKCALL libc_wcscat_s)(char32_t *dst,
                                     size_t dstsize,
@@ -5108,6 +5110,7 @@ NOTHROW_NCX(LIBKCALL libc_wcscat_s)(char32_t *dst,
 }
 #include <libc/errno.h>
 #include <libc/string.h>
+/* >> wcscpy_s(3) */
 INTERN ATTR_SECTION(".text.crt.dos.wchar.string.memory") errno_t
 NOTHROW_NCX(LIBDCALL libd_wcscpy_s)(char16_t *dst,
                                     size_t dstsize,
@@ -5129,6 +5132,7 @@ NOTHROW_NCX(LIBDCALL libd_wcscpy_s)(char16_t *dst,
 }
 #include <libc/errno.h>
 #include <libc/string.h>
+/* >> wcscpy_s(3) */
 INTERN ATTR_SECTION(".text.crt.dos.wchar.string.memory") errno_t
 NOTHROW_NCX(LIBKCALL libc_wcscpy_s)(char32_t *dst,
                                     size_t dstsize,
@@ -5150,6 +5154,7 @@ NOTHROW_NCX(LIBKCALL libc_wcscpy_s)(char32_t *dst,
 }
 #include <libc/errno.h>
 #include <libc/string.h>
+/* >> wcsncat_s(3) */
 INTERN ATTR_SECTION(".text.crt.dos.wchar.string.memory") errno_t
 NOTHROW_NCX(LIBDCALL libd_wcsncat_s)(char16_t *dst,
                                      rsize_t dstsize,
@@ -5191,6 +5196,7 @@ NOTHROW_NCX(LIBDCALL libd_wcsncat_s)(char16_t *dst,
 }
 #include <libc/errno.h>
 #include <libc/string.h>
+/* >> wcsncat_s(3) */
 INTERN ATTR_SECTION(".text.crt.dos.wchar.string.memory") errno_t
 NOTHROW_NCX(LIBKCALL libc_wcsncat_s)(char32_t *dst,
                                      rsize_t dstsize,
@@ -5232,6 +5238,7 @@ NOTHROW_NCX(LIBKCALL libc_wcsncat_s)(char32_t *dst,
 }
 #include <libc/errno.h>
 #include <libc/string.h>
+/* >> wcsncpy_s(3) */
 INTERN ATTR_SECTION(".text.crt.dos.wchar.string.memory") errno_t
 NOTHROW_NCX(LIBDCALL libd_wcsncpy_s)(char16_t *dst,
                                      size_t dstsize,
@@ -5273,6 +5280,7 @@ NOTHROW_NCX(LIBDCALL libd_wcsncpy_s)(char16_t *dst,
 }
 #include <libc/errno.h>
 #include <libc/string.h>
+/* >> wcsncpy_s(3) */
 INTERN ATTR_SECTION(".text.crt.dos.wchar.string.memory") errno_t
 NOTHROW_NCX(LIBKCALL libc_wcsncpy_s)(char32_t *dst,
                                      size_t dstsize,
@@ -5596,6 +5604,7 @@ NOTHROW_NCX(LIBKCALL libc_wmemmove_s)(char32_t *dst,
 	__libc_memmovec(dst, src, srclength, 4);
 	return 0;
 }
+/* >> wcsnset(3) */
 INTERN ATTR_SECTION(".text.crt.dos.wchar.string.memory") ATTR_RETNONNULL NONNULL((1)) char16_t *
 NOTHROW_NCX(LIBDCALL libd_wcsnset)(char16_t *__restrict str,
                                    char16_t ch,
@@ -5605,6 +5614,7 @@ NOTHROW_NCX(LIBDCALL libd_wcsnset)(char16_t *__restrict str,
 		*iter = (char16_t)ch;
 	return str;
 }
+/* >> wcsnset(3) */
 INTERN ATTR_SECTION(".text.crt.dos.wchar.string.memory") ATTR_RETNONNULL NONNULL((1)) char32_t *
 NOTHROW_NCX(LIBKCALL libc_wcsnset)(char32_t *__restrict str,
                                    char32_t ch,
@@ -5614,6 +5624,7 @@ NOTHROW_NCX(LIBKCALL libc_wcsnset)(char32_t *__restrict str,
 		*iter = (char32_t)ch;
 	return str;
 }
+/* >> wcsrev(3) */
 INTERN ATTR_SECTION(".text.crt.dos.wchar.string.memory") ATTR_RETNONNULL NONNULL((1)) char16_t *
 NOTHROW_NCX(LIBDCALL libd_wcsrev)(char16_t *__restrict str) {
 
@@ -5624,6 +5635,7 @@ NOTHROW_NCX(LIBDCALL libd_wcsrev)(char16_t *__restrict str) {
 
 
 }
+/* >> wcsrev(3) */
 INTERN ATTR_SECTION(".text.crt.dos.wchar.string.memory") ATTR_RETNONNULL NONNULL((1)) char32_t *
 NOTHROW_NCX(LIBKCALL libc_wcsrev)(char32_t *__restrict str) {
 
@@ -5634,6 +5646,7 @@ NOTHROW_NCX(LIBKCALL libc_wcsrev)(char32_t *__restrict str) {
 
 
 }
+/* >> wcsset(3) */
 INTERN ATTR_SECTION(".text.crt.dos.wchar.string.memory") ATTR_LEAF ATTR_RETNONNULL NONNULL((1)) char16_t *
 NOTHROW_NCX(LIBDCALL libd_wcsset)(char16_t *__restrict str,
                                   int ch) {
@@ -5642,6 +5655,7 @@ NOTHROW_NCX(LIBDCALL libd_wcsset)(char16_t *__restrict str,
 		*iter = (char16_t)ch;
 	return str;
 }
+/* >> wcsset(3) */
 INTERN ATTR_SECTION(".text.crt.dos.wchar.string.memory") ATTR_LEAF ATTR_RETNONNULL NONNULL((1)) char32_t *
 NOTHROW_NCX(LIBKCALL libc_wcsset)(char32_t *__restrict str,
                                   int ch) {
@@ -5650,6 +5664,7 @@ NOTHROW_NCX(LIBKCALL libc_wcsset)(char32_t *__restrict str,
 		*iter = (char32_t)ch;
 	return str;
 }
+/* >> wcslwr(3) */
 INTERN ATTR_SECTION(".text.crt.dos.wchar.unicode.static.memory") ATTR_RETNONNULL NONNULL((1)) char16_t *
 NOTHROW_NCX(LIBDCALL libd_wcslwr)(char16_t *__restrict str) {
 	char16_t *iter, ch;
@@ -5657,6 +5672,7 @@ NOTHROW_NCX(LIBDCALL libd_wcslwr)(char16_t *__restrict str) {
 		*iter = (char16_t)libd_towlower((char16_t)ch);
 	return str;
 }
+/* >> wcslwr(3) */
 INTERN ATTR_SECTION(".text.crt.dos.wchar.unicode.static.memory") ATTR_RETNONNULL NONNULL((1)) char32_t *
 NOTHROW_NCX(LIBKCALL libc_wcslwr)(char32_t *__restrict str) {
 	char32_t *iter, ch;
@@ -5664,6 +5680,7 @@ NOTHROW_NCX(LIBKCALL libc_wcslwr)(char32_t *__restrict str) {
 		*iter = (char32_t)libc_towlower((char32_t)ch);
 	return str;
 }
+/* >> wcsupr(3) */
 INTERN ATTR_SECTION(".text.crt.dos.wchar.unicode.static.memory") ATTR_RETNONNULL NONNULL((1)) char16_t *
 NOTHROW_NCX(LIBDCALL libd_wcsupr)(char16_t *__restrict str) {
 	char16_t *iter, ch;
@@ -5671,6 +5688,7 @@ NOTHROW_NCX(LIBDCALL libd_wcsupr)(char16_t *__restrict str) {
 		*iter = (char16_t)libd_towupper((char16_t)ch);
 	return str;
 }
+/* >> wcsupr(3) */
 INTERN ATTR_SECTION(".text.crt.dos.wchar.unicode.static.memory") ATTR_RETNONNULL NONNULL((1)) char32_t *
 NOTHROW_NCX(LIBKCALL libc_wcsupr)(char32_t *__restrict str) {
 	char32_t *iter, ch;

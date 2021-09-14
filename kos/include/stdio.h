@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x4debb935 */
+/* HASH CRC-32:0x4fc6aa3 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -472,12 +472,12 @@ __NAMESPACE_LOCAL_USING_OR_IMPL(remove, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_NO
 #ifndef __std_rename_defined
 #define __std_rename_defined 1
 #ifdef __rename_defined
-/* >> rename(3)
+/* >> rename(2)
  * Rename  a given file `oldname' to `newname_or_path', or in the event
  * that `newname_or_path' refers to a directory, place the file within. */
 __NAMESPACE_GLB_USING_OR_IMPL(rename, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_NONNULL((1, 2)) int __NOTHROW_RPC(__LIBCCALL rename)(char const *__oldname, char const *__newname_or_path) { return :: rename(__oldname, __newname_or_path); })
 #elif defined(__CRT_HAVE_rename)
-/* >> rename(3)
+/* >> rename(2)
  * Rename  a given file `oldname' to `newname_or_path', or in the event
  * that `newname_or_path' refers to a directory, place the file within. */
 __CDECLARE(__ATTR_NONNULL((1, 2)),int,__NOTHROW_RPC,rename,(char const *__oldname, char const *__newname_or_path),(__oldname,__newname_or_path))
@@ -489,7 +489,7 @@ __NAMESPACE_STD_BEGIN
 __NAMESPACE_STD_END
 #include <libc/local/stdio/rename.h>
 __NAMESPACE_STD_BEGIN
-/* >> rename(3)
+/* >> rename(2)
  * Rename  a given file `oldname' to `newname_or_path', or in the event
  * that `newname_or_path' refers to a directory, place the file within. */
 __NAMESPACE_LOCAL_USING_OR_IMPL(rename, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_NONNULL((1, 2)) int __NOTHROW_RPC(__LIBCCALL rename)(char const *__oldname, char const *__newname_or_path) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(rename))(__oldname, __newname_or_path); })
@@ -498,6 +498,7 @@ __NAMESPACE_LOCAL_USING_OR_IMPL(rename, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_NO
 #endif /* !__AT_FDCWD || (!__CRT_HAVE_renameat && !__CRT_HAVE_frenameat) */
 #endif /* !... */
 #endif /* !__std_rename_defined */
+/* >> tmpnam(3), tmpnam_r(3) */
 __CDECLARE_OPT(__ATTR_WUNUSED __ATTR_NONNULL((1)),char *,__NOTHROW_NCX,tmpnam,(char *__buf),(__buf))
 #ifdef __CRT_HAVE_fclose
 /* >> fclose(3)
@@ -581,43 +582,43 @@ __CREDIRECT(__ATTR_NONNULL((1)),int,__NOTHROW_NCX,setvbuf,(FILE *__restrict __st
 __CREDIRECT(__ATTR_NONNULL((1)),int,__NOTHROW_NCX,setvbuf,(FILE *__restrict __stream, char *__restrict __buf, __STDC_INT_AS_UINT_T __modes, size_t __bufsize),setvbuf_unlocked,(__stream,__buf,__modes,__bufsize))
 #endif /* ... */
 #if defined(__CRT_HAVE_fgetc_unlocked) && defined(__USE_STDIO_UNLOCKED)
-/* >> fgetc(3)
+/* >> getc(3), fgetc(3)
  * Read and return a single character from `stream'
  * If  the given `stream' has been exhausted or if an error occurred, `EOF' is
  * returned and the exact cause can be determined by using `ferror' and `feof' */
 __CREDIRECT(__ATTR_NONNULL((1)),int,__THROWING,fgetc,(FILE *__restrict __stream),fgetc_unlocked,(__stream))
 #elif defined(__CRT_HAVE_getc_unlocked) && defined(__USE_STDIO_UNLOCKED)
-/* >> fgetc(3)
+/* >> getc(3), fgetc(3)
  * Read and return a single character from `stream'
  * If  the given `stream' has been exhausted or if an error occurred, `EOF' is
  * returned and the exact cause can be determined by using `ferror' and `feof' */
 __CREDIRECT(__ATTR_NONNULL((1)),int,__THROWING,fgetc,(FILE *__restrict __stream),getc_unlocked,(__stream))
 #elif defined(__CRT_HAVE_fgetc)
-/* >> fgetc(3)
+/* >> getc(3), fgetc(3)
  * Read and return a single character from `stream'
  * If  the given `stream' has been exhausted or if an error occurred, `EOF' is
  * returned and the exact cause can be determined by using `ferror' and `feof' */
 __CDECLARE(__ATTR_NONNULL((1)),int,__THROWING,fgetc,(FILE *__restrict __stream),(__stream))
 #elif defined(__CRT_HAVE_getc)
-/* >> fgetc(3)
+/* >> getc(3), fgetc(3)
  * Read and return a single character from `stream'
  * If  the given `stream' has been exhausted or if an error occurred, `EOF' is
  * returned and the exact cause can be determined by using `ferror' and `feof' */
 __CREDIRECT(__ATTR_NONNULL((1)),int,__THROWING,fgetc,(FILE *__restrict __stream),getc,(__stream))
 #elif defined(__CRT_HAVE__IO_getc)
-/* >> fgetc(3)
+/* >> getc(3), fgetc(3)
  * Read and return a single character from `stream'
  * If  the given `stream' has been exhausted or if an error occurred, `EOF' is
  * returned and the exact cause can be determined by using `ferror' and `feof' */
 __CREDIRECT(__ATTR_NONNULL((1)),int,__THROWING,fgetc,(FILE *__restrict __stream),_IO_getc,(__stream))
 #elif defined(__CRT_HAVE_fgetc_unlocked)
-/* >> fgetc(3)
+/* >> getc(3), fgetc(3)
  * Read and return a single character from `stream'
  * If  the given `stream' has been exhausted or if an error occurred, `EOF' is
  * returned and the exact cause can be determined by using `ferror' and `feof' */
 __CREDIRECT(__ATTR_NONNULL((1)),int,__THROWING,fgetc,(FILE *__restrict __stream),fgetc_unlocked,(__stream))
 #elif defined(__CRT_HAVE_getc_unlocked)
-/* >> fgetc(3)
+/* >> getc(3), fgetc(3)
  * Read and return a single character from `stream'
  * If  the given `stream' has been exhausted or if an error occurred, `EOF' is
  * returned and the exact cause can be determined by using `ferror' and `feof' */
@@ -626,50 +627,50 @@ __CREDIRECT(__ATTR_NONNULL((1)),int,__THROWING,fgetc,(FILE *__restrict __stream)
 __NAMESPACE_STD_END
 #include <libc/local/stdio/fgetc.h>
 __NAMESPACE_STD_BEGIN
-/* >> fgetc(3)
+/* >> getc(3), fgetc(3)
  * Read and return a single character from `stream'
  * If  the given `stream' has been exhausted or if an error occurred, `EOF' is
  * returned and the exact cause can be determined by using `ferror' and `feof' */
 __NAMESPACE_LOCAL_USING_OR_IMPL(fgetc, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_NONNULL((1)) int (__LIBCCALL fgetc)(FILE *__restrict __stream) __THROWS(...) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(fgetc))(__stream); })
 #endif /* ... */
 #if defined(__CRT_HAVE_fgetc_unlocked) && defined(__USE_STDIO_UNLOCKED)
-/* >> fgetc(3)
+/* >> getc(3), fgetc(3)
  * Read and return a single character from `stream'
  * If  the given `stream' has been exhausted or if an error occurred, `EOF' is
  * returned and the exact cause can be determined by using `ferror' and `feof' */
 __CREDIRECT(__ATTR_NONNULL((1)),int,__THROWING,getc,(FILE *__restrict __stream),fgetc_unlocked,(__stream))
 #elif defined(__CRT_HAVE_getc_unlocked) && defined(__USE_STDIO_UNLOCKED)
-/* >> fgetc(3)
+/* >> getc(3), fgetc(3)
  * Read and return a single character from `stream'
  * If  the given `stream' has been exhausted or if an error occurred, `EOF' is
  * returned and the exact cause can be determined by using `ferror' and `feof' */
 __CREDIRECT(__ATTR_NONNULL((1)),int,__THROWING,getc,(FILE *__restrict __stream),getc_unlocked,(__stream))
 #elif defined(__CRT_HAVE_fgetc)
-/* >> fgetc(3)
+/* >> getc(3), fgetc(3)
  * Read and return a single character from `stream'
  * If  the given `stream' has been exhausted or if an error occurred, `EOF' is
  * returned and the exact cause can be determined by using `ferror' and `feof' */
 __CREDIRECT(__ATTR_NONNULL((1)),int,__THROWING,getc,(FILE *__restrict __stream),fgetc,(__stream))
 #elif defined(__CRT_HAVE_getc)
-/* >> fgetc(3)
+/* >> getc(3), fgetc(3)
  * Read and return a single character from `stream'
  * If  the given `stream' has been exhausted or if an error occurred, `EOF' is
  * returned and the exact cause can be determined by using `ferror' and `feof' */
 __CDECLARE(__ATTR_NONNULL((1)),int,__THROWING,getc,(FILE *__restrict __stream),(__stream))
 #elif defined(__CRT_HAVE__IO_getc)
-/* >> fgetc(3)
+/* >> getc(3), fgetc(3)
  * Read and return a single character from `stream'
  * If  the given `stream' has been exhausted or if an error occurred, `EOF' is
  * returned and the exact cause can be determined by using `ferror' and `feof' */
 __CREDIRECT(__ATTR_NONNULL((1)),int,__THROWING,getc,(FILE *__restrict __stream),_IO_getc,(__stream))
 #elif defined(__CRT_HAVE_fgetc_unlocked)
-/* >> fgetc(3)
+/* >> getc(3), fgetc(3)
  * Read and return a single character from `stream'
  * If  the given `stream' has been exhausted or if an error occurred, `EOF' is
  * returned and the exact cause can be determined by using `ferror' and `feof' */
 __CREDIRECT(__ATTR_NONNULL((1)),int,__THROWING,getc,(FILE *__restrict __stream),fgetc_unlocked,(__stream))
 #elif defined(__CRT_HAVE_getc_unlocked)
-/* >> fgetc(3)
+/* >> getc(3), fgetc(3)
  * Read and return a single character from `stream'
  * If  the given `stream' has been exhausted or if an error occurred, `EOF' is
  * returned and the exact cause can be determined by using `ferror' and `feof' */
@@ -678,7 +679,7 @@ __CREDIRECT(__ATTR_NONNULL((1)),int,__THROWING,getc,(FILE *__restrict __stream),
 __NAMESPACE_STD_END
 #include <libc/local/stdio/fgetc.h>
 __NAMESPACE_STD_BEGIN
-/* >> fgetc(3)
+/* >> getc(3), fgetc(3)
  * Read and return a single character from `stream'
  * If  the given `stream' has been exhausted or if an error occurred, `EOF' is
  * returned and the exact cause can be determined by using `ferror' and `feof' */
@@ -710,82 +711,82 @@ __NAMESPACE_LOCAL_USING_OR_IMPL(getchar, __FORCELOCAL __ATTR_ARTIFICIAL int (__L
 #endif /* !__NO_STDSTREAMS && (__CRT_HAVE_fgetc || __CRT_HAVE_getc || __CRT_HAVE__IO_getc || __CRT_HAVE_fgetc_unlocked || __CRT_HAVE_getc_unlocked || (__CRT_DOS && __CRT_HAVE__filbuf) || __CRT_HAVE_fread || __CRT_HAVE__IO_fread || __CRT_HAVE_fread_unlocked || __CRT_HAVE__fread_nolock) */
 #endif /* !... */
 #if __has_builtin(__builtin_fputc) && defined(__LIBC_BIND_CRTBUILTINS) && defined(__CRT_HAVE_fputc)
-/* >> fputc(3)
+/* >> putc(3), fputc(3)
  * Write a single character `ch' to `stream' */
 __CEIDECLARE(__ATTR_NONNULL((2)),int,__THROWING,fputc,(int __ch, FILE *__restrict __stream),{ return __builtin_fputc(__ch, __stream); })
 #elif defined(__CRT_HAVE_fputc_unlocked) && defined(__USE_STDIO_UNLOCKED)
-/* >> fputc(3)
+/* >> putc(3), fputc(3)
  * Write a single character `ch' to `stream' */
 __CREDIRECT(__ATTR_NONNULL((2)),int,__THROWING,fputc,(int __ch, FILE *__restrict __stream),fputc_unlocked,(__ch,__stream))
 #elif defined(__CRT_HAVE_putc_unlocked) && defined(__USE_STDIO_UNLOCKED)
-/* >> fputc(3)
+/* >> putc(3), fputc(3)
  * Write a single character `ch' to `stream' */
 __CREDIRECT(__ATTR_NONNULL((2)),int,__THROWING,fputc,(int __ch, FILE *__restrict __stream),putc_unlocked,(__ch,__stream))
 #elif defined(__CRT_HAVE_fputc)
-/* >> fputc(3)
+/* >> putc(3), fputc(3)
  * Write a single character `ch' to `stream' */
 __CDECLARE(__ATTR_NONNULL((2)),int,__THROWING,fputc,(int __ch, FILE *__restrict __stream),(__ch,__stream))
 #elif defined(__CRT_HAVE_putc)
-/* >> fputc(3)
+/* >> putc(3), fputc(3)
  * Write a single character `ch' to `stream' */
 __CREDIRECT(__ATTR_NONNULL((2)),int,__THROWING,fputc,(int __ch, FILE *__restrict __stream),putc,(__ch,__stream))
 #elif defined(__CRT_HAVE__IO_putc)
-/* >> fputc(3)
+/* >> putc(3), fputc(3)
  * Write a single character `ch' to `stream' */
 __CREDIRECT(__ATTR_NONNULL((2)),int,__THROWING,fputc,(int __ch, FILE *__restrict __stream),_IO_putc,(__ch,__stream))
 #elif defined(__CRT_HAVE_fputc_unlocked)
-/* >> fputc(3)
+/* >> putc(3), fputc(3)
  * Write a single character `ch' to `stream' */
 __CREDIRECT(__ATTR_NONNULL((2)),int,__THROWING,fputc,(int __ch, FILE *__restrict __stream),fputc_unlocked,(__ch,__stream))
 #elif defined(__CRT_HAVE_putc_unlocked)
-/* >> fputc(3)
+/* >> putc(3), fputc(3)
  * Write a single character `ch' to `stream' */
 __CREDIRECT(__ATTR_NONNULL((2)),int,__THROWING,fputc,(int __ch, FILE *__restrict __stream),putc_unlocked,(__ch,__stream))
 #elif (defined(__CRT_DOS) && defined(__CRT_HAVE__flsbuf)) || defined(__CRT_HAVE_fwrite) || defined(__CRT_HAVE__IO_fwrite) || defined(__CRT_HAVE_fwrite_s) || defined(__CRT_HAVE_fwrite_unlocked) || defined(__CRT_HAVE__fwrite_nolock)
 __NAMESPACE_STD_END
 #include <libc/local/stdio/fputc.h>
 __NAMESPACE_STD_BEGIN
-/* >> fputc(3)
+/* >> putc(3), fputc(3)
  * Write a single character `ch' to `stream' */
 __NAMESPACE_LOCAL_USING_OR_IMPL(fputc, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_NONNULL((2)) int (__LIBCCALL fputc)(int __ch, FILE *__restrict __stream) __THROWS(...) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(fputc))(__ch, __stream); })
 #endif /* ... */
 #if __has_builtin(__builtin_fputc) && defined(__LIBC_BIND_CRTBUILTINS) && defined(__CRT_HAVE_fputc)
-/* >> fputc(3)
+/* >> putc(3), fputc(3)
  * Write a single character `ch' to `stream' */
 __CEIREDIRECT(__ATTR_NONNULL((2)),int,__THROWING,putc,(int __ch, FILE *__restrict __stream),fputc,{ return __builtin_fputc(__ch, __stream); })
 #elif defined(__CRT_HAVE_fputc_unlocked) && defined(__USE_STDIO_UNLOCKED)
-/* >> fputc(3)
+/* >> putc(3), fputc(3)
  * Write a single character `ch' to `stream' */
 __CREDIRECT(__ATTR_NONNULL((2)),int,__THROWING,putc,(int __ch, FILE *__restrict __stream),fputc_unlocked,(__ch,__stream))
 #elif defined(__CRT_HAVE_putc_unlocked) && defined(__USE_STDIO_UNLOCKED)
-/* >> fputc(3)
+/* >> putc(3), fputc(3)
  * Write a single character `ch' to `stream' */
 __CREDIRECT(__ATTR_NONNULL((2)),int,__THROWING,putc,(int __ch, FILE *__restrict __stream),putc_unlocked,(__ch,__stream))
 #elif defined(__CRT_HAVE_fputc)
-/* >> fputc(3)
+/* >> putc(3), fputc(3)
  * Write a single character `ch' to `stream' */
 __CREDIRECT(__ATTR_NONNULL((2)),int,__THROWING,putc,(int __ch, FILE *__restrict __stream),fputc,(__ch,__stream))
 #elif defined(__CRT_HAVE_putc)
-/* >> fputc(3)
+/* >> putc(3), fputc(3)
  * Write a single character `ch' to `stream' */
 __CDECLARE(__ATTR_NONNULL((2)),int,__THROWING,putc,(int __ch, FILE *__restrict __stream),(__ch,__stream))
 #elif defined(__CRT_HAVE__IO_putc)
-/* >> fputc(3)
+/* >> putc(3), fputc(3)
  * Write a single character `ch' to `stream' */
 __CREDIRECT(__ATTR_NONNULL((2)),int,__THROWING,putc,(int __ch, FILE *__restrict __stream),_IO_putc,(__ch,__stream))
 #elif defined(__CRT_HAVE_fputc_unlocked)
-/* >> fputc(3)
+/* >> putc(3), fputc(3)
  * Write a single character `ch' to `stream' */
 __CREDIRECT(__ATTR_NONNULL((2)),int,__THROWING,putc,(int __ch, FILE *__restrict __stream),fputc_unlocked,(__ch,__stream))
 #elif defined(__CRT_HAVE_putc_unlocked)
-/* >> fputc(3)
+/* >> putc(3), fputc(3)
  * Write a single character `ch' to `stream' */
 __CREDIRECT(__ATTR_NONNULL((2)),int,__THROWING,putc,(int __ch, FILE *__restrict __stream),putc_unlocked,(__ch,__stream))
 #elif (defined(__CRT_DOS) && defined(__CRT_HAVE__flsbuf)) || defined(__CRT_HAVE_fwrite) || defined(__CRT_HAVE__IO_fwrite) || defined(__CRT_HAVE_fwrite_s) || defined(__CRT_HAVE_fwrite_unlocked) || defined(__CRT_HAVE__fwrite_nolock)
 __NAMESPACE_STD_END
 #include <libc/local/stdio/fputc.h>
 __NAMESPACE_STD_BEGIN
-/* >> fputc(3)
+/* >> putc(3), fputc(3)
  * Write a single character `ch' to `stream' */
 __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_NONNULL((2)) int (__LIBCCALL putc)(int __ch, FILE *__restrict __stream) __THROWS(...) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(fputc))(__ch, __stream); }
 #endif /* ... */
@@ -852,57 +853,72 @@ __NAMESPACE_LOCAL_USING_OR_IMPL(fgets, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_WUN
 #endif /* ... */
 #if __has_builtin(__builtin_fputs) && defined(__LIBC_BIND_CRTBUILTINS) && defined(__CRT_HAVE_fputs)
 /* >> fputs(3)
- * Print a given string `str' to `stream'. This is identical to:
- * >> fwrite(str, sizeof(char), strlen(str), stream); */
-__CEIDECLARE(__ATTR_NONNULL((1, 2)),__STDC_INT_AS_SSIZE_T,__THROWING,fputs,(char const *__restrict __str, FILE *__restrict __stream),{ return __builtin_fputs(__str, __stream); })
+ * Print a given string `string' to `stream'. This is identical to:
+ * >> fwrite(string, sizeof(char), strlen(string), stream); */
+__CEIDECLARE(__ATTR_NONNULL((1, 2)),__STDC_INT_AS_SSIZE_T,__THROWING,fputs,(char const *__restrict __string, FILE *__restrict __stream),{ return __builtin_fputs(__string, __stream); })
 #elif defined(__CRT_HAVE_fputs_unlocked) && defined(__USE_STDIO_UNLOCKED)
 /* >> fputs(3)
- * Print a given string `str' to `stream'. This is identical to:
- * >> fwrite(str, sizeof(char), strlen(str), stream); */
-__CREDIRECT(__ATTR_NONNULL((1, 2)),__STDC_INT_AS_SSIZE_T,__THROWING,fputs,(char const *__restrict __str, FILE *__restrict __stream),fputs_unlocked,(__str,__stream))
+ * Print a given string `string' to `stream'. This is identical to:
+ * >> fwrite(string, sizeof(char), strlen(string), stream); */
+__CREDIRECT(__ATTR_NONNULL((1, 2)),__STDC_INT_AS_SSIZE_T,__THROWING,fputs,(char const *__restrict __string, FILE *__restrict __stream),fputs_unlocked,(__string,__stream))
 #elif defined(__CRT_HAVE_fputs)
 /* >> fputs(3)
- * Print a given string `str' to `stream'. This is identical to:
- * >> fwrite(str, sizeof(char), strlen(str), stream); */
-__CDECLARE(__ATTR_NONNULL((1, 2)),__STDC_INT_AS_SSIZE_T,__THROWING,fputs,(char const *__restrict __str, FILE *__restrict __stream),(__str,__stream))
+ * Print a given string `string' to `stream'. This is identical to:
+ * >> fwrite(string, sizeof(char), strlen(string), stream); */
+__CDECLARE(__ATTR_NONNULL((1, 2)),__STDC_INT_AS_SSIZE_T,__THROWING,fputs,(char const *__restrict __string, FILE *__restrict __stream),(__string,__stream))
 #elif defined(__CRT_HAVE__IO_fputs)
 /* >> fputs(3)
- * Print a given string `str' to `stream'. This is identical to:
- * >> fwrite(str, sizeof(char), strlen(str), stream); */
-__CREDIRECT(__ATTR_NONNULL((1, 2)),__STDC_INT_AS_SSIZE_T,__THROWING,fputs,(char const *__restrict __str, FILE *__restrict __stream),_IO_fputs,(__str,__stream))
+ * Print a given string `string' to `stream'. This is identical to:
+ * >> fwrite(string, sizeof(char), strlen(string), stream); */
+__CREDIRECT(__ATTR_NONNULL((1, 2)),__STDC_INT_AS_SSIZE_T,__THROWING,fputs,(char const *__restrict __string, FILE *__restrict __stream),_IO_fputs,(__string,__stream))
 #elif defined(__CRT_HAVE_fputs_unlocked)
 /* >> fputs(3)
- * Print a given string `str' to `stream'. This is identical to:
- * >> fwrite(str, sizeof(char), strlen(str), stream); */
-__CREDIRECT(__ATTR_NONNULL((1, 2)),__STDC_INT_AS_SSIZE_T,__THROWING,fputs,(char const *__restrict __str, FILE *__restrict __stream),fputs_unlocked,(__str,__stream))
+ * Print a given string `string' to `stream'. This is identical to:
+ * >> fwrite(string, sizeof(char), strlen(string), stream); */
+__CREDIRECT(__ATTR_NONNULL((1, 2)),__STDC_INT_AS_SSIZE_T,__THROWING,fputs,(char const *__restrict __string, FILE *__restrict __stream),fputs_unlocked,(__string,__stream))
 #elif defined(__CRT_HAVE_fputc) || defined(__CRT_HAVE_putc) || defined(__CRT_HAVE__IO_putc) || defined(__CRT_HAVE_fputc_unlocked) || defined(__CRT_HAVE_putc_unlocked) || (defined(__CRT_DOS) && defined(__CRT_HAVE__flsbuf)) || defined(__CRT_HAVE_fwrite) || defined(__CRT_HAVE__IO_fwrite) || defined(__CRT_HAVE_fwrite_s) || defined(__CRT_HAVE_fwrite_unlocked) || defined(__CRT_HAVE__fwrite_nolock)
 __NAMESPACE_STD_END
 #include <libc/local/stdio/fputs.h>
 __NAMESPACE_STD_BEGIN
 /* >> fputs(3)
- * Print a given string `str' to `stream'. This is identical to:
- * >> fwrite(str, sizeof(char), strlen(str), stream); */
-__NAMESPACE_LOCAL_USING_OR_IMPL(fputs, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_NONNULL((1, 2)) __STDC_INT_AS_SSIZE_T (__LIBCCALL fputs)(char const *__restrict __str, FILE *__restrict __stream) __THROWS(...) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(fputs))(__str, __stream); })
+ * Print a given string `string' to `stream'. This is identical to:
+ * >> fwrite(string, sizeof(char), strlen(string), stream); */
+__NAMESPACE_LOCAL_USING_OR_IMPL(fputs, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_NONNULL((1, 2)) __STDC_INT_AS_SSIZE_T (__LIBCCALL fputs)(char const *__restrict __string, FILE *__restrict __stream) __THROWS(...) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(fputs))(__string, __stream); })
 #endif /* ... */
 #if __has_builtin(__builtin_puts) && defined(__LIBC_BIND_CRTBUILTINS) && defined(__CRT_HAVE_puts)
 /* >> puts(3)
- * Print a given string `str', followed by a line-feed to `stdout' */
+ * Print a given string `string', followed by a line-feed to `stdout'. This is identical to:
+ * >> fputs(string, stdout);
+ * >> putchar('\n');
+ * Return the number of written characters, or `EOF' on error */
 __CEIDECLARE(__ATTR_NONNULL((1)),__STDC_INT_AS_SSIZE_T,__THROWING,puts,(char const *__restrict __string),{ return __builtin_puts(__string); })
 #elif defined(__CRT_HAVE_puts_unlocked) && defined(__USE_STDIO_UNLOCKED)
 /* >> puts(3)
- * Print a given string `str', followed by a line-feed to `stdout' */
+ * Print a given string `string', followed by a line-feed to `stdout'. This is identical to:
+ * >> fputs(string, stdout);
+ * >> putchar('\n');
+ * Return the number of written characters, or `EOF' on error */
 __CREDIRECT(__ATTR_NONNULL((1)),__STDC_INT_AS_SSIZE_T,__THROWING,puts,(char const *__restrict __string),puts_unlocked,(__string))
 #elif defined(__CRT_HAVE_puts)
 /* >> puts(3)
- * Print a given string `str', followed by a line-feed to `stdout' */
+ * Print a given string `string', followed by a line-feed to `stdout'. This is identical to:
+ * >> fputs(string, stdout);
+ * >> putchar('\n');
+ * Return the number of written characters, or `EOF' on error */
 __CDECLARE(__ATTR_NONNULL((1)),__STDC_INT_AS_SSIZE_T,__THROWING,puts,(char const *__restrict __string),(__string))
 #elif defined(__CRT_HAVE__IO_puts)
 /* >> puts(3)
- * Print a given string `str', followed by a line-feed to `stdout' */
+ * Print a given string `string', followed by a line-feed to `stdout'. This is identical to:
+ * >> fputs(string, stdout);
+ * >> putchar('\n');
+ * Return the number of written characters, or `EOF' on error */
 __CREDIRECT(__ATTR_NONNULL((1)),__STDC_INT_AS_SSIZE_T,__THROWING,puts,(char const *__restrict __string),_IO_puts,(__string))
 #elif defined(__CRT_HAVE_puts_unlocked)
 /* >> puts(3)
- * Print a given string `str', followed by a line-feed to `stdout' */
+ * Print a given string `string', followed by a line-feed to `stdout'. This is identical to:
+ * >> fputs(string, stdout);
+ * >> putchar('\n');
+ * Return the number of written characters, or `EOF' on error */
 __CREDIRECT(__ATTR_NONNULL((1)),__STDC_INT_AS_SSIZE_T,__THROWING,puts,(char const *__restrict __string),puts_unlocked,(__string))
 #else /* ... */
 __NAMESPACE_STD_END
@@ -913,7 +929,10 @@ __NAMESPACE_STD_END
 #include <libc/local/stdio/puts.h>
 __NAMESPACE_STD_BEGIN
 /* >> puts(3)
- * Print a given string `str', followed by a line-feed to `stdout' */
+ * Print a given string `string', followed by a line-feed to `stdout'. This is identical to:
+ * >> fputs(string, stdout);
+ * >> putchar('\n');
+ * Return the number of written characters, or `EOF' on error */
 __NAMESPACE_LOCAL_USING_OR_IMPL(puts, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_NONNULL((1)) __STDC_INT_AS_SSIZE_T (__LIBCCALL puts)(char const *__restrict __string) __THROWS(...) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(puts))(__string); })
 #endif /* !__NO_STDSTREAMS && (__CRT_HAVE_fputc || __CRT_HAVE_putc || __CRT_HAVE__IO_putc || __CRT_HAVE_fputc_unlocked || __CRT_HAVE_putc_unlocked || (__CRT_DOS && __CRT_HAVE__flsbuf) || __CRT_HAVE_fwrite || __CRT_HAVE__IO_fwrite || __CRT_HAVE_fwrite_s || __CRT_HAVE_fwrite_unlocked || __CRT_HAVE__fwrite_nolock) */
 #endif /* !... */
@@ -2237,11 +2256,11 @@ __CDECLARE_OPT(__ATTR_NONNULL((2, 4)),int,__NOTHROW_RPC,frenameat,(__fd_t __oldf
 
 #ifdef __USE_MISC
 #ifdef __CRT_HAVE_tmpnam_r
-/* >> tmpnam_r(3) */
+/* >> tmpnam(3), tmpnam_r(3) */
 __CDECLARE(__ATTR_WUNUSED __ATTR_NONNULL((1)),char *,__NOTHROW_NCX,tmpnam_r,(char *__buf),(__buf))
 #elif defined(__CRT_HAVE_tmpnam)
 #include <libc/local/stdio/tmpnam_r.h>
-/* >> tmpnam_r(3) */
+/* >> tmpnam(3), tmpnam_r(3) */
 __NAMESPACE_LOCAL_USING_OR_IMPL(tmpnam_r, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_WUNUSED __ATTR_NONNULL((1)) char *__NOTHROW_NCX(__LIBCCALL tmpnam_r)(char *__buf) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(tmpnam_r))(__buf); })
 #endif /* ... */
 #ifdef __CRT_HAVE_setbuffer
@@ -2340,66 +2359,66 @@ __NAMESPACE_LOCAL_USING_OR_IMPL(fwrite_unlocked, __FORCELOCAL __ATTR_ARTIFICIAL 
 #endif /* ... */
 #if defined(__CRT_HAVE_feof_unlocked) && defined(__USE_STDIO_UNLOCKED)
 /* >> feof_unlocked(3)
- * Same as `feof()', but performs I/O without acquiring a lock to `stream' */
+ * Same as `feof()', but skip acquiring internal locks */
 __CDECLARE(__ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1)),int,__NOTHROW_NCX,feof_unlocked,(__FILE __KOS_FIXED_CONST *__restrict __stream),(__stream))
 #elif defined(__CRT_HAVE_feof)
 /* >> feof_unlocked(3)
- * Same as `feof()', but performs I/O without acquiring a lock to `stream' */
+ * Same as `feof()', but skip acquiring internal locks */
 __CREDIRECT(__ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1)),int,__NOTHROW_NCX,feof_unlocked,(__FILE __KOS_FIXED_CONST *__restrict __stream),feof,(__stream))
 #elif defined(__CRT_HAVE__IO_feof)
 /* >> feof_unlocked(3)
- * Same as `feof()', but performs I/O without acquiring a lock to `stream' */
+ * Same as `feof()', but skip acquiring internal locks */
 __CREDIRECT(__ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1)),int,__NOTHROW_NCX,feof_unlocked,(__FILE __KOS_FIXED_CONST *__restrict __stream),_IO_feof,(__stream))
 #elif defined(__CRT_HAVE_feof_unlocked)
 /* >> feof_unlocked(3)
- * Same as `feof()', but performs I/O without acquiring a lock to `stream' */
+ * Same as `feof()', but skip acquiring internal locks */
 __CDECLARE(__ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1)),int,__NOTHROW_NCX,feof_unlocked,(__FILE __KOS_FIXED_CONST *__restrict __stream),(__stream))
 #endif /* ... */
 #if defined(__CRT_HAVE_ferror_unlocked) && defined(__USE_STDIO_UNLOCKED)
 /* >> ferror_unlocked(3)
- * Same as `ferror()', but performs I/O without acquiring a lock to `stream' */
+ * Same as `ferror()', but skip acquiring internal locks */
 __CDECLARE(__ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1)),int,__NOTHROW_NCX,ferror_unlocked,(__FILE __KOS_FIXED_CONST *__restrict __stream),(__stream))
 #elif defined(__CRT_HAVE_ferror)
 /* >> ferror_unlocked(3)
- * Same as `ferror()', but performs I/O without acquiring a lock to `stream' */
+ * Same as `ferror()', but skip acquiring internal locks */
 __CREDIRECT(__ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1)),int,__NOTHROW_NCX,ferror_unlocked,(__FILE __KOS_FIXED_CONST *__restrict __stream),ferror,(__stream))
 #elif defined(__CRT_HAVE__IO_ferror)
 /* >> ferror_unlocked(3)
- * Same as `ferror()', but performs I/O without acquiring a lock to `stream' */
+ * Same as `ferror()', but skip acquiring internal locks */
 __CREDIRECT(__ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1)),int,__NOTHROW_NCX,ferror_unlocked,(__FILE __KOS_FIXED_CONST *__restrict __stream),_IO_ferror,(__stream))
 #elif defined(__CRT_HAVE_ferror_unlocked)
 /* >> ferror_unlocked(3)
- * Same as `ferror()', but performs I/O without acquiring a lock to `stream' */
+ * Same as `ferror()', but skip acquiring internal locks */
 __CDECLARE(__ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1)),int,__NOTHROW_NCX,ferror_unlocked,(__FILE __KOS_FIXED_CONST *__restrict __stream),(__stream))
 #endif /* ... */
 #if defined(__CRT_HAVE_clearerr_unlocked) && defined(__USE_STDIO_UNLOCKED)
 /* >> clearerr_unlocked(3)
- * Same as `clearerr()', but performs I/O without acquiring a lock to `stream' */
+ * Same as `clearerr()', but skip acquiring internal locks */
 __CDECLARE_VOID(__ATTR_NONNULL((1)),__NOTHROW_NCX,clearerr_unlocked,(__FILE *__restrict __stream),(__stream))
 #elif defined(__CRT_HAVE_clearerr)
 /* >> clearerr_unlocked(3)
- * Same as `clearerr()', but performs I/O without acquiring a lock to `stream' */
+ * Same as `clearerr()', but skip acquiring internal locks */
 __CREDIRECT_VOID(__ATTR_NONNULL((1)),__NOTHROW_NCX,clearerr_unlocked,(__FILE *__restrict __stream),clearerr,(__stream))
 #elif defined(__CRT_HAVE_clearerr_unlocked)
 /* >> clearerr_unlocked(3)
- * Same as `clearerr()', but performs I/O without acquiring a lock to `stream' */
+ * Same as `clearerr()', but skip acquiring internal locks */
 __CDECLARE_VOID(__ATTR_NONNULL((1)),__NOTHROW_NCX,clearerr_unlocked,(__FILE *__restrict __stream),(__stream))
 #endif /* ... */
 #if defined(__CRT_HAVE_fileno_unlocked) && defined(__USE_STDIO_UNLOCKED)
 /* >> fileno_unlocked(3)
- * Same as `fileno()', but performs I/O without acquiring a lock to `stream' */
+ * Same as `fileno()', but skip acquiring internal locks */
 __CDECLARE(__ATTR_WUNUSED __ATTR_NONNULL((1)),__fd_t,__NOTHROW_NCX,fileno_unlocked,(__FILE *__restrict __stream),(__stream))
 #elif defined(__CRT_HAVE_fileno)
 /* >> fileno_unlocked(3)
- * Same as `fileno()', but performs I/O without acquiring a lock to `stream' */
+ * Same as `fileno()', but skip acquiring internal locks */
 __CREDIRECT(__ATTR_WUNUSED __ATTR_NONNULL((1)),__fd_t,__NOTHROW_NCX,fileno_unlocked,(__FILE *__restrict __stream),fileno,(__stream))
 #elif defined(__CRT_HAVE__fileno)
 /* >> fileno_unlocked(3)
- * Same as `fileno()', but performs I/O without acquiring a lock to `stream' */
+ * Same as `fileno()', but skip acquiring internal locks */
 __CREDIRECT(__ATTR_WUNUSED __ATTR_NONNULL((1)),__fd_t,__NOTHROW_NCX,fileno_unlocked,(__FILE *__restrict __stream),_fileno,(__stream))
 #elif defined(__CRT_HAVE_fileno_unlocked)
 /* >> fileno_unlocked(3)
- * Same as `fileno()', but performs I/O without acquiring a lock to `stream' */
+ * Same as `fileno()', but skip acquiring internal locks */
 __CDECLARE(__ATTR_WUNUSED __ATTR_NONNULL((1)),__fd_t,__NOTHROW_NCX,fileno_unlocked,(__FILE *__restrict __stream),(__stream))
 #endif /* ... */
 #ifdef __CRT_HAVE_fgetc_unlocked

@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x78d0947e */
+/* HASH CRC-32:0x3722e15c */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -30,11 +30,17 @@
 DECL_BEGIN
 
 #if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
+/* >> adjtimex(2), adjtimex64(2) */
 INTDEF NONNULL((1)) int NOTHROW_NCX(LIBDCALL libd_adjtimex)(struct timex *__restrict ntx);
+/* >> ntp_gettime(3), ntp_gettime64(3) */
 INTDEF NONNULL((1)) int NOTHROW_NCX(LIBDCALL libd_ntp_gettimex)(struct ntptimeval *__restrict ntv);
+/* >> ntp_adjtime(3), ntp_adjtime64(3) */
 INTDEF NONNULL((1)) int NOTHROW_NCX(LIBDCALL libd_ntp_adjtime)(struct timex *__restrict tntx);
+/* >> adjtimex(2), adjtimex64(2) */
 INTDEF NONNULL((1)) int NOTHROW_NCX(LIBDCALL libd_adjtimex64)(struct timex64 *__restrict ntx);
+/* >> ntp_adjtime(3), ntp_adjtime64(3) */
 INTDEF NONNULL((1)) int NOTHROW_NCX(LIBDCALL libd_ntp_adjtime64)(struct timex64 *__restrict tntx);
+/* >> ntp_gettime(3), ntp_gettime64(3) */
 INTDEF NONNULL((1)) int NOTHROW_NCX(LIBDCALL libd_ntp_gettimex64)(struct ntptimeval64 *__restrict ntv);
 #endif /* !__LIBCCALL_IS_LIBDCALL && !__KERNEL__ */
 

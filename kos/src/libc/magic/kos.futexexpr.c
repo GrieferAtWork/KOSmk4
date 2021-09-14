@@ -220,8 +220,8 @@ int lfutexlockexpr32([[nonnull]] lfutex_t *ulockaddr, void *base,
 @@@return: -1:EINTR:     A blocking futex-wait operation was interrupted
 @@@return: -1:ETIMEDOUT: A blocking futex-wait operation has timed out
 [[cp, decl_include("<bits/types.h>", "<bits/os/timespec.h>", "<kos/bits/futex-expr.h>"), no_crt_self_import]]
-[[if(defined(__USE_TIME_BITS64)), preferred_alias("lfutexexpr64")]]
-[[if(!defined(__USE_TIME_BITS64)), preferred_alias("lfutexexpr")]]
+[[if($extended_include_prefix("<features.h>") defined(__USE_TIME_BITS64)), preferred_alias("lfutexexpr64")]]
+[[if($extended_include_prefix("<features.h>")!defined(__USE_TIME_BITS64)), preferred_alias("lfutexexpr")]]
 [[userimpl, requires($has_function(lfutexexpr32) || $has_function(lfutexexpr64))]]
 int lfutexexpr(void *base, $size_t exprc, [[nonnull]] struct lfutexexpr const *exprv,
                struct timespec const *timeout, unsigned int timeout_flags) {
@@ -270,8 +270,8 @@ int lfutexexpr(void *base, $size_t exprc, [[nonnull]] struct lfutexexpr const *e
 @@@return: -1:EINTR:     A blocking futex-wait operation was interrupted
 @@@return: -1:ETIMEDOUT: A blocking futex-wait operation has timed out
 [[cp, decl_include("<bits/types.h>", "<bits/os/timespec.h>", "<kos/bits/futex-expr.h>")]]
-[[if(defined(__USE_TIME_BITS64)), preferred_alias("lfutexlockexpr64")]]
-[[if(!defined(__USE_TIME_BITS64)), preferred_alias("lfutexlockexpr")]]
+[[if($extended_include_prefix("<features.h>") defined(__USE_TIME_BITS64)), preferred_alias("lfutexlockexpr64")]]
+[[if($extended_include_prefix("<features.h>")!defined(__USE_TIME_BITS64)), preferred_alias("lfutexlockexpr")]]
 [[section(".text.crt{|.dos}.sched.futexlockexpr"), no_crt_self_import]]
 [[userimpl, requires($has_function(lfutexlockexpr32) || $has_function(lfutexlockexpr64))]]
 int lfutexlockexpr([[nonnull]] lfutex_t *ulockaddr, void *base,

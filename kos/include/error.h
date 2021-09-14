@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xae0e9f1e */
+/* HASH CRC-32:0xac7a9a32 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -42,13 +42,15 @@
 __SYSDECL_BEGIN
 
 #ifdef __fast_error_defined
-/* Helper  function  for printing  an error  message to  `stderr' and  possibly exiting  the program
+/* >> error(3)
+ * Helper  function  for printing  an error  message to  `stderr' and  possibly exiting  the program
  * The message is printed as: `<program_invocation_short_name>: <format...>[: <strerror(errnum)>]\n'
  * Also note that `stdout' is flushed before the message is printed.
  * If `STATUS' is non-zero, follow up with a call to `exit(status)' */
 __NAMESPACE_FAST_USING_OR_IMPL(error, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_LIBC_PRINTF(3, 4) void (__VLIBCCALL error)(int __status, __errno_t __errnum, const char *__format, ...) __THROWS(...) { (__NAMESPACE_FAST_SYM __LIBC_FAST_NAME(error))(__status, __errnum, __format, __builtin_va_arg_pack()); })
 #elif defined(__CRT_HAVE_error)
-/* Helper  function  for printing  an error  message to  `stderr' and  possibly exiting  the program
+/* >> error(3)
+ * Helper  function  for printing  an error  message to  `stderr' and  possibly exiting  the program
  * The message is printed as: `<program_invocation_short_name>: <format...>[: <strerror(errnum)>]\n'
  * Also note that `stdout' is flushed before the message is printed.
  * If `STATUS' is non-zero, follow up with a call to `exit(status)' */
@@ -59,7 +61,8 @@ __LIBC __ATTR_LIBC_PRINTF(3, 4) void (__VLIBCCALL error)(int __status, __errno_t
 #include <features.h>
 #if !defined(__NO_STDSTREAMS) && (defined(__CRT_HAVE_exit) || defined(__CRT_HAVE_quick_exit) || defined(__CRT_HAVE__exit) || defined(__CRT_HAVE__Exit)) && (defined(__CRT_HAVE_fputc) || defined(__CRT_HAVE_putc) || defined(__CRT_HAVE__IO_putc) || defined(__CRT_HAVE_fputc_unlocked) || defined(__CRT_HAVE_putc_unlocked) || (defined(__CRT_DOS) && defined(__CRT_HAVE__flsbuf)) || defined(__CRT_HAVE_fwrite) || defined(__CRT_HAVE__IO_fwrite) || defined(__CRT_HAVE_fwrite_s) || defined(__CRT_HAVE_fwrite_unlocked) || defined(__CRT_HAVE__fwrite_nolock)) && defined(__LOCAL_program_invocation_short_name)
 #include <libc/local/error/error.h>
-/* Helper  function  for printing  an error  message to  `stderr' and  possibly exiting  the program
+/* >> error(3)
+ * Helper  function  for printing  an error  message to  `stderr' and  possibly exiting  the program
  * The message is printed as: `<program_invocation_short_name>: <format...>[: <strerror(errnum)>]\n'
  * Also note that `stdout' is flushed before the message is printed.
  * If `STATUS' is non-zero, follow up with a call to `exit(status)' */
@@ -71,13 +74,15 @@ __NAMESPACE_LOCAL_USING_OR_IMPL(error, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_LIB
 #endif /* !__NO_STDSTREAMS && (__CRT_HAVE_exit || __CRT_HAVE_quick_exit || __CRT_HAVE__exit || __CRT_HAVE__Exit) && (__CRT_HAVE_fputc || __CRT_HAVE_putc || __CRT_HAVE__IO_putc || __CRT_HAVE_fputc_unlocked || __CRT_HAVE_putc_unlocked || (__CRT_DOS && __CRT_HAVE__flsbuf) || __CRT_HAVE_fwrite || __CRT_HAVE__IO_fwrite || __CRT_HAVE_fwrite_s || __CRT_HAVE_fwrite_unlocked || __CRT_HAVE__fwrite_nolock) && __LOCAL_program_invocation_short_name */
 #endif /* !... */
 #ifdef __fast_error_at_line_defined
-/* Same as `error()', but also include the given filename in the error message.
+/* >> error_at_line(3)
+ * Same as `error()', but also include the given filename in the error message.
  * The message is printed as: `<program_invocation_short_name>:<filename>:<line>: <format...>[: <strerror(errnum)>]\n'
  * Additionally,    when   `error_one_per_line'   is    non-zero,   consecutive   calls    to   this   function   that
  * pass the same values for `filename' and `line' will not produce the error message. */
 __NAMESPACE_FAST_USING_OR_IMPL(error_at_line, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_LIBC_PRINTF(5, 6) void (__VLIBCCALL error_at_line)(int __status, __errno_t __errnum, char const *__filename, unsigned int __line, char const *__format, ...) __THROWS(...) { (__NAMESPACE_FAST_SYM __LIBC_FAST_NAME(error_at_line))(__status, __errnum, __filename, __line, __format, __builtin_va_arg_pack()); })
 #elif defined(__CRT_HAVE_error_at_line)
-/* Same as `error()', but also include the given filename in the error message.
+/* >> error_at_line(3)
+ * Same as `error()', but also include the given filename in the error message.
  * The message is printed as: `<program_invocation_short_name>:<filename>:<line>: <format...>[: <strerror(errnum)>]\n'
  * Additionally,    when   `error_one_per_line'   is    non-zero,   consecutive   calls    to   this   function   that
  * pass the same values for `filename' and `line' will not produce the error message. */
@@ -88,7 +93,8 @@ __LIBC __ATTR_LIBC_PRINTF(5, 6) void (__VLIBCCALL error_at_line)(int __status, _
 #include <features.h>
 #if !defined(__NO_STDSTREAMS) && (defined(__CRT_HAVE_exit) || defined(__CRT_HAVE_quick_exit) || defined(__CRT_HAVE__exit) || defined(__CRT_HAVE__Exit)) && (defined(__CRT_HAVE_fputc) || defined(__CRT_HAVE_putc) || defined(__CRT_HAVE__IO_putc) || defined(__CRT_HAVE_fputc_unlocked) || defined(__CRT_HAVE_putc_unlocked) || (defined(__CRT_DOS) && defined(__CRT_HAVE__flsbuf)) || defined(__CRT_HAVE_fwrite) || defined(__CRT_HAVE__IO_fwrite) || defined(__CRT_HAVE_fwrite_s) || defined(__CRT_HAVE_fwrite_unlocked) || defined(__CRT_HAVE__fwrite_nolock)) && defined(__LOCAL_program_invocation_short_name)
 #include <libc/local/error/error_at_line.h>
-/* Same as `error()', but also include the given filename in the error message.
+/* >> error_at_line(3)
+ * Same as `error()', but also include the given filename in the error message.
  * The message is printed as: `<program_invocation_short_name>:<filename>:<line>: <format...>[: <strerror(errnum)>]\n'
  * Additionally,    when   `error_one_per_line'   is    non-zero,   consecutive   calls    to   this   function   that
  * pass the same values for `filename' and `line' will not produce the error message. */

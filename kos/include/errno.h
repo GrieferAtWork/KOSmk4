@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xbbe798f2 */
+/* HASH CRC-32:0x393de74e */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -576,10 +576,13 @@ typedef __errno_t errno_t;
 #ifndef ____errno_location_defined
 #define ____errno_location_defined 1
 #ifdef __CRT_HAVE___errno_location
+/* >> __errno_location(3) */
 __CDECLARE(__ATTR_CONST __ATTR_RETNONNULL __ATTR_WUNUSED,__errno_t *,__NOTHROW_NCX,__errno_location,(void),())
 #elif defined(__CRT_HAVE__errno)
+/* >> __errno_location(3) */
 __CREDIRECT(__ATTR_CONST __ATTR_RETNONNULL __ATTR_WUNUSED,__errno_t *,__NOTHROW_NCX,__errno_location,(void),_errno,())
 #elif defined(__CRT_HAVE___errno)
+/* >> __errno_location(3) */
 __CREDIRECT(__ATTR_CONST __ATTR_RETNONNULL __ATTR_WUNUSED,__errno_t *,__NOTHROW_NCX,__errno_location,(void),__errno,())
 #else /* ... */
 #undef ____errno_location_defined
@@ -672,13 +675,15 @@ __LIBC char *__progname;
 #ifndef ____p_program_invocation_short_name_defined
 #define ____p_program_invocation_short_name_defined 1
 #ifdef __CRT_HAVE___p_program_invocation_short_name
-/* Alias for `strchr(argv[0], '/') ? strchr(argv[0], '/') + 1 : argv[0]', as passed to main() */
+/* >> __p_program_invocation_short_name(3)
+ * Alias for `strchr(argv[0], '/') ? strchr(argv[0], '/') + 1 : argv[0]', as passed to main() */
 __CDECLARE(__ATTR_CONST __ATTR_RETNONNULL __ATTR_WUNUSED,char **,__NOTHROW_NCX,__p_program_invocation_short_name,(void),())
 #else /* __CRT_HAVE___p_program_invocation_short_name */
 #include <libc/local/program_invocation_name.h>
 #ifdef __LOCAL_program_invocation_short_name_p
 #include <libc/local/errno/__p_program_invocation_short_name.h>
-/* Alias for `strchr(argv[0], '/') ? strchr(argv[0], '/') + 1 : argv[0]', as passed to main() */
+/* >> __p_program_invocation_short_name(3)
+ * Alias for `strchr(argv[0], '/') ? strchr(argv[0], '/') + 1 : argv[0]', as passed to main() */
 __NAMESPACE_LOCAL_USING_OR_IMPL(__p_program_invocation_short_name, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_CONST __ATTR_RETNONNULL __ATTR_WUNUSED char **__NOTHROW_NCX(__LIBCCALL __p_program_invocation_short_name)(void) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(__p_program_invocation_short_name))(); })
 #else /* __LOCAL_program_invocation_short_name_p */
 #undef ____p_program_invocation_short_name_defined

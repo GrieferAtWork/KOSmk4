@@ -676,7 +676,7 @@ wint_t fputwc(wchar_t wc, [[nonnull]] FILE *stream);
 @@>> fgetws(3)
 [[section(".text.crt{|.dos}.wchar.FILE.locked.read.read")]]
 [[cp_stdio, std, guard, wchar, wunused, alias("fgetws_unlocked", "_fgetws_nolock")]]
-[[if(defined(__USE_STDIO_UNLOCKED)), preferred_alias("fgetws_unlocked", "_fgetws_nolock")]]
+[[if($extended_include_prefix("<features.h>")defined(__USE_STDIO_UNLOCKED)), preferred_alias("fgetws_unlocked", "_fgetws_nolock")]]
 [[requires($has_function(fgetwc) && $has_function(ungetwc) && $has_function(ferror))]]
 [[impl_include("<libc/errno.h>", "<asm/crt/stdio.h>")]]
 [[decl_include("<features.h>", "<hybrid/typecore.h>")]]
@@ -726,7 +726,7 @@ wchar_t *fgetws([[outp(bufsize)]] wchar_t *__restrict buf,
 [[requires_function(file_wprinter)]]
 [[cp_stdio, std, guard, wchar, alias("fputws_unlocked", "_fputws_nolock")]]
 [[decl_include("<features.h>", "<hybrid/typecore.h>")]]
-[[if(defined(__USE_STDIO_UNLOCKED)), preferred_alias("fputws_unlocked", "_fputws_nolock")]]
+[[if($extended_include_prefix("<features.h>")defined(__USE_STDIO_UNLOCKED)), preferred_alias("fputws_unlocked", "_fputws_nolock")]]
 [[section(".text.crt{|.dos}.wchar.FILE.locked.write.write")]]
 __STDC_INT_AS_SIZE_T fputws([[nonnull]] wchar_t const *__restrict str,
                             [[nonnull]] FILE *__restrict stream) {
@@ -739,7 +739,7 @@ __STDC_INT_AS_SIZE_T fputws([[nonnull]] wchar_t const *__restrict str,
 [[decl_include("<hybrid/typecore.h>")]]
 [[std, guard, wchar, alias("ungetwc_unlocked")]]
 [[section(".text.crt{|.dos}.wchar.FILE.locked.write.putc")]]
-[[if(defined(__USE_STDIO_UNLOCKED)), preferred_alias("ungetwc_unlocked")]]
+[[if($extended_include_prefix("<features.h>")defined(__USE_STDIO_UNLOCKED)), preferred_alias("ungetwc_unlocked")]]
 wint_t ungetwc(wint_t wc, [[nonnull]] FILE *stream);
 
 @@>> wcsftime(3)
@@ -1417,7 +1417,7 @@ $size_t wcsftime_l([[outp(maxsize)]] wchar_t *__restrict buf, $size_t maxsize,
 @@For use with `format_wprintf()' and friends: Prints to a `FILE *' closure argument
 [[decl_include("<hybrid/typecore.h>")]]
 [[cp_stdio, wchar, impl_include("<asm/crt/stdio.h>")]]
-[[if(defined(__USE_STDIO_UNLOCKED)), preferred_alias("file_wprinter_unlocked")]]
+[[if($extended_include_prefix("<features.h>")defined(__USE_STDIO_UNLOCKED)), preferred_alias("file_wprinter_unlocked")]]
 [[alias("file_wprinter_unlocked")]]
 [[userimpl, requires($has_function(fputwc))]]
 [[section(".text.crt{|.dos}.wchar.FILE.locked.write.write")]]
@@ -2049,21 +2049,26 @@ wcslcpy(*) %{generate(str2wcs("strlcpy"))}
 
 %
 %#ifdef __USE_DOS_SLIB
+@@>> wcscat_s(3)
 [[guard, wchar, section(".text.crt.dos.wchar.string.memory")]]
 wcscat_s(*) %{generate(str2wcs("strcat_s"))}
 
+@@>> wcscpy_s(3)
 [[guard, wchar, section(".text.crt.dos.wchar.string.memory")]]
 wcscpy_s(*) %{generate(str2wcs("strcpy_s"))}
 
+@@>> wcsnlen_s(3)
 [[decl_include("<hybrid/typecore.h>")]]
 [[guard, inline, nocrt, wunused, pure]]
 $size_t wcsnlen_s([[nullable]] wchar_t const *str, $size_t maxlen) {
 	return str ? wcsnlen(str, maxlen) : 0;
 }
 
+@@>> wcsncat_s(3)
 [[guard, wchar, section(".text.crt.dos.wchar.string.memory")]]
 wcsncat_s(*) %{generate(str2wcs("strncat_s"))}
 
+@@>> wcsncpy_s(3)
 [[guard, wchar, section(".text.crt.dos.wchar.string.memory")]]
 wcsncpy_s(*) %{generate(str2wcs("strncpy_s"))}
 
@@ -2072,6 +2077,7 @@ wcsncpy_s(*) %{generate(str2wcs("strncpy_s"))}
 %#endif  /* __USE_DOS_SLIB */
 
 %[default:section(".text.crt.dos.wchar.errno")];
+
 [[guard, wchar, decl_include("<hybrid/typecore.h>")]]
 wchar_t *_wcserror(int errno_value);
 
@@ -2156,15 +2162,17 @@ $errno_t wmemmove_s([[nonnull]] wchar_t *dst, rsize_t dstlength,
 
 
 %#if defined(__USE_DOS) || defined(__USE_KOS)
+@@>> wcsnset(3)
 [[decl_include("<hybrid/typecore.h>")]]
 [[guard, wchar, dos_export_alias("_wcsnset")]]
 [[section(".text.crt.dos.wchar.string.memory")]]
 [[nonnull]] wchar_t *wcsnset([[nonnull]] wchar_t *__restrict str, wchar_t ch, $size_t maxlen)
 	%{generate(str2wcs("strnset"))}
 
+@@>> wcsrev(3)
 [[decl_include("<hybrid/typecore.h>")]]
 [[guard, wchar, dos_export_alias("_wcsrev")]]
-[[section(".text.crt.dos.wchar.string.memory"), doc_alias("strrev")]]
+[[section(".text.crt.dos.wchar.string.memory")]]
 [[nonnull]] wchar_t *wcsrev([[nonnull]] wchar_t *__restrict str) {
 @@pp_if __SIZEOF_WCHAR_T__ == 2@@
 	return (wchar_t *)memrevw(str, wcslen(str));
@@ -2176,14 +2184,17 @@ $errno_t wmemmove_s([[nonnull]] wchar_t *dst, rsize_t dstlength,
 }
 
 
+@@>> wcsset(3)
 [[guard, wchar, dos_export_alias("_wcsset")]]
 [[section(".text.crt.dos.wchar.string.memory")]]
 wcsset(*) %{generate(str2wcs("strset"))}
 
+@@>> wcslwr(3)
 [[guard, wchar, dos_export_alias("_wcslwr")]]
 [[section(".text.crt.dos.wchar.unicode.static.memory")]]
 wcslwr(*) %{generate(str2wcs("strlwr"))}
 
+@@>> wcsupr(3)
 [[guard, wchar, dos_export_alias("_wcsupr")]]
 [[section(".text.crt.dos.wchar.unicode.static.memory")]]
 wcsupr(*) %{generate(str2wcs("strupr"))}

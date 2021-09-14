@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xd6db77b8 */
+/* HASH CRC-32:0x97700e98 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -239,7 +239,9 @@ __CDECLARE_OPT(__ATTR_NONNULL((2)),size_t,__THROWING,Write,(__fd_t __fd, void co
  * the file descriptor by the amount of data that had already been loaded. - Errors
  * during this phase are silently ignored and don't cause `errno' to change */
 __CDECLARE(__ATTR_NONNULL((2)),size_t,__THROWING,ReadAll,(__fd_t __fd, void *__buf, size_t __bufsize),(__fd,__buf,__bufsize))
-#elif defined(__CRT_HAVE_Read) && (defined(__CRT_HAVE_lseek64) || defined(__CRT_HAVE__lseeki64) || defined(__CRT_HAVE_lseek) || defined(__CRT_HAVE__lseek) || defined(__CRT_HAVE___lseek))
+#else /* __CRT_HAVE_ReadAll */
+#include <bits/types.h>
+#if defined(__CRT_HAVE_Read) && (defined(__CRT_HAVE_lseek64) || defined(__CRT_HAVE__lseeki64) || defined(__CRT_HAVE_lseek) || defined(__CRT_HAVE__lseek) || defined(__CRT_HAVE___lseek))
 #include <libc/local/kos.unistd/ReadAll.h>
 /* >> readall(3)
  * Same  as `read(2)', however  keep on reading until  `read()' indicates EOF (causing
@@ -249,7 +251,8 @@ __CDECLARE(__ATTR_NONNULL((2)),size_t,__THROWING,ReadAll,(__fd_t __fd, void *__b
  * the file descriptor by the amount of data that had already been loaded. - Errors
  * during this phase are silently ignored and don't cause `errno' to change */
 __NAMESPACE_LOCAL_USING_OR_IMPL(ReadAll, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_NONNULL((2)) size_t (__LIBCCALL ReadAll)(__fd_t __fd, void *__buf, size_t __bufsize) __THROWS(...) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(ReadAll))(__fd, __buf, __bufsize); })
-#endif /* ... */
+#endif /* __CRT_HAVE_Read && (__CRT_HAVE_lseek64 || __CRT_HAVE__lseeki64 || __CRT_HAVE_lseek || __CRT_HAVE__lseek || __CRT_HAVE___lseek) */
+#endif /* !__CRT_HAVE_ReadAll */
 #endif /* __USE_KOS */
 #if defined(__CRT_HAVE_LSeek64) && defined(__USE_FILE_OFFSET64)
 /* >> lseek(2)
@@ -259,12 +262,15 @@ __CREDIRECT(,__FS_TYPE(pos),__THROWING,LSeek,(__fd_t __fd, __FS_TYPE(off) __offs
 /* >> lseek(2)
  * Change the position of the file read/write pointer within a file referred to by `fd' */
 __CDECLARE(,__FS_TYPE(pos),__THROWING,LSeek,(__fd_t __fd, __FS_TYPE(off) __offset, int __whence),(__fd,__offset,__whence))
-#elif defined(__CRT_HAVE_LSeek64) || defined(__CRT_HAVE_LSeek)
+#else /* ... */
+#include <bits/types.h>
+#if defined(__CRT_HAVE_LSeek64) || defined(__CRT_HAVE_LSeek)
 #include <libc/local/kos.unistd/LSeek.h>
 /* >> lseek(2)
  * Change the position of the file read/write pointer within a file referred to by `fd' */
 __NAMESPACE_LOCAL_USING_OR_IMPL(LSeek, __FORCELOCAL __ATTR_ARTIFICIAL __FS_TYPE(pos) (__LIBCCALL LSeek)(__fd_t __fd, __FS_TYPE(off) __offset, int __whence) __THROWS(...) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(LSeek))(__fd, __offset, __whence); })
-#endif /* ... */
+#endif /* __CRT_HAVE_LSeek64 || __CRT_HAVE_LSeek */
+#endif /* !... */
 /* >> dup2(2)
  * @return: newfd: Returns the new handle upon success.
  * Duplicate a file referred to by `oldfd' into `newfd' */
@@ -342,7 +348,9 @@ __CDECLARE_VOID_OPT(__ATTR_NONNULL((2)),__THROWING,UnlinkAt,(__fd_t __dfd, char 
 /* >> lseek64(2)
  * Change the position of the file read/write pointer within a file referred to by `fd' */
 __CDECLARE(,__pos64_t,__THROWING,LSeek64,(__fd_t __fd, __off64_t __offset, int __whence),(__fd,__offset,__whence))
-#elif defined(__CRT_HAVE_LSeek) && __SIZEOF_OFF32_T__ == __SIZEOF_OFF64_T__
+#else /* __CRT_HAVE_LSeek64 */
+#include <bits/types.h>
+#if defined(__CRT_HAVE_LSeek) && __SIZEOF_OFF32_T__ == __SIZEOF_OFF64_T__
 /* >> lseek64(2)
  * Change the position of the file read/write pointer within a file referred to by `fd' */
 __CREDIRECT(,__pos64_t,__THROWING,LSeek64,(__fd_t __fd, __off64_t __offset, int __whence),LSeek,(__fd,__offset,__whence))
@@ -352,6 +360,7 @@ __CREDIRECT(,__pos64_t,__THROWING,LSeek64,(__fd_t __fd, __off64_t __offset, int 
  * Change the position of the file read/write pointer within a file referred to by `fd' */
 __NAMESPACE_LOCAL_USING_OR_IMPL(LSeek64, __FORCELOCAL __ATTR_ARTIFICIAL __pos64_t (__LIBCCALL LSeek64)(__fd_t __fd, __off64_t __offset, int __whence) __THROWS(...) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(LSeek64))(__fd, __offset, __whence); })
 #endif /* ... */
+#endif /* !__CRT_HAVE_LSeek64 */
 #endif /* __USE_LARGEFILE64 */
 
 
@@ -366,13 +375,16 @@ __CREDIRECT(__ATTR_NONNULL((2)),size_t,__THROWING,PRead,(__fd_t __fd, void *__bu
  * Read data from a file at a specific `offset', rather than the current R/W position
  * @return: <= bufsize: The actual amount of read bytes */
 __CDECLARE(__ATTR_NONNULL((2)),size_t,__THROWING,PRead,(__fd_t __fd, void *__buf, size_t __bufsize, pos_t __offset),(__fd,__buf,__bufsize,__offset))
-#elif defined(__CRT_HAVE_PRead64) || defined(__CRT_HAVE_PRead)
+#else /* ... */
+#include <bits/types.h>
+#if defined(__CRT_HAVE_PRead64) || defined(__CRT_HAVE_PRead)
 #include <libc/local/kos.unistd/PRead.h>
 /* >> pread(2)
  * Read data from a file at a specific `offset', rather than the current R/W position
  * @return: <= bufsize: The actual amount of read bytes */
 __NAMESPACE_LOCAL_USING_OR_IMPL(PRead, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_NONNULL((2)) size_t (__LIBCCALL PRead)(__fd_t __fd, void *__buf, size_t __bufsize, pos_t __offset) __THROWS(...) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(PRead))(__fd, __buf, __bufsize, __offset); })
-#endif /* ... */
+#endif /* __CRT_HAVE_PRead64 || __CRT_HAVE_PRead */
+#endif /* !... */
 #if defined(__CRT_HAVE_PWrite64) && defined(__USE_FILE_OFFSET64)
 /* >> pwrite(2)
  * Write data to a file at a specific `offset', rather than the current R/W position
@@ -383,13 +395,16 @@ __CREDIRECT(__ATTR_NONNULL((2)),size_t,__THROWING,PWrite,(__fd_t __fd, void cons
  * Write data to a file at a specific `offset', rather than the current R/W position
  * @return: <= bufsize: The actual amount of written bytes */
 __CDECLARE(__ATTR_NONNULL((2)),size_t,__THROWING,PWrite,(__fd_t __fd, void const *__buf, size_t __bufsize, pos_t __offset),(__fd,__buf,__bufsize,__offset))
-#elif defined(__CRT_HAVE_PWrite64) || defined(__CRT_HAVE_PWrite)
+#else /* ... */
+#include <bits/types.h>
+#if defined(__CRT_HAVE_PWrite64) || defined(__CRT_HAVE_PWrite)
 #include <libc/local/kos.unistd/PWrite.h>
 /* >> pwrite(2)
  * Write data to a file at a specific `offset', rather than the current R/W position
  * @return: <= bufsize: The actual amount of written bytes */
 __NAMESPACE_LOCAL_USING_OR_IMPL(PWrite, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_NONNULL((2)) size_t (__LIBCCALL PWrite)(__fd_t __fd, void const *__buf, size_t __bufsize, pos_t __offset) __THROWS(...) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(PWrite))(__fd, __buf, __bufsize, __offset); })
-#endif /* ... */
+#endif /* __CRT_HAVE_PWrite64 || __CRT_HAVE_PWrite */
+#endif /* !... */
 #ifdef __USE_KOS
 #if defined(__CRT_HAVE_PReadAll64) && defined(__USE_FILE_OFFSET64)
 /* >> preadall(3)
@@ -399,19 +414,24 @@ __CREDIRECT(__ATTR_NONNULL((2)),size_t,__THROWING,PReadAll,(__fd_t __fd, void *_
 /* >> preadall(3)
  * Same as `readall(3)', but using `pread(2)' instead of `read()' */
 __CDECLARE(__ATTR_NONNULL((2)),size_t,__THROWING,PReadAll,(__fd_t __fd, void *__buf, size_t __bufsize, pos_t __offset),(__fd,__buf,__bufsize,__offset))
-#elif defined(__CRT_HAVE_PReadAll) || defined(__CRT_HAVE_PReadAll64) || defined(__CRT_HAVE_PRead64) || defined(__CRT_HAVE_PRead)
+#else /* ... */
+#include <bits/types.h>
+#if defined(__CRT_HAVE_PReadAll) || defined(__CRT_HAVE_PReadAll64) || defined(__CRT_HAVE_PRead64) || defined(__CRT_HAVE_PRead)
 #include <libc/local/kos.unistd/PReadAll.h>
 /* >> preadall(3)
  * Same as `readall(3)', but using `pread(2)' instead of `read()' */
 __NAMESPACE_LOCAL_USING_OR_IMPL(PReadAll, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_NONNULL((2)) size_t (__LIBCCALL PReadAll)(__fd_t __fd, void *__buf, size_t __bufsize, pos_t __offset) __THROWS(...) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(PReadAll))(__fd, __buf, __bufsize, __offset); })
-#endif /* ... */
+#endif /* __CRT_HAVE_PReadAll || __CRT_HAVE_PReadAll64 || __CRT_HAVE_PRead64 || __CRT_HAVE_PRead */
+#endif /* !... */
 #endif /* __USE_KOS */
 #ifdef __USE_LARGEFILE64
 #ifdef __CRT_HAVE_PRead64
 /* >> pread64(2)
  * Read data from a file at a specific offset */
 __CDECLARE(__ATTR_NONNULL((2)),size_t,__THROWING,PRead64,(__fd_t __fd, void *__buf, size_t __bufsize, pos64_t __offset),(__fd,__buf,__bufsize,__offset))
-#elif defined(__CRT_HAVE_PRead) && __SIZEOF_OFF32_T__ == __SIZEOF_OFF64_T__
+#else /* __CRT_HAVE_PRead64 */
+#include <bits/types.h>
+#if defined(__CRT_HAVE_PRead) && __SIZEOF_OFF32_T__ == __SIZEOF_OFF64_T__
 /* >> pread64(2)
  * Read data from a file at a specific offset */
 __CREDIRECT(__ATTR_NONNULL((2)),size_t,__THROWING,PRead64,(__fd_t __fd, void *__buf, size_t __bufsize, pos64_t __offset),PRead,(__fd,__buf,__bufsize,__offset))
@@ -421,11 +441,14 @@ __CREDIRECT(__ATTR_NONNULL((2)),size_t,__THROWING,PRead64,(__fd_t __fd, void *__
  * Read data from a file at a specific offset */
 __NAMESPACE_LOCAL_USING_OR_IMPL(PRead64, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_NONNULL((2)) size_t (__LIBCCALL PRead64)(__fd_t __fd, void *__buf, size_t __bufsize, pos64_t __offset) __THROWS(...) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(PRead64))(__fd, __buf, __bufsize, __offset); })
 #endif /* ... */
+#endif /* !__CRT_HAVE_PRead64 */
 #ifdef __CRT_HAVE_PWrite64
 /* >> pwrite64(2)
  * Write data to a file at a specific offset */
 __CDECLARE(__ATTR_NONNULL((2)),size_t,__THROWING,PWrite64,(__fd_t __fd, void *__buf, size_t __bufsize, pos64_t __offset),(__fd,__buf,__bufsize,__offset))
-#elif defined(__CRT_HAVE_PWrite) && __SIZEOF_OFF32_T__ == __SIZEOF_OFF64_T__
+#else /* __CRT_HAVE_PWrite64 */
+#include <bits/types.h>
+#if defined(__CRT_HAVE_PWrite) && __SIZEOF_OFF32_T__ == __SIZEOF_OFF64_T__
 /* >> pwrite64(2)
  * Write data to a file at a specific offset */
 __CREDIRECT(__ATTR_NONNULL((2)),size_t,__THROWING,PWrite64,(__fd_t __fd, void *__buf, size_t __bufsize, pos64_t __offset),PWrite,(__fd,__buf,__bufsize,__offset))
@@ -435,12 +458,15 @@ __CREDIRECT(__ATTR_NONNULL((2)),size_t,__THROWING,PWrite64,(__fd_t __fd, void *_
  * Write data to a file at a specific offset */
 __NAMESPACE_LOCAL_USING_OR_IMPL(PWrite64, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_NONNULL((2)) size_t (__LIBCCALL PWrite64)(__fd_t __fd, void *__buf, size_t __bufsize, pos64_t __offset) __THROWS(...) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(PWrite64))(__fd, __buf, __bufsize, __offset); })
 #endif /* ... */
+#endif /* !__CRT_HAVE_PWrite64 */
 #ifdef __USE_KOS
 #ifdef __CRT_HAVE_PReadAll64
 /* >> preadall64(3)
  * Same as `readall(3)', but using `pread64(2)' instead of `read()' */
 __CDECLARE(__ATTR_NONNULL((2)),size_t,__THROWING,PReadAll64,(__fd_t __fd, void *__buf, size_t __bufsize, pos64_t __offset),(__fd,__buf,__bufsize,__offset))
-#elif defined(__CRT_HAVE_PReadAll) && __SIZEOF_OFF32_T__ == __SIZEOF_OFF64_T__
+#else /* __CRT_HAVE_PReadAll64 */
+#include <bits/types.h>
+#if defined(__CRT_HAVE_PReadAll) && __SIZEOF_OFF32_T__ == __SIZEOF_OFF64_T__
 /* >> preadall64(3)
  * Same as `readall(3)', but using `pread64(2)' instead of `read()' */
 __CREDIRECT(__ATTR_NONNULL((2)),size_t,__THROWING,PReadAll64,(__fd_t __fd, void *__buf, size_t __bufsize, pos64_t __offset),PReadAll,(__fd,__buf,__bufsize,__offset))
@@ -450,6 +476,7 @@ __CREDIRECT(__ATTR_NONNULL((2)),size_t,__THROWING,PReadAll64,(__fd_t __fd, void 
  * Same as `readall(3)', but using `pread64(2)' instead of `read()' */
 __NAMESPACE_LOCAL_USING_OR_IMPL(PReadAll64, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_NONNULL((2)) size_t (__LIBCCALL PReadAll64)(__fd_t __fd, void *__buf, size_t __bufsize, pos64_t __offset) __THROWS(...) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(PReadAll64))(__fd, __buf, __bufsize, __offset); })
 #endif /* ... */
+#endif /* !__CRT_HAVE_PReadAll64 */
 #endif /* __USE_KOS */
 #endif /* __USE_LARGEFILE64 */
 #endif /* __USE_UNIX98 || __USE_XOPEN2K8 */
@@ -546,18 +573,23 @@ __CREDIRECT_VOID(__ATTR_NONNULL((1)),__THROWING,Truncate,(char const *__file, po
 /* >> truncate(2)
  * Truncate the given file `file' to a length of `length' */
 __CDECLARE_VOID(__ATTR_NONNULL((1)),__THROWING,Truncate,(char const *__file, pos_t __length),(__file,__length))
-#elif defined(__CRT_HAVE_Truncate64) || defined(__CRT_HAVE_Truncate)
+#else /* ... */
+#include <bits/types.h>
+#if defined(__CRT_HAVE_Truncate64) || defined(__CRT_HAVE_Truncate)
 #include <libc/local/kos.unistd/Truncate.h>
 /* >> truncate(2)
  * Truncate the given file `file' to a length of `length' */
 __NAMESPACE_LOCAL_USING_OR_IMPL(Truncate, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_NONNULL((1)) void (__LIBCCALL Truncate)(char const *__file, pos_t __length) __THROWS(...) { (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(Truncate))(__file, __length); })
-#endif /* ... */
+#endif /* __CRT_HAVE_Truncate64 || __CRT_HAVE_Truncate */
+#endif /* !... */
 #ifdef __USE_LARGEFILE64
 #ifdef __CRT_HAVE_Truncate64
 /* >> truncate64(2)
  * Truncate the given file `file' to a length of `length' */
 __CDECLARE_VOID(__ATTR_NONNULL((1)),__THROWING,Truncate64,(char const *__file, pos64_t __length),(__file,__length))
-#elif defined(__CRT_HAVE_Truncate) && __SIZEOF_OFF32_T__ == __SIZEOF_OFF64_T__
+#else /* __CRT_HAVE_Truncate64 */
+#include <bits/types.h>
+#if defined(__CRT_HAVE_Truncate) && __SIZEOF_OFF32_T__ == __SIZEOF_OFF64_T__
 /* >> truncate64(2)
  * Truncate the given file `file' to a length of `length' */
 __CREDIRECT_VOID(__ATTR_NONNULL((1)),__THROWING,Truncate64,(char const *__file, pos64_t __length),Truncate,(__file,__length))
@@ -567,6 +599,7 @@ __CREDIRECT_VOID(__ATTR_NONNULL((1)),__THROWING,Truncate64,(char const *__file, 
  * Truncate the given file `file' to a length of `length' */
 __NAMESPACE_LOCAL_USING_OR_IMPL(Truncate64, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_NONNULL((1)) void (__LIBCCALL Truncate64)(char const *__file, pos64_t __length) __THROWS(...) { (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(Truncate64))(__file, __length); })
 #endif /* ... */
+#endif /* !__CRT_HAVE_Truncate64 */
 #endif /* __USE_LARGEFILE64 */
 #endif /* __USE_XOPEN_EXTENDED || __USE_XOPEN2K8 */
 
@@ -719,18 +752,23 @@ __CREDIRECT_VOID(,__THROWING,FTruncate,(__fd_t __fd, pos_t __length),FTruncate64
 /* >> ftruncate(2), ftruncate64(2)
  * Truncate the given file `fd' to a length of `length' */
 __CDECLARE_VOID(,__THROWING,FTruncate,(__fd_t __fd, pos_t __length),(__fd,__length))
-#elif defined(__CRT_HAVE_FTruncate64) || defined(__CRT_HAVE_FTruncate)
+#else /* ... */
+#include <bits/types.h>
+#if defined(__CRT_HAVE_FTruncate64) || defined(__CRT_HAVE_FTruncate)
 #include <libc/local/kos.unistd/FTruncate.h>
 /* >> ftruncate(2), ftruncate64(2)
  * Truncate the given file `fd' to a length of `length' */
 __NAMESPACE_LOCAL_USING_OR_IMPL(FTruncate, __FORCELOCAL __ATTR_ARTIFICIAL void (__LIBCCALL FTruncate)(__fd_t __fd, pos_t __length) __THROWS(...) { (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(FTruncate))(__fd, __length); })
-#endif /* ... */
+#endif /* __CRT_HAVE_FTruncate64 || __CRT_HAVE_FTruncate */
+#endif /* !... */
 #ifdef __USE_LARGEFILE64
 #ifdef __CRT_HAVE_FTruncate64
 /* >> ftruncate(2), ftruncate64(2)
  * Truncate the given file `fd' to a length of `length' */
 __CDECLARE_VOID(,__THROWING,FTruncate64,(__fd_t __fd, pos64_t __length),(__fd,__length))
-#elif defined(__CRT_HAVE_FTruncate) && __SIZEOF_OFF32_T__ == __SIZEOF_OFF64_T__
+#else /* __CRT_HAVE_FTruncate64 */
+#include <bits/types.h>
+#if defined(__CRT_HAVE_FTruncate) && __SIZEOF_OFF32_T__ == __SIZEOF_OFF64_T__
 /* >> ftruncate(2), ftruncate64(2)
  * Truncate the given file `fd' to a length of `length' */
 __CREDIRECT_VOID(,__THROWING,FTruncate64,(__fd_t __fd, pos64_t __length),FTruncate,(__fd,__length))
@@ -740,6 +778,7 @@ __CREDIRECT_VOID(,__THROWING,FTruncate64,(__fd_t __fd, pos64_t __length),FTrunca
  * Truncate the given file `fd' to a length of `length' */
 __NAMESPACE_LOCAL_USING_OR_IMPL(FTruncate64, __FORCELOCAL __ATTR_ARTIFICIAL void (__LIBCCALL FTruncate64)(__fd_t __fd, pos64_t __length) __THROWS(...) { (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(FTruncate64))(__fd, __length); })
 #endif /* ... */
+#endif /* !__CRT_HAVE_FTruncate64 */
 #endif /* __USE_LARGEFILE64 */
 #endif /* __USE_POSIX199309 || __USE_XOPEN_EXTENDED || __USE_XOPEN2K */
 

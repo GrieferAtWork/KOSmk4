@@ -451,9 +451,9 @@ function escapeKeywordIfNotAlreadyEscaped(
 		word: string | UserString): string {
 	if (word is UserString)
 		word = word.text;
-	if (word.startswith("__"))
+	if (word.startswith("__") && word !in special_escapes)
 		return word;
-	if (word.startswith("_") && #word >= 2 && word.isupper(1))
+	if (word.startswith("_") && #word >= 2 && word.isupper(1) && word !in special_escapes)
 		return word;
 	local result = "__" + word;
 	if (result in special_escapes)

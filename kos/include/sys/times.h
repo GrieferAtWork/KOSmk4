@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xe99f6dcc */
+/* HASH CRC-32:0x1c2a4a09 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -51,6 +51,7 @@ __SYSDECL_BEGIN
 typedef __clock_t clock_t;
 #endif /* !__clock_t_defined */
 
+/* >> times(2) */
 __CDECLARE_OPT(,clock_t,__NOTHROW_NCX,times,(struct tms *__buffer),(__buffer))
 
 __SYSDECL_END

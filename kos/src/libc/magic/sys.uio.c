@@ -135,14 +135,14 @@ ssize_t preadv32($fd_t fd, [[inp(count)]] struct iovec const *iov,
 ssize_t pwritev32($fd_t fd, [[inp(count)]] struct iovec const *iov,
                   __STDC_INT_AS_SIZE_T count, $off32_t offset);
 
-@@>> preadv(2)
+@@>> preadv(2), preadv64(2)
 @@Same as  `readv(2)', but  read data  from a  file at  a
 @@specific `offset', rather than the current R/W position
 @@@return: <= SUM(iov[*].iov_len): The actual amount of read bytes
 [[cp, wunused, no_crt_self_import]]
 [[decl_include("<features.h>", "<bits/os/iovec.h>", "<bits/types.h>")]]
-[[if(defined(__USE_FILE_OFFSET64)), preferred_alias("preadv64")]]
-[[if(!defined(__USE_FILE_OFFSET64)), preferred_alias("preadv")]]
+[[if($extended_include_prefix("<features.h>") defined(__USE_FILE_OFFSET64)), preferred_alias("preadv64")]]
+[[if($extended_include_prefix("<features.h>")!defined(__USE_FILE_OFFSET64)), preferred_alias("preadv")]]
 [[userimpl, requires($has_function(preadv32) || $has_function(preadv64))]]
 ssize_t preadv($fd_t fd, [[inp(count)]] struct iovec const *iov,
                __STDC_INT_AS_SIZE_T count, $off_t offset) {
@@ -153,14 +153,14 @@ ssize_t preadv($fd_t fd, [[inp(count)]] struct iovec const *iov,
 @@pp_endif@@
 }
 
-@@>> pwritev(2)
+@@>> pwritev(2), pwritev64(2)
 @@Same as  `writev(2)', but  write data  to a  file at  a
 @@specific `offset', rather than the current R/W position
 @@@return: <= SUM(iov[*].iov_len): The actual amount of written bytes
 [[cp, no_crt_self_import]]
 [[decl_include("<features.h>", "<bits/os/iovec.h>", "<bits/types.h>")]]
-[[if(defined(__USE_FILE_OFFSET64)), preferred_alias("pwritev64")]]
-[[if(!defined(__USE_FILE_OFFSET64)), preferred_alias("pwritev")]]
+[[if($extended_include_prefix("<features.h>") defined(__USE_FILE_OFFSET64)), preferred_alias("pwritev64")]]
+[[if($extended_include_prefix("<features.h>")!defined(__USE_FILE_OFFSET64)), preferred_alias("pwritev")]]
 [[userimpl, requires($has_function(pwritev32) || $has_function(pwritev64))]]
 ssize_t pwritev($fd_t fd, [[inp(count)]] struct iovec const *iov,
                 __STDC_INT_AS_SIZE_T count, $off_t offset) {

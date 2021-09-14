@@ -27,9 +27,7 @@
 
 %[insert:prefix(
 #include <bits/os/sigstack.h>
-)]%{
-
-}%[insert:prefix(
+)]%[insert:prefix(
 #include <pthread.h>
 )]%{
 

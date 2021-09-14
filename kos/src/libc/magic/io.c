@@ -35,6 +35,10 @@
 #include <hybrid/typecore.h>
 )]%[insert:prefix(
 #include <bits/types.h>
+)]%[insert:prefix(
+#include <asm/os/fcntl.h>
+)]%[insert:prefix(
+#include <asm/os/oflags.h>
 )]%{
 
 

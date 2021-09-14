@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xe606bfaa */
+/* HASH CRC-32:0x7dc69dc0 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -55,6 +55,7 @@ __NAMESPACE_STD_USING(size_t)
 #if defined(__CRT_HAVE_raise) || (defined(__CRT_HAVE_pthread_kill) && (defined(__CRT_HAVE_pthread_self) || defined(__CRT_HAVE_thrd_current))) || (defined(__CRT_HAVE_kill) && (defined(__CRT_HAVE_getpid) || defined(__CRT_HAVE__getpid) || defined(__CRT_HAVE___getpid)))
 __NAMESPACE_STD_USING(raise)
 #endif /* __CRT_HAVE_raise || (__CRT_HAVE_pthread_kill && (__CRT_HAVE_pthread_self || __CRT_HAVE_thrd_current)) || (__CRT_HAVE_kill && (__CRT_HAVE_getpid || __CRT_HAVE__getpid || __CRT_HAVE___getpid)) */
+#include <features.h>
 #if (defined(__CRT_HAVE_signal) && defined(__USE_MISC)) || (defined(__CRT_HAVE__signal) && defined(__USE_MISC)) || defined(__CRT_HAVE_sysv_signal)
 __NAMESPACE_STD_USING(signal)
 #endif /* (__CRT_HAVE_signal && __USE_MISC) || (__CRT_HAVE__signal && __USE_MISC) || __CRT_HAVE_sysv_signal */

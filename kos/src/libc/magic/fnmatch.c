@@ -69,6 +69,7 @@ __SYSDECL_BEGIN
 
 
 
+@@>> fnmatch(3)
 @@Match the given `name' against `pattern', returning
 @@`0'  if  they match,  and  `FNM_NOMATCH' otherwise.
 @@@param: match_flags:   Set of `FNM_*'

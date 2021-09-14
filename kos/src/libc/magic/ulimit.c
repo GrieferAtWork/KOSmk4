@@ -73,6 +73,7 @@ enum {
 #ifdef __CC__
 }
 
+@@>> ulimit(2)
 @@@param: cmd: One OF `UL_*'
 [[vartypes(long), decl_include("<features.h>")]]
 $longptr_t ulimit(__STDC_INT_AS_UINT_T cmd, ...);

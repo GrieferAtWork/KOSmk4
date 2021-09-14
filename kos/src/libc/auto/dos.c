@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x98a77337 */
+/* HASH CRC-32:0xfbc7e0e5 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -31,7 +31,8 @@ DECL_BEGIN
 
 #ifndef __KERNEL__
 #include <bits/types.h>
-/* Sleep for `mill' milliseconds (1/1.000 seconds) */
+/* >> delay(3)
+ * Sleep for `mill' milliseconds (1/1.000 seconds) */
 INTERN ATTR_SECTION(".text.crt.dos.system") void
 NOTHROW_RPC(LIBCCALL libc_delay)(unsigned int mill) {
 	libc_usleep((useconds_t)mill * 1000);

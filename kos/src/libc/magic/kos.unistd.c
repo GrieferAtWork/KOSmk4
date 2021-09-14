@@ -192,8 +192,8 @@ $pos32_t LSeek32($fd_t fd, $off32_t offset, int whence);
 
 [[throws, decl_include("<bits/types.h>")]]
 [[doc_alias("lseek"), no_crt_self_import]]
-[[if(defined(__USE_FILE_OFFSET64)), preferred_alias("LSeek64")]]
-[[if(!defined(__USE_FILE_OFFSET64)), preferred_alias("LSeek")]]
+[[if($extended_include_prefix("<features.h>") defined(__USE_FILE_OFFSET64)), preferred_alias("LSeek64")]]
+[[if($extended_include_prefix("<features.h>")!defined(__USE_FILE_OFFSET64)), preferred_alias("LSeek")]]
 [[userimpl, requires($has_function(LSeek32) || $has_function(LSeek64))]]
 [[section(".text.crt{|.dos}.except.io.seek")]]
 $pos_t LSeek($fd_t fd, $off_t offset, int whence) {
@@ -290,8 +290,8 @@ $pos64_t LSeek64($fd_t fd, $off64_t offset, int whence) {
 
 [[cp, throws, decl_include("<bits/types.h>")]]
 [[doc_alias("pread"), no_crt_self_import]]
-[[if(defined(__USE_FILE_OFFSET64)), preferred_alias("PRead64")]]
-[[if(!defined(__USE_FILE_OFFSET64)), preferred_alias("PRead")]]
+[[if($extended_include_prefix("<features.h>") defined(__USE_FILE_OFFSET64)), preferred_alias("PRead64")]]
+[[if($extended_include_prefix("<features.h>")!defined(__USE_FILE_OFFSET64)), preferred_alias("PRead")]]
 [[section(".text.crt{|.dos}.except.io.read")]]
 [[userimpl, requires($has_function(PRead32) || $has_function(PRead64))]]
 size_t PRead($fd_t fd, [[outp(bufsize)]] void *buf, size_t bufsize, pos_t offset) {
@@ -304,8 +304,8 @@ size_t PRead($fd_t fd, [[outp(bufsize)]] void *buf, size_t bufsize, pos_t offset
 
 [[cp, throws, decl_include("<bits/types.h>")]]
 [[doc_alias("pwrite"), no_crt_self_import]]
-[[if(defined(__USE_FILE_OFFSET64)), preferred_alias("PWrite64")]]
-[[if(!defined(__USE_FILE_OFFSET64)), preferred_alias("PWrite")]]
+[[if($extended_include_prefix("<features.h>") defined(__USE_FILE_OFFSET64)), preferred_alias("PWrite64")]]
+[[if($extended_include_prefix("<features.h>")!defined(__USE_FILE_OFFSET64)), preferred_alias("PWrite")]]
 [[userimpl, requires($has_function(PWrite32) || $has_function(PWrite64))]]
 [[section(".text.crt{|.dos}.except.io.write")]]
 size_t PWrite($fd_t fd, [[inp(bufsize)]] void const *buf, size_t bufsize, pos_t offset) {
@@ -320,8 +320,8 @@ size_t PWrite($fd_t fd, [[inp(bufsize)]] void const *buf, size_t bufsize, pos_t 
 %#ifdef __USE_KOS
 [[cp, throws, decl_include("<bits/types.h>")]]
 [[doc_alias("preadall"), no_crt_self_import]]
-[[if(defined(__USE_FILE_OFFSET64)), preferred_alias("PReadAll64")]]
-[[if(!defined(__USE_FILE_OFFSET64)), preferred_alias("PReadAll")]]
+[[if($extended_include_prefix("<features.h>") defined(__USE_FILE_OFFSET64)), preferred_alias("PReadAll64")]]
+[[if($extended_include_prefix("<features.h>")!defined(__USE_FILE_OFFSET64)), preferred_alias("PReadAll")]]
 [[userimpl, requires($has_function(PReadAll32) || $has_function(PReadAll64))]]
 [[section(".text.crt{|.dos}.except.io.read")]]
 size_t PReadAll($fd_t fd, [[outp(bufsize)]] void *buf, size_t bufsize, pos_t offset) {
@@ -467,8 +467,8 @@ void LChown([[nonnull]] char const *file, $uid_t owner, $gid_t group) {
 
 [[throws, decl_include("<bits/types.h>")]]
 [[doc_alias("truncate"), no_crt_self_import]]
-[[if(defined(__USE_FILE_OFFSET64)), preferred_alias("Truncate64")]]
-[[if(!defined(__USE_FILE_OFFSET64)), preferred_alias("Truncate")]]
+[[if($extended_include_prefix("<features.h>") defined(__USE_FILE_OFFSET64)), preferred_alias("Truncate64")]]
+[[if($extended_include_prefix("<features.h>")!defined(__USE_FILE_OFFSET64)), preferred_alias("Truncate")]]
 [[section(".text.crt{|.dos}.except.fs.modify")]]
 [[userimpl, requires($has_function(Truncate32) || $has_function(Truncate64))]]
 void Truncate([[nonnull]] char const *file, pos_t length) {

@@ -138,11 +138,12 @@ $pid_t wait3_32([[nullable]] __WAIT_STATUS stat_loc,
                 __STDC_INT_AS_UINT_T options,
                 [[nullable]] struct $rusage32 *usage);
 
+@@>> wait3(2), wait3_64(2)
 @@Same as `waitpid(-1, STAT_LOC, OPTIONS)', though also fills in `USAGE' when non-NULL
 @@@param options: Set of `WNOHANG | WUNTRACED | WCONTINUED' (as a KOS extension, `WNOWAIT' is also accepted)
 [[cp, no_crt_self_import]]
-[[if(defined(__USE_TIME_BITS64)), preferred_alias("wait3_64")]]
-[[if(!defined(__USE_TIME_BITS64)), preferred_alias("wait3")]]
+[[if($extended_include_prefix("<features.h>") defined(__USE_TIME_BITS64)), preferred_alias("wait3_64")]]
+[[if($extended_include_prefix("<features.h>")!defined(__USE_TIME_BITS64)), preferred_alias("wait3")]]
 [[userimpl, requires($has_function(wait3_32) || $has_function(wait3_64))]]
 [[decl_include("<bits/types.h>", "<features.h>")]]
 [[decl_include("<bits/os/rusage.h>", "<parts/waitmacros.h>")]]
@@ -195,12 +196,12 @@ $pid_t wait4_32($pid_t pid, [[nullable]] __WAIT_STATUS stat_loc,
                 __STDC_INT_AS_UINT_T options,
                 [[nullable]] struct $rusage32 *usage);
 
-@@>> wait4(2)
+@@>> wait4(2), wait4_64(2)
 @@Same as `waitpid(pid, STAT_LOC, OPTIONS)', though also fills in `USAGE' when non-NULL
 @@@param: options: Set of `WNOHANG | WUNTRACED | WCONTINUED' (as a KOS extension, `WNOWAIT' is also accepted)
 [[cp, decl_prefix(struct rusage;)]]
-[[if(defined(__USE_TIME_BITS64)), preferred_alias("wait4_64")]]
-[[if(!defined(__USE_TIME_BITS64)), preferred_alias("wait4")]]
+[[if($extended_include_prefix("<features.h>") defined(__USE_TIME_BITS64)), preferred_alias("wait4_64")]]
+[[if($extended_include_prefix("<features.h>")!defined(__USE_TIME_BITS64)), preferred_alias("wait4")]]
 [[decl_include("<bits/types.h>", "<features.h>")]]
 [[decl_include("<bits/os/rusage.h>", "<parts/waitmacros.h>")]]
 [[impl_include("<bits/os/rusage-convert.h>")]]
@@ -287,9 +288,9 @@ $pid_t wait4_64($pid_t pid, [[nullable]] __WAIT_STATUS stat_loc,
 @@    If no waitable children existed, `ECHILD' is set; else `0' is returned.
 @@Before any of this is done, the thread referred to by `PID' is one of the following:
 @@  - The leader of the process that called `fork()' or `clone()' without
-@@   `CLONE_PARENT' to create the thread referred to by `PID'
-@@  - The creator of the process containing a thread that called
-@@   `clone()' with `CLONE_PARENT', which then created the thread
+@@    `CLONE_PARENT'  to  create   the  thread  referred   to  by   `PID'
+@@  - The creator of the process  containing a thread that  called
+@@    `clone()' with `CLONE_PARENT', which then created the thread
 @@    referred to by `PID'.
 @@  - Even if  the thread  doesn't deliver  a signal  upon it  terminating,
 @@    the process that would have received such a signal is still relevant.
@@ -320,19 +321,19 @@ $pid_t wait4_64($pid_t pid, [[nullable]] __WAIT_STATUS stat_loc,
 @@      In other words,  the child  of a  fork() can't  do this,  and
 @@      neither can the spawnee of  clone(CLONE_THREAD|CLONE_PARENT),
 @@      clone(0) or clone(CLONE_PARENT).
-@@@errno: EPERM:               The  calling  process isn't  the recipient  of signals
-@@                             delivered when `PID'  changes state.  This can  either
-@@                             be because `PID' has already been detached, or because
-@@                             YOU CAN'T DETACH SOMEONE ELSE'S THREAD!
-@@                             Another  possibility is that the thread was already
-@@                             detached, then exited, following which a new thread
-@@                             got created and had been  assigned the PID of  your
-@@                             ancient, no longer existent thread.
-@@@errno: ECHILD:             `PID' was equal to `-1', but no waitable children existed
-@@@throw: E_PROCESS_EXITED:    The  process  referred  to  by  `PID'  doesn't exist.
-@@                             This could  mean that  it had  already been  detached
-@@                             and exited, or that the `PID' is just invalid  (which
-@@                             would also be the case if it was valid at some point)
+@@@errno: EPERM:            The  calling  process isn't  the recipient  of signals
+@@                          delivered when `PID'  changes state.  This can  either
+@@                          be because `PID' has already been detached, or because
+@@                          YOU CAN'T DETACH SOMEONE ELSE'S THREAD!
+@@                          Another  possibility is that the thread was already
+@@                          detached, then exited, following which a new thread
+@@                          got created and had been  assigned the PID of  your
+@@                          ancient, no longer existent thread.
+@@@errno: ECHILD:           `PID' was equal to `-1', but no waitable children existed
+@@@throw: E_PROCESS_EXITED: The  process  referred  to  by  `PID'  doesn't exist.
+@@                          This could  mean that  it had  already been  detached
+@@                          and exited, or that the `PID' is just invalid  (which
+@@                          would also be the case if it was valid at some point)
 [[decl_include("<bits/types.h>")]]
 int detach($pid_t pid);
 %#endif /* __USE_KOS */

@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xbcb8e272 */
+/* HASH CRC-32:0x852d70f2 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -236,9 +236,9 @@ typedef __blksize_t blksize_t;
 #endif /* !S_ISGID && __S_ISGID */
 
 #if defined(__USE_MISC) || defined(__USE_XOPEN)
-#ifndef S_ISVTX
+#if !defined(S_ISVTX) && defined(__S_ISVTX)
 #define S_ISVTX __S_ISVTX
-#endif /* !S_ISVTX */
+#endif /* !S_ISVTX && __S_ISVTX */
 #endif /* __USE_MISC || __USE_XOPEN */
 
 #ifndef S_IRUSR
@@ -323,120 +323,169 @@ typedef __blksize_t blksize_t;
 #endif /* __USE_LARGEFILE64 */
 
 #if defined(__CRT_HAVE_kstat) && defined(__CRT_KOS_PRIMARY)
+/* >> stat(2), stat64(2) */
 __CREDIRECT(__ATTR_NONNULL((1, 2)),int,__NOTHROW_NCX,stat,(char const *__restrict __filename, struct stat *__restrict __buf),kstat,(__filename,__buf))
 #elif defined(__CRT_HAVE_kstat64) && defined(__CRT_KOS_PRIMARY)
+/* >> stat(2), stat64(2) */
 __CREDIRECT(__ATTR_NONNULL((1, 2)),int,__NOTHROW_NCX,stat,(char const *__restrict __filename, struct stat *__restrict __buf),kstat64,(__filename,__buf))
 #elif defined(__CRT_HAVE__stat64) && defined(__CRT_DOS_PRIMARY) && defined(__USE_TIME_BITS64)
+/* >> stat(2), stat64(2) */
 __CREDIRECT(__ATTR_NONNULL((1, 2)),int,__NOTHROW_NCX,stat,(char const *__restrict __filename, struct stat *__restrict __buf),_stat64,(__filename,__buf))
 #elif defined(__CRT_HAVE__stat64i32) && defined(__CRT_DOS_PRIMARY) && defined(__USE_TIME_BITS64)
+/* >> stat(2), stat64(2) */
 __CREDIRECT(__ATTR_NONNULL((1, 2)),int,__NOTHROW_NCX,stat,(char const *__restrict __filename, struct stat *__restrict __buf),_stat64i32,(__filename,__buf))
 #elif defined(__CRT_HAVE__stati64) && defined(__CRT_DOS_PRIMARY) && !defined(__USE_TIME_BITS64) && defined(__USE_FILE_OFFSET64)
+/* >> stat(2), stat64(2) */
 __CREDIRECT(__ATTR_NONNULL((1, 2)),int,__NOTHROW_NCX,stat,(char const *__restrict __filename, struct stat *__restrict __buf),_stati64,(__filename,__buf))
 #elif defined(__CRT_HAVE__stat32i64) && defined(__CRT_DOS_PRIMARY) && !defined(__USE_TIME_BITS64) && defined(__USE_FILE_OFFSET64)
+/* >> stat(2), stat64(2) */
 __CREDIRECT(__ATTR_NONNULL((1, 2)),int,__NOTHROW_NCX,stat,(char const *__restrict __filename, struct stat *__restrict __buf),_stat32i64,(__filename,__buf))
 #elif defined(__CRT_HAVE__stat) && defined(__CRT_DOS_PRIMARY) && !defined(__USE_TIME_BITS64) && !defined(__USE_FILE_OFFSET64)
+/* >> stat(2), stat64(2) */
 __CREDIRECT(__ATTR_NONNULL((1, 2)),int,__NOTHROW_NCX,stat,(char const *__restrict __filename, struct stat *__restrict __buf),_stat,(__filename,__buf))
 #elif defined(__CRT_HAVE__stat32) && defined(__CRT_DOS_PRIMARY) && !defined(__USE_TIME_BITS64) && !defined(__USE_FILE_OFFSET64)
+/* >> stat(2), stat64(2) */
 __CREDIRECT(__ATTR_NONNULL((1, 2)),int,__NOTHROW_NCX,stat,(char const *__restrict __filename, struct stat *__restrict __buf),_stat32,(__filename,__buf))
 #elif defined(__CRT_HAVE_stat64) && defined(__USE_FILE_OFFSET64)
+/* >> stat(2), stat64(2) */
 __CREDIRECT(__ATTR_NONNULL((1, 2)),int,__NOTHROW_NCX,stat,(char const *__restrict __filename, struct stat *__restrict __buf),stat64,(__filename,__buf))
 #elif defined(__CRT_HAVE_stat) && !defined(__USE_FILE_OFFSET64)
+/* >> stat(2), stat64(2) */
 __CDECLARE(__ATTR_NONNULL((1, 2)),int,__NOTHROW_NCX,stat,(char const *__restrict __filename, struct stat *__restrict __buf),(__filename,__buf))
 #endif /* ... */
-
 #if defined(__CRT_HAVE_kfstat) && defined(__CRT_KOS_PRIMARY)
+/* >> fstat(2), fstat64(2) */
 __CREDIRECT(__ATTR_NONNULL((2)),int,__NOTHROW_NCX,fstat,(__fd_t __fd, struct stat *__restrict __buf),kfstat,(__fd,__buf))
 #elif defined(__CRT_HAVE_kfstat64) && defined(__CRT_KOS_PRIMARY)
+/* >> fstat(2), fstat64(2) */
 __CREDIRECT(__ATTR_NONNULL((2)),int,__NOTHROW_NCX,fstat,(__fd_t __fd, struct stat *__restrict __buf),kfstat64,(__fd,__buf))
 #elif defined(__CRT_HAVE__fstat64) && defined(__CRT_DOS_PRIMARY) && defined(__USE_TIME_BITS64)
+/* >> fstat(2), fstat64(2) */
 __CREDIRECT(__ATTR_NONNULL((2)),int,__NOTHROW_NCX,fstat,(__fd_t __fd, struct stat *__restrict __buf),_fstat64,(__fd,__buf))
 #elif defined(__CRT_HAVE__fstat64i32) && defined(__CRT_DOS_PRIMARY) && defined(__USE_TIME_BITS64)
+/* >> fstat(2), fstat64(2) */
 __CREDIRECT(__ATTR_NONNULL((2)),int,__NOTHROW_NCX,fstat,(__fd_t __fd, struct stat *__restrict __buf),_fstat64i32,(__fd,__buf))
 #elif defined(__CRT_HAVE__fstati64) && defined(__CRT_DOS_PRIMARY) && !defined(__USE_TIME_BITS64) && defined(__USE_FILE_OFFSET64)
+/* >> fstat(2), fstat64(2) */
 __CREDIRECT(__ATTR_NONNULL((2)),int,__NOTHROW_NCX,fstat,(__fd_t __fd, struct stat *__restrict __buf),_fstati64,(__fd,__buf))
 #elif defined(__CRT_HAVE__fstat32i64) && defined(__CRT_DOS_PRIMARY) && !defined(__USE_TIME_BITS64) && defined(__USE_FILE_OFFSET64)
+/* >> fstat(2), fstat64(2) */
 __CREDIRECT(__ATTR_NONNULL((2)),int,__NOTHROW_NCX,fstat,(__fd_t __fd, struct stat *__restrict __buf),_fstat32i64,(__fd,__buf))
 #elif defined(__CRT_HAVE__fstat) && defined(__CRT_DOS_PRIMARY) && !defined(__USE_TIME_BITS64) && !defined(__USE_FILE_OFFSET64)
+/* >> fstat(2), fstat64(2) */
 __CREDIRECT(__ATTR_NONNULL((2)),int,__NOTHROW_NCX,fstat,(__fd_t __fd, struct stat *__restrict __buf),_fstat,(__fd,__buf))
 #elif defined(__CRT_HAVE__fstat32) && defined(__CRT_DOS_PRIMARY) && !defined(__USE_TIME_BITS64) && !defined(__USE_FILE_OFFSET64)
+/* >> fstat(2), fstat64(2) */
 __CREDIRECT(__ATTR_NONNULL((2)),int,__NOTHROW_NCX,fstat,(__fd_t __fd, struct stat *__restrict __buf),_fstat32,(__fd,__buf))
 #elif defined(__CRT_HAVE_fstat64) && defined(__USE_FILE_OFFSET64)
+/* >> fstat(2), fstat64(2) */
 __CREDIRECT(__ATTR_NONNULL((2)),int,__NOTHROW_NCX,fstat,(__fd_t __fd, struct stat *__restrict __buf),fstat64,(__fd,__buf))
 #elif defined(__CRT_HAVE_fstat) && !defined(__USE_FILE_OFFSET64)
+/* >> fstat(2), fstat64(2) */
 __CDECLARE(__ATTR_NONNULL((2)),int,__NOTHROW_NCX,fstat,(__fd_t __fd, struct stat *__restrict __buf),(__fd,__buf))
 #endif /* ... */
 
 #if defined(__USE_XOPEN_EXTENDED) || defined(__USE_XOPEN2K)
 #if defined(__CRT_HAVE_klstat) && defined(__CRT_KOS_PRIMARY)
+/* >> lstat(2), lstat64(2) */
 __CREDIRECT(__ATTR_NONNULL((1, 2)),int,__NOTHROW_NCX,lstat,(char const *__restrict __filename, struct stat *__restrict __buf),klstat,(__filename,__buf))
 #elif defined(__CRT_HAVE_klstat64) && defined(__CRT_KOS_PRIMARY)
+/* >> lstat(2), lstat64(2) */
 __CREDIRECT(__ATTR_NONNULL((1, 2)),int,__NOTHROW_NCX,lstat,(char const *__restrict __filename, struct stat *__restrict __buf),klstat64,(__filename,__buf))
 #elif defined(__CRT_HAVE__stat64) && defined(__CRT_DOS_PRIMARY) && defined(__USE_TIME_BITS64)
+/* >> lstat(2), lstat64(2) */
 __CREDIRECT(__ATTR_NONNULL((1, 2)),int,__NOTHROW_NCX,lstat,(char const *__restrict __filename, struct stat *__restrict __buf),_stat64,(__filename,__buf))
 #elif defined(__CRT_HAVE__stat64i32) && defined(__CRT_DOS_PRIMARY) && defined(__USE_TIME_BITS64)
+/* >> lstat(2), lstat64(2) */
 __CREDIRECT(__ATTR_NONNULL((1, 2)),int,__NOTHROW_NCX,lstat,(char const *__restrict __filename, struct stat *__restrict __buf),_stat64i32,(__filename,__buf))
 #elif defined(__CRT_HAVE__stati64) && defined(__CRT_DOS_PRIMARY) && !defined(__USE_TIME_BITS64) && defined(__USE_FILE_OFFSET64)
+/* >> lstat(2), lstat64(2) */
 __CREDIRECT(__ATTR_NONNULL((1, 2)),int,__NOTHROW_NCX,lstat,(char const *__restrict __filename, struct stat *__restrict __buf),_stati64,(__filename,__buf))
 #elif defined(__CRT_HAVE__stat32i64) && defined(__CRT_DOS_PRIMARY) && !defined(__USE_TIME_BITS64) && defined(__USE_FILE_OFFSET64)
+/* >> lstat(2), lstat64(2) */
 __CREDIRECT(__ATTR_NONNULL((1, 2)),int,__NOTHROW_NCX,lstat,(char const *__restrict __filename, struct stat *__restrict __buf),_stat32i64,(__filename,__buf))
 #elif defined(__CRT_HAVE__stat) && defined(__CRT_DOS_PRIMARY) && !defined(__USE_TIME_BITS64) && !defined(__USE_FILE_OFFSET64)
+/* >> lstat(2), lstat64(2) */
 __CREDIRECT(__ATTR_NONNULL((1, 2)),int,__NOTHROW_NCX,lstat,(char const *__restrict __filename, struct stat *__restrict __buf),_stat,(__filename,__buf))
 #elif defined(__CRT_HAVE__stat32) && defined(__CRT_DOS_PRIMARY) && !defined(__USE_TIME_BITS64) && !defined(__USE_FILE_OFFSET64)
+/* >> lstat(2), lstat64(2) */
 __CREDIRECT(__ATTR_NONNULL((1, 2)),int,__NOTHROW_NCX,lstat,(char const *__restrict __filename, struct stat *__restrict __buf),_stat32,(__filename,__buf))
 #elif defined(__CRT_HAVE_lstat64) && defined(__USE_FILE_OFFSET64)
+/* >> lstat(2), lstat64(2) */
 __CREDIRECT(__ATTR_NONNULL((1, 2)),int,__NOTHROW_NCX,lstat,(char const *__restrict __filename, struct stat *__restrict __buf),lstat64,(__filename,__buf))
 #elif defined(__CRT_HAVE_lstat) && !defined(__USE_FILE_OFFSET64)
+/* >> lstat(2), lstat64(2) */
 __CDECLARE(__ATTR_NONNULL((1, 2)),int,__NOTHROW_NCX,lstat,(char const *__restrict __filename, struct stat *__restrict __buf),(__filename,__buf))
 #endif /* ... */
 #endif /* __USE_XOPEN_EXTENDED || __USE_XOPEN2K */
 
 #ifdef __USE_LARGEFILE64
 #if defined(__CRT_HAVE_kstat) && defined(__CRT_KOS_PRIMARY)
+/* >> stat(2), stat64(2) */
 __CREDIRECT(__ATTR_NONNULL((1, 2)),int,__NOTHROW_NCX,stat64,(char const *__restrict __filename, struct stat64 *__restrict __buf),kstat,(__filename,__buf))
 #elif defined(__CRT_HAVE_kstat64) && defined(__CRT_KOS_PRIMARY)
+/* >> stat(2), stat64(2) */
 __CREDIRECT(__ATTR_NONNULL((1, 2)),int,__NOTHROW_NCX,stat64,(char const *__restrict __filename, struct stat64 *__restrict __buf),kstat64,(__filename,__buf))
 #elif defined(__CRT_HAVE__stat64) && defined(__CRT_DOS_PRIMARY) && defined(__USE_TIME_BITS64)
+/* >> stat(2), stat64(2) */
 __CREDIRECT(__ATTR_NONNULL((1, 2)),int,__NOTHROW_NCX,stat64,(char const *__restrict __filename, struct stat64 *__restrict __buf),_stat64,(__filename,__buf))
 #elif defined(__CRT_HAVE__stat64i32) && defined(__CRT_DOS_PRIMARY) && defined(__USE_TIME_BITS64)
+/* >> stat(2), stat64(2) */
 __CREDIRECT(__ATTR_NONNULL((1, 2)),int,__NOTHROW_NCX,stat64,(char const *__restrict __filename, struct stat64 *__restrict __buf),_stat64i32,(__filename,__buf))
 #elif defined(__CRT_HAVE__stati64) && defined(__CRT_DOS_PRIMARY) && !defined(__USE_TIME_BITS64)
+/* >> stat(2), stat64(2) */
 __CREDIRECT(__ATTR_NONNULL((1, 2)),int,__NOTHROW_NCX,stat64,(char const *__restrict __filename, struct stat64 *__restrict __buf),_stati64,(__filename,__buf))
 #elif defined(__CRT_HAVE__stat32i64) && defined(__CRT_DOS_PRIMARY) && !defined(__USE_TIME_BITS64)
+/* >> stat(2), stat64(2) */
 __CREDIRECT(__ATTR_NONNULL((1, 2)),int,__NOTHROW_NCX,stat64,(char const *__restrict __filename, struct stat64 *__restrict __buf),_stat32i64,(__filename,__buf))
 #elif defined(__CRT_HAVE_stat64)
+/* >> stat(2), stat64(2) */
 __CDECLARE(__ATTR_NONNULL((1, 2)),int,__NOTHROW_NCX,stat64,(char const *__restrict __filename, struct stat64 *__restrict __buf),(__filename,__buf))
 #endif /* ... */
-
 #if defined(__CRT_HAVE_kfstat) && defined(__CRT_KOS_PRIMARY)
+/* >> fstat(2), fstat64(2) */
 __CREDIRECT(__ATTR_NONNULL((2)),int,__NOTHROW_NCX,fstat64,(__fd_t __fd, struct stat64 *__restrict __buf),kfstat,(__fd,__buf))
 #elif defined(__CRT_HAVE_kfstat64) && defined(__CRT_KOS_PRIMARY)
+/* >> fstat(2), fstat64(2) */
 __CREDIRECT(__ATTR_NONNULL((2)),int,__NOTHROW_NCX,fstat64,(__fd_t __fd, struct stat64 *__restrict __buf),kfstat64,(__fd,__buf))
 #elif defined(__CRT_HAVE__fstat64) && defined(__CRT_DOS_PRIMARY) && defined(__USE_TIME_BITS64)
+/* >> fstat(2), fstat64(2) */
 __CREDIRECT(__ATTR_NONNULL((2)),int,__NOTHROW_NCX,fstat64,(__fd_t __fd, struct stat64 *__restrict __buf),_fstat64,(__fd,__buf))
 #elif defined(__CRT_HAVE__fstat64i32) && defined(__CRT_DOS_PRIMARY) && defined(__USE_TIME_BITS64)
+/* >> fstat(2), fstat64(2) */
 __CREDIRECT(__ATTR_NONNULL((2)),int,__NOTHROW_NCX,fstat64,(__fd_t __fd, struct stat64 *__restrict __buf),_fstat64i32,(__fd,__buf))
 #elif defined(__CRT_HAVE__fstati64) && defined(__CRT_DOS_PRIMARY) && !defined(__USE_TIME_BITS64)
+/* >> fstat(2), fstat64(2) */
 __CREDIRECT(__ATTR_NONNULL((2)),int,__NOTHROW_NCX,fstat64,(__fd_t __fd, struct stat64 *__restrict __buf),_fstati64,(__fd,__buf))
 #elif defined(__CRT_HAVE__fstat32i64) && defined(__CRT_DOS_PRIMARY) && !defined(__USE_TIME_BITS64)
+/* >> fstat(2), fstat64(2) */
 __CREDIRECT(__ATTR_NONNULL((2)),int,__NOTHROW_NCX,fstat64,(__fd_t __fd, struct stat64 *__restrict __buf),_fstat32i64,(__fd,__buf))
 #elif defined(__CRT_HAVE_fstat64)
+/* >> fstat(2), fstat64(2) */
 __CDECLARE(__ATTR_NONNULL((2)),int,__NOTHROW_NCX,fstat64,(__fd_t __fd, struct stat64 *__restrict __buf),(__fd,__buf))
 #endif /* ... */
 
 #if defined(__USE_XOPEN_EXTENDED) || defined(__USE_XOPEN2K)
 #if defined(__CRT_HAVE_klstat) && defined(__CRT_KOS_PRIMARY)
+/* >> lstat(2), lstat64(2) */
 __CREDIRECT(__ATTR_NONNULL((1, 2)),int,__NOTHROW_NCX,lstat64,(char const *__restrict __filename, struct stat64 *__restrict __buf),klstat,(__filename,__buf))
 #elif defined(__CRT_HAVE_klstat64) && defined(__CRT_KOS_PRIMARY)
+/* >> lstat(2), lstat64(2) */
 __CREDIRECT(__ATTR_NONNULL((1, 2)),int,__NOTHROW_NCX,lstat64,(char const *__restrict __filename, struct stat64 *__restrict __buf),klstat64,(__filename,__buf))
 #elif defined(__CRT_HAVE__stat64) && defined(__CRT_DOS_PRIMARY) && defined(__USE_TIME_BITS64)
+/* >> lstat(2), lstat64(2) */
 __CREDIRECT(__ATTR_NONNULL((1, 2)),int,__NOTHROW_NCX,lstat64,(char const *__restrict __filename, struct stat64 *__restrict __buf),_stat64,(__filename,__buf))
 #elif defined(__CRT_HAVE__stat64i32) && defined(__CRT_DOS_PRIMARY) && defined(__USE_TIME_BITS64)
+/* >> lstat(2), lstat64(2) */
 __CREDIRECT(__ATTR_NONNULL((1, 2)),int,__NOTHROW_NCX,lstat64,(char const *__restrict __filename, struct stat64 *__restrict __buf),_stat64i32,(__filename,__buf))
 #elif defined(__CRT_HAVE__stati64) && defined(__CRT_DOS_PRIMARY) && !defined(__USE_TIME_BITS64)
+/* >> lstat(2), lstat64(2) */
 __CREDIRECT(__ATTR_NONNULL((1, 2)),int,__NOTHROW_NCX,lstat64,(char const *__restrict __filename, struct stat64 *__restrict __buf),_stati64,(__filename,__buf))
 #elif defined(__CRT_HAVE__stat32i64) && defined(__CRT_DOS_PRIMARY) && !defined(__USE_TIME_BITS64)
+/* >> lstat(2), lstat64(2) */
 __CREDIRECT(__ATTR_NONNULL((1, 2)),int,__NOTHROW_NCX,lstat64,(char const *__restrict __filename, struct stat64 *__restrict __buf),_stat32i64,(__filename,__buf))
 #elif defined(__CRT_HAVE_lstat64)
+/* >> lstat(2), lstat64(2) */
 __CDECLARE(__ATTR_NONNULL((1, 2)),int,__NOTHROW_NCX,lstat64,(char const *__restrict __filename, struct stat64 *__restrict __buf),(__filename,__buf))
 #endif /* ... */
 #endif /* __USE_XOPEN_EXTENDED || __USE_XOPEN2K */
@@ -446,46 +495,54 @@ __CDECLARE(__ATTR_NONNULL((1, 2)),int,__NOTHROW_NCX,lstat64,(char const *__restr
 
 #ifdef __USE_ATFILE
 #if defined(__CRT_HAVE_kfstatat) && defined(__CRT_KOS_PRIMARY)
-/* @param flags: Set of `0 | AT_SYMLINK_NOFOLLOW | AT_DOSPATH' */
+/* >> fstatat(2), fstatat64(2)
+ * @param flags: Set of `0 | AT_SYMLINK_NOFOLLOW | AT_DOSPATH' */
 __CREDIRECT(__ATTR_NONNULL((2, 3)),int,__NOTHROW_NCX,fstatat,(__fd_t __dirfd, char const *__restrict __filename, struct stat *__restrict __buf, __atflag_t __flags),kfstatat,(__dirfd,__filename,__buf,__flags))
 #elif defined(__CRT_HAVE_kfstatat64) && defined(__CRT_KOS_PRIMARY)
-/* @param flags: Set of `0 | AT_SYMLINK_NOFOLLOW | AT_DOSPATH' */
+/* >> fstatat(2), fstatat64(2)
+ * @param flags: Set of `0 | AT_SYMLINK_NOFOLLOW | AT_DOSPATH' */
 __CREDIRECT(__ATTR_NONNULL((2, 3)),int,__NOTHROW_NCX,fstatat,(__fd_t __dirfd, char const *__restrict __filename, struct stat *__restrict __buf, __atflag_t __flags),kfstatat64,(__dirfd,__filename,__buf,__flags))
 #elif defined(__CRT_HAVE_fstatat64) && defined(__USE_FILE_OFFSET64)
-/* @param flags: Set of `0 | AT_SYMLINK_NOFOLLOW | AT_DOSPATH' */
+/* >> fstatat(2), fstatat64(2)
+ * @param flags: Set of `0 | AT_SYMLINK_NOFOLLOW | AT_DOSPATH' */
 __CREDIRECT(__ATTR_NONNULL((2, 3)),int,__NOTHROW_NCX,fstatat,(__fd_t __dirfd, char const *__restrict __filename, struct stat *__restrict __buf, __atflag_t __flags),fstatat64,(__dirfd,__filename,__buf,__flags))
 #elif defined(__CRT_HAVE_fstatat) && !defined(__USE_FILE_OFFSET64)
-/* @param flags: Set of `0 | AT_SYMLINK_NOFOLLOW | AT_DOSPATH' */
+/* >> fstatat(2), fstatat64(2)
+ * @param flags: Set of `0 | AT_SYMLINK_NOFOLLOW | AT_DOSPATH' */
 __CDECLARE(__ATTR_NONNULL((2, 3)),int,__NOTHROW_NCX,fstatat,(__fd_t __dirfd, char const *__restrict __filename, struct stat *__restrict __buf, __atflag_t __flags),(__dirfd,__filename,__buf,__flags))
 #endif /* ... */
 #ifdef __USE_LARGEFILE64
 #if defined(__CRT_HAVE_kfstatat) && defined(__CRT_KOS_PRIMARY)
-/* @param flags: Set of `0 | AT_SYMLINK_NOFOLLOW | AT_DOSPATH' */
+/* >> fstatat(2), fstatat64(2)
+ * @param flags: Set of `0 | AT_SYMLINK_NOFOLLOW | AT_DOSPATH' */
 __CREDIRECT(__ATTR_NONNULL((2, 3)),int,__NOTHROW_NCX,fstatat64,(__fd_t __dirfd, char const *__restrict __filename, struct stat64 *__restrict __buf, __atflag_t __flags),kfstatat,(__dirfd,__filename,__buf,__flags))
 #elif defined(__CRT_HAVE_kfstatat64) && defined(__CRT_KOS_PRIMARY)
-/* @param flags: Set of `0 | AT_SYMLINK_NOFOLLOW | AT_DOSPATH' */
+/* >> fstatat(2), fstatat64(2)
+ * @param flags: Set of `0 | AT_SYMLINK_NOFOLLOW | AT_DOSPATH' */
 __CREDIRECT(__ATTR_NONNULL((2, 3)),int,__NOTHROW_NCX,fstatat64,(__fd_t __dirfd, char const *__restrict __filename, struct stat64 *__restrict __buf, __atflag_t __flags),kfstatat64,(__dirfd,__filename,__buf,__flags))
 #endif /* ... */
 #endif /* __USE_LARGEFILE64 */
 #endif /* __USE_ATFILE */
-
 #ifndef __mkdir_defined
 #define __mkdir_defined 1
 #ifdef __CRT_HAVE_mkdir
+/* >> mkdir(2) */
 __CDECLARE(__ATTR_NONNULL((1)),int,__NOTHROW_RPC,mkdir,(char const *__pathname, __mode_t __mode),(__pathname,__mode))
 #elif defined(__CRT_DOS_PRIMARY) && defined(__CRT_HAVE__mkdir)
 #include <libc/local/sys.stat/mkdir.h>
+/* >> mkdir(2) */
 __NAMESPACE_LOCAL_USING_OR_IMPL(mkdir, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_NONNULL((1)) int __NOTHROW_RPC(__LIBCCALL mkdir)(char const *__pathname, __mode_t __mode) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(mkdir))(__pathname, __mode); })
 #else /* ... */
 #undef __mkdir_defined
 #endif /* !... */
 #endif /* !__mkdir_defined */
-
 #ifndef __chmod_defined
 #define __chmod_defined 1
 #ifdef __CRT_HAVE_chmod
+/* >> chmod(2) */
 __CDECLARE(__ATTR_NONNULL((1)),int,__NOTHROW_RPC,chmod,(char const *__filename, __mode_t __mode),(__filename,__mode))
 #elif defined(__CRT_HAVE__chmod)
+/* >> chmod(2) */
 __CREDIRECT(__ATTR_NONNULL((1)),int,__NOTHROW_RPC,chmod,(char const *__filename, __mode_t __mode),_chmod,(__filename,__mode))
 #else /* ... */
 #undef __chmod_defined
@@ -496,22 +553,26 @@ __CREDIRECT(__ATTR_NONNULL((1)),int,__NOTHROW_RPC,chmod,(char const *__filename,
 #ifndef __lchmod_defined
 #define __lchmod_defined 1
 #ifdef __CRT_HAVE_lchmod
+/* >> lchmod(2) */
 __CDECLARE(__ATTR_NONNULL((1)),int,__NOTHROW_RPC,lchmod,(char const *__filename, __mode_t __mode),(__filename,__mode))
 #elif defined(__CRT_HAVE__chmod) && defined(__CRT_DOS_PRIMARY)
+/* >> lchmod(2) */
 __CREDIRECT(__ATTR_NONNULL((1)),int,__NOTHROW_RPC,lchmod,(char const *__filename, __mode_t __mode),_chmod,(__filename,__mode))
 #elif defined(__CRT_HAVE_chmod) && defined(__CRT_DOS_PRIMARY)
+/* >> lchmod(2) */
 __CREDIRECT(__ATTR_NONNULL((1)),int,__NOTHROW_RPC,lchmod,(char const *__filename, __mode_t __mode),chmod,(__filename,__mode))
 #else /* ... */
 #undef __lchmod_defined
 #endif /* !... */
 #endif /* !__lchmod_defined */
 #endif /* __USE_MISC */
-
 #ifndef __umask_defined
 #define __umask_defined 1
 #ifdef __CRT_HAVE_umask
+/* >> umask(2) */
 __CDECLARE(,__mode_t,__NOTHROW_NCX,umask,(__mode_t __mode),(__mode))
 #elif defined(__CRT_HAVE__umask)
+/* >> umask(2) */
 __CREDIRECT(,__mode_t,__NOTHROW_NCX,umask,(__mode_t __mode),_umask,(__mode))
 #else /* ... */
 #undef __umask_defined
@@ -520,54 +581,67 @@ __CREDIRECT(,__mode_t,__NOTHROW_NCX,umask,(__mode_t __mode),_umask,(__mode))
 
 #ifdef __USE_GNU
 #ifdef __CRT_HAVE_getumask
-/* Return the current umask.
+/* >> getumask(2)
+ * Return the current umask.
  * WARNING: This function isn't thread-safe */
 __CDECLARE(,__mode_t,__NOTHROW_NCX,getumask,(void),())
 #elif defined(__CRT_HAVE_umask) || defined(__CRT_HAVE__umask)
 #include <libc/local/sys.stat/getumask.h>
-/* Return the current umask.
+/* >> getumask(2)
+ * Return the current umask.
  * WARNING: This function isn't thread-safe */
 __NAMESPACE_LOCAL_USING_OR_IMPL(getumask, __FORCELOCAL __ATTR_ARTIFICIAL __mode_t __NOTHROW_NCX(__LIBCCALL getumask)(void) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(getumask))(); })
 #endif /* ... */
 #endif /* __USE_GNU */
 
 #if defined(__USE_KOS) && defined(__USE_ATFILE)
-/* @param flags: Set of `0 | AT_DOSPATH' */
+/* >> fmkdirat(2)
+ * @param flags: Set of `0 | AT_DOSPATH' */
 __CDECLARE_OPT(__ATTR_NONNULL((2)),int,__NOTHROW_RPC,fmkdirat,(__fd_t __dirfd, char const *__pathname, __mode_t __mode, __atflag_t __flags),(__dirfd,__pathname,__mode,__flags))
-/* @param flags: Set of `0 | AT_DOSPATH' */
+/* >> fmknodat(2)
+ * @param flags: Set of `0 | AT_DOSPATH' */
 __CDECLARE_OPT(__ATTR_NONNULL((2)),int,__NOTHROW_RPC,fmknodat,(__fd_t __dirfd, char const *__nodename, __mode_t __mode, __dev_t __dev, __atflag_t __flags),(__dirfd,__nodename,__mode,__dev,__flags))
-#endif
-
+#endif /* __USE_KOS && __USE_ATFILE */
+/* >> mkfifo(2) */
 __CDECLARE_OPT(__ATTR_NONNULL((1)),int,__NOTHROW_RPC,mkfifo,(char const *__fifoname, __mode_t __mode),(__fifoname,__mode))
 
 #ifdef __USE_ATFILE
-/* @param flags: Set of `0 | AT_SYMLINK_NOFOLLOW | AT_DOSPATH' */
+/* >> fchmodat(2)
+ * @param flags: Set of `0 | AT_SYMLINK_NOFOLLOW | AT_DOSPATH' */
 __CDECLARE_OPT(__ATTR_NONNULL((2)),int,__NOTHROW_RPC,fchmodat,(__fd_t __dirfd, char const *__filename, __mode_t __mode, __atflag_t __flags),(__dirfd,__filename,__mode,__flags))
+/* >> mkdirat(2) */
 __CDECLARE_OPT(__ATTR_NONNULL((2)),int,__NOTHROW_RPC,mkdirat,(__fd_t __dirfd, char const *__pathname, __mode_t __mode),(__dirfd,__pathname,__mode))
+/* >> mkfifoat(2) */
 __CDECLARE_OPT(__ATTR_NONNULL((2)),int,__NOTHROW_RPC,mkfifoat,(__fd_t __dirfd, char const *__fifoname, __mode_t __mode),(__dirfd,__fifoname,__mode))
 #endif /* __USE_ATFILE */
 
 #ifdef __USE_POSIX
+/* >> fchmod(2) */
 __CDECLARE_OPT(,int,__NOTHROW_RPC,fchmod,(__fd_t __fd, __mode_t __mode),(__fd,__mode))
 #endif /* __USE_POSIX */
 
 #if defined(__USE_MISC) || defined(__USE_XOPEN_EXTENDED)
+/* >> mknod(2) */
 __CDECLARE_OPT(__ATTR_NONNULL((1)),int,__NOTHROW_RPC,mknod,(char const *__nodename, __mode_t __mode, __dev_t __dev),(__nodename,__mode,__dev))
 #ifdef __USE_ATFILE
+/* >> mknodat(2) */
 __CDECLARE_OPT(__ATTR_NONNULL((2)),int,__NOTHROW_RPC,mknodat,(__fd_t __dirfd, char const *__nodename, __mode_t __mode, __dev_t __dev),(__dirfd,__nodename,__mode,__dev))
 #endif /* __USE_ATFILE */
 #endif /* __USE_MISC || __USE_XOPEN_EXTENDED */
 
 #ifdef __USE_ATFILE
 #if defined(__CRT_HAVE_utimensat64) && defined(__USE_TIME_BITS64)
-/* @param flags: Set of `0|AT_SYMLINK_NOFOLLOW|AT_CHANGE_CTIME|AT_DOSPATH' */
+/* >> utimensat(2), utimensat64(2)
+ * @param flags: Set of `0|AT_SYMLINK_NOFOLLOW|AT_CHANGE_CTIME|AT_DOSPATH' */
 __CREDIRECT(__ATTR_NONNULL((2)),int,__NOTHROW_RPC,utimensat,(__fd_t __dirfd, char const *__filename, struct timespec const __times[2 /*or:3*/], __atflag_t __flags),utimensat64,(__dirfd,__filename,__times,__flags))
 #elif defined(__CRT_HAVE_utimensat) && !defined(__USE_TIME_BITS64)
-/* @param flags: Set of `0|AT_SYMLINK_NOFOLLOW|AT_CHANGE_CTIME|AT_DOSPATH' */
+/* >> utimensat(2), utimensat64(2)
+ * @param flags: Set of `0|AT_SYMLINK_NOFOLLOW|AT_CHANGE_CTIME|AT_DOSPATH' */
 __CDECLARE(__ATTR_NONNULL((2)),int,__NOTHROW_RPC,utimensat,(__fd_t __dirfd, char const *__filename, struct timespec const __times[2 /*or:3*/], __atflag_t __flags),(__dirfd,__filename,__times,__flags))
 #elif defined(__CRT_HAVE_utimensat64) || defined(__CRT_HAVE_utimensat)
 #include <libc/local/sys.stat/utimensat.h>
-/* @param flags: Set of `0|AT_SYMLINK_NOFOLLOW|AT_CHANGE_CTIME|AT_DOSPATH' */
+/* >> utimensat(2), utimensat64(2)
+ * @param flags: Set of `0|AT_SYMLINK_NOFOLLOW|AT_CHANGE_CTIME|AT_DOSPATH' */
 __NAMESPACE_LOCAL_USING_OR_IMPL(utimensat, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_NONNULL((2)) int __NOTHROW_RPC(__LIBCCALL utimensat)(__fd_t __dirfd, char const *__filename, struct timespec const __times[2 /*or:3*/], __atflag_t __flags) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(utimensat))(__dirfd, __filename, __times, __flags); })
 #endif /* ... */
 #ifdef __USE_TIME64
@@ -584,11 +658,14 @@ __NAMESPACE_LOCAL_USING_OR_IMPL(utimensat64, __FORCELOCAL __ATTR_ARTIFICIAL __AT
 
 #ifdef __USE_XOPEN2K8
 #if defined(__CRT_HAVE_futimens64) && defined(__USE_TIME_BITS64)
+/* >> futimens(2), futimens64(2) */
 __CREDIRECT(,int,__NOTHROW_RPC,futimens,(__fd_t __fd, struct timespec const __times[2 /*or:3*/]),futimens64,(__fd,__times))
 #elif defined(__CRT_HAVE_futimens) && !defined(__USE_TIME_BITS64)
+/* >> futimens(2), futimens64(2) */
 __CDECLARE(,int,__NOTHROW_RPC,futimens,(__fd_t __fd, struct timespec const __times[2 /*or:3*/]),(__fd,__times))
 #elif defined(__CRT_HAVE_futimens64) || defined(__CRT_HAVE_futimens)
 #include <libc/local/sys.stat/futimens.h>
+/* >> futimens(2), futimens64(2) */
 __NAMESPACE_LOCAL_USING_OR_IMPL(futimens, __FORCELOCAL __ATTR_ARTIFICIAL int __NOTHROW_RPC(__LIBCCALL futimens)(__fd_t __fd, struct timespec const __times[2 /*or:3*/]) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(futimens))(__fd, __times); })
 #endif /* ... */
 #ifdef __USE_TIME64

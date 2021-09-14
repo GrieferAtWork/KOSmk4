@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xb1fa1bab */
+/* HASH CRC-32:0xc4a54365 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -1895,91 +1895,155 @@ __NAMESPACE_LOCAL_USING_OR_IMPL(toctrans32_l, __FORCELOCAL __ATTR_ARTIFICIAL __A
 #endif /* __USE_XOPEN2K8 */
 #ifdef __USE_KOS
 #if defined(__CRT_HAVE___iswcsymf) && __SIZEOF_WCHAR_T__ == 2 && defined(__LIBCCALL_IS_LIBDCALL)
+/* >> iswsymstrt(3), iswsymstrt_l(3)
+ * Check if `wc' may appear at the start of a symbol/keyword/identifier */
 __CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,int,__NOTHROW_NCX,issymstrt16,(__WINT16_TYPE__ __wc),__iswcsymf,(__wc))
 #elif defined(__CRT_HAVE_DOS$__iswcsymf)
+/* >> iswsymstrt(3), iswsymstrt_l(3)
+ * Check if `wc' may appear at the start of a symbol/keyword/identifier */
 __CREDIRECT_DOS(__ATTR_CONST __ATTR_WUNUSED,int,__NOTHROW_NCX,issymstrt16,(__WINT16_TYPE__ __wc),__iswcsymf,(__wc))
 #elif __SIZEOF_WCHAR_T__ == 2
 #include <libc/local/wctype/iswsymstrt.h>
+/* >> iswsymstrt(3), iswsymstrt_l(3)
+ * Check if `wc' may appear at the start of a symbol/keyword/identifier */
 __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_CONST __ATTR_WUNUSED int __NOTHROW_NCX(__LIBDCALL issymstrt16)(__WINT16_TYPE__ __wc) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(iswsymstrt))((__WINT_TYPE__)__wc); }
 #else /* ... */
 #include <libc/local/parts.uchar.wctype/issymstrt16.h>
+/* >> iswsymstrt(3), iswsymstrt_l(3)
+ * Check if `wc' may appear at the start of a symbol/keyword/identifier */
 __NAMESPACE_LOCAL_USING_OR_IMPL(issymstrt16, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_CONST __ATTR_WUNUSED int __NOTHROW_NCX(__LIBDCALL issymstrt16)(__WINT16_TYPE__ __wc) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(issymstrt16))(__wc); })
 #endif /* !... */
 #if defined(__CRT_HAVE___iswcsymf) && __SIZEOF_WCHAR_T__ == 4 && defined(__LIBCCALL_IS_LIBKCALL)
+/* >> iswsymstrt(3), iswsymstrt_l(3)
+ * Check if `wc' may appear at the start of a symbol/keyword/identifier */
 __CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,int,__NOTHROW_NCX,issymstrt32,(__WINT32_TYPE__ __wc),__iswcsymf,(__wc))
 #elif defined(__CRT_HAVE_KOS$__iswcsymf)
+/* >> iswsymstrt(3), iswsymstrt_l(3)
+ * Check if `wc' may appear at the start of a symbol/keyword/identifier */
 __CREDIRECT_KOS(__ATTR_CONST __ATTR_WUNUSED,int,__NOTHROW_NCX,issymstrt32,(__WINT32_TYPE__ __wc),__iswcsymf,(__wc))
 #elif __SIZEOF_WCHAR_T__ == 4
 #include <libc/local/wctype/iswsymstrt.h>
+/* >> iswsymstrt(3), iswsymstrt_l(3)
+ * Check if `wc' may appear at the start of a symbol/keyword/identifier */
 __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_CONST __ATTR_WUNUSED int __NOTHROW_NCX(__LIBKCALL issymstrt32)(__WINT32_TYPE__ __wc) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(iswsymstrt))((__WINT_TYPE__)__wc); }
 #else /* ... */
 #include <libc/local/parts.uchar.wctype/issymstrt32.h>
+/* >> iswsymstrt(3), iswsymstrt_l(3)
+ * Check if `wc' may appear at the start of a symbol/keyword/identifier */
 __NAMESPACE_LOCAL_USING_OR_IMPL(issymstrt32, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_CONST __ATTR_WUNUSED int __NOTHROW_NCX(__LIBKCALL issymstrt32)(__WINT32_TYPE__ __wc) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(issymstrt32))(__wc); })
 #endif /* !... */
 #if defined(__CRT_HAVE___iswcsym) && __SIZEOF_WCHAR_T__ == 2 && defined(__LIBCCALL_IS_LIBDCALL)
+/* >> iswsymcont(3), iswsymcont_l(3)
+ * Check if `wc' may appear in the middle of a symbol/keyword/identifier */
 __CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,int,__NOTHROW_NCX,issymcont16,(__WINT16_TYPE__ __wc),__iswcsym,(__wc))
 #elif defined(__CRT_HAVE_DOS$__iswcsym)
+/* >> iswsymcont(3), iswsymcont_l(3)
+ * Check if `wc' may appear in the middle of a symbol/keyword/identifier */
 __CREDIRECT_DOS(__ATTR_CONST __ATTR_WUNUSED,int,__NOTHROW_NCX,issymcont16,(__WINT16_TYPE__ __wc),__iswcsym,(__wc))
 #elif __SIZEOF_WCHAR_T__ == 2
 #include <libc/local/wctype/iswsymcont.h>
+/* >> iswsymcont(3), iswsymcont_l(3)
+ * Check if `wc' may appear in the middle of a symbol/keyword/identifier */
 __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_CONST __ATTR_WUNUSED int __NOTHROW_NCX(__LIBDCALL issymcont16)(__WINT16_TYPE__ __wc) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(iswsymcont))((__WINT_TYPE__)__wc); }
 #else /* ... */
 #include <libc/local/parts.uchar.wctype/issymcont16.h>
+/* >> iswsymcont(3), iswsymcont_l(3)
+ * Check if `wc' may appear in the middle of a symbol/keyword/identifier */
 __NAMESPACE_LOCAL_USING_OR_IMPL(issymcont16, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_CONST __ATTR_WUNUSED int __NOTHROW_NCX(__LIBDCALL issymcont16)(__WINT16_TYPE__ __wc) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(issymcont16))(__wc); })
 #endif /* !... */
 #if defined(__CRT_HAVE___iswcsym) && __SIZEOF_WCHAR_T__ == 4 && defined(__LIBCCALL_IS_LIBKCALL)
+/* >> iswsymcont(3), iswsymcont_l(3)
+ * Check if `wc' may appear in the middle of a symbol/keyword/identifier */
 __CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,int,__NOTHROW_NCX,issymcont32,(__WINT32_TYPE__ __wc),__iswcsym,(__wc))
 #elif defined(__CRT_HAVE_KOS$__iswcsym)
+/* >> iswsymcont(3), iswsymcont_l(3)
+ * Check if `wc' may appear in the middle of a symbol/keyword/identifier */
 __CREDIRECT_KOS(__ATTR_CONST __ATTR_WUNUSED,int,__NOTHROW_NCX,issymcont32,(__WINT32_TYPE__ __wc),__iswcsym,(__wc))
 #elif __SIZEOF_WCHAR_T__ == 4
 #include <libc/local/wctype/iswsymcont.h>
+/* >> iswsymcont(3), iswsymcont_l(3)
+ * Check if `wc' may appear in the middle of a symbol/keyword/identifier */
 __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_CONST __ATTR_WUNUSED int __NOTHROW_NCX(__LIBKCALL issymcont32)(__WINT32_TYPE__ __wc) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(iswsymcont))((__WINT_TYPE__)__wc); }
 #else /* ... */
 #include <libc/local/parts.uchar.wctype/issymcont32.h>
+/* >> iswsymcont(3), iswsymcont_l(3)
+ * Check if `wc' may appear in the middle of a symbol/keyword/identifier */
 __NAMESPACE_LOCAL_USING_OR_IMPL(issymcont32, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_CONST __ATTR_WUNUSED int __NOTHROW_NCX(__LIBKCALL issymcont32)(__WINT32_TYPE__ __wc) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(issymcont32))(__wc); })
 #endif /* !... */
 #if defined(__CRT_HAVE__iswcsymf_l) && __SIZEOF_WCHAR_T__ == 2 && defined(__LIBCCALL_IS_LIBDCALL)
+/* >> iswsymstrt(3), iswsymstrt_l(3)
+ * Check if `wc' may appear at the start of a symbol/keyword/identifier */
 __CREDIRECT(__ATTR_PURE __ATTR_WUNUSED,int,__NOTHROW_NCX,issymstrt16_l,(__WINT16_TYPE__ __wc, __locale_t __locale),_iswcsymf_l,(__wc,__locale))
 #elif defined(__CRT_HAVE_DOS$_iswcsymf_l)
+/* >> iswsymstrt(3), iswsymstrt_l(3)
+ * Check if `wc' may appear at the start of a symbol/keyword/identifier */
 __CREDIRECT_DOS(__ATTR_PURE __ATTR_WUNUSED,int,__NOTHROW_NCX,issymstrt16_l,(__WINT16_TYPE__ __wc, __locale_t __locale),_iswcsymf_l,(__wc,__locale))
 #elif __SIZEOF_WCHAR_T__ == 2
 #include <libc/local/wctype/iswsymstrt_l.h>
+/* >> iswsymstrt(3), iswsymstrt_l(3)
+ * Check if `wc' may appear at the start of a symbol/keyword/identifier */
 __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_PURE __ATTR_WUNUSED int __NOTHROW_NCX(__LIBDCALL issymstrt16_l)(__WINT16_TYPE__ __wc, __locale_t __locale) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(iswsymstrt_l))((__WINT_TYPE__)__wc, __locale); }
 #else /* ... */
 #include <libc/local/parts.uchar.wctype/issymstrt16_l.h>
+/* >> iswsymstrt(3), iswsymstrt_l(3)
+ * Check if `wc' may appear at the start of a symbol/keyword/identifier */
 __NAMESPACE_LOCAL_USING_OR_IMPL(issymstrt16_l, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_PURE __ATTR_WUNUSED int __NOTHROW_NCX(__LIBDCALL issymstrt16_l)(__WINT16_TYPE__ __wc, __locale_t __locale) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(issymstrt16_l))(__wc, __locale); })
 #endif /* !... */
 #if defined(__CRT_HAVE__iswcsymf_l) && __SIZEOF_WCHAR_T__ == 4 && defined(__LIBCCALL_IS_LIBKCALL)
+/* >> iswsymstrt(3), iswsymstrt_l(3)
+ * Check if `wc' may appear at the start of a symbol/keyword/identifier */
 __CREDIRECT(__ATTR_PURE __ATTR_WUNUSED,int,__NOTHROW_NCX,issymstrt32_l,(__WINT32_TYPE__ __wc, __locale_t __locale),_iswcsymf_l,(__wc,__locale))
 #elif defined(__CRT_HAVE_KOS$_iswcsymf_l)
+/* >> iswsymstrt(3), iswsymstrt_l(3)
+ * Check if `wc' may appear at the start of a symbol/keyword/identifier */
 __CREDIRECT_KOS(__ATTR_PURE __ATTR_WUNUSED,int,__NOTHROW_NCX,issymstrt32_l,(__WINT32_TYPE__ __wc, __locale_t __locale),_iswcsymf_l,(__wc,__locale))
 #elif __SIZEOF_WCHAR_T__ == 4
 #include <libc/local/wctype/iswsymstrt_l.h>
+/* >> iswsymstrt(3), iswsymstrt_l(3)
+ * Check if `wc' may appear at the start of a symbol/keyword/identifier */
 __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_PURE __ATTR_WUNUSED int __NOTHROW_NCX(__LIBKCALL issymstrt32_l)(__WINT32_TYPE__ __wc, __locale_t __locale) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(iswsymstrt_l))((__WINT_TYPE__)__wc, __locale); }
 #else /* ... */
 #include <libc/local/parts.uchar.wctype/issymstrt32_l.h>
+/* >> iswsymstrt(3), iswsymstrt_l(3)
+ * Check if `wc' may appear at the start of a symbol/keyword/identifier */
 __NAMESPACE_LOCAL_USING_OR_IMPL(issymstrt32_l, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_PURE __ATTR_WUNUSED int __NOTHROW_NCX(__LIBKCALL issymstrt32_l)(__WINT32_TYPE__ __wc, __locale_t __locale) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(issymstrt32_l))(__wc, __locale); })
 #endif /* !... */
 #if defined(__CRT_HAVE__iswcsym_l) && __SIZEOF_WCHAR_T__ == 2 && defined(__LIBCCALL_IS_LIBDCALL)
+/* >> iswsymcont(3), iswsymcont_l(3)
+ * Check if `wc' may appear in the middle of a symbol/keyword/identifier */
 __CREDIRECT(__ATTR_PURE __ATTR_WUNUSED,int,__NOTHROW_NCX,issymcont16_l,(__WINT16_TYPE__ __wc, __locale_t __locale),_iswcsym_l,(__wc,__locale))
 #elif defined(__CRT_HAVE_DOS$_iswcsym_l)
+/* >> iswsymcont(3), iswsymcont_l(3)
+ * Check if `wc' may appear in the middle of a symbol/keyword/identifier */
 __CREDIRECT_DOS(__ATTR_PURE __ATTR_WUNUSED,int,__NOTHROW_NCX,issymcont16_l,(__WINT16_TYPE__ __wc, __locale_t __locale),_iswcsym_l,(__wc,__locale))
 #elif __SIZEOF_WCHAR_T__ == 2
 #include <libc/local/wctype/iswsymcont_l.h>
+/* >> iswsymcont(3), iswsymcont_l(3)
+ * Check if `wc' may appear in the middle of a symbol/keyword/identifier */
 __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_PURE __ATTR_WUNUSED int __NOTHROW_NCX(__LIBDCALL issymcont16_l)(__WINT16_TYPE__ __wc, __locale_t __locale) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(iswsymcont_l))((__WINT_TYPE__)__wc, __locale); }
 #else /* ... */
 #include <libc/local/parts.uchar.wctype/issymcont16_l.h>
+/* >> iswsymcont(3), iswsymcont_l(3)
+ * Check if `wc' may appear in the middle of a symbol/keyword/identifier */
 __NAMESPACE_LOCAL_USING_OR_IMPL(issymcont16_l, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_PURE __ATTR_WUNUSED int __NOTHROW_NCX(__LIBDCALL issymcont16_l)(__WINT16_TYPE__ __wc, __locale_t __locale) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(issymcont16_l))(__wc, __locale); })
 #endif /* !... */
 #if defined(__CRT_HAVE__iswcsym_l) && __SIZEOF_WCHAR_T__ == 4 && defined(__LIBCCALL_IS_LIBKCALL)
+/* >> iswsymcont(3), iswsymcont_l(3)
+ * Check if `wc' may appear in the middle of a symbol/keyword/identifier */
 __CREDIRECT(__ATTR_PURE __ATTR_WUNUSED,int,__NOTHROW_NCX,issymcont32_l,(__WINT32_TYPE__ __wc, __locale_t __locale),_iswcsym_l,(__wc,__locale))
 #elif defined(__CRT_HAVE_KOS$_iswcsym_l)
+/* >> iswsymcont(3), iswsymcont_l(3)
+ * Check if `wc' may appear in the middle of a symbol/keyword/identifier */
 __CREDIRECT_KOS(__ATTR_PURE __ATTR_WUNUSED,int,__NOTHROW_NCX,issymcont32_l,(__WINT32_TYPE__ __wc, __locale_t __locale),_iswcsym_l,(__wc,__locale))
 #elif __SIZEOF_WCHAR_T__ == 4
 #include <libc/local/wctype/iswsymcont_l.h>
+/* >> iswsymcont(3), iswsymcont_l(3)
+ * Check if `wc' may appear in the middle of a symbol/keyword/identifier */
 __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_PURE __ATTR_WUNUSED int __NOTHROW_NCX(__LIBKCALL issymcont32_l)(__WINT32_TYPE__ __wc, __locale_t __locale) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(iswsymcont_l))((__WINT_TYPE__)__wc, __locale); }
 #else /* ... */
 #include <libc/local/parts.uchar.wctype/issymcont32_l.h>
+/* >> iswsymcont(3), iswsymcont_l(3)
+ * Check if `wc' may appear in the middle of a symbol/keyword/identifier */
 __NAMESPACE_LOCAL_USING_OR_IMPL(issymcont32_l, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_PURE __ATTR_WUNUSED int __NOTHROW_NCX(__LIBKCALL issymcont32_l)(__WINT32_TYPE__ __wc, __locale_t __locale) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(issymcont32_l))(__wc, __locale); })
 #endif /* !... */
 #endif /* __USE_KOS */

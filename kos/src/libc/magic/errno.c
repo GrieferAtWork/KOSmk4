@@ -1086,6 +1086,7 @@ typedef __errno_t errno_t;
 #else /* errno */
 }
 
+@@>> __errno_location(3)
 [[libc, guard, alias("_errno", "__errno"), wunused]]
 [[ATTR_CONST, section(".text.crt{|.dos}.errno_access")]]
 [[decl_include("<bits/types.h>")]]
@@ -1207,6 +1208,8 @@ __LIBC char *__progname;
 #endif /* __NO_ASMNAME */
 #else /* ... */
 }
+
+@@>> __p_program_invocation_short_name(3)
 @@Alias for `strchr(argv[0], '/') ? strchr(argv[0], '/') + 1 : argv[0]', as passed to main()
 [[guard, wunused, ATTR_CONST, nonnull]]
 [[requires_include("<libc/local/program_invocation_name.h>")]]

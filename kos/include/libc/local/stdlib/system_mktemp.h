@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xa784e2a4 */
+/* HASH CRC-32:0x69d03433 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -61,6 +61,9 @@ __CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,__pid_t,__NOTHROW,__localdep_gettid,(voi
 #endif /* !__local___localdep_gettid_defined && __CRT_HAVE_gettid */
 #ifndef __local___localdep_gettimeofday_defined
 #define __local___localdep_gettimeofday_defined 1
+__NAMESPACE_LOCAL_END
+#include <features.h>
+__NAMESPACE_LOCAL_BEGIN
 #if defined(__CRT_HAVE_gettimeofday64) && defined(__USE_TIME_BITS64)
 __NAMESPACE_LOCAL_END
 #include <bits/os/timeval.h>
@@ -76,13 +79,18 @@ __NAMESPACE_LOCAL_END
 #include <bits/os/timeval.h>
 __NAMESPACE_LOCAL_BEGIN
 __CREDIRECT(__ATTR_NONNULL((1)),int,__NOTHROW_NCX,__localdep_gettimeofday,(struct timeval *__restrict __tv, void * __tz),__gettimeofday,(__tv,__tz))
-#elif defined(__CRT_HAVE_gettimeofday64) || defined(__CRT_HAVE_gettimeofday) || defined(__CRT_HAVE___gettimeofday)
+#else /* ... */
+__NAMESPACE_LOCAL_END
+#include <bits/types.h>
+__NAMESPACE_LOCAL_BEGIN
+#if defined(__CRT_HAVE_gettimeofday64) || defined(__CRT_HAVE_gettimeofday) || defined(__CRT_HAVE___gettimeofday)
 __NAMESPACE_LOCAL_END
 #include <libc/local/sys.time/gettimeofday.h>
 __NAMESPACE_LOCAL_BEGIN
 #define __localdep_gettimeofday __LIBC_LOCAL_NAME(gettimeofday)
-#else /* ... */
+#else /* __CRT_HAVE_gettimeofday64 || __CRT_HAVE_gettimeofday || __CRT_HAVE___gettimeofday */
 #undef __local___localdep_gettimeofday_defined
+#endif /* !__CRT_HAVE_gettimeofday64 && !__CRT_HAVE_gettimeofday && !__CRT_HAVE___gettimeofday */
 #endif /* !... */
 #endif /* !__local___localdep_gettimeofday_defined */
 #ifndef __local___localdep_gettimeofday64_defined
@@ -92,7 +100,11 @@ __NAMESPACE_LOCAL_END
 #include <bits/os/timeval.h>
 __NAMESPACE_LOCAL_BEGIN
 __CREDIRECT(__ATTR_NONNULL((1)),int,__NOTHROW_NCX,__localdep_gettimeofday64,(struct __timeval64 *__restrict __tv, void * __tz),gettimeofday64,(__tv,__tz))
-#elif defined(__CRT_HAVE_gettimeofday) && __SIZEOF_TIME32_T__ == __SIZEOF_TIME64_T__
+#else /* __CRT_HAVE_gettimeofday64 */
+__NAMESPACE_LOCAL_END
+#include <bits/types.h>
+__NAMESPACE_LOCAL_BEGIN
+#if defined(__CRT_HAVE_gettimeofday) && __SIZEOF_TIME32_T__ == __SIZEOF_TIME64_T__
 __NAMESPACE_LOCAL_END
 #include <bits/os/timeval.h>
 __NAMESPACE_LOCAL_BEGIN
@@ -105,6 +117,7 @@ __NAMESPACE_LOCAL_BEGIN
 #else /* ... */
 #undef __local___localdep_gettimeofday64_defined
 #endif /* !... */
+#endif /* !__CRT_HAVE_gettimeofday64 */
 #endif /* !__local___localdep_gettimeofday64_defined */
 #ifndef __local___localdep_memcmp_defined
 #define __local___localdep_memcmp_defined 1
@@ -143,6 +156,9 @@ __NAMESPACE_LOCAL_BEGIN
 #endif /* !__local___localdep_mkdir_defined */
 #ifndef __local___localdep_open_defined
 #define __local___localdep_open_defined 1
+__NAMESPACE_LOCAL_END
+#include <features.h>
+__NAMESPACE_LOCAL_BEGIN
 #if defined(__CRT_HAVE_open64) && defined(__USE_FILE_OFFSET64)
 __NAMESPACE_LOCAL_END
 #include <bits/types.h>
@@ -166,6 +182,7 @@ __CVREDIRECT(__ATTR_WUNUSED __ATTR_NONNULL((1)),__fd_t,__NOTHROW_RPC,__localdep_
 #else /* ... */
 __NAMESPACE_LOCAL_END
 #include <asm/os/fcntl.h>
+#include <asm/os/oflags.h>
 __NAMESPACE_LOCAL_BEGIN
 #if defined(__CRT_HAVE_open64) || defined(__CRT_HAVE___open64) || defined(__CRT_HAVE_open) || defined(__CRT_HAVE__open) || defined(__CRT_HAVE___open) || (defined(__AT_FDCWD) && (defined(__CRT_HAVE_openat64) || defined(__CRT_HAVE_openat)))
 __NAMESPACE_LOCAL_END
@@ -207,7 +224,11 @@ __NAMESPACE_LOCAL_END
 #include <bits/os/stat.h>
 __NAMESPACE_LOCAL_BEGIN
 __CREDIRECT(__ATTR_NONNULL((1, 2)),int,__NOTHROW_NCX,__localdep_stat,(char const *__restrict __filename, struct stat *__restrict __buf),kstat64,(__filename,__buf))
-#elif defined(__CRT_HAVE__stat64) && defined(__CRT_DOS_PRIMARY) && defined(__USE_TIME_BITS64)
+#else /* ... */
+__NAMESPACE_LOCAL_END
+#include <features.h>
+__NAMESPACE_LOCAL_BEGIN
+#if defined(__CRT_HAVE__stat64) && defined(__CRT_DOS_PRIMARY) && defined(__USE_TIME_BITS64)
 __NAMESPACE_LOCAL_END
 #include <bits/os/stat.h>
 __NAMESPACE_LOCAL_BEGIN
@@ -249,6 +270,7 @@ __NAMESPACE_LOCAL_BEGIN
 __CREDIRECT(__ATTR_NONNULL((1, 2)),int,__NOTHROW_NCX,__localdep_stat,(char const *__restrict __filename, struct stat *__restrict __buf),stat,(__filename,__buf))
 #else /* ... */
 #undef __local___localdep_stat_defined
+#endif /* !... */
 #endif /* !... */
 #endif /* !__local___localdep_stat_defined */
 #ifndef __local___localdep_strend_defined

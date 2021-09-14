@@ -43,6 +43,7 @@ __SYSDECL_BEGIN
 
 }
 
+@@>> ustat(2)
 [[decl_include("<bits/os/ustat.h>", "<bits/types.h>")]]
 int ustat($dev_t dev, [[nonnull]] struct ustat *ubuf);
 

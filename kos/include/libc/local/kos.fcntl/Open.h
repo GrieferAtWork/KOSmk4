@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x465c83ab */
+/* HASH CRC-32:0x9f34cc12 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -22,6 +22,8 @@
 #define __local_Open_defined 1
 #include <__crt.h>
 #include <asm/os/fcntl.h>
+#include <asm/os/oflags.h>
+#include <features.h>
 #if defined(__CRT_HAVE_Open64) || (defined(__AT_FDCWD) && (defined(__CRT_HAVE_OpenAt64) || defined(__CRT_HAVE_OpenAt))) || defined(__CRT_HAVE_Open)
 #include <bits/types.h>
 #include <kos/anno.h>

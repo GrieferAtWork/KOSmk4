@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x1885b516 */
+/* HASH CRC-32:0xfeee8858 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -34,10 +34,10 @@ INTERN ATTR_SECTION(".text.crt.net.convert") ATTR_CONST uint16_t
 NOTHROW_NCX(LIBCCALL libc_htons)(uint16_t hostword) {
 	return (uint16_t)__hybrid_htobe32(hostword);
 }
+#include <hybrid/__byteswap.h>
 #ifdef __HYBRID_HTOBE_IS_BETOH
 DEFINE_INTERN_ALIAS(libc_ntohs, libc_htons);
 #else /* __HYBRID_HTOBE_IS_BETOH */
-#include <hybrid/__byteswap.h>
 INTERN ATTR_SECTION(".text.crt.net.convert") ATTR_CONST uint16_t
 NOTHROW_NCX(LIBCCALL libc_ntohs)(uint16_t netshort) {
 	return (uint16_t)__hybrid_betoh16(netshort);
@@ -48,10 +48,10 @@ INTERN ATTR_SECTION(".text.crt.net.convert") ATTR_CONST uint32_t
 NOTHROW_NCX(LIBCCALL libc_htonl)(uint32_t hostlong) {
 	return (uint32_t)__hybrid_htobe32(hostlong);
 }
+#include <hybrid/__byteswap.h>
 #ifdef __HYBRID_HTOBE_IS_BETOH
 DEFINE_INTERN_ALIAS(libc_ntohl, libc_htonl);
 #else /* __HYBRID_HTOBE_IS_BETOH */
-#include <hybrid/__byteswap.h>
 INTERN ATTR_SECTION(".text.crt.net.convert") ATTR_CONST uint32_t
 NOTHROW_NCX(LIBCCALL libc_ntohl)(uint32_t netlong) {
 	return (uint32_t)__hybrid_betoh32(netlong);
@@ -62,10 +62,10 @@ INTERN ATTR_SECTION(".text.crt.net.convert") ATTR_CONST uint64_t
 NOTHROW_NCX(LIBCCALL libc_htonq)(uint64_t hostquad) {
 	return (uint64_t)__hybrid_htobe64(hostquad);
 }
+#include <hybrid/__byteswap.h>
 #ifdef __HYBRID_HTOBE_IS_BETOH
 DEFINE_INTERN_ALIAS(libc_ntohq, libc_htonq);
 #else /* __HYBRID_HTOBE_IS_BETOH */
-#include <hybrid/__byteswap.h>
 INTERN ATTR_SECTION(".text.crt.net.convert") ATTR_CONST uint64_t
 NOTHROW_NCX(LIBCCALL libc_ntohq)(uint64_t netquad) {
 	return (uint64_t)__hybrid_betoh64(netquad);

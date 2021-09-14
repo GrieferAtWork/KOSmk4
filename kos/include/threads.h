@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xcbf6ea1d */
+/* HASH CRC-32:0xeea5549d */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -227,7 +227,9 @@ __CREDIRECT(__ATTR_NONNULL((1)),int,__NOTHROW_RPC,thrd_sleep,(struct timespec co
  * @return:    -1: A signal was received while waiting, and `remaining' was filled in (if given)
  * @return: <= -2: Some other error occurred */
 __CDECLARE(__ATTR_NONNULL((1)),int,__NOTHROW_RPC,thrd_sleep,(struct timespec const *__time_point, struct timespec *__remaining),(__time_point,__remaining))
-#elif defined(__CRT_HAVE_thrd_sleep) || defined(__CRT_HAVE_thrd_sleep64) || defined(__CRT_HAVE_nanosleep64) || defined(__CRT_HAVE_nanosleep) || defined(__CRT_HAVE___nanosleep)
+#else /* ... */
+#include <bits/types.h>
+#if defined(__CRT_HAVE_thrd_sleep) || defined(__CRT_HAVE_thrd_sleep64) || defined(__CRT_HAVE_nanosleep64) || defined(__CRT_HAVE_nanosleep) || defined(__CRT_HAVE___nanosleep)
 #include <libc/local/threads/thrd_sleep.h>
 /* >> thrd_sleep(3), thrd_sleep64(3)
  * Sleep until a signal is received, or `time_point' has elapsed (s.a. `nanosleep(2)')
@@ -235,7 +237,8 @@ __CDECLARE(__ATTR_NONNULL((1)),int,__NOTHROW_RPC,thrd_sleep,(struct timespec con
  * @return:    -1: A signal was received while waiting, and `remaining' was filled in (if given)
  * @return: <= -2: Some other error occurred */
 __NAMESPACE_LOCAL_USING_OR_IMPL(thrd_sleep, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_NONNULL((1)) int __NOTHROW_RPC(__LIBCCALL thrd_sleep)(struct timespec const *__time_point, struct timespec *__remaining) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(thrd_sleep))(__time_point, __remaining); })
-#endif /* ... */
+#endif /* __CRT_HAVE_thrd_sleep || __CRT_HAVE_thrd_sleep64 || __CRT_HAVE_nanosleep64 || __CRT_HAVE_nanosleep || __CRT_HAVE___nanosleep */
+#endif /* !... */
 #ifdef __USE_TIME64
 #ifdef __CRT_HAVE_thrd_sleep64
 /* >> thrd_sleep(3), thrd_sleep64(3)
@@ -244,7 +247,9 @@ __NAMESPACE_LOCAL_USING_OR_IMPL(thrd_sleep, __FORCELOCAL __ATTR_ARTIFICIAL __ATT
  * @return:    -1: A signal was received while waiting, and `remaining' was filled in (if given)
  * @return: <= -2: Some other error occurred */
 __CDECLARE(__ATTR_NONNULL((1)),int,__NOTHROW_RPC,thrd_sleep64,(struct timespec64 const *__time_point, struct timespec64 *__remaining),(__time_point,__remaining))
-#elif defined(__CRT_HAVE_thrd_sleep) && __SIZEOF_TIME32_T__ == __SIZEOF_TIME64_T__
+#else /* __CRT_HAVE_thrd_sleep64 */
+#include <bits/types.h>
+#if defined(__CRT_HAVE_thrd_sleep) && __SIZEOF_TIME32_T__ == __SIZEOF_TIME64_T__
 /* >> thrd_sleep(3), thrd_sleep64(3)
  * Sleep until a signal is received, or `time_point' has elapsed (s.a. `nanosleep(2)')
  * @return:     0: The (relative) time specified by `time_point' has elapsed
@@ -260,6 +265,7 @@ __CREDIRECT(__ATTR_NONNULL((1)),int,__NOTHROW_RPC,thrd_sleep64,(struct timespec6
  * @return: <= -2: Some other error occurred */
 __NAMESPACE_LOCAL_USING_OR_IMPL(thrd_sleep64, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_NONNULL((1)) int __NOTHROW_RPC(__LIBCCALL thrd_sleep64)(struct timespec64 const *__time_point, struct timespec64 *__remaining) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(thrd_sleep64))(__time_point, __remaining); })
 #endif /* ... */
+#endif /* !__CRT_HAVE_thrd_sleep64 */
 #endif /* __USE_TIME64 */
 #ifdef __CRT_HAVE_thrd_exit
 /* >> thrd_exit(3)
@@ -366,7 +372,9 @@ __CREDIRECT(__ATTR_NONNULL((1, 2)),int,__NOTHROW_RPC,mtx_timedlock,(mtx_t *__res
  * @return: thrd_timedout: Timeout
  * @return: thrd_error:    Error */
 __CDECLARE(__ATTR_NONNULL((1, 2)),int,__NOTHROW_RPC,mtx_timedlock,(mtx_t *__restrict __mutex, struct timespec const *__restrict __time_point),(__mutex,__time_point))
-#elif defined(__CRT_HAVE_pthread_mutex_timedlock64) || defined(__CRT_HAVE_pthread_mutex_timedlock)
+#else /* ... */
+#include <bits/types.h>
+#if defined(__CRT_HAVE_pthread_mutex_timedlock64) || defined(__CRT_HAVE_pthread_mutex_timedlock)
 #include <libc/local/threads/mtx_timedlock.h>
 /* >> mtx_timedlock(3), mtx_timedlock64(3)
  * Acquire a lock to a given mutex (s.a. `pthread_mutex_timedlock(3)')
@@ -374,7 +382,8 @@ __CDECLARE(__ATTR_NONNULL((1, 2)),int,__NOTHROW_RPC,mtx_timedlock,(mtx_t *__rest
  * @return: thrd_timedout: Timeout
  * @return: thrd_error:    Error */
 __NAMESPACE_LOCAL_USING_OR_IMPL(mtx_timedlock, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_NONNULL((1, 2)) int __NOTHROW_RPC(__LIBCCALL mtx_timedlock)(mtx_t *__restrict __mutex, struct timespec const *__restrict __time_point) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(mtx_timedlock))(__mutex, __time_point); })
-#endif /* ... */
+#endif /* __CRT_HAVE_pthread_mutex_timedlock64 || __CRT_HAVE_pthread_mutex_timedlock */
+#endif /* !... */
 #ifdef __USE_TIME64
 #ifdef __CRT_HAVE_mtx_timedlock64
 /* >> mtx_timedlock(3), mtx_timedlock64(3)
@@ -383,7 +392,9 @@ __NAMESPACE_LOCAL_USING_OR_IMPL(mtx_timedlock, __FORCELOCAL __ATTR_ARTIFICIAL __
  * @return: thrd_timedout: Timeout
  * @return: thrd_error:    Error */
 __CDECLARE(__ATTR_NONNULL((1, 2)),int,__NOTHROW_RPC,mtx_timedlock64,(mtx_t *__restrict __mutex, struct timespec64 const *__restrict __time_point),(__mutex,__time_point))
-#elif defined(__CRT_HAVE_mtx_timedlock) && __SIZEOF_TIME32_T__ == __SIZEOF_TIME64_T__
+#else /* __CRT_HAVE_mtx_timedlock64 */
+#include <bits/types.h>
+#if defined(__CRT_HAVE_mtx_timedlock) && __SIZEOF_TIME32_T__ == __SIZEOF_TIME64_T__
 /* >> mtx_timedlock(3), mtx_timedlock64(3)
  * Acquire a lock to a given mutex (s.a. `pthread_mutex_timedlock(3)')
  * @return: thrd_success:  Success
@@ -399,6 +410,7 @@ __CREDIRECT(__ATTR_NONNULL((1, 2)),int,__NOTHROW_RPC,mtx_timedlock64,(mtx_t *__r
  * @return: thrd_error:    Error */
 __NAMESPACE_LOCAL_USING_OR_IMPL(mtx_timedlock64, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_NONNULL((1, 2)) int __NOTHROW_RPC(__LIBCCALL mtx_timedlock64)(mtx_t *__restrict __mutex, struct timespec64 const *__restrict __time_point) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(mtx_timedlock64))(__mutex, __time_point); })
 #endif /* ... */
+#endif /* !__CRT_HAVE_mtx_timedlock64 */
 #endif /* __USE_TIME64 */
 #ifdef __CRT_HAVE_mtx_trylock
 /* >> mtx_trylock(3)
@@ -531,7 +543,9 @@ __CREDIRECT(__ATTR_NONNULL((1, 2, 3)),int,__NOTHROW_RPC,cnd_timedwait,(cnd_t *__
  * @return: thrd_timedout: Timeout
  * @return: thrd_error:    Error */
 __CDECLARE(__ATTR_NONNULL((1, 2, 3)),int,__NOTHROW_RPC,cnd_timedwait,(cnd_t *__restrict __cond, mtx_t *__restrict __mutex, struct timespec const *__restrict __time_point),(__cond,__mutex,__time_point))
-#elif defined(__CRT_HAVE_pthread_cond_timedwait64) || defined(__CRT_HAVE_pthread_cond_timedwait)
+#else /* ... */
+#include <bits/types.h>
+#if defined(__CRT_HAVE_pthread_cond_timedwait64) || defined(__CRT_HAVE_pthread_cond_timedwait)
 #include <libc/local/threads/cnd_timedwait.h>
 /* >> cnd_timedwait(3), cnd_timedwait64(3)
  * Wait on the given condition variable (s.a. `pthread_cond_timedwait(3)')
@@ -539,7 +553,8 @@ __CDECLARE(__ATTR_NONNULL((1, 2, 3)),int,__NOTHROW_RPC,cnd_timedwait,(cnd_t *__r
  * @return: thrd_timedout: Timeout
  * @return: thrd_error:    Error */
 __NAMESPACE_LOCAL_USING_OR_IMPL(cnd_timedwait, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_NONNULL((1, 2, 3)) int __NOTHROW_RPC(__LIBCCALL cnd_timedwait)(cnd_t *__restrict __cond, mtx_t *__restrict __mutex, struct timespec const *__restrict __time_point) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(cnd_timedwait))(__cond, __mutex, __time_point); })
-#endif /* ... */
+#endif /* __CRT_HAVE_pthread_cond_timedwait64 || __CRT_HAVE_pthread_cond_timedwait */
+#endif /* !... */
 #ifdef __USE_TIME64
 #ifdef __CRT_HAVE_cnd_timedwait64
 /* >> cnd_timedwait(3), cnd_timedwait64(3)
@@ -548,7 +563,9 @@ __NAMESPACE_LOCAL_USING_OR_IMPL(cnd_timedwait, __FORCELOCAL __ATTR_ARTIFICIAL __
  * @return: thrd_timedout: Timeout
  * @return: thrd_error:    Error */
 __CDECLARE(__ATTR_NONNULL((1, 2, 3)),int,__NOTHROW_RPC,cnd_timedwait64,(cnd_t *__restrict __cond, mtx_t *__restrict __mutex, struct timespec64 const *__restrict __time_point),(__cond,__mutex,__time_point))
-#elif defined(__CRT_HAVE_cnd_timedwait) && __SIZEOF_TIME32_T__ == __SIZEOF_TIME64_T__
+#else /* __CRT_HAVE_cnd_timedwait64 */
+#include <bits/types.h>
+#if defined(__CRT_HAVE_cnd_timedwait) && __SIZEOF_TIME32_T__ == __SIZEOF_TIME64_T__
 /* >> cnd_timedwait(3), cnd_timedwait64(3)
  * Wait on the given condition variable (s.a. `pthread_cond_timedwait(3)')
  * @return: thrd_success:  Success
@@ -564,6 +581,7 @@ __CREDIRECT(__ATTR_NONNULL((1, 2, 3)),int,__NOTHROW_RPC,cnd_timedwait64,(cnd_t *
  * @return: thrd_error:    Error */
 __NAMESPACE_LOCAL_USING_OR_IMPL(cnd_timedwait64, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_NONNULL((1, 2, 3)) int __NOTHROW_RPC(__LIBCCALL cnd_timedwait64)(cnd_t *__restrict __cond, mtx_t *__restrict __mutex, struct timespec64 const *__restrict __time_point) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(cnd_timedwait64))(__cond, __mutex, __time_point); })
 #endif /* ... */
+#endif /* !__CRT_HAVE_cnd_timedwait64 */
 #endif /* __USE_TIME64 */
 #ifdef __CRT_HAVE_pthread_cond_destroy
 /* Destroy condition variable pointed by cond and free all of its resources

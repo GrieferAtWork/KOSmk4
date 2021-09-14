@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x7e5166d6 */
+/* HASH CRC-32:0xcd26050c */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -44,15 +44,6 @@ __NAMESPACE_LOCAL_END
 __NAMESPACE_LOCAL_BEGIN
 __LOCAL_LIBC(mktime64) __ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1)) __time64_t
 __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(mktime64))(struct __NAMESPACE_STD_SYM tm __KOS_FIXED_CONST *__tp) {
-
-
-
-
-
-
-
-
-
 #if defined(__CRT_HAVE_mktime) || defined(__CRT_HAVE__mktime32) || defined(__CRT_HAVE_timelocal)
 	return (__time64_t)(__NAMESPACE_LOCAL_SYM __localdep_mktime32)(__tp);
 #else /* __CRT_HAVE_mktime || __CRT_HAVE__mktime32 || __CRT_HAVE_timelocal */
@@ -60,8 +51,8 @@ __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(mktime64))(struct __NAMESPACE_STD_SYM
 	__result = __yearstodays(__tp->tm_year) - __yearstodays(1970); /* UNIX_TIME_START_YEAR */
 	__result += __tp->tm_yday;
 	__result *= 86400; /* SECONDS_PER_DAY */
-	__result += __tp->tm_hour*60*60;
-	__result += __tp->tm_min*60;
+	__result += __tp->tm_hour * 60 * 60;
+	__result += __tp->tm_min * 60;
 	__result += __tp->tm_sec;
 	return __result;
 #endif /* !__CRT_HAVE_mktime && !__CRT_HAVE__mktime32 && !__CRT_HAVE_timelocal */

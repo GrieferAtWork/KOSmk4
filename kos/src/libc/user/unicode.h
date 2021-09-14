@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x3a2261de */
+/* HASH CRC-32:0x1cfef63 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -31,25 +31,36 @@
 DECL_BEGIN
 
 #ifndef __KERNEL__
-/* Return the internal descriptor for the given `ch' */
+/* >> __unicode_descriptor(3)
+ * Return the internal descriptor for the given `ch'
+ * This is the main accessor function for the unicode database, but
+ * should not be called directly (unless you know what you're doing
+ * and are aware that your code might break should this API ever be
+ * changed)
+ * Also note that this function never returns `NULL'! */
 INTDEF ATTR_CONST ATTR_RETNONNULL struct __unitraits const *NOTHROW(LIBCCALL libc___unicode_descriptor)(char32_t ch);
-/* Return the integer constant associated with a given digit index
+/* >> __unicode_descriptor_digit(3), __unicode_descriptor_digit64(3)
+ * Return the integer constant associated  with a given digit  index
  * Returns `0' if the given index is invalid
  * @param: digit_idx: As read from `__unitraits::__ut_digit_idx' */
 INTDEF ATTR_CONST WUNUSED uint8_t NOTHROW(LIBCCALL libc___unicode_descriptor_digit)(uint8_t digit_idx);
-/* Return the integer constant associated with a given digit index
+/* >> __unicode_descriptor_digit(3), __unicode_descriptor_digit64(3)
+ * Return the integer constant associated  with a given digit  index
  * Returns `0' if the given index is invalid
  * @param: digit_idx: As read from `__unitraits::__ut_digit_idx' */
 INTDEF ATTR_CONST WUNUSED uint64_t NOTHROW(LIBCCALL libc___unicode_descriptor_digit64)(uint8_t digit_idx);
-/* Return the floating-point constant associated with a given digit index
+/* >> __unicode_descriptor_digitd(3), __unicode_descriptor_digitld(3)
+ * Return the floating-point constant associated with a given digit index
  * Returns `0.0' if the given index is invalid
  * @param: digit_idx: As read from `__unitraits::__ut_digit_idx' */
 INTDEF ATTR_CONST WUNUSED double NOTHROW(LIBCCALL libc___unicode_descriptor_digitd)(uint8_t digit_idx);
-/* Return the floating-point constant associated with a given digit index
+/* >> __unicode_descriptor_digitd(3), __unicode_descriptor_digitld(3)
+ * Return the floating-point constant associated with a given digit index
  * Returns `0.0' if the given index is invalid
  * @param: digit_idx: As read from `__unitraits::__ut_digit_idx' */
 INTDEF ATTR_CONST WUNUSED __LONGDOUBLE NOTHROW(LIBCCALL libc___unicode_descriptor_digitld)(uint8_t digit_idx);
-/* Fold the given unicode character `ch' */
+/* >> unicode_fold(3)
+ * Fold the given unicode character `ch' */
 INTDEF ATTR_RETNONNULL NONNULL((2)) char32_t *NOTHROW_NCX(LIBCCALL libc_unicode_fold)(char32_t ch, char32_t buf[3]);
 #endif /* !__KERNEL__ */
 

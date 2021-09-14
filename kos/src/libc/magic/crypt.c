@@ -40,11 +40,14 @@ __SYSDECL_BEGIN
 
 }
 
+@@>> setkey(3), setkey_r(3)
 void setkey([[nonnull]] char const *key);
 
+@@>> crypt(3), crypt_r(3)
 [[guard]]
 char *crypt([[nonnull]] char const *key, [[nonnull]] char const *salt);
 
+@@>> encrypt(3), encrypt_r(3)
 [[guard, decl_include("<features.h>")]]
 void encrypt([[nonnull]] char *glibc_block, __STDC_INT_AS_UINT_T edflag);
 

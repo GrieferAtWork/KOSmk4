@@ -37,18 +37,21 @@
 %[default:section(".text.crt{|.dos}.fs.exec.posix_spawn")]
 
 
-%{
+%[insert:prefix(
 #include <features.h>
-
-}%[insert:prefix(
+)]%[insert:prefix(
 #include <asm/crt/posix_spawn.h>
 )]%[insert:prefix(
 #include <bits/crt/posix_spawn.h>
-)]%{
-#include <bits/os/sched.h>  /* struct sched_param */
-#include <bits/os/sigset.h> /* struct __sigset_struct */
+)]%[insert:prefix(
+#include <bits/os/sched.h>
+)]%[insert:prefix(
+#include <bits/os/sigset.h>
+)]%[insert:prefix(
 #include <bits/types.h>
+)]%[insert:prefix(
 #include <sys/types.h>
+)]%{
 
 #ifdef __USE_GLIBC
 #include <sched.h>
