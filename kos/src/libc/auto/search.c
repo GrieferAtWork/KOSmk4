@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x990c7aea */
+/* HASH CRC-32:0x6583f74d */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -1047,6 +1047,17 @@ INTERN ATTR_SECTION(".text.crt.dos.utility.search") NONNULL((2)) void
 }
 #endif /* !__LIBCCALL_IS_LIBDCALL && !__KERNEL__ */
 #ifndef __KERNEL__
+#ifndef __LIBCCALL_CALLER_CLEANUP
+#ifndef ____invoke_free_fn_helper_defined
+__NAMESPACE_LOCAL_BEGIN
+#define ____invoke_free_fn_helper_defined 1
+__LOCAL_LIBC(__invoke_free_fn_helper) void
+(__LIBCCALL __invoke_free_fn_helper)(void *nodep, void *arg) {
+	(*(void (LIBCCALL *)(void *))arg)(nodep);
+}
+__NAMESPACE_LOCAL_END
+#endif /* !____invoke_free_fn_helper_defined */
+#endif /* !__LIBCCALL_CALLER_CLEANUP */
 /* >> tdestroy(3), tdestroy_r(3)
  * Destroy the whole tree, call `freefct' for each node or leaf */
 INTERN ATTR_SECTION(".text.crt.utility.search") NONNULL((2)) void
@@ -1055,7 +1066,7 @@ INTERN ATTR_SECTION(".text.crt.utility.search") NONNULL((2)) void
 #ifdef __LIBCCALL_CALLER_CLEANUP
 	libc_tdestroy_r(root, (void (LIBCCALL *)(void *, void *))(void *)freefct, NULL);
 #else /* __LIBCCALL_CALLER_CLEANUP */
-	libc_tdestroy_r(root, &__NAMESPACE_LOCAL_SYM __invoke_free_fn_helper, (void *)compar);
+	libc_tdestroy_r(root, &__NAMESPACE_LOCAL_SYM __invoke_free_fn_helper, (void *)freefct);
 #endif /* !__LIBCCALL_CALLER_CLEANUP */
 }
 #endif /* !__KERNEL__ */

@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x9b35ce76 */
+/* HASH CRC-32:0xa6c14c61 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -34,12 +34,25 @@ __NAMESPACE_LOCAL_BEGIN
 #define __localdep_tdestroy_r __LIBC_LOCAL_NAME(tdestroy_r)
 #endif /* !__CRT_HAVE_tdestroy_r */
 #endif /* !__local___localdep_tdestroy_r_defined */
+__NAMESPACE_LOCAL_END
+#ifndef __LIBCCALL_CALLER_CLEANUP
+#ifndef ____invoke_free_fn_helper_defined
+__NAMESPACE_LOCAL_BEGIN
+#define ____invoke_free_fn_helper_defined 1
+__LOCAL_LIBC(__invoke_free_fn_helper) void
+(__LIBCCALL __invoke_free_fn_helper)(void *__nodep, void *__arg) {
+	(*(void (__LIBCCALL *)(void *))__arg)(__nodep);
+}
+__NAMESPACE_LOCAL_END
+#endif /* !____invoke_free_fn_helper_defined */
+#endif /* !__LIBCCALL_CALLER_CLEANUP */
+__NAMESPACE_LOCAL_BEGIN
 __LOCAL_LIBC(tdestroy) __ATTR_NONNULL((2)) void
 (__LIBCCALL __LIBC_LOCAL_NAME(tdestroy))(void *__root, void (__LIBCCALL *__freefct)(void *__nodep)) __THROWS(...) {
 #ifdef __LIBCCALL_CALLER_CLEANUP
 	(__NAMESPACE_LOCAL_SYM __localdep_tdestroy_r)(__root, (void (__LIBCCALL *)(void *, void *))(void *)__freefct, __NULLPTR);
 #else /* __LIBCCALL_CALLER_CLEANUP */
-	(__NAMESPACE_LOCAL_SYM __localdep_tdestroy_r)(__root, &__NAMESPACE_LOCAL_SYM __invoke_free_fn_helper, (void *)__compar);
+	(__NAMESPACE_LOCAL_SYM __localdep_tdestroy_r)(__root, &__NAMESPACE_LOCAL_SYM __invoke_free_fn_helper, (void *)__freefct);
 #endif /* !__LIBCCALL_CALLER_CLEANUP */
 }
 __NAMESPACE_LOCAL_END

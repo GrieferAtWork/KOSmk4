@@ -969,9 +969,9 @@ typedef void (__LIBCCALL *__free_fn_t)(void *__nodep);
 @@pp_ifndef ____invoke_free_fn_helper_defined@@
 @@push_namespace(local)@@
 #define ____invoke_free_fn_helper_defined 1
-__LOCAL_LIBC(__invoke_free_fn_helper) int
+__LOCAL_LIBC(__invoke_free_fn_helper) void
 (__LIBCCALL __invoke_free_fn_helper)(void *nodep, void *arg) {
-	return (*(void (LIBCCALL *)(void *))arg)(nodep);
+	(*(void (LIBCCALL *)(void *))arg)(nodep);
 }
 @@pop_namespace@@
 @@pp_endif@@
@@ -982,13 +982,13 @@ __LOCAL_LIBC(__invoke_free_fn_helper) int
 	cook: auto = freefct,
 	wrap: (void *nodep, $cook c) { (*c)(nodep); },
 	impl: tdestroy_r(root, (void (LIBCCALL *)(void *, void *))&$wrap, (void *)$cook),
-))]]
+)), impl_prefix(DEFINE_INVOKE_FREE_FN_HELPER)]]
 void tdestroy([[nullable]] void *root,
               [[nonnull]] void (LIBCCALL *freefct)(void *nodep)) {
 @@pp_ifdef __LIBCCALL_CALLER_CLEANUP@@
 	tdestroy_r(root, (void (LIBCCALL *)(void *, void *))(void *)freefct, NULL);
 @@pp_else@@
-	tdestroy_r(root, &__NAMESPACE_LOCAL_SYM __invoke_free_fn_helper, (void *)compar);
+	tdestroy_r(root, &__NAMESPACE_LOCAL_SYM __invoke_free_fn_helper, (void *)freefct);
 @@pp_endif@@
 }
 %#endif /* __USE_GNU */
