@@ -926,9 +926,9 @@ typedef void (__LIBCCALL *__action_fn_t)(void const *nodep, VISIT value, int lev
 @@pp_ifndef ____invoke_twalk_action_helper_defined@@
 @@push_namespace(local)@@
 #define ____invoke_twalk_action_helper_defined 1
-__LOCAL_LIBC(__invoke_twalk_action_helper) int
+__LOCAL_LIBC(__invoke_twalk_action_helper) void
 (__LIBCCALL __invoke_twalk_action_helper)(void const *nodep, VISIT value, int level, void *arg) {
-	return (*(void (LIBCCALL *)(void const *, VISIT, int))arg)(nodep, value, level);
+	(*(void (LIBCCALL *)(void const *, VISIT, int))arg)(nodep, value, level);
 }
 @@pop_namespace@@
 @@pp_endif@@

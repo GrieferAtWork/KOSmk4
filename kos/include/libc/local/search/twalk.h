@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x54e85d94 */
+/* HASH CRC-32:0x25789622 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -48,9 +48,9 @@ __NAMESPACE_LOCAL_END
 #ifndef ____invoke_twalk_action_helper_defined
 __NAMESPACE_LOCAL_BEGIN
 #define ____invoke_twalk_action_helper_defined 1
-__LOCAL_LIBC(__invoke_twalk_action_helper) int
+__LOCAL_LIBC(__invoke_twalk_action_helper) void
 (__LIBCCALL __invoke_twalk_action_helper)(void const *__nodep, VISIT __value, int __level, void *__arg) {
-	return (*(void (__LIBCCALL *)(void const *, VISIT, int))__arg)(__nodep, __value, __level);
+	(*(void (__LIBCCALL *)(void const *, VISIT, int))__arg)(__nodep, __value, __level);
 }
 __NAMESPACE_LOCAL_END
 #endif /* !____invoke_twalk_action_helper_defined */
