@@ -169,6 +169,7 @@ SECTIONS {
 	.data : {
 		*(.data.read_mostly)
 		ENUMERATE_SECTIONS(.data)
+		*(.data.rel.local.DW.ref.__gxx_personality_v0)
 		*(.data.local.*)
 	} PHDR(data)
 
@@ -198,7 +199,6 @@ SECTIONS {
 		*(.gnu_debuglink)
 		*(.gnu.lto_*)
 		*(.data.DW.ref.*)
-		*(.data.rel.local.DW.ref.__gxx_personality_v0)
 	}
 
 }

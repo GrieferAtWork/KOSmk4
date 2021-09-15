@@ -36,25 +36,25 @@ KOS's libc is designed and optimized to minimize the number of relocations that 
 Running `readelf -rW bin/i386-kos-OD/lib/libc.so` yields:
 
 ```
-Relocation section '.rel.dyn' at offset 0xe0fcc contains 9 entries:
+Relocation section '.rel.dyn' at offset 0x113c88 contains 9 entries:
  Offset     Info    Type                Sym. Value  Symbol's Name
-000e211c  00000008 R_386_RELATIVE
-000e217c  00000008 R_386_RELATIVE
-000e21dc  00000008 R_386_RELATIVE
-000e2220  00000008 R_386_RELATIVE
-000e2224  00000008 R_386_RELATIVE
-000e2228  00000008 R_386_RELATIVE
-00000000  00000000 R_386_NONE
-000e20cc  00000023 R_386_TLS_DTPMOD32
-000e20c8  00147906 R_386_GLOB_DAT         000e20e4   __stack_chk_guard
+0011415c  00000008 R_386_RELATIVE
+001141bc  00000008 R_386_RELATIVE
+0011421c  00000008 R_386_RELATIVE
+00114220  00000008 R_386_RELATIVE
+00114224  00000008 R_386_RELATIVE
+00114228  00000008 R_386_RELATIVE
+001140c8  0014fd06 R_386_GLOB_DAT         001140e4   __stack_chk_guard
+001140cc  00000023 R_386_TLS_DTPMOD32
+001142dc  00101201 R_386_32               000482c3   __gxx_personality_v0
 
-Relocation section '.rel.plt' at offset 0xe1014 contains 5 entries:
+Relocation section '.rel.plt' at offset 0x113cd0 contains 5 entries:
  Offset     Info    Type                Sym. Value  Symbol's Name
-000e20b4  00015a07 R_386_JUMP_SLOT        00029e10   __cxa_end_catch
-000e20b8  00000107 R_386_JUMP_SLOT        00000000   ___tls_get_addr
-000e20bc  00090a07 R_386_JUMP_SLOT        00029db0   __cxa_begin_catch
-000e20c0  00000207 R_386_JUMP_SLOT        00000000   dlsym
-000e20c4  000dca07 R_386_JUMP_SLOT        00029b7c   _Unwind_Resume
+001140b4  00016707 R_386_JUMP_SLOT        00047a07   __cxa_end_catch
+001140b8  00000107 R_386_JUMP_SLOT        00000000   ___tls_get_addr
+001140bc  00094507 R_386_JUMP_SLOT        00047977   __cxa_begin_catch
+001140c0  00000207 R_386_JUMP_SLOT        00000000   dlsym
+001140c4  000e2707 R_386_JUMP_SLOT        00047745   _Unwind_Resume
 ```
 
 Other architectures display the same set of relocations with slight deviations as the result of different names for individual relocations. Though the total number of relocations should not deviate from the above base-line.
@@ -79,15 +79,15 @@ In the following, each of these relocations will be rationalized:
 	PUBLIC FILE *g_stderr = &default_stderr; /* !Relocation: &default_stderr */
 	```
 
-- The `R_386_NONE` relocation:
-	- Origin/cause is unknown and investigation might be warranted. A likely culprit might be exception handling and the discarding of `.data.rel.local.DW.ref.__gxx_personality_v0` in libc's linker script...
-- The `R_386_TLS_DTPMOD32` relocation:
-	- In order to facility `<pthread.h>` and a thread-local `errno`, libc includes a TLS section which contains 1 variable `current`. This variable holds everything needed for TLS and cannot be removed or circumvented without making pretty much everything about libc thread-unsafe. Working around this relocation would force libc to stray away from standard ELF thread-location variables support, which would be a bad idea due to the ease in implementation, integration with `libdl.so`, and interoperability with third-party libraries due to its standardization originating from outside the bounds of KOS development (going as far as GCC support).  
-	  Removal of this relocation is out of the question, and the only feasible approach would be to move all of libc's TLS stuff into `libdl.so`, which is also a bad idea since `libdl.so` is meant to be unconscious and entirely disconnected of which libc is used (if any) and what libc does.
 - The `R_386_GLOB_DAT` relocation against `__stack_chk_guard`:
 	- A possible candidate for future removal, this relocation is the result of libc being compiled with `-fstack-protector-strong`. A global variable `extern uintptr_t __stack_chk_guard;` is defined that contains a random™ value which is used to detect stack corruption as the result of buffer overruns.  
 	  Optimization potential exists because on KOS it is actually libc itself which defines this global variable, such that differently generated code could already resolve it at link-time (rather than run-time).  
 	  A proposed solution to rid of this relocation would be to read GCC's source code and see if there is a way to alter the name of the symbol used and have it point at an `INTERN` alias of `__stack_chk_guard`. If this is not possible, an alternate solution might be to modify libc's assembly to hard-change the symbol's name prior to final assembly (similar to what `libdl.so` does to prevent relocations against `__gxx_personality_v0`; s.a. `COMPILE_WITH_ASM_FILTER from kos.misc.libmagic.steps.c`), though due to the large number of source files that partake in the creation of libc, this might add too much overhead to the build process, with too little gain in return. Further investigation might be warranted.
+- The `R_386_TLS_DTPMOD32` relocation:
+	- In order to facility `<pthread.h>` and a thread-local `errno`, libc includes a TLS section which contains 1 variable `current`. This variable holds everything needed for TLS and cannot be removed or circumvented without making pretty much everything about libc thread-unsafe. Working around this relocation would force libc to stray away from standard ELF thread-location variables support, which would be a bad idea due to the ease in implementation, integration with `libdl.so`, and interoperability with third-party libraries due to its standardization originating from outside the bounds of KOS development (going as far as GCC support).  
+	  Removal of this relocation is out of the question, and the only feasible approach would be to move all of libc's TLS stuff into `libdl.so`, which is also a bad idea since `libdl.so` is meant to be unconscious and entirely disconnected of which libc is used (if any) and what libc does.
+- The `R_386_32` relocation against `__gxx_personality_v0`:
+	- This one is the result of `.data.rel.local.DW.ref.__gxx_personality_v0`, which is required to allow exceptions to be propagated through functions from within libc. the `__gxx_personality_v0` symbol, while already defined within `libc.so`, may actually be overwritten by `libstdc++` (if loaded), as the one provided by libc itself lacks support for c++ exceptions (and only supports KOS kernel exceptions).
 - Jump relocations against symbols:
 	- `__cxa_begin_catch`, `__cxa_end_catch`, `_Unwind_Resume`  
 	  All of these symbols relate to c++ exception handling (which is used by libc to integrate into the KOS kernel exception system; s.a. exception-enabled system calls and CamelCase variants of standard functions found in `<kos/...>` headers, such as `Malloc` in `<kos/malloc.h>`)  
