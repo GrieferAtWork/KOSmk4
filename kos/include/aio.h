@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x29d30804 */
+/* HASH CRC-32:0xceb9d80e */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -395,48 +395,53 @@ __CREDIRECT(,int,__NOTHROW_NCX,aio_cancel,(__fd_t __fd, struct aiocb *__self),ai
 /* >> aio_suspend(3), aio_suspend64(3), aio_suspendt64(3), aio_suspend64t64(3)
  * Suspend  the calling thread until at least  one of the given AIO operations
  * has been completed, a  signal is delivered to,  or (if non-NULL) the  given
- * timeout expired.
+ * `rel_timeout' expired.
+ * @param: rel_timeout: The amount of time (relative) for which to wait.
  * @return: 0:  Success (At least one of the given AIO operations has completed)
- * @return: -1: [errno=EAGAIN] The given timeout expired
+ * @return: -1: [errno=EAGAIN] The time specified by `rel_timeout' has elapsed
  * @return: -1: [errno=EINTR]  A signal was delivered to the calling thread */
-__CDECLARE(__ATTR_NONNULL((1)),int,__NOTHROW_RPC,aio_suspend,(struct aiocb const *const __list[], __STDC_INT_AS_SIZE_T __nent, struct timespec const *__restrict __timeout),(__list,__nent,__timeout))
+__CDECLARE(__ATTR_NONNULL((1)),int,__NOTHROW_RPC,aio_suspend,(struct aiocb const *const __list[], __STDC_INT_AS_SIZE_T __nent, struct timespec const *__restrict __rel_timeout),(__list,__nent,__rel_timeout))
 #elif defined(__CRT_HAVE_aio_suspend64) && defined(__USE_FILE_OFFSET64) && !defined(__USE_TIME_BITS64)
 /* >> aio_suspend(3), aio_suspend64(3), aio_suspendt64(3), aio_suspend64t64(3)
  * Suspend  the calling thread until at least  one of the given AIO operations
  * has been completed, a  signal is delivered to,  or (if non-NULL) the  given
- * timeout expired.
+ * `rel_timeout' expired.
+ * @param: rel_timeout: The amount of time (relative) for which to wait.
  * @return: 0:  Success (At least one of the given AIO operations has completed)
- * @return: -1: [errno=EAGAIN] The given timeout expired
+ * @return: -1: [errno=EAGAIN] The time specified by `rel_timeout' has elapsed
  * @return: -1: [errno=EINTR]  A signal was delivered to the calling thread */
-__CREDIRECT(__ATTR_NONNULL((1)),int,__NOTHROW_RPC,aio_suspend,(struct aiocb const *const __list[], __STDC_INT_AS_SIZE_T __nent, struct timespec const *__restrict __timeout),aio_suspend64,(__list,__nent,__timeout))
+__CREDIRECT(__ATTR_NONNULL((1)),int,__NOTHROW_RPC,aio_suspend,(struct aiocb const *const __list[], __STDC_INT_AS_SIZE_T __nent, struct timespec const *__restrict __rel_timeout),aio_suspend64,(__list,__nent,__rel_timeout))
 #elif defined(__CRT_HAVE_aio_suspendt64) && !defined(__USE_FILE_OFFSET64) && defined(__USE_TIME_BITS64)
 /* >> aio_suspend(3), aio_suspend64(3), aio_suspendt64(3), aio_suspend64t64(3)
  * Suspend  the calling thread until at least  one of the given AIO operations
  * has been completed, a  signal is delivered to,  or (if non-NULL) the  given
- * timeout expired.
+ * `rel_timeout' expired.
+ * @param: rel_timeout: The amount of time (relative) for which to wait.
  * @return: 0:  Success (At least one of the given AIO operations has completed)
- * @return: -1: [errno=EAGAIN] The given timeout expired
+ * @return: -1: [errno=EAGAIN] The time specified by `rel_timeout' has elapsed
  * @return: -1: [errno=EINTR]  A signal was delivered to the calling thread */
-__CREDIRECT(__ATTR_NONNULL((1)),int,__NOTHROW_RPC,aio_suspend,(struct aiocb const *const __list[], __STDC_INT_AS_SIZE_T __nent, struct timespec const *__restrict __timeout),aio_suspendt64,(__list,__nent,__timeout))
+__CREDIRECT(__ATTR_NONNULL((1)),int,__NOTHROW_RPC,aio_suspend,(struct aiocb const *const __list[], __STDC_INT_AS_SIZE_T __nent, struct timespec const *__restrict __rel_timeout),aio_suspendt64,(__list,__nent,__rel_timeout))
 #elif defined(__CRT_HAVE_aio_suspend64t64) && defined(__USE_FILE_OFFSET64) && defined(__USE_TIME_BITS64)
 /* >> aio_suspend(3), aio_suspend64(3), aio_suspendt64(3), aio_suspend64t64(3)
  * Suspend  the calling thread until at least  one of the given AIO operations
  * has been completed, a  signal is delivered to,  or (if non-NULL) the  given
- * timeout expired.
+ * `rel_timeout' expired.
+ * @param: rel_timeout: The amount of time (relative) for which to wait.
  * @return: 0:  Success (At least one of the given AIO operations has completed)
- * @return: -1: [errno=EAGAIN] The given timeout expired
+ * @return: -1: [errno=EAGAIN] The time specified by `rel_timeout' has elapsed
  * @return: -1: [errno=EINTR]  A signal was delivered to the calling thread */
-__CREDIRECT(__ATTR_NONNULL((1)),int,__NOTHROW_RPC,aio_suspend,(struct aiocb const *const __list[], __STDC_INT_AS_SIZE_T __nent, struct timespec const *__restrict __timeout),aio_suspend64t64,(__list,__nent,__timeout))
+__CREDIRECT(__ATTR_NONNULL((1)),int,__NOTHROW_RPC,aio_suspend,(struct aiocb const *const __list[], __STDC_INT_AS_SIZE_T __nent, struct timespec const *__restrict __rel_timeout),aio_suspend64t64,(__list,__nent,__rel_timeout))
 #elif (defined(__CRT_HAVE_aio_suspendt64) && (!defined(__USE_FILE_OFFSET64) || __SIZEOF_OFF32_T__ == __SIZEOF_OFF64_T__)) || (defined(__CRT_HAVE_aio_suspend64t64) && (defined(__USE_FILE_OFFSET64) || __SIZEOF_OFF32_T__ == __SIZEOF_OFF64_T__)) || (defined(__CRT_HAVE_aio_suspend) && (!defined(__USE_FILE_OFFSET64) || __SIZEOF_OFF32_T__ == __SIZEOF_OFF64_T__)) || (defined(__CRT_HAVE_aio_suspend64) && (defined(__USE_FILE_OFFSET64) || __SIZEOF_OFF32_T__ == __SIZEOF_OFF64_T__))
 #include <libc/local/aio/aio_suspend.h>
 /* >> aio_suspend(3), aio_suspend64(3), aio_suspendt64(3), aio_suspend64t64(3)
  * Suspend  the calling thread until at least  one of the given AIO operations
  * has been completed, a  signal is delivered to,  or (if non-NULL) the  given
- * timeout expired.
+ * `rel_timeout' expired.
+ * @param: rel_timeout: The amount of time (relative) for which to wait.
  * @return: 0:  Success (At least one of the given AIO operations has completed)
- * @return: -1: [errno=EAGAIN] The given timeout expired
+ * @return: -1: [errno=EAGAIN] The time specified by `rel_timeout' has elapsed
  * @return: -1: [errno=EINTR]  A signal was delivered to the calling thread */
-__NAMESPACE_LOCAL_USING_OR_IMPL(aio_suspend, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_NONNULL((1)) int __NOTHROW_RPC(__LIBCCALL aio_suspend)(struct aiocb const *const __list[], __STDC_INT_AS_SIZE_T __nent, struct timespec const *__restrict __timeout) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(aio_suspend))(__list, __nent, __timeout); })
+__NAMESPACE_LOCAL_USING_OR_IMPL(aio_suspend, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_NONNULL((1)) int __NOTHROW_RPC(__LIBCCALL aio_suspend)(struct aiocb const *const __list[], __STDC_INT_AS_SIZE_T __nent, struct timespec const *__restrict __rel_timeout) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(aio_suspend))(__list, __nent, __rel_timeout); })
 #endif /* ... */
 
 #ifdef __USE_LARGEFILE64
@@ -663,48 +668,53 @@ __CDECLARE(,int,__NOTHROW_NCX,aio_cancel64,(__fd_t __fildes, struct aiocb64 *__s
 /* >> aio_suspend(3), aio_suspend64(3), aio_suspendt64(3), aio_suspend64t64(3)
  * Suspend  the calling thread until at least  one of the given AIO operations
  * has been completed, a  signal is delivered to,  or (if non-NULL) the  given
- * timeout expired.
+ * `rel_timeout' expired.
+ * @param: rel_timeout: The amount of time (relative) for which to wait.
  * @return: 0:  Success (At least one of the given AIO operations has completed)
- * @return: -1: [errno=EAGAIN] The given timeout expired
+ * @return: -1: [errno=EAGAIN] The time specified by `rel_timeout' has elapsed
  * @return: -1: [errno=EINTR]  A signal was delivered to the calling thread */
-__CREDIRECT(__ATTR_NONNULL((1)),int,__NOTHROW_NCX,aio_suspend64,(struct aiocb64 const *const __list[], __STDC_INT_AS_SIZE_T __nent, struct timespec const *__restrict __timeout),aio_suspend,(__list,__nent,__timeout))
+__CREDIRECT(__ATTR_NONNULL((1)),int,__NOTHROW_NCX,aio_suspend64,(struct aiocb64 const *const __list[], __STDC_INT_AS_SIZE_T __nent, struct timespec const *__restrict __rel_timeout),aio_suspend,(__list,__nent,__rel_timeout))
 #elif defined(__CRT_HAVE_aio_suspend64) && (!defined(__USE_TIME_BITS64) || __SIZEOF_TIME32_T__ == __SIZEOF_TIME64_T__)
 /* >> aio_suspend(3), aio_suspend64(3), aio_suspendt64(3), aio_suspend64t64(3)
  * Suspend  the calling thread until at least  one of the given AIO operations
  * has been completed, a  signal is delivered to,  or (if non-NULL) the  given
- * timeout expired.
+ * `rel_timeout' expired.
+ * @param: rel_timeout: The amount of time (relative) for which to wait.
  * @return: 0:  Success (At least one of the given AIO operations has completed)
- * @return: -1: [errno=EAGAIN] The given timeout expired
+ * @return: -1: [errno=EAGAIN] The time specified by `rel_timeout' has elapsed
  * @return: -1: [errno=EINTR]  A signal was delivered to the calling thread */
-__CDECLARE(__ATTR_NONNULL((1)),int,__NOTHROW_NCX,aio_suspend64,(struct aiocb64 const *const __list[], __STDC_INT_AS_SIZE_T __nent, struct timespec const *__restrict __timeout),(__list,__nent,__timeout))
+__CDECLARE(__ATTR_NONNULL((1)),int,__NOTHROW_NCX,aio_suspend64,(struct aiocb64 const *const __list[], __STDC_INT_AS_SIZE_T __nent, struct timespec const *__restrict __rel_timeout),(__list,__nent,__rel_timeout))
 #elif defined(__CRT_HAVE_aio_suspendt64) && __SIZEOF_OFF32_T__ == __SIZEOF_OFF64_T__ && (defined(__USE_TIME_BITS64) || __SIZEOF_TIME32_T__ == __SIZEOF_TIME64_T__)
 /* >> aio_suspend(3), aio_suspend64(3), aio_suspendt64(3), aio_suspend64t64(3)
  * Suspend  the calling thread until at least  one of the given AIO operations
  * has been completed, a  signal is delivered to,  or (if non-NULL) the  given
- * timeout expired.
+ * `rel_timeout' expired.
+ * @param: rel_timeout: The amount of time (relative) for which to wait.
  * @return: 0:  Success (At least one of the given AIO operations has completed)
- * @return: -1: [errno=EAGAIN] The given timeout expired
+ * @return: -1: [errno=EAGAIN] The time specified by `rel_timeout' has elapsed
  * @return: -1: [errno=EINTR]  A signal was delivered to the calling thread */
-__CREDIRECT(__ATTR_NONNULL((1)),int,__NOTHROW_NCX,aio_suspend64,(struct aiocb64 const *const __list[], __STDC_INT_AS_SIZE_T __nent, struct timespec const *__restrict __timeout),aio_suspendt64,(__list,__nent,__timeout))
+__CREDIRECT(__ATTR_NONNULL((1)),int,__NOTHROW_NCX,aio_suspend64,(struct aiocb64 const *const __list[], __STDC_INT_AS_SIZE_T __nent, struct timespec const *__restrict __rel_timeout),aio_suspendt64,(__list,__nent,__rel_timeout))
 #elif defined(__CRT_HAVE_aio_suspend64t64) && (defined(__USE_TIME_BITS64) || __SIZEOF_TIME32_T__ == __SIZEOF_TIME64_T__)
 /* >> aio_suspend(3), aio_suspend64(3), aio_suspendt64(3), aio_suspend64t64(3)
  * Suspend  the calling thread until at least  one of the given AIO operations
  * has been completed, a  signal is delivered to,  or (if non-NULL) the  given
- * timeout expired.
+ * `rel_timeout' expired.
+ * @param: rel_timeout: The amount of time (relative) for which to wait.
  * @return: 0:  Success (At least one of the given AIO operations has completed)
- * @return: -1: [errno=EAGAIN] The given timeout expired
+ * @return: -1: [errno=EAGAIN] The time specified by `rel_timeout' has elapsed
  * @return: -1: [errno=EINTR]  A signal was delivered to the calling thread */
-__CREDIRECT(__ATTR_NONNULL((1)),int,__NOTHROW_NCX,aio_suspend64,(struct aiocb64 const *const __list[], __STDC_INT_AS_SIZE_T __nent, struct timespec const *__restrict __timeout),aio_suspend64t64,(__list,__nent,__timeout))
+__CREDIRECT(__ATTR_NONNULL((1)),int,__NOTHROW_NCX,aio_suspend64,(struct aiocb64 const *const __list[], __STDC_INT_AS_SIZE_T __nent, struct timespec const *__restrict __rel_timeout),aio_suspend64t64,(__list,__nent,__rel_timeout))
 #elif (defined(__CRT_HAVE_aio_suspend) && __SIZEOF_OFF32_T__ == __SIZEOF_OFF64_T__ && __SIZEOF_TIME32_T__ == __SIZEOF_TIME64_T__) || (defined(__CRT_HAVE_aio_suspendt64) && __SIZEOF_OFF32_T__ == __SIZEOF_OFF64_T__) || defined(__CRT_HAVE_aio_suspend64t64) || (defined(__CRT_HAVE_aio_suspend) && __SIZEOF_OFF32_T__ == __SIZEOF_OFF64_T__) || defined(__CRT_HAVE_aio_suspend64)
 #include <libc/local/aio/aio_suspend64.h>
 /* >> aio_suspend(3), aio_suspend64(3), aio_suspendt64(3), aio_suspend64t64(3)
  * Suspend  the calling thread until at least  one of the given AIO operations
  * has been completed, a  signal is delivered to,  or (if non-NULL) the  given
- * timeout expired.
+ * `rel_timeout' expired.
+ * @param: rel_timeout: The amount of time (relative) for which to wait.
  * @return: 0:  Success (At least one of the given AIO operations has completed)
- * @return: -1: [errno=EAGAIN] The given timeout expired
+ * @return: -1: [errno=EAGAIN] The time specified by `rel_timeout' has elapsed
  * @return: -1: [errno=EINTR]  A signal was delivered to the calling thread */
-__NAMESPACE_LOCAL_USING_OR_IMPL(aio_suspend64, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_NONNULL((1)) int __NOTHROW_NCX(__LIBCCALL aio_suspend64)(struct aiocb64 const *const __list[], __STDC_INT_AS_SIZE_T __nent, struct timespec const *__restrict __timeout) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(aio_suspend64))(__list, __nent, __timeout); })
+__NAMESPACE_LOCAL_USING_OR_IMPL(aio_suspend64, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_NONNULL((1)) int __NOTHROW_NCX(__LIBCCALL aio_suspend64)(struct aiocb64 const *const __list[], __STDC_INT_AS_SIZE_T __nent, struct timespec const *__restrict __rel_timeout) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(aio_suspend64))(__list, __nent, __rel_timeout); })
 #endif /* ... */
 #endif /* __USE_LARGEFILE64 */
 
@@ -713,48 +723,53 @@ __NAMESPACE_LOCAL_USING_OR_IMPL(aio_suspend64, __FORCELOCAL __ATTR_ARTIFICIAL __
 /* >> aio_suspend(3), aio_suspend64(3), aio_suspendt64(3), aio_suspend64t64(3)
  * Suspend  the calling thread until at least  one of the given AIO operations
  * has been completed, a  signal is delivered to,  or (if non-NULL) the  given
- * timeout expired.
+ * `rel_timeout' expired.
+ * @param: rel_timeout: The amount of time (relative) for which to wait.
  * @return: 0:  Success (At least one of the given AIO operations has completed)
- * @return: -1: [errno=EAGAIN] The given timeout expired
+ * @return: -1: [errno=EAGAIN] The time specified by `rel_timeout' has elapsed
  * @return: -1: [errno=EINTR]  A signal was delivered to the calling thread */
-__CREDIRECT(__ATTR_NONNULL((1)),int,__NOTHROW_NCX,aio_suspendt64,(struct aiocb const *const __list[], __STDC_INT_AS_SIZE_T __nent, struct timespec64 const *__restrict __timeout),aio_suspend,(__list,__nent,__timeout))
+__CREDIRECT(__ATTR_NONNULL((1)),int,__NOTHROW_NCX,aio_suspendt64,(struct aiocb const *const __list[], __STDC_INT_AS_SIZE_T __nent, struct timespec64 const *__restrict __rel_timeout),aio_suspend,(__list,__nent,__rel_timeout))
 #elif defined(__CRT_HAVE_aio_suspend64) && __SIZEOF_TIME32_T__ == __SIZEOF_TIME64_T__ && (defined(__USE_FILE_OFFSET64) || __SIZEOF_OFF32_T__ == __SIZEOF_OFF64_T__)
 /* >> aio_suspend(3), aio_suspend64(3), aio_suspendt64(3), aio_suspend64t64(3)
  * Suspend  the calling thread until at least  one of the given AIO operations
  * has been completed, a  signal is delivered to,  or (if non-NULL) the  given
- * timeout expired.
+ * `rel_timeout' expired.
+ * @param: rel_timeout: The amount of time (relative) for which to wait.
  * @return: 0:  Success (At least one of the given AIO operations has completed)
- * @return: -1: [errno=EAGAIN] The given timeout expired
+ * @return: -1: [errno=EAGAIN] The time specified by `rel_timeout' has elapsed
  * @return: -1: [errno=EINTR]  A signal was delivered to the calling thread */
-__CREDIRECT(__ATTR_NONNULL((1)),int,__NOTHROW_NCX,aio_suspendt64,(struct aiocb const *const __list[], __STDC_INT_AS_SIZE_T __nent, struct timespec64 const *__restrict __timeout),aio_suspend64,(__list,__nent,__timeout))
+__CREDIRECT(__ATTR_NONNULL((1)),int,__NOTHROW_NCX,aio_suspendt64,(struct aiocb const *const __list[], __STDC_INT_AS_SIZE_T __nent, struct timespec64 const *__restrict __rel_timeout),aio_suspend64,(__list,__nent,__rel_timeout))
 #elif defined(__CRT_HAVE_aio_suspendt64) && (!defined(__USE_FILE_OFFSET64) || __SIZEOF_OFF32_T__ == __SIZEOF_OFF64_T__)
 /* >> aio_suspend(3), aio_suspend64(3), aio_suspendt64(3), aio_suspend64t64(3)
  * Suspend  the calling thread until at least  one of the given AIO operations
  * has been completed, a  signal is delivered to,  or (if non-NULL) the  given
- * timeout expired.
+ * `rel_timeout' expired.
+ * @param: rel_timeout: The amount of time (relative) for which to wait.
  * @return: 0:  Success (At least one of the given AIO operations has completed)
- * @return: -1: [errno=EAGAIN] The given timeout expired
+ * @return: -1: [errno=EAGAIN] The time specified by `rel_timeout' has elapsed
  * @return: -1: [errno=EINTR]  A signal was delivered to the calling thread */
-__CDECLARE(__ATTR_NONNULL((1)),int,__NOTHROW_NCX,aio_suspendt64,(struct aiocb const *const __list[], __STDC_INT_AS_SIZE_T __nent, struct timespec64 const *__restrict __timeout),(__list,__nent,__timeout))
+__CDECLARE(__ATTR_NONNULL((1)),int,__NOTHROW_NCX,aio_suspendt64,(struct aiocb const *const __list[], __STDC_INT_AS_SIZE_T __nent, struct timespec64 const *__restrict __rel_timeout),(__list,__nent,__rel_timeout))
 #elif defined(__CRT_HAVE_aio_suspend64t64) && (defined(__USE_FILE_OFFSET64) || __SIZEOF_OFF32_T__ == __SIZEOF_OFF64_T__)
 /* >> aio_suspend(3), aio_suspend64(3), aio_suspendt64(3), aio_suspend64t64(3)
  * Suspend  the calling thread until at least  one of the given AIO operations
  * has been completed, a  signal is delivered to,  or (if non-NULL) the  given
- * timeout expired.
+ * `rel_timeout' expired.
+ * @param: rel_timeout: The amount of time (relative) for which to wait.
  * @return: 0:  Success (At least one of the given AIO operations has completed)
- * @return: -1: [errno=EAGAIN] The given timeout expired
+ * @return: -1: [errno=EAGAIN] The time specified by `rel_timeout' has elapsed
  * @return: -1: [errno=EINTR]  A signal was delivered to the calling thread */
-__CREDIRECT(__ATTR_NONNULL((1)),int,__NOTHROW_NCX,aio_suspendt64,(struct aiocb const *const __list[], __STDC_INT_AS_SIZE_T __nent, struct timespec64 const *__restrict __timeout),aio_suspend64t64,(__list,__nent,__timeout))
+__CREDIRECT(__ATTR_NONNULL((1)),int,__NOTHROW_NCX,aio_suspendt64,(struct aiocb const *const __list[], __STDC_INT_AS_SIZE_T __nent, struct timespec64 const *__restrict __rel_timeout),aio_suspend64t64,(__list,__nent,__rel_timeout))
 #elif (defined(__CRT_HAVE_aio_suspend) && (!defined(__USE_FILE_OFFSET64) || __SIZEOF_OFF32_T__ == __SIZEOF_OFF64_T__)) || (defined(__CRT_HAVE_aio_suspend64) && (defined(__USE_FILE_OFFSET64) || __SIZEOF_OFF32_T__ == __SIZEOF_OFF64_T__))
 #include <libc/local/aio/aio_suspendt64.h>
 /* >> aio_suspend(3), aio_suspend64(3), aio_suspendt64(3), aio_suspend64t64(3)
  * Suspend  the calling thread until at least  one of the given AIO operations
  * has been completed, a  signal is delivered to,  or (if non-NULL) the  given
- * timeout expired.
+ * `rel_timeout' expired.
+ * @param: rel_timeout: The amount of time (relative) for which to wait.
  * @return: 0:  Success (At least one of the given AIO operations has completed)
- * @return: -1: [errno=EAGAIN] The given timeout expired
+ * @return: -1: [errno=EAGAIN] The time specified by `rel_timeout' has elapsed
  * @return: -1: [errno=EINTR]  A signal was delivered to the calling thread */
-__NAMESPACE_LOCAL_USING_OR_IMPL(aio_suspendt64, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_NONNULL((1)) int __NOTHROW_NCX(__LIBCCALL aio_suspendt64)(struct aiocb const *const __list[], __STDC_INT_AS_SIZE_T __nent, struct timespec64 const *__restrict __timeout) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(aio_suspendt64))(__list, __nent, __timeout); })
+__NAMESPACE_LOCAL_USING_OR_IMPL(aio_suspendt64, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_NONNULL((1)) int __NOTHROW_NCX(__LIBCCALL aio_suspendt64)(struct aiocb const *const __list[], __STDC_INT_AS_SIZE_T __nent, struct timespec64 const *__restrict __rel_timeout) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(aio_suspendt64))(__list, __nent, __rel_timeout); })
 #endif /* ... */
 
 #ifdef __USE_LARGEFILE64
@@ -762,48 +777,53 @@ __NAMESPACE_LOCAL_USING_OR_IMPL(aio_suspendt64, __FORCELOCAL __ATTR_ARTIFICIAL _
 /* >> aio_suspend(3), aio_suspend64(3), aio_suspendt64(3), aio_suspend64t64(3)
  * Suspend  the calling thread until at least  one of the given AIO operations
  * has been completed, a  signal is delivered to,  or (if non-NULL) the  given
- * timeout expired.
+ * `rel_timeout' expired.
+ * @param: rel_timeout: The amount of time (relative) for which to wait.
  * @return: 0:  Success (At least one of the given AIO operations has completed)
- * @return: -1: [errno=EAGAIN] The given timeout expired
+ * @return: -1: [errno=EAGAIN] The time specified by `rel_timeout' has elapsed
  * @return: -1: [errno=EINTR]  A signal was delivered to the calling thread */
-__CREDIRECT(__ATTR_NONNULL((1)),int,__NOTHROW_NCX,aio_suspend64t64,(struct aiocb64 const *const __list[], __STDC_INT_AS_SIZE_T __nent, struct timespec64 const *__restrict __timeout),aio_suspend,(__list,__nent,__timeout))
+__CREDIRECT(__ATTR_NONNULL((1)),int,__NOTHROW_NCX,aio_suspend64t64,(struct aiocb64 const *const __list[], __STDC_INT_AS_SIZE_T __nent, struct timespec64 const *__restrict __rel_timeout),aio_suspend,(__list,__nent,__rel_timeout))
 #elif defined(__CRT_HAVE_aio_suspendt64) && __SIZEOF_OFF32_T__ == __SIZEOF_OFF64_T__
 /* >> aio_suspend(3), aio_suspend64(3), aio_suspendt64(3), aio_suspend64t64(3)
  * Suspend  the calling thread until at least  one of the given AIO operations
  * has been completed, a  signal is delivered to,  or (if non-NULL) the  given
- * timeout expired.
+ * `rel_timeout' expired.
+ * @param: rel_timeout: The amount of time (relative) for which to wait.
  * @return: 0:  Success (At least one of the given AIO operations has completed)
- * @return: -1: [errno=EAGAIN] The given timeout expired
+ * @return: -1: [errno=EAGAIN] The time specified by `rel_timeout' has elapsed
  * @return: -1: [errno=EINTR]  A signal was delivered to the calling thread */
-__CREDIRECT(__ATTR_NONNULL((1)),int,__NOTHROW_NCX,aio_suspend64t64,(struct aiocb64 const *const __list[], __STDC_INT_AS_SIZE_T __nent, struct timespec64 const *__restrict __timeout),aio_suspendt64,(__list,__nent,__timeout))
+__CREDIRECT(__ATTR_NONNULL((1)),int,__NOTHROW_NCX,aio_suspend64t64,(struct aiocb64 const *const __list[], __STDC_INT_AS_SIZE_T __nent, struct timespec64 const *__restrict __rel_timeout),aio_suspendt64,(__list,__nent,__rel_timeout))
 #elif defined(__CRT_HAVE_aio_suspend64) && __SIZEOF_TIME32_T__ == __SIZEOF_TIME64_T__
 /* >> aio_suspend(3), aio_suspend64(3), aio_suspendt64(3), aio_suspend64t64(3)
  * Suspend  the calling thread until at least  one of the given AIO operations
  * has been completed, a  signal is delivered to,  or (if non-NULL) the  given
- * timeout expired.
+ * `rel_timeout' expired.
+ * @param: rel_timeout: The amount of time (relative) for which to wait.
  * @return: 0:  Success (At least one of the given AIO operations has completed)
- * @return: -1: [errno=EAGAIN] The given timeout expired
+ * @return: -1: [errno=EAGAIN] The time specified by `rel_timeout' has elapsed
  * @return: -1: [errno=EINTR]  A signal was delivered to the calling thread */
-__CREDIRECT(__ATTR_NONNULL((1)),int,__NOTHROW_NCX,aio_suspend64t64,(struct aiocb64 const *const __list[], __STDC_INT_AS_SIZE_T __nent, struct timespec64 const *__restrict __timeout),aio_suspend64,(__list,__nent,__timeout))
+__CREDIRECT(__ATTR_NONNULL((1)),int,__NOTHROW_NCX,aio_suspend64t64,(struct aiocb64 const *const __list[], __STDC_INT_AS_SIZE_T __nent, struct timespec64 const *__restrict __rel_timeout),aio_suspend64,(__list,__nent,__rel_timeout))
 #elif defined(__CRT_HAVE_aio_suspend64t64)
 /* >> aio_suspend(3), aio_suspend64(3), aio_suspendt64(3), aio_suspend64t64(3)
  * Suspend  the calling thread until at least  one of the given AIO operations
  * has been completed, a  signal is delivered to,  or (if non-NULL) the  given
- * timeout expired.
+ * `rel_timeout' expired.
+ * @param: rel_timeout: The amount of time (relative) for which to wait.
  * @return: 0:  Success (At least one of the given AIO operations has completed)
- * @return: -1: [errno=EAGAIN] The given timeout expired
+ * @return: -1: [errno=EAGAIN] The time specified by `rel_timeout' has elapsed
  * @return: -1: [errno=EINTR]  A signal was delivered to the calling thread */
-__CDECLARE(__ATTR_NONNULL((1)),int,__NOTHROW_NCX,aio_suspend64t64,(struct aiocb64 const *const __list[], __STDC_INT_AS_SIZE_T __nent, struct timespec64 const *__restrict __timeout),(__list,__nent,__timeout))
+__CDECLARE(__ATTR_NONNULL((1)),int,__NOTHROW_NCX,aio_suspend64t64,(struct aiocb64 const *const __list[], __STDC_INT_AS_SIZE_T __nent, struct timespec64 const *__restrict __rel_timeout),(__list,__nent,__rel_timeout))
 #elif (defined(__CRT_HAVE_aio_suspend) && __SIZEOF_OFF32_T__ == __SIZEOF_OFF64_T__) || defined(__CRT_HAVE_aio_suspend64)
 #include <libc/local/aio/aio_suspend64t64.h>
 /* >> aio_suspend(3), aio_suspend64(3), aio_suspendt64(3), aio_suspend64t64(3)
  * Suspend  the calling thread until at least  one of the given AIO operations
  * has been completed, a  signal is delivered to,  or (if non-NULL) the  given
- * timeout expired.
+ * `rel_timeout' expired.
+ * @param: rel_timeout: The amount of time (relative) for which to wait.
  * @return: 0:  Success (At least one of the given AIO operations has completed)
- * @return: -1: [errno=EAGAIN] The given timeout expired
+ * @return: -1: [errno=EAGAIN] The time specified by `rel_timeout' has elapsed
  * @return: -1: [errno=EINTR]  A signal was delivered to the calling thread */
-__NAMESPACE_LOCAL_USING_OR_IMPL(aio_suspend64t64, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_NONNULL((1)) int __NOTHROW_NCX(__LIBCCALL aio_suspend64t64)(struct aiocb64 const *const __list[], __STDC_INT_AS_SIZE_T __nent, struct timespec64 const *__restrict __timeout) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(aio_suspend64t64))(__list, __nent, __timeout); })
+__NAMESPACE_LOCAL_USING_OR_IMPL(aio_suspend64t64, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_NONNULL((1)) int __NOTHROW_NCX(__LIBCCALL aio_suspend64t64)(struct aiocb64 const *const __list[], __STDC_INT_AS_SIZE_T __nent, struct timespec64 const *__restrict __rel_timeout) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(aio_suspend64t64))(__list, __nent, __rel_timeout); })
 #endif /* ... */
 #endif /* __USE_LARGEFILE64 */
 #endif /* __USE_TIME64 */

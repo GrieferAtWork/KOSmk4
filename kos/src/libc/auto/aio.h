@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xc35f5d2e */
+/* HASH CRC-32:0xcf3e1626 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -132,11 +132,12 @@ INTDEF int NOTHROW_NCX(LIBDCALL libd_aio_cancel)(fd_t fd, struct aiocb *self);
 /* >> aio_suspend(3), aio_suspend64(3), aio_suspendt64(3), aio_suspend64t64(3)
  * Suspend  the calling thread until at least  one of the given AIO operations
  * has been completed, a  signal is delivered to,  or (if non-NULL) the  given
- * timeout expired.
+ * `rel_timeout' expired.
+ * @param: rel_timeout: The amount of time (relative) for which to wait.
  * @return: 0:  Success (At least one of the given AIO operations has completed)
- * @return: -1: [errno=EAGAIN] The given timeout expired
+ * @return: -1: [errno=EAGAIN] The time specified by `rel_timeout' has elapsed
  * @return: -1: [errno=EINTR]  A signal was delivered to the calling thread */
-INTDEF NONNULL((1)) int NOTHROW_RPC(LIBDCALL libd_aio_suspend)(struct aiocb const *const list[], __STDC_INT_AS_SIZE_T nent, struct timespec const *__restrict timeout);
+INTDEF NONNULL((1)) int NOTHROW_RPC(LIBDCALL libd_aio_suspend)(struct aiocb const *const list[], __STDC_INT_AS_SIZE_T nent, struct timespec const *__restrict rel_timeout);
 /* >> aio_read(3), aio_read64(3)
  * Begin an async `pread(2)' operation:
  * >> pread(self->aio_fildes, self->aio_buf, self->aio_nbytes, self->aio_offset);
@@ -239,27 +240,30 @@ INTDEF int NOTHROW_NCX(LIBDCALL libd_aio_cancel64)(fd_t fildes, struct aiocb64 *
 /* >> aio_suspend(3), aio_suspend64(3), aio_suspendt64(3), aio_suspend64t64(3)
  * Suspend  the calling thread until at least  one of the given AIO operations
  * has been completed, a  signal is delivered to,  or (if non-NULL) the  given
- * timeout expired.
+ * `rel_timeout' expired.
+ * @param: rel_timeout: The amount of time (relative) for which to wait.
  * @return: 0:  Success (At least one of the given AIO operations has completed)
- * @return: -1: [errno=EAGAIN] The given timeout expired
+ * @return: -1: [errno=EAGAIN] The time specified by `rel_timeout' has elapsed
  * @return: -1: [errno=EINTR]  A signal was delivered to the calling thread */
-INTDEF NONNULL((1)) int NOTHROW_NCX(LIBDCALL libd_aio_suspend64)(struct aiocb64 const *const list[], __STDC_INT_AS_SIZE_T nent, struct timespec const *__restrict timeout);
+INTDEF NONNULL((1)) int NOTHROW_NCX(LIBDCALL libd_aio_suspend64)(struct aiocb64 const *const list[], __STDC_INT_AS_SIZE_T nent, struct timespec const *__restrict rel_timeout);
 /* >> aio_suspend(3), aio_suspend64(3), aio_suspendt64(3), aio_suspend64t64(3)
  * Suspend  the calling thread until at least  one of the given AIO operations
  * has been completed, a  signal is delivered to,  or (if non-NULL) the  given
- * timeout expired.
+ * `rel_timeout' expired.
+ * @param: rel_timeout: The amount of time (relative) for which to wait.
  * @return: 0:  Success (At least one of the given AIO operations has completed)
- * @return: -1: [errno=EAGAIN] The given timeout expired
+ * @return: -1: [errno=EAGAIN] The time specified by `rel_timeout' has elapsed
  * @return: -1: [errno=EINTR]  A signal was delivered to the calling thread */
-INTDEF NONNULL((1)) int NOTHROW_NCX(LIBDCALL libd_aio_suspendt64)(struct aiocb const *const list[], __STDC_INT_AS_SIZE_T nent, struct timespec64 const *__restrict timeout);
+INTDEF NONNULL((1)) int NOTHROW_NCX(LIBDCALL libd_aio_suspendt64)(struct aiocb const *const list[], __STDC_INT_AS_SIZE_T nent, struct timespec64 const *__restrict rel_timeout);
 /* >> aio_suspend(3), aio_suspend64(3), aio_suspendt64(3), aio_suspend64t64(3)
  * Suspend  the calling thread until at least  one of the given AIO operations
  * has been completed, a  signal is delivered to,  or (if non-NULL) the  given
- * timeout expired.
+ * `rel_timeout' expired.
+ * @param: rel_timeout: The amount of time (relative) for which to wait.
  * @return: 0:  Success (At least one of the given AIO operations has completed)
- * @return: -1: [errno=EAGAIN] The given timeout expired
+ * @return: -1: [errno=EAGAIN] The time specified by `rel_timeout' has elapsed
  * @return: -1: [errno=EINTR]  A signal was delivered to the calling thread */
-INTDEF NONNULL((1)) int NOTHROW_NCX(LIBDCALL libd_aio_suspend64t64)(struct aiocb64 const *const list[], __STDC_INT_AS_SIZE_T nent, struct timespec64 const *__restrict timeout);
+INTDEF NONNULL((1)) int NOTHROW_NCX(LIBDCALL libd_aio_suspend64t64)(struct aiocb64 const *const list[], __STDC_INT_AS_SIZE_T nent, struct timespec64 const *__restrict rel_timeout);
 /* >> aio_init(3) */
 INTDEF NONNULL((1)) void NOTHROW_NCX(LIBDCALL libd_aio_init)(struct aioinit const *init);
 #endif /* !__LIBCCALL_IS_LIBDCALL && !__KERNEL__ */

@@ -330,9 +330,10 @@ int aio_suspendt32([[nonnull]] struct aiocb const *const list[],
 @@>> aio_suspend(3), aio_suspend64(3), aio_suspendt64(3), aio_suspend64t64(3)
 @@Suspend  the calling thread until at least  one of the given AIO operations
 @@has been completed, a  signal is delivered to,  or (if non-NULL) the  given
-@@timeout expired.
+@@`rel_timeout' expired.
+@@@param: rel_timeout: The amount of time (relative) for which to wait.
 @@@return: 0:  Success (At least one of the given AIO operations has completed)
-@@@return: -1: [errno=EAGAIN] The given timeout expired
+@@@return: -1: [errno=EAGAIN] The time specified by `rel_timeout' has elapsed
 @@@return: -1: [errno=EINTR]  A signal was delivered to the calling thread
 [[cp, no_crt_self_import, decl_include("<features.h>", "<bits/crt/aiocb.h>", "<bits/os/timespec.h>")]]
 [[if($extended_include_prefix("<features.h>")!defined(__USE_FILE_OFFSET64) && !defined(__USE_TIME_BITS64)), preferred_alias("aio_suspend")]]
@@ -342,21 +343,21 @@ int aio_suspendt32([[nonnull]] struct aiocb const *const list[],
 [[userimpl, requires($has_function(aio_suspendt32) || $has_function(aio_suspendt64))]]
 int aio_suspend([[nonnull]] struct aiocb const *const list[],
                 __STDC_INT_AS_SIZE_T nent,
-                struct timespec const *__restrict timeout) {
+                struct timespec const *__restrict rel_timeout) {
 @@pp_if $has_function(aio_suspendt32)@@
-	struct timespec32 timeout32;
-	if (!timeout)
+	struct timespec32 rel_timeout32;
+	if (!rel_timeout)
 		return aio_suspendt32(list, nent, NULL);
-	timeout32.@tv_sec@  = (time32_t)timeout->@tv_sec@;
-	timeout32.@tv_nsec@ = timeout->@tv_nsec@;
-	return aio_suspendt32(list, nent, &timeout32);
+	rel_timeout32.@tv_sec@  = (time32_t)rel_timeout->@tv_sec@;
+	rel_timeout32.@tv_nsec@ = rel_timeout->@tv_nsec@;
+	return aio_suspendt32(list, nent, &rel_timeout32);
 @@pp_else@@
-	struct timespec64 timeout64;
-	if (!timeout)
+	struct timespec64 rel_timeout64;
+	if (!rel_timeout)
 		return aio_suspendt64(list, nent, NULL);
-	timeout64.@tv_sec@  = (time64_t)timeout->@tv_sec@;
-	timeout64.@tv_nsec@ = timeout->@tv_nsec@;
-	return aio_suspendt64(list, nent, &timeout64);
+	rel_timeout64.@tv_sec@  = (time64_t)rel_timeout->@tv_sec@;
+	rel_timeout64.@tv_nsec@ = rel_timeout->@tv_nsec@;
+	return aio_suspendt64(list, nent, &rel_timeout64);
 @@pp_endif@@
 }
 
@@ -398,7 +399,7 @@ int aio_cancel64($fd_t fildes, [[nullable]] struct aiocb64 *self);
 [[decl_include("<features.h>", "<bits/crt/aiocb.h>", "<bits/os/timespec.h>")]]
 int aio_suspend64t32([[nonnull]] struct aiocb64 const *const list[],
                      __STDC_INT_AS_SIZE_T nent,
-                     struct $timespec32 const *__restrict timeout);
+                     struct $timespec32 const *__restrict rel_timeout);
 
 [[no_crt_self_import, doc_alias("aio_suspend")]]
 [[if($extended_include_prefix("<bits/types.h>")__SIZEOF_OFF32_T__ == __SIZEOF_OFF64_T__), crt_intern_kos_alias("libc_aio_suspend")]]
@@ -410,21 +411,21 @@ int aio_suspend64t32([[nonnull]] struct aiocb64 const *const list[],
 [[userimpl, requires($has_function(aio_suspend64t32) || $has_function(aio_suspend64t64))]]
 int aio_suspend64([[nonnull]] struct aiocb64 const *const list[],
                   __STDC_INT_AS_SIZE_T nent,
-                  struct timespec const *__restrict timeout) {
+                  struct timespec const *__restrict rel_timeout) {
 @@pp_if $has_function(aio_suspend64t32)@@
-	struct timespec32 timeout32;
-	if (!timeout)
+	struct timespec32 rel_timeout32;
+	if (!rel_timeout)
 		return aio_suspend64t32(list, nent, NULL);
-	timeout32.@tv_sec@  = (time32_t)timeout->@tv_sec@;
-	timeout32.@tv_nsec@ = timeout->@tv_nsec@;
-	return aio_suspend64t32(list, nent, &timeout32);
+	rel_timeout32.@tv_sec@  = (time32_t)rel_timeout->@tv_sec@;
+	rel_timeout32.@tv_nsec@ = rel_timeout->@tv_nsec@;
+	return aio_suspend64t32(list, nent, &rel_timeout32);
 @@pp_else@@
-	struct timespec64 timeout64;
-	if (!timeout)
+	struct timespec64 rel_timeout64;
+	if (!rel_timeout)
 		return aio_suspend64t64(list, nent, NULL);
-	timeout64.@tv_sec@  = (time64_t)timeout->@tv_sec@;
-	timeout64.@tv_nsec@ = timeout->@tv_nsec@;
-	return aio_suspend64t64(list, nent, &timeout64);
+	rel_timeout64.@tv_sec@  = (time64_t)rel_timeout->@tv_sec@;
+	rel_timeout64.@tv_nsec@ = rel_timeout->@tv_nsec@;
+	return aio_suspend64t64(list, nent, &rel_timeout64);
 @@pp_endif@@
 }
 
@@ -444,13 +445,13 @@ int aio_suspend64([[nonnull]] struct aiocb64 const *const list[],
 [[userimpl, requires_function(aio_suspendt32)]]
 int aio_suspendt64([[nonnull]] struct aiocb const *const list[],
                    __STDC_INT_AS_SIZE_T nent,
-                   struct timespec64 const *__restrict timeout) {
-	struct timespec32 timeout32;
-	if (!timeout)
+                   struct timespec64 const *__restrict rel_timeout) {
+	struct timespec32 rel_timeout32;
+	if (!rel_timeout)
 		return aio_suspendt32(list, nent, NULL);
-	timeout32.@tv_sec@  = (time32_t)timeout->@tv_sec@;
-	timeout32.@tv_nsec@ = timeout->@tv_nsec@;
-	return aio_suspendt32(list, nent, &timeout32);
+	rel_timeout32.@tv_sec@  = (time32_t)rel_timeout->@tv_sec@;
+	rel_timeout32.@tv_nsec@ = rel_timeout->@tv_nsec@;
+	return aio_suspendt32(list, nent, &rel_timeout32);
 }
 
 %
@@ -464,13 +465,13 @@ int aio_suspendt64([[nonnull]] struct aiocb const *const list[],
 [[userimpl, requires_function(aio_suspend64t32)]]
 int aio_suspend64t64([[nonnull]] struct aiocb64 const *const list[],
                      __STDC_INT_AS_SIZE_T nent,
-                     struct timespec64 const *__restrict timeout) {
-	struct timespec32 timeout32;
-	if (!timeout)
+                     struct timespec64 const *__restrict rel_timeout) {
+	struct timespec32 rel_timeout32;
+	if (!rel_timeout)
 		return aio_suspend64t32(list, nent, NULL);
-	timeout32.@tv_sec@  = (time32_t)timeout->@tv_sec@;
-	timeout32.@tv_nsec@ = timeout->@tv_nsec@;
-	return aio_suspend64t32(list, nent, &timeout32);
+	rel_timeout32.@tv_sec@  = (time32_t)rel_timeout->@tv_sec@;
+	rel_timeout32.@tv_nsec@ = rel_timeout->@tv_nsec@;
+	return aio_suspend64t32(list, nent, &rel_timeout32);
 }
 
 %#endif /* __USE_LARGEFILE64 */

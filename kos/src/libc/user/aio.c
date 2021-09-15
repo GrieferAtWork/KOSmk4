@@ -759,11 +759,11 @@ switch_status:
 /* Suspend the calling thread until  the given AIO operations  has
  * been completed, or a signal is delivered to the calling thread.
  * @return: 0:  Success (At least one of the given AIO operations has completed)
- * @return: -1: [errno=EAGAIN] The given timeout expired
+ * @return: -1: [errno=EAGAIN] The time specified by `rel_timeout' has elapsed
  * @return: -1: [errno=EINTR]  A signal was delivered to the calling thread */
 PRIVATE ATTR_SECTION(".text.crt.utility.aio") NONNULL((1)) int
 NOTHROW_NCX(LIBCCALL waitfor_single_aio)(struct aio *__restrict self,
-                                         struct timespec64 const *timeout) {
+                                         struct timespec64 const *rel_timeout) {
 	union aio_status status;
 again:
 	status.as_word = ATOMIC_READ(self->aio_status.as_word);
@@ -787,7 +787,7 @@ again:
 		/* Wait until the status changes. */
 		error = sys_futex_time64(&self->aio_status.as_word,
 		                         FUTEX_WAIT, status.as_word,
-		                         timeout, NULL, 0);
+		                         rel_timeout, NULL, 0);
 		if (E_ISERR(error)) {
 			if (error == -ETIMEDOUT)
 				error = -EAGAIN;
@@ -837,20 +837,20 @@ again:
 
 /* Suspend the calling thread until at least one of the given AIO operations
  * has been completed, a signal is delivered to, or (if non-NULL) the  given
- * timeout expired.
+ * `rel_timeout' expired.
  * @return: 0:  Success (At least one of the given AIO operations has completed)
- * @return: -1: [errno=EAGAIN] The given timeout expired
+ * @return: -1: [errno=EAGAIN] The time specified by `rel_timeout' has elapsed
  * @return: -1: [errno=EINTR]  A signal was delivered to the calling thread */
 PRIVATE ATTR_SECTION(".text.crt.utility.aio") NONNULL((1)) int
 NOTHROW_NCX(LIBCCALL waitfor_aio)(struct aio *const list[], size_t nent,
-                                  struct timespec64 const *timeout) {
+                                  struct timespec64 const *rel_timeout) {
 	errno_t error;
 	size_t i;
 	lfutex_t version;
 	if unlikely(nent == 0) /* Special case: nothing to wait for. */
 		return 0;
 	if (nent == 1) /* Special case: wait for a single AIO operation. */
-		return waitfor_single_aio(list[0], timeout);
+		return waitfor_single_aio(list[0], rel_timeout);
 
 	/* Check if any of the AIO objects have already completed. */
 again:
@@ -867,8 +867,9 @@ again:
 		goto again;
 	ATOMIC_WRITE(aio_completion_signal_waiters, 1);
 	error = sys_lfutex(&aio_completion_signal_version,
-	                   LFUTEX_WAIT_WHILE, version,
-	                   timeout, 0);
+	                   LFUTEX_WAIT_WHILE |
+	                   LFUTEX_WAIT_FLAG_TIMEOUT_RELATIVE,
+	                   version, rel_timeout, 0);
 	if (!E_ISERR(error))
 		goto again;
 	if (error == -ETIMEDOUT)
@@ -1256,29 +1257,30 @@ NOTHROW_NCX(LIBCCALL libc_aio_cancel)(fd_t fd,
 }
 /*[[[end:libc_aio_cancel]]]*/
 
-/*[[[head:libc_aio_suspend,hash:CRC-32=0x4b9c0942]]]*/
+/*[[[head:libc_aio_suspend,hash:CRC-32=0xfa6ed228]]]*/
 /* >> aio_suspend(3), aio_suspend64(3), aio_suspendt64(3), aio_suspend64t64(3)
  * Suspend  the calling thread until at least  one of the given AIO operations
  * has been completed, a  signal is delivered to,  or (if non-NULL) the  given
- * timeout expired.
+ * `rel_timeout' expired.
+ * @param: rel_timeout: The amount of time (relative) for which to wait.
  * @return: 0:  Success (At least one of the given AIO operations has completed)
- * @return: -1: [errno=EAGAIN] The given timeout expired
+ * @return: -1: [errno=EAGAIN] The time specified by `rel_timeout' has elapsed
  * @return: -1: [errno=EINTR]  A signal was delivered to the calling thread */
 INTERN ATTR_SECTION(".text.crt.utility.aio") NONNULL((1)) int
 NOTHROW_RPC(LIBCCALL libc_aio_suspend)(struct aiocb const *const list[],
                                        __STDC_INT_AS_SIZE_T nent,
-                                       struct timespec const *__restrict timeout)
+                                       struct timespec const *__restrict rel_timeout)
 /*[[[body:libc_aio_suspend]]]*/
 {
 #if __SIZEOF_TIME32_T__ == __SIZEOF_TIME64_T__
 	return waitfor_aio((struct aio *const *)list, nent,
-	                   (struct timespec64 const *)timeout);
+	                   (struct timespec64 const *)rel_timeout);
 #else /* __SIZEOF_TIME32_T__ == __SIZEOF_TIME64_T__ */
 	struct timespec64 ts64;
-	if (!timeout)
+	if (!rel_timeout)
 		return waitfor_aio((struct aio *const *)list, nent, NULL);
-	ts64.tv_sec  = (time64_t)timeout->tv_sec;
-	ts64.tv_nsec = (time64_t)timeout->tv_nsec;
+	ts64.tv_sec  = (time64_t)rel_timeout->tv_sec;
+	ts64.tv_nsec = (time64_t)rel_timeout->tv_nsec;
 	return waitfor_aio((struct aio *const *)list, nent, &ts64);
 #endif /* !__SIZEOF_TIME32_T__ == __SIZEOF_TIME64_T__ */
 }
@@ -1406,24 +1408,25 @@ NOTHROW_NCX(LIBCCALL libc_lio_listio64)(int mode,
 /*[[[end:libc_lio_listio64]]]*/
 
 
-/*[[[head:libc_aio_suspendt64,hash:CRC-32=0x32f99857]]]*/
+/*[[[head:libc_aio_suspendt64,hash:CRC-32=0xbdb23116]]]*/
 #if __SIZEOF_TIME32_T__ == __SIZEOF_TIME64_T__
 DEFINE_INTERN_ALIAS(libc_aio_suspendt64, libc_aio_suspend);
 #else /* MAGIC:alias */
 /* >> aio_suspend(3), aio_suspend64(3), aio_suspendt64(3), aio_suspend64t64(3)
  * Suspend  the calling thread until at least  one of the given AIO operations
  * has been completed, a  signal is delivered to,  or (if non-NULL) the  given
- * timeout expired.
+ * `rel_timeout' expired.
+ * @param: rel_timeout: The amount of time (relative) for which to wait.
  * @return: 0:  Success (At least one of the given AIO operations has completed)
- * @return: -1: [errno=EAGAIN] The given timeout expired
+ * @return: -1: [errno=EAGAIN] The time specified by `rel_timeout' has elapsed
  * @return: -1: [errno=EINTR]  A signal was delivered to the calling thread */
 INTERN ATTR_SECTION(".text.crt.utility.aio") NONNULL((1)) int
 NOTHROW_NCX(LIBCCALL libc_aio_suspendt64)(struct aiocb const *const list[],
                                           __STDC_INT_AS_SIZE_T nent,
-                                          struct timespec64 const *__restrict timeout)
+                                          struct timespec64 const *__restrict rel_timeout)
 /*[[[body:libc_aio_suspendt64]]]*/
 {
-	return waitfor_aio((struct aio *const *)list, nent, timeout);
+	return waitfor_aio((struct aio *const *)list, nent, rel_timeout);
 }
 #endif /* MAGIC:alias */
 /*[[[end:libc_aio_suspendt64]]]*/
