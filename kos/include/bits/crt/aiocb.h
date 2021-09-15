@@ -40,15 +40,15 @@ __SYSDECL_BEGIN
 #undef tv_nsec
 
 struct aiocb /*[PREFIX(aio_)]*/ {
-	__INT32_TYPE__      aio_fildes;     /* ... */
-	__INT32_TYPE__      aio_lio_opcode; /* ... */
+	__INT32_TYPE__      aio_fildes;     /* [TYPE(fd_t)] File descriptor to operate upon */
+	__INT32_TYPE__      aio_lio_opcode; /* Opcode (s.a. `lio_listio(3)') */
 	__INT32_TYPE__      aio_reqprio;    /* ... */
 #if __SIZEOF_POINTER__ > 4
 	__INT32_TYPE__    __aio_pad0;       /* ... */
 #endif /* __SIZEOF_POINTER__ > 4 */
-	void volatile      *aio_buf;        /* ... */
-	__size_t            aio_nbytes;     /* ... */
-	struct sigevent     aio_sigevent;   /* ... */
+	void volatile      *aio_buf;        /* Input/output buffer for `aio_write(3)' and `aio_read(3)' */
+	__size_t            aio_nbytes;     /* Number of bytes to transfer `aio_write(3)' and `aio_read(3)' */
+	struct sigevent     aio_sigevent;   /* Signal event triggered once AIO operation has completed. */
 	/* Internal members. */
 	struct aiocb     *__next_prio;
 	__INT32_TYPE__    __abs_prio;
@@ -59,9 +59,9 @@ struct aiocb /*[PREFIX(aio_)]*/ {
 #endif /* __SIZEOF_SIZE_T__ > 4 */
 	__ssize_t         __return_value;
 #ifdef __USE_KOS_ALTERATIONS
-	__FS_TYPE(pos)      aio_offset;     /* ... */
+	__FS_TYPE(pos)      aio_offset;     /* File offset for `aio_write(3)' and `aio_read(3)' */
 #else /* __USE_KOS_ALTERATIONS */
-	__FS_TYPE(off)      aio_offset;     /* ... */
+	__FS_TYPE(off)      aio_offset;     /* File offset for `aio_write(3)' and `aio_read(3)' */
 #endif /* !__USE_KOS_ALTERATIONS */
 	char              __glibc_reserved[32];
 };
@@ -79,17 +79,17 @@ struct aiocb /*[PREFIX(aio_)]*/ {
 #define __aiocb64 aiocb
 #else /* (__USE_FILE_OFFSET64 || __SIZEOF_OFF32_T__ == __SIZEOF_OFF64_T__) && __USE_STRUCT64_MACRO */
 struct __aiocb64 /*[NAME(aiocb64)][PREFIX(tv_)]*/ {
-	__INT32_TYPE__      aio_fildes;     /* ... */
-	__INT32_TYPE__      aio_lio_opcode; /* ... */
+	__INT32_TYPE__      aio_fildes;     /* [TYPE(fd_t)] File descriptor to operate upon */
+	__INT32_TYPE__      aio_lio_opcode; /* Opcode (s.a. `lio_listio(3)') */
 	__INT32_TYPE__      aio_reqprio;    /* ... */
 #if __SIZEOF_POINTER__ > 4
 	__INT32_TYPE__    __aio_pad0;       /* ... */
 #endif /* __SIZEOF_POINTER__ > 4 */
-	void volatile      *aio_buf;        /* ... */
-	__size_t            aio_nbytes;     /* ... */
-	struct sigevent     aio_sigevent;   /* ... */
+	void volatile      *aio_buf;        /* Input/output buffer for `aio_write(3)' and `aio_read(3)' */
+	__size_t            aio_nbytes;     /* Number of bytes to transfer `aio_write(3)' and `aio_read(3)' */
+	struct sigevent     aio_sigevent;   /* Signal event triggered once AIO operation has completed. */
 	/* Internal members. */
-	struct __aiocb32 *__next_prio;
+	struct __aiocb64 *__next_prio;
 	__INT32_TYPE__    __abs_prio;
 	__INT32_TYPE__    __policy;
 	__INT32_TYPE__    __error_code;
@@ -98,9 +98,9 @@ struct __aiocb64 /*[NAME(aiocb64)][PREFIX(tv_)]*/ {
 #endif /* __SIZEOF_SIZE_T__ > 4 */
 	__ssize_t         __return_value;
 #ifdef __USE_KOS_ALTERATIONS
-	__pos64_t           aio_offset;     /* ... */
+	__pos64_t           aio_offset;     /* File offset for `aio_write(3)' and `aio_read(3)' */
 #else /* __USE_KOS_ALTERATIONS */
-	__off64_t           aio_offset;     /* ... */
+	__off64_t           aio_offset;     /* File offset for `aio_write(3)' and `aio_read(3)' */
 #endif /* !__USE_KOS_ALTERATIONS */
 	char              __glibc_reserved[32];
 };

@@ -535,14 +535,14 @@
 	                X(_, (self)->lh_first).le_prev = &X(_, hi_elem).le_next) \
 	       : (void)0,                                                        \
 	       *(X(_, lo_elem).le_prev = &(self)->lh_first) = (lo_elem))
+#define __HYBRID_LIST_P_INSERT_BEFORE(p_successor, elem, X, _) \
+	__HYBRID_LIST_P_INSERT_BEFORE_R(p_successor, elem, elem, X, _)
 #define __HYBRID_LIST_P_INSERT_BEFORE_R(p_successor, lo_elem, hi_elem, X, _)               \
 	(void)((X(_, hi_elem).le_next = *(X(_, lo_elem).le_prev = (p_successor))) != __NULLPTR \
 	       ? (void)(__HYBRID_LIST_Q_ASSERT_P_PREVLINK_(p_successor, X, _)                  \
 	                X(_, X(_, hi_elem).le_next).le_prev = &X(_, hi_elem).le_next)          \
 	       : (void)0,                                                                      \
 	       *(p_successor) = (lo_elem))
-#define __HYBRID_LIST_P_INSERT_BEFORE(p_successor, elem, X, _) \
-	__HYBRID_LIST_P_INSERT_BEFORE_R(p_successor, elem, elem, X, _)
 #define __HYBRID_LIST_P_REMOVE(p_elem, X, _) \
 	__HYBRID_LIST_P_REMOVE_R(p_elem, *(p_elem), X, _)
 #define __HYBRID_LIST_P_REMOVE_R(p_lo_elem, hi_elem, X, _)       \
@@ -2268,10 +2268,10 @@
 #define TAILQ_INSERT_BEFORE_R(successor, lo_elem, hi_elem, key)                              __HYBRID_TAILQ_INSERT_BEFORE_R(successor, lo_elem, hi_elem, __HYBRID_Q_KEY, key)
 #define TAILQ_INSERT_BEFORE_R_P(successor, lo_elem, hi_elem, getpath)                        __HYBRID_TAILQ_INSERT_BEFORE_R(successor, lo_elem, hi_elem, __HYBRID_Q_PTH, getpath)
 #define TAILQ_INSERT_HEAD_P(self, elem, getpath)                                             __HYBRID_TAILQ_INSERT_HEAD(self, elem, __HYBRID_Q_PTH, getpath)
-#define TAILQ_INSERT_HEAD_R(self, lo_elem, hi_elem, getpath)                                 __HYBRID_TAILQ_INSERT_HEAD_R(self, lo_elem, hi_elem, __HYBRID_Q_PTH, getpath)
+#define TAILQ_INSERT_HEAD_R(self, lo_elem, hi_elem, key)                                     __HYBRID_TAILQ_INSERT_HEAD_R(self, lo_elem, hi_elem, __HYBRID_Q_KEY, key)
 #define TAILQ_INSERT_HEAD_R_P(self, lo_elem, hi_elem, getpath)                               __HYBRID_TAILQ_INSERT_HEAD_R(self, lo_elem, hi_elem, __HYBRID_Q_PTH, getpath)
 #define TAILQ_INSERT_TAIL_P(self, elem, getpath)                                             __HYBRID_TAILQ_INSERT_TAIL(self, elem, __HYBRID_Q_PTH, getpath)
-#define TAILQ_INSERT_TAIL_R(self, lo_elem, hi_elem, getpath)                                 __HYBRID_TAILQ_INSERT_TAIL_R(self, lo_elem, hi_elem, __HYBRID_Q_PTH, getpath)
+#define TAILQ_INSERT_TAIL_R(self, lo_elem, hi_elem, key)                                     __HYBRID_TAILQ_INSERT_TAIL_R(self, lo_elem, hi_elem, __HYBRID_Q_KEY, key)
 #define TAILQ_INSERT_TAIL_R_P(self, lo_elem, hi_elem, getpath)                               __HYBRID_TAILQ_INSERT_TAIL_R(self, lo_elem, hi_elem, __HYBRID_Q_PTH, getpath)
 #define TAILQ_ISBOUND(elem, key)                                                             ((elem)->key.tqe_prev != __NULLPTR)
 #define TAILQ_ISBOUND_P(elem, getpath)                                                       (getpath(elem).tqe_prev != __NULLPTR)

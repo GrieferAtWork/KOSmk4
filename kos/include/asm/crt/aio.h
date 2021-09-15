@@ -26,9 +26,9 @@
 #define __AIO_ALLDONE     2 /* ??? */
 
 /* Operation codes for `aio_lio_opcode'. */
-#define __LIO_READ  0 /* ??? */
-#define __LIO_WRITE 1 /* ??? */
-#define __LIO_NOP   2 /* ??? */
+#define __LIO_READ  0 /* Perform an async `read(2)' or `pread(2)' */
+#define __LIO_WRITE 1 /* Perform an async `write(2)' or `pwrite(2)' */
+#define __LIO_NOP   2 /* No-op */
 
 /* Synchronization options for `lio_listio' function. */
 #define __LIO_WAIT   0 /* ??? */

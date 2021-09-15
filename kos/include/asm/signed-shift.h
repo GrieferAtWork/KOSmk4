@@ -20,7 +20,7 @@
 #ifndef _ASM_SIGNED_SHIFT
 #define _ASM_SIGNED_SHIFT 1
 
-/* Behavior of signed shift opeartions (`(-1 >> 1) == ???')
+/* Behavior of signed shift operations (`(-1 >> 1) == ???')
  *
  * The exact result of such an operation is arch-specific, but
  * for our purpose, we narrow down the range of  possibilities

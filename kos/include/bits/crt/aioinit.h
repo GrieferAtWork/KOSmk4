@@ -28,13 +28,13 @@
 __DECL_BEGIN
 
 struct aioinit {
-	__INT32_TYPE__ aio_threads;   /* ... */
+	__INT32_TYPE__ aio_threads;   /* Max number of simultaneous live AIO service threads. */
 	__INT32_TYPE__ aio_num;       /* ... */
 	__INT32_TYPE__ aio_locks;     /* ... */
 	__INT32_TYPE__ aio_usedba;    /* ... */
 	__INT32_TYPE__ aio_debug;     /* ... */
 	__INT32_TYPE__ aio_numusers;  /* ... */
-	__INT32_TYPE__ aio_idle_time; /* ... */
+	__INT32_TYPE__ aio_idle_time; /* Seconds until an idle AIO thread self-terminates */
 	__INT32_TYPE__ aio_reserved;  /* ... */
 };
 

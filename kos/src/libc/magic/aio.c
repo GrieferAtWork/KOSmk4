@@ -65,13 +65,13 @@
 
 /* Operation codes for `aio_lio_opcode'. */
 #if !defined(LIO_READ) && defined(__LIO_READ)
-#define LIO_READ  __LIO_READ  /* ??? */
+#define LIO_READ  __LIO_READ  /* Perform an async `read(2)' or `pread(2)' */
 #endif /* !LIO_READ && __LIO_READ */
 #if !defined(LIO_WRITE) && defined(__LIO_WRITE)
-#define LIO_WRITE __LIO_WRITE /* ??? */
+#define LIO_WRITE __LIO_WRITE /* Perform an async `write(2)' or `pwrite(2)' */
 #endif /* !LIO_WRITE && __LIO_WRITE */
 #if !defined(LIO_NOP) && defined(__LIO_NOP)
-#define LIO_NOP   __LIO_NOP   /* ??? */
+#define LIO_NOP   __LIO_NOP   /* No-op */
 #endif /* !LIO_NOP && __LIO_NOP */
 
 /* Synchronization options for `lio_listio' function. */
@@ -93,7 +93,7 @@ typedef struct sigevent sigevent_t;
 }
 
 %[define_replacement(aiocb = aiocb)]
-%[define_replacement(aiocb64 = aiocb64)]
+%[define_replacement(aiocb64 = __aiocb64)]
 %[define_c_language_keyword(__restrict_arr)]
 
 %{
@@ -144,9 +144,9 @@ typedef struct sigevent sigevent_t;
  * >>             pthread_attr_destroy(&_attr);
  * >>     } else if ((ev->sigev_notify == SIGEV_SIGNAL ||
  * >>                 ev->sigev_notify == SIGEV_THREAD_ID) &&
- * >>                (info.si_signo != 0)) {
- * >>         // When `si_signo == 0', the below syscalls would become no-ops
- * >>         // Or rather, would "test if we're allowed to send a signal".
+ * >>                (ev->sigev_signo != 0)) {
+ * >>         // When `sigev_signo == 0', the below syscalls would become no-ops
+ * >>         // Or   rather,   would  "test if we're allowed to send a signal".
  * >>         siginfo_t info;
  * >>         memset(&info, 0, sizeof(siginfo_t));
  * >>         info.si_signo = ev->sigev_signo;
@@ -159,7 +159,7 @@ typedef struct sigevent sigevent_t;
  * >>         } else {
  * >>             // PORTABILITY WARNING: Support for this case isn't implemented by
  * >>             //                      gLibc, which only supports `SIGEV_SIGNAL'!
- * >>             result = -sys_rt_tgsigqueueinfo(info.si_pid, ev->_tid,
+ * >>             result = -sys_rt_tgsigqueueinfo(info.si_pid, ev->_sigev_tid,
  * >>                                             info.si_signo, &info);
  * >>         }
  * >>     }
@@ -167,12 +167,7 @@ typedef struct sigevent sigevent_t;
  * >>     return result;
  * >> }
  *
- * The error returned by `NOTIFY_COMPLETION()' is treated the same as an error
- * caused  as a result of the actual  async operation returning to indicate an
- * error. Iow:
- *  - `aio_return(3)' will return `-1'
- *  - `aio_error(3)' can be used to read this error
- *
+ * WARNING: Errors returned by `NOTIFY_COMPLETION()' are silently discarded!
  */
 
 
@@ -245,17 +240,26 @@ int aio_fsync($oflag_t operation, [[nonnull]] struct aiocb *self);
 @@Alternatively,  when `mode == LIO_NOWAIT', AIO is performed asynchronously,
 @@and the function returns immediately once all operations have been started.
 @@If  this was successful, return `0', or  `-1' if doing so failed (`errno').
-@@Also  note that on  error, all of the  already-started operations will have
-@@been canceled even before this function returns.
-@@Additionally, the given `sig' (if non-NULL) will be assigned as a master
-@@completion event that is only triggered once _all_ of the AIO operations
-@@have completed. Note that in this case, `sig' will/has always be invoked
-@@if this function returns `0', even if  any of the AIO operations end  up
+@@Note that upon error here, no AIO operations will have been started, yet.
+@@
+@@Additionally, the given `sigev' (if non-NULL) will be assigned as a master
+@@completion event that is only triggered  once _all_ of the AIO  operations
+@@have completed. Note that in this case, `sigev' will/has always be invoked
+@@if this function returns  `0', even if  any of the  AIO operations end  up
 @@being canceled (s.a. `aio_cancel(3)') before they could be performed.
 @@
 @@@param: mode: One of `LIO_WAIT', `LIO_NOWAIT'
 @@@return: 0 : Success
-@@@return: -1: Error (s.a. `errno')
+@@@return: -1: [errno=EAGAIN] Out of memory (read: `ENOMEM')
+@@@return: -1: [errno=EINVAL] Invalid `mode'
+@@@return: -1: [errno=EINTR]  When `mode == LIO_WAIT': Calling thread was interrupted.
+@@                            Note that in  this case incomplete  AIO operations  will
+@@                            continue to run and that  the caller should handle  this
+@@                            case by looping over  all and using `aio_suspend(3)'  to
+@@                            wait for each until doing so has succeeded at least once
+@@                            for every entry.
+@@@return: -1: [errno=EIO]    When `mode == LIO_WAIT': At least one of the operations
+@@                            failed (s.a. `aio_error(3)')
 [[no_crt_self_import, decl_include("<features.h>", "<bits/os/sigevent.h>", "<bits/crt/aiocb.h>")]]
 [[if($extended_include_prefix("<features.h>", "<bits/types.h>")!defined(__USE_FILE_OFFSET64) || __SIZEOF_OFF32_T__ == __SIZEOF_OFF64_T__), preferred_alias("lio_listio")]]
 [[if($extended_include_prefix("<features.h>", "<bits/types.h>") defined(__USE_FILE_OFFSET64) || __SIZEOF_OFF32_T__ == __SIZEOF_OFF64_T__), preferred_alias("lio_listio64")]]
@@ -267,6 +271,7 @@ int lio_listio(int mode, [[nonnull]] struct aiocb *const list[__restrict_arr],
 @@@return: 0 :          Operation completed
 @@@return: EINPROGRESS: Async operation is still in progress (or pending)
 @@@return: ECANCELED:   Operation was canceled (s.a. `aio_cancel(3)')
+@@@return: EINVAL:      `self' is invalid, or its return value has already been read.
 @@@return: * :          The   `errno'  with  which   the  async  operation  failed.
 @@                      s.a. `pread(2)', `pwrite(2)', `fsync(2)' and `fdatasync(2)'
 [[wunused, no_crt_self_import, decl_include("<bits/crt/aiocb.h>", "<bits/types.h>")]]
@@ -277,8 +282,9 @@ $errno_t aio_error([[nonnull]] struct aiocb const *self);
 
 @@>> aio_return(3), aio_return64(3)
 @@@return: * : Return value of async `pread(2)', `pwrite(2)', `fsync(2)' or `fdatasync(2)'
-@@@return: -1: [errno=EINVAL] `self' is invalid (including the case where `self' is still
-@@                            in progress), or  its return value  has already been  read.
+@@@return: -1: [errno=<unchanged>] AIO operation failed (s.a. `aio_error(3)')
+@@@return: -1: [errno=EINVAL]      `self' is invalid (including the case where `self' is still
+@@                                 in progress), or  its return value  has already been  read.
 [[no_crt_self_import, decl_include("<bits/crt/aiocb.h>")]]
 [[if($extended_include_prefix("<features.h>", "<bits/types.h>")!defined(__USE_FILE_OFFSET64) || __SIZEOF_OFF32_T__ == __SIZEOF_OFF64_T__), preferred_alias("aio_return")]]
 [[if($extended_include_prefix("<features.h>", "<bits/types.h>") defined(__USE_FILE_OFFSET64) || __SIZEOF_OFF32_T__ == __SIZEOF_OFF64_T__), preferred_alias("aio_return64")]]
@@ -292,17 +298,21 @@ $ssize_t aio_return([[nonnull]] struct aiocb *self);
 @@active operations, or the pointed-to kernel object. As such, it is recommended
 @@that you always aio_cancel the same fd as was also used when the AIO operation
 @@was initiated.
-@@NOTE: When `AIO_CANCELED' is  returned, the completion  event of `self',  as
-@@      specified in `self->aio_sigevent' will _NOT_ have been triggered,  and
-@@      never  will be triggered. An exception to this is when `lio_listio(3)'
-@@      was used to start `self'  via `LIO_NOWAIT' and `sigev != NULL',  which
-@@      will still be triggered at some pointer after all remaining operations
-@@      of the same AIO set have completed, or were canceled as well. The same
-@@      also applies to operations of `fd' when `self == NULL'.
-@@@return: AIO_CANCELED:    Operations canceled successfully
+@@NOTE: When `AIO_CANCELED' is returned, the completion event of `self',
+@@      as  specified in `self->aio_sigevent'  will have been triggered,
+@@      as completion events are triggered even for canceled operations.
+@@@return: AIO_CANCELED:    At least one operation was canceled successfully
 @@@return: AIO_NOTCANCELED: At least one operation was still in progress (s.a. `aio_error(3)')
-@@@return: AIO_ALLDONE:     Operations were already completed before the call was made
-@@@return: -1:              Error (s.a. `errno')
+@@                          This KOS implementation never returns  this value, as it  includes
+@@                          facilities to force-abort any async operation (in the same vain as
+@@                          sending SIGKILL can also force-aborts a process)
+@@                          NOTE: In other implementations, this return value outweighs
+@@                                `AIO_CANCELED'  and `AIO_ALLDONE' in face of multiple
+@@                                AIO operations.
+@@@return: AIO_ALLDONE:     Operations had  already been  completed
+@@                          (or canceled) before the call was made.
+@@@return: -1: [errno=EBADF]  `fd' is not a valid file descriptor
+@@@return: -1: [errno=EINVAL] `self != NULL' and the given `fd' differs from `self->aio_fildes'
 [[no_crt_self_import, decl_include("<bits/types.h>", "<bits/crt/aiocb.h>")]]
 [[if($extended_include_prefix("<features.h>", "<bits/types.h>")!defined(__USE_FILE_OFFSET64) || __SIZEOF_OFF32_T__ == __SIZEOF_OFF64_T__), preferred_alias("aio_cancel")]]
 [[if($extended_include_prefix("<features.h>", "<bits/types.h>") defined(__USE_FILE_OFFSET64) || __SIZEOF_OFF32_T__ == __SIZEOF_OFF64_T__), preferred_alias("aio_cancel64")]]
@@ -324,7 +334,6 @@ int aio_suspendt32([[nonnull]] struct aiocb const *const list[],
 @@@return: 0:  Success (At least one of the given AIO operations has completed)
 @@@return: -1: [errno=EAGAIN] The given timeout expired
 @@@return: -1: [errno=EINTR]  A signal was delivered to the calling thread
-@@@return: -1: Error (s.a. `errno')
 [[cp, no_crt_self_import, decl_include("<features.h>", "<bits/crt/aiocb.h>", "<bits/os/timespec.h>")]]
 [[if($extended_include_prefix("<features.h>")!defined(__USE_FILE_OFFSET64) && !defined(__USE_TIME_BITS64)), preferred_alias("aio_suspend")]]
 [[if($extended_include_prefix("<features.h>") defined(__USE_FILE_OFFSET64) && !defined(__USE_TIME_BITS64)), preferred_alias("aio_suspend64")]]
@@ -370,7 +379,7 @@ int aio_fsync64(int operation, [[nonnull]] struct aiocb64 *self);
 [[preferred_off64_variant_of(lio_listio), doc_alias("lio_listio")]]
 [[decl_include("<bits/os/sigevent.h>", "<bits/crt/aiocb.h>")]]
 int lio_listio64(int mode, [[nonnull]] struct aiocb64 *const list[__restrict_arr],
-                 __STDC_INT_AS_SIZE_T nent, struct sigevent *__restrict sig);
+                 __STDC_INT_AS_SIZE_T nent, struct sigevent *__restrict sigev);
 
 [[wunused, preferred_off64_variant_of(aio_error), doc_alias("aio_error")]]
 [[decl_include("<bits/crt/aiocb.h>")]]
@@ -425,7 +434,7 @@ int aio_suspend64([[nonnull]] struct aiocb64 const *const list[],
 %
 %#ifdef __USE_TIME64
 
-[[no_crt_self_import, time64_variant_of(aio_suspend), doc_alias("aio_suspend")]]
+[[no_crt_self_import, doc_alias("aio_suspend")]]
 [[if($extended_include_prefix("<bits/types.h>")__SIZEOF_TIME32_T__ == __SIZEOF_TIME64_T__), crt_intern_kos_alias("libc_aio_suspend")]]
 [[if($extended_include_prefix("<features.h>", "<bits/types.h>")__SIZEOF_TIME32_T__ == __SIZEOF_TIME64_T__ && (!defined(__USE_FILE_OFFSET64) || __SIZEOF_OFF32_T__ == __SIZEOF_OFF64_T__)), preferred_alias("aio_suspend")]]
 [[if($extended_include_prefix("<features.h>", "<bits/types.h>")__SIZEOF_TIME32_T__ == __SIZEOF_TIME64_T__ && ( defined(__USE_FILE_OFFSET64) || __SIZEOF_OFF32_T__ == __SIZEOF_OFF64_T__)), preferred_alias("aio_suspend64")]]

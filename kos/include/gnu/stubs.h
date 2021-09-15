@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x1914ef79 */
+/* HASH CRC-32:0x57eca2d8 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -108,23 +108,6 @@
 #define __stub_adjtimex
 #define __stub___adjtimex64
 #define __stub_adjtimex64
-#define __stub_aio_cancel
-#define __stub_aio_cancel64
-#define __stub_aio_error
-#define __stub_aio_error64
-#define __stub_aio_fsync
-#define __stub_aio_fsync64
-#define __stub_aio_init
-#define __stub_aio_read
-#define __stub_aio_read64
-#define __stub_aio_return
-#define __stub_aio_return64
-#define __stub_aio_suspend
-#define __stub_aio_suspend64
-#define __stub_aio_suspend64t64
-#define __stub_aio_suspendt64
-#define __stub_aio_write
-#define __stub_aio_write64
 #define __stub___asin
 #define __stub_asin
 #define __stub___asinh
@@ -423,8 +406,6 @@
 #define __stub_lgamma
 #define __stub___lgamma_r
 #define __stub_lgamma_r
-#define __stub_lio_listio
-#define __stub_lio_listio64
 #define __stub_lockf64
 #define __stub___log
 #define __stub_log

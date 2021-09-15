@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xaba932f8 */
+/* HASH CRC-32:0x514b95ba */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -30,15 +30,15 @@ __NAMESPACE_LOCAL_BEGIN
 #ifndef __local___localdep_aio_suspend64t32_defined
 #define __local___localdep_aio_suspend64t32_defined 1
 #if defined(__CRT_HAVE_aio_suspend) && __SIZEOF_OFF32_T__ == __SIZEOF_OFF64_T__
-__CREDIRECT(__ATTR_NONNULL((1)),int,__NOTHROW_NCX,__localdep_aio_suspend64t32,(struct aiocb64 const *const __list[], __STDC_INT_AS_SIZE_T __nent, struct __timespec32 const *__restrict __timeout),aio_suspend,(__list,__nent,__timeout))
+__CREDIRECT(__ATTR_NONNULL((1)),int,__NOTHROW_NCX,__localdep_aio_suspend64t32,(struct __aiocb64 const *const __list[], __STDC_INT_AS_SIZE_T __nent, struct __timespec32 const *__restrict __timeout),aio_suspend,(__list,__nent,__timeout))
 #elif defined(__CRT_HAVE_aio_suspend64)
-__CREDIRECT(__ATTR_NONNULL((1)),int,__NOTHROW_NCX,__localdep_aio_suspend64t32,(struct aiocb64 const *const __list[], __STDC_INT_AS_SIZE_T __nent, struct __timespec32 const *__restrict __timeout),aio_suspend64,(__list,__nent,__timeout))
+__CREDIRECT(__ATTR_NONNULL((1)),int,__NOTHROW_NCX,__localdep_aio_suspend64t32,(struct __aiocb64 const *const __list[], __STDC_INT_AS_SIZE_T __nent, struct __timespec32 const *__restrict __timeout),aio_suspend64,(__list,__nent,__timeout))
 #else /* ... */
 #undef __local___localdep_aio_suspend64t32_defined
 #endif /* !... */
 #endif /* !__local___localdep_aio_suspend64t32_defined */
 __LOCAL_LIBC(aio_suspend64t64) __ATTR_NONNULL((1)) int
-__NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(aio_suspend64t64))(struct aiocb64 const *const __list[], __STDC_INT_AS_SIZE_T __nent, struct __timespec64 const *__restrict __timeout) {
+__NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(aio_suspend64t64))(struct __aiocb64 const *const __list[], __STDC_INT_AS_SIZE_T __nent, struct __timespec64 const *__restrict __timeout) {
 	struct __timespec32 __timeout32;
 	if (!__timeout)
 		return (__NAMESPACE_LOCAL_SYM __localdep_aio_suspend64t32)(__list, __nent, __NULLPTR);

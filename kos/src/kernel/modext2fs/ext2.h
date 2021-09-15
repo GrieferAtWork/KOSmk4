@@ -143,14 +143,14 @@ typedef struct ATTR_PACKED {
 	                              * counting the actual inode structure nor directory entries linking
 	                              * to the inode. */
 #define EXT2_INODE_FSECURE_DELETE 0x00000001 /* Rewrite data and INode headers of the file a couple
-	                                          * of times to prevent file recovery upon deletion. */
+                                              * of times to prevent file recovery upon deletion. */
 #define EXT2_INODE_FKEEP_DATA     0x00000002 /* (IGNORED) Try to preserve file data for as long as
-	                                          * possible after deletion to allow for undelete. */
+                                              * possible after deletion to allow for undelete. */
 #define EXT2_INODE_FSYNC          0x00000008 /* Changes are written to disk immediately. (same as `IO_DSYNC') */
 #define EXT2_INODE_FIMMUTABLE     0x00000010 /* File contents cannot be modified. */
 #define EXT2_INODE_FAPPEND        0x00000020 /* Opening the file forces `O_APPEND' to be used.
-	                                          * However, mapping the file to memory still allows
-	                                          * non-trailing data to be overwritten. */
+                                              * However, mapping the file to memory still allows
+                                              * non-trailing data to be overwritten. */
 #define EXT2_INODE_FDONT_DUMP     0x00000040 /* Don't include the file in filesystem dumps. */
 #define EXT2_INODE_FNOATIME       0x00000080 /* The file's last-accessed time should not be updated. */
 #define EXT2_INODE_FHASHDIR       0x00010000 /* Hash-indexed directory. */
@@ -170,9 +170,9 @@ typedef struct ATTR_PACKED {
 	le32    i_fragment;          /* Block address of fragment??? */
 #ifdef __INTELLISENSE__
 	struct ATTR_PACKED
-#else
+#else /* __INTELLISENSE__ */
 	union ATTR_PACKED
-#endif
+#endif /* !__INTELLISENSE__ */
 	{
 		struct ATTR_PACKED {
 			u8     l_fragno;        /* Fragment number??? */
@@ -206,18 +206,18 @@ typedef struct ATTR_PACKED {
 	le16        d_entsize;       /* Total size of the directory entry (including _all_ fields). */
 #ifdef __INTELLISENSE__
 	struct ATTR_PACKED
-#else
+#else /* __INTELLISENSE__ */
 	union ATTR_PACKED
-#endif
+#endif /* !__INTELLISENSE__ */
 	{
 		le16    d_namlen;        /* [valid_if(!(:->sd_feat_required & EXT2_FEAT_REQ_FDIRENT_TYPE))]
-									* length of the name (in characters; excluding \0) */
+		                          * length of the name (in characters; excluding \0) */
 		struct ATTR_PACKED {
 			u8  d_namlen_low;    /* Low 8 bits of the name length. */
 			u8  d_type;          /* Entry type (One of `DT_*'). */
 		};
 	};
-//  char        d_name[1];       /* The directory entry name. */
+//	char        d_name[1];       /* The directory entry name. */
 } Ext2DiskDirent;
 
 

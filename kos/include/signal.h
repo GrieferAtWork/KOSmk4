@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x7dc69dc0 */
+/* HASH CRC-32:0x8e46f43 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -380,8 +380,9 @@ __SYSDECL_BEGIN
 #if (defined(__USE_POSIX199309) || defined(__USE_XOPEN_EXTENDED) || defined(__USE_KOS))
 
 /* `sigev_notify' values. */
-#if (defined(__SIGEV_SIGNAL) || defined(__SIGEV_NONE) || \
-     defined(__SIGEV_THREAD) || defined(__SIGEV_THREAD_ID))
+#if (defined(__SIGEV_SIGNAL) || defined(__SIGEV_NONE) ||      \
+     defined(__SIGEV_THREAD) || defined(__SIGEV_THREAD_ID) || \
+     defined(__SIGEV_INLINE_THREAD))
 /*[[[enum]]]*/
 #ifdef __CC__
 enum {
@@ -395,37 +396,85 @@ enum {
 	SIGEV_THREAD    = __SIGEV_THREAD, /* Deliver via thread creation. */
 #endif /* __SIGEV_THREAD */
 #ifdef __SIGEV_THREAD_ID
-	SIGEV_THREAD_ID = __SIGEV_THREAD_ID  /* Send signal to specific thread. */
+	SIGEV_THREAD_ID = __SIGEV_THREAD_ID, /* Send signal to specific thread. */
 #endif /* __SIGEV_THREAD_ID */
+#ifdef __SIGEV_INLINE_THREAD
+	SIGEV_INLINE_THREAD = __SIGEV_INLINE_THREAD, /* KOS-only: Same as `SIGEV_THREAD', but try not to actually spawn a thread, though
+	                                              * this event kind  is allowed to  be implemented as  an alias for  `SIGEV_THREAD'.
+	                                              * Semantically, the following rules have to be followed by  `SIGEV_INLINE_THREAD':
+	                                              *   - You mustn't call `pthread_exit(3)'
+	                                              * In the context of AIO completion events (s.a. <aio.h>), the following applies:
+	                                              *   - If triggered as a result of `aio_cancel(3)', the call to `aio_cancel()' may
+	                                              *     not return until your callback has also returned (because your callback may
+	                                              *     have hi-jacked that thread)
+	                                              * NOTE: You are allowed to make modifications to `errno', so don't worry about it.
+	                                              * NOTE: Depending on context, this may be identical to `SIGEV_THREAD'!
+	                                              *
+	                                              * Generally speaking,  you should  act like  your callback  is invoked  as though  it
+	                                              * were a signal handler (note that it may actually be invoked from a signal handler),
+	                                              * meaning that you should only call NOBLOCK and re-entrance-safe functions. */
+#endif /* __SIGEV_INLINE_THREAD */
 };
 #endif /* __CC__ */
 /*[[[AUTO]]]*/
 #ifdef __COMPILER_PREFERR_ENUMS
 #ifdef __SIGEV_SIGNAL
-#define SIGEV_SIGNAL    SIGEV_SIGNAL    /* Notify via signal. */
+#define SIGEV_SIGNAL        SIGEV_SIGNAL        /* Notify via signal. */
 #endif /* __SIGEV_SIGNAL */
 #ifdef __SIGEV_NONE
-#define SIGEV_NONE      SIGEV_NONE      /* Other notification: meaningless. */
+#define SIGEV_NONE          SIGEV_NONE          /* Other notification: meaningless. */
 #endif /* __SIGEV_NONE */
 #ifdef __SIGEV_THREAD
-#define SIGEV_THREAD    SIGEV_THREAD    /* Deliver via thread creation. */
+#define SIGEV_THREAD        SIGEV_THREAD        /* Deliver via thread creation. */
 #endif /* __SIGEV_THREAD */
 #ifdef __SIGEV_THREAD_ID
-#define SIGEV_THREAD_ID SIGEV_THREAD_ID /* Send signal to specific thread. */
+#define SIGEV_THREAD_ID     SIGEV_THREAD_ID     /* Send signal to specific thread. */
 #endif /* __SIGEV_THREAD_ID */
+#ifdef __SIGEV_INLINE_THREAD
+#define SIGEV_INLINE_THREAD SIGEV_INLINE_THREAD /* KOS-only: Same as `SIGEV_THREAD', but try not to actually spawn a thread, though
+                                                 * this event kind  is allowed to  be implemented as  an alias for  `SIGEV_THREAD'.
+                                                 * Semantically, the following rules have to be followed by  `SIGEV_INLINE_THREAD':
+                                                 *   - You mustn't call `pthread_exit(3)'
+                                                 * In the context of AIO completion events (s.a. <aio.h>), the following applies:
+                                                 *   - If triggered as a result of `aio_cancel(3)', the call to `aio_cancel()' may
+                                                 *     not return until your callback has also returned (because your callback may
+                                                 *     have hi-jacked that thread)
+                                                 * NOTE: You are allowed to make modifications to `errno', so don't worry about it.
+                                                 * NOTE: Depending on context, this may be identical to `SIGEV_THREAD'!
+                                                 *
+                                                 * Generally speaking,  you should  act like  your callback  is invoked  as though  it
+                                                 * were a signal handler (note that it may actually be invoked from a signal handler),
+                                                 * meaning that you should only call NOBLOCK and re-entrance-safe functions. */
+#endif /* __SIGEV_INLINE_THREAD */
 #else /* __COMPILER_PREFERR_ENUMS */
 #ifdef __SIGEV_SIGNAL
-#define SIGEV_SIGNAL    __SIGEV_SIGNAL    /* Notify via signal. */
+#define SIGEV_SIGNAL        __SIGEV_SIGNAL        /* Notify via signal. */
 #endif /* __SIGEV_SIGNAL */
 #ifdef __SIGEV_NONE
-#define SIGEV_NONE      __SIGEV_NONE      /* Other notification: meaningless. */
+#define SIGEV_NONE          __SIGEV_NONE          /* Other notification: meaningless. */
 #endif /* __SIGEV_NONE */
 #ifdef __SIGEV_THREAD
-#define SIGEV_THREAD    __SIGEV_THREAD    /* Deliver via thread creation. */
+#define SIGEV_THREAD        __SIGEV_THREAD        /* Deliver via thread creation. */
 #endif /* __SIGEV_THREAD */
 #ifdef __SIGEV_THREAD_ID
-#define SIGEV_THREAD_ID __SIGEV_THREAD_ID /* Send signal to specific thread. */
+#define SIGEV_THREAD_ID     __SIGEV_THREAD_ID     /* Send signal to specific thread. */
 #endif /* __SIGEV_THREAD_ID */
+#ifdef __SIGEV_INLINE_THREAD
+#define SIGEV_INLINE_THREAD __SIGEV_INLINE_THREAD /* KOS-only: Same as `SIGEV_THREAD', but try not to actually spawn a thread, though
+                                                   * this event kind  is allowed to  be implemented as  an alias for  `SIGEV_THREAD'.
+                                                   * Semantically, the following rules have to be followed by  `SIGEV_INLINE_THREAD':
+                                                   *   - You mustn't call `pthread_exit(3)'
+                                                   * In the context of AIO completion events (s.a. <aio.h>), the following applies:
+                                                   *   - If triggered as a result of `aio_cancel(3)', the call to `aio_cancel()' may
+                                                   *     not return until your callback has also returned (because your callback may
+                                                   *     have hi-jacked that thread)
+                                                   * NOTE: You are allowed to make modifications to `errno', so don't worry about it.
+                                                   * NOTE: Depending on context, this may be identical to `SIGEV_THREAD'!
+                                                   *
+                                                   * Generally speaking,  you should  act like  your callback  is invoked  as though  it
+                                                   * were a signal handler (note that it may actually be invoked from a signal handler),
+                                                   * meaning that you should only call NOBLOCK and re-entrance-safe functions. */
+#endif /* __SIGEV_INLINE_THREAD */
 #endif /* !__COMPILER_PREFERR_ENUMS */
 /*[[[end]]]*/
 #endif /* __SIGEV_SIGNAL || __SIGEV_NONE || __SIGEV_THREAD || __SIGEV_THREAD_ID */
