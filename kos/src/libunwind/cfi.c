@@ -368,7 +368,7 @@ libuw_unwind_emulator_calculate_cfa(unwind_emulator_t *__restrict self) {
 			goto err_no_cfa;
 
 #ifndef __KERNEL__
-		/* Lazily load libdebuginfo.so, so we can parser the .debug_info section */
+		/* Lazily load libdebuginfo.so, so we can parse the .debug_info section */
 		if (!pdyn_debuginfo_cu_abbrev_fini && unlikely(libuw_load_libdebuginfo()))
 			goto err_no_cfa;
 #endif /* !__KERNEL__ */
@@ -744,12 +744,15 @@ dispatch_DW_OP_entry_value(unwind_emulator_t *__restrict self) {
 	length   = dwarf_decode_uleb128(&self->ue_pc);
 	start_pc = self->ue_pc;
 	end_pc   = self->ue_pc + length;
+
 	/* Verify that the PC value fits into the current program bounds. */
 	if unlikely(start_pc > end_pc ||
 	            end_pc < self->ue_pc_start ||
 	            end_pc > self->ue_pc_end)
 		return UNWIND_EMULATOR_ILLEGAL_INSTRUCTION;
-	self->ue_pc = end_pc; /* Set-up the return-pc for later. */
+
+	/* Set-up the return-pc for later. */
+	self->ue_pc = end_pc;
 
 #ifndef __KERNEL__
 	/* Lazily load libdebuginfo.so */
@@ -761,7 +764,7 @@ dispatch_DW_OP_entry_value(unwind_emulator_t *__restrict self) {
 	}
 #endif /* !__KERNEL__ */
 
-	/* Dispatch the call into libdebuginfo. */
+	/* Dispatch the call into `libdebuginfo.so'. */
 	result = debuginfo_run_entry_value_emulator(self, start_pc, end_pc);
 	return result;
 }
@@ -930,8 +933,8 @@ do_make_top_const:
 		DEFINE_PUSH_CONSTANT(DW_OP_const8u, s_uconst, (uintptr_t)UNALIGNED_GET32((uint32_t const *)pc), 8)
 		DEFINE_PUSH_CONSTANT(DW_OP_const8s, s_sconst, (intptr_t)(int32_t)UNALIGNED_GET32((uint32_t const *)pc), 8)
 #else /* ... */
-		DEFINE_PUSH_CONSTANT(DW_OP_const8u, s_uconst, (uintptr_t)UNALIGNED_GET32((uint32_t const *)pc + 1), 8)
-		DEFINE_PUSH_CONSTANT(DW_OP_const8s, s_sconst, (intptr_t)(int32_t)UNALIGNED_GET32((uint32_t const *)pc + 1), 8)
+		DEFINE_PUSH_CONSTANT(DW_OP_const8u, s_uconst, (uintptr_t)UNALIGNED_GET32((uint32_t const *)(pc + 4)), 8)
+		DEFINE_PUSH_CONSTANT(DW_OP_const8s, s_sconst, (intptr_t)(int32_t)UNALIGNED_GET32((uint32_t const *)(pc + 4)), 8)
 #endif /* !... */
 #undef DEFINE_PUSH_CONSTANT
 
@@ -1017,102 +1020,6 @@ do_make_top_const:
 			--stacksz;
 			break;
 
-		CASE(DW_OP_abs)
-			if unlikely(stacksz < 1)
-				ERROR(err_stack_underflow);
-			if (TOP.s_type != UNWIND_STE_CONSTANT)
-				goto do_make_top_const;
-			if (TOP.s_sconst < 0)
-				TOP.s_sconst = -TOP.s_sconst;
-			break;
-
-		CASE(DW_OP_and)
-			if unlikely(stacksz < 2)
-				ERROR(err_stack_underflow);
-			if (TOP.s_type != UNWIND_STE_CONSTANT)
-				goto do_make_top_const;
-			if (SECOND.s_type != UNWIND_STE_CONSTANT)
-				goto do_make_second_const;
-			SECOND.s_uconst &= TOP.s_uconst;
-			--stacksz;
-			break;
-
-		CASE(DW_OP_div)
-			if unlikely(stacksz < 2)
-				ERROR(err_stack_underflow);
-			if (TOP.s_type != UNWIND_STE_CONSTANT)
-				goto do_make_top_const;
-			if (SECOND.s_type != UNWIND_STE_CONSTANT)
-				goto do_make_second_const;
-			if unlikely(TOP.s_uconst == 0)
-				goto err_divide_by_zero;
-			SECOND.s_uconst /= TOP.s_uconst;
-			--stacksz;
-			break;
-
-		CASE(DW_OP_minus)
-			if unlikely(stacksz < 2)
-				ERROR(err_stack_underflow);
-			if (TOP.s_type != UNWIND_STE_CONSTANT)
-				goto do_make_top_const;
-			if (SECOND.s_type != UNWIND_STE_CONSTANT &&
-			    SECOND.s_type != UNWIND_STE_REGISTER)
-				goto do_make_second_const_or_register;
-			SECOND.s_uconst -= TOP.s_uconst;
-			--stacksz;
-			break;
-
-		CASE(DW_OP_mod)
-			if unlikely(stacksz < 2)
-				ERROR(err_stack_underflow);
-			if (TOP.s_type != UNWIND_STE_CONSTANT)
-				goto do_make_top_const;
-			if (SECOND.s_type != UNWIND_STE_CONSTANT)
-				goto do_make_second_const;
-			if unlikely(TOP.s_uconst == 0)
-				ERROR(err_divide_by_zero);
-			SECOND.s_uconst %= TOP.s_uconst;
-			--stacksz;
-			break;
-
-		CASE(DW_OP_mul)
-			if unlikely(stacksz < 2)
-				ERROR(err_stack_underflow);
-			if (TOP.s_type != UNWIND_STE_CONSTANT)
-				goto do_make_top_const;
-			if (SECOND.s_type != UNWIND_STE_CONSTANT)
-				goto do_make_second_const;
-			SECOND.s_uconst *= TOP.s_uconst;
-			--stacksz;
-			break;
-
-		CASE(DW_OP_neg)
-			if unlikely(stacksz < 1)
-				ERROR(err_stack_underflow);
-			if (TOP.s_type != UNWIND_STE_CONSTANT)
-				goto do_make_top_const;
-			TOP.s_sconst = -TOP.s_sconst;
-			break;
-
-		CASE(DW_OP_not)
-			if unlikely(stacksz < 1)
-				ERROR(err_stack_underflow);
-			if (TOP.s_type != UNWIND_STE_CONSTANT)
-				goto do_make_top_const;
-			TOP.s_uconst = ~TOP.s_uconst;
-			break;
-
-		CASE(DW_OP_or)
-			if unlikely(stacksz < 2)
-				ERROR(err_stack_underflow);
-			if (TOP.s_type != UNWIND_STE_CONSTANT)
-				goto do_make_top_const;
-			if (SECOND.s_type != UNWIND_STE_CONSTANT)
-				goto do_make_second_const;
-			SECOND.s_uconst |= TOP.s_uconst;
-			--stacksz;
-			break;
-
 		CASE(DW_OP_plus)
 			if unlikely(stacksz < 2)
 				ERROR(err_stack_underflow);
@@ -1174,47 +1081,117 @@ do_make_second_const:
 			TOP.s_uconst += dwarf_decode_uleb128(&pc);
 			break;
 
+		CASE(DW_OP_minus)
+			if unlikely(stacksz < 2)
+				ERROR(err_stack_underflow);
+			if (TOP.s_type != UNWIND_STE_CONSTANT)
+				goto do_make_top_const;
+			if (SECOND.s_type != UNWIND_STE_CONSTANT &&
+			    SECOND.s_type != UNWIND_STE_REGISTER)
+				goto do_make_second_const_or_register;
+			SECOND.s_uconst -= TOP.s_uconst;
+			--stacksz;
+			break;
+
+		CASE(DW_OP_abs)
+		CASE(DW_OP_neg)
+		CASE(DW_OP_not)
+			/* Unary (1-operand) arithmetic and bit-wise operators. */
+			if unlikely(stacksz < 1)
+				ERROR(err_stack_underflow);
+			if (TOP.s_type != UNWIND_STE_CONSTANT)
+				goto do_make_top_const;
+			switch (opcode) {
+			case DW_OP_abs:
+				if (TOP.s_sconst < 0)
+					TOP.s_sconst = -TOP.s_sconst;
+				break;
+			case DW_OP_neg:
+				TOP.s_sconst = -TOP.s_sconst;
+				break;
+			case DW_OP_not:
+				TOP.s_uconst = ~TOP.s_uconst;
+				break;
+			default:
+				__builtin_unreachable();
+			}
+			break;
+
+		CASE(DW_OP_div)
+		CASE(DW_OP_mod)
+		CASE(DW_OP_and)
+		CASE(DW_OP_mul)
+		CASE(DW_OP_or)
 		CASE(DW_OP_shl)
-			if unlikely(stacksz < 2)
-				ERROR(err_stack_underflow);
-			if (TOP.s_type != UNWIND_STE_CONSTANT)
-				goto do_make_top_const;
-			if (SECOND.s_type != UNWIND_STE_CONSTANT)
-				goto do_make_second_const;
-			SECOND.s_uconst <<= TOP.s_uconst;
-			--stacksz;
-			break;
-
 		CASE(DW_OP_shr)
-			if unlikely(stacksz < 2)
-				ERROR(err_stack_underflow);
-			if (TOP.s_type != UNWIND_STE_CONSTANT)
-				goto do_make_top_const;
-			if (SECOND.s_type != UNWIND_STE_CONSTANT)
-				goto do_make_second_const;
-			SECOND.s_uconst >>= TOP.s_uconst;
-			--stacksz;
-			break;
-
 		CASE(DW_OP_shra)
-			if unlikely(stacksz < 2)
-				ERROR(err_stack_underflow);
-			if (TOP.s_type != UNWIND_STE_CONSTANT)
-				goto do_make_top_const;
-			if (SECOND.s_type != UNWIND_STE_CONSTANT)
-				goto do_make_second_const;
-			SECOND.s_sconst >>= TOP.s_uconst;
-			--stacksz;
-			break;
-
 		CASE(DW_OP_xor)
+		CASE(DW_OP_eq)
+		CASE(DW_OP_ge)
+		CASE(DW_OP_gt)
+		CASE(DW_OP_le)
+		CASE(DW_OP_lt)
+		CASE(DW_OP_ne)
+			/* Binary (2-operand) arithmetic and bit-wise operators. */
 			if unlikely(stacksz < 2)
 				ERROR(err_stack_underflow);
 			if (TOP.s_type != UNWIND_STE_CONSTANT)
 				goto do_make_top_const;
 			if (SECOND.s_type != UNWIND_STE_CONSTANT)
 				goto do_make_second_const;
-			SECOND.s_uconst ^= TOP.s_uconst;
+			switch (opcode) {
+			case DW_OP_div:
+			case DW_OP_mod:
+				if unlikely(TOP.s_uconst == 0)
+					ERROR(err_divide_by_zero);
+				if (opcode == DW_OP_div) {
+					SECOND.s_uconst /= TOP.s_uconst;
+				} else {
+					SECOND.s_uconst %= TOP.s_uconst;
+				}
+				break;
+			case DW_OP_and:
+				SECOND.s_uconst &= TOP.s_uconst;
+				break;
+			case DW_OP_mul:
+				SECOND.s_uconst *= TOP.s_uconst;
+				break;
+			case DW_OP_or:
+				SECOND.s_uconst |= TOP.s_uconst;
+				break;
+			case DW_OP_shl:
+				SECOND.s_uconst <<= TOP.s_uconst;
+				break;
+			case DW_OP_shr:
+				SECOND.s_uconst >>= TOP.s_uconst;
+				break;
+			case DW_OP_shra:
+				SECOND.s_sconst >>= TOP.s_uconst;
+				break;
+			case DW_OP_xor:
+				SECOND.s_uconst ^= TOP.s_uconst;
+				break;
+			case DW_OP_eq:
+				SECOND.s_uconst = SECOND.s_uconst == TOP.s_uconst ? 1 : 0;
+				break;
+			case DW_OP_ge:
+				SECOND.s_uconst = SECOND.s_uconst >= TOP.s_uconst ? 1 : 0;
+				break;
+			case DW_OP_gt:
+				SECOND.s_uconst = SECOND.s_uconst > TOP.s_uconst ? 1 : 0;
+				break;
+			case DW_OP_le:
+				SECOND.s_uconst = SECOND.s_uconst <= TOP.s_uconst ? 1 : 0;
+				break;
+			case DW_OP_lt:
+				SECOND.s_uconst = SECOND.s_uconst < TOP.s_uconst ? 1 : 0;
+				break;
+			case DW_OP_ne:
+				SECOND.s_uconst = SECOND.s_uconst != TOP.s_uconst ? 1 : 0;
+				break;
+			default:
+				__builtin_unreachable();
+			}
 			--stacksz;
 			break;
 
@@ -1279,72 +1256,6 @@ do_make_second_const:
 			}
 			--stacksz;
 		}	break;
-
-		CASE(DW_OP_eq)
-			if unlikely(stacksz < 2)
-				ERROR(err_stack_underflow);
-			if (TOP.s_type != UNWIND_STE_CONSTANT)
-				goto do_make_top_const;
-			if (SECOND.s_type != UNWIND_STE_CONSTANT)
-				goto do_make_second_const;
-			SECOND.s_uconst = SECOND.s_uconst == TOP.s_uconst ? 1 : 0;
-			--stacksz;
-			break;
-
-		CASE(DW_OP_ge)
-			if unlikely(stacksz < 2)
-				ERROR(err_stack_underflow);
-			if (TOP.s_type != UNWIND_STE_CONSTANT)
-				goto do_make_top_const;
-			if (SECOND.s_type != UNWIND_STE_CONSTANT)
-				goto do_make_second_const;
-			SECOND.s_uconst = SECOND.s_uconst >= TOP.s_uconst ? 1 : 0;
-			--stacksz;
-			break;
-
-		CASE(DW_OP_gt)
-			if unlikely(stacksz < 2)
-				ERROR(err_stack_underflow);
-			if (TOP.s_type != UNWIND_STE_CONSTANT)
-				goto do_make_top_const;
-			if (SECOND.s_type != UNWIND_STE_CONSTANT)
-				goto do_make_second_const;
-			SECOND.s_uconst = SECOND.s_uconst > TOP.s_uconst ? 1 : 0;
-			--stacksz;
-			break;
-
-		CASE(DW_OP_le)
-			if unlikely(stacksz < 2)
-				ERROR(err_stack_underflow);
-			if (TOP.s_type != UNWIND_STE_CONSTANT)
-				goto do_make_top_const;
-			if (SECOND.s_type != UNWIND_STE_CONSTANT)
-				goto do_make_second_const;
-			SECOND.s_uconst = SECOND.s_uconst <= TOP.s_uconst ? 1 : 0;
-			--stacksz;
-			break;
-
-		CASE(DW_OP_lt)
-			if unlikely(stacksz < 2)
-				ERROR(err_stack_underflow);
-			if (TOP.s_type != UNWIND_STE_CONSTANT)
-				goto do_make_top_const;
-			if (SECOND.s_type != UNWIND_STE_CONSTANT)
-				goto do_make_second_const;
-			SECOND.s_uconst = SECOND.s_uconst < TOP.s_uconst ? 1 : 0;
-			--stacksz;
-			break;
-
-		CASE(DW_OP_ne)
-			if unlikely(stacksz < 2)
-				ERROR(err_stack_underflow);
-			if (TOP.s_type != UNWIND_STE_CONSTANT)
-				goto do_make_top_const;
-			if (SECOND.s_type != UNWIND_STE_CONSTANT)
-				goto do_make_second_const;
-			SECOND.s_uconst = SECOND.s_uconst != TOP.s_uconst ? 1 : 0;
-			--stacksz;
-			break;
 
 		CASE(DW_OP_lit0 ... DW_OP_lit31)
 			if unlikely(stacksz >= self->ue_stackmax)
@@ -1526,9 +1437,9 @@ do_read_bit_pieces:
 		CASE(DW_OP_call_ref) {
 			byte_t const *component_address;
 			unsigned int error;
-			if unlikely(!self->ue_sectinfo ||
-			             self->ue_sectinfo->ues_debug_info_start >= self->ue_sectinfo->ues_debug_info_end ||
-			             self->ue_sectinfo->ues_debug_abbrev_start >= self->ue_sectinfo->ues_debug_abbrev_end)
+			if unlikely(self->ue_sectinfo == NULL ||
+			            self->ue_sectinfo->ues_debug_info_start >= self->ue_sectinfo->ues_debug_info_end ||
+			            self->ue_sectinfo->ues_debug_abbrev_start >= self->ue_sectinfo->ues_debug_abbrev_end)
 				ERROR(err_illegal_instruction);
 			self->ue_pc = pc - 1;
 			if (opcode == DW_OP_call2) {

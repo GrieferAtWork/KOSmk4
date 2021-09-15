@@ -184,7 +184,7 @@
  *     form_tls_address     DW_OP_form_tls_address
  *     call_frame_cfa       DW_OP_call_frame_cfa
  *     stack_value          DW_OP_stack_value
- *     GNU_push_tls_address DW_OP_GNU_push_tls_address
+ *     GNU_push_tls_address DW_OP_GNU_push_tls_address    # WARNING: Doesn't actually "push" anything; same as 'form_tls_address'
  *     GNU_uninit           DW_OP_GNU_uninit
  *
  *     implicit_value "ABCD"   DW_OP_implicit_value, 4, 'A', 'B', 'C', 'D'
@@ -218,8 +218,8 @@
  *     add    [...]         alias for 'plus'
  *     sub    [...]         alias for 'minus'
  *     pop                  alias for 'drop'
- *     push_tls_address DW_OP_GNU_push_tls_address
- *     uninit DW_OP_GNU_uninit
+ *     push_tls_address     alias for 'GNU_push_tls_address'
+ *     uninit               alias for 'GNU_uninit'
  *     jf     pop, <symbol> Alias for 'not; bra <symbol>;'
  *     jf     top, <symbol> Alias for 'dup; not; bra <symbol>;'
  *     jt     pop, <symbol> Alias for 'bra <symbol>;'
