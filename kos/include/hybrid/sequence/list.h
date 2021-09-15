@@ -2420,7 +2420,7 @@
 	(__HYBRID_Q_BADPTR(X(_, (self)->tqh_first).tqe_prev),                \
 	 ((self)->tqh_first = X(_, (self)->tqh_first).tqe_next) != __NULLPTR \
 	 ? (void)(X(_, (self)->tqh_first).tqe_prev = &(self)->tqh_first)     \
-	 : (void)((self)->tqh_last = X(_, (self)->tqh_first).tqe_prev))
+	 : (void)((self)->tqh_last = &(self)->tqh_first))
 #define __HYBRID_TAILQ_REMOVE(self, elem, X, _) \
 	__HYBRID_TAILQ_REMOVE_R(self, elem, elem, X, _)
 #define __HYBRID_TAILQ_REMOVE_R(self, lo_elem, hi_elem, X, _)                 \
