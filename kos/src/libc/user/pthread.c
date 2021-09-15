@@ -1282,6 +1282,13 @@ NOTHROW_NCX(LIBCCALL libc_pthread_getattr_np)(pthread_t pthread,
 	attr->pa_flags = PTHREAD_ATTR_FLAG_SCHED_SET | PTHREAD_ATTR_FLAG_POLICY_SET;
 	if (pthread->pt_flags & PTHREAD_FUSERSTACK)
 		attr->pa_flags |= PTHREAD_ATTR_FLAG_STACKADDR;
+	/* When the thread is running (pt_tid != 0) and has a reference  counter
+	 * of `1', then  that means it  got detached. Note  the order of  checks
+	 * which ensures that a thread currently exiting isn't detected as being
+	 * detached! */
+	if (ATOMIC_READ(pthread->pt_refcnt) == 1 &&
+	    ATOMIC_READ(pthread->pt_tid) != 0)
+		attr->pa_flags |= PTHREAD_ATTR_FLAG_DETACHSTATE;
 	attr->pa_cpuset = (cpu_set_t *)&attr->pa_cpusetsize;
 	result = pthread_getaffinity_np(pthread,
 	                                sizeof(attr->pa_cpusetsize),
