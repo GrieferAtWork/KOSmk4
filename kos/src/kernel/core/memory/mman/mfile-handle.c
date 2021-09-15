@@ -86,7 +86,8 @@ handle_mfile_pread(struct mfile *__restrict self,
 		(void)mode;
 		return inode_read((struct inode *)self, dst, num_bytes, addr);
 	}
-	return 0;
+	THROW(E_FSERROR_UNSUPPORTED_OPERATION,
+	      E_FILESYSTEM_OPERATION_PREAD);
 }
 
 INTERN NONNULL((1)) size_t KCALL
@@ -99,7 +100,8 @@ handle_mfile_pwrite(struct mfile *__restrict self,
 		inode_write((struct inode *)self, src, num_bytes, addr);
 		return num_bytes;
 	}
-	return 0;
+	THROW(E_FSERROR_UNSUPPORTED_OPERATION,
+	      E_FILESYSTEM_OPERATION_PWRITE);
 }
 
 INTERN WUNUSED NONNULL((1)) size_t KCALL
@@ -111,7 +113,8 @@ handle_mfile_preadv(struct mfile *__restrict self,
 		(void)mode;
 		return inode_readv((struct inode *)self, dst, num_bytes, addr);
 	}
-	return 0;
+	THROW(E_FSERROR_UNSUPPORTED_OPERATION,
+	      E_FILESYSTEM_OPERATION_PREAD);
 }
 
 INTERN NONNULL((1)) size_t KCALL
@@ -124,7 +127,8 @@ handle_mfile_pwritev(struct mfile *__restrict self,
 		inode_writev((struct inode *)self, src, num_bytes, addr);
 		return num_bytes;
 	}
-	return 0;
+	THROW(E_FSERROR_UNSUPPORTED_OPERATION,
+	      E_FILESYSTEM_OPERATION_PWRITE);
 }
 
 

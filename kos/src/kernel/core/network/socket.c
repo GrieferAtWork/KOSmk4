@@ -2019,7 +2019,7 @@ handle_socket_pread(struct socket *__restrict self,
                     USER CHECKED void *dst, size_t num_bytes,
                     pos_t addr, iomode_t mode) THROWS(...) {
 	if (addr != 0)
-		THROW(E_FSERROR_UNSUPPORTED_OPERATION, E_FILESYSTEM_OPERATION_READ);
+		THROW(E_FSERROR_UNSUPPORTED_OPERATION, E_FILESYSTEM_OPERATION_PREAD);
 	return handle_socket_read(self, dst, num_bytes, mode);
 }
 
@@ -2028,7 +2028,7 @@ handle_socket_pwrite(struct socket *__restrict self,
                      USER CHECKED void const *src, size_t num_bytes,
                      pos_t addr, iomode_t mode) THROWS(...) {
 	if (addr != 0)
-		THROW(E_FSERROR_UNSUPPORTED_OPERATION, E_FILESYSTEM_OPERATION_READ);
+		THROW(E_FSERROR_UNSUPPORTED_OPERATION, E_FILESYSTEM_OPERATION_PREAD);
 	return handle_socket_write(self, src, num_bytes, mode);
 }
 
@@ -2055,7 +2055,7 @@ handle_socket_preadv(struct socket *__restrict self,
                      struct iov_buffer *__restrict dst,
                      size_t num_bytes, pos_t addr, iomode_t mode) THROWS(...) {
 	if (addr != 0)
-		THROW(E_FSERROR_UNSUPPORTED_OPERATION, E_FILESYSTEM_OPERATION_READ);
+		THROW(E_FSERROR_UNSUPPORTED_OPERATION, E_FILESYSTEM_OPERATION_PREAD);
 	return handle_socket_readv(self, dst, num_bytes, mode);
 }
 
@@ -2064,7 +2064,7 @@ handle_socket_pwritev(struct socket *__restrict self,
                       struct iov_buffer *__restrict src,
                       size_t num_bytes, pos_t addr, iomode_t mode) THROWS(...) {
 	if (addr != 0)
-		THROW(E_FSERROR_UNSUPPORTED_OPERATION, E_FILESYSTEM_OPERATION_READ);
+		THROW(E_FSERROR_UNSUPPORTED_OPERATION, E_FILESYSTEM_OPERATION_PWRITE);
 	return handle_socket_writev(self, src, num_bytes, mode);
 }
 

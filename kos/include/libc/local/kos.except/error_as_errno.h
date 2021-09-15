@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x36fb3df */
+/* HASH CRC-32:0x57785fc6 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -319,7 +319,8 @@ for (local name: classes.keys.sorted()) {
 #endif /* __ENOTDIR */
 #if defined(__ESPIPE) && defined(__EINVAL) && defined(__EPERM)
 		case ERROR_SUBCLASS(ERROR_CODEOF(E_FSERROR_UNSUPPORTED_OPERATION)):
-			__result = __self->e_args.e_fserror.f_unsupported_operation.uo_operation_id == E_FILESYSTEM_OPERATION_SEEK ? __ESPIPE :
+			__result = (__self->e_args.e_fserror.f_unsupported_operation.uo_operation_id == E_FILESYSTEM_OPERATION_SEEK || __self->e_args.e_fserror.f_unsupported_operation.uo_operation_id == E_FILESYSTEM_OPERATION_PREAD ||
+			         __self->e_args.e_fserror.f_unsupported_operation.uo_operation_id == E_FILESYSTEM_OPERATION_PWRITE) ? __ESPIPE :
 			        (__self->e_args.e_fserror.f_unsupported_operation.uo_operation_id == E_FILESYSTEM_OPERATION_READ || __self->e_args.e_fserror.f_unsupported_operation.uo_operation_id == E_FILESYSTEM_OPERATION_WRITE ||
 			         __self->e_args.e_fserror.f_unsupported_operation.uo_operation_id == E_FILESYSTEM_OPERATION_TRUNC || __self->e_args.e_fserror.f_unsupported_operation.uo_operation_id == E_FILESYSTEM_OPERATION_READDIR)
 			         ? __EINVAL : __EPERM;

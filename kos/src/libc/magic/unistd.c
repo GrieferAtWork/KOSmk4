@@ -2954,7 +2954,7 @@ $longptr_t sysconf(__STDC_INT_AS_UINT_T name);
 %
 %
 %{
-#ifdef __USE_GNU
+#if defined(__USE_GNU) && !defined(__NO_XBLOCK)
 #ifdef __COMPILER_HAVE_TYPEOF
 #define TEMP_FAILURE_RETRY(expression)                           \
 	__XBLOCK({                                                   \
@@ -2975,7 +2975,7 @@ $longptr_t sysconf(__STDC_INT_AS_UINT_T name);
 		__XRETURN __tfr_result;                          \
 	})
 #endif /* !__COMPILER_HAVE_TYPEOF */
-#endif /* __USE_GNU */
+#endif /* __USE_GNU && !__NO_XBLOCK */
 
 
 #ifdef __USE_BSD

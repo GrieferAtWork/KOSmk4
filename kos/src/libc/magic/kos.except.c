@@ -540,7 +540,8 @@ for (local name: classes.keys.sorted()) {
 @@pp_endif@@
 @@pp_if defined(ESPIPE) && defined(EINVAL) && defined(EPERM)@@
 		case @ERROR_SUBCLASS@(@ERROR_CODEOF@(@E_FSERROR_UNSUPPORTED_OPERATION@)):
-			result = self->@e_args@.@e_fserror@.@f_unsupported_operation@.@uo_operation_id@ == @E_FILESYSTEM_OPERATION_SEEK@ ? ESPIPE :
+			result = (self->@e_args@.@e_fserror@.@f_unsupported_operation@.@uo_operation_id@ == @E_FILESYSTEM_OPERATION_SEEK@ || self->@e_args@.@e_fserror@.@f_unsupported_operation@.@uo_operation_id@ == @E_FILESYSTEM_OPERATION_PREAD@ ||
+			         self->@e_args@.@e_fserror@.@f_unsupported_operation@.@uo_operation_id@ == @E_FILESYSTEM_OPERATION_PWRITE@) ? ESPIPE :
 			        (self->@e_args@.@e_fserror@.@f_unsupported_operation@.@uo_operation_id@ == @E_FILESYSTEM_OPERATION_READ@ || self->@e_args@.@e_fserror@.@f_unsupported_operation@.@uo_operation_id@ == @E_FILESYSTEM_OPERATION_WRITE@ ||
 			         self->@e_args@.@e_fserror@.@f_unsupported_operation@.@uo_operation_id@ == @E_FILESYSTEM_OPERATION_TRUNC@ || self->@e_args@.@e_fserror@.@f_unsupported_operation@.@uo_operation_id@ == @E_FILESYSTEM_OPERATION_READDIR@)
 			         ? EINVAL : EPERM;

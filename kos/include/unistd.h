@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x21b38ba4 */
+/* HASH CRC-32:0x9058cf77 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -2788,16 +2788,16 @@ __NAMESPACE_LOCAL_USING_OR_IMPL(lockf64, __FORCELOCAL __ATTR_ARTIFICIAL int __NO
 #endif /* __USE_MISC || (__USE_XOPEN_EXTENDED && !__USE_POSIX) */
 
 
-#ifdef __USE_GNU
+#if defined(__USE_GNU) && !defined(__NO_XBLOCK)
 #ifdef __COMPILER_HAVE_TYPEOF
-#define TEMP_FAILURE_RETRY(expression)                             \
-	__XBLOCK({                                                     \
-		__typeof__(expression) __tfr_result;                       \
-		do {                                                       \
-			__tfr_result = (expression);                           \
-		} while (__tfr_result == (__typeof__(__tfr_result)) - 1 && \
-		         errno == EINTR);                                  \
-		__XRETURN __tfr_result;                                    \
+#define TEMP_FAILURE_RETRY(expression)                           \
+	__XBLOCK({                                                   \
+		__typeof__(expression) __tfr_result;                     \
+		do {                                                     \
+			__tfr_result = (expression);                         \
+		} while (__tfr_result == (__typeof__(__tfr_result))-1 && \
+		         errno == EINTR);                                \
+		__XRETURN __tfr_result;                                  \
 	})
 #else /* __COMPILER_HAVE_TYPEOF */
 #define TEMP_FAILURE_RETRY(expression)                   \
@@ -2809,7 +2809,7 @@ __NAMESPACE_LOCAL_USING_OR_IMPL(lockf64, __FORCELOCAL __ATTR_ARTIFICIAL int __NO
 		__XRETURN __tfr_result;                          \
 	})
 #endif /* !__COMPILER_HAVE_TYPEOF */
-#endif /* __USE_GNU */
+#endif /* __USE_GNU && !__NO_XBLOCK */
 
 
 #ifdef __USE_BSD

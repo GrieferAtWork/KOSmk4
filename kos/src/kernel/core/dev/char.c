@@ -568,7 +568,7 @@ handle_characterdevice_pread(struct character_device *__restrict self,
 	if likely(self->cd_type.ct_pread)
 		return (*self->cd_type.ct_pread)(self, dst, num_bytes, addr, mode);
 	THROW(E_FSERROR_UNSUPPORTED_OPERATION,
-	      E_FILESYSTEM_OPERATION_READ);
+	      E_FILESYSTEM_OPERATION_PREAD);
 }
 
 INTERN size_t KCALL
@@ -578,7 +578,7 @@ handle_characterdevice_pwrite(struct character_device *__restrict self,
 	if likely(self->cd_type.ct_pwrite)
 		return (*self->cd_type.ct_pwrite)(self, src, num_bytes, addr, mode);
 	THROW(E_FSERROR_UNSUPPORTED_OPERATION,
-	      E_FILESYSTEM_OPERATION_WRITE);
+	      E_FILESYSTEM_OPERATION_PWRITE);
 }
 
 INTERN size_t KCALL
@@ -676,7 +676,7 @@ handle_characterdevice_preadv(struct character_device *__restrict self,
 		}
 	} else {
 		THROW(E_FSERROR_UNSUPPORTED_OPERATION,
-		      E_FILESYSTEM_OPERATION_READ);
+		      E_FILESYSTEM_OPERATION_PREAD);
 	}
 	return result;
 }
@@ -704,7 +704,7 @@ handle_characterdevice_pwritev(struct character_device *__restrict self,
 		}
 	} else {
 		THROW(E_FSERROR_UNSUPPORTED_OPERATION,
-		      E_FILESYSTEM_OPERATION_READ);
+		      E_FILESYSTEM_OPERATION_PWRITE);
 	}
 	return result;
 }

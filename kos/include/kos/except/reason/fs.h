@@ -102,8 +102,10 @@ enum {
 #ifdef __CC__
 enum {
 	E_FILESYSTEM_OPERATION_GENERIC,  /* Generic file-system operation */
-	E_FILESYSTEM_OPERATION_READ,     /* The object does not support reading */
-	E_FILESYSTEM_OPERATION_WRITE,    /* The object does not support writing */
+	E_FILESYSTEM_OPERATION_READ,     /* The object does not support read(2) */
+	E_FILESYSTEM_OPERATION_PREAD,    /* The object does not support pread(2) */
+	E_FILESYSTEM_OPERATION_WRITE,    /* The object does not support write(2) */
+	E_FILESYSTEM_OPERATION_PWRITE,   /* The object does not support pwrite(2) */
 	E_FILESYSTEM_OPERATION_TRUNC,    /* The object does not support being resized */
 	E_FILESYSTEM_OPERATION_READDIR,  /* The object does not support being read from as a directory */
 	E_FILESYSTEM_OPERATION_CREAT,    /* The object does not support creation of new files */
@@ -128,8 +130,10 @@ enum {
 /*[[[AUTO]]]*/
 #ifdef __COMPILER_PREFERR_ENUMS
 #define E_FILESYSTEM_OPERATION_GENERIC  E_FILESYSTEM_OPERATION_GENERIC  /* Generic file-system operation */
-#define E_FILESYSTEM_OPERATION_READ     E_FILESYSTEM_OPERATION_READ     /* The object does not support reading */
-#define E_FILESYSTEM_OPERATION_WRITE    E_FILESYSTEM_OPERATION_WRITE    /* The object does not support writing */
+#define E_FILESYSTEM_OPERATION_READ     E_FILESYSTEM_OPERATION_READ     /* The object does not support read(2) */
+#define E_FILESYSTEM_OPERATION_PREAD    E_FILESYSTEM_OPERATION_PREAD    /* The object does not support pread(2) */
+#define E_FILESYSTEM_OPERATION_WRITE    E_FILESYSTEM_OPERATION_WRITE    /* The object does not support write(2) */
+#define E_FILESYSTEM_OPERATION_PWRITE   E_FILESYSTEM_OPERATION_PWRITE   /* The object does not support pwrite(2) */
 #define E_FILESYSTEM_OPERATION_TRUNC    E_FILESYSTEM_OPERATION_TRUNC    /* The object does not support being resized */
 #define E_FILESYSTEM_OPERATION_READDIR  E_FILESYSTEM_OPERATION_READDIR  /* The object does not support being read from as a directory */
 #define E_FILESYSTEM_OPERATION_CREAT    E_FILESYSTEM_OPERATION_CREAT    /* The object does not support creation of new files */
@@ -151,27 +155,29 @@ enum {
 #define E_FILESYSTEM_OPERATION_ALLOCATE E_FILESYSTEM_OPERATION_ALLOCATE /* The object does not support the fallocate() operator */
 #else /* __COMPILER_PREFERR_ENUMS */
 #define E_FILESYSTEM_OPERATION_GENERIC  0  /* Generic file-system operation */
-#define E_FILESYSTEM_OPERATION_READ     1  /* The object does not support reading */
-#define E_FILESYSTEM_OPERATION_WRITE    2  /* The object does not support writing */
-#define E_FILESYSTEM_OPERATION_TRUNC    3  /* The object does not support being resized */
-#define E_FILESYSTEM_OPERATION_READDIR  4  /* The object does not support being read from as a directory */
-#define E_FILESYSTEM_OPERATION_CREAT    5  /* The object does not support creation of new files */
-#define E_FILESYSTEM_OPERATION_MKDIR    6  /* The object does not support creation of new directories */
-#define E_FILESYSTEM_OPERATION_SYMLINK  7  /* The object does not support creation of symbolic links */
-#define E_FILESYSTEM_OPERATION_MKNOD    8  /* The object does not support creation of device nodes */
-#define E_FILESYSTEM_OPERATION_LINK     9  /* The object does not support creation of hard links */
-#define E_FILESYSTEM_OPERATION_RENAME   10 /* The object does not support renaming of items */
-#define E_FILESYSTEM_OPERATION_UNLINK   11 /* The object does not support unlinking files */
-#define E_FILESYSTEM_OPERATION_RMDIR    12 /* The object does not support removal of directories */
-#define E_FILESYSTEM_OPERATION_ATTRIB   13 /* The values specified by chmod() or chown() cannot be applied within the file system */
-#define E_FILESYSTEM_OPERATION_WRATTR   14 /* The object does not support changes to attributes being written to disk */
-#define E_FILESYSTEM_OPERATION_SEEK     15 /* The object does not support seeking in file stream */
-#define E_FILESYSTEM_OPERATION_MMAP     16 /* The object does not support mapping data into memory */
-#define E_FILESYSTEM_OPERATION_SYNC     17 /* The object does not support the fsync() operator */
-#define E_FILESYSTEM_OPERATION_DATASYNC 18 /* The object does not support the fdatasync() operator */
-#define E_FILESYSTEM_OPERATION_STAT     19 /* The object does not support the fstat() operator */
-#define E_FILESYSTEM_OPERATION_POLL     20 /* The object does not support the poll() operator */
-#define E_FILESYSTEM_OPERATION_ALLOCATE 21 /* The object does not support the fallocate() operator */
+#define E_FILESYSTEM_OPERATION_READ     1  /* The object does not support read(2) */
+#define E_FILESYSTEM_OPERATION_PREAD    2  /* The object does not support pread(2) */
+#define E_FILESYSTEM_OPERATION_WRITE    3  /* The object does not support write(2) */
+#define E_FILESYSTEM_OPERATION_PWRITE   4  /* The object does not support pwrite(2) */
+#define E_FILESYSTEM_OPERATION_TRUNC    5  /* The object does not support being resized */
+#define E_FILESYSTEM_OPERATION_READDIR  6  /* The object does not support being read from as a directory */
+#define E_FILESYSTEM_OPERATION_CREAT    7  /* The object does not support creation of new files */
+#define E_FILESYSTEM_OPERATION_MKDIR    8  /* The object does not support creation of new directories */
+#define E_FILESYSTEM_OPERATION_SYMLINK  9  /* The object does not support creation of symbolic links */
+#define E_FILESYSTEM_OPERATION_MKNOD    10 /* The object does not support creation of device nodes */
+#define E_FILESYSTEM_OPERATION_LINK     11 /* The object does not support creation of hard links */
+#define E_FILESYSTEM_OPERATION_RENAME   12 /* The object does not support renaming of items */
+#define E_FILESYSTEM_OPERATION_UNLINK   13 /* The object does not support unlinking files */
+#define E_FILESYSTEM_OPERATION_RMDIR    14 /* The object does not support removal of directories */
+#define E_FILESYSTEM_OPERATION_ATTRIB   15 /* The values specified by chmod() or chown() cannot be applied within the file system */
+#define E_FILESYSTEM_OPERATION_WRATTR   16 /* The object does not support changes to attributes being written to disk */
+#define E_FILESYSTEM_OPERATION_SEEK     17 /* The object does not support seeking in file stream */
+#define E_FILESYSTEM_OPERATION_MMAP     18 /* The object does not support mapping data into memory */
+#define E_FILESYSTEM_OPERATION_SYNC     19 /* The object does not support the fsync() operator */
+#define E_FILESYSTEM_OPERATION_DATASYNC 20 /* The object does not support the fdatasync() operator */
+#define E_FILESYSTEM_OPERATION_STAT     21 /* The object does not support the fstat() operator */
+#define E_FILESYSTEM_OPERATION_POLL     22 /* The object does not support the poll() operator */
+#define E_FILESYSTEM_OPERATION_ALLOCATE 23 /* The object does not support the fallocate() operator */
 #endif /* !__COMPILER_PREFERR_ENUMS */
 /*[[[end]]]*/
 

@@ -647,7 +647,8 @@
 #endif /* !E_FSERROR_IS_A_MOUNTING_POINT */
 #ifndef E_FSERROR_UNSUPPORTED_OPERATION
 #define E_FSERROR_UNSUPPORTED_OPERATION           (E_FSERROR, 0x0100) /* [msg("Unsupported filesystem operation")]
-                                                                       * [errno($operation_id == E_FILESYSTEM_OPERATION_SEEK ? ESPIPE :
+                                                                       * [errno(($operation_id == E_FILESYSTEM_OPERATION_SEEK || $operation_id == E_FILESYSTEM_OPERATION_PREAD ||
+                                                                       *         $operation_id == E_FILESYSTEM_OPERATION_PWRITE) ? ESPIPE :
                                                                        *        ($operation_id == E_FILESYSTEM_OPERATION_READ || $operation_id == E_FILESYSTEM_OPERATION_WRITE ||
                                                                        *         $operation_id == E_FILESYSTEM_OPERATION_TRUNC || $operation_id == E_FILESYSTEM_OPERATION_READDIR)
                                                                        *         ? EINVAL : EPERM)]

@@ -74,7 +74,7 @@ DECL_BEGIN
 		   ("pos_t", "addr"),                                                                                 \
 		   ("iomode_t", "mode") },                                                                            \
 		 "THROWS(...)",                                                                                       \
-		 "THROW(E_FSERROR_UNSUPPORTED_OPERATION, E_FILESYSTEM_OPERATION_READ);"),                             \
+		 "THROW(E_FSERROR_UNSUPPORTED_OPERATION, E_FILESYSTEM_OPERATION_PREAD);"),                            \
 		("pwrite", "WUNUSED NONNULL((1))", "size_t", "", "KCALL",                                             \
 		 { ("T *__restrict", "self"),                                                                         \
 		   ("USER CHECKED void const *", "src"),                                                              \
@@ -82,7 +82,7 @@ DECL_BEGIN
 		   ("pos_t", "addr"),                                                                                 \
 		   ("iomode_t", "mode") },                                                                            \
 		 "THROWS(...)",                                                                                       \
-		 "THROW(E_FSERROR_UNSUPPORTED_OPERATION, E_FILESYSTEM_OPERATION_WRITE);"),                            \
+		 "THROW(E_FSERROR_UNSUPPORTED_OPERATION, E_FILESYSTEM_OPERATION_PWRITE);"),                           \
 		("readv", "WUNUSED NONNULL((1, 2))", "size_t", "", "KCALL",                                           \
 		 { ("T *__restrict", "self"),                                                                         \
 		   ("struct iov_buffer *__restrict", "dst"),                                                          \
@@ -104,7 +104,7 @@ DECL_BEGIN
 		   ("pos_t", "addr"),                                                                                 \
 		   ("iomode_t", "mode") },                                                                            \
 		 "THROWS(...)",                                                                                       \
-		 "THROW(E_FSERROR_UNSUPPORTED_OPERATION, E_FILESYSTEM_OPERATION_READ);"),                             \
+		 "THROW(E_FSERROR_UNSUPPORTED_OPERATION, E_FILESYSTEM_OPERATION_PREAD);"),                            \
 		("pwritev", "WUNUSED NONNULL((1, 2))", "size_t", "", "KCALL",                                         \
 		 { ("T *__restrict", "self"),                                                                         \
 		   ("struct iov_buffer *__restrict", "src"),                                                          \
@@ -112,7 +112,7 @@ DECL_BEGIN
 		   ("pos_t", "addr"),                                                                                 \
 		   ("iomode_t", "mode") },                                                                            \
 		 "THROWS(...)",                                                                                       \
-		 "THROW(E_FSERROR_UNSUPPORTED_OPERATION, E_FILESYSTEM_OPERATION_WRITE);"),                            \
+		 "THROW(E_FSERROR_UNSUPPORTED_OPERATION, E_FILESYSTEM_OPERATION_PWRITE);"),                           \
 		("readdir", "WUNUSED NONNULL((1))", "size_t", "", "KCALL",                                            \
 		 { ("T *__restrict", "self"),                                                                         \
 		   ("USER CHECKED struct dirent *", "buf"),                                                           \

@@ -66,15 +66,18 @@ NOTHROW(KCALL file_destroy)(struct file *__restrict self) {
 #undef CONFIG_BLOCKING_REGULAR_FILE_READ
 //#define CONFIG_BLOCKING_REGULAR_FILE_READ 1
 
-LOCAL NOBLOCK void
+LOCAL NOBLOCK NONNULL((1)) void
 NOTHROW(KCALL translate_read_exceptions)(struct file *__restrict self) {
-	if (error_code() == ERROR_CODEOF(E_FSERROR_UNSUPPORTED_OPERATION) &&
-	    PERTASK_GET(this_exception_args.e_fserror.f_unsupported_operation.uo_operation_id) == E_FILESYSTEM_OPERATION_READ &&
-	    INODE_ISDIR(self->f_node)) {
-		/* Posix wants us to return -EISDIR when trying to read from a directory... */
-		PERTASK_SET(this_exception_code, ERROR_CODEOF(E_FSERROR_IS_A_DIRECTORY));
-		PERTASK_SET(this_exception_args.e_fserror.f_is_a_directory.iad_action_context,
-		            E_FILESYSTEM_IS_A_DIRECTORY_READ);
+	if (error_code() == ERROR_CODEOF(E_FSERROR_UNSUPPORTED_OPERATION) && INODE_ISDIR(self->f_node)) {
+		syscall_ulong_t operation_id;
+		operation_id = PERTASK_GET(this_exception_args.e_fserror.f_unsupported_operation.uo_operation_id);
+		if (operation_id == E_FILESYSTEM_OPERATION_READ ||
+		    operation_id == E_FILESYSTEM_OPERATION_PREAD) {
+			/* Posix wants us to return -EISDIR when trying to read from a directory... */
+			PERTASK_SET(this_exception_code, ERROR_CODEOF(E_FSERROR_IS_A_DIRECTORY));
+			PERTASK_SET(this_exception_args.e_fserror.f_is_a_directory.iad_action_context,
+			            E_FILESYSTEM_IS_A_DIRECTORY_READ);
+		}
 	}
 }
 

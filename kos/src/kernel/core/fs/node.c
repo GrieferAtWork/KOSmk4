@@ -4589,7 +4589,7 @@ db_inode_loadpart(struct inode *__restrict self, pos_t daddr,
 	struct inode_type *type = self->i_type;
 	assert(type);
 	if (!type->it_file.f_pread)
-		THROW(E_FSERROR_UNSUPPORTED_OPERATION, (uintptr_t)E_FILESYSTEM_OPERATION_READ);
+		THROW(E_FSERROR_UNSUPPORTED_OPERATION, (uintptr_t)E_FILESYSTEM_OPERATION_PREAD);
 	inode_loadattr(self);
 	{
 		pos_t filesize;
@@ -4637,7 +4637,7 @@ db_inode_savepart(struct inode *__restrict self, pos_t daddr,
 	struct inode_type *type = self->i_type;
 	assert(type);
 	if (!type->it_file.f_pwrite)
-		THROW(E_FSERROR_UNSUPPORTED_OPERATION, (uintptr_t)E_FILESYSTEM_OPERATION_WRITE);
+		THROW(E_FSERROR_UNSUPPORTED_OPERATION, (uintptr_t)E_FILESYSTEM_OPERATION_PWRITE);
 	{
 		pos_t filesize;
 		struct aio_multihandle_generic hand;

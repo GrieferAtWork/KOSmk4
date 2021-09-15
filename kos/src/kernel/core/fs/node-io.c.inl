@@ -183,7 +183,7 @@ NOTHROW(KCALL FUNC2(inode_))(struct inode *__restrict self,
 #endif /* DEFINE_IO_VECTOR */
 #ifndef DEFINE_IO_READ
 		if unlikely(!self->i_type->it_file.RW_OPERATOR)
-			THROW(E_FSERROR_UNSUPPORTED_OPERATION, E_FILESYSTEM_OPERATION_WRITE);
+			THROW(E_FSERROR_UNSUPPORTED_OPERATION, E_FILESYSTEM_OPERATION_PWRITE);
 		SCOPED_WRITELOCK(INODE_SCOPED_LOCK_FOR(self));
 		inode_loadattr(self);
 		{
@@ -212,7 +212,7 @@ NOTHROW(KCALL FUNC2(inode_))(struct inode *__restrict self,
 			/* The INode uses anonymous parts. -> Use read-through / write-through */
 #ifdef DEFINE_IO_READ
 			if (!self->i_type->it_file.RW_OPERATOR)
-				THROW(E_FSERROR_UNSUPPORTED_OPERATION, E_FILESYSTEM_OPERATION_READ);
+				THROW(E_FSERROR_UNSUPPORTED_OPERATION, E_FILESYSTEM_OPERATION_PREAD);
 			(*self->i_type->it_file.RW_OPERATOR)(self, buf, num_bytes, file_position, aio);
 #else /* DEFINE_IO_READ */
 			TRY {
@@ -602,7 +602,7 @@ eof:
 	/* Check if reading would have even been possible.
 	 * Because if it wouldn't have been, then we must still throw an error! */
 	if unlikely(!self->i_type->it_file.RW_OPERATOR)
-		THROW(E_FSERROR_UNSUPPORTED_OPERATION, E_FILESYSTEM_OPERATION_READ);
+		THROW(E_FSERROR_UNSUPPORTED_OPERATION, E_FILESYSTEM_OPERATION_PREAD);
 	return 0;
 }
 

@@ -134,8 +134,8 @@ struct chrdev;
  *      - usually: MFILE_F_NOUSRMMAP;
  *      - usually: MFILE_F_FIXEDFILESIZE;
  *      - usually: mfile_isanon(self);
- *      - usually: implements(mso_pread)  { THROW(E_FSERROR_UNSUPPORTED_OPERATION, E_FILESYSTEM_OPERATION_READ); }
- *      - usually: implements(mso_pwrite) { THROW(E_FSERROR_UNSUPPORTED_OPERATION, E_FILESYSTEM_OPERATION_WRITE); }
+ *      - usually: implements(mso_pread)  { THROW(E_FSERROR_UNSUPPORTED_OPERATION, E_FILESYSTEM_OPERATION_PREAD); }
+ *      - usually: implements(mso_pwrite) { THROW(E_FSERROR_UNSUPPORTED_OPERATION, E_FILESYSTEM_OPERATION_PWRITE); }
  *   - fsuper:
  *      - always: fn_super == self;
  *
