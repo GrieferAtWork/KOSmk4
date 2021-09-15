@@ -406,6 +406,9 @@ NOTHROW_NCX(LIBCCALL libc_pthread_do_create)(pthread_t *__restrict newthread,
 		dltlsfreeseg(tls);
 		return (errno_t)-cpid;
 	}
+	/* Create as detached; iow: detach after creation... */
+	if (attr->pa_flags & PTHREAD_ATTR_FLAG_DETACHSTATE)
+		libc_pthread_detach(pt);
 	*newthread = pt;
 	return EOK;
 err_nomem_tls_cpuset:
