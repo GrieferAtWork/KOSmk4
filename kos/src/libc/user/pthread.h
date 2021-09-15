@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xe2f9d67c */
+/* HASH CRC-32:0xd54c3afe */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -105,10 +105,12 @@ INTDEF NONNULL((1)) errno_t NOTHROW_NCX(LIBCCALL libc_pthread_attr_init)(pthread
 INTDEF NONNULL((1)) errno_t NOTHROW_NCX(LIBCCALL libc_pthread_attr_destroy)(pthread_attr_t *attr);
 /* >> pthread_attr_getdetachstate(3)
  * Get   detach   state    attribute
+ * @param: *detachstate: One of `PTHREAD_CREATE_JOINABLE', `PTHREAD_CREATE_DETACHED'
  * @return: EOK: Success */
 INTDEF NONNULL((1, 2)) errno_t NOTHROW_NCX(LIBCCALL libc_pthread_attr_getdetachstate)(pthread_attr_t const *attr, int *detachstate);
 /* >> pthread_attr_setdetachstate(3)
  * Set   detach   state    attribute
+ * @param: detachstate: One of `PTHREAD_CREATE_JOINABLE', `PTHREAD_CREATE_DETACHED'
  * @return: EOK:    Success
  * @return: EINVAL: Invalid/unsupported `detachstate' */
 INTDEF NONNULL((1)) errno_t NOTHROW_NCX(LIBCCALL libc_pthread_attr_setdetachstate)(pthread_attr_t *attr, int detachstate);

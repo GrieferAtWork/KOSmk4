@@ -319,13 +319,36 @@ struct aio_tailq aio_pending_list = { NULL, NULL }; /* Lazily initialized. */
 	 ? (void)(aio_pending_list.tqh_last = &aio_pending_list.tqh_first) \
 	 : (void)0)
 
+/* [lock(aio_pending_lock)] Total  #  of  pending  AIO   operations.
+ * Broadcast by the number of additions when new descriptors appear. */
+PRIVATE ATTR_SECTION(".bss.crt.utility.aio") lfutex_t aio_pending_count = 0;
 
+/************************************************************************/
+/* AIO Thread info                                                      */
+/************************************************************************/
+
+/* [lock(ATOMIC)] The # of AIO worker threads in existence.
+ * Incremented just before `pthread_create()', and decremented just before
+ * the actual AIO worker thread exits. */
+PRIVATE ATTR_SECTION(".bss.crt.utility.aio") size_t aio_thread_count = 0;
+
+/* [lock(ATOMIC)] The # of  idle AIO worker  threads in  existence.
+ * Incremented just before the call to sys_lfutex() for the purpose
+ * of waiting for more AIO descriptors, and decremented just  after
+ * that system call returns. */
+PRIVATE ATTR_SECTION(".bss.crt.utility.aio") size_t aio_thread_idle = 0;
+
+
+/************************************************************************/
+/* AIO Limits                                                           */
+/************************************************************************/
 PRIVATE ATTR_SECTION(".data.crt.utility.aio") size_t aiolimit_threads = 4; /* Max # of simultaneous AIO threads. */
 PRIVATE ATTR_SECTION(".data.crt.utility.aio") time_t aiolimit_timeout = 1; /* # of seconds before AIO threads self-terminate. */
 
 
-/* [lock(aio_pending_lock)] Total # of pending AIO operations. */
-PRIVATE ATTR_SECTION(".bss.crt.utility.aio") size_t aio_pending_count = 0;
+/************************************************************************/
+/* AIO Completion signals                                               */
+/************************************************************************/
 
 /* Incremented every time `aio_after_finished_or_removing()' is called.
  * When `aio_completion_signal_waiters' is non-zero, that field is also
@@ -376,30 +399,161 @@ NOTHROW_NCX(LIBCCALL aio_on_completion)(struct aio *__restrict self,
 
 
 
-/* TODO: AIO worker thread main function:
- *   - Must wait on some kind of futex for items to be added to `aio_pending_list',
- *     using a timeout of `aiolimit_timeout'  and self-terminating if this  timeout
- *     expires.
- *   - Once  an AIO object  has been consumed, try  to ATOMIC_CMPXCH it's status
- *     from `AIO_STATUS_PENDING' to `AIO_STATUS_RUNNING' before releasing a lock
- *     from  `aio_pending_lock'. Afterwards, fill in `aio_threadpid' and execute
- *     the  actual AIO operation.  If the operation failed  with `EINTR', try to
- *     ATOMIC_CMPXCH the descriptor's  status from `AIO_STATUS_INTERRUPTING'  to
- *     `AIO_STATUS_REMOVED'. If  this  fails  because the  status  differs  from
- *     `AIO_STATUS_INTERRUPTING',  simply disregard the interrupt and re-try the
- *     AIO operation.
- *     Otherwise, set the status to `AIO_STATUS_FINISHED' before finalizing
- *     the operation with  `aio_on_completion(self, AIO_STATUS_COMPLETED)'.
- *   - If the AIO object's status cannot be ATOMIC_CMPXCH'd from `AIO_STATUS_PENDING'
- *     to  `AIO_STATUS_RUNNING',  release  the  lock  from  `aio_pending_lock' before
- *     asserting  that  its  status  is  `AIO_STATUS_CANCELING'.  Afterwards, confirm
- *     the cancel by calling `aio_on_completion(self, AIO_STATUS_REMOVED)'.
- *   - Once the above two cases have been handled, simply loop back around so-as
- *     to wait for more AIO operations to arrive.
- */
+PRIVATE void *LIBCCALL
+aio_worker_main(void *UNUSED(arg)) {
+	ssize_t result;
+	struct aio *self;
+again:
+	atomic_lock_acquire(&aio_pending_lock);
+	self = TAILQ_FIRST(&aio_pending_list);
+	if (!self) {
+		errno_t error;
+		struct timespec64 timeout;
+		assert(aio_pending_count == 0);
+		atomic_lock_release(&aio_pending_lock);
+		/* Wait for more threads to show up. */
+		timeout.tv_sec  = ATOMIC_READ(aiolimit_timeout);
+		timeout.tv_nsec = 0;
+		error = sys_lfutex(&aio_pending_count,
+		                   LFUTEX_WAIT_WHILE |
+		                   LFUTEX_WAIT_FLAG_TIMEOUT_RELATIVE,
+		                   0, &timeout, 0);
+		if (ATOMIC_READ(aio_pending_count) != 0)
+			goto again;
+		if (error == -ETIMEDOUT) {
+			/* Initiate self-termination */
+			ATOMIC_DEC(aio_thread_count);
+			if (ATOMIC_READ(aio_pending_count) != 0) {
+				ATOMIC_INC(aio_thread_count);
+				goto again;
+			}
+			return NULL;
+		}
+		goto again;
+	}
+
+	/* Found an entry -> Remove from the pending list. */
+	TAILQ_REMOVE_HEAD(&aio_pending_list, aio_link);
+	assert(aio_pending_count != 0);
+	--aio_pending_count;
+
+	/* Try to start serving this descriptor. */
+	if (!ATOMIC_CMPXCH(self->aio_status.as_status,
+	                   AIO_STATUS_PENDING,
+	                   AIO_STATUS_RUNNING)) {
+		/* Special case: descriptor was canceled. */
+		atomic_lock_release(&aio_pending_lock);
+		assert(self->aio_status.as_status == AIO_STATUS_CANCELING);
+		aio_on_completion(self, AIO_STATUS_REMOVED);
+		goto again;
+	}
+	atomic_lock_release(&aio_pending_lock);
+
+	/* The descriptor is now in  progress, so let's to  the
+	 * actual work that all of this has been leading up to! */
+again_operation:
+	switch (self->aio_lio_opcode) {
+
+	case LIO_READ:
+		result = sys_pread64(self->aio_fildes, self->aio_buf, self->aio_nbytes, self->aio_offset);
+		if (result == -ESPIPE) /* pread not supported by this file... */
+			result = sys_read(self->aio_fildes, self->aio_buf, self->aio_nbytes);
+		break;
+
+	case LIO_WRITE:
+		result = sys_pwrite64(self->aio_fildes, self->aio_buf, self->aio_nbytes, self->aio_offset);
+		if (result == -ESPIPE) /* pwrite not supported by this file... */
+			result = sys_write(self->aio_fildes, self->aio_buf, self->aio_nbytes);
+		break;
+
+#ifndef __OPTIMIZE_SIZE__
+	case LIO_NOP:
+		/* NOP should never appear here, but better be safe and handle it as well. */
+		result = EOK;
+		break;
+#endif /* !__OPTIMIZE_SIZE__ */
+
+	case LIO_FSYNC:
+		result = sys_fsync(self->aio_fildes);
+		break;
+
+	case LIO_FDATASYNC:
+		result = sys_fdatasync(self->aio_fildes);
+		break;
+
+	/* TODO: KOS-specific extensions for AIO versions of:
+	 *  - LIO_READV     --> sys_preadv() / sys_readv()
+	 *  - LIO_WRITEV    --> sys_pwritev() / sys_writev()
+	 *  - LIO_SYNC      --> sys_sync()
+	 *  - LIO_SYNCFS    --> sys_syncfs()
+	 *  - LIO_SEND      --> sys_send()      // NOTE: recv doesn't really make sense, though...
+	 *  - LIO_SENDTO    --> sys_sendto()
+	 *  - LIO_SENDMSG   --> sys_sendmsg()
+	 *  - LIO_SENDMMSG  --> sys_sendmmsg()
+	 *  - LIO_MOUNT     --> sys_mount()
+	 *  - LIO_UMOUNT    --> sys_umount()
+	 *  - LIO_SWAPON    --> sys_swapon()
+	 *  - LIO_SWAPOFF   --> sys_swapoff()
+	 *  - LIO_SENDFILE  --> sys_sendfile()
+	 */
+
+	default:
+		/* Fallback: Invalid operation. */
+		result = -EINVAL;
+		break;
+	}
+
+	/* Deal with interrupts. */
+	if (result == -EINTR) {
+		if (ATOMIC_READ(self->aio_status.as_status) != AIO_STATUS_INTERRUPTING)
+			goto again_operation; /* Sporadic interrupt */
+		/* Intentional interrupt */
+		aio_on_completion(self, AIO_STATUS_REMOVED);
+		goto again;
+	}
+
+	/* Store the return value. */
+	self->aio_retval = result;
+
+	/* Indicate completion. */
+	ATOMIC_WRITE(self->aio_status.as_status, AIO_STATUS_FINISHED);
+	aio_on_completion(self, AIO_STATUS_COMPLETED);
+
+	/* Check for more work to be done. */
+	goto again;
+}
 
 
 
+
+/* Spawn a new AIO worker thread.
+ * @return: EOK:    Success.
+ * @return: EAGAIN: Out of memory. */
+PRIVATE errno_t
+NOTHROW(LIBCCALL spawn_aio_worker_thread)(void) {
+	errno_t error;
+	pthread_t pt;
+	pthread_attr_t attr;
+	error = pthread_attr_init(&attr);
+	if unlikely(error != EOK)
+		goto done;
+
+	/* Create the thread with DETACHED disposition. */
+	error = pthread_attr_setdetachstate(&attr, PTHREAD_CREATE_DETACHED);
+	if unlikely(error != EOK)
+		goto done_attr;
+
+	/* Create the new thread */
+	ATOMIC_INC(aio_thread_count);
+	error = pthread_create(&pt, &attr, &aio_worker_main, NULL);
+	if unlikely(error != EOK)
+		ATOMIC_DEC(aio_thread_count);
+
+done_attr:
+	pthread_attr_destroy(&attr);
+done:
+	return error;
+}
 
 
 
@@ -409,24 +563,85 @@ PRIVATE ATTR_SECTION(".text.crt.utility.aio") NONNULL((1, 2)) int
 NOTHROW_NCX(LIBCCALL start_aio_operation_ex)(struct aio *first,
                                              struct aio *last,
                                              size_t count) {
+	size_t thread_limit, spawn_limit;
 	assert(count != 0);
+	assert(first->aio_status.as_status == AIO_STATUS_PENDING);
 	atomic_lock_acquire(&aio_pending_lock);
 	aio_pending_list__lazy_init();
 	TAILQ_INSERT_TAIL_R(&aio_pending_list, first, last, aio_link);
 	aio_pending_count += count;
 	atomic_lock_release(&aio_pending_lock);
 
-	/* TODO: spawn AIO worker threads while:
-	 *       >>     // As set by libc_aio_init()::aioinit::aio_threads
-	 *       >> WORKER_THREAD_COUNT < WORKER_THREAD_LIMIT &&
-	 *       >>     // Note that `aio_pending_count' is constantly re-
-	 *       >>     // read as threads are spawned and will already
-	 *       >>     // begin to consume AIO descriptors.
-	 *       >> WORKER_THREAD_COUNT < ATOMIC_READ(aio_pending_count) &&
-	 *       >>     // Limit to spawning at most `count' threads
-	 *       >> (--count != 0); */
-	abort();
+	/* spawn AIO worker threads while:
+	 * >>     // As set by libc_aio_init()::aioinit::aio_threads
+	 * >> ATOMIC_READ(aio_thread_count) < thread_limit &&
+	 * >>     // Note that `aio_pending_count' is constantly re-
+	 * >>     // read as threads are spawned and will already
+	 * >>     // begin to consume AIO descriptors.
+	 * >> ATOMIC_READ(aio_thread_idle) < ATOMIC_READ(aio_pending_count) &&
+	 * >>     // Limit to spawning at most `count' threads
+	 * >> (count-- != 0); */
+	thread_limit = ATOMIC_READ(aiolimit_threads);
+	spawn_limit  = count;
+	do {
+		errno_t error;
+		if (ATOMIC_READ(aio_thread_count) >= thread_limit)
+			break; /* Not allowed to spawn any more threads. */
+		if (ATOMIC_READ(aio_thread_idle) >= ATOMIC_READ(aio_pending_count))
+			break; /* Already got 1 idle thread for every pending
+			        * request, so no point in starting even more! */
 
+		error = spawn_aio_worker_thread();
+		if (error != EOK) {
+			/* Failed to spawn another thread. If there is at least one
+			 * thread that is still alive, then we may assume that said
+			 * thread would sooner or later get around to servicing our
+			 * descriptor. */
+			if (ATOMIC_READ(aio_thread_count) != 0)
+				break;
+
+			/* Remove our operations from the pending queue. */
+			atomic_lock_acquire(&aio_pending_lock);
+
+			/* Re-check  that no  other thread  was able  to spawn more
+			 * threads, and that the first descriptor is still pending. */
+			if (ATOMIC_READ(aio_thread_count) != 0 &&
+			    first->aio_status.as_status == AIO_STATUS_PENDING) {
+				atomic_lock_release(&aio_pending_lock);
+				break;
+			}
+
+			/* We know that _all_ of our descriptors will still be pending,
+			 * because there aren't any  threads which could consume  them,
+			 * as the only place that can remove arbitrary descriptors from
+			 * the pending set is inside of the AIO worker main function.
+			 *
+			 * As such, there is no race condition in regards to only a few
+			 * of our descriptors having been  completed, as they were  all
+			 * posted  at the same time, meaning that if something had been
+			 * able to consume them, it would have done so for all of them,
+			 * which  we've already checked by looking at the status of the
+			 * first of the set of descriptors we've posted earlier. */
+			assert(aio_pending_count >= count);
+			aio_pending_count -= count;
+			TAILQ_REMOVE_R(&aio_pending_list, first, last, aio_link);
+
+			/* Release our lock from the pending list of AIO descriptors. */
+			atomic_lock_release(&aio_pending_lock);
+
+			/* Set the thread-creation-errno and indicate failure. */
+			return libc_seterrno(error);
+		}
+	} while (--spawn_limit);
+
+	/* Wake up at most `aio_pending_count'  AIO worker threads waiting for  work
+	 * to show up. Note that this must happen after the above spawn loop so that
+	 * the number of idle threads is still correct in relation to new  requests. */
+	sys_lfutex(&aio_pending_count, LFUTEX_WAKE,
+	           ATOMIC_READ(aio_pending_count),
+	           NULL, 0);
+
+	/* And with that, there should be at least 1 thread out there to do our dirty work. */
 	return 0;
 }
 
@@ -496,7 +711,7 @@ switch_status:
 			sched_yield();
 			status.as_word = ATOMIC_READ(self->aio_status.as_word);
 			if (status.as_status != AIO_STATUS_CANCELING)
-				goto switch_status;
+				goto switch_status; /* Should be `AIO_STATUS_REMOVED' at this point... */
 		}
 		/* Remove from the pending list. */
 		TAILQ_REMOVE(&aio_pending_list, self, aio_link);
@@ -1236,7 +1451,10 @@ INTERN ATTR_SECTION(".text.crt.utility.aio") NONNULL((1)) void
 NOTHROW_NCX(LIBCCALL libc_aio_init)(struct aioinit const *init)
 /*[[[body:libc_aio_init]]]*/
 {
-	aiolimit_threads = init->aio_threads;
+	size_t threads = init->aio_threads;
+	if (threads < 1)
+		threads = 1; /* Need at least 1 thread! */
+	aiolimit_threads = threads;
 	aiolimit_timeout = init->aio_idle_time;
 }
 /*[[[end:libc_aio_init]]]*/

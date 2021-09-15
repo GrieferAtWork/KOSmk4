@@ -776,6 +776,7 @@ $errno_t pthread_attr_destroy([[nonnull]] pthread_attr_t *attr);
 
 @@>> pthread_attr_getdetachstate(3)
 @@Get   detach   state    attribute
+@@@param: *detachstate: One of `PTHREAD_CREATE_JOINABLE', `PTHREAD_CREATE_DETACHED'
 @@@return: EOK: Success
 [[decl_include("<bits/types.h>", "<bits/crt/pthreadtypes.h>")]]
 $errno_t pthread_attr_getdetachstate([[nonnull]] pthread_attr_t const *attr,
@@ -783,6 +784,7 @@ $errno_t pthread_attr_getdetachstate([[nonnull]] pthread_attr_t const *attr,
 
 @@>> pthread_attr_setdetachstate(3)
 @@Set   detach   state    attribute
+@@@param: detachstate: One of `PTHREAD_CREATE_JOINABLE', `PTHREAD_CREATE_DETACHED'
 @@@return: EOK:    Success
 @@@return: EINVAL: Invalid/unsupported `detachstate'
 [[decl_include("<bits/types.h>", "<bits/crt/pthreadtypes.h>")]]
