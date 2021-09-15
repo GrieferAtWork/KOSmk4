@@ -23,7 +23,7 @@
 #include "api.h"
 #include <bits/types.h>
 
-/* Absolute pointer encoding formats */
+/* Absolute pointer encoding formats (s.a. `DW_EH_PE_OFF()') */
 #define DW_EH_PE_absptr   0x00
 #define DW_EH_PE_uleb128  0x01
 #define DW_EH_PE_udata2   0x02
@@ -34,7 +34,7 @@
 #define DW_EH_PE_sdata2   0x0a
 #define DW_EH_PE_sdata4   0x0b
 #define DW_EH_PE_sdata8   0x0c
-/* Relative pointer encoding formats */
+/* Relative pointer encoding formats (s.a. `DW_EH_PE_BASE()') */
 #define DW_EH_PE_pcrel    0x10
 #define DW_EH_PE_textrel  0x20
 #define DW_EH_PE_datarel  0x30
@@ -43,6 +43,12 @@
 /* Special */
 #define DW_EH_PE_omit     0xff /* Omit the pointer. */
 #define DW_EH_PE_indirect 0x80 /* FLAG */
+
+/* Extract information from a DWARF pointer encoding format field. */
+#define DW_EH_PE_OFFMASK  0x0f /* Mask for offset format */
+#define DW_EH_PE_BASEMASK 0x70 /* Mask for base format */
+#define DW_EH_PE_OFF(x)  ((x) & DW_EH_PE_OFFMASK)
+#define DW_EH_PE_BASE(x) ((x) & DW_EH_PE_BASEMASK)
 
 
 #ifdef __CC__

@@ -197,8 +197,14 @@ again:
 		/* `aug_end' now points at `c_initinstr' */
 		cie_reader = aug_end;
 	}
-	result->f_pcstart = dwarf_decode_pointer(&fde_reader, result->f_encptr & 0xff, used_sizeof_address, &result->f_bases);
-	result->f_pcend   = dwarf_decode_pointer(&fde_reader, result->f_encptr & 0x0f, used_sizeof_address, &result->f_bases);
+	result->f_pcstart = dwarf_decode_pointer(&fde_reader,
+	                                         result->f_encptr,
+	                                         used_sizeof_address,
+	                                         &result->f_bases);
+	result->f_pcend = dwarf_decode_pointer(&fde_reader,
+	                                       DW_EH_PE_OFF(result->f_encptr),
+	                                       used_sizeof_address,
+	                                       &result->f_bases);
 	if (OVERFLOW_UADD((uintptr_t)result->f_pcstart,
 	                  (uintptr_t)result->f_pcend,
 	                  (uintptr_t *)&result->f_pcend))

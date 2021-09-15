@@ -110,7 +110,7 @@ NOTHROW_NCX(CC libuw_dwarf_decode_pointer)(byte_t const **__restrict preader,
 	byte_t const *reader = *preader;
 
 	/* Relative encoding formats. */
-	switch (encoding & 0x70) {
+	switch (DW_EH_PE_BASE(encoding)) {
 
 	case DW_EH_PE_pcrel:
 		result = (byte_t *)reader; /* Relative to here. */
@@ -162,7 +162,7 @@ NOTHROW_NCX(CC libuw_dwarf_decode_pointer)(byte_t const **__restrict preader,
 		result = (byte_t *)0;
 		break;
 	}
-	switch (encoding & 0xf) {
+	switch (DW_EH_PE_OFF(encoding)) {
 
 	case DW_EH_PE_absptr:
 		if (addrsize >= sizeof(uintptr_t)) {

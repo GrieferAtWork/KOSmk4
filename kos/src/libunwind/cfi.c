@@ -1581,9 +1581,9 @@ do_read_bit_pieces:
 			if unlikely(stacksz >= self->ue_stackmax)
 				ERROR(err_stack_overflow);
 			format = *pc++;
-			if (((format & 0x70) == DW_EH_PE_textrel && self->ue_bases.ub_tbase == NULL) ||
-			    ((format & 0x70) == DW_EH_PE_datarel && self->ue_bases.ub_dbase == NULL) ||
-			    ((format & 0x70) == DW_EH_PE_funcrel && self->ue_bases.ub_fbase == NULL)) {
+			if ((DW_EH_PE_BASE(format) == DW_EH_PE_textrel && self->ue_bases.ub_tbase == NULL) ||
+			    (DW_EH_PE_BASE(format) == DW_EH_PE_datarel && self->ue_bases.ub_dbase == NULL) ||
+			    (DW_EH_PE_BASE(format) == DW_EH_PE_funcrel && self->ue_bases.ub_fbase == NULL)) {
 				/* Figure out base addresses. */
 				union {
 					void const *p;
@@ -1944,14 +1944,9 @@ skip_1_uleb128:
 #if 0
 		dwarf_decode_pointer((byte_t const **)&unwind_pc, encoding, addrsize, NULL);
 #else
-		switch (encoding & 0x70) {
-		case DW_EH_PE_aligned:
+		if (DW_EH_PE_BASE(encoding) == DW_EH_PE_aligned)
 			unwind_pc = (byte_t const *)(((uintptr_t)unwind_pc + (addrsize - 1)) & ~(addrsize - 1));
-			break;
-		default:
-			break;
-		}
-		switch (encoding & 0xf) {
+		switch (DW_EH_PE_OFF(encoding)) {
 		case DW_EH_PE_absptr:
 			unwind_pc += addrsize;
 			break;
