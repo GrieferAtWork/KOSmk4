@@ -3090,7 +3090,7 @@ DEFINE_SYSCALL2(errno_t, kill, pid_t, pid, signo_t, signo) {
 		target = pidns_lookup_task(THIS_PIDNS, (upid_t)-pid);
 do_inherit_target_and_raise_processgroup:
 		FINALLY_DECREF_UNLIKELY(target);
-		info.si_pid = taskpid_getpid_ind(mypid, get_pid_indirection(target));;
+		info.si_pid = taskpid_getpid_ind(mypid, get_pid_indirection(target));
 		if (!task_raisesignalprocessgroup(target, &info))
 			THROW(E_PROCESS_EXITED, task_getpid_of_s(target));
 	}

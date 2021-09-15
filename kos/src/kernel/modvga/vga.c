@@ -1176,7 +1176,7 @@ again:
 					kfree(textbuf);
 					RETHROW();
 				}
-				new_textsize = self->v_textsizex * self->v_textsizey * 2;;
+				new_textsize = self->v_textsizex * self->v_textsizey * 2;
 				if unlikely(self->v_state & VGA_STATE_FGRAPHICS) {
 					sync_endwrite_both(self);
 					kfree(textbuf);

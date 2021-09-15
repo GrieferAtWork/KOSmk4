@@ -53,7 +53,7 @@ DECL_BEGIN
 
 DEFINE_TEST(aio) {
 	char buf[512];
-	fd_t pipefds[2];;
+	fd_t pipefds[2];
 	struct aiocb aio;
 	struct aiocb *aio_list[] = { &aio };
 	EQd(pipe(pipefds), 0);

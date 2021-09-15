@@ -273,7 +273,7 @@ NOTHROW(FCALL GDB_ClearAllBreakpointsOfMMan)(struct mman *__restrict effective_m
 			continue; /* Already in use. */
 		/* Try to delete this slot. */
 		if (!ATOMIC_CMPXCH(GDBBreak_SwList[i].sb_vm, effective_mm, NULL))
-			continue;;
+			continue;
 		if (isfirst) {
 			GDBBreak_SwMinFree_SetLower(i);
 			isfirst = false;

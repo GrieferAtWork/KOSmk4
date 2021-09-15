@@ -1300,10 +1300,10 @@ AsyncSend_Poll(async_job_t self,
 	struct async_send_job *me;
 	me = (struct async_send_job *)self;
 	if (AsyncSend_Test(me))
-		return ASYNC_JOB_POLL_AVAILABLE;;
+		return ASYNC_JOB_POLL_AVAILABLE;
 	task_connect_for_poll(&me->as_socket->us_sendbuf->pb_psta);
 	if (AsyncSend_Test(me))
-		return ASYNC_JOB_POLL_AVAILABLE;;
+		return ASYNC_JOB_POLL_AVAILABLE;
 	return ASYNC_JOB_POLL_WAITFOR_NOTIMEOUT;
 }
 #endif /* !CONFIG_USE_NEW_ASYNC */

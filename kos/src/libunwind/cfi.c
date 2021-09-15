@@ -370,7 +370,7 @@ libuw_unwind_emulator_calculate_cfa(unwind_emulator_t *__restrict self) {
 #ifndef __KERNEL__
 		/* Lazily load libdebuginfo.so, so we can parser the .debug_info section */
 		if (!pdyn_debuginfo_cu_abbrev_fini && unlikely(libuw_load_libdebuginfo()))
-			goto err_no_cfa;;
+			goto err_no_cfa;
 #endif /* !__KERNEL__ */
 
 		/* Also search the `.debug_frame' section, using `unwind_fde_scan_df()' */

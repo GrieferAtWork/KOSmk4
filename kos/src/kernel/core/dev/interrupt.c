@@ -340,7 +340,7 @@ NOTHROW(KCALL isr_vector_state_cleanup_noop_hisr)(struct isr_vector_state *__res
 #ifndef NDEBUG
 						assert(old_state->ivs_handv[oi].ivh_arg != ignored_arg);
 #endif /* !NDEBUG */
-						hisr_destroy((struct hisr *)old_state->ivs_greedy_arg);;
+						hisr_destroy((struct hisr *)old_state->ivs_greedy_arg);
 					}
 				} while (++oi < old_state->ivs_handc);
 				break;

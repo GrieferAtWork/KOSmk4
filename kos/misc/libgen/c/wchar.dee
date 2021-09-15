@@ -506,7 +506,7 @@ got_result_prototypes:
 				impl: replaceWcharFunctionImplementation(
 					wcLoaderImpl.impl, mode, functionName, result.prototype),
 				ppCond:       replaceWcharText(wcLoaderImpl.ppCond, mode),
-				ppCondPrefix: replaceWcharTextArray(wcLoaderImpl.ppCondPrefix, mode));;
+				ppCondPrefix: replaceWcharTextArray(wcLoaderImpl.ppCondPrefix, mode));
 			m_cx_cache[pair] = result;
 		}
 		return result;

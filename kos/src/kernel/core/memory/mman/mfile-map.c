@@ -703,7 +703,7 @@ continue_with_pnode:
 					 * above! */
 					SLIST_P_INSERT_BEFORE(p_node, new_node, _mn_alloc);
 					prev   = new_node;
-					p_node = SLIST_PNEXT(new_node, _mn_alloc);;
+					p_node = SLIST_PNEXT(new_node, _mn_alloc);
 					goto continue_with_pnode;
 				}
 			} /* Scope... */
@@ -740,7 +740,7 @@ continue_with_pnode:
 			/* Insert the new node and continue scanning for holes afterwards. */
 			SLIST_P_INSERT_BEFORE(p_node, new_node, _mn_alloc);
 			prev   = new_node;
-			p_node = SLIST_PNEXT(new_node, _mn_alloc);;
+			p_node = SLIST_PNEXT(new_node, _mn_alloc);
 			goto continue_with_pnode;
 		} else {
 			/* No gap here :) */
