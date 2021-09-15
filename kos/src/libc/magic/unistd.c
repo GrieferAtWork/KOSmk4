@@ -2955,25 +2955,15 @@ $longptr_t sysconf(__STDC_INT_AS_UINT_T name);
 %
 %{
 #ifdef __USE_GNU
-#if defined(__COMPILER_HAVE_AUTOTYPE) && defined(__COMPILER_HAVE_TYPEOF)
-#define TEMP_FAILURE_RETRY(expression)                             \
-	__XBLOCK({                                                     \
-		__auto_type __tfr_result;                                  \
-		do {                                                       \
-			__tfr_result = (expression);                           \
-		} while (__tfr_result == (__typeof__(__tfr_result)) - 1 && \
-		         errno == EINTR);                                  \
-		__XRETURN __tfr_result;                                    \
-	})
-#elif defined(__COMPILER_HAVE_TYPEOF)
-#define TEMP_FAILURE_RETRY(expression)                             \
-	__XBLOCK({                                                     \
-		__typeof__(expression) __tfr_result;                       \
-		do {                                                       \
-			__tfr_result = (expression);                           \
-		} while (__tfr_result == (__typeof__(__tfr_result)) - 1 && \
-		         errno == EINTR);                                  \
-		__XRETURN __tfr_result;                                    \
+#ifdef __COMPILER_HAVE_TYPEOF
+#define TEMP_FAILURE_RETRY(expression)                           \
+	__XBLOCK({                                                   \
+		__typeof__(expression) __tfr_result;                     \
+		do {                                                     \
+			__tfr_result = (expression);                         \
+		} while (__tfr_result == (__typeof__(__tfr_result))-1 && \
+		         errno == EINTR);                                \
+		__XRETURN __tfr_result;                                  \
 	})
 #else /* __COMPILER_HAVE_TYPEOF */
 #define TEMP_FAILURE_RETRY(expression)                   \
