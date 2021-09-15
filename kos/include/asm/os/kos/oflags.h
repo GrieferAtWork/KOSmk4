@@ -41,7 +41,7 @@
                                        * and  `O_WRONLY'  or  `O_RDWR'  access  is  specified. */
 #define __O_APPEND          0x0000400 /* Always append data to the end of the file */
 #define __O_NONBLOCK        0x0000800 /* Do not block when trying to read data that hasn't been written, yet. */
-#define __O_SYNC            0x0001000 /* ??? */
+#define __O_SYNC            0x0101000 /* ??? */
 #define __O_DSYNC           0x0001000 /* ??? */
 #define __O_ASYNC           0x0002000 /* ??? */
 #define __O_DIRECT          0x0004000 /* ??? */
@@ -60,7 +60,7 @@
 #define __O_PATH            0x0200000 /* Open a path for *at system calls. */
 #define __O_TMPFILE        (0x0400000 | __O_DIRECTORY) /* Open a temporary file */
 #ifdef __KOS__
-#define __O_CLOFORK         0x0100000 /* Close the handle when the file descriptors are unshared (s.a. `CLONE_FILES') */
+#define __O_CLOFORK         0x1000000 /* Close the handle when the file descriptors are unshared (s.a. `CLONE_FILES') */
 #define __O_SYMLINK         0x2000000 /* Open a symlink itself, rather than dereferencing it. (This flag implies `O_NOFOLLOW')
                                        * NOTE: When  combined  with `O_EXCL',  throw  an `E_FSERROR_NOT_A_SYMBOLIC_LINK:
                                        *       E_FILESYSTEM_NOT_A_SYMBOLIC_LINK_OPEN' if the file isn't a symbolic link. */

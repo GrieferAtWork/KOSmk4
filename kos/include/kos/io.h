@@ -489,6 +489,16 @@ typedef unsigned int poll_mode_t; /* Set of `POLL*' */
 
 
 
+#if !defined(FD_CLOEXEC) && defined(__FD_CLOEXEC)
+#define FD_CLOEXEC __FD_CLOEXEC /* FLAG: Close the descriptor on `exec()'. */
+#endif /* !FD_CLOEXEC && __FD_CLOEXEC */
+#if !defined(FD_CLOFORK) && defined(__FD_CLOFORK)
+#define FD_CLOFORK __FD_CLOFORK /* FLAG: Close the descriptor during unsharing after `fork()' (Similar to `PROT_LOOSE' for memory). */
+#endif /* !FD_CLOFORK && __FD_CLOFORK */
+
+
+
+
 /* Universal I/O mode & handle access flags. */
 #ifndef IO_GENERIC
 #define IO_GENERIC    0x0000 /* Generic I/O access. */
@@ -498,15 +508,23 @@ typedef unsigned int poll_mode_t; /* Set of `POLL*' */
 #define IO_RDWR       0x0002 /* Read/write access */
 #define IO_RDWR_ALT   0x0003 /* Read/write access */
 #define IO_CLOEXEC    0x0004 /* Close during exec() */
-#define IO_CLOFORK    0x0008 /* Close during fork() (or rather: `unshare(CLONE_FILES)') */
-#define IO_APPEND     0x0400 /* Append newly written data at the end */
-#define IO_NONBLOCK   0x0800 /* Don't block in I/O */
-#define IO_SYNC       0x1000 /* Ensure that all modified caches are flushed during write() */
+/*efine IO_           0x0008  * -- O_<undef> */
+/*efine IO_           0x0010  * -- O_<undef> */
+/*efine IO_           0x0020  * -- O_<undef> */
+/*efine IO_           0x0040  * -- O_CREAT */
+#define IO_CLOFORK    0x0080 /* Close during fork() (or rather: `unshare(CLONE_FILES)') */
+/*efine IO_           0x0100  * -- O_NOCTTY */
+/*efine IO_           0x0200  * -- O_TRUNC */
+#define IO_APPEND     0x0400 /* Append newly written data at the end (== O_APPEND) */
+#define IO_NONBLOCK   0x0800 /* Don't block in I/O (== O_NONBLOCK) */
+#define IO_DSYNC      0x1000 /* Ensure that all modified caches are flushed during write() (== O_DSYNC) */
 #define IO_ASYNC      0x2000 /* Use asynchronous I/O and generate SIGIO upon completion. */
 #define IO_DIRECT     0x4000 /* Bypass input/output buffers if possible. - Try to read/write data directly to/from provided buffers. */
 #define IO_NODATAZERO 0x8000 /* For use with  `IO_NONBLOCK': Allow  0 to be  returned (which  normally indicates  EOF)
                               * when no data  is available at  the moment (which  normally would cause  `E_WOULDBLOCK'
                               * to be thrown). NOTE: This flag is merely a hint. - Functions are allowed to ignore it! */
+#define IO_OFLAG_IDENT_MASK 0x7c03 /* Mask of flags with identical values to O_* flags */
+
 
 /* Check if reading/writing is possible with a given I/O mode. */
 #define IO_CANREAD(mode)      (((mode) & IO_ACCMODE) != IO_WRONLY)
@@ -515,10 +533,10 @@ typedef unsigned int poll_mode_t; /* Set of `POLL*' */
 
 /* Mask of flags accepted by the kos extension functions:
  *  `readf', `writef', `preadf', `pwritef', `ioctlf()', `hopf()' */
-#define IO_USERF_MASK (IO_APPEND | IO_NONBLOCK | IO_SYNC | IO_DIRECT | IO_NODATAZERO)
+#define IO_USERF_MASK (IO_APPEND | IO_NONBLOCK | IO_DSYNC | IO_DIRECT | IO_NODATAZERO)
 
 /* Mask of flags modifiable via `F_SETFD' / `F_SETFL' */
-#define IO_SETFL_MASK (IO_APPEND | IO_NONBLOCK | IO_SYNC | IO_ASYNC | IO_DIRECT | IO_NODATAZERO)
+#define IO_SETFL_MASK (IO_APPEND | IO_NONBLOCK | IO_DSYNC | IO_ASYNC | IO_DIRECT | IO_NODATAZERO)
 
 /* Mask for handle flags (flags not inherited during `dup()'). */
 #define IO_SETFD_MASK (IO_CLOEXEC | IO_CLOFORK)
@@ -527,17 +545,17 @@ typedef unsigned int poll_mode_t; /* Set of `POLL*' */
  *       Additionally,   their   `O_*'   equivalent   have   different   values. */
 #define IO_HANDLE_CLOEXEC           IO_CLOEXEC /* Close during exec() */
 #define IO_HANDLE_CLOFORK           IO_CLOFORK /* Close during fork() (or rather: `unshare(CLONE_FILES)') */
-#define IO_HANDLE_FFROM_OPENFLAG(x) (__CCAST(__iomode_t)(((x) & 0x180000) >> 17))
-#define IO_HANDLE_FTO_OPENFLAG(x)   ((__CCAST(__oflag_t)(x) & 0xc) << 17)
+#define IO_HANDLE_FFROM_OPENFLAG(x) (__CCAST(__iomode_t)(((x) & 0x1080000) >> 17))
+#define IO_HANDLE_FTO_OPENFLAG(x)   ((__CCAST(__oflag_t)(x) & 0x84) << 17)
 /* Similar to `IO_HANDLE_FFROM_O()' / `IO_HANDLE_FTO_O()', but used for converting `FD_*' flags. */
 #define IO_HANDLE_FFROM_FD(x) (__CCAST(__iomode_t)((x) << 2))
-#define IO_HANDLE_FTO_FD(x)   (__CCAST(__oflag_t)(x) >> 2)
+#define IO_HANDLE_FTO_FD(x)   (((x) & (IO_HANDLE_CLOEXEC | IO_HANDLE_CLOFORK)) >> 2)
 
 /* Convert I/O flags to/from `O_*' flags. */
-#define IO_FROM_OPENFLAG(x)          (((x) & 0xfff3) | IO_HANDLE_FFROM_OPENFLAG(x))
-#define IO_TO_OPENFLAG(x)            (((x) & 0xfff3) | IO_HANDLE_FTO_OPENFLAG(x))
-#define IO_FROM_OPENFLAG_NOHANDLE(x) ((x) & 0xfff3)
-#define IO_TO_OPENFLAG_NOHANDLE(x)   ((x) & 0xfff3)
+#define IO_FROM_OPENFLAG(x)          (((x) & IO_OFLAG_IDENT_MASK) | IO_HANDLE_FFROM_OPENFLAG(x))
+#define IO_TO_OPENFLAG(x)            (((x) & IO_OFLAG_IDENT_MASK) | IO_HANDLE_FTO_OPENFLAG(x))
+#define IO_FROM_OPENFLAG_NOHANDLE(x) ((x) & IO_OFLAG_IDENT_MASK)
+#define IO_TO_OPENFLAG_NOHANDLE(x)   ((x) & IO_OFLAG_IDENT_MASK)
 #endif /* !IO_GENERIC */
 
 

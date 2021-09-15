@@ -1127,7 +1127,7 @@ PRIVATE struct {
 	{ IO_CLOFORK,    "CLOFORK" },
 	{ IO_APPEND,     "APPEND" },
 	{ IO_NONBLOCK,   "NONBLOCK" },
-	{ IO_SYNC,       "SYNC" },
+	{ IO_DSYNC,      "DSYNC" },
 	{ IO_DIRECT,     "DIRECT" },
 	{ IO_NODATAZERO, "NODATAZERO" },
 };
@@ -1140,7 +1140,7 @@ print_iomode_t_impl(pformatprinter printer, void *arg,
 	unsigned int i;
 	enum {
 		VALID_MASK = (IO_ACCMODE | IO_CLOEXEC | IO_CLOFORK |
-		              IO_APPEND | IO_NONBLOCK | IO_SYNC |
+		              IO_APPEND | IO_NONBLOCK | IO_DSYNC |
 		              IO_DIRECT | IO_NODATAZERO)
 	};
 	if (force_accmode || (iomodes & IO_ACCMODE) != 0) {

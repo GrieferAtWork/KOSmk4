@@ -146,7 +146,7 @@ typedef struct ATTR_PACKED {
 	                                          * of times to prevent file recovery upon deletion. */
 #define EXT2_INODE_FKEEP_DATA     0x00000002 /* (IGNORED) Try to preserve file data for as long as
 	                                          * possible after deletion to allow for undelete. */
-#define EXT2_INODE_FSYNC          0x00000008 /* Changes are written to disk immediately. (same as `IO_SYNC') */
+#define EXT2_INODE_FSYNC          0x00000008 /* Changes are written to disk immediately. (same as `IO_DSYNC') */
 #define EXT2_INODE_FIMMUTABLE     0x00000010 /* File contents cannot be modified. */
 #define EXT2_INODE_FAPPEND        0x00000020 /* Opening the file forces `O_APPEND' to be used.
 	                                          * However, mapping the file to memory still allows

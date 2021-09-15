@@ -248,7 +248,7 @@
 /* File descriptor flags (s.a. `F_GETFD' and `F_SETFL') */
 #define __FD_CLOEXEC 0x01 /* FLAG: Close the descriptor on `exec()'. */
 #ifdef __KOS__
-#define __FD_CLOFORK 0x02 /* FLAG: Close the descriptor during unsharing after `fork()' (Similar to `PROT_LOOSE' for memory). */
+#define __FD_CLOFORK 0x20 /* FLAG: Close the descriptor during unsharing after `fork()' (Similar to `PROT_LOOSE' for memory). */
 #endif /* __KOS__ */
 
 #define __F_RDLCK 0 /* Read lock. */
