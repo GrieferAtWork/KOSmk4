@@ -178,6 +178,31 @@ DEFINE_SYSCALL6(syscall_slong_t, futex,
 }
 #endif /* __ARCH_WANT_SYSCALL_FUTEX */
 
+#ifdef __ARCH_WANT_SYSCALL_FUTEX_TIME64
+DEFINE_SYSCALL6(syscall_slong_t, futex_time64,
+                USER UNCHECKED uint32_t *, uaddr,
+                syscall_ulong_t, futex_op,
+                uint32_t, val,
+                USER UNCHECKED struct timespec64 const *, timeout_or_val2,
+                USER UNCHECKED uint32_t *, uaddr2,
+                uint32_t, val3) {
+	syscall_slong_t result;
+	ktime_t timeout = KTIME_INFINITE;
+	if (LINUX_FUTEX_USES_TIMEOUT(futex_op) && timeout_or_val2) {
+		/* `FUTEX_WAIT' takes a relative timeout, while all others takes an absolute one. */
+		if ((futex_op & 127) == FUTEX_WAIT) {
+			timeout = ktime() + relktime_from_user_rel(timeout_or_val2);
+		} else {
+			timeout = ktime_from_user(timeout_or_val2);
+		}
+	}
+	result = sys_futex_impl(uaddr, futex_op, val, timeout,
+	                        (uint32_t)(uintptr_t)timeout_or_val2,
+	                        uaddr2, val3);
+	return result;
+}
+#endif /* __ARCH_WANT_SYSCALL_FUTEX_TIME64 */
+
 #ifdef __ARCH_WANT_COMPAT_SYSCALL_FUTEX
 DEFINE_COMPAT_SYSCALL6(syscall_slong_t, futex,
                        USER UNCHECKED uint32_t *, uaddr,
@@ -202,6 +227,31 @@ DEFINE_COMPAT_SYSCALL6(syscall_slong_t, futex,
 	return result;
 }
 #endif /* __ARCH_WANT_COMPAT_SYSCALL_FUTEX */
+
+#ifdef __ARCH_WANT_COMPAT_SYSCALL_FUTEX_TIME64
+DEFINE_COMPAT_SYSCALL6(syscall_slong_t, futex_time64,
+                       USER UNCHECKED uint32_t *, uaddr,
+                       syscall_ulong_t, futex_op,
+                       uint32_t, val,
+                       USER UNCHECKED struct compat_timespec64 const *, timeout_or_val2,
+                       USER UNCHECKED uint32_t *, uaddr2,
+                       uint32_t, val3) {
+	syscall_slong_t result;
+	ktime_t timeout = KTIME_INFINITE;
+	if (LINUX_FUTEX_USES_TIMEOUT(futex_op) && timeout_or_val2) {
+		/* `FUTEX_WAIT' takes a relative timeout, while all others takes an absolute one. */
+		if ((futex_op & 127) == FUTEX_WAIT) {
+			timeout = ktime() + relktime_from_user_rel(timeout_or_val2);
+		} else {
+			timeout = ktime_from_user(timeout_or_val2);
+		}
+	}
+	result = sys_futex_impl(uaddr, futex_op, val, timeout,
+	                        (uint32_t)(uintptr_t)timeout_or_val2,
+	                        uaddr2, val3);
+	return result;
+}
+#endif /* __ARCH_WANT_COMPAT_SYSCALL_FUTEX_TIME64 */
 
 DECL_END
 
