@@ -59,6 +59,14 @@ BEGIN GROUP("apps.system-test") { COMPILE, LINK, MCOPY };
 	LINKER_SCRIPT("system-test/arch/" + XARCH + "/_linker" + SUFFIX + ".ld")
 	SET_OUTPUT("/bin/system-test")
 
+	/* Because libstdc++'s override for __gcc_personality_v0 makes it really
+	 * hard to debug exception-related problems, exclude it from the link. */
+	SET_NOSTDLIB()
+	USELIB("libc")
+	STATIC_USELIBGCC()
+	STATIC_USELIB("libssp")
+	OBJECT({ TARGET_BINPATH + DISK_LIBPATH + "crt0.o" });
+
 	/* When building the compatibility-mode system libraries for x86_64, also
 	 * include a regular 32-bit application /bin/system-test32 that is the 32-bit
 	 * variant of /bin/system-test, but will have to be executed in compatibility
