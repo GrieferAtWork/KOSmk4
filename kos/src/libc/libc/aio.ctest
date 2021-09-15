@@ -1,0 +1,92 @@
+/* Copyright (c) 2019-2021 Griefer@Work                                       *
+ *                                                                            *
+ * This software is provided 'as-is', without any express or implied          *
+ * warranty. In no event will the authors be held liable for any damages      *
+ * arising from the use of this software.                                     *
+ *                                                                            *
+ * Permission is granted to anyone to use this software for any purpose,      *
+ * including commercial applications, and to alter it and redistribute it     *
+ * freely, subject to the following restrictions:                             *
+ *                                                                            *
+ * 1. The origin of this software must not be misrepresented; you must not    *
+ *    claim that you wrote the original software. If you use this software    *
+ *    in a product, an acknowledgement (see the following) in the product     *
+ *    documentation is required:                                              *
+ *    Portions Copyright (c) 2019-2021 Griefer@Work                           *
+ * 2. Altered source versions must be plainly marked as such, and must not be *
+ *    misrepresented as being the original software.                          *
+ * 3. This notice may not be removed or altered from any source distribution. *
+ */
+#ifndef GUARD_LIBC_LIBC_AIO_CTEST
+#define GUARD_LIBC_LIBC_AIO_CTEST 1
+#define _GNU_SOURCE 1
+#define _KOS_SOURCE 1
+#undef NDEBUG
+
+#include <hybrid/compiler.h>
+
+#include <kos/types.h>
+#include <system-test/ctest.h>
+
+#include <aio.h>
+#include <assert.h>
+#include <errno.h>
+#include <pthread.h>
+#include <fcntl.h>
+#include <signal.h>
+#include <string.h>
+#include <unistd.h>
+
+DECL_BEGIN
+
+/* TODO: libc's __gxx_personality_v0 is entirely broken because we're always
+ *       just discarding the `.data.rel.local.DW.ref.__gxx_personality_v0'
+ *       section!
+ *  - As a result, libunwind will decode an indirect personality location
+ *    that points to an entirely unrelated location, which currently always
+ *    dereferences to a pointer `0x00002CFF' (in i386)
+ *    As a result, `libc_error_unwind()' will try to call that address which
+ *    in turn results in a segfault, resulting in another exception that
+ *    then results in the same...
+ *  - Iow: trying to propagate an exception through libc is broken!
+ */
+
+DEFINE_TEST(aio) {
+	char buf[512];
+	fd_t pipefds[2];;
+	struct aiocb aio;
+	struct aiocb *aio_list[] = { &aio };
+	EQd(pipe(pipefds), 0);
+
+	/* Start reading from the pipe. */
+	memset(&aio, 0, sizeof(aio));
+	aio.aio_fildes                = pipefds[0];
+	aio.aio_buf                   = buf;
+	aio.aio_nbytes                = sizeof(buf);
+	aio.aio_sigevent.sigev_notify = SIGEV_NONE;
+	EQd(aio_read(&aio), 0);
+	EQd(aio_error(&aio), EINPROGRESS);
+
+	/* Write some data to the pipe. */
+	EQss(write(pipefds[1], "test data", 9), 9);
+	EQd(close(pipefds[1]), 0);
+
+	/* Wait for AIO to complete. */
+	EQd(TEMP_FAILURE_RETRY(aio_suspend(aio_list, 1, NULL)), 0);
+	EQd(close(pipefds[0]), 0);
+
+	/* Ensure that AIO has the correct contents. */
+	EQd(aio_error(&aio), 0);
+	EQss(aio_return(&aio), 9);
+
+	/* Reading `aio_return()' a second time should fail with EINVAL */
+	errno = 0;
+	EQss(aio_return(&aio), -1);
+	EQd(errno, EINVAL);
+
+	assertf(memcmp(buf, "test data", 9) == 0, "%$q", 9, buf);
+}
+
+DECL_END
+
+#endif /* !GUARD_LIBC_LIBC_AIO_CTEST */
