@@ -20,11 +20,14 @@
 #ifndef GUARD_LIBC_LIBC_ARCH_I386_SYSCALL_BASE64_S
 #define GUARD_LIBC_LIBC_ARCH_I386_SYSCALL_BASE64_S 1
 #define __ASSEMBLER__ 1
+#define _KOS_SOURCE 1
 
 #include <hybrid/compiler.h>
 
 #include <asm/cfi.h>
 #include <sys/syscall.h>
+
+#include <errno.h>
 
 .section .text.crt.system.utility
 INTERN_FUNCTION(libc_syscall)
@@ -37,7 +40,7 @@ INTERN_FUNCTION(libc_syscall)
 	movq   %r9,     %r8  /* arg #4 */
 	movq   8(%rsp), %r9  /* arg #5 */
 	syscall
-	cmpq   $(-4096), %rax /* Check for error. */
+	cmpq   $(-ELIMIT), %rax /* Check for error. */
 	ja     1f
 	ret
 1:	movq   %rax, %rdi
@@ -55,7 +58,6 @@ DEFINE_PUBLIC_ALIAS(__syscall, libc_syscall64)
 .section .text.crt.except.system.utility
 INTERN_FUNCTION(libc_Syscall)
 	.cfi_startproc
-	.cfi_escape 0x16, 0x31, 0x07, 0x90, 0x31, 0x0a, 0x00, 0x04, 0x20, 0x1a /* Clear EFLAGS.DF on exit */
 	movq   %rdi,    %rax /* sysno */
 	movq   %rsi,    %rdi /* arg #0 */
 	movq   %rdx,    %rsi /* arg #1 */
@@ -64,6 +66,9 @@ INTERN_FUNCTION(libc_Syscall)
 	movq   %r9,     %r8  /* arg #4 */
 	movq   8(%rsp), %r9  /* arg #5 */
 	std /* Enable exceptions */
+/*[[[cfi{register='%rflags'} push %rflags; and ~$EFLAGS_DF]]]*/
+	.cfi_escape 22,49,7,146,49,0,11,255,251,26
+/*[[[end]]]*/
 	syscall
 	cld /* Disable exceptions */
 	ret

@@ -212,10 +212,10 @@ again:
  * suspend execution, such  that the caller  will end up  as the only  running
  * thread on the entire system.
  *
- * Note that in order to do something like this, preemption must be  enabled,
- * since other CPUs can only receive super-override-suspend request when they
- * have preemption enabled, meaning that if 2 CPUs were to call this function
- * at  the same time, one of them would  have to wait for the other's suspend
+ * Note  that in order to do something  like this, preemption must be enabled,
+ * since other CPUs can only receive super-override-suspend requests when they
+ * have preemption enabled, meaning that if 2 CPUs were to call this  function
+ * at the same time, one  of them would have to  wait for the other's  suspend
  * IPI, which in turn requires preemption to be enabled.
  *
  * So as a result, a function like this one can only be implemented safely

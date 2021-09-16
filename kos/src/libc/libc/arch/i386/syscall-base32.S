@@ -20,6 +20,7 @@
 #ifndef GUARD_LIBC_LIBC_ARCH_I386_SYSCALL_BASE32_S
 #define GUARD_LIBC_LIBC_ARCH_I386_SYSCALL_BASE32_S 1
 #define __ASSEMBLER__ 1
+#define _KOS_SOURCE 1
 
 #include <hybrid/compiler.h>
 
@@ -29,6 +30,8 @@
 #include <asm/cpu-cpuid.h>
 #include <asm/instr/ttest.h>
 #include <sys/syscall.h>
+
+#include <errno.h>
 
 #include <libdebuginfo/dwarf.h>
 #include <libunwind/cfi.h>
@@ -326,7 +329,9 @@ END(libc___i386_syscall)
 INTERN_FUNCTION(libc___i386_Xsyscall)
 #define _CFI_FUNBASE_OFFSET 1 /* Offset from `.cfi_startproc' to 0x55 (`pushl %ebp') or 0xcd (`int $0x80') */
 	.cfi_startproc
-	.cfi_escape 0x16, 0x09, 0x06, 0x59, 0x0a, 0x00, 0x04, 0x20, 0x1a /* Clear EFLAGS.DF */
+/*[[[cfi{register='%eflags'} push %eflags; and ~$EFLAGS_DF]]]*/
+	.cfi_escape 22,9,6,121,0,11,255,251,26
+/*[[[end]]]*/
 	.byte  0xfd              /* std                             std           */
 
 	.byte  0x55              /* pushl  %ebp                     int $0x80     */
@@ -396,7 +401,7 @@ INTERN_FUNCTION(libc_syscall)
 	movl   40(%esp), %edi /* arg #4 */
 	movl   44(%esp), %ebp /* arg #5 */
 	call   libc___i386_syscall
-	cmpl   $-4096, %eax /* Check for error. */
+	cmpl   $(-ELIMIT), %eax /* Check for error. */
 	ja     1f
 	.cfi_remember_state
 	popl_cfi_r %ebp

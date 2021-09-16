@@ -771,7 +771,7 @@ NOTHROW(FCALL sched_intern_localwake)(struct cpu *__restrict me,
 }
 
 
-/* Add a new (running) thread to current CPU.
+/* Add a new (running) thread to the current CPU.
  * @return: * :  The new thread with which to continue execution. */
 PUBLIC NOBLOCK NOPREEMPT ATTR_RETNONNULL WUNUSED NONNULL((1, 2, 3)) struct task *
 NOTHROW(FCALL sched_intern_localadd)(struct cpu *__restrict me,
@@ -802,7 +802,7 @@ NOTHROW(FCALL sched_intern_localadd)(struct cpu *__restrict me,
 }
 
 
-/* Yield execution to some other thread, returning the switch to which to switch.
+/* Yield execution to some other thread, returning the thread to which to switch.
  * If  it  is  impossible  to   yield  to  anyone,  simply  re-return   `caller'. */
 PUBLIC NOBLOCK NOPREEMPT ATTR_RETNONNULL WUNUSED NONNULL((1, 2)) struct task *
 NOTHROW(FCALL sched_intern_yield)(struct cpu *__restrict me,
@@ -1614,7 +1614,7 @@ cannot_shut_down:
  * Note that this is quite similar to disabling preemption,  however
  * many cases exist where disabling preemption is overkill, or maybe
  * even be counter-productive  (i.e. certain functionality  requires
- * thatpreemption remain enabled, such as disk-, user-, or  network-
+ * that preemption remain enabled, such as disk-, user-, or network-
  * I/O)
  *
  * Another similar mechanism  is to set  the TASK_FKEEPCORE flag  for

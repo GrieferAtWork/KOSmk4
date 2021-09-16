@@ -31,6 +31,7 @@
 #include <kernel/user.h>
 #include <sched/pid.h>
 #include <sched/posix-signal.h>
+#include <sched/task.h>
 
 #include <compat/config.h>
 #include <kos/except/reason/inval.h>
@@ -129,7 +130,7 @@ DEFINE_SYSCALL3(fd_t, pidfd_getfd,
 #if (defined(__ARCH_WANT_SYSCALL_PIDFD_SEND_SIGNAL) || \
      defined(__ARCH_WANT_COMPAT_SYSCALL_PIDFD_SEND_SIGNAL))
 
-PRIVATE errno_t KCALL
+PRIVATE NONNULL((2)) errno_t KCALL
 pidfd_send_signal_impl(fd_t pidfd,
                        siginfo_t const *__restrict info,
                        syscall_ulong_t flags) {

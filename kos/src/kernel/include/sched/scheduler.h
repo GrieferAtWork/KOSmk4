@@ -197,7 +197,7 @@ DATDEF struct task bootidle;
 
 /* Enumerate all (running+sleeping) threads of the given CPU
  * WARNING: The CPU's IDLE thread may or may not be enumerated!
- *          The IDLE thread is only  enumerated if it was  been
+ *          The IDLE thread is only  enumerated if it has  been
  *          scheduled before, but has yet to unschedule itself. */
 #define FOREACH_thiscpu_threads(iter, me)                                       \
 	for ((iter) = LIST_FIRST(&FORCPU(me, thiscpu_scheduler.s_running)); (iter); \
@@ -255,7 +255,7 @@ NOTHROW(FCALL sched_intern_localwake)(struct cpu *__restrict me,
                                       struct task *__restrict thread,
                                       __BOOL high_priority);
 
-/* Add a new (running) thread to current CPU.
+/* Add a new (running) thread to the current CPU.
  * @return: * :  The new thread with which to continue execution. */
 FUNDEF NOBLOCK NOPREEMPT ATTR_RETNONNULL WUNUSED NONNULL((1, 2, 3)) struct task *
 NOTHROW(FCALL sched_intern_localadd)(struct cpu *__restrict me,
@@ -263,7 +263,7 @@ NOTHROW(FCALL sched_intern_localadd)(struct cpu *__restrict me,
                                      /*inherit*/ REF struct task *__restrict thread,
                                      __BOOL high_priority);
 
-/* Yield execution to some other thread, returning the switch to which to switch.
+/* Yield execution to some other thread, returning the thread to which to switch.
  * If  it  is  impossible  to   yield  to  anyone,  simply  re-return   `caller'. */
 FUNDEF NOBLOCK NOPREEMPT ATTR_RETNONNULL WUNUSED NONNULL((1, 2)) struct task *
 NOTHROW(FCALL sched_intern_yield)(struct cpu *__restrict me,
@@ -301,7 +301,7 @@ DATDEF ATTR_PERCPU struct task *thiscpu_sched_override;
  * Note that this is quite similar to disabling preemption,  however
  * many cases exist where disabling preemption is overkill, or maybe
  * even be counter-productive  (i.e. certain functionality  requires
- * thatpreemption remain enabled, such as disk-, user-, or  network-
+ * that preemption remain enabled, such as disk-, user-, or network-
  * I/O)
  *
  * Another similar mechanism  is to set  the TASK_FKEEPCORE flag  for
@@ -351,10 +351,10 @@ NOTHROW(FCALL sched_override_yieldto)(struct task *__restrict thread);
  * suspend execution, such  that the caller  will end up  as the only  running
  * thread on the entire system.
  *
- * Note that in order to do something like this, preemption must be  enabled,
- * since other CPUs can only receive super-override-suspend request when they
- * have preemption enabled, meaning that if 2 CPUs were to call this function
- * at  the same time, one of them would  have to wait for the other's suspend
+ * Note  that in order to do something  like this, preemption must be enabled,
+ * since other CPUs can only receive super-override-suspend requests when they
+ * have preemption enabled, meaning that if 2 CPUs were to call this  function
+ * at the same time, one  of them would have to  wait for the other's  suspend
  * IPI, which in turn requires preemption to be enabled.
  *
  * So as a result, a function like this one can only be implemented safely

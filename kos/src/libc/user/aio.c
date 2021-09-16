@@ -37,7 +37,6 @@
 #include <malloc.h>
 #include <pthread.h>
 #include <signal.h>
-#include <stdlib.h>
 #include <string.h>
 #include <syscall.h>
 #include <unistd.h>
@@ -378,7 +377,7 @@ NOTHROW_NCX(LIBCCALL aio_on_completion)(struct aio *__restrict self,
 	DBG_memset(&self->aio_set, 0xcc, sizeof(self->aio_set));
 	memcpy(&completion, &self->aio_sigevent, sizeof(completion));
 	/* Don't do this (The user may not fully re-initialize the aiocb object!) */
-/*	DBG_memset(&self->aio_set, 0xcc, sizeof(self->aio_set)); */
+/*	DBG_memset(&self->aio_sigevent, 0xcc, sizeof(self->aio_sigevent)); */
 
 	/* Set the status to removed. */
 	ATOMIC_WRITE(self->aio_status.as_status, post_status);
@@ -403,6 +402,8 @@ PRIVATE void *LIBCCALL
 aio_worker_main(void *UNUSED(arg)) {
 	ssize_t result;
 	struct aio *self;
+	pid_t mytid;
+	mytid = gettid();
 again:
 	atomic_lock_acquire(&aio_pending_lock);
 	self = TAILQ_FIRST(&aio_pending_list);
@@ -437,6 +438,9 @@ again:
 	assert(aio_pending_count != 0);
 	--aio_pending_count;
 
+	/* Set our TID as the one responsible for this descriptor. */
+	self->aio_threadpid = mytid;
+
 	/* Try to start serving this descriptor. */
 	if (!ATOMIC_CMPXCH(self->aio_status.as_status,
 	                   AIO_STATUS_PENDING,
@@ -469,7 +473,7 @@ again_operation:
 #ifndef __OPTIMIZE_SIZE__
 	case LIO_NOP:
 		/* NOP should never appear here, but better be safe and handle it as well. */
-		result = EOK;
+		result = -EOK;
 		break;
 #endif /* !__OPTIMIZE_SIZE__ */
 
@@ -481,7 +485,12 @@ again_operation:
 		result = sys_fdatasync(self->aio_fildes);
 		break;
 
+	/* TODO: Expose `LIO_FSYNC' and `LIO_FDATASYNC'
+	 *       as `_KOS_SOURCE' extensions in <aio.h> */
+
 	/* TODO: KOS-specific extensions for AIO versions of:
+	 *  - LIO_READALL   --> readall(3)
+	 *  - LIO_WRITEALL  --> writeall(3)
 	 *  - LIO_READV     --> sys_preadv() / sys_readv()
 	 *  - LIO_WRITEV    --> sys_pwritev() / sys_writev()
 	 *  - LIO_SYNC      --> sys_sync()
@@ -1015,7 +1024,7 @@ no_wait_aio:
 			struct aio *req = list[i];
 			if (req->aio_lio_opcode == LIO_NOP)
 				continue; /* Ignore... */
-			if (req->aio_retval < 0)
+			if (E_ISERR(req->aio_retval))
 				return libc_seterrno(EIO);
 		}
 	}
@@ -1146,7 +1155,7 @@ NOTHROW_NCX(LIBCCALL libc_aio_error)(struct aiocb const *self)
 	case AIO_STATUS_COMPLETED:
 	case AIO_STATUS_RETURN_READ:
 		/* Check the status of a completed operation. */
-		if (me->aio_retval < 0)
+		if (E_ISERR(me->aio_retval))
 			return -me->aio_retval;
 		return EOK;
 
@@ -1177,7 +1186,7 @@ NOTHROW_NCX(LIBCCALL libc_aio_return)(struct aiocb *self)
 
 		/* Check the status of a completed operation. */
 		result = me->aio_retval;
-		if (result < 0)
+		if (E_ISERR(result))
 			result = -1; /* Caller should invoke `aio_error(3)' */
 
 		/* Cause any future status/error reads to fail with EINVAL,

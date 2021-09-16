@@ -715,18 +715,22 @@ NOTHROW(KCALL __i386_kernel_main)(struct icpustate *__restrict state) {
 	/* TODO: iconv extensions (take a look at FreeBSD's <iconv.h> header) */
 
 	/* TODO: Pretty much every function that uses `__USE_FILE_OFFSET64'
-	 *       in its declaration can be altered such that:
+	 *       in   its   declaration   can   be   altered   such   that:
 	 *       >> [[if(!defined(__USE_FILE_OFFSET64)), preferred_alias("myfunc")]]
 	 *       >> [[if( defined(__USE_FILE_OFFSET64)), preferred_alias("myfunc64")]]
 	 *       is turned into:
 	 *       >> [[if(!defined(__USE_FILE_OFFSET64) || __SIZEOF_OFF32_T__ == __SIZEOF_OFF64_T__), preferred_alias("myfunc")]]
 	 *       >> [[if( defined(__USE_FILE_OFFSET64) || __SIZEOF_OFF32_T__ == __SIZEOF_OFF64_T__), preferred_alias("myfunc64")]]
-	 * Additionally, the declaration of `func64' should be altered to include:
+	 * Additionally, the declaration of `myfunc64' should be altered to include:
 	 *       >> [[if(__SIZEOF_OFF32_T__ == __SIZEOF_OFF64_T__), preferred_alias("myfunc")]]
 	 * This way, we can cut down on the # of imported symbols on architectures where
-	 * 32-bit and 64-bit offset types have the same size (e.g. x86_64).
+	 * 32-bit   and  64-bit  offset   types  have  the   same  size  (e.g.  x86_64).
 	 *
 	 * The same also goes for `__USE_TIME_BITS64'! */
+
+	/* TODO: Add `libc_seterrno_neg(errno_t x)' that is just an alias for `libc_seterrno(-x)'
+	 *       That  way, we can  save on having to  negate the errno  everywhere else in libc,
+	 *       reducing code size overall! */
 
 	return state;
 }
