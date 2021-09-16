@@ -833,25 +833,24 @@
 #define E_INTERRUPT                               (0xf000)              /* [errno(EINTR), msg("Interrupt")]
                                                                          * The thread has been interrupted by a RPC function,
                                                                          * causing  a   premature   return   to   user-space.
-                                                                         * NOTE: If  the  system  communication facility  that  was used  for  the interrupt
-                                                                         *       supports  restarting (e.g.  loadcore() following a  #PF on X86),  or if the
-                                                                         *       interrupt happened during a  restartable system call (e.g.  `sys_close()'),
-                                                                         *       and  either  wasn't  caused by  a  posix_signal, or  that  posix_signal had
-                                                                         *       the `SA_RESTART' flag set, this exception isn't propagated into user-space,
-                                                                         *       but rather causes the underlying interrupt to be restarted.
+                                                                         * NOTE: If the  system communication  facility that  was used  for the  interrupt
+                                                                         *       supports restarting (e.g. loadcore() following a  #PF on X86), or if  the
+                                                                         *       interrupt happened during a restartable system call (e.g. `sys_close()'),
+                                                                         *       and either  wasn't caused  by a  posix_signal, or  that posix_signal  had
+                                                                         *       the  `SA_RESTART' flag  set, this  exception isn't  propagated into user-
+                                                                         *       space, but rather causes the underlying interrupt to be restarted.
                                                                          * KOS Implements 3 distinct system call interrupt-restart behaviors:
-                                                                         *  #1: The system call  is always  restarted (this  behavior is  also used  when
-                                                                         *      some other type of interrupt  handler is interrupted, such as  loadcore()
-                                                                         *      during  an  ALOA  operation,  or   when  loading  a  file  into   memory)
-                                                                         *      This  mainly  includes  system  calls  where  interrupts  are  undesired,
-                                                                         *      or would otherwise  be unexpected, most  notably ~cleanup~ system  calls,
-                                                                         *      as also mentioned by the documentation of `_EXCEPT_API' in `<features.h>'
-                                                                         *     (e.g. `close()' or `munmap()')
+                                                                         *  #1: The  system call is  always restarted (this behavior  is also used when
+                                                                         *      some other type of interrupt handler is interrupted, such as loadcore()
+                                                                         *      during  an ALOA  operation, or when  loading a file  into memory). This
+                                                                         *      mainly includes system calls where  interrupts are undesired, or  would
+                                                                         *      otherwise be unexpected,  most notably ~cleanup~  system calls such  as
+                                                                         *      `sys_close(2)' or `sys_munmap(2)' (or most importantly: `sys_exit(2)').
                                                                          *  #2: The system call  is never  restarted (required for  some system  calls
                                                                          *      that are meant to wait for events internally delivered by an interrupt
                                                                          *      mechanism, such as `sigtimedwait()'; the behavior here mirrors what is
                                                                          *      also done by linux, as described on this page:
-                                                                         *     `http://man7.org/linux/man-pages/man7/signal.7.html')
+                                                                         *      `http://man7.org/linux/man-pages/man7/signal.7.html')
                                                                          *  #3: Restart the system call if the interrupt wasn't caused by a posix_signal,
                                                                          *      or if it  was caused by  a posix_signal with  the `SA_RESTART' flag  set. */
 #endif /* !E_INTERRUPT */
@@ -877,7 +876,7 @@
 
 
 /************************************************************************/
-/* __E_RETRY_RWLOCK                                                     */
+/* RTL Thread/Process exit (E_EXIT_THREAD, E_EXIT_PROCESS)              */
 /************************************************************************/
 #ifndef E_EXIT_THREAD
 #define E_EXIT_THREAD                             (0xfe00) /* [fld(exit_code: uintptr_t, "The thread exit status")]

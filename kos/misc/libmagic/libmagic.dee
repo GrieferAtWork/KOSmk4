@@ -593,12 +593,11 @@ class BoundStep {
 
 	@@Create a new child-step of @this with @userData
 	public final function createChildStep(userData: Object): BoundStep {
-		local result     = BoundStep();
-		result.group     = group;
-		result.step      = step;
-		result.toolchain = toolchain;
-		result.userData  = userData;
-		return result;
+		return BoundStep(
+			group:     group,
+			step:      step,
+			toolchain: toolchain,
+			userData:  userData);
 	}
 
 	@@The bound group

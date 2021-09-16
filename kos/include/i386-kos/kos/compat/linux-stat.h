@@ -127,7 +127,7 @@ struct linux_statx32_64 {
 	__ULONG64_TYPE__ st_ino;
 };
 
-/* __unused is a <sys/cdefs.h> macro with `__USE_BSD' */
+/* `__unused' is a <sys/cdefs.h> macro under `__USE_BSD' */
 #ifdef __COMPILER_HAVE_PRAGMA_PUSHMACRO
 #pragma push_macro("__unused")
 #endif /* __COMPILER_HAVE_PRAGMA_PUSHMACRO */

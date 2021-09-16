@@ -28,8 +28,10 @@
 /* System exception classes.
  * NOTE: Many of these are never actually thrown, and those that are also
  *       exist as `E_*' classes below. Also note that some exceptions may
- *       be merged with others, while allowing for differentiation using
- *      `error_info()'. */
+ *       be merged with others, while allowing for differentiation  using
+ *       `error_info()' (most notably: `X86_E_SYSTEM_GP' as the result of
+ *       non-canonical memory access is thrown an `E_SEGFAULT', which  is
+ *       the same as `X86_E_SYSTEM_PF'). */
 #define X86_E_SYSTEM_DE   0xff00 /* Divide-by-zero. */
 #define X86_E_SYSTEM_DB   0xff01 /* Debug. */
 #define X86_E_SYSTEM_NMI  0xff02 /* Non-maskable Interrupt. */
@@ -71,10 +73,16 @@
 
 /* Helper macros to encode/decode the `opcode' field of `E_ILLEGAL_INSTRUCTION'
  * NOTE: If the instruction doesn't depend on `modrm_reg', set it directly. */
-#define E_ILLEGAL_INSTRUCTION_X86_OPCODE(opcode, modrm_reg) (__CCAST(__UINT32_TYPE__)(opcode) | __CCAST(__UINT32_TYPE__)(modrm_reg) << 29 | __UINT32_C(0x10000000))
-#define E_ILLEGAL_INSTRUCTION_X86_OPCODE_GETOPC(v)          (__CCAST(__UINT32_TYPE__)(v) & __UINT32_C(0x0fffffff))
-#define E_ILLEGAL_INSTRUCTION_X86_OPCODE_GETREG(v)          (__CCAST(__UINT8_TYPE__)(__CCAST(__UINT32_TYPE__)(v) >> 29))
-#define E_ILLEGAL_INSTRUCTION_X86_OPCODE_HASREG(v)          (__CCAST(__UINT32_TYPE__)(v) & __UINT32_C(0x10000000))
+#define E_ILLEGAL_INSTRUCTION_X86_OPCODE(opcode, modrm_reg) \
+	(__CCAST(__UINT32_TYPE__)(opcode) |                     \
+	 __CCAST(__UINT32_TYPE__)(modrm_reg) << 29 |            \
+	 __UINT32_C(0x10000000))
+#define E_ILLEGAL_INSTRUCTION_X86_OPCODE_GETOPC(v) \
+	(__CCAST(__UINT32_TYPE__)(v) & __UINT32_C(0x0fffffff))
+#define E_ILLEGAL_INSTRUCTION_X86_OPCODE_GETREG(v) \
+	(__CCAST(__UINT8_TYPE__)(__CCAST(__UINT32_TYPE__)(v) >> 29))
+#define E_ILLEGAL_INSTRUCTION_X86_OPCODE_HASREG(v) \
+	(__CCAST(__UINT32_TYPE__)(v) & __UINT32_C(0x10000000))
 
 
 
