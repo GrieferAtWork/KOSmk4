@@ -335,7 +335,6 @@ PUBLIC_CONST struct handle_types const handle_type_db = {
 		/* [HANDLE_TYPE_EVENTFD_FENCE]          = */ "eventfd_fence",
 		/* [HANDLE_TYPE_EVENTFD_SEMA]           = */ "eventfd_sema",
 		/* [HANDLE_TYPE_SIGNALFD]               = */ "signalfd",
-		/* [HANDLE_TYPE_UAIO]                   = */ "uaio",
 		/* [HANDLE_TYPE_FUTEX]                  = */ "futex",
 		/* [HANDLE_TYPE_FUTEXFD]                = */ "futexfd",
 		/* [HANDLE_TYPE_ONESHOT_DIRECTORY_FILE] = */ "oneshot_directory_file",
@@ -365,7 +364,6 @@ PUBLIC_CONST struct handle_types const handle_type_db = {
 		/* [HANDLE_TYPE_EVENTFD_FENCE]          = */ (refcnt_t (FCALL *)(void const *__restrict))&handle_eventfd_fence_refcnt,
 		/* [HANDLE_TYPE_EVENTFD_SEMA]           = */ (refcnt_t (FCALL *)(void const *__restrict))&handle_eventfd_sema_refcnt,
 		/* [HANDLE_TYPE_SIGNALFD]               = */ (refcnt_t (FCALL *)(void const *__restrict))&handle_signalfd_refcnt,
-		/* [HANDLE_TYPE_UAIO]                   = */ (refcnt_t (FCALL *)(void const *__restrict))&handle_uaio_refcnt,
 		/* [HANDLE_TYPE_FUTEX]                  = */ (refcnt_t (FCALL *)(void const *__restrict))&handle_futex_refcnt,
 		/* [HANDLE_TYPE_FUTEXFD]                = */ (refcnt_t (FCALL *)(void const *__restrict))&handle_futexfd_refcnt,
 		/* [HANDLE_TYPE_ONESHOT_DIRECTORY_FILE] = */ (refcnt_t (FCALL *)(void const *__restrict))&handle_oneshot_directory_file_refcnt,
@@ -395,7 +393,6 @@ PUBLIC_CONST struct handle_types const handle_type_db = {
 		/* [HANDLE_TYPE_EVENTFD_FENCE]          = */ (void (FCALL *)(void *__restrict))&handle_eventfd_fence_incref,
 		/* [HANDLE_TYPE_EVENTFD_SEMA]           = */ (void (FCALL *)(void *__restrict))&handle_eventfd_sema_incref,
 		/* [HANDLE_TYPE_SIGNALFD]               = */ (void (FCALL *)(void *__restrict))&handle_signalfd_incref,
-		/* [HANDLE_TYPE_UAIO]                   = */ (void (FCALL *)(void *__restrict))&handle_uaio_incref,
 		/* [HANDLE_TYPE_FUTEX]                  = */ (void (FCALL *)(void *__restrict))&handle_futex_incref,
 		/* [HANDLE_TYPE_FUTEXFD]                = */ (void (FCALL *)(void *__restrict))&handle_futexfd_incref,
 		/* [HANDLE_TYPE_ONESHOT_DIRECTORY_FILE] = */ (void (FCALL *)(void *__restrict))&handle_oneshot_directory_file_incref,
@@ -425,7 +422,6 @@ PUBLIC_CONST struct handle_types const handle_type_db = {
 		/* [HANDLE_TYPE_EVENTFD_FENCE]          = */ (void (FCALL *)(REF void *__restrict))&handle_eventfd_fence_decref,
 		/* [HANDLE_TYPE_EVENTFD_SEMA]           = */ (void (FCALL *)(REF void *__restrict))&handle_eventfd_sema_decref,
 		/* [HANDLE_TYPE_SIGNALFD]               = */ (void (FCALL *)(REF void *__restrict))&handle_signalfd_decref,
-		/* [HANDLE_TYPE_UAIO]                   = */ (void (FCALL *)(REF void *__restrict))&handle_uaio_decref,
 		/* [HANDLE_TYPE_FUTEX]                  = */ (void (FCALL *)(REF void *__restrict))&handle_futex_decref,
 		/* [HANDLE_TYPE_FUTEXFD]                = */ (void (FCALL *)(REF void *__restrict))&handle_futexfd_decref,
 		/* [HANDLE_TYPE_ONESHOT_DIRECTORY_FILE] = */ (void (FCALL *)(REF void *__restrict))&handle_oneshot_directory_file_decref,
@@ -455,7 +451,6 @@ PUBLIC_CONST struct handle_types const handle_type_db = {
 		/* [HANDLE_TYPE_EVENTFD_FENCE]          = */ (__BOOL (FCALL *)(void *__restrict))&handle_eventfd_fence_tryincref,
 		/* [HANDLE_TYPE_EVENTFD_SEMA]           = */ (__BOOL (FCALL *)(void *__restrict))&handle_eventfd_sema_tryincref,
 		/* [HANDLE_TYPE_SIGNALFD]               = */ (__BOOL (FCALL *)(void *__restrict))&handle_signalfd_tryincref,
-		/* [HANDLE_TYPE_UAIO]                   = */ (__BOOL (FCALL *)(void *__restrict))&handle_uaio_tryincref,
 		/* [HANDLE_TYPE_FUTEX]                  = */ (__BOOL (FCALL *)(void *__restrict))&handle_futex_tryincref,
 		/* [HANDLE_TYPE_FUTEXFD]                = */ (__BOOL (FCALL *)(void *__restrict))&handle_futexfd_tryincref,
 		/* [HANDLE_TYPE_ONESHOT_DIRECTORY_FILE] = */ (__BOOL (FCALL *)(void *__restrict))&handle_oneshot_directory_file_tryincref,
@@ -485,7 +480,6 @@ PUBLIC_CONST struct handle_types const handle_type_db = {
 		/* [HANDLE_TYPE_EVENTFD_FENCE]          = */ (WEAK REF void *(FCALL *)(void *__restrict))&handle_eventfd_fence_weakgetref,
 		/* [HANDLE_TYPE_EVENTFD_SEMA]           = */ (WEAK REF void *(FCALL *)(void *__restrict))&handle_eventfd_sema_weakgetref,
 		/* [HANDLE_TYPE_SIGNALFD]               = */ (WEAK REF void *(FCALL *)(void *__restrict))&handle_signalfd_weakgetref,
-		/* [HANDLE_TYPE_UAIO]                   = */ (WEAK REF void *(FCALL *)(void *__restrict))&handle_uaio_weakgetref,
 		/* [HANDLE_TYPE_FUTEX]                  = */ (WEAK REF void *(FCALL *)(void *__restrict))&handle_futex_weakgetref,
 		/* [HANDLE_TYPE_FUTEXFD]                = */ (WEAK REF void *(FCALL *)(void *__restrict))&handle_futexfd_weakgetref,
 		/* [HANDLE_TYPE_ONESHOT_DIRECTORY_FILE] = */ (WEAK REF void *(FCALL *)(void *__restrict))&handle_oneshot_directory_file_weakgetref,
@@ -515,7 +509,6 @@ PUBLIC_CONST struct handle_types const handle_type_db = {
 		/* [HANDLE_TYPE_EVENTFD_FENCE]          = */ (REF void *(FCALL *)(void *__restrict))&handle_eventfd_fence_weaklckref,
 		/* [HANDLE_TYPE_EVENTFD_SEMA]           = */ (REF void *(FCALL *)(void *__restrict))&handle_eventfd_sema_weaklckref,
 		/* [HANDLE_TYPE_SIGNALFD]               = */ (REF void *(FCALL *)(void *__restrict))&handle_signalfd_weaklckref,
-		/* [HANDLE_TYPE_UAIO]                   = */ (REF void *(FCALL *)(void *__restrict))&handle_uaio_weaklckref,
 		/* [HANDLE_TYPE_FUTEX]                  = */ (REF void *(FCALL *)(void *__restrict))&handle_futex_weaklckref,
 		/* [HANDLE_TYPE_FUTEXFD]                = */ (REF void *(FCALL *)(void *__restrict))&handle_futexfd_weaklckref,
 		/* [HANDLE_TYPE_ONESHOT_DIRECTORY_FILE] = */ (REF void *(FCALL *)(void *__restrict))&handle_oneshot_directory_file_weaklckref,
@@ -545,7 +538,6 @@ PUBLIC_CONST struct handle_types const handle_type_db = {
 		/* [HANDLE_TYPE_EVENTFD_FENCE]          = */ (void (FCALL *)(WEAK REF void *__restrict))&handle_eventfd_fence_weakdecref,
 		/* [HANDLE_TYPE_EVENTFD_SEMA]           = */ (void (FCALL *)(WEAK REF void *__restrict))&handle_eventfd_sema_weakdecref,
 		/* [HANDLE_TYPE_SIGNALFD]               = */ (void (FCALL *)(WEAK REF void *__restrict))&handle_signalfd_weakdecref,
-		/* [HANDLE_TYPE_UAIO]                   = */ (void (FCALL *)(WEAK REF void *__restrict))&handle_uaio_weakdecref,
 		/* [HANDLE_TYPE_FUTEX]                  = */ (void (FCALL *)(WEAK REF void *__restrict))&handle_futex_weakdecref,
 		/* [HANDLE_TYPE_FUTEXFD]                = */ (void (FCALL *)(WEAK REF void *__restrict))&handle_futexfd_weakdecref,
 		/* [HANDLE_TYPE_ONESHOT_DIRECTORY_FILE] = */ (void (FCALL *)(WEAK REF void *__restrict))&handle_oneshot_directory_file_weakdecref,
@@ -575,7 +567,6 @@ PUBLIC_CONST struct handle_types const handle_type_db = {
 		/* [HANDLE_TYPE_EVENTFD_FENCE]          = */ (size_t (KCALL *)(void *__restrict, USER CHECKED void *, size_t, iomode_t))&handle_eventfd_fence_read,
 		/* [HANDLE_TYPE_EVENTFD_SEMA]           = */ (size_t (KCALL *)(void *__restrict, USER CHECKED void *, size_t, iomode_t))&handle_eventfd_sema_read,
 		/* [HANDLE_TYPE_SIGNALFD]               = */ (size_t (KCALL *)(void *__restrict, USER CHECKED void *, size_t, iomode_t))&handle_signalfd_read,
-		/* [HANDLE_TYPE_UAIO]                   = */ (size_t (KCALL *)(void *__restrict, USER CHECKED void *, size_t, iomode_t))&handle_uaio_read,
 		/* [HANDLE_TYPE_FUTEX]                  = */ (size_t (KCALL *)(void *__restrict, USER CHECKED void *, size_t, iomode_t))&handle_futex_read,
 		/* [HANDLE_TYPE_FUTEXFD]                = */ (size_t (KCALL *)(void *__restrict, USER CHECKED void *, size_t, iomode_t))&handle_futexfd_read,
 		/* [HANDLE_TYPE_ONESHOT_DIRECTORY_FILE] = */ (size_t (KCALL *)(void *__restrict, USER CHECKED void *, size_t, iomode_t))&handle_oneshot_directory_file_read,
@@ -605,7 +596,6 @@ PUBLIC_CONST struct handle_types const handle_type_db = {
 		/* [HANDLE_TYPE_EVENTFD_FENCE]          = */ (size_t (KCALL *)(void *__restrict, USER CHECKED void const *, size_t, iomode_t))&handle_eventfd_fence_write,
 		/* [HANDLE_TYPE_EVENTFD_SEMA]           = */ (size_t (KCALL *)(void *__restrict, USER CHECKED void const *, size_t, iomode_t))&handle_eventfd_sema_write,
 		/* [HANDLE_TYPE_SIGNALFD]               = */ (size_t (KCALL *)(void *__restrict, USER CHECKED void const *, size_t, iomode_t))&handle_signalfd_write,
-		/* [HANDLE_TYPE_UAIO]                   = */ (size_t (KCALL *)(void *__restrict, USER CHECKED void const *, size_t, iomode_t))&handle_uaio_write,
 		/* [HANDLE_TYPE_FUTEX]                  = */ (size_t (KCALL *)(void *__restrict, USER CHECKED void const *, size_t, iomode_t))&handle_futex_write,
 		/* [HANDLE_TYPE_FUTEXFD]                = */ (size_t (KCALL *)(void *__restrict, USER CHECKED void const *, size_t, iomode_t))&handle_futexfd_write,
 		/* [HANDLE_TYPE_ONESHOT_DIRECTORY_FILE] = */ (size_t (KCALL *)(void *__restrict, USER CHECKED void const *, size_t, iomode_t))&handle_oneshot_directory_file_write,
@@ -635,7 +625,6 @@ PUBLIC_CONST struct handle_types const handle_type_db = {
 		/* [HANDLE_TYPE_EVENTFD_FENCE]          = */ (size_t (KCALL *)(void *__restrict, USER CHECKED void *, size_t, pos_t, iomode_t))&handle_eventfd_fence_pread,
 		/* [HANDLE_TYPE_EVENTFD_SEMA]           = */ (size_t (KCALL *)(void *__restrict, USER CHECKED void *, size_t, pos_t, iomode_t))&handle_eventfd_sema_pread,
 		/* [HANDLE_TYPE_SIGNALFD]               = */ (size_t (KCALL *)(void *__restrict, USER CHECKED void *, size_t, pos_t, iomode_t))&handle_signalfd_pread,
-		/* [HANDLE_TYPE_UAIO]                   = */ (size_t (KCALL *)(void *__restrict, USER CHECKED void *, size_t, pos_t, iomode_t))&handle_uaio_pread,
 		/* [HANDLE_TYPE_FUTEX]                  = */ (size_t (KCALL *)(void *__restrict, USER CHECKED void *, size_t, pos_t, iomode_t))&handle_futex_pread,
 		/* [HANDLE_TYPE_FUTEXFD]                = */ (size_t (KCALL *)(void *__restrict, USER CHECKED void *, size_t, pos_t, iomode_t))&handle_futexfd_pread,
 		/* [HANDLE_TYPE_ONESHOT_DIRECTORY_FILE] = */ (size_t (KCALL *)(void *__restrict, USER CHECKED void *, size_t, pos_t, iomode_t))&handle_oneshot_directory_file_pread,
@@ -665,7 +654,6 @@ PUBLIC_CONST struct handle_types const handle_type_db = {
 		/* [HANDLE_TYPE_EVENTFD_FENCE]          = */ (size_t (KCALL *)(void *__restrict, USER CHECKED void const *, size_t, pos_t, iomode_t))&handle_eventfd_fence_pwrite,
 		/* [HANDLE_TYPE_EVENTFD_SEMA]           = */ (size_t (KCALL *)(void *__restrict, USER CHECKED void const *, size_t, pos_t, iomode_t))&handle_eventfd_sema_pwrite,
 		/* [HANDLE_TYPE_SIGNALFD]               = */ (size_t (KCALL *)(void *__restrict, USER CHECKED void const *, size_t, pos_t, iomode_t))&handle_signalfd_pwrite,
-		/* [HANDLE_TYPE_UAIO]                   = */ (size_t (KCALL *)(void *__restrict, USER CHECKED void const *, size_t, pos_t, iomode_t))&handle_uaio_pwrite,
 		/* [HANDLE_TYPE_FUTEX]                  = */ (size_t (KCALL *)(void *__restrict, USER CHECKED void const *, size_t, pos_t, iomode_t))&handle_futex_pwrite,
 		/* [HANDLE_TYPE_FUTEXFD]                = */ (size_t (KCALL *)(void *__restrict, USER CHECKED void const *, size_t, pos_t, iomode_t))&handle_futexfd_pwrite,
 		/* [HANDLE_TYPE_ONESHOT_DIRECTORY_FILE] = */ (size_t (KCALL *)(void *__restrict, USER CHECKED void const *, size_t, pos_t, iomode_t))&handle_oneshot_directory_file_pwrite,
@@ -695,7 +683,6 @@ PUBLIC_CONST struct handle_types const handle_type_db = {
 		/* [HANDLE_TYPE_EVENTFD_FENCE]          = */ (size_t (KCALL *)(void *__restrict, struct iov_buffer *__restrict, size_t, iomode_t))&handle_eventfd_fence_readv,
 		/* [HANDLE_TYPE_EVENTFD_SEMA]           = */ (size_t (KCALL *)(void *__restrict, struct iov_buffer *__restrict, size_t, iomode_t))&handle_eventfd_sema_readv,
 		/* [HANDLE_TYPE_SIGNALFD]               = */ (size_t (KCALL *)(void *__restrict, struct iov_buffer *__restrict, size_t, iomode_t))&handle_signalfd_readv,
-		/* [HANDLE_TYPE_UAIO]                   = */ (size_t (KCALL *)(void *__restrict, struct iov_buffer *__restrict, size_t, iomode_t))&handle_uaio_readv,
 		/* [HANDLE_TYPE_FUTEX]                  = */ (size_t (KCALL *)(void *__restrict, struct iov_buffer *__restrict, size_t, iomode_t))&handle_futex_readv,
 		/* [HANDLE_TYPE_FUTEXFD]                = */ (size_t (KCALL *)(void *__restrict, struct iov_buffer *__restrict, size_t, iomode_t))&handle_futexfd_readv,
 		/* [HANDLE_TYPE_ONESHOT_DIRECTORY_FILE] = */ (size_t (KCALL *)(void *__restrict, struct iov_buffer *__restrict, size_t, iomode_t))&handle_oneshot_directory_file_readv,
@@ -725,7 +712,6 @@ PUBLIC_CONST struct handle_types const handle_type_db = {
 		/* [HANDLE_TYPE_EVENTFD_FENCE]          = */ (size_t (KCALL *)(void *__restrict, struct iov_buffer *__restrict, size_t, iomode_t))&handle_eventfd_fence_writev,
 		/* [HANDLE_TYPE_EVENTFD_SEMA]           = */ (size_t (KCALL *)(void *__restrict, struct iov_buffer *__restrict, size_t, iomode_t))&handle_eventfd_sema_writev,
 		/* [HANDLE_TYPE_SIGNALFD]               = */ (size_t (KCALL *)(void *__restrict, struct iov_buffer *__restrict, size_t, iomode_t))&handle_signalfd_writev,
-		/* [HANDLE_TYPE_UAIO]                   = */ (size_t (KCALL *)(void *__restrict, struct iov_buffer *__restrict, size_t, iomode_t))&handle_uaio_writev,
 		/* [HANDLE_TYPE_FUTEX]                  = */ (size_t (KCALL *)(void *__restrict, struct iov_buffer *__restrict, size_t, iomode_t))&handle_futex_writev,
 		/* [HANDLE_TYPE_FUTEXFD]                = */ (size_t (KCALL *)(void *__restrict, struct iov_buffer *__restrict, size_t, iomode_t))&handle_futexfd_writev,
 		/* [HANDLE_TYPE_ONESHOT_DIRECTORY_FILE] = */ (size_t (KCALL *)(void *__restrict, struct iov_buffer *__restrict, size_t, iomode_t))&handle_oneshot_directory_file_writev,
@@ -755,7 +741,6 @@ PUBLIC_CONST struct handle_types const handle_type_db = {
 		/* [HANDLE_TYPE_EVENTFD_FENCE]          = */ (size_t (KCALL *)(void *__restrict, struct iov_buffer *__restrict, size_t, pos_t, iomode_t))&handle_eventfd_fence_preadv,
 		/* [HANDLE_TYPE_EVENTFD_SEMA]           = */ (size_t (KCALL *)(void *__restrict, struct iov_buffer *__restrict, size_t, pos_t, iomode_t))&handle_eventfd_sema_preadv,
 		/* [HANDLE_TYPE_SIGNALFD]               = */ (size_t (KCALL *)(void *__restrict, struct iov_buffer *__restrict, size_t, pos_t, iomode_t))&handle_signalfd_preadv,
-		/* [HANDLE_TYPE_UAIO]                   = */ (size_t (KCALL *)(void *__restrict, struct iov_buffer *__restrict, size_t, pos_t, iomode_t))&handle_uaio_preadv,
 		/* [HANDLE_TYPE_FUTEX]                  = */ (size_t (KCALL *)(void *__restrict, struct iov_buffer *__restrict, size_t, pos_t, iomode_t))&handle_futex_preadv,
 		/* [HANDLE_TYPE_FUTEXFD]                = */ (size_t (KCALL *)(void *__restrict, struct iov_buffer *__restrict, size_t, pos_t, iomode_t))&handle_futexfd_preadv,
 		/* [HANDLE_TYPE_ONESHOT_DIRECTORY_FILE] = */ (size_t (KCALL *)(void *__restrict, struct iov_buffer *__restrict, size_t, pos_t, iomode_t))&handle_oneshot_directory_file_preadv,
@@ -785,7 +770,6 @@ PUBLIC_CONST struct handle_types const handle_type_db = {
 		/* [HANDLE_TYPE_EVENTFD_FENCE]          = */ (size_t (KCALL *)(void *__restrict, struct iov_buffer *__restrict, size_t, pos_t, iomode_t))&handle_eventfd_fence_pwritev,
 		/* [HANDLE_TYPE_EVENTFD_SEMA]           = */ (size_t (KCALL *)(void *__restrict, struct iov_buffer *__restrict, size_t, pos_t, iomode_t))&handle_eventfd_sema_pwritev,
 		/* [HANDLE_TYPE_SIGNALFD]               = */ (size_t (KCALL *)(void *__restrict, struct iov_buffer *__restrict, size_t, pos_t, iomode_t))&handle_signalfd_pwritev,
-		/* [HANDLE_TYPE_UAIO]                   = */ (size_t (KCALL *)(void *__restrict, struct iov_buffer *__restrict, size_t, pos_t, iomode_t))&handle_uaio_pwritev,
 		/* [HANDLE_TYPE_FUTEX]                  = */ (size_t (KCALL *)(void *__restrict, struct iov_buffer *__restrict, size_t, pos_t, iomode_t))&handle_futex_pwritev,
 		/* [HANDLE_TYPE_FUTEXFD]                = */ (size_t (KCALL *)(void *__restrict, struct iov_buffer *__restrict, size_t, pos_t, iomode_t))&handle_futexfd_pwritev,
 		/* [HANDLE_TYPE_ONESHOT_DIRECTORY_FILE] = */ (size_t (KCALL *)(void *__restrict, struct iov_buffer *__restrict, size_t, pos_t, iomode_t))&handle_oneshot_directory_file_pwritev,
@@ -815,7 +799,6 @@ PUBLIC_CONST struct handle_types const handle_type_db = {
 		/* [HANDLE_TYPE_EVENTFD_FENCE]          = */ (size_t (KCALL *)(void *__restrict, USER CHECKED struct dirent *, size_t, readdir_mode_t, iomode_t))&handle_eventfd_fence_readdir,
 		/* [HANDLE_TYPE_EVENTFD_SEMA]           = */ (size_t (KCALL *)(void *__restrict, USER CHECKED struct dirent *, size_t, readdir_mode_t, iomode_t))&handle_eventfd_sema_readdir,
 		/* [HANDLE_TYPE_SIGNALFD]               = */ (size_t (KCALL *)(void *__restrict, USER CHECKED struct dirent *, size_t, readdir_mode_t, iomode_t))&handle_signalfd_readdir,
-		/* [HANDLE_TYPE_UAIO]                   = */ (size_t (KCALL *)(void *__restrict, USER CHECKED struct dirent *, size_t, readdir_mode_t, iomode_t))&handle_uaio_readdir,
 		/* [HANDLE_TYPE_FUTEX]                  = */ (size_t (KCALL *)(void *__restrict, USER CHECKED struct dirent *, size_t, readdir_mode_t, iomode_t))&handle_futex_readdir,
 		/* [HANDLE_TYPE_FUTEXFD]                = */ (size_t (KCALL *)(void *__restrict, USER CHECKED struct dirent *, size_t, readdir_mode_t, iomode_t))&handle_futexfd_readdir,
 		/* [HANDLE_TYPE_ONESHOT_DIRECTORY_FILE] = */ (size_t (KCALL *)(void *__restrict, USER CHECKED struct dirent *, size_t, readdir_mode_t, iomode_t))&handle_oneshot_directory_file_readdir,
@@ -845,7 +828,6 @@ PUBLIC_CONST struct handle_types const handle_type_db = {
 		/* [HANDLE_TYPE_EVENTFD_FENCE]          = */ (pos_t (KCALL *)(void *__restrict, off_t, unsigned int))&handle_eventfd_fence_seek,
 		/* [HANDLE_TYPE_EVENTFD_SEMA]           = */ (pos_t (KCALL *)(void *__restrict, off_t, unsigned int))&handle_eventfd_sema_seek,
 		/* [HANDLE_TYPE_SIGNALFD]               = */ (pos_t (KCALL *)(void *__restrict, off_t, unsigned int))&handle_signalfd_seek,
-		/* [HANDLE_TYPE_UAIO]                   = */ (pos_t (KCALL *)(void *__restrict, off_t, unsigned int))&handle_uaio_seek,
 		/* [HANDLE_TYPE_FUTEX]                  = */ (pos_t (KCALL *)(void *__restrict, off_t, unsigned int))&handle_futex_seek,
 		/* [HANDLE_TYPE_FUTEXFD]                = */ (pos_t (KCALL *)(void *__restrict, off_t, unsigned int))&handle_futexfd_seek,
 		/* [HANDLE_TYPE_ONESHOT_DIRECTORY_FILE] = */ (pos_t (KCALL *)(void *__restrict, off_t, unsigned int))&handle_oneshot_directory_file_seek,
@@ -875,7 +857,6 @@ PUBLIC_CONST struct handle_types const handle_type_db = {
 		/* [HANDLE_TYPE_EVENTFD_FENCE]          = */ (syscall_slong_t (KCALL *)(void *__restrict, syscall_ulong_t, USER UNCHECKED void *, iomode_t))&handle_eventfd_fence_ioctl,
 		/* [HANDLE_TYPE_EVENTFD_SEMA]           = */ (syscall_slong_t (KCALL *)(void *__restrict, syscall_ulong_t, USER UNCHECKED void *, iomode_t))&handle_eventfd_sema_ioctl,
 		/* [HANDLE_TYPE_SIGNALFD]               = */ (syscall_slong_t (KCALL *)(void *__restrict, syscall_ulong_t, USER UNCHECKED void *, iomode_t))&handle_signalfd_ioctl,
-		/* [HANDLE_TYPE_UAIO]                   = */ (syscall_slong_t (KCALL *)(void *__restrict, syscall_ulong_t, USER UNCHECKED void *, iomode_t))&handle_uaio_ioctl,
 		/* [HANDLE_TYPE_FUTEX]                  = */ (syscall_slong_t (KCALL *)(void *__restrict, syscall_ulong_t, USER UNCHECKED void *, iomode_t))&handle_futex_ioctl,
 		/* [HANDLE_TYPE_FUTEXFD]                = */ (syscall_slong_t (KCALL *)(void *__restrict, syscall_ulong_t, USER UNCHECKED void *, iomode_t))&handle_futexfd_ioctl,
 		/* [HANDLE_TYPE_ONESHOT_DIRECTORY_FILE] = */ (syscall_slong_t (KCALL *)(void *__restrict, syscall_ulong_t, USER UNCHECKED void *, iomode_t))&handle_oneshot_directory_file_ioctl,
@@ -905,7 +886,6 @@ PUBLIC_CONST struct handle_types const handle_type_db = {
 		/* [HANDLE_TYPE_EVENTFD_FENCE]          = */ (void (KCALL *)(void *__restrict, pos_t))&handle_eventfd_fence_truncate,
 		/* [HANDLE_TYPE_EVENTFD_SEMA]           = */ (void (KCALL *)(void *__restrict, pos_t))&handle_eventfd_sema_truncate,
 		/* [HANDLE_TYPE_SIGNALFD]               = */ (void (KCALL *)(void *__restrict, pos_t))&handle_signalfd_truncate,
-		/* [HANDLE_TYPE_UAIO]                   = */ (void (KCALL *)(void *__restrict, pos_t))&handle_uaio_truncate,
 		/* [HANDLE_TYPE_FUTEX]                  = */ (void (KCALL *)(void *__restrict, pos_t))&handle_futex_truncate,
 		/* [HANDLE_TYPE_FUTEXFD]                = */ (void (KCALL *)(void *__restrict, pos_t))&handle_futexfd_truncate,
 		/* [HANDLE_TYPE_ONESHOT_DIRECTORY_FILE] = */ (void (KCALL *)(void *__restrict, pos_t))&handle_oneshot_directory_file_truncate,
@@ -935,7 +915,6 @@ PUBLIC_CONST struct handle_types const handle_type_db = {
 		/* [HANDLE_TYPE_EVENTFD_FENCE]          = */ (void (KCALL *)(void *__restrict, struct handle_mmap_info *__restrict))&handle_eventfd_fence_mmap,
 		/* [HANDLE_TYPE_EVENTFD_SEMA]           = */ (void (KCALL *)(void *__restrict, struct handle_mmap_info *__restrict))&handle_eventfd_sema_mmap,
 		/* [HANDLE_TYPE_SIGNALFD]               = */ (void (KCALL *)(void *__restrict, struct handle_mmap_info *__restrict))&handle_signalfd_mmap,
-		/* [HANDLE_TYPE_UAIO]                   = */ (void (KCALL *)(void *__restrict, struct handle_mmap_info *__restrict))&handle_uaio_mmap,
 		/* [HANDLE_TYPE_FUTEX]                  = */ (void (KCALL *)(void *__restrict, struct handle_mmap_info *__restrict))&handle_futex_mmap,
 		/* [HANDLE_TYPE_FUTEXFD]                = */ (void (KCALL *)(void *__restrict, struct handle_mmap_info *__restrict))&handle_futexfd_mmap,
 		/* [HANDLE_TYPE_ONESHOT_DIRECTORY_FILE] = */ (void (KCALL *)(void *__restrict, struct handle_mmap_info *__restrict))&handle_oneshot_directory_file_mmap,
@@ -965,7 +944,6 @@ PUBLIC_CONST struct handle_types const handle_type_db = {
 		/* [HANDLE_TYPE_EVENTFD_FENCE]          = */ (pos_t (KCALL *)(void *__restrict, fallocate_mode_t, pos_t, pos_t))&handle_eventfd_fence_allocate,
 		/* [HANDLE_TYPE_EVENTFD_SEMA]           = */ (pos_t (KCALL *)(void *__restrict, fallocate_mode_t, pos_t, pos_t))&handle_eventfd_sema_allocate,
 		/* [HANDLE_TYPE_SIGNALFD]               = */ (pos_t (KCALL *)(void *__restrict, fallocate_mode_t, pos_t, pos_t))&handle_signalfd_allocate,
-		/* [HANDLE_TYPE_UAIO]                   = */ (pos_t (KCALL *)(void *__restrict, fallocate_mode_t, pos_t, pos_t))&handle_uaio_allocate,
 		/* [HANDLE_TYPE_FUTEX]                  = */ (pos_t (KCALL *)(void *__restrict, fallocate_mode_t, pos_t, pos_t))&handle_futex_allocate,
 		/* [HANDLE_TYPE_FUTEXFD]                = */ (pos_t (KCALL *)(void *__restrict, fallocate_mode_t, pos_t, pos_t))&handle_futexfd_allocate,
 		/* [HANDLE_TYPE_ONESHOT_DIRECTORY_FILE] = */ (pos_t (KCALL *)(void *__restrict, fallocate_mode_t, pos_t, pos_t))&handle_oneshot_directory_file_allocate,
@@ -995,7 +973,6 @@ PUBLIC_CONST struct handle_types const handle_type_db = {
 		/* [HANDLE_TYPE_EVENTFD_FENCE]          = */ (void (KCALL *)(void *__restrict))&handle_eventfd_fence_sync,
 		/* [HANDLE_TYPE_EVENTFD_SEMA]           = */ (void (KCALL *)(void *__restrict))&handle_eventfd_sema_sync,
 		/* [HANDLE_TYPE_SIGNALFD]               = */ (void (KCALL *)(void *__restrict))&handle_signalfd_sync,
-		/* [HANDLE_TYPE_UAIO]                   = */ (void (KCALL *)(void *__restrict))&handle_uaio_sync,
 		/* [HANDLE_TYPE_FUTEX]                  = */ (void (KCALL *)(void *__restrict))&handle_futex_sync,
 		/* [HANDLE_TYPE_FUTEXFD]                = */ (void (KCALL *)(void *__restrict))&handle_futexfd_sync,
 		/* [HANDLE_TYPE_ONESHOT_DIRECTORY_FILE] = */ (void (KCALL *)(void *__restrict))&handle_oneshot_directory_file_sync,
@@ -1025,7 +1002,6 @@ PUBLIC_CONST struct handle_types const handle_type_db = {
 		/* [HANDLE_TYPE_EVENTFD_FENCE]          = */ (void (KCALL *)(void *__restrict))&handle_eventfd_fence_datasync,
 		/* [HANDLE_TYPE_EVENTFD_SEMA]           = */ (void (KCALL *)(void *__restrict))&handle_eventfd_sema_datasync,
 		/* [HANDLE_TYPE_SIGNALFD]               = */ (void (KCALL *)(void *__restrict))&handle_signalfd_datasync,
-		/* [HANDLE_TYPE_UAIO]                   = */ (void (KCALL *)(void *__restrict))&handle_uaio_datasync,
 		/* [HANDLE_TYPE_FUTEX]                  = */ (void (KCALL *)(void *__restrict))&handle_futex_datasync,
 		/* [HANDLE_TYPE_FUTEXFD]                = */ (void (KCALL *)(void *__restrict))&handle_futexfd_datasync,
 		/* [HANDLE_TYPE_ONESHOT_DIRECTORY_FILE] = */ (void (KCALL *)(void *__restrict))&handle_oneshot_directory_file_datasync,
@@ -1055,7 +1031,6 @@ PUBLIC_CONST struct handle_types const handle_type_db = {
 		/* [HANDLE_TYPE_EVENTFD_FENCE]          = */ (void (KCALL *)(void *__restrict, USER CHECKED struct stat *))&handle_eventfd_fence_stat,
 		/* [HANDLE_TYPE_EVENTFD_SEMA]           = */ (void (KCALL *)(void *__restrict, USER CHECKED struct stat *))&handle_eventfd_sema_stat,
 		/* [HANDLE_TYPE_SIGNALFD]               = */ (void (KCALL *)(void *__restrict, USER CHECKED struct stat *))&handle_signalfd_stat,
-		/* [HANDLE_TYPE_UAIO]                   = */ (void (KCALL *)(void *__restrict, USER CHECKED struct stat *))&handle_uaio_stat,
 		/* [HANDLE_TYPE_FUTEX]                  = */ (void (KCALL *)(void *__restrict, USER CHECKED struct stat *))&handle_futex_stat,
 		/* [HANDLE_TYPE_FUTEXFD]                = */ (void (KCALL *)(void *__restrict, USER CHECKED struct stat *))&handle_futexfd_stat,
 		/* [HANDLE_TYPE_ONESHOT_DIRECTORY_FILE] = */ (void (KCALL *)(void *__restrict, USER CHECKED struct stat *))&handle_oneshot_directory_file_stat,
@@ -1085,7 +1060,6 @@ PUBLIC_CONST struct handle_types const handle_type_db = {
 		/* [HANDLE_TYPE_EVENTFD_FENCE]          = */ (void (KCALL *)(void *__restrict, poll_mode_t))&handle_eventfd_fence_pollconnect,
 		/* [HANDLE_TYPE_EVENTFD_SEMA]           = */ (void (KCALL *)(void *__restrict, poll_mode_t))&handle_eventfd_sema_pollconnect,
 		/* [HANDLE_TYPE_SIGNALFD]               = */ (void (KCALL *)(void *__restrict, poll_mode_t))&handle_signalfd_pollconnect,
-		/* [HANDLE_TYPE_UAIO]                   = */ (void (KCALL *)(void *__restrict, poll_mode_t))&handle_uaio_pollconnect,
 		/* [HANDLE_TYPE_FUTEX]                  = */ (void (KCALL *)(void *__restrict, poll_mode_t))&handle_futex_pollconnect,
 		/* [HANDLE_TYPE_FUTEXFD]                = */ (void (KCALL *)(void *__restrict, poll_mode_t))&handle_futexfd_pollconnect,
 		/* [HANDLE_TYPE_ONESHOT_DIRECTORY_FILE] = */ (void (KCALL *)(void *__restrict, poll_mode_t))&handle_oneshot_directory_file_pollconnect,
@@ -1115,7 +1089,6 @@ PUBLIC_CONST struct handle_types const handle_type_db = {
 		/* [HANDLE_TYPE_EVENTFD_FENCE]          = */ (poll_mode_t (KCALL *)(void *__restrict, poll_mode_t))&handle_eventfd_fence_polltest,
 		/* [HANDLE_TYPE_EVENTFD_SEMA]           = */ (poll_mode_t (KCALL *)(void *__restrict, poll_mode_t))&handle_eventfd_sema_polltest,
 		/* [HANDLE_TYPE_SIGNALFD]               = */ (poll_mode_t (KCALL *)(void *__restrict, poll_mode_t))&handle_signalfd_polltest,
-		/* [HANDLE_TYPE_UAIO]                   = */ (poll_mode_t (KCALL *)(void *__restrict, poll_mode_t))&handle_uaio_polltest,
 		/* [HANDLE_TYPE_FUTEX]                  = */ (poll_mode_t (KCALL *)(void *__restrict, poll_mode_t))&handle_futex_polltest,
 		/* [HANDLE_TYPE_FUTEXFD]                = */ (poll_mode_t (KCALL *)(void *__restrict, poll_mode_t))&handle_futexfd_polltest,
 		/* [HANDLE_TYPE_ONESHOT_DIRECTORY_FILE] = */ (poll_mode_t (KCALL *)(void *__restrict, poll_mode_t))&handle_oneshot_directory_file_polltest,
@@ -1145,7 +1118,6 @@ PUBLIC_CONST struct handle_types const handle_type_db = {
 		/* [HANDLE_TYPE_EVENTFD_FENCE]          = */ (syscall_slong_t (KCALL *)(void *__restrict, syscall_ulong_t, USER UNCHECKED void *, iomode_t))&handle_eventfd_fence_hop,
 		/* [HANDLE_TYPE_EVENTFD_SEMA]           = */ (syscall_slong_t (KCALL *)(void *__restrict, syscall_ulong_t, USER UNCHECKED void *, iomode_t))&handle_eventfd_sema_hop,
 		/* [HANDLE_TYPE_SIGNALFD]               = */ (syscall_slong_t (KCALL *)(void *__restrict, syscall_ulong_t, USER UNCHECKED void *, iomode_t))&handle_signalfd_hop,
-		/* [HANDLE_TYPE_UAIO]                   = */ (syscall_slong_t (KCALL *)(void *__restrict, syscall_ulong_t, USER UNCHECKED void *, iomode_t))&handle_uaio_hop,
 		/* [HANDLE_TYPE_FUTEX]                  = */ (syscall_slong_t (KCALL *)(void *__restrict, syscall_ulong_t, USER UNCHECKED void *, iomode_t))&handle_futex_hop,
 		/* [HANDLE_TYPE_FUTEXFD]                = */ (syscall_slong_t (KCALL *)(void *__restrict, syscall_ulong_t, USER UNCHECKED void *, iomode_t))&handle_futexfd_hop,
 		/* [HANDLE_TYPE_ONESHOT_DIRECTORY_FILE] = */ (syscall_slong_t (KCALL *)(void *__restrict, syscall_ulong_t, USER UNCHECKED void *, iomode_t))&handle_oneshot_directory_file_hop,
@@ -1175,7 +1147,6 @@ PUBLIC_CONST struct handle_types const handle_type_db = {
 		/* [HANDLE_TYPE_EVENTFD_FENCE]          = */ (REF void *(KCALL *)(void *__restrict, uintptr_half_t))&handle_eventfd_fence_tryas,
 		/* [HANDLE_TYPE_EVENTFD_SEMA]           = */ (REF void *(KCALL *)(void *__restrict, uintptr_half_t))&handle_eventfd_sema_tryas,
 		/* [HANDLE_TYPE_SIGNALFD]               = */ (REF void *(KCALL *)(void *__restrict, uintptr_half_t))&handle_signalfd_tryas,
-		/* [HANDLE_TYPE_UAIO]                   = */ (REF void *(KCALL *)(void *__restrict, uintptr_half_t))&handle_uaio_tryas,
 		/* [HANDLE_TYPE_FUTEX]                  = */ (REF void *(KCALL *)(void *__restrict, uintptr_half_t))&handle_futex_tryas,
 		/* [HANDLE_TYPE_FUTEXFD]                = */ (REF void *(KCALL *)(void *__restrict, uintptr_half_t))&handle_futexfd_tryas,
 		/* [HANDLE_TYPE_ONESHOT_DIRECTORY_FILE] = */ (REF void *(KCALL *)(void *__restrict, uintptr_half_t))&handle_oneshot_directory_file_tryas,
@@ -1496,36 +1467,6 @@ DEFINE_INTERN_WEAK_ALIAS(handle_signalfd_pollconnect, handle_undefined_pollconne
 DEFINE_INTERN_WEAK_ALIAS(handle_signalfd_polltest, handle_undefined_polltest);
 DEFINE_INTERN_WEAK_ALIAS(handle_signalfd_hop, handle_undefined_hop);
 DEFINE_INTERN_WEAK_ALIAS(handle_signalfd_tryas, handle_undefined_tryas);
-
-/* Weakly define operators for `HANDLE_TYPE_UAIO' (`struct uaio_controller') */
-DEFINE_INTERN_WEAK_ALIAS(handle_uaio_refcnt, handle_undefined_refcnt);
-DEFINE_INTERN_WEAK_ALIAS(handle_uaio_incref, handle_undefined_incref);
-DEFINE_INTERN_WEAK_ALIAS(handle_uaio_decref, handle_undefined_decref);
-DEFINE_INTERN_WEAK_ALIAS(handle_uaio_tryincref, handle_undefined_tryincref);
-DEFINE_INTERN_WEAK_ALIAS(handle_uaio_weakgetref, handle_undefined_weakgetref);
-DEFINE_INTERN_WEAK_ALIAS(handle_uaio_weaklckref, handle_undefined_weaklckref);
-DEFINE_INTERN_WEAK_ALIAS(handle_uaio_weakdecref, handle_undefined_weakdecref);
-DEFINE_INTERN_WEAK_ALIAS(handle_uaio_read, handle_undefined_read);
-DEFINE_INTERN_WEAK_ALIAS(handle_uaio_write, handle_undefined_write);
-DEFINE_INTERN_WEAK_ALIAS(handle_uaio_pread, handle_undefined_pread);
-DEFINE_INTERN_WEAK_ALIAS(handle_uaio_pwrite, handle_undefined_pwrite);
-DEFINE_INTERN_WEAK_ALIAS(handle_uaio_readv, handle_undefined_readv);
-DEFINE_INTERN_WEAK_ALIAS(handle_uaio_writev, handle_undefined_writev);
-DEFINE_INTERN_WEAK_ALIAS(handle_uaio_preadv, handle_undefined_preadv);
-DEFINE_INTERN_WEAK_ALIAS(handle_uaio_pwritev, handle_undefined_pwritev);
-DEFINE_INTERN_WEAK_ALIAS(handle_uaio_readdir, handle_undefined_readdir);
-DEFINE_INTERN_WEAK_ALIAS(handle_uaio_seek, handle_undefined_seek);
-DEFINE_INTERN_WEAK_ALIAS(handle_uaio_ioctl, handle_undefined_ioctl);
-DEFINE_INTERN_WEAK_ALIAS(handle_uaio_truncate, handle_undefined_truncate);
-DEFINE_INTERN_WEAK_ALIAS(handle_uaio_mmap, handle_undefined_mmap);
-DEFINE_INTERN_WEAK_ALIAS(handle_uaio_allocate, handle_undefined_allocate);
-DEFINE_INTERN_WEAK_ALIAS(handle_uaio_sync, handle_undefined_sync);
-DEFINE_INTERN_WEAK_ALIAS(handle_uaio_datasync, handle_undefined_datasync);
-DEFINE_INTERN_WEAK_ALIAS(handle_uaio_stat, handle_undefined_stat);
-DEFINE_INTERN_WEAK_ALIAS(handle_uaio_pollconnect, handle_undefined_pollconnect);
-DEFINE_INTERN_WEAK_ALIAS(handle_uaio_polltest, handle_undefined_polltest);
-DEFINE_INTERN_WEAK_ALIAS(handle_uaio_hop, handle_undefined_hop);
-DEFINE_INTERN_WEAK_ALIAS(handle_uaio_tryas, handle_undefined_tryas);
 
 /* Weakly define operators for `HANDLE_TYPE_FUTEX' (`struct mfutex') */
 DEFINE_INTERN_WEAK_ALIAS(handle_futex_refcnt, handle_undefined_refcnt);

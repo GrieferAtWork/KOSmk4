@@ -315,7 +315,6 @@ struct pipe_writer;
 struct fifo_user;
 struct eventfd;
 struct signalfd;
-struct uaio_controller;
 struct mfutex;
 struct mfutexfd;
 struct oneshot_directory_file;
@@ -634,36 +633,6 @@ INTDEF NONNULL((1)) void KCALL handle_signalfd_pollconnect(struct signalfd *__re
 INTDEF WUNUSED NONNULL((1)) poll_mode_t KCALL handle_signalfd_polltest(struct signalfd *__restrict self, poll_mode_t what) THROWS(...);
 INTDEF NONNULL((1)) syscall_slong_t KCALL handle_signalfd_hop(struct signalfd *__restrict self, syscall_ulong_t cmd, USER UNCHECKED void *arg, iomode_t mode) THROWS(...);
 INTDEF NONNULL((1)) REF void *KCALL handle_signalfd_tryas(struct signalfd *__restrict self, uintptr_half_t wanted_type) THROWS(E_WOULDBLOCK);
-
-/* Handle operators for `HANDLE_TYPE_UAIO' (`struct uaio_controller') */
-INTDEF NOBLOCK WUNUSED NONNULL((1)) refcnt_t NOTHROW(FCALL handle_uaio_refcnt)(struct uaio_controller const *__restrict self);
-INTDEF NOBLOCK NONNULL((1)) void NOTHROW(FCALL handle_uaio_incref)(struct uaio_controller *__restrict self);
-INTDEF NOBLOCK NONNULL((1)) void NOTHROW(FCALL handle_uaio_decref)(REF struct uaio_controller *__restrict self);
-INTDEF NOBLOCK WUNUSED NONNULL((1)) __BOOL NOTHROW(FCALL handle_uaio_tryincref)(struct uaio_controller *__restrict self);
-INTDEF NOBLOCK ATTR_RETNONNULL WUNUSED NONNULL((1)) WEAK REF void *NOTHROW(FCALL handle_uaio_weakgetref)(struct uaio_controller *__restrict self);
-INTDEF NOBLOCK WUNUSED NONNULL((1)) REF struct uaio_controller *NOTHROW(FCALL handle_uaio_weaklckref)(void *__restrict weakref_ptr);
-INTDEF NOBLOCK NONNULL((1)) void NOTHROW(FCALL handle_uaio_weakdecref)(WEAK REF void *__restrict weakref_ptr);
-INTDEF WUNUSED NONNULL((1)) size_t KCALL handle_uaio_read(struct uaio_controller *__restrict self, USER CHECKED void *dst, size_t num_bytes, iomode_t mode) THROWS(...);
-INTDEF WUNUSED NONNULL((1)) size_t KCALL handle_uaio_write(struct uaio_controller *__restrict self, USER CHECKED void const *src, size_t num_bytes, iomode_t mode) THROWS(...);
-INTDEF WUNUSED NONNULL((1)) size_t KCALL handle_uaio_pread(struct uaio_controller *__restrict self, USER CHECKED void *dst, size_t num_bytes, pos_t addr, iomode_t mode) THROWS(...);
-INTDEF WUNUSED NONNULL((1)) size_t KCALL handle_uaio_pwrite(struct uaio_controller *__restrict self, USER CHECKED void const *src, size_t num_bytes, pos_t addr, iomode_t mode) THROWS(...);
-INTDEF WUNUSED NONNULL((1, 2)) size_t KCALL handle_uaio_readv(struct uaio_controller *__restrict self, struct iov_buffer *__restrict dst, size_t num_bytes, iomode_t mode) THROWS(...);
-INTDEF WUNUSED NONNULL((1, 2)) size_t KCALL handle_uaio_writev(struct uaio_controller *__restrict self, struct iov_buffer *__restrict src, size_t num_bytes, iomode_t mode) THROWS(...);
-INTDEF WUNUSED NONNULL((1, 2)) size_t KCALL handle_uaio_preadv(struct uaio_controller *__restrict self, struct iov_buffer *__restrict dst, size_t num_bytes, pos_t addr, iomode_t mode) THROWS(...);
-INTDEF WUNUSED NONNULL((1, 2)) size_t KCALL handle_uaio_pwritev(struct uaio_controller *__restrict self, struct iov_buffer *__restrict src, size_t num_bytes, pos_t addr, iomode_t mode) THROWS(...);
-INTDEF WUNUSED NONNULL((1)) size_t KCALL handle_uaio_readdir(struct uaio_controller *__restrict self, USER CHECKED struct dirent *buf, size_t bufsize, readdir_mode_t readdir_mode, iomode_t mode) THROWS(...);
-INTDEF NONNULL((1)) pos_t KCALL handle_uaio_seek(struct uaio_controller *__restrict self, off_t offset, unsigned int whence) THROWS(...);
-INTDEF NONNULL((1)) syscall_slong_t KCALL handle_uaio_ioctl(struct uaio_controller *__restrict self, syscall_ulong_t cmd, USER UNCHECKED void *arg, iomode_t mode) THROWS(...);
-INTDEF NONNULL((1)) void KCALL handle_uaio_truncate(struct uaio_controller *__restrict self, pos_t new_size) THROWS(...);
-INTDEF NONNULL((1, 2)) void KCALL handle_uaio_mmap(struct uaio_controller *__restrict self, struct handle_mmap_info *__restrict info) THROWS(...);
-INTDEF NONNULL((1)) pos_t KCALL handle_uaio_allocate(struct uaio_controller *__restrict self, fallocate_mode_t mode, pos_t start, pos_t length) THROWS(...);
-INTDEF NONNULL((1)) void KCALL handle_uaio_sync(struct uaio_controller *__restrict self) THROWS(...);
-INTDEF NONNULL((1)) void KCALL handle_uaio_datasync(struct uaio_controller *__restrict self) THROWS(...);
-INTDEF NONNULL((1)) void KCALL handle_uaio_stat(struct uaio_controller *__restrict self, USER CHECKED struct stat *result) THROWS(...);
-INTDEF NONNULL((1)) void KCALL handle_uaio_pollconnect(struct uaio_controller *__restrict self, poll_mode_t what) THROWS(...);
-INTDEF WUNUSED NONNULL((1)) poll_mode_t KCALL handle_uaio_polltest(struct uaio_controller *__restrict self, poll_mode_t what) THROWS(...);
-INTDEF NONNULL((1)) syscall_slong_t KCALL handle_uaio_hop(struct uaio_controller *__restrict self, syscall_ulong_t cmd, USER UNCHECKED void *arg, iomode_t mode) THROWS(...);
-INTDEF NONNULL((1)) REF void *KCALL handle_uaio_tryas(struct uaio_controller *__restrict self, uintptr_half_t wanted_type) THROWS(E_WOULDBLOCK);
 
 /* Handle operators for `HANDLE_TYPE_FUTEX' (`struct mfutex') */
 INTDEF NOBLOCK WUNUSED NONNULL((1)) refcnt_t NOTHROW(FCALL handle_futex_refcnt)(struct mfutex const *__restrict self);

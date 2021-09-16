@@ -260,9 +260,6 @@ struct ksysctl_driver_set_library_path /*[PREFIX(slp_)]*/ {
 #endif /* __CC__ */
 #undef __KSYSCTL_PAD_POINTER
 
-/* KOS extensions */
-#define KSYSCTL_UAIO_CREATE 0xe0010001 /* [syscall_ulong_t uaio_flags = UAIO_CREATE_*] Create and return a new UAIO object. */
-
 /* Generic kernel house-keeping */
 #define KSYSCTL_SYSTEM_CLEARCACHES             0xc05e0001 /* Invoke cache clear callbacks for each and every globally reachable
                                                            * component within the entire kernel.

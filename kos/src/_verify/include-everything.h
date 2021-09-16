@@ -564,7 +564,6 @@ incdir("");
 #include <kos/aref.h>
 #include <kos/asm/rtm.h>
 #include <kos/asm/syscall.h>
-#include <kos/asm/uaio.h>
 #include <kos/bits/coredump.h>
 #include <kos/bits/debugtrap.h>
 #include <kos/bits/except-handler.h>
@@ -577,7 +576,6 @@ incdir("");
 #include <kos/bits/futex.h>
 #include <kos/bits/rtm.h>
 #include <kos/bits/thread.h>
-#include <kos/bits/uaio.h>
 #include <kos/bits/ukern-struct.h>
 #include <kos/bits/ukern.h>
 #include <kos/bits/userprocmask.h>
@@ -627,7 +625,6 @@ incdir("");
 #include <kos/hop/pidns.h>
 #include <kos/hop/pipe.h>
 #include <kos/hop/task.h>
-#include <kos/hop/uaio.h>
 #include <kos/hybrid/heap.h>
 #include <kos/hybrid/sched-signal.h>
 #include <kos/io.h>
@@ -657,7 +654,6 @@ incdir("");
 #include <kos/syscalls.h>
 #include <kos/thread.h>
 #include <kos/types.h>
-#include <kos/uaio.h>
 #include <kos/ukern.h>
 #include <kos/unistd.h>
 #include <lastlog.h>

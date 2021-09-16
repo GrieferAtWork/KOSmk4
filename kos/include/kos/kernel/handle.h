@@ -62,28 +62,27 @@
 #define HANDLE_TYPE_EVENTFD_FENCE          0x0008 /* `struct eventfd' (without `EFD_SEMAPHORE') */
 #define HANDLE_TYPE_EVENTFD_SEMA           0x0009 /* `struct eventfd' (with `EFD_SEMAPHORE') */
 #define HANDLE_TYPE_SIGNALFD               0x000a /* `struct signalfd' */
-#define HANDLE_TYPE_UAIO                   0x000b /* `struct uaio_controller' */
-#define HANDLE_TYPE_FUTEX                  0x000c /* `struct mfutex' */
-#define HANDLE_TYPE_FUTEXFD                0x000d /* `struct mfutexfd' */
-#define HANDLE_TYPE_ONESHOT_DIRECTORY_FILE 0x000e /* `struct oneshot_directory_file'
+#define HANDLE_TYPE_FUTEX                  0x000b /* `struct mfutex' */
+#define HANDLE_TYPE_FUTEXFD                0x000c /* `struct mfutexfd' */
+#define HANDLE_TYPE_ONESHOT_DIRECTORY_FILE 0x000d /* `struct oneshot_directory_file'
                                                    * Castable into: HANDLE_TYPE_PATH, HANDLE_TYPE_MFILE, HANDLE_TYPE_DIRECTORYENTRY */
-#define HANDLE_TYPE_MFILE                  0x000f /* `struct mfile' (also includes `struct inode') */
-#define HANDLE_TYPE_BLOCKDEVICE            0x0010 /* `struct basic_block_device' */
-#define HANDLE_TYPE_DIRECTORYENTRY         0x0011 /* `struct directory_entry' */
-#define HANDLE_TYPE_PATH                   0x0012 /* `struct path' (also includes `struct vfs')
+#define HANDLE_TYPE_MFILE                  0x000e /* `struct mfile' (also includes `struct inode') */
+#define HANDLE_TYPE_BLOCKDEVICE            0x000f /* `struct basic_block_device' */
+#define HANDLE_TYPE_DIRECTORYENTRY         0x0010 /* `struct directory_entry' */
+#define HANDLE_TYPE_PATH                   0x0011 /* `struct path' (also includes `struct vfs')
                                                    * Castable into: HANDLE_TYPE_MFILE, HANDLE_TYPE_DIRECTORYENTRY */
-#define HANDLE_TYPE_FS                     0x0013 /* `struct fs' */
-#define HANDLE_TYPE_MMAN                   0x0014 /* `struct mman' */
-#define HANDLE_TYPE_TASK                   0x0015 /* `struct taskpid'
+#define HANDLE_TYPE_FS                     0x0012 /* `struct fs' */
+#define HANDLE_TYPE_MMAN                   0x0013 /* `struct mman' */
+#define HANDLE_TYPE_TASK                   0x0014 /* `struct taskpid'
                                                    * Castable into: HANDLE_TYPE_FS, HANDLE_TYPE_MMAN, HANDLE_TYPE_PIDNS */
-#define HANDLE_TYPE_MODULE                 0x0016 /* `struct module' */
-#define HANDLE_TYPE_PIDNS                  0x0017 /* `struct pidns' */
-#define HANDLE_TYPE_DRIVER_LOADLIST        0x0018 /* `struct driver_loadlist' */
-#define HANDLE_TYPE_CHARACTERDEVICE        0x0019 /* `struct character_device'
+#define HANDLE_TYPE_MODULE                 0x0015 /* `struct module' */
+#define HANDLE_TYPE_PIDNS                  0x0016 /* `struct pidns' */
+#define HANDLE_TYPE_DRIVER_LOADLIST        0x0017 /* `struct driver_loadlist' */
+#define HANDLE_TYPE_CHARACTERDEVICE        0x0018 /* `struct character_device'
                                                    * Castable into: HANDLE_TYPE_MFILE (if supported) */
-#define HANDLE_TYPE_MPART                  0x001a /* `struct mpart' */
-#define HANDLE_TYPE_MODULE_SECTION         0x001b /* `struct module_section' */
-#define HANDLE_TYPE_COUNT                  0x001c /* # of recognized handle types
+#define HANDLE_TYPE_MPART                  0x0019 /* `struct mpart' */
+#define HANDLE_TYPE_MODULE_SECTION         0x001a /* `struct module_section' */
+#define HANDLE_TYPE_COUNT                  0x001b /* # of recognized handle types
                                                    * NOTE: After changing  this value,  be sure  to
                                                    * `touch kos/src/kernel/include/kernel/handle.h' */
 
@@ -110,8 +109,7 @@
 	cb(HANDLE_TYPE_FUTEX, struct mfutex)                                  \
 	cb(HANDLE_TYPE_FUTEXFD, struct mfutexfd)                              \
 	cb(HANDLE_TYPE_MODULE_SECTION, struct driver_section)                 \
-	cb(HANDLE_TYPE_SOCKET, struct socket)                                 \
-	cb(HANDLE_TYPE_UAIO, struct uaio_controller)
+	cb(HANDLE_TYPE_SOCKET, struct socket)
 
 /* Invoke `cb(int HANDLE_TYPE, typename T)' for each handle  type
  * that could reasonably be used for callback registrations (such
@@ -122,8 +120,7 @@
 	cb(HANDLE_TYPE_MMAN, struct mman)                        \
 	cb(HANDLE_TYPE_MODULE, struct driver)                    \
 	cb(HANDLE_TYPE_CHARACTERDEVICE, struct character_device) \
-	cb(HANDLE_TYPE_SOCKET, struct socket)                    \
-	cb(HANDLE_TYPE_UAIO, struct uaio_controller)
+	cb(HANDLE_TYPE_SOCKET, struct socket)
 
 
 
