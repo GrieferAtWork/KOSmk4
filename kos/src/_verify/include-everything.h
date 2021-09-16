@@ -643,13 +643,16 @@ incdir("");
 #include <kos/keyboard.h>
 #include <kos/ksysctl.h>
 #include <kos/malloc.h>
+#include <kos/malloca.h>
 #include <kos/net/printf.h>
+#include <kos/parts/malloca.h>
 #include <kos/personality.h>
 #include <kos/refcnt-nonatomic.h>
 #include <kos/refcnt.h>
 #include <kos/refptr.h>
 #include <kos/rtm.h>
 #include <kos/sys/ioctl.h>
+#include <kos/sys/mman.h>
 #include <kos/sys/stat.h>
 #include <kos/syscalls.h>
 #include <kos/thread.h>
@@ -669,6 +672,7 @@ incdir("");
 #include <libc/core/errno.h>
 #include <libc/core/error.h>
 #include <libc/core/fenv.h>
+#include <libc/core/kos.malloc.h>
 #include <libc/core/malloc.h>
 #include <libc/core/parts.uchar.string.h>
 #include <libc/core/signal.h>
@@ -682,6 +686,7 @@ incdir("");
 #include <libc/errno.h>
 #include <libc/error.h>
 #include <libc/fenv.h>
+#include <libc/kos.malloc.h>
 #include <libc/malloc.h>
 #include <libc/parts.uchar.string.h>
 #include <libc/signal.h>

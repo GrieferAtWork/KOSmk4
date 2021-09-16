@@ -26,12 +26,6 @@
 
 #if defined(__KOS__) && defined(__KERNEL__)
 /* In this case, the regular malloca() is already exception-enabled! */
-#ifdef __malloca_stack
-#define __MallocaStack __malloca_stack
-#endif /* __malloca_stack */
-#ifdef __calloca_stack
-#define __CallocaStack __calloca_stack
-#endif /* __calloca_stack */
 #ifdef __malloca_heap
 #define __MallocaHeap __malloca_heap
 #endif /* __malloca_heap */
@@ -53,13 +47,6 @@
 
 #ifdef __CC__
 __SYSDECL_BEGIN
-
-#ifdef __malloca_stack
-#define __MallocaStack(num_bytes) __malloca_stack(num_bytes)
-#endif /* __malloca_stack */
-#ifdef __calloca_stack
-#define __CallocaStack(num_bytes) __calloca_stack(num_bytes)
-#endif /* __calloca_stack */
 
 #ifdef ____libc_Malloc_defined
 #ifndef __NO_XBLOCK

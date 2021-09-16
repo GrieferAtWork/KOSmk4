@@ -29,7 +29,7 @@
 /* A hybrid between alloca and malloc, using alloca for
  * small  allocations,  but malloc()  for  larger ones.
  * NOTE: In all cases, 'afree()' should be used to clean up a
- *       pointer previously allocated  using 'amalloc()'  and
+ *       pointer previously allocated  using 'malloca()'  and
  *       friends. */
 
 #ifdef __malloca_tryhard_mayfail
