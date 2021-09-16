@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x1ae25aa9 */
+/* HASH CRC-32:0x8a3c1955 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -136,7 +136,7 @@
 #define __NR32AC_fchown                       3
 #define __NR32AC_getpriority                  2
 #define __NR32AC_setpriority                  3
-#define __NR32AC_profil                       4
+#define __NR32AC_profil                       0
 #define __NR32AC_statfs                       2
 #define __NR32AC_fstatfs                      2
 #define __NR32AC_ioperm                       3
@@ -175,7 +175,7 @@
 #define __NR32AC_bdflush                      1
 #define __NR32AC_sysfs                        1
 #define __NR32AC_personality                  1
-#define __NR32AC_afs_syscall                  1
+#define __NR32AC_afs_syscall                  0
 #define __NR32AC_setfsuid                     1
 #define __NR32AC_setfsgid                     1
 #define __NR32AC__llseek                      4
@@ -226,8 +226,8 @@
 #define __NR32AC_capset                       1
 #define __NR32AC_sigaltstack                  2
 #define __NR32AC_sendfile                     4
-#define __NR32AC_getpmsg                      1
-#define __NR32AC_putpmsg                      1
+#define __NR32AC_getpmsg                      0
+#define __NR32AC_putpmsg                      0
 #define __NR32AC_vfork                        0
 #define __NR32AC_ugetrlimit                   1
 #define __NR32AC_mmap2                        6
@@ -308,7 +308,7 @@
 #define __NR32AC_tgkill                       3
 #define __NR32AC_utimes                       2
 #define __NR32AC_fadvise64_64                 1
-#define __NR32AC_vserver                      1
+#define __NR32AC_vserver                      0
 #define __NR32AC_mbind                        1
 #define __NR32AC_get_mempolicy                1
 #define __NR32AC_set_mempolicy                1
@@ -913,7 +913,7 @@
 #define __NR32RT_recvfrom                     (ssize_t, __ssize_t)
 #define __NR32RT_recvmsg                      (ssize_t, __ssize_t)
 #define __NR32RT_shutdown                     (errno_t, __errno_t)
-#define __NR32RT_userfaultfd                  (errno_t, __errno_t)
+#define __NR32RT_userfaultfd                  (fd_t, __fd_t)
 #define __NR32RT_membarrier                   (errno_t, __errno_t)
 #define __NR32RT_mlock2                       (errno_t, __errno_t)
 #define __NR32RT_copy_file_range              (errno_t, __errno_t)
@@ -1200,10 +1200,6 @@
 #define __NR32AT0_setpriority                  (syscall_ulong_t, __syscall_ulong_t)
 #define __NR32AT1_setpriority                  (id_t, __id_t)
 #define __NR32AT2_setpriority                  (syscall_ulong_t, __syscall_ulong_t)
-#define __NR32AT0_profil                       (uint16_t *, __uint16_t *)
-#define __NR32AT1_profil                       (size_t, __size_t)
-#define __NR32AT2_profil                       (size_t, __size_t)
-#define __NR32AT3_profil                       (syscall_ulong_t, __syscall_ulong_t)
 #define __NR32AT0_statfs                       (char const *, char const *)
 #define __NR32AT1_statfs                       (struct __statfsx32 *, struct __statfsx32 *)
 #define __NR32AT0_fstatfs                      (fd_t, __fd_t)
@@ -1255,7 +1251,7 @@
 #define __NR32AT0_modify_ldt                   (syscall_ulong_t, __syscall_ulong_t)
 #define __NR32AT1_modify_ldt                   (void *, void *)
 #define __NR32AT2_modify_ldt                   (syscall_ulong_t, __syscall_ulong_t)
-#define __NR32AT0_adjtimex                     (int, int)
+#define __NR32AT0_adjtimex                     (struct timex *, struct timex *)
 #define __NR32AT0_mprotect                     (void *, void *)
 #define __NR32AT1_mprotect                     (size_t, __size_t)
 #define __NR32AT2_mprotect                     (syscall_ulong_t, __syscall_ulong_t)
@@ -1273,7 +1269,6 @@
 #define __NR32AT0_bdflush                      (int, int)
 #define __NR32AT0_sysfs                        (int, int)
 #define __NR32AT0_personality                  (int, int)
-#define __NR32AT0_afs_syscall                  (int, int)
 #define __NR32AT0_setfsuid                     (uint16_t, __uint16_t)
 #define __NR32AT0_setfsgid                     (uint16_t, __uint16_t)
 #define __NR32AT0__llseek                      (fd_t, __fd_t)
@@ -1390,8 +1385,6 @@
 #define __NR32AT1_sendfile                     (fd_t, __fd_t)
 #define __NR32AT2_sendfile                     (__ULONG32_TYPE__ *, __ULONG32_TYPE__ *)
 #define __NR32AT3_sendfile                     (size_t, __size_t)
-#define __NR32AT0_getpmsg                      (int, int)
-#define __NR32AT0_putpmsg                      (int, int)
 #define __NR32AT0_ugetrlimit                   (int, int)
 #define __NR32AT0_mmap2                        (void *, void *)
 #define __NR32AT1_mmap2                        (size_t, __size_t)
@@ -1574,7 +1567,6 @@
 #define __NR32AT0_utimes                       (char const *, char const *)
 #define __NR32AT1_utimes                       (struct timevalx32 const *, struct __timevalx32 const *)
 #define __NR32AT0_fadvise64_64                 (int, int)
-#define __NR32AT0_vserver                      (int, int)
 #define __NR32AT0_mbind                        (int, int)
 #define __NR32AT0_get_mempolicy                (int, int)
 #define __NR32AT0_set_mempolicy                (int, int)
@@ -1874,7 +1866,7 @@
 #define __NR32AT2_recvmsg                      (syscall_ulong_t, __syscall_ulong_t)
 #define __NR32AT0_shutdown                     (fd_t, __fd_t)
 #define __NR32AT1_shutdown                     (syscall_ulong_t, __syscall_ulong_t)
-#define __NR32AT0_userfaultfd                  (int, int)
+#define __NR32AT0_userfaultfd                  (syscall_ulong_t, __syscall_ulong_t)
 #define __NR32AT0_membarrier                   (int, int)
 #define __NR32AT0_mlock2                       (void const *, void const *)
 #define __NR32AT1_mlock2                       (size_t, __size_t)
@@ -2309,7 +2301,7 @@
 #define __NR32AM_fchown(a, b, c, d, e, f)                       (__fd_t)a, (__uint16_t)b, (__uint16_t)c
 #define __NR32AM_getpriority(a, b, c, d, e, f)                  (__syscall_ulong_t)a, (__id_t)b
 #define __NR32AM_setpriority(a, b, c, d, e, f)                  (__syscall_ulong_t)a, (__id_t)b, (__syscall_ulong_t)c
-#define __NR32AM_profil(a, b, c, d, e, f)                       (__uint16_t *)a, (__size_t)b, (__size_t)c, (__syscall_ulong_t)d
+#define __NR32AM_profil(a, b, c, d, e, f)                       /* nothing */
 #define __NR32AM_statfs(a, b, c, d, e, f)                       (char const *)a, (struct __statfsx32 *)b
 #define __NR32AM_fstatfs(a, b, c, d, e, f)                      (__fd_t)a, (struct __statfsx32 *)b
 #define __NR32AM_ioperm(a, b, c, d, e, f)                       (__syscall_ulong_t)a, (__syscall_ulong_t)b, (__syscall_ulong_t)c
@@ -2335,7 +2327,7 @@
 #define __NR32AM_setdomainname(a, b, c, d, e, f)                (char const *)a, (__size_t)b
 #define __NR32AM_uname(a, b, c, d, e, f)                        (struct utsname *)a
 #define __NR32AM_modify_ldt(a, b, c, d, e, f)                   (__syscall_ulong_t)a, (void *)b, (__syscall_ulong_t)c
-#define __NR32AM_adjtimex(a, b, c, d, e, f)                     (int)a
+#define __NR32AM_adjtimex(a, b, c, d, e, f)                     (struct timex *)a
 #define __NR32AM_mprotect(a, b, c, d, e, f)                     (void *)a, (__size_t)b, (__syscall_ulong_t)c
 #define __NR32AM_sigprocmask(a, b, c, d, e, f)                  (__syscall_ulong_t)a, (struct __sigset_struct const *)b, (struct __sigset_struct *)c
 #define __NR32AM_create_module(a, b, c, d, e, f)                /* nothing */
@@ -2348,7 +2340,7 @@
 #define __NR32AM_bdflush(a, b, c, d, e, f)                      (int)a
 #define __NR32AM_sysfs(a, b, c, d, e, f)                        (int)a
 #define __NR32AM_personality(a, b, c, d, e, f)                  (int)a
-#define __NR32AM_afs_syscall(a, b, c, d, e, f)                  (int)a
+#define __NR32AM_afs_syscall(a, b, c, d, e, f)                  /* nothing */
 #define __NR32AM_setfsuid(a, b, c, d, e, f)                     (__uint16_t)a
 #define __NR32AM_setfsgid(a, b, c, d, e, f)                     (__uint16_t)a
 #define __NR32AM__llseek(a, b, c, d, e, f)                      (__fd_t)a, (__int64_t)((__uint64_t)b | (__uint64_t)c << 32), (__uint64_t *)d, (__syscall_ulong_t)e
@@ -2399,8 +2391,8 @@
 #define __NR32AM_capset(a, b, c, d, e, f)                       (int)a
 #define __NR32AM_sigaltstack(a, b, c, d, e, f)                  (struct __sigaltstackx32 const *)a, (struct __sigaltstackx32 *)b
 #define __NR32AM_sendfile(a, b, c, d, e, f)                     (__fd_t)a, (__fd_t)b, (__ULONG32_TYPE__ *)c, (__size_t)d
-#define __NR32AM_getpmsg(a, b, c, d, e, f)                      (int)a
-#define __NR32AM_putpmsg(a, b, c, d, e, f)                      (int)a
+#define __NR32AM_getpmsg(a, b, c, d, e, f)                      /* nothing */
+#define __NR32AM_putpmsg(a, b, c, d, e, f)                      /* nothing */
 #define __NR32AM_vfork(a, b, c, d, e, f)                        /* nothing */
 #define __NR32AM_ugetrlimit(a, b, c, d, e, f)                   (int)a
 #define __NR32AM_mmap2(a, b, c, d, e, f)                        (void *)a, (__size_t)b, (__syscall_ulong_t)c, (__syscall_ulong_t)d, (__fd_t)e, (__syscall_ulong_t)f
@@ -2481,7 +2473,7 @@
 #define __NR32AM_tgkill(a, b, c, d, e, f)                       (__pid_t)a, (__pid_t)b, (__signo_t)c
 #define __NR32AM_utimes(a, b, c, d, e, f)                       (char const *)a, (struct __timevalx32 const *)b
 #define __NR32AM_fadvise64_64(a, b, c, d, e, f)                 (int)a
-#define __NR32AM_vserver(a, b, c, d, e, f)                      (int)a
+#define __NR32AM_vserver(a, b, c, d, e, f)                      /* nothing */
 #define __NR32AM_mbind(a, b, c, d, e, f)                        (int)a
 #define __NR32AM_get_mempolicy(a, b, c, d, e, f)                (int)a
 #define __NR32AM_set_mempolicy(a, b, c, d, e, f)                (int)a
@@ -2581,7 +2573,7 @@
 #define __NR32AM_recvfrom(a, b, c, d, e, f)                     (__fd_t)a, (void *)b, (__size_t)c, (__syscall_ulong_t)d, (struct sockaddr *)e, (__socklen_t *)f
 #define __NR32AM_recvmsg(a, b, c, d, e, f)                      (__fd_t)a, (struct __msghdrx32 *)b, (__syscall_ulong_t)c
 #define __NR32AM_shutdown(a, b, c, d, e, f)                     (__fd_t)a, (__syscall_ulong_t)b
-#define __NR32AM_userfaultfd(a, b, c, d, e, f)                  (int)a
+#define __NR32AM_userfaultfd(a, b, c, d, e, f)                  (__syscall_ulong_t)a
 #define __NR32AM_membarrier(a, b, c, d, e, f)                   (int)a
 #define __NR32AM_mlock2(a, b, c, d, e, f)                       (void const *)a, (__size_t)b, (__syscall_ulong_t)c
 #define __NR32AM_copy_file_range(a, b, c, d, e, f)              (int)a
@@ -2814,7 +2806,7 @@
 #define __NR32AP_fchown(a, b, c)                                (__syscall_ulong_t)a, (__syscall_ulong_t)b, (__syscall_ulong_t)c
 #define __NR32AP_getpriority(a, b)                              (__syscall_ulong_t)a, (__syscall_ulong_t)b
 #define __NR32AP_setpriority(a, b, c)                           (__syscall_ulong_t)a, (__syscall_ulong_t)b, (__syscall_ulong_t)c
-#define __NR32AP_profil(a, b, c, d)                             (__syscall_ulong_t)a, (__syscall_ulong_t)b, (__syscall_ulong_t)c, (__syscall_ulong_t)d
+#define __NR32AP_profil()                                       /* nothing */
 #define __NR32AP_statfs(a, b)                                   (__syscall_ulong_t)a, (__syscall_ulong_t)b
 #define __NR32AP_fstatfs(a, b)                                  (__syscall_ulong_t)a, (__syscall_ulong_t)b
 #define __NR32AP_ioperm(a, b, c)                                (__syscall_ulong_t)a, (__syscall_ulong_t)b, (__syscall_ulong_t)c
@@ -2853,7 +2845,7 @@
 #define __NR32AP_bdflush(a)                                     (__syscall_ulong_t)a
 #define __NR32AP_sysfs(a)                                       (__syscall_ulong_t)a
 #define __NR32AP_personality(a)                                 (__syscall_ulong_t)a
-#define __NR32AP_afs_syscall(a)                                 (__syscall_ulong_t)a
+#define __NR32AP_afs_syscall()                                  /* nothing */
 #define __NR32AP_setfsuid(a)                                    (__syscall_ulong_t)a
 #define __NR32AP_setfsgid(a)                                    (__syscall_ulong_t)a
 #define __NR32AP__llseek(a, b, c, d)                            (__syscall_ulong_t)a, (__syscall_ulong_t)b, (__syscall_ulong_t)((__uint64_t)b >> 32), (__syscall_ulong_t)c, (__syscall_ulong_t)d
@@ -2904,8 +2896,8 @@
 #define __NR32AP_capset(a)                                      (__syscall_ulong_t)a
 #define __NR32AP_sigaltstack(a, b)                              (__syscall_ulong_t)a, (__syscall_ulong_t)b
 #define __NR32AP_sendfile(a, b, c, d)                           (__syscall_ulong_t)a, (__syscall_ulong_t)b, (__syscall_ulong_t)c, (__syscall_ulong_t)d
-#define __NR32AP_getpmsg(a)                                     (__syscall_ulong_t)a
-#define __NR32AP_putpmsg(a)                                     (__syscall_ulong_t)a
+#define __NR32AP_getpmsg()                                      /* nothing */
+#define __NR32AP_putpmsg()                                      /* nothing */
 #define __NR32AP_vfork()                                        /* nothing */
 #define __NR32AP_ugetrlimit(a)                                  (__syscall_ulong_t)a
 #define __NR32AP_mmap2(a, b, c, d, e, f)                        (__syscall_ulong_t)a, (__syscall_ulong_t)b, (__syscall_ulong_t)c, (__syscall_ulong_t)d, (__syscall_ulong_t)e, (__syscall_ulong_t)f
@@ -2986,7 +2978,7 @@
 #define __NR32AP_tgkill(a, b, c)                                (__syscall_ulong_t)a, (__syscall_ulong_t)b, (__syscall_ulong_t)c
 #define __NR32AP_utimes(a, b)                                   (__syscall_ulong_t)a, (__syscall_ulong_t)b
 #define __NR32AP_fadvise64_64(a)                                (__syscall_ulong_t)a
-#define __NR32AP_vserver(a)                                     (__syscall_ulong_t)a
+#define __NR32AP_vserver()                                      /* nothing */
 #define __NR32AP_mbind(a)                                       (__syscall_ulong_t)a
 #define __NR32AP_get_mempolicy(a)                               (__syscall_ulong_t)a
 #define __NR32AP_set_mempolicy(a)                               (__syscall_ulong_t)a

@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x94ae41ec */
+/* HASH CRC-32:0x78c16df1 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -397,7 +397,7 @@
 #define __NR_getcpu                 0xa8  /* errno_t getcpu(uint32_t *cpu, uint32_t *node, struct getcpu_cache *tcache) */
 #define __NR_gettimeofday           0xa9  /* errno_t gettimeofday(struct timeval *tv, struct timezone *tz) */
 #define __NR_settimeofday           0xaa  /* errno_t settimeofday(struct timeval const *tv, struct timezone const *tz) */
-#define __NR_adjtimex               0xab  /* errno_t adjtimex(int TODO_PROTOTYPE) */
+#define __NR_adjtimex               0xab  /* errno_t adjtimex(struct timex *ntx) */
 #define __NR_getpid                 0xac  /* pid_t getpid(void) */
 #define __NR_getppid                0xad  /* pid_t getppid(void) */
 /* >> getuid(2)
@@ -711,7 +711,7 @@
  * and execute it's `main()' method, passing the given `argv', and setting `environ' to `envp'
  * @param: flags: Set of `0 | AT_EMPTY_PATH | AT_SYMLINK_NOFOLLOW | AT_DOSPATH' */
 #define __NR_execveat               0x119 /* errno_t execveat(fd_t dirfd, char const *pathname, char const *const *argv, char const *const *envp, atflag_t flags) */
-#define __NR_userfaultfd            0x11a /* errno_t userfaultfd(int TODO_PROTOTYPE) */
+#define __NR_userfaultfd            0x11a /* fd_t userfaultfd(syscall_ulong_t flags) */
 #define __NR_membarrier             0x11b /* errno_t membarrier(int TODO_PROTOTYPE) */
 #define __NR_mlock2                 0x11c /* errno_t mlock2(void const *addr, size_t length, syscall_ulong_t flags) */
 /* Open  a  new  file  handle  to  the  file  specified  by `filename'

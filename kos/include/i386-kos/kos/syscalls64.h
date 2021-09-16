@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xdec13a1c */
+/* HASH CRC-32:0x3799d158 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -42,6 +42,7 @@
 #include <bits/os/mqueue.h>
 #include <bits/os/pollfd.h>
 #include <bits/os/sigevent.h>
+#include <bits/os/timex.h>
 #include <bits/types.h>
 #include <elf.h>
 #include <hybrid/__pointer.h>
@@ -134,6 +135,7 @@ struct sigevent;
 struct sockaddr;
 struct sysinfo;
 struct termios;
+struct timex;
 struct timezone;
 struct ucpustate64;
 struct userprocmask;
@@ -190,10 +192,10 @@ __CDECLARE_SC(,__errno_t,acct,(char const *__filename),(__filename))
 __CDECLARE_SC(,__errno_t,add_key,(int __TODO_PROTOTYPE),(__TODO_PROTOTYPE))
 #endif /* __CRT_HAVE_SC(add_key) */
 #if __CRT_HAVE_SC(adjtimex)
-__CDECLARE_SC(,__errno_t,adjtimex,(int __TODO_PROTOTYPE),(__TODO_PROTOTYPE))
+__CDECLARE_SC(,__errno_t,adjtimex,(struct timex *__ntx),(__ntx))
 #endif /* __CRT_HAVE_SC(adjtimex) */
 #if __CRT_HAVE_SC(afs_syscall)
-__CDECLARE_SC(,__errno_t,afs_syscall,(int __TODO_PROTOTYPE),(__TODO_PROTOTYPE))
+__CDECLARE_SC(,__errno_t,afs_syscall,(void),())
 #endif /* __CRT_HAVE_SC(afs_syscall) */
 #if __CRT_HAVE_SC(alarm)
 __CDECLARE_SC(,__syscall_ulong_t,alarm,(__syscall_ulong_t __seconds),(__seconds))
@@ -827,7 +829,7 @@ __CDECLARE_SC(,__pid_t,getpgrp,(void),())
 __CDECLARE_SC(,__pid_t,getpid,(void),())
 #endif /* __CRT_HAVE_SC(getpid) */
 #if __CRT_HAVE_SC(getpmsg)
-__CDECLARE_SC(,__errno_t,getpmsg,(int __TODO_PROTOTYPE),(__TODO_PROTOTYPE))
+__CDECLARE_SC(,__errno_t,getpmsg,(void),())
 #endif /* __CRT_HAVE_SC(getpmsg) */
 #if __CRT_HAVE_SC(getppid)
 __CDECLARE_SC(,__pid_t,getppid,(void),())
@@ -1470,7 +1472,7 @@ __CDECLARE_SC(,__ssize_t,pselect6,(__size_t __nfds, struct __fd_set_struct *__re
 __CDECLARE_SC(,__syscall_slong_t,ptrace,(__syscall_ulong_t __request, __pid_t __pid, void *__addr, void *__data),(__request,__pid,__addr,__data))
 #endif /* __CRT_HAVE_SC(ptrace) */
 #if __CRT_HAVE_SC(putpmsg)
-__CDECLARE_SC(,__errno_t,putpmsg,(int __TODO_PROTOTYPE),(__TODO_PROTOTYPE))
+__CDECLARE_SC(,__errno_t,putpmsg,(void),())
 #endif /* __CRT_HAVE_SC(putpmsg) */
 #if __CRT_HAVE_SC(pwrite64)
 __CDECLARE_SC(,__ssize_t,pwrite64,(__fd_t __fd, void const *__buf, __size_t __bufsize, __uint64_t __offset),(__fd,__buf,__bufsize,__offset))
@@ -1780,7 +1782,7 @@ __CDECLARE_SC(,__errno_t,sched_yield,(void),())
 __CDECLARE_SC(,__errno_t,seccomp,(int __TODO_PROTOTYPE),(__TODO_PROTOTYPE))
 #endif /* __CRT_HAVE_SC(seccomp) */
 #if __CRT_HAVE_SC(security)
-__CDECLARE_SC(,__errno_t,security,(int __TODO_PROTOTYPE),(__TODO_PROTOTYPE))
+__CDECLARE_SC(,__errno_t,security,(void),())
 #endif /* __CRT_HAVE_SC(security) */
 #if __CRT_HAVE_SC(select)
 __CDECLARE_SC(,__ssize_t,select,(__size_t __nfds, struct __fd_set_struct *__readfds, struct __fd_set_struct *__writefds, struct __fd_set_struct *__exceptfds, struct __timevalx64 *__timeout),(__nfds,__readfds,__writefds,__exceptfds,__timeout))
@@ -2190,7 +2192,7 @@ __CDECLARE_SC(,__errno_t,unshare,(__syscall_ulong_t __what),(__what))
 __CDECLARE_SC(,__errno_t,uselib,(char const *__library),(__library))
 #endif /* __CRT_HAVE_SC(uselib) */
 #if __CRT_HAVE_SC(userfaultfd)
-__CDECLARE_SC(,__errno_t,userfaultfd,(int __TODO_PROTOTYPE),(__TODO_PROTOTYPE))
+__CDECLARE_SC(,__fd_t,userfaultfd,(__syscall_ulong_t __flags),(__flags))
 #endif /* __CRT_HAVE_SC(userfaultfd) */
 #if __CRT_HAVE_SC(userviofd)
 /* Construct   a   user-vio-fd  object   supporting  mmap(2),   with  actual
@@ -2259,7 +2261,7 @@ __CDECLARE_SC(,__errno_t,vhangup,(void),())
 __CDECLARE_SC(,__ssize_t,vmsplice,(__fd_t __fdout, struct __iovecx64 const *__iov, __size_t __count, __syscall_ulong_t __flags),(__fdout,__iov,__count,__flags))
 #endif /* __CRT_HAVE_SC(vmsplice) */
 #if __CRT_HAVE_SC(vserver)
-__CDECLARE_SC(,__errno_t,vserver,(int __TODO_PROTOTYPE),(__TODO_PROTOTYPE))
+__CDECLARE_SC(,__errno_t,vserver,(void),())
 #endif /* __CRT_HAVE_SC(vserver) */
 #if __CRT_HAVE_SC(wait4)
 /* Same as `waitpid(pid, STAT_LOC, OPTIONS)', though also fills in `USAGE' when non-NULL
@@ -2359,10 +2361,10 @@ __CDECLARE_XSC(,__errno_t,acct,(char const *__filename),(__filename))
 __CDECLARE_XSC(,__errno_t,add_key,(int __TODO_PROTOTYPE),(__TODO_PROTOTYPE))
 #endif /* __CRT_HAVE_XSC(add_key) */
 #if __CRT_HAVE_XSC(adjtimex)
-__CDECLARE_XSC(,__errno_t,adjtimex,(int __TODO_PROTOTYPE),(__TODO_PROTOTYPE))
+__CDECLARE_XSC(,__errno_t,adjtimex,(struct timex *__ntx),(__ntx))
 #endif /* __CRT_HAVE_XSC(adjtimex) */
 #if __CRT_HAVE_XSC(afs_syscall)
-__CDECLARE_XSC(,__errno_t,afs_syscall,(int __TODO_PROTOTYPE),(__TODO_PROTOTYPE))
+__CDECLARE_XSC(,__errno_t,afs_syscall,(void),())
 #endif /* __CRT_HAVE_XSC(afs_syscall) */
 #if __CRT_HAVE_XSC(alarm)
 __CDECLARE_XSC(,__syscall_ulong_t,alarm,(__syscall_ulong_t __seconds),(__seconds))
@@ -2996,7 +2998,7 @@ __CDECLARE_XSC(,__pid_t,getpgrp,(void),())
 __CDECLARE_XSC(,__pid_t,getpid,(void),())
 #endif /* __CRT_HAVE_XSC(getpid) */
 #if __CRT_HAVE_XSC(getpmsg)
-__CDECLARE_XSC(,__errno_t,getpmsg,(int __TODO_PROTOTYPE),(__TODO_PROTOTYPE))
+__CDECLARE_XSC(,__errno_t,getpmsg,(void),())
 #endif /* __CRT_HAVE_XSC(getpmsg) */
 #if __CRT_HAVE_XSC(getppid)
 __CDECLARE_XSC(,__pid_t,getppid,(void),())
@@ -3639,7 +3641,7 @@ __CDECLARE_XSC(,__ssize_t,pselect6,(__size_t __nfds, struct __fd_set_struct *__r
 __CDECLARE_XSC(,__syscall_slong_t,ptrace,(__syscall_ulong_t __request, __pid_t __pid, void *__addr, void *__data),(__request,__pid,__addr,__data))
 #endif /* __CRT_HAVE_XSC(ptrace) */
 #if __CRT_HAVE_XSC(putpmsg)
-__CDECLARE_XSC(,__errno_t,putpmsg,(int __TODO_PROTOTYPE),(__TODO_PROTOTYPE))
+__CDECLARE_XSC(,__errno_t,putpmsg,(void),())
 #endif /* __CRT_HAVE_XSC(putpmsg) */
 #if __CRT_HAVE_XSC(pwrite64)
 __CDECLARE_XSC(,__ssize_t,pwrite64,(__fd_t __fd, void const *__buf, __size_t __bufsize, __uint64_t __offset),(__fd,__buf,__bufsize,__offset))
@@ -3932,7 +3934,7 @@ __CDECLARE_XSC(,__errno_t,sched_yield,(void),())
 __CDECLARE_XSC(,__errno_t,seccomp,(int __TODO_PROTOTYPE),(__TODO_PROTOTYPE))
 #endif /* __CRT_HAVE_XSC(seccomp) */
 #if __CRT_HAVE_XSC(security)
-__CDECLARE_XSC(,__errno_t,security,(int __TODO_PROTOTYPE),(__TODO_PROTOTYPE))
+__CDECLARE_XSC(,__errno_t,security,(void),())
 #endif /* __CRT_HAVE_XSC(security) */
 #if __CRT_HAVE_XSC(select)
 __CDECLARE_XSC(,__ssize_t,select,(__size_t __nfds, struct __fd_set_struct *__readfds, struct __fd_set_struct *__writefds, struct __fd_set_struct *__exceptfds, struct __timevalx64 *__timeout),(__nfds,__readfds,__writefds,__exceptfds,__timeout))
@@ -4342,7 +4344,7 @@ __CDECLARE_XSC(,__errno_t,unshare,(__syscall_ulong_t __what),(__what))
 __CDECLARE_XSC(,__errno_t,uselib,(char const *__library),(__library))
 #endif /* __CRT_HAVE_XSC(uselib) */
 #if __CRT_HAVE_XSC(userfaultfd)
-__CDECLARE_XSC(,__errno_t,userfaultfd,(int __TODO_PROTOTYPE),(__TODO_PROTOTYPE))
+__CDECLARE_XSC(,__fd_t,userfaultfd,(__syscall_ulong_t __flags),(__flags))
 #endif /* __CRT_HAVE_XSC(userfaultfd) */
 #if __CRT_HAVE_XSC(userviofd)
 /* Construct   a   user-vio-fd  object   supporting  mmap(2),   with  actual
@@ -4411,7 +4413,7 @@ __CDECLARE_XSC(,__errno_t,vhangup,(void),())
 __CDECLARE_XSC(,__ssize_t,vmsplice,(__fd_t __fdout, struct __iovecx64 const *__iov, __size_t __count, __syscall_ulong_t __flags),(__fdout,__iov,__count,__flags))
 #endif /* __CRT_HAVE_XSC(vmsplice) */
 #if __CRT_HAVE_XSC(vserver)
-__CDECLARE_XSC(,__errno_t,vserver,(int __TODO_PROTOTYPE),(__TODO_PROTOTYPE))
+__CDECLARE_XSC(,__errno_t,vserver,(void),())
 #endif /* __CRT_HAVE_XSC(vserver) */
 #if __CRT_HAVE_XSC(wait4)
 /* Same as `waitpid(pid, STAT_LOC, OPTIONS)', though also fills in `USAGE' when non-NULL

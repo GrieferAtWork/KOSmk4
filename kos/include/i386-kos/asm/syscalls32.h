@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x576d8034 */
+/* HASH CRC-32:0xd8b86c6e */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -216,7 +216,7 @@
 #define __NR_getpriority                  0x60                   /* syscall_slong_t getpriority(syscall_ulong_t which, id_t who) */
 /* @param: which: One of `PRIO_PROCESS', `PRIO_PGRP' or `PRIO_USER' */
 #define __NR_setpriority                  0x61                   /* errno_t setpriority(syscall_ulong_t which, id_t who, syscall_ulong_t value) */
-#define __NR_profil                       0x62                   /* errno_t profil(uint16_t *sample_buffer, size_t size, size_t offset, syscall_ulong_t scale) */
+#define __NR_profil                       0x62                   /* errno_t profil(void) */
 #define __NR_statfs                       0x63                   /* errno_t statfs(char const *file, struct __statfsx32 *buf) */
 #define __NR_fstatfs                      0x64                   /* errno_t fstatfs(fd_t file, struct __statfsx32 *buf) */
 #define __NR_ioperm                       0x65                   /* errno_t ioperm(syscall_ulong_t from, syscall_ulong_t num, syscall_ulong_t turn_on) */
@@ -254,7 +254,7 @@
 #define __NR_setdomainname                0x79                   /* errno_t setdomainname(char const *name, size_t len) */
 #define __NR_uname                        0x7a                   /* errno_t uname(struct utsname *name) */
 #define __NR_modify_ldt                   0x7b                   /* syscall_slong_t modify_ldt(syscall_ulong_t func, void *ptr, syscall_ulong_t bytecount) */
-#define __NR_adjtimex                     0x7c                   /* errno_t adjtimex(int TODO_PROTOTYPE) */
+#define __NR_adjtimex                     0x7c                   /* errno_t adjtimex(struct timex *ntx) */
 /* @param: prot: Either `PROT_NONE', or set of `PROT_EXEC | PROT_WRITE | PROT_READ | PROT_SEM | PROT_LOOSE | PROT_SHARED' */
 #define __NR_mprotect                     0x7d                   /* errno_t mprotect(void *addr, size_t len, syscall_ulong_t prot) */
 /* @param: how: One of `SIG_BLOCK', `SIG_UNBLOCK' or `SIG_SETMASK' */
@@ -291,7 +291,7 @@
 #define __NR_bdflush                      0x86                   /* errno_t bdflush(int TODO_PROTOTYPE) */
 #define __NR_sysfs                        0x87                   /* errno_t sysfs(int TODO_PROTOTYPE) */
 #define __NR_personality                  0x88                   /* errno_t personality(int TODO_PROTOTYPE) */
-#define __NR_afs_syscall                  0x89                   /* errno_t afs_syscall(int TODO_PROTOTYPE) */
+#define __NR_afs_syscall                  0x89                   /* errno_t afs_syscall(void) */
 /* >> setfsuid(2)
  * Set the  user ID  for the  cred-context (s.a.  `CLONE_CRED') of  the
  * calling thread. The calling thread needs the `CAP_SETUID' privilege.
@@ -403,8 +403,8 @@
 #define __NR_capset                       0xb9                   /* errno_t capset(int TODO_PROTOTYPE) */
 #define __NR_sigaltstack                  0xba                   /* errno_t sigaltstack(struct __sigaltstackx32 const *ss, struct __sigaltstackx32 *oss) */
 #define __NR_sendfile                     0xbb                   /* ssize_t sendfile(fd_t out_fd, fd_t in_fd, __ULONG32_TYPE__ *pin_offset, size_t num_bytes) */
-#define __NR_getpmsg                      0xbc                   /* errno_t getpmsg(int TODO_PROTOTYPE) */
-#define __NR_putpmsg                      0xbd                   /* errno_t putpmsg(int TODO_PROTOTYPE) */
+#define __NR_getpmsg                      0xbc                   /* errno_t getpmsg(void) */
+#define __NR_putpmsg                      0xbd                   /* errno_t putpmsg(void) */
 /* Same as `fork(2)', but the child process may be executed within in the same VM
  * as the parent process, with the  parent process remaining suspended until  the
  * child process invokes one of the following system calls:
@@ -603,7 +603,7 @@
  * @param: times[1]: New last-modified time */
 #define __NR_utimes                       0x10f                  /* errno_t utimes(char const *filename, struct timevalx32 const[2] times) */
 #define __NR_fadvise64_64                 0x110                  /* errno_t fadvise64_64(int TODO_PROTOTYPE) */
-#define __NR_vserver                      0x111                  /* errno_t vserver(int TODO_PROTOTYPE) */
+#define __NR_vserver                      0x111                  /* errno_t vserver(void) */
 #define __NR_mbind                        0x112                  /* errno_t mbind(int TODO_PROTOTYPE) */
 #define __NR_get_mempolicy                0x113                  /* errno_t get_mempolicy(int TODO_PROTOTYPE) */
 #define __NR_set_mempolicy                0x114                  /* errno_t set_mempolicy(int TODO_PROTOTYPE) */
@@ -968,7 +968,7 @@
  * @throw: E_INVALID_ARGUMENT_BAD_STATE:E_INVALID_ARGUMENT_CONTEXT_SHUTDOWN_NOT_CONNECTED
  * @return: 0 : Success */
 #define __NR_shutdown                     0x175                  /* errno_t shutdown(fd_t sockfd, syscall_ulong_t how) */
-#define __NR_userfaultfd                  0x176                  /* errno_t userfaultfd(int TODO_PROTOTYPE) */
+#define __NR_userfaultfd                  0x176                  /* fd_t userfaultfd(syscall_ulong_t flags) */
 #define __NR_membarrier                   0x177                  /* errno_t membarrier(int TODO_PROTOTYPE) */
 #define __NR_mlock2                       0x178                  /* errno_t mlock2(void const *addr, size_t length, syscall_ulong_t flags) */
 #define __NR_copy_file_range              0x179                  /* errno_t copy_file_range(int TODO_PROTOTYPE) */
@@ -2161,8 +2161,6 @@
 #define __NRCP_chown
 #define __NRCP_getcwd
 #define __NRCP_sendfile
-#define __NRCP_getpmsg
-#define __NRCP_putpmsg
 #define __NRCP_stat64
 #define __NRCP_lstat64
 #define __NRCP_fstat64
@@ -2386,7 +2384,7 @@
 #define __NRRC_fchown                       3
 #define __NRRC_getpriority                  2
 #define __NRRC_setpriority                  3
-#define __NRRC_profil                       4
+#define __NRRC_profil                       0
 #define __NRRC_statfs                       2
 #define __NRRC_fstatfs                      2
 #define __NRRC_ioperm                       3
@@ -2425,7 +2423,7 @@
 #define __NRRC_bdflush                      1
 #define __NRRC_sysfs                        1
 #define __NRRC_personality                  1
-#define __NRRC_afs_syscall                  1
+#define __NRRC_afs_syscall                  0
 #define __NRRC_setfsuid                     1
 #define __NRRC_setfsgid                     1
 #define __NRRC__llseek                      5 /* __NRAC__llseek + 1 */
@@ -2476,8 +2474,8 @@
 #define __NRRC_capset                       1
 #define __NRRC_sigaltstack                  2
 #define __NRRC_sendfile                     4
-#define __NRRC_getpmsg                      1
-#define __NRRC_putpmsg                      1
+#define __NRRC_getpmsg                      0
+#define __NRRC_putpmsg                      0
 #define __NRRC_vfork                        0
 #define __NRRC_ugetrlimit                   1
 #define __NRRC_mmap2                        6
@@ -2558,7 +2556,7 @@
 #define __NRRC_tgkill                       3
 #define __NRRC_utimes                       2
 #define __NRRC_fadvise64_64                 1
-#define __NRRC_vserver                      1
+#define __NRRC_vserver                      0
 #define __NRRC_mbind                        1
 #define __NRRC_get_mempolicy                1
 #define __NRRC_set_mempolicy                1

@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xb099ce18 */
+/* HASH CRC-32:0x16579c1f */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -219,11 +219,11 @@
 #define __NR64AC_query_module             0
 #define __NR64AC_quotactl                 1
 #define __NR64AC_nfsservctl               1
-#define __NR64AC_getpmsg                  1
-#define __NR64AC_putpmsg                  1
-#define __NR64AC_afs_syscall              1
+#define __NR64AC_getpmsg                  0
+#define __NR64AC_putpmsg                  0
+#define __NR64AC_afs_syscall              0
 #define __NR64AC_tuxcall                  0
-#define __NR64AC_security                 1
+#define __NR64AC_security                 0
 #define __NR64AC_gettid                   0
 #define __NR64AC_readahead                3
 #define __NR64AC_setxattr                 5
@@ -274,7 +274,7 @@
 #define __NR64AC_epoll_ctl                4
 #define __NR64AC_tgkill                   3
 #define __NR64AC_utimes                   2
-#define __NR64AC_vserver                  1
+#define __NR64AC_vserver                  0
 #define __NR64AC_mbind                    1
 #define __NR64AC_set_mempolicy            1
 #define __NR64AC_get_mempolicy            1
@@ -771,7 +771,7 @@
 #define __NR64RT_kexec_file_load          (errno_t, __errno_t)
 #define __NR64RT_bpf                      (errno_t, __errno_t)
 #define __NR64RT_execveat                 (errno_t, __errno_t)
-#define __NR64RT_userfaultfd              (errno_t, __errno_t)
+#define __NR64RT_userfaultfd              (fd_t, __fd_t)
 #define __NR64RT_membarrier               (errno_t, __errno_t)
 #define __NR64RT_mlock2                   (errno_t, __errno_t)
 #define __NR64RT_copy_file_range          (errno_t, __errno_t)
@@ -1189,7 +1189,7 @@
 #define __NR64AT0__sysctl                  (int, int)
 #define __NR64AT0_prctl                    (int, int)
 #define __NR64AT0_arch_prctl               (int, int)
-#define __NR64AT0_adjtimex                 (int, int)
+#define __NR64AT0_adjtimex                 (struct timex *, struct timex *)
 #define __NR64AT0_setrlimit                (syscall_ulong_t, __syscall_ulong_t)
 #define __NR64AT1_setrlimit                (struct rlimit const *, struct rlimit const *)
 #define __NR64AT0_chroot                   (char const *, char const *)
@@ -1222,10 +1222,6 @@
 #define __NR64AT1_delete_module            (oflag_t, __oflag_t)
 #define __NR64AT0_quotactl                 (int, int)
 #define __NR64AT0_nfsservctl               (int, int)
-#define __NR64AT0_getpmsg                  (int, int)
-#define __NR64AT0_putpmsg                  (int, int)
-#define __NR64AT0_afs_syscall              (int, int)
-#define __NR64AT0_security                 (int, int)
 #define __NR64AT0_readahead                (fd_t, __fd_t)
 #define __NR64AT1_readahead                (uint64_t, __uint64_t)
 #define __NR64AT2_readahead                (size_t, __size_t)
@@ -1349,7 +1345,6 @@
 #define __NR64AT2_tgkill                   (signo_t, __signo_t)
 #define __NR64AT0_utimes                   (char const *, char const *)
 #define __NR64AT1_utimes                   (struct timevalx64 const *, struct __timevalx64 const *)
-#define __NR64AT0_vserver                  (int, int)
 #define __NR64AT0_mbind                    (int, int)
 #define __NR64AT0_set_mempolicy            (int, int)
 #define __NR64AT0_get_mempolicy            (int, int)
@@ -1599,7 +1594,7 @@
 #define __NR64AT2_execveat                 (__HYBRID_PTR64(char const) const *, __HYBRID_PTR64(char const) const *)
 #define __NR64AT3_execveat                 (__HYBRID_PTR64(char const) const *, __HYBRID_PTR64(char const) const *)
 #define __NR64AT4_execveat                 (atflag_t, __atflag_t)
-#define __NR64AT0_userfaultfd              (int, int)
+#define __NR64AT0_userfaultfd              (syscall_ulong_t, __syscall_ulong_t)
 #define __NR64AT0_membarrier               (int, int)
 #define __NR64AT0_mlock2                   (void const *, void const *)
 #define __NR64AT1_mlock2                   (size_t, __size_t)
@@ -1967,7 +1962,7 @@
 #define __NR64AM__sysctl(a, b, c, d, e, f)                  (int)a
 #define __NR64AM_prctl(a, b, c, d, e, f)                    (int)a
 #define __NR64AM_arch_prctl(a, b, c, d, e, f)               (int)a
-#define __NR64AM_adjtimex(a, b, c, d, e, f)                 (int)a
+#define __NR64AM_adjtimex(a, b, c, d, e, f)                 (struct timex *)a
 #define __NR64AM_setrlimit(a, b, c, d, e, f)                (__syscall_ulong_t)a, (struct rlimit const *)b
 #define __NR64AM_chroot(a, b, c, d, e, f)                   (char const *)a
 #define __NR64AM_sync(a, b, c, d, e, f)                     /* nothing */
@@ -1989,11 +1984,11 @@
 #define __NR64AM_query_module(a, b, c, d, e, f)             /* nothing */
 #define __NR64AM_quotactl(a, b, c, d, e, f)                 (int)a
 #define __NR64AM_nfsservctl(a, b, c, d, e, f)               (int)a
-#define __NR64AM_getpmsg(a, b, c, d, e, f)                  (int)a
-#define __NR64AM_putpmsg(a, b, c, d, e, f)                  (int)a
-#define __NR64AM_afs_syscall(a, b, c, d, e, f)              (int)a
+#define __NR64AM_getpmsg(a, b, c, d, e, f)                  /* nothing */
+#define __NR64AM_putpmsg(a, b, c, d, e, f)                  /* nothing */
+#define __NR64AM_afs_syscall(a, b, c, d, e, f)              /* nothing */
 #define __NR64AM_tuxcall(a, b, c, d, e, f)                  /* nothing */
-#define __NR64AM_security(a, b, c, d, e, f)                 (int)a
+#define __NR64AM_security(a, b, c, d, e, f)                 /* nothing */
 #define __NR64AM_gettid(a, b, c, d, e, f)                   /* nothing */
 #define __NR64AM_readahead(a, b, c, d, e, f)                (__fd_t)a, (__uint64_t)b, (__size_t)c
 #define __NR64AM_setxattr(a, b, c, d, e, f)                 (char const *)a, (char const *)b, (void const *)c, (__size_t)d, (__syscall_ulong_t)e
@@ -2044,7 +2039,7 @@
 #define __NR64AM_epoll_ctl(a, b, c, d, e, f)                (__fd_t)a, (__syscall_ulong_t)b, (__fd_t)c, (struct epoll_event *)d
 #define __NR64AM_tgkill(a, b, c, d, e, f)                   (__pid_t)a, (__pid_t)b, (__signo_t)c
 #define __NR64AM_utimes(a, b, c, d, e, f)                   (char const *)a, (struct __timevalx64 const *)b
-#define __NR64AM_vserver(a, b, c, d, e, f)                  (int)a
+#define __NR64AM_vserver(a, b, c, d, e, f)                  /* nothing */
 #define __NR64AM_mbind(a, b, c, d, e, f)                    (int)a
 #define __NR64AM_set_mempolicy(a, b, c, d, e, f)            (int)a
 #define __NR64AM_get_mempolicy(a, b, c, d, e, f)            (int)a
@@ -2131,7 +2126,7 @@
 #define __NR64AM_kexec_file_load(a, b, c, d, e, f)          (int)a
 #define __NR64AM_bpf(a, b, c, d, e, f)                      (int)a
 #define __NR64AM_execveat(a, b, c, d, e, f)                 (__fd_t)a, (char const *)b, (__HYBRID_PTR64(char const) const *)c, (__HYBRID_PTR64(char const) const *)d, (__atflag_t)e
-#define __NR64AM_userfaultfd(a, b, c, d, e, f)              (int)a
+#define __NR64AM_userfaultfd(a, b, c, d, e, f)              (__syscall_ulong_t)a
 #define __NR64AM_membarrier(a, b, c, d, e, f)               (int)a
 #define __NR64AM_mlock2(a, b, c, d, e, f)                   (void const *)a, (__size_t)b, (__syscall_ulong_t)c
 #define __NR64AM_copy_file_range(a, b, c, d, e, f)          (int)a
@@ -2399,11 +2394,11 @@
 #define __NR64AP_query_module()                             /* nothing */
 #define __NR64AP_quotactl(a)                                (__syscall_ulong_t)a
 #define __NR64AP_nfsservctl(a)                              (__syscall_ulong_t)a
-#define __NR64AP_getpmsg(a)                                 (__syscall_ulong_t)a
-#define __NR64AP_putpmsg(a)                                 (__syscall_ulong_t)a
-#define __NR64AP_afs_syscall(a)                             (__syscall_ulong_t)a
+#define __NR64AP_getpmsg()                                  /* nothing */
+#define __NR64AP_putpmsg()                                  /* nothing */
+#define __NR64AP_afs_syscall()                              /* nothing */
 #define __NR64AP_tuxcall()                                  /* nothing */
-#define __NR64AP_security(a)                                (__syscall_ulong_t)a
+#define __NR64AP_security()                                 /* nothing */
 #define __NR64AP_gettid()                                   /* nothing */
 #define __NR64AP_readahead(a, b, c)                         (__syscall_ulong_t)a, (__syscall_ulong_t)b, (__syscall_ulong_t)c
 #define __NR64AP_setxattr(a, b, c, d, e)                    (__syscall_ulong_t)a, (__syscall_ulong_t)b, (__syscall_ulong_t)c, (__syscall_ulong_t)d, (__syscall_ulong_t)e
@@ -2454,7 +2449,7 @@
 #define __NR64AP_epoll_ctl(a, b, c, d)                      (__syscall_ulong_t)a, (__syscall_ulong_t)b, (__syscall_ulong_t)c, (__syscall_ulong_t)d
 #define __NR64AP_tgkill(a, b, c)                            (__syscall_ulong_t)a, (__syscall_ulong_t)b, (__syscall_ulong_t)c
 #define __NR64AP_utimes(a, b)                               (__syscall_ulong_t)a, (__syscall_ulong_t)b
-#define __NR64AP_vserver(a)                                 (__syscall_ulong_t)a
+#define __NR64AP_vserver()                                  /* nothing */
 #define __NR64AP_mbind(a)                                   (__syscall_ulong_t)a
 #define __NR64AP_set_mempolicy(a)                           (__syscall_ulong_t)a
 #define __NR64AP_get_mempolicy(a)                           (__syscall_ulong_t)a

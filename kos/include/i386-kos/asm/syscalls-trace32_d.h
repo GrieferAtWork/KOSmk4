@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x9a73f0ec */
+/* HASH CRC-32:0x7d50fc22 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -178,10 +178,6 @@
 #define __NR32AN0_setpriority                  which
 #define __NR32AN1_setpriority                  who
 #define __NR32AN2_setpriority                  value
-#define __NR32AN0_profil                       sample_buffer
-#define __NR32AN1_profil                       size
-#define __NR32AN2_profil                       offset
-#define __NR32AN3_profil                       scale
 #define __NR32AN0_statfs                       file
 #define __NR32AN1_statfs                       buf
 #define __NR32AN0_fstatfs                      file
@@ -233,7 +229,7 @@
 #define __NR32AN0_modify_ldt                   func
 #define __NR32AN1_modify_ldt                   ptr
 #define __NR32AN2_modify_ldt                   bytecount
-#define __NR32AN0_adjtimex                     TODO_PROTOTYPE
+#define __NR32AN0_adjtimex                     ntx
 #define __NR32AN0_mprotect                     addr
 #define __NR32AN1_mprotect                     len
 #define __NR32AN2_mprotect                     prot
@@ -251,7 +247,6 @@
 #define __NR32AN0_bdflush                      TODO_PROTOTYPE
 #define __NR32AN0_sysfs                        TODO_PROTOTYPE
 #define __NR32AN0_personality                  TODO_PROTOTYPE
-#define __NR32AN0_afs_syscall                  TODO_PROTOTYPE
 #define __NR32AN0_setfsuid                     uid
 #define __NR32AN0_setfsgid                     gid
 #define __NR32AN0__llseek                      fd
@@ -368,8 +363,6 @@
 #define __NR32AN1_sendfile                     in_fd
 #define __NR32AN2_sendfile                     pin_offset
 #define __NR32AN3_sendfile                     num_bytes
-#define __NR32AN0_getpmsg                      TODO_PROTOTYPE
-#define __NR32AN0_putpmsg                      TODO_PROTOTYPE
 #define __NR32AN0_ugetrlimit                   TODO_PROTOTYPE
 #define __NR32AN0_mmap2                        addr
 #define __NR32AN1_mmap2                        len
@@ -552,7 +545,6 @@
 #define __NR32AN0_utimes                       filename
 #define __NR32AN1_utimes                       times
 #define __NR32AN0_fadvise64_64                 TODO_PROTOTYPE
-#define __NR32AN0_vserver                      TODO_PROTOTYPE
 #define __NR32AN0_mbind                        TODO_PROTOTYPE
 #define __NR32AN0_get_mempolicy                TODO_PROTOTYPE
 #define __NR32AN0_set_mempolicy                TODO_PROTOTYPE
@@ -852,7 +844,7 @@
 #define __NR32AN2_recvmsg                      msg_flags
 #define __NR32AN0_shutdown                     sockfd
 #define __NR32AN1_shutdown                     how
-#define __NR32AN0_userfaultfd                  TODO_PROTOTYPE
+#define __NR32AN0_userfaultfd                  flags
 #define __NR32AN0_membarrier                   TODO_PROTOTYPE
 #define __NR32AN0_mlock2                       addr
 #define __NR32AN1_mlock2                       length
@@ -1449,10 +1441,6 @@
 #define __NR32ATR1_setpriority                  SC_REPR_ID_T                                                         /* who */ 
 #define __NR32ATR2_setpriority                  SC_REPR_SYSCALL_ULONG_T                                              /* value */ 
 #define __NR32RTR_setpriority                   SC_REPR_ERRNO_T                                                      /* return */
-#define __NR32ATR0_profil                       SC_REPR_POINTER                                                      /* sample_buffer */ 
-#define __NR32ATR1_profil                       SC_REPR_SIZE_T                                                       /* size */ 
-#define __NR32ATR2_profil                       SC_REPR_SIZE_T                                                       /* offset */ 
-#define __NR32ATR3_profil                       SC_REPR_SYSCALL_ULONG_T                                              /* scale */ 
 #define __NR32RTR_profil                        SC_REPR_ERRNO_T                                                      /* return */
 #define __NR32ATR0_statfs                       SC_REPR_FILENAME                                                     /* file */ 
 #define __NR32ATR1_statfs                       SC_REPR_POINTER                                                      /* buf */ 
@@ -1533,7 +1521,7 @@
 #define __NR32ATR1_modify_ldt                   SC_REPR_POINTER                                                      /* ptr */ 
 #define __NR32ATR2_modify_ldt                   SC_REPR_SYSCALL_ULONG_T                                              /* bytecount */ 
 #define __NR32RTR_modify_ldt                    SC_REPR_SYSCALL_SLONG_T                                              /* return */
-#define __NR32ATR0_adjtimex                     SC_REPR_INT                                                          /* TODO_PROTOTYPE */ 
+#define __NR32ATR0_adjtimex                     SC_REPR_POINTER                                                      /* ntx */ 
 #define __NR32RTR_adjtimex                      SC_REPR_ERRNO_T                                                      /* return */
 #define __NR32ATR0_mprotect                     SC_REPR_POINTER                                                      /* addr */ 
 #define __NR32ATR1_mprotect                     SC_REPR_SIZE_T                                                       /* len */ 
@@ -1564,7 +1552,6 @@
 #define __NR32RTR_sysfs                         SC_REPR_ERRNO_T                                                      /* return */
 #define __NR32ATR0_personality                  SC_REPR_INT                                                          /* TODO_PROTOTYPE */ 
 #define __NR32RTR_personality                   SC_REPR_ERRNO_T                                                      /* return */
-#define __NR32ATR0_afs_syscall                  SC_REPR_INT                                                          /* TODO_PROTOTYPE */ 
 #define __NR32RTR_afs_syscall                   SC_REPR_ERRNO_T                                                      /* return */
 #define __NR32ATR0_setfsuid                     SC_REPR_UID_T                                                        /* uid */ 
 #define __NR32RTR_setfsuid                      SC_REPR_ERRNO_T                                                      /* return */
@@ -1743,9 +1730,7 @@
 #define __NR32ATR2_sendfile                     SC_REPR_POINTER                                                      /* pin_offset */ 
 #define __NR32ATR3_sendfile                     SC_REPR_SIZE_T                                                       /* num_bytes */ 
 #define __NR32RTR_sendfile                      SC_REPR_SSIZE_T                                                      /* return */
-#define __NR32ATR0_getpmsg                      SC_REPR_INT                                                          /* TODO_PROTOTYPE */ 
 #define __NR32RTR_getpmsg                       SC_REPR_ERRNO_T                                                      /* return */
-#define __NR32ATR0_putpmsg                      SC_REPR_INT                                                          /* TODO_PROTOTYPE */ 
 #define __NR32RTR_putpmsg                       SC_REPR_ERRNO_T                                                      /* return */
 #define __NR32RTR_vfork                         SC_REPR_PID_T                                                        /* return */
 #define __NR32ATR0_ugetrlimit                   SC_REPR_INT                                                          /* TODO_PROTOTYPE */ 
@@ -2016,7 +2001,6 @@
 #define __NR32RTR_utimes                        SC_REPR_ERRNO_T                                                      /* return */
 #define __NR32ATR0_fadvise64_64                 SC_REPR_INT                                                          /* TODO_PROTOTYPE */ 
 #define __NR32RTR_fadvise64_64                  SC_REPR_ERRNO_T                                                      /* return */
-#define __NR32ATR0_vserver                      SC_REPR_INT                                                          /* TODO_PROTOTYPE */ 
 #define __NR32RTR_vserver                       SC_REPR_ERRNO_T                                                      /* return */
 #define __NR32ATR0_mbind                        SC_REPR_INT                                                          /* TODO_PROTOTYPE */ 
 #define __NR32RTR_mbind                         SC_REPR_ERRNO_T                                                      /* return */
@@ -2470,8 +2454,8 @@
 #define __NR32ATR0_shutdown                     SC_REPR_FD_T                                                         /* sockfd */ 
 #define __NR32ATR1_shutdown                     SC_REPR_SOCKET_SHUTDOWN_HOW                                          /* how */ 
 #define __NR32RTR_shutdown                      SC_REPR_ERRNO_T                                                      /* return */
-#define __NR32ATR0_userfaultfd                  SC_REPR_INT                                                          /* TODO_PROTOTYPE */ 
-#define __NR32RTR_userfaultfd                   SC_REPR_ERRNO_T                                                      /* return */
+#define __NR32ATR0_userfaultfd                  SC_REPR_SYSCALL_ULONG_T                                              /* flags */ 
+#define __NR32RTR_userfaultfd                   SC_REPR_FD_T                                                         /* return */
 #define __NR32ATR0_membarrier                   SC_REPR_INT                                                          /* TODO_PROTOTYPE */ 
 #define __NR32RTR_membarrier                    SC_REPR_ERRNO_T                                                      /* return */
 #define __NR32ATR0_mlock2                       SC_REPR_POINTER                                                      /* addr */ 

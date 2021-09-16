@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xe96e4961 */
+/* HASH CRC-32:0xd8d40ff0 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -3719,7 +3719,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_setpriority)
 	.cfi_endproc
 END(__x86_asm32_int80_setpriority)
 
-/* errno_t profil(uint16_t *sample_buffer, size_t size, size_t offset, syscall_ulong_t scale) */
+/* errno_t profil(void) */
 .section .text.x86.asm32_syscall_int80.profil
 INTERN_WEAK_FUNCTION(__x86_asm32_int80_profil)
 	.cfi_startproc simple
@@ -3738,16 +3738,12 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_profil)
 	movw   %ax, %es
 	movw   $(SEGMENT_KERNEL_FSBASE), %ax
 	movw   %ax, %fs
-	pushl_cfi_r %esi  /* Arg #3 */
-	pushl_cfi_r %edx  /* Arg #2 */
-	pushl_cfi_r %ecx  /* Arg #1 */
-	pushl_cfi_r %ebx  /* Arg #0 */
+	pushl_cfi_r %ecx
+	pushl_cfi_r %edx
 	EXTERN(sys_profil)
 	call   sys_profil
-	popl_cfi_r %ebx
-	popl_cfi_r %ecx
 	popl_cfi_r %edx
-	popl_cfi_r %esi
+	popl_cfi_r %ecx
 	popl_cfi %fs
 	.cfi_restore_iret_fs
 	popl_cfi %es
@@ -4702,7 +4698,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_modify_ldt)
 	.cfi_endproc
 END(__x86_asm32_int80_modify_ldt)
 
-/* errno_t adjtimex(int TODO_PROTOTYPE) */
+/* errno_t adjtimex(struct timex *ntx) */
 .section .text.x86.asm32_syscall_int80.adjtimex
 INTERN_WEAK_FUNCTION(__x86_asm32_int80_adjtimex)
 	.cfi_startproc simple
@@ -5203,7 +5199,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_personality)
 	.cfi_endproc
 END(__x86_asm32_int80_personality)
 
-/* errno_t afs_syscall(int TODO_PROTOTYPE) */
+/* errno_t afs_syscall(void) */
 .section .text.x86.asm32_syscall_int80.afs_syscall
 INTERN_WEAK_FUNCTION(__x86_asm32_int80_afs_syscall)
 	.cfi_startproc simple
@@ -5224,10 +5220,8 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_afs_syscall)
 	movw   %ax, %fs
 	pushl_cfi_r %ecx
 	pushl_cfi_r %edx
-	pushl_cfi_r %ebx  /* Arg #0 */
 	EXTERN(sys_afs_syscall)
 	call   sys_afs_syscall
-	popl_cfi_r %ebx
 	popl_cfi_r %edx
 	popl_cfi_r %ecx
 	popl_cfi %fs
@@ -7178,7 +7172,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_sendfile)
 	.cfi_endproc
 END(__x86_asm32_int80_sendfile)
 
-/* errno_t getpmsg(int TODO_PROTOTYPE) */
+/* errno_t getpmsg(void) */
 .section .text.x86.asm32_syscall_int80.getpmsg
 INTERN_WEAK_FUNCTION(__x86_asm32_int80_getpmsg)
 	.cfi_startproc simple
@@ -7199,10 +7193,8 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_getpmsg)
 	movw   %ax, %fs
 	pushl_cfi_r %ecx
 	pushl_cfi_r %edx
-	pushl_cfi_r %ebx  /* Arg #0 */
 	EXTERN(sys_getpmsg)
 	call   sys_getpmsg
-	popl_cfi_r %ebx
 	popl_cfi_r %edx
 	popl_cfi_r %ecx
 	popl_cfi %fs
@@ -7215,7 +7207,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_getpmsg)
 	.cfi_endproc
 END(__x86_asm32_int80_getpmsg)
 
-/* errno_t putpmsg(int TODO_PROTOTYPE) */
+/* errno_t putpmsg(void) */
 .section .text.x86.asm32_syscall_int80.putpmsg
 INTERN_WEAK_FUNCTION(__x86_asm32_int80_putpmsg)
 	.cfi_startproc simple
@@ -7236,10 +7228,8 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_putpmsg)
 	movw   %ax, %fs
 	pushl_cfi_r %ecx
 	pushl_cfi_r %edx
-	pushl_cfi_r %ebx  /* Arg #0 */
 	EXTERN(sys_putpmsg)
 	call   sys_putpmsg
-	popl_cfi_r %ebx
 	popl_cfi_r %edx
 	popl_cfi_r %ecx
 	popl_cfi %fs
@@ -10350,7 +10340,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_fadvise64_64)
 	.cfi_endproc
 END(__x86_asm32_int80_fadvise64_64)
 
-/* errno_t vserver(int TODO_PROTOTYPE) */
+/* errno_t vserver(void) */
 .section .text.x86.asm32_syscall_int80.vserver
 INTERN_WEAK_FUNCTION(__x86_asm32_int80_vserver)
 	.cfi_startproc simple
@@ -10371,10 +10361,8 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_vserver)
 	movw   %ax, %fs
 	pushl_cfi_r %ecx
 	pushl_cfi_r %edx
-	pushl_cfi_r %ebx  /* Arg #0 */
 	EXTERN(sys_vserver)
 	call   sys_vserver
-	popl_cfi_r %ebx
 	popl_cfi_r %edx
 	popl_cfi_r %ecx
 	popl_cfi %fs
@@ -14451,7 +14439,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_shutdown)
 	.cfi_endproc
 END(__x86_asm32_int80_shutdown)
 
-/* errno_t userfaultfd(int TODO_PROTOTYPE) */
+/* fd_t userfaultfd(syscall_ulong_t flags) */
 .section .text.x86.asm32_syscall_int80.userfaultfd
 INTERN_WEAK_FUNCTION(__x86_asm32_int80_userfaultfd)
 	.cfi_startproc simple
@@ -23350,7 +23338,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_sysenter_setpriority)
 	.cfi_endproc
 END(__x86_asm32_sysenter_setpriority)
 
-/* errno_t profil(uint16_t *sample_buffer, size_t size, size_t offset, syscall_ulong_t scale) */
+/* errno_t profil(void) */
 .section .text.x86.asm32_syscall_sysenter.profil
 INTERN_WEAK_FUNCTION(__x86_asm32_sysenter_profil)
 	.cfi_startproc simple
@@ -23369,16 +23357,12 @@ INTERN_WEAK_FUNCTION(__x86_asm32_sysenter_profil)
 	movw   %ax, %es
 	movw   $(SEGMENT_KERNEL_FSBASE), %ax
 	movw   %ax, %fs
-	pushl_cfi_r %esi  /* Arg #3 */
-	pushl_cfi_r %edx  /* Arg #2 */
-	pushl_cfi_r %ecx  /* Arg #1 */
-	pushl_cfi_r %ebx  /* Arg #0 */
+	pushl_cfi_r %ecx
+	pushl_cfi_r %edx
 	EXTERN(sys_profil)
 	call   sys_profil
-	popl_cfi_r %ebx
-	popl_cfi_r %ecx
 	popl_cfi_r %edx
-	popl_cfi_r %esi
+	popl_cfi_r %ecx
 	popl_cfi %fs
 	.cfi_restore_iret_fs
 	popl_cfi %es
@@ -24337,7 +24321,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_sysenter_modify_ldt)
 	.cfi_endproc
 END(__x86_asm32_sysenter_modify_ldt)
 
-/* errno_t adjtimex(int TODO_PROTOTYPE) */
+/* errno_t adjtimex(struct timex *ntx) */
 .section .text.x86.asm32_syscall_sysenter.adjtimex
 INTERN_WEAK_FUNCTION(__x86_asm32_sysenter_adjtimex)
 	.cfi_startproc simple
@@ -24838,7 +24822,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_sysenter_personality)
 	.cfi_endproc
 END(__x86_asm32_sysenter_personality)
 
-/* errno_t afs_syscall(int TODO_PROTOTYPE) */
+/* errno_t afs_syscall(void) */
 .section .text.x86.asm32_syscall_sysenter.afs_syscall
 INTERN_WEAK_FUNCTION(__x86_asm32_sysenter_afs_syscall)
 	.cfi_startproc simple
@@ -24859,10 +24843,8 @@ INTERN_WEAK_FUNCTION(__x86_asm32_sysenter_afs_syscall)
 	movw   %ax, %fs
 	pushl_cfi_r %ecx
 	pushl_cfi_r %edx
-	pushl_cfi_r %ebx  /* Arg #0 */
 	EXTERN(sys_afs_syscall)
 	call   sys_afs_syscall
-	popl_cfi_r %ebx
 	popl_cfi_r %edx
 	popl_cfi_r %ecx
 	popl_cfi %fs
@@ -26825,7 +26807,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_sysenter_sendfile)
 	.cfi_endproc
 END(__x86_asm32_sysenter_sendfile)
 
-/* errno_t getpmsg(int TODO_PROTOTYPE) */
+/* errno_t getpmsg(void) */
 .section .text.x86.asm32_syscall_sysenter.getpmsg
 INTERN_WEAK_FUNCTION(__x86_asm32_sysenter_getpmsg)
 	.cfi_startproc simple
@@ -26846,10 +26828,8 @@ INTERN_WEAK_FUNCTION(__x86_asm32_sysenter_getpmsg)
 	movw   %ax, %fs
 	pushl_cfi_r %ecx
 	pushl_cfi_r %edx
-	pushl_cfi_r %ebx  /* Arg #0 */
 	EXTERN(sys_getpmsg)
 	call   sys_getpmsg
-	popl_cfi_r %ebx
 	popl_cfi_r %edx
 	popl_cfi_r %ecx
 	popl_cfi %fs
@@ -26862,7 +26842,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_sysenter_getpmsg)
 	.cfi_endproc
 END(__x86_asm32_sysenter_getpmsg)
 
-/* errno_t putpmsg(int TODO_PROTOTYPE) */
+/* errno_t putpmsg(void) */
 .section .text.x86.asm32_syscall_sysenter.putpmsg
 INTERN_WEAK_FUNCTION(__x86_asm32_sysenter_putpmsg)
 	.cfi_startproc simple
@@ -26883,10 +26863,8 @@ INTERN_WEAK_FUNCTION(__x86_asm32_sysenter_putpmsg)
 	movw   %ax, %fs
 	pushl_cfi_r %ecx
 	pushl_cfi_r %edx
-	pushl_cfi_r %ebx  /* Arg #0 */
 	EXTERN(sys_putpmsg)
 	call   sys_putpmsg
-	popl_cfi_r %ebx
 	popl_cfi_r %edx
 	popl_cfi_r %ecx
 	popl_cfi %fs
@@ -30009,7 +29987,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_sysenter_fadvise64_64)
 	.cfi_endproc
 END(__x86_asm32_sysenter_fadvise64_64)
 
-/* errno_t vserver(int TODO_PROTOTYPE) */
+/* errno_t vserver(void) */
 .section .text.x86.asm32_syscall_sysenter.vserver
 INTERN_WEAK_FUNCTION(__x86_asm32_sysenter_vserver)
 	.cfi_startproc simple
@@ -30030,10 +30008,8 @@ INTERN_WEAK_FUNCTION(__x86_asm32_sysenter_vserver)
 	movw   %ax, %fs
 	pushl_cfi_r %ecx
 	pushl_cfi_r %edx
-	pushl_cfi_r %ebx  /* Arg #0 */
 	EXTERN(sys_vserver)
 	call   sys_vserver
-	popl_cfi_r %ebx
 	popl_cfi_r %edx
 	popl_cfi_r %ecx
 	popl_cfi %fs
@@ -34156,7 +34132,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_sysenter_shutdown)
 	.cfi_endproc
 END(__x86_asm32_sysenter_shutdown)
 
-/* errno_t userfaultfd(int TODO_PROTOTYPE) */
+/* fd_t userfaultfd(syscall_ulong_t flags) */
 .section .text.x86.asm32_syscall_sysenter.userfaultfd
 INTERN_WEAK_FUNCTION(__x86_asm32_sysenter_userfaultfd)
 	.cfi_startproc simple

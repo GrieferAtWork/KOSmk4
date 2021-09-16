@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xc3a0776e */
+/* HASH CRC-32:0xef99195c */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -419,7 +419,7 @@
 #define __NRAN1_gettimeofday           tz
 #define __NRAN0_settimeofday           tv
 #define __NRAN1_settimeofday           tz
-#define __NRAN0_adjtimex               TODO_PROTOTYPE
+#define __NRAN0_adjtimex               ntx
 #define __NRAN0_sysinfo                info
 #define __NRAN0_mq_open                name
 #define __NRAN1_mq_open                oflags
@@ -643,7 +643,7 @@
 #define __NRAN2_execveat               argv
 #define __NRAN3_execveat               envp
 #define __NRAN4_execveat               flags
-#define __NRAN0_userfaultfd            TODO_PROTOTYPE
+#define __NRAN0_userfaultfd            flags
 #define __NRAN0_membarrier             TODO_PROTOTYPE
 #define __NRAN0_mlock2                 addr
 #define __NRAN1_mlock2                 length
@@ -1381,7 +1381,7 @@
 #define __NRATR0_settimeofday           SC_REPR_STRUCT_TIMEVAL                                  /* tv */ 
 #define __NRATR1_settimeofday           SC_REPR_STRUCT_TIMEZONE                                 /* tz */ 
 #define __NRRTR_settimeofday            SC_REPR_ERRNO_T                                         /* return */
-#define __NRATR0_adjtimex               SC_REPR_INT                                             /* TODO_PROTOTYPE */ 
+#define __NRATR0_adjtimex               SC_REPR_POINTER                                         /* ntx */ 
 #define __NRRTR_adjtimex                SC_REPR_ERRNO_T                                         /* return */
 #define __NRRTR_getpid                  SC_REPR_PID_T                                           /* return */
 #define __NRRTR_getppid                 SC_REPR_PID_T                                           /* return */
@@ -1719,8 +1719,8 @@
 #define __NRATR3_execveat               SC_REPR_STRING_VECTOR                                   /* envp */ 
 #define __NRATR4_execveat               SC_REPR_ATFLAG__EMPTY_PATH__SYMLINK_NOFOLLOW__DOSPATH   /* flags */ 
 #define __NRRTR_execveat                SC_REPR_ERRNO_T                                         /* return */
-#define __NRATR0_userfaultfd            SC_REPR_INT                                             /* TODO_PROTOTYPE */ 
-#define __NRRTR_userfaultfd             SC_REPR_ERRNO_T                                         /* return */
+#define __NRATR0_userfaultfd            SC_REPR_SYSCALL_ULONG_T                                 /* flags */ 
+#define __NRRTR_userfaultfd             SC_REPR_FD_T                                            /* return */
 #define __NRATR0_membarrier             SC_REPR_INT                                             /* TODO_PROTOTYPE */ 
 #define __NRRTR_membarrier              SC_REPR_ERRNO_T                                         /* return */
 #define __NRATR0_mlock2                 SC_REPR_POINTER                                         /* addr */ 

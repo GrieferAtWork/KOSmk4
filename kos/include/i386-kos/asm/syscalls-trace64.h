@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x95e4aec3 */
+/* HASH CRC-32:0xd476bbc1 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -357,7 +357,7 @@
 #define __NRAN0__sysctl                  TODO_PROTOTYPE
 #define __NRAN0_prctl                    TODO_PROTOTYPE
 #define __NRAN0_arch_prctl               TODO_PROTOTYPE
-#define __NRAN0_adjtimex                 TODO_PROTOTYPE
+#define __NRAN0_adjtimex                 ntx
 #define __NRAN0_setrlimit                resource
 #define __NRAN1_setrlimit                rlimits
 #define __NRAN0_chroot                   path
@@ -390,10 +390,6 @@
 #define __NRAN1_delete_module            flags
 #define __NRAN0_quotactl                 TODO_PROTOTYPE
 #define __NRAN0_nfsservctl               TODO_PROTOTYPE
-#define __NRAN0_getpmsg                  TODO_PROTOTYPE
-#define __NRAN0_putpmsg                  TODO_PROTOTYPE
-#define __NRAN0_afs_syscall              TODO_PROTOTYPE
-#define __NRAN0_security                 TODO_PROTOTYPE
 #define __NRAN0_readahead                fd
 #define __NRAN1_readahead                offset
 #define __NRAN2_readahead                count
@@ -517,7 +513,6 @@
 #define __NRAN2_tgkill                   signo
 #define __NRAN0_utimes                   filename
 #define __NRAN1_utimes                   times
-#define __NRAN0_vserver                  TODO_PROTOTYPE
 #define __NRAN0_mbind                    TODO_PROTOTYPE
 #define __NRAN0_set_mempolicy            TODO_PROTOTYPE
 #define __NRAN0_get_mempolicy            TODO_PROTOTYPE
@@ -767,7 +762,7 @@
 #define __NRAN2_execveat                 argv
 #define __NRAN3_execveat                 envp
 #define __NRAN4_execveat                 flags
-#define __NRAN0_userfaultfd              TODO_PROTOTYPE
+#define __NRAN0_userfaultfd              flags
 #define __NRAN0_membarrier               TODO_PROTOTYPE
 #define __NRAN0_mlock2                   addr
 #define __NRAN1_mlock2                   length
@@ -1497,7 +1492,7 @@
 #define __NRRTR_prctl                     SC_REPR_ERRNO_T                                                      /* return */
 #define __NRATR0_arch_prctl               SC_REPR_INT                                                          /* TODO_PROTOTYPE */ 
 #define __NRRTR_arch_prctl                SC_REPR_ERRNO_T                                                      /* return */
-#define __NRATR0_adjtimex                 SC_REPR_INT                                                          /* TODO_PROTOTYPE */ 
+#define __NRATR0_adjtimex                 SC_REPR_POINTER                                                      /* ntx */ 
 #define __NRRTR_adjtimex                  SC_REPR_ERRNO_T                                                      /* return */
 #define __NRATR0_setrlimit                SC_REPR_RLIMIT_RESOURCE                                              /* resource */ 
 #define __NRATR1_setrlimit                SC_REPR_STRUCT_RLIMIT                                                /* rlimits */ 
@@ -1554,14 +1549,10 @@
 #define __NRRTR_quotactl                  SC_REPR_ERRNO_T                                                      /* return */
 #define __NRATR0_nfsservctl               SC_REPR_INT                                                          /* TODO_PROTOTYPE */ 
 #define __NRRTR_nfsservctl                SC_REPR_ERRNO_T                                                      /* return */
-#define __NRATR0_getpmsg                  SC_REPR_INT                                                          /* TODO_PROTOTYPE */ 
 #define __NRRTR_getpmsg                   SC_REPR_ERRNO_T                                                      /* return */
-#define __NRATR0_putpmsg                  SC_REPR_INT                                                          /* TODO_PROTOTYPE */ 
 #define __NRRTR_putpmsg                   SC_REPR_ERRNO_T                                                      /* return */
-#define __NRATR0_afs_syscall              SC_REPR_INT                                                          /* TODO_PROTOTYPE */ 
 #define __NRRTR_afs_syscall               SC_REPR_ERRNO_T                                                      /* return */
 #define __NRRTR_tuxcall                   SC_REPR_ERRNO_T                                                      /* return */
-#define __NRATR0_security                 SC_REPR_INT                                                          /* TODO_PROTOTYPE */ 
 #define __NRRTR_security                  SC_REPR_ERRNO_T                                                      /* return */
 #define __NRRTR_gettid                    SC_REPR_PID_T                                                        /* return */
 #define __NRATR0_readahead                SC_REPR_FD_T                                                         /* fd */ 
@@ -1741,7 +1732,6 @@
 #define __NRATR0_utimes                   SC_REPR_FILENAME                                                     /* filename */ 
 #define __NRATR1_utimes                   SC_REPR_STRUCT_TIMEVALX64_VEC2                                       /* times */ 
 #define __NRRTR_utimes                    SC_REPR_ERRNO_T                                                      /* return */
-#define __NRATR0_vserver                  SC_REPR_INT                                                          /* TODO_PROTOTYPE */ 
 #define __NRRTR_vserver                   SC_REPR_ERRNO_T                                                      /* return */
 #define __NRATR0_mbind                    SC_REPR_INT                                                          /* TODO_PROTOTYPE */ 
 #define __NRRTR_mbind                     SC_REPR_ERRNO_T                                                      /* return */
@@ -2122,8 +2112,8 @@
 #define __NRATR3_execveat                 SC_REPR_STRING_VECTOR64                                              /* envp */ 
 #define __NRATR4_execveat                 SC_REPR_ATFLAG__EMPTY_PATH__SYMLINK_NOFOLLOW__DOSPATH                /* flags */ 
 #define __NRRTR_execveat                  SC_REPR_ERRNO_T                                                      /* return */
-#define __NRATR0_userfaultfd              SC_REPR_INT                                                          /* TODO_PROTOTYPE */ 
-#define __NRRTR_userfaultfd               SC_REPR_ERRNO_T                                                      /* return */
+#define __NRATR0_userfaultfd              SC_REPR_SYSCALL_ULONG_T                                              /* flags */ 
+#define __NRRTR_userfaultfd               SC_REPR_FD_T                                                         /* return */
 #define __NRATR0_membarrier               SC_REPR_INT                                                          /* TODO_PROTOTYPE */ 
 #define __NRRTR_membarrier                SC_REPR_ERRNO_T                                                      /* return */
 #define __NRATR0_mlock2                   SC_REPR_POINTER                                                      /* addr */ 

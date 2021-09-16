@@ -242,6 +242,7 @@
 %[typeorg(<kos/compat/linux-olddirent.h>: old_linux_dirent, old_linux_direntx32, old_linux_direntx64)]
 %[typeorg(<kos/compat/linux-dirent.h>: linux_dirent, linux_direntx32, linux_direntx64)]
 %[typeorg(<kos/compat/linux-dirent64.h>: linux_dirent64)]
+%[typeorg(<bits/os/timex.h>: timex)]
 
 %[typecompat(*:linux_dirent64 = *:linux_dirent64)]
 
@@ -318,10 +319,17 @@ lock:() -> errno_t;
 mpx:() -> errno_t;
 ulimit:() -> errno_t;
 idle:() -> errno_t;
+/*[cp]*/ getpmsg:() -> errno_t;
+/*[cp]*/ putpmsg:() -> errno_t;
+afs_syscall:() -> errno_t;
+profil:() -> errno_t;
+/*profil:(uint16_t *sample_buffer, size_t size, size_t offset, syscall_ulong_t scale) -> errno_t;*/
 tuxcall:() -> errno_t;         /* Used-to-be implemented by linux, but no longer is. */
 query_module:() -> errno_t;    /* Used-to-be implemented by linux, but no longer is. */
 create_module:() -> errno_t;   /* Used-to-be implemented by linux, but no longer is. */
 get_kernel_syms:() -> errno_t; /* Used-to-be implemented by linux, but no longer is. */
+security:() -> errno_t;
+vserver:() -> errno_t;
 
 
 
@@ -2257,7 +2265,6 @@ ioperm:(syscall_ulong_t from, syscall_ulong_t num, syscall_ulong_t turn_on) -> e
 /* Debugging                                                            */
 /************************************************************************/
 ptrace:(syscall_ulong_t request, pid_t pid, void *addr, void *data) -> syscall_slong_t; /* UNIMPLEMENTED! */
-profil:(uint16_t *sample_buffer, size_t size, size_t offset, syscall_ulong_t scale) -> errno_t; /* UNIMPLEMENTED! */
 
 %[startgroup]
 @@Trigger a debugger trap `trapno', optionally extended with  `regs'
@@ -2812,11 +2819,20 @@ pkey_mprotect:(void *addr, size_t len, syscall_ulong_t prot, syscall_ulong_t pke
 
 
 /************************************************************************/
+/* INIMPLEMENTED                                                        */
+/************************************************************************/
+userfaultfd:(syscall_ulong_t flags) -> fd_t;
+adjtimex:(struct timex *ntx) -> errno_t;
+
+
+
+
+
+
+/************************************************************************/
 /* MISSING                                                              */
 /************************************************************************/
-adjtimex:(int TODO_PROTOTYPE) -> errno_t;
 quotactl:(int TODO_PROTOTYPE) -> errno_t;
-afs_syscall:(int TODO_PROTOTYPE) -> errno_t;
 
 vm86:(int TODO_PROTOTYPE) -> errno_t;
 vm86old:(int TODO_PROTOTYPE) -> errno_t;
@@ -2828,8 +2844,6 @@ prctl:(int TODO_PROTOTYPE) -> errno_t;
 
 capget:(int TODO_PROTOTYPE) -> errno_t;
 capset:(int TODO_PROTOTYPE) -> errno_t;
-[cp] getpmsg:(int TODO_PROTOTYPE) -> errno_t;
-[cp] putpmsg:(int TODO_PROTOTYPE) -> errno_t;
 ugetrlimit:(int TODO_PROTOTYPE) -> errno_t;
 
 pivot_root:(int TODO_PROTOTYPE) -> errno_t;
@@ -2847,7 +2861,6 @@ fadvise64:(int TODO_PROTOTYPE) -> errno_t;
 fadvise64_64:(int TODO_PROTOTYPE) -> errno_t;
 lookup_dcookie:(int TODO_PROTOTYPE) -> errno_t;
 
-vserver:(int TODO_PROTOTYPE) -> errno_t;
 mbind:(int TODO_PROTOTYPE) -> errno_t;
 get_mempolicy:(int TODO_PROTOTYPE) -> errno_t;
 set_mempolicy:(int TODO_PROTOTYPE) -> errno_t;
@@ -2874,7 +2887,6 @@ clock_adjtime64:(int TODO_PROTOTYPE) -> errno_t;
 sched_setattr:(int TODO_PROTOTYPE) -> errno_t;
 sched_getattr:(int TODO_PROTOTYPE) -> errno_t;
 
-userfaultfd:(int TODO_PROTOTYPE) -> errno_t;
 membarrier:(int TODO_PROTOTYPE) -> errno_t;
 
 kexec_load:(int TODO_PROTOTYPE) -> errno_t;
@@ -2916,7 +2928,6 @@ bpf:(int TODO_PROTOTYPE) -> errno_t;
 ipc:(int TODO_PROTOTYPE) -> errno_t;
 personality:(int TODO_PROTOTYPE) -> errno_t;
 seccomp:(int TODO_PROTOTYPE) -> errno_t;
-security:(int TODO_PROTOTYPE) -> errno_t;
 sysfs:(int TODO_PROTOTYPE) -> errno_t;
 rseq:(int TODO_PROTOTYPE) -> errno_t;
 statx:(int TODO_PROTOTYPE) -> errno_t;

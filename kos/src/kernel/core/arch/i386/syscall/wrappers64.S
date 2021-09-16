@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x77da6836 */
+/* HASH CRC-32:0x41ef1b87 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -5148,7 +5148,7 @@ INTERN_WEAK_FUNCTION(__x86_asm64_syscall_arch_prctl)
 	.cfi_endproc
 END(__x86_asm64_syscall_arch_prctl)
 
-/* errno_t adjtimex(int TODO_PROTOTYPE) */
+/* errno_t adjtimex(struct timex *ntx) */
 .section .text.x86.asm64_syscall.adjtimex
 INTERN_WEAK_FUNCTION(__x86_asm64_syscall_adjtimex)
 	.cfi_startproc simple
@@ -5834,7 +5834,7 @@ INTERN_WEAK_FUNCTION(__x86_asm64_syscall_nfsservctl)
 	.cfi_endproc
 END(__x86_asm64_syscall_nfsservctl)
 
-/* errno_t getpmsg(int TODO_PROTOTYPE) */
+/* errno_t getpmsg(void) */
 .section .text.x86.asm64_syscall.getpmsg
 INTERN_WEAK_FUNCTION(__x86_asm64_syscall_getpmsg)
 	.cfi_startproc simple
@@ -5864,7 +5864,7 @@ INTERN_WEAK_FUNCTION(__x86_asm64_syscall_getpmsg)
 	.cfi_endproc
 END(__x86_asm64_syscall_getpmsg)
 
-/* errno_t putpmsg(int TODO_PROTOTYPE) */
+/* errno_t putpmsg(void) */
 .section .text.x86.asm64_syscall.putpmsg
 INTERN_WEAK_FUNCTION(__x86_asm64_syscall_putpmsg)
 	.cfi_startproc simple
@@ -5894,7 +5894,7 @@ INTERN_WEAK_FUNCTION(__x86_asm64_syscall_putpmsg)
 	.cfi_endproc
 END(__x86_asm64_syscall_putpmsg)
 
-/* errno_t afs_syscall(int TODO_PROTOTYPE) */
+/* errno_t afs_syscall(void) */
 .section .text.x86.asm64_syscall.afs_syscall
 INTERN_WEAK_FUNCTION(__x86_asm64_syscall_afs_syscall)
 	.cfi_startproc simple
@@ -5954,7 +5954,7 @@ INTERN_WEAK_FUNCTION(__x86_asm64_syscall_tuxcall)
 	.cfi_endproc
 END(__x86_asm64_syscall_tuxcall)
 
-/* errno_t security(int TODO_PROTOTYPE) */
+/* errno_t security(void) */
 .section .text.x86.asm64_syscall.security
 INTERN_WEAK_FUNCTION(__x86_asm64_syscall_security)
 	.cfi_startproc simple
@@ -7566,7 +7566,7 @@ INTERN_WEAK_FUNCTION(__x86_asm64_syscall_utimes)
 	.cfi_endproc
 END(__x86_asm64_syscall_utimes)
 
-/* errno_t vserver(int TODO_PROTOTYPE) */
+/* errno_t vserver(void) */
 .section .text.x86.asm64_syscall.vserver
 INTERN_WEAK_FUNCTION(__x86_asm64_syscall_vserver)
 	.cfi_startproc simple
@@ -10345,7 +10345,7 @@ INTERN_WEAK_FUNCTION(__x86_asm64_syscall_execveat)
 	.cfi_endproc
 END(__x86_asm64_syscall_execveat)
 
-/* errno_t userfaultfd(int TODO_PROTOTYPE) */
+/* fd_t userfaultfd(syscall_ulong_t flags) */
 .section .text.x86.asm64_syscall.userfaultfd
 INTERN_WEAK_FUNCTION(__x86_asm64_syscall_userfaultfd)
 	.cfi_startproc simple
@@ -16304,7 +16304,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_setpriority)
 	.cfi_endproc
 END(__x86_asm32_int80_setpriority)
 
-/* errno_t profil(uint16_t *sample_buffer, size_t size, size_t offset, syscall_ulong_t scale) */
+/* errno_t profil(void) */
 .section .text.x86.asm32_syscall_int80.profil
 INTERN_WEAK_FUNCTION(__x86_asm32_int80_profil)
 	.cfi_startproc simple
@@ -16320,11 +16320,6 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_profil)
 	pushq_cfi_r %r9
 	pushq_cfi_r %r10
 	pushq_cfi_r %r11
-	movzlq %ebx, %rdi /* ARG0 = REG0 */
-	movzlq %edx, %rdx /* ARG2 = REG2 */
-	movzlq %esi, %rsi /* ARG1 = REG3 */
-	movzlq %ecx, %rcx /* ARG3 = REG1 */
-	xchgq  %rcx, %rsi /* ARG1 = ARG3, ARG3 = ARG1 */
 	EXTERN(sys32_profil)
 	call   sys32_profil
 	popq_cfi_r %r11
@@ -17155,7 +17150,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_modify_ldt)
 	.cfi_endproc
 END(__x86_asm32_int80_modify_ldt)
 
-/* errno_t adjtimex(int TODO_PROTOTYPE) */
+/* errno_t adjtimex(struct timex *ntx) */
 .section .text.x86.asm32_syscall_int80.adjtimex
 INTERN_WEAK_FUNCTION(__x86_asm32_int80_adjtimex)
 	.cfi_startproc simple
@@ -17171,7 +17166,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_adjtimex)
 	pushq_cfi_r %r9
 	pushq_cfi_r %r10
 	pushq_cfi_r %r11
-	movslq %ebx, %rdi /* ARG0 = REG0 */
+	movzlq %ebx, %rdi /* ARG0 = REG0 */
 	EXTERN(sys32_adjtimex)
 	call   sys32_adjtimex
 	popq_cfi_r %r11
@@ -17587,7 +17582,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_personality)
 	.cfi_endproc
 END(__x86_asm32_int80_personality)
 
-/* errno_t afs_syscall(int TODO_PROTOTYPE) */
+/* errno_t afs_syscall(void) */
 .section .text.x86.asm32_syscall_int80.afs_syscall
 INTERN_WEAK_FUNCTION(__x86_asm32_int80_afs_syscall)
 	.cfi_startproc simple
@@ -17603,7 +17598,6 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_afs_syscall)
 	pushq_cfi_r %r9
 	pushq_cfi_r %r10
 	pushq_cfi_r %r11
-	movslq %ebx, %rdi /* ARG0 = REG0 */
 	EXTERN(sys32_afs_syscall)
 	call   sys32_afs_syscall
 	popq_cfi_r %r11
@@ -19314,7 +19308,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_sendfile)
 	.cfi_endproc
 END(__x86_asm32_int80_sendfile)
 
-/* errno_t getpmsg(int TODO_PROTOTYPE) */
+/* errno_t getpmsg(void) */
 .section .text.x86.asm32_syscall_int80.getpmsg
 INTERN_WEAK_FUNCTION(__x86_asm32_int80_getpmsg)
 	.cfi_startproc simple
@@ -19330,7 +19324,6 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_getpmsg)
 	pushq_cfi_r %r9
 	pushq_cfi_r %r10
 	pushq_cfi_r %r11
-	movslq %ebx, %rdi /* ARG0 = REG0 */
 	EXTERN(sys32_getpmsg)
 	call   sys32_getpmsg
 	popq_cfi_r %r11
@@ -19345,7 +19338,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_getpmsg)
 	.cfi_endproc
 END(__x86_asm32_int80_getpmsg)
 
-/* errno_t putpmsg(int TODO_PROTOTYPE) */
+/* errno_t putpmsg(void) */
 .section .text.x86.asm32_syscall_int80.putpmsg
 INTERN_WEAK_FUNCTION(__x86_asm32_int80_putpmsg)
 	.cfi_startproc simple
@@ -19361,7 +19354,6 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_putpmsg)
 	pushq_cfi_r %r9
 	pushq_cfi_r %r10
 	pushq_cfi_r %r11
-	movslq %ebx, %rdi /* ARG0 = REG0 */
 	EXTERN(sys32_putpmsg)
 	call   sys32_putpmsg
 	popq_cfi_r %r11
@@ -22100,7 +22092,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_fadvise64_64)
 	.cfi_endproc
 END(__x86_asm32_int80_fadvise64_64)
 
-/* errno_t vserver(int TODO_PROTOTYPE) */
+/* errno_t vserver(void) */
 .section .text.x86.asm32_syscall_int80.vserver
 INTERN_WEAK_FUNCTION(__x86_asm32_int80_vserver)
 	.cfi_startproc simple
@@ -22116,7 +22108,6 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_vserver)
 	pushq_cfi_r %r9
 	pushq_cfi_r %r10
 	pushq_cfi_r %r11
-	movslq %ebx, %rdi /* ARG0 = REG0 */
 	EXTERN(sys32_vserver)
 	call   sys32_vserver
 	popq_cfi_r %r11
@@ -25718,7 +25709,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_shutdown)
 	.cfi_endproc
 END(__x86_asm32_int80_shutdown)
 
-/* errno_t userfaultfd(int TODO_PROTOTYPE) */
+/* fd_t userfaultfd(syscall_ulong_t flags) */
 .section .text.x86.asm32_syscall_int80.userfaultfd
 INTERN_WEAK_FUNCTION(__x86_asm32_int80_userfaultfd)
 	.cfi_startproc simple
@@ -25734,7 +25725,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_userfaultfd)
 	pushq_cfi_r %r9
 	pushq_cfi_r %r10
 	pushq_cfi_r %r11
-	movslq %ebx, %rdi /* ARG0 = REG0 */
+	movzlq %ebx, %rdi /* ARG0 = REG0 */
 	EXTERN(sys32_userfaultfd)
 	call   sys32_userfaultfd
 	popq_cfi_r %r11
@@ -30784,7 +30775,7 @@ DEFINE_INTERN_WEAK_ALIAS(__x86_asm32_sysenter_getpriority, __x86_asm32_int80_get
 /* errno_t setpriority(syscall_ulong_t which, id_t who, syscall_ulong_t value) */
 DEFINE_INTERN_WEAK_ALIAS(__x86_asm32_sysenter_setpriority, __x86_asm32_int80_setpriority)
 
-/* errno_t profil(uint16_t *sample_buffer, size_t size, size_t offset, syscall_ulong_t scale) */
+/* errno_t profil(void) */
 DEFINE_INTERN_WEAK_ALIAS(__x86_asm32_sysenter_profil, __x86_asm32_int80_profil)
 
 /* errno_t statfs(char const *file, struct __statfsx32 *buf) */
@@ -30941,7 +30932,7 @@ DEFINE_INTERN_WEAK_ALIAS(__x86_asm32_sysenter_uname, __x86_asm32_int80_uname)
 /* syscall_slong_t modify_ldt(syscall_ulong_t func, void *ptr, syscall_ulong_t bytecount) */
 DEFINE_INTERN_WEAK_ALIAS(__x86_asm32_sysenter_modify_ldt, __x86_asm32_int80_modify_ldt)
 
-/* errno_t adjtimex(int TODO_PROTOTYPE) */
+/* errno_t adjtimex(struct timex *ntx) */
 DEFINE_INTERN_WEAK_ALIAS(__x86_asm32_sysenter_adjtimex, __x86_asm32_int80_adjtimex)
 
 /* @param: prot: Either `PROT_NONE', or set of `PROT_EXEC | PROT_WRITE | PROT_READ | PROT_SEM | PROT_LOOSE | PROT_SHARED' */
@@ -31004,7 +30995,7 @@ DEFINE_INTERN_WEAK_ALIAS(__x86_asm32_sysenter_sysfs, __x86_asm32_int80_sysfs)
 /* errno_t personality(int TODO_PROTOTYPE) */
 DEFINE_INTERN_WEAK_ALIAS(__x86_asm32_sysenter_personality, __x86_asm32_int80_personality)
 
-/* errno_t afs_syscall(int TODO_PROTOTYPE) */
+/* errno_t afs_syscall(void) */
 DEFINE_INTERN_WEAK_ALIAS(__x86_asm32_sysenter_afs_syscall, __x86_asm32_int80_afs_syscall)
 
 /* >> setfsuid(2)
@@ -31423,10 +31414,10 @@ DEFINE_INTERN_WEAK_ALIAS(__x86_asm32_sysenter_sigaltstack, __x86_asm32_int80_sig
 /* ssize_t sendfile(fd_t out_fd, fd_t in_fd, __ULONG32_TYPE__ *pin_offset, size_t num_bytes) */
 DEFINE_INTERN_WEAK_ALIAS(__x86_asm32_sysenter_sendfile, __x86_asm32_int80_sendfile)
 
-/* errno_t getpmsg(int TODO_PROTOTYPE) */
+/* errno_t getpmsg(void) */
 DEFINE_INTERN_WEAK_ALIAS(__x86_asm32_sysenter_getpmsg, __x86_asm32_int80_getpmsg)
 
-/* errno_t putpmsg(int TODO_PROTOTYPE) */
+/* errno_t putpmsg(void) */
 DEFINE_INTERN_WEAK_ALIAS(__x86_asm32_sysenter_putpmsg, __x86_asm32_int80_putpmsg)
 
 /* Same as `fork(2)', but the child process may be executed within in the same VM
@@ -31987,7 +31978,7 @@ DEFINE_INTERN_WEAK_ALIAS(__x86_asm32_sysenter_utimes, __x86_asm32_int80_utimes)
 /* errno_t fadvise64_64(int TODO_PROTOTYPE) */
 DEFINE_INTERN_WEAK_ALIAS(__x86_asm32_sysenter_fadvise64_64, __x86_asm32_int80_fadvise64_64)
 
-/* errno_t vserver(int TODO_PROTOTYPE) */
+/* errno_t vserver(void) */
 DEFINE_INTERN_WEAK_ALIAS(__x86_asm32_sysenter_vserver, __x86_asm32_int80_vserver)
 
 /* errno_t mbind(int TODO_PROTOTYPE) */
@@ -33327,7 +33318,7 @@ DEFINE_INTERN_WEAK_ALIAS(__x86_asm32_sysenter_recvmsg, __x86_asm32_int80_recvmsg
 /* errno_t shutdown(fd_t sockfd, syscall_ulong_t how) */
 DEFINE_INTERN_WEAK_ALIAS(__x86_asm32_sysenter_shutdown, __x86_asm32_int80_shutdown)
 
-/* errno_t userfaultfd(int TODO_PROTOTYPE) */
+/* fd_t userfaultfd(syscall_ulong_t flags) */
 DEFINE_INTERN_WEAK_ALIAS(__x86_asm32_sysenter_userfaultfd, __x86_asm32_int80_userfaultfd)
 
 /* errno_t membarrier(int TODO_PROTOTYPE) */
@@ -35981,18 +35972,8 @@ INTERN_WEAK_FUNCTION(__x86_asm32_sysrun32_setpriority)
 	.cfi_endproc
 END(__x86_asm32_sysrun32_setpriority)
 
-/* errno_t profil(uint16_t *sample_buffer, size_t size, size_t offset, syscall_ulong_t scale) */
-.section .text.x86.asm32_syscall_sysrun32.profil
-INTERN_WEAK_FUNCTION(__x86_asm32_sysrun32_profil)
-	.cfi_startproc
-	movzlq 24(%rdi), %rcx
-	movzlq 16(%rdi), %rdx
-	movzlq 8(%rdi), %rsi
-	movzlq 0(%rdi), %rdi
-	EXTERN(sys32_profil)
-	jmp    sys32_profil
-	.cfi_endproc
-END(__x86_asm32_sysrun32_profil)
+/* errno_t profil(void) */
+/* DEFINE_INTERN_ALIAS(__x86_asm32_sysrun32_profil, sys32_profil); */
 
 /* errno_t statfs(char const *file, struct __statfsx32 *buf) */
 .section .text.x86.asm32_syscall_sysrun32.statfs
@@ -36270,7 +36251,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_sysrun32_modify_ldt)
 	.cfi_endproc
 END(__x86_asm32_sysrun32_modify_ldt)
 
-/* errno_t adjtimex(int TODO_PROTOTYPE) */
+/* errno_t adjtimex(struct timex *ntx) */
 .section .text.x86.asm32_syscall_sysrun32.adjtimex
 INTERN_WEAK_FUNCTION(__x86_asm32_sysrun32_adjtimex)
 	.cfi_startproc
@@ -36417,15 +36398,8 @@ INTERN_WEAK_FUNCTION(__x86_asm32_sysrun32_personality)
 	.cfi_endproc
 END(__x86_asm32_sysrun32_personality)
 
-/* errno_t afs_syscall(int TODO_PROTOTYPE) */
-.section .text.x86.asm32_syscall_sysrun32.afs_syscall
-INTERN_WEAK_FUNCTION(__x86_asm32_sysrun32_afs_syscall)
-	.cfi_startproc
-	movzlq 0(%rdi), %rdi
-	EXTERN(sys32_afs_syscall)
-	jmp    sys32_afs_syscall
-	.cfi_endproc
-END(__x86_asm32_sysrun32_afs_syscall)
+/* errno_t afs_syscall(void) */
+/* DEFINE_INTERN_ALIAS(__x86_asm32_sysrun32_afs_syscall, sys32_afs_syscall); */
 
 /* >> setfsuid(2)
  * Set the  user ID  for the  cred-context (s.a.  `CLONE_CRED') of  the
@@ -37045,25 +37019,11 @@ INTERN_WEAK_FUNCTION(__x86_asm32_sysrun32_sendfile)
 	.cfi_endproc
 END(__x86_asm32_sysrun32_sendfile)
 
-/* errno_t getpmsg(int TODO_PROTOTYPE) */
-.section .text.x86.asm32_syscall_sysrun32.getpmsg
-INTERN_WEAK_FUNCTION(__x86_asm32_sysrun32_getpmsg)
-	.cfi_startproc
-	movzlq 0(%rdi), %rdi
-	EXTERN(sys32_getpmsg)
-	jmp    sys32_getpmsg
-	.cfi_endproc
-END(__x86_asm32_sysrun32_getpmsg)
+/* errno_t getpmsg(void) */
+/* DEFINE_INTERN_ALIAS(__x86_asm32_sysrun32_getpmsg, sys32_getpmsg); */
 
-/* errno_t putpmsg(int TODO_PROTOTYPE) */
-.section .text.x86.asm32_syscall_sysrun32.putpmsg
-INTERN_WEAK_FUNCTION(__x86_asm32_sysrun32_putpmsg)
-	.cfi_startproc
-	movzlq 0(%rdi), %rdi
-	EXTERN(sys32_putpmsg)
-	jmp    sys32_putpmsg
-	.cfi_endproc
-END(__x86_asm32_sysrun32_putpmsg)
+/* errno_t putpmsg(void) */
+/* DEFINE_INTERN_ALIAS(__x86_asm32_sysrun32_putpmsg, sys32_putpmsg); */
 
 /* Same as `fork(2)', but the child process may be executed within in the same VM
  * as the parent process, with the  parent process remaining suspended until  the
@@ -38058,15 +38018,8 @@ INTERN_WEAK_FUNCTION(__x86_asm32_sysrun32_fadvise64_64)
 	.cfi_endproc
 END(__x86_asm32_sysrun32_fadvise64_64)
 
-/* errno_t vserver(int TODO_PROTOTYPE) */
-.section .text.x86.asm32_syscall_sysrun32.vserver
-INTERN_WEAK_FUNCTION(__x86_asm32_sysrun32_vserver)
-	.cfi_startproc
-	movzlq 0(%rdi), %rdi
-	EXTERN(sys32_vserver)
-	jmp    sys32_vserver
-	.cfi_endproc
-END(__x86_asm32_sysrun32_vserver)
+/* errno_t vserver(void) */
+/* DEFINE_INTERN_ALIAS(__x86_asm32_sysrun32_vserver, sys32_vserver); */
 
 /* errno_t mbind(int TODO_PROTOTYPE) */
 .section .text.x86.asm32_syscall_sysrun32.mbind
@@ -39535,7 +39488,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_sysrun32_shutdown)
 	.cfi_endproc
 END(__x86_asm32_sysrun32_shutdown)
 
-/* errno_t userfaultfd(int TODO_PROTOTYPE) */
+/* fd_t userfaultfd(syscall_ulong_t flags) */
 .section .text.x86.asm32_syscall_sysrun32.userfaultfd
 INTERN_WEAK_FUNCTION(__x86_asm32_sysrun32_userfaultfd)
 	.cfi_startproc

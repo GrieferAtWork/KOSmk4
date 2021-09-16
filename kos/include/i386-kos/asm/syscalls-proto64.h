@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xf5395fae */
+/* HASH CRC-32:0xeb9c6b6d */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -219,11 +219,11 @@
 #define __NRAC_query_module             0
 #define __NRAC_quotactl                 1
 #define __NRAC_nfsservctl               1
-#define __NRAC_getpmsg                  1
-#define __NRAC_putpmsg                  1
-#define __NRAC_afs_syscall              1
+#define __NRAC_getpmsg                  0
+#define __NRAC_putpmsg                  0
+#define __NRAC_afs_syscall              0
 #define __NRAC_tuxcall                  0
-#define __NRAC_security                 1
+#define __NRAC_security                 0
 #define __NRAC_gettid                   0
 #define __NRAC_readahead                3
 #define __NRAC_setxattr                 5
@@ -274,7 +274,7 @@
 #define __NRAC_epoll_ctl                4
 #define __NRAC_tgkill                   3
 #define __NRAC_utimes                   2
-#define __NRAC_vserver                  1
+#define __NRAC_vserver                  0
 #define __NRAC_mbind                    1
 #define __NRAC_set_mempolicy            1
 #define __NRAC_get_mempolicy            1
@@ -771,7 +771,7 @@
 #define __NRRT_kexec_file_load          (errno_t, __errno_t)
 #define __NRRT_bpf                      (errno_t, __errno_t)
 #define __NRRT_execveat                 (errno_t, __errno_t)
-#define __NRRT_userfaultfd              (errno_t, __errno_t)
+#define __NRRT_userfaultfd              (fd_t, __fd_t)
 #define __NRRT_membarrier               (errno_t, __errno_t)
 #define __NRRT_mlock2                   (errno_t, __errno_t)
 #define __NRRT_copy_file_range          (errno_t, __errno_t)
@@ -1189,7 +1189,7 @@
 #define __NRAT0__sysctl                  (int, int)
 #define __NRAT0_prctl                    (int, int)
 #define __NRAT0_arch_prctl               (int, int)
-#define __NRAT0_adjtimex                 (int, int)
+#define __NRAT0_adjtimex                 (struct timex *, struct timex *)
 #define __NRAT0_setrlimit                (syscall_ulong_t, __syscall_ulong_t)
 #define __NRAT1_setrlimit                (struct rlimit const *, struct rlimit const *)
 #define __NRAT0_chroot                   (char const *, char const *)
@@ -1222,10 +1222,6 @@
 #define __NRAT1_delete_module            (oflag_t, __oflag_t)
 #define __NRAT0_quotactl                 (int, int)
 #define __NRAT0_nfsservctl               (int, int)
-#define __NRAT0_getpmsg                  (int, int)
-#define __NRAT0_putpmsg                  (int, int)
-#define __NRAT0_afs_syscall              (int, int)
-#define __NRAT0_security                 (int, int)
 #define __NRAT0_readahead                (fd_t, __fd_t)
 #define __NRAT1_readahead                (uint64_t, __uint64_t)
 #define __NRAT2_readahead                (size_t, __size_t)
@@ -1349,7 +1345,6 @@
 #define __NRAT2_tgkill                   (signo_t, __signo_t)
 #define __NRAT0_utimes                   (char const *, char const *)
 #define __NRAT1_utimes                   (struct timevalx64 const *, struct __timevalx64 const *)
-#define __NRAT0_vserver                  (int, int)
 #define __NRAT0_mbind                    (int, int)
 #define __NRAT0_set_mempolicy            (int, int)
 #define __NRAT0_get_mempolicy            (int, int)
@@ -1599,7 +1594,7 @@
 #define __NRAT2_execveat                 (__HYBRID_PTR64(char const) const *, __HYBRID_PTR64(char const) const *)
 #define __NRAT3_execveat                 (__HYBRID_PTR64(char const) const *, __HYBRID_PTR64(char const) const *)
 #define __NRAT4_execveat                 (atflag_t, __atflag_t)
-#define __NRAT0_userfaultfd              (int, int)
+#define __NRAT0_userfaultfd              (syscall_ulong_t, __syscall_ulong_t)
 #define __NRAT0_membarrier               (int, int)
 #define __NRAT0_mlock2                   (void const *, void const *)
 #define __NRAT1_mlock2                   (size_t, __size_t)
@@ -1967,7 +1962,7 @@
 #define __NRAM__sysctl(a, b, c, d, e, f)                  (int)a
 #define __NRAM_prctl(a, b, c, d, e, f)                    (int)a
 #define __NRAM_arch_prctl(a, b, c, d, e, f)               (int)a
-#define __NRAM_adjtimex(a, b, c, d, e, f)                 (int)a
+#define __NRAM_adjtimex(a, b, c, d, e, f)                 (struct timex *)a
 #define __NRAM_setrlimit(a, b, c, d, e, f)                (__syscall_ulong_t)a, (struct rlimit const *)b
 #define __NRAM_chroot(a, b, c, d, e, f)                   (char const *)a
 #define __NRAM_sync(a, b, c, d, e, f)                     /* nothing */
@@ -1989,11 +1984,11 @@
 #define __NRAM_query_module(a, b, c, d, e, f)             /* nothing */
 #define __NRAM_quotactl(a, b, c, d, e, f)                 (int)a
 #define __NRAM_nfsservctl(a, b, c, d, e, f)               (int)a
-#define __NRAM_getpmsg(a, b, c, d, e, f)                  (int)a
-#define __NRAM_putpmsg(a, b, c, d, e, f)                  (int)a
-#define __NRAM_afs_syscall(a, b, c, d, e, f)              (int)a
+#define __NRAM_getpmsg(a, b, c, d, e, f)                  /* nothing */
+#define __NRAM_putpmsg(a, b, c, d, e, f)                  /* nothing */
+#define __NRAM_afs_syscall(a, b, c, d, e, f)              /* nothing */
 #define __NRAM_tuxcall(a, b, c, d, e, f)                  /* nothing */
-#define __NRAM_security(a, b, c, d, e, f)                 (int)a
+#define __NRAM_security(a, b, c, d, e, f)                 /* nothing */
 #define __NRAM_gettid(a, b, c, d, e, f)                   /* nothing */
 #define __NRAM_readahead(a, b, c, d, e, f)                (__fd_t)a, (__uint64_t)b, (__size_t)c
 #define __NRAM_setxattr(a, b, c, d, e, f)                 (char const *)a, (char const *)b, (void const *)c, (__size_t)d, (__syscall_ulong_t)e
@@ -2044,7 +2039,7 @@
 #define __NRAM_epoll_ctl(a, b, c, d, e, f)                (__fd_t)a, (__syscall_ulong_t)b, (__fd_t)c, (struct epoll_event *)d
 #define __NRAM_tgkill(a, b, c, d, e, f)                   (__pid_t)a, (__pid_t)b, (__signo_t)c
 #define __NRAM_utimes(a, b, c, d, e, f)                   (char const *)a, (struct __timevalx64 const *)b
-#define __NRAM_vserver(a, b, c, d, e, f)                  (int)a
+#define __NRAM_vserver(a, b, c, d, e, f)                  /* nothing */
 #define __NRAM_mbind(a, b, c, d, e, f)                    (int)a
 #define __NRAM_set_mempolicy(a, b, c, d, e, f)            (int)a
 #define __NRAM_get_mempolicy(a, b, c, d, e, f)            (int)a
@@ -2131,7 +2126,7 @@
 #define __NRAM_kexec_file_load(a, b, c, d, e, f)          (int)a
 #define __NRAM_bpf(a, b, c, d, e, f)                      (int)a
 #define __NRAM_execveat(a, b, c, d, e, f)                 (__fd_t)a, (char const *)b, (__HYBRID_PTR64(char const) const *)c, (__HYBRID_PTR64(char const) const *)d, (__atflag_t)e
-#define __NRAM_userfaultfd(a, b, c, d, e, f)              (int)a
+#define __NRAM_userfaultfd(a, b, c, d, e, f)              (__syscall_ulong_t)a
 #define __NRAM_membarrier(a, b, c, d, e, f)               (int)a
 #define __NRAM_mlock2(a, b, c, d, e, f)                   (void const *)a, (__size_t)b, (__syscall_ulong_t)c
 #define __NRAM_copy_file_range(a, b, c, d, e, f)          (int)a
@@ -2399,11 +2394,11 @@
 #define __NRAP_query_module()                             /* nothing */
 #define __NRAP_quotactl(a)                                (__syscall_ulong_t)a
 #define __NRAP_nfsservctl(a)                              (__syscall_ulong_t)a
-#define __NRAP_getpmsg(a)                                 (__syscall_ulong_t)a
-#define __NRAP_putpmsg(a)                                 (__syscall_ulong_t)a
-#define __NRAP_afs_syscall(a)                             (__syscall_ulong_t)a
+#define __NRAP_getpmsg()                                  /* nothing */
+#define __NRAP_putpmsg()                                  /* nothing */
+#define __NRAP_afs_syscall()                              /* nothing */
 #define __NRAP_tuxcall()                                  /* nothing */
-#define __NRAP_security(a)                                (__syscall_ulong_t)a
+#define __NRAP_security()                                 /* nothing */
 #define __NRAP_gettid()                                   /* nothing */
 #define __NRAP_readahead(a, b, c)                         (__syscall_ulong_t)a, (__syscall_ulong_t)b, (__syscall_ulong_t)c
 #define __NRAP_setxattr(a, b, c, d, e)                    (__syscall_ulong_t)a, (__syscall_ulong_t)b, (__syscall_ulong_t)c, (__syscall_ulong_t)d, (__syscall_ulong_t)e
@@ -2454,7 +2449,7 @@
 #define __NRAP_epoll_ctl(a, b, c, d)                      (__syscall_ulong_t)a, (__syscall_ulong_t)b, (__syscall_ulong_t)c, (__syscall_ulong_t)d
 #define __NRAP_tgkill(a, b, c)                            (__syscall_ulong_t)a, (__syscall_ulong_t)b, (__syscall_ulong_t)c
 #define __NRAP_utimes(a, b)                               (__syscall_ulong_t)a, (__syscall_ulong_t)b
-#define __NRAP_vserver(a)                                 (__syscall_ulong_t)a
+#define __NRAP_vserver()                                  /* nothing */
 #define __NRAP_mbind(a)                                   (__syscall_ulong_t)a
 #define __NRAP_set_mempolicy(a)                           (__syscall_ulong_t)a
 #define __NRAP_get_mempolicy(a)                           (__syscall_ulong_t)a

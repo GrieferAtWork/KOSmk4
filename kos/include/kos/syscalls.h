@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x326572ac */
+/* HASH CRC-32:0xfc14e2f9 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -39,6 +39,7 @@
 #include <bits/os/statfs.h>
 #include <bits/os/timespec.h>
 #include <bits/os/timeval.h>
+#include <bits/os/timex.h>
 #include <bits/os/tms.h>
 #include <bits/os/utimbuf.h>
 #include <bits/types.h>
@@ -117,6 +118,7 @@ struct statfs;
 struct sysinfo;
 struct timespec;
 struct timeval;
+struct timex;
 struct timezone;
 struct tms;
 struct ucpustate;
@@ -171,7 +173,7 @@ __CDECLARE_SC(,__errno_t,acct,(char const *__filename),(__filename))
 __CDECLARE_SC(,__errno_t,add_key,(int __TODO_PROTOTYPE),(__TODO_PROTOTYPE))
 #endif /* __CRT_HAVE_SC(add_key) */
 #if __CRT_HAVE_SC(adjtimex)
-__CDECLARE_SC(,__errno_t,adjtimex,(int __TODO_PROTOTYPE),(__TODO_PROTOTYPE))
+__CDECLARE_SC(,__errno_t,adjtimex,(struct timex *__ntx),(__ntx))
 #endif /* __CRT_HAVE_SC(adjtimex) */
 #if __CRT_HAVE_SC(alarm)
 __CDECLARE_SC(,__syscall_ulong_t,alarm,(__syscall_ulong_t __seconds),(__seconds))
@@ -1502,7 +1504,7 @@ __CDECLARE_SC(,__errno_t,unshare,(__syscall_ulong_t __what),(__what))
 __CDECLARE_SC(,__errno_t,uselib,(char const *__library),(__library))
 #endif /* __CRT_HAVE_SC(uselib) */
 #if __CRT_HAVE_SC(userfaultfd)
-__CDECLARE_SC(,__errno_t,userfaultfd,(int __TODO_PROTOTYPE),(__TODO_PROTOTYPE))
+__CDECLARE_SC(,__fd_t,userfaultfd,(__syscall_ulong_t __flags),(__flags))
 #endif /* __CRT_HAVE_SC(userfaultfd) */
 #if __CRT_HAVE_SC(ustat)
 __CDECLARE_SC(,__errno_t,ustat,(__dev_t __dev, struct ustat *__ubuf),(__dev,__ubuf))
@@ -1632,7 +1634,7 @@ __CDECLARE_XSC(,__errno_t,acct,(char const *__filename),(__filename))
 __CDECLARE_XSC(,__errno_t,add_key,(int __TODO_PROTOTYPE),(__TODO_PROTOTYPE))
 #endif /* __CRT_HAVE_XSC(add_key) */
 #if __CRT_HAVE_XSC(adjtimex)
-__CDECLARE_XSC(,__errno_t,adjtimex,(int __TODO_PROTOTYPE),(__TODO_PROTOTYPE))
+__CDECLARE_XSC(,__errno_t,adjtimex,(struct timex *__ntx),(__ntx))
 #endif /* __CRT_HAVE_XSC(adjtimex) */
 #if __CRT_HAVE_XSC(alarm)
 __CDECLARE_XSC(,__syscall_ulong_t,alarm,(__syscall_ulong_t __seconds),(__seconds))
@@ -2960,7 +2962,7 @@ __CDECLARE_XSC(,__errno_t,unshare,(__syscall_ulong_t __what),(__what))
 __CDECLARE_XSC(,__errno_t,uselib,(char const *__library),(__library))
 #endif /* __CRT_HAVE_XSC(uselib) */
 #if __CRT_HAVE_XSC(userfaultfd)
-__CDECLARE_XSC(,__errno_t,userfaultfd,(int __TODO_PROTOTYPE),(__TODO_PROTOTYPE))
+__CDECLARE_XSC(,__fd_t,userfaultfd,(__syscall_ulong_t __flags),(__flags))
 #endif /* __CRT_HAVE_XSC(userfaultfd) */
 #if __CRT_HAVE_XSC(ustat)
 __CDECLARE_XSC(,__errno_t,ustat,(__dev_t __dev, struct ustat *__ubuf),(__dev,__ubuf))

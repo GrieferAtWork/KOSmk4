@@ -1707,7 +1707,7 @@ NOTHROW_NCX(LIBCCALL libc_profil)(uint16_t *sample_buffer,
                                   unsigned int scale)
 /*[[[body:libc_profil]]]*/
 {
-#ifdef SYS_profil
+#if defined(SYS_profil) && 0
 	errno_t result;
 	result = sys_profil((uint16_t *)sample_buffer,
 	                    size,

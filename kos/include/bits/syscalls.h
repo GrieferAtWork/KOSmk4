@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xe25e1a5d */
+/* HASH CRC-32:0x24b4fa7f */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -400,7 +400,7 @@
 #define SYS_getcpu                 __NR_getcpu                 /* errno_t getcpu(uint32_t *cpu, uint32_t *node, struct getcpu_cache *tcache) */
 #define SYS_gettimeofday           __NR_gettimeofday           /* errno_t gettimeofday(struct timeval *tv, struct timezone *tz) */
 #define SYS_settimeofday           __NR_settimeofday           /* errno_t settimeofday(struct timeval const *tv, struct timezone const *tz) */
-#define SYS_adjtimex               __NR_adjtimex               /* errno_t adjtimex(int TODO_PROTOTYPE) */
+#define SYS_adjtimex               __NR_adjtimex               /* errno_t adjtimex(struct timex *ntx) */
 #define SYS_getpid                 __NR_getpid                 /* pid_t getpid(void) */
 #define SYS_getppid                __NR_getppid                /* pid_t getppid(void) */
 /* >> getuid(2)
@@ -714,7 +714,7 @@
  * and execute it's `main()' method, passing the given `argv', and setting `environ' to `envp'
  * @param: flags: Set of `0 | AT_EMPTY_PATH | AT_SYMLINK_NOFOLLOW | AT_DOSPATH' */
 #define SYS_execveat               __NR_execveat               /* errno_t execveat(fd_t dirfd, char const *pathname, char const *const *argv, char const *const *envp, atflag_t flags) */
-#define SYS_userfaultfd            __NR_userfaultfd            /* errno_t userfaultfd(int TODO_PROTOTYPE) */
+#define SYS_userfaultfd            __NR_userfaultfd            /* fd_t userfaultfd(syscall_ulong_t flags) */
 #define SYS_membarrier             __NR_membarrier             /* errno_t membarrier(int TODO_PROTOTYPE) */
 #define SYS_mlock2                 __NR_mlock2                 /* errno_t mlock2(void const *addr, size_t length, syscall_ulong_t flags) */
 /* Open  a  new  file  handle  to  the  file  specified  by `filename'

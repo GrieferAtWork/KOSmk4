@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x6be5a4bd */
+/* HASH CRC-32:0xb5232be8 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -219,7 +219,7 @@
 #define SYS_getpriority                  __NR_getpriority                  /* syscall_slong_t getpriority(syscall_ulong_t which, id_t who) */
 /* @param: which: One of `PRIO_PROCESS', `PRIO_PGRP' or `PRIO_USER' */
 #define SYS_setpriority                  __NR_setpriority                  /* errno_t setpriority(syscall_ulong_t which, id_t who, syscall_ulong_t value) */
-#define SYS_profil                       __NR_profil                       /* errno_t profil(uint16_t *sample_buffer, size_t size, size_t offset, syscall_ulong_t scale) */
+#define SYS_profil                       __NR_profil                       /* errno_t profil(void) */
 #define SYS_statfs                       __NR_statfs                       /* errno_t statfs(char const *file, struct __statfsx32 *buf) */
 #define SYS_fstatfs                      __NR_fstatfs                      /* errno_t fstatfs(fd_t file, struct __statfsx32 *buf) */
 #define SYS_ioperm                       __NR_ioperm                       /* errno_t ioperm(syscall_ulong_t from, syscall_ulong_t num, syscall_ulong_t turn_on) */
@@ -257,7 +257,7 @@
 #define SYS_setdomainname                __NR_setdomainname                /* errno_t setdomainname(char const *name, size_t len) */
 #define SYS_uname                        __NR_uname                        /* errno_t uname(struct utsname *name) */
 #define SYS_modify_ldt                   __NR_modify_ldt                   /* syscall_slong_t modify_ldt(syscall_ulong_t func, void *ptr, syscall_ulong_t bytecount) */
-#define SYS_adjtimex                     __NR_adjtimex                     /* errno_t adjtimex(int TODO_PROTOTYPE) */
+#define SYS_adjtimex                     __NR_adjtimex                     /* errno_t adjtimex(struct timex *ntx) */
 /* @param: prot: Either `PROT_NONE', or set of `PROT_EXEC | PROT_WRITE | PROT_READ | PROT_SEM | PROT_LOOSE | PROT_SHARED' */
 #define SYS_mprotect                     __NR_mprotect                     /* errno_t mprotect(void *addr, size_t len, syscall_ulong_t prot) */
 /* @param: how: One of `SIG_BLOCK', `SIG_UNBLOCK' or `SIG_SETMASK' */
@@ -294,7 +294,7 @@
 #define SYS_bdflush                      __NR_bdflush                      /* errno_t bdflush(int TODO_PROTOTYPE) */
 #define SYS_sysfs                        __NR_sysfs                        /* errno_t sysfs(int TODO_PROTOTYPE) */
 #define SYS_personality                  __NR_personality                  /* errno_t personality(int TODO_PROTOTYPE) */
-#define SYS_afs_syscall                  __NR_afs_syscall                  /* errno_t afs_syscall(int TODO_PROTOTYPE) */
+#define SYS_afs_syscall                  __NR_afs_syscall                  /* errno_t afs_syscall(void) */
 /* >> setfsuid(2)
  * Set the  user ID  for the  cred-context (s.a.  `CLONE_CRED') of  the
  * calling thread. The calling thread needs the `CAP_SETUID' privilege.
@@ -406,8 +406,8 @@
 #define SYS_capset                       __NR_capset                       /* errno_t capset(int TODO_PROTOTYPE) */
 #define SYS_sigaltstack                  __NR_sigaltstack                  /* errno_t sigaltstack(struct __sigaltstackx32 const *ss, struct __sigaltstackx32 *oss) */
 #define SYS_sendfile                     __NR_sendfile                     /* ssize_t sendfile(fd_t out_fd, fd_t in_fd, __ULONG32_TYPE__ *pin_offset, size_t num_bytes) */
-#define SYS_getpmsg                      __NR_getpmsg                      /* errno_t getpmsg(int TODO_PROTOTYPE) */
-#define SYS_putpmsg                      __NR_putpmsg                      /* errno_t putpmsg(int TODO_PROTOTYPE) */
+#define SYS_getpmsg                      __NR_getpmsg                      /* errno_t getpmsg(void) */
+#define SYS_putpmsg                      __NR_putpmsg                      /* errno_t putpmsg(void) */
 /* Same as `fork(2)', but the child process may be executed within in the same VM
  * as the parent process, with the  parent process remaining suspended until  the
  * child process invokes one of the following system calls:
@@ -606,7 +606,7 @@
  * @param: times[1]: New last-modified time */
 #define SYS_utimes                       __NR_utimes                       /* errno_t utimes(char const *filename, struct timevalx32 const[2] times) */
 #define SYS_fadvise64_64                 __NR_fadvise64_64                 /* errno_t fadvise64_64(int TODO_PROTOTYPE) */
-#define SYS_vserver                      __NR_vserver                      /* errno_t vserver(int TODO_PROTOTYPE) */
+#define SYS_vserver                      __NR_vserver                      /* errno_t vserver(void) */
 #define SYS_mbind                        __NR_mbind                        /* errno_t mbind(int TODO_PROTOTYPE) */
 #define SYS_get_mempolicy                __NR_get_mempolicy                /* errno_t get_mempolicy(int TODO_PROTOTYPE) */
 #define SYS_set_mempolicy                __NR_set_mempolicy                /* errno_t set_mempolicy(int TODO_PROTOTYPE) */
@@ -971,7 +971,7 @@
  * @throw: E_INVALID_ARGUMENT_BAD_STATE:E_INVALID_ARGUMENT_CONTEXT_SHUTDOWN_NOT_CONNECTED
  * @return: 0 : Success */
 #define SYS_shutdown                     __NR_shutdown                     /* errno_t shutdown(fd_t sockfd, syscall_ulong_t how) */
-#define SYS_userfaultfd                  __NR_userfaultfd                  /* errno_t userfaultfd(int TODO_PROTOTYPE) */
+#define SYS_userfaultfd                  __NR_userfaultfd                  /* fd_t userfaultfd(syscall_ulong_t flags) */
 #define SYS_membarrier                   __NR_membarrier                   /* errno_t membarrier(int TODO_PROTOTYPE) */
 #define SYS_mlock2                       __NR_mlock2                       /* errno_t mlock2(void const *addr, size_t length, syscall_ulong_t flags) */
 #define SYS_copy_file_range              __NR_copy_file_range              /* errno_t copy_file_range(int TODO_PROTOTYPE) */

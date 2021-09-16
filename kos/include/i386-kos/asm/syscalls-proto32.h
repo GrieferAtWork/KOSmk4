@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x8fe1618d */
+/* HASH CRC-32:0xb8b322cc */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -136,7 +136,7 @@
 #define __NRAC_fchown                       3
 #define __NRAC_getpriority                  2
 #define __NRAC_setpriority                  3
-#define __NRAC_profil                       4
+#define __NRAC_profil                       0
 #define __NRAC_statfs                       2
 #define __NRAC_fstatfs                      2
 #define __NRAC_ioperm                       3
@@ -175,7 +175,7 @@
 #define __NRAC_bdflush                      1
 #define __NRAC_sysfs                        1
 #define __NRAC_personality                  1
-#define __NRAC_afs_syscall                  1
+#define __NRAC_afs_syscall                  0
 #define __NRAC_setfsuid                     1
 #define __NRAC_setfsgid                     1
 #define __NRAC__llseek                      4
@@ -226,8 +226,8 @@
 #define __NRAC_capset                       1
 #define __NRAC_sigaltstack                  2
 #define __NRAC_sendfile                     4
-#define __NRAC_getpmsg                      1
-#define __NRAC_putpmsg                      1
+#define __NRAC_getpmsg                      0
+#define __NRAC_putpmsg                      0
 #define __NRAC_vfork                        0
 #define __NRAC_ugetrlimit                   1
 #define __NRAC_mmap2                        6
@@ -308,7 +308,7 @@
 #define __NRAC_tgkill                       3
 #define __NRAC_utimes                       2
 #define __NRAC_fadvise64_64                 1
-#define __NRAC_vserver                      1
+#define __NRAC_vserver                      0
 #define __NRAC_mbind                        1
 #define __NRAC_get_mempolicy                1
 #define __NRAC_set_mempolicy                1
@@ -913,7 +913,7 @@
 #define __NRRT_recvfrom                     (ssize_t, __ssize_t)
 #define __NRRT_recvmsg                      (ssize_t, __ssize_t)
 #define __NRRT_shutdown                     (errno_t, __errno_t)
-#define __NRRT_userfaultfd                  (errno_t, __errno_t)
+#define __NRRT_userfaultfd                  (fd_t, __fd_t)
 #define __NRRT_membarrier                   (errno_t, __errno_t)
 #define __NRRT_mlock2                       (errno_t, __errno_t)
 #define __NRRT_copy_file_range              (errno_t, __errno_t)
@@ -1200,10 +1200,6 @@
 #define __NRAT0_setpriority                  (syscall_ulong_t, __syscall_ulong_t)
 #define __NRAT1_setpriority                  (id_t, __id_t)
 #define __NRAT2_setpriority                  (syscall_ulong_t, __syscall_ulong_t)
-#define __NRAT0_profil                       (uint16_t *, __uint16_t *)
-#define __NRAT1_profil                       (size_t, __size_t)
-#define __NRAT2_profil                       (size_t, __size_t)
-#define __NRAT3_profil                       (syscall_ulong_t, __syscall_ulong_t)
 #define __NRAT0_statfs                       (char const *, char const *)
 #define __NRAT1_statfs                       (struct __statfsx32 *, struct __statfsx32 *)
 #define __NRAT0_fstatfs                      (fd_t, __fd_t)
@@ -1255,7 +1251,7 @@
 #define __NRAT0_modify_ldt                   (syscall_ulong_t, __syscall_ulong_t)
 #define __NRAT1_modify_ldt                   (void *, void *)
 #define __NRAT2_modify_ldt                   (syscall_ulong_t, __syscall_ulong_t)
-#define __NRAT0_adjtimex                     (int, int)
+#define __NRAT0_adjtimex                     (struct timex *, struct timex *)
 #define __NRAT0_mprotect                     (void *, void *)
 #define __NRAT1_mprotect                     (size_t, __size_t)
 #define __NRAT2_mprotect                     (syscall_ulong_t, __syscall_ulong_t)
@@ -1273,7 +1269,6 @@
 #define __NRAT0_bdflush                      (int, int)
 #define __NRAT0_sysfs                        (int, int)
 #define __NRAT0_personality                  (int, int)
-#define __NRAT0_afs_syscall                  (int, int)
 #define __NRAT0_setfsuid                     (uint16_t, __uint16_t)
 #define __NRAT0_setfsgid                     (uint16_t, __uint16_t)
 #define __NRAT0__llseek                      (fd_t, __fd_t)
@@ -1390,8 +1385,6 @@
 #define __NRAT1_sendfile                     (fd_t, __fd_t)
 #define __NRAT2_sendfile                     (__ULONG32_TYPE__ *, __ULONG32_TYPE__ *)
 #define __NRAT3_sendfile                     (size_t, __size_t)
-#define __NRAT0_getpmsg                      (int, int)
-#define __NRAT0_putpmsg                      (int, int)
 #define __NRAT0_ugetrlimit                   (int, int)
 #define __NRAT0_mmap2                        (void *, void *)
 #define __NRAT1_mmap2                        (size_t, __size_t)
@@ -1574,7 +1567,6 @@
 #define __NRAT0_utimes                       (char const *, char const *)
 #define __NRAT1_utimes                       (struct timevalx32 const *, struct __timevalx32 const *)
 #define __NRAT0_fadvise64_64                 (int, int)
-#define __NRAT0_vserver                      (int, int)
 #define __NRAT0_mbind                        (int, int)
 #define __NRAT0_get_mempolicy                (int, int)
 #define __NRAT0_set_mempolicy                (int, int)
@@ -1874,7 +1866,7 @@
 #define __NRAT2_recvmsg                      (syscall_ulong_t, __syscall_ulong_t)
 #define __NRAT0_shutdown                     (fd_t, __fd_t)
 #define __NRAT1_shutdown                     (syscall_ulong_t, __syscall_ulong_t)
-#define __NRAT0_userfaultfd                  (int, int)
+#define __NRAT0_userfaultfd                  (syscall_ulong_t, __syscall_ulong_t)
 #define __NRAT0_membarrier                   (int, int)
 #define __NRAT0_mlock2                       (void const *, void const *)
 #define __NRAT1_mlock2                       (size_t, __size_t)
@@ -2309,7 +2301,7 @@
 #define __NRAM_fchown(a, b, c, d, e, f)                       (__fd_t)a, (__uint16_t)b, (__uint16_t)c
 #define __NRAM_getpriority(a, b, c, d, e, f)                  (__syscall_ulong_t)a, (__id_t)b
 #define __NRAM_setpriority(a, b, c, d, e, f)                  (__syscall_ulong_t)a, (__id_t)b, (__syscall_ulong_t)c
-#define __NRAM_profil(a, b, c, d, e, f)                       (__uint16_t *)a, (__size_t)b, (__size_t)c, (__syscall_ulong_t)d
+#define __NRAM_profil(a, b, c, d, e, f)                       /* nothing */
 #define __NRAM_statfs(a, b, c, d, e, f)                       (char const *)a, (struct __statfsx32 *)b
 #define __NRAM_fstatfs(a, b, c, d, e, f)                      (__fd_t)a, (struct __statfsx32 *)b
 #define __NRAM_ioperm(a, b, c, d, e, f)                       (__syscall_ulong_t)a, (__syscall_ulong_t)b, (__syscall_ulong_t)c
@@ -2335,7 +2327,7 @@
 #define __NRAM_setdomainname(a, b, c, d, e, f)                (char const *)a, (__size_t)b
 #define __NRAM_uname(a, b, c, d, e, f)                        (struct utsname *)a
 #define __NRAM_modify_ldt(a, b, c, d, e, f)                   (__syscall_ulong_t)a, (void *)b, (__syscall_ulong_t)c
-#define __NRAM_adjtimex(a, b, c, d, e, f)                     (int)a
+#define __NRAM_adjtimex(a, b, c, d, e, f)                     (struct timex *)a
 #define __NRAM_mprotect(a, b, c, d, e, f)                     (void *)a, (__size_t)b, (__syscall_ulong_t)c
 #define __NRAM_sigprocmask(a, b, c, d, e, f)                  (__syscall_ulong_t)a, (struct __sigset_struct const *)b, (struct __sigset_struct *)c
 #define __NRAM_create_module(a, b, c, d, e, f)                /* nothing */
@@ -2348,7 +2340,7 @@
 #define __NRAM_bdflush(a, b, c, d, e, f)                      (int)a
 #define __NRAM_sysfs(a, b, c, d, e, f)                        (int)a
 #define __NRAM_personality(a, b, c, d, e, f)                  (int)a
-#define __NRAM_afs_syscall(a, b, c, d, e, f)                  (int)a
+#define __NRAM_afs_syscall(a, b, c, d, e, f)                  /* nothing */
 #define __NRAM_setfsuid(a, b, c, d, e, f)                     (__uint16_t)a
 #define __NRAM_setfsgid(a, b, c, d, e, f)                     (__uint16_t)a
 #define __NRAM__llseek(a, b, c, d, e, f)                      (__fd_t)a, (__int64_t)((__uint64_t)b | (__uint64_t)c << 32), (__uint64_t *)d, (__syscall_ulong_t)e
@@ -2399,8 +2391,8 @@
 #define __NRAM_capset(a, b, c, d, e, f)                       (int)a
 #define __NRAM_sigaltstack(a, b, c, d, e, f)                  (struct __sigaltstackx32 const *)a, (struct __sigaltstackx32 *)b
 #define __NRAM_sendfile(a, b, c, d, e, f)                     (__fd_t)a, (__fd_t)b, (__ULONG32_TYPE__ *)c, (__size_t)d
-#define __NRAM_getpmsg(a, b, c, d, e, f)                      (int)a
-#define __NRAM_putpmsg(a, b, c, d, e, f)                      (int)a
+#define __NRAM_getpmsg(a, b, c, d, e, f)                      /* nothing */
+#define __NRAM_putpmsg(a, b, c, d, e, f)                      /* nothing */
 #define __NRAM_vfork(a, b, c, d, e, f)                        /* nothing */
 #define __NRAM_ugetrlimit(a, b, c, d, e, f)                   (int)a
 #define __NRAM_mmap2(a, b, c, d, e, f)                        (void *)a, (__size_t)b, (__syscall_ulong_t)c, (__syscall_ulong_t)d, (__fd_t)e, (__syscall_ulong_t)f
@@ -2481,7 +2473,7 @@
 #define __NRAM_tgkill(a, b, c, d, e, f)                       (__pid_t)a, (__pid_t)b, (__signo_t)c
 #define __NRAM_utimes(a, b, c, d, e, f)                       (char const *)a, (struct __timevalx32 const *)b
 #define __NRAM_fadvise64_64(a, b, c, d, e, f)                 (int)a
-#define __NRAM_vserver(a, b, c, d, e, f)                      (int)a
+#define __NRAM_vserver(a, b, c, d, e, f)                      /* nothing */
 #define __NRAM_mbind(a, b, c, d, e, f)                        (int)a
 #define __NRAM_get_mempolicy(a, b, c, d, e, f)                (int)a
 #define __NRAM_set_mempolicy(a, b, c, d, e, f)                (int)a
@@ -2581,7 +2573,7 @@
 #define __NRAM_recvfrom(a, b, c, d, e, f)                     (__fd_t)a, (void *)b, (__size_t)c, (__syscall_ulong_t)d, (struct sockaddr *)e, (__socklen_t *)f
 #define __NRAM_recvmsg(a, b, c, d, e, f)                      (__fd_t)a, (struct __msghdrx32 *)b, (__syscall_ulong_t)c
 #define __NRAM_shutdown(a, b, c, d, e, f)                     (__fd_t)a, (__syscall_ulong_t)b
-#define __NRAM_userfaultfd(a, b, c, d, e, f)                  (int)a
+#define __NRAM_userfaultfd(a, b, c, d, e, f)                  (__syscall_ulong_t)a
 #define __NRAM_membarrier(a, b, c, d, e, f)                   (int)a
 #define __NRAM_mlock2(a, b, c, d, e, f)                       (void const *)a, (__size_t)b, (__syscall_ulong_t)c
 #define __NRAM_copy_file_range(a, b, c, d, e, f)              (int)a
@@ -2814,7 +2806,7 @@
 #define __NRAP_fchown(a, b, c)                                (__syscall_ulong_t)a, (__syscall_ulong_t)b, (__syscall_ulong_t)c
 #define __NRAP_getpriority(a, b)                              (__syscall_ulong_t)a, (__syscall_ulong_t)b
 #define __NRAP_setpriority(a, b, c)                           (__syscall_ulong_t)a, (__syscall_ulong_t)b, (__syscall_ulong_t)c
-#define __NRAP_profil(a, b, c, d)                             (__syscall_ulong_t)a, (__syscall_ulong_t)b, (__syscall_ulong_t)c, (__syscall_ulong_t)d
+#define __NRAP_profil()                                       /* nothing */
 #define __NRAP_statfs(a, b)                                   (__syscall_ulong_t)a, (__syscall_ulong_t)b
 #define __NRAP_fstatfs(a, b)                                  (__syscall_ulong_t)a, (__syscall_ulong_t)b
 #define __NRAP_ioperm(a, b, c)                                (__syscall_ulong_t)a, (__syscall_ulong_t)b, (__syscall_ulong_t)c
@@ -2853,7 +2845,7 @@
 #define __NRAP_bdflush(a)                                     (__syscall_ulong_t)a
 #define __NRAP_sysfs(a)                                       (__syscall_ulong_t)a
 #define __NRAP_personality(a)                                 (__syscall_ulong_t)a
-#define __NRAP_afs_syscall(a)                                 (__syscall_ulong_t)a
+#define __NRAP_afs_syscall()                                  /* nothing */
 #define __NRAP_setfsuid(a)                                    (__syscall_ulong_t)a
 #define __NRAP_setfsgid(a)                                    (__syscall_ulong_t)a
 #define __NRAP__llseek(a, b, c, d)                            (__syscall_ulong_t)a, (__syscall_ulong_t)b, (__syscall_ulong_t)((__uint64_t)b >> 32), (__syscall_ulong_t)c, (__syscall_ulong_t)d
@@ -2904,8 +2896,8 @@
 #define __NRAP_capset(a)                                      (__syscall_ulong_t)a
 #define __NRAP_sigaltstack(a, b)                              (__syscall_ulong_t)a, (__syscall_ulong_t)b
 #define __NRAP_sendfile(a, b, c, d)                           (__syscall_ulong_t)a, (__syscall_ulong_t)b, (__syscall_ulong_t)c, (__syscall_ulong_t)d
-#define __NRAP_getpmsg(a)                                     (__syscall_ulong_t)a
-#define __NRAP_putpmsg(a)                                     (__syscall_ulong_t)a
+#define __NRAP_getpmsg()                                      /* nothing */
+#define __NRAP_putpmsg()                                      /* nothing */
 #define __NRAP_vfork()                                        /* nothing */
 #define __NRAP_ugetrlimit(a)                                  (__syscall_ulong_t)a
 #define __NRAP_mmap2(a, b, c, d, e, f)                        (__syscall_ulong_t)a, (__syscall_ulong_t)b, (__syscall_ulong_t)c, (__syscall_ulong_t)d, (__syscall_ulong_t)e, (__syscall_ulong_t)f
@@ -2986,7 +2978,7 @@
 #define __NRAP_tgkill(a, b, c)                                (__syscall_ulong_t)a, (__syscall_ulong_t)b, (__syscall_ulong_t)c
 #define __NRAP_utimes(a, b)                                   (__syscall_ulong_t)a, (__syscall_ulong_t)b
 #define __NRAP_fadvise64_64(a)                                (__syscall_ulong_t)a
-#define __NRAP_vserver(a)                                     (__syscall_ulong_t)a
+#define __NRAP_vserver()                                      /* nothing */
 #define __NRAP_mbind(a)                                       (__syscall_ulong_t)a
 #define __NRAP_get_mempolicy(a)                               (__syscall_ulong_t)a
 #define __NRAP_set_mempolicy(a)                               (__syscall_ulong_t)a

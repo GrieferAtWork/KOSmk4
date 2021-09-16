@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xdff06bcc */
+/* HASH CRC-32:0xc8888e42 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -1639,7 +1639,7 @@ INTERN_FUNCTION(libc_sys_arch_prctl)
 END(libc_sys_arch_prctl)
 DEFINE_PUBLIC_ALIAS(sys_arch_prctl, libc_sys_arch_prctl)
 
-/* errno_t adjtimex(int TODO_PROTOTYPE) */
+/* errno_t adjtimex(struct timex *ntx) */
 INTERN_FUNCTION(libc_sys_adjtimex)
 	movq   $(0x9f), %rax
 	syscall
@@ -1841,7 +1841,7 @@ INTERN_FUNCTION(libc_sys_nfsservctl)
 END(libc_sys_nfsservctl)
 DEFINE_PUBLIC_ALIAS(sys_nfsservctl, libc_sys_nfsservctl)
 
-/* errno_t getpmsg(int TODO_PROTOTYPE) */
+/* errno_t getpmsg(void) */
 INTERN_FUNCTION(libc_sys_getpmsg)
 	movq   $(0xb5), %rax
 	syscall
@@ -1849,7 +1849,7 @@ INTERN_FUNCTION(libc_sys_getpmsg)
 END(libc_sys_getpmsg)
 DEFINE_PUBLIC_ALIAS(sys_getpmsg, libc_sys_getpmsg)
 
-/* errno_t putpmsg(int TODO_PROTOTYPE) */
+/* errno_t putpmsg(void) */
 INTERN_FUNCTION(libc_sys_putpmsg)
 	movq   $(0xb6), %rax
 	syscall
@@ -1857,7 +1857,7 @@ INTERN_FUNCTION(libc_sys_putpmsg)
 END(libc_sys_putpmsg)
 DEFINE_PUBLIC_ALIAS(sys_putpmsg, libc_sys_putpmsg)
 
-/* errno_t afs_syscall(int TODO_PROTOTYPE) */
+/* errno_t afs_syscall(void) */
 INTERN_FUNCTION(libc_sys_afs_syscall)
 	movq   $(0xb7), %rax
 	syscall
@@ -1873,7 +1873,7 @@ INTERN_FUNCTION(libc_sys_tuxcall)
 END(libc_sys_tuxcall)
 DEFINE_PUBLIC_ALIAS(sys_tuxcall, libc_sys_tuxcall)
 
-/* errno_t security(int TODO_PROTOTYPE) */
+/* errno_t security(void) */
 INTERN_FUNCTION(libc_sys_security)
 	movq   $(0xb9), %rax
 	syscall
@@ -2363,7 +2363,7 @@ INTERN_FUNCTION(libc_sys_utimes)
 END(libc_sys_utimes)
 DEFINE_PUBLIC_ALIAS(sys_utimes, libc_sys_utimes)
 
-/* errno_t vserver(int TODO_PROTOTYPE) */
+/* errno_t vserver(void) */
 INTERN_FUNCTION(libc_sys_vserver)
 	movq   $(0xec), %rax
 	syscall
@@ -3228,7 +3228,7 @@ INTERN_FUNCTION(libc_sys_execveat)
 END(libc_sys_execveat)
 DEFINE_PUBLIC_ALIAS(sys_execveat, libc_sys_execveat)
 
-/* errno_t userfaultfd(int TODO_PROTOTYPE) */
+/* fd_t userfaultfd(syscall_ulong_t flags) */
 INTERN_FUNCTION(libc_sys_userfaultfd)
 	movq   $(0x143), %rax
 	syscall
@@ -6200,7 +6200,7 @@ INTERN_FUNCTION(libc_sys_Xarch_prctl)
 END(libc_sys_Xarch_prctl)
 DEFINE_PUBLIC_ALIAS(sys_Xarch_prctl, libc_sys_Xarch_prctl)
 
-/* errno_t adjtimex(int TODO_PROTOTYPE) */
+/* errno_t adjtimex(struct timex *ntx) */
 INTERN_FUNCTION(libc_sys_Xadjtimex)
 	movq   $(0x9f), %rax
 	std /* Enable exceptions */
@@ -6446,7 +6446,7 @@ INTERN_FUNCTION(libc_sys_Xnfsservctl)
 END(libc_sys_Xnfsservctl)
 DEFINE_PUBLIC_ALIAS(sys_Xnfsservctl, libc_sys_Xnfsservctl)
 
-/* errno_t getpmsg(int TODO_PROTOTYPE) */
+/* errno_t getpmsg(void) */
 INTERN_FUNCTION(libc_sys_Xgetpmsg)
 	movq   $(0xb5), %rax
 	std /* Enable exceptions */
@@ -6456,7 +6456,7 @@ INTERN_FUNCTION(libc_sys_Xgetpmsg)
 END(libc_sys_Xgetpmsg)
 DEFINE_PUBLIC_ALIAS(sys_Xgetpmsg, libc_sys_Xgetpmsg)
 
-/* errno_t putpmsg(int TODO_PROTOTYPE) */
+/* errno_t putpmsg(void) */
 INTERN_FUNCTION(libc_sys_Xputpmsg)
 	movq   $(0xb6), %rax
 	std /* Enable exceptions */
@@ -6466,7 +6466,7 @@ INTERN_FUNCTION(libc_sys_Xputpmsg)
 END(libc_sys_Xputpmsg)
 DEFINE_PUBLIC_ALIAS(sys_Xputpmsg, libc_sys_Xputpmsg)
 
-/* errno_t afs_syscall(int TODO_PROTOTYPE) */
+/* errno_t afs_syscall(void) */
 INTERN_FUNCTION(libc_sys_Xafs_syscall)
 	movq   $(0xb7), %rax
 	std /* Enable exceptions */
@@ -6486,7 +6486,7 @@ INTERN_FUNCTION(libc_sys_Xtuxcall)
 END(libc_sys_Xtuxcall)
 DEFINE_PUBLIC_ALIAS(sys_Xtuxcall, libc_sys_Xtuxcall)
 
-/* errno_t security(int TODO_PROTOTYPE) */
+/* errno_t security(void) */
 INTERN_FUNCTION(libc_sys_Xsecurity)
 	movq   $(0xb9), %rax
 	std /* Enable exceptions */
@@ -7078,7 +7078,7 @@ INTERN_FUNCTION(libc_sys_Xutimes)
 END(libc_sys_Xutimes)
 DEFINE_PUBLIC_ALIAS(sys_Xutimes, libc_sys_Xutimes)
 
-/* errno_t vserver(int TODO_PROTOTYPE) */
+/* errno_t vserver(void) */
 INTERN_FUNCTION(libc_sys_Xvserver)
 	movq   $(0xec), %rax
 	std /* Enable exceptions */
@@ -8117,7 +8117,7 @@ INTERN_FUNCTION(libc_sys_Xexecveat)
 END(libc_sys_Xexecveat)
 DEFINE_PUBLIC_ALIAS(sys_Xexecveat, libc_sys_Xexecveat)
 
-/* errno_t userfaultfd(int TODO_PROTOTYPE) */
+/* fd_t userfaultfd(syscall_ulong_t flags) */
 INTERN_FUNCTION(libc_sys_Xuserfaultfd)
 	movq   $(0x143), %rax
 	std /* Enable exceptions */

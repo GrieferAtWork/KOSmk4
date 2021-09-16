@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x2f38718d */
+/* HASH CRC-32:0x581b7777 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -615,7 +615,7 @@
 #define __NRRT_memfd_create           (fd_t, __fd_t)
 #define __NRRT_bpf                    (errno_t, __errno_t)
 #define __NRRT_execveat               (errno_t, __errno_t)
-#define __NRRT_userfaultfd            (errno_t, __errno_t)
+#define __NRRT_userfaultfd            (fd_t, __fd_t)
 #define __NRRT_membarrier             (errno_t, __errno_t)
 #define __NRRT_mlock2                 (errno_t, __errno_t)
 #define __NRRT_open                   (fd_t, __fd_t)
@@ -1075,7 +1075,7 @@
 #define __NRAT1_gettimeofday           (struct timezone *, struct timezone *)
 #define __NRAT0_settimeofday           (struct timeval const *, struct timeval const *)
 #define __NRAT1_settimeofday           (struct timezone const *, struct timezone const *)
-#define __NRAT0_adjtimex               (int, int)
+#define __NRAT0_adjtimex               (struct timex *, struct timex *)
 #define __NRAT0_sysinfo                (struct sysinfo *, struct sysinfo *)
 #define __NRAT0_mq_open                (char const *, char const *)
 #define __NRAT1_mq_open                (oflag_t, __oflag_t)
@@ -1299,7 +1299,7 @@
 #define __NRAT2_execveat               (char const *const *, char const *const *)
 #define __NRAT3_execveat               (char const *const *, char const *const *)
 #define __NRAT4_execveat               (atflag_t, __atflag_t)
-#define __NRAT0_userfaultfd            (int, int)
+#define __NRAT0_userfaultfd            (syscall_ulong_t, __syscall_ulong_t)
 #define __NRAT0_membarrier             (int, int)
 #define __NRAT0_mlock2                 (void const *, void const *)
 #define __NRAT1_mlock2                 (size_t, __size_t)
@@ -1593,7 +1593,7 @@
 #define __NRAM_getcpu(a, b, c, d, e, f, g, h, i, j, k, l, m, n, o, p, q, r, s, t, u, v, w, x, y, z)                 (__uint32_t *)a, (__uint32_t *)b, (struct getcpu_cache *)c
 #define __NRAM_gettimeofday(a, b, c, d, e, f, g, h, i, j, k, l, m, n, o, p, q, r, s, t, u, v, w, x, y, z)           (struct timeval *)a, (struct timezone *)b
 #define __NRAM_settimeofday(a, b, c, d, e, f, g, h, i, j, k, l, m, n, o, p, q, r, s, t, u, v, w, x, y, z)           (struct timeval const *)a, (struct timezone const *)b
-#define __NRAM_adjtimex(a, b, c, d, e, f, g, h, i, j, k, l, m, n, o, p, q, r, s, t, u, v, w, x, y, z)               (int)a
+#define __NRAM_adjtimex(a, b, c, d, e, f, g, h, i, j, k, l, m, n, o, p, q, r, s, t, u, v, w, x, y, z)               (struct timex *)a
 #define __NRAM_getpid(a, b, c, d, e, f, g, h, i, j, k, l, m, n, o, p, q, r, s, t, u, v, w, x, y, z)                 /* nothing */
 #define __NRAM_getppid(a, b, c, d, e, f, g, h, i, j, k, l, m, n, o, p, q, r, s, t, u, v, w, x, y, z)                /* nothing */
 #define __NRAM_getuid(a, b, c, d, e, f, g, h, i, j, k, l, m, n, o, p, q, r, s, t, u, v, w, x, y, z)                 /* nothing */
@@ -1686,7 +1686,7 @@
 #define __NRAM_memfd_create(a, b, c, d, e, f, g, h, i, j, k, l, m, n, o, p, q, r, s, t, u, v, w, x, y, z)           (char const *)a, (__syscall_ulong_t)b
 #define __NRAM_bpf(a, b, c, d, e, f, g, h, i, j, k, l, m, n, o, p, q, r, s, t, u, v, w, x, y, z)                    (int)a
 #define __NRAM_execveat(a, b, c, d, e, f, g, h, i, j, k, l, m, n, o, p, q, r, s, t, u, v, w, x, y, z)               (__fd_t)a, (char const *)b, (char const *const *)c, (char const *const *)d, (__atflag_t)e
-#define __NRAM_userfaultfd(a, b, c, d, e, f, g, h, i, j, k, l, m, n, o, p, q, r, s, t, u, v, w, x, y, z)            (int)a
+#define __NRAM_userfaultfd(a, b, c, d, e, f, g, h, i, j, k, l, m, n, o, p, q, r, s, t, u, v, w, x, y, z)            (__syscall_ulong_t)a
 #define __NRAM_membarrier(a, b, c, d, e, f, g, h, i, j, k, l, m, n, o, p, q, r, s, t, u, v, w, x, y, z)             (int)a
 #define __NRAM_mlock2(a, b, c, d, e, f, g, h, i, j, k, l, m, n, o, p, q, r, s, t, u, v, w, x, y, z)                 (void const *)a, (__size_t)b, (__syscall_ulong_t)c
 #define __NRAM_open(a, b, c, d, e, f, g, h, i, j, k, l, m, n, o, p, q, r, s, t, u, v, w, x, y, z)                   (char const *)a, (__oflag_t)b, (__mode_t)c

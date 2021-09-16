@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x866163f7 */
+/* HASH CRC-32:0x64de3cea */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -988,10 +988,10 @@ INTERN_FUNCTION(libc_sys_setpriority)
 END(libc_sys_setpriority)
 DEFINE_PUBLIC_ALIAS(sys_setpriority, libc_sys_setpriority)
 
-/* errno_t profil(uint16_t *sample_buffer, size_t size, size_t offset, syscall_ulong_t scale) */
+/* errno_t profil(void) */
 INTERN_FUNCTION(libc_sys_profil)
 	movl   $(0x62), %eax
-	jmp    libc_x86_exec_syscall4
+	jmp    libc___i386_syscall
 END(libc_sys_profil)
 DEFINE_PUBLIC_ALIAS(sys_profil, libc_sys_profil)
 
@@ -1182,7 +1182,7 @@ INTERN_FUNCTION(libc_sys_modify_ldt)
 END(libc_sys_modify_ldt)
 DEFINE_PUBLIC_ALIAS(sys_modify_ldt, libc_sys_modify_ldt)
 
-/* errno_t adjtimex(int TODO_PROTOTYPE) */
+/* errno_t adjtimex(struct timex *ntx) */
 INTERN_FUNCTION(libc_sys_adjtimex)
 	movl   $(0x7c), %eax
 	jmp    libc_x86_exec_syscall1
@@ -1297,10 +1297,10 @@ INTERN_FUNCTION(libc_sys_personality)
 END(libc_sys_personality)
 DEFINE_PUBLIC_ALIAS(sys_personality, libc_sys_personality)
 
-/* errno_t afs_syscall(int TODO_PROTOTYPE) */
+/* errno_t afs_syscall(void) */
 INTERN_FUNCTION(libc_sys_afs_syscall)
 	movl   $(0x89), %eax
-	jmp    libc_x86_exec_syscall1
+	jmp    libc___i386_syscall
 END(libc_sys_afs_syscall)
 DEFINE_PUBLIC_ALIAS(sys_afs_syscall, libc_sys_afs_syscall)
 
@@ -1715,17 +1715,17 @@ INTERN_FUNCTION(libc_sys_sendfile)
 END(libc_sys_sendfile)
 DEFINE_PUBLIC_ALIAS(sys_sendfile, libc_sys_sendfile)
 
-/* errno_t getpmsg(int TODO_PROTOTYPE) */
+/* errno_t getpmsg(void) */
 INTERN_FUNCTION(libc_sys_getpmsg)
 	movl   $(0xbc), %eax
-	jmp    libc_x86_exec_syscall1
+	jmp    libc___i386_syscall
 END(libc_sys_getpmsg)
 DEFINE_PUBLIC_ALIAS(sys_getpmsg, libc_sys_getpmsg)
 
-/* errno_t putpmsg(int TODO_PROTOTYPE) */
+/* errno_t putpmsg(void) */
 INTERN_FUNCTION(libc_sys_putpmsg)
 	movl   $(0xbd), %eax
-	jmp    libc_x86_exec_syscall1
+	jmp    libc___i386_syscall
 END(libc_sys_putpmsg)
 DEFINE_PUBLIC_ALIAS(sys_putpmsg, libc_sys_putpmsg)
 
@@ -2407,10 +2407,10 @@ INTERN_FUNCTION(libc_sys_fadvise64_64)
 END(libc_sys_fadvise64_64)
 DEFINE_PUBLIC_ALIAS(sys_fadvise64_64, libc_sys_fadvise64_64)
 
-/* errno_t vserver(int TODO_PROTOTYPE) */
+/* errno_t vserver(void) */
 INTERN_FUNCTION(libc_sys_vserver)
 	movl   $(0x111), %eax
-	jmp    libc_x86_exec_syscall1
+	jmp    libc___i386_syscall
 END(libc_sys_vserver)
 DEFINE_PUBLIC_ALIAS(sys_vserver, libc_sys_vserver)
 
@@ -3372,7 +3372,7 @@ INTERN_FUNCTION(libc_sys_shutdown)
 END(libc_sys_shutdown)
 DEFINE_PUBLIC_ALIAS(sys_shutdown, libc_sys_shutdown)
 
-/* errno_t userfaultfd(int TODO_PROTOTYPE) */
+/* fd_t userfaultfd(syscall_ulong_t flags) */
 INTERN_FUNCTION(libc_sys_userfaultfd)
 	movl   $(0x176), %eax
 	jmp    libc_x86_exec_syscall1
@@ -5476,10 +5476,10 @@ INTERN_FUNCTION(libc_sys_Xsetpriority)
 END(libc_sys_Xsetpriority)
 DEFINE_PUBLIC_ALIAS(sys_Xsetpriority, libc_sys_Xsetpriority)
 
-/* errno_t profil(uint16_t *sample_buffer, size_t size, size_t offset, syscall_ulong_t scale) */
+/* errno_t profil(void) */
 INTERN_FUNCTION(libc_sys_Xprofil)
 	movl   $(0x62), %eax
-	jmp    libc_x86_exec_Xsyscall4
+	jmp    libc___i386_Xsyscall
 END(libc_sys_Xprofil)
 DEFINE_PUBLIC_ALIAS(sys_Xprofil, libc_sys_Xprofil)
 
@@ -5657,7 +5657,7 @@ INTERN_FUNCTION(libc_sys_Xmodify_ldt)
 END(libc_sys_Xmodify_ldt)
 DEFINE_PUBLIC_ALIAS(sys_Xmodify_ldt, libc_sys_Xmodify_ldt)
 
-/* errno_t adjtimex(int TODO_PROTOTYPE) */
+/* errno_t adjtimex(struct timex *ntx) */
 INTERN_FUNCTION(libc_sys_Xadjtimex)
 	movl   $(0x7c), %eax
 	jmp    libc_x86_exec_Xsyscall1
@@ -5772,10 +5772,10 @@ INTERN_FUNCTION(libc_sys_Xpersonality)
 END(libc_sys_Xpersonality)
 DEFINE_PUBLIC_ALIAS(sys_Xpersonality, libc_sys_Xpersonality)
 
-/* errno_t afs_syscall(int TODO_PROTOTYPE) */
+/* errno_t afs_syscall(void) */
 INTERN_FUNCTION(libc_sys_Xafs_syscall)
 	movl   $(0x89), %eax
-	jmp    libc_x86_exec_Xsyscall1
+	jmp    libc___i386_Xsyscall
 END(libc_sys_Xafs_syscall)
 DEFINE_PUBLIC_ALIAS(sys_Xafs_syscall, libc_sys_Xafs_syscall)
 
@@ -6177,17 +6177,17 @@ INTERN_FUNCTION(libc_sys_Xsendfile)
 END(libc_sys_Xsendfile)
 DEFINE_PUBLIC_ALIAS(sys_Xsendfile, libc_sys_Xsendfile)
 
-/* errno_t getpmsg(int TODO_PROTOTYPE) */
+/* errno_t getpmsg(void) */
 INTERN_FUNCTION(libc_sys_Xgetpmsg)
 	movl   $(0xbc), %eax
-	jmp    libc_x86_exec_Xsyscall1
+	jmp    libc___i386_Xsyscall
 END(libc_sys_Xgetpmsg)
 DEFINE_PUBLIC_ALIAS(sys_Xgetpmsg, libc_sys_Xgetpmsg)
 
-/* errno_t putpmsg(int TODO_PROTOTYPE) */
+/* errno_t putpmsg(void) */
 INTERN_FUNCTION(libc_sys_Xputpmsg)
 	movl   $(0xbd), %eax
-	jmp    libc_x86_exec_Xsyscall1
+	jmp    libc___i386_Xsyscall
 END(libc_sys_Xputpmsg)
 DEFINE_PUBLIC_ALIAS(sys_Xputpmsg, libc_sys_Xputpmsg)
 
@@ -6869,10 +6869,10 @@ INTERN_FUNCTION(libc_sys_Xfadvise64_64)
 END(libc_sys_Xfadvise64_64)
 DEFINE_PUBLIC_ALIAS(sys_Xfadvise64_64, libc_sys_Xfadvise64_64)
 
-/* errno_t vserver(int TODO_PROTOTYPE) */
+/* errno_t vserver(void) */
 INTERN_FUNCTION(libc_sys_Xvserver)
 	movl   $(0x111), %eax
-	jmp    libc_x86_exec_Xsyscall1
+	jmp    libc___i386_Xsyscall
 END(libc_sys_Xvserver)
 DEFINE_PUBLIC_ALIAS(sys_Xvserver, libc_sys_Xvserver)
 
@@ -7834,7 +7834,7 @@ INTERN_FUNCTION(libc_sys_Xshutdown)
 END(libc_sys_Xshutdown)
 DEFINE_PUBLIC_ALIAS(sys_Xshutdown, libc_sys_Xshutdown)
 
-/* errno_t userfaultfd(int TODO_PROTOTYPE) */
+/* fd_t userfaultfd(syscall_ulong_t flags) */
 INTERN_FUNCTION(libc_sys_Xuserfaultfd)
 	movl   $(0x176), %eax
 	jmp    libc_x86_exec_Xsyscall1

@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x6e005595 */
+/* HASH CRC-32:0x29ac3d2b */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -505,7 +505,7 @@
 #define __NR__sysctl                  0x9c                           /* errno_t _sysctl(int TODO_PROTOTYPE) */
 #define __NR_prctl                    0x9d                           /* errno_t prctl(int TODO_PROTOTYPE) */
 #define __NR_arch_prctl               0x9e                           /* errno_t arch_prctl(int TODO_PROTOTYPE) */
-#define __NR_adjtimex                 0x9f                           /* errno_t adjtimex(int TODO_PROTOTYPE) */
+#define __NR_adjtimex                 0x9f                           /* errno_t adjtimex(struct timex *ntx) */
 /* @param: resource: One of `RLIMIT_*' from <sys/resource.h> */
 #define __NR_setrlimit                0xa0                           /* errno_t setrlimit(syscall_ulong_t resource, struct rlimit const *rlimits) */
 #define __NR_chroot                   0xa1                           /* errno_t chroot(char const *path) */
@@ -552,11 +552,11 @@
 #define __NR_query_module             0xb2                           /* errno_t query_module(void) */
 #define __NR_quotactl                 0xb3                           /* errno_t quotactl(int TODO_PROTOTYPE) */
 #define __NR_nfsservctl               0xb4                           /* errno_t nfsservctl(int TODO_PROTOTYPE) */
-#define __NR_getpmsg                  0xb5                           /* errno_t getpmsg(int TODO_PROTOTYPE) */
-#define __NR_putpmsg                  0xb6                           /* errno_t putpmsg(int TODO_PROTOTYPE) */
-#define __NR_afs_syscall              0xb7                           /* errno_t afs_syscall(int TODO_PROTOTYPE) */
+#define __NR_getpmsg                  0xb5                           /* errno_t getpmsg(void) */
+#define __NR_putpmsg                  0xb6                           /* errno_t putpmsg(void) */
+#define __NR_afs_syscall              0xb7                           /* errno_t afs_syscall(void) */
 #define __NR_tuxcall                  0xb8                           /* errno_t tuxcall(void) */
-#define __NR_security                 0xb9                           /* errno_t security(int TODO_PROTOTYPE) */
+#define __NR_security                 0xb9                           /* errno_t security(void) */
 #define __NR_gettid                   0xba                           /* pid_t gettid(void) */
 #define __NR_readahead                0xbb                           /* ssize_t readahead(fd_t fd, uint64_t offset, size_t count) */
 /* @param: flags: One of `0', `XATTR_CREATE' or `XATTR_REPLACE' */
@@ -675,7 +675,7 @@
  * @param: times[0]: New access time
  * @param: times[1]: New last-modified time */
 #define __NR_utimes                   0xeb                           /* errno_t utimes(char const *filename, struct timevalx64 const[2] times) */
-#define __NR_vserver                  0xec                           /* errno_t vserver(int TODO_PROTOTYPE) */
+#define __NR_vserver                  0xec                           /* errno_t vserver(void) */
 #define __NR_mbind                    0xed                           /* errno_t mbind(int TODO_PROTOTYPE) */
 #define __NR_set_mempolicy            0xee                           /* errno_t set_mempolicy(int TODO_PROTOTYPE) */
 #define __NR_get_mempolicy            0xef                           /* errno_t get_mempolicy(int TODO_PROTOTYPE) */
@@ -895,7 +895,7 @@
  * and execute it's `main()' method, passing the given `argv', and setting `environ' to `envp'
  * @param: flags: Set of `0 | AT_EMPTY_PATH | AT_SYMLINK_NOFOLLOW | AT_DOSPATH' */
 #define __NR_execveat                 0x142                          /* errno_t execveat(fd_t dirfd, char const *pathname, __HYBRID_PTR64(char const) const *argv, __HYBRID_PTR64(char const) const *envp, atflag_t flags) */
-#define __NR_userfaultfd              0x143                          /* errno_t userfaultfd(int TODO_PROTOTYPE) */
+#define __NR_userfaultfd              0x143                          /* fd_t userfaultfd(syscall_ulong_t flags) */
 #define __NR_membarrier               0x144                          /* errno_t membarrier(int TODO_PROTOTYPE) */
 #define __NR_mlock2                   0x145                          /* errno_t mlock2(void const *addr, size_t length, syscall_ulong_t flags) */
 #define __NR_copy_file_range          0x146                          /* errno_t copy_file_range(int TODO_PROTOTYPE) */
@@ -1916,8 +1916,6 @@
 #define __NRCP_sync
 #define __NRCP_mount
 #define __NRCP_umount2
-#define __NRCP_getpmsg
-#define __NRCP_putpmsg
 #define __NRCP_setxattr
 #define __NRCP_lsetxattr
 #define __NRCP_fsetxattr
@@ -2193,11 +2191,11 @@
 #define __NRRC_query_module             0
 #define __NRRC_quotactl                 1
 #define __NRRC_nfsservctl               1
-#define __NRRC_getpmsg                  1
-#define __NRRC_putpmsg                  1
-#define __NRRC_afs_syscall              1
+#define __NRRC_getpmsg                  0
+#define __NRRC_putpmsg                  0
+#define __NRRC_afs_syscall              0
 #define __NRRC_tuxcall                  0
-#define __NRRC_security                 1
+#define __NRRC_security                 0
 #define __NRRC_gettid                   0
 #define __NRRC_readahead                3
 #define __NRRC_setxattr                 5
@@ -2248,7 +2246,7 @@
 #define __NRRC_epoll_ctl                4
 #define __NRRC_tgkill                   3
 #define __NRRC_utimes                   2
-#define __NRRC_vserver                  1
+#define __NRRC_vserver                  0
 #define __NRRC_mbind                    1
 #define __NRRC_set_mempolicy            1
 #define __NRRC_get_mempolicy            1
