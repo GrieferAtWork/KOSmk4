@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x852d70f2 */
+/* HASH CRC-32:0x63517c09 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -346,10 +346,10 @@ __CREDIRECT(__ATTR_NONNULL((1, 2)),int,__NOTHROW_NCX,stat,(char const *__restric
 #elif defined(__CRT_HAVE__stat32) && defined(__CRT_DOS_PRIMARY) && !defined(__USE_TIME_BITS64) && !defined(__USE_FILE_OFFSET64)
 /* >> stat(2), stat64(2) */
 __CREDIRECT(__ATTR_NONNULL((1, 2)),int,__NOTHROW_NCX,stat,(char const *__restrict __filename, struct stat *__restrict __buf),_stat32,(__filename,__buf))
-#elif defined(__CRT_HAVE_stat64) && defined(__USE_FILE_OFFSET64)
+#elif defined(__CRT_HAVE_stat64) && (defined(__USE_FILE_OFFSET64) || __SIZEOF_OFF32_T__ == __SIZEOF_OFF64_T__)
 /* >> stat(2), stat64(2) */
 __CREDIRECT(__ATTR_NONNULL((1, 2)),int,__NOTHROW_NCX,stat,(char const *__restrict __filename, struct stat *__restrict __buf),stat64,(__filename,__buf))
-#elif defined(__CRT_HAVE_stat) && !defined(__USE_FILE_OFFSET64)
+#elif defined(__CRT_HAVE_stat) && (!defined(__USE_FILE_OFFSET64) || __SIZEOF_OFF32_T__ == __SIZEOF_OFF64_T__)
 /* >> stat(2), stat64(2) */
 __CDECLARE(__ATTR_NONNULL((1, 2)),int,__NOTHROW_NCX,stat,(char const *__restrict __filename, struct stat *__restrict __buf),(__filename,__buf))
 #endif /* ... */
@@ -377,10 +377,10 @@ __CREDIRECT(__ATTR_NONNULL((2)),int,__NOTHROW_NCX,fstat,(__fd_t __fd, struct sta
 #elif defined(__CRT_HAVE__fstat32) && defined(__CRT_DOS_PRIMARY) && !defined(__USE_TIME_BITS64) && !defined(__USE_FILE_OFFSET64)
 /* >> fstat(2), fstat64(2) */
 __CREDIRECT(__ATTR_NONNULL((2)),int,__NOTHROW_NCX,fstat,(__fd_t __fd, struct stat *__restrict __buf),_fstat32,(__fd,__buf))
-#elif defined(__CRT_HAVE_fstat64) && defined(__USE_FILE_OFFSET64)
+#elif defined(__CRT_HAVE_fstat64) && (defined(__USE_FILE_OFFSET64) || __SIZEOF_OFF32_T__ == __SIZEOF_OFF64_T__)
 /* >> fstat(2), fstat64(2) */
 __CREDIRECT(__ATTR_NONNULL((2)),int,__NOTHROW_NCX,fstat,(__fd_t __fd, struct stat *__restrict __buf),fstat64,(__fd,__buf))
-#elif defined(__CRT_HAVE_fstat) && !defined(__USE_FILE_OFFSET64)
+#elif defined(__CRT_HAVE_fstat) && (!defined(__USE_FILE_OFFSET64) || __SIZEOF_OFF32_T__ == __SIZEOF_OFF64_T__)
 /* >> fstat(2), fstat64(2) */
 __CDECLARE(__ATTR_NONNULL((2)),int,__NOTHROW_NCX,fstat,(__fd_t __fd, struct stat *__restrict __buf),(__fd,__buf))
 #endif /* ... */
@@ -410,10 +410,10 @@ __CREDIRECT(__ATTR_NONNULL((1, 2)),int,__NOTHROW_NCX,lstat,(char const *__restri
 #elif defined(__CRT_HAVE__stat32) && defined(__CRT_DOS_PRIMARY) && !defined(__USE_TIME_BITS64) && !defined(__USE_FILE_OFFSET64)
 /* >> lstat(2), lstat64(2) */
 __CREDIRECT(__ATTR_NONNULL((1, 2)),int,__NOTHROW_NCX,lstat,(char const *__restrict __filename, struct stat *__restrict __buf),_stat32,(__filename,__buf))
-#elif defined(__CRT_HAVE_lstat64) && defined(__USE_FILE_OFFSET64)
+#elif defined(__CRT_HAVE_lstat64) && (defined(__USE_FILE_OFFSET64) || __SIZEOF_OFF32_T__ == __SIZEOF_OFF64_T__)
 /* >> lstat(2), lstat64(2) */
 __CREDIRECT(__ATTR_NONNULL((1, 2)),int,__NOTHROW_NCX,lstat,(char const *__restrict __filename, struct stat *__restrict __buf),lstat64,(__filename,__buf))
-#elif defined(__CRT_HAVE_lstat) && !defined(__USE_FILE_OFFSET64)
+#elif defined(__CRT_HAVE_lstat) && (!defined(__USE_FILE_OFFSET64) || __SIZEOF_OFF32_T__ == __SIZEOF_OFF64_T__)
 /* >> lstat(2), lstat64(2) */
 __CDECLARE(__ATTR_NONNULL((1, 2)),int,__NOTHROW_NCX,lstat,(char const *__restrict __filename, struct stat *__restrict __buf),(__filename,__buf))
 #endif /* ... */
@@ -502,11 +502,11 @@ __CREDIRECT(__ATTR_NONNULL((2, 3)),int,__NOTHROW_NCX,fstatat,(__fd_t __dirfd, ch
 /* >> fstatat(2), fstatat64(2)
  * @param flags: Set of `0 | AT_SYMLINK_NOFOLLOW | AT_DOSPATH' */
 __CREDIRECT(__ATTR_NONNULL((2, 3)),int,__NOTHROW_NCX,fstatat,(__fd_t __dirfd, char const *__restrict __filename, struct stat *__restrict __buf, __atflag_t __flags),kfstatat64,(__dirfd,__filename,__buf,__flags))
-#elif defined(__CRT_HAVE_fstatat64) && defined(__USE_FILE_OFFSET64)
+#elif defined(__CRT_HAVE_fstatat64) && (defined(__USE_FILE_OFFSET64) || __SIZEOF_OFF32_T__ == __SIZEOF_OFF64_T__)
 /* >> fstatat(2), fstatat64(2)
  * @param flags: Set of `0 | AT_SYMLINK_NOFOLLOW | AT_DOSPATH' */
 __CREDIRECT(__ATTR_NONNULL((2, 3)),int,__NOTHROW_NCX,fstatat,(__fd_t __dirfd, char const *__restrict __filename, struct stat *__restrict __buf, __atflag_t __flags),fstatat64,(__dirfd,__filename,__buf,__flags))
-#elif defined(__CRT_HAVE_fstatat) && !defined(__USE_FILE_OFFSET64)
+#elif defined(__CRT_HAVE_fstatat) && (!defined(__USE_FILE_OFFSET64) || __SIZEOF_OFF32_T__ == __SIZEOF_OFF64_T__)
 /* >> fstatat(2), fstatat64(2)
  * @param flags: Set of `0 | AT_SYMLINK_NOFOLLOW | AT_DOSPATH' */
 __CDECLARE(__ATTR_NONNULL((2, 3)),int,__NOTHROW_NCX,fstatat,(__fd_t __dirfd, char const *__restrict __filename, struct stat *__restrict __buf, __atflag_t __flags),(__dirfd,__filename,__buf,__flags))
@@ -630,37 +630,43 @@ __CDECLARE_OPT(__ATTR_NONNULL((2)),int,__NOTHROW_RPC,mknodat,(__fd_t __dirfd, ch
 #endif /* __USE_MISC || __USE_XOPEN_EXTENDED */
 
 #ifdef __USE_ATFILE
-#if defined(__CRT_HAVE_utimensat64) && defined(__USE_TIME_BITS64)
+#if defined(__CRT_HAVE_utimensat) && (!defined(__USE_TIME_BITS64) || __SIZEOF_TIME32_T__ == __SIZEOF_TIME64_T__)
 /* >> utimensat(2), utimensat64(2)
- * @param flags: Set of `0|AT_SYMLINK_NOFOLLOW|AT_CHANGE_CTIME|AT_DOSPATH' */
-__CREDIRECT(__ATTR_NONNULL((2)),int,__NOTHROW_RPC,utimensat,(__fd_t __dirfd, char const *__filename, struct timespec const __times[2 /*or:3*/], __atflag_t __flags),utimensat64,(__dirfd,__filename,__times,__flags))
-#elif defined(__CRT_HAVE_utimensat) && !defined(__USE_TIME_BITS64)
-/* >> utimensat(2), utimensat64(2)
- * @param flags: Set of `0|AT_SYMLINK_NOFOLLOW|AT_CHANGE_CTIME|AT_DOSPATH' */
+ * @param flags: Set of `0 | AT_SYMLINK_NOFOLLOW | AT_CHANGE_CTIME | AT_DOSPATH' */
 __CDECLARE(__ATTR_NONNULL((2)),int,__NOTHROW_RPC,utimensat,(__fd_t __dirfd, char const *__filename, struct timespec const __times[2 /*or:3*/], __atflag_t __flags),(__dirfd,__filename,__times,__flags))
+#elif defined(__CRT_HAVE_utimensat64) && (defined(__USE_TIME_BITS64) || __SIZEOF_TIME32_T__ == __SIZEOF_TIME64_T__)
+/* >> utimensat(2), utimensat64(2)
+ * @param flags: Set of `0 | AT_SYMLINK_NOFOLLOW | AT_CHANGE_CTIME | AT_DOSPATH' */
+__CREDIRECT(__ATTR_NONNULL((2)),int,__NOTHROW_RPC,utimensat,(__fd_t __dirfd, char const *__filename, struct timespec const __times[2 /*or:3*/], __atflag_t __flags),utimensat64,(__dirfd,__filename,__times,__flags))
 #elif defined(__CRT_HAVE_utimensat64) || defined(__CRT_HAVE_utimensat)
 #include <libc/local/sys.stat/utimensat.h>
 /* >> utimensat(2), utimensat64(2)
- * @param flags: Set of `0|AT_SYMLINK_NOFOLLOW|AT_CHANGE_CTIME|AT_DOSPATH' */
+ * @param flags: Set of `0 | AT_SYMLINK_NOFOLLOW | AT_CHANGE_CTIME | AT_DOSPATH' */
 __NAMESPACE_LOCAL_USING_OR_IMPL(utimensat, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_NONNULL((2)) int __NOTHROW_RPC(__LIBCCALL utimensat)(__fd_t __dirfd, char const *__filename, struct timespec const __times[2 /*or:3*/], __atflag_t __flags) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(utimensat))(__dirfd, __filename, __times, __flags); })
 #endif /* ... */
 #ifdef __USE_TIME64
-#ifdef __CRT_HAVE_utimensat64
-__CDECLARE(__ATTR_NONNULL((2)),int,__NOTHROW_RPC,utimensat64,(__fd_t __dirfd, char const *__filename, struct timespec64 const __times[2 /*or:3*/], __atflag_t __flags),(__dirfd,__filename,__times,__flags))
-#elif defined(__CRT_HAVE_utimensat) && __SIZEOF_TIME32_T__ == __SIZEOF_TIME64_T__
+#if defined(__CRT_HAVE_utimensat) && __SIZEOF_TIME32_T__ == __SIZEOF_TIME64_T__
+/* >> utimensat(2), utimensat64(2)
+ * @param flags: Set of `0 | AT_SYMLINK_NOFOLLOW | AT_CHANGE_CTIME | AT_DOSPATH' */
 __CREDIRECT(__ATTR_NONNULL((2)),int,__NOTHROW_RPC,utimensat64,(__fd_t __dirfd, char const *__filename, struct timespec64 const __times[2 /*or:3*/], __atflag_t __flags),utimensat,(__dirfd,__filename,__times,__flags))
+#elif defined(__CRT_HAVE_utimensat64)
+/* >> utimensat(2), utimensat64(2)
+ * @param flags: Set of `0 | AT_SYMLINK_NOFOLLOW | AT_CHANGE_CTIME | AT_DOSPATH' */
+__CDECLARE(__ATTR_NONNULL((2)),int,__NOTHROW_RPC,utimensat64,(__fd_t __dirfd, char const *__filename, struct timespec64 const __times[2 /*or:3*/], __atflag_t __flags),(__dirfd,__filename,__times,__flags))
 #elif defined(__CRT_HAVE_utimensat)
 #include <libc/local/sys.stat/utimensat64.h>
+/* >> utimensat(2), utimensat64(2)
+ * @param flags: Set of `0 | AT_SYMLINK_NOFOLLOW | AT_CHANGE_CTIME | AT_DOSPATH' */
 __NAMESPACE_LOCAL_USING_OR_IMPL(utimensat64, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_NONNULL((2)) int __NOTHROW_RPC(__LIBCCALL utimensat64)(__fd_t __dirfd, char const *__filename, struct timespec64 const __times[2 /*or:3*/], __atflag_t __flags) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(utimensat64))(__dirfd, __filename, __times, __flags); })
 #endif /* ... */
 #endif /* __USE_TIME64 */
 #endif /* __USE_ATFILE */
 
 #ifdef __USE_XOPEN2K8
-#if defined(__CRT_HAVE_futimens64) && defined(__USE_TIME_BITS64)
+#if defined(__CRT_HAVE_futimens64) && (defined(__USE_TIME_BITS64) || __SIZEOF_TIME32_T__ == __SIZEOF_TIME64_T__)
 /* >> futimens(2), futimens64(2) */
 __CREDIRECT(,int,__NOTHROW_RPC,futimens,(__fd_t __fd, struct timespec const __times[2 /*or:3*/]),futimens64,(__fd,__times))
-#elif defined(__CRT_HAVE_futimens) && !defined(__USE_TIME_BITS64)
+#elif defined(__CRT_HAVE_futimens) && (!defined(__USE_TIME_BITS64) || __SIZEOF_TIME32_T__ == __SIZEOF_TIME64_T__)
 /* >> futimens(2), futimens64(2) */
 __CDECLARE(,int,__NOTHROW_RPC,futimens,(__fd_t __fd, struct timespec const __times[2 /*or:3*/]),(__fd,__times))
 #elif defined(__CRT_HAVE_futimens64) || defined(__CRT_HAVE_futimens)
@@ -669,12 +675,15 @@ __CDECLARE(,int,__NOTHROW_RPC,futimens,(__fd_t __fd, struct timespec const __tim
 __NAMESPACE_LOCAL_USING_OR_IMPL(futimens, __FORCELOCAL __ATTR_ARTIFICIAL int __NOTHROW_RPC(__LIBCCALL futimens)(__fd_t __fd, struct timespec const __times[2 /*or:3*/]) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(futimens))(__fd, __times); })
 #endif /* ... */
 #ifdef __USE_TIME64
-#ifdef __CRT_HAVE_futimens64
-__CDECLARE(,int,__NOTHROW_RPC,futimens64,(__fd_t __fd, struct timespec64 const __times[2 /*or:3*/]),(__fd,__times))
-#elif defined(__CRT_HAVE_futimens) && __SIZEOF_TIME32_T__ == __SIZEOF_TIME64_T__
+#if defined(__CRT_HAVE_futimens) && __SIZEOF_TIME32_T__ == __SIZEOF_TIME64_T__
+/* >> futimens(2), futimens64(2) */
 __CREDIRECT(,int,__NOTHROW_RPC,futimens64,(__fd_t __fd, struct timespec64 const __times[2 /*or:3*/]),futimens,(__fd,__times))
+#elif defined(__CRT_HAVE_futimens64)
+/* >> futimens(2), futimens64(2) */
+__CDECLARE(,int,__NOTHROW_RPC,futimens64,(__fd_t __fd, struct timespec64 const __times[2 /*or:3*/]),(__fd,__times))
 #elif defined(__CRT_HAVE_futimens)
 #include <libc/local/sys.stat/futimens64.h>
+/* >> futimens(2), futimens64(2) */
 __NAMESPACE_LOCAL_USING_OR_IMPL(futimens64, __FORCELOCAL __ATTR_ARTIFICIAL int __NOTHROW_RPC(__LIBCCALL futimens64)(__fd_t __fd, struct timespec64 const __times[2 /*or:3*/]) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(futimens64))(__fd, __times); })
 #endif /* ... */
 #endif /* __USE_TIME64 */

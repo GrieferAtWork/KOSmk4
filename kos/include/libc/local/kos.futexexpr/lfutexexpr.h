@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xc9637c43 */
+/* HASH CRC-32:0x44094039 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -32,10 +32,10 @@ __CREDIRECT(__ATTR_NONNULL((3)),int,__NOTHROW_RPC,__localdep_lfutexexpr32,(void 
 #endif /* !__local___localdep_lfutexexpr32_defined && __CRT_HAVE_lfutexexpr */
 #ifndef __local___localdep_lfutexexpr64_defined
 #define __local___localdep_lfutexexpr64_defined 1
-#ifdef __CRT_HAVE_lfutexexpr64
-__CREDIRECT(__ATTR_NONNULL((3)),int,__NOTHROW_RPC,__localdep_lfutexexpr64,(void *__base, __SIZE_TYPE__ __exprc, struct lfutexexpr const *__exprv, struct __timespec64 const *__timeout, unsigned int __timeout_flags),lfutexexpr64,(__base,__exprc,__exprv,__timeout,__timeout_flags))
-#elif defined(__CRT_HAVE_lfutexexpr) && __SIZEOF_TIME32_T__ == __SIZEOF_TIME64_T__
+#if defined(__CRT_HAVE_lfutexexpr) && __SIZEOF_TIME32_T__ == __SIZEOF_TIME64_T__
 __CREDIRECT(__ATTR_NONNULL((3)),int,__NOTHROW_RPC,__localdep_lfutexexpr64,(void *__base, __SIZE_TYPE__ __exprc, struct lfutexexpr const *__exprv, struct __timespec64 const *__timeout, unsigned int __timeout_flags),lfutexexpr,(__base,__exprc,__exprv,__timeout,__timeout_flags))
+#elif defined(__CRT_HAVE_lfutexexpr64)
+__CREDIRECT(__ATTR_NONNULL((3)),int,__NOTHROW_RPC,__localdep_lfutexexpr64,(void *__base, __SIZE_TYPE__ __exprc, struct lfutexexpr const *__exprv, struct __timespec64 const *__timeout, unsigned int __timeout_flags),lfutexexpr64,(__base,__exprc,__exprv,__timeout,__timeout_flags))
 #elif defined(__CRT_HAVE_lfutexexpr)
 __NAMESPACE_LOCAL_END
 #include <libc/local/kos.futexexpr/lfutexexpr64.h>

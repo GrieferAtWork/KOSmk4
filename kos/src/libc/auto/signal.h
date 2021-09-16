@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xcb7fa2e5 */
+/* HASH CRC-32:0xe1b17df3 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -284,7 +284,7 @@ INTDEF NONNULL((1, 2, 3)) int NOTHROW_NCX(LIBCCALL libc_signandset)(sigset_t *se
  * @param: info: Information about the signal on which to wait.
  * @return: -1: [errno=EINTR] The signal handler for `signo' was executed. */
 INTDEF NONNULL((1)) int NOTHROW_RPC(LIBDCALL libd_sigwaitinfo)(sigset_t const *__restrict set, siginfo_t *__restrict info);
-/* >> sigtimedwait(2)
+/* >> sigtimedwait(2), sigtimedwait64(2)
  * Same as `sigwaitinfo(2)', but stop waiting after a total of `rel_timeout' has passed
  * @param: set:         The set of signals on which to wait
  * @param: info:        Information about the signal on which to wait.
@@ -308,7 +308,7 @@ INTDEF NONNULL((1)) int NOTHROW_RPC(LIBDCALL libd_sigtimedwait)(sigset_t const *
  * @return: -1:   [errno=EPERM]  The caller does not have permission to send signals to `pid'
  * @return: -1:   [errno=ESRCH]  No process is identified by `pid' */
 INTDEF int NOTHROW_NCX(LIBDCALL libd_sigqueue)(pid_t pid, signo_t signo, union sigval const val);
-/* >> sigtimedwait(2)
+/* >> sigtimedwait(2), sigtimedwait64(2)
  * Same as `sigwaitinfo(2)', but stop waiting after a total of `rel_timeout' has passed
  * @param: set:         The set of signals on which to wait
  * @param: info:        Information about the signal on which to wait.

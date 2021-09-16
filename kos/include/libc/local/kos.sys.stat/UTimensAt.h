@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x6ce75f9e */
+/* HASH CRC-32:0x8978c4e6 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -31,10 +31,10 @@ __CREDIRECT_VOID(__ATTR_NONNULL((2)),__THROWING,__localdep_UTimensAt32,(__fd_t _
 #endif /* !__local___localdep_UTimensAt32_defined && __CRT_HAVE_UTimensAt */
 #ifndef __local___localdep_UTimensAt64_defined
 #define __local___localdep_UTimensAt64_defined 1
-#ifdef __CRT_HAVE_UTimensAt64
-__CREDIRECT_VOID(__ATTR_NONNULL((2)),__THROWING,__localdep_UTimensAt64,(__fd_t __dirfd, char const *__filename, struct __timespec64 const __times[2 /*or:3*/], __atflag_t __flags),UTimensAt64,(__dirfd,__filename,__times,__flags))
-#elif defined(__CRT_HAVE_UTimensAt) && __SIZEOF_TIME32_T__ == __SIZEOF_TIME64_T__
+#if defined(__CRT_HAVE_UTimensAt) && __SIZEOF_TIME32_T__ == __SIZEOF_TIME64_T__
 __CREDIRECT_VOID(__ATTR_NONNULL((2)),__THROWING,__localdep_UTimensAt64,(__fd_t __dirfd, char const *__filename, struct __timespec64 const __times[2 /*or:3*/], __atflag_t __flags),UTimensAt,(__dirfd,__filename,__times,__flags))
+#elif defined(__CRT_HAVE_UTimensAt64)
+__CREDIRECT_VOID(__ATTR_NONNULL((2)),__THROWING,__localdep_UTimensAt64,(__fd_t __dirfd, char const *__filename, struct __timespec64 const __times[2 /*or:3*/], __atflag_t __flags),UTimensAt64,(__dirfd,__filename,__times,__flags))
 #elif defined(__CRT_HAVE_UTimensAt)
 __NAMESPACE_LOCAL_END
 #include <libc/local/kos.sys.stat/UTimensAt64.h>

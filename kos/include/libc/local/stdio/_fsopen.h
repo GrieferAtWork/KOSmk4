@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x82cd61f3 */
+/* HASH CRC-32:0xfc01f7d8 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -22,15 +22,14 @@
 #define __local__fsopen_defined 1
 #include <__crt.h>
 #include <features.h>
-#if defined(__CRT_HAVE_fopen) || defined(__CRT_HAVE__IO_fopen) || defined(__CRT_HAVE_fopen64)
+#include <asm/os/oflags.h>
+#if (defined(__CRT_HAVE_fopen) && (!defined(__USE_FILE_OFFSET64) || !defined(__O_LARGEFILE) || !__O_LARGEFILE)) || (defined(__CRT_HAVE__IO_fopen) && (!defined(__USE_FILE_OFFSET64) || !defined(__O_LARGEFILE) || !__O_LARGEFILE)) || defined(__CRT_HAVE_fopen64)
 __NAMESPACE_LOCAL_BEGIN
 #ifndef __local___localdep_fopen_defined
 #define __local___localdep_fopen_defined 1
-#if defined(__CRT_HAVE_fopen64) && defined(__USE_FILE_OFFSET64)
-__CREDIRECT(__ATTR_WUNUSED __ATTR_NONNULL((1, 2)),__FILE *,__NOTHROW_RPC,__localdep_fopen,(char const *__restrict __filename, char const *__restrict __modes),fopen64,(__filename,__modes))
-#elif defined(__CRT_HAVE_fopen)
+#if defined(__CRT_HAVE_fopen) && (!defined(__USE_FILE_OFFSET64) || !defined(__O_LARGEFILE) || !__O_LARGEFILE)
 __CREDIRECT(__ATTR_WUNUSED __ATTR_NONNULL((1, 2)),__FILE *,__NOTHROW_RPC,__localdep_fopen,(char const *__restrict __filename, char const *__restrict __modes),fopen,(__filename,__modes))
-#elif defined(__CRT_HAVE__IO_fopen)
+#elif defined(__CRT_HAVE__IO_fopen) && (!defined(__USE_FILE_OFFSET64) || !defined(__O_LARGEFILE) || !__O_LARGEFILE)
 __CREDIRECT(__ATTR_WUNUSED __ATTR_NONNULL((1, 2)),__FILE *,__NOTHROW_RPC,__localdep_fopen,(char const *__restrict __filename, char const *__restrict __modes),_IO_fopen,(__filename,__modes))
 #elif defined(__CRT_HAVE_fopen64)
 __CREDIRECT(__ATTR_WUNUSED __ATTR_NONNULL((1, 2)),__FILE *,__NOTHROW_RPC,__localdep_fopen,(char const *__restrict __filename, char const *__restrict __modes),fopen64,(__filename,__modes))
@@ -48,7 +47,7 @@ __NAMESPACE_LOCAL_END
 #define __local___localdep__fsopen_defined 1
 #define __localdep__fsopen __LIBC_LOCAL_NAME(_fsopen)
 #endif /* !__local___localdep__fsopen_defined */
-#else /* __CRT_HAVE_fopen || __CRT_HAVE__IO_fopen || __CRT_HAVE_fopen64 */
+#else /* (__CRT_HAVE_fopen && (!__USE_FILE_OFFSET64 || !__O_LARGEFILE || !__O_LARGEFILE)) || (__CRT_HAVE__IO_fopen && (!__USE_FILE_OFFSET64 || !__O_LARGEFILE || !__O_LARGEFILE)) || __CRT_HAVE_fopen64 */
 #undef __local__fsopen_defined
-#endif /* !__CRT_HAVE_fopen && !__CRT_HAVE__IO_fopen && !__CRT_HAVE_fopen64 */
+#endif /* (!__CRT_HAVE_fopen || (__USE_FILE_OFFSET64 && __O_LARGEFILE && __O_LARGEFILE)) && (!__CRT_HAVE__IO_fopen || (__USE_FILE_OFFSET64 && __O_LARGEFILE && __O_LARGEFILE)) && !__CRT_HAVE_fopen64 */
 #endif /* !__local__fsopen_defined */

@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xc2711926 */
+/* HASH CRC-32:0xc94de862 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -178,16 +178,16 @@ INTDEF NONNULL((1)) int NOTHROW_RPC(LIBDCALL libd_wlchown)(char16_t const *file,
  * Change the ownership of a given `file' to `group:owner',
  * but don't reference it if  that file is a symbolic  link */
 INTDEF NONNULL((1)) int NOTHROW_RPC(LIBKCALL libc_wlchown)(char32_t const *file, uid_t owner, gid_t group);
-/* >> truncate(2)
+/* >> truncate(2), truncate64(2)
  * Truncate the given file `file' to a length of `length' */
 INTDEF NONNULL((1)) int NOTHROW_NCX(LIBDCALL libd_wtruncate)(char16_t const *file, __PIO_OFFSET length);
-/* >> truncate(2)
+/* >> truncate(2), truncate64(2)
  * Truncate the given file `file' to a length of `length' */
 INTDEF NONNULL((1)) int NOTHROW_NCX(LIBKCALL libc_wtruncate)(char32_t const *file, __PIO_OFFSET length);
-/* >> truncate64(2)
+/* >> truncate(2), truncate64(2)
  * Truncate the given file `file' to a length of `length' */
 INTDEF NONNULL((1)) int NOTHROW_NCX(LIBDCALL libd_wtruncate64)(char16_t const *file, __PIO_OFFSET64 length);
-/* >> truncate64(2)
+/* >> truncate(2), truncate64(2)
  * Truncate the given file `file' to a length of `length' */
 INTDEF NONNULL((1)) int NOTHROW_NCX(LIBKCALL libc_wtruncate64)(char32_t const *file, __PIO_OFFSET64 length);
 /* >> symlink(3)

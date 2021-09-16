@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x2ff67720 */
+/* HASH CRC-32:0x461dff44 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -21,8 +21,8 @@
 #ifndef __local_posix_fadvise64_defined
 #define __local_posix_fadvise64_defined 1
 #include <__crt.h>
-#include <bits/types.h>
 #include <features.h>
+#include <bits/types.h>
 #ifndef __PIO_OFFSET
 #ifdef __USE_KOS_ALTERATIONS
 #define __PIO_OFFSET   __FS_TYPE(pos)

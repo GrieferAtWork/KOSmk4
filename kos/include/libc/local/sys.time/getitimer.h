@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x384ec70c */
+/* HASH CRC-32:0x166e4c50 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -31,10 +31,10 @@ __CREDIRECT(__ATTR_NONNULL((2)),int,__NOTHROW_NCX,__localdep_getitimer32,(int __
 #endif /* !__local___localdep_getitimer32_defined && __CRT_HAVE_getitimer */
 #ifndef __local___localdep_getitimer64_defined
 #define __local___localdep_getitimer64_defined 1
-#ifdef __CRT_HAVE_getitimer64
-__CREDIRECT(__ATTR_NONNULL((2)),int,__NOTHROW_NCX,__localdep_getitimer64,(int __which, struct __itimerval64 *__curr_value),getitimer64,(__which,__curr_value))
-#elif defined(__CRT_HAVE_getitimer) && __SIZEOF_TIME32_T__ == __SIZEOF_TIME64_T__
+#if defined(__CRT_HAVE_getitimer) && __SIZEOF_TIME32_T__ == __SIZEOF_TIME64_T__
 __CREDIRECT(__ATTR_NONNULL((2)),int,__NOTHROW_NCX,__localdep_getitimer64,(int __which, struct __itimerval64 *__curr_value),getitimer,(__which,__curr_value))
+#elif defined(__CRT_HAVE_getitimer64)
+__CREDIRECT(__ATTR_NONNULL((2)),int,__NOTHROW_NCX,__localdep_getitimer64,(int __which, struct __itimerval64 *__curr_value),getitimer64,(__which,__curr_value))
 #elif defined(__CRT_HAVE_getitimer)
 __NAMESPACE_LOCAL_END
 #include <libc/local/sys.time/getitimer64.h>

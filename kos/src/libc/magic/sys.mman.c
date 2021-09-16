@@ -577,27 +577,43 @@ typedef __mode_t mode_t; /* INode type (Set of `S_*' from `<fcntl.h>' or `<sys/s
 
 }
 
+%[define(DEFINE_PIO_OFFSET =
+#ifndef __PIO_OFFSET
+#ifdef __USE_KOS_ALTERATIONS
+#define __PIO_OFFSET   __FS_TYPE(@pos@)
+#define __PIO_OFFSET64 __pos64_t
+#else /* __USE_KOS_ALTERATIONS */
+#define __PIO_OFFSET   __FS_TYPE(@off@)
+#define __PIO_OFFSET64 __off64_t
+#endif /* !__USE_KOS_ALTERATIONS */
+#endif /* !__PIO_OFFSET */
+)]
+
+%[insert:prefix(DEFINE_PIO_OFFSET)]
+
+
 [[decl_include("<features.h>")]]
 [[doc_alias("mmap"), ignore, nocrt, alias("mmap")]]
 void *mmap32(void *addr, size_t len, __STDC_INT_AS_UINT_T prot,
              __STDC_INT_AS_UINT_T flags, $fd_t fd, $off32_t offset);
 
+@@>> mmap(2), mmap64(2)
 @@@param prot:  Either `PROT_NONE', or set of `PROT_EXEC | PROT_WRITE | PROT_READ | PROT_SEM | PROT_LOOSE | PROT_SHARED'
 @@@param flags: One of `MAP_SHARED`, 'MAP_SHARED_VALIDATE' or `MAP_PRIVATE', optionally or'd
 @@              with a set of `MAP_ANONYMOUS | MAP_FIXED | MAP_GROWSDOWN | MAP_LOCKED|
 @@              MAP_NONBLOCK | MAP_NORESERVE | MAP_POPULATE  | MAP_STACK | MAP_SYNC  |
 @@              MAP_UNINITIALIZED | MAP_DONT_MAP | MAP_FIXED_NOREPLACE'
-[[decl_include("<features.h>")]]
+[[decl_include("<features.h>"), decl_prefix(DEFINE_PIO_OFFSET)]]
 [[wunused, section(".text.crt{|.dos}.heap.mman"), no_crt_self_import]]
-[[if($extended_include_prefix("<features.h>") defined(__USE_FILE_OFFSET64)), preferred_alias("mmap64")]]
-[[if($extended_include_prefix("<features.h>")!defined(__USE_FILE_OFFSET64)), preferred_alias("mmap")]]
+[[if($extended_include_prefix("<features.h>", "<bits/types.h>")!defined(__USE_FILE_OFFSET64) || __SIZEOF_OFF32_T__ == __SIZEOF_OFF64_T__), preferred_alias("mmap")]]
+[[if($extended_include_prefix("<features.h>", "<bits/types.h>") defined(__USE_FILE_OFFSET64) || __SIZEOF_OFF32_T__ == __SIZEOF_OFF64_T__), preferred_alias("mmap64")]]
 [[userimpl, requires($has_function(mmap32) || $has_function(mmap64))]]
 void *mmap(void *addr, size_t len, __STDC_INT_AS_UINT_T prot,
-           __STDC_INT_AS_UINT_T flags, $fd_t fd, $off_t offset) {
+           __STDC_INT_AS_UINT_T flags, $fd_t fd, __PIO_OFFSET offset) {
 @@pp_if $has_function(mmap64)@@
-	return mmap64(addr, len, prot, flags, fd, (__off64_t)offset);
+	return mmap64(addr, len, prot, flags, fd, (__PIO_OFFSET64)offset);
 @@pp_else@@
-	return mmap32(addr, len, prot, flags, fd, (__off32_t)offset);
+	return mmap32(addr, len, prot, flags, fd, (off32_t)(off_t)(pos_t)offset);
 @@pp_endif@@
 }
 
@@ -727,11 +743,11 @@ int mincore([[nonnull]] void *start, size_t len, unsigned char *vec);
 %#ifdef __USE_LARGEFILE64
 [[decl_include("<features.h>")]]
 [[wunused, section(".text.crt{|.dos}.heap.mman")]]
-[[doc_alias("mmap"), off64_variant_of(mmap)]]
-[[userimpl, requires_function(mmap32)]]
+[[doc_alias("mmap"), preferred_off64_variant_of(mmap)]]
+[[userimpl, requires_function(mmap32), decl_prefix(DEFINE_PIO_OFFSET)]]
 void *mmap64(void *addr, size_t len, __STDC_INT_AS_UINT_T prot,
-             __STDC_INT_AS_UINT_T flags, $fd_t fd, $off64_t offset) {
-	return mmap32(addr, len, prot, flags, fd, (off32_t)offset);
+             __STDC_INT_AS_UINT_T flags, $fd_t fd, __PIO_OFFSET64 offset) {
+	return mmap32(addr, len, prot, flags, fd, (off32_t)(pos32_t)(pos64_t)offset);
 }
 %#endif /* __USE_LARGEFILE64 */
 
@@ -755,23 +771,30 @@ int posix_madvise([[nonnull]] void *addr, size_t len,
 %
 %#ifdef __USE_GNU
 
+@@>> mremap(2)
 @@@param flags: Set of `MREMAP_MAYMOVE | MREMAP_FIXED'
 [[section(".text.crt{|.dos}.heap.mman"), vartypes(void *)]]
 [[decl_include("<features.h>")]]
 void *mremap(void *addr, size_t old_len, size_t new_len,
              __STDC_INT_AS_UINT_T flags, ... /* void *new_address */);
 
+@@>> remap_file_pages(2)
 [[decl_include("<features.h>")]]
 int remap_file_pages(void *start, size_t size,
                      __STDC_INT_AS_UINT_T prot, size_t pgoff,
                      __STDC_INT_AS_UINT_T flags);
 
+@@>> memfd_create(2)
 $fd_t memfd_create(char const *name, unsigned int flags);
+
+@@>> mlock2(2)
 int mlock2(void const *addr, size_t length, unsigned int flags);
 
+@@>> pkey_alloc(2)
 [[crt_impl_if($extended_include_prefix("<asm/pkey.h>")!defined(__KERNEL__) && defined(__ARCH_HAVE_PKEY))]]
 int pkey_alloc(unsigned int flags, unsigned int access_rights);
 
+@@>> pkey_set(3)
 [[crt_impl_if($extended_include_prefix("<asm/pkey.h>")!defined(__KERNEL__) && defined(__ARCH_HAVE_PKEY))]]
 [[impl_include("<libc/errno.h>"), requires_include("<asm/pkey.h>"), requires(defined(__ARCH_HAVE_PKEY))]]
 int pkey_set(int pkey, unsigned int access_rights) {
@@ -788,6 +811,7 @@ badkey_or_rights:
 @@pp_endif@@
 }
 
+@@>> pkey_get(3)
 [[crt_impl_if($extended_include_prefix("<asm/pkey.h>")!defined(__KERNEL__) && defined(__ARCH_HAVE_PKEY))]]
 [[impl_include("<libc/errno.h>"), requires_include("<asm/pkey.h>"), requires(defined(__ARCH_HAVE_PKEY))]]
 int pkey_get(int pkey) {
@@ -802,9 +826,11 @@ badkey:
 @@pp_endif@@
 }
 
+@@>> pkey_free(2)
 [[crt_impl_if($extended_include_prefix("<asm/pkey.h>")!defined(__KERNEL__) && defined(__ARCH_HAVE_PKEY))]]
 int pkey_free(int pkey);
 
+@@>> pkey_mprotect(2)
 [[decl_include("<features.h>")]]
 [[crt_impl_if($extended_include_prefix("<asm/pkey.h>")!defined(__KERNEL__) && defined(__ARCH_HAVE_PKEY))]]
 int pkey_mprotect(void *addr, size_t len, __STDC_INT_AS_UINT_T prot, int pkey);

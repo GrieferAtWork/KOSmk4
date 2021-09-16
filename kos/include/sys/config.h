@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xb6f9b436 */
+/* HASH CRC-32:0x11fc0ef */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -293,15 +293,15 @@
 #endif /* __CRT_HAVE__ftime32_s || __CRT_HAVE__ftime64_s || __CRT_HAVE__ftime32 || __CRT_HAVE__ftime64 || __CRT_HAVE_ftime || __CRT_HAVE_ftime64 */
 
 #undef HAVE_FTRUNCATE
-#if (defined(__CRT_HAVE__chsize) && !defined(__USE_FILE_OFFSET64)) || (defined(__CRT_HAVE_chsize) && !defined(__USE_FILE_OFFSET64)) || defined(__CRT_HAVE_ftruncate64) || defined(__CRT_HAVE__chsize_s) || defined(__CRT_HAVE_ftruncate)
+#if (defined(__CRT_HAVE__chsize) && (!defined(__USE_FILE_OFFSET64) || __SIZEOF_OFF32_T__ == __SIZEOF_OFF64_T__)) || (defined(__CRT_HAVE_chsize) && (!defined(__USE_FILE_OFFSET64) || __SIZEOF_OFF32_T__ == __SIZEOF_OFF64_T__)) || defined(__CRT_HAVE_ftruncate64) || defined(__CRT_HAVE__chsize_s) || defined(__CRT_HAVE_ftruncate)
 #define HAVE_FTRUNCATE 1
-#endif /* (__CRT_HAVE__chsize && !__USE_FILE_OFFSET64) || (__CRT_HAVE_chsize && !__USE_FILE_OFFSET64) || __CRT_HAVE_ftruncate64 || __CRT_HAVE__chsize_s || __CRT_HAVE_ftruncate */
+#endif /* (__CRT_HAVE__chsize && (!__USE_FILE_OFFSET64 || __SIZEOF_OFF32_T__ == __SIZEOF_OFF64_T__)) || (__CRT_HAVE_chsize && (!__USE_FILE_OFFSET64 || __SIZEOF_OFF32_T__ == __SIZEOF_OFF64_T__)) || __CRT_HAVE_ftruncate64 || __CRT_HAVE__chsize_s || __CRT_HAVE_ftruncate */
 
 #undef HAVE_FTW
 #include <bits/os/stat.h>
-#if (defined(__CRT_HAVE_ftw) && defined(__STAT32_MATCHES_STAT64)) || (defined(__CRT_HAVE_ftw64) && defined(__USE_FILE_OFFSET64)) || (defined(__CRT_HAVE_ftw) && !defined(__USE_FILE_OFFSET64))
+#if (defined(__CRT_HAVE_ftw) && (!defined(__USE_FILE_OFFSET64) || defined(__STAT32_MATCHES_STAT64))) || (defined(__CRT_HAVE_ftw64) && (defined(__USE_FILE_OFFSET64) || defined(__STAT32_MATCHES_STAT64)))
 #define HAVE_FTW 1
-#endif /* (__CRT_HAVE_ftw && __STAT32_MATCHES_STAT64) || (__CRT_HAVE_ftw64 && __USE_FILE_OFFSET64) || (__CRT_HAVE_ftw && !__USE_FILE_OFFSET64) */
+#endif /* (__CRT_HAVE_ftw && (!__USE_FILE_OFFSET64 || __STAT32_MATCHES_STAT64)) || (__CRT_HAVE_ftw64 && (__USE_FILE_OFFSET64 || __STAT32_MATCHES_STAT64)) */
 
 #undef HAVE_GETCWD
 #if defined(__CRT_HAVE_getcwd) || defined(__CRT_HAVE__getcwd)
@@ -455,10 +455,10 @@
 #endif /* __CRT_HAVE_getmntent || __CRT_HAVE_getmntent_r || __CRT_HAVE___getmntent_r || __CRT_HAVE_fgets || __CRT_HAVE_fgets_unlocked || ((__CRT_HAVE_fgetc || __CRT_HAVE_getc || __CRT_HAVE__IO_getc || __CRT_HAVE_fgetc_unlocked || __CRT_HAVE_getc_unlocked || (__CRT_DOS && __CRT_HAVE__filbuf) || __CRT_HAVE_fread || __CRT_HAVE__IO_fread || __CRT_HAVE_fread_unlocked || __CRT_HAVE__fread_nolock) && (__CRT_HAVE_ungetc || __CRT_HAVE__IO_ungetc || __CRT_HAVE_ungetc_unlocked || __CRT_HAVE__ungetc_nolock) && (__CRT_HAVE_ferror || __CRT_HAVE__IO_ferror || __CRT_HAVE_ferror_unlocked)) */
 
 #undef STAT_STATFS2_BSIZE
-#if (defined(__CRT_HAVE_statfs) && !defined(__USE_FILE_OFFSET64)) || (defined(__CRT_HAVE___statfs) && !defined(__USE_FILE_OFFSET64)) || (defined(__CRT_HAVE_statfs64) && defined(__USE_FILE_OFFSET64))
+#if (defined(__CRT_HAVE_statfs) && (!defined(__USE_FILE_OFFSET64) || __SIZEOF_OFF32_T__ == __SIZEOF_OFF64_T__)) || (defined(__CRT_HAVE___statfs) && (!defined(__USE_FILE_OFFSET64) || __SIZEOF_OFF32_T__ == __SIZEOF_OFF64_T__)) || (defined(__CRT_HAVE_statfs64) && (defined(__USE_FILE_OFFSET64) || __SIZEOF_OFF32_T__ == __SIZEOF_OFF64_T__))
 #define STAT_STATFS2_BSIZE 1 /* Actually requires that statfs() takes 2 arguments,
                               * and    that    `struct statfs::f_bsize'    exists! */
-#endif /* (__CRT_HAVE_statfs && !__USE_FILE_OFFSET64) || (__CRT_HAVE___statfs && !__USE_FILE_OFFSET64) || (__CRT_HAVE_statfs64 && __USE_FILE_OFFSET64) */
+#endif /* (__CRT_HAVE_statfs && (!__USE_FILE_OFFSET64 || __SIZEOF_OFF32_T__ == __SIZEOF_OFF64_T__)) || (__CRT_HAVE___statfs && (!__USE_FILE_OFFSET64 || __SIZEOF_OFF32_T__ == __SIZEOF_OFF64_T__)) || (__CRT_HAVE_statfs64 && (__USE_FILE_OFFSET64 || __SIZEOF_OFF32_T__ == __SIZEOF_OFF64_T__)) */
 
 #undef HAVE_UTIME_NULL
 #if defined(__CRT_HAVE_utime) || defined(__CRT_HAVE__utime32) || defined(__CRT_HAVE_utime64) || defined(__CRT_HAVE__utime64)

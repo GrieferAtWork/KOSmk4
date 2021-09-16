@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x2cdca0a6 */
+/* HASH CRC-32:0x4e4a9035 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -36,10 +36,10 @@ __CREDIRECT(,__time32_t,__NOTHROW_NCX,__localdep_time32,(__time32_t *__timer),_t
 #endif /* !__local___localdep_time32_defined */
 #ifndef __local___localdep_time64_defined
 #define __local___localdep_time64_defined 1
-#ifdef __CRT_HAVE_time64
-__CREDIRECT(,__time64_t,__NOTHROW_NCX,__localdep_time64,(__time64_t *__timer),time64,(__timer))
-#elif defined(__CRT_HAVE_time) && __SIZEOF_TIME32_T__ == __SIZEOF_TIME64_T__
+#if defined(__CRT_HAVE_time) && __SIZEOF_TIME32_T__ == __SIZEOF_TIME64_T__
 __CREDIRECT(,__time64_t,__NOTHROW_NCX,__localdep_time64,(__time64_t *__timer),time,(__timer))
+#elif defined(__CRT_HAVE_time64)
+__CREDIRECT(,__time64_t,__NOTHROW_NCX,__localdep_time64,(__time64_t *__timer),time64,(__timer))
 #elif defined(__CRT_HAVE__time64)
 __CREDIRECT(,__time64_t,__NOTHROW_NCX,__localdep_time64,(__time64_t *__timer),_time64,(__timer))
 #elif defined(__CRT_HAVE_time) || defined(__CRT_HAVE__time32)

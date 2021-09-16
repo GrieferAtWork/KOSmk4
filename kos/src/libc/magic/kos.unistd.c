@@ -59,9 +59,11 @@ typedef __pos64_t pos64_t; /* File/device position */
 [[cp, throws, ATTR_NORETURN, doc_alias("execv"), argument_names(path, ___argv)]]
 [[decl_include("<features.h>"), decl_prefix(DEFINE_TARGV)]]
 void Execv([[nonnull]] char const *__restrict path, [[nonnull]] __TARGV);
+
 [[cp, throws, ATTR_NORETURN, doc_alias("execve"), argument_names(path, ___argv, ___envp)]]
 [[decl_include("<features.h>"), decl_prefix(DEFINE_TARGV)]]
 void Execve([[nonnull]] char const *__restrict path, [[nonnull]] __TARGV, [[nonnull]] __TENVP);
+
 [[cp, throws, ATTR_NORETURN, doc_alias("execvp"), argument_names(file, ___argv)]]
 [[decl_include("<features.h>"), decl_prefix(DEFINE_TARGV)]]
 void Execvp([[nonnull]] char const *__restrict file, [[nonnull]] __TARGV);
@@ -192,8 +194,8 @@ $pos32_t LSeek32($fd_t fd, $off32_t offset, int whence);
 
 [[throws, decl_include("<bits/types.h>")]]
 [[doc_alias("lseek"), no_crt_self_import]]
-[[if($extended_include_prefix("<features.h>") defined(__USE_FILE_OFFSET64)), preferred_alias("LSeek64")]]
-[[if($extended_include_prefix("<features.h>")!defined(__USE_FILE_OFFSET64)), preferred_alias("LSeek")]]
+[[if($extended_include_prefix("<features.h>", "<bits/types.h>")!defined(__USE_FILE_OFFSET64) || __SIZEOF_OFF32_T__ == __SIZEOF_OFF64_T__), preferred_alias("LSeek")]]
+[[if($extended_include_prefix("<features.h>", "<bits/types.h>") defined(__USE_FILE_OFFSET64) || __SIZEOF_OFF32_T__ == __SIZEOF_OFF64_T__), preferred_alias("LSeek64")]]
 [[userimpl, requires($has_function(LSeek32) || $has_function(LSeek64))]]
 [[section(".text.crt{|.dos}.except.io.seek")]]
 $pos_t LSeek($fd_t fd, $off_t offset, int whence) {
@@ -275,7 +277,7 @@ void UnlinkAt($fd_t dfd, [[nonnull]] char const *name, $atflag_t flags);
 %
 %#ifdef __USE_LARGEFILE64
 [[throws, decl_include("<bits/types.h>")]]
-[[doc_alias("lseek64"), off64_variant_of(LSeek)]]
+[[doc_alias("lseek64"), preferred_off64_variant_of(LSeek)]]
 [[userimpl, requires_function(LSeek32)]]
 [[section(".text.crt{|.dos}.except.io.large.seek")]]
 $pos64_t LSeek64($fd_t fd, $off64_t offset, int whence) {
@@ -290,8 +292,8 @@ $pos64_t LSeek64($fd_t fd, $off64_t offset, int whence) {
 
 [[cp, throws, decl_include("<bits/types.h>")]]
 [[doc_alias("pread"), no_crt_self_import]]
-[[if($extended_include_prefix("<features.h>") defined(__USE_FILE_OFFSET64)), preferred_alias("PRead64")]]
-[[if($extended_include_prefix("<features.h>")!defined(__USE_FILE_OFFSET64)), preferred_alias("PRead")]]
+[[if($extended_include_prefix("<features.h>", "<bits/types.h>")!defined(__USE_FILE_OFFSET64) || __SIZEOF_OFF32_T__ == __SIZEOF_OFF64_T__), preferred_alias("PRead")]]
+[[if($extended_include_prefix("<features.h>", "<bits/types.h>") defined(__USE_FILE_OFFSET64) || __SIZEOF_OFF32_T__ == __SIZEOF_OFF64_T__), preferred_alias("PRead64")]]
 [[section(".text.crt{|.dos}.except.io.read")]]
 [[userimpl, requires($has_function(PRead32) || $has_function(PRead64))]]
 size_t PRead($fd_t fd, [[outp(bufsize)]] void *buf, size_t bufsize, pos_t offset) {
@@ -304,8 +306,8 @@ size_t PRead($fd_t fd, [[outp(bufsize)]] void *buf, size_t bufsize, pos_t offset
 
 [[cp, throws, decl_include("<bits/types.h>")]]
 [[doc_alias("pwrite"), no_crt_self_import]]
-[[if($extended_include_prefix("<features.h>") defined(__USE_FILE_OFFSET64)), preferred_alias("PWrite64")]]
-[[if($extended_include_prefix("<features.h>")!defined(__USE_FILE_OFFSET64)), preferred_alias("PWrite")]]
+[[if($extended_include_prefix("<features.h>", "<bits/types.h>")!defined(__USE_FILE_OFFSET64) || __SIZEOF_OFF32_T__ == __SIZEOF_OFF64_T__), preferred_alias("PWrite")]]
+[[if($extended_include_prefix("<features.h>", "<bits/types.h>") defined(__USE_FILE_OFFSET64) || __SIZEOF_OFF32_T__ == __SIZEOF_OFF64_T__), preferred_alias("PWrite64")]]
 [[userimpl, requires($has_function(PWrite32) || $has_function(PWrite64))]]
 [[section(".text.crt{|.dos}.except.io.write")]]
 size_t PWrite($fd_t fd, [[inp(bufsize)]] void const *buf, size_t bufsize, pos_t offset) {
@@ -320,8 +322,8 @@ size_t PWrite($fd_t fd, [[inp(bufsize)]] void const *buf, size_t bufsize, pos_t 
 %#ifdef __USE_KOS
 [[cp, throws, decl_include("<bits/types.h>")]]
 [[doc_alias("preadall"), no_crt_self_import]]
-[[if($extended_include_prefix("<features.h>") defined(__USE_FILE_OFFSET64)), preferred_alias("PReadAll64")]]
-[[if($extended_include_prefix("<features.h>")!defined(__USE_FILE_OFFSET64)), preferred_alias("PReadAll")]]
+[[if($extended_include_prefix("<features.h>", "<bits/types.h>")!defined(__USE_FILE_OFFSET64) || __SIZEOF_OFF32_T__ == __SIZEOF_OFF64_T__), preferred_alias("PReadAll")]]
+[[if($extended_include_prefix("<features.h>", "<bits/types.h>") defined(__USE_FILE_OFFSET64) || __SIZEOF_OFF32_T__ == __SIZEOF_OFF64_T__), preferred_alias("PReadAll64")]]
 [[userimpl, requires($has_function(PReadAll32) || $has_function(PReadAll64))]]
 [[section(".text.crt{|.dos}.except.io.read")]]
 size_t PReadAll($fd_t fd, [[outp(bufsize)]] void *buf, size_t bufsize, pos_t offset) {
@@ -342,26 +344,25 @@ size_t PRead32($fd_t fd, [[outp(bufsize)]] void *buf, size_t bufsize, $pos32_t o
 size_t PWrite32($fd_t fd, [[inp(bufsize)]] void const *buf, size_t bufsize, $pos32_t offset);
 
 [[cp, throws, decl_include("<bits/types.h>")]]
-[[doc_alias("pread64"), off64_variant_of(PRead)]]
+[[doc_alias("pread64"), preferred_off64_variant_of(PRead)]]
 [[userimpl, requires_function(PRead32), section(".text.crt{|.dos}.except.io.large.read")]]
 size_t PRead64($fd_t fd, [[outp(bufsize)]] void *buf, size_t bufsize, pos64_t offset) {
 	return PRead32(fd, buf, bufsize, (pos32_t)offset);
 }
 
 [[cp, throws, decl_include("<bits/types.h>")]]
-[[doc_alias("pwrite64"), off64_variant_of(PWrite)]]
+[[doc_alias("pwrite64"), preferred_off64_variant_of(PWrite)]]
 [[userimpl, requires_function(PWrite32), section(".text.crt{|.dos}.except.io.large.write")]]
 size_t PWrite64($fd_t fd, [[outp(bufsize)]] void *buf, size_t bufsize, pos64_t offset) {
 	return PWrite32(fd, buf, bufsize, (pos32_t)offset);
 }
 
 %#ifdef __USE_KOS
-[[cp, throws, decl_include("<bits/types.h>")]]
-[[ignore, nocrt, alias("PReadAll")]]
+[[cp, throws, decl_include("<bits/types.h>"), ignore, nocrt, alias("PReadAll")]]
 size_t PReadAll32($fd_t fd, [[outp(bufsize)]] void *buf, size_t bufsize, $pos32_t offset);
 
 [[cp, throws, decl_include("<bits/types.h>")]]
-[[doc_alias("preadall64"), off64_variant_of(PReadAll)]]
+[[doc_alias("preadall64"), preferred_off64_variant_of(PReadAll)]]
 [[userimpl, requires_function(PRead64), section(".text.crt{|.dos}.except.io.large.read")]]
 size_t PReadAll64($fd_t fd, [[inp(bufsize)]] void *buf, size_t bufsize, pos64_t offset) {
 	size_t result, temp;
@@ -467,8 +468,8 @@ void LChown([[nonnull]] char const *file, $uid_t owner, $gid_t group) {
 
 [[throws, decl_include("<bits/types.h>")]]
 [[doc_alias("truncate"), no_crt_self_import]]
-[[if($extended_include_prefix("<features.h>") defined(__USE_FILE_OFFSET64)), preferred_alias("Truncate64")]]
-[[if($extended_include_prefix("<features.h>")!defined(__USE_FILE_OFFSET64)), preferred_alias("Truncate")]]
+[[if($extended_include_prefix("<features.h>", "<bits/types.h>")!defined(__USE_FILE_OFFSET64) || __SIZEOF_OFF32_T__ == __SIZEOF_OFF64_T__), preferred_alias("Truncate")]]
+[[if($extended_include_prefix("<features.h>", "<bits/types.h>") defined(__USE_FILE_OFFSET64) || __SIZEOF_OFF32_T__ == __SIZEOF_OFF64_T__), preferred_alias("Truncate64")]]
 [[section(".text.crt{|.dos}.except.fs.modify")]]
 [[userimpl, requires($has_function(Truncate32) || $has_function(Truncate64))]]
 void Truncate([[nonnull]] char const *file, pos_t length) {
@@ -485,15 +486,16 @@ vodi Truncate32([[nonnull]] char const *file, $pos32_t length);
 
 %#ifdef __USE_LARGEFILE64
 [[throws, decl_include("<bits/types.h>")]]
-[[doc_alias("truncate64"), off64_variant_of(Truncate)]]
+[[doc_alias("truncate64"), preferred_off64_variant_of(Truncate)]]
 [[userimpl, requires_function(Truncate32), section(".text.crt{|.dos}.except.fs.modify")]]
 void Truncate64([[nonnull]] char const *file, pos64_t length) {
 	Truncate32(file, (__pos32_t)length);
 }
 %#endif /* __USE_LARGEFILE64 */
 %#endif /* __USE_XOPEN_EXTENDED || __USE_XOPEN2K8 */
-%
 
+
+%
 %#ifdef __USE_XOPEN2K8
 
 [[guard, ATTR_NORETURN, doc_alias("fexecve")]]
@@ -504,26 +506,34 @@ void FExecve($fd_t fd, [[nonnull]] __TARGV, [[nonnull]] __TENVP);
 
 %#endif /* __USE_XOPEN2K8 */
 
+
+%
 %#ifdef __USE_GNU
+
 [[cp, throws, ATTR_NORETURN, doc_alias("execvpe")]]
 [[decl_include("<features.h>"), decl_prefix(DEFINE_TARGV)]]
 [[argument_names(file, ___argv, ___envp), section(".text.crt{|.dos}.except.fs.exec.exec")]]
 void Execvpe([[nonnull]] char const *__restrict file, [[nonnull]] __TARGV, [[nonnull]] __TENVP);
+
 %#endif /* __USE_GNU */
+
 
 %
 %#if defined(__USE_MISC) || defined(__USE_XOPEN)
+
 [[throws, userimpl, section(".text.crt{|.dos}.except.sched.param")]]
 int Nice(int inc) {
 	(void)inc;
 	/* It should be sufficient to emulate this is a no-op. */
 	return 0;
 }
+
 %#endif /* __USE_MISC || __USE_XOPEN */
 
 
 %
 %#if defined(__USE_MISC) || defined(__USE_XOPEN_EXTENDED)
+
 [[throws, doc_alias("setpgrp"), section(".text.crt{|.dos}.except.sched.process")]]
 void SetPGrp();
 
@@ -534,10 +544,13 @@ void SetReUid($uid_t ruid, $uid_t euid);
 [[doc_alias("setregid"), section(".text.crt{|.dos}.except.sched.user")]]
 [[throws, decl_include("<bits/types.h>")]]
 void SetReGid($gid_t rgid, $gid_t egid);
+
 %#endif /* __USE_MISC || __USE_XOPEN_EXTENDED */
+
 
 %
 %#ifdef __USE_XOPEN2K
+
 [[doc_alias("seteuid"), section(".text.crt{|.dos}.except.sched.user")]]
 [[throws, decl_include("<bits/types.h>")]]
 void SetEUid($uid_t euid);
@@ -545,10 +558,13 @@ void SetEUid($uid_t euid);
 [[doc_alias("setegid"), section(".text.crt{|.dos}.except.sched.user")]]
 [[throws, decl_include("<bits/types.h>")]]
 void SetEGid($gid_t egid);
+
 %#endif /* __USE_XOPEN2K */
+
 
 %
 %#if defined(__USE_XOPEN_EXTENDED) || defined(__USE_XOPEN2K)
+
 [[cp, throws, doc_alias("symlink"), section(".text.crt{|.dos}.except.fs.modify")]]
 [[userimpl, requires_include("<asm/os/fcntl.h>")]]
 [[requires(defined(__AT_FDCWD) && $has_function(SymlinkAt))]]
@@ -568,17 +584,21 @@ size_t Readlink([[nonnull]] char const *__restrict path,
 
 %#endif /* __USE_XOPEN_EXTENDED || __USE_XOPEN2K */
 
+
 %
 %#if defined(__USE_UNIX98) || defined(__USE_XOPEN2K)
+
 [[doc_alias("gethostname")]]
 [[section(".text.crt{|.dos}.except.system.configuration")]]
 [[throws, decl_include("<hybrid/typecore.h>")]]
 void GetHostName([[outp(buflen)]] char *name, size_t buflen);
+
 %#endif /* __USE_UNIX98 || __USE_XOPEN2K */
 
 
 %
 %#ifdef __USE_MISC
+
 [[doc_alias("sethostname"), section(".text.crt{|.dos}.except.system.configuration")]]
 [[throws, decl_include("<hybrid/typecore.h>")]]
 void SetHostName([[inp(len)]] char const *name, size_t len);
@@ -598,32 +618,36 @@ void SetDomainName([[inp(len)]] char const *name, size_t len);
 __syscall_slong_t Syscall($syscall_ulong_t sysno, ...);
 
 %#ifdef __USE_KOS
+
 [[section(".text.crt{|.dos}.except.system.utility"), preferred_alias("Syscall")]]
 [[cp, throws, decl_include("<bits/types.h>")]]
 [[vartypes($syscall_ulong_t, $syscall_ulong_t, $syscall_ulong_t,
            $syscall_ulong_t, $syscall_ulong_t, $syscall_ulong_t)]]
 __LONG64_TYPE__ Syscall64($syscall_ulong_t sysno, ...);
-%#endif /* __USE_KOS */
 
+%#endif /* __USE_KOS */
 %#endif /* __USE_MISC */
 
+
 %
-%#if defined(__USE_MISC) || \
-%   (defined(__USE_XOPEN) && !defined(__USE_XOPEN2K))
+%#if defined(__USE_MISC) || (defined(__USE_XOPEN) && !defined(__USE_XOPEN2K))
+
 [[cp, throws, doc_alias("chroot"), section(".text.crt{|.dos}.except.fs.utility")]]
 void ChRoot([[nonnull]] char const *__restrict path);
-%#endif /* ... */
+
+%#endif /* __USE_MISC || (__USE_XOPEN && !__USE_XOPEN2K) */
 
 
 %
 %#if defined(__USE_POSIX199309) || defined(__USE_XOPEN_EXTENDED) || defined(__USE_XOPEN2K)
+
 [[doc_alias("ftruncate32"), ignore, nocrt, alias("FTruncate")]]
 [[throws, decl_include("<bits/types.h>")]]
 int FTruncate32($fd_t fd, __pos32_t length);
 
 [[throws, doc_alias("ftruncate"), no_crt_self_import]]
-[[if("defined(__USE_FILE_OFFSET64)"), preferred_alias("FTruncate64")]]
-[[if("!defined(__USE_FILE_OFFSET64)"), preferred_alias("FTruncate")]]
+[[if($extended_include_prefix("<features.h>", "<bits/types.h>")!defined(__USE_FILE_OFFSET64) || __SIZEOF_OFF32_T__ == __SIZEOF_OFF64_T__), preferred_alias("FTruncate")]]
+[[if($extended_include_prefix("<features.h>", "<bits/types.h>") defined(__USE_FILE_OFFSET64) || __SIZEOF_OFF32_T__ == __SIZEOF_OFF64_T__), preferred_alias("FTruncate64")]]
 [[userimpl, requires($has_function(FTruncate32) || $has_function(FTruncate64))]]
 [[section(".text.crt{|.dos}.except.io.write"), decl_include("<bits/types.h>")]]
 void FTruncate($fd_t fd, pos_t length) {
@@ -634,13 +658,16 @@ void FTruncate($fd_t fd, pos_t length) {
 @@pp_endif@@
 }
 
+%
 %#ifdef __USE_LARGEFILE64
-[[throws, doc_alias("ftruncate64"), off64_variant_of(FTruncate)]]
+
+[[throws, doc_alias("ftruncate64"), preferred_off64_variant_of(FTruncate)]]
 [[section(".text.crt{|.dos}.except.io.large.write")]]
 [[userimpl, requires_function(FTruncate32), decl_include("<bits/types.h>")]]
 void FTruncate64($fd_t fd, pos64_t length) {
 	FTruncate32(fd, (pos32_t)length);
 }
+
 %#endif /* __USE_LARGEFILE64 */
 %#endif /* __USE_POSIX199309 || __USE_XOPEN_EXTENDED || __USE_XOPEN2K */
 

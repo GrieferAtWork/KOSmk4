@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xd83b95ff */
+/* HASH CRC-32:0x5ab780fc */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -217,81 +217,100 @@ typedef struct __glob64_struct glob64_t;
 #define ____glob_errfunc_t_defined 1
 #endif /* !____glob_errfunc_t_defined */
 
-#if defined(__CRT_HAVE_glob64) && defined(__USE_FILE_OFFSET64)
-/* @param: flags: Set of `GLOB_ERR | GLOB_MARK | GLOB_NOSORT | GLOB_DOOFFS |
- *                        GLOB_NOCHECK | GLOB_APPEND  | GLOB_NOESCAPE  |
- *                        GLOB_PERIOD | GLOB_MAGCHAR | GLOB_ALTDIRFUNC |
- *                        GLOB_BRACE  |  GLOB_NOMAGIC  |  GLOB_TILDE   |
- *                        GLOB_ONLYDIR | GLOB_TILDE_CHECK'
- * @return: GLOB_NOSPACE : ...
- * @return: GLOB_ABORTED : ...
- * @return: GLOB_NOMATCH : ...
- * @return: GLOB_NOSYS   : ... */
-__CREDIRECT(__ATTR_NONNULL((1, 4)),int,__NOTHROW_NCX,glob,(char const *__restrict __pattern, __STDC_INT_AS_UINT_T __flags, int (__LIBKCALL *__errfunc)(char const *__path, int __flags), glob_t *__restrict __pglob),glob64,(__pattern,__flags,__errfunc,__pglob))
-#elif defined(__CRT_HAVE_glob) && !defined(__USE_FILE_OFFSET64)
-/* @param: flags: Set of `GLOB_ERR | GLOB_MARK | GLOB_NOSORT | GLOB_DOOFFS |
- *                        GLOB_NOCHECK | GLOB_APPEND  | GLOB_NOESCAPE  |
- *                        GLOB_PERIOD | GLOB_MAGCHAR | GLOB_ALTDIRFUNC |
- *                        GLOB_BRACE  |  GLOB_NOMAGIC  |  GLOB_TILDE   |
- *                        GLOB_ONLYDIR | GLOB_TILDE_CHECK'
+#if defined(__CRT_HAVE_glob) && (!defined(__USE_FILE_OFFSET64) || defined(__GLOB32_MATCHES_GLOB64))
+/* >> glob(3), glob64(3)
+ * @param: flags: Set of `GLOB_ERR | GLOB_MARK  | GLOB_NOSORT | GLOB_DOOFFS  |
+ *                GLOB_NOCHECK  | GLOB_APPEND |  GLOB_NOESCAPE | GLOB_PERIOD |
+ *                GLOB_MAGCHAR | GLOB_ALTDIRFUNC | GLOB_BRACE | GLOB_NOMAGIC |
+ *                GLOB_TILDE | GLOB_ONLYDIR | GLOB_TILDE_CHECK'
  * @return: GLOB_NOSPACE : ...
  * @return: GLOB_ABORTED : ...
  * @return: GLOB_NOMATCH : ...
  * @return: GLOB_NOSYS   : ... */
 __CDECLARE(__ATTR_NONNULL((1, 4)),int,__NOTHROW_NCX,glob,(char const *__restrict __pattern, __STDC_INT_AS_UINT_T __flags, int (__LIBKCALL *__errfunc)(char const *__path, int __flags), glob_t *__restrict __pglob),(__pattern,__flags,__errfunc,__pglob))
+#elif defined(__CRT_HAVE_glob64) && (defined(__USE_FILE_OFFSET64) || defined(__GLOB32_MATCHES_GLOB64))
+/* >> glob(3), glob64(3)
+ * @param: flags: Set of `GLOB_ERR | GLOB_MARK  | GLOB_NOSORT | GLOB_DOOFFS  |
+ *                GLOB_NOCHECK  | GLOB_APPEND |  GLOB_NOESCAPE | GLOB_PERIOD |
+ *                GLOB_MAGCHAR | GLOB_ALTDIRFUNC | GLOB_BRACE | GLOB_NOMAGIC |
+ *                GLOB_TILDE | GLOB_ONLYDIR | GLOB_TILDE_CHECK'
+ * @return: GLOB_NOSPACE : ...
+ * @return: GLOB_ABORTED : ...
+ * @return: GLOB_NOMATCH : ...
+ * @return: GLOB_NOSYS   : ... */
+__CREDIRECT(__ATTR_NONNULL((1, 4)),int,__NOTHROW_NCX,glob,(char const *__restrict __pattern, __STDC_INT_AS_UINT_T __flags, int (__LIBKCALL *__errfunc)(char const *__path, int __flags), glob_t *__restrict __pglob),glob64,(__pattern,__flags,__errfunc,__pglob))
 #else /* ... */
 #include <libc/local/glob/glob.h>
-/* @param: flags: Set of `GLOB_ERR | GLOB_MARK | GLOB_NOSORT | GLOB_DOOFFS |
- *                        GLOB_NOCHECK | GLOB_APPEND  | GLOB_NOESCAPE  |
- *                        GLOB_PERIOD | GLOB_MAGCHAR | GLOB_ALTDIRFUNC |
- *                        GLOB_BRACE  |  GLOB_NOMAGIC  |  GLOB_TILDE   |
- *                        GLOB_ONLYDIR | GLOB_TILDE_CHECK'
+/* >> glob(3), glob64(3)
+ * @param: flags: Set of `GLOB_ERR | GLOB_MARK  | GLOB_NOSORT | GLOB_DOOFFS  |
+ *                GLOB_NOCHECK  | GLOB_APPEND |  GLOB_NOESCAPE | GLOB_PERIOD |
+ *                GLOB_MAGCHAR | GLOB_ALTDIRFUNC | GLOB_BRACE | GLOB_NOMAGIC |
+ *                GLOB_TILDE | GLOB_ONLYDIR | GLOB_TILDE_CHECK'
  * @return: GLOB_NOSPACE : ...
  * @return: GLOB_ABORTED : ...
  * @return: GLOB_NOMATCH : ...
  * @return: GLOB_NOSYS   : ... */
 __NAMESPACE_LOCAL_USING_OR_IMPL(glob, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_NONNULL((1, 4)) int __NOTHROW_NCX(__LIBCCALL glob)(char const *__restrict __pattern, __STDC_INT_AS_UINT_T __flags, int (__LIBKCALL *__errfunc)(char const *__path, int __flags), glob_t *__restrict __pglob) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(glob))(__pattern, __flags, __errfunc, __pglob); })
 #endif /* !... */
-#if defined(__CRT_HAVE_globfree64) && defined(__USE_FILE_OFFSET64)
-__CREDIRECT_VOID(__ATTR_NONNULL((1)),__NOTHROW_NCX,globfree,(glob_t *__pglob),globfree64,(__pglob))
-#elif defined(__CRT_HAVE_globfree) && !defined(__USE_FILE_OFFSET64)
+#if defined(__CRT_HAVE_globfree) && (!defined(__USE_FILE_OFFSET64) || defined(__GLOB32_MATCHES_GLOB64))
+/* >> globfree(3), globfree64(3) */
 __CDECLARE_VOID(__ATTR_NONNULL((1)),__NOTHROW_NCX,globfree,(glob_t *__pglob),(__pglob))
+#elif defined(__CRT_HAVE_globfree64) && (defined(__USE_FILE_OFFSET64) || defined(__GLOB32_MATCHES_GLOB64))
+/* >> globfree(3), globfree64(3) */
+__CREDIRECT_VOID(__ATTR_NONNULL((1)),__NOTHROW_NCX,globfree,(glob_t *__pglob),globfree64,(__pglob))
 #else /* ... */
 #include <libc/local/glob/globfree.h>
+/* >> globfree(3), globfree64(3) */
 __NAMESPACE_LOCAL_USING_OR_IMPL(globfree, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_NONNULL((1)) void __NOTHROW_NCX(__LIBCCALL globfree)(glob_t *__pglob) { (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(globfree))(__pglob); })
 #endif /* !... */
 
 #ifdef __USE_LARGEFILE64
-#ifdef __CRT_HAVE_glob64
-/* @param: flags: Set of `GLOB_ERR | GLOB_MARK | GLOB_NOSORT | GLOB_DOOFFS |
- *                        GLOB_NOCHECK | GLOB_APPEND  | GLOB_NOESCAPE  |
- *                        GLOB_PERIOD | GLOB_MAGCHAR | GLOB_ALTDIRFUNC |
- *                        GLOB_BRACE  |  GLOB_NOMAGIC  |  GLOB_TILDE   |
- *                        GLOB_ONLYDIR | GLOB_TILDE_CHECK'
+#if defined(__CRT_HAVE_glob) && defined(__GLOB32_MATCHES_GLOB64)
+/* >> glob(3), glob64(3)
+ * @param: flags: Set of `GLOB_ERR | GLOB_MARK  | GLOB_NOSORT | GLOB_DOOFFS  |
+ *                GLOB_NOCHECK  | GLOB_APPEND |  GLOB_NOESCAPE | GLOB_PERIOD |
+ *                GLOB_MAGCHAR | GLOB_ALTDIRFUNC | GLOB_BRACE | GLOB_NOMAGIC |
+ *                GLOB_TILDE | GLOB_ONLYDIR | GLOB_TILDE_CHECK'
+ * @return: GLOB_NOSPACE : ...
+ * @return: GLOB_ABORTED : ...
+ * @return: GLOB_NOMATCH : ...
+ * @return: GLOB_NOSYS   : ... */
+__CREDIRECT(__ATTR_NONNULL((1, 4)),int,__NOTHROW_NCX,glob64,(const char *__restrict __pattern, __STDC_INT_AS_UINT_T __flags, int (__LIBKCALL *__errfunc)(char const *__path, int __flags), struct __glob64_struct *__restrict __pglob),glob,(__pattern,__flags,__errfunc,__pglob))
+#elif defined(__CRT_HAVE_glob64)
+/* >> glob(3), glob64(3)
+ * @param: flags: Set of `GLOB_ERR | GLOB_MARK  | GLOB_NOSORT | GLOB_DOOFFS  |
+ *                GLOB_NOCHECK  | GLOB_APPEND |  GLOB_NOESCAPE | GLOB_PERIOD |
+ *                GLOB_MAGCHAR | GLOB_ALTDIRFUNC | GLOB_BRACE | GLOB_NOMAGIC |
+ *                GLOB_TILDE | GLOB_ONLYDIR | GLOB_TILDE_CHECK'
  * @return: GLOB_NOSPACE : ...
  * @return: GLOB_ABORTED : ...
  * @return: GLOB_NOMATCH : ...
  * @return: GLOB_NOSYS   : ... */
 __CDECLARE(__ATTR_NONNULL((1, 4)),int,__NOTHROW_NCX,glob64,(const char *__restrict __pattern, __STDC_INT_AS_UINT_T __flags, int (__LIBKCALL *__errfunc)(char const *__path, int __flags), struct __glob64_struct *__restrict __pglob),(__pattern,__flags,__errfunc,__pglob))
-#else /* __CRT_HAVE_glob64 */
+#else /* ... */
 #include <libc/local/glob/glob64.h>
-/* @param: flags: Set of `GLOB_ERR | GLOB_MARK | GLOB_NOSORT | GLOB_DOOFFS |
- *                        GLOB_NOCHECK | GLOB_APPEND  | GLOB_NOESCAPE  |
- *                        GLOB_PERIOD | GLOB_MAGCHAR | GLOB_ALTDIRFUNC |
- *                        GLOB_BRACE  |  GLOB_NOMAGIC  |  GLOB_TILDE   |
- *                        GLOB_ONLYDIR | GLOB_TILDE_CHECK'
+/* >> glob(3), glob64(3)
+ * @param: flags: Set of `GLOB_ERR | GLOB_MARK  | GLOB_NOSORT | GLOB_DOOFFS  |
+ *                GLOB_NOCHECK  | GLOB_APPEND |  GLOB_NOESCAPE | GLOB_PERIOD |
+ *                GLOB_MAGCHAR | GLOB_ALTDIRFUNC | GLOB_BRACE | GLOB_NOMAGIC |
+ *                GLOB_TILDE | GLOB_ONLYDIR | GLOB_TILDE_CHECK'
  * @return: GLOB_NOSPACE : ...
  * @return: GLOB_ABORTED : ...
  * @return: GLOB_NOMATCH : ...
  * @return: GLOB_NOSYS   : ... */
 __NAMESPACE_LOCAL_USING_OR_IMPL(glob64, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_NONNULL((1, 4)) int __NOTHROW_NCX(__LIBCCALL glob64)(const char *__restrict __pattern, __STDC_INT_AS_UINT_T __flags, int (__LIBKCALL *__errfunc)(char const *__path, int __flags), struct __glob64_struct *__restrict __pglob) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(glob64))(__pattern, __flags, __errfunc, __pglob); })
-#endif /* !__CRT_HAVE_glob64 */
-#ifdef __CRT_HAVE_globfree64
+#endif /* !... */
+#if defined(__CRT_HAVE_globfree) && defined(__GLOB32_MATCHES_GLOB64)
+/* >> globfree(3), globfree64(3) */
+__CREDIRECT_VOID(__ATTR_NONNULL((1)),__NOTHROW_NCX,globfree64,(struct __glob64_struct *__pglob),globfree,(__pglob))
+#elif defined(__CRT_HAVE_globfree64)
+/* >> globfree(3), globfree64(3) */
 __CDECLARE_VOID(__ATTR_NONNULL((1)),__NOTHROW_NCX,globfree64,(struct __glob64_struct *__pglob),(__pglob))
-#else /* __CRT_HAVE_globfree64 */
+#else /* ... */
 #include <libc/local/glob/globfree64.h>
+/* >> globfree(3), globfree64(3) */
 __NAMESPACE_LOCAL_USING_OR_IMPL(globfree64, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_NONNULL((1)) void __NOTHROW_NCX(__LIBCCALL globfree64)(struct __glob64_struct *__pglob) { (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(globfree64))(__pglob); })
-#endif /* !__CRT_HAVE_globfree64 */
+#endif /* !... */
 #endif /* __USE_LARGEFILE64 */
 
 __SYSDECL_END

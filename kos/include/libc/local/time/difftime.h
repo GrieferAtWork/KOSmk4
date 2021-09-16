@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x6281dc33 */
+/* HASH CRC-32:0xf72abf77 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -35,10 +35,10 @@ __CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,double,__NOTHROW,__localdep_difftime32,(
 #endif /* !__local___localdep_difftime32_defined */
 #ifndef __local___localdep_difftime64_defined
 #define __local___localdep_difftime64_defined 1
-#ifdef __CRT_HAVE_difftime64
-__CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,double,__NOTHROW_NCX,__localdep_difftime64,(__time64_t __time1, __time64_t __time0),difftime64,(__time1,__time0))
-#elif defined(__CRT_HAVE_difftime) && __SIZEOF_TIME32_T__ == __SIZEOF_TIME64_T__
+#if defined(__CRT_HAVE_difftime) && __SIZEOF_TIME32_T__ == __SIZEOF_TIME64_T__
 __CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,double,__NOTHROW_NCX,__localdep_difftime64,(__time64_t __time1, __time64_t __time0),difftime,(__time1,__time0))
+#elif defined(__CRT_HAVE_difftime64)
+__CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,double,__NOTHROW_NCX,__localdep_difftime64,(__time64_t __time1, __time64_t __time0),difftime64,(__time1,__time0))
 #elif defined(__CRT_HAVE__difftime64)
 __CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,double,__NOTHROW_NCX,__localdep_difftime64,(__time64_t __time1, __time64_t __time0),_difftime64,(__time1,__time0))
 #elif defined(__CRT_HAVE___difftime64)

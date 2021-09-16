@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x26281367 */
+/* HASH CRC-32:0x9c4b4903 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -37,7 +37,7 @@ __CVREDIRECT(__ATTR_WUNUSED __ATTR_NONNULL((1)),__fd_t,__NOTHROW_RPC,__localdep_
 #endif /* !... */
 #endif /* !__local___localdep_open32_defined */
 __NAMESPACE_LOCAL_END
-#include <asm/os/fcntl.h>
+#include <asm/os/oflags.h>
 __NAMESPACE_LOCAL_BEGIN
 __LOCAL_LIBC(open64) __ATTR_WUNUSED __ATTR_NONNULL((1)) __fd_t
 __NOTHROW_RPC(__VLIBCCALL __LIBC_LOCAL_NAME(open64))(char const *__filename, __oflag_t __oflags, ...) {

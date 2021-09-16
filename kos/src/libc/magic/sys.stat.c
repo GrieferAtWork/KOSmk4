@@ -511,8 +511,8 @@ int dos_fstat64i64($fd_t fd, [[nonnull]] struct __dos_stat64 *__restrict buf);
 [[if($extended_include_prefix("<features.h>")defined(__CRT_DOS_PRIMARY) &&  defined(__USE_TIME_BITS64)), preferred_alias("_stat64", "_stat64i32")]]
 [[if($extended_include_prefix("<features.h>")defined(__CRT_DOS_PRIMARY) && !defined(__USE_TIME_BITS64) && defined(__USE_FILE_OFFSET64)), preferred_alias("_stati64", "_stat32i64")]]
 [[if($extended_include_prefix("<features.h>")defined(__CRT_DOS_PRIMARY) && !defined(__USE_TIME_BITS64) && !defined(__USE_FILE_OFFSET64)), preferred_alias("_stat", "_stat32")]]
-[[if($extended_include_prefix("<features.h>") defined(__USE_FILE_OFFSET64)), preferred_alias("stat64")]]
-[[if($extended_include_prefix("<features.h>")!defined(__USE_FILE_OFFSET64)), preferred_alias("stat")]]
+[[if($extended_include_prefix("<features.h>", "<bits/types.h>") defined(__USE_FILE_OFFSET64) || __SIZEOF_OFF32_T__ == __SIZEOF_OFF64_T__), preferred_alias("stat64")]]
+[[if($extended_include_prefix("<features.h>", "<bits/types.h>")!defined(__USE_FILE_OFFSET64) || __SIZEOF_OFF32_T__ == __SIZEOF_OFF64_T__), preferred_alias("stat")]]
 int stat([[nonnull]] char const *__restrict filename,
          [[nonnull]] struct stat *__restrict buf);
 /* TODO: Emulate stat() for __USE_TIME_BITS64 compatibility! */
@@ -524,8 +524,8 @@ int stat([[nonnull]] char const *__restrict filename,
 [[if($extended_include_prefix("<features.h>")defined(__CRT_DOS_PRIMARY) &&  defined(__USE_TIME_BITS64)), preferred_alias("_fstat64", "_fstat64i32")]]
 [[if($extended_include_prefix("<features.h>")defined(__CRT_DOS_PRIMARY) && !defined(__USE_TIME_BITS64) && defined(__USE_FILE_OFFSET64)), preferred_alias("_fstati64", "_fstat32i64")]]
 [[if($extended_include_prefix("<features.h>")defined(__CRT_DOS_PRIMARY) && !defined(__USE_TIME_BITS64) && !defined(__USE_FILE_OFFSET64)), preferred_alias("_fstat", "_fstat32")]]
-[[if($extended_include_prefix("<features.h>") defined(__USE_FILE_OFFSET64)), preferred_alias("fstat64")]]
-[[if($extended_include_prefix("<features.h>")!defined(__USE_FILE_OFFSET64)), preferred_alias("fstat")]]
+[[if($extended_include_prefix("<features.h>", "<bits/types.h>") defined(__USE_FILE_OFFSET64) || __SIZEOF_OFF32_T__ == __SIZEOF_OFF64_T__), preferred_alias("fstat64")]]
+[[if($extended_include_prefix("<features.h>", "<bits/types.h>")!defined(__USE_FILE_OFFSET64) || __SIZEOF_OFF32_T__ == __SIZEOF_OFF64_T__), preferred_alias("fstat")]]
 int fstat($fd_t fd, [[nonnull]] struct stat *__restrict buf);
 
 %
@@ -537,8 +537,8 @@ int fstat($fd_t fd, [[nonnull]] struct stat *__restrict buf);
 [[if($extended_include_prefix("<features.h>")defined(__CRT_DOS_PRIMARY) &&  defined(__USE_TIME_BITS64)), preferred_alias("_stat64", "_stat64i32")]]
 [[if($extended_include_prefix("<features.h>")defined(__CRT_DOS_PRIMARY) && !defined(__USE_TIME_BITS64) && defined(__USE_FILE_OFFSET64)), preferred_alias("_stati64", "_stat32i64")]]
 [[if($extended_include_prefix("<features.h>")defined(__CRT_DOS_PRIMARY) && !defined(__USE_TIME_BITS64) && !defined(__USE_FILE_OFFSET64)), preferred_alias("_stat", "_stat32")]]
-[[if($extended_include_prefix("<features.h>") defined(__USE_FILE_OFFSET64)), preferred_alias("lstat64")]]
-[[if($extended_include_prefix("<features.h>")!defined(__USE_FILE_OFFSET64)), preferred_alias("lstat")]]
+[[if($extended_include_prefix("<features.h>", "<bits/types.h>") defined(__USE_FILE_OFFSET64) || __SIZEOF_OFF32_T__ == __SIZEOF_OFF64_T__), preferred_alias("lstat64")]]
+[[if($extended_include_prefix("<features.h>", "<bits/types.h>")!defined(__USE_FILE_OFFSET64) || __SIZEOF_OFF32_T__ == __SIZEOF_OFF64_T__), preferred_alias("lstat")]]
 int lstat([[nonnull]] char const *__restrict filename,
           [[nonnull]] struct stat *__restrict buf);
 %#endif /* __USE_XOPEN_EXTENDED || __USE_XOPEN2K */
@@ -617,8 +617,8 @@ INTDEF NONNULL((1, 2)) int NOTHROW_NCX(LIBCCALL libc_dos_stat64)(char const *__r
 [[no_crt_impl, no_crt_self_import]]
 [[decl_include("<bits/os/stat.h>", "<bits/types.h>")]]
 [[if(defined(__CRT_KOS_PRIMARY)), preferred_alias("kfstatat", "kfstatat64")]]
-[[if($extended_include_prefix("<features.h>") defined(__USE_FILE_OFFSET64)), preferred_alias("fstatat64")]]
-[[if($extended_include_prefix("<features.h>")!defined(__USE_FILE_OFFSET64)), preferred_alias("fstatat")]]
+[[if($extended_include_prefix("<features.h>", "<bits/types.h>") defined(__USE_FILE_OFFSET64) || __SIZEOF_OFF32_T__ == __SIZEOF_OFF64_T__), preferred_alias("fstatat64")]]
+[[if($extended_include_prefix("<features.h>", "<bits/types.h>")!defined(__USE_FILE_OFFSET64) || __SIZEOF_OFF32_T__ == __SIZEOF_OFF64_T__), preferred_alias("fstatat")]]
 int fstatat($fd_t dirfd, [[nonnull]] char const *__restrict filename,
             [[nonnull]] struct stat *__restrict buf, $atflag_t flags);
 
@@ -755,10 +755,10 @@ int utimensat32($fd_t dirfd, [[nonnull]] char const *filename,
 %
 %#ifdef __USE_ATFILE
 @@>> utimensat(2), utimensat64(2)
-@@@param flags: Set of `0|AT_SYMLINK_NOFOLLOW|AT_CHANGE_CTIME|AT_DOSPATH'
+@@@param flags: Set of `0 | AT_SYMLINK_NOFOLLOW | AT_CHANGE_CTIME | AT_DOSPATH'
 [[cp, no_crt_self_import]]
-[[if($extended_include_prefix("<features.h>") defined(__USE_TIME_BITS64)), preferred_alias("utimensat64")]]
-[[if($extended_include_prefix("<features.h>")!defined(__USE_TIME_BITS64)), preferred_alias("utimensat")]]
+[[if($extended_include_prefix("<features.h>", "<bits/types.h>")!defined(__USE_TIME_BITS64) || __SIZEOF_TIME32_T__ == __SIZEOF_TIME64_T__), preferred_alias("utimensat")]]
+[[if($extended_include_prefix("<features.h>", "<bits/types.h>") defined(__USE_TIME_BITS64) || __SIZEOF_TIME32_T__ == __SIZEOF_TIME64_T__), preferred_alias("utimensat64")]]
 [[userimpl, requires($has_function(utimensat32) || $has_function(utimensat64))]]
 [[impl_include("<asm/os/fcntl.h>")]]
 [[decl_include("<bits/os/timespec.h>", "<bits/types.h>")]]
@@ -791,7 +791,7 @@ int utimensat($fd_t dirfd, [[nonnull]] char const *filename,
 @@pp_endif@@
 @@pp_else@@
 @@pp_ifdef __AT_CHANGE_CTIME@@
-	struct @__timespec32@ tms[3];
+	struct timespec32 tms[3];
 	if (!times)
 		return utimensat32(dirfd, filename, NULL, flags);
 	tms[0].tv_sec  = (time32_t)times[0].tv_sec;
@@ -804,7 +804,7 @@ int utimensat($fd_t dirfd, [[nonnull]] char const *filename,
 	}
 	return utimensat32(dirfd, filename, tms, flags);
 @@pp_else@@
-	struct @__timespec32@ tms[2];
+	struct timespec32 tms[2];
 	if (!times)
 		return utimensat32(dirfd, filename, NULL, flags);
 	tms[0].tv_sec  = (time32_t)times[0].tv_sec;
@@ -817,7 +817,7 @@ int utimensat($fd_t dirfd, [[nonnull]] char const *filename,
 }
 
 %#ifdef __USE_TIME64
-[[cp, time64_variant_of(utimensat)]]
+[[cp, preferred_time64_variant_of(utimensat), doc_alias("utimensat")]]
 [[userimpl, requires_function(utimensat32)]]
 [[impl_include("<asm/os/fcntl.h>")]]
 [[decl_include("<bits/os/timespec.h>", "<bits/types.h>")]]
@@ -859,8 +859,8 @@ int futimens32($fd_t fd, [[nullable]] struct timespec const times[2 /*or:3*/]);
 %#ifdef __USE_XOPEN2K8
 @@>> futimens(2), futimens64(2)
 [[cp, no_crt_self_import]]
-[[if($extended_include_prefix("<features.h>") defined(__USE_TIME_BITS64)), preferred_alias("futimens64")]]
-[[if($extended_include_prefix("<features.h>")!defined(__USE_TIME_BITS64)), preferred_alias("futimens")]]
+[[if($extended_include_prefix("<features.h>", "<bits/types.h>") defined(__USE_TIME_BITS64) || __SIZEOF_TIME32_T__ == __SIZEOF_TIME64_T__), preferred_alias("futimens64")]]
+[[if($extended_include_prefix("<features.h>", "<bits/types.h>")!defined(__USE_TIME_BITS64) || __SIZEOF_TIME32_T__ == __SIZEOF_TIME64_T__), preferred_alias("futimens")]]
 [[userimpl, requires($has_function(futimens32) || $has_function(futimens64))]]
 [[decl_include("<bits/os/timespec.h>", "<bits/types.h>")]]
 int futimens($fd_t fd, [[nullable]] struct timespec const times[2 /*or:3*/]) {
@@ -886,7 +886,7 @@ int futimens($fd_t fd, [[nullable]] struct timespec const times[2 /*or:3*/]) {
 }
 
 %#ifdef __USE_TIME64
-[[cp, time64_variant_of(futimens)]]
+[[cp, preferred_time64_variant_of(futimens), doc_alias("futimens")]]
 [[userimpl, requires_function(futimens32)]]
 [[decl_include("<bits/os/timespec.h>", "<bits/types.h>")]]
 int futimens64($fd_t fd, [[nullable]] struct timespec64 const times[2 /*or:3*/]) {

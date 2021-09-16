@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x882aaee8 */
+/* HASH CRC-32:0xd5b41f52 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -32,10 +32,10 @@ __CREDIRECT(__ATTR_WUNUSED __ATTR_NONNULL((1, 2, 3)),__errno_t,__NOTHROW_RPC,__l
 #endif /* !__local___localdep_pthread_cond_reltimedwait32_np_defined && __CRT_HAVE_pthread_cond_reltimedwait_np */
 #ifndef __local___localdep_pthread_cond_reltimedwait64_np_defined
 #define __local___localdep_pthread_cond_reltimedwait64_np_defined 1
-#ifdef __CRT_HAVE_pthread_cond_reltimedwait64_np
-__CREDIRECT(__ATTR_WUNUSED __ATTR_NONNULL((1, 2, 3)),__errno_t,__NOTHROW_RPC,__localdep_pthread_cond_reltimedwait64_np,(__pthread_cond_t *__restrict __cond, __pthread_mutex_t *__restrict __mutex, struct __timespec64 const *__restrict __reltime),pthread_cond_reltimedwait64_np,(__cond,__mutex,__reltime))
-#elif defined(__CRT_HAVE_pthread_cond_reltimedwait_np) && __SIZEOF_TIME32_T__ == __SIZEOF_TIME64_T__
+#if defined(__CRT_HAVE_pthread_cond_reltimedwait_np) && __SIZEOF_TIME32_T__ == __SIZEOF_TIME64_T__
 __CREDIRECT(__ATTR_WUNUSED __ATTR_NONNULL((1, 2, 3)),__errno_t,__NOTHROW_RPC,__localdep_pthread_cond_reltimedwait64_np,(__pthread_cond_t *__restrict __cond, __pthread_mutex_t *__restrict __mutex, struct __timespec64 const *__restrict __reltime),pthread_cond_reltimedwait_np,(__cond,__mutex,__reltime))
+#elif defined(__CRT_HAVE_pthread_cond_reltimedwait64_np)
+__CREDIRECT(__ATTR_WUNUSED __ATTR_NONNULL((1, 2, 3)),__errno_t,__NOTHROW_RPC,__localdep_pthread_cond_reltimedwait64_np,(__pthread_cond_t *__restrict __cond, __pthread_mutex_t *__restrict __mutex, struct __timespec64 const *__restrict __reltime),pthread_cond_reltimedwait64_np,(__cond,__mutex,__reltime))
 #elif defined(__CRT_HAVE_pthread_cond_reltimedwait_np)
 __NAMESPACE_LOCAL_END
 #include <libc/local/pthread/pthread_cond_reltimedwait64_np.h>

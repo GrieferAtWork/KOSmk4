@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xe612035c */
+/* HASH CRC-32:0x7b8c4c58 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -31,10 +31,10 @@ __CREDIRECT(__ATTR_NONNULL((1, 2)),int,__NOTHROW_NCX,__localdep_utimes32,(char c
 #endif /* !__local___localdep_utimes32_defined && __CRT_HAVE_utimes */
 #ifndef __local___localdep_utimes64_defined
 #define __local___localdep_utimes64_defined 1
-#ifdef __CRT_HAVE_utimes64
-__CREDIRECT(__ATTR_NONNULL((1)),int,__NOTHROW_NCX,__localdep_utimes64,(char const *__file, struct __timeval64 const __tvp[2]),utimes64,(__file,__tvp))
-#elif defined(__CRT_HAVE_utimes) && __SIZEOF_TIME32_T__ == __SIZEOF_TIME64_T__
+#if defined(__CRT_HAVE_utimes) && __SIZEOF_TIME32_T__ == __SIZEOF_TIME64_T__
 __CREDIRECT(__ATTR_NONNULL((1)),int,__NOTHROW_NCX,__localdep_utimes64,(char const *__file, struct __timeval64 const __tvp[2]),utimes,(__file,__tvp))
+#elif defined(__CRT_HAVE_utimes64)
+__CREDIRECT(__ATTR_NONNULL((1)),int,__NOTHROW_NCX,__localdep_utimes64,(char const *__file, struct __timeval64 const __tvp[2]),utimes64,(__file,__tvp))
 #elif defined(__CRT_HAVE_utimes)
 __NAMESPACE_LOCAL_END
 #include <libc/local/sys.time/utimes64.h>

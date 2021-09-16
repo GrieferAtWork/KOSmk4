@@ -482,7 +482,7 @@
 	CB(PREFIX.crt.dos.string.memory.strsignal) \
 	CB(PREFIX.crt.dos.obstack) \
 	CB(PREFIX.crt.dos.system.auxv) \
-	CB(PREFIX.crt.dos.utility.aio PREFIX.crt.dos.utility.glob PREFIX.crt.dos.utility.klog PREFIX.crt.dos.utility.locale PREFIX.crt.dos.utility.monetary PREFIX.crt.dos.utility.mqueue PREFIX.crt.dos.utility.regex PREFIX.crt.dos.utility.search PREFIX.crt.dos.utility.shm PREFIX.crt.dos.utility.stdlib PREFIX.crt.dos.utility) \
+	CB(PREFIX.crt.dos.utility.aio PREFIX.crt.dos.utility.klog PREFIX.crt.dos.utility.locale PREFIX.crt.dos.utility.monetary PREFIX.crt.dos.utility.mqueue PREFIX.crt.dos.utility.regex PREFIX.crt.dos.utility.search PREFIX.crt.dos.utility.shm PREFIX.crt.dos.utility.stdlib PREFIX.crt.dos.utility) \
 	CB(PREFIX.crt.dos.i18n) \
 	CB(PREFIX.crt.dos.system.adjtime PREFIX.crt.dos.system.info PREFIX.crt.dos.system.ioperm PREFIX.crt.dos.system.mman PREFIX.crt.dos.system.ptrace PREFIX.crt.dos.system.reboot PREFIX.crt.dos.system.syslog PREFIX.crt.dos.system.utility PREFIX.crt.dos.system) \
 	CB(PREFIX.crt.dos.debug) \

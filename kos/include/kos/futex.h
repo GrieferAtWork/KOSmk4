@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x37a241b */
+/* HASH CRC-32:0xf3155ece */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -77,31 +77,7 @@ typedef __uintptr_t lfutex_t;
  */
 
 
-#if defined(__CRT_HAVE_lfutex64) && defined(__USE_TIME_BITS64)
-/* >> lfutex(2)
- * Provide the bottom-most API for implementing user-space synchronization on KOS
- * @param: futex_op: One of:
- *    - LFUTEX_WAKE:               (lfutex_t *uaddr, syscall_ulong_t LFUTEX_WAKE, size_t val = count)
- *    - LFUTEX_WAKEMASK:           (lfutex_t *uaddr, syscall_ulong_t LFUTEX_WAKEMASK, size_t val = count, lfutex_t mask_and, lfutex_t mask_or)
- *    - LFUTEX_NOP:                (lfutex_t *uaddr, syscall_ulong_t LFUTEX_NOP, size_t val = ignored)
- *    - LFUTEX_WAIT:               (lfutex_t *uaddr, syscall_ulong_t LFUTEX_WAIT, lfutex_t val = ignored, struct timespec const *timeout)
- *    - LFUTEX_WAIT_LOCK:          (lfutex_t *uaddr, syscall_ulong_t LFUTEX_WAIT_LOCK, lfutex_t val = lock_value, struct timespec const *timeout)
- *    - LFUTEX_WAIT_WHILE:         (lfutex_t *uaddr, syscall_ulong_t LFUTEX_WAIT_WHILE, lfutex_t val = value, struct timespec const *timeout)
- *    - LFUTEX_WAIT_UNTIL:         (lfutex_t *uaddr, syscall_ulong_t LFUTEX_WAIT_UNTIL, lfutex_t val = value, struct timespec const *timeout)
- *    - LFUTEX_WAIT_WHILE_ABOVE:   (lfutex_t *uaddr, syscall_ulong_t LFUTEX_WAIT_WHILE_ABOVE, lfutex_t val = value, struct timespec const *timeout)
- *    - LFUTEX_WAIT_WHILE_BELOW:   (lfutex_t *uaddr, syscall_ulong_t LFUTEX_WAIT_WHILE_BELOW, lfutex_t val = value, struct timespec const *timeout)
- *    - LFUTEX_WAIT_WHILE_BITMASK: (lfutex_t *uaddr, syscall_ulong_t LFUTEX_WAIT_WHILE_BITMASK, lfutex_t val = bitmask, struct timespec const *timeout, lfutex_t setmask)
- *    - LFUTEX_WAIT_UNTIL_BITMASK: (lfutex_t *uaddr, syscall_ulong_t LFUTEX_WAIT_UNTIL_BITMASK, lfutex_t val = bitmask, struct timespec const *timeout, lfutex_t setmask)
- *    - LFUTEX_WAIT_WHILE_CMPXCH:  (lfutex_t *uaddr, syscall_ulong_t LFUTEX_WAIT_WHILE_CMPXCH, lfutex_t val = oldval, struct timespec const *timeout, lfutex_t newval)
- *    - LFUTEX_WAIT_UNTIL_CMPXCH:  (lfutex_t *uaddr, syscall_ulong_t LFUTEX_WAIT_UNTIL_CMPXCH, lfutex_t val = oldval, struct timespec const *timeout, lfutex_t newval)
- * @param: timeout: Timeout for wait operations (s.a. `LFUTEX_WAIT_FLAG_TIMEOUT_*')
- * @return: * : Depending on `futex_op'
- * @return: -1:EFAULT:    A faulty pointer was given
- * @return: -1:EINVAL:    The given `futex_op' is invalid
- * @return: -1:EINTR:     A blocking futex-wait operation was interrupted
- * @return: -1:ETIMEDOUT: A blocking futex-wait operation has timed out */
-__CVREDIRECT(__ATTR_NONNULL((1)),__SSIZE_TYPE__,__NOTHROW_RPC,lfutex,(lfutex_t *__uaddr, __syscall_ulong_t __futex_op, lfutex_t __val),lfutex64,(__uaddr,__futex_op,__val),__val,2,(void *,__UINTPTR_TYPE__))
-#elif defined(__CRT_HAVE_lfutex) && !defined(__USE_TIME_BITS64)
+#if defined(__CRT_HAVE_lfutex) && (!defined(__USE_TIME_BITS64) || __SIZEOF_TIME32_T__ == __SIZEOF_TIME64_T__)
 /* >> lfutex(2)
  * Provide the bottom-most API for implementing user-space synchronization on KOS
  * @param: futex_op: One of:
@@ -125,6 +101,30 @@ __CVREDIRECT(__ATTR_NONNULL((1)),__SSIZE_TYPE__,__NOTHROW_RPC,lfutex,(lfutex_t *
  * @return: -1:EINTR:     A blocking futex-wait operation was interrupted
  * @return: -1:ETIMEDOUT: A blocking futex-wait operation has timed out */
 __LIBC __ATTR_NONNULL((1)) __SSIZE_TYPE__ __NOTHROW_RPC(__VLIBCCALL lfutex)(lfutex_t *__uaddr, __syscall_ulong_t __futex_op, lfutex_t __val, ...) __CASMNAME_SAME("lfutex");
+#elif defined(__CRT_HAVE_lfutex64) && (defined(__USE_TIME_BITS64) || __SIZEOF_TIME32_T__ == __SIZEOF_TIME64_T__)
+/* >> lfutex(2)
+ * Provide the bottom-most API for implementing user-space synchronization on KOS
+ * @param: futex_op: One of:
+ *    - LFUTEX_WAKE:               (lfutex_t *uaddr, syscall_ulong_t LFUTEX_WAKE, size_t val = count)
+ *    - LFUTEX_WAKEMASK:           (lfutex_t *uaddr, syscall_ulong_t LFUTEX_WAKEMASK, size_t val = count, lfutex_t mask_and, lfutex_t mask_or)
+ *    - LFUTEX_NOP:                (lfutex_t *uaddr, syscall_ulong_t LFUTEX_NOP, size_t val = ignored)
+ *    - LFUTEX_WAIT:               (lfutex_t *uaddr, syscall_ulong_t LFUTEX_WAIT, lfutex_t val = ignored, struct timespec const *timeout)
+ *    - LFUTEX_WAIT_LOCK:          (lfutex_t *uaddr, syscall_ulong_t LFUTEX_WAIT_LOCK, lfutex_t val = lock_value, struct timespec const *timeout)
+ *    - LFUTEX_WAIT_WHILE:         (lfutex_t *uaddr, syscall_ulong_t LFUTEX_WAIT_WHILE, lfutex_t val = value, struct timespec const *timeout)
+ *    - LFUTEX_WAIT_UNTIL:         (lfutex_t *uaddr, syscall_ulong_t LFUTEX_WAIT_UNTIL, lfutex_t val = value, struct timespec const *timeout)
+ *    - LFUTEX_WAIT_WHILE_ABOVE:   (lfutex_t *uaddr, syscall_ulong_t LFUTEX_WAIT_WHILE_ABOVE, lfutex_t val = value, struct timespec const *timeout)
+ *    - LFUTEX_WAIT_WHILE_BELOW:   (lfutex_t *uaddr, syscall_ulong_t LFUTEX_WAIT_WHILE_BELOW, lfutex_t val = value, struct timespec const *timeout)
+ *    - LFUTEX_WAIT_WHILE_BITMASK: (lfutex_t *uaddr, syscall_ulong_t LFUTEX_WAIT_WHILE_BITMASK, lfutex_t val = bitmask, struct timespec const *timeout, lfutex_t setmask)
+ *    - LFUTEX_WAIT_UNTIL_BITMASK: (lfutex_t *uaddr, syscall_ulong_t LFUTEX_WAIT_UNTIL_BITMASK, lfutex_t val = bitmask, struct timespec const *timeout, lfutex_t setmask)
+ *    - LFUTEX_WAIT_WHILE_CMPXCH:  (lfutex_t *uaddr, syscall_ulong_t LFUTEX_WAIT_WHILE_CMPXCH, lfutex_t val = oldval, struct timespec const *timeout, lfutex_t newval)
+ *    - LFUTEX_WAIT_UNTIL_CMPXCH:  (lfutex_t *uaddr, syscall_ulong_t LFUTEX_WAIT_UNTIL_CMPXCH, lfutex_t val = oldval, struct timespec const *timeout, lfutex_t newval)
+ * @param: timeout: Timeout for wait operations (s.a. `LFUTEX_WAIT_FLAG_TIMEOUT_*')
+ * @return: * : Depending on `futex_op'
+ * @return: -1:EFAULT:    A faulty pointer was given
+ * @return: -1:EINVAL:    The given `futex_op' is invalid
+ * @return: -1:EINTR:     A blocking futex-wait operation was interrupted
+ * @return: -1:ETIMEDOUT: A blocking futex-wait operation has timed out */
+__CVREDIRECT(__ATTR_NONNULL((1)),__SSIZE_TYPE__,__NOTHROW_RPC,lfutex,(lfutex_t *__uaddr, __syscall_ulong_t __futex_op, lfutex_t __val),lfutex64,(__uaddr,__futex_op,__val),__val,2,(void *,__UINTPTR_TYPE__))
 #elif defined(__CRT_HAVE_lfutex64) || defined(__CRT_HAVE_lfutex)
 #include <libc/local/kos.futex/lfutex.h>
 /* >> lfutex(2)
@@ -157,31 +157,7 @@ __NAMESPACE_LOCAL_USING_OR_IMPL(lfutex, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_NO
 #endif /* ... */
 
 #ifdef __USE_TIME64
-#ifdef __CRT_HAVE_lfutex64
-/* >> lfutex(2)
- * Provide the bottom-most API for implementing user-space synchronization on KOS
- * @param: futex_op: One of:
- *    - LFUTEX_WAKE:               (lfutex_t *uaddr, syscall_ulong_t LFUTEX_WAKE, size_t val = count)
- *    - LFUTEX_WAKEMASK:           (lfutex_t *uaddr, syscall_ulong_t LFUTEX_WAKEMASK, size_t val = count, lfutex_t mask_and, lfutex_t mask_or)
- *    - LFUTEX_NOP:                (lfutex_t *uaddr, syscall_ulong_t LFUTEX_NOP, size_t val = ignored)
- *    - LFUTEX_WAIT:               (lfutex_t *uaddr, syscall_ulong_t LFUTEX_WAIT, lfutex_t val = ignored, struct timespec const *timeout)
- *    - LFUTEX_WAIT_LOCK:          (lfutex_t *uaddr, syscall_ulong_t LFUTEX_WAIT_LOCK, lfutex_t val = lock_value, struct timespec const *timeout)
- *    - LFUTEX_WAIT_WHILE:         (lfutex_t *uaddr, syscall_ulong_t LFUTEX_WAIT_WHILE, lfutex_t val = value, struct timespec const *timeout)
- *    - LFUTEX_WAIT_UNTIL:         (lfutex_t *uaddr, syscall_ulong_t LFUTEX_WAIT_UNTIL, lfutex_t val = value, struct timespec const *timeout)
- *    - LFUTEX_WAIT_WHILE_ABOVE:   (lfutex_t *uaddr, syscall_ulong_t LFUTEX_WAIT_WHILE_ABOVE, lfutex_t val = value, struct timespec const *timeout)
- *    - LFUTEX_WAIT_WHILE_BELOW:   (lfutex_t *uaddr, syscall_ulong_t LFUTEX_WAIT_WHILE_BELOW, lfutex_t val = value, struct timespec const *timeout)
- *    - LFUTEX_WAIT_WHILE_BITMASK: (lfutex_t *uaddr, syscall_ulong_t LFUTEX_WAIT_WHILE_BITMASK, lfutex_t val = bitmask, struct timespec const *timeout, lfutex_t setmask)
- *    - LFUTEX_WAIT_UNTIL_BITMASK: (lfutex_t *uaddr, syscall_ulong_t LFUTEX_WAIT_UNTIL_BITMASK, lfutex_t val = bitmask, struct timespec const *timeout, lfutex_t setmask)
- *    - LFUTEX_WAIT_WHILE_CMPXCH:  (lfutex_t *uaddr, syscall_ulong_t LFUTEX_WAIT_WHILE_CMPXCH, lfutex_t val = oldval, struct timespec const *timeout, lfutex_t newval)
- *    - LFUTEX_WAIT_UNTIL_CMPXCH:  (lfutex_t *uaddr, syscall_ulong_t LFUTEX_WAIT_UNTIL_CMPXCH, lfutex_t val = oldval, struct timespec const *timeout, lfutex_t newval)
- * @param: timeout: Timeout for wait operations (s.a. `LFUTEX_WAIT_FLAG_TIMEOUT_*')
- * @return: * : Depending on `futex_op'
- * @return: -1:EFAULT:    A faulty pointer was given
- * @return: -1:EINVAL:    The given `futex_op' is invalid
- * @return: -1:EINTR:     A blocking futex-wait operation was interrupted
- * @return: -1:ETIMEDOUT: A blocking futex-wait operation has timed out */
-__LIBC __ATTR_NONNULL((1)) __SSIZE_TYPE__ __NOTHROW_RPC(__VLIBCCALL lfutex64)(lfutex_t *__uaddr, __syscall_ulong_t __futex_op, lfutex_t __val, ...) __CASMNAME_SAME("lfutex64");
-#elif defined(__CRT_HAVE_lfutex) && __SIZEOF_TIME32_T__ == __SIZEOF_TIME64_T__
+#if defined(__CRT_HAVE_lfutex) && __SIZEOF_TIME32_T__ == __SIZEOF_TIME64_T__
 /* >> lfutex(2)
  * Provide the bottom-most API for implementing user-space synchronization on KOS
  * @param: futex_op: One of:
@@ -205,6 +181,30 @@ __LIBC __ATTR_NONNULL((1)) __SSIZE_TYPE__ __NOTHROW_RPC(__VLIBCCALL lfutex64)(lf
  * @return: -1:EINTR:     A blocking futex-wait operation was interrupted
  * @return: -1:ETIMEDOUT: A blocking futex-wait operation has timed out */
 __CVREDIRECT(__ATTR_NONNULL((1)),__SSIZE_TYPE__,__NOTHROW_RPC,lfutex64,(lfutex_t *__uaddr, __syscall_ulong_t __futex_op, lfutex_t __val),lfutex,(__uaddr,__futex_op,__val),__val,2,(void *,__UINTPTR_TYPE__))
+#elif defined(__CRT_HAVE_lfutex64)
+/* >> lfutex(2)
+ * Provide the bottom-most API for implementing user-space synchronization on KOS
+ * @param: futex_op: One of:
+ *    - LFUTEX_WAKE:               (lfutex_t *uaddr, syscall_ulong_t LFUTEX_WAKE, size_t val = count)
+ *    - LFUTEX_WAKEMASK:           (lfutex_t *uaddr, syscall_ulong_t LFUTEX_WAKEMASK, size_t val = count, lfutex_t mask_and, lfutex_t mask_or)
+ *    - LFUTEX_NOP:                (lfutex_t *uaddr, syscall_ulong_t LFUTEX_NOP, size_t val = ignored)
+ *    - LFUTEX_WAIT:               (lfutex_t *uaddr, syscall_ulong_t LFUTEX_WAIT, lfutex_t val = ignored, struct timespec const *timeout)
+ *    - LFUTEX_WAIT_LOCK:          (lfutex_t *uaddr, syscall_ulong_t LFUTEX_WAIT_LOCK, lfutex_t val = lock_value, struct timespec const *timeout)
+ *    - LFUTEX_WAIT_WHILE:         (lfutex_t *uaddr, syscall_ulong_t LFUTEX_WAIT_WHILE, lfutex_t val = value, struct timespec const *timeout)
+ *    - LFUTEX_WAIT_UNTIL:         (lfutex_t *uaddr, syscall_ulong_t LFUTEX_WAIT_UNTIL, lfutex_t val = value, struct timespec const *timeout)
+ *    - LFUTEX_WAIT_WHILE_ABOVE:   (lfutex_t *uaddr, syscall_ulong_t LFUTEX_WAIT_WHILE_ABOVE, lfutex_t val = value, struct timespec const *timeout)
+ *    - LFUTEX_WAIT_WHILE_BELOW:   (lfutex_t *uaddr, syscall_ulong_t LFUTEX_WAIT_WHILE_BELOW, lfutex_t val = value, struct timespec const *timeout)
+ *    - LFUTEX_WAIT_WHILE_BITMASK: (lfutex_t *uaddr, syscall_ulong_t LFUTEX_WAIT_WHILE_BITMASK, lfutex_t val = bitmask, struct timespec const *timeout, lfutex_t setmask)
+ *    - LFUTEX_WAIT_UNTIL_BITMASK: (lfutex_t *uaddr, syscall_ulong_t LFUTEX_WAIT_UNTIL_BITMASK, lfutex_t val = bitmask, struct timespec const *timeout, lfutex_t setmask)
+ *    - LFUTEX_WAIT_WHILE_CMPXCH:  (lfutex_t *uaddr, syscall_ulong_t LFUTEX_WAIT_WHILE_CMPXCH, lfutex_t val = oldval, struct timespec const *timeout, lfutex_t newval)
+ *    - LFUTEX_WAIT_UNTIL_CMPXCH:  (lfutex_t *uaddr, syscall_ulong_t LFUTEX_WAIT_UNTIL_CMPXCH, lfutex_t val = oldval, struct timespec const *timeout, lfutex_t newval)
+ * @param: timeout: Timeout for wait operations (s.a. `LFUTEX_WAIT_FLAG_TIMEOUT_*')
+ * @return: * : Depending on `futex_op'
+ * @return: -1:EFAULT:    A faulty pointer was given
+ * @return: -1:EINVAL:    The given `futex_op' is invalid
+ * @return: -1:EINTR:     A blocking futex-wait operation was interrupted
+ * @return: -1:ETIMEDOUT: A blocking futex-wait operation has timed out */
+__LIBC __ATTR_NONNULL((1)) __SSIZE_TYPE__ __NOTHROW_RPC(__VLIBCCALL lfutex64)(lfutex_t *__uaddr, __syscall_ulong_t __futex_op, lfutex_t __val, ...) __CASMNAME_SAME("lfutex64");
 #elif defined(__CRT_HAVE_lfutex)
 #include <libc/local/kos.futex/lfutex64.h>
 /* >> lfutex(2)
@@ -514,15 +514,7 @@ __CDECLARE(__ATTR_NONNULL((1)),int,__NOTHROW_RPC,futex_waitwhile_allbits,(lfutex
  * @return: -1:EINTR:  Operation was interrupted */
 __NAMESPACE_LOCAL_USING_OR_IMPL(futex_waitwhile_allbits, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_NONNULL((1)) int __NOTHROW_RPC(__LIBCCALL futex_waitwhile_allbits)(lfutex_t *__uaddr, lfutex_t __bitmask) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(futex_waitwhile_allbits))(__uaddr, __bitmask); })
 #endif /* ... */
-#if defined(__CRT_HAVE_futex_timedwaitwhile64) && defined(__USE_TIME_BITS64)
-/* Wait if `*uaddr == equal_to_value'
- * @return: 0: Did wait
- * @return: 1: Didn't wait
- * @return: -1:EFAULT:    A faulty pointer was given
- * @return: -1:EINTR:     Operation was interrupted
- * @return: -1:ETIMEDOUT: The given `rel_timeout' has expired */
-__CREDIRECT(__ATTR_NONNULL((1)),int,__NOTHROW_RPC,futex_timedwaitwhile,(lfutex_t *__uaddr, lfutex_t __equal_to_value, struct timespec const *__rel_timeout),futex_timedwaitwhile64,(__uaddr,__equal_to_value,__rel_timeout))
-#elif defined(__CRT_HAVE_futex_timedwaitwhile) && !defined(__USE_TIME_BITS64)
+#if defined(__CRT_HAVE_futex_timedwaitwhile) && (!defined(__USE_TIME_BITS64) || __SIZEOF_TIME32_T__ == __SIZEOF_TIME64_T__)
 /* Wait if `*uaddr == equal_to_value'
  * @return: 0: Did wait
  * @return: 1: Didn't wait
@@ -530,6 +522,14 @@ __CREDIRECT(__ATTR_NONNULL((1)),int,__NOTHROW_RPC,futex_timedwaitwhile,(lfutex_t
  * @return: -1:EINTR:     Operation was interrupted
  * @return: -1:ETIMEDOUT: The given `rel_timeout' has expired */
 __CDECLARE(__ATTR_NONNULL((1)),int,__NOTHROW_RPC,futex_timedwaitwhile,(lfutex_t *__uaddr, lfutex_t __equal_to_value, struct timespec const *__rel_timeout),(__uaddr,__equal_to_value,__rel_timeout))
+#elif defined(__CRT_HAVE_futex_timedwaitwhile64) && (defined(__USE_TIME_BITS64) || __SIZEOF_TIME32_T__ == __SIZEOF_TIME64_T__)
+/* Wait if `*uaddr == equal_to_value'
+ * @return: 0: Did wait
+ * @return: 1: Didn't wait
+ * @return: -1:EFAULT:    A faulty pointer was given
+ * @return: -1:EINTR:     Operation was interrupted
+ * @return: -1:ETIMEDOUT: The given `rel_timeout' has expired */
+__CREDIRECT(__ATTR_NONNULL((1)),int,__NOTHROW_RPC,futex_timedwaitwhile,(lfutex_t *__uaddr, lfutex_t __equal_to_value, struct timespec const *__rel_timeout),futex_timedwaitwhile64,(__uaddr,__equal_to_value,__rel_timeout))
 #elif defined(__CRT_HAVE_lfutex64) || defined(__CRT_HAVE_lfutex)
 #include <libc/local/kos.futex/futex_timedwaitwhile.h>
 /* Wait if `*uaddr == equal_to_value'
@@ -540,15 +540,7 @@ __CDECLARE(__ATTR_NONNULL((1)),int,__NOTHROW_RPC,futex_timedwaitwhile,(lfutex_t 
  * @return: -1:ETIMEDOUT: The given `rel_timeout' has expired */
 __NAMESPACE_LOCAL_USING_OR_IMPL(futex_timedwaitwhile, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_NONNULL((1)) int __NOTHROW_RPC(__LIBCCALL futex_timedwaitwhile)(lfutex_t *__uaddr, lfutex_t __equal_to_value, struct timespec const *__rel_timeout) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(futex_timedwaitwhile))(__uaddr, __equal_to_value, __rel_timeout); })
 #endif /* ... */
-#if defined(__CRT_HAVE_futex_timedwaituntil64) && defined(__USE_TIME_BITS64)
-/* Wait if `*uaddr != not_equal_to_value'
- * @return: 0: Did wait
- * @return: 1: Didn't wait
- * @return: -1:EFAULT:    A faulty pointer was given
- * @return: -1:EINTR:     Operation was interrupted
- * @return: -1:ETIMEDOUT: The given `rel_timeout' has expired */
-__CREDIRECT(__ATTR_NONNULL((1)),int,__NOTHROW_RPC,futex_timedwaituntil,(lfutex_t *__uaddr, lfutex_t __not_equal_to_value, struct timespec const *__rel_timeout),futex_timedwaituntil64,(__uaddr,__not_equal_to_value,__rel_timeout))
-#elif defined(__CRT_HAVE_futex_timedwaituntil) && !defined(__USE_TIME_BITS64)
+#if defined(__CRT_HAVE_futex_timedwaituntil) && (!defined(__USE_TIME_BITS64) || __SIZEOF_TIME32_T__ == __SIZEOF_TIME64_T__)
 /* Wait if `*uaddr != not_equal_to_value'
  * @return: 0: Did wait
  * @return: 1: Didn't wait
@@ -556,6 +548,14 @@ __CREDIRECT(__ATTR_NONNULL((1)),int,__NOTHROW_RPC,futex_timedwaituntil,(lfutex_t
  * @return: -1:EINTR:     Operation was interrupted
  * @return: -1:ETIMEDOUT: The given `rel_timeout' has expired */
 __CDECLARE(__ATTR_NONNULL((1)),int,__NOTHROW_RPC,futex_timedwaituntil,(lfutex_t *__uaddr, lfutex_t __not_equal_to_value, struct timespec const *__rel_timeout),(__uaddr,__not_equal_to_value,__rel_timeout))
+#elif defined(__CRT_HAVE_futex_timedwaituntil64) && (defined(__USE_TIME_BITS64) || __SIZEOF_TIME32_T__ == __SIZEOF_TIME64_T__)
+/* Wait if `*uaddr != not_equal_to_value'
+ * @return: 0: Did wait
+ * @return: 1: Didn't wait
+ * @return: -1:EFAULT:    A faulty pointer was given
+ * @return: -1:EINTR:     Operation was interrupted
+ * @return: -1:ETIMEDOUT: The given `rel_timeout' has expired */
+__CREDIRECT(__ATTR_NONNULL((1)),int,__NOTHROW_RPC,futex_timedwaituntil,(lfutex_t *__uaddr, lfutex_t __not_equal_to_value, struct timespec const *__rel_timeout),futex_timedwaituntil64,(__uaddr,__not_equal_to_value,__rel_timeout))
 #elif defined(__CRT_HAVE_lfutex64) || defined(__CRT_HAVE_lfutex)
 #include <libc/local/kos.futex/futex_timedwaituntil.h>
 /* Wait if `*uaddr != not_equal_to_value'
@@ -566,15 +566,7 @@ __CDECLARE(__ATTR_NONNULL((1)),int,__NOTHROW_RPC,futex_timedwaituntil,(lfutex_t 
  * @return: -1:ETIMEDOUT: The given `rel_timeout' has expired */
 __NAMESPACE_LOCAL_USING_OR_IMPL(futex_timedwaituntil, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_NONNULL((1)) int __NOTHROW_RPC(__LIBCCALL futex_timedwaituntil)(lfutex_t *__uaddr, lfutex_t __not_equal_to_value, struct timespec const *__rel_timeout) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(futex_timedwaituntil))(__uaddr, __not_equal_to_value, __rel_timeout); })
 #endif /* ... */
-#if defined(__CRT_HAVE_futex_timedwaitwhile64) && defined(__USE_TIME_BITS64)
-/* Wait if `*uaddr == equal_to_value'
- * @return: 0: Did wait
- * @return: 1: Didn't wait
- * @return: -1:EFAULT:    A faulty pointer was given
- * @return: -1:EINTR:     Operation was interrupted
- * @return: -1:ETIMEDOUT: The given `rel_timeout' has expired */
-__CREDIRECT(__ATTR_NONNULL((1)),int,__NOTHROW_RPC,futex_timedwaitwhile_equal,(lfutex_t *__uaddr, lfutex_t __equal_to_value, struct timespec const *__rel_timeout),futex_timedwaitwhile64,(__uaddr,__equal_to_value,__rel_timeout))
-#elif defined(__CRT_HAVE_futex_timedwaitwhile) && !defined(__USE_TIME_BITS64)
+#if defined(__CRT_HAVE_futex_timedwaitwhile) && (!defined(__USE_TIME_BITS64) || __SIZEOF_TIME32_T__ == __SIZEOF_TIME64_T__)
 /* Wait if `*uaddr == equal_to_value'
  * @return: 0: Did wait
  * @return: 1: Didn't wait
@@ -582,6 +574,14 @@ __CREDIRECT(__ATTR_NONNULL((1)),int,__NOTHROW_RPC,futex_timedwaitwhile_equal,(lf
  * @return: -1:EINTR:     Operation was interrupted
  * @return: -1:ETIMEDOUT: The given `rel_timeout' has expired */
 __CREDIRECT(__ATTR_NONNULL((1)),int,__NOTHROW_RPC,futex_timedwaitwhile_equal,(lfutex_t *__uaddr, lfutex_t __equal_to_value, struct timespec const *__rel_timeout),futex_timedwaitwhile,(__uaddr,__equal_to_value,__rel_timeout))
+#elif defined(__CRT_HAVE_futex_timedwaitwhile64) && (defined(__USE_TIME_BITS64) || __SIZEOF_TIME32_T__ == __SIZEOF_TIME64_T__)
+/* Wait if `*uaddr == equal_to_value'
+ * @return: 0: Did wait
+ * @return: 1: Didn't wait
+ * @return: -1:EFAULT:    A faulty pointer was given
+ * @return: -1:EINTR:     Operation was interrupted
+ * @return: -1:ETIMEDOUT: The given `rel_timeout' has expired */
+__CREDIRECT(__ATTR_NONNULL((1)),int,__NOTHROW_RPC,futex_timedwaitwhile_equal,(lfutex_t *__uaddr, lfutex_t __equal_to_value, struct timespec const *__rel_timeout),futex_timedwaitwhile64,(__uaddr,__equal_to_value,__rel_timeout))
 #elif defined(__CRT_HAVE_lfutex64) || defined(__CRT_HAVE_lfutex)
 #include <libc/local/kos.futex/futex_timedwaitwhile.h>
 /* Wait if `*uaddr == equal_to_value'
@@ -592,15 +592,7 @@ __CREDIRECT(__ATTR_NONNULL((1)),int,__NOTHROW_RPC,futex_timedwaitwhile_equal,(lf
  * @return: -1:ETIMEDOUT: The given `rel_timeout' has expired */
 __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_NONNULL((1)) int __NOTHROW_RPC(__LIBCCALL futex_timedwaitwhile_equal)(lfutex_t *__uaddr, lfutex_t __equal_to_value, struct timespec const *__rel_timeout) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(futex_timedwaitwhile))(__uaddr, __equal_to_value, __rel_timeout); }
 #endif /* ... */
-#if defined(__CRT_HAVE_futex_timedwaituntil64) && defined(__USE_TIME_BITS64)
-/* Wait if `*uaddr != not_equal_to_value'
- * @return: 0: Did wait
- * @return: 1: Didn't wait
- * @return: -1:EFAULT:    A faulty pointer was given
- * @return: -1:EINTR:     Operation was interrupted
- * @return: -1:ETIMEDOUT: The given `rel_timeout' has expired */
-__CREDIRECT(__ATTR_NONNULL((1)),int,__NOTHROW_RPC,futex_timedwaitwhile_notequal,(lfutex_t *__uaddr, lfutex_t __not_equal_to_value, struct timespec const *__rel_timeout),futex_timedwaituntil64,(__uaddr,__not_equal_to_value,__rel_timeout))
-#elif defined(__CRT_HAVE_futex_timedwaituntil) && !defined(__USE_TIME_BITS64)
+#if defined(__CRT_HAVE_futex_timedwaituntil) && (!defined(__USE_TIME_BITS64) || __SIZEOF_TIME32_T__ == __SIZEOF_TIME64_T__)
 /* Wait if `*uaddr != not_equal_to_value'
  * @return: 0: Did wait
  * @return: 1: Didn't wait
@@ -608,6 +600,14 @@ __CREDIRECT(__ATTR_NONNULL((1)),int,__NOTHROW_RPC,futex_timedwaitwhile_notequal,
  * @return: -1:EINTR:     Operation was interrupted
  * @return: -1:ETIMEDOUT: The given `rel_timeout' has expired */
 __CREDIRECT(__ATTR_NONNULL((1)),int,__NOTHROW_RPC,futex_timedwaitwhile_notequal,(lfutex_t *__uaddr, lfutex_t __not_equal_to_value, struct timespec const *__rel_timeout),futex_timedwaituntil,(__uaddr,__not_equal_to_value,__rel_timeout))
+#elif defined(__CRT_HAVE_futex_timedwaituntil64) && (defined(__USE_TIME_BITS64) || __SIZEOF_TIME32_T__ == __SIZEOF_TIME64_T__)
+/* Wait if `*uaddr != not_equal_to_value'
+ * @return: 0: Did wait
+ * @return: 1: Didn't wait
+ * @return: -1:EFAULT:    A faulty pointer was given
+ * @return: -1:EINTR:     Operation was interrupted
+ * @return: -1:ETIMEDOUT: The given `rel_timeout' has expired */
+__CREDIRECT(__ATTR_NONNULL((1)),int,__NOTHROW_RPC,futex_timedwaitwhile_notequal,(lfutex_t *__uaddr, lfutex_t __not_equal_to_value, struct timespec const *__rel_timeout),futex_timedwaituntil64,(__uaddr,__not_equal_to_value,__rel_timeout))
 #elif defined(__CRT_HAVE_lfutex64) || defined(__CRT_HAVE_lfutex)
 #include <libc/local/kos.futex/futex_timedwaituntil.h>
 /* Wait if `*uaddr != not_equal_to_value'
@@ -618,15 +618,7 @@ __CREDIRECT(__ATTR_NONNULL((1)),int,__NOTHROW_RPC,futex_timedwaitwhile_notequal,
  * @return: -1:ETIMEDOUT: The given `rel_timeout' has expired */
 __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_NONNULL((1)) int __NOTHROW_RPC(__LIBCCALL futex_timedwaitwhile_notequal)(lfutex_t *__uaddr, lfutex_t __not_equal_to_value, struct timespec const *__rel_timeout) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(futex_timedwaituntil))(__uaddr, __not_equal_to_value, __rel_timeout); }
 #endif /* ... */
-#if defined(__CRT_HAVE_futex_timedwaitwhile_above64) && defined(__USE_TIME_BITS64)
-/* Wait if `*uaddr > above_value'
- * @return: 0: Did wait
- * @return: 1: Didn't wait
- * @return: -1:EFAULT:    A faulty pointer was given
- * @return: -1:EINTR:     Operation was interrupted
- * @return: -1:ETIMEDOUT: The given `rel_timeout' has expired */
-__CREDIRECT(__ATTR_NONNULL((1)),int,__NOTHROW_RPC,futex_timedwaitwhile_above,(lfutex_t *__uaddr, lfutex_t __above_value, struct timespec const *__rel_timeout),futex_timedwaitwhile_above64,(__uaddr,__above_value,__rel_timeout))
-#elif defined(__CRT_HAVE_futex_timedwaitwhile_above) && !defined(__USE_TIME_BITS64)
+#if defined(__CRT_HAVE_futex_timedwaitwhile_above) && (!defined(__USE_TIME_BITS64) || __SIZEOF_TIME32_T__ == __SIZEOF_TIME64_T__)
 /* Wait if `*uaddr > above_value'
  * @return: 0: Did wait
  * @return: 1: Didn't wait
@@ -634,6 +626,14 @@ __CREDIRECT(__ATTR_NONNULL((1)),int,__NOTHROW_RPC,futex_timedwaitwhile_above,(lf
  * @return: -1:EINTR:     Operation was interrupted
  * @return: -1:ETIMEDOUT: The given `rel_timeout' has expired */
 __CDECLARE(__ATTR_NONNULL((1)),int,__NOTHROW_RPC,futex_timedwaitwhile_above,(lfutex_t *__uaddr, lfutex_t __above_value, struct timespec const *__rel_timeout),(__uaddr,__above_value,__rel_timeout))
+#elif defined(__CRT_HAVE_futex_timedwaitwhile_above64) && (defined(__USE_TIME_BITS64) || __SIZEOF_TIME32_T__ == __SIZEOF_TIME64_T__)
+/* Wait if `*uaddr > above_value'
+ * @return: 0: Did wait
+ * @return: 1: Didn't wait
+ * @return: -1:EFAULT:    A faulty pointer was given
+ * @return: -1:EINTR:     Operation was interrupted
+ * @return: -1:ETIMEDOUT: The given `rel_timeout' has expired */
+__CREDIRECT(__ATTR_NONNULL((1)),int,__NOTHROW_RPC,futex_timedwaitwhile_above,(lfutex_t *__uaddr, lfutex_t __above_value, struct timespec const *__rel_timeout),futex_timedwaitwhile_above64,(__uaddr,__above_value,__rel_timeout))
 #elif defined(__CRT_HAVE_lfutex64) || defined(__CRT_HAVE_lfutex)
 #include <libc/local/kos.futex/futex_timedwaitwhile_above.h>
 /* Wait if `*uaddr > above_value'
@@ -644,15 +644,7 @@ __CDECLARE(__ATTR_NONNULL((1)),int,__NOTHROW_RPC,futex_timedwaitwhile_above,(lfu
  * @return: -1:ETIMEDOUT: The given `rel_timeout' has expired */
 __NAMESPACE_LOCAL_USING_OR_IMPL(futex_timedwaitwhile_above, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_NONNULL((1)) int __NOTHROW_RPC(__LIBCCALL futex_timedwaitwhile_above)(lfutex_t *__uaddr, lfutex_t __above_value, struct timespec const *__rel_timeout) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(futex_timedwaitwhile_above))(__uaddr, __above_value, __rel_timeout); })
 #endif /* ... */
-#if defined(__CRT_HAVE_futex_timedwaitwhile_below64) && defined(__USE_TIME_BITS64)
-/* Wait if `*uaddr < below_value'
- * @return: 0: Did wait
- * @return: 1: Didn't wait
- * @return: -1:EFAULT:    A faulty pointer was given
- * @return: -1:EINTR:     Operation was interrupted
- * @return: -1:ETIMEDOUT: The given `rel_timeout' has expired */
-__CREDIRECT(__ATTR_NONNULL((1)),int,__NOTHROW_RPC,futex_timedwaitwhile_below,(lfutex_t *__uaddr, lfutex_t __below_value, struct timespec const *__rel_timeout),futex_timedwaitwhile_below64,(__uaddr,__below_value,__rel_timeout))
-#elif defined(__CRT_HAVE_futex_timedwaitwhile_below) && !defined(__USE_TIME_BITS64)
+#if defined(__CRT_HAVE_futex_timedwaitwhile_below) && (!defined(__USE_TIME_BITS64) || __SIZEOF_TIME32_T__ == __SIZEOF_TIME64_T__)
 /* Wait if `*uaddr < below_value'
  * @return: 0: Did wait
  * @return: 1: Didn't wait
@@ -660,6 +652,14 @@ __CREDIRECT(__ATTR_NONNULL((1)),int,__NOTHROW_RPC,futex_timedwaitwhile_below,(lf
  * @return: -1:EINTR:     Operation was interrupted
  * @return: -1:ETIMEDOUT: The given `rel_timeout' has expired */
 __CDECLARE(__ATTR_NONNULL((1)),int,__NOTHROW_RPC,futex_timedwaitwhile_below,(lfutex_t *__uaddr, lfutex_t __below_value, struct timespec const *__rel_timeout),(__uaddr,__below_value,__rel_timeout))
+#elif defined(__CRT_HAVE_futex_timedwaitwhile_below64) && (defined(__USE_TIME_BITS64) || __SIZEOF_TIME32_T__ == __SIZEOF_TIME64_T__)
+/* Wait if `*uaddr < below_value'
+ * @return: 0: Did wait
+ * @return: 1: Didn't wait
+ * @return: -1:EFAULT:    A faulty pointer was given
+ * @return: -1:EINTR:     Operation was interrupted
+ * @return: -1:ETIMEDOUT: The given `rel_timeout' has expired */
+__CREDIRECT(__ATTR_NONNULL((1)),int,__NOTHROW_RPC,futex_timedwaitwhile_below,(lfutex_t *__uaddr, lfutex_t __below_value, struct timespec const *__rel_timeout),futex_timedwaitwhile_below64,(__uaddr,__below_value,__rel_timeout))
 #elif defined(__CRT_HAVE_lfutex64) || defined(__CRT_HAVE_lfutex)
 #include <libc/local/kos.futex/futex_timedwaitwhile_below.h>
 /* Wait if `*uaddr < below_value'
@@ -670,7 +670,7 @@ __CDECLARE(__ATTR_NONNULL((1)),int,__NOTHROW_RPC,futex_timedwaitwhile_below,(lfu
  * @return: -1:ETIMEDOUT: The given `rel_timeout' has expired */
 __NAMESPACE_LOCAL_USING_OR_IMPL(futex_timedwaitwhile_below, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_NONNULL((1)) int __NOTHROW_RPC(__LIBCCALL futex_timedwaitwhile_below)(lfutex_t *__uaddr, lfutex_t __below_value, struct timespec const *__rel_timeout) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(futex_timedwaitwhile_below))(__uaddr, __below_value, __rel_timeout); })
 #endif /* ... */
-#if defined(__CRT_HAVE_futex_timedwaitwhile_aboveequal64) && defined(__USE_TIME_BITS64)
+#if defined(__CRT_HAVE_futex_timedwaitwhile_aboveequal64) && (defined(__USE_TIME_BITS64) || __SIZEOF_TIME32_T__ == __SIZEOF_TIME64_T__)
 /* Wait if `*uaddr >= above_equal_value'
  * @return: 0: Did wait
  * @return: 1: Didn't wait
@@ -678,7 +678,7 @@ __NAMESPACE_LOCAL_USING_OR_IMPL(futex_timedwaitwhile_below, __FORCELOCAL __ATTR_
  * @return: -1:EINTR:     Operation was interrupted
  * @return: -1:ETIMEDOUT: The given `rel_timeout' has expired */
 __CREDIRECT(__ATTR_NONNULL((1)),int,__NOTHROW_RPC,futex_timedwaitwhile_aboveequal,(lfutex_t *__uaddr, lfutex_t __above_equal_value, struct timespec const *__rel_timeout),futex_timedwaitwhile_aboveequal64,(__uaddr,__above_equal_value,__rel_timeout))
-#elif defined(__CRT_HAVE_futex_timedwaitwhile_aboveequal) && !defined(__USE_TIME_BITS64)
+#elif defined(__CRT_HAVE_futex_timedwaitwhile_aboveequal) && (!defined(__USE_TIME_BITS64) || __SIZEOF_TIME32_T__ == __SIZEOF_TIME64_T__)
 /* Wait if `*uaddr >= above_equal_value'
  * @return: 0: Did wait
  * @return: 1: Didn't wait
@@ -696,15 +696,7 @@ __CDECLARE(__ATTR_NONNULL((1)),int,__NOTHROW_RPC,futex_timedwaitwhile_aboveequal
  * @return: -1:ETIMEDOUT: The given `rel_timeout' has expired */
 __NAMESPACE_LOCAL_USING_OR_IMPL(futex_timedwaitwhile_aboveequal, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_NONNULL((1)) int __NOTHROW_RPC(__LIBCCALL futex_timedwaitwhile_aboveequal)(lfutex_t *__uaddr, lfutex_t __above_equal_value, struct timespec const *__rel_timeout) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(futex_timedwaitwhile_aboveequal))(__uaddr, __above_equal_value, __rel_timeout); })
 #endif /* ... */
-#if defined(__CRT_HAVE_futex_timedwaitwhile_belowequal64) && defined(__USE_TIME_BITS64)
-/* Wait if `*uaddr <= below_equal_value'
- * @return: 0: Did wait
- * @return: 1: Didn't wait
- * @return: -1:EFAULT:    A faulty pointer was given
- * @return: -1:EINTR:     Operation was interrupted
- * @return: -1:ETIMEDOUT: The given `rel_timeout' has expired */
-__CREDIRECT(__ATTR_NONNULL((1)),int,__NOTHROW_RPC,futex_timedwaitwhile_belowequal,(lfutex_t *__uaddr, lfutex_t __below_equal_value, struct timespec const *__rel_timeout),futex_timedwaitwhile_belowequal64,(__uaddr,__below_equal_value,__rel_timeout))
-#elif defined(__CRT_HAVE_futex_timedwaitwhile_belowequal) && !defined(__USE_TIME_BITS64)
+#if defined(__CRT_HAVE_futex_timedwaitwhile_belowequal) && (!defined(__USE_TIME_BITS64) || __SIZEOF_TIME32_T__ == __SIZEOF_TIME64_T__)
 /* Wait if `*uaddr <= below_equal_value'
  * @return: 0: Did wait
  * @return: 1: Didn't wait
@@ -712,6 +704,14 @@ __CREDIRECT(__ATTR_NONNULL((1)),int,__NOTHROW_RPC,futex_timedwaitwhile_belowequa
  * @return: -1:EINTR:     Operation was interrupted
  * @return: -1:ETIMEDOUT: The given `rel_timeout' has expired */
 __CDECLARE(__ATTR_NONNULL((1)),int,__NOTHROW_RPC,futex_timedwaitwhile_belowequal,(lfutex_t *__uaddr, lfutex_t __below_equal_value, struct timespec const *__rel_timeout),(__uaddr,__below_equal_value,__rel_timeout))
+#elif defined(__CRT_HAVE_futex_timedwaitwhile_belowequal64) && (defined(__USE_TIME_BITS64) || __SIZEOF_TIME32_T__ == __SIZEOF_TIME64_T__)
+/* Wait if `*uaddr <= below_equal_value'
+ * @return: 0: Did wait
+ * @return: 1: Didn't wait
+ * @return: -1:EFAULT:    A faulty pointer was given
+ * @return: -1:EINTR:     Operation was interrupted
+ * @return: -1:ETIMEDOUT: The given `rel_timeout' has expired */
+__CREDIRECT(__ATTR_NONNULL((1)),int,__NOTHROW_RPC,futex_timedwaitwhile_belowequal,(lfutex_t *__uaddr, lfutex_t __below_equal_value, struct timespec const *__rel_timeout),futex_timedwaitwhile_belowequal64,(__uaddr,__below_equal_value,__rel_timeout))
 #elif defined(__CRT_HAVE_lfutex64) || defined(__CRT_HAVE_lfutex)
 #include <libc/local/kos.futex/futex_timedwaitwhile_belowequal.h>
 /* Wait if `*uaddr <= below_equal_value'
@@ -722,15 +722,7 @@ __CDECLARE(__ATTR_NONNULL((1)),int,__NOTHROW_RPC,futex_timedwaitwhile_belowequal
  * @return: -1:ETIMEDOUT: The given `rel_timeout' has expired */
 __NAMESPACE_LOCAL_USING_OR_IMPL(futex_timedwaitwhile_belowequal, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_NONNULL((1)) int __NOTHROW_RPC(__LIBCCALL futex_timedwaitwhile_belowequal)(lfutex_t *__uaddr, lfutex_t __below_equal_value, struct timespec const *__rel_timeout) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(futex_timedwaitwhile_belowequal))(__uaddr, __below_equal_value, __rel_timeout); })
 #endif /* ... */
-#if defined(__CRT_HAVE_futex_timedwaitwhile_cmpxch64) && defined(__USE_TIME_BITS64)
-/* Wait if `*uaddr == old_value', and set `*uaddr = new_value'
- * @return: 0: Did wait
- * @return: 1: Didn't wait
- * @return: -1:EFAULT:    A faulty pointer was given
- * @return: -1:EINTR:     Operation was interrupted (*uaddr was still set to new_value)
- * @return: -1:ETIMEDOUT: The given `rel_timeout' has expired */
-__CREDIRECT(__ATTR_NONNULL((1)),int,__NOTHROW_RPC,futex_timedwaitwhile_cmpxch,(lfutex_t *__uaddr, lfutex_t __old_value, lfutex_t __new_value, struct timespec const *__rel_timeout),futex_timedwaitwhile_cmpxch64,(__uaddr,__old_value,__new_value,__rel_timeout))
-#elif defined(__CRT_HAVE_futex_timedwaitwhile_cmpxch) && !defined(__USE_TIME_BITS64)
+#if defined(__CRT_HAVE_futex_timedwaitwhile_cmpxch) && (!defined(__USE_TIME_BITS64) || __SIZEOF_TIME32_T__ == __SIZEOF_TIME64_T__)
 /* Wait if `*uaddr == old_value', and set `*uaddr = new_value'
  * @return: 0: Did wait
  * @return: 1: Didn't wait
@@ -738,6 +730,14 @@ __CREDIRECT(__ATTR_NONNULL((1)),int,__NOTHROW_RPC,futex_timedwaitwhile_cmpxch,(l
  * @return: -1:EINTR:     Operation was interrupted (*uaddr was still set to new_value)
  * @return: -1:ETIMEDOUT: The given `rel_timeout' has expired */
 __CDECLARE(__ATTR_NONNULL((1)),int,__NOTHROW_RPC,futex_timedwaitwhile_cmpxch,(lfutex_t *__uaddr, lfutex_t __old_value, lfutex_t __new_value, struct timespec const *__rel_timeout),(__uaddr,__old_value,__new_value,__rel_timeout))
+#elif defined(__CRT_HAVE_futex_timedwaitwhile_cmpxch64) && (defined(__USE_TIME_BITS64) || __SIZEOF_TIME32_T__ == __SIZEOF_TIME64_T__)
+/* Wait if `*uaddr == old_value', and set `*uaddr = new_value'
+ * @return: 0: Did wait
+ * @return: 1: Didn't wait
+ * @return: -1:EFAULT:    A faulty pointer was given
+ * @return: -1:EINTR:     Operation was interrupted (*uaddr was still set to new_value)
+ * @return: -1:ETIMEDOUT: The given `rel_timeout' has expired */
+__CREDIRECT(__ATTR_NONNULL((1)),int,__NOTHROW_RPC,futex_timedwaitwhile_cmpxch,(lfutex_t *__uaddr, lfutex_t __old_value, lfutex_t __new_value, struct timespec const *__rel_timeout),futex_timedwaitwhile_cmpxch64,(__uaddr,__old_value,__new_value,__rel_timeout))
 #elif defined(__CRT_HAVE_lfutex64) || defined(__CRT_HAVE_lfutex)
 #include <libc/local/kos.futex/futex_timedwaitwhile_cmpxch.h>
 /* Wait if `*uaddr == old_value', and set `*uaddr = new_value'
@@ -748,15 +748,7 @@ __CDECLARE(__ATTR_NONNULL((1)),int,__NOTHROW_RPC,futex_timedwaitwhile_cmpxch,(lf
  * @return: -1:ETIMEDOUT: The given `rel_timeout' has expired */
 __NAMESPACE_LOCAL_USING_OR_IMPL(futex_timedwaitwhile_cmpxch, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_NONNULL((1)) int __NOTHROW_RPC(__LIBCCALL futex_timedwaitwhile_cmpxch)(lfutex_t *__uaddr, lfutex_t __old_value, lfutex_t __new_value, struct timespec const *__rel_timeout) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(futex_timedwaitwhile_cmpxch))(__uaddr, __old_value, __new_value, __rel_timeout); })
 #endif /* ... */
-#if defined(__CRT_HAVE_futex_timedwaituntil_cmpxch64) && defined(__USE_TIME_BITS64)
-/* Wait if `*uaddr != old_value', and set `*uaddr = new_value'
- * @return: 0: Did wait
- * @return: 1: Didn't wait
- * @return: -1:EFAULT:    A faulty pointer was given
- * @return: -1:EINTR:     Operation was interrupted (*uaddr was still set to new_value)
- * @return: -1:ETIMEDOUT: The given `rel_timeout' has expired */
-__CREDIRECT(__ATTR_NONNULL((1)),int,__NOTHROW_RPC,futex_timedwaituntil_cmpxch,(lfutex_t *__uaddr, lfutex_t __old_value, lfutex_t __new_value, struct timespec const *__rel_timeout),futex_timedwaituntil_cmpxch64,(__uaddr,__old_value,__new_value,__rel_timeout))
-#elif defined(__CRT_HAVE_futex_timedwaituntil_cmpxch) && !defined(__USE_TIME_BITS64)
+#if defined(__CRT_HAVE_futex_timedwaituntil_cmpxch) && (!defined(__USE_TIME_BITS64) || __SIZEOF_TIME32_T__ == __SIZEOF_TIME64_T__)
 /* Wait if `*uaddr != old_value', and set `*uaddr = new_value'
  * @return: 0: Did wait
  * @return: 1: Didn't wait
@@ -764,6 +756,14 @@ __CREDIRECT(__ATTR_NONNULL((1)),int,__NOTHROW_RPC,futex_timedwaituntil_cmpxch,(l
  * @return: -1:EINTR:     Operation was interrupted (*uaddr was still set to new_value)
  * @return: -1:ETIMEDOUT: The given `rel_timeout' has expired */
 __CDECLARE(__ATTR_NONNULL((1)),int,__NOTHROW_RPC,futex_timedwaituntil_cmpxch,(lfutex_t *__uaddr, lfutex_t __old_value, lfutex_t __new_value, struct timespec const *__rel_timeout),(__uaddr,__old_value,__new_value,__rel_timeout))
+#elif defined(__CRT_HAVE_futex_timedwaituntil_cmpxch64) && (defined(__USE_TIME_BITS64) || __SIZEOF_TIME32_T__ == __SIZEOF_TIME64_T__)
+/* Wait if `*uaddr != old_value', and set `*uaddr = new_value'
+ * @return: 0: Did wait
+ * @return: 1: Didn't wait
+ * @return: -1:EFAULT:    A faulty pointer was given
+ * @return: -1:EINTR:     Operation was interrupted (*uaddr was still set to new_value)
+ * @return: -1:ETIMEDOUT: The given `rel_timeout' has expired */
+__CREDIRECT(__ATTR_NONNULL((1)),int,__NOTHROW_RPC,futex_timedwaituntil_cmpxch,(lfutex_t *__uaddr, lfutex_t __old_value, lfutex_t __new_value, struct timespec const *__rel_timeout),futex_timedwaituntil_cmpxch64,(__uaddr,__old_value,__new_value,__rel_timeout))
 #elif defined(__CRT_HAVE_lfutex64) || defined(__CRT_HAVE_lfutex)
 #include <libc/local/kos.futex/futex_timedwaituntil_cmpxch.h>
 /* Wait if `*uaddr != old_value', and set `*uaddr = new_value'
@@ -774,15 +774,7 @@ __CDECLARE(__ATTR_NONNULL((1)),int,__NOTHROW_RPC,futex_timedwaituntil_cmpxch,(lf
  * @return: -1:ETIMEDOUT: The given `rel_timeout' has expired */
 __NAMESPACE_LOCAL_USING_OR_IMPL(futex_timedwaituntil_cmpxch, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_NONNULL((1)) int __NOTHROW_RPC(__LIBCCALL futex_timedwaituntil_cmpxch)(lfutex_t *__uaddr, lfutex_t __old_value, lfutex_t __new_value, struct timespec const *__rel_timeout) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(futex_timedwaituntil_cmpxch))(__uaddr, __old_value, __new_value, __rel_timeout); })
 #endif /* ... */
-#if defined(__CRT_HAVE_futex_timedwaitlock64) && defined(__USE_TIME_BITS64)
-/* Acquire a managed futex lock (s.a. `LFUTEX_WAIT_LOCK')
- * @return: 0: Did wait
- * @return: 1: Didn't wait
- * @return: -1:EFAULT:    A faulty pointer was given
- * @return: -1:EINTR:     Operation was interrupted (*uaddr was still set to new_value)
- * @return: -1:ETIMEDOUT: The given `rel_timeout' has expired */
-__CREDIRECT(__ATTR_NONNULL((1)),int,__NOTHROW_RPC,futex_timedwaitlock,(lfutex_t *__uaddr, struct timespec const *__rel_timeout),futex_timedwaitlock64,(__uaddr,__rel_timeout))
-#elif defined(__CRT_HAVE_futex_timedwaitlock) && !defined(__USE_TIME_BITS64)
+#if defined(__CRT_HAVE_futex_timedwaitlock) && (!defined(__USE_TIME_BITS64) || __SIZEOF_TIME32_T__ == __SIZEOF_TIME64_T__)
 /* Acquire a managed futex lock (s.a. `LFUTEX_WAIT_LOCK')
  * @return: 0: Did wait
  * @return: 1: Didn't wait
@@ -790,6 +782,14 @@ __CREDIRECT(__ATTR_NONNULL((1)),int,__NOTHROW_RPC,futex_timedwaitlock,(lfutex_t 
  * @return: -1:EINTR:     Operation was interrupted (*uaddr was still set to new_value)
  * @return: -1:ETIMEDOUT: The given `rel_timeout' has expired */
 __CDECLARE(__ATTR_NONNULL((1)),int,__NOTHROW_RPC,futex_timedwaitlock,(lfutex_t *__uaddr, struct timespec const *__rel_timeout),(__uaddr,__rel_timeout))
+#elif defined(__CRT_HAVE_futex_timedwaitlock64) && (defined(__USE_TIME_BITS64) || __SIZEOF_TIME32_T__ == __SIZEOF_TIME64_T__)
+/* Acquire a managed futex lock (s.a. `LFUTEX_WAIT_LOCK')
+ * @return: 0: Did wait
+ * @return: 1: Didn't wait
+ * @return: -1:EFAULT:    A faulty pointer was given
+ * @return: -1:EINTR:     Operation was interrupted (*uaddr was still set to new_value)
+ * @return: -1:ETIMEDOUT: The given `rel_timeout' has expired */
+__CREDIRECT(__ATTR_NONNULL((1)),int,__NOTHROW_RPC,futex_timedwaitlock,(lfutex_t *__uaddr, struct timespec const *__rel_timeout),futex_timedwaitlock64,(__uaddr,__rel_timeout))
 #elif defined(__CRT_HAVE_lfutex64) || defined(__CRT_HAVE_lfutex)
 #include <libc/local/kos.futex/futex_timedwaitlock.h>
 /* Acquire a managed futex lock (s.a. `LFUTEX_WAIT_LOCK')
@@ -800,20 +800,20 @@ __CDECLARE(__ATTR_NONNULL((1)),int,__NOTHROW_RPC,futex_timedwaitlock,(lfutex_t *
  * @return: -1:ETIMEDOUT: The given `rel_timeout' has expired */
 __NAMESPACE_LOCAL_USING_OR_IMPL(futex_timedwaitlock, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_NONNULL((1)) int __NOTHROW_RPC(__LIBCCALL futex_timedwaitlock)(lfutex_t *__uaddr, struct timespec const *__rel_timeout) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(futex_timedwaitlock))(__uaddr, __rel_timeout); })
 #endif /* ... */
-#if defined(__CRT_HAVE_futex_timedwaitwhile_exactbits64) && defined(__USE_TIME_BITS64)
-/* Wait if `(*uaddr & bitmask) == setmask'
- * @return: 0: Did wait
- * @return: 1: Didn't wait
- * @return: -1:EFAULT: A faulty pointer was given
- * @return: -1:EINTR:  Operation was interrupted */
-__CREDIRECT(__ATTR_NONNULL((1)),int,__NOTHROW_RPC,futex_timedwaitwhile_exactbits,(lfutex_t *__uaddr, lfutex_t __bitmask, lfutex_t __setmask, struct timespec const *__rel_timeout),futex_timedwaitwhile_exactbits64,(__uaddr,__bitmask,__setmask,__rel_timeout))
-#elif defined(__CRT_HAVE_futex_timedwaitwhile_exactbits) && !defined(__USE_TIME_BITS64)
+#if defined(__CRT_HAVE_futex_timedwaitwhile_exactbits) && (!defined(__USE_TIME_BITS64) || __SIZEOF_TIME32_T__ == __SIZEOF_TIME64_T__)
 /* Wait if `(*uaddr & bitmask) == setmask'
  * @return: 0: Did wait
  * @return: 1: Didn't wait
  * @return: -1:EFAULT: A faulty pointer was given
  * @return: -1:EINTR:  Operation was interrupted */
 __CDECLARE(__ATTR_NONNULL((1)),int,__NOTHROW_RPC,futex_timedwaitwhile_exactbits,(lfutex_t *__uaddr, lfutex_t __bitmask, lfutex_t __setmask, struct timespec const *__rel_timeout),(__uaddr,__bitmask,__setmask,__rel_timeout))
+#elif defined(__CRT_HAVE_futex_timedwaitwhile_exactbits64) && (defined(__USE_TIME_BITS64) || __SIZEOF_TIME32_T__ == __SIZEOF_TIME64_T__)
+/* Wait if `(*uaddr & bitmask) == setmask'
+ * @return: 0: Did wait
+ * @return: 1: Didn't wait
+ * @return: -1:EFAULT: A faulty pointer was given
+ * @return: -1:EINTR:  Operation was interrupted */
+__CREDIRECT(__ATTR_NONNULL((1)),int,__NOTHROW_RPC,futex_timedwaitwhile_exactbits,(lfutex_t *__uaddr, lfutex_t __bitmask, lfutex_t __setmask, struct timespec const *__rel_timeout),futex_timedwaitwhile_exactbits64,(__uaddr,__bitmask,__setmask,__rel_timeout))
 #elif defined(__CRT_HAVE_lfutex64) || defined(__CRT_HAVE_lfutex)
 #include <libc/local/kos.futex/futex_timedwaitwhile_exactbits.h>
 /* Wait if `(*uaddr & bitmask) == setmask'
@@ -823,20 +823,20 @@ __CDECLARE(__ATTR_NONNULL((1)),int,__NOTHROW_RPC,futex_timedwaitwhile_exactbits,
  * @return: -1:EINTR:  Operation was interrupted */
 __NAMESPACE_LOCAL_USING_OR_IMPL(futex_timedwaitwhile_exactbits, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_NONNULL((1)) int __NOTHROW_RPC(__LIBCCALL futex_timedwaitwhile_exactbits)(lfutex_t *__uaddr, lfutex_t __bitmask, lfutex_t __setmask, struct timespec const *__rel_timeout) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(futex_timedwaitwhile_exactbits))(__uaddr, __bitmask, __setmask, __rel_timeout); })
 #endif /* ... */
-#if defined(__CRT_HAVE_futex_timedwaituntil_exactbits64) && defined(__USE_TIME_BITS64)
-/* Wait if `(*uaddr & bitmask) != setmask'
- * @return: 0: Did wait
- * @return: 1: Didn't wait
- * @return: -1:EFAULT: A faulty pointer was given
- * @return: -1:EINTR:  Operation was interrupted */
-__CREDIRECT(__ATTR_NONNULL((1)),int,__NOTHROW_RPC,futex_timedwaituntil_exactbits,(lfutex_t *__uaddr, lfutex_t __bitmask, lfutex_t __setmask, struct timespec const *__rel_timeout),futex_timedwaituntil_exactbits64,(__uaddr,__bitmask,__setmask,__rel_timeout))
-#elif defined(__CRT_HAVE_futex_timedwaituntil_exactbits) && !defined(__USE_TIME_BITS64)
+#if defined(__CRT_HAVE_futex_timedwaituntil_exactbits) && (!defined(__USE_TIME_BITS64) || __SIZEOF_TIME32_T__ == __SIZEOF_TIME64_T__)
 /* Wait if `(*uaddr & bitmask) != setmask'
  * @return: 0: Did wait
  * @return: 1: Didn't wait
  * @return: -1:EFAULT: A faulty pointer was given
  * @return: -1:EINTR:  Operation was interrupted */
 __CDECLARE(__ATTR_NONNULL((1)),int,__NOTHROW_RPC,futex_timedwaituntil_exactbits,(lfutex_t *__uaddr, lfutex_t __bitmask, lfutex_t __setmask, struct timespec const *__rel_timeout),(__uaddr,__bitmask,__setmask,__rel_timeout))
+#elif defined(__CRT_HAVE_futex_timedwaituntil_exactbits64) && (defined(__USE_TIME_BITS64) || __SIZEOF_TIME32_T__ == __SIZEOF_TIME64_T__)
+/* Wait if `(*uaddr & bitmask) != setmask'
+ * @return: 0: Did wait
+ * @return: 1: Didn't wait
+ * @return: -1:EFAULT: A faulty pointer was given
+ * @return: -1:EINTR:  Operation was interrupted */
+__CREDIRECT(__ATTR_NONNULL((1)),int,__NOTHROW_RPC,futex_timedwaituntil_exactbits,(lfutex_t *__uaddr, lfutex_t __bitmask, lfutex_t __setmask, struct timespec const *__rel_timeout),futex_timedwaituntil_exactbits64,(__uaddr,__bitmask,__setmask,__rel_timeout))
 #elif defined(__CRT_HAVE_lfutex64) || defined(__CRT_HAVE_lfutex)
 #include <libc/local/kos.futex/futex_timedwaituntil_exactbits.h>
 /* Wait if `(*uaddr & bitmask) != setmask'
@@ -846,20 +846,20 @@ __CDECLARE(__ATTR_NONNULL((1)),int,__NOTHROW_RPC,futex_timedwaituntil_exactbits,
  * @return: -1:EINTR:  Operation was interrupted */
 __NAMESPACE_LOCAL_USING_OR_IMPL(futex_timedwaituntil_exactbits, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_NONNULL((1)) int __NOTHROW_RPC(__LIBCCALL futex_timedwaituntil_exactbits)(lfutex_t *__uaddr, lfutex_t __bitmask, lfutex_t __setmask, struct timespec const *__rel_timeout) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(futex_timedwaituntil_exactbits))(__uaddr, __bitmask, __setmask, __rel_timeout); })
 #endif /* ... */
-#if defined(__CRT_HAVE_futex_timedwaitwhile_anybit64) && defined(__USE_TIME_BITS64)
-/* Wait if `(*uaddr & bitmask) != 0'
- * @return: 0: Did wait
- * @return: 1: Didn't wait
- * @return: -1:EFAULT: A faulty pointer was given
- * @return: -1:EINTR:  Operation was interrupted */
-__CREDIRECT(__ATTR_NONNULL((1)),int,__NOTHROW_RPC,futex_timedwaitwhile_anybit,(lfutex_t *__uaddr, lfutex_t __bitmask, struct timespec const *__rel_timeout),futex_timedwaitwhile_anybit64,(__uaddr,__bitmask,__rel_timeout))
-#elif defined(__CRT_HAVE_futex_timedwaitwhile_anybit) && !defined(__USE_TIME_BITS64)
+#if defined(__CRT_HAVE_futex_timedwaitwhile_anybit) && (!defined(__USE_TIME_BITS64) || __SIZEOF_TIME32_T__ == __SIZEOF_TIME64_T__)
 /* Wait if `(*uaddr & bitmask) != 0'
  * @return: 0: Did wait
  * @return: 1: Didn't wait
  * @return: -1:EFAULT: A faulty pointer was given
  * @return: -1:EINTR:  Operation was interrupted */
 __CDECLARE(__ATTR_NONNULL((1)),int,__NOTHROW_RPC,futex_timedwaitwhile_anybit,(lfutex_t *__uaddr, lfutex_t __bitmask, struct timespec const *__rel_timeout),(__uaddr,__bitmask,__rel_timeout))
+#elif defined(__CRT_HAVE_futex_timedwaitwhile_anybit64) && (defined(__USE_TIME_BITS64) || __SIZEOF_TIME32_T__ == __SIZEOF_TIME64_T__)
+/* Wait if `(*uaddr & bitmask) != 0'
+ * @return: 0: Did wait
+ * @return: 1: Didn't wait
+ * @return: -1:EFAULT: A faulty pointer was given
+ * @return: -1:EINTR:  Operation was interrupted */
+__CREDIRECT(__ATTR_NONNULL((1)),int,__NOTHROW_RPC,futex_timedwaitwhile_anybit,(lfutex_t *__uaddr, lfutex_t __bitmask, struct timespec const *__rel_timeout),futex_timedwaitwhile_anybit64,(__uaddr,__bitmask,__rel_timeout))
 #elif defined(__CRT_HAVE_lfutex64) || defined(__CRT_HAVE_lfutex)
 #include <libc/local/kos.futex/futex_timedwaitwhile_anybit.h>
 /* Wait if `(*uaddr & bitmask) != 0'
@@ -869,20 +869,20 @@ __CDECLARE(__ATTR_NONNULL((1)),int,__NOTHROW_RPC,futex_timedwaitwhile_anybit,(lf
  * @return: -1:EINTR:  Operation was interrupted */
 __NAMESPACE_LOCAL_USING_OR_IMPL(futex_timedwaitwhile_anybit, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_NONNULL((1)) int __NOTHROW_RPC(__LIBCCALL futex_timedwaitwhile_anybit)(lfutex_t *__uaddr, lfutex_t __bitmask, struct timespec const *__rel_timeout) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(futex_timedwaitwhile_anybit))(__uaddr, __bitmask, __rel_timeout); })
 #endif /* ... */
-#if defined(__CRT_HAVE_futex_timedwaitwhile_allbits64) && defined(__USE_TIME_BITS64)
-/* Wait if `(*uaddr & bitmask) == bitmask'
- * @return: 0: Did wait
- * @return: 1: Didn't wait
- * @return: -1:EFAULT: A faulty pointer was given
- * @return: -1:EINTR:  Operation was interrupted */
-__CREDIRECT(__ATTR_NONNULL((1)),int,__NOTHROW_RPC,futex_timedwaitwhile_allbits,(lfutex_t *__uaddr, lfutex_t __bitmask, struct timespec const *__rel_timeout),futex_timedwaitwhile_allbits64,(__uaddr,__bitmask,__rel_timeout))
-#elif defined(__CRT_HAVE_futex_timedwaitwhile_allbits) && !defined(__USE_TIME_BITS64)
+#if defined(__CRT_HAVE_futex_timedwaitwhile_allbits) && (!defined(__USE_TIME_BITS64) || __SIZEOF_TIME32_T__ == __SIZEOF_TIME64_T__)
 /* Wait if `(*uaddr & bitmask) == bitmask'
  * @return: 0: Did wait
  * @return: 1: Didn't wait
  * @return: -1:EFAULT: A faulty pointer was given
  * @return: -1:EINTR:  Operation was interrupted */
 __CDECLARE(__ATTR_NONNULL((1)),int,__NOTHROW_RPC,futex_timedwaitwhile_allbits,(lfutex_t *__uaddr, lfutex_t __bitmask, struct timespec const *__rel_timeout),(__uaddr,__bitmask,__rel_timeout))
+#elif defined(__CRT_HAVE_futex_timedwaitwhile_allbits64) && (defined(__USE_TIME_BITS64) || __SIZEOF_TIME32_T__ == __SIZEOF_TIME64_T__)
+/* Wait if `(*uaddr & bitmask) == bitmask'
+ * @return: 0: Did wait
+ * @return: 1: Didn't wait
+ * @return: -1:EFAULT: A faulty pointer was given
+ * @return: -1:EINTR:  Operation was interrupted */
+__CREDIRECT(__ATTR_NONNULL((1)),int,__NOTHROW_RPC,futex_timedwaitwhile_allbits,(lfutex_t *__uaddr, lfutex_t __bitmask, struct timespec const *__rel_timeout),futex_timedwaitwhile_allbits64,(__uaddr,__bitmask,__rel_timeout))
 #elif defined(__CRT_HAVE_lfutex64) || defined(__CRT_HAVE_lfutex)
 #include <libc/local/kos.futex/futex_timedwaitwhile_allbits.h>
 /* Wait if `(*uaddr & bitmask) == bitmask'
@@ -894,15 +894,7 @@ __NAMESPACE_LOCAL_USING_OR_IMPL(futex_timedwaitwhile_allbits, __FORCELOCAL __ATT
 #endif /* ... */
 
 #ifdef __USE_TIME64
-#ifdef __CRT_HAVE_futex_timedwaitwhile64
-/* Wait if `*uaddr == equal_to_value'
- * @return: 0: Did wait
- * @return: 1: Didn't wait
- * @return: -1:EFAULT:    A faulty pointer was given
- * @return: -1:EINTR:     Operation was interrupted
- * @return: -1:ETIMEDOUT: The given `rel_timeout' has expired */
-__CDECLARE(__ATTR_NONNULL((1)),int,__NOTHROW_RPC,futex_timedwaitwhile64,(lfutex_t *__uaddr, lfutex_t __equal_to_value, struct timespec64 const *__rel_timeout),(__uaddr,__equal_to_value,__rel_timeout))
-#elif defined(__CRT_HAVE_futex_timedwaitwhile) && __SIZEOF_TIME32_T__ == __SIZEOF_TIME64_T__
+#if defined(__CRT_HAVE_futex_timedwaitwhile) && __SIZEOF_TIME32_T__ == __SIZEOF_TIME64_T__
 /* Wait if `*uaddr == equal_to_value'
  * @return: 0: Did wait
  * @return: 1: Didn't wait
@@ -910,6 +902,14 @@ __CDECLARE(__ATTR_NONNULL((1)),int,__NOTHROW_RPC,futex_timedwaitwhile64,(lfutex_
  * @return: -1:EINTR:     Operation was interrupted
  * @return: -1:ETIMEDOUT: The given `rel_timeout' has expired */
 __CREDIRECT(__ATTR_NONNULL((1)),int,__NOTHROW_RPC,futex_timedwaitwhile64,(lfutex_t *__uaddr, lfutex_t __equal_to_value, struct timespec64 const *__rel_timeout),futex_timedwaitwhile,(__uaddr,__equal_to_value,__rel_timeout))
+#elif defined(__CRT_HAVE_futex_timedwaitwhile64)
+/* Wait if `*uaddr == equal_to_value'
+ * @return: 0: Did wait
+ * @return: 1: Didn't wait
+ * @return: -1:EFAULT:    A faulty pointer was given
+ * @return: -1:EINTR:     Operation was interrupted
+ * @return: -1:ETIMEDOUT: The given `rel_timeout' has expired */
+__CDECLARE(__ATTR_NONNULL((1)),int,__NOTHROW_RPC,futex_timedwaitwhile64,(lfutex_t *__uaddr, lfutex_t __equal_to_value, struct timespec64 const *__rel_timeout),(__uaddr,__equal_to_value,__rel_timeout))
 #elif defined(__CRT_HAVE_lfutex64) || defined(__CRT_HAVE_lfutex)
 #include <libc/local/kos.futex/futex_timedwaitwhile64.h>
 /* Wait if `*uaddr == equal_to_value'
@@ -920,15 +920,7 @@ __CREDIRECT(__ATTR_NONNULL((1)),int,__NOTHROW_RPC,futex_timedwaitwhile64,(lfutex
  * @return: -1:ETIMEDOUT: The given `rel_timeout' has expired */
 __NAMESPACE_LOCAL_USING_OR_IMPL(futex_timedwaitwhile64, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_NONNULL((1)) int __NOTHROW_RPC(__LIBCCALL futex_timedwaitwhile64)(lfutex_t *__uaddr, lfutex_t __equal_to_value, struct timespec64 const *__rel_timeout) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(futex_timedwaitwhile64))(__uaddr, __equal_to_value, __rel_timeout); })
 #endif /* ... */
-#ifdef __CRT_HAVE_futex_timedwaituntil64
-/* Wait if `*uaddr != not_equal_to_value'
- * @return: 0: Did wait
- * @return: 1: Didn't wait
- * @return: -1:EFAULT:    A faulty pointer was given
- * @return: -1:EINTR:     Operation was interrupted
- * @return: -1:ETIMEDOUT: The given `rel_timeout' has expired */
-__CDECLARE(__ATTR_NONNULL((1)),int,__NOTHROW_RPC,futex_timedwaituntil64,(lfutex_t *__uaddr, lfutex_t __not_equal_to_value, struct timespec64 const *__rel_timeout),(__uaddr,__not_equal_to_value,__rel_timeout))
-#elif defined(__CRT_HAVE_futex_timedwaituntil) && __SIZEOF_TIME32_T__ == __SIZEOF_TIME64_T__
+#if defined(__CRT_HAVE_futex_timedwaituntil) && __SIZEOF_TIME32_T__ == __SIZEOF_TIME64_T__
 /* Wait if `*uaddr != not_equal_to_value'
  * @return: 0: Did wait
  * @return: 1: Didn't wait
@@ -936,6 +928,14 @@ __CDECLARE(__ATTR_NONNULL((1)),int,__NOTHROW_RPC,futex_timedwaituntil64,(lfutex_
  * @return: -1:EINTR:     Operation was interrupted
  * @return: -1:ETIMEDOUT: The given `rel_timeout' has expired */
 __CREDIRECT(__ATTR_NONNULL((1)),int,__NOTHROW_RPC,futex_timedwaituntil64,(lfutex_t *__uaddr, lfutex_t __not_equal_to_value, struct timespec64 const *__rel_timeout),futex_timedwaituntil,(__uaddr,__not_equal_to_value,__rel_timeout))
+#elif defined(__CRT_HAVE_futex_timedwaituntil64)
+/* Wait if `*uaddr != not_equal_to_value'
+ * @return: 0: Did wait
+ * @return: 1: Didn't wait
+ * @return: -1:EFAULT:    A faulty pointer was given
+ * @return: -1:EINTR:     Operation was interrupted
+ * @return: -1:ETIMEDOUT: The given `rel_timeout' has expired */
+__CDECLARE(__ATTR_NONNULL((1)),int,__NOTHROW_RPC,futex_timedwaituntil64,(lfutex_t *__uaddr, lfutex_t __not_equal_to_value, struct timespec64 const *__rel_timeout),(__uaddr,__not_equal_to_value,__rel_timeout))
 #elif defined(__CRT_HAVE_lfutex64) || defined(__CRT_HAVE_lfutex)
 #include <libc/local/kos.futex/futex_timedwaituntil64.h>
 /* Wait if `*uaddr != not_equal_to_value'
@@ -946,15 +946,7 @@ __CREDIRECT(__ATTR_NONNULL((1)),int,__NOTHROW_RPC,futex_timedwaituntil64,(lfutex
  * @return: -1:ETIMEDOUT: The given `rel_timeout' has expired */
 __NAMESPACE_LOCAL_USING_OR_IMPL(futex_timedwaituntil64, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_NONNULL((1)) int __NOTHROW_RPC(__LIBCCALL futex_timedwaituntil64)(lfutex_t *__uaddr, lfutex_t __not_equal_to_value, struct timespec64 const *__rel_timeout) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(futex_timedwaituntil64))(__uaddr, __not_equal_to_value, __rel_timeout); })
 #endif /* ... */
-#ifdef __CRT_HAVE_futex_timedwaitwhile64
-/* Wait if `*uaddr == equal_to_value'
- * @return: 0: Did wait
- * @return: 1: Didn't wait
- * @return: -1:EFAULT:    A faulty pointer was given
- * @return: -1:EINTR:     Operation was interrupted
- * @return: -1:ETIMEDOUT: The given `rel_timeout' has expired */
-__CREDIRECT(__ATTR_NONNULL((1)),int,__NOTHROW_RPC,futex_timedwaitwhile_equal64,(lfutex_t *__uaddr, lfutex_t __equal_to_value, struct timespec64 const *__rel_timeout),futex_timedwaitwhile64,(__uaddr,__equal_to_value,__rel_timeout))
-#elif defined(__CRT_HAVE_futex_timedwaitwhile) && __SIZEOF_TIME32_T__ == __SIZEOF_TIME64_T__
+#if defined(__CRT_HAVE_futex_timedwaitwhile) && __SIZEOF_TIME32_T__ == __SIZEOF_TIME64_T__
 /* Wait if `*uaddr == equal_to_value'
  * @return: 0: Did wait
  * @return: 1: Didn't wait
@@ -962,6 +954,14 @@ __CREDIRECT(__ATTR_NONNULL((1)),int,__NOTHROW_RPC,futex_timedwaitwhile_equal64,(
  * @return: -1:EINTR:     Operation was interrupted
  * @return: -1:ETIMEDOUT: The given `rel_timeout' has expired */
 __CREDIRECT(__ATTR_NONNULL((1)),int,__NOTHROW_RPC,futex_timedwaitwhile_equal64,(lfutex_t *__uaddr, lfutex_t __equal_to_value, struct timespec64 const *__rel_timeout),futex_timedwaitwhile,(__uaddr,__equal_to_value,__rel_timeout))
+#elif defined(__CRT_HAVE_futex_timedwaitwhile64)
+/* Wait if `*uaddr == equal_to_value'
+ * @return: 0: Did wait
+ * @return: 1: Didn't wait
+ * @return: -1:EFAULT:    A faulty pointer was given
+ * @return: -1:EINTR:     Operation was interrupted
+ * @return: -1:ETIMEDOUT: The given `rel_timeout' has expired */
+__CREDIRECT(__ATTR_NONNULL((1)),int,__NOTHROW_RPC,futex_timedwaitwhile_equal64,(lfutex_t *__uaddr, lfutex_t __equal_to_value, struct timespec64 const *__rel_timeout),futex_timedwaitwhile64,(__uaddr,__equal_to_value,__rel_timeout))
 #elif defined(__CRT_HAVE_lfutex64) || defined(__CRT_HAVE_lfutex)
 #include <libc/local/kos.futex/futex_timedwaitwhile64.h>
 /* Wait if `*uaddr == equal_to_value'
@@ -972,15 +972,7 @@ __CREDIRECT(__ATTR_NONNULL((1)),int,__NOTHROW_RPC,futex_timedwaitwhile_equal64,(
  * @return: -1:ETIMEDOUT: The given `rel_timeout' has expired */
 __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_NONNULL((1)) int __NOTHROW_RPC(__LIBCCALL futex_timedwaitwhile_equal64)(lfutex_t *__uaddr, lfutex_t __equal_to_value, struct timespec64 const *__rel_timeout) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(futex_timedwaitwhile64))(__uaddr, __equal_to_value, __rel_timeout); }
 #endif /* ... */
-#ifdef __CRT_HAVE_futex_timedwaituntil64
-/* Wait if `*uaddr != not_equal_to_value'
- * @return: 0: Did wait
- * @return: 1: Didn't wait
- * @return: -1:EFAULT:    A faulty pointer was given
- * @return: -1:EINTR:     Operation was interrupted
- * @return: -1:ETIMEDOUT: The given `rel_timeout' has expired */
-__CREDIRECT(__ATTR_NONNULL((1)),int,__NOTHROW_RPC,futex_timedwaitwhile_notequal64,(lfutex_t *__uaddr, lfutex_t __not_equal_to_value, struct timespec64 const *__rel_timeout),futex_timedwaituntil64,(__uaddr,__not_equal_to_value,__rel_timeout))
-#elif defined(__CRT_HAVE_futex_timedwaituntil) && __SIZEOF_TIME32_T__ == __SIZEOF_TIME64_T__
+#if defined(__CRT_HAVE_futex_timedwaituntil) && __SIZEOF_TIME32_T__ == __SIZEOF_TIME64_T__
 /* Wait if `*uaddr != not_equal_to_value'
  * @return: 0: Did wait
  * @return: 1: Didn't wait
@@ -988,6 +980,14 @@ __CREDIRECT(__ATTR_NONNULL((1)),int,__NOTHROW_RPC,futex_timedwaitwhile_notequal6
  * @return: -1:EINTR:     Operation was interrupted
  * @return: -1:ETIMEDOUT: The given `rel_timeout' has expired */
 __CREDIRECT(__ATTR_NONNULL((1)),int,__NOTHROW_RPC,futex_timedwaitwhile_notequal64,(lfutex_t *__uaddr, lfutex_t __not_equal_to_value, struct timespec64 const *__rel_timeout),futex_timedwaituntil,(__uaddr,__not_equal_to_value,__rel_timeout))
+#elif defined(__CRT_HAVE_futex_timedwaituntil64)
+/* Wait if `*uaddr != not_equal_to_value'
+ * @return: 0: Did wait
+ * @return: 1: Didn't wait
+ * @return: -1:EFAULT:    A faulty pointer was given
+ * @return: -1:EINTR:     Operation was interrupted
+ * @return: -1:ETIMEDOUT: The given `rel_timeout' has expired */
+__CREDIRECT(__ATTR_NONNULL((1)),int,__NOTHROW_RPC,futex_timedwaitwhile_notequal64,(lfutex_t *__uaddr, lfutex_t __not_equal_to_value, struct timespec64 const *__rel_timeout),futex_timedwaituntil64,(__uaddr,__not_equal_to_value,__rel_timeout))
 #elif defined(__CRT_HAVE_lfutex64) || defined(__CRT_HAVE_lfutex)
 #include <libc/local/kos.futex/futex_timedwaituntil64.h>
 /* Wait if `*uaddr != not_equal_to_value'
@@ -998,15 +998,7 @@ __CREDIRECT(__ATTR_NONNULL((1)),int,__NOTHROW_RPC,futex_timedwaitwhile_notequal6
  * @return: -1:ETIMEDOUT: The given `rel_timeout' has expired */
 __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_NONNULL((1)) int __NOTHROW_RPC(__LIBCCALL futex_timedwaitwhile_notequal64)(lfutex_t *__uaddr, lfutex_t __not_equal_to_value, struct timespec64 const *__rel_timeout) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(futex_timedwaituntil64))(__uaddr, __not_equal_to_value, __rel_timeout); }
 #endif /* ... */
-#ifdef __CRT_HAVE_futex_timedwaitwhile_above64
-/* Wait if `*uaddr > above_value'
- * @return: 0: Did wait
- * @return: 1: Didn't wait
- * @return: -1:EFAULT:    A faulty pointer was given
- * @return: -1:EINTR:     Operation was interrupted
- * @return: -1:ETIMEDOUT: The given `rel_timeout' has expired */
-__CDECLARE(__ATTR_NONNULL((1)),int,__NOTHROW_RPC,futex_timedwaitwhile_above64,(lfutex_t *__uaddr, lfutex_t __above_value, struct timespec64 const *__rel_timeout),(__uaddr,__above_value,__rel_timeout))
-#elif defined(__CRT_HAVE_futex_timedwaitwhile_above) && __SIZEOF_TIME32_T__ == __SIZEOF_TIME64_T__
+#if defined(__CRT_HAVE_futex_timedwaitwhile_above) && __SIZEOF_TIME32_T__ == __SIZEOF_TIME64_T__
 /* Wait if `*uaddr > above_value'
  * @return: 0: Did wait
  * @return: 1: Didn't wait
@@ -1014,6 +1006,14 @@ __CDECLARE(__ATTR_NONNULL((1)),int,__NOTHROW_RPC,futex_timedwaitwhile_above64,(l
  * @return: -1:EINTR:     Operation was interrupted
  * @return: -1:ETIMEDOUT: The given `rel_timeout' has expired */
 __CREDIRECT(__ATTR_NONNULL((1)),int,__NOTHROW_RPC,futex_timedwaitwhile_above64,(lfutex_t *__uaddr, lfutex_t __above_value, struct timespec64 const *__rel_timeout),futex_timedwaitwhile_above,(__uaddr,__above_value,__rel_timeout))
+#elif defined(__CRT_HAVE_futex_timedwaitwhile_above64)
+/* Wait if `*uaddr > above_value'
+ * @return: 0: Did wait
+ * @return: 1: Didn't wait
+ * @return: -1:EFAULT:    A faulty pointer was given
+ * @return: -1:EINTR:     Operation was interrupted
+ * @return: -1:ETIMEDOUT: The given `rel_timeout' has expired */
+__CDECLARE(__ATTR_NONNULL((1)),int,__NOTHROW_RPC,futex_timedwaitwhile_above64,(lfutex_t *__uaddr, lfutex_t __above_value, struct timespec64 const *__rel_timeout),(__uaddr,__above_value,__rel_timeout))
 #elif defined(__CRT_HAVE_lfutex64) || defined(__CRT_HAVE_lfutex)
 #include <libc/local/kos.futex/futex_timedwaitwhile_above64.h>
 /* Wait if `*uaddr > above_value'
@@ -1024,15 +1024,7 @@ __CREDIRECT(__ATTR_NONNULL((1)),int,__NOTHROW_RPC,futex_timedwaitwhile_above64,(
  * @return: -1:ETIMEDOUT: The given `rel_timeout' has expired */
 __NAMESPACE_LOCAL_USING_OR_IMPL(futex_timedwaitwhile_above64, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_NONNULL((1)) int __NOTHROW_RPC(__LIBCCALL futex_timedwaitwhile_above64)(lfutex_t *__uaddr, lfutex_t __above_value, struct timespec64 const *__rel_timeout) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(futex_timedwaitwhile_above64))(__uaddr, __above_value, __rel_timeout); })
 #endif /* ... */
-#ifdef __CRT_HAVE_futex_timedwaitwhile_below64
-/* Wait if `*uaddr < below_value'
- * @return: 0: Did wait
- * @return: 1: Didn't wait
- * @return: -1:EFAULT:    A faulty pointer was given
- * @return: -1:EINTR:     Operation was interrupted
- * @return: -1:ETIMEDOUT: The given `rel_timeout' has expired */
-__CDECLARE(__ATTR_NONNULL((1)),int,__NOTHROW_RPC,futex_timedwaitwhile_below64,(lfutex_t *__uaddr, lfutex_t __below_value, struct timespec64 const *__rel_timeout),(__uaddr,__below_value,__rel_timeout))
-#elif defined(__CRT_HAVE_futex_timedwaitwhile_below) && __SIZEOF_TIME32_T__ == __SIZEOF_TIME64_T__
+#if defined(__CRT_HAVE_futex_timedwaitwhile_below) && __SIZEOF_TIME32_T__ == __SIZEOF_TIME64_T__
 /* Wait if `*uaddr < below_value'
  * @return: 0: Did wait
  * @return: 1: Didn't wait
@@ -1040,6 +1032,14 @@ __CDECLARE(__ATTR_NONNULL((1)),int,__NOTHROW_RPC,futex_timedwaitwhile_below64,(l
  * @return: -1:EINTR:     Operation was interrupted
  * @return: -1:ETIMEDOUT: The given `rel_timeout' has expired */
 __CREDIRECT(__ATTR_NONNULL((1)),int,__NOTHROW_RPC,futex_timedwaitwhile_below64,(lfutex_t *__uaddr, lfutex_t __below_value, struct timespec64 const *__rel_timeout),futex_timedwaitwhile_below,(__uaddr,__below_value,__rel_timeout))
+#elif defined(__CRT_HAVE_futex_timedwaitwhile_below64)
+/* Wait if `*uaddr < below_value'
+ * @return: 0: Did wait
+ * @return: 1: Didn't wait
+ * @return: -1:EFAULT:    A faulty pointer was given
+ * @return: -1:EINTR:     Operation was interrupted
+ * @return: -1:ETIMEDOUT: The given `rel_timeout' has expired */
+__CDECLARE(__ATTR_NONNULL((1)),int,__NOTHROW_RPC,futex_timedwaitwhile_below64,(lfutex_t *__uaddr, lfutex_t __below_value, struct timespec64 const *__rel_timeout),(__uaddr,__below_value,__rel_timeout))
 #elif defined(__CRT_HAVE_lfutex64) || defined(__CRT_HAVE_lfutex)
 #include <libc/local/kos.futex/futex_timedwaitwhile_below64.h>
 /* Wait if `*uaddr < below_value'
@@ -1050,15 +1050,7 @@ __CREDIRECT(__ATTR_NONNULL((1)),int,__NOTHROW_RPC,futex_timedwaitwhile_below64,(
  * @return: -1:ETIMEDOUT: The given `rel_timeout' has expired */
 __NAMESPACE_LOCAL_USING_OR_IMPL(futex_timedwaitwhile_below64, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_NONNULL((1)) int __NOTHROW_RPC(__LIBCCALL futex_timedwaitwhile_below64)(lfutex_t *__uaddr, lfutex_t __below_value, struct timespec64 const *__rel_timeout) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(futex_timedwaitwhile_below64))(__uaddr, __below_value, __rel_timeout); })
 #endif /* ... */
-#ifdef __CRT_HAVE_futex_timedwaitwhile_aboveequal64
-/* Wait if `*uaddr >= above_equal_value'
- * @return: 0: Did wait
- * @return: 1: Didn't wait
- * @return: -1:EFAULT:    A faulty pointer was given
- * @return: -1:EINTR:     Operation was interrupted
- * @return: -1:ETIMEDOUT: The given `rel_timeout' has expired */
-__CDECLARE(__ATTR_NONNULL((1)),int,__NOTHROW_RPC,futex_timedwaitwhile_aboveequal64,(lfutex_t *__uaddr, lfutex_t __above_equal_value, struct timespec64 const *__rel_timeout),(__uaddr,__above_equal_value,__rel_timeout))
-#elif defined(__CRT_HAVE_futex_timedwaitwhile_aboveequal) && __SIZEOF_TIME32_T__ == __SIZEOF_TIME64_T__
+#if defined(__CRT_HAVE_futex_timedwaitwhile_aboveequal) && __SIZEOF_TIME32_T__ == __SIZEOF_TIME64_T__
 /* Wait if `*uaddr >= above_equal_value'
  * @return: 0: Did wait
  * @return: 1: Didn't wait
@@ -1066,6 +1058,14 @@ __CDECLARE(__ATTR_NONNULL((1)),int,__NOTHROW_RPC,futex_timedwaitwhile_aboveequal
  * @return: -1:EINTR:     Operation was interrupted
  * @return: -1:ETIMEDOUT: The given `rel_timeout' has expired */
 __CREDIRECT(__ATTR_NONNULL((1)),int,__NOTHROW_RPC,futex_timedwaitwhile_aboveequal64,(lfutex_t *__uaddr, lfutex_t __above_equal_value, struct timespec64 const *__rel_timeout),futex_timedwaitwhile_aboveequal,(__uaddr,__above_equal_value,__rel_timeout))
+#elif defined(__CRT_HAVE_futex_timedwaitwhile_aboveequal64)
+/* Wait if `*uaddr >= above_equal_value'
+ * @return: 0: Did wait
+ * @return: 1: Didn't wait
+ * @return: -1:EFAULT:    A faulty pointer was given
+ * @return: -1:EINTR:     Operation was interrupted
+ * @return: -1:ETIMEDOUT: The given `rel_timeout' has expired */
+__CDECLARE(__ATTR_NONNULL((1)),int,__NOTHROW_RPC,futex_timedwaitwhile_aboveequal64,(lfutex_t *__uaddr, lfutex_t __above_equal_value, struct timespec64 const *__rel_timeout),(__uaddr,__above_equal_value,__rel_timeout))
 #elif defined(__CRT_HAVE_lfutex64) || defined(__CRT_HAVE_lfutex)
 #include <libc/local/kos.futex/futex_timedwaitwhile_aboveequal64.h>
 /* Wait if `*uaddr >= above_equal_value'
@@ -1076,15 +1076,7 @@ __CREDIRECT(__ATTR_NONNULL((1)),int,__NOTHROW_RPC,futex_timedwaitwhile_aboveequa
  * @return: -1:ETIMEDOUT: The given `rel_timeout' has expired */
 __NAMESPACE_LOCAL_USING_OR_IMPL(futex_timedwaitwhile_aboveequal64, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_NONNULL((1)) int __NOTHROW_RPC(__LIBCCALL futex_timedwaitwhile_aboveequal64)(lfutex_t *__uaddr, lfutex_t __above_equal_value, struct timespec64 const *__rel_timeout) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(futex_timedwaitwhile_aboveequal64))(__uaddr, __above_equal_value, __rel_timeout); })
 #endif /* ... */
-#ifdef __CRT_HAVE_futex_timedwaitwhile_belowequal64
-/* Wait if `*uaddr <= below_equal_value'
- * @return: 0: Did wait
- * @return: 1: Didn't wait
- * @return: -1:EFAULT:    A faulty pointer was given
- * @return: -1:EINTR:     Operation was interrupted
- * @return: -1:ETIMEDOUT: The given `rel_timeout' has expired */
-__CDECLARE(__ATTR_NONNULL((1)),int,__NOTHROW_RPC,futex_timedwaitwhile_belowequal64,(lfutex_t *__uaddr, lfutex_t __below_equal_value, struct timespec64 const *__rel_timeout),(__uaddr,__below_equal_value,__rel_timeout))
-#elif defined(__CRT_HAVE_futex_timedwaitwhile_belowequal) && __SIZEOF_TIME32_T__ == __SIZEOF_TIME64_T__
+#if defined(__CRT_HAVE_futex_timedwaitwhile_belowequal) && __SIZEOF_TIME32_T__ == __SIZEOF_TIME64_T__
 /* Wait if `*uaddr <= below_equal_value'
  * @return: 0: Did wait
  * @return: 1: Didn't wait
@@ -1092,6 +1084,14 @@ __CDECLARE(__ATTR_NONNULL((1)),int,__NOTHROW_RPC,futex_timedwaitwhile_belowequal
  * @return: -1:EINTR:     Operation was interrupted
  * @return: -1:ETIMEDOUT: The given `rel_timeout' has expired */
 __CREDIRECT(__ATTR_NONNULL((1)),int,__NOTHROW_RPC,futex_timedwaitwhile_belowequal64,(lfutex_t *__uaddr, lfutex_t __below_equal_value, struct timespec64 const *__rel_timeout),futex_timedwaitwhile_belowequal,(__uaddr,__below_equal_value,__rel_timeout))
+#elif defined(__CRT_HAVE_futex_timedwaitwhile_belowequal64)
+/* Wait if `*uaddr <= below_equal_value'
+ * @return: 0: Did wait
+ * @return: 1: Didn't wait
+ * @return: -1:EFAULT:    A faulty pointer was given
+ * @return: -1:EINTR:     Operation was interrupted
+ * @return: -1:ETIMEDOUT: The given `rel_timeout' has expired */
+__CDECLARE(__ATTR_NONNULL((1)),int,__NOTHROW_RPC,futex_timedwaitwhile_belowequal64,(lfutex_t *__uaddr, lfutex_t __below_equal_value, struct timespec64 const *__rel_timeout),(__uaddr,__below_equal_value,__rel_timeout))
 #elif defined(__CRT_HAVE_lfutex64) || defined(__CRT_HAVE_lfutex)
 #include <libc/local/kos.futex/futex_timedwaitwhile_belowequal64.h>
 /* Wait if `*uaddr <= below_equal_value'
@@ -1102,15 +1102,7 @@ __CREDIRECT(__ATTR_NONNULL((1)),int,__NOTHROW_RPC,futex_timedwaitwhile_belowequa
  * @return: -1:ETIMEDOUT: The given `rel_timeout' has expired */
 __NAMESPACE_LOCAL_USING_OR_IMPL(futex_timedwaitwhile_belowequal64, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_NONNULL((1)) int __NOTHROW_RPC(__LIBCCALL futex_timedwaitwhile_belowequal64)(lfutex_t *__uaddr, lfutex_t __below_equal_value, struct timespec64 const *__rel_timeout) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(futex_timedwaitwhile_belowequal64))(__uaddr, __below_equal_value, __rel_timeout); })
 #endif /* ... */
-#ifdef __CRT_HAVE_futex_timedwaitwhile_cmpxch64
-/* Wait if `*uaddr == old_value', and set `*uaddr = new_value'
- * @return: 0: Did wait
- * @return: 1: Didn't wait
- * @return: -1:EFAULT:    A faulty pointer was given
- * @return: -1:EINTR:     Operation was interrupted (*uaddr was still set to new_value)
- * @return: -1:ETIMEDOUT: The given `rel_timeout' has expired */
-__CDECLARE(__ATTR_NONNULL((1)),int,__NOTHROW_RPC,futex_timedwaitwhile_cmpxch64,(lfutex_t *__uaddr, lfutex_t __old_value, lfutex_t __new_value, struct timespec64 const *__rel_timeout),(__uaddr,__old_value,__new_value,__rel_timeout))
-#elif defined(__CRT_HAVE_futex_timedwaitwhile_cmpxch) && __SIZEOF_TIME32_T__ == __SIZEOF_TIME64_T__
+#if defined(__CRT_HAVE_futex_timedwaitwhile_cmpxch) && __SIZEOF_TIME32_T__ == __SIZEOF_TIME64_T__
 /* Wait if `*uaddr == old_value', and set `*uaddr = new_value'
  * @return: 0: Did wait
  * @return: 1: Didn't wait
@@ -1118,6 +1110,14 @@ __CDECLARE(__ATTR_NONNULL((1)),int,__NOTHROW_RPC,futex_timedwaitwhile_cmpxch64,(
  * @return: -1:EINTR:     Operation was interrupted (*uaddr was still set to new_value)
  * @return: -1:ETIMEDOUT: The given `rel_timeout' has expired */
 __CREDIRECT(__ATTR_NONNULL((1)),int,__NOTHROW_RPC,futex_timedwaitwhile_cmpxch64,(lfutex_t *__uaddr, lfutex_t __old_value, lfutex_t __new_value, struct timespec64 const *__rel_timeout),futex_timedwaitwhile_cmpxch,(__uaddr,__old_value,__new_value,__rel_timeout))
+#elif defined(__CRT_HAVE_futex_timedwaitwhile_cmpxch64)
+/* Wait if `*uaddr == old_value', and set `*uaddr = new_value'
+ * @return: 0: Did wait
+ * @return: 1: Didn't wait
+ * @return: -1:EFAULT:    A faulty pointer was given
+ * @return: -1:EINTR:     Operation was interrupted (*uaddr was still set to new_value)
+ * @return: -1:ETIMEDOUT: The given `rel_timeout' has expired */
+__CDECLARE(__ATTR_NONNULL((1)),int,__NOTHROW_RPC,futex_timedwaitwhile_cmpxch64,(lfutex_t *__uaddr, lfutex_t __old_value, lfutex_t __new_value, struct timespec64 const *__rel_timeout),(__uaddr,__old_value,__new_value,__rel_timeout))
 #elif defined(__CRT_HAVE_lfutex64) || defined(__CRT_HAVE_lfutex)
 #include <libc/local/kos.futex/futex_timedwaitwhile_cmpxch64.h>
 /* Wait if `*uaddr == old_value', and set `*uaddr = new_value'
@@ -1128,15 +1128,7 @@ __CREDIRECT(__ATTR_NONNULL((1)),int,__NOTHROW_RPC,futex_timedwaitwhile_cmpxch64,
  * @return: -1:ETIMEDOUT: The given `rel_timeout' has expired */
 __NAMESPACE_LOCAL_USING_OR_IMPL(futex_timedwaitwhile_cmpxch64, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_NONNULL((1)) int __NOTHROW_RPC(__LIBCCALL futex_timedwaitwhile_cmpxch64)(lfutex_t *__uaddr, lfutex_t __old_value, lfutex_t __new_value, struct timespec64 const *__rel_timeout) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(futex_timedwaitwhile_cmpxch64))(__uaddr, __old_value, __new_value, __rel_timeout); })
 #endif /* ... */
-#ifdef __CRT_HAVE_futex_timedwaituntil_cmpxch64
-/* Wait if `*uaddr != old_value', and set `*uaddr = new_value'
- * @return: 0: Did wait
- * @return: 1: Didn't wait
- * @return: -1:EFAULT:    A faulty pointer was given
- * @return: -1:EINTR:     Operation was interrupted (*uaddr was still set to new_value)
- * @return: -1:ETIMEDOUT: The given `rel_timeout' has expired */
-__CDECLARE(__ATTR_NONNULL((1)),int,__NOTHROW_RPC,futex_timedwaituntil_cmpxch64,(lfutex_t *__uaddr, lfutex_t __old_value, lfutex_t __new_value, struct timespec64 const *__rel_timeout),(__uaddr,__old_value,__new_value,__rel_timeout))
-#elif defined(__CRT_HAVE_futex_timedwaituntil_cmpxch) && __SIZEOF_TIME32_T__ == __SIZEOF_TIME64_T__
+#if defined(__CRT_HAVE_futex_timedwaituntil_cmpxch) && __SIZEOF_TIME32_T__ == __SIZEOF_TIME64_T__
 /* Wait if `*uaddr != old_value', and set `*uaddr = new_value'
  * @return: 0: Did wait
  * @return: 1: Didn't wait
@@ -1144,6 +1136,14 @@ __CDECLARE(__ATTR_NONNULL((1)),int,__NOTHROW_RPC,futex_timedwaituntil_cmpxch64,(
  * @return: -1:EINTR:     Operation was interrupted (*uaddr was still set to new_value)
  * @return: -1:ETIMEDOUT: The given `rel_timeout' has expired */
 __CREDIRECT(__ATTR_NONNULL((1)),int,__NOTHROW_RPC,futex_timedwaituntil_cmpxch64,(lfutex_t *__uaddr, lfutex_t __old_value, lfutex_t __new_value, struct timespec64 const *__rel_timeout),futex_timedwaituntil_cmpxch,(__uaddr,__old_value,__new_value,__rel_timeout))
+#elif defined(__CRT_HAVE_futex_timedwaituntil_cmpxch64)
+/* Wait if `*uaddr != old_value', and set `*uaddr = new_value'
+ * @return: 0: Did wait
+ * @return: 1: Didn't wait
+ * @return: -1:EFAULT:    A faulty pointer was given
+ * @return: -1:EINTR:     Operation was interrupted (*uaddr was still set to new_value)
+ * @return: -1:ETIMEDOUT: The given `rel_timeout' has expired */
+__CDECLARE(__ATTR_NONNULL((1)),int,__NOTHROW_RPC,futex_timedwaituntil_cmpxch64,(lfutex_t *__uaddr, lfutex_t __old_value, lfutex_t __new_value, struct timespec64 const *__rel_timeout),(__uaddr,__old_value,__new_value,__rel_timeout))
 #elif defined(__CRT_HAVE_lfutex64) || defined(__CRT_HAVE_lfutex)
 #include <libc/local/kos.futex/futex_timedwaituntil_cmpxch64.h>
 /* Wait if `*uaddr != old_value', and set `*uaddr = new_value'
@@ -1154,15 +1154,7 @@ __CREDIRECT(__ATTR_NONNULL((1)),int,__NOTHROW_RPC,futex_timedwaituntil_cmpxch64,
  * @return: -1:ETIMEDOUT: The given `rel_timeout' has expired */
 __NAMESPACE_LOCAL_USING_OR_IMPL(futex_timedwaituntil_cmpxch64, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_NONNULL((1)) int __NOTHROW_RPC(__LIBCCALL futex_timedwaituntil_cmpxch64)(lfutex_t *__uaddr, lfutex_t __old_value, lfutex_t __new_value, struct timespec64 const *__rel_timeout) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(futex_timedwaituntil_cmpxch64))(__uaddr, __old_value, __new_value, __rel_timeout); })
 #endif /* ... */
-#ifdef __CRT_HAVE_futex_timedwaitlock64
-/* Acquire a managed futex lock (s.a. `LFUTEX_WAIT_LOCK')
- * @return: 0: Did wait
- * @return: 1: Didn't wait
- * @return: -1:EFAULT:    A faulty pointer was given
- * @return: -1:EINTR:     Operation was interrupted (*uaddr was still set to new_value)
- * @return: -1:ETIMEDOUT: The given `rel_timeout' has expired */
-__CDECLARE(__ATTR_NONNULL((1)),int,__NOTHROW_RPC,futex_timedwaitlock64,(lfutex_t *__uaddr, struct timespec64 const *__rel_timeout),(__uaddr,__rel_timeout))
-#elif defined(__CRT_HAVE_futex_timedwaitlock) && __SIZEOF_TIME32_T__ == __SIZEOF_TIME64_T__
+#if defined(__CRT_HAVE_futex_timedwaitlock) && __SIZEOF_TIME32_T__ == __SIZEOF_TIME64_T__
 /* Acquire a managed futex lock (s.a. `LFUTEX_WAIT_LOCK')
  * @return: 0: Did wait
  * @return: 1: Didn't wait
@@ -1170,6 +1162,14 @@ __CDECLARE(__ATTR_NONNULL((1)),int,__NOTHROW_RPC,futex_timedwaitlock64,(lfutex_t
  * @return: -1:EINTR:     Operation was interrupted (*uaddr was still set to new_value)
  * @return: -1:ETIMEDOUT: The given `rel_timeout' has expired */
 __CREDIRECT(__ATTR_NONNULL((1)),int,__NOTHROW_RPC,futex_timedwaitlock64,(lfutex_t *__uaddr, struct timespec64 const *__rel_timeout),futex_timedwaitlock,(__uaddr,__rel_timeout))
+#elif defined(__CRT_HAVE_futex_timedwaitlock64)
+/* Acquire a managed futex lock (s.a. `LFUTEX_WAIT_LOCK')
+ * @return: 0: Did wait
+ * @return: 1: Didn't wait
+ * @return: -1:EFAULT:    A faulty pointer was given
+ * @return: -1:EINTR:     Operation was interrupted (*uaddr was still set to new_value)
+ * @return: -1:ETIMEDOUT: The given `rel_timeout' has expired */
+__CDECLARE(__ATTR_NONNULL((1)),int,__NOTHROW_RPC,futex_timedwaitlock64,(lfutex_t *__uaddr, struct timespec64 const *__rel_timeout),(__uaddr,__rel_timeout))
 #elif defined(__CRT_HAVE_lfutex64) || defined(__CRT_HAVE_lfutex)
 #include <libc/local/kos.futex/futex_timedwaitlock64.h>
 /* Acquire a managed futex lock (s.a. `LFUTEX_WAIT_LOCK')
@@ -1180,20 +1180,20 @@ __CREDIRECT(__ATTR_NONNULL((1)),int,__NOTHROW_RPC,futex_timedwaitlock64,(lfutex_
  * @return: -1:ETIMEDOUT: The given `rel_timeout' has expired */
 __NAMESPACE_LOCAL_USING_OR_IMPL(futex_timedwaitlock64, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_NONNULL((1)) int __NOTHROW_RPC(__LIBCCALL futex_timedwaitlock64)(lfutex_t *__uaddr, struct timespec64 const *__rel_timeout) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(futex_timedwaitlock64))(__uaddr, __rel_timeout); })
 #endif /* ... */
-#ifdef __CRT_HAVE_futex_timedwaitwhile_exactbits64
-/* Wait if `(*uaddr & bitmask) == setmask'
- * @return: 0: Did wait
- * @return: 1: Didn't wait
- * @return: -1:EFAULT: A faulty pointer was given
- * @return: -1:EINTR:  Operation was interrupted */
-__CDECLARE(__ATTR_NONNULL((1)),int,__NOTHROW_RPC,futex_timedwaitwhile_exactbits64,(lfutex_t *__uaddr, lfutex_t __bitmask, lfutex_t __setmask, struct timespec64 const *__rel_timeout),(__uaddr,__bitmask,__setmask,__rel_timeout))
-#elif defined(__CRT_HAVE_futex_timedwaitwhile_exactbits) && __SIZEOF_TIME32_T__ == __SIZEOF_TIME64_T__
+#if defined(__CRT_HAVE_futex_timedwaitwhile_exactbits) && __SIZEOF_TIME32_T__ == __SIZEOF_TIME64_T__
 /* Wait if `(*uaddr & bitmask) == setmask'
  * @return: 0: Did wait
  * @return: 1: Didn't wait
  * @return: -1:EFAULT: A faulty pointer was given
  * @return: -1:EINTR:  Operation was interrupted */
 __CREDIRECT(__ATTR_NONNULL((1)),int,__NOTHROW_RPC,futex_timedwaitwhile_exactbits64,(lfutex_t *__uaddr, lfutex_t __bitmask, lfutex_t __setmask, struct timespec64 const *__rel_timeout),futex_timedwaitwhile_exactbits,(__uaddr,__bitmask,__setmask,__rel_timeout))
+#elif defined(__CRT_HAVE_futex_timedwaitwhile_exactbits64)
+/* Wait if `(*uaddr & bitmask) == setmask'
+ * @return: 0: Did wait
+ * @return: 1: Didn't wait
+ * @return: -1:EFAULT: A faulty pointer was given
+ * @return: -1:EINTR:  Operation was interrupted */
+__CDECLARE(__ATTR_NONNULL((1)),int,__NOTHROW_RPC,futex_timedwaitwhile_exactbits64,(lfutex_t *__uaddr, lfutex_t __bitmask, lfutex_t __setmask, struct timespec64 const *__rel_timeout),(__uaddr,__bitmask,__setmask,__rel_timeout))
 #elif defined(__CRT_HAVE_lfutex64) || defined(__CRT_HAVE_lfutex)
 #include <libc/local/kos.futex/futex_timedwaitwhile_exactbits64.h>
 /* Wait if `(*uaddr & bitmask) == setmask'
@@ -1203,20 +1203,20 @@ __CREDIRECT(__ATTR_NONNULL((1)),int,__NOTHROW_RPC,futex_timedwaitwhile_exactbits
  * @return: -1:EINTR:  Operation was interrupted */
 __NAMESPACE_LOCAL_USING_OR_IMPL(futex_timedwaitwhile_exactbits64, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_NONNULL((1)) int __NOTHROW_RPC(__LIBCCALL futex_timedwaitwhile_exactbits64)(lfutex_t *__uaddr, lfutex_t __bitmask, lfutex_t __setmask, struct timespec64 const *__rel_timeout) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(futex_timedwaitwhile_exactbits64))(__uaddr, __bitmask, __setmask, __rel_timeout); })
 #endif /* ... */
-#ifdef __CRT_HAVE_futex_timedwaituntil_exactbits64
-/* Wait if `(*uaddr & bitmask) != setmask'
- * @return: 0: Did wait
- * @return: 1: Didn't wait
- * @return: -1:EFAULT: A faulty pointer was given
- * @return: -1:EINTR:  Operation was interrupted */
-__CDECLARE(__ATTR_NONNULL((1)),int,__NOTHROW_RPC,futex_timedwaituntil_exactbits64,(lfutex_t *__uaddr, lfutex_t __bitmask, lfutex_t __setmask, struct timespec64 const *__rel_timeout),(__uaddr,__bitmask,__setmask,__rel_timeout))
-#elif defined(__CRT_HAVE_futex_timedwaituntil_exactbits) && __SIZEOF_TIME32_T__ == __SIZEOF_TIME64_T__
+#if defined(__CRT_HAVE_futex_timedwaituntil_exactbits) && __SIZEOF_TIME32_T__ == __SIZEOF_TIME64_T__
 /* Wait if `(*uaddr & bitmask) != setmask'
  * @return: 0: Did wait
  * @return: 1: Didn't wait
  * @return: -1:EFAULT: A faulty pointer was given
  * @return: -1:EINTR:  Operation was interrupted */
 __CREDIRECT(__ATTR_NONNULL((1)),int,__NOTHROW_RPC,futex_timedwaituntil_exactbits64,(lfutex_t *__uaddr, lfutex_t __bitmask, lfutex_t __setmask, struct timespec64 const *__rel_timeout),futex_timedwaituntil_exactbits,(__uaddr,__bitmask,__setmask,__rel_timeout))
+#elif defined(__CRT_HAVE_futex_timedwaituntil_exactbits64)
+/* Wait if `(*uaddr & bitmask) != setmask'
+ * @return: 0: Did wait
+ * @return: 1: Didn't wait
+ * @return: -1:EFAULT: A faulty pointer was given
+ * @return: -1:EINTR:  Operation was interrupted */
+__CDECLARE(__ATTR_NONNULL((1)),int,__NOTHROW_RPC,futex_timedwaituntil_exactbits64,(lfutex_t *__uaddr, lfutex_t __bitmask, lfutex_t __setmask, struct timespec64 const *__rel_timeout),(__uaddr,__bitmask,__setmask,__rel_timeout))
 #elif defined(__CRT_HAVE_lfutex64) || defined(__CRT_HAVE_lfutex)
 #include <libc/local/kos.futex/futex_timedwaituntil_exactbits64.h>
 /* Wait if `(*uaddr & bitmask) != setmask'
@@ -1226,20 +1226,20 @@ __CREDIRECT(__ATTR_NONNULL((1)),int,__NOTHROW_RPC,futex_timedwaituntil_exactbits
  * @return: -1:EINTR:  Operation was interrupted */
 __NAMESPACE_LOCAL_USING_OR_IMPL(futex_timedwaituntil_exactbits64, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_NONNULL((1)) int __NOTHROW_RPC(__LIBCCALL futex_timedwaituntil_exactbits64)(lfutex_t *__uaddr, lfutex_t __bitmask, lfutex_t __setmask, struct timespec64 const *__rel_timeout) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(futex_timedwaituntil_exactbits64))(__uaddr, __bitmask, __setmask, __rel_timeout); })
 #endif /* ... */
-#ifdef __CRT_HAVE_futex_timedwaitwhile_anybit64
-/* Wait if `(*uaddr & bitmask) != 0'
- * @return: 0: Did wait
- * @return: 1: Didn't wait
- * @return: -1:EFAULT: A faulty pointer was given
- * @return: -1:EINTR:  Operation was interrupted */
-__CDECLARE(__ATTR_NONNULL((1)),int,__NOTHROW_RPC,futex_timedwaitwhile_anybit64,(lfutex_t *__uaddr, lfutex_t __bitmask, struct timespec64 const *__rel_timeout),(__uaddr,__bitmask,__rel_timeout))
-#elif defined(__CRT_HAVE_futex_timedwaitwhile_anybit) && __SIZEOF_TIME32_T__ == __SIZEOF_TIME64_T__
+#if defined(__CRT_HAVE_futex_timedwaitwhile_anybit) && __SIZEOF_TIME32_T__ == __SIZEOF_TIME64_T__
 /* Wait if `(*uaddr & bitmask) != 0'
  * @return: 0: Did wait
  * @return: 1: Didn't wait
  * @return: -1:EFAULT: A faulty pointer was given
  * @return: -1:EINTR:  Operation was interrupted */
 __CREDIRECT(__ATTR_NONNULL((1)),int,__NOTHROW_RPC,futex_timedwaitwhile_anybit64,(lfutex_t *__uaddr, lfutex_t __bitmask, struct timespec64 const *__rel_timeout),futex_timedwaitwhile_anybit,(__uaddr,__bitmask,__rel_timeout))
+#elif defined(__CRT_HAVE_futex_timedwaitwhile_anybit64)
+/* Wait if `(*uaddr & bitmask) != 0'
+ * @return: 0: Did wait
+ * @return: 1: Didn't wait
+ * @return: -1:EFAULT: A faulty pointer was given
+ * @return: -1:EINTR:  Operation was interrupted */
+__CDECLARE(__ATTR_NONNULL((1)),int,__NOTHROW_RPC,futex_timedwaitwhile_anybit64,(lfutex_t *__uaddr, lfutex_t __bitmask, struct timespec64 const *__rel_timeout),(__uaddr,__bitmask,__rel_timeout))
 #elif defined(__CRT_HAVE_lfutex64) || defined(__CRT_HAVE_lfutex)
 #include <libc/local/kos.futex/futex_timedwaitwhile_anybit64.h>
 /* Wait if `(*uaddr & bitmask) != 0'
@@ -1249,20 +1249,20 @@ __CREDIRECT(__ATTR_NONNULL((1)),int,__NOTHROW_RPC,futex_timedwaitwhile_anybit64,
  * @return: -1:EINTR:  Operation was interrupted */
 __NAMESPACE_LOCAL_USING_OR_IMPL(futex_timedwaitwhile_anybit64, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_NONNULL((1)) int __NOTHROW_RPC(__LIBCCALL futex_timedwaitwhile_anybit64)(lfutex_t *__uaddr, lfutex_t __bitmask, struct timespec64 const *__rel_timeout) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(futex_timedwaitwhile_anybit64))(__uaddr, __bitmask, __rel_timeout); })
 #endif /* ... */
-#ifdef __CRT_HAVE_futex_timedwaitwhile_allbits64
-/* Wait if `(*uaddr & bitmask) == bitmask'
- * @return: 0: Did wait
- * @return: 1: Didn't wait
- * @return: -1:EFAULT: A faulty pointer was given
- * @return: -1:EINTR:  Operation was interrupted */
-__CDECLARE(__ATTR_NONNULL((1)),int,__NOTHROW_RPC,futex_timedwaitwhile_allbits64,(lfutex_t *__uaddr, lfutex_t __bitmask, struct timespec64 const *__rel_timeout),(__uaddr,__bitmask,__rel_timeout))
-#elif defined(__CRT_HAVE_futex_timedwaitwhile_allbits) && __SIZEOF_TIME32_T__ == __SIZEOF_TIME64_T__
+#if defined(__CRT_HAVE_futex_timedwaitwhile_allbits) && __SIZEOF_TIME32_T__ == __SIZEOF_TIME64_T__
 /* Wait if `(*uaddr & bitmask) == bitmask'
  * @return: 0: Did wait
  * @return: 1: Didn't wait
  * @return: -1:EFAULT: A faulty pointer was given
  * @return: -1:EINTR:  Operation was interrupted */
 __CREDIRECT(__ATTR_NONNULL((1)),int,__NOTHROW_RPC,futex_timedwaitwhile_allbits64,(lfutex_t *__uaddr, lfutex_t __bitmask, struct timespec64 const *__rel_timeout),futex_timedwaitwhile_allbits,(__uaddr,__bitmask,__rel_timeout))
+#elif defined(__CRT_HAVE_futex_timedwaitwhile_allbits64)
+/* Wait if `(*uaddr & bitmask) == bitmask'
+ * @return: 0: Did wait
+ * @return: 1: Didn't wait
+ * @return: -1:EFAULT: A faulty pointer was given
+ * @return: -1:EINTR:  Operation was interrupted */
+__CDECLARE(__ATTR_NONNULL((1)),int,__NOTHROW_RPC,futex_timedwaitwhile_allbits64,(lfutex_t *__uaddr, lfutex_t __bitmask, struct timespec64 const *__rel_timeout),(__uaddr,__bitmask,__rel_timeout))
 #elif defined(__CRT_HAVE_lfutex64) || defined(__CRT_HAVE_lfutex)
 #include <libc/local/kos.futex/futex_timedwaitwhile_allbits64.h>
 /* Wait if `(*uaddr & bitmask) == bitmask'
@@ -1486,15 +1486,7 @@ extern "C++" {
  * @return: -1:EFAULT: A faulty pointer was given */
 __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_NONNULL((1)) __SSIZE_TYPE__ __NOTHROW_NCX(__LIBCCALL futex_wake)(lfutex_t *__uaddr) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(futex_wakeall))(__uaddr); }
 #endif /* ... */
-#if defined(__CRT_HAVE_futex_timedwaitwhile64) && defined(__USE_TIME_BITS64)
-/* Wait if `*uaddr == equal_to_value'
- * @return: 0: Did wait
- * @return: 1: Didn't wait
- * @return: -1:EFAULT:    A faulty pointer was given
- * @return: -1:EINTR:     Operation was interrupted
- * @return: -1:ETIMEDOUT: The given `rel_timeout' has expired */
-__CREDIRECT(__ATTR_NONNULL((1)),int,__NOTHROW_RPC,futex_waitwhile,(lfutex_t *__uaddr, lfutex_t __equal_to_value, struct timespec const *__rel_timeout),futex_timedwaitwhile64,(__uaddr,__equal_to_value,__rel_timeout))
-#elif defined(__CRT_HAVE_futex_timedwaitwhile) && !defined(__USE_TIME_BITS64)
+#if defined(__CRT_HAVE_futex_timedwaitwhile) && (!defined(__USE_TIME_BITS64) || __SIZEOF_TIME32_T__ == __SIZEOF_TIME64_T__)
 /* Wait if `*uaddr == equal_to_value'
  * @return: 0: Did wait
  * @return: 1: Didn't wait
@@ -1502,6 +1494,14 @@ __CREDIRECT(__ATTR_NONNULL((1)),int,__NOTHROW_RPC,futex_waitwhile,(lfutex_t *__u
  * @return: -1:EINTR:     Operation was interrupted
  * @return: -1:ETIMEDOUT: The given `rel_timeout' has expired */
 __CREDIRECT(__ATTR_NONNULL((1)),int,__NOTHROW_RPC,futex_waitwhile,(lfutex_t *__uaddr, lfutex_t __equal_to_value, struct timespec const *__rel_timeout),futex_timedwaitwhile,(__uaddr,__equal_to_value,__rel_timeout))
+#elif defined(__CRT_HAVE_futex_timedwaitwhile64) && (defined(__USE_TIME_BITS64) || __SIZEOF_TIME32_T__ == __SIZEOF_TIME64_T__)
+/* Wait if `*uaddr == equal_to_value'
+ * @return: 0: Did wait
+ * @return: 1: Didn't wait
+ * @return: -1:EFAULT:    A faulty pointer was given
+ * @return: -1:EINTR:     Operation was interrupted
+ * @return: -1:ETIMEDOUT: The given `rel_timeout' has expired */
+__CREDIRECT(__ATTR_NONNULL((1)),int,__NOTHROW_RPC,futex_waitwhile,(lfutex_t *__uaddr, lfutex_t __equal_to_value, struct timespec const *__rel_timeout),futex_timedwaitwhile64,(__uaddr,__equal_to_value,__rel_timeout))
 #elif defined(__CRT_HAVE_lfutex64) || defined(__CRT_HAVE_lfutex)
 } /* extern "C++" */
 #include <libc/local/kos.futex/futex_timedwaitwhile.h>
@@ -1514,15 +1514,7 @@ extern "C++" {
  * @return: -1:ETIMEDOUT: The given `rel_timeout' has expired */
 __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_NONNULL((1)) int __NOTHROW_RPC(__LIBCCALL futex_waitwhile)(lfutex_t *__uaddr, lfutex_t __equal_to_value, struct timespec const *__rel_timeout) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(futex_timedwaitwhile))(__uaddr, __equal_to_value, __rel_timeout); }
 #endif /* ... */
-#if defined(__CRT_HAVE_futex_timedwaituntil64) && defined(__USE_TIME_BITS64)
-/* Wait if `*uaddr != not_equal_to_value'
- * @return: 0: Did wait
- * @return: 1: Didn't wait
- * @return: -1:EFAULT:    A faulty pointer was given
- * @return: -1:EINTR:     Operation was interrupted
- * @return: -1:ETIMEDOUT: The given `rel_timeout' has expired */
-__CREDIRECT(__ATTR_NONNULL((1)),int,__NOTHROW_RPC,futex_waituntil,(lfutex_t *__uaddr, lfutex_t __not_equal_to_value, struct timespec const *__rel_timeout),futex_timedwaituntil64,(__uaddr,__not_equal_to_value,__rel_timeout))
-#elif defined(__CRT_HAVE_futex_timedwaituntil) && !defined(__USE_TIME_BITS64)
+#if defined(__CRT_HAVE_futex_timedwaituntil) && (!defined(__USE_TIME_BITS64) || __SIZEOF_TIME32_T__ == __SIZEOF_TIME64_T__)
 /* Wait if `*uaddr != not_equal_to_value'
  * @return: 0: Did wait
  * @return: 1: Didn't wait
@@ -1530,6 +1522,14 @@ __CREDIRECT(__ATTR_NONNULL((1)),int,__NOTHROW_RPC,futex_waituntil,(lfutex_t *__u
  * @return: -1:EINTR:     Operation was interrupted
  * @return: -1:ETIMEDOUT: The given `rel_timeout' has expired */
 __CREDIRECT(__ATTR_NONNULL((1)),int,__NOTHROW_RPC,futex_waituntil,(lfutex_t *__uaddr, lfutex_t __not_equal_to_value, struct timespec const *__rel_timeout),futex_timedwaituntil,(__uaddr,__not_equal_to_value,__rel_timeout))
+#elif defined(__CRT_HAVE_futex_timedwaituntil64) && (defined(__USE_TIME_BITS64) || __SIZEOF_TIME32_T__ == __SIZEOF_TIME64_T__)
+/* Wait if `*uaddr != not_equal_to_value'
+ * @return: 0: Did wait
+ * @return: 1: Didn't wait
+ * @return: -1:EFAULT:    A faulty pointer was given
+ * @return: -1:EINTR:     Operation was interrupted
+ * @return: -1:ETIMEDOUT: The given `rel_timeout' has expired */
+__CREDIRECT(__ATTR_NONNULL((1)),int,__NOTHROW_RPC,futex_waituntil,(lfutex_t *__uaddr, lfutex_t __not_equal_to_value, struct timespec const *__rel_timeout),futex_timedwaituntil64,(__uaddr,__not_equal_to_value,__rel_timeout))
 #elif defined(__CRT_HAVE_lfutex64) || defined(__CRT_HAVE_lfutex)
 } /* extern "C++" */
 #include <libc/local/kos.futex/futex_timedwaituntil.h>
@@ -1542,15 +1542,7 @@ extern "C++" {
  * @return: -1:ETIMEDOUT: The given `rel_timeout' has expired */
 __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_NONNULL((1)) int __NOTHROW_RPC(__LIBCCALL futex_waituntil)(lfutex_t *__uaddr, lfutex_t __not_equal_to_value, struct timespec const *__rel_timeout) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(futex_timedwaituntil))(__uaddr, __not_equal_to_value, __rel_timeout); }
 #endif /* ... */
-#if defined(__CRT_HAVE_futex_timedwaitwhile64) && defined(__USE_TIME_BITS64)
-/* Wait if `*uaddr == equal_to_value'
- * @return: 0: Did wait
- * @return: 1: Didn't wait
- * @return: -1:EFAULT:    A faulty pointer was given
- * @return: -1:EINTR:     Operation was interrupted
- * @return: -1:ETIMEDOUT: The given `rel_timeout' has expired */
-__CREDIRECT(__ATTR_NONNULL((1)),int,__NOTHROW_RPC,futex_waitwhile_equal,(lfutex_t *__uaddr, lfutex_t __equal_to_value, struct timespec const *__rel_timeout),futex_timedwaitwhile64,(__uaddr,__equal_to_value,__rel_timeout))
-#elif defined(__CRT_HAVE_futex_timedwaitwhile) && !defined(__USE_TIME_BITS64)
+#if defined(__CRT_HAVE_futex_timedwaitwhile) && (!defined(__USE_TIME_BITS64) || __SIZEOF_TIME32_T__ == __SIZEOF_TIME64_T__)
 /* Wait if `*uaddr == equal_to_value'
  * @return: 0: Did wait
  * @return: 1: Didn't wait
@@ -1558,6 +1550,14 @@ __CREDIRECT(__ATTR_NONNULL((1)),int,__NOTHROW_RPC,futex_waitwhile_equal,(lfutex_
  * @return: -1:EINTR:     Operation was interrupted
  * @return: -1:ETIMEDOUT: The given `rel_timeout' has expired */
 __CREDIRECT(__ATTR_NONNULL((1)),int,__NOTHROW_RPC,futex_waitwhile_equal,(lfutex_t *__uaddr, lfutex_t __equal_to_value, struct timespec const *__rel_timeout),futex_timedwaitwhile,(__uaddr,__equal_to_value,__rel_timeout))
+#elif defined(__CRT_HAVE_futex_timedwaitwhile64) && (defined(__USE_TIME_BITS64) || __SIZEOF_TIME32_T__ == __SIZEOF_TIME64_T__)
+/* Wait if `*uaddr == equal_to_value'
+ * @return: 0: Did wait
+ * @return: 1: Didn't wait
+ * @return: -1:EFAULT:    A faulty pointer was given
+ * @return: -1:EINTR:     Operation was interrupted
+ * @return: -1:ETIMEDOUT: The given `rel_timeout' has expired */
+__CREDIRECT(__ATTR_NONNULL((1)),int,__NOTHROW_RPC,futex_waitwhile_equal,(lfutex_t *__uaddr, lfutex_t __equal_to_value, struct timespec const *__rel_timeout),futex_timedwaitwhile64,(__uaddr,__equal_to_value,__rel_timeout))
 #elif defined(__CRT_HAVE_lfutex64) || defined(__CRT_HAVE_lfutex)
 } /* extern "C++" */
 #include <libc/local/kos.futex/futex_timedwaitwhile.h>
@@ -1570,15 +1570,7 @@ extern "C++" {
  * @return: -1:ETIMEDOUT: The given `rel_timeout' has expired */
 __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_NONNULL((1)) int __NOTHROW_RPC(__LIBCCALL futex_waitwhile_equal)(lfutex_t *__uaddr, lfutex_t __equal_to_value, struct timespec const *__rel_timeout) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(futex_timedwaitwhile))(__uaddr, __equal_to_value, __rel_timeout); }
 #endif /* ... */
-#if defined(__CRT_HAVE_futex_timedwaituntil64) && defined(__USE_TIME_BITS64)
-/* Wait if `*uaddr != not_equal_to_value'
- * @return: 0: Did wait
- * @return: 1: Didn't wait
- * @return: -1:EFAULT:    A faulty pointer was given
- * @return: -1:EINTR:     Operation was interrupted
- * @return: -1:ETIMEDOUT: The given `rel_timeout' has expired */
-__CREDIRECT(__ATTR_NONNULL((1)),int,__NOTHROW_RPC,futex_waitwhile_notequal,(lfutex_t *__uaddr, lfutex_t __not_equal_to_value, struct timespec const *__rel_timeout),futex_timedwaituntil64,(__uaddr,__not_equal_to_value,__rel_timeout))
-#elif defined(__CRT_HAVE_futex_timedwaituntil) && !defined(__USE_TIME_BITS64)
+#if defined(__CRT_HAVE_futex_timedwaituntil) && (!defined(__USE_TIME_BITS64) || __SIZEOF_TIME32_T__ == __SIZEOF_TIME64_T__)
 /* Wait if `*uaddr != not_equal_to_value'
  * @return: 0: Did wait
  * @return: 1: Didn't wait
@@ -1586,6 +1578,14 @@ __CREDIRECT(__ATTR_NONNULL((1)),int,__NOTHROW_RPC,futex_waitwhile_notequal,(lfut
  * @return: -1:EINTR:     Operation was interrupted
  * @return: -1:ETIMEDOUT: The given `rel_timeout' has expired */
 __CREDIRECT(__ATTR_NONNULL((1)),int,__NOTHROW_RPC,futex_waitwhile_notequal,(lfutex_t *__uaddr, lfutex_t __not_equal_to_value, struct timespec const *__rel_timeout),futex_timedwaituntil,(__uaddr,__not_equal_to_value,__rel_timeout))
+#elif defined(__CRT_HAVE_futex_timedwaituntil64) && (defined(__USE_TIME_BITS64) || __SIZEOF_TIME32_T__ == __SIZEOF_TIME64_T__)
+/* Wait if `*uaddr != not_equal_to_value'
+ * @return: 0: Did wait
+ * @return: 1: Didn't wait
+ * @return: -1:EFAULT:    A faulty pointer was given
+ * @return: -1:EINTR:     Operation was interrupted
+ * @return: -1:ETIMEDOUT: The given `rel_timeout' has expired */
+__CREDIRECT(__ATTR_NONNULL((1)),int,__NOTHROW_RPC,futex_waitwhile_notequal,(lfutex_t *__uaddr, lfutex_t __not_equal_to_value, struct timespec const *__rel_timeout),futex_timedwaituntil64,(__uaddr,__not_equal_to_value,__rel_timeout))
 #elif defined(__CRT_HAVE_lfutex64) || defined(__CRT_HAVE_lfutex)
 } /* extern "C++" */
 #include <libc/local/kos.futex/futex_timedwaituntil.h>
@@ -1598,15 +1598,7 @@ extern "C++" {
  * @return: -1:ETIMEDOUT: The given `rel_timeout' has expired */
 __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_NONNULL((1)) int __NOTHROW_RPC(__LIBCCALL futex_waitwhile_notequal)(lfutex_t *__uaddr, lfutex_t __not_equal_to_value, struct timespec const *__rel_timeout) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(futex_timedwaituntil))(__uaddr, __not_equal_to_value, __rel_timeout); }
 #endif /* ... */
-#if defined(__CRT_HAVE_futex_timedwaitwhile_above64) && defined(__USE_TIME_BITS64)
-/* Wait if `*uaddr > above_value'
- * @return: 0: Did wait
- * @return: 1: Didn't wait
- * @return: -1:EFAULT:    A faulty pointer was given
- * @return: -1:EINTR:     Operation was interrupted
- * @return: -1:ETIMEDOUT: The given `rel_timeout' has expired */
-__CREDIRECT(__ATTR_NONNULL((1)),int,__NOTHROW_RPC,futex_waitwhile_above,(lfutex_t *__uaddr, lfutex_t __above_value, struct timespec const *__rel_timeout),futex_timedwaitwhile_above64,(__uaddr,__above_value,__rel_timeout))
-#elif defined(__CRT_HAVE_futex_timedwaitwhile_above) && !defined(__USE_TIME_BITS64)
+#if defined(__CRT_HAVE_futex_timedwaitwhile_above) && (!defined(__USE_TIME_BITS64) || __SIZEOF_TIME32_T__ == __SIZEOF_TIME64_T__)
 /* Wait if `*uaddr > above_value'
  * @return: 0: Did wait
  * @return: 1: Didn't wait
@@ -1614,6 +1606,14 @@ __CREDIRECT(__ATTR_NONNULL((1)),int,__NOTHROW_RPC,futex_waitwhile_above,(lfutex_
  * @return: -1:EINTR:     Operation was interrupted
  * @return: -1:ETIMEDOUT: The given `rel_timeout' has expired */
 __CREDIRECT(__ATTR_NONNULL((1)),int,__NOTHROW_RPC,futex_waitwhile_above,(lfutex_t *__uaddr, lfutex_t __above_value, struct timespec const *__rel_timeout),futex_timedwaitwhile_above,(__uaddr,__above_value,__rel_timeout))
+#elif defined(__CRT_HAVE_futex_timedwaitwhile_above64) && (defined(__USE_TIME_BITS64) || __SIZEOF_TIME32_T__ == __SIZEOF_TIME64_T__)
+/* Wait if `*uaddr > above_value'
+ * @return: 0: Did wait
+ * @return: 1: Didn't wait
+ * @return: -1:EFAULT:    A faulty pointer was given
+ * @return: -1:EINTR:     Operation was interrupted
+ * @return: -1:ETIMEDOUT: The given `rel_timeout' has expired */
+__CREDIRECT(__ATTR_NONNULL((1)),int,__NOTHROW_RPC,futex_waitwhile_above,(lfutex_t *__uaddr, lfutex_t __above_value, struct timespec const *__rel_timeout),futex_timedwaitwhile_above64,(__uaddr,__above_value,__rel_timeout))
 #elif defined(__CRT_HAVE_lfutex64) || defined(__CRT_HAVE_lfutex)
 } /* extern "C++" */
 #include <libc/local/kos.futex/futex_timedwaitwhile_above.h>
@@ -1626,15 +1626,7 @@ extern "C++" {
  * @return: -1:ETIMEDOUT: The given `rel_timeout' has expired */
 __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_NONNULL((1)) int __NOTHROW_RPC(__LIBCCALL futex_waitwhile_above)(lfutex_t *__uaddr, lfutex_t __above_value, struct timespec const *__rel_timeout) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(futex_timedwaitwhile_above))(__uaddr, __above_value, __rel_timeout); }
 #endif /* ... */
-#if defined(__CRT_HAVE_futex_timedwaitwhile_below64) && defined(__USE_TIME_BITS64)
-/* Wait if `*uaddr < below_value'
- * @return: 0: Did wait
- * @return: 1: Didn't wait
- * @return: -1:EFAULT:    A faulty pointer was given
- * @return: -1:EINTR:     Operation was interrupted
- * @return: -1:ETIMEDOUT: The given `rel_timeout' has expired */
-__CREDIRECT(__ATTR_NONNULL((1)),int,__NOTHROW_RPC,futex_waitwhile_below,(lfutex_t *__uaddr, lfutex_t __below_value, struct timespec const *__rel_timeout),futex_timedwaitwhile_below64,(__uaddr,__below_value,__rel_timeout))
-#elif defined(__CRT_HAVE_futex_timedwaitwhile_below) && !defined(__USE_TIME_BITS64)
+#if defined(__CRT_HAVE_futex_timedwaitwhile_below) && (!defined(__USE_TIME_BITS64) || __SIZEOF_TIME32_T__ == __SIZEOF_TIME64_T__)
 /* Wait if `*uaddr < below_value'
  * @return: 0: Did wait
  * @return: 1: Didn't wait
@@ -1642,6 +1634,14 @@ __CREDIRECT(__ATTR_NONNULL((1)),int,__NOTHROW_RPC,futex_waitwhile_below,(lfutex_
  * @return: -1:EINTR:     Operation was interrupted
  * @return: -1:ETIMEDOUT: The given `rel_timeout' has expired */
 __CREDIRECT(__ATTR_NONNULL((1)),int,__NOTHROW_RPC,futex_waitwhile_below,(lfutex_t *__uaddr, lfutex_t __below_value, struct timespec const *__rel_timeout),futex_timedwaitwhile_below,(__uaddr,__below_value,__rel_timeout))
+#elif defined(__CRT_HAVE_futex_timedwaitwhile_below64) && (defined(__USE_TIME_BITS64) || __SIZEOF_TIME32_T__ == __SIZEOF_TIME64_T__)
+/* Wait if `*uaddr < below_value'
+ * @return: 0: Did wait
+ * @return: 1: Didn't wait
+ * @return: -1:EFAULT:    A faulty pointer was given
+ * @return: -1:EINTR:     Operation was interrupted
+ * @return: -1:ETIMEDOUT: The given `rel_timeout' has expired */
+__CREDIRECT(__ATTR_NONNULL((1)),int,__NOTHROW_RPC,futex_waitwhile_below,(lfutex_t *__uaddr, lfutex_t __below_value, struct timespec const *__rel_timeout),futex_timedwaitwhile_below64,(__uaddr,__below_value,__rel_timeout))
 #elif defined(__CRT_HAVE_lfutex64) || defined(__CRT_HAVE_lfutex)
 } /* extern "C++" */
 #include <libc/local/kos.futex/futex_timedwaitwhile_below.h>
@@ -1654,7 +1654,7 @@ extern "C++" {
  * @return: -1:ETIMEDOUT: The given `rel_timeout' has expired */
 __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_NONNULL((1)) int __NOTHROW_RPC(__LIBCCALL futex_waitwhile_below)(lfutex_t *__uaddr, lfutex_t __below_value, struct timespec const *__rel_timeout) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(futex_timedwaitwhile_below))(__uaddr, __below_value, __rel_timeout); }
 #endif /* ... */
-#if defined(__CRT_HAVE_futex_timedwaitwhile_aboveequal64) && defined(__USE_TIME_BITS64)
+#if defined(__CRT_HAVE_futex_timedwaitwhile_aboveequal64) && (defined(__USE_TIME_BITS64) || __SIZEOF_TIME32_T__ == __SIZEOF_TIME64_T__)
 /* Wait if `*uaddr >= above_equal_value'
  * @return: 0: Did wait
  * @return: 1: Didn't wait
@@ -1662,7 +1662,7 @@ __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_NONNULL((1)) int __NOTHROW_RPC(__LIBCCALL 
  * @return: -1:EINTR:     Operation was interrupted
  * @return: -1:ETIMEDOUT: The given `rel_timeout' has expired */
 __CREDIRECT(__ATTR_NONNULL((1)),int,__NOTHROW_RPC,futex_waitwhile_aboveequal,(lfutex_t *__uaddr, lfutex_t __above_equal_value, struct timespec const *__rel_timeout),futex_timedwaitwhile_aboveequal64,(__uaddr,__above_equal_value,__rel_timeout))
-#elif defined(__CRT_HAVE_futex_timedwaitwhile_aboveequal) && !defined(__USE_TIME_BITS64)
+#elif defined(__CRT_HAVE_futex_timedwaitwhile_aboveequal) && (!defined(__USE_TIME_BITS64) || __SIZEOF_TIME32_T__ == __SIZEOF_TIME64_T__)
 /* Wait if `*uaddr >= above_equal_value'
  * @return: 0: Did wait
  * @return: 1: Didn't wait
@@ -1682,15 +1682,7 @@ extern "C++" {
  * @return: -1:ETIMEDOUT: The given `rel_timeout' has expired */
 __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_NONNULL((1)) int __NOTHROW_RPC(__LIBCCALL futex_waitwhile_aboveequal)(lfutex_t *__uaddr, lfutex_t __above_equal_value, struct timespec const *__rel_timeout) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(futex_timedwaitwhile_aboveequal))(__uaddr, __above_equal_value, __rel_timeout); }
 #endif /* ... */
-#if defined(__CRT_HAVE_futex_timedwaitwhile_belowequal64) && defined(__USE_TIME_BITS64)
-/* Wait if `*uaddr <= below_equal_value'
- * @return: 0: Did wait
- * @return: 1: Didn't wait
- * @return: -1:EFAULT:    A faulty pointer was given
- * @return: -1:EINTR:     Operation was interrupted
- * @return: -1:ETIMEDOUT: The given `rel_timeout' has expired */
-__CREDIRECT(__ATTR_NONNULL((1)),int,__NOTHROW_RPC,futex_waitwhile_belowequal,(lfutex_t *__uaddr, lfutex_t __below_equal_value, struct timespec const *__rel_timeout),futex_timedwaitwhile_belowequal64,(__uaddr,__below_equal_value,__rel_timeout))
-#elif defined(__CRT_HAVE_futex_timedwaitwhile_belowequal) && !defined(__USE_TIME_BITS64)
+#if defined(__CRT_HAVE_futex_timedwaitwhile_belowequal) && (!defined(__USE_TIME_BITS64) || __SIZEOF_TIME32_T__ == __SIZEOF_TIME64_T__)
 /* Wait if `*uaddr <= below_equal_value'
  * @return: 0: Did wait
  * @return: 1: Didn't wait
@@ -1698,6 +1690,14 @@ __CREDIRECT(__ATTR_NONNULL((1)),int,__NOTHROW_RPC,futex_waitwhile_belowequal,(lf
  * @return: -1:EINTR:     Operation was interrupted
  * @return: -1:ETIMEDOUT: The given `rel_timeout' has expired */
 __CREDIRECT(__ATTR_NONNULL((1)),int,__NOTHROW_RPC,futex_waitwhile_belowequal,(lfutex_t *__uaddr, lfutex_t __below_equal_value, struct timespec const *__rel_timeout),futex_timedwaitwhile_belowequal,(__uaddr,__below_equal_value,__rel_timeout))
+#elif defined(__CRT_HAVE_futex_timedwaitwhile_belowequal64) && (defined(__USE_TIME_BITS64) || __SIZEOF_TIME32_T__ == __SIZEOF_TIME64_T__)
+/* Wait if `*uaddr <= below_equal_value'
+ * @return: 0: Did wait
+ * @return: 1: Didn't wait
+ * @return: -1:EFAULT:    A faulty pointer was given
+ * @return: -1:EINTR:     Operation was interrupted
+ * @return: -1:ETIMEDOUT: The given `rel_timeout' has expired */
+__CREDIRECT(__ATTR_NONNULL((1)),int,__NOTHROW_RPC,futex_waitwhile_belowequal,(lfutex_t *__uaddr, lfutex_t __below_equal_value, struct timespec const *__rel_timeout),futex_timedwaitwhile_belowequal64,(__uaddr,__below_equal_value,__rel_timeout))
 #elif defined(__CRT_HAVE_lfutex64) || defined(__CRT_HAVE_lfutex)
 } /* extern "C++" */
 #include <libc/local/kos.futex/futex_timedwaitwhile_belowequal.h>
@@ -1710,15 +1710,7 @@ extern "C++" {
  * @return: -1:ETIMEDOUT: The given `rel_timeout' has expired */
 __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_NONNULL((1)) int __NOTHROW_RPC(__LIBCCALL futex_waitwhile_belowequal)(lfutex_t *__uaddr, lfutex_t __below_equal_value, struct timespec const *__rel_timeout) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(futex_timedwaitwhile_belowequal))(__uaddr, __below_equal_value, __rel_timeout); }
 #endif /* ... */
-#if defined(__CRT_HAVE_futex_timedwaitwhile_cmpxch64) && defined(__USE_TIME_BITS64)
-/* Wait if `*uaddr == old_value', and set `*uaddr = new_value'
- * @return: 0: Did wait
- * @return: 1: Didn't wait
- * @return: -1:EFAULT:    A faulty pointer was given
- * @return: -1:EINTR:     Operation was interrupted (*uaddr was still set to new_value)
- * @return: -1:ETIMEDOUT: The given `rel_timeout' has expired */
-__CREDIRECT(__ATTR_NONNULL((1)),int,__NOTHROW_RPC,futex_waitwhile_cmpxch,(lfutex_t *__uaddr, lfutex_t __old_value, lfutex_t __new_value, struct timespec const *__rel_timeout),futex_timedwaitwhile_cmpxch64,(__uaddr,__old_value,__new_value,__rel_timeout))
-#elif defined(__CRT_HAVE_futex_timedwaitwhile_cmpxch) && !defined(__USE_TIME_BITS64)
+#if defined(__CRT_HAVE_futex_timedwaitwhile_cmpxch) && (!defined(__USE_TIME_BITS64) || __SIZEOF_TIME32_T__ == __SIZEOF_TIME64_T__)
 /* Wait if `*uaddr == old_value', and set `*uaddr = new_value'
  * @return: 0: Did wait
  * @return: 1: Didn't wait
@@ -1726,6 +1718,14 @@ __CREDIRECT(__ATTR_NONNULL((1)),int,__NOTHROW_RPC,futex_waitwhile_cmpxch,(lfutex
  * @return: -1:EINTR:     Operation was interrupted (*uaddr was still set to new_value)
  * @return: -1:ETIMEDOUT: The given `rel_timeout' has expired */
 __CREDIRECT(__ATTR_NONNULL((1)),int,__NOTHROW_RPC,futex_waitwhile_cmpxch,(lfutex_t *__uaddr, lfutex_t __old_value, lfutex_t __new_value, struct timespec const *__rel_timeout),futex_timedwaitwhile_cmpxch,(__uaddr,__old_value,__new_value,__rel_timeout))
+#elif defined(__CRT_HAVE_futex_timedwaitwhile_cmpxch64) && (defined(__USE_TIME_BITS64) || __SIZEOF_TIME32_T__ == __SIZEOF_TIME64_T__)
+/* Wait if `*uaddr == old_value', and set `*uaddr = new_value'
+ * @return: 0: Did wait
+ * @return: 1: Didn't wait
+ * @return: -1:EFAULT:    A faulty pointer was given
+ * @return: -1:EINTR:     Operation was interrupted (*uaddr was still set to new_value)
+ * @return: -1:ETIMEDOUT: The given `rel_timeout' has expired */
+__CREDIRECT(__ATTR_NONNULL((1)),int,__NOTHROW_RPC,futex_waitwhile_cmpxch,(lfutex_t *__uaddr, lfutex_t __old_value, lfutex_t __new_value, struct timespec const *__rel_timeout),futex_timedwaitwhile_cmpxch64,(__uaddr,__old_value,__new_value,__rel_timeout))
 #elif defined(__CRT_HAVE_lfutex64) || defined(__CRT_HAVE_lfutex)
 } /* extern "C++" */
 #include <libc/local/kos.futex/futex_timedwaitwhile_cmpxch.h>
@@ -1738,15 +1738,7 @@ extern "C++" {
  * @return: -1:ETIMEDOUT: The given `rel_timeout' has expired */
 __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_NONNULL((1)) int __NOTHROW_RPC(__LIBCCALL futex_waitwhile_cmpxch)(lfutex_t *__uaddr, lfutex_t __old_value, lfutex_t __new_value, struct timespec const *__rel_timeout) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(futex_timedwaitwhile_cmpxch))(__uaddr, __old_value, __new_value, __rel_timeout); }
 #endif /* ... */
-#if defined(__CRT_HAVE_futex_timedwaituntil_cmpxch64) && defined(__USE_TIME_BITS64)
-/* Wait if `*uaddr != old_value', and set `*uaddr = new_value'
- * @return: 0: Did wait
- * @return: 1: Didn't wait
- * @return: -1:EFAULT:    A faulty pointer was given
- * @return: -1:EINTR:     Operation was interrupted (*uaddr was still set to new_value)
- * @return: -1:ETIMEDOUT: The given `rel_timeout' has expired */
-__CREDIRECT(__ATTR_NONNULL((1)),int,__NOTHROW_RPC,futex_waituntil_cmpxch,(lfutex_t *__uaddr, lfutex_t __old_value, lfutex_t __new_value, struct timespec const *__rel_timeout),futex_timedwaituntil_cmpxch64,(__uaddr,__old_value,__new_value,__rel_timeout))
-#elif defined(__CRT_HAVE_futex_timedwaituntil_cmpxch) && !defined(__USE_TIME_BITS64)
+#if defined(__CRT_HAVE_futex_timedwaituntil_cmpxch) && (!defined(__USE_TIME_BITS64) || __SIZEOF_TIME32_T__ == __SIZEOF_TIME64_T__)
 /* Wait if `*uaddr != old_value', and set `*uaddr = new_value'
  * @return: 0: Did wait
  * @return: 1: Didn't wait
@@ -1754,6 +1746,14 @@ __CREDIRECT(__ATTR_NONNULL((1)),int,__NOTHROW_RPC,futex_waituntil_cmpxch,(lfutex
  * @return: -1:EINTR:     Operation was interrupted (*uaddr was still set to new_value)
  * @return: -1:ETIMEDOUT: The given `rel_timeout' has expired */
 __CREDIRECT(__ATTR_NONNULL((1)),int,__NOTHROW_RPC,futex_waituntil_cmpxch,(lfutex_t *__uaddr, lfutex_t __old_value, lfutex_t __new_value, struct timespec const *__rel_timeout),futex_timedwaituntil_cmpxch,(__uaddr,__old_value,__new_value,__rel_timeout))
+#elif defined(__CRT_HAVE_futex_timedwaituntil_cmpxch64) && (defined(__USE_TIME_BITS64) || __SIZEOF_TIME32_T__ == __SIZEOF_TIME64_T__)
+/* Wait if `*uaddr != old_value', and set `*uaddr = new_value'
+ * @return: 0: Did wait
+ * @return: 1: Didn't wait
+ * @return: -1:EFAULT:    A faulty pointer was given
+ * @return: -1:EINTR:     Operation was interrupted (*uaddr was still set to new_value)
+ * @return: -1:ETIMEDOUT: The given `rel_timeout' has expired */
+__CREDIRECT(__ATTR_NONNULL((1)),int,__NOTHROW_RPC,futex_waituntil_cmpxch,(lfutex_t *__uaddr, lfutex_t __old_value, lfutex_t __new_value, struct timespec const *__rel_timeout),futex_timedwaituntil_cmpxch64,(__uaddr,__old_value,__new_value,__rel_timeout))
 #elif defined(__CRT_HAVE_lfutex64) || defined(__CRT_HAVE_lfutex)
 } /* extern "C++" */
 #include <libc/local/kos.futex/futex_timedwaituntil_cmpxch.h>
@@ -1766,15 +1766,7 @@ extern "C++" {
  * @return: -1:ETIMEDOUT: The given `rel_timeout' has expired */
 __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_NONNULL((1)) int __NOTHROW_RPC(__LIBCCALL futex_waituntil_cmpxch)(lfutex_t *__uaddr, lfutex_t __old_value, lfutex_t __new_value, struct timespec const *__rel_timeout) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(futex_timedwaituntil_cmpxch))(__uaddr, __old_value, __new_value, __rel_timeout); }
 #endif /* ... */
-#if defined(__CRT_HAVE_futex_timedwaitlock64) && defined(__USE_TIME_BITS64)
-/* Acquire a managed futex lock (s.a. `LFUTEX_WAIT_LOCK')
- * @return: 0: Did wait
- * @return: 1: Didn't wait
- * @return: -1:EFAULT:    A faulty pointer was given
- * @return: -1:EINTR:     Operation was interrupted (*uaddr was still set to new_value)
- * @return: -1:ETIMEDOUT: The given `rel_timeout' has expired */
-__CREDIRECT(__ATTR_NONNULL((1)),int,__NOTHROW_RPC,futex_waitlock,(lfutex_t *__uaddr, struct timespec const *__rel_timeout),futex_timedwaitlock64,(__uaddr,__rel_timeout))
-#elif defined(__CRT_HAVE_futex_timedwaitlock) && !defined(__USE_TIME_BITS64)
+#if defined(__CRT_HAVE_futex_timedwaitlock) && (!defined(__USE_TIME_BITS64) || __SIZEOF_TIME32_T__ == __SIZEOF_TIME64_T__)
 /* Acquire a managed futex lock (s.a. `LFUTEX_WAIT_LOCK')
  * @return: 0: Did wait
  * @return: 1: Didn't wait
@@ -1782,6 +1774,14 @@ __CREDIRECT(__ATTR_NONNULL((1)),int,__NOTHROW_RPC,futex_waitlock,(lfutex_t *__ua
  * @return: -1:EINTR:     Operation was interrupted (*uaddr was still set to new_value)
  * @return: -1:ETIMEDOUT: The given `rel_timeout' has expired */
 __CREDIRECT(__ATTR_NONNULL((1)),int,__NOTHROW_RPC,futex_waitlock,(lfutex_t *__uaddr, struct timespec const *__rel_timeout),futex_timedwaitlock,(__uaddr,__rel_timeout))
+#elif defined(__CRT_HAVE_futex_timedwaitlock64) && (defined(__USE_TIME_BITS64) || __SIZEOF_TIME32_T__ == __SIZEOF_TIME64_T__)
+/* Acquire a managed futex lock (s.a. `LFUTEX_WAIT_LOCK')
+ * @return: 0: Did wait
+ * @return: 1: Didn't wait
+ * @return: -1:EFAULT:    A faulty pointer was given
+ * @return: -1:EINTR:     Operation was interrupted (*uaddr was still set to new_value)
+ * @return: -1:ETIMEDOUT: The given `rel_timeout' has expired */
+__CREDIRECT(__ATTR_NONNULL((1)),int,__NOTHROW_RPC,futex_waitlock,(lfutex_t *__uaddr, struct timespec const *__rel_timeout),futex_timedwaitlock64,(__uaddr,__rel_timeout))
 #elif defined(__CRT_HAVE_lfutex64) || defined(__CRT_HAVE_lfutex)
 } /* extern "C++" */
 #include <libc/local/kos.futex/futex_timedwaitlock.h>
@@ -1794,20 +1794,20 @@ extern "C++" {
  * @return: -1:ETIMEDOUT: The given `rel_timeout' has expired */
 __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_NONNULL((1)) int __NOTHROW_RPC(__LIBCCALL futex_waitlock)(lfutex_t *__uaddr, struct timespec const *__rel_timeout) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(futex_timedwaitlock))(__uaddr, __rel_timeout); }
 #endif /* ... */
-#if defined(__CRT_HAVE_futex_timedwaitwhile_exactbits64) && defined(__USE_TIME_BITS64)
-/* Wait if `(*uaddr & bitmask) == setmask'
- * @return: 0: Did wait
- * @return: 1: Didn't wait
- * @return: -1:EFAULT: A faulty pointer was given
- * @return: -1:EINTR:  Operation was interrupted */
-__CREDIRECT(__ATTR_NONNULL((1)),int,__NOTHROW_RPC,futex_waitwhile_exactbits,(lfutex_t *__uaddr, lfutex_t __bitmask, lfutex_t __setmask, struct timespec const *__rel_timeout),futex_timedwaitwhile_exactbits64,(__uaddr,__bitmask,__setmask,__rel_timeout))
-#elif defined(__CRT_HAVE_futex_timedwaitwhile_exactbits) && !defined(__USE_TIME_BITS64)
+#if defined(__CRT_HAVE_futex_timedwaitwhile_exactbits) && (!defined(__USE_TIME_BITS64) || __SIZEOF_TIME32_T__ == __SIZEOF_TIME64_T__)
 /* Wait if `(*uaddr & bitmask) == setmask'
  * @return: 0: Did wait
  * @return: 1: Didn't wait
  * @return: -1:EFAULT: A faulty pointer was given
  * @return: -1:EINTR:  Operation was interrupted */
 __CREDIRECT(__ATTR_NONNULL((1)),int,__NOTHROW_RPC,futex_waitwhile_exactbits,(lfutex_t *__uaddr, lfutex_t __bitmask, lfutex_t __setmask, struct timespec const *__rel_timeout),futex_timedwaitwhile_exactbits,(__uaddr,__bitmask,__setmask,__rel_timeout))
+#elif defined(__CRT_HAVE_futex_timedwaitwhile_exactbits64) && (defined(__USE_TIME_BITS64) || __SIZEOF_TIME32_T__ == __SIZEOF_TIME64_T__)
+/* Wait if `(*uaddr & bitmask) == setmask'
+ * @return: 0: Did wait
+ * @return: 1: Didn't wait
+ * @return: -1:EFAULT: A faulty pointer was given
+ * @return: -1:EINTR:  Operation was interrupted */
+__CREDIRECT(__ATTR_NONNULL((1)),int,__NOTHROW_RPC,futex_waitwhile_exactbits,(lfutex_t *__uaddr, lfutex_t __bitmask, lfutex_t __setmask, struct timespec const *__rel_timeout),futex_timedwaitwhile_exactbits64,(__uaddr,__bitmask,__setmask,__rel_timeout))
 #elif defined(__CRT_HAVE_lfutex64) || defined(__CRT_HAVE_lfutex)
 } /* extern "C++" */
 #include <libc/local/kos.futex/futex_timedwaitwhile_exactbits.h>
@@ -1819,20 +1819,20 @@ extern "C++" {
  * @return: -1:EINTR:  Operation was interrupted */
 __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_NONNULL((1)) int __NOTHROW_RPC(__LIBCCALL futex_waitwhile_exactbits)(lfutex_t *__uaddr, lfutex_t __bitmask, lfutex_t __setmask, struct timespec const *__rel_timeout) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(futex_timedwaitwhile_exactbits))(__uaddr, __bitmask, __setmask, __rel_timeout); }
 #endif /* ... */
-#if defined(__CRT_HAVE_futex_timedwaituntil_exactbits64) && defined(__USE_TIME_BITS64)
-/* Wait if `(*uaddr & bitmask) != setmask'
- * @return: 0: Did wait
- * @return: 1: Didn't wait
- * @return: -1:EFAULT: A faulty pointer was given
- * @return: -1:EINTR:  Operation was interrupted */
-__CREDIRECT(__ATTR_NONNULL((1)),int,__NOTHROW_RPC,futex_waituntil_exactbits,(lfutex_t *__uaddr, lfutex_t __bitmask, lfutex_t __setmask, struct timespec const *__rel_timeout),futex_timedwaituntil_exactbits64,(__uaddr,__bitmask,__setmask,__rel_timeout))
-#elif defined(__CRT_HAVE_futex_timedwaituntil_exactbits) && !defined(__USE_TIME_BITS64)
+#if defined(__CRT_HAVE_futex_timedwaituntil_exactbits) && (!defined(__USE_TIME_BITS64) || __SIZEOF_TIME32_T__ == __SIZEOF_TIME64_T__)
 /* Wait if `(*uaddr & bitmask) != setmask'
  * @return: 0: Did wait
  * @return: 1: Didn't wait
  * @return: -1:EFAULT: A faulty pointer was given
  * @return: -1:EINTR:  Operation was interrupted */
 __CREDIRECT(__ATTR_NONNULL((1)),int,__NOTHROW_RPC,futex_waituntil_exactbits,(lfutex_t *__uaddr, lfutex_t __bitmask, lfutex_t __setmask, struct timespec const *__rel_timeout),futex_timedwaituntil_exactbits,(__uaddr,__bitmask,__setmask,__rel_timeout))
+#elif defined(__CRT_HAVE_futex_timedwaituntil_exactbits64) && (defined(__USE_TIME_BITS64) || __SIZEOF_TIME32_T__ == __SIZEOF_TIME64_T__)
+/* Wait if `(*uaddr & bitmask) != setmask'
+ * @return: 0: Did wait
+ * @return: 1: Didn't wait
+ * @return: -1:EFAULT: A faulty pointer was given
+ * @return: -1:EINTR:  Operation was interrupted */
+__CREDIRECT(__ATTR_NONNULL((1)),int,__NOTHROW_RPC,futex_waituntil_exactbits,(lfutex_t *__uaddr, lfutex_t __bitmask, lfutex_t __setmask, struct timespec const *__rel_timeout),futex_timedwaituntil_exactbits64,(__uaddr,__bitmask,__setmask,__rel_timeout))
 #elif defined(__CRT_HAVE_lfutex64) || defined(__CRT_HAVE_lfutex)
 } /* extern "C++" */
 #include <libc/local/kos.futex/futex_timedwaituntil_exactbits.h>
@@ -1844,20 +1844,20 @@ extern "C++" {
  * @return: -1:EINTR:  Operation was interrupted */
 __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_NONNULL((1)) int __NOTHROW_RPC(__LIBCCALL futex_waituntil_exactbits)(lfutex_t *__uaddr, lfutex_t __bitmask, lfutex_t __setmask, struct timespec const *__rel_timeout) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(futex_timedwaituntil_exactbits))(__uaddr, __bitmask, __setmask, __rel_timeout); }
 #endif /* ... */
-#if defined(__CRT_HAVE_futex_timedwaitwhile_anybit64) && defined(__USE_TIME_BITS64)
-/* Wait if `(*uaddr & bitmask) != 0'
- * @return: 0: Did wait
- * @return: 1: Didn't wait
- * @return: -1:EFAULT: A faulty pointer was given
- * @return: -1:EINTR:  Operation was interrupted */
-__CREDIRECT(__ATTR_NONNULL((1)),int,__NOTHROW_RPC,futex_waitwhile_anybit,(lfutex_t *__uaddr, lfutex_t __bitmask, struct timespec const *__rel_timeout),futex_timedwaitwhile_anybit64,(__uaddr,__bitmask,__rel_timeout))
-#elif defined(__CRT_HAVE_futex_timedwaitwhile_anybit) && !defined(__USE_TIME_BITS64)
+#if defined(__CRT_HAVE_futex_timedwaitwhile_anybit) && (!defined(__USE_TIME_BITS64) || __SIZEOF_TIME32_T__ == __SIZEOF_TIME64_T__)
 /* Wait if `(*uaddr & bitmask) != 0'
  * @return: 0: Did wait
  * @return: 1: Didn't wait
  * @return: -1:EFAULT: A faulty pointer was given
  * @return: -1:EINTR:  Operation was interrupted */
 __CREDIRECT(__ATTR_NONNULL((1)),int,__NOTHROW_RPC,futex_waitwhile_anybit,(lfutex_t *__uaddr, lfutex_t __bitmask, struct timespec const *__rel_timeout),futex_timedwaitwhile_anybit,(__uaddr,__bitmask,__rel_timeout))
+#elif defined(__CRT_HAVE_futex_timedwaitwhile_anybit64) && (defined(__USE_TIME_BITS64) || __SIZEOF_TIME32_T__ == __SIZEOF_TIME64_T__)
+/* Wait if `(*uaddr & bitmask) != 0'
+ * @return: 0: Did wait
+ * @return: 1: Didn't wait
+ * @return: -1:EFAULT: A faulty pointer was given
+ * @return: -1:EINTR:  Operation was interrupted */
+__CREDIRECT(__ATTR_NONNULL((1)),int,__NOTHROW_RPC,futex_waitwhile_anybit,(lfutex_t *__uaddr, lfutex_t __bitmask, struct timespec const *__rel_timeout),futex_timedwaitwhile_anybit64,(__uaddr,__bitmask,__rel_timeout))
 #elif defined(__CRT_HAVE_lfutex64) || defined(__CRT_HAVE_lfutex)
 } /* extern "C++" */
 #include <libc/local/kos.futex/futex_timedwaitwhile_anybit.h>
@@ -1869,20 +1869,20 @@ extern "C++" {
  * @return: -1:EINTR:  Operation was interrupted */
 __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_NONNULL((1)) int __NOTHROW_RPC(__LIBCCALL futex_waitwhile_anybit)(lfutex_t *__uaddr, lfutex_t __bitmask, struct timespec const *__rel_timeout) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(futex_timedwaitwhile_anybit))(__uaddr, __bitmask, __rel_timeout); }
 #endif /* ... */
-#if defined(__CRT_HAVE_futex_timedwaitwhile_allbits64) && defined(__USE_TIME_BITS64)
-/* Wait if `(*uaddr & bitmask) == bitmask'
- * @return: 0: Did wait
- * @return: 1: Didn't wait
- * @return: -1:EFAULT: A faulty pointer was given
- * @return: -1:EINTR:  Operation was interrupted */
-__CREDIRECT(__ATTR_NONNULL((1)),int,__NOTHROW_RPC,futex_waitwhile_allbits,(lfutex_t *__uaddr, lfutex_t __bitmask, struct timespec const *__rel_timeout),futex_timedwaitwhile_allbits64,(__uaddr,__bitmask,__rel_timeout))
-#elif defined(__CRT_HAVE_futex_timedwaitwhile_allbits) && !defined(__USE_TIME_BITS64)
+#if defined(__CRT_HAVE_futex_timedwaitwhile_allbits) && (!defined(__USE_TIME_BITS64) || __SIZEOF_TIME32_T__ == __SIZEOF_TIME64_T__)
 /* Wait if `(*uaddr & bitmask) == bitmask'
  * @return: 0: Did wait
  * @return: 1: Didn't wait
  * @return: -1:EFAULT: A faulty pointer was given
  * @return: -1:EINTR:  Operation was interrupted */
 __CREDIRECT(__ATTR_NONNULL((1)),int,__NOTHROW_RPC,futex_waitwhile_allbits,(lfutex_t *__uaddr, lfutex_t __bitmask, struct timespec const *__rel_timeout),futex_timedwaitwhile_allbits,(__uaddr,__bitmask,__rel_timeout))
+#elif defined(__CRT_HAVE_futex_timedwaitwhile_allbits64) && (defined(__USE_TIME_BITS64) || __SIZEOF_TIME32_T__ == __SIZEOF_TIME64_T__)
+/* Wait if `(*uaddr & bitmask) == bitmask'
+ * @return: 0: Did wait
+ * @return: 1: Didn't wait
+ * @return: -1:EFAULT: A faulty pointer was given
+ * @return: -1:EINTR:  Operation was interrupted */
+__CREDIRECT(__ATTR_NONNULL((1)),int,__NOTHROW_RPC,futex_waitwhile_allbits,(lfutex_t *__uaddr, lfutex_t __bitmask, struct timespec const *__rel_timeout),futex_timedwaitwhile_allbits64,(__uaddr,__bitmask,__rel_timeout))
 #elif defined(__CRT_HAVE_lfutex64) || defined(__CRT_HAVE_lfutex)
 } /* extern "C++" */
 #include <libc/local/kos.futex/futex_timedwaitwhile_allbits.h>
@@ -1897,15 +1897,7 @@ __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_NONNULL((1)) int __NOTHROW_RPC(__LIBCCALL 
 } /* extern "C++" */
 #if defined(__USE_TIME64) && !((defined(__USE_TIME_BITS64) || defined(_TIMESPEC_MATCHES_TIMESPEC64)) && defined(__USE_STRUCT64_MACRO))
 extern "C++" {
-#ifdef __CRT_HAVE_futex_timedwaitwhile64
-/* Wait if `*uaddr == equal_to_value'
- * @return: 0: Did wait
- * @return: 1: Didn't wait
- * @return: -1:EFAULT:    A faulty pointer was given
- * @return: -1:EINTR:     Operation was interrupted
- * @return: -1:ETIMEDOUT: The given `rel_timeout' has expired */
-__CREDIRECT(__ATTR_NONNULL((1)),int,__NOTHROW_RPC,futex_waitwhile,(lfutex_t *__uaddr, lfutex_t __equal_to_value, struct timespec64 const *__rel_timeout),futex_timedwaitwhile64,(__uaddr,__equal_to_value,__rel_timeout))
-#elif defined(__CRT_HAVE_futex_timedwaitwhile) && __SIZEOF_TIME32_T__ == __SIZEOF_TIME64_T__
+#if defined(__CRT_HAVE_futex_timedwaitwhile) && __SIZEOF_TIME32_T__ == __SIZEOF_TIME64_T__
 /* Wait if `*uaddr == equal_to_value'
  * @return: 0: Did wait
  * @return: 1: Didn't wait
@@ -1913,6 +1905,14 @@ __CREDIRECT(__ATTR_NONNULL((1)),int,__NOTHROW_RPC,futex_waitwhile,(lfutex_t *__u
  * @return: -1:EINTR:     Operation was interrupted
  * @return: -1:ETIMEDOUT: The given `rel_timeout' has expired */
 __CREDIRECT(__ATTR_NONNULL((1)),int,__NOTHROW_RPC,futex_waitwhile,(lfutex_t *__uaddr, lfutex_t __equal_to_value, struct timespec64 const *__rel_timeout),futex_timedwaitwhile,(__uaddr,__equal_to_value,__rel_timeout))
+#elif defined(__CRT_HAVE_futex_timedwaitwhile64)
+/* Wait if `*uaddr == equal_to_value'
+ * @return: 0: Did wait
+ * @return: 1: Didn't wait
+ * @return: -1:EFAULT:    A faulty pointer was given
+ * @return: -1:EINTR:     Operation was interrupted
+ * @return: -1:ETIMEDOUT: The given `rel_timeout' has expired */
+__CREDIRECT(__ATTR_NONNULL((1)),int,__NOTHROW_RPC,futex_waitwhile,(lfutex_t *__uaddr, lfutex_t __equal_to_value, struct timespec64 const *__rel_timeout),futex_timedwaitwhile64,(__uaddr,__equal_to_value,__rel_timeout))
 #elif defined(__CRT_HAVE_lfutex64) || defined(__CRT_HAVE_lfutex)
 } /* extern "C++" */
 #include <libc/local/kos.futex/futex_timedwaitwhile64.h>
@@ -1925,15 +1925,7 @@ extern "C++" {
  * @return: -1:ETIMEDOUT: The given `rel_timeout' has expired */
 __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_NONNULL((1)) int __NOTHROW_RPC(__LIBCCALL futex_waitwhile)(lfutex_t *__uaddr, lfutex_t __equal_to_value, struct timespec64 const *__rel_timeout) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(futex_timedwaitwhile64))(__uaddr, __equal_to_value, __rel_timeout); }
 #endif /* ... */
-#ifdef __CRT_HAVE_futex_timedwaituntil64
-/* Wait if `*uaddr != not_equal_to_value'
- * @return: 0: Did wait
- * @return: 1: Didn't wait
- * @return: -1:EFAULT:    A faulty pointer was given
- * @return: -1:EINTR:     Operation was interrupted
- * @return: -1:ETIMEDOUT: The given `rel_timeout' has expired */
-__CREDIRECT(__ATTR_NONNULL((1)),int,__NOTHROW_RPC,futex_waituntil,(lfutex_t *__uaddr, lfutex_t __not_equal_to_value, struct timespec64 const *__rel_timeout),futex_timedwaituntil64,(__uaddr,__not_equal_to_value,__rel_timeout))
-#elif defined(__CRT_HAVE_futex_timedwaituntil) && __SIZEOF_TIME32_T__ == __SIZEOF_TIME64_T__
+#if defined(__CRT_HAVE_futex_timedwaituntil) && __SIZEOF_TIME32_T__ == __SIZEOF_TIME64_T__
 /* Wait if `*uaddr != not_equal_to_value'
  * @return: 0: Did wait
  * @return: 1: Didn't wait
@@ -1941,6 +1933,14 @@ __CREDIRECT(__ATTR_NONNULL((1)),int,__NOTHROW_RPC,futex_waituntil,(lfutex_t *__u
  * @return: -1:EINTR:     Operation was interrupted
  * @return: -1:ETIMEDOUT: The given `rel_timeout' has expired */
 __CREDIRECT(__ATTR_NONNULL((1)),int,__NOTHROW_RPC,futex_waituntil,(lfutex_t *__uaddr, lfutex_t __not_equal_to_value, struct timespec64 const *__rel_timeout),futex_timedwaituntil,(__uaddr,__not_equal_to_value,__rel_timeout))
+#elif defined(__CRT_HAVE_futex_timedwaituntil64)
+/* Wait if `*uaddr != not_equal_to_value'
+ * @return: 0: Did wait
+ * @return: 1: Didn't wait
+ * @return: -1:EFAULT:    A faulty pointer was given
+ * @return: -1:EINTR:     Operation was interrupted
+ * @return: -1:ETIMEDOUT: The given `rel_timeout' has expired */
+__CREDIRECT(__ATTR_NONNULL((1)),int,__NOTHROW_RPC,futex_waituntil,(lfutex_t *__uaddr, lfutex_t __not_equal_to_value, struct timespec64 const *__rel_timeout),futex_timedwaituntil64,(__uaddr,__not_equal_to_value,__rel_timeout))
 #elif defined(__CRT_HAVE_lfutex64) || defined(__CRT_HAVE_lfutex)
 } /* extern "C++" */
 #include <libc/local/kos.futex/futex_timedwaituntil64.h>
@@ -1953,15 +1953,7 @@ extern "C++" {
  * @return: -1:ETIMEDOUT: The given `rel_timeout' has expired */
 __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_NONNULL((1)) int __NOTHROW_RPC(__LIBCCALL futex_waituntil)(lfutex_t *__uaddr, lfutex_t __not_equal_to_value, struct timespec64 const *__rel_timeout) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(futex_timedwaituntil64))(__uaddr, __not_equal_to_value, __rel_timeout); }
 #endif /* ... */
-#ifdef __CRT_HAVE_futex_timedwaitwhile64
-/* Wait if `*uaddr == equal_to_value'
- * @return: 0: Did wait
- * @return: 1: Didn't wait
- * @return: -1:EFAULT:    A faulty pointer was given
- * @return: -1:EINTR:     Operation was interrupted
- * @return: -1:ETIMEDOUT: The given `rel_timeout' has expired */
-__CREDIRECT(__ATTR_NONNULL((1)),int,__NOTHROW_RPC,futex_waitwhile_equal,(lfutex_t *__uaddr, lfutex_t __equal_to_value, struct timespec64 const *__rel_timeout),futex_timedwaitwhile64,(__uaddr,__equal_to_value,__rel_timeout))
-#elif defined(__CRT_HAVE_futex_timedwaitwhile) && __SIZEOF_TIME32_T__ == __SIZEOF_TIME64_T__
+#if defined(__CRT_HAVE_futex_timedwaitwhile) && __SIZEOF_TIME32_T__ == __SIZEOF_TIME64_T__
 /* Wait if `*uaddr == equal_to_value'
  * @return: 0: Did wait
  * @return: 1: Didn't wait
@@ -1969,6 +1961,14 @@ __CREDIRECT(__ATTR_NONNULL((1)),int,__NOTHROW_RPC,futex_waitwhile_equal,(lfutex_
  * @return: -1:EINTR:     Operation was interrupted
  * @return: -1:ETIMEDOUT: The given `rel_timeout' has expired */
 __CREDIRECT(__ATTR_NONNULL((1)),int,__NOTHROW_RPC,futex_waitwhile_equal,(lfutex_t *__uaddr, lfutex_t __equal_to_value, struct timespec64 const *__rel_timeout),futex_timedwaitwhile,(__uaddr,__equal_to_value,__rel_timeout))
+#elif defined(__CRT_HAVE_futex_timedwaitwhile64)
+/* Wait if `*uaddr == equal_to_value'
+ * @return: 0: Did wait
+ * @return: 1: Didn't wait
+ * @return: -1:EFAULT:    A faulty pointer was given
+ * @return: -1:EINTR:     Operation was interrupted
+ * @return: -1:ETIMEDOUT: The given `rel_timeout' has expired */
+__CREDIRECT(__ATTR_NONNULL((1)),int,__NOTHROW_RPC,futex_waitwhile_equal,(lfutex_t *__uaddr, lfutex_t __equal_to_value, struct timespec64 const *__rel_timeout),futex_timedwaitwhile64,(__uaddr,__equal_to_value,__rel_timeout))
 #elif defined(__CRT_HAVE_lfutex64) || defined(__CRT_HAVE_lfutex)
 } /* extern "C++" */
 #include <libc/local/kos.futex/futex_timedwaitwhile64.h>
@@ -1981,15 +1981,7 @@ extern "C++" {
  * @return: -1:ETIMEDOUT: The given `rel_timeout' has expired */
 __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_NONNULL((1)) int __NOTHROW_RPC(__LIBCCALL futex_waitwhile_equal)(lfutex_t *__uaddr, lfutex_t __equal_to_value, struct timespec64 const *__rel_timeout) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(futex_timedwaitwhile64))(__uaddr, __equal_to_value, __rel_timeout); }
 #endif /* ... */
-#ifdef __CRT_HAVE_futex_timedwaituntil64
-/* Wait if `*uaddr != not_equal_to_value'
- * @return: 0: Did wait
- * @return: 1: Didn't wait
- * @return: -1:EFAULT:    A faulty pointer was given
- * @return: -1:EINTR:     Operation was interrupted
- * @return: -1:ETIMEDOUT: The given `rel_timeout' has expired */
-__CREDIRECT(__ATTR_NONNULL((1)),int,__NOTHROW_RPC,futex_waitwhile_notequal,(lfutex_t *__uaddr, lfutex_t __not_equal_to_value, struct timespec64 const *__rel_timeout),futex_timedwaituntil64,(__uaddr,__not_equal_to_value,__rel_timeout))
-#elif defined(__CRT_HAVE_futex_timedwaituntil) && __SIZEOF_TIME32_T__ == __SIZEOF_TIME64_T__
+#if defined(__CRT_HAVE_futex_timedwaituntil) && __SIZEOF_TIME32_T__ == __SIZEOF_TIME64_T__
 /* Wait if `*uaddr != not_equal_to_value'
  * @return: 0: Did wait
  * @return: 1: Didn't wait
@@ -1997,6 +1989,14 @@ __CREDIRECT(__ATTR_NONNULL((1)),int,__NOTHROW_RPC,futex_waitwhile_notequal,(lfut
  * @return: -1:EINTR:     Operation was interrupted
  * @return: -1:ETIMEDOUT: The given `rel_timeout' has expired */
 __CREDIRECT(__ATTR_NONNULL((1)),int,__NOTHROW_RPC,futex_waitwhile_notequal,(lfutex_t *__uaddr, lfutex_t __not_equal_to_value, struct timespec64 const *__rel_timeout),futex_timedwaituntil,(__uaddr,__not_equal_to_value,__rel_timeout))
+#elif defined(__CRT_HAVE_futex_timedwaituntil64)
+/* Wait if `*uaddr != not_equal_to_value'
+ * @return: 0: Did wait
+ * @return: 1: Didn't wait
+ * @return: -1:EFAULT:    A faulty pointer was given
+ * @return: -1:EINTR:     Operation was interrupted
+ * @return: -1:ETIMEDOUT: The given `rel_timeout' has expired */
+__CREDIRECT(__ATTR_NONNULL((1)),int,__NOTHROW_RPC,futex_waitwhile_notequal,(lfutex_t *__uaddr, lfutex_t __not_equal_to_value, struct timespec64 const *__rel_timeout),futex_timedwaituntil64,(__uaddr,__not_equal_to_value,__rel_timeout))
 #elif defined(__CRT_HAVE_lfutex64) || defined(__CRT_HAVE_lfutex)
 } /* extern "C++" */
 #include <libc/local/kos.futex/futex_timedwaituntil64.h>
@@ -2009,15 +2009,7 @@ extern "C++" {
  * @return: -1:ETIMEDOUT: The given `rel_timeout' has expired */
 __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_NONNULL((1)) int __NOTHROW_RPC(__LIBCCALL futex_waitwhile_notequal)(lfutex_t *__uaddr, lfutex_t __not_equal_to_value, struct timespec64 const *__rel_timeout) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(futex_timedwaituntil64))(__uaddr, __not_equal_to_value, __rel_timeout); }
 #endif /* ... */
-#ifdef __CRT_HAVE_futex_timedwaitwhile_above64
-/* Wait if `*uaddr > above_value'
- * @return: 0: Did wait
- * @return: 1: Didn't wait
- * @return: -1:EFAULT:    A faulty pointer was given
- * @return: -1:EINTR:     Operation was interrupted
- * @return: -1:ETIMEDOUT: The given `rel_timeout' has expired */
-__CREDIRECT(__ATTR_NONNULL((1)),int,__NOTHROW_RPC,futex_waitwhile_above,(lfutex_t *__uaddr, lfutex_t __above_value, struct timespec64 const *__rel_timeout),futex_timedwaitwhile_above64,(__uaddr,__above_value,__rel_timeout))
-#elif defined(__CRT_HAVE_futex_timedwaitwhile_above) && __SIZEOF_TIME32_T__ == __SIZEOF_TIME64_T__
+#if defined(__CRT_HAVE_futex_timedwaitwhile_above) && __SIZEOF_TIME32_T__ == __SIZEOF_TIME64_T__
 /* Wait if `*uaddr > above_value'
  * @return: 0: Did wait
  * @return: 1: Didn't wait
@@ -2025,6 +2017,14 @@ __CREDIRECT(__ATTR_NONNULL((1)),int,__NOTHROW_RPC,futex_waitwhile_above,(lfutex_
  * @return: -1:EINTR:     Operation was interrupted
  * @return: -1:ETIMEDOUT: The given `rel_timeout' has expired */
 __CREDIRECT(__ATTR_NONNULL((1)),int,__NOTHROW_RPC,futex_waitwhile_above,(lfutex_t *__uaddr, lfutex_t __above_value, struct timespec64 const *__rel_timeout),futex_timedwaitwhile_above,(__uaddr,__above_value,__rel_timeout))
+#elif defined(__CRT_HAVE_futex_timedwaitwhile_above64)
+/* Wait if `*uaddr > above_value'
+ * @return: 0: Did wait
+ * @return: 1: Didn't wait
+ * @return: -1:EFAULT:    A faulty pointer was given
+ * @return: -1:EINTR:     Operation was interrupted
+ * @return: -1:ETIMEDOUT: The given `rel_timeout' has expired */
+__CREDIRECT(__ATTR_NONNULL((1)),int,__NOTHROW_RPC,futex_waitwhile_above,(lfutex_t *__uaddr, lfutex_t __above_value, struct timespec64 const *__rel_timeout),futex_timedwaitwhile_above64,(__uaddr,__above_value,__rel_timeout))
 #elif defined(__CRT_HAVE_lfutex64) || defined(__CRT_HAVE_lfutex)
 } /* extern "C++" */
 #include <libc/local/kos.futex/futex_timedwaitwhile_above64.h>
@@ -2037,15 +2037,7 @@ extern "C++" {
  * @return: -1:ETIMEDOUT: The given `rel_timeout' has expired */
 __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_NONNULL((1)) int __NOTHROW_RPC(__LIBCCALL futex_waitwhile_above)(lfutex_t *__uaddr, lfutex_t __above_value, struct timespec64 const *__rel_timeout) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(futex_timedwaitwhile_above64))(__uaddr, __above_value, __rel_timeout); }
 #endif /* ... */
-#ifdef __CRT_HAVE_futex_timedwaitwhile_below64
-/* Wait if `*uaddr < below_value'
- * @return: 0: Did wait
- * @return: 1: Didn't wait
- * @return: -1:EFAULT:    A faulty pointer was given
- * @return: -1:EINTR:     Operation was interrupted
- * @return: -1:ETIMEDOUT: The given `rel_timeout' has expired */
-__CREDIRECT(__ATTR_NONNULL((1)),int,__NOTHROW_RPC,futex_waitwhile_below,(lfutex_t *__uaddr, lfutex_t __below_value, struct timespec64 const *__rel_timeout),futex_timedwaitwhile_below64,(__uaddr,__below_value,__rel_timeout))
-#elif defined(__CRT_HAVE_futex_timedwaitwhile_below) && __SIZEOF_TIME32_T__ == __SIZEOF_TIME64_T__
+#if defined(__CRT_HAVE_futex_timedwaitwhile_below) && __SIZEOF_TIME32_T__ == __SIZEOF_TIME64_T__
 /* Wait if `*uaddr < below_value'
  * @return: 0: Did wait
  * @return: 1: Didn't wait
@@ -2053,6 +2045,14 @@ __CREDIRECT(__ATTR_NONNULL((1)),int,__NOTHROW_RPC,futex_waitwhile_below,(lfutex_
  * @return: -1:EINTR:     Operation was interrupted
  * @return: -1:ETIMEDOUT: The given `rel_timeout' has expired */
 __CREDIRECT(__ATTR_NONNULL((1)),int,__NOTHROW_RPC,futex_waitwhile_below,(lfutex_t *__uaddr, lfutex_t __below_value, struct timespec64 const *__rel_timeout),futex_timedwaitwhile_below,(__uaddr,__below_value,__rel_timeout))
+#elif defined(__CRT_HAVE_futex_timedwaitwhile_below64)
+/* Wait if `*uaddr < below_value'
+ * @return: 0: Did wait
+ * @return: 1: Didn't wait
+ * @return: -1:EFAULT:    A faulty pointer was given
+ * @return: -1:EINTR:     Operation was interrupted
+ * @return: -1:ETIMEDOUT: The given `rel_timeout' has expired */
+__CREDIRECT(__ATTR_NONNULL((1)),int,__NOTHROW_RPC,futex_waitwhile_below,(lfutex_t *__uaddr, lfutex_t __below_value, struct timespec64 const *__rel_timeout),futex_timedwaitwhile_below64,(__uaddr,__below_value,__rel_timeout))
 #elif defined(__CRT_HAVE_lfutex64) || defined(__CRT_HAVE_lfutex)
 } /* extern "C++" */
 #include <libc/local/kos.futex/futex_timedwaitwhile_below64.h>
@@ -2065,15 +2065,7 @@ extern "C++" {
  * @return: -1:ETIMEDOUT: The given `rel_timeout' has expired */
 __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_NONNULL((1)) int __NOTHROW_RPC(__LIBCCALL futex_waitwhile_below)(lfutex_t *__uaddr, lfutex_t __below_value, struct timespec64 const *__rel_timeout) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(futex_timedwaitwhile_below64))(__uaddr, __below_value, __rel_timeout); }
 #endif /* ... */
-#ifdef __CRT_HAVE_futex_timedwaitwhile_aboveequal64
-/* Wait if `*uaddr >= above_equal_value'
- * @return: 0: Did wait
- * @return: 1: Didn't wait
- * @return: -1:EFAULT:    A faulty pointer was given
- * @return: -1:EINTR:     Operation was interrupted
- * @return: -1:ETIMEDOUT: The given `rel_timeout' has expired */
-__CREDIRECT(__ATTR_NONNULL((1)),int,__NOTHROW_RPC,futex_waitwhile_aboveequal,(lfutex_t *__uaddr, lfutex_t __above_equal_value, struct timespec64 const *__rel_timeout),futex_timedwaitwhile_aboveequal64,(__uaddr,__above_equal_value,__rel_timeout))
-#elif defined(__CRT_HAVE_futex_timedwaitwhile_aboveequal) && __SIZEOF_TIME32_T__ == __SIZEOF_TIME64_T__
+#if defined(__CRT_HAVE_futex_timedwaitwhile_aboveequal) && __SIZEOF_TIME32_T__ == __SIZEOF_TIME64_T__
 /* Wait if `*uaddr >= above_equal_value'
  * @return: 0: Did wait
  * @return: 1: Didn't wait
@@ -2081,6 +2073,14 @@ __CREDIRECT(__ATTR_NONNULL((1)),int,__NOTHROW_RPC,futex_waitwhile_aboveequal,(lf
  * @return: -1:EINTR:     Operation was interrupted
  * @return: -1:ETIMEDOUT: The given `rel_timeout' has expired */
 __CREDIRECT(__ATTR_NONNULL((1)),int,__NOTHROW_RPC,futex_waitwhile_aboveequal,(lfutex_t *__uaddr, lfutex_t __above_equal_value, struct timespec64 const *__rel_timeout),futex_timedwaitwhile_aboveequal,(__uaddr,__above_equal_value,__rel_timeout))
+#elif defined(__CRT_HAVE_futex_timedwaitwhile_aboveequal64)
+/* Wait if `*uaddr >= above_equal_value'
+ * @return: 0: Did wait
+ * @return: 1: Didn't wait
+ * @return: -1:EFAULT:    A faulty pointer was given
+ * @return: -1:EINTR:     Operation was interrupted
+ * @return: -1:ETIMEDOUT: The given `rel_timeout' has expired */
+__CREDIRECT(__ATTR_NONNULL((1)),int,__NOTHROW_RPC,futex_waitwhile_aboveequal,(lfutex_t *__uaddr, lfutex_t __above_equal_value, struct timespec64 const *__rel_timeout),futex_timedwaitwhile_aboveequal64,(__uaddr,__above_equal_value,__rel_timeout))
 #elif defined(__CRT_HAVE_lfutex64) || defined(__CRT_HAVE_lfutex)
 } /* extern "C++" */
 #include <libc/local/kos.futex/futex_timedwaitwhile_aboveequal64.h>
@@ -2093,15 +2093,7 @@ extern "C++" {
  * @return: -1:ETIMEDOUT: The given `rel_timeout' has expired */
 __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_NONNULL((1)) int __NOTHROW_RPC(__LIBCCALL futex_waitwhile_aboveequal)(lfutex_t *__uaddr, lfutex_t __above_equal_value, struct timespec64 const *__rel_timeout) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(futex_timedwaitwhile_aboveequal64))(__uaddr, __above_equal_value, __rel_timeout); }
 #endif /* ... */
-#ifdef __CRT_HAVE_futex_timedwaitwhile_belowequal64
-/* Wait if `*uaddr <= below_equal_value'
- * @return: 0: Did wait
- * @return: 1: Didn't wait
- * @return: -1:EFAULT:    A faulty pointer was given
- * @return: -1:EINTR:     Operation was interrupted
- * @return: -1:ETIMEDOUT: The given `rel_timeout' has expired */
-__CREDIRECT(__ATTR_NONNULL((1)),int,__NOTHROW_RPC,futex_waitwhile_belowequal,(lfutex_t *__uaddr, lfutex_t __below_equal_value, struct timespec64 const *__rel_timeout),futex_timedwaitwhile_belowequal64,(__uaddr,__below_equal_value,__rel_timeout))
-#elif defined(__CRT_HAVE_futex_timedwaitwhile_belowequal) && __SIZEOF_TIME32_T__ == __SIZEOF_TIME64_T__
+#if defined(__CRT_HAVE_futex_timedwaitwhile_belowequal) && __SIZEOF_TIME32_T__ == __SIZEOF_TIME64_T__
 /* Wait if `*uaddr <= below_equal_value'
  * @return: 0: Did wait
  * @return: 1: Didn't wait
@@ -2109,6 +2101,14 @@ __CREDIRECT(__ATTR_NONNULL((1)),int,__NOTHROW_RPC,futex_waitwhile_belowequal,(lf
  * @return: -1:EINTR:     Operation was interrupted
  * @return: -1:ETIMEDOUT: The given `rel_timeout' has expired */
 __CREDIRECT(__ATTR_NONNULL((1)),int,__NOTHROW_RPC,futex_waitwhile_belowequal,(lfutex_t *__uaddr, lfutex_t __below_equal_value, struct timespec64 const *__rel_timeout),futex_timedwaitwhile_belowequal,(__uaddr,__below_equal_value,__rel_timeout))
+#elif defined(__CRT_HAVE_futex_timedwaitwhile_belowequal64)
+/* Wait if `*uaddr <= below_equal_value'
+ * @return: 0: Did wait
+ * @return: 1: Didn't wait
+ * @return: -1:EFAULT:    A faulty pointer was given
+ * @return: -1:EINTR:     Operation was interrupted
+ * @return: -1:ETIMEDOUT: The given `rel_timeout' has expired */
+__CREDIRECT(__ATTR_NONNULL((1)),int,__NOTHROW_RPC,futex_waitwhile_belowequal,(lfutex_t *__uaddr, lfutex_t __below_equal_value, struct timespec64 const *__rel_timeout),futex_timedwaitwhile_belowequal64,(__uaddr,__below_equal_value,__rel_timeout))
 #elif defined(__CRT_HAVE_lfutex64) || defined(__CRT_HAVE_lfutex)
 } /* extern "C++" */
 #include <libc/local/kos.futex/futex_timedwaitwhile_belowequal64.h>
@@ -2121,15 +2121,7 @@ extern "C++" {
  * @return: -1:ETIMEDOUT: The given `rel_timeout' has expired */
 __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_NONNULL((1)) int __NOTHROW_RPC(__LIBCCALL futex_waitwhile_belowequal)(lfutex_t *__uaddr, lfutex_t __below_equal_value, struct timespec64 const *__rel_timeout) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(futex_timedwaitwhile_belowequal64))(__uaddr, __below_equal_value, __rel_timeout); }
 #endif /* ... */
-#ifdef __CRT_HAVE_futex_timedwaitwhile_cmpxch64
-/* Wait if `*uaddr == old_value', and set `*uaddr = new_value'
- * @return: 0: Did wait
- * @return: 1: Didn't wait
- * @return: -1:EFAULT:    A faulty pointer was given
- * @return: -1:EINTR:     Operation was interrupted (*uaddr was still set to new_value)
- * @return: -1:ETIMEDOUT: The given `rel_timeout' has expired */
-__CREDIRECT(__ATTR_NONNULL((1)),int,__NOTHROW_RPC,futex_waitwhile_cmpxch,(lfutex_t *__uaddr, lfutex_t __old_value, lfutex_t __new_value, struct timespec64 const *__rel_timeout),futex_timedwaitwhile_cmpxch64,(__uaddr,__old_value,__new_value,__rel_timeout))
-#elif defined(__CRT_HAVE_futex_timedwaitwhile_cmpxch) && __SIZEOF_TIME32_T__ == __SIZEOF_TIME64_T__
+#if defined(__CRT_HAVE_futex_timedwaitwhile_cmpxch) && __SIZEOF_TIME32_T__ == __SIZEOF_TIME64_T__
 /* Wait if `*uaddr == old_value', and set `*uaddr = new_value'
  * @return: 0: Did wait
  * @return: 1: Didn't wait
@@ -2137,6 +2129,14 @@ __CREDIRECT(__ATTR_NONNULL((1)),int,__NOTHROW_RPC,futex_waitwhile_cmpxch,(lfutex
  * @return: -1:EINTR:     Operation was interrupted (*uaddr was still set to new_value)
  * @return: -1:ETIMEDOUT: The given `rel_timeout' has expired */
 __CREDIRECT(__ATTR_NONNULL((1)),int,__NOTHROW_RPC,futex_waitwhile_cmpxch,(lfutex_t *__uaddr, lfutex_t __old_value, lfutex_t __new_value, struct timespec64 const *__rel_timeout),futex_timedwaitwhile_cmpxch,(__uaddr,__old_value,__new_value,__rel_timeout))
+#elif defined(__CRT_HAVE_futex_timedwaitwhile_cmpxch64)
+/* Wait if `*uaddr == old_value', and set `*uaddr = new_value'
+ * @return: 0: Did wait
+ * @return: 1: Didn't wait
+ * @return: -1:EFAULT:    A faulty pointer was given
+ * @return: -1:EINTR:     Operation was interrupted (*uaddr was still set to new_value)
+ * @return: -1:ETIMEDOUT: The given `rel_timeout' has expired */
+__CREDIRECT(__ATTR_NONNULL((1)),int,__NOTHROW_RPC,futex_waitwhile_cmpxch,(lfutex_t *__uaddr, lfutex_t __old_value, lfutex_t __new_value, struct timespec64 const *__rel_timeout),futex_timedwaitwhile_cmpxch64,(__uaddr,__old_value,__new_value,__rel_timeout))
 #elif defined(__CRT_HAVE_lfutex64) || defined(__CRT_HAVE_lfutex)
 } /* extern "C++" */
 #include <libc/local/kos.futex/futex_timedwaitwhile_cmpxch64.h>
@@ -2149,15 +2149,7 @@ extern "C++" {
  * @return: -1:ETIMEDOUT: The given `rel_timeout' has expired */
 __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_NONNULL((1)) int __NOTHROW_RPC(__LIBCCALL futex_waitwhile_cmpxch)(lfutex_t *__uaddr, lfutex_t __old_value, lfutex_t __new_value, struct timespec64 const *__rel_timeout) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(futex_timedwaitwhile_cmpxch64))(__uaddr, __old_value, __new_value, __rel_timeout); }
 #endif /* ... */
-#ifdef __CRT_HAVE_futex_timedwaituntil_cmpxch64
-/* Wait if `*uaddr != old_value', and set `*uaddr = new_value'
- * @return: 0: Did wait
- * @return: 1: Didn't wait
- * @return: -1:EFAULT:    A faulty pointer was given
- * @return: -1:EINTR:     Operation was interrupted (*uaddr was still set to new_value)
- * @return: -1:ETIMEDOUT: The given `rel_timeout' has expired */
-__CREDIRECT(__ATTR_NONNULL((1)),int,__NOTHROW_RPC,futex_waituntil_cmpxch,(lfutex_t *__uaddr, lfutex_t __old_value, lfutex_t __new_value, struct timespec64 const *__rel_timeout),futex_timedwaituntil_cmpxch64,(__uaddr,__old_value,__new_value,__rel_timeout))
-#elif defined(__CRT_HAVE_futex_timedwaituntil_cmpxch) && __SIZEOF_TIME32_T__ == __SIZEOF_TIME64_T__
+#if defined(__CRT_HAVE_futex_timedwaituntil_cmpxch) && __SIZEOF_TIME32_T__ == __SIZEOF_TIME64_T__
 /* Wait if `*uaddr != old_value', and set `*uaddr = new_value'
  * @return: 0: Did wait
  * @return: 1: Didn't wait
@@ -2165,6 +2157,14 @@ __CREDIRECT(__ATTR_NONNULL((1)),int,__NOTHROW_RPC,futex_waituntil_cmpxch,(lfutex
  * @return: -1:EINTR:     Operation was interrupted (*uaddr was still set to new_value)
  * @return: -1:ETIMEDOUT: The given `rel_timeout' has expired */
 __CREDIRECT(__ATTR_NONNULL((1)),int,__NOTHROW_RPC,futex_waituntil_cmpxch,(lfutex_t *__uaddr, lfutex_t __old_value, lfutex_t __new_value, struct timespec64 const *__rel_timeout),futex_timedwaituntil_cmpxch,(__uaddr,__old_value,__new_value,__rel_timeout))
+#elif defined(__CRT_HAVE_futex_timedwaituntil_cmpxch64)
+/* Wait if `*uaddr != old_value', and set `*uaddr = new_value'
+ * @return: 0: Did wait
+ * @return: 1: Didn't wait
+ * @return: -1:EFAULT:    A faulty pointer was given
+ * @return: -1:EINTR:     Operation was interrupted (*uaddr was still set to new_value)
+ * @return: -1:ETIMEDOUT: The given `rel_timeout' has expired */
+__CREDIRECT(__ATTR_NONNULL((1)),int,__NOTHROW_RPC,futex_waituntil_cmpxch,(lfutex_t *__uaddr, lfutex_t __old_value, lfutex_t __new_value, struct timespec64 const *__rel_timeout),futex_timedwaituntil_cmpxch64,(__uaddr,__old_value,__new_value,__rel_timeout))
 #elif defined(__CRT_HAVE_lfutex64) || defined(__CRT_HAVE_lfutex)
 } /* extern "C++" */
 #include <libc/local/kos.futex/futex_timedwaituntil_cmpxch64.h>
@@ -2177,15 +2177,7 @@ extern "C++" {
  * @return: -1:ETIMEDOUT: The given `rel_timeout' has expired */
 __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_NONNULL((1)) int __NOTHROW_RPC(__LIBCCALL futex_waituntil_cmpxch)(lfutex_t *__uaddr, lfutex_t __old_value, lfutex_t __new_value, struct timespec64 const *__rel_timeout) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(futex_timedwaituntil_cmpxch64))(__uaddr, __old_value, __new_value, __rel_timeout); }
 #endif /* ... */
-#ifdef __CRT_HAVE_futex_timedwaitlock64
-/* Acquire a managed futex lock (s.a. `LFUTEX_WAIT_LOCK')
- * @return: 0: Did wait
- * @return: 1: Didn't wait
- * @return: -1:EFAULT:    A faulty pointer was given
- * @return: -1:EINTR:     Operation was interrupted (*uaddr was still set to new_value)
- * @return: -1:ETIMEDOUT: The given `rel_timeout' has expired */
-__CREDIRECT(__ATTR_NONNULL((1)),int,__NOTHROW_RPC,futex_waitlock,(lfutex_t *__uaddr, struct timespec64 const *__rel_timeout),futex_timedwaitlock64,(__uaddr,__rel_timeout))
-#elif defined(__CRT_HAVE_futex_timedwaitlock) && __SIZEOF_TIME32_T__ == __SIZEOF_TIME64_T__
+#if defined(__CRT_HAVE_futex_timedwaitlock) && __SIZEOF_TIME32_T__ == __SIZEOF_TIME64_T__
 /* Acquire a managed futex lock (s.a. `LFUTEX_WAIT_LOCK')
  * @return: 0: Did wait
  * @return: 1: Didn't wait
@@ -2193,6 +2185,14 @@ __CREDIRECT(__ATTR_NONNULL((1)),int,__NOTHROW_RPC,futex_waitlock,(lfutex_t *__ua
  * @return: -1:EINTR:     Operation was interrupted (*uaddr was still set to new_value)
  * @return: -1:ETIMEDOUT: The given `rel_timeout' has expired */
 __CREDIRECT(__ATTR_NONNULL((1)),int,__NOTHROW_RPC,futex_waitlock,(lfutex_t *__uaddr, struct timespec64 const *__rel_timeout),futex_timedwaitlock,(__uaddr,__rel_timeout))
+#elif defined(__CRT_HAVE_futex_timedwaitlock64)
+/* Acquire a managed futex lock (s.a. `LFUTEX_WAIT_LOCK')
+ * @return: 0: Did wait
+ * @return: 1: Didn't wait
+ * @return: -1:EFAULT:    A faulty pointer was given
+ * @return: -1:EINTR:     Operation was interrupted (*uaddr was still set to new_value)
+ * @return: -1:ETIMEDOUT: The given `rel_timeout' has expired */
+__CREDIRECT(__ATTR_NONNULL((1)),int,__NOTHROW_RPC,futex_waitlock,(lfutex_t *__uaddr, struct timespec64 const *__rel_timeout),futex_timedwaitlock64,(__uaddr,__rel_timeout))
 #elif defined(__CRT_HAVE_lfutex64) || defined(__CRT_HAVE_lfutex)
 } /* extern "C++" */
 #include <libc/local/kos.futex/futex_timedwaitlock64.h>
@@ -2205,20 +2205,20 @@ extern "C++" {
  * @return: -1:ETIMEDOUT: The given `rel_timeout' has expired */
 __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_NONNULL((1)) int __NOTHROW_RPC(__LIBCCALL futex_waitlock)(lfutex_t *__uaddr, struct timespec64 const *__rel_timeout) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(futex_timedwaitlock64))(__uaddr, __rel_timeout); }
 #endif /* ... */
-#ifdef __CRT_HAVE_futex_timedwaitwhile_exactbits64
-/* Wait if `(*uaddr & bitmask) == setmask'
- * @return: 0: Did wait
- * @return: 1: Didn't wait
- * @return: -1:EFAULT: A faulty pointer was given
- * @return: -1:EINTR:  Operation was interrupted */
-__CREDIRECT(__ATTR_NONNULL((1)),int,__NOTHROW_RPC,futex_waitwhile_exactbits,(lfutex_t *__uaddr, lfutex_t __bitmask, lfutex_t __setmask, struct timespec64 const *__rel_timeout),futex_timedwaitwhile_exactbits64,(__uaddr,__bitmask,__setmask,__rel_timeout))
-#elif defined(__CRT_HAVE_futex_timedwaitwhile_exactbits) && __SIZEOF_TIME32_T__ == __SIZEOF_TIME64_T__
+#if defined(__CRT_HAVE_futex_timedwaitwhile_exactbits) && __SIZEOF_TIME32_T__ == __SIZEOF_TIME64_T__
 /* Wait if `(*uaddr & bitmask) == setmask'
  * @return: 0: Did wait
  * @return: 1: Didn't wait
  * @return: -1:EFAULT: A faulty pointer was given
  * @return: -1:EINTR:  Operation was interrupted */
 __CREDIRECT(__ATTR_NONNULL((1)),int,__NOTHROW_RPC,futex_waitwhile_exactbits,(lfutex_t *__uaddr, lfutex_t __bitmask, lfutex_t __setmask, struct timespec64 const *__rel_timeout),futex_timedwaitwhile_exactbits,(__uaddr,__bitmask,__setmask,__rel_timeout))
+#elif defined(__CRT_HAVE_futex_timedwaitwhile_exactbits64)
+/* Wait if `(*uaddr & bitmask) == setmask'
+ * @return: 0: Did wait
+ * @return: 1: Didn't wait
+ * @return: -1:EFAULT: A faulty pointer was given
+ * @return: -1:EINTR:  Operation was interrupted */
+__CREDIRECT(__ATTR_NONNULL((1)),int,__NOTHROW_RPC,futex_waitwhile_exactbits,(lfutex_t *__uaddr, lfutex_t __bitmask, lfutex_t __setmask, struct timespec64 const *__rel_timeout),futex_timedwaitwhile_exactbits64,(__uaddr,__bitmask,__setmask,__rel_timeout))
 #elif defined(__CRT_HAVE_lfutex64) || defined(__CRT_HAVE_lfutex)
 } /* extern "C++" */
 #include <libc/local/kos.futex/futex_timedwaitwhile_exactbits64.h>
@@ -2230,20 +2230,20 @@ extern "C++" {
  * @return: -1:EINTR:  Operation was interrupted */
 __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_NONNULL((1)) int __NOTHROW_RPC(__LIBCCALL futex_waitwhile_exactbits)(lfutex_t *__uaddr, lfutex_t __bitmask, lfutex_t __setmask, struct timespec64 const *__rel_timeout) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(futex_timedwaitwhile_exactbits64))(__uaddr, __bitmask, __setmask, __rel_timeout); }
 #endif /* ... */
-#ifdef __CRT_HAVE_futex_timedwaituntil_exactbits64
-/* Wait if `(*uaddr & bitmask) != setmask'
- * @return: 0: Did wait
- * @return: 1: Didn't wait
- * @return: -1:EFAULT: A faulty pointer was given
- * @return: -1:EINTR:  Operation was interrupted */
-__CREDIRECT(__ATTR_NONNULL((1)),int,__NOTHROW_RPC,futex_waituntil_exactbits,(lfutex_t *__uaddr, lfutex_t __bitmask, lfutex_t __setmask, struct timespec64 const *__rel_timeout),futex_timedwaituntil_exactbits64,(__uaddr,__bitmask,__setmask,__rel_timeout))
-#elif defined(__CRT_HAVE_futex_timedwaituntil_exactbits) && __SIZEOF_TIME32_T__ == __SIZEOF_TIME64_T__
+#if defined(__CRT_HAVE_futex_timedwaituntil_exactbits) && __SIZEOF_TIME32_T__ == __SIZEOF_TIME64_T__
 /* Wait if `(*uaddr & bitmask) != setmask'
  * @return: 0: Did wait
  * @return: 1: Didn't wait
  * @return: -1:EFAULT: A faulty pointer was given
  * @return: -1:EINTR:  Operation was interrupted */
 __CREDIRECT(__ATTR_NONNULL((1)),int,__NOTHROW_RPC,futex_waituntil_exactbits,(lfutex_t *__uaddr, lfutex_t __bitmask, lfutex_t __setmask, struct timespec64 const *__rel_timeout),futex_timedwaituntil_exactbits,(__uaddr,__bitmask,__setmask,__rel_timeout))
+#elif defined(__CRT_HAVE_futex_timedwaituntil_exactbits64)
+/* Wait if `(*uaddr & bitmask) != setmask'
+ * @return: 0: Did wait
+ * @return: 1: Didn't wait
+ * @return: -1:EFAULT: A faulty pointer was given
+ * @return: -1:EINTR:  Operation was interrupted */
+__CREDIRECT(__ATTR_NONNULL((1)),int,__NOTHROW_RPC,futex_waituntil_exactbits,(lfutex_t *__uaddr, lfutex_t __bitmask, lfutex_t __setmask, struct timespec64 const *__rel_timeout),futex_timedwaituntil_exactbits64,(__uaddr,__bitmask,__setmask,__rel_timeout))
 #elif defined(__CRT_HAVE_lfutex64) || defined(__CRT_HAVE_lfutex)
 } /* extern "C++" */
 #include <libc/local/kos.futex/futex_timedwaituntil_exactbits64.h>
@@ -2255,20 +2255,20 @@ extern "C++" {
  * @return: -1:EINTR:  Operation was interrupted */
 __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_NONNULL((1)) int __NOTHROW_RPC(__LIBCCALL futex_waituntil_exactbits)(lfutex_t *__uaddr, lfutex_t __bitmask, lfutex_t __setmask, struct timespec64 const *__rel_timeout) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(futex_timedwaituntil_exactbits64))(__uaddr, __bitmask, __setmask, __rel_timeout); }
 #endif /* ... */
-#ifdef __CRT_HAVE_futex_timedwaitwhile_anybit64
-/* Wait if `(*uaddr & bitmask) != 0'
- * @return: 0: Did wait
- * @return: 1: Didn't wait
- * @return: -1:EFAULT: A faulty pointer was given
- * @return: -1:EINTR:  Operation was interrupted */
-__CREDIRECT(__ATTR_NONNULL((1)),int,__NOTHROW_RPC,futex_waitwhile_anybit,(lfutex_t *__uaddr, lfutex_t __bitmask, struct timespec64 const *__rel_timeout),futex_timedwaitwhile_anybit64,(__uaddr,__bitmask,__rel_timeout))
-#elif defined(__CRT_HAVE_futex_timedwaitwhile_anybit) && __SIZEOF_TIME32_T__ == __SIZEOF_TIME64_T__
+#if defined(__CRT_HAVE_futex_timedwaitwhile_anybit) && __SIZEOF_TIME32_T__ == __SIZEOF_TIME64_T__
 /* Wait if `(*uaddr & bitmask) != 0'
  * @return: 0: Did wait
  * @return: 1: Didn't wait
  * @return: -1:EFAULT: A faulty pointer was given
  * @return: -1:EINTR:  Operation was interrupted */
 __CREDIRECT(__ATTR_NONNULL((1)),int,__NOTHROW_RPC,futex_waitwhile_anybit,(lfutex_t *__uaddr, lfutex_t __bitmask, struct timespec64 const *__rel_timeout),futex_timedwaitwhile_anybit,(__uaddr,__bitmask,__rel_timeout))
+#elif defined(__CRT_HAVE_futex_timedwaitwhile_anybit64)
+/* Wait if `(*uaddr & bitmask) != 0'
+ * @return: 0: Did wait
+ * @return: 1: Didn't wait
+ * @return: -1:EFAULT: A faulty pointer was given
+ * @return: -1:EINTR:  Operation was interrupted */
+__CREDIRECT(__ATTR_NONNULL((1)),int,__NOTHROW_RPC,futex_waitwhile_anybit,(lfutex_t *__uaddr, lfutex_t __bitmask, struct timespec64 const *__rel_timeout),futex_timedwaitwhile_anybit64,(__uaddr,__bitmask,__rel_timeout))
 #elif defined(__CRT_HAVE_lfutex64) || defined(__CRT_HAVE_lfutex)
 } /* extern "C++" */
 #include <libc/local/kos.futex/futex_timedwaitwhile_anybit64.h>
@@ -2280,20 +2280,20 @@ extern "C++" {
  * @return: -1:EINTR:  Operation was interrupted */
 __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_NONNULL((1)) int __NOTHROW_RPC(__LIBCCALL futex_waitwhile_anybit)(lfutex_t *__uaddr, lfutex_t __bitmask, struct timespec64 const *__rel_timeout) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(futex_timedwaitwhile_anybit64))(__uaddr, __bitmask, __rel_timeout); }
 #endif /* ... */
-#ifdef __CRT_HAVE_futex_timedwaitwhile_allbits64
-/* Wait if `(*uaddr & bitmask) == bitmask'
- * @return: 0: Did wait
- * @return: 1: Didn't wait
- * @return: -1:EFAULT: A faulty pointer was given
- * @return: -1:EINTR:  Operation was interrupted */
-__CREDIRECT(__ATTR_NONNULL((1)),int,__NOTHROW_RPC,futex_waitwhile_allbits,(lfutex_t *__uaddr, lfutex_t __bitmask, struct timespec64 const *__rel_timeout),futex_timedwaitwhile_allbits64,(__uaddr,__bitmask,__rel_timeout))
-#elif defined(__CRT_HAVE_futex_timedwaitwhile_allbits) && __SIZEOF_TIME32_T__ == __SIZEOF_TIME64_T__
+#if defined(__CRT_HAVE_futex_timedwaitwhile_allbits) && __SIZEOF_TIME32_T__ == __SIZEOF_TIME64_T__
 /* Wait if `(*uaddr & bitmask) == bitmask'
  * @return: 0: Did wait
  * @return: 1: Didn't wait
  * @return: -1:EFAULT: A faulty pointer was given
  * @return: -1:EINTR:  Operation was interrupted */
 __CREDIRECT(__ATTR_NONNULL((1)),int,__NOTHROW_RPC,futex_waitwhile_allbits,(lfutex_t *__uaddr, lfutex_t __bitmask, struct timespec64 const *__rel_timeout),futex_timedwaitwhile_allbits,(__uaddr,__bitmask,__rel_timeout))
+#elif defined(__CRT_HAVE_futex_timedwaitwhile_allbits64)
+/* Wait if `(*uaddr & bitmask) == bitmask'
+ * @return: 0: Did wait
+ * @return: 1: Didn't wait
+ * @return: -1:EFAULT: A faulty pointer was given
+ * @return: -1:EINTR:  Operation was interrupted */
+__CREDIRECT(__ATTR_NONNULL((1)),int,__NOTHROW_RPC,futex_waitwhile_allbits,(lfutex_t *__uaddr, lfutex_t __bitmask, struct timespec64 const *__rel_timeout),futex_timedwaitwhile_allbits64,(__uaddr,__bitmask,__rel_timeout))
 #elif defined(__CRT_HAVE_lfutex64) || defined(__CRT_HAVE_lfutex)
 } /* extern "C++" */
 #include <libc/local/kos.futex/futex_timedwaitwhile_allbits64.h>

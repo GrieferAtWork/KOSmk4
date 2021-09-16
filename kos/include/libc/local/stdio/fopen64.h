@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x3b4f7511 */
+/* HASH CRC-32:0xe1bb5e5e */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -22,11 +22,12 @@
 #define __local_fopen64_defined 1
 #include <__crt.h>
 #include <features.h>
+#include <bits/types.h>
 #if defined(__CRT_HAVE_fopen) || defined(__CRT_HAVE__IO_fopen) || defined(__CRT_HAVE_fopen64)
 __NAMESPACE_LOCAL_BEGIN
 #ifndef __local___localdep_fopen_defined
 #define __local___localdep_fopen_defined 1
-#if defined(__CRT_HAVE_fopen64) && defined(__USE_FILE_OFFSET64)
+#if defined(__CRT_HAVE_fopen64) && (defined(__USE_FILE_OFFSET64) || __SIZEOF_OFF32_T__ == __SIZEOF_OFF64_T__)
 __CREDIRECT(__ATTR_WUNUSED __ATTR_NONNULL((1, 2)),__FILE *,__NOTHROW_RPC,__localdep_fopen,(char const *__restrict __filename, char const *__restrict __modes),fopen64,(__filename,__modes))
 #elif defined(__CRT_HAVE_fopen)
 __CREDIRECT(__ATTR_WUNUSED __ATTR_NONNULL((1, 2)),__FILE *,__NOTHROW_RPC,__localdep_fopen,(char const *__restrict __filename, char const *__restrict __modes),fopen,(__filename,__modes))

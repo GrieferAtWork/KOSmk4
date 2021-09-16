@@ -338,8 +338,8 @@ INTERN ATTR_SECTION(".text.crt.except.fs.basic_property") char *
 }
 /*[[[end:libc_GetCwd]]]*/
 
-/*[[[head:libc_PRead,hash:CRC-32=0xf6eff9a6]]]*/
-/* >> pread(2)
+/*[[[head:libc_PRead,hash:CRC-32=0xbd57a03a]]]*/
+/* >> pread(2), pread64(2)
  * Read data from a file at a specific `offset', rather than the current R/W position
  * @return: <= bufsize: The actual amount of read bytes */
 INTERN ATTR_SECTION(".text.crt.except.io.read") NONNULL((2)) size_t
@@ -353,8 +353,8 @@ INTERN ATTR_SECTION(".text.crt.except.io.read") NONNULL((2)) size_t
 }
 /*[[[end:libc_PRead]]]*/
 
-/*[[[head:libc_PWrite,hash:CRC-32=0x59d73efb]]]*/
-/* >> pwrite(2)
+/*[[[head:libc_PWrite,hash:CRC-32=0xaad8526b]]]*/
+/* >> pwrite(2), pwrite64(2)
  * Write data to a file at a specific `offset', rather than the current R/W position
  * @return: <= bufsize: The actual amount of written bytes */
 INTERN ATTR_SECTION(".text.crt.except.io.write") NONNULL((2)) size_t
@@ -368,8 +368,8 @@ INTERN ATTR_SECTION(".text.crt.except.io.write") NONNULL((2)) size_t
 }
 /*[[[end:libc_PWrite]]]*/
 
-/*[[[head:libc_PReadAll,hash:CRC-32=0x42df31c5]]]*/
-/* >> preadall(3)
+/*[[[head:libc_PReadAll,hash:CRC-32=0x82133a57]]]*/
+/* >> preadall(3), preadall64(3)
  * Same as `readall(3)', but using `pread(2)' instead of `read()' */
 INTERN ATTR_SECTION(".text.crt.except.io.read") NONNULL((2)) size_t
 (LIBCCALL libc_PReadAll)(fd_t fd,
@@ -382,12 +382,12 @@ INTERN ATTR_SECTION(".text.crt.except.io.read") NONNULL((2)) size_t
 }
 /*[[[end:libc_PReadAll]]]*/
 
-/*[[[head:libc_PReadAll64,hash:CRC-32=0x2ef5e7a0]]]*/
+/*[[[head:libc_PReadAll64,hash:CRC-32=0xa05b7398]]]*/
 #if __SIZEOF_OFF32_T__ == __SIZEOF_OFF64_T__
 DEFINE_INTERN_ALIAS(libc_PReadAll64, libc_PReadAll);
 #else /* MAGIC:alias */
-/* >> preadall64(3)
- * Same as `readall(3)', but using `pread64(2)' instead of `read()' */
+/* >> preadall(3), preadall64(3)
+ * Same as `readall(3)', but using `pread(2)' instead of `read()' */
 INTERN ATTR_SECTION(".text.crt.except.io.large.read") NONNULL((2)) size_t
 (LIBCCALL libc_PReadAll64)(fd_t fd,
                            void *buf,

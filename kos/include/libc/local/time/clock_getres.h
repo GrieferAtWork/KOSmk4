@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x1f45d0ca */
+/* HASH CRC-32:0x277fdd3e */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -37,10 +37,10 @@ __CREDIRECT(__ATTR_NONNULL((2)),int,__NOTHROW_NCX,__localdep_clock_getres32,(__c
 #endif /* !__local___localdep_clock_getres32_defined */
 #ifndef __local___localdep_clock_getres64_defined
 #define __local___localdep_clock_getres64_defined 1
-#ifdef __CRT_HAVE_clock_getres64
-__CREDIRECT(__ATTR_NONNULL((2)),int,__NOTHROW_NCX,__localdep_clock_getres64,(__clockid_t __clock_id, struct __timespec64 *__res),clock_getres64,(__clock_id,__res))
-#elif defined(__CRT_HAVE_clock_getres) && __SIZEOF_TIME32_T__ == __SIZEOF_TIME64_T__
+#if defined(__CRT_HAVE_clock_getres) && __SIZEOF_TIME32_T__ == __SIZEOF_TIME64_T__
 __CREDIRECT(__ATTR_NONNULL((2)),int,__NOTHROW_NCX,__localdep_clock_getres64,(__clockid_t __clock_id, struct __timespec64 *__res),clock_getres,(__clock_id,__res))
+#elif defined(__CRT_HAVE_clock_getres64)
+__CREDIRECT(__ATTR_NONNULL((2)),int,__NOTHROW_NCX,__localdep_clock_getres64,(__clockid_t __clock_id, struct __timespec64 *__res),clock_getres64,(__clock_id,__res))
 #elif defined(__CRT_HAVE_clock_getres) || defined(__CRT_HAVE___clock_getres)
 __NAMESPACE_LOCAL_END
 #include <libc/local/time/clock_getres64.h>

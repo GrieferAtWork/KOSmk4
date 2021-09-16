@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x1e07f179 */
+/* HASH CRC-32:0x46b9aebc */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -31,10 +31,10 @@ __CREDIRECT(,__pos32_t,__THROWING,__localdep_LSeek32,(__fd_t __fd, __off32_t __o
 #endif /* !__local___localdep_LSeek32_defined && __CRT_HAVE_LSeek */
 #ifndef __local___localdep_LSeek64_defined
 #define __local___localdep_LSeek64_defined 1
-#ifdef __CRT_HAVE_LSeek64
-__CREDIRECT(,__pos64_t,__THROWING,__localdep_LSeek64,(__fd_t __fd, __off64_t __offset, int __whence),LSeek64,(__fd,__offset,__whence))
-#elif defined(__CRT_HAVE_LSeek) && __SIZEOF_OFF32_T__ == __SIZEOF_OFF64_T__
+#if defined(__CRT_HAVE_LSeek) && __SIZEOF_OFF32_T__ == __SIZEOF_OFF64_T__
 __CREDIRECT(,__pos64_t,__THROWING,__localdep_LSeek64,(__fd_t __fd, __off64_t __offset, int __whence),LSeek,(__fd,__offset,__whence))
+#elif defined(__CRT_HAVE_LSeek64)
+__CREDIRECT(,__pos64_t,__THROWING,__localdep_LSeek64,(__fd_t __fd, __off64_t __offset, int __whence),LSeek64,(__fd,__offset,__whence))
 #elif defined(__CRT_HAVE_LSeek)
 __NAMESPACE_LOCAL_END
 #include <libc/local/kos.unistd/LSeek64.h>

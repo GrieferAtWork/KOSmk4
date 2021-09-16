@@ -751,8 +751,8 @@ NOTHROW_RPC(LIBCCALL libc_sigwaitinfo)(sigset_t const *__restrict set,
 }
 /*[[[end:libc_sigwaitinfo]]]*/
 
-/*[[[head:libc_sigtimedwait,hash:CRC-32=0x164aa466]]]*/
-/* >> sigtimedwait(2)
+/*[[[head:libc_sigtimedwait,hash:CRC-32=0x30cd6d43]]]*/
+/* >> sigtimedwait(2), sigtimedwait64(2)
  * Same as `sigwaitinfo(2)', but stop waiting after a total of `rel_timeout' has passed
  * @param: set:         The set of signals on which to wait
  * @param: info:        Information about the signal on which to wait.
@@ -774,11 +774,11 @@ NOTHROW_RPC(LIBCCALL libc_sigtimedwait)(sigset_t const *__restrict set,
 }
 /*[[[end:libc_sigtimedwait]]]*/
 
-/*[[[head:libc_sigtimedwait64,hash:CRC-32=0x9c8be360]]]*/
+/*[[[head:libc_sigtimedwait64,hash:CRC-32=0x26c965df]]]*/
 #if __SIZEOF_TIME32_T__ == __SIZEOF_TIME64_T__
 DEFINE_INTERN_ALIAS(libc_sigtimedwait64, libc_sigtimedwait);
 #else /* MAGIC:alias */
-/* >> sigtimedwait(2)
+/* >> sigtimedwait(2), sigtimedwait64(2)
  * Same as `sigwaitinfo(2)', but stop waiting after a total of `rel_timeout' has passed
  * @param: set:         The set of signals on which to wait
  * @param: info:        Information about the signal on which to wait.

@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xb5f91c6f */
+/* HASH CRC-32:0x13a4f03b */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -22,8 +22,8 @@
 #define __local_wait3_64_defined 1
 #include <__crt.h>
 #ifdef __CRT_HAVE_wait3
-#include <bits/types.h>
 #include <features.h>
+#include <bits/types.h>
 #include <bits/os/rusage.h>
 #include <parts/waitmacros.h>
 __NAMESPACE_LOCAL_BEGIN

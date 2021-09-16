@@ -612,8 +612,8 @@ NOTHROW_RPC(LIBCCALL libc_write)(fd_t fd,
 }
 /*[[[end:libc_write]]]*/
 
-/*[[[head:libc_lseek,hash:CRC-32=0xf5643ece]]]*/
-/* >> lseek(2)
+/*[[[head:libc_lseek,hash:CRC-32=0x7c8c5d75]]]*/
+/* >> lseek(2), lseek64(2)
  * Change the position of the file read/write pointer within a file referred to by `fd' */
 INTERN ATTR_SECTION(".text.crt.io.seek") off_t
 NOTHROW_NCX(LIBCCALL libc_lseek)(fd_t fd,
@@ -936,11 +936,11 @@ NOTHROW_RPC(LIBCCALL libc_unlinkat)(fd_t dfd,
 }
 /*[[[end:libc_unlinkat]]]*/
 
-/*[[[head:libc_lseek64,hash:CRC-32=0x94399d16]]]*/
+/*[[[head:libc_lseek64,hash:CRC-32=0x2815d5fb]]]*/
 #if __SIZEOF_OFF32_T__ == __SIZEOF_OFF64_T__
 DEFINE_INTERN_ALIAS(libc_lseek64, libc_lseek);
 #else /* MAGIC:alias */
-/* >> lseek64(2)
+/* >> lseek(2), lseek64(2)
  * Change the position of the file read/write pointer within a file referred to by `fd' */
 INTERN ATTR_SECTION(".text.crt.io.large.seek") off64_t
 NOTHROW_NCX(LIBCCALL libc_lseek64)(fd_t fd,
@@ -957,8 +957,8 @@ NOTHROW_NCX(LIBCCALL libc_lseek64)(fd_t fd,
 #endif /* MAGIC:alias */
 /*[[[end:libc_lseek64]]]*/
 
-/*[[[head:libc_pread,hash:CRC-32=0x91b7bc1d]]]*/
-/* >> pread(2)
+/*[[[head:libc_pread,hash:CRC-32=0x19a7f0f1]]]*/
+/* >> pread(2), pread64(2)
  * Read data from a file at a specific `offset', rather than the current R/W position
  * @return: <= bufsize: The actual amount of read bytes */
 INTERN ATTR_SECTION(".text.crt.io.read") NONNULL((2)) ssize_t
@@ -977,8 +977,8 @@ NOTHROW_RPC(LIBCCALL libc_pread)(fd_t fd,
 }
 /*[[[end:libc_pread]]]*/
 
-/*[[[head:libc_pwrite,hash:CRC-32=0x70ec361c]]]*/
-/* >> pwrite(2)
+/*[[[head:libc_pwrite,hash:CRC-32=0xafdcd809]]]*/
+/* >> pwrite(2), pwrite64(2)
  * Write data to a file at a specific `offset', rather than the current R/W position
  * @return: <= bufsize: The actual amount of written bytes */
 INTERN ATTR_SECTION(".text.crt.io.write") NONNULL((2)) ssize_t
@@ -997,12 +997,13 @@ NOTHROW_RPC(LIBCCALL libc_pwrite)(fd_t fd,
 }
 /*[[[end:libc_pwrite]]]*/
 
-/*[[[head:libc_pread64,hash:CRC-32=0xa822560a]]]*/
+/*[[[head:libc_pread64,hash:CRC-32=0xa867626e]]]*/
 #if __SIZEOF_OFF32_T__ == __SIZEOF_OFF64_T__
 DEFINE_INTERN_ALIAS(libc_pread64, libc_pread);
 #else /* MAGIC:alias */
-/* >> pread64(2)
- * Read data from a file at a specific offset */
+/* >> pread(2), pread64(2)
+ * Read data from a file at a specific `offset', rather than the current R/W position
+ * @return: <= bufsize: The actual amount of read bytes */
 INTERN ATTR_SECTION(".text.crt.io.large.read") NONNULL((2)) ssize_t
 NOTHROW_RPC(LIBCCALL libc_pread64)(fd_t fd,
                                    void *buf,
@@ -1020,12 +1021,13 @@ NOTHROW_RPC(LIBCCALL libc_pread64)(fd_t fd,
 #endif /* MAGIC:alias */
 /*[[[end:libc_pread64]]]*/
 
-/*[[[head:libc_pwrite64,hash:CRC-32=0xbd5df9c6]]]*/
+/*[[[head:libc_pwrite64,hash:CRC-32=0x553bea6d]]]*/
 #if __SIZEOF_OFF32_T__ == __SIZEOF_OFF64_T__
 DEFINE_INTERN_ALIAS(libc_pwrite64, libc_pwrite);
 #else /* MAGIC:alias */
-/* >> pwrite64(2)
- * Write data to a file at a specific offset */
+/* >> pwrite(2), pwrite64(2)
+ * Write data to a file at a specific `offset', rather than the current R/W position
+ * @return: <= bufsize: The actual amount of written bytes */
 INTERN ATTR_SECTION(".text.crt.io.large.write") NONNULL((2)) ssize_t
 NOTHROW_RPC(LIBCCALL libc_pwrite64)(fd_t fd,
                                     void const *buf,
@@ -1329,8 +1331,8 @@ NOTHROW_RPC(LIBCCALL libc_lchown)(char const *file,
 }
 /*[[[end:libc_lchown]]]*/
 
-/*[[[head:libc_truncate,hash:CRC-32=0x7c24ef0]]]*/
-/* >> truncate(2)
+/*[[[head:libc_truncate,hash:CRC-32=0xb94025bd]]]*/
+/* >> truncate(2), truncate64(2)
  * Truncate the given file `file' to a length of `length' */
 INTERN ATTR_SECTION(".text.crt.fs.modify") NONNULL((1)) int
 NOTHROW_NCX(LIBCCALL libc_truncate)(char const *file,
@@ -1344,11 +1346,11 @@ NOTHROW_NCX(LIBCCALL libc_truncate)(char const *file,
 }
 /*[[[end:libc_truncate]]]*/
 
-/*[[[head:libc_truncate64,hash:CRC-32=0x7bf49012]]]*/
+/*[[[head:libc_truncate64,hash:CRC-32=0xd349c447]]]*/
 #if __SIZEOF_OFF32_T__ == __SIZEOF_OFF64_T__
 DEFINE_INTERN_ALIAS(libc_truncate64, libc_truncate);
 #else /* MAGIC:alias */
-/* >> truncate64(2)
+/* >> truncate(2), truncate64(2)
  * Truncate the given file `file' to a length of `length' */
 INTERN ATTR_SECTION(".text.crt.fs.modify") NONNULL((1)) int
 NOTHROW_NCX(LIBCCALL libc_truncate64)(char const *file,
@@ -3330,8 +3332,8 @@ NOTHROW_RPC(LIBCCALL libc_writeall)(fd_t fd,
 }
 /*[[[end:libc_writeall]]]*/
 
-/*[[[head:libc_preadall,hash:CRC-32=0x208b5ffc]]]*/
-/* >> preadall(3)
+/*[[[head:libc_preadall,hash:CRC-32=0xb289f5c7]]]*/
+/* >> preadall(3), preadall64(3)
  * Same as `readall(3)', but using `pread(2)' instead of `read()' */
 INTERN ATTR_SECTION(".text.crt.io.read") NONNULL((2)) ssize_t
 NOTHROW_RPC(LIBCCALL libc_preadall)(fd_t fd,
@@ -3362,12 +3364,12 @@ NOTHROW_RPC(LIBCCALL libc_preadall)(fd_t fd,
 }
 /*[[[end:libc_preadall]]]*/
 
-/*[[[head:libc_preadall64,hash:CRC-32=0x65d5e44c]]]*/
+/*[[[head:libc_preadall64,hash:CRC-32=0x64bc77b2]]]*/
 #if __SIZEOF_OFF32_T__ == __SIZEOF_OFF64_T__
 DEFINE_INTERN_ALIAS(libc_preadall64, libc_preadall);
 #else /* MAGIC:alias */
-/* >> preadall64(3)
- * Same as `readall(3)', but using `pread64(2)' instead of `read()' */
+/* >> preadall(3), preadall64(3)
+ * Same as `readall(3)', but using `pread(2)' instead of `read()' */
 INTERN ATTR_SECTION(".text.crt.io.large.read") NONNULL((2)) ssize_t
 NOTHROW_RPC(LIBCCALL libc_preadall64)(fd_t fd,
                                       void *buf,
@@ -3398,8 +3400,8 @@ NOTHROW_RPC(LIBCCALL libc_preadall64)(fd_t fd,
 #endif /* MAGIC:alias */
 /*[[[end:libc_preadall64]]]*/
 
-/*[[[head:libc_pwriteall,hash:CRC-32=0x61cf24d8]]]*/
-/* >> pwriteall(3)
+/*[[[head:libc_pwriteall,hash:CRC-32=0xa3df57d0]]]*/
+/* >> pwriteall(3), pwriteall64(3)
  * Same as `writeall(3)', but using `pwrite(2)' instead of `write()' */
 INTERN ATTR_SECTION(".text.crt.io.write") NONNULL((2)) ssize_t
 NOTHROW_RPC(LIBCCALL libc_pwriteall)(fd_t fd,
@@ -3430,12 +3432,12 @@ NOTHROW_RPC(LIBCCALL libc_pwriteall)(fd_t fd,
 }
 /*[[[end:libc_pwriteall]]]*/
 
-/*[[[head:libc_pwriteall64,hash:CRC-32=0x4aa10dd8]]]*/
+/*[[[head:libc_pwriteall64,hash:CRC-32=0xce88eb77]]]*/
 #if __SIZEOF_OFF32_T__ == __SIZEOF_OFF64_T__
 DEFINE_INTERN_ALIAS(libc_pwriteall64, libc_pwriteall);
 #else /* MAGIC:alias */
-/* >> pwriteall64(3)
- * Same as `writeall(3)', but using `pwrite64(2)' instead of `write()' */
+/* >> pwriteall(3), pwriteall64(3)
+ * Same as `writeall(3)', but using `pwrite(2)' instead of `write()' */
 INTERN ATTR_SECTION(".text.crt.io.large.write") NONNULL((2)) ssize_t
 NOTHROW_RPC(LIBCCALL libc_pwriteall64)(fd_t fd,
                                        void *buf,

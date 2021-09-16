@@ -6427,8 +6427,6 @@
 #define __CRT_HAVE_KOS$getwchar_unlocked
 #define __CRT_HAVE_KOS$getwd
 #define __CRT_HAVE_KOS$getxattr
-#define __CRT_HAVE_KOS$globfree
-#define __CRT_HAVE_KOS$globfree64
 #define __CRT_HAVE_KOS$gmtime
 #define __CRT_HAVE_KOS$gmtime64
 #define __CRT_HAVE_KOS$gmtime64_r
@@ -9833,8 +9831,6 @@
 #define __CRT_HAVE_DOS$getwchar_unlocked
 #define __CRT_HAVE_DOS$getwd
 #define __CRT_HAVE_DOS$getxattr
-#define __CRT_HAVE_DOS$globfree
-#define __CRT_HAVE_DOS$globfree64
 #define __CRT_HAVE_DOS$gmtime
 #define __CRT_HAVE_DOS$gmtime64
 #define __CRT_HAVE_DOS$gmtime64_r

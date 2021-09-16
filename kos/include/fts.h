@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x71a66471 */
+/* HASH CRC-32:0x66d57ac9 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -159,57 +159,46 @@ typedef struct _ftsent64 FTSENT64;
 typedef struct __fts64 FTS64;
 #endif /* __USE_LARGEFILE64 */
 
-#if defined(__CRT_HAVE_fts64_children) && defined(__USE_FILE_OFFSET64)
-/* >> fts_children(3), fts_children64(3)
- * @param: instr: One of `FTS_AGAIN', `FTS_FOLLOW', `FTS_NOINSTR' or `FTS_SKIP' */
-__CREDIRECT(__ATTR_WUNUSED __ATTR_NONNULL((1)),FTSENT *,__NOTHROW_RPC,fts_children,(FTS *__ftsp, __STDC_INT_AS_UINT_T __instr),fts64_children,(__ftsp,__instr))
-#elif defined(__CRT_HAVE_fts_children) && !defined(__USE_FILE_OFFSET64)
+#if defined(__CRT_HAVE_fts_children) && (!defined(__USE_FILE_OFFSET64) || defined(__FTS32_MATCHES_FTS64))
 /* >> fts_children(3), fts_children64(3)
  * @param: instr: One of `FTS_AGAIN', `FTS_FOLLOW', `FTS_NOINSTR' or `FTS_SKIP' */
 __CDECLARE(__ATTR_WUNUSED __ATTR_NONNULL((1)),FTSENT *,__NOTHROW_RPC,fts_children,(FTS *__ftsp, __STDC_INT_AS_UINT_T __instr),(__ftsp,__instr))
+#elif defined(__CRT_HAVE_fts64_children) && (defined(__USE_FILE_OFFSET64) || defined(__FTS32_MATCHES_FTS64))
+/* >> fts_children(3), fts_children64(3)
+ * @param: instr: One of `FTS_AGAIN', `FTS_FOLLOW', `FTS_NOINSTR' or `FTS_SKIP' */
+__CREDIRECT(__ATTR_WUNUSED __ATTR_NONNULL((1)),FTSENT *,__NOTHROW_RPC,fts_children,(FTS *__ftsp, __STDC_INT_AS_UINT_T __instr),fts64_children,(__ftsp,__instr))
 #endif /* ... */
-#if defined(__CRT_HAVE_fts64_close) && defined(__USE_FILE_OFFSET64)
-/* >> fts_close(3), fts_close64(3) */
-__CREDIRECT(__ATTR_NONNULL((1)),int,__NOTHROW_NCX,fts_close,(FTS *__ftsp),fts64_close,(__ftsp))
-#elif defined(__CRT_HAVE_fts_children) && !defined(__USE_FILE_OFFSET64)
+#if defined(__CRT_HAVE_fts_children) && (!defined(__USE_FILE_OFFSET64) || defined(__FTS32_MATCHES_FTS64))
 /* >> fts_close(3), fts_close64(3) */
 __CREDIRECT(__ATTR_NONNULL((1)),int,__NOTHROW_NCX,fts_close,(FTS *__ftsp),fts_children,(__ftsp))
+#elif defined(__CRT_HAVE_fts64_close) && (defined(__USE_FILE_OFFSET64) || defined(__FTS32_MATCHES_FTS64))
+/* >> fts_close(3), fts_close64(3) */
+__CREDIRECT(__ATTR_NONNULL((1)),int,__NOTHROW_NCX,fts_close,(FTS *__ftsp),fts64_close,(__ftsp))
 #endif /* ... */
-#if defined(__CRT_HAVE_fts_open) && defined(__FTS32_MATCHES_FTS64)
+#if defined(__CRT_HAVE_fts_open) && (!defined(__USE_FILE_OFFSET64) || defined(__FTS32_MATCHES_FTS64))
 /* >> fts_open(3), fts_open64(3)
  * @param: options: Set of `FTS_COMFOLLOW | FTS_LOGICAL | ... | FTS_STOP' */
 __CDECLARE(__ATTR_WUNUSED __ATTR_NONNULL((1)),FTS *,__NOTHROW_RPC,fts_open,(char *const *__path_argv, __STDC_INT_AS_UINT_T __options, int (__LIBKCALL *__compar)(FTSENT const **__lhs, FTSENT const **__rhs)),(__path_argv,__options,__compar))
-#elif defined(__CRT_HAVE_fts64_open) && defined(__USE_FILE_OFFSET64)
+#elif defined(__CRT_HAVE_fts64_open) && (defined(__USE_FILE_OFFSET64) || defined(__FTS32_MATCHES_FTS64))
 /* >> fts_open(3), fts_open64(3)
  * @param: options: Set of `FTS_COMFOLLOW | FTS_LOGICAL | ... | FTS_STOP' */
 __CREDIRECT(__ATTR_WUNUSED __ATTR_NONNULL((1)),FTS *,__NOTHROW_RPC,fts_open,(char *const *__path_argv, __STDC_INT_AS_UINT_T __options, int (__LIBKCALL *__compar)(FTSENT const **__lhs, FTSENT const **__rhs)),fts64_open,(__path_argv,__options,__compar))
-#elif defined(__CRT_HAVE_fts_open) && !defined(__USE_FILE_OFFSET64)
-/* >> fts_open(3), fts_open64(3)
- * @param: options: Set of `FTS_COMFOLLOW | FTS_LOGICAL | ... | FTS_STOP' */
-__CDECLARE(__ATTR_WUNUSED __ATTR_NONNULL((1)),FTS *,__NOTHROW_RPC,fts_open,(char *const *__path_argv, __STDC_INT_AS_UINT_T __options, int (__LIBKCALL *__compar)(FTSENT const **__lhs, FTSENT const **__rhs)),(__path_argv,__options,__compar))
 #endif /* ... */
-#if defined(__CRT_HAVE_fts_read) && defined(__FTS32_MATCHES_FTS64)
+#if defined(__CRT_HAVE_fts_read) && (!defined(__USE_FILE_OFFSET64) || defined(__FTS32_MATCHES_FTS64))
 /* >> fts_read(3), fts_read64(3) */
 __CDECLARE(__ATTR_WUNUSED __ATTR_NONNULL((1)),FTSENT *,__NOTHROW_RPC,fts_read,(FTS *__ftsp),(__ftsp))
-#elif defined(__CRT_HAVE_fts64_read) && defined(__USE_FILE_OFFSET64)
+#elif defined(__CRT_HAVE_fts64_read) && (defined(__USE_FILE_OFFSET64) || defined(__FTS32_MATCHES_FTS64))
 /* >> fts_read(3), fts_read64(3) */
 __CREDIRECT(__ATTR_WUNUSED __ATTR_NONNULL((1)),FTSENT *,__NOTHROW_RPC,fts_read,(FTS *__ftsp),fts64_read,(__ftsp))
-#elif defined(__CRT_HAVE_fts_read) && !defined(__USE_FILE_OFFSET64)
-/* >> fts_read(3), fts_read64(3) */
-__CDECLARE(__ATTR_WUNUSED __ATTR_NONNULL((1)),FTSENT *,__NOTHROW_RPC,fts_read,(FTS *__ftsp),(__ftsp))
 #endif /* ... */
-#if defined(__CRT_HAVE_fts_set) && defined(__FTS32_MATCHES_FTS64)
+#if defined(__CRT_HAVE_fts_set) && (!defined(__USE_FILE_OFFSET64) || defined(__FTS32_MATCHES_FTS64))
 /* >> fts_set(3), fts_set64(3)
  * @param: instr: One of `FTS_AGAIN', `FTS_FOLLOW', `FTS_NOINSTR' or `FTS_SKIP' */
 __CDECLARE(__ATTR_NONNULL((1, 2)),int,__NOTHROW_NCX,fts_set,(FTS *__ftsp, FTSENT *__f, __STDC_INT_AS_UINT_T __instr),(__ftsp,__f,__instr))
-#elif defined(__CRT_HAVE_fts64_set) && defined(__USE_FILE_OFFSET64)
+#elif defined(__CRT_HAVE_fts64_set) && (defined(__USE_FILE_OFFSET64) || defined(__FTS32_MATCHES_FTS64))
 /* >> fts_set(3), fts_set64(3)
  * @param: instr: One of `FTS_AGAIN', `FTS_FOLLOW', `FTS_NOINSTR' or `FTS_SKIP' */
 __CREDIRECT(__ATTR_NONNULL((1, 2)),int,__NOTHROW_NCX,fts_set,(FTS *__ftsp, FTSENT *__f, __STDC_INT_AS_UINT_T __instr),fts64_set,(__ftsp,__f,__instr))
-#elif defined(__CRT_HAVE_fts_set) && !defined(__USE_FILE_OFFSET64)
-/* >> fts_set(3), fts_set64(3)
- * @param: instr: One of `FTS_AGAIN', `FTS_FOLLOW', `FTS_NOINSTR' or `FTS_SKIP' */
-__CDECLARE(__ATTR_NONNULL((1, 2)),int,__NOTHROW_NCX,fts_set,(FTS *__ftsp, FTSENT *__f, __STDC_INT_AS_UINT_T __instr),(__ftsp,__f,__instr))
 #endif /* ... */
 
 

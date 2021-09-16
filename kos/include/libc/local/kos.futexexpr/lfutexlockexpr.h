@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xb6c3e3c5 */
+/* HASH CRC-32:0xc8da52fe */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -32,10 +32,10 @@ __CREDIRECT(__ATTR_NONNULL((1, 4)),int,__NOTHROW_RPC,__localdep_lfutexlockexpr32
 #endif /* !__local___localdep_lfutexlockexpr32_defined && __CRT_HAVE_lfutexlockexpr */
 #ifndef __local___localdep_lfutexlockexpr64_defined
 #define __local___localdep_lfutexlockexpr64_defined 1
-#ifdef __CRT_HAVE_lfutexlockexpr64
-__CREDIRECT(__ATTR_NONNULL((1, 4)),int,__NOTHROW_RPC,__localdep_lfutexlockexpr64,(__uintptr_t *__ulockaddr, void *__base, __SIZE_TYPE__ __exprc, struct lfutexexpr const *__exprv, struct __timespec64 const *__timeout, unsigned int __timeout_flags),lfutexlockexpr64,(__ulockaddr,__base,__exprc,__exprv,__timeout,__timeout_flags))
-#elif defined(__CRT_HAVE_lfutexlockexpr) && __SIZEOF_TIME32_T__ == __SIZEOF_TIME64_T__
+#if defined(__CRT_HAVE_lfutexlockexpr) && __SIZEOF_TIME32_T__ == __SIZEOF_TIME64_T__
 __CREDIRECT(__ATTR_NONNULL((1, 4)),int,__NOTHROW_RPC,__localdep_lfutexlockexpr64,(__uintptr_t *__ulockaddr, void *__base, __SIZE_TYPE__ __exprc, struct lfutexexpr const *__exprv, struct __timespec64 const *__timeout, unsigned int __timeout_flags),lfutexlockexpr,(__ulockaddr,__base,__exprc,__exprv,__timeout,__timeout_flags))
+#elif defined(__CRT_HAVE_lfutexlockexpr64)
+__CREDIRECT(__ATTR_NONNULL((1, 4)),int,__NOTHROW_RPC,__localdep_lfutexlockexpr64,(__uintptr_t *__ulockaddr, void *__base, __SIZE_TYPE__ __exprc, struct lfutexexpr const *__exprv, struct __timespec64 const *__timeout, unsigned int __timeout_flags),lfutexlockexpr64,(__ulockaddr,__base,__exprc,__exprv,__timeout,__timeout_flags))
 #elif defined(__CRT_HAVE_lfutexlockexpr)
 __NAMESPACE_LOCAL_END
 #include <libc/local/kos.futexexpr/lfutexlockexpr64.h>

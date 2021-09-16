@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x1073bdc2 */
+/* HASH CRC-32:0x6454ffa0 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -22,21 +22,15 @@
 #define __local_fopen_s_defined 1
 #include <__crt.h>
 #include <asm/os/oflags.h>
-#include <features.h>
-#if defined(__CRT_HAVE_fopen) || defined(__CRT_HAVE__IO_fopen) || defined(__CRT_HAVE_fopen64)
+#if (defined(__CRT_HAVE_fopen) && (!defined(__O_LARGEFILE) || !__O_LARGEFILE)) || defined(__CRT_HAVE_fopen64)
 #include <bits/types.h>
 __NAMESPACE_LOCAL_BEGIN
 #ifndef __local___localdep_fopen64_defined
 #define __local___localdep_fopen64_defined 1
-#ifdef __CRT_HAVE_fopen64
-__CREDIRECT(__ATTR_WUNUSED __ATTR_NONNULL((1, 2)),__FILE *,__NOTHROW_RPC,__localdep_fopen64,(char const *__restrict __filename, char const *__restrict __modes),fopen64,(__filename,__modes))
-#elif defined(__CRT_HAVE_fopen)
+#if defined(__CRT_HAVE_fopen) && (!defined(__O_LARGEFILE) || !__O_LARGEFILE)
 __CREDIRECT(__ATTR_WUNUSED __ATTR_NONNULL((1, 2)),__FILE *,__NOTHROW_RPC,__localdep_fopen64,(char const *__restrict __filename, char const *__restrict __modes),fopen,(__filename,__modes))
-#elif defined(__CRT_HAVE__IO_fopen)
-__NAMESPACE_LOCAL_END
-#include <libc/local/stdio/fopen64.h>
-__NAMESPACE_LOCAL_BEGIN
-#define __localdep_fopen64 __LIBC_LOCAL_NAME(fopen64)
+#elif defined(__CRT_HAVE_fopen64)
+__CREDIRECT(__ATTR_WUNUSED __ATTR_NONNULL((1, 2)),__FILE *,__NOTHROW_RPC,__localdep_fopen64,(char const *__restrict __filename, char const *__restrict __modes),fopen64,(__filename,__modes))
 #else /* ... */
 #undef __local___localdep_fopen64_defined
 #endif /* !... */
@@ -70,7 +64,7 @@ __NAMESPACE_LOCAL_END
 #define __local___localdep_fopen_s_defined 1
 #define __localdep_fopen_s __LIBC_LOCAL_NAME(fopen_s)
 #endif /* !__local___localdep_fopen_s_defined */
-#else /* __CRT_HAVE_fopen || __CRT_HAVE__IO_fopen || __CRT_HAVE_fopen64 */
+#else /* (__CRT_HAVE_fopen && (!__O_LARGEFILE || !__O_LARGEFILE)) || __CRT_HAVE_fopen64 */
 #undef __local_fopen_s_defined
-#endif /* !__CRT_HAVE_fopen && !__CRT_HAVE__IO_fopen && !__CRT_HAVE_fopen64 */
+#endif /* (!__CRT_HAVE_fopen || (__O_LARGEFILE && __O_LARGEFILE)) && !__CRT_HAVE_fopen64 */
 #endif /* !__local_fopen_s_defined */

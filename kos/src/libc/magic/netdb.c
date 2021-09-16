@@ -708,8 +708,8 @@ int getaddrinfo_a(int mode,
 @@This   function  is  not   part  of  POSIX   and  therefore  no  official
 @@cancellation point
 [[cp, no_crt_self_import]]
-[[if($extended_include_prefix("<features.h>") defined(__USE_TIME_BITS64)), preferred_alias("gai_suspend64")]]
-[[if($extended_include_prefix("<features.h>")!defined(__USE_TIME_BITS64)), preferred_alias("gai_suspend")]]
+[[if($extended_include_prefix("<features.h>", "<bits/types.h>")!defined(__USE_TIME_BITS64) || __SIZEOF_TIME32_T__ == __SIZEOF_TIME64_T__), preferred_alias("gai_suspend")]]
+[[if($extended_include_prefix("<features.h>", "<bits/types.h>") defined(__USE_TIME_BITS64) || __SIZEOF_TIME32_T__ == __SIZEOF_TIME64_T__), preferred_alias("gai_suspend64")]]
 [[userimpl, requires($has_function(gai_suspend64) || $has_function(gai_suspend32))]]
 int gai_suspend(struct gaicb const *const list[],
                 int ent, struct timespec const *timeout) {
@@ -736,7 +736,7 @@ int gai_suspend(struct gaicb const *const list[],
 int gai_suspend32(struct gaicb const *const list[],
                   int ent, struct $timespec32 const *timeout);
 
-[[cp, doc_alias("gai_suspend"), time64_variant_of(gai_suspend)]]
+[[cp, preferred_time64_variant_of(gai_suspend), doc_alias("gai_suspend")]]
 [[userimpl, requires_function(gai_suspend32)]]
 int gai_suspend64(struct gaicb const *const list[],
                   int ent, struct timespec64 const *timeout) {

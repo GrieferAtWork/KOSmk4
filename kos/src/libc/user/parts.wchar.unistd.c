@@ -1112,8 +1112,8 @@ NOTHROW_RPC(LIBDCALL libd_wlchown)(char16_t const *file,
 }
 /*[[[end:libd_wlchown]]]*/
 
-/*[[[head:libc_wtruncate,hash:CRC-32=0x3b21e851]]]*/
-/* >> truncate(2)
+/*[[[head:libc_wtruncate,hash:CRC-32=0xef924873]]]*/
+/* >> truncate(2), truncate64(2)
  * Truncate the given file `file' to a length of `length' */
 INTERN ATTR_SECTION(".text.crt.unsorted") NONNULL((1)) int
 NOTHROW_NCX(LIBKCALL libc_wtruncate)(char32_t const *file,
@@ -1131,8 +1131,8 @@ NOTHROW_NCX(LIBKCALL libc_wtruncate)(char32_t const *file,
 }
 /*[[[end:libc_wtruncate]]]*/
 
-/*[[[head:libd_wtruncate,hash:CRC-32=0x23659ca3]]]*/
-/* >> truncate(2)
+/*[[[head:libd_wtruncate,hash:CRC-32=0xbe704dc0]]]*/
+/* >> truncate(2), truncate64(2)
  * Truncate the given file `file' to a length of `length' */
 INTERN ATTR_SECTION(".text.crt.dos.unsorted") NONNULL((1)) int
 NOTHROW_NCX(LIBDCALL libd_wtruncate)(char16_t const *file,
@@ -1150,11 +1150,11 @@ NOTHROW_NCX(LIBDCALL libd_wtruncate)(char16_t const *file,
 }
 /*[[[end:libd_wtruncate]]]*/
 
-/*[[[head:libc_wtruncate64,hash:CRC-32=0x57b75706]]]*/
+/*[[[head:libc_wtruncate64,hash:CRC-32=0xaf6060d0]]]*/
 #if __SIZEOF_OFF32_T__ == __SIZEOF_OFF64_T__
 DEFINE_INTERN_ALIAS(libc_wtruncate64, libc_wtruncate);
 #else /* MAGIC:alias */
-/* >> truncate64(2)
+/* >> truncate(2), truncate64(2)
  * Truncate the given file `file' to a length of `length' */
 INTERN ATTR_SECTION(".text.crt.unsorted") NONNULL((1)) int
 NOTHROW_NCX(LIBKCALL libc_wtruncate64)(char32_t const *file,
@@ -1173,8 +1173,8 @@ NOTHROW_NCX(LIBKCALL libc_wtruncate64)(char32_t const *file,
 #endif /* MAGIC:alias */
 /*[[[end:libc_wtruncate64]]]*/
 
-/*[[[head:libd_wtruncate64,hash:CRC-32=0x11fac740]]]*/
-/* >> truncate64(2)
+/*[[[head:libd_wtruncate64,hash:CRC-32=0x3b6382c7]]]*/
+/* >> truncate(2), truncate64(2)
  * Truncate the given file `file' to a length of `length' */
 INTERN ATTR_SECTION(".text.crt.dos.unsorted") NONNULL((1)) int
 NOTHROW_NCX(LIBDCALL libd_wtruncate64)(char16_t const *file,

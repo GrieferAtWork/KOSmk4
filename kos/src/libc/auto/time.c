@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x904e34b */
+/* HASH CRC-32:0xf5527eb4 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -44,7 +44,7 @@ NOTHROW_NCX(LIBCCALL libc_difftime)(time_t time1,
 
 }
 #ifndef __yearstodays
-#define __yearstodays(n_years) (((146097*(n_years))/400)/*-1*/) /* rounding error? */
+#define __yearstodays(n_years) (((146097 * (n_years)) / 400) /*-1*/) /* rounding error? */
 #endif /* !__yearstodays */
 /* >> mktime(3), mktime64(3)
  * Return the `time_t' representation of `tp' and normalize `tp' */
@@ -305,7 +305,7 @@ NOTHROW_NCX(LIBCCALL libc_timegm)(struct tm *tp) {
 
 }
 #ifndef __isleap
-#define __isleap(year) ((year)%4 == 0 && ((year)%100 != 0 || (year)%400 == 0))
+#define __isleap(year) ((year) % 4 == 0 && ((year) % 100 != 0 || (year) % 400 == 0))
 #endif /* !__isleap */
 /* >> dysize(3)
  * Return the number of days in YEAR */
@@ -416,13 +416,13 @@ NOTHROW_NCX(LIBCCALL libc_getdate_r)(char const *__restrict string,
 }
 #ifdef __BUILDING_LIBC
 #ifndef __isleap
-#define __isleap(year) ((year)%4 == 0 && ((year)%100 != 0 || (year)%400 == 0))
+#define __isleap(year) ((year) % 4 == 0 && ((year) % 100 != 0 || (year) % 400 == 0))
 #endif /* !__isleap */
 #ifndef __daystoyears
-#define __daystoyears(n_days)  ((400*((n_days)+1))/146097)
+#define __daystoyears(n_days) ((400 * ((n_days) + 1)) / 146097)
 #endif /* !__daystoyears */
 #ifndef __yearstodays
-#define __yearstodays(n_years) (((146097*(n_years))/400)/*-1*/) /* rounding error? */
+#define __yearstodays(n_years) (((146097 * (n_years)) / 400) /*-1*/) /* rounding error? */
 #endif /* !__yearstodays */
 #ifndef ____TIME_MONTHSTART_YDAY_DEFINED
 #define ____TIME_MONTHSTART_YDAY_DEFINED 1
@@ -538,13 +538,13 @@ __NAMESPACE_LOCAL_END
 
 #endif /* __BUILDING_LIBC || (!__CRT_HAVE__gmtime64_s && !__CRT_HAVE__gmtime32_s) */
 #ifndef __isleap
-#define __isleap(year) ((year)%4 == 0 && ((year)%100 != 0 || (year)%400 == 0))
+#define __isleap(year) ((year) % 4 == 0 && ((year) % 100 != 0 || (year) % 400 == 0))
 #endif /* !__isleap */
 #ifndef __daystoyears
-#define __daystoyears(n_days)  ((400*((n_days)+1))/146097)
+#define __daystoyears(n_days) ((400 * ((n_days) + 1)) / 146097)
 #endif /* !__daystoyears */
 #ifndef __yearstodays
-#define __yearstodays(n_years) (((146097*(n_years))/400)/*-1*/) /* rounding error? */
+#define __yearstodays(n_years) (((146097 * (n_years)) / 400) /*-1*/) /* rounding error? */
 #endif /* !__yearstodays */
 /* >> gmtime_r(3), gmtime64_r(3)
  * Return the `struct tm' representation of `*timer' in UTC, using `*tp' to store the result */

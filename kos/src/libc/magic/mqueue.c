@@ -127,8 +127,8 @@ int mq_timedsend32(mqd_t mqdes,
 
 @@>> mq_timedreceive(3), mq_timedreceive64(3)
 [[cp, decl_include("<bits/os/timespec.h>", "<bits/os/mqueue.h>"), no_crt_self_import]]
-[[if($extended_include_prefix("<features.h>") defined(__USE_TIME_BITS64)), preferred_alias("mq_timedreceive64")]]
-[[if($extended_include_prefix("<features.h>")!defined(__USE_TIME_BITS64)), preferred_alias("mq_timedreceive")]]
+[[if($extended_include_prefix("<features.h>", "<bits/types.h>")!defined(__USE_TIME_BITS64) || __SIZEOF_TIME32_T__ == __SIZEOF_TIME64_T__), preferred_alias("mq_timedreceive")]]
+[[if($extended_include_prefix("<features.h>", "<bits/types.h>") defined(__USE_TIME_BITS64) || __SIZEOF_TIME32_T__ == __SIZEOF_TIME64_T__), preferred_alias("mq_timedreceive64")]]
 [[userimpl, requires($has_function(mq_timedreceive32) || $has_function(mq_timedreceive64))]]
 $ssize_t mq_timedreceive(mqd_t mqdes,
                          [[nonnull]] char *__restrict msg_ptr, $size_t msg_len, unsigned int *pmsg_prio,
@@ -149,8 +149,8 @@ $ssize_t mq_timedreceive(mqd_t mqdes,
 
 @@>> mq_timedsend(3), mq_timedsend64(3)
 [[cp, decl_include("<bits/os/timespec.h>", "<bits/os/mqueue.h>"), no_crt_self_import]]
-[[if($extended_include_prefix("<features.h>") defined(__USE_TIME_BITS64)), preferred_alias("mq_timedsend64")]]
-[[if($extended_include_prefix("<features.h>")!defined(__USE_TIME_BITS64)), preferred_alias("mq_timedsend")]]
+[[if($extended_include_prefix("<features.h>", "<bits/types.h>")!defined(__USE_TIME_BITS64) || __SIZEOF_TIME32_T__ == __SIZEOF_TIME64_T__), preferred_alias("mq_timedsend")]]
+[[if($extended_include_prefix("<features.h>", "<bits/types.h>") defined(__USE_TIME_BITS64) || __SIZEOF_TIME32_T__ == __SIZEOF_TIME64_T__), preferred_alias("mq_timedsend64")]]
 [[userimpl, requires($has_function(mq_timedsend32) || $has_function(mq_timedsend64))]]
 int mq_timedsend(mqd_t mqdes,
                  [[nonnull]] char const *msg_ptr, $size_t msg_len, unsigned int msg_prio,
@@ -173,7 +173,7 @@ int mq_timedsend(mqd_t mqdes,
 %#ifdef __USE_TIME64
 
 [[cp, decl_include("<bits/os/timespec.h>", "<bits/os/mqueue.h>")]]
-[[time64_variant_of(mq_timedreceive), doc_alias("mq_timedreceive")]]
+[[preferred_time64_variant_of(mq_timedreceive), doc_alias("mq_timedreceive")]]
 [[userimpl, requires_function(mq_timedreceive32)]]
 $ssize_t mq_timedreceive64(mqd_t mqdes,
                            [[nonnull]] char *__restrict msg_ptr, $size_t msg_len, unsigned int *pmsg_prio,
@@ -185,7 +185,7 @@ $ssize_t mq_timedreceive64(mqd_t mqdes,
 }
 
 [[cp, decl_include("<bits/os/timespec.h>", "<bits/os/mqueue.h>")]]
-[[time64_variant_of(mq_timedsend), doc_alias("mq_timedsend")]]
+[[preferred_time64_variant_of(mq_timedsend), doc_alias("mq_timedsend")]]
 [[userimpl, requires_function(mq_timedsend32)]]
 int mq_timedsend64(mqd_t mqdes,
                    [[nonnull]] char const *msg_ptr, $size_t msg_len, unsigned int msg_prio,

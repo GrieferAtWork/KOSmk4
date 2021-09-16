@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xe28c9226 */
+/* HASH CRC-32:0x95cce37f */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -39,10 +39,10 @@ __CREDIRECT(,int,__NOTHROW_NCX,__localdep_posix_fallocate32,(__fd_t __fd, __pos3
 #endif /* !__local___localdep_posix_fallocate32_defined && __CRT_HAVE_posix_fallocate */
 #ifndef __local___localdep_posix_fallocate64_defined
 #define __local___localdep_posix_fallocate64_defined 1
-#ifdef __CRT_HAVE_posix_fallocate64
-__CREDIRECT(,int,__NOTHROW_NCX,__localdep_posix_fallocate64,(__fd_t __fd, __PIO_OFFSET64 __offset, __PIO_OFFSET64 __length),posix_fallocate64,(__fd,__offset,__length))
-#elif defined(__CRT_HAVE_posix_fallocate) && __SIZEOF_OFF32_T__ == __SIZEOF_OFF64_T__
+#if defined(__CRT_HAVE_posix_fallocate) && __SIZEOF_OFF32_T__ == __SIZEOF_OFF64_T__
 __CREDIRECT(,int,__NOTHROW_NCX,__localdep_posix_fallocate64,(__fd_t __fd, __PIO_OFFSET64 __offset, __PIO_OFFSET64 __length),posix_fallocate,(__fd,__offset,__length))
+#elif defined(__CRT_HAVE_posix_fallocate64)
+__CREDIRECT(,int,__NOTHROW_NCX,__localdep_posix_fallocate64,(__fd_t __fd, __PIO_OFFSET64 __offset, __PIO_OFFSET64 __length),posix_fallocate64,(__fd,__offset,__length))
 #else /* ... */
 __NAMESPACE_LOCAL_END
 #include <libc/local/fcntl/posix_fallocate64.h>

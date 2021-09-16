@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x470dfda9 */
+/* HASH CRC-32:0x70f79ed8 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -25,11 +25,6 @@
 __NAMESPACE_LOCAL_BEGIN
 #ifndef __local___localdep_c16utime64_defined
 #define __local___localdep_c16utime64_defined 1
-#if defined(__CRT_HAVE_wutime64) && __SIZEOF_WCHAR_T__ == 2 && defined(__LIBCCALL_IS_LIBDCALL)
-__CREDIRECT(__ATTR_NONNULL((1)),int,__NOTHROW_RPC,__localdep_c16utime64,(__CHAR16_TYPE__ const *__filename, struct __utimbuf64 const *__file_times),wutime64,(__filename,__file_times))
-#elif defined(__CRT_HAVE_DOS$wutime64)
-__CREDIRECT_DOS(__ATTR_NONNULL((1)),int,__NOTHROW_RPC,__localdep_c16utime64,(__CHAR16_TYPE__ const *__filename, struct __utimbuf64 const *__file_times),wutime64,(__filename,__file_times))
-#else /* ... */
 __NAMESPACE_LOCAL_END
 #include <bits/types.h>
 __NAMESPACE_LOCAL_BEGIN
@@ -37,6 +32,10 @@ __NAMESPACE_LOCAL_BEGIN
 __CREDIRECT(__ATTR_NONNULL((1)),int,__NOTHROW_RPC,__localdep_c16utime64,(__CHAR16_TYPE__ const *__filename, struct __utimbuf64 const *__file_times),wutime,(__filename,__file_times))
 #elif defined(__CRT_HAVE_DOS$wutime) && __SIZEOF_TIME32_T__ == __SIZEOF_TIME64_T__
 __CREDIRECT_DOS(__ATTR_NONNULL((1)),int,__NOTHROW_RPC,__localdep_c16utime64,(__CHAR16_TYPE__ const *__filename, struct __utimbuf64 const *__file_times),wutime,(__filename,__file_times))
+#elif defined(__CRT_HAVE_wutime64) && __SIZEOF_WCHAR_T__ == 2 && defined(__LIBCCALL_IS_LIBDCALL)
+__CREDIRECT(__ATTR_NONNULL((1)),int,__NOTHROW_RPC,__localdep_c16utime64,(__CHAR16_TYPE__ const *__filename, struct __utimbuf64 const *__file_times),wutime64,(__filename,__file_times))
+#elif defined(__CRT_HAVE_DOS$wutime64)
+__CREDIRECT_DOS(__ATTR_NONNULL((1)),int,__NOTHROW_RPC,__localdep_c16utime64,(__CHAR16_TYPE__ const *__filename, struct __utimbuf64 const *__file_times),wutime64,(__filename,__file_times))
 #elif defined(__CRT_HAVE__wutime64) && __SIZEOF_WCHAR_T__ == 2 && defined(__LIBCCALL_IS_LIBDCALL)
 __CREDIRECT(__ATTR_NONNULL((1)),int,__NOTHROW_RPC,__localdep_c16utime64,(__CHAR16_TYPE__ const *__filename, struct __utimbuf64 const *__file_times),_wutime64,(__filename,__file_times))
 #elif defined(__CRT_HAVE_DOS$_wutime64)
@@ -53,7 +52,6 @@ __NAMESPACE_LOCAL_BEGIN
 #define __localdep_c16utime64 __LIBC_LOCAL_NAME(c16utime64)
 #else /* ... */
 #undef __local___localdep_c16utime64_defined
-#endif /* !... */
 #endif /* !... */
 #endif /* !__local___localdep_c16utime64_defined */
 #ifndef __local___localdep_crt_c16utime32_defined

@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x9e8c7ee8 */
+/* HASH CRC-32:0x5b3edf6b */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -31,10 +31,10 @@ __CREDIRECT(,int,__THROWING,__localdep_FTruncate32,(__fd_t __fd, __pos32_t __len
 #endif /* !__local___localdep_FTruncate32_defined && __CRT_HAVE_FTruncate */
 #ifndef __local___localdep_FTruncate64_defined
 #define __local___localdep_FTruncate64_defined 1
-#ifdef __CRT_HAVE_FTruncate64
-__CREDIRECT_VOID(,__THROWING,__localdep_FTruncate64,(__fd_t __fd, __pos64_t __length),FTruncate64,(__fd,__length))
-#elif defined(__CRT_HAVE_FTruncate) && __SIZEOF_OFF32_T__ == __SIZEOF_OFF64_T__
+#if defined(__CRT_HAVE_FTruncate) && __SIZEOF_OFF32_T__ == __SIZEOF_OFF64_T__
 __CREDIRECT_VOID(,__THROWING,__localdep_FTruncate64,(__fd_t __fd, __pos64_t __length),FTruncate,(__fd,__length))
+#elif defined(__CRT_HAVE_FTruncate64)
+__CREDIRECT_VOID(,__THROWING,__localdep_FTruncate64,(__fd_t __fd, __pos64_t __length),FTruncate64,(__fd,__length))
 #elif defined(__CRT_HAVE_FTruncate)
 __NAMESPACE_LOCAL_END
 #include <libc/local/kos.unistd/FTruncate64.h>

@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xb9e094ba */
+/* HASH CRC-32:0xf4050238 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -31,10 +31,10 @@ __CREDIRECT(__ATTR_NONNULL((2)),int,__NOTHROW_NCX,__localdep_timerfd_gettime32,(
 #endif /* !__local___localdep_timerfd_gettime32_defined && __CRT_HAVE_timerfd_gettime */
 #ifndef __local___localdep_timerfd_gettime64_defined
 #define __local___localdep_timerfd_gettime64_defined 1
-#ifdef __CRT_HAVE_timerfd_gettime64
-__CREDIRECT(__ATTR_NONNULL((2)),int,__NOTHROW_NCX,__localdep_timerfd_gettime64,(__fd_t __ufd, struct __itimerspec64 *__restrict __otmr),timerfd_gettime64,(__ufd,__otmr))
-#elif defined(__CRT_HAVE_timerfd_gettime) && __SIZEOF_TIME32_T__ == __SIZEOF_TIME64_T__
+#if defined(__CRT_HAVE_timerfd_gettime) && __SIZEOF_TIME32_T__ == __SIZEOF_TIME64_T__
 __CREDIRECT(__ATTR_NONNULL((2)),int,__NOTHROW_NCX,__localdep_timerfd_gettime64,(__fd_t __ufd, struct __itimerspec64 *__restrict __otmr),timerfd_gettime,(__ufd,__otmr))
+#elif defined(__CRT_HAVE_timerfd_gettime64)
+__CREDIRECT(__ATTR_NONNULL((2)),int,__NOTHROW_NCX,__localdep_timerfd_gettime64,(__fd_t __ufd, struct __itimerspec64 *__restrict __otmr),timerfd_gettime64,(__ufd,__otmr))
 #elif defined(__CRT_HAVE_timerfd_gettime)
 __NAMESPACE_LOCAL_END
 #include <libc/local/sys.timerfd/timerfd_gettime64.h>

@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xccbda10 */
+/* HASH CRC-32:0x3269c3f5 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -30,10 +30,10 @@ __CREDIRECT(,__SSIZE_TYPE__,__NOTHROW_NCX,__localdep_sendfile32,(__fd_t __out_fd
 #endif /* !__local___localdep_sendfile32_defined && __CRT_HAVE_sendfile */
 #ifndef __local___localdep_sendfile64_defined
 #define __local___localdep_sendfile64_defined 1
-#ifdef __CRT_HAVE_sendfile64
-__CREDIRECT(,__SSIZE_TYPE__,__NOTHROW_NCX,__localdep_sendfile64,(__fd_t __out_fd, __fd_t __in_fd, __off64_t *__offset, __SIZE_TYPE__ __count),sendfile64,(__out_fd,__in_fd,__offset,__count))
-#elif defined(__CRT_HAVE_sendfile) && __SIZEOF_OFF32_T__ == __SIZEOF_OFF64_T__
+#if defined(__CRT_HAVE_sendfile) && __SIZEOF_OFF32_T__ == __SIZEOF_OFF64_T__
 __CREDIRECT(,__SSIZE_TYPE__,__NOTHROW_NCX,__localdep_sendfile64,(__fd_t __out_fd, __fd_t __in_fd, __off64_t *__offset, __SIZE_TYPE__ __count),sendfile,(__out_fd,__in_fd,__offset,__count))
+#elif defined(__CRT_HAVE_sendfile64)
+__CREDIRECT(,__SSIZE_TYPE__,__NOTHROW_NCX,__localdep_sendfile64,(__fd_t __out_fd, __fd_t __in_fd, __off64_t *__offset, __SIZE_TYPE__ __count),sendfile64,(__out_fd,__in_fd,__offset,__count))
 #elif defined(__CRT_HAVE_sendfile)
 __NAMESPACE_LOCAL_END
 #include <libc/local/sys.sendfile/sendfile64.h>

@@ -1221,10 +1221,10 @@ int recvmmsg32($fd_t sockfd, [inp(vlen)] struct mmsghdr *vmessages,
 @@@return: * : The # of datagrams successfully received.
 @@@return: -1: Error (s.a. `recvmsg(2)')
 [[cp, no_crt_self_import]]
-[[if($extended_include_prefix("<features.h>") defined(__USE_TIME_BITS64)), preferred_alias("recvmmsg64")]]
-[[if($extended_include_prefix("<features.h>")!defined(__USE_TIME_BITS64)), preferred_alias("recvmmsg")]]
-[[userimpl, requires($has_function(recvmmsg32) || $has_function(recvmmsg64))]]
 [[decl_include("<features.h>", "<bits/types.h>", "<bits/os/mmsghdr.h>", "<bits/os/timespec.h>")]]
+[[if($extended_include_prefix("<features.h>", "<bits/types.h>")!defined(__USE_TIME_BITS64) || __SIZEOF_TIME32_T__ == __SIZEOF_TIME64_T__), preferred_alias("recvmmsg")]]
+[[if($extended_include_prefix("<features.h>", "<bits/types.h>") defined(__USE_TIME_BITS64) || __SIZEOF_TIME32_T__ == __SIZEOF_TIME64_T__), preferred_alias("recvmmsg64")]]
+[[userimpl, requires($has_function(recvmmsg32) || $has_function(recvmmsg64))]]
 int recvmmsg($fd_t sockfd, [inp(vlen)] struct mmsghdr *vmessages,
              __STDC_UINT_AS_SIZE_T vlen, __STDC_INT_AS_UINT_T msg_flags,
              [[nullable]] struct timespec *tmo) {
@@ -1246,12 +1246,12 @@ int recvmmsg($fd_t sockfd, [inp(vlen)] struct mmsghdr *vmessages,
 }
 
 %#ifdef __USE_TIME64
-[[cp, doc_alias("recvmmsg"), time64_variant_of(recvmmsg)]]
+[[cp, preferred_time64_variant_of(recvmmsg), doc_alias("recvmmsg")]]
 [[userimpl, requires_function(recvmmsg32)]]
 [[decl_include("<features.h>", "<bits/types.h>", "<bits/os/mmsghdr.h>", "<bits/os/timespec.h>")]]
 int recvmmsg64($fd_t sockfd, [inp(vlen)] struct mmsghdr *vmessages,
                __STDC_UINT_AS_SIZE_T vlen, __STDC_INT_AS_UINT_T msg_flags,
-               [[nullable]] struct $timespec64 *tmo) {
+               [[nullable]] struct timespec64 *tmo) {
 	struct timespec32 tmo32;
 	if (!tmo)
 		return recvmmsg32(sockfd, vmessages, vlen, msg_flags, NULL);

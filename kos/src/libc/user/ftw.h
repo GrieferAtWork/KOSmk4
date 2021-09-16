@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x45ef448b */
+/* HASH CRC-32:0x9b14eab */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -35,10 +35,10 @@ INTDEF NONNULL((1, 2)) int NOTHROW_RPC(LIBCCALL libc_ftw)(char const *dir, __ftw
 /* >> ftw(3), ftw64(3) */
 INTDEF NONNULL((1, 2)) int NOTHROW_RPC(LIBCCALL libc_ftw64)(char const *dir, __ftw64_func_t func, __STDC_INT_AS_UINT_T nopenfd);
 /* >> nftw(3), nftw64(3)
- * @Param: flags: Set of `FTW_PHYS | FTW_MOUNT | FTW_CHDIR | FTW_DEPTH | FTW_ACTIONRETVAL' */
+ * @param: flags: Set of `FTW_PHYS | FTW_MOUNT | FTW_CHDIR | FTW_DEPTH | FTW_ACTIONRETVAL' */
 INTDEF NONNULL((1, 2)) int NOTHROW_RPC(LIBCCALL libc_nftw)(char const *dir, __nftw_func_t func, __STDC_INT_AS_UINT_T descriptors, __STDC_INT_AS_UINT_T flags);
 /* >> nftw(3), nftw64(3)
- * @Param: flags: Set of `FTW_PHYS | FTW_MOUNT | FTW_CHDIR | FTW_DEPTH | FTW_ACTIONRETVAL' */
+ * @param: flags: Set of `FTW_PHYS | FTW_MOUNT | FTW_CHDIR | FTW_DEPTH | FTW_ACTIONRETVAL' */
 INTDEF NONNULL((1, 2)) int NOTHROW_RPC(LIBCCALL libc_nftw64)(char const *dir, __nftw64_func_t func, __STDC_INT_AS_UINT_T descriptors, __STDC_INT_AS_UINT_T flags);
 #endif /* !__KERNEL__ */
 

@@ -540,8 +540,8 @@ err:
 }
 /*[[[end:libc_getdirentries]]]*/
 
-/*[[[head:libc_getdirentries64,hash:CRC-32=0x490bef25]]]*/
-#ifdef _DIRENT_MATCHES_DIRENT64
+/*[[[head:libc_getdirentries64,hash:CRC-32=0x9c969aaa]]]*/
+#ifdef __DIRENT32_MATCHES_DIRENT64
 DEFINE_INTERN_ALIAS(libc_getdirentries64, libc_getdirentries);
 #else /* MAGIC:alias */
 /* >> getdirentries(2), getdirentries64(2)

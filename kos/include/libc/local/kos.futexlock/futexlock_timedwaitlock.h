@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x66ac11b */
+/* HASH CRC-32:0xf8fc2e19 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -28,10 +28,10 @@
 __NAMESPACE_LOCAL_BEGIN
 #ifndef __local___localdep_lfutexlock_defined
 #define __local___localdep_lfutexlock_defined 1
-#if defined(__CRT_HAVE_lfutexlock64) && defined(__USE_TIME_BITS64)
-__CVREDIRECT(__ATTR_NONNULL((1, 2)),__SSIZE_TYPE__,__NOTHROW_RPC,__localdep_lfutexlock,(__uintptr_t *__ulockaddr, __uintptr_t *__uaddr, __syscall_ulong_t __futex_op, __uintptr_t __val),lfutexlock64,(__ulockaddr,__uaddr,__futex_op,__val),__val,2,(void *,__UINTPTR_TYPE__))
-#elif defined(__CRT_HAVE_lfutexlock) && !defined(__USE_TIME_BITS64)
+#if defined(__CRT_HAVE_lfutexlock) && (!defined(__USE_TIME_BITS64) || __SIZEOF_TIME32_T__ == __SIZEOF_TIME64_T__)
 __CVREDIRECT(__ATTR_NONNULL((1, 2)),__SSIZE_TYPE__,__NOTHROW_RPC,__localdep_lfutexlock,(__uintptr_t *__ulockaddr, __uintptr_t *__uaddr, __syscall_ulong_t __futex_op, __uintptr_t __val),lfutexlock,(__ulockaddr,__uaddr,__futex_op,__val),__val,2,(void *,__UINTPTR_TYPE__))
+#elif defined(__CRT_HAVE_lfutexlock64) && (defined(__USE_TIME_BITS64) || __SIZEOF_TIME32_T__ == __SIZEOF_TIME64_T__)
+__CVREDIRECT(__ATTR_NONNULL((1, 2)),__SSIZE_TYPE__,__NOTHROW_RPC,__localdep_lfutexlock,(__uintptr_t *__ulockaddr, __uintptr_t *__uaddr, __syscall_ulong_t __futex_op, __uintptr_t __val),lfutexlock64,(__ulockaddr,__uaddr,__futex_op,__val),__val,2,(void *,__UINTPTR_TYPE__))
 #else /* ... */
 __NAMESPACE_LOCAL_END
 #include <libc/local/kos.futexlock/lfutexlock.h>

@@ -52,8 +52,8 @@ int crt_wutime64([[nonnull]] $wchar_t const *filename,
                  [[nullable]] struct $utimbuf64 const *file_times);
 
 [[cp, wchar, export_as("_wutime32"), no_crt_self_import]]
-[[if($extended_include_prefix("<features.h>") defined(__USE_TIME_BITS64)), preferred_alias("wutime64", "_wutime64")]]
-[[if($extended_include_prefix("<features.h>")!defined(__USE_TIME_BITS64)), preferred_alias("wutime", "_wutime32")]]
+[[if($extended_include_prefix("<features.h>", "<bits/types.h>")!defined(__USE_TIME_BITS64) || __SIZEOF_TIME32_T__ == __SIZEOF_TIME64_T__), preferred_alias("wutime", "_wutime32")]]
+[[if($extended_include_prefix("<features.h>", "<bits/types.h>") defined(__USE_TIME_BITS64) || __SIZEOF_TIME32_T__ == __SIZEOF_TIME64_T__), preferred_alias("wutime64", "_wutime64")]]
 [[userimpl, requires($has_function(crt_wutime32) || $has_function(crt_wutime64))]]
 int wutime([[nonnull]] wchar_t const *filename,
            [[nullable]] struct utimbuf const *file_times) {
@@ -84,10 +84,12 @@ int wutime([[nonnull]] wchar_t const *filename,
 #endif /* __COMPILER_HAVE_PRAGMA_PUSHMACRO */
 }
 
+
 %
 %#ifdef __USE_TIME64
-[[time64_variant_of(wutime)]]
-[[cp, wchar, dos_export_alias("_wutime64"), doc_alias("wutime")]]
+
+[[preferred_time64_variant_of(wutime), doc_alias("wutime")]]
+[[cp, wchar, dos_export_alias("_wutime64")]]
 [[userimpl, requires_function(crt_wutime32)]]
 int wutime64([[nonnull]] $wchar_t const *filename,
              [[nullable]] struct utimbuf64 const *file_times) {
@@ -108,6 +110,7 @@ int wutime64([[nonnull]] $wchar_t const *filename,
 #pragma @pop_macro@("actime")
 #endif /* __COMPILER_HAVE_PRAGMA_PUSHMACRO */
 }
+
 %#endif /* __USE_TIME64 */
 
 

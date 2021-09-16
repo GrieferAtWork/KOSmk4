@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x5bc16940 */
+/* HASH CRC-32:0xc86cd505 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -158,15 +158,12 @@ typedef int (__LIBKCALL *__nftw64_func_t)(char const *__fpath, struct stat64 con
 #endif /* !____nftw64_func_t_defined */
 #endif /* __USE_LARGEFILE64 */
 #endif /* __USE_XOPEN_EXTENDED */
-#if defined(__CRT_HAVE_ftw) && defined(__STAT32_MATCHES_STAT64)
+#if defined(__CRT_HAVE_ftw) && (!defined(__USE_FILE_OFFSET64) || defined(__STAT32_MATCHES_STAT64))
 /* >> ftw(3), ftw64(3) */
 __CDECLARE(__ATTR_NONNULL((1, 2)),int,__NOTHROW_RPC,ftw,(char const *__dir, __ftw_func_t __func, __STDC_INT_AS_UINT_T __nopenfd),(__dir,__func,__nopenfd))
-#elif defined(__CRT_HAVE_ftw64) && defined(__USE_FILE_OFFSET64)
+#elif defined(__CRT_HAVE_ftw64) && (defined(__USE_FILE_OFFSET64) || defined(__STAT32_MATCHES_STAT64))
 /* >> ftw(3), ftw64(3) */
 __CREDIRECT(__ATTR_NONNULL((1, 2)),int,__NOTHROW_RPC,ftw,(char const *__dir, __ftw_func_t __func, __STDC_INT_AS_UINT_T __nopenfd),ftw64,(__dir,__func,__nopenfd))
-#elif defined(__CRT_HAVE_ftw) && !defined(__USE_FILE_OFFSET64)
-/* >> ftw(3), ftw64(3) */
-__CDECLARE(__ATTR_NONNULL((1, 2)),int,__NOTHROW_RPC,ftw,(char const *__dir, __ftw_func_t __func, __STDC_INT_AS_UINT_T __nopenfd),(__dir,__func,__nopenfd))
 #endif /* ... */
 
 #ifdef __USE_LARGEFILE64
@@ -176,47 +173,30 @@ __CREDIRECT(__ATTR_NONNULL((1, 2)),int,__NOTHROW_RPC,ftw64,(char const *__dir, _
 #elif defined(__CRT_HAVE_ftw64)
 /* >> ftw(3), ftw64(3) */
 __CDECLARE(__ATTR_NONNULL((1, 2)),int,__NOTHROW_RPC,ftw64,(char const *__dir, __ftw64_func_t __func, __STDC_INT_AS_UINT_T __nopenfd),(__dir,__func,__nopenfd))
-#else /* ... */
-#include <bits/crt/fts.h>
-#if defined(__CRT_HAVE_ftw) && defined(__FTS32_MATCHES_FTS64)
-/* >> ftw(3), ftw64(3) */
-__CREDIRECT(__ATTR_NONNULL((1, 2)),int,__NOTHROW_RPC,ftw64,(char const *__dir, __ftw64_func_t __func, __STDC_INT_AS_UINT_T __nopenfd),ftw,(__dir,__func,__nopenfd))
-#endif /* __CRT_HAVE_ftw && __FTS32_MATCHES_FTS64 */
-#endif /* !... */
+#endif /* ... */
 #endif /* __USE_LARGEFILE64 */
 
 #ifdef __USE_XOPEN_EXTENDED
-#if defined(__CRT_HAVE_nftw) && defined(__STAT32_MATCHES_STAT64)
+#if defined(__CRT_HAVE_nftw) && (!defined(__USE_FILE_OFFSET64) || defined(__STAT32_MATCHES_STAT64))
 /* >> nftw(3), nftw64(3)
- * @Param: flags: Set of `FTW_PHYS | FTW_MOUNT | FTW_CHDIR | FTW_DEPTH | FTW_ACTIONRETVAL' */
+ * @param: flags: Set of `FTW_PHYS | FTW_MOUNT | FTW_CHDIR | FTW_DEPTH | FTW_ACTIONRETVAL' */
 __CDECLARE(__ATTR_NONNULL((1, 2)),int,__NOTHROW_RPC,nftw,(char const *__dir, __nftw_func_t __func, __STDC_INT_AS_UINT_T __descriptors, __STDC_INT_AS_UINT_T __flags),(__dir,__func,__descriptors,__flags))
-#elif defined(__CRT_HAVE_nftw64) && defined(__USE_FILE_OFFSET64)
+#elif defined(__CRT_HAVE_nftw64) && (defined(__USE_FILE_OFFSET64) || defined(__STAT32_MATCHES_STAT64))
 /* >> nftw(3), nftw64(3)
- * @Param: flags: Set of `FTW_PHYS | FTW_MOUNT | FTW_CHDIR | FTW_DEPTH | FTW_ACTIONRETVAL' */
+ * @param: flags: Set of `FTW_PHYS | FTW_MOUNT | FTW_CHDIR | FTW_DEPTH | FTW_ACTIONRETVAL' */
 __CREDIRECT(__ATTR_NONNULL((1, 2)),int,__NOTHROW_RPC,nftw,(char const *__dir, __nftw_func_t __func, __STDC_INT_AS_UINT_T __descriptors, __STDC_INT_AS_UINT_T __flags),nftw64,(__dir,__func,__descriptors,__flags))
-#elif defined(__CRT_HAVE_nftw) && !defined(__USE_FILE_OFFSET64)
-/* >> nftw(3), nftw64(3)
- * @Param: flags: Set of `FTW_PHYS | FTW_MOUNT | FTW_CHDIR | FTW_DEPTH | FTW_ACTIONRETVAL' */
-__CDECLARE(__ATTR_NONNULL((1, 2)),int,__NOTHROW_RPC,nftw,(char const *__dir, __nftw_func_t __func, __STDC_INT_AS_UINT_T __descriptors, __STDC_INT_AS_UINT_T __flags),(__dir,__func,__descriptors,__flags))
 #endif /* ... */
 
 #ifdef __USE_LARGEFILE64
 #if defined(__CRT_HAVE_nftw) && defined(__STAT32_MATCHES_STAT64)
 /* >> nftw(3), nftw64(3)
- * @Param: flags: Set of `FTW_PHYS | FTW_MOUNT | FTW_CHDIR | FTW_DEPTH | FTW_ACTIONRETVAL' */
+ * @param: flags: Set of `FTW_PHYS | FTW_MOUNT | FTW_CHDIR | FTW_DEPTH | FTW_ACTIONRETVAL' */
 __CREDIRECT(__ATTR_NONNULL((1, 2)),int,__NOTHROW_RPC,nftw64,(char const *__dir, __nftw64_func_t __func, __STDC_INT_AS_UINT_T __descriptors, __STDC_INT_AS_UINT_T __flags),nftw,(__dir,__func,__descriptors,__flags))
 #elif defined(__CRT_HAVE_nftw64)
 /* >> nftw(3), nftw64(3)
- * @Param: flags: Set of `FTW_PHYS | FTW_MOUNT | FTW_CHDIR | FTW_DEPTH | FTW_ACTIONRETVAL' */
+ * @param: flags: Set of `FTW_PHYS | FTW_MOUNT | FTW_CHDIR | FTW_DEPTH | FTW_ACTIONRETVAL' */
 __CDECLARE(__ATTR_NONNULL((1, 2)),int,__NOTHROW_RPC,nftw64,(char const *__dir, __nftw64_func_t __func, __STDC_INT_AS_UINT_T __descriptors, __STDC_INT_AS_UINT_T __flags),(__dir,__func,__descriptors,__flags))
-#else /* ... */
-#include <bits/crt/fts.h>
-#if defined(__CRT_HAVE_ftw) && defined(__FTS32_MATCHES_FTS64)
-/* >> nftw(3), nftw64(3)
- * @Param: flags: Set of `FTW_PHYS | FTW_MOUNT | FTW_CHDIR | FTW_DEPTH | FTW_ACTIONRETVAL' */
-__CREDIRECT(__ATTR_NONNULL((1, 2)),int,__NOTHROW_RPC,nftw64,(char const *__dir, __nftw64_func_t __func, __STDC_INT_AS_UINT_T __descriptors, __STDC_INT_AS_UINT_T __flags),ftw,(__dir,__func,__descriptors,__flags))
-#endif /* __CRT_HAVE_ftw && __FTS32_MATCHES_FTS64 */
-#endif /* !... */
+#endif /* ... */
 #endif /* __USE_LARGEFILE64 */
 #endif /* __USE_XOPEN_EXTENDED */
 

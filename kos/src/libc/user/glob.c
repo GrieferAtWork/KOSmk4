@@ -31,12 +31,12 @@ DECL_BEGIN
 
 
 
-/*[[[head:libc_glob,hash:CRC-32=0x4ec65b2e]]]*/
-/* @param: flags: Set of `GLOB_ERR | GLOB_MARK | GLOB_NOSORT | GLOB_DOOFFS |
- *                        GLOB_NOCHECK | GLOB_APPEND  | GLOB_NOESCAPE  |
- *                        GLOB_PERIOD | GLOB_MAGCHAR | GLOB_ALTDIRFUNC |
- *                        GLOB_BRACE  |  GLOB_NOMAGIC  |  GLOB_TILDE   |
- *                        GLOB_ONLYDIR | GLOB_TILDE_CHECK'
+/*[[[head:libc_glob,hash:CRC-32=0xa86f422f]]]*/
+/* >> glob(3), glob64(3)
+ * @param: flags: Set of `GLOB_ERR | GLOB_MARK  | GLOB_NOSORT | GLOB_DOOFFS  |
+ *                GLOB_NOCHECK  | GLOB_APPEND |  GLOB_NOESCAPE | GLOB_PERIOD |
+ *                GLOB_MAGCHAR | GLOB_ALTDIRFUNC | GLOB_BRACE | GLOB_NOMAGIC |
+ *                GLOB_TILDE | GLOB_ONLYDIR | GLOB_TILDE_CHECK'
  * @return: GLOB_NOSPACE : ...
  * @return: GLOB_ABORTED : ...
  * @return: GLOB_NOMATCH : ...
@@ -58,7 +58,8 @@ NOTHROW_NCX(LIBCCALL libc_glob)(char const *__restrict pattern,
 }
 /*[[[end:libc_glob]]]*/
 
-/*[[[head:libc_globfree,hash:CRC-32=0x28adcec1]]]*/
+/*[[[head:libc_globfree,hash:CRC-32=0x20e2c836]]]*/
+/* >> globfree(3), globfree64(3) */
 INTERN ATTR_SECTION(".text.crt.utility.glob") NONNULL((1)) void
 NOTHROW_NCX(LIBCCALL libc_globfree)(glob_t *pglob)
 /*[[[body:libc_globfree]]]*/
@@ -69,12 +70,15 @@ NOTHROW_NCX(LIBCCALL libc_globfree)(glob_t *pglob)
 }
 /*[[[end:libc_globfree]]]*/
 
-/*[[[head:libc_glob64,hash:CRC-32=0x522dcb23]]]*/
-/* @param: flags: Set of `GLOB_ERR | GLOB_MARK | GLOB_NOSORT | GLOB_DOOFFS |
- *                        GLOB_NOCHECK | GLOB_APPEND  | GLOB_NOESCAPE  |
- *                        GLOB_PERIOD | GLOB_MAGCHAR | GLOB_ALTDIRFUNC |
- *                        GLOB_BRACE  |  GLOB_NOMAGIC  |  GLOB_TILDE   |
- *                        GLOB_ONLYDIR | GLOB_TILDE_CHECK'
+/*[[[head:libc_glob64,hash:CRC-32=0xc44a16c0]]]*/
+#ifdef __GLOB32_MATCHES_GLOB64
+DEFINE_INTERN_ALIAS(libc_glob64, libc_glob);
+#else /* MAGIC:alias */
+/* >> glob(3), glob64(3)
+ * @param: flags: Set of `GLOB_ERR | GLOB_MARK  | GLOB_NOSORT | GLOB_DOOFFS  |
+ *                GLOB_NOCHECK  | GLOB_APPEND |  GLOB_NOESCAPE | GLOB_PERIOD |
+ *                GLOB_MAGCHAR | GLOB_ALTDIRFUNC | GLOB_BRACE | GLOB_NOMAGIC |
+ *                GLOB_TILDE | GLOB_ONLYDIR | GLOB_TILDE_CHECK'
  * @return: GLOB_NOSPACE : ...
  * @return: GLOB_ABORTED : ...
  * @return: GLOB_NOMATCH : ...
@@ -94,9 +98,14 @@ NOTHROW_NCX(LIBCCALL libc_glob64)(const char *__restrict pattern,
 	/* TODO */
 	return GLOB_NOSYS;
 }
+#endif /* MAGIC:alias */
 /*[[[end:libc_glob64]]]*/
 
-/*[[[head:libc_globfree64,hash:CRC-32=0x876076f2]]]*/
+/*[[[head:libc_globfree64,hash:CRC-32=0x73c7f23a]]]*/
+#ifdef __GLOB32_MATCHES_GLOB64
+DEFINE_INTERN_ALIAS(libc_globfree64, libc_globfree);
+#else /* MAGIC:alias */
+/* >> globfree(3), globfree64(3) */
 INTERN ATTR_SECTION(".text.crt.utility.glob") NONNULL((1)) void
 NOTHROW_NCX(LIBCCALL libc_globfree64)(struct __glob64_struct *pglob)
 /*[[[body:libc_globfree64]]]*/
@@ -105,6 +114,7 @@ NOTHROW_NCX(LIBCCALL libc_globfree64)(struct __glob64_struct *pglob)
 	CRT_UNIMPLEMENTED("globfree64"); /* TODO */
 	libc_seterrno(ENOSYS);
 }
+#endif /* MAGIC:alias */
 /*[[[end:libc_globfree64]]]*/
 
 

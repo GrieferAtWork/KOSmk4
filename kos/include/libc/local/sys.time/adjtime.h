@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xf93f0067 */
+/* HASH CRC-32:0xb7754f6c */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -31,10 +31,10 @@ __CREDIRECT(,int,__NOTHROW_NCX,__localdep_adjtime32,(struct __timeval32 const *_
 #endif /* !__local___localdep_adjtime32_defined && __CRT_HAVE_adjtime */
 #ifndef __local___localdep_adjtime64_defined
 #define __local___localdep_adjtime64_defined 1
-#ifdef __CRT_HAVE_adjtime64
-__CREDIRECT(,int,__NOTHROW_NCX,__localdep_adjtime64,(struct __timeval64 const *__delta, struct __timeval64 *__olddelta),adjtime64,(__delta,__olddelta))
-#elif defined(__CRT_HAVE_adjtime) && __SIZEOF_TIME32_T__ == __SIZEOF_TIME64_T__
+#if defined(__CRT_HAVE_adjtime) && __SIZEOF_TIME32_T__ == __SIZEOF_TIME64_T__
 __CREDIRECT(,int,__NOTHROW_NCX,__localdep_adjtime64,(struct __timeval64 const *__delta, struct __timeval64 *__olddelta),adjtime,(__delta,__olddelta))
+#elif defined(__CRT_HAVE_adjtime64)
+__CREDIRECT(,int,__NOTHROW_NCX,__localdep_adjtime64,(struct __timeval64 const *__delta, struct __timeval64 *__olddelta),adjtime64,(__delta,__olddelta))
 #elif defined(__CRT_HAVE_adjtime)
 __NAMESPACE_LOCAL_END
 #include <libc/local/sys.time/adjtime64.h>

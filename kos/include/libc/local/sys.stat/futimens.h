@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x73c3e772 */
+/* HASH CRC-32:0x4356f5ce */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -31,10 +31,10 @@ __CREDIRECT(,int,__NOTHROW_RPC,__localdep_futimens32,(__fd_t __fd, struct timesp
 #endif /* !__local___localdep_futimens32_defined && __CRT_HAVE_futimens */
 #ifndef __local___localdep_futimens64_defined
 #define __local___localdep_futimens64_defined 1
-#ifdef __CRT_HAVE_futimens64
-__CREDIRECT(,int,__NOTHROW_RPC,__localdep_futimens64,(__fd_t __fd, struct __timespec64 const __times[2 /*or:3*/]),futimens64,(__fd,__times))
-#elif defined(__CRT_HAVE_futimens) && __SIZEOF_TIME32_T__ == __SIZEOF_TIME64_T__
+#if defined(__CRT_HAVE_futimens) && __SIZEOF_TIME32_T__ == __SIZEOF_TIME64_T__
 __CREDIRECT(,int,__NOTHROW_RPC,__localdep_futimens64,(__fd_t __fd, struct __timespec64 const __times[2 /*or:3*/]),futimens,(__fd,__times))
+#elif defined(__CRT_HAVE_futimens64)
+__CREDIRECT(,int,__NOTHROW_RPC,__localdep_futimens64,(__fd_t __fd, struct __timespec64 const __times[2 /*or:3*/]),futimens64,(__fd,__times))
 #elif defined(__CRT_HAVE_futimens)
 __NAMESPACE_LOCAL_END
 #include <libc/local/sys.stat/futimens64.h>

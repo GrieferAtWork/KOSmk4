@@ -1782,16 +1782,16 @@ int sigtimedwait32([[nonnull]] $sigset_t const *__restrict set,
                    [[nullable]] siginfo_t *__restrict info,
                    [[nullable]] struct $timespec32 const *rel_timeout);
 
-@@>> sigtimedwait(2)
+@@>> sigtimedwait(2), sigtimedwait64(2)
 @@Same as `sigwaitinfo(2)', but stop waiting after a total of `rel_timeout' has passed
 @@@param: set:         The set of signals on which to wait
 @@@param: info:        Information about the signal on which to wait.
 @@@param: rel_timeout: The timeout specifying for how long to wait (or `NULL' to wait indefinitely)
 @@@return: -1: [errno=EINTR]  The signal handler for `signo' was executed.
 @@@return: -1: [errno=EAGAIN] A total of `rel_timeout' has passed.
-[[cp, no_crt_self_import, decl_include("<bits/os/siginfo.h>")]]
-[[if($extended_include_prefix("<features.h>") defined(__USE_TIME_BITS64)), preferred_alias("sigtimedwait64")]]
-[[if($extended_include_prefix("<features.h>")!defined(__USE_TIME_BITS64)), preferred_alias("sigtimedwait")]]
+[[cp, no_crt_self_import, decl_include("<bits/os/siginfo.h>", "<bits/os/timespec.h>")]]
+[[if($extended_include_prefix("<features.h>", "<bits/types.h>")!defined(__USE_TIME_BITS64) || __SIZEOF_TIME32_T__ == __SIZEOF_TIME64_T__), preferred_alias("sigtimedwait")]]
+[[if($extended_include_prefix("<features.h>", "<bits/types.h>") defined(__USE_TIME_BITS64) || __SIZEOF_TIME32_T__ == __SIZEOF_TIME64_T__), preferred_alias("sigtimedwait64")]]
 [[userimpl, requires($has_function(sigtimedwait32) || $has_function(sigtimedwait64))]]
 int sigtimedwait([[nonnull]] $sigset_t const *__restrict set,
                  [[nullable]] siginfo_t *__restrict info,
@@ -1833,12 +1833,12 @@ int sigqueue($pid_t pid, $signo_t signo, union sigval const val);
 
 %#ifdef __USE_TIME64
 
-[[time64_variant_of(sigtimedwait), doc_alias("sigtimedwait")]]
+[[preferred_time64_variant_of(sigtimedwait), doc_alias("sigtimedwait")]]
 [[cp, userimpl, requires_function(sigtimedwait32)]]
-[[decl_include("<bits/os/siginfo.h>")]]
+[[decl_include("<bits/os/siginfo.h>", "<bits/os/timespec.h>")]]
 int sigtimedwait64([[nonnull]] $sigset_t const *__restrict set,
                    [[nullable]] siginfo_t *__restrict info,
-                   [[nullable]] struct $timespec64 const *rel_timeout) {
+                   [[nullable]] struct timespec64 const *rel_timeout) {
 	struct timespec32 tmv;
 	if (!rel_timeout)
 		return sigtimedwait32(set, info, NULL);

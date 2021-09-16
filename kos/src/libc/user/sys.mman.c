@@ -35,8 +35,9 @@
 
 DECL_BEGIN
 
-/*[[[head:libc_mmap,hash:CRC-32=0x91c9a5cc]]]*/
-/* @param prot:  Either `PROT_NONE', or set of `PROT_EXEC | PROT_WRITE | PROT_READ | PROT_SEM | PROT_LOOSE | PROT_SHARED'
+/*[[[head:libc_mmap,hash:CRC-32=0x632fe961]]]*/
+/* >> mmap(2), mmap64(2)
+ * @param prot:  Either `PROT_NONE', or set of `PROT_EXEC | PROT_WRITE | PROT_READ | PROT_SEM | PROT_LOOSE | PROT_SHARED'
  * @param flags: One of `MAP_SHARED`, 'MAP_SHARED_VALIDATE' or `MAP_PRIVATE', optionally or'd
  *               with a set of `MAP_ANONYMOUS | MAP_FIXED | MAP_GROWSDOWN | MAP_LOCKED|
  *               MAP_NONBLOCK | MAP_NORESERVE | MAP_POPULATE  | MAP_STACK | MAP_SYNC  |
@@ -47,7 +48,7 @@ NOTHROW_NCX(LIBCCALL libc_mmap)(void *addr,
                                 __STDC_INT_AS_UINT_T prot,
                                 __STDC_INT_AS_UINT_T flags,
                                 fd_t fd,
-                                off_t offset)
+                                __PIO_OFFSET offset)
 /*[[[body:libc_mmap]]]*/
 {
 	void *result;
@@ -185,11 +186,12 @@ NOTHROW_NCX(LIBCCALL libc_mincore)(void *start,
 }
 /*[[[end:libc_mincore]]]*/
 
-/*[[[head:libc_mmap64,hash:CRC-32=0x8f205132]]]*/
+/*[[[head:libc_mmap64,hash:CRC-32=0x9a1b2e5]]]*/
 #if __SIZEOF_OFF32_T__ == __SIZEOF_OFF64_T__
 DEFINE_INTERN_ALIAS(libc_mmap64, libc_mmap);
 #else /* MAGIC:alias */
-/* @param prot:  Either `PROT_NONE', or set of `PROT_EXEC | PROT_WRITE | PROT_READ | PROT_SEM | PROT_LOOSE | PROT_SHARED'
+/* >> mmap(2), mmap64(2)
+ * @param prot:  Either `PROT_NONE', or set of `PROT_EXEC | PROT_WRITE | PROT_READ | PROT_SEM | PROT_LOOSE | PROT_SHARED'
  * @param flags: One of `MAP_SHARED`, 'MAP_SHARED_VALIDATE' or `MAP_PRIVATE', optionally or'd
  *               with a set of `MAP_ANONYMOUS | MAP_FIXED | MAP_GROWSDOWN | MAP_LOCKED|
  *               MAP_NONBLOCK | MAP_NORESERVE | MAP_POPULATE  | MAP_STACK | MAP_SYNC  |
@@ -200,7 +202,7 @@ NOTHROW_NCX(LIBCCALL libc_mmap64)(void *addr,
                                   __STDC_INT_AS_UINT_T prot,
                                   __STDC_INT_AS_UINT_T flags,
                                   fd_t fd,
-                                  off64_t offset)
+                                  __PIO_OFFSET64 offset)
 /*[[[body:libc_mmap64]]]*/
 {
 	void *result;
@@ -245,8 +247,9 @@ NOTHROW_NCX(LIBCCALL libc_posix_madvise)(void *addr,
 /*[[[end:libc_posix_madvise]]]*/
 
 
-/*[[[head:libc_mremap,hash:CRC-32=0x31cbe7cb]]]*/
-/* @param flags: Set of `MREMAP_MAYMOVE | MREMAP_FIXED' */
+/*[[[head:libc_mremap,hash:CRC-32=0xb79d55d6]]]*/
+/* >> mremap(2)
+ * @param flags: Set of `MREMAP_MAYMOVE | MREMAP_FIXED' */
 INTERN ATTR_SECTION(".text.crt.heap.mman") void *
 NOTHROW_NCX(VLIBCCALL libc_mremap)(void *addr,
                                    size_t old_len,
@@ -266,7 +269,8 @@ NOTHROW_NCX(VLIBCCALL libc_mremap)(void *addr,
 }
 /*[[[end:libc_mremap]]]*/
 
-/*[[[head:libc_remap_file_pages,hash:CRC-32=0xd51bfd2e]]]*/
+/*[[[head:libc_remap_file_pages,hash:CRC-32=0x3cf68988]]]*/
+/* >> remap_file_pages(2) */
 INTERN ATTR_SECTION(".text.crt.system.mman") int
 NOTHROW_NCX(LIBCCALL libc_remap_file_pages)(void *start,
                                             size_t size,
@@ -285,7 +289,8 @@ NOTHROW_NCX(LIBCCALL libc_remap_file_pages)(void *start,
 }
 /*[[[end:libc_remap_file_pages]]]*/
 
-/*[[[head:libc_memfd_create,hash:CRC-32=0xb3c4f089]]]*/
+/*[[[head:libc_memfd_create,hash:CRC-32=0x7ab68fd3]]]*/
+/* >> memfd_create(2) */
 INTERN ATTR_SECTION(".text.crt.system.mman") fd_t
 NOTHROW_NCX(LIBCCALL libc_memfd_create)(char const *name,
                                         unsigned int flags)
@@ -297,7 +302,8 @@ NOTHROW_NCX(LIBCCALL libc_memfd_create)(char const *name,
 }
 /*[[[end:libc_memfd_create]]]*/
 
-/*[[[head:libc_mlock2,hash:CRC-32=0xa7787755]]]*/
+/*[[[head:libc_mlock2,hash:CRC-32=0x6759c12a]]]*/
+/* >> mlock2(2) */
 INTERN ATTR_SECTION(".text.crt.system.mman") int
 NOTHROW_NCX(LIBCCALL libc_mlock2)(void const *addr,
                                   size_t length,
@@ -310,8 +316,9 @@ NOTHROW_NCX(LIBCCALL libc_mlock2)(void const *addr,
 }
 /*[[[end:libc_mlock2]]]*/
 
-/*[[[head:libc_pkey_alloc,hash:CRC-32=0xc828dc13]]]*/
+/*[[[head:libc_pkey_alloc,hash:CRC-32=0xc5433a8]]]*/
 #ifdef __ARCH_HAVE_PKEY
+/* >> pkey_alloc(2) */
 INTERN ATTR_SECTION(".text.crt.system.mman") int
 NOTHROW_NCX(LIBCCALL libc_pkey_alloc)(unsigned int flags,
                                       unsigned int access_rights)
@@ -327,8 +334,9 @@ NOTHROW_NCX(LIBCCALL libc_pkey_alloc)(unsigned int flags,
 
 
 
-/*[[[head:libc_pkey_free,hash:CRC-32=0x75ef0f67]]]*/
+/*[[[head:libc_pkey_free,hash:CRC-32=0x80aa8ed7]]]*/
 #ifdef __ARCH_HAVE_PKEY
+/* >> pkey_free(2) */
 INTERN ATTR_SECTION(".text.crt.system.mman") int
 NOTHROW_NCX(LIBCCALL libc_pkey_free)(int pkey)
 /*[[[body:libc_pkey_free]]]*/
@@ -340,8 +348,9 @@ NOTHROW_NCX(LIBCCALL libc_pkey_free)(int pkey)
 #endif /* MAGIC:impl_if */
 /*[[[end:libc_pkey_free]]]*/
 
-/*[[[head:libc_pkey_mprotect,hash:CRC-32=0x51b21a55]]]*/
+/*[[[head:libc_pkey_mprotect,hash:CRC-32=0x9c144d9e]]]*/
 #ifdef __ARCH_HAVE_PKEY
+/* >> pkey_mprotect(2) */
 INTERN ATTR_SECTION(".text.crt.system.mman") int
 NOTHROW_NCX(LIBCCALL libc_pkey_mprotect)(void *addr,
                                          size_t len,

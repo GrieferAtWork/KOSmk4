@@ -493,8 +493,8 @@ int sched_getaffinity($pid_t pid, $size_t cpusetsize, cpu_set_t *cpuset);
 int sched_rr_get_interval32($pid_t pid, struct $timespec32 *tms);
 
 [[no_crt_self_import]]
-[[if($extended_include_prefix("<features.h>") defined(__USE_TIME_BITS64)), preferred_alias("sched_rr_get_interval64")]]
-[[if($extended_include_prefix("<features.h>")!defined(__USE_TIME_BITS64)), preferred_alias("sched_rr_get_interval")]]
+[[if($extended_include_prefix("<features.h>", "<bits/types.h>")!defined(__USE_TIME_BITS64) || __SIZEOF_TIME32_T__ == __SIZEOF_TIME64_T__), preferred_alias("sched_rr_get_interval")]]
+[[if($extended_include_prefix("<features.h>", "<bits/types.h>") defined(__USE_TIME_BITS64) || __SIZEOF_TIME32_T__ == __SIZEOF_TIME64_T__), preferred_alias("sched_rr_get_interval64")]]
 [[userimpl, requires($has_function(sched_rr_get_interval32) || $has_function(sched_rr_get_interval64))]]
 [[decl_include("<bits/types.h>", "<bits/os/timespec.h>")]]
 int sched_rr_get_interval($pid_t pid, struct timespec *tms) {
@@ -516,7 +516,7 @@ int sched_rr_get_interval($pid_t pid, struct timespec *tms) {
 }
 
 %#ifdef __USE_TIME64
-[[time64_variant_of(sched_rr_get_interval)]]
+[[preferred_time64_variant_of(sched_rr_get_interval), doc_alias("sched_rr_get_interval")]]
 [[userimpl, requires_function(sched_rr_get_interval32)]]
 [[decl_include("<bits/types.h>", "<bits/os/timespec.h>")]]
 int sched_rr_get_interval64($pid_t pid, struct $timespec64 *tms) {

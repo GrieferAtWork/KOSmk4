@@ -336,10 +336,10 @@ int aio_suspendt32([[nonnull]] struct aiocb const *const list[],
 @@@return: -1: [errno=EAGAIN] The time specified by `rel_timeout' has elapsed
 @@@return: -1: [errno=EINTR]  A signal was delivered to the calling thread
 [[cp, no_crt_self_import, decl_include("<features.h>", "<bits/crt/aiocb.h>", "<bits/os/timespec.h>")]]
-[[if($extended_include_prefix("<features.h>")!defined(__USE_FILE_OFFSET64) && !defined(__USE_TIME_BITS64)), preferred_alias("aio_suspend")]]
-[[if($extended_include_prefix("<features.h>") defined(__USE_FILE_OFFSET64) && !defined(__USE_TIME_BITS64)), preferred_alias("aio_suspend64")]]
-[[if($extended_include_prefix("<features.h>")!defined(__USE_FILE_OFFSET64) &&  defined(__USE_TIME_BITS64)), preferred_alias("aio_suspendt64")]]
-[[if($extended_include_prefix("<features.h>") defined(__USE_FILE_OFFSET64) &&  defined(__USE_TIME_BITS64)), preferred_alias("aio_suspend64t64")]]
+[[if($extended_include_prefix("<features.h>", "<bits/types.h>")(!defined(__USE_FILE_OFFSET64) || __SIZEOF_OFF32_T__ == __SIZEOF_OFF64_T__) && (!defined(__USE_TIME_BITS64) || __SIZEOF_TIME32_T__ == __SIZEOF_TIME64_T__)), preferred_alias("aio_suspend")]]
+[[if($extended_include_prefix("<features.h>", "<bits/types.h>")( defined(__USE_FILE_OFFSET64) || __SIZEOF_OFF32_T__ == __SIZEOF_OFF64_T__) && (!defined(__USE_TIME_BITS64) || __SIZEOF_TIME32_T__ == __SIZEOF_TIME64_T__)), preferred_alias("aio_suspend64")]]
+[[if($extended_include_prefix("<features.h>", "<bits/types.h>")(!defined(__USE_FILE_OFFSET64) || __SIZEOF_OFF32_T__ == __SIZEOF_OFF64_T__) && ( defined(__USE_TIME_BITS64) || __SIZEOF_TIME32_T__ == __SIZEOF_TIME64_T__)), preferred_alias("aio_suspendt64")]]
+[[if($extended_include_prefix("<features.h>", "<bits/types.h>")( defined(__USE_FILE_OFFSET64) || __SIZEOF_OFF32_T__ == __SIZEOF_OFF64_T__) && ( defined(__USE_TIME_BITS64) || __SIZEOF_TIME32_T__ == __SIZEOF_TIME64_T__)), preferred_alias("aio_suspend64t64")]]
 [[userimpl, requires($has_function(aio_suspendt32) || $has_function(aio_suspendt64))]]
 int aio_suspend([[nonnull]] struct aiocb const *const list[],
                 __STDC_INT_AS_SIZE_T nent,

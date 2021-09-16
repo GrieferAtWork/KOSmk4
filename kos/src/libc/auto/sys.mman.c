@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x1edde979 */
+/* HASH CRC-32:0xfcb42a84 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -117,6 +117,7 @@ NOTHROW_RPC(LIBCCALL libc_shm_unlink)(char const *name) {
 #include <asm/pkey.h>
 #if !defined(__KERNEL__) && defined(__ARCH_HAVE_PKEY)
 #include <libc/errno.h>
+/* >> pkey_set(3) */
 INTERN ATTR_SECTION(".text.crt.system.mman") int
 NOTHROW_NCX(LIBCCALL libc_pkey_set)(int pkey,
                                     unsigned int access_rights) {
@@ -133,6 +134,7 @@ badkey_or_rights:
 #endif /* !EINVAL */
 }
 #include <libc/errno.h>
+/* >> pkey_get(3) */
 INTERN ATTR_SECTION(".text.crt.system.mman") int
 NOTHROW_NCX(LIBCCALL libc_pkey_get)(int pkey) {
 	if unlikely(!__arch_pkey_verify_key(pkey))

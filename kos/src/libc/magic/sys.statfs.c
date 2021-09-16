@@ -48,27 +48,26 @@ __SYSDECL_BEGIN
 
 }
 
-[[no_crt_self_import, export_as("__statfs")]]
-[[if($extended_include_prefix("<features.h>")!defined(__USE_FILE_OFFSET64)), preferred_alias("statfs", "__statfs")]]
-[[if($extended_include_prefix("<features.h>") defined(__USE_FILE_OFFSET64)), preferred_alias("statfs64")]]
-[[decl_include("<bits/os/statfs.h>")]]
+[[decl_include("<bits/os/statfs.h>"), no_crt_self_import]]
+[[if($extended_include_prefix("<features.h>", "<bits/types.h>")!defined(__USE_FILE_OFFSET64) || __SIZEOF_OFF32_T__ == __SIZEOF_OFF64_T__), alias("statfs", "__statfs")]]
+[[if($extended_include_prefix("<features.h>", "<bits/types.h>") defined(__USE_FILE_OFFSET64) || __SIZEOF_OFF32_T__ == __SIZEOF_OFF64_T__), alias("statfs64")]]
+[[export_as("__statfs")]]
 int statfs([[nonnull]] char const *file, [[nonnull]] struct statfs *buf);
 
-[[no_crt_self_import]]
-[[if($extended_include_prefix("<features.h>")!defined(__USE_FILE_OFFSET64)), preferred_alias("fstatfs")]]
-[[if($extended_include_prefix("<features.h>") defined(__USE_FILE_OFFSET64)), preferred_alias("fstatfs64")]]
-[[decl_include("<bits/os/statfs.h>")]]
+[[decl_include("<bits/os/statfs.h>"), no_crt_self_import]]
+[[if($extended_include_prefix("<features.h>", "<bits/types.h>")!defined(__USE_FILE_OFFSET64) || __SIZEOF_OFF32_T__ == __SIZEOF_OFF64_T__), alias("fstatfs")]]
+[[if($extended_include_prefix("<features.h>", "<bits/types.h>") defined(__USE_FILE_OFFSET64) || __SIZEOF_OFF32_T__ == __SIZEOF_OFF64_T__), alias("fstatfs64")]]
 int fstatfs($fd_t filedes, [[nonnull]] struct statfs *buf);
 
 %
 %#ifdef __USE_LARGEFILE64
 %#ifndef statfs64
-[[doc_alias("statfs"), statfs64_variant_of(statfs)]]
+[[preferred_statfs64_variant_of(statfs), doc_alias("statfs")]]
 [[decl_include("<bits/os/statfs.h>")]]
 int statfs64([[nonnull]] const char *file, [[nonnull]] struct statfs64 *buf);
 %#endif /* !statfs64 */
 
-[[doc_alias("fstatfs"), statfs64_variant_of(fstatfs)]]
+[[preferred_statfs64_variant_of(fstatfs), doc_alias("fstatfs")]]
 [[decl_include("<bits/os/statfs.h>")]]
 int fstatfs64($fd_t filedes, [[nonnull]] struct statfs64 *buf);
 %#endif /* __USE_LARGEFILE64 */

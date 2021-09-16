@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x2f91dd92 */
+/* HASH CRC-32:0x8c65c590 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -31,10 +31,10 @@ __CREDIRECT(__ATTR_NONNULL((2, 3)),int,__NOTHROW_NCX,__localdep_futimesat32,(__f
 #endif /* !__local___localdep_futimesat32_defined && __CRT_HAVE_futimesat */
 #ifndef __local___localdep_futimesat64_defined
 #define __local___localdep_futimesat64_defined 1
-#ifdef __CRT_HAVE_futimesat64
-__CREDIRECT(__ATTR_NONNULL((2)),int,__NOTHROW_NCX,__localdep_futimesat64,(__fd_t __fd, char const *__file, struct __timeval64 const __tvp[2]),futimesat64,(__fd,__file,__tvp))
-#elif defined(__CRT_HAVE_futimesat) && __SIZEOF_TIME32_T__ == __SIZEOF_TIME64_T__
+#if defined(__CRT_HAVE_futimesat) && __SIZEOF_TIME32_T__ == __SIZEOF_TIME64_T__
 __CREDIRECT(__ATTR_NONNULL((2)),int,__NOTHROW_NCX,__localdep_futimesat64,(__fd_t __fd, char const *__file, struct __timeval64 const __tvp[2]),futimesat,(__fd,__file,__tvp))
+#elif defined(__CRT_HAVE_futimesat64)
+__CREDIRECT(__ATTR_NONNULL((2)),int,__NOTHROW_NCX,__localdep_futimesat64,(__fd_t __fd, char const *__file, struct __timeval64 const __tvp[2]),futimesat64,(__fd,__file,__tvp))
 #elif defined(__CRT_HAVE_futimesat)
 __NAMESPACE_LOCAL_END
 #include <libc/local/sys.time/futimesat64.h>

@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xef3b5776 */
+/* HASH CRC-32:0x6c23f51b */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -92,11 +92,14 @@ INTDEF NONNULL((1)) int NOTHROW_RPC(LIBCCALL libc_mknod)(char const *nodename, m
 /* >> mknodat(2) */
 INTDEF NONNULL((2)) int NOTHROW_RPC(LIBCCALL libc_mknodat)(fd_t dirfd, char const *nodename, mode_t mode, dev_t dev);
 /* >> utimensat(2), utimensat64(2)
- * @param flags: Set of `0|AT_SYMLINK_NOFOLLOW|AT_CHANGE_CTIME|AT_DOSPATH' */
+ * @param flags: Set of `0 | AT_SYMLINK_NOFOLLOW | AT_CHANGE_CTIME | AT_DOSPATH' */
 INTDEF NONNULL((2)) int NOTHROW_RPC(LIBCCALL libc_utimensat)(fd_t dirfd, char const *filename, struct timespec const times[2 /*or:3*/], atflag_t flags);
+/* >> utimensat(2), utimensat64(2)
+ * @param flags: Set of `0 | AT_SYMLINK_NOFOLLOW | AT_CHANGE_CTIME | AT_DOSPATH' */
 INTDEF NONNULL((2)) int NOTHROW_RPC(LIBCCALL libc_utimensat64)(fd_t dirfd, char const *filename, struct timespec64 const times[2 /*or:3*/], atflag_t flags);
 /* >> futimens(2), futimens64(2) */
 INTDEF int NOTHROW_RPC(LIBCCALL libc_futimens)(fd_t fd, struct timespec const times[2 /*or:3*/]);
+/* >> futimens(2), futimens64(2) */
 INTDEF int NOTHROW_RPC(LIBCCALL libc_futimens64)(fd_t fd, struct timespec64 const times[2 /*or:3*/]);
 INTDEF NONNULL((1, 2)) int NOTHROW_NCX(LIBDCALL libd__wstat32)(char16_t const *filename, struct __dos_stat32 *buf);
 INTDEF NONNULL((1, 2)) int NOTHROW_NCX(LIBKCALL libc__wstat32)(char32_t const *filename, struct __dos_stat32 *buf);

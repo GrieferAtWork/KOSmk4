@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x817b89f1 */
+/* HASH CRC-32:0xb3e2afda */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -38,10 +38,10 @@ __CREDIRECT(__ATTR_NONNULL((3)),int,__NOTHROW_RPC,__localdep_clock_nanosleep32,(
 #endif /* !__local___localdep_clock_nanosleep32_defined */
 #ifndef __local___localdep_clock_nanosleep64_defined
 #define __local___localdep_clock_nanosleep64_defined 1
-#ifdef __CRT_HAVE_clock_nanosleep64
-__CREDIRECT(__ATTR_NONNULL((3)),int,__NOTHROW_RPC,__localdep_clock_nanosleep64,(__clockid_t __clock_id, __STDC_INT_AS_UINT_T __flags, struct __timespec64 const *__requested_time, struct __timespec64 *__remaining),clock_nanosleep64,(__clock_id,__flags,__requested_time,__remaining))
-#elif defined(__CRT_HAVE_clock_nanosleep) && __SIZEOF_TIME32_T__ == __SIZEOF_TIME64_T__
+#if defined(__CRT_HAVE_clock_nanosleep) && __SIZEOF_TIME32_T__ == __SIZEOF_TIME64_T__
 __CREDIRECT(__ATTR_NONNULL((3)),int,__NOTHROW_RPC,__localdep_clock_nanosleep64,(__clockid_t __clock_id, __STDC_INT_AS_UINT_T __flags, struct __timespec64 const *__requested_time, struct __timespec64 *__remaining),clock_nanosleep,(__clock_id,__flags,__requested_time,__remaining))
+#elif defined(__CRT_HAVE_clock_nanosleep64)
+__CREDIRECT(__ATTR_NONNULL((3)),int,__NOTHROW_RPC,__localdep_clock_nanosleep64,(__clockid_t __clock_id, __STDC_INT_AS_UINT_T __flags, struct __timespec64 const *__requested_time, struct __timespec64 *__remaining),clock_nanosleep64,(__clock_id,__flags,__requested_time,__remaining))
 #elif defined(__CRT_HAVE_clock_nanosleep) || defined(__CRT_HAVE___clock_nanosleep)
 __NAMESPACE_LOCAL_END
 #include <libc/local/time/clock_nanosleep64.h>

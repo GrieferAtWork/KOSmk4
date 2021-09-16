@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xcc08c0c9 */
+/* HASH CRC-32:0x788ff0c5 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -91,7 +91,7 @@ INTDEF WUNUSED FILE *NOTHROW_RPC(LIBCCALL libc_tmpfile)(void);
 /* >> fopen(3), fopen64(3)
  * Create and return a new file-stream for accessing `filename' */
 INTDEF WUNUSED NONNULL((1, 2)) FILE *NOTHROW_RPC(LIBCCALL libc_fopen)(char const *__restrict filename, char const *__restrict modes);
-/* >> freopen(3), freopen64(3)
+/* >> freopen(3), freopen64(3), freopen_unlocked(3), freopen64_unlocked(3)
  * Re-open the given `stream' as a file-stream for accessing `filename' */
 INTDEF NONNULL((1, 2, 3)) FILE *NOTHROW_RPC(LIBCCALL libc_freopen)(char const *__restrict filename, char const *__restrict modes, FILE *__restrict stream);
 /* >> fgetpos(3), fgetpos64(3)
@@ -182,7 +182,7 @@ INTDEF WUNUSED NONNULL((1)) off64_t (LIBCCALL libc_ftello64)(FILE *__restrict st
 /* >> fopen(3), fopen64(3)
  * Create and return a new file-stream for accessing `filename' */
 INTDEF WUNUSED NONNULL((1, 2)) FILE *NOTHROW_RPC(LIBCCALL libc_fopen64)(char const *__restrict filename, char const *__restrict modes);
-/* >> freopen(3), freopen64(3)
+/* >> freopen(3), freopen64(3), freopen_unlocked(3), freopen64_unlocked(3)
  * Re-open the given `stream' as a file-stream for accessing `filename' */
 INTDEF NONNULL((1, 2, 3)) FILE *NOTHROW_RPC(LIBCCALL libc_freopen64)(char const *__restrict filename, char const *__restrict modes, FILE *__restrict stream);
 /* >> fgetpos(3), fgetpos64(3)
@@ -198,16 +198,16 @@ INTDEF NONNULL((1, 2)) ssize_t (__FORMATPRINTER_CC libc_file_printer)(void *arg,
 /* >> file_printer_unlocked(3)
  * Same as `file_printer()', but performs I/O without acquiring a lock to `(FILE *)arg' */
 INTDEF NONNULL((1, 2)) ssize_t (__FORMATPRINTER_CC libc_file_printer_unlocked)(void *arg, char const *__restrict data, size_t datalen) THROWS(...);
-/* >> fdreopen(3)
+/* >> fdreopen(3), fdreopen_unlocked(3)
  * Re-open the given `stream' as a file-stream for accessing `fd' */
 INTDEF NONNULL((2, 3)) FILE *NOTHROW_RPC(LIBCCALL libc_fdreopen)(fd_t fd, char const *__restrict modes, FILE *__restrict stream);
-/* >> fdreopen(3)
+/* >> fdreopen(3), fdreopen_unlocked(3)
  * Re-open the given `stream' as a file-stream for accessing `fd' */
 INTDEF NONNULL((2, 3)) FILE *NOTHROW_RPC(LIBCCALL libc_fdreopen_unlocked)(fd_t fd, char const *__restrict modes, FILE *__restrict stream);
-/* >> freopen(3), freopen64(3)
+/* >> freopen(3), freopen64(3), freopen_unlocked(3), freopen64_unlocked(3)
  * Re-open the given `stream' as a file-stream for accessing `filename' */
 INTDEF NONNULL((1, 2, 3)) FILE *NOTHROW_RPC(LIBCCALL libc_freopen_unlocked)(char const *__restrict filename, char const *__restrict modes, FILE *__restrict stream);
-/* >> freopen(3), freopen64(3)
+/* >> freopen(3), freopen64(3), freopen_unlocked(3), freopen64_unlocked(3)
  * Re-open the given `stream' as a file-stream for accessing `filename' */
 INTDEF NONNULL((1, 2, 3)) FILE *NOTHROW_RPC(LIBCCALL libc_freopen64_unlocked)(char const *__restrict filename, char const *__restrict modes, FILE *__restrict stream);
 INTDEF NONNULL((1)) int (LIBCCALL libc_fseek_unlocked)(FILE *__restrict stream, long int off, int whence) THROWS(...);

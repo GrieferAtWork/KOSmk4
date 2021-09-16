@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x140dbd0c */
+/* HASH CRC-32:0xbe176a2f */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -31,10 +31,10 @@ __CREDIRECT(__ATTR_NONNULL((1)),int,__NOTHROW_NCX,__localdep_lutimes32,(char con
 #endif /* !__local___localdep_lutimes32_defined && __CRT_HAVE_lutimes */
 #ifndef __local___localdep_lutimes64_defined
 #define __local___localdep_lutimes64_defined 1
-#ifdef __CRT_HAVE_lutimes64
-__CREDIRECT(__ATTR_NONNULL((1)),int,__NOTHROW_NCX,__localdep_lutimes64,(char const *__file, struct __timeval64 const __tvp[2]),lutimes64,(__file,__tvp))
-#elif defined(__CRT_HAVE_lutimes) && __SIZEOF_TIME32_T__ == __SIZEOF_TIME64_T__
+#if defined(__CRT_HAVE_lutimes) && __SIZEOF_TIME32_T__ == __SIZEOF_TIME64_T__
 __CREDIRECT(__ATTR_NONNULL((1)),int,__NOTHROW_NCX,__localdep_lutimes64,(char const *__file, struct __timeval64 const __tvp[2]),lutimes,(__file,__tvp))
+#elif defined(__CRT_HAVE_lutimes64)
+__CREDIRECT(__ATTR_NONNULL((1)),int,__NOTHROW_NCX,__localdep_lutimes64,(char const *__file, struct __timeval64 const __tvp[2]),lutimes64,(__file,__tvp))
 #elif defined(__CRT_HAVE_lutimes)
 __NAMESPACE_LOCAL_END
 #include <libc/local/sys.time/lutimes64.h>

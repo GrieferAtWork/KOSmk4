@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xc1918662 */
+/* HASH CRC-32:0xf3c44928 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -32,10 +32,10 @@ __CREDIRECT(__ATTR_WUNUSED __ATTR_NONNULL((1, 2)),__errno_t,__NOTHROW_RPC,__loca
 #endif /* !__local___localdep_pthread_rwlock_reltimedwrlock32_np_defined && __CRT_HAVE_pthread_rwlock_reltimedwrlock_np */
 #ifndef __local___localdep_pthread_rwlock_reltimedwrlock64_np_defined
 #define __local___localdep_pthread_rwlock_reltimedwrlock64_np_defined 1
-#ifdef __CRT_HAVE_pthread_rwlock_reltimedwrlock64_np
-__CREDIRECT(__ATTR_WUNUSED __ATTR_NONNULL((1, 2)),__errno_t,__NOTHROW_RPC,__localdep_pthread_rwlock_reltimedwrlock64_np,(__pthread_rwlock_t *__restrict __rwlock, struct __timespec64 const *__restrict __reltime),pthread_rwlock_reltimedwrlock64_np,(__rwlock,__reltime))
-#elif defined(__CRT_HAVE_pthread_rwlock_reltimedwrlock_np) && __SIZEOF_TIME32_T__ == __SIZEOF_TIME64_T__
+#if defined(__CRT_HAVE_pthread_rwlock_reltimedwrlock_np) && __SIZEOF_TIME32_T__ == __SIZEOF_TIME64_T__
 __CREDIRECT(__ATTR_WUNUSED __ATTR_NONNULL((1, 2)),__errno_t,__NOTHROW_RPC,__localdep_pthread_rwlock_reltimedwrlock64_np,(__pthread_rwlock_t *__restrict __rwlock, struct __timespec64 const *__restrict __reltime),pthread_rwlock_reltimedwrlock_np,(__rwlock,__reltime))
+#elif defined(__CRT_HAVE_pthread_rwlock_reltimedwrlock64_np)
+__CREDIRECT(__ATTR_WUNUSED __ATTR_NONNULL((1, 2)),__errno_t,__NOTHROW_RPC,__localdep_pthread_rwlock_reltimedwrlock64_np,(__pthread_rwlock_t *__restrict __rwlock, struct __timespec64 const *__restrict __reltime),pthread_rwlock_reltimedwrlock64_np,(__rwlock,__reltime))
 #elif defined(__CRT_HAVE_pthread_rwlock_reltimedwrlock_np)
 __NAMESPACE_LOCAL_END
 #include <libc/local/pthread/pthread_rwlock_reltimedwrlock64_np.h>

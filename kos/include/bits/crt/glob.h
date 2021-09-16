@@ -26,16 +26,16 @@
 
 #include <hybrid/typecore.h>
 
+#include <bits/os/dirent.h>
+#include <bits/os/stat.h>
 #include <bits/types.h>
+
+#if defined(__DIRENT32_MATCHES_DIRENT64) && defined(__STAT32_MATCHES_STAT64)
+#define __GLOB32_MATCHES_GLOB64 1
+#endif /* __DIRENT32_MATCHES_DIRENT64 && __STAT32_MATCHES_STAT64 */
 
 #ifdef __CC__
 __DECL_BEGIN
-
-#ifdef __USE_GNU
-struct dirent;
-struct stat;
-#endif /* !__USE_GNU */
-
 
 struct __glob_struct {
 	__size_t gl_pathc; /* ??? */
@@ -59,10 +59,6 @@ struct __glob_struct {
 };
 
 #ifdef __USE_LARGEFILE64
-#ifdef __USE_GNU
-struct dirent64;
-struct stat64;
-#endif /* __USE_GNU */
 struct __glob64_struct {
 	__size_t gl_pathc; /* ??? */
 	char   **gl_pathv; /* ??? */
@@ -84,7 +80,6 @@ struct __glob64_struct {
 #endif /* !__USE_GNU */
 };
 #endif /* __USE_LARGEFILE64 */
-
 
 __DECL_END
 #endif /* __CC__ */

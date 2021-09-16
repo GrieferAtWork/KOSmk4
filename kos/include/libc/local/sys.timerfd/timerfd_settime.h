@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x637d91b4 */
+/* HASH CRC-32:0x5f4b0039 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -32,10 +32,10 @@ __CREDIRECT(__ATTR_NONNULL((3)),int,__NOTHROW_NCX,__localdep_timerfd_settime32,(
 #endif /* !__local___localdep_timerfd_settime32_defined && __CRT_HAVE_timerfd_settime */
 #ifndef __local___localdep_timerfd_settime64_defined
 #define __local___localdep_timerfd_settime64_defined 1
-#ifdef __CRT_HAVE_timerfd_settime64
-__CREDIRECT(__ATTR_NONNULL((3)),int,__NOTHROW_NCX,__localdep_timerfd_settime64,(__fd_t __ufd, __STDC_INT_AS_UINT_T __flags, struct __itimerspec64 const *__utmr, struct __itimerspec64 *__otmr),timerfd_settime64,(__ufd,__flags,__utmr,__otmr))
-#elif defined(__CRT_HAVE_timerfd_settime) && __SIZEOF_TIME32_T__ == __SIZEOF_TIME64_T__
+#if defined(__CRT_HAVE_timerfd_settime) && __SIZEOF_TIME32_T__ == __SIZEOF_TIME64_T__
 __CREDIRECT(__ATTR_NONNULL((3)),int,__NOTHROW_NCX,__localdep_timerfd_settime64,(__fd_t __ufd, __STDC_INT_AS_UINT_T __flags, struct __itimerspec64 const *__utmr, struct __itimerspec64 *__otmr),timerfd_settime,(__ufd,__flags,__utmr,__otmr))
+#elif defined(__CRT_HAVE_timerfd_settime64)
+__CREDIRECT(__ATTR_NONNULL((3)),int,__NOTHROW_NCX,__localdep_timerfd_settime64,(__fd_t __ufd, __STDC_INT_AS_UINT_T __flags, struct __itimerspec64 const *__utmr, struct __itimerspec64 *__otmr),timerfd_settime64,(__ufd,__flags,__utmr,__otmr))
 #elif defined(__CRT_HAVE_timerfd_settime)
 __NAMESPACE_LOCAL_END
 #include <libc/local/sys.timerfd/timerfd_settime64.h>

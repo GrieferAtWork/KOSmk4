@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x71730fd7 */
+/* HASH CRC-32:0xcbf85b89 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -33,10 +33,10 @@ __CREDIRECT(__ATTR_NONNULL((1)),int,__NOTHROW_RPC,__localdep_ppoll32,(struct pol
 #endif /* !__local___localdep_ppoll32_defined && __CRT_HAVE_ppoll */
 #ifndef __local___localdep_ppoll64_defined
 #define __local___localdep_ppoll64_defined 1
-#ifdef __CRT_HAVE_ppoll64
-__CREDIRECT(__ATTR_NONNULL((1)),int,__NOTHROW_RPC,__localdep_ppoll64,(struct pollfd *__fds, __UINTPTR_TYPE__ __nfds, struct __timespec64 const *__timeout, struct __sigset_struct const *__ss),ppoll64,(__fds,__nfds,__timeout,__ss))
-#elif defined(__CRT_HAVE_ppoll) && __SIZEOF_TIME32_T__ == __SIZEOF_TIME64_T__
+#if defined(__CRT_HAVE_ppoll) && __SIZEOF_TIME32_T__ == __SIZEOF_TIME64_T__
 __CREDIRECT(__ATTR_NONNULL((1)),int,__NOTHROW_RPC,__localdep_ppoll64,(struct pollfd *__fds, __UINTPTR_TYPE__ __nfds, struct __timespec64 const *__timeout, struct __sigset_struct const *__ss),ppoll,(__fds,__nfds,__timeout,__ss))
+#elif defined(__CRT_HAVE_ppoll64)
+__CREDIRECT(__ATTR_NONNULL((1)),int,__NOTHROW_RPC,__localdep_ppoll64,(struct pollfd *__fds, __UINTPTR_TYPE__ __nfds, struct __timespec64 const *__timeout, struct __sigset_struct const *__ss),ppoll64,(__fds,__nfds,__timeout,__ss))
 #elif defined(__CRT_HAVE_ppoll)
 __NAMESPACE_LOCAL_END
 #include <libc/local/sys.poll/ppoll64.h>

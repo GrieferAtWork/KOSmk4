@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x69fd2d88 */
+/* HASH CRC-32:0xf40d6dae */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -246,7 +246,7 @@ INTDEF NONNULL((2)) ssize_t NOTHROW_RPC(__FORMATPRINTER_CC libc_write_printer)(v
 INTDEF NONNULL((2)) ssize_t NOTHROW_RPC(__FORMATPRINTER_CC libc_write_printer)(void *fd, char const *__restrict buf, size_t bufsize) ASMNAME("libc_writeall");
 #endif /* !__KERNEL__ && (__LIBCCALL_IS_FORMATPRINTER_CC && __SIZEOF_INT__ == __SIZEOF_POINTER__) */
 #if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
-/* >> lseek(2)
+/* >> lseek(2), lseek64(2)
  * Change the position of the file read/write pointer within a file referred to by `fd' */
 INTDEF off_t NOTHROW_NCX(LIBDCALL libd_lseek)(fd_t fd, off_t offset, __STDC_INT_AS_UINT_T whence);
 /* >> isatty(2)
@@ -324,34 +324,36 @@ INTDEF NONNULL((2, 3)) ssize_t NOTHROW_RPC(LIBDCALL libd_freadlinkat)(fd_t dfd, 
 /* >> unlinkat(2)
  * Remove a file, symbolic link, device or FIFO referred to by `dfd:name' */
 INTDEF NONNULL((2)) int NOTHROW_RPC(LIBDCALL libd_unlinkat)(fd_t dfd, char const *name, atflag_t flags);
-/* >> lseek64(2)
+/* >> lseek(2), lseek64(2)
  * Change the position of the file read/write pointer within a file referred to by `fd' */
 INTDEF off64_t NOTHROW_NCX(LIBDCALL libd_lseek64)(fd_t fd, off64_t offset, __STDC_INT_AS_UINT_T whence);
-/* >> pread(2)
+/* >> pread(2), pread64(2)
  * Read data from a file at a specific `offset', rather than the current R/W position
  * @return: <= bufsize: The actual amount of read bytes */
 INTDEF NONNULL((2)) ssize_t NOTHROW_RPC(LIBDCALL libd_pread)(fd_t fd, void *buf, size_t bufsize, __PIO_OFFSET offset);
-/* >> pwrite(2)
+/* >> pwrite(2), pwrite64(2)
  * Write data to a file at a specific `offset', rather than the current R/W position
  * @return: <= bufsize: The actual amount of written bytes */
 INTDEF NONNULL((2)) ssize_t NOTHROW_RPC(LIBDCALL libd_pwrite)(fd_t fd, void const *buf, size_t bufsize, __PIO_OFFSET offset);
-/* >> preadall(3)
+/* >> preadall(3), preadall64(3)
  * Same as `readall(3)', but using `pread(2)' instead of `read()' */
 INTDEF NONNULL((2)) ssize_t NOTHROW_RPC(LIBDCALL libd_preadall)(fd_t fd, void *buf, size_t bufsize, __PIO_OFFSET offset);
-/* >> pwriteall(3)
+/* >> pwriteall(3), pwriteall64(3)
  * Same as `writeall(3)', but using `pwrite(2)' instead of `write()' */
 INTDEF NONNULL((2)) ssize_t NOTHROW_RPC(LIBDCALL libd_pwriteall)(fd_t fd, void const *buf, size_t bufsize, __PIO_OFFSET offset);
-/* >> pread64(2)
- * Read data from a file at a specific offset */
+/* >> pread(2), pread64(2)
+ * Read data from a file at a specific `offset', rather than the current R/W position
+ * @return: <= bufsize: The actual amount of read bytes */
 INTDEF NONNULL((2)) ssize_t NOTHROW_RPC(LIBDCALL libd_pread64)(fd_t fd, void *buf, size_t bufsize, __PIO_OFFSET64 offset);
-/* >> pwrite64(2)
- * Write data to a file at a specific offset */
+/* >> pwrite(2), pwrite64(2)
+ * Write data to a file at a specific `offset', rather than the current R/W position
+ * @return: <= bufsize: The actual amount of written bytes */
 INTDEF NONNULL((2)) ssize_t NOTHROW_RPC(LIBDCALL libd_pwrite64)(fd_t fd, void const *buf, size_t bufsize, __PIO_OFFSET64 offset);
-/* >> preadall64(3)
- * Same as `readall(3)', but using `pread64(2)' instead of `read()' */
+/* >> preadall(3), preadall64(3)
+ * Same as `readall(3)', but using `pread(2)' instead of `read()' */
 INTDEF NONNULL((2)) ssize_t NOTHROW_RPC(LIBDCALL libd_preadall64)(fd_t fd, void *buf, size_t bufsize, __PIO_OFFSET64 offset);
-/* >> pwriteall64(3)
- * Same as `writeall(3)', but using `pwrite64(2)' instead of `write()' */
+/* >> pwriteall(3), pwriteall64(3)
+ * Same as `writeall(3)', but using `pwrite(2)' instead of `write()' */
 INTDEF NONNULL((2)) ssize_t NOTHROW_RPC(LIBDCALL libd_pwriteall64)(fd_t fd, void *buf, size_t bufsize, __PIO_OFFSET64 offset);
 INTDEF fd_t NOTHROW_NCX(LIBDCALL libd_dup3)(fd_t oldfd, fd_t newfd, oflag_t flags);
 INTDEF NONNULL((1)) int NOTHROW_NCX(LIBDCALL libd_pipe2)(fd_t pipedes[2], oflag_t flags);
@@ -407,10 +409,10 @@ INTDEF WUNUSED pid_t NOTHROW_NCX(LIBDCALL libd_getsid)(pid_t pid);
  * Change the ownership of a given `file' to `group:owner',
  * but don't reference it if  that file is a symbolic  link */
 INTDEF NONNULL((1)) int NOTHROW_RPC(LIBDCALL libd_lchown)(char const *file, uid_t owner, gid_t group);
-/* >> truncate(2)
+/* >> truncate(2), truncate64(2)
  * Truncate the given file `file' to a length of `length' */
 INTDEF NONNULL((1)) int NOTHROW_NCX(LIBDCALL libd_truncate)(char const *file, __PIO_OFFSET length);
-/* >> truncate64(2)
+/* >> truncate(2), truncate64(2)
  * Truncate the given file `file' to a length of `length' */
 INTDEF NONNULL((1)) int NOTHROW_NCX(LIBDCALL libd_truncate64)(char const *file, __PIO_OFFSET64 length);
 /* >> fexecve(2)

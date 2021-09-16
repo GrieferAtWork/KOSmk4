@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xda5bd723 */
+/* HASH CRC-32:0xaaecdc7c */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -370,10 +370,6 @@ DEFINE_PUBLIC_ALIAS(DOS$fts64_set, libd_fts64_set);
 DEFINE_PUBLIC_ALIAS(DOS$getopt, libd_getopt);
 DEFINE_PUBLIC_ALIAS(DOS$getopt_long, libd_getopt_long);
 DEFINE_PUBLIC_ALIAS(DOS$getopt_long_only, libd_getopt_long_only);
-
-/* glob */
-DEFINE_PUBLIC_ALIAS(DOS$globfree, libd_globfree);
-DEFINE_PUBLIC_ALIAS(DOS$globfree64, libd_globfree64);
 
 /* grp */
 DEFINE_PUBLIC_ALIAS(DOS$getgrgid, libd_getgrgid);
@@ -1806,10 +1802,10 @@ DEFINE_PUBLIC_ALIAS(DOS$random_r, libd_random_r);
 DEFINE_PUBLIC_ALIAS(DOS$srandom_r, libd_srandom_r);
 DEFINE_PUBLIC_ALIAS(DOS$initstate_r, libd_initstate_r);
 DEFINE_PUBLIC_ALIAS(DOS$setstate_r, libd_setstate_r);
-DEFINE_PUBLIC_ALIAS(DOS$mkstemps64, libd_mkstemps);
 DEFINE_PUBLIC_ALIAS(DOS$mkstemps, libd_mkstemps);
 DEFINE_PUBLIC_ALIAS(DOS$rpmatch, libd_rpmatch);
 DEFINE_PUBLIC_ALIAS(DOS$getloadavg, libd_getloadavg);
+DEFINE_PUBLIC_ALIAS(DOS$mkstemps64, libd_mkstemps64);
 DEFINE_PUBLIC_ALIAS(DOS$setenv, libd_setenv);
 DEFINE_PUBLIC_ALIAS(DOS$unsetenv, libd_unsetenv);
 DEFINE_PUBLIC_ALIAS(DOS$erand48, libd_erand48);
@@ -1837,8 +1833,8 @@ DEFINE_PUBLIC_ALIAS(DOS$ecvt, libd_ecvt);
 DEFINE_PUBLIC_ALIAS(DOS$_fcvt, libd_fcvt);
 DEFINE_PUBLIC_ALIAS(DOS$fcvt, libd_fcvt);
 DEFINE_PUBLIC_ALIAS(DOS$getsubopt, libd_getsubopt);
-DEFINE_PUBLIC_ALIAS(DOS$mkstemp64, libd_mkstemp);
 DEFINE_PUBLIC_ALIAS(DOS$mkstemp, libd_mkstemp);
+DEFINE_PUBLIC_ALIAS(DOS$mkstemp64, libd_mkstemp64);
 DEFINE_PUBLIC_ALIAS(DOS$mkdtemp, libd_mkdtemp);
 DEFINE_PUBLIC_ALIAS(DOS$grantpt, libd_grantpt);
 DEFINE_PUBLIC_ALIAS(DOS$unlockpt, libd_unlockpt);
@@ -1883,10 +1879,10 @@ DEFINE_PUBLIC_ALIAS(DOS$mergesort, libd_mergesort);
 DEFINE_PUBLIC_ALIAS(DOS$radixsort, libd_radixsort);
 DEFINE_PUBLIC_ALIAS(DOS$sradixsort, libd_sradixsort);
 DEFINE_PUBLIC_ALIAS(DOS$strtonum, libd_strtonum);
-DEFINE_PUBLIC_ALIAS(DOS$mkostemp64, libd_mkostemp);
 DEFINE_PUBLIC_ALIAS(DOS$mkostemp, libd_mkostemp);
-DEFINE_PUBLIC_ALIAS(DOS$mkostemps64, libd_mkostemps);
 DEFINE_PUBLIC_ALIAS(DOS$mkostemps, libd_mkostemps);
+DEFINE_PUBLIC_ALIAS(DOS$mkostemp64, libd_mkostemp64);
+DEFINE_PUBLIC_ALIAS(DOS$mkostemps64, libd_mkostemps64);
 DEFINE_PUBLIC_ALIAS(DOS$devname, libd_devname);
 DEFINE_PUBLIC_ALIAS(DOS$devname_r, libd_devname_r);
 DEFINE_PUBLIC_ALIAS(DOS$humanize_number, libd_humanize_number);

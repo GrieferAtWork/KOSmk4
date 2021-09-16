@@ -261,9 +261,9 @@ thrd_t thrd_current() = pthread_self;
 @@@return:     0: The (relative) time specified by `time_point' has elapsed
 @@@return:    -1: A signal was received while waiting, and `remaining' was filled in (if given)
 @@@return: <= -2: Some other error occurred
-[[cp, no_crt_self_import, decl_include("<bits/os/timespec.h>")]]
-[[if($extended_include_prefix("<features.h>") defined(__USE_TIME_BITS64)), preferred_alias("thrd_sleep64")]]
-[[if($extended_include_prefix("<features.h>")!defined(__USE_TIME_BITS64)), preferred_alias("thrd_sleep")]]
+[[cp, decl_include("<bits/os/timespec.h>"), no_crt_self_import]]
+[[if($extended_include_prefix("<features.h>", "<bits/types.h>")!defined(__USE_TIME_BITS64) || __SIZEOF_TIME32_T__ == __SIZEOF_TIME64_T__), alias("thrd_sleep")]]
+[[if($extended_include_prefix("<features.h>", "<bits/types.h>") defined(__USE_TIME_BITS64) || __SIZEOF_TIME32_T__ == __SIZEOF_TIME64_T__), alias("thrd_sleep64")]]
 [[impl_include("<asm/crt/threads.h>", "<libc/errno.h>")]]
 [[userimpl, requires($has_function(thrd_sleep32) || $has_function(crt_thrd_sleep64) || $has_function(nanosleep))]]
 int thrd_sleep([[nonnull]] struct timespec const *time_point,
@@ -314,8 +314,8 @@ int thrd_sleep32([[nonnull]] struct $timespec32 const *time_point,
 int crt_thrd_sleep64([[nonnull]] struct timespec64 const *time_point,
                      [[nullable]] struct timespec64 *remaining);
 
-[[cp, doc_alias("thrd_sleep")]]
-[[decl_include("<bits/os/timespec.h>"), time64_variant_of(thrd_sleep)]]
+[[cp, decl_include("<bits/os/timespec.h>")]]
+[[preferred_time64_variant_of(thrd_sleep), doc_alias("thrd_sleep")]]
 [[userimpl, requires($has_function(thrd_sleep32) || $has_function(nanosleep64))]]
 int thrd_sleep64([[nonnull]] struct timespec64 const *time_point,
                  [[nullable]] struct timespec64 *remaining) {
@@ -454,8 +454,8 @@ int mtx_lock([[nonnull]] mtx_t *__restrict mutex) {
 @@@return: thrd_timedout: Timeout
 @@@return: thrd_error:    Error
 [[cp, no_crt_self_import]]
-[[if($extended_include_prefix("<features.h>") defined(__USE_TIME_BITS64)), preferred_alias("mtx_timedlock64")]]
-[[if($extended_include_prefix("<features.h>")!defined(__USE_TIME_BITS64)), preferred_alias("mtx_timedlock")]]
+[[if($extended_include_prefix("<features.h>", "<bits/types.h>")!defined(__USE_TIME_BITS64) || __SIZEOF_TIME32_T__ == __SIZEOF_TIME64_T__), alias("mtx_timedlock")]]
+[[if($extended_include_prefix("<features.h>", "<bits/types.h>") defined(__USE_TIME_BITS64) || __SIZEOF_TIME32_T__ == __SIZEOF_TIME64_T__), alias("mtx_timedlock64")]]
 [[decl_include("<bits/crt/threads.h>")]]
 [[impl_include("<asm/crt/threads.h>", "<bits/crt/pthreadtypes.h>", "<asm/os/errno.h>")]]
 [[requires_function(pthread_mutex_timedlock)]]
@@ -473,8 +473,8 @@ int mtx_timedlock([[nonnull]] mtx_t *__restrict mutex,
 }
 
 %#ifdef __USE_TIME64
-[[cp, doc_alias("mtx_timedlock"), time64_variant_of(mtx_timedlock)]]
-[[decl_include("<bits/crt/threads.h>")]]
+[[cp, decl_include("<bits/crt/threads.h>")]]
+[[preferred_time64_variant_of(mtx_timedlock), doc_alias("mtx_timedlock")]]
 [[impl_include("<asm/crt/threads.h>", "<bits/crt/pthreadtypes.h>", "<asm/os/errno.h>")]]
 [[requires_function(pthread_mutex_timedlock64)]]
 int mtx_timedlock64([[nonnull]] mtx_t *__restrict mutex,
@@ -614,13 +614,11 @@ int cnd_wait([[nonnull]] cnd_t *__restrict cond,
 @@@return: thrd_success:  Success
 @@@return: thrd_timedout: Timeout
 @@@return: thrd_error:    Error
-[[cp, no_crt_self_import]]
-[[if($extended_include_prefix("<features.h>") defined(__USE_TIME_BITS64)), preferred_alias("cnd_timedwait64")]]
-[[if($extended_include_prefix("<features.h>")!defined(__USE_TIME_BITS64)), preferred_alias("cnd_timedwait")]]
-[[decl_include("<bits/crt/threads.h>", "<bits/os/timespec.h>")]]
-[[impl_include("<asm/crt/threads.h>", "<bits/crt/pthreadtypes.h>")]]
-[[impl_include("<asm/os/errno.h>")]]
-[[requires($has_function(pthread_cond_timedwait))]]
+[[cp, decl_include("<bits/crt/threads.h>", "<bits/os/timespec.h>"), no_crt_self_import]]
+[[if($extended_include_prefix("<features.h>", "<bits/types.h>")!defined(__USE_TIME_BITS64) || __SIZEOF_TIME32_T__ == __SIZEOF_TIME64_T__), alias("cnd_timedwait")]]
+[[if($extended_include_prefix("<features.h>", "<bits/types.h>") defined(__USE_TIME_BITS64) || __SIZEOF_TIME32_T__ == __SIZEOF_TIME64_T__), alias("cnd_timedwait64")]]
+[[impl_include("<asm/crt/threads.h>", "<bits/crt/pthreadtypes.h>", "<asm/os/errno.h>")]]
+[[requires_function(pthread_cond_timedwait)]]
 int cnd_timedwait([[nonnull]] cnd_t *__restrict cond,
                   [[nonnull]] mtx_t *__restrict mutex,
                   [[nonnull]] struct timespec const *__restrict time_point) {
@@ -638,11 +636,10 @@ int cnd_timedwait([[nonnull]] cnd_t *__restrict cond,
 }
 
 %#ifdef __USE_TIME64
-[[cp, doc_alias("cnd_timedwait"), time64_variant_of(cnd_timedwait)]]
-[[decl_include("<bits/crt/threads.h>", "<bits/os/timespec.h>")]]
-[[impl_include("<asm/crt/threads.h>", "<bits/crt/pthreadtypes.h>")]]
-[[impl_include("<asm/os/errno.h>")]]
-[[requires($has_function(pthread_cond_timedwait64))]]
+[[cp, decl_include("<bits/crt/threads.h>", "<bits/os/timespec.h>")]]
+[[preferred_time64_variant_of(cnd_timedwait), doc_alias("cnd_timedwait")]]
+[[impl_include("<asm/crt/threads.h>", "<bits/crt/pthreadtypes.h>", "<asm/os/errno.h>")]]
+[[requires_function(pthread_cond_timedwait64)]]
 int cnd_timedwait64([[nonnull]] cnd_t *__restrict cond,
                     [[nonnull]] mtx_t *__restrict mutex,
                     [[nonnull]] struct timespec64 const *__restrict time_point) {

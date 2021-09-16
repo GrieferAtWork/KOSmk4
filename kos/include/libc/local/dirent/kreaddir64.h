@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x31fb3c62 */
+/* HASH CRC-32:0xacbff815 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -22,15 +22,15 @@
 #define __local_kreaddir64_defined 1
 #include <__crt.h>
 #include <bits/os/dirent.h>
-#if defined(__CRT_HAVE_kreaddirf64) || (defined(__CRT_HAVE_kreaddirf) && defined(_DIRENT_MATCHES_DIRENT64))
+#if (defined(__CRT_HAVE_kreaddirf) && defined(__DIRENT32_MATCHES_DIRENT64)) || defined(__CRT_HAVE_kreaddirf64)
 #include <bits/types.h>
 __NAMESPACE_LOCAL_BEGIN
 #ifndef __local___localdep_kreaddirf64_defined
 #define __local___localdep_kreaddirf64_defined 1
-#ifdef __CRT_HAVE_kreaddirf64
-__CREDIRECT(__ATTR_WUNUSED,__SSIZE_TYPE__,__NOTHROW_RPC,__localdep_kreaddirf64,(__fd_t __fd, struct dirent64 *__buf, __SIZE_TYPE__ __bufsize, unsigned int __mode, __oflag_t __flags),kreaddirf64,(__fd,__buf,__bufsize,__mode,__flags))
-#elif defined(__CRT_HAVE_kreaddirf) && defined(_DIRENT_MATCHES_DIRENT64)
+#if defined(__CRT_HAVE_kreaddirf) && defined(__DIRENT32_MATCHES_DIRENT64)
 __CREDIRECT(__ATTR_WUNUSED,__SSIZE_TYPE__,__NOTHROW_RPC,__localdep_kreaddirf64,(__fd_t __fd, struct dirent64 *__buf, __SIZE_TYPE__ __bufsize, unsigned int __mode, __oflag_t __flags),kreaddirf,(__fd,__buf,__bufsize,__mode,__flags))
+#elif defined(__CRT_HAVE_kreaddirf64)
+__CREDIRECT(__ATTR_WUNUSED,__SSIZE_TYPE__,__NOTHROW_RPC,__localdep_kreaddirf64,(__fd_t __fd, struct dirent64 *__buf, __SIZE_TYPE__ __bufsize, unsigned int __mode, __oflag_t __flags),kreaddirf64,(__fd,__buf,__bufsize,__mode,__flags))
 #else /* ... */
 #undef __local___localdep_kreaddirf64_defined
 #endif /* !... */
@@ -44,7 +44,7 @@ __NAMESPACE_LOCAL_END
 #define __local___localdep_kreaddir64_defined 1
 #define __localdep_kreaddir64 __LIBC_LOCAL_NAME(kreaddir64)
 #endif /* !__local___localdep_kreaddir64_defined */
-#else /* __CRT_HAVE_kreaddirf64 || (__CRT_HAVE_kreaddirf && _DIRENT_MATCHES_DIRENT64) */
+#else /* (__CRT_HAVE_kreaddirf && __DIRENT32_MATCHES_DIRENT64) || __CRT_HAVE_kreaddirf64 */
 #undef __local_kreaddir64_defined
-#endif /* !__CRT_HAVE_kreaddirf64 && (!__CRT_HAVE_kreaddirf || !_DIRENT_MATCHES_DIRENT64) */
+#endif /* (!__CRT_HAVE_kreaddirf || !__DIRENT32_MATCHES_DIRENT64) && !__CRT_HAVE_kreaddirf64 */
 #endif /* !__local_kreaddir64_defined */

@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xdf0e435c */
+/* HASH CRC-32:0x95ecf15a */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -22,38 +22,32 @@
 #define __local_mkostemps64_defined 1
 #include <__crt.h>
 #include <features.h>
-#include <asm/os/fcntl.h>
 #include <asm/os/oflags.h>
-#if defined(__CRT_HAVE_mkostemps) || defined(__CRT_HAVE_mkostemps64) || defined(__CRT_HAVE_open64) || defined(__CRT_HAVE___open64) || defined(__CRT_HAVE_open) || defined(__CRT_HAVE__open) || defined(__CRT_HAVE___open) || (defined(__AT_FDCWD) && (defined(__CRT_HAVE_openat64) || defined(__CRT_HAVE_openat)))
+#include <asm/os/fcntl.h>
+#if defined(__CRT_HAVE_open64) || defined(__CRT_HAVE___open64) || defined(__CRT_HAVE_open) || defined(__CRT_HAVE__open) || defined(__CRT_HAVE___open) || (defined(__AT_FDCWD) && (defined(__CRT_HAVE_openat64) || defined(__CRT_HAVE_openat)))
 #include <bits/types.h>
 __NAMESPACE_LOCAL_BEGIN
-#ifndef __local___localdep_mkostemps_defined
-#define __local___localdep_mkostemps_defined 1
-#if defined(__CRT_HAVE_mkostemps64) && defined(__USE_FILE_OFFSET64)
-__CREDIRECT(__ATTR_WUNUSED __ATTR_NONNULL((1)),__fd_t,__NOTHROW_NCX,__localdep_mkostemps,(char *__template_, __STDC_INT_AS_SIZE_T __suffixlen, __oflag_t __flags),mkostemps64,(__template_,__suffixlen,__flags))
-#elif defined(__CRT_HAVE_mkostemps)
-__CREDIRECT(__ATTR_WUNUSED __ATTR_NONNULL((1)),__fd_t,__NOTHROW_NCX,__localdep_mkostemps,(char *__template_, __STDC_INT_AS_SIZE_T __suffixlen, __oflag_t __flags),mkostemps,(__template_,__suffixlen,__flags))
-#elif defined(__CRT_HAVE_mkostemps64)
-__CREDIRECT(__ATTR_WUNUSED __ATTR_NONNULL((1)),__fd_t,__NOTHROW_NCX,__localdep_mkostemps,(char *__template_, __STDC_INT_AS_SIZE_T __suffixlen, __oflag_t __flags),mkostemps64,(__template_,__suffixlen,__flags))
-#elif defined(__CRT_HAVE_open64) || defined(__CRT_HAVE___open64) || defined(__CRT_HAVE_open) || defined(__CRT_HAVE__open) || defined(__CRT_HAVE___open) || (defined(__AT_FDCWD) && (defined(__CRT_HAVE_openat64) || defined(__CRT_HAVE_openat)))
+#ifndef __local___localdep_system_mktemp_defined
+#define __local___localdep_system_mktemp_defined 1
 __NAMESPACE_LOCAL_END
-#include <libc/local/stdlib/mkostemps.h>
+#include <libc/local/stdlib/system_mktemp.h>
 __NAMESPACE_LOCAL_BEGIN
-#define __localdep_mkostemps __LIBC_LOCAL_NAME(mkostemps)
-#else /* ... */
-#undef __local___localdep_mkostemps_defined
-#endif /* !... */
-#endif /* !__local___localdep_mkostemps_defined */
+#define __localdep_system_mktemp __LIBC_LOCAL_NAME(system_mktemp)
+#endif /* !__local___localdep_system_mktemp_defined */
 __LOCAL_LIBC(mkostemps64) __ATTR_WUNUSED __ATTR_NONNULL((1)) __fd_t
 __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(mkostemps64))(char *__template_, __STDC_INT_AS_SIZE_T __suffixlen, __oflag_t __flags) {
-	return (__NAMESPACE_LOCAL_SYM __localdep_mkostemps)(__template_, __suffixlen, __flags | __O_LARGEFILE);
+#ifdef __O_LARGEFILE
+	return (__NAMESPACE_LOCAL_SYM __localdep_system_mktemp)(0, __template_, __suffixlen, __flags | __O_LARGEFILE);
+#else /* __O_LARGEFILE */
+	return (__NAMESPACE_LOCAL_SYM __localdep_system_mktemp)(0, __template_, __suffixlen, __flags);
+#endif /* !__O_LARGEFILE */
 }
 __NAMESPACE_LOCAL_END
 #ifndef __local___localdep_mkostemps64_defined
 #define __local___localdep_mkostemps64_defined 1
 #define __localdep_mkostemps64 __LIBC_LOCAL_NAME(mkostemps64)
 #endif /* !__local___localdep_mkostemps64_defined */
-#else /* __CRT_HAVE_mkostemps || __CRT_HAVE_mkostemps64 || __CRT_HAVE_open64 || __CRT_HAVE___open64 || __CRT_HAVE_open || __CRT_HAVE__open || __CRT_HAVE___open || (__AT_FDCWD && (__CRT_HAVE_openat64 || __CRT_HAVE_openat)) */
+#else /* __CRT_HAVE_open64 || __CRT_HAVE___open64 || __CRT_HAVE_open || __CRT_HAVE__open || __CRT_HAVE___open || (__AT_FDCWD && (__CRT_HAVE_openat64 || __CRT_HAVE_openat)) */
 #undef __local_mkostemps64_defined
-#endif /* !__CRT_HAVE_mkostemps && !__CRT_HAVE_mkostemps64 && !__CRT_HAVE_open64 && !__CRT_HAVE___open64 && !__CRT_HAVE_open && !__CRT_HAVE__open && !__CRT_HAVE___open && (!__AT_FDCWD || (!__CRT_HAVE_openat64 && !__CRT_HAVE_openat)) */
+#endif /* !__CRT_HAVE_open64 && !__CRT_HAVE___open64 && !__CRT_HAVE_open && !__CRT_HAVE__open && !__CRT_HAVE___open && (!__AT_FDCWD || (!__CRT_HAVE_openat64 && !__CRT_HAVE_openat)) */
 #endif /* !__local_mkostemps64_defined */

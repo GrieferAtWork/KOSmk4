@@ -687,9 +687,9 @@ NOTHROW_RPC(LIBCCALL libc_mknodat)(fd_t dirfd,
 
 
 
-/*[[[head:libc_utimensat,hash:CRC-32=0x954ac02d]]]*/
+/*[[[head:libc_utimensat,hash:CRC-32=0x2d0e96da]]]*/
 /* >> utimensat(2), utimensat64(2)
- * @param flags: Set of `0|AT_SYMLINK_NOFOLLOW|AT_CHANGE_CTIME|AT_DOSPATH' */
+ * @param flags: Set of `0 | AT_SYMLINK_NOFOLLOW | AT_CHANGE_CTIME | AT_DOSPATH' */
 INTERN ATTR_SECTION(".text.crt.fs.modify_time") NONNULL((2)) int
 NOTHROW_RPC(LIBCCALL libc_utimensat)(fd_t dirfd,
                                      char const *filename,
@@ -706,10 +706,12 @@ NOTHROW_RPC(LIBCCALL libc_utimensat)(fd_t dirfd,
 }
 /*[[[end:libc_utimensat]]]*/
 
-/*[[[head:libc_utimensat64,hash:CRC-32=0xcd992e3]]]*/
+/*[[[head:libc_utimensat64,hash:CRC-32=0x3b985c10]]]*/
 #if __SIZEOF_TIME32_T__ == __SIZEOF_TIME64_T__
 DEFINE_INTERN_ALIAS(libc_utimensat64, libc_utimensat);
 #else /* MAGIC:alias */
+/* >> utimensat(2), utimensat64(2)
+ * @param flags: Set of `0 | AT_SYMLINK_NOFOLLOW | AT_CHANGE_CTIME | AT_DOSPATH' */
 INTERN ATTR_SECTION(".text.crt.fs.modify_time") NONNULL((2)) int
 NOTHROW_RPC(LIBCCALL libc_utimensat64)(fd_t dirfd,
                                        char const *filename,
@@ -752,10 +754,11 @@ NOTHROW_RPC(LIBCCALL libc_futimens)(fd_t fd,
 }
 /*[[[end:libc_futimens]]]*/
 
-/*[[[head:libc_futimens64,hash:CRC-32=0x727ddb86]]]*/
+/*[[[head:libc_futimens64,hash:CRC-32=0x80bd0f8a]]]*/
 #if __SIZEOF_TIME32_T__ == __SIZEOF_TIME64_T__
 DEFINE_INTERN_ALIAS(libc_futimens64, libc_futimens);
 #else /* MAGIC:alias */
+/* >> futimens(2), futimens64(2) */
 INTERN ATTR_SECTION(".text.crt.fs.modify_time") int
 NOTHROW_RPC(LIBCCALL libc_futimens64)(fd_t fd,
                                       struct timespec64 const times[2 /*or:3*/])

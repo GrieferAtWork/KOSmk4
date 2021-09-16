@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x126604b3 */
+/* HASH CRC-32:0xfbc1bb75 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -388,43 +388,43 @@ typedef int __priority_which_t;
 #endif /* !__USE_GNU || !__COMPILER_PREFERR_ENUMS */
 
 #ifdef __USE_GNU
-#if defined(__CRT_HAVE_prlimit64) && defined(__USE_FILE_OFFSET64)
-__CREDIRECT(,int,__NOTHROW_NCX,prlimit,(__pid_t __pid, __rlimit_resource_t __resource, struct rlimit const *__new_limit, struct rlimit *__old_limit),prlimit64,(__pid,__resource,__new_limit,__old_limit))
-#elif defined(__CRT_HAVE_prlimit) && !defined(__USE_FILE_OFFSET64)
+#if defined(__CRT_HAVE_prlimit) && (!defined(__USE_FILE_OFFSET64) || __SIZEOF_RLIM32_T__ == __SIZEOF_RLIM64_T__)
 __CDECLARE(,int,__NOTHROW_NCX,prlimit,(__pid_t __pid, __rlimit_resource_t __resource, struct rlimit const *__new_limit, struct rlimit *__old_limit),(__pid,__resource,__new_limit,__old_limit))
+#elif defined(__CRT_HAVE_prlimit64) && (defined(__USE_FILE_OFFSET64) || __SIZEOF_RLIM32_T__ == __SIZEOF_RLIM64_T__)
+__CREDIRECT(,int,__NOTHROW_NCX,prlimit,(__pid_t __pid, __rlimit_resource_t __resource, struct rlimit const *__new_limit, struct rlimit *__old_limit),prlimit64,(__pid,__resource,__new_limit,__old_limit))
 #endif /* ... */
 #ifdef __USE_LARGEFILE64
-#ifdef __CRT_HAVE_prlimit64
-__CDECLARE(,int,__NOTHROW_NCX,prlimit64,(__pid_t __pid, __rlimit_resource_t __resource, struct rlimit64 const *__new_limit, struct rlimit64 *__old_limit),(__pid,__resource,__new_limit,__old_limit))
-#elif defined(__CRT_HAVE_prlimit) && __SIZEOF_RLIM32_T__ == __SIZEOF_RLIM64_T__
+#if defined(__CRT_HAVE_prlimit) && __SIZEOF_RLIM32_T__ == __SIZEOF_RLIM64_T__
 __CREDIRECT(,int,__NOTHROW_NCX,prlimit64,(__pid_t __pid, __rlimit_resource_t __resource, struct rlimit64 const *__new_limit, struct rlimit64 *__old_limit),prlimit,(__pid,__resource,__new_limit,__old_limit))
+#elif defined(__CRT_HAVE_prlimit64)
+__CDECLARE(,int,__NOTHROW_NCX,prlimit64,(__pid_t __pid, __rlimit_resource_t __resource, struct rlimit64 const *__new_limit, struct rlimit64 *__old_limit),(__pid,__resource,__new_limit,__old_limit))
 #endif /* ... */
 #endif /* __USE_LARGEFILE64 */
 #endif /* __USE_GNU */
-#if defined(__CRT_HAVE_getrlimit64) && defined(__USE_FILE_OFFSET64)
-__CREDIRECT(__ATTR_NONNULL((2)),int,__NOTHROW_NCX,getrlimit,(__rlimit_resource_t __resource, struct rlimit *__rlimits),getrlimit64,(__resource,__rlimits))
-#elif defined(__CRT_HAVE_getrlimit) && !defined(__USE_FILE_OFFSET64)
+#if defined(__CRT_HAVE_getrlimit) && (!defined(__USE_FILE_OFFSET64) || __SIZEOF_RLIM32_T__ == __SIZEOF_RLIM64_T__)
 __CDECLARE(__ATTR_NONNULL((2)),int,__NOTHROW_NCX,getrlimit,(__rlimit_resource_t __resource, struct rlimit *__rlimits),(__resource,__rlimits))
-#elif defined(__CRT_HAVE___getrlimit) && !defined(__USE_FILE_OFFSET64)
+#elif defined(__CRT_HAVE___getrlimit) && (!defined(__USE_FILE_OFFSET64) || __SIZEOF_RLIM32_T__ == __SIZEOF_RLIM64_T__)
 __CREDIRECT(__ATTR_NONNULL((2)),int,__NOTHROW_NCX,getrlimit,(__rlimit_resource_t __resource, struct rlimit *__rlimits),__getrlimit,(__resource,__rlimits))
+#elif defined(__CRT_HAVE_getrlimit64) && (defined(__USE_FILE_OFFSET64) || __SIZEOF_RLIM32_T__ == __SIZEOF_RLIM64_T__)
+__CREDIRECT(__ATTR_NONNULL((2)),int,__NOTHROW_NCX,getrlimit,(__rlimit_resource_t __resource, struct rlimit *__rlimits),getrlimit64,(__resource,__rlimits))
 #endif /* ... */
-#if defined(__CRT_HAVE_setrlimit64) && defined(__USE_FILE_OFFSET64)
-__CREDIRECT(__ATTR_NONNULL((2)),int,__NOTHROW_NCX,setrlimit,(__rlimit_resource_t __resource, struct rlimit const *__rlimits),setrlimit64,(__resource,__rlimits))
-#elif defined(__CRT_HAVE_setrlimit) && !defined(__USE_FILE_OFFSET64)
+#if defined(__CRT_HAVE_setrlimit) && (!defined(__USE_FILE_OFFSET64) || __SIZEOF_RLIM32_T__ == __SIZEOF_RLIM64_T__)
 __CDECLARE(__ATTR_NONNULL((2)),int,__NOTHROW_NCX,setrlimit,(__rlimit_resource_t __resource, struct rlimit const *__rlimits),(__resource,__rlimits))
+#elif defined(__CRT_HAVE_setrlimit64) && (defined(__USE_FILE_OFFSET64) || __SIZEOF_RLIM32_T__ == __SIZEOF_RLIM64_T__)
+__CREDIRECT(__ATTR_NONNULL((2)),int,__NOTHROW_NCX,setrlimit,(__rlimit_resource_t __resource, struct rlimit const *__rlimits),setrlimit64,(__resource,__rlimits))
 #endif /* ... */
-#if defined(__CRT_HAVE_getrusage64) && defined(__USE_FILE_OFFSET64)
-__CREDIRECT(__ATTR_NONNULL((2)),int,__NOTHROW_NCX,getrusage,(__rusage_who_t __who, struct rusage *__usage),getrusage64,(__who,__usage))
-#elif defined(__CRT_HAVE_getrusage) && !defined(__USE_FILE_OFFSET64)
+#if defined(__CRT_HAVE_getrusage) && (!defined(__USE_TIME_BITS64) || __SIZEOF_TIME32_T__ == __SIZEOF_TIME64_T__)
 __CDECLARE(__ATTR_NONNULL((2)),int,__NOTHROW_NCX,getrusage,(__rusage_who_t __who, struct rusage *__usage),(__who,__usage))
+#elif defined(__CRT_HAVE_getrusage64) && (defined(__USE_TIME_BITS64) || __SIZEOF_TIME32_T__ == __SIZEOF_TIME64_T__)
+__CREDIRECT(__ATTR_NONNULL((2)),int,__NOTHROW_NCX,getrusage,(__rusage_who_t __who, struct rusage *__usage),getrusage64,(__who,__usage))
 #endif /* ... */
-#ifdef __USE_TIME_BITS64
-#ifdef __CRT_HAVE_getrusage64
-__CDECLARE(__ATTR_NONNULL((2)),int,__NOTHROW_NCX,getrusage64,(__rusage_who_t __who, struct rusage64 *__usage),(__who,__usage))
-#elif defined(__CRT_HAVE_getrusage) && __SIZEOF_TIME32_T__ == __SIZEOF_TIME64_T__
+#ifdef __USE_TIME64
+#if defined(__CRT_HAVE_getrusage) && __SIZEOF_TIME32_T__ == __SIZEOF_TIME64_T__
 __CREDIRECT(__ATTR_NONNULL((2)),int,__NOTHROW_NCX,getrusage64,(__rusage_who_t __who, struct rusage64 *__usage),getrusage,(__who,__usage))
+#elif defined(__CRT_HAVE_getrusage64)
+__CDECLARE(__ATTR_NONNULL((2)),int,__NOTHROW_NCX,getrusage64,(__rusage_who_t __who, struct rusage64 *__usage),(__who,__usage))
 #endif /* ... */
-#endif /* __USE_TIME_BITS64 */
+#endif /* __USE_TIME64 */
 /* >> getpriority(2), setpriority(2)
  * @param: which: One of `PRIO_PROCESS', `PRIO_PGRP' or `PRIO_USER'
  * @param: who:   An ID in the namespace indicated by `which' */
@@ -435,15 +435,15 @@ __CDECLARE_OPT(,int,__NOTHROW_NCX,getpriority,(__priority_which_t __which, id_t 
 __CDECLARE_OPT(,int,__NOTHROW_NCX,setpriority,(__priority_which_t __which, id_t __who, int __prio),(__which,__who,__prio))
 
 #ifdef __USE_LARGEFILE64
-#ifdef __CRT_HAVE_getrlimit64
-__CDECLARE(__ATTR_NONNULL((2)),int,__NOTHROW_NCX,getrlimit64,(__rlimit_resource_t __resource, struct rlimit64 *__rlimits),(__resource,__rlimits))
-#elif defined(__CRT_HAVE_getrlimit) && __SIZEOF_OFF32_T__ == __SIZEOF_OFF64_T__
+#if defined(__CRT_HAVE_getrlimit) && __SIZEOF_RLIM32_T__ == __SIZEOF_RLIM64_T__
 __CREDIRECT(__ATTR_NONNULL((2)),int,__NOTHROW_NCX,getrlimit64,(__rlimit_resource_t __resource, struct rlimit64 *__rlimits),getrlimit,(__resource,__rlimits))
+#elif defined(__CRT_HAVE_getrlimit64)
+__CDECLARE(__ATTR_NONNULL((2)),int,__NOTHROW_NCX,getrlimit64,(__rlimit_resource_t __resource, struct rlimit64 *__rlimits),(__resource,__rlimits))
 #endif /* ... */
-#ifdef __CRT_HAVE_setrlimit64
-__CDECLARE(__ATTR_NONNULL((2)),int,__NOTHROW_NCX,setrlimit64,(__rlimit_resource_t __resource, struct rlimit64 const *__rlimits),(__resource,__rlimits))
-#elif defined(__CRT_HAVE_setrlimit) && __SIZEOF_OFF32_T__ == __SIZEOF_OFF64_T__
+#if defined(__CRT_HAVE_setrlimit) && __SIZEOF_RLIM32_T__ == __SIZEOF_RLIM64_T__
 __CREDIRECT(__ATTR_NONNULL((2)),int,__NOTHROW_NCX,setrlimit64,(__rlimit_resource_t __resource, struct rlimit64 const *__rlimits),setrlimit,(__resource,__rlimits))
+#elif defined(__CRT_HAVE_setrlimit64)
+__CDECLARE(__ATTR_NONNULL((2)),int,__NOTHROW_NCX,setrlimit64,(__rlimit_resource_t __resource, struct rlimit64 const *__rlimits),(__resource,__rlimits))
 #endif /* ... */
 #endif /* __USE_LARGEFILE64 */
 

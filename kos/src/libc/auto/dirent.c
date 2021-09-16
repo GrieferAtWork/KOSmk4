@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x11e3d910 */
+/* HASH CRC-32:0x60c0e51a */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -39,9 +39,9 @@ NOTHROW_NCX(LIBCCALL libc_alphasort)(struct dirent const **e1,
 	return libc_strcoll((*e1)->d_name, (*e2)->d_name);
 }
 #include <bits/os/dirent.h>
-#ifdef _DIRENT_MATCHES_DIRENT64
+#ifdef __DIRENT32_MATCHES_DIRENT64
 DEFINE_INTERN_ALIAS(libc_alphasort64, libc_alphasort);
-#else /* _DIRENT_MATCHES_DIRENT64 */
+#else /* __DIRENT32_MATCHES_DIRENT64 */
 /* >> alphasort(3), alphasort64(3)
  * Sort the 2 given directory entries `e1' and `e2' the same way `strcmp(3)' would */
 INTERN ATTR_SECTION(".text.crt.fs.dir") ATTR_PURE NONNULL((1, 2)) int
@@ -49,7 +49,7 @@ NOTHROW_NCX(LIBCCALL libc_alphasort64)(struct dirent64 const **e1,
                                        struct dirent64 const **e2) {
 	return libc_strcoll((*e1)->d_name, (*e2)->d_name);
 }
-#endif /* !_DIRENT_MATCHES_DIRENT64 */
+#endif /* !__DIRENT32_MATCHES_DIRENT64 */
 #include <bits/os/dirent.h>
 /* >> versionsort(3), versionsort64(3)
  * Sort the 2 given directory entries `e1' and `e2' the same way `strvercmp(3)' would. */
@@ -59,9 +59,9 @@ NOTHROW_NCX(LIBCCALL libc_versionsort)(struct dirent const **e1,
 	return libc_strverscmp((*e1)->d_name, (*e2)->d_name);
 }
 #include <bits/os/dirent.h>
-#ifdef _DIRENT_MATCHES_DIRENT64
+#ifdef __DIRENT32_MATCHES_DIRENT64
 DEFINE_INTERN_ALIAS(libc_versionsort64, libc_versionsort);
-#else /* _DIRENT_MATCHES_DIRENT64 */
+#else /* __DIRENT32_MATCHES_DIRENT64 */
 /* >> versionsort(3), versionsort64(3)
  * Sort the 2 given directory entries `e1' and `e2' the same way `strvercmp(3)' would. */
 INTERN ATTR_SECTION(".text.crt.fs.dir") ATTR_PURE NONNULL((1, 2)) int
@@ -69,7 +69,7 @@ NOTHROW_NCX(LIBCCALL libc_versionsort64)(struct dirent64 const **e1,
                                          struct dirent64 const **e2) {
 	return libc_strverscmp((*e1)->d_name, (*e2)->d_name);
 }
-#endif /* !_DIRENT_MATCHES_DIRENT64 */
+#endif /* !__DIRENT32_MATCHES_DIRENT64 */
 #endif /* !__KERNEL__ */
 
 DECL_END

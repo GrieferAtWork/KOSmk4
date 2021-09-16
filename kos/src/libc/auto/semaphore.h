@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x72aab78f */
+/* HASH CRC-32:0x923b5092 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -88,7 +88,7 @@ INTDEF NONNULL((1)) int NOTHROW_RPC_KOS(LIBDCALL libd_sem_unlink)(const char *na
  * @return: 0:  Success
  * @return: -1: [errno=EINTR] Interrupted. */
 INTDEF NONNULL((1)) int NOTHROW_RPC(LIBDCALL libd_sem_wait)(sem_t *sem);
-/* >> sem_timedwait(3)
+/* >> sem_timedwait(3), sem_timedwait64(3)
  * Wait for a  ticket to  become available  to the  given semaphore  `sem'
  * Once a ticket has become available, consume it and return. If no ticket
  * becomes  available until `abstime' has passed, return `errno=ETIMEDOUT'
@@ -96,7 +96,7 @@ INTDEF NONNULL((1)) int NOTHROW_RPC(LIBDCALL libd_sem_wait)(sem_t *sem);
  * @return: -1: [errno=EINTR]     Interrupted.
  * @return: -1: [errno=ETIMEDOUT] The given `abstime' expired before a ticket became available. */
 INTDEF NONNULL((1, 2)) int NOTHROW_RPC(LIBDCALL libd_sem_timedwait)(sem_t *__restrict sem, struct timespec const *__restrict abstime);
-/* >> sem_timedwait(3)
+/* >> sem_timedwait(3), sem_timedwait64(3)
  * Wait for a  ticket to  become available  to the  given semaphore  `sem'
  * Once a ticket has become available, consume it and return. If no ticket
  * becomes  available until `abstime' has passed, return `errno=ETIMEDOUT'

@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x2a0400b4 */
+/* HASH CRC-32:0x500a4adc */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -565,7 +565,7 @@ INTDEF NONNULL((1, 2)) int NOTHROW_NCX(LIBDCALL libd_setstate_r)(char *__restric
  * descriptor of that file.
  * @param: suffixlen: The #  of trailing  characters to-be  ignored
  *                    after the required 6 trailing 'X'-characters. */
-INTDEF WUNUSED NONNULL((1)) fd_t NOTHROW_NCX(LIBDCALL libd_mkstemps)(char *template_, __STDC_INT_AS_SIZE_T suffixlen);
+INTDEF WUNUSED NONNULL((1)) fd_t NOTHROW_RPC(LIBDCALL libd_mkstemps)(char *template_, __STDC_INT_AS_SIZE_T suffixlen);
 #endif /* !__LIBCCALL_IS_LIBDCALL && !__KERNEL__ */
 #ifndef __KERNEL__
 /* >> mkstemps(3), mkstemps64(3)
@@ -577,7 +577,7 @@ INTDEF WUNUSED NONNULL((1)) fd_t NOTHROW_NCX(LIBDCALL libd_mkstemps)(char *templ
  * descriptor of that file.
  * @param: suffixlen: The #  of trailing  characters to-be  ignored
  *                    after the required 6 trailing 'X'-characters. */
-INTDEF WUNUSED NONNULL((1)) fd_t NOTHROW_NCX(LIBCCALL libc_mkstemps)(char *template_, __STDC_INT_AS_SIZE_T suffixlen);
+INTDEF WUNUSED NONNULL((1)) fd_t NOTHROW_RPC(LIBCCALL libc_mkstemps)(char *template_, __STDC_INT_AS_SIZE_T suffixlen);
 #endif /* !__KERNEL__ */
 #if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
 INTDEF ATTR_PURE WUNUSED NONNULL((1)) int NOTHROW_NCX(LIBDCALL libd_rpmatch)(char const *response);
@@ -587,6 +587,30 @@ INTDEF ATTR_PURE WUNUSED NONNULL((1)) int NOTHROW_NCX(LIBCCALL libc_rpmatch)(cha
 #endif /* !__KERNEL__ */
 #if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
 INTDEF int NOTHROW_RPC(LIBDCALL libd_getloadavg)(double loadavg[], __STDC_INT_AS_SIZE_T nelem);
+/* >> mkstemps(3), mkstemps64(3)
+ * Replace the last 6 characters of `template_' (which are followed by exactly
+ * `suffixlen' more characters that are left alone), which must be filled with
+ * all  'X'-characters before the  call (else errno=EINVAL  + return -1), with
+ * random  characters such that the filename described by `template_' will not
+ * already  exists. Then, create a new file  with `O_RDWR' and return the file
+ * descriptor of that file.
+ * @param: suffixlen: The #  of trailing  characters to-be  ignored
+ *                    after the required 6 trailing 'X'-characters. */
+INTDEF WUNUSED NONNULL((1)) fd_t NOTHROW_RPC(LIBDCALL libd_mkstemps64)(char *template_, __STDC_INT_AS_SIZE_T suffixlen);
+#endif /* !__LIBCCALL_IS_LIBDCALL && !__KERNEL__ */
+#ifndef __KERNEL__
+/* >> mkstemps(3), mkstemps64(3)
+ * Replace the last 6 characters of `template_' (which are followed by exactly
+ * `suffixlen' more characters that are left alone), which must be filled with
+ * all  'X'-characters before the  call (else errno=EINVAL  + return -1), with
+ * random  characters such that the filename described by `template_' will not
+ * already  exists. Then, create a new file  with `O_RDWR' and return the file
+ * descriptor of that file.
+ * @param: suffixlen: The #  of trailing  characters to-be  ignored
+ *                    after the required 6 trailing 'X'-characters. */
+INTDEF WUNUSED NONNULL((1)) fd_t NOTHROW_RPC(LIBCCALL libc_mkstemps64)(char *template_, __STDC_INT_AS_SIZE_T suffixlen);
+#endif /* !__KERNEL__ */
+#if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
 INTDEF NONNULL((1, 2)) int NOTHROW_NCX(LIBDCALL libd_setenv)(char const *varname, char const *val, int replace);
 INTDEF NONNULL((1)) int NOTHROW_NCX(LIBDCALL libd_unsetenv)(char const *varname);
 INTDEF NONNULL((1)) double NOTHROW_NCX(LIBDCALL libd_erand48)(unsigned short xsubi[3]);
@@ -715,6 +739,24 @@ INTDEF WUNUSED NONNULL((1)) fd_t NOTHROW_RPC(LIBDCALL libd_mkstemp)(char *templa
  * will not already exists. Then, create a new file with `O_RDWR' and return
  * the file descriptor of that file. */
 INTDEF WUNUSED NONNULL((1)) fd_t NOTHROW_RPC(LIBCCALL libc_mkstemp)(char *template_);
+#endif /* !__KERNEL__ */
+#if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
+/* >> mkstemp(3), mkstemp64(3)
+ * Replace the last 6 characters of  `template_', which must be filled  with
+ * all  'X'-characters  before the  call  (else errno=EINVAL  +  return -1),
+ * with random characters  such that the  filename described by  `template_'
+ * will not already exists. Then, create a new file with `O_RDWR' and return
+ * the file descriptor of that file. */
+INTDEF WUNUSED NONNULL((1)) fd_t NOTHROW_RPC(LIBDCALL libd_mkstemp64)(char *template_);
+#endif /* !__LIBCCALL_IS_LIBDCALL && !__KERNEL__ */
+#ifndef __KERNEL__
+/* >> mkstemp(3), mkstemp64(3)
+ * Replace the last 6 characters of  `template_', which must be filled  with
+ * all  'X'-characters  before the  call  (else errno=EINVAL  +  return -1),
+ * with random characters  such that the  filename described by  `template_'
+ * will not already exists. Then, create a new file with `O_RDWR' and return
+ * the file descriptor of that file. */
+INTDEF WUNUSED NONNULL((1)) fd_t NOTHROW_RPC(LIBCCALL libc_mkstemp64)(char *template_);
 #endif /* !__KERNEL__ */
 #if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
 /* >> mkdtemp(3)
@@ -996,6 +1038,36 @@ INTDEF WUNUSED NONNULL((1)) fd_t NOTHROW_NCX(LIBDCALL libd_mkostemps)(char *temp
 #endif /* !__LIBCCALL_IS_LIBDCALL && !__KERNEL__ */
 #ifndef __KERNEL__
 INTDEF WUNUSED NONNULL((1)) fd_t NOTHROW_NCX(LIBCCALL libc_mkostemps)(char *template_, __STDC_INT_AS_SIZE_T suffixlen, oflag_t flags);
+#endif /* !__KERNEL__ */
+#if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
+/* >> mkostemp(3), mkostemp64(3)
+ * Replace  the  last 6  characters of  `template_' (which  are followed  by exactly
+ * `suffixlen'  more  characters that  are left  alone), which  must be  filled with
+ * all  'X'-characters  before  the  call  (else  errno=EINVAL  +  return  -1), with
+ * random  characters  such  that the  filename  described by  `template_'  will not
+ * already exists. Then, create a new file with `O_RDWR | flags' and return the file
+ * descriptor of that file.
+ * @param: flags: Additional  flags  to pass  to `open(2)',
+ *                but `O_ACCMODE' is always set to `O_RDWR' */
+INTDEF WUNUSED NONNULL((1)) fd_t NOTHROW_NCX(LIBDCALL libd_mkostemp64)(char *template_, oflag_t flags);
+#endif /* !__LIBCCALL_IS_LIBDCALL && !__KERNEL__ */
+#ifndef __KERNEL__
+/* >> mkostemp(3), mkostemp64(3)
+ * Replace  the  last 6  characters of  `template_' (which  are followed  by exactly
+ * `suffixlen'  more  characters that  are left  alone), which  must be  filled with
+ * all  'X'-characters  before  the  call  (else  errno=EINVAL  +  return  -1), with
+ * random  characters  such  that the  filename  described by  `template_'  will not
+ * already exists. Then, create a new file with `O_RDWR | flags' and return the file
+ * descriptor of that file.
+ * @param: flags: Additional  flags  to pass  to `open(2)',
+ *                but `O_ACCMODE' is always set to `O_RDWR' */
+INTDEF WUNUSED NONNULL((1)) fd_t NOTHROW_NCX(LIBCCALL libc_mkostemp64)(char *template_, oflag_t flags);
+#endif /* !__KERNEL__ */
+#if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
+INTDEF WUNUSED NONNULL((1)) fd_t NOTHROW_NCX(LIBDCALL libd_mkostemps64)(char *template_, __STDC_INT_AS_SIZE_T suffixlen, oflag_t flags);
+#endif /* !__LIBCCALL_IS_LIBDCALL && !__KERNEL__ */
+#ifndef __KERNEL__
+INTDEF WUNUSED NONNULL((1)) fd_t NOTHROW_NCX(LIBCCALL libc_mkostemps64)(char *template_, __STDC_INT_AS_SIZE_T suffixlen, oflag_t flags);
 #endif /* !__KERNEL__ */
 #if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
 /* >> devname(3), devname_r(3) */

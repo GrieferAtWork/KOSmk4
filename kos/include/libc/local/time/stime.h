@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xc1b9e885 */
+/* HASH CRC-32:0x2cd4b260 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -30,10 +30,10 @@ __CREDIRECT(__ATTR_NONNULL((1)),int,__NOTHROW_NCX,__localdep_stime32,(__time32_t
 #endif /* !__local___localdep_stime32_defined && __CRT_HAVE_stime */
 #ifndef __local___localdep_stime64_defined
 #define __local___localdep_stime64_defined 1
-#ifdef __CRT_HAVE_stime64
-__CREDIRECT(__ATTR_NONNULL((1)),int,__NOTHROW_NCX,__localdep_stime64,(__time64_t const *__when),stime64,(__when))
-#elif defined(__CRT_HAVE_stime) && __SIZEOF_TIME32_T__ == __SIZEOF_TIME64_T__
+#if defined(__CRT_HAVE_stime) && __SIZEOF_TIME32_T__ == __SIZEOF_TIME64_T__
 __CREDIRECT(__ATTR_NONNULL((1)),int,__NOTHROW_NCX,__localdep_stime64,(__time64_t const *__when),stime,(__when))
+#elif defined(__CRT_HAVE_stime64)
+__CREDIRECT(__ATTR_NONNULL((1)),int,__NOTHROW_NCX,__localdep_stime64,(__time64_t const *__when),stime64,(__when))
 #elif defined(__CRT_HAVE_stime)
 __NAMESPACE_LOCAL_END
 #include <libc/local/time/stime64.h>

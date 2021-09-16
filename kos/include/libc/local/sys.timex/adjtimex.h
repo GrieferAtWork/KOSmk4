@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x3cedf128 */
+/* HASH CRC-32:0xa7b67a72 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -37,12 +37,14 @@ __CREDIRECT(__ATTR_NONNULL((1)),int,__NOTHROW_NCX,__localdep_adjtimex32,(struct 
 #endif /* !__local___localdep_adjtimex32_defined */
 #ifndef __local___localdep_adjtimex64_defined
 #define __local___localdep_adjtimex64_defined 1
-#ifdef __CRT_HAVE_adjtimex64
+#if defined(__CRT_HAVE_adjtimex) && __SIZEOF_TIME32_T__ == __SIZEOF_TIME64_T__
+__CREDIRECT(__ATTR_NONNULL((1)),int,__NOTHROW_NCX,__localdep_adjtimex64,(struct __timex64 *__restrict __ntx),adjtimex,(__ntx))
+#elif defined(__CRT_HAVE___adjtimex) && __SIZEOF_TIME32_T__ == __SIZEOF_TIME64_T__
+__CREDIRECT(__ATTR_NONNULL((1)),int,__NOTHROW_NCX,__localdep_adjtimex64,(struct __timex64 *__restrict __ntx),__adjtimex,(__ntx))
+#elif defined(__CRT_HAVE_adjtimex64)
 __CREDIRECT(__ATTR_NONNULL((1)),int,__NOTHROW_NCX,__localdep_adjtimex64,(struct __timex64 *__restrict __ntx),adjtimex64,(__ntx))
 #elif defined(__CRT_HAVE___adjtimex64)
 __CREDIRECT(__ATTR_NONNULL((1)),int,__NOTHROW_NCX,__localdep_adjtimex64,(struct __timex64 *__restrict __ntx),__adjtimex64,(__ntx))
-#elif defined(__CRT_HAVE_adjtimex) && __SIZEOF_TIME32_T__ == __SIZEOF_TIME64_T__
-__CREDIRECT(__ATTR_NONNULL((1)),int,__NOTHROW_NCX,__localdep_adjtimex64,(struct __timex64 *__restrict __ntx),adjtimex,(__ntx))
 #elif defined(__CRT_HAVE_adjtimex) || defined(__CRT_HAVE___adjtimex)
 __NAMESPACE_LOCAL_END
 #include <libc/local/sys.timex/adjtimex64.h>

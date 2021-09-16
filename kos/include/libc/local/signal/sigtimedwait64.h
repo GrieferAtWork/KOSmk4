@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xb5c87d15 */
+/* HASH CRC-32:0xe202b8b */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -23,6 +23,7 @@
 #include <__crt.h>
 #ifdef __CRT_HAVE_sigtimedwait
 #include <bits/os/siginfo.h>
+#include <bits/os/timespec.h>
 __NAMESPACE_LOCAL_BEGIN
 #ifndef __local___localdep_sigtimedwait32_defined
 #define __local___localdep_sigtimedwait32_defined 1

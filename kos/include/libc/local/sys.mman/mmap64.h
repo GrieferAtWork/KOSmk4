@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xeee8b804 */
+/* HASH CRC-32:0xfb5c7734 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -23,14 +23,23 @@
 #include <__crt.h>
 #ifdef __CRT_HAVE_mmap
 #include <features.h>
+#ifndef __PIO_OFFSET
+#ifdef __USE_KOS_ALTERATIONS
+#define __PIO_OFFSET   __FS_TYPE(pos)
+#define __PIO_OFFSET64 __pos64_t
+#else /* __USE_KOS_ALTERATIONS */
+#define __PIO_OFFSET   __FS_TYPE(off)
+#define __PIO_OFFSET64 __off64_t
+#endif /* !__USE_KOS_ALTERATIONS */
+#endif /* !__PIO_OFFSET */
 __NAMESPACE_LOCAL_BEGIN
 #ifndef __local___localdep_mmap32_defined
 #define __local___localdep_mmap32_defined 1
 __CREDIRECT(,void *,__NOTHROW_NCX,__localdep_mmap32,(void *__addr, __SIZE_TYPE__ __len, __STDC_INT_AS_UINT_T __prot, __STDC_INT_AS_UINT_T __flags, __fd_t __fd, __off32_t __offset),mmap,(__addr,__len,__prot,__flags,__fd,__offset))
 #endif /* !__local___localdep_mmap32_defined */
 __LOCAL_LIBC(mmap64) __ATTR_WUNUSED void *
-__NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(mmap64))(void *__addr, __SIZE_TYPE__ __len, __STDC_INT_AS_UINT_T __prot, __STDC_INT_AS_UINT_T __flags, __fd_t __fd, __off64_t __offset) {
-	return (__NAMESPACE_LOCAL_SYM __localdep_mmap32)(__addr, __len, __prot, __flags, __fd, (__off32_t)__offset);
+__NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(mmap64))(void *__addr, __SIZE_TYPE__ __len, __STDC_INT_AS_UINT_T __prot, __STDC_INT_AS_UINT_T __flags, __fd_t __fd, __PIO_OFFSET64 __offset) {
+	return (__NAMESPACE_LOCAL_SYM __localdep_mmap32)(__addr, __len, __prot, __flags, __fd, (__off32_t)(__pos32_t)(__pos64_t)__offset);
 }
 __NAMESPACE_LOCAL_END
 #ifndef __local___localdep_mmap64_defined

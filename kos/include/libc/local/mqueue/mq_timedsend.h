@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x4cda7a */
+/* HASH CRC-32:0xce95f417 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -32,10 +32,10 @@ __CREDIRECT(__ATTR_NONNULL((2, 5)),int,__NOTHROW_RPC,__localdep_mq_timedsend32,(
 #endif /* !__local___localdep_mq_timedsend32_defined && __CRT_HAVE_mq_timedsend */
 #ifndef __local___localdep_mq_timedsend64_defined
 #define __local___localdep_mq_timedsend64_defined 1
-#ifdef __CRT_HAVE_mq_timedsend64
-__CREDIRECT(__ATTR_NONNULL((2, 5)),int,__NOTHROW_RPC,__localdep_mq_timedsend64,(__mqd_t __mqdes, char const *__msg_ptr, __SIZE_TYPE__ __msg_len, unsigned int __msg_prio, struct __timespec64 const *__abs_timeout),mq_timedsend64,(__mqdes,__msg_ptr,__msg_len,__msg_prio,__abs_timeout))
-#elif defined(__CRT_HAVE_mq_timedsend) && __SIZEOF_TIME32_T__ == __SIZEOF_TIME64_T__
+#if defined(__CRT_HAVE_mq_timedsend) && __SIZEOF_TIME32_T__ == __SIZEOF_TIME64_T__
 __CREDIRECT(__ATTR_NONNULL((2, 5)),int,__NOTHROW_RPC,__localdep_mq_timedsend64,(__mqd_t __mqdes, char const *__msg_ptr, __SIZE_TYPE__ __msg_len, unsigned int __msg_prio, struct __timespec64 const *__abs_timeout),mq_timedsend,(__mqdes,__msg_ptr,__msg_len,__msg_prio,__abs_timeout))
+#elif defined(__CRT_HAVE_mq_timedsend64)
+__CREDIRECT(__ATTR_NONNULL((2, 5)),int,__NOTHROW_RPC,__localdep_mq_timedsend64,(__mqd_t __mqdes, char const *__msg_ptr, __SIZE_TYPE__ __msg_len, unsigned int __msg_prio, struct __timespec64 const *__abs_timeout),mq_timedsend64,(__mqdes,__msg_ptr,__msg_len,__msg_prio,__abs_timeout))
 #elif defined(__CRT_HAVE_mq_timedsend)
 __NAMESPACE_LOCAL_END
 #include <libc/local/mqueue/mq_timedsend64.h>

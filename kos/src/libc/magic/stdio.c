@@ -1107,27 +1107,29 @@ void perror([[nullable]] char const *message) {
 
 @@>> tmpfile(3), tmpfile64(3)
 @@Create and return a new file-stream for accessing a temporary file for reading/writing
-[[cp, std, wunused, alias("tmpfile64")]]
-[[section(".text.crt{|.dos}.FILE.locked.access")]]
-[[if($extended_include_prefix("<features.h>") defined(__USE_FILE_OFFSET64)), preferred_alias("tmpfile64")]]
+[[cp, std, wunused, section(".text.crt{|.dos}.FILE.locked.access"), no_crt_self_import]]
+[[if($extended_include_prefix("<features.h>", "<asm/os/oflags.h>")!defined(__USE_FILE_OFFSET64) || !defined(__O_LARGEFILE) || (__O_LARGEFILE+0) == 0), alias("tmpfile")]]
+[[                                                                                                                                                     alias("tmpfile64")]]
 FILE *tmpfile();
 
 @@>> fopen(3), fopen64(3)
 @@Create and return a new file-stream for accessing `filename'
-[[cp, std, wunused, export_alias("_IO_fopen"), alias("fopen64")]]
-[[export_as("setmntent", "__setmntent")]]
-[[section(".text.crt{|.dos}.FILE.locked.access")]]
-[[if($extended_include_prefix("<features.h>") defined(__USE_FILE_OFFSET64)), preferred_alias("fopen64")]]
+[[cp, std, wunused, export_as("_IO_fopen")]]
+[[export_as("setmntent", "__setmntent"), section(".text.crt{|.dos}.FILE.locked.access"), no_crt_self_import]]
+[[if($extended_include_prefix("<features.h>", "<asm/os/oflags.h>")!defined(__USE_FILE_OFFSET64) || !defined(__O_LARGEFILE) || (__O_LARGEFILE+0) == 0), alias("fopen", "_IO_fopen")]]
+[[                                                                                                                                                     alias("fopen64")]]
 FILE *fopen([[nonnull]] char const *__restrict filename,
             [[nonnull]] char const *__restrict modes);
 
-@@>> freopen(3), freopen64(3)
+@@>> freopen(3), freopen64(3), freopen_unlocked(3), freopen64_unlocked(3)
 @@Re-open the given `stream' as a file-stream for accessing `filename'
-[[cp, std, section(".text.crt{|.dos}.FILE.locked.access")]]
-[[if($extended_include_prefix("<features.h>")defined(__USE_STDIO_UNLOCKED) && defined(__USE_FILE_OFFSET64)), preferred_alias("freopen64_unlocked")]]
-[[if($extended_include_prefix("<features.h>")defined(__USE_STDIO_UNLOCKED)                                ), preferred_alias("freopen_unlocked")]]
-[[if($extended_include_prefix("<features.h>")defined(__USE_FILE_OFFSET64)                                 ), preferred_alias("freopen64")]]
-[[alias("freopen64", "freopen_unlocked", "freopen64_unlocked")]]
+[[cp, std, section(".text.crt{|.dos}.FILE.locked.access"), no_crt_self_import]]
+[[if($extended_include_prefix("<features.h>", "<asm/os/oflags.h>")defined(__USE_STDIO_UNLOCKED) && (!defined(__USE_FILE_OFFSET64) || !defined(__O_LARGEFILE) || (__O_LARGEFILE+0) == 0)), alias("freopen_unlocked")]]
+[[if($extended_include_prefix("<features.h>"                     )defined(__USE_STDIO_UNLOCKED)                                                                                        ), alias("freopen64_unlocked")]]
+[[if($extended_include_prefix("<features.h>", "<asm/os/oflags.h>")                                 (!defined(__USE_FILE_OFFSET64) || !defined(__O_LARGEFILE) || (__O_LARGEFILE+0) == 0)), alias("freopen")]]
+[[                                                                                                                                                                                        alias("freopen64")]]
+[[if($extended_include_prefix("<features.h>", "<asm/os/oflags.h>")                                 (!defined(__USE_FILE_OFFSET64) || !defined(__O_LARGEFILE) || (__O_LARGEFILE+0) == 0)), alias("freopen_unlocked")]]
+[[                                                                                                                                                                                        alias("freopen64_unlocked")]]
 FILE *freopen([[nonnull]] char const *__restrict filename,
               [[nonnull]] char const *__restrict modes,
               [[nonnull]] FILE *__restrict stream);
@@ -1139,12 +1141,12 @@ FILE *freopen([[nonnull]] char const *__restrict filename,
 [[stdio_throws, std, decl_include("<bits/crt/stdio.h>")]]
 [[section(".text.crt{|.dos}.FILE.locked.seek.pos")]]
 [[no_crt_self_import, no_crt_self_export, export_as(CNL_fgetpos...)]]
-[[if($extended_include_prefix("<bits/crt/stdio.h>")defined(__USE_STDIO_UNLOCKED) && __SIZEOF_FPOS_T__ == __SIZEOF_FPOS32_T__), alias(CNL_fgetpos_unlocked...)]]
-[[if($extended_include_prefix("<bits/crt/stdio.h>")defined(__USE_STDIO_UNLOCKED) && __SIZEOF_FPOS_T__ == __SIZEOF_FPOS64_T__), alias(CNL_fgetpos64_unlocked...)]]
-[[if($extended_include_prefix("<bits/crt/stdio.h>")                                 __SIZEOF_FPOS_T__ == __SIZEOF_FPOS32_T__), alias(CNL_fgetpos...)]]
-[[if($extended_include_prefix("<bits/crt/stdio.h>")                                 __SIZEOF_FPOS_T__ == __SIZEOF_FPOS64_T__), alias(CNL_fgetpos64...)]]
-[[if($extended_include_prefix("<bits/crt/stdio.h>")                                 __SIZEOF_FPOS_T__ == __SIZEOF_FPOS32_T__), alias(CNL_fgetpos_unlocked...)]]
-[[if($extended_include_prefix("<bits/crt/stdio.h>")                                 __SIZEOF_FPOS_T__ == __SIZEOF_FPOS64_T__), alias(CNL_fgetpos64_unlocked...)]]
+[[if($extended_include_prefix("<features.h>", "<bits/crt/stdio.h>")defined(__USE_STDIO_UNLOCKED) && __SIZEOF_FPOS_T__ == __SIZEOF_FPOS32_T__), alias(CNL_fgetpos_unlocked...)]]
+[[if($extended_include_prefix("<features.h>", "<bits/crt/stdio.h>")defined(__USE_STDIO_UNLOCKED) && __SIZEOF_FPOS_T__ == __SIZEOF_FPOS64_T__), alias(CNL_fgetpos64_unlocked...)]]
+[[if($extended_include_prefix(                "<bits/crt/stdio.h>")                                 __SIZEOF_FPOS_T__ == __SIZEOF_FPOS32_T__), alias(CNL_fgetpos...)]]
+[[if($extended_include_prefix(                "<bits/crt/stdio.h>")                                 __SIZEOF_FPOS_T__ == __SIZEOF_FPOS64_T__), alias(CNL_fgetpos64...)]]
+[[if($extended_include_prefix(                "<bits/crt/stdio.h>")                                 __SIZEOF_FPOS_T__ == __SIZEOF_FPOS32_T__), alias(CNL_fgetpos_unlocked...)]]
+[[if($extended_include_prefix(                "<bits/crt/stdio.h>")                                 __SIZEOF_FPOS_T__ == __SIZEOF_FPOS64_T__), alias(CNL_fgetpos64_unlocked...)]]
 [[userimpl, requires($has_function(crt_ftello64) || $has_function(crt_fgetpos) ||
                      $has_function(crt_fgetpos64) || $has_function(crt_ftello64) ||
                      $has_function(crt_ftello) || $has_function(crt_ftell))]]
@@ -1177,12 +1179,12 @@ int fgetpos([[nonnull]] FILE *__restrict stream, [[nonnull]] fpos_t *__restrict 
 [[stdio_throws, std, decl_include("<bits/crt/stdio.h>"), impl_include("<features.h>")]]
 [[section(".text.crt{|.dos}.FILE.locked.seek.pos")]]
 [[no_crt_self_import, no_crt_self_export, export_as(CNL_fsetpos...)]]
-[[if($extended_include_prefix("<bits/crt/stdio.h>")defined(__USE_STDIO_UNLOCKED) && __SIZEOF_FPOS_T__ == __SIZEOF_FPOS32_T__), alias(CNL_fsetpos_unlocked...)]]
-[[if($extended_include_prefix("<bits/crt/stdio.h>")defined(__USE_STDIO_UNLOCKED) && __SIZEOF_FPOS_T__ == __SIZEOF_FPOS64_T__), alias(CNL_fsetpos64_unlocked...)]]
-[[if($extended_include_prefix("<bits/crt/stdio.h>")                                 __SIZEOF_FPOS_T__ == __SIZEOF_FPOS32_T__), alias(CNL_fsetpos...)]]
-[[if($extended_include_prefix("<bits/crt/stdio.h>")                                 __SIZEOF_FPOS_T__ == __SIZEOF_FPOS64_T__), alias(CNL_fsetpos64...)]]
-[[if($extended_include_prefix("<bits/crt/stdio.h>")                                 __SIZEOF_FPOS_T__ == __SIZEOF_FPOS32_T__), alias(CNL_fsetpos_unlocked...)]]
-[[if($extended_include_prefix("<bits/crt/stdio.h>")                                 __SIZEOF_FPOS_T__ == __SIZEOF_FPOS64_T__), alias(CNL_fsetpos64_unlocked...)]]
+[[if($extended_include_prefix("<features.h>", "<bits/crt/stdio.h>")defined(__USE_STDIO_UNLOCKED) && __SIZEOF_FPOS_T__ == __SIZEOF_FPOS32_T__), alias(CNL_fsetpos_unlocked...)]]
+[[if($extended_include_prefix("<features.h>", "<bits/crt/stdio.h>")defined(__USE_STDIO_UNLOCKED) && __SIZEOF_FPOS_T__ == __SIZEOF_FPOS64_T__), alias(CNL_fsetpos64_unlocked...)]]
+[[if($extended_include_prefix(                "<bits/crt/stdio.h>")                                 __SIZEOF_FPOS_T__ == __SIZEOF_FPOS32_T__), alias(CNL_fsetpos...)]]
+[[if($extended_include_prefix(                "<bits/crt/stdio.h>")                                 __SIZEOF_FPOS_T__ == __SIZEOF_FPOS64_T__), alias(CNL_fsetpos64...)]]
+[[if($extended_include_prefix(                "<bits/crt/stdio.h>")                                 __SIZEOF_FPOS_T__ == __SIZEOF_FPOS32_T__), alias(CNL_fsetpos_unlocked...)]]
+[[if($extended_include_prefix(                "<bits/crt/stdio.h>")                                 __SIZEOF_FPOS_T__ == __SIZEOF_FPOS64_T__), alias(CNL_fsetpos64_unlocked...)]]
 [[userimpl, requires($has_function(crt_fseeko64) || $has_function(crt_fsetpos) ||
                      $has_function(crt_fsetpos64) || $has_function(crt_fseeko) ||
                      $has_function(crt_fseek))]]
@@ -2440,8 +2442,8 @@ $off_t ftello([[nonnull]] $FILE *__restrict stream) {
 %#ifdef __USE_LARGEFILE64
 %[default:section(".text.crt{|.dos}.FILE.locked.access")]
 
-[[cp, wunused, alias("tmpfile"), doc_alias("tmpfile")]]
-[[largefile64_variant_of(tmpfile)]]
+[[cp, wunused]]
+[[preferred_largefile64_variant_of(tmpfile), doc_alias("tmpfile")]]
 $FILE *tmpfile64();
 
 %[default:section(".text.crt{|.dos}.FILE.locked.seek.seek")]
@@ -2501,22 +2503,21 @@ $off64_t ftello64([[nonnull]] $FILE *__restrict stream) {
 
 %[default:section(".text.crt{|.dos}.FILE.locked.access")]
 
-[[cp, wunused, alias("fopen"), largefile64_variant_of(fopen)]]
-[[userimpl, requires_function(fopen), doc_alias("fopen")]]
+[[cp, wunused]]
+[[preferred_largefile64_variant_of(fopen), doc_alias("fopen")]]
 $FILE *fopen64([[nonnull]] char const *__restrict filename,
-               [[nonnull]] char const *__restrict modes) {
-	return fopen(filename, modes);
-}
+               [[nonnull]] char const *__restrict modes);
 
-[[cp, largefile64_variant_of(freopen), doc_alias("freopen")]]
-[[if($extended_include_prefix("<features.h>")defined(__USE_STDIO_UNLOCKED)), preferred_alias("freopen64_unlocked")]]
-[[alias("freopen", "freopen_unlocked", "freopen64_unlocked")]]
-[[userimpl, requires_function(freopen)]]
+[[cp, doc_alias("freopen"), no_crt_self_import]]
+[[if($extended_include_prefix("<features.h>", "<asm/os/oflags.h>")defined(__USE_STDIO_UNLOCKED) && (!defined(__O_LARGEFILE) || (__O_LARGEFILE+0) == 0)), alias("freopen_unlocked")]]
+[[if($extended_include_prefix("<features.h>"                     )defined(__USE_STDIO_UNLOCKED)                                                       ), alias("freopen64_unlocked")]]
+[[                                                                                                                                       largefile64_variant_of(freopen)]]
+[[                                                                                                                                                       alias("freopen64")]]
+[[if($extended_include_prefix(                "<asm/os/oflags.h>")                                  !defined(__O_LARGEFILE) || (__O_LARGEFILE+0) == 0),  alias("freopen_unlocked")]]
+[[                                                                                                                                                       alias("freopen64_unlocked")]]
 $FILE *freopen64([[nonnull]] char const *__restrict filename,
                  [[nonnull]] char const *__restrict modes,
-                 [[nonnull]] $FILE *__restrict stream) {
-	return freopen(filename, modes, stream);
-}
+                 [[nonnull]] $FILE *__restrict stream);
 
 %[default:section(".text.crt{|.dos}.FILE.locked.seek.pos")]
 
@@ -2673,35 +2674,34 @@ __STDC_INT_AS_SSIZE_T asprintf([[nonnull]] char **__restrict pstr,
 
 %[default:section(".text.crt{|.dos}.FILE.locked.access")]
 
-@@>> fdreopen(3)
+@@>> fdreopen(3), fdreopen_unlocked(3)
 @@Re-open the given `stream' as a file-stream for accessing `fd'
-[[if($extended_include_prefix("<features.h>")defined(__USE_STDIO_UNLOCKED) && defined(__USE_FILE_OFFSET64)), preferred_alias("fdreopen64_unlocked")]]
-[[if($extended_include_prefix("<features.h>")defined(__USE_STDIO_UNLOCKED)                                ), preferred_alias("fdreopen_unlocked")]]
-[[if($extended_include_prefix("<features.h>")defined(__USE_FILE_OFFSET64)                                 ), preferred_alias("fdreopen64")]]
-[[cp, alias("fdreopen64", "fdreopen_unlocked", "fdreopen64_unlocked")]]
+[[cp]]
+[[if($extended_include_prefix("<features.h>")defined(__USE_STDIO_UNLOCKED)), preferred_alias("fdreopen_unlocked")]]
 $FILE *fdreopen($fd_t fd, [[nonnull]] char const *__restrict modes,
                 [[nonnull]] $FILE *__restrict stream);
 
 
 %[default:section(".text.crt{|.dos}.FILE.unlocked.access")]
 
-[[cp, alias("fdreopen"), doc_alias("fdreopen")]]
-[[userimpl, requires_function(fdreopen)]]
+[[cp, doc_alias("fdreopen"), alias("fdreopen")]]
 $FILE *fdreopen_unlocked($fd_t fd, [[nonnull]] char const *__restrict modes,
-                         [[nonnull]] $FILE *__restrict stream) {
-	return fdreopen(fd, modes, stream);
-}
+                         [[nonnull]] $FILE *__restrict stream);
 
-[[cp, alias("freopen64_unlocked", "freopen", "freopen64"), doc_alias("freopen")]]
-[[if($extended_include_prefix("<features.h>") defined(__USE_FILE_OFFSET64)), preferred_alias("freopen64_unlocked")]]
-[[userimpl, requires_function(freopen)]]
+[[cp, doc_alias("freopen"), no_crt_self_import]]
+[[if($extended_include_prefix("<features.h>", "<asm/os/oflags.h>")!defined(__USE_FILE_OFFSET64) || !defined(__O_LARGEFILE) || (__O_LARGEFILE+0) == 0), alias("freopen_unlocked")]]
+[[                                                                                                                                                     alias("freopen64_unlocked")]]
+[[if($extended_include_prefix("<features.h>", "<asm/os/oflags.h>")!defined(__USE_FILE_OFFSET64) || !defined(__O_LARGEFILE) || (__O_LARGEFILE+0) == 0), alias("freopen")]]
+[[                                                                                                                                                     alias("freopen64")]]
 $FILE *freopen_unlocked([[nonnull]] char const *__restrict filename,
                         [[nonnull]] char const *__restrict modes,
-                        [[nonnull]] $FILE *__restrict stream) {
-	return freopen(filename, modes, stream);
-}
+                        [[nonnull]] $FILE *__restrict stream);
 
-[[cp, alias("freopen64", "freopen_unlocked", "freopen"), doc_alias("freopen")]]
+[[cp, doc_alias("freopen"), no_crt_self_import]]
+[[                                                                                    largefile64_variant_of(freopen_unlocked)]]
+[[                                                                                                    alias("freopen64_unlocked")]]
+[[if($extended_include_prefix("<asm/os/oflags.h>")!defined(__O_LARGEFILE) || (__O_LARGEFILE+0) == 0), alias("freopen")]]
+[[                                                                                                    alias("freopen64")]]
 [[userimpl, requires_function(freopen64)]]
 $FILE *freopen64_unlocked([[nonnull]] char const *__restrict filename,
                           [[nonnull]] char const *__restrict modes,

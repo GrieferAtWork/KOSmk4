@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x674b8266 */
+/* HASH CRC-32:0xcc31cc87 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -34,16 +34,16 @@ __CREDIRECT(,__pid_t,__NOTHROW_RPC,__localdep_wait4_32,(__pid_t __pid, __WAIT_ST
 #endif /* !__local___localdep_wait4_32_defined && __CRT_HAVE_wait4 */
 #ifndef __local___localdep_wait4_64_defined
 #define __local___localdep_wait4_64_defined 1
-#ifdef __CRT_HAVE_wait4_64
-__NAMESPACE_LOCAL_END
-struct __rusage64;
-__NAMESPACE_LOCAL_BEGIN
-__CREDIRECT(,__pid_t,__NOTHROW_NCX,__localdep_wait4_64,(__pid_t __pid, __WAIT_STATUS __stat_loc, __STDC_INT_AS_UINT_T __options, struct __rusage64 *__usage),wait4_64,(__pid,__stat_loc,__options,__usage))
-#elif defined(__CRT_HAVE_wait4) && __SIZEOF_TIME32_T__ == __SIZEOF_TIME64_T__
+#if defined(__CRT_HAVE_wait4) && __SIZEOF_TIME32_T__ == __SIZEOF_TIME64_T__
 __NAMESPACE_LOCAL_END
 struct __rusage64;
 __NAMESPACE_LOCAL_BEGIN
 __CREDIRECT(,__pid_t,__NOTHROW_NCX,__localdep_wait4_64,(__pid_t __pid, __WAIT_STATUS __stat_loc, __STDC_INT_AS_UINT_T __options, struct __rusage64 *__usage),wait4,(__pid,__stat_loc,__options,__usage))
+#elif defined(__CRT_HAVE_wait4_64)
+__NAMESPACE_LOCAL_END
+struct __rusage64;
+__NAMESPACE_LOCAL_BEGIN
+__CREDIRECT(,__pid_t,__NOTHROW_NCX,__localdep_wait4_64,(__pid_t __pid, __WAIT_STATUS __stat_loc, __STDC_INT_AS_UINT_T __options, struct __rusage64 *__usage),wait4_64,(__pid,__stat_loc,__options,__usage))
 #elif defined(__CRT_HAVE_wait4)
 __NAMESPACE_LOCAL_END
 #include <libc/local/sys.wait/wait4_64.h>

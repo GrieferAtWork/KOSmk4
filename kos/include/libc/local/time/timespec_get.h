@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x5c395e88 */
+/* HASH CRC-32:0x816a6a1e */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -30,12 +30,12 @@
 __NAMESPACE_LOCAL_BEGIN
 #ifndef __local___localdep_clock_gettime_defined
 #define __local___localdep_clock_gettime_defined 1
-#if defined(__CRT_HAVE_clock_gettime64) && defined(__USE_TIME_BITS64)
-__CREDIRECT(__ATTR_NONNULL((2)),int,__NOTHROW_NCX,__localdep_clock_gettime,(__clockid_t __clock_id, struct timespec *__tp),clock_gettime64,(__clock_id,__tp))
-#elif defined(__CRT_HAVE_clock_gettime) && !defined(__USE_TIME_BITS64)
+#if defined(__CRT_HAVE_clock_gettime) && (!defined(__USE_TIME_BITS64) || __SIZEOF_TIME32_T__ == __SIZEOF_TIME64_T__)
 __CREDIRECT(__ATTR_NONNULL((2)),int,__NOTHROW_NCX,__localdep_clock_gettime,(__clockid_t __clock_id, struct timespec *__tp),clock_gettime,(__clock_id,__tp))
-#elif defined(__CRT_HAVE___clock_gettime) && !defined(__USE_TIME_BITS64)
+#elif defined(__CRT_HAVE___clock_gettime) && (!defined(__USE_TIME_BITS64) || __SIZEOF_TIME32_T__ == __SIZEOF_TIME64_T__)
 __CREDIRECT(__ATTR_NONNULL((2)),int,__NOTHROW_NCX,__localdep_clock_gettime,(__clockid_t __clock_id, struct timespec *__tp),__clock_gettime,(__clock_id,__tp))
+#elif defined(__CRT_HAVE_clock_gettime64) && (defined(__USE_TIME_BITS64) || __SIZEOF_TIME32_T__ == __SIZEOF_TIME64_T__)
+__CREDIRECT(__ATTR_NONNULL((2)),int,__NOTHROW_NCX,__localdep_clock_gettime,(__clockid_t __clock_id, struct timespec *__tp),clock_gettime64,(__clock_id,__tp))
 #else /* ... */
 __NAMESPACE_LOCAL_END
 #include <libc/local/time/clock_gettime.h>

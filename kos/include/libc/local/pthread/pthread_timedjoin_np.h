@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x19a3b767 */
+/* HASH CRC-32:0x436cb061 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -32,10 +32,10 @@ __CREDIRECT(,__errno_t,__NOTHROW_RPC,__localdep_pthread_timedjoin32_np,(__pthrea
 #endif /* !__local___localdep_pthread_timedjoin32_np_defined && __CRT_HAVE_pthread_timedjoin_np */
 #ifndef __local___localdep_pthread_timedjoin64_np_defined
 #define __local___localdep_pthread_timedjoin64_np_defined 1
-#ifdef __CRT_HAVE_pthread_timedjoin64_np
-__CREDIRECT(,__errno_t,__NOTHROW_RPC,__localdep_pthread_timedjoin64_np,(__pthread_t __pthread, void **__thread_return, struct __timespec64 const *__abstime),pthread_timedjoin64_np,(__pthread,__thread_return,__abstime))
-#elif defined(__CRT_HAVE_pthread_timedjoin_np) && __SIZEOF_TIME32_T__ == __SIZEOF_TIME64_T__
+#if defined(__CRT_HAVE_pthread_timedjoin_np) && __SIZEOF_TIME32_T__ == __SIZEOF_TIME64_T__
 __CREDIRECT(,__errno_t,__NOTHROW_RPC,__localdep_pthread_timedjoin64_np,(__pthread_t __pthread, void **__thread_return, struct __timespec64 const *__abstime),pthread_timedjoin_np,(__pthread,__thread_return,__abstime))
+#elif defined(__CRT_HAVE_pthread_timedjoin64_np)
+__CREDIRECT(,__errno_t,__NOTHROW_RPC,__localdep_pthread_timedjoin64_np,(__pthread_t __pthread, void **__thread_return, struct __timespec64 const *__abstime),pthread_timedjoin64_np,(__pthread,__thread_return,__abstime))
 #elif defined(__CRT_HAVE_pthread_timedjoin_np)
 __NAMESPACE_LOCAL_END
 #include <libc/local/pthread/pthread_timedjoin64_np.h>

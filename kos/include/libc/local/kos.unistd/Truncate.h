@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x3b0d29fd */
+/* HASH CRC-32:0x50e0c411 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -31,10 +31,10 @@ __CREDIRECT(__ATTR_NONNULL((1)),__vodi,__THROWING,__localdep_Truncate32,(char co
 #endif /* !__local___localdep_Truncate32_defined && __CRT_HAVE_Truncate */
 #ifndef __local___localdep_Truncate64_defined
 #define __local___localdep_Truncate64_defined 1
-#ifdef __CRT_HAVE_Truncate64
-__CREDIRECT_VOID(__ATTR_NONNULL((1)),__THROWING,__localdep_Truncate64,(char const *__file, __pos64_t __length),Truncate64,(__file,__length))
-#elif defined(__CRT_HAVE_Truncate) && __SIZEOF_OFF32_T__ == __SIZEOF_OFF64_T__
+#if defined(__CRT_HAVE_Truncate) && __SIZEOF_OFF32_T__ == __SIZEOF_OFF64_T__
 __CREDIRECT_VOID(__ATTR_NONNULL((1)),__THROWING,__localdep_Truncate64,(char const *__file, __pos64_t __length),Truncate,(__file,__length))
+#elif defined(__CRT_HAVE_Truncate64)
+__CREDIRECT_VOID(__ATTR_NONNULL((1)),__THROWING,__localdep_Truncate64,(char const *__file, __pos64_t __length),Truncate64,(__file,__length))
 #elif defined(__CRT_HAVE_Truncate)
 __NAMESPACE_LOCAL_END
 #include <libc/local/kos.unistd/Truncate64.h>

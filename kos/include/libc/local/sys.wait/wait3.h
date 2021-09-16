@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xa319b63d */
+/* HASH CRC-32:0xa436555a */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -33,10 +33,10 @@ __CREDIRECT(,__pid_t,__NOTHROW_RPC,__localdep_wait3_32,(__WAIT_STATUS __stat_loc
 #endif /* !__local___localdep_wait3_32_defined && __CRT_HAVE_wait3 */
 #ifndef __local___localdep_wait3_64_defined
 #define __local___localdep_wait3_64_defined 1
-#ifdef __CRT_HAVE_wait3_64
-__CREDIRECT(,__pid_t,__NOTHROW_NCX,__localdep_wait3_64,(__WAIT_STATUS __stat_loc, __STDC_INT_AS_UINT_T __options, struct __rusage64 *__usage),wait3_64,(__stat_loc,__options,__usage))
-#elif defined(__CRT_HAVE_wait3) && __SIZEOF_TIME32_T__ == __SIZEOF_TIME64_T__
+#if defined(__CRT_HAVE_wait3) && __SIZEOF_TIME32_T__ == __SIZEOF_TIME64_T__
 __CREDIRECT(,__pid_t,__NOTHROW_NCX,__localdep_wait3_64,(__WAIT_STATUS __stat_loc, __STDC_INT_AS_UINT_T __options, struct __rusage64 *__usage),wait3,(__stat_loc,__options,__usage))
+#elif defined(__CRT_HAVE_wait3_64)
+__CREDIRECT(,__pid_t,__NOTHROW_NCX,__localdep_wait3_64,(__WAIT_STATUS __stat_loc, __STDC_INT_AS_UINT_T __options, struct __rusage64 *__usage),wait3_64,(__stat_loc,__options,__usage))
 #elif defined(__CRT_HAVE_wait3)
 __NAMESPACE_LOCAL_END
 #include <libc/local/sys.wait/wait3_64.h>

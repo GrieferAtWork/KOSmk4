@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xade119c6 */
+/* HASH CRC-32:0x5e559975 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -1600,7 +1600,7 @@ NOTHROW_NCX(LIBCCALL libc_qfcvt)(__LONGDOUBLE val,
  * @param: suffixlen: The #  of trailing  characters to-be  ignored
  *                    after the required 6 trailing 'X'-characters. */
 INTERN ATTR_SECTION(".text.crt.fs.utility") WUNUSED NONNULL((1)) fd_t
-NOTHROW_NCX(LIBCCALL libc_mkstemps)(char *template_,
+NOTHROW_RPC(LIBCCALL libc_mkstemps)(char *template_,
                                     __STDC_INT_AS_SIZE_T suffixlen) {
 	return libc_mkostemps(template_, suffixlen, 0);
 }
@@ -1613,6 +1613,25 @@ NOTHROW_NCX(LIBCCALL libc_rpmatch)(char const *response) {
 		return 1;
 	return -1;
 }
+#include <asm/os/oflags.h>
+#if !defined(__O_LARGEFILE) || !__O_LARGEFILE
+DEFINE_INTERN_ALIAS(libc_mkstemps64, libc_mkstemps);
+#else /* !__O_LARGEFILE || !__O_LARGEFILE */
+/* >> mkstemps(3), mkstemps64(3)
+ * Replace the last 6 characters of `template_' (which are followed by exactly
+ * `suffixlen' more characters that are left alone), which must be filled with
+ * all  'X'-characters before the  call (else errno=EINVAL  + return -1), with
+ * random  characters such that the filename described by `template_' will not
+ * already  exists. Then, create a new file  with `O_RDWR' and return the file
+ * descriptor of that file.
+ * @param: suffixlen: The #  of trailing  characters to-be  ignored
+ *                    after the required 6 trailing 'X'-characters. */
+INTERN ATTR_SECTION(".text.crt.unsorted") WUNUSED NONNULL((1)) fd_t
+NOTHROW_RPC(LIBCCALL libc_mkstemps64)(char *template_,
+                                      __STDC_INT_AS_SIZE_T suffixlen) {
+	return libc_mkostemps64(template_, suffixlen, 0);
+}
+#endif /* __O_LARGEFILE && __O_LARGEFILE */
 #include <hybrid/typecore.h>
 /* >> l64a(3), a64l(3)
  * Convert between `long' and base-64 encoded integer strings. */
@@ -1737,6 +1756,21 @@ INTERN ATTR_SECTION(".text.crt.fs.utility") WUNUSED NONNULL((1)) fd_t
 NOTHROW_RPC(LIBCCALL libc_mkstemp)(char *template_) {
 	return libc_mkstemps(template_, 0);
 }
+#include <asm/os/oflags.h>
+#if !defined(__O_LARGEFILE) || !__O_LARGEFILE
+DEFINE_INTERN_ALIAS(libc_mkstemp64, libc_mkstemp);
+#else /* !__O_LARGEFILE || !__O_LARGEFILE */
+/* >> mkstemp(3), mkstemp64(3)
+ * Replace the last 6 characters of  `template_', which must be filled  with
+ * all  'X'-characters  before the  call  (else errno=EINVAL  +  return -1),
+ * with random characters  such that the  filename described by  `template_'
+ * will not already exists. Then, create a new file with `O_RDWR' and return
+ * the file descriptor of that file. */
+INTERN ATTR_SECTION(".text.crt.unsorted") WUNUSED NONNULL((1)) fd_t
+NOTHROW_RPC(LIBCCALL libc_mkstemp64)(char *template_) {
+	return libc_mkstemps64(template_, 0);
+}
+#endif /* __O_LARGEFILE && __O_LARGEFILE */
 /* >> mkdtemp(3)
  * Replace the last 6 characters of `template_', which must be filled with
  * all  'X'-characters before  the call  (else errno=EINVAL  + return -1),
@@ -1991,12 +2025,12 @@ again:
 		break;
 #endif /* __CRT_HAVE_mkdir || (__CRT_DOS_PRIMARY && __CRT_HAVE__mkdir) */
 
-#if defined(__CRT_HAVE_open64) || defined(__CRT_HAVE___open64) || defined(__CRT_HAVE_open) || defined(__CRT_HAVE__open) || defined(__CRT_HAVE___open) || (defined(__AT_FDCWD) && (defined(__CRT_HAVE_openat64) || defined(__CRT_HAVE_openat))) || (defined(__CRT_HAVE_kstat) && defined(__CRT_KOS_PRIMARY)) || (defined(__CRT_HAVE_kstat64) && defined(__CRT_KOS_PRIMARY)) || (defined(__CRT_HAVE__stat64) && defined(__CRT_DOS_PRIMARY) && defined(__USE_TIME_BITS64)) || (defined(__CRT_HAVE__stat64i32) && defined(__CRT_DOS_PRIMARY) && defined(__USE_TIME_BITS64)) || (defined(__CRT_HAVE__stati64) && defined(__CRT_DOS_PRIMARY) && !defined(__USE_TIME_BITS64) && defined(__USE_FILE_OFFSET64)) || (defined(__CRT_HAVE__stat32i64) && defined(__CRT_DOS_PRIMARY) && !defined(__USE_TIME_BITS64) && defined(__USE_FILE_OFFSET64)) || (defined(__CRT_HAVE__stat) && defined(__CRT_DOS_PRIMARY) && !defined(__USE_TIME_BITS64) && !defined(__USE_FILE_OFFSET64)) || (defined(__CRT_HAVE__stat32) && defined(__CRT_DOS_PRIMARY) && !defined(__USE_TIME_BITS64) && !defined(__USE_FILE_OFFSET64)) || (defined(__CRT_HAVE_stat64) && defined(__USE_FILE_OFFSET64)) || (defined(__CRT_HAVE_stat) && !defined(__USE_FILE_OFFSET64))
+#if defined(__CRT_HAVE_open64) || defined(__CRT_HAVE___open64) || defined(__CRT_HAVE_open) || defined(__CRT_HAVE__open) || defined(__CRT_HAVE___open) || (defined(__AT_FDCWD) && (defined(__CRT_HAVE_openat64) || defined(__CRT_HAVE_openat))) || (defined(__CRT_HAVE_kstat) && defined(__CRT_KOS_PRIMARY)) || (defined(__CRT_HAVE_kstat64) && defined(__CRT_KOS_PRIMARY)) || (defined(__CRT_HAVE__stat64) && defined(__CRT_DOS_PRIMARY) && defined(__USE_TIME_BITS64)) || (defined(__CRT_HAVE__stat64i32) && defined(__CRT_DOS_PRIMARY) && defined(__USE_TIME_BITS64)) || (defined(__CRT_HAVE__stati64) && defined(__CRT_DOS_PRIMARY) && !defined(__USE_TIME_BITS64) && defined(__USE_FILE_OFFSET64)) || (defined(__CRT_HAVE__stat32i64) && defined(__CRT_DOS_PRIMARY) && !defined(__USE_TIME_BITS64) && defined(__USE_FILE_OFFSET64)) || (defined(__CRT_HAVE__stat) && defined(__CRT_DOS_PRIMARY) && !defined(__USE_TIME_BITS64) && !defined(__USE_FILE_OFFSET64)) || (defined(__CRT_HAVE__stat32) && defined(__CRT_DOS_PRIMARY) && !defined(__USE_TIME_BITS64) && !defined(__USE_FILE_OFFSET64)) || (defined(__CRT_HAVE_stat64) && (defined(__USE_FILE_OFFSET64) || __SIZEOF_OFF32_T__ == __SIZEOF_OFF64_T__)) || (defined(__CRT_HAVE_stat) && (!defined(__USE_FILE_OFFSET64) || __SIZEOF_OFF32_T__ == __SIZEOF_OFF64_T__))
 	case 2: {
-#if (defined(__CRT_HAVE_kstat) && defined(__CRT_KOS_PRIMARY)) || (defined(__CRT_HAVE_kstat64) && defined(__CRT_KOS_PRIMARY)) || (defined(__CRT_HAVE__stat64) && defined(__CRT_DOS_PRIMARY) && defined(__USE_TIME_BITS64)) || (defined(__CRT_HAVE__stat64i32) && defined(__CRT_DOS_PRIMARY) && defined(__USE_TIME_BITS64)) || (defined(__CRT_HAVE__stati64) && defined(__CRT_DOS_PRIMARY) && !defined(__USE_TIME_BITS64) && defined(__USE_FILE_OFFSET64)) || (defined(__CRT_HAVE__stat32i64) && defined(__CRT_DOS_PRIMARY) && !defined(__USE_TIME_BITS64) && defined(__USE_FILE_OFFSET64)) || (defined(__CRT_HAVE__stat) && defined(__CRT_DOS_PRIMARY) && !defined(__USE_TIME_BITS64) && !defined(__USE_FILE_OFFSET64)) || (defined(__CRT_HAVE__stat32) && defined(__CRT_DOS_PRIMARY) && !defined(__USE_TIME_BITS64) && !defined(__USE_FILE_OFFSET64)) || (defined(__CRT_HAVE_stat64) && defined(__USE_FILE_OFFSET64)) || (defined(__CRT_HAVE_stat) && !defined(__USE_FILE_OFFSET64))
+#if (defined(__CRT_HAVE_kstat) && defined(__CRT_KOS_PRIMARY)) || (defined(__CRT_HAVE_kstat64) && defined(__CRT_KOS_PRIMARY)) || (defined(__CRT_HAVE__stat64) && defined(__CRT_DOS_PRIMARY) && defined(__USE_TIME_BITS64)) || (defined(__CRT_HAVE__stat64i32) && defined(__CRT_DOS_PRIMARY) && defined(__USE_TIME_BITS64)) || (defined(__CRT_HAVE__stati64) && defined(__CRT_DOS_PRIMARY) && !defined(__USE_TIME_BITS64) && defined(__USE_FILE_OFFSET64)) || (defined(__CRT_HAVE__stat32i64) && defined(__CRT_DOS_PRIMARY) && !defined(__USE_TIME_BITS64) && defined(__USE_FILE_OFFSET64)) || (defined(__CRT_HAVE__stat) && defined(__CRT_DOS_PRIMARY) && !defined(__USE_TIME_BITS64) && !defined(__USE_FILE_OFFSET64)) || (defined(__CRT_HAVE__stat32) && defined(__CRT_DOS_PRIMARY) && !defined(__USE_TIME_BITS64) && !defined(__USE_FILE_OFFSET64)) || (defined(__CRT_HAVE_stat64) && (defined(__USE_FILE_OFFSET64) || __SIZEOF_OFF32_T__ == __SIZEOF_OFF64_T__)) || (defined(__CRT_HAVE_stat) && (!defined(__USE_FILE_OFFSET64) || __SIZEOF_OFF32_T__ == __SIZEOF_OFF64_T__))
 		struct stat st;
 		result = stat(template_, &st);
-#else /* (__CRT_HAVE_kstat && __CRT_KOS_PRIMARY) || (__CRT_HAVE_kstat64 && __CRT_KOS_PRIMARY) || (__CRT_HAVE__stat64 && __CRT_DOS_PRIMARY && __USE_TIME_BITS64) || (__CRT_HAVE__stat64i32 && __CRT_DOS_PRIMARY && __USE_TIME_BITS64) || (__CRT_HAVE__stati64 && __CRT_DOS_PRIMARY && !__USE_TIME_BITS64 && __USE_FILE_OFFSET64) || (__CRT_HAVE__stat32i64 && __CRT_DOS_PRIMARY && !__USE_TIME_BITS64 && __USE_FILE_OFFSET64) || (__CRT_HAVE__stat && __CRT_DOS_PRIMARY && !__USE_TIME_BITS64 && !__USE_FILE_OFFSET64) || (__CRT_HAVE__stat32 && __CRT_DOS_PRIMARY && !__USE_TIME_BITS64 && !__USE_FILE_OFFSET64) || (__CRT_HAVE_stat64 && __USE_FILE_OFFSET64) || (__CRT_HAVE_stat && !__USE_FILE_OFFSET64) */
+#else /* (__CRT_HAVE_kstat && __CRT_KOS_PRIMARY) || (__CRT_HAVE_kstat64 && __CRT_KOS_PRIMARY) || (__CRT_HAVE__stat64 && __CRT_DOS_PRIMARY && __USE_TIME_BITS64) || (__CRT_HAVE__stat64i32 && __CRT_DOS_PRIMARY && __USE_TIME_BITS64) || (__CRT_HAVE__stati64 && __CRT_DOS_PRIMARY && !__USE_TIME_BITS64 && __USE_FILE_OFFSET64) || (__CRT_HAVE__stat32i64 && __CRT_DOS_PRIMARY && !__USE_TIME_BITS64 && __USE_FILE_OFFSET64) || (__CRT_HAVE__stat && __CRT_DOS_PRIMARY && !__USE_TIME_BITS64 && !__USE_FILE_OFFSET64) || (__CRT_HAVE__stat32 && __CRT_DOS_PRIMARY && !__USE_TIME_BITS64 && !__USE_FILE_OFFSET64) || (__CRT_HAVE_stat64 && (__USE_FILE_OFFSET64 || __SIZEOF_OFF32_T__ == __SIZEOF_OFF64_T__)) || (__CRT_HAVE_stat && (!__USE_FILE_OFFSET64 || __SIZEOF_OFF32_T__ == __SIZEOF_OFF64_T__)) */
 		result = libc_open(template_,
 #ifdef O_RDONLY
 		              O_RDONLY
@@ -2009,15 +2043,15 @@ again:
 #endif /* !... */
 		              ,
 		              0600);
-#endif /* (!__CRT_HAVE_kstat || !__CRT_KOS_PRIMARY) && (!__CRT_HAVE_kstat64 || !__CRT_KOS_PRIMARY) && (!__CRT_HAVE__stat64 || !__CRT_DOS_PRIMARY || !__USE_TIME_BITS64) && (!__CRT_HAVE__stat64i32 || !__CRT_DOS_PRIMARY || !__USE_TIME_BITS64) && (!__CRT_HAVE__stati64 || !__CRT_DOS_PRIMARY || __USE_TIME_BITS64 || !__USE_FILE_OFFSET64) && (!__CRT_HAVE__stat32i64 || !__CRT_DOS_PRIMARY || __USE_TIME_BITS64 || !__USE_FILE_OFFSET64) && (!__CRT_HAVE__stat || !__CRT_DOS_PRIMARY || __USE_TIME_BITS64 || __USE_FILE_OFFSET64) && (!__CRT_HAVE__stat32 || !__CRT_DOS_PRIMARY || __USE_TIME_BITS64 || __USE_FILE_OFFSET64) && (!__CRT_HAVE_stat64 || !__USE_FILE_OFFSET64) && (!__CRT_HAVE_stat || __USE_FILE_OFFSET64) */
+#endif /* (!__CRT_HAVE_kstat || !__CRT_KOS_PRIMARY) && (!__CRT_HAVE_kstat64 || !__CRT_KOS_PRIMARY) && (!__CRT_HAVE__stat64 || !__CRT_DOS_PRIMARY || !__USE_TIME_BITS64) && (!__CRT_HAVE__stat64i32 || !__CRT_DOS_PRIMARY || !__USE_TIME_BITS64) && (!__CRT_HAVE__stati64 || !__CRT_DOS_PRIMARY || __USE_TIME_BITS64 || !__USE_FILE_OFFSET64) && (!__CRT_HAVE__stat32i64 || !__CRT_DOS_PRIMARY || __USE_TIME_BITS64 || !__USE_FILE_OFFSET64) && (!__CRT_HAVE__stat || !__CRT_DOS_PRIMARY || __USE_TIME_BITS64 || __USE_FILE_OFFSET64) && (!__CRT_HAVE__stat32 || !__CRT_DOS_PRIMARY || __USE_TIME_BITS64 || __USE_FILE_OFFSET64) && (!__CRT_HAVE_stat64 || (!__USE_FILE_OFFSET64 && __SIZEOF_OFF32_T__ != __SIZEOF_OFF64_T__)) && (!__CRT_HAVE_stat || (__USE_FILE_OFFSET64 && __SIZEOF_OFF32_T__ != __SIZEOF_OFF64_T__)) */
 		if (result < 0) {
 			/* File doesn't already exist. */
 			result = 0;
 		} else {
 			/* File does already exist. */
-#if (!defined(__CRT_HAVE_kstat) || !defined(__CRT_KOS_PRIMARY)) && (!defined(__CRT_HAVE_kstat64) || !defined(__CRT_KOS_PRIMARY)) && (!defined(__CRT_HAVE__stat64) || !defined(__CRT_DOS_PRIMARY) || !defined(__USE_TIME_BITS64)) && (!defined(__CRT_HAVE__stat64i32) || !defined(__CRT_DOS_PRIMARY) || !defined(__USE_TIME_BITS64)) && (!defined(__CRT_HAVE__stati64) || !defined(__CRT_DOS_PRIMARY) || defined(__USE_TIME_BITS64) || !defined(__USE_FILE_OFFSET64)) && (!defined(__CRT_HAVE__stat32i64) || !defined(__CRT_DOS_PRIMARY) || defined(__USE_TIME_BITS64) || !defined(__USE_FILE_OFFSET64)) && (!defined(__CRT_HAVE__stat) || !defined(__CRT_DOS_PRIMARY) || defined(__USE_TIME_BITS64) || defined(__USE_FILE_OFFSET64)) && (!defined(__CRT_HAVE__stat32) || !defined(__CRT_DOS_PRIMARY) || defined(__USE_TIME_BITS64) || defined(__USE_FILE_OFFSET64)) && (!defined(__CRT_HAVE_stat64) || !defined(__USE_FILE_OFFSET64)) && (!defined(__CRT_HAVE_stat) || defined(__USE_FILE_OFFSET64)) && (defined(__CRT_HAVE_close) || defined(__CRT_HAVE__close) || defined(__CRT_HAVE___close))
+#if (!defined(__CRT_HAVE_kstat) || !defined(__CRT_KOS_PRIMARY)) && (!defined(__CRT_HAVE_kstat64) || !defined(__CRT_KOS_PRIMARY)) && (!defined(__CRT_HAVE__stat64) || !defined(__CRT_DOS_PRIMARY) || !defined(__USE_TIME_BITS64)) && (!defined(__CRT_HAVE__stat64i32) || !defined(__CRT_DOS_PRIMARY) || !defined(__USE_TIME_BITS64)) && (!defined(__CRT_HAVE__stati64) || !defined(__CRT_DOS_PRIMARY) || defined(__USE_TIME_BITS64) || !defined(__USE_FILE_OFFSET64)) && (!defined(__CRT_HAVE__stat32i64) || !defined(__CRT_DOS_PRIMARY) || defined(__USE_TIME_BITS64) || !defined(__USE_FILE_OFFSET64)) && (!defined(__CRT_HAVE__stat) || !defined(__CRT_DOS_PRIMARY) || defined(__USE_TIME_BITS64) || defined(__USE_FILE_OFFSET64)) && (!defined(__CRT_HAVE__stat32) || !defined(__CRT_DOS_PRIMARY) || defined(__USE_TIME_BITS64) || defined(__USE_FILE_OFFSET64)) && (!defined(__CRT_HAVE_stat64) || (!defined(__USE_FILE_OFFSET64) && __SIZEOF_OFF32_T__ != __SIZEOF_OFF64_T__)) && (!defined(__CRT_HAVE_stat) || (defined(__USE_FILE_OFFSET64) && __SIZEOF_OFF32_T__ != __SIZEOF_OFF64_T__)) && (defined(__CRT_HAVE_close) || defined(__CRT_HAVE__close) || defined(__CRT_HAVE___close))
 			libc_close(result);
-#endif /* (!__CRT_HAVE_kstat || !__CRT_KOS_PRIMARY) && (!__CRT_HAVE_kstat64 || !__CRT_KOS_PRIMARY) && (!__CRT_HAVE__stat64 || !__CRT_DOS_PRIMARY || !__USE_TIME_BITS64) && (!__CRT_HAVE__stat64i32 || !__CRT_DOS_PRIMARY || !__USE_TIME_BITS64) && (!__CRT_HAVE__stati64 || !__CRT_DOS_PRIMARY || __USE_TIME_BITS64 || !__USE_FILE_OFFSET64) && (!__CRT_HAVE__stat32i64 || !__CRT_DOS_PRIMARY || __USE_TIME_BITS64 || !__USE_FILE_OFFSET64) && (!__CRT_HAVE__stat || !__CRT_DOS_PRIMARY || __USE_TIME_BITS64 || __USE_FILE_OFFSET64) && (!__CRT_HAVE__stat32 || !__CRT_DOS_PRIMARY || __USE_TIME_BITS64 || __USE_FILE_OFFSET64) && (!__CRT_HAVE_stat64 || !__USE_FILE_OFFSET64) && (!__CRT_HAVE_stat || __USE_FILE_OFFSET64) && (__CRT_HAVE_close || __CRT_HAVE__close || __CRT_HAVE___close) */
+#endif /* (!__CRT_HAVE_kstat || !__CRT_KOS_PRIMARY) && (!__CRT_HAVE_kstat64 || !__CRT_KOS_PRIMARY) && (!__CRT_HAVE__stat64 || !__CRT_DOS_PRIMARY || !__USE_TIME_BITS64) && (!__CRT_HAVE__stat64i32 || !__CRT_DOS_PRIMARY || !__USE_TIME_BITS64) && (!__CRT_HAVE__stati64 || !__CRT_DOS_PRIMARY || __USE_TIME_BITS64 || !__USE_FILE_OFFSET64) && (!__CRT_HAVE__stat32i64 || !__CRT_DOS_PRIMARY || __USE_TIME_BITS64 || !__USE_FILE_OFFSET64) && (!__CRT_HAVE__stat || !__CRT_DOS_PRIMARY || __USE_TIME_BITS64 || __USE_FILE_OFFSET64) && (!__CRT_HAVE__stat32 || !__CRT_DOS_PRIMARY || __USE_TIME_BITS64 || __USE_FILE_OFFSET64) && (!__CRT_HAVE_stat64 || (!__USE_FILE_OFFSET64 && __SIZEOF_OFF32_T__ != __SIZEOF_OFF64_T__)) && (!__CRT_HAVE_stat || (__USE_FILE_OFFSET64 && __SIZEOF_OFF32_T__ != __SIZEOF_OFF64_T__)) && (__CRT_HAVE_close || __CRT_HAVE__close || __CRT_HAVE___close) */
 #ifdef EEXIST
 			result = __libc_seterrno(EEXIST);
 #else /* EEXIST */
@@ -2027,7 +2061,7 @@ again:
 			goto do_try_again;
 		}
 	}	break;
-#endif /* __CRT_HAVE_open64 || __CRT_HAVE___open64 || __CRT_HAVE_open || __CRT_HAVE__open || __CRT_HAVE___open || (__AT_FDCWD && (__CRT_HAVE_openat64 || __CRT_HAVE_openat)) || (__CRT_HAVE_kstat && __CRT_KOS_PRIMARY) || (__CRT_HAVE_kstat64 && __CRT_KOS_PRIMARY) || (__CRT_HAVE__stat64 && __CRT_DOS_PRIMARY && __USE_TIME_BITS64) || (__CRT_HAVE__stat64i32 && __CRT_DOS_PRIMARY && __USE_TIME_BITS64) || (__CRT_HAVE__stati64 && __CRT_DOS_PRIMARY && !__USE_TIME_BITS64 && __USE_FILE_OFFSET64) || (__CRT_HAVE__stat32i64 && __CRT_DOS_PRIMARY && !__USE_TIME_BITS64 && __USE_FILE_OFFSET64) || (__CRT_HAVE__stat && __CRT_DOS_PRIMARY && !__USE_TIME_BITS64 && !__USE_FILE_OFFSET64) || (__CRT_HAVE__stat32 && __CRT_DOS_PRIMARY && !__USE_TIME_BITS64 && !__USE_FILE_OFFSET64) || (__CRT_HAVE_stat64 && __USE_FILE_OFFSET64) || (__CRT_HAVE_stat && !__USE_FILE_OFFSET64) */
+#endif /* __CRT_HAVE_open64 || __CRT_HAVE___open64 || __CRT_HAVE_open || __CRT_HAVE__open || __CRT_HAVE___open || (__AT_FDCWD && (__CRT_HAVE_openat64 || __CRT_HAVE_openat)) || (__CRT_HAVE_kstat && __CRT_KOS_PRIMARY) || (__CRT_HAVE_kstat64 && __CRT_KOS_PRIMARY) || (__CRT_HAVE__stat64 && __CRT_DOS_PRIMARY && __USE_TIME_BITS64) || (__CRT_HAVE__stat64i32 && __CRT_DOS_PRIMARY && __USE_TIME_BITS64) || (__CRT_HAVE__stati64 && __CRT_DOS_PRIMARY && !__USE_TIME_BITS64 && __USE_FILE_OFFSET64) || (__CRT_HAVE__stat32i64 && __CRT_DOS_PRIMARY && !__USE_TIME_BITS64 && __USE_FILE_OFFSET64) || (__CRT_HAVE__stat && __CRT_DOS_PRIMARY && !__USE_TIME_BITS64 && !__USE_FILE_OFFSET64) || (__CRT_HAVE__stat32 && __CRT_DOS_PRIMARY && !__USE_TIME_BITS64 && !__USE_FILE_OFFSET64) || (__CRT_HAVE_stat64 && (__USE_FILE_OFFSET64 || __SIZEOF_OFF32_T__ == __SIZEOF_OFF64_T__)) || (__CRT_HAVE_stat && (!__USE_FILE_OFFSET64 || __SIZEOF_OFF32_T__ == __SIZEOF_OFF64_T__)) */
 
 	default: __builtin_unreachable();
 	}
@@ -2415,6 +2449,40 @@ NOTHROW_NCX(LIBCCALL libc_mkostemps)(char *template_,
                                      oflag_t flags) {
 	return libc_system_mktemp(0, template_, suffixlen, flags);
 }
+#include <asm/os/oflags.h>
+#if !defined(__O_LARGEFILE) || !__O_LARGEFILE
+DEFINE_INTERN_ALIAS(libc_mkostemp64, libc_mkostemp);
+#else /* !__O_LARGEFILE || !__O_LARGEFILE */
+/* >> mkostemp(3), mkostemp64(3)
+ * Replace  the  last 6  characters of  `template_' (which  are followed  by exactly
+ * `suffixlen'  more  characters that  are left  alone), which  must be  filled with
+ * all  'X'-characters  before  the  call  (else  errno=EINVAL  +  return  -1), with
+ * random  characters  such  that the  filename  described by  `template_'  will not
+ * already exists. Then, create a new file with `O_RDWR | flags' and return the file
+ * descriptor of that file.
+ * @param: flags: Additional  flags  to pass  to `open(2)',
+ *                but `O_ACCMODE' is always set to `O_RDWR' */
+INTERN ATTR_SECTION(".text.crt.bsd") WUNUSED NONNULL((1)) fd_t
+NOTHROW_NCX(LIBCCALL libc_mkostemp64)(char *template_,
+                                      oflag_t flags) {
+	return libc_mkostemps64(template_, 0, flags);
+}
+#endif /* __O_LARGEFILE && __O_LARGEFILE */
+#include <asm/os/oflags.h>
+#if !defined(__O_LARGEFILE) || !__O_LARGEFILE
+DEFINE_INTERN_ALIAS(libc_mkostemps64, libc_mkostemps);
+#else /* !__O_LARGEFILE || !__O_LARGEFILE */
+INTERN ATTR_SECTION(".text.crt.bsd") WUNUSED NONNULL((1)) fd_t
+NOTHROW_NCX(LIBCCALL libc_mkostemps64)(char *template_,
+                                       __STDC_INT_AS_SIZE_T suffixlen,
+                                       oflag_t flags) {
+#ifdef O_LARGEFILE
+	return libc_system_mktemp(0, template_, suffixlen, flags | O_LARGEFILE);
+#else /* O_LARGEFILE */
+	return libc_system_mktemp(0, template_, suffixlen, flags);
+#endif /* !O_LARGEFILE */
+}
+#endif /* __O_LARGEFILE && __O_LARGEFILE */
 /* >> devname(3), devname_r(3) */
 INTERN ATTR_SECTION(".text.crt.bsd") ATTR_CONST char *
 NOTHROW_NCX(LIBCCALL libc_devname)(dev_t dev,
@@ -4629,9 +4697,9 @@ DEFINE_PUBLIC_ALIAS(qecvt_r, libc_qecvt_r);
 DEFINE_PUBLIC_ALIAS(qfcvt_r, libc_qfcvt_r);
 DEFINE_PUBLIC_ALIAS(qecvt, libc_qecvt);
 DEFINE_PUBLIC_ALIAS(qfcvt, libc_qfcvt);
-DEFINE_PUBLIC_ALIAS(mkstemps64, libc_mkstemps);
 DEFINE_PUBLIC_ALIAS(mkstemps, libc_mkstemps);
 DEFINE_PUBLIC_ALIAS(rpmatch, libc_rpmatch);
+DEFINE_PUBLIC_ALIAS(mkstemps64, libc_mkstemps64);
 DEFINE_PUBLIC_ALIAS(l64a, libc_l64a);
 DEFINE_PUBLIC_ALIAS(a64l, libc_a64l);
 #ifdef __LIBCCALL_IS_LIBDCALL
@@ -4648,8 +4716,8 @@ DEFINE_PUBLIC_ALIAS(_fcvt, libc_fcvt);
 #endif /* __LIBCCALL_IS_LIBDCALL */
 DEFINE_PUBLIC_ALIAS(fcvt, libc_fcvt);
 DEFINE_PUBLIC_ALIAS(getsubopt, libc_getsubopt);
-DEFINE_PUBLIC_ALIAS(mkstemp64, libc_mkstemp);
 DEFINE_PUBLIC_ALIAS(mkstemp, libc_mkstemp);
+DEFINE_PUBLIC_ALIAS(mkstemp64, libc_mkstemp64);
 DEFINE_PUBLIC_ALIAS(mkdtemp, libc_mkdtemp);
 DEFINE_PUBLIC_ALIAS(unlockpt, libc_unlockpt);
 DEFINE_PUBLIC_ALIAS(ptsname, libc_ptsname);
@@ -4711,10 +4779,10 @@ DEFINE_PUBLIC_ALIAS(DOS$qsort_r, libd_qsort_r);
 #endif /* !__LIBCCALL_IS_LIBDCALL && !__KERNEL__ */
 DEFINE_PUBLIC_ALIAS(qsort_r, libc_qsort_r);
 #ifndef __KERNEL__
-DEFINE_PUBLIC_ALIAS(mkostemp64, libc_mkostemp);
 DEFINE_PUBLIC_ALIAS(mkostemp, libc_mkostemp);
-DEFINE_PUBLIC_ALIAS(mkostemps64, libc_mkostemps);
 DEFINE_PUBLIC_ALIAS(mkostemps, libc_mkostemps);
+DEFINE_PUBLIC_ALIAS(mkostemp64, libc_mkostemp64);
+DEFINE_PUBLIC_ALIAS(mkostemps64, libc_mkostemps64);
 DEFINE_PUBLIC_ALIAS(devname, libc_devname);
 DEFINE_PUBLIC_ALIAS(strsuftoll, libc_strsuftoll);
 DEFINE_PUBLIC_ALIAS(strsuftollx, libc_strsuftollx);

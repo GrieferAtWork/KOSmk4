@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xd4d04cd4 */
+/* HASH CRC-32:0xd4491439 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -52,13 +52,13 @@ __NAMESPACE_LOCAL_END
 
 #endif /* __BUILDING_LIBC || (!__CRT_HAVE__gmtime64_s && !__CRT_HAVE__gmtime32_s) */
 #ifndef __isleap
-#define __isleap(__year) ((__year)%4 == 0 && ((__year)%100 != 0 || (__year)%400 == 0))
+#define __isleap(__year) ((__year) % 4 == 0 && ((__year) % 100 != 0 || (__year) % 400 == 0))
 #endif /* !__isleap */
 #ifndef __daystoyears
-#define __daystoyears(__n_days)  ((400*((__n_days)+1))/146097)
+#define __daystoyears(__n_days) ((400 * ((__n_days) + 1)) / 146097)
 #endif /* !__daystoyears */
 #ifndef __yearstodays
-#define __yearstodays(__n_years) (((146097*(__n_years))/400)/*-1*/) /* rounding error? */
+#define __yearstodays(__n_years) (((146097 * (__n_years)) / 400) /*-1*/) /* rounding error? */
 #endif /* !__yearstodays */
 __NAMESPACE_LOCAL_BEGIN
 __LOCAL_LIBC(gmtime64_r) __ATTR_NONNULL((1, 2)) struct __NAMESPACE_STD_SYM tm *

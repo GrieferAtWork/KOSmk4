@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xaa7efcfe */
+/* HASH CRC-32:0xcaff737a */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -36,10 +36,10 @@ __CREDIRECT(__ATTR_RETNONNULL __ATTR_WUNUSED __ATTR_NONNULL((1)),struct __NAMESP
 #endif /* !__local___localdep_gmtime32_defined */
 #ifndef __local___localdep_gmtime64_defined
 #define __local___localdep_gmtime64_defined 1
-#ifdef __CRT_HAVE_gmtime64
-__CREDIRECT(__ATTR_RETNONNULL __ATTR_WUNUSED __ATTR_NONNULL((1)),struct __NAMESPACE_STD_SYM tm *,__NOTHROW_NCX,__localdep_gmtime64,(__time64_t const *__timer),gmtime64,(__timer))
-#elif defined(__CRT_HAVE_gmtime) && __SIZEOF_TIME32_T__ == __SIZEOF_TIME64_T__
+#if defined(__CRT_HAVE_gmtime) && __SIZEOF_TIME32_T__ == __SIZEOF_TIME64_T__
 __CREDIRECT(__ATTR_RETNONNULL __ATTR_WUNUSED __ATTR_NONNULL((1)),struct __NAMESPACE_STD_SYM tm *,__NOTHROW_NCX,__localdep_gmtime64,(__time64_t const *__timer),gmtime,(__timer))
+#elif defined(__CRT_HAVE_gmtime64)
+__CREDIRECT(__ATTR_RETNONNULL __ATTR_WUNUSED __ATTR_NONNULL((1)),struct __NAMESPACE_STD_SYM tm *,__NOTHROW_NCX,__localdep_gmtime64,(__time64_t const *__timer),gmtime64,(__timer))
 #elif defined(__CRT_HAVE__gmtime64)
 __CREDIRECT(__ATTR_RETNONNULL __ATTR_WUNUSED __ATTR_NONNULL((1)),struct __NAMESPACE_STD_SYM tm *,__NOTHROW_NCX,__localdep_gmtime64,(__time64_t const *__timer),_gmtime64,(__timer))
 #else /* ... */

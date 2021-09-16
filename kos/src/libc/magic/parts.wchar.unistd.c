@@ -93,15 +93,15 @@ wget_current_dir_name(*)
 }
 
 [[wchar, userimpl, no_crt_self_import]]
-[[if($extended_include_prefix("<features.h>") defined(__USE_FILE_OFFSET64)), preferred_alias("wtruncate64")]]
-[[if($extended_include_prefix("<features.h>")!defined(__USE_FILE_OFFSET64)), preferred_alias("wtruncate")]]
+[[if($extended_include_prefix("<features.h>", "<bits/types.h>")!defined(__USE_FILE_OFFSET64) || __SIZEOF_OFF32_T__ == __SIZEOF_OFF64_T__), preferred_alias("wtruncate")]]
+[[if($extended_include_prefix("<features.h>", "<bits/types.h>") defined(__USE_FILE_OFFSET64) || __SIZEOF_OFF32_T__ == __SIZEOF_OFF64_T__), preferred_alias("wtruncate64")]]
 wtruncate(*) %{generate(str2wcs("truncate"))}
 
 [[wchar, ignore, nocrt, alias("wtruncate")]]
 wtruncate32(*) %{generate(str2wcs("truncate32"))}
 
 %#ifdef __USE_LARGEFILE64
-[[wchar, userimpl, off64_variant_of(wtruncate)]]
+[[wchar, userimpl, preferred_off64_variant_of(wtruncate)]]
 wtruncate64(*) %{generate(str2wcs("truncate64"))}
 %#endif /* __USE_LARGEFILE64 */
 %#endif /* __USE_XOPEN_EXTENDED || __USE_XOPEN2K8 */
@@ -131,14 +131,12 @@ wtruncate64(*) %{generate(str2wcs("truncate64"))}
 %#endif /* __USE_MISC */
 
 %
-%#if (defined(__USE_MISC) || \
-%     (defined(__USE_XOPEN) && !defined(__USE_XOPEN2K)))
+%#if defined(__USE_MISC) || (defined(__USE_XOPEN) && !defined(__USE_XOPEN2K))
 [[wchar, userimpl]] wchroot(*) %{generate(str2wcs("chroot"))}
-%#endif /* ... */
+%#endif /* __USE_MISC || (__USE_XOPEN && !__USE_XOPEN2K) */
 
 //%
-//%#if (defined(_EVERY_SOURCE) || \
-//%     (defined(__USE_XOPEN) && !defined(__USE_XOPEN2K)))
+//%#if defined(_EVERY_SOURCE) || (defined(__USE_XOPEN) && !defined(__USE_XOPEN2K))
 //[[wchar, userimpl]] wctermid(*) %{generate(str2wcs("ctermid"))}
 //%#endif /* _EVERY_SOURCE || (__USE_XOPEN && !__USE_XOPEN2K) */
 

@@ -387,8 +387,8 @@ NOTHROW_RPC(LIBCCALL libc_sem_wait)(sem_t *sem)
 }
 /*[[[end:libc_sem_wait]]]*/
 
-/*[[[head:libc_sem_timedwait,hash:CRC-32=0x7cbb475]]]*/
-/* >> sem_timedwait(3)
+/*[[[head:libc_sem_timedwait,hash:CRC-32=0xc28b06c9]]]*/
+/* >> sem_timedwait(3), sem_timedwait64(3)
  * Wait for a  ticket to  become available  to the  given semaphore  `sem'
  * Once a ticket has become available, consume it and return. If no ticket
  * becomes  available until `abstime' has passed, return `errno=ETIMEDOUT'
@@ -429,11 +429,11 @@ NOTHROW_RPC(LIBCCALL libc_sem_timedwait)(sem_t *__restrict sem,
 }
 /*[[[end:libc_sem_timedwait]]]*/
 
-/*[[[head:libc_sem_timedwait64,hash:CRC-32=0x31716bbc]]]*/
+/*[[[head:libc_sem_timedwait64,hash:CRC-32=0xfc8ce2f]]]*/
 #if __SIZEOF_TIME32_T__ == __SIZEOF_TIME64_T__
 DEFINE_INTERN_ALIAS(libc_sem_timedwait64, libc_sem_timedwait);
 #else /* MAGIC:alias */
-/* >> sem_timedwait(3)
+/* >> sem_timedwait(3), sem_timedwait64(3)
  * Wait for a  ticket to  become available  to the  given semaphore  `sem'
  * Once a ticket has become available, consume it and return. If no ticket
  * becomes  available until `abstime' has passed, return `errno=ETIMEDOUT'

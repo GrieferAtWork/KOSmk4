@@ -169,14 +169,14 @@ typedef struct __fts64 FTS64;
 @@>> fts_children(3), fts_children64(3)
 @@@param: instr: One of `FTS_AGAIN', `FTS_FOLLOW', `FTS_NOINSTR' or `FTS_SKIP'
 [[cp, wunused, no_crt_self_import, decl_include("<features.h>")]]
-[[if($extended_include_prefix("<features.h>")defined(__USE_FILE_OFFSET64)), preferred_alias("fts64_children")]]
-[[if($extended_include_prefix("<features.h>")!defined(__USE_FILE_OFFSET64)), preferred_alias("fts_children")]]
+[[if($extended_include_prefix("<features.h>", "<bits/crt/fts.h>")!defined(__USE_FILE_OFFSET64) || defined(__FTS32_MATCHES_FTS64)), preferred_alias("fts_children")]]
+[[if($extended_include_prefix("<features.h>", "<bits/crt/fts.h>") defined(__USE_FILE_OFFSET64) || defined(__FTS32_MATCHES_FTS64)), preferred_alias("fts64_children")]]
 FTSENT *fts_children([[nonnull]] FTS *ftsp, __STDC_INT_AS_UINT_T instr);
 
 @@>> fts_close(3), fts_close64(3)
 [[no_crt_self_import]]
-[[if($extended_include_prefix("<features.h>")defined(__USE_FILE_OFFSET64)), preferred_alias("fts64_close")]]
-[[if($extended_include_prefix("<features.h>")!defined(__USE_FILE_OFFSET64)), preferred_alias("fts_children")]]
+[[if($extended_include_prefix("<features.h>", "<bits/crt/fts.h>")!defined(__USE_FILE_OFFSET64) || defined(__FTS32_MATCHES_FTS64)), preferred_alias("fts_children")]]
+[[if($extended_include_prefix("<features.h>", "<bits/crt/fts.h>") defined(__USE_FILE_OFFSET64) || defined(__FTS32_MATCHES_FTS64)), preferred_alias("fts64_close")]]
 int fts_close([[nonnull]] FTS *ftsp);
 
 
@@ -184,25 +184,22 @@ int fts_close([[nonnull]] FTS *ftsp);
 @@@param: options: Set of `FTS_COMFOLLOW | FTS_LOGICAL | ... | FTS_STOP'
 [[cp, wunused, no_crt_self_import]]
 [[decl_include("<features.h>"), decl_prefix(DEFINE_FTS_OPEN_COMPAR_T)]]
-[[if($extended_include_prefix("<bits/crt/fts.h>")defined(__FTS32_MATCHES_FTS64)), preferred_alias("fts_open")]]
-[[if($extended_include_prefix("<features.h>")defined(__USE_FILE_OFFSET64)), preferred_alias("fts64_open")]]
-[[if($extended_include_prefix("<features.h>")!defined(__USE_FILE_OFFSET64)), preferred_alias("fts_open")]]
+[[if($extended_include_prefix("<features.h>", "<bits/crt/fts.h>")!defined(__USE_FILE_OFFSET64) || defined(__FTS32_MATCHES_FTS64)), preferred_alias("fts_open")]]
+[[if($extended_include_prefix("<features.h>", "<bits/crt/fts.h>") defined(__USE_FILE_OFFSET64) || defined(__FTS32_MATCHES_FTS64)), preferred_alias("fts64_open")]]
 FTS *fts_open([[nonnull]] char *const *path_argv, __STDC_INT_AS_UINT_T options,
               int (LIBKCALL *compar)(FTSENT const **lhs, FTSENT const **rhs));
 
 @@>> fts_read(3), fts_read64(3)
 [[cp, wunused, no_crt_self_import]]
-[[if($extended_include_prefix("<bits/crt/fts.h>")defined(__FTS32_MATCHES_FTS64)), preferred_alias("fts_read")]]
-[[if($extended_include_prefix("<features.h>")defined(__USE_FILE_OFFSET64)), preferred_alias("fts64_read")]]
-[[if($extended_include_prefix("<features.h>")!defined(__USE_FILE_OFFSET64)), preferred_alias("fts_read")]]
+[[if($extended_include_prefix("<features.h>", "<bits/crt/fts.h>")!defined(__USE_FILE_OFFSET64) || defined(__FTS32_MATCHES_FTS64)), preferred_alias("fts_read")]]
+[[if($extended_include_prefix("<features.h>", "<bits/crt/fts.h>") defined(__USE_FILE_OFFSET64) || defined(__FTS32_MATCHES_FTS64)), preferred_alias("fts64_read")]]
 FTSENT *fts_read([[nonnull]] FTS *ftsp);
 
 @@>> fts_set(3), fts_set64(3)
 @@@param: instr: One of `FTS_AGAIN', `FTS_FOLLOW', `FTS_NOINSTR' or `FTS_SKIP'
 [[no_crt_self_import, decl_include("<features.h>")]]
-[[if($extended_include_prefix("<bits/crt/fts.h>")defined(__FTS32_MATCHES_FTS64)), preferred_alias("fts_set")]]
-[[if($extended_include_prefix("<features.h>")defined(__USE_FILE_OFFSET64)), preferred_alias("fts64_set")]]
-[[if($extended_include_prefix("<features.h>")!defined(__USE_FILE_OFFSET64)), preferred_alias("fts_set")]]
+[[if($extended_include_prefix("<features.h>", "<bits/crt/fts.h>")!defined(__USE_FILE_OFFSET64) || defined(__FTS32_MATCHES_FTS64)), preferred_alias("fts_set")]]
+[[if($extended_include_prefix("<features.h>", "<bits/crt/fts.h>") defined(__USE_FILE_OFFSET64) || defined(__FTS32_MATCHES_FTS64)), preferred_alias("fts64_set")]]
 int fts_set([[nonnull]] FTS *ftsp,
             [[nonnull]] FTSENT *f,
             __STDC_INT_AS_UINT_T instr);
@@ -212,31 +209,26 @@ int fts_set([[nonnull]] FTS *ftsp,
 %
 %#ifdef __USE_LARGEFILE64
 [[cp, wunused, decl_include("<features.h>", "<bits/crt/fts.h>")]]
-[[doc_alias("fts_children"), fts64_variant_of(fts_children)]]
-[[if($extended_include_prefix("<bits/crt/fts.h>")defined(__FTS32_MATCHES_FTS64)), preferred_alias("fts_children")]]
+[[doc_alias("fts_children"), preferred_fts64_variant_of(fts_children)]]
 FTSENT64 *fts64_children([[nonnull]] FTS64 *ftsp, __STDC_INT_AS_UINT_T instr);
 
 [[cp, wunused, decl_include("<bits/crt/fts.h>")]]
-[[doc_alias("fts_close"), fts64_variant_of(fts_close)]]
-[[if($extended_include_prefix("<bits/crt/fts.h>")defined(__FTS32_MATCHES_FTS64)), preferred_alias("fts_close")]]
+[[doc_alias("fts_close"), preferred_fts64_variant_of(fts_close)]]
 int fts64_close([[nonnull]] FTS64 *ftsp);
 
 [[cp, wunused, decl_include("<features.h>", "<bits/crt/fts.h>")]]
-[[doc_alias("fts_open"), fts64_variant_of(fts_open)]]
+[[doc_alias("fts_open"), preferred_fts64_variant_of(fts_open)]]
 [[decl_prefix(DEFINE_FTS_OPEN_COMPAR64_T)]]
-[[if($extended_include_prefix("<bits/crt/fts.h>")defined(__FTS32_MATCHES_FTS64)), preferred_alias("fts_open")]]
 FTS64 *fts64_open([[nonnull]] char *const *path_argv,
                   __STDC_INT_AS_UINT_T options,
                   int (LIBKCALL *compar)(FTSENT64 const **lhs, FTSENT64 const **rhs));
 
 [[cp, wunused, decl_include("<bits/crt/fts.h>")]]
-[[doc_alias("fts_read"), fts64_variant_of(fts_read)]]
-[[if($extended_include_prefix("<bits/crt/fts.h>")defined(__FTS32_MATCHES_FTS64)), preferred_alias("fts_read")]]
+[[doc_alias("fts_read"), preferred_fts64_variant_of(fts_read)]]
 FTSENT64 *fts64_read([[nonnull]] FTS64 *ftsp);
 
 [[decl_include("<features.h>", "<bits/crt/fts.h>")]]
-[[doc_alias("fts_set"), fts64_variant_of(fts_set)]]
-[[if($extended_include_prefix("<bits/crt/fts.h>")defined(__FTS32_MATCHES_FTS64)), preferred_alias("fts_set")]]
+[[doc_alias("fts_set"), preferred_fts64_variant_of(fts_set)]]
 int fts64_set([[nonnull]] FTS64 *ftsp,
               [[nonnull]] FTSENT64 *f,
               __STDC_INT_AS_UINT_T instr);

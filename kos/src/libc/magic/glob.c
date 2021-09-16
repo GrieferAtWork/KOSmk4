@@ -34,8 +34,6 @@
 }
 
 %[default:section(".text.crt{|.dos}.utility.glob")]
-%[define_replacement(glob_t = "struct __glob_struct")]
-%[define_replacement(glob64_t = "struct __glob64_struct")]
 
 
 %[insert:prefix(
@@ -222,92 +220,66 @@ typedef struct __glob64_struct glob64_t;
 
 }
 
-
-[[ignore, nocrt, doc_alias("glob"), alias("glob")]]
-int glob32([[nonnull]] char const *__restrict pattern,
-           int flags, int (LIBKCALL *errfunc)(char const *path, int flags),
-           [[nonnull]] void *__restrict pglob);
-[[ignore, nocrt, doc_alias("globfree"), alias("globfree")]]
-void globfree32(void *pglob);
+%[define_replacement(glob_t = "struct __glob_struct")]
+%[define_replacement(glob64_t = "struct __glob64_struct")]
+%[define_replacement(GLOB_NOSYS = __GLOB_NOSYS)]
 
 
-@@@param: flags: Set of `GLOB_ERR | GLOB_MARK | GLOB_NOSORT | GLOB_DOOFFS |
-@@                       GLOB_NOCHECK | GLOB_APPEND  | GLOB_NOESCAPE  |
-@@                       GLOB_PERIOD | GLOB_MAGCHAR | GLOB_ALTDIRFUNC |
-@@                       GLOB_BRACE  |  GLOB_NOMAGIC  |  GLOB_TILDE   |
-@@                       GLOB_ONLYDIR | GLOB_TILDE_CHECK'
+@@>> glob(3), glob64(3)
+@@@param: flags: Set of `GLOB_ERR | GLOB_MARK  | GLOB_NOSORT | GLOB_DOOFFS  |
+@@               GLOB_NOCHECK  | GLOB_APPEND |  GLOB_NOESCAPE | GLOB_PERIOD |
+@@               GLOB_MAGCHAR | GLOB_ALTDIRFUNC | GLOB_BRACE | GLOB_NOMAGIC |
+@@               GLOB_TILDE | GLOB_ONLYDIR | GLOB_TILDE_CHECK'
 @@@return: GLOB_NOSPACE : ...
 @@@return: GLOB_ABORTED : ...
 @@@return: GLOB_NOMATCH : ...
 @@@return: GLOB_NOSYS   : ...
-[[userimpl, no_crt_self_import]]
-[[decl_prefix(struct __glob_struct;)]]
-[[if($extended_include_prefix("<features.h>") defined(__USE_FILE_OFFSET64)), preferred_alias("glob64")]]
-[[if($extended_include_prefix("<features.h>")!defined(__USE_FILE_OFFSET64)), preferred_alias("glob")]]
-[[nodos, decl_include("<features.h>"), impl_include("<asm/crt/glob.h>")]]
+[[no_crt_self_import, decl_include("<features.h>", "<bits/crt/glob.h>")]]
+[[if($extended_include_prefix("<features.h>", "<bits/crt/glob.h>")!defined(__USE_FILE_OFFSET64) || defined(__GLOB32_MATCHES_GLOB64)), preferred_alias("glob")]]
+[[if($extended_include_prefix("<features.h>", "<bits/crt/glob.h>") defined(__USE_FILE_OFFSET64) || defined(__GLOB32_MATCHES_GLOB64)), preferred_alias("glob64")]]
+[[userimpl, nodos, impl_include("<asm/crt/glob.h>")]]
 int glob([[nonnull]] char const *__restrict pattern, __STDC_INT_AS_UINT_T flags,
          [[nullable]] int (LIBKCALL *errfunc)(char const *path, int flags),
          [[nonnull]] glob_t *__restrict pglob) {
-@@pp_if $has_function(glob32)@@
-	return glob32(pattern, flags, errfunc, pglob);
-@@pp_elif $has_function(glob64)@@
-	return glob64(pattern, flags, errfunc, (struct __glob64_struct *)pglob);
-@@pp_else@@
 	(void)pattern;
 	(void)flags;
 	(void)errfunc;
 	(void)pglob;
 	COMPILER_IMPURE();
-	return @__GLOB_NOSYS@;
-@@pp_endif@@
+	return GLOB_NOSYS;
 }
 
-
-
-
-[[userimpl, no_crt_self_import]]
-[[decl_prefix(struct __glob_struct;)]]
-[[if($extended_include_prefix("<features.h>") defined(__USE_FILE_OFFSET64)), preferred_alias("globfree64")]]
-[[if($extended_include_prefix("<features.h>")!defined(__USE_FILE_OFFSET64)), preferred_alias("globfree")]]
+@@>> globfree(3), globfree64(3)
+[[no_crt_self_import, decl_include("<bits/crt/glob.h>")]]
+[[if($extended_include_prefix("<features.h>", "<bits/crt/glob.h>")!defined(__USE_FILE_OFFSET64) || defined(__GLOB32_MATCHES_GLOB64)), preferred_alias("globfree")]]
+[[if($extended_include_prefix("<features.h>", "<bits/crt/glob.h>") defined(__USE_FILE_OFFSET64) || defined(__GLOB32_MATCHES_GLOB64)), preferred_alias("globfree64")]]
+[[userimpl, nodos]]
 void globfree([[nonnull]] glob_t *pglob) {
-@@pp_if $has_function(globfree32)@@
-	globfree32(pglob);
-@@pp_elif $has_function(globfree64)@@
-	globfree64((struct __glob64_struct *)pglob);
-@@pp_else@@
 	COMPILER_IMPURE();
 	(void)pglob;
-@@pp_endif@@
 }
 
 %
 %#ifdef __USE_LARGEFILE64
-[[doc_alias("glob"), decl_prefix(struct __glob64_struct;), userimpl]]
-[[nodos, decl_include("<features.h>"), impl_include("<asm/crt/glob.h>")]]
+[[doc_alias("glob"), decl_include("<features.h>", "<bits/crt/glob.h>")]]
+[[nodos, userimpl, preferred_glob64_variant_of(glob), impl_include("<asm/crt/glob.h>")]]
 int glob64([[nonnull]] const char *__restrict pattern, __STDC_INT_AS_UINT_T flags,
            [[nullable]] int (LIBKCALL *errfunc)(char const *path, int flags),
            [[nonnull]] struct __glob64_struct *__restrict pglob) {
-@@pp_if $has_function(glob32)@@
-	return glob32(pattern, flags, errfunc, pglob);
-@@pp_else@@
 	(void)pattern;
 	(void)flags;
 	(void)errfunc;
 	(void)pglob;
 	COMPILER_IMPURE();
-	return @__GLOB_NOSYS@;
-@@pp_endif@@
+	return GLOB_NOSYS;
 }
 
-[[doc_alias("globfree"), decl_prefix(struct __glob64_struct;), userimpl]]
+[[doc_alias("globfree"), decl_include("<bits/crt/glob.h>")]]
+[[nodos, userimpl, preferred_glob64_variant_of(globfree)]]
 void globfree64([[nonnull]] struct __glob64_struct *pglob) {
-@@pp_if $has_function(globfree32)@@
-	globfree32(pglob);
-@@pp_else@@
-	COMPILER_IMPURE();
 	(void)pglob;
-@@pp_endif@@
 }
+
 %#endif /* __USE_LARGEFILE64 */
 
 

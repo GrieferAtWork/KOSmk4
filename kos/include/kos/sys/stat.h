@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xfa4eb13d */
+/* HASH CRC-32:0xfb659700 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -31,78 +31,90 @@
 #include <features.h>
 #include <sys/stat.h>
 #include <kos/anno.h>
+#include <bits/os/stat.h>
 
 #ifdef __CC__
 __SYSDECL_BEGIN
 
-#if defined(__CRT_HAVE_KStat) && defined(__USE_FILE_OFFSET64)
+#if defined(__CRT_HAVE_KStat) && (defined(__USE_FILE_OFFSET64) || defined(__STAT32_MATCHES_STAT64))
 /* >> stat(2), stat64(2) */
 __CREDIRECT_VOID(__ATTR_NONNULL((1, 2)),__THROWING,Stat,(char const *__restrict __filename, struct stat *__restrict __buf),KStat,(__filename,__buf))
-#elif defined(__CRT_HAVE_KStat64) && !defined(__USE_FILE_OFFSET64)
+#elif defined(__CRT_HAVE_KStat64) && (!defined(__USE_FILE_OFFSET64) || defined(__STAT32_MATCHES_STAT64))
 /* >> stat(2), stat64(2) */
 __CREDIRECT_VOID(__ATTR_NONNULL((1, 2)),__THROWING,Stat,(char const *__restrict __filename, struct stat *__restrict __buf),KStat64,(__filename,__buf))
 #endif /* ... */
 
-#if defined(__CRT_HAVE_KFStat) && defined(__USE_FILE_OFFSET64)
+#if defined(__CRT_HAVE_KFStat) && (defined(__USE_FILE_OFFSET64) || defined(__STAT32_MATCHES_STAT64))
 /* >> fstat(2), fstat64(2) */
 __CREDIRECT_VOID(__ATTR_NONNULL((2)),__THROWING,FStat,(__fd_t __fd, struct stat *__restrict __buf),KFStat,(__fd,__buf))
-#elif defined(__CRT_HAVE_KFStat64) && !defined(__USE_FILE_OFFSET64)
+#elif defined(__CRT_HAVE_KFStat64) && (!defined(__USE_FILE_OFFSET64) || defined(__STAT32_MATCHES_STAT64))
 /* >> fstat(2), fstat64(2) */
 __CREDIRECT_VOID(__ATTR_NONNULL((2)),__THROWING,FStat,(__fd_t __fd, struct stat *__restrict __buf),KFStat64,(__fd,__buf))
 #endif /* ... */
 
 #if defined(__USE_XOPEN_EXTENDED) || defined(__USE_XOPEN2K)
-#if defined(__CRT_HAVE_KLStat) && defined(__USE_FILE_OFFSET64)
+#if defined(__CRT_HAVE_KLStat) && (defined(__USE_FILE_OFFSET64) || defined(__STAT32_MATCHES_STAT64))
 /* >> lstat(2), lstat64(2) */
 __CREDIRECT_VOID(__ATTR_NONNULL((1, 2)),__THROWING,LStat,(char const *__restrict __filename, struct stat *__restrict __buf),KLStat,(__filename,__buf))
-#elif defined(__CRT_HAVE_KLStat64) && !defined(__USE_FILE_OFFSET64)
+#elif defined(__CRT_HAVE_KLStat64) && (!defined(__USE_FILE_OFFSET64) || defined(__STAT32_MATCHES_STAT64))
 /* >> lstat(2), lstat64(2) */
 __CREDIRECT_VOID(__ATTR_NONNULL((1, 2)),__THROWING,LStat,(char const *__restrict __filename, struct stat *__restrict __buf),KLStat64,(__filename,__buf))
 #endif /* ... */
 #endif /* __USE_XOPEN_EXTENDED || __USE_XOPEN2K */
 
 #ifdef __USE_LARGEFILE64
-#ifdef __CRT_HAVE_KStat64
+#if defined(__CRT_HAVE_KFStatAt) && defined(__STAT32_MATCHES_STAT64)
+/* >> stat(2), stat64(2) */
+__CREDIRECT_VOID(__ATTR_NONNULL((1, 2)),__THROWING,Stat64,(char const *__restrict __filename, struct stat64 *__restrict __buf),KFStatAt,(__filename,__buf))
+#elif defined(__CRT_HAVE_KStat64)
 /* >> stat(2), stat64(2) */
 __CREDIRECT_VOID(__ATTR_NONNULL((1, 2)),__THROWING,Stat64,(char const *__restrict __filename, struct stat64 *__restrict __buf),KStat64,(__filename,__buf))
-#endif /* __CRT_HAVE_KStat64 */
-#ifdef __CRT_HAVE_KFStat64
+#endif /* ... */
+#if defined(__CRT_HAVE_KFStatAt) && defined(__STAT32_MATCHES_STAT64)
+/* >> fstat(2), fstat64(2) */
+__CREDIRECT_VOID(__ATTR_NONNULL((2)),__THROWING,FStat64,(__fd_t __fd, struct stat64 *__restrict __buf),KFStatAt,(__fd,__buf))
+#elif defined(__CRT_HAVE_KFStat64)
 /* >> fstat(2), fstat64(2) */
 __CREDIRECT_VOID(__ATTR_NONNULL((2)),__THROWING,FStat64,(__fd_t __fd, struct stat64 *__restrict __buf),KFStat64,(__fd,__buf))
-#endif /* __CRT_HAVE_KFStat64 */
+#endif /* ... */
 
 #if defined(__USE_XOPEN_EXTENDED) || defined(__USE_XOPEN2K)
-#ifdef __CRT_HAVE_KLStat64
+#if defined(__CRT_HAVE_KFStatAt) && defined(__STAT32_MATCHES_STAT64)
+/* >> lstat(2), lstat64(2) */
+__CREDIRECT_VOID(__ATTR_NONNULL((1, 2)),__THROWING,LStat64,(char const *__restrict __filename, struct stat64 *__restrict __buf),KFStatAt,(__filename,__buf))
+#elif defined(__CRT_HAVE_KLStat64)
 /* >> lstat(2), lstat64(2) */
 __CREDIRECT_VOID(__ATTR_NONNULL((1, 2)),__THROWING,LStat64,(char const *__restrict __filename, struct stat64 *__restrict __buf),KLStat64,(__filename,__buf))
-#endif /* __CRT_HAVE_KLStat64 */
+#endif /* ... */
 #endif /* __USE_XOPEN_EXTENDED || __USE_XOPEN2K */
 #endif /* __USE_LARGEFILE64 */
 
 
 
 #ifdef __USE_ATFILE
-#if defined(__CRT_HAVE_KFStatAt) && defined(__USE_FILE_OFFSET64)
+#if defined(__CRT_HAVE_KFStatAt) && (defined(__USE_FILE_OFFSET64) || defined(__STAT32_MATCHES_STAT64))
 /* >> fstatat(2), fstatat64(2)
  * @param flags: Set of `0 | AT_SYMLINK_NOFOLLOW | AT_DOSPATH' */
 __CREDIRECT_VOID(__ATTR_NONNULL((2, 3)),__THROWING,FStatAt,(__fd_t __dirfd, char const *__restrict __filename, struct stat *__restrict __buf, __atflag_t __flags),KFStatAt,(__dirfd,__filename,__buf,__flags))
-#elif defined(__CRT_HAVE_KFStatAt64) && !defined(__USE_FILE_OFFSET64)
+#elif defined(__CRT_HAVE_KFStatAt64) && (!defined(__USE_FILE_OFFSET64) || defined(__STAT32_MATCHES_STAT64))
 /* >> fstatat(2), fstatat64(2)
  * @param flags: Set of `0 | AT_SYMLINK_NOFOLLOW | AT_DOSPATH' */
 __CREDIRECT_VOID(__ATTR_NONNULL((2, 3)),__THROWING,FStatAt,(__fd_t __dirfd, char const *__restrict __filename, struct stat *__restrict __buf, __atflag_t __flags),KFStatAt64,(__dirfd,__filename,__buf,__flags))
 #endif /* ... */
 #ifdef __USE_LARGEFILE64
-#ifdef __CRT_HAVE_KFStatAt64
+#if defined(__CRT_HAVE_KFStatAt) && defined(__STAT32_MATCHES_STAT64)
+/* >> fstatat(2), fstatat64(2)
+ * @param flags: Set of `0 | AT_SYMLINK_NOFOLLOW | AT_DOSPATH' */
+__CREDIRECT_VOID(__ATTR_NONNULL((2, 3)),__THROWING,FStatAt64,(__fd_t __dirfd, char const *__restrict __filename, struct stat64 *__restrict __buf, __atflag_t __flags),KFStatAt,(__dirfd,__filename,__buf,__flags))
+#elif defined(__CRT_HAVE_KFStatAt64)
 /* >> fstatat(2), fstatat64(2)
  * @param flags: Set of `0 | AT_SYMLINK_NOFOLLOW | AT_DOSPATH' */
 __CREDIRECT_VOID(__ATTR_NONNULL((2, 3)),__THROWING,FStatAt64,(__fd_t __dirfd, char const *__restrict __filename, struct stat64 *__restrict __buf, __atflag_t __flags),KFStatAt64,(__dirfd,__filename,__buf,__flags))
-#endif /* __CRT_HAVE_KFStatAt64 */
+#endif /* ... */
 #endif /* __USE_LARGEFILE64 */
 #endif /* __USE_ATFILE */
-
 /* >> mkdir(2) */
 __CDECLARE_VOID_OPT(__ATTR_NONNULL((1)),__THROWING,Mkdir,(char const *__pathname, __mode_t __mode),(__pathname,__mode))
-
 /* >> chmod(2) */
 __CDECLARE_VOID_OPT(__ATTR_NONNULL((1)),__THROWING,Chmod,(char const *__filename, __mode_t __mode),(__filename,__mode))
 
@@ -119,7 +131,6 @@ __CDECLARE_VOID_OPT(__ATTR_NONNULL((2)),__THROWING,FMkdirAt,(__fd_t __dirfd, cha
  * @param flags: Set of `0 | AT_DOSPATH' */
 __CDECLARE_VOID_OPT(__ATTR_NONNULL((2)),__THROWING,FMknodAt,(__fd_t __dirfd, char const *__nodename, __mode_t __mode, __dev_t __dev, __atflag_t __flags),(__dirfd,__nodename,__mode,__dev,__flags))
 #endif /* __USE_KOS && __USE_ATFILE */
-
 /* >> mkfifo(2) */
 __CDECLARE_VOID_OPT(__ATTR_NONNULL((1)),__THROWING,Mkfifo,(char const *__fifoname, __mode_t __mode),(__fifoname,__mode))
 
@@ -148,74 +159,63 @@ __CDECLARE_VOID_OPT(__ATTR_NONNULL((2)),__THROWING,MknodAt,(__fd_t __dirfd, char
 #endif /* __USE_MISC || __USE_XOPEN_EXTENDED */
 
 #ifdef __USE_ATFILE
-#if defined(__CRT_HAVE_UTimensAt64) && defined(__USE_TIME_BITS64)
-/* >> utimensat(2), utimensat64(2)
- * @param flags: Set of `0|AT_SYMLINK_NOFOLLOW|AT_CHANGE_CTIME|AT_DOSPATH' */
-__CREDIRECT_VOID(__ATTR_NONNULL((2)),__THROWING,UTimensAt,(__fd_t __dirfd, char const *__filename, struct timespec const __times[2 /*or:3*/], __atflag_t __flags),UTimensAt64,(__dirfd,__filename,__times,__flags))
-#elif defined(__CRT_HAVE_UTimensAt) && !defined(__USE_TIME_BITS64)
-/* >> utimensat(2), utimensat64(2)
- * @param flags: Set of `0|AT_SYMLINK_NOFOLLOW|AT_CHANGE_CTIME|AT_DOSPATH' */
-__CDECLARE_VOID(__ATTR_NONNULL((2)),__THROWING,UTimensAt,(__fd_t __dirfd, char const *__filename, struct timespec const __times[2 /*or:3*/], __atflag_t __flags),(__dirfd,__filename,__times,__flags))
-#else /* ... */
 #include <bits/types.h>
-#if defined(__CRT_HAVE_UTimensAt64) || defined(__CRT_HAVE_UTimensAt)
+#if defined(__CRT_HAVE_UTimensAt) && (!defined(__USE_TIME_BITS64) || __SIZEOF_TIME32_T__ == __SIZEOF_TIME64_T__)
+/* >> utimensat(2), utimensat64(2)
+ * @param flags: Set of `0 | AT_SYMLINK_NOFOLLOW | AT_CHANGE_CTIME | AT_DOSPATH' */
+__CDECLARE_VOID(__ATTR_NONNULL((2)),__THROWING,UTimensAt,(__fd_t __dirfd, char const *__filename, struct timespec const __times[2 /*or:3*/], __atflag_t __flags),(__dirfd,__filename,__times,__flags))
+#elif defined(__CRT_HAVE_UTimensAt64) && (defined(__USE_TIME_BITS64) || __SIZEOF_TIME32_T__ == __SIZEOF_TIME64_T__)
+/* >> utimensat(2), utimensat64(2)
+ * @param flags: Set of `0 | AT_SYMLINK_NOFOLLOW | AT_CHANGE_CTIME | AT_DOSPATH' */
+__CREDIRECT_VOID(__ATTR_NONNULL((2)),__THROWING,UTimensAt,(__fd_t __dirfd, char const *__filename, struct timespec const __times[2 /*or:3*/], __atflag_t __flags),UTimensAt64,(__dirfd,__filename,__times,__flags))
+#elif defined(__CRT_HAVE_UTimensAt64) || defined(__CRT_HAVE_UTimensAt)
 #include <libc/local/kos.sys.stat/UTimensAt.h>
 /* >> utimensat(2), utimensat64(2)
- * @param flags: Set of `0|AT_SYMLINK_NOFOLLOW|AT_CHANGE_CTIME|AT_DOSPATH' */
+ * @param flags: Set of `0 | AT_SYMLINK_NOFOLLOW | AT_CHANGE_CTIME | AT_DOSPATH' */
 __NAMESPACE_LOCAL_USING_OR_IMPL(UTimensAt, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_NONNULL((2)) void (__LIBCCALL UTimensAt)(__fd_t __dirfd, char const *__filename, struct timespec const __times[2 /*or:3*/], __atflag_t __flags) __THROWS(...) { (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(UTimensAt))(__dirfd, __filename, __times, __flags); })
-#endif /* __CRT_HAVE_UTimensAt64 || __CRT_HAVE_UTimensAt */
-#endif /* !... */
+#endif /* ... */
 #ifdef __USE_TIME64
-#ifdef __CRT_HAVE_UTimensAt64
-/* >> utimensat(2), utimensat64(2)
- * @param flags: Set of `0|AT_SYMLINK_NOFOLLOW|AT_CHANGE_CTIME|AT_DOSPATH' */
-__CDECLARE_VOID(__ATTR_NONNULL((2)),__THROWING,UTimensAt64,(__fd_t __dirfd, char const *__filename, struct timespec64 const __times[2 /*or:3*/], __atflag_t __flags),(__dirfd,__filename,__times,__flags))
-#else /* __CRT_HAVE_UTimensAt64 */
-#include <bits/types.h>
 #if defined(__CRT_HAVE_UTimensAt) && __SIZEOF_TIME32_T__ == __SIZEOF_TIME64_T__
 /* >> utimensat(2), utimensat64(2)
- * @param flags: Set of `0|AT_SYMLINK_NOFOLLOW|AT_CHANGE_CTIME|AT_DOSPATH' */
+ * @param flags: Set of `0 | AT_SYMLINK_NOFOLLOW | AT_CHANGE_CTIME | AT_DOSPATH' */
 __CREDIRECT_VOID(__ATTR_NONNULL((2)),__THROWING,UTimensAt64,(__fd_t __dirfd, char const *__filename, struct timespec64 const __times[2 /*or:3*/], __atflag_t __flags),UTimensAt,(__dirfd,__filename,__times,__flags))
+#elif defined(__CRT_HAVE_UTimensAt64)
+/* >> utimensat(2), utimensat64(2)
+ * @param flags: Set of `0 | AT_SYMLINK_NOFOLLOW | AT_CHANGE_CTIME | AT_DOSPATH' */
+__CDECLARE_VOID(__ATTR_NONNULL((2)),__THROWING,UTimensAt64,(__fd_t __dirfd, char const *__filename, struct timespec64 const __times[2 /*or:3*/], __atflag_t __flags),(__dirfd,__filename,__times,__flags))
 #elif defined(__CRT_HAVE_UTimensAt)
 #include <libc/local/kos.sys.stat/UTimensAt64.h>
 /* >> utimensat(2), utimensat64(2)
- * @param flags: Set of `0|AT_SYMLINK_NOFOLLOW|AT_CHANGE_CTIME|AT_DOSPATH' */
+ * @param flags: Set of `0 | AT_SYMLINK_NOFOLLOW | AT_CHANGE_CTIME | AT_DOSPATH' */
 __NAMESPACE_LOCAL_USING_OR_IMPL(UTimensAt64, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_NONNULL((2)) void (__LIBCCALL UTimensAt64)(__fd_t __dirfd, char const *__filename, struct timespec64 const __times[2 /*or:3*/], __atflag_t __flags) __THROWS(...) { (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(UTimensAt64))(__dirfd, __filename, __times, __flags); })
 #endif /* ... */
-#endif /* !__CRT_HAVE_UTimensAt64 */
 #endif /* __USE_TIME64 */
 #endif /* __USE_ATFILE */
 
 #ifdef __USE_XOPEN2K8
-#if defined(__CRT_HAVE_FUtimens64) && defined(__USE_TIME_BITS64)
-/* >> futimens(2), futimens64(2) */
-__CREDIRECT_VOID(,__THROWING,FUtimens,(__fd_t __fd, struct timespec const __times[2 /*or:3*/]),FUtimens64,(__fd,__times))
-#elif defined(__CRT_HAVE_FUtimens) && !defined(__USE_TIME_BITS64)
+#if defined(__CRT_HAVE_FUtimens) && (!defined(__USE_TIME_BITS64) || __SIZEOF_TIME32_T__ == __SIZEOF_TIME64_T__)
 /* >> futimens(2), futimens64(2) */
 __CDECLARE_VOID(,__THROWING,FUtimens,(__fd_t __fd, struct timespec const __times[2 /*or:3*/]),(__fd,__times))
-#else /* ... */
-#include <bits/types.h>
-#if defined(__CRT_HAVE_FUtimens64) || defined(__CRT_HAVE_FUtimens)
+#elif defined(__CRT_HAVE_FUtimens64) && (defined(__USE_TIME_BITS64) || __SIZEOF_TIME32_T__ == __SIZEOF_TIME64_T__)
+/* >> futimens(2), futimens64(2) */
+__CREDIRECT_VOID(,__THROWING,FUtimens,(__fd_t __fd, struct timespec const __times[2 /*or:3*/]),FUtimens64,(__fd,__times))
+#elif defined(__CRT_HAVE_FUtimens64) || defined(__CRT_HAVE_FUtimens)
 #include <libc/local/kos.sys.stat/FUtimens.h>
 /* >> futimens(2), futimens64(2) */
 __NAMESPACE_LOCAL_USING_OR_IMPL(FUtimens, __FORCELOCAL __ATTR_ARTIFICIAL void (__LIBCCALL FUtimens)(__fd_t __fd, struct timespec const __times[2 /*or:3*/]) __THROWS(...) { (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(FUtimens))(__fd, __times); })
-#endif /* __CRT_HAVE_FUtimens64 || __CRT_HAVE_FUtimens */
-#endif /* !... */
+#endif /* ... */
 #ifdef __USE_TIME64
-#ifdef __CRT_HAVE_FUtimens64
-/* >> futimens(2), futimens64(2) */
-__CDECLARE_VOID(,__THROWING,FUtimens64,(__fd_t __fd, struct timespec64 const __times[2 /*or:3*/]),(__fd,__times))
-#else /* __CRT_HAVE_FUtimens64 */
-#include <bits/types.h>
 #if defined(__CRT_HAVE_FUtimens) && __SIZEOF_TIME32_T__ == __SIZEOF_TIME64_T__
 /* >> futimens(2), futimens64(2) */
 __CREDIRECT_VOID(,__THROWING,FUtimens64,(__fd_t __fd, struct timespec64 const __times[2 /*or:3*/]),FUtimens,(__fd,__times))
+#elif defined(__CRT_HAVE_FUtimens64)
+/* >> futimens(2), futimens64(2) */
+__CDECLARE_VOID(,__THROWING,FUtimens64,(__fd_t __fd, struct timespec64 const __times[2 /*or:3*/]),(__fd,__times))
 #elif defined(__CRT_HAVE_FUtimens)
 #include <libc/local/kos.sys.stat/FUtimens64.h>
 /* >> futimens(2), futimens64(2) */
 __NAMESPACE_LOCAL_USING_OR_IMPL(FUtimens64, __FORCELOCAL __ATTR_ARTIFICIAL void (__LIBCCALL FUtimens64)(__fd_t __fd, struct timespec64 const __times[2 /*or:3*/]) __THROWS(...) { (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(FUtimens64))(__fd, __times); })
 #endif /* ... */
-#endif /* !__CRT_HAVE_FUtimens64 */
 #endif /* __USE_TIME64 */
 #endif /* __USE_XOPEN2K8 */
 

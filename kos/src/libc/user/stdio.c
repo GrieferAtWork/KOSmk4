@@ -3490,8 +3490,8 @@ NOTHROW_NCX(LIBCCALL libc__set_printf_count_output)(int val)
 }
 /*[[[end:libc__set_printf_count_output]]]*/
 
-/*[[[head:libc_fdreopen,hash:CRC-32=0x2df3c663]]]*/
-/* >> fdreopen(3)
+/*[[[head:libc_fdreopen,hash:CRC-32=0xf42bb1fc]]]*/
+/* >> fdreopen(3), fdreopen_unlocked(3)
  * Re-open the given `stream' as a file-stream for accessing `fd' */
 INTERN ATTR_SECTION(".text.crt.FILE.locked.access") NONNULL((2, 3)) FILE *
 NOTHROW_RPC(LIBCCALL libc_fdreopen)(fd_t fd,
@@ -3524,8 +3524,8 @@ done:
 }
 /*[[[end:libc_fdreopen]]]*/
 
-/*[[[head:libc_fdreopen_unlocked,hash:CRC-32=0x10ea89fb]]]*/
-/* >> fdreopen(3)
+/*[[[head:libc_fdreopen_unlocked,hash:CRC-32=0x4d768afa]]]*/
+/* >> fdreopen(3), fdreopen_unlocked(3)
  * Re-open the given `stream' as a file-stream for accessing `fd' */
 INTERN ATTR_SECTION(".text.crt.FILE.unlocked.access") NONNULL((2, 3)) FILE *
 NOTHROW_RPC(LIBCCALL libc_fdreopen_unlocked)(fd_t fd,
@@ -3553,8 +3553,8 @@ done:
 }
 /*[[[end:libc_fdreopen_unlocked]]]*/
 
-/*[[[head:libc_freopen,hash:CRC-32=0xb196b2c8]]]*/
-/* >> freopen(3), freopen64(3)
+/*[[[head:libc_freopen,hash:CRC-32=0x98fd620c]]]*/
+/* >> freopen(3), freopen64(3), freopen_unlocked(3), freopen64_unlocked(3)
  * Re-open the given `stream' as a file-stream for accessing `filename' */
 INTERN ATTR_SECTION(".text.crt.FILE.locked.access") NONNULL((1, 2, 3)) FILE *
 NOTHROW_RPC(LIBCCALL libc_freopen)(char const *__restrict filename,
@@ -3583,8 +3583,8 @@ NOTHROW_RPC(LIBCCALL libc_freopen)(char const *__restrict filename,
 }
 /*[[[end:libc_freopen]]]*/
 
-/*[[[head:libc_freopen_unlocked,hash:CRC-32=0xfccc30a6]]]*/
-/* >> freopen(3), freopen64(3)
+/*[[[head:libc_freopen_unlocked,hash:CRC-32=0xce123472]]]*/
+/* >> freopen(3), freopen64(3), freopen_unlocked(3), freopen64_unlocked(3)
  * Re-open the given `stream' as a file-stream for accessing `filename' */
 INTERN ATTR_SECTION(".text.crt.FILE.unlocked.access") NONNULL((1, 2, 3)) FILE *
 NOTHROW_RPC(LIBCCALL libc_freopen_unlocked)(char const *__restrict filename,

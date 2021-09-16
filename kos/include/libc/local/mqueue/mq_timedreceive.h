@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xdc198a3e */
+/* HASH CRC-32:0x20232ae4 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -32,10 +32,10 @@ __CREDIRECT(__ATTR_NONNULL((2, 5)),__SSIZE_TYPE__,__NOTHROW_RPC,__localdep_mq_ti
 #endif /* !__local___localdep_mq_timedreceive32_defined && __CRT_HAVE_mq_timedreceive */
 #ifndef __local___localdep_mq_timedreceive64_defined
 #define __local___localdep_mq_timedreceive64_defined 1
-#ifdef __CRT_HAVE_mq_timedreceive64
-__CREDIRECT(__ATTR_NONNULL((2, 5)),__SSIZE_TYPE__,__NOTHROW_RPC,__localdep_mq_timedreceive64,(__mqd_t __mqdes, char *__restrict __msg_ptr, __SIZE_TYPE__ __msg_len, unsigned int *__pmsg_prio, struct __timespec64 const *__restrict __abs_timeout),mq_timedreceive64,(__mqdes,__msg_ptr,__msg_len,__pmsg_prio,__abs_timeout))
-#elif defined(__CRT_HAVE_mq_timedreceive) && __SIZEOF_TIME32_T__ == __SIZEOF_TIME64_T__
+#if defined(__CRT_HAVE_mq_timedreceive) && __SIZEOF_TIME32_T__ == __SIZEOF_TIME64_T__
 __CREDIRECT(__ATTR_NONNULL((2, 5)),__SSIZE_TYPE__,__NOTHROW_RPC,__localdep_mq_timedreceive64,(__mqd_t __mqdes, char *__restrict __msg_ptr, __SIZE_TYPE__ __msg_len, unsigned int *__pmsg_prio, struct __timespec64 const *__restrict __abs_timeout),mq_timedreceive,(__mqdes,__msg_ptr,__msg_len,__pmsg_prio,__abs_timeout))
+#elif defined(__CRT_HAVE_mq_timedreceive64)
+__CREDIRECT(__ATTR_NONNULL((2, 5)),__SSIZE_TYPE__,__NOTHROW_RPC,__localdep_mq_timedreceive64,(__mqd_t __mqdes, char *__restrict __msg_ptr, __SIZE_TYPE__ __msg_len, unsigned int *__pmsg_prio, struct __timespec64 const *__restrict __abs_timeout),mq_timedreceive64,(__mqdes,__msg_ptr,__msg_len,__pmsg_prio,__abs_timeout))
 #elif defined(__CRT_HAVE_mq_timedreceive)
 __NAMESPACE_LOCAL_END
 #include <libc/local/mqueue/mq_timedreceive64.h>

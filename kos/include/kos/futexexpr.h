@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x1cc1d14b */
+/* HASH CRC-32:0x6623e851 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -168,36 +168,7 @@ __NAMESPACE_INT_END
 	(__NAMESPACE_INT_SYM __LFutexExprOffset(offset))
 #endif /* __cplusplus */
 
-#if defined(__CRT_HAVE_lfutexexpr64) && defined(__USE_TIME_BITS64)
-/* >> lfutexexpr(2)
- * The lfutexexpr()  system call  can be  used to  specify arbitrarily  complex
- * expressions  that must  atomically (in  relation to  other futex operations)
- * hold  true before the scheduler will suspend  the calling thread, as well as
- * have the calling thread wait for any number of futex objects associated with
- * any  address that  is checked as  part of the  expression. (s.a. `lfutex()')
- * Notes:
- *   - This is the only futex  function that can be used  to wait on multiple  futex
- *     objects (i.e. resume execution when `LFUTEX_WAKE' is called on _any_ of them)
- *   - For more precise control over waiting on  futex objects, as well as waiting  on
- *     futexes in conjunction  with waiting  on other things  such as  files, see  the
- *     documentation on this topic (lfutex() and select()) at the top of <kos/futex.h>
- * @param: base:          Base pointer added to the `fe_offset' fields of given expressions
- * @param: exprv:         Vector of expressions for which to check
- * @param: exprc:         Number of expressions given in `exprv'
- * @param: timeout:       Timeout for wait operations (s.a. `LFUTEX_WAIT_FLAG_TIMEOUT_*')
- * @param: timeout_flags: Set of `LFUTEX_WAIT_FLAG_TIMEOUT_*'
- * @return: * : The  first  non-zero return  value  from executing  all  of the  given `exprv'
- *              in order (s.a. the documentations of the individual `LFUTEX_WAIT_*'  functions
- *              to see their  possible return  values, which are  always `0'  when they  would
- *              perform a wait  operation, and usually  `1' otherwise) or  `0' if the  calling
- *              thread had to perform a wait operation, at which point this function returning
- *              that value means that you've once again been re-awoken.
- * @return: -1:EFAULT:    A faulty pointer was given
- * @return: -1:EINVAL:    One of the given commands is invalid, or `exprc' was `0'
- * @return: -1:EINTR:     A blocking futex-wait operation was interrupted
- * @return: -1:ETIMEDOUT: A blocking futex-wait operation has timed out */
-__CREDIRECT(__ATTR_NONNULL((3)),int,__NOTHROW_RPC,lfutexexpr,(void *__base, __SIZE_TYPE__ __exprc, struct lfutexexpr const *__exprv, struct timespec const *__timeout, unsigned int __timeout_flags),lfutexexpr64,(__base,__exprc,__exprv,__timeout,__timeout_flags))
-#elif defined(__CRT_HAVE_lfutexexpr) && !defined(__USE_TIME_BITS64)
+#if defined(__CRT_HAVE_lfutexexpr) && (!defined(__USE_TIME_BITS64) || __SIZEOF_TIME32_T__ == __SIZEOF_TIME64_T__)
 /* >> lfutexexpr(2)
  * The lfutexexpr()  system call  can be  used to  specify arbitrarily  complex
  * expressions  that must  atomically (in  relation to  other futex operations)
@@ -226,6 +197,35 @@ __CREDIRECT(__ATTR_NONNULL((3)),int,__NOTHROW_RPC,lfutexexpr,(void *__base, __SI
  * @return: -1:EINTR:     A blocking futex-wait operation was interrupted
  * @return: -1:ETIMEDOUT: A blocking futex-wait operation has timed out */
 __CDECLARE(__ATTR_NONNULL((3)),int,__NOTHROW_RPC,lfutexexpr,(void *__base, __SIZE_TYPE__ __exprc, struct lfutexexpr const *__exprv, struct timespec const *__timeout, unsigned int __timeout_flags),(__base,__exprc,__exprv,__timeout,__timeout_flags))
+#elif defined(__CRT_HAVE_lfutexexpr64) && (defined(__USE_TIME_BITS64) || __SIZEOF_TIME32_T__ == __SIZEOF_TIME64_T__)
+/* >> lfutexexpr(2)
+ * The lfutexexpr()  system call  can be  used to  specify arbitrarily  complex
+ * expressions  that must  atomically (in  relation to  other futex operations)
+ * hold  true before the scheduler will suspend  the calling thread, as well as
+ * have the calling thread wait for any number of futex objects associated with
+ * any  address that  is checked as  part of the  expression. (s.a. `lfutex()')
+ * Notes:
+ *   - This is the only futex  function that can be used  to wait on multiple  futex
+ *     objects (i.e. resume execution when `LFUTEX_WAKE' is called on _any_ of them)
+ *   - For more precise control over waiting on  futex objects, as well as waiting  on
+ *     futexes in conjunction  with waiting  on other things  such as  files, see  the
+ *     documentation on this topic (lfutex() and select()) at the top of <kos/futex.h>
+ * @param: base:          Base pointer added to the `fe_offset' fields of given expressions
+ * @param: exprv:         Vector of expressions for which to check
+ * @param: exprc:         Number of expressions given in `exprv'
+ * @param: timeout:       Timeout for wait operations (s.a. `LFUTEX_WAIT_FLAG_TIMEOUT_*')
+ * @param: timeout_flags: Set of `LFUTEX_WAIT_FLAG_TIMEOUT_*'
+ * @return: * : The  first  non-zero return  value  from executing  all  of the  given `exprv'
+ *              in order (s.a. the documentations of the individual `LFUTEX_WAIT_*'  functions
+ *              to see their  possible return  values, which are  always `0'  when they  would
+ *              perform a wait  operation, and usually  `1' otherwise) or  `0' if the  calling
+ *              thread had to perform a wait operation, at which point this function returning
+ *              that value means that you've once again been re-awoken.
+ * @return: -1:EFAULT:    A faulty pointer was given
+ * @return: -1:EINVAL:    One of the given commands is invalid, or `exprc' was `0'
+ * @return: -1:EINTR:     A blocking futex-wait operation was interrupted
+ * @return: -1:ETIMEDOUT: A blocking futex-wait operation has timed out */
+__CREDIRECT(__ATTR_NONNULL((3)),int,__NOTHROW_RPC,lfutexexpr,(void *__base, __SIZE_TYPE__ __exprc, struct lfutexexpr const *__exprv, struct timespec const *__timeout, unsigned int __timeout_flags),lfutexexpr64,(__base,__exprc,__exprv,__timeout,__timeout_flags))
 #elif defined(__CRT_HAVE_lfutexexpr64) || defined(__CRT_HAVE_lfutexexpr)
 #include <libc/local/kos.futexexpr/lfutexexpr.h>
 /* >> lfutexexpr(2)
@@ -257,36 +257,7 @@ __CDECLARE(__ATTR_NONNULL((3)),int,__NOTHROW_RPC,lfutexexpr,(void *__base, __SIZ
  * @return: -1:ETIMEDOUT: A blocking futex-wait operation has timed out */
 __NAMESPACE_LOCAL_USING_OR_IMPL(lfutexexpr, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_NONNULL((3)) int __NOTHROW_RPC(__LIBCCALL lfutexexpr)(void *__base, __SIZE_TYPE__ __exprc, struct lfutexexpr const *__exprv, struct timespec const *__timeout, unsigned int __timeout_flags) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(lfutexexpr))(__base, __exprc, __exprv, __timeout, __timeout_flags); })
 #endif /* ... */
-#if defined(__CRT_HAVE_lfutexlockexpr64) && defined(__USE_TIME_BITS64)
-/* >> lfutexlockexpr(2)
- * A  function that is similar to `lfutexexpr()', but  allows for the use of one central
- * locking futex that is used for waiting and may be distinct from any other given futex
- * object pointer.
- * Notes:
- *   - This function  only  has  the  calling  thread wait  on  a  single  futex  `ulockaddr',
- *     rather than having it wait on an arbitrary number of futexes, as would be the case when
- *     the `lfutexexpr()' function is used.
- *   - For more precise control over waiting on futex objects, as well as waiting on futexes
- *     in conjunction with waiting on other things  such as files, see the documentation  on
- *     this topic (lfutex() and select()) at the top of <kos/futex.h>
- * @param: ulockaddr:     Address of the futex lock to-be used / The futex on which to wait
- * @param: base:          Base pointer added to the `fe_offset' fields of given expressions
- * @param: exprv:         Vector of expressions for which to check
- * @param: exprc:         Number of expressions given in `exprv'
- * @param: timeout:       Timeout for wait operations (s.a. `LFUTEX_WAIT_FLAG_TIMEOUT_*')
- * @param: timeout_flags: Set of `LFUTEX_WAIT_FLAG_TIMEOUT_*'
- * @return: * : The  first  non-zero return  value  from executing  all  of the  given `exprv'
- *              in order (s.a. the documentations of the individual `LFUTEX_WAIT_*'  functions
- *              to see their  possible return  values, which are  always `0'  when they  would
- *              perform a wait  operation, and usually  `1' otherwise) or  `0' if the  calling
- *              thread had to perform a wait operation, at which point this function returning
- *              that value means that you've once again been re-awoken.
- * @return: -1:EFAULT:    A faulty pointer was given
- * @return: -1:EINVAL:    One of the given commands is invalid, or `exprc' was `0'
- * @return: -1:EINTR:     A blocking futex-wait operation was interrupted
- * @return: -1:ETIMEDOUT: A blocking futex-wait operation has timed out */
-__CREDIRECT(__ATTR_NONNULL((1, 4)),int,__NOTHROW_RPC,lfutexlockexpr,(lfutex_t *__ulockaddr, void *__base, __SIZE_TYPE__ __exprc, struct lfutexexpr const *__exprv, struct timespec const *__timeout, unsigned int __timeout_flags),lfutexlockexpr64,(__ulockaddr,__base,__exprc,__exprv,__timeout,__timeout_flags))
-#elif defined(__CRT_HAVE_lfutexlockexpr) && !defined(__USE_TIME_BITS64)
+#if defined(__CRT_HAVE_lfutexlockexpr) && (!defined(__USE_TIME_BITS64) || __SIZEOF_TIME32_T__ == __SIZEOF_TIME64_T__)
 /* >> lfutexlockexpr(2)
  * A  function that is similar to `lfutexexpr()', but  allows for the use of one central
  * locking futex that is used for waiting and may be distinct from any other given futex
@@ -315,6 +286,35 @@ __CREDIRECT(__ATTR_NONNULL((1, 4)),int,__NOTHROW_RPC,lfutexlockexpr,(lfutex_t *_
  * @return: -1:EINTR:     A blocking futex-wait operation was interrupted
  * @return: -1:ETIMEDOUT: A blocking futex-wait operation has timed out */
 __CDECLARE(__ATTR_NONNULL((1, 4)),int,__NOTHROW_RPC,lfutexlockexpr,(lfutex_t *__ulockaddr, void *__base, __SIZE_TYPE__ __exprc, struct lfutexexpr const *__exprv, struct timespec const *__timeout, unsigned int __timeout_flags),(__ulockaddr,__base,__exprc,__exprv,__timeout,__timeout_flags))
+#elif defined(__CRT_HAVE_lfutexlockexpr64) && (defined(__USE_TIME_BITS64) || __SIZEOF_TIME32_T__ == __SIZEOF_TIME64_T__)
+/* >> lfutexlockexpr(2)
+ * A  function that is similar to `lfutexexpr()', but  allows for the use of one central
+ * locking futex that is used for waiting and may be distinct from any other given futex
+ * object pointer.
+ * Notes:
+ *   - This function  only  has  the  calling  thread wait  on  a  single  futex  `ulockaddr',
+ *     rather than having it wait on an arbitrary number of futexes, as would be the case when
+ *     the `lfutexexpr()' function is used.
+ *   - For more precise control over waiting on futex objects, as well as waiting on futexes
+ *     in conjunction with waiting on other things  such as files, see the documentation  on
+ *     this topic (lfutex() and select()) at the top of <kos/futex.h>
+ * @param: ulockaddr:     Address of the futex lock to-be used / The futex on which to wait
+ * @param: base:          Base pointer added to the `fe_offset' fields of given expressions
+ * @param: exprv:         Vector of expressions for which to check
+ * @param: exprc:         Number of expressions given in `exprv'
+ * @param: timeout:       Timeout for wait operations (s.a. `LFUTEX_WAIT_FLAG_TIMEOUT_*')
+ * @param: timeout_flags: Set of `LFUTEX_WAIT_FLAG_TIMEOUT_*'
+ * @return: * : The  first  non-zero return  value  from executing  all  of the  given `exprv'
+ *              in order (s.a. the documentations of the individual `LFUTEX_WAIT_*'  functions
+ *              to see their  possible return  values, which are  always `0'  when they  would
+ *              perform a wait  operation, and usually  `1' otherwise) or  `0' if the  calling
+ *              thread had to perform a wait operation, at which point this function returning
+ *              that value means that you've once again been re-awoken.
+ * @return: -1:EFAULT:    A faulty pointer was given
+ * @return: -1:EINVAL:    One of the given commands is invalid, or `exprc' was `0'
+ * @return: -1:EINTR:     A blocking futex-wait operation was interrupted
+ * @return: -1:ETIMEDOUT: A blocking futex-wait operation has timed out */
+__CREDIRECT(__ATTR_NONNULL((1, 4)),int,__NOTHROW_RPC,lfutexlockexpr,(lfutex_t *__ulockaddr, void *__base, __SIZE_TYPE__ __exprc, struct lfutexexpr const *__exprv, struct timespec const *__timeout, unsigned int __timeout_flags),lfutexlockexpr64,(__ulockaddr,__base,__exprc,__exprv,__timeout,__timeout_flags))
 #elif defined(__CRT_HAVE_lfutexlockexpr64) || defined(__CRT_HAVE_lfutexlockexpr)
 #include <libc/local/kos.futexexpr/lfutexlockexpr.h>
 /* >> lfutexlockexpr(2)
@@ -348,36 +348,7 @@ __NAMESPACE_LOCAL_USING_OR_IMPL(lfutexlockexpr, __FORCELOCAL __ATTR_ARTIFICIAL _
 #endif /* ... */
 
 #ifdef __USE_TIME64
-#ifdef __CRT_HAVE_lfutexexpr64
-/* >> lfutexexpr(2)
- * The lfutexexpr()  system call  can be  used to  specify arbitrarily  complex
- * expressions  that must  atomically (in  relation to  other futex operations)
- * hold  true before the scheduler will suspend  the calling thread, as well as
- * have the calling thread wait for any number of futex objects associated with
- * any  address that  is checked as  part of the  expression. (s.a. `lfutex()')
- * Notes:
- *   - This is the only futex  function that can be used  to wait on multiple  futex
- *     objects (i.e. resume execution when `LFUTEX_WAKE' is called on _any_ of them)
- *   - For more precise control over waiting on  futex objects, as well as waiting  on
- *     futexes in conjunction  with waiting  on other things  such as  files, see  the
- *     documentation on this topic (lfutex() and select()) at the top of <kos/futex.h>
- * @param: base:          Base pointer added to the `fe_offset' fields of given expressions
- * @param: exprv:         Vector of expressions for which to check
- * @param: exprc:         Number of expressions given in `exprv'
- * @param: timeout:       Timeout for wait operations (s.a. `LFUTEX_WAIT_FLAG_TIMEOUT_*')
- * @param: timeout_flags: Set of `LFUTEX_WAIT_FLAG_TIMEOUT_*'
- * @return: * : The  first  non-zero return  value  from executing  all  of the  given `exprv'
- *              in order (s.a. the documentations of the individual `LFUTEX_WAIT_*'  functions
- *              to see their  possible return  values, which are  always `0'  when they  would
- *              perform a wait  operation, and usually  `1' otherwise) or  `0' if the  calling
- *              thread had to perform a wait operation, at which point this function returning
- *              that value means that you've once again been re-awoken.
- * @return: -1:EFAULT:    A faulty pointer was given
- * @return: -1:EINVAL:    One of the given commands is invalid, or `exprc' was `0'
- * @return: -1:EINTR:     A blocking futex-wait operation was interrupted
- * @return: -1:ETIMEDOUT: A blocking futex-wait operation has timed out */
-__CDECLARE(__ATTR_NONNULL((3)),int,__NOTHROW_RPC,lfutexexpr64,(void *__base, __SIZE_TYPE__ __exprc, struct lfutexexpr const *__exprv, struct timespec64 const *__timeout, unsigned int __timeout_flags),(__base,__exprc,__exprv,__timeout,__timeout_flags))
-#elif defined(__CRT_HAVE_lfutexexpr) && __SIZEOF_TIME32_T__ == __SIZEOF_TIME64_T__
+#if defined(__CRT_HAVE_lfutexexpr) && __SIZEOF_TIME32_T__ == __SIZEOF_TIME64_T__
 /* >> lfutexexpr(2)
  * The lfutexexpr()  system call  can be  used to  specify arbitrarily  complex
  * expressions  that must  atomically (in  relation to  other futex operations)
@@ -406,6 +377,35 @@ __CDECLARE(__ATTR_NONNULL((3)),int,__NOTHROW_RPC,lfutexexpr64,(void *__base, __S
  * @return: -1:EINTR:     A blocking futex-wait operation was interrupted
  * @return: -1:ETIMEDOUT: A blocking futex-wait operation has timed out */
 __CREDIRECT(__ATTR_NONNULL((3)),int,__NOTHROW_RPC,lfutexexpr64,(void *__base, __SIZE_TYPE__ __exprc, struct lfutexexpr const *__exprv, struct timespec64 const *__timeout, unsigned int __timeout_flags),lfutexexpr,(__base,__exprc,__exprv,__timeout,__timeout_flags))
+#elif defined(__CRT_HAVE_lfutexexpr64)
+/* >> lfutexexpr(2)
+ * The lfutexexpr()  system call  can be  used to  specify arbitrarily  complex
+ * expressions  that must  atomically (in  relation to  other futex operations)
+ * hold  true before the scheduler will suspend  the calling thread, as well as
+ * have the calling thread wait for any number of futex objects associated with
+ * any  address that  is checked as  part of the  expression. (s.a. `lfutex()')
+ * Notes:
+ *   - This is the only futex  function that can be used  to wait on multiple  futex
+ *     objects (i.e. resume execution when `LFUTEX_WAKE' is called on _any_ of them)
+ *   - For more precise control over waiting on  futex objects, as well as waiting  on
+ *     futexes in conjunction  with waiting  on other things  such as  files, see  the
+ *     documentation on this topic (lfutex() and select()) at the top of <kos/futex.h>
+ * @param: base:          Base pointer added to the `fe_offset' fields of given expressions
+ * @param: exprv:         Vector of expressions for which to check
+ * @param: exprc:         Number of expressions given in `exprv'
+ * @param: timeout:       Timeout for wait operations (s.a. `LFUTEX_WAIT_FLAG_TIMEOUT_*')
+ * @param: timeout_flags: Set of `LFUTEX_WAIT_FLAG_TIMEOUT_*'
+ * @return: * : The  first  non-zero return  value  from executing  all  of the  given `exprv'
+ *              in order (s.a. the documentations of the individual `LFUTEX_WAIT_*'  functions
+ *              to see their  possible return  values, which are  always `0'  when they  would
+ *              perform a wait  operation, and usually  `1' otherwise) or  `0' if the  calling
+ *              thread had to perform a wait operation, at which point this function returning
+ *              that value means that you've once again been re-awoken.
+ * @return: -1:EFAULT:    A faulty pointer was given
+ * @return: -1:EINVAL:    One of the given commands is invalid, or `exprc' was `0'
+ * @return: -1:EINTR:     A blocking futex-wait operation was interrupted
+ * @return: -1:ETIMEDOUT: A blocking futex-wait operation has timed out */
+__CDECLARE(__ATTR_NONNULL((3)),int,__NOTHROW_RPC,lfutexexpr64,(void *__base, __SIZE_TYPE__ __exprc, struct lfutexexpr const *__exprv, struct timespec64 const *__timeout, unsigned int __timeout_flags),(__base,__exprc,__exprv,__timeout,__timeout_flags))
 #elif defined(__CRT_HAVE_lfutexexpr)
 #include <libc/local/kos.futexexpr/lfutexexpr64.h>
 /* >> lfutexexpr(2)
@@ -437,36 +437,7 @@ __CREDIRECT(__ATTR_NONNULL((3)),int,__NOTHROW_RPC,lfutexexpr64,(void *__base, __
  * @return: -1:ETIMEDOUT: A blocking futex-wait operation has timed out */
 __NAMESPACE_LOCAL_USING_OR_IMPL(lfutexexpr64, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_NONNULL((3)) int __NOTHROW_RPC(__LIBCCALL lfutexexpr64)(void *__base, __SIZE_TYPE__ __exprc, struct lfutexexpr const *__exprv, struct timespec64 const *__timeout, unsigned int __timeout_flags) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(lfutexexpr64))(__base, __exprc, __exprv, __timeout, __timeout_flags); })
 #endif /* ... */
-#ifdef __CRT_HAVE_lfutexlockexpr64
-/* >> lfutexlockexpr(2)
- * A  function that is similar to `lfutexexpr()', but  allows for the use of one central
- * locking futex that is used for waiting and may be distinct from any other given futex
- * object pointer.
- * Notes:
- *   - This function  only  has  the  calling  thread wait  on  a  single  futex  `ulockaddr',
- *     rather than having it wait on an arbitrary number of futexes, as would be the case when
- *     the `lfutexexpr()' function is used.
- *   - For more precise control over waiting on futex objects, as well as waiting on futexes
- *     in conjunction with waiting on other things  such as files, see the documentation  on
- *     this topic (lfutex() and select()) at the top of <kos/futex.h>
- * @param: ulockaddr:     Address of the futex lock to-be used / The futex on which to wait
- * @param: base:          Base pointer added to the `fe_offset' fields of given expressions
- * @param: exprv:         Vector of expressions for which to check
- * @param: exprc:         Number of expressions given in `exprv'
- * @param: timeout:       Timeout for wait operations (s.a. `LFUTEX_WAIT_FLAG_TIMEOUT_*')
- * @param: timeout_flags: Set of `LFUTEX_WAIT_FLAG_TIMEOUT_*'
- * @return: * : The  first  non-zero return  value  from executing  all  of the  given `exprv'
- *              in order (s.a. the documentations of the individual `LFUTEX_WAIT_*'  functions
- *              to see their  possible return  values, which are  always `0'  when they  would
- *              perform a wait  operation, and usually  `1' otherwise) or  `0' if the  calling
- *              thread had to perform a wait operation, at which point this function returning
- *              that value means that you've once again been re-awoken.
- * @return: -1:EFAULT:    A faulty pointer was given
- * @return: -1:EINVAL:    One of the given commands is invalid, or `exprc' was `0'
- * @return: -1:EINTR:     A blocking futex-wait operation was interrupted
- * @return: -1:ETIMEDOUT: A blocking futex-wait operation has timed out */
-__CDECLARE(__ATTR_NONNULL((1, 4)),int,__NOTHROW_RPC,lfutexlockexpr64,(lfutex_t *__ulockaddr, void *__base, __SIZE_TYPE__ __exprc, struct lfutexexpr const *__exprv, struct timespec64 const *__timeout, unsigned int __timeout_flags),(__ulockaddr,__base,__exprc,__exprv,__timeout,__timeout_flags))
-#elif defined(__CRT_HAVE_lfutexlockexpr) && __SIZEOF_TIME32_T__ == __SIZEOF_TIME64_T__
+#if defined(__CRT_HAVE_lfutexlockexpr) && __SIZEOF_TIME32_T__ == __SIZEOF_TIME64_T__
 /* >> lfutexlockexpr(2)
  * A  function that is similar to `lfutexexpr()', but  allows for the use of one central
  * locking futex that is used for waiting and may be distinct from any other given futex
@@ -495,6 +466,35 @@ __CDECLARE(__ATTR_NONNULL((1, 4)),int,__NOTHROW_RPC,lfutexlockexpr64,(lfutex_t *
  * @return: -1:EINTR:     A blocking futex-wait operation was interrupted
  * @return: -1:ETIMEDOUT: A blocking futex-wait operation has timed out */
 __CREDIRECT(__ATTR_NONNULL((1, 4)),int,__NOTHROW_RPC,lfutexlockexpr64,(lfutex_t *__ulockaddr, void *__base, __SIZE_TYPE__ __exprc, struct lfutexexpr const *__exprv, struct timespec64 const *__timeout, unsigned int __timeout_flags),lfutexlockexpr,(__ulockaddr,__base,__exprc,__exprv,__timeout,__timeout_flags))
+#elif defined(__CRT_HAVE_lfutexlockexpr64)
+/* >> lfutexlockexpr(2)
+ * A  function that is similar to `lfutexexpr()', but  allows for the use of one central
+ * locking futex that is used for waiting and may be distinct from any other given futex
+ * object pointer.
+ * Notes:
+ *   - This function  only  has  the  calling  thread wait  on  a  single  futex  `ulockaddr',
+ *     rather than having it wait on an arbitrary number of futexes, as would be the case when
+ *     the `lfutexexpr()' function is used.
+ *   - For more precise control over waiting on futex objects, as well as waiting on futexes
+ *     in conjunction with waiting on other things  such as files, see the documentation  on
+ *     this topic (lfutex() and select()) at the top of <kos/futex.h>
+ * @param: ulockaddr:     Address of the futex lock to-be used / The futex on which to wait
+ * @param: base:          Base pointer added to the `fe_offset' fields of given expressions
+ * @param: exprv:         Vector of expressions for which to check
+ * @param: exprc:         Number of expressions given in `exprv'
+ * @param: timeout:       Timeout for wait operations (s.a. `LFUTEX_WAIT_FLAG_TIMEOUT_*')
+ * @param: timeout_flags: Set of `LFUTEX_WAIT_FLAG_TIMEOUT_*'
+ * @return: * : The  first  non-zero return  value  from executing  all  of the  given `exprv'
+ *              in order (s.a. the documentations of the individual `LFUTEX_WAIT_*'  functions
+ *              to see their  possible return  values, which are  always `0'  when they  would
+ *              perform a wait  operation, and usually  `1' otherwise) or  `0' if the  calling
+ *              thread had to perform a wait operation, at which point this function returning
+ *              that value means that you've once again been re-awoken.
+ * @return: -1:EFAULT:    A faulty pointer was given
+ * @return: -1:EINVAL:    One of the given commands is invalid, or `exprc' was `0'
+ * @return: -1:EINTR:     A blocking futex-wait operation was interrupted
+ * @return: -1:ETIMEDOUT: A blocking futex-wait operation has timed out */
+__CDECLARE(__ATTR_NONNULL((1, 4)),int,__NOTHROW_RPC,lfutexlockexpr64,(lfutex_t *__ulockaddr, void *__base, __SIZE_TYPE__ __exprc, struct lfutexexpr const *__exprv, struct timespec64 const *__timeout, unsigned int __timeout_flags),(__ulockaddr,__base,__exprc,__exprv,__timeout,__timeout_flags))
 #elif defined(__CRT_HAVE_lfutexlockexpr)
 #include <libc/local/kos.futexexpr/lfutexlockexpr64.h>
 /* >> lfutexlockexpr(2)

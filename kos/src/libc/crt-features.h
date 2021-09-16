@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xd08d73cf */
+/* HASH CRC-32:0xc79caa36 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -1265,8 +1265,6 @@
 #if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
 #define __CRT_HAVE_DOS$getwd
 #define __CRT_HAVE_DOS$getxattr
-#define __CRT_HAVE_DOS$globfree
-#define __CRT_HAVE_DOS$globfree64
 #define __CRT_HAVE_DOS$gmtime
 #define __CRT_HAVE_DOS$gmtime64
 #define __CRT_HAVE_DOS$gmtime64_r
@@ -1670,9 +1668,13 @@
 #define __CRT_HAVE_DOS$mknod
 #define __CRT_HAVE_DOS$mknodat
 #define __CRT_HAVE_DOS$mkostemp
+#define __CRT_HAVE_DOS$mkostemp64
 #define __CRT_HAVE_DOS$mkostemps
+#define __CRT_HAVE_DOS$mkostemps64
 #define __CRT_HAVE_DOS$mkstemp
+#define __CRT_HAVE_DOS$mkstemp64
 #define __CRT_HAVE_DOS$mkstemps
+#define __CRT_HAVE_DOS$mkstemps64
 #define __CRT_HAVE_DOS$mktemp
 #define __CRT_HAVE_DOS$mktime
 #define __CRT_HAVE_DOS$mktime64
@@ -4901,9 +4903,13 @@
 #define __CRT_HAVE_mknod
 #define __CRT_HAVE_mknodat
 #define __CRT_HAVE_mkostemp
+#define __CRT_HAVE_mkostemp64
 #define __CRT_HAVE_mkostemps
+#define __CRT_HAVE_mkostemps64
 #define __CRT_HAVE_mkstemp
+#define __CRT_HAVE_mkstemp64
 #define __CRT_HAVE_mkstemps
+#define __CRT_HAVE_mkstemps64
 #define __CRT_HAVE_mktemp
 #define __CRT_HAVE_mktime
 #define __CRT_HAVE_mktime64

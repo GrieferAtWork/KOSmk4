@@ -689,8 +689,8 @@ $errno_t pthread_tryjoin_np(pthread_t pthread, void **thread_return);
 @@@return: EINVAL:    The given `abstime' is invalid
 @@@return: ETIMEDOUT: The given `abstime' has expired
 [[cp, decl_include("<bits/types.h>", "<bits/crt/pthreadtypes.h>", "<bits/os/timespec.h>"), no_crt_self_import]]
-[[if($extended_include_prefix("<features.h>") defined(__USE_TIME_BITS64)), preferred_alias("pthread_timedjoin64_np")]]
-[[if($extended_include_prefix("<features.h>")!defined(__USE_TIME_BITS64)), preferred_alias("pthread_timedjoin_np")]]
+[[if($extended_include_prefix("<features.h>", "<bits/types.h>")!defined(__USE_TIME_BITS64) || __SIZEOF_TIME32_T__ == __SIZEOF_TIME64_T__), preferred_alias("pthread_timedjoin_np")]]
+[[if($extended_include_prefix("<features.h>", "<bits/types.h>") defined(__USE_TIME_BITS64) || __SIZEOF_TIME32_T__ == __SIZEOF_TIME64_T__), preferred_alias("pthread_timedjoin64_np")]]
 [[userimpl, requires($has_function(pthread_timedjoin32_np) || $has_function(pthread_timedjoin64_np))]]
 $errno_t pthread_timedjoin_np(pthread_t pthread, void **thread_return,
                               struct timespec const *abstime) {
@@ -718,7 +718,7 @@ $errno_t pthread_timedjoin32_np(pthread_t pthread, void **thread_return,
                                 struct timespec32 const *abstime);
 
 
-[[cp, time64_variant_of(pthread_timedjoin_np), doc_alias("pthread_timedjoin_np")]]
+[[cp, preferred_time64_variant_of(pthread_timedjoin_np), doc_alias("pthread_timedjoin_np")]]
 [[decl_include("<bits/types.h>", "<bits/crt/pthreadtypes.h>", "<bits/os/timespec.h>")]]
 [[userimpl, requires_function(pthread_timedjoin32_np)]]
 $errno_t pthread_timedjoin64_np(pthread_t pthread, void **thread_return,
@@ -1562,8 +1562,8 @@ $errno_t pthread_mutex_lock([[nonnull]] pthread_mutex_t *mutex);
 @@@return: ETIMEDOUT: The given `abstime' has expired
 [[cp, wunused, userimpl, no_crt_self_import]]
 [[decl_include("<bits/types.h>", "<bits/crt/pthreadtypes.h>", "<bits/os/timespec.h>")]]
-[[if($extended_include_prefix("<features.h>") defined(__USE_TIME_BITS64)), preferred_alias("pthread_mutex_timedlock64")]]
-[[if($extended_include_prefix("<features.h>")!defined(__USE_TIME_BITS64)), preferred_alias("pthread_mutex_timedlock")]]
+[[if($extended_include_prefix("<features.h>", "<bits/types.h>")!defined(__USE_TIME_BITS64) || __SIZEOF_TIME32_T__ == __SIZEOF_TIME64_T__), preferred_alias("pthread_mutex_timedlock")]]
+[[if($extended_include_prefix("<features.h>", "<bits/types.h>") defined(__USE_TIME_BITS64) || __SIZEOF_TIME32_T__ == __SIZEOF_TIME64_T__), preferred_alias("pthread_mutex_timedlock64")]]
 [[requires($has_function(pthread_mutex_timedlock32) ||
            $has_function(pthread_mutex_timedlock64))]]
 $errno_t pthread_mutex_timedlock([[nonnull]] pthread_mutex_t *__restrict mutex,
@@ -1591,7 +1591,7 @@ $errno_t pthread_mutex_timedlock([[nonnull]] pthread_mutex_t *__restrict mutex,
 $errno_t pthread_mutex_timedlock32([[nonnull]] pthread_mutex_t *__restrict mutex,
                                    [[nonnull]] struct timespec const *__restrict abstime);
 
-[[cp, doc_alias("pthread_mutex_timedlock"), time64_variant_of(pthread_mutex_timedlock)]]
+[[cp, preferred_time64_variant_of(pthread_mutex_timedlock), doc_alias("pthread_mutex_timedlock")]]
 [[decl_include("<bits/types.h>", "<bits/crt/pthreadtypes.h>", "<bits/os/timespec.h>")]]
 [[wunused, userimpl, requires($has_function(pthread_mutex_timedlock32))]]
 $errno_t pthread_mutex_timedlock64([[nonnull]] pthread_mutex_t *__restrict mutex,
@@ -1615,8 +1615,8 @@ $errno_t pthread_mutex_timedlock64([[nonnull]] pthread_mutex_t *__restrict mutex
 @@@return: ETIMEDOUT: The given `reltime' has expired
 [[cp, wunused, userimpl, no_crt_self_import]]
 [[decl_include("<bits/types.h>", "<bits/crt/pthreadtypes.h>", "<bits/os/timespec.h>")]]
-[[if($extended_include_prefix("<features.h>") defined(__USE_TIME_BITS64)), preferred_alias("pthread_mutex_reltimedlock64_np")]]
-[[if($extended_include_prefix("<features.h>")!defined(__USE_TIME_BITS64)), preferred_alias("pthread_mutex_reltimedlock_np")]]
+[[if($extended_include_prefix("<features.h>", "<bits/types.h>")!defined(__USE_TIME_BITS64) || __SIZEOF_TIME32_T__ == __SIZEOF_TIME64_T__), preferred_alias("pthread_mutex_reltimedlock_np")]]
+[[if($extended_include_prefix("<features.h>", "<bits/types.h>") defined(__USE_TIME_BITS64) || __SIZEOF_TIME32_T__ == __SIZEOF_TIME64_T__), preferred_alias("pthread_mutex_reltimedlock64_np")]]
 [[requires($has_function(pthread_mutex_reltimedlock32_np) ||
            $has_function(pthread_mutex_reltimedlock64_np))]]
 $errno_t pthread_mutex_reltimedlock_np([[nonnull]] pthread_mutex_t *__restrict mutex,
@@ -1644,7 +1644,7 @@ $errno_t pthread_mutex_reltimedlock_np([[nonnull]] pthread_mutex_t *__restrict m
 $errno_t pthread_mutex_reltimedlock32_np([[nonnull]] pthread_mutex_t *__restrict mutex,
                                          [[nonnull]] struct timespec const *__restrict reltime);
 
-[[cp, doc_alias("pthread_mutex_reltimedlock_np"), time64_variant_of(pthread_mutex_reltimedlock_np)]]
+[[cp, preferred_time64_variant_of(pthread_mutex_reltimedlock_np), doc_alias("pthread_mutex_reltimedlock_np")]]
 [[decl_include("<bits/types.h>", "<bits/crt/pthreadtypes.h>", "<bits/os/timespec.h>")]]
 [[wunused, userimpl, requires($has_function(pthread_mutex_reltimedlock32_np))]]
 $errno_t pthread_mutex_reltimedlock64_np([[nonnull]] pthread_mutex_t *__restrict mutex,
@@ -1865,8 +1865,8 @@ $errno_t pthread_rwlock_trywrlock([[nonnull]] pthread_rwlock_t *rwlock);
 @@@return: EINVAL:    The given `abstime' is invalid
 @@@return: ETIMEDOUT: The given `abstime' has expired
 [[cp, userimpl, wunused, no_crt_self_import]]
-[[if($extended_include_prefix("<features.h>") defined(__USE_TIME_BITS64)), preferred_alias("pthread_rwlock_timedrdlock64")]]
-[[if($extended_include_prefix("<features.h>")!defined(__USE_TIME_BITS64)), preferred_alias("pthread_rwlock_timedrdlock")]]
+[[if($extended_include_prefix("<features.h>", "<bits/types.h>")!defined(__USE_TIME_BITS64) || __SIZEOF_TIME32_T__ == __SIZEOF_TIME64_T__), preferred_alias("pthread_rwlock_timedrdlock")]]
+[[if($extended_include_prefix("<features.h>", "<bits/types.h>") defined(__USE_TIME_BITS64) || __SIZEOF_TIME32_T__ == __SIZEOF_TIME64_T__), preferred_alias("pthread_rwlock_timedrdlock64")]]
 [[decl_include("<bits/types.h>", "<bits/crt/pthreadtypes.h>", "<bits/os/timespec.h>")]]
 [[requires($has_function(pthread_rwlock_timedrdlock32) ||
            $has_function(pthread_rwlock_timedrdlock64))]]
@@ -1895,8 +1895,8 @@ $errno_t pthread_rwlock_timedrdlock([[nonnull]] pthread_rwlock_t *__restrict rwl
 @@@return: EINVAL:    The given `abstime' is invalid
 @@@return: ETIMEDOUT: The given `abstime' has expired
 [[cp, wunused, userimpl, no_crt_self_import]]
-[[if($extended_include_prefix("<features.h>") defined(__USE_TIME_BITS64)), preferred_alias("pthread_rwlock_timedwrlock64")]]
-[[if($extended_include_prefix("<features.h>")!defined(__USE_TIME_BITS64)), preferred_alias("pthread_rwlock_timedwrlock")]]
+[[if($extended_include_prefix("<features.h>", "<bits/types.h>")!defined(__USE_TIME_BITS64) || __SIZEOF_TIME32_T__ == __SIZEOF_TIME64_T__), preferred_alias("pthread_rwlock_timedwrlock")]]
+[[if($extended_include_prefix("<features.h>", "<bits/types.h>") defined(__USE_TIME_BITS64) || __SIZEOF_TIME32_T__ == __SIZEOF_TIME64_T__), preferred_alias("pthread_rwlock_timedwrlock64")]]
 [[decl_include("<bits/types.h>", "<bits/crt/pthreadtypes.h>", "<bits/os/timespec.h>")]]
 [[requires($has_function(pthread_rwlock_timedwrlock32) ||
            $has_function(pthread_rwlock_timedwrlock64))]]
@@ -1929,7 +1929,7 @@ $errno_t pthread_rwlock_timedrdlock32([[nonnull]] pthread_rwlock_t *__restrict r
 $errno_t pthread_rwlock_timedwrlock32([[nonnull]] pthread_rwlock_t *__restrict rwlock,
                                       [[nonnull]] struct timespec32 const *__restrict abstime);
 
-[[cp, doc_alias("pthread_rwlock_timedrdlock"), time64_variant_of(pthread_rwlock_timedrdlock)]]
+[[cp, preferred_time64_variant_of(pthread_rwlock_timedrdlock), doc_alias("pthread_rwlock_timedrdlock")]]
 [[decl_include("<bits/types.h>", "<bits/crt/pthreadtypes.h>", "<bits/os/timespec.h>")]]
 [[wunused, userimpl, requires_function(pthread_rwlock_timedrdlock32)]]
 $errno_t pthread_rwlock_timedrdlock64([[nonnull]] pthread_rwlock_t *__restrict rwlock,
@@ -1942,7 +1942,7 @@ $errno_t pthread_rwlock_timedrdlock64([[nonnull]] pthread_rwlock_t *__restrict r
 	return result;
 }
 
-[[cp, doc_alias("pthread_rwlock_timedwrlock"), time64_variant_of(pthread_rwlock_timedwrlock)]]
+[[cp, preferred_time64_variant_of(pthread_rwlock_timedwrlock), doc_alias("pthread_rwlock_timedwrlock")]]
 [[decl_include("<bits/types.h>", "<bits/crt/pthreadtypes.h>", "<bits/os/timespec.h>")]]
 [[wunused, userimpl, requires_function(pthread_rwlock_timedwrlock32)]]
 $errno_t pthread_rwlock_timedwrlock64([[nonnull]] pthread_rwlock_t *__restrict rwlock,
@@ -1964,8 +1964,8 @@ $errno_t pthread_rwlock_timedwrlock64([[nonnull]] pthread_rwlock_t *__restrict r
 @@@return: EINVAL:    The given `reltime' is invalid
 @@@return: ETIMEDOUT: The given `reltime' has expired
 [[cp, userimpl, wunused, no_crt_self_import]]
-[[if($extended_include_prefix("<features.h>") defined(__USE_TIME_BITS64)), preferred_alias("pthread_rwlock_reltimedrdlock64_np")]]
-[[if($extended_include_prefix("<features.h>")!defined(__USE_TIME_BITS64)), preferred_alias("pthread_rwlock_reltimedrdlock_np")]]
+[[if($extended_include_prefix("<features.h>", "<bits/types.h>")!defined(__USE_TIME_BITS64) || __SIZEOF_TIME32_T__ == __SIZEOF_TIME64_T__), preferred_alias("pthread_rwlock_reltimedrdlock_np")]]
+[[if($extended_include_prefix("<features.h>", "<bits/types.h>") defined(__USE_TIME_BITS64) || __SIZEOF_TIME32_T__ == __SIZEOF_TIME64_T__), preferred_alias("pthread_rwlock_reltimedrdlock64_np")]]
 [[decl_include("<bits/types.h>", "<bits/crt/pthreadtypes.h>", "<bits/os/timespec.h>")]]
 [[requires($has_function(pthread_rwlock_reltimedrdlock32_np) ||
            $has_function(pthread_rwlock_reltimedrdlock64_np))]]
@@ -1994,8 +1994,8 @@ $errno_t pthread_rwlock_reltimedrdlock_np([[nonnull]] pthread_rwlock_t *__restri
 @@@return: EINVAL:    The given `reltime' is invalid
 @@@return: ETIMEDOUT: The given `reltime' has expired
 [[cp, wunused, userimpl, no_crt_self_import]]
-[[if($extended_include_prefix("<features.h>") defined(__USE_TIME_BITS64)), preferred_alias("pthread_rwlock_reltimedwrlock64_np")]]
-[[if($extended_include_prefix("<features.h>")!defined(__USE_TIME_BITS64)), preferred_alias("pthread_rwlock_reltimedwrlock_np")]]
+[[if($extended_include_prefix("<features.h>", "<bits/types.h>")!defined(__USE_TIME_BITS64) || __SIZEOF_TIME32_T__ == __SIZEOF_TIME64_T__), preferred_alias("pthread_rwlock_reltimedwrlock_np")]]
+[[if($extended_include_prefix("<features.h>", "<bits/types.h>") defined(__USE_TIME_BITS64) || __SIZEOF_TIME32_T__ == __SIZEOF_TIME64_T__), preferred_alias("pthread_rwlock_reltimedwrlock64_np")]]
 [[decl_include("<bits/types.h>", "<bits/crt/pthreadtypes.h>", "<bits/os/timespec.h>")]]
 [[requires($has_function(pthread_rwlock_reltimedwrlock32_np) ||
            $has_function(pthread_rwlock_reltimedwrlock64_np))]]
@@ -2028,7 +2028,7 @@ $errno_t pthread_rwlock_reltimedrdlock32_np([[nonnull]] pthread_rwlock_t *__rest
 $errno_t pthread_rwlock_reltimedwrlock32_np([[nonnull]] pthread_rwlock_t *__restrict rwlock,
                                             [[nonnull]] struct timespec32 const *__restrict reltime);
 
-[[cp, doc_alias("pthread_rwlock_reltimedrdlock_np"), time64_variant_of(pthread_rwlock_reltimedrdlock_np)]]
+[[cp, preferred_time64_variant_of(pthread_rwlock_reltimedrdlock_np), doc_alias("pthread_rwlock_reltimedrdlock_np")]]
 [[decl_include("<bits/types.h>", "<bits/crt/pthreadtypes.h>", "<bits/os/timespec.h>")]]
 [[wunused, userimpl, requires_function(pthread_rwlock_reltimedrdlock32_np)]]
 $errno_t pthread_rwlock_reltimedrdlock64_np([[nonnull]] pthread_rwlock_t *__restrict rwlock,
@@ -2041,7 +2041,7 @@ $errno_t pthread_rwlock_reltimedrdlock64_np([[nonnull]] pthread_rwlock_t *__rest
 	return result;
 }
 
-[[cp, doc_alias("pthread_rwlock_reltimedwrlock_np"), time64_variant_of(pthread_rwlock_reltimedwrlock_np)]]
+[[cp, preferred_time64_variant_of(pthread_rwlock_reltimedwrlock_np), doc_alias("pthread_rwlock_reltimedwrlock_np")]]
 [[decl_include("<bits/types.h>", "<bits/crt/pthreadtypes.h>", "<bits/os/timespec.h>")]]
 [[wunused, userimpl, requires_function(pthread_rwlock_reltimedwrlock32_np)]]
 $errno_t pthread_rwlock_reltimedwrlock64_np([[nonnull]] pthread_rwlock_t *__restrict rwlock,
@@ -2161,8 +2161,8 @@ $errno_t pthread_cond_wait([[nonnull]] pthread_cond_t *__restrict cond,
 @@@return: EINVAL:    The given `abstime' is invalid
 @@@return: ETIMEDOUT: The given `abstime' has expired
 [[cp, wunused, userimpl, no_crt_self_import]]
-[[if($extended_include_prefix("<features.h>") defined(__USE_TIME_BITS64)), preferred_alias("pthread_cond_timedwait64")]]
-[[if($extended_include_prefix("<features.h>")!defined(__USE_TIME_BITS64)), preferred_alias("pthread_cond_timedwait")]]
+[[if($extended_include_prefix("<features.h>", "<bits/types.h>")!defined(__USE_TIME_BITS64) || __SIZEOF_TIME32_T__ == __SIZEOF_TIME64_T__), preferred_alias("pthread_cond_timedwait")]]
+[[if($extended_include_prefix("<features.h>", "<bits/types.h>") defined(__USE_TIME_BITS64) || __SIZEOF_TIME32_T__ == __SIZEOF_TIME64_T__), preferred_alias("pthread_cond_timedwait64")]]
 [[decl_include("<bits/types.h>", "<bits/crt/pthreadtypes.h>", "<bits/os/timespec.h>")]]
 [[requires($has_function(pthread_cond_timedwait32) ||
            $has_function(pthread_cond_timedwait64))]]
@@ -2194,7 +2194,7 @@ $errno_t pthread_cond_timedwait32([[nonnull]] pthread_cond_t *__restrict cond,
                                   [[nonnull]] pthread_mutex_t *__restrict mutex,
                                   [[nonnull]] struct timespec32 const *__restrict abstime);
 
-[[cp, doc_alias("pthread_cond_timedwait"), time64_variant_of(pthread_cond_timedwait)]]
+[[cp, preferred_time64_variant_of(pthread_cond_timedwait), doc_alias("pthread_cond_timedwait")]]
 [[decl_include("<bits/types.h>", "<bits/crt/pthreadtypes.h>", "<bits/os/timespec.h>")]]
 [[wunused, userimpl, requires_function(pthread_cond_timedwait32)]]
 $errno_t pthread_cond_timedwait64([[nonnull]] pthread_cond_t *__restrict cond,
@@ -2218,8 +2218,8 @@ $errno_t pthread_cond_timedwait64([[nonnull]] pthread_cond_t *__restrict cond,
 @@@return: EINVAL:    The given `reltime' is invalid
 @@@return: ETIMEDOUT: The given `reltime' has expired
 [[cp, wunused, userimpl, no_crt_self_import]]
-[[if($extended_include_prefix("<features.h>") defined(__USE_TIME_BITS64)), preferred_alias("pthread_cond_reltimedwait64_np")]]
-[[if($extended_include_prefix("<features.h>")!defined(__USE_TIME_BITS64)), preferred_alias("pthread_cond_reltimedwait_np")]]
+[[if($extended_include_prefix("<features.h>", "<bits/types.h>")!defined(__USE_TIME_BITS64) || __SIZEOF_TIME32_T__ == __SIZEOF_TIME64_T__), preferred_alias("pthread_cond_reltimedwait_np")]]
+[[if($extended_include_prefix("<features.h>", "<bits/types.h>") defined(__USE_TIME_BITS64) || __SIZEOF_TIME32_T__ == __SIZEOF_TIME64_T__), preferred_alias("pthread_cond_reltimedwait64_np")]]
 [[decl_include("<bits/types.h>", "<bits/crt/pthreadtypes.h>", "<bits/os/timespec.h>")]]
 [[requires($has_function(pthread_cond_reltimedwait32_np) ||
            $has_function(pthread_cond_reltimedwait64_np))]]
@@ -2251,7 +2251,7 @@ $errno_t pthread_cond_reltimedwait32_np([[nonnull]] pthread_cond_t *__restrict c
                                         [[nonnull]] pthread_mutex_t *__restrict mutex,
                                         [[nonnull]] struct timespec32 const *__restrict reltime);
 
-[[cp, doc_alias("pthread_cond_reltimedwait_np"), time64_variant_of(pthread_cond_reltimedwait_np)]]
+[[cp, preferred_time64_variant_of(pthread_cond_reltimedwait_np), doc_alias("pthread_cond_reltimedwait_np")]]
 [[decl_include("<bits/types.h>", "<bits/crt/pthreadtypes.h>", "<bits/os/timespec.h>")]]
 [[wunused, userimpl, requires_function(pthread_cond_reltimedwait32_np)]]
 $errno_t pthread_cond_reltimedwait64_np([[nonnull]] pthread_cond_t *__restrict cond,

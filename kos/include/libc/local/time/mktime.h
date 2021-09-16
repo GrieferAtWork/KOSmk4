@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xf107153a */
+/* HASH CRC-32:0xe3a47263 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -21,8 +21,8 @@
 #ifndef __local_mktime_defined
 #define __local_mktime_defined 1
 #include <__crt.h>
-#include <bits/types.h>
 #include <features.h>
+#include <bits/types.h>
 #include <bits/crt/tm.h>
 __NAMESPACE_LOCAL_BEGIN
 #ifndef __local___localdep_mktime32_defined
@@ -39,10 +39,10 @@ __CREDIRECT(__ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1)),__time32_t,__NOTHROW_
 #endif /* !__local___localdep_mktime32_defined */
 #ifndef __local___localdep_mktime64_defined
 #define __local___localdep_mktime64_defined 1
-#ifdef __CRT_HAVE_mktime64
-__CREDIRECT(__ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1)),__time64_t,__NOTHROW_NCX,__localdep_mktime64,(struct __NAMESPACE_STD_SYM tm __KOS_FIXED_CONST *__tp),mktime64,(__tp))
-#elif defined(__CRT_HAVE_mktime) && __SIZEOF_TIME32_T__ == __SIZEOF_TIME64_T__
+#if defined(__CRT_HAVE_mktime) && __SIZEOF_TIME32_T__ == __SIZEOF_TIME64_T__
 __CREDIRECT(__ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1)),__time64_t,__NOTHROW_NCX,__localdep_mktime64,(struct __NAMESPACE_STD_SYM tm __KOS_FIXED_CONST *__tp),mktime,(__tp))
+#elif defined(__CRT_HAVE_mktime64)
+__CREDIRECT(__ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1)),__time64_t,__NOTHROW_NCX,__localdep_mktime64,(struct __NAMESPACE_STD_SYM tm __KOS_FIXED_CONST *__tp),mktime64,(__tp))
 #elif defined(__CRT_HAVE__mktime64)
 __CREDIRECT(__ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1)),__time64_t,__NOTHROW_NCX,__localdep_mktime64,(struct __NAMESPACE_STD_SYM tm __KOS_FIXED_CONST *__tp),_mktime64,(__tp))
 #elif defined(__CRT_HAVE_timelocal64)
@@ -56,7 +56,7 @@ __NAMESPACE_LOCAL_BEGIN
 #endif /* !__local___localdep_mktime64_defined */
 __NAMESPACE_LOCAL_END
 #ifndef __yearstodays
-#define __yearstodays(__n_years) (((146097*(__n_years))/400)/*-1*/) /* rounding error? */
+#define __yearstodays(__n_years) (((146097 * (__n_years)) / 400) /*-1*/) /* rounding error? */
 #endif /* !__yearstodays */
 __NAMESPACE_LOCAL_BEGIN
 __LOCAL_LIBC(mktime) __ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1)) __TM_TYPE(time)

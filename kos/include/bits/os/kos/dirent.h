@@ -31,6 +31,8 @@
 #define _DIRENT_HAVE_D_FILENO    1 /* Backwards compatibility. */
 #define _DIRENT_MATCHES_DIRENT64 1
 
+#define __DIRENT32_MATCHES_DIRENT64 1
+
 #ifdef __CC__
 __DECL_BEGIN
 

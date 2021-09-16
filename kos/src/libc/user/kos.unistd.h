@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xc58e5f0c */
+/* HASH CRC-32:0xfc3d16a1 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -135,7 +135,7 @@ INTDEF NONNULL((2)) size_t (LIBCCALL libc_Write)(fd_t fd, void const *buf, size_
  * the file descriptor by the amount of data that had already been loaded. - Errors
  * during this phase are silently ignored and don't cause `errno' to change */
 INTDEF NONNULL((2)) size_t (LIBCCALL libc_ReadAll)(fd_t fd, void *buf, size_t bufsize) THROWS(...);
-/* >> lseek(2)
+/* >> lseek(2), lseek64(2)
  * Change the position of the file read/write pointer within a file referred to by `fd' */
 INTDEF pos_t (LIBCCALL libc_LSeek)(fd_t fd, off_t offset, int whence) THROWS(...);
 /* >> dup2(2)
@@ -184,28 +184,30 @@ INTDEF NONNULL((2, 3)) size_t (LIBCCALL libc_FReadlinkAt)(fd_t dfd, char const *
 /* >> unlinkat(2)
  * Remove a file, symbolic link, device or FIFO referred to by `dfd:name' */
 INTDEF NONNULL((2)) void (LIBCCALL libc_UnlinkAt)(fd_t dfd, char const *name, atflag_t flags) THROWS(...);
-/* >> lseek64(2)
+/* >> lseek(2), lseek64(2)
  * Change the position of the file read/write pointer within a file referred to by `fd' */
 INTDEF pos64_t (LIBCCALL libc_LSeek64)(fd_t fd, off64_t offset, int whence) THROWS(...);
-/* >> pread(2)
+/* >> pread(2), pread64(2)
  * Read data from a file at a specific `offset', rather than the current R/W position
  * @return: <= bufsize: The actual amount of read bytes */
 INTDEF NONNULL((2)) size_t (LIBCCALL libc_PRead)(fd_t fd, void *buf, size_t bufsize, pos_t offset) THROWS(...);
-/* >> pwrite(2)
+/* >> pwrite(2), pwrite64(2)
  * Write data to a file at a specific `offset', rather than the current R/W position
  * @return: <= bufsize: The actual amount of written bytes */
 INTDEF NONNULL((2)) size_t (LIBCCALL libc_PWrite)(fd_t fd, void const *buf, size_t bufsize, pos_t offset) THROWS(...);
-/* >> preadall(3)
+/* >> preadall(3), preadall64(3)
  * Same as `readall(3)', but using `pread(2)' instead of `read()' */
 INTDEF NONNULL((2)) size_t (LIBCCALL libc_PReadAll)(fd_t fd, void *buf, size_t bufsize, pos_t offset) THROWS(...);
-/* >> pread64(2)
- * Read data from a file at a specific offset */
+/* >> pread(2), pread64(2)
+ * Read data from a file at a specific `offset', rather than the current R/W position
+ * @return: <= bufsize: The actual amount of read bytes */
 INTDEF NONNULL((2)) size_t (LIBCCALL libc_PRead64)(fd_t fd, void *buf, size_t bufsize, pos64_t offset) THROWS(...);
-/* >> pwrite64(2)
- * Write data to a file at a specific offset */
+/* >> pwrite(2), pwrite64(2)
+ * Write data to a file at a specific `offset', rather than the current R/W position
+ * @return: <= bufsize: The actual amount of written bytes */
 INTDEF NONNULL((2)) size_t (LIBCCALL libc_PWrite64)(fd_t fd, void *buf, size_t bufsize, pos64_t offset) THROWS(...);
-/* >> preadall64(3)
- * Same as `readall(3)', but using `pread64(2)' instead of `read()' */
+/* >> preadall(3), preadall64(3)
+ * Same as `readall(3)', but using `pread(2)' instead of `read()' */
 INTDEF NONNULL((2)) size_t (LIBCCALL libc_PReadAll64)(fd_t fd, void *buf, size_t bufsize, pos64_t offset) THROWS(...);
 INTDEF NONNULL((1)) void (LIBCCALL libc_Pipe2)(fd_t pipedes[2], oflag_t flags) THROWS(...);
 INTDEF fd_t (LIBCCALL libc_Dup3)(fd_t oldfd, fd_t newfd, oflag_t flags) THROWS(...);
@@ -262,10 +264,10 @@ INTDEF WUNUSED pid_t (LIBCCALL libc_GetSid)(pid_t pid) THROWS(...);
  * Change the ownership of a given `file' to `group:owner',
  * but don't reference it if  that file is a symbolic  link */
 INTDEF NONNULL((1)) void (LIBCCALL libc_LChown)(char const *file, uid_t owner, gid_t group) THROWS(...);
-/* >> truncate(2)
+/* >> truncate(2), truncate64(2)
  * Truncate the given file `file' to a length of `length' */
 INTDEF NONNULL((1)) void (LIBCCALL libc_Truncate)(char const *file, pos_t length) THROWS(...);
-/* >> truncate64(2)
+/* >> truncate(2), truncate64(2)
  * Truncate the given file `file' to a length of `length' */
 INTDEF NONNULL((1)) void (LIBCCALL libc_Truncate64)(char const *file, pos64_t length) THROWS(...);
 /* >> fexecve(2)

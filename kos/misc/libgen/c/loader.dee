@@ -4165,6 +4165,8 @@ again_parse_annotations:
 				case "dirent64_variant_of":
 				case "statfs64_variant_of":
 				case "longdouble_variant_of":
+				case "stat64_variant_of":
+				case "glob64_variant_of":
 				case "preferred_rlim64_variant_of":
 				case "preferred_time64_variant_of":
 				case "preferred_off64_variant_of":
@@ -4173,6 +4175,8 @@ again_parse_annotations:
 				case "preferred_dirent64_variant_of":
 				case "preferred_statfs64_variant_of":
 				case "preferred_longdouble_variant_of":
+				case "preferred_stat64_variant_of":
+				case "preferred_glob64_variant_of":
 					if (currentConditions !is none)
 						goto illegal_annotation_with_condition;
 					wholeCond = {
@@ -4181,9 +4185,11 @@ again_parse_annotations:
 						"off64_variant_of"       : "$extended_include_prefix(\"<bits/types.h>\")__SIZEOF_OFF32_T__ == __SIZEOF_OFF64_T__",
 						"largefile64_variant_of" : "$extended_include_prefix(\"<asm/os/oflags.h>\")!defined(__O_LARGEFILE) || (__O_LARGEFILE+0) == 0",
 						"fts64_variant_of"       : "$extended_include_prefix(\"<bits/crt/fts.h>\")defined(__FTS32_MATCHES_FTS64)",
-						"dirent64_variant_of"    : "$extended_include_prefix(\"<bits/os/dirent.h>\")defined(_DIRENT_MATCHES_DIRENT64)",
 						"statfs64_variant_of"    : "$extended_include_prefix(\"<bits/os/statfs.h>\")defined(_STATFS_MATCHES_STATFS64)",
 						"longdouble_variant_of"  : "$extended_include_prefix(\"<hybrid/typecore.h>\")defined(__ARCH_LONG_DOUBLE_IS_DOUBLE)",
+						"dirent64_variant_of"    : "$extended_include_prefix(\"<bits/os/dirent.h>\")defined(__DIRENT32_MATCHES_DIRENT64)",
+						"stat64_variant_of"      : "$extended_include_prefix(\"<bits/os/stat.h>\")defined(__STAT32_MATCHES_STAT64)",
+						"glob64_variant_of"      : "$extended_include_prefix(\"<bits/crt/glob.h>\")defined(__GLOB32_MATCHES_GLOB64)",
 					}[tok.lsstrip("preferred_")];
 					self.next();
 					self.skip("(");

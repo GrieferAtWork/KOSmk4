@@ -65,9 +65,9 @@ ssize_t sendfile32($fd_t out_fd, $fd_t in_fd,
                    size_t count);
 
 
-[[no_crt_self_import, decl_include("<bits/types.h>")]]
-[[if($extended_include_prefix("<features.h>") defined(__USE_FILE_OFFSET64)), preferred_alias("sendfile64")]]
-[[if($extended_include_prefix("<features.h>")!defined(__USE_FILE_OFFSET64)), preferred_alias("sendfile")]]
+[[decl_include("<bits/types.h>"), no_crt_self_import]]
+[[if($extended_include_prefix("<features.h>", "<bits/types.h>")!defined(__USE_FILE_OFFSET64) || __SIZEOF_OFF32_T__ == __SIZEOF_OFF64_T__), alias("sendfile")]]
+[[if($extended_include_prefix("<features.h>", "<bits/types.h>") defined(__USE_FILE_OFFSET64) || __SIZEOF_OFF32_T__ == __SIZEOF_OFF64_T__), alias("sendfile64")]]
 [[userimpl, requires($has_function(sendfile32) || $has_function(sendfile64))]]
 ssize_t sendfile($fd_t out_fd, $fd_t in_fd,
                  [[nullable]] $off_t *offset, size_t count) {
@@ -96,7 +96,7 @@ ssize_t sendfile($fd_t out_fd, $fd_t in_fd,
 
 %#ifdef __USE_LARGEFILE64
 [[decl_include("<bits/types.h>")]]
-[[doc_alias("sendfile"), off64_variant_of(sendfile)]]
+[[preferred_off64_variant_of(sendfile), doc_alias("sendfile")]]
 [[userimpl, requires_function(sendfile32)]]
 ssize_t sendfile64($fd_t out_fd, $fd_t in_fd,
                    [[nullable]] $off64_t *offset, size_t count) {

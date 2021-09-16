@@ -774,7 +774,7 @@ __LONGLONG atoll([[nonnull]] char const *__restrict nptr) {
 %#endif /* __LONGLONG && __USE_ISOC99 */
 
 
-[[std, ATTR_LEAF]]
+[[std, leaf]]
 [[section(".text.crt{|.dos}.unicode.static.convert")]]
 [[decl_include("<features.h>", "<hybrid/typecore.h>")]]
 [[no_crt_self_import, no_crt_self_export, export_alias(CNL_strtoul...)]]
@@ -792,7 +792,7 @@ unsigned long strtoul([[nonnull]] char const *__restrict nptr,
 @@pp_endif@@
 }
 
-[[std, ATTR_LEAF]]
+[[std, leaf]]
 [[section(".text.crt{|.dos}.unicode.static.convert")]]
 [[no_crt_self_import, no_crt_self_export, export_alias(CNL_strtol...)]]
 [[decl_include("<features.h>", "<hybrid/typecore.h>")]]
@@ -814,7 +814,7 @@ long strtol([[nonnull]] char const *__restrict nptr,
 
 %(std)#ifdef __LONGLONG
 %(std)#ifdef __USE_ISOC99
-[[std, guard, ATTR_LEAF]]
+[[std, guard, leaf]]
 [[section(".text.crt{|.dos}.unicode.static.convert")]]
 [[no_crt_self_import, no_crt_self_export, export_alias(CNL_strtoull...)]]
 [[decl_include("<features.h>", "<hybrid/typecore.h>")]]
@@ -834,7 +834,7 @@ __ULONGLONG strtoull([[nonnull]] char const *__restrict nptr,
 @@pp_endif@@
 }
 
-[[std, guard, ATTR_LEAF]]
+[[std, guard, leaf]]
 [[section(".text.crt{|.dos}.unicode.static.convert")]]
 [[no_crt_self_import, no_crt_self_export, export_alias(CNL_strtoll...)]]
 [[decl_include("<features.h>", "<hybrid/typecore.h>")]]
@@ -857,13 +857,13 @@ __LONGLONG strtoll([[nonnull]] char const *__restrict nptr,
 %(std)#endif /* __LONGLONG */
 
 %(std, c, ccompat)#ifndef __NO_FPU
-[[std, ATTR_LEAF, wunused]]
+[[std, leaf, wunused]]
 [[section(".text.crt{|.dos}.unicode.static.convert")]]
 double atof([[nonnull]] char const *__restrict nptr) {
 	return strtod(nptr, NULL);
 }
 
-[[std, ATTR_LEAF]]
+[[std, leaf]]
 [[section(".text.crt{|.dos}.unicode.static.convert")]]
 [[impl_include("<asm/crt/stdio.h>")]]
 [[impl_prefix(
@@ -904,7 +904,7 @@ double strtod([[nonnull]] char const *__restrict nptr,
 }
 
 %(std)#ifdef __USE_ISOC99
-[[guard, std, ATTR_LEAF]]
+[[guard, std, leaf]]
 [[section(".text.crt{|.dos}.unicode.static.convert")]]
 [[impl_include("<asm/crt/stdio.h>")]]
 [[impl_prefix(
@@ -943,7 +943,7 @@ float strtof([[nonnull]] char const *__restrict nptr,
 }
 
 %(std)#ifdef __COMPILER_HAVE_LONGDOUBLE
-[[guard, std, ATTR_LEAF]]
+[[guard, std, leaf]]
 [[section(".text.crt{|.dos}.unicode.static.convert")]]
 [[impl_include("<asm/crt/stdio.h>")]]
 [[impl_prefix(
@@ -1007,7 +1007,7 @@ __LONGDOUBLE strtold([[nonnull]] char const *__restrict nptr,
 @@ - EINVAL:    Only when `endptr == NULL': The parsed number is followed
 @@              by   at  least  1  additional  non-whitespace  character.
 @@              The returned integer value is not affected by this error.
-[[kernel, ATTR_LEAF]]
+[[kernel, leaf]]
 [[section(".text.crt{|.dos}.unicode.static.convert")]]
 [[decl_include("<features.h>", "<bits/types.h>")]]
 [[impl_include("<asm/os/errno.h>", "<hybrid/__overflow.h>")]]
@@ -1123,7 +1123,7 @@ $uint32_t strtou32_r([[nonnull]] char const *__restrict nptr,
 	return result;
 }
 
-[[kernel, ATTR_LEAF, doc_alias("strtou32_r")]]
+[[kernel, leaf, doc_alias("strtou32_r")]]
 [[section(".text.crt{|.dos}.unicode.static.convert")]]
 [[decl_include("<features.h>", "<bits/types.h>")]]
 [[impl_include("<asm/os/errno.h>", "<hybrid/__overflow.h>")]]
@@ -1256,7 +1256,7 @@ handle_overflow:
 
 
 %#ifdef __UINT64_TYPE__
-[[kernel, ATTR_LEAF, doc_alias("strtou32_r")]]
+[[kernel, leaf, doc_alias("strtou32_r")]]
 [[section(".text.crt{|.dos}.unicode.static.convert")]]
 [[decl_include("<features.h>", "<bits/types.h>")]]
 [[impl_include("<asm/os/errno.h>", "<hybrid/__overflow.h>")]]
@@ -1372,7 +1372,7 @@ $uint64_t strtou64_r([[nonnull]] char const *__restrict nptr,
 	return result;
 }
 
-[[kernel, ATTR_LEAF, doc_alias("strtou32_r")]]
+[[kernel, leaf, doc_alias("strtou32_r")]]
 [[section(".text.crt{|.dos}.unicode.static.convert")]]
 [[decl_include("<features.h>", "<bits/types.h>")]]
 [[impl_include("<asm/os/errno.h>", "<hybrid/__overflow.h>")]]
@@ -1507,7 +1507,7 @@ handle_overflow:
 /************************************************************************/
 /* WARNING: The following functions aren't exported by-name from libc!  */
 /************************************************************************/
-[[nocrt, ATTR_LEAF, decl_include("<features.h>")]]
+[[nocrt, leaf, decl_include("<features.h>")]]
 [[if($extended_include_prefix("<hybrid/typecore.h>")__SIZEOF_LONG__ == 4), alias("strto32_r")]]
 [[if($extended_include_prefix("<hybrid/typecore.h>")__SIZEOF_LONG__ == 8), alias("strto64_r")]]
 [[if($extended_include_prefix("<hybrid/typecore.h>")__SIZEOF_LONG__ == 4), bind_local_function(strto32_r)]]
@@ -1545,7 +1545,7 @@ long strtol_r([[nonnull]] char const *__restrict nptr,
 @@pp_endif@@
 }
 
-[[nocrt, ATTR_LEAF, decl_include("<features.h>")]]
+[[nocrt, leaf, decl_include("<features.h>")]]
 [[if($extended_include_prefix("<hybrid/typecore.h>")__SIZEOF_LONG__ == 4), alias("strtou32_r")]]
 [[if($extended_include_prefix("<hybrid/typecore.h>")__SIZEOF_LONG__ == 8), alias("strtou64_r")]]
 [[if($extended_include_prefix("<hybrid/typecore.h>")__SIZEOF_LONG__ == 4), bind_local_function(strtou32_r)]]
@@ -1575,7 +1575,7 @@ unsigned long strtoul_r([[nonnull]] char const *__restrict nptr,
 }
 
 %#ifdef __LONGLONG
-[[nocrt, ATTR_LEAF, decl_include("<features.h>")]]
+[[nocrt, leaf, decl_include("<features.h>")]]
 [[if($extended_include_prefix("<hybrid/typecore.h>")__SIZEOF_LONG_LONG__ == 8), alias("strto64_r")]]
 [[if($extended_include_prefix("<hybrid/typecore.h>")__SIZEOF_LONG_LONG__ == 4), alias("strto32_r")]]
 [[if($extended_include_prefix("<hybrid/typecore.h>")__SIZEOF_LONG_LONG__ == 8), bind_local_function(strto64_r)]]
@@ -1613,7 +1613,7 @@ __LONGLONG strtoll_r([[nonnull]] char const *__restrict nptr,
 @@pp_endif@@
 }
 
-[[nocrt, ATTR_LEAF, decl_include("<features.h>")]]
+[[nocrt, leaf, decl_include("<features.h>")]]
 [[if($extended_include_prefix("<hybrid/typecore.h>")__SIZEOF_LONG_LONG__ == 8), alias("strtou64_r")]]
 [[if($extended_include_prefix("<hybrid/typecore.h>")__SIZEOF_LONG_LONG__ == 4), alias("strtou32_r")]]
 [[if($extended_include_prefix("<hybrid/typecore.h>")__SIZEOF_LONG_LONG__ == 8), bind_local_function(strtou64_r)]]
@@ -1662,7 +1662,7 @@ __ULONGLONG strtoull_r([[nonnull]] char const *__restrict nptr,
 @@@return: 0 :         [*endptr=nptr] error: Nothing was parsed
 @@@return: INTn_MIN:   [errno=ERANGE] error: Value to low to represent
 @@@return: U?INTn_MAX: [errno=ERANGE] error: Value to great to represent
-[[kernel, ATTR_LEAF, section(".text.crt{|.dos}.unicode.static.convert")]]
+[[kernel, leaf, section(".text.crt{|.dos}.unicode.static.convert")]]
 [[decl_include("<features.h>", "<hybrid/typecore.h>")]]
 [[if($extended_include_prefix("<hybrid/typecore.h>")__SIZEOF_LONG__ == 4),      alias(CNL_strtoul...)]]
 [[if($extended_include_prefix("<hybrid/typecore.h>")__SIZEOF_LONG_LONG__ == 4), alias(CNL_strtoull...)]]
@@ -1682,7 +1682,7 @@ $uint32_t strtou32([[nonnull]] char const *__restrict nptr,
 @@pp_endif@@
 }
 
-[[kernel, ATTR_LEAF, section(".text.crt{|.dos}.unicode.static.convert")]]
+[[kernel, leaf, section(".text.crt{|.dos}.unicode.static.convert")]]
 [[decl_include("<features.h>", "<hybrid/typecore.h>")]]
 [[if($extended_include_prefix("<hybrid/typecore.h>")__SIZEOF_LONG__ == 4),      alias(CNL_strtol...)]]
 [[if($extended_include_prefix("<hybrid/typecore.h>")__SIZEOF_LONG_LONG__ == 4), alias(CNL_strtoll...)]]
@@ -1703,7 +1703,7 @@ $int32_t strto32([[nonnull]] char const *__restrict nptr,
 }
 
 %#ifdef __UINT64_TYPE__
-[[kernel, ATTR_LEAF, alias("_strtoui64")]]
+[[kernel, leaf, alias("_strtoui64")]]
 [[if(!defined(__KERNEL__)), dos_only_export_as("_strtoui64")]]
 [[decl_include("<features.h>", "<hybrid/typecore.h>")]]
 [[section(".text.crt{|.dos}.unicode.static.convert")]]
@@ -1725,7 +1725,7 @@ $uint64_t strtou64([[nonnull]] char const *__restrict nptr,
 @@pp_endif@@
 }
 
-[[kernel, ATTR_LEAF, alias("_strtoi64")]]
+[[kernel, leaf, alias("_strtoi64")]]
 [[if(!defined(__KERNEL__)), dos_only_export_as("_strtoi64")]]
 [[decl_include("<features.h>", "<hybrid/typecore.h>")]]
 [[section(".text.crt{|.dos}.unicode.static.convert")]]
@@ -1752,7 +1752,7 @@ $int64_t strto64([[nonnull]] char const *__restrict nptr,
 %
 %#ifdef __USE_XOPEN2K8
 [[section(".text.crt{|.dos}.unicode.static.convert")]]
-[[ATTR_LEAF, decl_include("<features.h>", "<hybrid/typecore.h>")]]
+[[leaf, decl_include("<features.h>", "<hybrid/typecore.h>")]]
 [[if($extended_include_prefix("<hybrid/typecore.h>")__SIZEOF_LONG__ == 4),      alias(CNL_strtoul_l...)]]
 [[if($extended_include_prefix("<hybrid/typecore.h>")__SIZEOF_LONG_LONG__ == 4), alias(CNL_strtoull_l...)]]
 [[if($extended_include_prefix("<hybrid/typecore.h>")__SIZEOF_INTMAX_T__ == 4),  alias(CNL_strtoumax_l...)]]
@@ -1763,7 +1763,7 @@ $uint32_t strtou32_l([[nonnull]] char const *__restrict nptr,
 }
 
 [[section(".text.crt{|.dos}.unicode.static.convert")]]
-[[ATTR_LEAF, decl_include("<features.h>", "<hybrid/typecore.h>")]]
+[[leaf, decl_include("<features.h>", "<hybrid/typecore.h>")]]
 [[if($extended_include_prefix("<hybrid/typecore.h>")__SIZEOF_LONG__ == 4),      alias(CNL_strtol_l...)]]
 [[if($extended_include_prefix("<hybrid/typecore.h>")__SIZEOF_LONG_LONG__ == 4), alias(CNL_strtoll_l...)]]
 [[if($extended_include_prefix("<hybrid/typecore.h>")__SIZEOF_INTMAX_T__ == 4),  alias(CNL_strtoimax_l...)]]
@@ -1775,7 +1775,7 @@ $int32_t strto32_l([[nonnull]] char const *__restrict nptr,
 
 %#ifdef __UINT64_TYPE__
 [[section(".text.crt{|.dos}.unicode.static.convert")]]
-[[ATTR_LEAF, dos_only_export_alias("_strtoui64_l")]]
+[[leaf, dos_only_export_alias("_strtoui64_l")]]
 [[decl_include("<features.h>", "<hybrid/typecore.h>")]]
 [[if($extended_include_prefix("<hybrid/typecore.h>")__SIZEOF_LONG__ == 8),      alias(CNL_strtoul_l...)]]
 [[if($extended_include_prefix("<hybrid/typecore.h>")__SIZEOF_LONG_LONG__ == 8), alias(CNL_strtoull_l...)]]
@@ -1787,7 +1787,7 @@ $uint64_t strtou64_l([[nonnull]] char const *__restrict nptr,
 }
 
 [[section(".text.crt{|.dos}.unicode.static.convert")]]
-[[ATTR_LEAF, dos_only_export_alias("_strtoi64_l")]]
+[[leaf, dos_only_export_alias("_strtoi64_l")]]
 [[decl_include("<features.h>", "<hybrid/typecore.h>")]]
 [[if($extended_include_prefix("<hybrid/typecore.h>")__SIZEOF_LONG__ == 8),      alias(CNL_strtol_l...)]]
 [[if($extended_include_prefix("<hybrid/typecore.h>")__SIZEOF_LONG_LONG__ == 8), alias(CNL_strtoll_l...)]]
@@ -2091,10 +2091,11 @@ int clearenv();
 @@descriptor of that file.
 @@@param: suffixlen: The #  of trailing  characters to-be  ignored
 @@                   after the required 6 trailing 'X'-characters.
-[[section(".text.crt{|.dos}.fs.utility")]]
-[[wunused, guard, decl_include("<features.h>", "<bits/types.h>")]]
-[[if($extended_include_prefix("<features.h>") defined(__USE_FILE_OFFSET64)), preferred_alias("mkstemps64")]]
-[[export_alias("mkstemps64"), requires_function(mkostemps)]]
+[[cp, wunused, guard, section(".text.crt{|.dos}.fs.utility")]]
+[[decl_include("<features.h>", "<bits/types.h>"), no_crt_self_import]]
+[[if($extended_include_prefix("<features.h>", "<asm/os/oflags.h>")!defined(__USE_FILE_OFFSET64) || !defined(__O_LARGEFILE) || (__O_LARGEFILE+0) == 0), alias("mkstemps")]]
+[[                                                                                                                                                     alias("mkstemps64")]]
+[[requires_function(mkostemps)]]
 $fd_t mkstemps([[nonnull]] char *template_, __STDC_INT_AS_SIZE_T suffixlen) {
 	return mkostemps(template_, suffixlen, 0);
 }
@@ -2119,8 +2120,8 @@ int getloadavg(double loadavg[], __STDC_INT_AS_SIZE_T nelem);
 %#endif /* !__NO_FPU */
 
 %#ifdef __USE_LARGEFILE64
-[[alias("mkstemps64"), nocrt, largefile64_variant_of(mkstemps)]]
-[[wunused, requires_function(mkostemps64), decl_include("<features.h>", "<bits/types.h>")]]
+[[cp, wunused, preferred_largefile64_variant_of(mkstemps), doc_alias("mkstemps")]]
+[[requires_function(mkostemps64), decl_include("<features.h>", "<bits/types.h>")]]
 $fd_t mkstemps64([[nonnull]] char *template_, __STDC_INT_AS_SIZE_T suffixlen) {
 	return mkostemps64(template_, suffixlen, 0);
 }
@@ -2470,18 +2471,17 @@ int getsubopt([[nonnull]] char **__restrict optionp,
 @@with random characters  such that the  filename described by  `template_'
 @@will not already exists. Then, create a new file with `O_RDWR' and return
 @@the file descriptor of that file.
-[[section(".text.crt{|.dos}.fs.utility")]]
-[[if($extended_include_prefix("<features.h>") defined(__USE_FILE_OFFSET64)), preferred_alias("mkstemp64")]]
-[[cp, wunused, export_alias("mkstemp64"), requires_function(mkstemps)]]
-[[decl_include("<bits/types.h>")]]
+[[cp, wunused, section(".text.crt{|.dos}.fs.utility"), decl_include("<bits/types.h>"), no_crt_self_import]]
+[[if($extended_include_prefix("<features.h>", "<asm/os/oflags.h>")!defined(__USE_FILE_OFFSET64) || !defined(__O_LARGEFILE) || (__O_LARGEFILE+0) == 0), alias("mkstemp")]]
+[[                                                                                                                                                     alias("mkstemp64")]]
+[[requires_function(mkstemps)]]
 $fd_t mkstemp([[nonnull]] char *template_) {
 	return mkstemps(template_, 0);
 }
 
 %#ifdef __USE_LARGEFILE64
-[[cp, alias("mkstemp64"), nocrt, alt_variant_of(mkstemp)]]
-[[wunused, requires_function(mkstemps64)]]
-[[decl_include("<bits/types.h>")]]
+[[cp, wunused, preferred_largefile64_variant_of(mkstemp), doc_alias("mkstemp")]]
+[[requires_function(mkstemps64), decl_include("<bits/types.h>")]]
 $fd_t mkstemp64([[nonnull]] char *template_) {
 	return mkstemps64(template_, 0);
 }
@@ -3426,18 +3426,19 @@ void qsort_r([[nonnull]] void *pbase, $size_t item_count, $size_t item_size,
 @@descriptor of that file.
 @@@param: flags: Additional  flags  to pass  to `open(2)',
 @@               but `O_ACCMODE' is always set to `O_RDWR'
-[[section(".text.crt{|.dos}.fs.utility")]]
-[[if($extended_include_prefix("<features.h>") defined(__USE_FILE_OFFSET64)), preferred_alias("mkostemp64")]]
-[[wunused, export_alias("mkostemp64"), requires_function(mkostemps)]]
-[[decl_include("<bits/types.h>")]]
+[[wunused, section(".text.crt{|.dos}.fs.utility")]]
+[[decl_include("<bits/types.h>"), no_crt_self_import]]
+[[if($extended_include_prefix("<features.h>", "<asm/os/oflags.h>")!defined(__USE_FILE_OFFSET64) || !defined(__O_LARGEFILE) || (__O_LARGEFILE+0) == 0), alias("mkostemp")]]
+[[                                                                                                                                                     alias("mkostemp64")]]
+[[requires_function(mkostemps)]]
 $fd_t mkostemp([[nonnull]] char *template_, $oflag_t flags) {
 	return mkostemps(template_, 0, flags);
 }
 
-[[section(".text.crt{|.dos}.fs.utility")]]
-[[if($extended_include_prefix("<features.h>") defined(__USE_FILE_OFFSET64)), preferred_alias("mkostemps64")]]
-[[wunused, export_alias("mkostemps64")]]
-[[decl_include("<features.h>", "<bits/types.h>")]]
+[[wunused, section(".text.crt{|.dos}.fs.utility")]]
+[[decl_include("<features.h>", "<bits/types.h>"), no_crt_self_import]]
+[[if($extended_include_prefix("<features.h>", "<asm/os/oflags.h>")!defined(__USE_FILE_OFFSET64) || !defined(__O_LARGEFILE) || (__O_LARGEFILE+0) == 0), alias("mkostemps")]]
+[[                                                                                                                                                     alias("mkostemps64")]]
 [[requires_function(open, system_mktemp)]]
 $fd_t mkostemps([[nonnull]] char *template_,
                 __STDC_INT_AS_SIZE_T suffixlen,
@@ -3446,19 +3447,24 @@ $fd_t mkostemps([[nonnull]] char *template_,
 }
 
 %#ifdef __USE_LARGEFILE64
-[[alias("mkostemp64"), nocrt, largefile64_variant_of(mkostemp)]]
-[[wunused, requires_function(mkostemps64), decl_include("<bits/types.h>")]]
+[[wunused, preferred_largefile64_variant_of(mkostemp), doc_alias("mkostemp")]]
+[[requires_function(mkostemps64), decl_include("<bits/types.h>")]]
 $fd_t mkostemp64([[nonnull]] char *template_, $oflag_t flags) {
 	return mkostemps64(template_, 0, flags);
 }
 
-[[wunused, alias("mkostemps64"), nocrt, largefile64_variant_of(mkostemps)]]
-[[requires_function(mkostemps), decl_include("<features.h>", "<bits/types.h>")]]
+[[wunused, preferred_largefile64_variant_of(mkostemps), doc_alias("mkostemps")]]
+[[decl_include("<features.h>", "<bits/types.h>")]]
 [[impl_include("<asm/os/oflags.h>")]]
+[[requires_function(open, system_mktemp)]]
 $fd_t mkostemps64([[nonnull]] char *template_,
                   __STDC_INT_AS_SIZE_T suffixlen,
                   $oflag_t flags) {
-	return mkostemps(template_, suffixlen, flags | __O_LARGEFILE);
+@@pp_ifdef O_LARGEFILE@@
+	return system_mktemp(0, template_, suffixlen, flags | O_LARGEFILE);
+@@pp_else@@
+	return system_mktemp(0, template_, suffixlen, flags);
+@@pp_endif@@
 }
 %#endif /* __USE_LARGEFILE64 */
 %#endif /* __USE_GNU || __USE_BSD */

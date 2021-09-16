@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x129418eb */
+/* HASH CRC-32:0xaa1de0d1 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -31,10 +31,10 @@ __CREDIRECT(__ATTR_NONNULL((1)),int,__NOTHROW_NCX,__localdep_ntp_gettime32,(stru
 #endif /* !__local___localdep_ntp_gettime32_defined && __CRT_HAVE_ntp_gettimex */
 #ifndef __local___localdep_ntp_gettime64_defined
 #define __local___localdep_ntp_gettime64_defined 1
-#ifdef __CRT_HAVE_ntp_gettimex64
-__CREDIRECT(__ATTR_NONNULL((1)),int,__NOTHROW_NCX,__localdep_ntp_gettime64,(struct __ntptimeval64 *__restrict __ntv),ntp_gettimex64,(__ntv))
-#elif defined(__CRT_HAVE_ntp_gettimex) && __SIZEOF_TIME32_T__ == __SIZEOF_TIME64_T__
+#if defined(__CRT_HAVE_ntp_gettimex) && __SIZEOF_TIME32_T__ == __SIZEOF_TIME64_T__
 __CREDIRECT(__ATTR_NONNULL((1)),int,__NOTHROW_NCX,__localdep_ntp_gettime64,(struct __ntptimeval64 *__restrict __ntv),ntp_gettimex,(__ntv))
+#elif defined(__CRT_HAVE_ntp_gettimex64)
+__CREDIRECT(__ATTR_NONNULL((1)),int,__NOTHROW_NCX,__localdep_ntp_gettime64,(struct __ntptimeval64 *__restrict __ntv),ntp_gettimex64,(__ntv))
 #elif defined(__CRT_HAVE_ntp_gettimex)
 __NAMESPACE_LOCAL_END
 #include <libc/local/sys.timex/ntp_gettime64.h>
