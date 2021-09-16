@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xd54c3afe */
+/* HASH CRC-32:0x12df186e */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -614,7 +614,7 @@ INTDEF NONNULL((1)) errno_t NOTHROW_NCX(LIBCCALL libc_pthread_condattr_setclock)
  * The  barrier is opened when `count' waiters arrived
  * @return: EOK:    Success
  * @return: EINVAL: The given `count' is ZERO(0) */
-INTDEF NONNULL((1, 2)) errno_t NOTHROW_NCX(LIBCCALL libc_pthread_barrier_init)(pthread_barrier_t *__restrict barrier, pthread_barrierattr_t const *__restrict attr, unsigned int count);
+INTDEF NONNULL((1)) errno_t NOTHROW_NCX(LIBCCALL libc_pthread_barrier_init)(pthread_barrier_t *__restrict barrier, pthread_barrierattr_t const *__restrict attr, unsigned int count);
 /* >> pthread_barrier_destroy(3)
  * Destroy the given (previously dynamically initialized) `barrier'
  * @return: EOK: Success */

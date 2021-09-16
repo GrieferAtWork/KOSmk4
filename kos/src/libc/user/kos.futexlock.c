@@ -224,8 +224,9 @@ NOTHROW_RPC(VLIBCCALL libc_lfutexlock64)(lfutex_t *ulockaddr,
 #endif /* MAGIC:alias */
 /*[[[end:libc_lfutexlock64]]]*/
 
-/*[[[head:libc_futexlock_wake,hash:CRC-32=0xd3cbb09f]]]*/
-/* A more efficient variant of `futex_wake()' that can be used to wake up threads waiting
+/*[[[head:libc_futexlock_wake,hash:CRC-32=0x7315cc1c]]]*/
+/* >> futexlock_wake(3), futexlock_wakeall(3)
+ * A more efficient variant of `futex_wake()' that can be used to wake up threads waiting
  * on some given futex-lock. - This method of waking is faster, since it doesn't invoke a
  * system call when no thread is waiting on the given lock */
 INTERN ATTR_SECTION(".text.crt.sched.futexlock") NONNULL((1)) ssize_t
@@ -243,8 +244,9 @@ NOTHROW_NCX(LIBCCALL libc_futexlock_wake)(lfutex_t *ulockaddr,
 }
 /*[[[end:libc_futexlock_wake]]]*/
 
-/*[[[head:libc_futexlock_wakeall,hash:CRC-32=0xbf81228b]]]*/
-/* A more efficient variant of `futex_wake()' that can be used to wake up threads waiting
+/*[[[head:libc_futexlock_wakeall,hash:CRC-32=0xd8fbe16e]]]*/
+/* >> futexlock_wake(3), futexlock_wakeall(3)
+ * A more efficient variant of `futex_wake()' that can be used to wake up threads waiting
  * on some given futex-lock. - This method of waking is faster, since it doesn't invoke a
  * system call when no thread is waiting on the given lock */
 INTERN ATTR_SECTION(".text.crt.sched.futexlock") NONNULL((1)) ssize_t

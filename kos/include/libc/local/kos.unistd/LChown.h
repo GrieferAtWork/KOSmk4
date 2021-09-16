@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x8ae625e5 */
+/* HASH CRC-32:0xe3dfcb87 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -22,7 +22,7 @@
 #define __local_LChown_defined 1
 #include <__crt.h>
 #include <asm/os/fcntl.h>
-#if defined(__AT_FDCWD) && defined(__CRT_HAVE_FChownAt)
+#if defined(__AT_FDCWD) && defined(__AT_SYMLINK_NOFOLLOW) && defined(__CRT_HAVE_FChownAt)
 #include <kos/anno.h>
 #include <bits/types.h>
 __NAMESPACE_LOCAL_BEGIN
@@ -32,14 +32,14 @@ __CREDIRECT_VOID(__ATTR_NONNULL((2)),__THROWING,__localdep_FChownAt,(__fd_t __df
 #endif /* !__local___localdep_FChownAt_defined */
 __LOCAL_LIBC(LChown) __ATTR_NONNULL((1)) void
 (__LIBCCALL __LIBC_LOCAL_NAME(LChown))(char const *__file, __uid_t __owner, __gid_t __group) __THROWS(...) {
-	(__NAMESPACE_LOCAL_SYM __localdep_FChownAt)(__AT_FDCWD, __file, __owner, __group, 0x0100); /* AT_SYMLINK_NOFOLLOW */
+	(__NAMESPACE_LOCAL_SYM __localdep_FChownAt)(__AT_FDCWD, __file, __owner, __group, __AT_SYMLINK_NOFOLLOW);
 }
 __NAMESPACE_LOCAL_END
 #ifndef __local___localdep_LChown_defined
 #define __local___localdep_LChown_defined 1
 #define __localdep_LChown __LIBC_LOCAL_NAME(LChown)
 #endif /* !__local___localdep_LChown_defined */
-#else /* __AT_FDCWD && __CRT_HAVE_FChownAt */
+#else /* __AT_FDCWD && __AT_SYMLINK_NOFOLLOW && __CRT_HAVE_FChownAt */
 #undef __local_LChown_defined
-#endif /* !__AT_FDCWD || !__CRT_HAVE_FChownAt */
+#endif /* !__AT_FDCWD || !__AT_SYMLINK_NOFOLLOW || !__CRT_HAVE_FChownAt */
 #endif /* !__local_LChown_defined */

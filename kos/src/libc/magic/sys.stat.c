@@ -506,39 +506,39 @@ int dos_fstat64i64($fd_t fd, [[nonnull]] struct __dos_stat64 *__restrict buf);
 
 
 @@>> stat(2), stat64(2)
-[[no_crt_impl, no_crt_self_import, decl_include("<bits/os/stat.h>")]]
-[[if(defined(__CRT_KOS_PRIMARY)), preferred_alias("kstat", "kstat64")]]
-[[if($extended_include_prefix("<features.h>")defined(__CRT_DOS_PRIMARY) &&  defined(__USE_TIME_BITS64)), preferred_alias("_stat64", "_stat64i32")]]
-[[if($extended_include_prefix("<features.h>")defined(__CRT_DOS_PRIMARY) && !defined(__USE_TIME_BITS64) && defined(__USE_FILE_OFFSET64)), preferred_alias("_stati64", "_stat32i64")]]
-[[if($extended_include_prefix("<features.h>")defined(__CRT_DOS_PRIMARY) && !defined(__USE_TIME_BITS64) && !defined(__USE_FILE_OFFSET64)), preferred_alias("_stat", "_stat32")]]
-[[if($extended_include_prefix("<features.h>", "<bits/types.h>") defined(__USE_FILE_OFFSET64) || __SIZEOF_OFF32_T__ == __SIZEOF_OFF64_T__), preferred_alias("stat64")]]
-[[if($extended_include_prefix("<features.h>", "<bits/types.h>")!defined(__USE_FILE_OFFSET64) || __SIZEOF_OFF32_T__ == __SIZEOF_OFF64_T__), preferred_alias("stat")]]
+[[no_crt_impl, decl_include("<bits/os/stat.h>"), no_crt_self_import]]
+[[if(                                                             defined(__CRT_KOS_PRIMARY)                                                                ), alias("kstat", "kstat64")]]
+[[if($extended_include_prefix("<features.h>")                     defined(__CRT_DOS_PRIMARY) &&  defined(__USE_TIME_BITS64)                                 ), alias("_stat64", "_stat64i32")]]
+[[if($extended_include_prefix("<features.h>")                     defined(__CRT_DOS_PRIMARY) && !defined(__USE_TIME_BITS64) && defined(__USE_FILE_OFFSET64) ), alias("_stati64", "_stat32i64")]]
+[[if($extended_include_prefix("<features.h>")                     defined(__CRT_DOS_PRIMARY) && !defined(__USE_TIME_BITS64) && !defined(__USE_FILE_OFFSET64)), alias("_stat", "_stat32")]]
+[[if($extended_include_prefix("<features.h>", "<bits/os/stat.h>")!defined(__USE_FILE_OFFSET64) || defined(__STAT32_MATCHES_STAT64)                          ), alias("stat")]]
+[[if($extended_include_prefix("<features.h>", "<bits/os/stat.h>") defined(__USE_FILE_OFFSET64) || defined(__STAT32_MATCHES_STAT64)                          ), alias("stat64")]]
 int stat([[nonnull]] char const *__restrict filename,
          [[nonnull]] struct stat *__restrict buf);
 /* TODO: Emulate stat() for __USE_TIME_BITS64 compatibility! */
 
 
 @@>> fstat(2), fstat64(2)
-[[no_crt_impl, no_crt_self_import, decl_include("<bits/os/stat.h>")]]
-[[if(defined(__CRT_KOS_PRIMARY)), preferred_alias("kfstat", "kfstat64")]]
-[[if($extended_include_prefix("<features.h>")defined(__CRT_DOS_PRIMARY) &&  defined(__USE_TIME_BITS64)), preferred_alias("_fstat64", "_fstat64i32")]]
-[[if($extended_include_prefix("<features.h>")defined(__CRT_DOS_PRIMARY) && !defined(__USE_TIME_BITS64) && defined(__USE_FILE_OFFSET64)), preferred_alias("_fstati64", "_fstat32i64")]]
-[[if($extended_include_prefix("<features.h>")defined(__CRT_DOS_PRIMARY) && !defined(__USE_TIME_BITS64) && !defined(__USE_FILE_OFFSET64)), preferred_alias("_fstat", "_fstat32")]]
-[[if($extended_include_prefix("<features.h>", "<bits/types.h>") defined(__USE_FILE_OFFSET64) || __SIZEOF_OFF32_T__ == __SIZEOF_OFF64_T__), preferred_alias("fstat64")]]
-[[if($extended_include_prefix("<features.h>", "<bits/types.h>")!defined(__USE_FILE_OFFSET64) || __SIZEOF_OFF32_T__ == __SIZEOF_OFF64_T__), preferred_alias("fstat")]]
+[[no_crt_impl, decl_include("<bits/os/stat.h>"), no_crt_self_import]]
+[[if(                                                             defined(__CRT_KOS_PRIMARY)                                                                ), alias("kfstat", "kfstat64")]]
+[[if($extended_include_prefix("<features.h>")                     defined(__CRT_DOS_PRIMARY) &&  defined(__USE_TIME_BITS64)                                 ), alias("_fstat64", "_fstat64i32")]]
+[[if($extended_include_prefix("<features.h>")                     defined(__CRT_DOS_PRIMARY) && !defined(__USE_TIME_BITS64) && defined(__USE_FILE_OFFSET64) ), alias("_fstati64", "_fstat32i64")]]
+[[if($extended_include_prefix("<features.h>")                     defined(__CRT_DOS_PRIMARY) && !defined(__USE_TIME_BITS64) && !defined(__USE_FILE_OFFSET64)), alias("_fstat", "_fstat32")]]
+[[if($extended_include_prefix("<features.h>", "<bits/os/stat.h>")!defined(__USE_FILE_OFFSET64) || defined(__STAT32_MATCHES_STAT64)                          ), alias("fstat")]]
+[[if($extended_include_prefix("<features.h>", "<bits/os/stat.h>") defined(__USE_FILE_OFFSET64) || defined(__STAT32_MATCHES_STAT64)                          ), alias("fstat64")]]
 int fstat($fd_t fd, [[nonnull]] struct stat *__restrict buf);
 
 %
 %#if defined(__USE_XOPEN_EXTENDED) || defined(__USE_XOPEN2K)
 
 @@>> lstat(2), lstat64(2)
-[[no_crt_impl, no_crt_self_import, decl_include("<bits/os/stat.h>")]]
-[[if(defined(__CRT_KOS_PRIMARY)), preferred_alias("klstat", "klstat64")]]
-[[if($extended_include_prefix("<features.h>")defined(__CRT_DOS_PRIMARY) &&  defined(__USE_TIME_BITS64)), preferred_alias("_stat64", "_stat64i32")]]
-[[if($extended_include_prefix("<features.h>")defined(__CRT_DOS_PRIMARY) && !defined(__USE_TIME_BITS64) && defined(__USE_FILE_OFFSET64)), preferred_alias("_stati64", "_stat32i64")]]
-[[if($extended_include_prefix("<features.h>")defined(__CRT_DOS_PRIMARY) && !defined(__USE_TIME_BITS64) && !defined(__USE_FILE_OFFSET64)), preferred_alias("_stat", "_stat32")]]
-[[if($extended_include_prefix("<features.h>", "<bits/types.h>") defined(__USE_FILE_OFFSET64) || __SIZEOF_OFF32_T__ == __SIZEOF_OFF64_T__), preferred_alias("lstat64")]]
-[[if($extended_include_prefix("<features.h>", "<bits/types.h>")!defined(__USE_FILE_OFFSET64) || __SIZEOF_OFF32_T__ == __SIZEOF_OFF64_T__), preferred_alias("lstat")]]
+[[no_crt_impl, decl_include("<bits/os/stat.h>"), no_crt_self_import]]
+[[if(                                                             defined(__CRT_KOS_PRIMARY)                                                                ), alias("klstat", "klstat64")]]
+[[if($extended_include_prefix("<features.h>")                     defined(__CRT_DOS_PRIMARY) &&  defined(__USE_TIME_BITS64)                                 ), alias("_stat64", "_stat64i32")]]
+[[if($extended_include_prefix("<features.h>")                     defined(__CRT_DOS_PRIMARY) && !defined(__USE_TIME_BITS64) && defined(__USE_FILE_OFFSET64) ), alias("_stati64", "_stat32i64")]]
+[[if($extended_include_prefix("<features.h>")                     defined(__CRT_DOS_PRIMARY) && !defined(__USE_TIME_BITS64) && !defined(__USE_FILE_OFFSET64)), alias("_stat", "_stat32")]]
+[[if($extended_include_prefix("<features.h>", "<bits/os/stat.h>")!defined(__USE_FILE_OFFSET64) || defined(__STAT32_MATCHES_STAT64)                          ), alias("lstat")]]
+[[if($extended_include_prefix("<features.h>", "<bits/os/stat.h>") defined(__USE_FILE_OFFSET64) || defined(__STAT32_MATCHES_STAT64)                          ), alias("lstat64")]]
 int lstat([[nonnull]] char const *__restrict filename,
           [[nonnull]] struct stat *__restrict buf);
 %#endif /* __USE_XOPEN_EXTENDED || __USE_XOPEN2K */
@@ -546,28 +546,31 @@ int lstat([[nonnull]] char const *__restrict filename,
 %
 %#ifdef __USE_LARGEFILE64
 
-[[no_crt_impl, no_crt_self_import, decl_include("<bits/os/stat.h>")]]
-[[if(defined(__CRT_KOS_PRIMARY)), preferred_alias("kstat", "kstat64")]]
-[[if($extended_include_prefix("<features.h>")defined(__CRT_DOS_PRIMARY) &&  defined(__USE_TIME_BITS64)), preferred_alias("_stat64", "_stat64i32")]]
-[[if($extended_include_prefix("<features.h>")defined(__CRT_DOS_PRIMARY) && !defined(__USE_TIME_BITS64)), preferred_alias("_stati64", "_stat32i64")]]
-[[preferred_alias("stat64"), doc_alias("stat")]]
+[[no_crt_impl, doc_alias("stat"), decl_include("<bits/os/stat.h>"), no_crt_self_import]]
+[[if(                                        defined(__CRT_KOS_PRIMARY)                               ), alias("kstat", "kstat64")]]
+[[if($extended_include_prefix("<features.h>")defined(__CRT_DOS_PRIMARY) &&  defined(__USE_TIME_BITS64)), alias("_stat64", "_stat64i32")]]
+[[if($extended_include_prefix("<features.h>")defined(__CRT_DOS_PRIMARY) && !defined(__USE_TIME_BITS64)), alias("_stati64", "_stat32i64")]]
+[[if($extended_include_prefix("<bits/os/stat.h>")defined(__STAT32_MATCHES_STAT64)                     ), alias("stat")]]
+[[                                                                                                       alias("stat64")]]
 int stat64([[nonnull]] char const *__restrict filename,
            [[nonnull]] struct stat64 *__restrict buf);
 
-[[no_crt_impl, no_crt_self_import, decl_include("<bits/os/stat.h>")]]
-[[if(defined(__CRT_KOS_PRIMARY)), preferred_alias("kfstat", "kfstat64")]]
-[[if($extended_include_prefix("<features.h>")defined(__CRT_DOS_PRIMARY) &&  defined(__USE_TIME_BITS64)), preferred_alias("_fstat64", "_fstat64i32")]]
-[[if($extended_include_prefix("<features.h>")defined(__CRT_DOS_PRIMARY) && !defined(__USE_TIME_BITS64)), preferred_alias("_fstati64", "_fstat32i64")]]
-[[preferred_alias("fstat64"), doc_alias("fstat")]]
+[[no_crt_impl, doc_alias("fstat"), decl_include("<bits/os/stat.h>"), no_crt_self_import]]
+[[if(                                        defined(__CRT_KOS_PRIMARY)                               ), alias("kfstat", "kfstat64")]]
+[[if($extended_include_prefix("<features.h>")defined(__CRT_DOS_PRIMARY) &&  defined(__USE_TIME_BITS64)), alias("_fstat64", "_fstat64i32")]]
+[[if($extended_include_prefix("<features.h>")defined(__CRT_DOS_PRIMARY) && !defined(__USE_TIME_BITS64)), alias("_fstati64", "_fstat32i64")]]
+[[if($extended_include_prefix("<bits/os/stat.h>")defined(__STAT32_MATCHES_STAT64)                     ), alias("fstat")]]
+[[                                                                                                       alias("fstat64")]]
 int fstat64($fd_t fd, [[nonnull]] struct stat64 *__restrict buf);
 
 %
 %#if defined(__USE_XOPEN_EXTENDED) || defined(__USE_XOPEN2K)
-[[no_crt_impl, no_crt_self_import, decl_include("<bits/os/stat.h>")]]
-[[if(defined(__CRT_KOS_PRIMARY)), preferred_alias("klstat", "klstat64")]]
-[[if($extended_include_prefix("<features.h>")defined(__CRT_DOS_PRIMARY) &&  defined(__USE_TIME_BITS64)), preferred_alias("_stat64", "_stat64i32")]]
-[[if($extended_include_prefix("<features.h>")defined(__CRT_DOS_PRIMARY) && !defined(__USE_TIME_BITS64)), preferred_alias("_stati64", "_stat32i64")]]
-[[preferred_alias("lstat64"), doc_alias("lstat")]]
+[[no_crt_impl, doc_alias("lstat"), decl_include("<bits/os/stat.h>"), no_crt_self_import]]
+[[if(                                        defined(__CRT_KOS_PRIMARY)                               ), alias("klstat", "klstat64")]]
+[[if($extended_include_prefix("<features.h>")defined(__CRT_DOS_PRIMARY) &&  defined(__USE_TIME_BITS64)), alias("_stat64", "_stat64i32")]]
+[[if($extended_include_prefix("<features.h>")defined(__CRT_DOS_PRIMARY) && !defined(__USE_TIME_BITS64)), alias("_stati64", "_stat32i64")]]
+[[if($extended_include_prefix("<bits/os/stat.h>")defined(__STAT32_MATCHES_STAT64)                     ), alias("lstat")]]
+[[                                                                                                       alias("lstat64")]]
 int lstat64([[nonnull]] char const *__restrict filename,
             [[nonnull]] struct stat64 *__restrict buf);
 %#endif /* __USE_XOPEN_EXTENDED || __USE_XOPEN2K */
@@ -614,18 +617,18 @@ INTDEF NONNULL((1, 2)) int NOTHROW_NCX(LIBCCALL libc_dos_stat64)(char const *__r
 
 @@>> fstatat(2), fstatat64(2)
 @@@param flags: Set of `0 | AT_SYMLINK_NOFOLLOW | AT_DOSPATH'
-[[no_crt_impl, no_crt_self_import]]
-[[decl_include("<bits/os/stat.h>", "<bits/types.h>")]]
-[[if(defined(__CRT_KOS_PRIMARY)), preferred_alias("kfstatat", "kfstatat64")]]
-[[if($extended_include_prefix("<features.h>", "<bits/types.h>") defined(__USE_FILE_OFFSET64) || __SIZEOF_OFF32_T__ == __SIZEOF_OFF64_T__), preferred_alias("fstatat64")]]
-[[if($extended_include_prefix("<features.h>", "<bits/types.h>")!defined(__USE_FILE_OFFSET64) || __SIZEOF_OFF32_T__ == __SIZEOF_OFF64_T__), preferred_alias("fstatat")]]
+[[no_crt_impl, decl_include("<bits/os/stat.h>", "<bits/types.h>"), no_crt_self_import]]
+[[if(                                                             defined(__CRT_KOS_PRIMARY)                                      ), alias("kfstatat", "kfstatat64")]]
+[[if($extended_include_prefix("<features.h>", "<bits/os/stat.h>")!defined(__USE_FILE_OFFSET64) || defined(__STAT32_MATCHES_STAT64)), alias("fstatat")]]
+[[if($extended_include_prefix("<features.h>", "<bits/os/stat.h>") defined(__USE_FILE_OFFSET64) || defined(__STAT32_MATCHES_STAT64)), alias("fstatat64")]]
 int fstatat($fd_t dirfd, [[nonnull]] char const *__restrict filename,
             [[nonnull]] struct stat *__restrict buf, $atflag_t flags);
 
 %#ifdef __USE_LARGEFILE64
-[[no_crt_impl, no_crt_self_import, doc_alias("fstatat")]]
-[[decl_include("<bits/os/stat.h>", "<bits/types.h>")]]
-[[if(defined(__CRT_KOS_PRIMARY)), preferred_alias("kfstatat", "kfstatat64")]]
+[[no_crt_impl, doc_alias("fstatat"), decl_include("<bits/os/stat.h>", "<bits/types.h>"), no_crt_self_import]]
+[[if(                                            defined(__CRT_KOS_PRIMARY)      ), alias("kfstatat", "kfstatat64")]]
+[[if($extended_include_prefix("<bits/os/stat.h>")defined(__STAT32_MATCHES_STAT64)), alias("fstatat")]]
+[[                                                                                  alias("fstatat64")]]
 int fstatat64($fd_t dirfd, [[nonnull]] char const *__restrict filename,
               [[nonnull]] struct stat64 *__restrict buf, $atflag_t flags);
 %#endif /* __USE_LARGEFILE64 */
@@ -658,6 +661,7 @@ int chmod([[nonnull]] char const *filename, $mode_t mode);
 [[cp, guard, decl_include("<bits/types.h>")]]
 [[if(defined(__CRT_DOS_PRIMARY)), alias("_chmod", "chmod")]]
 int lchmod([[nonnull]] char const *filename, $mode_t mode);
+
 %#endif /* __USE_MISC */
 
 %[default:section(".text.crt{|.dos}.fs.basic_property")];
@@ -756,12 +760,11 @@ int utimensat32($fd_t dirfd, [[nonnull]] char const *filename,
 %#ifdef __USE_ATFILE
 @@>> utimensat(2), utimensat64(2)
 @@@param flags: Set of `0 | AT_SYMLINK_NOFOLLOW | AT_CHANGE_CTIME | AT_DOSPATH'
-[[cp, no_crt_self_import]]
-[[if($extended_include_prefix("<features.h>", "<bits/types.h>")!defined(__USE_TIME_BITS64) || __SIZEOF_TIME32_T__ == __SIZEOF_TIME64_T__), preferred_alias("utimensat")]]
-[[if($extended_include_prefix("<features.h>", "<bits/types.h>") defined(__USE_TIME_BITS64) || __SIZEOF_TIME32_T__ == __SIZEOF_TIME64_T__), preferred_alias("utimensat64")]]
+[[cp, decl_include("<bits/os/timespec.h>", "<bits/types.h>"), no_crt_self_import]]
+[[if($extended_include_prefix("<features.h>", "<bits/types.h>")!defined(__USE_TIME_BITS64) || __SIZEOF_TIME32_T__ == __SIZEOF_TIME64_T__), alias("utimensat")]]
+[[if($extended_include_prefix("<features.h>", "<bits/types.h>") defined(__USE_TIME_BITS64) || __SIZEOF_TIME32_T__ == __SIZEOF_TIME64_T__), alias("utimensat64")]]
 [[userimpl, requires($has_function(utimensat32) || $has_function(utimensat64))]]
 [[impl_include("<asm/os/fcntl.h>")]]
-[[decl_include("<bits/os/timespec.h>", "<bits/types.h>")]]
 int utimensat($fd_t dirfd, [[nonnull]] char const *filename,
               [[nullable]] struct timespec const times[2 /*or:3*/],
               $atflag_t flags) {
@@ -817,10 +820,10 @@ int utimensat($fd_t dirfd, [[nonnull]] char const *filename,
 }
 
 %#ifdef __USE_TIME64
-[[cp, preferred_time64_variant_of(utimensat), doc_alias("utimensat")]]
+[[cp, decl_include("<bits/os/timespec.h>", "<bits/types.h>")]]
+[[preferred_time64_variant_of(utimensat), doc_alias("utimensat")]]
 [[userimpl, requires_function(utimensat32)]]
 [[impl_include("<asm/os/fcntl.h>")]]
-[[decl_include("<bits/os/timespec.h>", "<bits/types.h>")]]
 int utimensat64($fd_t dirfd, [[nonnull]] char const *filename,
                 [[nullable]] struct timespec64 const times[2 /*or:3*/],
                 $atflag_t flags) {
@@ -858,11 +861,10 @@ int futimens32($fd_t fd, [[nullable]] struct timespec const times[2 /*or:3*/]);
 %
 %#ifdef __USE_XOPEN2K8
 @@>> futimens(2), futimens64(2)
-[[cp, no_crt_self_import]]
-[[if($extended_include_prefix("<features.h>", "<bits/types.h>") defined(__USE_TIME_BITS64) || __SIZEOF_TIME32_T__ == __SIZEOF_TIME64_T__), preferred_alias("futimens64")]]
-[[if($extended_include_prefix("<features.h>", "<bits/types.h>")!defined(__USE_TIME_BITS64) || __SIZEOF_TIME32_T__ == __SIZEOF_TIME64_T__), preferred_alias("futimens")]]
+[[cp, decl_include("<bits/os/timespec.h>", "<bits/types.h>"), no_crt_self_import]]
+[[if($extended_include_prefix("<features.h>", "<bits/types.h>") defined(__USE_TIME_BITS64) || __SIZEOF_TIME32_T__ == __SIZEOF_TIME64_T__), alias("futimens64")]]
+[[if($extended_include_prefix("<features.h>", "<bits/types.h>")!defined(__USE_TIME_BITS64) || __SIZEOF_TIME32_T__ == __SIZEOF_TIME64_T__), alias("futimens")]]
 [[userimpl, requires($has_function(futimens32) || $has_function(futimens64))]]
-[[decl_include("<bits/os/timespec.h>", "<bits/types.h>")]]
 int futimens($fd_t fd, [[nullable]] struct timespec const times[2 /*or:3*/]) {
 @@pp_if $has_function(futimens64)@@
 	struct timespec64 tms[2];
@@ -886,9 +888,9 @@ int futimens($fd_t fd, [[nullable]] struct timespec const times[2 /*or:3*/]) {
 }
 
 %#ifdef __USE_TIME64
-[[cp, preferred_time64_variant_of(futimens), doc_alias("futimens")]]
+[[cp, decl_include("<bits/os/timespec.h>", "<bits/types.h>")]]
+[[preferred_time64_variant_of(futimens), doc_alias("futimens")]]
 [[userimpl, requires_function(futimens32)]]
-[[decl_include("<bits/os/timespec.h>", "<bits/types.h>")]]
 int futimens64($fd_t fd, [[nullable]] struct timespec64 const times[2 /*or:3*/]) {
 	struct timespec32 tms[2];
 	if (!times)
@@ -912,19 +914,23 @@ int futimens64($fd_t fd, [[nullable]] struct timespec64 const times[2 /*or:3*/])
 /* TODO: Emulate these functions when not running under DOS-CRT */
 [[nocrt, alias("_stat", "_stat32")]]
 [[decl_prefix(struct __dos_stat32;)]]
-int _stat32([[nonnull]] char const *__restrict filename, [[nonnull]] struct __dos_stat32 *__restrict buf);
+int _stat32([[nonnull]] char const *__restrict filename,
+            [[nonnull]] struct __dos_stat32 *__restrict buf);
 
 [[nocrt, alias("_stati64", "_stat32i64")]]
 [[decl_prefix(struct __dos_stat32i64;)]]
-int _stat32i64([[nonnull]] char const *__restrict filename, [[nonnull]] struct __dos_stat32i64 *__restrict buf);
+int _stat32i64([[nonnull]] char const *__restrict filename,
+               [[nonnull]] struct __dos_stat32i64 *__restrict buf);
 
 [[nocrt, alias("_stat64", "_stat64i32")]]
 [[decl_prefix(struct __dos_stat64i32;)]]
-int _stat64i32([[nonnull]] char const *__restrict filename, [[nonnull]] struct __dos_stat64i32 *__restrict buf);
+int _stat64i32([[nonnull]] char const *__restrict filename,
+               [[nonnull]] struct __dos_stat64i32 *__restrict buf);
 
 [[nocrt, alias("_stat64", "_stat64i32")]]
 [[decl_prefix(struct __dos_stat64;)]]
-int _stat64([[nonnull]] char const *__restrict filename, [[nonnull]] struct __dos_stat64 *__restrict buf);
+int _stat64([[nonnull]] char const *__restrict filename,
+            [[nonnull]] struct __dos_stat64 *__restrict buf);
 
 [[nocrt, alias("_fstat", "_fstat32")]]
 [[decl_prefix(struct __dos_stat32;), decl_include("<bits/types.h>")]]
@@ -943,16 +949,20 @@ int _fstat64i32($fd_t fd, [[nonnull]] struct __dos_stat64i32 *__restrict buf);
 int _fstat64($fd_t fd, [[nonnull]] struct __dos_stat64 *__restrict buf);
 
 [[wchar, decl_prefix(struct __dos_stat32;)]]
-int _wstat32([[nonnull]] $wchar_t const *filename, [[nonnull]] struct __dos_stat32 *buf);
+int _wstat32([[nonnull]] $wchar_t const *filename,
+             [[nonnull]] struct __dos_stat32 *buf);
 
 [[wchar, decl_prefix(struct __dos_stat64;)]]
-int _wstat64([[nonnull]] $wchar_t const *filename, [[nonnull]] struct __dos_stat64 *buf);
+int _wstat64([[nonnull]] $wchar_t const *filename,
+             [[nonnull]] struct __dos_stat64 *buf);
 
 [[wchar, decl_prefix(struct __dos_stat32i64;)]]
-int _wstat32i64([[nonnull]] $wchar_t const *filename, [[nonnull]] struct __dos_stat32i64 *buf);
+int _wstat32i64([[nonnull]] $wchar_t const *filename,
+                [[nonnull]] struct __dos_stat32i64 *buf);
 
 [[wchar, decl_prefix(struct __dos_stat64i32;)]]
-int _wstat64i32([[nonnull]] $wchar_t const *filename, [[nonnull]] struct __dos_stat64i32 *buf);
+int _wstat64i32([[nonnull]] $wchar_t const *filename,
+                [[nonnull]] struct __dos_stat64i32 *buf);
 %#endif /* __USE_DOS */
 
 

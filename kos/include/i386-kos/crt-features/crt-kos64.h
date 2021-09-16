@@ -6243,12 +6243,10 @@
 #define __CRT_HAVE_KOS$ftrylockfile
 #define __CRT_HAVE_KOS$fts64_children
 #define __CRT_HAVE_KOS$fts64_close
-#define __CRT_HAVE_KOS$fts64_open
 #define __CRT_HAVE_KOS$fts64_read
 #define __CRT_HAVE_KOS$fts64_set
 #define __CRT_HAVE_KOS$fts_children
 #define __CRT_HAVE_KOS$fts_close
-#define __CRT_HAVE_KOS$fts_open
 #define __CRT_HAVE_KOS$fts_read
 #define __CRT_HAVE_KOS$fts_set
 #define __CRT_HAVE_KOS$funlockfile
@@ -9647,12 +9645,10 @@
 #define __CRT_HAVE_DOS$ftrylockfile
 #define __CRT_HAVE_DOS$fts64_children
 #define __CRT_HAVE_DOS$fts64_close
-#define __CRT_HAVE_DOS$fts64_open
 #define __CRT_HAVE_DOS$fts64_read
 #define __CRT_HAVE_DOS$fts64_set
 #define __CRT_HAVE_DOS$fts_children
 #define __CRT_HAVE_DOS$fts_close
-#define __CRT_HAVE_DOS$fts_open
 #define __CRT_HAVE_DOS$fts_read
 #define __CRT_HAVE_DOS$fts_set
 #define __CRT_HAVE_DOS$funlockfile

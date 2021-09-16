@@ -146,11 +146,11 @@ __STDC_INT_AS_SSIZE_T pselect32(__STDC_INT_AS_SIZE_T nfds,
                                 [[nullable]] $sigset_t const *__restrict sigmask);
 
 
-[[cp, no_crt_self_import, export_as("__select")]]
-[[decl_include("<features.h>", "<bits/os/timeval.h>", "<bits/os/fd_set.h>")]]
-[[if($extended_include_prefix("<features.h>", "<bits/types.h>")!defined(__USE_TIME_BITS64) || __SIZEOF_TIME32_T__ == __SIZEOF_TIME64_T__), preferred_alias("select", "__select")]]
-[[if($extended_include_prefix("<features.h>", "<bits/types.h>") defined(__USE_TIME_BITS64) || __SIZEOF_TIME32_T__ == __SIZEOF_TIME64_T__), preferred_alias("select64")]]
+[[cp, decl_include("<features.h>", "<bits/os/timeval.h>", "<bits/os/fd_set.h>"), no_crt_self_import]]
+[[if($extended_include_prefix("<features.h>", "<bits/types.h>")!defined(__USE_TIME_BITS64) || __SIZEOF_TIME32_T__ == __SIZEOF_TIME64_T__), alias("select", "__select")]]
+[[if($extended_include_prefix("<features.h>", "<bits/types.h>") defined(__USE_TIME_BITS64) || __SIZEOF_TIME32_T__ == __SIZEOF_TIME64_T__), alias("select64")]]
 [[userimpl, requires($has_function(select32) || $has_function(select64))]]
+[[export_as("__select")]]
 __STDC_INT_AS_SSIZE_T select(__STDC_INT_AS_SIZE_T nfds,
                              [[nullable]] fd_set *__restrict readfds,
                              [[nullable]] fd_set *__restrict writefds,
@@ -160,24 +160,23 @@ __STDC_INT_AS_SSIZE_T select(__STDC_INT_AS_SIZE_T nfds,
 	struct timeval64 tmv;
 	if (!timeout)
 		return select64(nfds, readfds, writefds, exceptfds, NULL);
-	tmv.@tv_sec@  = (time64_t)timeout->@tv_sec@;
+	tmv.tv_sec  = (time64_t)timeout->tv_sec;
 	tmv.@tv_usec@ = timeout->@tv_usec@;
 	return select64(nfds, readfds, writefds, exceptfds, &tmv);
 @@pp_else@@
 	struct timeval32 tmv;
 	if (!timeout)
 		return select32(nfds, readfds, writefds, exceptfds, NULL);
-	tmv.@tv_sec@  = (time32_t)timeout->@tv_sec@;
+	tmv.tv_sec  = (time32_t)timeout->tv_sec;
 	tmv.@tv_usec@ = timeout->@tv_usec@;
 	return select32(nfds, readfds, writefds, exceptfds, &tmv);
 @@pp_endif@@
 }
 
 %#ifdef __USE_XOPEN2K
-[[cp, no_crt_self_import]]
-[[decl_include("<features.h>", "<bits/os/timespec.h>", "<bits/os/sigset.h>", "<bits/os/fd_set.h>")]]
-[[if($extended_include_prefix("<features.h>", "<bits/types.h>")!defined(__USE_TIME_BITS64) || __SIZEOF_TIME32_T__ == __SIZEOF_TIME64_T__), preferred_alias("pselect")]]
-[[if($extended_include_prefix("<features.h>", "<bits/types.h>") defined(__USE_TIME_BITS64) || __SIZEOF_TIME32_T__ == __SIZEOF_TIME64_T__), preferred_alias("pselect64")]]
+[[cp, decl_include("<features.h>", "<bits/os/timespec.h>", "<bits/os/sigset.h>", "<bits/os/fd_set.h>"), no_crt_self_import]]
+[[if($extended_include_prefix("<features.h>", "<bits/types.h>")!defined(__USE_TIME_BITS64) || __SIZEOF_TIME32_T__ == __SIZEOF_TIME64_T__), alias("pselect")]]
+[[if($extended_include_prefix("<features.h>", "<bits/types.h>") defined(__USE_TIME_BITS64) || __SIZEOF_TIME32_T__ == __SIZEOF_TIME64_T__), alias("pselect64")]]
 [[userimpl, requires($has_function(pselect32) || $has_function(pselect64))]]
 __STDC_INT_AS_SSIZE_T pselect(__STDC_INT_AS_SIZE_T nfds,
                               [[nullable]] fd_set *__restrict readfds,
@@ -189,15 +188,15 @@ __STDC_INT_AS_SSIZE_T pselect(__STDC_INT_AS_SIZE_T nfds,
 	struct timespec64 tmv;
 	if (!timeout)
 		return pselect64(nfds, readfds, writefds, exceptfds, NULL, sigmask);
-	tms.@tv_sec@  = (time64_t)timeout->@tv_sec@;
-	tms.@tv_nsec@ = timeout->@tv_nsec@;
+	tms.tv_sec  = (time64_t)timeout->tv_sec;
+	tms.tv_nsec = timeout->tv_nsec;
 	return pselect64(nfds, readfds, writefds, exceptfds, &tms, sigmask);
 @@pp_else@@
 	struct timespec32 tms;
 	if (!timeout)
 		return pselect32(nfds, readfds, writefds, exceptfds, NULL, sigmask);
-	tms.@tv_sec@  = (time32_t)timeout->@tv_sec@;
-	tms.@tv_nsec@ = timeout->@tv_nsec@;
+	tms.tv_sec  = (time32_t)timeout->tv_sec;
+	tms.tv_nsec = timeout->tv_nsec;
 	return pselect32(nfds, readfds, writefds, exceptfds, &tms, sigmask);
 @@pp_endif@@
 }
@@ -216,7 +215,7 @@ __STDC_INT_AS_SSIZE_T select64(__STDC_INT_AS_SIZE_T nfds,
 	struct timeval32 tmv;
 	if (!timeout)
 		return select32(nfds, readfds, writefds, exceptfds, NULL);
-	tmv.tv_sec  = (time32_t)timeout->@tv_sec@;
+	tmv.tv_sec  = (time32_t)timeout->tv_sec;
 	tmv.tv_usec = timeout->@tv_usec@;
 	return select32(nfds, readfds, writefds, exceptfds, &tmv);
 }
@@ -234,8 +233,8 @@ __STDC_INT_AS_SSIZE_T pselect64(__STDC_INT_AS_SIZE_T nfds,
 	struct timespec32 tms;
 	if (!timeout)
 		return pselect32(nfds, readfds, writefds, exceptfds, NULL, sigmask);
-	tms.tv_sec  = (time32_t)timeout->@tv_sec@;
-	tms.tv_nsec = timeout->@tv_nsec@;
+	tms.tv_sec  = (time32_t)timeout->tv_sec;
+	tms.tv_nsec = timeout->tv_nsec;
 	return pselect32(nfds, readfds, writefds, exceptfds, &tms, sigmask);
 }
 %#endif /* __USE_XOPEN2K */

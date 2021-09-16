@@ -402,8 +402,8 @@ typedef int __priority_which_t;
 
 %#ifdef __USE_GNU
 [[decl_include("<bits/os/rlimit.h>"), no_crt_self_import]]
-[[if($extended_include_prefix("<features.h>", "<bits/types.h>")!defined(__USE_FILE_OFFSET64) || __SIZEOF_RLIM32_T__ == __SIZEOF_RLIM64_T__), preferred_alias("prlimit")]]
-[[if($extended_include_prefix("<features.h>", "<bits/types.h>") defined(__USE_FILE_OFFSET64) || __SIZEOF_RLIM32_T__ == __SIZEOF_RLIM64_T__), preferred_alias("prlimit64")]]
+[[if($extended_include_prefix("<features.h>", "<bits/types.h>")!defined(__USE_FILE_OFFSET64) || __SIZEOF_RLIM32_T__ == __SIZEOF_RLIM64_T__), alias("prlimit")]]
+[[if($extended_include_prefix("<features.h>", "<bits/types.h>") defined(__USE_FILE_OFFSET64) || __SIZEOF_RLIM32_T__ == __SIZEOF_RLIM64_T__), alias("prlimit64")]]
 int prlimit($pid_t pid, __rlimit_resource_t resource,
             [[nullable]] struct rlimit const *new_limit,
             [[nullable]] struct rlimit *old_limit);

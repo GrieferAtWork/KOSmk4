@@ -2091,7 +2091,7 @@ int clearenv();
 @@descriptor of that file.
 @@@param: suffixlen: The #  of trailing  characters to-be  ignored
 @@                   after the required 6 trailing 'X'-characters.
-[[cp, wunused, guard, section(".text.crt{|.dos}.fs.utility")]]
+[[cp, guard, wunused, section(".text.crt{|.dos}.fs.utility")]]
 [[decl_include("<features.h>", "<bits/types.h>"), no_crt_self_import]]
 [[if($extended_include_prefix("<features.h>", "<asm/os/oflags.h>")!defined(__USE_FILE_OFFSET64) || !defined(__O_LARGEFILE) || (__O_LARGEFILE+0) == 0), alias("mkstemps")]]
 [[                                                                                                                                                     alias("mkstemps64")]]
@@ -2717,8 +2717,8 @@ again:
 @@pp_if $has_function(gettimeofday64) && __SIZEOF_TIME32_T__ != __SIZEOF_TIME64_T__@@
 		struct timeval64 tv;
 		if (gettimeofday64(&tv, NULL) == 0) {
-			seed = (uint32_t)(tv.@tv_sec@) ^
-			       (uint32_t)(tv.@tv_sec@ >> 32) ^
+			seed = (uint32_t)(tv.tv_sec) ^
+			       (uint32_t)(tv.tv_sec >> 32) ^
 			       (uint32_t)(tv.@tv_usec@ << 12); /* The  max value is 0xf423f, so shift
 			                                        * that to  become `0xf423f000',  thus
 			                                        * filling in the upper bits of `seed' */
@@ -2726,9 +2726,9 @@ again:
 @@pp_elif $has_function(gettimeofday)@@
 		struct timeval tv;
 		if (gettimeofday(&tv, NULL) == 0) {
-			seed = (uint32_t)(tv.@tv_sec@) ^
+			seed = (uint32_t)(tv.tv_sec) ^
 @@pp_if __SIZEOF_TIME_T__ > 4@@
-			       (uint32_t)(tv.@tv_sec@ >> 32) ^
+			       (uint32_t)(tv.tv_sec >> 32) ^
 @@pp_endif@@
 			       (uint32_t)(tv.@tv_usec@ << 12); /* The  max value is 0xf423f, so shift
 			                                        * that to  become `0xf423f000',  thus

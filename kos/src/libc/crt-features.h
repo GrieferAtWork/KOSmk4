@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xc79caa36 */
+/* HASH CRC-32:0xc9bb1725 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -1074,12 +1074,10 @@
 #define __CRT_HAVE_DOS$ftrylockfile
 #define __CRT_HAVE_DOS$fts64_children
 #define __CRT_HAVE_DOS$fts64_close
-#define __CRT_HAVE_DOS$fts64_open
 #define __CRT_HAVE_DOS$fts64_read
 #define __CRT_HAVE_DOS$fts64_set
 #define __CRT_HAVE_DOS$fts_children
 #define __CRT_HAVE_DOS$fts_close
-#define __CRT_HAVE_DOS$fts_open
 #define __CRT_HAVE_DOS$fts_read
 #define __CRT_HAVE_DOS$fts_set
 #define __CRT_HAVE_DOS$funlockfile

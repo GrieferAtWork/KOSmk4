@@ -1789,9 +1789,9 @@ int sigtimedwait32([[nonnull]] $sigset_t const *__restrict set,
 @@@param: rel_timeout: The timeout specifying for how long to wait (or `NULL' to wait indefinitely)
 @@@return: -1: [errno=EINTR]  The signal handler for `signo' was executed.
 @@@return: -1: [errno=EAGAIN] A total of `rel_timeout' has passed.
-[[cp, no_crt_self_import, decl_include("<bits/os/siginfo.h>", "<bits/os/timespec.h>")]]
-[[if($extended_include_prefix("<features.h>", "<bits/types.h>")!defined(__USE_TIME_BITS64) || __SIZEOF_TIME32_T__ == __SIZEOF_TIME64_T__), preferred_alias("sigtimedwait")]]
-[[if($extended_include_prefix("<features.h>", "<bits/types.h>") defined(__USE_TIME_BITS64) || __SIZEOF_TIME32_T__ == __SIZEOF_TIME64_T__), preferred_alias("sigtimedwait64")]]
+[[cp, decl_include("<bits/os/siginfo.h>", "<bits/os/timespec.h>"), no_crt_self_import]]
+[[if($extended_include_prefix("<features.h>", "<bits/types.h>")!defined(__USE_TIME_BITS64) || __SIZEOF_TIME32_T__ == __SIZEOF_TIME64_T__), alias("sigtimedwait")]]
+[[if($extended_include_prefix("<features.h>", "<bits/types.h>") defined(__USE_TIME_BITS64) || __SIZEOF_TIME32_T__ == __SIZEOF_TIME64_T__), alias("sigtimedwait64")]]
 [[userimpl, requires($has_function(sigtimedwait32) || $has_function(sigtimedwait64))]]
 int sigtimedwait([[nonnull]] $sigset_t const *__restrict set,
                  [[nullable]] siginfo_t *__restrict info,

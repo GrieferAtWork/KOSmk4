@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x9eeb0727 */
+/* HASH CRC-32:0xd31b13a3 */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -342,12 +342,10 @@ DFUN(".text.crt.dos.string.format", libd_format_aprintf_alloc, libc_format_aprin
 /* fts */
 DFUN(".text.crt.dos.fs.fts", libd_fts_children, libc_fts_children, TP, 2, TP, TD)
 DFUN(".text.crt.dos.fs.fts", libd_fts_close, libc_fts_close, TD, 1, TP)
-DFUN(".text.crt.dos.fs.fts", libd_fts_open, libc_fts_open, TP, 3, TP, TD, TP)
 DFUN(".text.crt.dos.fs.fts", libd_fts_read, libc_fts_read, TP, 1, TP)
 DFUN(".text.crt.dos.fs.fts", libd_fts_set, libc_fts_set, TD, 3, TP, TP, TD)
 DFUN(".text.crt.dos.fs.fts", libd_fts64_children, libc_fts64_children, TP, 2, TP, TD)
 DFUN(".text.crt.dos.fs.fts", libd_fts64_close, libc_fts64_close, TD, 1, TP)
-DFUN(".text.crt.dos.fs.fts", libd_fts64_open, libc_fts64_open, TP, 3, TP, TD, TP)
 DFUN(".text.crt.dos.fs.fts", libd_fts64_read, libc_fts64_read, TP, 1, TP)
 DFUN(".text.crt.dos.fs.fts", libd_fts64_set, libc_fts64_set, TD, 3, TP, TP, TD)
 

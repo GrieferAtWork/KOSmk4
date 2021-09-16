@@ -1220,10 +1220,9 @@ int recvmmsg32($fd_t sockfd, [inp(vlen)] struct mmsghdr *vmessages,
 @@                           MSG_WAITFORONE'
 @@@return: * : The # of datagrams successfully received.
 @@@return: -1: Error (s.a. `recvmsg(2)')
-[[cp, no_crt_self_import]]
-[[decl_include("<features.h>", "<bits/types.h>", "<bits/os/mmsghdr.h>", "<bits/os/timespec.h>")]]
-[[if($extended_include_prefix("<features.h>", "<bits/types.h>")!defined(__USE_TIME_BITS64) || __SIZEOF_TIME32_T__ == __SIZEOF_TIME64_T__), preferred_alias("recvmmsg")]]
-[[if($extended_include_prefix("<features.h>", "<bits/types.h>") defined(__USE_TIME_BITS64) || __SIZEOF_TIME32_T__ == __SIZEOF_TIME64_T__), preferred_alias("recvmmsg64")]]
+[[cp, decl_include("<features.h>", "<bits/types.h>", "<bits/os/mmsghdr.h>", "<bits/os/timespec.h>"), no_crt_self_import]]
+[[if($extended_include_prefix("<features.h>", "<bits/types.h>")!defined(__USE_TIME_BITS64) || __SIZEOF_TIME32_T__ == __SIZEOF_TIME64_T__), alias("recvmmsg")]]
+[[if($extended_include_prefix("<features.h>", "<bits/types.h>") defined(__USE_TIME_BITS64) || __SIZEOF_TIME32_T__ == __SIZEOF_TIME64_T__), alias("recvmmsg64")]]
 [[userimpl, requires($has_function(recvmmsg32) || $has_function(recvmmsg64))]]
 int recvmmsg($fd_t sockfd, [inp(vlen)] struct mmsghdr *vmessages,
              __STDC_UINT_AS_SIZE_T vlen, __STDC_INT_AS_UINT_T msg_flags,
@@ -1232,15 +1231,15 @@ int recvmmsg($fd_t sockfd, [inp(vlen)] struct mmsghdr *vmessages,
 	struct timespec64 tmo64;
 	if (!tmo)
 		return recvmmsg64(sockfd, vmessages, vlen, msg_flags, NULL);
-	tmo32.@tv_sec@  = (time64_t)tmo->@tv_sec@,
-	tmo32.@tv_nsec@ = tmo->@tv_nsec@;
+	tmo32.tv_sec  = (time64_t)tmo->tv_sec,
+	tmo32.tv_nsec = tmo->tv_nsec;
 	return recvmmsg64(sockfd, vmessages, vlen, msg_flags, &tmo64);
 @@pp_else@@
 	struct timespec32 tmo32;
 	if (!tmo)
 		return recvmmsg32(sockfd, vmessages, vlen, msg_flags, NULL);
-	tmo32.@tv_sec@  = (time32_t)tmo->@tv_sec@,
-	tmo32.@tv_nsec@ = tmo->@tv_nsec@;
+	tmo32.tv_sec  = (time32_t)tmo->tv_sec,
+	tmo32.tv_nsec = tmo->tv_nsec;
 	return recvmmsg32(sockfd, vmessages, vlen, msg_flags, &tmo32);
 @@pp_endif@@
 }
@@ -1255,8 +1254,8 @@ int recvmmsg64($fd_t sockfd, [inp(vlen)] struct mmsghdr *vmessages,
 	struct timespec32 tmo32;
 	if (!tmo)
 		return recvmmsg32(sockfd, vmessages, vlen, msg_flags, NULL);
-	tmo32.@tv_sec@  = (time32_t)tmo->@tv_sec@,
-	tmo32.@tv_nsec@ = tmo->@tv_nsec@;
+	tmo32.tv_sec  = (time32_t)tmo->tv_sec,
+	tmo32.tv_nsec = tmo->tv_nsec;
 	return recvmmsg32(sockfd, vmessages, vlen, msg_flags, &tmo32);
 }
 %#endif /* __USE_TIME64 */

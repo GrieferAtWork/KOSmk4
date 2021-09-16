@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x27283ba9 */
+/* HASH CRC-32:0x743142ae */
 /* Copyright (c) 2019-2021 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -23,8 +23,8 @@
 #include <__crt.h>
 #include <asm/os/oflags.h>
 #if defined(__CRT_HAVE_OpenAt64) || defined(__CRT_HAVE_OpenAt)
-#include <bits/types.h>
 #include <kos/anno.h>
+#include <bits/types.h>
 __NAMESPACE_LOCAL_BEGIN
 #if !defined(__local___localdep_OpenAt32_defined) && defined(__CRT_HAVE_OpenAt)
 #define __local___localdep_OpenAt32_defined 1

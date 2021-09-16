@@ -127,21 +127,21 @@ int mq_timedsend32(mqd_t mqdes,
 
 @@>> mq_timedreceive(3), mq_timedreceive64(3)
 [[cp, decl_include("<bits/os/timespec.h>", "<bits/os/mqueue.h>"), no_crt_self_import]]
-[[if($extended_include_prefix("<features.h>", "<bits/types.h>")!defined(__USE_TIME_BITS64) || __SIZEOF_TIME32_T__ == __SIZEOF_TIME64_T__), preferred_alias("mq_timedreceive")]]
-[[if($extended_include_prefix("<features.h>", "<bits/types.h>") defined(__USE_TIME_BITS64) || __SIZEOF_TIME32_T__ == __SIZEOF_TIME64_T__), preferred_alias("mq_timedreceive64")]]
+[[if($extended_include_prefix("<features.h>", "<bits/types.h>")!defined(__USE_TIME_BITS64) || __SIZEOF_TIME32_T__ == __SIZEOF_TIME64_T__), alias("mq_timedreceive")]]
+[[if($extended_include_prefix("<features.h>", "<bits/types.h>") defined(__USE_TIME_BITS64) || __SIZEOF_TIME32_T__ == __SIZEOF_TIME64_T__), alias("mq_timedreceive64")]]
 [[userimpl, requires($has_function(mq_timedreceive32) || $has_function(mq_timedreceive64))]]
 $ssize_t mq_timedreceive(mqd_t mqdes,
                          [[nonnull]] char *__restrict msg_ptr, $size_t msg_len, unsigned int *pmsg_prio,
                          [[nonnull]] struct timespec const *__restrict abs_timeout) {
 @@pp_if $has_function(mq_timedreceive32)@@
 	struct timespec32 abs_timeout32;
-	abs_timeout32.@tv_sec@  = (time32_t)abs_timeout->@tv_sec@;
-	abs_timeout32.@tv_nsec@ = abs_timeout->@tv_nsec@;
+	abs_timeout32.tv_sec  = (time32_t)abs_timeout->tv_sec;
+	abs_timeout32.tv_nsec = abs_timeout->tv_nsec;
 	return mq_timedreceive32(mqdes, msg_ptr, msg_len, pmsg_prio, &abs_timeout32);
 @@pp_else@@
 	struct timespec64 abs_timeout64;
-	abs_timeout64.@tv_sec@  = (time64_t)abs_timeout->@tv_sec@;
-	abs_timeout64.@tv_nsec@ = abs_timeout->@tv_nsec@;
+	abs_timeout64.tv_sec  = (time64_t)abs_timeout->tv_sec;
+	abs_timeout64.tv_nsec = abs_timeout->tv_nsec;
 	return mq_timedreceive64(mqdes, msg_ptr, msg_len, pmsg_prio, &abs_timeout64);
 @@pp_endif@@
 }
@@ -149,21 +149,21 @@ $ssize_t mq_timedreceive(mqd_t mqdes,
 
 @@>> mq_timedsend(3), mq_timedsend64(3)
 [[cp, decl_include("<bits/os/timespec.h>", "<bits/os/mqueue.h>"), no_crt_self_import]]
-[[if($extended_include_prefix("<features.h>", "<bits/types.h>")!defined(__USE_TIME_BITS64) || __SIZEOF_TIME32_T__ == __SIZEOF_TIME64_T__), preferred_alias("mq_timedsend")]]
-[[if($extended_include_prefix("<features.h>", "<bits/types.h>") defined(__USE_TIME_BITS64) || __SIZEOF_TIME32_T__ == __SIZEOF_TIME64_T__), preferred_alias("mq_timedsend64")]]
+[[if($extended_include_prefix("<features.h>", "<bits/types.h>")!defined(__USE_TIME_BITS64) || __SIZEOF_TIME32_T__ == __SIZEOF_TIME64_T__), alias("mq_timedsend")]]
+[[if($extended_include_prefix("<features.h>", "<bits/types.h>") defined(__USE_TIME_BITS64) || __SIZEOF_TIME32_T__ == __SIZEOF_TIME64_T__), alias("mq_timedsend64")]]
 [[userimpl, requires($has_function(mq_timedsend32) || $has_function(mq_timedsend64))]]
 int mq_timedsend(mqd_t mqdes,
                  [[nonnull]] char const *msg_ptr, $size_t msg_len, unsigned int msg_prio,
                  [[nonnull]] struct timespec const *abs_timeout) {
 @@pp_if $has_function(mq_timedsend32)@@
 	struct timespec32 abs_timeout32;
-	abs_timeout32.@tv_sec@  = (time32_t)abs_timeout->@tv_sec@;
-	abs_timeout32.@tv_nsec@ = abs_timeout->@tv_nsec@;
+	abs_timeout32.tv_sec  = (time32_t)abs_timeout->tv_sec;
+	abs_timeout32.tv_nsec = abs_timeout->tv_nsec;
 	return mq_timedsend32(mqdes, msg_ptr, msg_len, msg_prio, &abs_timeout32);
 @@pp_else@@
 	struct timespec64 abs_timeout64;
-	abs_timeout64.@tv_sec@  = (time64_t)abs_timeout->@tv_sec@;
-	abs_timeout64.@tv_nsec@ = abs_timeout->@tv_nsec@;
+	abs_timeout64.tv_sec  = (time64_t)abs_timeout->tv_sec;
+	abs_timeout64.tv_nsec = abs_timeout->tv_nsec;
 	return mq_timedsend64(mqdes, msg_ptr, msg_len, msg_prio, &abs_timeout64);
 @@pp_endif@@
 }
@@ -179,8 +179,8 @@ $ssize_t mq_timedreceive64(mqd_t mqdes,
                            [[nonnull]] char *__restrict msg_ptr, $size_t msg_len, unsigned int *pmsg_prio,
                            [[nonnull]] struct timespec64 const *__restrict abs_timeout) {
 	struct timespec32 abs_timeout32;
-	abs_timeout32.@tv_sec@  = (time32_t)abs_timeout->@tv_sec@;
-	abs_timeout32.@tv_nsec@ = abs_timeout->@tv_nsec@;
+	abs_timeout32.tv_sec  = (time32_t)abs_timeout->tv_sec;
+	abs_timeout32.tv_nsec = abs_timeout->tv_nsec;
 	return mq_timedreceive32(mqdes, msg_ptr, msg_len, pmsg_prio, &abs_timeout32);
 }
 
@@ -191,8 +191,8 @@ int mq_timedsend64(mqd_t mqdes,
                    [[nonnull]] char const *msg_ptr, $size_t msg_len, unsigned int msg_prio,
                    [[nonnull]] struct timespec64 const *abs_timeout) {
 	struct timespec32 abs_timeout32;
-	abs_timeout32.@tv_sec@  = (time32_t)abs_timeout->@tv_sec@;
-	abs_timeout32.@tv_nsec@ = abs_timeout->@tv_nsec@;
+	abs_timeout32.tv_sec  = (time32_t)abs_timeout->tv_sec;
+	abs_timeout32.tv_nsec = abs_timeout->tv_nsec;
 	return mq_timedsend32(mqdes, msg_ptr, msg_len, msg_prio, &abs_timeout32);
 }
 

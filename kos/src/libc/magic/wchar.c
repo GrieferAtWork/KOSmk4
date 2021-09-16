@@ -766,7 +766,7 @@ size_t wcsftime([[outp(min(return, buflen))]] wchar_t *__restrict buf, size_t bu
 [[std, guard, wchar, no_crt_self_import, no_crt_self_export]]
 [[dos_export_as("DOS$wcstok_s"), kos_export_as("wcstok")]]
 [[if(!defined(__CRT_DOS_PRIMARY)), preferred_alias("wcstok")]]
-[[if(defined(__CRT_DOS_PRIMARY)), preferred_alias("wcstok_s")]]
+[[if( defined(__CRT_DOS_PRIMARY)), preferred_alias("wcstok_s")]]
 wchar_t *wcstok([[nullable]] wchar_t *str,
                 [[nonnull]] wchar_t const *__restrict delim,
                 [[nonnull]] wchar_t **__restrict save_ptr)

@@ -278,8 +278,8 @@ errno_t _ftime64_s([[nonnull]] struct $timeb64 *timebuf) {
 @@@return: 0 : Success
 @@@return: -1: Error (s.a. `errno')
 [[decl_include("<bits/os/timeb.h>"), no_crt_self_import]]
-[[if($extended_include_prefix("<features.h>", "<bits/types.h>")!defined(__USE_TIME_BITS64) || __SIZEOF_TIME32_T__ == __SIZEOF_TIME64_T__), preferred_alias("ftime")]]
-[[if($extended_include_prefix("<features.h>", "<bits/types.h>") defined(__USE_TIME_BITS64) || __SIZEOF_TIME32_T__ == __SIZEOF_TIME64_T__), preferred_alias("ftime64")]]
+[[if($extended_include_prefix("<features.h>", "<bits/types.h>")!defined(__USE_TIME_BITS64) || __SIZEOF_TIME32_T__ == __SIZEOF_TIME64_T__), alias("ftime")]]
+[[if($extended_include_prefix("<features.h>", "<bits/types.h>") defined(__USE_TIME_BITS64) || __SIZEOF_TIME32_T__ == __SIZEOF_TIME64_T__), alias("ftime64")]]
 [[requires($has_function(crt_ftime32_s) || $has_function(crt_ftime64_s) ||
            $has_function(crt_dos_ftime32) || $has_function(crt_dos_ftime64) ||
            $has_function(crt_ftime32) || $has_function(crt_ftime64))]]

@@ -703,7 +703,7 @@ int tcsetpgrp($fd_t fd, $pid_t pgrp_id);
 @@Return the login name for the current user, or `NULL' on error.
 @@s.a. `getlogin_r()' and `cuserid()'
 [[section(".text.crt{|.dos}.io.tty")]]
-[[wunused, guard, requires($has_function(getenv) || $has_function(cuserid))]]
+[[guard, wunused, requires($has_function(getenv) || $has_function(cuserid))]]
 char *getlogin() {
 @@pp_if $has_function(getenv) && $has_function(cuserid)@@
 	char *result = getenv("LOGNAME");
@@ -2002,10 +2002,9 @@ int ftruncate32($fd_t fd, $pos32_t length);
 
 @@>> ftruncate(2), ftruncate64(2)
 @@Truncate the given file `fd' to a length of `length'
-[[decl_include("<features.h>"), decl_prefix(DEFINE_PIO_OFFSET)]]
-[[no_crt_self_import, decl_include("<bits/types.h>")]]
-[[if($extended_include_prefix("<features.h>", "<bits/types.h>") defined(__USE_FILE_OFFSET64) || __SIZEOF_OFF32_T__ == __SIZEOF_OFF64_T__), preferred_alias("ftruncate64", "_chsize_s")]]
-[[if($extended_include_prefix("<features.h>", "<bits/types.h>")!defined(__USE_FILE_OFFSET64) || __SIZEOF_OFF32_T__ == __SIZEOF_OFF64_T__), preferred_alias("ftruncate", "_chsize", "chsize")]]
+[[decl_include("<features.h>", "<bits/types.h>"), decl_prefix(DEFINE_PIO_OFFSET), no_crt_self_import]]
+[[if($extended_include_prefix("<features.h>", "<bits/types.h>")!defined(__USE_FILE_OFFSET64) || __SIZEOF_OFF32_T__ == __SIZEOF_OFF64_T__), alias("ftruncate", "_chsize", "chsize")]]
+[[if($extended_include_prefix("<features.h>", "<bits/types.h>") defined(__USE_FILE_OFFSET64) || __SIZEOF_OFF32_T__ == __SIZEOF_OFF64_T__), alias("ftruncate64", "_chsize_s")]]
 [[userimpl, requires($has_function(ftruncate32) || $has_function(ftruncate64))]]
 [[dos_only_export_as("_chsize"), export_as("chsize")]]
 [[section(".text.crt{|.dos}.io.write")]]
@@ -3061,9 +3060,9 @@ __STDC_INT_AS_SSIZE_T resolvepath([[nonnull]] char const *filename,
 
 @@>> tell(3), tell64(3)
 @@Return the current file position (alias for `lseek(fd, 0, SEEK_CUR)')
-[[wunused, guard, no_crt_self_import, decl_include("<features.h>", "<bits/types.h>")]]
-[[if($extended_include_prefix("<features.h>", "<bits/types.h>") defined(__USE_FILE_OFFSET64) || __SIZEOF_OFF32_T__ == __SIZEOF_OFF64_T__), preferred_alias("tell64", "_telli64")]]
-[[if($extended_include_prefix("<features.h>", "<bits/types.h>")!defined(__USE_FILE_OFFSET64) || __SIZEOF_OFF32_T__ == __SIZEOF_OFF64_T__), preferred_alias("tell", "_tell")]]
+[[guard, wunused, decl_include("<features.h>", "<bits/types.h>"), no_crt_self_import]]
+[[if($extended_include_prefix("<features.h>", "<bits/types.h>")!defined(__USE_FILE_OFFSET64) || __SIZEOF_OFF32_T__ == __SIZEOF_OFF64_T__), alias("tell", "_tell")]]
+[[if($extended_include_prefix("<features.h>", "<bits/types.h>") defined(__USE_FILE_OFFSET64) || __SIZEOF_OFF32_T__ == __SIZEOF_OFF64_T__), alias("tell64", "_telli64")]]
 [[requires_include("<asm/os/stdio.h>")]]
 [[requires($has_function(lseek) && defined(__SEEK_CUR))]]
 [[impl_include("<asm/os/stdio.h>"), dos_only_export_as("_tell")]]
@@ -3072,8 +3071,9 @@ $off_t tell($fd_t fd) {
 }
 
 %#ifdef __USE_LARGEFILE64
-[[wunused, guard, decl_include("<bits/types.h>")]]
-[[requires_include("<asm/os/stdio.h>"), doc_alias("tell")]]
+[[guard, wunused, decl_include("<bits/types.h>")]]
+[[preferred_off64_variant_of(tell), doc_alias("tell")]]
+[[requires_include("<asm/os/stdio.h>")]]
 [[requires($has_function(lseek64) && defined(__SEEK_CUR))]]
 [[impl_include("<asm/os/stdio.h>"), dos_only_export_alias("_telli64")]]
 $off64_t tell64($fd_t fd) {

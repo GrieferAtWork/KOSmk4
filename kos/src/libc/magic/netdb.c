@@ -708,8 +708,8 @@ int getaddrinfo_a(int mode,
 @@This   function  is  not   part  of  POSIX   and  therefore  no  official
 @@cancellation point
 [[cp, no_crt_self_import]]
-[[if($extended_include_prefix("<features.h>", "<bits/types.h>")!defined(__USE_TIME_BITS64) || __SIZEOF_TIME32_T__ == __SIZEOF_TIME64_T__), preferred_alias("gai_suspend")]]
-[[if($extended_include_prefix("<features.h>", "<bits/types.h>") defined(__USE_TIME_BITS64) || __SIZEOF_TIME32_T__ == __SIZEOF_TIME64_T__), preferred_alias("gai_suspend64")]]
+[[if($extended_include_prefix("<features.h>", "<bits/types.h>")!defined(__USE_TIME_BITS64) || __SIZEOF_TIME32_T__ == __SIZEOF_TIME64_T__), alias("gai_suspend")]]
+[[if($extended_include_prefix("<features.h>", "<bits/types.h>") defined(__USE_TIME_BITS64) || __SIZEOF_TIME32_T__ == __SIZEOF_TIME64_T__), alias("gai_suspend64")]]
 [[userimpl, requires($has_function(gai_suspend64) || $has_function(gai_suspend32))]]
 int gai_suspend(struct gaicb const *const list[],
                 int ent, struct timespec const *timeout) {

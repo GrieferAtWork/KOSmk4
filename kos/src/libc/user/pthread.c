@@ -3381,13 +3381,13 @@ NOTHROW_RPC(LIBCCALL libc_pthread_cond_reltimedwait64_np)(pthread_cond_t *__rest
 /* pthread_barrier_t                                                    */
 /************************************************************************/
 
-/*[[[head:libc_pthread_barrier_init,hash:CRC-32=0xd28d79e3]]]*/
+/*[[[head:libc_pthread_barrier_init,hash:CRC-32=0x439eb7c9]]]*/
 /* >> pthread_barrier_init(3)
  * Initialize `barrier' with the attributes in `attr'.
  * The  barrier is opened when `count' waiters arrived
  * @return: EOK:    Success
  * @return: EINVAL: The given `count' is ZERO(0) */
-INTERN ATTR_SECTION(".text.crt.sched.pthread") NONNULL((1, 2)) errno_t
+INTERN ATTR_SECTION(".text.crt.sched.pthread") NONNULL((1)) errno_t
 NOTHROW_NCX(LIBCCALL libc_pthread_barrier_init)(pthread_barrier_t *__restrict barrier,
                                                 pthread_barrierattr_t const *__restrict attr,
                                                 unsigned int count)
