@@ -144,7 +144,7 @@ NOTHROW_NCX(LIBCCALL libc_closedir)(DIR *dirp)
 	free(dirp);
 	return 0;
 err_null:
-	return (int)libc_seterrno(EINVAL);
+	return libc_seterrno(EINVAL);
 }
 /*[[[end:libc_closedir]]]*/
 
@@ -163,7 +163,7 @@ NOTHROW_NCX(LIBCCALL libc_fdclosedir)(DIR *dirp)
 	free(dirp);
 	return result;
 err_null:
-	return (fd_t)libc_seterrno(EINVAL);
+	return libc_seterrno(EINVAL);
 }
 /*[[[end:libc_fdclosedir]]]*/
 

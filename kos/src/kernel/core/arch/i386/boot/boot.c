@@ -728,10 +728,6 @@ NOTHROW(KCALL __i386_kernel_main)(struct icpustate *__restrict state) {
 	 *
 	 * The same also goes for `__USE_TIME_BITS64'! */
 
-	/* TODO: Add `libc_seterrno_neg(errno_t x)' that is just an alias for `libc_seterrno(-x)'
-	 *       That  way, we can  save on having to  negate the errno  everywhere else in libc,
-	 *       reducing code size overall! */
-
 	return state;
 }
 

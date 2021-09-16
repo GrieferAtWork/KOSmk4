@@ -66,10 +66,9 @@ INTERN_FUNCTION(libc_clone)
 
 	ret
 .Lthread_clone_error:
-	negl   %eax
 	movl   %eax, %ecx
-	INTERN(libc_seterrno)
-	call   libc_seterrno
+	INTERN(libc_seterrno_neg)
+	call   libc_seterrno_neg
 	ret
 	.cfi_endproc
 

@@ -66,10 +66,9 @@ INTERN_FUNCTION(libc_vfork)
 	 * Note that we only get here when the vfork() _itself_ fails.
 	 * We  _dont_ get here if something within the child after the
 	 * vfork() fails. */
-	negP   %Pax
 	movP   %Pax, %R_fcall0P
-	EXTERN(libc_seterrno)
-	call   libc_seterrno /* Returns -1 unconditionally in %Pax */
+	EXTERN(libc_seterrno_neg)
+	call   libc_seterrno_neg /* Returns -1 unconditionally in %Pax */
 	ret
 
 	.cfi_endproc

@@ -88,7 +88,7 @@ NOTHROW(LIBCCALL libc_rtm_end)(void)
 	errno_t error;
 	/* sys_rtm_end() doesn't return on success. */
 	error = sys_rtm_end();
-	return libc_seterrno(-error);
+	return libc_seterrno_neg(error);
 #else /* OS_HAVE_RTM */
 	return libc_seterrno(ENOSYS);
 #endif /* !OS_HAVE_RTM */

@@ -180,10 +180,8 @@ NOTHROW_NCX(LIBCCALL libc_getpriority)(__priority_which_t which,
 {
 	syscall_slong_t result;
 	result = sys_getpriority((syscall_ulong_t)which, who);
-	if unlikely(E_ISERR(result)) {
-		libc_seterrno(-result);
-		return -1;
-	}
+	if unlikely(E_ISERR(result))
+		return libc_seterrno_neg(result);
 	return (int)(20 - result);
 }
 /*[[[end:libc_getpriority]]]*/

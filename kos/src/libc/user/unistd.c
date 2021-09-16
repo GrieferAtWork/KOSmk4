@@ -99,7 +99,7 @@ NOTHROW_RPC(LIBCCALL libc_execve)(char const *__restrict path,
 	result = sys_execve(path,
 	                    (char *const *)___argv,
 	                    (char *const *)___envp);
-	return (int)libc_seterrno(-result);
+	return libc_seterrno_neg(result);
 }
 /*[[[end:libc_execve]]]*/
 
@@ -375,9 +375,8 @@ INTERN ATTR_SECTION(".text.crt.system.utility") int
 NOTHROW_RPC(LIBCCALL libc_pause)(void)
 /*[[[body:libc_pause]]]*/
 {
-	errno_t result;
-	result = sys_pause();
-	return (int)libc_seterrno(-result);
+	errno_t result = sys_pause();
+	return libc_seterrno_neg(result);
 }
 /*[[[end:libc_pause]]]*/
 
@@ -755,7 +754,7 @@ NOTHROW_RPC(LIBCCALL libc_getcwd)(char *buf,
 err_buffer_result_errno:
 			free(buffer);
 		}
-		libc_seterrno(-result);
+		libc_seterrno_neg(result);
 		return NULL;
 	}
 done:
@@ -1380,7 +1379,7 @@ NOTHROW_RPC(LIBCCALL libc_fexecve)(fd_t fd,
 	                     (char const *const *)___argv,
 	                     (char const *const *)___envp,
 	                     AT_EMPTY_PATH);
-	return (int)libc_seterrno(-error);
+	return libc_seterrno_neg(error);
 }
 /*[[[end:libc_fexecve]]]*/
 
@@ -3532,7 +3531,7 @@ NOTHROW_NCX(LIBCCALL libc_nice)(int inc)
 #endif /* !__sys_Xnice_defined */
 	return 20 - error;
 err:
-	return libc_seterrno(-error);
+	return libc_seterrno_neg(error);
 }
 /*[[[end:libc_nice]]]*/
 
@@ -3544,8 +3543,7 @@ INTERN ATTR_SECTION(".text.crt.io.sync") int
 NOTHROW_RPC(LIBCCALL libc_fsync)(fd_t fd)
 /*[[[body:libc_fsync]]]*/
 {
-	errno_t error;
-	error = sys_fsync(fd);
+	errno_t error = sys_fsync(fd);
 	return libc_seterrno_syserr(error);
 }
 /*[[[end:libc_fsync]]]*/

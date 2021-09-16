@@ -800,7 +800,7 @@ again:
 		if (E_ISERR(error)) {
 			if (error == -ETIMEDOUT)
 				error = -EAGAIN;
-			return libc_seterrno(-error);
+			return libc_seterrno_neg(error);
 		}
 		goto again;
 	}	break;
@@ -883,7 +883,7 @@ again:
 		goto again;
 	if (error == -ETIMEDOUT)
 		error = -EAGAIN;
-	return libc_seterrno(-error);
+	return libc_seterrno_neg(error);
 }
 
 
@@ -1247,7 +1247,7 @@ NOTHROW_NCX(LIBCCALL libc_aio_cancel)(fd_t fd,
 		errno_t error;
 		error = sys_fcntl(fd, F_GETFD, NULL);
 		if (E_ISERR(error))
-			return libc_seterrno(-error);
+			return libc_seterrno_neg(error);
 		return AIO_ALLDONE;
 	}
 

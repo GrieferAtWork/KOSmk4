@@ -65,7 +65,7 @@ NOTHROW_RPC(LIBCCALL libc__chdrive)(int drive)
 {
 	drive = toupper((unsigned char)drive);
 	if unlikely(drive < AT_DOS_DRIVEMIN || drive > AT_DOS_DRIVEMAX)
-		return (int)libc_seterrno(EINVAL);
+		return libc_seterrno(EINVAL);
 	return fchdir(AT_FDDRIVE_ROOT(drive));
 }
 /*[[[end:libc__chdrive]]]*/
@@ -101,7 +101,7 @@ NOTHROW_RPC(LIBCCALL libc__getdrives)(void)
 	syscall_slong_t result;
 	result = sys_getdrives();
 	if (E_ISERR(result)) {
-		libc_seterrno(-result);
+		libc_seterrno_neg(result);
 		result = 0;
 	}
 	return (__ULONG32_TYPE__)(syscall_ulong_t)result;

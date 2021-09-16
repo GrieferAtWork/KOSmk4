@@ -42,7 +42,7 @@ NOTHROW_NCX(VLIBCCALL libc_ksysctl)(syscall_ulong_t cmd, ... /*, void *arg*/) {
 	result = sys_ksysctl(cmd, va_arg(args, void *));
 	va_end(args);
 	if (E_ISERR(result))
-		result = libc_seterrno((errno_t)-result);
+		result = libc_seterrno_neg((errno_t)result);
 	return result;
 }
 

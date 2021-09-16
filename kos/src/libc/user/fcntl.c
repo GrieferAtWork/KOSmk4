@@ -104,7 +104,7 @@ NOTHROW_RPC(VLIBDCALL libd_open)(char const *filename,
 	                  va_arg(args, mode_t));
 	va_end(args);
 	if unlikely(E_ISERR(result))
-		return libc_seterrno(-result);
+		return libc_seterrno_neg(result);
 	if (!(oflags & DOS_O_OBTAIN_DIR)) {
 		/* Make sure that the opened file isn't a directory. */
 		struct stat st;
@@ -229,7 +229,7 @@ NOTHROW_RPC(VLIBDCALL libd_openat)(fd_t dirfd,
 	                    va_arg(args, mode_t));
 	va_end(args);
 	if unlikely(E_ISERR(result))
-		return libc_seterrno(-result);
+		return libc_seterrno_neg(result);
 	if (!(oflags & DOS_O_OBTAIN_DIR)) {
 		/* Make sure that the opened file isn't a directory. */
 		struct stat st;

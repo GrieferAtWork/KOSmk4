@@ -207,8 +207,8 @@
 #define __libc_seterrno         libc_seterrno
 #define ____errno_location_defined 1
 #define __errno_location()         libc_errno_p()
-#define libc_seterrno_syserr(e)       (likely(!E_ISERR(e)) ? (e) : libc_seterrno((errno_t)-(syscall_slong_t)(syscall_ulong_t)(e)))
-#define libc_seterrno_syserr2(e, ERR) (likely(!E_ISERR(e)) ? (e) : (libc_seterrno((errno_t)-(syscall_slong_t)(syscall_ulong_t)(e)), (ERR)))
+#define libc_seterrno_syserr(e)       (likely(!E_ISERR(e)) ? (e) : libc_seterrno_neg((errno_t)(syscall_slong_t)(syscall_ulong_t)(e)))
+#define libc_seterrno_syserr2(e, ERR) (likely(!E_ISERR(e)) ? (e) : (libc_seterrno_neg((errno_t)(syscall_slong_t)(syscall_ulong_t)(e)), (ERR)))
 #endif /* !__KERNEL__ */
 
 
@@ -231,6 +231,8 @@ INTDEF NOBLOCK ATTR_PURE errno_t NOTHROW(LIBCCALL libc_geterrno)(void);
 INTDEF NOBLOCK ATTR_PURE errno_t NOTHROW(LIBCCALL libc_geterrno_safe)(void);
 /* Always returns (syscall_slong_t)-1 */
 INTDEF NOBLOCK syscall_slong_t NOTHROW(__FCALL libc_seterrno)(errno_t value);
+/* Same as `libc_seterrno(-value)' */
+INTDEF NOBLOCK syscall_slong_t NOTHROW(__FCALL libc_seterrno_neg)(errno_t value);
 
 #if 1
 #define CONFIG_LOG_LIBC_UNIMPLEMENTED 1

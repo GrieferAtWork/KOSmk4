@@ -160,7 +160,7 @@ NOTHROW_NCX(LIBCCALL libc_sysv_signal)(signo_t signo,
 	result = sys_rt_sigaction(signo, &act, &oact, sizeof(sigset_t));
 #endif /* !__NR_sigaction */
 	if unlikely(E_ISERR(result)) {
-		libc_seterrno(-result);
+		libc_seterrno_neg(result);
 		oact.sa_handler = SIG_ERR;
 	}
 	return oact.sa_handler;

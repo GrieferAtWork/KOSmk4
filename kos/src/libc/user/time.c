@@ -154,10 +154,8 @@ NOTHROW_NCX(LIBCCALL libc_time)(time_t *timer)
 	struct timeval tv;
 	errno_t error;
 	error = sys_gettimeofday(&tv, NULL);
-	if (E_ISERR(error)) {
-		libc_seterrno(-error);
-		return -1;
-	}
+	if (E_ISERR(error))
+		return libc_seterrno_neg(error);
 	if (timer)
 		*timer = tv.tv_sec;
 	return tv.tv_sec;
@@ -183,10 +181,8 @@ NOTHROW_NCX(LIBCCALL libc_time64)(time64_t *timer)
 	struct timeval64 tv;
 	errno_t error;
 	error = sys_gettimeofday64(&tv, NULL);
-	if (E_ISERR(error)) {
-		libc_seterrno(-error);
-		return -1;
-	}
+	if (E_ISERR(error))
+		return libc_seterrno_neg(error);
 	if (timer)
 		*timer = tv.tv_sec;
 	return tv.tv_sec;

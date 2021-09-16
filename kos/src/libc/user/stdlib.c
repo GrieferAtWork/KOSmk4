@@ -1295,7 +1295,7 @@ NOTHROW_RPC(LIBCCALL libc_frealpath4)(fd_t fd,
 err_buffer_result_errno:
 			free(buffer);
 		}
-		libc_seterrno(-result);
+		libc_seterrno_neg(result);
 		return NULL;
 	}
 	if unlikely((size_t)result > buflen) {
@@ -1382,7 +1382,7 @@ NOTHROW_RPC(LIBCCALL libc_frealpathat)(fd_t dirfd,
 err_buffer_result_errno:
 			free(buffer);
 		}
-		libc_seterrno(-result);
+		libc_seterrno_neg(result);
 		return NULL;
 	}
 	if unlikely((size_t)result > buflen) {

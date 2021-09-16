@@ -44,8 +44,8 @@ INTERN_FUNCTION(libc_syscall)
 	ja     1f
 	ret
 1:	movq   %rax, %rdi
-	INTERN(libc_seterrno)
-	call   libc_seterrno /* errno = -return */
+	INTERN(libc_seterrno_neg)
+	call   libc_seterrno_neg /* errno = -return */
 //	movq   %rax, %rdx /* Extend to 128 bits. (No such system call exists, so no need) */
 	ret
 	.cfi_endproc

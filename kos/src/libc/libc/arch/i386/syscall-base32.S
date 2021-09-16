@@ -410,10 +410,9 @@ INTERN_FUNCTION(libc_syscall)
 	popl_cfi_r %ebx
 	ret
 	.cfi_restore_state
-1:	negl   %eax
-	movl   %eax, %ecx
-	INTERN(libc_seterrno)
-	call   libc_seterrno /* errno = -return */
+1:	movl   %eax, %ecx
+	INTERN(libc_seterrno_neg)
+	call   libc_seterrno_neg /* errno = -return */
 	movl   %eax, %edx /* Extend to 64 bits. */
 	popl_cfi_r %ebp
 	popl_cfi_r %edi

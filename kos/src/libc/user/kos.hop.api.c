@@ -42,9 +42,7 @@ NOTHROW_NCX(VLIBCCALL libc_hop)(fd_t fd,
 	va_start(args, cmd);
 	result = sys_hop(fd, cmd, va_arg(args, void *));
 	va_end(args);
-	if (E_ISERR(result))
-		result = libc_seterrno((errno_t)-result);
-	return result;
+	return libc_seterrno_syserr(result);
 }
 /*[[[end:libc_hop]]]*/
 
@@ -63,9 +61,7 @@ NOTHROW_NCX(VLIBCCALL libc_hopf)(fd_t fd,
 	va_start(args, mode);
 	result = sys_hopf(fd, cmd, mode, va_arg(args, void *));
 	va_end(args);
-	if (E_ISERR(result))
-		result = libc_seterrno((errno_t)-result);
-	return result;
+	return libc_seterrno_syserr(result);
 }
 /*[[[end:libc_hopf]]]*/
 

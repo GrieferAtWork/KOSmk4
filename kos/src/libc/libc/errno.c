@@ -92,6 +92,11 @@ NOBLOCK syscall_slong_t NOTHROW(__FCALL libc_seterrno)(errno_t value) {
 	return -1;
 }
 
+INTERN ATTR_SECTION(".text.crt.errno_access")
+NOBLOCK syscall_slong_t NOTHROW(__FCALL libc_seterrno_neg)(errno_t value) {
+	return libc_seterrno(-value);
+}
+
 
 /************************************************************************/
 /* DOS/NT                                                               */

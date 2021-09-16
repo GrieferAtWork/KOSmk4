@@ -768,9 +768,8 @@ NOTHROW_NCX(LIBCCALL libc_isfdtype)(fd_t fd,
 {
 	struct stat st;
 	errno_t error = sys_kfstat(fd, &st);
-	if unlikely(E_ISERR(error)) {
-		return libc_seterrno(-error);
-	}
+	if unlikely(E_ISERR(error))
+		return libc_seterrno_neg(error);
 	return (st.st_mode & S_IFMT) == (mode_t)fdtype;
 }
 /*[[[end:libc_isfdtype]]]*/
